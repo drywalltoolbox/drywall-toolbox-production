@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { 
   Menu, 
@@ -19,10 +19,29 @@ export default function Header() {
 
   const isActive = (path) => location.pathname === path;
 
+  const navigate = useNavigate();
+
+  const toggleCart = () => {
+    if (location.pathname === '/cart') {
+      // go back if possible, otherwise navigate to products
+      try {
+        if (window.history.length > 1) {
+          navigate(-1);
+          return;
+        }
+      } catch {
+        // ignore
+      }
+      navigate('/products');
+    } else {
+      navigate('/cart');
+    }
+  };
+
   return (
     <header className="sticky top-0 z-50 bg-white shadow-md">
       {/* Top Bar */}
-      <div className="bg-gradient-to-r from-primary-600 to-primary-700 text-white">
+      <div className="bg-linear-to-r from-primary-600 to-primary-700 text-white">
         <div className="container mx-auto px-4">
           <div className="flex flex-col sm:flex-row justify-between items-center py-2 text-sm">
             <div className="flex items-center gap-4">
@@ -45,19 +64,50 @@ export default function Header() {
       {/* Main Header */}
       <div className="border-b border-gray-200">
         <div className="container mx-auto px-4 relative">
-          <div className="flex items-center h-20 md:h-24">
-            {/* Left Navigation - Desktop */}
-            <nav className="hidden lg:flex items-center gap-8 flex-1">
-              <Link 
-                to="/" 
-                className={`font-semibold text-base transition-colors pb-1 ${
-                  isActive('/') 
-                    ? 'text-primary-600 border-b-2 border-primary-600' 
-                    : 'text-gray-700 hover:text-primary-600 border-b-2 border-transparent'
-                }`}
-              >
-                Home
-              </Link>
+          {/* Mobile Actions - visible only on small screens */}
+          <div className="flex lg:hidden items-center gap-2 md:gap-4 justify-end w-full mb-2">
+            <button
+              onClick={() => setSearchOpen(!searchOpen)}
+              className="p-2 text-gray-700 hover:text-primary-600 hover:bg-gray-100 rounded-lg transition-all"
+              aria-label="Search"
+            >
+              <Search className="h-5 w-5" />
+            </button>
+            <button
+              onClick={toggleCart}
+              className="relative p-2 text-gray-700 hover:text-primary-600 hover:bg-gray-100 rounded-lg transition-all"
+              aria-label="Shopping cart toggle"
+            >
+              <ShoppingCart className="h-5 w-5" />
+              {getCartCount() > 0 && (
+                <span className="absolute -top-1 -right-1 bg-accent-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
+                  {getCartCount()}
+                </span>
+              )}
+            </button>
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="p-2 text-gray-700 hover:text-primary-600 hover:bg-gray-100 rounded-lg transition-all"
+              aria-label="Toggle menu"
+            >
+              {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+            </button>
+          </div>
+
+          <div className="grid grid-cols-3 items-center h-16 md:h-20 lg:h-24 w-full">
+            {/* Left Navigation - Desktop (left column) */}
+            <div className="hidden lg:flex items-center gap-10 justify-end">
+              <nav className="flex items-center gap-10">
+                <Link
+                  to="/parts"
+                  className={`font-semibold text-base transition-colors pb-1 ${
+                    isActive('/parts')
+                      ? 'text-primary-600 border-b-2 border-primary-600'
+                      : 'text-gray-700 hover:text-primary-600 border-b-2 border-transparent'
+                  }`}
+                >
+                  Parts
+                </Link>
               <Link 
                 to="/products" 
                 className={`font-semibold text-base transition-colors pb-1 ${
@@ -68,19 +118,19 @@ export default function Header() {
               >
                 Shop
               </Link>
-            </nav>
+              </nav>
+            </div>
 
-            {/* spacer to preserve left/right nav spacing */}
-            <div className="flex-1" aria-hidden="true" />
-            {/* Centered logo (absolute). Image file should be at public/drywall-toolbox.png */}
-            <div className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 z-30 pointer-events-auto" aria-hidden="false">
-              <Link to="/" aria-label="Drywall Toolbox home">
-                <img src="/drywall-toolbox.png" alt="Drywall Toolbox" className="block h-12 md:h-16 lg:h-20 w-auto" />
+            {/* Center - simple inline logo (center column) */}
+            <div className="flex items-center justify-center">
+              <Link to="/" aria-label="Drywall Toolbox home" className="inline-flex items-center gap-2">
+                <span className="text-lg font-semibold text-primary-600">Drywall Toolbox</span>
               </Link>
             </div>
 
             {/* Right Navigation - Desktop */}
-            <nav className="hidden lg:flex items-center gap-8 flex-1 justify-end">
+            <div className="hidden lg:flex items-center gap-10 justify-start">
+              <nav className="flex items-center gap-10">
               <Link 
                 to="/about" 
                 className={`font-semibold text-base transition-colors pb-1 ${
@@ -101,65 +151,30 @@ export default function Header() {
               >
                 Contact
               </Link>
-            </nav>
+              </nav>
+              {/* desktop actions pushed to far right of the header column */}
+              <div className="ml-auto flex items-center gap-3">
+                <button
+                  onClick={() => setSearchOpen(!searchOpen)}
+                  className="p-2 text-gray-700 hover:text-primary-600 hover:bg-gray-100 rounded-lg transition-all"
+                  aria-label="Search"
+                >
+                  <Search className="h-5 w-5" />
+                </button>
 
-            {/* Actions - Mobile Only */}
-            <div className="lg:hidden flex items-center gap-2 md:gap-4 shrink-0">
-              {/* Search Button */}
-              <button
-                onClick={() => setSearchOpen(!searchOpen)}
-                className="p-2 text-gray-700 hover:text-primary-600 hover:bg-gray-100 rounded-lg transition-all"
-                aria-label="Search"
-              >
-                <Search className="h-5 w-5" />
-              </button>
-
-              {/* Cart */}
-              <Link
-                to="/cart"
-                className="relative p-2 text-gray-700 hover:text-primary-600 hover:bg-gray-100 rounded-lg transition-all"
-                aria-label="Shopping cart"
-              >
-                <ShoppingCart className="h-5 w-5" />
-                {getCartCount() > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-accent-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
-                    {getCartCount()}
-                  </span>
-                )}
-              </Link>
-
-              {/* Mobile Menu Button */}
-              <button
-                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="p-2 text-gray-700 hover:text-primary-600 hover:bg-gray-100 rounded-lg transition-all"
-                aria-label="Toggle menu"
-              >
-                {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-              </button>
-            </div>
-
-            {/* Desktop Actions - Search & Cart */}
-            <div className="hidden lg:flex items-center gap-3 ml-8">
-              <button
-                onClick={() => setSearchOpen(!searchOpen)}
-                className="p-2 text-gray-700 hover:text-primary-600 hover:bg-gray-100 rounded-lg transition-all"
-                aria-label="Search"
-              >
-                <Search className="h-5 w-5" />
-              </button>
-
-              <Link
-                to="/cart"
-                className="relative p-2 text-gray-700 hover:text-primary-600 hover:bg-gray-100 rounded-lg transition-all"
-                aria-label="Shopping cart"
-              >
-                <ShoppingCart className="h-5 w-5" />
-                {getCartCount() > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-accent-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
-                    {getCartCount()}
-                  </span>
-                )}
-              </Link>
+                <button
+                  onClick={toggleCart}
+                  className="relative p-2 text-gray-700 hover:text-primary-600 hover:bg-gray-100 rounded-lg transition-all"
+                  aria-label="Shopping cart toggle"
+                >
+                  <ShoppingCart className="h-5 w-5" />
+                  {getCartCount() > 0 && (
+                    <span className="absolute -top-1 -right-1 bg-accent-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
+                      {getCartCount()}
+                    </span>
+                  )}
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -187,15 +202,15 @@ export default function Header() {
         <div className="lg:hidden border-b border-gray-200 bg-white animate-slide-down">
           <nav className="container mx-auto px-4 py-4 flex flex-col gap-2">
             <Link 
-              to="/" 
+              to="/parts" 
               onClick={() => setMobileMenuOpen(false)}
               className={`px-4 py-3 rounded-lg font-medium transition-colors ${
-                isActive('/') 
+                isActive('/parts') 
                   ? 'bg-primary-50 text-primary-600' 
                   : 'text-gray-700 hover:bg-gray-100'
               }`}
             >
-              Home
+              Parts
             </Link>
             <Link 
               to="/products" 

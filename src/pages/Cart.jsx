@@ -61,12 +61,16 @@ export default function Cart() {
                   }`}
                 >
                   {/* Product Image */}
-                  <div className="flex-shrink-0 w-full sm:w-32 h-32 bg-gray-100 rounded-lg flex items-center justify-center">
-                    <ShoppingCart className="h-12 w-12 text-gray-400" />
+                  <div className="shrink-0 w-full sm:w-32 h-32 bg-gray-100 rounded-lg flex items-center justify-center overflow-hidden">
+                    {item.image ? (
+                      <img src={item.image} alt={item.name} className="object-contain w-full h-full" />
+                    ) : (
+                      <ShoppingCart className="h-12 w-12 text-gray-400" />
+                    )}
                   </div>
 
                   {/* Product Info */}
-                  <div className="flex-grow">
+                  <div className="grow">
                     <div className="flex justify-between items-start mb-2">
                       <div>
                         <p className="text-xs text-gray-500 mb-1">{item.brand}</p>
@@ -165,7 +169,7 @@ export default function Cart() {
               {subtotal < 500 && (
                 <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-6">
                   <div className="flex items-start gap-3">
-                    <Truck className="h-5 w-5 text-amber-600 flex-shrink-0 mt-0.5" />
+                    <Truck className="h-5 w-5 text-amber-600 shrink-0 mt-0.5" />
                     <div className="text-sm">
                       <p className="text-amber-900 font-semibold mb-1">
                         Almost there!

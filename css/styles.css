@@ -187,26 +187,7 @@ a:hover {
   color: var(--primary-hover);
 }
 
-/* Header centered logo helpers */
-.header-logo-wrapper {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 30;
-  pointer-events: auto;
-}
-.header-logo {
-  display: block;
-  width: auto;
-  max-height: 56px; /* mobile - increased for better visibility */
-}
-@media (min-width: 768px) {
-  .header-logo { max-height: 80px; }
-}
-@media (min-width: 1024px) {
-  .header-logo { max-height: 96px; }
-}
+/* centered-logo helpers removed (logo moved to center column as inline SVG) */
 
 /* Navigation Menu */
 .nav-menu {
@@ -838,4 +819,19 @@ section {
 
 @keyframes spin {
   to { transform: rotate(360deg); }
+}
+
+/* Hide native scrollbars while keeping scrolling functional
+   Apply the `no-scrollbar` class to any scrollable container (modal, sidebars, etc.)
+   Cross-browser approach: -ms-overflow-style (IE/Edge), scrollbar-width (Firefox),
+   and ::-webkit-scrollbar (Chrome/Safari). Also enable smooth scrolling and
+   momentum on iOS devices. */
+.no-scrollbar {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+  -webkit-overflow-scrolling: touch; /* momentum scrolling on iOS */
+  scroll-behavior: smooth;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none; /* Safari and Chrome */
 }
