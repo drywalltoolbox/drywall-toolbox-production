@@ -1,22 +1,7 @@
 import { Link } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { loadProducts } from '../data/products';
-import { 
-  ArrowRight, 
-  Ruler, 
-  Sparkles, 
-  Square, 
-  Hammer, 
-  Shield, 
-  CircleSlash, 
-  Settings, 
-  Droplets,
-  CheckCircle2,
-  Truck,
-  Award,
-  Clock,
-  Star
-} from 'lucide-react';
+import { ArrowRight, CheckCircle2, Truck, Award, Clock, Star } from 'lucide-react';
 
 export default function Home() {
   const categories = [
@@ -24,56 +9,48 @@ export default function Home() {
       id: 'taping',
       name: 'Automatic Taping',
       description: 'Professional automatic taping tools and accessories',
-      icon: Ruler,
       color: 'from-blue-500 to-blue-600'
     },
     {
       id: 'finishing',
       name: 'Finishing Tools',
       description: 'Smoothing and finishing tools for perfect results',
-      icon: Sparkles,
       color: 'from-purple-500 to-purple-600'
     },
     {
       id: 'corner',
       name: 'Corner Tools',
       description: 'Professional corner bead and angle tools',
-      icon: Square,
       color: 'from-green-500 to-green-600'
     },
     {
       id: 'mudboxes',
       name: 'Mud Boxes & Pumps',
       description: 'High-capacity mixing and pumping equipment',
-      icon: Droplets,
       color: 'from-cyan-500 to-cyan-600'
     },
     {
       id: 'sanding',
       name: 'Sanding Tools',
       description: 'Power sanders and hand sanding solutions',
-      icon: CircleSlash,
       color: 'from-orange-500 to-orange-600'
     },
     {
       id: 'safety',
       name: 'Safety Equipment',
       description: 'Protective gear and safety accessories',
-      icon: Shield,
       color: 'from-red-500 to-red-600'
     },
     {
       id: 'accessories',
       name: 'Accessories & Parts',
       description: 'Replacement parts and tool accessories',
-      icon: Settings,
       color: 'from-gray-500 to-gray-600'
     },
     {
       id: 'specialty',
       name: 'Specialty Tools',
       description: 'Specialized equipment for unique applications',
-      icon: Hammer,
       color: 'from-indigo-500 to-indigo-600'
     }
   ];
@@ -123,7 +100,6 @@ export default function Home() {
     <div className="flex flex-col min-h-screen">
       {/* Hero Section */}
       <section className="relative bg-linear-to-br from-primary-600 via-primary-700 to-primary-800 text-white overflow-hidden">
-        <div className="absolute inset-0 bg-grid-pattern opacity-10"></div>
         <div className="container mx-auto px-4 py-16 md:py-24 lg:py-32 relative">
           <div className="max-w-4xl mx-auto text-center">
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 animate-fade-in">
@@ -132,21 +108,7 @@ export default function Home() {
             <p className="text-lg md:text-xl mb-8 text-primary-100 animate-slide-up">
               Premium quality tools from industry-leading brands. Everything you need to get the job done right.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center animate-slide-up">
-              <Link
-                to="/products"
-                className="inline-flex items-center justify-center gap-2 bg-accent-500 hover:bg-accent-600 text-white px-8 py-4 rounded-lg font-semibold text-lg transition-all shadow-lg hover:shadow-xl hover:scale-105"
-              >
-                Shop Now
-                <ArrowRight size={20} />
-              </Link>
-              <Link
-                to="/about"
-                className="inline-flex items-center justify-center gap-2 bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white px-8 py-4 rounded-lg font-semibold text-lg transition-all border-2 border-white/30"
-              >
-                Learn More
-              </Link>
-            </div>
+            {/* CTAs removed to simplify hero */}
           </div>
         </div>
         <div className="absolute bottom-0 left-0 right-0 h-16 bg-linear-to-t from-white to-transparent"></div>
@@ -174,9 +136,7 @@ export default function Home() {
                   className="group relative bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-200 hover:border-primary-300 hover:-translate-y-1"
                 >
                   <div className="p-6">
-                    <div className={`inline-flex items-center justify-center w-14 h-14 rounded-lg bg-linear-to-br ${category.color} text-white mb-4 group-hover:scale-110 transition-transform`}>
-                      <IconComponent size={28} />
-                    </div>
+                            {/* icon removed intentionally to simplify category cards */}
                     <h3 className="text-lg font-bold text-gray-900 mb-2 group-hover:text-primary-600 transition-colors">
                       {category.name}
                     </h3>

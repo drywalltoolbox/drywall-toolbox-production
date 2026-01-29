@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import DOMPurify from 'dompurify';
+import { useCart } from '../context/CartContext';
 import { ShoppingCart, Heart, Plus, Minus, Star, Package, Truck, Shield, ChevronRight } from 'lucide-react';
 
 function cleanDescription(s) {
@@ -39,6 +40,7 @@ function renderSpecObject(obj) {
 }
 
 export default function ProductDetail({ product, onAddToCart }) {
+  const { addToCart } = useCart();
   const [quantity, setQuantity] = useState(1);
   const [isWishlisted, setIsWishlisted] = useState(false);
 
@@ -47,21 +49,23 @@ export default function ProductDetail({ product, onAddToCart }) {
   const handleAddToCart = () => {
     if (onAddToCart) {
       onAddToCart(product, quantity);
+    } else {
+      // fallback to cart context
+      addToCart(product, quantity);
     }
   };
 
   const incrementQuantity = () => setQuantity(prev => prev + 1);
   const decrementQuantity = () => setQuantity(prev => Math.max(1, prev - 1));
-
   const price = product.price || 0;
   const displayPrice = typeof price === 'number' ? price.toFixed(2) : parseFloat(price || 0).toFixed(2);
 
   return (
-    <div className="bg-gradient-to-br from-white via-white to-gray-50 rounded-2xl shadow-2xl overflow-hidden animate-fadeIn">
+    <div className="bg-linear-to-br from-white via-white to-gray-50 rounded-2xl shadow-2xl overflow-hidden animate-fadeIn">
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 p-6 lg:p-8">
         {/* Product Image Section */}
         <div className="lg:col-span-2">
-          <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl overflow-hidden aspect-square flex items-center justify-center p-8 border-2 border-gray-200 shadow-inner">
+          <div className="bg-linear-to-br from-gray-50 to-gray-100 rounded-xl overflow-hidden aspect-square flex items-center justify-center p-8 border-2 border-gray-200 shadow-inner">
             {product.image ? (
               <img 
                 src={product.image} 
@@ -123,7 +127,7 @@ export default function ProductDetail({ product, onAddToCart }) {
           )}
 
           {/* Price Section */}
-          <div className="bg-gradient-to-r from-primary-50 to-accent-50 rounded-xl p-6 mb-6 border border-primary-100">
+          <div className="bg-linear-to-r from-primary-50 to-accent-50 rounded-xl p-6 mb-6 border border-primary-100">
             <div className="flex items-baseline gap-3">
               <span className="text-5xl font-bold text-gray-900">${displayPrice}</span>
               <span className="text-gray-500 line-through text-xl">${(parseFloat(displayPrice) * 1.2).toFixed(2)}</span>
@@ -142,7 +146,7 @@ export default function ProductDetail({ product, onAddToCart }) {
               >
                 <Minus size={20} />
               </button>
-              <span className="px-6 py-3 font-bold text-lg text-gray-900 border-x-2 border-gray-200 min-w-[60px] text-center" aria-label="Current quantity">
+              <span className="px-6 py-3 font-bold text-lg text-gray-900 border-x-2 border-gray-200 min-w-15 text-center" aria-label="Current quantity">
                 {quantity}
               </span>
               <button
@@ -156,7 +160,8 @@ export default function ProductDetail({ product, onAddToCart }) {
 
             <button
               onClick={handleAddToCart}
-              className="flex-1 flex items-center justify-center gap-3 px-8 py-4 bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white rounded-xl font-bold text-lg shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
+              className="flex-1 flex items-center justify-center gap-3 px-8 py-4 bg-linear-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white rounded-xl font-bold text-lg shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
+              aria-label="Add to cart"
             >
               <ShoppingCart size={24} />
               Add to Cart

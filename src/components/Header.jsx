@@ -22,7 +22,7 @@ export default function Header() {
   return (
     <header className="sticky top-0 z-50 bg-white shadow-md">
       {/* Top Bar */}
-      <div className="bg-gradient-to-r from-primary-600 to-primary-700 text-white">
+      <div className="bg-linear-to-r from-primary-600 to-primary-700 text-white">
         <div className="container mx-auto px-4">
           <div className="flex flex-col sm:flex-row justify-between items-center py-2 text-sm">
             <div className="flex items-center gap-4">
@@ -70,22 +70,8 @@ export default function Header() {
               </Link>
             </nav>
 
-            {/* Centered Logo */}
-            <Link to="/" className="flex flex-col items-center group flex-1 justify-center">
-              <div className="flex items-center gap-3">
-                <div className="bg-gradient-to-br from-primary-600 to-primary-700 p-2.5 rounded-xl shadow-lg group-hover:shadow-xl transition-all group-hover:scale-105">
-                  <Wrench className="h-7 w-7 md:h-8 md:w-8 text-white transform -rotate-45" />
-                </div>
-                <div>
-                  <h1 className="text-2xl md:text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-primary-600 via-primary-700 to-primary-800 tracking-tight">
-                    Drywall Toolbox
-                  </h1>
-                  <p className="hidden md:block text-xs font-medium text-gray-500 tracking-wider uppercase mt-0.5">
-                    Professional Tools & Equipment
-                  </p>
-                </div>
-              </div>
-            </Link>
+            {/* Centered logo removed as requested. Keep spacer to preserve layout */}
+            <div className="flex-1" aria-hidden="true" />
 
             {/* Right Navigation - Desktop */}
             <nav className="hidden lg:flex items-center gap-8 flex-1 justify-end">
@@ -112,7 +98,7 @@ export default function Header() {
             </nav>
 
             {/* Actions - Mobile Only */}
-            <div className="lg:hidden flex items-center gap-2 md:gap-4 flex-shrink-0">
+            <div className="lg:hidden flex items-center gap-2 md:gap-4 shrink-0">
               {/* Search Button */}
               <button
                 onClick={() => setSearchOpen(!searchOpen)}
