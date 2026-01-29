@@ -1,5 +1,8 @@
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import ProductDetail from '../components/ProductDetail';
+import { X } from 'lucide-react';
+import { loadProducts } from '../data/products';
 import { 
   ShoppingCart, 
   Filter, 
@@ -9,136 +12,8 @@ import {
   ChevronDown
 } from 'lucide-react';
 
-const products = [
-  {
-    id: 1,
-    name: 'TapeTech 7" Flat Box',
-    brand: 'TapeTech',
-    category: 'finishing',
-    price: 289.99,
-    rating: 4.8,
-    reviews: 124,
-    badge: 'Best Seller',
-    image: '/product-placeholder.jpg'
-  },
-  {
-    id: 2,
-    name: 'Level5 10" Flat Box',
-    brand: 'Level5',
-    category: 'finishing',
-    price: 319.99,
-    rating: 4.9,
-    reviews: 98,
-    badge: 'Popular',
-    image: '/product-placeholder.jpg'
-  },
-  {
-    id: 3,
-    name: 'Columbia Automatic Taper',
-    brand: 'Columbia',
-    category: 'taping',
-    price: 549.99,
-    rating: 4.7,
-    reviews: 76,
-    badge: 'New',
-    image: '/product-placeholder.jpg'
-  },
-  {
-    id: 4,
-    name: 'Delko Banjo Taper',
-    brand: 'Delko',
-    category: 'taping',
-    price: 189.99,
-    rating: 4.6,
-    reviews: 145,
-    image: '/product-placeholder.jpg'
-  },
-  {
-    id: 5,
-    name: 'Kraft Corner Bead Roller',
-    brand: 'Kraft',
-    category: 'corner',
-    price: 79.99,
-    rating: 4.5,
-    reviews: 89,
-    image: '/product-placeholder.jpg'
-  },
-  {
-    id: 6,
-    name: 'Can-Am Angle Box',
-    brand: 'Can-Am',
-    category: 'corner',
-    price: 199.99,
-    rating: 4.8,
-    reviews: 67,
-    badge: 'Sale',
-    image: '/product-placeholder.jpg'
-  },
-  {
-    id: 7,
-    name: 'TapeTech Power Sander',
-    brand: 'TapeTech',
-    category: 'sanding',
-    price: 899.99,
-    rating: 4.9,
-    reviews: 234,
-    badge: 'Best Seller',
-    image: '/product-placeholder.jpg'
-  },
-  {
-    id: 8,
-    name: 'Drywall Master Mud Box',
-    brand: 'Drywall Master',
-    category: 'mudboxes',
-    price: 1299.99,
-    rating: 4.7,
-    reviews: 54,
-    image: '/product-placeholder.jpg'
-  },
-  {
-    id: 9,
-    name: 'Level5 4" Corner Finisher',
-    brand: 'Level5',
-    category: 'corner',
-    price: 159.99,
-    rating: 4.6,
-    reviews: 112,
-    image: '/product-placeholder.jpg'
-  },
-  {
-    id: 10,
-    name: 'Columbia Mud Pump',
-    brand: 'Columbia',
-    category: 'mudboxes',
-    price: 2199.99,
-    rating: 4.8,
-    reviews: 43,
-    badge: 'Popular',
-    image: '/product-placeholder.jpg'
-  },
-  {
-    id: 11,
-    name: 'Goldblatt Taping Knife Set',
-    brand: 'Goldblatt',
-    category: 'finishing',
-    price: 149.99,
-    rating: 4.5,
-    reviews: 189,
-    image: '/product-placeholder.jpg'
-  },
-  {
-    id: 12,
-    name: 'Marshalltown Hand Sander',
-    brand: 'Marshalltown',
-    category: 'sanding',
-    price: 39.99,
-    rating: 4.4,
-    reviews: 267,
-    image: '/product-placeholder.jpg'
-  }
-];
-
-const brands = ['TapeTech', 'Level5', 'Columbia', 'Delko', 'Can-Am', 'Kraft', 'Drywall Master', 'Goldblatt', 'Marshalltown'];
+// products will be loaded from CSV at runtime
+// brands list will be derived from loaded products
 const categories = [
   { id: 'taping', name: 'Automatic Taping' },
   { id: 'finishing', name: 'Finishing Tools' },
@@ -148,11 +23,41 @@ const categories = [
 ];
 
 export default function Products() {
-  const [selectedBrands, setSelectedBrands] = useState([]);
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  // initialize selected brands from ?brand= param (supports comma-separated)
+  const params = new URLSearchParams(location.search);
+  const brandParam = params.get('brand');
+  const initialSelectedBrands = brandParam ? brandParam.split(',').map(b => b.trim()).filter(Boolean) : [];
+
+  const [selectedBrands, setSelectedBrands] = useState(initialSelectedBrands);
+  const [products, setProducts] = useState([]);
+  const [brands, setBrands] = useState([]);
   const [selectedCategories, setSelectedCategories] = useState([]);
   const [priceRange, setPriceRange] = useState([0, 3000]);
   const [sortBy, setSortBy] = useState('popular');
   const [showFilters, setShowFilters] = useState(false);
+  const [modalProduct, setModalProduct] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const openModal = (product) => {
+    setModalProduct(product);
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setModalProduct(null);
+  };
+
+  // close on escape
+  useEffect(() => {
+    const onKey = (e) => { if (e.key === 'Escape') closeModal(); };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, []);
+  
 
   const toggleBrand = (brand) => {
     setSelectedBrands(prev =>
@@ -160,16 +65,29 @@ export default function Products() {
     );
   };
 
+  // load products once
+  useEffect(() => {
+    let mounted = true;
+    loadProducts().then(list => {
+      if (!mounted) return;
+      setProducts(list);
+      const unique = Array.from(new Set(list.map(p => p.brand).filter(Boolean))).sort();
+      setBrands(unique);
+    }).catch(() => {});
+    return () => { mounted = false; };
+  }, []);
+
   const toggleCategory = (category) => {
     setSelectedCategories(prev =>
       prev.includes(category) ? prev.filter(c => c !== category) : [...prev, category]
     );
   };
 
-  const filteredProducts = products.filter(product => {
+  const filteredProducts = (products || []).filter(product => {
     if (selectedBrands.length > 0 && !selectedBrands.includes(product.brand)) return false;
     if (selectedCategories.length > 0 && !selectedCategories.includes(product.category)) return false;
-    if (product.price < priceRange[0] || product.price > priceRange[1]) return false;
+    // price may not exist in CSV; ignore if missing
+    if (product.price && (product.price < priceRange[0] || product.price > priceRange[1])) return false;
     return true;
   });
 
@@ -195,9 +113,26 @@ export default function Products() {
           <p className="text-gray-600">Browse our extensive collection of professional drywall tools</p>
         </div>
 
-        <div className="flex flex-col lg:flex-row gap-8">
-          {/* Sidebar Filters */}
-          <aside className="lg:w-64 flex-shrink-0">
+        {selectedBrands.length === 0 ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            {brands.map(brand => (
+              <button
+                key={brand}
+                onClick={() => {
+                  navigate(`/products?brand=${encodeURIComponent(brand)}`);
+                  setSelectedBrands([brand]);
+                }}
+                className="bg-white rounded-lg p-6 shadow-sm border border-gray-200 text-left hover:shadow-md transition"
+              >
+                <div className="text-lg font-semibold text-gray-900 mb-1">{brand}</div>
+                <div className="text-sm text-gray-500">View products</div>
+              </button>
+            ))}
+          </div>
+        ) : (
+          <div className="flex flex-col lg:flex-row gap-8">
+            {/* Sidebar Filters */}
+            <aside className="lg:w-64 shrink-0">
             <div className="lg:sticky lg:top-24">
               {/* Mobile Filter Toggle */}
               <button
@@ -218,6 +153,7 @@ export default function Products() {
               <div className={`bg-white rounded-lg shadow-md p-6 space-y-6 ${showFilters ? 'block' : 'hidden lg:block'}`}>
                 {/* Categories */}
                 <div>
+                
                   <h3 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
                     <SlidersHorizontal size={18} />
                     Categories
@@ -320,9 +256,13 @@ export default function Products() {
                 >
                   {/* Product Image */}
                   <div className="relative bg-gray-100 aspect-square overflow-hidden">
-                    <div className="absolute inset-0 flex items-center justify-center text-gray-400">
-                      <ShoppingCart size={48} />
-                    </div>
+                    <button onClick={() => openModal(product)} className="absolute inset-0 flex items-center justify-center">
+                      {product.image ? (
+                        <img src={product.image} alt={product.name} className="object-contain w-full h-full" />
+                      ) : (
+                        <div className="text-gray-400"><ShoppingCart size={48} /></div>
+                      )}
+                    </button>
                     {product.badge && (
                       <div className={`absolute top-3 left-3 px-3 py-1 rounded-full text-xs font-semibold text-white ${
                         product.badge === 'Best Seller' ? 'bg-accent-500' :
@@ -342,7 +282,7 @@ export default function Products() {
                   <div className="p-5">
                     <p className="text-xs text-gray-500 mb-1">{product.brand}</p>
                     <h3 className="text-lg font-semibold text-gray-900 mb-2 line-clamp-2 group-hover:text-primary-600 transition-colors">
-                      {product.name}
+                      <button onClick={() => openModal(product)} className="block text-left w-full">{product.name}</button>
                     </h3>
                     
                     {/* Rating */}
@@ -363,6 +303,22 @@ export default function Products() {
                         <ShoppingCart size={20} />
                       </button>
                     </div>
+                    {/* Product Detail Modal - moved out of sidebar so it overlays correctly */}
+                    {isModalOpen && modalProduct && (
+                      <div className="fixed inset-0 z-50 flex items-center justify-center">
+                        <div className="fixed inset-0 bg-black/50" onClick={closeModal} />
+                        <div className="relative z-10 max-w-5xl w-full mx-4">
+                          <div className="flex justify-end mb-3">
+                            <button onClick={closeModal} className="p-2 bg-white rounded-full shadow">
+                              <X size={20} />
+                            </button>
+                          </div>
+                          <div onClick={(e) => e.stopPropagation()}>
+                            <ProductDetail product={modalProduct} />
+                          </div>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
               ))}
@@ -387,7 +343,8 @@ export default function Products() {
               </div>
             )}
           </div>
-        </div>
+          </div>
+        )}
       </div>
     </div>
   );

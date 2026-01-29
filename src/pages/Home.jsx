@@ -1,4 +1,6 @@
 import { Link } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { loadProducts } from '../data/products';
 import { 
   ArrowRight, 
   Ruler, 
@@ -99,16 +101,28 @@ export default function Home() {
     }
   ];
 
-  const brands = [
+  const fallbackBrands = [
     'TapeTech', 'Level5', 'Columbia', 'Drywall Master',
     'Can-Am', 'Delko', 'Kraft', 'Advance', 'Northstar', 
     'Goldblatt', 'Marshalltown', 'Warner'
   ];
 
+  const [brands, setBrands] = useState(fallbackBrands);
+
+  useEffect(() => {
+    let mounted = true;
+    loadProducts().then(list => {
+      if (!mounted) return;
+      const unique = Array.from(new Set(list.map(p => p.brand).filter(Boolean))).sort();
+      if (unique.length > 0) setBrands(unique);
+    }).catch(() => {});
+    return () => { mounted = false; };
+  }, []);
+
   return (
     <div className="flex flex-col min-h-screen">
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-primary-600 via-primary-700 to-primary-800 text-white overflow-hidden">
+      <section className="relative bg-linear-to-br from-primary-600 via-primary-700 to-primary-800 text-white overflow-hidden">
         <div className="absolute inset-0 bg-grid-pattern opacity-10"></div>
         <div className="container mx-auto px-4 py-16 md:py-24 lg:py-32 relative">
           <div className="max-w-4xl mx-auto text-center">
@@ -135,7 +149,7 @@ export default function Home() {
             </div>
           </div>
         </div>
-        <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-white to-transparent"></div>
+        <div className="absolute bottom-0 left-0 right-0 h-16 bg-linear-to-t from-white to-transparent"></div>
       </section>
 
       {/* Categories Section */}
@@ -160,7 +174,7 @@ export default function Home() {
                   className="group relative bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-200 hover:border-primary-300 hover:-translate-y-1"
                 >
                   <div className="p-6">
-                    <div className={`inline-flex items-center justify-center w-14 h-14 rounded-lg bg-gradient-to-br ${category.color} text-white mb-4 group-hover:scale-110 transition-transform`}>
+                    <div className={`inline-flex items-center justify-center w-14 h-14 rounded-lg bg-linear-to-br ${category.color} text-white mb-4 group-hover:scale-110 transition-transform`}>
                       <IconComponent size={28} />
                     </div>
                     <h3 className="text-lg font-bold text-gray-900 mb-2 group-hover:text-primary-600 transition-colors">
@@ -233,7 +247,7 @@ export default function Home() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-16 bg-gradient-to-r from-primary-600 to-primary-700 text-white">
+      <section className="py-16 bg-linear-to-r from-primary-600 to-primary-700 text-white">
         <div className="container mx-auto px-4 text-center">
           <div className="max-w-3xl mx-auto">
             <Star className="h-12 w-12 mx-auto mb-6 text-accent-400" />
