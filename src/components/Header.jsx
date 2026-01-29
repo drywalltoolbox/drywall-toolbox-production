@@ -44,7 +44,7 @@ export default function Header() {
 
       {/* Main Header */}
       <div className="border-b border-gray-200">
-        <div className="container mx-auto px-4">
+        <div className="container mx-auto px-4 relative">
           <div className="flex items-center h-20 md:h-24">
             {/* Left Navigation - Desktop */}
             <nav className="hidden lg:flex items-center gap-8 flex-1">
@@ -70,8 +70,14 @@ export default function Header() {
               </Link>
             </nav>
 
-            {/* Centered logo removed as requested. Keep spacer to preserve layout */}
+            {/* spacer to preserve left/right nav spacing */}
             <div className="flex-1" aria-hidden="true" />
+            {/* Centered logo (absolute). Image file should be at public/drywall-toolbox.png */}
+            <div className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 z-30 pointer-events-auto" aria-hidden="false">
+              <Link to="/" aria-label="Drywall Toolbox home">
+                <img src="/drywall-toolbox.png" alt="Drywall Toolbox" className="block h-12 md:h-16 lg:h-20 w-auto" />
+              </Link>
+            </div>
 
             {/* Right Navigation - Desktop */}
             <nav className="hidden lg:flex items-center gap-8 flex-1 justify-end">
