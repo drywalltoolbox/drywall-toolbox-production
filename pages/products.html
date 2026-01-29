@@ -5,7 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="Browse our extensive collection of professional drywall tools. Filter by brand, category, and price.">
   <title>Products - Drywall Toolbox</title>
-  <link rel="stylesheet" href="css/styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/styles.css">
   <style>
     .products-layout {
       display: grid;
@@ -58,27 +61,30 @@
     
     <div class="header-main">
       <div class="container">
-        <div class="header-content">
+        <div class="header-content header-centered">
+          <nav class="nav-left" aria-label="Primary left navigation">
+            <ul class="nav-menu">
+              <li><a href="index.html">Home</a></li>
+              <li><a href="products.html#brands" class="active">Shop</a></li>
+            </ul>
+          </nav>
+
           <a href="index.html" class="logo">
             🔧 Drywall Toolbox
           </a>
-          
-          <nav>
+
+          <nav class="nav-right" aria-label="Primary right navigation">
             <ul class="nav-menu">
-              <li><a href="index.html">Home</a></li>
-              <li><a href="products.html" class="active">Products</a></li>
-              <li><a href="index.html#brands">Brands</a></li>
               <li><a href="about.html">About</a></li>
               <li><a href="contact.html">Contact</a></li>
             </ul>
           </nav>
-          
-          <div class="search-bar">
-            <input type="search" placeholder="Search for tools, brands, or categories..." aria-label="Search products">
-            <button type="submit" aria-label="Search">🔍</button>
-          </div>
-          
+
           <div class="header-actions">
+            <div class="search-bar">
+              <input type="search" placeholder="Search for tools, brands, or categories..." aria-label="Search products">
+              <button type="submit" aria-label="Search">🔍</button>
+            </div>
             <a href="cart.html" class="icon-btn" aria-label="Shopping cart">
               🛒
               <span class="badge">0</span>
@@ -99,6 +105,31 @@
       </div>
     </div>
   </section>
+  
+    <!-- Brands Section (moved into products page so the unified tab can open here) -->
+    <section id="brands">
+      <div class="container">
+        <div class="section-header">
+          <h2>Trusted Brands We Carry</h2>
+          <p>Industry-leading manufacturers you can rely on</p>
+        </div>
+      
+        <div class="brands-grid">
+          <div class="brand-logo" data-brand="tapetech">TapeTech</div>
+          <div class="brand-logo" data-brand="level5">Level5</div>
+          <div class="brand-logo" data-brand="columbia">Columbia</div>
+          <div class="brand-logo" data-brand="drywall-master">Drywall Master</div>
+          <div class="brand-logo" data-brand="can-am">Can-Am</div>
+          <div class="brand-logo" data-brand="delko">Delko</div>
+          <div class="brand-logo" data-brand="kraft">Kraft</div>
+          <div class="brand-logo" data-brand="marshalltown">Marshalltown</div>
+          <div class="brand-logo" data-brand="wal-board">Wal-Board</div>
+          <div class="brand-logo" data-brand="hyde">Hyde</div>
+          <div class="brand-logo" data-brand="pro-form">Pro-Form</div>
+          <div class="brand-logo" data-brand="goldblatt">Goldblatt</div>
+        </div>
+      </div>
+    </section>
 
   <!-- Products Section -->
   <section>
@@ -186,14 +217,17 @@
         
         <!-- Products Grid -->
         <div>
-          <div class="products-header">
+          <div id="products" class="products-header">
             <h2>All Products</h2>
-            <select class="sort-by" aria-label="Sort products">
-              <option value="featured">Sort by: Featured</option>
-              <option value="price-low">Price: Low to High</option>
-              <option value="price-high">Price: High to Low</option>
-              <option value="name">Name: A to Z</option>
-            </select>
+            <div style="display:flex; align-items:center; gap:var(--spacing-sm);">
+              <select class="sort-by" aria-label="Sort products">
+                <option value="featured">Sort by: Featured</option>
+                <option value="price-low">Price: Low to High</option>
+                <option value="price-high">Price: High to Low</option>
+                <option value="name">Name: A to Z</option>
+              </select>
+              <button id="clear-filter" style="display:none;" class="btn">Show all</button>
+            </div>
           </div>
           
           <div class="grid grid-3">
@@ -414,7 +448,7 @@
           <h3>Quick Links</h3>
           <ul>
             <li><a href="index.html">Home</a></li>
-            <li><a href="products.html">Products</a></li>
+            <li><a href="products.html#brands">Products</a></li>
             <li><a href="about.html">About Us</a></li>
             <li><a href="contact.html">Contact</a></li>
           </ul>
@@ -423,10 +457,10 @@
         <div class="footer-section">
           <h3>Product Categories</h3>
           <ul>
-            <li><a href="products.html?category=taping">Automatic Taping</a></li>
-            <li><a href="products.html?category=finishing">Finishing Tools</a></li>
-            <li><a href="products.html?category=corner">Corner Tools</a></li>
-            <li><a href="products.html?category=sanding">Sanding Equipment</a></li>
+            <li><a href="products.html?category=taping#products">Automatic Taping</a></li>
+            <li><a href="products.html?category=finishing#products">Finishing Tools</a></li>
+            <li><a href="products.html?category=corner#products">Corner Tools</a></li>
+            <li><a href="products.html?category=sanding#products">Sanding Equipment</a></li>
           </ul>
         </div>
         
@@ -447,6 +481,6 @@
     </div>
   </footer>
 
-  <script src="js/main.js"></script>
+  <script src="../js/main.js"></script>
 </body>
 </html>

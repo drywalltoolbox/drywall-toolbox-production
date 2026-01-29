@@ -3,12 +3,37 @@
 // Mobile Menu Toggle
 document.addEventListener('DOMContentLoaded', function() {
   const mobileToggle = document.querySelector('.mobile-menu-toggle');
-  const navMenu = document.querySelector('.nav-menu');
-  
+  const navLeft = document.querySelector('.nav-left');
+  const navRight = document.querySelector('.nav-right');
+
   if (mobileToggle) {
     mobileToggle.addEventListener('click', function() {
-      navMenu.classList.toggle('active');
+      // Toggle mobile visibility on both navs (left + right)
+      [navLeft, navRight].forEach(n => { if (n) n.classList.toggle('active'); });
     });
+  }
+
+  // Header normalization: ensure there's a single canonical "Shop" nav item across the header
+  const headerEl = document.querySelector('.header');
+  if (headerEl) {
+    const anchors = headerEl.querySelectorAll('a');
+    anchors.forEach(a => {
+      try {
+        const href = a.getAttribute('href') || '';
+        if (href.includes('products.html')) {
+          a.setAttribute('href', 'products.html#brands');
+          a.textContent = 'Shop';
+        }
+      } catch (err) {
+        // ignore malformed hrefs
+      }
+    });
+
+    if (window.location.pathname.includes('products.html')) {
+      headerEl.querySelectorAll('a').forEach(a => a.classList.remove('active'));
+      const shopLink = Array.from(headerEl.querySelectorAll('a')).find(x => x.getAttribute('href') && x.getAttribute('href').includes('products.html'));
+      if (shopLink) shopLink.classList.add('active');
+    }
   }
   
   // Close mobile menu when clicking outside
@@ -94,9 +119,22 @@ document.addEventListener('DOMContentLoaded', function() {
   // Brand filter
   const brandLinks = document.querySelectorAll('.brand-logo');
   brandLinks.forEach(link => {
-    link.addEventListener('click', function() {
+    link.addEventListener('click', function(e) {
       const brand = this.dataset.brand;
-      if (brand) {
+      if (!brand) return;
+      // If we're already on the products page, filter in-place without navigating
+      if (window.location.pathname.includes('products.html')) {
+        e.preventDefault();
+        filterByBrand(brand);
+        // update URL so it's shareable
+        const url = new URL(window.location.href);
+        url.searchParams.set('brand', brand);
+        window.history.replaceState({}, '', url.pathname + url.search + url.hash);
+        // scroll to products
+        const productsEl = document.getElementById('products');
+        if (productsEl) productsEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      } else {
+        // navigate to products page with brand param
         window.location.href = `products.html?brand=${encodeURIComponent(brand)}`;
       }
     });
@@ -203,6 +241,35 @@ function showNotification(message, type = 'success') {
 }
 
 // Filter Products
+function filterByBrand(brand) {
+  const products = document.querySelectorAll('.product-card');
+  products.forEach(product => {
+    const productBrand = product.dataset.brand;
+    if (productBrand === brand) {
+      product.style.display = 'block';
+      product.style.animation = 'fadeIn 0.25s ease-out';
+    } else {
+      product.style.display = 'none';
+    }
+  });
+  // show clear filter button if present
+  const clearBtn = document.getElementById('clear-filter');
+  if (clearBtn) clearBtn.style.display = 'inline-block';
+  if (clearBtn) {
+    // attach click handler (idempotent)
+    if (!clearBtn._hasHandler) {
+      clearBtn.addEventListener('click', function() {
+        const url = new URL(window.location.href);
+        url.searchParams.delete('brand');
+        window.history.replaceState({}, '', url.pathname + url.search + url.hash);
+        document.querySelectorAll('.product-card').forEach(p => p.style.display = 'block');
+        clearBtn.style.display = 'none';
+      });
+      clearBtn._hasHandler = true;
+    }
+  }
+}
+
 function filterProducts() {
   const selectedBrands = [];
   const selectedCategories = [];
@@ -304,6 +371,29 @@ if (window.location.pathname.includes('products.html')) {
         product.style.display = 'none';
       }
     });
+  }
+
+  // Handle brand query param (e.g. products.html?brand=tapetech)
+  const brandParam = getUrlParameter('brand');
+  if (brandParam) {
+    filterByBrand(brandParam);
+    // show clear filter control if present
+    const clearBtn = document.getElementById('clear-filter');
+    if (clearBtn) {
+      clearBtn.style.display = 'inline-block';
+      clearBtn.addEventListener('click', function() {
+        // clear URL param and show all products
+        const url = new URL(window.location.href);
+        url.searchParams.delete('brand');
+        window.history.replaceState({}, '', url.pathname + url.search + url.hash);
+        // show all
+        document.querySelectorAll('.product-card').forEach(p => p.style.display = 'block');
+        clearBtn.style.display = 'none';
+      });
+    }
+    // scroll to products area if exists
+    const productsEl = document.getElementById('products');
+    if (productsEl) productsEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 }
 

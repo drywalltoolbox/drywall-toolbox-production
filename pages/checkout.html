@@ -5,7 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="Secure checkout for your drywall tools order">
   <title>Checkout - Drywall Toolbox</title>
-  <link rel="stylesheet" href="css/styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/styles.css">
   <style>
     .checkout-container {
       max-width: 1200px;
@@ -189,27 +192,30 @@
     
     <div class="header-main">
       <div class="container">
-        <div class="header-content">
+        <div class="header-content header-centered">
+          <nav class="nav-left" aria-label="Primary left navigation">
+            <ul class="nav-menu">
+              <li><a href="index.html">Home</a></li>
+              <li><a href="products.html#brands">Shop</a></li>
+            </ul>
+          </nav>
+
           <a href="index.html" class="logo">
             🔧 Drywall Toolbox
           </a>
-          
-          <nav>
+
+          <nav class="nav-right" aria-label="Primary right navigation">
             <ul class="nav-menu">
-              <li><a href="index.html">Home</a></li>
-              <li><a href="products.html">Products</a></li>
-              <li><a href="index.html#brands">Brands</a></li>
               <li><a href="about.html">About</a></li>
               <li><a href="contact.html">Contact</a></li>
             </ul>
           </nav>
-          
-          <div class="search-bar">
-            <input type="search" placeholder="Search for tools, brands, or categories..." aria-label="Search products">
-            <button type="submit" aria-label="Search">🔍</button>
-          </div>
-          
+
           <div class="header-actions">
+            <div class="search-bar">
+              <input type="search" placeholder="Search for tools, brands, or categories..." aria-label="Search products">
+              <button type="submit" aria-label="Search">🔍</button>
+            </div>
             <a href="cart.html" class="icon-btn" aria-label="Shopping cart">
               🛒
               <span class="badge">0</span>
@@ -399,7 +405,7 @@
           <h3>Quick Links</h3>
           <ul>
             <li><a href="index.html">Home</a></li>
-            <li><a href="products.html">Products</a></li>
+            <li><a href="products.html#brands">Products</a></li>
             <li><a href="about.html">About Us</a></li>
             <li><a href="contact.html">Contact</a></li>
           </ul>
@@ -408,10 +414,10 @@
         <div class="footer-section">
           <h3>Product Categories</h3>
           <ul>
-            <li><a href="products.html?category=taping">Automatic Taping</a></li>
-            <li><a href="products.html?category=finishing">Finishing Tools</a></li>
-            <li><a href="products.html?category=corner">Corner Tools</a></li>
-            <li><a href="products.html?category=sanding">Sanding Equipment</a></li>
+            <li><a href="products.html?category=taping#products">Automatic Taping</a></li>
+            <li><a href="products.html?category=finishing#products">Finishing Tools</a></li>
+            <li><a href="products.html?category=corner#products">Corner Tools</a></li>
+            <li><a href="products.html?category=sanding#products">Sanding Equipment</a></li>
           </ul>
         </div>
         
@@ -431,7 +437,7 @@
     </div>
   </footer>
 
-  <script src="js/main.js"></script>
+  <script src="../js/main.js"></script>
   <script>
     // Load order summary
     function loadOrderSummary() {

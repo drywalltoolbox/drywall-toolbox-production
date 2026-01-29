@@ -143,6 +143,37 @@ a:hover {
   gap: var(--spacing-lg);
 }
 
+/* Centered logo layout: logo visually centered while nav items sit left/right */
+.header-content.header-centered {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-lg);
+}
+
+.header-content.header-centered .logo {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+}
+
+.nav-left,
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-lg);
+}
+
+.nav-left { justify-self: start; }
+.nav-right { justify-self: end; }
+
+/* Make sure header-actions (search, cart, mobile toggle) stay on the far right */
+.header-actions {
+  margin-left: auto;
+}
+
 .logo {
   font-size: var(--font-size-2xl);
   font-weight: 700;
@@ -186,6 +217,13 @@ a:hover {
   font-size: var(--font-size-2xl);
   cursor: pointer;
   color: var(--text-primary);
+}
+
+@media (max-width: 968px) {
+  .mobile-menu-toggle { display: inline-block; }
+  .nav-left, .nav-right { display: none; }
+  .logo { position: static; transform: none; }
+  .header-content.header-centered { justify-content: space-between; }
 }
 
 /* Search Bar */
