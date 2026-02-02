@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Hotspot Coordinate Mapper</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+            background: #1a1a1a;
+            color: #fff;
+        }
+        .container {
+            max-width: 1800px;
+            margin: 0 auto;
+        }
+        .header {
+            background: #2563eb;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .instructions {
+            background: #334155;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .workspace {
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 20px;
+        }
+        .image-container {
+            background: #fff;
+            border: 3px solid #2563eb;
+            border-radius: 8px;
+            overflow: hidden;
+            position: relative;
+        }
+        .wrapper {
+            position: relative;
+            display: inline-block;
+            width: 100%;
+        }
+        img {
+            width: 100%;
+            height: auto;
+            display: block;
+            cursor: crosshair;
+        }
+        .marker {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            border: 3px solid #ef4444;
+            background: rgba(239, 68, 68, 0.3);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: #fff;
+            text-shadow: 0 0 3px #000;
+            font-size: 14px;
+        }
+        .sidebar {
+            background: #334155;
+            padding: 20px;
+            border-radius: 8px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        .part-item {
+            background: #1e293b;
+            padding: 12px;
+            margin-bottom: 10px;
+            border-radius: 6px;
+            border: 2px solid transparent;
+            cursor: pointer;
+        }
+        .part-item:hover {
+            border-color: #2563eb;
+        }
+        .part-item.active {
+            border-color: #22c55e;
+            background: #1e3a1e;
+        }
+        .part-item.done {
+            opacity: 0.6;
+            border-color: #64748b;
+        }
+        .part-number {
+            font-size: 18px;
+            font-weight: bold;
+            color: #2563eb;
+            margin-bottom: 5px;
+        }
+        .part-name {
+            font-size: 14px;
+            color: #cbd5e1;
+        }
+        .coordinates {
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            color: #22c55e;
+            margin-top: 5px;
+        }
+        button {
+            background: #2563eb;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 10px;
+            width: 100%;
+        }
+        button:hover {
+            background: #1d4ed8;
+        }
+        button.success {
+            background: #22c55e;
+        }
+        .output {
+            background: #000;
+            padding: 15px;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 11px;
+            max-height: 300px;
+            overflow-y: auto;
+            margin-top: 15px;
+            display: none;
+        }
+        .progress {
+            background: #1e293b;
+            padding: 10px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+        }
+        .progress-bar {
+            background: #334155;
+            height: 10px;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        .progress-fill {
+            background: #22c55e;
+            height: 100%;
+            transition: width 0.3s;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎯 Interactive Hotspot Coordinate Mapper</h1>
+            <p>Click on each numbered callout in the diagram to map its exact position</p>
+        </div>
+
+        <div class="instructions">
+            <strong>Instructions:</strong>
+            <ol>
+                <li>Click on a part number in the right panel to select it</li>
+                <li>Click on the corresponding numbered callout in the diagram</li>
+                <li>Repeat for all 14 parts</li>
+                <li>Click "Generate Coordinates" when done</li>
+            </ol>
+        </div>
+
+        <div class="workspace">
+            <div class="image-container">
+                <div class="wrapper" id="wrapper">
+                    <img src="15TT_SCH-1.png" id="schematic" alt="Corner Roller Assembly">
+                </div>
+            </div>
+
+            <div class="sidebar">
+                <div class="progress">
+                    <div>Progress: <span id="progress-text">0/14</span></div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progress-fill" style="width: 0%"></div>
+                    </div>
+                </div>
+
+                <div id="parts-list"></div>
+
+                <button id="generate-btn" onclick="generateOutput()">Generate Coordinates</button>
+                <button id="copy-btn" onclick="copyOutput()" style="display:none;" class="success">Copy to Clipboard</button>
+                
+                <div class="output" id="output"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const parts = [
+            { id: '01', sku: '164348', name: 'Handle Assembly', quantity: 1 },
+            { id: '02', sku: '150003F', name: 'Coupling', quantity: 1 },
+            { id: '03', sku: '059143', name: 'Cotter Pin, 1/16 x 1/2', quantity: 1 },
+            { id: '04', sku: '156001F', name: 'Corner Roller Head', quantity: 1 },
+            { id: '05', sku: '150004F', name: 'Swivel Coupling Pin', quantity: 1 },
+            { id: '06', sku: '150008', name: 'Thrust Washer', quantity: 4 },
+            { id: '07', sku: '809006', name: 'Brass Washer', quantity: 4 },
+            { id: '08', sku: '159006', name: 'Roller Axle, 1/4-20 x 1 1/4 Hex.', quantity: 4 },
+            { id: '09', sku: '150011F', name: 'Roller Bushing', quantity: 4 },
+            { id: '10', sku: '150005', name: 'Roller', quantity: 4 },
+            { id: '11', sku: '159010', name: 'Screw, 8-32 x 3/8 Fil. Hd. Nylock', quantity: 1 },
+            { id: '12', sku: '154007', name: 'Swivel Assy.', quantity: 1 },
+            { id: '13', sku: '150009', name: 'Swivel Axle', quantity: 1 },
+            { id: '14', sku: '151042', name: 'Handle Grip, Black', quantity: 1 }
+        ];
+
+        let coordinates = {};
+        let activePartId = null;
+        let imageWidth = 0;
+        let imageHeight = 0;
+
+        const img = document.getElementById('schematic');
+        const wrapper = document.getElementById('wrapper');
+        const partsList = document.getElementById('parts-list');
+
+        img.onload = function() {
+            imageWidth = img.naturalWidth;
+            imageHeight = img.naturalHeight;
+            console.log(`Image loaded: ${imageWidth} x ${imageHeight}`);
+        };
+
+        // Render parts list
+        parts.forEach(part => {
+            const div = document.createElement('div');
+            div.className = 'part-item';
+            div.id = `part-${part.id}`;
+            div.innerHTML = `
+                <div class="part-number">#${part.id} - ${part.sku}</div>
+                <div class="part-name">${part.name}</div>
+                <div class="coordinates" id="coords-${part.id}">Click to select, then click on diagram</div>
+            `;
+            div.onclick = () => selectPart(part.id);
+            partsList.appendChild(div);
+        });
+
+        function selectPart(partId) {
+            document.querySelectorAll('.part-item').forEach(el => el.classList.remove('active'));
+            document.getElementById(`part-${partId}`).classList.add('active');
+            activePartId = partId;
+        }
+
+        wrapper.onclick = function(e) {
+            if (!activePartId) {
+                alert('Please select a part from the list first!');
+                return;
+            }
+
+            const rect = img.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            
+            // Calculate percentages based on displayed image
+            const leftPercent = (x / rect.width * 100).toFixed(2);
+            const topPercent = (y / rect.height * 100).toFixed(2);
+            
+            // Store coordinates
+            coordinates[activePartId] = {
+                left: leftPercent,
+                top: topPercent
+            };
+
+            // Update display
+            document.getElementById(`coords-${activePartId}`).innerHTML = 
+                `✓ Position: ${leftPercent}% left, ${topPercent}% top`;
+            
+            // Mark as done
+            document.getElementById(`part-${activePartId}`).classList.add('done');
+            document.getElementById(`part-${activePartId}`).classList.remove('active');
+            
+            // Add marker
+            const existingMarker = document.getElementById(`marker-${activePartId}`);
+            if (existingMarker) existingMarker.remove();
+            
+            const marker = document.createElement('div');
+            marker.className = 'marker';
+            marker.id = `marker-${activePartId}`;
+            marker.style.left = leftPercent + '%';
+            marker.style.top = topPercent + '%';
+            marker.innerHTML = activePartId;
+            wrapper.appendChild(marker);
+            
+            // Update progress
+            updateProgress();
+            
+            // Auto-select next part
+            const currentIndex = parts.findIndex(p => p.id === activePartId);
+            if (currentIndex < parts.length - 1) {
+                selectPart(parts[currentIndex + 1].id);
+            } else {
+                activePartId = null;
+            }
+        };
+
+        function updateProgress() {
+            const done = Object.keys(coordinates).length;
+            document.getElementById('progress-text').textContent = `${done}/14`;
+            document.getElementById('progress-fill').style.width = `${(done / 14 * 100)}%`;
+        }
+
+        function generateOutput() {
+            if (Object.keys(coordinates).length < 14) {
+                alert('Please map all 14 parts before generating!');
+                return;
+            }
+
+            let output = 'parts: [\n';
+            parts.forEach(part => {
+                const coord = coordinates[part.id];
+                output += `        {\n`;
+                output += `          id: '${part.id}',\n`;
+                output += `          name: '${part.name}',\n`;
+                output += `          sku: '${part.sku}',\n`;
+                output += `          material: 'STEEL', // UPDATE THIS\n`;
+                output += `          price: 15.00, // UPDATE THIS\n`;
+                output += `          position: { top: '${coord.top}%', left: '${coord.left}%' },\n`;
+                output += `          quantity: ${part.quantity}\n`;
+                output += `        },\n`;
+            });
+            output += '      ]';
+
+            document.getElementById('output').textContent = output;
+            document.getElementById('output').style.display = 'block';
+            document.getElementById('copy-btn').style.display = 'block';
+            document.getElementById('generate-btn').textContent = 'Regenerate Coordinates';
+        }
+
+        function copyOutput() {
+            const output = document.getElementById('output').textContent;
+            navigator.clipboard.writeText(output).then(() => {
+                document.getElementById('copy-btn').textContent = '✓ Copied!';
+                setTimeout(() => {
+                    document.getElementById('copy-btn').textContent = 'Copy to Clipboard';
+                }, 2000);
+            });
+        }
+
+        // Auto-select first part
+        selectPart('01');
+    </script>
+</body>
+</html>

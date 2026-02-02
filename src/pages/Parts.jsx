@@ -4,12 +4,148 @@ import Toast from '../components/Toast';
 
 export default function Parts() {
   const [activeHotspot, setActiveHotspot] = useState(null);
-  const [selectedSchematic, setSelectedSchematic] = useState('auto-taper');
+  const [selectedSchematic, setSelectedSchematic] = useState('corner-roller-assy');
   const [toast, setToast] = useState(null);
   const { addToCart } = useCart();
 
-  // Schematic data for 5 different tools
+  // Schematic data for tools
   const schematics = [
+    {
+      id: 'corner-roller-assy',
+      title: '15" Corner Roller Assembly',
+      description: 'Complete corner roller assembly with swivel coupling and precision rollers',
+      image: '/15TT_SCH-1.png',
+      imageWidth: 3400,
+      imageHeight: 2200,
+      parts: [
+        {
+          id: '01',
+          name: 'Handle Assembly',
+          sku: '164348',
+          material: 'ALUMINUM',
+          price: 45.00,
+          position: { top: '50.97%', left: '56.22%' },
+          quantity: 1
+        },
+        {
+          id: '02',
+          name: 'Coupling',
+          sku: '150003F',
+          material: 'STEEL',
+          price: 18.50,
+          position: { top: '57.27%', left: '50.55%' },
+          quantity: 1
+        },
+        {
+          id: '03',
+          name: 'Cotter Pin, 1/16 x 1/2',
+          sku: '059143',
+          material: 'STAINLESS-STEEL',
+          price: 2.50,
+          position: { top: '61.99%', left: '45.45%' },
+          quantity: 1
+        },
+        {
+          id: '04',
+          name: 'Corner Roller Head',
+          sku: '156001F',
+          material: 'ALLOY-STEEL',
+          price: 65.00,
+          position: { top: '82.91%', left: '40.43%' },
+          quantity: 1
+        },
+        {
+          id: '05',
+          name: 'Swivel Coupling Pin',
+          sku: '150004F',
+          material: 'STEEL',
+          price: 12.00,
+          position: { top: '87.75%', left: '35.63%' },
+          quantity: 1
+        },
+        {
+          id: '06',
+          name: 'Thrust Washer',
+          sku: '150008',
+          material: 'BRASS',
+          price: 5.50,
+          position: { top: '82.80%', left: '21.58%' },
+          quantity: 4
+        },
+        {
+          id: '07',
+          name: 'Brass Washer',
+          sku: '809006',
+          material: 'BRASS',
+          price: 3.00,
+          position: { top: '91.57%', left: '11.68%' },
+          quantity: 4
+        },
+        {
+          id: '08',
+          name: 'Roller Axle, 1/4-20 x 1 1/4 Hex.',
+          sku: '159006',
+          material: 'CHROME-STEEL',
+          price: 8.50,
+          position: { top: '76.73%', left: '6.15%' },
+          quantity: 4
+        },
+        {
+          id: '09',
+          name: 'Roller Bushing',
+          sku: '150011F',
+          material: 'BRONZE',
+          price: 6.00,
+          position: { top: '73.58%', left: '9.79%' },
+          quantity: 4
+        },
+        {
+          id: '10',
+          name: 'Roller',
+          sku: '150005',
+          material: 'POLYURETHANE',
+          price: 22.00,
+          position: { top: '70.65%', left: '12.55%' },
+          quantity: 4
+        },
+        {
+          id: '11',
+          name: 'Screw, 8-32 x 3/8 Fil. Hd. Nylock',
+          sku: '159010',
+          material: 'STAINLESS-STEEL',
+          price: 1.50,
+          position: { top: '68.18%', left: '15.61%' },
+          quantity: 1
+        },
+        {
+          id: '12',
+          name: 'Swivel Assy.',
+          sku: '154007',
+          material: 'STEEL',
+          price: 35.00,
+          position: { top: '35.90%', left: '31.91%' },
+          quantity: 1
+        },
+        {
+          id: '13',
+          name: 'Swivel Axle',
+          sku: '150009',
+          material: 'STEEL',
+          price: 15.00,
+          position: { top: '31.85%', left: '36.14%' },
+          quantity: 1
+        },
+        {
+          id: '14',
+          name: 'Handle Grip, Black',
+          sku: '151042',
+          material: 'RUBBER',
+          price: 8.50,
+          position: { top: '22.06%', left: '82.35%' },
+          quantity: 1
+        }
+      ]
+    },
     {
       id: 'auto-taper',
       title: 'Automatic Taper G2',
@@ -315,24 +451,51 @@ export default function Parts() {
             </div>
 
             <div className="schematic-container">
-              {currentSchematic.svg}
-              
-              {currentSchematic.parts.map((part) => (
-                <div
-                  key={part.id}
-                  className={`hotspot ${activeHotspot === part.id ? 'active' : ''}`}
-                  style={{
-                    position: 'absolute',
-                    top: part.position.top,
-                    left: part.position.left,
-                    transform: 'translate(-50%, -50%)'
-                  }}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setActiveHotspot(activeHotspot === part.id ? null : part.id);
-                  }}
-                >
-                  <div className="part-modal" onClick={(e) => e.stopPropagation()}>
+              <div style={{ position: 'relative', display: 'inline-block', width: '100%' }}>
+                {currentSchematic.image ? (
+                  <img 
+                    src={currentSchematic.image} 
+                    alt={currentSchematic.title}
+                    style={{ width: '100%', height: 'auto', display: 'block' }}
+                  />
+                ) : (
+                  currentSchematic.svg
+                )}
+                
+                {currentSchematic.parts.map((part) => (
+                  <div
+                    key={part.id}
+                    className={`hotspot ${activeHotspot === part.id ? 'active' : ''}`}
+                    style={{
+                      position: 'absolute',
+                      top: part.position.top,
+                      left: part.position.left,
+                      transform: 'translate(-50%, -50%)',
+                      zIndex: 100
+                    }}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setActiveHotspot(activeHotspot === part.id ? null : part.id);
+                    }}
+                    title={`Part ${part.id}: ${part.name} at ${part.position.left}, ${part.position.top}`}
+                  >
+                    <span style={{
+                      position: 'absolute',
+                      top: '-20px',
+                      left: '50%',
+                      transform: 'translateX(-50%)',
+                      fontSize: '10px',
+                      fontWeight: 'bold',
+                      color: '#1e40af',
+                      backgroundColor: 'white',
+                      padding: '2px 4px',
+                      borderRadius: '3px',
+                      whiteSpace: 'nowrap',
+                      pointerEvents: 'none'
+                    }}>
+                      #{part.id}
+                    </span>
+                    <div className="part-modal" onClick={(e) => e.stopPropagation()}>
                     <h4 style={{
                       textTransform: 'uppercase',
                       fontSize: '0.75rem',
@@ -343,6 +506,7 @@ export default function Parts() {
                     </h4>
                     <div className="part-meta">
                       SKU: {part.sku} | {part.material}
+                      {part.quantity > 1 && ` | Qty: ${part.quantity}`}
                     </div>
                     <div style={{
                       display: 'flex',
@@ -372,6 +536,7 @@ export default function Parts() {
                   </div>
                 </div>
               ))}
+              </div>
             </div>
           </div>
         )}
