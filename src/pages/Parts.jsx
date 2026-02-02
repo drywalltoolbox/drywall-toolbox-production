@@ -185,12 +185,6 @@ export default function Parts() {
 
   const currentSchematic = schematics.find(s => s.id === selectedSchematic);
 
-  const handleOverlayClick = (e) => {
-    if (e.target.classList.contains('part-modal-overlay')) {
-      setActiveHotspot(null);
-    }
-  };
-
   const handleAddToCart = (part) => {
     // Create a product object compatible with the cart system
     const cartProduct = {
@@ -211,14 +205,20 @@ export default function Parts() {
   };
 
   return (
-    <section style={{ 
-      padding: '120px 40px 80px', 
-      minHeight: '100vh'
-    }} className="section-enter">
+    <section 
+      style={{ 
+        padding: '120px 40px 80px',
+        minHeight: '100vh'
+      }} 
+      className="section-enter"
+      onClick={() => setActiveHotspot(null)}
+    >
       <div style={{
         maxWidth: '1400px',
         margin: '0 auto'
-      }}>
+      }}
+      onClick={(e) => e.stopPropagation()}
+      >
         {/* Header */}
         <div style={{ marginBottom: '60px', textAlign: 'center' }}>
           <h2 style={{ 
@@ -290,7 +290,7 @@ export default function Parts() {
 
         {/* Interactive Viewer */}
         {currentSchematic && (
-          <div className="schematic-container">
+          <div>
             <div style={{
               marginBottom: '32px',
               padding: '24px',
@@ -314,85 +314,65 @@ export default function Parts() {
               </p>
             </div>
 
-            <div className="schematic-diagram" style={{ position: 'relative' }}>
+            <div className="schematic-container">
               {currentSchematic.svg}
               
               {currentSchematic.parts.map((part) => (
-                <button
+                <div
                   key={part.id}
-                  onClick={() => setActiveHotspot(part.id)}
-                  className="hotspot"
+                  className={`hotspot ${activeHotspot === part.id ? 'active' : ''}`}
                   style={{
                     position: 'absolute',
                     top: part.position.top,
                     left: part.position.left,
                     transform: 'translate(-50%, -50%)'
                   }}
-                  aria-label={`View details for ${part.name}`}
-                />
-              ))}
-            </div>
-
-            {/* Part Modal */}
-            {activeHotspot && (
-              <div className="part-modal-overlay" onClick={handleOverlayClick}>
-                {(() => {
-                  const part = currentSchematic.parts.find(p => p.id === activeHotspot);
-                  return part ? (
-                    <div className="part-modal">
-                      <button 
-                        onClick={() => setActiveHotspot(null)}
-                        style={{
-                          position: 'absolute',
-                          top: '16px',
-                          right: '16px',
-                          background: 'transparent',
-                          border: 'none',
-                          fontSize: '1.5rem',
-                          color: 'var(--alloy-text)',
-                          cursor: 'pointer',
-                          padding: '4px 8px'
-                        }}
-                      >
-                        
-                      </button>
-                      <h4 style={{ 
-                        fontSize: '1.5rem',
-                        marginBottom: '24px',
-                        color: 'var(--tension-accent)'
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setActiveHotspot(activeHotspot === part.id ? null : part.id);
+                  }}
+                >
+                  <div className="part-modal" onClick={(e) => e.stopPropagation()}>
+                    <h4 style={{
+                      textTransform: 'uppercase',
+                      fontSize: '0.75rem',
+                      letterSpacing: '0.1em',
+                      marginBottom: '8px'
+                    }}>
+                      {part.name}
+                    </h4>
+                    <div className="part-meta">
+                      SKU: {part.sku} | {part.material}
+                    </div>
+                    <div style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center'
+                    }}>
+                      <span style={{
+                        fontFamily: 'var(--font-mono)',
+                        fontWeight: 800
                       }}>
-                        {part.name}
-                      </h4>
-                      <div className="part-specs">
-                        <div className="spec-row">
-                          <span className="spec-label">SKU</span>
-                          <span className="spec-value">{part.sku}</span>
-                        </div>
-                        <div className="spec-row">
-                          <span className="spec-label">Material</span>
-                          <span className="spec-value">{part.material}</span>
-                        </div>
-                        <div className="spec-row">
-                          <span className="spec-label">Price</span>
-                          <span className="spec-value">${part.price.toFixed(2)}</span>
-                        </div>
-                      </div>
-                      <button 
-                        className="alloy-button" 
-                        onClick={() => handleAddToCart(part)}
-                        style={{ 
-                          width: '100%',
-                          marginTop: '24px',
-                          justifyContent: 'center'
+                        ${part.price.toFixed(2)}
+                      </span>
+                      <button
+                        className="alloy-button"
+                        style={{
+                          padding: '8px 16px',
+                          fontSize: '0.6rem'
+                        }}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleAddToCart(part);
                         }}
                       >
-                        Add to Cart
+                        Add
                       </button>
                     </div>
-                  ) : null;
-                })()}
-              </div>
-            )}
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         )}
       </div>
