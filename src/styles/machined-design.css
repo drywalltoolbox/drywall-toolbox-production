@@ -1,0 +1,289 @@
+/* Machined Precision Design System */
+
+:root {
+    --alloy-base: #f8fafc;
+    --alloy-mid: #e2e8f0;
+    --alloy-deep: #0f172a;
+    --tension-accent: #2563eb;
+    --tension-highlight: #60a5fa;
+    --machined-border: rgba(15, 23, 42, 0.08);
+    --surface-glass: rgba(255, 255, 255, 0.7);
+    --font-main: 'Inter', sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+    --ease-tension: cubic-bezier(0.16, 1, 0.3, 1);
+    
+    /* Consistent blue accent - replaces any old color references */
+    --primary-600: #2563eb;
+    --primary-700: #1d4ed8;
+    --primary-500: #3b82f6;
+    --primary-400: #60a5fa;
+    --primary-100: #dbeafe;
+    --accent-500: #2563eb;
+}
+
+* {
+    -webkit-font-smoothing: antialiased;
+}
+
+body {
+    background: var(--alloy-base);
+    color: var(--alloy-deep);
+    font-family: var(--font-main);
+    line-height: 1.5;
+}
+
+/* --- BACKGROUND TEXTURE --- */
+.machined-bg {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    background-image: 
+        radial-gradient(circle at 2px 2px, var(--machined-border) 1px, transparent 0);
+    background-size: 40px 40px;
+    opacity: 0.5;
+}
+
+/* --- SECTION ANIMATIONS --- */
+.section-enter {
+    animation: sectionIn 0.6s var(--ease-tension) forwards;
+}
+
+@keyframes sectionIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* --- TYPOGRAPHY --- */
+.machined-title {
+    font-size: clamp(3rem, 8vw, 6rem);
+    font-weight: 800;
+    line-height: 0.9;
+    letter-spacing: -0.04em;
+}
+
+/* --- BUTTONS --- */
+.alloy-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px 32px;
+    background: var(--alloy-deep);
+    color: white;
+    text-decoration: none;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-size: 0.75rem;
+    clip-path: polygon(0% 0%, 95% 0%, 100% 25%, 100% 100%, 5% 100%, 0% 75%);
+    transition: transform 0.2s;
+    border: none;
+    cursor: pointer;
+}
+
+.alloy-button:hover {
+    transform: scale(1.02);
+}
+
+.alloy-button-sm {
+    padding: 8px 16px;
+    font-size: 0.6rem;
+}
+
+/* --- CARDS --- */
+.tool-card {
+    background: white;
+    border: 1px solid var(--machined-border);
+    padding: 24px;
+    position: relative;
+    transition: all 0.4s var(--ease-tension);
+}
+
+.tool-card:hover {
+    border-color: var(--alloy-deep);
+    box-shadow: 0 20px 40px -20px rgba(0,0,0,0.1);
+}
+
+.tool-image {
+    width: 100%;
+    height: 240px;
+    background: #f1f5f9;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.tool-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    padding: 16px;
+}
+
+.tool-price {
+    font-family: var(--font-mono);
+    font-size: 1.1rem;
+    margin-top: 12px;
+    font-weight: 800;
+}
+
+/* --- CART OVERLAY --- */
+.cart-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.4);
+    backdrop-filter: blur(4px);
+    z-index: 2000;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s;
+}
+
+.cart-overlay.active {
+    opacity: 1;
+    pointer-events: all;
+}
+
+.cart-panel {
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    width: 400px;
+    max-width: 100%;
+    background: white;
+    padding: 40px;
+    transform: translateX(100%);
+    transition: transform 0.5s var(--ease-tension);
+    overflow-y: auto;
+}
+
+.cart-overlay.active .cart-panel {
+    transform: translateX(0);
+}
+
+.cart-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 0;
+    border-bottom: 1px solid var(--machined-border);
+}
+
+/* --- FORMS --- */
+.form-group {
+    margin-bottom: 24px;
+}
+
+.machined-label {
+    display: block;
+    text-transform: uppercase;
+    font-size: 0.7rem;
+    font-weight: 800;
+    margin-bottom: 8px;
+    letter-spacing: 0.05em;
+}
+
+.machined-input,
+.machined-textarea {
+    width: 100%;
+    padding: 16px;
+    border: 1px solid var(--machined-border);
+    background: rgba(255, 255, 255, 0.5);
+    font-family: var(--font-main);
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.machined-input:focus,
+.machined-textarea:focus {
+    border-color: var(--alloy-deep);
+}
+
+/* --- SCHEMATIC / PARTS --- */
+.schematic-container {
+    position: relative;
+    background: #fff;
+    border: 1px solid var(--machined-border);
+    aspect-ratio: 16/9;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.schematic-svg {
+    width: 80%;
+    height: auto;
+    opacity: 0.3;
+}
+
+.hotspot {
+    position: absolute;
+    width: 24px;
+    height: 24px;
+    background: var(--tension-accent);
+    border-radius: 50%;
+    cursor: pointer;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.4);
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.7); }
+    70% { box-shadow: 0 0 0 10px rgba(37, 99, 235, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(37, 99, 235, 0); }
+}
+
+.hotspot::after {
+    content: '';
+    width: 8px;
+    height: 8px;
+    background: white;
+    border-radius: 50%;
+}
+
+.part-modal {
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%) translateY(10px);
+    width: 280px;
+    background: white;
+    border: 1px solid var(--alloy-deep);
+    padding: 20px;
+    z-index: 100;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s var(--ease-tension);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+}
+
+.hotspot.active .part-modal {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%) translateY(20px);
+}
+
+.part-meta {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    color: #64748b;
+    margin-bottom: 16px;
+}
+
+/* --- RESPONSIVE --- */
+@media (max-width: 768px) {
+    .machined-title {
+        font-size: clamp(2rem, 10vw, 3rem);
+    }
+    
+    .cart-panel {
+        width: 100%;
+    }
+}
