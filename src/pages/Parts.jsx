@@ -477,24 +477,8 @@ export default function Parts() {
                       e.stopPropagation();
                       setActiveHotspot(activeHotspot === part.id ? null : part.id);
                     }}
-                    title={`Part ${part.id}: ${part.name} at ${part.position.left}, ${part.position.top}`}
+                    title={`${part.name} (${part.sku})`}
                   >
-                    <span style={{
-                      position: 'absolute',
-                      top: '-20px',
-                      left: '50%',
-                      transform: 'translateX(-50%)',
-                      fontSize: '10px',
-                      fontWeight: 'bold',
-                      color: '#1e40af',
-                      backgroundColor: 'white',
-                      padding: '2px 4px',
-                      borderRadius: '3px',
-                      whiteSpace: 'nowrap',
-                      pointerEvents: 'none'
-                    }}>
-                      #{part.id}
-                    </span>
                     <div className="part-modal" onClick={(e) => e.stopPropagation()}>
                     <h4 style={{
                       textTransform: 'uppercase',
