@@ -848,9 +848,6 @@
                         <div class="slider-container">
                             <input type="range" id="sel-width-slider" min="20" max="100" value="36" oninput="updateSelectedHotspot()">
                         </div>
-                        <input type="number" id="sel-width-input" min="10" max="200" step="1" value="36" 
-                               style="width: 100%; padding: 8px; border: 2px solid #e5e7eb; border-radius: 6px; margin-top: 6px; font-size: 13px;"
-                               oninput="updateSelectedHotspotPrecise()" placeholder="Enter width in pixels">
                     </div>
 
                     <div class="control-group">
@@ -858,9 +855,6 @@
                         <div class="slider-container">
                             <input type="range" id="sel-height-slider" min="20" max="100" value="36" oninput="updateSelectedHotspot()">
                         </div>
-                        <input type="number" id="sel-height-input" min="10" max="200" step="1" value="36" 
-                               style="width: 100%; padding: 8px; border: 2px solid #e5e7eb; border-radius: 6px; margin-top: 6px; font-size: 13px;"
-                               oninput="updateSelectedHotspotPrecise()" placeholder="Enter height in pixels">
                     </div>
 
                     <div class="control-group">
@@ -1513,27 +1507,15 @@
                 editBtn.style.display = 'none';
             }
             
-            const width = coord.width || hotspotWidth;
-            const height = coord.height || hotspotHeight;
-            const rotation = coord.rotation || 0;
-            
-            // Update sliders
-            document.getElementById('sel-width-slider').value = Math.min(100, width);
-            document.getElementById('sel-height-slider').value = Math.min(100, height);
-            document.getElementById('sel-rotation-slider').value = rotation;
-            
-            // Update number inputs
-            document.getElementById('sel-width-input').value = width;
-            document.getElementById('sel-height-input').value = height;
-            
-            // Update position inputs
+            document.getElementById('sel-width-slider').value = coord.width || hotspotWidth;
+            document.getElementById('sel-height-slider').value = coord.height || hotspotHeight;
+            document.getElementById('sel-rotation-slider').value = coord.rotation || 0;
             document.getElementById('sel-left-input').value = parseFloat(coord.left);
             document.getElementById('sel-top-input').value = parseFloat(coord.top);
             
-            // Update labels
-            document.getElementById('sel-width-value').textContent = width + 'px';
-            document.getElementById('sel-height-value').textContent = height + 'px';
-            document.getElementById('sel-rotation-value').textContent = rotation + '°';
+            document.getElementById('sel-width-value').textContent = (coord.width || hotspotWidth) + 'px';
+            document.getElementById('sel-height-value').textContent = (coord.height || hotspotHeight) + 'px';
+            document.getElementById('sel-rotation-value').textContent = (coord.rotation || 0) + '°';
             document.getElementById('sel-left-value').textContent = parseFloat(coord.left).toFixed(2) + '%';
             document.getElementById('sel-top-value').textContent = parseFloat(coord.top).toFixed(2) + '%';
             
@@ -1563,36 +1545,9 @@
             coord.height = parseInt(document.getElementById('sel-height-slider').value);
             coord.rotation = parseInt(document.getElementById('sel-rotation-slider').value);
             
-            // Update all displays
             document.getElementById('sel-width-value').textContent = coord.width + 'px';
             document.getElementById('sel-height-value').textContent = coord.height + 'px';
             document.getElementById('sel-rotation-value').textContent = coord.rotation + '°';
-            
-            // Sync number inputs
-            document.getElementById('sel-width-input').value = coord.width;
-            document.getElementById('sel-height-input').value = coord.height;
-            
-            renderMarkers();
-        }
-
-        function updateSelectedHotspotPrecise() {
-            if (!selectedHotspotId) return;
-            
-            const coord = currentSchematic.coordinates[selectedHotspotId];
-            const width = parseInt(document.getElementById('sel-width-input').value);
-            const height = parseInt(document.getElementById('sel-height-input').value);
-            
-            if (width >= 10 && width <= 200) {
-                coord.width = width;
-                document.getElementById('sel-width-slider').value = Math.min(100, width);
-                document.getElementById('sel-width-value').textContent = width + 'px';
-            }
-            
-            if (height >= 10 && height <= 200) {
-                coord.height = height;
-                document.getElementById('sel-height-slider').value = Math.min(100, height);
-                document.getElementById('sel-height-value').textContent = height + 'px';
-            }
             
             renderMarkers();
         }
@@ -1629,27 +1584,6 @@
                 renderMarkers();
                 updateProgress();
             }
-        }
-
-        function editSelectedPart() {
-            if (!selectedHotspotId) return;
-            
-            const part = currentSchematic.parts.find(p => p.id === selectedHotspotId);
-            if (!part || !part.isCustom) return;
-            
-            // Populate form with existing data
-            document.getElementById('custom-id').value = part.id;
-            document.getElementById('custom-id').disabled = true; // Don't allow changing ID
-            document.getElementById('custom-sku').value = part.sku;
-            document.getElementById('custom-name').value = part.name;
-            document.getElementById('custom-quantity').value = part.quantity;
-            
-            // Update modal title and button
-            document.getElementById('custom-modal-title').textContent = '✏️ Edit Custom Hotspot';
-            document.getElementById('custom-save-btn').textContent = '✓ Update Part Info';
-            
-            // Show modal
-            document.getElementById('custom-hotspot-modal').classList.add('active');
         }
 
         function startDrag(e, partId) {
@@ -1742,10 +1676,8 @@
                 dragStartY = e.clientY;
                 
                 if (selectedHotspotId === partId) {
-                    document.getElementById('sel-width-slider').value = Math.min(100, coord.width);
-                    document.getElementById('sel-height-slider').value = Math.min(100, coord.height);
-                    document.getElementById('sel-width-input').value = coord.width;
-                    document.getElementById('sel-height-input').value = coord.height;
+                    document.getElementById('sel-width-slider').value = coord.width;
+                    document.getElementById('sel-height-slider').value = coord.height;
                     document.getElementById('sel-width-value').textContent = coord.width + 'px';
                     document.getElementById('sel-height-value').textContent = coord.height + 'px';
                     document.getElementById('sel-left-input').value = parseFloat(coord.left);
@@ -1900,14 +1832,9 @@
         function addCustomHotspot() {
             // Clear form
             document.getElementById('custom-id').value = '';
-            document.getElementById('custom-id').disabled = false;
             document.getElementById('custom-sku').value = '';
             document.getElementById('custom-name').value = '';
             document.getElementById('custom-quantity').value = '1';
-            
-            // Reset modal title and button
-            document.getElementById('custom-modal-title').textContent = '➕ Add Custom Hotspot';
-            document.getElementById('custom-save-btn').textContent = '✓ Add & Place Hotspot';
             
             // Show modal
             document.getElementById('custom-hotspot-modal').classList.add('active');
@@ -1915,7 +1842,6 @@
 
         function closeCustomHotspotModal() {
             document.getElementById('custom-hotspot-modal').classList.remove('active');
-            document.getElementById('custom-id').disabled = false; // Re-enable for next time
         }
 
         function saveCustomHotspot() {
@@ -1929,45 +1855,35 @@
                 return;
             }
             
-            // Check if we're editing or adding
-            const existingPart = currentSchematic.parts.find(p => p.id === id);
-            
-            if (existingPart) {
-                // Edit mode
-                existingPart.sku = sku;
-                existingPart.name = name;
-                existingPart.quantity = quantity;
-                
-                // Close modal and refresh
-                closeCustomHotspotModal();
-                renderPartsList();
-                
-                alert(`Hotspot "${id}" updated!`);
-            } else {
-                // Add mode
-                const newPart = {
-                    id: id,
-                    sku: sku,
-                    name: name,
-                    quantity: quantity,
-                    isCustom: true
-                };
-                
-                currentSchematic.parts.push(newPart);
-                
-                // Close modal and render updated list
-                closeCustomHotspotModal();
-                renderPartsList();
-                updateProgress();
-                
-                // Auto-select the new part for placement
-                selectPart(id);
-                
-                // Show success message
-                setTimeout(() => {
-                    alert(`Custom hotspot "${id}" added! Click on the diagram to place it.`);
-                }, 100);
+            // Check if ID already exists
+            if (currentSchematic.parts.find(p => p.id === id)) {
+                alert(`A part with ID "${id}" already exists!`);
+                return;
             }
+            
+            // Add new part to schematic
+            const newPart = {
+                id: id,
+                sku: sku,
+                name: name,
+                quantity: quantity,
+                isCustom: true
+            };
+            
+            currentSchematic.parts.push(newPart);
+            
+            // Close modal and render updated list
+            closeCustomHotspotModal();
+            renderPartsList();
+            updateProgress();
+            
+            // Auto-select the new part for placement
+            selectPart(id);
+            
+            // Show success message
+            setTimeout(() => {
+                alert(`Custom hotspot "${id}" added! Click on the diagram to place it.`);
+            }, 100);
         }
 
         function zoom(delta) {
