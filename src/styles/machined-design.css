@@ -353,7 +353,8 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: all 0.2s ease;
+    /* Only transition the properties we care about for a lighter, smoother feel */
+    transition: transform 180ms ease-out, box-shadow 180ms ease-out, background-color 180ms ease-out;
 }
 
 /* Shape variants */
@@ -373,18 +374,20 @@ body {
 
 /* Enlarge hotspot on hover for easier clicking */
 .hotspot:hover {
-    background: rgba(37, 99, 235, 0.15);
-    box-shadow: 0 0 0 6px rgba(37, 99, 235, 0.08);
+    background: rgba(37, 99, 235, 0.08);
+    /* softer, tighter shadow to avoid the large spread effect */
+    box-shadow: 0 4px 14px rgba(37, 99, 235, 0.06);
+    transform: translate(-50%, -50%) scale(1.08);
 }
 
 .hotspot-circle:hover {
-    width: 48px;
-    height: 48px;
+    /* Prefer scale transform over abrupt width/height change for smoother animation */
+    transform: translate(-50%, -50%) scale(1.12);
 }
 
 .hotspot-rectangle:hover,
 .hotspot-square:hover {
-    transform: translate(-50%, -50%) scale(1.3) !important;
+    transform: translate(-50%, -50%) scale(1.12);
 }
 
 @keyframes pulse {
@@ -405,7 +408,8 @@ body {
     position: absolute;
     top: 100%;
     left: 50%;
-    transform: translateX(-50%) translateY(10px);
+    /* smaller initial offset so the modal feels more anchored */
+    transform: translateX(-50%) translateY(8px);
     width: 280px;
     background: white;
     border: 1px solid var(--alloy-deep);
@@ -413,14 +417,16 @@ body {
     z-index: 100;
     opacity: 0;
     visibility: hidden;
-    transition: all 0.3s var(--ease-tension);
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+    /* use a quicker, smooth ease-out for modal appearing */
+    transition: opacity 180ms ease-out, transform 220ms ease-out, visibility 180ms;
+    box-shadow: 0 14px 30px rgba(0, 0, 0, 0.14);
 }
 
 .hotspot.active .part-modal {
     opacity: 1;
     visibility: visible;
-    transform: translateX(-50%) translateY(20px);
+    /* small gentle pop downward when active */
+    transform: translateX(-50%) translateY(12px);
 }
 
 .part-meta {

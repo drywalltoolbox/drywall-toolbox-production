@@ -1,0 +1,103 @@
+image,matched,prod_part_number,prod_name,prod_brand,schem_part_id,schem_part_sku,schem_part_name,schem_source,match_type
+059018,yes,,,,059018,059018,#6-32 Locknut,D:\AMD\projects\drywall-toolbox\schematics\brands\TapeTech\products\88TTR_SCH_hotspots\schematic_data.json,exact
+059020,yes,,,,26,059020,"Screw, 6-32x3/8, BdH, SST",D:\AMD\projects\drywall-toolbox\schematics\brands\TapeTech\products\13TT_SCH_hotspots\schematic_data.json,exact
+059057,yes,,,,059057,059057,Screw 4-40 x 3/16 Bind Hd. S.S,D:\AMD\projects\drywall-toolbox\schematics\brands\TapeTech\products\NS02TT_SCH_hotspots\schematic_data.json,exact
+059074,yes,,,,059074,059074,"Stopnut, 8-32 Hex, Elas., S.S.",D:\AMD\projects\drywall-toolbox\schematics\brands\TapeTech\products\NS02TT_SCH_hotspots\schematic_data.json,exact
+059102,yes,,,,27,059102,"Screw, 4-40x1/4, FH, SST",D:\AMD\projects\drywall-toolbox\schematics\brands\TapeTech\products\13TT_SCH_hotspots\schematic_data.json,exact
+059143,yes,,,,059143,059143,Cotter Pin 1/16 X 1/2 SST.,D:\AMD\projects\drywall-toolbox\schematics\brands\TapeTech\products\88TTR_SCH_hotspots\schematic_data.json,exact
+059156,yes,,,,059156,059156,#4-40 x 5/16 Binding Head Screw,D:\AMD\projects\drywall-toolbox\schematics\brands\TapeTech\products\88TTR_SCH_hotspots\schematic_data.json,exact
+059225,yes,,,,059225,059225,Nut 10-32 Elastic,D:\AMD\projects\drywall-toolbox\schematics\brands\TapeTech\products\NS02TT_SCH_hotspots\schematic_data.json,exact
+130002,yes,,,,19,130002,"Clip, Long",D:\AMD\projects\drywall-toolbox\schematics\brands\TapeTech\products\13TT_SCH_hotspots\schematic_data.json,exact
+209030,yes,,,,35,209030,"Wing Nut, 10-24, SST.",D:\AMD\projects\drywall-toolbox\schematics\brands\TapeTech\products\73TT_SCH_hotspots\schematic_data.json,exact
+209042,yes,,,,209042,209042,#10 Brass Washer,D:\AMD\projects\drywall-toolbox\schematics\brands\TapeTech\products\NS02TT_SCH_hotspots\schematic_data.json,exact
+209755,yes,,,,209755,209755,"Screw, 6-32 x 1/2 Flat Hd",D:\AMD\projects\drywall-toolbox\schematics\brands\TapeTech\products\NS02TT_SCH_hotspots\schematic_data.json,exact
+359005,yes,,,,359005,359005,Screw: 6-32 X 1/4 Bind Hd.,D:\AMD\projects\drywall-toolbox\schematics\brands\TapeTech\products\NS02TT_SCH_hotspots\schematic_data.json,exact
+400023F,yes,,,,34,400023F,Ball Retainer,D:\AMD\projects\drywall-toolbox\schematics\brands\TapeTech\products\13TT_SCH_hotspots\schematic_data.json,exact
+402002F,yes,,,,17,402002F,Spring Retainer,D:\AMD\projects\drywall-toolbox\schematics\brands\TapeTech\products\13TT_SCH_hotspots\schematic_data.json,exact
+402006,yes,,,,41,402006,Insert Socket,D:\AMD\projects\drywall-toolbox\schematics\brands\TapeTech\products\13TT_SCH_hotspots\schematic_data.json,exact
+409011,yes,,,,30,409011,Skid,D:\AMD\projects\drywall-toolbox\schematics\brands\TapeTech\products\13TT_SCH_hotspots\schematic_data.json,exact
+409021,yes,,,,33,409021,Spring,D:\AMD\projects\drywall-toolbox\schematics\brands\TapeTech\products\13TT_SCH_hotspots\schematic_data.json,exact
+450005,yes,,,,32,450005,Frame Tension Spring,D:\AMD\projects\drywall-toolbox\schematics\brands\TapeTech\products\13TT_SCH_hotspots\schematic_data.json,exact
+450009F,yes,,,,31,450009F,"Blade, 3""",D:\AMD\projects\drywall-toolbox\schematics\brands\TapeTech\products\13TT_SCH_hotspots\schematic_data.json,exact
+450021,yes,,,,39,450021,Blade Tension Spring,D:\AMD\projects\drywall-toolbox\schematics\brands\TapeTech\products\13TT_SCH_hotspots\schematic_data.json,exact
+499023,yes,,,,23,499023,"Screw, 4-40x3/16, FH, SST",D:\AMD\projects\drywall-toolbox\schematics\brands\TapeTech\products\13TT_SCH_hotspots\schematic_data.json,exact
+499024,yes,,,,24,499024,"Washer, 0.188ID, 0.380D, SST",D:\AMD\projects\drywall-toolbox\schematics\brands\TapeTech\products\13TT_SCH_hotspots\schematic_data.json,exact
+499025,yes,,,,25,499025,"Screw, 6-32x1/2, BdH, SST",D:\AMD\projects\drywall-toolbox\schematics\brands\TapeTech\products\13TT_SCH_hotspots\schematic_data.json,exact
+509010,yes,,,,29,509010,"Screw, 4-40x5/16, FH, SST",D:\AMD\projects\drywall-toolbox\schematics\brands\TapeTech\products\13TT_SCH_hotspots\schematic_data.json,exact
+600005F,yes,,,,600005F,600005F,"Blade, Carbide, 2"" N.S.",D:\AMD\projects\drywall-toolbox\schematics\brands\TapeTech\products\NS02TT_SCH_hotspots\schematic_data.json,exact
+600007,yes,,,,600007,600007,"2"" Skid",D:\AMD\projects\drywall-toolbox\schematics\brands\TapeTech\products\NS02TT_SCH_hotspots\schematic_data.json,exact
+600022,yes,,,,600022,600022,Connector,D:\AMD\projects\drywall-toolbox\schematics\brands\TapeTech\products\NS02TT_SCH_hotspots\schematic_data.json,exact
+602029F,yes,,,,602029F,602029F,"Rivet, Special",D:\AMD\projects\drywall-toolbox\schematics\brands\TapeTech\products\NS02TT_SCH_hotspots\schematic_data.json,exact
+602035,yes,,,,602035,602035,Adjustable Stop,D:\AMD\projects\drywall-toolbox\schematics\brands\TapeTech\products\NS02TT_SCH_hotspots\schematic_data.json,exact
+602045F,yes,,,,602045F,602045F,Special Washer,D:\AMD\projects\drywall-toolbox\schematics\brands\TapeTech\products\NS02TT_SCH_hotspots\schematic_data.json,exact
+604036,yes,,,,604036,604036,Blade Clamp Assy,D:\AMD\projects\drywall-toolbox\schematics\brands\TapeTech\products\NS02TT_SCH_hotspots\schematic_data.json,exact
+609008,yes,,,,609008,609008,Screw 4-40 X 1/2 Flat Hd. S.S.,D:\AMD\projects\drywall-toolbox\schematics\brands\TapeTech\products\NS02TT_SCH_hotspots\schematic_data.json,exact
+609011,yes,,,,609011,609011,"Screw, Rnd. Hd. S.S.",D:\AMD\projects\drywall-toolbox\schematics\brands\TapeTech\products\NS02TT_SCH_hotspots\schematic_data.json,exact
+609012,yes,,,,609012,609012,Stopnut 4-40 S.S,D:\AMD\projects\drywall-toolbox\schematics\brands\TapeTech\products\NS02TT_SCH_hotspots\schematic_data.json,exact
+609015,yes,,,,609015,609015,Nut Block,D:\AMD\projects\drywall-toolbox\schematics\brands\TapeTech\products\NS02TT_SCH_hotspots\schematic_data.json,exact
+609018,yes,,,,609018,609018,Washer (Plastic),D:\AMD\projects\drywall-toolbox\schematics\brands\TapeTech\products\NS02TT_SCH_hotspots\schematic_data.json,exact
+609020,yes,,,,609020,609020,Friction Washer,D:\AMD\projects\drywall-toolbox\schematics\brands\TapeTech\products\NS02TT_SCH_hotspots\schematic_data.json,exact
+609048,yes,,,,28,609048,"Screw, 4-40x3/8, FH, SST",D:\AMD\projects\drywall-toolbox\schematics\brands\TapeTech\products\13TT_SCH_hotspots\schematic_data.json,exact
+609049,yes,,,,609049,609049,Serrated Hex Flange Nut,D:\AMD\projects\drywall-toolbox\schematics\brands\TapeTech\products\NS02TT_SCH_hotspots\schematic_data.json,exact
+609050,yes,,,,609050,609050,"Screw,6-32 X 3/32 Slotted Rd Hd",D:\AMD\projects\drywall-toolbox\schematics\brands\TapeTech\products\NS02TT_SCH_hotspots\schematic_data.json,exact
+630002,yes,,,,630002,630002,"Latch, 2"" N.S.",D:\AMD\projects\drywall-toolbox\schematics\brands\TapeTech\products\NS02TT_SCH_hotspots\schematic_data.json,exact
+630009,yes,,,,630009,630009,"2"" N.S. Facing",D:\AMD\projects\drywall-toolbox\schematics\brands\TapeTech\products\NS02TT_SCH_hotspots\schematic_data.json,exact
+630010,yes,,,,630010,630010,"2"" Hinge Block",D:\AMD\projects\drywall-toolbox\schematics\brands\TapeTech\products\NS02TT_SCH_hotspots\schematic_data.json,exact
+630030,yes,,,,630030,630030,"2"" N.S. Insert",D:\AMD\projects\drywall-toolbox\schematics\brands\TapeTech\products\NS02TT_SCH_hotspots\schematic_data.json,exact
+634028,yes,,,,634028,634028,"2""Press Plate Assy W/ New Style Tab",D:\AMD\projects\drywall-toolbox\schematics\brands\TapeTech\products\NS02TT_SCH_hotspots\schematic_data.json,exact
+638001,yes,,,,638001,638001,"2"" Easyclean Nail Spotter Body, No-Logo",D:\AMD\projects\drywall-toolbox\schematics\brands\TapeTech\products\NS02TT_SCH_hotspots\schematic_data.json,exact
+639020,yes,,,,639020,639020,Plastic Washer,D:\AMD\projects\drywall-toolbox\schematics\brands\TapeTech\products\NS02TT_SCH_hotspots\schematic_data.json,exact
+700002F,yes,,,,9,700002F,Piston Rod,D:\AMD\projects\drywall-toolbox\schematics\brands\TapeTech\products\73TT_SCH_hotspots\schematic_data.json,exact
+700004F,yes,,,,1,700004F,Gland,D:\AMD\projects\drywall-toolbox\schematics\brands\TapeTech\products\73TT_SCH_hotspots\schematic_data.json,exact
+700005,yes,,,,3,700005,'U' Cup,D:\AMD\projects\drywall-toolbox\schematics\brands\TapeTech\products\73TT_SCH_hotspots\schematic_data.json,exact
+700008,yes,,,,27,700008,Large Retainer,D:\AMD\projects\drywall-toolbox\schematics\brands\TapeTech\products\73TT_SCH_hotspots\schematic_data.json,exact
+700010F,yes,,,,23,700010F,Valve Disk,D:\AMD\projects\drywall-toolbox\schematics\brands\TapeTech\products\73TT_SCH_hotspots\schematic_data.json,exact
+700015F,yes,,,,6,700015F,Link,D:\AMD\projects\drywall-toolbox\schematics\brands\TapeTech\products\73TT_SCH_hotspots\schematic_data.json,exact
+700029,yes,,,,2,700029,Bushing Liner,D:\AMD\projects\drywall-toolbox\schematics\brands\TapeTech\products\73TT_SCH_hotspots\schematic_data.json,exact
+700032F,yes,,,,34,700032F,Screen (Fine),D:\AMD\projects\drywall-toolbox\schematics\brands\TapeTech\products\73TT_SCH_hotspots\schematic_data.json,exact
+700033F,yes,,,,34,700033F,Screen (Coarse),D:\AMD\projects\drywall-toolbox\schematics\brands\TapeTech\products\73TT_SCH_hotspots\schematic_data.json,exact
+700036,yes,,,,16,700036,"Stud, 5/16-24 x 1 7/16",D:\AMD\projects\drywall-toolbox\schematics\brands\TapeTech\products\73TT_SCH_hotspots\schematic_data.json,exact
+700037,yes,,,,11,700037,Special Nut,D:\AMD\projects\drywall-toolbox\schematics\brands\TapeTech\products\73TT_SCH_hotspots\schematic_data.json,exact
+700045,yes,,,,24,700045,Small Retainer,D:\AMD\projects\drywall-toolbox\schematics\brands\TapeTech\products\73TT_SCH_hotspots\schematic_data.json,exact
+700049,yes,,,,15,700049,Gasket,D:\AMD\projects\drywall-toolbox\schematics\brands\TapeTech\products\73TT_SCH_hotspots\schematic_data.json,exact
+706020F,yes,,,,40,706020F,Foot Bracket,D:\AMD\projects\drywall-toolbox\schematics\brands\TapeTech\products\73TT_SCH_hotspots\schematic_data.json,exact
+709006,yes,,,,19,709006,"CapScrew, 1/4-20 x 5/8 Soc. Hd. SST.",D:\AMD\projects\drywall-toolbox\schematics\brands\TapeTech\products\73TT_SCH_hotspots\schematic_data.json,exact
+709007,yes,,,,18,709007,"Nut, 5/16-24 Hex.",D:\AMD\projects\drywall-toolbox\schematics\brands\TapeTech\products\73TT_SCH_hotspots\schematic_data.json,exact
+709012,yes,,,,37,709012,Washer,D:\AMD\projects\drywall-toolbox\schematics\brands\TapeTech\products\73TT_SCH_hotspots\schematic_data.json,exact
+709023,yes,,,,48,709023,"CapScrew, 5/16-18 x 7/8 Hex. Hd.",D:\AMD\projects\drywall-toolbox\schematics\brands\TapeTech\products\73TT_SCH_hotspots\schematic_data.json,exact
+709024,yes,,,,47,709024,"LockWasher, 5/16 Med.",D:\AMD\projects\drywall-toolbox\schematics\brands\TapeTech\products\73TT_SCH_hotspots\schematic_data.json,exact
+709027,yes,,,,39,709027,"Lock Nut, 3/8-16 Flex. Loc. SST.",D:\AMD\projects\drywall-toolbox\schematics\brands\TapeTech\products\73TT_SCH_hotspots\schematic_data.json,exact
+709046,yes,,,,28,709046,Locator,D:\AMD\projects\drywall-toolbox\schematics\brands\TapeTech\products\73TT_SCH_hotspots\schematic_data.json,exact
+709052,yes,,,,5,709052,"Stop Nut, 1/4-20 Thin Pattern",D:\AMD\projects\drywall-toolbox\schematics\brands\TapeTech\products\73TT_SCH_hotspots\schematic_data.json,exact
+709055,yes,,,,38,709055,"Screw, 10-24 x 7/8 Rd. Hd. SST.",D:\AMD\projects\drywall-toolbox\schematics\brands\TapeTech\products\73TT_SCH_hotspots\schematic_data.json,exact
+709056,yes,,,,33,709056,"Nut, 10-24, Hex. SST.",D:\AMD\projects\drywall-toolbox\schematics\brands\TapeTech\products\73TT_SCH_hotspots\schematic_data.json,exact
+720009,yes,,,,25,720009,Piston Cup,D:\AMD\projects\drywall-toolbox\schematics\brands\TapeTech\products\73TT_SCH_hotspots\schematic_data.json,exact
+720066F,yes,,,,22,720066F,'O' Ring Enclosure,D:\AMD\projects\drywall-toolbox\schematics\brands\TapeTech\products\73TT_SCH_hotspots\schematic_data.json,exact
+724061F,yes,,,,41,724061F,Clamp Assy. (Clamp + Keeper),D:\AMD\projects\drywall-toolbox\schematics\brands\TapeTech\products\73TT_SCH_hotspots\schematic_data.json,exact
+724065,yes,,,,4,724065,Quick Release Pin,D:\AMD\projects\drywall-toolbox\schematics\brands\TapeTech\products\73TT_SCH_hotspots\schematic_data.json,exact
+726018,yes,,,,52,726018,Pump Handle Assembly,D:\AMD\projects\drywall-toolbox\schematics\brands\TapeTech\products\73TT_SCH_hotspots\schematic_data.json,exact
+728001F,yes,,,,17,728001F,Easy Clean Pump Head,D:\AMD\projects\drywall-toolbox\schematics\brands\TapeTech\products\73TT_SCH_hotspots\schematic_data.json,exact
+729051,yes,,,,45,729051,Hex Head Cap Screw,D:\AMD\projects\drywall-toolbox\schematics\brands\TapeTech\products\73TT_SCH_hotspots\schematic_data.json,exact
+729060,yes,,,,21,729060,'O' Ring,D:\AMD\projects\drywall-toolbox\schematics\brands\TapeTech\products\73TT_SCH_hotspots\schematic_data.json,exact
+729063,yes,,,,30,729063,Screw 8-32 x 3/16 Bind HD. S.M.,D:\AMD\projects\drywall-toolbox\schematics\brands\TapeTech\products\73TT_SCH_hotspots\schematic_data.json,exact
+729064,yes,,,,42,729064,"Screw, 8-32 x 3/8 Bd. Hd. SST.",D:\AMD\projects\drywall-toolbox\schematics\brands\TapeTech\products\73TT_SCH_hotspots\schematic_data.json,exact
+880028,yes,,,,880028,880028,Compression Spring,D:\AMD\projects\drywall-toolbox\schematics\brands\TapeTech\products\88TTR_SCH_hotspots\schematic_data.json,exact
+880042,yes,,,,880042,880042,Rubber Grip Handle,D:\AMD\projects\drywall-toolbox\schematics\brands\TapeTech\products\88TTR_SCH_hotspots\schematic_data.json,exact
+880053,yes,,,,880053,880053,Lock Block,D:\AMD\projects\drywall-toolbox\schematics\brands\TapeTech\products\88TTR_SCH_hotspots\schematic_data.json,exact
+882001G,yes,,,,882001G,882001G,Exterior Tube,D:\AMD\projects\drywall-toolbox\schematics\brands\TapeTech\products\88TTR_SCH_hotspots\schematic_data.json,exact
+882002,yes,,,,882002,882002,Profile Extrusion,D:\AMD\projects\drywall-toolbox\schematics\brands\TapeTech\products\88TTR_SCH_hotspots\schematic_data.json,exact
+882011B,yes,,,,882011B,882011B,Actuator,D:\AMD\projects\drywall-toolbox\schematics\brands\TapeTech\products\88TTR_SCH_hotspots\schematic_data.json,exact
+882012,yes,,,,882012,882012,Actuator-Clip Pin,D:\AMD\projects\drywall-toolbox\schematics\brands\TapeTech\products\88TTR_SCH_hotspots\schematic_data.json,exact
+882013,yes,,,,882013,882013,Locking Pin,D:\AMD\projects\drywall-toolbox\schematics\brands\TapeTech\products\88TTR_SCH_hotspots\schematic_data.json,exact
+882014,yes,,,,882014,882014,Locking Clip,D:\AMD\projects\drywall-toolbox\schematics\brands\TapeTech\products\88TTR_SCH_hotspots\schematic_data.json,exact
+882016,yes,,,,882016,882016,Guide Plug,D:\AMD\projects\drywall-toolbox\schematics\brands\TapeTech\products\88TTR_SCH_hotspots\schematic_data.json,exact
+882039,yes,,,,882039,882039,Spring Housing,D:\AMD\projects\drywall-toolbox\schematics\brands\TapeTech\products\88TTR_SCH_hotspots\schematic_data.json,exact
+883021,yes,,,,883021,883021,NS Adapter Jam Nut,D:\AMD\projects\drywall-toolbox\schematics\brands\TapeTech\products\NS02TT_SCH_hotspots\schematic_data.json,exact
+883022,yes,,,,883022,883022,NS Adapter,D:\AMD\projects\drywall-toolbox\schematics\brands\TapeTech\products\NS02TT_SCH_hotspots\schematic_data.json,exact
+883023,yes,,,,883023,883023,NS Adapter Clamp,D:\AMD\projects\drywall-toolbox\schematics\brands\TapeTech\products\NS02TT_SCH_hotspots\schematic_data.json,exact
+884003B,yes,,,,884003B,884003B,Handle Bracket,D:\AMD\projects\drywall-toolbox\schematics\brands\TapeTech\products\88TTR_SCH_hotspots\schematic_data.json,exact
+889009,yes,,,,889009,889009,5/32 x 1 Slotted Spring Pin,D:\AMD\projects\drywall-toolbox\schematics\brands\TapeTech\products\88TTR_SCH_hotspots\schematic_data.json,exact
+889017,yes,,,,889017,889017,Conical Spring,D:\AMD\projects\drywall-toolbox\schematics\brands\TapeTech\products\88TTR_SCH_hotspots\schematic_data.json,exact
+889035,yes,,,,889035,889035,#6-32 x 1/4 Slotted Pan Head Screw,D:\AMD\projects\drywall-toolbox\schematics\brands\TapeTech\products\88TTR_SCH_hotspots\schematic_data.json,exact
+910005,yes,,,,910005,910005,Knob,D:\AMD\projects\drywall-toolbox\schematics\brands\TapeTech\products\88TTR_SCH_hotspots\schematic_data.json,exact
+910037,yes,,,,910037,910037,Corner Roller Adapter,D:\AMD\projects\drywall-toolbox\schematics\brands\TapeTech\products\88TTR_SCH_hotspots\schematic_data.json,exact

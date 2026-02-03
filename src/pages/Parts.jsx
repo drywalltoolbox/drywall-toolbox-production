@@ -10,6 +10,10 @@ import schematic88Img from '../../schematics/brands/TapeTech/products/88TTR_SCH_
 import schematic88ImgPage3 from '../../schematics/brands/TapeTech/products/88TTR_SCH_hotspots/images/page_3.png';
 import schematicNS02Data from '../../schematics/brands/TapeTech/products/NS02TT_SCH_hotspots/schematic_data.json';
 import schematicNS02Img from '../../schematics/brands/TapeTech/products/NS02TT_SCH_hotspots/images/page_1.png';
+import schematic73Data from '../../schematics/brands/TapeTech/products/73TT_SCH_hotspots/schematic_data.json';
+import schematic73Img from '../../schematics/brands/TapeTech/products/73TT_SCH_hotspots/images/page_2.png';
+import schematicPAHC10Data from '../../schematics/brands/TapeTech/products/PAHC10_SCH_v2_hotspots/schematic_data.json';
+import schematicPAHC10Img from '../../schematics/brands/TapeTech/products/PAHC10_SCH_v2_hotspots/images/page_1.png';
 
 export default function Parts() {
   const [activeHotspot, setActiveHotspot] = useState(null);
@@ -106,6 +110,54 @@ export default function Parts() {
       rotation: c && c.rotation ? c.rotation : 0
     };
   }).filter(Boolean) : [];
+  // Build 73TT schematic parts from JSON data
+  const schematic73Parts = (schematic73Data && schematic73Data.parts) ? schematic73Data.parts.map((p) => {
+    const coords = schematic73Data.coordinates || {};
+    const c = coords[p.id] || coords[String(Number(p.id))] || null;
+    const top = c && c.top !== undefined ? `${c.top}%` : '50%';
+    const left = c && c.left !== undefined ? `${c.left}%` : '50%';
+    const pageNumber = c && c.pageNumber ? c.pageNumber : (schematic73Data.diagramPages && schematic73Data.diagramPages[0]) || 1;
+    return {
+      id: p.id,
+      name: p.name,
+      sku: p.sku || p.SKU || '',
+      quantity: p.quantity || 1,
+      material: p.material || '',
+      price: p.price || 0,
+      position: { top, left },
+      pageNumber,
+      shape: c && c.shape ? c.shape : 'circle',
+      width: c && c.width ? c.width : null,
+      height: c && c.height ? c.height : null,
+      rotation: c && c.rotation ? c.rotation : 0
+    };
+  }) : [];
+  // Build PAHC10 v2 schematic parts from JSON data
+  const schematicPAHC10Parts = (schematicPAHC10Data && schematicPAHC10Data.parts) ? schematicPAHC10Data.parts.map((p) => {
+    const coords = schematicPAHC10Data.coordinates || {};
+    // Parts in this schematic may have empty `id` fields but valid `sku` values.
+    // Use sku as the primary lookup key when id is missing so coordinates (which
+    // are keyed by SKU) are found and hotspots render in the right place.
+    const lookupKey = (p.id && String(p.id).trim() !== '') ? String(p.id) : (p.sku || p.SKU || '');
+    const c = lookupKey && (coords[lookupKey] || coords[String(Number(lookupKey))]) ? (coords[lookupKey] || coords[String(Number(lookupKey))]) : null;
+    const top = c && c.top !== undefined ? `${c.top}%` : '50%';
+    const left = c && c.left !== undefined ? `${c.left}%` : '50%';
+    const pageNumber = c && c.pageNumber ? c.pageNumber : (schematicPAHC10Data.diagramPages && schematicPAHC10Data.diagramPages[0]) || 1;
+    return {
+      id: p.id && String(p.id).trim() !== '' ? p.id : (p.sku || p.SKU || ''),
+      name: p.name,
+      sku: p.sku || p.SKU || '',
+      quantity: p.quantity || 1,
+      material: p.material || '',
+      price: p.price || 0,
+      position: { top, left },
+      pageNumber,
+      shape: c && c.shape ? c.shape : 'circle',
+      width: c && c.width ? c.width : null,
+      height: c && c.height ? c.height : null,
+      rotation: c && c.rotation ? c.rotation : 0
+    };
+  }) : [];
   const schematics = [
     {
       id: 'tapetech-corner-roller',
@@ -272,6 +324,30 @@ export default function Parts() {
           },
           parts: schematic88Parts
         },
+    {
+      id: 'tapetech-73tt',
+      title: 'TapeTech 73TT Schematic',
+      description: 'Interactive schematic for TapeTech 73TT (hotspots & parts)',
+      brand: 'TapeTech',
+      productPartNumber: null,
+      diagramPages: schematic73Data.diagramPages || [2],
+      imagePages: {
+        [schematic73Data.diagramPages ? schematic73Data.diagramPages[0] : 2]: schematic73Img
+      },
+      parts: schematic73Parts
+    },
+    {
+      id: 'tapetech-pahc10-v2',
+      title: 'TapeTech PAHC10 Schematic v2',
+      description: 'Interactive schematic for TapeTech PAHC10 (v2) - hotspots & parts',
+      brand: 'TapeTech',
+      productPartNumber: null,
+      diagramPages: schematicPAHC10Data.diagramPages || [1],
+      imagePages: {
+        [schematicPAHC10Data.diagramPages ? schematicPAHC10Data.diagramPages[0] : 1]: schematicPAHC10Img
+      },
+      parts: schematicPAHC10Parts
+    },
     {
       id: 'tapetech-nail-spotter-2',
       title: 'TapeTech 2" Nail Spotter',
