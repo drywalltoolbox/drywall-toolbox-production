@@ -1,7 +1,15 @@
 ﻿import { useState, useEffect } from 'react';
 import { useCart } from '../context/CartContext';
 import Toast from '../components/Toast';
+import SchematicFilterBar from '../components/SchematicFilterBar';
 import { loadProducts } from '../data/products';
+import schematic13Data from '../../schematics/brands/TapeTech/products/13TT_SCH_hotspots/schematic_data.json';
+import schematic13Img from '../../schematics/brands/TapeTech/products/13TT_SCH_hotspots/images/page_1.png';
+import schematic88Data from '../../schematics/brands/TapeTech/products/88TTR_SCH_hotspots/schematic_data.json';
+import schematic88Img from '../../schematics/brands/TapeTech/products/88TTR_SCH_hotspots/images/page_2.png';
+import schematic88ImgPage3 from '../../schematics/brands/TapeTech/products/88TTR_SCH_hotspots/images/page_3.png';
+import schematicNS02Data from '../../schematics/brands/TapeTech/products/NS02TT_SCH_hotspots/schematic_data.json';
+import schematicNS02Img from '../../schematics/brands/TapeTech/products/NS02TT_SCH_hotspots/images/page_1.png';
 
 export default function Parts() {
   const [activeHotspot, setActiveHotspot] = useState(null);
@@ -29,8 +37,75 @@ export default function Parts() {
       }
     });
   }, []);
-
+  
   // Schematic data for tools
+  // Build 13TT schematic parts from JSON data
+  const schematic13Parts = (schematic13Data && schematic13Data.parts) ? schematic13Data.parts.map((p) => {
+    const coords = schematic13Data.coordinates || {};
+    // coordinates keys are strings matching part ids
+    const c = coords[p.id] || coords[String(Number(p.id))] || null;
+    const top = c && c.top !== undefined ? `${c.top}%` : '50%';
+    const left = c && c.left !== undefined ? `${c.left}%` : '50%';
+    const pageNumber = c && c.pageNumber ? c.pageNumber : (schematic13Data.diagramPages && schematic13Data.diagramPages[0]) || 1;
+    return {
+      id: p.id,
+      name: p.name,
+      sku: p.sku || p.SKU || '',
+      quantity: p.quantity || 1,
+      material: p.material || '',
+      price: p.price || 0,
+      position: { top, left },
+      pageNumber,
+      shape: c && c.shape ? c.shape : 'circle',
+      width: c && c.width ? c.width : null,
+      height: c && c.height ? c.height : null,
+      rotation: c && c.rotation ? c.rotation : 0
+    };
+  }) : [];
+  // Build 88TTR schematic parts using coordinates for page 2 (first diagram page)
+  const schematic88Parts = (schematic88Data && schematic88Data.parts) ? schematic88Data.parts.map((p) => {
+    const coords = schematic88Data.coordinates || {};
+    const c = coords[p.id] || coords[String(Number(p.id))] || null;
+    const top = c && c.top !== undefined ? `${c.top}%` : '50%';
+    const left = c && c.left !== undefined ? `${c.left}%` : '50%';
+    const pageNumber = c && c.pageNumber ? c.pageNumber : (schematic88Data.diagramPages && schematic88Data.diagramPages[0]) || 1;
+    return {
+      id: p.id,
+      name: p.name,
+      sku: p.sku || p.SKU || '',
+      quantity: p.quantity || 1,
+      material: p.material || '',
+      price: p.price || 0,
+      position: { top, left },
+      pageNumber,
+      shape: c && c.shape ? c.shape : 'circle',
+      width: c && c.width ? c.width : null,
+      height: c && c.height ? c.height : null,
+      rotation: c && c.rotation ? c.rotation : 0
+    };
+  }).filter(Boolean) : [];
+  // Build NS02TT schematic parts from JSON data
+  const schematicNS02Parts = (schematicNS02Data && schematicNS02Data.parts) ? schematicNS02Data.parts.map((p) => {
+    const coords = schematicNS02Data.coordinates || {};
+    const c = coords[p.id] || coords[String(Number(p.id))] || null;
+    const top = c && c.top !== undefined ? `${c.top}%` : '50%';
+    const left = c && c.left !== undefined ? `${c.left}%` : '50%';
+    const pageNumber = c && c.pageNumber ? c.pageNumber : (schematicNS02Data.diagramPages && schematicNS02Data.diagramPages[0]) || 1;
+    return {
+      id: p.id,
+      name: p.name,
+      sku: p.sku || p.SKU || '',
+      quantity: p.quantity || 1,
+      material: p.material || '',
+      price: p.price || 0,
+      position: { top, left },
+      pageNumber,
+      shape: c && c.shape ? c.shape : 'circle',
+      width: c && c.width ? c.width : null,
+      height: c && c.height ? c.height : null,
+      rotation: c && c.rotation ? c.rotation : 0
+    };
+  }).filter(Boolean) : [];
   const schematics = [
     {
       id: 'tapetech-corner-roller',
@@ -168,6 +243,62 @@ export default function Parts() {
           position: { top: '22.06%', left: '82.35%' },
           quantity: 1
         }
+      ]
+    },
+    {
+      id: 'tapetech-13tt',
+        title: 'TapeTech 13TT Schematic',
+        description: 'Interactive schematic for TapeTech 13TT with hotspots',
+        brand: 'TapeTech',
+        productPartNumber: null,
+        // single-page schematic -- page 1
+        diagramPages: schematic13Data.diagramPages || [1],
+        imagePages: {
+          [schematic13Data.diagramPages ? schematic13Data.diagramPages[0] : 1]: schematic13Img
+        },
+        parts: schematic13Parts
+      },
+      {
+        id: 'tapetech-88ttr',
+          title: 'TapeTech 88TTR Schematic',
+          description: 'Interactive schematic for TapeTech 88TTR (multi-page). Use the pager to switch diagram pages.',
+          brand: 'TapeTech',
+          productPartNumber: null,
+          diagramPages: schematic88Data.diagramPages || [2],
+          imagePages: {
+            // diagramPages reference page numbers from the original PDF export
+            2: schematic88Img,
+            3: schematic88ImgPage3
+          },
+          parts: schematic88Parts
+        },
+    {
+      id: 'tapetech-nail-spotter-2',
+      title: 'TapeTech 2" Nail Spotter',
+      description: 'Professional 2" EasyClean Nail Spotter - Model NS02TT',
+      brand: 'TapeTech',
+      productPartNumber: 'NS02TT',
+      diagramPages: schematicNS02Data.diagramPages || [1],
+      imagePages: {
+        [schematicNS02Data.diagramPages ? schematicNS02Data.diagramPages[0] : 1]: schematicNS02Img
+      },
+      parts: schematicNS02Parts
+    },
+    {
+      id: 'tapetech-corner-finisher-t5',
+      title: 'TapeTech T5 Corner Finisher',
+      description: 'Precision Corner Finisher Assembly - Model T05CF (Main Components)',
+      brand: 'TapeTech',
+      productPartNumber: 'T05CF',
+      image: '/T05CF_SCH-9.png',
+      parts: [
+        { id: '499023', name: 'Finisher Blade', sku: '499023', material: 'STAINLESS-STEEL', price: 24.50, position: { top: '50.38%', left: '77.25%' }, quantity: 1 },
+        { id: '800856', name: 'Main Body casting', sku: '800856', material: 'ALUMINUM', price: 85.00, position: { top: '72.35%', left: '53.70%' }, quantity: 1 },
+        { id: '800857', name: 'Upper Frame', sku: '800857', material: 'STEEL', price: 42.00, position: { top: '60.95%', left: '34.60%' }, quantity: 1 },
+        { id: '800858', name: 'Lower Frame', sku: '800858', material: 'STEEL', price: 42.00, position: { top: '63.30%', left: '29.10%' }, quantity: 1 },
+        { id: '809860', name: 'Adjuster Pin', sku: '809860', material: 'STEEL', price: 12.50, position: { top: '58.25%', left: '39.80%' }, quantity: 1 },
+        { id: '809861', name: 'Spring Retainer', sku: '809861', material: 'PLASTIC', price: 5.50, position: { top: '78.45%', left: '38.50%' }, quantity: 1 },
+        { id: '809862', name: 'Cushion Spring', sku: '809862', material: 'STEEL', price: 8.00, position: { top: '82.90%', left: '24.10%' }, quantity: 1 }
       ]
     },
     {
@@ -352,14 +483,23 @@ export default function Parts() {
     if (selectedBrand && schematic.brand !== selectedBrand) {
       return false;
     }
-    // If product selected, only show schematics matching that product
-    if (selectedProduct && schematic.productPartNumber !== selectedProduct.part_number) {
+    // If product selected, only show schematics that specify a productPartNumber matching the product
+    // Schematics without productPartNumber (null/undefined) are considered brand-level and shown for the brand
+    if (selectedProduct && schematic.productPartNumber && schematic.productPartNumber !== selectedProduct.part_number) {
       return false;
     }
     return true;
   });
 
   const currentSchematic = schematics.find(s => s.id === selectedSchematic);
+  const [currentPage, setCurrentPage] = useState(1);
+
+  // When schematic changes we reset the page in the schematic selector's onChange handler below.
+
+  // Pick the image for the currently selected diagram page (if available)
+  const schematicImageSrc = currentSchematic
+    ? (currentSchematic.imagePages && currentSchematic.imagePages[currentPage]) || currentSchematic.image || null
+    : null;
 
   const handleAddToCart = (part) => {
     // Create a product object compatible with the cart system
@@ -404,307 +544,111 @@ export default function Parts() {
           }}>
             INTERACTIVE SCHEMATIC VIEWER
           </h2>
-          <p style={{ opacity: 0.7, fontSize: '1.1rem' }}>
-            Select brand → product → explore technical diagrams and component specifications
-          </p>
         </div>
-
-        {/* Horizontal Navigation Bar */}
-        <div style={{
-          marginBottom: '40px',
-          background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.98) 0%, rgba(30, 41, 59, 0.98) 100%)',
-          backdropFilter: 'blur(20px)',
-          border: '1px solid rgba(37, 99, 235, 0.2)',
-          borderRadius: '12px',
-          padding: '16px 24px',
-          boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '24px',
-          flexWrap: 'wrap'
-        }}>
-          
-          {/* Brand Dropdown */}
-          <div style={{ position: 'relative', flex: '1 1 250px', minWidth: '200px' }}>
-            <label style={{
-              display: 'block',
-              fontSize: '0.7rem',
-              fontWeight: '700',
-              letterSpacing: '0.1em',
-              textTransform: 'uppercase',
-              color: 'rgba(255, 255, 255, 0.5)',
-              marginBottom: '8px'
-            }}>
-              Brand
-            </label>
-            <select
-              value={selectedBrand}
-              onChange={(e) => {
-                setSelectedBrand(e.target.value);
-                setSelectedProduct(null);
-              }}
-              style={{
-                width: '100%',
-                padding: '12px 16px',
-                background: 'rgba(255, 255, 255, 0.05)',
-                border: '1px solid rgba(255, 255, 255, 0.1)',
-                borderRadius: '8px',
-                color: 'white',
-                fontSize: '0.95rem',
-                fontWeight: '500',
-                cursor: 'pointer',
-                outline: 'none',
-                transition: 'all 0.2s ease',
-                appearance: 'none',
-                backgroundImage: `url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1.5L6 6.5L11 1.5' stroke='%2360a5fa' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")`,
-                backgroundRepeat: 'no-repeat',
-                backgroundPosition: 'right 16px center',
-                paddingRight: '48px'
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.08)';
-                e.currentTarget.style.borderColor = 'rgba(37, 99, 235, 0.5)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.05)';
-                e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.1)';
-              }}
-            >
-              {brands.map((brand) => (
-                <option key={brand} value={brand} style={{ background: '#1e293b', color: 'white' }}>
-                  {brand}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {/* Separator */}
-          <div style={{
-            width: '1px',
-            height: '40px',
-            background: 'rgba(255, 255, 255, 0.1)',
-            display: brands.length > 0 && filteredProducts.length > 0 ? 'block' : 'none'
-          }} />
-
-          {/* Product Dropdown */}
-          {selectedBrand && filteredProducts.length > 0 && (
-            <div style={{ position: 'relative', flex: '1 1 300px', minWidth: '250px' }}>
-              <label style={{
-                display: 'block',
-                fontSize: '0.7rem',
-                fontWeight: '700',
-                letterSpacing: '0.1em',
-                textTransform: 'uppercase',
-                color: 'rgba(255, 255, 255, 0.5)',
-                marginBottom: '8px'
-              }}>
-                Product <span style={{ opacity: 0.6, fontWeight: '400' }}>({filteredProducts.length})</span>
-              </label>
-              <select
-                value={selectedProduct?.id || ''}
-                onChange={(e) => {
-                  const product = filteredProducts.find(p => p.id === e.target.value);
-                  setSelectedProduct(product);
-                }}
-                style={{
-                  width: '100%',
-                  padding: '12px 16px',
-                  background: 'rgba(255, 255, 255, 0.05)',
-                  border: '1px solid rgba(255, 255, 255, 0.1)',
-                  borderRadius: '8px',
-                  color: 'white',
-                  fontSize: '0.95rem',
-                  fontWeight: '500',
-                  cursor: 'pointer',
-                  outline: 'none',
-                  transition: 'all 0.2s ease',
-                  appearance: 'none',
-                  backgroundImage: `url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1.5L6 6.5L11 1.5' stroke='%2360a5fa' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")`,
-                  backgroundRepeat: 'no-repeat',
-                  backgroundPosition: 'right 16px center',
-                  paddingRight: '48px'
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.background = 'rgba(255, 255, 255, 0.08)';
-                  e.currentTarget.style.borderColor = 'rgba(96, 165, 250, 0.5)';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.background = 'rgba(255, 255, 255, 0.05)';
-                  e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.1)';
-                }}
-              >
-                <option value="" style={{ background: '#1e293b', color: 'white' }}>
-                  Select a product...
-                </option>
-                {filteredProducts.map((product) => (
-                  <option key={product.id} value={product.id} style={{ background: '#1e293b', color: 'white' }}>
-                    {product.name} ({product.part_number})
-                  </option>
-                ))}
-              </select>
-            </div>
-          )}
-
-          {/* Separator */}
-          <div style={{
-            width: '1px',
-            height: '40px',
-            background: 'rgba(255, 255, 255, 0.1)'
-          }} />
-
-          {/* Schematic Dropdown */}
-          <div style={{ position: 'relative', flex: '1 1 280px', minWidth: '220px' }}>
-            <label style={{
-              display: 'block',
-              fontSize: '0.7rem',
-              fontWeight: '700',
-              letterSpacing: '0.1em',
-              textTransform: 'uppercase',
-              color: 'rgba(255, 255, 255, 0.5)',
-              marginBottom: '8px'
-            }}>
-              Schematic Diagram
-            </label>
-            <select
-              value={selectedSchematic || ''}
-              onChange={(e) => setSelectedSchematic(e.target.value)}
-              style={{
-                width: '100%',
-                padding: '12px 16px',
-                background: selectedSchematic 
-                  ? 'rgba(37, 99, 235, 0.15)' 
-                  : 'rgba(255, 255, 255, 0.05)',
-                border: selectedSchematic 
-                  ? '1px solid rgba(37, 99, 235, 0.4)' 
-                  : '1px solid rgba(255, 255, 255, 0.1)',
-                borderRadius: '8px',
-                color: 'white',
-                fontSize: '0.95rem',
-                fontWeight: selectedSchematic ? '600' : '500',
-                cursor: 'pointer',
-                outline: 'none',
-                transition: 'all 0.2s ease',
-                appearance: 'none',
-                backgroundImage: `url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1.5L6 6.5L11 1.5' stroke='%2393c5fd' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")`,
-                backgroundRepeat: 'no-repeat',
-                backgroundPosition: 'right 16px center',
-                paddingRight: '48px',
-                boxShadow: selectedSchematic 
-                  ? '0 0 20px rgba(37, 99, 235, 0.2)' 
-                  : 'none'
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.background = selectedSchematic 
-                  ? 'rgba(37, 99, 235, 0.2)' 
-                  : 'rgba(255, 255, 255, 0.08)';
-                e.currentTarget.style.borderColor = 'rgba(147, 197, 253, 0.5)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.background = selectedSchematic 
-                  ? 'rgba(37, 99, 235, 0.15)' 
-                  : 'rgba(255, 255, 255, 0.05)';
-                e.currentTarget.style.borderColor = selectedSchematic 
-                  ? 'rgba(37, 99, 235, 0.4)' 
-                  : 'rgba(255, 255, 255, 0.1)';
-              }}
-            >
-              <option value="" style={{ background: '#1e293b', color: 'white' }}>
-                {filteredSchematics.length === 0 ? 'No schematics available' : 'Select schematic...'}
-              </option>
-              {filteredSchematics.map((schematic) => (
-                <option key={schematic.id} value={schematic.id} style={{ background: '#1e293b', color: 'white' }}>
-                  {schematic.title}
-                </option>
-              ))}
-            </select>
-            {filteredSchematics.length === 0 && selectedProduct && (
-              <div style={{
-                fontSize: '0.75rem',
-                color: 'rgba(255, 255, 255, 0.4)',
-                marginTop: '6px',
-                fontStyle: 'italic'
-              }}>
-                No diagrams available for this product yet
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Product/Schematic Info Banner */}
-        {selectedProduct && currentSchematic && (
-          <div style={{
-            marginBottom: '24px',
-            padding: '16px 24px',
-            background: 'linear-gradient(135deg, rgba(37, 99, 235, 0.1) 0%, rgba(96, 165, 250, 0.1) 100%)',
-            border: '1px solid rgba(37, 99, 235, 0.3)',
-            borderRadius: '8px',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '16px'
-          }}>
-            <div style={{
-              width: '32px',
-              height: '32px',
-              background: 'rgba(37, 99, 235, 0.2)',
-              borderRadius: '50%',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontSize: '1.2rem'
-            }}>
-              📘
-            </div>
-            <div style={{ flex: 1 }}>
-              <div style={{ 
-                fontSize: '0.9rem', 
-                fontWeight: '600',
-                color: 'var(--alloy-deep)',
-                marginBottom: '4px'
-              }}>
-                Viewing Schematic for: {selectedProduct.name}
-              </div>
-              <div style={{ 
-                fontSize: '0.8rem', 
-                color: 'rgba(15, 23, 42, 0.7)',
-                fontFamily: 'var(--font-mono)'
-              }}>
-                {selectedBrand} → {selectedProduct.part_number} → {currentSchematic.title}
-              </div>
-            </div>
-          </div>
-        )}
 
         {/* Interactive Viewer */}
         {currentSchematic && (
           <div>
-            <div style={{
-              marginBottom: '32px',
-              padding: '24px',
-              background: 'var(--surface-glass)',
-              backdropFilter: 'blur(20px)',
-              border: '1px solid var(--alloy-edge)',
-              borderRadius: '8px'
-            }}>
+            <div 
+              className="schematic-title-container"
+              style={{
+                marginBottom: '12px',
+                padding: '8px 16px',
+                background: 'var(--surface-glass)',
+                backdropFilter: 'blur(12px)',
+                border: '1px solid var(--alloy-edge)',
+                borderRadius: '8px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '16px',
+                flexWrap: 'nowrap',
+                position: 'relative',
+                zIndex: 9999
+              }}>
               <h3 style={{ 
-                fontSize: '2rem', 
-                marginBottom: '8px',
-                color: 'var(--tension-accent)'
+                fontSize: '1.1rem',
+                margin: 0,
+                letterSpacing: '-0.01em',
+                color: 'var(--tension-accent)',
+                flex: '0 0 auto',
+                whiteSpace: 'nowrap'
               }}>
                 {currentSchematic.title}
               </h3>
-              <p style={{ 
-                opacity: 0.8,
-                fontSize: '1.05rem'
-              }}>
-                {currentSchematic.description}
-              </p>
+
+              {/* Filter bar positioned inline on the right */}
+              <SchematicFilterBar
+                brands={brands}
+                selectedBrand={selectedBrand}
+                onBrandChange={(brand) => {
+                  setSelectedBrand(brand);
+                  setSelectedProduct(null);
+                }}
+                products={filteredProducts}
+                selectedProduct={selectedProduct}
+                onProductChange={setSelectedProduct}
+                schematics={filteredSchematics}
+                selectedSchematic={selectedSchematic}
+                onSchematicChange={(schematicId) => {
+                  setSelectedSchematic(schematicId);
+                  const s = schematics.find(sch => sch.id === schematicId);
+                  const firstPage = (s && s.diagramPages && s.diagramPages[0]) || 1;
+                  setCurrentPage(firstPage);
+                }}
+              />
             </div>
+
+            {/* Page selector for multi-page schematics - positioned at top center */}
+            {currentSchematic && currentSchematic.diagramPages && currentSchematic.diagramPages.length > 1 && (
+              <div style={{ 
+                display: 'flex', 
+                justifyContent: 'center', 
+                marginBottom: '8px' 
+              }}>
+                <div className="schematic-pager schematic-pager-top" role="group" aria-label="Schematic pages">
+                  <button
+                    className={`pager-pill ${currentSchematic.diagramPages.indexOf(currentPage) <= 0 ? 'disabled' : ''}`}
+                    onClick={() => {
+                      const pages = currentSchematic.diagramPages;
+                      const idx = pages.indexOf(currentPage);
+                      if (idx > 0) setCurrentPage(pages[idx - 1]);
+                    }}
+                    aria-label="Previous page"
+                    disabled={currentSchematic.diagramPages.indexOf(currentPage) <= 0}
+                  >
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
+                      <path d="M15 18L9 12L15 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  </button>
+
+                  <div className="pager-counter" aria-hidden>
+                    {currentSchematic.diagramPages.indexOf(currentPage) + 1} / {currentSchematic.diagramPages.length}
+                  </div>
+
+                  <button
+                    className={`pager-pill ${currentSchematic.diagramPages.indexOf(currentPage) >= currentSchematic.diagramPages.length - 1 ? 'disabled' : ''}`}
+                    onClick={() => {
+                      const pages = currentSchematic.diagramPages;
+                      const idx = pages.indexOf(currentPage);
+                      if (idx < pages.length - 1) setCurrentPage(pages[idx + 1]);
+                    }}
+                    aria-label="Next page"
+                    disabled={currentSchematic.diagramPages.indexOf(currentPage) >= currentSchematic.diagramPages.length - 1}
+                  >
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
+                      <path d="M9 6L15 12L9 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            )}
 
             <div className="schematic-container">
               <div style={{ position: 'relative', display: 'inline-block', width: '100%' }}>
-                {currentSchematic.image ? (
+                {schematicImageSrc ? (
                   <img 
-                    src={currentSchematic.image} 
+                    src={schematicImageSrc} 
                     alt={currentSchematic.title}
                     style={{ width: '100%', height: 'auto', display: 'block' }}
                   />
@@ -712,16 +656,20 @@ export default function Parts() {
                   currentSchematic.svg
                 )}
                 
-                {currentSchematic.parts.map((part) => (
+                {currentSchematic.parts.filter(part => !part.pageNumber || part.pageNumber === currentPage).map((part) => (
                   <div
                     key={part.id}
-                    className={`hotspot ${activeHotspot === part.id ? 'active' : ''}`}
+                    className={`hotspot hotspot-${part.shape || 'circle'} ${activeHotspot === part.id ? 'active' : ''}`}
                     style={{
                       position: 'absolute',
                       top: part.position.top,
                       left: part.position.left,
-                      transform: 'translate(-50%, -50%)',
-                      zIndex: 100
+                      transform: part.rotation ? `translate(-50%, -50%) rotate(${part.rotation}deg)` : 'translate(-50%, -50%)',
+                      zIndex: 100,
+                      ...(part.width && part.height ? {
+                        width: `${part.width}%`,
+                        height: `${part.height}%`
+                      } : {})
                     }}
                     onClick={(e) => {
                       e.stopPropagation();
