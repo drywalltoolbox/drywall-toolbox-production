@@ -729,6 +729,7 @@
             <div class="schematic-list" id="schematic-list"></div>
             <button class="btn success" onclick="generateAllOutput()" style="margin-top: 20px;">Generate All Coordinates</button>
             <button class="btn" onclick="exportJSON()" style="margin-top: 10px; background: #f59e0b;">Export as JSON</button>
+            <button class="btn" onclick="exportPackage()" style="margin-top: 10px; background: #06b6d4; margin-left:8px;">Export package (JSON + image)</button>
         </div>
 
         <div class="workspace" id="workspace">
@@ -960,6 +961,7 @@
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <script>
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
@@ -990,6 +992,58 @@
 
         const img = document.getElementById('schematic');
         const wrapper = document.getElementById('wrapper');
+
+        // Coordinate utilities to support multiple hotspots per part
+        function ensureCoordinatesArray(partId) {
+            if (!currentSchematic) return;
+            if (!currentSchematic.coordinates) currentSchematic.coordinates = {};
+            const v = currentSchematic.coordinates[partId];
+            if (!v) {
+                currentSchematic.coordinates[partId] = [];
+            } else if (!Array.isArray(v)) {
+                currentSchematic.coordinates[partId] = [v];
+            }
+        }
+
+        function addCoordinate(partId, coord) {
+            ensureCoordinatesArray(partId);
+            currentSchematic.coordinates[partId].push(coord);
+            return currentSchematic.coordinates[partId].length - 1; // index
+        }
+
+        function getCoordinate(partId, instanceIndex = 0) {
+            if (!currentSchematic || !currentSchematic.coordinates) return null;
+            const arr = currentSchematic.coordinates[partId];
+            if (!arr) return null;
+            if (!Array.isArray(arr)) return arr;
+            return arr[instanceIndex] || null;
+        }
+
+        function setCoordinate(partId, instanceIndex, coord) {
+            ensureCoordinatesArray(partId);
+            currentSchematic.coordinates[partId][instanceIndex] = coord;
+        }
+
+        function deleteCoordinate(partId, instanceIndex) {
+            if (!currentSchematic || !currentSchematic.coordinates) return;
+            const arr = currentSchematic.coordinates[partId];
+            if (!arr) return;
+            if (!Array.isArray(arr)) {
+                delete currentSchematic.coordinates[partId];
+                return;
+            }
+            arr.splice(instanceIndex, 1);
+            if (arr.length === 0) delete currentSchematic.coordinates[partId];
+        }
+
+        function parseCompositeId(composite) {
+            if (!composite && composite !== 0) return null;
+            if (typeof composite === 'string' && composite.includes(':')) {
+                const [p, i] = composite.split(':');
+                return { partId: p, instance: parseInt(i) };
+            }
+            return { partId: composite, instance: 0 };
+        }
 
         function log(msg) {
             console.log(msg);
@@ -1060,7 +1114,8 @@
                     const page = await pdfDoc.getPage(i);
                     
                     const textContent = await page.getTextContent();
-                    const text = textContent.items.map(item => item.str).join(' ');
+                    // Preserve line breaks from PDF text items so line-based regexes work
+                    const text = textContent.items.map(item => item.str).join('\n');
                     
                     const viewport = page.getViewport({scale: 1.5});
                     const canvas = document.createElement('canvas');
@@ -1208,9 +1263,28 @@
                     }
                 });
                 
-                uniqueParts.sort((a, b) => a.sku.localeCompare(b.sku));
-                uniqueParts.forEach((part, idx) => {
-                    part.id = String(idx + 1).padStart(2, '0');
+                // Prefer ordering by original ITEM# index when available so IDs match diagram labels.
+                uniqueParts.sort((a, b) => {
+                    const ai = (typeof a.index === 'number') ? a.index : Infinity;
+                    const bi = (typeof b.index === 'number') ? b.index : Infinity;
+                    if (ai !== bi) return ai - bi;
+                    // fallback: preserve SKU order
+                    return (a.sku || '').localeCompare(b.sku || '');
+                });
+
+                // Assign IDs: use the parsed index when present; otherwise allocate the next unused integer.
+                const used = new Set();
+                uniqueParts.forEach(p => { if (typeof p.index === 'number') used.add(p.index); });
+                let nextUnused = 1;
+                const allocateNext = () => {
+                    while (used.has(nextUnused)) nextUnused++;
+                    used.add(nextUnused);
+                    return nextUnused;
+                };
+
+                uniqueParts.forEach((part) => {
+                    let idNum = (typeof part.index === 'number') ? part.index : allocateNext();
+                    part.id = String(idNum).padStart(2, '0');
                 });
                 
                 sch.parts = uniqueParts;
@@ -1223,18 +1297,40 @@
 
         function extractPartsFromLegend(text) {
             const parts = [];
+
+            // Normalize whitespace but keep line breaks so we can parse line-by-line
+            const normalized = text.replace(/\r\n/g, '\n').replace(/\t/g, ' ');
+
+            // Debugging output to help trace why parsing may return zero parts
+            try {
+                console.groupCollapsed && console.groupCollapsed('extractPartsFromLegend');
+                console.debug('Normalized legend text (first 5000 chars):\n', normalized.slice(0, 5000));
+            } catch (e) {
+                /* ignore console errors in older browsers */
+            }
+
+            // Primary patterns: look for a SKU-like token, a name, and a trailing quantity.
+            // Flags: g and m so ^/$ and line endings work when text has preserved newlines.
             const patterns = [
-                /(\d{6}[A-Z]?)\s+([^\d\n]{8,100}?)\s+(\d+)\s*$/gm,
-                /(\d{6}[A-Z]?)\s+(.{10,100}?)\s+(\d+)\s/g,
+                /(\d{6}[A-Z]?)\s+([^\d\n]{3,200}?)\s+(\d+)\s*$/gm,
+                /(\d{6}[A-Z]?)\s+(.{3,200}?)\s+(\d+)\s*$/gm,
             ];
-            
+
             for (let pattern of patterns) {
+                try {
+                    console.debug('Trying pattern:', pattern.toString());
+                } catch (e) {}
+
                 let match;
-                while ((match = pattern.exec(text)) !== null) {
+                while ((match = pattern.exec(normalized)) !== null) {
                     const [, sku, name, qty] = match;
                     const cleanName = name.trim().replace(/\s+/g, ' ');
-                    
-                    if (cleanName.length > 3 && !parts.find(p => p.sku === sku)) {
+
+                    try {
+                        console.debug('Pattern matched:', { sku, name: cleanName, qty });
+                    } catch (e) {}
+
+                    if (cleanName.length > 2 && !parts.find(p => p.sku === sku)) {
                         parts.push({
                             id: '',
                             sku: sku,
@@ -1244,7 +1340,136 @@
                     }
                 }
             }
-            
+
+            // Fallback: try parsing lines into logical rows. Many PDFs split columns into vertical stacks,
+            // e.g. lines like: INDEX (on its own line), SKU (next line), QTY (next line), NAME (next line).
+            const lines = normalized.split(/\n/).map(l => l.trim()).filter(Boolean);
+
+            // First, handle the common block pattern: idx \n sku \n qty \n name
+            for (let i = 0; i < lines.length; i++) {
+                try { console.debug('Line', i, lines[i]); } catch (e) {}
+
+                if (/^\d{1,3}$/.test(lines[i])) {
+                    const idx = lines[i];
+                    const skuCandidate = lines[i + 1] || '';
+                    const qtyCandidate = lines[i + 2] || '';
+                    const nameCandidate = lines[i + 3] || '';
+
+                    // SKU often contains digits and optional letters (e.g., 350033F) or may be all-digits
+                    const isSku = /^[0-9A-Z\-]{3,}$/.test(skuCandidate);
+                    const isQty = /^\d+$/.test(qtyCandidate);
+                    const isName = nameCandidate && /[A-Za-z\"\'\(\)\-]/.test(nameCandidate);
+
+                    if (isSku && isQty && isName) {
+                        const cleanName = nameCandidate.replace(/\s+/g, ' ').trim();
+                        const sku = skuCandidate.trim();
+                        try { console.debug('Block-style matched at', i, { idx, sku, qty: qtyCandidate, name: cleanName }); } catch (e) {}
+                        if (!parts.find(p => p.sku === sku)) {
+                            parts.push({ id: '', sku: sku, name: cleanName, quantity: parseInt(qtyCandidate) || 1, index: parseInt(idx) });
+                        }
+                        i += 3; // consume the block
+                        continue;
+                    }
+                }
+            }
+
+            // Next, attempt index-style single-line patterns (legacy fallback)
+            const indexPattern = /^\s*(\d{1,3})[\)\.\-\s]+(.+?)\s+(\d+)$/;
+            for (let line of lines) {
+                const m = line.match(indexPattern);
+                if (m) {
+                    const [, idx, name, qty] = m;
+                    const cleanName = name.replace(/\s+/g, ' ').trim();
+                    // Use index as a pseudo-sku if no SKU was found for this line
+                    const pseudoSku = `IDX-${idx}`;
+                    try { console.debug('Index-style line matched:', { line, pseudoSku, name: cleanName, qty }); } catch (e) {}
+                    if (!parts.find(p => p.sku === pseudoSku)) {
+                        parts.push({ id: '', sku: pseudoSku, name: cleanName, quantity: parseInt(qty) || 1, index: parseInt(idx) });
+                    }
+                } else {
+                    try { console.debug('Index-style no match for line:', line); } catch (e) {}
+                }
+            }
+
+            // Post-process: try to associate an ITEM# index with parts that didn't capture it directly.
+            try {
+                const linesForSearch = normalized.split(/\n/).map(l => l.trim());
+                for (let part of parts) {
+                    if (part.index) continue;
+                    // find a line that contains the SKU (exact match or as a token)
+                    let foundLine = -1;
+                    for (let i = 0; i < linesForSearch.length; i++) {
+                        const line = linesForSearch[i];
+                        if (!line) continue;
+                        // match SKU as whole token
+                        const skuToken = part.sku.replace(/[-\\/\\^$*+?.()|[\]{}]/g, '\\$&');
+                        const re = new RegExp('(^|\\s)'+skuToken+'($|\\s)');
+                        if (re.test(line)) { foundLine = i; break; }
+                    }
+
+                    if (foundLine > 0) {
+                        // look up to 3 lines above for a pure number index
+                        for (let k = 1; k <= 3; k++) {
+                            const cand = linesForSearch[foundLine - k];
+                            if (!cand) continue;
+                            const m = cand.match(/^\s*(\d{1,3})\s*$/);
+                            if (m) { part.index = parseInt(m[1]); break; }
+                        }
+                    }
+                }
+
+                console.debug('extractPartsFromLegend found parts count before groupEnd:', parts.length, parts.slice(0,20));
+                console.groupEnd && console.groupEnd('extractPartsFromLegend');
+            } catch (e) {
+                console.debug('post-process index association error', e);
+            }
+
+            // On-page debug panel so users can see normalized legend text and parsed results
+            try {
+                let dbg = document.getElementById('legend-debug');
+                if (!dbg) {
+                    dbg = document.createElement('pre');
+                    dbg.id = 'legend-debug';
+                    dbg.style.position = 'fixed';
+                    dbg.style.right = '12px';
+                    dbg.style.bottom = '12px';
+                    dbg.style.width = '420px';
+                    dbg.style.maxHeight = '60vh';
+                    dbg.style.overflow = 'auto';
+                    dbg.style.background = 'rgba(0,0,0,0.85)';
+                    dbg.style.color = 'white';
+                    dbg.style.padding = '12px';
+                    dbg.style.fontSize = '12px';
+                    dbg.style.zIndex = 99999;
+                    dbg.style.borderRadius = '8px';
+                    dbg.style.boxShadow = '0 6px 20px rgba(0,0,0,0.5)';
+                    dbg.style.whiteSpace = 'pre-wrap';
+                    const closeBtn = document.createElement('button');
+                    closeBtn.textContent = '✕';
+                    closeBtn.style.position = 'absolute';
+                    closeBtn.style.right = '6px';
+                    closeBtn.style.top = '6px';
+                    closeBtn.style.background = 'transparent';
+                    closeBtn.style.color = 'white';
+                    closeBtn.style.border = 'none';
+                    closeBtn.style.fontSize = '14px';
+                    closeBtn.style.cursor = 'pointer';
+                    closeBtn.onclick = () => dbg.remove();
+                    dbg.appendChild(closeBtn);
+                    const content = document.createElement('div');
+                    content.id = 'legend-debug-content';
+                    content.style.paddingTop = '18px';
+                    dbg.appendChild(content);
+                    document.body.appendChild(dbg);
+                }
+
+                const content = document.getElementById('legend-debug-content');
+                const partsJson = JSON.stringify(parts.slice(0,200), null, 2);
+                content.textContent = `Normalized (first 4000 chars):\n${normalized.slice(0,4000)}\n\nParts found: ${parts.length}\n${partsJson}`;
+            } catch (e) {
+                /* ignore UI debug errors */
+            }
+
             return parts;
         }
 
@@ -1330,9 +1555,14 @@
                 div.id = `part-${part.id}`;
                 if (coord) div.classList.add('done');
                 
-                const coordText = coord 
-                    ? `✓ Left: ${parseFloat(coord.left).toFixed(1)}%, Top: ${parseFloat(coord.top).toFixed(1)}%`
-                    : 'Click diagram to place';
+                let coordText = 'Click diagram to place';
+                if (coord) {
+                    if (Array.isArray(coord)) {
+                        coordText = `Mapped: ${coord.length} location${coord.length > 1 ? 's' : ''} — First: ${parseFloat(coord[0].left).toFixed(1)}%, ${parseFloat(coord[0].top).toFixed(1)}%`;
+                    } else {
+                        coordText = `✓ Left: ${parseFloat(coord.left).toFixed(1)}%, Top: ${parseFloat(coord.top).toFixed(1)}%`;
+                    }
+                }
                 
                 const customBadge = part.isCustom ? '<span style="background: #f59e0b; color: white; padding: 2px 6px; border-radius: 3px; font-size: 10px; margin-left: 5px;">CUSTOM</span>' : '';
                 
@@ -1389,8 +1619,7 @@
             
             const leftPercent = (x / rect.width * 100).toFixed(2);
             const topPercent = (y / rect.height * 100).toFixed(2);
-            
-            currentSchematic.coordinates[activePartId] = {
+            const coord = {
                 left: leftPercent,
                 top: topPercent,
                 page: currentSchematic.diagramPages[currentPageIdx],
@@ -1400,88 +1629,101 @@
                 rotation: hotspotRotation || 0
             };
 
-            document.getElementById(`coords-${activePartId}`).innerHTML = 
-                `✓ Left: ${parseFloat(leftPercent).toFixed(1)}%, Top: ${parseFloat(topPercent).toFixed(1)}%`;
-            
-            document.getElementById(`part-${activePartId}`).classList.add('done');
-            document.getElementById(`part-${activePartId}`).classList.remove('active');
-            
+            const instance = addCoordinate(activePartId, coord);
+
+            // Update UI: show count and first coordinate summary
+            const coordsEl = document.getElementById(`coords-${activePartId}`);
+            const arr = currentSchematic.coordinates[activePartId];
+            if (coordsEl) {
+                if (Array.isArray(arr)) {
+                    coordsEl.innerHTML = `Mapped: ${arr.length} location${arr.length > 1 ? 's' : ''} — First: ${parseFloat(arr[0].left).toFixed(1)}%, ${parseFloat(arr[0].top).toFixed(1)}%`;
+                } else {
+                    coordsEl.innerHTML = `✓ Left: ${parseFloat(arr.left).toFixed(1)}%, Top: ${parseFloat(arr.top).toFixed(1)}%`;
+                }
+            }
+
+            const partEl = document.getElementById(`part-${activePartId}`);
+            if (partEl) {
+                partEl.classList.add('done');
+                partEl.classList.remove('active');
+            }
+
             renderMarkers();
             updateProgress();
-            
-            const idx = currentSchematic.parts.findIndex(p => p.id === activePartId);
-            if (idx < currentSchematic.parts.length - 1) {
-                selectPart(currentSchematic.parts[idx + 1].id);
-            } else {
-                activePartId = null;
-            }
+
+            // Keep activePartId selected so the user can add multiple hotspots for the same part.
         };
 
         function renderMarkers() {
             document.querySelectorAll('.marker').forEach(m => m.remove());
-            
+
             const currentPage = currentSchematic.diagramPages[currentPageIdx];
-            Object.entries(currentSchematic.coordinates).forEach(([partId, coord]) => {
-                if (coord.page === currentPage) {
+            Object.entries(currentSchematic.coordinates || {}).forEach(([partId, coords]) => {
+                const arr = Array.isArray(coords) ? coords : [coords];
+                arr.forEach((coord, idx) => {
+                    if (!coord || coord.page !== currentPage) return;
+
                     const marker = document.createElement('div');
                     marker.className = `marker ${coord.shape || hotspotShape}`;
                     marker.dataset.partId = partId;
+                    marker.dataset.instance = String(idx);
                     marker.style.left = coord.left + '%';
                     marker.style.top = coord.top + '%';
                     marker.style.width = (coord.width || hotspotWidth) + 'px';
                     marker.style.height = (coord.height || hotspotHeight) + 'px';
-                    
+
                     const rotation = coord.rotation || 0;
                     marker.style.transform = `translate(-50%, -50%) rotate(${rotation}deg)`;
-                    
-                    if (selectedHotspotId === partId) {
+
+                    const compositeId = `${partId}:${idx}`;
+                    if (selectedHotspotId === compositeId) {
                         marker.classList.add('selected');
                     }
-                    
+
                     const label = document.createElement('span');
-                    label.textContent = partId;
+                    label.textContent = partId + (arr.length > 1 ? `.${idx+1}` : '');
                     label.style.display = 'inline-block';
                     label.style.transform = `rotate(-${rotation}deg)`;
                     marker.appendChild(label);
-                    
+
                     // Add event listeners
                     marker.onclick = (e) => {
                         e.stopPropagation();
-                        selectHotspot(partId);
+                        selectHotspot(compositeId);
                     };
-                    
+
                     marker.onmousedown = (e) => {
                         if (e.button !== 0) return; // Only left click
                         e.stopPropagation();
-                        selectHotspot(partId);
-                        startDrag(e, partId);
+                        selectHotspot(compositeId);
+                        startDrag(e, compositeId);
                     };
-                    
+
                     wrapper.appendChild(marker);
-                    
+
                     // Add resize handles and rotate handle if selected
-                    if (selectedHotspotId === partId) {
-                        addResizeHandles(marker, partId);
-                        addRotateHandle(marker, partId);
+                    if (selectedHotspotId === compositeId) {
+                        addResizeHandles(marker, compositeId);
+                        addRotateHandle(marker, compositeId);
                     }
-                }
+                });
             });
         }
 
-        function addResizeHandles(marker, partId) {
+        function addResizeHandles(marker, compositeId) {
             const positions = ['nw', 'ne', 'sw', 'se'];
             positions.forEach(pos => {
                 const handle = document.createElement('div');
                 handle.className = `resize-handle ${pos}`;
                 handle.onmousedown = (e) => {
                     e.stopPropagation();
-                    startResize(e, partId, pos);
+                    startResize(e, compositeId, pos);
                 };
                 marker.appendChild(handle);
             });
         }
 
-        function addRotateHandle(marker, partId) {
+        function addRotateHandle(marker, compositeId) {
             const line = document.createElement('div');
             line.className = 'rotate-line';
             marker.appendChild(line);
@@ -1491,19 +1733,22 @@
             handle.innerHTML = '↻';
             handle.onmousedown = (e) => {
                 e.stopPropagation();
-                startRotate(e, partId);
+                startRotate(e, compositeId);
             };
             marker.appendChild(handle);
         }
 
-        function selectHotspot(partId) {
-            selectedHotspotId = partId;
-            const coord = currentSchematic.coordinates[partId];
+        function selectHotspot(compositeId) {
+            selectedHotspotId = compositeId;
+            const parsed = parseCompositeId(compositeId);
+            if (!parsed) return;
+            const { partId, instance } = parsed;
+            const coord = getCoordinate(partId, instance);
             const part = currentSchematic.parts.find(p => p.id === partId);
             
             // Update selected hotspot controls
             document.getElementById('selected-hotspot-controls').style.display = 'block';
-            document.getElementById('selected-hotspot-id').textContent = `#${partId}`;
+            document.getElementById('selected-hotspot-id').textContent = `#${partId}${instance > 0 ? '.' + (instance+1) : ''}`;
             
             // Show edit button only for custom parts
             const editBtn = document.getElementById('edit-part-btn');
@@ -1513,9 +1758,9 @@
                 editBtn.style.display = 'none';
             }
             
-            const width = coord.width || hotspotWidth;
-            const height = coord.height || hotspotHeight;
-            const rotation = coord.rotation || 0;
+            const width = coord ? (coord.width || hotspotWidth) : hotspotWidth;
+            const height = coord ? (coord.height || hotspotHeight) : hotspotHeight;
+            const rotation = coord ? (coord.rotation || 0) : 0;
             
             // Update sliders
             document.getElementById('sel-width-slider').value = Math.min(100, width);
@@ -1527,105 +1772,124 @@
             document.getElementById('sel-height-input').value = height;
             
             // Update position inputs
-            document.getElementById('sel-left-input').value = parseFloat(coord.left);
-            document.getElementById('sel-top-input').value = parseFloat(coord.top);
+            document.getElementById('sel-left-input').value = coord ? parseFloat(coord.left) : 0;
+            document.getElementById('sel-top-input').value = coord ? parseFloat(coord.top) : 0;
             
             // Update labels
             document.getElementById('sel-width-value').textContent = width + 'px';
             document.getElementById('sel-height-value').textContent = height + 'px';
             document.getElementById('sel-rotation-value').textContent = rotation + '°';
-            document.getElementById('sel-left-value').textContent = parseFloat(coord.left).toFixed(2) + '%';
-            document.getElementById('sel-top-value').textContent = parseFloat(coord.top).toFixed(2) + '%';
+            document.getElementById('sel-left-value').textContent = coord ? (parseFloat(coord.left).toFixed(2) + '%') : '0%';
+            document.getElementById('sel-top-value').textContent = coord ? (parseFloat(coord.top).toFixed(2) + '%') : '0%';
             
             // Update shape buttons
             document.querySelectorAll('[id^="sel-shape-"]').forEach(btn => btn.classList.remove('active'));
-            document.getElementById(`sel-shape-${coord.shape || hotspotShape}`).classList.add('active');
+            document.getElementById(`sel-shape-${(coord && coord.shape) || hotspotShape}`).classList.add('active');
             
             renderMarkers();
         }
 
         function updateSelectedHotspotShape(shape) {
             if (!selectedHotspotId) return;
-            
-            currentSchematic.coordinates[selectedHotspotId].shape = shape;
-            
+            const parsed = parseCompositeId(selectedHotspotId);
+            if (!parsed) return;
+            const { partId, instance } = parsed;
+            const coord = getCoordinate(partId, instance);
+            if (!coord) return;
+            coord.shape = shape;
+
             document.querySelectorAll('[id^="sel-shape-"]').forEach(btn => btn.classList.remove('active'));
             document.getElementById(`sel-shape-${shape}`).classList.add('active');
-            
+
             renderMarkers();
         }
 
         function updateSelectedHotspot() {
             if (!selectedHotspotId) return;
-            
-            const coord = currentSchematic.coordinates[selectedHotspotId];
+            const parsed = parseCompositeId(selectedHotspotId);
+            if (!parsed) return;
+            const { partId, instance } = parsed;
+            const coord = getCoordinate(partId, instance);
+            if (!coord) return;
             coord.width = parseInt(document.getElementById('sel-width-slider').value);
             coord.height = parseInt(document.getElementById('sel-height-slider').value);
             coord.rotation = parseInt(document.getElementById('sel-rotation-slider').value);
-            
+
             // Update all displays
             document.getElementById('sel-width-value').textContent = coord.width + 'px';
             document.getElementById('sel-height-value').textContent = coord.height + 'px';
             document.getElementById('sel-rotation-value').textContent = coord.rotation + '°';
-            
+
             // Sync number inputs
             document.getElementById('sel-width-input').value = coord.width;
             document.getElementById('sel-height-input').value = coord.height;
-            
+
             renderMarkers();
         }
 
         function updateSelectedHotspotPrecise() {
             if (!selectedHotspotId) return;
-            
-            const coord = currentSchematic.coordinates[selectedHotspotId];
+            const parsed = parseCompositeId(selectedHotspotId);
+            if (!parsed) return;
+            const { partId, instance } = parsed;
+            const coord = getCoordinate(partId, instance);
             const width = parseInt(document.getElementById('sel-width-input').value);
             const height = parseInt(document.getElementById('sel-height-input').value);
-            
+
             if (width >= 10 && width <= 200) {
                 coord.width = width;
                 document.getElementById('sel-width-slider').value = Math.min(100, width);
                 document.getElementById('sel-width-value').textContent = width + 'px';
             }
-            
+
             if (height >= 10 && height <= 200) {
                 coord.height = height;
                 document.getElementById('sel-height-slider').value = Math.min(100, height);
                 document.getElementById('sel-height-value').textContent = height + 'px';
             }
-            
+
             renderMarkers();
         }
 
         function updateSelectedHotspotPosition() {
             if (!selectedHotspotId) return;
-            
-            const coord = currentSchematic.coordinates[selectedHotspotId];
+            const parsed = parseCompositeId(selectedHotspotId);
+            if (!parsed) return;
+            const { partId, instance } = parsed;
+            const coord = getCoordinate(partId, instance);
             coord.left = parseFloat(document.getElementById('sel-left-input').value).toFixed(2);
             coord.top = parseFloat(document.getElementById('sel-top-input').value).toFixed(2);
-            
+
             document.getElementById('sel-left-value').textContent = coord.left + '%';
             document.getElementById('sel-top-value').textContent = coord.top + '%';
-            
+
             renderMarkers();
         }
 
         function deleteSelectedHotspot() {
             if (!selectedHotspotId) return;
+            const parsed = parseCompositeId(selectedHotspotId);
+            if (!parsed) return;
+            const { partId, instance } = parsed;
             
             if (confirm(`Delete hotspot #${selectedHotspotId}?`)) {
-                delete currentSchematic.coordinates[selectedHotspotId];
-                
+                deleteCoordinate(partId, instance);
+
                 // Update part item
-                const partItem = document.getElementById(`part-${selectedHotspotId}`);
+                const coordsArr = currentSchematic.coordinates[partId];
+                const partItem = document.getElementById(`part-${partId}`);
                 if (partItem) {
-                    partItem.classList.remove('done');
-                    document.getElementById(`coords-${selectedHotspotId}`).textContent = 'Click diagram to place';
+                    if (!coordsArr) {
+                        partItem.classList.remove('done');
+                        document.getElementById(`coords-${partId}`).textContent = 'Click diagram to place';
+                    } else if (Array.isArray(coordsArr)) {
+                        document.getElementById(`coords-${partId}`).textContent = `Mapped: ${coordsArr.length} locations`;
+                    }
                 }
-                
+
                 document.getElementById('selected-hotspot-controls').style.display = 'none';
                 selectedHotspotId = null;
-                
+
                 renderMarkers();
                 updateProgress();
             }
@@ -1633,8 +1897,9 @@
 
         function editSelectedPart() {
             if (!selectedHotspotId) return;
-            
-            const part = currentSchematic.parts.find(p => p.id === selectedHotspotId);
+            const parsed = parseCompositeId(selectedHotspotId);
+            if (!parsed) return;
+            const part = currentSchematic.parts.find(p => p.id === parsed.partId);
             if (!part || !part.isCustom) return;
             
             // Populate form with existing data
@@ -1652,73 +1917,82 @@
             document.getElementById('custom-hotspot-modal').classList.add('active');
         }
 
-        function startDrag(e, partId) {
+        function startDrag(e, compositeId) {
+            const parsed = parseCompositeId(compositeId);
+            if (!parsed) return;
+            const { partId, instance } = parsed;
+
             isDragging = true;
             const rect = img.getBoundingClientRect();
             dragStartX = e.clientX;
             dragStartY = e.clientY;
-            
+
             document.body.style.cursor = 'move';
-            
+
             const onMouseMove = (e) => {
                 if (!isDragging) return;
-                
+
                 const deltaX = e.clientX - dragStartX;
                 const deltaY = e.clientY - dragStartY;
-                
+
                 const deltaXPercent = (deltaX / rect.width) * 100;
                 const deltaYPercent = (deltaY / rect.height) * 100;
-                
-                const coord = currentSchematic.coordinates[partId];
+
+                const coord = getCoordinate(partId, instance);
+                if (!coord) return;
                 coord.left = (parseFloat(coord.left) + deltaXPercent).toFixed(2);
                 coord.top = (parseFloat(coord.top) + deltaYPercent).toFixed(2);
-                
+
                 dragStartX = e.clientX;
                 dragStartY = e.clientY;
-                
-                if (selectedHotspotId === partId) {
+
+                if (selectedHotspotId === compositeId) {
                     document.getElementById('sel-left-input').value = parseFloat(coord.left);
                     document.getElementById('sel-top-input').value = parseFloat(coord.top);
                     document.getElementById('sel-left-value').textContent = coord.left + '%';
                     document.getElementById('sel-top-value').textContent = coord.top + '%';
                 }
-                
+
                 renderMarkers();
             };
-            
+
             const onMouseUp = () => {
                 isDragging = false;
                 document.body.style.cursor = '';
                 document.removeEventListener('mousemove', onMouseMove);
                 document.removeEventListener('mouseup', onMouseUp);
             };
-            
+
             document.addEventListener('mousemove', onMouseMove);
             document.addEventListener('mouseup', onMouseUp);
         }
 
-        function startResize(e, partId, handle) {
+        function startResize(e, compositeId, handle) {
             e.preventDefault();
             isResizing = true;
             resizeHandle = handle;
-            
-            const coord = currentSchematic.coordinates[partId];
-            const marker = document.querySelector(`[data-part-id="${partId}"]`);
+
+            const parsed = parseCompositeId(compositeId);
+            if (!parsed) return;
+            const { partId, instance } = parsed;
+
+            const coord = getCoordinate(partId, instance);
+            const marker = document.querySelector(`[data-part-id="${partId}"][data-instance="${instance}"]`);
             const rect = marker.getBoundingClientRect();
             const imgRect = img.getBoundingClientRect();
-            
+
             dragStartX = e.clientX;
             dragStartY = e.clientY;
-            
+
             const onMouseMove = (e) => {
                 if (!isResizing) return;
-                
+
                 const deltaX = e.clientX - dragStartX;
                 const deltaY = e.clientY - dragStartY;
-                
+
                 const scaleX = imgRect.width / 100;
                 const scaleY = imgRect.height / 100;
-                
+
                 if (handle.includes('e')) {
                     coord.width = Math.max(20, (coord.width || hotspotWidth) + deltaX);
                 }
@@ -1737,11 +2011,11 @@
                     coord.height = newHeight;
                     coord.top = (parseFloat(coord.top) + (deltaY / scaleY)).toFixed(2);
                 }
-                
+
                 dragStartX = e.clientX;
                 dragStartY = e.clientY;
-                
-                if (selectedHotspotId === partId) {
+
+                if (selectedHotspotId === compositeId) {
                     document.getElementById('sel-width-slider').value = Math.min(100, coord.width);
                     document.getElementById('sel-height-slider').value = Math.min(100, coord.height);
                     document.getElementById('sel-width-input').value = coord.width;
@@ -1753,56 +2027,60 @@
                     document.getElementById('sel-left-value').textContent = coord.left + '%';
                     document.getElementById('sel-top-value').textContent = coord.top + '%';
                 }
-                
+
                 renderMarkers();
             };
-            
+
             const onMouseUp = () => {
                 isResizing = false;
                 resizeHandle = null;
                 document.removeEventListener('mousemove', onMouseMove);
                 document.removeEventListener('mouseup', onMouseUp);
             };
-            
+
             document.addEventListener('mousemove', onMouseMove);
             document.addEventListener('mouseup', onMouseUp);
         }
 
-        function startRotate(e, partId) {
+        function startRotate(e, compositeId) {
             e.preventDefault();
             isRotating = true;
-            
-            const coord = currentSchematic.coordinates[partId];
-            const marker = document.querySelector(`[data-part-id="${partId}"]`);
+
+            const parsed = parseCompositeId(compositeId);
+            if (!parsed) return;
+            const { partId, instance } = parsed;
+
+            const coord = getCoordinate(partId, instance);
+            const marker = document.querySelector(`[data-part-id="${partId}"][data-instance="${instance}"]`);
             const rect = marker.getBoundingClientRect();
             const centerX = rect.left + rect.width / 2;
             const centerY = rect.top + rect.height / 2;
-            
+
             rotateStartAngle = Math.atan2(e.clientY - centerY, e.clientX - centerX) * (180 / Math.PI);
             const currentRotation = coord.rotation || 0;
-            
+
             const onMouseMove = (e) => {
                 if (!isRotating) return;
-                
+
                 const angle = Math.atan2(e.clientY - centerY, e.clientX - centerX) * (180 / Math.PI);
                 let delta = angle - rotateStartAngle;
-                
+
                 coord.rotation = Math.round((currentRotation + delta + 360) % 360);
-                
-                if (selectedHotspotId === partId) {
+
+                if (selectedHotspotId === compositeId) {
                     document.getElementById('sel-rotation-slider').value = coord.rotation;
                     document.getElementById('sel-rotation-value').textContent = coord.rotation + '°';
                 }
-                
+
                 renderMarkers();
             };
-            
+
             const onMouseUp = () => {
                 isRotating = false;
                 document.removeEventListener('mousemove', onMouseMove);
                 document.removeEventListener('mouseup', onMouseUp);
             };
-            
+
             document.addEventListener('mousemove', onMouseMove);
             document.addEventListener('mouseup', onMouseUp);
         }
@@ -1838,15 +2116,29 @@
                 const mappedParts = sch.parts.filter(p => sch.coordinates[p.id]);
                 mappedParts.forEach((part, partIdx) => {
                     const coord = sch.coordinates[part.id];
-                    output += `      {\n`;
-                    output += `        "id": "${part.id}",\n`;
-                    output += `        "sku": "${part.sku}",\n`;
-                    output += `        "name": "${part.name}",\n`;
-                    output += `        "quantity": ${part.quantity},\n`;
-                    output += `        "position": { "top": "${coord.top}%", "left": "${coord.left}%" },\n`;
-                    output += `        "hotspot": { "shape": "${coord.shape}", "width": ${coord.width}, "height": ${coord.height}, "rotation": ${coord.rotation || 0} },\n`;
-                    output += `        "page": ${coord.page}\n`;
-                    output += `      }${partIdx < mappedParts.length - 1 ? ',' : ''}\n`;
+                    if (Array.isArray(coord)) {
+                        coord.forEach((c, i) => {
+                            output += `      {\n`;
+                            output += `        "id": "${part.id}",\n`;
+                            output += `        "sku": "${part.sku}",\n`;
+                            output += `        "name": "${part.name}",\n`;
+                            output += `        "quantity": ${part.quantity},\n`;
+                            output += `        "position": { "top": "${c.top}%", "left": "${c.left}%" },\n`;
+                            output += `        "hotspot": { "shape": "${c.shape}", "width": ${c.width}, "height": ${c.height}, "rotation": ${c.rotation || 0} },\n`;
+                            output += `        "page": ${c.page}\n`;
+                            output += `      }${partIdx < mappedParts.length - 1 || i < coord.length - 1 ? ',' : ''}\n`;
+                        });
+                    } else {
+                        output += `      {\n`;
+                        output += `        "id": "${part.id}",\n`;
+                        output += `        "sku": "${part.sku}",\n`;
+                        output += `        "name": "${part.name}",\n`;
+                        output += `        "quantity": ${part.quantity},\n`;
+                        output += `        "position": { "top": "${coord.top}%", "left": "${coord.left}%" },\n`;
+                        output += `        "hotspot": { "shape": "${coord.shape}", "width": ${coord.width}, "height": ${coord.height}, "rotation": ${coord.rotation || 0} },\n`;
+                        output += `        "page": ${coord.page}\n`;
+                        output += `      }${partIdx < mappedParts.length - 1 ? ',' : ''}\n`;
+                    }
                 });
                 
                 output += `    ]\n`;
@@ -1859,33 +2151,105 @@
             document.getElementById('output-modal').classList.add('active');
         }
 
-        function exportJSON() {
+        function getExportData() {
             const data = {};
             schematics.forEach(sch => {
                 data[sch.id] = {
                     title: sch.title,
                     diagramPages: sch.diagramPages,
-                    parts: sch.parts.filter(p => sch.coordinates[p.id]).map(p => {
-                        const coord = sch.coordinates[p.id];
-                        return {
-                            id: p.id,
-                            sku: p.sku,
-                            name: p.name,
-                            quantity: p.quantity,
-                            position: { top: coord.top + '%', left: coord.left + '%' },
-                            hotspot: { shape: coord.shape, width: coord.width, height: coord.height, rotation: coord.rotation || 0 },
-                            page: coord.page
-                        };
-                    })
+                    parts: (function() {
+                        const out = [];
+                        sch.parts.filter(p => sch.coordinates[p.id]).forEach(p => {
+                            const coord = sch.coordinates[p.id];
+                            if (Array.isArray(coord)) {
+                                coord.forEach(c => out.push({
+                                    id: p.id,
+                                    sku: p.sku,
+                                    name: p.name,
+                                    quantity: p.quantity,
+                                    position: { top: c.top + '%', left: c.left + '%' },
+                                    hotspot: { shape: c.shape, width: c.width, height: c.height, rotation: c.rotation || 0 },
+                                    page: c.page
+                                }));
+                            } else {
+                                out.push({
+                                    id: p.id,
+                                    sku: p.sku,
+                                    name: p.name,
+                                    quantity: p.quantity,
+                                    position: { top: coord.top + '%', left: coord.left + '%' },
+                                    hotspot: { shape: coord.shape, width: coord.width, height: coord.height, rotation: coord.rotation || 0 },
+                                    page: coord.page
+                                });
+                            }
+                        });
+                        return out;
+                    })()
                 };
             });
+            return data;
+        }
 
+        function exportJSON() {
+            const data = getExportData();
             const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
             a.download = 'schematic-coordinates.json';
             a.click();
+        }
+
+        // Convert data URL to Blob
+        function dataURLToBlob(dataurl) {
+            const arr = dataurl.split(',');
+            const mimeMatch = arr[0].match(/:(.*?);/);
+            const mime = mimeMatch ? mimeMatch[1] : 'image/png';
+            const bstr = atob(arr[1]);
+            let n = bstr.length;
+            const u8arr = new Uint8Array(n);
+            while (n--) {
+                u8arr[n] = bstr.charCodeAt(n);
+            }
+            return new Blob([u8arr], { type: mime });
+        }
+
+        // Create a zip package containing the JSON export and schematic images
+        async function exportPackage() {
+            const data = getExportData();
+            try {
+                if (typeof JSZip === 'undefined') {
+                    alert('Zip library not loaded. Please ensure JSZip is available.');
+                    return;
+                }
+
+                const zip = new JSZip();
+                zip.file('schematic-coordinates.json', JSON.stringify(data, null, 2));
+
+                const added = new Set();
+                for (const sch of schematics) {
+                    for (const pageNum of sch.diagramPages) {
+                        const page = pageData.find(p => p.pageNum === pageNum);
+                        if (page && page.image) {
+                            const name = `diagram-${sch.id}-page-${pageNum}.png`;
+                            if (added.has(name)) continue;
+                            added.add(name);
+                            const blob = dataURLToBlob(page.image);
+                            zip.file(name, blob);
+                        }
+                    }
+                }
+
+                const content = await zip.generateAsync({ type: 'blob' });
+                const url = URL.createObjectURL(content);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'schematic-package.zip';
+                a.click();
+            } catch (err) {
+                console.error('Error creating package:', err);
+                alert('Error creating package: ' + (err.message || err));
+            }
         }
 
         function copyToClipboard() {
