@@ -47,9 +47,9 @@ export default function Header({ onCartToggle }) {
         </div>
 
         {/* Desktop Layout */}
-        <div className="hidden md:flex md:items-center md:justify-between w-full">
+        <div className="hidden md:contents">
           <div className="header-left">
-            <nav className="nav-links nav-left" aria-label="Primary">
+            <nav className="nav-links" aria-label="Primary">
               <Link to="/products" className={`nav-link ${isActive('/products') ? 'active' : ''}`}>Tools</Link>
               <Link to="/parts" className={`nav-link ${isActive('/parts') ? 'active' : ''}`}>Parts</Link>
             </nav>
@@ -63,7 +63,7 @@ export default function Header({ onCartToggle }) {
           </div>
 
           <div className="header-right">
-            <nav className="nav-links nav-right" aria-label="Secondary">
+            <nav className="nav-links" aria-label="Secondary">
               <Link to="/about" className={`nav-link ${isActive('/about') ? 'active' : ''}`}>About</Link>
               <Link to="/contact" className={`nav-link ${isActive('/contact') ? 'active' : ''}`}>Contact</Link>
             </nav>
