@@ -5,6 +5,7 @@
 .schematic-filter-bar {
   display: flex;
   align-items: center;
+  justify-content: center;
   position: relative;
   z-index: 10002;
 }
@@ -12,6 +13,7 @@
 .filter-bar-container {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 6px;
   padding: 6px 10px;
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 252, 0.95) 100%);

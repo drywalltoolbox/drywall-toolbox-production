@@ -599,7 +599,7 @@ export default function Parts() {
   return (
     <section 
       style={{ 
-        padding: '120px 40px 80px',
+        padding: '96px 40px 80px',
         minHeight: '100vh'
       }} 
       className="section-enter"

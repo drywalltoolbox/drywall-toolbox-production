@@ -499,9 +499,31 @@ body {
 /* Desktop: Grid layout for screens >= 768px */
 @media (min-width: 768px) {
     .site-header-inner {
-        display: grid;
-        grid-template-columns: 1fr auto 1fr;
-        gap: 48px;
+        display: grid !important;
+        grid-template-columns: auto 1fr auto;
+        gap: 24px;
+    }
+    
+    .header-left {
+        display: flex;
+        align-items: center;
+        justify-self: start;
+        gap: 16px;
+    }
+    
+    .header-right {
+        display: flex;
+        align-items: center;
+        justify-self: end;
+        gap: 16px;
+    }
+    
+    .header-center {
+        display: flex;
+        align-items: center;
+        justify-self: center;
+        justify-content: center;
+        gap: 10px;
     }
 }
 
@@ -509,23 +531,6 @@ body {
 .header-right {
     display: flex;
     align-items: center;
-}
-
-.header-left {
-    justify-self: start;
-    gap: 28px;
-}
-
-.header-right {
-    justify-self: end;
-    gap: 28px;
-}
-
-.header-center {
-    justify-self: center;
-    display: flex;
-    align-items: center;
-    gap: 10px;
 }
 
 .brand-icon {
@@ -557,7 +562,7 @@ body {
 .nav-links {
     display: flex;
     align-items: center;
-    gap: 28px;
+    gap: 18px;
 }
 
 .nav-link {
@@ -582,6 +587,7 @@ body {
 .cart-area {
     display: flex;
     align-items: center;
+    margin-left: 12px;
 }
 
 .cart-toggle {
