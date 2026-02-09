@@ -2,23 +2,64 @@
 // Loads and parses the CSV placed in /public/tswfast_all_products.csv
 
 export async function loadProducts() {
-  const res = await fetch('/tswfast_all_products.csv');
+  // load the new unified products catalog (ALS schema) by default
+  const res = await fetch('/products_catalog.csv');
   if (!res.ok) return [];
   const text = await res.text();
   const rows = parseCSV(text);
-  // CSV header: brand,product_name,part_number,url,image_url,short_description,category,specifications
-  const products = rows.map((r, idx) => ({
-    id: r.part_number || `p-${idx}`,
-    part_number: r.part_number || `p-${idx}`,
-    name: r.product_name || '',
-    brand: r.brand || '',
-    url: r.url || '',
-    image: r.image_url || '/product-placeholder.jpg',
-    short_description: r.short_description || '',
-    category: r.category || '',
-    specifications: tryParseJSON(r.specifications) || null,
-    _raw: r
-  }));
+  // The loader supports both old app CSV and new ALS CSV headers.
+  // ALS header (preferred): brand,name,description_full,sku,upc,price,price_numeric,description_short,image_1...image_9,all_images
+  // Legacy app header: brand,product_name,part_number,url,image_url,short_description,category,specifications
+  const products = rows.map((r, idx) => {
+    // Normalize fields from either schema into the runtime product shape
+  const sku = String(r.sku || r.part_number || '').trim();
+  const upc = String(r.upc || '').trim();
+  const name = String(r.name || r.product_name || '').trim();
+  const brand = String(r.brand || '').trim();
+  const url = String(r.url || '').trim();
+  // prefer image_1 (ALS) then image_url (legacy) then first of all_images
+  let image = (r.image_1 || r.image_url || '').trim();
+  if (!image && r.all_images) image = String(r.all_images).split('|')[0].trim() || '';
+  if (!image) image = '/product-placeholder.jpg';
+  const short_description = String(r.description_short || r.short_description || '').trim();
+  const description_full = String(r.description_full || '').trim();
+  const category = String(r.category || '').trim();
+    // specifications: if present (legacy), parse it; otherwise synthesize from description_full
+    let specifications = null;
+    if (r.specifications) {
+      specifications = tryParseJSON(r.specifications) || null;
+    } else if (r.description_full || sku || brand) {
+      specifications = { PART: sku || '', MANUFACTURER: brand || '', full_description: r.description_full || '', spec_source: 'als' };
+    }
+
+    // normalize price to numeric where possible
+    let priceVal = '';
+    const rawPrice = r.price_numeric || r.price || '';
+    if (rawPrice !== '') {
+      const n = parseFloat(String(rawPrice).replace(/[^0-9.-]+/g, ''));
+      if (!Number.isNaN(n)) priceVal = n;
+    }
+
+    return {
+      id: sku || `p-${idx}`,
+      part_number: sku || `p-${idx}`,
+      sku: sku || '',
+      upc: upc || '',
+      // ensure name fallback so UI always has something to render
+      name: name || sku || `Product ${idx}`,
+      brand,
+      url,
+      image: image,
+      short_description,
+      description_full,
+      category,
+      specifications,
+      price: priceVal,
+      rating: r.rating ? Number(r.rating) : 0,
+      reviews: r.reviews ? Number(r.reviews) : 0,
+      _raw: r
+    };
+  });
   return products;
 }
 
@@ -32,45 +73,74 @@ function tryParseJSON(s) {
 }
 
 function parseCSV(text) {
-  const lines = text.split(/\r?\n/).filter(l => l.trim() !== '');
-  if (lines.length === 0) return [];
-  const header = splitCSVLine(lines[0]).map(h => h.trim());
+  // robust CSV parser that supports quoted fields with newlines
   const rows = [];
-  for (let i = 1; i < lines.length; i++) {
-    const parts = splitCSVLine(lines[i]);
-    if (parts.length === 0) continue;
-    const obj = {};
-    for (let j = 0; j < header.length; j++) {
-      obj[header[j]] = parts[j] !== undefined ? parts[j] : '';
-    }
-    rows.push(obj);
-  }
-  return rows;
-}
-
-function splitCSVLine(line) {
-  const result = [];
+  let i = 0;
+  const N = text.length;
   let cur = '';
+  let row = [];
   let inQuotes = false;
-  for (let i = 0; i < line.length; i++) {
-    const ch = line[i];
-    if (ch === '"') {
-      // handle double-quote escapes
-      if (inQuotes && line[i + 1] === '"') {
-        cur += '"';
+  while (i < N) {
+    const ch = text[i];
+    if (inQuotes) {
+      if (ch === '"') {
+        // lookahead for escaped quote
+        if (i + 1 < N && text[i + 1] === '"') {
+          cur += '"';
+          i += 2;
+          continue;
+        }
+        inQuotes = false;
         i++;
-      } else {
-        inQuotes = !inQuotes;
+        continue;
       }
+      // preserve any char inside quotes including newlines
+      cur += ch;
+      i++;
       continue;
     }
-    if (ch === ',' && !inQuotes) {
-      result.push(cur);
+    // not in quotes
+    if (ch === '"') {
+      inQuotes = true;
+      i++;
+      continue;
+    }
+    if (ch === ',') {
+      row.push(cur);
       cur = '';
+      i++;
+      continue;
+    }
+    if (ch === '\r') { i++; continue; }
+    if (ch === '\n') {
+      row.push(cur);
+      rows.push(row);
+      row = [];
+      cur = '';
+      i++;
       continue;
     }
     cur += ch;
+    i++;
   }
-  result.push(cur);
-  return result;
+  // last field
+  if (cur !== '' || row.length > 0) {
+    row.push(cur);
+    rows.push(row);
+  }
+
+  if (rows.length === 0) return [];
+  const header = rows[0].map(h => h.trim());
+  const objs = [];
+  for (let r = 1; r < rows.length; r++) {
+    const rowArr = rows[r];
+    // skip empty trailing rows
+    if (rowArr.length === 1 && rowArr[0] === '') continue;
+    const obj = {};
+    for (let c = 0; c < header.length; c++) {
+      obj[header[c]] = rowArr[c] !== undefined ? rowArr[c] : '';
+    }
+    objs.push(obj);
+  }
+  return objs;
 }

@@ -271,7 +271,13 @@ export default function Products() {
                   <div className="relative bg-gray-100 aspect-square overflow-hidden">
                     <button onClick={() => openModal(product)} className="absolute inset-0 flex items-center justify-center">
                       {product.image ? (
-                        <img src={product.image} alt={product.name} className="object-contain w-full h-full" />
+                        <img
+                          src={product.image}
+                          alt={product.name}
+                          className="object-contain w-full h-full"
+                          loading="lazy"
+                          onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = '/product-placeholder.jpg'; }}
+                        />
                       ) : (
                         <div className="text-gray-400"><ShoppingCart size={48} /></div>
                       )}
@@ -295,7 +301,7 @@ export default function Products() {
                   <div className="p-5">
                     <p className="text-xs text-gray-500 mb-1">{product.brand}</p>
                     <h3 className="text-lg font-semibold text-gray-900 mb-2 line-clamp-2 group-hover:text-primary-600 transition-colors">
-                      <button onClick={() => openModal(product)} className="block text-left w-full">{product.name}</button>
+                      <button onClick={() => openModal(product)} className="block text-left w-full">{product.name || product.part_number}</button>
                     </h3>
                     
                     {/* Rating */}

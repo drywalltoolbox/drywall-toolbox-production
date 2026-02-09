@@ -1,44 +1,7 @@
 import { useState } from 'react';
 import Reviews from './Reviews';
-import DOMPurify from 'dompurify';
 import { useCart } from '../context/CartContext';
-import { ShoppingCart, Heart, Plus, Minus, Star, Package, Truck, Shield, ChevronRight } from 'lucide-react';
-
-function cleanDescription(s) {
-  if (!s) return '';
-  const cleaned = s.replace(/^\s*Product Details Resources\s*[:\-–—]?\s*/i, '').trim();
-  return cleaned.replace(/\s{2,}/g, ' ');
-}
-
-function renderSpecObject(obj) {
-  if (!obj) return null;
-  if (obj.full_description) {
-    const fd = cleanDescription(String(obj.full_description));
-    const looksLikeHtml = /<[^>]+>/.test(fd);
-    if (looksLikeHtml) {
-      const clean = DOMPurify.sanitize(fd);
-      return <div dangerouslySetInnerHTML={{ __html: clean }} />;
-    }
-    return (
-      <div className="space-y-3 text-sm text-gray-700">
-        {fd.split(/\r?\n\s*\r?\n/).map((para, i) => (
-          <p key={i}>{para.trim()}</p>
-        ))}
-      </div>
-    );
-  }
-
-  return (
-    <ul className="list-disc pl-5 space-y-1 text-sm text-gray-700">
-      {Object.entries(obj).map(([k, v]) => (
-        <li key={k} className="wrap-break-word">
-          <strong className="text-gray-900">{k}:</strong>{' '}
-          {typeof v === 'object' ? <pre className="inline whitespace-pre-wrap">{JSON.stringify(v)}</pre> : <span>{cleanDescription(String(v))}</span>}
-        </li>
-      ))}
-    </ul>
-  );
-}
+import { ShoppingCart, Heart, Plus, Minus, Star, Package, Truck, Shield } from 'lucide-react';
 
 export default function ProductDetail({ product, onAddToCart, onClose }) {
   const { addToCart } = useCart();
@@ -78,10 +41,11 @@ export default function ProductDetail({ product, onAddToCart, onClose }) {
         <div className="lg:col-span-2">
           <div className="bg-linear-to-br from-gray-50 to-gray-100 rounded-xl overflow-hidden aspect-square flex items-center justify-center p-8 border-2 border-gray-200 shadow-inner">
             {product.image ? (
-              <img 
-                src={product.image} 
-                alt={product.name} 
-                className="object-contain w-full h-full hover:scale-105 transition-transform duration-300" 
+              <img
+                src={product.image}
+                alt={product.name}
+                className="object-contain w-full h-full hover:scale-105 transition-transform duration-300"
+                onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = '/product-placeholder.jpg'; }}
               />
             ) : (
               <div className="text-gray-300"><ShoppingCart size={80} strokeWidth={1.5} /></div>
@@ -132,19 +96,26 @@ export default function ProductDetail({ product, onAddToCart, onClose }) {
 
           {/* Product Name */}
           <h1 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-3 leading-tight">
-            {product.name}
+            {product.name || product.sku || product.part_number}
           </h1>
 
-          {/* Part Number */}
-          {product.part_number && (
-            <p className="text-sm text-gray-500 mb-4">
-              Part #: <span className="font-mono font-medium text-gray-700">{product.part_number}</span>
-            </p>
-          )}
+          {/* SKU and UPC */}
+          <div className="flex flex-wrap gap-x-6 gap-y-2 mb-4 text-sm text-gray-500">
+            {product.sku && (
+              <div>
+                SKU: <span className="font-mono font-medium text-gray-700">{product.sku}</span>
+              </div>
+            )}
+            {product.upc && (
+              <div>
+                UPC: <span className="font-mono font-medium text-gray-700">{product.upc}</span>
+              </div>
+            )}
+          </div>
 
-          {/* Short Description */}
-          {product.short_description && (
-            <p className="text-gray-700 mb-6 leading-relaxed">{product.short_description}</p>
+          {/* Full Description */}
+          {product.description_full && (
+            <p className="text-gray-700 mb-6 leading-relaxed">{product.description_full}</p>
           )}
 
           {/* Price Section */}
@@ -201,35 +172,6 @@ export default function ProductDetail({ product, onAddToCart, onClose }) {
             </button>
           </div>
 
-          {/* Specifications */}
-          {product.specifications && (
-            <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
-              <h3 className="flex items-center gap-2 font-bold text-xl text-gray-900 mb-4">
-                <ChevronRight className="text-primary-600" size={24} />
-                Specifications
-              </h3>
-              <div className="text-sm text-gray-700 bg-gray-50 p-4 rounded-lg">
-                {typeof product.specifications === 'string' ? (
-                  (() => {
-                    try {
-                      const parsed = JSON.parse(product.specifications);
-                      return renderSpecObject(parsed);
-                    } catch {
-                      const cleaned = cleanDescription(product.specifications);
-                      const looksLikeHtml = /<[^>]+>/.test(cleaned);
-                      if (looksLikeHtml) {
-                        const safe = DOMPurify.sanitize(cleaned);
-                        return <div dangerouslySetInnerHTML={{ __html: safe }} />;
-                      }
-                      return <pre className="whitespace-pre-wrap">{cleaned}</pre>;
-                    }
-                  })()
-                ) : (
-                  renderSpecObject(product.specifications)
-                )}
-              </div>
-            </div>
-          )}
           {/* Reviews trigger modal: when clicked opens verified reviews (read-only) */}
           {showReviewsPopup && (
             <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
