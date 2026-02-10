@@ -296,7 +296,7 @@ export default function Products() {
                       setPriceRange([0, MAX_PRICE]);
                       navigate('/products');
                     }}
-                    className="w-full text-sm text-primary-600 hover:text-primary-700 font-medium"
+                    className="w-full text-sm text-gray-900 hover:text-gray-800 font-medium"
                   >
                     Clear All Filters
                   </button>
