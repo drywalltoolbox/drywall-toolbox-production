@@ -36,17 +36,7 @@ export default function Contact() {
               Email
             </h5>
             <p className="text-sm sm:text-base break-all" style={{ fontFamily: 'var(--font-mono)' }}>
-              ops@drywalltoolbox.com
-            </p>
-          </div>
-
-          <div>
-            <h5 className="uppercase text-[0.65rem] sm:text-[0.7rem] tracking-wider text-primary-600 mb-2">
-              Headquarters
-            </h5>
-            <p className="text-sm sm:text-base" style={{ fontFamily: 'var(--font-mono)' }}>
-              1024 Precision Way, Alloy Park<br />
-              Industrial District, TX 75001
+              support@drywalltoolbox.com
             </p>
           </div>
         </div>
