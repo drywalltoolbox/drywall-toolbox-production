@@ -114,7 +114,11 @@ export default function Products() {
     const currentBrandsSet = [...selectedBrands].sort().join(',');
     
     if (urlBrandsSet !== currentBrandsSet) {
-      setSelectedBrands(brandsFromUrl);
+      // Defer the state update to avoid synchronous setState inside an effect
+      // which can cause cascading renders. Scheduling the update asynchronously
+      // ensures the effect completes before the state change occurs.
+      const t = setTimeout(() => setSelectedBrands(brandsFromUrl), 0);
+      return () => clearTimeout(t);
     }
   }, [location.search]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -375,7 +379,7 @@ export default function Products() {
 
                     {/* Price and Add to Cart */}
                     <div className="flex items-center justify-between">
-                      <p className="text-2xl font-bold text-primary-600">
+                      <p className="text-2xl font-bold text-gray-900">
                         ${product.price}
                       </p>
                       <button
@@ -428,12 +432,12 @@ export default function Products() {
       
       {/* Product Detail Modal */}
       {isModalOpen && modalProduct && (
-        <div className="fixed inset-0 z-[1100] flex items-center justify-center p-0 sm:p-4">
+        <div className="fixed inset-0 z-1100 flex items-center justify-center p-0 sm:p-4">
           <div className="fixed inset-0 bg-black/60 backdrop-blur-sm" onClick={closeModal} />
           {/* Close Button - Direct child of fixed modal wrapper to avoid stacking context issues */}
           <button
             onClick={closeModal}
-            className="fixed top-4 right-4 sm:absolute sm:top-4 sm:right-4 z-[1120] p-2.5 sm:p-2 bg-white rounded-full shadow-xl hover:bg-gray-100 transition-colors border border-gray-200"
+            className="fixed top-4 right-4 sm:absolute sm:top-4 sm:right-4 z-1120 p-2.5 sm:p-2 bg-white rounded-full shadow-xl hover:bg-gray-100 transition-colors border border-gray-200"
             aria-label="Close"
           >
             <X className="w-6 h-6 text-gray-700" />

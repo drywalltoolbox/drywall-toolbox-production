@@ -72,7 +72,7 @@ export default function ProductDetail({ product, onAddToCart, onClose }) {
 
               {/* Price */}
               <div className="mb-4 sm:mb-6">
-                <span className="text-3xl sm:text-4xl font-bold text-blue-600">${displayPrice}</span>
+                <span className="text-3xl sm:text-4xl font-bold text-gray-900">${displayPrice}</span>
               </div>
 
               {/* SKU & UPC */}
@@ -113,7 +113,7 @@ export default function ProductDetail({ product, onAddToCart, onClose }) {
 
                 <button
                   onClick={handleAddToCart}
-                  className="flex-1 flex items-center justify-center gap-2 px-6 sm:px-8 py-2.5 sm:py-3 bg-black hover:bg-gray-800 text-white rounded font-semibold transition-colors text-sm sm:text-base"
+                  className="flex-1 flex items-center justify-center gap-2 px-6 sm:px-8 py-2.5 sm:py-3 bg-primary-600 hover:bg-primary-700 text-white rounded font-semibold transition-colors text-sm sm:text-base"
                 >
                   ADD TO CART
                 </button>

@@ -3,8 +3,9 @@
 :root {
     --alloy-base: var(--color-primary-50, #f8fafc);
     --alloy-mid: var(--color-primary-100, #e2e8f0);
-    /* Use the About page primary palette for the deep/navy branding color */
-    --alloy-deep: var(--color-primary-900, #0f172a);
+     /* Use the About page primary palette for the deep/navy branding color.
+         Map to primary-600 so branding matches the About hero blue. */
+     --alloy-deep: var(--color-primary-600, #2563eb);
     /* Accent and highlight map to the centralized primary shades */
     --tension-accent: var(--color-primary-600, #2563eb);
     --tension-highlight: var(--color-primary-400, #60a5fa);
