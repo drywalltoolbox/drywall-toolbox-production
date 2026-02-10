@@ -100,6 +100,82 @@ body {
     font-size: 0.6rem;
 }
 
+/* --- QUANTITY CONTROL - modern, touch-friendly pill --- */
+.quantity-control {
+    display: inline-flex;
+    align-items: center;
+    background: linear-gradient(180deg, #ffffff, #fbfdff);
+    border-radius: 999px;
+    padding: 6px;
+    box-shadow: 0 6px 20px rgba(2,6,23,0.06);
+    border: 1px solid rgba(15,23,42,0.06);
+    overflow: hidden;
+}
+
+.quantity-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    transition: background 160ms var(--ease-tension), transform 120ms var(--ease-tension);
+    color: var(--alloy-deep);
+}
+
+.quantity-btn:active { transform: translateY(1px) scale(0.995); }
+
+.quantity-btn:hover { background: rgba(2,6,23,0.04); }
+
+.quantity-decrease { border-radius: 999px; }
+.quantity-increase { border-radius: 999px; background: linear-gradient(90deg, var(--primary-500), var(--primary-600)); color: #fff; }
+
+.quantity-input {
+    width: 64px;
+    min-width: 64px;
+    text-align: center;
+    font-weight: 700;
+    font-size: 1rem;
+    border: none;
+    outline: none;
+    padding: 8px 10px;
+    background: transparent;
+    color: var(--alloy-deep);
+}
+
+/* Modern Add to Cart button variant for the modal */
+.btn-add-to-cart {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 18px;
+    background: linear-gradient(90deg, var(--primary-600), var(--primary-700));
+    color: #fff;
+    border-radius: 12px;
+    font-weight: 800;
+    box-shadow: 0 18px 40px rgba(37,99,235,0.12);
+    border: none;
+    transition: transform 200ms var(--ease-tension), box-shadow 200ms var(--ease-tension);
+}
+
+.btn-add-to-cart:hover { transform: translateY(-3px) scale(1.01); box-shadow: 0 22px 48px rgba(37,99,235,0.14); }
+
+.btn-wishlist {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px;
+    border-radius: 12px;
+    border: 1px solid rgba(15,23,42,0.06);
+    background: white;
+    color: var(--alloy-deep);
+}
+
+.btn-wishlist.wishlisted { background: #fff5f6; border-color: rgba(220,38,38,0.15); color: #dc2626; }
+
 /* --- CARDS --- */
 .tool-card {
     background: white;
@@ -567,6 +643,14 @@ body {
         align-items: center;
         justify-self: end;
         gap: 16px;
+    }
+
+    /* Limit the side columns so nav items sit closer to the centered brand mark
+       without changing the overall responsive layout. Tweak the max-width value
+       to nudge further in/out as needed. */
+    .header-left,
+    .header-right {
+        max-width: 360px;
     }
     
     .header-center {

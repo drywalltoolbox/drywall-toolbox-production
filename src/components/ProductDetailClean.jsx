@@ -66,6 +66,11 @@ export default function ProductDetail({ product, onAddToCart, onClose }) {
 
   const incrementQuantity = () => setQuantity(prev => prev + 1);
   const decrementQuantity = () => setQuantity(prev => Math.max(1, prev - 1));
+  const onQuantityChange = (e) => {
+    const v = parseInt(e.target.value, 10);
+    if (Number.isNaN(v) || v < 1) return setQuantity(1);
+    setQuantity(v);
+  };
 
   const price = product.price || 0;
   const displayPrice = typeof price === 'number' ? price.toFixed(2) : parseFloat(price || 0).toFixed(2);
@@ -125,20 +130,44 @@ export default function ProductDetail({ product, onAddToCart, onClose }) {
             <p className="text-sm text-gray-600 mt-2">Free shipping on orders over $500</p>
           </div>
 
-          <div className="flex flex-wrap gap-4 mb-6">
-            <div className="flex items-center bg-white border-2 border-gray-200 rounded-xl overflow-hidden shadow-sm">
-              <button onClick={decrementQuantity} className="px-4 py-3 hover:bg-gray-100 transition-colors text-gray-700" aria-label="Decrease quantity"><Minus size={20} /></button>
-              <span className="px-6 py-3 font-bold text-lg text-gray-900 border-x-2 border-gray-200 min-w-15 text-center" aria-label="Current quantity">{quantity}</span>
-              <button onClick={incrementQuantity} className="px-4 py-3 hover:bg-gray-100 transition-colors text-gray-700" aria-label="Increase quantity"><Plus size={20} /></button>
+          <div className="flex flex-wrap gap-4 mb-6 items-center">
+            {/* Modernized quantity control */}
+            <div className="quantity-control">
+              <button
+                type="button"
+                onClick={decrementQuantity}
+                className="quantity-btn quantity-decrease"
+                aria-label="Decrease quantity"
+              >
+                <Minus size={18} />
+              </button>
+
+              <input
+                type="number"
+                min="1"
+                value={quantity}
+                onChange={onQuantityChange}
+                className="quantity-input"
+                aria-label="Quantity"
+              />
+
+              <button
+                type="button"
+                onClick={incrementQuantity}
+                className="quantity-btn quantity-increase"
+                aria-label="Increase quantity"
+              >
+                <Plus size={18} />
+              </button>
             </div>
 
-            <button onClick={handleAddToCart} className="flex-1 flex items-center justify-center gap-3 px-8 py-4 bg-linear-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white rounded-xl font-bold text-lg shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105" aria-label="Add to cart">
-              <ShoppingCart size={24} />
-              Add to Cart
+            <button onClick={handleAddToCart} className="btn-add-to-cart" aria-label="Add to cart">
+              <ShoppingCart size={20} />
+              <span>Add to Cart</span>
             </button>
 
-            <button onClick={() => setIsWishlisted(!isWishlisted)} className={`px-5 py-4 rounded-xl border-2 transition-all duration-300 ${isWishlisted ? 'bg-red-50 border-red-300 text-red-600' : 'bg-white border-gray-200 text-gray-600 hover:border-red-300 hover:text-red-600'}`} aria-label={isWishlisted ? 'Remove from wishlist' : 'Add to wishlist'}>
-              <Heart size={24} className={isWishlisted ? 'fill-current' : ''} />
+            <button onClick={() => setIsWishlisted(!isWishlisted)} className={`btn-wishlist ${isWishlisted ? 'wishlisted' : ''}`} aria-label={isWishlisted ? 'Remove from wishlist' : 'Add to wishlist'}>
+              <Heart size={20} className={isWishlisted ? 'fill-current' : ''} />
             </button>
           </div>
 
