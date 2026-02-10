@@ -56,14 +56,16 @@ export default function CartSidebar({ isOpen, onClose }) {
                 <div>
                   <div style={{ 
                     fontWeight: 600, 
-                    fontSize: '0.9rem' 
+                    fontSize: '0.9rem',
+                    color: '#0f172a' /* force black, not brand blue */
                   }}>
                     {item.name}
                   </div>
                   <div style={{ 
                     fontFamily: 'var(--font-mono)', 
                     fontSize: '0.75rem', 
-                    opacity: 0.6 
+                    opacity: 0.6,
+                    color: '#0f172a' /* ensure price text is black */
                   }}>
                     ${item.price ? item.price.toFixed(2) : '0.00'} × {item.quantity}
                   </div>
@@ -97,8 +99,8 @@ export default function CartSidebar({ isOpen, onClose }) {
             justifyContent: 'space-between', 
             marginBottom: '24px' 
           }}>
-            <span style={{ fontWeight: 800 }}>SUBTOTAL</span>
-            <span style={{ fontFamily: 'var(--font-mono)' }}>
+            <span style={{ fontWeight: 800, color: '#0f172a' }}>SUBTOTAL</span>
+            <span style={{ fontFamily: 'var(--font-mono)', color: '#0f172a', fontWeight: 800 }}>
               ${getCartTotal().toFixed(2)}
             </span>
           </div>

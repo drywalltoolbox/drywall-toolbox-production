@@ -29,7 +29,7 @@ export default function Header({ onCartToggle }) {
           {/* Cart Icon - Far Left */}
           <button 
             onClick={onCartToggle} 
-            className="relative p-2 hover:bg-gray-100 rounded-lg transition-colors" 
+            className="relative p-2 hover:bg-gray-100 rounded-lg transition-colors header-icon" 
             aria-label="Toggle cart"
           >
             <ShoppingCart size={22} />
@@ -47,7 +47,7 @@ export default function Header({ onCartToggle }) {
           {/* Menu Icon - Far Right */}
           <button 
             onClick={toggleMobileMenu}
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+            className="p-2 hover:bg-gray-100 rounded-lg transition-colors header-icon"
             aria-label="Toggle menu"
           >
             {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
@@ -77,7 +77,7 @@ export default function Header({ onCartToggle }) {
             </nav>
 
             <div className="cart-area">
-              <button onClick={onCartToggle} className="cart-toggle" aria-label="Toggle cart">
+              <button onClick={onCartToggle} className="cart-toggle header-icon" aria-label="Toggle cart">
                 <ShoppingCart size={20} />
                 {getCartCount() > 0 && (
                   <span className="cart-badge">{getCartCount()}</span>
