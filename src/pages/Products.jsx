@@ -11,7 +11,8 @@ import {
   SlidersHorizontal,
   Star,
   Heart,
-  ChevronDown
+  ChevronDown,
+  ArrowLeft
 } from 'lucide-react';
 
 // products will be loaded from CSV at runtime
@@ -23,6 +24,8 @@ const categories = [
   { id: 'mudboxes', name: 'Mud Boxes & Pumps' },
   { id: 'sanding', name: 'Sanding Tools' }
 ];
+
+const MAX_PRICE = 3000;
 
 export default function Products() {
   const location = useLocation();
@@ -38,7 +41,7 @@ export default function Products() {
   const [products, setProducts] = useState([]);
   const [brands, setBrands] = useState([]);
   const [selectedCategories, setSelectedCategories] = useState([]);
-  const [priceRange, setPriceRange] = useState([0, 3000]);
+  const [priceRange, setPriceRange] = useState([0, MAX_PRICE]);
   const [sortBy, setSortBy] = useState('popular');
   const [showFilters, setShowFilters] = useState(false);
   const [modalProduct, setModalProduct] = useState(null);
@@ -73,9 +76,17 @@ export default function Products() {
   
 
   const toggleBrand = (brand) => {
-    setSelectedBrands(prev =>
-      prev.includes(brand) ? prev.filter(b => b !== brand) : [...prev, brand]
-    );
+    const newBrands = selectedBrands.includes(brand) 
+      ? selectedBrands.filter(b => b !== brand) 
+      : [...selectedBrands, brand];
+    setSelectedBrands(newBrands);
+  };
+
+  const resetToBrandList = () => {
+    setSelectedBrands([]);
+    setSelectedCategories([]);
+    setPriceRange([0, MAX_PRICE]);
+    navigate('/products');
   };
 
   // load products once
@@ -89,6 +100,41 @@ export default function Products() {
     }).catch(() => {});
     return () => { mounted = false; };
   }, []);
+
+  // Watch for URL changes to update selected brands (only on mount and URL changes)
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const brandParam = params.get('brand');
+    const brandsFromUrl = brandParam 
+      ? brandParam.split(',').map(b => decodeURIComponent(b.trim())).filter(Boolean)
+      : [];
+    
+    // Compare as sorted sets to avoid order issues (create copies to avoid mutation)
+    const urlBrandsSet = [...brandsFromUrl].sort().join(',');
+    const currentBrandsSet = [...selectedBrands].sort().join(',');
+    
+    if (urlBrandsSet !== currentBrandsSet) {
+      setSelectedBrands(brandsFromUrl);
+    }
+  }, [location.search]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Sync selectedBrands to URL
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const currentBrandParam = params.get('brand') || '';
+    const expectedBrandParam = selectedBrands.length > 0 
+      ? selectedBrands.map(b => encodeURIComponent(b)).join(',')
+      : '';
+    
+    // Only navigate if URL needs to change
+    if (currentBrandParam !== expectedBrandParam) {
+      if (selectedBrands.length > 0) {
+        navigate(`/products?brand=${expectedBrandParam}`, { replace: true });
+      } else {
+        navigate('/products', { replace: true });
+      }
+    }
+  }, [selectedBrands, navigate, location.search]);
 
   const toggleCategory = (category) => {
     setSelectedCategories(prev =>
@@ -125,6 +171,19 @@ export default function Products() {
           <h1 className="text-4xl font-bold text-gray-900 mb-2">Products</h1>
           <p className="text-gray-600">Browse our extensive collection of professional drywall tools</p>
         </div>
+
+        {/* Back to Brands button - shows when brand is selected */}
+        {selectedBrands.length > 0 && (
+          <div className="mb-6">
+            <button
+              onClick={resetToBrandList}
+              className="inline-flex items-center gap-2 px-4 py-2 text-primary-600 hover:text-primary-700 hover:bg-primary-50 rounded-lg transition-colors font-medium"
+            >
+              <ArrowLeft size={20} />
+              Back to Brands
+            </button>
+          </div>
+        )}
 
         {selectedBrands.length === 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
@@ -215,7 +274,7 @@ export default function Products() {
                     <input
                       type="range"
                       min="0"
-                      max="3000"
+                      max={MAX_PRICE}
                       step="50"
                       value={priceRange[1]}
                       onChange={(e) => setPriceRange([0, parseInt(e.target.value)])}
@@ -230,7 +289,8 @@ export default function Products() {
                     onClick={() => {
                       setSelectedBrands([]);
                       setSelectedCategories([]);
-                      setPriceRange([0, 3000]);
+                      setPriceRange([0, MAX_PRICE]);
+                      navigate('/products');
                     }}
                     className="w-full text-sm text-primary-600 hover:text-primary-700 font-medium"
                   >
@@ -343,7 +403,8 @@ export default function Products() {
                   onClick={() => {
                     setSelectedBrands([]);
                     setSelectedCategories([]);
-                    setPriceRange([0, 3000]);
+                    setPriceRange([0, MAX_PRICE]);
+                    navigate('/products');
                   }}
                   className="inline-flex items-center gap-2 bg-primary-600 hover:bg-primary-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors"
                 >
@@ -367,10 +428,18 @@ export default function Products() {
       
       {/* Product Detail Modal */}
       {isModalOpen && modalProduct && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-0 sm:p-4 pt-16 sm:pt-8 pb-4">
+        <div className="fixed inset-0 z-[1100] flex items-center justify-center p-0 sm:p-4">
           <div className="fixed inset-0 bg-black/60 backdrop-blur-sm" onClick={closeModal} />
+          {/* Close Button - Direct child of fixed modal wrapper to avoid stacking context issues */}
+          <button
+            onClick={closeModal}
+            className="fixed top-4 right-4 sm:absolute sm:top-4 sm:right-4 z-[1120] p-2.5 sm:p-2 bg-white rounded-full shadow-xl hover:bg-gray-100 transition-colors border border-gray-200"
+            aria-label="Close"
+          >
+            <X className="w-6 h-6 text-gray-700" />
+          </button>
           <div className="relative z-10 w-full h-full sm:h-auto max-w-full sm:max-w-3xl md:max-w-5xl lg:max-w-6xl mx-auto">
-            <div onClick={(e) => e.stopPropagation()}>
+            <div onClick={(e) => e.stopPropagation()} className="h-full overflow-x-hidden">
               <ProductDetail product={modalProduct} onAddToCart={handleAddToCart} onClose={closeModal} />
             </div>
           </div>

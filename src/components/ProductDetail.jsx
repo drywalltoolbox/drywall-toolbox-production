@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import Reviews from './Reviews';
 import { useCart } from '../context/CartContext';
-import { ShoppingCart, Heart, Plus, Minus, X } from 'lucide-react';
+import { Heart, Plus, Minus, X } from 'lucide-react';
+import ProductImageGallery from './ProductImageGallery';
 
 export default function ProductDetail({ product, onAddToCart, onClose }) {
   const { addToCart } = useCart();
@@ -32,38 +33,14 @@ export default function ProductDetail({ product, onAddToCart, onClose }) {
   const displayPrice = typeof price === 'number' ? price.toFixed(2) : parseFloat(price || 0).toFixed(2);
 
   return (
-    <div className="bg-white rounded-none sm:rounded-xl lg:rounded-2xl shadow-2xl overflow-hidden animate-fadeIn w-full max-w-6xl mx-auto max-h-[92vh] sm:max-h-[90vh] flex flex-col">
-      {/* Close Button - Responsive positioning with better mobile visibility */}
-      <button
-        onClick={onClose}
-        className="absolute top-3 right-3 sm:top-4 sm:right-4 z-50 p-2 sm:p-2 bg-white rounded-full shadow-xl hover:bg-gray-100 transition-colors border border-gray-200"
-        aria-label="Close"
-      >
-        <X size={22} className="sm:w-6 sm:h-6 text-gray-700" />
-      </button>
-
+    <div className="bg-white rounded-none sm:rounded-xl lg:rounded-2xl shadow-2xl overflow-hidden animate-fadeIn w-full max-w-6xl mx-auto h-full sm:max-h-[90vh] flex flex-col relative">
       {/* Scrollable Content with Custom Scrollbar */}
-      <div className="overflow-y-auto custom-scrollbar">
-        <div className="p-4 sm:p-6 md:p-8 lg:p-12 pt-14 sm:pt-6">
+      <div className="overflow-y-auto overflow-x-hidden custom-scrollbar h-full">
+        <div className="p-4 sm:p-6 md:p-8 lg:p-12 pt-16 sm:pt-6 max-w-full">
           {/* Top Section - Image Left, Details Right */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 md:gap-8 mb-6 sm:mb-8">
-            {/* Product Image - Compact */}
-            <div className="bg-gray-50 rounded-lg p-4 sm:p-6 flex items-center justify-center min-h-62.5 sm:min-h-75">
-              <div className="w-full max-w-sm">
-                {product.image ? (
-                  <img
-                    src={product.image}
-                    alt={product.name}
-                    className="object-contain w-full h-full"
-                    onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = '/product-placeholder.jpg'; }}
-                  />
-                ) : (
-                  <div className="text-gray-300 flex justify-center">
-                    <ShoppingCart size={80} className="sm:w-28 sm:h-28 lg:w-32 lg:h-32" strokeWidth={1} />
-                  </div>
-                )}
-              </div>
-            </div>
+            {/* Product Image Gallery */}
+            <ProductImageGallery product={product} />
 
             {/* Product Info - Right Side */}
             <div className="flex flex-col">
@@ -141,9 +118,10 @@ export default function ProductDetail({ product, onAddToCart, onClose }) {
                   ADD TO CART
                 </button>
 
+                {/* Favorite button - hidden on mobile */}
                 <button
                   onClick={() => setIsWishlisted(!isWishlisted)}
-                  className={`p-2.5 sm:p-3 rounded border transition-colors ${
+                  className={`hidden md:block p-2.5 sm:p-3 rounded border transition-colors ${
                     isWishlisted
                       ? 'bg-red-50 border-red-300 text-red-600'
                       : 'border-gray-300 text-gray-600 hover:border-red-300 hover:text-red-600'
