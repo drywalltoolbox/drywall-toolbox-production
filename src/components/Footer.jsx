@@ -29,7 +29,7 @@ export default function Footer() {
           }} />
           <span>Drywall Toolbox</span>
         </div>
-        <p style={{ fontSize: '0.8rem', opacity: 0.5 }}>
+        <p style={{ fontSize: '0.8rem', opacity: 0.5, color: 'black' }}>
           Machined Precision for the Modern Finisher. Built for the grind.
         </p>
       </div>
@@ -40,27 +40,28 @@ export default function Footer() {
           fontSize: '0.75rem',
           letterSpacing: '0.1em',
           marginBottom: '24px',
-          fontWeight: 800
+          fontWeight: 800,
+          color: 'var(--primary-600)'
         }}>
           Navigation
         </h5>
         <ul style={{ listStyle: 'none', padding: 0 }}>
-          <li style={{ marginBottom: '12px', fontSize: '0.85rem', opacity: 0.6 }}>
-            <Link to="/products" style={{ textDecoration: 'none', color: 'inherit' }}>
+          <li style={{ marginBottom: '12px', fontSize: '0.85rem', opacity: 0.6, color: 'black' }}>
+            <Link to="/products" style={{ textDecoration: 'none', color: 'black' }}>
               Catalog
             </Link>
           </li>
-          <li style={{ marginBottom: '12px', fontSize: '0.85rem', opacity: 0.6 }}>
-            <Link to="/parts" style={{ textDecoration: 'none', color: 'inherit' }}>
+          <li style={{ marginBottom: '12px', fontSize: '0.85rem', opacity: 0.6, color: 'black' }}>
+            <Link to="/parts" style={{ textDecoration: 'none', color: 'black' }}>
               Parts Schematics
             </Link>
           </li>
-          <li style={{ marginBottom: '12px', fontSize: '0.85rem', opacity: 0.6 }}>
-            <Link to="/about" style={{ textDecoration: 'none', color: 'inherit' }}>
+          <li style={{ marginBottom: '12px', fontSize: '0.85rem', opacity: 0.6, color: 'black' }}>
+            <Link to="/about" style={{ textDecoration: 'none', color: 'black' }}>
               About Us
             </Link>
           </li>
-          <li style={{ marginBottom: '12px', fontSize: '0.85rem', opacity: 0.6 }}>
+          <li style={{ marginBottom: '12px', fontSize: '0.85rem', opacity: 0.6, color: 'black' }}>
             Technical Docs
           </li>
         </ul>
@@ -72,22 +73,23 @@ export default function Footer() {
           fontSize: '0.75rem',
           letterSpacing: '0.1em',
           marginBottom: '24px',
-          fontWeight: 800
+          fontWeight: 800,
+          color: 'var(--primary-600)'
         }}>
           Support
         </h5>
         <ul style={{ listStyle: 'none', padding: 0 }}>
-          <li style={{ marginBottom: '12px', fontSize: '0.85rem', opacity: 0.6 }}>
+          <li style={{ marginBottom: '12px', fontSize: '0.85rem', opacity: 0.6, color: 'black' }}>
             Shipping Policy
           </li>
-          <li style={{ marginBottom: '12px', fontSize: '0.85rem', opacity: 0.6 }}>
+          <li style={{ marginBottom: '12px', fontSize: '0.85rem', opacity: 0.6, color: 'black' }}>
             Return Portal
           </li>
-          <li style={{ marginBottom: '12px', fontSize: '0.85rem', opacity: 0.6 }}>
+          <li style={{ marginBottom: '12px', fontSize: '0.85rem', opacity: 0.6, color: 'black' }}>
             Safety Guides
           </li>
-          <li style={{ marginBottom: '12px', fontSize: '0.85rem', opacity: 0.6 }}>
-            <Link to="/contact" style={{ textDecoration: 'none', color: 'inherit' }}>
+          <li style={{ marginBottom: '12px', fontSize: '0.85rem', opacity: 0.6, color: 'black' }}>
+            <Link to="/contact" style={{ textDecoration: 'none', color: 'black' }}>
               Contact
             </Link>
           </li>
@@ -104,7 +106,7 @@ export default function Footer() {
         }}>
           Industrial Access
         </h5>
-        <p style={{ fontSize: '0.8rem', marginBottom: '16px' }}>
+        <p style={{ fontSize: '0.8rem', marginBottom: '16px', color: 'black', fontWeight: 'normal' }}>
           Sign up for trade-only discounts and technical updates.
         </p>
         <input 

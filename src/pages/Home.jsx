@@ -17,14 +17,15 @@ export default function Home() {
       className="home-hero-grid"
       >
         <div>
-          <h1 className="machined-title" style={{ marginBottom: '40px' }}>
+          <h1 className="machined-title" style={{ marginBottom: '40px', color: 'var(--primary-600)' }}>
             ENGINEERED<br />FOR PRECISION<br />WALL FINISHES.
           </h1>
           <p style={{ 
             maxWidth: '500px', 
             marginBottom: '40px', 
             fontSize: '1.1rem', 
-            opacity: 0.7 
+            opacity: 0.7, 
+            color: 'black' 
           }}>
             The industry standard for professional drywall contractors. High-tension alloy tools 
             designed for lifelong durability and flawless execution.

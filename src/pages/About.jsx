@@ -10,8 +10,11 @@ import {
   TrendingUp,
   Heart
 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 export default function About() {
+  const navigate = useNavigate();
+
   const values = [
     {
       icon: Award,
@@ -180,13 +183,21 @@ export default function About() {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <a
-                href="/products"
+                href="#"
+                onClick={(e) => {
+                  e.preventDefault();
+                  navigate('/products');
+                }}
                 className="inline-flex items-center justify-center gap-2 bg-white text-primary-600 hover:bg-gray-100 px-8 py-4 rounded-lg font-semibold text-lg transition-all shadow-lg hover:shadow-xl"
               >
                 Shop Now
               </a>
               <a
-                href="/contact"
+                href="#"
+                onClick={(e) => {
+                  e.preventDefault();
+                  navigate('/contact');
+                }}
                 className="inline-flex items-center justify-center gap-2 bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white px-8 py-4 rounded-lg font-semibold text-lg transition-all border-2 border-white/30"
               >
                 Contact Us

@@ -58,8 +58,8 @@ export default function Header({ onCartToggle }) {
         <div className="hidden md:contents">
           <div className="header-left">
             <nav className="nav-links" aria-label="Primary">
-              <Link to="/products" onClick={handleToolsClick} className={`nav-link ${isActive('/products') ? 'active' : ''}`}>Tools</Link>
-              <Link to="/parts" className={`nav-link ${isActive('/parts') ? 'active' : ''}`}>Parts</Link>
+              <Link to="/products" onClick={handleToolsClick} className={`nav-link ${isActive('/products') ? 'active' : ''}`} style={{ color: isActive('/products') ? 'var(--color-primary-600)' : 'black' }}>Tools</Link>
+              <Link to="/parts" className={`nav-link ${isActive('/parts') ? 'active' : ''}`} style={{ color: isActive('/parts') ? 'var(--color-primary-600)' : 'black' }}>Parts</Link>
             </nav>
           </div>
 
@@ -72,8 +72,8 @@ export default function Header({ onCartToggle }) {
 
           <div className="header-right">
             <nav className="nav-links" aria-label="Secondary">
-              <Link to="/about" className={`nav-link ${isActive('/about') ? 'active' : ''}`}>About</Link>
-              <Link to="/contact" className={`nav-link ${isActive('/contact') ? 'active' : ''}`}>Contact</Link>
+              <Link to="/about" className={`nav-link ${isActive('/about') ? 'active' : ''}`} style={{ color: isActive('/about') ? 'var(--color-primary-600)' : 'black' }}>About</Link>
+              <Link to="/contact" className={`nav-link ${isActive('/contact') ? 'active' : ''}`} style={{ color: isActive('/contact') ? 'var(--color-primary-600)' : 'black' }}>Contact</Link>
             </nav>
 
             <div className="cart-area">

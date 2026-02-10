@@ -9,7 +9,6 @@ import {
   ShoppingCart, 
   Filter, 
   SlidersHorizontal,
-  Star,
   Heart,
   ChevronDown,
   ArrowLeft
@@ -211,19 +210,7 @@ export default function Products() {
             <aside className="lg:w-64 shrink-0">
             <div className="lg:sticky lg:top-24">
               {/* Mobile Filter Toggle */}
-              <button
-                onClick={() => setShowFilters(!showFilters)}
-                className="lg:hidden w-full flex items-center justify-between gap-2 bg-white px-4 py-3 rounded-lg shadow-md mb-4 border border-gray-200"
-              >
-                <span className="flex items-center gap-2 font-semibold text-gray-900">
-                  <Filter size={20} />
-                  Filters
-                </span>
-                <ChevronDown
-                  size={20}
-                  className={`transform transition-transform ${showFilters ? 'rotate-180' : ''}`}
-                />
-              </button>
+              
 
               {/* Filters */}
               <div className={`bg-white rounded-lg shadow-md p-6 space-y-6 ${showFilters ? 'block' : 'hidden lg:block'}`}>
@@ -308,21 +295,38 @@ export default function Products() {
           {/* Products Grid */}
           <div className="flex-1">
             {/* Sort and Results */}
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-              <p className="text-gray-600">
-                Showing <span className="font-semibold text-gray-900">{sortedProducts.length}</span> products
-              </p>
+            <div className="flex flex-row justify-between items-center gap-4 mb-6">
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value)}
-                className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 bg-white"
+                className="px-4 py-2 border border-gray-300 rounded-lg bg-white text-black focus:outline-none focus:ring-2 focus:ring-primary-500"
               >
                 <option value="popular">Most Popular</option>
                 <option value="price-low">Price: Low to High</option>
                 <option value="price-high">Price: High to Low</option>
                 <option value="rating">Highest Rated</option>
               </select>
+              <div className="relative">
+                <button
+                  onClick={() => setShowFilters(!showFilters)}
+                  className="flex items-center px-3 py-2 border border-gray-300 rounded-lg bg-white text-black focus:outline-none focus:ring-2 focus:ring-primary-500"
+                  aria-label="Toggle Filters"
+                >
+                  <Filter size={16} />
+                </button>
+                {showFilters && (
+                  <div className="absolute top-full left-0 w-64 bg-white shadow-lg border border-gray-300 rounded-lg mt-2 p-4 transition-transform transform origin-top scale-y-100">
+                    <div className="flex flex-col gap-4">
+                      {/* Add filter options here */}
+                      <p>Filter options go here</p>
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
+
+            {/* Filter Modal */}
+            
 
             {/* Products Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -368,13 +372,14 @@ export default function Products() {
                       <button onClick={() => openModal(product)} className="block text-left w-full">{product.name || product.part_number}</button>
                     </h3>
                     
-                    {/* Rating */}
-                    <div className="flex items-center gap-2 mb-3">
-                      <div className="flex items-center gap-1">
-                        <Star size={14} className="text-yellow-400 fill-current" />
-                        <span className="text-sm font-medium text-gray-700">{product.rating}</span>
-                      </div>
-                      <span className="text-xs text-gray-500">({product.reviews} reviews)</span>
+                    {/* SKU and UPC */}
+                    <div className="flex items-center gap-4 mb-3">
+                      {product.sku && (
+                        <p className="text-xs text-gray-500">SKU: {product.sku}</p>
+                      )}
+                      {product.upc && (
+                        <p className="text-xs text-gray-500">UPC: {product.upc}</p>
+                      )}
                     </div>
 
                     {/* Price and Add to Cart */}

@@ -53,8 +53,8 @@ export default function SchematicFilterBar({
             onClick={() => setExpandedSection(expandedSection === 'brand' ? null : 'brand')}
           >
             <div className="filter-trigger-content">
-              <span className="filter-label">BRAND</span>
-              <span className="filter-value">{selectedBrand || 'Select brand'}</span>
+              <span className="filter-label" style={{ color: 'var(--color-primary-600)' }}>BRAND</span>
+              <span className="filter-value" style={{ color: 'black' }}>{selectedBrand || 'Select brand'}</span>
             </div>
             <svg 
               className={`filter-chevron ${expandedSection === 'brand' ? 'rotated' : ''}`}
@@ -104,8 +104,8 @@ export default function SchematicFilterBar({
             disabled={!selectedBrand || products.length === 0}
           >
             <div className="filter-trigger-content">
-              <span className="filter-label">PRODUCT</span>
-              <span className="filter-value">
+              <span className="filter-label" style={{ color: 'var(--color-primary-600)' }}>PRODUCT</span>
+              <span className="filter-value" style={{ color: 'black' }}>
                 {selectedProduct ? `${selectedProduct.name}` : products.length === 0 ? 'No products' : 'Select product'}
               </span>
             </div>
@@ -175,8 +175,8 @@ export default function SchematicFilterBar({
             disabled={schematics.length === 0}
           >
             <div className="filter-trigger-content">
-              <span className="filter-label">SCHEMATIC</span>
-              <span className="filter-value">
+              <span className="filter-label" style={{ color: 'var(--color-primary-600)' }}>SCHEMATIC</span>
+              <span className="filter-value" style={{ color: 'black' }}>
                 {selectedSchematic ? schematics.find(s => s.id === selectedSchematic)?.title || 'Select schematic' : schematics.length === 0 ? 'No schematics' : 'Select schematic'}
               </span>
             </div>
