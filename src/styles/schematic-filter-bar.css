@@ -320,6 +320,7 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  word-break: break-word;
 }
 
 .filter-option svg {
@@ -327,6 +328,45 @@
   flex-shrink: 0;
   width: 16px;
   height: 16px;
+}
+
+/* Schematic Dropdown Specific Styling */
+.filter-dropdown-schematic {
+  min-width: 280px;
+  max-width: 100vw;
+  width: auto;
+}
+
+.filter-option-schematic {
+  width: 100%;
+  padding: 10px 12px;
+}
+
+.filter-option-schematic .filter-option-content {
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.filter-option-schematic .filter-option-main {
+  flex: 1;
+  min-width: 200px;
+  word-wrap: break-word;
+  word-break: break-word;
+}
+
+.filter-option-schematic .filter-option-text {
+  white-space: normal;
+  line-height: 1.3;
+  overflow: visible;
+  text-overflow: unset;
+}
+
+.filter-option-schematic .filter-option-meta {
+  white-space: normal;
+  overflow: visible;
+  text-overflow: unset;
+  max-width: 100%;
+  line-height: 1.3;
 }
 
 /* Reset Button */
@@ -395,6 +435,10 @@
     min-width: 110px;
     max-width: 180px;
   }
+
+  .filter-dropdown-schematic {
+    min-width: 240px;
+  }
 }
 
 @media (max-width: 768px) {
@@ -419,6 +463,39 @@
     max-width: none;
   }
 
+  .filter-dropdown-schematic {
+    min-width: 90vw;
+    max-width: 90vw;
+    left: 50% !important;
+    right: auto !important;
+    transform: translateX(-50%) !important;
+  }
+
+  .filter-dropdown-schematic .filter-dropdown-content {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 4px;
+  }
+
+  .filter-option-schematic {
+    padding: 12px 10px;
+  }
+
+  .filter-option-schematic .filter-option-content {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .filter-option-schematic .filter-option-main {
+    min-width: 100%;
+    width: 100%;
+  }
+
+  .filter-option-schematic svg {
+    align-self: flex-end;
+    margin-top: 8px;
+  }
+
   .filter-reset {
     width: 100%;
     height: 32px;
@@ -428,6 +505,37 @@
 
   .filter-reset:hover {
     transform: translateY(-2px) rotate(0deg);
+  }
+}
+
+@media (max-width: 480px) {
+  .filter-dropdown-schematic {
+    min-width: calc(100vw - 20px);
+    max-width: calc(100vw - 20px);
+    left: 50% !important;
+    right: auto !important;
+    transform: translateX(-50%) !important;
+  }
+
+  .filter-bar-container {
+    padding: 6px 8px;
+    gap: 4px;
+  }
+
+  .filter-section {
+    min-width: 100px;
+  }
+
+  .filter-option-schematic {
+    padding: 10px 8px;
+  }
+
+  .filter-option-schematic .filter-option-text {
+    font-size: 0.8rem;
+  }
+
+  .filter-option-schematic .filter-option-meta {
+    font-size: 0.7rem;
   }
 }
 

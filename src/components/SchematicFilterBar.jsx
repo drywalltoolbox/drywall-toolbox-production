@@ -194,12 +194,12 @@ export default function SchematicFilterBar({
           </button>
           
           {expandedSection === 'schematic' && (
-            <div className="filter-dropdown">
+            <div className="filter-dropdown filter-dropdown-schematic">
               <div className="filter-dropdown-content">
                 {schematics.map((schematic) => (
                   <button
                     key={schematic.id}
-                    className={`filter-option ${selectedSchematic === schematic.id ? 'active' : ''}`}
+                    className={`filter-option filter-option-schematic ${selectedSchematic === schematic.id ? 'active' : ''}`}
                     onClick={() => handleSchematicSelect(schematic.id)}
                   >
                     <div className="filter-option-content">
