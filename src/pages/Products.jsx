@@ -169,13 +169,7 @@ export default function Products() {
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="container mx-auto px-4 py-8">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">Products</h1>
-          <p className="text-gray-600">Browse our extensive collection of professional drywall tools</p>
-        </div>
-
-        {/* Back to Brands button - shows when brand is selected */}
+        {/* Back to Brands button - shows when brand is selected (moved above header) */}
         {selectedBrands.length > 0 && (
           <div className="mb-6">
             <button
@@ -183,10 +177,16 @@ export default function Products() {
               className="inline-flex items-center gap-2 px-4 py-2 text-primary-600 hover:text-primary-700 hover:bg-primary-50 rounded-lg transition-colors font-medium"
             >
               <ArrowLeft size={20} />
-              Back to Brands
+              Brands
             </button>
           </div>
         )}
+
+        {/* Header */}
+        <div className="mb-8">
+          <h1 className="text-4xl font-bold text-gray-900 mb-2">Products</h1>
+          <p className="text-gray-600">Browse our extensive collection of professional drywall tools</p>
+        </div>
 
         {selectedBrands.length === 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
