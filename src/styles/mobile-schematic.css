@@ -70,33 +70,6 @@
     }
   }
 
-  .mobile-modal-close-btn {
-    position: absolute;
-    top: 12px;
-    right: 12px;
-    width: 34px;
-    height: 34px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: rgba(15, 23, 42, 0.06);
-    border: 1px solid rgba(15, 23, 42, 0.1);
-    border-radius: 10px;
-    cursor: pointer;
-    color: rgba(15, 23, 42, 0.65);
-    transition: all 180ms ease;
-    -webkit-tap-highlight-color: transparent;
-    touch-action: manipulation;
-    z-index: 1;
-  }
-
-  .mobile-modal-close-btn:active {
-    background: rgba(239, 68, 68, 0.1);
-    border-color: rgba(239, 68, 68, 0.3);
-    color: #dc2626;
-    transform: scale(0.9);
-  }
-
   /* On mobile, hide the in-hotspot modal since the overlay handles it */
   .hotspot .part-modal {
     display: none !important;
