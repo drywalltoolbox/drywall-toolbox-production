@@ -742,23 +742,15 @@ aside input[type="range"],
         width: 100%;
     }
     
-    /* Hide wrench icon on mobile to prevent overflow */
-    .home-hero-icon {
-        display: none !important;
-    }
-    
-    /* Make home hero grid single column on mobile */
-    .home-hero-grid {
-        grid-template-columns: 1fr !important;
-    }
-
-    /* Center text and button on mobile */
+    /* Center text and button on mobile with proper spacing */
     .home-hero-grid > div {
         text-align: center !important;
+        gap: clamp(1rem, 3vw, 1.5rem) !important;
     }
 
     .home-hero-grid .alloy-button {
         margin: 0 auto !important;
+        width: fit-content !important;
     }
 }
 
@@ -1227,16 +1219,8 @@ div.min-h-screen {
     }
 
     .home-hero-grid {
-        display: grid !important;
-        grid-template-columns: 1fr !important;
-        gap: 2rem !important;
         max-width: 100% !important;
         margin: 0 auto !important;
-    }
-
-    .home-hero-icon {
-        height: 300px;
-        clip-path: polygon(5% 0, 100% 0, 100% 95%, 95% 100%, 0 100%, 0 5%) !important;
     }
 
     /* === CARDS: Improved tablet spacing === */
