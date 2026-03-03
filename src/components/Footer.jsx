@@ -90,9 +90,6 @@ export default function Footer() {
               About Us
             </Link>
           </li>
-          <li style={{ marginBottom: '12px', fontSize: '0.85rem', opacity: 0.6, color: 'black' }}>
-            Technical Docs
-          </li>
         </ul>
       </div>
 
