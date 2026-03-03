@@ -32,7 +32,7 @@ export default function Home() {
             color: 'black',
             lineHeight: 1.6
           }}>
-            Your go-to source for the highest quality drywall tools and parts. A one stop shop for everything you need to ensure a flawless finish everytime. Get production-grade tools, unbeatable prices, and lightning-fast shipping from a team that knows the job site.
+            Your one stop shop for everything you need to ensure a flawless finish everytime. Get production-grade tools, unbeatable prices, and lightning-fast shipping from a team that knows the job site.
           </p>
           <Link to="/products" className="alloy-button" style={{ textDecoration: 'none', marginTop: 'clamp(0.5rem, 2vw, 1rem)' }}>
             Shop Products
