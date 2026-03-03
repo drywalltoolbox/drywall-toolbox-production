@@ -123,14 +123,14 @@ export default function Header({ onCartToggle }) {
               className={`nav-link-mobile ${isActive('/products') ? 'active' : ''}`}
               onClick={handleToolsClick}
             >
-              Tools
+              Shop
             </Link>
             <Link 
               to="/parts" 
               className={`nav-link-mobile ${isActive('/parts') ? 'active' : ''}`}
               onClick={closeMobileMenu}
             >
-              Parts
+              Schematics
             </Link>
             <Link 
               to="/about" 

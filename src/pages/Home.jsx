@@ -1,12 +1,14 @@
 ﻿import { Link } from 'react-router-dom';
 import { Wrench } from 'lucide-react';
+import SchematicDiagrams from '../components/SchematicDiagrams';
 
 export default function Home() {
   return (
+    <>
     <section style={{ 
-      padding: '140px 40px 80px', 
+      padding: '140px 40px 40px', 
       minHeight: '100vh' 
-    }} className="section-enter">
+    }} className="section-enter home-hero-section">
       <div style={{
         display: 'grid',
         gridTemplateColumns: '1.2fr 0.8fr',
@@ -28,8 +30,7 @@ export default function Home() {
             color: 'black',
             margin: '0 auto 40px'
           }}>
-            The industry standard for professional drywall contractors. High-tension alloy tools 
-            designed for lifelong durability and flawless execution.
+            Your trusted source for industry-leading drywall tools and equipment. We deliver premium brands trusted by professional contractors nationwide.
           </p>
           <div style={{ display: 'flex', justifyContent: 'center' }}>
             <Link to="/products" className="alloy-button" style={{ textDecoration: 'none' }}>
@@ -57,5 +58,7 @@ export default function Home() {
         </div>
       </div>
     </section>
+    <SchematicDiagrams />
+    </>
   );
 }

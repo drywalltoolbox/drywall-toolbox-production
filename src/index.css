@@ -30,3 +30,19 @@
     @apply bg-white text-gray-900 antialiased;
   }
 }
+
+/* Mobile responsive spacing adjustments */
+@media (max-width: 768px) {
+  .home-hero-section {
+    padding: 100px 20px 80px !important;
+    min-height: auto !important;
+  }
+  
+  .schematic-section {
+    padding: 80px 20px 20px !important;
+  }
+  
+  .site-footer {
+    padding: 40px 20px !important;
+  }
+}
