@@ -1,5 +1,5 @@
 ﻿import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useCart } from '../context/CartContext';
 import { ShoppingCart, Menu, X } from 'lucide-react';
 import Logo from '/logo.svg';
@@ -9,11 +9,38 @@ export default function Header({ onCartToggle }) {
   const navigate = useNavigate();
   const { getCartCount } = useCart();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isTablet, setIsTablet] = useState(() => {
+    try {
+      return typeof window !== 'undefined' && window.matchMedia('(min-width: 641px) and (max-width: 1024px)').matches;
+    } catch {
+      return false;
+    }
+  });
 
   const isActive = (path) => location.pathname === path;
 
   const toggleMobileMenu = () => setMobileMenuOpen(!mobileMenuOpen);
   const closeMobileMenu = () => setMobileMenuOpen(false);
+
+  useEffect(() => {
+    // Match tablet-sized screens (between 641px and 1024px)
+    const mq = window.matchMedia('(min-width: 641px) and (max-width: 1024px)');
+    const handler = (e) => setIsTablet(e.matches);
+    // Listen for changes
+    if (mq.addEventListener) {
+      mq.addEventListener('change', handler);
+    } else {
+      // Safari fallback
+      mq.addListener(handler);
+    }
+    return () => {
+      if (mq.removeEventListener) {
+        mq.removeEventListener('change', handler);
+      } else {
+        mq.removeListener(handler);
+      }
+    };
+  }, []);
 
   const handleToolsClick = (e) => {
     e.preventDefault();
@@ -25,8 +52,8 @@ export default function Header({ onCartToggle }) {
   return (
     <header className="site-header" role="banner">
       <div className="site-header-inner">
-        {/* Mobile Layout */}
-        <div className="flex md:hidden items-center justify-between w-full">
+  {/* Mobile Layout */}
+  <div className="flex md:hidden items-center justify-between w-full header-mobile-layout" style={{ display: isTablet ? 'flex' : undefined }}>
           {/* Cart Icon - Far Left */}
           <button 
             onClick={onCartToggle} 
@@ -54,8 +81,8 @@ export default function Header({ onCartToggle }) {
           </button>
         </div>
 
-        {/* Desktop Layout */}
-        <div className="hidden md:contents">
+  {/* Desktop Layout */}
+  <div className="hidden md:contents header-desktop-layout" style={{ display: isTablet ? 'none' : undefined }}>
           <div className="header-left">
             <nav className="nav-links" aria-label="Primary">
               <Link to="/products" onClick={handleToolsClick} className={`nav-link ${isActive('/products') ? 'active' : ''}`} style={{ color: isActive('/products') ? 'var(--color-primary-600)' : 'black' }}>Tools</Link>
@@ -89,7 +116,7 @@ export default function Header({ onCartToggle }) {
 
       {/* Mobile Menu Dropdown */}
       {mobileMenuOpen && (
-        <div className="md:hidden border-t border-gray-200 bg-white shadow-lg">
+        <div className="md:hidden border-t border-gray-200 bg-white shadow-lg header-mobile-menu" style={{ display: isTablet ? 'block' : undefined }}>
           <nav className="flex flex-col p-4 space-y-2">
             <Link 
               to="/products" 
