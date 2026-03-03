@@ -107,26 +107,6 @@ export default function About() {
         }} />
 
         <div style={{ maxWidth: '760px', margin: '0 auto', textAlign: 'center', position: 'relative' }}>
-          {/* Badge */}
-          <div style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '8px',
-            background: 'rgba(255,255,255,0.1)',
-            backdropFilter: 'blur(10px)',
-            border: '1px solid rgba(255,255,255,0.2)',
-            borderRadius: '999px',
-            padding: '6px 18px',
-            marginBottom: '32px',
-            fontSize: '0.75rem',
-            fontWeight: '700',
-            letterSpacing: '0.1em',
-            textTransform: 'uppercase',
-            color: 'rgba(255,255,255,0.85)'
-          }}>
-            <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#60a5fa', display: 'inline-block' }} />
-            Professional Drywall Tools Since 2026
-          </div>
 
           <h1 style={{
             fontSize: 'clamp(2.5rem, 8vw, 4.5rem)',
