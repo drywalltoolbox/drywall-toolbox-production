@@ -629,7 +629,7 @@ export default function Parts() {
   return (
     <section 
       style={{ 
-        padding: isFullscreen ? '60px 0 0' : '140px 40px 80px',
+        padding: isFullscreen ? '60px 0 0' : 'clamp(80px, 15vw, 140px) clamp(1rem, 5vw, 2.5rem) 80px',
         minHeight: '100vh'
       }} 
       className={`section-enter ${isFullscreen ? 'fullscreen-mode' : ''}`}
@@ -806,7 +806,15 @@ export default function Parts() {
                 cursor: scale > 1 ? (isPanning ? 'grabbing' : 'grab') : 'default',
                 WebkitUserSelect: 'none',
                 userSelect: 'none',
-                position: 'relative'
+                position: 'relative',
+                backfaceVisibility: 'hidden',
+                WebkitBackfaceVisibility: 'hidden',
+                WebkitPerspective: 1000,
+                WebkitTransformZ: 0,
+                transform: 'translateZ(0)',
+                willChange: 'transform',
+                WebkitFontSmoothing: 'antialiased',
+                WebkitTextSizeAdjust: '100%'
               }}
             >
               <div 
@@ -820,7 +828,12 @@ export default function Parts() {
                   transition: isPanning ? 'none' : 'transform 0.3s ease-out',
                   WebkitUserSelect: 'none',
                   userSelect: 'none',
-                  pointerEvents: 'auto'
+                  pointerEvents: 'auto',
+                  backfaceVisibility: 'hidden',
+                  WebkitBackfaceVisibility: 'hidden',
+                  WebkitPerspective: 1000,
+                  willChange: 'transform',
+                  imageRendering: 'high-quality'
                 }}
               >
                 {schematicImageSrc ? (
@@ -832,10 +845,15 @@ export default function Parts() {
                       height: 'auto', 
                       display: 'block', 
                       pointerEvents: 'none',
-                      imageRendering: 'crisp-edges',
+                      imageRendering: 'high-quality',
+                      WebkitImageRendering: '-webkit-optimize-contrast',
                       WebkitTouchCallout: 'none',
                       WebkitUserSelect: 'none',
-                      userSelect: 'none'
+                      userSelect: 'none',
+                      backfaceVisibility: 'hidden',
+                      WebkitBackfaceVisibility: 'hidden',
+                      WebkitPerspective: 1000,
+                      willChange: 'transform'
                     }}
                     loading="eager"
                     decoding="async"

@@ -152,7 +152,7 @@
 }
 
 /* =============================================
-   SCHEMATIC CONTAINER — MOBILE
+   SCHEMATIC CONTAINER — MOBILE RESPONSIVE
    ============================================= */
 .schematic-container {
   position: relative;
@@ -165,6 +165,9 @@
   -webkit-user-select: none;
   user-select: none;
   -webkit-touch-callout: none;
+  width: 100%;
+  max-width: 100%;
+  aspect-ratio: auto;
 }
 
 @media (max-width: 768px) {
@@ -176,6 +179,8 @@
     -webkit-user-select: none !important;
     user-select: none !important;
     -webkit-touch-callout: none !important;
+    min-height: 300px;
+    margin-bottom: 8px;
   }
 
   .schematic-container img {
@@ -184,10 +189,21 @@
     height: auto !important;
     max-width: 100% !important;
     pointer-events: none !important;
-    image-rendering: crisp-edges;
+    image-rendering: high-quality;
     -webkit-user-select: none;
     user-select: none;
     -webkit-touch-callout: none;
+    -webkit-image-rendering: -webkit-optimize-contrast;
+    image-rendering: -moz-crisp-edges;
+    image-rendering: pixelated;
+    -ms-interpolation-mode: nearest-neighbor;
+  }
+}
+
+@media (max-width: 480px) {
+  .schematic-container {
+    min-height: 260px;
+    border-radius: 5px;
   }
 }
 
@@ -246,19 +262,26 @@
 }
 
 /* =============================================
-   MOBILE ZOOM CONTROLS — FABs
+   MOBILE ZOOM CONTROLS — SLEEK & COMPACT
    ============================================= */
 .mobile-zoom-controls {
   display: none; /* hidden by default */
   position: fixed;
-  bottom: 24px;
+  bottom: 16px;
   left: 50%;
   transform: translateX(-50%);
   flex-direction: row;
   align-items: center;
-  gap: 10px;
+  gap: 6px;
   z-index: 900;
   pointer-events: none;
+  background: rgba(15, 23, 42, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  padding: 8px 12px;
+  border-radius: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.25);
 }
 
 .mobile-zoom-controls > * {
@@ -272,7 +295,7 @@
   }
 
   @keyframes slideInFromBottom {
-    from { opacity: 0; transform: translateX(-50%) translateY(12px); }
+    from { opacity: 0; transform: translateX(-50%) translateY(8px); }
     to { opacity: 1; transform: translateX(-50%) translateY(0); }
   }
 }
@@ -281,7 +304,7 @@
 @supports (padding: max(0px)) {
   @media (max-width: 768px) {
     .mobile-zoom-controls {
-      bottom: max(24px, env(safe-area-inset-bottom, 24px));
+      bottom: max(16px, env(safe-area-inset-bottom, 16px));
     }
 
     .section-enter:not(.fullscreen-mode) {
@@ -292,139 +315,178 @@
 }
 
 .zoom-control-btn {
-  width: 52px;
-  height: 52px;
-  min-width: 52px;
+  width: 40px;
+  height: 40px;
+  min-width: 40px;
   display: flex;
   align-items: center;
   justify-content: center;
   border-radius: 50%;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(248, 250, 252, 0.98) 100%);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(15, 23, 42, 0.12);
-  color: var(--tension-accent);
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  color: rgba(255, 255, 255, 0.9);
   cursor: pointer;
-  transition: all 250ms cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow:
-    0 4px 12px rgba(15, 23, 42, 0.08),
-    0 2px 4px rgba(15, 23, 42, 0.04);
+  transition: all 200ms cubic-bezier(0.4, 0, 0.2, 1);
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
+  padding: 0;
 }
 
 .zoom-control-btn:active {
-  transform: scale(0.92);
+  transform: scale(0.88);
+  background: rgba(255, 255, 255, 0.25);
 }
 
 .zoom-control-btn:focus-visible {
-  outline: 2px solid var(--tension-accent);
+  outline: 2px solid rgba(255, 255, 255, 0.5);
   outline-offset: 2px;
 }
 
+.zoom-control-btn svg {
+  width: 18px;
+  height: 18px;
+  stroke-width: 2;
+}
+
 .fullscreen-btn {
-  background: linear-gradient(135deg, rgba(37, 99, 235, 0.12) 0%, rgba(37, 99, 235, 0.08) 100%);
-  border-color: rgba(37, 99, 235, 0.25);
+  background: rgba(37, 99, 235, 0.25);
+  border-color: rgba(37, 99, 235, 0.4);
+  color: rgba(255, 255, 255, 0.95);
+}
+
+.fullscreen-btn:active {
+  background: rgba(37, 99, 235, 0.35);
 }
 
 .reset-btn {
-  background: linear-gradient(135deg, rgba(239, 68, 68, 0.12) 0%, rgba(239, 68, 68, 0.08) 100%);
-  border-color: rgba(239, 68, 68, 0.25);
-  color: #dc2626;
+  background: rgba(239, 68, 68, 0.25);
+  border-color: rgba(239, 68, 68, 0.4);
+  color: rgba(255, 255, 255, 0.95);
+}
+
+.reset-btn:active {
+  background: rgba(239, 68, 68, 0.35);
 }
 
 .zoom-indicator {
-  padding: 8px 14px;
-  background: linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(15, 23, 42, 0.9) 100%);
-  backdrop-filter: blur(10px);
-  border-radius: 20px;
-  font-size: 0.8rem;
+  padding: 6px 10px;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 16px;
+  font-size: 0.7rem;
   font-weight: 700;
-  color: white;
+  color: rgba(255, 255, 255, 0.9);
   font-family: var(--font-mono);
-  min-width: 56px;
+  min-width: 48px;
   text-align: center;
-  box-shadow:
-    0 4px 12px rgba(15, 23, 42, 0.2),
-    0 2px 4px rgba(15, 23, 42, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  white-space: nowrap;
 }
 
 @media (max-width: 480px) {
   .mobile-zoom-controls {
     bottom: 20px;
-    gap: 8px;
+    gap: 6px;
+    padding: 8px 10px;
   }
 
   .zoom-control-btn {
-    width: 48px;
-    height: 48px;
-    min-width: 48px;
+    width: 36px;
+    height: 36px;
+    min-width: 36px;
   }
 
   .zoom-control-btn svg {
-    width: 20px;
-    height: 20px;
+    width: 16px;
+    height: 16px;
+    stroke-width: 2.5;
   }
 
   .zoom-indicator {
-    padding: 6px 12px;
-    font-size: 0.75rem;
-    min-width: 52px;
+    padding: 5px 8px;
+    font-size: 0.65rem;
+    min-width: 44px;
+    border-radius: 14px;
   }
 }
 
 /* =============================================
-   SCHEMATIC PAGER — MOBILE
+   SCHEMATIC PAGER — MOBILE OPTIMIZED
    ============================================= */
 @media (max-width: 768px) {
   .schematic-pager-top {
     padding: 6px 8px !important;
+    gap: 6px !important;
+    margin-bottom: 12px !important;
   }
 
   .pager-pill {
-    width: 40px !important;
-    height: 40px !important;
+    width: 38px !important;
+    height: 38px !important;
+    font-size: 0.75rem !important;
+    padding: 8px !important;
   }
 
   .pager-pill svg {
-    width: 16px;
-    height: 16px;
+    width: 14px;
+    height: 14px;
+    stroke-width: 2.5;
   }
 
   .pager-counter {
-    font-size: 0.8rem !important;
-    padding: 6px 12px !important;
+    font-size: 0.8rem;
+    padding: 0 8px;
+    font-weight: 600;
   }
 }
 
 @media (max-width: 480px) {
+  .schematic-pager-top {
+    gap: 4px !important;
+    margin-bottom: 10px !important;
+  }
+
   .pager-pill {
-    width: 36px !important;
-    height: 36px !important;
+    width: 34px !important;
+    height: 34px !important;
+    font-size: 0.7rem !important;
+    padding: 6px !important;
   }
 
   .pager-counter {
-    font-size: 0.75rem !important;
-    padding: 5px 10px !important;
+    font-size: 0.75rem;
+    padding: 0 6px;
   }
 }
 
 /* =============================================
-   SCHEMATIC TITLE CONTAINER — MOBILE
+   SCHEMATIC TITLE CONTAINER — MOBILE RESPONSIVE
    ============================================= */
 @media (max-width: 768px) {
   .schematic-title-container {
+    margin-bottom: 12px !important;
+    padding: 10px 12px !important;
+    border-radius: 6px !important;
+    gap: 8px !important;
     flex-direction: column !important;
-    align-items: stretch !important;
-    gap: 10px !important;
-    padding: 10px !important;
   }
 
   .schematic-title-container h3 {
-    font-size: 0.95rem !important;
-    text-align: center;
+    font-size: 0.9rem !important;
+    text-align: center !important;
     white-space: normal !important;
+    margin: 0 !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .schematic-title-container {
+    margin-bottom: 10px !important;
+    padding: 8px 10px !important;
+    gap: 6px !important;
+  }
+
+  .schematic-title-container h3 {
+    font-size: 0.85rem !important;
   }
 }
 
@@ -466,4 +528,159 @@
     scroll-behavior: smooth;
   }
 }
+
+/* =============================================
+   TABLET SCHEMATIC ENHANCEMENTS (641px - 1024px)
+   Mobile-first scaling with improved touch UX
+   ============================================= */
+@media (min-width: 641px) and (max-width: 1024px) {
+  /* Tablet modal: larger and better positioned */
+  .mobile-part-modal-overlay {
+    width: min(calc(100vw - 48px), 420px);
+    max-height: min(calc(100vh - 140px), 85vh);
+    padding: 28px 24px 24px;
+    border-radius: 16px;
+    box-shadow:
+      0 28px 70px rgba(0, 0, 0, 0.24),
+      0 10px 24px rgba(0, 0, 0, 0.12),
+      0 0 0 1px rgba(255, 255, 255, 0.4) inset;
+  }
+
+  .mobile-modal-close-btn {
+    width: 36px;
+    height: 36px;
+    top: 14px;
+    right: 14px;
+    border-radius: 10px;
+  }
+
+  /* Tablet backdrop: slightly more visible */
+  .mobile-modal-backdrop {
+    background: rgba(15, 23, 42, 0.5);
+  }
+
+  /* Schematic container spacing */
+  .schematic-container {
+    margin-bottom: 2rem;
+    border-radius: 8px;
+  }
+
+  /* Hotspots: larger touch targets on tablet */
+  .hotspot {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+  }
+
+  .hotspot:hover {
+    transform: translate(-50%, -50%) scale(1.25);
+    background: rgba(37, 99, 235, 0.15);
+    box-shadow: 0 6px 18px rgba(37, 99, 235, 0.12);
+  }
+
+  /* Schematic pager: better visibility on tablet */
+  .schematic-pager {
+    padding: 8px 12px;
+    gap: 10px;
+  }
+
+  .pager-pill {
+    width: 40px;
+    height: 40px;
+    font-size: 0.95rem;
+  }
+
+  .pager-counter {
+    padding: 6px 14px;
+    font-size: 0.9rem;
+    border-radius: 999px;
+  }
+
+  /* Compact controls: tablet sizing */
+  .compact-controls {
+    flex-direction: row;
+    gap: 14px;
+    align-items: center;
+  }
+
+  .compact-select {
+    min-width: 160px;
+    padding: 10px 16px;
+    font-size: 0.95rem;
+    min-height: 44px;
+    background-position: right 12px center;
+  }
+
+  .compact-select:focus {
+    box-shadow: 0 12px 32px rgba(2, 6, 23, 0.1);
+  }
+
+  /* Section padding: balanced for tablet */
+  section:not(.fullscreen-mode) {
+    padding: 2.5rem 1.5rem !important;
+  }
+
+  /* Filter bar: tablet-friendly */
+  .schematic-filter-bar {
+    padding: 1.25rem;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+
+  /* Ensure smooth interactions */
+  .hotspot,
+  .pager-pill,
+  .compact-select,
+  button[class*="modal"] {
+    transition: all 200ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  /* Part modal content spacing */
+  .part-modal h3,
+  .mobile-part-modal-overlay h3 {
+    font-size: clamp(1.1rem, 3vw, 1.4rem);
+    margin-bottom: 0.75rem;
+  }
+
+  .part-modal p,
+  .mobile-part-modal-overlay p {
+    font-size: 0.95rem;
+    line-height: 1.6;
+    margin-bottom: 0.75rem;
+  }
+
+  /* Part modal list items */
+  .part-modal ul,
+  .mobile-part-modal-overlay ul {
+    margin: 1rem 0;
+    padding-left: 1.25rem;
+  }
+
+  .part-modal li,
+  .mobile-part-modal-overlay li {
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+  }
+
+  /* Action buttons in modal */
+  .part-modal .btn-add-to-cart,
+  .mobile-part-modal-overlay .btn-add-to-cart {
+    width: 100%;
+    padding: 12px 16px;
+    font-size: 0.9rem;
+    margin-top: 1rem;
+  }
+
+  /* Improved spacing for readability on tablet */
+  .part-modal .part-modal-section,
+  .mobile-part-modal-overlay section {
+    margin-bottom: 1rem;
+  }
+
+  .part-modal .part-modal-section:last-child,
+  .mobile-part-modal-overlay section:last-child {
+    margin-bottom: 0;
+  }
+}
+
 

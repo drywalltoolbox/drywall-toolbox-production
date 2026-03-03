@@ -60,7 +60,7 @@ export default function ProductImageGallery({ product }) {
       {/* Main Image Display */}
       <div className="relative bg-gray-50 rounded-lg p-4 sm:p-6 flex items-center justify-center">
         <div 
-          className="w-full h-[300px] sm:h-[400px] lg:h-[500px] flex items-center justify-center relative"
+          className="w-full h-75 sm:h-100 lg:h-125 flex items-center justify-center relative"
           onTouchStart={onTouchStart}
           onTouchMove={onTouchMove}
           onTouchEnd={onTouchEnd}
@@ -118,7 +118,7 @@ export default function ProductImageGallery({ product }) {
             <button
               key={index}
               onClick={() => goToImage(index)}
-              className={`flex-shrink-0 w-16 h-16 sm:w-20 sm:h-20 rounded-lg overflow-hidden border-2 transition-all ${
+              className={`shrink-0 w-16 h-16 sm:w-20 sm:h-20 rounded-lg overflow-hidden border-2 transition-all ${
                 index === currentImageIndex
                   ? 'border-blue-600 ring-2 ring-blue-200 scale-105'
                   : 'border-gray-200 hover:border-gray-400'

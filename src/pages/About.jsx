@@ -70,7 +70,7 @@ export default function About() {
   const brands = ['TapeTech', 'Columbia', 'DeWalt', 'Hyde', 'Warner', 'Marshalltown', 'Goldblatt', 'Wal-Board'];
 
   return (
-    <div style={{ minHeight: '100vh', background: '#f8fafc', paddingTop: '140px' }}>
+    <div style={{ minHeight: '100vh', background: '#f8fafc', paddingTop: 'clamp(80px, 15vw, 140px)' }}>
 
       {/* Hero */}
       <section style={{
