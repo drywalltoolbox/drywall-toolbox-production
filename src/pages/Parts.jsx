@@ -629,7 +629,7 @@ export default function Parts() {
   return (
     <section 
       style={{ 
-        padding: isFullscreen ? '60px 0 0' : 'clamp(80px, 15vw, 140px) clamp(1rem, 5vw, 2.5rem) 80px',
+        padding: isFullscreen ? '60px 0 0' : 'clamp(80px, 15vw, 140px) clamp(1rem, 5vw, 2.5rem) clamp(160px, 30vw, 280px)',
         minHeight: '100vh'
       }} 
       className={`section-enter ${isFullscreen ? 'fullscreen-mode' : ''}`}

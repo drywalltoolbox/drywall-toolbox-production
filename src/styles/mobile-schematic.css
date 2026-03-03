@@ -113,7 +113,7 @@
    MOBILE SECTION PADDING
    ============================================= */
 @media (max-width: 768px) {
-  /* Parts page uses 140px top padding inline; override horizontals only */
+  /* Parts page uses responsive top padding inline; override horizontals only */
   .section-enter:not(.fullscreen-mode) {
     padding-left: 12px !important;
     padding-right: 12px !important;
@@ -152,8 +152,9 @@
     -webkit-user-select: none !important;
     user-select: none !important;
     -webkit-touch-callout: none !important;
-    min-height: 300px;
-    margin-bottom: 8px;
+    min-height: 400px;
+    margin-bottom: 0px;
+    flex-grow: 1;
   }
 
   .schematic-container img {
@@ -175,7 +176,7 @@
 
 @media (max-width: 480px) {
   .schematic-container {
-    min-height: 260px;
+    min-height: 350px;
     border-radius: 5px;
   }
 }
@@ -240,7 +241,7 @@
 .mobile-zoom-controls {
   display: none; /* hidden by default */
   position: fixed;
-  bottom: 16px;
+  bottom: max(8px, env(safe-area-inset-bottom, 8px));
   left: 50%;
   transform: translateX(-50%);
   flex-direction: row;
@@ -276,10 +277,6 @@
 /* Safe area for devices with home indicator */
 @supports (padding: max(0px)) {
   @media (max-width: 768px) {
-    .mobile-zoom-controls {
-      bottom: max(16px, env(safe-area-inset-bottom, 16px));
-    }
-
     .section-enter:not(.fullscreen-mode) {
       padding-left: max(12px, env(safe-area-inset-left)) !important;
       padding-right: max(12px, env(safe-area-inset-right)) !important;
@@ -357,7 +354,7 @@
 
 @media (max-width: 480px) {
   .mobile-zoom-controls {
-    bottom: 20px;
+    bottom: max(8px, env(safe-area-inset-bottom, 8px));
     gap: 6px;
     padding: 8px 10px;
   }

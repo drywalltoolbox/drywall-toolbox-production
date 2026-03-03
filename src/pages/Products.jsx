@@ -426,6 +426,161 @@ export default function Products() {
         )}
       </div>
       
+      {/* Coming Soon Overlay */}
+      <div 
+        style={{
+          position: 'fixed',
+          inset: 0,
+          backgroundColor: 'rgba(15, 23, 42, 0.5)',
+          backdropFilter: 'blur(8px)',
+          WebkitBackdropFilter: 'blur(8px)',
+          zIndex: 999,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          animation: 'fadeInOverlay 600ms ease-out'
+        }}
+      >
+        <div style={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: 'clamp(1rem, 4vw, 2rem)',
+          padding: '0 1rem'
+        }}>
+          <h1
+            style={{
+              fontSize: 'clamp(1.75rem, 5vw, 2.5rem)',
+              fontWeight: 500,
+              lineHeight: 1.2,
+              letterSpacing: '-0.01em',
+              color: 'rgba(255, 255, 255, 0.9)',
+              textAlign: 'center',
+              fontFamily: "'Geist Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+              animation: 'slideInDown 700ms cubic-bezier(0.34, 1.56, 0.64, 1)',
+              margin: 0
+            }}
+          >
+            Coming Soon
+          </h1>
+          
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              // Placeholder for signup logic
+              alert('Thank you! We\'ll notify you when we launch.');
+            }}
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              gap: '0.75rem',
+              animation: 'slideInUp 700ms cubic-bezier(0.34, 1.56, 0.64, 1)',
+              width: '100%',
+              maxWidth: '320px'
+            }}
+          >
+            <input
+              type="email"
+              placeholder="Enter your email"
+              required
+              style={{
+                width: '100%',
+                padding: '12px 16px',
+                borderRadius: '6px',
+                border: '1px solid rgba(255, 255, 255, 0.2)',
+                backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                color: 'rgba(255, 255, 255, 0.9)',
+                fontSize: '0.95rem',
+                fontFamily: "'Geist Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+                backdropFilter: 'blur(8px)',
+                outline: 'none',
+                transition: 'all 200ms ease-out',
+                boxSizing: 'border-box'
+              }}
+              onFocus={(e) => {
+                e.target.style.backgroundColor = 'rgba(255, 255, 255, 0.15)';
+                e.target.style.borderColor = 'rgba(255, 255, 255, 0.3)';
+              }}
+              onBlur={(e) => {
+                e.target.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
+                e.target.style.borderColor = 'rgba(255, 255, 255, 0.2)';
+              }}
+            />
+            <button
+              type="submit"
+              style={{
+                width: '100%',
+                padding: '12px 16px',
+                borderRadius: '6px',
+                border: 'none',
+                backgroundColor: '#2563eb',
+                color: 'white',
+                fontSize: '0.95rem',
+                fontWeight: 500,
+                fontFamily: "'Geist Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+                cursor: 'pointer',
+                transition: 'all 200ms ease-out',
+                boxSizing: 'border-box'
+              }}
+              onMouseEnter={(e) => {
+                e.target.style.backgroundColor = '#1d4ed8';
+                e.target.style.transform = 'translateY(-1px)';
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.backgroundColor = '#2563eb';
+                e.target.style.transform = 'translateY(0)';
+              }}
+            >
+              Sign Up
+            </button>
+            <p style={{
+              fontSize: '0.8rem',
+              color: 'rgba(255, 255, 255, 0.6)',
+              margin: 0,
+              textAlign: 'center',
+              fontFamily: "'Geist Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"
+            }}>
+              Be the first to know when we launch
+            </p>
+          </form>
+        </div>
+      </div>
+
+      <style>{`
+        @keyframes fadeInOverlay {
+          from {
+            opacity: 0;
+          }
+          to {
+            opacity: 1;
+          }
+        }
+        
+        @keyframes slideInDown {
+          from {
+            opacity: 0;
+            transform: translateY(-30px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        @keyframes slideInUp {
+          from {
+            opacity: 0;
+            transform: translateY(20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+      `}</style>
+      
       {/* Toast Notification */}
       {toast && (
         <Toast

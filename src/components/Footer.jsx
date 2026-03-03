@@ -76,18 +76,19 @@ export default function Footer() {
         <div className="footer-col footer-center-on-mobile" style={{ order: 1 }}>
           <button
             onClick={() => setNavOpen(!navOpen)}
-            className="md:hidden w-full flex items-center justify-between bg-none border-none p-0 cursor-pointer text-center relative mb-6"
+            className="md:hidden flex items-center justify-center bg-none border-none cursor-pointer text-center relative mb-6"
             style={{
               display: 'flex',
               alignItems: 'center',
-              justifyContent: 'space-between',
+              justifyContent: 'center',
               background: 'none',
               border: 'none',
               padding: 0,
               cursor: 'pointer',
               textAlign: 'center',
               position: 'relative',
-              marginBottom: '24px'
+              marginBottom: '24px',
+              width: '100%'
             }}
           >
             <h5 style={{
@@ -96,30 +97,35 @@ export default function Footer() {
               letterSpacing: '0.1em',
               margin: 0,
               fontWeight: 800,
-              color: 'var(--primary-600)'
+              color: 'var(--primary-600)',
+              flex: 'none'
             }}>
               Menu
             </h5>
             <ChevronDown 
               size={16} 
               style={{
+                position: 'absolute',
+                right: 0,
                 transform: navOpen ? 'rotate(180deg)' : 'rotate(0deg)',
-                transition: 'transform 0.3s'
+                transition: 'transform 0.3s',
+                flex: 'none'
               }}
             />
           </button>
           <ul style={{ 
             listStyle: 'none', 
-            padding: 0
+            padding: 0,
+            textAlign: 'center'
           }} className={navOpen ? 'block md:block' : 'hidden md:block'}>
             <li style={{ marginBottom: '12px', fontSize: '0.85rem', opacity: 0.6, color: 'black' }}>
               <Link to="/products" style={{ textDecoration: 'none', color: 'black' }}>
-                Catalog
+                Shop
               </Link>
             </li>
             <li style={{ marginBottom: '12px', fontSize: '0.85rem', opacity: 0.6, color: 'black' }}>
               <Link to="/parts" style={{ textDecoration: 'none', color: 'black' }}>
-                Parts Schematics
+                Schematics
               </Link>
             </li>
             <li style={{ marginBottom: '12px', fontSize: '0.85rem', opacity: 0.6, color: 'black' }}>
@@ -133,18 +139,19 @@ export default function Footer() {
         <div className="footer-col footer-center-on-mobile" style={{ order: 2 }}>
           <button
             onClick={() => setSupportOpen(!supportOpen)}
-            className="md:hidden w-full flex items-center justify-between bg-none border-none p-0 cursor-pointer text-center relative mb-6"
+            className="md:hidden flex items-center justify-center bg-none border-none cursor-pointer text-center relative mb-6"
             style={{
               display: 'flex',
               alignItems: 'center',
-              justifyContent: 'space-between',
+              justifyContent: 'center',
               background: 'none',
               border: 'none',
               padding: 0,
               cursor: 'pointer',
               textAlign: 'center',
               position: 'relative',
-              marginBottom: '24px'
+              marginBottom: '24px',
+              width: '100%'
             }}
           >
             <h5 style={{
@@ -153,21 +160,26 @@ export default function Footer() {
               letterSpacing: '0.1em',
               margin: 0,
               fontWeight: 800,
-              color: 'var(--primary-600)'
+              color: 'var(--primary-600)',
+              flex: 'none'
             }}>
               Support
             </h5>
             <ChevronDown 
               size={16} 
               style={{
+                position: 'absolute',
+                right: 0,
                 transform: supportOpen ? 'rotate(180deg)' : 'rotate(0deg)',
-                transition: 'transform 0.3s'
+                transition: 'transform 0.3s',
+                flex: 'none'
               }}
             />
           </button>
           <ul style={{ 
             listStyle: 'none', 
-            padding: 0
+            padding: 0,
+            textAlign: 'center'
           }} className={supportOpen ? 'block md:block' : 'hidden md:block'}>
             <li style={{ marginBottom: '12px', fontSize: '0.85rem', opacity: 0.6, color: 'black' }}>
               Shipping Policy

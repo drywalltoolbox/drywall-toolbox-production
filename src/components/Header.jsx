@@ -1,14 +1,14 @@
-﻿import { Link, useLocation, useNavigate } from 'react-router-dom';
+﻿import { Link, useLocation } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { useCart } from '../context/CartContext';
-import { ShoppingCart, Menu, X } from 'lucide-react';
+import { ShoppingCart, Menu, X, ChevronDown } from 'lucide-react';
 import Logo from '/logo2.svg';
 
 export default function Header({ onCartToggle }) {
   const location = useLocation();
-  const navigate = useNavigate();
   const { getCartCount } = useCart();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [shopDropdownOpen, setShopDropdownOpen] = useState(false);
   const [isTablet, setIsTablet] = useState(() => {
     try {
       return typeof window !== 'undefined' && window.matchMedia('(min-width: 641px) and (max-width: 1024px)').matches;
@@ -41,13 +41,6 @@ export default function Header({ onCartToggle }) {
       }
     };
   }, []);
-
-  const handleToolsClick = (e) => {
-    e.preventDefault();
-    closeMobileMenu();
-    // Navigate to /products without query params to show brand list
-    navigate('/products');
-  };
 
   return (
     <header className="site-header" role="banner">
@@ -85,8 +78,71 @@ export default function Header({ onCartToggle }) {
   <div className="hidden md:contents header-desktop-layout" style={{ display: isTablet ? 'none' : undefined }}>
           <div className="header-left">
             <nav className="nav-links" aria-label="Primary">
-              <Link to="/products" onClick={handleToolsClick} className={`nav-link ${isActive('/products') ? 'active' : ''}`} style={{ color: isActive('/products') ? 'var(--color-primary-600)' : 'black' }}>Tools</Link>
-              <Link to="/parts" className={`nav-link ${isActive('/parts') ? 'active' : ''}`} style={{ color: isActive('/parts') ? 'var(--color-primary-600)' : 'black' }}>Parts</Link>
+              <div style={{ position: 'relative' }}>
+                <button 
+                  onClick={() => setShopDropdownOpen(!shopDropdownOpen)}
+                  onMouseEnter={() => setShopDropdownOpen(true)}
+                  onMouseLeave={() => setShopDropdownOpen(false)}
+                  className={`nav-link flex items-center gap-1 ${isActive('/products') ? 'active' : ''}`}
+                  style={{ color: isActive('/products') ? 'var(--color-primary-600)' : 'black', background: 'none', border: 'none', cursor: 'pointer', padding: '8px 0', fontSize: 'inherit' }}
+                >
+                  Shop
+                  <ChevronDown size={16} style={{ transition: 'transform 200ms ease-out', transform: shopDropdownOpen ? 'rotate(180deg)' : 'rotate(0deg)' }} />
+                </button>
+                
+                {shopDropdownOpen && (
+                  <div 
+                    onMouseEnter={() => setShopDropdownOpen(true)}
+                    onMouseLeave={() => setShopDropdownOpen(false)}
+                    style={{
+                      position: 'absolute',
+                      top: '100%',
+                      left: 0,
+                      backgroundColor: 'white',
+                      border: '1px solid var(--machined-border)',
+                      borderRadius: '6px',
+                      boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
+                      minWidth: '160px',
+                      zIndex: 1000,
+                      animation: 'dropdownSlideIn 200ms ease-out'
+                    }}
+                    className="shop-dropdown-menu"
+                  >
+                    <Link 
+                      to="/products" 
+                      onClick={() => setShopDropdownOpen(false)}
+                      style={{
+                        display: 'block',
+                        padding: '12px 16px',
+                        color: 'black',
+                        textDecoration: 'none',
+                        transition: 'background-color 150ms ease-out',
+                        borderRadius: '6px 6px 0 0'
+                      }}
+                      onMouseEnter={(e) => e.target.style.backgroundColor = 'var(--alloy-base)'}
+                      onMouseLeave={(e) => e.target.style.backgroundColor = 'white'}
+                    >
+                      All Products
+                    </Link>
+                    <Link 
+                      to="/products" 
+                      onClick={() => setShopDropdownOpen(false)}
+                      style={{
+                        display: 'block',
+                        padding: '12px 16px',
+                        color: 'black',
+                        textDecoration: 'none',
+                        transition: 'background-color 150ms ease-out'
+                      }}
+                      onMouseEnter={(e) => e.target.style.backgroundColor = 'var(--alloy-base)'}
+                      onMouseLeave={(e) => e.target.style.backgroundColor = 'white'}
+                    >
+                      Brands
+                    </Link>
+                  </div>
+                )}
+              </div>
+              <Link to="/parts" className={`nav-link ${isActive('/parts') ? 'active' : ''}`} style={{ color: isActive('/parts') ? 'var(--color-primary-600)' : 'black' }}>Schematics</Link>
             </nav>
           </div>
 
@@ -118,13 +174,35 @@ export default function Header({ onCartToggle }) {
       {mobileMenuOpen && (
         <div className="md:hidden border-t border-gray-200 bg-white shadow-lg header-mobile-menu" style={{ display: isTablet ? 'block' : undefined }}>
           <nav className="flex flex-col p-4 space-y-2">
-            <Link 
-              to="/products" 
-              className={`nav-link-mobile ${isActive('/products') ? 'active' : ''}`}
-              onClick={handleToolsClick}
-            >
-              Shop
-            </Link>
+            <div>
+              <button 
+                onClick={() => setShopDropdownOpen(!shopDropdownOpen)}
+                className={`nav-link-mobile w-full text-left flex items-center gap-2 ${isActive('/products') ? 'active' : ''}`}
+                style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '0.875rem 1rem', fontSize: 'inherit' }}
+              >
+                Shop
+                <ChevronDown size={16} style={{ transition: 'transform 200ms ease-out', transform: shopDropdownOpen ? 'rotate(180deg)' : 'rotate(0deg)', marginLeft: 'auto' }} />
+              </button>
+              
+              {shopDropdownOpen && (
+                <div style={{ paddingLeft: '16px', borderLeft: '2px solid var(--alloy-mid)', marginTop: '8px' }}>
+                  <Link 
+                    to="/products" 
+                    onClick={() => { setShopDropdownOpen(false); closeMobileMenu(); }}
+                    className="nav-link-mobile block py-2 text-sm"
+                  >
+                    All Products
+                  </Link>
+                  <Link 
+                    to="/products" 
+                    onClick={() => { setShopDropdownOpen(false); closeMobileMenu(); }}
+                    className="nav-link-mobile block py-2 text-sm"
+                  >
+                    Brands
+                  </Link>
+                </div>
+              )}
+            </div>
             <Link 
               to="/parts" 
               className={`nav-link-mobile ${isActive('/parts') ? 'active' : ''}`}
@@ -149,6 +227,19 @@ export default function Header({ onCartToggle }) {
           </nav>
         </div>
       )}
+
+      <style>{`
+        @keyframes dropdownSlideIn {
+          from {
+            opacity: 0;
+            transform: translateY(-8px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+      `}</style>
     </header>
   );
 }
