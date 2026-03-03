@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { useCart } from '../context/CartContext';
 import { ShoppingCart, Menu, X } from 'lucide-react';
-import Logo from '/logo.svg';
+import Logo from '/logo2.svg';
 
 export default function Header({ onCartToggle }) {
   const location = useLocation();

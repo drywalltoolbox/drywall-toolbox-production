@@ -764,7 +764,7 @@ aside input[type="range"],
     backdrop-filter: blur(18px);
     border-bottom: 1px solid var(--machined-border);
     z-index: 1000;
-    overflow-x: hidden;
+    overflow: hidden;
 }
 
 /* Desktop Layout - Grid with centered branding */
@@ -833,8 +833,8 @@ aside input[type="range"],
 
 /* SVG Logo - Desktop */
 .logo-image {
-    width: 240px;
-    height: 126px;
+    width: 260px;
+    height: 137px;
     object-fit: contain;
     object-position: center;
     flex-shrink: 0;
@@ -849,8 +849,8 @@ aside input[type="range"],
 
 /* SVG Logo - Mobile */
 .logo-image-mobile {
-    width: 200px;
-    height: 104px;
+    width: 220px;
+    height: 115px;
     object-fit: contain;
     object-position: center;
     flex-shrink: 0;

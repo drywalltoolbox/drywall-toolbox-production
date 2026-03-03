@@ -21,7 +21,7 @@ export default function Parts() {
   const [activeHotspotPart, setActiveHotspotPart] = useState(null);
   const [selectedBrand, setSelectedBrand] = useState('TapeTech');
   const [selectedProduct, setSelectedProduct] = useState(null);
-  const [selectedSchematic, setSelectedSchematic] = useState('tapetech-corner-roller');
+  const [selectedSchematic, setSelectedSchematic] = useState('tapetech-13tt');
   const [toast, setToast] = useState(null);
   const [products, setProducts] = useState([]);
   const [brands, setBrands] = useState([]);
@@ -45,12 +45,8 @@ export default function Parts() {
       const uniqueBrands = [...new Set(prods.map(p => p.brand).filter(Boolean))].sort();
       setBrands(uniqueBrands);
       
-      // Auto-select TapeTech brand and Corner Roller product
+      // Auto-select TapeTech brand
       setSelectedBrand('TapeTech');
-      const cornerRoller = prods.find(p => p.part_number === 'TTT15TTEWOH');
-      if (cornerRoller) {
-        setSelectedProduct(cornerRoller);
-      }
     });
   }, []);
   
@@ -171,144 +167,6 @@ export default function Parts() {
     };
   }) : [];
   const schematics = [
-    {
-      id: 'tapetech-corner-roller',
-      title: 'TapeTech Inside Corner Roller',
-      description: 'Complete corner roller assembly - Model TTT15TTEWOH',
-      brand: 'TapeTech',
-      productPartNumber: 'TTT15TTEWOH',
-      image: '/15TT_SCH-1.png',
-      imageWidth: 3400,
-      imageHeight: 2200,
-      parts: [
-        {
-          id: '01',
-          name: 'Handle Assembly',
-          sku: '164348',
-          material: 'ALUMINUM',
-          price: 45.00,
-          position: { top: '50.97%', left: '56.22%' },
-          quantity: 1
-        },
-        {
-          id: '02',
-          name: 'Coupling',
-          sku: '150003F',
-          material: 'STEEL',
-          price: 18.50,
-          position: { top: '57.27%', left: '50.55%' },
-          quantity: 1
-        },
-        {
-          id: '03',
-          name: 'Cotter Pin, 1/16 x 1/2',
-          sku: '059143',
-          material: 'STAINLESS-STEEL',
-          price: 2.50,
-          position: { top: '61.99%', left: '45.45%' },
-          quantity: 1
-        },
-        {
-          id: '04',
-          name: 'Corner Roller Head',
-          sku: '156001F',
-          material: 'ALLOY-STEEL',
-          price: 65.00,
-          position: { top: '82.91%', left: '40.43%' },
-          quantity: 1
-        },
-        {
-          id: '05',
-          name: 'Swivel Coupling Pin',
-          sku: '150004F',
-          material: 'STEEL',
-          price: 12.00,
-          position: { top: '87.75%', left: '35.63%' },
-          quantity: 1
-        },
-        {
-          id: '06',
-          name: 'Thrust Washer',
-          sku: '150008',
-          material: 'BRASS',
-          price: 5.50,
-          position: { top: '82.80%', left: '21.58%' },
-          quantity: 4
-        },
-        {
-          id: '07',
-          name: 'Brass Washer',
-          sku: '809006',
-          material: 'BRASS',
-          price: 3.00,
-          position: { top: '91.57%', left: '11.68%' },
-          quantity: 4
-        },
-        {
-          id: '08',
-          name: 'Roller Axle, 1/4-20 x 1 1/4 Hex.',
-          sku: '159006',
-          material: 'CHROME-STEEL',
-          price: 8.50,
-          position: { top: '76.73%', left: '6.15%' },
-          quantity: 4
-        },
-        {
-          id: '09',
-          name: 'Roller Bushing',
-          sku: '150011F',
-          material: 'BRONZE',
-          price: 6.00,
-          position: { top: '73.58%', left: '9.79%' },
-          quantity: 4
-        },
-        {
-          id: '10',
-          name: 'Roller',
-          sku: '150005',
-          material: 'POLYURETHANE',
-          price: 22.00,
-          position: { top: '70.65%', left: '12.55%' },
-          quantity: 4
-        },
-        {
-          id: '11',
-          name: 'Screw, 8-32 x 3/8 Fil. Hd. Nylock',
-          sku: '159010',
-          material: 'STAINLESS-STEEL',
-          price: 1.50,
-          position: { top: '68.18%', left: '15.61%' },
-          quantity: 1
-        },
-        {
-          id: '12',
-          name: 'Swivel Assy.',
-          sku: '154007',
-          material: 'STEEL',
-          price: 35.00,
-          position: { top: '35.90%', left: '31.91%' },
-          quantity: 1
-        },
-        {
-          id: '13',
-          name: 'Swivel Axle',
-          sku: '150009',
-          material: 'STEEL',
-          price: 15.00,
-          position: { top: '31.85%', left: '36.14%' },
-          quantity: 1
-        },
-        {
-          id: '14',
-          name: 'Handle Grip, Black',
-          sku: '151042',
-          material: 'RUBBER',
-          price: 8.50,
-          position: { top: '22.06%', left: '82.35%' },
-          quantity: 1
-        }
-      ]
-    },
     {
       id: 'tapetech-13tt',
         title: 'TapeTech 13TT Schematic',
@@ -624,20 +482,24 @@ export default function Parts() {
       return () => clearTimeout(t);
     }, [selectedSchematic, currentPage]);
 
-  // Touch and zoom handlers for mobile
+  // Touch and zoom handlers for mobile - enhanced with smooth interactions
   const handleTouchStart = (e) => {
     if (e.touches.length === 2) {
-      // Pinch gesture
+      // Pinch gesture - prevent default and calculate distance
+      e.preventDefault();
       const touch1 = e.touches[0];
       const touch2 = e.touches[1];
       const distance = Math.hypot(
         touch2.clientX - touch1.clientX,
         touch2.clientY - touch1.clientY
       );
-      schematicImageRef.current.dataset.initialDistance = distance;
-      schematicImageRef.current.dataset.initialScale = scale;
+      if (schematicImageRef.current) {
+        schematicImageRef.current.dataset.initialDistance = distance;
+        schematicImageRef.current.dataset.initialScale = scale;
+      }
     } else if (e.touches.length === 1 && scale > 1) {
-      // Pan gesture (only when zoomed)
+      // Pan gesture (only when zoomed in) - with smooth interaction
+      e.preventDefault();
       setIsPanning(true);
       setStartPanPosition({
         x: e.touches[0].clientX - position.x,
@@ -647,31 +509,57 @@ export default function Parts() {
   };
 
   const handleTouchMove = (e) => {
-    if (e.touches.length === 2) {
-      // Pinch zoom
+    if (e.touches.length === 2 && schematicImageRef.current) {
+      // Pinch zoom with smooth scaling
       e.preventDefault();
+      e.stopPropagation();
       const touch1 = e.touches[0];
       const touch2 = e.touches[1];
       const distance = Math.hypot(
         touch2.clientX - touch1.clientX,
         touch2.clientY - touch1.clientY
       );
-      const initialDistance = parseFloat(schematicImageRef.current.dataset.initialDistance);
-      const initialScale = parseFloat(schematicImageRef.current.dataset.initialScale);
-      const newScale = Math.min(Math.max((distance / initialDistance) * initialScale, 1), 4);
+      const initialDistance = parseFloat(schematicImageRef.current.dataset.initialDistance || distance);
+      const initialScale = parseFloat(schematicImageRef.current.dataset.initialScale || scale);
+      
+      // Smooth pinch zoom with proper bounds
+      const zoomFactor = distance / initialDistance;
+      const newScale = Math.min(Math.max(zoomFactor * initialScale, 1), 4);
       setScale(newScale);
     } else if (e.touches.length === 1 && isPanning && scale > 1) {
-      // Pan when zoomed
+      // Pan when zoomed - smooth panning with bounds
       e.preventDefault();
+      e.stopPropagation();
+      
+      const newX = e.touches[0].clientX - startPanPosition.x;
+      const newY = e.touches[0].clientY - startPanPosition.y;
+      
+      // Constrain pan to reasonable bounds
+      const maxPan = 100;
+      const constrainedX = Math.min(Math.max(newX, -maxPan), maxPan);
+      const constrainedY = Math.min(Math.max(newY, -maxPan), maxPan);
+      
       setPosition({
-        x: e.touches[0].clientX - startPanPosition.x,
-        y: e.touches[0].clientY - startPanPosition.y
+        x: constrainedX,
+        y: constrainedY
       });
     }
   };
 
-  const handleTouchEnd = () => {
+  const handleTouchEnd = (e) => {
+    e.preventDefault();
     setIsPanning(false);
+  };
+
+  // Mouse wheel zoom for hybrid devices (tablets, laptops with touch)
+  const handleWheel = (e) => {
+    if (e.ctrlKey || e.metaKey) {
+      // Pinch-to-zoom on trackpad or ctrl+wheel
+      e.preventDefault();
+      const zoomDirection = e.deltaY > 0 ? -0.2 : 0.2;
+      const newScale = Math.min(Math.max(scale + zoomDirection, 1), 4);
+      setScale(newScale);
+    }
   };
 
   // Zoom controls
@@ -871,10 +759,14 @@ export default function Parts() {
             <div 
               className="schematic-container"
               ref={schematicContainerRef}
+              onWheel={handleWheel}
               style={{
                 overflow: scale > 1 ? 'hidden' : 'visible',
                 touchAction: scale > 1 ? 'none' : 'auto',
-                cursor: scale > 1 ? (isPanning ? 'grabbing' : 'grab') : 'default'
+                cursor: scale > 1 ? (isPanning ? 'grabbing' : 'grab') : 'default',
+                WebkitUserSelect: 'none',
+                userSelect: 'none',
+                position: 'relative'
               }}
             >
               <div 
@@ -888,20 +780,36 @@ export default function Parts() {
                   width: '100%',
                   transform: `scale(${scale}) translate(${position.x / scale}px, ${position.y / scale}px)`,
                   transformOrigin: 'center center',
-                  transition: isPanning ? 'none' : 'transform 0.3s ease-out'
+                  transition: isPanning ? 'none' : 'transform 0.3s ease-out',
+                  WebkitUserSelect: 'none',
+                  userSelect: 'none',
+                  pointerEvents: 'none'
                 }}
               >
                 {schematicImageSrc ? (
                   <img 
                     src={schematicImageSrc} 
                     alt={currentSchematic.title}
-                    style={{ width: '100%', height: 'auto', display: 'block', pointerEvents: scale > 1 ? 'none' : 'auto' }}
+                    style={{ 
+                      width: '100%', 
+                      height: 'auto', 
+                      display: 'block', 
+                      pointerEvents: 'none',
+                      imageRendering: 'crisp-edges',
+                      WebkitTouchCallout: 'none',
+                      WebkitUserSelect: 'none',
+                      userSelect: 'none'
+                    }}
+                    loading="eager"
+                    decoding="async"
                   />
                 ) : (
                   currentSchematic.svg
                 )}
-                
-                {currentSchematic.parts.filter(part => !part.pageNumber || part.pageNumber === currentPage).map((part) => (
+              </div>
+
+              {/* Hotspots rendered OUTSIDE the transformed container for proper touch interaction */}
+              {currentSchematic.parts.filter(part => !part.pageNumber || part.pageNumber === currentPage).map((part) => (
                   <div
                     key={part.id}
                     className={`hotspot hotspot-${part.shape || 'circle'} ${activeHotspot === part.id ? 'active' : ''}`}
@@ -910,7 +818,8 @@ export default function Parts() {
                       top: part.position.top,
                       left: part.position.left,
                       transform: part.rotation ? `translate(-50%, -50%) rotate(${part.rotation}deg)` : 'translate(-50%, -50%)',
-                      zIndex: 100,
+                      zIndex: activeHotspot === part.id ? 1001 : 100,
+                      pointerEvents: 'auto',
                       ...(part.width && part.height ? {
                         width: `${part.width}%`,
                         height: `${part.height}%`
@@ -969,7 +878,6 @@ export default function Parts() {
                   </div>
                 </div>
               ))}
-              </div>
             </div>
           </div>
         )}

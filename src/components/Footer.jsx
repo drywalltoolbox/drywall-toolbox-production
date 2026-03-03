@@ -1,7 +1,7 @@
 ﻿import { Link } from 'react-router-dom';
 import { Instagram, Facebook, Twitter, ChevronDown } from 'lucide-react';
 import { useState } from 'react';
-import Logo from '/logo.svg';
+import Logo from '/logo2.svg';
 
 export default function Footer() {
   const [navOpen, setNavOpen] = useState(false);
