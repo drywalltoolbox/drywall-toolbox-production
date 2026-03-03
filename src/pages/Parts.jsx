@@ -1,4 +1,4 @@
-﻿import { useState, useEffect, useRef } from 'react';
+﻿import { useState, useEffect, useRef, useCallback } from 'react';
 import { useCart } from '../context/CartContext';
 import Toast from '../components/Toast';
 import SchematicFilterBar from '../components/SchematicFilterBar';
@@ -33,6 +33,8 @@ export default function Parts() {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [isPanning, setIsPanning] = useState(false);
   const [startPanPosition, setStartPanPosition] = useState({ x: 0, y: 0 });
+  const [touchStartPos, setTouchStartPos] = useState({ x: 0, y: 0 });
+  const [hasMoved, setHasMoved] = useState(false);
   
   const schematicContainerRef = useRef(null);
   const schematicImageRef = useRef(null);
@@ -49,7 +51,7 @@ export default function Parts() {
       setSelectedBrand('TapeTech');
     });
   }, []);
-  
+
   // Schematic data for tools
   // Build 13TT schematic parts from JSON data
   const schematic13Parts = (schematic13Data && schematic13Data.parts) ? schematic13Data.parts.map((p) => {
@@ -483,10 +485,11 @@ export default function Parts() {
     }, [selectedSchematic, currentPage]);
 
   // Touch and zoom handlers for mobile - enhanced with smooth interactions
-  const handleTouchStart = (e) => {
+  const handleTouchStart = useCallback((e) => {
     if (e.touches.length === 2) {
       // Pinch gesture - prevent default and calculate distance
       e.preventDefault();
+      e.stopPropagation();
       const touch1 = e.touches[0];
       const touch2 = e.touches[1];
       const distance = Math.hypot(
@@ -498,17 +501,21 @@ export default function Parts() {
         schematicImageRef.current.dataset.initialScale = scale;
       }
     } else if (e.touches.length === 1 && scale > 1) {
-      // Pan gesture (only when zoomed in) - with smooth interaction
-      e.preventDefault();
-      setIsPanning(true);
+      // Pan gesture (only when zoomed in) - store initial position
+      // Don't preventDefault yet - let tap events through
+      setTouchStartPos({
+        x: e.touches[0].clientX,
+        y: e.touches[0].clientY
+      });
+      setHasMoved(false);
       setStartPanPosition({
         x: e.touches[0].clientX - position.x,
         y: e.touches[0].clientY - position.y
       });
     }
-  };
+  }, [scale, position]);
 
-  const handleTouchMove = (e) => {
+  const handleTouchMove = useCallback((e) => {
     if (e.touches.length === 2 && schematicImageRef.current) {
       // Pinch zoom with smooth scaling
       e.preventDefault();
@@ -526,30 +533,63 @@ export default function Parts() {
       const zoomFactor = distance / initialDistance;
       const newScale = Math.min(Math.max(zoomFactor * initialScale, 1), 4);
       setScale(newScale);
-    } else if (e.touches.length === 1 && isPanning && scale > 1) {
-      // Pan when zoomed - smooth panning with bounds
-      e.preventDefault();
-      e.stopPropagation();
+    } else if (e.touches.length === 1 && scale > 1) {
+      // Check distance moved to determine if this is a drag or a tap
+      const touch = e.touches[0];
+      const moveDistance = Math.hypot(
+        touch.clientX - touchStartPos.x,
+        touch.clientY - touchStartPos.y
+      );
       
-      const newX = e.touches[0].clientX - startPanPosition.x;
-      const newY = e.touches[0].clientY - startPanPosition.y;
-      
-      // Constrain pan to reasonable bounds
-      const maxPan = 100;
-      const constrainedX = Math.min(Math.max(newX, -maxPan), maxPan);
-      const constrainedY = Math.min(Math.max(newY, -maxPan), maxPan);
-      
-      setPosition({
-        x: constrainedX,
-        y: constrainedY
-      });
+      if (moveDistance > 10) {
+        // Only preventDefault if user is actually dragging (threshold: 10px)
+        if (!hasMoved) {
+          e.preventDefault();
+          e.stopPropagation();
+          setHasMoved(true);
+          setIsPanning(true);
+        }
+        
+        // Pan when zoomed - smooth panning with bounds
+        const newX = touch.clientX - startPanPosition.x;
+        const newY = touch.clientY - startPanPosition.y;
+        
+        // Constrain pan to reasonable bounds
+        const maxPan = 150;
+        const constrainedX = Math.min(Math.max(newX, -maxPan), maxPan);
+        const constrainedY = Math.min(Math.max(newY, -maxPan), maxPan);
+        
+        setPosition({
+          x: constrainedX,
+          y: constrainedY
+        });
+      }
     }
-  };
+  }, [scale, startPanPosition, touchStartPos, hasMoved]);
 
-  const handleTouchEnd = (e) => {
-    e.preventDefault();
-    setIsPanning(false);
-  };
+  const handleTouchEnd = useCallback((e) => {
+    if (e.touches.length === 0) {
+      setIsPanning(false);
+      setHasMoved(false);
+    }
+  }, []);
+
+  // Setup non-passive touch event listeners to allow preventDefault
+  useEffect(() => {
+    const container = schematicContainerRef.current;
+    if (!container) return;
+
+    // Attach non-passive touch listeners
+    container.addEventListener('touchstart', handleTouchStart, { passive: false });
+    container.addEventListener('touchmove', handleTouchMove, { passive: false });
+    container.addEventListener('touchend', handleTouchEnd, { passive: false });
+
+    return () => {
+      container.removeEventListener('touchstart', handleTouchStart);
+      container.removeEventListener('touchmove', handleTouchMove);
+      container.removeEventListener('touchend', handleTouchEnd);
+    };
+  }, [handleTouchStart, handleTouchMove, handleTouchEnd]);
 
   // Mouse wheel zoom for hybrid devices (tablets, laptops with touch)
   const handleWheel = (e) => {
@@ -771,9 +811,6 @@ export default function Parts() {
             >
               <div 
                 ref={schematicImageRef}
-                onTouchStart={handleTouchStart}
-                onTouchMove={handleTouchMove}
-                onTouchEnd={handleTouchEnd}
                 style={{ 
                   position: 'relative', 
                   display: 'inline-block', 
@@ -783,7 +820,7 @@ export default function Parts() {
                   transition: isPanning ? 'none' : 'transform 0.3s ease-out',
                   WebkitUserSelect: 'none',
                   userSelect: 'none',
-                  pointerEvents: 'none'
+                  pointerEvents: 'auto'
                 }}
               >
                 {schematicImageSrc ? (
@@ -806,10 +843,9 @@ export default function Parts() {
                 ) : (
                   currentSchematic.svg
                 )}
-              </div>
-
-              {/* Hotspots rendered OUTSIDE the transformed container for proper touch interaction */}
-              {currentSchematic.parts.filter(part => !part.pageNumber || part.pageNumber === currentPage).map((part) => (
+                
+                {/* Hotspots rendered INSIDE the transformed container so they scale and pan with the image */}
+                {currentSchematic.parts.filter(part => !part.pageNumber || part.pageNumber === currentPage).map((part) => (
                   <div
                     key={part.id}
                     className={`hotspot hotspot-${part.shape || 'circle'} ${activeHotspot === part.id ? 'active' : ''}`}
@@ -878,6 +914,9 @@ export default function Parts() {
                   </div>
                 </div>
               ))}
+              </div>
+
+              {/* Hotspots END */}
             </div>
           </div>
         )}
