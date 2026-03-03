@@ -34,7 +34,7 @@ export default function Home() {
           </p>
           <div style={{ display: 'flex', justifyContent: 'center' }}>
             <Link to="/products" className="alloy-button" style={{ textDecoration: 'none' }}>
-              Shop
+              Shop Products
             </Link>
           </div>
         </div>
