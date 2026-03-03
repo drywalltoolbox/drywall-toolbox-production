@@ -4,7 +4,7 @@ import Logo from '/logo.svg';
 
 export default function Footer() {
   return (
-    <footer style={{
+    <footer className="site-footer" style={{
       background: 'white',
       borderTop: '1px solid var(--machined-border)',
       padding: '80px 40px',
@@ -63,7 +63,7 @@ export default function Footer() {
         </div>
       </div>
 
-      <div>
+  <div className="footer-col footer-center-on-mobile">
         <h5 style={{
           textTransform: 'uppercase',
           fontSize: '0.75rem',
@@ -96,7 +96,7 @@ export default function Footer() {
         </ul>
       </div>
 
-      <div>
+  <div className="footer-col footer-center-on-mobile">
         <h5 style={{
           textTransform: 'uppercase',
           fontSize: '0.75rem',

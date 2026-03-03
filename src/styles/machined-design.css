@@ -400,6 +400,46 @@ aside input[type="range"],
     position: relative;
 }
 
+/* --- SITE FOOTER RESPONSIVE TWEAKS --- */
+/* Center Navigation and Support columns on small screens */
+@media (max-width: 640px) {
+    .site-footer {
+        padding: 40px 20px;
+        grid-template-columns: 1fr !important; /* stack columns */
+        gap: 24px;
+    }
+
+    /* target columns that should center their content on mobile */
+    .site-footer .footer-center-on-mobile {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+
+    .site-footer .footer-center-on-mobile h5 {
+        width: 100%;
+        display: block;
+        text-align: center;
+    }
+
+    .site-footer .footer-center-on-mobile ul {
+        padding: 0;
+        margin: 0 auto;
+    }
+
+    .site-footer img {
+        max-width: 220px;
+        width: 80%;
+        height: auto;
+    }
+
+    .site-footer input.machined-input {
+        width: 100%;
+        max-width: 360px;
+    }
+}
+
 /* --- SCHEMATIC PAGER (floating pill) --- */
 .schematic-pager {
     position: absolute;

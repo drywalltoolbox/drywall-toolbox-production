@@ -1,4 +1,4 @@
-import { X } from 'lucide-react';
+import { X, Trash2 } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { Link } from 'react-router-dom';
 
@@ -72,17 +72,20 @@ export default function CartSidebar({ isOpen, onClose }) {
                 </div>
                 <button 
                   onClick={() => removeFromCart(item.id)}
+                  aria-label={`Remove ${item.name}`}
                   style={{ 
                     background: 'none', 
                     border: 'none', 
                     color: 'red', 
                     fontSize: '0.7rem', 
                     cursor: 'pointer',
-                    textTransform: 'uppercase',
-                    fontWeight: 600
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    padding: '6px'
                   }}
                 >
-                  Remove
+                  <Trash2 size={16} />
                 </button>
               </div>
             ))
