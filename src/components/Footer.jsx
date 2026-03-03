@@ -1,4 +1,6 @@
 ﻿import { Link } from 'react-router-dom';
+import { Instagram, Facebook, Twitter } from 'lucide-react';
+import Logo from '/logo.svg';
 
 export default function Footer() {
   return (
@@ -10,28 +12,55 @@ export default function Footer() {
       gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
       gap: '40px'
     }}>
-      <div>
-        <div style={{
-          fontWeight: 800,
-          textTransform: 'uppercase',
-          letterSpacing: '-0.02em',
-          fontSize: '1.25rem',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '10px',
-          marginBottom: '20px'
-        }}>
-          <div style={{
-            width: '24px',
-            height: '24px',
-            background: 'var(--alloy-deep)',
-            clipPath: 'polygon(0% 15%, 15% 0%, 100% 0%, 100% 85%, 85% 100%, 0% 100%)'
-          }} />
-          <span>Drywall Toolbox</span>
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-start' }}>
+        <Link to="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', marginBottom: '-8px' }}>
+          <img 
+            src={Logo} 
+            alt="Drywall Toolbox Logo" 
+            style={{
+              width: '280px',
+              height: 'auto',
+              maxHeight: '146px',
+              objectFit: 'contain',
+              objectPosition: 'center',
+              display: 'block',
+              padding: 0,
+              margin: 0
+            }}
+          />
+        </Link>
+        <div style={{ display: 'flex', gap: '16px', marginTop: '0px' }}>
+          <a 
+            href="https://instagram.com" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            style={{ textDecoration: 'none', color: 'var(--alloy-deep)', transition: 'opacity 0.2s' }}
+            onMouseEnter={(e) => e.target.style.opacity = '0.7'}
+            onMouseLeave={(e) => e.target.style.opacity = '1'}
+          >
+            <Instagram size={20} />
+          </a>
+          <a 
+            href="https://facebook.com" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            style={{ textDecoration: 'none', color: 'var(--alloy-deep)', transition: 'opacity 0.2s' }}
+            onMouseEnter={(e) => e.target.style.opacity = '0.7'}
+            onMouseLeave={(e) => e.target.style.opacity = '1'}
+          >
+            <Facebook size={20} />
+          </a>
+          <a 
+            href="https://twitter.com" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            style={{ textDecoration: 'none', color: 'var(--alloy-deep)', transition: 'opacity 0.2s' }}
+            onMouseEnter={(e) => e.target.style.opacity = '0.7'}
+            onMouseLeave={(e) => e.target.style.opacity = '1'}
+          >
+            <Twitter size={20} />
+          </a>
         </div>
-        <p style={{ fontSize: '0.8rem', opacity: 0.5, color: 'black' }}>
-          Machined Precision for the Modern Finisher. Built for the grind.
-        </p>
       </div>
 
       <div>

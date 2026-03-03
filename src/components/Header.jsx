@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { useCart } from '../context/CartContext';
 import { ShoppingCart, Menu, X } from 'lucide-react';
+import Logo from '/logo.svg';
 
 export default function Header({ onCartToggle }) {
   const location = useLocation();
@@ -38,10 +39,9 @@ export default function Header({ onCartToggle }) {
             )}
           </button>
 
-          {/* Centered Brand with Icon */}
-          <Link to="/" className="flex items-center gap-2" onClick={closeMobileMenu}>
-            <div className="brand-mark" style={{ width: '20px', height: '20px' }} />
-            <span className="text-base font-bold uppercase tracking-wide">Drywall Toolbox</span>
+          {/* Centered Logo */}
+          <Link to="/" className="flex items-center justify-center" onClick={closeMobileMenu}>
+            <img src={Logo} alt="Drywall Toolbox Logo" className="logo-image-mobile" />
           </Link>
 
           {/* Menu Icon - Far Right */}
@@ -64,9 +64,8 @@ export default function Header({ onCartToggle }) {
           </div>
 
           <div className="header-center">
-            <Link to="/" className="flex items-center gap-2">
-              <div className="brand-mark" />
-              <span className="brand-title">Drywall Toolbox</span>
+            <Link to="/" className="flex items-center justify-center">
+              <img src={Logo} alt="Drywall Toolbox Logo" className="logo-image" />
             </Link>
           </div>
 
