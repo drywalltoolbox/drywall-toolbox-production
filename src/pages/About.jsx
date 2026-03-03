@@ -143,33 +143,6 @@ export default function About() {
         </div>
       </section>
 
-      {/* Brands Section */}
-      <section className="py-16 bg-gray-50">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-              Trusted Brand Partners
-            </h2>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              We partner with the industry's most respected manufacturers
-            </p>
-          </div>
-
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6">
-            {['TapeTech', 'Level5', 'Columbia', 'Drywall Master', 'Can-Am', 'Delko', 'Kraft', 'Advance', 'Northstar', 'Goldblatt', 'Marshalltown', 'Warner'].map((brand, index) => (
-              <div
-                key={index}
-                className="flex items-center justify-center p-6 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow border border-gray-200"
-              >
-                <span className="text-gray-700 font-semibold text-center">
-                  {brand}
-                </span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* CTA Section */}
       <section className="py-16 bg-linear-to-r from-primary-600 to-primary-700 text-white">
         <div className="container mx-auto px-4 text-center">

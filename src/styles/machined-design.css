@@ -41,8 +41,13 @@ body {
     line-height: 1.5;
     margin: 0;
     padding: 0;
-    /* Account for fixed header: 140px desktop */
-    padding-top: 150px;
+}
+
+/* Mobile adjustment: ensure no extra padding on body */
+@media (max-width: 767px) {
+    body {
+        padding-top: 0 !important;
+    }
 }
 
 /* --- BACKGROUND TEXTURE --- */
@@ -831,6 +836,15 @@ aside input[type="range"],
     .home-hero-grid {
         grid-template-columns: 1fr !important;
     }
+
+    /* Center text and button on mobile */
+    .home-hero-grid > div {
+        text-align: center !important;
+    }
+
+    .home-hero-grid .alloy-button {
+        margin: 0 auto !important;
+    }
 }
 
 /* Responsive adjustments for schematic title + filter bar */
@@ -1110,3 +1124,26 @@ aside input[type="range"],
     }
 }
 
+/* --- PAGE SPACING FIX --- */
+/* Ensure all full-page divs account for fixed header */
+.min-h-screen {
+    padding-top: 140px;
+}
+
+/* Override excessive top padding on pages */
+/* Account for fixed header on all pages */
+section[style*="padding: '140px"] {
+    padding-top: 140px !important;
+}
+
+/* All page wrappers get header spacing */
+div.min-h-screen {
+    padding-top: 140px !important;
+}
+
+/* Mobile header is smaller (70px), adjust padding */
+@media (max-width: 767px) {
+    div.min-h-screen {
+        padding-top: 70px !important;
+    }
+}

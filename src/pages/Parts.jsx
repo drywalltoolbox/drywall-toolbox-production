@@ -1,8 +1,9 @@
-﻿import { useState, useEffect } from 'react';
+﻿import { useState, useEffect, useRef } from 'react';
 import { useCart } from '../context/CartContext';
 import Toast from '../components/Toast';
 import SchematicFilterBar from '../components/SchematicFilterBar';
 import { loadProducts } from '../data/products';
+import '../styles/mobile-schematic.css';
 import schematic13Data from '../../schematics/brands/TapeTech/products/13TT_SCH_hotspots/schematic_data.json';
 import schematic13Img from '../../schematics/brands/TapeTech/products/13TT_SCH_hotspots/images/page_1.png';
 import schematic88Data from '../../schematics/brands/TapeTech/products/88TTR_SCH_hotspots/schematic_data.json';
@@ -24,6 +25,16 @@ export default function Parts() {
   const [products, setProducts] = useState([]);
   const [brands, setBrands] = useState([]);
   const { addToCart } = useCart();
+  
+  // Mobile zoom/pan state
+  const [scale, setScale] = useState(1);
+  const [position, setPosition] = useState({ x: 0, y: 0 });
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [isPanning, setIsPanning] = useState(false);
+  const [startPanPosition, setStartPanPosition] = useState({ x: 0, y: 0 });
+  
+  const schematicContainerRef = useRef(null);
+  const schematicImageRef = useRef(null);
 
   // Load products on mount
   useEffect(() => {
@@ -596,31 +607,118 @@ export default function Parts() {
     setActiveHotspot(null); // Close modal after adding
   };
 
+  // Reset zoom/pan when schematic changes
+    useEffect(() => {
+      const t = setTimeout(() => {
+        setScale(1);
+        setPosition({ x: 0, y: 0 });
+        setIsFullscreen(false);
+      }, 0);
+      return () => clearTimeout(t);
+    }, [selectedSchematic, currentPage]);
+
+  // Touch and zoom handlers for mobile
+  const handleTouchStart = (e) => {
+    if (e.touches.length === 2) {
+      // Pinch gesture
+      const touch1 = e.touches[0];
+      const touch2 = e.touches[1];
+      const distance = Math.hypot(
+        touch2.clientX - touch1.clientX,
+        touch2.clientY - touch1.clientY
+      );
+      schematicImageRef.current.dataset.initialDistance = distance;
+      schematicImageRef.current.dataset.initialScale = scale;
+    } else if (e.touches.length === 1 && scale > 1) {
+      // Pan gesture (only when zoomed)
+      setIsPanning(true);
+      setStartPanPosition({
+        x: e.touches[0].clientX - position.x,
+        y: e.touches[0].clientY - position.y
+      });
+    }
+  };
+
+  const handleTouchMove = (e) => {
+    if (e.touches.length === 2) {
+      // Pinch zoom
+      e.preventDefault();
+      const touch1 = e.touches[0];
+      const touch2 = e.touches[1];
+      const distance = Math.hypot(
+        touch2.clientX - touch1.clientX,
+        touch2.clientY - touch1.clientY
+      );
+      const initialDistance = parseFloat(schematicImageRef.current.dataset.initialDistance);
+      const initialScale = parseFloat(schematicImageRef.current.dataset.initialScale);
+      const newScale = Math.min(Math.max((distance / initialDistance) * initialScale, 1), 4);
+      setScale(newScale);
+    } else if (e.touches.length === 1 && isPanning && scale > 1) {
+      // Pan when zoomed
+      e.preventDefault();
+      setPosition({
+        x: e.touches[0].clientX - startPanPosition.x,
+        y: e.touches[0].clientY - startPanPosition.y
+      });
+    }
+  };
+
+  const handleTouchEnd = () => {
+    setIsPanning(false);
+  };
+
+  // Zoom controls
+  const handleZoomIn = () => {
+    setScale(prev => Math.min(prev + 0.5, 4));
+  };
+
+  const handleZoomOut = () => {
+    setScale(prev => {
+      const newScale = Math.max(prev - 0.5, 1);
+      if (newScale === 1) {
+        setPosition({ x: 0, y: 0 });
+      }
+      return newScale;
+    });
+  };
+
+  const handleResetZoom = () => {
+    setScale(1);
+    setPosition({ x: 0, y: 0 });
+  };
+
+  const toggleFullscreen = () => {
+    setIsFullscreen(!isFullscreen);
+  };
+
   return (
     <section 
       style={{ 
-        padding: '96px 40px 80px',
+        padding: isFullscreen ? '60px 0 0' : '140px 40px 80px',
         minHeight: '100vh'
       }} 
-      className="section-enter"
+      className={`section-enter ${isFullscreen ? 'fullscreen-mode' : ''}`}
       onClick={() => setActiveHotspot(null)}
     >
       <div style={{
-        maxWidth: '1400px',
-        margin: '0 auto'
+        maxWidth: isFullscreen ? '100%' : '1400px',
+        margin: '0 auto',
+        padding: isFullscreen ? '0' : undefined
       }}
       onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div style={{ marginBottom: '60px', textAlign: 'center' }}>
-          <h2 style={{ 
-            fontSize: '3rem', 
-            marginBottom: '16px',
-            letterSpacing: '-0.02em'
-          }}>
-            INTERACTIVE SCHEMATIC VIEWER
-          </h2>
-        </div>
+        {!isFullscreen && (
+          <div style={{ marginBottom: '40px', textAlign: 'center' }}>
+            <h2 style={{ 
+              fontSize: 'clamp(1.5rem, 5vw, 3rem)', 
+              marginBottom: '16px',
+              letterSpacing: '-0.02em'
+            }}>
+              INTERACTIVE SCHEMATIC VIEWER
+            </h2>
+          </div>
+        )}
 
         {/* Interactive Viewer */}
         {currentSchematic && (
@@ -720,13 +818,77 @@ export default function Parts() {
               </div>
             )}
 
-            <div className="schematic-container">
-              <div style={{ position: 'relative', display: 'inline-block', width: '100%' }}>
+            {/* Mobile Zoom Controls */}
+            <div className="mobile-zoom-controls">
+              <button 
+                className="zoom-control-btn fullscreen-btn" 
+                onClick={toggleFullscreen}
+                aria-label={isFullscreen ? "Exit fullscreen" : "Enter fullscreen"}
+                title={isFullscreen ? "Exit fullscreen" : "Enter fullscreen"}
+              >
+                {isFullscreen ? (
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                    <path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 1 2-2h3M3 16h3a2 2 0 0 1 2 2v3" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                ) : (
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                    <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                )}
+              </button>
+              <button className="zoom-control-btn" onClick={handleZoomIn} aria-label="Zoom in" title="Zoom in">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                  <circle cx="11" cy="11" r="8" stroke="currentColor" strokeWidth="2"/>
+                  <path d="M21 21l-4.35-4.35M11 8v6m-3-3h6" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                </svg>
+              </button>
+              <button className="zoom-control-btn" onClick={handleZoomOut} aria-label="Zoom out" title="Zoom out">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                  <circle cx="11" cy="11" r="8" stroke="currentColor" strokeWidth="2"/>
+                  <path d="M21 21l-4.35-4.35M8 11h6" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                </svg>
+              </button>
+              {scale > 1 && (
+                <button className="zoom-control-btn reset-btn" onClick={handleResetZoom} aria-label="Reset zoom" title="Reset zoom">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                    <path d="M1 4v6h6M23 20v-6h-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    <path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </button>
+              )}
+              <div className="zoom-indicator">
+                {Math.round(scale * 100)}%
+              </div>
+            </div>
+
+            <div 
+              className="schematic-container"
+              ref={schematicContainerRef}
+              style={{
+                overflow: scale > 1 ? 'hidden' : 'visible',
+                touchAction: scale > 1 ? 'none' : 'auto',
+                cursor: scale > 1 ? (isPanning ? 'grabbing' : 'grab') : 'default'
+              }}
+            >
+              <div 
+                ref={schematicImageRef}
+                onTouchStart={handleTouchStart}
+                onTouchMove={handleTouchMove}
+                onTouchEnd={handleTouchEnd}
+                style={{ 
+                  position: 'relative', 
+                  display: 'inline-block', 
+                  width: '100%',
+                  transform: `scale(${scale}) translate(${position.x / scale}px, ${position.y / scale}px)`,
+                  transformOrigin: 'center center',
+                  transition: isPanning ? 'none' : 'transform 0.3s ease-out'
+                }}
+              >
                 {schematicImageSrc ? (
                   <img 
                     src={schematicImageSrc} 
                     alt={currentSchematic.title}
-                    style={{ width: '100%', height: 'auto', display: 'block' }}
+                    style={{ width: '100%', height: 'auto', display: 'block', pointerEvents: scale > 1 ? 'none' : 'auto' }}
                   />
                 ) : (
                   currentSchematic.svg
@@ -754,6 +916,19 @@ export default function Parts() {
                     title={`${part.name} (${part.sku})`}
                   >
                     <div className="part-modal" onClick={(e) => e.stopPropagation()}>
+                    {/* Close button for mobile */}
+                    <button 
+                      className="modal-close-btn"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setActiveHotspot(null);
+                      }}
+                      aria-label="Close"
+                    >
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                        <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
+                    </button>
                     <h4 style={{
                       textTransform: 'uppercase',
                       fontSize: '0.75rem',

@@ -108,7 +108,7 @@ export default function WooCommerceSettings() {
             {isEnabled ? (
               <>
                 <CheckCircle className="h-6 w-6 text-green-600" />
-                <div className="flex-grow">
+                <div className="grow">
                   <p className="font-semibold text-green-700">Connected to WooCommerce</p>
                   <p className="text-sm text-gray-600">Integration is active</p>
                 </div>
@@ -123,7 +123,7 @@ export default function WooCommerceSettings() {
             ) : (
               <>
                 <XCircle className="h-6 w-6 text-gray-400" />
-                <div className="flex-grow">
+                <div className="grow">
                   <p className="font-semibold text-gray-700">Not Connected</p>
                   <p className="text-sm text-gray-600">Configure credentials to enable integration</p>
                 </div>
@@ -219,7 +219,7 @@ export default function WooCommerceSettings() {
           {/* Info Box */}
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
             <div className="flex gap-3">
-              <AlertCircle className="h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5" />
+              <AlertCircle className="h-5 w-5 text-blue-600 shrink-0 mt-0.5" />
               <div className="text-sm text-blue-900">
                 <p className="font-semibold mb-2">Setting Up WooCommerce API</p>
                 <ol className="list-decimal list-inside space-y-1 text-blue-800">
@@ -328,28 +328,28 @@ export default function WooCommerceSettings() {
           <h2 className="text-xl font-bold text-gray-900 mb-4">Integration Features</h2>
           <div className="grid md:grid-cols-2 gap-4">
             <div className="flex gap-3">
-              <ShoppingBag className="h-5 w-5 text-primary-600 flex-shrink-0 mt-0.5" />
+              <ShoppingBag className="h-5 w-5 text-primary-600 shrink-0 mt-0.5" />
               <div>
                 <p className="font-semibold text-gray-900">Product Synchronization</p>
                 <p className="text-sm text-gray-600">Sync products from WooCommerce catalog</p>
               </div>
             </div>
             <div className="flex gap-3">
-              <Database className="h-5 w-5 text-primary-600 flex-shrink-0 mt-0.5" />
+              <Database className="h-5 w-5 text-primary-600 shrink-0 mt-0.5" />
               <div>
                 <p className="font-semibold text-gray-900">Order Management</p>
                 <p className="text-sm text-gray-600">Create and track orders automatically</p>
               </div>
             </div>
             <div className="flex gap-3">
-              <CreditCard className="h-5 w-5 text-primary-600 flex-shrink-0 mt-0.5" />
+              <CreditCard className="h-5 w-5 text-primary-600 shrink-0 mt-0.5" />
               <div>
                 <p className="font-semibold text-gray-900">Payment Processing</p>
                 <p className="text-sm text-gray-600">Process payments through configured gateways</p>
               </div>
             </div>
             <div className="flex gap-3">
-              <CheckCircle className="h-5 w-5 text-primary-600 flex-shrink-0 mt-0.5" />
+              <CheckCircle className="h-5 w-5 text-primary-600 shrink-0 mt-0.5" />
               <div>
                 <p className="font-semibold text-gray-900">Stock Management</p>
                 <p className="text-sm text-gray-600">Real-time inventory tracking</p>
