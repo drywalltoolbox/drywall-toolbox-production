@@ -1,11 +1,11 @@
 ﻿import { Link } from 'react-router-dom';
-import SchematicDiagrams from '../components/SchematicDiagrams';
+import PartsDiagrams from '../components/SchematicDiagrams';
 
 export default function Home() {
   return (
     <>
     <section style={{ 
-      padding: 'clamp(60px, 12vw, 140px) clamp(1rem, 5vw, 2.5rem) clamp(1.5rem, 5vw, 2.5rem)',
+      padding: 'clamp(20px, 5vw, 40px) clamp(1rem, 5vw, 2.5rem) clamp(1.5rem, 5vw, 2.5rem)',
       minHeight: '100vh'
     }} className="section-enter home-hero-section">
       <div style={{
@@ -40,7 +40,7 @@ export default function Home() {
         </div>
       </div>
     </section>
-    <SchematicDiagrams />
+    <PartsDiagrams />
     </>
   );
 }

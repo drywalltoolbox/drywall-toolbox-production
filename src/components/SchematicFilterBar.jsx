@@ -167,7 +167,7 @@ export default function SchematicFilterBar({
           <path d="M9 6l6 6-6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
         </svg>
 
-        {/* Schematic Selector */}
+        {/* Parts Selector */}
         <div className={`filter-section ${expandedSection === 'schematic' ? 'expanded' : ''} ${selectedSchematic ? 'has-selection' : ''} ${schematics.length === 0 ? 'disabled' : ''}`}>
           <button 
             className="filter-trigger"
@@ -175,9 +175,9 @@ export default function SchematicFilterBar({
             disabled={schematics.length === 0}
           >
             <div className="filter-trigger-content">
-              <span className="filter-label" style={{ color: 'var(--color-primary-600)' }}>SCHEMATIC</span>
+              <span className="filter-label" style={{ color: 'var(--color-primary-600)' }}>PART</span>
               <span className="filter-value" style={{ color: 'black' }}>
-                {selectedSchematic ? schematics.find(s => s.id === selectedSchematic)?.title || 'Select schematic' : schematics.length === 0 ? 'No schematics' : 'Select schematic'}
+                {selectedSchematic ? schematics.find(s => s.id === selectedSchematic)?.title || 'Select part' : schematics.length === 0 ? 'No parts' : 'Select part'}
               </span>
             </div>
             {schematics.length > 0 && (

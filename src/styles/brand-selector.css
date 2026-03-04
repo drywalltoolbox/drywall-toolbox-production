@@ -185,5 +185,53 @@
 
   .brand-card {
     padding: 32px 24px;
+    transition: none;
+    animation: fadeIn 0.5s ease-out;
+  }
+
+  .brand-card:nth-child(1),
+  .brand-card:nth-child(2),
+  .brand-card:nth-child(3),
+  .brand-card:nth-child(4) {
+    animation-delay: 0s;
+  }
+
+  .brand-card:hover {
+    border-color: var(--alloy-edge);
+    box-shadow: none;
+    transform: none;
+  }
+
+  .brand-card:hover .brand-card-background {
+    opacity: 0;
+  }
+
+  .brand-card-background {
+    transition: none;
+  }
+
+  .brand-logo-placeholder {
+    transition: none;
+  }
+
+  .brand-card:hover .brand-logo-placeholder {
+    border-color: var(--alloy-edge);
+    background: linear-gradient(135deg, var(--surface-elevated) 0%, var(--surface-secondary) 100%);
+  }
+
+  .brand-logo-placeholder .placeholder-icon {
+    transition: none;
+  }
+
+  .brand-card:hover .brand-logo-placeholder .placeholder-icon {
+    color: var(--text-tertiary);
+  }
+
+  .brand-name {
+    transition: none;
+  }
+
+  .brand-card:hover .brand-name {
+    color: var(--text-primary);
   }
 }

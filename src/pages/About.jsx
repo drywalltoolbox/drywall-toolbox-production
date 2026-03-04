@@ -542,7 +542,7 @@ export default function About() {
               onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.18)'; }}
               onMouseLeave={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.1)'; }}
             >
-              View Schematics
+              View Parts
             </button>
           </div>
         </div>

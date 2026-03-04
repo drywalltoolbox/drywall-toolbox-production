@@ -142,7 +142,7 @@ export default function Header({ onCartToggle }) {
                   </div>
                 )}
               </div>
-              <Link to="/parts" className={`nav-link ${isActive('/parts') ? 'active' : ''}`} style={{ color: isActive('/parts') ? 'var(--color-primary-600)' : 'black' }}>Schematics</Link>
+              <Link to="/parts" className={`nav-link ${isActive('/parts') ? 'active' : ''}`} style={{ color: isActive('/parts') ? 'var(--color-primary-600)' : 'black' }}>Parts</Link>
             </nav>
           </div>
 
@@ -208,7 +208,7 @@ export default function Header({ onCartToggle }) {
               className={`nav-link-mobile ${isActive('/parts') ? 'active' : ''}`}
               onClick={closeMobileMenu}
             >
-              Schematics
+              Parts
             </Link>
             <Link 
               to="/about" 

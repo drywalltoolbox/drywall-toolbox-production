@@ -125,7 +125,7 @@ export default function Footer() {
             </li>
             <li style={{ marginBottom: '12px', fontSize: '0.85rem', opacity: 0.6, color: 'black' }}>
               <Link to="/parts" style={{ textDecoration: 'none', color: 'black' }}>
-                Schematics
+                Parts
               </Link>
             </li>
             <li style={{ marginBottom: '12px', fontSize: '0.85rem', opacity: 0.6, color: 'black' }}>

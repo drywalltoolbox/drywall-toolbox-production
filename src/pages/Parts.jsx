@@ -35,9 +35,7 @@ export default function Parts() {
   // Schematic viewer state
   const [activeHotspot, setActiveHotspot] = useState(null);
   const [activeHotspotPart, setActiveHotspotPart] = useState(null);
-  const [selectedProduct, setSelectedProduct] = useState(null);
   const [toast, setToast] = useState(null);
-  const [products, setProducts] = useState([]);
   const [brands, setBrands] = useState([]);
   const { addToCart } = useCart();
   
@@ -58,12 +56,12 @@ export default function Parts() {
   // Load products on mount
   useEffect(() => {
     loadProducts().then(prods => {
-      setProducts(prods);
       // Extract unique brands and filter to only allowed brands
       const uniqueBrands = [...new Set(prods.map(p => p.brand).filter(Boolean))].sort();
       const filteredBrands = uniqueBrands.filter(brand => ALLOWED_BRANDS.includes(brand));
       setBrands(filteredBrands);
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Schematic data for tools
@@ -439,23 +437,7 @@ export default function Parts() {
   // Filter schematics to only include tools from allowed brands
   const allowedSchematics = schematics.filter(s => !s.brand || ALLOWED_BRANDS.includes(s.brand));
 
-  // Get products filtered by selected brand
-  const filteredProducts = products.filter(p => p.brand === selectedBrand);
-  
-  // Filter schematics by selected brand and product
-  const filteredSchematics = allowedSchematics.filter(schematic => {
-    // If brand selected, only show schematics for that brand
-    if (selectedBrand && schematic.brand !== selectedBrand) {
-      return false;
-    }
-    // If product selected, only show schematics that specify a productPartNumber matching the product
-    // Schematics without productPartNumber (null/undefined) are considered brand-level and shown for the brand
-    if (selectedProduct && schematic.productPartNumber && schematic.productPartNumber !== selectedProduct.part_number) {
-      return false;
-    }
-    return true;
-  });
-
+  // When schematic changes we reset the page in the schematic selector's onChange handler below.
   const currentSchematic = allowedSchematics.find(s => s.id === selectedSchematic);
   const [currentPage, setCurrentPage] = useState(1);
 
@@ -705,7 +687,7 @@ export default function Parts() {
   return (
     <section 
       style={{ 
-        padding: isFullscreen ? '60px 0 0' : 'clamp(80px, 15vw, 140px) clamp(1rem, 5vw, 2.5rem) clamp(160px, 30vw, 280px)',
+        padding: isFullscreen ? '60px 0 0' : 'clamp(20px, 5vw, 40px) clamp(1rem, 5vw, 2.5rem) clamp(160px, 30vw, 280px)',
         minHeight: '100vh'
       }} 
       className={`section-enter ${isFullscreen ? 'fullscreen-mode' : ''}`}
@@ -783,19 +765,29 @@ export default function Parts() {
                 </svg>
                 <span>Back to Tools</span>
               </button>
-              <h2 style={{ 
-                fontSize: 'clamp(1.5rem, 5vw, 3rem)', 
-                marginBottom: '16px',
-                letterSpacing: '-0.02em',
-                margin: 0,
-                textAlign: 'center'
-              }}>
-                {currentSchematic?.title}
-              </h2>
+              <div style={{ textAlign: 'center' }}>
+                <h3 style={{ 
+                  fontSize: 'clamp(1rem, 3vw, 1.5rem)', 
+                  margin: '0 0 8px 0',
+                  letterSpacing: '-0.02em',
+                  color: 'var(--text-secondary)',
+                  fontWeight: 600
+                }}>
+                  {currentSchematic?.brand}
+                </h3>
+                <h2 style={{ 
+                  fontSize: 'clamp(1.5rem, 5vw, 3rem)', 
+                  margin: '0',
+                  letterSpacing: '-0.02em',
+                  textAlign: 'center'
+                }}>
+                  {currentSchematic?.title}
+                </h2>
+              </div>
             </div>
           )}
 
-          {/* Page selector for multi-page schematics - positioned at top center */}
+          {/* Page selector for multi-page parts diagrams - positioned at top center */}
           {currentSchematic.diagramPages && currentSchematic.diagramPages.length > 1 && (
           <div style={{ 
             display: 'flex', 

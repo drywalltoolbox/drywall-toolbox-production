@@ -191,11 +191,18 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: transform 180ms ease-out, box-shadow 180ms ease-out, background-color 180ms ease-out;
+  transition: none;
   -webkit-user-select: none;
   user-select: none;
   -webkit-touch-callout: none;
   touch-action: none;
+}
+
+/* Desktop hover effects only */
+@media (min-width: 769px) {
+  .hotspot {
+    transition: transform 180ms ease-out, box-shadow 180ms ease-out, background-color 180ms ease-out;
+  }
 }
 
 @media (max-width: 768px) {
@@ -209,6 +216,13 @@
     -webkit-user-select: none;
     user-select: none;
     pointer-events: auto !important;
+    transition: none !important;
+  }
+
+  .hotspot:hover {
+    transform: translate(-50%, -50%) !important;
+    background: transparent !important;
+    box-shadow: none !important;
   }
 
   .hotspot-rectangle {
@@ -262,6 +276,19 @@
   .mobile-zoom-controls {
     display: flex;
     animation: slideInFromBottom 300ms ease-out;
+  }
+
+  .zoom-control-btn {
+    transition: none !important;
+  }
+
+  .zoom-control-btn:active {
+    transform: none;
+    background: rgba(255, 255, 255, 0.15);
+  }
+
+  .zoom-control-btn:focus-visible {
+    outline: none;
   }
 
   @keyframes slideInFromBottom {

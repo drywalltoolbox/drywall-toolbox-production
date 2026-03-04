@@ -1,13 +1,13 @@
 import { Link } from 'react-router-dom';
 import schematicImg from '/15TT_SCH-1.png?url';
 
-export default function SchematicDiagrams() {
+export default function PartsDiagrams() {
   return (
     <section style={{
       padding: '20px 40px 100px',
       maxWidth: '1400px',
       margin: '0 auto'
-    }} className="section-enter schematic-section">
+    }} className="section-enter parts-section">
       <Link to="/parts" style={{ textDecoration: 'none' }}>
         <div style={{
           position: 'relative',
@@ -24,7 +24,7 @@ export default function SchematicDiagrams() {
           transition: 'all 0.3s var(--ease-tension)',
           boxShadow: '0 1px 3px rgba(0,0,0,0.05)'
         }}
-        className="schematic-hero"
+        className="parts-hero"
         onMouseEnter={(e) => {
           e.currentTarget.style.transform = 'scale(1.02)';
           e.currentTarget.style.boxShadow = '0 12px 24px rgba(0,0,0,0.1)';
@@ -37,7 +37,7 @@ export default function SchematicDiagrams() {
           {/* Blueprint background with subtle blur */}
           <img
             src={schematicImg}
-            alt="Schematic Diagrams Background"
+            alt="Parts Diagrams Background"
             style={{
               position: 'absolute',
               inset: 0,
@@ -84,7 +84,7 @@ export default function SchematicDiagrams() {
               lineHeight: 1.1,
               filter: 'drop-shadow(0 0 12px rgba(255, 255, 255, 0.2))'
             }}>
-              SCHEMATIC<br />DIAGRAMS
+              PARTS<br />DIAGRAMS
             </h2>
             <div style={{
               width: '60px',
