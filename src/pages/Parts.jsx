@@ -1,7 +1,8 @@
 ﻿import { useState, useEffect, useRef, useCallback } from 'react';
 import { useCart } from '../context/CartContext';
 import Toast from '../components/Toast';
-import SchematicFilterBar from '../components/SchematicFilterBar';
+import BrandSelector from '../components/BrandSelector';
+import ToolSelector from '../components/ToolSelector';
 import { loadProducts } from '../data/products';
 import '../styles/mobile-schematic.css';
 import schematic13Data from '../../schematics/brands/TapeTech/products/13TT_SCH_hotspots/schematic_data.json';
@@ -17,11 +18,24 @@ import schematicPAHC10Data from '../../schematics/brands/TapeTech/products/PAHC1
 import schematicPAHC10Img from '../../schematics/brands/TapeTech/products/PAHC10_SCH_v2_hotspots/images/page_1.png';
 
 export default function Parts() {
+  // Allowed brands to display
+  const ALLOWED_BRANDS = [
+    'TapeTech',
+    'Columbia Taping Tools',
+    'Asgard',
+    'SurPro',
+    'Spray King',
+    'Graco'
+  ];
+
+  // Selection flow state
+  const [selectedBrand, setSelectedBrand] = useState(null);
+  const [selectedSchematic, setSelectedSchematic] = useState(null);
+  
+  // Schematic viewer state
   const [activeHotspot, setActiveHotspot] = useState(null);
   const [activeHotspotPart, setActiveHotspotPart] = useState(null);
-  const [selectedBrand, setSelectedBrand] = useState('TapeTech');
   const [selectedProduct, setSelectedProduct] = useState(null);
-  const [selectedSchematic, setSelectedSchematic] = useState('tapetech-13tt');
   const [toast, setToast] = useState(null);
   const [products, setProducts] = useState([]);
   const [brands, setBrands] = useState([]);
@@ -45,12 +59,10 @@ export default function Parts() {
   useEffect(() => {
     loadProducts().then(prods => {
       setProducts(prods);
-      // Extract unique brands
+      // Extract unique brands and filter to only allowed brands
       const uniqueBrands = [...new Set(prods.map(p => p.brand).filter(Boolean))].sort();
-      setBrands(uniqueBrands);
-      
-      // Auto-select TapeTech brand
-      setSelectedBrand('TapeTech');
+      const filteredBrands = uniqueBrands.filter(brand => ALLOWED_BRANDS.includes(brand));
+      setBrands(filteredBrands);
     });
   }, []);
 
@@ -173,7 +185,7 @@ export default function Parts() {
   const schematics = [
     {
       id: 'tapetech-13tt',
-        title: 'TapeTech 13TT Schematic',
+        title: '13TT',
         description: 'Interactive schematic for TapeTech 13TT with hotspots',
         brand: 'TapeTech',
         productPartNumber: null,
@@ -186,8 +198,8 @@ export default function Parts() {
       },
       {
         id: 'tapetech-88ttr',
-          title: 'TapeTech 88TTR Schematic',
-          description: 'Interactive schematic for TapeTech 88TTR (multi-page). Use the pager to switch diagram pages.',
+          title: '88TTR',
+          description: 'Interactive schematic for TapeTech 88TTR (multi-page). Use the pager to switch diagram pages',
           brand: 'TapeTech',
           productPartNumber: null,
           diagramPages: schematic88Data.diagramPages || [2],
@@ -200,7 +212,7 @@ export default function Parts() {
         },
     {
       id: 'tapetech-73tt',
-      title: 'TapeTech 73TT Schematic',
+      title: '73TT',
       description: 'Interactive schematic for TapeTech 73TT (hotspots & parts)',
       brand: 'TapeTech',
       productPartNumber: null,
@@ -212,7 +224,7 @@ export default function Parts() {
     },
     {
       id: 'tapetech-pahc10-v2',
-      title: 'TapeTech PAHC10 Schematic v2',
+      title: 'PAHC10 v2',
       description: 'Interactive schematic for TapeTech PAHC10 (v2) - hotspots & parts',
       brand: 'TapeTech',
       productPartNumber: null,
@@ -224,7 +236,7 @@ export default function Parts() {
     },
     {
       id: 'tapetech-nail-spotter-2',
-      title: 'TapeTech 2" Nail Spotter',
+      title: '2" Nail Spotter',
       description: 'Professional 2" EasyClean Nail Spotter - Model NS02TT',
       brand: 'TapeTech',
       productPartNumber: 'NS02TT',
@@ -236,7 +248,7 @@ export default function Parts() {
     },
     {
       id: 'tapetech-corner-finisher-t5',
-      title: 'TapeTech T5 Corner Finisher',
+      title: 'T5 Corner Finisher',
       description: 'Precision Corner Finisher Assembly - Model T05CF (Main Components)',
       brand: 'TapeTech',
       productPartNumber: 'T05CF',
@@ -356,7 +368,7 @@ export default function Parts() {
           <rect x="150" y="150" width="500" height="100" rx="15" stroke="var(--alloy-edge)" fill="none" strokeWidth="2"/>
           <circle cx="200" cy="250" r="20" stroke="var(--alloy-edge)" fill="none" strokeWidth="2"/>
           <circle cx="600" cy="250" r="20" stroke="var(--alloy-edge)" fill="none" strokeWidth="2"/>
-          <line x1="350" y1="150" x2="450" y2="150" stroke="var(--alloy-edge)" strokeWidth="3"/>
+          <line x1="350" y1="150" x2="450" y2="150" stroke="var(--tension-accent)" strokeWidth="2"/>
         </svg>
       )
     },
@@ -424,11 +436,14 @@ export default function Parts() {
     }
   ];
 
+  // Filter schematics to only include tools from allowed brands
+  const allowedSchematics = schematics.filter(s => !s.brand || ALLOWED_BRANDS.includes(s.brand));
+
   // Get products filtered by selected brand
   const filteredProducts = products.filter(p => p.brand === selectedBrand);
   
   // Filter schematics by selected brand and product
-  const filteredSchematics = schematics.filter(schematic => {
+  const filteredSchematics = allowedSchematics.filter(schematic => {
     // If brand selected, only show schematics for that brand
     if (selectedBrand && schematic.brand !== selectedBrand) {
       return false;
@@ -441,7 +456,7 @@ export default function Parts() {
     return true;
   });
 
-  const currentSchematic = schematics.find(s => s.id === selectedSchematic);
+  const currentSchematic = allowedSchematics.find(s => s.id === selectedSchematic);
   const [currentPage, setCurrentPage] = useState(1);
 
   // When schematic changes we reset the page in the schematic selector's onChange handler below.
@@ -696,86 +711,96 @@ export default function Parts() {
       className={`section-enter ${isFullscreen ? 'fullscreen-mode' : ''}`}
       onClick={closeModal}
     >
-      <div style={{
-        maxWidth: isFullscreen ? '100%' : '1400px',
-        margin: '0 auto',
-        padding: isFullscreen ? '0' : undefined
-      }}
-      onClick={(e) => e.stopPropagation()}
-      >
-        {/* Header */}
-        {!isFullscreen && (
-          <div style={{ marginBottom: '40px', textAlign: 'center' }}>
-            <h2 style={{ 
-              fontSize: 'clamp(1.5rem, 5vw, 3rem)', 
-              marginBottom: '16px',
-              letterSpacing: '-0.02em'
-            }}>
-              INTERACTIVE SCHEMATIC VIEWER
-            </h2>
-          </div>
-        )}
-
-        {/* Interactive Viewer */}
-        {currentSchematic && (
-          <div>
-            <div 
-              className="schematic-title-container"
-              style={{
-                marginBottom: '12px',
-                padding: '8px 16px',
-                background: 'var(--surface-glass)',
-                backdropFilter: 'blur(12px)',
-                border: '1px solid var(--alloy-edge)',
-                borderRadius: '8px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '16px',
-                flexWrap: 'nowrap',
-                position: 'relative',
-                zIndex: 9999
-              }}>
-              <h3 style={{ 
-                fontSize: '1.1rem',
+      {/* Show BrandSelector if no brand selected */}
+      {!selectedBrand ? (
+        <BrandSelector
+          brands={brands}
+          onSelectBrand={(brand) => {
+            setSelectedBrand(brand);
+            setSelectedSchematic(null);
+          }}
+        />
+      ) : !selectedSchematic ? (
+        /* Show ToolSelector if brand selected but no schematic */
+        <ToolSelector
+          brand={selectedBrand}
+          tools={allowedSchematics.filter(s => s.brand === selectedBrand)}
+          onSelectTool={(tool) => {
+            setSelectedSchematic(tool.id);
+            const s = allowedSchematics.find(sch => sch.id === tool.id);
+            const firstPage = (s && s.diagramPages && s.diagramPages[0]) || 1;
+            setCurrentPage(firstPage);
+          }}
+          onBack={() => {
+            setSelectedBrand(null);
+            setSelectedSchematic(null);
+          }}
+        />
+      ) : (
+        /* Show Schematic Viewer if schematic selected */
+        <div style={{
+          maxWidth: isFullscreen ? '100%' : '1400px',
+          margin: '0 auto',
+          padding: isFullscreen ? '0' : undefined
+        }}
+        onClick={(e) => e.stopPropagation()}
+        >
+          {/* Back Button & Header */}
+          {!isFullscreen && (
+            <div style={{ marginBottom: '40px' }}>
+              <button
+                onClick={() => {
+                  setSelectedSchematic(null);
+                  setScale(1);
+                  setPosition({ x: 0, y: 0 });
+                }}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  background: 'none',
+                  border: 'none',
+                  padding: '8px 12px',
+                  color: 'var(--text-primary)',
+                  cursor: 'pointer',
+                  fontSize: '0.95rem',
+                  fontWeight: 600,
+                  marginBottom: '24px',
+                  transition: 'all 0.3s ease-out',
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.color = 'var(--tension-accent)';
+                  e.target.style.transform = 'translateX(-4px)';
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.color = 'var(--text-primary)';
+                  e.target.style.transform = 'translateX(0)';
+                }}
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M19 12H5M12 19l-7-7 7-7" />
+                </svg>
+                <span>Back to Tools</span>
+              </button>
+              <h2 style={{ 
+                fontSize: 'clamp(1.5rem, 5vw, 3rem)', 
+                marginBottom: '16px',
+                letterSpacing: '-0.02em',
                 margin: 0,
-                letterSpacing: '-0.01em',
-                color: 'var(--tension-accent)',
-                flex: '0 0 auto',
-                whiteSpace: 'nowrap'
+                textAlign: 'center'
               }}>
-                {currentSchematic.title}
-              </h3>
-
-              {/* Filter bar positioned inline on the right */}
-              <SchematicFilterBar
-                brands={brands}
-                selectedBrand={selectedBrand}
-                onBrandChange={(brand) => {
-                  setSelectedBrand(brand);
-                  setSelectedProduct(null);
-                }}
-                products={filteredProducts}
-                selectedProduct={selectedProduct}
-                onProductChange={setSelectedProduct}
-                schematics={filteredSchematics}
-                selectedSchematic={selectedSchematic}
-                onSchematicChange={(schematicId) => {
-                  setSelectedSchematic(schematicId);
-                  const s = schematics.find(sch => sch.id === schematicId);
-                  const firstPage = (s && s.diagramPages && s.diagramPages[0]) || 1;
-                  setCurrentPage(firstPage);
-                }}
-              />
+                {currentSchematic?.title}
+              </h2>
             </div>
+          )}
 
-            {/* Page selector for multi-page schematics - positioned at top center */}
-            {currentSchematic && currentSchematic.diagramPages && currentSchematic.diagramPages.length > 1 && (
-              <div style={{ 
-                display: 'flex', 
-                justifyContent: 'center', 
-                marginBottom: '8px' 
-              }}>
+          {/* Page selector for multi-page schematics - positioned at top center */}
+          {currentSchematic.diagramPages && currentSchematic.diagramPages.length > 1 && (
+          <div style={{ 
+            display: 'flex', 
+            justifyContent: 'center', 
+            marginBottom: '8px' 
+          }}>
                 <div className="schematic-pager schematic-pager-top" role="group" aria-label="Schematic pages">
                   <button
                     className={`pager-pill ${currentSchematic.diagramPages.indexOf(currentPage) <= 0 ? 'disabled' : ''}`}
@@ -812,7 +837,7 @@ export default function Parts() {
                   </button>
                 </div>
               </div>
-            )}
+              )}
 
             {/* Mobile Zoom Controls */}
             <div className="mobile-zoom-controls">
@@ -977,13 +1002,10 @@ export default function Parts() {
                   </div>
                 </div>
               ))}
-              </div>
-
-              {/* Hotspots END */}
             </div>
           </div>
+        </div>
         )}
-      </div>
 
       {/* Mobile Part Modal Overlay — rendered outside the transform context */}
       {activeHotspotPart && (
