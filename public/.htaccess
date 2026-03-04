@@ -1,0 +1,7 @@
+# Disable directory listing
+Options -Indexes
+
+# Rewrite rules
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+</IfModule>
