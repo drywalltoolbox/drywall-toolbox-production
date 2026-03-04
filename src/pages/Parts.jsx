@@ -718,6 +718,7 @@ export default function Parts() {
           onSelectBrand={(brand) => {
             setSelectedBrand(brand);
             setSelectedSchematic(null);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
           }}
         />
       ) : !selectedSchematic ? (
