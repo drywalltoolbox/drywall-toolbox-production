@@ -84,7 +84,7 @@ export default function PartsDiagrams() {
               lineHeight: 1.1,
               filter: 'drop-shadow(0 0 12px rgba(255, 255, 255, 0.2))'
             }}>
-              PARTS<br />DIAGRAMS
+              PARTS
             </h2>
             <div style={{
               width: '60px',

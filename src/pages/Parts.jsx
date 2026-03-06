@@ -16,6 +16,7 @@ import schematic73Data from '../../schematics/brands/TapeTech/products/73TT_SCH_
 import schematic73Img from '../../schematics/brands/TapeTech/products/73TT_SCH_hotspots/images/page_2.png';
 import schematicPAHC10Data from '../../schematics/brands/TapeTech/products/PAHC10_SCH_v2_hotspots/schematic_data.json';
 import schematicPAHC10Img from '../../schematics/brands/TapeTech/products/PAHC10_SCH_v2_hotspots/images/page_1.png';
+import columbiaInsideCornerRollerImg from '../../schematics/brands/Columbia/InsideCornerRoller-2014_1_-enhanced-squared.png';
 
 export default function Parts() {
   // Allowed brands to display
@@ -24,7 +25,6 @@ export default function Parts() {
     'Columbia Taping Tools',
     'Asgard',
     'SurPro',
-    'Spray King',
     'Graco'
   ];
 
@@ -431,6 +431,49 @@ export default function Parts() {
           <line x1="350" y1="165" x2="450" y2="165" stroke="var(--tension-accent)" strokeWidth="2"/>
         </svg>
       )
+    },
+    {
+      id: 'columbia-inside-corner-roller',
+      title: 'Inside Corner Roller',
+      description: 'Professional inside corner roller for smooth corner finishing',
+      brand: 'Columbia Taping Tools',
+      productPartNumber: null,
+      diagramPages: [1],
+      imagePages: {
+        1: columbiaInsideCornerRollerImg
+      },
+      parts: [
+        {
+          id: '01',
+          name: 'Handle',
+          sku: 'ICR-001',
+          quantity: 1,
+          material: 'WOOD',
+          price: 18.50,
+          position: { top: '25%', left: '50%' },
+          pageNumber: 1
+        },
+        {
+          id: '02',
+          name: 'Roller Head Assembly',
+          sku: 'ICR-002',
+          quantity: 1,
+          material: 'ALUMINUM',
+          price: 42.00,
+          position: { top: '60%', left: '50%' },
+          pageNumber: 1
+        },
+        {
+          id: '03',
+          name: 'Wheel Insert',
+          sku: 'ICR-003',
+          quantity: 2,
+          material: 'POLYURETHANE',
+          price: 15.99,
+          position: { top: '75%', left: '45%' },
+          pageNumber: 1
+        }
+      ]
     }
   ];
 

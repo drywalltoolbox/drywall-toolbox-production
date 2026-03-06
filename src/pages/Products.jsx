@@ -30,7 +30,6 @@ const ALLOWED_BRANDS = [
   'Columbia Taping Tools',
   'Asgard',
   'SurPro',
-  'Spray King',
   'Graco'
 ];
 

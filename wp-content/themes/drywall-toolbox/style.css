@@ -88,7 +88,7 @@ body {
     margin-bottom: 0;
     position: relative;
     z-index: 10;
-    padding: 0;
+    padding: 2rem 0 0 0;
     overflow: hidden;
 }
 
@@ -380,7 +380,7 @@ body {
 /* Tablet & Desktop (768px and above) */
 @media (min-width: 768px) {
     .container {
-        padding: 2rem;
+        padding: 4rem 2rem 2rem 2rem;
         gap: 2rem;
     }
 
