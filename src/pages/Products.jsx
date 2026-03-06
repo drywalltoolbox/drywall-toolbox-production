@@ -13,6 +13,11 @@ import {
   ChevronDown,
   ArrowLeft
 } from 'lucide-react';
+import tapeTechLogo from '/brands/TapeTech/tapetech_logo.svg';
+import columbiaLogo from '/brands/Columbia/columbia_taping_tools_logo.svg';
+import surproLogo from '/brands/SurPro/surpro_logo.svg';
+import asgardLogo from '/brands/Asgard/asgard_logo.svg';
+import gracoLogo from '/brands/Graco/graco_logo.svg';
 
 // products will be loaded from CSV at runtime
 // brands list will be derived from loaded products
@@ -34,6 +39,14 @@ const ALLOWED_BRANDS = [
 ];
 
 const MAX_PRICE = 3000;
+
+const brandLogos = {
+  'TapeTech': tapeTechLogo,
+  'Columbia Taping Tools': columbiaLogo,
+  'SurPro': surproLogo,
+  'Asgard': asgardLogo,
+  'Graco': gracoLogo
+};
 
 export default function Products() {
   const location = useLocation();
@@ -201,7 +214,7 @@ export default function Products() {
         </div>
 
         {selectedBrands.length === 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
             {brands.map(brand => (
               <button
                 key={brand}
@@ -209,10 +222,13 @@ export default function Products() {
                   navigate(`/products?brand=${encodeURIComponent(brand)}`);
                   setSelectedBrands([brand]);
                 }}
-                className="bg-white rounded-lg p-6 shadow-sm border border-gray-200 text-left hover:shadow-md transition"
+                className="bg-white rounded-lg p-4 sm:p-6 shadow-sm border border-gray-200 hover:shadow-md transition flex items-center justify-center aspect-square"
               >
-                <div className="text-lg font-semibold text-gray-900 mb-1">{brand}</div>
-                <div className="text-sm text-gray-500">View products</div>
+                <img 
+                  src={brandLogos[brand]} 
+                  alt={`${brand} logo`}
+                  className="h-16 sm:h-24 w-auto object-contain"
+                />
               </button>
             ))}
           </div>
