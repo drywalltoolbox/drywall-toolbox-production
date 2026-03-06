@@ -1,5 +1,4 @@
 import { Link } from 'react-router-dom';
-import schematicImg from '/15TT_SCH-1.png?url';
 
 export default function PartsDiagrams() {
   return (
@@ -13,53 +12,29 @@ export default function PartsDiagrams() {
           position: 'relative',
           width: '100%',
           aspectRatio: '16 / 9',
-          background: 'var(--alloy-mid)',
+          background: 'linear-gradient(135deg, rgba(30, 58, 138, 0.08) 0%, rgba(59, 130, 246, 0.06) 100%)',
+          backdropFilter: 'blur(40px)',
+          WebkitBackdropFilter: 'blur(40px)',
           borderRadius: '4px',
-          border: '1px solid var(--machined-border)',
+          border: '1px solid rgba(59, 130, 246, 0.15)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
           overflow: 'hidden',
           cursor: 'pointer',
           transition: 'all 0.3s var(--ease-tension)',
-          boxShadow: '0 1px 3px rgba(0,0,0,0.05)'
+          boxShadow: '0 8px 32px rgba(59, 130, 246, 0.08)'
         }}
         className="parts-hero"
         onMouseEnter={(e) => {
           e.currentTarget.style.transform = 'scale(1.02)';
-          e.currentTarget.style.boxShadow = '0 12px 24px rgba(0,0,0,0.1)';
+          e.currentTarget.style.boxShadow = '0 16px 48px rgba(59, 130, 246, 0.12)';
         }}
         onMouseLeave={(e) => {
           e.currentTarget.style.transform = 'scale(1)';
-          e.currentTarget.style.boxShadow = '0 1px 3px rgba(0,0,0,0.05)';
+          e.currentTarget.style.boxShadow = '0 8px 32px rgba(59, 130, 246, 0.08)';
         }}
         >
-          {/* Blueprint background with subtle blur */}
-          <img
-            src={schematicImg}
-            alt="Parts Diagrams Background"
-            style={{
-              position: 'absolute',
-              inset: 0,
-              width: '100%',
-              height: '100%',
-              objectFit: 'cover',
-              objectPosition: 'center',
-              filter: 'blur(1.5px) opacity(0.6)',
-              WebkitFilter: 'blur(1.5px) opacity(0.6)'
-            }}
-          />
-          
-          {/* Overlay to enhance text visibility */}
-          <div
-            style={{
-              position: 'absolute',
-              inset: 0,
-              background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.3) 0%, rgba(15, 23, 42, 0.2) 100%)',
-              pointerEvents: 'none'
-            }}
-          />
-          
           {/* Centered text content */}
           <div
             style={{
@@ -80,18 +55,15 @@ export default function PartsDiagrams() {
               textTransform: 'uppercase',
               letterSpacing: '0.08em',
               fontWeight: 800,
-              textShadow: '0 0 25px rgba(255, 255, 255, 0.25), 0 0 15px rgba(255, 255, 255, 0.15), 0 4px 12px rgba(0,0,0,0.3)',
-              lineHeight: 1.1,
-              filter: 'drop-shadow(0 0 12px rgba(255, 255, 255, 0.2))'
+              lineHeight: 1.1
             }}>
               PARTS
             </h2>
             <div style={{
               width: '60px',
               height: '3px',
-              background: 'rgba(255, 255, 255, 0.6)',
-              borderRadius: '2px',
-              boxShadow: '0 2px 8px rgba(0,0,0,0.2)'
+              background: 'rgba(59, 130, 246, 0.4)',
+              borderRadius: '2px'
             }} />
           </div>
         </div>
