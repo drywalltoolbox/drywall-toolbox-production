@@ -819,7 +819,7 @@ export default function Parts() {
         <div>
           {/* Top Back Button - Positioned in top left */}
           <div style={{
-            padding: '60px 20px 0 20px',
+            padding: '20px 20px 0 20px',
           }}>
             <button
               className="back-button"
