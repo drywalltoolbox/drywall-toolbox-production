@@ -689,14 +689,20 @@
 
         <div class="upload-section" id="upload-section">
             <div class="upload-area">
-                <div class="upload-box" onclick="document.getElementById('pdf-input').click()">
+                <div class="upload-box" onclick="document.getElementById('pdf-input').click()" id="pdf-upload-box">
                     <div class="upload-icon">📄</div>
                     <h3>Upload Schematic PDF</h3>
                     <p>Will auto-detect diagram and legend pages</p>
                     <input type="file" id="pdf-input" accept=".pdf" onchange="handlePDFUpload(event)">
                 </div>
+                <div class="upload-box" onclick="document.getElementById('image-input').click()" id="image-upload-box">
+                    <div class="upload-icon">🖼️</div>
+                    <h3>Upload Image Schematic</h3>
+                    <p>PNG, JPG, or other image formats</p>
+                    <input type="file" id="image-input" accept=".png,.jpg,.jpeg,.gif,.bmp,.webp" onchange="handleImageUpload(event)">
+                </div>
                 <div style="display: flex; flex-direction: column; gap: 10px;">
-                    <button class="btn" id="process-btn" onclick="processPDF()" disabled>Analyze PDF</button>
+                    <button class="btn" id="process-btn" onclick="processUploadedFile()" disabled>Analyze File</button>
                     <button class="btn danger" onclick="location.reload()">Reset</button>
                 </div>
             </div>
@@ -966,6 +972,8 @@
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
         let pdfFile = null;
+        let uploadedFile = null;
+        let fileType = null; // 'pdf' or 'image'
         let pdfDoc = null;
         let pageData = [];
         let schematics = [];
@@ -1093,8 +1101,100 @@
             const file = event.target.files[0];
             if (file && file.type === 'application/pdf') {
                 pdfFile = file;
+                uploadedFile = file;
+                fileType = 'pdf';
+                document.getElementById('pdf-upload-box').classList.add('active');
+                document.getElementById('image-upload-box').classList.remove('active');
                 document.getElementById('process-btn').disabled = false;
                 log('PDF selected: ' + file.name);
+            } else {
+                log('ERROR: Please select a valid PDF file');
+                document.getElementById('process-btn').disabled = true;
+            }
+        }
+
+        async function handleImageUpload(event) {
+            const file = event.target.files[0];
+            const validImageTypes = ['image/png', 'image/jpeg', 'image/gif', 'image/bmp', 'image/webp'];
+            
+            if (file && validImageTypes.includes(file.type)) {
+                uploadedFile = file;
+                fileType = 'image';
+                document.getElementById('image-upload-box').classList.add('active');
+                document.getElementById('pdf-upload-box').classList.remove('active');
+                document.getElementById('process-btn').disabled = false;
+                log('Image selected: ' + file.name + ' (' + file.type + ')');
+            } else {
+                log('ERROR: Please select a valid image file (PNG, JPG, GIF, BMP, WebP)');
+                document.getElementById('process-btn').disabled = true;
+            }
+        }
+
+        async function processUploadedFile() {
+            if (!uploadedFile || !fileType) {
+                alert('Please select a file first');
+                return;
+            }
+
+            if (fileType === 'pdf') {
+                await processPDF();
+            } else if (fileType === 'image') {
+                await processImage();
+            }
+        }
+
+        async function processImage() {
+            document.getElementById('upload-section').style.display = 'none';
+            document.getElementById('loading').classList.add('active');
+            
+            try {
+                log('Loading image...');
+                const reader = new FileReader();
+                
+                reader.onload = async (e) => {
+                    try {
+                        const imageDataUrl = e.target.result;
+                        
+                        // Create image element to get dimensions
+                        const img = new Image();
+                        img.onload = async () => {
+                            log(`Image loaded: ${img.width}x${img.height}px`);
+                            
+                            // For single image, create one page
+                            pageData = [{
+                                pageNum: 1,
+                                text: '',  // No text extraction from images
+                                image: imageDataUrl,
+                                thumbnail: imageDataUrl,
+                                type: 'diagram'  // Default to diagram for images
+                            }];
+                            
+                            log('Image ready for hotspot mapping');
+                            showPageConfiguration();
+                        };
+                        
+                        img.onerror = () => {
+                            log('ERROR: Failed to load image');
+                            alert('Error: Failed to load image');
+                            document.getElementById('loading').classList.remove('active');
+                            document.getElementById('upload-section').style.display = 'block';
+                        };
+                        
+                        img.src = imageDataUrl;
+                    } catch (error) {
+                        log('ERROR: ' + error.message);
+                        alert('Error: ' + error.message);
+                        document.getElementById('loading').classList.remove('active');
+                        document.getElementById('upload-section').style.display = 'block';
+                    }
+                };
+                
+                reader.readAsDataURL(uploadedFile);
+            } catch (error) {
+                log('ERROR: ' + error.message);
+                alert('Error: ' + error.message);
+                document.getElementById('loading').classList.remove('active');
+                document.getElementById('upload-section').style.display = 'block';
             }
         }
 
@@ -1104,7 +1204,7 @@
             
             try {
                 log('Loading PDF...');
-                const arrayBuffer = await pdfFile.arrayBuffer();
+                const arrayBuffer = await uploadedFile.arrayBuffer();
                 pdfDoc = await pdfjsLib.getDocument({data: arrayBuffer}).promise;
                 log(`PDF loaded: ${pdfDoc.numPages} pages`);
 

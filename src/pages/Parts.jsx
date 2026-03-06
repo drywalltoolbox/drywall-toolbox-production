@@ -16,6 +16,8 @@ import schematic73Data from '../../schematics/brands/TapeTech/products/73TT_SCH_
 import schematic73Img from '../../schematics/brands/TapeTech/products/73TT_SCH_hotspots/images/page_2.png';
 import schematicPAHC10Data from '../../schematics/brands/TapeTech/products/PAHC10_SCH_v2_hotspots/schematic_data.json';
 import schematicPAHC10Img from '../../schematics/brands/TapeTech/products/PAHC10_SCH_v2_hotspots/images/page_1.png';
+import columbiaInsideCornerRollerData from '../../schematics/brands/Columbia/InsideCornerRoller/schematic_data.json';
+import columbiaMatrixBoxHandleData from '../../schematics/brands/Columbia/MatrixBoxHandle/schematic_data.json';
 
 const columbiaInsideCornerRollerImg = '/drywall-toolbox/brands/Columbia/Schematics/InsideCornerRoller/InsideCornerRoller-2014_1_-enhanced-squared.png';
 const columbiaMatrixBoxHandleImg = '/drywall-toolbox/brands/Columbia/Schematics/MatrixBoxHandle/Matrix_Handle-enhanced-square.png';
@@ -194,6 +196,58 @@ export default function Parts() {
       rotation: c && c.rotation ? c.rotation : 0
     };
   }) : [];
+  // Build Columbia Inside Corner Roller schematic parts from JSON data
+  const columbiaParts = (columbiaInsideCornerRollerData && columbiaInsideCornerRollerData.parts) ? columbiaInsideCornerRollerData.parts.map((p) => {
+    const coords = columbiaInsideCornerRollerData.coordinates || {};
+    const c = coords[p.id] || coords[String(Number(p.id))] || null;
+    // Use percentage-based positioning directly from JSON (already in percentage format)
+    const top = c && c.top !== undefined ? `${c.top}%` : '50%';
+    const left = c && c.left !== undefined ? `${c.left}%` : '50%';
+    const pageNumber = c && c.pageNumber ? c.pageNumber : (columbiaInsideCornerRollerData.diagramPages && columbiaInsideCornerRollerData.diagramPages[0]) || 1;
+    return {
+      id: p.id,
+      name: p.name,
+      sku: p.sku || p.SKU || '',
+      quantity: p.quantity || 1,
+      material: p.material || 'UNKNOWN',
+      price: p.price || 0,
+      position: { top, left },
+      pageNumber,
+      shape: c && c.shape ? c.shape : 'circle',
+      width: c && c.width ? c.width : null,
+      height: c && c.height ? c.height : null,
+      widthPx: c && c.widthPx ? c.widthPx : null,
+      heightPx: c && c.heightPx ? c.heightPx : null,
+      rotation: c && c.rotation ? c.rotation : 0
+    };
+  }) : [];
+
+  // Build Columbia Matrix Box Handle schematic parts from JSON data
+  const matrixBoxHandleParts = (columbiaMatrixBoxHandleData && columbiaMatrixBoxHandleData.parts) ? columbiaMatrixBoxHandleData.parts.map((p) => {
+    const coords = columbiaMatrixBoxHandleData.coordinates || {};
+    const c = coords[p.id] || coords[String(Number(p.id))] || null;
+    // Use percentage-based positioning directly from JSON (already in percentage format)
+    const top = c && c.top !== undefined ? `${c.top}%` : '50%';
+    const left = c && c.left !== undefined ? `${c.left}%` : '50%';
+    const pageNumber = c && c.pageNumber ? c.pageNumber : (columbiaMatrixBoxHandleData.diagramPages && columbiaMatrixBoxHandleData.diagramPages[0]) || 1;
+    return {
+      id: p.id,
+      name: p.name,
+      sku: p.sku || p.SKU || '',
+      quantity: p.quantity || 1,
+      material: p.material || 'UNKNOWN',
+      price: p.price || 0,
+      position: { top, left },
+      pageNumber,
+      shape: c && c.shape ? c.shape : 'circle',
+      width: c && c.width ? c.width : null,
+      height: c && c.height ? c.height : null,
+      widthPx: c && c.widthPx ? c.widthPx : null,
+      heightPx: c && c.heightPx ? c.heightPx : null,
+      rotation: c && c.rotation ? c.rotation : 0
+    };
+  }) : [];
+
   const schematics = [
     {
       id: 'tapetech-13tt',
@@ -452,42 +506,11 @@ export default function Parts() {
       description: 'Professional inside corner roller for smooth corner finishing',
       brand: 'Columbia Taping Tools',
       productPartNumber: null,
-      diagramPages: [1],
+      diagramPages: columbiaInsideCornerRollerData.diagramPages || [1],
       imagePages: {
-        1: columbiaInsideCornerRollerImg
+        [columbiaInsideCornerRollerData.diagramPages ? columbiaInsideCornerRollerData.diagramPages[0] : 1]: columbiaInsideCornerRollerImg
       },
-      parts: [
-        {
-          id: '01',
-          name: 'Handle',
-          sku: 'ICR-001',
-          quantity: 1,
-          material: 'WOOD',
-          price: 18.50,
-          position: { top: '25%', left: '50%' },
-          pageNumber: 1
-        },
-        {
-          id: '02',
-          name: 'Roller Head Assembly',
-          sku: 'ICR-002',
-          quantity: 1,
-          material: 'ALUMINUM',
-          price: 42.00,
-          position: { top: '60%', left: '50%' },
-          pageNumber: 1
-        },
-        {
-          id: '03',
-          name: 'Wheel Insert',
-          sku: 'ICR-003',
-          quantity: 2,
-          material: 'POLYURETHANE',
-          price: 15.99,
-          position: { top: '75%', left: '45%' },
-          pageNumber: 1
-        }
-      ]
+      parts: columbiaParts
     },
     {
       id: 'columbia-matrix-box-handle',
@@ -495,42 +518,11 @@ export default function Parts() {
       description: 'Professional matrix box handle for mud application',
       brand: 'Columbia Taping Tools',
       productPartNumber: null,
-      diagramPages: [1],
+      diagramPages: columbiaMatrixBoxHandleData.diagramPages || [1],
       imagePages: {
-        1: columbiaMatrixBoxHandleImg
+        [columbiaMatrixBoxHandleData.diagramPages ? columbiaMatrixBoxHandleData.diagramPages[0] : 1]: columbiaMatrixBoxHandleImg
       },
-      parts: [
-        {
-          id: '01',
-          name: 'Main Handle',
-          sku: 'MBH-001',
-          quantity: 1,
-          material: 'WOOD',
-          price: 22.00,
-          position: { top: '25%', left: '50%' },
-          pageNumber: 1
-        },
-        {
-          id: '02',
-          name: 'Handle Bracket',
-          sku: 'MBH-002',
-          quantity: 1,
-          material: 'ALUMINUM',
-          price: 35.50,
-          position: { top: '50%', left: '50%' },
-          pageNumber: 1
-        },
-        {
-          id: '03',
-          name: 'Grip Pad',
-          sku: 'MBH-003',
-          quantity: 1,
-          material: 'RUBBER',
-          price: 8.99,
-          position: { top: '70%', left: '50%' },
-          pageNumber: 1
-        }
-      ]
+      parts: matrixBoxHandleParts
     }
   ];
 
@@ -816,10 +808,17 @@ export default function Parts() {
         />
       ) : (
         /* Show Schematic Viewer if schematic selected */
-        <div>
+        <div style={{
+          display: 'flex',
+          flexDirection: 'column',
+          minHeight: '100vh',
+          width: '100%',
+          overflow: 'hidden'
+        }}>
           {/* Top Back Button - Positioned in top left */}
           <div style={{
             padding: '20px 20px 0 20px',
+            flexShrink: 0
           }}>
             <button
               className="back-button"
@@ -837,16 +836,26 @@ export default function Parts() {
             </button>
           </div>
 
-          {/* Schematic Container */}
+          {/* Schematic Container Wrapper - Allows flex growth */}
           <div style={{
             maxWidth: isFullscreen ? '100%' : '1400px',
             margin: '0 auto',
-            padding: isFullscreen ? '0' : undefined
+            padding: isFullscreen ? '0' : undefined,
+            width: '100%',
+            display: 'flex',
+            flexDirection: 'column',
+            flex: 1,
+            minHeight: 0
           }}
           onClick={(e) => e.stopPropagation()}
           >
           {/* Brand & Title Header */}
-          <div style={{ marginBottom: '40px', textAlign: 'center' }}>
+          <div style={{ 
+            marginBottom: '40px', 
+            textAlign: 'center',
+            flexShrink: 0,
+            padding: '20px'
+          }}>
             <h3 style={{ 
               fontSize: 'clamp(1rem, 3vw, 1.5rem)', 
               margin: '0 0 8px 0',
@@ -871,7 +880,8 @@ export default function Parts() {
           <div style={{ 
             display: 'flex', 
             justifyContent: 'center', 
-            marginBottom: '8px' 
+            marginBottom: '8px',
+            flexShrink: 0
           }}>
                 <div className="schematic-pager schematic-pager-top" role="group" aria-label="Schematic pages">
                   <button
@@ -940,23 +950,31 @@ export default function Parts() {
               ref={schematicContainerRef}
               onWheel={handleWheel}
               style={{
-                overflow: scale > 1 ? 'hidden' : 'visible',
+                overflow: 'hidden',
                 touchAction: scale > 1 ? 'none' : 'auto',
                 cursor: scale > 1 ? (isPanning ? 'grabbing' : 'grab') : 'default',
                 WebkitUserSelect: 'none',
                 userSelect: 'none',
                 position: 'relative',
                 willChange: scale > 1 ? 'transform' : 'auto',
+                flex: 1,
+                minHeight: 0,
+                display: 'flex',
+                flexDirection: 'column'
               }}
             >
               <div 
                 ref={schematicImageRef}
                 style={{ 
                   position: 'relative', 
-                  display: 'inline-block', 
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'flex-start',
                   width: '100%',
+                  aspectRatio: '1 / 1',
+                  flex: 'none',
                   transform: `scale(${scale}) translate(${position.x / scale}px, ${position.y / scale}px)`,
-                  transformOrigin: 'center center',
+                  transformOrigin: 'center top',
                   transition: isPanning ? 'none' : 'transform 0.3s ease-out',
                   WebkitUserSelect: 'none',
                   userSelect: 'none',
@@ -970,7 +988,8 @@ export default function Parts() {
                     alt={currentSchematic.title}
                     style={{ 
                       width: '100%', 
-                      height: 'auto', 
+                      height: 'auto',
+                      aspectRatio: '1 / 1',
                       display: 'block', 
                       pointerEvents: 'none',
                       imageRendering: 'auto',
@@ -997,10 +1016,13 @@ export default function Parts() {
                       transform: part.rotation ? `translate(-50%, -50%) rotate(${part.rotation}deg)` : 'translate(-50%, -50%)',
                       zIndex: activeHotspot === part.id ? 1001 : 100,
                       pointerEvents: 'auto',
-                      ...(part.width && part.height ? {
+                      ...(part.widthPx && part.heightPx ? {
+                        width: `${part.widthPx}px`,
+                        height: `${part.heightPx}px`
+                      } : (part.width && part.height ? {
                         width: `${part.width}%`,
                         height: `${part.height}%`
-                      } : {})
+                      } : {}))
                     }}
                     onClick={(e) => {
                       e.stopPropagation();
