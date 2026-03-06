@@ -16,9 +16,10 @@ import schematic73Data from '../../schematics/brands/TapeTech/products/73TT_SCH_
 import schematic73Img from '../../schematics/brands/TapeTech/products/73TT_SCH_hotspots/images/page_2.png';
 import schematicPAHC10Data from '../../schematics/brands/TapeTech/products/PAHC10_SCH_v2_hotspots/schematic_data.json';
 import schematicPAHC10Img from '../../schematics/brands/TapeTech/products/PAHC10_SCH_v2_hotspots/images/page_1.png';
+import schematicBoxHandleData from '../../schematics/brands/TapeTech/products/Box_Handle/schematic_data.json';
+import schematicBoxHandleImg from '../../public/brands/TapeTech/BoxHandle/BH_SCH-enhanced1.png';
 import columbiaInsideCornerRollerData from '../../schematics/brands/Columbia/InsideCornerRoller/schematic_data.json';
 import columbiaMatrixBoxHandleData from '../../schematics/brands/Columbia/MatrixBoxHandle/schematic_data.json';
-
 const columbiaInsideCornerRollerImg = '/drywall-toolbox/brands/Columbia/Schematics/InsideCornerRoller/InsideCornerRoller-2014_1_-enhanced-squared.png';
 const columbiaMatrixBoxHandleImg = '/drywall-toolbox/brands/Columbia/Schematics/MatrixBoxHandle/Matrix_Handle-enhanced-square.png';
 
@@ -196,6 +197,30 @@ export default function Parts() {
       rotation: c && c.rotation ? c.rotation : 0
     };
   }) : [];
+
+  // Build TapeTech Box Handle schematic parts from JSON data
+  const schematicBoxHandleParts = (schematicBoxHandleData && schematicBoxHandleData.parts) ? schematicBoxHandleData.parts.map((p) => {
+    const coords = schematicBoxHandleData.coordinates || {};
+    const c = coords[p.id] || coords[String(Number(p.id))] || null;
+    const top = c && c.top !== undefined ? `${c.top}%` : '50%';
+    const left = c && c.left !== undefined ? `${c.left}%` : '50%';
+    const pageNumber = c && c.pageNumber ? c.pageNumber : (schematicBoxHandleData.diagramPages && schematicBoxHandleData.diagramPages[0]) || 1;
+    return {
+      id: p.id,
+      name: p.name,
+      sku: p.sku || p.SKU || '',
+      quantity: p.quantity || 1,
+      material: p.material || '',
+      price: p.price || 0,
+      position: { top, left },
+      pageNumber,
+      shape: c && c.shape ? c.shape : 'circle',
+      width: c && c.width ? c.width : null,
+      height: c && c.height ? c.height : null,
+      rotation: c && c.rotation ? c.rotation : 0
+    };
+  }) : [];
+
   // Build Columbia Inside Corner Roller schematic parts from JSON data
   const columbiaParts = (columbiaInsideCornerRollerData && columbiaInsideCornerRollerData.parts) ? columbiaInsideCornerRollerData.parts.map((p) => {
     const coords = columbiaInsideCornerRollerData.coordinates || {};
@@ -311,6 +336,18 @@ export default function Parts() {
         [schematicNS02Data.diagramPages ? schematicNS02Data.diagramPages[0] : 1]: schematicNS02Img
       },
       parts: schematicNS02Parts
+    },
+    {
+      id: 'tapetech-box-handle',
+      title: 'Box Handle',
+      description: 'TapeTech Box Handle Assembly - Complete schematic with all components',
+      brand: 'TapeTech',
+      productPartNumber: null,
+      diagramPages: schematicBoxHandleData.diagramPages || [1],
+      imagePages: {
+        [schematicBoxHandleData.diagramPages ? schematicBoxHandleData.diagramPages[0] : 1]: schematicBoxHandleImg
+      },
+      parts: schematicBoxHandleParts
     },
     {
       id: 'tapetech-corner-finisher-t5',

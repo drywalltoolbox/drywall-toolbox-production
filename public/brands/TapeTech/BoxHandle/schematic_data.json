@@ -1,0 +1,152 @@
+{
+  "id": "BH_SCH",
+  "title": "Box Handle",
+  "diagramPages": [
+    1
+  ],
+  "legendPages": [],
+  "parts": [
+    {
+      "id": "01",
+      "name": "Main Rod Assembly",
+      "sku": "192001",
+      "quantity": 1,
+      "material": "STEEL",
+      "price": 18.5
+    },
+    {
+      "id": "02",
+      "name": "Handle Grip/Sleeve",
+      "sku": "880060",
+      "quantity": 1,
+      "material": "RUBBER",
+      "price": 12
+    },
+    {
+      "id": "03",
+      "name": "Assembly instruction note regarding adhesive",
+      "sku": "No Loctite",
+      "quantity": 1,
+      "material": "STEEL",
+      "price": 10
+    },
+    {
+      "id": "04",
+      "name": "Knob Component",
+      "sku": "199013",
+      "quantity": 1,
+      "material": "PLASTIC",
+      "price": 5.5
+    },
+    {
+      "id": "05",
+      "name": "Screw Assembly",
+      "sku": "359005",
+      "quantity": 4,
+      "material": "STEEL",
+      "price": 2.5
+    },
+    {
+      "id": "06",
+      "name": "Fastener Pin",
+      "sku": "889062",
+      "quantity": 2,
+      "material": "STAINLESS-STEEL",
+      "price": 1.5
+    },
+    {
+      "id": "07",
+      "name": "Connector Joint",
+      "sku": "192003",
+      "quantity": 1,
+      "material": "STEEL",
+      "price": 8
+    },
+    {
+      "id": "08",
+      "name": "Pin/Dowel",
+      "sku": "192006",
+      "quantity": 1,
+      "material": "STAINLESS-STEEL",
+      "price": 3.5
+    },
+    {
+      "id": "09",
+      "name": "Base Plate",
+      "sku": "811018",
+      "quantity": 1,
+      "material": "ALUMINUM",
+      "price": 15
+    },
+    {
+      "id": "10",
+      "name": "Nut Component",
+      "sku": "199014",
+      "quantity": 2,
+      "material": "STEEL",
+      "price": 1
+    }
+  ],
+  "coordinates": {
+    "10": {
+      "top": 41.8,
+      "left": 14.89,
+      "pageNumber": 1,
+      "shape": "circle"
+    },
+    "01": {
+      "top": 6.84,
+      "left": 31.79,
+      "pageNumber": 1,
+      "shape": "circle"
+    },
+    "02": {
+      "top": 6.79,
+      "left": 44.17,
+      "pageNumber": 1,
+      "shape": "circle"
+    },
+    "03": {
+      "top": 24.95,
+      "left": 5.08,
+      "pageNumber": 1,
+      "shape": "circle"
+    },
+    "04": {
+      "top": 24.22,
+      "left": 5.13,
+      "pageNumber": 1,
+      "shape": "circle"
+    },
+    "05": {
+      "top": 24.22,
+      "left": 14.99,
+      "pageNumber": 1,
+      "shape": "circle"
+    },
+    "06": {
+      "top": 26.95,
+      "left": 5.2,
+      "pageNumber": 1,
+      "shape": "circle"
+    },
+    "07": {
+      "top": 26.07,
+      "left": 14.53,
+      "pageNumber": 1,
+      "shape": "circle"
+    },
+    "08": {
+      "top": 39.7,
+      "left": 1.17,
+      "pageNumber": 1,
+      "shape": "circle"
+    },
+    "09": {
+      "top": 39.7,
+      "left": 14.31,
+      "pageNumber": 1,
+      "shape": "circle"
+    }
+  }
+}
