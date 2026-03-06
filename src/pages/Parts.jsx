@@ -16,7 +16,9 @@ import schematic73Data from '../../schematics/brands/TapeTech/products/73TT_SCH_
 import schematic73Img from '../../schematics/brands/TapeTech/products/73TT_SCH_hotspots/images/page_2.png';
 import schematicPAHC10Data from '../../schematics/brands/TapeTech/products/PAHC10_SCH_v2_hotspots/schematic_data.json';
 import schematicPAHC10Img from '../../schematics/brands/TapeTech/products/PAHC10_SCH_v2_hotspots/images/page_1.png';
-import columbiaInsideCornerRollerImg from '../../schematics/brands/Columbia/InsideCornerRoller-2014_1_-enhanced-squared.png';
+
+const columbiaInsideCornerRollerImg = '/drywall-toolbox/brands/Columbia/Schematics/InsideCornerRoller/InsideCornerRoller-2014_1_-enhanced-squared.png';
+const columbiaMatrixBoxHandleImg = '/drywall-toolbox/brands/Columbia/Schematics/MatrixBoxHandle/Matrix_Handle-enhanced-square.png';
 
 export default function Parts() {
   // Allowed brands to display
@@ -474,6 +476,49 @@ export default function Parts() {
           pageNumber: 1
         }
       ]
+    },
+    {
+      id: 'columbia-matrix-box-handle',
+      title: 'Matrix Box Handle',
+      description: 'Professional matrix box handle for mud application',
+      brand: 'Columbia Taping Tools',
+      productPartNumber: null,
+      diagramPages: [1],
+      imagePages: {
+        1: columbiaMatrixBoxHandleImg
+      },
+      parts: [
+        {
+          id: '01',
+          name: 'Main Handle',
+          sku: 'MBH-001',
+          quantity: 1,
+          material: 'WOOD',
+          price: 22.00,
+          position: { top: '25%', left: '50%' },
+          pageNumber: 1
+        },
+        {
+          id: '02',
+          name: 'Handle Bracket',
+          sku: 'MBH-002',
+          quantity: 1,
+          material: 'ALUMINUM',
+          price: 35.50,
+          position: { top: '50%', left: '50%' },
+          pageNumber: 1
+        },
+        {
+          id: '03',
+          name: 'Grip Pad',
+          sku: 'MBH-003',
+          quantity: 1,
+          material: 'RUBBER',
+          price: 8.99,
+          position: { top: '70%', left: '50%' },
+          pageNumber: 1
+        }
+      ]
     }
   ];
 
@@ -764,71 +809,55 @@ export default function Parts() {
         />
       ) : (
         /* Show Schematic Viewer if schematic selected */
-        <div style={{
-          maxWidth: isFullscreen ? '100%' : '1400px',
-          margin: '0 auto',
-          padding: isFullscreen ? '0' : undefined
-        }}
-        onClick={(e) => e.stopPropagation()}
-        >
-          {/* Back Button & Header */}
-          {!isFullscreen && (
-            <div style={{ marginBottom: '40px' }}>
-              <button
-                onClick={() => {
-                  setSelectedSchematic(null);
-                  setScale(1);
-                  setPosition({ x: 0, y: 0 });
-                }}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '8px',
-                  background: 'none',
-                  border: 'none',
-                  padding: '8px 12px',
-                  color: 'var(--text-primary)',
-                  cursor: 'pointer',
-                  fontSize: '0.95rem',
-                  fontWeight: 600,
-                  marginBottom: '24px',
-                  transition: 'all 0.3s ease-out',
-                }}
-                onMouseEnter={(e) => {
-                  e.target.style.color = 'var(--tension-accent)';
-                  e.target.style.transform = 'translateX(-4px)';
-                }}
-                onMouseLeave={(e) => {
-                  e.target.style.color = 'var(--text-primary)';
-                  e.target.style.transform = 'translateX(0)';
-                }}
-              >
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M19 12H5M12 19l-7-7 7-7" />
-                </svg>
-                <span>Back to Tools</span>
-              </button>
-              <div style={{ textAlign: 'center' }}>
-                <h3 style={{ 
-                  fontSize: 'clamp(1rem, 3vw, 1.5rem)', 
-                  margin: '0 0 8px 0',
-                  letterSpacing: '-0.02em',
-                  color: 'var(--text-secondary)',
-                  fontWeight: 600
-                }}>
-                  {currentSchematic?.brand}
-                </h3>
-                <h2 style={{ 
-                  fontSize: 'clamp(1.5rem, 5vw, 3rem)', 
-                  margin: '0',
-                  letterSpacing: '-0.02em',
-                  textAlign: 'center'
-                }}>
-                  {currentSchematic?.title}
-                </h2>
-              </div>
-            </div>
-          )}
+        <div>
+          {/* Top Back Button - Positioned in top left */}
+          <div style={{
+            padding: '60px 20px 0 20px',
+          }}>
+            <button
+              className="back-button"
+              onClick={() => {
+                setSelectedSchematic(null);
+                setScale(1);
+                setPosition({ x: 0, y: 0 });
+              }}
+              aria-label="Back to Tools"
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M19 12H5M12 19l-7-7 7-7" />
+              </svg>
+              <span>Back</span>
+            </button>
+          </div>
+
+          {/* Schematic Container */}
+          <div style={{
+            maxWidth: isFullscreen ? '100%' : '1400px',
+            margin: '0 auto',
+            padding: isFullscreen ? '0' : undefined
+          }}
+          onClick={(e) => e.stopPropagation()}
+          >
+          {/* Brand & Title Header */}
+          <div style={{ marginBottom: '40px', textAlign: 'center' }}>
+            <h3 style={{ 
+              fontSize: 'clamp(1rem, 3vw, 1.5rem)', 
+              margin: '0 0 8px 0',
+              letterSpacing: '-0.02em',
+              color: 'var(--text-secondary)',
+              fontWeight: 600
+            }}>
+              {currentSchematic?.brand}
+            </h3>
+            <h2 style={{ 
+              fontSize: 'clamp(1.5rem, 5vw, 3rem)', 
+              margin: '0',
+              letterSpacing: '-0.02em',
+              textAlign: 'center'
+            }}>
+              {currentSchematic?.title}
+            </h2>
+          </div>
 
           {/* Page selector for multi-page parts diagrams - positioned at top center */}
           {currentSchematic.diagramPages && currentSchematic.diagramPages.length > 1 && (
@@ -1041,7 +1070,8 @@ export default function Parts() {
             </div>
           </div>
         </div>
-        )}
+        </div>
+      )}
 
       {/* Mobile Part Modal Overlay — rendered outside the transform context */}
       {activeHotspotPart && (

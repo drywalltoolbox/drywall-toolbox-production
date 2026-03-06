@@ -1,8 +1,6 @@
-import { useState } from 'react';
 import '../styles/tool-selector.css';
 
 export default function ToolSelector({ brand, tools, onSelectTool, onBack }) {
-  const [hoveredTool, setHoveredTool] = useState(null);
 
   return (
     <div className="tool-selector">
@@ -33,26 +31,32 @@ export default function ToolSelector({ brand, tools, onSelectTool, onBack }) {
             key={tool.id}
             className="tool-card"
             onClick={() => onSelectTool(tool)}
-            onMouseEnter={() => setHoveredTool(tool.id)}
-            onMouseLeave={() => setHoveredTool(null)}
           >
             <div className="tool-card-content">
               <div className="tool-image-placeholder">
-                <svg
-                  className="placeholder-icon"
-                  width="40"
-                  height="40"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="1.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <rect x="3" y="3" width="18" height="18" rx="2" />
-                  <circle cx="8.5" cy="8.5" r="1.5" />
-                  <path d="M21 15l-5-5L5 21" />
-                </svg>
+                {tool.imagePages && Object.keys(tool.imagePages).length > 0 ? (
+                  <img 
+                    src={tool.imagePages[Object.keys(tool.imagePages)[0]]} 
+                    alt={tool.title}
+                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                  />
+                ) : (
+                  <svg
+                    className="placeholder-icon"
+                    width="40"
+                    height="40"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <rect x="3" y="3" width="18" height="18" rx="2" />
+                    <circle cx="8.5" cy="8.5" r="1.5" />
+                    <path d="M21 15l-5-5L5 21" />
+                  </svg>
+                )}
               </div>
               <h3 className="tool-name">{tool.title}</h3>
             </div>
