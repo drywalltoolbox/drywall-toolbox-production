@@ -222,12 +222,39 @@ export default function Products() {
                   navigate(`/products?brand=${encodeURIComponent(brand)}`);
                   setSelectedBrands([brand]);
                 }}
-                className="bg-white rounded-lg p-4 sm:p-6 shadow-sm border border-gray-200 hover:shadow-md transition flex items-center justify-center aspect-square"
+                style={{
+                  background: 'white',
+                  borderRadius: '0.5rem',
+                  padding: 'clamp(1rem, 4vw, 1.5rem)',
+                  boxShadow: '0 1px 2px rgba(0,0,0,0.05)',
+                  border: '1px solid rgb(229, 231, 235)',
+                  transition: 'all 0.3s ease-out',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  aspectRatio: '1 / 1',
+                  cursor: 'pointer'
+                }}
+                className="brand-card-products"
+                onMouseEnter={(e) => {
+                  if (window.innerWidth > 768) {
+                    e.currentTarget.style.boxShadow = '0 4px 6px rgba(0,0,0,0.1)';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (window.innerWidth > 768) {
+                    e.currentTarget.style.boxShadow = '0 1px 2px rgba(0,0,0,0.05)';
+                  }
+                }}
               >
                 <img 
                   src={brandLogos[brand]} 
                   alt={`${brand} logo`}
-                  className="h-16 sm:h-24 w-auto object-contain"
+                  style={{
+                    height: 'clamp(4rem, 12vw, 6rem)',
+                    width: 'auto',
+                    objectFit: 'contain'
+                  }}
                 />
               </button>
             ))}

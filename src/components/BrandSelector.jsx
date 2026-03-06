@@ -70,14 +70,18 @@ export default function BrandSelector({ brands, onSelectBrand }) {
             }}
             className="brand-card-button"
             onMouseEnter={(e) => {
-              e.currentTarget.style.boxShadow = '0 12px 24px rgba(0,0,0,0.1)';
-              e.currentTarget.style.transform = 'translateY(-4px)';
-              e.currentTarget.style.borderColor = 'var(--tension-accent)';
+              if (window.innerWidth > 768) {
+                e.currentTarget.style.boxShadow = '0 12px 24px rgba(0,0,0,0.1)';
+                e.currentTarget.style.transform = 'translateY(-4px)';
+                e.currentTarget.style.borderColor = 'var(--tension-accent)';
+              }
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.boxShadow = 'none';
-              e.currentTarget.style.transform = 'none';
-              e.currentTarget.style.borderColor = 'var(--machined-border)';
+              if (window.innerWidth > 768) {
+                e.currentTarget.style.boxShadow = 'none';
+                e.currentTarget.style.transform = 'none';
+                e.currentTarget.style.borderColor = 'var(--machined-border)';
+              }
             }}
           >
             <img 
