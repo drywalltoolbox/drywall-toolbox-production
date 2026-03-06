@@ -6,13 +6,7 @@
 
         <!-- Brand / Logo column (order 3 on mobile) -->
         <div class="footer-col footer-brand-col">
-            <a href="<?php echo esc_url( home_url( '/' ) ); ?>"
-               class="footer-logo-link"
-               aria-label="<?php esc_attr_e( 'Drywall Toolbox – Home', 'drywall-toolbox' ); ?>">
-                <img src="<?php echo esc_url( get_template_directory_uri() . '/logo2.svg' ); ?>"
-                     alt="<?php esc_attr_e( 'Drywall Toolbox', 'drywall-toolbox' ); ?>"
-                     width="280" height="94">
-            </a>
+            <h3><?php esc_html_e( 'FOLLOW US', 'drywall-toolbox' ); ?></h3>
 
             <div class="social-links" aria-label="<?php esc_attr_e( 'Social media links', 'drywall-toolbox' ); ?>">
 

@@ -125,7 +125,7 @@
 }
 
 /* =============================================
-   SCHEMATIC CONTAINER — MOBILE RESPONSIVE
+   SCHEMATIC CONTAINER — MOBILE & DESKTOP RESPONSIVE
    ============================================= */
 .schematic-container {
   position: relative;
@@ -167,6 +167,27 @@
     -webkit-user-select: none;
     user-select: none;
     -webkit-touch-callout: none;
+  }
+}
+
+/* Desktop: positioned relative to accommodate toolbar */
+@media (min-width: 769px) {
+  .schematic-container {
+    min-height: 500px;
+    max-height: 70vh;
+    border-radius: 8px;
+    padding-top: 0;
+  }
+
+  .schematic-container img {
+    display: block !important;
+    width: 100% !important;
+    height: auto !important;
+    max-width: 100% !important;
+    pointer-events: none !important;
+    image-rendering: auto;
+    -webkit-user-select: none;
+    user-select: none;
   }
 }
 
@@ -246,38 +267,66 @@
 }
 
 /* =============================================
-   MOBILE ZOOM CONTROLS — SLEEK & COMPACT
+   SCHEMATIC ZOOM CONTROLS — MODERN RESPONSIVE TOOLBAR
+   Mobile (floating, bottom-center) & Desktop (inline, top-left)
+   Sleek, subtle, and minimalist design
    ============================================= */
-.mobile-zoom-controls {
+.schematic-zoom-controls {
   display: none; /* hidden by default */
   position: fixed;
-  bottom: max(8px, env(safe-area-inset-bottom, 8px));
+  bottom: max(16px, env(safe-area-inset-bottom, 16px));
   left: 50%;
   transform: translateX(-50%);
   flex-direction: row;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
   z-index: 900;
   pointer-events: none;
-  background: rgba(15, 23, 42, 0.85);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  padding: 8px 12px;
-  border-radius: 24px;
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.25);
+  background: rgba(15, 23, 42, 0.55);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  padding: 10px 14px;
+  border-radius: 28px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
 }
 
-.mobile-zoom-controls > * {
+.schematic-zoom-controls > * {
   pointer-events: auto;
 }
 
+/* Mobile: Floating toolbar at bottom */
 @media (max-width: 768px) {
-  .mobile-zoom-controls {
+  .schematic-zoom-controls {
     display: flex;
-    animation: slideInFromBottom 300ms ease-out;
+    animation: slideInFromBottom 300ms cubic-bezier(0.34, 1.56, 0.64, 1);
   }
+}
 
+/* Desktop: Inline toolbar at top-left, integrated with schematic container */
+@media (min-width: 769px) {
+  .schematic-zoom-controls {
+    position: absolute;
+    top: 14px;
+    left: 14px;
+    right: auto;
+    bottom: auto;
+    transform: none;
+    z-index: 100;
+    display: flex;
+    background: rgba(15, 23, 42, 0.4);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+    padding: 8px 10px;
+    border-radius: 10px;
+    gap: 6px;
+  }
+}
+
+/* Mobile: additional zoom control styles */
+@media (max-width: 768px) {
   .zoom-control-btn {
     transition: none !important;
   }
@@ -294,6 +343,26 @@
   @keyframes slideInFromBottom {
     from { opacity: 0; transform: translateX(-50%) translateY(8px); }
     to { opacity: 1; transform: translateX(-50%) translateY(0); }
+  }
+}
+
+/* Desktop: tablet-size zoom controls adjustments */
+@media (min-width: 769px) {
+  .zoom-control-btn {
+    width: 36px;
+    height: 36px;
+    min-width: 36px;
+  }
+
+  .zoom-control-btn svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  .zoom-indicator {
+    padding: 4px 8px;
+    font-size: 0.65rem;
+    min-width: 40px;
   }
 }
 
@@ -314,20 +383,26 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.15);
-  border: 1px solid rgba(255, 255, 255, 0.25);
-  color: rgba(255, 255, 255, 0.9);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: rgba(255, 255, 255, 0.85);
   cursor: pointer;
-  transition: all 200ms cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 240ms cubic-bezier(0.4, 0, 0.2, 1);
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
   padding: 0;
 }
 
+.zoom-control-btn:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.16);
+  color: rgba(255, 255, 255, 0.95);
+}
+
 .zoom-control-btn:active {
-  transform: scale(0.88);
-  background: rgba(255, 255, 255, 0.25);
+  transform: scale(0.92);
+  background: rgba(255, 255, 255, 0.16);
 }
 
 .zoom-control-btn:focus-visible {
@@ -341,45 +416,27 @@
   stroke-width: 2;
 }
 
-.fullscreen-btn {
-  background: rgba(37, 99, 235, 0.25);
-  border-color: rgba(37, 99, 235, 0.4);
-  color: rgba(255, 255, 255, 0.95);
-}
-
-.fullscreen-btn:active {
-  background: rgba(37, 99, 235, 0.35);
-}
-
 .reset-btn {
-  background: rgba(239, 68, 68, 0.25);
-  border-color: rgba(239, 68, 68, 0.4);
-  color: rgba(255, 255, 255, 0.95);
+  background: rgba(239, 68, 68, 0.12);
+  border-color: rgba(239, 68, 68, 0.2);
+  color: rgba(248, 113, 113, 0.9);
+}
+
+.reset-btn:hover {
+  background: rgba(239, 68, 68, 0.18);
+  border-color: rgba(239, 68, 68, 0.3);
+  color: rgba(248, 113, 113, 0.95);
 }
 
 .reset-btn:active {
-  background: rgba(239, 68, 68, 0.35);
-}
-
-.zoom-indicator {
-  padding: 6px 10px;
-  background: rgba(255, 255, 255, 0.12);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 16px;
-  font-size: 0.7rem;
-  font-weight: 700;
-  color: rgba(255, 255, 255, 0.9);
-  font-family: var(--font-mono);
-  min-width: 48px;
-  text-align: center;
-  white-space: nowrap;
+  background: rgba(239, 68, 68, 0.24);
 }
 
 @media (max-width: 480px) {
-  .mobile-zoom-controls {
-    bottom: max(8px, env(safe-area-inset-bottom, 8px));
-    gap: 6px;
-    padding: 8px 10px;
+  .schematic-zoom-controls {
+    bottom: max(16px, env(safe-area-inset-bottom, 16px));
+    gap: 8px;
+    padding: 10px 12px;
   }
 
   .zoom-control-btn {
@@ -392,13 +449,6 @@
     width: 16px;
     height: 16px;
     stroke-width: 2.5;
-  }
-
-  .zoom-indicator {
-    padding: 5px 8px;
-    font-size: 0.65rem;
-    min-width: 44px;
-    border-radius: 14px;
   }
 }
 

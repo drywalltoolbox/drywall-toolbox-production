@@ -44,8 +44,20 @@ export default function Parts() {
   // Mobile zoom/pan state
   const [scale, setScale] = useState(1);
   const [position, setPosition] = useState({ x: 0, y: 0 });
-  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [isMobile, setIsMobile] = useState(typeof window !== 'undefined' ? window.innerWidth <= 768 : false);
   const [isPanning, setIsPanning] = useState(false);
+  
+  // Fullscreen is always enabled on mobile, never on desktop
+  const isFullscreen = isMobile;
+  
+  // Track window resize for mobile detection
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
   const [startPanPosition, setStartPanPosition] = useState({ x: 0, y: 0 });
   const [touchStartPos, setTouchStartPos] = useState({ x: 0, y: 0 });
   const [hasMoved, setHasMoved] = useState(false);
@@ -566,7 +578,6 @@ export default function Parts() {
       const t = setTimeout(() => {
         setScale(1);
         setPosition({ x: 0, y: 0 });
-        setIsFullscreen(false);
       }, 0);
       return () => clearTimeout(t);
     }, [selectedSchematic, currentPage]);
@@ -768,10 +779,6 @@ export default function Parts() {
     setPosition({ x: 0, y: 0 });
   };
 
-  const toggleFullscreen = () => {
-    setIsFullscreen(!isFullscreen);
-  };
-
   return (
     <section 
       style={{ 
@@ -904,24 +911,8 @@ export default function Parts() {
               </div>
               )}
 
-            {/* Mobile Zoom Controls */}
-            <div className="mobile-zoom-controls">
-              <button 
-                className="zoom-control-btn fullscreen-btn" 
-                onClick={toggleFullscreen}
-                aria-label={isFullscreen ? "Exit fullscreen" : "Enter fullscreen"}
-                title={isFullscreen ? "Exit fullscreen" : "Enter fullscreen"}
-              >
-                {isFullscreen ? (
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                    <path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 1 2-2h3M3 16h3a2 2 0 0 1 2 2v3" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
-                ) : (
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                    <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
-                )}
-              </button>
+            {/* Zoom/Pan Controls Toolbar - Visible on Both Mobile and Desktop */}
+            <div className="schematic-zoom-controls">
               <button className="zoom-control-btn" onClick={handleZoomIn} aria-label="Zoom in" title="Zoom in">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
                   <circle cx="11" cy="11" r="8" stroke="currentColor" strokeWidth="2"/>
@@ -942,9 +933,6 @@ export default function Parts() {
                   </svg>
                 </button>
               )}
-              <div className="zoom-indicator">
-                {Math.round(scale * 100)}%
-              </div>
             </div>
 
             <div 

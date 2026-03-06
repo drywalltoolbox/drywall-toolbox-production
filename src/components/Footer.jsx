@@ -1,7 +1,6 @@
 ﻿import { Link } from 'react-router-dom';
 import { Instagram, Facebook, Twitter, ChevronDown } from 'lucide-react';
 import { useState } from 'react';
-import Logo from '/logo2.svg';
 
 export default function Footer() {
   const [navOpen, setNavOpen] = useState(false);
@@ -22,24 +21,17 @@ export default function Footer() {
         gap: '40px'
       }}>
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-start', order: 3 }}>
-          <Link to="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', marginBottom: '-8px' }}>
-            <img 
-              src={Logo} 
-              alt="Drywall Toolbox Logo" 
-              style={{
-                width: '280px',
-                height: 'auto',
-                maxHeight: '146px',
-                objectFit: 'contain',
-                objectPosition: 'center',
-                display: 'block',
-                padding: 0,
-                margin: 0
-              }}
-              className="footer-logo"
-            />
-          </Link>
-          <div style={{ display: 'flex', gap: '16px', marginTop: '8px' }}>
+          <h3 style={{
+            textTransform: 'uppercase',
+            fontSize: '0.75rem',
+            letterSpacing: '0.1em',
+            margin: '0 0 24px 0',
+            fontWeight: 800,
+            color: 'var(--primary-600)'
+          }}>
+            Follow Us
+          </h3>
+          <div style={{ display: 'flex', gap: '16px' }}>
             <a 
               href="https://instagram.com" 
               target="_blank" 
