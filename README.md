@@ -18,7 +18,7 @@ A modern, fully responsive e-commerce platform for professional drywall tools an
 
 - Node.js 16+ and npm
 
-### Installation
+#### Installation
 
 ```bash
 # Install dependencies
