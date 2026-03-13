@@ -8,15 +8,10 @@ import '../styles/mobile-schematic.css';
 
 // ---------------------------------------------------------------------------
 // Schematic JSON data — static imports (bundled by webpack at build time).
-// All source files now live under public/schematics/brands/ so they are also
-// available as plain-URL assets at runtime.
+// Keep only the schematics that are still included in the UI. TapeTech
+// schematics removed by request have been deleted from the public assets and
+// their imports removed here so the build won't require them.
 // ---------------------------------------------------------------------------
-import schematic13Data from '../../public/schematics/brands/TapeTech/products/13TT_SCH_hotspots/schematic_data.json';
-import schematic88Data from '../../public/schematics/brands/TapeTech/products/88TTR_SCH_hotspots/schematic_data.json';
-import schematicNS02Data from '../../public/schematics/brands/TapeTech/products/NS02TT_SCH_hotspots/schematic_data.json';
-import schematic73Data from '../../public/schematics/brands/TapeTech/products/73TT_SCH_hotspots/schematic_data.json';
-import schematicPAHC10Data from '../../public/schematics/brands/TapeTech/products/PAHC10_SCH_v2_hotspots/schematic_data.json';
-import schematicBoxHandleData from '../../public/schematics/brands/TapeTech/products/Box_Handle/schematic_data.json';
 import columbiaInsideCornerRollerData from '../../public/schematics/brands/Columbia/InsideCornerRoller/schematic_data.json';
 import columbiaMatrixBoxHandleData from '../../public/schematics/brands/Columbia/MatrixBoxHandle/schematic_data.json';
 
@@ -25,13 +20,6 @@ import columbiaMatrixBoxHandleData from '../../public/schematics/brands/Columbia
 // Files are served from public/schematics/brands/... at their original paths.
 // ---------------------------------------------------------------------------
 const _BASE = process.env.PUBLIC_URL;
-const schematic13Img           = `${_BASE}schematics/brands/TapeTech/products/13TT_SCH_hotspots/images/page_1.png`;
-const schematic88Img           = `${_BASE}schematics/brands/TapeTech/products/88TTR_SCH_hotspots/images/page_2.png`;
-const schematic88ImgPage3      = `${_BASE}schematics/brands/TapeTech/products/88TTR_SCH_hotspots/images/page_3.png`;
-const schematicNS02Img         = `${_BASE}schematics/brands/TapeTech/products/NS02TT_SCH_hotspots/images/page_1.png`;
-const schematic73Img           = `${_BASE}schematics/brands/TapeTech/products/73TT_SCH_hotspots/images/page_2.png`;
-const schematicPAHC10Img       = `${_BASE}schematics/brands/TapeTech/products/PAHC10_SCH_v2_hotspots/images/page_1.png`;
-const schematicBoxHandleImg    = `${_BASE}schematics/brands/TapeTech/products/Box_Handle/BH_SCH-enhanced1.png`;
 const columbiaInsideCornerRollerImg = `${_BASE}schematics/brands/Columbia/InsideCornerRoller/InsideCornerRoller-2014_1_-enhanced-squared.png`;
 const columbiaMatrixBoxHandleImg    = `${_BASE}schematics/brands/Columbia/MatrixBoxHandle/Matrix_Handle-enhanced-square.png`;
 
@@ -131,144 +119,6 @@ export default function Parts() {
   }, []);
 
   // Schematic data for tools
-  // Build 13TT schematic parts from JSON data
-  const schematic13Parts = (schematic13Data && schematic13Data.parts) ? schematic13Data.parts.map((p) => {
-    const coords = schematic13Data.coordinates || {};
-    // coordinates keys are strings matching part ids
-    const c = coords[p.id] || coords[String(Number(p.id))] || null;
-    const top = c && c.top !== undefined ? `${c.top}%` : '50%';
-    const left = c && c.left !== undefined ? `${c.left}%` : '50%';
-    const pageNumber = c && c.pageNumber ? c.pageNumber : (schematic13Data.diagramPages && schematic13Data.diagramPages[0]) || 1;
-    return {
-      id: p.id,
-      name: p.name,
-      sku: p.sku || p.SKU || '',
-      quantity: p.quantity || 1,
-      material: p.material || '',
-      price: p.price || 0,
-      position: { top, left },
-      pageNumber,
-      shape: c && c.shape ? c.shape : 'circle',
-      width: c && c.width ? c.width : null,
-      height: c && c.height ? c.height : null,
-      rotation: c && c.rotation ? c.rotation : 0
-    };
-  }) : [];
-  // Build 88TTR schematic parts using coordinates for page 2 (first diagram page)
-  const schematic88Parts = (schematic88Data && schematic88Data.parts) ? schematic88Data.parts.map((p) => {
-    const coords = schematic88Data.coordinates || {};
-    const c = coords[p.id] || coords[String(Number(p.id))] || null;
-    const top = c && c.top !== undefined ? `${c.top}%` : '50%';
-    const left = c && c.left !== undefined ? `${c.left}%` : '50%';
-    const pageNumber = c && c.pageNumber ? c.pageNumber : (schematic88Data.diagramPages && schematic88Data.diagramPages[0]) || 1;
-    return {
-      id: p.id,
-      name: p.name,
-      sku: p.sku || p.SKU || '',
-      quantity: p.quantity || 1,
-      material: p.material || '',
-      price: p.price || 0,
-      position: { top, left },
-      pageNumber,
-      shape: c && c.shape ? c.shape : 'circle',
-      width: c && c.width ? c.width : null,
-      height: c && c.height ? c.height : null,
-      rotation: c && c.rotation ? c.rotation : 0
-    };
-  }).filter(Boolean) : [];
-  // Build NS02TT schematic parts from JSON data
-  const schematicNS02Parts = (schematicNS02Data && schematicNS02Data.parts) ? schematicNS02Data.parts.map((p) => {
-    const coords = schematicNS02Data.coordinates || {};
-    const c = coords[p.id] || coords[String(Number(p.id))] || null;
-    const top = c && c.top !== undefined ? `${c.top}%` : '50%';
-    const left = c && c.left !== undefined ? `${c.left}%` : '50%';
-    const pageNumber = c && c.pageNumber ? c.pageNumber : (schematicNS02Data.diagramPages && schematicNS02Data.diagramPages[0]) || 1;
-    return {
-      id: p.id,
-      name: p.name,
-      sku: p.sku || p.SKU || '',
-      quantity: p.quantity || 1,
-      material: p.material || '',
-      price: p.price || 0,
-      position: { top, left },
-      pageNumber,
-      shape: c && c.shape ? c.shape : 'circle',
-      width: c && c.width ? c.width : null,
-      height: c && c.height ? c.height : null,
-      rotation: c && c.rotation ? c.rotation : 0
-    };
-  }).filter(Boolean) : [];
-  // Build 73TT schematic parts from JSON data
-  const schematic73Parts = (schematic73Data && schematic73Data.parts) ? schematic73Data.parts.map((p) => {
-    const coords = schematic73Data.coordinates || {};
-    const c = coords[p.id] || coords[String(Number(p.id))] || null;
-    const top = c && c.top !== undefined ? `${c.top}%` : '50%';
-    const left = c && c.left !== undefined ? `${c.left}%` : '50%';
-    const pageNumber = c && c.pageNumber ? c.pageNumber : (schematic73Data.diagramPages && schematic73Data.diagramPages[0]) || 1;
-    return {
-      id: p.id,
-      name: p.name,
-      sku: p.sku || p.SKU || '',
-      quantity: p.quantity || 1,
-      material: p.material || '',
-      price: p.price || 0,
-      position: { top, left },
-      pageNumber,
-      shape: c && c.shape ? c.shape : 'circle',
-      width: c && c.width ? c.width : null,
-      height: c && c.height ? c.height : null,
-      rotation: c && c.rotation ? c.rotation : 0
-    };
-  }) : [];
-  // Build PAHC10 v2 schematic parts from JSON data
-  const schematicPAHC10Parts = (schematicPAHC10Data && schematicPAHC10Data.parts) ? schematicPAHC10Data.parts.map((p) => {
-    const coords = schematicPAHC10Data.coordinates || {};
-    // Parts in this schematic may have empty `id` fields but valid `sku` values.
-    // Use sku as the primary lookup key when id is missing so coordinates (which
-    // are keyed by SKU) are found and hotspots render in the right place.
-    const lookupKey = (p.id && String(p.id).trim() !== '') ? String(p.id) : (p.sku || p.SKU || '');
-    const c = lookupKey && (coords[lookupKey] || coords[String(Number(lookupKey))]) ? (coords[lookupKey] || coords[String(Number(lookupKey))]) : null;
-    const top = c && c.top !== undefined ? `${c.top}%` : '50%';
-    const left = c && c.left !== undefined ? `${c.left}%` : '50%';
-    const pageNumber = c && c.pageNumber ? c.pageNumber : (schematicPAHC10Data.diagramPages && schematicPAHC10Data.diagramPages[0]) || 1;
-    return {
-      id: p.id && String(p.id).trim() !== '' ? p.id : (p.sku || p.SKU || ''),
-      name: p.name,
-      sku: p.sku || p.SKU || '',
-      quantity: p.quantity || 1,
-      material: p.material || '',
-      price: p.price || 0,
-      position: { top, left },
-      pageNumber,
-      shape: c && c.shape ? c.shape : 'circle',
-      width: c && c.width ? c.width : null,
-      height: c && c.height ? c.height : null,
-      rotation: c && c.rotation ? c.rotation : 0
-    };
-  }) : [];
-
-  // Build TapeTech Box Handle schematic parts from JSON data
-  const schematicBoxHandleParts = (schematicBoxHandleData && schematicBoxHandleData.parts) ? schematicBoxHandleData.parts.map((p) => {
-    const coords = schematicBoxHandleData.coordinates || {};
-    const c = coords[p.id] || coords[String(Number(p.id))] || null;
-    const top = c && c.top !== undefined ? `${c.top}%` : '50%';
-    const left = c && c.left !== undefined ? `${c.left}%` : '50%';
-    const pageNumber = c && c.pageNumber ? c.pageNumber : (schematicBoxHandleData.diagramPages && schematicBoxHandleData.diagramPages[0]) || 1;
-    return {
-      id: p.id,
-      name: p.name,
-      sku: p.sku || p.SKU || '',
-      quantity: p.quantity || 1,
-      material: p.material || '',
-      price: p.price || 0,
-      position: { top, left },
-      pageNumber,
-      shape: c && c.shape ? c.shape : 'circle',
-      width: c && c.width ? c.width : null,
-      height: c && c.height ? c.height : null,
-      rotation: c && c.rotation ? c.rotation : 0
-    };
-  }) : [];
 
   // Build Columbia Inside Corner Roller schematic parts from JSON data
   const columbiaParts = (columbiaInsideCornerRollerData && columbiaInsideCornerRollerData.parts) ? columbiaInsideCornerRollerData.parts.map((p) => {
@@ -323,98 +173,6 @@ export default function Parts() {
   }) : [];
 
   const schematics = [
-    {
-      id: 'tapetech-13tt',
-        title: '13TT',
-        description: 'Interactive schematic for TapeTech 13TT with hotspots',
-        brand: 'TapeTech',
-        productPartNumber: null,
-        // single-page schematic -- page 1
-        diagramPages: schematic13Data.diagramPages || [1],
-        imagePages: {
-          [schematic13Data.diagramPages ? schematic13Data.diagramPages[0] : 1]: schematic13Img
-        },
-        parts: schematic13Parts
-      },
-      {
-        id: 'tapetech-88ttr',
-          title: '88TTR',
-          description: 'Interactive schematic for TapeTech 88TTR (multi-page). Use the pager to switch diagram pages',
-          brand: 'TapeTech',
-          productPartNumber: null,
-          diagramPages: schematic88Data.diagramPages || [2],
-          imagePages: {
-            // diagramPages reference page numbers from the original PDF export
-            2: schematic88Img,
-            3: schematic88ImgPage3
-          },
-          parts: schematic88Parts
-        },
-    {
-      id: 'tapetech-73tt',
-      title: '73TT',
-      description: 'Interactive schematic for TapeTech 73TT (hotspots & parts)',
-      brand: 'TapeTech',
-      productPartNumber: null,
-      diagramPages: schematic73Data.diagramPages || [2],
-      imagePages: {
-        [schematic73Data.diagramPages ? schematic73Data.diagramPages[0] : 2]: schematic73Img
-      },
-      parts: schematic73Parts
-    },
-    {
-      id: 'tapetech-pahc10-v2',
-      title: 'PAHC10 v2',
-      description: 'Interactive schematic for TapeTech PAHC10 (v2) - hotspots & parts',
-      brand: 'TapeTech',
-      productPartNumber: null,
-      diagramPages: schematicPAHC10Data.diagramPages || [1],
-      imagePages: {
-        [schematicPAHC10Data.diagramPages ? schematicPAHC10Data.diagramPages[0] : 1]: schematicPAHC10Img
-      },
-      parts: schematicPAHC10Parts
-    },
-    {
-      id: 'tapetech-nail-spotter-2',
-      title: '2" Nail Spotter',
-      description: 'Professional 2" EasyClean Nail Spotter - Model NS02TT',
-      brand: 'TapeTech',
-      productPartNumber: 'NS02TT',
-      diagramPages: schematicNS02Data.diagramPages || [1],
-      imagePages: {
-        [schematicNS02Data.diagramPages ? schematicNS02Data.diagramPages[0] : 1]: schematicNS02Img
-      },
-      parts: schematicNS02Parts
-    },
-    {
-      id: 'tapetech-box-handle',
-      title: 'Box Handle',
-      description: 'TapeTech Box Handle Assembly - Complete schematic with all components',
-      brand: 'TapeTech',
-      productPartNumber: null,
-      diagramPages: schematicBoxHandleData.diagramPages || [1],
-      imagePages: {
-        [schematicBoxHandleData.diagramPages ? schematicBoxHandleData.diagramPages[0] : 1]: schematicBoxHandleImg
-      },
-      parts: schematicBoxHandleParts
-    },
-    {
-      id: 'tapetech-corner-finisher-t5',
-      title: 'T5 Corner Finisher',
-      description: 'Precision Corner Finisher Assembly - Model T05CF (Main Components)',
-      brand: 'TapeTech',
-      productPartNumber: 'T05CF',
-      image: `${_BASE}schematics/brands/TapeTech/products/T05CF_SCH_hotspots/images/page_9.png`,
-      parts: [
-        { id: '499023', name: 'Finisher Blade', sku: '499023', material: 'STAINLESS-STEEL', price: 24.50, position: { top: '50.38%', left: '77.25%' }, quantity: 1 },
-        { id: '800856', name: 'Main Body casting', sku: '800856', material: 'ALUMINUM', price: 85.00, position: { top: '72.35%', left: '53.70%' }, quantity: 1 },
-        { id: '800857', name: 'Upper Frame', sku: '800857', material: 'STEEL', price: 42.00, position: { top: '60.95%', left: '34.60%' }, quantity: 1 },
-        { id: '800858', name: 'Lower Frame', sku: '800858', material: 'STEEL', price: 42.00, position: { top: '63.30%', left: '29.10%' }, quantity: 1 },
-        { id: '809860', name: 'Adjuster Pin', sku: '809860', material: 'STEEL', price: 12.50, position: { top: '58.25%', left: '39.80%' }, quantity: 1 },
-        { id: '809861', name: 'Spring Retainer', sku: '809861', material: 'PLASTIC', price: 5.50, position: { top: '78.45%', left: '38.50%' }, quantity: 1 },
-        { id: '809862', name: 'Cushion Spring', sku: '809862', material: 'STEEL', price: 8.00, position: { top: '82.90%', left: '24.10%' }, quantity: 1 }
-      ]
-    },
     {
       id: 'auto-taper',
       title: 'Automatic Taper G2',
