@@ -25,14 +25,21 @@ const HtmlWebpackPlugin   = require('html-webpack-plugin');
 const CopyWebpackPlugin   = require('copy-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
-const isDev       = process.env.NODE_ENV !== 'production';
-// Normalise: strip any trailing slash, default to '' (serves from /)
-const PUBLIC_URL  = (process.env.PUBLIC_URL || '').replace(/\/+$/, '');
-// publicPath must end with /  e.g. "/drywall-toolbox/"  or  "/"
-const publicPath  = PUBLIC_URL ? `${PUBLIC_URL}/` : '/';
+// Export a function to derive webpack `mode` from the CLI args. This ensures
+// child compilations (HtmlWebpackPlugin etc.) receive the same mode and the
+// DefinePlugin values remain consistent across compilers.
+module.exports = (env, argv) => {
+  const mode = (argv && argv.mode) ? argv.mode : (process.env.NODE_ENV || 'development');
+  const isDev = mode !== 'production';
+  // Normalise: strip any trailing slash, default to '' (serves from /)
+  const PUBLIC_URL  = (process.env.PUBLIC_URL || '').replace(/\/+$/, '');
+  // Use a simple root publicPath during development so the dev server serves
+  // assets from '/' even when a production PUBLIC_URL is set in the env.
+  // In production we honour PUBLIC_URL (e.g. '/drywall-toolbox/').
+  const publicPath  = isDev ? '/' : (PUBLIC_URL ? `${PUBLIC_URL}/` : '/');
 
-module.exports = {
-  mode: isDev ? 'development' : 'production',
+  return {
+    mode,
 
   // ─── Entry point ─────────────────────────────────────────────────────────
   entry: './src/main.jsx',
@@ -95,7 +102,9 @@ module.exports = {
     new webpack.DefinePlugin({
       // Standard CRA-style public URL constant
       'process.env.PUBLIC_URL': JSON.stringify(publicPath),
-      'process.env.NODE_ENV':   JSON.stringify(process.env.NODE_ENV || 'development'),
+      // Use the webpack-mode-derived flag for consistent NODE_ENV across
+      // child compilations instead of reading from the environment.
+      'process.env.NODE_ENV':   JSON.stringify(isDev ? 'development' : 'production'),
 
       // Vite-compat: replace all import.meta.env.BASE_URL occurrences
       'import.meta.env.BASE_URL': JSON.stringify(publicPath),
@@ -168,4 +177,5 @@ module.exports = {
 
   // Source maps: fast in dev, proper in prod
   devtool: isDev ? 'eval-cheap-module-source-map' : 'source-map',
+  };
 };
