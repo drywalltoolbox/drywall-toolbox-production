@@ -12,7 +12,6 @@ import '../styles/mobile-schematic.css';
 // schematics removed by request have been deleted from the public assets and
 // their imports removed here so the build won't require them.
 // ---------------------------------------------------------------------------
-import columbiaInsideCornerRollerData from '../../public/schematics/brands/Columbia/InsideCornerRoller/schematic_data.json';
 import columbiaMatrixBoxHandleData from '../../public/schematics/brands/Columbia/MatrixBoxHandle/schematic_data.json';
 
 // ---------------------------------------------------------------------------
@@ -20,7 +19,6 @@ import columbiaMatrixBoxHandleData from '../../public/schematics/brands/Columbia
 // Files are served from public/schematics/brands/... at their original paths.
 // ---------------------------------------------------------------------------
 const _BASE = process.env.PUBLIC_URL;
-const columbiaInsideCornerRollerImg = `${_BASE}schematics/brands/Columbia/InsideCornerRoller/InsideCornerRoller-2014_1_-enhanced-squared.png`;
 const columbiaMatrixBoxHandleImg    = `${_BASE}schematics/brands/Columbia/MatrixBoxHandle/Matrix_Handle-enhanced-square.png`;
 
 // New TapeTech image-only schematics
@@ -44,7 +42,7 @@ const tapeTechPAHC12Img     = `${_BASE}schematics/brands/TapeTech/products/PAHC1
 const columbia2WheelImg            = `${_BASE}schematics/brands/Columbia/2_Wheel_Internal_Corner_Applicator-enhanced.png`;
 const columbia4WheelImg            = `${_BASE}schematics/brands/Columbia/4_Wheel_Internal_Corner_Applicator-enhanced.png`;
 const columbiaExtensionHousingImg  = `${_BASE}schematics/brands/Columbia/Extension_Housing_Schematic-enhanced.png`;
-const columbiaICREnhancedImg       = `${_BASE}schematics/brands/Columbia/InsideCornerRoller-2014_1_-enhanced.png`;
+// (Inside Corner Roller images/data intentionally removed from parts schematics)
 const columbiaMatrixHandleImg      = `${_BASE}schematics/brands/Columbia/Matrix_Handle-enhanced.png`;
 const columbiaMatrixHeadImg        = `${_BASE}schematics/brands/Columbia/Matrix_Head-enhanced.png`;
 const columbiaMatrixLeverImg       = `${_BASE}schematics/brands/Columbia/Matrix_Lever-enhanced.png`;
@@ -120,31 +118,7 @@ export default function Parts() {
 
   // Schematic data for tools
 
-  // Build Columbia Inside Corner Roller schematic parts from JSON data
-  const columbiaParts = (columbiaInsideCornerRollerData && columbiaInsideCornerRollerData.parts) ? columbiaInsideCornerRollerData.parts.map((p) => {
-    const coords = columbiaInsideCornerRollerData.coordinates || {};
-    const c = coords[p.id] || coords[String(Number(p.id))] || null;
-    // Use percentage-based positioning directly from JSON (already in percentage format)
-    const top = c && c.top !== undefined ? `${c.top}%` : '50%';
-    const left = c && c.left !== undefined ? `${c.left}%` : '50%';
-    const pageNumber = c && c.pageNumber ? c.pageNumber : (columbiaInsideCornerRollerData.diagramPages && columbiaInsideCornerRollerData.diagramPages[0]) || 1;
-    return {
-      id: p.id,
-      name: p.name,
-      sku: p.sku || p.SKU || '',
-      quantity: p.quantity || 1,
-      material: p.material || 'UNKNOWN',
-      price: p.price || 0,
-      position: { top, left },
-      pageNumber,
-      shape: c && c.shape ? c.shape : 'circle',
-      width: c && c.width ? c.width : null,
-      height: c && c.height ? c.height : null,
-      widthPx: c && c.widthPx ? c.widthPx : null,
-      heightPx: c && c.heightPx ? c.heightPx : null,
-      rotation: c && c.rotation ? c.rotation : 0
-    };
-  }) : [];
+  // Columbia Inside Corner Roller removed from parts schematics per request.
 
   // Build Columbia Matrix Box Handle schematic parts from JSON data
   const matrixBoxHandleParts = (columbiaMatrixBoxHandleData && columbiaMatrixBoxHandleData.parts) ? columbiaMatrixBoxHandleData.parts.map((p) => {
@@ -344,18 +318,7 @@ export default function Parts() {
         </svg>
       )
     },
-    {
-      id: 'columbia-inside-corner-roller',
-      title: 'Inside Corner Roller',
-      description: 'Professional inside corner roller for smooth corner finishing',
-      brand: 'Columbia Taping Tools',
-      productPartNumber: null,
-      diagramPages: columbiaInsideCornerRollerData.diagramPages || [1],
-      imagePages: {
-        [columbiaInsideCornerRollerData.diagramPages ? columbiaInsideCornerRollerData.diagramPages[0] : 1]: columbiaInsideCornerRollerImg
-      },
-      parts: columbiaParts
-    },
+    // Columbia Inside Corner Roller (parts-based) removed
     {
       id: 'columbia-matrix-box-handle',
       title: 'Matrix Box Handle',
@@ -532,15 +495,7 @@ export default function Parts() {
       imagePages: { 1: columbiaExtensionHousingImg },
       parts: []
     },
-    {
-      id: 'columbia-inside-corner-roller-enhanced',
-      title: 'Inside Corner Roller (2014)',
-      description: 'Columbia Inside Corner Roller 2014 enhanced schematic diagram',
-      brand: 'Columbia Taping Tools',
-      diagramPages: [1],
-      imagePages: { 1: columbiaICREnhancedImg },
-      parts: []
-    },
+    // Columbia Inside Corner Roller (enhanced image-only) removed
     {
       id: 'columbia-matrix-handle',
       title: 'Matrix Handle',

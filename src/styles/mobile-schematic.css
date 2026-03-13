@@ -554,6 +554,28 @@
   }
 }
 
+/* Desktop: ensure the top-left "Back" button in schematic view sits above
+   the fixed site header and remains visible and clickable. Also add a subtle
+   background so it remains readable over schematic images. */
+@media (min-width: 769px) {
+  .section-enter .back-button {
+    position: relative; /* already relative but ensure stacking context */
+    z-index: 2000; /* above site header (950) and toolbar (100)
+                      but below modal overlays */
+    background: rgba(255,255,255,0.92);
+    padding: 8px 12px;
+    border-radius: 10px;
+    box-shadow: 0 8px 20px rgba(2,6,23,0.08);
+    color: var(--text-primary);
+  }
+
+  /* When hovering on desktop, keep the subtle translate but ensure it's
+     visible and doesn't move under the header. */
+  .section-enter .back-button:hover {
+    transform: translateX(-4px);
+  }
+}
+
 /* =============================================
    MISCELLANEOUS
    ============================================= */
