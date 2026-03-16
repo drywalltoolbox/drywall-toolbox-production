@@ -556,9 +556,8 @@
 
 /* Mobile: ensure the back button is visible, clickable, and has proper touch target size */
 @media (max-width: 768px) {
-  .section-enter .back-button {
+  .back-button {
     position: relative;
-    z-index: 2000;
     background: rgba(255, 255, 255, 0.95);
     padding: 10px 14px;
     border-radius: 8px;
@@ -570,18 +569,20 @@
     align-items: center;
     gap: 6px;
     transition: none;
+    border: none;
+    cursor: pointer;
   }
 
-  .section-enter .back-button:hover {
+  .back-button:hover {
     transform: none;
     background: rgba(255, 255, 255, 0.98);
   }
 
-  .section-enter .back-button:active {
+  .back-button:active {
     background: rgba(255, 255, 255, 0.9);
   }
 
-  .section-enter .back-button svg {
+  .back-button svg {
     width: 18px;
     height: 18px;
   }
@@ -589,13 +590,13 @@
 
 /* Extra small screens */
 @media (max-width: 480px) {
-  .section-enter .back-button {
+  .back-button {
     padding: 8px 12px;
     font-size: 0.85rem;
     min-height: 40px;
   }
 
-  .section-enter .back-button svg {
+  .back-button svg {
     width: 16px;
     height: 16px;
   }
@@ -605,21 +606,31 @@
    the fixed site header and remains visible and clickable. Also add a subtle
    background so it remains readable over schematic images. */
 @media (min-width: 769px) {
-  .section-enter .back-button {
-    position: relative; /* already relative but ensure stacking context */
-    z-index: 2000; /* above site header (950) and toolbar (100)
-                      but below modal overlays */
-    background: rgba(255,255,255,0.92);
+  .back-button {
+    position: relative;
+    background: rgba(255, 255, 255, 0.92);
     padding: 8px 12px;
     border-radius: 10px;
-    box-shadow: 0 8px 20px rgba(2,6,23,0.08);
+    box-shadow: 0 8px 20px rgba(2, 6, 23, 0.08);
     color: var(--text-primary);
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.95rem;
+    font-weight: 600;
   }
 
   /* When hovering on desktop, keep the subtle translate but ensure it's
      visible and doesn't move under the header. */
-  .section-enter .back-button:hover {
+  .back-button:hover {
     transform: translateX(-4px);
+  }
+
+  .back-button svg {
+    width: 20px;
+    height: 20px;
   }
 }
 

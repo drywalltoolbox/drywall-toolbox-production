@@ -952,7 +952,9 @@ export default function Parts() {
           {/* Top Back Button - Positioned in top left */}
           <div style={{
             padding: '20px 20px 0 20px',
-            flexShrink: 0
+            flexShrink: 0,
+            position: 'relative',
+            zIndex: 2000
           }}>
             <button
               className="back-button"
