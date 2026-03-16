@@ -554,6 +554,53 @@
   }
 }
 
+/* Mobile: ensure the back button is visible, clickable, and has proper touch target size */
+@media (max-width: 768px) {
+  .section-enter .back-button {
+    position: relative;
+    z-index: 2000;
+    background: rgba(255, 255, 255, 0.95);
+    padding: 10px 14px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+    color: var(--text-primary);
+    font-size: 0.9rem;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: none;
+  }
+
+  .section-enter .back-button:hover {
+    transform: none;
+    background: rgba(255, 255, 255, 0.98);
+  }
+
+  .section-enter .back-button:active {
+    background: rgba(255, 255, 255, 0.9);
+  }
+
+  .section-enter .back-button svg {
+    width: 18px;
+    height: 18px;
+  }
+}
+
+/* Extra small screens */
+@media (max-width: 480px) {
+  .section-enter .back-button {
+    padding: 8px 12px;
+    font-size: 0.85rem;
+    min-height: 40px;
+  }
+
+  .section-enter .back-button svg {
+    width: 16px;
+    height: 16px;
+  }
+}
+
 /* Desktop: ensure the top-left "Back" button in schematic view sits above
    the fixed site header and remains visible and clickable. Also add a subtle
    background so it remains readable over schematic images. */
