@@ -19,7 +19,7 @@ import columbiaMatrixBoxHandleData from '../../public/schematics/brands/Columbia
 // Files are served from public/schematics/brands/... at their original paths.
 // ---------------------------------------------------------------------------
 const _BASE = process.env.PUBLIC_URL;
-const columbiaMatrixBoxHandleImg    = `${_BASE}schematics/brands/Columbia/MatrixBoxHandle/Matrix_Handle-enhanced-square.png`;
+const columbiaMatrixBoxHandleImg    = `${_BASE}schematics/brands/Columbia/Matrix_Handle-enhanced.png`;
 
 // New TapeTech image-only schematics
 const tapeTech15TTEImg      = `${_BASE}schematics/brands/TapeTech/products/15TTE_SCH-enhanced.png`;
@@ -43,7 +43,6 @@ const columbia2WheelImg            = `${_BASE}schematics/brands/Columbia/2_Wheel
 const columbia4WheelImg            = `${_BASE}schematics/brands/Columbia/4_Wheel_Internal_Corner_Applicator-enhanced.png`;
 const columbiaExtensionHousingImg  = `${_BASE}schematics/brands/Columbia/Extension_Housing_Schematic-enhanced.png`;
 // (Inside Corner Roller images/data intentionally removed from parts schematics)
-const columbiaMatrixHandleImg      = `${_BASE}schematics/brands/Columbia/Matrix_Handle-enhanced.png`;
 const columbiaMatrixHeadImg        = `${_BASE}schematics/brands/Columbia/Matrix_Head-enhanced.png`;
 const columbiaMatrixLeverImg       = `${_BASE}schematics/brands/Columbia/Matrix_Lever-enhanced.png`;
 const columbiaMatrixPinchboxImg    = `${_BASE}schematics/brands/Columbia/Matrix_Pinchbox-enhanced.png`;
@@ -496,15 +495,6 @@ export default function Parts() {
       parts: []
     },
     // Columbia Inside Corner Roller (enhanced image-only) removed
-    {
-      id: 'columbia-matrix-handle',
-      title: 'Matrix Handle',
-      description: 'Columbia Matrix Handle schematic diagram',
-      brand: 'Columbia Taping Tools',
-      diagramPages: [1],
-      imagePages: { 1: columbiaMatrixHandleImg },
-      parts: []
-    },
     {
       id: 'columbia-matrix-head',
       title: 'Matrix Head',
