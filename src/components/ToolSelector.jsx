@@ -34,7 +34,13 @@ export default function ToolSelector({ brand, tools, onSelectTool, onBack }) {
           >
             <div className="tool-card-content">
               <div className="tool-image-placeholder">
-                {tool.imagePages && Object.keys(tool.imagePages).length > 0 ? (
+                {tool.previewImage ? (
+                  <img 
+                    src={tool.previewImage} 
+                    alt={tool.title}
+                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                  />
+                ) : tool.imagePages && Object.keys(tool.imagePages).length > 0 ? (
                   <img 
                     src={tool.imagePages[Object.keys(tool.imagePages)[0]]} 
                     alt={tool.title}

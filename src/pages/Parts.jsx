@@ -20,6 +20,7 @@ import columbiaMatrixBoxHandleData from '../../public/schematics/brands/Columbia
 // ---------------------------------------------------------------------------
 const _BASE = process.env.PUBLIC_URL;
 const columbiaMatrixBoxHandleImg    = `${_BASE}schematics/brands/Columbia/Matrix_Handle-enhanced.png`;
+const columbiaMatrixBoxHandlePreview = `${_BASE}schematics/brands/Columbia/MatrixBoxHandle/columbia_matrix_box_handle.jpg`;
 
 // New TapeTech image-only schematics
 const tapeTech15TTEImg      = `${_BASE}schematics/brands/TapeTech/products/15TTE_SCH-enhanced.png`;
@@ -328,6 +329,7 @@ export default function Parts() {
       imagePages: {
         [columbiaMatrixBoxHandleData.diagramPages ? columbiaMatrixBoxHandleData.diagramPages[0] : 1]: columbiaMatrixBoxHandleImg
       },
+      previewImage: columbiaMatrixBoxHandlePreview,
       parts: matrixBoxHandleParts
     },
     // New TapeTech image-only schematics
