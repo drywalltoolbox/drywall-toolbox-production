@@ -44,7 +44,7 @@ const columbia2WheelImg            = `${_BASE}schematics/brands/Columbia/2_Wheel
 const columbia4WheelImg            = `${_BASE}schematics/brands/Columbia/4_Wheel_Internal_Corner_Applicator-enhanced.png`;
 const columbiaExtensionHousingImg  = `${_BASE}schematics/brands/Columbia/Extension_Housing_Schematic-enhanced.png`;
 // (Inside Corner Roller images/data intentionally removed from parts schematics)
-const columbiaMatrixHeadImg        = `${_BASE}schematics/brands/Columbia/Matrix_Head-enhanced.png`;
+const columbiaMatrixHeadImg        = `${_BASE}schematics/brands/Columbia/Matrix_Head-enhanced-enhanced.png`;
 const columbiaMatrixLeverImg       = `${_BASE}schematics/brands/Columbia/Matrix_Lever-1-enhanced.png`;
 const columbiaMatrixPinchboxImg    = `${_BASE}schematics/brands/Columbia/Matrix_Pinchbox-enhanced.png`;
 const columbiaPredatorBodyImg      = `${_BASE}schematics/brands/Columbia/PREDATOR_BODY_OCTOBER_2018-enhanced.png`;
