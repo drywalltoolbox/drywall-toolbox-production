@@ -45,7 +45,7 @@ const columbiaExtensionHousingImg  = `${_BASE}schematics/brands/Columbia/Extensi
 // (Inside Corner Roller images/data intentionally removed from parts schematics)
 const columbiaMatrixHeadImg        = `${_BASE}schematics/brands/Columbia/Matrix_Head-enhanced-enhanced.png`;
 const columbiaMatrixLeverImg       = `${_BASE}schematics/brands/Columbia/Matrix_Lever-1-enhanced.png`;
-const columbiaMatrixPinchboxImg    = `${_BASE}schematics/brands/Columbia/Matrix_Pinchbox-enhanced.png`;
+const columbiaMatrixPinchboxImg    = `${_BASE}schematics/brands/Columbia/Matrix_Pinchbox-1-enhanced.png`;
 const columbiaPredatorBodyImg      = `${_BASE}schematics/brands/Columbia/PREDATOR_BODY_OCTOBER_2018-enhanced.png`;
 const columbiaPredatorTaperHeadImg = `${_BASE}schematics/brands/Columbia/PREDATOR_TAPER_HEAD-enhanced.png`;
 const columbiaSemiAutoTaperImg     = `${_BASE}schematics/brands/Columbia/SemiAutomaticTaper-2015-enhanced.png`;
