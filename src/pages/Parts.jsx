@@ -40,8 +40,7 @@ const tapeTechCFHTTImg      = `${_BASE}schematics/brands/TapeTech/products/CFHTT
 const tapeTechPAHC12Img     = `${_BASE}schematics/brands/TapeTech/products/PAHC12_SCH-enhanced.png`;
 
 // New Columbia image-only schematics
-const columbia2WheelImg            = `${_BASE}schematics/brands/Columbia/2_Wheel_Internal_Corner_Applicator-enhanced.png`;
-const columbia4WheelImg            = `${_BASE}schematics/brands/Columbia/4_Wheel_Internal_Corner_Applicator-enhanced.png`;
+const columbia2WayInternalCornerImg = `${_BASE}schematics/brands/Columbia/2_Way_Internal_Corner_Applicator-1-enhanced.png`;
 const columbiaExtensionHousingImg  = `${_BASE}schematics/brands/Columbia/Extension_Housing_Schematic-enhanced.png`;
 // (Inside Corner Roller images/data intentionally removed from parts schematics)
 const columbiaMatrixHeadImg        = `${_BASE}schematics/brands/Columbia/Matrix_Head-enhanced-enhanced.png`;
@@ -470,21 +469,12 @@ export default function Parts() {
     },
     // New Columbia image-only schematics
     {
-      id: 'columbia-2-wheel-applicator',
-      title: '2-Wheel Internal Corner Applicator',
-      description: 'Columbia 2-Wheel Internal Corner Applicator schematic diagram',
+      id: 'columbia-2-way-internal-corner',
+      title: '2-Way Internal Corner Applicator',
+      description: 'Columbia 2-Way Internal Corner Applicator schematic diagram',
       brand: 'Columbia Taping Tools',
       diagramPages: [1],
-      imagePages: { 1: columbia2WheelImg },
-      parts: []
-    },
-    {
-      id: 'columbia-4-wheel-applicator',
-      title: '4-Wheel Internal Corner Applicator',
-      description: 'Columbia 4-Wheel Internal Corner Applicator schematic diagram',
-      brand: 'Columbia Taping Tools',
-      diagramPages: [1],
-      imagePages: { 1: columbia4WheelImg },
+      imagePages: { 1: columbia2WayInternalCornerImg },
       parts: []
     },
     {
