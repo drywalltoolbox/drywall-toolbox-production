@@ -479,8 +479,8 @@ export default function Parts() {
     },
     {
       id: 'columbia-extension-housing',
-      title: 'Extension Housing',
-      description: 'Columbia Extension Housing schematic diagram',
+      title: 'Matrix Extension Housing',
+      description: 'Columbia Matrix Extension Housing schematic diagram',
       brand: 'Columbia Taping Tools',
       diagramPages: [1],
       imagePages: { 1: columbiaExtensionHousingImg },
