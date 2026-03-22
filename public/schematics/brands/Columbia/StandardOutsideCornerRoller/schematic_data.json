@@ -1,0 +1,282 @@
+{
+  "id": "columbia-standard-outside-corner-roller",
+  "title": "Standard Outside Corner Roller",
+  "diagramPages": [1],
+  "legendPages": [],
+  "parts": [
+    {
+      "id": "1dwjmx67s",
+      "name": "OCR 2D",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "mjyatjgay",
+      "name": "FA 301",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "p5lg9gy3k",
+      "name": "CR 11",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "qy3o3z37m",
+      "name": "OCR 5",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "it3rg52he",
+      "name": "FA 274",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "t0jyu4c9z",
+      "name": "OCR 2A",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "l16952mag",
+      "name": "OCR 6",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "bbg4a50wj",
+      "name": "OCR 3A",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "dmr4ak7hs",
+      "name": "FA 312",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "getswge04",
+      "name": "FA 288",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "t4t1xwf7d",
+      "name": "CR 6",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "oodosw7gi",
+      "name": "FA 299",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "hu7i5px4t",
+      "name": "OCR 2C",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "xj0gwdvbq",
+      "name": "FA 290",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "apdbqgo3b",
+      "name": "OCR 2B",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "c116cv4kk",
+      "name": "OCR 1",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "9s6n1m2iq",
+      "name": "OCR 3",
+      "quantity": 1,
+      "sku": ""
+    }
+  ],
+  "coordinates": {
+    "1dwjmx67s": {
+      "id": "1dwjmx67s",
+      "pageNumber": 1,
+      "top": 17.58,
+      "left": 84.29,
+      "widthPx": 74,
+      "heightPx": 46,
+      "shape": "rect",
+      "rotation": 0
+    },
+    "mjyatjgay": {
+      "id": "mjyatjgay",
+      "pageNumber": 1,
+      "top": 64.78,
+      "left": 89.19,
+      "widthPx": 57,
+      "heightPx": 39,
+      "shape": "rect",
+      "rotation": 0
+    },
+    "p5lg9gy3k": {
+      "id": "p5lg9gy3k",
+      "pageNumber": 1,
+      "top": 93.29,
+      "left": 42.70,
+      "widthPx": 47,
+      "heightPx": 39,
+      "shape": "rect",
+      "rotation": 0
+    },
+    "qy3o3z37m": {
+      "id": "qy3o3z37m",
+      "pageNumber": 1,
+      "top": 54.61,
+      "left": 57.14,
+      "widthPx": 60,
+      "heightPx": 47,
+      "shape": "rect",
+      "rotation": 0
+    },
+    "it3rg52he": {
+      "id": "it3rg52he",
+      "pageNumber": 1,
+      "top": 76.47,
+      "left": 59.29,
+      "widthPx": 53,
+      "heightPx": 42,
+      "shape": "rect",
+      "rotation": 0
+    },
+    "t0jyu4c9z": {
+      "id": "t0jyu4c9z",
+      "pageNumber": 1,
+      "top": 17.86,
+      "left": 32.14,
+      "widthPx": 78,
+      "heightPx": 48,
+      "shape": "rect",
+      "rotation": 0
+    },
+    "l16952mag": {
+      "id": "l16952mag",
+      "pageNumber": 1,
+      "top": 74.42,
+      "left": 16.43,
+      "widthPx": 62,
+      "heightPx": 48,
+      "shape": "rect",
+      "rotation": 0
+    },
+    "bbg4a50wj": {
+      "id": "bbg4a50wj",
+      "pageNumber": 1,
+      "top": 17.68,
+      "left": 59.29,
+      "widthPx": 78,
+      "heightPx": 48,
+      "shape": "rect",
+      "rotation": 0
+    },
+    "dmr4ak7hs": {
+      "id": "dmr4ak7hs",
+      "pageNumber": 1,
+      "top": 54.72,
+      "left": 65.86,
+      "widthPx": 53,
+      "heightPx": 40,
+      "shape": "rect",
+      "rotation": 0
+    },
+    "getswge04": {
+      "id": "getswge04",
+      "pageNumber": 1,
+      "top": 98.68,
+      "left": 41.07,
+      "widthPx": 59,
+      "heightPx": 41,
+      "shape": "rect",
+      "rotation": 0
+    },
+    "t4t1xwf7d": {
+      "id": "t4t1xwf7d",
+      "pageNumber": 1,
+      "top": 87.36,
+      "left": 41.86,
+      "widthPx": 50,
+      "heightPx": 39,
+      "shape": "rect",
+      "rotation": 0
+    },
+    "oodosw7gi": {
+      "id": "oodosw7gi",
+      "pageNumber": 1,
+      "top": 25.25,
+      "left": 60.00,
+      "widthPx": 69,
+      "heightPx": 42,
+      "shape": "rect",
+      "rotation": 0
+    },
+    "hu7i5px4t": {
+      "id": "hu7i5px4t",
+      "pageNumber": 1,
+      "top": 10.71,
+      "left": 59.29,
+      "widthPx": 78,
+      "heightPx": 48,
+      "shape": "rect",
+      "rotation": 0
+    },
+    "xj0gwdvbq": {
+      "id": "xj0gwdvbq",
+      "pageNumber": 1,
+      "top": 37.30,
+      "left": 16.43,
+      "widthPx": 51,
+      "heightPx": 39,
+      "shape": "rect",
+      "rotation": 0
+    },
+    "apdbqgo3b": {
+      "id": "apdbqgo3b",
+      "pageNumber": 1,
+      "top": 46.43,
+      "left": 16.43,
+      "widthPx": 62,
+      "heightPx": 48,
+      "shape": "rect",
+      "rotation": 0
+    },
+    "c116cv4kk": {
+      "id": "c116cv4kk",
+      "pageNumber": 1,
+      "top": 74.42,
+      "left": 27.86,
+      "widthPx": 66,
+      "heightPx": 49,
+      "shape": "rect",
+      "rotation": 0
+    },
+    "9s6n1m2iq": {
+      "id": "9s6n1m2iq",
+      "pageNumber": 1,
+      "top": 55.61,
+      "left": 16.43,
+      "widthPx": 61,
+      "heightPx": 46,
+      "shape": "rect",
+      "rotation": 0
+    }
+  }
+}
