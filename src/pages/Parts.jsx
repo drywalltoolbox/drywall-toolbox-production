@@ -1033,11 +1033,12 @@ export default function Parts() {
           flexDirection: 'column',
           minHeight: '100vh',
           width: '100%',
-          overflow: 'hidden'
+          overflow: 'hidden',
+          height: '100%'
         }}>
           {/* Top Back Button - Positioned in top left */}
           <div style={{
-            padding: '20px 20px 0 20px',
+            padding: 'clamp(12px, 2vw, 20px) clamp(12px, 2vw, 20px) 0 clamp(12px, 2vw, 20px)',
             flexShrink: 0,
             position: 'relative',
             zIndex: 2000
@@ -1058,11 +1059,11 @@ export default function Parts() {
             </button>
           </div>
 
-          {/* Schematic Container Wrapper - Allows flex growth */}
+          {/* Schematic Container Wrapper - Allows flex growth with responsive sizing */}
           <div style={{
-            maxWidth: isFullscreen ? '100%' : '1400px',
+            maxWidth: isFullscreen ? '100%' : 'clamp(600px, 95vw, 1400px)',
             margin: '0 auto',
-            padding: isFullscreen ? '0' : undefined,
+            padding: isFullscreen ? '0' : 'clamp(12px, 2vw, 20px)',
             width: '100%',
             display: 'flex',
             flexDirection: 'column',
@@ -1073,10 +1074,10 @@ export default function Parts() {
           >
           {/* Brand & Title Header */}
           <div style={{ 
-            marginBottom: '40px', 
+            marginBottom: 'clamp(24px, 4vw, 40px)', 
             textAlign: 'center',
             flexShrink: 0,
-            padding: '20px'
+            padding: 'clamp(12px, 2vw, 20px)'
           }}>
             <h3 style={{ 
               fontSize: 'clamp(1rem, 3vw, 1.5rem)', 
@@ -1195,9 +1196,14 @@ export default function Parts() {
                 ref={schematicImageRef}
                 style={{ 
                   position: 'relative',
-                  display: 'block',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'center',
+                  alignItems: 'center',
                   width: '100%',
-                  flex: 'none',
+                  height: '100%',
+                  minHeight: '100%',
+                  flex: 1,
                   transform: `scale(${scale}) translate(${position.x / scale}px, ${position.y / scale}px)`,
                   transformOrigin: 'center center',
                   transition: isPanning || isDragging ? 'none' : 'transform 0.3s ease-out',
