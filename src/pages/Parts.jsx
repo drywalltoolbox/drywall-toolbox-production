@@ -320,8 +320,8 @@ export default function Parts() {
     // Columbia Inside Corner Roller (parts-based) removed
     {
       id: 'columbia-matrix',
-      title: 'Matrix',
-      description: 'Columbia Matrix series schematic diagrams',
+      title: 'Predator Matrix Handle',
+      description: 'Columbia Predator Matrix Handle series schematic diagrams',
       brand: 'Columbia Taping Tools',
       diagramPages: [1, 2, 3, 4, 5],
       pageLabels: {
