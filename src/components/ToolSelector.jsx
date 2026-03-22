@@ -38,13 +38,13 @@ export default function ToolSelector({ brand, tools, onSelectTool, onBack }) {
                   <img 
                     src={tool.previewImage} 
                     alt={tool.title}
-                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                    style={{ width: '100%', height: '100%', objectFit: 'contain' }}
                   />
                 ) : tool.imagePages && Object.keys(tool.imagePages).length > 0 ? (
                   <img 
                     src={tool.imagePages[Object.keys(tool.imagePages)[0]]} 
                     alt={tool.title}
-                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                    style={{ width: '100%', height: '100%', objectFit: 'contain' }}
                   />
                 ) : (
                   <svg

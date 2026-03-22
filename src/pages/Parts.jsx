@@ -48,9 +48,6 @@ const columbiaMatrixLeverImg       = `${_BASE}schematics/brands/Columbia/Matrix_
 const columbiaMatrixPinchboxImg    = `${_BASE}schematics/brands/Columbia/Matrix_Pinchbox-1-enhanced.png`;
 const columbiaPredatorBodyImg      = `${_BASE}schematics/brands/Columbia/PREDATOR_BODY_OCTOBER_2018-enhanced.png`;
 const columbiaPredatorTaperHeadImg = `${_BASE}schematics/brands/Columbia/PREDATOR_TAPER_HEAD-enhanced.png`;
-const columbiaSemiAutoTaperImg     = `${_BASE}schematics/brands/Columbia/SemiAutomaticTaper-2015-enhanced.png`;
-const columbiaTaperBodyImg         = `${_BASE}schematics/brands/Columbia/TaperBody-2014-enhanced.png`;
-const columbiaTaperHeadImg         = `${_BASE}schematics/brands/Columbia/TaperHead-2014-DS-enhanced.png`;
 const columbia3SchematicImg        = `${_BASE}schematics/brands/Columbia/columbia_3_schematic-enhanced.png`;
 
 export default function Parts() {
@@ -504,33 +501,6 @@ export default function Parts() {
       brand: 'Columbia Taping Tools',
       diagramPages: [1],
       imagePages: { 1: columbiaPredatorTaperHeadImg },
-      parts: []
-    },
-    {
-      id: 'columbia-semi-auto-taper',
-      title: 'Semi-Automatic Taper (2015)',
-      description: 'Columbia Semi-Automatic Taper 2015 schematic diagram',
-      brand: 'Columbia Taping Tools',
-      diagramPages: [1],
-      imagePages: { 1: columbiaSemiAutoTaperImg },
-      parts: []
-    },
-    {
-      id: 'columbia-taper-body',
-      title: 'Taper Body (2014)',
-      description: 'Columbia Taper Body 2014 schematic diagram',
-      brand: 'Columbia Taping Tools',
-      diagramPages: [1],
-      imagePages: { 1: columbiaTaperBodyImg },
-      parts: []
-    },
-    {
-      id: 'columbia-taper-head',
-      title: 'Taper Head (2014-DS)',
-      description: 'Columbia Taper Head 2014-DS schematic diagram',
-      brand: 'Columbia Taping Tools',
-      diagramPages: [1],
-      imagePages: { 1: columbiaTaperHeadImg },
       parts: []
     },
     {
