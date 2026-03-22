@@ -644,7 +644,7 @@ export default function Parts() {
       title: 'Gooseneck Adapter',
       description: 'Columbia Gooseneck Adapter schematic diagram',
       brand: 'Columbia Taping Tools',
-      category: 'Handles',
+      category: 'Pumps',
       diagramPages: [1],
       imagePages: { 1: columbiaGooseneckAdapterImg },
       previewImage: columbiaGooseneckAdapterPreview,

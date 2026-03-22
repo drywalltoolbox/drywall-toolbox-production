@@ -1,6 +1,19 @@
 import '../styles/tool-selector.css';
 
 export default function ToolSelector({ brand, tools, onSelectTool, onBack }) {
+  // Group tools by category if they have categories defined
+  const groupedTools = tools.reduce((acc, tool) => {
+    const category = tool.category || 'Other';
+    if (!acc[category]) {
+      acc[category] = [];
+    }
+    acc[category].push(tool);
+    return acc;
+  }, {});
+
+  // Determine if we should show categories (only if there are multiple categories or if some tools have categories)
+  const categories = Object.keys(groupedTools);
+  const showCategories = categories.length > 1 || (categories.length === 1 && categories[0] !== 'Other');
 
   return (
     <div className="tool-selector">
@@ -25,51 +38,106 @@ export default function ToolSelector({ brand, tools, onSelectTool, onBack }) {
         </div>
       </div>
 
-      <div className="tools-grid">
-        {tools.map((tool) => (
-          <button
-            key={tool.id}
-            className="tool-card"
-            onClick={() => onSelectTool(tool)}
-          >
-            <div className="tool-card-content">
-              <div className="tool-image-placeholder">
-                {tool.previewImage ? (
-                  <img 
-                    src={tool.previewImage} 
-                    alt={tool.title}
-                    style={{ width: '100%', height: '100%', objectFit: 'contain' }}
-                  />
-                ) : tool.imagePages && Object.keys(tool.imagePages).length > 0 ? (
-                  <img 
-                    src={tool.imagePages[Object.keys(tool.imagePages)[0]]} 
-                    alt={tool.title}
-                    style={{ width: '100%', height: '100%', objectFit: 'contain' }}
-                  />
-                ) : (
-                  <svg
-                    className="placeholder-icon"
-                    width="40"
-                    height="40"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="1.5"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
+      {showCategories ? (
+        <div className="tools-by-category">
+          {categories.map((category) => (
+            <div key={category} className="category-section">
+              <h3 className="category-title">{category}</h3>
+              <div className="tools-grid">
+                {groupedTools[category].map((tool) => (
+                  <button
+                    key={tool.id}
+                    className="tool-card"
+                    onClick={() => onSelectTool(tool)}
                   >
-                    <rect x="3" y="3" width="18" height="18" rx="2" />
-                    <circle cx="8.5" cy="8.5" r="1.5" />
-                    <path d="M21 15l-5-5L5 21" />
-                  </svg>
-                )}
+                    <div className="tool-card-content">
+                      <div className="tool-image-placeholder">
+                        {tool.previewImage ? (
+                          <img 
+                            src={tool.previewImage} 
+                            alt={tool.title}
+                            style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+                          />
+                        ) : tool.imagePages && Object.keys(tool.imagePages).length > 0 ? (
+                          <img 
+                            src={tool.imagePages[Object.keys(tool.imagePages)[0]]} 
+                            alt={tool.title}
+                            style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+                          />
+                        ) : (
+                          <svg
+                            className="placeholder-icon"
+                            width="40"
+                            height="40"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="1.5"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          >
+                            <rect x="3" y="3" width="18" height="18" rx="2" />
+                            <circle cx="8.5" cy="8.5" r="1.5" />
+                            <path d="M21 15l-5-5L5 21" />
+                          </svg>
+                        )}
+                      </div>
+                      <h3 className="tool-name">{tool.title}</h3>
+                    </div>
+                    <div className="tool-card-background" />
+                  </button>
+                ))}
               </div>
-              <h3 className="tool-name">{tool.title}</h3>
             </div>
-            <div className="tool-card-background" />
-          </button>
-        ))}
-      </div>
+          ))}
+        </div>
+      ) : (
+        <div className="tools-grid">
+          {tools.map((tool) => (
+            <button
+              key={tool.id}
+              className="tool-card"
+              onClick={() => onSelectTool(tool)}
+            >
+              <div className="tool-card-content">
+                <div className="tool-image-placeholder">
+                  {tool.previewImage ? (
+                    <img 
+                      src={tool.previewImage} 
+                      alt={tool.title}
+                      style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+                    />
+                  ) : tool.imagePages && Object.keys(tool.imagePages).length > 0 ? (
+                    <img 
+                      src={tool.imagePages[Object.keys(tool.imagePages)[0]]} 
+                      alt={tool.title}
+                      style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+                    />
+                  ) : (
+                    <svg
+                      className="placeholder-icon"
+                      width="40"
+                      height="40"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="1.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <rect x="3" y="3" width="18" height="18" rx="2" />
+                      <circle cx="8.5" cy="8.5" r="1.5" />
+                      <path d="M21 15l-5-5L5 21" />
+                    </svg>
+                  )}
+                </div>
+                <h3 className="tool-name">{tool.title}</h3>
+              </div>
+              <div className="tool-card-background" />
+            </button>
+          ))}
+        </div>
+      )}
 
       {tools.length === 0 && (
         <div className="empty-state">

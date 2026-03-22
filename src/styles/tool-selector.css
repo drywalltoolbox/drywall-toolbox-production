@@ -194,6 +194,39 @@
   color: var(--tension-accent);
 }
 
+/* =============================================
+   CATEGORY GROUPING STYLES
+   ============================================= */
+.tools-by-category {
+  display: flex;
+  flex-direction: column;
+  gap: 56px;
+  margin-bottom: 40px;
+}
+
+.category-section {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  animation: fadeIn 0.5s ease-out;
+}
+
+.category-title {
+  font-size: clamp(1.5rem, 4vw, 2rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+  margin: 0;
+  padding-bottom: 12px;
+  border-bottom: 2px solid var(--machined-border);
+  text-transform: capitalize;
+}
+
+.category-section .tools-grid {
+  margin-bottom: 0;
+}
+
+
 
 
 
