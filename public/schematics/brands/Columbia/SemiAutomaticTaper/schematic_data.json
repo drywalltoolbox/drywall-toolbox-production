@@ -1,0 +1,130 @@
+{
+  "id": "columbia-semi-automatic-taper",
+  "title": "Semi-Automatic Taper",
+  "diagramPages": [1],
+  "legendPages": [],
+  "parts": [
+    {
+      "id": "SAT-1",
+      "name": "Main Tube Body",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "SAT-2",
+      "name": "Drive Mechanism",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "SAT-3",
+      "name": "Taping Head Assembly",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "SAT-4",
+      "name": "Compound Feed System",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "SAT-5",
+      "name": "Pressure Roller",
+      "quantity": 2,
+      "sku": ""
+    },
+    {
+      "id": "SAT-6",
+      "name": "Control Lever",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "SAT-7",
+      "name": "Handle Assembly",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "SAT-8",
+      "name": "Wheel Assembly",
+      "quantity": 2,
+      "sku": ""
+    }
+  ],
+  "coordinates": {
+    "SAT-1": {
+      "id": "SAT-1",
+      "pageNumber": 1,
+      "top": 50,
+      "left": 50,
+      "shape": "rect",
+      "width": 15,
+      "height": 60
+    },
+    "SAT-2": {
+      "id": "SAT-2",
+      "pageNumber": 1,
+      "top": 35,
+      "left": 45,
+      "shape": "rect",
+      "width": 20,
+      "height": 15
+    },
+    "SAT-3": {
+      "id": "SAT-3",
+      "pageNumber": 1,
+      "top": 15,
+      "left": 50,
+      "shape": "circle",
+      "width": 12,
+      "height": 12
+    },
+    "SAT-4": {
+      "id": "SAT-4",
+      "pageNumber": 1,
+      "top": 30,
+      "left": 70,
+      "shape": "rect",
+      "width": 16,
+      "height": 25
+    },
+    "SAT-5": {
+      "id": "SAT-5",
+      "pageNumber": 1,
+      "top": 20,
+      "left": 35,
+      "shape": "circle",
+      "width": 10,
+      "height": 10
+    },
+    "SAT-6": {
+      "id": "SAT-6",
+      "pageNumber": 1,
+      "top": 50,
+      "left": 75,
+      "shape": "rect",
+      "width": 12,
+      "height": 18
+    },
+    "SAT-7": {
+      "id": "SAT-7",
+      "pageNumber": 1,
+      "top": 65,
+      "left": 65,
+      "shape": "rect",
+      "width": 18,
+      "height": 20
+    },
+    "SAT-8": {
+      "id": "SAT-8",
+      "pageNumber": 1,
+      "top": 78,
+      "left": 45,
+      "shape": "circle",
+      "width": 11,
+      "height": 11
+    }
+  }
+}

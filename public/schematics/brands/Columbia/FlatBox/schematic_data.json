@@ -1,0 +1,130 @@
+{
+  "id": "columbia-flat-box",
+  "title": "Flat Box",
+  "diagramPages": [1],
+  "legendPages": [],
+  "parts": [
+    {
+      "id": "FB-STD-1",
+      "name": "Main Housing Body",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "FB-STD-2",
+      "name": "Compound Chamber",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "FB-STD-3",
+      "name": "Blade Insert",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "FB-STD-4",
+      "name": "Handle Attachment",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "FB-STD-5",
+      "name": "Wheel Assembly",
+      "quantity": 2,
+      "sku": ""
+    },
+    {
+      "id": "FB-STD-6",
+      "name": "Pressure Plate",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "FB-STD-7",
+      "name": "Side Plate",
+      "quantity": 2,
+      "sku": ""
+    },
+    {
+      "id": "FB-STD-8",
+      "name": "Shaft Assembly",
+      "quantity": 1,
+      "sku": ""
+    }
+  ],
+  "coordinates": {
+    "FB-STD-1": {
+      "id": "FB-STD-1",
+      "pageNumber": 1,
+      "top": 50,
+      "left": 50,
+      "shape": "rect",
+      "width": 35,
+      "height": 40
+    },
+    "FB-STD-2": {
+      "id": "FB-STD-2",
+      "pageNumber": 1,
+      "top": 45,
+      "left": 50,
+      "shape": "rect",
+      "width": 22,
+      "height": 28
+    },
+    "FB-STD-3": {
+      "id": "FB-STD-3",
+      "pageNumber": 1,
+      "top": 62,
+      "left": 50,
+      "shape": "rect",
+      "width": 28,
+      "height": 6
+    },
+    "FB-STD-4": {
+      "id": "FB-STD-4",
+      "pageNumber": 1,
+      "top": 28,
+      "left": 68,
+      "shape": "rect",
+      "width": 14,
+      "height": 18
+    },
+    "FB-STD-5": {
+      "id": "FB-STD-5",
+      "pageNumber": 1,
+      "top": 72,
+      "left": 35,
+      "shape": "circle",
+      "width": 11,
+      "height": 11
+    },
+    "FB-STD-6": {
+      "id": "FB-STD-6",
+      "pageNumber": 1,
+      "top": 38,
+      "left": 50,
+      "shape": "rect",
+      "width": 20,
+      "height": 14
+    },
+    "FB-STD-7": {
+      "id": "FB-STD-7",
+      "pageNumber": 1,
+      "top": 50,
+      "left": 30,
+      "shape": "rect",
+      "width": 8,
+      "height": 35
+    },
+    "FB-STD-8": {
+      "id": "FB-STD-8",
+      "pageNumber": 1,
+      "top": 50,
+      "left": 55,
+      "shape": "circle",
+      "width": 6,
+      "height": 30
+    }
+  }
+}

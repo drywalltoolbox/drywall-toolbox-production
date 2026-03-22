@@ -1,0 +1,130 @@
+{
+  "id": "columbia-fat-boy-box",
+  "title": "Fat Boy Box",
+  "diagramPages": [1],
+  "legendPages": [],
+  "parts": [
+    {
+      "id": "FBB-1",
+      "name": "Main Housing Body",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "FBB-2",
+      "name": "Large Compound Chamber",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "FBB-3",
+      "name": "Wide Blade Insert",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "FBB-4",
+      "name": "Handle Attachment",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "FBB-5",
+      "name": "Wheel Assembly",
+      "quantity": 2,
+      "sku": ""
+    },
+    {
+      "id": "FBB-6",
+      "name": "Pressure Spring",
+      "quantity": 2,
+      "sku": ""
+    },
+    {
+      "id": "FBB-7",
+      "name": "Side Reinforcement",
+      "quantity": 2,
+      "sku": ""
+    },
+    {
+      "id": "FBB-8",
+      "name": "Shaft Assembly",
+      "quantity": 1,
+      "sku": ""
+    }
+  ],
+  "coordinates": {
+    "FBB-1": {
+      "id": "FBB-1",
+      "pageNumber": 1,
+      "top": 50,
+      "left": 50,
+      "shape": "rect",
+      "width": 40,
+      "height": 42
+    },
+    "FBB-2": {
+      "id": "FBB-2",
+      "pageNumber": 1,
+      "top": 45,
+      "left": 50,
+      "shape": "rect",
+      "width": 26,
+      "height": 32
+    },
+    "FBB-3": {
+      "id": "FBB-3",
+      "pageNumber": 1,
+      "top": 63,
+      "left": 50,
+      "shape": "rect",
+      "width": 32,
+      "height": 8
+    },
+    "FBB-4": {
+      "id": "FBB-4",
+      "pageNumber": 1,
+      "top": 26,
+      "left": 70,
+      "shape": "rect",
+      "width": 16,
+      "height": 20
+    },
+    "FBB-5": {
+      "id": "FBB-5",
+      "pageNumber": 1,
+      "top": 74,
+      "left": 32,
+      "shape": "circle",
+      "width": 12,
+      "height": 12
+    },
+    "FBB-6": {
+      "id": "FBB-6",
+      "pageNumber": 1,
+      "top": 22,
+      "left": 38,
+      "shape": "circle",
+      "width": 10,
+      "height": 10
+    },
+    "FBB-7": {
+      "id": "FBB-7",
+      "pageNumber": 1,
+      "top": 50,
+      "left": 28,
+      "shape": "rect",
+      "width": 10,
+      "height": 38
+    },
+    "FBB-8": {
+      "id": "FBB-8",
+      "pageNumber": 1,
+      "top": 50,
+      "left": 58,
+      "shape": "circle",
+      "width": 8,
+      "height": 35
+    }
+  }
+}

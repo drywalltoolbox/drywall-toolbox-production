@@ -1,0 +1,130 @@
+{
+  "id": "columbia-angle-head",
+  "title": "3\" Angle Head",
+  "diagramPages": [1],
+  "legendPages": [],
+  "parts": [
+    {
+      "id": "AH-1",
+      "name": "Main Head Body",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "AH-2",
+      "name": "Angle Housing",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "AH-3",
+      "name": "Blade Insert",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "AH-4",
+      "name": "Pressure Spring",
+      "quantity": 2,
+      "sku": ""
+    },
+    {
+      "id": "AH-5",
+      "name": "Compound Tube Connection",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "AH-6",
+      "name": "Side Plate Assembly",
+      "quantity": 2,
+      "sku": ""
+    },
+    {
+      "id": "AH-7",
+      "name": "Control Knob",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "AH-8",
+      "name": "Roller Wheel",
+      "quantity": 2,
+      "sku": ""
+    }
+  ],
+  "coordinates": {
+    "AH-1": {
+      "id": "AH-1",
+      "pageNumber": 1,
+      "top": 50,
+      "left": 50,
+      "shape": "rect",
+      "width": 20,
+      "height": 25
+    },
+    "AH-2": {
+      "id": "AH-2",
+      "pageNumber": 1,
+      "top": 45,
+      "left": 50,
+      "shape": "polygon",
+      "width": 18,
+      "height": 22
+    },
+    "AH-3": {
+      "id": "AH-3",
+      "pageNumber": 1,
+      "top": 58,
+      "left": 50,
+      "shape": "rect",
+      "width": 16,
+      "height": 4
+    },
+    "AH-4": {
+      "id": "AH-4",
+      "pageNumber": 1,
+      "top": 35,
+      "left": 42,
+      "shape": "circle",
+      "width": 8,
+      "height": 8
+    },
+    "AH-5": {
+      "id": "AH-5",
+      "pageNumber": 1,
+      "top": 25,
+      "left": 50,
+      "shape": "rect",
+      "width": 10,
+      "height": 12
+    },
+    "AH-6": {
+      "id": "AH-6",
+      "pageNumber": 1,
+      "top": 50,
+      "left": 32,
+      "shape": "rect",
+      "width": 6,
+      "height": 20
+    },
+    "AH-7": {
+      "id": "AH-7",
+      "pageNumber": 1,
+      "top": 30,
+      "left": 65,
+      "shape": "circle",
+      "width": 8,
+      "height": 8
+    },
+    "AH-8": {
+      "id": "AH-8",
+      "pageNumber": 1,
+      "top": 68,
+      "left": 45,
+      "shape": "circle",
+      "width": 10,
+      "height": 10
+    }
+  }
+}
