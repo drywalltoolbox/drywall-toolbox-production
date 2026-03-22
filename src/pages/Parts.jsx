@@ -20,6 +20,7 @@ import columbiaThrottleBoxData from '../../public/schematics/brands/Columbia/Thr
 import columbiaAutomaticFlatBoxData from '../../public/schematics/brands/Columbia/AutomaticFlatBox/schematic_data.json';
 import columbiaFlatBoxData from '../../public/schematics/brands/Columbia/FlatBox/schematic_data.json';
 import columbiaFatBoyBoxData from '../../public/schematics/brands/Columbia/FatBoyBox/schematic_data.json';
+import columbiaTallBoyMudPumpData from '../../public/schematics/brands/Columbia/TallBoyMudPump/schematic_data.json';
 
 // ---------------------------------------------------------------------------
 // Schematic image paths — runtime URLs relative to the deployment base.
@@ -71,6 +72,14 @@ const columbiaFlatBoxImg = `${_BASE}schematics/brands/Columbia/FlatBox/FLAT-BOX-
 const columbiaFlatBoxPreview = `${_BASE}schematics/brands/Columbia/FlatBox/2023flatbox.jpg`;
 const columbiaFatBoyBoxImg = `${_BASE}schematics/brands/Columbia/FatBoyBox/fat_boy_box.png`;
 const columbiaFatBoyBoxPreview = `${_BASE}schematics/brands/Columbia/FatBoyBox/InsideTrackBoxFrontSmall.png`;
+const columbiaAngleHeadImg = `${_BASE}schematics/brands/Columbia/AngleHead/AngleHead-2014-3-enhanced.png`;
+const columbiaAngleHeadPreview = `${_BASE}schematics/brands/Columbia/AngleHead/angleheadbacksquare.jpg`;
+const columbiaGooseneckAdapterImg = `${_BASE}schematics/brands/Columbia/GooseneckAdapter/Gooseneck-1-1-enhanced.png`;
+const columbiaGooseneckAdapterPreview = `${_BASE}schematics/brands/Columbia/GooseneckAdapter/goosenecksquare.jpg`;
+const columbiaMudPumpImg = `${_BASE}schematics/brands/Columbia/MudPump/MUD-PUMP-SCHEMATIC-2022-enhanced.png`;
+const columbiaMudPumpPreview = `${_BASE}schematics/brands/Columbia/MudPump/TallBoyMudpumps.jpg`;
+const columbiaTallBoyMudPumpImg = `${_BASE}schematics/brands/Columbia/TallBoyMudPump/TALL-BOY-MUD-PUMP-SCHEMATIC-2022-enhanced.png`;
+const columbiaTallBoyMudPumpPreview = `${_BASE}schematics/brands/Columbia/TallBoyMudPump/TallBoyPump.jpg`;
 
 export default function Parts() {
   // Allowed brands to display
@@ -177,6 +186,7 @@ export default function Parts() {
   const automaticFlatBoxParts = buildPartsFromData(columbiaAutomaticFlatBoxData);
   const flatBoxParts = buildPartsFromData(columbiaFlatBoxData);
   const fatBoyBoxParts = buildPartsFromData(columbiaFatBoyBoxData);
+  const tallBoyMudPumpParts = buildPartsFromData(columbiaTallBoyMudPumpData);
 
   const schematics = [
     {
@@ -638,6 +648,46 @@ export default function Parts() {
       imagePages: { 1: columbiaFatBoyBoxImg },
       previewImage: columbiaFatBoyBoxPreview,
       parts: fatBoyBoxParts
+    },
+    {
+      id: 'columbia-angle-head',
+      title: 'Angle Head',
+      description: 'Columbia Angle Head schematic diagram',
+      brand: 'Columbia Taping Tools',
+      diagramPages: [1],
+      imagePages: { 1: columbiaAngleHeadImg },
+      previewImage: columbiaAngleHeadPreview,
+      parts: []
+    },
+    {
+      id: 'columbia-gooseneck-adapter',
+      title: 'Gooseneck Adapter',
+      description: 'Columbia Gooseneck Adapter schematic diagram',
+      brand: 'Columbia Taping Tools',
+      diagramPages: [1],
+      imagePages: { 1: columbiaGooseneckAdapterImg },
+      previewImage: columbiaGooseneckAdapterPreview,
+      parts: []
+    },
+    {
+      id: 'columbia-mud-pump',
+      title: 'Mud Pump',
+      description: 'Columbia Mud Pump schematic diagram',
+      brand: 'Columbia Taping Tools',
+      diagramPages: [1],
+      imagePages: { 1: columbiaMudPumpImg },
+      previewImage: columbiaMudPumpPreview,
+      parts: []
+    },
+    {
+      id: 'columbia-tall-boy-mud-pump',
+      title: 'Tall Boy Mud Pump',
+      description: 'Columbia Tall Boy Mud Pump schematic diagram',
+      brand: 'Columbia Taping Tools',
+      diagramPages: [1],
+      imagePages: { 1: columbiaTallBoyMudPumpImg },
+      previewImage: columbiaTallBoyMudPumpPreview,
+      parts: tallBoyMudPumpParts
     }
   ];
 
