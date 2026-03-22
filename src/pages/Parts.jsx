@@ -15,6 +15,7 @@ import '../styles/mobile-schematic.css';
 import columbiaMatrixBoxHandleData from '../../public/schematics/brands/Columbia/MatrixBoxHandle/schematic_data.json';
 import columbiaPredatorTaperData   from '../../public/schematics/brands/Columbia/PredatorTaper/schematic_data.json';
 import columbiaStandardOutsideCornerRollerData from '../../public/schematics/brands/Columbia/StandardOutsideCornerRoller/schematic_data.json';
+import columbiaInsideCornerRollerData from '../../public/schematics/brands/Columbia/InsideCornerRoller/schematic_data.json';
 
 // ---------------------------------------------------------------------------
 // Schematic image paths — runtime URLs relative to the deployment base.
@@ -56,6 +57,8 @@ const columbiaPredatorTaperBodyImg = `${_BASE}schematics/brands/Columbia/predato
 const columbiaPredatorTaperHeadNewImg = `${_BASE}schematics/brands/Columbia/predator_taper_head.png`;
 const columbiaStandardOutsideCornerRollerImg = `${_BASE}schematics/brands/Columbia/StandardOutsideCornerRoller/OutsideCornerRollers-2016-1-enhanced.png`;
 const columbiaStandardOutsideCornerRollerPreview = `${_BASE}schematics/brands/Columbia/StandardOutsideCornerRoller/External_90_Aplicator.jpg`;
+const columbiaInsideCornerRollerImg = `${_BASE}schematics/brands/Columbia/InsideCornerRoller/InsideCornerRoller-2014_1_-enhanced-squared.png`;
+const columbiaInsideCornerRollerPreview = `${_BASE}schematics/brands/Columbia/InsideCornerRoller/cornerroller.jpg`;
 
 export default function Parts() {
   // Allowed brands to display
@@ -157,6 +160,7 @@ export default function Parts() {
   const matrixBoxHandleParts  = buildPartsFromData(columbiaMatrixBoxHandleData);
   const predatorTaperParts    = buildPartsFromData(columbiaPredatorTaperData);
   const standardOutsideCornerRollerParts = buildPartsFromData(columbiaStandardOutsideCornerRollerData);
+  const insideCornerRollerParts = buildPartsFromData(columbiaInsideCornerRollerData);
 
   const schematics = [
     {
@@ -568,6 +572,16 @@ export default function Parts() {
       imagePages: { 1: columbiaStandardOutsideCornerRollerImg },
       previewImage: columbiaStandardOutsideCornerRollerPreview,
       parts: standardOutsideCornerRollerParts
+    },
+    {
+      id: 'columbia-inside-corner-roller',
+      title: 'Inside Corner Roller',
+      description: 'Columbia Inside Corner Roller schematic diagram',
+      brand: 'Columbia Taping Tools',
+      diagramPages: [1],
+      imagePages: { 1: columbiaInsideCornerRollerImg },
+      previewImage: columbiaInsideCornerRollerPreview,
+      parts: insideCornerRollerParts
     }
   ];
 

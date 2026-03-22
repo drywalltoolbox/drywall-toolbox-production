@@ -207,6 +207,7 @@
 
 /* =============================================
    HOTSPOTS — MOBILE TOUCH TARGETS
+   Responsive across all screen sizes with proper scaling
    ============================================= */
 .hotspot {
   position: absolute;
@@ -228,14 +229,38 @@
   box-sizing: border-box;
 }
 
-/* Desktop hover effects only */
-@media (min-width: 769px) {
+/* Desktop (1024px+): Small hotspots with hover effects */
+@media (min-width: 1024px) {
   .hotspot {
+    width: 24px;
+    height: 24px;
+    min-width: 24px;
+    min-height: 24px;
     transition: transform 180ms ease-out, box-shadow 180ms ease-out, background-color 180ms ease-out;
+  }
+
+  .hotspot-rectangle {
+    border-radius: 2px;
   }
 }
 
-@media (max-width: 768px) {
+/* Tablet landscape (769px - 1023px): Medium hotspots */
+@media (min-width: 769px) and (max-width: 1023px) {
+  .hotspot {
+    min-width: 40px;
+    min-height: 40px;
+    transition: transform 180ms ease-out, box-shadow 180ms ease-out, background-color 180ms ease-out;
+  }
+
+  .hotspot-rectangle {
+    min-width: 48px !important;
+    min-height: 32px !important;
+    border-radius: 2px;
+  }
+}
+
+/* Tablet portrait & large phones (481px - 768px): Larger hotspots */
+@media (min-width: 481px) and (max-width: 768px) {
   .hotspot {
     min-width: 44px;
     min-height: 44px;
@@ -254,20 +279,48 @@
   }
 
   .hotspot-rectangle {
-    min-width: 50px !important;
-    min-height: 35px !important;
+    min-width: 52px !important;
+    min-height: 36px !important;
+    border-radius: 2px;
   }
 }
 
+/* Small phones (max-width: 480px): Extra large hotspots for better touchability */
 @media (max-width: 480px) {
   .hotspot {
     min-width: 48px;
     min-height: 48px;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: none;
+    -webkit-user-select: none;
+    user-select: none;
+    pointer-events: auto !important;
+    transition: none !important;
+  }
+
+  .hotspot:hover {
+    transform: translate(-50%, -50%) !important;
+    background: transparent !important;
+    box-shadow: none !important;
   }
 
   .hotspot-rectangle {
     min-width: 56px !important;
     min-height: 40px !important;
+    border-radius: 2px;
+  }
+}
+
+/* Extra small phones (max-width: 360px): Responsive scaling */
+@media (max-width: 360px) {
+  .hotspot {
+    min-width: 44px;
+    min-height: 44px;
+  }
+
+  .hotspot-rectangle {
+    min-width: 50px !important;
+    min-height: 36px !important;
   }
 }
 
