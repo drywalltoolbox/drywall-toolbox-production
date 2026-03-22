@@ -52,7 +52,6 @@ const columbiaMatrixPinchboxImg    = `${_BASE}schematics/brands/Columbia/Matrix_
 const columbiaPredatorTaperPreview = `${_BASE}schematics/brands/Columbia/predator_taper.jpg`;
 const columbiaPredatorTaperBodyImg = `${_BASE}schematics/brands/Columbia/predator_taper_body.png`;
 const columbiaPredatorTaperHeadNewImg = `${_BASE}schematics/brands/Columbia/predator_taper_head.png`;
-const columbia3SchematicImg        = `${_BASE}schematics/brands/Columbia/columbia_3_schematic-enhanced.png`;
 
 export default function Parts() {
   // Allowed brands to display
@@ -514,16 +513,6 @@ export default function Parts() {
       diagramPages: [1],
       imagePages: { 1: columbiaExternalCornerApplicatorImg },
       previewImage: columbiaExternalCornerApplicatorPreview,
-      parts: []
-    },
-    // Columbia Inside Corner Roller (enhanced image-only) removed
-    {
-      id: 'columbia-3-schematic',
-      title: 'Columbia 3"',
-      description: 'Columbia 3" schematic diagram',
-      brand: 'Columbia Taping Tools',
-      diagramPages: [1],
-      imagePages: { 1: columbia3SchematicImg },
       parts: []
     }
   ];
