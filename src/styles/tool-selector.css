@@ -70,7 +70,7 @@
 
 .tools-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
   gap: 28px;
   margin-bottom: 40px;
   place-items: stretch;
@@ -81,7 +81,7 @@
   background: var(--surface-base);
   border: 1px solid var(--alloy-edge);
   border-radius: 12px;
-  padding: 40px 32px;
+  padding: 24px;
   cursor: pointer;
   transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
   overflow: hidden;
@@ -150,12 +150,12 @@
 
 .tool-image-placeholder {
   width: 100%;
-  aspect-ratio: 16 / 10;
+  aspect-ratio: 4 / 3;
   display: flex;
   align-items: center;
   justify-content: center;
   background: linear-gradient(135deg, var(--surface-elevated) 0%, var(--surface-secondary) 100%);
-  border: 2px dashed var(--alloy-edge);
+  border: none;
   border-radius: 8px;
   color: var(--text-tertiary);
   transition: all 0.4s ease-out;
@@ -164,7 +164,7 @@
 }
 
 .tool-card:hover .tool-image-placeholder {
-  border-color: var(--tension-accent);
+  border-color: transparent;
   background: linear-gradient(135deg, var(--surface-secondary) 0%, var(--surface-elevated) 100%);
 }
 
