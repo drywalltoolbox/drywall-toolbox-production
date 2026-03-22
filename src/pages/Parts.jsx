@@ -46,8 +46,9 @@ const columbiaExtensionHousingImg  = `${_BASE}schematics/brands/Columbia/Extensi
 const columbiaMatrixHeadImg        = `${_BASE}schematics/brands/Columbia/Matrix_Head-enhanced-enhanced.png`;
 const columbiaMatrixLeverImg       = `${_BASE}schematics/brands/Columbia/Matrix_Lever-1-enhanced.png`;
 const columbiaMatrixPinchboxImg    = `${_BASE}schematics/brands/Columbia/Matrix_Pinchbox-1-enhanced.png`;
-const columbiaPredatorBodyImg      = `${_BASE}schematics/brands/Columbia/PREDATOR_BODY_OCTOBER_2018-enhanced.png`;
-const columbiaPredatorTaperHeadImg = `${_BASE}schematics/brands/Columbia/PREDATOR_TAPER_HEAD-enhanced.png`;
+const columbiaPredatorTaperPreview = `${_BASE}schematics/brands/Columbia/predator_taper.jpg`;
+const columbiaPredatorTaperBodyImg = `${_BASE}schematics/brands/Columbia/predator_taper_body.png`;
+const columbiaPredatorTaperHeadNewImg = `${_BASE}schematics/brands/Columbia/predator_taper_head.png`;
 const columbia3SchematicImg        = `${_BASE}schematics/brands/Columbia/columbia_3_schematic-enhanced.png`;
 
 export default function Parts() {
@@ -338,6 +339,23 @@ export default function Parts() {
       previewImage: columbiaMatrixBoxHandlePreview,
       parts: matrixBoxHandleParts
     },
+    {
+      id: 'columbia-predator-taper',
+      title: 'Predator Taper',
+      description: 'Columbia Predator Taper series schematic diagrams',
+      brand: 'Columbia Taping Tools',
+      diagramPages: [1, 2],
+      pageLabels: {
+        1: 'Body',
+        2: 'Head'
+      },
+      imagePages: {
+        1: columbiaPredatorTaperBodyImg,
+        2: columbiaPredatorTaperHeadNewImg
+      },
+      previewImage: columbiaPredatorTaperPreview,
+      parts: []
+    },
     // New TapeTech image-only schematics
     {
       id: 'tapetech-15tte',
@@ -485,24 +503,6 @@ export default function Parts() {
       parts: []
     },
     // Columbia Inside Corner Roller (enhanced image-only) removed
-    {
-      id: 'columbia-predator-body',
-      title: 'Predator Body',
-      description: 'Columbia Predator Body schematic diagram',
-      brand: 'Columbia Taping Tools',
-      diagramPages: [1],
-      imagePages: { 1: columbiaPredatorBodyImg },
-      parts: []
-    },
-    {
-      id: 'columbia-predator-taper-head',
-      title: 'Predator Taper Head',
-      description: 'Columbia Predator Taper Head schematic diagram',
-      brand: 'Columbia Taping Tools',
-      diagramPages: [1],
-      imagePages: { 1: columbiaPredatorTaperHeadImg },
-      parts: []
-    },
     {
       id: 'columbia-3-schematic',
       title: 'Columbia 3"',
