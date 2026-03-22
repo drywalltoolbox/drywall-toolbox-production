@@ -1,185 +1,187 @@
 {
   "id": "columbia-inside-corner-roller",
   "title": "Inside Corner Roller",
-  "diagramPages": [1],
+  "diagramPages": [
+    1
+  ],
   "legendPages": [],
   "parts": [
     {
-      "id": "maczd3oje",
-      "name": "CR 12",
+      "id": "FA 288",
+      "name": "Upper Support Arm Assembly",
       "quantity": 1,
       "sku": ""
     },
     {
-      "id": "xbba2ztyh",
-      "name": "CR 1",
+      "id": "CR 11",
+      "name": "Handle Connector",
       "quantity": 1,
       "sku": ""
     },
     {
-      "id": "k8fsbv9ty",
-      "name": "CR 4",
+      "id": "CR 6",
+      "name": "Bearing Support",
       "quantity": 1,
       "sku": ""
     },
     {
-      "id": "b1ewloqmj",
-      "name": "FA 299",
+      "id": "FA 262",
+      "name": "Adjustable Rod",
       "quantity": 1,
       "sku": ""
     },
     {
-      "id": "igtpqqqoc",
-      "name": "CR 3",
+      "id": "CR 12",
+      "name": "Roller Housing Left",
       "quantity": 1,
       "sku": ""
     },
     {
-      "id": "n6sxkh4qc",
-      "name": "CR 2B",
+      "id": "CR 1",
+      "name": "Roller Wheel - Left",
       "quantity": 1,
       "sku": ""
     },
     {
-      "id": "h85fyn017",
-      "name": "CR 2A",
+      "id": "CR 4",
+      "name": "Corner Guide",
       "quantity": 1,
       "sku": ""
     },
     {
-      "id": "0thf9cuol",
-      "name": "FA 262",
+      "id": "CR 2A",
+      "name": "Roller Wheel - Right Top",
       "quantity": 1,
       "sku": ""
     },
     {
-      "id": "3esxf96ll",
-      "name": "CR 6",
+      "id": "CR 2B",
+      "name": "Roller Wheel - Right Bottom",
       "quantity": 1,
       "sku": ""
     },
     {
-      "id": "hm9u1uxog",
-      "name": "CR 11",
+      "id": "CR 3",
+      "name": "Roller Housing Right",
       "quantity": 1,
       "sku": ""
     },
     {
-      "id": "qbpm0ymea",
-      "name": "FA 288",
+      "id": "FA 299",
+      "name": "Lower Support Arm",
       "quantity": 1,
       "sku": ""
     }
   ],
   "coordinates": {
-    "maczd3oje": {
-      "id": "maczd3oje",
+    "CR 12": {
+      "id": "CR 12",
       "pageNumber": 1,
-      "top": 39.13,
-      "left": 18.88,
-      "width": 6.45,
-      "height": 4.63,
-      "shape": "rect",
+      "top": 16.21,
+      "left": 31.6,
+      "width": 4.17,
+      "height": 5.58,
+      "shape": "circle",
       "rotation": 0
     },
-    "xbba2ztyh": {
-      "id": "xbba2ztyh",
+    "CR 1": {
+      "id": "CR 1",
       "pageNumber": 1,
-      "top": 70.66,
-      "left": 18.99,
-      "width": 6.45,
-      "height": 4.63,
-      "shape": "rect",
+      "top": 16.41,
+      "left": 68.57,
+      "width": 4.17,
+      "height": 5.58,
+      "shape": "circle",
       "rotation": 0
     },
-    "k8fsbv9ty": {
-      "id": "k8fsbv9ty",
+    "CR 4": {
+      "id": "CR 4",
       "pageNumber": 1,
-      "top": 70.66,
-      "left": 35.70,
-      "width": 5.79,
-      "height": 4.63,
-      "shape": "rect",
+      "top": 30.69,
+      "left": 68.57,
+      "width": 4.17,
+      "height": 5.58,
+      "shape": "circle",
       "rotation": 0
     },
-    "b1ewloqmj": {
-      "id": "b1ewloqmj",
+    "FA 288": {
+      "id": "FA 288",
       "pageNumber": 1,
-      "top": 94.95,
-      "left": 82.01,
-      "width": 6.45,
-      "height": 4.63,
-      "shape": "rect",
+      "top": 67.39,
+      "left": 11.14,
+      "width": 4.17,
+      "height": 5.58,
+      "shape": "circle",
       "rotation": 0
     },
-    "igtpqqqoc": {
-      "id": "igtpqqqoc",
+    "CR 11": {
+      "id": "CR 11",
       "pageNumber": 1,
-      "top": 86.75,
-      "left": 82.46,
-      "width": 6.45,
-      "height": 4.63,
-      "shape": "rect",
+      "top": 67.28,
+      "left": 18.13,
+      "width": 4.17,
+      "height": 5.58,
+      "shape": "circle",
       "rotation": 0
     },
-    "n6sxkh4qc": {
-      "id": "n6sxkh4qc",
+    "CR 6": {
+      "id": "CR 6",
       "pageNumber": 1,
-      "top": 78.49,
-      "left": 82.01,
-      "width": 6.45,
-      "height": 4.63,
-      "shape": "rect",
+      "top": 67.39,
+      "left": 25.32,
+      "width": 4.17,
+      "height": 5.58,
+      "shape": "circle",
       "rotation": 0
     },
-    "h85fyn017": {
-      "id": "h85fyn017",
+    "FA 262": {
+      "id": "FA 262",
       "pageNumber": 1,
-      "top": 70.45,
-      "left": 82.34,
-      "width": 6.45,
-      "height": 4.63,
-      "shape": "rect",
+      "top": 67.39,
+      "left": 32.82,
+      "width": 4.17,
+      "height": 5.58,
+      "shape": "circle",
       "rotation": 0
     },
-    "0thf9cuol": {
-      "id": "0thf9cuol",
+    "CR 2A": {
+      "id": "CR 2A",
       "pageNumber": 1,
-      "top": 39.13,
-      "left": 82.34,
-      "width": 6.45,
-      "height": 4.63,
-      "shape": "rect",
+      "top": 67.39,
+      "left": 68.57,
+      "width": 4.17,
+      "height": 5.58,
+      "shape": "circle",
       "rotation": 0
     },
-    "3esxf96ll": {
-      "id": "3esxf96ll",
+    "CR 2B": {
+      "id": "CR 2B",
       "pageNumber": 1,
-      "top": 31.77,
-      "left": 82.80,
-      "width": 6.45,
-      "height": 4.63,
-      "shape": "rect",
+      "top": 67.29,
+      "left": 77.18,
+      "width": 4.17,
+      "height": 5.58,
+      "shape": "circle",
       "rotation": 0
     },
-    "hm9u1uxog": {
-      "id": "hm9u1uxog",
+    "CR 3": {
+      "id": "CR 3",
       "pageNumber": 1,
-      "top": 25.13,
-      "left": 82.34,
-      "width": 6.45,
-      "height": 4.63,
-      "shape": "rect",
+      "top": 67.29,
+      "left": 85.68,
+      "width": 4.17,
+      "height": 5.58,
+      "shape": "circle",
       "rotation": 0
     },
-    "qbpm0ymea": {
-      "id": "qbpm0ymea",
+    "FA 299": {
+      "id": "FA 299",
       "pageNumber": 1,
-      "top": 18.69,
-      "left": 82.01,
-      "width": 6.45,
-      "height": 4.63,
-      "shape": "rect",
+      "top": 67.49,
+      "left": 94.29,
+      "width": 4.17,
+      "height": 5.58,
+      "shape": "circle",
       "rotation": 0
     }
   }
