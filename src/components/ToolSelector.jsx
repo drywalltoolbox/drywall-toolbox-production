@@ -11,9 +11,10 @@ export default function ToolSelector({ brand, tools, onSelectTool, onBack }) {
     return acc;
   }, {});
 
-  // Determine if we should show categories (only if there are multiple categories or if some tools have categories)
+  // Determine if we should show categories - show if any tool has a category defined
   const categories = Object.keys(groupedTools);
-  const showCategories = categories.length > 1 || (categories.length === 1 && categories[0] !== 'Other');
+  const hasAnyCategory = tools.some(tool => tool.category);
+  const showCategories = hasAnyCategory || categories.length > 1;
 
   return (
     <div className="tool-selector">
