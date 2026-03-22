@@ -1,0 +1,686 @@
+{
+  "id": "columbia-throttle-box",
+  "title": "Throttle Box",
+  "diagramPages": [
+    1
+  ],
+  "legendPages": [],
+  "parts": [
+    {
+      "id": "FA258",
+      "name": "FA258",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "FA234",
+      "name": "FA234",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "CFB5B",
+      "name": "CFB5B",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "CFB5A",
+      "name": "CFB5A",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "CFB6",
+      "name": "CFB6",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "CFB9 FOR 7\" CORNER BOX",
+      "name": "CFB9 FOR 7\" CORNER BOX",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "CT101",
+      "name": "CT101",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "CFB5C",
+      "name": "CFB5C",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "CT98",
+      "name": "CT98",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "FA219",
+      "name": "FA219",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "CFB15A",
+      "name": "CFB15A",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "CFB1A",
+      "name": "CFB1A",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "CFB1 8\"",
+      "name": "CFB1 8\"",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "FA231",
+      "name": "FA231",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "CFB15",
+      "name": "CFB15",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "FA247",
+      "name": "FA247",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "CFB16",
+      "name": "CFB16",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "CFB3 8\"",
+      "name": "CFB3 8\"",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "FA247",
+      "name": "FA247",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "FA242",
+      "name": "FA242",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "FA238",
+      "name": "FA238",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "CFB19",
+      "name": "CFB19",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "FA296",
+      "name": "FA296",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "FA253",
+      "name": "FA253",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "FA262",
+      "name": "FA262",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "AB44",
+      "name": "AB44",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "CFB2 8\"",
+      "name": "CFB2 8\"",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "FA247",
+      "name": "FA247",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "FA234",
+      "name": "FA234",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "FA228",
+      "name": "FA228",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "FFB32",
+      "name": "FFB32",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "FA280",
+      "name": "FA280",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "FFB32A",
+      "name": "FFB32A",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "FA241",
+      "name": "FA241",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "AB45",
+      "name": "AB45",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "CFB4 8\"",
+      "name": "CFB4 8\"",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "AB49",
+      "name": "AB49",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "FA263",
+      "name": "FA263",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "CFB7 8\"",
+      "name": "CFB7 8\"",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "CFB8A",
+      "name": "CFB8A",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "AB44B",
+      "name": "AB44B",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "AB44A",
+      "name": "AB44A",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "FA309",
+      "name": "FA309",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "CT39",
+      "name": "CT39",
+      "quantity": 1,
+      "sku": ""
+    }
+  ],
+  "coordinates": {
+    "FA258": {
+      "id": "FA258",
+      "pageNumber": 1,
+      "top": 14.63,
+      "left": 15.87,
+      "width": 1.33,
+      "height": 2.18,
+      "shape": "rect",
+      "rotation": 0
+    },
+    "FA234": {
+      "id": "FA234",
+      "pageNumber": 1,
+      "top": 41.85,
+      "left": 9.46,
+      "width": 1.33,
+      "height": 2.9,
+      "shape": "rect",
+      "rotation": 0
+    },
+    "CFB5B": {
+      "id": "CFB5B",
+      "pageNumber": 1,
+      "top": 14.35,
+      "left": 6.11,
+      "width": 1.38,
+      "height": 3.07,
+      "shape": "rect",
+      "rotation": 0
+    },
+    "CFB5A": {
+      "id": "CFB5A",
+      "pageNumber": 1,
+      "top": 16.23,
+      "left": 8.2,
+      "width": 1.42,
+      "height": 3.07,
+      "shape": "rect",
+      "rotation": 0
+    },
+    "CFB6": {
+      "id": "CFB6",
+      "pageNumber": 1,
+      "top": 8.26,
+      "left": 20.42,
+      "width": 1.29,
+      "height": 2.46,
+      "shape": "rect",
+      "rotation": 0
+    },
+    "CFB9 FOR 7\" CORNER BOX": {
+      "id": "CFB9 FOR 7\" CORNER BOX",
+      "pageNumber": 1,
+      "top": 3.57,
+      "left": 27.0,
+      "width": 1.92,
+      "height": 7.76,
+      "shape": "rect",
+      "rotation": 0
+    },
+    "CT101": {
+      "id": "CT101",
+      "pageNumber": 1,
+      "top": 11.22,
+      "left": 20.88,
+      "width": 1.29,
+      "height": 2.79,
+      "shape": "rect",
+      "rotation": 0
+    },
+    "CFB5C": {
+      "id": "CFB5C",
+      "pageNumber": 1,
+      "top": 18.0,
+      "left": 10.1,
+      "width": 1.54,
+      "height": 3.01,
+      "shape": "rect",
+      "rotation": 0
+    },
+    "CT98": {
+      "id": "CT98",
+      "pageNumber": 1,
+      "top": 14.4,
+      "left": 21.08,
+      "width": 1.42,
+      "height": 2.4,
+      "shape": "rect",
+      "rotation": 0
+    },
+    "FA219": {
+      "id": "FA219",
+      "pageNumber": 1,
+      "top": 25.64,
+      "left": 4.9,
+      "width": 1.42,
+      "height": 2.79,
+      "shape": "rect",
+      "rotation": 0
+    },
+    "CFB15A": {
+      "id": "CFB15A",
+      "pageNumber": 1,
+      "top": 12.83,
+      "left": 25.46,
+      "width": 1.54,
+      "height": 3.57,
+      "shape": "rect",
+      "rotation": 0
+    },
+    "CFB1A": {
+      "id": "CFB1A",
+      "pageNumber": 1,
+      "top": 15.46,
+      "left": 22.67,
+      "width": 1.42,
+      "height": 3.01,
+      "shape": "rect",
+      "rotation": 0
+    },
+    "CFB1 8\"": {
+      "id": "CFB1 8\"",
+      "pageNumber": 1,
+      "top": 29.72,
+      "left": 7.68,
+      "width": 1.46,
+      "height": 3.57,
+      "shape": "rect",
+      "rotation": 0
+    },
+    "FA231": {
+      "id": "FA231",
+      "pageNumber": 1,
+      "top": 18.02,
+      "left": 24.79,
+      "width": 1.46,
+      "height": 2.9,
+      "shape": "rect",
+      "rotation": 0
+    },
+    "CFB15": {
+      "id": "CFB15",
+      "pageNumber": 1,
+      "top": 13.67,
+      "left": 30.5,
+      "width": 1.54,
+      "height": 2.85,
+      "shape": "rect",
+      "rotation": 0
+    },
+    "FA247": {
+      "id": "FA247",
+      "pageNumber": 1,
+      "top": 38.53,
+      "left": 17.27,
+      "width": 1.38,
+      "height": 2.73,
+      "shape": "rect",
+      "rotation": 0
+    },
+    "CFB16": {
+      "id": "CFB16",
+      "pageNumber": 1,
+      "top": 21.15,
+      "left": 24.92,
+      "width": 1.5,
+      "height": 3.07,
+      "shape": "rect",
+      "rotation": 0
+    },
+    "CFB3 8\"": {
+      "id": "CFB3 8\"",
+      "pageNumber": 1,
+      "top": 29.81,
+      "left": 17.61,
+      "width": 1.33,
+      "height": 3.46,
+      "shape": "rect",
+      "rotation": 0
+    },
+    "FA242": {
+      "id": "FA242",
+      "pageNumber": 1,
+      "top": 18.3,
+      "left": 26.29,
+      "width": 1.42,
+      "height": 2.9,
+      "shape": "rect",
+      "rotation": 0
+    },
+    "FA238": {
+      "id": "FA238",
+      "pageNumber": 1,
+      "top": 17.02,
+      "left": 34.75,
+      "width": 1.33,
+      "height": 2.85,
+      "shape": "rect",
+      "rotation": 0
+    },
+    "CFB19": {
+      "id": "CFB19",
+      "pageNumber": 1,
+      "top": 25.0,
+      "left": 22.33,
+      "width": 1.38,
+      "height": 2.85,
+      "shape": "rect",
+      "rotation": 0
+    },
+    "FA296": {
+      "id": "FA296",
+      "pageNumber": 1,
+      "top": 30.39,
+      "left": 20.47,
+      "width": 1.42,
+      "height": 2.9,
+      "shape": "rect",
+      "rotation": 0
+    },
+    "FA253": {
+      "id": "FA253",
+      "pageNumber": 1,
+      "top": 26.28,
+      "left": 27.88,
+      "width": 1.54,
+      "height": 2.73,
+      "shape": "rect",
+      "rotation": 0
+    },
+    "FA262": {
+      "id": "FA262",
+      "pageNumber": 1,
+      "top": 29.63,
+      "left": 24.29,
+      "width": 1.42,
+      "height": 2.85,
+      "shape": "rect",
+      "rotation": 0
+    },
+    "AB44": {
+      "id": "AB44",
+      "pageNumber": 1,
+      "top": 20.98,
+      "left": 36.29,
+      "width": 1.25,
+      "height": 2.46,
+      "shape": "rect",
+      "rotation": 0
+    },
+    "CFB2 8\"": {
+      "id": "CFB2 8\"",
+      "pageNumber": 1,
+      "top": 40.19,
+      "left": 5.76,
+      "width": 1.29,
+      "height": 3.52,
+      "shape": "rect",
+      "rotation": 0
+    },
+    "FA228": {
+      "id": "FA228",
+      "pageNumber": 1,
+      "top": 45.3,
+      "left": 10.55,
+      "width": 1.29,
+      "height": 2.73,
+      "shape": "rect",
+      "rotation": 0
+    },
+    "FFB32": {
+      "id": "FFB32",
+      "pageNumber": 1,
+      "top": 45.65,
+      "left": 12.5,
+      "width": 1.33,
+      "height": 2.79,
+      "shape": "rect",
+      "rotation": 0
+    },
+    "FA280": {
+      "id": "FA280",
+      "pageNumber": 1,
+      "top": 46.32,
+      "left": 14.04,
+      "width": 1.38,
+      "height": 2.9,
+      "shape": "rect",
+      "rotation": 0
+    },
+    "FFB32A": {
+      "id": "FFB32A",
+      "pageNumber": 1,
+      "top": 45.59,
+      "left": 15.88,
+      "width": 1.25,
+      "height": 3.4,
+      "shape": "rect",
+      "rotation": 0
+    },
+    "FA241": {
+      "id": "FA241",
+      "pageNumber": 1,
+      "top": 44.7,
+      "left": 18.12,
+      "width": 1.33,
+      "height": 2.9,
+      "shape": "rect",
+      "rotation": 0
+    },
+    "AB45": {
+      "id": "AB45",
+      "pageNumber": 1,
+      "top": 44.98,
+      "left": 20.0,
+      "width": 1.29,
+      "height": 2.46,
+      "shape": "rect",
+      "rotation": 0
+    },
+    "CFB4 8\"": {
+      "id": "CFB4 8\"",
+      "pageNumber": 1,
+      "top": 38.98,
+      "left": 25.31,
+      "width": 1.42,
+      "height": 3.4,
+      "shape": "rect",
+      "rotation": 0
+    },
+    "AB49": {
+      "id": "AB49",
+      "pageNumber": 1,
+      "top": 45.03,
+      "left": 22.0,
+      "width": 1.33,
+      "height": 2.51,
+      "shape": "rect",
+      "rotation": 0
+    },
+    "FA263": {
+      "id": "FA263",
+      "pageNumber": 1,
+      "top": 28.63,
+      "left": 31.37,
+      "width": 1.38,
+      "height": 2.73,
+      "shape": "rect",
+      "rotation": 0
+    },
+    "CFB7 8\"": {
+      "id": "CFB7 8\"",
+      "pageNumber": 1,
+      "top": 43.81,
+      "left": 24.04,
+      "width": 1.38,
+      "height": 3.57,
+      "shape": "rect",
+      "rotation": 0
+    },
+    "CFB8A": {
+      "id": "CFB8A",
+      "pageNumber": 1,
+      "top": 37.0,
+      "left": 27.21,
+      "width": 1.38,
+      "height": 2.9,
+      "shape": "rect",
+      "rotation": 0
+    },
+    "AB44B": {
+      "id": "AB44B",
+      "pageNumber": 1,
+      "top": 27.46,
+      "left": 33.5,
+      "width": 1.33,
+      "height": 2.96,
+      "shape": "rect",
+      "rotation": 0
+    },
+    "AB44A": {
+      "id": "AB44A",
+      "pageNumber": 1,
+      "top": 27.04,
+      "left": 35.16,
+      "width": 1.42,
+      "height": 2.96,
+      "shape": "rect",
+      "rotation": 0
+    },
+    "FA309": {
+      "id": "FA309",
+      "pageNumber": 1,
+      "top": 39.83,
+      "left": 31.31,
+      "width": 1.29,
+      "height": 2.9,
+      "shape": "rect",
+      "rotation": 0
+    },
+    "CT39": {
+      "id": "CT39",
+      "pageNumber": 1,
+      "top": 38.39,
+      "left": 33.1,
+      "width": 1.38,
+      "height": 2.51,
+      "shape": "rect",
+      "rotation": 0
+    }
+  }
+}

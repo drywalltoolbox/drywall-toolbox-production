@@ -16,6 +16,7 @@ import columbiaMatrixBoxHandleData from '../../public/schematics/brands/Columbia
 import columbiaPredatorTaperData   from '../../public/schematics/brands/Columbia/PredatorTaper/schematic_data.json';
 import columbiaStandardOutsideCornerRollerData from '../../public/schematics/brands/Columbia/StandardOutsideCornerRoller/schematic_data.json';
 import columbiaInsideCornerRollerData from '../../public/schematics/brands/Columbia/InsideCornerRoller/schematic_data.json';
+import columbiaThrottleBoxData from '../../public/schematics/brands/Columbia/ThrottleBox/schematic_data.json';
 
 // ---------------------------------------------------------------------------
 // Schematic image paths — runtime URLs relative to the deployment base.
@@ -59,6 +60,8 @@ const columbiaStandardOutsideCornerRollerImg = `${_BASE}schematics/brands/Columb
 const columbiaStandardOutsideCornerRollerPreview = `${_BASE}schematics/brands/Columbia/StandardOutsideCornerRoller/External_90_Aplicator.jpg`;
 const columbiaInsideCornerRollerImg = `${_BASE}schematics/brands/Columbia/InsideCornerRoller/InsideCornerRoller-2014_1_-enhanced-squared.png`;
 const columbiaInsideCornerRollerPreview = `${_BASE}schematics/brands/Columbia/InsideCornerRoller/cornerroller.jpg`;
+const columbiaThrottleBoxImg = `${_BASE}schematics/brands/Columbia/ThrottleBox/CORNER-BOX-SCHEMATIC-enhanced.png`;
+const columbiaThrottleBoxPreview = `${_BASE}schematics/brands/Columbia/ThrottleBox/throttlebox8small.jpg`;
 
 export default function Parts() {
   // Allowed brands to display
@@ -161,6 +164,7 @@ export default function Parts() {
   const predatorTaperParts    = buildPartsFromData(columbiaPredatorTaperData);
   const standardOutsideCornerRollerParts = buildPartsFromData(columbiaStandardOutsideCornerRollerData);
   const insideCornerRollerParts = buildPartsFromData(columbiaInsideCornerRollerData);
+  const throttleBoxParts = buildPartsFromData(columbiaThrottleBoxData);
 
   const schematics = [
     {
@@ -582,6 +586,16 @@ export default function Parts() {
       imagePages: { 1: columbiaInsideCornerRollerImg },
       previewImage: columbiaInsideCornerRollerPreview,
       parts: insideCornerRollerParts
+    },
+    {
+      id: 'columbia-throttle-box',
+      title: 'Throttle Box',
+      description: 'Columbia Throttle Box schematic diagram',
+      brand: 'Columbia Taping Tools',
+      diagramPages: [1],
+      imagePages: { 1: columbiaThrottleBoxImg },
+      previewImage: columbiaThrottleBoxPreview,
+      parts: throttleBoxParts
     }
   ];
 
