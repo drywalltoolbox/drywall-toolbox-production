@@ -211,8 +211,8 @@
    ============================================= */
 .hotspot {
   position: absolute;
-  width: 24px;
-  height: 24px;
+  width: 6px;
+  height: 6px;
   background: transparent;
   border-radius: 50%;
   cursor: pointer;
@@ -229,41 +229,41 @@
   box-sizing: border-box;
 }
 
-/* Desktop (1024px+): Small hotspots with hover effects */
+/* Desktop (1024px+): Small precise hotspots with hover effects */
 @media (min-width: 1024px) {
   .hotspot {
-    width: 24px;
-    height: 24px;
-    min-width: 24px;
-    min-height: 24px;
+    width: 8px;
+    height: 8px;
+    min-width: 8px;
+    min-height: 8px;
     transition: transform 180ms ease-out, box-shadow 180ms ease-out, background-color 180ms ease-out;
   }
 
   .hotspot-rectangle {
-    border-radius: 2px;
+    border-radius: 1px;
   }
 }
 
 /* Tablet landscape (769px - 1023px): Medium hotspots */
 @media (min-width: 769px) and (max-width: 1023px) {
   .hotspot {
-    min-width: 40px;
-    min-height: 40px;
+    min-width: 12px;
+    min-height: 12px;
     transition: transform 180ms ease-out, box-shadow 180ms ease-out, background-color 180ms ease-out;
   }
 
   .hotspot-rectangle {
-    min-width: 48px !important;
-    min-height: 32px !important;
-    border-radius: 2px;
+    min-width: 14px !important;
+    min-height: 10px !important;
+    border-radius: 1px;
   }
 }
 
 /* Tablet portrait & large phones (481px - 768px): Larger hotspots */
 @media (min-width: 481px) and (max-width: 768px) {
   .hotspot {
-    min-width: 44px;
-    min-height: 44px;
+    min-width: 16px;
+    min-height: 16px;
     -webkit-tap-highlight-color: transparent;
     touch-action: none;
     -webkit-user-select: none;
@@ -279,17 +279,17 @@
   }
 
   .hotspot-rectangle {
-    min-width: 52px !important;
-    min-height: 36px !important;
-    border-radius: 2px;
+    min-width: 18px !important;
+    min-height: 12px !important;
+    border-radius: 1px;
   }
 }
 
 /* Small phones (max-width: 480px): Extra large hotspots for better touchability */
 @media (max-width: 480px) {
   .hotspot {
-    min-width: 48px;
-    min-height: 48px;
+    min-width: 20px;
+    min-height: 20px;
     -webkit-tap-highlight-color: transparent;
     touch-action: none;
     -webkit-user-select: none;
@@ -305,22 +305,22 @@
   }
 
   .hotspot-rectangle {
-    min-width: 56px !important;
-    min-height: 40px !important;
-    border-radius: 2px;
+    min-width: 22px !important;
+    min-height: 14px !important;
+    border-radius: 1px;
   }
 }
 
 /* Extra small phones (max-width: 360px): Responsive scaling */
 @media (max-width: 360px) {
   .hotspot {
-    min-width: 44px;
-    min-height: 44px;
+    min-width: 16px;
+    min-height: 16px;
   }
 
   .hotspot-rectangle {
-    min-width: 50px !important;
-    min-height: 36px !important;
+    min-width: 18px !important;
+    min-height: 12px !important;
   }
 }
 
@@ -746,17 +746,11 @@
     border-radius: 8px;
   }
 
-  /* Hotspots: larger touch targets on tablet */
+  /* Hotspots: smaller, more precise touch targets on tablet */
   .hotspot {
-    width: 40px;
-    height: 40px;
+    width: 12px;
+    height: 12px;
     border-radius: 50%;
-  }
-
-  .hotspot:hover {
-    transform: translate(-50%, -50%) scale(1.25);
-    background: rgba(37, 99, 235, 0.15);
-    box-shadow: 0 6px 18px rgba(37, 99, 235, 0.12);
   }
 
   /* Schematic pager: better visibility on tablet */

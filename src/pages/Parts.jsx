@@ -382,38 +382,7 @@ export default function Parts() {
         5: columbiaExtensionHousingImg
       },
       previewImage: columbiaMatrixBoxHandlePreview,
-      parts: matrixBoxHandleParts,
-      // Navigation hotspots: click a physical region to jump to its detail page
-      navHotspots: [
-        {
-          id: 'nav-matrix-head',
-          label: 'Head Detail',
-          pageNumber: 1,
-          top: '60.8%', left: '2.5%', width: '33.8%', height: '37.4%',
-          targetPage: 2
-        },
-        {
-          id: 'nav-matrix-lever',
-          label: 'Lever Detail',
-          pageNumber: 1,
-          top: '1.1%', left: '73.3%', width: '26.2%', height: '17.3%',
-          targetPage: 3
-        },
-        {
-          id: 'nav-matrix-pinchbox',
-          label: 'Pinchbox Detail',
-          pageNumber: 1,
-          top: '31.2%', left: '30.8%', width: '23.3%', height: '20.1%',
-          targetPage: 4
-        },
-        {
-          id: 'nav-matrix-ext-housing',
-          label: 'Ext. Housing Detail',
-          pageNumber: 1,
-          top: '30.1%', left: '55%', width: '19.2%', height: '18.4%',
-          targetPage: 5
-        }
-      ]
+      parts: matrixBoxHandleParts
     },
     {
       id: 'columbia-predator-taper',
