@@ -396,17 +396,7 @@ export default function Parts() {
         2: columbiaPredatorTaperHeadNewImg
       },
       previewImage: columbiaPredatorTaperPreview,
-      parts: predatorTaperParts,
-      // Navigation hotspot: click the head region on Body page → Head detail
-      navHotspots: [
-        {
-          id: 'nav-taper-head',
-          label: 'Head Detail',
-          pageNumber: 1,
-          top: '5%', left: '28%', width: '44%', height: '28%',
-          targetPage: 2
-        }
-      ]
+      parts: predatorTaperParts
     },
     // New TapeTech image-only schematics
     {
