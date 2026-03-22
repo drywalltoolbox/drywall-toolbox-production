@@ -59,21 +59,6 @@ export default function ToolSelector({ brand, tools, onSelectTool, onBack }) {
               onClick={() => setSelectedCategory(category)}
             >
               <div className="category-card-content">
-                <div className="category-icon">
-                  <svg
-                    width="48"
-                    height="48"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="1.5"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <path d="M12 2L2 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5z" />
-                    <path d="M12 12m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0" />
-                  </svg>
-                </div>
                 <h3 className="category-name">{category}</h3>
                 <p className="category-count">{groupedTools[category].length} tool{groupedTools[category].length !== 1 ? 's' : ''}</p>
               </div>
