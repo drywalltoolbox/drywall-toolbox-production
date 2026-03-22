@@ -20,8 +20,6 @@ import columbiaThrottleBoxData from '../../public/schematics/brands/Columbia/Thr
 import columbiaAutomaticFlatBoxData from '../../public/schematics/brands/Columbia/AutomaticFlatBox/schematic_data.json';
 import columbiaFlatBoxData from '../../public/schematics/brands/Columbia/FlatBox/schematic_data.json';
 import columbiaFatBoyBoxData from '../../public/schematics/brands/Columbia/FatBoyBox/schematic_data.json';
-import columbiaSemiAutomaticTaperData from '../../public/schematics/brands/Columbia/SemiAutomaticTaper/schematic_data.json';
-import columbiaAngleHeadData from '../../public/schematics/brands/Columbia/AngleHead/schematic_data.json';
 
 // ---------------------------------------------------------------------------
 // Schematic image paths — runtime URLs relative to the deployment base.
@@ -72,8 +70,7 @@ const columbiaAutomaticFlatBoxPreview = `${_BASE}schematics/brands/Columbia/Auto
 const columbiaFlatBoxImg = `${_BASE}schematics/brands/Columbia/FlatBox/FLAT-BOX-HINGED-SCHEMATIC-2022-enhanced.png`;
 const columbiaFlatBoxPreview = `${_BASE}schematics/brands/Columbia/FlatBox/2023flatbox.jpg`;
 const columbiaFatBoyBoxImg = `${_BASE}schematics/brands/Columbia/FatBoyBox/fat_boy_box.png`;
-const columbiaSemiAutomaticTaperImg = `${_BASE}schematics/brands/Columbia/SemiAutomaticTaper-2015-enhanced.png`;
-const columbiaAngleHeadImg = `${_BASE}schematics/brands/Columbia/columbia_3_schematic-enhanced.png`;
+const columbiaFatBoyBoxPreview = `${_BASE}schematics/brands/Columbia/FatBoyBox/InsideTrackBoxFrontSmall.png`;
 
 export default function Parts() {
   // Allowed brands to display
@@ -180,8 +177,6 @@ export default function Parts() {
   const automaticFlatBoxParts = buildPartsFromData(columbiaAutomaticFlatBoxData);
   const flatBoxParts = buildPartsFromData(columbiaFlatBoxData);
   const fatBoyBoxParts = buildPartsFromData(columbiaFatBoyBoxData);
-  const semiAutomaticTaperParts = buildPartsFromData(columbiaSemiAutomaticTaperData);
-  const angleHeadParts = buildPartsFromData(columbiaAngleHeadData);
 
   const schematics = [
     {
@@ -641,25 +636,8 @@ export default function Parts() {
       brand: 'Columbia Taping Tools',
       diagramPages: [1],
       imagePages: { 1: columbiaFatBoyBoxImg },
+      previewImage: columbiaFatBoyBoxPreview,
       parts: fatBoyBoxParts
-    },
-    {
-      id: 'columbia-semi-automatic-taper',
-      title: 'Semi-Automatic Taper',
-      description: 'Columbia Semi-Automatic Taper schematic diagram',
-      brand: 'Columbia Taping Tools',
-      diagramPages: [1],
-      imagePages: { 1: columbiaSemiAutomaticTaperImg },
-      parts: semiAutomaticTaperParts
-    },
-    {
-      id: 'columbia-angle-head',
-      title: '3" Angle Head',
-      description: 'Columbia 3" Angle Head schematic diagram',
-      brand: 'Columbia Taping Tools',
-      diagramPages: [1],
-      imagePages: { 1: columbiaAngleHeadImg },
-      parts: angleHeadParts
     }
   ];
 
