@@ -43,6 +43,8 @@ const tapeTechPAHC12Img     = `${_BASE}schematics/brands/TapeTech/products/PAHC1
 const columbia2WayInternalCornerImg = `${_BASE}schematics/brands/Columbia/2_Way_Internal_Corner_Applicator-1-enhanced.png`;
 const columbia2WayInternalCornerPreview = `${_BASE}schematics/brands/Columbia/Two-Way_Internal_Corner_Applicator.jpg`;
 const columbiaExtensionHousingImg  = `${_BASE}schematics/brands/Columbia/Extension_Housing_Schematic-1-enhanced.png`;
+const columbiaExternalCornerApplicatorImg = `${_BASE}schematics/brands/Columbia/8_Wheel_External_Corner_Applicator-1-enhanced.png`;
+const columbiaExternalCornerApplicatorPreview = `${_BASE}schematics/brands/Columbia/External_90_Aplicator_CEXT90_-_FRONT.jpg`;
 // (Inside Corner Roller images/data intentionally removed from parts schematics)
 const columbiaMatrixHeadImg        = `${_BASE}schematics/brands/Columbia/Matrix_Head-enhanced-enhanced.png`;
 const columbiaMatrixLeverImg       = `${_BASE}schematics/brands/Columbia/Matrix_Lever-1-enhanced.png`;
@@ -502,6 +504,16 @@ export default function Parts() {
       diagramPages: [1],
       imagePages: { 1: columbia2WayInternalCornerImg },
       previewImage: columbia2WayInternalCornerPreview,
+      parts: []
+    },
+    {
+      id: 'columbia-external-corner-applicator',
+      title: 'External Corner Applicator',
+      description: 'Columbia External Corner Applicator schematic diagram',
+      brand: 'Columbia Taping Tools',
+      diagramPages: [1],
+      imagePages: { 1: columbiaExternalCornerApplicatorImg },
+      previewImage: columbiaExternalCornerApplicatorPreview,
       parts: []
     },
     // Columbia Inside Corner Roller (enhanced image-only) removed
