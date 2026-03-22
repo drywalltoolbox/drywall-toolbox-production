@@ -41,6 +41,7 @@ const tapeTechPAHC12Img     = `${_BASE}schematics/brands/TapeTech/products/PAHC1
 
 // New Columbia image-only schematics
 const columbia2WayInternalCornerImg = `${_BASE}schematics/brands/Columbia/2_Way_Internal_Corner_Applicator-1-enhanced.png`;
+const columbia2WayInternalCornerPreview = `${_BASE}schematics/brands/Columbia/Two-Way_Internal_Corner_Applicator.jpg`;
 const columbiaExtensionHousingImg  = `${_BASE}schematics/brands/Columbia/Extension_Housing_Schematic-1-enhanced.png`;
 // (Inside Corner Roller images/data intentionally removed from parts schematics)
 const columbiaMatrixHeadImg        = `${_BASE}schematics/brands/Columbia/Matrix_Head-enhanced-enhanced.png`;
@@ -500,6 +501,7 @@ export default function Parts() {
       brand: 'Columbia Taping Tools',
       diagramPages: [1],
       imagePages: { 1: columbia2WayInternalCornerImg },
+      previewImage: columbia2WayInternalCornerPreview,
       parts: []
     },
     // Columbia Inside Corner Roller (enhanced image-only) removed
