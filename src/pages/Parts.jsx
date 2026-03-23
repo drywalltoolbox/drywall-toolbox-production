@@ -82,6 +82,8 @@ const columbiaTallBoyMudPumpImg = `${_BASE}schematics/brands/Columbia/TallBoyMud
 const columbiaTallBoyMudPumpPreview = `${_BASE}schematics/brands/Columbia/TallBoyMudPump/TallBoyPump.jpg`;
 const columbiaNailspotterImg = `${_BASE}schematics/brands/Columbia/Nailspotter/NAIL-SPOTTER-SCHEMATIC-2022-enhanced.png`;
 const columbiaNailspotterPreview = `${_BASE}schematics/brands/Columbia/Nailspotter/2023Nailspotter3inch.jpg`;
+const columbiaTomahawkSmoothingBladesImg = `${_BASE}schematics/brands/Columbia/TomahawkSmoothingBlades/TOMAHAWK-SCHEMATIC-2022-enhanced.png`;
+const columbiaTomahawkSmoothingBladesPreview = `${_BASE}schematics/brands/Columbia/TomahawkSmoothingBlades/Tomahawksmoothingblade.jpg`;
 
 export default function Parts() {
   // Allowed brands to display
@@ -683,6 +685,17 @@ export default function Parts() {
       diagramPages: [1],
       imagePages: { 1: columbiaNailspotterImg },
       previewImage: columbiaNailspotterPreview,
+      parts: []
+    },
+    {
+      id: 'columbia-tomahawk-smoothing-blades',
+      title: 'Tomahawk Smoothing Blades',
+      description: 'Columbia Tomahawk Smoothing Blades schematic diagram',
+      brand: 'Columbia Taping Tools',
+      category: 'Smoothing Blades',
+      diagramPages: [1],
+      imagePages: { 1: columbiaTomahawkSmoothingBladesImg },
+      previewImage: columbiaTomahawkSmoothingBladesPreview,
       parts: []
     }
   ];
