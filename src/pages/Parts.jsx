@@ -80,6 +80,8 @@ const columbiaMudPumpImg = `${_BASE}schematics/brands/Columbia/MudPump/MUD-PUMP-
 const columbiaMudPumpPreview = `${_BASE}schematics/brands/Columbia/MudPump/TallBoyMudpumps.jpg`;
 const columbiaTallBoyMudPumpImg = `${_BASE}schematics/brands/Columbia/TallBoyMudPump/TALL-BOY-MUD-PUMP-SCHEMATIC-2022-enhanced.png`;
 const columbiaTallBoyMudPumpPreview = `${_BASE}schematics/brands/Columbia/TallBoyMudPump/TallBoyPump.jpg`;
+const columbiaNailspotterImg = `${_BASE}schematics/brands/Columbia/Nailspotter/NAIL-SPOTTER-SCHEMATIC-2022-enhanced.png`;
+const columbiaNailspotterPreview = `${_BASE}schematics/brands/Columbia/Nailspotter/2023Nailspotter3inch.jpg`;
 
 export default function Parts() {
   // Allowed brands to display
@@ -671,6 +673,17 @@ export default function Parts() {
       imagePages: { 1: columbiaTallBoyMudPumpImg },
       previewImage: columbiaTallBoyMudPumpPreview,
       parts: tallBoyMudPumpParts
+    },
+    {
+      id: 'columbia-nailspotter',
+      title: 'Nailspotter 3"',
+      description: 'Columbia Nailspotter 3" schematic diagram',
+      brand: 'Columbia Taping Tools',
+      category: 'Nailspotters',
+      diagramPages: [1],
+      imagePages: { 1: columbiaNailspotterImg },
+      previewImage: columbiaNailspotterPreview,
+      parts: []
     }
   ];
 
