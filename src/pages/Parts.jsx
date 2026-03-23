@@ -92,6 +92,8 @@ const columbiaComboFlusherImg = `${_BASE}schematics/brands/Columbia/CornerFlushe
 const columbiaComboFlusherPreview = `${_BASE}schematics/brands/Columbia/CornerFlusher/combo_flusher.jpg`;
 const columbiaSanderHeadImg = `${_BASE}schematics/brands/Columbia/Sanders/SANDER-HEAD-SCHEMATIC-enhanced.png`;
 const columbiaSanderHeadPreview = `${_BASE}schematics/brands/Columbia/Sanders/sanderwhandlesquaresmall.jpg`;
+const columbiaCompoundTubeImg = `${_BASE}schematics/brands/Columbia/CompoundTubes/COMPOUND-TUBE-SCHEMATIC-2022-enhanced.png`;
+const columbiaCompoundTubePreview = `${_BASE}schematics/brands/Columbia/CompoundTubes/compoundtubesquare.jpg`;
 
 export default function Parts() {
   // Allowed brands to display
@@ -748,6 +750,17 @@ export default function Parts() {
       diagramPages: [1],
       imagePages: { 1: columbiaSanderHeadImg },
       previewImage: columbiaSanderHeadPreview,
+      parts: []
+    },
+    {
+      id: 'columbia-compound-tube',
+      title: 'Compound Tube',
+      description: 'Columbia Compound Tube schematic diagram',
+      brand: 'Columbia Taping Tools',
+      category: 'Compound Tubes',
+      diagramPages: [1],
+      imagePages: { 1: columbiaCompoundTubeImg },
+      previewImage: columbiaCompoundTubePreview,
       parts: []
     }
   ];
