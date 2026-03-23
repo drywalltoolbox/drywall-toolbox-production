@@ -90,6 +90,8 @@ const columbiaDirectCornerFlusherImg = `${_BASE}schematics/brands/Columbia/Corne
 const columbiaDirectCornerFlusherPreview = `${_BASE}schematics/brands/Columbia/CornerFlusher/2.5_Direct_Flusher_2.5DF.jpg`;
 const columbiaComboFlusherImg = `${_BASE}schematics/brands/Columbia/CornerFlusher/Classic_Combo_Flusher-1-enhanced.png`;
 const columbiaComboFlusherPreview = `${_BASE}schematics/brands/Columbia/CornerFlusher/combo_flusher.jpg`;
+const columbiaSanderHeadImg = `${_BASE}schematics/brands/Columbia/Sanders/SANDER-HEAD-SCHEMATIC-enhanced.png`;
+const columbiaSanderHeadPreview = `${_BASE}schematics/brands/Columbia/Sanders/sanderwhandlesquaresmall.jpg`;
 
 export default function Parts() {
   // Allowed brands to display
@@ -735,6 +737,17 @@ export default function Parts() {
       diagramPages: [1],
       imagePages: { 1: columbiaComboFlusherImg },
       previewImage: columbiaComboFlusherPreview,
+      parts: []
+    },
+    {
+      id: 'columbia-sander-head',
+      title: 'Sander Head',
+      description: 'Columbia Sander Head schematic diagram',
+      brand: 'Columbia Taping Tools',
+      category: 'Sanders',
+      diagramPages: [1],
+      imagePages: { 1: columbiaSanderHeadImg },
+      previewImage: columbiaSanderHeadPreview,
       parts: []
     }
   ];
