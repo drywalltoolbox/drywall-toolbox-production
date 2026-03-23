@@ -84,6 +84,10 @@ const columbiaNailspotterImg = `${_BASE}schematics/brands/Columbia/Nailspotter/N
 const columbiaNailspotterPreview = `${_BASE}schematics/brands/Columbia/Nailspotter/2023Nailspotter3inch.jpg`;
 const columbiaTomahawkSmoothingBladesImg = `${_BASE}schematics/brands/Columbia/TomahawkSmoothingBlades/TOMAHAWK-SCHEMATIC-2022-enhanced.png`;
 const columbiaTomahawkSmoothingBladesPreview = `${_BASE}schematics/brands/Columbia/TomahawkSmoothingBlades/Tomahawksmoothingblade.jpg`;
+const columbiaStandardCornerFlusherImg = `${_BASE}schematics/brands/Columbia/CornerFlusher/3.5INCH-CORNER-FLUSHER-SCHEMATIC-2015-enhanced.png`;
+const columbiaStandardCornerFlusherPreview = `${_BASE}schematics/brands/Columbia/CornerFlusher/3inchflusher.png`;
+const columbiaDirectCornerFlusherImg = `${_BASE}schematics/brands/Columbia/CornerFlusher/DirectStandardFlusher-2015-enhanced.png`;
+const columbiaDirectCornerFlusherPreview = `${_BASE}schematics/brands/Columbia/CornerFlusher/2.5_Direct_Flusher_2.5DF.jpg`;
 
 export default function Parts() {
   // Allowed brands to display
@@ -696,6 +700,28 @@ export default function Parts() {
       diagramPages: [1],
       imagePages: { 1: columbiaTomahawkSmoothingBladesImg },
       previewImage: columbiaTomahawkSmoothingBladesPreview,
+      parts: []
+    },
+    {
+      id: 'columbia-standard-corner-flusher',
+      title: 'Standard Corner Flusher',
+      description: 'Columbia Standard Corner Flusher schematic diagram',
+      brand: 'Columbia Taping Tools',
+      category: 'Corner Flushers',
+      diagramPages: [1],
+      imagePages: { 1: columbiaStandardCornerFlusherImg },
+      previewImage: columbiaStandardCornerFlusherPreview,
+      parts: []
+    },
+    {
+      id: 'columbia-direct-corner-flusher',
+      title: 'Direct Corner Flusher',
+      description: 'Columbia Direct Corner Flusher schematic diagram',
+      brand: 'Columbia Taping Tools',
+      category: 'Corner Flushers',
+      diagramPages: [1],
+      imagePages: { 1: columbiaDirectCornerFlusherImg },
+      previewImage: columbiaDirectCornerFlusherPreview,
       parts: []
     }
   ];
