@@ -94,6 +94,8 @@ const columbiaSanderHeadImg = `${_BASE}schematics/brands/Columbia/Sanders/SANDER
 const columbiaSanderHeadPreview = `${_BASE}schematics/brands/Columbia/Sanders/sanderwhandlesquaresmall.jpg`;
 const columbiaCompoundTubeImg = `${_BASE}schematics/brands/Columbia/CompoundTubes/COMPOUND-TUBE-SCHEMATIC-2022-enhanced.png`;
 const columbiaCompoundTubePreview = `${_BASE}schematics/brands/Columbia/CompoundTubes/compoundtubesquare.jpg`;
+const columbiaCamLockTubeImg = `${_BASE}schematics/brands/Columbia/CompoundTubes/Cam_Lock_Tube_2019-enhanced.png`;
+const columbiaCamLockTubePreview = `${_BASE}schematics/brands/Columbia/CompoundTubes/camlocktubesquare.jpg`;
 
 export default function Parts() {
   // Allowed brands to display
@@ -761,6 +763,17 @@ export default function Parts() {
       diagramPages: [1],
       imagePages: { 1: columbiaCompoundTubeImg },
       previewImage: columbiaCompoundTubePreview,
+      parts: []
+    },
+    {
+      id: 'columbia-cam-lock-tube',
+      title: 'Cam Lock Tube',
+      description: 'Columbia Cam Lock Tube schematic diagram',
+      brand: 'Columbia Taping Tools',
+      category: 'Compound Tubes',
+      diagramPages: [1],
+      imagePages: { 1: columbiaCamLockTubeImg },
+      previewImage: columbiaCamLockTubePreview,
       parts: []
     }
   ];
