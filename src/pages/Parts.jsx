@@ -88,6 +88,8 @@ const columbiaStandardCornerFlusherImg = `${_BASE}schematics/brands/Columbia/Cor
 const columbiaStandardCornerFlusherPreview = `${_BASE}schematics/brands/Columbia/CornerFlusher/3inchflusher.png`;
 const columbiaDirectCornerFlusherImg = `${_BASE}schematics/brands/Columbia/CornerFlusher/DirectStandardFlusher-2015-enhanced.png`;
 const columbiaDirectCornerFlusherPreview = `${_BASE}schematics/brands/Columbia/CornerFlusher/2.5_Direct_Flusher_2.5DF.jpg`;
+const columbiaComboFlusherImg = `${_BASE}schematics/brands/Columbia/CornerFlusher/Classic_Combo_Flusher-1-enhanced.png`;
+const columbiaComboFlusherPreview = `${_BASE}schematics/brands/Columbia/CornerFlusher/combo_flusher.jpg`;
 
 export default function Parts() {
   // Allowed brands to display
@@ -722,6 +724,17 @@ export default function Parts() {
       diagramPages: [1],
       imagePages: { 1: columbiaDirectCornerFlusherImg },
       previewImage: columbiaDirectCornerFlusherPreview,
+      parts: []
+    },
+    {
+      id: 'columbia-combo-flusher',
+      title: 'Combo Flusher',
+      description: 'Columbia Combo Flusher schematic diagram',
+      brand: 'Columbia Taping Tools',
+      category: 'Corner Flushers',
+      diagramPages: [1],
+      imagePages: { 1: columbiaComboFlusherImg },
+      previewImage: columbiaComboFlusherPreview,
       parts: []
     }
   ];
