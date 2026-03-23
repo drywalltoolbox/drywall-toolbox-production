@@ -98,6 +98,8 @@ const columbiaCamLockTubeImg = `${_BASE}schematics/brands/Columbia/CompoundTubes
 const columbiaCamLockTubePreview = `${_BASE}schematics/brands/Columbia/CompoundTubes/camlocktubesquare.jpg`;
 const columbiaSemiAutomaticTaperImg = `${_BASE}schematics/brands/Columbia/SemiAutomaticTaper/SEMI-AUTOMATIC-TAPER-SCHEMATIC-2022-enhanced.png`;
 const columbiaSemiAutomaticTaperPreview = `${_BASE}schematics/brands/Columbia/SemiAutomaticTaper/semiautotapersquare.jpg`;
+const columbiaOneImg = `${_BASE}schematics/brands/Columbia/Handles/Columbia_One-enhanced.png`;
+const columbiaOnePreview = `${_BASE}schematics/brands/Columbia/Handles/columbiaonesquare.jpg`;
 
 export default function Parts() {
   // Allowed brands to display
@@ -787,6 +789,17 @@ export default function Parts() {
       diagramPages: [1],
       imagePages: { 1: columbiaSemiAutomaticTaperImg },
       previewImage: columbiaSemiAutomaticTaperPreview,
+      parts: []
+    },
+    {
+      id: 'columbia-one',
+      title: 'Columbia One',
+      description: 'Columbia One schematic diagram',
+      brand: 'Columbia Taping Tools',
+      category: 'Handles',
+      diagramPages: [1],
+      imagePages: { 1: columbiaOneImg },
+      previewImage: columbiaOnePreview,
       parts: []
     }
   ];
