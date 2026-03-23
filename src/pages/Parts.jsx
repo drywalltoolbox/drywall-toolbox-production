@@ -96,6 +96,8 @@ const columbiaCompoundTubeImg = `${_BASE}schematics/brands/Columbia/CompoundTube
 const columbiaCompoundTubePreview = `${_BASE}schematics/brands/Columbia/CompoundTubes/compoundtubesquare.jpg`;
 const columbiaCamLockTubeImg = `${_BASE}schematics/brands/Columbia/CompoundTubes/Cam_Lock_Tube_2019-enhanced.png`;
 const columbiaCamLockTubePreview = `${_BASE}schematics/brands/Columbia/CompoundTubes/camlocktubesquare.jpg`;
+const columbiaSemiAutomaticTaperImg = `${_BASE}schematics/brands/Columbia/SemiAutomaticTaper/SEMI-AUTOMATIC-TAPER-SCHEMATIC-2022-enhanced.png`;
+const columbiaSemiAutomaticTaperPreview = `${_BASE}schematics/brands/Columbia/SemiAutomaticTaper/semiautotapersquare.jpg`;
 
 export default function Parts() {
   // Allowed brands to display
@@ -774,6 +776,17 @@ export default function Parts() {
       diagramPages: [1],
       imagePages: { 1: columbiaCamLockTubeImg },
       previewImage: columbiaCamLockTubePreview,
+      parts: []
+    },
+    {
+      id: 'columbia-semi-automatic-taper',
+      title: 'Semi-Automatic Taper',
+      description: 'Columbia Semi-Automatic Taper schematic diagram',
+      brand: 'Columbia Taping Tools',
+      category: 'Semi-Automatic Tapers',
+      diagramPages: [1],
+      imagePages: { 1: columbiaSemiAutomaticTaperImg },
+      previewImage: columbiaSemiAutomaticTaperPreview,
       parts: []
     }
   ];
