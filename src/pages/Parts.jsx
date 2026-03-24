@@ -1150,10 +1150,12 @@ export default function Parts() {
             const s = allowedSchematics.find(sch => sch.id === tool.id);
             const firstPage = (s && s.diagramPages && s.diagramPages[0]) || 1;
             setCurrentPage(firstPage);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
           }}
           onBack={() => {
             setSelectedBrand(null);
             setSelectedSchematic(null);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
           }}
         />
       ) : (
@@ -1179,6 +1181,7 @@ export default function Parts() {
                 setSelectedSchematic(null);
                 setScale(1);
                 setPosition({ x: 0, y: 0 });
+                window.scrollTo({ top: 0, behavior: 'smooth' });
               }}
               aria-label="Back to Tools"
             >
