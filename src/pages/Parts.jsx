@@ -102,6 +102,10 @@ const columbiaOneImg = `${_BASE}schematics/brands/Columbia/Handles/Columbia_One-
 const columbiaOnePreview = `${_BASE}schematics/brands/Columbia/Handles/columbiaonesquare.jpg`;
 const columbiaLongExtendableHandleImg = `${_BASE}schematics/brands/Columbia/Handles/extendable-handle-enhanced.png`;
 const columbiaLongExtendableHandlePreview = `${_BASE}schematics/brands/Columbia/Handles/corner_roller_handle_extendible.jpg`;
+const columbiaFlatBoxHandleImg = `${_BASE}schematics/brands/Columbia/Handles/180GripBoxHandle-2014-enhanced.png`;
+const columbiaFlatBoxHandlePreview = `${_BASE}schematics/brands/Columbia/Handles/boxhandle.jpg`;
+const columbiaClosetMonsterFlatBoxHandleImg = `${_BASE}schematics/brands/Columbia/Handles/ClosetMonster-2015-enhanced.png`;
+const columbiaClosetMonsterFlatBoxHandlePreview = `${_BASE}schematics/brands/Columbia/Handles/closet_monster_copy.jpg`;
 
 export default function Parts() {
   // Allowed brands to display
@@ -813,6 +817,28 @@ export default function Parts() {
       diagramPages: [1],
       imagePages: { 1: columbiaLongExtendableHandleImg },
       previewImage: columbiaLongExtendableHandlePreview,
+      parts: []
+    },
+    {
+      id: 'columbia-flat-box-handle',
+      title: 'Flat Box Handle',
+      description: 'Columbia Flat Box Handle schematic diagram',
+      brand: 'Columbia Taping Tools',
+      category: 'Handles',
+      diagramPages: [1],
+      imagePages: { 1: columbiaFlatBoxHandleImg },
+      previewImage: columbiaFlatBoxHandlePreview,
+      parts: []
+    },
+    {
+      id: 'columbia-closet-monster-flat-box-handle',
+      title: 'Closet Monster Flat Box Handle',
+      description: 'Columbia Closet Monster Flat Box Handle schematic diagram',
+      brand: 'Columbia Taping Tools',
+      category: 'Handles',
+      diagramPages: [1],
+      imagePages: { 1: columbiaClosetMonsterFlatBoxHandleImg },
+      previewImage: columbiaClosetMonsterFlatBoxHandlePreview,
       parts: []
     }
   ];
