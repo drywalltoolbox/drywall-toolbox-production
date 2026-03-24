@@ -16,7 +16,7 @@ export default function BrandSelector({ brands, onSelectBrand }) {
   return (
     <div>
       <div className="mb-8">
-        <h1 className="text-4xl font-bold text-gray-900 mb-2">Parts & Schematics</h1>
+        <h1 className="text-4xl font-bold text-gray-900 mb-2">Part Schematics</h1>
         <p className="text-gray-600">Browse tool schematics and order replacement parts</p>
       </div>
 
