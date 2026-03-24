@@ -51,9 +51,27 @@
 
 .brands-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  grid-template-columns: repeat(2, 1fr);
   gap: clamp(16px, 3vw, 20px);
   margin-bottom: 40px;
+}
+
+@media (min-width: 640px) {
+  .brands-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 768px) {
+  .brands-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .brands-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
 }
 
 .brand-card {
@@ -72,7 +90,7 @@
   text-align: center;
   animation: slideUp 0.6s ease-out;
   animation-fill-mode: both;
-  aspect-ratio: 2.5 / 1;
+  aspect-ratio: 1 / 1;
 }
 
 .brands-grid .brand-card:nth-child(1) {
