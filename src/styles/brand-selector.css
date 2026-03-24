@@ -1,5 +1,5 @@
 .brand-selector {
-  padding: 60px 20px;
+  padding: 12px 20px;
   max-width: 1400px;
   margin: 0 auto;
   animation: fadeIn 0.5s ease-out;
@@ -27,7 +27,7 @@
 
 .brand-selector-header {
   text-align: center;
-  margin-bottom: 60px;
+  margin-bottom: 24px;
 }
 
 .brand-selector-header h2 {
