@@ -27,7 +27,10 @@ export default function ToolSelector({ brand, tools, onSelectTool, onBack }) {
       <div className="tool-selector-header">
         <button 
           className="back-button" 
-          onClick={selectedCategory ? () => setSelectedCategory(null) : onBack}
+          onClick={selectedCategory ? () => {
+            setSelectedCategory(null);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          } : onBack}
           aria-label={selectedCategory ? "Back to categories" : "Back to brands"}
         >
           <svg
@@ -56,7 +59,10 @@ export default function ToolSelector({ brand, tools, onSelectTool, onBack }) {
             <button
               key={category}
               className="category-card"
-              onClick={() => setSelectedCategory(category)}
+              onClick={() => {
+                setSelectedCategory(category);
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }}
             >
               <div className="category-card-content">
                 <h3 className="category-name">{category}</h3>
