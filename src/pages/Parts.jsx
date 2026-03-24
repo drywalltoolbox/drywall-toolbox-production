@@ -100,6 +100,8 @@ const columbiaSemiAutomaticTaperImg = `${_BASE}schematics/brands/Columbia/SemiAu
 const columbiaSemiAutomaticTaperPreview = `${_BASE}schematics/brands/Columbia/SemiAutomaticTaper/semiautotapersquare.jpg`;
 const columbiaOneImg = `${_BASE}schematics/brands/Columbia/Handles/Columbia_One-enhanced.png`;
 const columbiaOnePreview = `${_BASE}schematics/brands/Columbia/Handles/columbiaonesquare.jpg`;
+const columbiaLongExtendableHandleImg = `${_BASE}schematics/brands/Columbia/Handles/extendable-handle-enhanced.png`;
+const columbiaLongExtendableHandlePreview = `${_BASE}schematics/brands/Columbia/Handles/corner_roller_handle_extendible.jpg`;
 
 export default function Parts() {
   // Allowed brands to display
@@ -800,6 +802,17 @@ export default function Parts() {
       diagramPages: [1],
       imagePages: { 1: columbiaOneImg },
       previewImage: columbiaOnePreview,
+      parts: []
+    },
+    {
+      id: 'columbia-long-extendable-handle',
+      title: 'Long Extendable Handle',
+      description: 'Columbia Long Extendable Handle schematic diagram',
+      brand: 'Columbia Taping Tools',
+      category: 'Handles',
+      diagramPages: [1],
+      imagePages: { 1: columbiaLongExtendableHandleImg },
+      previewImage: columbiaLongExtendableHandlePreview,
       parts: []
     }
   ];
