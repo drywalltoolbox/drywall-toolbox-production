@@ -1176,7 +1176,7 @@ export default function Parts() {
   return (
     <section 
       style={{ 
-        padding: isFullscreen ? 'var(--header-height, 70px) 0 0' : 'calc(var(--header-height, 70px) + clamp(4px, 0.5vw, 8px)) clamp(1rem, 5vw, 2.5rem) clamp(160px, 30vw, 280px)',
+        padding: isFullscreen ? 'var(--header-height, 70px) 0 0' : 'calc(var(--header-height, 70px) + clamp(4px, 2vw, 24px)) clamp(1rem, 5vw, 2.5rem) clamp(160px, 30vw, 280px)',
         minHeight: '100vh'
       }} 
       className={`section-enter ${isFullscreen ? 'fullscreen-mode' : ''}`}
