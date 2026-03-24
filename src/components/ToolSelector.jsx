@@ -29,7 +29,7 @@ export default function ToolSelector({ brand, tools, onSelectTool, onBack }) {
           className="back-button" 
           onClick={selectedCategory ? () => {
             setSelectedCategory(null);
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            setTimeout(() => window.scrollTo({ top: 0, behavior: 'smooth' }), 0);
           } : onBack}
           aria-label={selectedCategory ? "Back to categories" : "Back to brands"}
         >
@@ -61,7 +61,7 @@ export default function ToolSelector({ brand, tools, onSelectTool, onBack }) {
               className="category-card"
               onClick={() => {
                 setSelectedCategory(category);
-                window.scrollTo({ top: 0, behavior: 'smooth' });
+                setTimeout(() => window.scrollTo({ top: 0, behavior: 'smooth' }), 0);
               }}
             >
               <div className="category-card-content">
