@@ -106,6 +106,8 @@ const columbiaFlatBoxHandleImg = `${_BASE}schematics/brands/Columbia/Handles/180
 const columbiaFlatBoxHandlePreview = `${_BASE}schematics/brands/Columbia/Handles/boxhandle.jpg`;
 const columbiaClosetMonsterFlatBoxHandleImg = `${_BASE}schematics/brands/Columbia/Handles/ClosetMonster-2015-enhanced.png`;
 const columbiaClosetMonsterFlatBoxHandlePreview = `${_BASE}schematics/brands/Columbia/Handles/closet_monster_copy.jpg`;
+const columbiaBoxFillerImg = `${_BASE}schematics/brands/Columbia/BoxFiller/Box_Filler.png`;
+const columbiaBoxFillerPreview = `${_BASE}schematics/brands/Columbia/BoxFiller/boxfiller.jpg`;
 
 export default function Parts() {
   // Allowed brands to display
@@ -839,6 +841,17 @@ export default function Parts() {
       diagramPages: [1],
       imagePages: { 1: columbiaClosetMonsterFlatBoxHandleImg },
       previewImage: columbiaClosetMonsterFlatBoxHandlePreview,
+      parts: []
+    },
+    {
+      id: 'columbia-box-filler',
+      title: 'Box Filler',
+      description: 'Columbia Box Filler schematic diagram',
+      brand: 'Columbia Taping Tools',
+      category: 'Pumps',
+      diagramPages: [1],
+      imagePages: { 1: columbiaBoxFillerImg },
+      previewImage: columbiaBoxFillerPreview,
       parts: []
     }
   ];
