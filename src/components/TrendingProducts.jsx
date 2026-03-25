@@ -104,17 +104,19 @@ export default function TrendingProducts() {
       </div>
 
       {/* Scrollable Container */}
-      <div style={{ position: 'relative' }}>
+      <div style={{ position: 'relative', overflow: 'hidden' }}>
         <div
           ref={scrollContainerRef}
           style={{
             display: 'flex',
-            gap: '20px',
+            gap: '16px',
             overflowX: 'auto',
+            overflowY: 'hidden',
             scrollBehavior: 'smooth',
-            paddingBottom: '12px',
+            paddingBottom: '8px',
             scrollbarWidth: 'thin',
-            scrollbarColor: 'rgba(37, 99, 235, 0.3) transparent'
+            scrollbarColor: 'rgba(37, 99, 235, 0.3) transparent',
+            alignItems: 'stretch'
           }}
           className="trending-scroll-container"
         >
@@ -122,7 +124,7 @@ export default function TrendingProducts() {
             <Link
               key={product.sku}
               to={`/product/${product.sku}`}
-              style={{ textDecoration: 'none', minWidth: '280px', display: 'flex' }}
+              style={{ textDecoration: 'none', minWidth: '280px', maxWidth: '280px', display: 'flex', flexShrink: 0 }}
             >
               <div
                 style={{
