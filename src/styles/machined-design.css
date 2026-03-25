@@ -1477,3 +1477,41 @@ div.min-h-screen {
         }
     }
 }
+
+/* --- HOME PAGE DESKTOP OPTIMIZATION --- */
+@media (min-width: 1025px) {
+    /* Hero section: improve desktop spacing and proportions */
+    .home-hero-section {
+        padding: clamp(2.5rem, 5vw, 4rem) clamp(1.5rem, 4vw, 2.5rem) clamp(2.5rem, 6vw, 4rem) !important;
+        min-height: 100vh;
+    }
+
+    .home-hero-grid {
+        max-width: 1200px !important;
+        gap: clamp(1.5rem, 5vw, 2.5rem) !important;
+    }
+
+    .machined-title {
+        font-size: clamp(2.5rem, 8vw, 3.5rem);
+    }
+
+    /* Category banners: better grid proportions */
+    .home-hero-section + section {
+        padding: clamp(3rem, 6vw, 4.5rem) clamp(1.5rem, 4vw, 2.5rem) !important;
+    }
+
+    /* Trust badges: responsive grid on desktop */
+    .home-hero-section + section + section {
+        padding: clamp(3rem, 6vw, 4.5rem) clamp(1.5rem, 4vw, 2.5rem) !important;
+    }
+
+    .home-hero-section + section + section > div {
+        grid-template-columns: repeat(4, 1fr) !important;
+        gap: clamp(1.5rem, 3vw, 2.5rem) !important;
+    }
+
+    /* Brand logos section: balanced spacing */
+    .home-hero-section + section + section + section + section {
+        padding: clamp(3rem, 6vw, 4.5rem) clamp(1.5rem, 4vw, 2.5rem) clamp(4rem, 8vw, 5rem) !important;
+    }
+}

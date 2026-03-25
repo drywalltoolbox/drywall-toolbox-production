@@ -85,11 +85,12 @@ const brandLogos = [
 export default function Home() {
   return (
     <>
+      <div style={{ minHeight: '100vh', background: 'white', paddingTop: 'clamp(60px, 10vw, 80px)' }}>
       {/* ─── HERO ─── */}
       <section
         className="section-enter home-hero-section"
         style={{
-          padding: 'clamp(4px, 2vw, 24px) clamp(1rem, 5vw, 2.5rem) clamp(1.5rem, 5vw, 2.5rem)',
+          padding: 'clamp(2.5rem, 5vw, 4rem) clamp(1rem, 5vw, 2.5rem) clamp(2rem, 6vw, 3.5rem)',
           minHeight: '100vh'
         }}
       >
@@ -315,6 +316,7 @@ export default function Home() {
           ))}
         </div>
       </section>
+      </div>
     </>
   );
 }
