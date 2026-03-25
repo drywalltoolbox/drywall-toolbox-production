@@ -40,6 +40,7 @@ import columbiaMatrixBoxHandleLeverData from '../../public/brands/Columbia/Schem
 import columbiaMatrixBoxHandlePinchboxData from '../../public/brands/Columbia/Schematics/Handles/MatrixBoxHandle/Pinchbox/schematic_data.json';
 import columbiaMatrixBoxHandleExtensionHousingData from '../../public/brands/Columbia/Schematics/Handles/MatrixBoxHandle/ExtensionHousing/schematic_data.json';
 import columbiaFlatBoxHandleData from '../../public/brands/Columbia/Schematics/Handles/FlatBoxHandle/schematic_data.json';
+import tapeTechExtendableSupportHandleData from '../../public/brands/TapeTech/Schematics/ExtendableSupportHandle/schematic_data.json';
 
 // ---------------------------------------------------------------------------
 // Schematic image paths — runtime URLs relative to the deployment base.
@@ -49,22 +50,9 @@ const _BASE = process.env.PUBLIC_URL;
 const columbiaMatrixBoxHandleImg    = `${_BASE}brands/Columbia/Schematics/Handles/MatrixBoxHandle/BoxHandle/Matrix_Handle-enhanced.png`;
 const columbiaMatrixBoxHandlePreview = `${_BASE}brands/Columbia/Schematics/Handles/MatrixBoxHandle/BoxHandle/columbia_matrix_box_handle.jpg`;
 
-// New TapeTech image-only schematics
-const tapeTech15TTEImg      = `${_BASE}schematics/brands/TapeTech/products/15TTE_SCH-enhanced.png`;
-const tapeTech17TTImg       = `${_BASE}schematics/brands/TapeTech/products/17TT_SCH-enhanced.png`;
-const tapeTech30TTXImg      = `${_BASE}schematics/brands/TapeTech/products/30TTX_SCH-enhanced.png`;
-const tapeTech35TTImg       = `${_BASE}schematics/brands/TapeTech/products/35TT_SCH-enhanced.png`;
-const tapeTech40TTImg       = `${_BASE}schematics/brands/TapeTech/products/40TT_SCH-enhanced.png`;
-const tapeTech45TTImg       = `${_BASE}schematics/brands/TapeTech/products/45TT_SCH-enhanced.png`;
-const tapeTech76TTCAImg     = `${_BASE}schematics/brands/TapeTech/products/76TT-CA_SCH-enhanced.png`;
-const tapeTech8000TTImg     = `${_BASE}schematics/brands/TapeTech/products/8000TT-PA_SCH-enhanced.png`;
-const tapeTech8154TTImg     = `${_BASE}schematics/brands/TapeTech/products/8154TT_SCH-enhanced.png`;
-const tapeTech85TImg        = `${_BASE}schematics/brands/TapeTech/products/85T_SCH-enhanced.png`;
-const tapeTech88TTEImg      = `${_BASE}schematics/brands/TapeTech/products/88TTE_SCH-enhanced.png`;
-const tapeTech90TImg        = `${_BASE}schematics/brands/TapeTech/products/90T_SCH-enhanced.png`;
-const tapeTechCF30TTImg     = `${_BASE}schematics/brands/TapeTech/products/CF30TT_SCH-enhanced.png`;
-const tapeTechCFHTTImg      = `${_BASE}schematics/brands/TapeTech/products/CFHTT-rA-enhanced.png`;
-const tapeTechPAHC12Img     = `${_BASE}schematics/brands/TapeTech/products/PAHC12_SCH-enhanced.png`;
+// TapeTech Extendable Support Handle schematic
+const tapeTechExtendableSupportHandleImg = `${_BASE}brands/TapeTech/Schematics/ExtendableSupportHandle/XHTT_SCH.png`;
+const tapeTechExtendableSupportHandlePreview = `${_BASE}brands/TapeTech/Schematics/ExtendableSupportHandle/XHTT_SCH.png`;
 
 // New Columbia image-only schematics
 const columbia2WayInternalCornerImg = `${_BASE}brands/Columbia/Schematics/Applicators/TwoWayInternalCorner/2_Way_Internal_Corner_Applicator-1-enhanced.png`;
@@ -272,6 +260,7 @@ export default function Parts() {
   const matrixBoxHandlePinchboxParts = buildPartsFromData(columbiaMatrixBoxHandlePinchboxData);
   const matrixBoxHandleExtensionHousingParts = buildPartsFromData(columbiaMatrixBoxHandleExtensionHousingData);
   const flatBoxHandleParts = buildPartsFromData(columbiaFlatBoxHandleData);
+  const tapeTechExtendableSupportHandleParts = buildPartsFromData(tapeTechExtendableSupportHandleData);
 
   const schematics = [
     {
@@ -316,141 +305,17 @@ export default function Parts() {
       previewImage: columbiaPredatorTaperPreview,
       parts: predatorTaperParts
     },
-    // New TapeTech image-only schematics
+    // TapeTech Extendable Support Handle schematic
     {
-      id: 'tapetech-15tte',
-      title: '15TTE',
-      description: 'TapeTech 15TTE schematic diagram',
+      id: 'tapetech-extendable-support-handle',
+      title: 'Extendable Support Handle',
+      description: 'TapeTech Extendable Support Handle schematic diagram with parts hotspots',
       brand: 'TapeTech',
+      category: 'Handles',
       diagramPages: [1],
-      imagePages: { 1: tapeTech15TTEImg },
-      parts: []
-    },
-    {
-      id: 'tapetech-17tt',
-      title: '17TT',
-      description: 'TapeTech 17TT schematic diagram',
-      brand: 'TapeTech',
-      diagramPages: [1],
-      imagePages: { 1: tapeTech17TTImg },
-      parts: []
-    },
-    {
-      id: 'tapetech-30ttx',
-      title: '30TTX',
-      description: 'TapeTech 30TTX schematic diagram',
-      brand: 'TapeTech',
-      diagramPages: [1],
-      imagePages: { 1: tapeTech30TTXImg },
-      parts: []
-    },
-    {
-      id: 'tapetech-35tt',
-      title: '35TT',
-      description: 'TapeTech 35TT schematic diagram',
-      brand: 'TapeTech',
-      diagramPages: [1],
-      imagePages: { 1: tapeTech35TTImg },
-      parts: []
-    },
-    {
-      id: 'tapetech-40tt',
-      title: '40TT',
-      description: 'TapeTech 40TT schematic diagram',
-      brand: 'TapeTech',
-      diagramPages: [1],
-      imagePages: { 1: tapeTech40TTImg },
-      parts: []
-    },
-    {
-      id: 'tapetech-45tt',
-      title: '45TT',
-      description: 'TapeTech 45TT schematic diagram',
-      brand: 'TapeTech',
-      diagramPages: [1],
-      imagePages: { 1: tapeTech45TTImg },
-      parts: []
-    },
-    {
-      id: 'tapetech-76tt-ca',
-      title: '76TT-CA',
-      description: 'TapeTech 76TT-CA schematic diagram',
-      brand: 'TapeTech',
-      diagramPages: [1],
-      imagePages: { 1: tapeTech76TTCAImg },
-      parts: []
-    },
-    {
-      id: 'tapetech-8000tt-pa',
-      title: '8000TT-PA',
-      description: 'TapeTech 8000TT-PA schematic diagram',
-      brand: 'TapeTech',
-      diagramPages: [1],
-      imagePages: { 1: tapeTech8000TTImg },
-      parts: []
-    },
-    {
-      id: 'tapetech-8154tt',
-      title: '8154TT',
-      description: 'TapeTech 8154TT schematic diagram',
-      brand: 'TapeTech',
-      diagramPages: [1],
-      imagePages: { 1: tapeTech8154TTImg },
-      parts: []
-    },
-    {
-      id: 'tapetech-85t',
-      title: '85T',
-      description: 'TapeTech 85T schematic diagram',
-      brand: 'TapeTech',
-      diagramPages: [1],
-      imagePages: { 1: tapeTech85TImg },
-      parts: []
-    },
-    {
-      id: 'tapetech-88tte',
-      title: '88TTE',
-      description: 'TapeTech 88TTE schematic diagram',
-      brand: 'TapeTech',
-      diagramPages: [1],
-      imagePages: { 1: tapeTech88TTEImg },
-      parts: []
-    },
-    {
-      id: 'tapetech-90t',
-      title: '90T',
-      description: 'TapeTech 90T schematic diagram',
-      brand: 'TapeTech',
-      diagramPages: [1],
-      imagePages: { 1: tapeTech90TImg },
-      parts: []
-    },
-    {
-      id: 'tapetech-cf30tt',
-      title: 'CF30TT',
-      description: 'TapeTech CF30TT schematic diagram',
-      brand: 'TapeTech',
-      diagramPages: [1],
-      imagePages: { 1: tapeTechCF30TTImg },
-      parts: []
-    },
-    {
-      id: 'tapetech-cfhtt',
-      title: 'CFHTT-rA',
-      description: 'TapeTech CFHTT-rA schematic diagram',
-      brand: 'TapeTech',
-      diagramPages: [1],
-      imagePages: { 1: tapeTechCFHTTImg },
-      parts: []
-    },
-    {
-      id: 'tapetech-pahc12',
-      title: 'PAHC12',
-      description: 'TapeTech PAHC12 schematic diagram',
-      brand: 'TapeTech',
-      diagramPages: [1],
-      imagePages: { 1: tapeTechPAHC12Img },
-      parts: []
+      imagePages: { 1: tapeTechExtendableSupportHandleImg },
+      previewImage: tapeTechExtendableSupportHandlePreview,
+      parts: tapeTechExtendableSupportHandleParts
     },
     {
       id: 'columbia-2-way-internal-corner',
