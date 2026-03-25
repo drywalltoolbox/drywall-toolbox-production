@@ -1,0 +1,271 @@
+{
+  "id": "columbia-compound-tube",
+  "title": "Compound Tube",
+  "diagramPages": [
+    1
+  ],
+  "legendPages": [],
+  "parts": [
+    {
+      "id": "CMT8",
+      "name": "CMT8",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "FA323",
+      "name": "FA323",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "FA28",
+      "name": "FA28",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "CT110",
+      "name": "CT110",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "CT111",
+      "name": "CT111",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "CMT2",
+      "name": "CMT2",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "FA286",
+      "name": "FA286",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "CT115A",
+      "name": "CT115A",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "FA219",
+      "name": "FA219",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "FA256",
+      "name": "FA256",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "FA23",
+      "name": "FA23",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "CMT1-24\"",
+      "name": "CMT1-24\"",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "CMT1A-24\"",
+      "name": "CMT1A-24\"",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "CMT5",
+      "name": "CMT5",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "FA239",
+      "name": "FA239",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "FA235",
+      "name": "FA235",
+      "quantity": 1,
+      "sku": ""
+    }
+  ],
+  "coordinates": {
+    "CMT8": {
+      "id": "CMT8",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 39.9,
+      "y_pct": 11.15,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "FA323": {
+      "id": "FA323",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 18.1,
+      "y_pct": 11.75,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "FA28": {
+      "id": "FA28",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 18.25,
+      "y_pct": 16.55,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "CT110": {
+      "id": "CT110",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 20.95,
+      "y_pct": 20.95,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "CT111": {
+      "id": "CT111",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 43.95,
+      "y_pct": 19.15,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "CMT2": {
+      "id": "CMT2",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 77.8,
+      "y_pct": 22.95,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "FA286": {
+      "id": "FA286",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 22.55,
+      "y_pct": 25.8,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "CT115A": {
+      "id": "CT115A",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 79.25,
+      "y_pct": 28.75,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "FA219": {
+      "id": "FA219",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 80.7,
+      "y_pct": 33.35,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "FA256": {
+      "id": "FA256",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 48.9,
+      "y_pct": 36.25,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "FA23": {
+      "id": "FA23",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 82.8,
+      "y_pct": 37.75,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "CMT1-24\"": {
+      "id": "CMT1-24\"",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 89.75,
+      "y_pct": 55.35,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "CMT1A-24\"": {
+      "id": "CMT1A-24\"",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 26.8,
+      "y_pct": 63.55,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "CMT5": {
+      "id": "CMT5",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 90.85,
+      "y_pct": 85.65,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "FA239": {
+      "id": "FA239",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 94.1,
+      "y_pct": 89.75,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "FA235": {
+      "id": "FA235",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 93.8,
+      "y_pct": 94.25,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    }
+  },
+  "schema_version": "1.0",
+  "image_natural_width": 1792,
+  "image_natural_height": 2400
+}

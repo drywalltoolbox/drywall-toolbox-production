@@ -1,0 +1,463 @@
+{
+  "id": "columbia-angle-head",
+  "title": "Angle Head",
+  "diagramPages": [
+    1
+  ],
+  "legendPages": [],
+  "parts": [
+    {
+      "id": "FA235",
+      "name": "FA235",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "AH6",
+      "name": "AH6",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "AH7-2.5\"",
+      "name": "AH7-2.5\"",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "AH7-3\"",
+      "name": "AH7-3\"",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "AH3-3\"",
+      "name": "AH3-3\"",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "FA239",
+      "name": "FA239",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "AH18",
+      "name": "AH18",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "AH16",
+      "name": "AH16",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "FA245",
+      "name": "FA245",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "AH5",
+      "name": "AH5",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "FA236",
+      "name": "FA236",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "AH4",
+      "name": "AH4",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "AH2-3\"L",
+      "name": "AH2-3\"L",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "AH8",
+      "name": "AH8",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "AH9",
+      "name": "AH9",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "FA258",
+      "name": "FA258",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "AH1",
+      "name": "AH1",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "AH2-3\"R",
+      "name": "AH2-3\"R",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "FA221",
+      "name": "FA221",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "AH11",
+      "name": "AH11",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "AH12",
+      "name": "AH12",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "FA210",
+      "name": "FA210",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "AH1-3.5\"",
+      "name": "AH1-3.5\"",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "AH23",
+      "name": "AH23",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "FA228",
+      "name": "FA228",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "AH21",
+      "name": "AH21",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "AH20",
+      "name": "AH20",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "AH22",
+      "name": "AH22",
+      "quantity": 1,
+      "sku": ""
+    }
+  ],
+  "coordinates": {
+    "FA235": {
+      "id": "FA235",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 37.0,
+      "y_pct": 9.2,
+      "shape": "circle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "AH6": {
+      "id": "AH6",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 43.8,
+      "y_pct": 8.0,
+      "shape": "circle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "AH7-2.5\"": {
+      "id": "AH7-2.5\"",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 50.9,
+      "y_pct": 8.0,
+      "shape": "circle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "AH7-3\"": {
+      "id": "AH7-3\"",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 56.0,
+      "y_pct": 8.0,
+      "shape": "circle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "AH3-3\"": {
+      "id": "AH3-3\"",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 31.4,
+      "y_pct": 28.6,
+      "shape": "circle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "FA239": {
+      "id": "FA239",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 39.2,
+      "y_pct": 28.4,
+      "shape": "circle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "AH18": {
+      "id": "AH18",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 45.6,
+      "y_pct": 28.7,
+      "shape": "circle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "AH16": {
+      "id": "AH16",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 27.3,
+      "y_pct": 32.0,
+      "shape": "circle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "FA245": {
+      "id": "FA245",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 45.1,
+      "y_pct": 32.6,
+      "shape": "circle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "AH5": {
+      "id": "AH5",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 54.4,
+      "y_pct": 32.0,
+      "shape": "circle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "FA236": {
+      "id": "FA236",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 16.4,
+      "y_pct": 40.2,
+      "shape": "circle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "AH4": {
+      "id": "AH4",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 5.7,
+      "y_pct": 50.6,
+      "shape": "circle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "AH2-3\"L": {
+      "id": "AH2-3\"L",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 10.3,
+      "y_pct": 53.6,
+      "shape": "circle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "AH8": {
+      "id": "AH8",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 24.7,
+      "y_pct": 62.5,
+      "shape": "circle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "AH9": {
+      "id": "AH9",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 29.4,
+      "y_pct": 63.5,
+      "shape": "circle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "FA258": {
+      "id": "FA258",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 37.3,
+      "y_pct": 63.7,
+      "shape": "circle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "AH1": {
+      "id": "AH1",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 41.6,
+      "y_pct": 64.0,
+      "shape": "circle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "AH2-3\"R": {
+      "id": "AH2-3\"R",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 55.0,
+      "y_pct": 53.6,
+      "shape": "circle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "FA221": {
+      "id": "FA221",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 75.6,
+      "y_pct": 17.1,
+      "shape": "circle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "AH11": {
+      "id": "AH11",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 83.9,
+      "y_pct": 17.1,
+      "shape": "circle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "AH12": {
+      "id": "AH12",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 86.1,
+      "y_pct": 30.4,
+      "shape": "circle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "FA210": {
+      "id": "FA210",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 75.6,
+      "y_pct": 40.8,
+      "shape": "circle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "AH1-3.5\"": {
+      "id": "AH1-3.5\"",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 87.0,
+      "y_pct": 38.4,
+      "shape": "circle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "AH23": {
+      "id": "AH23",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 71.8,
+      "y_pct": 67.7,
+      "shape": "circle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "FA228": {
+      "id": "FA228",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 75.2,
+      "y_pct": 67.6,
+      "shape": "circle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "AH21": {
+      "id": "AH21",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 78.6,
+      "y_pct": 67.1,
+      "shape": "circle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "AH20": {
+      "id": "AH20",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 81.6,
+      "y_pct": 67.1,
+      "shape": "circle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "AH22": {
+      "id": "AH22",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 83.8,
+      "y_pct": 67.1,
+      "shape": "circle",
+      "pageNumber": 1,
+      "rotation": 0
+    }
+  },
+  "schema_version": "1.0",
+  "image_natural_width": 2400,
+  "image_natural_height": 1792
+}

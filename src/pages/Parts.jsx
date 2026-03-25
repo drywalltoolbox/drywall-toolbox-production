@@ -21,6 +21,15 @@ import columbiaAutomaticFlatBoxData from '../../public/schematics/brands/Columbi
 import columbiaFlatBoxData from '../../public/schematics/brands/Columbia/FlatBox/schematic_data.json';
 import columbiaFatBoyBoxData from '../../public/schematics/brands/Columbia/FatBoyBox/schematic_data.json';
 import columbiaTallBoyMudPumpData from '../../public/schematics/brands/Columbia/TallBoyMudPump/schematic_data.json';
+import columbiaNailspotterData from '../../public/schematics/brands/Columbia/Nailspotter/schematic_data.json';
+import columbiaTomahawkData from '../../public/schematics/brands/Columbia/TomahawkSmoothingBlades/schematic_data.json';
+import columbiaSemiAutomaticTaperData from '../../public/schematics/brands/Columbia/SemiAutomaticTaper/schematic_data.json';
+import columbiaSanderHeadData from '../../public/schematics/brands/Columbia/Sanders/schematic_data.json';
+import columbiaAngleHeadData from '../../public/schematics/brands/Columbia/AngleHead/schematic_data.json';
+import columbiaMudPumpData from '../../public/schematics/brands/Columbia/MudPump/schematic_data.json';
+import columbiaCornerCobraData from '../../public/schematics/brands/Columbia/CornerRollers/schematic_data.json';
+import columbiaCompoundTubeDataJson from '../../public/schematics/brands/Columbia/CompoundTubes/compound_tube_data.json';
+import columbiaCf35Data from '../../public/schematics/brands/Columbia/CornerFlusher/cf35_data.json';
 
 // ---------------------------------------------------------------------------
 // Schematic image paths — runtime URLs relative to the deployment base.
@@ -108,6 +117,8 @@ const columbiaClosetMonsterFlatBoxHandleImg = `${_BASE}schematics/brands/Columbi
 const columbiaClosetMonsterFlatBoxHandlePreview = `${_BASE}schematics/brands/Columbia/Handles/closet_monster_copy.jpg`;
 const columbiaBoxFillerImg = `${_BASE}schematics/brands/Columbia/BoxFiller/Box_Filler.png`;
 const columbiaBoxFillerPreview = `${_BASE}schematics/brands/Columbia/BoxFiller/boxfiller.jpg`;
+const columbiaCornerCobraImg = `${_BASE}schematics/brands/Columbia/CornerRollers/CORNER-COBRA-SCHEMATIC.2024-enhanced.png`;
+const columbiaCornerCobraPreview = `${_BASE}schematics/brands/Columbia/CornerRollers/NEWCORNERCOBRA-scaled.png`;
 
 export default function Parts() {
   // Allowed brands to display
@@ -175,14 +186,27 @@ export default function Parts() {
 
   // Columbia Inside Corner Roller removed from parts schematics per request.
 
-  // Helper: build part-hotspot array from a schematic JSON data object
+  // Helper: build part-hotspot array from a schematic JSON data object.
+  // Supports both the official schema (x_pct / y_pct, 4 dp) and the legacy
+  // top / left format for backward compatibility.
+  //
+  // Official formula:
+  //   x_pct = round((center_x_px / image_natural_width)  * 100, 4)  → CSS left
+  //   y_pct = round((center_y_px / image_natural_height) * 100, 4)  → CSS top
   const buildPartsFromData = (data) => {
     if (!data || !data.parts) return [];
     const coords = data.coordinates || {};
     return data.parts.map((p) => {
       const c = coords[p.id] || null;
-      const top  = c && c.top  !== undefined ? `${c.top}%`  : '50%';
-      const left = c && c.left !== undefined ? `${c.left}%` : '50%';
+      // x_pct = horizontal = CSS left; y_pct = vertical = CSS top
+      const leftVal = c
+        ? (c.x_pct !== undefined ? c.x_pct : (c.left !== undefined ? c.left : 50))
+        : 50;
+      const topVal  = c
+        ? (c.y_pct !== undefined ? c.y_pct : (c.top  !== undefined ? c.top  : 50))
+        : 50;
+      const top  = `${topVal}%`;
+      const left = `${leftVal}%`;
       const pageNumber = c && c.pageNumber
         ? c.pageNumber
         : (data.diagramPages && data.diagramPages[0]) || 1;
@@ -200,7 +224,11 @@ export default function Parts() {
         height:  c && c.height  ? c.height  : null,
         widthPx: c && c.widthPx ? c.widthPx : null,
         heightPx: c && c.heightPx ? c.heightPx : null,
-        rotation: c && c.rotation ? c.rotation : 0
+        rotation: c && c.rotation ? c.rotation : 0,
+        // Pass through official schema fields for optional consumer use
+        xPx:  c && c.x_px  !== null && c.x_px  !== undefined ? c.x_px  : null,
+        yPx:  c && c.y_px  !== null && c.y_px  !== undefined ? c.y_px  : null,
+        bbox: c && c.bbox ? c.bbox : null,
       };
     });
   };
@@ -215,6 +243,15 @@ export default function Parts() {
   const flatBoxParts = buildPartsFromData(columbiaFlatBoxData);
   const fatBoyBoxParts = buildPartsFromData(columbiaFatBoyBoxData);
   const tallBoyMudPumpParts = buildPartsFromData(columbiaTallBoyMudPumpData);
+  const nailspotterParts = buildPartsFromData(columbiaNailspotterData);
+  const tomahawkParts = buildPartsFromData(columbiaTomahawkData);
+  const semiAutomaticTaperParts = buildPartsFromData(columbiaSemiAutomaticTaperData);
+  const sanderHeadParts = buildPartsFromData(columbiaSanderHeadData);
+  const angleHeadParts = buildPartsFromData(columbiaAngleHeadData);
+  const mudPumpParts = buildPartsFromData(columbiaMudPumpData);
+  const cornerCobraParts = buildPartsFromData(columbiaCornerCobraData);
+  const compoundTubeParts = buildPartsFromData(columbiaCompoundTubeDataJson);
+  const cf35Parts = buildPartsFromData(columbiaCf35Data);
 
   const schematics = [
     {
@@ -665,7 +702,7 @@ export default function Parts() {
       diagramPages: [1],
       imagePages: { 1: columbiaAngleHeadImg },
       previewImage: columbiaAngleHeadPreview,
-      parts: []
+      parts: angleHeadParts
     },
     {
       id: 'columbia-gooseneck-adapter',
@@ -687,7 +724,7 @@ export default function Parts() {
       diagramPages: [1],
       imagePages: { 1: columbiaMudPumpImg },
       previewImage: columbiaMudPumpPreview,
-      parts: []
+      parts: mudPumpParts
     },
     {
       id: 'columbia-tall-boy-mud-pump',
@@ -709,7 +746,7 @@ export default function Parts() {
       diagramPages: [1],
       imagePages: { 1: columbiaNailspotterImg },
       previewImage: columbiaNailspotterPreview,
-      parts: []
+      parts: nailspotterParts
     },
     {
       id: 'columbia-tomahawk-smoothing-blades',
@@ -720,7 +757,7 @@ export default function Parts() {
       diagramPages: [1],
       imagePages: { 1: columbiaTomahawkSmoothingBladesImg },
       previewImage: columbiaTomahawkSmoothingBladesPreview,
-      parts: []
+      parts: tomahawkParts
     },
     {
       id: 'columbia-standard-corner-flusher',
@@ -731,7 +768,7 @@ export default function Parts() {
       diagramPages: [1],
       imagePages: { 1: columbiaStandardCornerFlusherImg },
       previewImage: columbiaStandardCornerFlusherPreview,
-      parts: []
+      parts: cf35Parts
     },
     {
       id: 'columbia-direct-corner-flusher',
@@ -764,7 +801,7 @@ export default function Parts() {
       diagramPages: [1],
       imagePages: { 1: columbiaSanderHeadImg },
       previewImage: columbiaSanderHeadPreview,
-      parts: []
+      parts: sanderHeadParts
     },
     {
       id: 'columbia-compound-tube',
@@ -775,7 +812,7 @@ export default function Parts() {
       diagramPages: [1],
       imagePages: { 1: columbiaCompoundTubeImg },
       previewImage: columbiaCompoundTubePreview,
-      parts: []
+      parts: compoundTubeParts
     },
     {
       id: 'columbia-cam-lock-tube',
@@ -797,7 +834,7 @@ export default function Parts() {
       diagramPages: [1],
       imagePages: { 1: columbiaSemiAutomaticTaperImg },
       previewImage: columbiaSemiAutomaticTaperPreview,
-      parts: []
+      parts: semiAutomaticTaperParts
     },
     {
       id: 'columbia-one',
@@ -853,6 +890,17 @@ export default function Parts() {
       imagePages: { 1: columbiaBoxFillerImg },
       previewImage: columbiaBoxFillerPreview,
       parts: []
+    },
+    {
+      id: 'columbia-corner-cobra',
+      title: 'Corner Cobra',
+      description: 'Columbia Corner Cobra schematic diagram',
+      brand: 'Columbia Taping Tools',
+      category: 'Corner Rollers',
+      diagramPages: [1],
+      imagePages: { 1: columbiaCornerCobraImg },
+      previewImage: columbiaCornerCobraPreview,
+      parts: cornerCobraParts
     }
   ];
 

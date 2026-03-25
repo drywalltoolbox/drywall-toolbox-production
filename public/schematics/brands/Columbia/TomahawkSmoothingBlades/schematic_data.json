@@ -1,0 +1,175 @@
+{
+  "id": "columbia-tomahawk-smoothing-blades",
+  "title": "Tomahawk Smoothing Blades",
+  "diagramPages": [
+    1
+  ],
+  "legendPages": [],
+  "parts": [
+    {
+      "id": "FA327",
+      "name": "FA327",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "FA272",
+      "name": "FA272",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "FA271",
+      "name": "FA271",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "SB7",
+      "name": "SB7",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "SB2-12IN",
+      "name": "SB2-12IN",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "SB5",
+      "name": "SB5",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "SB6",
+      "name": "SB6",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "SB4",
+      "name": "SB4",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "SB1-12IN",
+      "name": "SB1-12IN",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "SB3",
+      "name": "SB3",
+      "quantity": 1,
+      "sku": ""
+    }
+  ],
+  "coordinates": {
+    "FA327": {
+      "id": "FA327",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 56.0,
+      "y_pct": 6.3,
+      "shape": "circle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "FA272": {
+      "id": "FA272",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 48.2,
+      "y_pct": 12.1,
+      "shape": "circle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "FA271": {
+      "id": "FA271",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 47.8,
+      "y_pct": 17.5,
+      "shape": "circle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "SB7": {
+      "id": "SB7",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 42.8,
+      "y_pct": 51.5,
+      "shape": "circle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "SB2-12IN": {
+      "id": "SB2-12IN",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 37.5,
+      "y_pct": 78.0,
+      "shape": "circle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "SB5": {
+      "id": "SB5",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 74.5,
+      "y_pct": 17.2,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "SB6": {
+      "id": "SB6",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 76.0,
+      "y_pct": 19.0,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "SB4": {
+      "id": "SB4",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 21.0,
+      "y_pct": 25.5,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "SB1-12IN": {
+      "id": "SB1-12IN",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 72.0,
+      "y_pct": 32.3,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "SB3": {
+      "id": "SB3",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 72.0,
+      "y_pct": 53.0,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    }
+  },
+  "schema_version": "1.0",
+  "image_natural_width": 2400,
+  "image_natural_height": 1792
+}
