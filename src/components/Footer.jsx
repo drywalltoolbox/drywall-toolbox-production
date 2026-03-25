@@ -24,11 +24,8 @@ export default function Footer() {
         {/* Brand column */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
           <Link to="/" style={{ display: 'inline-block' }}>
-            <img src={Logo} alt="Drywall Toolbox" className="footer-logo" style={{ height: '48px', width: 'auto' }} />
+            <img src={Logo} alt="Drywall Toolbox" className="footer-logo" style={{ height: '64px', width: 'auto' }} />
           </Link>
-          <p style={{ fontSize: '0.8rem', color: 'rgba(15,23,42,0.55)', lineHeight: 1.6, margin: 0, maxWidth: '220px' }}>
-            Professional drywall tools, parts, and accessories. Contractor trusted since day one.
-          </p>
           <div style={{ display: 'flex', gap: '12px', marginTop: '4px' }}>
             <a
               href="https://instagram.com"

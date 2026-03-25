@@ -1186,9 +1186,9 @@ export default function Parts() {
                 )}
                 
                 {/* Hotspots rendered INSIDE the transformed container so they scale and pan with the image */}
-                {currentSchematic.parts.filter(part => !part.pageNumber || part.pageNumber === currentPage).map((part) => (
+                {currentSchematic.parts.filter(part => !part.pageNumber || part.pageNumber === currentPage).map((part, index) => (
                   <div
-                    key={part.id}
+                    key={`${part.id}-${part.position.top}-${part.position.left}-${index}`}
                     className={`hotspot hotspot-${part.shape || 'circle'} ${activeHotspot === part.id ? 'active' : ''}`}
                     style={{
                       position: 'absolute',
@@ -1275,9 +1275,9 @@ export default function Parts() {
                 {/* Navigation hotspots — click a tool region to jump to its detail page */}
                 {(currentSchematic.navHotspots || [])
                   .filter(nh => nh.pageNumber === currentPage)
-                  .map((nh) => (
+                  .map((nh, navIndex) => (
                     <div
-                      key={nh.id}
+                      key={`${nh.id}-${nh.top}-${nh.left}-${navIndex}`}
                       className="nav-hotspot"
                       role="button"
                       tabIndex={0}
