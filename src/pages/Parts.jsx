@@ -12,7 +12,8 @@ import '../styles/mobile-schematic.css';
 // schematics removed by request have been deleted from the public assets and
 // their imports removed here so the build won't require them.
 // ---------------------------------------------------------------------------
-import columbiaPredatorTaperData   from '../../public/brands/Columbia/Schematics/AutomaticTapers/PredatorTaper/schematic_data.json';
+import columbiaPredatorTaperBodyData   from '../../public/brands/Columbia/Schematics/AutomaticTapers/PredatorTaper/Body/schematic_data.json';
+import columbiaPredatorTaperHeadData   from '../../public/brands/Columbia/Schematics/AutomaticTapers/PredatorTaper/Head/schematic_data.json';
 import columbiaStandardOutsideCornerRollerData from '../../public/brands/Columbia/Schematics/CornerRollers/StandardOutsideCornerRoller/schematic_data.json';
 import columbiaInsideCornerRollerData from '../../public/brands/Columbia/Schematics/CornerRollers/InsideCornerRoller/schematic_data.json';
 import columbiaThrottleBoxData from '../../public/brands/Columbia/Schematics/CornerBoxes/ThrottleBox/schematic_data.json';
@@ -232,7 +233,8 @@ export default function Parts() {
   };
 
   // Build parts arrays from JSON data
-  const predatorTaperParts    = buildPartsFromData(columbiaPredatorTaperData);
+  const predatorTaperBodyParts = buildPartsFromData(columbiaPredatorTaperBodyData);
+  const predatorTaperHeadParts = buildPartsFromData(columbiaPredatorTaperHeadData);
   const standardOutsideCornerRollerParts = buildPartsFromData(columbiaStandardOutsideCornerRollerData);
   const insideCornerRollerParts = buildPartsFromData(columbiaInsideCornerRollerData);
   const throttleBoxParts = buildPartsFromData(columbiaThrottleBoxData);
@@ -303,7 +305,7 @@ export default function Parts() {
         2: columbiaPredatorTaperHeadNewImg
       },
       previewImage: columbiaPredatorTaperPreview,
-      parts: predatorTaperParts
+      parts: [...predatorTaperBodyParts, ...predatorTaperHeadParts]
     },
     // TapeTech Extendable Support Handle schematic
     {
