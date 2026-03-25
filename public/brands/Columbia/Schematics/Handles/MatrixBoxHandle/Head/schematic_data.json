@@ -81,7 +81,7 @@
       "x_pct": 11.600000000000001,
       "y_pct": 38.30002929801946,
       "shape": "rectangle",
-      "pageNumber": 1,
+      "pageNumber": 2,
       "rotation": 0
     },
     "MH 5": {
@@ -91,7 +91,7 @@
       "x_pct": 33.85,
       "y_pct": 23.25,
       "shape": "rectangle",
-      "pageNumber": 1,
+      "pageNumber": 2,
       "rotation": 0
     },
     "FA 362": {
@@ -101,7 +101,7 @@
       "x_pct": 23.299999999999997,
       "y_pct": 50,
       "shape": "rectangle",
-      "pageNumber": 1,
+      "pageNumber": 2,
       "rotation": 0
     },
     "FA 258": {
@@ -111,7 +111,7 @@
       "x_pct": 27.25,
       "y_pct": 54.349999999999994,
       "shape": "rectangle",
-      "pageNumber": 1,
+      "pageNumber": 2,
       "rotation": 0
     },
     "MH 13": {
@@ -121,7 +121,7 @@
       "x_pct": 43.9,
       "y_pct": 68.1,
       "shape": "rectangle",
-      "pageNumber": 1,
+      "pageNumber": 2,
       "rotation": 0
     },
     "MH 1": {
@@ -131,7 +131,7 @@
       "x_pct": 48.400000000000006,
       "y_pct": 85.25,
       "shape": "rectangle",
-      "pageNumber": 1,
+      "pageNumber": 2,
       "rotation": 0
     },
     "MH 20": {
@@ -141,7 +141,7 @@
       "x_pct": 66.65,
       "y_pct": 83.15,
       "shape": "rectangle",
-      "pageNumber": 1,
+      "pageNumber": 2,
       "rotation": 0
     },
     "MH 7": {
@@ -151,7 +151,7 @@
       "x_pct": 83.6,
       "y_pct": 74.85,
       "shape": "rectangle",
-      "pageNumber": 1,
+      "pageNumber": 2,
       "rotation": 0
     },
     "MH 14": {
@@ -161,7 +161,7 @@
       "x_pct": 83.6,
       "y_pct": 59.150000000000006,
       "shape": "rectangle",
-      "pageNumber": 1,
+      "pageNumber": 2,
       "rotation": 0
     },
     "MH 8": {
@@ -171,7 +171,7 @@
       "x_pct": 83.60000000000001,
       "y_pct": 44.449960935974055,
       "shape": "rectangle",
-      "pageNumber": 1,
+      "pageNumber": 2,
       "rotation": 0
     },
     "MH 2": {
@@ -181,7 +181,7 @@
       "x_pct": 83.78667055563659,
       "y_pct": 26.40007812805188,
       "shape": "rectangle",
-      "pageNumber": 1,
+      "pageNumber": 2,
       "rotation": 0
     }
   },
@@ -211,3 +211,4 @@
   "image_natural_width": 1200,
   "image_natural_height": 896
 }
+
