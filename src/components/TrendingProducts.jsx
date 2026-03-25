@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { loadProducts } from '../data/products';
+import { filterProductsWithSchematics } from '../data/schematicMappings';
 import { ShoppingCart, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import Toast from './Toast';
@@ -27,10 +28,18 @@ export default function TrendingProducts() {
     let mounted = true;
     loadProducts().then((loadedProducts) => {
       if (!mounted) return;
-      // Get top/trending products - take first 12 from catalog
-      const trending = loadedProducts
-        .filter(p => p.price)
-        .slice(0, 12);
+      // Get Columbia products that have schematics in Parts
+      // These are all tools/products we have detailed interactive schematics for
+      const trendingWithSchematics = filterProductsWithSchematics(
+        loadedProducts,
+        'Columbia Taping Tools'
+      ).filter(p => p.price);
+      
+      // Sort by price descending (premium products first) for a more "curated" feel
+      trendingWithSchematics.sort((a, b) => (b.price || 0) - (a.price || 0));
+      
+      // Take top 12 or all if less available
+      const trending = trendingWithSchematics.slice(0, 12);
       setProducts(trending);
       setLoading(false);
     }).catch(() => {
