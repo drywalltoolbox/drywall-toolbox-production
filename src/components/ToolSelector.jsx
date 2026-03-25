@@ -81,40 +81,43 @@ export default function ToolSelector({ brand, tools, onSelectTool, onBack }) {
               className="tool-card"
               onClick={() => onSelectTool(tool)}
             >
-              <div className="tool-card-content">
-                <div className="tool-image-placeholder">
-                  {tool.previewImage ? (
-                    <img 
-                      src={tool.previewImage} 
-                      alt={tool.title}
-                      style={{ width: '100%', height: '100%', objectFit: 'contain' }}
-                    />
-                  ) : tool.imagePages && Object.keys(tool.imagePages).length > 0 ? (
-                    <img 
-                      src={tool.imagePages[Object.keys(tool.imagePages)[0]]} 
-                      alt={tool.title}
-                      style={{ width: '100%', height: '100%', objectFit: 'contain' }}
-                    />
-                  ) : (
-                    <svg
-                      className="placeholder-icon"
-                      width="40"
-                      height="40"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="1.5"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
-                      <rect x="3" y="3" width="18" height="18" rx="2" />
-                      <circle cx="8.5" cy="8.5" r="1.5" />
-                      <path d="M21 15l-5-5L5 21" />
-                    </svg>
-                  )}
-                </div>
+              {/* Image Background */}
+              <div className="tool-card-image-bg">
+                {tool.previewImage ? (
+                  <img 
+                    src={tool.previewImage} 
+                    alt={tool.title}
+                  />
+                ) : tool.imagePages && Object.keys(tool.imagePages).length > 0 ? (
+                  <img 
+                    src={tool.imagePages[Object.keys(tool.imagePages)[0]]} 
+                    alt={tool.title}
+                  />
+                ) : (
+                  <svg
+                    className="placeholder-icon"
+                    width="60"
+                    height="60"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <rect x="3" y="3" width="18" height="18" rx="2" />
+                    <circle cx="8.5" cy="8.5" r="1.5" />
+                    <path d="M21 15l-5-5L5 21" />
+                  </svg>
+                )}
+              </div>
+
+              {/* Title Overlay */}
+              <div className="tool-card-overlay">
                 <h3 className="tool-name">{tool.title}</h3>
               </div>
+
+              {/* Hover Background */}
               <div className="tool-card-background" />
             </button>
           ))}
@@ -128,40 +131,43 @@ export default function ToolSelector({ brand, tools, onSelectTool, onBack }) {
               className="tool-card"
               onClick={() => onSelectTool(tool)}
             >
-              <div className="tool-card-content">
-                <div className="tool-image-placeholder">
-                  {tool.previewImage ? (
-                    <img 
-                      src={tool.previewImage} 
-                      alt={tool.title}
-                      style={{ width: '100%', height: '100%', objectFit: 'contain' }}
-                    />
-                  ) : tool.imagePages && Object.keys(tool.imagePages).length > 0 ? (
-                    <img 
-                      src={tool.imagePages[Object.keys(tool.imagePages)[0]]} 
-                      alt={tool.title}
-                      style={{ width: '100%', height: '100%', objectFit: 'contain' }}
-                    />
-                  ) : (
-                    <svg
-                      className="placeholder-icon"
-                      width="40"
-                      height="40"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="1.5"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
-                      <rect x="3" y="3" width="18" height="18" rx="2" />
-                      <circle cx="8.5" cy="8.5" r="1.5" />
-                      <path d="M21 15l-5-5L5 21" />
-                    </svg>
-                  )}
-                </div>
+              {/* Image Background */}
+              <div className="tool-card-image-bg">
+                {tool.previewImage ? (
+                  <img 
+                    src={tool.previewImage} 
+                    alt={tool.title}
+                  />
+                ) : tool.imagePages && Object.keys(tool.imagePages).length > 0 ? (
+                  <img 
+                    src={tool.imagePages[Object.keys(tool.imagePages)[0]]} 
+                    alt={tool.title}
+                  />
+                ) : (
+                  <svg
+                    className="placeholder-icon"
+                    width="60"
+                    height="60"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <rect x="3" y="3" width="18" height="18" rx="2" />
+                    <circle cx="8.5" cy="8.5" r="1.5" />
+                    <path d="M21 15l-5-5L5 21" />
+                  </svg>
+                )}
+              </div>
+
+              {/* Title Overlay */}
+              <div className="tool-card-overlay">
                 <h3 className="tool-name">{tool.title}</h3>
               </div>
+
+              {/* Hover Background */}
               <div className="tool-card-background" />
             </button>
           ))}
