@@ -39,6 +39,7 @@ import columbiaMatrixBoxHandleHeadData from '../../public/brands/Columbia/Schema
 import columbiaMatrixBoxHandleLeverData from '../../public/brands/Columbia/Schematics/Handles/MatrixBoxHandle/Lever/schematic_data.json';
 import columbiaMatrixBoxHandlePinchboxData from '../../public/brands/Columbia/Schematics/Handles/MatrixBoxHandle/Pinchbox/schematic_data.json';
 import columbiaMatrixBoxHandleExtensionHousingData from '../../public/brands/Columbia/Schematics/Handles/MatrixBoxHandle/ExtensionHousing/schematic_data.json';
+import columbiaFlatBoxHandleData from '../../public/brands/Columbia/Schematics/Handles/FlatBoxHandle/schematic_data.json';
 
 // ---------------------------------------------------------------------------
 // Schematic image paths — runtime URLs relative to the deployment base.
@@ -270,6 +271,7 @@ export default function Parts() {
   const matrixBoxHandleLeverParts = buildPartsFromData(columbiaMatrixBoxHandleLeverData);
   const matrixBoxHandlePinchboxParts = buildPartsFromData(columbiaMatrixBoxHandlePinchboxData);
   const matrixBoxHandleExtensionHousingParts = buildPartsFromData(columbiaMatrixBoxHandleExtensionHousingData);
+  const flatBoxHandleParts = buildPartsFromData(columbiaFlatBoxHandleData);
 
   const schematics = [
     {
@@ -712,7 +714,7 @@ export default function Parts() {
       diagramPages: [1],
       imagePages: { 1: columbiaFlatBoxHandleImg },
       previewImage: columbiaFlatBoxHandlePreview,
-      parts: []
+      parts: flatBoxHandleParts
     },
     {
       id: 'columbia-closet-monster-flat-box-handle',
