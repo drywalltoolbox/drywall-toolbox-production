@@ -30,6 +30,8 @@ import columbiaMudPumpData from '../../public/brands/Columbia/Schematics/Pumps/M
 import columbiaCornerCobraData from '../../public/brands/Columbia/Schematics/CornerRollers/CornerCobra/schematic_data.json';
 import columbiaCompoundTubeDataJson from '../../public/brands/Columbia/Schematics/CompoundTubes/CompoundTube/schematic_data.json';
 import columbiaCf35Data from '../../public/brands/Columbia/Schematics/CornerFlushers/StandardCornerFlusher/schematic_data.json';
+import columbiaExternalCornerApplicatorData from '../../public/brands/Columbia/Schematics/Applicators/ExternalCorner/schematic_data.json';
+import columbiaTwoWayInternalCornerApplicatorData from '../../public/brands/Columbia/Schematics/Applicators/TwoWayInternalCorner/schematic_data.json';
 
 // ---------------------------------------------------------------------------
 // Schematic image paths — runtime URLs relative to the deployment base.
@@ -252,6 +254,8 @@ export default function Parts() {
   const cornerCobraParts = buildPartsFromData(columbiaCornerCobraData);
   const compoundTubeParts = buildPartsFromData(columbiaCompoundTubeDataJson);
   const cf35Parts = buildPartsFromData(columbiaCf35Data);
+  const externalCornerApplicatorParts = buildPartsFromData(columbiaExternalCornerApplicatorData);
+  const twoWayInternalCornerApplicatorParts = buildPartsFromData(columbiaTwoWayInternalCornerApplicatorData);
 
   const schematics = [
     {
@@ -432,7 +436,6 @@ export default function Parts() {
       imagePages: { 1: tapeTechPAHC12Img },
       parts: []
     },
-    // New Columbia image-only schematics
     {
       id: 'columbia-2-way-internal-corner',
       title: '2-Way Internal Corner Applicator',
@@ -442,7 +445,7 @@ export default function Parts() {
       diagramPages: [1],
       imagePages: { 1: columbia2WayInternalCornerImg },
       previewImage: columbia2WayInternalCornerPreview,
-      parts: []
+      parts: twoWayInternalCornerApplicatorParts
     },
     {
       id: 'columbia-external-corner-applicator',
@@ -453,7 +456,7 @@ export default function Parts() {
       diagramPages: [1],
       imagePages: { 1: columbiaExternalCornerApplicatorImg },
       previewImage: columbiaExternalCornerApplicatorPreview,
-      parts: []
+      parts: externalCornerApplicatorParts
     },
     {
       id: 'columbia-standard-outside-corner-roller',
