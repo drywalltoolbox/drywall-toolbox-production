@@ -35,11 +35,14 @@ function App() {
   const toggleCart = () => setCartOpen(!cartOpen);
   const closeCart = () => setCartOpen(false);
 
+  // Use PUBLIC_URL for Router basename to support GitHub Pages deployment
+  const basename = process.env.PUBLIC_URL || '/';
+
   return (
     <VeeqoProvider>
       <WooCommerceProvider>
         <CartProvider>
-          <Router basename="/">
+          <Router basename={basename}>
             <ScrollToTop />
             {/* Background Texture */}
             <div className="machined-bg"></div>
