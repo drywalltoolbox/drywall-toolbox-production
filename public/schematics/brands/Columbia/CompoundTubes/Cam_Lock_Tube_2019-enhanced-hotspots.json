@@ -1,0 +1,427 @@
+{
+  "id": "1774439024479",
+  "title": "Cam_Lock_Tube_2019-enhanced",
+  "diagramPages": [
+    1
+  ],
+  "legendPages": [],
+  "parts": [
+    {
+      "id": "CFB 5A",
+      "name": "CFB 5A",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "CLT 16",
+      "name": "CLT 16",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "CFB 5C",
+      "name": "CFB 5C",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "CLT 14",
+      "name": "CLT 14",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "CLT 12",
+      "name": "CLT 12",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "FA 239",
+      "name": "FA 239",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "CT 115",
+      "name": "CT 115",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "CLT 13",
+      "name": "CLT 13",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "CLT 15",
+      "name": "CLT 15",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "CMT 4",
+      "name": "CMT 4",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "FA 323",
+      "name": "FA 323",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "FA 286",
+      "name": "FA 286",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "CT 110",
+      "name": "CT 110",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "CMT 8",
+      "name": "CMT 8",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "CT 111",
+      "name": "CT 111",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "FA 286",
+      "name": "FA 286",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "CMT 8",
+      "name": "CMT 8",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "FA 284",
+      "name": "FA 284",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "FA 256",
+      "name": "FA 256",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "CMT 1-24\"",
+      "name": "CMT 1-24\"",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "CMT 1A-22\"",
+      "name": "CMT 1A-22\"",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "CMT 5",
+      "name": "CMT 5",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "FA 347",
+      "name": "FA 347",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "FA 235",
+      "name": "FA 235",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "CMT 6",
+      "name": "CMT 6",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "FA 348",
+      "name": "FA 348",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "EXT 35",
+      "name": "EXT 35",
+      "quantity": 1,
+      "sku": ""
+    }
+  ],
+  "coordinates": {
+    "CFB 5A": {
+      "id": "CFB 5A",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 51.95,
+      "y_pct": 9.65,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "CLT 16": {
+      "id": "CLT 16",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 51.95,
+      "y_pct": 16,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "CFB 5C": {
+      "id": "CFB 5C",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 51.95,
+      "y_pct": 22.65,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "CLT 14": {
+      "id": "CLT 14",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 64.08483310662342,
+      "y_pct": 21.649755849837884,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "CLT 12": {
+      "id": "CLT 12",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 64.08483310662342,
+      "y_pct": 27.949921871948124,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "FA 239": {
+      "id": "FA 239",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 63.75,
+      "y_pct": 33.85,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "CT 115": {
+      "id": "CT 115",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 63.75,
+      "y_pct": 40.05,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "CLT 13": {
+      "id": "CLT 13",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 31.301668933765825,
+      "y_pct": 23.800009766006486,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "CLT 15": {
+      "id": "CLT 15",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 31.97133514701266,
+      "y_pct": 29.89995116996758,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "CMT 4": {
+      "id": "CMT 4",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 35.25,
+      "y_pct": 35.650000000000006,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "FA 323": {
+      "id": "FA 323",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 7.2,
+      "y_pct": 18.15,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "FA 286": {
+      "id": "FA 286",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 9.3,
+      "y_pct": 35.55,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "CT 110": {
+      "id": "CT 110",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 25.449999999999996,
+      "y_pct": 18.15,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "CMT 8": {
+      "id": "CMT 8",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 16.75,
+      "y_pct": 35.75,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "CT 111": {
+      "id": "CT 111",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 9.25,
+      "y_pct": 29.700000000000003,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "FA 284": {
+      "id": "FA 284",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 18.75,
+      "y_pct": 41.5,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "FA 256": {
+      "id": "FA 256",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 18.75,
+      "y_pct": 47.25,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "CMT 1-24\"": {
+      "id": "CMT 1-24\"",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 78.69999999999999,
+      "y_pct": 55,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "CMT 1A-22\"": {
+      "id": "CMT 1A-22\"",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 34.8,
+      "y_pct": 67.5,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "CMT 5": {
+      "id": "CMT 5",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 94.5,
+      "y_pct": 73.19999999999999,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "FA 347": {
+      "id": "FA 347",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 94.4,
+      "y_pct": 78.05000000000001,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "FA 235": {
+      "id": "FA 235",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 94.5,
+      "y_pct": 85.8,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "CMT 6": {
+      "id": "CMT 6",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 94.55000000000001,
+      "y_pct": 91.4,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "FA 348": {
+      "id": "FA 348",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 87,
+      "y_pct": 91.25,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "EXT 35": {
+      "id": "EXT 35",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 51.3,
+      "y_pct": 89.15,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    }
+  },
+  "schema_version": "1.0",
+  "image_natural_width": 1792,
+  "image_natural_height": 2400
+}
