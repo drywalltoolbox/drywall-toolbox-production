@@ -12,7 +12,6 @@ import '../styles/mobile-schematic.css';
 // schematics removed by request have been deleted from the public assets and
 // their imports removed here so the build won't require them.
 // ---------------------------------------------------------------------------
-import columbiaMatrixBoxHandleData from '../../public/brands/Columbia/Schematics/Handles/MatrixBoxHandle/schematic_data.json';
 import columbiaPredatorTaperData   from '../../public/brands/Columbia/Schematics/AutomaticTapers/PredatorTaper/schematic_data.json';
 import columbiaStandardOutsideCornerRollerData from '../../public/brands/Columbia/Schematics/CornerRollers/StandardOutsideCornerRoller/schematic_data.json';
 import columbiaInsideCornerRollerData from '../../public/brands/Columbia/Schematics/CornerRollers/InsideCornerRoller/schematic_data.json';
@@ -32,6 +31,14 @@ import columbiaCompoundTubeDataJson from '../../public/brands/Columbia/Schematic
 import columbiaCf35Data from '../../public/brands/Columbia/Schematics/CornerFlushers/StandardCornerFlusher/schematic_data.json';
 import columbiaExternalCornerApplicatorData from '../../public/brands/Columbia/Schematics/Applicators/ExternalCorner/schematic_data.json';
 import columbiaTwoWayInternalCornerApplicatorData from '../../public/brands/Columbia/Schematics/Applicators/TwoWayInternalCorner/schematic_data.json';
+import columbiaCamLockTubeData from '../../public/brands/Columbia/Schematics/CompoundTubes/CamLockTube/schematic_data.json';
+import columbiaClosetMonsterData from '../../public/brands/Columbia/Schematics/Handles/ClosetMonster/schematic_data.json';
+import columbiaColumbiaOneData from '../../public/brands/Columbia/Schematics/Handles/ColumbiaOne/schematic_data.json';
+import columbiaMatrixBoxHandleBoxHandleData from '../../public/brands/Columbia/Schematics/Handles/MatrixBoxHandle/BoxHandle/schematic_data.json';
+import columbiaMatrixBoxHandleHeadData from '../../public/brands/Columbia/Schematics/Handles/MatrixBoxHandle/Head/schematic_data.json';
+import columbiaMatrixBoxHandleLeverData from '../../public/brands/Columbia/Schematics/Handles/MatrixBoxHandle/Lever/schematic_data.json';
+import columbiaMatrixBoxHandlePinchboxData from '../../public/brands/Columbia/Schematics/Handles/MatrixBoxHandle/Pinchbox/schematic_data.json';
+import columbiaMatrixBoxHandleExtensionHousingData from '../../public/brands/Columbia/Schematics/Handles/MatrixBoxHandle/ExtensionHousing/schematic_data.json';
 
 // ---------------------------------------------------------------------------
 // Schematic image paths — runtime URLs relative to the deployment base.
@@ -236,7 +243,6 @@ export default function Parts() {
   };
 
   // Build parts arrays from JSON data
-  const matrixBoxHandleParts  = buildPartsFromData(columbiaMatrixBoxHandleData);
   const predatorTaperParts    = buildPartsFromData(columbiaPredatorTaperData);
   const standardOutsideCornerRollerParts = buildPartsFromData(columbiaStandardOutsideCornerRollerData);
   const insideCornerRollerParts = buildPartsFromData(columbiaInsideCornerRollerData);
@@ -256,6 +262,14 @@ export default function Parts() {
   const cf35Parts = buildPartsFromData(columbiaCf35Data);
   const externalCornerApplicatorParts = buildPartsFromData(columbiaExternalCornerApplicatorData);
   const twoWayInternalCornerApplicatorParts = buildPartsFromData(columbiaTwoWayInternalCornerApplicatorData);
+  const camLockTubeParts = buildPartsFromData(columbiaCamLockTubeData);
+  const closetMonsterParts = buildPartsFromData(columbiaClosetMonsterData);
+  const columbiaOneParts = buildPartsFromData(columbiaColumbiaOneData);
+  const matrixBoxHandleBoxHandleParts = buildPartsFromData(columbiaMatrixBoxHandleBoxHandleData);
+  const matrixBoxHandleHeadParts = buildPartsFromData(columbiaMatrixBoxHandleHeadData);
+  const matrixBoxHandleLeverParts = buildPartsFromData(columbiaMatrixBoxHandleLeverData);
+  const matrixBoxHandlePinchboxParts = buildPartsFromData(columbiaMatrixBoxHandlePinchboxData);
+  const matrixBoxHandleExtensionHousingParts = buildPartsFromData(columbiaMatrixBoxHandleExtensionHousingData);
 
   const schematics = [
     {
@@ -280,7 +294,7 @@ export default function Parts() {
         5: columbiaExtensionHousingImg
       },
       previewImage: columbiaMatrixBoxHandlePreview,
-      parts: matrixBoxHandleParts
+      parts: [...matrixBoxHandleBoxHandleParts, ...matrixBoxHandleHeadParts, ...matrixBoxHandleLeverParts, ...matrixBoxHandlePinchboxParts, ...matrixBoxHandleExtensionHousingParts]
     },
     {
       id: 'columbia-predator-taper',
@@ -654,7 +668,7 @@ export default function Parts() {
       diagramPages: [1],
       imagePages: { 1: columbiaCamLockTubeImg },
       previewImage: columbiaCamLockTubePreview,
-      parts: []
+      parts: camLockTubeParts
     },
     {
       id: 'columbia-semi-automatic-taper',
@@ -676,7 +690,7 @@ export default function Parts() {
       diagramPages: [1],
       imagePages: { 1: columbiaOneImg },
       previewImage: columbiaOnePreview,
-      parts: []
+      parts: columbiaOneParts
     },
     {
       id: 'columbia-long-extendable-handle',
@@ -709,7 +723,7 @@ export default function Parts() {
       diagramPages: [1],
       imagePages: { 1: columbiaClosetMonsterFlatBoxHandleImg },
       previewImage: columbiaClosetMonsterFlatBoxHandlePreview,
-      parts: []
+      parts: closetMonsterParts
     },
     {
       id: 'columbia-box-filler',
