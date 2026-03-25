@@ -1,6 +1,6 @@
 {
-  "id": "columbia-nailspotter",
-  "title": "Nailspotter 3\"",
+  "id": "1774449670295",
+  "title": "NAIL-SPOTTER-SCHEMATIC-2022-enhanced",
   "diagramPages": [
     1
   ],
@@ -13,14 +13,14 @@
       "sku": ""
     },
     {
-      "id": "HNS14A",
-      "name": "HNS14A",
+      "id": "FA375",
+      "name": "FA375",
       "quantity": 1,
       "sku": ""
     },
     {
-      "id": "HNS12A",
-      "name": "HNS12A",
+      "id": "HNS14A",
+      "name": "HNS14A",
       "quantity": 1,
       "sku": ""
     },
@@ -31,14 +31,8 @@
       "sku": ""
     },
     {
-      "id": "FA375",
-      "name": "FA375",
-      "quantity": 1,
-      "sku": ""
-    },
-    {
-      "id": "HNS10A",
-      "name": "HNS10A",
+      "id": "HNS12A",
+      "name": "HNS12A",
       "quantity": 1,
       "sku": ""
     },
@@ -49,14 +43,8 @@
       "sku": ""
     },
     {
-      "id": "FA314",
-      "name": "FA314",
-      "quantity": 1,
-      "sku": ""
-    },
-    {
-      "id": "HNS 13",
-      "name": "HNS 13",
+      "id": "HNS10A",
+      "name": "HNS10A",
       "quantity": 1,
       "sku": ""
     },
@@ -79,8 +67,14 @@
       "sku": ""
     },
     {
-      "id": "FA268",
-      "name": "FA268",
+      "id": "FA314",
+      "name": "FA314",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "HNS 13",
+      "name": "HNS 13",
       "quantity": 1,
       "sku": ""
     },
@@ -91,14 +85,26 @@
       "sku": ""
     },
     {
-      "id": "FA271",
-      "name": "FA271",
+      "id": "FA268",
+      "name": "FA268",
       "quantity": 1,
       "sku": ""
     },
     {
       "id": "FFB38",
       "name": "FFB38",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "FA271",
+      "name": "FA271",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "HNS4-3'",
+      "name": "HNS4-3'",
       "quantity": 1,
       "sku": ""
     },
@@ -115,32 +121,14 @@
       "sku": ""
     },
     {
-      "id": "HNS4-3'",
-      "name": "HNS4-3'",
-      "quantity": 1,
-      "sku": ""
-    },
-    {
       "id": "FFB16",
       "name": "FFB16",
       "quantity": 1,
       "sku": ""
     },
     {
-      "id": "HNS20",
-      "name": "HNS20",
-      "quantity": 1,
-      "sku": ""
-    },
-    {
-      "id": "FA218",
-      "name": "FA218",
-      "quantity": 1,
-      "sku": ""
-    },
-    {
-      "id": "FA214",
-      "name": "FA214",
+      "id": "FA241",
+      "name": "FA241",
       "quantity": 1,
       "sku": ""
     },
@@ -157,26 +145,44 @@
       "sku": ""
     },
     {
+      "id": "HNS20",
+      "name": "HNS20",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "FA231",
+      "name": "FA231",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "FFB16",
+      "name": "FFB16",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "FA218",
+      "name": "FA218",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "FA214",
+      "name": "FA214",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
       "id": "HNS15-3'",
       "name": "HNS15-3'",
       "quantity": 1,
       "sku": ""
     },
     {
-      "id": "FA260",
-      "name": "FA260",
-      "quantity": 1,
-      "sku": ""
-    },
-    {
-      "id": "FFB1A",
-      "name": "FFB1A",
-      "quantity": 1,
-      "sku": ""
-    },
-    {
-      "id": "HNS1-3'",
-      "name": "HNS1-3'",
+      "id": "FA280",
+      "name": "FA280",
       "quantity": 1,
       "sku": ""
     },
@@ -193,32 +199,8 @@
       "sku": ""
     },
     {
-      "id": "FA247",
-      "name": "FA247",
-      "quantity": 1,
-      "sku": ""
-    },
-    {
-      "id": "HNS2-3'",
-      "name": "HNS2-3'",
-      "quantity": 1,
-      "sku": ""
-    },
-    {
-      "id": "HNS 3",
-      "name": "HNS 3",
-      "quantity": 1,
-      "sku": ""
-    },
-    {
       "id": "FA234",
       "name": "FA234",
-      "quantity": 1,
-      "sku": ""
-    },
-    {
-      "id": "HNS9-3'",
-      "name": "HNS9-3'",
       "quantity": 1,
       "sku": ""
     },
@@ -247,6 +229,54 @@
       "sku": ""
     },
     {
+      "id": "FA260",
+      "name": "FA260",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "HNS1-3'",
+      "name": "HNS1-3'",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "FFB1A",
+      "name": "FFB1A",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "FA247",
+      "name": "FA247",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "HNS 3",
+      "name": "HNS 3",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "HNS2-3'",
+      "name": "HNS2-3'",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "HNS9-3'",
+      "name": "HNS9-3'",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "FA214",
+      "name": "FA214",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
       "id": "HNS2A",
       "name": "HNS2A",
       "quantity": 1,
@@ -256,659 +286,413 @@
   "coordinates": {
     "FA371": {
       "id": "FA371",
-      "x_px": 55.9969,
-      "y_px": 385.4426,
-      "x_pct": 2.3332,
-      "y_pct": 21.5091,
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 38.349999999999994,
+      "y_pct": 6,
       "shape": "rectangle",
       "pageNumber": 1,
-      "rotation": 0,
-      "bbox": {
-        "x": 41.4969,
-        "y": 358.9426,
-        "w": 29.0,
-        "h": 53.0
-      }
-    },
-    "HNS14A": {
-      "id": "HNS14A",
-      "x_px": 66.4876,
-      "y_px": 536.722,
-      "x_pct": 2.7703,
-      "y_pct": 29.951,
-      "shape": "rectangle",
-      "pageNumber": 1,
-      "rotation": 0,
-      "bbox": {
-        "x": 51.9876,
-        "y": 501.222,
-        "w": 29.0,
-        "h": 71.0
-      }
-    },
-    "HNS12A": {
-      "id": "HNS12A",
-      "x_px": 105.9969,
-      "y_px": 248.4961,
-      "x_pct": 4.4165,
-      "y_pct": 13.867,
-      "shape": "rectangle",
-      "pageNumber": 1,
-      "rotation": 0,
-      "bbox": {
-        "x": 91.4969,
-        "y": 213.4961,
-        "w": 29.0,
-        "h": 70.0
-      }
-    },
-    "FA280": {
-      "id": "FA280",
-      "x_px": 118.4969,
-      "y_px": 150.3329,
-      "x_pct": 4.9374,
-      "y_pct": 8.3891,
-      "shape": "rectangle",
-      "pageNumber": 1,
-      "rotation": 0,
-      "bbox": {
-        "x": 104.4969,
-        "y": 123.8329,
-        "w": 28.0,
-        "h": 53.0
-      }
+      "rotation": 0
     },
     "FA375": {
       "id": "FA375",
-      "x_px": 131.7578,
-      "y_px": 382.748,
-      "x_pct": 5.4899,
-      "y_pct": 21.3587,
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 38.769999999999996,
+      "y_pct": 13.100009766006485,
       "shape": "rectangle",
       "pageNumber": 1,
-      "rotation": 0,
-      "bbox": {
-        "x": 117.2578,
-        "y": 356.248,
-        "w": 29.0,
-        "h": 53.0
-      }
+      "rotation": 0
     },
-    "HNS10A": {
-      "id": "HNS10A",
-      "x_px": 111.5,
-      "y_px": 654.5,
-      "x_pct": 4.6458,
-      "y_pct": 36.5234,
+    "HNS14A": {
+      "id": "HNS14A",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 53.349999999999994,
+      "y_pct": 7.1,
       "shape": "rectangle",
       "pageNumber": 1,
-      "rotation": 0,
-      "bbox": {
-        "x": 97,
-        "y": 619,
-        "w": 29,
-        "h": 71
-      }
+      "rotation": 0
+    },
+    "FA280": {
+      "id": "FA280",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 29.900000000000002,
+      "y_pct": 54.45,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "HNS12A": {
+      "id": "HNS12A",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 25.073329444363424,
+      "y_pct": 10.5,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
     },
     "HNS14-PR": {
       "id": "HNS14-PR",
-      "x_px": 212.4937,
-      "y_px": 491.4438,
-      "x_pct": 8.8539,
-      "y_pct": 27.4243,
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 49.300000000000004,
+      "y_pct": 21.25,
       "shape": "rectangle",
       "pageNumber": 1,
-      "rotation": 0,
-      "bbox": {
-        "x": 197.9937,
-        "y": 445.4438,
-        "w": 29.0,
-        "h": 92.0
-      }
+      "rotation": 0
     },
-    "FA314": {
-      "id": "FA314",
-      "x_px": 228.9969,
-      "y_px": 85.1109,
-      "x_pct": 9.5415,
-      "y_pct": 4.7495,
+    "HNS10A": {
+      "id": "HNS10A",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 65.75,
+      "y_pct": 10.649999999999999,
       "shape": "rectangle",
       "pageNumber": 1,
-      "rotation": 0,
-      "bbox": {
-        "x": 214.4969,
-        "y": 58.6109,
-        "w": 29.0,
-        "h": 53.0
-      }
-    },
-    "HNS 13": {
-      "id": "HNS 13",
-      "x_px": 250.9907,
-      "y_px": 167.3054,
-      "x_pct": 10.4579,
-      "y_pct": 9.3362,
-      "shape": "rectangle",
-      "pageNumber": 1,
-      "rotation": 0,
-      "bbox": {
-        "x": 236.4907,
-        "y": 135.3054,
-        "w": 29.0,
-        "h": 64.0
-      }
+      "rotation": 0
     },
     "HNS10": {
       "id": "HNS10",
-      "x_px": 161.9969,
-      "y_px": 704.8329,
-      "x_pct": 6.7499,
-      "y_pct": 39.3322,
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 70.65,
+      "y_pct": 16.099999999999998,
       "shape": "rectangle",
       "pageNumber": 1,
-      "rotation": 0,
-      "bbox": {
-        "x": 147.4969,
-        "y": 672.8329,
-        "w": 29.0,
-        "h": 64.0
-      }
+      "rotation": 0
     },
     "HNS19-3'": {
       "id": "HNS19-3'",
-      "x_px": 164.5,
-      "y_px": 844.6658,
-      "x_pct": 6.8542,
-      "y_pct": 47.1354,
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 84.26332944436342,
+      "y_pct": 15.799921871948122,
       "shape": "rectangle",
       "pageNumber": 1,
-      "rotation": 0,
-      "bbox": {
-        "x": 150,
-        "y": 804.6658,
-        "w": 29,
-        "h": 80.0
-      }
+      "rotation": 0
     },
     "HNS18": {
       "id": "HNS18",
-      "x_px": 223.5,
-      "y_px": 869.9437,
-      "x_pct": 9.3125,
-      "y_pct": 48.546,
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 86.65,
+      "y_pct": 22.65,
       "shape": "rectangle",
       "pageNumber": 1,
-      "rotation": 0,
-      "bbox": {
-        "x": 209,
-        "y": 842.4437,
-        "w": 29,
-        "h": 55.0
-      }
+      "rotation": 0
     },
-    "FA268": {
-      "id": "FA268",
-      "x_px": 278.5,
-      "y_px": 313.5,
-      "x_pct": 11.6042,
-      "y_pct": 17.4944,
+    "FA314": {
+      "id": "FA314",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 8.6,
+      "y_pct": 23.450000000000003,
       "shape": "rectangle",
       "pageNumber": 1,
-      "rotation": 0,
-      "bbox": {
-        "x": 264,
-        "y": 287,
-        "w": 29,
-        "h": 53
-      }
+      "rotation": 0
+    },
+    "HNS 13": {
+      "id": "HNS 13",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 16.900000000000002,
+      "y_pct": 24.9,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
     },
     "HNS12": {
       "id": "HNS12",
-      "x_px": 283.5,
-      "y_px": 234.0,
-      "x_pct": 11.8125,
-      "y_pct": 13.058,
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 23.85,
+      "y_pct": 28.1,
       "shape": "rectangle",
       "pageNumber": 1,
-      "rotation": 0,
-      "bbox": {
-        "x": 269,
-        "y": 206,
-        "w": 29,
-        "h": 56
-      }
+      "rotation": 0
     },
-    "FA271": {
-      "id": "FA271",
-      "x_px": 276.764,
-      "y_px": 475.3303,
-      "x_pct": 11.5318,
-      "y_pct": 26.5251,
+    "FA268": {
+      "id": "FA268",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 31.7,
+      "y_pct": 28.4,
       "shape": "rectangle",
       "pageNumber": 1,
-      "rotation": 0,
-      "bbox": {
-        "x": 262.264,
-        "y": 448.8303,
-        "w": 29.0,
-        "h": 53.0
-      }
+      "rotation": 0
     },
     "FFB38": {
       "id": "FFB38",
-      "x_px": 298.5249,
-      "y_px": 397.8054,
-      "x_pct": 12.4385,
-      "y_pct": 22.199,
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 39.58667055563657,
+      "y_pct": 29.850029298019454,
       "shape": "rectangle",
       "pageNumber": 1,
-      "rotation": 0,
-      "bbox": {
-        "x": 284.0249,
-        "y": 371.3054,
-        "w": 29.0,
-        "h": 53.0
-      }
+      "rotation": 0
     },
-    "FA231": {
-      "id": "FA231",
-      "x_px": 343.2547,
-      "y_px": 220.5836,
-      "x_pct": 14.3023,
-      "y_pct": 12.3093,
+    "FA271": {
+      "id": "FA271",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 47.773329444363426,
+      "y_pct": 27.75,
       "shape": "rectangle",
       "pageNumber": 1,
-      "rotation": 0,
-      "bbox": {
-        "x": 328.7547,
-        "y": 194.0836,
-        "w": 29.0,
-        "h": 53.0
-      }
-    },
-    "FFB4C": {
-      "id": "FFB4C",
-      "x_px": 385.5,
-      "y_px": 255.722,
-      "x_pct": 16.0625,
-      "y_pct": 14.2702,
-      "shape": "rectangle",
-      "pageNumber": 1,
-      "rotation": 0,
-      "bbox": {
-        "x": 371,
-        "y": 229.222,
-        "w": 29,
-        "h": 53.0
-      }
+      "rotation": 0
     },
     "HNS4-3'": {
       "id": "HNS4-3'",
-      "x_px": 327.0093,
-      "y_px": 473.4713,
-      "x_pct": 13.6254,
-      "y_pct": 26.4214,
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 47.650000000000006,
+      "y_pct": 32.650000000000006,
       "shape": "rectangle",
       "pageNumber": 1,
-      "rotation": 0,
-      "bbox": {
-        "x": 312.5093,
-        "y": 436.9713,
-        "w": 29.0,
-        "h": 73.0
-      }
+      "rotation": 0
+    },
+    "FA231": {
+      "id": "FA231",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 60.30669388945603,
+      "y_pct": 33.04999023399351,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "FFB4C": {
+      "id": "FFB4C",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 25.5,
+      "y_pct": 38.25,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
     },
     "FFB16": {
       "id": "FFB16",
-      "x_px": 375.7391,
-      "y_px": 402.8394,
-      "x_pct": 15.6558,
-      "y_pct": 22.4799,
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 67.05,
+      "y_pct": 36.05,
       "shape": "rectangle",
       "pageNumber": 1,
-      "rotation": 0,
-      "bbox": {
-        "x": 361.2391,
-        "y": 376.3394,
-        "w": 29.0,
-        "h": 53.0
-      }
-    },
-    "HNS20": {
-      "id": "HNS20",
-      "x_px": 299.5,
-      "y_px": 731.0,
-      "x_pct": 12.4792,
-      "y_pct": 40.7924,
-      "shape": "rectangle",
-      "pageNumber": 1,
-      "rotation": 0,
-      "bbox": {
-        "x": 285,
-        "y": 703,
-        "w": 29,
-        "h": 56
-      }
-    },
-    "FA218": {
-      "id": "FA218",
-      "x_px": 356.5,
-      "y_px": 906.5,
-      "x_pct": 14.8542,
-      "y_pct": 50.5859,
-      "shape": "rectangle",
-      "pageNumber": 1,
-      "rotation": 0,
-      "bbox": {
-        "x": 342,
-        "y": 880,
-        "w": 29,
-        "h": 53
-      }
-    },
-    "FA214": {
-      "id": "FA214",
-      "x_px": 406.5,
-      "y_px": 871.5,
-      "x_pct": 16.9375,
-      "y_pct": 48.6328,
-      "shape": "rectangle",
-      "pageNumber": 1,
-      "rotation": 0,
-      "bbox": {
-        "x": 392,
-        "y": 845,
-        "w": 29,
-        "h": 53
-      }
+      "rotation": 0
     },
     "FA241": {
       "id": "FA241",
-      "x_px": 427.4876,
-      "y_px": 398.5,
-      "x_pct": 17.812,
-      "y_pct": 22.2377,
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 24.900000000000002,
+      "y_pct": 46.900000000000006,
       "shape": "rectangle",
       "pageNumber": 1,
-      "rotation": 0,
-      "bbox": {
-        "x": 412.9876,
-        "y": 372,
-        "w": 29.0,
-        "h": 53
-      }
+      "rotation": 0
     },
     "FFB32A": {
       "id": "FFB32A",
-      "x_px": 455.2547,
-      "y_px": 469.5822,
-      "x_pct": 18.9689,
-      "y_pct": 26.2044,
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 46.963329444363424,
+      "y_pct": 45.55000976600648,
       "shape": "rectangle",
       "pageNumber": 1,
-      "rotation": 0,
-      "bbox": {
-        "x": 440.7547,
-        "y": 439.5822,
-        "w": 29.0,
-        "h": 60.0
-      }
+      "rotation": 0
+    },
+    "HNS20": {
+      "id": "HNS20",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 73.65,
+      "y_pct": 30.1,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "FA218": {
+      "id": "FA218",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 91.05,
+      "y_pct": 35.75,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "FA214": {
+      "id": "FA214",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 62,
+      "y_pct": 86.19999999999999,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
     },
     "HNS15-3'": {
       "id": "HNS15-3'",
-      "x_px": 425.7578,
-      "y_px": 120.3603,
-      "x_pct": 17.7399,
-      "y_pct": 6.7165,
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 12,
+      "y_pct": 42.55,
       "shape": "rectangle",
       "pageNumber": 1,
-      "rotation": 0,
-      "bbox": {
-        "x": 411.2578,
-        "y": 80.3603,
-        "w": 29.0,
-        "h": 80.0
-      }
-    },
-    "FA260": {
-      "id": "FA260",
-      "x_px": 498.5,
-      "y_px": 534.5,
-      "x_pct": 20.7708,
-      "y_pct": 29.827,
-      "shape": "rectangle",
-      "pageNumber": 1,
-      "rotation": 0,
-      "bbox": {
-        "x": 484,
-        "y": 508,
-        "w": 29,
-        "h": 53
-      }
-    },
-    "FFB1A": {
-      "id": "FFB1A",
-      "x_px": 543.4937,
-      "y_px": 742.7493,
-      "x_pct": 22.6456,
-      "y_pct": 41.4481,
-      "shape": "rectangle",
-      "pageNumber": 1,
-      "rotation": 0,
-      "bbox": {
-        "x": 528.9937,
-        "y": 716.7493,
-        "w": 29.0,
-        "h": 52.0
-      }
-    },
-    "HNS1-3'": {
-      "id": "HNS1-3'",
-      "x_px": 564.7516,
-      "y_px": 594.0,
-      "x_pct": 23.5313,
-      "y_pct": 33.1473,
-      "shape": "rectangle",
-      "pageNumber": 1,
-      "rotation": 0,
-      "bbox": {
-        "x": 550.2516,
-        "y": 558,
-        "w": 29.0,
-        "h": 72
-      }
+      "rotation": 0
     },
     "FFB32": {
       "id": "FFB32",
-      "x_px": 591.7578,
-      "y_px": 313.4164,
-      "x_pct": 24.6566,
-      "y_pct": 17.4898,
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 31.9,
+      "y_pct": 59.099999999999994,
       "shape": "rectangle",
       "pageNumber": 1,
-      "rotation": 0,
-      "bbox": {
-        "x": 577.2578,
-        "y": 286.9164,
-        "w": 29.0,
-        "h": 53.0
-      }
+      "rotation": 0
     },
     "FA228": {
       "id": "FA228",
-      "x_px": 634.5,
-      "y_px": 327.5,
-      "x_pct": 26.4375,
-      "y_pct": 18.2757,
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 33.1,
+      "y_pct": 63.65,
       "shape": "rectangle",
       "pageNumber": 1,
-      "rotation": 0,
-      "bbox": {
-        "x": 620,
-        "y": 301,
-        "w": 29,
-        "h": 53
-      }
-    },
-    "FA247": {
-      "id": "FA247",
-      "x_px": 607.5,
-      "y_px": 853.5,
-      "x_pct": 25.3125,
-      "y_pct": 47.6283,
-      "shape": "rectangle",
-      "pageNumber": 1,
-      "rotation": 0,
-      "bbox": {
-        "x": 593,
-        "y": 827,
-        "w": 29,
-        "h": 53
-      }
-    },
-    "HNS2-3'": {
-      "id": "HNS2-3'",
-      "x_px": 634.5,
-      "y_px": 487.0,
-      "x_pct": 26.4375,
-      "y_pct": 27.1763,
-      "shape": "rectangle",
-      "pageNumber": 1,
-      "rotation": 0,
-      "bbox": {
-        "x": 620,
-        "y": 451,
-        "w": 29,
-        "h": 72
-      }
-    },
-    "HNS 3": {
-      "id": "HNS 3",
-      "x_px": 654.5,
-      "y_px": 689.0,
-      "x_pct": 27.2708,
-      "y_pct": 38.4487,
-      "shape": "rectangle",
-      "pageNumber": 1,
-      "rotation": 0,
-      "bbox": {
-        "x": 640,
-        "y": 661,
-        "w": 29,
-        "h": 56
-      }
+      "rotation": 0
     },
     "FA234": {
       "id": "FA234",
-      "x_px": 687.2422,
-      "y_px": 345.111,
-      "x_pct": 28.6351,
-      "y_pct": 19.2584,
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 34.65,
+      "y_pct": 68.35,
       "shape": "rectangle",
       "pageNumber": 1,
-      "rotation": 0,
-      "bbox": {
-        "x": 672.7422,
-        "y": 318.611,
-        "w": 29.0,
-        "h": 53.0
-      }
-    },
-    "HNS9-3'": {
-      "id": "HNS9-3'",
-      "x_px": 698.5,
-      "y_px": 603.0,
-      "x_pct": 29.1042,
-      "y_pct": 33.6496,
-      "shape": "rectangle",
-      "pageNumber": 1,
-      "rotation": 0,
-      "bbox": {
-        "x": 684,
-        "y": 567,
-        "w": 29,
-        "h": 72
-      }
+      "rotation": 0
     },
     "HNS7-3'": {
       "id": "HNS7-3'",
-      "x_px": 734.7453,
-      "y_px": 360.222,
-      "x_pct": 30.6144,
-      "y_pct": 20.1017,
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 36.1,
+      "y_pct": 73.1,
       "shape": "rectangle",
       "pageNumber": 1,
-      "rotation": 0,
-      "bbox": {
-        "x": 720.2453,
-        "y": 324.222,
-        "w": 29.0,
-        "h": 72.0
-      }
+      "rotation": 0
     },
     "HNS8-3'": {
       "id": "HNS8-3'",
-      "x_px": 775.2609,
-      "y_px": 313.3054,
-      "x_pct": 32.3025,
-      "y_pct": 17.4836,
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 31.400000000000002,
+      "y_pct": 77.55000000000001,
       "shape": "rectangle",
       "pageNumber": 1,
-      "rotation": 0,
-      "bbox": {
-        "x": 760.7609,
-        "y": 277.3054,
-        "w": 29.0,
-        "h": 72.0
-      }
+      "rotation": 0
     },
     "FA254": {
       "id": "FA254",
-      "x_px": 834.2422,
-      "y_px": 325.9438,
-      "x_pct": 34.7601,
-      "y_pct": 18.1888,
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 32.5,
+      "y_pct": 83.15,
       "shape": "rectangle",
       "pageNumber": 1,
-      "rotation": 0,
-      "bbox": {
-        "x": 819.7422,
-        "y": 299.4438,
-        "w": 29.0,
-        "h": 53.0
-      }
+      "rotation": 0
     },
     "FA252": {
       "id": "FA252",
-      "x_px": 897.5,
-      "y_px": 504.5,
-      "x_pct": 37.3958,
-      "y_pct": 28.1529,
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 50.900000000000006,
+      "y_pct": 89.75,
       "shape": "rectangle",
       "pageNumber": 1,
-      "rotation": 0,
-      "bbox": {
-        "x": 883,
-        "y": 478,
-        "w": 29,
-        "h": 53
-      }
+      "rotation": 0
+    },
+    "FA260": {
+      "id": "FA260",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 53.849999999999994,
+      "y_pct": 49.8,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "HNS1-3'": {
+      "id": "HNS1-3'",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 59.86001166690973,
+      "y_pct": 56.35,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "FFB1A": {
+      "id": "FFB1A",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 74.35,
+      "y_pct": 54.300000000000004,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "FA247": {
+      "id": "FA247",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 85.5,
+      "y_pct": 60.9,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "HNS 3": {
+      "id": "HNS 3",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 69.2,
+      "y_pct": 65.85,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "HNS2-3'": {
+      "id": "HNS2-3'",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 48.900000000000006,
+      "y_pct": 63.65,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "HNS9-3'": {
+      "id": "HNS9-3'",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 60.599999999999994,
+      "y_pct": 70.15,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
     },
     "HNS2A": {
       "id": "HNS2A",
-      "x_px": 915.5,
-      "y_px": 591.5,
-      "x_pct": 38.1458,
-      "y_pct": 33.0078,
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 59.75,
+      "y_pct": 91.30000000000001,
       "shape": "rectangle",
       "pageNumber": 1,
-      "rotation": 0,
-      "bbox": {
-        "x": 901,
-        "y": 563,
-        "w": 29,
-        "h": 57
-      }
+      "rotation": 0
     }
   },
   "schema_version": "1.0",

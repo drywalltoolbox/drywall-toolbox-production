@@ -2,7 +2,7 @@
   "id": "1774448223441",
   "title": "Extension_Housing_Schematic-1-enhanced",
   "diagramPages": [
-    1
+    5
   ],
   "legendPages": [],
   "parts": [
@@ -149,6 +149,28 @@
       "rotation": 0
     }
   },
+  "navHotspots": [
+    {
+      "id": "nav-to-pinchbox",
+      "label": "Back to Pinchbox",
+      "targetPage": 4,
+      "pageNumber": 5,
+      "top": "5%",
+      "left": "5%",
+      "width": "12%",
+      "height": "6%"
+    },
+    {
+      "id": "nav-to-boxhandle",
+      "label": "Back to Box Handle",
+      "targetPage": 1,
+      "pageNumber": 5,
+      "top": "5%",
+      "left": "87%",
+      "width": "12%",
+      "height": "6%"
+    }
+  ],
   "schema_version": "1.0",
   "image_natural_width": 1200,
   "image_natural_height": 896
