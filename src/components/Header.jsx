@@ -47,7 +47,21 @@ export default function Header({ onCartToggle }) {
       <div className="site-header-inner">
   {/* Mobile Layout */}
   <div className="flex md:hidden items-center justify-between w-full header-mobile-layout" style={{ display: isTablet ? 'flex' : undefined }}>
-          {/* Cart Icon - Far Left */}
+          {/* Menu Icon - Far Left */}
+          <button 
+            onClick={toggleMobileMenu}
+            className="p-2 hover:bg-gray-100 rounded-lg transition-colors header-icon"
+            aria-label="Toggle menu"
+          >
+            {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+          </button>
+
+          {/* Centered Logo */}
+          <Link to="/" className="flex items-center justify-center" onClick={closeMobileMenu}>
+            <img src={Logo} alt="Drywall Toolbox Logo" className="logo-image-mobile" />
+          </Link>
+
+          {/* Cart Icon - Far Right */}
           <button 
             onClick={onCartToggle} 
             className="relative p-2 hover:bg-gray-100 rounded-lg transition-colors header-icon" 
@@ -57,20 +71,6 @@ export default function Header({ onCartToggle }) {
             {getCartCount() > 0 && (
               <span className="cart-badge">{getCartCount()}</span>
             )}
-          </button>
-
-          {/* Centered Logo */}
-          <Link to="/" className="flex items-center justify-center" onClick={closeMobileMenu}>
-            <img src={Logo} alt="Drywall Toolbox Logo" className="logo-image-mobile" />
-          </Link>
-
-          {/* Menu Icon - Far Right */}
-          <button 
-            onClick={toggleMobileMenu}
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors header-icon"
-            aria-label="Toggle menu"
-          >
-            {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
         </div>
 

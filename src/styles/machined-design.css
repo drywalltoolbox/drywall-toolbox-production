@@ -1169,7 +1169,7 @@ div.min-h-screen {
         grid-column: 1 / -1;
     }
 
-    /* Left icon - positioned on far left */
+    /* Left icon (Menu) - positioned on far left */
     .site-header .header-mobile-layout button:first-of-type {
         flex: 0 0 auto;
         order: -1;
@@ -1184,7 +1184,7 @@ div.min-h-screen {
         order: 0;
     }
 
-    /* Right icon - positioned on far right */
+    /* Right icon (Cart) - positioned on far right */
     .site-header .header-mobile-layout button:last-of-type {
         flex: 0 0 auto;
         order: 1;
