@@ -1,8 +1,15 @@
 import { Link } from 'react-router-dom';
-import { Instagram, Facebook, Twitter } from 'lucide-react';
+import { useState } from 'react';
+import { Instagram, Facebook, Twitter, ChevronDown } from 'lucide-react';
 import Logo from '/logo2.svg';
 
 export default function Footer() {
+  const [expandedMobile, setExpandedMobile] = useState(null);
+
+  const toggleMobileSection = (section) => {
+    setExpandedMobile(expandedMobile === section ? null : section);
+  };
+
   return (
     <footer className="site-footer" style={{
       background: 'white',
@@ -66,6 +73,7 @@ export default function Footer() {
         {/* Shop column */}
         <div className="footer-col">
           <h5 style={{
+            display: 'none',
             textTransform: 'uppercase',
             fontSize: '0.7rem',
             letterSpacing: '0.12em',
@@ -75,7 +83,45 @@ export default function Footer() {
           }}>
             Shop
           </h5>
-          <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '10px' }}>
+          <button
+            onClick={() => toggleMobileSection('shop')}
+            style={{
+              background: 'none',
+              border: 'none',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '8px',
+              padding: 0,
+              textTransform: 'uppercase',
+              fontSize: '0.7rem',
+              letterSpacing: '0.12em',
+              margin: '0 0 20px 0',
+              fontWeight: 800,
+              color: 'var(--primary-600)',
+              width: '100%'
+            }}
+            className="footer-header-mobile"
+          >
+            Shop
+            <ChevronDown size={16} style={{ 
+              transition: 'transform 0.3s ease',
+              transform: expandedMobile === 'shop' ? 'rotate(180deg)' : 'rotate(0deg)',
+              marginLeft: 'auto'
+            }} />
+          </button>
+          <ul style={{ 
+            listStyle: 'none', 
+            padding: 0, 
+            margin: 0, 
+            display: expandedMobile === 'shop' ? 'flex' : 'none',
+            flexDirection: 'column', 
+            gap: '10px',
+            '@media (min-width: 641px)': {
+              display: 'flex'
+            }
+          }}>
             {[
               { to: '/products', label: 'All Products' },
               { to: '/products?category=taping', label: 'Taping Tools' },
@@ -100,6 +146,7 @@ export default function Footer() {
         {/* Support column */}
         <div className="footer-col">
           <h5 style={{
+            display: 'none',
             textTransform: 'uppercase',
             fontSize: '0.7rem',
             letterSpacing: '0.12em',
@@ -109,7 +156,45 @@ export default function Footer() {
           }}>
             Support
           </h5>
-          <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '10px' }}>
+          <button
+            onClick={() => toggleMobileSection('support')}
+            style={{
+              background: 'none',
+              border: 'none',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '8px',
+              padding: 0,
+              textTransform: 'uppercase',
+              fontSize: '0.7rem',
+              letterSpacing: '0.12em',
+              margin: '0 0 20px 0',
+              fontWeight: 800,
+              color: 'var(--primary-600)',
+              width: '100%'
+            }}
+            className="footer-header-mobile"
+          >
+            Support
+            <ChevronDown size={16} style={{ 
+              transition: 'transform 0.3s ease',
+              transform: expandedMobile === 'support' ? 'rotate(180deg)' : 'rotate(0deg)',
+              marginLeft: 'auto'
+            }} />
+          </button>
+          <ul style={{ 
+            listStyle: 'none', 
+            padding: 0, 
+            margin: 0, 
+            display: expandedMobile === 'support' ? 'flex' : 'none',
+            flexDirection: 'column', 
+            gap: '10px',
+            '@media (min-width: 641px)': {
+              display: 'flex'
+            }
+          }}>
             {[
               { to: '/contact', label: 'Contact Us' },
               { to: '/repairs', label: 'Repair Services' },
@@ -129,43 +214,6 @@ export default function Footer() {
               </li>
             ))}
           </ul>
-        </div>
-
-        {/* Contact column */}
-        <div className="footer-col">
-          <h5 style={{
-            textTransform: 'uppercase',
-            fontSize: '0.7rem',
-            letterSpacing: '0.12em',
-            margin: '0 0 20px 0',
-            fontWeight: 800,
-            color: 'var(--primary-600)'
-          }}>
-            Contact
-          </h5>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-            <div>
-              <div style={{ fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '0.1em', color: 'rgba(15,23,42,0.4)', marginBottom: '3px' }}>Email</div>
-              <a
-                href="mailto:support@drywalltoolbox.com"
-                style={{ fontSize: '0.8rem', color: 'rgba(15,23,42,0.65)', textDecoration: 'none', fontFamily: 'var(--font-mono)', transition: 'color 0.15s' }}
-                onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--primary-600)')}
-                onMouseLeave={(e) => (e.currentTarget.style.color = 'rgba(15,23,42,0.65)')}
-              >
-                support@drywalltoolbox.com
-              </a>
-            </div>
-            <div style={{
-              marginTop: '8px',
-              background: 'var(--alloy-base)',
-              border: '1px solid var(--machined-border)',
-              borderRadius: '4px',
-              padding: '12px 16px'
-            }}>
-              <div style={{ fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '0.1em', color: 'rgba(15,23,42,0.4)', marginBottom: '4px' }}>Hours</div>
-              <div style={{ fontSize: '0.8rem', color: 'rgba(15,23,42,0.65)' }}>Mon – Fri: 8am – 6pm EST</div>
-            </div>
-          </div>
         </div>
       </div>
 

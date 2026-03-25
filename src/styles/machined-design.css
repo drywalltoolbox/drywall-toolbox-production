@@ -444,6 +444,24 @@ aside input[type="range"],
         text-align: center;
     }
 
+    /* Hide contact column on mobile */
+    .site-footer .footer-grid > div:nth-child(4) {
+        display: none !important;
+    }
+
+    /* Mobile footer header buttons - clickable sections */
+    .site-footer .footer-header-mobile {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        width: 100% !important;
+        margin: 0 auto !important;
+    }
+
+    .site-footer .footer-col {
+        text-align: center !important;
+    }
+
     /* target columns that should center their content on mobile */
     .site-footer .footer-center-on-mobile {
         display: flex;
@@ -486,6 +504,29 @@ aside input[type="range"],
 
     .site-footer > div:first-child > div {
         order: unset !important;
+    }
+
+    /* Show contact column on desktop */
+    .site-footer .footer-grid > div:nth-child(4) {
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        text-align: left !important;
+    }
+
+    /* Desktop: show footer headers as h5 elements */
+    .site-footer .footer-col h5 {
+        display: block !important;
+    }
+
+    /* Desktop: hide footer buttons */
+    .site-footer .footer-header-mobile {
+        display: none !important;
+    }
+
+    /* Desktop: always show footer lists */
+    .site-footer .footer-col ul {
+        display: flex !important;
     }
 }
 
