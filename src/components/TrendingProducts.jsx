@@ -122,7 +122,7 @@ export default function TrendingProducts() {
             <Link
               key={product.sku}
               to={`/product/${product.sku}`}
-              style={{ textDecoration: 'none', minWidth: '280px' }}
+              style={{ textDecoration: 'none', minWidth: '280px', display: 'flex' }}
             >
               <div
                 style={{
@@ -132,7 +132,10 @@ export default function TrendingProducts() {
                   overflow: 'hidden',
                   transition: 'all 0.3s ease',
                   cursor: 'pointer',
-                  height: '100%'
+                  display: 'flex',
+                  flexDirection: 'column',
+                  height: '440px',
+                  width: '100%'
                 }}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.boxShadow = '0 12px 32px rgba(0,0,0,0.12)';
@@ -151,7 +154,8 @@ export default function TrendingProducts() {
                   overflow: 'hidden',
                   display: 'flex',
                   alignItems: 'center',
-                  justifyContent: 'center'
+                  justifyContent: 'center',
+                  flexShrink: 0
                 }}>
                   <img
                     src={product.image}
@@ -166,7 +170,7 @@ export default function TrendingProducts() {
                 </div>
 
                 {/* Product Info */}
-                <div style={{ padding: '16px' }}>
+                <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0 }}>
                   {/* Brand */}
                   <div style={{
                     fontSize: '0.65rem',
@@ -174,7 +178,8 @@ export default function TrendingProducts() {
                     letterSpacing: '0.08em',
                     color: 'rgba(15,23,42,0.5)',
                     marginBottom: '6px',
-                    fontWeight: 600
+                    fontWeight: 600,
+                    flexShrink: 0
                   }}>
                     {product.brand}
                   </div>
@@ -186,7 +191,12 @@ export default function TrendingProducts() {
                     color: 'black',
                     margin: '0 0 8px 0',
                     lineHeight: 1.3,
-                    minHeight: '36px'
+                    height: '36px',
+                    overflow: 'hidden',
+                    display: '-webkit-box',
+                    WebkitLineClamp: 2,
+                    WebkitBoxOrient: 'vertical',
+                    flexShrink: 0
                   }}>
                     {product.name}
                   </h3>
@@ -198,7 +208,12 @@ export default function TrendingProducts() {
                       color: 'rgba(15,23,42,0.6)',
                       margin: '0 0 12px 0',
                       lineHeight: 1.4,
-                      minHeight: '30px'
+                      height: '30px',
+                      overflow: 'hidden',
+                      display: '-webkit-box',
+                      WebkitLineClamp: 2,
+                      WebkitBoxOrient: 'vertical',
+                      flexShrink: 0
                     }}>
                       {product.short_description.substring(0, 60)}...
                     </p>
@@ -210,7 +225,10 @@ export default function TrendingProducts() {
                     alignItems: 'center',
                     justifyContent: 'space-between',
                     gap: '12px',
-                    marginTop: '12px'
+                    marginTop: 'auto',
+                    paddingTop: '12px',
+                    borderTop: '1px solid rgba(15,23,42,0.06)',
+                    flexShrink: 0
                   }}>
                     <span style={{
                       fontSize: '0.9rem',
@@ -234,7 +252,9 @@ export default function TrendingProducts() {
                         display: 'flex',
                         alignItems: 'center',
                         gap: '4px',
-                        transition: 'all 0.2s ease'
+                        transition: 'all 0.2s ease',
+                        whiteSpace: 'nowrap',
+                        flexShrink: 0
                       }}
                       onMouseEnter={(e) => {
                         e.currentTarget.style.background = 'var(--primary-700)';

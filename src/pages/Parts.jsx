@@ -959,7 +959,7 @@ export default function Parts() {
       <div style={{
         maxWidth: '1280px',
         margin: '0 auto',
-        padding: isFullscreen ? 'var(--header-height, 70px) 16px 0' : 'calc(var(--header-height, 70px) + 24px) 16px 24px'
+        padding: isFullscreen ? 'var(--header-height, 70px) 16px 0' : 'calc(var(--header-height, 70px) + 8px) 16px 24px'
       }}>
       {/* Show BrandSelector if no brand selected */}
       {!selectedBrand ? (

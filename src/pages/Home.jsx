@@ -57,7 +57,7 @@ const brandLogos = [
 export default function Home() {
   return (
     <>
-      <div style={{ minHeight: '100vh', background: 'white', paddingTop: 'clamp(60px, 10vw, 80px)' }}>
+      <div style={{ minHeight: '100vh', background: 'white', paddingTop: 'clamp(8px, 3vw, 16px)' }}>
       {/* ─── HERO ─── */}
       <section
         className="section-enter home-hero-section"
