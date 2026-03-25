@@ -153,28 +153,7 @@
       "rotation": 0
     }
   },
-  "navHotspots": [
-    {
-      "id": "nav-to-head",
-      "label": "Back to Head",
-      "targetPage": 2,
-      "pageNumber": 3,
-      "top": "5%",
-      "left": "5%",
-      "width": "12%",
-      "height": "6%"
-    },
-    {
-      "id": "nav-to-pinchbox",
-      "label": "See Pinchbox Detail",
-      "targetPage": 4,
-      "pageNumber": 3,
-      "top": "5%",
-      "left": "87%",
-      "width": "12%",
-      "height": "6%"
-    }
-  ],
+  "navHotspots": [],
   "schema_version": "1.0",
   "image_natural_width": 1200,
   "image_natural_height": 896

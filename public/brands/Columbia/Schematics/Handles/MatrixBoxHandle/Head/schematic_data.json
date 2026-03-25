@@ -185,28 +185,7 @@
       "rotation": 0
     }
   },
-  "navHotspots": [
-    {
-      "id": "nav-to-boxhandle",
-      "label": "Back to Box Handle",
-      "targetPage": 1,
-      "pageNumber": 2,
-      "top": "5%",
-      "left": "5%",
-      "width": "12%",
-      "height": "6%"
-    },
-    {
-      "id": "nav-to-lever",
-      "label": "See Lever Detail",
-      "targetPage": 3,
-      "pageNumber": 2,
-      "top": "5%",
-      "left": "87%",
-      "width": "12%",
-      "height": "6%"
-    }
-  ],
+  "navHotspots": [],
   "schema_version": "1.0",
   "image_natural_width": 1200,
   "image_natural_height": 896

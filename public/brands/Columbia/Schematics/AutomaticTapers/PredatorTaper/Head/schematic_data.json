@@ -137,18 +137,7 @@
       "rotation": 0
     }
   },
-  "navHotspots": [
-    {
-      "id": "nav-to-body",
-      "label": "Back to Body",
-      "targetPage": 1,
-      "pageNumber": 2,
-      "top": "5%",
-      "left": "5%",
-      "width": "12%",
-      "height": "6%"
-    }
-  ],
+  "navHotspots": [],
   "schema_version": "1.0",
   "image_natural_width": 2400,
   "image_natural_height": 1792

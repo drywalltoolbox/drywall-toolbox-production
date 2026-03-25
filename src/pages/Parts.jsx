@@ -1207,7 +1207,20 @@ export default function Parts() {
                     }}
                     onClick={(e) => {
                       e.stopPropagation();
-                      if (activeHotspot === part.id) {
+                      // Check if this is a navigation hotspot
+                      if (part.name === 'SEE HEAD DETAIL') {
+                        setCurrentPage(2);
+                        closeModal();
+                      } else if (part.name === 'SEE LEVER DETAIL') {
+                        setCurrentPage(3);
+                        closeModal();
+                      } else if (part.name === 'SEE PINCHBOX DETAIL') {
+                        setCurrentPage(4);
+                        closeModal();
+                      } else if (part.name === 'SEE EXTENSION HOUSING DETAIL') {
+                        setCurrentPage(5);
+                        closeModal();
+                      } else if (activeHotspot === part.id) {
                         closeModal();
                       } else {
                         setActiveHotspot(part.id);

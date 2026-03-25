@@ -239,48 +239,7 @@
       "rotation": 0
     }
   },
-  "navHotspots": [
-    {
-      "id": "nav-to-lever",
-      "label": "See Lever Detail",
-      "targetPage": 3,
-      "pageNumber": 1,
-      "top": "3.1%",
-      "left": "82.62%",
-      "width": "10%",
-      "height": "6%"
-    },
-    {
-      "id": "nav-to-pinchbox",
-      "label": "See Pinchbox Detail",
-      "targetPage": 4,
-      "pageNumber": 1,
-      "top": "29.15%",
-      "left": "37.95%",
-      "width": "10%",
-      "height": "6%"
-    },
-    {
-      "id": "nav-to-extension-housing",
-      "label": "See Extension Housing Detail",
-      "targetPage": 5,
-      "pageNumber": 1,
-      "top": "42.6%",
-      "left": "83.3%",
-      "width": "10%",
-      "height": "6%"
-    },
-    {
-      "id": "nav-to-head",
-      "label": "See Head Detail",
-      "targetPage": 2,
-      "pageNumber": 1,
-      "top": "86.15%",
-      "left": "25.4%",
-      "width": "10%",
-      "height": "6%"
-    }
-  ],
+  "navHotspots": [],
   "schema_version": "1.0",
   "image_natural_width": 1200,
   "image_natural_height": 896

@@ -169,28 +169,7 @@
       "rotation": 0
     }
   },
-  "navHotspots": [
-    {
-      "id": "nav-to-lever",
-      "label": "Back to Lever",
-      "targetPage": 3,
-      "pageNumber": 4,
-      "top": "5%",
-      "left": "5%",
-      "width": "12%",
-      "height": "6%"
-    },
-    {
-      "id": "nav-to-extension-housing",
-      "label": "See Extension Housing",
-      "targetPage": 5,
-      "pageNumber": 4,
-      "top": "5%",
-      "left": "87%",
-      "width": "12%",
-      "height": "6%"
-    }
-  ],
+  "navHotspots": [],
   "schema_version": "1.0",
   "image_natural_width": 1200,
   "image_natural_height": 896
