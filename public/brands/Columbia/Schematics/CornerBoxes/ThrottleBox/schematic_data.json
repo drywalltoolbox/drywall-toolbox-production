@@ -1,23 +1,11 @@
 {
-  "id": "columbia-throttle-box",
-  "title": "Throttle Box",
+  "id": "1774467392453",
+  "title": "CORNER-BOX-SCHEMATIC-enhanced",
   "diagramPages": [
     1
   ],
   "legendPages": [],
   "parts": [
-    {
-      "id": "FA258",
-      "name": "FA258",
-      "quantity": 1,
-      "sku": ""
-    },
-    {
-      "id": "FA234",
-      "name": "FA234",
-      "quantity": 1,
-      "sku": ""
-    },
     {
       "id": "CFB5B",
       "name": "CFB5B",
@@ -31,32 +19,8 @@
       "sku": ""
     },
     {
-      "id": "CFB6",
-      "name": "CFB6",
-      "quantity": 1,
-      "sku": ""
-    },
-    {
-      "id": "CFB9 FOR 7\" CORNER BOX",
-      "name": "CFB9 FOR 7\" CORNER BOX",
-      "quantity": 1,
-      "sku": ""
-    },
-    {
-      "id": "CT101",
-      "name": "CT101",
-      "quantity": 1,
-      "sku": ""
-    },
-    {
       "id": "CFB5C",
       "name": "CFB5C",
-      "quantity": 1,
-      "sku": ""
-    },
-    {
-      "id": "CT98",
-      "name": "CT98",
       "quantity": 1,
       "sku": ""
     },
@@ -67,32 +31,8 @@
       "sku": ""
     },
     {
-      "id": "CFB15A",
-      "name": "CFB15A",
-      "quantity": 1,
-      "sku": ""
-    },
-    {
-      "id": "CFB1A",
-      "name": "CFB1A",
-      "quantity": 1,
-      "sku": ""
-    },
-    {
       "id": "CFB1 8\"",
       "name": "CFB1 8\"",
-      "quantity": 1,
-      "sku": ""
-    },
-    {
-      "id": "FA231",
-      "name": "FA231",
-      "quantity": 1,
-      "sku": ""
-    },
-    {
-      "id": "CFB15",
-      "name": "CFB15",
       "quantity": 1,
       "sku": ""
     },
@@ -103,62 +43,14 @@
       "sku": ""
     },
     {
-      "id": "CFB16",
-      "name": "CFB16",
-      "quantity": 1,
-      "sku": ""
-    },
-    {
-      "id": "CFB3 8\"",
-      "name": "CFB3 8\"",
-      "quantity": 1,
-      "sku": ""
-    },
-    {
-      "id": "FA242",
-      "name": "FA242",
-      "quantity": 1,
-      "sku": ""
-    },
-    {
-      "id": "FA238",
-      "name": "FA238",
-      "quantity": 1,
-      "sku": ""
-    },
-    {
-      "id": "CFB19",
-      "name": "CFB19",
-      "quantity": 1,
-      "sku": ""
-    },
-    {
-      "id": "FA296",
-      "name": "FA296",
-      "quantity": 1,
-      "sku": ""
-    },
-    {
-      "id": "FA253",
-      "name": "FA253",
-      "quantity": 1,
-      "sku": ""
-    },
-    {
-      "id": "FA262",
-      "name": "FA262",
-      "quantity": 1,
-      "sku": ""
-    },
-    {
-      "id": "AB44",
-      "name": "AB44",
-      "quantity": 1,
-      "sku": ""
-    },
-    {
       "id": "CFB2 8\"",
       "name": "CFB2 8\"",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "FA234",
+      "name": "FA234",
       "quantity": 1,
       "sku": ""
     },
@@ -187,6 +79,18 @@
       "sku": ""
     },
     {
+      "id": "FA247",
+      "name": "FA247",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "CFB3 8\"",
+      "name": "CFB3 8\"",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
       "id": "FA241",
       "name": "FA241",
       "quantity": 1,
@@ -199,20 +103,8 @@
       "sku": ""
     },
     {
-      "id": "CFB4 8\"",
-      "name": "CFB4 8\"",
-      "quantity": 1,
-      "sku": ""
-    },
-    {
       "id": "AB49",
       "name": "AB49",
-      "quantity": 1,
-      "sku": ""
-    },
-    {
-      "id": "FA263",
-      "name": "FA263",
       "quantity": 1,
       "sku": ""
     },
@@ -223,14 +115,122 @@
       "sku": ""
     },
     {
+      "id": "CFB4 8\"",
+      "name": "CFB4 8\"",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
       "id": "CFB8A",
       "name": "CFB8A",
       "quantity": 1,
       "sku": ""
     },
     {
-      "id": "AB44B",
-      "name": "AB44B",
+      "id": "FA296",
+      "name": "FA296",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "FA262",
+      "name": "FA262",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "FA247",
+      "name": "FA247",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "CFB19",
+      "name": "CFB19",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "CFB16",
+      "name": "CFB16",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "FA242",
+      "name": "FA242",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "FA253",
+      "name": "FA253",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "FA231",
+      "name": "FA231",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "CFB1A",
+      "name": "CFB1A",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "FA258",
+      "name": "FA258",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "CT98",
+      "name": "CT98",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "CT101",
+      "name": "CT101",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "CFB6",
+      "name": "CFB6",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "FA234",
+      "name": "FA234",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "CFB15A",
+      "name": "CFB15A",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "CFB15",
+      "name": "CFB15",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "FA238",
+      "name": "FA238",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "AB44",
+      "name": "AB44",
       "quantity": 1,
       "sku": ""
     },
@@ -241,8 +241,14 @@
       "sku": ""
     },
     {
-      "id": "FA309",
-      "name": "FA309",
+      "id": "AB44B",
+      "name": "AB44B",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "FA263",
+      "name": "FA263",
       "quantity": 1,
       "sku": ""
     },
@@ -251,664 +257,414 @@
       "name": "CT39",
       "quantity": 1,
       "sku": ""
+    },
+    {
+      "id": "FA309",
+      "name": "FA309",
+      "quantity": 1,
+      "sku": ""
     }
   ],
   "coordinates": {
-    "FA258": {
-      "id": "FA258",
-      "x_px": 396.7983,
-      "y_px": 281.7507,
-      "x_pct": 16.5333,
-      "y_pct": 15.7227,
-      "shape": "rectangle",
-      "pageNumber": 1,
-      "rotation": 0,
-      "bbox": {
-        "x": 380.7983,
-        "y": 262.2507,
-        "w": 32.0,
-        "h": 39.0
-      }
-    },
-    "FA234": {
-      "id": "FA234",
-      "x_px": 243.0,
-      "y_px": 776.0,
-      "x_pct": 10.125,
-      "y_pct": 43.3036,
-      "shape": "rectangle",
-      "pageNumber": 1,
-      "rotation": 0,
-      "bbox": {
-        "x": 227,
-        "y": 750,
-        "w": 32,
-        "h": 52
-      }
-    },
     "CFB5B": {
       "id": "CFB5B",
-      "x_px": 163.2484,
-      "y_px": 284.7219,
-      "x_pct": 6.802,
-      "y_pct": 15.8885,
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 28.246682222546305,
+      "y_pct": 16.20011719207782,
       "shape": "rectangle",
       "pageNumber": 1,
-      "rotation": 0,
-      "bbox": {
-        "x": 146.7484,
-        "y": 257.2219,
-        "w": 33.0,
-        "h": 55.0
-      }
+      "rotation": 0
     },
     "CFB5A": {
       "id": "CFB5A",
-      "x_px": 213.7422,
-      "y_px": 318.4164,
-      "x_pct": 8.9059,
-      "y_pct": 17.7688,
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 32.403434446550975,
+      "y_pct": 20.949980467987032,
       "shape": "rectangle",
       "pageNumber": 1,
-      "rotation": 0,
-      "bbox": {
-        "x": 196.7422,
-        "y": 290.9164,
-        "w": 34.0,
-        "h": 55.0
-      }
-    },
-    "CFB6": {
-      "id": "CFB6",
-      "x_px": 505.5,
-      "y_px": 170.0,
-      "x_pct": 21.0625,
-      "y_pct": 9.4866,
-      "shape": "rectangle",
-      "pageNumber": 1,
-      "rotation": 0,
-      "bbox": {
-        "x": 490,
-        "y": 148,
-        "w": 31,
-        "h": 44
-      }
-    },
-    "CFB9 FOR 7\" CORNER BOX": {
-      "id": "CFB9 FOR 7\" CORNER BOX",
-      "x_px": 671.0,
-      "y_px": 133.5,
-      "x_pct": 27.9583,
-      "y_pct": 7.4498,
-      "shape": "rectangle",
-      "pageNumber": 1,
-      "rotation": 0,
-      "bbox": {
-        "x": 648,
-        "y": 64,
-        "w": 46,
-        "h": 139
-      }
-    },
-    "CT101": {
-      "id": "CT101",
-      "x_px": 516.5,
-      "y_px": 226.0,
-      "x_pct": 21.5208,
-      "y_pct": 12.6116,
-      "shape": "rectangle",
-      "pageNumber": 1,
-      "rotation": 0,
-      "bbox": {
-        "x": 501,
-        "y": 201,
-        "w": 31,
-        "h": 50
-      }
+      "rotation": 0
     },
     "CFB5C": {
       "id": "CFB5C",
-      "x_px": 260.9907,
-      "y_px": 349.5274,
-      "x_pct": 10.8746,
-      "y_pct": 19.5049,
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 34.34679889164357,
+      "y_pct": 25.599951169967575,
       "shape": "rectangle",
       "pageNumber": 1,
-      "rotation": 0,
-      "bbox": {
-        "x": 242.4907,
-        "y": 322.5274,
-        "w": 37.0,
-        "h": 54.0
-      }
-    },
-    "CT98": {
-      "id": "CT98",
-      "x_px": 523.0,
-      "y_px": 279.5,
-      "x_pct": 21.7917,
-      "y_pct": 15.5971,
-      "shape": "rectangle",
-      "pageNumber": 1,
-      "rotation": 0,
-      "bbox": {
-        "x": 506,
-        "y": 258,
-        "w": 34,
-        "h": 43
-      }
+      "rotation": 0
     },
     "FA219": {
       "id": "FA219",
-      "x_px": 134.5031,
-      "y_px": 484.4439,
-      "x_pct": 5.6043,
-      "y_pct": 27.0337,
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 48.3,
+      "y_pct": 13.45,
       "shape": "rectangle",
       "pageNumber": 1,
-      "rotation": 0,
-      "bbox": {
-        "x": 117.5031,
-        "y": 459.4439,
-        "w": 34.0,
-        "h": 50.0
-      }
-    },
-    "CFB15A": {
-      "id": "CFB15A",
-      "x_px": 629.5,
-      "y_px": 262.0,
-      "x_pct": 26.2292,
-      "y_pct": 14.6205,
-      "shape": "rectangle",
-      "pageNumber": 1,
-      "rotation": 0,
-      "bbox": {
-        "x": 611,
-        "y": 230,
-        "w": 37,
-        "h": 64
-      }
-    },
-    "CFB1A": {
-      "id": "CFB1A",
-      "x_px": 561.0,
-      "y_px": 304.0,
-      "x_pct": 23.375,
-      "y_pct": 16.9643,
-      "shape": "rectangle",
-      "pageNumber": 1,
-      "rotation": 0,
-      "bbox": {
-        "x": 544,
-        "y": 277,
-        "w": 34,
-        "h": 54
-      }
+      "rotation": 0
     },
     "CFB1 8\"": {
       "id": "CFB1 8\"",
-      "x_px": 201.7578,
-      "y_px": 564.5274,
-      "x_pct": 8.4066,
-      "y_pct": 31.5026,
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 56,
+      "y_pct": 20.25,
       "shape": "rectangle",
       "pageNumber": 1,
-      "rotation": 0,
-      "bbox": {
-        "x": 184.2578,
-        "y": 532.5274,
-        "w": 35.0,
-        "h": 64.0
-      }
-    },
-    "FA231": {
-      "id": "FA231",
-      "x_px": 612.5,
-      "y_px": 349.0,
-      "x_pct": 25.5208,
-      "y_pct": 19.4754,
-      "shape": "rectangle",
-      "pageNumber": 1,
-      "rotation": 0,
-      "bbox": {
-        "x": 595,
-        "y": 323,
-        "w": 35,
-        "h": 52
-      }
-    },
-    "CFB15": {
-      "id": "CFB15",
-      "x_px": 750.5,
-      "y_px": 270.5,
-      "x_pct": 31.2708,
-      "y_pct": 15.0949,
-      "shape": "rectangle",
-      "pageNumber": 1,
-      "rotation": 0,
-      "bbox": {
-        "x": 732,
-        "y": 245,
-        "w": 37,
-        "h": 51
-      }
+      "rotation": 0
     },
     "FA247": {
       "id": "FA247",
-      "x_px": 431.0093,
-      "y_px": 715.0275,
-      "x_pct": 17.9587,
-      "y_pct": 39.9011,
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 49.7,
+      "y_pct": 48.8,
       "shape": "rectangle",
       "pageNumber": 1,
-      "rotation": 0,
-      "bbox": {
-        "x": 414.5093,
-        "y": 690.5275,
-        "w": 33.0,
-        "h": 49.0
-      }
-    },
-    "CFB16": {
-      "id": "CFB16",
-      "x_px": 616.0,
-      "y_px": 406.5,
-      "x_pct": 25.6667,
-      "y_pct": 22.6842,
-      "shape": "rectangle",
-      "pageNumber": 1,
-      "rotation": 0,
-      "bbox": {
-        "x": 598,
-        "y": 379,
-        "w": 36,
-        "h": 55
-      }
-    },
-    "CFB3 8\"": {
-      "id": "CFB3 8\"",
-      "x_px": 438.7485,
-      "y_px": 565.1384,
-      "x_pct": 18.2812,
-      "y_pct": 31.5367,
-      "shape": "rectangle",
-      "pageNumber": 1,
-      "rotation": 0,
-      "bbox": {
-        "x": 422.7485,
-        "y": 534.1384,
-        "w": 32.0,
-        "h": 62.0
-      }
-    },
-    "FA242": {
-      "id": "FA242",
-      "x_px": 648.0,
-      "y_px": 354.0,
-      "x_pct": 27.0,
-      "y_pct": 19.7545,
-      "shape": "rectangle",
-      "pageNumber": 1,
-      "rotation": 0,
-      "bbox": {
-        "x": 631,
-        "y": 328,
-        "w": 34,
-        "h": 52
-      }
-    },
-    "FA238": {
-      "id": "FA238",
-      "x_px": 850.0,
-      "y_px": 330.5,
-      "x_pct": 35.4167,
-      "y_pct": 18.4431,
-      "shape": "rectangle",
-      "pageNumber": 1,
-      "rotation": 0,
-      "bbox": {
-        "x": 834,
-        "y": 305,
-        "w": 32,
-        "h": 51
-      }
-    },
-    "CFB19": {
-      "id": "CFB19",
-      "x_px": 552.5,
-      "y_px": 473.5,
-      "x_pct": 23.0208,
-      "y_pct": 26.423,
-      "shape": "rectangle",
-      "pageNumber": 1,
-      "rotation": 0,
-      "bbox": {
-        "x": 536,
-        "y": 448,
-        "w": 33,
-        "h": 51
-      }
-    },
-    "FA296": {
-      "id": "FA296",
-      "x_px": 508.2453,
-      "y_px": 570.5822,
-      "x_pct": 21.1769,
-      "y_pct": 31.8405,
-      "shape": "rectangle",
-      "pageNumber": 1,
-      "rotation": 0,
-      "bbox": {
-        "x": 491.2453,
-        "y": 544.5822,
-        "w": 34.0,
-        "h": 52.0
-      }
-    },
-    "FA253": {
-      "id": "FA253",
-      "x_px": 687.5,
-      "y_px": 495.5,
-      "x_pct": 28.6458,
-      "y_pct": 27.6507,
-      "shape": "rectangle",
-      "pageNumber": 1,
-      "rotation": 0,
-      "bbox": {
-        "x": 669,
-        "y": 471,
-        "w": 37,
-        "h": 49
-      }
-    },
-    "FA262": {
-      "id": "FA262",
-      "x_px": 600.0,
-      "y_px": 556.5,
-      "x_pct": 25.0,
-      "y_pct": 31.0547,
-      "shape": "rectangle",
-      "pageNumber": 1,
-      "rotation": 0,
-      "bbox": {
-        "x": 583,
-        "y": 531,
-        "w": 34,
-        "h": 51
-      }
-    },
-    "AB44": {
-      "id": "AB44",
-      "x_px": 886.0,
-      "y_px": 398.0,
-      "x_pct": 36.9167,
-      "y_pct": 22.2098,
-      "shape": "rectangle",
-      "pageNumber": 1,
-      "rotation": 0,
-      "bbox": {
-        "x": 871,
-        "y": 376,
-        "w": 30,
-        "h": 44
-      }
+      "rotation": 0
     },
     "CFB2 8\"": {
       "id": "CFB2 8\"",
-      "x_px": 153.7516,
-      "y_px": 751.7219,
-      "x_pct": 6.4063,
-      "y_pct": 41.9488,
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 75.4,
+      "y_pct": 15.05,
       "shape": "rectangle",
       "pageNumber": 1,
-      "rotation": 0,
-      "bbox": {
-        "x": 138.2516,
-        "y": 720.2219,
-        "w": 31.0,
-        "h": 63.0
-      }
+      "rotation": 0
+    },
+    "FA234": {
+      "id": "FA234",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 12.4,
+      "y_pct": 47.3,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
     },
     "FA228": {
       "id": "FA228",
-      "x_px": 268.7578,
-      "y_px": 836.3329,
-      "x_pct": 11.1982,
-      "y_pct": 46.6704,
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 83.25,
+      "y_pct": 27.15,
       "shape": "rectangle",
       "pageNumber": 1,
-      "rotation": 0,
-      "bbox": {
-        "x": 253.2578,
-        "y": 811.8329,
-        "w": 31.0,
-        "h": 49.0
-      }
+      "rotation": 0
     },
     "FFB32": {
       "id": "FFB32",
-      "x_px": 316.0,
-      "y_px": 843.0,
-      "x_pct": 13.1667,
-      "y_pct": 47.0424,
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 84.89999999999999,
+      "y_pct": 31.5,
       "shape": "rectangle",
       "pageNumber": 1,
-      "rotation": 0,
-      "bbox": {
-        "x": 300,
-        "y": 818,
-        "w": 32,
-        "h": 50
-      }
+      "rotation": 0
     },
     "FA280": {
       "id": "FA280",
-      "x_px": 353.5,
-      "y_px": 856.0,
-      "x_pct": 14.7292,
-      "y_pct": 47.7679,
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 86.15,
+      "y_pct": 35.6,
       "shape": "rectangle",
       "pageNumber": 1,
-      "rotation": 0,
-      "bbox": {
-        "x": 337,
-        "y": 830,
-        "w": 33,
-        "h": 52
-      }
+      "rotation": 0
     },
     "FFB32A": {
       "id": "FFB32A",
-      "x_px": 396.0,
-      "y_px": 847.5,
-      "x_pct": 16.5,
-      "y_pct": 47.2935,
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 85.35,
+      "y_pct": 39.349999999999994,
       "shape": "rectangle",
       "pageNumber": 1,
-      "rotation": 0,
-      "bbox": {
-        "x": 381,
-        "y": 817,
-        "w": 30,
-        "h": 61
-      }
+      "rotation": 0
+    },
+    "CFB3 8\"": {
+      "id": "CFB3 8\"",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 56.25,
+      "y_pct": 44.05,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
     },
     "FA241": {
       "id": "FA241",
-      "x_px": 451.0,
-      "y_px": 827.0,
-      "x_pct": 18.7917,
-      "y_pct": 46.1496,
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 83.45,
+      "y_pct": 45.349999999999994,
       "shape": "rectangle",
       "pageNumber": 1,
-      "rotation": 0,
-      "bbox": {
-        "x": 435,
-        "y": 801,
-        "w": 32,
-        "h": 52
-      }
+      "rotation": 0
     },
     "AB45": {
       "id": "AB45",
-      "x_px": 495.5,
-      "y_px": 828.0,
-      "x_pct": 20.6458,
-      "y_pct": 46.2054,
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 83.25,
+      "y_pct": 49.8,
       "shape": "rectangle",
       "pageNumber": 1,
-      "rotation": 0,
-      "bbox": {
-        "x": 480,
-        "y": 806,
-        "w": 31,
-        "h": 44
-      }
-    },
-    "CFB4 8\"": {
-      "id": "CFB4 8\"",
-      "x_px": 624.4969,
-      "y_px": 729.0511,
-      "x_pct": 26.0207,
-      "y_pct": 40.6837,
-      "shape": "rectangle",
-      "pageNumber": 1,
-      "rotation": 0,
-      "bbox": {
-        "x": 607.4969,
-        "y": 698.5511,
-        "w": 34.0,
-        "h": 61.0
-      }
+      "rotation": 0
     },
     "AB49": {
       "id": "AB49",
-      "x_px": 544.0,
-      "y_px": 829.5,
-      "x_pct": 22.6667,
-      "y_pct": 46.2891,
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 83.6,
+      "y_pct": 54.6,
       "shape": "rectangle",
       "pageNumber": 1,
-      "rotation": 0,
-      "bbox": {
-        "x": 528,
-        "y": 807,
-        "w": 32,
-        "h": 45
-      }
-    },
-    "FA263": {
-      "id": "FA263",
-      "x_px": 769.5,
-      "y_px": 537.5,
-      "x_pct": 32.0625,
-      "y_pct": 29.9944,
-      "shape": "rectangle",
-      "pageNumber": 1,
-      "rotation": 0,
-      "bbox": {
-        "x": 753,
-        "y": 513,
-        "w": 33,
-        "h": 49
-      }
+      "rotation": 0
     },
     "CFB7 8\"": {
       "id": "CFB7 8\"",
-      "x_px": 593.4937,
-      "y_px": 817.1385,
-      "x_pct": 24.7289,
-      "y_pct": 45.5992,
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 81.5,
+      "y_pct": 59.5,
       "shape": "rectangle",
       "pageNumber": 1,
-      "rotation": 0,
-      "bbox": {
-        "x": 576.9937,
-        "y": 785.1385,
-        "w": 33.0,
-        "h": 64.0
-      }
+      "rotation": 0
+    },
+    "CFB4 8\"": {
+      "id": "CFB4 8\"",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 72.94999999999999,
+      "y_pct": 62.45,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
     },
     "CFB8A": {
       "id": "CFB8A",
-      "x_px": 669.5,
-      "y_px": 689.0,
-      "x_pct": 27.8958,
-      "y_pct": 38.4487,
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 69.55,
+      "y_pct": 67.35,
       "shape": "rectangle",
       "pageNumber": 1,
-      "rotation": 0,
-      "bbox": {
-        "x": 653,
-        "y": 663,
-        "w": 33,
-        "h": 52
-      }
+      "rotation": 0
     },
-    "AB44B": {
-      "id": "AB44B",
-      "x_px": 820.0,
-      "y_px": 518.5,
-      "x_pct": 34.1667,
-      "y_pct": 28.9342,
+    "FA296": {
+      "id": "FA296",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 56.75,
+      "y_pct": 51.2,
       "shape": "rectangle",
       "pageNumber": 1,
-      "rotation": 0,
-      "bbox": {
-        "x": 804,
-        "y": 492,
-        "w": 32,
-        "h": 53
-      }
+      "rotation": 0
+    },
+    "FA262": {
+      "id": "FA262",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 56.3,
+      "y_pct": 60.7,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "CFB19": {
+      "id": "CFB19",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 47.95,
+      "y_pct": 55.95,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "CFB16": {
+      "id": "CFB16",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 41.099999999999994,
+      "y_pct": 62.4,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "FA242": {
+      "id": "FA242",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 35.85,
+      "y_pct": 65.15,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "FA253": {
+      "id": "FA253",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 50.150000000000006,
+      "y_pct": 69.94999999999999,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "FA231": {
+      "id": "FA231",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 35.400000000000006,
+      "y_pct": 59.949999999999996,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "CFB1A": {
+      "id": "CFB1A",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 30.75,
+      "y_pct": 56.900000000000006,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "FA258": {
+      "id": "FA258",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 28.2,
+      "y_pct": 40.05,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "CT98": {
+      "id": "CT98",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 28.696682222546304,
+      "y_pct": 52.49985350990273,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "CT101": {
+      "id": "CT101",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 22.950000000000003,
+      "y_pct": 51.64984374389624,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "CFB6": {
+      "id": "CFB6",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 17.35,
+      "y_pct": 50.900000000000006,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "CFB15A": {
+      "id": "CFB15A",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 26.6,
+      "y_pct": 63.900000000000006,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "CFB15": {
+      "id": "CFB15",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 27.4,
+      "y_pct": 76,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "FA238": {
+      "id": "FA238",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 33.65,
+      "y_pct": 85.35,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "AB44": {
+      "id": "AB44",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 40.3,
+      "y_pct": 88.85,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
     },
     "AB44A": {
       "id": "AB44A",
-      "x_px": 860.7485,
-      "y_px": 511.0274,
-      "x_pct": 35.8645,
-      "y_pct": 28.5172,
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 51,
+      "y_pct": 86.4,
       "shape": "rectangle",
       "pageNumber": 1,
-      "rotation": 0,
-      "bbox": {
-        "x": 843.7485,
-        "y": 484.5274,
-        "w": 34.0,
-        "h": 53.0
-      }
+      "rotation": 0
     },
-    "FA309": {
-      "id": "FA309",
-      "x_px": 766.9969,
-      "y_px": 739.8329,
-      "x_pct": 31.9582,
-      "y_pct": 41.2853,
+    "AB44B": {
+      "id": "AB44B",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 52.5,
+      "y_pct": 82.55,
       "shape": "rectangle",
       "pageNumber": 1,
-      "rotation": 0,
-      "bbox": {
-        "x": 751.4969,
-        "y": 713.8329,
-        "w": 31.0,
-        "h": 52.0
-      }
+      "rotation": 0
+    },
+    "FA263": {
+      "id": "FA263",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 54.349999999999994,
+      "y_pct": 77.35,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
     },
     "CT39": {
       "id": "CT39",
-      "x_px": 810.9907,
-      "y_px": 710.5287,
-      "x_pct": 33.7913,
-      "y_pct": 39.65,
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 70.66664722181713,
+      "y_pct": 81.3999902339935,
       "shape": "rectangle",
       "pageNumber": 1,
-      "rotation": 0,
-      "bbox": {
-        "x": 794.4907,
-        "y": 688.0287,
-        "w": 33.0,
-        "h": 45.0
-      }
+      "rotation": 0
+    },
+    "FA309": {
+      "id": "FA309",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 73.85,
+      "y_pct": 76.6,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
     }
   },
   "schema_version": "1.0",
