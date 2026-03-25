@@ -71,7 +71,7 @@ export default function Footer() {
         </div>
 
         {/* Shop column */}
-        <div className="footer-col">
+        <div className="footer-col" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '16px' }}>
           <h5 style={{
             display: 'none',
             textTransform: 'uppercase',
@@ -97,7 +97,7 @@ export default function Footer() {
               textTransform: 'uppercase',
               fontSize: '0.7rem',
               letterSpacing: '0.12em',
-              margin: '0 0 20px 0',
+              margin: '0',
               fontWeight: 800,
               color: 'var(--primary-600)',
               width: '100%'
@@ -118,6 +118,7 @@ export default function Footer() {
             display: expandedMobile === 'shop' ? 'flex' : 'none',
             flexDirection: 'column', 
             gap: '10px',
+            alignItems: 'center',
             '@media (min-width: 641px)': {
               display: 'flex'
             }
@@ -144,7 +145,7 @@ export default function Footer() {
         </div>
 
         {/* Support column */}
-        <div className="footer-col">
+        <div className="footer-col" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '16px' }}>
           <h5 style={{
             display: 'none',
             textTransform: 'uppercase',
@@ -170,7 +171,7 @@ export default function Footer() {
               textTransform: 'uppercase',
               fontSize: '0.7rem',
               letterSpacing: '0.12em',
-              margin: '0 0 20px 0',
+              margin: '0',
               fontWeight: 800,
               color: 'var(--primary-600)',
               width: '100%'
@@ -191,6 +192,7 @@ export default function Footer() {
             display: expandedMobile === 'support' ? 'flex' : 'none',
             flexDirection: 'column', 
             gap: '10px',
+            alignItems: 'center',
             '@media (min-width: 641px)': {
               display: 'flex'
             }

@@ -1,5 +1,6 @@
 ﻿import { Link } from 'react-router-dom';
 import PartsDiagrams from '../components/SchematicDiagrams';
+import TrendingProducts from '../components/TrendingProducts';
 import tapeTechLogo from '/brands/TapeTech/tapetech_logo.svg';
 import columbiaLogo from '/brands/Columbia/columbia_taping_tools_logo.svg';
 import surproLogo from '/brands/SurPro/surpro_logo.svg';
@@ -42,35 +43,6 @@ const trustBadges = [
     ),
     label: 'Expert Support',
     sub: 'Real help from real people'
-  }
-];
-
-const categories = [
-  {
-    id: 'taping',
-    title: 'Automatic Taping Tools',
-    subtitle: 'Professional-grade automatic tapers, banjos, and applicators',
-    cta: 'Shop Taping',
-    brand: 'TapeTech',
-    gradient: 'linear-gradient(135deg, #0f172a 0%, #1e3a8a 60%, #1d4ed8 100%)',
-    icon: (
-      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.25)" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M14.5 10c-.83 0-1.5-.67-1.5-1.5v-5c0-.83.67-1.5 1.5-1.5s1.5.67 1.5 1.5v5c0 .83-.67 1.5-1.5 1.5z"/><path d="M20.5 10H19V8.5c0-.83.67-1.5 1.5-1.5s1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/><path d="M9.5 14c.83 0 1.5.67 1.5 1.5v5c0 .83-.67 1.5-1.5 1.5S8 21.33 8 20.5v-5c0-.83.67-1.5 1.5-1.5z"/><path d="M3.5 14H5v1.5c0 .83-.67 1.5-1.5 1.5S2 16.33 2 15.5 2.67 14 3.5 14z"/><path d="M14 14.5c0-.83.67-1.5 1.5-1.5h5c.83 0 1.5.67 1.5 1.5s-.67 1.5-1.5 1.5h-5c-.83 0-1.5-.67-1.5-1.5z"/><path d="M15.5 19H14v-1.5c0-.83.67-1.5 1.5-1.5s1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/><path d="M10 9.5C10 8.67 9.33 8 8.5 8h-5C2.67 8 2 8.67 2 9.5S2.67 11 3.5 11h5c.83 0 1.5-.67 1.5-1.5z"/><path d="M8.5 5H10v1.5C10 7.33 9.33 8 8.5 8S7 7.33 7 6.5 7.67 5 8.5 5z"/>
-      </svg>
-    )
-  },
-  {
-    id: 'finishing',
-    title: 'Finishing & Corner Tools',
-    subtitle: 'Skimming blades, corner tools, and finishing knives',
-    cta: 'Shop Finishing',
-    brand: 'Columbia',
-    gradient: 'linear-gradient(135deg, #1e3a5f 0%, #1e40af 60%, #3b82f6 100%)',
-    icon: (
-      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.25)" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>
-      </svg>
-    )
   }
 ];
 
@@ -128,112 +100,8 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ─── CATEGORY BANNERS ─── */}
-      <section style={{
-        padding: '0 clamp(1rem, 5vw, 2.5rem) clamp(2rem, 5vw, 3rem)',
-        maxWidth: '1400px',
-        margin: '0 auto'
-      }}>
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-          gap: '24px'
-        }}>
-          {categories.map((cat) => (
-            <Link
-              key={cat.id}
-              to={`/products?category=${cat.id}`}
-              style={{ textDecoration: 'none' }}
-            >
-              <div
-                style={{
-                  background: cat.gradient,
-                  borderRadius: '4px',
-                  padding: 'clamp(2rem, 5vw, 3rem) clamp(1.5rem, 4vw, 2.5rem)',
-                  position: 'relative',
-                  overflow: 'hidden',
-                  cursor: 'pointer',
-                  transition: 'transform 0.3s var(--ease-tension), box-shadow 0.3s var(--ease-tension)',
-                  boxShadow: '0 8px 32px rgba(0,0,0,0.12)'
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.transform = 'translateY(-4px)';
-                  e.currentTarget.style.boxShadow = '0 16px 48px rgba(0,0,0,0.18)';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.transform = 'translateY(0)';
-                  e.currentTarget.style.boxShadow = '0 8px 32px rgba(0,0,0,0.12)';
-                }}
-              >
-                {/* Background dot grid texture */}
-                <div style={{
-                  position: 'absolute',
-                  inset: 0,
-                  backgroundImage: 'radial-gradient(circle at 2px 2px, rgba(255,255,255,0.06) 1px, transparent 0)',
-                  backgroundSize: '40px 40px',
-                  pointerEvents: 'none'
-                }} />
-                {/* Large background icon */}
-                <div style={{ position: 'absolute', top: '50%', right: '-10px', transform: 'translateY(-50%) scale(2.5)', opacity: 0.15, pointerEvents: 'none' }}>
-                  {cat.icon}
-                </div>
-                <div style={{ position: 'relative', zIndex: 1 }}>
-                  <div style={{
-                    display: 'inline-block',
-                    background: 'rgba(255,255,255,0.12)',
-                    border: '1px solid rgba(255,255,255,0.2)',
-                    borderRadius: '3px',
-                    padding: '3px 10px',
-                    fontSize: '0.65rem',
-                    fontWeight: 700,
-                    letterSpacing: '0.12em',
-                    textTransform: 'uppercase',
-                    color: 'rgba(255,255,255,0.8)',
-                    marginBottom: '12px'
-                  }}>
-                    {cat.brand}
-                  </div>
-                  <h2 style={{
-                    color: 'white',
-                    fontSize: 'clamp(1.3rem, 3vw, 1.75rem)',
-                    fontWeight: 800,
-                    margin: '0 0 8px 0',
-                    lineHeight: 1.15,
-                    letterSpacing: '-0.02em'
-                  }}>
-                    {cat.title}
-                  </h2>
-                  <p style={{
-                    color: 'rgba(255,255,255,0.7)',
-                    fontSize: '0.875rem',
-                    margin: '0 0 24px 0',
-                    lineHeight: 1.5
-                  }}>
-                    {cat.subtitle}
-                  </p>
-                  <span style={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '8px',
-                    color: 'white',
-                    fontWeight: 700,
-                    fontSize: '0.8rem',
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.1em',
-                    borderBottom: '2px solid rgba(255,255,255,0.4)',
-                    paddingBottom: '2px'
-                  }}>
-                    {cat.cta}
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M5 12h14M12 5l7 7-7 7"/>
-                    </svg>
-                  </span>
-                </div>
-              </div>
-            </Link>
-          ))}
-        </div>
-      </section>
+      {/* ─── TRENDING PRODUCTS ─── */}
+      <TrendingProducts />
 
       {/* ─── TRUST BADGES ─── */}
       <section style={{
