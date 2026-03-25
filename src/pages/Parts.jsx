@@ -46,8 +46,8 @@ import columbiaFlatBoxHandleData from '../../public/brands/Columbia/Schematics/H
 // Columbia files are served from public/brands/Columbia/Schematics/... at their original paths.
 // ---------------------------------------------------------------------------
 const _BASE = process.env.PUBLIC_URL;
-const columbiaMatrixBoxHandleImg    = `${_BASE}brands/Columbia/Schematics/Handles/MatrixBoxHandle/Matrix_Handle-enhanced.png`;
-const columbiaMatrixBoxHandlePreview = `${_BASE}brands/Columbia/Schematics/Handles/MatrixBoxHandle/columbia_matrix_box_handle.jpg`;
+const columbiaMatrixBoxHandleImg    = `${_BASE}brands/Columbia/Schematics/Handles/MatrixBoxHandle/BoxHandle/Matrix_Handle-enhanced.png`;
+const columbiaMatrixBoxHandlePreview = `${_BASE}brands/Columbia/Schematics/Handles/MatrixBoxHandle/BoxHandle/columbia_matrix_box_handle.jpg`;
 
 // New TapeTech image-only schematics
 const tapeTech15TTEImg      = `${_BASE}schematics/brands/TapeTech/products/15TTE_SCH-enhanced.png`;
@@ -69,13 +69,13 @@ const tapeTechPAHC12Img     = `${_BASE}schematics/brands/TapeTech/products/PAHC1
 // New Columbia image-only schematics
 const columbia2WayInternalCornerImg = `${_BASE}brands/Columbia/Schematics/Applicators/TwoWayInternalCorner/2_Way_Internal_Corner_Applicator-1-enhanced.png`;
 const columbia2WayInternalCornerPreview = `${_BASE}brands/Columbia/Schematics/Applicators/TwoWayInternalCorner/Two-Way_Internal_Corner_Applicator.jpg`;
-const columbiaExtensionHousingImg  = `${_BASE}brands/Columbia/Schematics/Handles/MatrixBoxHandle/Extension_Housing_Schematic-1-enhanced.png`;
+const columbiaExtensionHousingImg  = `${_BASE}brands/Columbia/Schematics/Handles/MatrixBoxHandle/ExtensionHousing/Extension_Housing_Schematic-1-enhanced.png`;
 const columbiaExternalCornerApplicatorImg = `${_BASE}brands/Columbia/Schematics/Applicators/ExternalCorner/8_Wheel_External_Corner_Applicator-1-enhanced.png`;
 const columbiaExternalCornerApplicatorPreview = `${_BASE}brands/Columbia/Schematics/Applicators/ExternalCorner/External_90_Aplicator_CEXT90_-_FRONT.jpg`;
 // (Inside Corner Roller images/data intentionally removed from parts schematics)
-const columbiaMatrixHeadImg        = `${_BASE}brands/Columbia/Schematics/Handles/MatrixBoxHandle/Matrix_Head-enhanced-enhanced.png`;
-const columbiaMatrixLeverImg       = `${_BASE}brands/Columbia/Schematics/Handles/MatrixBoxHandle/Matrix_Lever-1-enhanced.png`;
-const columbiaMatrixPinchboxImg    = `${_BASE}brands/Columbia/Schematics/Handles/MatrixBoxHandle/Matrix_Pinchbox-1-enhanced.png`;
+const columbiaMatrixHeadImg        = `${_BASE}brands/Columbia/Schematics/Handles/MatrixBoxHandle/Head/Matrix_Head-enhanced-enhanced.png`;
+const columbiaMatrixLeverImg       = `${_BASE}brands/Columbia/Schematics/Handles/MatrixBoxHandle/Lever/Matrix_Lever-1-enhanced.png`;
+const columbiaMatrixPinchboxImg    = `${_BASE}brands/Columbia/Schematics/Handles/MatrixBoxHandle/Pinchbox/Matrix_Pinchbox-1-enhanced.png`;
 const columbiaPredatorTaperPreview = `${_BASE}brands/Columbia/Schematics/AutomaticTapers/PredatorTaper/predator_taper.jpg`;
 const columbiaPredatorTaperBodyImg = `${_BASE}brands/Columbia/Schematics/AutomaticTapers/PredatorTaper/predator_taper_body.png`;
 const columbiaPredatorTaperHeadNewImg = `${_BASE}brands/Columbia/Schematics/AutomaticTapers/PredatorTaper/predator_taper_head.png`;
