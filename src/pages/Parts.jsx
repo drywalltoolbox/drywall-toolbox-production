@@ -949,12 +949,18 @@ export default function Parts() {
   return (
     <section 
       style={{ 
-        padding: isFullscreen ? 'var(--header-height, 70px) 0 0' : 'calc(var(--header-height, 70px) + clamp(4px, 2vw, 24px)) clamp(1rem, 5vw, 2.5rem) clamp(160px, 30vw, 280px)',
-        minHeight: '100vh'
+        minHeight: '100vh',
+        backgroundColor: '#f9fafb'
       }} 
       className={`section-enter ${isFullscreen ? 'fullscreen-mode' : ''}`}
       onClick={closeModal}
     >
+      {/* Container wrapper with consistent padding like Products page */}
+      <div style={{
+        maxWidth: '1280px',
+        margin: '0 auto',
+        padding: isFullscreen ? 'var(--header-height, 70px) 16px 0' : 'calc(var(--header-height, 70px) + 24px) 16px 24px'
+      }}>
       {/* Show BrandSelector if no brand selected */}
       {!selectedBrand ? (
         <BrandSelector
@@ -1420,6 +1426,7 @@ export default function Parts() {
           onClose={() => setToast(null)}
         />
       )}
+      </div>
     </section>
   );
 }
