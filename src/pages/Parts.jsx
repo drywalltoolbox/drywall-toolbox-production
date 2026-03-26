@@ -36,6 +36,8 @@ import columbiaDirectCornerFlusherData from '../../public/brands/Columbia/Schema
 import columbiaComboFlusherData from '../../public/brands/Columbia/Schematics/CornerFlushers/ComboFlusher/schematic_data.json';
 import columbiaExternalCornerApplicatorData from '../../public/brands/Columbia/Schematics/Applicators/ExternalCorner/schematic_data.json';
 import columbiaTwoWayInternalCornerApplicatorData from '../../public/brands/Columbia/Schematics/Applicators/TwoWayInternalCorner/schematic_data.json';
+import columbiaInsideCornerApplicator2WheelData from '../../public/brands/Columbia/Schematics/Applicators/InsideCornerApplicator/2Wheel/schematic_data.json';
+import columbiaInsideCornerApplicator4WheelData from '../../public/brands/Columbia/Schematics/Applicators/InsideCornerApplicator/4Wheel/schematic_data.json';
 import columbiaCamLockTubeData from '../../public/brands/Columbia/Schematics/CompoundTubes/CamLockTube/schematic_data.json';
 import columbiaClosetMonsterData from '../../public/brands/Columbia/Schematics/Handles/ClosetMonster/schematic_data.json';
 import columbiaColumbiaOneData from '../../public/brands/Columbia/Schematics/Handles/ColumbiaOne/schematic_data.json';
@@ -65,6 +67,9 @@ const columbia2WayInternalCornerPreview = `${_BASE}brands/Columbia/Schematics/Ap
 const columbiaExtensionHousingImg  = `${_BASE}brands/Columbia/Schematics/Handles/MatrixBoxHandle/ExtensionHousing/Extension_Housing_Schematic-1-enhanced.png`;
 const columbiaExternalCornerApplicatorImg = `${_BASE}brands/Columbia/Schematics/Applicators/ExternalCorner/8_Wheel_External_Corner_Applicator-1-enhanced.png`;
 const columbiaExternalCornerApplicatorPreview = `${_BASE}brands/Columbia/Schematics/Applicators/ExternalCorner/External_90_Aplicator_CEXT90_-_FRONT.jpg`;
+const columbiaInsideCornerApplicator2WheelImg = `${_BASE}brands/Columbia/Schematics/Applicators/InsideCornerApplicator/2Wheel/ICA1-2-2015.png`;
+const columbiaInsideCornerApplicator4WheelImg = `${_BASE}brands/Columbia/Schematics/Applicators/InsideCornerApplicator/4Wheel/ICA1-4-2015.png`;
+const columbiaInsideCornerApplicatorPreview = `${_BASE}brands/Columbia/Schematics/Applicators/InsideCornerApplicator/Inside_Corner_Applicator_4_Wheels_ICA1-4_-_BACK.jpg`;
 // (Inside Corner Roller images/data intentionally removed from parts schematics)
 const columbiaMatrixHeadImg        = `${_BASE}brands/Columbia/Schematics/Handles/MatrixBoxHandle/Head/Matrix_Head-enhanced-enhanced.png`;
 const columbiaMatrixLeverImg       = `${_BASE}brands/Columbia/Schematics/Handles/MatrixBoxHandle/Lever/Matrix_Lever-1-enhanced.png`;
@@ -259,6 +264,8 @@ export default function Parts() {
   const cf35Parts = buildPartsFromData(columbiaCf35Data);
   const externalCornerApplicatorParts = buildPartsFromData(columbiaExternalCornerApplicatorData);
   const twoWayInternalCornerApplicatorParts = buildPartsFromData(columbiaTwoWayInternalCornerApplicatorData);
+  const insideCornerApplicator2WheelParts = buildPartsFromData(columbiaInsideCornerApplicator2WheelData);
+  const insideCornerApplicator4WheelParts = buildPartsFromData(columbiaInsideCornerApplicator4WheelData);
   const camLockTubeParts = buildPartsFromData(columbiaCamLockTubeData);
   const closetMonsterParts = buildPartsFromData(columbiaClosetMonsterData);
   const columbiaOneParts = buildPartsFromData(columbiaColumbiaOneData);
@@ -357,6 +364,24 @@ export default function Parts() {
       imagePages: { 1: columbiaExternalCornerApplicatorImg },
       previewImage: columbiaExternalCornerApplicatorPreview,
       parts: externalCornerApplicatorParts
+    },
+    {
+      id: 'columbia-inside-corner-applicator',
+      title: 'Inside Corner Applicator',
+      description: 'Columbia Inside Corner Applicator schematic diagrams',
+      brand: 'Columbia Taping Tools',
+      category: 'Applicators',
+      diagramPages: [1, 2],
+      pageLabels: {
+        1: '2-Wheel',
+        2: '4-Wheel'
+      },
+      imagePages: {
+        1: columbiaInsideCornerApplicator2WheelImg,
+        2: columbiaInsideCornerApplicator4WheelImg
+      },
+      previewImage: columbiaInsideCornerApplicatorPreview,
+      parts: [...insideCornerApplicator2WheelParts, ...insideCornerApplicator4WheelParts]
     },
     {
       id: 'columbia-standard-outside-corner-roller',
