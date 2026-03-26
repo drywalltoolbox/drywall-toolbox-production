@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import ProductDetail from '../components/ProductDetail';
 import BackButton from '../components/BackButton';
+import SearchBar from '../components/SearchBar';
+import SortDropdown from '../components/SortDropdown';
 import Toast from '../components/Toast';
 import { X } from 'lucide-react';
 import { loadProducts } from '../data/products';
@@ -64,6 +66,7 @@ export default function Products() {
   const [products, setProducts] = useState([]);
   const [brands, setBrands] = useState([]);
   const [selectedCategories, setSelectedCategories] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');
   const [priceRange, setPriceRange] = useState([0, MAX_PRICE]);
   const [sortBy, setSortBy] = useState('popular');
   const [showFilters, setShowFilters] = useState(false);
@@ -175,6 +178,15 @@ export default function Products() {
     if (selectedCategories.length > 0 && !selectedCategories.includes(product.category)) return false;
     // price may not exist in CSV; ignore if missing
     if (product.price && (product.price < priceRange[0] || product.price > priceRange[1])) return false;
+    // Search filter
+    if (searchQuery) {
+      const query = searchQuery.toLowerCase();
+      const matchesName = product.name && product.name.toLowerCase().includes(query);
+      const matchesSku = product.sku && product.sku.toLowerCase().includes(query);
+      const matchesUpc = product.upc && product.upc.toLowerCase().includes(query);
+      const matchesBrand = product.brand && product.brand.toLowerCase().includes(query);
+      if (!matchesName && !matchesSku && !matchesUpc && !matchesBrand) return false;
+    }
     return true;
   });
 
@@ -209,6 +221,15 @@ export default function Products() {
           <h1 className="text-4xl font-bold text-gray-900 mb-2">Products</h1>
           <p className="text-gray-600">Browse our extensive collection of professional drywall tools</p>
         </div>
+
+        {/* Search Bar - Only shown when brand is selected */}
+        {selectedBrands.length > 0 && (
+          <SearchBar 
+            placeholder="Search products by name, SKU, or brand..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+        )}
 
         {selectedBrands.length === 0 ? (
           <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
@@ -348,16 +369,10 @@ export default function Products() {
           <div className="flex-1">
             {/* Sort and Results */}
             <div className="flex flex-row justify-between items-center gap-4 mb-6">
-              <select
+              <SortDropdown
                 value={sortBy}
-                onChange={(e) => setSortBy(e.target.value)}
-                className="px-4 py-2 border border-gray-300 rounded-lg bg-white text-black focus:outline-none focus:ring-2 focus:ring-primary-500"
-              >
-                <option value="popular">Most Popular</option>
-                <option value="price-low">Price: Low to High</option>
-                <option value="price-high">Price: High to Low</option>
-                <option value="rating">Highest Rated</option>
-              </select>
+                onChange={(value) => setSortBy(value)}
+              />
               <div className="relative">
                 <button
                   onClick={() => setShowFilters(!showFilters)}

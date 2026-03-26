@@ -3,6 +3,7 @@ import columbiaLogo from '/brands/Columbia/columbia_taping_tools_logo.svg';
 import surproLogo from '/brands/SurPro/surpro_logo.svg';
 import asgardLogo from '/brands/Asgard/asgard_logo.svg';
 import gracoLogo from '/brands/Graco/graco_logo.svg';
+import SearchBar from './SearchBar';
 
 const brandLogos = {
   'TapeTech': tapeTechLogo,
@@ -19,6 +20,9 @@ export default function BrandSelector({ brands, onSelectBrand }) {
         <h1 className="text-4xl font-bold text-gray-900 mb-2">Part Schematics</h1>
         <p className="text-gray-600">Browse tool schematics and order replacement parts</p>
       </div>
+
+      {/* Search Bar */}
+      <SearchBar placeholder="Search schematics by product name..." />
 
       <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
         {brands.map((brand) => (

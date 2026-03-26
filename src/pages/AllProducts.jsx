@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import ProductDetail from '../components/ProductDetail';
 import BackButton from '../components/BackButton';
+import SearchBar from '../components/SearchBar';
 import Toast from '../components/Toast';
 import { X } from 'lucide-react';
 import { loadProducts } from '../data/products';
@@ -39,6 +40,7 @@ export default function AllProducts() {
   const [brands, setBrands] = useState([]);
   const [selectedBrands, setSelectedBrands] = useState([]);
   const [selectedCategories, setSelectedCategories] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');
   const [priceRange, setPriceRange] = useState([0, MAX_PRICE]);
   const [sortBy, setSortBy] = useState('popular');
   const [showFilters, setShowFilters] = useState(false);
@@ -103,6 +105,15 @@ export default function AllProducts() {
     if (selectedCategories.length > 0 && !selectedCategories.includes(product.category)) return false;
     // price may not exist in CSV; ignore if missing
     if (product.price && (product.price < priceRange[0] || product.price > priceRange[1])) return false;
+    // Search filter
+    if (searchQuery) {
+      const query = searchQuery.toLowerCase();
+      const matchesName = product.name && product.name.toLowerCase().includes(query);
+      const matchesSku = product.sku && product.sku.toLowerCase().includes(query);
+      const matchesUpc = product.upc && product.upc.toLowerCase().includes(query);
+      const matchesBrand = product.brand && product.brand.toLowerCase().includes(query);
+      if (!matchesName && !matchesSku && !matchesUpc && !matchesBrand) return false;
+    }
     return true;
   });
 
@@ -127,6 +138,13 @@ export default function AllProducts() {
           <h1 className="text-4xl font-bold text-gray-900 mb-2">All Products</h1>
           <p className="text-gray-600">Browse our complete collection of professional drywall tools from all brands</p>
         </div>
+
+        {/* Search Bar */}
+        <SearchBar 
+          placeholder="Search products by name, SKU, or brand..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+        />
 
         <div className="flex flex-col lg:flex-row gap-8">
           {/* Sidebar Filters */}
