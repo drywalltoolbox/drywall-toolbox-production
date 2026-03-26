@@ -192,7 +192,7 @@ export default function Products() {
   });
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 page-wrapper">
       <div className="container mx-auto px-4 py-4 pt-6">
         {/* Back to Brands button - shows when brand is selected (moved above header) */}
         {selectedBrands.length > 0 && (

@@ -45,7 +45,7 @@ export default function VeeqoCallback() {
   }, [searchParams, handleOAuthCallback, navigate]);
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4">
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4 page-wrapper">
       <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-8 text-center">
         {status === 'processing' && (
           <>

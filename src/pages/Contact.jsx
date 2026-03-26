@@ -53,7 +53,7 @@ export default function Contact() {
   };
 
   return (
-    <div style={{ minHeight: '100vh' }} className="section-enter">
+    <div style={{ minHeight: '100vh' }} className="section-enter page-wrapper">
 
       {/* Hero strip */}
       <section style={{

@@ -26,28 +26,35 @@
     --color-accent-900: #1e3a8a;
   }
 
-  /* GLOBAL FIX: Account for fixed header on all pages
-     The --header-height variable is set in machined-design.css and updates
-     via media queries for mobile/tablet/desktop. This ensures content never
-     hides behind the fixed header, working across all pages and breakpoints. */
+  /* GLOBAL FIX: Scroll padding for anchor links */
   html {
     scroll-padding-top: var(--header-height, 70px);
   }
 
   body {
     @apply bg-white text-gray-900 antialiased;
-    padding-top: var(--header-height, 70px);
     margin: 0;
+    padding: 0;
   }
 
-  /* Ensure main content doesn't add additional padding on top of body's header spacing */
   main {
-    padding-top: 0;
+    padding: 0;
   }
 
-  /* Remove any default margins that could interfere with header spacing */
   h1, h2, h3, h4, h5, h6 {
     margin-top: 0;
+  }
+}
+
+/* UTILITY: Page wrapper - primarily for styling/organization
+   Header spacing is handled globally by body { padding-top: var(--header-height) }
+   This class is kept for semantic organization of page containers */
+
+/* Mobile optimization: ensure no conflicting padding from page internals */
+@media (max-width: 639px) {
+  /* Remove top padding from first child divs that might add extra spacing */
+  .page-wrapper > div:first-child {
+    padding-top: 0 !important;
   }
 }
 

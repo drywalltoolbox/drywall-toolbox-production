@@ -1001,14 +1001,14 @@ export default function Parts() {
         minHeight: '100vh',
         backgroundColor: '#f9fafb'
       }} 
-      className={`section-enter ${isFullscreen ? 'fullscreen-mode' : ''}`}
+      className={`section-enter page-wrapper ${isFullscreen ? 'fullscreen-mode' : ''}`}
       onClick={closeModal}
     >
       {/* Container wrapper with consistent padding like Products page */}
       <div style={{
         maxWidth: '1280px',
         margin: '0 auto',
-        padding: isFullscreen ? 'var(--header-height, 70px) 16px 0' : 'calc(var(--header-height, 70px) + 2px) 16px 24px'
+        padding: isFullscreen ? '16px' : '2px 16px 24px'
       }}>
       {/* Show BrandSelector if no brand selected */}
       {!selectedBrand ? (

@@ -47,6 +47,9 @@ body {
     line-height: 1.5;
     margin: 0;
     padding: 0;
+    /* Apply header spacing globally - prevents content from hiding behind fixed header
+       This works with --header-height variable which updates via media queries */
+    padding-top: var(--header-height, 70px);
 }
 
 /* --- BACKGROUND TEXTURE --- */
