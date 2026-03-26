@@ -132,7 +132,7 @@ export default function AllProducts() {
 
   return (
     <div className="min-h-screen bg-gray-50 page-wrapper">
-      <div className="container mx-auto px-4 py-4 pt-6">
+      <div className="container mx-auto px-4 py-8 pt-12">
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-4xl font-bold text-gray-900 mb-2">All Products</h1>

@@ -106,3 +106,86 @@
     gap: 12px !important;
   }
 }
+
+/* ===== CRITICAL: Mobile Zoom Prevention for Input Fields ===== */
+/* 
+  iOS Safari auto-zooms on input focus if font-size < 16px.
+  Setting font-size: 16px prevents the zoom behavior.
+  This is a critical mobile UX optimization.
+*/
+
+/* All input elements */
+input[type="text"],
+input[type="search"],
+input[type="email"],
+input[type="password"],
+input[type="number"],
+input[type="tel"],
+input[type="url"],
+input[type="date"],
+input[type="time"],
+input[type="datetime-local"],
+input[type="month"],
+input[type="week"],
+textarea,
+select {
+  /* Prevent iOS Safari zoom on focus */
+  font-size: 16px !important;
+  /* Improve touch targeting */
+  padding: 12px 10px;
+  /* Smooth focus transition */
+  transition: all 0.2s ease-out;
+  /* Prevent text scaling */
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+/* Specific mobile search input - ensure no zoom */
+.mobile-search-input {
+  font-size: 16px !important;
+  -webkit-appearance: none;
+  appearance: none;
+  border-radius: 8px;
+}
+
+/* Prevent browser default styling on iOS */
+input,
+textarea,
+select {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  /* Disable iOS Safari zoom on input focus */
+  font-size: 16px;
+}
+
+/* Prevent zoom on input focus for iPhone */
+@supports (-webkit-touch-callout: none) {
+  input,
+  textarea,
+  select {
+    font-size: 16px !important;
+  }
+}
+
+/* Disable double-tap zoom on buttons and clickable elements */
+button,
+a,
+[role="button"],
+.mobile-search-result-item {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+}
+
+/* Prevent text selection delay on touch devices */
+* {
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0.1);
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Smooth scrolling on iOS */
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}

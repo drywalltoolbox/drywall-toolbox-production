@@ -114,7 +114,7 @@ export default function Footer() {
             alignItems: 'center'
           }} className="footer-list-shop">
             {[
-              { to: '/products', label: 'All Products' },
+              { to: '/all-products', label: 'All Products' },
               { to: '/products?category=taping', label: 'Taping Tools' },
               { to: '/products?category=finishing', label: 'Finishing Tools' },
               { to: '/products?category=sanding', label: 'Sanding Tools' },

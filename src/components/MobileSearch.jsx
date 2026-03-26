@@ -162,9 +162,12 @@ export default function MobileSearch({ onClose = () => {} }) {
           background: none;
           border: none;
           outline: none;
-          font-size: 14px;
+          font-size: 16px;
           font-family: inherit;
           color: #1f2937;
+          padding: 8px 4px;
+          -webkit-appearance: none;
+          appearance: none;
         }
 
         .mobile-search-input::placeholder {

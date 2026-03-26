@@ -27,14 +27,17 @@ export default function SearchBar({ placeholder = "Search products...", value = 
           style={{
             width: '100%',
             padding: 'clamp(10px, 2vw, 14px) clamp(10px, 2vw, 14px) clamp(10px, 2vw, 14px) 40px',
-            fontSize: 'clamp(0.9rem, 2vw, 1rem)',
+            fontSize: 'clamp(16px, 2vw, 1rem)',
             border: '1px solid rgb(229, 231, 235)',
             borderRadius: '8px',
             backgroundColor: 'white',
             transition: 'all 0.2s ease-out',
             boxShadow: '0 1px 2px rgba(0,0,0,0.05)',
             outline: 'none',
-            fontFamily: 'inherit'
+            fontFamily: 'inherit',
+            WebkitAppearance: 'none',
+            appearance: 'none',
+            minHeight: '44px'
           }}
           onFocus={(e) => {
             e.currentTarget.style.borderColor = 'var(--primary-600)';
