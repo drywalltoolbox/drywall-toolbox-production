@@ -885,34 +885,7 @@ export default function Repairs() {
             )}
           </div>
 
-          {/* Trust badges */}
-          <div style={{
-            display: 'flex',
-            flexWrap: 'wrap',
-            gap: '16px',
-            justifyContent: 'center',
-            marginTop: '28px',
-          }}>
-            {[
-              { icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>, text: 'Response within 1 business day' },
-              { icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>, text: 'No charge until you approve the quote' },
-              { icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>, text: 'OEM-certified Columbia technicians' },
-            ].map((badge) => (
-              <div key={badge.text} style={{
-                display: 'flex', alignItems: 'center', gap: '8px',
-                background: 'white',
-                border: '1px solid var(--machined-border)',
-                borderRadius: '999px',
-                padding: '8px 16px',
-                fontSize: '0.78rem',
-                color: 'rgba(15,23,42,0.65)',
-                fontWeight: 500,
-              }}>
-                <span style={{ color: 'var(--primary-600)' }}>{badge.icon}</span>
-                {badge.text}
-              </div>
-            ))}
-          </div>
+
         </div>
       </section>
 
