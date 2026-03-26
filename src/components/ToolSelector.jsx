@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import '../styles/tool-selector.css';
+import BackButton from './BackButton';
 
 export default function ToolSelector({ brand, tools, onSelectTool, onBack }) {
   const [selectedCategory, setSelectedCategory] = useState(null);
@@ -25,28 +26,13 @@ export default function ToolSelector({ brand, tools, onSelectTool, onBack }) {
   return (
     <div className="tool-selector">
       <div className="tool-selector-header">
-        <button 
-          className="back-button" 
+        <BackButton 
           onClick={selectedCategory ? () => {
             setSelectedCategory(null);
             setTimeout(() => window.scrollTo({ top: 0, behavior: 'smooth' }), 0);
           } : onBack}
-          aria-label={selectedCategory ? "Back to categories" : "Back to brands"}
-        >
-          <svg
-            width="20"
-            height="20"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <path d="M19 12H5M12 19l-7-7 7-7" />
-          </svg>
-          <span>Back</span>
-        </button>
+          label={selectedCategory ? "Categories" : "Brands"}
+        />
         <div className="header-content">
           <h2>{selectedCategory || brand}</h2>
         </div>

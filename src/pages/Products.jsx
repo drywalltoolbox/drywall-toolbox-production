@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import ProductDetail from '../components/ProductDetail';
+import BackButton from '../components/BackButton';
 import Toast from '../components/Toast';
 import { X } from 'lucide-react';
 import { loadProducts } from '../data/products';
@@ -10,8 +11,7 @@ import {
   Filter, 
   SlidersHorizontal,
   Heart,
-  ChevronDown,
-  ArrowLeft
+  ChevronDown
 } from 'lucide-react';
 import tapeTechLogo from '/brands/TapeTech/tapetech_logo.svg';
 import columbiaLogo from '/brands/Columbia/columbia_taping_tools_logo.svg';
@@ -197,13 +197,10 @@ export default function Products() {
         {/* Back to Brands button - shows when brand is selected (moved above header) */}
         {selectedBrands.length > 0 && (
           <div className="mb-6">
-            <button
+            <BackButton 
               onClick={resetToBrandList}
-              className="inline-flex items-center gap-2 px-4 py-2 text-primary-600 hover:text-primary-700 hover:bg-primary-50 rounded-lg transition-colors font-medium"
-            >
-              <ArrowLeft size={20} />
-              Brands
-            </button>
+              label="Brands"
+            />
           </div>
         )}
 

@@ -33,7 +33,7 @@ export default function ProductDetail({ product, onAddToCart, onClose }) {
   const displayPrice = typeof price === 'number' ? price.toFixed(2) : parseFloat(price || 0).toFixed(2);
 
   return (
-    <div className="bg-white rounded-none sm:rounded-xl lg:rounded-2xl shadow-2xl overflow-hidden animate-fadeIn w-full max-w-6xl mx-auto h-full sm:max-h-[90vh] flex flex-col relative">
+    <div className="bg-white rounded-none sm:rounded-xl lg:rounded-2xl shadow-2xl overflow-visible animate-fadeIn w-full max-w-6xl mx-auto h-full sm:max-h-[90vh] flex flex-col relative">
       {/* Close Button - Fixed Position at Top Right */}
       {onClose && (
         <button
@@ -102,7 +102,7 @@ export default function ProductDetail({ product, onAddToCart, onClose }) {
               </div>
 
               {/* Quantity & Add to Cart */}
-              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 mb-4 sm:mb-6">
+              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 mb-4 sm:mb-6 items-stretch">
                 <div className="flex items-center border border-gray-300 rounded w-full sm:w-auto">
                   <button
                     onClick={decrementQuantity}
@@ -125,7 +125,25 @@ export default function ProductDetail({ product, onAddToCart, onClose }) {
 
                 <button
                   onClick={handleAddToCart}
-                  className="flex-1 flex items-center justify-center gap-2 px-6 sm:px-8 py-2.5 sm:py-3 bg-primary-600 hover:bg-primary-700 text-white rounded font-semibold transition-colors text-sm sm:text-base"
+                  style={{
+                    flex: 1,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '8px',
+                    padding: '10px 24px',
+                    backgroundColor: '#2563eb',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '6px',
+                    fontWeight: '600',
+                    fontSize: '14px',
+                    cursor: 'pointer',
+                    transition: 'background-color 0.2s ease',
+                    minHeight: '44px'
+                  }}
+                  onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#1d4ed8'}
+                  onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#2563eb'}
                 >
                   ADD TO CART
                 </button>

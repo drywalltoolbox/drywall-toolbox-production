@@ -2,14 +2,17 @@ import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { loadProducts } from '../data/products';
 import { filterProductsWithSchematics } from '../data/schematicMappings';
-import { ShoppingCart, ChevronLeft, ChevronRight } from 'lucide-react';
+import { ShoppingCart, ChevronLeft, ChevronRight, X } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import Toast from './Toast';
+import ProductDetail from './ProductDetail';
 
 export default function TrendingProducts() {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [toast, setToast] = useState(null);
+  const [modalProduct, setModalProduct] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const scrollContainerRef = useRef(null);
   const { addToCart } = useCart();
 
@@ -17,10 +20,22 @@ export default function TrendingProducts() {
     setToast({ message, type });
   };
 
-  const handleAddToCart = (product, e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    addToCart(product, 1);
+  const openModal = (product, e) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    setModalProduct(product);
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setModalProduct(null);
+  };
+
+  const handleAddToCart = (product, quantity = 1) => {
+    addToCart(product, quantity);
     showToast(`${product.name} added to cart!`, 'cart');
   };
 
@@ -121,10 +136,10 @@ export default function TrendingProducts() {
           className="trending-scroll-container"
         >
           {products.map((product) => (
-            <Link
+            <div
               key={product.sku}
-              to={`/product/${product.sku}`}
-              style={{ textDecoration: 'none', minWidth: '280px', maxWidth: '280px', display: 'flex', flexShrink: 0 }}
+              onClick={() => openModal(product)}
+              style={{ textDecoration: 'none', minWidth: '280px', maxWidth: '280px', display: 'flex', flexShrink: 0, cursor: 'pointer' }}
             >
               <div
                 style={{
@@ -179,7 +194,7 @@ export default function TrendingProducts() {
                     textTransform: 'uppercase',
                     letterSpacing: '0.08em',
                     color: 'rgba(15,23,42,0.5)',
-                    marginBottom: '4px',
+                    marginBottom: '3px',
                     fontWeight: 600,
                     flexShrink: 0
                   }}>
@@ -191,8 +206,8 @@ export default function TrendingProducts() {
                     fontSize: '0.9rem',
                     fontWeight: 700,
                     color: 'black',
-                    margin: '0 0 6px 0',
-                    lineHeight: 1.3,
+                    margin: '0 0 8px 0',
+                    lineHeight: 1.2,
                     height: '36px',
                     overflow: 'hidden',
                     display: '-webkit-box',
@@ -203,31 +218,35 @@ export default function TrendingProducts() {
                     {product.name}
                   </h3>
 
-                  {/* Description */}
-                  {product.short_description && (
-                    <p style={{
-                      fontSize: '0.75rem',
-                      color: 'rgba(15,23,42,0.6)',
-                      margin: '0 0 8px 0',
-                      lineHeight: 1.4,
-                      height: '30px',
-                      overflow: 'hidden',
-                      display: '-webkit-box',
-                      WebkitLineClamp: 2,
-                      WebkitBoxOrient: 'vertical',
-                      flexShrink: 0
-                    }}>
-                      {product.short_description.substring(0, 60)}...
-                    </p>
-                  )}
+                  {/* SKU & UPC Info */}
+                  <div style={{
+                    fontSize: '0.7rem',
+                    color: 'rgba(15,23,42,0.6)',
+                    margin: '0',
+                    paddingBottom: '6px',
+                    lineHeight: 1.4,
+                    flex: 1,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '2px'
+                  }}>
+                    {product.sku && (
+                      <div style={{ fontFamily: 'monospace', color: 'rgba(15,23,42,0.7)' }}>
+                        <span style={{ fontWeight: 600 }}>SKU:</span> {product.sku}
+                      </div>
+                    )}
+                    {product.upc && (
+                      <div style={{ fontFamily: 'monospace', color: 'rgba(15,23,42,0.7)' }}>
+                        <span style={{ fontWeight: 600 }}>UPC:</span> {product.upc}
+                      </div>
+                    )}
+                  </div>
 
-                  {/* Footer with Price and Button */}
+                  {/* Footer with Price only */}
                   <div style={{
                     display: 'flex',
                     alignItems: 'center',
-                    justifyContent: 'space-between',
-                    gap: '12px',
-                    marginTop: 'auto',
+                    justifyContent: 'flex-start',
                     paddingTop: '8px',
                     borderTop: '1px solid rgba(15,23,42,0.06)',
                     flexShrink: 0
@@ -240,40 +259,10 @@ export default function TrendingProducts() {
                     }}>
                       ${product.price.toFixed(2)}
                     </span>
-                    <button
-                      onClick={(e) => handleAddToCart(product, e)}
-                      style={{
-                        background: 'var(--primary-600)',
-                        color: 'white',
-                        border: 'none',
-                        borderRadius: '6px',
-                        padding: '8px 12px',
-                        fontSize: '0.7rem',
-                        fontWeight: 700,
-                        cursor: 'pointer',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '4px',
-                        transition: 'all 0.2s ease',
-                        whiteSpace: 'nowrap',
-                        flexShrink: 0
-                      }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.background = 'var(--primary-700)';
-                        e.currentTarget.style.transform = 'scale(1.05)';
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.background = 'var(--primary-600)';
-                        e.currentTarget.style.transform = 'scale(1)';
-                      }}
-                    >
-                      <ShoppingCart size={14} />
-                      Add
-                    </button>
                   </div>
                 </div>
               </div>
-            </Link>
+            </div>
           ))}
         </div>
 
@@ -373,6 +362,26 @@ export default function TrendingProducts() {
       `}</style>
 
       {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
+
+      {/* Product Detail Modal - Matches Products.jsx exactly */}
+      {isModalOpen && modalProduct && (
+        <div className="fixed inset-0 z-1100 flex items-center justify-center p-0 sm:p-4">
+          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm" onClick={closeModal} />
+          {/* Close Button - Direct child of fixed modal wrapper to avoid stacking context issues */}
+          <button
+            onClick={closeModal}
+            className="fixed top-4 right-4 sm:absolute sm:top-4 sm:right-4 z-1120 p-2.5 sm:p-2 bg-white rounded-full shadow-xl hover:bg-gray-100 transition-colors border border-gray-200"
+            aria-label="Close"
+          >
+            <X className="w-6 h-6 text-gray-700" />
+          </button>
+          <div className="relative z-10 w-full h-full sm:h-auto max-w-full sm:max-w-3xl md:max-w-5xl lg:max-w-6xl mx-auto">
+            <div onClick={(e) => e.stopPropagation()} className="h-full overflow-x-hidden">
+              <ProductDetail product={modalProduct} onAddToCart={handleAddToCart} onClose={closeModal} />
+            </div>
+          </div>
+        </div>
+      )}
     </section>
   );
 }
