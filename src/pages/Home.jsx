@@ -179,8 +179,8 @@ export default function Home() {
                 src={brand.src}
                 alt={brand.name}
                 style={{ 
-                  height: brand.name === 'Columbia' ? 'clamp(60px, 10vw, 100px)' : 'clamp(24px, 4vw, 40px)',
-                  maxWidth: brand.name === 'Columbia' ? '300px' : '120px',
+                  height: brand.name === 'Columbia' ? 'clamp(60px, 10vw, 100px)' : brand.name === 'Asgard' || brand.name === 'Graco' ? 'clamp(32px, 5vw, 50px)' : 'clamp(24px, 4vw, 40px)',
+                  maxWidth: brand.name === 'Columbia' ? '300px' : brand.name === 'Asgard' || brand.name === 'Graco' ? '150px' : '120px',
                   objectFit: 'contain' 
                 }}
               />
