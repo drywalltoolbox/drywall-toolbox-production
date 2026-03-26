@@ -10,7 +10,7 @@ export async function loadProducts() {
   const text = await res.text();
   const rows = parseCSV(text);
   // The loader supports both old app CSV and new ALS CSV headers.
-  // ALS header (preferred): brand,name,description_full,sku,upc,price,price_numeric,description_short,image_1...image_9,all_images
+  // ALS header (current): brand,name,description_full,sku,upc,price,price_numeric,description_short,image_1...image_9
   // Legacy app header: brand,product_name,part_number,url,image_url,short_description,category,specifications
   const products = rows.map((r, idx) => {
     // Normalize fields from either schema into the runtime product shape
@@ -19,9 +19,8 @@ export async function loadProducts() {
   const name = String(r.name || r.product_name || '').trim();
   const brand = String(r.brand || '').trim();
   const url = String(r.url || '').trim();
-  // prefer image_1 (ALS) then image_url (legacy) then first of all_images
+  // prefer image_1 (ALS) then image_url (legacy)
   let image = (r.image_1 || r.image_url || '').trim();
-  if (!image && r.all_images) image = String(r.all_images).split('|')[0].trim() || '';
   if (!image) image = '/product-placeholder.jpg';
   
   // Collect all images (image_1 through image_9)
@@ -29,11 +28,6 @@ export async function loadProducts() {
   for (let i = 1; i <= 9; i++) {
     const img = (r[`image_${i}`] || '').trim();
     if (img) images.push(img);
-  }
-  // Fallback to all_images if no individual images found
-  if (images.length === 0 && r.all_images) {
-    const allImgs = String(r.all_images).split('|').map(s => s.trim()).filter(Boolean);
-    images.push(...allImgs);
   }
   // Ensure at least one image (the primary one)
   if (images.length === 0) images.push(image);
