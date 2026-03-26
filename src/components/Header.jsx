@@ -180,15 +180,31 @@ export default function Header({ onCartToggle }) {
             <div>
               <button 
                 onClick={() => setShopDropdownOpen(!shopDropdownOpen)}
-                className={`nav-link-mobile w-full text-left flex items-center gap-2 ${isActive('/products') ? 'active' : ''}`}
-                style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '0.875rem 1rem', fontSize: 'inherit' }}
+                className={`nav-link-mobile ${isActive('/products') ? 'active' : ''}`}
+                style={{ 
+                  background: 'none', 
+                  border: 'none', 
+                  cursor: 'pointer', 
+                  padding: '14px 20px', 
+                  fontSize: 'inherit', 
+                  width: '100%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  textAlign: 'left'
+                }}
               >
-                Shop
-                <ChevronDown size={16} style={{ transition: 'transform 200ms ease-out', transform: shopDropdownOpen ? 'rotate(180deg)' : 'rotate(0deg)', marginLeft: 'auto' }} />
+                <span style={{ whiteSpace: 'nowrap' }}>Shop</span>
+                <ChevronDown size={16} style={{ 
+                  transition: 'transform 200ms ease-out', 
+                  transform: shopDropdownOpen ? 'rotate(180deg)' : 'rotate(0deg)', 
+                  flexShrink: 0,
+                  marginLeft: '8px'
+                }} />
               </button>
               
               {shopDropdownOpen && (
-                <div style={{ paddingLeft: '16px', borderLeft: '2px solid var(--alloy-mid)', marginTop: '8px' }}>
+                <div style={{ paddingLeft: '16px', borderLeft: '2px solid var(--alloy-mid)', marginTop: '0px' }}>
                   <Link 
                     to="/all-products" 
                     onClick={() => { setShopDropdownOpen(false); closeMobileMenu(); }}
