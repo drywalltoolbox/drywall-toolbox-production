@@ -27,6 +27,8 @@ import columbiaSemiAutomaticTaperData from '../../public/brands/Columbia/Schemat
 import columbiaSanderHeadData from '../../public/brands/Columbia/Schematics/Sanders/SanderHead/schematic_data.json';
 import columbiaAngleHeadData from '../../public/brands/Columbia/Schematics/Angleheads/AngleHead/schematic_data.json';
 import columbiaMudPumpData from '../../public/brands/Columbia/Schematics/Pumps/MudPump/schematic_data.json';
+import columbiaGooseneckAdapterData from '../../public/brands/Columbia/Schematics/Pumps/GooseneckAdapter/schematic_data.json';
+import columbiaBoxFillerData from '../../public/brands/Columbia/Schematics/Pumps/BoxFiller/schematic_data.json';
 import columbiaCornerCobraData from '../../public/brands/Columbia/Schematics/CornerRollers/CornerCobra/schematic_data.json';
 import columbiaCompoundTubeDataJson from '../../public/brands/Columbia/Schematics/CompoundTubes/CompoundTube/schematic_data.json';
 import columbiaCf35Data from '../../public/brands/Columbia/Schematics/CornerFlushers/StandardCornerFlusher/schematic_data.json';

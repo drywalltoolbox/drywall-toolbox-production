@@ -1,6 +1,6 @@
 {
-  "id": "columbia-tomahawk-smoothing-blades",
-  "title": "Tomahawk Smoothing Blades",
+  "id": "1774486439869",
+  "title": "TOMAHAWK-SCHEMATIC-2022-enhanced",
   "diagramPages": [
     1
   ],
@@ -25,32 +25,14 @@
       "sku": ""
     },
     {
-      "id": "SB7",
-      "name": "SB7",
+      "id": "SB5 & SB6",
+      "name": "SB5 & SB6",
       "quantity": 1,
       "sku": ""
     },
     {
-      "id": "SB2-12IN",
-      "name": "SB2-12IN",
-      "quantity": 1,
-      "sku": ""
-    },
-    {
-      "id": "SB5",
-      "name": "SB5",
-      "quantity": 1,
-      "sku": ""
-    },
-    {
-      "id": "SB6",
-      "name": "SB6",
-      "quantity": 1,
-      "sku": ""
-    },
-    {
-      "id": "SB4",
-      "name": "SB4",
+      "id": "SB4 RIGHT",
+      "name": "SB4 RIGHT",
       "quantity": 1,
       "sku": ""
     },
@@ -61,8 +43,20 @@
       "sku": ""
     },
     {
-      "id": "SB3",
-      "name": "SB3",
+      "id": "SB3 LEFT",
+      "name": "SB3 LEFT",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "SB7",
+      "name": "SB7",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "SB2-12IN",
+      "name": "SB2-12IN",
       "quantity": 1,
       "sku": ""
     }
@@ -72,9 +66,9 @@
       "id": "FA327",
       "x_px": null,
       "y_px": null,
-      "x_pct": 56.0,
-      "y_pct": 6.3,
-      "shape": "circle",
+      "x_pct": 59.99778706867892,
+      "y_pct": 5.783339169971997,
+      "shape": "rectangle",
       "pageNumber": 1,
       "rotation": 0
     },
@@ -82,9 +76,9 @@
       "id": "FA272",
       "x_px": null,
       "y_px": null,
-      "x_pct": 48.2,
-      "y_pct": 12.1,
-      "shape": "circle",
+      "x_pct": 47.82333745317047,
+      "y_pct": 9.846668459621027,
+      "shape": "rectangle",
       "pageNumber": 1,
       "rotation": 0
     },
@@ -92,58 +86,28 @@
       "id": "FA271",
       "x_px": null,
       "y_px": null,
-      "x_pct": 47.8,
-      "y_pct": 17.5,
-      "shape": "circle",
-      "pageNumber": 1,
-      "rotation": 0
-    },
-    "SB7": {
-      "id": "SB7",
-      "x_px": null,
-      "y_px": null,
-      "x_pct": 42.8,
-      "y_pct": 51.5,
-      "shape": "circle",
-      "pageNumber": 1,
-      "rotation": 0
-    },
-    "SB2-12IN": {
-      "id": "SB2-12IN",
-      "x_px": null,
-      "y_px": null,
-      "x_pct": 37.5,
-      "y_pct": 78.0,
-      "shape": "circle",
-      "pageNumber": 1,
-      "rotation": 0
-    },
-    "SB5": {
-      "id": "SB5",
-      "x_px": null,
-      "y_px": null,
-      "x_pct": 74.5,
-      "y_pct": 17.2,
+      "x_pct": 48.25,
+      "y_pct": 16.400000000000002,
       "shape": "rectangle",
       "pageNumber": 1,
       "rotation": 0
     },
-    "SB6": {
-      "id": "SB6",
+    "SB5 & SB6": {
+      "id": "SB5 & SB6",
       "x_px": null,
       "y_px": null,
-      "x_pct": 76.0,
-      "y_pct": 19.0,
+      "x_pct": 76.75,
+      "y_pct": 18.299999999999997,
       "shape": "rectangle",
       "pageNumber": 1,
       "rotation": 0
     },
-    "SB4": {
-      "id": "SB4",
+    "SB4 RIGHT": {
+      "id": "SB4 RIGHT",
       "x_px": null,
       "y_px": null,
-      "x_pct": 21.0,
-      "y_pct": 25.5,
+      "x_pct": 21.64888783766201,
+      "y_pct": 27.283331540378974,
       "shape": "rectangle",
       "pageNumber": 1,
       "rotation": 0
@@ -152,18 +116,38 @@
       "id": "SB1-12IN",
       "x_px": null,
       "y_px": null,
-      "x_pct": 72.0,
-      "y_pct": 32.3,
+      "x_pct": 74.85,
+      "y_pct": 37.24998699154389,
       "shape": "rectangle",
       "pageNumber": 1,
       "rotation": 0
     },
-    "SB3": {
-      "id": "SB3",
+    "SB3 LEFT": {
+      "id": "SB3 LEFT",
       "x_px": null,
       "y_px": null,
-      "x_pct": 72.0,
-      "y_pct": 53.0,
+      "x_pct": 80.3,
+      "y_pct": 54.35001300845611,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "SB7": {
+      "id": "SB7",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 44.35,
+      "y_pct": 61.64999999999999,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "SB2-12IN": {
+      "id": "SB2-12IN",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 52.650000000000006,
+      "y_pct": 80.95,
       "shape": "rectangle",
       "pageNumber": 1,
       "rotation": 0
