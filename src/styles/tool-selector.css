@@ -163,12 +163,12 @@
   height: 100%;
   object-fit: cover;
   object-position: center;
-  filter: blur(0.8px);
+  filter: blur(2.5px);
   transition: filter 0.4s ease-out;
 }
 
 .tool-card:hover .tool-card-image-bg img {
-  filter: blur(0.5px);
+  filter: blur(2px);
 }
 
 .tool-card-image-bg .placeholder-icon {
@@ -194,7 +194,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(to top, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.2) 50%, rgba(0,0,0,0.1) 100%);
+  background: linear-gradient(to top, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.35) 40%, rgba(0,0,0,0.15) 100%);
   z-index: 2;
   padding: clamp(16px, 4vw, 24px);
   text-align: center;
@@ -210,12 +210,18 @@
   transition: all 0.4s ease-out;
   line-height: 1.3;
   text-align: center;
-  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  text-shadow: 
+    0 2px 8px rgba(0, 0, 0, 0.4),
+    0 0 20px rgba(255, 255, 255, 0.3),
+    0 0 40px rgba(37, 99, 235, 0.2);
 }
 
 .tool-card:hover .tool-name {
   color: white;
-  text-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  text-shadow: 
+    0 4px 12px rgba(0, 0, 0, 0.5),
+    0 0 30px rgba(255, 255, 255, 0.5),
+    0 0 60px rgba(37, 99, 235, 0.3);
 }
 
 /* =============================================

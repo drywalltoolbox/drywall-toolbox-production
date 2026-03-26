@@ -34,6 +34,18 @@ export default function ProductDetail({ product, onAddToCart, onClose }) {
 
   return (
     <div className="bg-white rounded-none sm:rounded-xl lg:rounded-2xl shadow-2xl overflow-hidden animate-fadeIn w-full max-w-6xl mx-auto h-full sm:max-h-[90vh] flex flex-col relative">
+      {/* Close Button - Fixed Position at Top Right */}
+      {onClose && (
+        <button
+          onClick={onClose}
+          className="absolute top-2 right-2 sm:top-4 sm:right-4 z-50 p-2 sm:p-3 hover:bg-gray-100 rounded-full transition-colors"
+          aria-label="Close product detail"
+          title="Close"
+        >
+          <X size={24} className="text-gray-600 hover:text-gray-900" />
+        </button>
+      )}
+      
       {/* Scrollable Content with Custom Scrollbar */}
       <div className="overflow-y-auto overflow-x-hidden custom-scrollbar h-full">
         <div className="p-4 sm:p-6 md:p-8 lg:p-12 pt-16 sm:pt-6 max-w-full">

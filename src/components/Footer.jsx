@@ -118,11 +118,8 @@ export default function Footer() {
             display: expandedMobile === 'shop' ? 'flex' : 'none',
             flexDirection: 'column', 
             gap: '10px',
-            alignItems: 'center',
-            '@media (min-width: 641px)': {
-              display: 'flex'
-            }
-          }}>
+            alignItems: 'center'
+          }} className="footer-list-shop">
             {[
               { to: '/products', label: 'All Products' },
               { to: '/products?category=taping', label: 'Taping Tools' },
@@ -192,11 +189,8 @@ export default function Footer() {
             display: expandedMobile === 'support' ? 'flex' : 'none',
             flexDirection: 'column', 
             gap: '10px',
-            alignItems: 'center',
-            '@media (min-width: 641px)': {
-              display: 'flex'
-            }
-          }}>
+            alignItems: 'center'
+          }} className="footer-list-support">
             {[
               { to: '/contact', label: 'Contact Us' },
               { to: '/repairs', label: 'Repair Services' },

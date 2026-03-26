@@ -66,7 +66,11 @@ export default function Product() {
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="container mx-auto px-4 py-12">
-        <ProductDetail product={product} onAddToCart={handleAddToCart} />
+        <ProductDetail 
+          product={product} 
+          onAddToCart={handleAddToCart}
+          onClose={() => navigate(-1)}
+        />
       </div>
       
       {/* Toast Notification */}
