@@ -3,6 +3,8 @@ import ProductDetail from '../components/ProductDetail';
 import BackButton from '../components/BackButton';
 import SearchBar from '../components/SearchBar';
 import Toast from '../components/Toast';
+import SortDropdown from '../components/SortDropdown';
+import FilterPanel from '../components/FilterPanel';
 import { X } from 'lucide-react';
 import { loadProducts } from '../data/products';
 import { useCart } from '../context/CartContext';
@@ -147,118 +149,44 @@ export default function AllProducts() {
         />
 
         <div className="flex flex-col lg:flex-row gap-8">
-          {/* Sidebar Filters */}
-          <aside className="lg:w-64 shrink-0">
-            <div className="lg:sticky lg:top-24">
-              {/* Filters */}
-              <div className={`bg-white rounded-lg shadow-md p-6 space-y-6 ${showFilters ? 'block' : 'hidden lg:block'}`}>
-                {/* Categories */}
-                <div>
-                  <h3 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
-                    <SlidersHorizontal size={18} />
-                    Categories
-                  </h3>
-                  <div className="space-y-2">
-                    {categories.map(category => (
-                      <label key={category.id} className="flex items-center gap-2 cursor-pointer">
-                        <input
-                          type="checkbox"
-                          checked={selectedCategories.includes(category.id)}
-                          onChange={() => toggleCategory(category.id)}
-                          className="w-4 h-4 text-primary-600 rounded focus:ring-2 focus:ring-primary-500"
-                        />
-                        <span className="text-sm text-gray-700">{category.name}</span>
-                      </label>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Brands */}
-                <div className="border-t pt-6">
-                  <h3 className="font-semibold text-gray-900 mb-3">Brands</h3>
-                  <div className="space-y-2 max-h-48 overflow-y-auto">
-                    {brands.map(brand => (
-                      <label key={brand} className="flex items-center gap-2 cursor-pointer">
-                        <input
-                          type="checkbox"
-                          checked={selectedBrands.includes(brand)}
-                          onChange={() => toggleBrand(brand)}
-                          className="w-4 h-4 text-primary-600 rounded focus:ring-2 focus:ring-primary-500"
-                        />
-                        <span className="text-sm text-gray-700">{brand}</span>
-                      </label>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Price Range */}
-                <div className="border-t pt-6">
-                  <h3 className="font-semibold text-gray-900 mb-3">Price Range</h3>
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between text-sm text-gray-600">
-                      <span>${priceRange[0].toFixed(2)}</span>
-                      <span>${priceRange[1].toFixed(2)}</span>
-                    </div>
-                    <input
-                      type="range"
-                      min="0"
-                      max={MAX_PRICE}
-                      step="50"
-                      value={priceRange[1]}
-                      onChange={(e) => setPriceRange([0, parseInt(e.target.value)])}
-                      className="w-full"
-                    />
-                  </div>
-                </div>
-
-                {/* Clear Filters */}
-                {(selectedBrands.length > 0 || selectedCategories.length > 0) && (
-                  <button
-                    onClick={() => {
-                      setSelectedBrands([]);
-                      setSelectedCategories([]);
-                      setPriceRange([0, MAX_PRICE]);
-                    }}
-                    className="w-full text-sm text-gray-900 hover:text-gray-800 font-medium"
-                  >
-                    Clear All Filters
-                  </button>
-                )}
-              </div>
-            </div>
-          </aside>
+          {/* Filter Panel - Modern Mobile-First Design */}
+          <FilterPanel
+            isOpen={showFilters}
+            onClose={() => setShowFilters(false)}
+            categories={categories}
+            brands={brands}
+            maxPrice={MAX_PRICE}
+            selectedBrands={selectedBrands}
+            selectedCategories={selectedCategories}
+            priceRange={priceRange}
+            onBrandChange={toggleBrand}
+            onCategoryChange={toggleCategory}
+            onPriceChange={setPriceRange}
+            onClearFilters={() => {
+              setSelectedBrands([]);
+              setSelectedCategories([]);
+              setPriceRange([0, MAX_PRICE]);
+            }}
+            resultsCount={sortedProducts.length}
+          />
 
           {/* Products Grid */}
           <div className="flex-1">
-            {/* Sort and Results */}
+            {/* Sort Bar */}
             <div className="flex flex-row justify-between items-center gap-4 mb-6">
-              <select
+              <SortDropdown
                 value={sortBy}
-                onChange={(e) => setSortBy(e.target.value)}
-                className="px-4 py-2 border border-gray-300 rounded-lg bg-white text-black focus:outline-none focus:ring-2 focus:ring-primary-500"
+                onChange={(value) => setSortBy(value)}
+              />
+              {/* Mobile Filter Button */}
+              <button
+                onClick={() => setShowFilters(!showFilters)}
+                className="lg:hidden flex items-center gap-2 px-4 py-2.5 border border-gray-300 rounded-lg bg-white text-gray-900 hover:bg-gray-50 font-medium text-sm transition-colors"
+                aria-label="Toggle Filters"
               >
-                <option value="popular">Most Popular</option>
-                <option value="price-low">Price: Low to High</option>
-                <option value="price-high">Price: High to Low</option>
-                <option value="rating">Highest Rated</option>
-              </select>
-              <div className="relative">
-                <button
-                  onClick={() => setShowFilters(!showFilters)}
-                  className="flex items-center px-3 py-2 border border-gray-300 rounded-lg bg-white text-black focus:outline-none focus:ring-2 focus:ring-primary-500"
-                  aria-label="Toggle Filters"
-                >
-                  <Filter size={16} />
-                </button>
-                {showFilters && (
-                  <div className="absolute top-full left-0 w-64 bg-white shadow-lg border border-gray-300 rounded-lg mt-2 p-4 transition-transform transform origin-top scale-y-100">
-                    <div className="flex flex-col gap-4">
-                      {/* Add filter options here */}
-                      <p>Filter options go here</p>
-                    </div>
-                  </div>
-                )}
-              </div>
+                <Filter size={18} />
+                <span>Filters</span>
+              </button>
             </div>
 
             {/* Products Grid */}
