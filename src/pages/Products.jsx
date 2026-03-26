@@ -384,29 +384,34 @@ export default function Products() {
             
 
             {/* Products Grid */}
-            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
+            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-5 lg:gap-6">
               {sortedProducts.map(product => (
                 <div
                   key={product.id}
-                  className="bg-white rounded-lg shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden group border border-gray-200 hover:border-primary-300 hover:-translate-y-1"
+                  className="bg-white rounded-lg shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden group border border-gray-100 hover:border-primary-300 flex flex-col h-full"
                 >
-                  {/* Product Image */}
-                  <div className="relative bg-gray-100 aspect-square overflow-hidden">
-                    <button onClick={() => openModal(product)} className="absolute inset-0 flex items-center justify-center">
+                  {/* Product Image Container */}
+                  <div className="relative bg-gray-50 aspect-square overflow-hidden shrink-0">
+                    <button 
+                      onClick={() => openModal(product)} 
+                      className="absolute inset-0 flex items-center justify-center bg-gray-50 hover:bg-gray-100 transition-colors w-full h-full"
+                    >
                       {product.image ? (
                         <img
                           src={product.image}
                           alt={product.name}
-                          className="object-contain w-full h-full"
+                          className="object-contain w-full h-full p-2 sm:p-3"
                           loading="lazy"
                           onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = '/product-placeholder.jpg'; }}
                         />
                       ) : (
-                        <div className="text-gray-400"><ShoppingCart size={48} /></div>
+                        <div className="text-gray-300"><ShoppingCart size={40} /></div>
                       )}
                     </button>
+                    
+                    {/* Badge */}
                     {product.badge && (
-                      <div className={`absolute top-3 left-3 px-3 py-1 rounded-full text-xs font-semibold text-white ${
+                      <div className={`absolute top-2 left-2 px-2 py-1 rounded-md text-xs font-semibold text-white ${
                         product.badge === 'Best Seller' ? 'bg-accent-500' :
                         product.badge === 'Popular' ? 'bg-primary-600' :
                         product.badge === 'New' ? 'bg-green-500' :
@@ -415,31 +420,38 @@ export default function Products() {
                         {product.badge}
                       </div>
                     )}
-                    <button className="absolute top-3 right-3 p-2 bg-white/90 rounded-full hover:bg-white transition-colors opacity-0 group-hover:opacity-100">
-                      <Heart size={18} className="text-gray-600 hover:text-red-500 transition-colors" />
+                    
+                    {/* Wishlist Button */}
+                    <button className="absolute top-2 right-2 p-1.5 bg-white/95 rounded-full hover:bg-white transition-all opacity-0 group-hover:opacity-100 shadow-sm hover:shadow-md">
+                      <Heart size={16} className="text-gray-500 hover:text-red-500 transition-colors" />
                     </button>
                   </div>
 
-                  {/* Product Info */}
-                  <div className="p-5">
-                    <p className="text-xs text-gray-500 mb-1">{product.brand}</p>
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2 line-clamp-2 group-hover:text-primary-600 transition-colors">
-                      <button onClick={() => openModal(product)} className="block text-left w-full">{product.name || product.part_number}</button>
+                  {/* Product Info - Grows to fill available space */}
+                  <div className="p-3 sm:p-4 flex flex-col grow">
+                    {/* Brand */}
+                    <p className="text-xs text-gray-500 mb-1 font-medium uppercase tracking-wide">{product.brand}</p>
+                    
+                    {/* Title */}
+                    <h3 className="text-sm sm:text-base font-semibold text-gray-900 mb-2 line-clamp-2 group-hover:text-primary-600 transition-colors grow">
+                      <button onClick={() => openModal(product)} className="block text-left w-full hover:text-primary-600">
+                        {product.name || product.part_number}
+                      </button>
                     </h3>
                     
-                    {/* SKU and UPC */}
-                    <div className="flex items-center gap-4 mb-3">
+                    {/* SKU/UPC - Mobile optimized */}
+                    <div className="flex flex-wrap gap-2 mb-3 text-xs text-gray-500">
                       {product.sku && (
-                        <p className="text-xs text-gray-500">SKU: {product.sku}</p>
+                        <span className="truncate">SKU: {product.sku}</span>
                       )}
                       {product.upc && (
-                        <p className="text-xs text-gray-500">UPC: {product.upc}</p>
+                        <span className="truncate">UPC: {product.upc}</span>
                       )}
                     </div>
 
                     {/* Price and Add to Cart */}
-                    <div className="flex items-center justify-between">
-                      <p className="text-2xl font-bold text-gray-900">
+                    <div className="flex items-center justify-between gap-2 pt-2 border-t border-gray-100">
+                      <p className="text-lg sm:text-xl font-bold text-gray-900 shrink-0">
                         ${typeof product.price === 'number' ? product.price.toFixed(2) : parseFloat(product.price || 0).toFixed(2)}
                       </p>
                       <button
@@ -447,7 +459,8 @@ export default function Products() {
                           e.stopPropagation();
                           handleAddToCart(product, 1);
                         }}
-                        className="p-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
+                        className="shrink-0 p-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-all hover:scale-110 active:scale-95"
+
                       >
                         <ShoppingCart size={20} />
                       </button>
