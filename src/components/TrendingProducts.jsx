@@ -91,7 +91,7 @@ export default function TrendingProducts() {
 
   return (
     <section style={{
-      padding: 'clamp(2rem, 5vw, 3rem) clamp(1rem, 5vw, 2.5rem)',
+      padding: 'clamp(1.5rem, 5vw, 3rem) clamp(0.75rem, 4vw, 2.5rem)',
       maxWidth: '1400px',
       margin: '0 auto'
     }}>
@@ -124,14 +124,16 @@ export default function TrendingProducts() {
           ref={scrollContainerRef}
           style={{
             display: 'flex',
-            gap: '16px',
+            gap: 'clamp(12px, 3vw, 16px)',
             overflowX: 'auto',
             overflowY: 'hidden',
             scrollBehavior: 'smooth',
             paddingBottom: '8px',
             scrollbarWidth: 'thin',
             scrollbarColor: 'rgba(37, 99, 235, 0.3) transparent',
-            alignItems: 'stretch'
+            alignItems: 'stretch',
+            paddingLeft: 'clamp(4px, 2vw, 8px)',
+            paddingRight: 'clamp(4px, 2vw, 8px)'
           }}
           className="trending-scroll-container"
         >
@@ -139,7 +141,7 @@ export default function TrendingProducts() {
             <div
               key={product.sku}
               onClick={() => openModal(product)}
-              style={{ textDecoration: 'none', minWidth: '280px', maxWidth: '280px', display: 'flex', flexShrink: 0, cursor: 'pointer' }}
+              style={{ textDecoration: 'none', minWidth: 'clamp(240px, 85vw, 280px)', maxWidth: 'clamp(240px, 85vw, 280px)', display: 'flex', flexShrink: 0, cursor: 'pointer' }}
             >
               <div
                 style={{
@@ -151,7 +153,7 @@ export default function TrendingProducts() {
                   cursor: 'pointer',
                   display: 'flex',
                   flexDirection: 'column',
-                  height: '440px',
+                  height: 'auto',
                   width: '100%'
                 }}
                 onMouseEnter={(e) => {
@@ -166,7 +168,7 @@ export default function TrendingProducts() {
                 {/* Product Image */}
                 <div style={{
                   width: '100%',
-                  height: '200px',
+                  aspectRatio: '1',
                   background: '#f8fafc',
                   overflow: 'hidden',
                   display: 'flex',
@@ -180,82 +182,94 @@ export default function TrendingProducts() {
                     style={{
                       width: '100%',
                       height: '100%',
-                      objectFit: 'cover',
-                      objectPosition: 'center'
+                      objectFit: 'contain',
+                      objectPosition: 'center',
+                      padding: 'clamp(8px, 3vw, 12px)'
                     }}
                   />
                 </div>
 
                 {/* Product Info */}
-                <div style={{ padding: '12px 14px', display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0 }}>
+                <div style={{ padding: 'clamp(10px, 2.5vw, 14px)', display: 'flex', flexDirection: 'column', gap: 0, height: '100%' }}>
                   {/* Brand */}
                   <div style={{
-                    fontSize: '0.65rem',
+                    fontSize: 'clamp(0.6rem, 1.8vw, 0.7rem)',
                     textTransform: 'uppercase',
                     letterSpacing: '0.08em',
                     color: 'rgba(15,23,42,0.5)',
-                    marginBottom: '3px',
                     fontWeight: 600,
-                    flexShrink: 0
+                    flexShrink: 0,
+                    height: 'clamp(10px, 2vw, 12px)'
                   }}>
                     {product.brand}
                   </div>
 
+                  {/* Spacing after brand */}
+                  <div style={{ height: 'clamp(4px, 1vw, 6px)' }}></div>
+
                   {/* Name */}
                   <h3 style={{
-                    fontSize: '0.9rem',
+                    fontSize: 'clamp(0.8rem, 2vw, 0.95rem)',
                     fontWeight: 700,
                     color: 'black',
-                    margin: '0 0 8px 0',
-                    lineHeight: 1.2,
-                    height: '36px',
+                    margin: 0,
+                    lineHeight: 1.3,
                     overflow: 'hidden',
                     display: '-webkit-box',
                     WebkitLineClamp: 2,
                     WebkitBoxOrient: 'vertical',
-                    flexShrink: 0
+                    flexShrink: 0,
+                    height: 'clamp(32px, 6vw, 40px)'
                   }}>
                     {product.name}
                   </h3>
 
-                  {/* SKU & UPC Info */}
+                  {/* Spacing after name */}
+                  <div style={{ height: 'clamp(4px, 1vw, 6px)' }}></div>
+
+                  {/* SKU & UPC Info - Fixed height */}
                   <div style={{
-                    fontSize: '0.7rem',
+                    fontSize: 'clamp(0.65rem, 1.5vw, 0.75rem)',
                     color: 'rgba(15,23,42,0.6)',
-                    margin: '0',
-                    paddingBottom: '6px',
-                    lineHeight: 1.4,
-                    flex: 1,
+                    margin: 0,
+                    lineHeight: 1.3,
                     display: 'flex',
                     flexDirection: 'column',
-                    gap: '2px'
+                    gap: 'clamp(1px, 0.5vw, 2px)',
+                    flexShrink: 0,
+                    height: 'clamp(32px, 5vw, 40px)'
                   }}>
                     {product.sku && (
-                      <div style={{ fontFamily: 'monospace', color: 'rgba(15,23,42,0.7)' }}>
+                      <div style={{ fontFamily: 'monospace', color: 'rgba(15,23,42,0.7)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                         <span style={{ fontWeight: 600 }}>SKU:</span> {product.sku}
                       </div>
                     )}
                     {product.upc && (
-                      <div style={{ fontFamily: 'monospace', color: 'rgba(15,23,42,0.7)' }}>
+                      <div style={{ fontFamily: 'monospace', color: 'rgba(15,23,42,0.7)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                         <span style={{ fontWeight: 600 }}>UPC:</span> {product.upc}
                       </div>
                     )}
                   </div>
 
-                  {/* Footer with Price only */}
+                  {/* Spacer that pushes price to bottom */}
+                  <div style={{ flex: 1, minHeight: 'clamp(4px, 1vw, 6px)' }}></div>
+
+                  {/* Price */}
                   <div style={{
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'flex-start',
-                    paddingTop: '8px',
+                    paddingTop: 'clamp(6px, 1.5vw, 8px)',
                     borderTop: '1px solid rgba(15,23,42,0.06)',
-                    flexShrink: 0
+                    flexShrink: 0,
+                    height: 'clamp(28px, 4vw, 34px)'
                   }}>
                     <span style={{
-                      fontSize: '0.9rem',
+                      fontSize: 'clamp(1rem, 2.8vw, 1.4rem)',
                       fontWeight: 800,
                       color: 'var(--primary-600)',
-                      fontFamily: 'var(--font-mono)'
+                      fontFamily: 'var(--font-mono)',
+                      whiteSpace: 'nowrap'
                     }}>
                       ${product.price.toFixed(2)}
                     </span>
