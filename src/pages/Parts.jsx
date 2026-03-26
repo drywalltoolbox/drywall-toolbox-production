@@ -47,6 +47,7 @@ import columbiaMatrixBoxHandleLeverData from '../../public/brands/Columbia/Schem
 import columbiaMatrixBoxHandlePinchboxData from '../../public/brands/Columbia/Schematics/Handles/MatrixBoxHandle/Pinchbox/schematic_data.json';
 import columbiaMatrixBoxHandleExtensionHousingData from '../../public/brands/Columbia/Schematics/Handles/MatrixBoxHandle/ExtensionHousing/schematic_data.json';
 import columbiaFlatBoxHandleData from '../../public/brands/Columbia/Schematics/Handles/FlatBoxHandle/schematic_data.json';
+import columbiaLongExtendableHandleData from '../../public/brands/Columbia/Schematics/Handles/LongExtendableHandle/schematic_data.json';
 import tapeTechExtendableSupportHandleData from '../../public/brands/TapeTech/Schematics/ExtendableSupportHandle/schematic_data.json';
 
 // ---------------------------------------------------------------------------
@@ -275,6 +276,7 @@ export default function Parts() {
   const matrixBoxHandlePinchboxParts = buildPartsFromData(columbiaMatrixBoxHandlePinchboxData);
   const matrixBoxHandleExtensionHousingParts = buildPartsFromData(columbiaMatrixBoxHandleExtensionHousingData);
   const flatBoxHandleParts = buildPartsFromData(columbiaFlatBoxHandleData);
+  const longExtendableHandleParts = buildPartsFromData(columbiaLongExtendableHandleData);
   const tapeTechExtendableSupportHandleParts = buildPartsFromData(tapeTechExtendableSupportHandleData);
 
   const schematics = [
@@ -612,7 +614,7 @@ export default function Parts() {
       diagramPages: [1],
       imagePages: { 1: columbiaLongExtendableHandleImg },
       previewImage: columbiaLongExtendableHandlePreview,
-      parts: []
+      parts: longExtendableHandleParts
     },
     {
       id: 'columbia-flat-box-handle',
