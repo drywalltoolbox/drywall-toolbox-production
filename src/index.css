@@ -29,6 +29,27 @@
   body {
     @apply bg-white text-gray-900 antialiased;
   }
+  
+  /* Main content area with responsive header spacing */
+  main.main-content {
+    /* The fixed header is 70px on mobile + safe-area-inset
+       80px on desktop. Let the CSS body padding handle the spacing. */
+    padding-top: 0;
+  }
+  
+  /* Remove excess body padding on mobile, rely on header size instead */
+  @media (max-width: 767px) {
+    body {
+      padding-top: 0 !important;
+    }
+  }
+  
+  /* Desktop: maintain padding for header spacing */
+  @media (min-width: 768px) {
+    main.main-content {
+      padding-top: 20px;
+    }
+  }
 }
 
 /* Mobile responsive spacing adjustments */

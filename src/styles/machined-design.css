@@ -1092,7 +1092,7 @@ aside input[type="range"],
     }
 
     body {
-        padding-top: 80px;
+        padding-top: 0;
     }
 
     .logo-image-mobile {
