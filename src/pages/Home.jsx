@@ -108,7 +108,8 @@ export default function Home() {
         <div style={{
           display: 'grid',
           gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-          gap: '16px'
+          gap: '16px',
+          placeItems: 'stretch'
         }}>
           {trustBadges.map((badge) => (
             <div
@@ -116,12 +117,14 @@ export default function Home() {
               style={{
                 display: 'flex',
                 alignItems: 'center',
+                justifyContent: 'center',
                 gap: '16px',
                 background: 'white',
                 border: '1px solid var(--machined-border)',
                 borderRadius: '4px',
                 padding: '20px 24px',
-                transition: 'box-shadow 0.2s'
+                transition: 'box-shadow 0.2s',
+                textAlign: 'center'
               }}
             >
               <div style={{ color: 'var(--primary-600)', flexShrink: 0 }}>
@@ -148,7 +151,7 @@ export default function Home() {
           fontSize: '0.7rem',
           letterSpacing: '0.15em',
           fontWeight: 700,
-          color: 'rgba(15,23,42,0.4)',
+          color: 'var(--primary-600)',
           marginBottom: '32px'
         }}>
           Trusted Brands
@@ -164,14 +167,14 @@ export default function Home() {
             <Link
               key={brand.name}
               to={`/products?brand=${encodeURIComponent(brand.name === 'Columbia' ? 'Columbia Taping Tools' : brand.name)}`}
-              style={{ textDecoration: 'none', opacity: 0.55, transition: 'opacity 0.2s' }}
-              onMouseEnter={(e) => (e.currentTarget.style.opacity = '1')}
-              onMouseLeave={(e) => (e.currentTarget.style.opacity = '0.55')}
+              style={{ textDecoration: 'none', opacity: 1, transition: 'opacity 0.2s' }}
+              onMouseEnter={(e) => (e.currentTarget.style.opacity = '0.8')}
+              onMouseLeave={(e) => (e.currentTarget.style.opacity = '1')}
             >
               <img
                 src={brand.src}
                 alt={brand.name}
-                style={{ height: 'clamp(24px, 4vw, 40px)', maxWidth: '120px', objectFit: 'contain', filter: 'grayscale(100%)' }}
+                style={{ height: 'clamp(24px, 4vw, 40px)', maxWidth: '120px', objectFit: 'contain' }}
               />
             </Link>
           ))}

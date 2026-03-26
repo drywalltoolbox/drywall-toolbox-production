@@ -22,18 +22,18 @@ export default function Footer() {
         padding: 'clamp(40px, 6vw, 80px) clamp(20px, 5vw, 40px)',
         display: 'grid',
         gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
-        gap: '40px',
+        gap: '60px',
         maxWidth: '1400px',
         margin: '0 auto',
         width: '100%'
       }} className="footer-grid">
 
         {/* Brand column */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', alignItems: 'center', width: 'auto' }}>
           <Link to="/" style={{ display: 'inline-block' }}>
-            <img src={Logo} alt="Drywall Toolbox" className="footer-logo" style={{ height: '64px', width: 'auto' }} />
+            <img src={Logo} alt="Drywall Toolbox" className="footer-logo" style={{ height: '80px', width: 'auto', display: 'block' }} />
           </Link>
-          <div style={{ display: 'flex', gap: '12px', marginTop: '4px' }}>
+          <div style={{ display: 'flex', gap: '6px', marginTop: '0px', justifyContent: 'center', alignItems: 'center' }}>
             <a
               href="https://instagram.com"
               target="_blank"
@@ -107,8 +107,7 @@ export default function Footer() {
             Shop
             <ChevronDown size={16} style={{ 
               transition: 'transform 0.3s ease',
-              transform: expandedMobile === 'shop' ? 'rotate(180deg)' : 'rotate(0deg)',
-              marginLeft: 'auto'
+              transform: expandedMobile === 'shop' ? 'rotate(180deg)' : 'rotate(0deg)'
             }} />
           </button>
           <ul style={{ 
@@ -178,8 +177,7 @@ export default function Footer() {
             Support
             <ChevronDown size={16} style={{ 
               transition: 'transform 0.3s ease',
-              transform: expandedMobile === 'support' ? 'rotate(180deg)' : 'rotate(0deg)',
-              marginLeft: 'auto'
+              transform: expandedMobile === 'support' ? 'rotate(180deg)' : 'rotate(0deg)'
             }} />
           </button>
           <ul style={{ 
@@ -218,11 +216,12 @@ export default function Footer() {
         borderTop: '1px solid var(--machined-border)',
         padding: '20px clamp(20px, 5vw, 40px)',
         display: 'flex',
+        flexDirection: 'column',
         alignItems: 'center',
-        justifyContent: 'space-between',
-        flexWrap: 'wrap',
-        gap: '8px',
-        backgroundColor: '#f8fafc'
+        justifyContent: 'center',
+        gap: '12px',
+        backgroundColor: '#f8fafc',
+        textAlign: 'center'
       }}>
         <p style={{
           fontSize: '0.775rem',
@@ -232,7 +231,7 @@ export default function Footer() {
         }}>
           © 2026 Drywall Toolbox. All rights reserved.
         </p>
-        <div style={{ display: 'flex', gap: '16px' }}>
+        <div style={{ display: 'flex', gap: '16px', justifyContent: 'center', flexWrap: 'wrap' }}>
           {['Privacy Policy', 'Terms of Service'].map((item) => (
             <Link
               key={item}

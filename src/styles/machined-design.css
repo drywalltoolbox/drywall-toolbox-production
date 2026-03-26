@@ -404,6 +404,15 @@ aside input[type="range"],
 
 /* --- SITE FOOTER RESPONSIVE TWEAKS --- */
 /* footer-grid: single column on small screens */
+
+/* Global footer logo styling - allow full sizing without constraints */
+.site-footer img.footer-logo,
+.site-footer .footer-logo {
+    max-width: none !important;
+    width: auto !important;
+    height: auto;
+}
+
 @media (max-width: 640px) {
     .footer-grid {
         grid-template-columns: 1fr !important;
