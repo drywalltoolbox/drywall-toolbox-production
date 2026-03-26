@@ -1,8 +1,8 @@
 // products.js
-// Loads and parses the CSV placed in /public/tswfast_all_products.csv
+// Loads and parses the CSV from /public/products_catalog.csv
 
 export async function loadProducts() {
-  // load the new unified products catalog (ALS schema) by default
+  // load the unified products catalog (ALS schema)
   // Use BASE_URL to ensure correct path in both dev and production (GitHub Pages)
   const csvPath = `${process.env.PUBLIC_URL}products_catalog.csv`;
   const res = await fetch(csvPath);
