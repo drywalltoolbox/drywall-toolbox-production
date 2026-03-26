@@ -38,9 +38,7 @@ export default function Footer() {
               href="https://instagram.com"
               target="_blank"
               rel="noopener noreferrer"
-              style={{ color: 'var(--alloy-deep)', opacity: 0.6, transition: 'opacity 0.2s' }}
-              onMouseEnter={(e) => (e.currentTarget.style.opacity = '1')}
-              onMouseLeave={(e) => (e.currentTarget.style.opacity = '0.6')}
+              style={{ color: 'var(--alloy-deep)', textDecoration: 'none', cursor: 'pointer' }}
               aria-label="Instagram"
             >
               <Instagram size={18} />
@@ -49,9 +47,7 @@ export default function Footer() {
               href="https://facebook.com"
               target="_blank"
               rel="noopener noreferrer"
-              style={{ color: 'var(--alloy-deep)', opacity: 0.6, transition: 'opacity 0.2s' }}
-              onMouseEnter={(e) => (e.currentTarget.style.opacity = '1')}
-              onMouseLeave={(e) => (e.currentTarget.style.opacity = '0.6')}
+              style={{ color: 'var(--alloy-deep)', textDecoration: 'none', cursor: 'pointer' }}
               aria-label="Facebook"
             >
               <Facebook size={18} />
@@ -60,9 +56,7 @@ export default function Footer() {
               href="https://twitter.com"
               target="_blank"
               rel="noopener noreferrer"
-              style={{ color: 'var(--alloy-deep)', opacity: 0.6, transition: 'opacity 0.2s' }}
-              onMouseEnter={(e) => (e.currentTarget.style.opacity = '1')}
-              onMouseLeave={(e) => (e.currentTarget.style.opacity = '0.6')}
+              style={{ color: 'var(--alloy-deep)', textDecoration: 'none', cursor: 'pointer' }}
               aria-label="Twitter / X"
             >
               <Twitter size={18} />

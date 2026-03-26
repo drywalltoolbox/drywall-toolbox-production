@@ -96,14 +96,15 @@ export default function TrendingProducts() {
       margin: '0 auto'
     }}>
       {/* Header */}
-      <div style={{ marginBottom: '32px' }}>
+      <div style={{ marginBottom: '32px', textAlign: 'center' }}>
         <p style={{
           textTransform: 'uppercase',
           fontSize: '0.7rem',
           letterSpacing: '0.15em',
           fontWeight: 700,
           color: 'rgba(15,23,42,0.4)',
-          margin: '0 0 16px 0'
+          margin: '0 0 16px 0',
+          display: 'none'
         }}>
           Trending Now
         </p>
@@ -112,9 +113,18 @@ export default function TrendingProducts() {
           fontWeight: 800,
           color: 'var(--primary-600)',
           margin: 0,
-          letterSpacing: '-0.02em'
+          letterSpacing: '-0.02em',
+          paddingBottom: '8px',
+          paddingLeft: '16px',
+          paddingRight: '16px',
+          display: 'inline-block',
+          position: 'relative',
+          background: 'linear-gradient(to right, var(--primary-600) 0%, var(--primary-600) 100%) no-repeat bottom',
+          backgroundSize: 'calc(100% + 32px) 3px',
+          backgroundPosition: '-16px calc(100% + 0px)',
+          transition: 'all 0.3s ease-out'
         }}>
-          Top Products
+          Trending Products
         </h2>
       </div>
 

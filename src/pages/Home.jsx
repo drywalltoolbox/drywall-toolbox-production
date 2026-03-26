@@ -137,16 +137,29 @@ export default function Home() {
         margin: '0 auto',
         textAlign: 'center'
       }}>
-        <p style={{
-          textTransform: 'uppercase',
-          fontSize: '0.7rem',
-          letterSpacing: '0.15em',
-          fontWeight: 700,
-          color: 'var(--primary-600)',
+        <div style={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
           marginBottom: '32px'
         }}>
-          Trusted Brands
-        </p>
+          <p style={{
+            textTransform: 'uppercase',
+            fontSize: '0.7rem',
+            letterSpacing: '0.15em',
+            fontWeight: 700,
+            color: 'var(--primary-600)',
+            margin: 0,
+            paddingBottom: '6px',
+            paddingLeft: '12px',
+            paddingRight: '12px',
+            borderBottom: '2px solid var(--primary-600)',
+            transition: 'all 0.3s ease-out'
+          }}>
+            Trusted Brands
+          </p>
+        </div>
         <div style={{
           display: 'flex',
           flexWrap: 'wrap',
