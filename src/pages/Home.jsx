@@ -174,7 +174,11 @@ export default function Home() {
               <img
                 src={brand.src}
                 alt={brand.name}
-                style={{ height: 'clamp(24px, 4vw, 40px)', maxWidth: '120px', objectFit: 'contain' }}
+                style={{ 
+                  height: brand.name === 'Columbia' ? 'clamp(60px, 10vw, 100px)' : 'clamp(24px, 4vw, 40px)',
+                  maxWidth: brand.name === 'Columbia' ? '300px' : '120px',
+                  objectFit: 'contain' 
+                }}
               />
             </Link>
           ))}

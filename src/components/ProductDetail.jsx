@@ -211,7 +211,7 @@ export default function ProductDetail({ product, onAddToCart, onClose }) {
                       <img
                         src={BRAND_LOGOS[product.brand]}
                         alt={`${product.brand} logo`}
-                        className="h-12 sm:h-16 w-auto object-contain"
+                        className="h-48 sm:h-64 md:h-80 w-auto object-contain"
                       />
                     </div>
                   )}
