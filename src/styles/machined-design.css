@@ -49,13 +49,6 @@ body {
     padding: 0;
 }
 
-/* Mobile adjustment: ensure no extra padding on body */
-@media (max-width: 767px) {
-    body {
-        padding-top: 0 !important;
-    }
-}
-
 /* --- BACKGROUND TEXTURE --- */
 .machined-bg {
     position: fixed;
@@ -1106,30 +1099,6 @@ aside input[type="range"],
 
     .brand-title {
         font-size: 0.95rem;
-    }
-}
-
-/* --- PAGE SPACING FIX --- */
-/* Ensure all full-page divs account for fixed header */
-.min-h-screen {
-    padding-top: 140px;
-}
-
-/* Override excessive top padding on pages */
-/* Account for fixed header on all pages */
-section[style*="padding: '140px"] {
-    padding-top: 140px !important;
-}
-
-/* All page wrappers get header spacing */
-div.min-h-screen {
-    padding-top: 140px !important;
-}
-
-/* Mobile header is smaller (70px), adjust padding */
-@media (max-width: 767px) {
-    div.min-h-screen {
-        padding-top: 70px !important;
     }
 }
 
