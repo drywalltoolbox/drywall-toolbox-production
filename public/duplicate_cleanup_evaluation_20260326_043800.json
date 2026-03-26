@@ -1,0 +1,34 @@
+{
+  "timestamp": "2026-03-26T04:40:23.697679",
+  "analysis": {
+    "total_products": 286,
+    "upc_duplicates_found": 4,
+    "near_duplicates": 236,
+    "all_near_duplicates_are_legitimate_variants": true,
+    "data_quality_issues": 260,
+    "recommendation": "KEEP ALL CURRENT PRODUCTS - No duplicate deletion needed"
+  },
+  "cleanup_actions": {
+    "delete_products": [],
+    "fix_upc_errors": [
+      {
+        "type": "upc_error",
+        "upc": "824149009270",
+        "keep_row": 126,
+        "fix_rows": [
+          127,
+          128,
+          130,
+          138
+        ],
+        "action": "VERIFY_AND_FIX_UPC"
+      }
+    ],
+    "improve_data_quality": {
+      "total_affected": 260,
+      "issue_breakdown": {
+        "Data Quality Issues": 260
+      }
+    }
+  }
+}
