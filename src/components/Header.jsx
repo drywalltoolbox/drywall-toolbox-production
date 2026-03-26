@@ -109,7 +109,7 @@ export default function Header({ onCartToggle }) {
                     className="shop-dropdown-menu"
                   >
                     <Link 
-                      to="/products" 
+                      to="/all-products" 
                       onClick={() => setShopDropdownOpen(false)}
                       style={{
                         display: 'block',
@@ -188,7 +188,7 @@ export default function Header({ onCartToggle }) {
               {shopDropdownOpen && (
                 <div style={{ paddingLeft: '16px', borderLeft: '2px solid var(--alloy-mid)', marginTop: '8px' }}>
                   <Link 
-                    to="/products" 
+                    to="/all-products" 
                     onClick={() => { setShopDropdownOpen(false); closeMobileMenu(); }}
                     className="nav-link-mobile block py-2 text-sm"
                   >

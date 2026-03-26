@@ -8,6 +8,7 @@ import Footer from './components/Footer';
 import CartSidebar from './components/CartSidebar';
 import Home from './pages/Home';
 import Products from './pages/Products';
+import AllProducts from './pages/AllProducts';
 import Cart from './pages/Cart';
 import Checkout from './pages/Checkout';
 import About from './pages/About';
@@ -54,6 +55,7 @@ function App() {
                 <Routes>
                   <Route path="/" element={<Home />} />
                   <Route path="/products" element={<Products />} />
+                  <Route path="/all-products" element={<AllProducts />} />
                   <Route path="/product/:partNumber" element={<Product />} />
                   <Route path="/parts" element={<Parts />} />
                   <Route path="/repairs" element={<Repairs />} />
