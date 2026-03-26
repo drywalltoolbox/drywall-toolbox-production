@@ -95,8 +95,10 @@ const columbiaAngleHeadPreview = `${_BASE}brands/Columbia/Schematics/Angleheads/
 const columbiaGooseneckAdapterImg = `${_BASE}brands/Columbia/Schematics/Pumps/GooseneckAdapter/Gooseneck-1-1-enhanced.png`;
 const columbiaGooseneckAdapterPreview = `${_BASE}brands/Columbia/Schematics/Pumps/GooseneckAdapter/goosenecksquare.jpg`;
 const columbiaMudPumpImg = `${_BASE}brands/Columbia/Schematics/Pumps/MudPump/MUD-PUMP-SCHEMATIC-2022-enhanced.png`;
+const columbiaMudPumpSubAssembliesImg = `${_BASE}brands/Columbia/Schematics/Pumps/MudPump/MUD-PUMP-SUB-ASSEMBLIES-2022-enhanced.png`;
 const columbiaMudPumpPreview = `${_BASE}brands/Columbia/Schematics/Pumps/MudPump/TallBoyMudpumps.jpg`;
 const columbiaTallBoyMudPumpImg = `${_BASE}brands/Columbia/Schematics/Pumps/TallBoyMudPump/TALL-BOY-MUD-PUMP-SCHEMATIC-2022-enhanced.png`;
+const columbiaTallBoyMudPumpSubAssembliesImg = `${_BASE}brands/Columbia/Schematics/Pumps/TallBoyMudPump/TALL-BOY-MUD-PUMP-SUB-ASSEMBLIES-2022-enhanced.png`;
 const columbiaTallBoyMudPumpPreview = `${_BASE}brands/Columbia/Schematics/Pumps/TallBoyMudPump/TallBoyPump.jpg`;
 const columbiaNailspotterImg = `${_BASE}brands/Columbia/Schematics/Nailspotters/Nailspotter/NAIL-SPOTTER-SCHEMATIC-2022-enhanced.png`;
 const columbiaNailspotterPreview = `${_BASE}brands/Columbia/Schematics/Nailspotters/Nailspotter/2023Nailspotter3inch.jpg`;
@@ -476,22 +478,36 @@ export default function Parts() {
     {
       id: 'columbia-mud-pump',
       title: 'Mud Pump',
-      description: 'Columbia Mud Pump schematic diagram',
+      description: 'Columbia Mud Pump schematic diagrams',
       brand: 'Columbia Taping Tools',
       category: 'Pumps',
-      diagramPages: [1],
-      imagePages: { 1: columbiaMudPumpImg },
+      diagramPages: [1, 2],
+      pageLabels: {
+        1: 'Sub-Assemblies',
+        2: 'Schematic'
+      },
+      imagePages: {
+        1: columbiaMudPumpSubAssembliesImg,
+        2: columbiaMudPumpImg
+      },
       previewImage: columbiaMudPumpPreview,
       parts: mudPumpParts
     },
     {
       id: 'columbia-tall-boy-mud-pump',
       title: 'Tall Boy Mud Pump',
-      description: 'Columbia Tall Boy Mud Pump schematic diagram',
+      description: 'Columbia Tall Boy Mud Pump schematic diagrams',
       brand: 'Columbia Taping Tools',
       category: 'Pumps',
-      diagramPages: [1],
-      imagePages: { 1: columbiaTallBoyMudPumpImg },
+      diagramPages: [1, 2],
+      pageLabels: {
+        1: 'Sub-Assemblies',
+        2: 'Schematic'
+      },
+      imagePages: {
+        1: columbiaTallBoyMudPumpSubAssembliesImg,
+        2: columbiaTallBoyMudPumpImg
+      },
       previewImage: columbiaTallBoyMudPumpPreview,
       parts: tallBoyMudPumpParts
     },
