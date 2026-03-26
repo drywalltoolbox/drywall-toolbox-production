@@ -172,14 +172,14 @@ export default function TrendingProducts() {
                 </div>
 
                 {/* Product Info */}
-                <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0 }}>
+                <div style={{ padding: '12px 14px', display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0 }}>
                   {/* Brand */}
                   <div style={{
                     fontSize: '0.65rem',
                     textTransform: 'uppercase',
                     letterSpacing: '0.08em',
                     color: 'rgba(15,23,42,0.5)',
-                    marginBottom: '6px',
+                    marginBottom: '4px',
                     fontWeight: 600,
                     flexShrink: 0
                   }}>
@@ -191,7 +191,7 @@ export default function TrendingProducts() {
                     fontSize: '0.9rem',
                     fontWeight: 700,
                     color: 'black',
-                    margin: '0 0 8px 0',
+                    margin: '0 0 6px 0',
                     lineHeight: 1.3,
                     height: '36px',
                     overflow: 'hidden',
@@ -208,7 +208,7 @@ export default function TrendingProducts() {
                     <p style={{
                       fontSize: '0.75rem',
                       color: 'rgba(15,23,42,0.6)',
-                      margin: '0 0 12px 0',
+                      margin: '0 0 8px 0',
                       lineHeight: 1.4,
                       height: '30px',
                       overflow: 'hidden',
@@ -228,7 +228,7 @@ export default function TrendingProducts() {
                     justifyContent: 'space-between',
                     gap: '12px',
                     marginTop: 'auto',
-                    paddingTop: '12px',
+                    paddingTop: '8px',
                     borderTop: '1px solid rgba(15,23,42,0.06)',
                     flexShrink: 0
                   }}>

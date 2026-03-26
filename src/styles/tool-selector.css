@@ -70,10 +70,31 @@
 
 .tools-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(clamp(300px, 80vw, 420px), 1fr));
-  gap: clamp(20px, 3vw, 32px);
+  grid-template-columns: repeat(2, 1fr);
+  gap: clamp(12px, 3vw, 20px);
   margin-bottom: clamp(32px, 5vw, 40px);
   place-items: stretch;
+}
+
+@media (min-width: 640px) {
+  .tools-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: clamp(16px, 3vw, 24px);
+  }
+}
+
+@media (min-width: 768px) {
+  .tools-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: clamp(20px, 3vw, 28px);
+  }
+}
+
+@media (min-width: 1024px) {
+  .tools-grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: clamp(24px, 3vw, 32px);
+  }
 }
 
 .tool-card {
@@ -230,18 +251,39 @@
    ============================================= */
 .categories-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: 20px;
+  grid-template-columns: repeat(2, 1fr);
+  gap: clamp(12px, 3vw, 20px);
   margin-bottom: 40px;
   place-items: stretch;
+}
+
+@media (min-width: 640px) {
+  .categories-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: clamp(16px, 3vw, 24px);
+  }
+}
+
+@media (min-width: 768px) {
+  .categories-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: clamp(20px, 3vw, 28px);
+  }
+}
+
+@media (min-width: 1024px) {
+  .categories-grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: clamp(24px, 3vw, 32px);
+  }
 }
 
 .category-card {
   position: relative;
   background: var(--surface-base);
   border: 1px solid var(--alloy-edge);
-  border-radius: 8px;
-  padding: 28px 24px;
+  border-radius: 12px;
+  padding: clamp(16px, 4vw, 28px) clamp(12px, 3vw, 24px);
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
   overflow: hidden;
@@ -253,7 +295,8 @@
   height: 100%;
   align-items: center;
   justify-content: center;
-  min-height: 160px;
+  min-height: clamp(120px, 25vw, 180px);
+  gap: clamp(8px, 2vw, 12px);
 }
 
 .categories-grid .category-card:nth-child(1) {
@@ -321,7 +364,7 @@
 }
 
 .category-name {
-  font-size: 1.1rem;
+  font-size: clamp(0.95rem, 2.5vw, 1.1rem);
   margin: 0;
   font-weight: 700;
   letter-spacing: -0.01em;
@@ -335,7 +378,7 @@
 }
 
 .category-count {
-  font-size: 0.85rem;
+  font-size: clamp(0.75rem, 2vw, 0.85rem);
   margin: 0;
   color: var(--text-tertiary);
   transition: color 0.3s ease-out;

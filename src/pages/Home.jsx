@@ -1,5 +1,4 @@
 ﻿import { Link } from 'react-router-dom';
-import PartsDiagrams from '../components/SchematicDiagrams';
 import TrendingProducts from '../components/TrendingProducts';
 import tapeTechLogo from '/brands/TapeTech/tapetech_logo.svg';
 import columbiaLogo from '/brands/Columbia/columbia_taping_tools_logo.svg';
@@ -136,9 +135,6 @@ export default function Home() {
           ))}
         </div>
       </section>
-
-      {/* ─── PARTS / SCHEMATICS ─── */}
-      <PartsDiagrams />
 
       {/* ─── BRAND LOGOS ─── */}
       <section style={{
