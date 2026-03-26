@@ -1,54 +1,53 @@
 @import "tailwindcss";
 
-@theme {
-  --color-primary-50: #eff6ff;
-  --color-primary-100: #dbeafe;
-  --color-primary-200: #bfdbfe;
-  --color-primary-300: #93c5fd;
-  --color-primary-400: #60a5fa;
-  --color-primary-500: #3b82f6;
-  --color-primary-600: #2563eb;
-  --color-primary-700: #1d4ed8;
-  --color-primary-800: #1e40af;
-  --color-primary-900: #1e3a8a;
-  
-  /* Accent colors now match primary blue for consistency */
-  --color-accent-50: #eff6ff;
-  --color-accent-100: #dbeafe;
-  --color-accent-200: #bfdbfe;
-  --color-accent-300: #93c5fd;
-  --color-accent-400: #60a5fa;
-  --color-accent-500: #2563eb;
-  --color-accent-600: #1d4ed8;
-  --color-accent-700: #1e40af;
-  --color-accent-800: #1e3a8a;
-  --color-accent-900: #1e3a8a;
-}
-
 @layer base {
+  :root {
+    --color-primary-50: #eff6ff;
+    --color-primary-100: #dbeafe;
+    --color-primary-200: #bfdbfe;
+    --color-primary-300: #93c5fd;
+    --color-primary-400: #60a5fa;
+    --color-primary-500: #3b82f6;
+    --color-primary-600: #2563eb;
+    --color-primary-700: #1d4ed8;
+    --color-primary-800: #1e40af;
+    --color-primary-900: #1e3a8a;
+    
+    /* Accent colors now match primary blue for consistency */
+    --color-accent-50: #eff6ff;
+    --color-accent-100: #dbeafe;
+    --color-accent-200: #bfdbfe;
+    --color-accent-300: #93c5fd;
+    --color-accent-400: #60a5fa;
+    --color-accent-500: #2563eb;
+    --color-accent-600: #1d4ed8;
+    --color-accent-700: #1e40af;
+    --color-accent-800: #1e3a8a;
+    --color-accent-900: #1e3a8a;
+  }
+
+  /* GLOBAL FIX: Account for fixed header on all pages
+     The --header-height variable is set in machined-design.css and updates
+     via media queries for mobile/tablet/desktop. This ensures content never
+     hides behind the fixed header, working across all pages and breakpoints. */
+  html {
+    scroll-padding-top: var(--header-height, 70px);
+  }
+
   body {
     @apply bg-white text-gray-900 antialiased;
+    padding-top: var(--header-height, 70px);
+    margin: 0;
   }
-  
-  /* Main content area with responsive header spacing */
-  main.main-content {
-    /* The fixed header is 70px on mobile + safe-area-inset
-       80px on desktop. Let the CSS body padding handle the spacing. */
+
+  /* Ensure main content doesn't add additional padding on top of body's header spacing */
+  main {
     padding-top: 0;
   }
-  
-  /* Remove excess body padding on mobile, rely on header size instead */
-  @media (max-width: 767px) {
-    body {
-      padding-top: 0 !important;
-    }
-  }
-  
-  /* Desktop: maintain padding for header spacing */
-  @media (min-width: 768px) {
-    main.main-content {
-      padding-top: 20px;
-    }
+
+  /* Remove any default margins that could interfere with header spacing */
+  h1, h2, h3, h4, h5, h6 {
+    margin-top: 0;
   }
 }
 

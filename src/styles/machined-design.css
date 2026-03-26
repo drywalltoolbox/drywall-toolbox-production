@@ -24,11 +24,10 @@
     --accent-500: var(--color-accent-500, #2563eb);
 
     /* Fluid header height — keep in sync with .site-header actual rendered height.
-       Formula: logo max-height (clamp(90px, 12vw, 137px)) + 24px global padding
-       (0.75rem top + 0.75rem bottom) + safe-area-inset-top.
-       Mobile (≤767px) and tablet (641-1024px) override this with their own values
-       that match their respective paddings (which are reset to 0/safe-area only). */
-    --header-height: calc(clamp(90px, 12vw, 137px) + 24px + env(safe-area-inset-top, 0px));
+       Desktop: min-height clamp(80px, 12vw, 140px) + 12px top padding (0.75rem)
+       Mobile (≤767px) and tablet (641-1024px) override this with their own values.
+       This is used for body padding-top to prevent content from hiding behind fixed header. */
+    --header-height: calc(clamp(80px, 12vw, 140px) + 12px + env(safe-area-inset-top, 0px));
 }
 
 * {
@@ -1092,7 +1091,7 @@ aside input[type="range"],
     }
 
     body {
-        padding-top: 0;
+        padding-top: var(--header-height, 70px);
     }
 
     .logo-image-mobile {
