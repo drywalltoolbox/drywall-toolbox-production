@@ -40,19 +40,16 @@ const STEPS = [
    ───────────────────────────────────────────────────────────────────────── */
 const services = [
   {
-    icon: <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>,
     title: 'Preventative Maintenance',
     description: 'Scheduled inspections, lubrication, seal replacements, and performance tuning to keep tools running at peak condition.',
     items: ['Seasonal equipment inspections', 'Lubrication & fluid replacement', 'Seal & gasket replacements', 'Calibration & adjustment'],
   },
   {
-    icon: <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>,
     title: 'Emergency Repairs',
     description: 'When your tools stop working on the job, our technicians diagnose and resolve issues fast — same-day diagnostics available.',
     items: ['Same-day diagnostics', 'Expedited repair turnaround', '24/7 emergency support', 'Field service available'],
   },
   {
-    icon: <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>,
     title: 'Warranty & Extended Coverage',
     description: 'Protect your investment with manufacturer warranties and extended coverage plans for professional equipment.',
     items: ['Extended manufacturer warranties', 'Accidental damage coverage', 'Parts & labor protection', 'Annual inspection plans'],
@@ -344,15 +341,6 @@ export default function Repairs() {
                 e.currentTarget.style.transform = 'translateY(0)';
               }}
             >
-              <div style={{
-                width: '52px', height: '52px',
-                background: 'linear-gradient(135deg, #eff6ff, #dbeafe)',
-                borderRadius: '12px',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                color: 'var(--primary-600)', marginBottom: '18px',
-              }}>
-                {svc.icon}
-              </div>
               <h3 style={{ fontSize: '1.05rem', fontWeight: 700, color: 'black', margin: '0 0 10px 0' }}>
                 {svc.title}
               </h3>
@@ -912,19 +900,16 @@ export default function Repairs() {
             {[
               {
                 to: '/parts',
-                icon: <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>,
                 title: 'Parts & Schematics',
                 description: 'Browse interactive part diagrams and order replacement parts for all major brands.',
               },
               {
                 to: '/products',
-                icon: <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>,
                 title: 'Shop Replacement Tools',
                 description: 'Upgrade your toolkit — browse our full catalog of professional drywall tools and accessories.',
               },
               {
                 to: '/contact',
-                icon: <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 11.93a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.6A16 16 0 0 0 16 16.68l.96-.95a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>,
                 title: 'Talk to an Expert',
                 description: 'Our industry veterans are ready to help — no bots, no runaround, just real support.',
               },
@@ -948,7 +933,6 @@ export default function Repairs() {
                     e.currentTarget.style.borderColor = 'var(--machined-border)';
                   }}
                 >
-                  <div style={{ color: 'var(--primary-600)', marginBottom: '12px' }}>{ql.icon}</div>
                   <h3 style={{ fontSize: '1rem', fontWeight: 700, color: 'black', margin: '0 0 8px 0' }}>{ql.title}</h3>
                   <p style={{ fontSize: '0.825rem', color: 'rgba(15,23,42,0.6)', margin: 0, lineHeight: 1.5 }}>{ql.description}</p>
                   <div style={{
