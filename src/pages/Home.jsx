@@ -62,7 +62,7 @@ export default function Home() {
       <section
         className="section-enter home-hero-section"
         style={{
-          padding: 'clamp(2.5rem, 5vw, 4rem) clamp(1rem, 5vw, 2.5rem) clamp(2rem, 6vw, 3.5rem)',
+          padding: 'clamp(2.5rem, 5vw, 4rem) clamp(1rem, 5vw, 2.5rem) clamp(1rem, 3vw, 1.5rem)',
           minHeight: '100vh'
         }}
       >
@@ -93,9 +93,6 @@ export default function Home() {
             }}>
               Everything you need to ensure a flawless finish every time. Get production-grade tools and parts at unbeatable prices with lightning-fast shipping.
             </p>
-            <Link to="/products" className="alloy-button" style={{ textDecoration: 'none', marginTop: 'clamp(0.5rem, 2vw, 1rem)' }}>
-              Shop Products
-            </Link>
           </div>
         </div>
       </section>
