@@ -14,7 +14,7 @@ A modern, fully responsive e-commerce platform for professional drywall tools an
 
 ## 🚀 Getting Started
 
----
+----
 ### Prerequisites
 
 - Node.js 16+ and npm
