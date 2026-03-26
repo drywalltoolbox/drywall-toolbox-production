@@ -58,6 +58,7 @@ export default function Products() {
   // initialize selected brands from ?brand= param (supports comma-separated)
   const params = new URLSearchParams(location.search);
   const brandParam = params.get('brand');
+  const searchParam = params.get('search');
   const initialSelectedBrands = brandParam 
     ? brandParam.split(',').map(b => b.trim()).filter(Boolean).filter(brand => ALLOWED_BRANDS.includes(brand))
     : [];
@@ -66,7 +67,7 @@ export default function Products() {
   const [products, setProducts] = useState([]);
   const [brands, setBrands] = useState([]);
   const [selectedCategories, setSelectedCategories] = useState([]);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState(searchParam ? decodeURIComponent(searchParam) : '');
   const [priceRange, setPriceRange] = useState([0, MAX_PRICE]);
   const [sortBy, setSortBy] = useState('popular');
   const [showFilters, setShowFilters] = useState(false);

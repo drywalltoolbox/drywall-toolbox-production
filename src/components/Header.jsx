@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { useCart } from '../context/CartContext';
 import { ShoppingCart, Menu, X, ChevronDown } from 'lucide-react';
 import Logo from '/logo2.svg';
+import MobileSearch from './MobileSearch';
 
 export default function Header({ onCartToggle }) {
   const location = useLocation();
@@ -174,6 +175,7 @@ export default function Header({ onCartToggle }) {
       {/* Mobile Menu Dropdown */}
       {mobileMenuOpen && (
         <div className="md:hidden border-t border-gray-200 bg-white shadow-lg header-mobile-menu" style={{ display: isTablet ? 'block' : undefined }}>
+          <MobileSearch onClose={closeMobileMenu} />
           <nav className="flex flex-col p-4 space-y-2">
             <div>
               <button 
