@@ -30,6 +30,8 @@ import columbiaMudPumpData from '../../public/brands/Columbia/Schematics/Pumps/M
 import columbiaCornerCobraData from '../../public/brands/Columbia/Schematics/CornerRollers/CornerCobra/schematic_data.json';
 import columbiaCompoundTubeDataJson from '../../public/brands/Columbia/Schematics/CompoundTubes/CompoundTube/schematic_data.json';
 import columbiaCf35Data from '../../public/brands/Columbia/Schematics/CornerFlushers/StandardCornerFlusher/schematic_data.json';
+import columbiaDirectCornerFlusherData from '../../public/brands/Columbia/Schematics/CornerFlushers/DirectCornerFlusher/schematic_data.json';
+import columbiaComboFlusherData from '../../public/brands/Columbia/Schematics/CornerFlushers/ComboFlusher/schematic_data.json';
 import columbiaExternalCornerApplicatorData from '../../public/brands/Columbia/Schematics/Applicators/ExternalCorner/schematic_data.json';
 import columbiaTwoWayInternalCornerApplicatorData from '../../public/brands/Columbia/Schematics/Applicators/TwoWayInternalCorner/schematic_data.json';
 import columbiaCamLockTubeData from '../../public/brands/Columbia/Schematics/CompoundTubes/CamLockTube/schematic_data.json';
@@ -504,7 +506,7 @@ export default function Parts() {
       diagramPages: [1],
       imagePages: { 1: columbiaDirectCornerFlusherImg },
       previewImage: columbiaDirectCornerFlusherPreview,
-      parts: []
+      parts: columbiaDirectCornerFlusherData?.parts || []
     },
     {
       id: 'columbia-combo-flusher',
@@ -515,7 +517,7 @@ export default function Parts() {
       diagramPages: [1],
       imagePages: { 1: columbiaComboFlusherImg },
       previewImage: columbiaComboFlusherPreview,
-      parts: []
+      parts: columbiaComboFlusherData?.parts || []
     },
     {
       id: 'columbia-sander-head',
