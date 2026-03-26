@@ -252,6 +252,8 @@ export default function Parts() {
   const sanderHeadParts = buildPartsFromData(columbiaSanderHeadData);
   const angleHeadParts = buildPartsFromData(columbiaAngleHeadData);
   const mudPumpParts = buildPartsFromData(columbiaMudPumpData);
+  const gooseneckAdapterParts = buildPartsFromData(columbiaGooseneckAdapterData);
+  const boxFillerParts = buildPartsFromData(columbiaBoxFillerData);
   const cornerCobraParts = buildPartsFromData(columbiaCornerCobraData);
   const compoundTubeParts = buildPartsFromData(columbiaCompoundTubeDataJson);
   const cf35Parts = buildPartsFromData(columbiaCf35Data);
@@ -442,7 +444,7 @@ export default function Parts() {
       diagramPages: [1],
       imagePages: { 1: columbiaGooseneckAdapterImg },
       previewImage: columbiaGooseneckAdapterPreview,
-      parts: []
+      parts: gooseneckAdapterParts
     },
     {
       id: 'columbia-mud-pump',
@@ -618,7 +620,7 @@ export default function Parts() {
       diagramPages: [1],
       imagePages: { 1: columbiaBoxFillerImg },
       previewImage: columbiaBoxFillerPreview,
-      parts: []
+      parts: boxFillerParts
     },
     {
       id: 'columbia-corner-cobra',
