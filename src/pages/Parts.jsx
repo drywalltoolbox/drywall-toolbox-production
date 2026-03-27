@@ -187,8 +187,15 @@ export default function Parts() {
   const [startPanPosition, setStartPanPosition] = useState({ x: 0, y: 0 });
   const [touchStartPos, setTouchStartPos] = useState({ x: 0, y: 0 });
   const [hasMoved, setHasMoved] = useState(false);
+  const [lastTouchTime, setLastTouchTime] = useState(0);
+  const [velocity, setVelocity] = useState({ x: 0, y: 0 });
+  const [lastTapTime, setLastTapTime] = useState(0);
+  const [lastTapPos, setLastTapPos] = useState({ x: 0, y: 0 });
+  const [forceUpdate, setForceUpdate] = useState(0);
   // Ref to track pinch zoom state without triggering re-renders
   const pinchRef = useRef({ active: false, initDist: 0, initScale: 1, initPanX: 0, initPanY: 0, centerX: 0, centerY: 0 });
+  // Ref to track any active gesture for synchronous transition control
+  const gestureActiveRef = useRef(false);
   
   const schematicContainerRef = useRef(null);
   const schematicImageRef = useRef(null);
@@ -759,6 +766,8 @@ export default function Parts() {
       // Pinch gesture - prevent default and calculate distance
       e.preventDefault();
       e.stopPropagation();
+      gestureActiveRef.current = true;
+      setForceUpdate(prev => prev + 1);
       const touch1 = e.touches[0];
       const touch2 = e.touches[1];
       const distance = Math.hypot(
@@ -785,11 +794,12 @@ export default function Parts() {
       };
     } else if (e.touches.length === 1 && scale > 1) {
       // Pan gesture (only when zoomed in) - store initial position
-      // Don't preventDefault yet - let tap events through
+      const now = Date.now();
       setTouchStartPos({
         x: e.touches[0].clientX,
         y: e.touches[0].clientY
       });
+      setLastTouchTime(now);
       setHasMoved(false);
       setStartPanPosition({
         x: e.touches[0].clientX - position.x,
@@ -800,7 +810,7 @@ export default function Parts() {
 
   const handleTouchMove = useCallback((e) => {
     if (e.touches.length === 2 && pinchRef.current.active) {
-      // Pinch zoom with smooth scaling towards the pinch midpoint
+      // Smooth continuous pinch zoom
       e.preventDefault();
       e.stopPropagation();
       const touch1 = e.touches[0];
@@ -811,20 +821,21 @@ export default function Parts() {
       );
       const { initDist, initScale, initPanX, initPanY, centerX, centerY } = pinchRef.current;
       const zoomFactor = distance / initDist;
-      const newScale = Math.min(Math.max(zoomFactor * initScale, 1), 4);
+      const rawScale = zoomFactor * initScale;
+      const newScale = Math.min(Math.max(rawScale, 0.5), 5);
 
-      // Adjust pan so the pinch center stays fixed on screen:
-      // newPan = center - (center - initPan) * (newScale / initScale)
+      // Zoom towards pinch center with smooth focal point tracking
       const ratio = newScale / initScale;
       const newPanX = centerX - (centerX - initPanX) * ratio;
       const newPanY = centerY - (centerY - initPanY) * ratio;
 
-      // Clamp pan to valid bounds for the new scale
+      // Dynamic bounds based on actual image dimensions
       const container = schematicContainerRef.current;
+      const imageDiv = schematicImageRef.current;
       const containerW = container ? container.offsetWidth : 400;
-      const containerH = container ? container.offsetHeight : 400;
-      const maxPanX = ((newScale - 1) * containerW) / 2;
-      const maxPanY = ((newScale - 1) * containerH) / 2;
+      const containerH = imageDiv ? imageDiv.offsetHeight : (container ? container.offsetHeight : 400);
+      const maxPanX = Math.max(0, ((newScale - 1) * containerW) / 2);
+      const maxPanY = Math.max(0, ((newScale - 1) * containerH) / 2);
 
       setScale(newScale);
       setPosition({
@@ -846,7 +857,19 @@ export default function Parts() {
           e.stopPropagation();
           setHasMoved(true);
           setIsPanning(true);
+          gestureActiveRef.current = true;
+          setForceUpdate(prev => prev + 1);
         }
+        
+        // Calculate velocity for momentum
+        const now = Date.now();
+        const timeDelta = now - lastTouchTime;
+        if (timeDelta > 0) {
+          const velX = (touch.clientX - touchStartPos.x) / timeDelta * 16;
+          const velY = (touch.clientY - touchStartPos.y) / timeDelta * 16;
+          setVelocity({ x: velX, y: velY });
+        }
+        setLastTouchTime(now);
         
         // Pan when zoomed - smooth panning with dynamic bounds
         const newX = touch.clientX - startPanPosition.x;
@@ -856,8 +879,8 @@ export default function Parts() {
         const container = schematicContainerRef.current;
         const containerW = container ? container.offsetWidth : 400;
         const containerH = container ? container.offsetHeight : 400;
-        const maxPanX = ((scale - 1) * containerW) / 2;
-        const maxPanY = ((scale - 1) * containerH) / 2;
+        const maxPanX = Math.max(0, ((scale - 1) * containerW) / 2);
+        const maxPanY = Math.max(0, ((scale - 1) * containerH) / 2);
         
         setPosition({
           x: Math.min(Math.max(newX, -maxPanX), maxPanX),
@@ -870,13 +893,116 @@ export default function Parts() {
   const handleTouchEnd = useCallback((e) => {
     if (e.touches.length === 0) {
       pinchRef.current.active = false;
+      const wasActive = gestureActiveRef.current;
+      gestureActiveRef.current = false;
+      if (wasActive) setForceUpdate(prev => prev + 1);
+      
+      // Double-tap to zoom
+      if (!hasMoved && e.changedTouches.length === 1) {
+        const now = Date.now();
+        const touch = e.changedTouches[0];
+        const tapX = touch.clientX;
+        const tapY = touch.clientY;
+        const timeSinceLastTap = now - lastTapTime;
+        const distanceFromLastTap = Math.hypot(tapX - lastTapPos.x, tapY - lastTapPos.y);
+        
+        if (timeSinceLastTap < 300 && distanceFromLastTap < 30) {
+          // Double tap detected - zoom in/out
+          e.preventDefault();
+          const container = schematicContainerRef.current;
+          if (container) {
+            const rect = container.getBoundingClientRect();
+            const centerX = tapX - (rect.left + rect.width / 2);
+            const centerY = tapY - (rect.top + rect.height / 2);
+            
+            if (scale === 1) {
+              // Zoom in to 2.5x at tap point
+              const newScale = 2.5;
+              const containerW = container.offsetWidth;
+              const containerH = container.offsetHeight;
+              const ratio = newScale / scale;
+              const newPanX = centerX - (centerX - position.x) * ratio;
+              const newPanY = centerY - (centerY - position.y) * ratio;
+              const maxPanX = Math.max(0, ((newScale - 1) * containerW) / 2);
+              const maxPanY = Math.max(0, ((newScale - 1) * containerH) / 2);
+              
+              setScale(newScale);
+              setPosition({
+                x: Math.min(Math.max(newPanX, -maxPanX), maxPanX),
+                y: Math.min(Math.max(newPanY, -maxPanY), maxPanY),
+              });
+            } else {
+              // Zoom out to 1x
+              setScale(1);
+              setPosition({ x: 0, y: 0 });
+            }
+          }
+          setLastTapTime(0);
+        } else {
+          setLastTapTime(now);
+          setLastTapPos({ x: tapX, y: tapY });
+        }
+      }
+      
+      // Apply momentum if user was panning
+      if (hasMoved && scale > 1) {
+        const now = Date.now();
+        const timeDelta = now - lastTouchTime;
+        if (timeDelta < 100 && (Math.abs(velocity.x) > 0.5 || Math.abs(velocity.y) > 0.5)) {
+          // Apply momentum decay
+          const momentumDecay = 0.95;
+          let currentVelX = velocity.x;
+          let currentVelY = velocity.y;
+          let currentX = position.x;
+          let currentY = position.y;
+          
+          const animate = () => {
+            currentVelX *= momentumDecay;
+            currentVelY *= momentumDecay;
+            currentX += currentVelX;
+            currentY += currentVelY;
+            
+            const container = schematicContainerRef.current;
+            const containerW = container ? container.offsetWidth : 400;
+            const containerH = container ? container.offsetHeight : 400;
+            const maxPanX = Math.max(0, ((scale - 1) * containerW) / 2);
+            const maxPanY = Math.max(0, ((scale - 1) * containerH) / 2);
+            
+            currentX = Math.min(Math.max(currentX, -maxPanX), maxPanX);
+            currentY = Math.min(Math.max(currentY, -maxPanY), maxPanY);
+            
+            setPosition({ x: currentX, y: currentY });
+            
+            if (Math.abs(currentVelX) > 0.1 || Math.abs(currentVelY) > 0.1) {
+              requestAnimationFrame(animate);
+            }
+          };
+          requestAnimationFrame(animate);
+        }
+      }
+      
       setIsPanning(false);
       setHasMoved(false);
+      setVelocity({ x: 0, y: 0 });
     } else if (e.touches.length === 1 && pinchRef.current.active) {
-      // Transitioned from pinch to single-touch — reset pinch tracking
+      // Transitioned from pinch to single-touch — reset pinch tracking cleanly
       pinchRef.current.active = false;
+      // Keep gesture active if user continues with single finger
+      if (scale > 1) {
+        const now = Date.now();
+        const touch = e.touches[0];
+        setTouchStartPos({ x: touch.clientX, y: touch.clientY });
+        setLastTouchTime(now);
+        setHasMoved(false);
+        setStartPanPosition({
+          x: touch.clientX - position.x,
+          y: touch.clientY - position.y
+        });
+      } else {
+        gestureActiveRef.current = false;
+      }
     }
-  }, []);
+  }, [hasMoved, scale, lastTouchTime, velocity, position, lastTapTime, lastTapPos]);
 
   // Setup non-passive touch event listeners to allow preventDefault
   useEffect(() => {
@@ -1265,11 +1391,11 @@ export default function Parts() {
                   width: '100%',
                   transform: `scale(${scale}) translate(${position.x / scale}px, ${position.y / scale}px)`,
                   transformOrigin: 'center center',
-                  transition: isPanning || isDragging ? 'none' : 'transform 0.3s ease-out',
+                  transition: gestureActiveRef.current ? 'none' : 'transform 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
                   WebkitUserSelect: 'none',
                   userSelect: 'none',
                   pointerEvents: 'auto',
-                  willChange: 'transform',
+                  willChange: scale > 1 || gestureActiveRef.current ? 'transform' : 'auto',
                 }}
               >
                 {schematicImageSrc ? (
@@ -1281,10 +1407,13 @@ export default function Parts() {
                       height: 'auto',
                       display: 'block', 
                       pointerEvents: 'none',
-                      imageRendering: 'crisp-edges',
+                      imageRendering: scale > 1.5 ? '-webkit-optimize-contrast' : 'auto',
                       WebkitTouchCallout: 'none',
                       WebkitUserSelect: 'none',
                       userSelect: 'none',
+                      WebkitBackfaceVisibility: 'hidden',
+                      backfaceVisibility: 'hidden',
+                      transform: 'translateZ(0)',
                     }}
                     loading="eager"
                     decoding="async"
