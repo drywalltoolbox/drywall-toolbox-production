@@ -3,10 +3,11 @@
 
 This script reads an "enhanced" CSV file containing improved
 description_full and description_short values (default:
-`public/columbia_20_products_enhanced.csv`), finds the matching
+`public/enhanced_products.csv`), finds the matching
 products in the master `public/products_catalog.csv` by brand+name,
-replaces the description fields, and writes a new CSV (default:
-`public/products_catalog_enhanced.csv`).
+replaces the description fields, and writes the result back to the
+master catalog by default (creates a timestamped backup). You can
+also provide an explicit --output path to write to a separate file.
 
 Matching is done by a normalized (lowercased, whitespace-collapsed)
 combination of brand and name. The script reports how many enhanced
@@ -52,7 +53,8 @@ def load_enhanced(path: Path):
 
 
 def apply_enhancements(master_path: Path, enhanced_map: dict, output_path: Path, in_place=False):
-    # read master
+    # read master and write to a temporary file in same directory, then move to output_path
+    tmp_path = master_path.with_suffix('.tmp')
     with master_path.open("r", newline="", encoding="utf-8-sig") as f:
         reader = csv.DictReader(f)
         fieldnames = list(reader.fieldnames or [])
@@ -62,13 +64,12 @@ def apply_enhancements(master_path: Path, enhanced_map: dict, output_path: Path,
             if df not in fieldnames:
                 fieldnames.append(df)
 
-        out_path = output_path
-        out_path.parent.mkdir(parents=True, exist_ok=True)
+        tmp_path.parent.mkdir(parents=True, exist_ok=True)
         applied = 0
         total = 0
         seen_keys = set()
 
-        with out_path.open("w", newline="", encoding="utf-8") as outf:
+        with tmp_path.open("w", newline="", encoding="utf-8") as outf:
             writer = csv.DictWriter(outf, fieldnames=fieldnames)
             writer.writeheader()
 
@@ -79,14 +80,24 @@ def apply_enhancements(master_path: Path, enhanced_map: dict, output_path: Path,
                 key = (brand, name)
 
                 if key in enhanced_map:
-                    # replace fields
+                    # replace only the two description fields, leave all other fields untouched
                     enh = enhanced_map[key]
-                    row["description_full"] = enh.get("description_full", "")
-                    row["description_short"] = enh.get("description_short", "")
+                    # Use dict copy to avoid mutating original row object if needed elsewhere
+                    out_row = dict(row)
+                    out_row["description_full"] = enh.get("description_full", "")
+                    out_row["description_short"] = enh.get("description_short", "")
                     applied += 1
                     seen_keys.add(key)
+                else:
+                    out_row = row
 
-                writer.writerow(row)
+                writer.writerow(out_row)
+
+    # Move temp to final output (atomic on most platforms)
+    # Ensure parent directory exists
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    from shutil import move
+    move(str(tmp_path), str(output_path))
 
     return {
         "master_rows": total,
@@ -97,18 +108,18 @@ def apply_enhancements(master_path: Path, enhanced_map: dict, output_path: Path,
 
 def main():
     p = argparse.ArgumentParser(description="Apply enhanced descriptions to master products CSV")
-    p.add_argument("--enhanced", "-e", default="public/columbia_20_products_enhanced.csv", help="CSV with enhanced descriptions")
+    p.add_argument("--enhanced", "-e", default="public/enhanced_products.csv", help="CSV with enhanced descriptions")
     p.add_argument("--input", "-i", default="public/products_catalog.csv", help="master products CSV")
-    p.add_argument("--output", "-o", default="public/products_catalog_enhanced.csv", help="output CSV (default does not overwrite input)")
-    p.add_argument("--in-place", action="store_true", help="overwrite the input file with enhancements")
+    p.add_argument("--output", "-o", default=None, help="output CSV (default: overwrite the input file; set to write to a different path)")
     args = p.parse_args()
 
     enhanced_path = Path(args.enhanced)
     master_path = Path(args.input)
-    if args.in_place:
-        output_path = master_path
-    else:
+    # If --output isn't provided, overwrite the master file (but create a backup first)
+    if args.output:
         output_path = Path(args.output)
+    else:
+        output_path = master_path
 
     if not enhanced_path.exists():
         print(f"Enhanced CSV not found: {enhanced_path}")
@@ -118,7 +129,18 @@ def main():
         sys.exit(2)
 
     enhanced_map, enhanced_rows = load_enhanced(enhanced_path)
-    result = apply_enhancements(master_path, enhanced_map, output_path, in_place=args.in_place)
+
+    # If we're about to overwrite the master file, create a timestamped backup
+    if output_path.resolve() == master_path.resolve():
+        from shutil import copy2
+        from datetime import datetime
+
+        ts = datetime.utcnow().strftime('%Y%m%dT%H%M%SZ')
+        backup_path = master_path.parent / f"{master_path.name}.bak.{ts}"
+        copy2(str(master_path), str(backup_path))
+        print(f'Backup created: {backup_path}')
+
+    result = apply_enhancements(master_path, enhanced_map, output_path)
 
     # find unmatched enhanced keys
     all_keys = set(k for k, _ in enhanced_rows)
