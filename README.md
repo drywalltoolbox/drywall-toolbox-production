@@ -2,7 +2,7 @@
 
 A modern, fully responsive platform for professional drywall tools and equipment, built with React and deployable to both GitHub Pages (React SPA) and HostGator WordPress (themes/plugins).
 
----
+----
 
 ## Table of Contents
 
