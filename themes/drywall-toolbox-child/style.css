@@ -326,3 +326,9 @@ img {
     font-size: var(--dtb-fs-4xl);
   }
 }
+
+/* Import consolidated legacy site styles so child theme stays in sync with project CSS
+   The legacy framework lives at project root: css/styles.css
+   Importing keeps the child stylesheet small while ensuring the same styling applies.
+*/
+@import url("../../css/styles.css");
