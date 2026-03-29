@@ -5,8 +5,7 @@ on:
     branches:
       - main
     paths:
-      - 'wp/wp-content/themes/**'
-      - 'wp/wp-content/plugins/**'
+      - 'wp/wp-content/**'
   workflow_dispatch:
 
 jobs:
@@ -22,6 +21,16 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Debug repository layout
+        run: |
+          echo "PWD=$(pwd)"
+          echo "-- root files --"
+          ls -la
+          echo "-- wp folder --"
+          ls -la wp || true
+          echo "-- wp/wp-content --"
+          ls -la wp/wp-content || true
+
       - name: Deploy themes and plugins via FTPS
         uses: SamKirkland/FTP-Deploy-Action@v4.3.4
         with:
@@ -31,7 +40,7 @@ jobs:
           protocol: ftps
           port: 21
           server-dir: /wp-content/
-          local-dir: ./wp-content/
+          local-dir: ./wp/wp-content/
           exclude: |
             **/.git*
             **/.github/**

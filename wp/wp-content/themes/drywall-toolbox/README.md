@@ -14,7 +14,7 @@ A professional, fully responsive coming-soon landing page WordPress theme for Dr
 - ♿ Accessibility focused
 
 ## Installation
--
+
 1. Upload the theme folder to `/wp-content/themes/`
 2. Go to Appearance > Themes in WordPress admin
 3. Activate "Drywall Toolbox" theme
