@@ -3,7 +3,7 @@
 A modern, fully responsive e-commerce platform for professional drywall tools and equipment, built with React and Lucide icons.
 
 ## 🎨 Features
-
+-
 - **Modern React Architecture** - Built with React 19 and Vite for optimal performance
 - **Beautiful UI/UX** - Clean, professional design with Tailwind CSS
 - **Lucide Icons** - Professional icon system throughout (40+ icons)
