@@ -31,6 +31,8 @@ jobs:
           protocol: ftps
           port: 21
           server-dir: /public_html/website_a246e6a8/wp-content/
+          # Deploy only the WordPress content directory to the remote wp-content
+          # (adjust if you prefer deploying the repo root instead)
           local-dir: ./wp-content/
           exclude: |
             **/.git*
