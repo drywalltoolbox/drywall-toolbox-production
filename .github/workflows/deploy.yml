@@ -5,8 +5,8 @@ on:
     branches:
       - main
     paths:
-      - 'wp-content/themes/**'
-      - 'wp-content/plugins/**'
+      - 'wp/wp-content/themes/**'
+      - 'wp/wp-content/plugins/**'
   workflow_dispatch:
 
 jobs:
