@@ -48,6 +48,71 @@ add_action( 'after_setup_theme', 'dtb_setup' );
 
 // ─── ENQUEUE SCRIPTS & STYLES ───────────────────────────────────────────────
 function dtb_enqueue_assets() {
+    // If a webpack production build has been emitted into the theme's
+    // `dist/` directory, prefer enqueuing those hashed assets via the
+    // generated `asset-manifest.json`. This keeps cache-busting intact.
+    $manifest_path = DTB_THEME_DIR . '/dist/asset-manifest.json';
+    if ( file_exists( $manifest_path ) ) {
+        $manifest = json_decode( file_get_contents( $manifest_path ), true );
+        if ( is_array( $manifest ) && ! empty( $manifest['files'] ) ) {
+            // Load CSS files first
+            foreach ( $manifest['files'] as $file ) {
+                if ( substr( $file, -4 ) === '.css' ) {
+                    $file_path = DTB_THEME_DIR . '/dist/' . $file;
+                    $file_uri  = DTB_THEME_URI . '/dist/' . $file;
+                    $ver = file_exists( $file_path ) ? filemtime( $file_path ) : DTB_THEME_VERSION;
+                    wp_enqueue_style( 'drywall-toolbox-style', $file_uri, [], $ver );
+                }
+            }
+
+            // JS: enqueue vendor first, then main, then other chunks
+            $jsFiles = array_values( array_filter( $manifest['files'], function ( $f ) { return substr( $f, -3 ) === '.js'; } ) );
+            // Sort so vendors.* appears before main.* if present
+            usort( $jsFiles, function ( $a, $b ) {
+                if ( strpos( $a, 'vendors' ) !== false && strpos( $b, 'main' ) !== false ) return -1;
+                if ( strpos( $b, 'vendors' ) !== false && strpos( $a, 'main' ) !== false ) return 1;
+                if ( strpos( $a, 'main' ) !== false && strpos( $b, 'main' ) === false ) return -1;
+                return strcmp( $a, $b );
+            } );
+
+            $handle_index = 0;
+            foreach ( $jsFiles as $file ) {
+                $basename = basename( $file );
+                $file_path = DTB_THEME_DIR . '/dist/' . $file;
+                $file_uri  = DTB_THEME_URI . '/dist/' . $file;
+                $ver = file_exists( $file_path ) ? filemtime( $file_path ) : DTB_THEME_VERSION;
+
+                // Keep the legacy handle 'dtb-main' for the main bundle so
+                // other theme scripts that depend on it continue to work.
+                if ( strpos( $basename, 'main' ) !== false ) {
+                    $handle = 'dtb-main';
+                } else {
+                    // Create a deterministic handle for other chunks
+                    $handle = 'dtb-build-' . $handle_index;
+                    $handle_index++;
+                }
+
+                wp_enqueue_script( $handle, $file_uri, [], $ver, true );
+            }
+
+            // Pass data to JavaScript using the main handle (if registered)
+            $dtb_data = [
+                'themeUri'  => DTB_THEME_URI,
+                'ajaxUrl'   => admin_url( 'admin-ajax.php' ),
+                'siteUrl'   => home_url(),
+                'nonce'     => wp_create_nonce( 'dtb_nonce' ),
+                'assetsUri' => DTB_THEME_URI . '/assets',
+            ];
+            if ( wp_script_is( 'dtb-main', 'enqueued' ) || wp_script_is( 'dtb-main', 'registered' ) ) {
+                wp_localize_script( 'dtb-main', 'DTB', $dtb_data );
+            }
+
+            return;
+        }
+    }
+
+    // Fallback: legacy theme JS/CSS (keeps existing behaviour when no
+    // production build is present in the theme dist directory)
     // Main stylesheet
     wp_enqueue_style(
         'drywall-toolbox-style',

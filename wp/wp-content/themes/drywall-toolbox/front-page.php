@@ -8,6 +8,11 @@ get_header();
 ?>
 <div style="min-height:100vh;background:white;" class="page-wrapper">
 
+    <!-- React mount point -->
+    <div id="root" style="min-height:100vh;">
+        <!-- React app will hydrate/mount here. Server-rendered fallback content remains below. -->
+    </div>
+
     <!-- HERO -->
     <section class="section-enter home-hero-section" style="padding:clamp(2.5rem,5vw,4rem) clamp(1rem,5vw,2.5rem) clamp(1rem,3vw,1.5rem);min-height:100vh;display:flex;align-items:center;justify-content:center;">
         <div style="display:flex;flex-direction:column;justify-content:center;align-items:center;gap:clamp(1.25rem,4vw,2rem);max-width:1400px;margin:0 auto;text-align:center;">

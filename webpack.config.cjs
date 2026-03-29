@@ -38,6 +38,13 @@ module.exports = (env, argv) => {
   // In production we honour PUBLIC_URL (e.g. '/drywall-toolbox/').
   const publicPath  = isDev ? '/' : (PUBLIC_URL ? `${PUBLIC_URL}/` : '/');
 
+  // Choose output directory: use repo-root `dist` for dev, but write
+  // production builds directly into the WordPress theme so CI can
+  // deploy without extra copy steps.
+  const outputPath = isDev
+    ? path.resolve(__dirname, 'dist')
+    : path.resolve(__dirname, 'wp', 'wp-content', 'themes', 'drywall-toolbox', 'dist');
+
   return {
     mode,
 
@@ -46,7 +53,7 @@ module.exports = (env, argv) => {
 
   // ─── Output ──────────────────────────────────────────────────────────────
   output: {
-    path:       path.resolve(__dirname, 'dist'),
+  path:       outputPath,
     filename:   isDev ? 'assets/js/[name].js' : 'assets/js/[name].[contenthash:8].js',
     publicPath,
     clean:      true,
@@ -150,6 +157,30 @@ module.exports = (env, argv) => {
         filename: 'assets/css/[name].[contenthash:8].css',
       }),
     ]),
+
+    // Emit a simple asset manifest (asset-manifest.json) listing built files.
+    // This avoids an external dependency and gives PHP a way to find hashed
+    // filenames when enqueuing assets from the WordPress theme.
+    {
+      apply: (compiler) => {
+        compiler.hooks.thisCompilation.tap('EmitAssetManifestPlugin', (compilation) => {
+          compilation.hooks.processAssets.tap(
+            { name: 'EmitAssetManifestPlugin', stage: webpack.Compilation.PROCESS_ASSETS_STAGE_SUMMARIZE },
+            (assets) => {
+              try {
+                const files = Object.keys(assets).filter(n => n !== 'asset-manifest.json');
+                const manifest = { files };
+                const json = JSON.stringify(manifest, null, 2);
+                compilation.emitAsset('asset-manifest.json', new webpack.sources.RawSource(json));
+              } catch (err) {
+                // Don't crash the compilation on manifest write failure
+                compilation.errors.push(err);
+              }
+            }
+          );
+        });
+      }
+    },
   ],
 
   // ─── Dev server ──────────────────────────────────────────────────────────
