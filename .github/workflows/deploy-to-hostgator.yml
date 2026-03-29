@@ -30,26 +30,7 @@ jobs:
           password:         ${{ secrets.HOSTGATOR_FTP_PASS }}
           # HostGator shared hosting: deploy into wp-content/
           server-dir:       /public_html/wp-content/
-          local-dir:        ./
-          # Only sync theme and plugin directories
-          include:          |
-            themes/**
-            plugins/**
-          # Exclude sensitive and development-only files
-          exclude:          |
-            **/.git/**
-            **/.github/**
-            **/node_modules/**
-            **/.env
-            **/.env.*
-            **/logs/**
-            **/*.log
-            **/dist/**
-            **/build/**
-            **/coverage/**
-            **/.DS_Store
-            **/wp-config.php
-            **/.htaccess
+          local-dir:        ./themes/,./plugins/
           # Safety: log what will be transferred but do not delete remote files
           # that are not in the local source (preserves WP core & uploads).
           dangerous-clean-slate: false
