@@ -5,13 +5,13 @@ on:
     branches:
       - main
     paths:
-      - 'themes/**'
-      - 'plugins/**'
+      - 'wp-content/themes/**'
+      - 'wp-content/plugins/**'
   workflow_dispatch:
 
 jobs:
   deploy:
-    name: FTPS Deploy to HostGator
+    name: FTP Deploy to HostGator
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -31,7 +31,7 @@ jobs:
           protocol: ftps
           port: 21
           server-dir: /public_html/website_a246e6a8/wp-content/
-          local-dir: ./
+          local-dir: ./wp-content/
           exclude: |
             **/.git*
             **/.github/**
@@ -42,6 +42,7 @@ jobs:
             **/README.md
             **/twentytwenty*/**
             **/yith-wonder/**
+            **/*.bak
           dangerous-clean-slate: false
           log-level: verbose
           dry-run: false
