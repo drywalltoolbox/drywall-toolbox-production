@@ -20,7 +20,7 @@ A modern, fully responsive platform for professional drywall tools and equipment
 5. [Verification Checklist](#verification-checklist)
 6. [Troubleshooting](#troubleshooting)
 
----
+----
 
 ## React App — Quick Start
 
