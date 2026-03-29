@@ -19,18 +19,26 @@ export async function loadProducts() {
   const name = String(r.name || r.product_name || '').trim();
   const brand = String(r.brand || '').trim();
   const url = String(r.url || '').trim();
-  // prefer image_1 (ALS) then image_url (legacy)
-  let image = (r.image_1 || r.image_url || '').trim();
-  if (!image) image = '/product-placeholder.jpg';
-  
-  // Collect all images (image_1 through image_9)
-  const images = [];
-  for (let i = 1; i <= 9; i++) {
-    const img = (r[`image_${i}`] || '').trim();
-    if (img) images.push(img);
+  // Image handling: prefer a consolidated `images` column (comma-separated URLs).
+  // Fall back to legacy fields (image_1..image_9, image_url) for compatibility.
+  const imagesRaw = String(r.images || r.Images || '').trim();
+  let images = [];
+  if (imagesRaw) {
+    images = imagesRaw.split(',').map(s => s.trim()).filter(Boolean);
+  } else {
+    // prefer image_1 (ALS) then image_url (legacy)
+    const primary = String(r.image_1 || r.image_url || '').trim();
+    // Collect all images (image_1 through image_9)
+    for (let i = 1; i <= 9; i++) {
+      const img = String(r[`image_${i}`] || '').trim();
+      if (img) images.push(img);
+    }
+    // If nothing found, use primary or placeholder
+    if (images.length === 0 && primary) images.push(primary);
   }
-  // Ensure at least one image (the primary one)
-  if (images.length === 0) images.push(image);
+  // Ensure at least one image URL
+  if (images.length === 0) images = ['/product-placeholder.jpg'];
+  const image = images[0];
   
   const short_description = String(r.description_short || r.short_description || '').trim();
   const description_full = String(r.description_full || '').trim();
