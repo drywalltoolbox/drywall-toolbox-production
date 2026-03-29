@@ -1,45 +1,97 @@
-﻿Category,Product Name,SKU / Item No.,Dimensions (L x W x H) / Size,Weight,Materials,Key Technical Specifications,Replacement Parts SKUs
-Automatic Tapers,Automatic Taper (Standard),TAPER,"53"" x 6.75"" x 6.75""",9 lbs (4.08 kg),"Billet Aluminum Head, Steel Components, Aluminum Tube",Pump-action cutting sleeve on Teflon slides; Cam Lock Cap; Brake on taper wheel; Holds 500ft tape roll,CTR-42A" (Blades), "CTR-72" (Cable), "CTR-63" (Needles), "CTR-1 (Maint. Kit)
-Automatic Tapers,Predator Automatic Taper,PTAPER,"55"" x 6.5"" x 6.5""",11.33 lbs (5.14 kg),"Carbon Fiber Tube, Billet Aluminum Head, Steel Parts",Lightest/Most durable taper; Carbon fiber maintains temp stability; Titanium pull rod; Reduced drag system,CTR-42A" (Blades), "CTR-72" (Cable), "CTR-63" (Needles), "CTR-1 (Maint. Kit)
-Automatic Tapers,Sawed-Off Automatic Taper,STAPER,"39"" x 6.75"" x 6.75""",~7 lbs,"Billet Aluminum Head, Steel Components","Compact 39"" length for tight spaces (closets/crawlspaces); Same head mechanics as standard taper",CTR-42A" (Blades), "CTR-72" (Cable), "CTR-63 (Needles)
-Automatic Tapers,Predator Sawed-Off Taper,SPTAPER,"39"" x 6.5"" x 6.5""",~5 lbs,"Carbon Fiber Tube, Billet Aluminum Head",Carbon fiber compact version; Ideal for low ceilings; Quick release cap,CTR-42A" (Blades), "CTR-72" (Cable), "CTR-63 (Needles)
-Automatic Tapers,Semi-Automatic Taper,SAT,"22.5"" x 6"" x 3.5""",2 lbs (0.9 kg),"Billet Aluminum, Steel","""Bucket Taper""; Tape spool with brake; Laser engraved instructions; Fits standard 5-gal bucket",CTR-42A" (Blades), "CTR-1 (Maint. Kit)
-Automatic Tapers,Compound Tube (Standard),CMT24", "CMT32", "CMT42", "CMT55,"24"", 32"", 42"", 55"" Lengths","1.27 kg (42"" model)",Machined Aluminum,Smooth interior finish; Compatible with semi-auto taper; Cam lock or threaded options,N/A
-Automatic Tapers,Cam Lock Tube,CLT24", "CLT32", "CLT42", "CLT55,"24"", 32"", 42"", 55"" Lengths",Varies,Machined Aluminum,Quick-release cam lock mechanism; Reduces fill time,N/A
-Flat Finisher Boxes,Standard Flat Box,5.5FFB", "7FFB", "8FFB", "10FFB", "12FFB", "14FFB,"5.5"" to 14"" Width",Varies by size,"Billet Aluminum Body, Stainless Steel Blades","Bead wheel axle standard (prevents wear); Manual sweep grip (except 5.5""); Replaceable blades/shoes",FFBR-9-5.5 to FFBR-9-14" (Blades), "FFBR-7-7A" (Shoes), "FFBA-36 (Wheels)
-Flat Finisher Boxes,Fat Boy Flat Box,8FBB", "10FBB", "12FBB,"8"", 10"", 12"" Width",Varies by size,"Billet Aluminum, Stainless Steel",+40% Mud Capacity; Deeper chamber for high volume; Reduces pump refills,FFBR-9-8 to FFBR-9-12" (Blades), "FFBA-36 (Wheels)
-Flat Finisher Boxes,Automatic Flat Box,8FFBA", "10FFBA", "12FFBA", "14FFBA,"8"" to 14"" Width",Varies by size,"Billet Aluminum, Spring-Loaded Axle","Spring-loaded axle applies pressure to mud; ""Easy Push"" operation; Reduces user fatigue by 50%",FFBR-9-8 to FFBR-9-14" (Blades), "FFBA-36 (Wheels)
-Flat Finisher Boxes,Automatic Fat Boy,8FBBA", "10FBBA", "12FBBA,"8"", 10"", 12"" Width",Varies by size,"Billet Aluminum, Spring-Loaded Axle",Combines high capacity with automatic assist; Heavy-duty springs,FFBR-9-8 to FFBR-9-12" (Blades), "FFBA-36 (Wheels)
-Flat Finisher Boxes,Inside Track Flat Box,8ITFB", "10ITFB", "12ITFB,"8"", 10"", 12"" Width",Varies by size,Billet Aluminum,Wheels located inside side plates; Allows running over obstacles (pot lights/beads) without tipping,FFBR-9-8 to FFBR-9-12" (Blades), "FFBA-36 (Wheels)
-Angle Heads,Angle Head,2AH", "2.5AH", "3AH", "3.5AH,"2"", 2.5"", 3"", 3.5""",~1 lb,"Billet Aluminum Body, Welded Stainless Steel Wings","Precision machined; Wheels included; Side blades set .002"" lower than main blade (""Thumbnail Click"")",AHR-BK-2", "AHR-BK-2.5", "AHR-BK-3" (Blade Kits), "AHR-K (Maint. Kit)
-Angle Heads,Angle Head Adapter,AHA,N/A,N/A,Aluminum,Adapts angle heads to Columbia One Handle system,N/A
-Corner Finishers,Standard Corner Flusher,2.5SF", "3SF", "3WTSF", "3.5SF", "4SF,"2.5"" - 4""",0.5 - 1 lbs,"Billet Aluminum Cone, Stainless Steel Valve",Hand-ground on granite plate; Solid stainless valve (no welds); Thumb release door stop,"Size-specific blades (e.g., "3SF-Blade)
-Corner Finishers,Direct Corner Flusher,2.5DF", "3DF", "3WTDF", "3.5DF", "4DF,"2.5"" - 4""",~0.5 lbs,"Billet Aluminum, Stainless Steel",Direct feed design; Eliminates need for separate corner box in some workflows,Size-specific blades
-Corner Finishers,Combo Flusher,2.5CSF", "3CSF", "3WTCSF", "3.5CSF,"2.5"" - 3.5""",~0.75 lbs,"Billet Aluminum, Stainless Steel",Combines flushing and finishing in one pass; Wide track options available,Size-specific blades
-Corner Finishers,Corner Flusher Box,7CFB", "8CFB,"7"", 8""",N/A,Billet Aluminum Cone,Specially angled cone for tight corners; Rust-proof aluminum vs. nickel-plated steel,"Size-specific blades, gaskets"
-Corner Rolling Tools,Corner Roller,CR,Internal 90° Tape Embed,~0.75 lbs,Hardened Steel / Delrin Wheels,Split wheel design reduces drag; Adjustable head; Embeds tape prior to angle heading,CRA-2 (Wheel Kit - 4 wheels/bushings)
-Corner Rolling Tools,Corner Cobra,CC,Structural Bead (No-Coat),~1.5 lbs,"Hardened Steel, Aluminum",Pivoting head (85°-180°); Applies bead to inside/outside angles; Replaces manual taping for bead,CC-RK (Repair Kit)
-Corner Rolling Tools,Outside Corner Roller (Std),COBCR,Standard Bead,~1 lb,Hardened Steel,Profiles standard metal bead,Wheel replacement kits
-Corner Rolling Tools,Outside Corner Roller (Bullnose),CBNCR,Bullnose Bead,~1 lb,Hardened Steel,Profiles bullnose bead,Wheel replacement kits
-Corner Rolling Tools,Outside Corner Roller (Euro),COBCRE,Euro/Micro Bead,~1 lb,Hardened Steel,Profiles thin euro bead,Wheel replacement kits
-Corner Rolling Tools,Outside Corner Roller (Wide),COBCRW,Wide Bead,~1 lb,Hardened Steel,Profiles wide structural bead,Wheel replacement kits
-Mud Pumps & Fillers,Hot Mud Pump,HMP,"20"" x 8"" x 6""",9-11 lbs,"Anodized Aluminum Cylinder, Stainless Shaft",Air-tight seal for easy priming; 20° angled handle; Top disconnect for cleaning,MPR-1" (Maint. Kit), "MP-24 (Screen)
-Mud Pumps & Fillers,Tall Boy Mud Pump,TBMP,Extended Height,~12 lbs,"Anodized Aluminum, Stainless Steel",Allows standing operation; Fits 30-gallon pails; Reduces back strain,MPR-1" (Maint. Kit), "MP-24 (Screen)
-Mud Pumps & Fillers,Box Filler,BF,Standard,~3 lbs,"Aluminum, Stainless Steel",Patented design; Fast fill for flat boxes; Cam lock option available,"Gaskets, seals"
-Mud Pumps & Fillers,Tall Boy Box Filler,TBBF,Extended,~4 lbs,"Aluminum, Stainless Steel",Stand-up operation for box filling,"Gaskets, seals"
-Mud Pumps & Fillers,Gooseneck,GN", "TBGN,Curved Spout,~1 lb,Aluminum,Flexible/Tubular spout for hard-to-reach fills; Tall Boy version available,N/A
-Nail Spotters,Nail Spotter,2NS", "3NS,"2"", 3""",~1 lb,"Billet Aluminum, Stainless Steel",Hinged door for easy cleaning; Adjustable thumb tension; Lightweight design,HNS7-2", "HNS7-3" (Blades), "HNS-12A", "HNS-13 (Pivot Kit)
-Nail Spotters,Wheel Conversion Kit,HNSA-5-2", "HNSA-5-3,"2"", 3""",N/A,Delrin/Steel,Adds wheels to standard nail spotter for smoother glide,Wheel replacements
-Smoothing Blades,Tomahawk Smoothing Blade,TSB-7 to TSB-48,"7"", 10"", 12"", 14"", 18"", 24"", 32"", 40"", 48""",Varies by size,"Billet Aluminum Body, Stainless Blade",Zero Plastic; Replaceable blades; Will not snap under pressure; Cam Lock adapter compatible,Size-specific replacement blades
-Handles,Columbia One Handle,C1H,Fixed,~0.5 lbs,Billet Aluminum,"Universal fit for Angle Heads, Rollers, Nail Spotters; Reduces tool count",N/A
-Handles,One Extendible Handle,C1HEXT,3' - 5',~1.5 lbs,Aluminum,Hydraulic-free extension; Twist lock,Locking mechanism replacements
-Handles,Long Extendible Handle,CHXL,4' - 8',~2 lbs,Aluminum,Extra reach for high walls,Locking mechanism replacements
-Handles,180° Grip Flat Box Handle,3BH", "4BH", "5BH", "6BH,"3', 4', 5', 6'",2-4 lbs,Aluminum,Continuous braking over 180° range; Ergonomic grip,"Brake pads, locking pins"
-Handles,Matrix Flat Box Handle,MH", "MHS", "MHL,"Variable (29""-76"")",3-5 lbs,Billet Aluminum,All-mechanical (no hydraulics); 90° grip for control; Lightweight,"Locking pins, grip pads"
-Handles,Closet Monster Handle,CMH,"~19""",~1 lb,Aluminum,Short handle for tight spaces; Adjustable wingnut angle,"Wingnut, pivot pins"
-Handles,Twist Lock Handle,TL-3-8,3' - 8',2-3 lbs,Aluminum,Compatible with Tomahawk and Columbia One tools,Locking mechanism replacements
-Specialty Tools,Phantom DDM Sander,PDDM,Complete System,~8 lbs (head only),Billet Aluminum Head; 30ft Hose,Dustless sander head/pole/hose system,CS" (Sander Head), hose replacements"
-Specialty Tools,Sander Head,CS,Standard,~2 lbs,Billet Aluminum,"Replacement head for Phantom; ""No Flip"" technology",Screen attachments
-Specialty Tools,Mud Heads (Applicators),FMH", "IA90", "OA90,"L-Trim, Inside/Outside 90°",~0.5 lbs,UHMW Plastic (Grooved) or Billet Aluminum,"L-Trim, Inside/Outside 90° applicators","Blade replacements, gaskets"
-Specialty Tools,Road Case,ROADCASE,Full Set Storage,~25 lbs,Durable Composite,Protective storage for full sets; Rubber feet; Wheels,"Latches, wheels, handles"
-Specialty Tools,Bucket Scoop,(Various),Compound transfer scoop,~0.5 lbs,Aluminum/Plastic,Compound transfer from bucket to pump/filler,N/A
+Brand,Name+Variant,Size/Length,Dimensions,Weight_Dry_LBS,Weight_Dry_KG,Materials,Key_Specifications,Compatible_Parts_SKUs,Warranty_Years
+Columbia Taping Tools,Automatic Taper - Standard (TAPER),53" Total,"53" x 6.75" x 6.75"",9.00,4.08,"Billet Aluminum Head, Steel, Aluminum Tube","Pump-action cutting sleeve, Teflon slides, Cam Lock Cap, 500ft tape capacity","CTR-42A, CTR-72, CTR-63, CTR-1",5
+Columbia Taping Tools,Predator Automatic Taper - Standard (PTAPER),55" Total,"55" x 6.5" x 6.5"",11.33,5.14,"Carbon Fiber Tube, Billet Aluminum Head, Steel","Titanium pull rod, Temp stable carbon fiber, Reduced drag system","CTR-42A, CTR-72, CTR-63, CTR-1",5
+Columbia Taping Tools,Sawed-Off Automatic Taper - Standard (STAPER),39" Total,"39" x 6.75" x 6.75"",7.00,3.18,"Billet Aluminum Head, Steel, Aluminum Tube","Compact for tight spaces, Standard head mechanics","CTR-42A, CTR-72, CTR-63",5
+Columbia Taping Tools,Predator Sawed-Off Taper - Standard (SPTAPER),39" Total,"39" x 6.5" x 6.5"",5.00,2.27,"Carbon Fiber Tube, Billet Aluminum Head, Steel","Compact carbon fiber, Quick release cap","CTR-42A, CTR-72, CTR-63",5
+Columbia Taping Tools,Semi-Auto Taper - Bucket Taper (SAT),22.5" Total,"22.5" x 6" x 3.5"",2.00,0.90,"Billet Aluminum, Steel","Fits 5-gal bucket, Tape spool brake, Laser instructions","CTR-42A, CTR-1",5
+Columbia Taping Tools,Compound Tube - Standard 24" (CMT24),24" Length,"24" x 2.5" Diameter",0.90,0.41,Machined Aluminum,"Smooth interior, Threaded/Cam options",N/A,5
+Columbia Taping Tools,Compound Tube - Standard 32" (CMT32),32" Length,"32" x 2.5" Diameter",1.10,0.50,Machined Aluminum,"Smooth interior, Threaded/Cam options",N/A,5
+Columbia Taping Tools,Compound Tube - Standard 42" (CMT42),42" Length,"42" x 2.5" Diameter",2.80,1.27,Machined Aluminum,"Smooth interior, Threaded/Cam options",N/A,5
+Columbia Taping Tools,Compound Tube - Standard 55" (CMT55),55" Length,"55" x 2.5" Diameter",1.50,0.68,Machined Aluminum,"Smooth interior, Threaded/Cam options",N/A,5
+Columbia Taping Tools,Cam Lock Tube - Standard 24" (CLT24),24" Length,"24" x 2.5" Diameter",0.95,0.43,Machined Aluminum,"Quick-release cam lock mechanism",N/A,5
+Columbia Taping Tools,Cam Lock Tube - Standard 32" (CLT32),32" Length,"32" x 2.5" Diameter",1.15,0.52,Machined Aluminum,"Quick-release cam lock mechanism",N/A,5
+Columbia Taping Tools,Cam Lock Tube - Standard 42" (CLT42),42" Length,"42" x 2.5" Diameter",1.35,0.61,Machined Aluminum,"Quick-release cam lock mechanism",N/A,5
+Columbia Taping Tools,Cam Lock Tube - Standard 55" (CLT55),55" Length,"55" x 2.5" Diameter",1.60,0.73,Machined Aluminum,"Quick-release cam lock mechanism",N/A,5
+Columbia Taping Tools,Flat Box - Standard 5.5" (5.5FFB),5.5" Width,"5.5" x 8" x 4"",1.50,0.68,"Billet Aluminum, Stainless Steel","Manual sweep, Bead wheel axle standard","FFBR-9-5.5, FFBA-36",5
+Columbia Taping Tools,Flat Box - Standard 7" (7FFB),7" Width,"7" x 8" x 4"",1.75,0.79,"Billet Aluminum, Stainless Steel","Manual sweep, Bead wheel axle standard","FFBR-9-7, FFBA-36",5
+Columbia Taping Tools,Flat Box - Standard 8" (8FFB),8" Width,"8" x 8" x 4"",2.00,0.91,"Billet Aluminum, Stainless Steel","Manual sweep, Bead wheel axle standard","FFBR-9-8, FFBA-36",5
+Columbia Taping Tools,Flat Box - Standard 10" (10FFB),10" Width,"10" x 8" x 4"",2.50,1.13,"Billet Aluminum, Stainless Steel","Manual sweep, Bead wheel axle standard","FFBR-9-10, FFBA-36",5
+Columbia Taping Tools,Flat Box - Standard 12" (12FFB),12" Width,"12" x 8" x 4"",3.00,1.36,"Billet Aluminum, Stainless Steel","Manual sweep, Bead wheel axle standard","FFBR-9-12, FFBA-36",5
+Columbia Taping Tools,Flat Box - Standard 14" (14FFB),14" Width,"14" x 8" x 4"",3.50,1.59,"Billet Aluminum, Stainless Steel","Manual sweep, Bead wheel axle standard","FFBR-9-14, FFBA-36",5
+Columbia Taping Tools,Flat Box - Fat Boy 8" (8FBB),8" Width,"8" x 8" x 5"",2.25,1.02,"Billet Aluminum, Stainless Steel","+40% Mud Capacity, Deeper chamber","FFBR-9-8, FFBA-36",5
+Columbia Taping Tools,Flat Box - Fat Boy 10" (10FBB),10" Width,"10" x 8" x 5"",2.75,1.25,"Billet Aluminum, Stainless Steel","+40% Mud Capacity, Deeper chamber","FFBR-9-10, FFBA-36",5
+Columbia Taping Tools,Flat Box - Fat Boy 12" (12FBB),12" Width,"12" x 8" x 5"",3.25,1.47,"Billet Aluminum, Stainless Steel","+40% Mud Capacity, Deeper chamber","FFBR-9-12, FFBA-36",5
+Columbia Taping Tools,Flat Box - Automatic 8" (8FFBA),8" Width,"8" x 8" x 4"",2.50,1.13,"Billet Aluminum, Spring-Loaded Axle","Spring-loaded axle, Easy Push, -50% fatigue","FFBR-9-8, FFBA-36",5
+Columbia Taping Tools,Flat Box - Automatic 10" (10FFBA),10" Width,"10" x 8" x 4"",3.00,1.36,"Billet Aluminum, Spring-Loaded Axle","Spring-loaded axle, Easy Push, -50% fatigue","FFBR-9-10, FFBA-36",5
+Columbia Taping Tools,Flat Box - Automatic 12" (12FFBA),12" Width,"12" x 8" x 4"",3.50,1.59,"Billet Aluminum, Spring-Loaded Axle","Spring-loaded axle, Easy Push, -50% fatigue","FFBR-9-12, FFBA-36",5
+Columbia Taping Tools,Flat Box - Automatic 14" (14FFBA),14" Width,"14" x 8" x 4"",4.00,1.81,"Billet Aluminum, Spring-Loaded Axle","Spring-loaded axle, Easy Push, -50% fatigue","FFBR-9-14, FFBA-36",5
+Columbia Taping Tools,Flat Box - Auto Fat Boy 8" (8FBBA),8" Width,"8" x 8" x 5"",2.75,1.25,"Billet Aluminum, Spring-Loaded Axle","High capacity + Auto assist, Heavy-duty springs","FFBR-9-8, FFBA-36",5
+Columbia Taping Tools,Flat Box - Auto Fat Boy 10" (10FBBA),10" Width,"10" x 8" x 5"",3.25,1.47,"Billet Aluminum, Spring-Loaded Axle","High capacity + Auto assist, Heavy-duty springs","FFBR-9-10, FFBA-36",5
+Columbia Taping Tools,Flat Box - Auto Fat Boy 12" (12FBBA),12" Width,"12" x 8" x 5"",3.75,1.70,"Billet Aluminum, Spring-Loaded Axle","High capacity + Auto assist, Heavy-duty springs","FFBR-9-12, FFBA-36",5
+Columbia Taping Tools,Flat Box - Inside Track 8" (8ITFB),8" Width,"8" x 8" x 4"",2.25,1.02,Billet Aluminum,"Wheels inside side plates, Clears obstacles","FFBR-9-8, FFBA-36",5
+Columbia Taping Tools,Flat Box - Inside Track 10" (10ITFB),10" Width,"10" x 8" x 4"",2.75,1.25,Billet Aluminum,"Wheels inside side plates, Clears obstacles","FFBR-9-10, FFBA-36",5
+Columbia Taping Tools,Flat Box - Inside Track 12" (12ITFB),12" Width,"12" x 8" x 4"",3.25,1.47,Billet Aluminum,"Wheels inside side plates, Clears obstacles","FFBR-9-12, FFBA-36",5
+Columbia Taping Tools,Angle Head - Standard 2" (2AH),2" Width,"2" x 4" x 3"",0.75,0.34,"Billet Aluminum, Welded Stainless Steel Wings",".002" side blade offset, Wheels included","AHR-BK-2, AHR-K",5
+Columbia Taping Tools,Angle Head - Standard 2.5" (2.5AH),2.5" Width,"2.5" x 4" x 3"",0.85,0.39,"Billet Aluminum, Welded Stainless Steel Wings",".002" side blade offset, Wheels included","AHR-BK-2.5, AHR-K",5
+Columbia Taping Tools,Angle Head - Standard 3" (3AH),3" Width,"3" x 4" x 3"",1.00,0.45,"Billet Aluminum, Welded Stainless Steel Wings",".002" side blade offset, Wheels included","AHR-BK-3, AHR-K",5
+Columbia Taping Tools,Angle Head - Standard 3.5" (3.5AH),3.5" Width,"3.5" x 4" x 3"",1.15,0.52,"Billet Aluminum, Welded Stainless Steel Wings",".002" side blade offset, Wheels included","AHR-BK-3.5, AHR-K",5
+Columbia Taping Tools,Corner Flusher - Standard 2.5" (2.5SF),2.5" Width,"2.5" x 5" x 4"",0.50,0.23,"Billet Aluminum Cone, Stainless Steel Valve","Hand-ground granite plate, Solid SS valve",Size-specific_Blade,5
+Columbia Taping Tools,Corner Flusher - Standard 3" (3SF),3" Width,"3" x 5" x 4"",0.65,0.29,"Billet Aluminum Cone, Stainless Steel Valve","Hand-ground granite plate, Solid SS valve",Size-specific_Blade,5
+Columbia Taping Tools,Corner Flusher - Standard 3" Wide (3WTSF),3" Width Wide,"3" x 6" x 4"",0.70,0.32,"Billet Aluminum Cone, Stainless Steel Valve","Wide track option, Solid SS valve",Size-specific_Blade,5
+Columbia Taping Tools,Corner Flusher - Standard 3.5" (3.5SF),3.5" Width,"3.5" x 5" x 4"",0.85,0.39,"Billet Aluminum Cone, Stainless Steel Valve","Hand-ground granite plate, Solid SS valve",Size-specific_Blade,5
+Columbia Taping Tools,Corner Flusher - Standard 4" (4SF),4" Width,"4" x 5" x 4"",1.00,0.45,"Billet Aluminum Cone, Stainless Steel Valve","Hand-ground granite plate, Solid SS valve",Size-specific_Blade,5
+Columbia Taping Tools,Corner Flusher - Direct 2.5" (2.5DF),2.5" Width,"2.5" x 5" x 4"",0.50,0.23,"Billet Aluminum, Stainless Steel","Direct feed design, No separate box needed",Size-specific_Blade,5
+Columbia Taping Tools,Corner Flusher - Direct 3" (3DF),3" Width,"3" x 5" x 4"",0.65,0.29,"Billet Aluminum, Stainless Steel","Direct feed design, No separate box needed",Size-specific_Blade,5
+Columbia Taping Tools,Corner Flusher - Direct 3" Wide (3WTDF),3" Width Wide,"3" x 6" x 4"",0.70,0.32,"Billet Aluminum, Stainless Steel","Direct feed design, Wide track",Size-specific_Blade,5
+Columbia Taping Tools,Corner Flusher - Direct 3.5" (3.5DF),3.5" Width,"3.5" x 5" x 4"",0.85,0.39,"Billet Aluminum, Stainless Steel","Direct feed design, No separate box needed",Size-specific_Blade,5
+Columbia Taping Tools,Corner Flusher - Direct 4" (4DF),4" Width,"4" x 5" x 4"",1.00,0.45,"Billet Aluminum, Stainless Steel","Direct feed design, No separate box needed",Size-specific_Blade,5
+Columbia Taping Tools,Corner Flusher - Combo 2.5" (2.5CSF),2.5" Width,"2.5" x 5" x 4"",0.60,0.27,"Billet Aluminum, Stainless Steel","Flush + Finish in one pass",Size-specific_Blade,5
+Columbia Taping Tools,Corner Flusher - Combo 3" (3CSF),3" Width,"3" x 5" x 4"",0.75,0.34,"Billet Aluminum, Stainless Steel","Flush + Finish in one pass",Size-specific_Blade,5
+Columbia Taping Tools,Corner Flusher - Combo 3" Wide (3WTCSF),3" Width Wide,"3" x 6" x 4"",0.80,0.36,"Billet Aluminum, Stainless Steel","Flush + Finish in one pass, Wide track",Size-specific_Blade,5
+Columbia Taping Tools,Corner Flusher - Combo 3.5" (3.5CSF),3.5" Width,"3.5" x 5" x 4"",0.90,0.41,"Billet Aluminum, Stainless Steel","Flush + Finish in one pass",Size-specific_Blade,5
+Columbia Taping Tools,Corner Box - Flusher Box 7" (7CFB),7" Width,"7" x 6" x 5"",1.50,0.68,Billet Aluminum Cone,"Angled cone for tight corners, Rust-proof","Size-specific_Blade, Gaskets",5
+Columbia Taping Tools,Corner Box - Flusher Box 8" (8CFB),8" Width,"8" x 6" x 5"",1.75,0.79,Billet Aluminum Cone,"Angled cone for tight corners, Rust-proof","Size-specific_Blade, Gaskets",5
+Columbia Taping Tools,Corner Roller - Standard Internal (CR),Internal 90°,"4" x 3" x 2"",0.75,0.34,"Hardened Steel, Delrin Wheels","Split wheel design, Adjustable head",CRA-2,5
+Columbia Taping Tools,Corner Cobra - Standard Bead (CC),Inside/Outside,"6" x 4" x 3"",1.50,0.68,"Hardened Steel, Aluminum","Pivoting head 85°-180°, Inside/Outside",CC-RK,5
+Columbia Taping Tools,OC Roller - Standard Standard (COBCR),Standard Bead,"5" x 3" x 2"",1.00,0.45,Hardened Steel,"Profiles standard metal bead",Wheel_Replacement,5
+Columbia Taping Tools,OC Roller - Bullnose Standard (CBNCR),Bullnose Bead,"5" x 3" x 2"",1.00,0.45,Hardened Steel,"Profiles bullnose bead",Wheel_Replacement,5
+Columbia Taping Tools,OC Roller - Euro Standard (COBCRE),Euro/Micro Bead,"5" x 3" x 2"",1.00,0.45,Hardened Steel,"Profiles thin euro bead",Wheel_Replacement,5
+Columbia Taping Tools,OC Roller - Wide Standard (COBCRW),Wide Bead,"5" x 3" x 2"",1.00,0.45,Hardened Steel,"Profiles wide structural bead",Wheel_Replacement,5
+Columbia Taping Tools,Mud Pump - Hot Mud Standard (HMP),Standard,"20" x 8" x 6"",9.00-11.00,4.08-4.99,"Anodized Aluminum Cylinder, Stainless Shaft","Air-tight seal, 20° angled handle, Top disconnect","MPR-1, MP-24",5
+Columbia Taping Tools,Mud Pump - Tall Boy Standard (TBMP),Extended,"28" x 8" x 6"",12.00,5.44,"Anodized Aluminum, Stainless Steel","Standing operation, Fits 30-gal pails","MPR-1, MP-24",5
+Columbia Taping Tools,Box Filler - Standard Standard (BF),Standard,"12" x 6" x 4"",3.00,1.36,"Aluminum, Stainless Steel","Patented design, Fast fill, Cam lock option","Gaskets, Seals",5
+Columbia Taping Tools,Box Filler - Tall Boy Standard (TBBF),Extended,"18" x 6" x 4"",4.00,1.81,"Aluminum, Stainless Steel","Stand-up operation for box filling","Gaskets, Seals",5
+Columbia Taping Tools,Gooseneck - Standard Standard (GN),Curved,"10" x 4" x 3"",1.00,0.45,Aluminum,"Flexible spout for hard-to-reach fills",N/A,5
+Columbia Taping Tools,Gooseneck - Tall Boy Standard (TBGN),Curved,"14" x 4" x 3"",1.00,0.45,Aluminum,"Tall Boy version for extended reach",N/A,5
+Columbia Taping Tools,Nail Spotter - Standard 2" (2NS),2" Width,"6" x 4" x 3"",0.80,0.36,"Billet Aluminum, Stainless Steel","Hinged door, Adjustable thumb tension","HNS7-2, HNS-12A",5
+Columbia Taping Tools,Nail Spotter - Standard 3" (3NS),3" Width,"7" x 4" x 3"",1.00,0.45,"Billet Aluminum, Stainless Steel","Hinged door, Adjustable thumb tension","HNS7-3, HNS-13",5
+Columbia Taping Tools,Nail Spotter - Wheel Kit 2" (HNSA-5-2),2" Width,N/A,N/A,N/A,"Delrin/Steel","Adds wheels to standard 2" spotter",Wheel_Replacements,5
+Columbia Taping Tools,Nail Spotter - Wheel Kit 3" (HNSA-5-3),3" Width,N/A,N/A,N/A,"Delrin/Steel","Adds wheels to standard 3" spotter",Wheel_Replacements,5
+Columbia Taping Tools,Smoothing Blade - Tomahawk 7" (TSB-7),7" Width,"7" x 3" x 1"",0.50,0.23,"Billet Aluminum, Stainless Blade","Zero Plastic, Replaceable blades",Size-specific_Blade,5
+Columbia Taping Tools,Smoothing Blade - Tomahawk 10" (TSB-10),10" Width,"10" x 3" x 1"",0.75,0.34,"Billet Aluminum, Stainless Blade","Zero Plastic, Replaceable blades",Size-specific_Blade,5
+Columbia Taping Tools,Smoothing Blade - Tomahawk 12" (TSB-12),12" Width,"12" x 3" x 1"",0.85,0.39,"Billet Aluminum, Stainless Blade","Zero Plastic, Replaceable blades",Size-specific_Blade,5
+Columbia Taping Tools,Smoothing Blade - Tomahawk 14" (TSB-14),14" Width,"14" x 3" x 1"",1.00,0.45,"Billet Aluminum, Stainless Blade","Zero Plastic, Replaceable blades",Size-specific_Blade,5
+Columbia Taping Tools,Smoothing Blade - Tomahawk 18" (TSB-18),18" Width,"18" x 3" x 1"",1.25,0.57,"Billet Aluminum, Stainless Blade","Zero Plastic, Replaceable blades",Size-specific_Blade,5
+Columbia Taping Tools,Smoothing Blade - Tomahawk 24" (TSB-24),24" Width,"24" x 3" x 1"",1.50,0.68,"Billet Aluminum, Stainless Blade","Zero Plastic, Replaceable blades",Size-specific_Blade,5
+Columbia Taping Tools,Smoothing Blade - Tomahawk 32" (TSB-32),32" Width,"32" x 3" x 1"",2.00,0.91,"Billet Aluminum, Stainless Blade","Zero Plastic, Replaceable blades",Size-specific_Blade,5
+Columbia Taping Tools,Smoothing Blade - Tomahawk 40" (TSB-40),40" Width,"40" x 3" x 1"",2.50,1.13,"Billet Aluminum, Stainless Blade","Zero Plastic, Replaceable blades",Size-specific_Blade,5
+Columbia Taping Tools,Smoothing Blade - Tomahawk 48" (TSB-48),48" Width,"48" x 3" x 1"",3.00,1.36,"Billet Aluminum, Stainless Blade","Zero Plastic, Replaceable blades",Size-specific_Blade,5
+Columbia Taping Tools,Handle - One Handle Fixed (C1H),Fixed,"12" x 2" x 2"",0.50,0.23,Billet Aluminum,"Universal fit, Reduces tool count",N/A,5
+Columbia Taping Tools,Handle - One Extend 3-5ft (C1HEXT),3' - 5',36" - 60" x 2" x 2",1.50,0.68,Aluminum,"Hydraulic-free, Twist lock",Locking_Mechanism,5
+Columbia Taping Tools,Handle - Long Extend 4-8ft (CHXL),4' - 8',48" - 96" x 2" x 2",2.00,0.91,Aluminum,"Extra reach for high walls",Locking_Mechanism,5
+Columbia Taping Tools,Handle - 180 Grip 3ft (3BH),3 Foot,"36" x 3" x 3"",2.00,0.91,Aluminum,"Continuous braking 180°, Ergonomic","Brake_Pads, Pins",5
+Columbia Taping Tools,Handle - 180 Grip 4ft (4BH),4 Foot,"48" x 3" x 3"",2.50,1.13,Aluminum,"Continuous braking 180°, Ergonomic","Brake_Pads, Pins",5
+Columbia Taping Tools,Handle - 180 Grip 5ft (5BH),5 Foot,"60" x 3" x 3"",3.00,1.36,Aluminum,"Continuous braking 180°, Ergonomic","Brake_Pads, Pins",5
+Columbia Taping Tools,Handle - 180 Grip 6ft (6BH),6 Foot,"72" x 3" x 3"",3.50,1.59,Aluminum,"Continuous braking 180°, Ergonomic","Brake_Pads, Pins",5
+Columbia Taping Tools,Handle - Matrix Standard (MH),29" - 50",29" - 50" x 3" x 3",3.00,1.36,Billet Aluminum,"All-mechanical, 90° grip",Locking_Pins,5
+Columbia Taping Tools,Handle - Matrix Short (MHS),29" - 50",29" - 50" x 3" x 3",3.00,1.36,Billet Aluminum,"Short version, All-mechanical",Locking_Pins,5
+Columbia Taping Tools,Handle - Matrix Long (MHL),50" - 76",50" - 76" x 3" x 3",4.00,1.81,Billet Aluminum,"Long version, All-mechanical",Locking_Pins,5
+Columbia Taping Tools,Handle - Closet Monster Fixed (CMH),~19 Inch,"19" x 3" x 3"",1.00,0.45,Aluminum,"Short handle, Adjustable wingnut angle","Wingnut, Pins",5
+Columbia Taping Tools,Handle - Twist Lock 3-8ft (TL-3-8),3' - 8',36" - 96" x 2" x 2",2.50,1.13,Aluminum,"Compatible with Tomahawk/One",Locking_Mechanism,5
+Columbia Taping Tools,Sander - Phantom DDM Complete (PDDM),Full_System,"60" x 12" x 6"",8.00,3.63,"Billet Aluminum Head, 30ft Hose","Dustless head/pole/hose system","CS, Hose_Replacements",5
+Columbia Taping Tools,Sander - Head Only Complete (CS),Replacement,"8" x 8" x 3"",2.00,0.91,Billet Aluminum,"No Flip technology",Screen_Attachments,5
+Columbia Taping Tools,Mud Applicator - L-Trim Standard (FMH),L-Trim,"6" x 4" x 3"",0.50,0.23,"UHMW Plastic / Aluminum","L-Trim applicator",Blade_Replacements,5
+Columbia Taping Tools,Mud Applicator - Inside 90 Standard (IA90),Inside 90°,"6" x 4" x 3"",0.50,0.23,"UHMW Plastic / Aluminum","Inside 90° applicator",Blade_Replacements,5
+Columbia Taping Tools,Mud Applicator - Outside 90 Standard (OA90),Outside 90°,"6" x 4" x 3"",0.50,0.23,"UHMW Plastic / Aluminum","Outside 90° applicator",Blade_Replacements,5
+Columbia Taping Tools,Storage - Road Case Complete (ROADCASE),Full_Set,"36" x 24" x 18"",25.00,11.34,Durable_Composite,"Protective storage, Rubber feet, Wheels","Latches, Wheels, Handles",5
+Columbia Taping Tools,Accessory - Bucket Scoop Standard (BSCOOP),Transfer,"10" x 6" x 4"",0.50,0.23,Aluminum/Plastic,"Compound transfer from bucket",N/A,5
