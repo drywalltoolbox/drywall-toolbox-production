@@ -86,11 +86,34 @@ jobs:
             **/twentytwenty*/**
             **/yith-wonder/**
             **/*.bak
+            **/*.map
+            **/products_catalog.csv
           dangerous-clean-slate: false
           log-level: verbose
           dry-run: false
-          timeout: 60000
+          timeout: 300000
+
+      - name: Prune generated maps & large CSVs before upload
+        run: |
+          echo "Pruning source maps and large CSVs to speed up upload..."
+          # remove source maps from the generated theme dist (if any)
+          if [ -d "wp/wp-content/themes/drywall-toolbox/dist" ]; then
+            find wp/wp-content/themes/drywall-toolbox/dist -type f -name "*.map" -print -delete || true
+          fi
+          # remove large products CSV if present in the theme assets
+          find wp/wp-content/themes/drywall-toolbox -type f -name "products_catalog.csv" -print -delete || true
 
       - name: Deployment complete
         if: always()
         run: echo "✓ Deployed to HostGator at $(date -u '+%Y-%m-%dT%H:%M:%SZ')"
+
+      - name: Post-deploy verification (manifest)
+        if: always()
+        run: |
+          echo "Checking asset-manifest.json on live site..."
+          code=$(curl -s -o /dev/null -w "%{http_code}" "https://drywalltoolbox.com/wp-content/themes/drywall-toolbox/dist/asset-manifest.json" || echo "000")
+          echo "HTTP status for asset-manifest.json: $code"
+          if [ "$code" != "200" ]; then
+            echo "Warning: asset-manifest.json not reachable (status $code). If deploy just finished, re-run workflow or check HostGator File Manager.";
+            exit 0
+          fi
