@@ -116,15 +116,7 @@ jobs:
       contents: read
 
     env:
-      # REMOTE_ROOT is the absolute path on HostGator to the website root.
-      # For push events github.event.inputs.remote_root is undefined, so we
-      # fall back to the hardcoded production path.  For workflow_dispatch it
-      # uses the caller-supplied value (which defaults to the same path).
-      # Prefer an explicit secret first (safer), then the workflow input, then
-      # the legacy hard-coded default. Set `HOSTGATOR_REMOTE_ROOT` in repo
-      # secrets to the exact cPanel path (for example: /home/youruser/public_html/website_a246e6a8
-      # or public_html/website_a246e6a8 depending on your FTP user chroot).
-      REMOTE_ROOT: "${{ secrets.HOSTGATOR_REMOTE_ROOT || github.event.inputs.remote_root || '/home1/benconklin/public_html/website_a246e6a8' }}"
+      REMOTE_ROOT: "${{ secrets.HOSTGATOR_REMOTE_ROOT || github.event.inputs.remote_root || 'public_html/website_a246e6a8' }}"
 
     steps:
       - name: Checkout repository (wp/ + root files)
@@ -157,10 +149,6 @@ jobs:
           sudo apt-get update -y >/dev/null
           sudo apt-get install -y lftp >/dev/null
           echo "Probing FTP server: ${{ secrets.HOSTGATOR_FTP_HOST }} (will print remote pwd and top-level listing)"
-          # Some HostGator FTPS endpoints present a certificate CN that doesn't
-          # match the host name; to get a useful diagnostic listing we disable
-          # certificate verification for this probe only. This is safe for
-          # debugging but should not be used for production uploads.
           lftp -u "${{ secrets.HOSTGATOR_FTP_USER }},${{ secrets.HOSTGATOR_FTP_PASS }}" \
             -e "set ssl:verify-certificate no; pwd; ls -la; quit" "${{ secrets.HOSTGATOR_FTP_HOST }}" || true
 
