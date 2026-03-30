@@ -8,7 +8,7 @@ This repository contains:
 
 - A React SPA (`src/`) that fetches all product and category data from the WooCommerce REST API. No static product data is bundled — WordPress is the single source of truth.
 
-- WordPress theme and plugin code under `wp/wp-content/` that are deployed to HostGator.
+- WordPress theme and plugin code under `wp-content/` that are deployed to HostGator.
 
 - GitHub Actions workflows to deploy theme/plugin assets to HostGator via FTPS.
 
@@ -57,7 +57,7 @@ npm run lint
 
 Key folders and files:
 
-- `wp/wp-content/` — WordPress theme and plugin code targeted for production.
+- `wp-content/` — WordPress theme and plugin code targeted for production.
 
 - `src/`, `public/` — React site source and static assets.
 
@@ -65,7 +65,7 @@ Key folders and files:
 
 - `src/hooks/useFetch.js` — Shared loading/error/empty-state hook for API calls.
 
-- `.github/workflows/deploy.yml` — GitHub Actions workflow that deploys `wp/wp-content` to HostGator.
+- `.github/workflows/deploy.yml` — GitHub Actions workflow that deploys `wp-content` to HostGator.
 
 - `public/.htaccess` — React Router SPA fallback + WordPress/WooCommerce API pass-through rules.
 
@@ -113,11 +113,12 @@ Our FTP connection to HostGator is already configured and operational.
 
 ## WordPress deployment (HostGator)
 
+
 Overview
 
-- We deploy theme and plugin assets (the `wp/wp-content` subtree) to HostGator using a GitHub Action (FTPS).
+- We deploy theme and plugin assets (the `wp-content` subtree) to HostGator using a GitHub Action (FTPS).
 
-- The action uploads only `wp/wp-content/themes/...` and `wp/wp-content/plugins/...` to the server — it does not modify WordPress core files.
+- The action uploads only `wp-content/themes/...` and `wp-content/plugins/...` to the server — it does not modify WordPress core files.
 
 Before you deploy
 
@@ -129,13 +130,13 @@ Before you deploy
 
 ### Manual deploy options
 
-- FileZilla / WinSCP: connect with explicit FTPS, upload `wp/wp-content/themes/drywall-toolbox/` and the plugin folder to the remote `public_html/wp-content/` path.
+. FileZilla / WinSCP: connect with explicit FTPS, upload `wp-content/themes/drywall-toolbox/` and the plugin folder to the remote `public_html/wp-content/` path.
 
 - cPanel File Manager: upload and extract ZIP archives when convenient.
 
 ## Automated deploy (GitHub Actions)
 
-The repository includes a GitHub Actions workflow that runs on pushes to `main` when files under `wp/wp-content/**` change. The workflow uses `SamKirkland/FTP-Deploy-Action` to upload files over FTPS.
+The repository includes a GitHub Actions workflow that runs on pushes to `main` when files under `wp-content/**` change. The workflow uses `SamKirkland/FTP-Deploy-Action` to upload files over FTPS.
 
 Recommended workflow steps
 

@@ -19,6 +19,11 @@ on:
         required: false
         default: false
         type: boolean
+      remote_root:
+        description: 'Remote site root path (used for optional deletion of coming-soon/index)'
+        required: false
+        default: '/home1/benconklin/public_html/website_a246e6a8'
+        type: string
 
 concurrency:
   group: deploy-${{ github.ref }}
@@ -137,6 +142,43 @@ jobs:
           echo "── dist ──"
           ls -la wp-content/themes/drywall-toolbox/dist/ || true
 
+      - name: "Dry-run: show remote deletion command for coming-soon.html"
+        if: "${{ github.event.inputs.dry_run == 'true' }}"
+        env:
+          HOST: "${{ secrets.HOSTGATOR_FTP_HOST }}"
+          PORT: "${{ secrets.HOSTGATOR_FTP_PORT }}"
+          USER: "${{ secrets.HOSTGATOR_FTP_USER }}"
+          REMOTE_ROOT: "${{ github.event.inputs.remote_root }}"
+        run: |
+          echo "Dry-run mode: will NOT delete files. Displaying the FTPS command that would run:"
+          echo
+          echo "Computed remote paths to be deleted (if present):"
+          echo "  $REMOTE_ROOT/coming-soon.html"
+          echo "  $REMOTE_ROOT/index.html"
+          echo
+          echo "lftp -u $USER,<password> -e \"set ftp:ssl-force true; set ssl:verify-certificate no; rm $REMOTE_ROOT/coming-soon.html; rm $REMOTE_ROOT/index.html; bye\" ftps://$HOST:$PORT"
+          echo
+          echo "You can run the workflow with dry_run=false to actually perform the deletion."
+
+      - name: "Remove remote coming-soon/index (FTPS)"
+        if: "${{ github.event.inputs.dry_run != 'true' }}"
+        env:
+          HOST: "${{ secrets.HOSTGATOR_FTP_HOST }}"
+          PORT: "${{ secrets.HOSTGATOR_FTP_PORT }}"
+          USER: "${{ secrets.HOSTGATOR_FTP_USER }}"
+          PASS: "${{ secrets.HOSTGATOR_FTP_PASS }}"
+          REMOTE_ROOT: "${{ github.event.inputs.remote_root }}"
+        run: |
+          echo "Attempting remote delete via curl (FTPS)."
+          echo "Listing remote root ($REMOTE_ROOT) via FTP LIST (best-effort):"
+          # show remote directory listing (may require proper permissions/path mapping)
+          curl -s --ftp-ssl --insecure -u "$USER:$PASS" "ftps://$HOST:$PORT/" -Q "LIST $REMOTE_ROOT" || true
+          echo "Attempting to delete coming-soon and index files (if present):"
+          # Use FTP DELE command via --quote (-Q) to remove files; ignore errors if not present
+          curl -s --ftp-ssl --insecure -u "$USER:$PASS" "ftps://$HOST:$PORT/" -Q "DELE $REMOTE_ROOT/coming-soon.html" || true
+          curl -s --ftp-ssl --insecure -u "$USER:$PASS" "ftps://$HOST:$PORT/" -Q "DELE $REMOTE_ROOT/index.html" || true
+          echo "Remote deletion step finished."
+
       - name: Deploy via FTPS
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
@@ -173,7 +215,7 @@ jobs:
             **/assets/brands/TapeTech/Schematics/**
           dangerous-clean-slate: false
           log-level: verbose
-          dry-run: ${{ github.event.inputs.dry_run == 'true' }}
+          dry-run: "${{ github.event.inputs.dry_run == 'true' }}"
           timeout: 300000
 
       - name: Deployment summary
