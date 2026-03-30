@@ -265,8 +265,21 @@ def _slug_for(schematic_id: str, page: int | None, is_preview: bool) -> str:
 def _find_existing_by_slug(session: "requests.Session", api_base: str, slug: str) -> dict | None:
     """Return the WP media item dict for the given slug, or None."""
     r = session.get(f"{api_base}/media", params={"slug": slug, "per_page": 1})
-    r.raise_for_status()
-    items = r.json()
+    try:
+        r.raise_for_status()
+    except requests.HTTPError:
+        # Surface server response to help diagnose 406/other REST errors.
+        sys.stderr.write(f"ERROR: GET {r.url} returned {r.status_code}\n")
+        try:
+            sys.stderr.write(r.text + "\n")
+        except Exception:
+            pass
+        raise
+    try:
+        items = r.json()
+    except ValueError:
+        sys.stderr.write(f"ERROR: Non-JSON response for GET {r.url}:\n{r.text}\n")
+        raise
     return items[0] if items else None
 
 
@@ -339,6 +352,13 @@ def main() -> None:
 
     session = requests.Session()
     session.auth = (auth_user, auth_pass)
+    # Some servers return 406 Not Acceptable when no Accept header is provided.
+    # Set a permissive JSON accept header and a stable User-Agent to improve
+    # compatibility with REST endpoints and security filtering.
+    session.headers.update({
+        "Accept": "application/json",
+        "User-Agent": "drywall-toolbox-scripts/1.0",
+    })
 
     total = ok = skip = error = 0
 
