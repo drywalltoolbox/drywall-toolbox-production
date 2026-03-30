@@ -1,6 +1,6 @@
 <?php
 /**
- * Headless Base Theme — index.php
+ * Headless Base Theme - index.php
  *
  * This is intentionally empty. All frontend rendering is handled by the
  * React SPA served from dist/index.html via the root .htaccess catch-all.

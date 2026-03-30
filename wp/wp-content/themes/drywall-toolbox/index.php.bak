@@ -1,6 +1,6 @@
 <?php
 /**
- * React SPA Shell - Drywall Toolbox Headless Theme
+ * React SPA Shell — Drywall Toolbox Headless Theme
  *
  * This is the single HTML entry point served for every public-facing request.
  * The template_include filter in functions.php routes all frontend routes here

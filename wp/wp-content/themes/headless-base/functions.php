@@ -1,9 +1,9 @@
 <?php
 /**
- * Headless Base Theme — functions.php
+ * Headless Base Theme - functions.php
  *
  * Minimal WordPress theme for the Drywall Toolbox headless architecture.
- * This theme produces zero frontend output — the React SPA at the domain root
+ * This theme produces zero frontend output - the React SPA at the domain root
  * owns all rendering.  WordPress and WooCommerce serve as the REST API backend.
  *
  * @package headless-base
@@ -11,7 +11,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-// ─── Theme Setup ─────────────────────────────────────────────────────────────
+// --- Theme Setup -----------------------------------------------------------
 
 add_action( 'after_setup_theme', 'hb_theme_setup' );
 function hb_theme_setup() {
@@ -30,8 +30,8 @@ function hb_theme_setup() {
 	);
 }
 
-// ─── Disable All Frontend Output ─────────────────────────────────────────────
-// This theme never renders PHP templates — React owns the frontend.
+// --- Disable All Frontend Output -------------------------------------------
+// This theme never renders PHP templates - React owns the frontend.
 // Redirect any direct template request to the React SPA (served by .htaccess).
 
 add_filter( 'template_include', 'hb_block_frontend_templates', 99 );
@@ -43,7 +43,7 @@ function hb_block_frontend_templates( $template ) {
 	return get_template_directory() . '/index.php';
 }
 
-// ─── Remove Unnecessary WordPress Head Output ─────────────────────────────────
+// --- Remove Unnecessary WordPress Head Output -------------------------------
 
 add_action( 'init', 'hb_clean_head' );
 function hb_clean_head() {
@@ -62,7 +62,7 @@ function hb_clean_head() {
 	remove_action( 'wp_head', 'wp_oembed_add_host_js' );
 }
 
-// ─── Miscellaneous Security ───────────────────────────────────────────────────
+// --- Miscellaneous Security -------------------------------------------------
 
 add_filter( 'the_generator', '__return_empty_string' );
 add_filter( 'xmlrpc_enabled', '__return_false' );
@@ -78,7 +78,7 @@ function hb_block_author_enumeration() {
 	}
 }
 
-// ─── REST API: Navigation Menu Endpoint ──────────────────────────────────────
+// --- REST API: Navigation Menu Endpoint ------------------------------------
 // Expose registered menus via /wp-json/headless/v1/menus/<location>
 // so the React SPA can render dynamic navigation.
 
@@ -148,7 +148,7 @@ function hb_get_menu_by_location( WP_REST_Request $request ) {
 	return rest_ensure_response( $output );
 }
 
-// ─── WooCommerce: Public Read for Products ────────────────────────────────────
+// --- WooCommerce: Public Read for Products ---------------------------------
 // Allow unauthenticated GET requests to product/category/tag endpoints.
 
 add_filter( 'woocommerce_rest_check_permissions', 'hb_wc_rest_public_read', 10, 4 );

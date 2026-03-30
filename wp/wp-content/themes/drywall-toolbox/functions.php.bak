@@ -17,7 +17,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-// --- Theme Setup -------------------------------------------------------------
+// ─── Theme Setup ─────────────────────────────────────────────────────────────
 
 add_action( 'after_setup_theme', 'dtb_theme_setup' );
 function dtb_theme_setup() {
@@ -26,7 +26,7 @@ function dtb_theme_setup() {
     add_theme_support( 'title-tag' );
 }
 
-// --- Enqueue React SPA Assets ------------------------------------------------
+// ─── Enqueue React SPA Assets ────────────────────────────────────────────────
 
 add_action( 'wp_enqueue_scripts', 'dtb_enqueue_react_app' );
 function dtb_enqueue_react_app() {
@@ -46,7 +46,7 @@ function dtb_enqueue_react_app() {
 
     $files = $data['files'];
 
-    // -- CSS ------------------------------------------------------------------
+    // ── CSS ──────────────────────────────────────────────────────────────────
     // Enqueue in <head> (no defer). Using null version disables the ?ver= cache-
     // buster since the filename already contains a content hash.
     foreach ( $files as $key => $src ) {
@@ -56,8 +56,8 @@ function dtb_enqueue_react_app() {
         }
     }
 
-    // -- JavaScript -----------------------------------------------------------
-    // Load order: runtime => vendor-react => vendor => common => main.
+    // ── JavaScript ───────────────────────────────────────────────────────────
+    // Load order: runtime → vendor-react → vendor → common → main.
     // Each chunk is marked with its correct dependency chain so WordPress
     // outputs <script> tags in the right order.
     $enqueued = [];
@@ -74,13 +74,13 @@ function dtb_enqueue_react_app() {
 
     $enqueue( 'dtb-runtime',      '/^runtime.*\.js$/',      [] );
     $enqueue( 'dtb-vendor-react', '/^vendor-react.*\.js$/', dtb_filter_deps( [ 'dtb-runtime' ], $enqueued ) );
-    // Match the manifest key "vendor.js" exactly - the webpack chunk is named "vendor"
+    // Match the manifest key "vendor.js" exactly — the webpack chunk is named "vendor"
     // by the splitChunks cacheGroup, distinct from "vendor-react".
     $enqueue( 'dtb-vendor',       '/^vendor\.js$/',         dtb_filter_deps( [ 'dtb-runtime' ], $enqueued ) );
     $enqueue( 'dtb-common',       '/^common.*\.js$/',        dtb_filter_deps( [ 'dtb-runtime', 'dtb-vendor-react', 'dtb-vendor' ], $enqueued ) );
     $enqueue( 'dtb-main',         '/^main.*\.js$/',          dtb_filter_deps( [ 'dtb-runtime', 'dtb-vendor-react', 'dtb-vendor', 'dtb-common' ], $enqueued ) );
 
-    // -- Runtime Config -------------------------------------------------------
+    // ── Runtime Config ───────────────────────────────────────────────────────
     // Expose site URLs and a REST nonce so the React app can read them from
     // window.DTB_CONFIG without hard-coding values at build time.
     if ( in_array( 'dtb-main', $enqueued, true ) ) {
@@ -119,7 +119,7 @@ function dtb_resolve_asset_url( $manifest_src, $dist_uri ) {
 
     // Extract the path component after /dist/ and rebuild with the real URI.
     // e.g. "/wp-content/themes/drywall-toolbox/dist/assets/js/main.hash.js"
-    //   => "assets/js/main.hash.js"
+    //   → "assets/js/main.hash.js"
     $relative = ltrim( preg_replace( '#^.*?/dist/#', '', $manifest_src ), '/' );
 
     return esc_url_raw( $dist_uri . '/' . $relative );
@@ -137,7 +137,7 @@ function dtb_filter_deps( array $wanted, array $enqueued ) {
     return array_values( array_intersect( $wanted, $enqueued ) );
 }
 
-// --- Template Override -------------------------------------------------------
+// ─── Template Override ───────────────────────────────────────────────────────
 // Force every public-facing request to use the React SPA shell (index.php).
 // WordPress admin, REST API, and wp-login.php are unaffected.
 
@@ -149,7 +149,7 @@ function dtb_force_react_template( $template ) {
     return get_template_directory() . '/index.php';
 }
 
-// --- Clean Up WordPress Head -------------------------------------------------
+// ─── Clean Up WordPress Head ─────────────────────────────────────────────────
 // Remove WordPress cruft that serves no purpose in a headless React SPA.
 
 add_action( 'init', 'dtb_clean_head' );
@@ -163,7 +163,7 @@ function dtb_clean_head() {
     remove_action( 'wp_head', 'feed_links_extra', 3 );
     remove_action( 'wp_head', 'wp_resource_hints', 2 );
 
-    // Disable WordPress emoji scripts - unused in React SPA.
+    // Disable WordPress emoji scripts — unused in React SPA.
     remove_action( 'wp_head', 'print_emoji_detection_script', 7 );
     remove_action( 'wp_print_styles', 'print_emoji_styles' );
     add_filter( 'emoji_svg_url', '__return_false' );
@@ -173,17 +173,17 @@ function dtb_clean_head() {
     remove_action( 'wp_head', 'wp_oembed_add_host_js' );
 }
 
-// --- Hide WordPress Version --------------------------------------------------
+// ─── Hide WordPress Version ──────────────────────────────────────────────────
 add_filter( 'the_generator', '__return_empty_string' );
 
-// --- Disable XML-RPC ---------------------------------------------------------
+// ─── Disable XML-RPC ─────────────────────────────────────────────────────────
 add_filter( 'xmlrpc_enabled', '__return_false' );
 add_filter( 'xmlrpc_methods', function() { return []; } );
 
-// --- Disable Admin Bar on Frontend -------------------------------------------
+// ─── Disable Admin Bar on Frontend ───────────────────────────────────────────
 add_filter( 'show_admin_bar', '__return_false' );
 
-// --- Prevent Author Enumeration ----------------------------------------------
+// ─── Prevent Author Enumeration ──────────────────────────────────────────────
 add_action( 'template_redirect', 'dtb_block_author_enumeration' );
 function dtb_block_author_enumeration() {
     if ( is_author() ) {
@@ -192,7 +192,7 @@ function dtb_block_author_enumeration() {
     }
 }
 
-// --- Security Headers --------------------------------------------------------
+// ─── Security Headers ────────────────────────────────────────────────────────
 add_action( 'send_headers', 'dtb_security_headers' );
 function dtb_security_headers() {
     if ( is_admin() ) {
@@ -205,7 +205,7 @@ function dtb_security_headers() {
     header( 'Permissions-Policy: camera=(), microphone=(), geolocation=()' );
 }
 
-// --- CORS for WooCommerce REST API -------------------------------------------
+// ─── CORS for WooCommerce REST API ───────────────────────────────────────────
 // Allows the React SPA (served at the same origin) and local dev server to
 // call /wp-json/wc/v3/* endpoints.
 
@@ -227,10 +227,10 @@ function dtb_send_cors_headers( $value ) {
     $raw_origin = isset( $_SERVER['HTTP_ORIGIN'] ) ? wp_unslash( $_SERVER['HTTP_ORIGIN'] ) : '';
 
     if ( $raw_origin && in_array( rtrim( $raw_origin, '/' ), $allowed, true ) ) {
-        // Origin is in the allowlist - safe to echo back after escaping.
+        // Origin is in the allowlist — safe to echo back after escaping.
         header( 'Access-Control-Allow-Origin: ' . esc_url_raw( $raw_origin ) );
     } else {
-        // Unknown origin - fall back to the production origin (same-origin requests
+        // Unknown origin — fall back to the production origin (same-origin requests
         // from browsers without an Origin header are unaffected).
         header( 'Access-Control-Allow-Origin: ' . esc_url_raw( home_url() ) );
     }
@@ -243,7 +243,7 @@ function dtb_send_cors_headers( $value ) {
     return $value;
 }
 
-// --- WooCommerce REST API Authentication -------------------------------------
+// ─── WooCommerce REST API Authentication ─────────────────────────────────────
 // Ensure unauthenticated product/category listing requests succeed while still
 // requiring authentication for order-related endpoints.
 
