@@ -2,7 +2,7 @@
  * frontend/src/api/products.js
  *
  * WooCommerce product helpers via the wcClient (REST API v3).
- * Base URL: VITE_WC_API_BASE (e.g. https://drywalltoolbox.com/wp/wp-json/wc/v3)
+ * Base URL: VITE_WC_API_BASE (e.g. https://drywalltoolbox.com/wp-json/wc/v3)
  *
  * Docs: https://woocommerce.github.io/woocommerce-rest-api-docs/#products
  */

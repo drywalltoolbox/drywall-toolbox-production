@@ -11,7 +11,7 @@
  */
 
 const SITE_URL      = import.meta.env.VITE_SITE_URL  || '';
-const STORE_API_BASE = `${SITE_URL}/wp/wp-json/wc/store/v1`;
+const STORE_API_BASE = `${SITE_URL}/wp-json/wc/store/v1`;
 
 // ─── Fetch helper ─────────────────────────────────────────────────────────────
 

@@ -24,7 +24,7 @@ const WP_API_BASE = import.meta.env.VITE_WP_API_BASE
   // Strip /wp/v2 suffix if present — we want the namespace root
   ?.replace(/\/wp\/v2\/?$/, '')
   // Fall back to production URL so static builds always have a default
-  ?? 'https://drywalltoolbox.com/wp/wp-json';
+  ?? 'https://drywalltoolbox.com/wp-json';
 
 /** Full URL of the schematics manifest endpoint. */
 export const SCHEMATICS_MEDIA_URL = `${WP_API_BASE}/dtb/v1/schematics/media`;

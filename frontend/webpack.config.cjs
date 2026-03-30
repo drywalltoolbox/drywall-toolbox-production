@@ -323,7 +323,7 @@ module.exports = (envFlags, argv) => {
       ],
       proxy: [
         {
-          context: ['/wp/wp-json'],
+          context: ['/wp-json'],
           target: 'http://localhost',
           changeOrigin: true,
         },

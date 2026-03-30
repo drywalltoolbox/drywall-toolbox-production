@@ -2,7 +2,7 @@
  * frontend/src/api/auth.js
  *
  * JWT authentication helpers for the WordPress REST API.
- * Token endpoint: VITE_JWT_ENDPOINT (e.g. /wp/wp-json/jwt-auth/v1/token)
+ * Token endpoint: VITE_JWT_ENDPOINT (e.g. /wp-json/jwt-auth/v1/token)
  *
  * Requires: jwt-authentication-for-wp-rest-api WordPress plugin.
  */

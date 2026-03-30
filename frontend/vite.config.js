@@ -1,6 +1,9 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
-import { resolve } from 'path';
+import { resolve, dirname } from 'path';
+import { fileURLToPath } from 'url';
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -44,11 +47,11 @@ export default defineConfig({
     },
   },
 
-  // Dev server — proxy /wp/wp-json to local WordPress
+  // Dev server — proxy /wp-json to local WordPress (matches production)
   server: {
     port: 5173,
     proxy: {
-      '/wp/wp-json': {
+      '/wp-json': {
         target: 'http://localhost',
         changeOrigin: true,
       },
