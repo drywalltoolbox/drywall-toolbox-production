@@ -20,7 +20,7 @@ A professional, fully responsive coming-soon landing page WordPress theme for Dr
 3. Activate "Drywall Toolbox" theme
 
 ## Customization
--
+
 ### Logo
 1. Go to Appearance > Customize
 2. Click on "Site Identity"

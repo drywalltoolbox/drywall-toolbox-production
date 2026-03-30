@@ -6,85 +6,145 @@ on:
       - main
     paths:
       - 'wp/wp-content/**'
+      - 'src/**'
+      - 'public/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'webpack.config.cjs'
+      - '.github/workflows/deploy.yml'
   workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Dry run (no files uploaded)'
+        required: false
+        default: false
+        type: boolean
+
+concurrency:
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
-  deploy:
-    name: FTP Deploy to HostGator
+  build:
+    name: Build React Assets
     runs-on: ubuntu-latest
     permissions:
       contents: read
+
+    outputs:
+      build-cache-key: ${{ steps.cache-key.outputs.key }}
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          fetch-depth: 1            # Shallow clone — history not needed for build
 
-      - name: Validate wp-content structure
-        run: |
-          echo "PWD=$(pwd)"
-          echo "-- root files --"
-          ls -la
-          echo "-- wp folder --"
-          ls -la wp || true
-          echo "-- wp/wp-content --"
-          ls -la wp/wp-content || true
-          echo "-- themes --"
-          ls -la wp/wp-content/themes || true
-          echo "-- plugins --"
-          ls -la wp/wp-content/plugins || true
-
-      - name: Setup Node.js (for building React assets)
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
+          cache: 'npm'              # Built-in npm cache (replaces manual cache step)
 
-      - name: Install Node dependencies
-        run: npm ci
+      - name: Install dependencies
+        run: npm ci --prefer-offline --no-audit --no-fund
 
       - name: Build frontend (webpack)
-        # Builds production assets into wp/wp-content/themes/drywall-toolbox/dist
         run: npm run build
-        # Pass build-time secrets into the Node process so webpack/DefinePlugin
-        # can inject them into the compiled bundle. Add PUBLIC_URL if you need
-        # to serve from a subpath (e.g. /drywall-toolbox/).
         env:
-          REACT_APP_WP_BASE_URL: ${{ secrets.REACT_APP_WP_BASE_URL }}
-          REACT_APP_WC_BASE_URL: ${{ secrets.REACT_APP_WC_BASE_URL }}
-          REACT_APP_WC_CONSUMER_KEY: ${{ secrets.REACT_APP_WC_CONSUMER_KEY }}
-          REACT_APP_WC_CONSUMER_SECRET: ${{ secrets.REACT_APP_WC_CONSUMER_SECRET }}
-          VITE_WOOCOMMERCE_STORE_URL: ${{ secrets.VITE_WOOCOMMERCE_STORE_URL }}
-          VITE_WOOCOMMERCE_CONSUMER_KEY: ${{ secrets.VITE_WOOCOMMERCE_CONSUMER_KEY }}
+          NODE_ENV: production
+          REACT_APP_WP_BASE_URL:          ${{ secrets.REACT_APP_WP_BASE_URL }}
+          REACT_APP_WC_BASE_URL:          ${{ secrets.REACT_APP_WC_BASE_URL }}
+          REACT_APP_WC_CONSUMER_KEY:      ${{ secrets.REACT_APP_WC_CONSUMER_KEY }}
+          REACT_APP_WC_CONSUMER_SECRET:   ${{ secrets.REACT_APP_WC_CONSUMER_SECRET }}
+          VITE_WOOCOMMERCE_STORE_URL:     ${{ secrets.VITE_WOOCOMMERCE_STORE_URL }}
+          VITE_WOOCOMMERCE_CONSUMER_KEY:  ${{ secrets.VITE_WOOCOMMERCE_CONSUMER_KEY }}
           VITE_WOOCOMMERCE_CONSUMER_SECRET: ${{ secrets.VITE_WOOCOMMERCE_CONSUMER_SECRET }}
-          PUBLIC_URL: ${{ secrets.PUBLIC_URL }}
+          PUBLIC_URL:                     ${{ secrets.PUBLIC_URL }}
 
-      - name: Prune generated maps & large CSVs before upload
+      - name: Validate build output
         run: |
-          echo "Pruning source maps and large CSVs to speed up upload..."
-          # remove source maps from the generated theme dist (if any)
-          if [ -d "wp/wp-content/themes/drywall-toolbox/dist" ]; then
-            find wp/wp-content/themes/drywall-toolbox/dist -type f -name "*.map" -print -delete || true
+          DIST="wp/wp-content/themes/drywall-toolbox/dist"
+          echo "── dist contents ──"
+          find "$DIST" -type f | sort
+          # Fail fast if the HTML entry point is missing
+          if [ ! -f "$DIST/index.html" ]; then
+            echo "ERROR: dist/index.html not found — build may have failed."
+            exit 1
           fi
-          # remove large products CSV if present in the theme assets
-          find wp/wp-content/themes/drywall-toolbox -type f -name "products_catalog.csv" -print -delete || true
+          if [ ! -f "$DIST/asset-manifest.json" ]; then
+            echo "ERROR: asset-manifest.json not found — PHP enqueue will break."
+            exit 1
+          fi
+          echo "✓ Build output validated."
 
-      - name: Deploy themes and plugins via FTPS
+      - name: Prune source maps and large assets before upload
+        run: |
+          DIST="wp/wp-content/themes/drywall-toolbox/dist"
+          echo "Pruning .map files..."
+          find "$DIST" -type f -name "*.map" -print -delete || true
+          echo "Pruning large product CSVs from theme folder..."
+          find wp/wp-content/themes/drywall-toolbox -type f -name "products_catalog*.csv" -print -delete || true
+          echo "✓ Pruning complete."
+
+      - name: Generate build artifact key
+        id: cache-key
+        run: echo "key=build-${{ github.sha }}" >> "$GITHUB_OUTPUT"
+
+      - name: Upload dist as workflow artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-${{ github.sha }}
+          path: wp/wp-content/
+          retention-days: 1         # Short retention — only needed for the deploy job
+          if-no-files-found: error
+
+  deploy:
+    name: FTP Deploy to HostGator
+    runs-on: ubuntu-latest
+    needs: build
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout repository (PHP/plugin files)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          # Only need the non-built wp-content files (plugins, mu-plugins, etc.)
+          sparse-checkout: |
+            wp/wp-content/plugins
+            wp/wp-content/mu-plugins
+
+      - name: Download build artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: build-${{ github.sha }}
+          path: wp/wp-content/
+
+      - name: Validate wp-content structure pre-deploy
+        run: |
+          echo "── wp-content layout ──"
+          ls -la wp/wp-content/ || true
+          echo "── themes ──"
+          ls -la wp/wp-content/themes/ || true
+          echo "── plugins ──"
+          ls -la wp/wp-content/plugins/ || true
+          echo "── dist ──"
+          ls -la wp/wp-content/themes/drywall-toolbox/dist/ || true
+
+      - name: Deploy via FTPS
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
-          server: ${{ secrets.HOSTGATOR_FTP_HOST }}
+          server:   ${{ secrets.HOSTGATOR_FTP_HOST }}
           username: ${{ secrets.HOSTGATOR_FTP_USER }}
           password: ${{ secrets.HOSTGATOR_FTP_PASS }}
           protocol: ftps
-          port: ${{ secrets.HOSTGATOR_FTP_PORT }}
-          # server-dir must match the FTP account's document-root on HostGator.
-          # Use the full path to the site's public HTML if your FTP user is
-          # anchored at the account home. For this host the site home is:
-          # /home1/benconklin/public_html/website_a246e6a8
-          # Adjusted to match the File Manager path you provided which includes
-          # an extra public_html folder.
+          port:     ${{ secrets.HOSTGATOR_FTP_PORT }}
+          # ── Server path (unchanged from original config) ──────────────────
+          # /home1/benconklin/public_html/website_a246e6a8/public_html/wp-content/
           server-dir: /home1/benconklin/public_html/website_a246e6a8/public_html/wp-content/
-          local-dir: ./wp/wp-content/
+          local-dir:  ./wp/wp-content/
           exclude: |
             **/.git*
             **/.github/**
@@ -99,22 +159,58 @@ jobs:
             **/*.map
             **/products_catalog.csv
             **/catalog/**
+            **/themes/drywall-toolbox/dist/brands/**
+            **/dist/brands/**
+            **/public/brands/**
           dangerous-clean-slate: false
           log-level: verbose
-          dry-run: false
+          dry-run: ${{ github.event.inputs.dry_run == 'true' }}
           timeout: 300000
 
-      - name: Deployment complete
-        if: always()
-        run: echo "✓ Deployed to HostGator at $(date -u '+%Y-%m-%dT%H:%M:%SZ')"
-
-      - name: Post-deploy verification (manifest)
+      - name: Deployment summary
         if: always()
         run: |
-          echo "Checking asset-manifest.json on live site..."
-          code=$(curl -s -o /dev/null -w "%{http_code}" "https://drywalltoolbox.com/wp-content/themes/drywall-toolbox/dist/asset-manifest.json" || echo "000")
-          echo "HTTP status for asset-manifest.json: $code"
-          if [ "$code" != "200" ]; then
-            echo "Warning: asset-manifest.json not reachable (status $code). If deploy just finished, re-run workflow or check HostGator File Manager.";
-            exit 0
+          echo "────────────────────────────────────────────"
+          echo "  Deploy status : ${{ job.status }}"
+          echo "  Commit SHA    : ${{ github.sha }}"
+          echo "  Triggered by  : ${{ github.actor }}"
+          echo "  Timestamp     : $(date -u '+%Y-%m-%dT%H:%M:%SZ')"
+          echo "  Dry run       : ${{ github.event.inputs.dry_run == 'true' }}"
+          echo "────────────────────────────────────────────"
+
+  verify:
+    name: Post-Deploy Verification
+    runs-on: ubuntu-latest
+    needs: deploy
+    if: success() && github.event.inputs.dry_run != 'true'
+
+    steps:
+      - name: Check asset-manifest.json on live site
+        run: |
+          URL="https://drywalltoolbox.com/wp-content/themes/drywall-toolbox/dist/asset-manifest.json"
+          echo "Probing: $URL"
+          # Retry up to 3 times with 15-second back-off (FTP may take a moment to flush)
+          for attempt in 1 2 3; do
+            code=$(curl -s -o /tmp/manifest.json -w "%{http_code}" "$URL" || echo "000")
+            echo "Attempt $attempt — HTTP $code"
+            if [ "$code" = "200" ]; then
+              echo "✓ asset-manifest.json is reachable."
+              echo "── manifest contents ──"
+              cat /tmp/manifest.json
+              exit 0
+            fi
+            [ "$attempt" -lt 3 ] && sleep 15
+          done
+          echo "⚠ asset-manifest.json not reachable after 3 attempts (status $code)."
+          echo "  Check HostGator File Manager or re-run the workflow."
+          exit 0    # Non-fatal — FTP propagation can lag; don't fail the run
+
+      - name: Check site homepage reachability
+        run: |
+          code=$(curl -s -o /dev/null -w "%{http_code}" "https://drywalltoolbox.com/" || echo "000")
+          echo "Homepage HTTP status: $code"
+          if [ "$code" != "200" ] && [ "$code" != "301" ] && [ "$code" != "302" ]; then
+            echo "⚠ Homepage returned unexpected status $code — investigate if this persists."
+          else
+            echo "✓ Homepage is reachable."
           fi
