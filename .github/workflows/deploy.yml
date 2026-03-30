@@ -120,7 +120,11 @@ jobs:
       # For push events github.event.inputs.remote_root is undefined, so we
       # fall back to the hardcoded production path.  For workflow_dispatch it
       # uses the caller-supplied value (which defaults to the same path).
-      REMOTE_ROOT: "${{ github.event.inputs.remote_root || '/home1/benconklin/public_html/website_a246e6a8' }}"
+      # Prefer an explicit secret first (safer), then the workflow input, then
+      # the legacy hard-coded default. Set `HOSTGATOR_REMOTE_ROOT` in repo
+      # secrets to the exact cPanel path (for example: /home/youruser/public_html/website_a246e6a8
+      # or public_html/website_a246e6a8 depending on your FTP user chroot).
+      REMOTE_ROOT: "${{ secrets.HOSTGATOR_REMOTE_ROOT || github.event.inputs.remote_root || '/home1/benconklin/public_html/website_a246e6a8' }}"
 
     steps:
       - name: Checkout repository (wp/ + root files)
@@ -153,10 +157,12 @@ jobs:
           sudo apt-get update -y >/dev/null
           sudo apt-get install -y lftp >/dev/null
           echo "Probing FTP server: ${{ secrets.HOSTGATOR_FTP_HOST }} (will print remote pwd and top-level listing)"
-          # Use lftp to print remote working directory and a short listing. This reveals
-          # the server-side root the FTP user is jailed to (useful to detect mismatched paths).
+          # Some HostGator FTPS endpoints present a certificate CN that doesn't
+          # match the host name; to get a useful diagnostic listing we disable
+          # certificate verification for this probe only. This is safe for
+          # debugging but should not be used for production uploads.
           lftp -u "${{ secrets.HOSTGATOR_FTP_USER }},${{ secrets.HOSTGATOR_FTP_PASS }}" \
-            -e "pwd; ls -la; quit" "${{ secrets.HOSTGATOR_FTP_HOST }}" || true
+            -e "set ssl:verify-certificate no; pwd; ls -la; quit" "${{ secrets.HOSTGATOR_FTP_HOST }}" || true
 
       - name: "Dry-run: display what would be deployed"
         if: ${{ github.event.inputs.dry_run == 'true' }}
@@ -174,6 +180,19 @@ jobs:
           echo "── root-deploy contents ──"
           ls -la root-deploy/
 
+      - name: Normalize REMOTE_ROOT (strip leading slash)
+        run: |
+          # Some FTP users are jailed to a home directory. If REMOTE_ROOT is an
+          # absolute path (starts with '/') the FTP server may append it under
+          # the logged-in user's home, creating a duplicated path. To avoid
+          # that, strip a leading slash so we use a path relative to the FTP
+          # home (for example: public_html/website_a246e6a8).
+          DEPLOY_ROOT="${{ env.REMOTE_ROOT }}"
+          # remove leading slash
+          DEPLOY_ROOT="${DEPLOY_ROOT#/}"
+          echo "DEPLOY_ROOT=$DEPLOY_ROOT" >> "$GITHUB_ENV"
+          echo "Normalized REMOTE_ROOT -> $DEPLOY_ROOT"
+
       - name: Deploy root files (.htaccess, index.php) via FTPS
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
@@ -182,7 +201,7 @@ jobs:
           password: ${{ secrets.HOSTGATOR_FTP_PASS }}
           protocol: ftps
           port:     ${{ secrets.HOSTGATOR_FTP_PORT }}
-          server-dir: ${{ env.REMOTE_ROOT }}/
+          server-dir: ${{ env.DEPLOY_ROOT }}/
           local-dir:  ./root-deploy/
           exclude: |
             **/.git*
@@ -200,7 +219,7 @@ jobs:
           password: ${{ secrets.HOSTGATOR_FTP_PASS }}
           protocol: ftps
           port:     ${{ secrets.HOSTGATOR_FTP_PORT }}
-          server-dir: ${{ env.REMOTE_ROOT }}/dist/
+          server-dir: ${{ env.DEPLOY_ROOT }}/dist/
           local-dir:  ./dist/
           exclude: |
             **/.git*
@@ -222,7 +241,7 @@ jobs:
           password: ${{ secrets.HOSTGATOR_FTP_PASS }}
           protocol: ftps
           port:     ${{ secrets.HOSTGATOR_FTP_PORT }}
-          server-dir: ${{ env.REMOTE_ROOT }}/wp/wp-content/
+          server-dir: ${{ env.DEPLOY_ROOT }}/wp/wp-content/
           local-dir:  ./wp/wp-content/
           exclude: |
             **/.git*
