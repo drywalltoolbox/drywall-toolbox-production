@@ -81,10 +81,14 @@ jobs:
       - name: Prune source maps and large assets before upload
         run: |
           DIST="wp/wp-content/themes/drywall-toolbox/dist"
+          ASSETS="wp/wp-content/themes/drywall-toolbox/assets"
           echo "Pruning .map files..."
           find "$DIST" -type f -name "*.map" -print -delete || true
           echo "Pruning large product CSVs from theme folder..."
           find wp/wp-content/themes/drywall-toolbox -type f -name "products_catalog*.csv" -print -delete || true
+          echo "Pruning schematic image trees (static assets — upload once via File Manager)..."
+          rm -rf "$ASSETS/brands/Columbia/Schematics" || true
+          rm -rf "$ASSETS/brands/TapeTech/Schematics" || true
           echo "✓ Pruning complete."
 
       - name: Generate build artifact key
@@ -162,6 +166,10 @@ jobs:
             **/themes/drywall-toolbox/dist/brands/**
             **/dist/brands/**
             **/public/brands/**
+            # Schematic image folders — large static assets uploaded once manually.
+            # Never re-upload via CI; manage through HostGator File Manager instead.
+            **/assets/brands/Columbia/Schematics/**
+            **/assets/brands/TapeTech/Schematics/**
           dangerous-clean-slate: false
           log-level: verbose
           dry-run: ${{ github.event.inputs.dry_run == 'true' }}
@@ -176,6 +184,7 @@ jobs:
           echo "  Triggered by  : ${{ github.actor }}"
           echo "  Timestamp     : $(date -u '+%Y-%m-%dT%H:%M:%SZ')"
           echo "  Dry run       : ${{ github.event.inputs.dry_run == 'true' }}"
+          echo "  JS chunks     : $(find wp/wp-content/themes/drywall-toolbox/dist/assets/js -name '*.js' 2>/dev/null | wc -l) files"
           echo "────────────────────────────────────────────"
 
   verify:

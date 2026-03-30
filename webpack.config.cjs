@@ -117,6 +117,9 @@ module.exports = (envFlags, argv) => {
       publicPath,
       // Deterministic hashes for reliable long-term browser caching
       filename:  isDev ? 'assets/js/[name].js'                  : 'assets/js/[name].[contenthash:8].js',
+      // Lazy-loaded route chunks get readable names in dev, hashed in prod.
+      // [name] resolves to the page component name (e.g. "Home", "Products")
+      // because App.jsx uses named import() calls via React.lazy().
       chunkFilename: isDev ? 'assets/js/[name].chunk.js'        : 'assets/js/[name].[contenthash:8].chunk.js',
       assetModuleFilename: 'assets/media/[name].[hash:8][ext]',
       clean: true,
@@ -273,28 +276,32 @@ module.exports = (envFlags, argv) => {
       splitChunks: {
         chunks: 'all',
         maxInitialRequests: 25,
+        maxAsyncRequests:   30,   // Allow up to 30 parallel lazy chunk requests
         minSize: 20_000,
         cacheGroups: {
-          // Large third-party libs that change rarely — cache them independently
+          // React core — changes only on React version bumps, very long cache life
           reactVendor: {
             test:     /[\\/]node_modules[\\/](react|react-dom|react-router(-dom)?)[\\/]/,
             name:     'vendor-react',
             chunks:   'all',
             priority: 30,
           },
+          // All other node_modules — changes less often than app code
           vendor: {
             test:     /[\\/]node_modules[\\/]/,
             name:     'vendor',
             chunks:   'all',
             priority: 20,
           },
-          // Shared modules used by ≥2 chunks get their own file
+          // Shared app modules used by ≥2 chunks (including lazy route chunks)
+          // e.g. shared hooks, utility functions, shared components
           common: {
             name:               'common',
             minChunks:          2,
             chunks:             'all',
             priority:           10,
             reuseExistingChunk: true,
+            enforce:            true,  // Always split even if below minSize
           },
         },
       },
@@ -332,9 +339,11 @@ module.exports = (envFlags, argv) => {
 
     // ─── Performance ───────────────────────────────────────────────────────
     performance: {
-      // Warn when a bundle or asset exceeds these sizes (bytes)
+      // Warn when a bundle or asset exceeds these sizes (bytes).
+      // Thresholds are tighter now that route chunks are lazy-loaded —
+      // the initial entrypoint should be well under 500 KB.
       hints:             isDev ? false : 'warning',
-      maxEntrypointSize: 512_000,   // 500 KB
+      maxEntrypointSize: 500_000,   // 500 KB — should be comfortably met post-lazy
       maxAssetSize:      1_000_000, // 1 MB — schematic images are intentionally large
     },
 
@@ -342,7 +351,8 @@ module.exports = (envFlags, argv) => {
     // Clean, readable output in CI logs; full detail locally via --display verbose
     stats: isDev ? 'errors-warnings' : {
       assets:       true,
-      chunks:       false,
+      chunks:       true,          // Show chunk list — useful to verify lazy splits
+      chunkGroups:  false,
       modules:      false,
       entrypoints:  true,
       colors:       true,
