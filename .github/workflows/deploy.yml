@@ -71,7 +71,9 @@ jobs:
           # Use the full path to the site's public HTML if your FTP user is
           # anchored at the account home. For this host the site home is:
           # /home1/benconklin/public_html/website_a246e6a8
-          server-dir: /home1/benconklin/public_html/website_a246e6a8/wp-content/
+          # Adjusted to match the File Manager path you provided which includes
+          # an extra public_html folder.
+          server-dir: /home1/benconklin/public_html/website_a246e6a8/public_html/wp-content/
           local-dir: ./wp/wp-content/
           exclude: |
             **/.git*
