@@ -164,7 +164,7 @@ jobs:
           password: ${{ secrets.HOSTGATOR_FTP_PASS }}
           protocol: ftps
           port:     ${{ secrets.HOSTGATOR_FTP_PORT }}
-          server-dir: /home1/benconklin/public_html/website_a246e6a8/
+          server-dir: ${{ github.event.inputs.remote_root }}
           local-dir:  ./root-deploy/
           exclude: |
             **/.git*
@@ -182,7 +182,7 @@ jobs:
           password: ${{ secrets.HOSTGATOR_FTP_PASS }}
           protocol: ftps
           port:     ${{ secrets.HOSTGATOR_FTP_PORT }}
-          server-dir: /home1/benconklin/public_html/website_a246e6a8/dist/
+          server-dir: ${{ github.event.inputs.remote_root }}/dist/
           local-dir:  ./dist/
           exclude: |
             **/.git*
@@ -204,7 +204,7 @@ jobs:
           password: ${{ secrets.HOSTGATOR_FTP_PASS }}
           protocol: ftps
           port:     ${{ secrets.HOSTGATOR_FTP_PORT }}
-          server-dir: /home1/benconklin/public_html/website_a246e6a8/wp/wp-content/
+          server-dir: ${{ github.event.inputs.remote_root }}/wp/wp-content/
           local-dir:  ./wp/wp-content/
           exclude: |
             **/.git*
