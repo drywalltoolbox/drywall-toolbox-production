@@ -147,6 +147,17 @@ jobs:
           echo "── root files ──"
           ls -la .htaccess index.php 2>/dev/null || true
 
+      - name: Probe FTP root (diagnostic)
+        run: |
+          echo "Installing lftp for FTP probe..."
+          sudo apt-get update -y >/dev/null
+          sudo apt-get install -y lftp >/dev/null
+          echo "Probing FTP server: ${{ secrets.HOSTGATOR_FTP_HOST }} (will print remote pwd and top-level listing)"
+          # Use lftp to print remote working directory and a short listing. This reveals
+          # the server-side root the FTP user is jailed to (useful to detect mismatched paths).
+          lftp -u "${{ secrets.HOSTGATOR_FTP_USER }},${{ secrets.HOSTGATOR_FTP_PASS }}" \
+            -e "pwd; ls -la; quit" "${{ secrets.HOSTGATOR_FTP_HOST }}" || true
+
       - name: "Dry-run: display what would be deployed"
         if: ${{ github.event.inputs.dry_run == 'true' }}
         run: |
