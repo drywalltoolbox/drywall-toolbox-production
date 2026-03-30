@@ -3,7 +3,7 @@
 Headless React storefront for Drywalltoolbox.com — powered by WordPress + WooCommerce as the backend CMS.
 
 **Architecture:** React SPA (webpack) → WooCommerce REST API v3 → HostGator shared hosting
-
+--
 This repository contains:
 
 - A React SPA (`src/`) that fetches all product and category data from the WooCommerce REST API. No static product data is bundled — WordPress is the single source of truth.
