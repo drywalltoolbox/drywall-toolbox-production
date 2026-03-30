@@ -20,7 +20,7 @@ on:
       remote_root:
         description: 'Remote site root path'
         required: false
-        default: '/home1/benconklin/public_html/website_a246e6a8'
+        default: '/home4/benconklin/public_html/website_a246e6a8'
         type: string
 
 concurrency:
@@ -150,11 +150,17 @@ jobs:
           sudo apt-get install -y lftp >/dev/null
           echo "Probing FTP server: ${{ secrets.HOSTGATOR_FTP_HOST }} (will print remote pwd and top-level listing)"
           # Capture the FTP user's working directory to help compute a safe
-          # server-dir that is relative to the FTP home. Save to /tmp/ftp_pwd.txt
+          # server-dir that is relative to the FTP home. Run `pwd` separately
+          # so we reliably capture only the working directory line.
           lftp -u "${{ secrets.HOSTGATOR_FTP_USER }},${{ secrets.HOSTGATOR_FTP_PASS }}" \
-            -e "set ssl:verify-certificate no; pwd; ls -la; quit" "${{ secrets.HOSTGATOR_FTP_HOST }}" 2>/dev/null | tee /tmp/ftp_probe.txt || true
-          # The last non-empty line of the probe contains the pwd. Write it to a file.
-          awk 'NF{last=$0} END{print last}' /tmp/ftp_probe.txt > /tmp/ftp_pwd.txt || true
+            -e "set ssl:verify-certificate no; pwd; bye" "${{ secrets.HOSTGATOR_FTP_HOST }}" 2>/dev/null > /tmp/ftp_pwd_raw.txt || true
+
+          # Also capture a top-level listing for diagnostics.
+          lftp -u "${{ secrets.HOSTGATOR_FTP_USER }},${{ secrets.HOSTGATOR_FTP_PASS }}" \
+            -e "set ssl:verify-certificate no; ls -la; bye" "${{ secrets.HOSTGATOR_FTP_HOST }}" 2>/dev/null > /tmp/ftp_probe.txt || true
+
+          # Extract the first non-empty line from the pwd output (the pwd)
+          awk 'NF{print; exit}' /tmp/ftp_pwd_raw.txt > /tmp/ftp_pwd.txt || true
           echo "FTP probe saved to /tmp/ftp_probe.txt; PWD -> $(cat /tmp/ftp_pwd.txt 2>/dev/null || echo '<empty>')"
 
       - name: "Dry-run: display what would be deployed"
