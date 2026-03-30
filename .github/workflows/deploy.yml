@@ -68,10 +68,10 @@ jobs:
           protocol: ftps
           port: ${{ secrets.HOSTGATOR_FTP_PORT }}
           # server-dir must match the FTP account's document-root on HostGator.
-          # If the FTP account's home is the cPanel user home directory, use
-          # /public_html/wp-content/.  If the FTP account's home is already
-          # public_html/, use /wp-content/. Adjust to match your cPanel setup.
-          server-dir: /public_html/wp-content/
+          # Use the full path to the site's public HTML if your FTP user is
+          # anchored at the account home. For this host the site home is:
+          # /home1/benconklin/public_html/website_a246e6a8
+          server-dir: /home1/benconklin/public_html/website_a246e6a8/wp-content/
           local-dir: ./wp/wp-content/
           exclude: |
             **/.git*
