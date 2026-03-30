@@ -120,7 +120,7 @@ jobs:
       # For push events github.event.inputs.remote_root is undefined, so we
       # fall back to the hardcoded production path.  For workflow_dispatch it
       # uses the caller-supplied value (which defaults to the same path).
-      REMOTE_ROOT: ${{ github.event.inputs.remote_root || '/home1/benconklin/public_html/website_a246e6a8' }}
+      REMOTE_ROOT: "${{ github.event.inputs.remote_root || '/home1/benconklin/public_html/website_a246e6a8' }}"
 
     steps:
       - name: Checkout repository (wp/ + root files)
@@ -148,7 +148,7 @@ jobs:
           ls -la .htaccess index.php 2>/dev/null || true
 
       - name: "Dry-run: display what would be deployed"
-        if: "${{ github.event.inputs.dry_run == 'true' }}"
+        if: ${{ github.event.inputs.dry_run == 'true' }}
         run: |
           echo "Dry-run mode: displaying deploy plan."
           echo
@@ -178,7 +178,7 @@ jobs:
             **/.github/**
           dangerous-clean-slate: false
           log-level: verbose
-          dry-run: "${{ github.event.inputs.dry_run == 'true' }}"
+          dry-run: ${{ github.event.inputs.dry_run == 'true' }}
           timeout: 60000
 
       - name: Deploy dist/ via FTPS
@@ -200,7 +200,7 @@ jobs:
             **/*.map
           dangerous-clean-slate: true
           log-level: verbose
-          dry-run: "${{ github.event.inputs.dry_run == 'true' }}"
+          dry-run: ${{ github.event.inputs.dry_run == 'true' }}
           timeout: 300000
 
       - name: Deploy wp/wp-content/ via FTPS
@@ -229,7 +229,7 @@ jobs:
             **/catalog/**
           dangerous-clean-slate: false
           log-level: verbose
-          dry-run: "${{ github.event.inputs.dry_run == 'true' }}"
+          dry-run: ${{ github.event.inputs.dry_run == 'true' }}
           timeout: 300000
 
       - name: Deployment summary

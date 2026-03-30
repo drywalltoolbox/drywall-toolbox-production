@@ -10,14 +10,17 @@
  *
  * REST endpoint:
  *   GET /wp-json/dtb/v1/schematics/media
- *   Returns: { "<schematic-id>": { "pages": { "1": { "url": "...", "width": n, "height": n }, ... }, "preview": "..." }, ... }
+ *   Returns: JSON manifest mapping schematic IDs to pages and preview URLs.
  *
  * Upload workflow:
- *   1. Run  scripts/convert_schematics_to_webp.py  to convert PNG/JPG -> WebP.
- *   2. Run  scripts/upload_schematics_to_wp.py      to batch-upload to WP Media Library.
- *      The script sets the three meta fields below on every uploaded attachment.
- *   3. Once you confirm the manifest endpoint returns all expected images, you
- *      may delete the PNG/JPG originals from public/brands/*/Schematics/.
+ *   1. Convert source PNG/JPG schematic images to WebP using
+ *      scripts/convert_schematics_to_webp.py.
+ *   2. Batch-upload converted WebP files with
+ *      scripts/upload_schematics_to_wp.py (the script sets the attachment meta
+ *      fields used by this endpoint).
+ *   3. After verifying the manifest contains the uploaded images, you may
+ *      remove original PNG/JPG files from the corresponding
+ *      public/brands/<brand>/Schematics/ directories (replace <brand> as needed).
  *
  * @package drywall-toolbox
  */
@@ -94,7 +97,10 @@ function dtb_get_schematic_media_manifest() {
 
 	$manifest = [];
 
+	/** @var WP_Post[] $attachments */
+	/** @var WP_Post[] $attachments */
 	foreach ( $attachments as $attachment ) {
+		/** @var WP_Post $attachment */
 		$id   = get_post_meta( $attachment->ID, '_dtb_schematic_id', true );
 		$page = get_post_meta( $attachment->ID, '_dtb_schematic_page', true );
 		$type = get_post_meta( $attachment->ID, '_dtb_schematic_type', true );
@@ -111,7 +117,8 @@ function dtb_get_schematic_media_manifest() {
 		}
 
 		$url  = wp_get_attachment_url( $attachment->ID );
-		$meta = wp_get_attachment_metadata( $attachment->ID );
+	/** @var array|false $meta */
+	$meta = wp_get_attachment_metadata( $attachment->ID );
 
 		$entry = [
 			'url'    => $url,
