@@ -145,8 +145,9 @@ module.exports = (env, argv) => {
         {
           from:        'public',
           to:          '.',
-          // index.html is already emitted by HtmlWebpackPlugin
-          globOptions: { ignore: ['**/index.html'] },
+          // index.html is already emitted by HtmlWebpackPlugin. Also ignore
+          // large product CSVs that we no longer serve from the static build.
+          globOptions: { ignore: ['**/index.html', '**/products_catalog.csv', '**/products_catalog_*.csv'] },
         },
       ],
     }),
