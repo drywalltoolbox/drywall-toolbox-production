@@ -15,8 +15,10 @@ import axios from 'axios';
 
 // ─── Base URLs ────────────────────────────────────────────────────────────────
 
-const WP_API_BASE   = import.meta.env.VITE_WP_API_BASE   || '';
-const WC_API_BASE   = import.meta.env.VITE_WC_API_BASE   || '';
+// Prefer build-time VITE_* values but fall back to sensible runtime defaults
+// so the SPA can still call WP endpoints if environment injection was misconfigured.
+const WP_API_BASE   = import.meta.env.VITE_WP_API_BASE   || (typeof window !== 'undefined' ? `${window.location.origin}/wp-json/` : '');
+const WC_API_BASE   = import.meta.env.VITE_WC_API_BASE   || (typeof window !== 'undefined' ? `${window.location.origin}/wp-json/wc/v3` : '');
 const WC_AUTH_USER  = import.meta.env.VITE_WC_AUTH_USER  || '';
 const WC_AUTH_PASS  = import.meta.env.VITE_WC_AUTH_PASS  || '';
 

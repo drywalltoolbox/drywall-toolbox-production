@@ -12,7 +12,8 @@
  * WooCommerce REST API docs: https://woocommerce.github.io/woocommerce-rest-api-docs/
  */
 
-const WC_BASE  = process.env.REACT_APP_WC_BASE_URL        || '';
+// Prefer build-time env injection, fall back to runtime-origin based paths
+const WC_BASE  = process.env.REACT_APP_WC_BASE_URL || (typeof window !== 'undefined' ? `${window.location.origin}/wp-json/wc/v3` : '');
 const KEY      = process.env.REACT_APP_WC_CONSUMER_KEY    || '';
 const SECRET   = process.env.REACT_APP_WC_CONSUMER_SECRET || '';
 
