@@ -35,6 +35,30 @@ jobs:
           echo "-- plugins --"
           ls -la wp/wp-content/plugins || true
 
+      - name: Setup Node.js (for building React assets)
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Node dependencies
+        run: npm ci
+
+      - name: Build frontend (webpack)
+        # Builds production assets into wp/wp-content/themes/drywall-toolbox/dist
+        run: npm run build
+        # Pass build-time secrets into the Node process so webpack/DefinePlugin
+        # can inject them into the compiled bundle. Add PUBLIC_URL if you need
+        # to serve from a subpath (e.g. /drywall-toolbox/).
+        env:
+          REACT_APP_WP_BASE_URL: ${{ secrets.REACT_APP_WP_BASE_URL }}
+          REACT_APP_WC_BASE_URL: ${{ secrets.REACT_APP_WC_BASE_URL }}
+          REACT_APP_WC_CONSUMER_KEY: ${{ secrets.REACT_APP_WC_CONSUMER_KEY }}
+          REACT_APP_WC_CONSUMER_SECRET: ${{ secrets.REACT_APP_WC_CONSUMER_SECRET }}
+          VITE_WOOCOMMERCE_STORE_URL: ${{ secrets.VITE_WOOCOMMERCE_STORE_URL }}
+          VITE_WOOCOMMERCE_CONSUMER_KEY: ${{ secrets.VITE_WOOCOMMERCE_CONSUMER_KEY }}
+          VITE_WOOCOMMERCE_CONSUMER_SECRET: ${{ secrets.VITE_WOOCOMMERCE_CONSUMER_SECRET }}
+          PUBLIC_URL: ${{ secrets.PUBLIC_URL }}
+
       - name: Deploy themes and plugins via FTPS
         uses: SamKirkland/FTP-Deploy-Action@v4.3.4
         with:
@@ -42,7 +66,7 @@ jobs:
           username: ${{ secrets.HOSTGATOR_FTP_USER }}
           password: ${{ secrets.HOSTGATOR_FTP_PASS }}
           protocol: ftps
-          port: 21
+          port: ${{ secrets.HOSTGATOR_FTP_PORT }}
           # server-dir must match the FTP account's document-root on HostGator.
           # If the FTP account's home is the cPanel user home directory, use
           # /public_html/wp-content/.  If the FTP account's home is already
