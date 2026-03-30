@@ -5,7 +5,7 @@ on:
     branches:
       - main
     paths:
-      - 'wp/wp-content/**'
+      - 'wp-content/**'
       - 'src/**'
       - 'public/**'
       - 'package.json'
@@ -64,7 +64,7 @@ jobs:
 
       - name: Validate build output
         run: |
-          DIST="wp/wp-content/themes/drywall-toolbox/dist"
+          DIST="wp-content/themes/drywall-toolbox/dist"
           echo "── dist contents ──"
           find "$DIST" -type f | sort
           # Fail fast if the HTML entry point is missing
@@ -80,8 +80,8 @@ jobs:
 
       - name: Prune source maps and large assets before upload
         run: |
-          DIST="wp/wp-content/themes/drywall-toolbox/dist"
-          ASSETS="wp/wp-content/themes/drywall-toolbox/assets"
+          DIST="wp-content/themes/drywall-toolbox/dist"
+          ASSETS="wp-content/themes/drywall-toolbox/assets"
           echo "Pruning .map files..."
           find "$DIST" -type f -name "*.map" -print -delete || true
           echo "Pruning large product CSVs from theme folder..."
@@ -99,7 +99,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: build-${{ github.sha }}
-          path: wp/wp-content/
+          path: wp-content/
           retention-days: 1         # Short retention — only needed for the deploy job
           if-no-files-found: error
 
@@ -117,25 +117,25 @@ jobs:
           fetch-depth: 1
           # Only need the non-built wp-content files (plugins, mu-plugins, etc.)
           sparse-checkout: |
-            wp/wp-content/plugins
-            wp/wp-content/mu-plugins
+            wp-content/plugins
+            wp-content/mu-plugins
 
       - name: Download build artifact
         uses: actions/download-artifact@v4
         with:
           name: build-${{ github.sha }}
-          path: wp/wp-content/
+          path: wp-content/
 
       - name: Validate wp-content structure pre-deploy
         run: |
           echo "── wp-content layout ──"
-          ls -la wp/wp-content/ || true
+          ls -la wp-content/ || true
           echo "── themes ──"
-          ls -la wp/wp-content/themes/ || true
+          ls -la wp-content/themes/ || true
           echo "── plugins ──"
-          ls -la wp/wp-content/plugins/ || true
+          ls -la wp-content/plugins/ || true
           echo "── dist ──"
-          ls -la wp/wp-content/themes/drywall-toolbox/dist/ || true
+          ls -la wp-content/themes/drywall-toolbox/dist/ || true
 
       - name: Deploy via FTPS
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
@@ -146,8 +146,9 @@ jobs:
           protocol: ftps
           port:     ${{ secrets.HOSTGATOR_FTP_PORT }}
           # ── Server path (unchanged from original config) ──────────────────
-          # /home1/benconklin/public_html/website_a246e6a8/public_html/wp-content/
-          server-dir: /home1/benconklin/public_html/website_a246e6a8/public_html/wp-content/
+          # Server path corrected to remove duplicate `public_html` segment
+          # (confirmed by user):
+          server-dir: /home1/benconklin/public_html/website_a246e6a8/wp-content/
           local-dir:  ./wp/wp-content/
           exclude: |
             **/.git*
@@ -184,7 +185,7 @@ jobs:
           echo "  Triggered by  : ${{ github.actor }}"
           echo "  Timestamp     : $(date -u '+%Y-%m-%dT%H:%M:%SZ')"
           echo "  Dry run       : ${{ github.event.inputs.dry_run == 'true' }}"
-          echo "  JS chunks     : $(find wp/wp-content/themes/drywall-toolbox/dist/assets/js -name '*.js' 2>/dev/null | wc -l) files"
+          echo "  JS chunks     : $(find wp-content/themes/drywall-toolbox/dist/assets/js -name '*.js' 2>/dev/null | wc -l) files"
           echo "────────────────────────────────────────────"
 
   verify:

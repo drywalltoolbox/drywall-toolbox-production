@@ -47,7 +47,7 @@ module.exports = (envFlags, argv) => {
   // Production writes directly into the WordPress theme for zero-copy CI deploys.
   const outputPath = isDev
     ? path.resolve(__dirname, 'dist')
-    : path.resolve(__dirname, 'wp', 'wp-content', 'themes', 'drywall-toolbox', 'dist');
+    : path.resolve(__dirname, 'wp-content', 'themes', 'drywall-toolbox', 'dist');
 
   // ─── DefinePlugin values ────────────────────────────────────────────────
   // Group all compile-time replacements so they're easy to audit / extend.
