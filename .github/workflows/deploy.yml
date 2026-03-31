@@ -1,15 +1,19 @@
 name: Deploy Drywall Toolbox to HostGator
 
+# TEMPORARILY DISABLED - Automatic deployments are paused
+# To re-enable automatic deployments on push to main, uncomment the "on:" section below
+# To trigger a manual deployment, use the "Run workflow" button in GitHub Actions tab
+
 on:
-  push:
-    branches:
-      - main
-    paths:
-      - 'frontend/**'
-      - 'wp/**'
-      - '.htaccess'
-      - 'index.php'
-      - '.github/workflows/deploy.yml'
+  # push:
+  #   branches:
+  #     - main
+  #   paths:
+  #     - 'frontend/**'
+  #     - 'wp/**'
+  #     - '.htaccess'
+  #     - 'index.php'
+  #     - '.github/workflows/deploy.yml'
   workflow_dispatch:
     inputs:
       dry_run:
