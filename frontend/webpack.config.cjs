@@ -39,10 +39,10 @@ module.exports = (envFlags, argv) => {
   const isDev  = mode !== 'production';
   const analyze = process.env.ANALYZE === 'true';
 
-  // Production: assets are served from /dist/ at the domain root.
+  // Production: assets are served from / at the domain root.
   // Development: serve from / (webpack-dev-server).
   const PUBLIC_URL = env('PUBLIC_URL').replace(/\/+$/, '');
-  const publicPath = isDev ? '/' : (PUBLIC_URL ? `${PUBLIC_URL}/` : '/dist/');
+  const publicPath = isDev ? '/' : (PUBLIC_URL ? `${PUBLIC_URL}/` : '/');
 
   // Production writes to repo-root dist/ for clean CI separation.
   // Development writes to a local dist/ inside frontend/.
@@ -59,16 +59,20 @@ module.exports = (envFlags, argv) => {
     // WooCommerce REST API (CRA-style — legacy compat)
     'process.env.REACT_APP_WP_BASE_URL':        JSON.stringify(env('REACT_APP_WP_BASE_URL')),
     'process.env.REACT_APP_WC_BASE_URL':        JSON.stringify(env('REACT_APP_WC_BASE_URL')),
-    'process.env.REACT_APP_WC_CONSUMER_KEY':    JSON.stringify(env('REACT_APP_WC_CONSUMER_KEY')),
-    'process.env.REACT_APP_WC_CONSUMER_SECRET': JSON.stringify(env('REACT_APP_WC_CONSUMER_SECRET')),
+    'process.env.REACT_APP_WC_AUTH_USER':       JSON.stringify(env('REACT_APP_WC_AUTH_USER')),
+    'process.env.REACT_APP_WC_AUTH_PASS':       JSON.stringify(env('REACT_APP_WC_AUTH_PASS')),
 
     // Vite-compat shims — replaces import.meta.env.* at compile time
+    // NOTE: We're using Webpack (not Vite), but our source code uses import.meta.env.VITE_*
+    // naming conventions. DefinePlugin below handles these automatically at build time.
+    // No separate Vite config needed — this is standard Webpack practice for compatibility.
     'import.meta.env.BASE_URL':                         JSON.stringify(publicPath),
     'import.meta.env.MODE':                             JSON.stringify(mode),
     'import.meta.env.DEV':                              JSON.stringify(isDev),
     'import.meta.env.PROD':                             JSON.stringify(!isDev),
 
     // New VITE_* vars for headless WP + WooCommerce architecture
+    // (These are just naming conventions; DefinePlugin replaces them at build time)
     'import.meta.env.VITE_WP_API_BASE':                 JSON.stringify(env('VITE_WP_API_BASE')),
     'import.meta.env.VITE_WC_API_BASE':                 JSON.stringify(env('VITE_WC_API_BASE')),
     'import.meta.env.VITE_JWT_ENDPOINT':                JSON.stringify(env('VITE_JWT_ENDPOINT')),
@@ -352,3 +356,5 @@ module.exports = (envFlags, argv) => {
     },
   };
 };
+
+

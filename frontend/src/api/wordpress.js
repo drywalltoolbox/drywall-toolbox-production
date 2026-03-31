@@ -7,39 +7,39 @@
  *
  *   REACT_APP_WP_BASE_URL        – WordPress site root including /wp subdir
  *                                   e.g. https://drywalltoolbox.com/wp
- *   REACT_APP_WC_CONSUMER_KEY    – WooCommerce REST API consumer key
- *   REACT_APP_WC_CONSUMER_SECRET – WooCommerce REST API consumer secret
+ *   REACT_APP_WC_AUTH_USER       – WooCommerce Application Password username
+ *   REACT_APP_WC_AUTH_PASS       – WooCommerce Application Password password
  *
  * WordPress REST API docs: https://developer.wordpress.org/rest-api/
  * WooCommerce REST API docs: https://woocommerce.github.io/woocommerce-rest-api-docs/
  */
 
 const WP_BASE_URL = process.env.REACT_APP_WP_BASE_URL || '';
-const WC_KEY      = process.env.REACT_APP_WC_CONSUMER_KEY || '';
-const WC_SECRET   = process.env.REACT_APP_WC_CONSUMER_SECRET || '';
+const WC_AUTH_USER = process.env.REACT_APP_WC_AUTH_USER || '';
+const WC_AUTH_PASS = process.env.REACT_APP_WC_AUTH_PASS || '';
 
 // Warn during local development when required variables are not set so that
 // misconfigured builds surface immediately rather than failing silently later.
 if (process.env.NODE_ENV !== 'production') {
-  if (!WP_BASE_URL)  console.warn('[wordpress.js] REACT_APP_WP_BASE_URL is not set — all API calls will fail.');
-  if (!WC_KEY)       console.warn('[wordpress.js] REACT_APP_WC_CONSUMER_KEY is not set — WooCommerce calls will fail.');
-  if (!WC_SECRET)    console.warn('[wordpress.js] REACT_APP_WC_CONSUMER_SECRET is not set — WooCommerce calls will fail.');
+  if (!WP_BASE_URL)    console.warn('[wordpress.js] REACT_APP_WP_BASE_URL is not set — all API calls will fail.');
+  if (!WC_AUTH_USER)   console.warn('[wordpress.js] REACT_APP_WC_AUTH_USER is not set — WooCommerce authentication will fail.');
+  if (!WC_AUTH_PASS)   console.warn('[wordpress.js] REACT_APP_WC_AUTH_PASS is not set — WooCommerce authentication will fail.');
 }
 
-// NOTE: WooCommerce Basic Auth credentials are injected at build time and will
+// NOTE: WooCommerce Application Password credentials are injected at build time and will
 // be present in the compiled JavaScript bundle.  This is the documented approach
 // for client-side WooCommerce integrations (HTTPS is mandatory to protect them
 // in transit).  For higher-security requirements consider routing WooCommerce
 // calls through a server-side proxy so credentials remain out of the bundle.
 
 /**
- * Build a Basic Auth header from the WooCommerce API key pair.
- * https://woocommerce.github.io/woocommerce-rest-api-docs/#authentication-over-https
+ * Build a Basic Auth header from WooCommerce Application Password credentials.
+ * https://woocommerce.github.io/woocommerce-rest-api-docs/#authentication
  *
  * @returns {string}
  */
 function wcAuthHeader() {
-  return 'Basic ' + btoa(`${WC_KEY}:${WC_SECRET}`);
+  return 'Basic ' + btoa(`${WC_AUTH_USER}:${WC_AUTH_PASS}`);
 }
 
 /**

@@ -1,0 +1,15 @@
+# Python Testing Dependencies for Drywall Toolbox API Integration Tests
+
+# Core testing framework
+pytest==7.4.3
+pytest-cov==4.1.0  # Coverage reporting
+pytest-mock==3.12.0  # Mock support
+pytest-timeout==2.2.0  # Timeout handling
+
+# HTTP and requests
+requests==2.31.0
+requests-mock==1.11.0  # Mock requests library
+
+# Additional utilities
+python-dotenv==1.0.0  # Environment variable management
+pydantic==2.5.0  # Data validation

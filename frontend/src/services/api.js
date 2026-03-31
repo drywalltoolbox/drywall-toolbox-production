@@ -3,32 +3,33 @@
  *
  * Centralized WooCommerce REST API module.
  *
- * All env vars are injected at build time by webpack DefinePlugin.
- *   REACT_APP_WC_BASE_URL        – WooCommerce REST API base, e.g.
- *                                   https://drywalltoolbox.com/wp-json/wc/v3
- *   REACT_APP_WC_CONSUMER_KEY    – WooCommerce consumer key  (ck_…)
- *   REACT_APP_WC_CONSUMER_SECRET – WooCommerce consumer secret (cs_…)
+ * Authentication: WooCommerce Application Passwords (more secure than consumer keys for client-side).
+ * Env vars are injected at build time by webpack DefinePlugin:
+ *   REACT_APP_WC_BASE_URL        – WooCommerce REST API base
+ *                                   e.g. https://drywalltoolbox.com/wp-json/wc/v3
+ *   REACT_APP_WC_AUTH_USER       – WooCommerce Application Password username
+ *   REACT_APP_WC_AUTH_PASS       – WooCommerce Application Password password
  *
  * WooCommerce REST API docs: https://woocommerce.github.io/woocommerce-rest-api-docs/
  */
 
 // Prefer build-time env injection, fall back to runtime-origin based paths
 const WC_BASE  = process.env.REACT_APP_WC_BASE_URL || (typeof window !== 'undefined' ? `${window.location.origin}/wp-json/wc/v3` : '');
-const KEY      = process.env.REACT_APP_WC_CONSUMER_KEY    || '';
-const SECRET   = process.env.REACT_APP_WC_CONSUMER_SECRET || '';
+const AUTH_USER = process.env.REACT_APP_WC_AUTH_USER || '';
+const AUTH_PASS = process.env.REACT_APP_WC_AUTH_PASS || '';
 
 if (process.env.NODE_ENV !== 'production') {
-  if (!WC_BASE)  console.warn('[api.js] REACT_APP_WC_BASE_URL is not set — all WooCommerce calls will fail.');
-  if (!KEY)      console.warn('[api.js] REACT_APP_WC_CONSUMER_KEY is not set — WooCommerce calls will fail.');
-  if (!SECRET)   console.warn('[api.js] REACT_APP_WC_CONSUMER_SECRET is not set — WooCommerce calls will fail.');
+  if (!WC_BASE)      console.warn('[api.js] REACT_APP_WC_BASE_URL is not set — all WooCommerce calls will fail.');
+  if (!AUTH_USER)    console.warn('[api.js] REACT_APP_WC_AUTH_USER is not set — WooCommerce authentication will fail.');
+  if (!AUTH_PASS)    console.warn('[api.js] REACT_APP_WC_AUTH_PASS is not set — WooCommerce authentication will fail.');
 }
 
-// NOTE: WooCommerce Basic Auth credentials are embedded in the compiled bundle.
+// NOTE: WooCommerce Application Password credentials are embedded in the compiled bundle.
 // This is the documented client-side approach and requires HTTPS to protect them
 // in transit. For higher-security requirements, route WooCommerce calls through a
 // server-side proxy so credentials remain out of the bundle.
 const authHeader = {
-  Authorization: 'Basic ' + btoa(`${KEY}:${SECRET}`),
+  Authorization: 'Basic ' + btoa(`${AUTH_USER}:${AUTH_PASS}`),
 };
 
 /**

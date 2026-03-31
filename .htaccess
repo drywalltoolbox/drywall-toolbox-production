@@ -22,8 +22,20 @@
 #   5. Everything else          → dist/index.html (React SPA catch-all)
 
 # ─── Disable Directory Listing & Defaults ─────────────────────────────────────
+# Disable directory indexing globally for security
 Options -Indexes
 Options +FollowSymLinks
+
+# ─── Allow Directory Access for WordPress Core & Plugin Assets ────────────────
+# WordPress directories need to allow direct access to static files
+# without requiring an index file (this prevents AH01276 errors)
+<IfModule mod_dir.c>
+    # Allow WordPress assets to be served directly
+    # without throwing AH01276 "No matching DirectoryIndex" errors
+    <DirectoryMatch "^/.*/(wp-includes|wp-content)">
+        Options +Indexes
+    </DirectoryMatch>
+</IfModule>
 
 # ─── Force HTTPS ──────────────────────────────────────────────────────────────
 <IfModule mod_rewrite.c>
@@ -177,11 +189,5 @@ Options +FollowSymLinks
 ErrorDocument 404 /index.html
 # Note: This lets React Router handle 404s gracefully (React shows 404 page)
 
-# ─── Disable Scripts Execution in Uploads Directory ────────────────────────────
-<Directory "/home4/benconklin/public_html/drywalltoolbox/wp/wp-content/uploads">
-    php_flag engine off
-    <FilesMatch "\.php$">
-        Deny from all
-    </FilesMatch>
-</Directory>
+
 

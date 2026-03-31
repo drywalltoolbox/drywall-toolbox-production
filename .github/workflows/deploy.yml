@@ -1,9 +1,5 @@
 name: Deploy Drywall Toolbox to HostGator
 
-# TEMPORARILY DISABLED - Automatic deployments are paused
-# To re-enable automatic deployments on push to main, uncomment the "on:" section below
-# To trigger a manual deployment, use the "Run workflow" button in GitHub Actions tab
-
 on:
   # push:
   #   branches:
@@ -61,24 +57,26 @@ jobs:
         run: cd frontend && npm run build
         env:
           NODE_ENV: production
-          # Legacy CRA-style vars (src/services/api.js, src/api/wordpress.js)
+          # Frontend build configuration
           REACT_APP_WP_BASE_URL:            ${{ secrets.REACT_APP_WP_BASE_URL }}
           REACT_APP_WC_BASE_URL:            ${{ secrets.REACT_APP_WC_BASE_URL }}
-          REACT_APP_WC_CONSUMER_KEY:        ${{ secrets.REACT_APP_WC_CONSUMER_KEY }}
-          REACT_APP_WC_CONSUMER_SECRET:     ${{ secrets.REACT_APP_WC_CONSUMER_SECRET }}
-          # New VITE_* vars for headless WP + WC architecture
-          VITE_WP_API_BASE:                 ${{ secrets.VITE_WP_API_BASE }}
-          VITE_WC_API_BASE:                 ${{ secrets.VITE_WC_API_BASE }}
+          REACT_APP_WC_AUTH_USER:           ${{ secrets.REACT_APP_WC_AUTH_USER }}
+          REACT_APP_WC_AUTH_PASS:           ${{ secrets.REACT_APP_WC_AUTH_PASS }}
+          # Note: Webpack DefinePlugin automatically handles import.meta.env.* references
+          # No Vite config needed — these VITE_* names are just env var conventions
+          VITE_WP_API_BASE:                 ${{ secrets.VITE_WP_API_BASE || secrets.REACT_APP_WP_BASE_URL }}
+          VITE_WC_API_BASE:                 ${{ secrets.VITE_WC_API_BASE || secrets.REACT_APP_WC_BASE_URL }}
           VITE_JWT_ENDPOINT:                ${{ secrets.VITE_JWT_ENDPOINT }}
           VITE_SITE_URL:                    ${{ secrets.VITE_SITE_URL }}
           VITE_APP_ENV:                     production
-          VITE_WC_AUTH_USER:                ${{ secrets.VITE_WC_AUTH_USER }}
-          VITE_WC_AUTH_PASS:                ${{ secrets.VITE_WC_AUTH_PASS }}
-          # Legacy WooCommerce vars
+          VITE_WC_AUTH_USER:                ${{ secrets.VITE_WC_AUTH_USER || secrets.REACT_APP_WC_AUTH_USER }}
+          VITE_WC_AUTH_PASS:                ${{ secrets.VITE_WC_AUTH_PASS || secrets.REACT_APP_WC_AUTH_PASS }}
           VITE_WOOCOMMERCE_STORE_URL:       ${{ secrets.VITE_WOOCOMMERCE_STORE_URL }}
           VITE_WOOCOMMERCE_CONSUMER_KEY:    ${{ secrets.VITE_WOOCOMMERCE_CONSUMER_KEY }}
           VITE_WOOCOMMERCE_CONSUMER_SECRET: ${{ secrets.VITE_WOOCOMMERCE_CONSUMER_SECRET }}
-          PUBLIC_URL:                       ${{ secrets.PUBLIC_URL }}
+          VITE_VEEQO_CLIENT_ID:             ${{ secrets.VITE_VEEQO_CLIENT_ID }}
+          VITE_VEEQO_CLIENT_SECRET:         ${{ secrets.VITE_VEEQO_CLIENT_SECRET }}
+          VITE_VEEQO_REDIRECT_URI:          ${{ secrets.VITE_VEEQO_REDIRECT_URI }}
 
       - name: Validate build output
         run: |
