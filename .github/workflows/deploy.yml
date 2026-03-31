@@ -1,15 +1,16 @@
 name: Deploy Drywall Toolbox to HostGator
 
 on:
-  push:
-    branches:
-      - main
-    paths:
-      - 'frontend/**'
-      - 'wp/**'
-      - '.htaccess'
-      - 'index.php'
-      - '.github/workflows/deploy.yml'
+  # DISABLED - Deploy workflow is currently disabled
+  # push:
+  #   branches:
+  #     - main
+  #   paths:
+  #     - 'frontend/**'
+  #     - 'wp/**'
+  #     - '.htaccess'
+  #     - 'index.php'
+  #     - '.github/workflows/deploy.yml'
   workflow_dispatch:
     inputs:
       dry_run:
