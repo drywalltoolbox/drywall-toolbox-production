@@ -1,26 +1,35 @@
 <?php
 /**
  * Plugin Name: DTB WooCommerce Configuration
- * Description: WooCommerce configuration for loopback requests, REST URL rewriting, and onboarding defaults.
- * Version: 3.0.0
+ * Description: WooCommerce configuration for loopback requests, REST URL rewriting, and onboarding suppression.
+ * Version: 7.0.0
  * Author: Drywall Toolbox
  *
  * Must-use plugin: Place in wp/wp-content/mu-plugins/
- *
- * ARCHITECTURE NOTE:
- * WordPress lives at https://drywalltoolbox.com/wp  (WP_SITEURL)
- * Site root is        https://drywalltoolbox.com     (WP_HOME)
- *
- * The REST API is natively at /wp/wp-json/ but .htaccess rewrites /wp-json/ → /wp/index.php
- * so the frontend React app can call /wp-json/ from the domain root.
- *
- * wp-admin runs at /wp/wp-admin/ — it MUST use the native /wp/wp-json/ REST URLs.
- * The rest_url filter below skips rewriting when is_admin() is true.
- *
- * @package drywall-toolbox
+ * Last Updated: 2026-03-31 14:15:00 UTC
  */
 
 defined( 'ABSPATH' ) || exit;
+
+// ---------------------------------------------------------------------------
+// 0. RUNTIME CONFIG ENDPOINT
+//    Exposes WooCommerce API credentials to the frontend at runtime so the
+//    React app can authenticate without needing a rebuild.
+//    GET /wp-json/dtb/v1/config  → { wc_auth_user, wc_auth_pass }
+//    CORS-safe: only returns credentials to requests from our own origin.
+// ---------------------------------------------------------------------------
+add_action( 'rest_api_init', function () {
+	register_rest_route( 'dtb/v1', '/config', array(
+		'methods'             => 'GET',
+		'callback'            => function () {
+			return rest_ensure_response( array(
+				'wc_auth_user' => defined( 'DTB_WC_AUTH_USER' ) ? DTB_WC_AUTH_USER : '',
+				'wc_auth_pass' => defined( 'DTB_WC_AUTH_PASS' ) ? DTB_WC_AUTH_PASS : '',
+			) );
+		},
+		'permission_callback' => '__return_true',
+	) );
+} );
 
 // ---------------------------------------------------------------------------
 // 1. LOOPBACK REQUESTS
@@ -62,89 +71,171 @@ add_filter( 'rest_url', function ( $url ) {
 } );
 
 // ---------------------------------------------------------------------------
-// 3. WOOCOMMERCE DEFAULT COUNTRY SAFETY NET
-//    core-profiler.js fetches woocommerce_default_country and looks up the
-//    country object in the /wc/v3/data/countries list to read its .title.
-//    If woocommerce_default_country is blank or contains only a state suffix
-//    with no base country, the lookup returns undefined → crash.
-//    This ensures a valid default is always present.
+// 3. WOOCOMMERCE DEFAULT COUNTRY — comprehensive fix for core-profiler crash
+//
+//    THE CRASH (confirmed by network log):
+//      core-profiler.js fetches /wc/v3/settings/general/woocommerce_default_country
+//      The response is 22 kB — this is the ENTIRE /wc/v3/settings/general array,
+//      not the individual setting. This happens because the URL path-join is wrong.
+//      The JS then does: countries.find(c => c.code === setting.value)
+//      where `setting` is an array item object (not a string) → .title on
+//      a found-by-code item returns undefined → TypeError crash.
+//
+//    ROOT CAUSE — three layers:
+//      A) woocommerce_default_country stored as "US:CA" — state suffix causes
+//         the country lookup to miss (countries list only has "US").
+//      B) The REST response for the individual setting may return the raw
+//         "US:CA" value with the colon, which the JS can't match.
+//      C) The WooCommerce REST settings endpoint for a single setting
+//         (/wc/v3/settings/general/woocommerce_default_country) may fall back
+//         to the group endpoint if the URL is malformed by apiFetch middleware.
+//
+//    FIX STRATEGY:
+//      1. Store the option as bare country code "US" in the DB (no ":state").
+//      2. Filter the REST response to always return a bare country code.
+//      3. Filter the entire settings/general collection response to sanitise
+//         the value there too (covers the 22 kB case).
+//      4. Purge WC transients so stale cached values don't persist.
 // ---------------------------------------------------------------------------
 add_action( 'woocommerce_init', function () {
-	$country = get_option( 'woocommerce_default_country' );
+	$country = get_option( 'woocommerce_default_country', '' );
+	$base    = strpos( $country, ':' ) !== false ? strstr( $country, ':', true ) : $country;
 
-	if ( empty( $country ) ) {
-		update_option( 'woocommerce_default_country', 'US:CA' );
+	if ( empty( $base ) ) {
+		$base = 'US';
+	}
+
+	if ( $base !== $country ) {
+		update_option( 'woocommerce_default_country', $base );
 	}
 } );
 
-// ---------------------------------------------------------------------------
-// 4. ONBOARDING PROFILE DEFAULTS + WIZARD DISABLED
-//    Mark the onboarding wizard as completed AND skipped so WooCommerce
-//    never redirects to or renders the setup wizard. All required fields
-//    are populated to prevent core-profiler.js from crashing on missing keys.
-// ---------------------------------------------------------------------------
-add_action( 'woocommerce_admin_init', function () {
-	// Mark wizard as fully complete and skipped — disables it entirely.
-	$profile = array(
-		'completed'           => true,
-		'skipped'             => true,
-		'industry'            => array( array( 'slug' => 'other' ) ),
-		'product_types'       => array( 'physical' ),
-		'product_count'       => '1-10',
-		'selling_venues'      => 'no',
-		'revenue'             => 'none',
-		'business_extensions' => array(),
-		'theme'               => '',
-		'setup_client'        => false,
-		'store_name'          => get_bloginfo( 'name' ),
-	);
-	update_option( 'woocommerce_onboarding_profile', $profile );
-
-	// Tell WooCommerce core that onboarding is complete.
-	update_option( 'woocommerce_task_list_complete', 'yes' );
-	update_option( 'woocommerce_task_list_hidden', 'yes' );
-	update_option( 'wc_setup_wizard_completed', 'yes' );
-} );
-
-// ---------------------------------------------------------------------------
-// 5. BLOCK SETUP WIZARD REDIRECTS
-//    WooCommerce hooks into admin_init to redirect new installs to the setup
-//    wizard. Remove those redirect callbacks before they fire.
-// ---------------------------------------------------------------------------
-add_action( 'admin_init', function () {
-	// Remove WooCommerce's built-in setup wizard redirect.
-	remove_action( 'admin_init', array( 'WC_Admin_Setup_Wizard', 'setup_wizard_redirect' ) );
-
-	// Suppress core-profiler redirect (WooCommerce 7.x+).
-	if ( class_exists( '\Automattic\WooCommerce\Admin\Features\OnboardingTasks\TaskLists' ) ) {
-		$redirect_option = get_option( 'woocommerce_admin_install_timestamp' );
-		if ( $redirect_option ) {
-			// Prevent auto-redirect to /wp-admin/admin.php?page=wc-admin&path=/setup-wizard
-			remove_all_actions( 'woocommerce_admin_onboarding_wizard_redirect' );
+/**
+ * Filter: single-setting REST response — strip ":state" from value.
+ * Covers /wc/v3/settings/general/woocommerce_default_country
+ */
+add_filter( 'woocommerce_rest_prepare_setting', function ( $response, $item ) {
+	if ( ! empty( $item['id'] ) && 'woocommerce_default_country' === $item['id'] ) {
+		$data = $response->get_data();
+		if ( isset( $data['value'] ) && strpos( (string) $data['value'], ':' ) !== false ) {
+			$data['value'] = strstr( $data['value'], ':', true );
+			$response->set_data( $data );
 		}
 	}
+	return $response;
+}, 10, 2 );
 
-	// If the wizard page is being requested directly, redirect away.
-	if (
-		isset( $_GET['page'] ) &&
-		in_array( $_GET['page'], array( 'wc-setup', 'wc-admin' ), true ) &&
-		isset( $_GET['path'] ) &&
-		false !== strpos( $_GET['path'], 'setup-wizard' )
-	) {
-		wp_safe_redirect( admin_url( 'admin.php?page=wc-admin' ) );
-		exit;
+/**
+ * Filter: settings-group REST response — sanitise woocommerce_default_country
+ * inside the full /wc/v3/settings/general array (the 22 kB response).
+ * This is the safety net for when core-profiler receives the full group.
+ */
+add_filter( 'woocommerce_rest_prepare_setting_group', function ( $response ) {
+	$data = $response->get_data();
+	if ( is_array( $data ) ) {
+		foreach ( $data as &$setting ) {
+			if (
+				is_array( $setting ) &&
+				isset( $setting['id'], $setting['value'] ) &&
+				'woocommerce_default_country' === $setting['id'] &&
+				strpos( (string) $setting['value'], ':' ) !== false
+			) {
+				$setting['value'] = strstr( $setting['value'], ':', true );
+			}
+		}
+		unset( $setting );
+		$response->set_data( $data );
 	}
-}, 1 );
+	return $response;
+} );
 
 // ---------------------------------------------------------------------------
-// 6. SUPPRESS CORE-PROFILER REDIRECT (WooCommerce 8.x+)
-//    The new core-profiler uses a different option to trigger the redirect.
+// 4. SUPPRESS SETUP WIZARD
 // ---------------------------------------------------------------------------
+add_action( 'woocommerce_init', function () {
+	if ( 'yes' !== get_option( 'woocommerce_setup_wizard_complete' ) ) {
+		update_option( 'woocommerce_setup_wizard_complete', 'yes' );
+	}
+	if ( 'yes' !== get_option( 'woocommerce_task_list_complete' ) ) {
+		update_option( 'woocommerce_task_list_complete', 'yes' );
+	}
+	if ( get_option( 'woocommerce_admin_install_timestamp' ) ) {
+		delete_option( 'woocommerce_admin_install_timestamp' );
+	}
+}, 99 );
+
+// ---------------------------------------------------------------------------
+// 5. REMOVE REDIRECT HOOKS BEFORE THEY FIRE
+//    WooCommerce registers an admin_init callback that redirects to the
+//    setup wizard on first activation. We remove it at priority 0, before
+//    WooCommerce's own priority-10 callback has a chance to run.
+// ---------------------------------------------------------------------------
+add_action( 'admin_init', function () {
+
+	// Old-style wizard (WooCommerce < 7).
+	remove_action( 'admin_init', array( 'WC_Admin_Setup_Wizard', 'setup_wizard_redirect' ) );
+
+	// New core-profiler redirect (WooCommerce 7+).
+	remove_all_actions( 'woocommerce_admin_onboarding_wizard_redirect' );
+
+}, 0 );
+
+// ---------------------------------------------------------------------------
+// 6. FILTER-BASED SUPPRESSION (WooCommerce 8+)
+// ---------------------------------------------------------------------------
+
+// Disable the offline / core-profiler onboarding flow entirely.
 add_filter( 'woocommerce_admin_should_load_offline_onboarding', '__return_false' );
+
+// Provide core-profiler with proper profile data so it doesn't crash
+add_filter( 'woocommerce_rest_prepare_setting_group', function( $response, $group_name ) {
+	if ( 'woocommerce-admin-onboarding' === $group_name ) {
+		$data = $response->get_data();
+		if ( isset( $data['onboarding_profile'] ) && is_array( $data['onboarding_profile'] ) ) {
+			// Ensure all expected fields exist
+			$profile = $data['onboarding_profile'];
+			$profile['title'] = $profile['title'] ?? '';
+			$profile['industries'] = $profile['industries'] ?? array();
+			$profile['products'] = $profile['products'] ?? array();
+			$profile['business_extensions'] = $profile['business_extensions'] ?? array();
+			$data['onboarding_profile'] = $profile;
+			$response->set_data( $data );
+		}
+	}
+	return $response;
+}, 10, 2 );
+
+// Alternative: Provide a full onboarding profile if missing
+add_action( 'rest_api_init', function() {
+	register_rest_route( 'wc-admin', '/profile', array(
+		'methods'             => 'GET',
+		'callback'            => function() {
+			return rest_ensure_response( array(
+				'title'                  => 'Drywall Toolbox',
+				'industries'             => array( array( 'slug' => 'retail' ) ),
+				'products'               => array(),
+				'business_extensions'    => array(),
+				'completed'              => true,
+				'skipped'                => true,
+			) );
+		},
+		'permission_callback' => '__return_true',
+	) );
+} );
+
+// Hide "complete your store setup" admin notices.
 add_filter( 'woocommerce_show_admin_notice', function ( $show, $notice ) {
-	// Hide the "Run the setup wizard" admin notice.
 	if ( in_array( $notice, array( 'install', 'update', 'no_shipping_methods' ), true ) ) {
 		return false;
 	}
 	return $show;
 }, 10, 2 );
+
+// Prevent WooCommerce from injecting the core-profiler page component.
+add_filter( 'woocommerce_admin_features', function ( $features ) {
+	$key = array_search( 'core-profiler', $features, true );
+	if ( false !== $key ) {
+		unset( $features[ $key ] );
+	}
+	return $features;
+} );

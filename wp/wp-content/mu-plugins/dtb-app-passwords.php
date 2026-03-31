@@ -4,6 +4,7 @@
  * Description: Enable and manage Application Passwords for WooCommerce REST API access
  * Version: 1.0.0
  * Author: Drywall Toolbox
+ * Last Updated: 2026-03-31 14:15:00 UTC
  * 
  * Must-use plugin: Place in wp/wp-content/mu-plugins/
  */
@@ -13,10 +14,8 @@ if ( ! class_exists( 'WP_Application_Passwords' ) ) {
 	require_once ABSPATH . 'wp-includes/class-wp-application-passwords.php';
 }
 
-// Log plugin activation for debugging
-if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
-	error_log( 'DTB Application Passwords plugin loaded' );
-}
+// Plugin loaded — debug logging removed to keep debug.log clean.
+// CACHE_BUSTER: 2026-03-31-14-18-UTC
 
 // Add REST API endpoint to create application passwords
 add_action( 'rest_api_init', function() {

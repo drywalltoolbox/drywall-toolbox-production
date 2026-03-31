@@ -7,20 +7,40 @@
  *   wpClient  – WordPress REST API (JWT-authenticated)
  *   wcClient  – WooCommerce REST API (Application Password authenticated)
  *
- * All base URLs and credentials are read from VITE_* environment variables
- * injected at build time.  Zero hardcoded URLs or credentials.
+ * Credentials are read from VITE_* build-time env vars when available.
+ * If they are absent (e.g. older deploy), the app fetches them at runtime
+ * from GET /wp-json/dtb/v1/config — stored securely in wp-config.php on
+ * the server, never in version control.
  */
 
 import axios from 'axios';
 
 // ─── Base URLs ────────────────────────────────────────────────────────────────
 
-// Prefer build-time VITE_* values but fall back to sensible runtime defaults
-// so the SPA can still call WP endpoints if environment injection was misconfigured.
-const WP_API_BASE   = import.meta.env.VITE_WP_API_BASE   || (typeof window !== 'undefined' ? `${window.location.origin}/wp-json/` : '');
-const WC_API_BASE   = import.meta.env.VITE_WC_API_BASE   || (typeof window !== 'undefined' ? `${window.location.origin}/wp-json/wc/v3` : '');
-const WC_AUTH_USER  = import.meta.env.VITE_WC_AUTH_USER  || '';
-const WC_AUTH_PASS  = import.meta.env.VITE_WC_AUTH_PASS  || '';
+const WP_API_BASE  = import.meta.env.VITE_WP_API_BASE  || (typeof window !== 'undefined' ? `${window.location.origin}/wp-json/` : '');
+const WC_API_BASE  = import.meta.env.VITE_WC_API_BASE  || (typeof window !== 'undefined' ? `${window.location.origin}/wp-json/wc/v3` : '');
+let   WC_AUTH_USER = import.meta.env.VITE_WC_AUTH_USER || '';
+let   WC_AUTH_PASS = import.meta.env.VITE_WC_AUTH_PASS || '';
+
+// ─── Runtime credential bootstrap ────────────────────────────────────────────
+// If build-time env vars were not injected, fetch from the server config
+// endpoint once and patch the Authorization header on wcClient.
+
+let _credentialsReady = (WC_AUTH_USER && WC_AUTH_PASS)
+  ? Promise.resolve()
+  : fetch(`${WP_API_BASE.replace(/\/?$/, '/')}dtb/v1/config`)
+      .then((r) => r.json())
+      .then((data) => {
+        if (data && data.wc_auth_user && data.wc_auth_pass) {
+          WC_AUTH_USER = data.wc_auth_user;
+          WC_AUTH_PASS = data.wc_auth_pass;
+          const encoded = btoa(`${WC_AUTH_USER}:${WC_AUTH_PASS}`);
+          wcClient.defaults.headers.common['Authorization'] = `Basic ${encoded}`;
+        }
+      })
+      .catch(() => { /* silently continue without auth — public endpoints still work */ });
+
+export const credentialsReady = () => _credentialsReady;
 
 // ─── WordPress REST API client (JWT) ─────────────────────────────────────────
 
@@ -51,7 +71,6 @@ wpClient.interceptors.response.use(
     if (error.response && error.response.status === 401) {
       localStorage.removeItem('dtb_jwt_token');
       localStorage.removeItem('dtb_jwt_user');
-      // Only redirect if not already on a login/public page
       if (!window.location.pathname.includes('/login')) {
         window.location.href = '/login';
       }
@@ -66,7 +85,8 @@ export const wcClient = axios.create({
   baseURL: WC_API_BASE,
   headers: {
     'Content-Type': 'application/json',
-    // Application Password Basic Auth — credentials come from env vars only
+    // Auth header set immediately if build-time creds are available;
+    // otherwise patched after _credentialsReady resolves (see above).
     ...(WC_AUTH_USER && WC_AUTH_PASS
       ? { Authorization: 'Basic ' + btoa(`${WC_AUTH_USER}:${WC_AUTH_PASS}`) }
       : {}),
