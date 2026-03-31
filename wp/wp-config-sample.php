@@ -1,52 +1,53 @@
 <?php
 /**
- * WordPress Configuration Sample - Drywall Toolbox
+ * The base configuration for WordPress
  *
- * Copy this file to wp-config.php and fill in the values below.
- * NEVER commit wp-config.php to the repository (it is gitignored).
+ * The wp-config.php creation script uses this file during the installation.
+ * You don't have to use the website, you can copy this file to "wp-config.php"
+ * and fill in the values.
  *
- * WordPress is installed in the /wp/ subdirectory while the public site URL
- * is the domain root.  The two constants below are the critical difference
- * from a standard WordPress installation:
+ * This file contains the following configurations:
  *
- *   WP_HOME    - the public-facing URL visitors use (domain root)
- *   WP_SITEURL - the URL where WordPress core files live (/wp/ subdirectory)
+ * * Database settings
+ * * Secret keys
+ * * Database table prefix
+ * * ABSPATH
  *
- * This separation lets React own the domain root while WordPress acts as a
- * headless REST API backend accessible at /wp/wp-json/.
+ * @link https://developer.wordpress.org/advanced-administration/wordpress/wp-config/
+ *
+ * @package WordPress
  */
 
-// --- Site URLs ----------------------------------------------------------------
+// ** Database settings - You can get this info from your web host ** //
+/** The name of the database for WordPress */
+define( 'DB_NAME', 'database_name_here' );
 
-/** The public-facing site URL - domain root (NOT the /wp/ subdirectory). */
-define( 'WP_HOME', 'https://drywalltoolbox.com' );
+/** Database username */
+define( 'DB_USER', 'username_here' );
 
-/** The URL where WordPress is installed. */
-define( 'WP_SITEURL', 'https://drywalltoolbox.com/wp' );
+/** Database password */
+define( 'DB_PASSWORD', 'password_here' );
 
-// --- Database -----------------------------------------------------------------
-
-/** Database name - set in cPanel => MySQL Databases. */
-define( 'DB_NAME', 'your_database_name' );
-
-/** Database username. */
-define( 'DB_USER', 'your_database_user' );
-
-/** Database password. */
-define( 'DB_PASSWORD', 'your_database_password' );
-
-/** Database hostname. */
+/** Database hostname */
 define( 'DB_HOST', 'localhost' );
 
-/** Database charset. */
+/** Database charset to use in creating database tables. */
 define( 'DB_CHARSET', 'utf8mb4' );
 
-/** Database table collation. */
+/** The database collate type. Don't change this if in doubt. */
 define( 'DB_COLLATE', '' );
 
-// --- Security Keys & Salts ---------------------------------------------------
-// Generate fresh keys at: https://api.wordpress.org/secret-key/1.1/salt/
-
+/**#@+
+ * Authentication unique keys and salts.
+ *
+ * Change these to different unique phrases! You can generate these using
+ * the {@link https://api.wordpress.org/secret-key/1.1/salt/ WordPress.org secret-key service}.
+ *
+ * You can change these at any point in time to invalidate all existing cookies.
+ * This will force all users to have to log in again.
+ *
+ * @since 2.6.0
+ */
 define( 'AUTH_KEY',         'put your unique phrase here' );
 define( 'SECURE_AUTH_KEY',  'put your unique phrase here' );
 define( 'LOGGED_IN_KEY',    'put your unique phrase here' );
@@ -56,35 +57,41 @@ define( 'SECURE_AUTH_SALT', 'put your unique phrase here' );
 define( 'LOGGED_IN_SALT',   'put your unique phrase here' );
 define( 'NONCE_SALT',       'put your unique phrase here' );
 
-// --- JWT Authentication -------------------------------------------------------
-// Required for the jwt-authentication-for-wp-rest-api plugin.
-// Generate a strong random string (e.g. openssl rand -base64 64).
+/**#@-*/
 
-define( 'JWT_AUTH_SECRET_KEY', 'your-jwt-secret-key-here' );
-define( 'JWT_AUTH_CORS_ENABLE', true );
-
-// --- Table Prefix -------------------------------------------------------------
-
+/**
+ * WordPress database table prefix.
+ *
+ * You can have multiple installations in one database if you give each
+ * a unique prefix. Only numbers, letters, and underscores please!
+ *
+ * At the installation time, database tables are created with the specified prefix.
+ * Changing this value after WordPress is installed will make your site think
+ * it has not been installed.
+ *
+ * @link https://developer.wordpress.org/advanced-administration/wordpress/wp-config/#table-prefix
+ */
 $table_prefix = 'wp_';
 
-// --- Environment --------------------------------------------------------------
-
-/** Enable WP_DEBUG only in local development - never on production. */
+/**
+ * For developers: WordPress debugging mode.
+ *
+ * Change this to true to enable the display of notices during development.
+ * It is strongly recommended that plugin and theme developers use WP_DEBUG
+ * in their development environments.
+ *
+ * For information on other constants that can be used for debugging,
+ * visit the documentation.
+ *
+ * @link https://developer.wordpress.org/advanced-administration/debug/debug-wordpress/
+ */
 define( 'WP_DEBUG', false );
-define( 'WP_DEBUG_LOG', false );
-define( 'WP_DEBUG_DISPLAY', false );
 
-/** Disable the file editor in wp-admin for security. */
-define( 'DISALLOW_FILE_EDIT', true );
+/* Add any custom values between this line and the "stop editing" line. */
 
-/** Limit post revisions to save database space. */
-define( 'WP_POST_REVISIONS', 5 );
 
-/** Move wp-content to the standard wp/wp-content/ location in this repo. */
-define( 'WP_CONTENT_DIR', dirname( __FILE__ ) . '/wp-content' );
-define( 'WP_CONTENT_URL', 'https://drywalltoolbox.com/wp/wp-content' );
 
-// --- Bootstrap ----------------------------------------------------------------
+/* That's all, stop editing! Happy publishing. */
 
 /** Absolute path to the WordPress directory. */
 if ( ! defined( 'ABSPATH' ) ) {
