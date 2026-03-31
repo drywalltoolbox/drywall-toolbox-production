@@ -224,7 +224,7 @@ module.exports = (envFlags, argv) => {
         patterns: [
           {
             from: 'public',
-            to:   '.',
+            to:   'public',
             globOptions: {
               dot: true,
               ignore: [
