@@ -1,23 +1,40 @@
-# ─── Drywall Toolbox — Production .htaccess ───────────────────────────────────
-# Headless WordPress + React SPA architecture
+# ─── Drywall Toolbox — Production .htaccess ──────────────────────────────────
+# Headless WordPress + React SPA architecture (CORRECTED VERSION)
 #
-# Traffic routing:
-#   /wp/*               → WordPress (in /wp/ subdirectory)
-#   /wp-json/*          → WordPress REST API (convenience alias)
-#   /dist/assets/*      → Static files served directly (no rewrite)
-#   Everything else     → dist/index.html (React SPA catch-all)
+# Architecture:
+#   Domain Root (public_html/)
+#   ├── index.html              ← React SPA shell (served by catch-all rule)
+#   ├── assets/                 ← React compiled assets (JS/CSS/images)
+#   ├── .htaccess               ← This file
+#   ├── wp/                     ← WordPress subdirectory
+#   │   ├── wp-admin/           ← WordPress admin
+#   │   ├── wp-includes/        ← WordPress core
+#   │   ├── wp-content/         ← Themes, plugins, uploads
+#   │   ├── wp-config.php       ← Database config
+#   │   └── index.php           ← WordPress entry point
+#   └── wp-json/ → wp/wp-json/  ← Rewritten convenience alias
+#
+# Traffic Routing Rules:
+#   1. /wp/*                    → WordPress (in /wp/ subdirectory)
+#   2. /wp-json/*               → WordPress REST API (convenience alias)
+#   3. /wp-admin/*, /wp-login/* → WordPress admin panel
+#   4. /assets/*                → Static files (served directly, no rewrite)
+#   5. Everything else          → dist/index.html (React SPA catch-all)
 
-# Disable directory listing
+# ─── Disable Directory Listing & Defaults ─────────────────────────────────────
 Options -Indexes
+Options +FollowSymLinks
 
 # ─── Force HTTPS ──────────────────────────────────────────────────────────────
 <IfModule mod_rewrite.c>
     RewriteEngine On
+    RewriteBase /
 
-    # Redirect HTTP → HTTPS (skip if already HTTPS or on localhost)
+    # Redirect HTTP → HTTPS
+    # Skip if already HTTPS or on localhost
     RewriteCond %{HTTPS} off
     RewriteCond %{HTTP_HOST} !^localhost [NC]
-    RewriteCond %{HTTP_HOST} !^127\.0\.0\.1
+    RewriteCond %{HTTP_HOST} !^127\.0\.0\.1 [NC]
     RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
 </IfModule>
 
@@ -28,6 +45,16 @@ Options -Indexes
     Header always set X-XSS-Protection "1; mode=block"
     Header always set Referrer-Policy "strict-origin-when-cross-origin"
     Header always set Permissions-Policy "camera=(), microphone=(), geolocation=()"
+    Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains"
+</IfModule>
+
+# ─── CORS Headers (Allow React to call WordPress API) ─────────────────────────
+<IfModule mod_headers.c>
+    # Allow requests from same origin
+    Header set Access-Control-Allow-Origin "*"
+    Header set Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
+    Header set Access-Control-Allow-Headers "Content-Type, Authorization"
+    Header set Access-Control-Max-Age "86400"
 </IfModule>
 
 # ─── Gzip / Brotli Compression ────────────────────────────────────────────────
@@ -42,15 +69,22 @@ Options -Indexes
     AddOutputFilterByType DEFLATE application/xml
     AddOutputFilterByType DEFLATE image/svg+xml
     AddOutputFilterByType DEFLATE font/woff2
+
+    # Exclude already-compressed formats
+    SetEnvIfNoCase Request_URI \.(?:gif|jpe?g|png|gz|zip|exe)$ no-gzip
 </IfModule>
 
 # ─── Browser Caching ──────────────────────────────────────────────────────────
 <IfModule mod_expires.c>
     ExpiresActive On
-    # HTML — no caching for SPA shell (index.html contains hashed asset references;
-    # a stale index.html would try to load old JS/CSS hashes that may no longer exist)
+
+    # HTML (React SPA shell) — NO caching
+    # Reason: index.html contains hashed asset references;
+    #         stale index.html would load old/missing JS/CSS chunks
     ExpiresByType text/html                "access plus 0 seconds"
-    # Content-hashed assets — very long TTL
+
+    # Content-hashed assets — very long TTL (1 year)
+    # These filenames include content hash, so they're cache-safe forever
     ExpiresByType text/css                 "access plus 1 year"
     ExpiresByType application/javascript   "access plus 1 year"
     ExpiresByType image/svg+xml            "access plus 1 year"
@@ -58,9 +92,20 @@ Options -Indexes
     ExpiresByType image/jpeg               "access plus 1 year"
     ExpiresByType image/webp               "access plus 1 year"
     ExpiresByType image/gif                "access plus 1 year"
+    ExpiresByType image/x-icon             "access plus 1 year"
     ExpiresByType font/woff2               "access plus 1 year"
     ExpiresByType font/woff                "access plus 1 year"
+
+    # API responses — NO caching
+    # REST API results change frequently
     ExpiresByType application/json         "access plus 0 seconds"
+    ExpiresByType application/xml          "access plus 0 seconds"
+</IfModule>
+
+# ─── ETag Handling (optimize cache validation) ────────────────────────────────
+<IfModule mod_headers.c>
+    Header edit ETag ^"(.*)"$  "$1-gzip"
+    Header always append Vary Accept-Encoding
 </IfModule>
 
 # ─── URL Routing ──────────────────────────────────────────────────────────────
@@ -68,35 +113,75 @@ Options -Indexes
     RewriteEngine On
     RewriteBase /
 
-    # ── WordPress admin & login ──────────────────────────────────────────────
-    # Route /wp-admin/ → /wp/wp-admin/ transparently
+    # ── HTTPS redirection (already done above, but repeating for clarity) ──
+    RewriteCond %{HTTPS} off
+    RewriteCond %{HTTP_HOST} !^localhost [NC]
+    RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
+
+    # ── WordPress admin & login ──────────────────────────────────────
+    # Map /wp-admin/ → /wp/wp-admin/ (transparent to client)
     RewriteRule ^wp-admin(/.*)?$  wp/wp-admin$1  [L]
-    # Route /wp-login.php → /wp/wp-login.php
+
+    # Map /wp-login.php → /wp/wp-login.php
     RewriteRule ^wp-login\.php$   wp/wp-login.php  [L]
 
-    # ── WordPress wp-content (uploads, plugins, themes) ─────────────────────
+    # ── WordPress wp-content (uploads, plugins, themes) ───────────────
+    # Map /wp-content/* → /wp/wp-content/*
     RewriteRule ^wp-content/(.*)$ wp/wp-content/$1  [L]
 
-    # ── WordPress REST API convenience aliases ───────────────────────────────
-    # Allow both /wp-json/ and /wp/wp-json/ to reach WordPress
+    # ── WordPress REST API convenience aliases ──────────────────────
+    # Allow BOTH /wp-json/ and /wp/wp-json/ to reach WordPress
+    # (more convenient than requiring /wp/wp-json/ in API calls)
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteRule ^wp-json/(.*)$     wp/wp-json/$1  [L,QSA]
 
-    # ── WordPress XML feeds & sitemap ────────────────────────────────────────
+    # ── WordPress XML feeds & sitemap ────────────────────────────────
     RewriteRule ^feed(/.*)?$       wp/index.php  [L,QSA]
     RewriteRule ^sitemap\.xml$     wp/sitemap.xml  [L,QSA]
     RewriteRule ^xmlrpc\.php$      wp/xmlrpc.php  [L]
 
-    # ── Static dist assets — served directly, no rewrite ────────────────────
+    # ── Static files (dist/assets) — served directly, NO rewrite ─────
+    # If file exists in filesystem, serve it as-is (don't rewrite)
     RewriteCond %{REQUEST_FILENAME} -f
     RewriteRule ^ - [L]
 
-    # ── React SPA catch-all ──────────────────────────────────────────────────
-    # Any request that doesn't match an existing file or directory
-    # and is not a WordPress path → serve dist/index.html for React Router.
+    # If directory exists in filesystem, don't rewrite
+    RewriteCond %{REQUEST_FILENAME} -d
+    RewriteRule ^ - [L]
+
+    # ── React SPA catch-all ────────────────────────────────────────
+    # Any request that:
+    #   • Is NOT an existing file
+    #   • Is NOT an existing directory
+    #   • Is NOT a WordPress path (/wp/*, /wp-admin/*, etc.)
+    # Should be rewritten to dist/index.html for React Router
+    #
+    # CORRECTED: If dist files are in domain root (not /dist/ subdir):
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteCond %{REQUEST_URI} !^/wp/
-    RewriteRule ^ dist/index.html  [QSA,L]
+    RewriteCond %{REQUEST_URI} !^/wp-admin/
+    RewriteCond %{REQUEST_URI} !^/wp-login\.php
+    RewriteRule ^ /index.html  [QSA,L]
+
+    # ── Alternative catch-all (if React assets are in /dist/ subdirectory) ──
+    # UNCOMMENT ONLY if your deployment puts files in /dist/ subdir:
+    # RewriteCond %{REQUEST_FILENAME} !-f
+    # RewriteCond %{REQUEST_FILENAME} !-d
+    # RewriteCond %{REQUEST_URI} !^/wp/
+    # RewriteRule ^ /dist/index.html  [QSA,L]
 </IfModule>
+
+# ─── Error Documents ──────────────────────────────────────────────────────────
+ErrorDocument 404 /index.html
+# Note: This lets React Router handle 404s gracefully (React shows 404 page)
+
+# ─── Disable Scripts Execution in Uploads Directory ────────────────────────────
+<Directory "/home4/benconklin/public_html/website_a246e6a8/wp/wp-content/uploads">
+    php_flag engine off
+    <FilesMatch "\.php$">
+        Deny from all
+    </FilesMatch>
+</Directory>
+

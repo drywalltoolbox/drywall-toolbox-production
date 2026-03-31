@@ -109,7 +109,7 @@ jobs:
           if-no-files-found: error
 
   deploy:
-    name: FTP Deploy to HostGator
+    name: FTPS Deploy to HostGator
     runs-on: ubuntu-latest
     needs: build
     permissions:
@@ -117,6 +117,14 @@ jobs:
 
     env:
       REMOTE_ROOT: "${{ secrets.HOSTGATOR_REMOTE_ROOT || github.event.inputs.remote_root || 'public_html/website_a246e6a8' }}"
+    
+    # ────────────────────────────────────────────────────────────────────────────
+    # DEPLOYMENT STRATEGY:
+    # • Only upload files necessary for production (no dev/test files)
+    # • Exclude build artifacts, cache, logs, source maps
+    # • Minimize upload time and bandwidth
+    # • Keep deployment fast and safe
+    # ────────────────────────────────────────────────────────────────────────────
 
     steps:
       - name: Checkout repository (wp/ + root files)
@@ -168,9 +176,9 @@ jobs:
         run: |
           echo "Dry-run mode: displaying deploy plan."
           echo
-          echo "Would deploy .htaccess + index.php → ${{ env.REMOTE_ROOT }}/"
-          echo "Would deploy dist/ → ${{ env.REMOTE_ROOT }}/dist/"
-          echo "Would deploy wp/wp-content/ → ${{ env.REMOTE_ROOT }}/wp/wp-content/"
+          echo "Will deploy .htaccess + index.php → ${{ env.REMOTE_ROOT }}/"
+          echo "Will deploy dist/ → ${{ env.REMOTE_ROOT }}/ (directly to root)"
+          echo "Will deploy wp/wp-content/ → ${{ env.REMOTE_ROOT }}/wp/wp-content/"
 
       - name: Stage root files for deployment
         run: |
@@ -251,7 +259,7 @@ jobs:
           USER: ${{ secrets.HOSTGATOR_FTP_USER }}
           PASS: ${{ secrets.HOSTGATOR_FTP_PASS }}
 
-      - name: Deploy dist/ via FTPS
+      - name: Deploy React assets (dist/ → root, NOT to /dist/ subdirectory) via FTPS
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
           server:   ${{ secrets.HOSTGATOR_FTP_HOST }}
@@ -259,8 +267,10 @@ jobs:
           password: ${{ secrets.HOSTGATOR_FTP_PASS }}
           protocol: ftps
           port:     ${{ secrets.HOSTGATOR_FTP_PORT }}
-          server-dir: ${{ env.SERVER_DIR }}/dist/
+          # FIXED: Deploy directly to root, NOT to /dist/ subdirectory
+          server-dir: ${{ env.SERVER_DIR }}/
           local-dir:  ./dist/
+          # Exclude unnecessary files — only upload what the app needs
           exclude: |
             **/.git*
             **/.github/**
@@ -268,7 +278,28 @@ jobs:
             **/*.log
             **/.env*
             **/*.map
-          dangerous-clean-slate: true
+            **/package.json
+            **/package-lock.json
+            **/tsconfig.json
+            **/.eslintrc*
+            **/.babelrc*
+            **/webpack.config.*
+            **/vite.config.*
+            **/README.md
+            **/.DS_Store
+            **/Thumbs.db
+            **/.vscode/**
+            **/.idea/**
+            **/*.swp
+            **/*~
+            **/.turbo/**
+            **/.next/**
+            **/.nuxt/**
+            **/dist/**
+            **/build/**
+            **/out/**
+          # FIXED: Set to false to preserve existing files (safer)
+          dangerous-clean-slate: false
           log-level: verbose
           dry-run: ${{ github.event.inputs.dry_run == 'true' }}
           timeout: 300000
@@ -283,6 +314,7 @@ jobs:
           port:     ${{ secrets.HOSTGATOR_FTP_PORT }}
           server-dir: ${{ env.SERVER_DIR }}/wp/wp-content/
           local-dir:  ./wp/wp-content/
+          # Exclude unnecessary files and cache — only upload essential content
           exclude: |
             **/.git*
             **/.github/**
@@ -290,13 +322,62 @@ jobs:
             **/*.log
             **/.env*
             **/.gitignore
+            **/.DS_Store
+            **/Thumbs.db
+            **/.vscode/**
+            **/.idea/**
             **/README.md
-            **/twentytwenty*/**
-            **/yith-wonder/**
+            **/*.md
+            **/*.txt
             **/*.bak
+            **/*.swp
+            **/*~
+            **/._*
+            **/.turbo/**
+            # Exclude cache and temporary files
+            **/cache/**
+            **/temp/**
+            **/tmp/**
+            **/.cache/**
+            # Exclude build/transpiled files not needed at runtime
             **/*.map
-            **/products_catalog.csv
-            **/catalog/**
+            **/dist/**
+            **/build/**
+            **/out/**
+            # Exclude package management files (not needed on server)
+            **/package.json
+            **/package-lock.json
+            **/composer.json
+            **/composer.lock
+            **/tsconfig.json
+            **/.eslintrc*
+            **/.babelrc*
+            # Exclude default/demo plugins/themes
+            **/twentytwenty*/**
+            **/twentytwentyone*/**
+            **/twentytwentytwo*/**
+            **/twentytwentythree*/**
+            **/akismet/**
+            **/hello.php
+            # Exclude database backups and dumps
+            **/*.sql
+            **/*.sql.gz
+            **/*.sql.bz2
+            # Exclude media library index files (regenerated on server)
+            **/uploads/index.html
+            # Exclude backup plugins commonly created
+            **/yith-wonder/**
+            **/duplicate-post/**
+            **/wp-db-backup/**
+            **/wordpress-backup/**
+            # Exclude maintenance files
+            **/wp-maintenance-mode/**
+            **/under-construction/**
+            # Exclude security scanner databases
+            **/wordfence-scan-**
+            # Exclude analytics data
+            **/*analytics*
+            **/*statistic*
           dangerous-clean-slate: false
           log-level: verbose
           dry-run: ${{ github.event.inputs.dry_run == 'true' }}
@@ -305,17 +386,29 @@ jobs:
       - name: Deployment summary
         if: always()
         run: |
-          echo "────────────────────────────────────────────"
-          echo "  Deploy status : ${{ job.status }}"
-          echo "  Commit SHA    : ${{ github.sha }}"
-          echo "  Triggered by  : ${{ github.actor }}"
-          echo "  Timestamp     : $(date -u '+%Y-%m-%dT%H:%M:%SZ')"
-          echo "  Dry run       : ${{ github.event.inputs.dry_run == 'true' }}"
-          echo "  Remote root   : ${{ env.REMOTE_ROOT }}"
-          echo "  JS chunks     : $(find dist/assets/js -name '*.js' 2>/dev/null | wc -l) files"
-          echo "  WP theme      : wp/wp-content/themes/headless-base/ (active headless theme)"
-          echo "  Root .htaccess: .htaccess → website root (React Router + WP routing)"
-          echo "────────────────────────────────────────────"
+          echo "────────────────────────────────────────────────────────"
+          echo "  Deployment Summary"
+          echo "────────────────────────────────────────────────────────"
+          echo "  Status              : ${{ job.status }}"
+          echo "  Commit SHA          : ${{ github.sha }}"
+          echo "  Triggered by        : ${{ github.actor }}"
+          echo "  Timestamp           : $(date -u '+%Y-%m-%dT%H:%M:%SZ')"
+          echo "  Dry run             : ${{ github.event.inputs.dry_run == 'true' }}"
+          echo "  Remote root         : ${{ env.REMOTE_ROOT }}"
+          echo ""
+          echo "  Files deployed:"
+          echo "  • dist/* → root (React assets + index.html)"
+          echo "  • .htaccess → root (URL rewriting rules)"
+          echo "  • index.php → root (entry point)"
+          echo "  • wp/wp-content/* → wp/wp-content/ (WordPress content)"
+          echo ""
+          echo "  Notes:"
+          echo "  • WordPress core files (/wp/wp-admin, /wp/wp-includes, etc.)"
+          echo "    must be manually uploaded once via cPanel or SFTP"
+          echo "  • wp-config.php must be manually created with real DB credentials"
+          echo "  • See DEPLOYMENT_AUDIT.md for detailed setup instructions"
+          echo "  • Verify deployment at: https://drywalltoolbox.com/"
+          echo "────────────────────────────────────────────────────────"
 
   verify:
     name: Post-Deploy Verification

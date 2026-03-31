@@ -1,0 +1,2 @@
+# This file ensures the plugins directory is tracked by git
+# Plugin files are uploaded to this directory on the server via cPanel/WP-CLI

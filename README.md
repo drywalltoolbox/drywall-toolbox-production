@@ -101,6 +101,30 @@ npm run lint
 
 ---
 
+## Deployment — HostGator / cPanel
+
+### � START HERE: [DEPLOY_NOW.md](./DEPLOY_NOW.md)
+
+**→ Complete step-by-step guide from start to finish (2-3 hours)**
+
+Everything you need:
+- MySQL database setup
+- WordPress core file upload
+- React build & deployment
+- Automated GitHub Actions setup
+- Testing & verification
+- Troubleshooting
+
+**For Questions:**
+- **[WORDPRESS_IMPLEMENTATION.md](./docs/WORDPRESS_IMPLEMENTATION.md)** — WordPress /wp/ structure
+- **[GITHUB_ACTIONS_SECRETS.md](./docs/GITHUB_ACTIONS_SECRETS.md)** — GitHub secrets config
+- **[TROUBLESHOOTING_CHECKLIST.md](./docs/TROUBLESHOOTING_CHECKLIST.md)** — Debugging help
+- **[ARCHITECTURE_VISUAL_GUIDE.md](./docs/ARCHITECTURE_VISUAL_GUIDE.md)** — How it all works
+
+
+
+---
+
 ## API Architecture
 
 ### Environment Variables (VITE_*)
