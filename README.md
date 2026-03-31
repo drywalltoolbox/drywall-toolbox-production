@@ -8,6 +8,22 @@ Headless React storefront for Drywalltoolbox.com — powered by WordPress + WooC
 
 ---
 
+## 🚀 Deployment Guides
+
+**Choose based on your experience level:**
+
+- **👤 Non-Technical / First Time?** → Start with [BEGINNER_DEPLOYMENT_GUIDE.md](./BEGINNER_DEPLOYMENT_GUIDE.md)
+  - Simple step-by-step instructions
+  - No jargon, just copy-paste files
+  - About 1-2 hours to complete
+
+- **👨‍💻 Technical / Full Details?** → See [docs/README.md](./docs/README.md)
+  - Complete architecture documentation
+  - Detailed troubleshooting
+  - 7 specialized guides for different aspects
+
+---
+
 ## Repository Layout
 
 ```
