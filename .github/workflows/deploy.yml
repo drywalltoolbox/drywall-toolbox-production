@@ -64,8 +64,8 @@ jobs:
           REACT_APP_WC_AUTH_PASS:           ${{ secrets.REACT_APP_WC_AUTH_PASS }}
           # Note: Webpack DefinePlugin automatically handles import.meta.env.* references
           # No Vite config needed — these VITE_* names are just env var conventions
-          VITE_WP_API_BASE:                 ${{ secrets.VITE_WP_API_BASE || secrets.REACT_APP_WP_BASE_URL }}
-          VITE_WC_API_BASE:                 ${{ secrets.VITE_WC_API_BASE || secrets.REACT_APP_WC_BASE_URL }}
+          VITE_WP_API_BASE:                 ${{ secrets.VITE_WP_API_BASE || 'https://drywalltoolbox.com/wp-json' }}
+          VITE_WC_API_BASE:                 ${{ secrets.VITE_WC_API_BASE || 'https://drywalltoolbox.com/wp-json/wc/v3' }}
           VITE_JWT_ENDPOINT:                ${{ secrets.VITE_JWT_ENDPOINT }}
           VITE_SITE_URL:                    ${{ secrets.VITE_SITE_URL }}
           VITE_APP_ENV:                     production

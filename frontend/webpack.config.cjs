@@ -228,14 +228,13 @@ module.exports = (envFlags, argv) => {
         patterns: [
           {
             from: 'public',
-            to:   'public',
+            to:   '.',
             globOptions: {
               dot: true,
               ignore: [
                 '**/index.html',
                 '**/products_catalog.csv',
                 '**/products_catalog_*.csv',
-                '**/brands/**',
               ],
             },
           },

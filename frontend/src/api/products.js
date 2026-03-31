@@ -73,3 +73,23 @@ export async function getProductCategories(params = {}) {
   });
   return response.data;
 }
+
+/**
+ * Fetch a single WooCommerce product by its SKU.
+ *
+ * WooCommerce GET /products?sku=<sku> returns an array; we return the first
+ * match or null if nothing is found.
+ *
+ * @param {string} sku  The product SKU (e.g. "CT119", "FA362")
+ * @returns {Promise<Object|null>}  WooCommerce product object or null
+ */
+export async function getProductBySku(sku) {
+  if (!sku) return null;
+  try {
+    const response = await wcClient.get('/products', { params: { sku, per_page: 1 } });
+    const products = response.data;
+    return Array.isArray(products) && products.length > 0 ? products[0] : null;
+  } catch {
+    return null;
+  }
+}

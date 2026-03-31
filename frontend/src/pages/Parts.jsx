@@ -4,7 +4,7 @@ import { useCart } from '../context/CartContext';
 import Toast from '../components/Toast';
 import BrandSelector from '../components/BrandSelector';
 import ToolSelector from '../components/ToolSelector';
-import { loadProducts } from '../data/products';
+import { getProductBySku } from '../api/products';
 import { SCHEMATIC_DEFINITIONS } from '../data/schematicMappings';
 import { useSchematicMedia } from '../hooks/useSchematicMedia';
 import '../styles/mobile-schematic.css';
@@ -78,150 +78,151 @@ import tapeTechExtendableSupportHandleData from '/brands/TapeTech/Schematics/Ext
 // ---------------------------------------------------------------------------
 const _BASE = process.env.PUBLIC_URL;
 
-// Static fallback image paths (PNG/JPG originals, served from public/)
+// Static fallback image paths — all converted to WebP.
+// These are served from public/brands/ and copied verbatim into dist/ by webpack.
 const _fallbacks = {
   'columbia-matrix': {
     pages: {
-      1: `${_BASE}brands/Columbia/Schematics/Handles/MatrixBoxHandle/BoxHandle/Matrix_Handle-enhanced.png`,
-      2: `${_BASE}brands/Columbia/Schematics/Handles/MatrixBoxHandle/Head/Matrix_Head-enhanced-enhanced.png`,
-      3: `${_BASE}brands/Columbia/Schematics/Handles/MatrixBoxHandle/Lever/Matrix_Lever-1-enhanced.png`,
-      4: `${_BASE}brands/Columbia/Schematics/Handles/MatrixBoxHandle/Pinchbox/Matrix_Pinchbox-1-enhanced.png`,
-      5: `${_BASE}brands/Columbia/Schematics/Handles/MatrixBoxHandle/ExtensionHousing/Extension_Housing_Schematic-1-enhanced.png`,
+      1: `${_BASE}brands/Columbia/Schematics/Handles/MatrixBoxHandle/BoxHandle/Matrix_Handle-enhanced.webp`,
+      2: `${_BASE}brands/Columbia/Schematics/Handles/MatrixBoxHandle/Head/Matrix_Head-enhanced-enhanced.webp`,
+      3: `${_BASE}brands/Columbia/Schematics/Handles/MatrixBoxHandle/Lever/Matrix_Lever-1-enhanced.webp`,
+      4: `${_BASE}brands/Columbia/Schematics/Handles/MatrixBoxHandle/Pinchbox/Matrix_Pinchbox-1-enhanced.webp`,
+      5: `${_BASE}brands/Columbia/Schematics/Handles/MatrixBoxHandle/ExtensionHousing/Extension_Housing_Schematic-1-enhanced.webp`,
     },
-    preview: `${_BASE}brands/Columbia/Schematics/Handles/MatrixBoxHandle/BoxHandle/columbia_matrix_box_handle.jpg`,
+    preview: `${_BASE}brands/Columbia/Schematics/Handles/MatrixBoxHandle/BoxHandle/columbia_matrix_box_handle.webp`,
   },
   'columbia-predator-taper': {
     pages: {
-      1: `${_BASE}brands/Columbia/Schematics/AutomaticTapers/PredatorTaper/Body/predator_taper_body.png`,
-      2: `${_BASE}brands/Columbia/Schematics/AutomaticTapers/PredatorTaper/Head/predator_taper_head.png`,
+      1: `${_BASE}brands/Columbia/Schematics/AutomaticTapers/PredatorTaper/Body/predator_taper_body.webp`,
+      2: `${_BASE}brands/Columbia/Schematics/AutomaticTapers/PredatorTaper/Head/predator_taper_head.webp`,
     },
-    preview: `${_BASE}brands/Columbia/Schematics/AutomaticTapers/PredatorTaper/predator_taper.jpg`,
+    preview: `${_BASE}brands/Columbia/Schematics/AutomaticTapers/PredatorTaper/predator_taper.webp`,
   },
   'tapetech-extendable-support-handle': {
-    pages: { 1: `${_BASE}brands/TapeTech/Schematics/ExtendableSupportHandle/XHTT_SCH.png` },
-    preview: `${_BASE}brands/TapeTech/Schematics/ExtendableSupportHandle/XHTT_02-300x300.jpg`,
+    pages: { 1: `${_BASE}brands/TapeTech/Schematics/ExtendableSupportHandle/XHTT_SCH.webp` },
+    preview: `${_BASE}brands/TapeTech/Schematics/ExtendableSupportHandle/XHTT_02-300x300.webp`,
   },
   'columbia-2-way-internal-corner': {
-    pages: { 1: `${_BASE}brands/Columbia/Schematics/Applicators/TwoWayInternalCorner/2_Way_Internal_Corner_Applicator-1-enhanced.png` },
-    preview: `${_BASE}brands/Columbia/Schematics/Applicators/TwoWayInternalCorner/Two-Way_Internal_Corner_Applicator.jpg`,
+    pages: { 1: `${_BASE}brands/Columbia/Schematics/Applicators/TwoWayInternalCorner/2_Way_Internal_Corner_Applicator-1-enhanced.webp` },
+    preview: `${_BASE}brands/Columbia/Schematics/Applicators/TwoWayInternalCorner/Two-Way_Internal_Corner_Applicator.webp`,
   },
   'columbia-external-corner-applicator': {
-    pages: { 1: `${_BASE}brands/Columbia/Schematics/Applicators/ExternalCorner/8_Wheel_External_Corner_Applicator-1-enhanced.png` },
-    preview: `${_BASE}brands/Columbia/Schematics/Applicators/ExternalCorner/External_90_Aplicator_CEXT90_-_FRONT.jpg`,
+    pages: { 1: `${_BASE}brands/Columbia/Schematics/Applicators/ExternalCorner/8_Wheel_External_Corner_Applicator-1-enhanced.webp` },
+    preview: `${_BASE}brands/Columbia/Schematics/Applicators/ExternalCorner/External_90_Aplicator_CEXT90_-_FRONT.webp`,
   },
   'columbia-inside-corner-applicator': {
     pages: {
-      1: `${_BASE}brands/Columbia/Schematics/Applicators/InsideCornerApplicator/2Wheel/ICA1-2-2015.png`,
-      2: `${_BASE}brands/Columbia/Schematics/Applicators/InsideCornerApplicator/4Wheel/ICA1-4-2015.png`,
+      1: `${_BASE}brands/Columbia/Schematics/Applicators/InsideCornerApplicator/2Wheel/ICA1-2-2015.webp`,
+      2: `${_BASE}brands/Columbia/Schematics/Applicators/InsideCornerApplicator/4Wheel/ICA1-4-2015.webp`,
     },
-    preview: `${_BASE}brands/Columbia/Schematics/Applicators/InsideCornerApplicator/Inside_Corner_Applicator_4_Wheels_ICA1-4_-_BACK.jpg`,
+    preview: `${_BASE}brands/Columbia/Schematics/Applicators/InsideCornerApplicator/Inside_Corner_Applicator_4_Wheels_ICA1-4_-_BACK.webp`,
   },
   // (Inside Corner Roller images/data intentionally removed from parts schematics)
   'columbia-standard-outside-corner-roller': {
-    pages: { 1: `${_BASE}brands/Columbia/Schematics/CornerRollers/StandardOutsideCornerRoller/OutsideCornerRollers-2016-1-enhanced.png` },
-    preview: `${_BASE}brands/Columbia/Schematics/CornerRollers/StandardOutsideCornerRoller/External_90_Aplicator.jpg`,
+    pages: { 1: `${_BASE}brands/Columbia/Schematics/CornerRollers/StandardOutsideCornerRoller/OutsideCornerRollers-2016-1-enhanced.webp` },
+    preview: `${_BASE}brands/Columbia/Schematics/CornerRollers/StandardOutsideCornerRoller/External_90_Aplicator.webp`,
   },
   'columbia-inside-corner-roller': {
-    pages: { 1: `${_BASE}brands/Columbia/Schematics/CornerRollers/InsideCornerRoller/InsideCornerRoller-2014_1_-enhanced-squared.png` },
-    preview: `${_BASE}brands/Columbia/Schematics/CornerRollers/InsideCornerRoller/cornerroller.jpg`,
+    pages: { 1: `${_BASE}brands/Columbia/Schematics/CornerRollers/InsideCornerRoller/InsideCornerRoller-2014_1_-enhanced-squared.webp` },
+    preview: `${_BASE}brands/Columbia/Schematics/CornerRollers/InsideCornerRoller/cornerroller.webp`,
   },
   'columbia-throttle-box': {
-    pages: { 1: `${_BASE}brands/Columbia/Schematics/CornerBoxes/ThrottleBox/CORNER-BOX-SCHEMATIC-enhanced.png` },
-    preview: `${_BASE}brands/Columbia/Schematics/CornerBoxes/ThrottleBox/throttlebox8small.jpg`,
+    pages: { 1: `${_BASE}brands/Columbia/Schematics/CornerBoxes/ThrottleBox/CORNER-BOX-SCHEMATIC-enhanced.webp` },
+    preview: `${_BASE}brands/Columbia/Schematics/CornerBoxes/ThrottleBox/throttlebox8small.webp`,
   },
   'columbia-automatic-flat-box': {
-    pages: { 1: `${_BASE}brands/Columbia/Schematics/FinishingBoxes/AutomaticFlatBox/AUTO-BOX-SCHEMATIC-2022-enhanced.png` },
-    preview: `${_BASE}brands/Columbia/Schematics/FinishingBoxes/AutomaticFlatBox/automaticbox-1.jpg`,
+    pages: { 1: `${_BASE}brands/Columbia/Schematics/FinishingBoxes/AutomaticFlatBox/AUTO-BOX-SCHEMATIC-2022-enhanced.webp` },
+    preview: `${_BASE}brands/Columbia/Schematics/FinishingBoxes/AutomaticFlatBox/automaticbox-1.webp`,
   },
   'columbia-flat-box': {
-    pages: { 1: `${_BASE}brands/Columbia/Schematics/FinishingBoxes/FlatBox/FLAT-BOX-HINGED-SCHEMATIC-2022-enhanced.png` },
-    preview: `${_BASE}brands/Columbia/Schematics/FinishingBoxes/FlatBox/2023flatbox.jpg`,
+    pages: { 1: `${_BASE}brands/Columbia/Schematics/FinishingBoxes/FlatBox/FLAT-BOX-HINGED-SCHEMATIC-2022-enhanced.webp` },
+    preview: `${_BASE}brands/Columbia/Schematics/FinishingBoxes/FlatBox/2023flatbox.webp`,
   },
   'columbia-fat-boy-box': {
-    pages: { 1: `${_BASE}brands/Columbia/Schematics/FinishingBoxes/FatBoyBox/fat_boy_box.png` },
-    preview: `${_BASE}brands/Columbia/Schematics/FinishingBoxes/FatBoyBox/InsideTrackBoxFrontSmall.png`,
+    pages: { 1: `${_BASE}brands/Columbia/Schematics/FinishingBoxes/FatBoyBox/fat_boy_box.webp` },
+    preview: `${_BASE}brands/Columbia/Schematics/FinishingBoxes/FatBoyBox/InsideTrackBoxFrontSmall.webp`,
   },
   'columbia-angle-head': {
-    pages: { 1: `${_BASE}brands/Columbia/Schematics/Angleheads/AngleHead/AngleHead-2014-3-enhanced.png` },
-    preview: `${_BASE}brands/Columbia/Schematics/Angleheads/AngleHead/angleheadbacksquare.jpg`,
+    pages: { 1: `${_BASE}brands/Columbia/Schematics/Angleheads/AngleHead/AngleHead-2014-3-enhanced.webp` },
+    preview: `${_BASE}brands/Columbia/Schematics/Angleheads/AngleHead/angleheadbacksquare.webp`,
   },
   'columbia-gooseneck-adapter': {
-    pages: { 1: `${_BASE}brands/Columbia/Schematics/Pumps/GooseneckAdapter/Gooseneck-1-1-enhanced.png` },
-    preview: `${_BASE}brands/Columbia/Schematics/Pumps/GooseneckAdapter/goosenecksquare.jpg`,
+    pages: { 1: `${_BASE}brands/Columbia/Schematics/Pumps/GooseneckAdapter/Gooseneck-1-1-enhanced.webp` },
+    preview: `${_BASE}brands/Columbia/Schematics/Pumps/GooseneckAdapter/goosenecksquare.webp`,
   },
   'columbia-mud-pump': {
     pages: {
-      1: `${_BASE}brands/Columbia/Schematics/Pumps/MudPump/MUD-PUMP-SUB-ASSEMBLIES-2022-enhanced.png`,
-      2: `${_BASE}brands/Columbia/Schematics/Pumps/MudPump/MUD-PUMP-SCHEMATIC-2022-enhanced.png`,
+      1: `${_BASE}brands/Columbia/Schematics/Pumps/MudPump/MUD-PUMP-SUB-ASSEMBLIES-2022-enhanced.webp`,
+      2: `${_BASE}brands/Columbia/Schematics/Pumps/MudPump/MUD-PUMP-SCHEMATIC-2022-enhanced.webp`,
     },
-    preview: `${_BASE}brands/Columbia/Schematics/Pumps/MudPump/TallBoyMudpumps.jpg`,
+    preview: `${_BASE}brands/Columbia/Schematics/Pumps/MudPump/TallBoyMudpumps.webp`,
   },
   'columbia-tall-boy-mud-pump': {
     pages: {
-      1: `${_BASE}brands/Columbia/Schematics/Pumps/TallBoyMudPump/TALL-BOY-MUD-PUMP-SUB-ASSEMBLIES-2022-enhanced.png`,
-      2: `${_BASE}brands/Columbia/Schematics/Pumps/TallBoyMudPump/TALL-BOY-MUD-PUMP-SCHEMATIC-2022-enhanced.png`,
+      1: `${_BASE}brands/Columbia/Schematics/Pumps/TallBoyMudPump/TALL-BOY-MUD-PUMP-SUB-ASSEMBLIES-2022-enhanced.webp`,
+      2: `${_BASE}brands/Columbia/Schematics/Pumps/TallBoyMudPump/TALL-BOY-MUD-PUMP-SCHEMATIC-2022-enhanced.webp`,
     },
-    preview: `${_BASE}brands/Columbia/Schematics/Pumps/TallBoyMudPump/TallBoyPump.jpg`,
+    preview: `${_BASE}brands/Columbia/Schematics/Pumps/TallBoyMudPump/TallBoyPump.webp`,
   },
   'columbia-nailspotter': {
-    pages: { 1: `${_BASE}brands/Columbia/Schematics/Nailspotters/Nailspotter/NAIL-SPOTTER-SCHEMATIC-2022-enhanced.png` },
-    preview: `${_BASE}brands/Columbia/Schematics/Nailspotters/Nailspotter/2023Nailspotter3inch.jpg`,
+    pages: { 1: `${_BASE}brands/Columbia/Schematics/Nailspotters/Nailspotter/NAIL-SPOTTER-SCHEMATIC-2022-enhanced.webp` },
+    preview: `${_BASE}brands/Columbia/Schematics/Nailspotters/Nailspotter/2023Nailspotter3inch.webp`,
   },
   'columbia-tomahawk-smoothing-blades': {
-    pages: { 1: `${_BASE}brands/Columbia/Schematics/SmoothingBlades/TomahawkSmoothingBlades/TOMAHAWK-SCHEMATIC-2022-enhanced.png` },
-    preview: `${_BASE}brands/Columbia/Schematics/SmoothingBlades/TomahawkSmoothingBlades/Tomahawksmoothingblade.jpg`,
+    pages: { 1: `${_BASE}brands/Columbia/Schematics/SmoothingBlades/TomahawkSmoothingBlades/TOMAHAWK-SCHEMATIC-2022-enhanced.webp` },
+    preview: `${_BASE}brands/Columbia/Schematics/SmoothingBlades/TomahawkSmoothingBlades/Tomahawksmoothingblade.webp`,
   },
   'columbia-standard-corner-flusher': {
-    pages: { 1: `${_BASE}brands/Columbia/Schematics/CornerFlushers/StandardCornerFlusher/3.5INCH-CORNER-FLUSHER-SCHEMATIC-2015-enhanced.png` },
-    preview: `${_BASE}brands/Columbia/Schematics/CornerFlushers/StandardCornerFlusher/3inchflusher.png`,
+    pages: { 1: `${_BASE}brands/Columbia/Schematics/CornerFlushers/StandardCornerFlusher/3.5INCH-CORNER-FLUSHER-SCHEMATIC-2015-enhanced.webp` },
+    preview: `${_BASE}brands/Columbia/Schematics/CornerFlushers/StandardCornerFlusher/3inchflusher.webp`,
   },
   'columbia-direct-corner-flusher': {
-    pages: { 1: `${_BASE}brands/Columbia/Schematics/CornerFlushers/DirectCornerFlusher/DirectStandardFlusher-2015-enhanced.png` },
-    preview: `${_BASE}brands/Columbia/Schematics/CornerFlushers/DirectCornerFlusher/2.5_Direct_Flusher_2.5DF.jpg`,
+    pages: { 1: `${_BASE}brands/Columbia/Schematics/CornerFlushers/DirectCornerFlusher/DirectStandardFlusher-2015-enhanced.webp` },
+    preview: `${_BASE}brands/Columbia/Schematics/CornerFlushers/DirectCornerFlusher/2.5_Direct_Flusher_2.5DF.webp`,
   },
   'columbia-combo-flusher': {
-    pages: { 1: `${_BASE}brands/Columbia/Schematics/CornerFlushers/ComboFlusher/Classic_Combo_Flusher-1-enhanced.png` },
-    preview: `${_BASE}brands/Columbia/Schematics/CornerFlushers/ComboFlusher/combo_flusher.jpg`,
+    pages: { 1: `${_BASE}brands/Columbia/Schematics/CornerFlushers/ComboFlusher/Classic_Combo_Flusher-1-enhanced.webp` },
+    preview: `${_BASE}brands/Columbia/Schematics/CornerFlushers/ComboFlusher/combo_flusher.webp`,
   },
   'columbia-sander-head': {
-    pages: { 1: `${_BASE}brands/Columbia/Schematics/Sanders/SanderHead/SANDER-HEAD-SCHEMATIC-enhanced.png` },
-    preview: `${_BASE}brands/Columbia/Schematics/Sanders/SanderHead/sanderwhandlesquaresmall.jpg`,
+    pages: { 1: `${_BASE}brands/Columbia/Schematics/Sanders/SanderHead/SANDER-HEAD-SCHEMATIC-enhanced.webp` },
+    preview: `${_BASE}brands/Columbia/Schematics/Sanders/SanderHead/sanderwhandlesquaresmall.webp`,
   },
   'columbia-compound-tube': {
-    pages: { 1: `${_BASE}brands/Columbia/Schematics/CompoundTubes/CompoundTube/COMPOUND-TUBE-SCHEMATIC-2022-enhanced.png` },
-    preview: `${_BASE}brands/Columbia/Schematics/CompoundTubes/CompoundTube/compoundtubesquare.jpg`,
+    pages: { 1: `${_BASE}brands/Columbia/Schematics/CompoundTubes/CompoundTube/COMPOUND-TUBE-SCHEMATIC-2022-enhanced.webp` },
+    preview: `${_BASE}brands/Columbia/Schematics/CompoundTubes/CompoundTube/compoundtubesquare.webp`,
   },
   'columbia-cam-lock-tube': {
-    pages: { 1: `${_BASE}brands/Columbia/Schematics/CompoundTubes/CamLockTube/Cam_Lock_Tube_2019-enhanced.png` },
-    preview: `${_BASE}brands/Columbia/Schematics/CompoundTubes/CamLockTube/camlocktubesquare.jpg`,
+    pages: { 1: `${_BASE}brands/Columbia/Schematics/CompoundTubes/CamLockTube/Cam_Lock_Tube_2019-enhanced.webp` },
+    preview: `${_BASE}brands/Columbia/Schematics/CompoundTubes/CamLockTube/camlocktubesquare.webp`,
   },
   'columbia-semi-automatic-taper': {
-    pages: { 1: `${_BASE}brands/Columbia/Schematics/SemiAutomaticTapers/SemiAutomaticTaper/SEMI-AUTOMATIC-TAPER-SCHEMATIC-2022-enhanced.png` },
-    preview: `${_BASE}brands/Columbia/Schematics/SemiAutomaticTapers/SemiAutomaticTaper/semiautotapersquare.jpg`,
+    pages: { 1: `${_BASE}brands/Columbia/Schematics/SemiAutomaticTapers/SemiAutomaticTaper/SEMI-AUTOMATIC-TAPER-SCHEMATIC-2022-enhanced.webp` },
+    preview: `${_BASE}brands/Columbia/Schematics/SemiAutomaticTapers/SemiAutomaticTaper/semiautotapersquare.webp`,
   },
   'columbia-one': {
-    pages: { 1: `${_BASE}brands/Columbia/Schematics/Handles/ColumbiaOne/Columbia_One-enhanced.png` },
-    preview: `${_BASE}brands/Columbia/Schematics/Handles/ColumbiaOne/columbiaonesquare.jpg`,
+    pages: { 1: `${_BASE}brands/Columbia/Schematics/Handles/ColumbiaOne/Columbia_One-enhanced.webp` },
+    preview: `${_BASE}brands/Columbia/Schematics/Handles/ColumbiaOne/columbiaonesquare.webp`,
   },
   'columbia-long-extendable-handle': {
-    pages: { 1: `${_BASE}brands/Columbia/Schematics/Handles/LongExtendableHandle/extendable-handle-enhanced.png` },
-    preview: `${_BASE}brands/Columbia/Schematics/Handles/LongExtendableHandle/corner_roller_handle_extendible.jpg`,
+    pages: { 1: `${_BASE}brands/Columbia/Schematics/Handles/LongExtendableHandle/extendable-handle-enhanced.webp` },
+    preview: `${_BASE}brands/Columbia/Schematics/Handles/LongExtendableHandle/corner_roller_handle_extendible.webp`,
   },
   'columbia-flat-box-handle': {
-    pages: { 1: `${_BASE}brands/Columbia/Schematics/Handles/FlatBoxHandle/180GripBoxHandle-2014-enhanced.png` },
-    preview: `${_BASE}brands/Columbia/Schematics/Handles/FlatBoxHandle/boxhandle.jpg`,
+    pages: { 1: `${_BASE}brands/Columbia/Schematics/Handles/FlatBoxHandle/180GripBoxHandle-2014-enhanced.webp` },
+    preview: `${_BASE}brands/Columbia/Schematics/Handles/FlatBoxHandle/boxhandle.webp`,
   },
   'columbia-closet-monster-flat-box-handle': {
-    pages: { 1: `${_BASE}brands/Columbia/Schematics/Handles/ClosetMonster/ClosetMonster-2015-enhanced.png` },
-    preview: `${_BASE}brands/Columbia/Schematics/Handles/ClosetMonster/closet_monster_copy.jpg`,
+    pages: { 1: `${_BASE}brands/Columbia/Schematics/Handles/ClosetMonster/ClosetMonster-2015-enhanced.webp` },
+    preview: `${_BASE}brands/Columbia/Schematics/Handles/ClosetMonster/closet_monster_copy.webp`,
   },
   'columbia-box-filler': {
-    pages: { 1: `${_BASE}brands/Columbia/Schematics/Pumps/BoxFiller/Box_Filler.png` },
-    preview: `${_BASE}brands/Columbia/Schematics/Pumps/BoxFiller/boxfiller.jpg`,
+    pages: { 1: `${_BASE}brands/Columbia/Schematics/Pumps/BoxFiller/Box_Filler.webp` },
+    preview: `${_BASE}brands/Columbia/Schematics/Pumps/BoxFiller/boxfiller.webp`,
   },
   'columbia-corner-cobra': {
-    pages: { 1: `${_BASE}brands/Columbia/Schematics/CornerRollers/CornerCobra/CORNER-COBRA-SCHEMATIC.2024-enhanced.png` },
-    preview: `${_BASE}brands/Columbia/Schematics/CornerRollers/CornerCobra/NEWCORNERCOBRA-scaled.png`,
+    pages: { 1: `${_BASE}brands/Columbia/Schematics/CornerRollers/CornerCobra/CORNER-COBRA-SCHEMATIC.2024-enhanced.webp` },
+    preview: `${_BASE}brands/Columbia/Schematics/CornerRollers/CornerCobra/NEWCORNERCOBRA-scaled.webp`,
   },
 };
 
@@ -308,14 +309,11 @@ export default function Parts() {
   const [isDragging, setIsDragging] = useState(false);
   const dragStartRef = useRef({ x: 0, y: 0, panX: 0, panY: 0 });
 
-  // Load products on mount
+  // Brand list is static — these are the known brands with schematics.
+  // We do NOT derive this from WooCommerce product inventory; the brand cards
+  // should always be visible regardless of whether WC products are loaded.
   useEffect(() => {
-    loadProducts().then(prods => {
-      // Extract unique brands and filter to only allowed brands
-      const uniqueBrands = [...new Set(prods.map(p => p.brand).filter(Boolean))].sort();
-      const filteredBrands = uniqueBrands.filter(brand => ALLOWED_BRANDS.includes(brand));
-      setBrands(filteredBrands);
-    });
+    setBrands(ALLOWED_BRANDS);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -841,24 +839,52 @@ export default function Parts() {
     ? (currentSchematic.imagePages && currentSchematic.imagePages[currentPage]) || currentSchematic.image || null
     : null;
 
-  const handleAddToCart = (part) => {
-    // Create a product object compatible with the cart system
-    const cartProduct = {
-      id: part.sku, // Use SKU as unique ID
-      name: part.name,
-      brand: currentSchematic?.brand || selectedBrand || 'Parts', // Use actual brand
-      price: part.price,
-      part_number: part.sku,
-      image: '/placeholder-part.png', // Can be updated later with actual images
-    };
-    
-    addToCart(cartProduct, 1);
-    setToast({
-      message: `${part.name} added to cart!`,
-      type: 'cart'
-    });
-    setActiveHotspot(null); // Close modal after adding
-    setActiveHotspotPart(null);
+  const [addingToCart, setAddingToCart] = useState(null); // part.id being added
+
+  const handleAddToCart = async (part) => {
+    if (addingToCart) return; // prevent double-click
+    setAddingToCart(part.id);
+
+    try {
+      // Look up the live WooCommerce product by SKU so we use the real price,
+      // product ID, and image from the store instead of stale JSON values.
+      const wcProduct = part.sku ? await getProductBySku(part.sku) : null;
+
+      const cartProduct = wcProduct
+        ? {
+            id: wcProduct.id,
+            name: wcProduct.name || part.name,
+            brand: currentSchematic?.brand || selectedBrand || 'Parts',
+            price: parseFloat(wcProduct.price) || 0,
+            part_number: wcProduct.sku || part.sku,
+            sku: wcProduct.sku || part.sku,
+            image: wcProduct.images?.[0]?.src || '/placeholder-part.png',
+            permalink: wcProduct.permalink || '',
+            _wcProduct: wcProduct,
+          }
+        : {
+            // Fallback: WC product not found — use schematic JSON data as-is
+            id: part.sku || part.id,
+            name: part.name,
+            brand: currentSchematic?.brand || selectedBrand || 'Parts',
+            price: part.price || 0,
+            part_number: part.sku,
+            sku: part.sku,
+            image: '/placeholder-part.png',
+          };
+
+      addToCart(cartProduct, 1);
+      setToast({
+        message: `${cartProduct.name} added to cart!`,
+        type: 'cart',
+      });
+    } catch {
+      setToast({ message: 'Could not add item to cart. Try again.', type: 'error' });
+    } finally {
+      setAddingToCart(null);
+      setActiveHotspot(null);
+      setActiveHotspotPart(null);
+    }
   };
 
   const closeModal = () => {
@@ -1557,12 +1583,13 @@ export default function Parts() {
                           padding: '8px 16px',
                           fontSize: '0.6rem'
                         }}
+                        disabled={addingToCart === part.id}
                         onClick={(e) => {
                           e.stopPropagation();
                           handleAddToCart(part);
                         }}
                       >
-                        Add
+                        {addingToCart === part.id ? '…' : 'Add'}
                       </button>
                     </div>
                   </div>
@@ -1698,12 +1725,13 @@ export default function Parts() {
                   clipPath: 'none',
                   fontWeight: '700'
                 }}
+                disabled={addingToCart === activeHotspotPart?.id}
                 onClick={(e) => {
                   e.stopPropagation();
                   handleAddToCart(activeHotspotPart);
                 }}
               >
-                Add to Cart
+                {addingToCart === activeHotspotPart?.id ? 'Adding…' : 'Add to Cart'}
               </button>
             </div>
           </div>
