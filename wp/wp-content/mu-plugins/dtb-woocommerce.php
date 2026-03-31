@@ -78,20 +78,19 @@ add_action( 'woocommerce_init', function () {
 } );
 
 // ---------------------------------------------------------------------------
-// 4. ONBOARDING PROFILE DEFAULTS
-//    Ensure the onboarding profile option exists with all fields that
-//    WooCommerce core-profiler expects. Missing keys cause JS to crash when
-//    it destructures the response object.
+// 4. ONBOARDING PROFILE DEFAULTS + WIZARD DISABLED
+//    Mark the onboarding wizard as completed AND skipped so WooCommerce
+//    never redirects to or renders the setup wizard. All required fields
+//    are populated to prevent core-profiler.js from crashing on missing keys.
 // ---------------------------------------------------------------------------
 add_action( 'woocommerce_admin_init', function () {
-	$profile = get_option( 'woocommerce_onboarding_profile', array() );
-
-	$defaults = array(
-		'completed'           => false,
-		'skipped'             => false,
-		'industry'            => array(),
-		'product_types'       => array(),
-		'product_count'       => '0',
+	// Mark wizard as fully complete and skipped — disables it entirely.
+	$profile = array(
+		'completed'           => true,
+		'skipped'             => true,
+		'industry'            => array( array( 'slug' => 'other' ) ),
+		'product_types'       => array( 'physical' ),
+		'product_count'       => '1-10',
 		'selling_venues'      => 'no',
 		'revenue'             => 'none',
 		'business_extensions' => array(),
@@ -99,10 +98,53 @@ add_action( 'woocommerce_admin_init', function () {
 		'setup_client'        => false,
 		'store_name'          => get_bloginfo( 'name' ),
 	);
+	update_option( 'woocommerce_onboarding_profile', $profile );
 
-	// Merge — only write back if something was actually missing.
-	$merged = array_merge( $defaults, $profile );
-	if ( $merged !== $profile ) {
-		update_option( 'woocommerce_onboarding_profile', $merged );
-	}
+	// Tell WooCommerce core that onboarding is complete.
+	update_option( 'woocommerce_task_list_complete', 'yes' );
+	update_option( 'woocommerce_task_list_hidden', 'yes' );
+	update_option( 'wc_setup_wizard_completed', 'yes' );
 } );
+
+// ---------------------------------------------------------------------------
+// 5. BLOCK SETUP WIZARD REDIRECTS
+//    WooCommerce hooks into admin_init to redirect new installs to the setup
+//    wizard. Remove those redirect callbacks before they fire.
+// ---------------------------------------------------------------------------
+add_action( 'admin_init', function () {
+	// Remove WooCommerce's built-in setup wizard redirect.
+	remove_action( 'admin_init', array( 'WC_Admin_Setup_Wizard', 'setup_wizard_redirect' ) );
+
+	// Suppress core-profiler redirect (WooCommerce 7.x+).
+	if ( class_exists( '\Automattic\WooCommerce\Admin\Features\OnboardingTasks\TaskLists' ) ) {
+		$redirect_option = get_option( 'woocommerce_admin_install_timestamp' );
+		if ( $redirect_option ) {
+			// Prevent auto-redirect to /wp-admin/admin.php?page=wc-admin&path=/setup-wizard
+			remove_all_actions( 'woocommerce_admin_onboarding_wizard_redirect' );
+		}
+	}
+
+	// If the wizard page is being requested directly, redirect away.
+	if (
+		isset( $_GET['page'] ) &&
+		in_array( $_GET['page'], array( 'wc-setup', 'wc-admin' ), true ) &&
+		isset( $_GET['path'] ) &&
+		false !== strpos( $_GET['path'], 'setup-wizard' )
+	) {
+		wp_safe_redirect( admin_url( 'admin.php?page=wc-admin' ) );
+		exit;
+	}
+}, 1 );
+
+// ---------------------------------------------------------------------------
+// 6. SUPPRESS CORE-PROFILER REDIRECT (WooCommerce 8.x+)
+//    The new core-profiler uses a different option to trigger the redirect.
+// ---------------------------------------------------------------------------
+add_filter( 'woocommerce_admin_should_load_offline_onboarding', '__return_false' );
+add_filter( 'woocommerce_show_admin_notice', function ( $show, $notice ) {
+	// Hide the "Run the setup wizard" admin notice.
+	if ( in_array( $notice, array( 'install', 'update', 'no_shipping_methods' ), true ) ) {
+		return false;
+	}
+	return $show;
+}, 10, 2 );
