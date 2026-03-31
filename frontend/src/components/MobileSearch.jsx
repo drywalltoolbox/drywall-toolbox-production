@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Search, X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { loadProducts } from '../data/products';
+import { searchProducts } from '../services/catalog';
 
 export default function MobileSearch({ onClose = () => {} }) {
   const [searchQuery, setSearchQuery] = useState('');
@@ -20,15 +20,7 @@ export default function MobileSearch({ onClose = () => {} }) {
 
     setIsLoading(true);
     try {
-      const products = await loadProducts();
-      const filtered = products.filter(product => {
-        const name = (product.name || '').toLowerCase();
-        const sku = (product.sku || '').toLowerCase();
-        const brand = (product.brand || '').toLowerCase();
-        const q = query.toLowerCase();
-        
-        return name.includes(q) || sku.includes(q) || brand.includes(q);
-      }).slice(0, 5); // Limit to 5 results for mobile
+      const filtered = (await searchProducts(query)).slice(0, 5); // Limit to 5 results for mobile
       
       setResults(filtered);
     } catch (error) {

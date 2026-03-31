@@ -14,23 +14,41 @@
  */
 
 // Prefer build-time env injection, fall back to runtime-origin based paths
-const WC_BASE  = process.env.REACT_APP_WC_BASE_URL || (typeof window !== 'undefined' ? `${window.location.origin}/wp-json/wc/v3` : '');
-const AUTH_USER = process.env.REACT_APP_WC_AUTH_USER || '';
-const AUTH_PASS = process.env.REACT_APP_WC_AUTH_PASS || '';
+const WC_BASE = process.env.REACT_APP_WC_BASE_URL || (typeof window !== 'undefined' ? `${window.location.origin}/wp-json/wc/v3` : '');
 
-if (process.env.NODE_ENV !== 'production') {
-  if (!WC_BASE)      console.warn('[api.js] REACT_APP_WC_BASE_URL is not set — all WooCommerce calls will fail.');
-  if (!AUTH_USER)    console.warn('[api.js] REACT_APP_WC_AUTH_USER is not set — WooCommerce authentication will fail.');
-  if (!AUTH_PASS)    console.warn('[api.js] REACT_APP_WC_AUTH_PASS is not set — WooCommerce authentication will fail.');
+// ─── Auth header (lazy, runtime-safe) ────────────────────────────────────────
+//
+// Build-time env vars (REACT_APP_WC_AUTH_USER / VITE_WC_AUTH_USER) are baked
+// in by webpack DefinePlugin.  If the deploy predates dotenv being wired up,
+// they will be empty strings.
+//
+// client.js runs a runtime bootstrap: it fetches /wp-json/dtb/v1/config and
+// patches wcClient.defaults.headers.common['Authorization'] when it resolves.
+//
+// We MUST read the Authorization header lazily (at call time, not at module
+// load time) so we pick up whatever client.js has patched in.  Reading it
+// once at module init would always get the empty pre-bootstrap value.
+//
+// Resolution order:
+//   1. wcClient.defaults.headers.common['Authorization']  (patched by bootstrap)
+//   2. build-time REACT_APP_WC_AUTH_USER / VITE_WC_AUTH_USER env vars
+//   3. build-time REACT_APP_WC_AUTH_PASS / VITE_WC_AUTH_PASS env vars
+
+import { wcClient } from '../api/client.js';
+
+function getAuthHeader() {
+  // First choice: whatever client.js has set (may be bootstrap-patched at runtime)
+  const live = wcClient?.defaults?.headers?.common?.['Authorization'];
+  if (live) return { Authorization: live };
+
+  // Second choice: build-time env vars (works when dotenv is properly wired)
+  const user = process.env.REACT_APP_WC_AUTH_USER || import.meta.env.VITE_WC_AUTH_USER || '';
+  const pass = process.env.REACT_APP_WC_AUTH_PASS || import.meta.env.VITE_WC_AUTH_PASS || '';
+  if (user && pass) return { Authorization: 'Basic ' + btoa(`${user}:${pass}`) };
+
+  // No credentials available — request will 401 and catalog.js will fall back to CSV
+  return {};
 }
-
-// NOTE: WooCommerce Application Password credentials are embedded in the compiled bundle.
-// This is the documented client-side approach and requires HTTPS to protect them
-// in transit. For higher-security requirements, route WooCommerce calls through a
-// server-side proxy so credentials remain out of the bundle.
-const authHeader = {
-  Authorization: 'Basic ' + btoa(`${AUTH_USER}:${AUTH_PASS}`),
-};
 
 /**
  * Core fetch helper — appends query params, authenticates, parses JSON,
@@ -43,7 +61,7 @@ const authHeader = {
 const wcFetch = async (endpoint, params = {}) => {
   const query = new URLSearchParams(params).toString();
   const url   = `${WC_BASE}${endpoint}${query ? '?' + query : ''}`;
-  const res   = await fetch(url, { headers: authHeader });
+  const res   = await fetch(url, { headers: getAuthHeader() });
   if (!res.ok) {
     let message = `WooCommerce API error ${res.status}: ${url}`;
     try {

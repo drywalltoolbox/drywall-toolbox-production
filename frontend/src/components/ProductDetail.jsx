@@ -225,10 +225,13 @@ export default function ProductDetail({ product, onAddToCart, onClose }) {
                   )}
                   <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-3 sm:mb-4">Description</h3>
                   {product.description_full ? (
-                    <div className="prose prose-sm max-w-none text-gray-700 prose-headings:text-gray-900 prose-strong:text-gray-900 prose-table:text-sm prose-th:font-semibold prose-th:text-gray-900 prose-td:text-gray-700">
-                      <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                        {product.description_full}
-                      </ReactMarkdown>
+                    <div className="prose prose-sm max-w-none text-gray-700 prose-headings:font-bold prose-headings:text-gray-900 prose-h2:text-xl prose-h2:mt-6 prose-h2:mb-2 prose-h3:text-lg prose-h3:mt-4 prose-strong:text-gray-900 prose-ul:pl-5 prose-li:my-1 prose-table:w-full prose-table:text-sm prose-thead:bg-gray-50 prose-th:px-3 prose-th:py-2 prose-th:text-left prose-th:font-semibold prose-th:text-gray-900 prose-td:px-3 prose-td:py-1.5 prose-td:text-gray-700 prose-td:border-t prose-td:border-gray-200">
+                      {/* CSV products: description is pre-converted to Markdown */}
+                      {/* API products: description is raw WordPress HTML          */}
+                      {product._source === 'csv'
+                        ? <ReactMarkdown remarkPlugins={[remarkGfm]}>{product.description_full}</ReactMarkdown>
+                        : <div dangerouslySetInnerHTML={{ __html: product.description_full }} />
+                      }
                     </div>
                   ) : (
                     <p className="text-gray-500">No description available.</p>

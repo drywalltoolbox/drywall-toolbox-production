@@ -17,10 +17,11 @@ coverage/
 /.env.development
 /.env.production
 
-# frontend/ env files are committed (non-secret URL config only; no credentials)
-# frontend/.env.development  — committed (localhost defaults)
-# frontend/.env.production   — committed (production URLs; no secrets)
-# Secrets (WC keys, JWT key, FTP credentials) live in GitHub Actions secrets only.
+# frontend/ env files — .env.example is committed (template only, no secrets)
+# frontend/.env contains real credentials for local builds — NEVER commit it
+frontend/.env
+frontend/.env.local
+frontend/.env.*.local
 
 # frontend build artifacts
 frontend/dist/

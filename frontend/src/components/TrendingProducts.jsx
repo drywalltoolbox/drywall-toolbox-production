@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { loadProducts } from '../data/products';
-import { getProducts as wcGetProducts } from '../services/api';
+import { getProducts } from '../services/catalog';
 import { filterProductsWithSchematics } from '../data/schematicMappings';
 import { ShoppingCart, ChevronLeft, ChevronRight, X } from 'lucide-react';
 import { useCart } from '../context/CartContext';
@@ -42,26 +41,48 @@ export default function TrendingProducts() {
 
   useEffect(() => {
     let mounted = true;
-    const loader = process.env.REACT_APP_WC_BASE_URL ? wcGetProducts() : loadProducts();
-    loader.then((loadedProducts) => {
+
+    getProducts().then((allProducts) => {
       if (!mounted) return;
-      // Get Columbia products that have schematics in Parts
-      // These are all tools/products we have detailed interactive schematics for
-      const trendingWithSchematics = filterProductsWithSchematics(
-        loadedProducts,
-        'Columbia Taping Tools'
-      ).filter(p => p.price);
-      
-      // Sort by price descending (premium products first) for a more "curated" feel
-      trendingWithSchematics.sort((a, b) => (b.price || 0) - (a.price || 0));
-      
-      // Take top 12 or all if less available
-      const trending = trendingWithSchematics.slice(0, 12);
-      setProducts(trending);
+
+      // ── Priority 1: Columbia products that have interactive schematics ────
+      // These are the most "featured" products — we have parts diagrams for them.
+      const withSchematics = filterProductsWithSchematics(allProducts, 'Columbia Taping Tools')
+        .filter(p => p.price);
+
+      if (withSchematics.length >= 6) {
+        // Enough schematic-matched products — sort premium first, take top 12.
+        withSchematics.sort((a, b) => (b.price || 0) - (a.price || 0));
+        setProducts(withSchematics.slice(0, 12));
+        setLoading(false);
+        return;
+      }
+
+      // ── Priority 2: Cross-brand curated selection ─────────────────────────
+      // Not enough Columbia/schematic products — build a balanced sample from
+      // all brands.  Pick up to 3 products per brand, sorted by price desc.
+      const withPrice = allProducts.filter(p => p.price);
+      const byBrand = {};
+      withPrice.forEach(p => {
+        const b = p.brand || 'Other';
+        if (!byBrand[b]) byBrand[b] = [];
+        byBrand[b].push(p);
+      });
+
+      const featured = [];
+      Object.values(byBrand).forEach(group => {
+        group.sort((a, b) => (b.price || 0) - (a.price || 0));
+        featured.push(...group.slice(0, 3));
+      });
+
+      // Final sort by price desc, take top 12
+      featured.sort((a, b) => (b.price || 0) - (a.price || 0));
+      setProducts(featured.slice(0, 12));
       setLoading(false);
     }).catch(() => {
       if (mounted) setLoading(false);
     });
+
     return () => { mounted = false; };
   }, []);
 

@@ -29,6 +29,82 @@ add_action( 'rest_api_init', function () {
 		},
 		'permission_callback' => '__return_true',
 	) );
+
+	// -----------------------------------------------------------------------
+	// PRODUCT CATALOG ENDPOINT
+	//   GET /wp-json/dtb/v1/catalog  → { csv_url: "https://…/dtb/v1/products-csv" }
+	//
+	//   Returns the URL of the PHP CSV proxy endpoint (see below) so the
+	//   React app always fetches through PHP — never a direct file access
+	//   that Apache/mod_security could block with 403.
+	// -----------------------------------------------------------------------
+	register_rest_route( 'dtb/v1', '/catalog', array(
+		'methods'             => 'GET',
+		'callback'            => function () {
+			$csv_filename = defined( 'DTB_WC_CSV_FILENAME' )
+				? DTB_WC_CSV_FILENAME
+				: 'product-woocommerce_products_import-pjzmqbe2sf.csv';
+
+			// Return the proxy URL, not the direct file URL.
+			// The /dtb/v1/products-csv endpoint below streams the file through
+			// PHP, bypassing any Apache/mod_security rule that blocks
+			// wp-content/uploads/ direct access.
+			$proxy_url = rest_url( 'dtb/v1/products-csv' );
+
+			return rest_ensure_response( array(
+				'csv_url'  => $proxy_url,
+				'filename' => $csv_filename,
+			) );
+		},
+		'permission_callback' => '__return_true',
+	) );
+
+	// -----------------------------------------------------------------------
+	// CSV PROXY ENDPOINT
+	//   GET /wp-json/dtb/v1/products-csv  → streams the WooCommerce CSV file
+	//
+	//   Reads the file from the uploads directory and outputs it with
+	//   text/csv headers.  This sidesteps any Apache .htaccess or
+	//   mod_security rule that blocks direct browser access to
+	//   wp-content/uploads/wc-imports/.
+	// -----------------------------------------------------------------------
+	register_rest_route( 'dtb/v1', '/products-csv', array(
+		'methods'             => 'GET',
+		'callback'            => function () {
+			$csv_filename = defined( 'DTB_WC_CSV_FILENAME' )
+				? DTB_WC_CSV_FILENAME
+				: 'product-woocommerce_products_import-pjzmqbe2sf.csv';
+
+			$upload_dir = wp_upload_dir();
+			$file_path  = trailingslashit( $upload_dir['basedir'] ) . 'wc-imports/' . $csv_filename;
+
+			if ( ! file_exists( $file_path ) ) {
+				return new WP_Error(
+					'csv_not_found',
+					'Product CSV file not found on server.',
+					array( 'status' => 404 )
+				);
+			}
+
+			$csv_content = file_get_contents( $file_path );
+			if ( $csv_content === false ) {
+				return new WP_Error(
+					'csv_read_error',
+					'Could not read product CSV file.',
+					array( 'status' => 500 )
+				);
+			}
+
+			// Output raw CSV and exit — bypasses WP REST JSON wrapping.
+			header( 'Content-Type: text/csv; charset=UTF-8' );
+			header( 'Content-Disposition: inline; filename="' . $csv_filename . '"' );
+			header( 'Cache-Control: public, max-age=3600' );
+			header( 'Access-Control-Allow-Origin: *' );
+			echo $csv_content;
+			exit;
+		},
+		'permission_callback' => '__return_true',
+	) );
 } );
 
 // ---------------------------------------------------------------------------

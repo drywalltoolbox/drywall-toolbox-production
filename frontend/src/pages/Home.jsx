@@ -47,14 +47,10 @@ const brandLogos = [
 export default function Home() {
   return (
     <>
-      <div style={{ minHeight: '100vh', background: 'white' }} className="page-wrapper">
+      <div style={{ background: 'white' }} className="page-wrapper">
       {/* ─── HERO ─── */}
       <section
         className="section-enter home-hero-section"
-        style={{
-          padding: 'clamp(2.5rem, 5vw, 4rem) clamp(1rem, 5vw, 2.5rem) clamp(1rem, 3vw, 1.5rem)',
-          minHeight: '100vh'
-        }}
       >
         <div
           className="home-hero-grid"
@@ -66,7 +62,6 @@ export default function Home() {
             gap: 'clamp(1.25rem, 4vw, 2rem)',
             maxWidth: '1400px',
             margin: '0 auto',
-            minHeight: '100%'
           }}
         >
           <div style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 'clamp(1.25rem, 4vw, 2rem)' }}>
@@ -91,17 +86,8 @@ export default function Home() {
       <TrendingProducts />
 
       {/* ─── TRUST BADGES ─── */}
-      <section style={{
-        padding: 'clamp(2rem, 5vw, 3rem) clamp(1rem, 5vw, 2.5rem)',
-        maxWidth: '1400px',
-        margin: '0 auto'
-      }}>
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-          gap: '16px',
-          placeItems: 'stretch'
-        }}>
+      <section className="home-trust-section">
+        <div className="trust-badges-grid">
           {trustBadges.map((badge) => (
             <div
               key={badge.label}
@@ -131,12 +117,7 @@ export default function Home() {
       </section>
 
       {/* ─── BRAND LOGOS ─── */}
-      <section style={{
-        padding: 'clamp(2rem, 5vw, 3rem) clamp(1rem, 5vw, 2.5rem) clamp(3rem, 6vw, 4rem)',
-        maxWidth: '1400px',
-        margin: '0 auto',
-        textAlign: 'center'
-      }}>
+      <section className="home-brands-section">
         <div style={{
           display: 'flex',
           flexDirection: 'column',
@@ -160,13 +141,7 @@ export default function Home() {
             Trusted Brands
           </p>
         </div>
-        <div style={{
-          display: 'flex',
-          flexWrap: 'wrap',
-          alignItems: 'center',
-          justifyContent: 'center',
-          gap: 'clamp(24px, 5vw, 56px)'
-        }}>
+        <div className="brand-logos-row">
           {brandLogos.map((brand) => (
             <Link
               key={brand.name}

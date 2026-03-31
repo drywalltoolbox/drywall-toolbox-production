@@ -102,6 +102,22 @@ Options +FollowSymLinks
     Header always append Vary Accept-Encoding
 </IfModule>
 
+# ─── Authorization Header Passthrough ────────────────────────────────────────
+# HostGator (and many shared hosts) strip the Authorization header before PHP
+# sees it, which causes WordPress Application Password authentication to always
+# return 401. These two rules re-expose the raw header value as a server
+# variable so that WordPress/PHP can reconstruct it.
+#
+# Rule 1: mod_rewrite passthrough (works on most Apache configs)
+# Rule 2: SetEnvIf fallback (catches edge cases where mod_rewrite doesn't fire)
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+</IfModule>
+<IfModule mod_setenvif.c>
+    SetEnvIf Authorization "(.*)" HTTP_AUTHORIZATION=$1
+</IfModule>
+
 # ─── URL Routing ──────────────────────────────────────────────────────────────
 <IfModule mod_rewrite.c>
     RewriteEngine On

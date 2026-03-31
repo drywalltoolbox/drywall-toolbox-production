@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { loadProducts } from '../data/products';
-import { getProduct as wcGetProduct, getProducts as wcGetProducts } from '../services/api';
+import { getProductById } from '../services/catalog';
 import { useCart } from '../context/CartContext';
 import ProductDetail from '../components/ProductDetail';
 import Toast from '../components/Toast';
@@ -29,18 +28,8 @@ export default function Product() {
     const key = id || partNumber;
 
     const load = async () => {
-      // If a numeric ID and WooCommerce is configured, fetch directly by ID
-      if (process.env.REACT_APP_WC_BASE_URL && id && /^\d+$/.test(id)) {
-        return wcGetProduct(id);
-      }
-      // If WooCommerce is configured, search by SKU / part number in the full list
-      if (process.env.REACT_APP_WC_BASE_URL) {
-        const list = await wcGetProducts();
-        return list.find(p => (p.sku || p.part_number || String(p.id)) === key) || null;
-      }
-      // Fall back to CSV
-      const list = await loadProducts();
-      return list.find(p => (p.part_number || p.id) === key) || null;
+      // catalog service handles API-first → CSV-fallback transparently
+      return getProductById(key);
     };
 
     load()

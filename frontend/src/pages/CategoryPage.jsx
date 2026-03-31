@@ -1,6 +1,6 @@
 import { useParams, Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
-import { getCategories, getProductsByCategory } from '../services/api';
+import { getProductsByCategory } from '../services/catalog';
 import { useCart } from '../context/CartContext';
 import ProductDetail from '../components/ProductDetail';
 import Toast from '../components/Toast';
@@ -9,10 +9,9 @@ export default function CategoryPage() {
   const { slug } = useParams();
   const { addToCart } = useCart();
 
-  const [category, setCategory]   = useState(null);
-  const [products, setProducts]   = useState([]);
-  const [loading, setLoading]     = useState(true);
-  const [error, setError]         = useState(null);
+  // All fetch-derived state in one object — avoids synchronous multi-setState
+  // inside useEffect (react-hooks/set-state-in-effect rule).
+  const [pageState, setPageState] = useState({ loading: true, products: [], category: null, error: null });
   const [modalProduct, setModalProduct] = useState(null);
   const [toast, setToast]         = useState(null);
 
@@ -25,40 +24,24 @@ export default function CategoryPage() {
 
   useEffect(() => {
     let mounted = true;
-    setLoading(true);
-    setError(null);
 
-    const run = async () => {
-      if (!process.env.REACT_APP_WC_BASE_URL) {
-        if (mounted) {
-          setError('WooCommerce API is not configured.');
-          setLoading(false);
-        }
-        return;
-      }
+    getProductsByCategory(slug).then((prods) => {
+      if (!mounted) return;
+      const label = slug.charAt(0).toUpperCase() + slug.slice(1);
+      setPageState({
+        loading: false,
+        products: prods,
+        category: { name: label, slug },
+        error: prods.length === 0 ? `No products found in "${label}".` : null,
+      });
+    }).catch((err) => {
+      if (mounted) setPageState({ loading: false, products: [], category: null, error: err.message || 'Failed to load category.' });
+    });
 
-      try {
-        const cats  = await getCategories();
-        const found = cats.find((c) => c.slug === slug);
-        if (!mounted) return;
-        if (!found) {
-          setError(`Category "${slug}" not found.`);
-          setLoading(false);
-          return;
-        }
-        setCategory(found);
-        const prods = await getProductsByCategory(found.id);
-        if (mounted) setProducts(prods);
-      } catch (err) {
-        if (mounted) setError(err.message || 'Failed to load category.');
-      } finally {
-        if (mounted) setLoading(false);
-      }
-    };
-
-    run();
     return () => { mounted = false; };
   }, [slug]);
+
+  const { loading, products, category, error } = pageState;
 
   if (loading) {
     return (

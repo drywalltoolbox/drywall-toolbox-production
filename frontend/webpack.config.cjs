@@ -27,6 +27,12 @@ const CssMinimizerPlugin    = require('css-minimizer-webpack-plugin');
 const TerserPlugin          = require('terser-webpack-plugin');
 const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
 
+// ─── Load .env into process.env (local builds / cPanel workflow) ─────────────
+// dotenv.config() is a no-op when the variable is already set in the shell
+// (e.g. GitHub Actions injects secrets directly), so it is always safe to call.
+// It reads frontend/.env  (never committed — see .env.example for the template).
+require('dotenv').config();
+
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
 /** Read an env var, trim whitespace, return empty string if absent/empty. */
@@ -88,6 +94,10 @@ module.exports = (envFlags, argv) => {
     'import.meta.env.VITE_VEEQO_CLIENT_ID':             JSON.stringify(env('VITE_VEEQO_CLIENT_ID')),
     'import.meta.env.VITE_VEEQO_CLIENT_SECRET':         JSON.stringify(env('VITE_VEEQO_CLIENT_SECRET')),
     'import.meta.env.VITE_VEEQO_REDIRECT_URI':          JSON.stringify(env('VITE_VEEQO_REDIRECT_URI')),
+
+    // Product catalog CSV fallback URL
+    'process.env.REACT_APP_WC_CSV_URL':                 JSON.stringify(env('REACT_APP_WC_CSV_URL')),
+    'import.meta.env.VITE_WC_CSV_URL':                  JSON.stringify(env('VITE_WC_CSV_URL')),
   };
 
   // ─── Inline asset manifest plugin ───────────────────────────────────────
