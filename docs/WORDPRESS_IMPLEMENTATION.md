@@ -160,7 +160,7 @@ These files are **NOT in the repository** but **MUST be installed on the server*
 **Option 2: Via WP-CLI (Recommended)**
 ```bash
 # SSH into HostGator server
-wp core download --path=/public_html/website_a246e6a8/wp/
+wp core download --path=/public_html/drywalltoolbox/wp/
 wp db create
 wp core install --url=https://drywalltoolbox.com/wp --title="Drywall Toolbox" --admin_user=... --admin_password=... --admin_email=...
 ```

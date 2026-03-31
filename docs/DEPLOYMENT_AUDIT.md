@@ -39,7 +39,7 @@
 
 **What Should Happen:**
 ```
-Domain Root (public_html/website_a246e6a8/)
+Domain Root (public_html/drywalltoolbox/)
 ├── index.html          ← React SPA shell (from dist/)
 ├── assets/
 │   ├── js/
@@ -58,14 +58,14 @@ Domain Root (public_html/website_a246e6a8/)
 ```
 GitHub Actions:
   - Deploys dist/* → REMOTE_ROOT/dist/
-  - This creates: public_html/website_a246e6a8/dist/index.html  ❌
+  - This creates: public_html/drywalltoolbox/dist/index.html  ❌
 ```
 
 **Correct Deploy Setup:**
 ```
 GitHub Actions should:
   - Deploy dist/* → REMOTE_ROOT/  (without /dist/ subdirectory)
-  - Result: public_html/website_a246e6a8/index.html  ✓
+  - Result: public_html/drywalltoolbox/index.html  ✓
 ```
 
 ---
@@ -238,7 +238,7 @@ curl -i https://drywalltoolbox.com/wp-json/
 2. Record credentials (DB_NAME, DB_USER, DB_PASSWORD, DB_HOST)
 3. Set PHP settings in cPanel > Select PHP Version
 4. Copy `wp-config-sample.php` → `wp-config.php` with real credentials
-5. Upload WordPress core files to `/public_html/website_a246e6a8/wp/`
+5. Upload WordPress core files to `/public_html/drywalltoolbox/wp/`
    - Download from wordpress.org
    - Or have FTP upload script do it once
 6. Install WordPress via `https://drywalltoolbox.com/wp/wp-admin/install.php`
@@ -251,8 +251,8 @@ curl -i https://drywalltoolbox.com/wp-json/
 ```
 Main branch push:
   1. Build React (webpack) → dist/
-  2. Deploy dist/* → public_html/website_a246e6a8/  [FILES TO ROOT, NOT /dist/]
-  3. Deploy wp/wp-content/ → public_html/website_a246e6a8/wp/wp-content/
+  2. Deploy dist/* → public_html/drywalltoolbox/  [FILES TO ROOT, NOT /dist/]
+  3. Deploy wp/wp-content/ → public_html/drywalltoolbox/wp/wp-content/
   4. Verify: curl homepage + API
 ```
 
@@ -260,7 +260,7 @@ Main branch push:
 
 ### 3.2 **Directory Structure on Server**
 ```
-/home4/benconklin/public_html/website_a246e6a8/
+/home4/benconklin/public_html/drywalltoolbox/
 ├── index.html                 ← React SPA (from dist/index.html)
 ├── assets/                    ← React assets (from dist/assets/)
 │   ├── js/
@@ -372,7 +372,7 @@ Create a fixed version with:
 1. Download `dist/` locally
 2. ZIP it: `dist.zip`
 3. Upload via cPanel > File Manager > Upload
-4. Extract in `public_html/website_a246e6a8/`
+4. Extract in `public_html/drywalltoolbox/`
 5. Copy files from `dist/` to root (except `dist/` folder itself)
 6. Verify directory structure
 
@@ -380,14 +380,14 @@ Create a fixed version with:
 ```bash
 # Local:
 sftp> open ftp.HostGator.com
-sftp> cd public_html/website_a246e6a8/
+sftp> cd public_html/drywalltoolbox/
 sftp> put -r dist/* .
 ```
 
 ### 5.3 **Via SSH** (If available on your plan)
 ```bash
 ssh user@HostGator.com
-cd public_html/website_a246e6a8/
+cd public_html/drywalltoolbox/
 scp -r ~/drywall-toolbox/dist/* .
 ```
 
@@ -423,7 +423,7 @@ curl -I https://drywalltoolbox.com/
 **Causes & Fixes:**
 ```
 ☐ assets/ directory not deployed to root
-  Fix: deploy dist/assets/* → public_html/website_a246e6a8/assets/
+  Fix: deploy dist/assets/* → public_html/drywalltoolbox/assets/
   
 ☐ webpack publicPath incorrect
   Fix: check webpack.config.cjs publicPath = '/dist/' or '/'

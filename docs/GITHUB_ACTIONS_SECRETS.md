@@ -20,7 +20,7 @@ HOSTGATOR_FTP_PORT=21
 # - Standard FTP port: 21
 # - SFTP port: 22 (if using SFTP instead of FTPS)
 
-HOSTGATOR_REMOTE_ROOT=public_html/website_a246e6a8
+HOSTGATOR_REMOTE_ROOT=public_html/drywalltoolbox
 # - Path from FTP home to your site root
 # - Do NOT include leading slash
 # - Usually: public_html/website_XXXXX
@@ -202,11 +202,11 @@ After adding secrets, test the GitHub Actions workflow:
 
 **Error: "Access denied / Permission denied"**
 - FTP user may not have permission to target directory
-- In cPanel > FTP Accounts, set Directory to: public_html/website_a246e6a8
+- In cPanel > FTP Accounts, set Directory to: public_html/drywalltoolbox
 
 **Deployment uploads to wrong location**
 - Verify HOSTGATOR_REMOTE_ROOT is correct
-- Should be: public_html/website_a246e6a8
+- Should be: public_html/drywalltoolbox
 - Do NOT include leading slash
 
 ---

@@ -20,7 +20,7 @@ on:
       remote_root:
         description: 'Remote site root path'
         required: false
-        default: '/home4/benconklin/public_html/website_a246e6a8'
+        default: '/home4/benconklin/public_html/drywalltoolbox'
         type: string
 
 concurrency:
@@ -116,7 +116,7 @@ jobs:
       contents: read
 
     env:
-      REMOTE_ROOT: "${{ secrets.HOSTGATOR_REMOTE_ROOT || github.event.inputs.remote_root || 'public_html/website_a246e6a8' }}"
+      REMOTE_ROOT: "${{ secrets.HOSTGATOR_REMOTE_ROOT || github.event.inputs.remote_root || 'public_html/drywalltoolbox' }}"
     
     # ────────────────────────────────────────────────────────────────────────────
     # DEPLOYMENT STRATEGY:
@@ -205,8 +205,8 @@ jobs:
           # If REMOTE starts with the FTP_PWD prefix, strip that prefix so we get
           # a path relative to the FTP home. Example:
           #   FTP_PWD = home1/benconklin
-          #   REMOTE  = home1/benconklin/public_html/website_a246e6a8
-          # => SERVER_DIR = public_html/website_a246e6a8
+          #   REMOTE  = home1/benconklin/public_html/drywalltoolbox
+          # => SERVER_DIR = public_html/drywalltoolbox
           if [ -n "$FTP_PWD" ] && [ "${REMOTE#${FTP_PWD}}" != "$REMOTE" ]; then
             # strip leading FTP_PWD and any leading '/'
             SERVER_DIR="${REMOTE#${FTP_PWD}}"

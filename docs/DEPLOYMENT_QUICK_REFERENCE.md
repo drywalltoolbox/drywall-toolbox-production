@@ -77,7 +77,7 @@ Your Repository (GitHub)
 
 
 HostGator Server (Public HTML)
-└── public_html/website_a246e6a8/    ← Your site root
+└── public_html/drywalltoolbox/    ← Your site root
     ├── index.html                   ← React SPA (from dist/)
     ├── assets/                      ← React assets (from dist/)
     ├── public/                      ← Static files (from dist/public/)
@@ -124,7 +124,7 @@ HostGator Server (Public HTML)
    ├─→ Add DB credentials
    ├─→ Add site URLs (WP_HOME, WP_SITEURL)
    ├─→ Add security keys
-   └─→ Upload to /public_html/website_a246e6a8/
+   └─→ Upload to /public_html/drywalltoolbox/
 
 7. Set file permissions (755 dirs, 644 files)
 

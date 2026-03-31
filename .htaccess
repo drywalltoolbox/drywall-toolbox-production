@@ -178,7 +178,7 @@ ErrorDocument 404 /index.html
 # Note: This lets React Router handle 404s gracefully (React shows 404 page)
 
 # ─── Disable Scripts Execution in Uploads Directory ────────────────────────────
-<Directory "/home4/benconklin/public_html/website_a246e6a8/wp/wp-content/uploads">
+<Directory "/home4/benconklin/public_html/drywalltoolbox/wp/wp-content/uploads">
     php_flag engine off
     <FilesMatch "\.php$">
         Deny from all

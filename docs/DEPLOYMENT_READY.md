@@ -174,7 +174,7 @@ Your App:
 └── Deployment Config (.github/workflows/deploy.yml)
 
 Hosting (HostGator):
-├── Domain Root (public_html/website_a246e6a8/)
+├── Domain Root (public_html/drywalltoolbox/)
 │   ├── index.html (React SPA)
 │   ├── assets/ (JS/CSS/images)
 │   ├── .htaccess (URL rewriting)

@@ -102,7 +102,7 @@ npm run build
 
 ### FTP / SFTP
 - [ ] FTP account created in cPanel: `deploybot`
-- [ ] FTP account assigned to `public_html/website_a246e6a8/`
+- [ ] FTP account assigned to `public_html/drywalltoolbox/`
 - [ ] Test FTP login locally
 - [ ] Test with credentials from cPanel
 
@@ -194,7 +194,7 @@ npm run build
 
 ### File Structure on Server
 ```
-public_html/website_a246e6a8/
+public_html/drywalltoolbox/
 ├── index.html                 ✓ From dist/
 ├── assets/
 │   ├── js/                    ✓ From dist/
@@ -207,7 +207,7 @@ public_html/website_a246e6a8/
 
 ### Verify via SFTP or cPanel File Manager
 - [ ] Connect to FTP
-- [ ] Navigate to `public_html/website_a246e6a8/`
+- [ ] Navigate to `public_html/drywalltoolbox/`
 - [ ] Check structure matches above
 - [ ] Verify `index.html` exists at root (NOT in `/dist/` subdirectory)
 - [ ] Verify asset files exist with correct names
@@ -217,7 +217,7 @@ public_html/website_a246e6a8/
 ## .HTACCESS CONFIGURATION VERIFICATION
 
 ### File Location & Syntax
-- [ ] `.htaccess` exists at domain root: `public_html/website_a246e6a8/.htaccess`
+- [ ] `.htaccess` exists at domain root: `public_html/drywalltoolbox/.htaccess`
 - [ ] File is readable (644 permissions)
 - [ ] Valid Apache syntax (no typos)
 - [ ] Test online: https://www.htaccess-generator.com/
@@ -388,7 +388,7 @@ curl -I https://drywalltoolbox.com/
 ```
 
 **Checklist:**
-- [ ] `index.html` exists at `public_html/website_a246e6a8/index.html`
+- [ ] `index.html` exists at `public_html/drywalltoolbox/index.html`
 - [ ] `.htaccess` exists and is readable
 - [ ] `.htaccess` has valid syntax
 - [ ] mod_rewrite enabled on server (test with HostGator support)
@@ -544,7 +544,7 @@ But files not visible in cPanel File Manager
 1. Wait 5-10 minutes for cache invalidation
 2. Manually verify via SFTP:
    ```bash
-   sftp> cd public_html/website_a246e6a8/
+   sftp> cd public_html/drywalltoolbox/
    sftp> ls -la
    ```
 3. Check GitHub Actions logs for actual upload path

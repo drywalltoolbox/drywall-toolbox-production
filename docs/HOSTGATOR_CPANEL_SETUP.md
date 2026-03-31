@@ -96,7 +96,7 @@ Password: <your cPanel password>
 2. **Create New Account:**
    - Login: `deploybot` (or any name)
    - Password: Generate strong password
-   - Directory: `public_html/website_a246e6a8/` (or your public dir)
+   - Directory: `public_html/drywalltoolbox/` (or your public dir)
    - Quota: Unlimited
    - Click "Create"
 
@@ -117,16 +117,16 @@ Password: <your cPanel password>
 
 1. Download WordPress from https://wordpress.org/latest.zip
 2. Extract locally (to a folder named `wordpress/`)
-3. **Navigate:** cPanel > File Manager > `public_html/website_a246e6a8/`
+3. **Navigate:** cPanel > File Manager > `public_html/drywalltoolbox/`
 4. **Create folder:** `wp` (right-click > New Folder)
 5. **Upload WordPress files:**
    - Zip the WordPress folder: `wordpress.zip`
-   - Upload to `public_html/website_a246e6a8/wp/`
+   - Upload to `public_html/drywalltoolbox/wp/`
    - Extract in File Manager (right-click > Extract)
    - Delete `wordpress.zip` after extraction
 6. **Result:**
    ```
-   public_html/website_a246e6a8/wp/
+   public_html/drywalltoolbox/wp/
    ├── wp-admin/
    ├── wp-includes/
    ├── wp-content/   (will be overwritten by deployment)
@@ -141,7 +141,7 @@ Password: <your cPanel password>
 ```bash
 # Local terminal
 sftp deploybot@ftp.drywalltoolbox.com
-sftp> cd public_html/website_a246e6a8/
+sftp> cd public_html/drywalltoolbox/
 sftp> mkdir wp
 sftp> cd wp
 
@@ -213,10 +213,10 @@ require_once ABSPATH . 'wp-settings.php';
 ```
 
 2. **Upload to Server:**
-   - Via cPanel File Manager: Upload `wp-config.php` to `public_html/website_a246e6a8/`
+   - Via cPanel File Manager: Upload `wp-config.php` to `public_html/drywalltoolbox/`
    - Via SFTP:
      ```bash
-     sftp> put wp-config.php public_html/website_a246e6a8/
+     sftp> put wp-config.php public_html/drywalltoolbox/
      ```
 
 3. **Verify Permissions:**
@@ -228,7 +228,7 @@ require_once ABSPATH . 'wp-settings.php';
 ### Step 8: Set File Permissions
 
 1. **Via File Manager:**
-   - Select `public_html/website_a246e6a8/`
+   - Select `public_html/drywalltoolbox/`
    - Right-click > Change Permissions (Recursive)
    - Set:
      - Directories: `755`
@@ -290,13 +290,13 @@ require_once ABSPATH . 'wp-settings.php';
 ### Step 11: Upload Remaining Repository Files
 
 1. **Via cPanel File Manager:**
-   - Navigate to `public_html/website_a246e6a8/`
+   - Navigate to `public_html/drywalltoolbox/`
    - Upload `.htaccess` from repo root
    - Upload `index.php` from repo root
 
 2. **Via SFTP:**
    ```bash
-   sftp> cd public_html/website_a246e6a8/
+   sftp> cd public_html/drywalltoolbox/
    sftp> put .htaccess
    sftp> put index.php
    ```
@@ -312,7 +312,7 @@ HOSTGATOR_FTP_HOST:     ftp.drywalltoolbox.com
 HOSTGATOR_FTP_USER:     deploybot@drywalltoolbox.com (or full user)
 HOSTGATOR_FTP_PASS:     <FTP password from Step 5>
 HOSTGATOR_FTP_PORT:     21 (or 22 for SFTP)
-HOSTGATOR_REMOTE_ROOT:  public_html/website_a246e6a8
+HOSTGATOR_REMOTE_ROOT:  public_html/drywalltoolbox
 
 # WordPress / WooCommerce API URLs
 VITE_WP_API_BASE:       https://drywalltoolbox.com/wp-json/wp/v2
@@ -345,7 +345,7 @@ mysql> show tables;
 
 ### Verify PHP Configuration
 ```bash
-# Create test.php in public_html/website_a246e6a8/test.php:
+# Create test.php in public_html/drywalltoolbox/test.php:
 <?php phpinfo(); ?>
 
 # Visit: https://drywalltoolbox.com/test.php

@@ -47,7 +47,7 @@
 │                    HOSTGATOR SHARED HOSTING                             │
 │  (drywalltoolbox.com)                                                   │
 ├─────────────────────────────────────────────────────────────────────────┤
-│  /home4/benconklin/public_html/website_a246e6a8/                        │
+│  /home4/benconklin/public_html/drywalltoolbox/                        │
 ├─────────────────────────────────────────────────────────────────────────┤
 │                                                                           │
 │  ROOT LEVEL (Served by .htaccess)                                       │

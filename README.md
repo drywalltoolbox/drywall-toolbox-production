@@ -103,23 +103,22 @@ npm run lint
 
 ## Deployment — HostGator / cPanel
 
-### � START HERE: [DEPLOY_NOW.md](./DEPLOY_NOW.md)
+### 🚀 READY TO DEPLOY?
 
-**→ Complete step-by-step guide from start to finish (2-3 hours)**
+**→ [QUICK_START.md](./QUICK_START.md)** — 8-step flow to get live (2-3 hours)
 
-Everything you need:
-- MySQL database setup
-- WordPress core file upload
-- React build & deployment
-- Automated GitHub Actions setup
-- Testing & verification
-- Troubleshooting
+**→ [DEPLOY_NOW.md](./DEPLOY_NOW.md)** — Detailed guide with every step explained
 
-**For Questions:**
-- **[WORDPRESS_IMPLEMENTATION.md](./docs/WORDPRESS_IMPLEMENTATION.md)** — WordPress /wp/ structure
-- **[GITHUB_ACTIONS_SECRETS.md](./docs/GITHUB_ACTIONS_SECRETS.md)** — GitHub secrets config
+**Verification:**
+- **[HOSTGATOR_COMPLIANCE.md](./HOSTGATOR_COMPLIANCE.md)** — ✅ All official HostGator requirements met
+- **[FILE_MANAGER_GUIDE.md](./FILE_MANAGER_GUIDE.md)** — Before/after directory structure
+- **[DIRECTORY_CHECKLIST.md](./DIRECTORY_CHECKLIST.md)** — Quick verification checklist
+
+**Reference:**
+- **[WORDPRESS_IMPLEMENTATION.md](./docs/WORDPRESS_IMPLEMENTATION.md)** — WordPress /wp/ details
+- **[GITHUB_ACTIONS_SECRETS.md](./docs/GITHUB_ACTIONS_SECRETS.md)** — Auto-deployment setup
 - **[TROUBLESHOOTING_CHECKLIST.md](./docs/TROUBLESHOOTING_CHECKLIST.md)** — Debugging help
-- **[ARCHITECTURE_VISUAL_GUIDE.md](./docs/ARCHITECTURE_VISUAL_GUIDE.md)** — How it all works
+- **[ARCHITECTURE_VISUAL_GUIDE.md](./docs/ARCHITECTURE_VISUAL_GUIDE.md)** — Architecture explained
 
 
 
@@ -236,8 +235,8 @@ Trigger: push to `main` when `frontend/**` or `wp/**` changes.
 5. Upload `dist/` as workflow artifact
 
 **Deploy job:**
-1. Deploy `dist/` → `website_a246e6a8/dist/` via FTPS
-2. Deploy `wp/wp-content/` → `website_a246e6a8/wp/wp-content/` via FTPS
+1. Deploy `dist/` → `drywalltoolbox/dist/` via FTPS
+2. Deploy `wp/wp-content/` → `drywalltoolbox/wp/wp-content/` via FTPS
 
 ### Required GitHub Secrets
 

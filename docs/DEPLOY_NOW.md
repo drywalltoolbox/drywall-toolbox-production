@@ -1,8 +1,10 @@
 # 🚀 DEPLOY NOW — Complete Step-by-Step Guide
 
 **Time Required:** ~2-3 hours (one-time setup)  
-**Status:** You have FTP + cPanel access — ready to deploy  
+**Status:** You have SSH + cPanel access — ready to deploy  
 **Goal:** Fully deployed website: React SPA + WordPress API by end of this guide
+
+**📁 Visual Reference:** Before starting, see [FILE_MANAGER_GUIDE.md](./FILE_MANAGER_GUIDE.md) for what your directory should look like
 
 ---
 
@@ -19,7 +21,7 @@ Login with: your cPanel username / password
 
 **In cPanel, navigate to:**
 - **File Manager** → public_html → (find your website folder)
-- Note the exact path (e.g., `/public_html/website_a246e6a8/`)
+- Note the exact path (e.g., `/public_html/drywalltoolbox/`)
 
 **For FTP, you should have:**
 - Host: `yourdomain.com` or `ftp.yourdomain.com`
@@ -77,7 +79,7 @@ WordPress core files (wp-admin/, wp-includes/) are NOT in the GitHub repo—they
    ```powershell
    Expand-Archive wordpress.zip -DestinationPath .\wordpress-extracted\
    ```
-3. In your SFTP client (or cPanel File Manager), upload to `/public_html/website_a246e6a8/wp/`:
+1. Navigate to `/public_html/drywalltoolbox/wp/`:
    - Upload `wordpress-extracted/wp-admin/` → `/wp/wp-admin/`
    - Upload `wordpress-extracted/wp-includes/` → `/wp/wp-includes/`
    - Upload `wordpress-extracted/wp-*.php` files → `/wp/`
@@ -88,14 +90,14 @@ WordPress core files (wp-admin/, wp-includes/) are NOT in the GitHub repo—they
 **Option B: Use cPanel File Manager**
 
 1. Go to cPanel → **File Manager**
-2. Navigate to `/public_html/website_a246e6a8/wp/`
+2. Navigate to `/public_html/drywalltoolbox/wp/`
 3. Click **Upload** (top menu)
 4. Upload the `wordpress.zip` file
 5. Extract it by right-clicking → **Extract**
 6. Move files into `/wp/` directory
 
 ✅ **Verify in cPanel:**
-- File Manager → `public_html/website_a246e6a8/wp/`
+- File Manager → `public_html/drywalltoolbox/wp/`
 - You should see: `wp-admin/`, `wp-includes/`, `wp-*.php` files
 
 ---
@@ -117,7 +119,7 @@ The `wp-config-sample.php` template is already in the repo. You need to create t
 1. Download `wp-config-sample.php` to your computer
 2. Rename to `wp-config.php`
 3. Open in a text editor and fill in the values below
-4. Upload back to `/public_html/website_a246e6a8/wp/wp-config.php`
+4. Upload back to `/public_html/drywalltoolbox/wp/wp-config.php`
 
 **Fill in these values in wp-config.php:**
 
@@ -201,7 +203,7 @@ This creates `/dist/` folder (~2-5MB) with all optimized React assets.
 
 **Using SFTP or cPanel File Manager:**
 
-1. Navigate to `/public_html/website_a246e6a8/` (the root)
+1. Navigate to `/public_html/drywalltoolbox/` (the root)
 2. Upload all files from your local `dist/` folder to this directory
 3. Upload these files specifically to root:
    - `dist/index.html` → `/index.html`
@@ -213,7 +215,7 @@ This creates `/dist/` folder (~2-5MB) with all optimized React assets.
 
 ⏱️ **This takes 5-10 minutes (React assets are ~2MB gzipped)**
 
-✅ **Verify:** You should see `index.html` and `assets/` folder in `/public_html/website_a246e6a8/`
+✅ **Verify:** You should see `index.html` and `assets/` folder in `/public_html/drywalltoolbox/`
 
 ---
 
@@ -227,7 +229,7 @@ These are already small and need to be on the server.
 
 **Using SFTP or cPanel File Manager:**
 
-1. Navigate to `/public_html/website_a246e6a8/wp/`
+1. Navigate to `/public_html/drywalltoolbox/wp/`
 2. Upload the entire `wp/wp-content/` folder from your repo
    - This overwrites the WordPress-default wp-content with your custom one
    - Or just the `themes/` and `mu-plugins/` folders if you prefer
@@ -246,14 +248,14 @@ The repo contains `.htaccess` files that handle routing.
 
 **Root .htaccess** (handles React routing + WordPress routing):
 
-1. In cPanel File Manager, navigate to `/public_html/website_a246e6a8/`
+1. In cPanel File Manager, navigate to `/public_html/drywalltoolbox/`
 2. Right-click → **Create New File**
 3. Name it `.htaccess`
 4. Edit and paste the entire content from your repo's `.htaccess`
 
 **WordPress .htaccess** (already uploaded with wp-content):
 
-1. Verify in `/public_html/website_a246e6a8/wp/` that `.htaccess` exists
+1. Verify in `/public_html/drywalltoolbox/wp/` that `.htaccess` exists
 2. If not, edit the existing one or upload from repo
 
 ✅ **Both .htaccess files should be in place.**
@@ -414,7 +416,7 @@ Name: FTP_PASSWORD
 Value: your-ftp-password
 
 Name: SERVER_DIR
-Value: /public_html/website_a246e6a8/
+Value: /public_html/drywalltoolbox/
 ```
 
 ✅ **All secrets are added.**
@@ -496,7 +498,7 @@ steps:
 **Problem:** React assets not loading
 
 **Fix:**
-1. Check that `index.html` is in `/public_html/website_a246e6a8/`
+1. Check that `index.html` is in `/public_html/drywalltoolbox/`
 2. Check that `assets/` folder has JS/CSS files
 3. Check `.htaccess` in root exists and has rewrite rules
 4. Clear browser cache (Ctrl+Shift+Delete)
@@ -563,16 +565,16 @@ steps:
 
 | What | Where (On Server) |
 |------|-------------------|
-| React homepage | `/public_html/website_a246e6a8/index.html` |
-| React assets | `/public_html/website_a246e6a8/assets/` |
-| Root routing | `/public_html/website_a246e6a8/.htaccess` |
-| WordPress core | `/public_html/website_a246e6a8/wp/wp-admin/` & `wp/wp-includes/` |
-| WordPress config | `/public_html/website_a246e6a8/wp/wp-config.php` |
-| WordPress routing | `/public_html/website_a246e6a8/wp/.htaccess` |
-| Custom plugins | `/public_html/website_a246e6a8/wp/wp-content/mu-plugins/` |
-| Custom themes | `/public_html/website_a246e6a8/wp/wp-content/themes/` |
-| WordPress uploads | `/public_html/website_a246e6a8/wp/wp-content/uploads/` |
-| Error logs | cPanel → Error Log or `/public_html/website_a246e6a8/wp/wp-content/debug.log` |
+| React homepage | `/public_html/drywalltoolbox/index.html` |
+| React assets | `/public_html/drywalltoolbox/assets/` |
+| Root routing | `/public_html/drywalltoolbox/.htaccess` |
+| WordPress core | `/public_html/drywalltoolbox/wp/wp-admin/` & `wp/wp-includes/` |
+| WordPress config | `/public_html/drywalltoolbox/wp/wp-config.php` |
+| WordPress routing | `/public_html/drywalltoolbox/wp/.htaccess` |
+| Custom plugins | `/public_html/drywalltoolbox/wp/wp-content/mu-plugins/` |
+| Custom themes | `/public_html/drywalltoolbox/wp/wp-content/themes/` |
+| WordPress uploads | `/public_html/drywalltoolbox/wp/wp-content/uploads/` |
+| Error logs | cPanel → Error Log or `/public_html/drywalltoolbox/wp/wp-content/debug.log` |
 
 ---
 
