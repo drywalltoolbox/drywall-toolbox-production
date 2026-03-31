@@ -73,13 +73,9 @@ add_filter( 'rest_api_init', function() {
 // Fix WooCommerce admin script loading in setup wizard
 add_action( 'admin_enqueue_scripts', function() {
 	// Ensure WooCommerce scripts load properly
-	if ( function_exists( 'WC' ) && ! wp_script_is( 'wc-admin-app', 'registered' ) ) {
-		wp_register_script(
-			'wc-admin-app',
-			WC()->plugin_url() . '/assets/client/admin/index.js',
-			array(),
-			WC_VERSION
-		);
+	if ( function_exists( 'WC' ) ) {
+		// Just ensure WC class exists, don't force script registration
+		// WooCommerce will handle its own script loading
 	}
 }, 5 );
 
@@ -103,7 +99,8 @@ add_filter( 'woocommerce_rest_is_request_to_rest_api', function( $is_rest, $requ
 add_filter( 'woocommerce_admin_features_is_enabled', '__return_true' );
 
 // Increase memory limit for WooCommerce operations
-if ( (int) WP_MEMORY_LIMIT < 256 ) {
+// Only define if not already set in wp-config.php
+if ( ! defined( 'WP_MEMORY_LIMIT' ) ) {
 	define( 'WP_MEMORY_LIMIT', '256M' );
 }
 
