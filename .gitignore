@@ -11,16 +11,31 @@ coverage/
 .amazonq
 .venv
 
-# Root-level env files — never commit real secrets
+# ─── Environment Configuration Files ──────────────────────────────────────────
+# Sensitive credentials and environment-specific settings — NEVER committed.
+# GitHub Actions injects production credentials via Secrets, not .env files.
+#
+# Structure:
+#   Root-level (.env files for various scripts/workflows):
+#     /.env                 — Legacy single env file (if used)
+#     /.env.development     — Root dev env (if used)
+#     /.env.production      — Root prod env (if used)
+#
+#   Frontend (.env files with webpack DefinePlugin auto-detection):
+#     /frontend/.env                    — Legacy single env file (if used)
+#     /frontend/.env.development        — Used by: npm run dev
+#     /frontend/.env.production         — Used by: npm run build (local testing)
+#     /frontend/.env.*.local            — Any other local overrides
+#
+# Committed files (templates, no secrets):
+#     /frontend/.env.example            — Template for developers (no secrets)
+
 /.env
-/.env.local
 /.env.development
 /.env.production
-
-# frontend/ env files — .env.example is committed (template only, no secrets)
-# frontend/.env contains real credentials for local builds — NEVER commit it
 frontend/.env
-frontend/.env.local
+frontend/.env.development
+frontend/.env.production
 frontend/.env.*.local
 
 # frontend build artifacts

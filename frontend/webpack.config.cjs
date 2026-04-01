@@ -19,6 +19,7 @@
 'use strict';
 
 const path                  = require('path');
+const fs                    = require('fs');
 const webpack               = require('webpack');
 const HtmlWebpackPlugin     = require('html-webpack-plugin');
 const CopyWebpackPlugin     = require('copy-webpack-plugin');
@@ -26,12 +27,17 @@ const MiniCssExtractPlugin  = require('mini-css-extract-plugin');
 const CssMinimizerPlugin    = require('css-minimizer-webpack-plugin');
 const TerserPlugin          = require('terser-webpack-plugin');
 const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
-
-// ─── Load .env into process.env (local builds / cPanel workflow) ─────────────
-// dotenv.config() is a no-op when the variable is already set in the shell
-// (e.g. GitHub Actions injects secrets directly), so it is always safe to call.
-// It reads frontend/.env  (never committed — see .env.example for the template).
-require('dotenv').config();
+// ─── Load environment-specific .env files ──────────────────────────────────
+// This MUST happen inside the module.exports function so we can access argv.mode
+// from webpack. If we do this at the top level, webpack hasn't passed argv yet.
+//
+// Priority order (first found wins):
+//   1. NODE_ENV already set in shell (GitHub Actions, CI/CD)
+//   2. argv.mode from webpack (--mode flag)
+//   3. .env.development or .env.production (based on detected mode)
+//   4. .env (legacy fallback)
+//
+// dotenv.config() is a no-op if variables are already set, so it's always safe.
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -41,7 +47,21 @@ const env = (key) => (process.env[key] || '').trim();
 // ─── Config factory ──────────────────────────────────────────────────────────
 
 module.exports = (envFlags, argv) => {
+  // Determine build mode from webpack argv FIRST
   const mode   = (argv && argv.mode) ? argv.mode : (process.env.NODE_ENV || 'development');
+
+  // NOW load the appropriate .env file based on the actual build mode
+  const envFile = mode === 'production' ? '.env.production' : '.env.development';
+  
+  // Load environment-specific .env file
+  require('dotenv').config({ path: envFile });
+
+  // Fallback to .env if the environment-specific file doesn't exist
+  if (!require('fs').existsSync(envFile)) {
+    require('dotenv').config({ path: '.env' });
+  }
+
+  // Now that env vars are loaded, continue with the rest of config
   const isDev  = mode !== 'production';
   const analyze = process.env.ANALYZE === 'true';
 
@@ -98,6 +118,12 @@ module.exports = (envFlags, argv) => {
     // Product catalog CSV fallback URL
     'process.env.REACT_APP_WC_CSV_URL':                 JSON.stringify(env('REACT_APP_WC_CSV_URL')),
     'import.meta.env.VITE_WC_CSV_URL':                  JSON.stringify(env('VITE_WC_CSV_URL')),
+
+    // ─── Local Development Mode ───────────────────────────────────────────────
+    // When set, frontend loads from /public/wp-catalog.csv instead of live API.
+    // Only used in 'npm run dev' with .env.local; never affects production builds.
+    'process.env.REACT_APP_USE_LOCAL_CSV':              JSON.stringify(env('REACT_APP_USE_LOCAL_CSV')),
+    'import.meta.env.VITE_USE_LOCAL_CSV':               JSON.stringify(env('VITE_USE_LOCAL_CSV')),
   };
 
   // ─── Inline asset manifest plugin ───────────────────────────────────────

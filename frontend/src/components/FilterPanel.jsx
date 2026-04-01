@@ -200,7 +200,8 @@ function FilterContent({
 
       {/* Filter Sections */}
       <div className="divide-y divide-gray-200">
-        {/* Categories Section */}
+        {/* Categories Section - only shown when categories are provided */}
+        {categories && categories.length > 0 && (
         <FilterSection
           title="Categories"
           isExpanded={expandedSections.categories}
@@ -239,6 +240,7 @@ function FilterContent({
             })}
           </div>
         </FilterSection>
+        )}
 
         {/* Brands Section */}
         <FilterSection
@@ -280,7 +282,8 @@ function FilterContent({
           </div>
         </FilterSection>
 
-        {/* Price Range Section */}
+        {/* Price Range Section - only shown when maxPrice is set */}
+        {maxPrice > 0 && (
         <FilterSection
           title="Price Range"
           isExpanded={expandedSections.price}
@@ -351,6 +354,7 @@ function FilterContent({
             </div>
           </div>
         </FilterSection>
+        )}
       </div>
 
       {/* Clear Filters Button */}

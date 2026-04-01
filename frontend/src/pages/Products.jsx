@@ -20,6 +20,7 @@ import columbiaLogo from '/brands/Columbia/columbia_taping_tools_logo.svg';
 import surproLogo from '/brands/SurPro/surpro_logo.svg';
 import asgardLogo from '/brands/Asgard/asgard_logo.svg';
 import gracoLogo from '/brands/Graco/graco_logo.svg';
+import level5Logo from '/brands/Level5/Level5.svg';
 
 // products will be loaded from CSV at runtime
 // brands list will be derived from loaded products
@@ -44,13 +45,27 @@ const ALLOWED_BRANDS = [
 const MAX_PRICE = 3000;
 const ITEMS_PER_PAGE = 24;
 
+// Brand name ↔ URL slug maps so navigation produces readable URLs like
+// /products?brand=columbia-taping-tools
+const BRAND_TO_SLUG = {
+  'TapeTech':              'tapetech',
+  'Columbia Taping Tools': 'columbia-taping-tools',
+  'Asgard':                'asgard',
+  'Level5':                'level5',
+  'SurPro':                'surpro',
+  'Graco':                 'graco',
+};
+const SLUG_TO_BRAND = Object.fromEntries(
+  Object.entries(BRAND_TO_SLUG).map(([name, slug]) => [slug, name])
+);
+
 const brandLogos = {
   'TapeTech': tapeTechLogo,
   'Columbia Taping Tools': columbiaLogo,
   'SurPro': surproLogo,
   'Asgard': asgardLogo,
   'Graco': gracoLogo,
-  'Level5': null,  // no SVG logo — renders as a styled text card
+  'Level5': level5Logo,
 };
 
 export default function Products() {
@@ -64,7 +79,12 @@ export default function Products() {
   const searchParam = params.get('search');
   const pageParam = parseInt(params.get('page') || '1', 10);
   const initialSelectedBrands = brandParam 
-    ? brandParam.split(',').map(b => b.trim()).filter(Boolean).filter(brand => ALLOWED_BRANDS.includes(brand))
+    ? brandParam
+        .split(',')
+        .map(b => b.trim())
+        .map(b => SLUG_TO_BRAND[b] || b)  // Convert slug to full name, keep unknown names as-is for backward-compat
+        .filter(Boolean)
+        .filter(brand => ALLOWED_BRANDS.includes(brand))
     : [];
 
   const [selectedBrands, setSelectedBrands] = useState(initialSelectedBrands);
@@ -184,6 +204,8 @@ export default function Products() {
   }, [selectedBrands, searchQuery, currentPage, navigate, location.search]);
 
   // Reset to page 1 when filters / search change
+  // This is an appropriate use case for setState in effect - reset pagination when filters change
+  // eslint-disable-next-line
   useEffect(() => { setCurrentPage(1); }, [selectedBrands, selectedCategories, priceRange, searchQuery, sortBy]);
 
   const toggleCategory = (category) => {
@@ -266,7 +288,8 @@ export default function Products() {
               <button
                 key={brand}
                 onClick={() => {
-                  navigate(`/products?brand=${encodeURIComponent(brand)}`);
+                  const brandSlug = BRAND_TO_SLUG[brand] || brand;
+                  navigate(`/products?brand=${encodeURIComponent(brandSlug)}`);
                   setSelectedBrands([brand]);
                 }}
                 style={{
@@ -299,7 +322,9 @@ export default function Products() {
                     src={brandLogos[brand]}
                     alt={`${brand} logo`}
                     style={{
-                      height: 'clamp(4rem, 12vw, 6rem)',
+                      height: ['Columbia Taping Tools', 'Graco', 'Level5'].includes(brand)
+                        ? 'clamp(5.5rem, 16vw, 8rem)'
+                        : 'clamp(4rem, 12vw, 6rem)',
                       width: 'auto',
                       objectFit: 'contain'
                     }}
@@ -500,22 +525,31 @@ export default function Products() {
       
       {/* Product Detail Modal */}
       {isModalOpen && modalProduct && (
-        <div className="fixed inset-0 z-1100 flex items-center justify-center p-0 sm:p-4">
-          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm" onClick={closeModal} />
-          {/* Close Button - Direct child of fixed modal wrapper to avoid stacking context issues */}
-          <button
+        <>
+          {/* Backdrop covers full screen */}
+          <div
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm"
+            style={{ zIndex: 10001 }}
             onClick={closeModal}
-            className="fixed top-4 right-4 sm:absolute sm:top-4 sm:right-4 z-1120 p-2.5 sm:p-2 bg-white rounded-full shadow-xl hover:bg-gray-100 transition-colors border border-gray-200"
-            aria-label="Close"
+          />
+          {/* Scroll container starts below the fixed header */}
+          <div
+            className="fixed left-0 right-0 bottom-0 overflow-y-auto"
+            style={{ zIndex: 10002, top: 'var(--header-height, 100px)' }}
           >
-            <X className="w-6 h-6 text-gray-700" />
-          </button>
-          <div className="relative z-10 w-full h-full sm:h-auto max-w-full sm:max-w-3xl md:max-w-5xl lg:max-w-6xl mx-auto">
-            <div onClick={(e) => e.stopPropagation()} className="h-full overflow-x-hidden">
-              <ProductDetail product={modalProduct} onAddToCart={handleAddToCart} onClose={closeModal} />
+            <div
+              className="flex items-start justify-center min-h-full p-4 py-6"
+              onClick={closeModal}
+            >
+              <div
+                className="w-full max-w-6xl"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <ProductDetail product={modalProduct} onAddToCart={handleAddToCart} onClose={closeModal} />
+              </div>
             </div>
           </div>
-        </div>
+        </>
       )}
     </div>
   );

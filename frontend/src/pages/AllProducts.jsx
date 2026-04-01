@@ -132,6 +132,8 @@ export default function AllProducts() {
   }, [searchQuery, currentPage, navigate, location.search]);
 
   // Reset to page 1 when filters or search change
+  // This is an appropriate use case for setState in effect - reset pagination when filters change
+  // eslint-disable-next-line
   useEffect(() => { setCurrentPage(1); }, [selectedBrands, selectedCategories, priceRange, searchQuery, sortBy]);
 
   const filteredProducts = (products || []).filter(product => {
@@ -367,22 +369,31 @@ export default function AllProducts() {
       
       {/* Product Detail Modal */}
       {isModalOpen && modalProduct && (
-        <div className="fixed inset-0 z-1100 flex items-center justify-center p-0 sm:p-4">
-          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm" onClick={closeModal} />
-          {/* Close Button - Direct child of fixed modal wrapper to avoid stacking context issues */}
-          <button
+        <>
+          {/* Backdrop covers full screen */}
+          <div
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm"
+            style={{ zIndex: 10001 }}
             onClick={closeModal}
-            className="fixed top-4 right-4 sm:absolute sm:top-4 sm:right-4 z-1120 p-2.5 sm:p-2 bg-white rounded-full shadow-xl hover:bg-gray-100 transition-colors border border-gray-200"
-            aria-label="Close"
+          />
+          {/* Scroll container starts below the fixed header */}
+          <div
+            className="fixed left-0 right-0 bottom-0 overflow-y-auto"
+            style={{ zIndex: 10002, top: 'var(--header-height, 100px)' }}
           >
-            <X className="w-6 h-6 text-gray-700" />
-          </button>
-          <div className="relative z-10 w-full h-full sm:h-auto max-w-full sm:max-w-3xl md:max-w-5xl lg:max-w-6xl mx-auto">
-            <div onClick={(e) => e.stopPropagation()} className="h-full overflow-x-hidden">
-              <ProductDetail product={modalProduct} onAddToCart={handleAddToCart} onClose={closeModal} />
+            <div
+              className="flex items-start justify-center min-h-full p-4 py-6"
+              onClick={closeModal}
+            >
+              <div
+                className="w-full max-w-6xl"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <ProductDetail product={modalProduct} onAddToCart={handleAddToCart} onClose={closeModal} />
+              </div>
             </div>
           </div>
-        </div>
+        </>
       )}
     </div>
   );

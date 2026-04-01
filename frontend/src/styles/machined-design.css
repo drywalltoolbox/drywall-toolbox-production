@@ -849,8 +849,8 @@ aside input[type="range"],
     background: var(--surface-glass);
     backdrop-filter: blur(18px);
     border-bottom: 1px solid var(--machined-border);
-    z-index: 1000;
-    overflow: hidden;
+    z-index: 9999;
+    overflow: visible;
     padding: 0.75rem 0;
 }
 
@@ -880,6 +880,8 @@ aside input[type="range"],
         align-items: center;
         justify-self: start;
         gap: 16px;
+        position: relative;
+        overflow: visible;
     }
     
     .header-right {
@@ -894,7 +896,7 @@ aside input[type="range"],
        to nudge further in/out as needed. */
     .header-left,
     .header-right {
-        max-width: 360px;
+        max-width: 280px;
     }
     
     .header-center {
@@ -976,7 +978,7 @@ aside input[type="range"],
 .nav-links {
     display: flex;
     align-items: center;
-    gap: 18px;
+    gap: 32px;
 }
 
 .nav-link {
@@ -988,6 +990,8 @@ aside input[type="range"],
     letter-spacing: 0.05em;
     transition: opacity 150ms ease, color 150ms ease;
     white-space: nowrap;
+    padding: 8px 12px;
+    border-radius: 4px;
 }
 
 .nav-link:hover {
@@ -1548,4 +1552,238 @@ aside input[type="range"],
 .site-footer a:active,
 .site-footer a:focus {
     color: var(--alloy-deep) !important;
+}
+
+/* --- PRODUCT DETAIL MODAL --- */
+/* Backdrop + scroll container are plain inline styles in JSX (top: var(--header-height)) */
+/* No extra CSS class needed — just ensure body scroll lock when modal is open */
+
+/* Ensure modal animations work smoothly */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fadeIn {
+    animation: fadeIn 0.18s ease-out;
+}
+
+/* Custom scrollbar for the modal scroll container */
+.modal-scroll::-webkit-scrollbar { width: 6px; }
+.modal-scroll::-webkit-scrollbar-track { background: transparent; }
+.modal-scroll::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 3px; }
+.modal-scroll::-webkit-scrollbar-thumb:hover { background: #9ca3af; }
+
+/* --- PROSE STYLING FOR MARKDOWN --- */
+.product-description {
+    color: #374151;
+    font-size: 0.9375rem;
+    line-height: 1.75;
+}
+
+.product-description p {
+    margin-top: 0;
+    margin-bottom: 1em;
+}
+
+.product-description h2 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #111827;
+    margin-top: 1.5em;
+    margin-bottom: 0.5em;
+}
+
+.product-description h3 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #111827;
+    margin-top: 1.25em;
+    margin-bottom: 0.4em;
+}
+
+.product-description strong,
+.product-description b {
+    font-weight: 700;
+    color: #111827;
+}
+
+.product-description ul {
+    list-style: disc;
+    padding-left: 1.5em;
+    margin-bottom: 1em;
+}
+
+.product-description ol {
+    list-style: decimal;
+    padding-left: 1.5em;
+    margin-bottom: 1em;
+}
+
+.product-description li {
+    margin-bottom: 0.35em;
+}
+
+.product-description table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.875rem;
+    margin-top: 1.5em;
+    margin-bottom: 1.5em;
+}
+
+.product-description thead {
+    background-color: #f9fafb;
+}
+
+.product-description th {
+    padding: 0.6em 0.75em;
+    text-align: left;
+    font-weight: 600;
+    color: #111827;
+    border-bottom: 2px solid #e5e7eb;
+}
+
+.product-description td {
+    padding: 0.6em 0.75em;
+    color: #6b7280;
+    border-bottom: 1px solid #f3f4f6;
+}
+
+.product-description tr:last-child td {
+    border-bottom: none;
+}
+
+.product-description a {
+    color: #2563eb;
+    text-decoration: underline;
+}
+
+.product-description code {
+    background: #f3f4f6;
+    padding: 0.15em 0.4em;
+    border-radius: 3px;
+    font-size: 0.875em;
+}
+
+/* WooCommerce HTML descriptions */
+.product-description p + p { margin-top: 0.75em; }
+
+/* --- PROSE STYLING FOR MARKDOWN --- */
+.prose {
+    --tw-prose-body: #374151;
+    --tw-prose-headings: #111827;
+    --tw-prose-lead: #6b7280;
+    --tw-prose-links: #2563eb;
+    --tw-prose-bold: #111827;
+    --tw-prose-counters: #6b7280;
+    --tw-prose-bullets: #d1d5db;
+    --tw-prose-hr: #e5e7eb;
+    --tw-prose-quotes: #111827;
+    --tw-prose-quote-borders: #e5e7eb;
+    --tw-prose-captions: #6b7280;
+    --tw-prose-code: #111827;
+    --tw-prose-pre-code: #e5e7eb;
+    --tw-prose-pre-bg: #1f2937;
+    --tw-prose-th-borders: #d1d5db;
+    --tw-prose-td-borders: #e5e7eb;
+}
+
+.prose p {
+    line-height: 1.75;
+    margin-top: 1.25em;
+    margin-bottom: 1.25em;
+}
+
+.prose strong {
+    font-weight: 700;
+    color: var(--tw-prose-bold);
+}
+
+.prose h2 {
+    font-size: 1.5em;
+    font-weight: 700;
+    color: var(--tw-prose-headings);
+    margin-top: 1.5em;
+    margin-bottom: 0.5em;
+    line-height: 1.3333333;
+}
+
+.prose h3 {
+    font-size: 1.25em;
+    font-weight: 700;
+    color: var(--tw-prose-headings);
+    margin-top: 1em;
+    margin-bottom: 0.5em;
+    line-height: 1.6;
+}
+
+.prose ul,
+.prose ol {
+    margin-top: 1.25em;
+    margin-bottom: 1.25em;
+    padding-left: 1.25em;
+}
+
+.prose li {
+    margin-top: 0.5em;
+    margin-bottom: 0.5em;
+}
+
+.prose table {
+    width: 100%;
+    table-layout: auto;
+    margin-top: 2em;
+    margin-bottom: 2em;
+    font-size: 0.875em;
+    line-height: 1.7142857;
+}
+
+.prose thead {
+    border-bottom-width: 1px;
+    border-bottom-color: var(--tw-prose-th-borders);
+    background-color: #f9fafb;
+}
+
+.prose th {
+    padding: 0.75em;
+    text-align: left;
+    font-weight: 600;
+    color: var(--tw-prose-headings);
+}
+
+.prose td {
+    padding: 0.75em;
+    border-bottom-width: 1px;
+    border-bottom-color: var(--tw-prose-td-borders);
+    color: #6b7280;
+}
+
+.prose code {
+    display: inline;
+    padding: 0.2em 0.4em;
+    background-color: #f3f4f6;
+    border-radius: 0.25em;
+    font-size: 0.875em;
+    color: var(--tw-prose-code);
+}
+
+.prose pre {
+    overflow-x: auto;
+    font-weight: 400;
+    background-color: var(--tw-prose-pre-bg);
+    border-radius: 0.375em;
+    padding: 1.25em 1.5em;
+    line-height: 1.7142857;
+    margin-top: 1.6666667em;
+    margin-bottom: 1.6666667em;
+}
+
+.prose pre code {
+    display: block;
+    color: #f3f4f6;
+    font-size: 0.875em;
+    padding: 0;
+    background: none;
+    border-radius: 0;
 }

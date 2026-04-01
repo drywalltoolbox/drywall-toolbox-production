@@ -1,5 +1,5 @@
 ﻿import { Link, useLocation } from 'react-router-dom';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useCart } from '../context/CartContext';
 import { ShoppingCart, Menu, X, ChevronDown } from 'lucide-react';
 import Logo from '/logo2.svg';
@@ -17,11 +17,68 @@ export default function Header({ onCartToggle }) {
       return false;
     }
   });
+  
+  // Ref for dropdown close timer (prevents flickering on fast mouse movement)
+  const dropdownCloseTimerRef = useRef(null);
 
   const isActive = (path) => location.pathname === path;
 
   const toggleMobileMenu = () => setMobileMenuOpen(!mobileMenuOpen);
   const closeMobileMenu = () => setMobileMenuOpen(false);
+  const closeMenus = () => {
+    setShopDropdownOpen(false);
+    setMobileMenuOpen(false);
+  };
+
+  // Handle dropdown close with small delay to prevent flicker
+  const handleDropdownMouseLeave = () => {
+    // Clear any existing timer
+    if (dropdownCloseTimerRef.current) {
+      clearTimeout(dropdownCloseTimerRef.current);
+    }
+    // Set new timer (50ms delay is imperceptible but prevents flicker)
+    dropdownCloseTimerRef.current = setTimeout(() => {
+      setShopDropdownOpen(false);
+    }, 50);
+  };
+
+  const handleDropdownMouseEnter = () => {
+    // Cancel any pending close when mouse enters
+    if (dropdownCloseTimerRef.current) {
+      clearTimeout(dropdownCloseTimerRef.current);
+      dropdownCloseTimerRef.current = null;
+    }
+    setShopDropdownOpen(true);
+  };
+
+  // Cleanup timer on unmount
+  useEffect(() => {
+    return () => {
+      if (dropdownCloseTimerRef.current) {
+        clearTimeout(dropdownCloseTimerRef.current);
+      }
+    };
+  }, []);
+
+  // Close dropdowns when location changes (page navigation)
+  useEffect(() => {
+    // We intentionally close menus on navigation - standard UX pattern
+    // Pylance warns about setState in effects, but this is an appropriate use
+    setShopDropdownOpen(false);
+    setMobileMenuOpen(false);
+  }, [location.pathname]);
+
+  // Handle keyboard shortcuts (Escape to close)
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        closeMenus();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   useEffect(() => {
     // Match tablet-sized screens (between 641px and 1024px)
@@ -41,6 +98,20 @@ export default function Header({ onCartToggle }) {
         mq.removeListener(handler);
       }
     };
+  }, []);
+
+  // Handle clicking outside the header to close menus
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      // If the click is outside the header, close the dropdown
+      const header = document.querySelector('.site-header');
+      if (header && !header.contains(e.target)) {
+        setShopDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener('click', handleClickOutside);
+    return () => document.removeEventListener('click', handleClickOutside);
   }, []);
 
   return (
@@ -79,11 +150,12 @@ export default function Header({ onCartToggle }) {
   <div className="hidden md:contents header-desktop-layout" style={{ display: isTablet ? 'none' : undefined }}>
           <div className="header-left">
             <nav className="nav-links" aria-label="Primary">
-              <div style={{ position: 'relative' }}>
+              <div 
+                style={{ position: 'relative' }}
+                onMouseEnter={handleDropdownMouseEnter}
+                onMouseLeave={handleDropdownMouseLeave}
+              >
                 <button 
-                  onClick={() => setShopDropdownOpen(!shopDropdownOpen)}
-                  onMouseEnter={() => setShopDropdownOpen(true)}
-                  onMouseLeave={() => setShopDropdownOpen(false)}
                   className={`nav-link flex items-center gap-1 ${isActive('/products') ? 'active' : ''}`}
                   style={{ color: isActive('/products') ? 'var(--color-primary-600)' : 'black', background: 'none', border: 'none', cursor: 'pointer', padding: '8px 0', fontSize: 'inherit' }}
                 >
@@ -91,24 +163,28 @@ export default function Header({ onCartToggle }) {
                   <ChevronDown size={16} style={{ transition: 'transform 200ms ease-out', transform: shopDropdownOpen ? 'rotate(180deg)' : 'rotate(0deg)' }} />
                 </button>
                 
-                {shopDropdownOpen && (
-                  <div 
-                    onMouseEnter={() => setShopDropdownOpen(true)}
-                    onMouseLeave={() => setShopDropdownOpen(false)}
-                    style={{
-                      position: 'absolute',
-                      top: '100%',
-                      left: 0,
-                      backgroundColor: 'white',
-                      border: '1px solid var(--machined-border)',
-                      borderRadius: '6px',
-                      boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
-                      minWidth: '160px',
-                      zIndex: 1000,
-                      animation: 'dropdownSlideIn 200ms ease-out'
-                    }}
-                    className="shop-dropdown-menu"
-                  >
+                {/* Always render dropdown, control visibility with opacity/pointer-events */}
+                <div 
+                  style={{
+                    position: 'absolute',
+                    top: '100%',
+                    left: 0,
+                    backgroundColor: 'white',
+                    border: '1px solid var(--machined-border)',
+                    borderRadius: '6px',
+                    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
+                    minWidth: '200px',
+                    width: 'max-content',
+                    zIndex: 10000,
+                    marginTop: '4px',
+                    opacity: shopDropdownOpen ? 1 : 0,
+                    visibility: shopDropdownOpen ? 'visible' : 'hidden',
+                    pointerEvents: shopDropdownOpen ? 'auto' : 'none',
+                    transition: 'opacity 150ms ease-out, visibility 150ms ease-out',
+                    animation: shopDropdownOpen ? 'dropdownSlideIn 200ms ease-out' : 'none'
+                  }}
+                  className="shop-dropdown-menu"
+                >
                     <Link 
                       to="/all-products" 
                       onClick={() => setShopDropdownOpen(false)}
@@ -141,7 +217,7 @@ export default function Header({ onCartToggle }) {
                       Brands
                     </Link>
                     <Link 
-                      to="/parts-shop" 
+                      to="/parts" 
                       onClick={() => setShopDropdownOpen(false)}
                       style={{
                         display: 'block',
@@ -157,9 +233,8 @@ export default function Header({ onCartToggle }) {
                       Replacement Parts
                     </Link>
                   </div>
-                )}
               </div>
-              <Link to="/parts" className={`nav-link ${isActive('/parts') ? 'active' : ''}`} style={{ color: isActive('/parts') ? 'var(--color-primary-600)' : 'black' }}>Parts</Link>
+              <Link to="/schematics" className={`nav-link ${isActive('/schematics') ? 'active' : ''}`} style={{ color: isActive('/schematics') ? 'var(--color-primary-600)' : 'black' }}>Schematics</Link>
               <Link to="/repairs" className={`nav-link ${isActive('/repairs') ? 'active' : ''}`} style={{ color: isActive('/repairs') ? 'var(--color-primary-600)' : 'black' }}>Repairs</Link>
             </nav>
           </div>
@@ -236,7 +311,7 @@ export default function Header({ onCartToggle }) {
                     Brands
                   </Link>
                   <Link 
-                    to="/parts-shop" 
+                    to="/parts" 
                     onClick={() => { setShopDropdownOpen(false); closeMobileMenu(); }}
                     className="nav-link-mobile block py-2 text-sm"
                   >
@@ -246,11 +321,11 @@ export default function Header({ onCartToggle }) {
               )}
             </div>
             <Link 
-              to="/parts" 
-              className={`nav-link-mobile ${isActive('/parts') ? 'active' : ''}`}
+              to="/schematics" 
+              className={`nav-link-mobile ${isActive('/schematics') ? 'active' : ''}`}
               onClick={closeMobileMenu}
             >
-              Parts
+              Schematics
             </Link>
             <Link 
               to="/repairs" 

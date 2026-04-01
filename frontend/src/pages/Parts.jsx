@@ -1,1751 +1,406 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
-import { useLocation } from 'react-router-dom';
-import { useCart } from '../context/CartContext';
+/**
+ * frontend/src/pages/Parts.jsx
+ *
+ * Replacement Parts shop — shows only the repair kits / parts items from
+ * the WooCommerce catalog (products whose `is_parts` flag is true).
+ *
+ * Includes:
+ *   • Brand filter chips (TapeTech, Columbia, Asgard, Level5, Graco)
+ *   • Full-text search (name, SKU, UPC, brand)
+ *   • Sort dropdown (popular, price ↑, price ↓)
+ *   • Responsive product grid (2–4 columns)
+ *   • Pagination (24 per page)
+ *   • Quick-view product detail modal
+ *   • Add-to-cart with toast notification
+ */
+
+import { useState, useEffect, useCallback } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import ProductDetail from '../components/ProductDetail';
+import SearchBar from '../components/SearchBar';
+import SortDropdown from '../components/SortDropdown';
 import Toast from '../components/Toast';
-import BrandSelector from '../components/BrandSelector';
-import ToolSelector from '../components/ToolSelector';
-import { getProductBySku } from '../api/products';
-import { SCHEMATIC_DEFINITIONS } from '../data/schematicMappings';
-import { useSchematicMedia } from '../hooks/useSchematicMedia';
-import '../styles/mobile-schematic.css';
+import Pagination from '../components/Pagination';
+import { ShoppingCart, Filter, Heart, Wrench } from 'lucide-react';
+import FilterPanel from '../components/FilterPanel';
+import { getProducts } from '../services/catalog';
+import { useCart } from '../context/CartContext';
 
-import tapeTechLogo from '/brands/TapeTech/tapetech_logo.svg';
-import columbiaLogo from '/brands/Columbia/columbia_taping_tools_logo.svg';
-import surproLogo from '/brands/SurPro/surpro_logo.svg';
-import asgardLogo from '/brands/Asgard/asgard_logo.svg';
-import gracoLogo from '/brands/Graco/graco_logo.svg';
+// Brands that carry repair-kit / parts items in the catalog
+const PARTS_BRANDS = [
+  'TapeTech',
+  'Columbia Taping Tools',
+  'Asgard',
+  'Level5',
+  'Graco',
+];
 
-const brandLogos = {
-  'TapeTech': tapeTechLogo,
-  'Columbia Taping Tools': columbiaLogo,
-  'SurPro': surproLogo,
-  'Asgard': asgardLogo,
-  'Graco': gracoLogo
+// Brand name ↔ URL slug maps so navigation produces readable URLs like
+// /parts?brand=columbia-taping-tools&search=handle
+const BRAND_TO_SLUG = {
+  'TapeTech':              'tapetech',
+  'Columbia Taping Tools': 'columbia-taping-tools',
+  'Asgard':                'asgard',
+  'Level5':                'level5',
+  'Graco':                 'graco',
 };
+const SLUG_TO_BRAND = Object.fromEntries(
+  Object.entries(BRAND_TO_SLUG).map(([name, slug]) => [slug, name])
+);
 
-// ---------------------------------------------------------------------------
-// Schematic JSON data — static imports (bundled by webpack at build time).
-// Keep only the schematics that are still included in the UI. TapeTech
-// schematics removed by request have been deleted from the public assets and
-// their imports removed here so the build won't require them.
-// ---------------------------------------------------------------------------
-import columbiaPredatorTaperBodyData   from '/brands/Columbia/Schematics/AutomaticTapers/PredatorTaper/Body/schematic_data.json';
-import columbiaPredatorTaperHeadData   from '/brands/Columbia/Schematics/AutomaticTapers/PredatorTaper/Head/schematic_data.json';
-import columbiaStandardOutsideCornerRollerData from '/brands/Columbia/Schematics/CornerRollers/StandardOutsideCornerRoller/schematic_data.json';
-import columbiaInsideCornerRollerData from '/brands/Columbia/Schematics/CornerRollers/InsideCornerRoller/schematic_data.json';
-import columbiaThrottleBoxData from '/brands/Columbia/Schematics/CornerBoxes/ThrottleBox/schematic_data.json';
-import columbiaAutomaticFlatBoxData from '/brands/Columbia/Schematics/FinishingBoxes/AutomaticFlatBox/schematic_data.json';
-import columbiaFlatBoxData from '/brands/Columbia/Schematics/FinishingBoxes/FlatBox/schematic_data.json';
-import columbiaFatBoyBoxData from '/brands/Columbia/Schematics/FinishingBoxes/FatBoyBox/schematic_data.json';
-import columbiaTallBoyMudPumpData from '/brands/Columbia/Schematics/Pumps/TallBoyMudPump/schematic_data.json';
-import columbiaNailspotterData from '/brands/Columbia/Schematics/Nailspotters/Nailspotter/schematic_data.json';
-import columbiaTomahawkData from '/brands/Columbia/Schematics/SmoothingBlades/TomahawkSmoothingBlades/schematic_data.json';
-import columbiaSemiAutomaticTaperData from '/brands/Columbia/Schematics/SemiAutomaticTapers/SemiAutomaticTaper/schematic_data.json';
-import columbiaSanderHeadData from '/brands/Columbia/Schematics/Sanders/SanderHead/schematic_data.json';
-import columbiaAngleHeadData from '/brands/Columbia/Schematics/Angleheads/AngleHead/schematic_data.json';
-import columbiaMudPumpData from '/brands/Columbia/Schematics/Pumps/MudPump/schematic_data.json';
-import columbiaGooseneckAdapterData from '/brands/Columbia/Schematics/Pumps/GooseneckAdapter/schematic_data.json';
-import columbiaBoxFillerData from '/brands/Columbia/Schematics/Pumps/BoxFiller/schematic_data.json';
-import columbiaCornerCobraData from '/brands/Columbia/Schematics/CornerRollers/CornerCobra/schematic_data.json';
-import columbiaCompoundTubeDataJson from '/brands/Columbia/Schematics/CompoundTubes/CompoundTube/schematic_data.json';
-import columbiaCf35Data from '/brands/Columbia/Schematics/CornerFlushers/StandardCornerFlusher/schematic_data.json';
-import columbiaDirectCornerFlusherData from '/brands/Columbia/Schematics/CornerFlushers/DirectCornerFlusher/schematic_data.json';
-import columbiaComboFlusherData from '/brands/Columbia/Schematics/CornerFlushers/ComboFlusher/schematic_data.json';
-import columbiaExternalCornerApplicatorData from '/brands/Columbia/Schematics/Applicators/ExternalCorner/schematic_data.json';
-import columbiaTwoWayInternalCornerApplicatorData from '/brands/Columbia/Schematics/Applicators/TwoWayInternalCorner/schematic_data.json';
-import columbiaInsideCornerApplicator2WheelData from '/brands/Columbia/Schematics/Applicators/InsideCornerApplicator/2Wheel/schematic_data.json';
-import columbiaInsideCornerApplicator4WheelData from '/brands/Columbia/Schematics/Applicators/InsideCornerApplicator/4Wheel/schematic_data.json';
-import columbiaCamLockTubeData from '/brands/Columbia/Schematics/CompoundTubes/CamLockTube/schematic_data.json';
-import columbiaClosetMonsterData from '/brands/Columbia/Schematics/Handles/ClosetMonster/schematic_data.json';
-import columbiaColumbiaOneData from '/brands/Columbia/Schematics/Handles/ColumbiaOne/schematic_data.json';
-import columbiaMatrixBoxHandleBoxHandleData from '/brands/Columbia/Schematics/Handles/MatrixBoxHandle/BoxHandle/schematic_data.json';
-import columbiaMatrixBoxHandleHeadData from '/brands/Columbia/Schematics/Handles/MatrixBoxHandle/Head/schematic_data.json';
-import columbiaMatrixBoxHandleLeverData from '/brands/Columbia/Schematics/Handles/MatrixBoxHandle/Lever/schematic_data.json';
-import columbiaMatrixBoxHandlePinchboxData from '/brands/Columbia/Schematics/Handles/MatrixBoxHandle/Pinchbox/schematic_data.json';
-import columbiaMatrixBoxHandleExtensionHousingData from '/brands/Columbia/Schematics/Handles/MatrixBoxHandle/ExtensionHousing/schematic_data.json';
-import columbiaFlatBoxHandleData from '/brands/Columbia/Schematics/Handles/FlatBoxHandle/schematic_data.json';
-import columbiaLongExtendableHandleData from '/brands/Columbia/Schematics/Handles/LongExtendableHandle/schematic_data.json';
-import tapeTechExtendableSupportHandleData from '/brands/TapeTech/Schematics/ExtendableSupportHandle/schematic_data.json';
-
-// ---------------------------------------------------------------------------
-// Schematic image paths — static fallbacks served from public/brands/…
-// Primary source: WordPress Media Library WebP images (via useSchematicMedia).
-// Fallback: original PNG/JPG files from public/brands/ (used before WP upload).
-//
-// Migration: run scripts/convert_schematics_to_webp.py then
-//            scripts/upload_schematics_to_wp.py to populate WP Media Library.
-//            Once confirmed, originals in public/brands/*/Schematics/ can be deleted.
-// ---------------------------------------------------------------------------
-const _BASE = process.env.PUBLIC_URL;
-
-// Static fallback image paths — all converted to WebP.
-// These are served from public/brands/ and copied verbatim into dist/ by webpack.
-const _fallbacks = {
-  'columbia-matrix': {
-    pages: {
-      1: `${_BASE}brands/Columbia/Schematics/Handles/MatrixBoxHandle/BoxHandle/Matrix_Handle-enhanced.webp`,
-      2: `${_BASE}brands/Columbia/Schematics/Handles/MatrixBoxHandle/Head/Matrix_Head-enhanced-enhanced.webp`,
-      3: `${_BASE}brands/Columbia/Schematics/Handles/MatrixBoxHandle/Lever/Matrix_Lever-1-enhanced.webp`,
-      4: `${_BASE}brands/Columbia/Schematics/Handles/MatrixBoxHandle/Pinchbox/Matrix_Pinchbox-1-enhanced.webp`,
-      5: `${_BASE}brands/Columbia/Schematics/Handles/MatrixBoxHandle/ExtensionHousing/Extension_Housing_Schematic-1-enhanced.webp`,
-    },
-    preview: `${_BASE}brands/Columbia/Schematics/Handles/MatrixBoxHandle/BoxHandle/columbia_matrix_box_handle.webp`,
-  },
-  'columbia-predator-taper': {
-    pages: {
-      1: `${_BASE}brands/Columbia/Schematics/AutomaticTapers/PredatorTaper/Body/predator_taper_body.webp`,
-      2: `${_BASE}brands/Columbia/Schematics/AutomaticTapers/PredatorTaper/Head/predator_taper_head.webp`,
-    },
-    preview: `${_BASE}brands/Columbia/Schematics/AutomaticTapers/PredatorTaper/predator_taper.webp`,
-  },
-  'tapetech-extendable-support-handle': {
-    pages: { 1: `${_BASE}brands/TapeTech/Schematics/ExtendableSupportHandle/XHTT_SCH.webp` },
-    preview: `${_BASE}brands/TapeTech/Schematics/ExtendableSupportHandle/XHTT_02-300x300.webp`,
-  },
-  'columbia-2-way-internal-corner': {
-    pages: { 1: `${_BASE}brands/Columbia/Schematics/Applicators/TwoWayInternalCorner/2_Way_Internal_Corner_Applicator-1-enhanced.webp` },
-    preview: `${_BASE}brands/Columbia/Schematics/Applicators/TwoWayInternalCorner/Two-Way_Internal_Corner_Applicator.webp`,
-  },
-  'columbia-external-corner-applicator': {
-    pages: { 1: `${_BASE}brands/Columbia/Schematics/Applicators/ExternalCorner/8_Wheel_External_Corner_Applicator-1-enhanced.webp` },
-    preview: `${_BASE}brands/Columbia/Schematics/Applicators/ExternalCorner/External_90_Aplicator_CEXT90_-_FRONT.webp`,
-  },
-  'columbia-inside-corner-applicator': {
-    pages: {
-      1: `${_BASE}brands/Columbia/Schematics/Applicators/InsideCornerApplicator/2Wheel/ICA1-2-2015.webp`,
-      2: `${_BASE}brands/Columbia/Schematics/Applicators/InsideCornerApplicator/4Wheel/ICA1-4-2015.webp`,
-    },
-    preview: `${_BASE}brands/Columbia/Schematics/Applicators/InsideCornerApplicator/Inside_Corner_Applicator_4_Wheels_ICA1-4_-_BACK.webp`,
-  },
-  // (Inside Corner Roller images/data intentionally removed from parts schematics)
-  'columbia-standard-outside-corner-roller': {
-    pages: { 1: `${_BASE}brands/Columbia/Schematics/CornerRollers/StandardOutsideCornerRoller/OutsideCornerRollers-2016-1-enhanced.webp` },
-    preview: `${_BASE}brands/Columbia/Schematics/CornerRollers/StandardOutsideCornerRoller/External_90_Aplicator.webp`,
-  },
-  'columbia-inside-corner-roller': {
-    pages: { 1: `${_BASE}brands/Columbia/Schematics/CornerRollers/InsideCornerRoller/InsideCornerRoller-2014_1_-enhanced-squared.webp` },
-    preview: `${_BASE}brands/Columbia/Schematics/CornerRollers/InsideCornerRoller/cornerroller.webp`,
-  },
-  'columbia-throttle-box': {
-    pages: { 1: `${_BASE}brands/Columbia/Schematics/CornerBoxes/ThrottleBox/CORNER-BOX-SCHEMATIC-enhanced.webp` },
-    preview: `${_BASE}brands/Columbia/Schematics/CornerBoxes/ThrottleBox/throttlebox8small.webp`,
-  },
-  'columbia-automatic-flat-box': {
-    pages: { 1: `${_BASE}brands/Columbia/Schematics/FinishingBoxes/AutomaticFlatBox/AUTO-BOX-SCHEMATIC-2022-enhanced.webp` },
-    preview: `${_BASE}brands/Columbia/Schematics/FinishingBoxes/AutomaticFlatBox/automaticbox-1.webp`,
-  },
-  'columbia-flat-box': {
-    pages: { 1: `${_BASE}brands/Columbia/Schematics/FinishingBoxes/FlatBox/FLAT-BOX-HINGED-SCHEMATIC-2022-enhanced.webp` },
-    preview: `${_BASE}brands/Columbia/Schematics/FinishingBoxes/FlatBox/2023flatbox.webp`,
-  },
-  'columbia-fat-boy-box': {
-    pages: { 1: `${_BASE}brands/Columbia/Schematics/FinishingBoxes/FatBoyBox/fat_boy_box.webp` },
-    preview: `${_BASE}brands/Columbia/Schematics/FinishingBoxes/FatBoyBox/InsideTrackBoxFrontSmall.webp`,
-  },
-  'columbia-angle-head': {
-    pages: { 1: `${_BASE}brands/Columbia/Schematics/Angleheads/AngleHead/AngleHead-2014-3-enhanced.webp` },
-    preview: `${_BASE}brands/Columbia/Schematics/Angleheads/AngleHead/angleheadbacksquare.webp`,
-  },
-  'columbia-gooseneck-adapter': {
-    pages: { 1: `${_BASE}brands/Columbia/Schematics/Pumps/GooseneckAdapter/Gooseneck-1-1-enhanced.webp` },
-    preview: `${_BASE}brands/Columbia/Schematics/Pumps/GooseneckAdapter/goosenecksquare.webp`,
-  },
-  'columbia-mud-pump': {
-    pages: {
-      1: `${_BASE}brands/Columbia/Schematics/Pumps/MudPump/MUD-PUMP-SUB-ASSEMBLIES-2022-enhanced.webp`,
-      2: `${_BASE}brands/Columbia/Schematics/Pumps/MudPump/MUD-PUMP-SCHEMATIC-2022-enhanced.webp`,
-    },
-    preview: `${_BASE}brands/Columbia/Schematics/Pumps/MudPump/TallBoyMudpumps.webp`,
-  },
-  'columbia-tall-boy-mud-pump': {
-    pages: {
-      1: `${_BASE}brands/Columbia/Schematics/Pumps/TallBoyMudPump/TALL-BOY-MUD-PUMP-SUB-ASSEMBLIES-2022-enhanced.webp`,
-      2: `${_BASE}brands/Columbia/Schematics/Pumps/TallBoyMudPump/TALL-BOY-MUD-PUMP-SCHEMATIC-2022-enhanced.webp`,
-    },
-    preview: `${_BASE}brands/Columbia/Schematics/Pumps/TallBoyMudPump/TallBoyPump.webp`,
-  },
-  'columbia-nailspotter': {
-    pages: { 1: `${_BASE}brands/Columbia/Schematics/Nailspotters/Nailspotter/NAIL-SPOTTER-SCHEMATIC-2022-enhanced.webp` },
-    preview: `${_BASE}brands/Columbia/Schematics/Nailspotters/Nailspotter/2023Nailspotter3inch.webp`,
-  },
-  'columbia-tomahawk-smoothing-blades': {
-    pages: { 1: `${_BASE}brands/Columbia/Schematics/SmoothingBlades/TomahawkSmoothingBlades/TOMAHAWK-SCHEMATIC-2022-enhanced.webp` },
-    preview: `${_BASE}brands/Columbia/Schematics/SmoothingBlades/TomahawkSmoothingBlades/Tomahawksmoothingblade.webp`,
-  },
-  'columbia-standard-corner-flusher': {
-    pages: { 1: `${_BASE}brands/Columbia/Schematics/CornerFlushers/StandardCornerFlusher/3.5INCH-CORNER-FLUSHER-SCHEMATIC-2015-enhanced.webp` },
-    preview: `${_BASE}brands/Columbia/Schematics/CornerFlushers/StandardCornerFlusher/3inchflusher.webp`,
-  },
-  'columbia-direct-corner-flusher': {
-    pages: { 1: `${_BASE}brands/Columbia/Schematics/CornerFlushers/DirectCornerFlusher/DirectStandardFlusher-2015-enhanced.webp` },
-    preview: `${_BASE}brands/Columbia/Schematics/CornerFlushers/DirectCornerFlusher/2.5_Direct_Flusher_2.5DF.webp`,
-  },
-  'columbia-combo-flusher': {
-    pages: { 1: `${_BASE}brands/Columbia/Schematics/CornerFlushers/ComboFlusher/Classic_Combo_Flusher-1-enhanced.webp` },
-    preview: `${_BASE}brands/Columbia/Schematics/CornerFlushers/ComboFlusher/combo_flusher.webp`,
-  },
-  'columbia-sander-head': {
-    pages: { 1: `${_BASE}brands/Columbia/Schematics/Sanders/SanderHead/SANDER-HEAD-SCHEMATIC-enhanced.webp` },
-    preview: `${_BASE}brands/Columbia/Schematics/Sanders/SanderHead/sanderwhandlesquaresmall.webp`,
-  },
-  'columbia-compound-tube': {
-    pages: { 1: `${_BASE}brands/Columbia/Schematics/CompoundTubes/CompoundTube/COMPOUND-TUBE-SCHEMATIC-2022-enhanced.webp` },
-    preview: `${_BASE}brands/Columbia/Schematics/CompoundTubes/CompoundTube/compoundtubesquare.webp`,
-  },
-  'columbia-cam-lock-tube': {
-    pages: { 1: `${_BASE}brands/Columbia/Schematics/CompoundTubes/CamLockTube/Cam_Lock_Tube_2019-enhanced.webp` },
-    preview: `${_BASE}brands/Columbia/Schematics/CompoundTubes/CamLockTube/camlocktubesquare.webp`,
-  },
-  'columbia-semi-automatic-taper': {
-    pages: { 1: `${_BASE}brands/Columbia/Schematics/SemiAutomaticTapers/SemiAutomaticTaper/SEMI-AUTOMATIC-TAPER-SCHEMATIC-2022-enhanced.webp` },
-    preview: `${_BASE}brands/Columbia/Schematics/SemiAutomaticTapers/SemiAutomaticTaper/semiautotapersquare.webp`,
-  },
-  'columbia-one': {
-    pages: { 1: `${_BASE}brands/Columbia/Schematics/Handles/ColumbiaOne/Columbia_One-enhanced.webp` },
-    preview: `${_BASE}brands/Columbia/Schematics/Handles/ColumbiaOne/columbiaonesquare.webp`,
-  },
-  'columbia-long-extendable-handle': {
-    pages: { 1: `${_BASE}brands/Columbia/Schematics/Handles/LongExtendableHandle/extendable-handle-enhanced.webp` },
-    preview: `${_BASE}brands/Columbia/Schematics/Handles/LongExtendableHandle/corner_roller_handle_extendible.webp`,
-  },
-  'columbia-flat-box-handle': {
-    pages: { 1: `${_BASE}brands/Columbia/Schematics/Handles/FlatBoxHandle/180GripBoxHandle-2014-enhanced.webp` },
-    preview: `${_BASE}brands/Columbia/Schematics/Handles/FlatBoxHandle/boxhandle.webp`,
-  },
-  'columbia-closet-monster-flat-box-handle': {
-    pages: { 1: `${_BASE}brands/Columbia/Schematics/Handles/ClosetMonster/ClosetMonster-2015-enhanced.webp` },
-    preview: `${_BASE}brands/Columbia/Schematics/Handles/ClosetMonster/closet_monster_copy.webp`,
-  },
-  'columbia-box-filler': {
-    pages: { 1: `${_BASE}brands/Columbia/Schematics/Pumps/BoxFiller/Box_Filler.webp` },
-    preview: `${_BASE}brands/Columbia/Schematics/Pumps/BoxFiller/boxfiller.webp`,
-  },
-  'columbia-corner-cobra': {
-    pages: { 1: `${_BASE}brands/Columbia/Schematics/CornerRollers/CornerCobra/CORNER-COBRA-SCHEMATIC.2024-enhanced.webp` },
-    preview: `${_BASE}brands/Columbia/Schematics/CornerRollers/CornerCobra/NEWCORNERCOBRA-scaled.webp`,
-  },
-};
-
-// Build a static schematic-id → brand lookup from SCHEMATIC_DEFINITIONS so the
-// URL-param handler can resolve the correct brand without needing the full
-// schematics array (which is built inside the component).
-const SCHEMATIC_ID_TO_BRAND = {};
-Object.entries(SCHEMATIC_DEFINITIONS).forEach(([brand, list]) => {
-  list.forEach(({ id }) => { SCHEMATIC_ID_TO_BRAND[id] = brand; });
-});
+const ITEMS_PER_PAGE = 24;
 
 export default function Parts() {
-  // Allowed brands to display
-  const ALLOWED_BRANDS = [
-    'TapeTech',
-    'Columbia Taping Tools',
-    'Asgard',
-    'SurPro',
-    'Graco'
-  ];
-
   const location = useLocation();
-
-  // WP Media Library schematic manifest (WebP, preferred over static fallbacks)
-  const { manifest: schematicManifest } = useSchematicMedia();
-
-  // Helper: resolve a diagram page URL — WP manifest WebP takes priority,
-  //         falls back to static PNG/JPG from public/brands/ until WP is populated.
-  const schImg = useCallback((id, page) => {
-    const wpUrl = schematicManifest?.[id]?.pages?.[String(page)]?.url;
-    return wpUrl ?? _fallbacks[id]?.pages?.[page];
-  }, [schematicManifest]);
-
-  // Helper: resolve a preview image URL — same WP-first, static-fallback pattern.
-  const schPrev = useCallback((id) => {
-    const wpUrl = schematicManifest?.[id]?.preview;
-    return wpUrl ?? _fallbacks[id]?.preview;
-  }, [schematicManifest]);
-
-  // Selection flow state
-  const [selectedBrand, setSelectedBrand] = useState(null);
-  const [selectedSchematic, setSelectedSchematic] = useState(null);
-  const [searchQuery, setSearchQuery] = useState('');
-  
-  // Schematic viewer state
-  const [activeHotspot, setActiveHotspot] = useState(null);
-  const [activeHotspotPart, setActiveHotspotPart] = useState(null);
-  const [toast, setToast] = useState(null);
-  const [brands, setBrands] = useState([]);
+  const navigate = useNavigate();
   const { addToCart } = useCart();
-  
-  // Mobile zoom/pan state
-  const [scale, setScale] = useState(1);
-  const [position, setPosition] = useState({ x: 0, y: 0 });
-  const [isMobile, setIsMobile] = useState(typeof window !== 'undefined' ? window.innerWidth <= 768 : false);
-  const [isPanning, setIsPanning] = useState(false);
-  
-  // Fullscreen is always enabled on mobile, never on desktop
-  const isFullscreen = isMobile;
-  
-  // Track window resize for mobile detection
-  useEffect(() => {
-    const handleResize = () => {
-      setIsMobile(window.innerWidth <= 768);
-    };
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
-  const [startPanPosition, setStartPanPosition] = useState({ x: 0, y: 0 });
-  const [touchStartPos, setTouchStartPos] = useState({ x: 0, y: 0 });
-  const [hasMoved, setHasMoved] = useState(false);
-  const [lastTapTime, setLastTapTime] = useState(0);
-  const [lastTapPos, setLastTapPos] = useState({ x: 0, y: 0 });
-  const [, setForceUpdate] = useState(0);
-  // Ref to track pinch zoom state without triggering re-renders
-  const pinchRef = useRef({ active: false, initDist: 0, initScale: 1, initPanX: 0, initPanY: 0, centerX: 0, centerY: 0 });
-  // Ref to track any active gesture for synchronous transition control
-  const gestureActiveRef = useRef(false);
-  
-  const schematicContainerRef = useRef(null);
-  const schematicImageRef = useRef(null);
 
-  // Desktop mouse-drag panning
-  const [isDragging, setIsDragging] = useState(false);
-  const dragStartRef = useRef({ x: 0, y: 0, panX: 0, panY: 0 });
+  // Read URL params for deep-linking
+  const urlParams   = new URLSearchParams(location.search);
+  const searchParam = urlParams.get('search') || '';
+  const brandParam  = urlParams.get('brand')  || '';
+  const pageParam   = parseInt(urlParams.get('page') || '1', 10);
 
-  // Brand list is static — these are the known brands with schematics.
-  // We do NOT derive this from WooCommerce product inventory; the brand cards
-  // should always be visible regardless of whether WC products are loaded.
+  const [allParts, setAllParts]         = useState([]);
+  const [brands, setBrands]             = useState([]);
+  const [loading, setLoading]           = useState(true);
+  const [selectedBrands, setSelectedBrands] = useState(() => {
+    // Decode brand slugs from URL params back to full brand names
+    if (!brandParam) return [];
+    return brandParam
+      .split(',')
+      .map(slug => slug.trim())
+      .map(slug => SLUG_TO_BRAND[slug] || slug)  // Convert slug to full name, keep unknown names as-is for backward-compat
+      .filter(b => PARTS_BRANDS.includes(b));
+  });
+  const [searchQuery, setSearchQuery]   = useState(decodeURIComponent(searchParam));
+  const [sortBy, setSortBy]             = useState('popular');
+  const [currentPage, setCurrentPage]   = useState(pageParam);
+  const [showFilters, setShowFilters]   = useState(false);
+  const [modalProduct, setModalProduct] = useState(null);
+  const [isModalOpen, setIsModalOpen]   = useState(false);
+  const [toast, setToast]               = useState(null);
+
+  // ── Load parts products ────────────────────────────────────────────────────
   useEffect(() => {
-    setBrands(ALLOWED_BRANDS);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    let mounted = true;
+    getProducts().then(list => {
+      if (!mounted) return;
+      const parts = list.filter(p => p.is_parts);
+      setAllParts(parts);
+      const unique = Array.from(new Set(parts.map(p => p.brand).filter(Boolean)));
+      setBrands(PARTS_BRANDS.filter(b => unique.includes(b)));
+      setLoading(false);
+    }).catch(() => { if (mounted) setLoading(false); });
+    return () => { mounted = false; };
   }, []);
 
-  // Pre-select brand + schematic when a ?schematic=<id> query param is present
+  // ── Helpers ───────────────────────────────────────────────────────────────
+  const toggleBrand = (brand) =>
+    setSelectedBrands(prev =>
+      prev.includes(brand) ? prev.filter(b => b !== brand) : [...prev, brand]
+    );
+
+  const clearFilters = () => {
+    setSelectedBrands([]);
+    setSearchQuery('');
+    setCurrentPage(1);
+  };
+
+  const openModal  = (product) => { setModalProduct(product); setIsModalOpen(true); };
+  const closeModal = useCallback(() => { setIsModalOpen(false); setModalProduct(null); }, []);
+
+  // ── Escape key closes modal ────────────────────────────────────────────────
   useEffect(() => {
-    const params = new URLSearchParams(location.search);
-    const schematicId = params.get('schematic');
-    if (!schematicId) return;
-    const brand = SCHEMATIC_ID_TO_BRAND[schematicId];
-    if (!brand) return;
-    setSelectedBrand(brand);
-    setSelectedSchematic(schematicId);
-  }, [location.search]);
+    const onKey = (e) => { if (e.key === 'Escape') closeModal(); };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [closeModal]);
 
-  // Schematic data for tools
-
-  // Columbia Inside Corner Roller removed from parts schematics per request.
-
-  // Helper: build part-hotspot array from a schematic JSON data object.
-  // Supports both the official schema (x_pct / y_pct, 4 dp) and the legacy
-  // top / left format for backward compatibility.
-  //
-  // Official formula:
-  //   x_pct = round((center_x_px / image_natural_width)  * 100, 4)  → CSS left
-  //   y_pct = round((center_y_px / image_natural_height) * 100, 4)  → CSS top
-  const buildPartsFromData = (data) => {
-    if (!data || !data.parts) return [];
-    const coords = data.coordinates || {};
-    return data.parts.map((p) => {
-      const c = coords[p.id] || null;
-      // x_pct = horizontal = CSS left; y_pct = vertical = CSS top
-      const leftVal = c
-        ? (c.x_pct !== undefined ? c.x_pct : (c.left !== undefined ? c.left : 50))
-        : 50;
-      const topVal  = c
-        ? (c.y_pct !== undefined ? c.y_pct : (c.top  !== undefined ? c.top  : 50))
-        : 50;
-      const top  = `${topVal}%`;
-      const left = `${leftVal}%`;
-      const pageNumber = c && c.pageNumber
-        ? c.pageNumber
-        : (data.diagramPages && data.diagramPages[0]) || 1;
-      return {
-        id: p.id,
-        name: p.name,
-        sku: p.sku || '',
-        quantity: p.quantity || 1,
-        material: p.material || 'UNKNOWN',
-        price: p.price || 0,
-        position: { top, left },
-        pageNumber,
-        shape: c && c.shape ? c.shape : 'circle',
-        width:   c && c.width   ? c.width   : null,
-        height:  c && c.height  ? c.height  : null,
-        widthPx: c && c.widthPx ? c.widthPx : null,
-        heightPx: c && c.heightPx ? c.heightPx : null,
-        rotation: c && c.rotation ? c.rotation : 0,
-        // Pass through official schema fields for optional consumer use
-        xPx:  c && c.x_px  !== null && c.x_px  !== undefined ? c.x_px  : null,
-        yPx:  c && c.y_px  !== null && c.y_px  !== undefined ? c.y_px  : null,
-        bbox: c && c.bbox ? c.bbox : null,
-      };
-    });
-  };
-
-  // Build parts arrays from JSON data
-  const predatorTaperBodyParts = buildPartsFromData(columbiaPredatorTaperBodyData);
-  const predatorTaperHeadParts = buildPartsFromData(columbiaPredatorTaperHeadData);
-  const standardOutsideCornerRollerParts = buildPartsFromData(columbiaStandardOutsideCornerRollerData);
-  const insideCornerRollerParts = buildPartsFromData(columbiaInsideCornerRollerData);
-  const throttleBoxParts = buildPartsFromData(columbiaThrottleBoxData);
-  const automaticFlatBoxParts = buildPartsFromData(columbiaAutomaticFlatBoxData);
-  const flatBoxParts = buildPartsFromData(columbiaFlatBoxData);
-  const fatBoyBoxParts = buildPartsFromData(columbiaFatBoyBoxData);
-  const tallBoyMudPumpParts = buildPartsFromData(columbiaTallBoyMudPumpData);
-  const nailspotterParts = buildPartsFromData(columbiaNailspotterData);
-  const tomahawkParts = buildPartsFromData(columbiaTomahawkData);
-  const semiAutomaticTaperParts = buildPartsFromData(columbiaSemiAutomaticTaperData);
-  const sanderHeadParts = buildPartsFromData(columbiaSanderHeadData);
-  const angleHeadParts = buildPartsFromData(columbiaAngleHeadData);
-  const mudPumpParts = buildPartsFromData(columbiaMudPumpData);
-  const gooseneckAdapterParts = buildPartsFromData(columbiaGooseneckAdapterData);
-  const boxFillerParts = buildPartsFromData(columbiaBoxFillerData);
-  const cornerCobraParts = buildPartsFromData(columbiaCornerCobraData);
-  const compoundTubeParts = buildPartsFromData(columbiaCompoundTubeDataJson);
-  const cf35Parts = buildPartsFromData(columbiaCf35Data);
-  const externalCornerApplicatorParts = buildPartsFromData(columbiaExternalCornerApplicatorData);
-  const twoWayInternalCornerApplicatorParts = buildPartsFromData(columbiaTwoWayInternalCornerApplicatorData);
-  const insideCornerApplicator2WheelParts = buildPartsFromData(columbiaInsideCornerApplicator2WheelData);
-  const insideCornerApplicator4WheelParts = buildPartsFromData(columbiaInsideCornerApplicator4WheelData);
-  const camLockTubeParts = buildPartsFromData(columbiaCamLockTubeData);
-  const closetMonsterParts = buildPartsFromData(columbiaClosetMonsterData);
-  const columbiaOneParts = buildPartsFromData(columbiaColumbiaOneData);
-  const matrixBoxHandleBoxHandleParts = buildPartsFromData(columbiaMatrixBoxHandleBoxHandleData);
-  const matrixBoxHandleHeadParts = buildPartsFromData(columbiaMatrixBoxHandleHeadData);
-  const matrixBoxHandleLeverParts = buildPartsFromData(columbiaMatrixBoxHandleLeverData);
-  const matrixBoxHandlePinchboxParts = buildPartsFromData(columbiaMatrixBoxHandlePinchboxData);
-  const matrixBoxHandleExtensionHousingParts = buildPartsFromData(columbiaMatrixBoxHandleExtensionHousingData);
-  const flatBoxHandleParts = buildPartsFromData(columbiaFlatBoxHandleData);
-  const longExtendableHandleParts = buildPartsFromData(columbiaLongExtendableHandleData);
-  const tapeTechExtendableSupportHandleParts = buildPartsFromData(tapeTechExtendableSupportHandleData);
-
-  const schematics = [
-    {
-      id: 'columbia-matrix',
-      title: 'Predator Matrix Handle',
-      description: 'Columbia Predator Matrix Handle series schematic diagrams',
-      brand: 'Columbia Taping Tools',
-      category: 'Handles',
-      diagramPages: [1, 2, 3, 4, 5],
-      pageLabels: {
-        1: 'Box Handle',
-        2: 'Head',
-        3: 'Lever',
-        4: 'Pinchbox',
-        5: 'Extension Housing'
-      },
-      imagePages: {
-        1: schImg('columbia-matrix', 1),
-        2: schImg('columbia-matrix', 2),
-        3: schImg('columbia-matrix', 3),
-        4: schImg('columbia-matrix', 4),
-        5: schImg('columbia-matrix', 5)
-      },
-      previewImage: schPrev('columbia-matrix'),
-      navHotspots: [
-        ...(columbiaMatrixBoxHandleBoxHandleData.navHotspots || []),
-        ...(columbiaMatrixBoxHandleHeadData.navHotspots || []),
-        ...(columbiaMatrixBoxHandleLeverData.navHotspots || []),
-        ...(columbiaMatrixBoxHandlePinchboxData.navHotspots || []),
-        ...(columbiaMatrixBoxHandleExtensionHousingData.navHotspots || []),
-      ],
-      parts: [...matrixBoxHandleBoxHandleParts, ...matrixBoxHandleHeadParts, ...matrixBoxHandleLeverParts, ...matrixBoxHandlePinchboxParts, ...matrixBoxHandleExtensionHousingParts]
-    },
-    {
-      id: 'columbia-predator-taper',
-      title: 'Predator Taper',
-      description: 'Columbia Predator Taper series schematic diagrams',
-      brand: 'Columbia Taping Tools',
-      category: 'Automatic Tapers',
-      diagramPages: [1, 2],
-      pageLabels: {
-        1: 'Body',
-        2: 'Head'
-      },
-      imagePages: {
-        1: schImg('columbia-predator-taper', 1),
-        2: schImg('columbia-predator-taper', 2)
-      },
-      previewImage: schPrev('columbia-predator-taper'),
-      navHotspots: [
-        ...(columbiaPredatorTaperBodyData.navHotspots || []),
-        ...(columbiaPredatorTaperHeadData.navHotspots || []),
-      ],
-      parts: [...predatorTaperBodyParts, ...predatorTaperHeadParts]
-    },
-    // TapeTech Extendable Support Handle schematic
-    {
-      id: 'tapetech-extendable-support-handle',
-      title: 'Extendable Support Handle',
-      description: 'TapeTech Extendable Support Handle schematic diagram with parts hotspots',
-      brand: 'TapeTech',
-      category: 'Handles',
-      diagramPages: [1],
-      imagePages: { 1: schImg('tapetech-extendable-support-handle', 1) },
-      previewImage: schPrev('tapetech-extendable-support-handle'),
-      parts: tapeTechExtendableSupportHandleParts
-    },
-    {
-      id: 'columbia-2-way-internal-corner',
-      title: '2-Way Internal Corner Applicator',
-      description: 'Columbia 2-Way Internal Corner Applicator schematic diagram',
-      brand: 'Columbia Taping Tools',
-      category: 'Applicators',
-      diagramPages: [1],
-      imagePages: { 1: schImg('columbia-2-way-internal-corner', 1) },
-      previewImage: schPrev('columbia-2-way-internal-corner'),
-      parts: twoWayInternalCornerApplicatorParts
-    },
-    {
-      id: 'columbia-external-corner-applicator',
-      title: 'External Corner Applicator',
-      description: 'Columbia External Corner Applicator schematic diagram',
-      brand: 'Columbia Taping Tools',
-      category: 'Applicators',
-      diagramPages: [1],
-      imagePages: { 1: schImg('columbia-external-corner-applicator', 1) },
-      previewImage: schPrev('columbia-external-corner-applicator'),
-      parts: externalCornerApplicatorParts
-    },
-    {
-      id: 'columbia-inside-corner-applicator',
-      title: 'Inside Corner Applicator',
-      description: 'Columbia Inside Corner Applicator schematic diagrams',
-      brand: 'Columbia Taping Tools',
-      category: 'Applicators',
-      diagramPages: [1, 2],
-      pageLabels: {
-        1: '2-Wheel',
-        2: '4-Wheel'
-      },
-      imagePages: {
-        1: schImg('columbia-inside-corner-applicator', 1),
-        2: schImg('columbia-inside-corner-applicator', 2)
-      },
-      previewImage: schPrev('columbia-inside-corner-applicator'),
-      parts: [...insideCornerApplicator2WheelParts, ...insideCornerApplicator4WheelParts]
-    },
-    {
-      id: 'columbia-standard-outside-corner-roller',
-      title: 'Standard Outside Corner Roller',
-      description: 'Columbia Standard Outside Corner Roller schematic diagram',
-      brand: 'Columbia Taping Tools',
-      category: 'Corner Rollers',
-      diagramPages: [1],
-      imagePages: { 1: schImg('columbia-standard-outside-corner-roller', 1) },
-      previewImage: schPrev('columbia-standard-outside-corner-roller'),
-      parts: standardOutsideCornerRollerParts
-    },
-    {
-      id: 'columbia-inside-corner-roller',
-      title: 'Inside Corner Roller',
-      description: 'Columbia Inside Corner Roller schematic diagram',
-      brand: 'Columbia Taping Tools',
-      category: 'Corner Rollers',
-      diagramPages: [1],
-      imagePages: { 1: schImg('columbia-inside-corner-roller', 1) },
-      previewImage: schPrev('columbia-inside-corner-roller'),
-      parts: insideCornerRollerParts
-    },
-    {
-      id: 'columbia-throttle-box',
-      title: 'Throttle Box',
-      description: 'Columbia Throttle Box schematic diagram',
-      brand: 'Columbia Taping Tools',
-      category: 'Corner Boxes',
-      diagramPages: [1],
-      imagePages: { 1: schImg('columbia-throttle-box', 1) },
-      previewImage: schPrev('columbia-throttle-box'),
-      parts: throttleBoxParts
-    },
-    {
-      id: 'columbia-automatic-flat-box',
-      title: 'Automatic Flat Box',
-      description: 'Columbia Automatic Flat Box schematic diagram',
-      brand: 'Columbia Taping Tools',
-      category: 'Finishing Boxes',
-      diagramPages: [1],
-      imagePages: { 1: schImg('columbia-automatic-flat-box', 1) },
-      previewImage: schPrev('columbia-automatic-flat-box'),
-      parts: automaticFlatBoxParts
-    },
-    {
-      id: 'columbia-flat-box',
-      title: 'Flat Box',
-      description: 'Columbia Flat Box schematic diagram',
-      brand: 'Columbia Taping Tools',
-      category: 'Finishing Boxes',
-      diagramPages: [1],
-      imagePages: { 1: schImg('columbia-flat-box', 1) },
-      previewImage: schPrev('columbia-flat-box'),
-      parts: flatBoxParts
-    },
-    {
-      id: 'columbia-fat-boy-box',
-      title: 'Fat Boy Box',
-      description: 'Columbia Fat Boy Box schematic diagram',
-      brand: 'Columbia Taping Tools',
-      category: 'Finishing Boxes',
-      diagramPages: [1],
-      imagePages: { 1: schImg('columbia-fat-boy-box', 1) },
-      previewImage: schPrev('columbia-fat-boy-box'),
-      parts: fatBoyBoxParts
-    },
-    {
-      id: 'columbia-angle-head',
-      title: 'Angle Head',
-      description: 'Columbia Angle Head schematic diagram',
-      brand: 'Columbia Taping Tools',
-      category: 'Angleheads',
-      diagramPages: [1],
-      imagePages: { 1: schImg('columbia-angle-head', 1) },
-      previewImage: schPrev('columbia-angle-head'),
-      parts: angleHeadParts
-    },
-    {
-      id: 'columbia-gooseneck-adapter',
-      title: 'Gooseneck Adapter',
-      description: 'Columbia Gooseneck Adapter schematic diagram',
-      brand: 'Columbia Taping Tools',
-      category: 'Pumps',
-      diagramPages: [1],
-      imagePages: { 1: schImg('columbia-gooseneck-adapter', 1) },
-      previewImage: schPrev('columbia-gooseneck-adapter'),
-      parts: gooseneckAdapterParts
-    },
-    {
-      id: 'columbia-mud-pump',
-      title: 'Mud Pump',
-      description: 'Columbia Mud Pump schematic diagrams',
-      brand: 'Columbia Taping Tools',
-      category: 'Pumps',
-      diagramPages: [1, 2],
-      pageLabels: {
-        1: 'Sub-Assemblies',
-        2: 'Schematic'
-      },
-      imagePages: {
-        1: schImg('columbia-mud-pump', 1),
-        2: schImg('columbia-mud-pump', 2)
-      },
-      previewImage: schPrev('columbia-mud-pump'),
-      parts: mudPumpParts
-    },
-    {
-      id: 'columbia-tall-boy-mud-pump',
-      title: 'Tall Boy Mud Pump',
-      description: 'Columbia Tall Boy Mud Pump schematic diagrams',
-      brand: 'Columbia Taping Tools',
-      category: 'Pumps',
-      diagramPages: [1, 2],
-      pageLabels: {
-        1: 'Sub-Assemblies',
-        2: 'Schematic'
-      },
-      imagePages: {
-        1: schImg('columbia-tall-boy-mud-pump', 1),
-        2: schImg('columbia-tall-boy-mud-pump', 2)
-      },
-      previewImage: schPrev('columbia-tall-boy-mud-pump'),
-      parts: tallBoyMudPumpParts
-    },
-    {
-      id: 'columbia-nailspotter',
-      title: 'Nailspotter 3"',
-      description: 'Columbia Nailspotter 3" schematic diagram',
-      brand: 'Columbia Taping Tools',
-      category: 'Nailspotters',
-      diagramPages: [1],
-      imagePages: { 1: schImg('columbia-nailspotter', 1) },
-      previewImage: schPrev('columbia-nailspotter'),
-      parts: nailspotterParts
-    },
-    {
-      id: 'columbia-tomahawk-smoothing-blades',
-      title: 'Tomahawk Smoothing Blades',
-      description: 'Columbia Tomahawk Smoothing Blades schematic diagram',
-      brand: 'Columbia Taping Tools',
-      category: 'Smoothing Blades',
-      diagramPages: [1],
-      imagePages: { 1: schImg('columbia-tomahawk-smoothing-blades', 1) },
-      previewImage: schPrev('columbia-tomahawk-smoothing-blades'),
-      parts: tomahawkParts
-    },
-    {
-      id: 'columbia-standard-corner-flusher',
-      title: 'Standard Corner Flusher',
-      description: 'Columbia Standard Corner Flusher schematic diagram',
-      brand: 'Columbia Taping Tools',
-      category: 'Corner Flushers',
-      diagramPages: [1],
-      imagePages: { 1: schImg('columbia-standard-corner-flusher', 1) },
-      previewImage: schPrev('columbia-standard-corner-flusher'),
-      parts: cf35Parts
-    },
-    {
-      id: 'columbia-direct-corner-flusher',
-      title: 'Direct Corner Flusher',
-      description: 'Columbia Direct Corner Flusher schematic diagram',
-      brand: 'Columbia Taping Tools',
-      category: 'Corner Flushers',
-      diagramPages: [1],
-      imagePages: { 1: schImg('columbia-direct-corner-flusher', 1) },
-      previewImage: schPrev('columbia-direct-corner-flusher'),
-      parts: columbiaDirectCornerFlusherData?.parts || []
-    },
-    {
-      id: 'columbia-combo-flusher',
-      title: 'Combo Flusher',
-      description: 'Columbia Combo Flusher schematic diagram',
-      brand: 'Columbia Taping Tools',
-      category: 'Corner Flushers',
-      diagramPages: [1],
-      imagePages: { 1: schImg('columbia-combo-flusher', 1) },
-      previewImage: schPrev('columbia-combo-flusher'),
-      parts: columbiaComboFlusherData?.parts || []
-    },
-    {
-      id: 'columbia-sander-head',
-      title: 'Sander Head',
-      description: 'Columbia Sander Head schematic diagram',
-      brand: 'Columbia Taping Tools',
-      category: 'Sanders',
-      diagramPages: [1],
-      imagePages: { 1: schImg('columbia-sander-head', 1) },
-      previewImage: schPrev('columbia-sander-head'),
-      parts: sanderHeadParts
-    },
-    {
-      id: 'columbia-compound-tube',
-      title: 'Compound Tube',
-      description: 'Columbia Compound Tube schematic diagram',
-      brand: 'Columbia Taping Tools',
-      category: 'Compound Tubes',
-      diagramPages: [1],
-      imagePages: { 1: schImg('columbia-compound-tube', 1) },
-      previewImage: schPrev('columbia-compound-tube'),
-      parts: compoundTubeParts
-    },
-    {
-      id: 'columbia-cam-lock-tube',
-      title: 'Cam Lock Tube',
-      description: 'Columbia Cam Lock Tube schematic diagram',
-      brand: 'Columbia Taping Tools',
-      category: 'Compound Tubes',
-      diagramPages: [1],
-      imagePages: { 1: schImg('columbia-cam-lock-tube', 1) },
-      previewImage: schPrev('columbia-cam-lock-tube'),
-      parts: camLockTubeParts
-    },
-    {
-      id: 'columbia-semi-automatic-taper',
-      title: 'Semi-Automatic Taper',
-      description: 'Columbia Semi-Automatic Taper schematic diagram',
-      brand: 'Columbia Taping Tools',
-      category: 'Semi-Automatic Tapers',
-      diagramPages: [1],
-      imagePages: { 1: schImg('columbia-semi-automatic-taper', 1) },
-      previewImage: schPrev('columbia-semi-automatic-taper'),
-      parts: semiAutomaticTaperParts
-    },
-    {
-      id: 'columbia-one',
-      title: 'Columbia One',
-      description: 'Columbia One schematic diagram',
-      brand: 'Columbia Taping Tools',
-      category: 'Handles',
-      diagramPages: [1],
-      imagePages: { 1: schImg('columbia-one', 1) },
-      previewImage: schPrev('columbia-one'),
-      parts: columbiaOneParts
-    },
-    {
-      id: 'columbia-long-extendable-handle',
-      title: 'Long Extendable Handle',
-      description: 'Columbia Long Extendable Handle schematic diagram',
-      brand: 'Columbia Taping Tools',
-      category: 'Handles',
-      diagramPages: [1],
-      imagePages: { 1: schImg('columbia-long-extendable-handle', 1) },
-      previewImage: schPrev('columbia-long-extendable-handle'),
-      parts: longExtendableHandleParts
-    },
-    {
-      id: 'columbia-flat-box-handle',
-      title: 'Flat Box Handle',
-      description: 'Columbia Flat Box Handle schematic diagram',
-      brand: 'Columbia Taping Tools',
-      category: 'Handles',
-      diagramPages: [1],
-      imagePages: { 1: schImg('columbia-flat-box-handle', 1) },
-      previewImage: schPrev('columbia-flat-box-handle'),
-      parts: flatBoxHandleParts
-    },
-    {
-      id: 'columbia-closet-monster-flat-box-handle',
-      title: 'Closet Monster Flat Box Handle',
-      description: 'Columbia Closet Monster Flat Box Handle schematic diagram',
-      brand: 'Columbia Taping Tools',
-      category: 'Handles',
-      diagramPages: [1],
-      imagePages: { 1: schImg('columbia-closet-monster-flat-box-handle', 1) },
-      previewImage: schPrev('columbia-closet-monster-flat-box-handle'),
-      parts: closetMonsterParts
-    },
-    {
-      id: 'columbia-box-filler',
-      title: 'Box Filler',
-      description: 'Columbia Box Filler schematic diagram',
-      brand: 'Columbia Taping Tools',
-      category: 'Pumps',
-      diagramPages: [1],
-      imagePages: { 1: schImg('columbia-box-filler', 1) },
-      previewImage: schPrev('columbia-box-filler'),
-      parts: boxFillerParts
-    },
-    {
-      id: 'columbia-corner-cobra',
-      title: 'Corner Cobra',
-      description: 'Columbia Corner Cobra schematic diagram',
-      brand: 'Columbia Taping Tools',
-      category: 'Corner Rollers',
-      diagramPages: [1],
-      imagePages: { 1: schImg('columbia-corner-cobra', 1) },
-      previewImage: schPrev('columbia-corner-cobra'),
-      parts: cornerCobraParts
+  // ── Sync state → URL (brand, search, page) ────────────────────────────────
+  useEffect(() => {
+    const p = new URLSearchParams();
+    if (selectedBrands.length > 0) {
+      const brandSlugs = selectedBrands.map(b => BRAND_TO_SLUG[b] || b);
+      p.set('brand', brandSlugs.join(','));
     }
-  ];
+    if (searchQuery)                p.set('search', encodeURIComponent(searchQuery));
+    if (currentPage > 1)            p.set('page', String(currentPage));
+    const qs = p.toString();
+    navigate(qs ? `/parts?${qs}` : '/parts', { replace: true });
+  }, [selectedBrands, searchQuery, currentPage, navigate]);
 
-  // Filter schematics to only include tools from allowed brands
-  const allowedSchematics = schematics.filter(s => !s.brand || ALLOWED_BRANDS.includes(s.brand));
+  // ── Reset to page 1 when filters / search change ──────────────────────────
+  // This is an appropriate use case for setState in effect - reset pagination when filters change
+  // eslint-disable-next-line
+  useEffect(() => { setCurrentPage(1); }, [selectedBrands, searchQuery]);
 
-  // Filter schematics by search query across brand, category, and tool name
-  const searchResults = searchQuery.trim()
-    ? allowedSchematics.filter(s => {
-        const q = searchQuery.toLowerCase().trim();
-        return (
-          s.title?.toLowerCase().includes(q) ||
-          s.brand?.toLowerCase().includes(q) ||
-          s.category?.toLowerCase().includes(q)
-        );
-      })
-    : [];
-
-  // When schematic changes we reset the page in the schematic selector's onChange handler below.
-  const currentSchematic = allowedSchematics.find(s => s.id === selectedSchematic);
-  const [currentPage, setCurrentPage] = useState(1);
-
-  // When schematic changes we reset the page in the schematic selector's onChange handler below.
-
-  // Pick the image for the currently selected diagram page (if available)
-  const schematicImageSrc = currentSchematic
-    ? (currentSchematic.imagePages && currentSchematic.imagePages[currentPage]) || currentSchematic.image || null
-    : null;
-
-  const [addingToCart, setAddingToCart] = useState(null); // part.id being added
-
-  const handleAddToCart = async (part) => {
-    if (addingToCart) return; // prevent double-click
-    setAddingToCart(part.id);
-
-    try {
-      // Look up the live WooCommerce product by SKU so we use the real price,
-      // product ID, and image from the store instead of stale JSON values.
-      const wcProduct = part.sku ? await getProductBySku(part.sku) : null;
-
-      const cartProduct = wcProduct
-        ? {
-            id: wcProduct.id,
-            name: wcProduct.name || part.name,
-            brand: currentSchematic?.brand || selectedBrand || 'Parts',
-            price: parseFloat(wcProduct.price) || 0,
-            part_number: wcProduct.sku || part.sku,
-            sku: wcProduct.sku || part.sku,
-            image: wcProduct.images?.[0]?.src || '/placeholder-part.png',
-            permalink: wcProduct.permalink || '',
-            _wcProduct: wcProduct,
-          }
-        : {
-            // Fallback: WC product not found — use schematic JSON data as-is
-            id: part.sku || part.id,
-            name: part.name,
-            brand: currentSchematic?.brand || selectedBrand || 'Parts',
-            price: part.price || 0,
-            part_number: part.sku,
-            sku: part.sku,
-            image: '/placeholder-part.png',
-          };
-
-      addToCart(cartProduct, 1);
-      setToast({
-        message: `${cartProduct.name} added to cart!`,
-        type: 'cart',
-      });
-    } catch {
-      setToast({ message: 'Could not add item to cart. Try again.', type: 'error' });
-    } finally {
-      setAddingToCart(null);
-      setActiveHotspot(null);
-      setActiveHotspotPart(null);
-    }
+  const handleAddToCart = (product, quantity = 1) => {
+    addToCart(product, quantity);
+    setToast({ message: `${product.name} added to cart!`, type: 'cart' });
   };
 
-  const closeModal = () => {
-    setActiveHotspot(null);
-    setActiveHotspotPart(null);
-  };
-
-  // Reset zoom/pan when schematic changes
-    useEffect(() => {
-      const t = setTimeout(() => {
-        setScale(1);
-        setPosition({ x: 0, y: 0 });
-      }, 0);
-      return () => clearTimeout(t);
-    }, [selectedSchematic, currentPage]);
-
-  // Touch and zoom handlers for mobile - enhanced with smooth interactions
-  const handleTouchStart = useCallback((e) => {
-    if (e.touches.length === 2) {
-      // Pinch gesture - prevent default and calculate distance
-      e.preventDefault();
-      e.stopPropagation();
-      gestureActiveRef.current = true;
-      setForceUpdate(prev => prev + 1);
-      const touch1 = e.touches[0];
-      const touch2 = e.touches[1];
-      const distance = Math.hypot(
-        touch2.clientX - touch1.clientX,
-        touch2.clientY - touch1.clientY
+  // ── Filter + sort ─────────────────────────────────────────────────────────
+  const filtered = allParts.filter(p => {
+    if (selectedBrands.length > 0 && !selectedBrands.includes(p.brand)) return false;
+    if (searchQuery) {
+      const q = searchQuery.toLowerCase();
+      return (
+        (p.name  || '').toLowerCase().includes(q) ||
+        (p.sku   || '').toLowerCase().includes(q) ||
+        (p.upc   || '').toLowerCase().includes(q) ||
+        (p.brand || '').toLowerCase().includes(q)
       );
-      // Record pinch midpoint relative to the container center so we can
-      // keep the focal point stationary as the user zooms.
-      const container = schematicContainerRef.current;
-      const rect = container ? container.getBoundingClientRect() : { left: 0, top: 0, width: 0, height: 0 };
-      const midX = (touch1.clientX + touch2.clientX) / 2;
-      const midY = (touch1.clientY + touch2.clientY) / 2;
-      // Offset from container center (our transform-origin)
-      const centerX = midX - (rect.left + rect.width / 2);
-      const centerY = midY - (rect.top + rect.height / 2);
-      pinchRef.current = {
-        active: true,
-        initDist: distance,
-        initScale: scale,
-        initPanX: position.x,
-        initPanY: position.y,
-        centerX,
-        centerY,
-      };
-    } else if (e.touches.length === 1 && scale > 1) {
-      // Pan gesture (only when zoomed in) - store initial position
-      setTouchStartPos({
-        x: e.touches[0].clientX,
-        y: e.touches[0].clientY
-      });
-      setHasMoved(false);
-      setStartPanPosition({
-        x: e.touches[0].clientX - position.x,
-        y: e.touches[0].clientY - position.y
-      });
     }
-  }, [scale, position]);
+    return true;
+  });
 
-  const handleTouchMove = useCallback((e) => {
-    if (e.touches.length === 2 && pinchRef.current.active) {
-      // Smooth continuous pinch zoom
-      e.preventDefault();
-      e.stopPropagation();
-      const touch1 = e.touches[0];
-      const touch2 = e.touches[1];
-      const distance = Math.hypot(
-        touch2.clientX - touch1.clientX,
-        touch2.clientY - touch1.clientY
-      );
-      const { initDist, initScale, initPanX, initPanY, centerX, centerY } = pinchRef.current;
-      const zoomFactor = distance / initDist;
-      const rawScale = zoomFactor * initScale;
-      const newScale = Math.min(Math.max(rawScale, 0.5), 5);
+  const sorted = [...filtered].sort((a, b) => {
+    if (sortBy === 'price-low')  return (a.price || 0) - (b.price || 0);
+    if (sortBy === 'price-high') return (b.price || 0) - (a.price || 0);
+    return 0;
+  });
 
-      // Zoom towards pinch center with smooth focal point tracking
-      const ratio = newScale / initScale;
-      const newPanX = centerX - (centerX - initPanX) * ratio;
-      const newPanY = centerY - (centerY - initPanY) * ratio;
+  // ── Pagination ────────────────────────────────────────────────────────────
+  const totalPages  = Math.max(1, Math.ceil(sorted.length / ITEMS_PER_PAGE));
+  const safePage    = Math.min(currentPage, totalPages);
+  const pageStart   = (safePage - 1) * ITEMS_PER_PAGE;
+  const paginated   = sorted.slice(pageStart, pageStart + ITEMS_PER_PAGE);
 
-      // Dynamic bounds based on actual image dimensions
-      const container = schematicContainerRef.current;
-      const imageDiv = schematicImageRef.current;
-      const containerW = container ? container.offsetWidth : 400;
-      const containerH = imageDiv ? imageDiv.offsetHeight : (container ? container.offsetHeight : 400);
-      const maxPanX = Math.max(0, ((newScale - 1) * containerW) / 2);
-      const maxPanY = Math.max(0, ((newScale - 1) * containerH) / 2);
-
-      setScale(newScale);
-      setPosition({
-        x: Math.min(Math.max(newPanX, -maxPanX), maxPanX),
-        y: Math.min(Math.max(newPanY, -maxPanY), maxPanY),
-      });
-    } else if (e.touches.length === 1 && scale > 1) {
-      // Check distance moved to determine if this is a drag or a tap
-      const touch = e.touches[0];
-      const moveDistance = Math.hypot(
-        touch.clientX - touchStartPos.x,
-        touch.clientY - touchStartPos.y
-      );
-      
-      if (moveDistance > 10) {
-        // Only preventDefault if user is actually dragging (threshold: 10px)
-        if (!hasMoved) {
-          e.preventDefault();
-          e.stopPropagation();
-          setHasMoved(true);
-          setIsPanning(true);
-          gestureActiveRef.current = true;
-          setForceUpdate(prev => prev + 1);
-        }
-        
-        // Pan when zoomed - smooth panning with dynamic bounds
-        const newX = touch.clientX - startPanPosition.x;
-        const newY = touch.clientY - startPanPosition.y;
-        
-        // Constrain pan based on scale and container size
-        const container = schematicContainerRef.current;
-        const containerW = container ? container.offsetWidth : 400;
-        const containerH = container ? container.offsetHeight : 400;
-        const maxPanX = Math.max(0, ((scale - 1) * containerW) / 2);
-        const maxPanY = Math.max(0, ((scale - 1) * containerH) / 2);
-        
-        setPosition({
-          x: Math.min(Math.max(newX, -maxPanX), maxPanX),
-          y: Math.min(Math.max(newY, -maxPanY), maxPanY),
-        });
-      }
-    }
-  }, [scale, startPanPosition, touchStartPos, hasMoved]);
-
-  const handleTouchEnd = useCallback((e) => {
-    if (e.touches.length === 0) {
-      pinchRef.current.active = false;
-      const wasActive = gestureActiveRef.current;
-      gestureActiveRef.current = false;
-      if (wasActive) setForceUpdate(prev => prev + 1);
-      
-      // Double-tap to zoom
-      if (!hasMoved && e.changedTouches.length === 1) {
-        const now = Date.now();
-        const touch = e.changedTouches[0];
-        const tapX = touch.clientX;
-        const tapY = touch.clientY;
-        const timeSinceLastTap = now - lastTapTime;
-        const distanceFromLastTap = Math.hypot(tapX - lastTapPos.x, tapY - lastTapPos.y);
-        
-        if (timeSinceLastTap < 300 && distanceFromLastTap < 30) {
-          // Double tap detected - zoom in/out
-          e.preventDefault();
-          const container = schematicContainerRef.current;
-          if (container) {
-            const rect = container.getBoundingClientRect();
-            const centerX = tapX - (rect.left + rect.width / 2);
-            const centerY = tapY - (rect.top + rect.height / 2);
-            
-            if (scale === 1) {
-              // Zoom in to 2.5x at tap point
-              const newScale = 2.5;
-              const containerW = container.offsetWidth;
-              const containerH = container.offsetHeight;
-              const ratio = newScale / scale;
-              const newPanX = centerX - (centerX - position.x) * ratio;
-              const newPanY = centerY - (centerY - position.y) * ratio;
-              const maxPanX = Math.max(0, ((newScale - 1) * containerW) / 2);
-              const maxPanY = Math.max(0, ((newScale - 1) * containerH) / 2);
-              
-              setScale(newScale);
-              setPosition({
-                x: Math.min(Math.max(newPanX, -maxPanX), maxPanX),
-                y: Math.min(Math.max(newPanY, -maxPanY), maxPanY),
-              });
-            } else {
-              // Zoom out to 1x
-              setScale(1);
-              setPosition({ x: 0, y: 0 });
-            }
-          }
-          setLastTapTime(0);
-        } else {
-          setLastTapTime(now);
-          setLastTapPos({ x: tapX, y: tapY });
-        }
-      }
-      
-      setIsPanning(false);
-      setHasMoved(false);
-    } else if (e.touches.length === 1 && pinchRef.current.active) {
-      // Transitioned from pinch to single-touch — reset pinch tracking cleanly
-      pinchRef.current.active = false;
-      // Keep gesture active if user continues with single finger
-      if (scale > 1) {
-        const touch = e.touches[0];
-        setTouchStartPos({ x: touch.clientX, y: touch.clientY });
-        setHasMoved(false);
-        setStartPanPosition({
-          x: touch.clientX - position.x,
-          y: touch.clientY - position.y
-        });
-      } else {
-        gestureActiveRef.current = false;
-      }
-    }
-  }, [hasMoved, scale, position, lastTapTime, lastTapPos]);
-
-  // Setup non-passive touch event listeners to allow preventDefault
-  useEffect(() => {
-    const container = schematicContainerRef.current;
-    if (!container) return;
-
-    // Attach non-passive touch listeners
-    container.addEventListener('touchstart', handleTouchStart, { passive: false });
-    container.addEventListener('touchmove', handleTouchMove, { passive: false });
-    container.addEventListener('touchend', handleTouchEnd, { passive: false });
-
-    return () => {
-      container.removeEventListener('touchstart', handleTouchStart);
-      container.removeEventListener('touchmove', handleTouchMove);
-      container.removeEventListener('touchend', handleTouchEnd);
-    };
-  }, [handleTouchStart, handleTouchMove, handleTouchEnd]);
-
-  // Mouse wheel zoom — cursor-aware, non-passive listener added via useEffect below
-  const handleWheel = useCallback((e) => {
-    if (e.ctrlKey || e.metaKey) {
-      e.preventDefault();
-      const zoomDirection = e.deltaY > 0 ? -0.2 : 0.2;
-      const newScale = Math.min(Math.max(scale + zoomDirection, 1), 4);
-      const container = schematicContainerRef.current;
-      const imageDiv  = schematicImageRef.current;
-      const containerW = container ? container.offsetWidth  : 400;
-      const containerH = imageDiv   ? imageDiv.offsetHeight : (container ? container.offsetHeight : 400);
-      if (newScale === 1) {
-        setPosition({ x: 0, y: 0 });
-      } else {
-        // Zoom towards the cursor position
-        const rect = container ? container.getBoundingClientRect() : { left: 0, top: 0, width: containerW, height: containerH };
-        const cursorX = e.clientX - (rect.left + rect.width  / 2);
-        const cursorY = e.clientY - (rect.top  + rect.height / 2);
-        const ratio = newScale / scale;
-        const newX = cursorX - (cursorX - position.x) * ratio;
-        const newY = cursorY - (cursorY - position.y) * ratio;
-        const maxPanX = ((newScale - 1) * containerW) / 2;
-        const maxPanY = ((newScale - 1) * containerH) / 2;
-        setPosition({
-          x: Math.min(Math.max(newX, -maxPanX), maxPanX),
-          y: Math.min(Math.max(newY, -maxPanY), maxPanY),
-        });
-      }
-      setScale(newScale);
-    }
-  }, [scale, position]);
-
-  // Attach non-passive wheel listener so preventDefault() is respected
-  useEffect(() => {
-    const container = schematicContainerRef.current;
-    if (!container) return;
-    container.addEventListener('wheel', handleWheel, { passive: false });
-    return () => container.removeEventListener('wheel', handleWheel);
-  }, [handleWheel]);
-
-  // Desktop mouse-drag panning: track start when mouse is pressed on the schematic
-  const handleMouseDown = useCallback((e) => {
-    if (e.button !== 0 || scale <= 1 || isMobile) return;
-    e.preventDefault();
-    dragStartRef.current = {
-      x: e.clientX,
-      y: e.clientY,
-      panX: position.x,
-      panY: position.y,
-    };
-    setIsDragging(true);
-    setIsPanning(true);
-  }, [scale, position, isMobile]);
-
-  // Global mouse-move / mouse-up while dragging
-  useEffect(() => {
-    if (!isDragging) return;
-    const onMouseMove = (e) => {
-      const { x, y, panX, panY } = dragStartRef.current;
-      const newX = panX + (e.clientX - x);
-      const newY = panY + (e.clientY - y);
-      const container = schematicContainerRef.current;
-      const imageDiv  = schematicImageRef.current;
-      const containerW = container ? container.offsetWidth  : 400;
-      const containerH = imageDiv   ? imageDiv.offsetHeight : (container ? container.offsetHeight : 400);
-      const maxPanX = ((scale - 1) * containerW) / 2;
-      const maxPanY = ((scale - 1) * containerH) / 2;
-      setPosition({
-        x: Math.min(Math.max(newX, -maxPanX), maxPanX),
-        y: Math.min(Math.max(newY, -maxPanY), maxPanY),
-      });
-    };
-    const onMouseUp = () => {
-      setIsDragging(false);
-      setIsPanning(false);
-    };
-    window.addEventListener('mousemove', onMouseMove);
-    window.addEventListener('mouseup',   onMouseUp);
-    return () => {
-      window.removeEventListener('mousemove', onMouseMove);
-      window.removeEventListener('mouseup',   onMouseUp);
-    };
-  }, [isDragging, scale]);
-
-  // Zoom controls
-  const handleZoomIn = () => {
-    setScale(prev => {
-      const newScale = Math.min(prev + 0.5, 4);
-      const container = schematicContainerRef.current;
-      const imageDiv  = schematicImageRef.current;
-      const containerW = container ? container.offsetWidth  : 400;
-      const containerH = imageDiv   ? imageDiv.offsetHeight : (container ? container.offsetHeight : 400);
-      const maxPanX = ((newScale - 1) * containerW) / 2;
-      const maxPanY = ((newScale - 1) * containerH) / 2;
-      setPosition(p => ({
-        x: Math.min(Math.max(p.x, -maxPanX), maxPanX),
-        y: Math.min(Math.max(p.y, -maxPanY), maxPanY),
-      }));
-      return newScale;
-    });
-  };
-
-  const handleZoomOut = () => {
-    setScale(prev => {
-      const newScale = Math.max(prev - 0.5, 1);
-      if (newScale === 1) {
-        setPosition({ x: 0, y: 0 });
-      } else {
-        const container = schematicContainerRef.current;
-        const imageDiv  = schematicImageRef.current;
-        const containerW = container ? container.offsetWidth  : 400;
-        const containerH = imageDiv   ? imageDiv.offsetHeight : (container ? container.offsetHeight : 400);
-        const maxPanX = ((newScale - 1) * containerW) / 2;
-        const maxPanY = ((newScale - 1) * containerH) / 2;
-        setPosition(p => ({
-          x: Math.min(Math.max(p.x, -maxPanX), maxPanX),
-          y: Math.min(Math.max(p.y, -maxPanY), maxPanY),
-        }));
-      }
-      return newScale;
-    });
-  };
-
-  const handleResetZoom = () => {
-    setScale(1);
-    setPosition({ x: 0, y: 0 });
+  const goToPage = (n) => {
+    setCurrentPage(n);
+    if (typeof window !== 'undefined') window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   return (
-    <section 
-      style={{ 
-        minHeight: '100vh',
-        backgroundColor: '#f9fafb'
-      }} 
-      className={`section-enter page-wrapper ${isFullscreen ? 'fullscreen-mode' : ''}`}
-      onClick={closeModal}
-    >
-      {/* Container wrapper with consistent padding like Products page */}
-      <div style={{
-        maxWidth: '1280px',
-        margin: '0 auto',
-        padding: isFullscreen ? '16px' : '2px 16px 24px'
-      }}>
-      {/* Show BrandSelector if no brand selected */}
-      {!selectedBrand ? (
-        <BrandSelector
-          brands={brands}
-          onSelectBrand={(brand) => {
-            setSelectedBrand(brand);
-            setSelectedSchematic(null);
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-          }}
-          searchQuery={searchQuery}
-          onSearchChange={(e) => setSearchQuery(e.target.value)}
-          searchResults={searchResults}
-          onSelectSchematic={(schematic) => {
-            const firstPage = (schematic.diagramPages && schematic.diagramPages[0]) || 1;
-            setSelectedBrand(schematic.brand);
-            setSelectedSchematic(schematic.id);
-            setCurrentPage(firstPage);
-            setSearchQuery('');
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-          }}
-        />
-      ) : !selectedSchematic ? (
-        /* Show ToolSelector if brand selected but no schematic */
-        <ToolSelector
-          brand={selectedBrand}
-          brandLogo={brandLogos[selectedBrand]}
-          tools={allowedSchematics.filter(s => s.brand === selectedBrand)}
-          onSelectTool={(tool) => {
-            setSelectedSchematic(tool.id);
-            const s = allowedSchematics.find(sch => sch.id === tool.id);
-            const firstPage = (s && s.diagramPages && s.diagramPages[0]) || 1;
-            setCurrentPage(firstPage);
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-          }}
-          onBack={() => {
-            setSelectedBrand(null);
-            setSelectedSchematic(null);
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-          }}
-        />
-      ) : (
-        /* Show Schematic Viewer if schematic selected */
-        <div style={{
-          display: 'flex',
-          flexDirection: 'column',
-          minHeight: '100vh',
-          width: '100%',
-          overflow: 'hidden',
-          height: '100%'
-        }}>
-          {/* Top Back Button - Positioned in top left */}
-          <div style={{
-            padding: 'clamp(12px, 2vw, 20px) clamp(12px, 2vw, 20px) 0 clamp(12px, 2vw, 20px)',
-            flexShrink: 0,
-            position: 'relative',
-            zIndex: 2000
-          }}>
-            <button
-              className="back-button"
-              onClick={() => {
-                setSelectedSchematic(null);
-                setScale(1);
-                setPosition({ x: 0, y: 0 });
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-              }}
-              aria-label="Back to Tools"
-            >
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M19 12H5M12 19l-7-7 7-7" />
-              </svg>
-              <span>Back</span>
-            </button>
+    <div className="min-h-screen bg-gray-50 page-wrapper">
+      <div className="container mx-auto px-4 py-8 pt-12">
+
+        {/* ── Page header ──────────────────────────────────────────────────── */}
+        <div className="mb-8">
+          <div className="flex items-center gap-3 mb-2">
+            <h1 className="text-4xl font-bold text-gray-900">Replacement Parts</h1>
           </div>
+          <p className="text-gray-600">
+            Genuine repair kits, replacement parts, and accessories for professional
+            drywall finishing tools.
+          </p>
+        </div>
 
-          {/* Schematic Container Wrapper - Allows flex growth with responsive sizing */}
-          <div style={{
-            maxWidth: isFullscreen ? '100%' : 'clamp(600px, 95vw, 1400px)',
-            margin: '0 auto',
-            padding: isFullscreen ? '0' : 'clamp(12px, 2vw, 20px)',
-            width: '100%',
-            display: 'flex',
-            flexDirection: 'column',
-            flex: 1,
-            minHeight: 0
-          }}
-          onClick={(e) => e.stopPropagation()}
-          >
-          {/* Brand & Title Header */}
-          <div style={{ 
-            marginBottom: 'clamp(24px, 4vw, 40px)', 
-            textAlign: 'center',
-            flexShrink: 0,
-            padding: 'clamp(12px, 2vw, 20px)'
-          }}>
-            {brandLogos[currentSchematic?.brand] ? (
-              <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '8px' }}>
-                <img
-                  src={brandLogos[currentSchematic.brand]}
-                  alt={`${currentSchematic.brand} logo`}
-                  style={{
-                    height: 'clamp(2.5rem, 6vw, 4rem)',
-                    width: 'auto',
-                    objectFit: 'contain'
-                  }}
-                />
+        {/* ── Search bar ───────────────────────────────────────────────────── */}
+        <SearchBar
+          placeholder="Search parts by name, SKU, or brand…"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+        />
+
+        <div className="flex flex-col lg:flex-row gap-8">
+
+          {/* ── Filter Panel ─────────────────────────────────────────────── */}
+          <FilterPanel
+            isOpen={showFilters}
+            onClose={() => setShowFilters(false)}
+            categories={[]}
+            brands={brands}
+            maxPrice={0}
+            selectedBrands={selectedBrands}
+            selectedCategories={[]}
+            priceRange={[0, 0]}
+            onBrandChange={toggleBrand}
+            onCategoryChange={() => {}}
+            onPriceChange={() => {}}
+            onClearFilters={clearFilters}
+            resultsCount={sorted.length}
+          />
+
+          {/* ── Right: product grid ──────────────────────────────────────── */}
+          <div className="flex-1 min-w-0">
+
+            {/* Sort bar + mobile filter toggle */}
+            <div className="flex flex-row items-center justify-between gap-4 mb-6">
+              <div className="flex items-center gap-3">
+                <SortDropdown value={sortBy} onChange={setSortBy} />
+                <span className="hidden sm:inline text-sm text-gray-500">
+                  {loading ? 'Loading…' : `${sorted.length.toLocaleString()} part${sorted.length !== 1 ? 's' : ''}`}
+                </span>
               </div>
-            ) : (
-              <h3 style={{ 
-                fontSize: 'clamp(1rem, 3vw, 1.5rem)', 
-                margin: '0 0 8px 0',
-                letterSpacing: '-0.02em',
-                color: 'var(--text-secondary)',
-                fontWeight: 600
-              }}>
-                {currentSchematic?.brand}
-              </h3>
-            )}
-            <h2 style={{ 
-              fontSize: 'clamp(1.5rem, 5vw, 3rem)', 
-              margin: '0',
-              letterSpacing: '-0.02em',
-              textAlign: 'center'
-            }}>
-              {currentSchematic?.title}
-            </h2>
-          </div>
 
-          {/* Page selector for multi-page parts diagrams - positioned at top center */}
-          {currentSchematic.diagramPages && currentSchematic.diagramPages.length > 1 && (
-          <div style={{ 
-            display: 'flex', 
-            justifyContent: 'center', 
-            marginBottom: '8px',
-            flexShrink: 0
-          }}>
-                <div className="schematic-pager schematic-pager-top" role="group" aria-label="Schematic pages">
-                  <button
-                    className={`pager-pill ${currentSchematic.diagramPages.indexOf(currentPage) <= 0 ? 'disabled' : ''}`}
-                    onClick={() => {
-                      const pages = currentSchematic.diagramPages;
-                      const idx = pages.indexOf(currentPage);
-                      if (idx > 0) setCurrentPage(pages[idx - 1]);
-                    }}
-                    aria-label="Previous page"
-                    disabled={currentSchematic.diagramPages.indexOf(currentPage) <= 0}
-                  >
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
-                      <path d="M15 18L9 12L15 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                    </svg>
-                  </button>
-
-                  <div className="pager-counter" aria-hidden>
-                    {currentSchematic.pageLabels?.[currentPage]
-                      ? `${currentSchematic.pageLabels[currentPage]} (${currentSchematic.diagramPages.indexOf(currentPage) + 1}/${currentSchematic.diagramPages.length})`
-                      : `${currentSchematic.diagramPages.indexOf(currentPage) + 1} / ${currentSchematic.diagramPages.length}`
-                    }
-                  </div>
-
-                  <button
-                    className={`pager-pill ${currentSchematic.diagramPages.indexOf(currentPage) >= currentSchematic.diagramPages.length - 1 ? 'disabled' : ''}`}
-                    onClick={() => {
-                      const pages = currentSchematic.diagramPages;
-                      const idx = pages.indexOf(currentPage);
-                      if (idx < pages.length - 1) setCurrentPage(pages[idx + 1]);
-                    }}
-                    aria-label="Next page"
-                    disabled={currentSchematic.diagramPages.indexOf(currentPage) >= currentSchematic.diagramPages.length - 1}
-                  >
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
-                      <path d="M9 6L15 12L9 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                    </svg>
-                  </button>
-                </div>
-              </div>
-              )}
-
-            {/* Zoom/Pan Controls Toolbar - Visible on Both Mobile and Desktop */}
-            <div className="schematic-zoom-controls">
-              <button className="zoom-control-btn" onClick={handleZoomIn} aria-label="Zoom in" title="Zoom in">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                  <circle cx="11" cy="11" r="8" stroke="currentColor" strokeWidth="2"/>
-                  <path d="M21 21l-4.35-4.35M11 8v6m-3-3h6" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-                </svg>
-              </button>
-              <button className="zoom-control-btn" onClick={handleZoomOut} aria-label="Zoom out" title="Zoom out">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                  <circle cx="11" cy="11" r="8" stroke="currentColor" strokeWidth="2"/>
-                  <path d="M21 21l-4.35-4.35M8 11h6" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-                </svg>
-              </button>
-              {scale > 1 && (
-                <button className="zoom-control-btn reset-btn" onClick={handleResetZoom} aria-label="Reset zoom" title="Reset zoom">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                    <path d="M1 4v6h6M23 20v-6h-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                    <path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
-                </button>
-              )}
-            </div>
-
-            <div 
-              className="schematic-container"
-              ref={schematicContainerRef}
-              onMouseDown={handleMouseDown}
-              style={{
-                overflow: 'hidden',
-                touchAction: scale > 1 ? 'none' : 'auto',
-                cursor: scale > 1 ? (isPanning || isDragging ? 'grabbing' : 'grab') : 'default',
-                WebkitUserSelect: 'none',
-                userSelect: 'none',
-                position: 'relative',
-                willChange: scale > 1 ? 'transform' : 'auto',
-                flex: 1,
-                minHeight: 0,
-                display: 'flex',
-                flexDirection: 'column'
-              }}
-            >
-              {/* Transform wrapper — sized by the image's natural aspect ratio.
-                  Hotspots are absolutely positioned inside here so they scale
-                  and pan with the image on every zoom level and screen size. */}
-              <div 
-                ref={schematicImageRef}
-                style={{ 
-                  position: 'relative',
-                  width: '100%',
-                  transform: `scale(${scale}) translate(${position.x / scale}px, ${position.y / scale}px)`,
-                  transformOrigin: 'center center',
-                  transition: gestureActiveRef.current ? 'none' : 'transform 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
-                  WebkitUserSelect: 'none',
-                  userSelect: 'none',
-                  pointerEvents: 'auto',
-                  willChange: scale > 1 || gestureActiveRef.current ? 'transform' : 'auto',
-                }}
+              <button
+                onClick={() => setShowFilters(!showFilters)}
+                className="lg:hidden flex items-center gap-2 px-4 py-2.5 border border-gray-300 rounded-lg bg-white text-gray-900 hover:bg-gray-50 font-medium text-sm transition-colors"
               >
-                {schematicImageSrc ? (
-                  <img 
-                    src={schematicImageSrc} 
-                    alt={currentSchematic.title}
-                    style={{ 
-                      width: '100%', 
-                      height: 'auto',
-                      display: 'block', 
-                      pointerEvents: 'none',
-                      imageRendering: 'auto',
-                      WebkitTouchCallout: 'none',
-                      WebkitUserSelect: 'none',
-                      userSelect: 'none',
-                    }}
-                    loading="eager"
-                    decoding="async"
-                  />
-                ) : (
-                  currentSchematic.svg
-                )}
-                
-                {/* Hotspots rendered INSIDE the transformed container so they scale and pan with the image */}
-                {currentSchematic.parts.filter(part => !part.pageNumber || part.pageNumber === currentPage).map((part, index) => (
-                  <div
-                    key={`${part.id}-${part.position.top}-${part.position.left}-${index}`}
-                    className={`hotspot hotspot-${part.shape || 'circle'} ${activeHotspot === part.id ? 'active' : ''}`}
-                    style={{
-                      position: 'absolute',
-                      top: part.position.top,
-                      left: part.position.left,
-                      transform: part.rotation ? `translate(-50%, -50%) rotate(${part.rotation}deg)` : 'translate(-50%, -50%)',
-                      zIndex: activeHotspot === part.id ? 1001 : 100,
-                      pointerEvents: 'auto',
-                      ...(part.widthPx && part.heightPx ? {
-                        width: `${part.widthPx}px`,
-                        height: `${part.heightPx}px`
-                      } : (part.width && part.height ? {
-                        width: `${part.width}%`,
-                        height: `${part.height}%`
-                      } : {}))
-                    }}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      // Check if this is a navigation hotspot
-                      if (part.name === 'SEE HEAD DETAIL') {
-                        setCurrentPage(2);
-                        closeModal();
-                      } else if (part.name === 'SEE LEVER DETAIL') {
-                        setCurrentPage(3);
-                        closeModal();
-                      } else if (part.name === 'SEE PINCHBOX DETAIL') {
-                        setCurrentPage(4);
-                        closeModal();
-                      } else if (part.name === 'SEE EXTENSION HOUSING DETAIL') {
-                        setCurrentPage(5);
-                        closeModal();
-                      } else if (activeHotspot === part.id) {
-                        closeModal();
-                      } else {
-                        setActiveHotspot(part.id);
-                        setActiveHotspotPart(part);
-                      }
-                    }}
-                    title={`${part.name} (${part.sku})`}
-                  >
-                    {/* Desktop inline modal (hidden on mobile via CSS) */}
-                    <div className="part-modal" onClick={(e) => e.stopPropagation()}>
-                    <h4 style={{
-                      textTransform: 'uppercase',
-                      fontSize: '0.75rem',
-                      letterSpacing: '0.1em',
-                      marginBottom: '8px'
-                    }}>
-                      {part.name}
-                    </h4>
-                    <div className="part-meta">
-                      SKU: {part.sku} | {part.material}
-                      {part.quantity > 1 && ` | Qty: ${part.quantity}`}
-                    </div>
-                    <div style={{
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      alignItems: 'center'
-                    }}>
-                      <span style={{
-                        fontFamily: 'var(--font-mono)',
-                        fontWeight: 800
-                      }}>
-                        ${part.price.toFixed(2)}
-                      </span>
-                      <button
-                        className="alloy-button"
-                        style={{
-                          padding: '8px 16px',
-                          fontSize: '0.6rem'
-                        }}
-                        disabled={addingToCart === part.id}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleAddToCart(part);
-                        }}
-                      >
-                        {addingToCart === part.id ? '…' : 'Add'}
-                      </button>
+                <Filter size={16} />
+                <span>
+                  Brands
+                  {selectedBrands.length > 0 && (
+                    <span className="ml-1.5 inline-flex items-center justify-center w-5 h-5 rounded-full bg-primary-600 text-white text-xs font-bold">
+                      {selectedBrands.length}
+                    </span>
+                  )}
+                </span>
+              </button>
+            </div>
+
+            {/* Loading skeleton */}
+            {loading && (
+              <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
+                {Array.from({ length: 8 }).map((_, i) => (
+                  <div key={i} className="bg-white rounded-lg border border-gray-100 overflow-hidden animate-pulse">
+                    <div className="aspect-square bg-gray-200" />
+                    <div className="p-3 space-y-2">
+                      <div className="h-3 bg-gray-200 rounded w-1/3" />
+                      <div className="h-4 bg-gray-200 rounded w-3/4" />
+                      <div className="h-4 bg-gray-200 rounded w-1/2" />
                     </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
+            )}
 
-                {/* Navigation hotspots — click a tool region to jump to its detail page */}
-                {(currentSchematic.navHotspots || [])
-                  .filter(nh => nh.pageNumber === currentPage)
-                  .map((nh, navIndex) => (
+            {/* Product grid */}
+            {!loading && paginated.length > 0 && (
+              <>
+                <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-5 lg:gap-6">
+                  {paginated.map(product => (
                     <div
-                      key={`${nh.id}-${nh.top}-${nh.left}-${navIndex}`}
-                      className="nav-hotspot"
-                      role="button"
-                      tabIndex={0}
-                      aria-label={`Navigate to ${nh.label}`}
-                      style={{
-                        position: 'absolute',
-                        top: nh.top,
-                        left: nh.left,
-                        width: nh.width,
-                        height: nh.height,
-                        zIndex: 80,
-                      }}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setCurrentPage(nh.targetPage);
-                        setActiveHotspot(null);
-                        setActiveHotspotPart(null);
-                      }}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter' || e.key === ' ') {
-                          e.preventDefault();
-                          setCurrentPage(nh.targetPage);
-                          setActiveHotspot(null);
-                          setActiveHotspotPart(null);
-                        }
-                      }}
+                      key={product.id}
+                      className="bg-white rounded-lg shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden group border border-gray-100 hover:border-primary-300 flex flex-col h-full"
                     >
-                      <span className="nav-hotspot-label">
-                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                          <path d="M5 12h14M12 5l7 7-7 7"/>
-                        </svg>
-                        {nh.label}
-                      </span>
+                      {/* Image */}
+                      <div className="relative bg-gray-50 aspect-square overflow-hidden shrink-0">
+                        <button
+                          onClick={() => openModal(product)}
+                          className="absolute inset-0 flex items-center justify-center bg-gray-50 hover:bg-gray-100 transition-colors w-full h-full"
+                        >
+                          {product.image && product.image !== '/product-placeholder.jpg' ? (
+                            <img
+                              src={product.image}
+                              alt={product.name}
+                              className="object-contain w-full h-full p-2 sm:p-3"
+                              loading="lazy"
+                              onError={(e) => {
+                                e.currentTarget.onerror = null;
+                                e.currentTarget.src = '/product-placeholder.jpg';
+                              }}
+                            />
+                          ) : (
+                            <div className="text-gray-200">
+                              <Wrench size={40} />
+                            </div>
+                          )}
+                        </button>
+
+                        {/* Wishlist hint */}
+                        <button className="absolute top-2 right-2 p-1.5 bg-white/95 rounded-full hover:bg-white transition-all opacity-0 group-hover:opacity-100 shadow-sm hover:shadow-md">
+                          <Heart size={16} className="text-gray-500 hover:text-red-500 transition-colors" />
+                        </button>
+                      </div>
+
+                      {/* Info */}
+                      <div className="p-3 sm:p-4 flex flex-col grow">
+                        <p className="text-xs text-gray-500 mb-1 font-medium uppercase tracking-wide">
+                          {product.brand}
+                        </p>
+                        <h3 className="text-sm sm:text-base font-semibold text-gray-900 mb-2 line-clamp-2 group-hover:text-primary-600 transition-colors grow">
+                          <button
+                            onClick={() => openModal(product)}
+                            className="block text-left w-full hover:text-primary-600"
+                          >
+                            {product.name || product.sku}
+                          </button>
+                        </h3>
+
+                        <div className="flex flex-wrap gap-1.5 mb-3 text-xs text-gray-500">
+                          {product.sku && <span>SKU: {product.sku}</span>}
+                          {product.upc && <span className="hidden sm:inline">UPC: {product.upc}</span>}
+                        </div>
+
+                        <div className="flex items-center justify-between gap-2 pt-2 border-t border-gray-100">
+                          <p className="text-base sm:text-lg font-bold text-gray-900 shrink-0">
+                            {product.price > 0
+                              ? `$${parseFloat(product.price).toFixed(2)}`
+                              : <span className="text-sm font-normal text-gray-400">Call for price</span>
+                            }
+                          </p>
+                          <button
+                            onClick={(e) => { e.stopPropagation(); handleAddToCart(product, 1); }}
+                            className="shrink-0 p-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-all hover:scale-110 active:scale-95"
+                          >
+                            <ShoppingCart size={18} />
+                          </button>
+                        </div>
+                      </div>
                     </div>
-                  ))
-                }
-            </div>
+                  ))}
+                </div>
+
+                {/* Pagination */}
+                <Pagination
+                  currentPage={safePage}
+                  totalPages={totalPages}
+                  onPageChange={goToPage}
+                  className="mt-8"
+                />
+
+                {/* Results summary */}
+                <p className="text-center text-sm text-gray-400 mt-2">
+                  Showing {pageStart + 1}–{Math.min(pageStart + ITEMS_PER_PAGE, sorted.length)} of{' '}
+                  {sorted.length.toLocaleString()} results
+                </p>
+              </>
+            )}
+
+            {/* Empty state */}
+            {!loading && paginated.length === 0 && (
+              <div className="text-center py-16">
+                <Wrench className="h-20 w-20 mx-auto mb-6 text-gray-200" />
+                <h2 className="text-2xl font-bold text-gray-900 mb-3">No parts found</h2>
+                <p className="text-gray-500 mb-6">Try adjusting your search or brand filter.</p>
+                <button
+                  onClick={clearFilters}
+                  className="inline-flex items-center gap-2 bg-primary-600 hover:bg-primary-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors"
+                >
+                  Clear Filters
+                </button>
+              </div>
+            )}
           </div>
         </div>
-        </div>
+      </div>
+
+      {/* Toast */}
+      {toast && (
+        <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />
       )}
 
-      {/* Mobile Part Modal Overlay — rendered outside the transform context */}
-      {activeHotspotPart && (
+      {/* Product detail modal */}
+      {isModalOpen && modalProduct && (
         <>
-          {/* Backdrop */}
+          {/* Backdrop covers full screen */}
           <div
-            className="mobile-modal-backdrop"
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm"
+            style={{ zIndex: 10001 }}
             onClick={closeModal}
           />
-          {/* Modal */}
+          {/* Scroll container starts below the fixed header */}
           <div
-            className="mobile-part-modal-overlay"
-            onClick={(e) => e.stopPropagation()}
+            className="fixed left-0 right-0 bottom-0 overflow-y-auto"
+            style={{ zIndex: 10002, top: 'var(--header-height, 100px)' }}
           >
-            {/* Close button */}
-            <button
-              className="mobile-modal-close-btn"
+            <div
+              className="flex items-start justify-center min-h-full p-4 py-6"
               onClick={closeModal}
-              aria-label="Close"
-              style={{
-                position: 'absolute',
-                top: '12px',
-                right: '12px',
-                width: '34px',
-                height: '34px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                background: 'rgba(15,23,42,0.06)',
-                border: 'none',
-                borderRadius: '8px',
-                cursor: 'pointer',
-                color: '#0f172a',
-                WebkitTapHighlightColor: 'transparent',
-              }}
             >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
-                <path d="M18 6L6 18M6 6l12 12"/>
-              </svg>
-            </button>
-            <h4 style={{
-              textTransform: 'uppercase',
-              fontSize: '0.8rem',
-              fontWeight: '700',
-              letterSpacing: '0.08em',
-              marginBottom: '10px',
-              paddingRight: '38px',
-              lineHeight: '1.35',
-              wordBreak: 'break-word',
-              color: '#0f172a'
-            }}>
-              {activeHotspotPart.name}
-            </h4>
-            <div className="part-meta" style={{ marginBottom: '14px', fontSize: '0.78rem' }}>
-              SKU: {activeHotspotPart.sku} | {activeHotspotPart.material}
-              {activeHotspotPart.quantity > 1 && ` | Qty: ${activeHotspotPart.quantity}`}
-            </div>
-            <div style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              paddingTop: '14px',
-              borderTop: '1px solid rgba(15,23,42,0.08)',
-              gap: '12px'
-            }}>
-              <span style={{
-                fontFamily: 'var(--font-mono)',
-                fontWeight: 800,
-                fontSize: '1.3rem',
-                color: 'var(--tension-accent)'
-              }}>
-                ${activeHotspotPart.price.toFixed(2)}
-              </span>
-              <button
-                className="alloy-button"
-                style={{
-                  padding: '10px 20px',
-                  fontSize: '0.75rem',
-                  borderRadius: '8px',
-                  clipPath: 'none',
-                  fontWeight: '700'
-                }}
-                disabled={addingToCart === activeHotspotPart?.id}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleAddToCart(activeHotspotPart);
-                }}
+              <div
+                className="w-full max-w-6xl"
+                onClick={(e) => e.stopPropagation()}
               >
-                {addingToCart === activeHotspotPart?.id ? 'Adding…' : 'Add to Cart'}
-              </button>
+                <ProductDetail product={modalProduct} onAddToCart={handleAddToCart} onClose={closeModal} />
+              </div>
             </div>
           </div>
         </>
       )}
-
-      {toast && (
-        <Toast
-          message={toast.message}
-          type={toast.type}
-          onClose={() => setToast(null)}
-        />
-      )}
-      </div>
-    </section>
+    </div>
   );
 }

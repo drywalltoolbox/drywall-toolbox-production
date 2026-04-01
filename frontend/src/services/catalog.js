@@ -76,7 +76,7 @@ async function getCsvUrl() {
 // ─── In-memory cache ──────────────────────────────────────────────────────────
 
 let _cache = null;           // Promise<Product[]> once populated
-let _source = null;          // 'api' | 'csv' — for diagnostics
+let _source = null;          // 'api' | 'csv' | 'local-csv' — for diagnostics
 
 export function getCatalogSource() { return _source; }
 
@@ -132,6 +132,27 @@ function loadCatalog() {
   if (_cache) return _cache;
 
   _cache = (async () => {
+    // --- Attempt 0 (Dev Only): Local CSV at /public/wp-catalog.csv --------
+    // When VITE_USE_LOCAL_CSV=true or REACT_APP_USE_LOCAL_CSV=true is set,
+    // we prioritize the local CSV file. This is ONLY for local development
+    // (npm run dev with .env.local) and never affects production builds.
+    const useLocal =
+      process.env.REACT_APP_USE_LOCAL_CSV === 'true' ||
+      import.meta.env.VITE_USE_LOCAL_CSV === 'true';
+    
+    if (useLocal) {
+      try {
+        const origin = typeof window !== 'undefined' ? window.location.origin : '';
+        const products = await fetchFromCsv(`${origin}/wp-catalog.csv`);
+        _source = 'local-csv';
+        console.info(`[catalog] DEV MODE: Loaded ${products.length} products from local /wp-catalog.csv`);
+        return products;
+      } catch (localErr) {
+        console.warn('[catalog] Local CSV dev mode failed, falling back to standard resolution:', localErr.message);
+        // Continue to normal resolution below
+      }
+    }
+
     // --- Attempt 1: WooCommerce REST API ------------------------------------
     try {
       const products = await fetchFromApi();

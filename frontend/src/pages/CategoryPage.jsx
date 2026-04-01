@@ -77,13 +77,27 @@ export default function CategoryPage() {
                 className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden cursor-pointer hover:shadow-md transition-shadow"
                 onClick={() => setModalProduct(product)}
               >
-                {product.image && (
-                  <img
-                    src={product.image}
-                    alt={product.name}
-                    className="w-full h-48 object-contain p-4 bg-gray-50"
-                  />
-                )}
+                <div className="w-full h-48 bg-gray-50 flex items-center justify-center overflow-hidden">
+                  {product.image ? (
+                    <img
+                      src={product.image}
+                      alt={product.name}
+                      className="w-full h-full object-contain p-4"
+                      onError={(e) => {
+                        e.currentTarget.onerror = null;
+                        e.currentTarget.src = '/product-placeholder.jpg';
+                      }}
+                    />
+                  ) : (
+                    <div className="text-gray-300">
+                      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <circle cx="9" cy="21" r="1" />
+                        <circle cx="20" cy="21" r="1" />
+                        <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
+                      </svg>
+                    </div>
+                  )}
+                </div>
                 <div className="p-4">
                   {product.brand && (
                     <p className="text-xs text-gray-500 uppercase tracking-wide mb-1">{product.brand}</p>

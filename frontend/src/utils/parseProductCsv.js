@@ -209,6 +209,12 @@ export function htmlToMarkdown(html) {
 
   let md = html;
 
+  // ── 0. Normalise escaped newlines ─────────────────────────────────────────
+  // WooCommerce CSV exports embed literal \n (backslash + n) escape sequences
+  // inside HTML strings (e.g. between <br /> and the next table row).
+  // Convert them to real newlines first so all subsequent regex work correctly.
+  md = md.replace(/\\n/g, '\n');
+
   // ── 1. Headings ────────────────────────────────────────────────────────────
   md = md.replace(/<h1[^>]*>([\s\S]*?)<\/h1>/gi, (_, t) => `# ${t.trim()}\n\n`);
   md = md.replace(/<h2[^>]*>([\s\S]*?)<\/h2>/gi, (_, t) => `## ${t.trim()}\n\n`);

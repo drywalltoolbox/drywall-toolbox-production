@@ -237,7 +237,40 @@ jobs:
           dry-run: ${{ github.event.inputs.dry_run == 'true' }}
           timeout: 60000
 
-      - name: Deploy React assets (dist/ → root, NOT to /dist/ subdirectory) via FTPS
+      - name: Prepare dist files for deployment (whitelist only)
+        run: |
+          # Create a deployment staging directory with ONLY the files we want to deploy
+          mkdir -p dist-deploy/assets
+          mkdir -p dist-deploy/brands
+          
+          # Copy only the whitelisted files and directories
+          if [ -d "dist/assets" ]; then cp -r dist/assets/* dist-deploy/assets/ 2>/dev/null || true; fi
+          if [ -d "dist/brands" ]; then cp -r dist/brands/* dist-deploy/brands/ 2>/dev/null || true; fi
+          
+          # Copy individual files
+          for file in \
+            404.html \
+            asset-manifest.json \
+            index.html \
+            logo-white.svg \
+            logo.svg \
+            logo2.svg \
+            pwa_icon.png \
+            vite.svg \
+            wp-catalog.csv; do
+            if [ -f "dist/$file" ]; then
+              cp "dist/$file" "dist-deploy/$file"
+              echo "✓ Copied $file"
+            else
+              echo "⚠ Warning: $file not found in dist/"
+            fi
+          done
+          
+          echo "── dist-deploy contents ──"
+          find dist-deploy -type f | sort
+          echo "✓ Whitelist staging complete."
+
+      - name: Deploy React assets (dist-deploy/ → root) via FTPS
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
           server:   ${{ secrets.HOSTGATOR_FTP_HOST }}
@@ -245,10 +278,10 @@ jobs:
           password: ${{ secrets.HOSTGATOR_FTP_PASS }}
           protocol: ftps
           port:     ${{ secrets.HOSTGATOR_FTP_PORT }}
-          # FIXED: Deploy directly to root, NOT to /dist/ subdirectory
+          # Deploy directly to root, NOT to /dist/ subdirectory
           server-dir: ${{ env.SERVER_DIR }}/
-          local-dir:  ./dist/
-          # Exclude unnecessary files — only upload what the app needs
+          local-dir:  ./dist-deploy/
+          # Exclude unnecessary files (minimal — we've already filtered at source)
           exclude: |
             **/.git*
             **/.github/**
@@ -256,27 +289,13 @@ jobs:
             **/*.log
             **/.env*
             **/*.map
-            **/package.json
-            **/package-lock.json
-            **/tsconfig.json
-            **/.eslintrc*
-            **/.babelrc*
-            **/webpack.config.*
-            **/vite.config.*
-            **/README.md
             **/.DS_Store
             **/Thumbs.db
             **/.vscode/**
             **/.idea/**
             **/*.swp
             **/*~
-            **/.turbo/**
-            **/.next/**
-            **/.nuxt/**
-            **/dist/**
-            **/build/**
-            **/out/**
-          # FIXED: Set to false to preserve existing files (safer)
+          # Set to false to preserve existing files (safer)
           dangerous-clean-slate: false
           log-level: verbose
           dry-run: ${{ github.event.inputs.dry_run == 'true' }}
@@ -418,13 +437,24 @@ jobs:
           echo "  Dry run             : ${{ github.event.inputs.dry_run == 'true' }}"
           echo "  Remote root         : ${{ env.REMOTE_ROOT }}"
           echo ""
-          echo "  Files deployed:"
-          echo "  • dist/* → root (React assets + index.html)"
-          echo "  • .htaccess → root (URL rewriting rules)"
-          echo "  • index.php → root (entry point)"
-          echo "  • wp/wp-content/* → wp/wp-content/ (WordPress content)"
+          echo "  Files deployed (whitelisted):"
+          echo "  • dist/assets/ → root/assets/"
+          echo "  • dist/brands/ → root/brands/"
+          echo "  • dist/404.html → root/"
+          echo "  • dist/asset-manifest.json → root/"
+          echo "  • dist/index.html → root/"
+          echo "  • dist/logo-white.svg → root/"
+          echo "  • dist/logo.svg → root/"
+          echo "  • dist/logo2.svg → root/"
+          echo "  • dist/pwa_icon.png → root/"
+          echo "  • dist/vite.svg → root/"
+          echo "  • dist/wp-catalog.csv → root/"
+          echo "  • .htaccess → root/"
+          echo "  • index.php → root/"
+          echo "  • wp/wp-content/* → wp/wp-content/"
           echo ""
           echo "  Notes:"
+          echo "  • Only whitelisted dist/ files are deployed"
           echo "  • WordPress core files (/wp/wp-admin, /wp/wp-includes, etc.)"
           echo "    must be manually uploaded once via cPanel or SFTP"
           echo "  • wp-config.php must be manually created with real DB credentials"

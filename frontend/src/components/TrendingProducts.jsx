@@ -1,8 +1,8 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { getProducts } from '../services/catalog';
 import { filterProductsWithSchematics } from '../data/schematicMappings';
-import { ShoppingCart, ChevronLeft, ChevronRight, X } from 'lucide-react';
+import { ShoppingCart, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import Toast from './Toast';
 import ProductDetail from './ProductDetail';
@@ -29,10 +29,17 @@ export default function TrendingProducts() {
     setIsModalOpen(true);
   };
 
-  const closeModal = () => {
+  const closeModal = useCallback(() => {
     setIsModalOpen(false);
     setModalProduct(null);
-  };
+  }, []);
+
+  // Escape key closes modal
+  useEffect(() => {
+    const onKey = (e) => { if (e.key === 'Escape') closeModal(); };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [closeModal]);
 
   const handleAddToCart = (product, quantity = 1) => {
     addToCart(product, quantity);
@@ -209,17 +216,27 @@ export default function TrendingProducts() {
                   justifyContent: 'center',
                   flexShrink: 0
                 }}>
-                  <img
-                    src={product.image}
-                    alt={product.name}
-                    style={{
-                      width: '100%',
-                      height: '100%',
-                      objectFit: 'contain',
-                      objectPosition: 'center',
-                      padding: 'clamp(8px, 3vw, 12px)'
-                    }}
-                  />
+                  {product.image && product.image !== '/product-placeholder.jpg' ? (
+                    <img
+                      src={product.image}
+                      alt={product.name}
+                      style={{
+                        width: '100%',
+                        height: '100%',
+                        objectFit: 'contain',
+                        objectPosition: 'center',
+                        padding: 'clamp(8px, 3vw, 12px)'
+                      }}
+                      onError={(e) => {
+                        e.currentTarget.onerror = null;
+                        e.currentTarget.src = '/product-placeholder.jpg';
+                      }}
+                    />
+                  ) : (
+                    <div style={{ fontSize: 'clamp(2rem, 8vw, 3rem)', color: '#d1d5db' }}>
+                      <ShoppingCart size={48} strokeWidth={1.5} />
+                    </div>
+                  )}
                 </div>
 
                 {/* Product Info */}
@@ -410,24 +427,33 @@ export default function TrendingProducts() {
 
       {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
 
-      {/* Product Detail Modal - Matches Products.jsx exactly */}
+      {/* Product detail modal */}
       {isModalOpen && modalProduct && (
-        <div className="fixed inset-0 z-1100 flex items-center justify-center p-0 sm:p-4">
-          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm" onClick={closeModal} />
-          {/* Close Button - Direct child of fixed modal wrapper to avoid stacking context issues */}
-          <button
+        <>
+          {/* Backdrop covers full screen */}
+          <div
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm"
+            style={{ zIndex: 10001 }}
             onClick={closeModal}
-            className="fixed top-4 right-4 sm:absolute sm:top-4 sm:right-4 z-1120 p-2.5 sm:p-2 bg-white rounded-full shadow-xl hover:bg-gray-100 transition-colors border border-gray-200"
-            aria-label="Close"
+          />
+          {/* Scroll container starts below the fixed header */}
+          <div
+            className="fixed left-0 right-0 bottom-0 overflow-y-auto"
+            style={{ zIndex: 10002, top: 'var(--header-height, 100px)' }}
           >
-            <X className="w-6 h-6 text-gray-700" />
-          </button>
-          <div className="relative z-10 w-full h-full sm:h-auto max-w-full sm:max-w-3xl md:max-w-5xl lg:max-w-6xl mx-auto">
-            <div onClick={(e) => e.stopPropagation()} className="h-full overflow-x-hidden">
-              <ProductDetail product={modalProduct} onAddToCart={handleAddToCart} onClose={closeModal} />
+            <div
+              className="flex items-start justify-center min-h-full p-4 py-6"
+              onClick={closeModal}
+            >
+              <div
+                className="w-full max-w-6xl"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <ProductDetail product={modalProduct} onAddToCart={handleAddToCart} onClose={closeModal} />
+              </div>
             </div>
           </div>
-        </div>
+        </>
       )}
     </section>
   );

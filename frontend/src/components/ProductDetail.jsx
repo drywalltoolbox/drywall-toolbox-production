@@ -54,22 +54,22 @@ export default function ProductDetail({ product, onAddToCart, onClose }) {
   const displayPrice = typeof price === 'number' ? price.toFixed(2) : parseFloat(price || 0).toFixed(2);
 
   return (
-    <div className="bg-white rounded-none sm:rounded-xl lg:rounded-2xl shadow-2xl overflow-visible animate-fadeIn w-full max-w-6xl mx-auto h-full sm:max-h-[90vh] flex flex-col relative">
+    <div className="bg-white rounded-none sm:rounded-xl lg:rounded-2xl shadow-2xl overflow-visible animate-fadeIn w-full max-w-6xl mx-auto flex flex-col relative">
       {/* Close Button - Fixed Position at Top Right */}
       {onClose && (
         <button
           onClick={onClose}
-          className="absolute top-2 right-2 sm:top-4 sm:right-4 z-50 p-2 sm:p-3 hover:bg-gray-100 rounded-full transition-colors"
+          className="absolute top-3 right-3 sm:top-4 sm:right-4 z-50 p-2 sm:p-3 hover:bg-gray-100 rounded-full transition-colors"
           aria-label="Close product detail"
           title="Close"
         >
-          <X size={24} className="text-gray-600 hover:text-gray-900" />
+          <X size={20} className="sm:w-6 sm:h-6 text-gray-600 hover:text-gray-900" />
         </button>
       )}
       
       {/* Scrollable Content with Custom Scrollbar */}
-      <div className="overflow-y-auto overflow-x-hidden custom-scrollbar h-full">
-        <div className="p-4 sm:p-6 md:p-8 lg:p-12 pt-16 sm:pt-6 max-w-full">
+      <div className="overflow-y-auto overflow-x-hidden custom-scrollbar">
+        <div className="p-4 sm:p-6 md:p-8 lg:p-12 max-w-full">
           {/* Top Section - Image Left, Details Right */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 md:gap-8 mb-6 sm:mb-8">
             {/* Product Image Gallery */}
@@ -225,12 +225,19 @@ export default function ProductDetail({ product, onAddToCart, onClose }) {
                   )}
                   <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-3 sm:mb-4">Description</h3>
                   {product.description_full ? (
-                    <div className="prose prose-sm max-w-none text-gray-700 prose-headings:font-bold prose-headings:text-gray-900 prose-h2:text-xl prose-h2:mt-6 prose-h2:mb-2 prose-h3:text-lg prose-h3:mt-4 prose-strong:text-gray-900 prose-ul:pl-5 prose-li:my-1 prose-table:w-full prose-table:text-sm prose-thead:bg-gray-50 prose-th:px-3 prose-th:py-2 prose-th:text-left prose-th:font-semibold prose-th:text-gray-900 prose-td:px-3 prose-td:py-1.5 prose-td:text-gray-700 prose-td:border-t prose-td:border-gray-200">
-                      {/* CSV products: description is pre-converted to Markdown */}
-                      {/* API products: description is raw WordPress HTML          */}
-                      {product._source === 'csv'
-                        ? <ReactMarkdown remarkPlugins={[remarkGfm]}>{product.description_full}</ReactMarkdown>
-                        : <div dangerouslySetInnerHTML={{ __html: product.description_full }} />
+                    <div className="product-description prose prose-sm max-w-none">
+                      {/* Detect raw HTML (WooCommerce API) vs plain/markdown text (CSV) */}
+                      {/^\s*<[a-z]/i.test(product.description_full)
+                        ? (
+                            // Raw HTML from WooCommerce — render as-is
+                            <div dangerouslySetInnerHTML={{ __html: product.description_full }} />
+                          )
+                        : (
+                            // CSV markdown — \n escapes already normalised by htmlToMarkdown at parse time
+                            <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                              {product.description_full}
+                            </ReactMarkdown>
+                          )
                       }
                     </div>
                   ) : (
