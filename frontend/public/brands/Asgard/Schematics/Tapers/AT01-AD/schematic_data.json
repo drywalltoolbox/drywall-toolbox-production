@@ -1,10 +1,21 @@
 {
   "id": "1775158856369",
   "title": "AT01-AD_SCH",
-  "product_name": "HAMMER Automatic Taper Schematic",
+  "product_name": "HAMMER Automatic Taper",
   "sku": "AT01-AD",
   "diagramPages": [
-    1
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12
   ],
   "legendPages": [],
   "parts": [

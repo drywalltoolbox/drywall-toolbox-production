@@ -259,15 +259,15 @@ const _fallbacks = {
   // ── Asgard ─────────────────────────────────────────────────────────────────
   'asgard-fa01-ad': {
     pages: { 1: `${_BASE}brands/Asgard/Schematics/Adapters/FA01-AD/images/FA01-AD_SCH-page-001.png` },
-    preview: `${_BASE}brands/Asgard/Schematics/Adapters/FA01-AD/images/FA01-AD_SCH-page-001.png`,
+    preview: `${_BASE}brands/Asgard/Schematics/Adapters/FA01-AD/images/FA01-AD_preview.jpg`,
   },
   'asgard-ah25-ad': {
     pages: { 1: `${_BASE}brands/Asgard/Schematics/AngleHeads/AH25-AD/images/AH25-AD_SCH-page-001.png` },
-    preview: `${_BASE}brands/Asgard/Schematics/AngleHeads/AH25-AD/images/AH25-AD_SCH-page-001.png`,
+    preview: `${_BASE}brands/Asgard/Schematics/AngleHeads/AH25-AD/images/AH25-AD_preview.jpg`,
   },
   'asgard-ah30-ad': {
     pages: { 1: `${_BASE}brands/Asgard/Schematics/AngleHeads/AH30-AD/images/AH30-AD_SCH-page-001.png` },
-    preview: `${_BASE}brands/Asgard/Schematics/AngleHeads/AH30-AD/images/AH30-AD_SCH-page-001.png`,
+    preview: `${_BASE}brands/Asgard/Schematics/AngleHeads/AH30-AD/images/AH30-AD_preview.jpg`,
   },
   'asgard-ah35-ad': {
     pages: { 1: `${_BASE}brands/Asgard/Schematics/AngleHeads/AH35-AD/images/AH35-AD_SCH-page-001.png` },
@@ -275,51 +275,51 @@ const _fallbacks = {
   },
   'asgard-ca08-ad': {
     pages: { 1: `${_BASE}brands/Asgard/Schematics/AngleHeads/CA08-AD/images/CA08-AD_SCH-page-001.png` },
-    preview: `${_BASE}brands/Asgard/Schematics/AngleHeads/CA08-AD/images/CA08-AD_SCH-page-001.png`,
+    preview: `${_BASE}brands/Asgard/Schematics/AngleHeads/CA08-AD/images/CA08-AD_preview.jpg`,
   },
   'asgard-cfa-ad': {
     pages: { 1: `${_BASE}brands/Asgard/Schematics/AngleHeads/CFA-AD/images/CFA-AD_SCH-page-001.png` },
-    preview: `${_BASE}brands/Asgard/Schematics/AngleHeads/CFA-AD/images/CFA-AD_SCH-page-001.png`,
+    preview: `${_BASE}brands/Asgard/Schematics/AngleHeads/CFA-AD/images/CFA-AD_preview.jpg`,
   },
   'asgard-ehc07-ad': {
     pages: { 1: `${_BASE}brands/Asgard/Schematics/FinishingBoxes/EHC07-AD/images/EHC07-AD_SCH-page-001.png` },
-    preview: `${_BASE}brands/Asgard/Schematics/FinishingBoxes/EHC07-AD/images/EHC07-AD_SCH-page-001.png`,
+    preview: `${_BASE}brands/Asgard/Schematics/FinishingBoxes/EHC07-AD/images/EHC07-AD_preview.jpg`,
   },
   'asgard-ehc10-ad': {
     pages: { 1: `${_BASE}brands/Asgard/Schematics/FinishingBoxes/EHC10-AD/images/EHC10-AD_SCH-page-001.png` },
-    preview: `${_BASE}brands/Asgard/Schematics/FinishingBoxes/EHC10-AD/images/EHC10-AD_SCH-page-001.png`,
+    preview: `${_BASE}brands/Asgard/Schematics/FinishingBoxes/EHC10-AD/images/EHC10-AD_preview.jpg`,
   },
   'asgard-ehc12-ad': {
     pages: { 1: `${_BASE}brands/Asgard/Schematics/FinishingBoxes/EHC12-AD/images/EHC12-AD_SCH-page-001.png` },
-    preview: `${_BASE}brands/Asgard/Schematics/FinishingBoxes/EHC12-AD/images/EHC12-AD_SCH-page-001.png`,
+    preview: `${_BASE}brands/Asgard/Schematics/FinishingBoxes/EHC12-AD/images/EHC12-AD_preview.jpg`,
   },
   'asgard-ez07-ad': {
     pages: { 1: `${_BASE}brands/Asgard/Schematics/FinishingBoxes/EZ07-AD/images/EZ07-AD_SCH-page-001.png` },
-    preview: `${_BASE}brands/Asgard/Schematics/FinishingBoxes/EZ07-AD/images/EZ07-AD_SCH-page-001.png`,
+    preview: `${_BASE}brands/Asgard/Schematics/FinishingBoxes/EZ07-AD/images/EZ07-AD_preview.jpg`,
   },
   'asgard-ez10-ad': {
     pages: { 1: `${_BASE}brands/Asgard/Schematics/FinishingBoxes/EZ10-AD/images/EZ10-AD_SCH-page-001.png` },
-    preview: `${_BASE}brands/Asgard/Schematics/FinishingBoxes/EZ10-AD/images/EZ10-AD_SCH-page-001.png`,
+    preview: `${_BASE}brands/Asgard/Schematics/FinishingBoxes/EZ10-AD/images/EZ10-AD_preview.jpg`,
   },
   'asgard-ez12-ad': {
     pages: { 1: `${_BASE}brands/Asgard/Schematics/FinishingBoxes/EZ12-AD/images/EZ12-AD_SCH-page-001.png` },
-    preview: `${_BASE}brands/Asgard/Schematics/FinishingBoxes/EZ12-AD/images/EZ12-AD_SCH-page-001.png`,
+    preview: `${_BASE}brands/Asgard/Schematics/FinishingBoxes/EZ12-AD/images/EZ12-AD_preview.jpg`,
   },
   'asgard-pa07-ad': {
     pages: { 1: `${_BASE}brands/Asgard/Schematics/FinishingBoxes/PA07-AD/images/PA07-AD_SCH-page-001.png` },
-    preview: `${_BASE}brands/Asgard/Schematics/FinishingBoxes/PA07-AD/images/PA07-AD_SCH-page-001.png`,
+    preview: `${_BASE}brands/Asgard/Schematics/FinishingBoxes/PA07-AD/images/PA07-AD_preview.jpg`,
   },
   'asgard-pa10-ad': {
     pages: { 1: `${_BASE}brands/Asgard/Schematics/FinishingBoxes/PA10-AD/images/PA10-AD_SCH-page-001.png` },
-    preview: `${_BASE}brands/Asgard/Schematics/FinishingBoxes/PA10-AD/images/PA10-AD_SCH-page-001.png`,
+    preview: `${_BASE}brands/Asgard/Schematics/FinishingBoxes/PA10-AD/images/PA10-AD_preview.jpg`,
   },
   'asgard-pa12-ad': {
     pages: { 1: `${_BASE}brands/Asgard/Schematics/FinishingBoxes/PA12-AD/images/PA12-AD_SCH-page-001.png` },
-    preview: `${_BASE}brands/Asgard/Schematics/FinishingBoxes/PA12-AD/images/PA12-AD_SCH-page-001.png`,
+    preview: `${_BASE}brands/Asgard/Schematics/FinishingBoxes/PA12-AD/images/PA12-AD_preview.jpg`,
   },
   'asgard-bbh-ad': {
     pages: { 1: `${_BASE}brands/Asgard/Schematics/Handles/BBH-AD/images/BBH-AD_SCH-page-001.png` },
-    preview: `${_BASE}brands/Asgard/Schematics/Handles/BBH-AD/images/BBH-AD_SCH-page-001.png`,
+    preview: `${_BASE}brands/Asgard/Schematics/Handles/BBH-AD/images/BBH-AD_preview.jpg`,
   },
   'asgard-bbhe-ad': {
     pages: {
@@ -333,34 +333,34 @@ const _fallbacks = {
       1: `${_BASE}brands/Asgard/Schematics/Handles/FBHE-AD/images/FBHE-AD_SCH-page-001.png`,
       2: `${_BASE}brands/Asgard/Schematics/Handles/FBHE-AD/images/FBHE-AD_SCH-page-002.png`,
     },
-    preview: `${_BASE}brands/Asgard/Schematics/Handles/FBHE-AD/images/FBHE-AD_SCH-page-001.png`,
+    preview: `${_BASE}brands/Asgard/Schematics/Handles/FBHE-AD/images/FBHE-AD_preview.jpg`,
   },
   'asgard-fh-ad': {
     pages: { 1: `${_BASE}brands/Asgard/Schematics/Handles/FH-AD/images/FH-AD_SCH-page-001.png` },
-    preview: `${_BASE}brands/Asgard/Schematics/Handles/FH-AD/images/FH-AD_SCH-page-001.png`,
+    preview: `${_BASE}brands/Asgard/Schematics/Handles/FH-AD/images/FH-AD_preview.jpg`,
   },
   'asgard-xh-ad': {
     pages: { 1: `${_BASE}brands/Asgard/Schematics/Handles/XH-AD/images/XH-AD_SCH-page-001.png` },
-    preview: `${_BASE}brands/Asgard/Schematics/Handles/XH-AD/images/XH-AD_SCH-page-001.png`,
+    preview: `${_BASE}brands/Asgard/Schematics/Handles/XH-AD/images/XH-AD_preview.jpg`,
   },
   'asgard-gn01-ad': {
     pages: { 1: `${_BASE}brands/Asgard/Schematics/Other/GN01-AD/images/GN01-AD_SCH-page-001.png` },
-    preview: `${_BASE}brands/Asgard/Schematics/Other/GN01-AD/images/GN01-AD_SCH-page-001.png`,
+    preview: `${_BASE}brands/Asgard/Schematics/Other/GN01-AD/images/GN01-AD_preview.jpg`,
   },
   'asgard-lp01-ad': {
     pages: { 1: `${_BASE}brands/Asgard/Schematics/Pumps/LP01-AD/images/LP01-AD_SCH-page-001.png` },
-    preview: `${_BASE}brands/Asgard/Schematics/Pumps/LP01-AD/images/LP01-AD_SCH-page-001.png`,
+    preview: `${_BASE}brands/Asgard/Schematics/Pumps/LP01-AD/images/LP01-AD_preview.jpg`,
   },
   'asgard-cr01-ad': {
     pages: { 1: `${_BASE}brands/Asgard/Schematics/Rollers/CR01-AD/images/CR01-AD_SCH-page-001.png` },
-    preview: `${_BASE}brands/Asgard/Schematics/Rollers/CR01-AD/images/CR01-AD_SCH-page-001.png`,
+    preview: `${_BASE}brands/Asgard/Schematics/Rollers/CR01-AD/images/CR01-AD_preview.jpg`,
   },
   'asgard-ns03-ad': {
     pages: {
       1: `${_BASE}brands/Asgard/Schematics/Spotters/NS03-AD/images/NS03-AD_SCH-page-001.png`,
       2: `${_BASE}brands/Asgard/Schematics/Spotters/NS03-AD/images/NS03-AD_SCH-page-002.png`,
     },
-    preview: `${_BASE}brands/Asgard/Schematics/Spotters/NS03-AD/images/NS03-AD_SCH-page-001.png`,
+    preview: `${_BASE}brands/Asgard/Schematics/Spotters/NS03-AD/images/NS03-AD_preview.jpg`,
   },
   'asgard-at01-ad': {
     pages: {
@@ -377,7 +377,7 @@ const _fallbacks = {
       11: `${_BASE}brands/Asgard/Schematics/Tapers/AT01-AD/images/AT01-AD_SCH-page-011.png`,
       12: `${_BASE}brands/Asgard/Schematics/Tapers/AT01-AD/images/AT01-AD_SCH-page-012.png`,
     },
-    preview: `${_BASE}brands/Asgard/Schematics/Tapers/AT01-AD/images/AT01-AD_SCH-page-001.png`,
+    preview: `${_BASE}brands/Asgard/Schematics/Tapers/AT01-AD/images/AT01-AD_preview.jpg`,
   },
 };
 
@@ -1029,6 +1029,20 @@ export default function Parts() {
       brand: 'Asgard',
       category: 'Tapers',
       diagramPages: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+      pageLabels: {
+        1: 'Assembly 1',
+        2: 'Assembly 2',
+        3: 'Assembly 3',
+        4: 'Assembly 4',
+        5: 'Assembly 5',
+        6: 'Assembly 6',
+        7: 'Assembly 7',
+        8: 'Assembly 8',
+        9: 'Assembly 9',
+        10: 'Assembly 10',
+        11: 'Assembly 11',
+        12: 'Assembly 12',
+      },
       imagePages: {
         1:  schImg('asgard-at01-ad', 1),
         2:  schImg('asgard-at01-ad', 2),
@@ -1229,6 +1243,10 @@ export default function Parts() {
       brand: 'Asgard',
       category: 'Handles',
       diagramPages: [1, 2],
+      pageLabels: {
+        1: 'Handle',
+        2: 'Extension'
+      },
       imagePages: {
         1: schImg('asgard-bbhe-ad', 1),
         2: schImg('asgard-bbhe-ad', 2),
@@ -1243,6 +1261,10 @@ export default function Parts() {
       brand: 'Asgard',
       category: 'Handles',
       diagramPages: [1, 2],
+      pageLabels: {
+        1: 'Handle',
+        2: 'Extension'
+      },
       imagePages: {
         1: schImg('asgard-fbhe-ad', 1),
         2: schImg('asgard-fbhe-ad', 2),

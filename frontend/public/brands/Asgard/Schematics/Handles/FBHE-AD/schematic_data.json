@@ -1,10 +1,11 @@
 {
   "id": "1775158856336",
   "title": "FBHE-AD_SCH",
-  "product_name": "Extendable Flat Box Handle with Brake Schematic",
+  "product_name": "Extendable Flat Box Handle with Brake",
   "sku": "FBHE-AD",
   "diagramPages": [
-    1
+    1,
+    2
   ],
   "legendPages": [],
   "parts": [

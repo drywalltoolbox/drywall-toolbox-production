@@ -1,10 +1,11 @@
 {
   "id": "1775158856326",
   "title": "BBHE-AD_SCH",
-  "product_name": "Brakeless Box Handle – Extendable Schematic",
+  "product_name": "Brakeless Box Handle – Extendable",
   "sku": "BBHE-AD",
   "diagramPages": [
-    1
+    1,
+    2
   ],
   "legendPages": [],
   "parts": [
