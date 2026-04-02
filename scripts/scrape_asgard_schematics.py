@@ -28,6 +28,7 @@ Optional flags:
 """
 
 import argparse
+import io
 import json
 import re
 import sys
@@ -36,8 +37,13 @@ from pathlib import Path
 from urllib.parse import urljoin, urlparse
 
 import fitz  # PyMuPDF
-import requests
+import cloudscraper
 from bs4 import BeautifulSoup
+
+# Fix encoding for Windows terminal output
+if sys.stdout.encoding != 'utf-8':
+    import io
+    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace')
 
 # ---------------------------------------------------------------------------
 # Constants
@@ -62,20 +68,17 @@ _STRIP_CHARS = " |-\u2013\u2014"  # space, pipe, hyphen, en-dash, em-dash
 # HTTP session
 # ---------------------------------------------------------------------------
 
-def make_session() -> requests.Session:
-    session = requests.Session()
-    session.headers.update({
+def make_session():
+    """Create a cloudscraper session to bypass Cloudflare protection."""
+    scraper = cloudscraper.create_scraper()
+    scraper.headers.update({
         "User-Agent": (
-            "Mozilla/5.0 (X11; Linux x86_64) "
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
             "AppleWebKit/537.36 (KHTML, like Gecko) "
-            "Chrome/124.0 Safari/537.36"
+            "Chrome/123.0.0.0 Safari/537.36"
         ),
-        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-        "Accept-Language": "en-US,en;q=0.9",
-        "Accept-Encoding": "gzip, deflate",  # no brotli -- requests can't decode it
-        "Referer": "https://asgardtools.com/",
     })
-    return session
+    return scraper
 
 
 # ---------------------------------------------------------------------------
@@ -247,13 +250,13 @@ def save_manifest(path: Path, data: dict) -> None:
 # Download
 # ---------------------------------------------------------------------------
 
-def download_pdf(session: requests.Session, url: str, dest: Path) -> bool:
+def download_pdf(session, url: str, dest: Path) -> bool:
     """Download a PDF to *dest*.  Returns True on success."""
     if dest.exists() and dest.stat().st_size > 0:
         print(f"    [skip] already downloaded: {dest.name}")
         return True
 
-    print(f"    Downloading → {dest.name}")
+    print(f"    Downloading: {dest.name}")
     try:
         resp = session.get(url, timeout=60, stream=True)
         resp.raise_for_status()
@@ -264,7 +267,7 @@ def download_pdf(session: requests.Session, url: str, dest: Path) -> bool:
                     fh.write(chunk)
         print(f"    Saved {dest.stat().st_size // 1024} KB")
         return True
-    except requests.RequestException as exc:
+    except Exception as exc:
         print(f"    ERROR downloading {url}: {exc}", file=sys.stderr)
         if dest.exists():
             dest.unlink()
@@ -452,7 +455,8 @@ def main() -> None:
             url = entry["url"]
             filename = entry["filename"]
 
-            print(f"[{idx}/{len(entries)}] {name}  |  SKU: {sku}  |  Category: {cat}")
+            # Simplify output to avoid encoding issues
+            print(f"[{idx}/{len(entries)}] {name[:50]}...  |  SKU: {sku}  |  Category: {cat}")
             dest = pdf_dir / filename
             ok = download_pdf(session, url, dest)
             if ok:

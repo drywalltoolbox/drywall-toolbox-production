@@ -1,0 +1,101 @@
+{
+  "id": "1775076968688",
+  "title": "page-001",
+  "diagramPages": [
+    1
+  ],
+  "legendPages": [],
+  "parts": [
+    {
+      "id": "722039",
+      "name": "722039",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "709043",
+      "name": "709043",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "709034",
+      "name": "709034",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "700042",
+      "name": "700042",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "709043",
+      "name": "709043",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "704040",
+      "name": "704040",
+      "quantity": 1,
+      "sku": ""
+    }
+  ],
+  "coordinates": {
+    "700042": {
+      "id": "700042",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 63.56,
+      "y_pct": 44.70264039084371,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "704040": {
+      "id": "704040",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 73.80607843137255,
+      "y_pct": 84.65132019542186,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "709034": {
+      "id": "709034",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 12.100000000000001,
+      "y_pct": 41.65396058626557,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "709043": {
+      "id": "709043",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 92.9078431372549,
+      "y_pct": 70.20264039084371,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "722039": {
+      "id": "722039",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 38.59607843137255,
+      "y_pct": 7.659999999999999,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    }
+  },
+  "schema_version": "1.0",
+  "image_natural_width": 1376,
+  "image_natural_height": 768
+}

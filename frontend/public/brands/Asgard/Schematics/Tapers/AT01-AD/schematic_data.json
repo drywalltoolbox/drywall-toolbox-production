@@ -1,0 +1,26 @@
+{
+  "id": "1775076343193",
+  "title": "AT01-AD_SCH",
+  "product_name": "HAMMER Automatic Taper Schematic",
+  "sku": "AT01-AD",
+  "diagramPages": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12
+  ],
+  "legendPages": [],
+  "parts": [],
+  "coordinates": {},
+  "schema_version": "1.0",
+  "image_natural_width": 5100,
+  "image_natural_height": 3300
+}
