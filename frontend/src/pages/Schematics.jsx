@@ -99,6 +99,11 @@ import asgardNS03ADData    from '/brands/Asgard/Schematics/Spotters/NS03-AD/sche
 import asgardAT01ADData    from '/brands/Asgard/Schematics/Tapers/AT01-AD/schematic_data.json';
 
 // ---------------------------------------------------------------------------
+// Level5 schematic JSON data imports
+// ---------------------------------------------------------------------------
+import level5CornerRollerData from '/brands/Level5/Schematics/CornerRollers/Corner-Roller/schematic_data.json';
+
+// ---------------------------------------------------------------------------
 // Schematic image paths — static fallbacks served from public/brands/…
 // Primary source: WordPress Media Library WebP images (via useSchematicMedia).
 // Fallback: original PNG/JPG files from public/brands/ (used before WP upload).
@@ -379,6 +384,12 @@ const _fallbacks = {
     },
     preview: `${_BASE}brands/Asgard/Schematics/Tapers/AT01-AD/images/AT01-AD_preview.jpg`,
   },
+
+  // ── Level5 ────────────────────────────────────────────────────────────────
+  'level5-corner-roller-4-707': {
+    pages:   { 1: `${_BASE}brands/Level5/Schematics/CornerRollers/Corner-Roller/Corner-Roller-4-707-page-001.png` },
+    preview: `${_BASE}brands/Level5/Schematics/CornerRollers/Corner-Roller/corner-roller.png`,
+  },
 };
 
 // Brand name ↔ URL slug maps so navigation produces readable URLs like
@@ -624,6 +635,9 @@ export default function Parts() {
   const asgardCR01ADParts    = buildPartsFromData(asgardCR01ADData);
   const asgardNS03ADParts    = buildPartsFromData(asgardNS03ADData);
   const asgardAT01ADParts    = buildPartsFromData(asgardAT01ADData);
+
+  // Level5 parts arrays
+  const level5CornerRollerParts = buildPartsFromData(level5CornerRollerData);
 
   const schematics = [
     {
@@ -1341,6 +1355,19 @@ export default function Parts() {
       previewImage: schPrev('asgard-ns03-ad'),
       parts: asgardNS03ADParts
     },
+
+    // ── Level5 ───────────────────────────────────────────────────────────────
+    {
+      id: 'level5-corner-roller-4-707',
+      title: 'Corner Roller',
+      description: 'Level5 Corner Roller schematic diagram with parts hotspots',
+      brand: 'Level5',
+      category: 'Corner Rollers',
+      diagramPages: [1],
+      imagePages: { 1: schImg('level5-corner-roller-4-707', 1) },
+      previewImage: schPrev('level5-corner-roller-4-707'),
+      parts: level5CornerRollerParts
+    },
   ];
 
   // Filter schematics to only include tools from allowed brands
@@ -1882,7 +1909,9 @@ export default function Parts() {
                   src={brandLogos[currentSchematic.brand]}
                   alt={`${currentSchematic.brand} logo`}
                   style={{
-                    height: 'clamp(2.5rem, 6vw, 4rem)',
+                    height: currentSchematic.brand === 'Level5'
+                      ? 'clamp(4rem, 10vw, 7rem)'
+                      : 'clamp(2.5rem, 6vw, 4rem)',
                     width: 'auto',
                     objectFit: 'contain'
                   }}

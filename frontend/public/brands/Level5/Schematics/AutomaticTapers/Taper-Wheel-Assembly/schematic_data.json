@@ -1,0 +1,42 @@
+{
+  "id": "level5-7218-taper-wheel-assembly",
+  "title": "7218-Taper-Wheel-Assembly_SCH",
+  "product_name": "Taper Wheel Assembly",
+  "sku": "7218",
+  "diagramPages": [
+    1
+  ],
+  "legendPages": [],
+  "parts": [
+    {
+      "id": "1",
+      "name": "4-40 x3/16 Bind Head Screw",
+      "quantity": 1,
+      "sku": "7047"
+    },
+    {
+      "id": "2",
+      "name": "Taper Wheel",
+      "quantity": 1,
+      "sku": "7077"
+    },
+    {
+      "id": "3",
+      "name": "Drive hub",
+      "quantity": 1,
+      "sku": "7090"
+    },
+    {
+      "id": "4",
+      "name": "Taper Wheel Spool",
+      "quantity": 1,
+      "sku": "7078"
+    },
+    {
+      "id": "5",
+      "name": "8-32 x 1/4 FH Screw",
+      "quantity": 1,
+      "sku": "7070"
+    }
+  ]
+}

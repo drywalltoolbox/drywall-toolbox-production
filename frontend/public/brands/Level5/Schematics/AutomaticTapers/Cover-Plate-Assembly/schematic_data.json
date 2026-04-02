@@ -1,0 +1,96 @@
+{
+  "id": "level5-7377-cover-plate-assembly-old-style",
+  "title": "7377-Cover-Plate-AssemblyOld-Style_SCH",
+  "product_name": "Cover Plate Assembly (Old Style)",
+  "sku": "7377",
+  "diagramPages": [
+    1
+  ],
+  "legendPages": [],
+  "parts": [
+    {
+      "id": "1",
+      "name": "Disengaging Rod Bearing",
+      "quantity": 1,
+      "sku": "7034"
+    },
+    {
+      "id": "2",
+      "name": "O'Ring",
+      "quantity": 1,
+      "sku": "7033"
+    },
+    {
+      "id": "3",
+      "name": "O'Ring Housing",
+      "quantity": 1,
+      "sku": "7032"
+    },
+    {
+      "id": "4",
+      "name": "6-32X3/16 Fillister Head Screw",
+      "quantity": 1,
+      "sku": "7042"
+    },
+    {
+      "id": "5",
+      "name": "#6 Lockwasher Medium",
+      "quantity": 1,
+      "sku": "7013"
+    },
+    {
+      "id": "6",
+      "name": "Cover Plate",
+      "quantity": 1,
+      "sku": "7045"
+    },
+    {
+      "id": "7",
+      "name": "4-40 x 5/16 BH Screw- Fastenal 70657",
+      "quantity": 1,
+      "sku": "7126"
+    },
+    {
+      "id": "8",
+      "name": "6-32 x 3/8 Bind Head Screw",
+      "quantity": 1,
+      "sku": "7017"
+    },
+    {
+      "id": "9",
+      "name": "Bracket Base",
+      "quantity": 1,
+      "sku": "7029"
+    },
+    {
+      "id": "10",
+      "name": "Collar Bushing",
+      "quantity": 1,
+      "sku": "7014"
+    },
+    {
+      "id": "11",
+      "name": "Disengaging Cam",
+      "quantity": 1,
+      "sku": "7016"
+    },
+    {
+      "id": "12",
+      "name": "#6-32 Thin Pattern Locknut",
+      "quantity": 1,
+      "sku": "7015"
+    },
+    {
+      "id": "13",
+      "name": "Disengaging Rod (shaft)",
+      "quantity": 1,
+      "sku": "7028"
+    },
+    {
+      "id": "14",
+      "name": "4-40 Lock Nut",
+      "quantity": 1,
+      "sku": "7248"
+    }
+  ]
+}

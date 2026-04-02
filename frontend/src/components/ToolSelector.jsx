@@ -38,7 +38,11 @@ export default function ToolSelector({ brand, brandLogo, tools, onSelectTool, on
             <img
               src={brandLogo}
               alt={`${brand} logo`}
-              className={`brand-header-logo${brand === 'Columbia Taping Tools' ? ' brand-header-logo--columbia' : ''}`}
+              className={[
+                'brand-header-logo',
+                brand === 'Columbia Taping Tools' ? 'brand-header-logo--columbia' : '',
+                brand === 'Level5'                ? 'brand-header-logo--level5'   : '',
+              ].filter(Boolean).join(' ')}
             />
           )}
           {selectedCategory && <h2>{selectedCategory}</h2>}

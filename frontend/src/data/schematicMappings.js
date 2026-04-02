@@ -67,6 +67,9 @@ export const SCHEMATIC_DEFINITIONS = {
     { id: 'asgard-lp01-ad',  title: 'Compound Loading Pump',               category: 'Pumps' },
     { id: 'asgard-cr01-ad',  title: 'Inside Corner Roller',                category: 'Rollers' },
     { id: 'asgard-ns03-ad',  title: '3″ Nail Spotter',                     category: 'Spotters' },
+  ],
+  'Level5': [
+    { id: 'level5-corner-roller-4-707', title: 'Corner Roller', category: 'Corner Rollers' },
   ]
 };
 
