@@ -271,7 +271,7 @@ const _fallbacks = {
   },
   'asgard-ah35-ad': {
     pages: { 1: `${_BASE}brands/Asgard/Schematics/AngleHeads/AH35-AD/images/AH35-AD_SCH-page-001.png` },
-    preview: `${_BASE}brands/Asgard/Schematics/AngleHeads/AH35-AD/images/AH35-AD_SCH-page-001.png`,
+    preview: `${_BASE}brands/Asgard/Schematics/AngleHeads/AH35-AD/images/AH35-AD_preview.jpg`,
   },
   'asgard-ca08-ad': {
     pages: { 1: `${_BASE}brands/Asgard/Schematics/AngleHeads/CA08-AD/images/CA08-AD_SCH-page-001.png` },
@@ -326,7 +326,7 @@ const _fallbacks = {
       1: `${_BASE}brands/Asgard/Schematics/Handles/BBHE-AD/images/BBHE-AD_SCH-page-001.png`,
       2: `${_BASE}brands/Asgard/Schematics/Handles/BBHE-AD/images/BBHE-AD_SCH-page-002.png`,
     },
-    preview: `${_BASE}brands/Asgard/Schematics/Handles/BBHE-AD/images/BBHE-AD_SCH-page-001.png`,
+    preview: `${_BASE}brands/Asgard/Schematics/Handles/BBHE-AD/images/BBHE-AD_preview.jpg`,
   },
   'asgard-fbhe-ad': {
     pages: {
