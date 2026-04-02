@@ -1,5 +1,5 @@
 {
-  "id": "1775077102530",
+  "id": "1775158856169",
   "title": "AH25-AD_SCH",
   "product_name": "2.5″ Angle Head Corner Finisher Schematic",
   "sku": "AH25-AD",
@@ -51,8 +51,8 @@
       "sku": ""
     },
     {
-      "id": "059084 X 2",
-      "name": "059084 X 2",
+      "id": "059084",
+      "name": "059084",
       "quantity": 1,
       "sku": ""
     },
@@ -63,8 +63,8 @@
       "sku": ""
     },
     {
-      "id": "480002B X 2",
-      "name": "480002B X 2",
+      "id": "480002B",
+      "name": "480002B",
       "quantity": 1,
       "sku": ""
     },
@@ -75,32 +75,32 @@
       "sku": ""
     },
     {
-      "id": "359005 X 2",
-      "name": "359005 X 2",
+      "id": "359005",
+      "name": "359005",
       "quantity": 1,
       "sku": ""
     },
     {
-      "id": "059037 X 4",
-      "name": "059037 X 4",
+      "id": "059037",
+      "name": "059037",
       "quantity": 1,
       "sku": ""
     },
     {
-      "id": "489022 X 2",
-      "name": "489022 X 2",
+      "id": "489022",
+      "name": "489022",
       "quantity": 1,
       "sku": ""
     },
     {
-      "id": "480230 X 2",
-      "name": "480230 X 2",
+      "id": "480230",
+      "name": "480230",
       "quantity": 1,
       "sku": ""
     },
     {
-      "id": "489013 X 12",
-      "name": "489013 X 12",
+      "id": "489013",
+      "name": "489013",
       "quantity": 1,
       "sku": ""
     },
@@ -111,8 +111,8 @@
       "sku": ""
     },
     {
-      "id": "409011 X 2",
-      "name": "409011 X 2",
+      "id": "409011",
+      "name": "409011",
       "quantity": 1,
       "sku": ""
     },
@@ -123,14 +123,14 @@
       "sku": ""
     },
     {
-      "id": "402019 X 2",
-      "name": "402019 X 2",
+      "id": "402019",
+      "name": "402019",
       "quantity": 1,
       "sku": ""
     },
     {
-      "id": "059037 X 4",
-      "name": "059037 X 4",
+      "id": "059037",
+      "name": "059037",
       "quantity": 1,
       "sku": ""
     },
@@ -141,8 +141,8 @@
       "sku": ""
     },
     {
-      "id": "359005 X 2",
-      "name": "359005 X 2",
+      "id": "359005",
+      "name": "359005",
       "quantity": 1,
       "sku": ""
     }
@@ -172,8 +172,8 @@
       "id": "402019",
       "x_px": null,
       "y_px": null,
-      "x_pct": 19.646078431372548,
-      "y_pct": 39.728876873250265,
+      "x_pct": 72.08823529411765,
+      "y_pct": 41.79075863204699,
       "shape": "rectangle",
       "pageNumber": 1,
       "rotation": 0
@@ -258,26 +258,6 @@
       "pageNumber": 1,
       "rotation": 0
     },
-    "059084 X 2": {
-      "id": "059084 X 2",
-      "x_px": null,
-      "y_px": null,
-      "x_pct": 19.646078431372548,
-      "y_pct": 44.37359609156283,
-      "shape": "rectangle",
-      "pageNumber": 1,
-      "rotation": 0
-    },
-    "480002B X 2": {
-      "id": "480002B X 2",
-      "x_px": null,
-      "y_px": null,
-      "x_pct": 17.4,
-      "y_pct": 86.590758632047,
-      "shape": "rectangle",
-      "pageNumber": 1,
-      "rotation": 0
-    },
     "484014F": {
       "id": "484014F",
       "x_px": null,
@@ -288,8 +268,28 @@
       "pageNumber": 1,
       "rotation": 0
     },
-    "359005 X 2": {
-      "id": "359005 X 2",
+    "059084": {
+      "id": "059084",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 19.646078431372548,
+      "y_pct": 44.37359609156283,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "480002B": {
+      "id": "480002B",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 17.4,
+      "y_pct": 86.590758632047,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "359005": {
+      "id": "359005",
       "x_px": null,
       "y_px": null,
       "x_pct": 79.5578431372549,
@@ -298,8 +298,8 @@
       "pageNumber": 1,
       "rotation": 0
     },
-    "059037 X 4": {
-      "id": "059037 X 4",
+    "059037": {
+      "id": "059037",
       "x_px": null,
       "y_px": null,
       "x_pct": 72.2843137254902,
@@ -308,8 +308,8 @@
       "pageNumber": 1,
       "rotation": 0
     },
-    "489022 X 2": {
-      "id": "489022 X 2",
+    "489022": {
+      "id": "489022",
       "x_px": null,
       "y_px": null,
       "x_pct": 61.05392156862745,
@@ -318,8 +318,8 @@
       "pageNumber": 1,
       "rotation": 0
     },
-    "480230 X 2": {
-      "id": "480230 X 2",
+    "480230": {
+      "id": "480230",
       "x_px": null,
       "y_px": null,
       "x_pct": 49.780392156862746,
@@ -328,8 +328,8 @@
       "pageNumber": 1,
       "rotation": 0
     },
-    "489013 X 12": {
-      "id": "489013 X 12",
+    "489013": {
+      "id": "489013",
       "x_px": null,
       "y_px": null,
       "x_pct": 72.48392156862745,
@@ -338,22 +338,12 @@
       "pageNumber": 1,
       "rotation": 0
     },
-    "409011 X 2": {
-      "id": "409011 X 2",
+    "409011": {
+      "id": "409011",
       "x_px": null,
       "y_px": null,
       "x_pct": 72.48039215686275,
       "y_pct": 29.188118241203274,
-      "shape": "rectangle",
-      "pageNumber": 1,
-      "rotation": 0
-    },
-    "402019 X 2": {
-      "id": "402019 X 2",
-      "x_px": null,
-      "y_px": null,
-      "x_pct": 72.08823529411765,
-      "y_pct": 41.79075863204699,
       "shape": "rectangle",
       "pageNumber": 1,
       "rotation": 0

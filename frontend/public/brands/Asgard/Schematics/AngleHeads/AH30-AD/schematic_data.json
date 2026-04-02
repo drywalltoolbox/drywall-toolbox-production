@@ -1,5 +1,5 @@
 {
-  "id": "1775077465837",
+  "id": "1775158856169",
   "title": "AH30-AD_SCH",
   "product_name": "3″ Angle Head Corner Finisher Schematic",
   "sku": "AH30-AD",
@@ -51,8 +51,8 @@
       "sku": ""
     },
     {
-      "id": "059084 X 2",
-      "name": "059084 X 2",
+      "id": "059084",
+      "name": "059084",
       "quantity": 1,
       "sku": ""
     },
@@ -69,20 +69,20 @@
       "sku": ""
     },
     {
-      "id": "46Y013 X 12",
-      "name": "46Y013 X 12",
+      "id": "46Y013",
+      "name": "46Y013",
       "quantity": 1,
       "sku": ""
     },
     {
-      "id": "450009F X 2",
-      "name": "450009F X 2",
+      "id": "450009F",
+      "name": "450009F",
       "quantity": 1,
       "sku": ""
     },
     {
-      "id": "40Y011 X 2",
-      "name": "40Y011 X 2",
+      "id": "40Y011",
+      "name": "40Y011",
       "quantity": 1,
       "sku": ""
     },
@@ -99,14 +99,14 @@
       "sku": ""
     },
     {
-      "id": "359005 X 2",
-      "name": "359005 X 2",
+      "id": "359005",
+      "name": "359005",
       "quantity": 1,
       "sku": ""
     },
     {
-      "id": "409020 X 2",
-      "name": "409020 X 2",
+      "id": "409020",
+      "name": "409020",
       "quantity": 1,
       "sku": ""
     },
@@ -117,14 +117,14 @@
       "sku": ""
     },
     {
-      "id": "05P037 X 4",
-      "name": "05P037 X 4",
+      "id": "05P037",
+      "name": "05P037",
       "quantity": 1,
       "sku": ""
     },
     {
-      "id": "405022 X 2",
-      "name": "405022 X 2",
+      "id": "405022",
+      "name": "405022",
       "quantity": 1,
       "sku": ""
     },
@@ -135,8 +135,8 @@
       "sku": ""
     },
     {
-      "id": "4B0002B X 2",
-      "name": "4B0002B X 2",
+      "id": "4B0002B",
+      "name": "4B0002B",
       "quantity": 1,
       "sku": ""
     },
@@ -147,32 +147,32 @@
       "sku": ""
     },
     {
-      "id": "480026 X 2",
-      "name": "480026 X 2",
+      "id": "480026",
+      "name": "480026",
       "quantity": 1,
       "sku": ""
     },
     {
-      "id": "489026 X 4",
-      "name": "489026 X 4",
+      "id": "489026",
+      "name": "489026",
       "quantity": 1,
       "sku": ""
     },
     {
-      "id": "48Y027 X 2",
-      "name": "48Y027 X 2",
+      "id": "48Y027",
+      "name": "48Y027",
       "quantity": 1,
       "sku": ""
     },
     {
-      "id": "489023 X 4",
-      "name": "489023 X 4",
+      "id": "489023",
+      "name": "489023",
       "quantity": 1,
       "sku": ""
     },
     {
-      "id": "489029 X 2",
-      "name": "489029 X 2",
+      "id": "489029",
+      "name": "489029",
       "quantity": 1,
       "sku": ""
     }
@@ -278,52 +278,12 @@
       "pageNumber": 1,
       "rotation": 0
     },
-    "059084 X 2": {
-      "id": "059084 X 2",
-      "x_px": null,
-      "y_px": null,
-      "x_pct": 20.407843137254904,
-      "y_pct": 42.44735960915628,
-      "shape": "rectangle",
-      "pageNumber": 1,
-      "rotation": 0
-    },
     "480008F": {
       "id": "480008F",
       "x_px": null,
       "y_px": null,
       "x_pct": 49.7,
       "y_pct": 29.9,
-      "shape": "rectangle",
-      "pageNumber": 1,
-      "rotation": 0
-    },
-    "46Y013 X 12": {
-      "id": "46Y013 X 12",
-      "x_px": null,
-      "y_px": null,
-      "x_pct": 70.2578431372549,
-      "y_pct": 18.548679804578143,
-      "shape": "rectangle",
-      "pageNumber": 1,
-      "rotation": 0
-    },
-    "450009F X 2": {
-      "id": "450009F X 2",
-      "x_px": null,
-      "y_px": null,
-      "x_pct": 70.4078431372549,
-      "y_pct": 23.747359609156284,
-      "shape": "rectangle",
-      "pageNumber": 1,
-      "rotation": 0
-    },
-    "40Y011 X 2": {
-      "id": "40Y011 X 2",
-      "x_px": null,
-      "y_px": null,
-      "x_pct": 70.45392156862744,
-      "y_pct": 28.84867980457814,
       "shape": "rectangle",
       "pageNumber": 1,
       "rotation": 0
@@ -338,62 +298,12 @@
       "pageNumber": 1,
       "rotation": 0
     },
-    "359005 X 2": {
-      "id": "359005 X 2",
-      "x_px": null,
-      "y_px": null,
-      "x_pct": 74.5621568627451,
-      "y_pct": 70.27132019542185,
-      "shape": "rectangle",
-      "pageNumber": 1,
-      "rotation": 0
-    },
-    "409020 X 2": {
-      "id": "409020 X 2",
-      "x_px": null,
-      "y_px": null,
-      "x_pct": 51.85,
-      "y_pct": 68.75,
-      "shape": "rectangle",
-      "pageNumber": 1,
-      "rotation": 0
-    },
     "480007F": {
       "id": "480007F",
       "x_px": null,
       "y_px": null,
       "x_pct": 52,
       "y_pct": 72.5,
-      "shape": "rectangle",
-      "pageNumber": 1,
-      "rotation": 0
-    },
-    "05P037 X 4": {
-      "id": "05P037 X 4",
-      "x_px": null,
-      "y_px": null,
-      "x_pct": 57.31568627450981,
-      "y_pct": 72.24867980457813,
-      "shape": "rectangle",
-      "pageNumber": 1,
-      "rotation": 0
-    },
-    "405022 X 2": {
-      "id": "405022 X 2",
-      "x_px": null,
-      "y_px": null,
-      "x_pct": 63.057843137254906,
-      "y_pct": 72.6,
-      "shape": "rectangle",
-      "pageNumber": 1,
-      "rotation": 0
-    },
-    "4B0002B X 2": {
-      "id": "4B0002B X 2",
-      "x_px": null,
-      "y_px": null,
-      "x_pct": 20.8,
-      "y_pct": 79.7,
       "shape": "rectangle",
       "pageNumber": 1,
       "rotation": 0
@@ -408,8 +318,98 @@
       "pageNumber": 1,
       "rotation": 0
     },
-    "480026 X 2": {
-      "id": "480026 X 2",
+    "059084": {
+      "id": "059084",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 20.407843137254904,
+      "y_pct": 42.44735960915628,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "46Y013": {
+      "id": "46Y013",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 70.2578431372549,
+      "y_pct": 18.548679804578143,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "450009F": {
+      "id": "450009F",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 70.4078431372549,
+      "y_pct": 23.747359609156284,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "40Y011": {
+      "id": "40Y011",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 70.45392156862744,
+      "y_pct": 28.84867980457814,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "359005": {
+      "id": "359005",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 74.5621568627451,
+      "y_pct": 70.27132019542185,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "409020": {
+      "id": "409020",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 51.85,
+      "y_pct": 68.75,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "05P037": {
+      "id": "05P037",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 57.31568627450981,
+      "y_pct": 72.24867980457813,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "405022": {
+      "id": "405022",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 63.057843137254906,
+      "y_pct": 72.6,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "4B0002B": {
+      "id": "4B0002B",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 20.8,
+      "y_pct": 79.7,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "480026": {
+      "id": "480026",
       "x_px": null,
       "y_px": null,
       "x_pct": 35.45,
@@ -418,8 +418,8 @@
       "pageNumber": 1,
       "rotation": 0
     },
-    "489026 X 4": {
-      "id": "489026 X 4",
+    "489026": {
+      "id": "489026",
       "x_px": null,
       "y_px": null,
       "x_pct": 35.45,
@@ -428,8 +428,8 @@
       "pageNumber": 1,
       "rotation": 0
     },
-    "48Y027 X 2": {
-      "id": "48Y027 X 2",
+    "48Y027": {
+      "id": "48Y027",
       "x_px": null,
       "y_px": null,
       "x_pct": 35.45,
@@ -438,8 +438,8 @@
       "pageNumber": 1,
       "rotation": 0
     },
-    "489023 X 4": {
-      "id": "489023 X 4",
+    "489023": {
+      "id": "489023",
       "x_px": null,
       "y_px": null,
       "x_pct": 35.45,
@@ -448,8 +448,8 @@
       "pageNumber": 1,
       "rotation": 0
     },
-    "489029 X 2": {
-      "id": "489029 X 2",
+    "489029": {
+      "id": "489029",
       "x_px": null,
       "y_px": null,
       "x_pct": 35.45,

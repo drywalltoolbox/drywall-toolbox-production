@@ -1,5 +1,5 @@
 {
-  "id": "1775076370329",
+  "id": "1775158856341",
   "title": "FH-AD_SCH",
   "product_name": "Fiberglass Handle Schematic",
   "sku": "FH-AD",
@@ -7,9 +7,43 @@
     1
   ],
   "legendPages": [],
-  "parts": [],
-  "coordinates": {},
+  "parts": [
+    {
+      "id": "883027",
+      "name": "883027",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "880060",
+      "name": "880060",
+      "quantity": 1,
+      "sku": ""
+    }
+  ],
+  "coordinates": {
+    "880060": {
+      "id": "880060",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 33.89586700367823,
+      "y_pct": 87.43009059743446,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "883027": {
+      "id": "883027",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 41.6,
+      "y_pct": 31.700000000000003,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    }
+  },
   "schema_version": "1.0",
-  "image_natural_width": 5100,
-  "image_natural_height": 3300
+  "image_natural_width": 1376,
+  "image_natural_height": 768
 }

@@ -1,5 +1,5 @@
 {
-  "id": "1775076352585",
+  "id": "1775158856245",
   "title": "EHC12-AD_SCH",
   "product_name": "12″ MaxxBox Finishing Box Schematic",
   "sku": "EHC12-AD",
@@ -7,9 +7,989 @@
     1
   ],
   "legendPages": [],
-  "parts": [],
-  "coordinates": {},
+  "parts": [
+    {
+      "id": "202021",
+      "name": "202021",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "206003",
+      "name": "206003",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "303010",
+      "name": "303010",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "304005",
+      "name": "304005",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "209012",
+      "name": "209012",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "489023",
+      "name": "489023",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "219064",
+      "name": "219064",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "210059",
+      "name": "210059",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "502034",
+      "name": "502034",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "310024F",
+      "name": "310024F",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "202028",
+      "name": "202028",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "209030",
+      "name": "209030",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "339073",
+      "name": "339073",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "202044F",
+      "name": "202044F",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "209039",
+      "name": "209039",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "2800258",
+      "name": "2800258",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "059051",
+      "name": "059051",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "889030",
+      "name": "889030",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "310097",
+      "name": "310097",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "310096",
+      "name": "310096",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "3500508",
+      "name": "3500508",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "330031B",
+      "name": "330031B",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "209047",
+      "name": "209047",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "209042",
+      "name": "209042",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "059225",
+      "name": "059225",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "202036",
+      "name": "202036",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "809006",
+      "name": "809006",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "310045",
+      "name": "310045",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "310051F",
+      "name": "310051F",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "219067",
+      "name": "219067",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "200052F",
+      "name": "200052F",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "209148",
+      "name": "209148",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "209042",
+      "name": "209042",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "059029",
+      "name": "059029",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "3100338",
+      "name": "3100338",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "509010",
+      "name": "509010",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "330052",
+      "name": "330052",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "209148",
+      "name": "209148",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "210060",
+      "name": "210060",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "202020",
+      "name": "202020",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "059016",
+      "name": "059016",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "059020",
+      "name": "059020",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "059102",
+      "name": "059102",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "202022",
+      "name": "202022",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "209006",
+      "name": "209006",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "059015",
+      "name": "059015",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "059038",
+      "name": "059038",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "059161",
+      "name": "059161",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "280023B",
+      "name": "280023B",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "310071",
+      "name": "310071",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "3301328",
+      "name": "3301328",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "059018",
+      "name": "059018",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "059018",
+      "name": "059018",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "202007",
+      "name": "202007",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "300001",
+      "name": "300001",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "304002",
+      "name": "304002",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "209016",
+      "name": "209016",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "209058",
+      "name": "209058",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "330009B",
+      "name": "330009B",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "319081",
+      "name": "319081",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "209017",
+      "name": "209017",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "209046",
+      "name": "209046",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "310027B",
+      "name": "310027B",
+      "quantity": 1,
+      "sku": ""
+    }
+  ],
+  "coordinates": {
+    "202021": {
+      "id": "202021",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 44.58835510698701,
+      "y_pct": 4.26,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "202036": {
+      "id": "202036",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 37.849999999999994,
+      "y_pct": 96.55,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "206003": {
+      "id": "206003",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 57.72,
+      "y_pct": 4.173913513940642,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "209006": {
+      "id": "209006",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 18.65,
+      "y_pct": 50.75,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "209039": {
+      "id": "209039",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 76.65,
+      "y_pct": 50.5,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "209042": {
+      "id": "209042",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 29.5,
+      "y_pct": 79.25,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "209047": {
+      "id": "209047",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 49.75,
+      "y_pct": 97.3,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "300001": {
+      "id": "300001",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 34.45,
+      "y_pct": 19.75,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "303010": {
+      "id": "303010",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 58.57218522264823,
+      "y_pct": 8.21611325390706,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "304002": {
+      "id": "304002",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 34.45,
+      "y_pct": 15.049999999999999,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "304005": {
+      "id": "304005",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 59.88,
+      "y_pct": 11.637800260033579,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "310045": {
+      "id": "310045",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 35.7,
+      "y_pct": 90.75,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "310096": {
+      "id": "310096",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 57.8,
+      "y_pct": 75.5,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "310097": {
+      "id": "310097",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 58,
+      "y_pct": 73,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "809006": {
+      "id": "809006",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 37.2,
+      "y_pct": 93.25,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "2800258": {
+      "id": "2800258",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 72.95,
+      "y_pct": 60.83219438639688,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "3100338": {
+      "id": "3100338",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 30.799999999999997,
+      "y_pct": 74.15,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "3301328": {
+      "id": "3301328",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 37.3443943494037,
+      "y_pct": 29.65,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "3500508": {
+      "id": "3500508",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 57.75,
+      "y_pct": 78.5,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "310024F": {
+      "id": "310024F",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 66.20822446506493,
+      "y_pct": 30.78219438639688,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "330031B": {
+      "id": "330031B",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 56.849999999999994,
+      "y_pct": 83.25,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "059225": {
+      "id": "059225",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 48.150000000000006,
+      "y_pct": 84.5,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "280023B": {
+      "id": "280023B",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 21.9,
+      "y_pct": 37.75,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "059018": {
+      "id": "059018",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 34.85,
+      "y_pct": 27.25,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "330009B": {
+      "id": "330009B",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 62.95274945639072,
+      "y_pct": 61.8316047388941,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "310027B": {
+      "id": "310027B",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 38.17768413542968,
+      "y_pct": 33.382194386396876,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "209012": {
+      "id": "209012",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 61.35259491036139,
+      "y_pct": 14.582210447105503,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "489023": {
+      "id": "489023",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 66.21164489301299,
+      "y_pct": 18.05,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "219064": {
+      "id": "219064",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 66.37891934072951,
+      "y_pct": 21.343918867510183,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "210059": {
+      "id": "210059",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 68.76110456337774,
+      "y_pct": 25.96780561360312,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "502034": {
+      "id": "502034",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 65.31835510698701,
+      "y_pct": 28.213918867510184,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "202028": {
+      "id": "202028",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 67.40261881446864,
+      "y_pct": 33.91610254676799,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "209030": {
+      "id": "209030",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 67.84426370748162,
+      "y_pct": 37.51610254676798,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "339073": {
+      "id": "339073",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 68.10945967036476,
+      "y_pct": 40.45,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "202044F": {
+      "id": "202044F",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 67.7310806592705,
+      "y_pct": 45.17779490646403,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "059051": {
+      "id": "059051",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 61.518355106987016,
+      "y_pct": 68.24389745323202,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "889030": {
+      "id": "889030",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 60.19220912675547,
+      "y_pct": 70.47,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "310051F": {
+      "id": "310051F",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 27.4,
+      "y_pct": 93.9,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "219067": {
+      "id": "219067",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 24.9,
+      "y_pct": 91.2,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "200052F": {
+      "id": "200052F",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 25.1,
+      "y_pct": 87.35,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "209148": {
+      "id": "209148",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 21.75,
+      "y_pct": 75.95,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "059029": {
+      "id": "059029",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 30.150000000000006,
+      "y_pct": 76.65,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "509010": {
+      "id": "509010",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 31.1,
+      "y_pct": 71.44999999999999,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "330052": {
+      "id": "330052",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 32.01383011566122,
+      "y_pct": 67.45,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "210060": {
+      "id": "210060",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 21,
+      "y_pct": 73,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "202020": {
+      "id": "202020",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 18.85,
+      "y_pct": 70.25,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "059016": {
+      "id": "059016",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 18.85,
+      "y_pct": 66.05000000000001,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "059020": {
+      "id": "059020",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 18.45,
+      "y_pct": 62,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "059102": {
+      "id": "059102",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 17.65,
+      "y_pct": 57.64999999999999,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "202022": {
+      "id": "202022",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 18.56383011566122,
+      "y_pct": 53.95,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "059015": {
+      "id": "059015",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 17.6,
+      "y_pct": 45.650000000000006,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "059038": {
+      "id": "059038",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 19.6,
+      "y_pct": 42.95,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "059161": {
+      "id": "059161",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 20.15,
+      "y_pct": 40.900000000000006,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "310071": {
+      "id": "310071",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 30.310000000000002,
+      "y_pct": 39.613908160371096,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "202007": {
+      "id": "202007",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 35,
+      "y_pct": 22,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "209016": {
+      "id": "209016",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 35.76383011566122,
+      "y_pct": 11.6178163207422,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "209058": {
+      "id": "209058",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 39.94986935807791,
+      "y_pct": 8.350000000000001,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "319081": {
+      "id": "319081",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 37.9,
+      "y_pct": 41,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "209017": {
+      "id": "209017",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 37.95,
+      "y_pct": 38.55,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "209046": {
+      "id": "209046",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 38.21109261132411,
+      "y_pct": 36.05,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    }
+  },
   "schema_version": "1.0",
-  "image_natural_width": 5100,
-  "image_natural_height": 3300
+  "image_natural_width": 1376,
+  "image_natural_height": 768
 }
