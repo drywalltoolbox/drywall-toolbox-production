@@ -18,11 +18,15 @@ export default function ProductImageGallery({ product }) {
 
   const hasMultiple = images.length > 1;
 
-  // Reset when product changes
-  useEffect(() => {
+  // Reset index when product changes — done during render (not in an effect)
+  // to avoid the "setState in effect" lint warning.
+  const productKey = `${product?.id ?? ''}|${product?.sku ?? ''}`;
+  const [lastProductKey, setLastProductKey] = useState(productKey);
+  if (productKey !== lastProductKey) {
+    setLastProductKey(productKey);
     setCurrentIndex(0);
     setLoaded(false);
-  }, [product?.id, product?.sku]);
+  }
 
   const prev = () => {
     setLoaded(false);
@@ -74,13 +78,13 @@ export default function ProductImageGallery({ product }) {
       {/* ── Main image ───────────────────────────────────────────── */}
       <div
         className="relative w-full rounded-2xl overflow-hidden bg-gray-50 border border-gray-100"
-        style={{ aspectRatio: '4 / 3' }}
+        style={{ aspectRatio: '1 / 1' }}
         onTouchStart={onTouchStart}
         onTouchEnd={onTouchEnd}
       >
         {/* Loading skeleton */}
         {!loaded && (
-          <div className="absolute inset-0 bg-gradient-to-br from-gray-100 to-gray-200 animate-pulse" />
+          <div className="absolute inset-0 bg-linear-to-br from-gray-100 to-gray-200 animate-pulse" />
         )}
 
         {/* Image */}
@@ -88,7 +92,7 @@ export default function ProductImageGallery({ product }) {
           key={src}
           src={src}
           alt={`${product?.name || 'Product'} — Image ${currentIndex + 1}`}
-          className={`absolute inset-0 w-full h-full object-contain p-4 sm:p-6 transition-opacity duration-200 ${loaded ? 'opacity-100' : 'opacity-0'}`}
+          className={`absolute inset-0 w-full h-full object-contain p-2 sm:p-3 transition-opacity duration-200 ${loaded ? 'opacity-100' : 'opacity-0'}`}
           onLoad={() => setLoaded(true)}
           onError={(e) => {
             e.currentTarget.onerror = null;
@@ -149,7 +153,7 @@ export default function ProductImageGallery({ product }) {
               <img
                 src={img}
                 alt={`Thumbnail ${i + 1}`}
-                className="w-full h-full object-cover"
+                className="w-full h-full object-contain bg-white p-1"
                 onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = '/no-image-placeholder.webp'; }}
               />
             </button>

@@ -155,7 +155,7 @@ export default function ProductDetail({ product, onAddToCart, onClose }) {
                   >
                     <Minus size={14} strokeWidth={2.5} />
                   </button>
-                  <span className="px-3 min-w-[2.5rem] text-center text-sm font-bold text-gray-900 tabular-nums border-x border-gray-200">
+                  <span className="px-3 min-w-10 text-center text-sm font-bold text-gray-900 tabular-nums border-x border-gray-200">
                     {quantity}
                   </span>
                   <button
