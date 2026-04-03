@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight, ShoppingCart } from 'lucide-react';
 
 export default function ProductImageGallery({ product }) {
@@ -52,6 +52,24 @@ export default function ProductImageGallery({ product }) {
       goToPreviousImage();
     }
   };
+
+  // Keyboard arrow navigation for desktop users — only fires when no form element is focused
+  useEffect(() => {
+    if (!hasMultipleImages) return;
+    const handleKeyDown = (e) => {
+      const tag = document.activeElement?.tagName.toLowerCase();
+      if (['input', 'textarea', 'select'].includes(tag)) return;
+      if (e.key === 'ArrowLeft') {
+        e.preventDefault();
+        setCurrentImageIndex(prev => (prev - 1 + images.length) % images.length);
+      } else if (e.key === 'ArrowRight') {
+        e.preventDefault();
+        setCurrentImageIndex(prev => (prev + 1) % images.length);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [hasMultipleImages, images.length]);
 
   const currentImage = images[currentImageIndex] || '/no-image-placeholder.webp';
 
