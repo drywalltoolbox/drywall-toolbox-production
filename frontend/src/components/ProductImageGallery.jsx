@@ -106,14 +106,14 @@ export default function ProductImageGallery({ product }) {
           <>
             <button
               onClick={prev}
-              className="absolute left-2.5 top-1/2 -translate-y-1/2 z-10 flex items-center justify-center w-9 h-9 rounded-full bg-white/90 backdrop-blur-sm shadow-md hover:bg-white hover:scale-105 active:scale-95 transition-all"
+              className="absolute left-2.5 top-1/2 -translate-y-1/2 z-10 flex items-center justify-center w-9 h-9 rounded-full bg-white/95 shadow-md hover:bg-white hover:scale-105 active:scale-95 transition-all"
               aria-label="Previous image"
             >
               <ChevronLeft size={17} className="text-gray-700" />
             </button>
             <button
               onClick={next}
-              className="absolute right-2.5 top-1/2 -translate-y-1/2 z-10 flex items-center justify-center w-9 h-9 rounded-full bg-white/90 backdrop-blur-sm shadow-md hover:bg-white hover:scale-105 active:scale-95 transition-all"
+              className="absolute right-2.5 top-1/2 -translate-y-1/2 z-10 flex items-center justify-center w-9 h-9 rounded-full bg-white/95 shadow-md hover:bg-white hover:scale-105 active:scale-95 transition-all"
               aria-label="Next image"
             >
               <ChevronRight size={17} className="text-gray-700" />

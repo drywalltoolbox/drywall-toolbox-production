@@ -6,6 +6,7 @@ import { useCart } from '../context/CartContext';
 import Toast from './Toast';
 import ProductDetail from './ProductDetail';
 import LoadingSpinner from './LoadingSpinner';
+import ProductCardImage from './ProductCardImage';
 
 export default function TrendingProducts() {
   const [products, setProducts] = useState([]);
@@ -245,40 +246,14 @@ export default function TrendingProducts() {
                   aspectRatio: '1',
                   background: '#f8fafc',
                   overflow: 'hidden',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
+                  position: 'relative',
                   flexShrink: 0
                 }}>
-                  {product.image && product.image !== '/no-image-placeholder.webp' ? (
-                    <img
-                      src={product.image}
-                      alt={product.name}
-                      style={{
-                        width: '100%',
-                        height: '100%',
-                        objectFit: 'contain',
-                        objectPosition: 'center',
-                        padding: 'clamp(8px, 3vw, 12px)'
-                      }}
-                      onError={(e) => {
-                        e.currentTarget.onerror = null;
-                        e.currentTarget.src = '/no-image-placeholder.webp';
-                      }}
-                    />
-                  ) : (
-                    <img
-                      src="/no-image-placeholder.webp"
-                      alt="No image available"
-                      style={{
-                        width: '100%',
-                        height: '100%',
-                        objectFit: 'contain',
-                        objectPosition: 'center',
-                        padding: 'clamp(8px, 3vw, 12px)'
-                      }}
-                    />
-                  )}
+                  <ProductCardImage
+                    src={product.image}
+                    alt={product.name}
+                    padding="clamp(8px, 3vw, 12px)"
+                  />
                 </div>
 
                 {/* Product Info */}

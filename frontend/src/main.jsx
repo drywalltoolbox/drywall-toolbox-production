@@ -6,30 +6,33 @@ import App from './App.jsx'
 import ErrorBoundary from './components/ErrorBoundary.jsx'
 
 // ===== Mobile Viewport Optimization =====
-// Prevent keyboard from causing zoom on mobile devices
+// Prevent iOS Safari from auto-zooming on input focus.
+// The correct fix is font-size: 16px on all inputs (done in index.css).
+// This JS layer is a belt-and-suspenders guard: on focus it briefly sets
+// maximum-scale=1 to suppress the zoom animation, then immediately restores
+// normal scaling on blur so pinch-to-zoom still works (required by WCAG 1.4.4).
 if (typeof window !== 'undefined') {
-  // Set up viewport management for iOS keyboard
-  const disableZoomOnInputFocus = () => {
+  const manageInputZoom = () => {
     const inputs = document.querySelectorAll('input, textarea, select');
     
     inputs.forEach(input => {
-      // Ensure minimum font size to prevent auto-zoom
+      // Belt-and-suspenders: enforce 16px via JS as well as CSS
       input.style.fontSize = '16px';
       
-      // Prevent zoom on focus
       input.addEventListener('focus', () => {
-        // iOS Safari workaround: adjust viewport scale
+        // Temporarily suppress the iOS zoom animation while the keyboard rises.
+        // maximum-scale=1 is the minimum needed; user-scalable remains yes.
         const viewport = document.querySelector('meta[name="viewport"]');
         if (viewport) {
-          viewport.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no');
+          viewport.setAttribute('content', 'width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0');
         }
       });
       
       input.addEventListener('blur', () => {
-        // Restore viewport after keyboard closes
+        // Restore full zoom capability after the keyboard closes.
         const viewport = document.querySelector('meta[name="viewport"]');
         if (viewport) {
-          viewport.setAttribute('content', 'width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no');
+          viewport.setAttribute('content', 'width=device-width, initial-scale=1.0, viewport-fit=cover');
         }
       });
     });
@@ -37,16 +40,15 @@ if (typeof window !== 'undefined') {
   
   // Run on initial load
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', disableZoomOnInputFocus);
+    document.addEventListener('DOMContentLoaded', manageInputZoom);
   } else {
-    disableZoomOnInputFocus();
+    manageInputZoom();
   }
   
   // Re-run when new inputs are dynamically added to the DOM
   const observer = new MutationObserver((mutations) => {
     mutations.forEach((mutation) => {
       if (mutation.addedNodes.length) {
-        // Check if any input elements were added
         const hasInputs = Array.from(mutation.addedNodes).some(node => 
           node.querySelector && (
             node.querySelector('input') || 
@@ -58,19 +60,20 @@ if (typeof window !== 'undefined') {
           )
         );
         if (hasInputs) {
-          disableZoomOnInputFocus();
+          manageInputZoom();
         }
       }
     });
   });
   
-  // Start observing the document for changes
   observer.observe(document.body, {
     childList: true,
     subtree: true,
   });
   
-  // Disable double-tap zoom
+  // Prevent accidental multi-touch zoom (e.g. two-finger scroll misread as pinch).
+  // passive:false is required to call preventDefault(); kept narrowly scoped to
+  // multi-touch only so single-finger scroll is never affected.
   document.addEventListener('touchmove', (e) => {
     if (e.touches.length > 1) {
       e.preventDefault();

@@ -26,6 +26,7 @@ import FilterPanel from '../components/FilterPanel';
 import { getProducts } from '../services/catalog';
 import { useCart } from '../context/CartContext';
 import LoadingSpinner from '../components/LoadingSpinner';
+import ProductCardImage from '../components/ProductCardImage';
 
 // Brands that carry repair-kit / parts items in the catalog
 const PARTS_BRANDS = [
@@ -279,26 +280,13 @@ export default function Parts() {
                       <div className="relative bg-gray-50 aspect-square overflow-hidden shrink-0">
                         <button
                           onClick={() => openModal(product)}
-                          className="absolute inset-0 flex items-center justify-center bg-gray-50 hover:bg-gray-100 transition-colors w-full h-full"
+                          className="absolute inset-0 w-full h-full"
                         >
-                          {product.image && product.image !== '/no-image-placeholder.webp' ? (
-                            <img
-                              src={product.image}
-                              alt={product.name}
-                              className="object-contain w-full h-full p-2 sm:p-3"
-                              loading="lazy"
-                              onError={(e) => {
-                                e.currentTarget.onerror = null;
-                                e.currentTarget.src = '/no-image-placeholder.webp';
-                              }}
-                            />
-                          ) : (
-                            <img
-                              src="/no-image-placeholder.webp"
-                              alt="No image available"
-                              className="object-contain w-full h-full p-2 sm:p-3"
-                            />
-                          )}
+                          <ProductCardImage
+                            src={product.image}
+                            alt={product.name}
+                            padding="8px"
+                          />
                         </button>
 
                         {/* Wishlist hint */}

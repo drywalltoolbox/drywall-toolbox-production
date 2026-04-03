@@ -4,7 +4,13 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/logo.svg" />
     <link rel="apple-touch-icon" href="/pwa_icon.png" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    <!--
+      viewport-fit=cover: lets content extend into iPhone notch/dynamic-island safe areas.
+      user-scalable=yes + maximum-scale=5: allows pinch-zoom (WCAG 1.4.4) and keeps
+      Android Chrome's fast-tap scroll path active. iOS Safari auto-zoom on inputs is
+      prevented via font-size:16px in CSS — no need to lock the viewport.
+    -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta name="description" content="Professional drywall tools and equipment from top brands. Shop automatic taping tools, mud boxes, finishing tools, and more.">
     <meta name="keywords" content="drywall tools, taping tools, finishing tools, construction equipment, TapeTech, Level5">
     <meta name="theme-color" content="#0f172a">
@@ -12,9 +18,18 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Drywall Toolbox">
     <title>Drywall Toolbox - Professional Tools & Equipment</title>
+    <!-- Establish connections to font servers as early as possible -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!--
+      font-display=swap: browser immediately renders text in a fallback font and
+      swaps in Inter/JetBrains Mono once downloaded — eliminates FOIT (invisible
+      text) and prevents layout-blocking on slow mobile connections.
+      Loading only the weights actually used (400,600,700,800 for Inter;
+      400,700 for JetBrains Mono) cuts the font payload significantly vs the
+      previous 6-weight Inter request with no JetBrains Mono at all.
+    -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
   </head>
   <body>
     <!--

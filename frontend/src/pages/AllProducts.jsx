@@ -8,6 +8,7 @@ import SortDropdown from '../components/SortDropdown';
 import FilterPanel from '../components/FilterPanel';
 import Pagination from '../components/Pagination';
 import LoadingSpinner from '../components/LoadingSpinner';
+import ProductCardImage from '../components/ProductCardImage';
 import { X } from 'lucide-react';
 import { getProducts } from '../services/catalog';
 import { useCart } from '../context/CartContext';
@@ -294,19 +295,13 @@ export default function AllProducts() {
                   <div className="relative bg-gray-50 aspect-square overflow-hidden shrink-0">
                     <button 
                       onClick={() => openModal(product)} 
-                      className="absolute inset-0 flex items-center justify-center bg-gray-50 hover:bg-gray-100 transition-colors w-full h-full"
+                      className="absolute inset-0 w-full h-full"
                     >
-                      {product.image ? (
-                        <img
-                          src={product.image}
-                          alt={product.name}
-                          className="object-contain w-full h-full p-2 sm:p-3"
-                          loading="lazy"
-                          onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = '/no-image-placeholder.webp'; }}
-                        />
-                      ) : (
-                        <div className="text-gray-300"><ShoppingCart size={40} /></div>
-                      )}
+                      <ProductCardImage
+                        src={product.image}
+                        alt={product.name}
+                        padding="8px"
+                      />
                     </button>
                     
                     {/* Badge */}

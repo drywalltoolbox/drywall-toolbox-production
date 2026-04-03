@@ -53,24 +53,67 @@ body {
 }
 
 /* --- BACKGROUND TEXTURE --- */
+/*
+  Previously `position: fixed` which caused the browser to repaint this
+  entire radial-gradient on every scroll tick on mobile — a major source of
+  scroll jank. Switched to `position: absolute` so it scrolls with the page
+  and is only painted once. `will-change: transform` promotes it to its own
+  GPU compositor layer so the main thread is never blocked.
+  The parent (#root / flex column wrapper) must be `position: relative` for
+  absolute positioning to work correctly — it already is via inline styles.
+*/
 .machined-bg {
-    position: fixed;
+    position: absolute;
     inset: 0;
     z-index: -1;
     background-image: 
         radial-gradient(circle at 2px 2px, var(--machined-border) 1px, transparent 0);
     background-size: 40px 40px;
     opacity: 0.5;
+    will-change: transform;
+    pointer-events: none;
+}
+
+/* --- PRODUCT CARD IMAGE SHIMMER --- */
+/*
+  Used by ProductCardImage.jsx as the skeleton placeholder while an image
+  downloads. The gradient sweeps left-to-right giving a "scanning" feel.
+  Pure CSS — zero JS cost on the main thread.
+*/
+@keyframes dtb-shimmer {
+    0%   { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
 }
 
 /* --- SECTION ANIMATIONS --- */
+/*
+  Reduced from 600ms → 280ms and translateY from 20px → 10px.
+  The original 600ms cubic-bezier ease felt sluggish on mobile — content was
+  invisible for half a second on every page load. 280ms is fast enough to
+  feel instant while still giving a polished entrance.
+*/
 .section-enter {
-    animation: sectionIn 0.6s var(--ease-tension) forwards;
+    animation: sectionIn 0.28s var(--ease-tension) forwards;
 }
 
 @keyframes sectionIn {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; }
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/*
+  dtb-page-in: smooth fade + micro-lift used by PageTransition.jsx on every
+  route change. Previously this class was referenced in JSX but never defined
+  in CSS, causing a hard snap (instant unmount/remount with no transition).
+  Kept short (220ms) so navigation feels instant on mobile.
+*/
+.dtb-page-in {
+    animation: dtbPageIn 0.22s var(--ease-tension) both;
+}
+
+@keyframes dtbPageIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
 }
 
 /* --- TYPOGRAPHY --- */
@@ -191,7 +234,9 @@ body {
     border: 1px solid var(--machined-border);
     padding: 24px;
     position: relative;
-    transition: all 0.4s var(--ease-tension);
+    /* transition:all watches every CSS property — very expensive on mobile.
+       Scope to only the properties that actually change on hover. */
+    transition: border-color 0.3s var(--ease-tension), box-shadow 0.3s var(--ease-tension);
 }
 
 .tool-card:hover {
@@ -225,15 +270,22 @@ body {
 }
 
 /* --- CART OVERLAY --- */
+/*
+  backdrop-filter: blur() removed — it forces the GPU to composite every
+  element behind it on every animation frame, which is extremely expensive on
+  mobile CPUs and causes dropped frames when the panel slides in/out.
+  A semi-transparent background achieves the same "dimming" UX without the
+  compositing cost.
+  Cart panel transition shortened 500ms → 300ms which feels snappier on mobile.
+*/
 .cart-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(15, 23, 42, 0.4);
-    backdrop-filter: blur(4px);
+    background: rgba(15, 23, 42, 0.45);
     z-index: 2000;
     opacity: 0;
     pointer-events: none;
-    transition: opacity 0.3s;
+    transition: opacity 0.25s ease;
 }
 
 .cart-overlay.active {
@@ -251,8 +303,9 @@ body {
     background: white;
     padding: 40px;
     transform: translateX(100%);
-    transition: transform 0.5s var(--ease-tension);
+    transition: transform 0.3s var(--ease-tension);
     overflow-y: auto;
+    will-change: transform;
 }
 
 .cart-overlay.active .cart-panel {
@@ -575,7 +628,7 @@ aside input[type="range"],
     border: 1px solid transparent;
     color: var(--tension-accent);
     cursor: pointer;
-    transition: all 180ms var(--ease-tension);
+    transition: background 180ms var(--ease-tension), transform 180ms var(--ease-tension);
 }
 
 .pager-pill:hover:not(:disabled) {
@@ -622,7 +675,7 @@ aside input[type="range"],
     line-height: 1;
     cursor: pointer;
     outline: none;
-    transition: all 160ms var(--ease-tension);
+    transition: box-shadow 160ms var(--ease-tension), border-color 160ms var(--ease-tension);
     box-shadow: 0 6px 18px rgba(2,6,23,0.04);
     padding-right: 36px; /* room for custom arrow */
     position: relative;
@@ -1287,7 +1340,7 @@ aside input[type="range"],
     .tool-card {
         padding: 1.25rem;
         border-radius: 8px;
-        transition: all 300ms ease;
+        transition: border-color 300ms ease, box-shadow 300ms ease, transform 300ms ease;
     }
 
     .tool-card:hover {
@@ -1380,7 +1433,7 @@ aside input[type="range"],
         padding: 14px 32px;
         font-size: 0.8rem;
         border-radius: 6px;
-        transition: all 200ms ease;
+        transition: transform 200ms ease, box-shadow 200ms ease;
         min-height: 44px; /* Touch-friendly min height */
     }
 
@@ -1438,7 +1491,7 @@ aside input[type="range"],
         min-height: 44px;
         padding: 10px 16px;
         border-radius: 8px;
-        transition: all 200ms ease;
+        transition: transform 200ms ease, box-shadow 200ms ease, background 200ms ease;
     }
 
     button:active,

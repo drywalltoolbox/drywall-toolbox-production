@@ -155,6 +155,8 @@ export default function Home() {
               <img
                 src={brand.src}
                 alt={brand.name}
+                loading="lazy"
+                decoding="async"
                 style={{ 
                   height: brand.name === 'Columbia' ? 'clamp(60px, 10vw, 100px)' : brand.name === 'Asgard' || brand.name === 'Graco' ? 'clamp(32px, 5vw, 50px)' : brand.name === 'Platinum' ? 'clamp(28px, 4.5vw, 44px)' : 'clamp(24px, 4vw, 40px)',
                   maxWidth: brand.name === 'Columbia' ? '300px' : brand.name === 'Asgard' || brand.name === 'Graco' ? '150px' : brand.name === 'Platinum' ? '180px' : '120px',
