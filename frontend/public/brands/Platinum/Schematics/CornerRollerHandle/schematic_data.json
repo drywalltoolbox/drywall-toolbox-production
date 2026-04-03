@@ -1,0 +1,79 @@
+{
+  "id": "1775251189642",
+  "title": "platinum_corner_roller_Handle-page-001",
+  "diagramPages": [
+    1
+  ],
+  "legendPages": [],
+  "parts": [
+    {
+      "id": "1",
+      "name": "1",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "2",
+      "name": "2",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "3",
+      "name": "3",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "4",
+      "name": "4",
+      "quantity": 1,
+      "sku": ""
+    }
+  ],
+  "coordinates": {
+    "1": {
+      "id": "1",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 36.7,
+      "y_pct": 25.2,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "2": {
+      "id": "2",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 73.46945967036476,
+      "y_pct": 57.703406133670285,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "3": {
+      "id": "3",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 61.229459670364754,
+      "y_pct": 94.10829693316487,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "4": {
+      "id": "4",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 13.130540329635249,
+      "y_pct": 3.998296933164861,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    }
+  },
+  "schema_version": "1.0",
+  "image_natural_width": 1376,
+  "image_natural_height": 768
+}
