@@ -159,14 +159,50 @@ export default function AllProducts() {
 
   const sortedProducts = [...filteredProducts].sort((a, b) => {
     switch (sortBy) {
-      case 'price-low':
+      case 'price-low': {
         return a.price - b.price;
-      case 'price-high':
+      }
+      case 'price-high': {
         return b.price - a.price;
-      case 'rating':
+      }
+      case 'rating': {
         return b.rating - a.rating;
-      default:
-        return 0;
+      }
+      case 'popular':
+      default: {
+        // Popular sorting: prioritize main products over small parts
+        // 1. Sort by badge priority (Best Seller > Popular > New > no badge)
+        const badgePriority = { 'Best Seller': 0, 'Popular': 1, 'New': 2 };
+        const aBadgePriority = badgePriority[a.badge] ?? 3;
+        const bBadgePriority = badgePriority[b.badge] ?? 3;
+        if (aBadgePriority !== bBadgePriority) {
+          return aBadgePriority - bBadgePriority;
+        }
+        
+        // 2. Sort by number of reviews (more reviews = more popular)
+        const aReviews = a.reviews || 0;
+        const bReviews = b.reviews || 0;
+        if (aReviews !== bReviews) {
+          return bReviews - aReviews;
+        }
+        
+        // 3. Sort by rating (higher rating = more popular)
+        const aRating = a.rating || 0;
+        const bRating = b.rating || 0;
+        if (aRating !== bRating) {
+          return bRating - aRating;
+        }
+        
+        // 4. Prioritize main products over parts (products with price > $50 are likely main tools)
+        const aIsMainTool = (a.price || 0) > 50;
+        const bIsMainTool = (b.price || 0) > 50;
+        if (aIsMainTool !== bIsMainTool) {
+          return aIsMainTool ? -1 : 1;
+        }
+        
+        // 5. Sort by price (higher price main products first, lower price parts)
+        return (b.price || 0) - (a.price || 0);
+      }
     }
   });
 

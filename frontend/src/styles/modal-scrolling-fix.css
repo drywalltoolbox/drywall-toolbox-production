@@ -1,0 +1,223 @@
+/**
+ * MODAL SCROLLING FIX
+ * Production-grade modal scrolling and responsiveness
+ * Fixes issues with overflow-x: hidden and ensures proper scrolling
+ * Load this AFTER index.css and machined-design.css in production
+ */
+
+/* ===================================================================
+   CRITICAL FIX: Ensure body/html don't block modal scrolling
+   =================================================================== */
+
+/* Force html and body to allow scrolling */
+html {
+  overflow-x: auto;
+  overflow-y: scroll;
+  scroll-behavior: smooth;
+}
+
+body {
+  overflow-x: visible;
+  /* IMPORTANT: Never set overflow: hidden on body for modals to work */
+  /* JavaScript handles scroll lock via document.body.style.overflow = 'hidden' */
+  /* when a modal opens. This CSS should not override that behavior. */
+}
+
+/* ===================================================================
+   MODAL SCROLL CONTAINER
+   =================================================================== */
+
+/* Universal modal scroll container */
+.modal-scroll,
+[role="dialog"] [class*="scroll"],
+.fixed[style*="overflow"] {
+  /* Allow scrolling on the modal container */
+  overflow-y: auto !important;
+  overflow-x: hidden;
+  
+  /* Enable momentum scrolling on iOS */
+  -webkit-overflow-scrolling: touch;
+  
+  /* Prevent scroll interference */
+  overscroll-behavior: contain;
+  
+  /* Smooth scrolling experience */
+  scroll-behavior: smooth;
+}
+
+/* ===================================================================
+   SCROLLBAR STYLING - Consistent across all modals
+   =================================================================== */
+
+/* Custom scrollbar for WebKit browsers */
+.modal-scroll::-webkit-scrollbar,
+[role="dialog"] [class*="scroll"]::-webkit-scrollbar,
+.fixed[style*="overflow"]::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.modal-scroll::-webkit-scrollbar-track,
+[role="dialog"] [class*="scroll"]::-webkit-scrollbar-track,
+.fixed[style*="overflow"]::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.modal-scroll::-webkit-scrollbar-thumb,
+[role="dialog"] [class*="scroll"]::-webkit-scrollbar-thumb,
+.fixed[style*="overflow"]::-webkit-scrollbar-thumb {
+  background: rgba(156, 163, 175, 0.3);
+  border-radius: 3px;
+}
+
+.modal-scroll::-webkit-scrollbar-thumb:hover,
+[role="dialog"] [class*="scroll"]::-webkit-scrollbar-thumb:hover,
+.fixed[style*="overflow"]::-webkit-scrollbar-thumb:hover {
+  background: rgba(156, 163, 175, 0.5);
+}
+
+/* Firefox scrollbar styling */
+.modal-scroll,
+[role="dialog"] [class*="scroll"],
+.fixed[style*="overflow"] {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(156, 163, 175, 0.3) transparent;
+}
+
+/* ===================================================================
+   PRODUCT DETAIL MODAL SPECIFIC
+   =================================================================== */
+
+/* Ensure modal content doesn't overflow parent boundaries */
+[role="dialog"] > * {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+/* Fix for ProductDetail component within modal - NO max-height here, let inline styles handle it */
+.bg-white.rounded-t-3xl {
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Close button should be accessible on sticky positioning */
+[aria-label="Close product detail"],
+[title="Close"] {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+
+/* ===================================================================
+   MODAL BACKDROP
+   =================================================================== */
+
+/* Modal backdrop - prevent interaction */
+.fixed.inset-0[class*="bg-black"] {
+  -webkit-touch-callout: none;
+  user-select: none;
+  pointer-events: auto;
+}
+
+/* ===================================================================
+   RESPONSIVE MODAL ADJUSTMENTS
+   =================================================================== */
+
+/* Mobile: Ensure modals are touchable and scrollable */
+@media (max-width: 640px) {
+  /* Touch device optimizations */
+  .modal-scroll,
+  [role="dialog"] {
+    /* Ensure safe area insets are respected */
+    max-height: min(calc(100vh - var(--header-height, 70px)), 90vh);
+    
+    /* Better touch scrolling */
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-y;
+  }
+
+  /* Modal content padding on mobile */
+  [role="dialog"] > div {
+    padding: 1rem;
+  }
+}
+
+/* Tablet: Balance modal size */
+@media (min-width: 641px) and (max-width: 1024px) {
+  .modal-scroll,
+  [role="dialog"] {
+    max-height: min(calc(100vh - 80px), 85vh);
+  }
+}
+
+/* Desktop: Full scroll experience */
+@media (min-width: 1025px) {
+  .modal-scroll,
+  [role="dialog"] {
+    max-height: calc(100vh - 100px);
+  }
+}
+
+/* ===================================================================
+   FIX FOR OVERFLOW CONFLICTS
+   =================================================================== */
+
+/* Prevent overflow-x: hidden from interfering with vertical scrolling */
+.page-wrapper,
+.container,
+main {
+  overflow-x: clip;
+  /* Using 'clip' instead of 'hidden' prevents scrollbar issues */
+}
+
+/* Ensure content containers don't lock scrolling */
+.main-content {
+  overflow: visible;
+}
+
+/* ===================================================================
+   ACCESSIBILITY AND KEYBOARD NAVIGATION
+   =================================================================== */
+
+/* Ensure focusable elements in modals are accessible */
+[role="dialog"] button:focus-visible,
+[role="dialog"] a:focus-visible,
+[role="dialog"] input:focus-visible {
+  outline: 2px solid var(--color-primary-500);
+  outline-offset: 2px;
+  z-index: 51; /* Higher than modal content */
+}
+
+/* ===================================================================
+   ANIMATION SMOOTHING
+   =================================================================== */
+
+/* Smooth transitions during modal open/close */
+[role="dialog"],
+.modal-scroll {
+  transition: opacity 200ms ease-out, transform 200ms ease-out;
+}
+
+/* ===================================================================
+   NOTCH/SAFE AREA SUPPORT
+   =================================================================== */
+
+@supports (padding: max(0px)) {
+  [role="dialog"] {
+    /* Respect device notches/safe areas */
+    padding-left: max(1rem, env(safe-area-inset-left));
+    padding-right: max(1rem, env(safe-area-inset-right));
+    padding-top: max(1rem, env(safe-area-inset-top));
+    padding-bottom: max(1rem, env(safe-area-inset-bottom));
+  }
+}
+
+/* ===================================================================
+   PREVENTS LAYOUT SHIFT
+   =================================================================== */
+
+/* Prevent scrollbar from causing layout shift */
+html {
+  overflow-y: scroll;
+  scrollbar-gutter: stable;
+}

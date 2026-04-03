@@ -287,8 +287,9 @@ export function htmlToMarkdown(html) {
  * @returns {Object}    Normalized product
  */
 function normalizeRow(row, idx) {
-  // Images: pipe-separated URLs
-  const images = (row['Images'] || '')
+  // Images: pipe-separated URLs. CSV columns may contain "Images" or "Images (comma separated)"
+  const rawImages = row['Images'] || row['Images (comma separated)'] || '';
+  const images = rawImages
     .split('|')
     .map(u => u.trim())
     .filter(Boolean);

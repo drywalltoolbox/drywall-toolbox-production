@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { getProducts } from '../services/catalog';
-import { filterProductsWithSchematics } from '../data/schematicMappings';
 import { ShoppingCart, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import Toast from './Toast';
@@ -53,41 +52,75 @@ export default function TrendingProducts() {
     getProducts().then((allProducts) => {
       if (!mounted) return;
 
-      // ── Priority 1: Columbia products that have interactive schematics ────
-      // These are the most "featured" products — we have parts diagrams for them.
-      const withSchematics = filterProductsWithSchematics(allProducts, 'Columbia Taping Tools')
-        .filter(p => p.price);
+      // ── Diversified Trending Selection: Automatic Tapers prioritized ─────
+      // We specifically look for Automatic Taper products across all brands
+      // and ensure they are mixed for diversity.
+      
+      const taperKeywords = ['automatic taper', 'taper', 'taping tool'];
+      // Exclude Level5 products for now as requested
+      const withPrice = allProducts.filter(p => (p.price || 0) > 0 && (p.brand || '').toLowerCase() !== 'level5');
+      
+      // Categorize products into "Tapers" and "Other Main Tools"
+      const groupedByBrand = {};
+      
+      withPrice.forEach(p => {
+        const brandName = p.brand || 'Other';
+        if (!groupedByBrand[brandName]) {
+          groupedByBrand[brandName] = { tapers: [], others: [] };
+        }
+        
+        const isTaper = taperKeywords.some(key => 
+          (p.name || '').toLowerCase().includes(key) || 
+          (p.category || '').toLowerCase().includes(key)
+        );
 
-      if (withSchematics.length >= 6) {
-        // Enough schematic-matched products — sort premium first, take top 12.
-        withSchematics.sort((a, b) => (b.price || 0) - (a.price || 0));
-        setProducts(withSchematics.slice(0, 12));
-        setLoading(false);
-        return;
+        if (isTaper) {
+          groupedByBrand[brandName].tapers.push(p);
+        } else if (p.price > 100) { // Keep high-value tools as secondary options
+          groupedByBrand[brandName].others.push(p);
+        }
+      });
+
+      let balancedSelection = [];
+      const brandKeys = Object.keys(groupedByBrand);
+
+      // Strategy: 1. Take tapers from every brand first
+      brandKeys.forEach(brand => {
+        const brandGroup = groupedByBrand[brand];
+        // Sort tapers by price descending (main tools first)
+        brandGroup.tapers.sort((a, b) => (b.price || 0) - (a.price || 0));
+        // Take up to 3 tapers per brand
+        balancedSelection.push(...brandGroup.tapers.slice(0, 3));
+      });
+
+      // Strategy: 2. If we need more variety, add high-value tools from different brands
+      if (balancedSelection.length < 12) {
+        brandKeys.forEach(brand => {
+          const brandGroup = groupedByBrand[brand];
+          brandGroup.others.sort((a, b) => (b.price || 0) - (a.price || 0));
+          balancedSelection.push(...brandGroup.others.slice(0, 2));
+        });
       }
 
-      // ── Priority 2: Cross-brand curated selection ─────────────────────────
-      // Not enough Columbia/schematic products — build a balanced sample from
-      // all brands.  Pick up to 3 products per brand, sorted by price desc.
-      const withPrice = allProducts.filter(p => p.price);
-      const byBrand = {};
-      withPrice.forEach(p => {
-        const b = p.brand || 'Other';
-        if (!byBrand[b]) byBrand[b] = [];
-        byBrand[b].push(p);
+      // Final Mix: Maintain a diverse mix of tapers at the front
+      balancedSelection.sort((a, b) => {
+        const aIsTaper = taperKeywords.some(key => (a.name || '').toLowerCase().includes(key));
+        const bIsTaper = taperKeywords.some(key => (b.name || '').toLowerCase().includes(key));
+        
+        if (aIsTaper && !bIsTaper) return -1;
+        if (!aIsTaper && bIsTaper) return 1;
+        
+        // Equal priority (both tapers or both others): Compare price with brand spacing
+        if (Math.abs((b.price || 0) - (a.price || 0)) > 50) {
+          return (b.price || 0) - (a.price || 0);
+        }
+        return (a.brand || '').localeCompare(b.brand || '');
       });
 
-      const featured = [];
-      Object.values(byBrand).forEach(group => {
-        group.sort((a, b) => (b.price || 0) - (a.price || 0));
-        featured.push(...group.slice(0, 3));
-      });
-
-      // Final sort by price desc, take top 12
-      featured.sort((a, b) => (b.price || 0) - (a.price || 0));
-      setProducts(featured.slice(0, 12));
+      setProducts(balancedSelection.slice(0, 16));
       setLoading(false);
-    }).catch(() => {
+    }).catch((err) => {
+      console.error('Error fetching trending products:', err);
       if (mounted) setLoading(false);
     });
 
