@@ -4,6 +4,7 @@ import { getProductById } from '../services/catalog';
 import { useCart } from '../context/CartContext';
 import ProductDetail from '../components/ProductDetail';
 import Toast from '../components/Toast';
+import LoadingSpinner from '../components/LoadingSpinner';
 
 export default function Product() {
   const { partNumber, id } = useParams();
@@ -41,13 +42,7 @@ export default function Product() {
   }, [partNumber, id]);
 
   if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="mx-auto mb-4 text-gray-400">Loading product…</div>
-        </div>
-      </div>
-    );
+    return <LoadingSpinner fullPage size="lg" label="Loading product" />;
   }
 
   if (!product) {

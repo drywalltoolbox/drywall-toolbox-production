@@ -15,6 +15,7 @@ import surproLogo from '/brands/SurPro/surpro_logo.svg';
 import asgardLogo from '/brands/Asgard/asgard_logo.svg';
 import gracoLogo from '/brands/Graco/graco_logo.svg';
 import level5Logo from '/brands/Level5/Level5.svg';
+import platinumLogo from '/brands/Platinum/platinum_logo.svg';
 
 const brandLogos = {
   'TapeTech': tapeTechLogo,
@@ -23,6 +24,7 @@ const brandLogos = {
   'Asgard': asgardLogo,
   'Graco': gracoLogo,
   'Level5': level5Logo,
+  'Platinum': platinumLogo,
 };
 
 // ---------------------------------------------------------------------------
@@ -116,6 +118,13 @@ import level512inFlatBoxData          from '/brands/Level5/Schematics/FinishingB
 import level512inMegaBoxData          from '/brands/Level5/Schematics/FinishingBoxes/12-inch-Mega-Box/schematic_data.json';
 import level514inFlatBoxData          from '/brands/Level5/Schematics/FinishingBoxes/14-inch-Flat-Box/schematic_data.json';
 import level5CompoundPumpData         from '/brands/Level5/Schematics/Pumps/Compound-Pump/schematic_data.json';
+
+// ---------------------------------------------------------------------------
+// Platinum schematic JSON data imports
+// ---------------------------------------------------------------------------
+import platinumCompoundPumpData       from '/brands/Platinum/Schematics/CompoundPump/schematic_data.json';
+import platinumFlatBoxData            from '/brands/Platinum/Schematics/FlatBox/schematic_data.json';
+import platinumOutsideCornerRollerData from '/brands/Platinum/Schematics/OutsideCornerRoller/schematic_data.json';
 
 // ---------------------------------------------------------------------------
 // Schematic image paths — static fallbacks served from public/brands/…
@@ -277,180 +286,179 @@ const _fallbacks = {
 
   // ── Asgard ─────────────────────────────────────────────────────────────────
   'asgard-fa01-ad': {
-    pages: { 1: `${_BASE}brands/Asgard/Schematics/Adapters/FA01-AD/images/FA01-AD_SCH-page-001.png` },
-    preview: `${_BASE}brands/Asgard/Schematics/Adapters/FA01-AD/images/FA01-AD_preview.jpg`,
+    pages: { 1: `${_BASE}brands/Asgard/Schematics/Adapters/FA01-AD/images/FA01-AD_SCH-page-001.webp` },
+    preview: `${_BASE}brands/Asgard/Schematics/Adapters/FA01-AD/images/FA01-AD_preview.webp`,
   },
   'asgard-ah25-ad': {
-    pages: { 1: `${_BASE}brands/Asgard/Schematics/AngleHeads/AH25-AD/images/AH25-AD_SCH-page-001.png` },
-    preview: `${_BASE}brands/Asgard/Schematics/AngleHeads/AH25-AD/images/AH25-AD_preview.jpg`,
+    pages: { 1: `${_BASE}brands/Asgard/Schematics/AngleHeads/AH25-AD/images/AH25-AD_SCH-page-001.webp` },
+    preview: `${_BASE}brands/Asgard/Schematics/AngleHeads/AH25-AD/images/AH25-AD_preview.webp`,
   },
   'asgard-ah30-ad': {
-    pages: { 1: `${_BASE}brands/Asgard/Schematics/AngleHeads/AH30-AD/images/AH30-AD_SCH-page-001.png` },
-    preview: `${_BASE}brands/Asgard/Schematics/AngleHeads/AH30-AD/images/AH30-AD_preview.jpg`,
+    pages: { 1: `${_BASE}brands/Asgard/Schematics/AngleHeads/AH30-AD/images/AH30-AD_SCH-page-001.webp` },
+    preview: `${_BASE}brands/Asgard/Schematics/AngleHeads/AH30-AD/images/AH30-AD_preview.webp`,
   },
   'asgard-ah35-ad': {
-    pages: { 1: `${_BASE}brands/Asgard/Schematics/AngleHeads/AH35-AD/images/AH35-AD_SCH-page-001.png` },
-    preview: `${_BASE}brands/Asgard/Schematics/AngleHeads/AH35-AD/images/AH35-AD_preview.jpg`,
+    pages: { 1: `${_BASE}brands/Asgard/Schematics/AngleHeads/AH35-AD/images/AH35-AD_SCH-page-001.webp` },
+    preview: `${_BASE}brands/Asgard/Schematics/AngleHeads/AH35-AD/images/AH35-AD_preview.webp`,
   },
   'asgard-ca08-ad': {
-    pages: { 1: `${_BASE}brands/Asgard/Schematics/AngleHeads/CA08-AD/images/CA08-AD_SCH-page-001.png` },
-    preview: `${_BASE}brands/Asgard/Schematics/AngleHeads/CA08-AD/images/CA08-AD_preview.jpg`,
+    pages: { 1: `${_BASE}brands/Asgard/Schematics/AngleHeads/CA08-AD/images/CA08-AD_SCH-page-001.webp` },
+    preview: `${_BASE}brands/Asgard/Schematics/AngleHeads/CA08-AD/images/CA08-AD_preview.webp`,
   },
   'asgard-cfa-ad': {
-    pages: { 1: `${_BASE}brands/Asgard/Schematics/AngleHeads/CFA-AD/images/CFA-AD_SCH-page-001.png` },
-    preview: `${_BASE}brands/Asgard/Schematics/AngleHeads/CFA-AD/images/CFA-AD_preview.jpg`,
+    pages: { 1: `${_BASE}brands/Asgard/Schematics/AngleHeads/CFA-AD/images/CFA-AD_SCH-page-001.webp` },
+    preview: `${_BASE}brands/Asgard/Schematics/AngleHeads/CFA-AD/images/CFA-AD_preview.webp`,
   },
   'asgard-ehc07-ad': {
-    pages: { 1: `${_BASE}brands/Asgard/Schematics/FinishingBoxes/EHC07-AD/images/EHC07-AD_SCH-page-001.png` },
-    preview: `${_BASE}brands/Asgard/Schematics/FinishingBoxes/EHC07-AD/images/EHC07-AD_preview.jpg`,
+    pages: { 1: `${_BASE}brands/Asgard/Schematics/FinishingBoxes/EHC07-AD/images/EHC07-AD_SCH-page-001.webp` },
+    preview: `${_BASE}brands/Asgard/Schematics/FinishingBoxes/EHC07-AD/images/EHC07-AD_preview.webp`,
   },
   'asgard-ehc10-ad': {
-    pages: { 1: `${_BASE}brands/Asgard/Schematics/FinishingBoxes/EHC10-AD/images/EHC10-AD_SCH-page-001.png` },
-    preview: `${_BASE}brands/Asgard/Schematics/FinishingBoxes/EHC10-AD/images/EHC10-AD_preview.jpg`,
+    pages: { 1: `${_BASE}brands/Asgard/Schematics/FinishingBoxes/EHC10-AD/images/EHC10-AD_SCH-page-001.webp` },
+    preview: `${_BASE}brands/Asgard/Schematics/FinishingBoxes/EHC10-AD/images/EHC10-AD_preview.webp`,
   },
   'asgard-ehc12-ad': {
-    pages: { 1: `${_BASE}brands/Asgard/Schematics/FinishingBoxes/EHC12-AD/images/EHC12-AD_SCH-page-001.png` },
-    preview: `${_BASE}brands/Asgard/Schematics/FinishingBoxes/EHC12-AD/images/EHC12-AD_preview.jpg`,
+    pages: { 1: `${_BASE}brands/Asgard/Schematics/FinishingBoxes/EHC12-AD/images/EHC12-AD_SCH-page-001.webp` },
+    preview: `${_BASE}brands/Asgard/Schematics/FinishingBoxes/EHC12-AD/images/EHC12-AD_preview.webp`,
   },
   'asgard-ez07-ad': {
-    pages: { 1: `${_BASE}brands/Asgard/Schematics/FinishingBoxes/EZ07-AD/images/EZ07-AD_SCH-page-001.png` },
-    preview: `${_BASE}brands/Asgard/Schematics/FinishingBoxes/EZ07-AD/images/EZ07-AD_preview.jpg`,
+    pages: { 1: `${_BASE}brands/Asgard/Schematics/FinishingBoxes/EZ07-AD/images/EZ07-AD_SCH-page-001.webp` },
+    preview: `${_BASE}brands/Asgard/Schematics/FinishingBoxes/EZ07-AD/images/EZ07-AD_preview.webp`,
   },
   'asgard-ez10-ad': {
-    pages: { 1: `${_BASE}brands/Asgard/Schematics/FinishingBoxes/EZ10-AD/images/EZ10-AD_SCH-page-001.png` },
-    preview: `${_BASE}brands/Asgard/Schematics/FinishingBoxes/EZ10-AD/images/EZ10-AD_preview.jpg`,
+    pages: { 1: `${_BASE}brands/Asgard/Schematics/FinishingBoxes/EZ10-AD/images/EZ10-AD_SCH-page-001.webp` },
+    preview: `${_BASE}brands/Asgard/Schematics/FinishingBoxes/EZ10-AD/images/EZ10-AD_preview.webp`,
   },
   'asgard-ez12-ad': {
-    pages: { 1: `${_BASE}brands/Asgard/Schematics/FinishingBoxes/EZ12-AD/images/EZ12-AD_SCH-page-001.png` },
-    preview: `${_BASE}brands/Asgard/Schematics/FinishingBoxes/EZ12-AD/images/EZ12-AD_preview.jpg`,
+    pages: { 1: `${_BASE}brands/Asgard/Schematics/FinishingBoxes/EZ12-AD/images/EZ12-AD_SCH-page-001.webp` },
+    preview: `${_BASE}brands/Asgard/Schematics/FinishingBoxes/EZ12-AD/images/EZ12-AD_preview.webp`,
   },
   'asgard-pa07-ad': {
-    pages: { 1: `${_BASE}brands/Asgard/Schematics/FinishingBoxes/PA07-AD/images/PA07-AD_SCH-page-001.png` },
-    preview: `${_BASE}brands/Asgard/Schematics/FinishingBoxes/PA07-AD/images/PA07-AD_preview.jpg`,
+    pages: { 1: `${_BASE}brands/Asgard/Schematics/FinishingBoxes/PA07-AD/images/PA07-AD_SCH-page-001.webp` },
+    preview: `${_BASE}brands/Asgard/Schematics/FinishingBoxes/PA07-AD/images/PA07-AD_preview.webp`,
   },
   'asgard-pa10-ad': {
-    pages: { 1: `${_BASE}brands/Asgard/Schematics/FinishingBoxes/PA10-AD/images/PA10-AD_SCH-page-001.png` },
-    preview: `${_BASE}brands/Asgard/Schematics/FinishingBoxes/PA10-AD/images/PA10-AD_preview.jpg`,
+    pages: { 1: `${_BASE}brands/Asgard/Schematics/FinishingBoxes/PA10-AD/images/PA10-AD_SCH-page-001.webp` },
+    preview: `${_BASE}brands/Asgard/Schematics/FinishingBoxes/PA10-AD/images/PA10-AD_preview.webp`,
   },
   'asgard-pa12-ad': {
-    pages: { 1: `${_BASE}brands/Asgard/Schematics/FinishingBoxes/PA12-AD/images/PA12-AD_SCH-page-001.png` },
-    preview: `${_BASE}brands/Asgard/Schematics/FinishingBoxes/PA12-AD/images/PA12-AD_preview.jpg`,
+    pages: { 1: `${_BASE}brands/Asgard/Schematics/FinishingBoxes/PA12-AD/images/PA12-AD_SCH-page-001.webp` },
+    preview: `${_BASE}brands/Asgard/Schematics/FinishingBoxes/PA12-AD/images/PA12-AD_preview.webp`,
   },
   'asgard-bbh-ad': {
-    pages: { 1: `${_BASE}brands/Asgard/Schematics/Handles/BBH-AD/images/BBH-AD_SCH-page-001.png` },
-    preview: `${_BASE}brands/Asgard/Schematics/Handles/BBH-AD/images/BBH-AD_preview.jpg`,
+    pages: { 1: `${_BASE}brands/Asgard/Schematics/Handles/BBH-AD/images/BBH-AD_SCH-page-001.webp` },
+    preview: `${_BASE}brands/Asgard/Schematics/Handles/BBH-AD/images/BBH-AD_preview.webp`,
   },
   'asgard-bbhe-ad': {
     pages: {
-      1: `${_BASE}brands/Asgard/Schematics/Handles/BBHE-AD/images/BBHE-AD_SCH-page-001.png`,
-      2: `${_BASE}brands/Asgard/Schematics/Handles/BBHE-AD/images/BBHE-AD_SCH-page-002.png`,
+      1: `${_BASE}brands/Asgard/Schematics/Handles/BBHE-AD/images/BBHE-AD_SCH-page-001.webp`,
+      2: `${_BASE}brands/Asgard/Schematics/Handles/BBHE-AD/images/BBHE-AD_SCH-page-002.webp`,
     },
-    preview: `${_BASE}brands/Asgard/Schematics/Handles/BBHE-AD/images/BBHE-AD_preview.jpg`,
+    preview: `${_BASE}brands/Asgard/Schematics/Handles/BBHE-AD/images/BBHE-AD_preview.webp`,
   },
   'asgard-fbhe-ad': {
     pages: {
-      1: `${_BASE}brands/Asgard/Schematics/Handles/FBHE-AD/images/FBHE-AD_SCH-page-001.png`,
-      2: `${_BASE}brands/Asgard/Schematics/Handles/FBHE-AD/images/FBHE-AD_SCH-page-002.png`,
+      1: `${_BASE}brands/Asgard/Schematics/Handles/FBHE-AD/images/FBHE-AD_SCH-page-001.webp`,
+      2: `${_BASE}brands/Asgard/Schematics/Handles/FBHE-AD/images/FBHE-AD_SCH-page-002.webp`,
     },
-    preview: `${_BASE}brands/Asgard/Schematics/Handles/FBHE-AD/images/FBHE-AD_preview.jpg`,
+    preview: `${_BASE}brands/Asgard/Schematics/Handles/FBHE-AD/images/FBHE-AD_preview.webp`,
   },
   'asgard-fh-ad': {
-    pages: { 1: `${_BASE}brands/Asgard/Schematics/Handles/FH-AD/images/FH-AD_SCH-page-001.png` },
-    preview: `${_BASE}brands/Asgard/Schematics/Handles/FH-AD/images/FH-AD_preview.jpg`,
+    pages: { 1: `${_BASE}brands/Asgard/Schematics/Handles/FH-AD/images/FH-AD_SCH-page-001.webp` },
+    preview: `${_BASE}brands/Asgard/Schematics/Handles/FH-AD/images/FH-AD_preview.webp`,
   },
   'asgard-xh-ad': {
-    pages: { 1: `${_BASE}brands/Asgard/Schematics/Handles/XH-AD/images/XH-AD_SCH-page-001.png` },
-    preview: `${_BASE}brands/Asgard/Schematics/Handles/XH-AD/images/XH-AD_preview.jpg`,
+    pages: { 1: `${_BASE}brands/Asgard/Schematics/Handles/XH-AD/images/XH-AD_SCH-page-001.webp` },
+    preview: `${_BASE}brands/Asgard/Schematics/Handles/XH-AD/images/XH-AD_preview.webp`,
   },
   'asgard-gn01-ad': {
-    pages: { 1: `${_BASE}brands/Asgard/Schematics/Other/GN01-AD/images/GN01-AD_SCH-page-001.png` },
-    preview: `${_BASE}brands/Asgard/Schematics/Other/GN01-AD/images/GN01-AD_preview.jpg`,
+    pages: { 1: `${_BASE}brands/Asgard/Schematics/Other/GN01-AD/images/GN01-AD_SCH-page-001.webp` },
+    preview: `${_BASE}brands/Asgard/Schematics/Other/GN01-AD/images/GN01-AD_preview.webp`,
   },
   'asgard-lp01-ad': {
-    pages: { 1: `${_BASE}brands/Asgard/Schematics/Pumps/LP01-AD/images/LP01-AD_SCH-page-001.png` },
-    preview: `${_BASE}brands/Asgard/Schematics/Pumps/LP01-AD/images/LP01-AD_preview.jpg`,
+    pages: { 1: `${_BASE}brands/Asgard/Schematics/Pumps/LP01-AD/images/LP01-AD_SCH-page-001.webp` },
+    preview: `${_BASE}brands/Asgard/Schematics/Pumps/LP01-AD/images/LP01-AD_preview.webp`,
   },
   'asgard-cr01-ad': {
-    pages: { 1: `${_BASE}brands/Asgard/Schematics/Rollers/CR01-AD/images/CR01-AD_SCH-page-001.png` },
-    preview: `${_BASE}brands/Asgard/Schematics/Rollers/CR01-AD/images/CR01-AD_preview.jpg`,
+    pages: { 1: `${_BASE}brands/Asgard/Schematics/Rollers/CR01-AD/images/CR01-AD_SCH-page-001.webp` },
+    preview: `${_BASE}brands/Asgard/Schematics/Rollers/CR01-AD/images/CR01-AD_preview.webp`,
   },
   'asgard-ns03-ad': {
     pages: {
-      1: `${_BASE}brands/Asgard/Schematics/Spotters/NS03-AD/images/NS03-AD_SCH-page-001.png`,
-      2: `${_BASE}brands/Asgard/Schematics/Spotters/NS03-AD/images/NS03-AD_SCH-page-002.png`,
+      1: `${_BASE}brands/Asgard/Schematics/Spotters/NS03-AD/images/NS03-AD_SCH-page-001.webp`,
     },
-    preview: `${_BASE}brands/Asgard/Schematics/Spotters/NS03-AD/images/NS03-AD_preview.jpg`,
+    preview: `${_BASE}brands/Asgard/Schematics/Spotters/NS03-AD/images/NS03-AD_preview.webp`,
   },
   'asgard-at01-ad': {
     pages: {
-      1:  `${_BASE}brands/Asgard/Schematics/Tapers/AT01-AD/images/AT01-AD_SCH-page-001.png`,
-      2:  `${_BASE}brands/Asgard/Schematics/Tapers/AT01-AD/images/AT01-AD_SCH-page-002.png`,
-      3:  `${_BASE}brands/Asgard/Schematics/Tapers/AT01-AD/images/AT01-AD_SCH-page-003.png`,
-      4:  `${_BASE}brands/Asgard/Schematics/Tapers/AT01-AD/images/AT01-AD_SCH-page-004.png`,
-      5:  `${_BASE}brands/Asgard/Schematics/Tapers/AT01-AD/images/AT01-AD_SCH-page-005.png`,
-      6:  `${_BASE}brands/Asgard/Schematics/Tapers/AT01-AD/images/AT01-AD_SCH-page-006.png`,
-      7:  `${_BASE}brands/Asgard/Schematics/Tapers/AT01-AD/images/AT01-AD_SCH-page-007.png`,
-      8:  `${_BASE}brands/Asgard/Schematics/Tapers/AT01-AD/images/AT01-AD_SCH-page-008.png`,
-      9:  `${_BASE}brands/Asgard/Schematics/Tapers/AT01-AD/images/AT01-AD_SCH-page-009.png`,
-      10: `${_BASE}brands/Asgard/Schematics/Tapers/AT01-AD/images/AT01-AD_SCH-page-010.png`,
-      11: `${_BASE}brands/Asgard/Schematics/Tapers/AT01-AD/images/AT01-AD_SCH-page-011.png`,
-      12: `${_BASE}brands/Asgard/Schematics/Tapers/AT01-AD/images/AT01-AD_SCH-page-012.png`,
+      1:  `${_BASE}brands/Asgard/Schematics/Tapers/AT01-AD/images/AT01-AD_SCH-page-001.webp`,
+      2:  `${_BASE}brands/Asgard/Schematics/Tapers/AT01-AD/images/AT01-AD_SCH-page-002.webp`,
+      3:  `${_BASE}brands/Asgard/Schematics/Tapers/AT01-AD/images/AT01-AD_SCH-page-003.webp`,
+      4:  `${_BASE}brands/Asgard/Schematics/Tapers/AT01-AD/images/AT01-AD_SCH-page-004.webp`,
+      5:  `${_BASE}brands/Asgard/Schematics/Tapers/AT01-AD/images/AT01-AD_SCH-page-005.webp`,
+      6:  `${_BASE}brands/Asgard/Schematics/Tapers/AT01-AD/images/AT01-AD_SCH-page-006.webp`,
+      7:  `${_BASE}brands/Asgard/Schematics/Tapers/AT01-AD/images/AT01-AD_SCH-page-007.webp`,
+      8:  `${_BASE}brands/Asgard/Schematics/Tapers/AT01-AD/images/AT01-AD_SCH-page-008.webp`,
+      9:  `${_BASE}brands/Asgard/Schematics/Tapers/AT01-AD/images/AT01-AD_SCH-page-009.webp`,
+      10: `${_BASE}brands/Asgard/Schematics/Tapers/AT01-AD/images/AT01-AD_SCH-page-010.webp`,
+      11: `${_BASE}brands/Asgard/Schematics/Tapers/AT01-AD/images/AT01-AD_SCH-page-011.webp`,
+      12: `${_BASE}brands/Asgard/Schematics/Tapers/AT01-AD/images/AT01-AD_SCH-page-012.webp`,
     },
-    preview: `${_BASE}brands/Asgard/Schematics/Tapers/AT01-AD/images/AT01-AD_preview.jpg`,
+    preview: `${_BASE}brands/Asgard/Schematics/Tapers/AT01-AD/images/AT01-AD_preview.webp`,
   },
 
   // ── Level5 ────────────────────────────────────────────────────────────────
   'level5-corner-roller-4-707': {
-    pages:   { 1: `${_BASE}brands/Level5/Schematics/CornerRollers/Corner-Roller/Corner-Roller-4-707-page-001.png` },
-    preview: `${_BASE}brands/Level5/Schematics/CornerRollers/Corner-Roller/corner-roller.png`,
+    pages:   { 1: `${_BASE}brands/Level5/Schematics/CornerRollers/Corner-Roller/4-707_SCH-page-001.webp` },
+    preview: `${_BASE}brands/Level5/Schematics/CornerRollers/Corner-Roller/4-707_preview.webp`,
   },
   'level5-9333-cutter-chain-assembly': {
-    pages:   { 1: `${_BASE}brands/Level5/Schematics/AutomaticTapers/Cutter-Chain-Assembly/9333-Cutter-Chain-Assembly-enhanced.png` },
-    preview: `${_BASE}brands/Level5/Schematics/AutomaticTapers/Cutter-Chain-Assembly/9333-Cutter-Chain-Assembly-enhanced.png`,
+    pages:   { 1: `${_BASE}brands/Level5/Schematics/AutomaticTapers/Cutter-Chain-Assembly/9333_SCH-page-001.webp` },
+    preview: `${_BASE}brands/Level5/Schematics/AutomaticTapers/Cutter-Chain-Assembly/9333_SCH-page-001.webp`,
   },
   'level5-7097-drive-dog-assembly': {
-    pages:   { 1: `${_BASE}brands/Level5/Schematics/AutomaticTapers/Drive-Dog-Assembly/7097-Drive-Dog-Assembly-enhanced.png` },
-    preview: `${_BASE}brands/Level5/Schematics/AutomaticTapers/Drive-Dog-Assembly/7097-Drive-Dog-Assembly-enhanced.png`,
+    pages:   { 1: `${_BASE}brands/Level5/Schematics/AutomaticTapers/Drive-Dog-Assembly/7097_SCH-page-001.webp` },
+    preview: `${_BASE}brands/Level5/Schematics/AutomaticTapers/Drive-Dog-Assembly/7097_SCH-page-001.webp`,
   },
   'level5-7293-gooser-assembly': {
-    pages:   { 1: `${_BASE}brands/Level5/Schematics/AutomaticTapers/Gooser-Assembly/7293-Gooser-Assembly-enhanced.png` },
-    preview: `${_BASE}brands/Level5/Schematics/AutomaticTapers/Gooser-Assembly/7293-Gooser-Assembly-enhanced.png`,
+    pages:   { 1: `${_BASE}brands/Level5/Schematics/AutomaticTapers/Gooser-Assembly/7293_SCH-page-001.webp` },
+    preview: `${_BASE}brands/Level5/Schematics/AutomaticTapers/Gooser-Assembly/7293_SCH-page-001.webp`,
   },
   'level5-7218-taper-wheel-assembly': {
-    pages:   { 1: `${_BASE}brands/Level5/Schematics/AutomaticTapers/Taper-Wheel-Assembly/7218-Taper-Wheel-Assembly-enhanced.png` },
-    preview: `${_BASE}brands/Level5/Schematics/AutomaticTapers/Taper-Wheel-Assembly/7218-Taper-Wheel-Assembly-enhanced.png`,
+    pages:   { 1: `${_BASE}brands/Level5/Schematics/AutomaticTapers/Taper-Wheel-Assembly/7218_SCH-page-001.webp` },
+    preview: `${_BASE}brands/Level5/Schematics/AutomaticTapers/Taper-Wheel-Assembly/7218_SCH-page-001.webp`,
   },
   'level5-7377-cover-plate-assembly-old-style': {
-    pages:   { 1: `${_BASE}brands/Level5/Schematics/AutomaticTapers/Cover-Plate-Assembly/7377-Cover-Plate-AssemblyOld-Style-enhanced.png` },
-    preview: `${_BASE}brands/Level5/Schematics/AutomaticTapers/Cover-Plate-Assembly/7377-Cover-Plate-AssemblyOld-Style-enhanced.png`,
+    pages:   { 1: `${_BASE}brands/Level5/Schematics/AutomaticTapers/Cover-Plate-Assembly/7377_SCH-page-001.webp` },
+    preview: `${_BASE}brands/Level5/Schematics/AutomaticTapers/Cover-Plate-Assembly/7377_SCH-page-001.webp`,
   },
   'level5-4-734-3-5-corner-finisher': {
-    pages:   { 1: `${_BASE}brands/Level5/Schematics/CornerFinishers/3.5-inch-Corner-Finisher/4-734-3.5-Corner-Finisher-enhanced.png` },
-    preview: `${_BASE}brands/Level5/Schematics/CornerFinishers/3.5-inch-Corner-Finisher/4-734-3.5-Corner-Finisher-enhanced.png`,
+    pages:   { 1: `${_BASE}brands/Level5/Schematics/CornerFinishers/3.5-inch-Corner-Finisher/4-734_SCH-page-001.webp` },
+    preview: `${_BASE}brands/Level5/Schematics/CornerFinishers/3.5-inch-Corner-Finisher/4-734_SCH-page-001.webp`,
   },
   'level5-7-inch-flat-box-4-764': {
-    pages:   { 1: `${_BASE}brands/Level5/Schematics/FinishingBoxes/7-inch-Flat-Box/7-inch-Flat-Box-4-764-enhanced.png` },
-    preview: `${_BASE}brands/Level5/Schematics/FinishingBoxes/7-inch-Flat-Box/7-inch-Flat-Box-4-764-enhanced.png`,
+    pages:   { 1: `${_BASE}brands/Level5/Schematics/FinishingBoxes/7-inch-Flat-Box/4-764_SCH-page-001.webp` },
+    preview: `${_BASE}brands/Level5/Schematics/FinishingBoxes/7-inch-Flat-Box/4-764_SCH-page-001.webp`,
   },
   'level5-7-inch-mega-flat-box-4-767': {
-    pages:   { 1: `${_BASE}brands/Level5/Schematics/FinishingBoxes/7-inch-Mega-Flat-Box/7-inch-Mega-Flat-Box-4-767-enhanced.png` },
-    preview: `${_BASE}brands/Level5/Schematics/FinishingBoxes/7-inch-Mega-Flat-Box/7-inch-Mega-Flat-Box-4-767-enhanced.png`,
+    pages:   { 1: `${_BASE}brands/Level5/Schematics/FinishingBoxes/7-inch-Mega-Flat-Box/4-767_SCH-page-001.webp` },
+    preview: `${_BASE}brands/Level5/Schematics/FinishingBoxes/7-inch-Mega-Flat-Box/4-767_SCH-page-001.webp`,
   },
   'level5-10-inch-flat-box-4-765': {
-    pages:   { 1: `${_BASE}brands/Level5/Schematics/FinishingBoxes/10-inch-Flat-Box/10-inch-Flat-Box-4-765-enhanced.png` },
-    preview: `${_BASE}brands/Level5/Schematics/FinishingBoxes/10-inch-Flat-Box/10-inch-Flat-Box-4-765-enhanced.png`,
+    pages:   { 1: `${_BASE}brands/Level5/Schematics/FinishingBoxes/10-inch-Flat-Box/4-765_SCH-page-001.webp` },
+    preview: `${_BASE}brands/Level5/Schematics/FinishingBoxes/10-inch-Flat-Box/4-765_SCH-page-001.webp`,
   },
   'level5-10-inch-mega-flat-box-4-768': {
-    pages:   { 1: `${_BASE}brands/Level5/Schematics/FinishingBoxes/10-inch-Mega-Flat-Box/10-inch-Mega-Flat-Box-4-768-enhanced.png` },
-    preview: `${_BASE}brands/Level5/Schematics/FinishingBoxes/10-inch-Mega-Flat-Box/10-inch-Mega-Flat-Box-4-768-enhanced.png`,
+    pages:   { 1: `${_BASE}brands/Level5/Schematics/FinishingBoxes/10-inch-Mega-Flat-Box/4-768_SCH-page-001.webp` },
+    preview: `${_BASE}brands/Level5/Schematics/FinishingBoxes/10-inch-Mega-Flat-Box/4-768_SCH-page-001.webp`,
   },
   'level5-12-inch-flat-box-4-766': {
-    pages:   { 1: `${_BASE}brands/Level5/Schematics/FinishingBoxes/12-inch-Flat-Box/12-inch-Flat-Box-4-766-enhanced.png` },
-    preview: `${_BASE}brands/Level5/Schematics/FinishingBoxes/12-inch-Flat-Box/12-inch-Flat-Box-4-766-enhanced.png`,
+    pages:   { 1: `${_BASE}brands/Level5/Schematics/FinishingBoxes/12-inch-Flat-Box/4-766_SCH-page-001.webp` },
+    preview: `${_BASE}brands/Level5/Schematics/FinishingBoxes/12-inch-Flat-Box/4-766_SCH-page-001.webp`,
   },
   'level5-12-inch-mega-box-4-769': {
-    pages:   { 1: `${_BASE}brands/Level5/Schematics/FinishingBoxes/12-inch-Mega-Box/12-inch-Mega-Box-4-769-enhanced.png` },
-    preview: `${_BASE}brands/Level5/Schematics/FinishingBoxes/12-inch-Mega-Box/12-inch-Mega-Box-4-769-enhanced.png`,
+    pages:   { 1: `${_BASE}brands/Level5/Schematics/FinishingBoxes/12-inch-Mega-Box/4-769_SCH-page-001.webp` },
+    preview: `${_BASE}brands/Level5/Schematics/FinishingBoxes/12-inch-Mega-Box/4-769_SCH-page-001.webp`,
   },
   // 14" Flat Box has no static image yet; entry kept for WP Media Library pickup
   'level5-14-inch-flat-box-4-770': {
@@ -458,8 +466,22 @@ const _fallbacks = {
     preview: undefined,
   },
   'level5-compound-pump-4-771': {
-    pages:   { 1: `${_BASE}brands/Level5/Schematics/Pumps/Compound-Pump/Compound-Pump-4-771-enhanced.png` },
-    preview: `${_BASE}brands/Level5/Schematics/Pumps/Compound-Pump/Compound-Pump-4-771-enhanced.png`,
+    pages:   { 1: `${_BASE}brands/Level5/Schematics/Pumps/Compound-Pump/4-771_SCH-page-001.webp` },
+    preview: `${_BASE}brands/Level5/Schematics/Pumps/Compound-Pump/4-771_SCH-page-001.webp`,
+  },
+
+  // ── Platinum ──────────────────────────────────────────────────────────────
+  'platinum-compound-pump': {
+    pages:   { 1: `${_BASE}brands/Platinum/Schematics/CompoundPump/PT-Compound-Pump-page-001.webp` },
+    preview: `${_BASE}brands/Platinum/Schematics/CompoundPump/PT-Compound-Pump-preview.webp`,
+  },
+  'platinum-flat-box': {
+    pages:   { 1: `${_BASE}brands/Platinum/Schematics/FlatBox/Platinum_Flat_Box-page-001.webp` },
+    preview: `${_BASE}brands/Platinum/Schematics/FlatBox/Platinum_Flat_Box-preview.webp`,
+  },
+  'platinum-outside-corner-roller': {
+    pages:   { 1: `${_BASE}brands/Platinum/Schematics/OutsideCornerRoller/platinum_outside_cornerroller-page-001.webp` },
+    preview: `${_BASE}brands/Platinum/Schematics/OutsideCornerRoller/platinum_outside_cornerroller_preview.webp`,
   },
 };
 
@@ -472,6 +494,7 @@ const BRAND_TO_SLUG = {
   'Level5':                'level5',
   'SurPro':                'surpro',
   'Graco':                 'graco',
+  'Platinum':              'platinum',
 };
 const SLUG_TO_BRAND = Object.fromEntries(
   Object.entries(BRAND_TO_SLUG).map(([name, slug]) => [slug, name])
@@ -493,7 +516,8 @@ export default function Parts() {
     'Asgard',
     'Level5',
     'SurPro',
-    'Graco'
+    'Graco',
+    'Platinum',
   ];
 
   const location = useLocation();
@@ -534,6 +558,7 @@ export default function Parts() {
   // Schematic viewer state
   const [activeHotspot, setActiveHotspot] = useState(null);
   const [activeHotspotPart, setActiveHotspotPart] = useState(null);
+  const [hotspotStockStatus, setHotspotStockStatus] = useState(null); // 'instock' | 'outofstock' | null (loading)
   const [toast, setToast] = useState(null);
   const [brands, setBrands] = useState([]);
   const { addToCart } = useCart();
@@ -625,7 +650,6 @@ export default function Parts() {
         name: p.name,
         sku: p.sku || '',
         quantity: p.quantity || 1,
-        material: p.material || 'UNKNOWN',
         price: p.price || 0,
         position: { top, left },
         pageNumber,
@@ -723,6 +747,11 @@ export default function Parts() {
   const level512inMegaBoxParts         = buildPartsFromData(level512inMegaBoxData);
   const level514inFlatBoxParts         = buildPartsFromData(level514inFlatBoxData);
   const level5CompoundPumpParts        = buildPartsFromData(level5CompoundPumpData);
+
+  // Platinum parts arrays
+  const platinumCompoundPumpParts       = buildPartsFromData(platinumCompoundPumpData);
+  const platinumFlatBoxParts            = buildPartsFromData(platinumFlatBoxData);
+  const platinumOutsideCornerRollerParts = buildPartsFromData(platinumOutsideCornerRollerData);
 
   const schematics = [
     {
@@ -1607,6 +1636,41 @@ export default function Parts() {
       previewImage: schPrev('level5-compound-pump-4-771'),
       parts: level5CompoundPumpParts
     },
+
+    // ── Platinum ────────────────────────────────────────────────────────────
+    {
+      id: 'platinum-compound-pump',
+      title: 'Compound Pump',
+      description: 'Platinum Drywall Tools Compound Pump schematic diagram',
+      brand: 'Platinum',
+      category: 'Pumps',
+      diagramPages: [1],
+      imagePages: { 1: schImg('platinum-compound-pump', 1) },
+      previewImage: schPrev('platinum-compound-pump'),
+      parts: platinumCompoundPumpParts,
+    },
+    {
+      id: 'platinum-flat-box',
+      title: 'Flat Box',
+      description: 'Platinum Drywall Tools Flat Box schematic diagram',
+      brand: 'Platinum',
+      category: 'Finishing Boxes',
+      diagramPages: [1],
+      imagePages: { 1: schImg('platinum-flat-box', 1) },
+      previewImage: schPrev('platinum-flat-box'),
+      parts: platinumFlatBoxParts,
+    },
+    {
+      id: 'platinum-outside-corner-roller',
+      title: 'Outside Corner Roller',
+      description: 'Platinum Drywall Tools Outside Corner Roller schematic diagram',
+      brand: 'Platinum',
+      category: 'Corner Rollers',
+      diagramPages: [1],
+      imagePages: { 1: schImg('platinum-outside-corner-roller', 1) },
+      previewImage: schPrev('platinum-outside-corner-roller'),
+      parts: platinumOutsideCornerRollerParts,
+    },
   ];
 
   // Filter schematics to only include tools from allowed brands
@@ -1688,7 +1752,24 @@ export default function Parts() {
     setActiveHotspotPart(null);
   };
 
-  // Reset zoom/pan when schematic changes
+  // Fetch live WooCommerce stock status whenever a hotspot is opened.
+  // Runs in the background — UI shows a loading state until resolved.
+  useEffect(() => {
+    if (!activeHotspotPart?.sku) {
+      setHotspotStockStatus(null);
+      return;
+    }
+    let cancelled = false;
+    setHotspotStockStatus(null); // reset to loading while fetching
+    getProductBySku(activeHotspotPart.sku).then((wc) => {
+      if (!cancelled) {
+        setHotspotStockStatus(wc ? (wc.stock_status || 'instock') : 'unknown');
+      }
+    }).catch(() => {
+      if (!cancelled) setHotspotStockStatus('unknown');
+    });
+    return () => { cancelled = true; };
+  }, [activeHotspotPart]);
     useEffect(() => {
       const t = setTimeout(() => {
         setScale(1);
@@ -2124,7 +2205,7 @@ export default function Parts() {
 
           {/* Schematic Container Wrapper - Allows flex growth with responsive sizing */}
           <div style={{
-            maxWidth: isFullscreen ? '100%' : 'clamp(600px, 95vw, 1400px)',
+            maxWidth: isFullscreen ? '100%' : 'clamp(500px, 75vw, 960px)',
             margin: '0 auto',
             padding: isFullscreen ? '0' : 'clamp(12px, 2vw, 20px)',
             width: '100%',
@@ -2361,8 +2442,22 @@ export default function Parts() {
                       {part.name}
                     </h4>
                     <div className="part-meta">
-                      SKU: {part.sku} | {part.material}
+                      SKU: {part.sku}
                       {part.quantity > 1 && ` | Qty: ${part.quantity}`}
+                      {activeHotspot === part.id && (
+                        <span style={{
+                          marginLeft: '6px',
+                          fontWeight: 700,
+                          color: hotspotStockStatus === 'instock' ? '#16a34a'
+                               : hotspotStockStatus === 'outofstock' ? '#dc2626'
+                               : '#6b7280',
+                        }}>
+                          {hotspotStockStatus === 'instock' ? '● In Stock'
+                         : hotspotStockStatus === 'outofstock' ? '● Out of Stock'
+                         : hotspotStockStatus === 'unknown' ? '● Unavailable'
+                         : '…'}
+                        </span>
+                      )}
                     </div>
                     <div style={{
                       display: 'flex',
@@ -2495,8 +2590,20 @@ export default function Parts() {
               {activeHotspotPart.name}
             </h4>
             <div className="part-meta" style={{ marginBottom: '14px', fontSize: '0.78rem' }}>
-              SKU: {activeHotspotPart.sku} | {activeHotspotPart.material}
+              SKU: {activeHotspotPart.sku}
               {activeHotspotPart.quantity > 1 && ` | Qty: ${activeHotspotPart.quantity}`}
+              <span style={{
+                marginLeft: '6px',
+                fontWeight: 700,
+                color: hotspotStockStatus === 'instock' ? '#16a34a'
+                     : hotspotStockStatus === 'outofstock' ? '#dc2626'
+                     : '#6b7280',
+              }}>
+                {hotspotStockStatus === 'instock' ? '● In Stock'
+               : hotspotStockStatus === 'outofstock' ? '● Out of Stock'
+               : hotspotStockStatus === 'unknown' ? '● Unavailable'
+               : '…'}
+              </span>
             </div>
             <div style={{
               display: 'flex',

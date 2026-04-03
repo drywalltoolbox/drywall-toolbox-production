@@ -21,6 +21,7 @@ import surproLogo from '/brands/SurPro/surpro_logo.svg';
 import asgardLogo from '/brands/Asgard/asgard_logo.svg';
 import gracoLogo from '/brands/Graco/graco_logo.svg';
 import level5Logo from '/brands/Level5/Level5.svg';
+import platinumLogo from '/brands/Platinum/platinum_logo.svg';
 
 // products will be loaded from CSV at runtime
 // brands list will be derived from loaded products
@@ -39,7 +40,8 @@ const ALLOWED_BRANDS = [
   'Asgard',
   'Level5',
   'SurPro',
-  'Graco'
+  'Graco',
+  'Platinum'
 ];
 
 const MAX_PRICE = 3000;
@@ -54,6 +56,7 @@ const BRAND_TO_SLUG = {
   'Level5':                'level5',
   'SurPro':                'surpro',
   'Graco':                 'graco',
+  'Platinum':              'platinum',
 };
 const SLUG_TO_BRAND = Object.fromEntries(
   Object.entries(BRAND_TO_SLUG).map(([name, slug]) => [slug, name])
@@ -66,6 +69,7 @@ const brandLogos = {
   'Asgard': asgardLogo,
   'Graco': gracoLogo,
   'Level5': level5Logo,
+  'Platinum': platinumLogo,
 };
 
 export default function Products() {
@@ -147,9 +151,14 @@ export default function Products() {
     getProducts().then(list => {
       if (!mounted) return;
       setProducts(list);
-      const unique = Array.from(new Set(list.map(p => p.brand).filter(Boolean))).sort();
-      const filteredBrands = unique.filter(brand => ALLOWED_BRANDS.includes(brand));
-      setBrands(filteredBrands);
+      // Always show every ALLOWED_BRAND in the selector regardless of whether
+      // the catalog has products for it yet (e.g. Platinum has no CSV rows).
+      // Brands that DO appear in the catalog are sorted alphabetically first;
+      // any catalog-absent brands are appended in ALLOWED_BRANDS order.
+      const fromCatalog = Array.from(new Set(list.map(p => p.brand).filter(Boolean))).sort();
+      const inCatalog = fromCatalog.filter(b => ALLOWED_BRANDS.includes(b));
+      const notInCatalog = ALLOWED_BRANDS.filter(b => !inCatalog.includes(b));
+      setBrands([...inCatalog, ...notInCatalog]);
     }).catch(() => {});
     return () => { mounted = false; };
   }, []);
@@ -538,7 +547,7 @@ export default function Products() {
             style={{ zIndex: 10002, top: 'var(--header-height, 100px)' }}
           >
             <div
-              className="flex items-start justify-center min-h-full p-4 py-6"
+              className="flex items-start justify-center min-h-full px-3 py-4 sm:p-4 sm:py-6"
               onClick={closeModal}
             >
               <div

@@ -5,6 +5,7 @@ import columbiaLogo from '/brands/Columbia/columbia_taping_tools_logo.svg';
 import surproLogo from '/brands/SurPro/surpro_logo.svg';
 import asgardLogo from '/brands/Asgard/asgard_logo.svg';
 import gracoLogo from '/brands/Graco/graco_logo.svg';
+import platinumLogo from '/brands/Platinum/platinum_logo.svg';
 
 const trustBadges = [
   {
@@ -41,7 +42,8 @@ const brandLogos = [
   { name: 'Columbia', src: columbiaLogo },
   { name: 'SurPro', src: surproLogo },
   { name: 'Asgard', src: asgardLogo },
-  { name: 'Graco', src: gracoLogo }
+  { name: 'Graco', src: gracoLogo },
+  { name: 'Platinum', src: platinumLogo },
 ];
 
 export default function Home() {
@@ -154,8 +156,8 @@ export default function Home() {
                 src={brand.src}
                 alt={brand.name}
                 style={{ 
-                  height: brand.name === 'Columbia' ? 'clamp(60px, 10vw, 100px)' : brand.name === 'Asgard' || brand.name === 'Graco' ? 'clamp(32px, 5vw, 50px)' : 'clamp(24px, 4vw, 40px)',
-                  maxWidth: brand.name === 'Columbia' ? '300px' : brand.name === 'Asgard' || brand.name === 'Graco' ? '150px' : '120px',
+                  height: brand.name === 'Columbia' ? 'clamp(60px, 10vw, 100px)' : brand.name === 'Asgard' || brand.name === 'Graco' ? 'clamp(32px, 5vw, 50px)' : brand.name === 'Platinum' ? 'clamp(28px, 4.5vw, 44px)' : 'clamp(24px, 4vw, 40px)',
+                  maxWidth: brand.name === 'Columbia' ? '300px' : brand.name === 'Asgard' || brand.name === 'Graco' ? '150px' : brand.name === 'Platinum' ? '180px' : '120px',
                   objectFit: 'contain' 
                 }}
               />

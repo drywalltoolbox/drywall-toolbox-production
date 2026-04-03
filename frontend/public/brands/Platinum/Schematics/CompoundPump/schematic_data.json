@@ -1,0 +1,13 @@
+{
+  "id": "platinum-compound-pump",
+  "title": "PT-Compound-Pump_SCH",
+  "product_name": "Compound Pump",
+  "sku": "",
+  "diagramPages": [1],
+  "legendPages": [],
+  "parts": [],
+  "coordinates": {},
+  "schema_version": "1.0",
+  "image_natural_width": 1200,
+  "image_natural_height": 896
+}

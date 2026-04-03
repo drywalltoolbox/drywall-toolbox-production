@@ -54,7 +54,7 @@ export default function ProductDetail({ product, onAddToCart, onClose }) {
   const displayPrice = typeof price === 'number' ? price.toFixed(2) : parseFloat(price || 0).toFixed(2);
 
   return (
-    <div className="bg-white rounded-none sm:rounded-xl lg:rounded-2xl shadow-2xl overflow-visible animate-fadeIn w-full max-w-6xl mx-auto flex flex-col relative">
+    <div className="bg-white rounded-2xl sm:rounded-xl lg:rounded-2xl shadow-2xl overflow-visible animate-fadeIn w-full max-w-6xl mx-auto flex flex-col relative">
       {/* Close Button - Fixed Position at Top Right */}
       {onClose && (
         <button

@@ -25,6 +25,7 @@ import { ShoppingCart, Filter, Heart, Wrench } from 'lucide-react';
 import FilterPanel from '../components/FilterPanel';
 import { getProducts } from '../services/catalog';
 import { useCart } from '../context/CartContext';
+import LoadingSpinner from '../components/LoadingSpinner';
 
 // Brands that carry repair-kit / parts items in the catalog
 const PARTS_BRANDS = [
@@ -33,6 +34,7 @@ const PARTS_BRANDS = [
   'Asgard',
   'Level5',
   'Graco',
+  'Platinum',
 ];
 
 // Brand name ↔ URL slug maps so navigation produces readable URLs like
@@ -43,6 +45,7 @@ const BRAND_TO_SLUG = {
   'Asgard':                'asgard',
   'Level5':                'level5',
   'Graco':                 'graco',
+  'Platinum':              'platinum',
 };
 const SLUG_TO_BRAND = Object.fromEntries(
   Object.entries(BRAND_TO_SLUG).map(([name, slug]) => [slug, name])
@@ -88,8 +91,12 @@ export default function Parts() {
       if (!mounted) return;
       const parts = list.filter(p => p.is_parts);
       setAllParts(parts);
+      // Always show every PARTS_BRAND in the filter regardless of whether
+      // the catalog has parts for it yet (e.g. Platinum has no CSV rows).
       const unique = Array.from(new Set(parts.map(p => p.brand).filter(Boolean)));
-      setBrands(PARTS_BRANDS.filter(b => unique.includes(b)));
+      const inCatalog = PARTS_BRANDS.filter(b => unique.includes(b));
+      const notInCatalog = PARTS_BRANDS.filter(b => !unique.includes(b));
+      setBrands([...inCatalog, ...notInCatalog]);
       setLoading(false);
     }).catch(() => { if (mounted) setLoading(false); });
     return () => { mounted = false; };
@@ -221,7 +228,9 @@ export default function Parts() {
               <div className="flex items-center gap-3">
                 <SortDropdown value={sortBy} onChange={setSortBy} />
                 <span className="hidden sm:inline text-sm text-gray-500">
-                  {loading ? 'Loading…' : `${sorted.length.toLocaleString()} part${sorted.length !== 1 ? 's' : ''}`}
+                  {loading
+                    ? <LoadingSpinner size="sm" label="Loading parts" />
+                    : `${sorted.length.toLocaleString()} part${sorted.length !== 1 ? 's' : ''}`}
                 </span>
               </div>
 
@@ -390,7 +399,7 @@ export default function Parts() {
             style={{ zIndex: 10002, top: 'var(--header-height, 100px)' }}
           >
             <div
-              className="flex items-start justify-center min-h-full p-4 py-6"
+              className="flex items-start justify-center min-h-full px-3 py-4 sm:p-4 sm:py-6"
               onClick={closeModal}
             >
               <div

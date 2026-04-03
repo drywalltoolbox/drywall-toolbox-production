@@ -84,6 +84,11 @@ export const SCHEMATIC_DEFINITIONS = {
     { id: 'level5-12-inch-mega-box-4-769',                title: '12" Mega Box',                  category: 'Finishing Boxes'   },
     { id: 'level5-14-inch-flat-box-4-770',                title: '14" Flat Box',                  category: 'Finishing Boxes'   },
     { id: 'level5-compound-pump-4-771',                   title: 'Compound Pump',                 category: 'Pumps'             },
+  ],
+  'Platinum': [
+    { id: 'platinum-compound-pump',          title: 'Compound Pump',          category: 'Pumps'             },
+    { id: 'platinum-flat-box',               title: 'Flat Box',               category: 'Finishing Boxes'   },
+    { id: 'platinum-outside-corner-roller',  title: 'Outside Corner Roller',  category: 'Corner Rollers'    },
   ]
 };
 

@@ -1,6 +1,10 @@
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
 
+/* ── Global loading spinner keyframe ─────────────────────────────────── */
+@keyframes dtb-spin {
+  to { transform: rotate(360deg); }
+}
 @layer base {
   :root {
     --color-primary-50: #eff6ff;

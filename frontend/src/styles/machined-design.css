@@ -661,8 +661,6 @@ aside input[type="range"],
 
 .hotspot {
     position: absolute;
-    width: 24px;
-    height: 24px;
     background: transparent; /* Hidden by default */
     border-radius: 50%;
     cursor: pointer;
@@ -681,8 +679,6 @@ aside input[type="range"],
 
 .hotspot-rectangle {
     border-radius: 4px;
-    min-width: 30px;
-    min-height: 16px;
 }
 
 .hotspot-square {
@@ -692,13 +688,11 @@ aside input[type="range"],
 /* Enlarge hotspot on hover for easier clicking */
 .hotspot:hover {
     background: rgba(37, 99, 235, 0.08);
-    /* softer, tighter shadow to avoid the large spread effect */
     box-shadow: 0 4px 14px rgba(37, 99, 235, 0.06);
     transform: translate(-50%, -50%) scale(1.08);
 }
 
 .hotspot-circle:hover {
-    /* Prefer scale transform over abrupt width/height change for smoother animation */
     transform: translate(-50%, -50%) scale(1.12);
 }
 
@@ -1458,28 +1452,6 @@ aside input[type="range"],
         margin-bottom: 1.5rem;
     }
 
-    .hotspot {
-        width: 32px;
-        height: 32px;
-    }
-
-    .hotspot:hover {
-        transform: translate(-50%, -50%) scale(1.15);
-        background: rgba(37, 99, 235, 0.12);
-    }
-
-    /* Increase hotspot size on tablet for better touch targets */
-    @media (min-width: 768px) and (max-width: 1024px) {
-        .hotspot {
-            width: 40px;
-            height: 40px;
-        }
-
-        .hotspot:hover {
-            transform: translate(-50%, -50%) scale(1.2);
-        }
-    }
-
     /* === SPACING: Consistent padding throughout === */
     section {
         padding: 2.5rem 1.5rem;
@@ -1508,7 +1480,7 @@ aside input[type="range"],
     /* Hero section: improve desktop spacing and proportions */
     .home-hero-section {
         padding: clamp(2.5rem, 5vw, 4rem) clamp(1.5rem, 4vw, 2.5rem) clamp(2.5rem, 6vw, 4rem) !important;
-        min-height: 100vh;
+        min-height: auto;
     }
 
     .home-hero-grid {

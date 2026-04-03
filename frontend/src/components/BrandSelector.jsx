@@ -4,6 +4,7 @@ import surproLogo from '/brands/SurPro/surpro_logo.svg';
 import asgardLogo from '/brands/Asgard/asgard_logo.svg';
 import gracoLogo from '/brands/Graco/graco_logo.svg';
 import level5Logo from '/brands/Level5/Level5.svg';
+import platinumLogo from '/brands/Platinum/platinum_logo.svg';
 import SearchBar from './SearchBar';
 
 const brandLogos = {
@@ -13,6 +14,7 @@ const brandLogos = {
   'Asgard': asgardLogo,
   'Graco': gracoLogo,
   'Level5': level5Logo,
+  'Platinum': platinumLogo,
 };
 
 export default function BrandSelector({

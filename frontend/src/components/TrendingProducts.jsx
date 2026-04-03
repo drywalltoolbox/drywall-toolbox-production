@@ -6,6 +6,7 @@ import { ShoppingCart, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import Toast from './Toast';
 import ProductDetail from './ProductDetail';
+import LoadingSpinner from './LoadingSpinner';
 
 export default function TrendingProducts() {
   const [products, setProducts] = useState([]);
@@ -110,7 +111,7 @@ export default function TrendingProducts() {
         maxWidth: '1400px',
         margin: '0 auto'
       }}>
-        <div style={{ textAlign: 'center', padding: '40px' }}>Loading products...</div>
+        <LoadingSpinner fullPage={false} size="lg" label="Loading products" />
       </section>
     );
   }

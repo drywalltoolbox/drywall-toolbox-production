@@ -33,7 +33,8 @@ const ALLOWED_BRANDS = [
   'Asgard',
   'Level5',
   'SurPro',
-  'Graco'
+  'Graco',
+  'Platinum'
 ];
 
 const MAX_PRICE = 3000;
@@ -107,9 +108,12 @@ export default function AllProducts() {
     getProducts().then(list => {
       if (!mounted) return;
       setProducts(list);
-      const unique = Array.from(new Set(list.map(p => p.brand).filter(Boolean))).sort();
-      const filteredBrands = unique.filter(brand => ALLOWED_BRANDS.includes(brand));
-      setBrands(filteredBrands);
+      // Always show every ALLOWED_BRAND in the selector regardless of whether
+      // the catalog has products for it yet (e.g. Platinum has no CSV rows).
+      const fromCatalog = Array.from(new Set(list.map(p => p.brand).filter(Boolean))).sort();
+      const inCatalog = fromCatalog.filter(b => ALLOWED_BRANDS.includes(b));
+      const notInCatalog = ALLOWED_BRANDS.filter(b => !inCatalog.includes(b));
+      setBrands([...inCatalog, ...notInCatalog]);
     }).catch(() => {});
     return () => { mounted = false; };
   }, []);
@@ -382,7 +386,7 @@ export default function AllProducts() {
             style={{ zIndex: 10002, top: 'var(--header-height, 100px)' }}
           >
             <div
-              className="flex items-start justify-center min-h-full p-4 py-6"
+              className="flex items-start justify-center min-h-full px-3 py-4 sm:p-4 sm:py-6"
               onClick={closeModal}
             >
               <div
