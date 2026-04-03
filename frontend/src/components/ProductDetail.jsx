@@ -11,7 +11,7 @@ import tapeTechLogo from '/brands/TapeTech/tapetech_logo.svg';
 import surproLogo from '/brands/SurPro/surpro_logo.svg';
 import asgardLogo from '/brands/Asgard/asgard_logo.svg';
 import gracoLogo from '/brands/Graco/graco_logo.svg';
-import { getSchematicIdForProduct, buildPartsUrl } from '../data/schematicMappings';
+import { getSchematicIdForProduct, buildSchematicsUrl } from '../data/schematicMappings';
 
 const BRAND_LOGOS = {
   'Columbia Taping Tools': columbiaLogo,
@@ -31,7 +31,7 @@ export default function ProductDetail({ product, onAddToCart, onClose }) {
 
   // Determine if this product has a matching schematic diagram
   const schematicId = getSchematicIdForProduct(product);
-  const partsUrl = schematicId ? buildPartsUrl(schematicId) : null;
+  const partsUrl = schematicId ? buildSchematicsUrl(schematicId) : null;
 
   const handleAddToCart = () => {
     if (onAddToCart) {
@@ -262,7 +262,7 @@ export default function ProductDetail({ product, onAddToCart, onClose }) {
                           <circle cx="11" cy="11" r="8" />
                           <line x1="21" y1="21" x2="16.65" y2="16.65" />
                         </svg>
-                        View Parts Schematic
+                        View Schematic &amp; Parts Diagram
                       </Link>
                     </div>
                   )}

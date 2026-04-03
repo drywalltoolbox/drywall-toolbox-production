@@ -272,7 +272,7 @@ export default function Parts() {
                           onClick={() => openModal(product)}
                           className="absolute inset-0 flex items-center justify-center bg-gray-50 hover:bg-gray-100 transition-colors w-full h-full"
                         >
-                          {product.image && product.image !== '/product-placeholder.jpg' ? (
+                          {product.image && product.image !== '/no-image-placeholder.webp' ? (
                             <img
                               src={product.image}
                               alt={product.name}
@@ -280,13 +280,15 @@ export default function Parts() {
                               loading="lazy"
                               onError={(e) => {
                                 e.currentTarget.onerror = null;
-                                e.currentTarget.src = '/product-placeholder.jpg';
+                                e.currentTarget.src = '/no-image-placeholder.webp';
                               }}
                             />
                           ) : (
-                            <div className="text-gray-200">
-                              <Wrench size={40} />
-                            </div>
+                            <img
+                              src="/no-image-placeholder.webp"
+                              alt="No image available"
+                              className="object-contain w-full h-full p-2 sm:p-3"
+                            />
                           )}
                         </button>
 

@@ -53,7 +53,7 @@ export default function ProductImageGallery({ product }) {
     }
   };
 
-  const currentImage = images[currentImageIndex] || '/product-placeholder.jpg';
+  const currentImage = images[currentImageIndex] || '/no-image-placeholder.webp';
 
   return (
     <div className="flex flex-col gap-3 sm:gap-4">
@@ -72,7 +72,7 @@ export default function ProductImageGallery({ product }) {
               className="max-w-full max-h-full w-auto h-auto object-contain transition-opacity duration-300"
               onError={(e) => { 
                 e.currentTarget.onerror = null; 
-                e.currentTarget.src = '/product-placeholder.jpg'; 
+                e.currentTarget.src = '/no-image-placeholder.webp'; 
               }}
             />
           ) : (
@@ -131,7 +131,7 @@ export default function ProductImageGallery({ product }) {
                 className="w-full h-full object-cover"
                 onError={(e) => { 
                   e.currentTarget.onerror = null; 
-                  e.currentTarget.src = '/product-placeholder.jpg'; 
+                  e.currentTarget.src = '/no-image-placeholder.webp'; 
                 }}
               />
             </button>

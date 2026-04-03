@@ -114,7 +114,7 @@ export function normalizeProduct(wcProduct) {
 
   // Images: prefer array of src strings; keep single `image` for legacy compat
   const images = (wcProduct.images || []).map((img) => img.src).filter(Boolean);
-  if (images.length === 0) images.push('/product-placeholder.jpg');
+  if (images.length === 0) images.push('/no-image-placeholder.webp');
   const image = images[0];
 
   // Price: prefer numeric parse; keep string fallback

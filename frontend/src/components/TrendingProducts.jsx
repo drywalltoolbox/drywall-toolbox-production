@@ -216,7 +216,7 @@ export default function TrendingProducts() {
                   justifyContent: 'center',
                   flexShrink: 0
                 }}>
-                  {product.image && product.image !== '/product-placeholder.jpg' ? (
+                  {product.image && product.image !== '/no-image-placeholder.webp' ? (
                     <img
                       src={product.image}
                       alt={product.name}
@@ -229,13 +229,21 @@ export default function TrendingProducts() {
                       }}
                       onError={(e) => {
                         e.currentTarget.onerror = null;
-                        e.currentTarget.src = '/product-placeholder.jpg';
+                        e.currentTarget.src = '/no-image-placeholder.webp';
                       }}
                     />
                   ) : (
-                    <div style={{ fontSize: 'clamp(2rem, 8vw, 3rem)', color: '#d1d5db' }}>
-                      <ShoppingCart size={48} strokeWidth={1.5} />
-                    </div>
+                    <img
+                      src="/no-image-placeholder.webp"
+                      alt="No image available"
+                      style={{
+                        width: '100%',
+                        height: '100%',
+                        objectFit: 'contain',
+                        objectPosition: 'center',
+                        padding: 'clamp(8px, 3vw, 12px)'
+                      }}
+                    />
                   )}
                 </div>
 

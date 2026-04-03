@@ -252,7 +252,7 @@ export default function AllProducts() {
                           alt={product.name}
                           className="object-contain w-full h-full p-2 sm:p-3"
                           loading="lazy"
-                          onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = '/product-placeholder.jpg'; }}
+                          onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = '/no-image-placeholder.webp'; }}
                         />
                       ) : (
                         <div className="text-gray-300"><ShoppingCart size={40} /></div>

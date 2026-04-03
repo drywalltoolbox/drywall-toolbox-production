@@ -196,20 +196,106 @@ export function getSchematicToProductMap(allProducts) {
 
 /**
  * Returns the schematic ID that best matches the given product, or null if
- * no schematic exists for it.  Currently covers Columbia Taping Tools only.
+ * no schematic exists for it.  Covers Columbia Taping Tools, TapeTech,
+ * Asgard, and Level5.
  *
- * Matching priority: more-specific keyword checks always appear before
- * catch-all checks for the same product family.
+ * Matching priority: SKU-exact match first (most reliable), then
+ * more-specific keyword checks before catch-all checks for the same family.
  *
  * @param {Object} product - A product object from the catalog
  * @returns {string|null} schematic ID (e.g. 'columbia-flat-box') or null
  */
 export function getSchematicIdForProduct(product) {
   if (!product) return null;
-  // Currently only Columbia Taping Tools products have schematics
-  if (product.brand !== 'Columbia Taping Tools') return null;
 
   const name = (product.name || '').toLowerCase();
+  const sku  = (product.sku  || product.part_number || '').toUpperCase().trim();
+  const brand = product.brand || '';
+
+  // ── TapeTech ─────────────────────────────────────────────────────────────
+  if (brand === 'TapeTech') {
+    if (sku.startsWith('XHTT') || name.includes('extendable support handle')) {
+      return 'tapetech-extendable-support-handle';
+    }
+    return null;
+  }
+
+  // ── Asgard ────────────────────────────────────────────────────────────────
+  if (brand === 'Asgard') {
+    // SKU-exact match is the most reliable path for Asgard products
+    const asgardSkuMap = {
+      'AT01-AD':  'asgard-at01-ad',
+      'AH25-AD':  'asgard-ah25-ad',
+      'AH30-AD':  'asgard-ah30-ad',
+      'AH35-AD':  'asgard-ah35-ad',
+      'CA08-AD':  'asgard-ca08-ad',
+      'CFA-AD':   'asgard-cfa-ad',
+      'FA01-AD':  'asgard-fa01-ad',
+      'EHC07-AD': 'asgard-ehc07-ad',
+      'EHC10-AD': 'asgard-ehc10-ad',
+      'EHC12-AD': 'asgard-ehc12-ad',
+      'EZ07-AD':  'asgard-ez07-ad',
+      'EZ10-AD':  'asgard-ez10-ad',
+      'EZ12-AD':  'asgard-ez12-ad',
+      'PA07-AD':  'asgard-pa07-ad',
+      'PA10-AD':  'asgard-pa10-ad',
+      'PA12-AD':  'asgard-pa12-ad',
+      'BBH-AD':   'asgard-bbh-ad',
+      'BBHE-AD':  'asgard-bbhe-ad',
+      'FBHE-AD':  'asgard-fbhe-ad',
+      'FH-AD':    'asgard-fh-ad',
+      'XH-AD':    'asgard-xh-ad',
+      'GN01-AD':  'asgard-gn01-ad',
+      'LP01-AD':  'asgard-lp01-ad',
+      'CR01-AD':  'asgard-cr01-ad',
+      'NS03-AD':  'asgard-ns03-ad',
+    };
+    if (asgardSkuMap[sku]) return asgardSkuMap[sku];
+
+    // Name-keyword fallback for Asgard
+    if (name.includes('hammer') && (name.includes('taper') || name.includes('automatic'))) return 'asgard-at01-ad';
+    if (name.includes('automatic taper')) return 'asgard-at01-ad';
+    if (name.includes('2.5') && name.includes('angle head')) return 'asgard-ah25-ad';
+    if (name.includes('3.5') && name.includes('angle head')) return 'asgard-ah35-ad';
+    if (name.includes('3') && name.includes('angle head') && !name.includes('3.5')) return 'asgard-ah30-ad';
+    if (name.includes('8') && name.includes('corner applicator')) return 'asgard-ca08-ad';
+    if (name.includes('angle head adapter')) return 'asgard-cfa-ad';
+    if (name.includes('filler adapter')) return 'asgard-fa01-ad';
+    if (name.includes('maxxbox') && name.includes('7')) return 'asgard-ehc07-ad';
+    if (name.includes('maxxbox') && name.includes('10')) return 'asgard-ehc10-ad';
+    if (name.includes('maxxbox') && name.includes('12')) return 'asgard-ehc12-ad';
+    if (name.includes('maxxbox')) {
+      // generic maxxbox without size — can't determine, skip
+      return null;
+    }
+    if (name.includes('power assist') && name.includes('7')) return 'asgard-pa07-ad';
+    if (name.includes('power assist') && name.includes('10')) return 'asgard-pa10-ad';
+    if (name.includes('power assist') && name.includes('12')) return 'asgard-pa12-ad';
+    if (name.includes('flat finishing box') && name.includes('7')) return 'asgard-ez07-ad';
+    if (name.includes('flat finishing box') && name.includes('10')) return 'asgard-ez10-ad';
+    if (name.includes('flat finishing box') && name.includes('12')) return 'asgard-ez12-ad';
+    if (name.includes('brakeless') && name.includes('extendable')) return 'asgard-bbhe-ad';
+    if (name.includes('brakeless box handle')) return 'asgard-bbh-ad';
+    if (name.includes('extendable flat box handle')) return 'asgard-fbhe-ad';
+    if (name.includes('fiberglass handle')) return 'asgard-fh-ad';
+    if (name.includes('extendable support handle')) return 'asgard-xh-ad';
+    if (name.includes('gooseneck')) return 'asgard-gn01-ad';
+    if (name.includes('compound loading pump') || (name.includes('loading pump'))) return 'asgard-lp01-ad';
+    if (name.includes('inside corner roller')) return 'asgard-cr01-ad';
+    if (name.includes('nail spotter') || name.includes('nailspotter')) return 'asgard-ns03-ad';
+    return null;
+  }
+
+  // ── Level5 ────────────────────────────────────────────────────────────────
+  if (brand === 'Level5') {
+    if (sku.includes('4-707') || sku.includes('4707') || name.includes('corner roller')) {
+      return 'level5-corner-roller-4-707';
+    }
+    return null;
+  }
+
+  // ── Columbia Taping Tools ─────────────────────────────────────────────────
+  if (brand !== 'Columbia Taping Tools') return null;
 
   // ── Handles ──────────────────────────────────────────────────────────────
   if (name.includes('closet monster')) return 'columbia-closet-monster-flat-box-handle';
@@ -327,4 +413,34 @@ export function getSchematicIdForProduct(product) {
 export function buildPartsUrl(schematicId) {
   if (!schematicId) return '/parts';
   return `/parts?schematic=${encodeURIComponent(schematicId)}`;
+}
+
+// Maps each brand name to the URL slug used in /schematics?brand=<slug>
+const BRAND_TO_SLUG = {
+  'Columbia Taping Tools': 'columbia-taping-tools',
+  'TapeTech': 'tapetech',
+  'Asgard': 'asgard',
+  'Level5': 'level5',
+};
+
+// Reverse-lookup: schematic ID → brand name (built once from SCHEMATIC_DEFINITIONS)
+const SCHEMATIC_ID_TO_BRAND = (() => {
+  const map = {};
+  Object.entries(SCHEMATIC_DEFINITIONS).forEach(([brand, entries]) => {
+    entries.forEach(({ id }) => { map[id] = brand; });
+  });
+  return map;
+})();
+
+/**
+ * Builds the URL path for the Schematics viewer pre-selected to a given schematic.
+ *
+ * @param {string} schematicId  - e.g. 'asgard-at01-ad'
+ * @returns {string} URL path   - e.g. '/schematics?brand=asgard&schematic=asgard-at01-ad'
+ */
+export function buildSchematicsUrl(schematicId) {
+  if (!schematicId) return '/schematics';
+  const brand = SCHEMATIC_ID_TO_BRAND[schematicId] || '';
+  const slug  = BRAND_TO_SLUG[brand] || '';
+  return `/schematics?brand=${encodeURIComponent(slug)}&schematic=${encodeURIComponent(schematicId)}`;
 }

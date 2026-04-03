@@ -292,7 +292,7 @@ function normalizeRow(row, idx) {
     .split('|')
     .map(u => u.trim())
     .filter(Boolean);
-  if (images.length === 0) images.push('/product-placeholder.jpg');
+  if (images.length === 0) images.push('/no-image-placeholder.webp');
 
   // Brand: prefer explicit "Attribute 1 name == Brand" value; fall back to
   // the second segment of the category path (e.g. "TapeTech" from

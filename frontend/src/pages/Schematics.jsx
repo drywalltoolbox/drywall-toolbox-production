@@ -1415,7 +1415,7 @@ export default function Parts() {
             price: parseFloat(wcProduct.price) || 0,
             part_number: wcProduct.sku || part.sku,
             sku: wcProduct.sku || part.sku,
-            image: wcProduct.images?.[0]?.src || '/placeholder-part.png',
+            image: wcProduct.images?.[0]?.src || '/no-image-placeholder.webp',
             permalink: wcProduct.permalink || '',
             _wcProduct: wcProduct,
           }
@@ -1427,7 +1427,7 @@ export default function Parts() {
             price: part.price || 0,
             part_number: part.sku,
             sku: part.sku,
-            image: '/placeholder-part.png',
+            image: '/no-image-placeholder.webp',
           };
 
       addToCart(cartProduct, 1);
