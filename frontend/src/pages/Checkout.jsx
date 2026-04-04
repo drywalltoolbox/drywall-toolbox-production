@@ -24,8 +24,6 @@ import {
   AlertTriangle,
   ShoppingCart,
   User,
-  FileText,
-  Building2,
   Smartphone,
 } from 'lucide-react';
 import DOMPurify from 'dompurify';
@@ -40,10 +38,8 @@ import { syncAndPlace } from '../api/cart.js';
 // 'stripe' and 'paypal' are included as UI placeholders; they activate
 // automatically once their corresponding WC gateways are configured.
 const PAYMENT_METHODS = [
-  { id: 'cod',    label: 'Check / Invoice'      },
-  { id: 'bacs',   label: 'Bank Transfer (BACS)' },
-  { id: 'stripe', label: 'Credit / Debit Card'  },
-  { id: 'paypal', label: 'PayPal / Express'      },
+  { id: 'stripe', label: 'Credit / Debit Card' },
+  { id: 'paypal', label: 'PayPal / Express'    },
 ];
 
 // ─── Framer Motion shared variants ────────────────────────────────────────────
@@ -230,10 +226,8 @@ function PayPalExpressButtons() {
 // Uses AnimatePresence so only the active panel is mounted, preventing layout
 // shifts when switching between Stripe, PayPal, or offline methods.
 const METHOD_META = {
-  cod:    { sublabel: "Pay by check or invoice — we'll invoice you after dispatch.", Icon: FileText   },
-  bacs:   { sublabel: 'Direct bank transfer. Details sent in your confirmation email.', Icon: Building2  },
-  stripe: { sublabel: 'Secured by Stripe TLS. PCI-DSS compliant.',                   Icon: CreditCard },
-  paypal: { sublabel: 'PayPal, Apple Pay, and Google Pay.',                           Icon: Smartphone },
+  stripe: { sublabel: 'Secured by Stripe TLS. PCI-DSS compliant.',  Icon: CreditCard },
+  paypal: { sublabel: 'PayPal, Apple Pay, and Google Pay.',          Icon: Smartphone },
 };
 
 function PaymentMethodSelector( { selectedMethod, onChange, inputClass } ) {
@@ -398,7 +392,7 @@ export default function Checkout() {
     state:         '',
     zip:           '',
     country:       'US',
-    paymentMethod: 'cod',
+    paymentMethod: 'stripe',
     customerNote:  '',
   } );
 

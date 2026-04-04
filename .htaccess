@@ -22,10 +22,9 @@
 #   5. Everything else          → dist/index.html (React SPA catch-all)
 
 # ─── Directory Index ──────────────────────────────────────────────────────────
-# During the pre-launch (coming-soon) phase, serve coming-soon.html as the
-# default document for any directory request — most importantly the root "/".
-# REMOVE or comment out this line when deploying the full React SPA (index.html).
-DirectoryIndex coming-soon.html index.html index.php
+# index.html at the domain root serves the coming-soon page (pre-launch).
+# When the React SPA is deployed, index.html becomes the SPA shell.
+DirectoryIndex index.html index.php
 
 # ─── Disable Directory Listing & Defaults ─────────────────────────────────────
 # Disable directory indexing globally for security
@@ -41,18 +40,27 @@ Options +FollowSymLinks
     Header always set Permissions-Policy "camera=(), microphone=(), geolocation=()"
     # Extended HSTS max-age: 2 years with preload
     Header always set Strict-Transport-Security "max-age=63072000; includeSubDomains; preload"
+</IfModule>
 
-    # ── Cache-Control for REST API routes ────────────────────────────────────
-    # Cart, order, and auth endpoints must never be cached anywhere.
-    <LocationMatch "^/(wp-json|dtb)(/|$)">
-        Header always set Cache-Control "no-store, no-cache, must-revalidate, private"
-        Header always set Pragma "no-cache"
-    </LocationMatch>
+# ── Cache-Control for REST API routes ─────────────────────────────────────────
+# Cart, order, and auth endpoints must never be cached anywhere.
+# SetEnvIf is used because <LocationMatch> is not permitted in .htaccess on
+# shared hosting. The env var is set when the URI matches, then the Header
+# directive fires only when the env var is present.
+<IfModule mod_setenvif.c>
+    SetEnvIf Request_URI "^/(wp-json|dtb)(/|$)" IS_API_ROUTE=1
+</IfModule>
+<IfModule mod_headers.c>
+    Header always set Cache-Control "no-store, no-cache, must-revalidate, private" env=IS_API_ROUTE
+    Header always set Pragma "no-cache" env=IS_API_ROUTE
+</IfModule>
 
-    # ── Prevent search engines from indexing WP Admin ─────────────────────────
-    <LocationMatch "^/(wp-admin(/|$)|wp-login\.php)">
-        Header always set X-Robots-Tag "noindex, nofollow"
-    </LocationMatch>
+# ── Prevent search engines from indexing WP Admin ─────────────────────────────
+<IfModule mod_setenvif.c>
+    SetEnvIf Request_URI "^/(wp-admin(/|$)|wp-login\.php)" IS_WP_ADMIN=1
+</IfModule>
+<IfModule mod_headers.c>
+    Header always set X-Robots-Tag "noindex, nofollow" env=IS_WP_ADMIN
 </IfModule>
 
 # ─── WP Admin & Login Protection ──────────────────────────────────────────────
@@ -64,20 +72,13 @@ Options +FollowSymLinks
 # Alternatively, restrict by IP — replace the AuthType block with:
 #   Require ip 1.2.3.4 5.6.7.8
 #
-<LocationMatch "^/(wp-admin(/|$)|wp-login\.php)">
-    # Uncomment and configure to enable HTTP Basic Auth gate on WP Admin.
-    # This adds a second authentication layer on top of WordPress login.
-    #
-    # AuthType Basic
-    # AuthName "Restricted Area"
-    # AuthUserFile /home/<cpanel_user>/public_html/drywalltoolbox/.htpasswd
-    # Require valid-user
-
-    # ── IP allowlist (alternative to Basic Auth) ──────────────────────────
-    # Uncomment and add your admin IP addresses to lock down WP Admin.
-    # Require ip 1.2.3.4
-    # Require ip 5.6.7.0/24
-</LocationMatch>
+# Note: Auth/Require directives for specific paths require either a per-directory
+# .htaccess inside /wp/wp-admin/, or mod_rewrite conditions. Uncomment as needed.
+#
+# AuthType Basic
+# AuthName "Restricted Area"
+# AuthUserFile /home/<cpanel_user>/public_html/drywalltoolbox/.htpasswd
+# Require valid-user
 
 # ─── REST API Origin Guard ─────────────────────────────────────────────────────
 # Block cross-origin REST API requests from domains NOT in the DTB allowlist.
@@ -107,12 +108,13 @@ Options +FollowSymLinks
 # PHP-emitted headers and break cross-origin preflight for localhost.
 #
 # Only static-asset cross-origin requests (fonts, images) benefit from a fixed
-# header, which is set here scoped to the uploads and asset paths.
+# header, which is set here scoped by file extension via <FilesMatch>.
+# (<LocationMatch> is not permitted in .htaccess on shared hosting.)
 <IfModule mod_headers.c>
-    <LocationMatch "\.(woff2?|ttf|otf|eot|svg|webp|png|jpe?g|gif)$">
+    <FilesMatch "\.(woff2?|ttf|otf|eot|svg|webp|png|jpe?g|gif)$">
         Header set Access-Control-Allow-Origin "https://drywalltoolbox.com"
         Header set Vary "Origin"
-    </LocationMatch>
+    </FilesMatch>
 </IfModule>
 
 # ─── Gzip / Brotli Compression ────────────────────────────────────────────────
@@ -196,10 +198,15 @@ Options +FollowSymLinks
     RewriteCond %{HTTP_HOST} !^127\.0\.0\.1 [NC]
     RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
 
-    # ── Coming-Soon homepage ──────────────────────────────────────────
-    # Serve coming-soon.html for root "/" requests during pre-launch.
-    # REMOVE this rule when the React SPA (index.html) replaces coming-soon.html.
-    RewriteRule ^$ /coming-soon.html [L]
+    # ── Root homepage ─────────────────────────────────────────────────
+    # index.html at the root serves both the coming-soon page (pre-launch)
+    # and the React SPA shell (post-launch) — same file, content swapped.
+    RewriteRule ^$ /index.html [L]
+
+    # ── Favicon — return empty 204 to suppress browser 500/404 loops ─
+    # No favicon.ico exists at the root during pre-launch; returning 204
+    # (No Content) silences the browser request cleanly without an error.
+    RewriteRule ^favicon\.ico$ - [R=204,L]
 
     # ── WordPress admin & login ──────────────────────────────────────
     # Map /wp-admin/ → /wp/wp-admin/ (transparent to client)
@@ -258,8 +265,9 @@ Options +FollowSymLinks
 </IfModule>
 
 # ─── Error Documents ──────────────────────────────────────────────────────────
+# During pre-launch: /index.html contains the coming-soon page content.
+# When the React SPA ships, this stays as /index.html — React Router handles 404s.
 ErrorDocument 404 /index.html
-# Note: This lets React Router handle 404s gracefully (React shows 404 page)
 
 
 
