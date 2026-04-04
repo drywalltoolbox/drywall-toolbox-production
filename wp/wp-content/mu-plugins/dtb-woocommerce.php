@@ -96,10 +96,23 @@ add_action( 'rest_api_init', function () {
 			}
 
 			// Output raw CSV and exit — bypasses WP REST JSON wrapping.
+			$allowed_origins = array(
+				'https://drywalltoolbox.com',
+				'https://www.drywalltoolbox.com',
+				'http://localhost:5173',
+				'http://127.0.0.1:5173',
+			);
+			$raw_origin = isset( $_SERVER['HTTP_ORIGIN'] )
+				? wp_unslash( $_SERVER['HTTP_ORIGIN'] )  // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+				: '';
+
 			header( 'Content-Type: text/csv; charset=UTF-8' );
 			header( 'Content-Disposition: inline; filename="' . $csv_filename . '"' );
 			header( 'Cache-Control: public, max-age=3600' );
-			header( 'Access-Control-Allow-Origin: *' );
+			if ( $raw_origin && in_array( rtrim( $raw_origin, '/' ), $allowed_origins, true ) ) {
+				header( 'Access-Control-Allow-Origin: ' . esc_url_raw( $raw_origin ) );
+				header( 'Vary: Origin' );
+			}
 			echo $csv_content;
 			exit;
 		},
