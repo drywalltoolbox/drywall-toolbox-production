@@ -473,6 +473,7 @@ function dtb_notify_admin( string $email ): void {
 		admin_url( 'options-general.php?page=dtb-subscribers' )
 	);
 
+
 	wp_mail(
 		$admin_email,
 		$subject,
@@ -480,69 +481,4 @@ function dtb_notify_admin( string $email ): void {
 		array( 'Content-Type: text/plain; charset=UTF-8' )
 	);
 }
-
-/**
- * Determine the real client IP address, accounting for common proxy headers.
- *
- * Header priority (first valid IP wins):
- *  1. HTTP_CF_CONNECTING_IP  — Cloudflare
- *  2. HTTP_X_FORWARDED_FOR   — load balancers / reverse proxies
- *  3. HTTP_X_REAL_IP         — Nginx-style proxy
- *  4. REMOTE_ADDR            — direct connection (final fallback)
- *
- * @return string A valid IP address string, or '0.0.0.0' if none found.
- */
-function dtb_get_client_ip(): string {
-	$candidates = array(
-		'HTTP_CF_CONNECTING_IP',
-		'HTTP_X_FORWARDED_FOR',
-		'HTTP_X_REAL_IP',
-		'REMOTE_ADDR',
-	);
-
-	foreach ( $candidates as $key ) {
-		if ( empty( $_SERVER[ $key ] ) ) {
-			continue;
-		}
-
-		// X-Forwarded-For may be a comma-separated list; use only the first value.
-		$raw = sanitize_text_field( wp_unslash( $_SERVER[ $key ] ) );
-		$ip  = trim( explode( ',', $raw )[0] );
-
-		if ( filter_var( $ip, FILTER_VALIDATE_IP ) ) {
-			return $ip;
-		}
-	}
-
-	return '0.0.0.0';
-}
-
-/**
- * Anonymise an IP address before storing it (GDPR-friendlier).
- *
- *  IPv4 — zeroes the last octet          e.g. 203.0.113.42  → 203.0.113.0
- *  IPv6 — keeps first 48 bits, zeroes the rest
- *
- * @param string $ip Raw IP address string.
- * @return string Anonymised IP, or a safe placeholder on parse failure.
- */
-function dtb_anonymise_ip( string $ip ): string {
-	if ( filter_var( $ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6 ) ) {
-		$bin = inet_pton( $ip );
-		if ( false === $bin ) {
-			return '::';
-		}
-		// Keep first 6 bytes (48 bits); zero out remaining 10 bytes.
-		$bin = substr( $bin, 0, 6 ) . str_repeat( "\x00", 10 );
-		return inet_ntop( $bin ) ?: '::';
-	}
-
-	// IPv4: zero out the last octet.
-	$parts = explode( '.', $ip );
-	if ( 4 === count( $parts ) ) {
-		$parts[3] = '0';
-		return implode( '.', $parts );
-	}
-
-	return '0.0.0.0';
-}
+// dtb_get_client_ip() and dtb_anonymise_ip() are provided by dtb-utils.php.

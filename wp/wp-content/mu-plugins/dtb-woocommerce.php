@@ -12,135 +12,6 @@
 defined( 'ABSPATH' ) || exit;
 
 // ---------------------------------------------------------------------------
-// 0. RUNTIME CONFIG ENDPOINT
-//    Exposes WooCommerce Application Password credentials to the frontend at
-//    runtime so the React app can authenticate without needing a rebuild.
-//    GET /wp-json/dtb/v1/config  → { wc_auth_user, wc_auth_pass }
-//
-//    Credentials are only returned when the request carries a browser Origin
-//    header matching the DTB allowlist.  Server-to-server requests (no Origin)
-//    receive empty strings so that automated scrapers cannot harvest credentials.
-//    Define DTB_WC_AUTH_USER and DTB_WC_AUTH_PASS in wp-config.php.
-// ---------------------------------------------------------------------------
-add_action( 'rest_api_init', function () {
-	register_rest_route( 'dtb/v1', '/config', array(
-		'methods'             => 'GET',
-		'callback'            => function () {
-			// Only expose credentials to requests from our own browser origin.
-			// Absent-origin (curl / server-to-server) requests get empty strings.
-			$raw_origin = isset( $_SERVER['HTTP_ORIGIN'] )
-				? rtrim( (string) wp_unslash( $_SERVER['HTTP_ORIGIN'] ), '/' ) // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
-				: '';
-			$origin_ok  = '' !== $raw_origin && in_array( $raw_origin, dtb_allowed_origins(), true );
-
-			$response = rest_ensure_response( array(
-				'wc_auth_user' => $origin_ok && defined( 'DTB_WC_AUTH_USER' ) ? DTB_WC_AUTH_USER : '',
-				'wc_auth_pass' => $origin_ok && defined( 'DTB_WC_AUTH_PASS' ) ? DTB_WC_AUTH_PASS : '',
-			) );
-
-			// Never allow this response to be stored in a shared/CDN cache.
-			$response->header( 'Cache-Control', 'private, no-store' );
-
-			return $response;
-		},
-		'permission_callback' => '__return_true',
-	) );
-
-	// -----------------------------------------------------------------------
-	// PRODUCT CATALOG ENDPOINT
-	//   GET /wp-json/dtb/v1/catalog  → { csv_url: "https://…/dtb/v1/products-csv" }
-	//
-	//   Returns the URL of the PHP CSV proxy endpoint (see below) so the
-	//   React app always fetches through PHP — never a direct file access
-	//   that Apache/mod_security could block with 403.
-	// -----------------------------------------------------------------------
-	register_rest_route( 'dtb/v1', '/catalog', array(
-		'methods'             => 'GET',
-		'callback'            => function () {
-			$csv_filename = defined( 'DTB_WC_CSV_FILENAME' )
-				? DTB_WC_CSV_FILENAME
-				: 'product-wp-catalog-c7p3my05pn.csv';
-
-			// Return the proxy URL, not the direct file URL.
-			// The /dtb/v1/products-csv endpoint below streams the file through
-			// PHP, bypassing any Apache/mod_security rule that blocks
-			// wp-content/uploads/ direct access.
-			$proxy_url = rest_url( 'dtb/v1/products-csv' );
-
-			return rest_ensure_response( array(
-				'csv_url'  => $proxy_url,
-				'filename' => $csv_filename,
-			) );
-		},
-		'permission_callback' => '__return_true',
-	) );
-
-	// -----------------------------------------------------------------------
-	// CSV PROXY ENDPOINT
-	//   GET /wp-json/dtb/v1/products-csv  → streams the WooCommerce CSV file
-	//
-	//   Reads the file from the uploads directory and outputs it with
-	//   text/csv headers.  This sidesteps any Apache .htaccess or
-	//   mod_security rule that blocks direct browser access to
-	//   wp-content/uploads/wc-imports/.
-	// -----------------------------------------------------------------------
-	register_rest_route( 'dtb/v1', '/products-csv', array(
-		'methods'             => 'GET',
-		'callback'            => function () {
-			$csv_filename = defined( 'DTB_WC_CSV_FILENAME' )
-				? DTB_WC_CSV_FILENAME
-				: 'product-wp-catalog-c7p3my05pn.csv';
-
-			$upload_dir  = wp_upload_dir();
-			$uploads_dir = trailingslashit( $upload_dir['basedir'] );
-			$file_path   = $uploads_dir . 'wc-imports/' . $csv_filename;
-
-			// Resolve the real path and confirm it is within the uploads directory.
-			// This defends against path traversal if the filename ever comes from
-			// an untrusted source (e.g., a wp-config constant set incorrectly).
-			$real_path      = realpath( $file_path );
-			$real_uploads   = realpath( $uploads_dir );
-			if (
-				false === $real_path ||
-				false === $real_uploads ||
-				0 !== strpos( $real_path, trailingslashit( $real_uploads ) )
-			) {
-				return new WP_Error(
-					'csv_not_found',
-					'Product CSV file not found on server.',
-					array( 'status' => 404 )
-				);
-			}
-
-			if ( ! file_exists( $real_path ) ) {
-				return new WP_Error(
-					'csv_not_found',
-					'Product CSV file not found on server.',
-					array( 'status' => 404 )
-				);
-			}
-
-			// Output raw CSV and exit — bypasses WP REST JSON wrapping.
-			$raw_origin = isset( $_SERVER['HTTP_ORIGIN'] )
-				? (string) wp_unslash( $_SERVER['HTTP_ORIGIN'] ) // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
-				: '';
-
-			header( 'Content-Type: text/csv; charset=UTF-8' );
-			header( 'Content-Disposition: inline; filename="' . $csv_filename . '"' );
-			header( 'Cache-Control: public, max-age=3600' );
-			if ( $raw_origin && in_array( rtrim( $raw_origin, '/' ), dtb_allowed_origins(), true ) ) {
-				header( 'Access-Control-Allow-Origin: ' . esc_url_raw( $raw_origin ) );
-				header( 'Vary: Origin' );
-			}
-			// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_readfile
-			readfile( $real_path );
-			exit;
-		},
-		'permission_callback' => '__return_true',
-	) );
-} );
-
-// ---------------------------------------------------------------------------
 // 1. LOOPBACK REQUESTS
 //    WooCommerce setup wizard and background tasks make server-to-server
 //    (loopback) HTTP calls. We only need to relax SSL — do NOT set
@@ -314,24 +185,6 @@ add_filter( 'woocommerce_rest_prepare_setting_group', function( $response, $grou
 	return $response;
 }, 10, 2 );
 
-// Alternative: Provide a full onboarding profile if missing
-add_action( 'rest_api_init', function() {
-	register_rest_route( 'wc-admin', '/profile', array(
-		'methods'             => 'GET',
-		'callback'            => function() {
-			return rest_ensure_response( array(
-				'title'                  => 'Drywall Toolbox',
-				'industries'             => array( array( 'slug' => 'retail' ) ),
-				'products'               => array(),
-				'business_extensions'    => array(),
-				'completed'              => true,
-				'skipped'                => true,
-			) );
-		},
-		'permission_callback' => '__return_true',
-	) );
-} );
-
 // Hide "complete your store setup" admin notices.
 add_filter( 'woocommerce_show_admin_notice', function ( $show, $notice ) {
 	if ( in_array( $notice, array( 'install', 'update', 'no_shipping_methods' ), true ) ) {
@@ -350,151 +203,63 @@ add_filter( 'woocommerce_admin_features', function ( $features ) {
 } );
 
 // ---------------------------------------------------------------------------
-// 7. CATALOG IMPORT TRIGGER
-//    POST /wp-json/dtb/v1/import-catalog
+// 7. WEBHOOK AUTO-CREATION  (merged from drywall-webhooks.php)
 //
-//    Accepts a JSON body { "secret": "<DTB_IMPORT_SECRET>" } and schedules
-//    (or runs synchronously as a fallback) a WooCommerce product CSV import
-//    from the file uploaded to wp-content/uploads/wc-imports/ during the
-//    deploy workflow.
-//
-//    Configure the secret in wp-config.php:
-//      define( 'DTB_IMPORT_SECRET', 'your-random-secret-here' );
-//    or store it in the dtb_import_secret WordPress option.
-//
-//    When Action Scheduler is available (bundled with WooCommerce 3.5+) the
-//    import is queued as a background job and the endpoint returns immediately.
-//    For small catalogs or environments without Action Scheduler the import
-//    runs synchronously and returns results inline.
+//    On WordPress init, checks the WooCommerce webhooks table for the four
+//    product lifecycle webhooks (created / updated / deleted / restored).
+//    Any missing webhook is auto-created using WC_Webhook with:
+//      - status:       active
+//      - delivery URL: DTB_WEBHOOK_DELIVERY_URL (or the production default)
+//      - secret:       WC_WEBHOOK_SECRET constant from wp-config.php
 // ---------------------------------------------------------------------------
-add_action( 'rest_api_init', function () {
-	register_rest_route( 'dtb/v1', '/import-catalog', array(
-		'methods'             => 'POST',
-		'callback'            => function ( WP_REST_Request $request ) {
+add_action( 'init', 'drywall_ensure_webhooks', 20 );
 
-			// ---- Authenticate -------------------------------------------
-			$provided = (string) ( $request->get_param( 'secret' ) ?? '' );
-			$expected = defined( 'DTB_IMPORT_SECRET' )
-				? DTB_IMPORT_SECRET
-				: (string) get_option( 'dtb_import_secret', '' );
-
-			if ( empty( $expected ) || ! hash_equals( $expected, $provided ) ) {
-				return new WP_Error(
-					'forbidden',
-					'Invalid or missing import secret.',
-					array( 'status' => 403 )
-				);
-			}
-
-			// ---- Locate the CSV -----------------------------------------
-			$csv_filename = defined( 'DTB_WC_CSV_FILENAME' )
-				? DTB_WC_CSV_FILENAME
-				: 'product-wp-catalog-c7p3my05pn.csv';
-
-			$upload_dir = wp_upload_dir();
-			$file_path  = trailingslashit( $upload_dir['basedir'] ) . 'wc-imports/' . $csv_filename;
-
-			if ( ! file_exists( $file_path ) ) {
-				return new WP_Error(
-					'csv_not_found',
-					'Product CSV not found. Ensure the deploy step has uploaded it to wc-imports/.',
-					array( 'status' => 404 )
-				);
-			}
-
-			// ---- Schedule via Action Scheduler (preferred) --------------
-			if ( function_exists( 'as_unschedule_all_actions' ) && function_exists( 'as_schedule_single_action' ) ) {
-				as_unschedule_all_actions( 'dtb_run_catalog_import', array(), 'dtb-catalog-sync' );
-				$action_id = as_schedule_single_action(
-					time(),
-					'dtb_run_catalog_import',
-					array( $file_path ),
-					'dtb-catalog-sync'
-				);
-				return rest_ensure_response( array(
-					'status'    => 'scheduled',
-					'action_id' => $action_id,
-					'file'      => basename( $file_path ),
-					'message'   => 'WooCommerce product import scheduled as background job.',
-				) );
-			}
-
-			// ---- Fallback: synchronous import ---------------------------
-			return dtb_run_catalog_import_sync( $file_path );
-		},
-		// permission_callback is intentionally __return_true — access control is
-		// enforced inside the callback via hash_equals( $expected, $provided ).
-		// This matches the pattern used by all other dtb/v1 endpoints in this
-		// file, which also authenticate at the application layer.
-		'permission_callback' => '__return_true',
-	) );
-} );
-
-/**
- * Action Scheduler hook: run the WooCommerce product CSV import.
- *
- * @param string $file_path Absolute server path to the import CSV.
- */
-add_action( 'dtb_run_catalog_import', function ( $file_path ) {
-	dtb_run_catalog_import_sync( $file_path );
-} );
-
-/**
- * Runs a WooCommerce CSV product import synchronously and returns a
- * WP_REST_Response with counts, or a WP_Error on failure.
- *
- * @param string $file_path Absolute server path to the import CSV.
- * @return WP_REST_Response|WP_Error
- */
-function dtb_run_catalog_import_sync( $file_path ) {
-	if ( ! file_exists( $file_path ) ) {
-		return new WP_Error(
-			'csv_not_found',
-			'CSV file not found: ' . basename( $file_path ),
-			array( 'status' => 404 )
-		);
+function drywall_ensure_webhooks(): void {
+	if ( ! function_exists( 'wc_get_webhooks' ) || ! class_exists( 'WC_Webhook' ) ) {
+		return;
 	}
 
-	if ( ! defined( 'WC_ABSPATH' ) ) {
-		return new WP_Error(
-			'wc_not_loaded',
-			'WooCommerce is not loaded.',
-			array( 'status' => 500 )
-		);
+	$config = dtb_get_config();
+	$secret = $config['webhook_secret'];
+
+	if ( '' === $secret ) {
+		return; // Cannot create functional webhooks without a secret — bail silently.
 	}
 
-	if ( ! class_exists( 'WC_Product_CSV_Importer' ) ) {
-		$importer_file = WC_ABSPATH . 'includes/import/class-wc-product-csv-importer.php';
-		if ( ! file_exists( $importer_file ) ) {
-			return new WP_Error(
-				'importer_not_found',
-				'WooCommerce CSV importer class not available.',
-				array( 'status' => 500 )
-			);
+	$delivery_url    = $config['webhook_delivery'];
+	$required_topics = [
+		'product.created',
+		'product.updated',
+		'product.deleted',
+		'product.restored',
+	];
+
+	$existing_hooks = wc_get_webhooks( [
+		'delivery_url' => $delivery_url,
+		'return'       => 'ids',
+		'limit'        => -1,
+	] );
+
+	$registered_topics = [];
+	foreach ( $existing_hooks as $hook_id ) {
+		$webhook = new WC_Webhook( $hook_id );
+		$registered_topics[ $webhook->get_topic() ] = true;
+	}
+
+	foreach ( $required_topics as $topic ) {
+		if ( isset( $registered_topics[ $topic ] ) ) {
+			continue;
 		}
-		require_once $importer_file;
+
+		$webhook = new WC_Webhook();
+		$webhook->set_name( 'Drywall Cache Invalidation — ' . $topic );
+		$webhook->set_topic( $topic );
+		$webhook->set_delivery_url( $delivery_url );
+		$webhook->set_secret( $secret );
+		$webhook->set_status( 'active' );
+		$webhook->save();
+
+		// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+		error_log( '[DryWall Toolbox] Webhook created: ' . $topic );
 	}
-
-	$params = array(
-		'update_existing'    => true,
-		'character_encoding' => '',
-		'lines'              => -1, // -1 = no per-batch limit; import the full file.
-		'mapping'            => array(),
-		'parse'              => true,
-	);
-
-	$importer = new WC_Product_CSV_Importer( $file_path, $params );
-	$results  = $importer->import();
-
-	do_action( 'woocommerce_product_import_end' );
-	wc_delete_product_transients();
-
-	return rest_ensure_response( array(
-		'status'   => 'completed',
-		'file'     => basename( $file_path ),
-		'imported' => isset( $results['imported'] ) ? (int) $results['imported'] : 0,
-		'updated'  => isset( $results['updated'] )  ? (int) $results['updated']  : 0,
-		'skipped'  => isset( $results['skipped'] )  ? (int) $results['skipped']  : 0,
-		'failed'   => isset( $results['failed'] )   ? (int) $results['failed']   : 0,
-	) );
 }

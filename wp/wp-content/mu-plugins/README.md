@@ -7,18 +7,96 @@ the files that follow.
 
 ---
 
-## File inventory
+## File inventory (6 files)
 
 | File | Purpose |
 |------|---------|
-| `00-dtb-loader.php` | Shared bootstrap — defines `dtb_allowed_origins()` and `dtb_check_origin()` |
-| `drywall-api-proxy.php` | Server-side proxy for WooCommerce REST API v3 (`drywall/v1` namespace) |
-| `drywall-webhooks.php` | Auto-creates the four WC product-lifecycle webhooks |
-| `dtb-app-passwords.php` | REST endpoint to create WP Application Passwords (`dtb/v1/create-app-password`) |
+| `00-dtb-loader.php` | Bootstrap — defines `dtb_allowed_origins()` and `dtb_check_origin()` |
 | `dtb-coming-soon.php` | Coming-soon e-mail subscriber handler and admin UI |
 | `dtb-cors.php` | Global CORS handler for all REST API responses |
-| `dtb-schematics-api.php` | Schematics media manifest endpoint (`dtb/v1/schematics/media`) |
-| `dtb-woocommerce.php` | WooCommerce config, onboarding suppression, catalog import trigger |
+| `dtb-rest-api.php` | **All** custom REST routes (`drywall/v1` + `dtb/v1`) — single source of truth |
+| `dtb-schematics-api.php` | Schematics media manifest endpoint (`GET /dtb/v1/schematics/media`) |
+| `dtb-utils.php` | Shared helpers — `dtb_get_config()`, `dtb_error_envelope()`, IP utils, etc. |
+| `dtb-woocommerce.php` | WooCommerce config: loopback, REST URL rewrite, onboarding suppression, webhooks |
+
+> **Load order matters.**  Alphabetical loading ensures:
+> `00-dtb-loader.php` → `dtb-cors.php` → `dtb-rest-api.php` / `dtb-schematics-api.php` → `dtb-utils.php` → `dtb-woocommerce.php`
+
+---
+
+## Dependency graph
+
+```
+00-dtb-loader.php          (no dependencies)
+  └── dtb_allowed_origins()
+  └── dtb_check_origin()
+
+dtb-utils.php              (no dependencies)
+  └── dtb_get_config()         ← $GLOBALS cache; reads wp-config constants once
+  └── dtb_get_wc_credentials() ← wraps dtb_get_config() + dtb_check_origin()
+  └── dtb_error_envelope()
+  └── dtb_get_client_ip()
+  └── dtb_anonymise_ip()
+
+dtb-cors.php               (no dependencies)
+  └── handles REST CORS headers and OPTIONS preflight
+
+dtb-rest-api.php           depends on: 00-dtb-loader, dtb-utils
+  └── drywall/v1  — product proxy, categories, search, orders, customers, coupons, webhooks
+  └── dtb/v1      — /config, /catalog, /products-csv, /import-catalog, /create-app-password
+  └── wc-admin/profile shim
+
+dtb-schematics-api.php     (self-contained)
+  └── dtb/v1/schematics/media
+
+dtb-woocommerce.php        depends on: dtb-utils
+  └── Loopback request fixes
+  └── REST URL rewriting  (/wp/wp-json/ → /wp-json/)
+  └── WooCommerce default country fix
+  └── Setup wizard / onboarding suppression
+  └── Webhook auto-creation  (via dtb_get_config())
+
+dtb-coming-soon.php        depends on: 00-dtb-loader, dtb-utils
+  └── POST /dtb/v1/subscribe
+  └── GET  /dtb/v1/subscribe-nonce
+  └── GET  /dtb/v1/subscribers  (admin-only)
+  └── Admin UI for subscriber list
+```
+
+---
+
+## REST API routes
+
+### `drywall/v1` — WooCommerce proxy
+
+| Method | Path | Auth | Notes |
+|--------|------|------|-------|
+| GET | `/drywall/v1/products` | Public | Supports `page`, `per_page`, `category`, `search`, `orderby`, `order`, `min_price`, `max_price`, `stock_status` |
+| GET | `/drywall/v1/products/{id}` | Public | Cached 10 min |
+| GET | `/drywall/v1/products/slug/{slug}` | Public | Cached 10 min |
+| GET | `/drywall/v1/categories` | Public | Cached 15 min |
+| GET | `/drywall/v1/attributes` | Public | Cached 15 min |
+| GET | `/drywall/v1/search?q=…` | Public | Cached 10 min |
+| POST | `/drywall/v1/orders` | JWT Bearer | Rate-limited 10 req/60 s |
+| GET | `/drywall/v1/orders/{id}` | JWT Bearer | |
+| GET | `/drywall/v1/coupons/{code}` | Public | |
+| POST | `/drywall/v1/customers` | Public | Rate-limited 10 req/60 s |
+| GET | `/drywall/v1/customers/{id}` | JWT Bearer | |
+| POST | `/drywall/v1/webhooks/products` | HMAC-SHA256 sig | Cache-invalidation receiver |
+
+### `dtb/v1` — Site management
+
+| Method | Path | Auth | Notes |
+|--------|------|------|-------|
+| GET | `/dtb/v1/config` | Origin-check | Returns WC app-password credentials |
+| GET | `/dtb/v1/catalog` | Public | Returns CSV proxy URL + filename |
+| GET | `/dtb/v1/products-csv` | Public | Streams CSV file through PHP |
+| POST | `/dtb/v1/import-catalog` | `DTB_IMPORT_SECRET` | Schedules / runs WC CSV import |
+| POST | `/dtb/v1/create-app-password` | WP credentials in body | Rate-limited 5 req/5 min |
+| GET | `/dtb/v1/schematics/media` | Public | Schematics manifest |
+| POST | `/dtb/v1/subscribe` | Nonce | Coming-soon subscriber |
+| GET | `/dtb/v1/subscribe-nonce` | Public | Get subscribe nonce |
+| GET | `/dtb/v1/subscribers` | WP admin | List subscribers |
 
 ---
 
@@ -85,6 +163,8 @@ The following origins are always allowed (hard-coded in `00-dtb-loader.php`):
 - `https://www.drywalltoolbox.com`
 - `http://localhost:5173`
 - `http://127.0.0.1:5173`
+- `http://localhost:3000`
+- `http://127.0.0.1:3000`
 
 To add a staging or preview domain without modifying code:
 
@@ -100,3 +180,15 @@ add_filter( 'dtb_allowed_origins', function( $origins ) {
     return $origins;
 } );
 ```
+
+---
+
+## Refactor history
+
+| Date | Change |
+|------|--------|
+| 2025 | Initial split into per-concern files |
+| 2025 | `dtb-utils.php` extracted — shared helpers, config cache |
+| 2025 | `drywall-webhooks.php` merged into `dtb-woocommerce.php` Section 7 |
+| 2025 | `drywall-api-proxy.php` + `dtb-app-passwords.php` merged into `dtb-rest-api.php` |
+| 2025 | Duplicate `dtb_get_client_ip()` / `dtb_anonymise_ip()` removed from `dtb-coming-soon.php` |
