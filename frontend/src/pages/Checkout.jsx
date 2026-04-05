@@ -529,7 +529,7 @@ export default function Checkout() {
             onClick={ () => navigate( '/products' ) }
             className="inline-flex items-center gap-2 bg-primary-600 hover:bg-primary-700
                        active:scale-95 text-white px-8 py-3.5 rounded-xl font-semibold
-                       transition-all min-h-[48px]"
+                       transition-all min-h-12"
           >
             Continue Shopping
           </button>
@@ -595,7 +595,7 @@ export default function Checkout() {
                 to={ `/order/${ wcOrder.order_id }` }
                 className="inline-flex items-center gap-2 bg-primary-600 hover:bg-primary-700
                            active:scale-95 text-white px-6 py-3 rounded-xl font-semibold
-                           text-sm transition-all min-h-[48px]"
+                           text-sm transition-all min-h-12"
               >
                 View Order Status
               </Link>
@@ -604,7 +604,7 @@ export default function Checkout() {
               onClick={ () => navigate( '/products' ) }
               className="inline-flex items-center gap-2 border border-gray-200 text-gray-700
                          hover:bg-gray-50 active:scale-95 px-6 py-3 rounded-xl font-semibold
-                         text-sm transition-all min-h-[48px]"
+                         text-sm transition-all min-h-12"
             >
               Continue Shopping
             </button>
@@ -659,9 +659,9 @@ export default function Checkout() {
                 </p>
                 <PayPalExpressButtons />
                 <div className="relative flex items-center mt-5 mb-1">
-                  <div className="flex-grow border-t border-gray-100" />
+                  <div className="grow border-t border-gray-100" />
                   <span className="mx-3 text-xs text-gray-400 shrink-0">or continue below</span>
-                  <div className="flex-grow border-t border-gray-100" />
+                  <div className="grow border-t border-gray-100" />
                 </div>
               </StepCard>
 
@@ -793,7 +793,7 @@ export default function Checkout() {
                     rows={ 2 }
                     placeholder="Special instructions for your order…"
                     className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white
-                               text-sm resize-none min-h-[44px]
+                               text-sm resize-none min-h-11
                                focus:outline-none focus:ring-2 focus:ring-primary-500/30
                                focus:border-primary-500 transition-all hover:border-gray-300"
                   />
@@ -827,7 +827,7 @@ export default function Checkout() {
                              bg-primary-600 hover:bg-primary-700 active:scale-[0.99]
                              text-white px-6 py-4 rounded-xl font-bold text-base
                              tracking-wide transition-all shadow-md hover:shadow-lg
-                             disabled:opacity-50 disabled:cursor-not-allowed min-h-[52px]"
+                             disabled:opacity-50 disabled:cursor-not-allowed min-h-13"
                 >
                   <Lock size={ 17 } />
                   Complete Purchase — ${ total.toFixed( 2 ) }
@@ -876,7 +876,7 @@ export default function Checkout() {
                      bg-primary-600 hover:bg-primary-700 text-white py-3.5 rounded-xl
                      font-bold text-sm tracking-wide transition-all shadow-md
                      active:scale-[0.99] disabled:opacity-40 disabled:cursor-not-allowed
-                     min-h-[48px]"
+                     min-h-12"
         >
           <Lock size={ 16 } />
           { isFormComplete
