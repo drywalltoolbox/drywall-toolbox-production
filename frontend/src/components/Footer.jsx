@@ -35,7 +35,7 @@ export default function Footer() {
           </Link>
           <div style={{ display: 'flex', gap: '6px', marginTop: '0px', justifyContent: 'center', alignItems: 'center' }}>
             <a
-              href="https://instagram.com"
+              href="https://www.instagram.com/drywalltoolbox"
               target="_blank"
               rel="noopener noreferrer"
               style={{ color: 'var(--alloy-deep)', textDecoration: 'none', cursor: 'pointer' }}
