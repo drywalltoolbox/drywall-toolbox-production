@@ -1,0 +1,569 @@
+<?php
+/**
+ * DTB Rewards Bridge — Must-Use Plugin
+ *
+ * Exposes WPLoyalty point data through the DTB REST API (dtb/v1 namespace).
+ * The React SPA never calls WPLoyalty directly — it calls only these endpoints.
+ *
+ * Endpoints:
+ *   GET  /wp-json/dtb/v1/rewards/balance/{id}  — User's current point balance
+ *   GET  /wp-json/dtb/v1/rewards/history/{id}  — Paginated transaction history
+ *   POST /wp-json/dtb/v1/rewards/redeem        — Redeem points → WC coupon code
+ *   POST /wp-json/dtb/v1/rewards/admin/adjust  — Admin: manual point adjustment
+ *
+ * All user endpoints require a valid DTB JWT (dtb_jwt_permission).
+ * The admin endpoint additionally requires manage_woocommerce capability.
+ *
+ * EARN LOGIC — 5-TIER SYSTEM (based on catalog pricing analysis):
+ *   WPLoyalty Lite does not support conditional/tiered campaign rules.
+ *   Points are awarded here via the woocommerce_order_status_completed hook.
+ *   WPLoyalty is used only as a ledger (storage + balance tracking).
+ *   WPLoyalty's own campaign engine should be disabled or set to 0 pts/$.
+ *
+ *   Tier 1: $0    – $49.99   → 2 pts per $1
+ *   Tier 2: $50   – $199.99  → 3 pts per $1
+ *   Tier 3: $200  – $499.99  → 4 pts per $1
+ *   Tier 4: $500  – $1499.99 → 5 pts per $1
+ *   Tier 5: $1500+           → 3 pts per $1  (diminishing — protects margin)
+ *
+ * Depends on (loaded before this via 00-dtb-loader.php):
+ *   dtb-auth.php  → dtb_jwt_permission(), dtb_verify_jwt()
+ *   WPLoyalty     → active plugin providing WLR\Plugin\Helpers\App
+ *
+ * @package drywall-toolbox
+ */
+
+defined( 'ABSPATH' ) || exit;
+
+// =============================================================================
+// EARN ENGINE — ORDER COMPLETION HOOK
+//
+// WPLoyalty Lite does not support conditional (order-total-based) campaign rules.
+// We bypass its campaign engine entirely and award points here on order completion.
+// WPLoyalty is used only as a ledger — install it, but disable its own campaigns
+// or set them to 0 pts/$ so there's no double-awarding.
+// =============================================================================
+
+add_action( 'woocommerce_order_status_completed', 'dtb_rewards_award_order_points', 20 );
+
+/**
+ * Award tiered points when an order is marked complete.
+ *
+ * Idempotent: guarded by order meta flag so it cannot fire twice
+ * (e.g., if an admin manually switches status back and forth).
+ *
+ * Tier schedule (derived from catalog pricing analysis — 2,304 products):
+ *   $0    – $49.99   → 2 pts / $1   (63% of catalog — small parts, tape, screws)
+ *   $50   – $199.99  → 3 pts / $1   (consumables, mid-range heads/tools)
+ *   $200  – $499.99  → 4 pts / $1   (pro hand tools, individual machines)
+ *   $500  – $1499.99 → 5 pts / $1   (full tool sets, automatic tapers)
+ *   $1500+           → 3 pts / $1   (diminishing — large machines, protects margin)
+ *
+ * @param int $order_id
+ */
+function dtb_rewards_award_order_points( int $order_id ): void {
+	// Bail if WPLoyalty is not active.
+	if ( ! class_exists( 'WLR\Plugin\Helpers\App' ) ) {
+		return;
+	}
+
+	$order = wc_get_order( $order_id );
+	if ( ! $order ) {
+		return;
+	}
+
+	// Idempotency guard — only award once per order.
+	if ( $order->get_meta( '_dtb_rewards_awarded' ) ) {
+		return;
+	}
+
+	$user_id = (int) $order->get_user_id();
+	if ( ! $user_id ) {
+		return; // Guest order — no user to credit.
+	}
+
+	$user_email = dtb_wlr_get_user_email( $user_id );
+	if ( ! $user_email ) {
+		return;
+	}
+
+	// Use the subtotal (excl. shipping and taxes) as the earn basis.
+	$order_total = (float) $order->get_subtotal();
+
+	$points = dtb_rewards_calculate_points( $order_total );
+
+	if ( $points <= 0 ) {
+		return;
+	}
+
+	try {
+		\WLR\Plugin\Helpers\App::addPoints(
+			$user_email,
+			$points,
+			'purchase',
+			sprintf( 'Order #%d — $%.2f subtotal → %d pts', $order_id, $order_total, $points )
+		);
+
+		// Mark the order so we never double-award.
+		$order->update_meta_data( '_dtb_rewards_awarded', true );
+		$order->update_meta_data( '_dtb_rewards_points', $points );
+		$order->save_meta_data();
+	} catch ( \Throwable $e ) {
+		// Log silently — never block the order completion flow.
+		error_log( '[DTB Rewards] Award failed for order ' . $order_id . ': ' . $e->getMessage() );
+	}
+}
+
+/**
+ * Calculate points earned for a given order subtotal using the 5-tier schedule.
+ *
+ * @param float $subtotal  Order subtotal in USD (excl. shipping + tax).
+ * @return int             Points to award (rounded down).
+ */
+function dtb_rewards_calculate_points( float $subtotal ): int {
+	$rate = match ( true ) {
+		$subtotal < 50.00    => 2,   // Tier 1: $0    – $49.99
+		$subtotal < 200.00   => 3,   // Tier 2: $50   – $199.99
+		$subtotal < 500.00   => 4,   // Tier 3: $200  – $499.99
+		$subtotal < 1500.00  => 5,   // Tier 4: $500  – $1,499.99
+		default              => 3,   // Tier 5: $1,500+ (diminishing returns)
+	};
+
+	return (int) floor( $subtotal * $rate );
+}
+
+// =============================================================================
+// ROUTE REGISTRATION
+// Register after WPLoyalty has had a chance to load (priority 10 is fine as
+// WPLoyalty loads its classes on plugins_loaded before rest_api_init fires).
+// =============================================================================
+
+add_action( 'rest_api_init', 'dtb_rewards_register_routes', 10 );
+
+function dtb_rewards_register_routes(): void {
+
+	// Bail gracefully if WPLoyalty is not yet active — no fatal errors.
+	if ( ! class_exists( 'WLR\Plugin\Helpers\App' ) ) {
+		return;
+	}
+
+	$ns = 'dtb/v1';
+
+	// ── GET /dtb/v1/rewards/balance/{id} ─────────────────────────────────────
+	register_rest_route( $ns, '/rewards/balance/(?P<id>\d+)', [
+		'methods'             => 'GET',
+		'callback'            => 'dtb_rewards_get_balance',
+		'permission_callback' => 'dtb_jwt_permission',
+		'args'                => [
+			'id' => [ 'validate_callback' => 'is_numeric' ],
+		],
+	] );
+
+	// ── GET /dtb/v1/rewards/history/{id} ─────────────────────────────────────
+	register_rest_route( $ns, '/rewards/history/(?P<id>\d+)', [
+		'methods'             => 'GET',
+		'callback'            => 'dtb_rewards_get_history',
+		'permission_callback' => 'dtb_jwt_permission',
+		'args'                => [
+			'id'     => [ 'validate_callback' => 'is_numeric' ],
+			'limit'  => [ 'default' => 20, 'validate_callback' => 'is_numeric' ],
+			'offset' => [ 'default' => 0,  'validate_callback' => 'is_numeric' ],
+		],
+	] );
+
+	// ── POST /dtb/v1/rewards/redeem ──────────────────────────────────────────
+	register_rest_route( $ns, '/rewards/redeem', [
+		'methods'             => 'POST',
+		'callback'            => 'dtb_rewards_redeem',
+		'permission_callback' => 'dtb_jwt_permission',
+	] );
+
+	// ── POST /dtb/v1/rewards/admin/adjust ────────────────────────────────────
+	register_rest_route( $ns, '/rewards/admin/adjust', [
+		'methods'             => 'POST',
+		'callback'            => 'dtb_rewards_admin_adjust',
+		'permission_callback' => 'dtb_rewards_admin_permission',
+	] );
+}
+
+// =============================================================================
+// PERMISSION CALLBACKS
+// =============================================================================
+
+/**
+ * Admin-only permission: valid DTB JWT + manage_woocommerce capability.
+ * Decodes the JWT to get the WP user_id, then checks their role.
+ *
+ * @param WP_REST_Request $request
+ * @return true|WP_Error
+ */
+function dtb_rewards_admin_permission( WP_REST_Request $request ) {
+	$jwt_check = dtb_jwt_permission( $request );
+	if ( is_wp_error( $jwt_check ) ) {
+		return $jwt_check;
+	}
+
+	// Re-read token to extract user_id from payload.
+	$token = null;
+	if ( ! empty( $_COOKIE['dtb_auth'] ) ) {
+		$token = sanitize_text_field( wp_unslash( $_COOKIE['dtb_auth'] ) );
+	} else {
+		$auth = $request->get_header( 'authorization' );
+		if ( $auth && preg_match( '/^Bearer\s+(\S+)$/i', $auth, $m ) ) {
+			$token = $m[1];
+		}
+	}
+
+	$payload = dtb_verify_jwt( (string) $token );
+	if ( is_wp_error( $payload ) ) {
+		return $payload;
+	}
+
+	$user = get_user_by( 'id', (int) $payload->sub );
+	if ( ! $user || ! user_can( $user, 'manage_woocommerce' ) ) {
+		return new WP_Error( 'forbidden', 'Shop admin access required.', [ 'status' => 403 ] );
+	}
+
+	return true;
+}
+
+// =============================================================================
+// ROUTE CALLBACKS
+// =============================================================================
+
+/**
+ * GET /dtb/v1/rewards/balance/{id}
+ *
+ * Returns the user's point balance, lifetime earned, lifetime redeemed,
+ * and current USD-equivalent value.
+ *
+ * @param WP_REST_Request $request
+ * @return WP_REST_Response|WP_Error
+ */
+function dtb_rewards_get_balance( WP_REST_Request $request ) {
+	$user_id = (int) $request['id'];
+	$data    = dtb_wlr_get_user_points( $user_id );
+
+	if ( is_wp_error( $data ) ) {
+		return $data;
+	}
+
+	return rest_ensure_response( [
+		'user_id'          => $user_id,
+		'points'           => $data['balance'],
+		'points_earned'    => $data['earned'],
+		'points_redeemed'  => $data['redeemed'],
+		'points_value_usd' => round( $data['balance'] / 100, 2 ), // 100 pts = $1
+	] );
+}
+
+/**
+ * GET /dtb/v1/rewards/history/{id}?limit=20&offset=0
+ *
+ * Returns paginated transaction history for the user.
+ *
+ * @param WP_REST_Request $request
+ * @return WP_REST_Response|WP_Error
+ */
+function dtb_rewards_get_history( WP_REST_Request $request ) {
+	$user_id = (int) $request['id'];
+	$limit   = max( 1, min( 100, (int) $request['limit'] ) );
+	$offset  = max( 0, (int) $request['offset'] );
+	$result  = dtb_wlr_get_history( $user_id, $limit, $offset );
+
+	if ( is_wp_error( $result ) ) {
+		return $result;
+	}
+
+	return rest_ensure_response( $result );
+}
+
+/**
+ * POST /dtb/v1/rewards/redeem
+ * Body: { user_id: int, points_to_redeem: int }
+ *
+ * Validates the request, calls the WPLoyalty helper to deduct points
+ * and create a WooCommerce coupon, then returns the coupon code to the SPA.
+ *
+ * @param WP_REST_Request $request
+ * @return WP_REST_Response|WP_Error
+ */
+function dtb_rewards_redeem( WP_REST_Request $request ) {
+	$params           = $request->get_json_params();
+	$user_id          = (int) ( $params['user_id'] ?? 0 );
+	$points_to_redeem = (int) ( $params['points_to_redeem'] ?? 0 );
+
+	if ( ! $user_id || $points_to_redeem <= 0 ) {
+		return new WP_Error( 'invalid_params', 'user_id and points_to_redeem are required.', [ 'status' => 400 ] );
+	}
+
+	// Minimum redemption threshold: 500 points = $5.00
+	if ( $points_to_redeem < 500 ) {
+		return new WP_Error( 'below_minimum', 'Minimum redemption is 500 points ($5.00).', [ 'status' => 400 ] );
+	}
+
+	// Maximum redemption per order: 5,000 points = $50.00
+	if ( $points_to_redeem > 5000 ) {
+		return new WP_Error( 'above_maximum', 'Maximum redemption per order is 5,000 points ($50.00).', [ 'status' => 400 ] );
+	}
+
+	// Rate limit: 5 redemption requests per user per hour.
+	$rate_key = 'dtb_redeem_user_' . $user_id;
+	$attempts = (int) get_transient( $rate_key );
+	if ( $attempts >= 5 ) {
+		return new WP_Error( 'rate_limited', 'Too many redemption attempts. Please wait before trying again.', [ 'status' => 429 ] );
+	}
+	set_transient( $rate_key, $attempts + 1, HOUR_IN_SECONDS );
+
+	$result = dtb_wlr_redeem_points( $user_id, $points_to_redeem );
+
+	if ( is_wp_error( $result ) ) {
+		return $result;
+	}
+
+	return rest_ensure_response( $result );
+}
+
+/**
+ * POST /dtb/v1/rewards/admin/adjust
+ * Body: { user_id: int, points_delta: int, reason: string }
+ *
+ * Admin-only. Adds (positive delta) or deducts (negative delta) points
+ * from a user and logs the reason in WPLoyalty's activity ledger.
+ *
+ * @param WP_REST_Request $request
+ * @return WP_REST_Response|WP_Error
+ */
+function dtb_rewards_admin_adjust( WP_REST_Request $request ) {
+	$params       = $request->get_json_params();
+	$user_id      = (int) ( $params['user_id'] ?? 0 );
+	$points_delta = (int) ( $params['points_delta'] ?? 0 );
+	$reason       = sanitize_text_field( $params['reason'] ?? 'Manual admin adjustment' );
+
+	if ( ! $user_id || $points_delta === 0 ) {
+		return new WP_Error( 'invalid_params', 'user_id and non-zero points_delta are required.', [ 'status' => 400 ] );
+	}
+
+	$result = dtb_wlr_adjust_points( $user_id, $points_delta, $reason );
+
+	if ( is_wp_error( $result ) ) {
+		return $result;
+	}
+
+	return rest_ensure_response( $result );
+}
+
+// =============================================================================
+// WPLOYALTY ADAPTER FUNCTIONS
+//
+// All WPLoyalty internals are isolated here. If WPLoyalty ever changes its
+// class/method names, only this section needs updating.
+// =============================================================================
+
+/**
+ * Get a user's point balance and lifetime totals from WPLoyalty.
+ *
+ * @param int $user_id
+ * @return array|WP_Error { balance: int, earned: int, redeemed: int }
+ */
+function dtb_wlr_get_user_points( int $user_id ): array|WP_Error {
+	if ( ! get_user_by( 'id', $user_id ) ) {
+		return new WP_Error( 'user_not_found', 'User not found.', [ 'status' => 404 ] );
+	}
+
+	try {
+		$pts = \WLR\Plugin\Helpers\App::getUserPoints( $user_id );
+
+		return [
+			'balance'  => isset( $pts->points )       ? (int) $pts->points       : 0,
+			'earned'   => isset( $pts->earn_total )   ? (int) $pts->earn_total   : 0,
+			'redeemed' => isset( $pts->redeem_total ) ? (int) $pts->redeem_total : 0,
+		];
+	} catch ( \Throwable $e ) {
+		return new WP_Error( 'wlr_error', 'Could not fetch points data.', [ 'status' => 500 ] );
+	}
+}
+
+/**
+ * Get paginated transaction history for a user from WPLoyalty's activity table.
+ *
+ * WPLoyalty stores history in {prefix}wlr_reward_activity, keyed by user_email.
+ *
+ * @param int $user_id
+ * @param int $limit
+ * @param int $offset
+ * @return array|WP_Error { user_id, events, total, limit, offset }
+ */
+function dtb_wlr_get_history( int $user_id, int $limit, int $offset ): array|WP_Error {
+	$user_email = dtb_wlr_get_user_email( $user_id );
+	if ( ! $user_email ) {
+		return new WP_Error( 'user_not_found', 'User not found.', [ 'status' => 404 ] );
+	}
+
+	global $wpdb;
+
+	$table = $wpdb->prefix . 'wlr_reward_activity';
+
+	// phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+	$total = (int) $wpdb->get_var(
+		$wpdb->prepare( "SELECT COUNT(*) FROM {$table} WHERE user_email = %s", $user_email )
+	);
+
+	$rows = $wpdb->get_results(
+		$wpdb->prepare(
+			"SELECT action_type, points, note, created_at
+			 FROM {$table}
+			 WHERE user_email = %s
+			 ORDER BY id DESC
+			 LIMIT %d OFFSET %d",
+			$user_email,
+			$limit,
+			$offset
+		),
+		ARRAY_A
+	);
+	// phpcs:enable WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+
+	$events = array_map( static function ( array $row ): array {
+		return [
+			'event'  => $row['action_type'] ?? 'unknown',
+			'points' => (int) ( $row['points'] ?? 0 ),
+			'note'   => $row['note'] ?? '',
+			'date'   => $row['created_at'] ?? '',
+		];
+	}, $rows ?: [] );
+
+	return [
+		'user_id' => $user_id,
+		'events'  => $events,
+		'total'   => $total,
+		'limit'   => $limit,
+		'offset'  => $offset,
+	];
+}
+
+/**
+ * Redeem points for a WooCommerce coupon code via WPLoyalty.
+ *
+ * Creates a fixed-cart coupon, then asks WPLoyalty to deduct the points
+ * from the user's ledger and record the transaction in its activity table.
+ *
+ * @param int $user_id
+ * @param int $points_to_redeem
+ * @return array|WP_Error { success, coupon_code, discount_amount, new_balance }
+ */
+function dtb_wlr_redeem_points( int $user_id, int $points_to_redeem ): array|WP_Error {
+	$user_data = dtb_wlr_get_user_points( $user_id );
+	if ( is_wp_error( $user_data ) ) {
+		return $user_data;
+	}
+
+	if ( $user_data['balance'] < $points_to_redeem ) {
+		return new WP_Error(
+			'insufficient_points',
+			sprintf( 'You have %d points but tried to redeem %d.', $user_data['balance'], $points_to_redeem ),
+			[ 'status' => 400 ]
+		);
+	}
+
+	// 100 points = $1.00 discount
+	$discount_amount = round( $points_to_redeem / 100, 2 );
+
+	// Collision-resistant coupon code: DTB- + 8 hex chars
+	$coupon_code = 'DTB-' . strtoupper( substr( md5( $user_id . $points_to_redeem . microtime() ), 0, 8 ) );
+
+	try {
+		// Build and save the WooCommerce coupon.
+		$coupon = new WC_Coupon();
+		$coupon->set_code( $coupon_code );
+		$coupon->set_discount_type( 'fixed_cart' );
+		$coupon->set_amount( $discount_amount );
+		$coupon->set_usage_limit( 1 );
+		$coupon->set_usage_limit_per_user( 1 );
+		$coupon->set_individual_use( true );
+		$coupon->set_date_expires( strtotime( '+7 days' ) );
+
+		// Restrict coupon to this user's email — prevents sharing.
+		$user = get_user_by( 'id', $user_id );
+		if ( $user ) {
+			$coupon->set_email_restrictions( [ $user->user_email ] );
+		}
+
+		$coupon->save();
+
+		// Tell WPLoyalty to deduct the points and log the transaction.
+		\WLR\Plugin\Helpers\App::deductPoints(
+			dtb_wlr_get_user_email( $user_id ),
+			$points_to_redeem,
+			'redeem',
+			sprintf( 'Redeemed %d pts → coupon %s (−$%.2f)', $points_to_redeem, $coupon_code, $discount_amount )
+		);
+
+		return [
+			'success'         => true,
+			'coupon_code'     => $coupon_code,
+			'discount_amount' => $discount_amount,
+			'new_balance'     => $user_data['balance'] - $points_to_redeem,
+		];
+	} catch ( \Throwable $e ) {
+		return new WP_Error( 'redemption_failed', 'Redemption failed: ' . $e->getMessage(), [ 'status' => 500 ] );
+	}
+}
+
+/**
+ * Admin helper: manually add or deduct points from a user.
+ *
+ * @param int    $user_id
+ * @param int    $points_delta  Positive = award, Negative = deduct
+ * @param string $reason        Admin note recorded in WPLoyalty activity log
+ * @return array|WP_Error { success, adjusted, new_balance, reason }
+ */
+function dtb_wlr_adjust_points( int $user_id, int $points_delta, string $reason ): array|WP_Error {
+	$user_data = dtb_wlr_get_user_points( $user_id );
+	if ( is_wp_error( $user_data ) ) {
+		return $user_data;
+	}
+
+	if ( $points_delta < 0 && $user_data['balance'] < abs( $points_delta ) ) {
+		return new WP_Error(
+			'insufficient_points',
+			sprintf( 'Cannot deduct %d points; user only has %d.', abs( $points_delta ), $user_data['balance'] ),
+			[ 'status' => 400 ]
+		);
+	}
+
+	try {
+		$user_email = dtb_wlr_get_user_email( $user_id );
+
+		if ( $points_delta > 0 ) {
+			\WLR\Plugin\Helpers\App::addPoints( $user_email, $points_delta, 'credit', $reason );
+		} else {
+			\WLR\Plugin\Helpers\App::deductPoints( $user_email, abs( $points_delta ), 'debit', $reason );
+		}
+
+		$new_data = dtb_wlr_get_user_points( $user_id );
+
+		return [
+			'success'     => true,
+			'adjusted'    => $points_delta,
+			'new_balance' => is_wp_error( $new_data ) ? null : $new_data['balance'],
+			'reason'      => $reason,
+		];
+	} catch ( \Throwable $e ) {
+		return new WP_Error( 'adjust_failed', 'Adjustment failed: ' . $e->getMessage(), [ 'status' => 500 ] );
+	}
+}
+
+// ─── Utility ─────────────────────────────────────────────────────────────────
+
+/**
+ * Get a WordPress user's email address by user ID.
+ * WPLoyalty keys its activity table by user_email, not user_id.
+ *
+ * @param int $user_id
+ * @return string  Email address, or empty string if the user does not exist.
+ */
+function dtb_wlr_get_user_email( int $user_id ): string {
+	$user = get_user_by( 'id', $user_id );
+	return $user ? $user->user_email : '';
+}
