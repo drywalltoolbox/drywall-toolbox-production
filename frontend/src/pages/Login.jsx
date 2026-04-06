@@ -109,11 +109,12 @@ export default function Login() {
         minHeight:           '100vh',
       } }>
 
-        {/* ── Left: branded hero panel ── */}
-        <div style={ {
+        {/* ── Left: branded hero panel — hidden on mobile, visible md+ ── */}
+        <div
+          className="hidden md:flex"
+          style={ {
           background:     'linear-gradient(135deg, #0f172a 0%, #1e3a8a 55%, #1d4ed8 100%)',
           padding:        'clamp(3rem, 8vw, 5rem) clamp(2rem, 6vw, 4rem)',
-          display:        'flex',
           flexDirection:  'column',
           justifyContent: 'center',
           position:       'relative',

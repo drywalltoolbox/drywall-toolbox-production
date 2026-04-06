@@ -143,6 +143,7 @@ export default function Register() {
   const [ confirm,     setConfirm     ] = useState( '' );
   const [ showPw,      setShowPw      ] = useState( false );
   const [ showConfirm, setShowConfirm ] = useState( false );
+  const [ referralCode, setReferralCode ] = useState( '' );
   const [ submitError, setSubmitError ] = useState( null );
   const [ submitting,  setSubmitting  ] = useState( false );
 
@@ -165,7 +166,7 @@ export default function Register() {
 
     setSubmitting( true );
     try {
-      await register( { firstName, lastName, email, password } );
+      await register( { firstName, lastName, email, password, referralCode: referralCode.trim() || undefined } );
       navigate( '/dashboard', { replace: true } );
     } catch ( err ) {
       setSubmitError( err.message || 'Registration failed. Please try again.' );
@@ -432,8 +433,37 @@ export default function Register() {
                 </AnimatePresence>
               </Motion.div>
 
+              <Motion.div className="form-group" custom={ 5 } variants={ fieldVariants } initial="hidden" animate="visible">
+                <label className="machined-label text-blue-600" htmlFor="reg-referral">
+                  Referral Code
+                  <span style={ {
+                    marginLeft:    '6px',
+                    fontSize:      '0.68rem',
+                    fontWeight:    500,
+                    color:         'rgba(15,23,42,0.38)',
+                    letterSpacing: '0.02em',
+                    textTransform: 'none',
+                  } }>
+                    (optional)
+                  </span>
+                </label>
+                <input
+                  id="reg-referral"
+                  type="text"
+                  className="machined-input text-black"
+                  placeholder="Enter referral code"
+                  value={ referralCode }
+                  onChange={ ( e ) => setReferralCode( e.target.value ) }
+                  autoComplete="off"
+                  autoCorrect="off"
+                  autoCapitalize="characters"
+                  spellCheck={ false }
+                  disabled={ busy }
+                />
+              </Motion.div>
+
               <Motion.div
-                custom={ 5 }
+                custom={ 6 }
                 variants={ fieldVariants }
                 initial="hidden"
                 animate="visible"

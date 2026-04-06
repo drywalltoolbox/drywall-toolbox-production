@@ -1,15 +1,19 @@
 ﻿import { Link, useLocation } from 'react-router-dom';
 import { useState, useEffect, useRef } from 'react';
 import { useCart } from '../context/CartContext';
-import { ShoppingCart, Menu, X, ChevronDown } from 'lucide-react';
+import { useAuthContext } from '../auth/AuthContext.js';
+import { ShoppingCart, Menu, X, ChevronDown, User, LogIn, UserPlus, LogOut } from 'lucide-react';
 import Logo from '/logo2.svg';
 import MobileSearch from './MobileSearch';
 
 export default function Header({ onCartToggle }) {
   const location = useLocation();
   const { getCartCount } = useCart();
+  const { user, isAuthenticated, isLoading, logout } = useAuthContext();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [shopDropdownOpen, setShopDropdownOpen] = useState(false);
+  const [accountDropdownOpen, setAccountDropdownOpen] = useState(false);
+  const accountDropdownRef = useRef(null);
   const [isTablet, setIsTablet] = useState(() => {
     try {
       return typeof window !== 'undefined' && window.matchMedia('(min-width: 641px) and (max-width: 1024px)').matches;
@@ -20,6 +24,9 @@ export default function Header({ onCartToggle }) {
   
   // Ref for dropdown close timer (prevents flickering on fast mouse movement)
   const dropdownCloseTimerRef = useRef(null);
+  // Tracks the previous pathname so the navigation-close effect can run
+  // asynchronously and avoid the react-hooks/set-state-in-effect lint error.
+  const prevPathnameRef = useRef(location.pathname);
 
   const isActive = (path) => location.pathname === path;
 
@@ -28,6 +35,7 @@ export default function Header({ onCartToggle }) {
   const closeMenus = () => {
     setShopDropdownOpen(false);
     setMobileMenuOpen(false);
+    setAccountDropdownOpen(false);
   };
 
   // Handle dropdown close with small delay to prevent flicker
@@ -60,12 +68,18 @@ export default function Header({ onCartToggle }) {
     };
   }, []);
 
-  // Close dropdowns when location changes (page navigation)
+  // Close dropdowns on navigation.
+  // setState calls are deferred via setTimeout so they run asynchronously,
+  // satisfying the react-hooks/set-state-in-effect rule.
   useEffect(() => {
-    // We intentionally close menus on navigation - standard UX pattern
-    // Pylance warns about setState in effects, but this is an appropriate use
-    setShopDropdownOpen(false);
-    setMobileMenuOpen(false);
+    if (prevPathnameRef.current === location.pathname) return;
+    prevPathnameRef.current = location.pathname;
+    const t = setTimeout(() => {
+      setShopDropdownOpen(false);
+      setMobileMenuOpen(false);
+      setAccountDropdownOpen(false);
+    }, 0);
+    return () => clearTimeout(t);
   }, [location.pathname]);
 
   // Handle keyboard shortcuts (Escape to close)
@@ -103,10 +117,14 @@ export default function Header({ onCartToggle }) {
   // Handle clicking outside the header to close menus
   useEffect(() => {
     const handleClickOutside = (e) => {
-      // If the click is outside the header, close the dropdown
+      // Close shop dropdown if clicking outside the header
       const header = document.querySelector('.site-header');
       if (header && !header.contains(e.target)) {
         setShopDropdownOpen(false);
+      }
+      // Close account dropdown if clicking outside its container
+      if (accountDropdownRef.current && !accountDropdownRef.current.contains(e.target)) {
+        setAccountDropdownOpen(false);
       }
     };
 
@@ -251,6 +269,148 @@ export default function Header({ onCartToggle }) {
               <Link to="/contact" className={`nav-link ${isActive('/contact') ? 'active' : ''}`} style={{ color: isActive('/contact') ? 'var(--color-primary-600)' : 'black' }}>Contact</Link>
             </nav>
 
+            {/* ── Desktop account icon + dropdown ─────────────────────────── */}
+            {!isLoading && (
+              <div ref={accountDropdownRef} style={{ position: 'relative' }}>
+
+                {/* Trigger — circle icon button */}
+                <button
+                  onClick={() => setAccountDropdownOpen((o) => !o)}
+                  aria-label="Account menu"
+                  aria-expanded={accountDropdownOpen}
+                  style={{
+                    display:        'flex',
+                    alignItems:     'center',
+                    justifyContent: 'center',
+                    width:          '36px',
+                    height:         '36px',
+                    borderRadius:   '50%',
+                    border:         isAuthenticated ? '2px solid #2563eb' : '1.5px solid #cbd5e1',
+                    background:     isAuthenticated ? 'linear-gradient(135deg, #1d4ed8, #2563eb)' : 'white',
+                    cursor:         'pointer',
+                    padding:        0,
+                    flexShrink:     0,
+                    transition:     'box-shadow 150ms',
+                    boxShadow:      accountDropdownOpen ? '0 0 0 3px rgba(37,99,235,0.18)' : 'none',
+                  }}
+                  onMouseEnter={(e) => { if (!accountDropdownOpen) e.currentTarget.style.boxShadow = '0 0 0 3px rgba(37,99,235,0.12)'; }}
+                  onMouseLeave={(e) => { if (!accountDropdownOpen) e.currentTarget.style.boxShadow = 'none'; }}
+                >
+                  <User size={16} style={{ color: isAuthenticated ? 'white' : '#475569' }} />
+                </button>
+
+                {/* Dropdown panel — always rendered, CSS-driven open/close */}
+                <div
+                  style={{
+                    position:        'absolute',
+                    top:             'calc(100% + 10px)',
+                    right:           0,
+                    width:           '224px',
+                    background:      'white',
+                    border:          '1px solid rgba(15,23,42,0.09)',
+                    borderRadius:    '10px',
+                    boxShadow:       '0 8px 28px rgba(15,23,42,0.13), 0 2px 8px rgba(15,23,42,0.06)',
+                    zIndex:          10001,
+                    overflow:        'hidden',
+                    opacity:         accountDropdownOpen ? 1 : 0,
+                    visibility:      accountDropdownOpen ? 'visible' : 'hidden',
+                    pointerEvents:   accountDropdownOpen ? 'auto' : 'none',
+                    transform:       accountDropdownOpen ? 'translateY(0) scale(1)' : 'translateY(-6px) scale(0.97)',
+                    transformOrigin: 'top right',
+                    transition:      'opacity 160ms ease-out, transform 160ms ease-out, visibility 160ms',
+                  }}
+                >
+                  {isAuthenticated ? (
+                    /* ── Logged-in state ── */
+                    <>
+                      {/* Identity header */}
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '14px 16px 12px', borderBottom: '1px solid rgba(15,23,42,0.07)' }}>
+                        <div style={{ width: '34px', height: '34px', borderRadius: '50%', background: 'linear-gradient(135deg, #1d4ed8, #2563eb)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                          <User size={15} style={{ color: 'white' }} />
+                        </div>
+                        <div style={{ minWidth: 0 }}>
+                          <p style={{ margin: 0, fontWeight: 700, fontSize: '0.825rem', color: '#0f172a', lineHeight: 1.2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                            {user?.first_name && user?.last_name ? `${user.first_name} ${user.last_name}` : user?.email || 'My Account'}
+                          </p>
+                          {user?.email && (
+                            <p style={{ margin: 0, fontSize: '0.7rem', color: '#64748b', lineHeight: 1.3, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                              {user.email}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Dashboard */}
+                      <Link
+                        to="/dashboard"
+                        onClick={() => setAccountDropdownOpen(false)}
+                        style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '11px 16px', color: '#0f172a', textDecoration: 'none', fontSize: '0.845rem', fontWeight: 500, transition: 'background 130ms' }}
+                        onMouseEnter={(e) => e.currentTarget.style.background = '#f1f5f9'}
+                        onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+                      >
+                        <User size={14} style={{ opacity: 0.45, flexShrink: 0 }} />
+                        My Dashboard
+                      </Link>
+
+                      <div style={{ height: '1px', background: 'rgba(15,23,42,0.07)', margin: '2px 0' }} />
+
+                      {/* Sign out */}
+                      <button
+                        onClick={async () => { setAccountDropdownOpen(false); await logout(); }}
+                        style={{ display: 'flex', alignItems: 'center', gap: '10px', width: '100%', padding: '11px 16px', background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left', fontSize: '0.845rem', fontWeight: 600, color: '#dc2626', transition: 'background 130ms' }}
+                        onMouseEnter={(e) => e.currentTarget.style.background = '#fef2f2'}
+                        onMouseLeave={(e) => e.currentTarget.style.background = 'none'}
+                      >
+                        <LogOut size={14} style={{ flexShrink: 0 }} />
+                        Sign Out
+                      </button>
+                    </>
+                  ) : (
+                    /* ── Guest state ── */
+                    <>
+                      {/* Label */}
+                      <div style={{ padding: '13px 16px 10px', borderBottom: '1px solid rgba(15,23,42,0.07)' }}>
+                        <p style={{ margin: 0, fontSize: '0.7rem', fontWeight: 700, letterSpacing: '0.07em', textTransform: 'uppercase', color: '#94a3b8' }}>
+                          My Account
+                        </p>
+                      </div>
+
+                      {/* Sign In */}
+                      <Link
+                        to="/login"
+                        onClick={() => setAccountDropdownOpen(false)}
+                        style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '11px 16px', color: '#0f172a', textDecoration: 'none', fontSize: '0.845rem', fontWeight: 600, transition: 'background 130ms' }}
+                        onMouseEnter={(e) => e.currentTarget.style.background = '#f1f5f9'}
+                        onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+                      >
+                        <LogIn size={14} style={{ opacity: 0.5, flexShrink: 0 }} />
+                        Sign In
+                      </Link>
+
+                      <div style={{ height: '1px', background: 'rgba(15,23,42,0.07)', margin: '2px 16px' }} />
+
+                      {/* Create Account */}
+                      <div style={{ padding: '10px 12px 12px' }}>
+                        <Link
+                          to="/register"
+                          onClick={() => setAccountDropdownOpen(false)}
+                          style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '7px', padding: '9px 14px', background: 'linear-gradient(135deg, #1d4ed8, #2563eb)', borderRadius: '6px', color: 'white', textDecoration: 'none', fontSize: '0.825rem', fontWeight: 700, transition: 'opacity 130ms' }}
+                          onMouseEnter={(e) => e.currentTarget.style.opacity = '0.88'}
+                          onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
+                        >
+                          <UserPlus size={13} />
+                          Create Account
+                        </Link>
+                        <p style={{ margin: '8px 0 0', fontSize: '0.68rem', color: '#94a3b8', textAlign: 'center', lineHeight: 1.4 }}>
+                          No account needed to browse or checkout.
+                        </p>
+                      </div>
+                    </>
+                  )}
+                </div>
+              </div>
+            )}
+
             <div className="cart-area">
               <button onClick={onCartToggle} className="cart-toggle header-icon" aria-label="Toggle cart">
                 <ShoppingCart size={20} />
@@ -348,20 +508,92 @@ export default function Header({ onCartToggle }) {
             >
               Contact
             </Link>
+
+            {/* ── Account / Auth — bottom of mobile menu ─────────────────── */}
+            <div style={{ marginTop: '8px', paddingTop: '12px', borderTop: '1px solid var(--machined-border)' }}>
+              {!isLoading && (
+                isAuthenticated ? (
+                  /* ── Logged-in ── */
+                  <>
+                    {/* Identity row */}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '10px 20px', marginBottom: '4px' }}>
+                      <div style={{ width: '34px', height: '34px', borderRadius: '50%', background: 'linear-gradient(135deg, #1d4ed8, #2563eb)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                        <User size={16} style={{ color: 'white' }} />
+                      </div>
+                      <div>
+                        <p style={{ margin: 0, fontWeight: 700, fontSize: '0.875rem', color: '#0f172a', lineHeight: 1.2 }}>
+                          {user?.first_name && user?.last_name ? `${user.first_name} ${user.last_name}` : user?.email || 'My Account'}
+                        </p>
+                        {user?.email && (
+                          <p style={{ margin: 0, fontSize: '0.72rem', color: '#64748b', lineHeight: 1.3 }}>
+                            {user.email}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+
+                    <Link
+                      to="/dashboard"
+                      className={`nav-link-mobile ${isActive('/dashboard') ? 'active' : ''}`}
+                      onClick={closeMobileMenu}
+                      style={{ display: 'flex', alignItems: 'center', gap: '10px' }}
+                    >
+                      <User size={16} style={{ flexShrink: 0, opacity: 0.55 }} />
+                      My Dashboard
+                    </Link>
+
+                    <button
+                      onClick={async () => { await logout(); closeMobileMenu(); }}
+                      style={{ display: 'flex', alignItems: 'center', gap: '10px', width: '100%', padding: '14px 20px', background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left', fontSize: 'inherit', color: '#dc2626', fontWeight: 600, borderRadius: '6px', transition: 'background 150ms' }}
+                      onMouseEnter={(e) => e.currentTarget.style.background = '#fef2f2'}
+                      onMouseLeave={(e) => e.currentTarget.style.background = 'none'}
+                    >
+                      <LogOut size={16} style={{ flexShrink: 0 }} />
+                      Sign Out
+                    </button>
+                  </>
+                ) : (
+                  /* ── Guest ── */
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', padding: '4px 20px 8px' }}>
+                    <Link
+                      to="/login"
+                      onClick={closeMobileMenu}
+                      style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', padding: '12px 16px', border: '1.5px solid #cbd5e1', borderRadius: '6px', color: '#0f172a', fontWeight: 600, fontSize: '0.9rem', textDecoration: 'none', background: 'white', transition: 'background 150ms' }}
+                      onMouseEnter={(e) => e.currentTarget.style.background = '#f1f5f9'}
+                      onMouseLeave={(e) => e.currentTarget.style.background = 'white'}
+                    >
+                      <LogIn size={16} />
+                      Sign In
+                    </Link>
+                    <Link
+                      to="/register"
+                      onClick={closeMobileMenu}
+                      style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', padding: '12px 16px', background: 'linear-gradient(135deg, #1d4ed8, #2563eb)', borderRadius: '6px', color: 'white', fontWeight: 700, fontSize: '0.9rem', textDecoration: 'none', transition: 'opacity 150ms' }}
+                      onMouseEnter={(e) => e.currentTarget.style.opacity = '0.88'}
+                      onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
+                    >
+                      <UserPlus size={16} />
+                      Create Account
+                    </Link>
+                    <p style={{ margin: '2px 0 0', fontSize: '0.72rem', color: '#94a3b8', textAlign: 'center', lineHeight: 1.4 }}>
+                      No account needed to browse or checkout.
+                    </p>
+                  </div>
+                )
+              )}
+            </div>
           </nav>
         </div>
       )}
 
       <style>{`
         @keyframes dropdownSlideIn {
-          from {
-            opacity: 0;
-            transform: translateY(-8px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
+          from { opacity: 0; transform: translateY(-8px); }
+          to   { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes accountDropdownIn {
+          from { opacity: 0; transform: translateY(-6px) scale(0.97); }
+          to   { opacity: 1; transform: translateY(0) scale(1); }
         }
       `}</style>
     </header>

@@ -93,11 +93,12 @@ function App() {
   const toggleCart = () => setCartOpen(prev => !prev);
   const closeCart  = () => setCartOpen(false);
 
-  // The app is always served at the domain root by the .htaccess catch-all rule.
-  // Hardcode basename to '/' — using process.env.PUBLIC_URL would evaluate to
-  // '/dist/' (the asset public path), which is correct for asset loading but
-  // wrong for React Router — it would expect all URLs to start with /dist/.
-  const basename = '/';
+  // On GitHub Pages the site lives at /drywall-toolbox, so React Router needs
+  // the same sub-path as basename. PUBLIC_URL is injected at build time by
+  // webpack DefinePlugin from the PUBLIC_URL env var (set to /drywall-toolbox
+  // in the GH Actions workflow). In production on a custom domain PUBLIC_URL
+  // is '' (empty), which resolves to '/' here — correct for both cases.
+  const basename = (process.env.PUBLIC_URL || '').replace(/\/+$/, '') || '/';
 
   return (
     <AuthProvider>

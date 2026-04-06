@@ -33,6 +33,35 @@
   </head>
   <body>
     <!--
+      GitHub Pages SPA deep-link restore.
+      404.html encodes the original path into ?/path — this script decodes it
+      back and replaces the browser URL *before* React/ReactRouter boots so the
+      router sees the real path (e.g. /login, /register) rather than /?/login.
+    -->
+    <script>
+      (function () {
+        var redirect = sessionStorage.redirect;
+        delete sessionStorage.redirect;
+        if (redirect && redirect !== location.href) {
+          history.replaceState(null, null, redirect);
+        }
+      })();
+      // Also handle the ?/ encoding used by 404.html
+      (function (l) {
+        if (l.search[1] === '/') {
+          var decoded = l.search.slice(1).split('&').map(function (s) {
+            return s.replace(/~and~/g, '&');
+          });
+          window.history.replaceState(
+            null, null,
+            l.pathname.slice(0, -1) + decoded[0] +
+            (decoded.slice(1).length ? '?' + decoded.slice(1).join('&') : '') +
+            l.hash
+          );
+        }
+      }(window.location));
+    </script>
+    <!--
       WooCommerce core-profiler safety guard
       ──────────────────────────────────────
       WooCommerce 7+ ships a React-based admin app (core-profiler.js) that can

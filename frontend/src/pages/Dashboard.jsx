@@ -55,7 +55,7 @@ const cardVariants = {
 
 // ─── Stat card ────────────────────────────────────────────────────────────────
 
-function StatCard( { icon: Icon, label, value, color, delay } ) {
+function StatCard( { label, value, color, delay } ) {
   return (
     <Motion.div
       custom={ delay }
@@ -99,7 +99,7 @@ function StatCard( { icon: Icon, label, value, color, delay } ) {
 
 // ─── Nav link ─────────────────────────────────────────────────────────────────
 
-function SideNavLink( { icon: Icon, label, to, external } ) {
+function SideNavLink( { label, to, external } ) {
   const inner = (
     <div style={ {
       display:        'flex',
