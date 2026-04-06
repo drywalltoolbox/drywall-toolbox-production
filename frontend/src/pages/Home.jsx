@@ -6,6 +6,7 @@ import surproLogo from '/brands/SurPro/surpro_logo.svg';
 import asgardLogo from '/brands/Asgard/asgard_logo.svg';
 import gracoLogo from '/brands/Graco/graco_logo.svg';
 import platinumLogo from '/brands/Platinum/platinum_logo.svg';
+import duraStiltsLogo from '/brands/Dura-Stilts/dura-stilts-logo.svg';
 
 const trustBadges = [
   {
@@ -44,6 +45,7 @@ const brandLogos = [
   { name: 'Asgard', src: asgardLogo },
   { name: 'Graco', src: gracoLogo },
   { name: 'Platinum', src: platinumLogo },
+  { name: 'Dura-Stilts', src: duraStiltsLogo },
 ];
 
 export default function Home() {

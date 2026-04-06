@@ -16,6 +16,7 @@ import asgardLogo from '/brands/Asgard/asgard_logo.svg';
 import gracoLogo from '/brands/Graco/graco_logo.svg';
 import level5Logo from '/brands/Level5/Level5.svg';
 import platinumLogo from '/brands/Platinum/platinum_logo.svg';
+import duraStiltsLogo from '/brands/Dura-Stilts/dura-stilts-logo.svg';
 
 const brandLogos = {
   'TapeTech': tapeTechLogo,
@@ -25,6 +26,7 @@ const brandLogos = {
   'Graco': gracoLogo,
   'Level5': level5Logo,
   'Platinum': platinumLogo,
+  'Dura-Stilts': duraStiltsLogo,
 };
 
 // ---------------------------------------------------------------------------
@@ -495,6 +497,7 @@ const BRAND_TO_SLUG = {
   'SurPro':                'surpro',
   'Graco':                 'graco',
   'Platinum':              'platinum',
+  'Dura-Stilts':           'dura-stilts',
 };
 const SLUG_TO_BRAND = Object.fromEntries(
   Object.entries(BRAND_TO_SLUG).map(([name, slug]) => [slug, name])
@@ -518,6 +521,7 @@ export default function Parts() {
     'SurPro',
     'Graco',
     'Platinum',
+    'Dura-Stilts',
   ];
 
   const location = useLocation();

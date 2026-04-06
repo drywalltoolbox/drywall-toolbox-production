@@ -5,6 +5,7 @@ import asgardLogo from '/brands/Asgard/asgard_logo.svg';
 import gracoLogo from '/brands/Graco/graco_logo.svg';
 import level5Logo from '/brands/Level5/Level5.svg';
 import platinumLogo from '/brands/Platinum/platinum_logo.svg';
+import duraStiltsLogo from '/brands/Dura-Stilts/dura-stilts-logo.svg';
 import SearchBar from './SearchBar';
 
 const brandLogos = {
@@ -15,6 +16,7 @@ const brandLogos = {
   'Graco': gracoLogo,
   'Level5': level5Logo,
   'Platinum': platinumLogo,
+  'Dura-Stilts': duraStiltsLogo,
 };
 
 export default function BrandSelector({

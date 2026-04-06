@@ -36,6 +36,7 @@ const PARTS_BRANDS = [
   'Level5',
   'Graco',
   'Platinum',
+  'Dura-Stilts',
 ];
 
 // Brand name ↔ URL slug maps so navigation produces readable URLs like
@@ -47,6 +48,7 @@ const BRAND_TO_SLUG = {
   'Level5':                'level5',
   'Graco':                 'graco',
   'Platinum':              'platinum',
+  'Dura-Stilts':           'dura-stilts',
 };
 const SLUG_TO_BRAND = Object.fromEntries(
   Object.entries(BRAND_TO_SLUG).map(([name, slug]) => [slug, name])

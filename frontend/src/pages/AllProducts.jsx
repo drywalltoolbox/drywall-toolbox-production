@@ -36,7 +36,8 @@ const ALLOWED_BRANDS = [
   'Level5',
   'SurPro',
   'Graco',
-  'Platinum'
+  'Platinum',
+  'Dura-Stilts'
 ];
 
 const MAX_PRICE = 3000;
