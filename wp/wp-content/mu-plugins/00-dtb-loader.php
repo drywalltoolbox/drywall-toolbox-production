@@ -20,6 +20,7 @@
  *   dtb-cache.php          — transient cache helpers and diagnostic route
  *   dtb-rest-api.php       — WC proxy + site-management REST routes + CORS
  *   dtb-rewards.php        — WPLoyalty REST bridge (dtb/v1/rewards/* endpoints)
+ *   dtb-image-sync.php     — media-library sync for uploads/2026/04/ images
  *   dtb-woocommerce.php    — WC configuration and webhook auto-creation
  *   dtb-schematics-api.php — schematics media REST route
  *   dtb-coming-soon.php    — e-mail subscriber handler
@@ -90,6 +91,7 @@ require_once $_dtb_dir . '/dtb-auth.php';
 require_once $_dtb_dir . '/dtb-cache.php';
 require_once $_dtb_dir . '/dtb-rest-api.php';
 require_once $_dtb_dir . '/dtb-rewards.php';       // WPLoyalty REST bridge (loads after dtb-auth)
+require_once $_dtb_dir . '/dtb-image-sync.php';    // media-library sync for uploads/YYYY/MM/ images
 require_once $_dtb_dir . '/dtb-woocommerce.php';
 require_once $_dtb_dir . '/dtb-schematics-api.php';
 require_once $_dtb_dir . '/dtb-coming-soon.php';

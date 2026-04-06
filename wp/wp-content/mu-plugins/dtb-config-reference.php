@@ -115,4 +115,64 @@
  *   WooCommerce Store API calls directly from the browser.
  *
  * =============================================================================
+ * PRODUCT IMAGE SYNC — WORKFLOW
+ * =============================================================================
+ *
+ * Images are stored on the live server at:
+ *   public_html/drywalltoolbox/wp/wp-content/uploads/2026/04/<filename>.webp
+ *
+ * The workflow to wire those images to WooCommerce products is:
+ *
+ * STEP 1 — Rewrite image URLs in wp-catalog.csv (run once locally)
+ * ----------------------------------------------------------------
+ *   python scripts/rewrite_csv_image_urls.py
+ *
+ *   This changes every Images column entry from:
+ *     https://drywalltoolbox.com/brands/<Brand>/Products/<file>.webp
+ *   to:
+ *     https://drywalltoolbox.com/wp-content/uploads/2026/04/<file>.webp
+ *
+ *   A .bak backup is written before overwriting the file. Use --dry-run
+ *   to preview changes without writing.
+ *
+ * STEP 2 — Upload the updated CSV to the server
+ * -----------------------------------------------
+ *   Via cPanel File Manager or SFTP, copy the updated wp-catalog.csv to:
+ *     public_html/drywalltoolbox/wp/wp-content/uploads/wc-imports/
+ *   (filename must match DTB_WC_CSV_FILENAME / dtb_get_config()['csv_filename'])
+ *
+ * STEP 3 — Register images in the WP Media Library
+ * --------------------------------------------------
+ *   POST https://drywalltoolbox.com/wp-json/dtb/v1/sync-images
+ *   Authorization: Bearer <admin-jwt>     (or Application Password Basic auth)
+ *   Content-Type: application/json
+ *
+ *   Body (all fields optional):
+ *     { "year": "2026", "month": "04", "dry_run": false }
+ *
+ *   This scans wp-content/uploads/2026/04/, creates WP attachment records for
+ *   any file not yet in the Media Library, and sets each image as the featured
+ *   image on the matching WooCommerce product (matched by SKU = filename stem).
+ *
+ *   Status check (no writes):
+ *   GET https://drywalltoolbox.com/wp-json/dtb/v1/sync-images/status
+ *
+ * STEP 4 — Re-import the product catalog
+ * ----------------------------------------
+ *   POST https://drywalltoolbox.com/wp-json/dtb/v1/import-catalog
+ *   Content-Type: application/json
+ *   { "secret": "<DTB_IMPORT_SECRET>" }
+ *
+ *   WooCommerce will now find the images already registered in the Media
+ *   Library and link them to products by URL during the CSV import.
+ *
+ * NOTES:
+ *   • The WooCommerce CSV importer resolves Images column URLs by matching
+ *     them against attachment GUIDs. Steps 3 and 4 together ensure GUIDs
+ *     and the CSV URLs are in sync.
+ *   • To add images for a future upload month (e.g. 2026/05), repeat
+ *     Step 1 with --base https://drywalltoolbox.com/wp-content/uploads/2026/05
+ *     and call sync-images with { "year": "2026", "month": "05" }.
+ *
+ * =============================================================================
  */
