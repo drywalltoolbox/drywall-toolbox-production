@@ -417,3 +417,151 @@ add_action( 'woocommerce_after_checkout_validation', function ( $data, $errors )
 		);
 	}
 }, 10, 2 );
+
+
+// ============================================================================
+// SECTION 12 — CSV IMPORTER: MPN COLUMN MAPPING
+//
+// Adds "MPN" as a recognised column mapping target in the WooCommerce product
+// CSV importer. The value is persisted to the `_mpn` product meta key.
+// ============================================================================
+
+add_filter( 'woocommerce_csv_product_import_mapping_options', function ( array $options ): array {
+	$options['mpn'] = __( 'MPN', 'woocommerce' );
+	return $options;
+} );
+
+add_filter( 'woocommerce_csv_product_import_mapping_default_columns', function ( array $columns ): array {
+	$columns['MPN'] = 'mpn';
+	$columns['mpn'] = 'mpn';
+	return $columns;
+} );
+
+add_filter( 'woocommerce_product_import_pre_insert_product_object', function ( \WC_Product $product, array $data ): \WC_Product {
+	if ( ! empty( $data['mpn'] ) ) {
+		$product->update_meta_data( '_mpn', sanitize_text_field( (string) $data['mpn'] ) );
+	}
+	return $product;
+}, 10, 2 );
+
+
+// ============================================================================
+// SECTION 13 — CSV IMPORTER: WEBP SUPPORT + BATCH PERFORMANCE
+//
+// Two problems prevented all 2,663 products from importing:
+//
+//   A) "Invalid image: Sorry, you are not allowed to upload this file type."
+//      WordPress core does not include image/webp in its default allowed-MIME
+//      list on all PHP/server configurations. The importer tries to sideload
+//      each image through wp_handle_sideload() which calls
+//      wp_check_filetype_and_ext(). If the server's mime_content_type() or
+//      finfo doesn't return 'image/webp', WP falls back to the extension map
+//      and the upload_mimes filter. We add webp to both the extension map and
+//      the file_is_valid_image check so sideloading succeeds.
+//
+//   B) Timeout / stall after ~725 rows.
+//      The importer runs in 30-product Ajax batches. On HostGator shared
+//      hosting each batch can time out before completing. Raising the batch
+//      size to 100 cuts round-trips from ~89 to ~27, and bumping
+//      max_execution_time to 120s gives each batch room to finish.
+// ============================================================================
+
+// A1 — Add webp to WordPress allowed upload MIME types.
+add_filter( 'upload_mimes', function ( array $mimes ): array {
+	$mimes['webp'] = 'image/webp';
+	return $mimes;
+} );
+
+// A2 — Confirm webp files pass the filetype-and-ext check.
+//      The second filter argument $file is the tmp path; $filename is the
+//      original name. We only override when the extension is webp.
+add_filter( 'wp_check_filetype_and_ext', function ( array $data, string $file, string $filename ): array {
+	if ( empty( $data['ext'] ) ) {
+		$ext = strtolower( pathinfo( $filename, PATHINFO_EXTENSION ) );
+		if ( 'webp' === $ext ) {
+			$data['ext']  = 'webp';
+			$data['type'] = 'image/webp';
+		}
+	}
+	return $data;
+}, 10, 3 );
+
+// B — Increase batch size and execution time for the importer Ajax actions.
+add_filter( 'woocommerce_product_import_batch_size', function (): int {
+	return 100;
+} );
+
+add_action( 'admin_init', function (): void {
+	$action = isset( $_REQUEST['action'] )
+		? sanitize_text_field( wp_unslash( $_REQUEST['action'] ) ) // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		: '';
+	if ( in_array( $action, [ 'woocommerce_do_ajax_product_import', 'woocommerce_ajax_import_products' ], true ) ) {
+		if ( function_exists( 'set_time_limit' ) ) {
+			set_time_limit( 120 );
+		}
+		if ( function_exists( 'ini_set' ) ) {
+			ini_set( 'memory_limit', '512M' ); // phpcs:ignore WordPress.PHP.IniSet.memory_limit_Blacklisted
+		}
+	}
+} );
+
+
+// ============================================================================
+// SECTION 12 — CSV IMPORTER: MPN COLUMN MAPPING
+//
+// The WooCommerce product CSV importer shows a "Map Fields" step where each
+// CSV column is matched to a WC product field. By default the importer offers
+// "GTIN, UPC, EAN, or ISBN" as the only barcode-style option — there is no
+// built-in MPN mapping.
+//
+// This section adds "MPN" to the mapping dropdown AND persists the value to
+// the `_mpn` product meta key when a row is imported or updated.
+//
+// Two filters are used:
+//   woocommerce_csv_product_import_mapping_options
+//     → Adds the "MPN" label to the column-selector dropdown.
+//   woocommerce_csv_product_import_mapping_default_columns
+//     → Auto-selects "MPN" when the CSV column header is literally "MPN"
+//       so the mapping step requires no manual action.
+//   woocommerce_product_import_pre_insert_product_object
+//     → Writes the mapped value into `_mpn` product meta before save.
+// ============================================================================
+
+/**
+ * Add "MPN" to the list of available mapping targets in the importer UI.
+ *
+ * @param array $options Existing mapping options keyed by internal field name.
+ * @return array
+ */
+add_filter( 'woocommerce_csv_product_import_mapping_options', function ( array $options ): array {
+	$options['mpn'] = __( 'MPN', 'woocommerce' );
+	return $options;
+} );
+
+/**
+ * Auto-map CSV columns named "MPN" (case-insensitive) to the mpn field
+ * so the import can run without touching the Map Fields screen.
+ *
+ * @param array $columns Existing auto-map rules [ 'csv header' => 'field key' ].
+ * @return array
+ */
+add_filter( 'woocommerce_csv_product_import_mapping_default_columns', function ( array $columns ): array {
+	$columns['MPN'] = 'mpn';
+	$columns['mpn'] = 'mpn';
+	return $columns;
+} );
+
+/**
+ * Persist the mapped MPN value to the `_mpn` product meta key before the
+ * product object is inserted or updated in the database.
+ *
+ * @param \WC_Product $product  Product object being imported.
+ * @param array       $data     Parsed CSV row data, keyed by mapped field name.
+ * @return \WC_Product
+ */
+add_filter( 'woocommerce_product_import_pre_insert_product_object', function ( \WC_Product $product, array $data ): \WC_Product {
+	if ( ! empty( $data['mpn'] ) ) {
+		$product->update_meta_data( '_mpn', sanitize_text_field( (string) $data['mpn'] ) );
+	}
+	return $product;
+}, 10, 2 );
