@@ -1,6 +1,7 @@
 import { useState, useMemo, useEffect } from 'react'
 import ResultCard from './shared/ResultCard'
 import InfoBox from './shared/InfoBox'
+import CalcDropdown from './shared/CalcDropdown'
 
 const LS_KEY = 'dwCalc_bead'
 // 5% added to straight-run lengths to cover splice waste (industry standard)
@@ -14,6 +15,19 @@ function loadSaved() {
     return data
   } catch { return {} }
 }
+
+const beadTypeOptions = [
+  { value: 'metal',    label: 'Metal corner bead',  description: 'Standard — most durable' },
+  { value: 'bullnose', label: 'Bullnose bead',       description: 'Rounded profile, modern look' },
+  { value: 'vinyl',    label: 'Vinyl corner bead',   description: 'High-humidity / bathrooms' },
+  { value: 'flex',     label: 'Flexible / arch bead',description: 'Bends to any radius' },
+]
+
+const stockLengthOptions = [
+  { value: 8,  label: '8 ft sections',  description: 'Standard stock length' },
+  { value: 10, label: '10 ft sections', description: 'Less waste on tall walls' },
+  { value: 12, label: '12 ft sections', description: 'Minimum cuts on tall walls' },
+]
 
 export default function CornerBeadCalculator({ onUpdate }) {
   const saved = loadSaved()
@@ -52,35 +66,22 @@ export default function CornerBeadCalculator({ onUpdate }) {
     }
   }, [results, beadType, stockLength, onUpdate])
 
-  const beadTypes = [
-    { value: 'metal', label: 'Metal corner bead (standard)' },
-    { value: 'bullnose', label: 'Bullnose corner bead' },
-    { value: 'vinyl', label: 'Vinyl corner bead' },
-    { value: 'flex', label: 'Flexible / arch bead' },
-  ]
-
-  const stockLengths = [
-    { value: 8, label: '8 ft sections' },
-    { value: 10, label: '10 ft sections' },
-    { value: 12, label: '12 ft sections' },
-  ]
-
   const tips = {
-    metal: 'Metal bead is industry standard — the most durable option. Fasten every 6–9" alternating sides. 5% splice waste included.',
+    metal:    'Metal bead is industry standard — the most durable option. Fasten every 6–9" alternating sides. 5% splice waste included.',
     bullnose: 'Bullnose gives a rounded profile — popular in modern and contemporary builds. 5% splice waste included.',
-    vinyl: 'Use vinyl in bathrooms and high-humidity areas to prevent rust bleed. Use vinyl-specific compound for best adhesion.',
-    flex: 'Flexible bead bends to any radius — required for archways. Score lightly before bending to prevent kinking.'
+    vinyl:    'Use vinyl in bathrooms and high-humidity areas to prevent rust bleed. Use vinyl-specific compound for best adhesion.',
+    flex:     'Flexible bead bends to any radius — required for archways. Score lightly before bending to prevent kinking.',
   }
 
   return (
     <div className="space-y-6">
       <div>
-        <h3 className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3">
+        <h3 className="text-[11px] font-semibold text-gray-400 uppercase tracking-widest mb-3">
           Outside Corners
         </h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <div className="grid grid-cols-2 gap-2 sm:gap-3">
           <div>
-            <label htmlFor="cb-corners" className="block text-xs text-gray-600 dark:text-gray-400 mb-1">
+            <label htmlFor="cb-corners" className="block text-xs font-medium text-gray-600 mb-1.5">
               Straight outside corners
             </label>
             <input
@@ -89,14 +90,14 @@ export default function CornerBeadCalculator({ onUpdate }) {
               value={corners}
               min={0}
               onChange={e => setCorners(+e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
+              className="w-full px-3 py-2.5 border border-gray-300 rounded-xl bg-white text-gray-900 text-sm focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition"
             />
-            <span className="text-xs text-gray-500 dark:text-gray-400 mt-1 block">
+            <span className="text-xs text-gray-500 mt-1.5 block leading-snug">
               Standard 90° outside corners
             </span>
           </div>
           <div>
-            <label htmlFor="cb-height" className="block text-xs text-gray-600 dark:text-gray-400 mb-1">
+            <label htmlFor="cb-height" className="block text-xs font-medium text-gray-600 mb-1.5">
               Wall / ceiling height (ft)
             </label>
             <input
@@ -106,16 +107,16 @@ export default function CornerBeadCalculator({ onUpdate }) {
               min={1}
               step={0.5}
               onChange={e => setHeight(+e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
+              className="w-full px-3 py-2.5 border border-gray-300 rounded-xl bg-white text-gray-900 text-sm focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition"
             />
           </div>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+      <div className="grid grid-cols-2 gap-2 sm:gap-3">
         <div>
-          <label htmlFor="cb-arches" className="block text-xs text-gray-600 dark:text-gray-400 mb-1">
-            Archways / curved corners
+          <label htmlFor="cb-arches" className="block text-xs font-medium text-gray-600 mb-1.5">
+            Curved / arch corners
           </label>
           <input
             id="cb-arches"
@@ -123,14 +124,14 @@ export default function CornerBeadCalculator({ onUpdate }) {
             value={arches}
             min={0}
             onChange={e => setArches(+e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
+            className="w-full px-3 py-2.5 border border-gray-300 rounded-xl bg-white text-gray-900 text-sm focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition"
           />
-          <span className="text-xs text-gray-500 dark:text-gray-400 mt-1 block">
+          <span className="text-xs text-gray-500 mt-1.5 block leading-snug">
             Uses flexible arch bead
           </span>
         </div>
         <div>
-          <label htmlFor="cb-arch-h" className="block text-xs text-gray-600 dark:text-gray-400 mb-1">
+          <label htmlFor="cb-arch-h" className="block text-xs font-medium text-gray-600 mb-1.5">
             Arch height (ft)
           </label>
           <input
@@ -140,56 +141,44 @@ export default function CornerBeadCalculator({ onUpdate }) {
             min={1}
             step={0.5}
             onChange={e => setArchHeight(+e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
+            className="w-full px-3 py-2.5 border border-gray-300 rounded-xl bg-white text-gray-900 text-sm focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition"
           />
         </div>
       </div>
 
       <div>
-        <h3 className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3">
+        <h3 className="text-[11px] font-semibold text-gray-400 uppercase tracking-widest mb-3">
           Bead Type &amp; Stock Length
         </h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <div className="grid grid-cols-2 gap-2 sm:gap-3">
           <div>
-            <label htmlFor="cb-type" className="block text-xs text-gray-600 dark:text-gray-400 mb-1">
+            <label htmlFor="cb-type" className="block text-xs font-medium text-gray-600 mb-1.5">
               Corner bead type
             </label>
-            <select
+            <CalcDropdown
               id="cb-type"
               value={beadType}
-              onChange={e => setBeadType(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
-            >
-              {beadTypes.map(type => (
-                <option key={type.value} value={type.value}>
-                  {type.label}
-                </option>
-              ))}
-            </select>
+              onChange={setBeadType}
+              options={beadTypeOptions}
+            />
           </div>
           <div>
-            <label htmlFor="cb-stock" className="block text-xs text-gray-600 dark:text-gray-400 mb-1">
+            <label htmlFor="cb-stock" className="block text-xs font-medium text-gray-600 mb-1.5">
               Stock bead length (ft)
             </label>
-            <select
+            <CalcDropdown
               id="cb-stock"
               value={stockLength}
-              onChange={e => setStockLength(+e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
-            >
-              {stockLengths.map(len => (
-                <option key={len.value} value={len.value}>
-                  {len.label}
-                </option>
-              ))}
-            </select>
+              onChange={v => setStockLength(+v)}
+              options={stockLengthOptions}
+            />
           </div>
         </div>
       </div>
 
-      <div className="border-t border-gray-200 dark:border-gray-700 pt-6">
+      <div className="border-t border-gray-200 pt-6">
         <div
-          className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4"
+          className="grid grid-cols-2 gap-2 sm:gap-3 mb-4"
           aria-live="polite"
           aria-label="Corner bead calculator results"
         >
@@ -223,3 +212,4 @@ export default function CornerBeadCalculator({ onUpdate }) {
     </div>
   )
 }
+

@@ -1,4 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
+import { motion as Motion, AnimatePresence } from 'framer-motion'
+import { CheckCircle2 } from 'lucide-react'
 import SheetCalculator from './SheetCalculator'
 import MudCalculator from './MudCalculator'
 import TapeCalculator from './TapeCalculator'
@@ -7,18 +9,121 @@ import ScrewCalculator from './ScrewCalculator'
 import SummaryView from './SummaryView'
 
 const TABS = [
-  { id: 'sheets', label: 'Sheets', icon: '📋' },
-  { id: 'mud', label: 'Mud', icon: '🪣' },
-  { id: 'tape', label: 'Tape', icon: '📏' },
-  { id: 'bead', label: 'Corner Bead', icon: '📐' },
-  { id: 'screws', label: 'Screws', icon: '🔩' },
-  { id: 'summary', label: 'Summary', icon: '📊' },
+  { 
+    id: 'sheets', 
+    label: 'Drywall Sheets', 
+    shortLabel: 'Sheets',
+    gradient: 'from-primary-500 to-primary-600',
+    bgGradient: 'from-primary-500/10 to-primary-600/10',
+  },
+  { 
+    id: 'mud', 
+    label: 'Joint Compound', 
+    shortLabel: 'Compound',
+    gradient: 'from-primary-600 to-primary-700',
+    bgGradient: 'from-primary-600/10 to-primary-700/10',
+  },
+  { 
+    id: 'tape', 
+    label: 'Drywall Tape', 
+    shortLabel: 'Tape',
+    gradient: 'from-primary-400 to-primary-600',
+    bgGradient: 'from-primary-400/10 to-primary-600/10',
+  },
+  { 
+    id: 'bead', 
+    label: 'Corner Bead', 
+    shortLabel: 'Bead',
+    gradient: 'from-primary-700 to-primary-800',
+    bgGradient: 'from-primary-700/10 to-primary-800/10',
+  },
+  { 
+    id: 'screws', 
+    label: 'Screws', 
+    shortLabel: 'Screws',
+    gradient: 'from-primary-500 to-primary-700',
+    bgGradient: 'from-primary-500/10 to-primary-700/10',
+  },
+  { 
+    id: 'summary', 
+    label: 'Project Summary', 
+    shortLabel: 'Summary',
+    gradient: 'from-accent-500 to-primary-700',
+    bgGradient: 'from-accent-500/10 to-primary-700/10',
+  },
 ]
 
+// Animation variants
+const pageTransition = {
+  initial: (direction) => ({
+    x: direction > 0 ? 300 : -300,
+    opacity: 0,
+    scale: 0.95
+  }),
+  animate: {
+    x: 0,
+    opacity: 1,
+    scale: 1,
+    transition: {
+      type: 'spring',
+      stiffness: 300,
+      damping: 30,
+      opacity: { duration: 0.2 }
+    }
+  },
+  exit: (direction) => ({
+    x: direction > 0 ? -300 : 300,
+    opacity: 0,
+    scale: 0.95,
+    transition: {
+      type: 'spring',
+      stiffness: 300,
+      damping: 30,
+      opacity: { duration: 0.2 }
+    }
+  })
+}
+
+const toastVariants = {
+  initial: { opacity: 0, y: -50, scale: 0.9 },
+  animate: { 
+    opacity: 1, 
+    y: 0, 
+    scale: 1,
+    transition: { type: 'spring', stiffness: 500, damping: 30 }
+  },
+  exit: { 
+    opacity: 0, 
+    y: -20, 
+    scale: 0.9,
+    transition: { duration: 0.2 }
+  }
+}
+
+const TabIndicatorVariants = {
+  animate: {
+    transition: {
+      type: 'spring',
+      stiffness: 400,
+      damping: 35
+    }
+  }
+}
+
 export default function CalculatorHub() {
-  const [activeTab, setActiveTab] = useState(0)
-  const [projectName, setProjectName] = useState('New Project')
-  const [lastSaved, setLastSaved] = useState(null)
+  // Lazy initialisers read localStorage once on mount — no setState in effects
+  const [activeTab, setActiveTab] = useState(() => {
+    try {
+      const s = JSON.parse(localStorage.getItem('dwCalc_state') || '{}')
+      return s.activeTab ?? 0
+    } catch { return 0 }
+  })
+  const [showToast, setShowToast] = useState(false)
+  const [toastMessage, setToastMessage] = useState('')
+  const [direction, setDirection] = useState(0)
+  const [touchStart, setTouchStart] = useState(null)
+  const [touchEnd, setTouchEnd] = useState(null)
+
   const [summaryData, setSummaryData] = useState({
     sheets: {},
     mud: {},
@@ -27,10 +132,7 @@ export default function CalculatorHub() {
     screws: {}
   })
 
-  // Touch gesture handling for mobile swipe
-  const [touchStart, setTouchStart] = useState(0)
-  const [touchEnd, setTouchEnd] = useState(0)
-
+  // Touch gesture handling for mobile swipe with haptic feedback
   const handleTouchStart = (e) => {
     setTouchStart(e.targetTouches[0].clientX)
   }
@@ -43,18 +145,25 @@ export default function CalculatorHub() {
     if (!touchStart || !touchEnd) return
     
     const distance = touchStart - touchEnd
-    const isLeftSwipe = distance > 50
-    const isRightSwipe = distance < -50
+    const isLeftSwipe = distance > 75
+    const isRightSwipe = distance < -75
 
     if (isLeftSwipe && activeTab < TABS.length - 1) {
-      setActiveTab(prev => prev + 1)
+      changeTab(activeTab + 1, 1)
     }
     if (isRightSwipe && activeTab > 0) {
-      setActiveTab(prev => prev - 1)
+      changeTab(activeTab - 1, -1)
     }
 
-    setTouchStart(0)
-    setTouchEnd(0)
+    setTouchStart(null)
+    setTouchEnd(null)
+  }
+
+  // Enhanced tab changing with direction tracking
+  const changeTab = (newTab, dir = 0) => {
+    if (newTab === activeTab) return
+    setDirection(dir || (newTab > activeTab ? 1 : -1))
+    setActiveTab(newTab)
   }
 
   // Update handlers for each calculator
@@ -78,170 +187,116 @@ export default function CalculatorHub() {
     setSummaryData(prev => ({ ...prev, screws: data }))
   }, [])
 
-  // Save/Load functionality with localStorage
-  useEffect(() => {
-    const saved = localStorage.getItem('dwCalc_state')
-    if (saved) {
-      try {
-        const state = JSON.parse(saved)
-        if (state.projectName) setProjectName(state.projectName)
-        if (state.activeTab !== undefined) setActiveTab(state.activeTab)
-        if (state.timestamp) setLastSaved(new Date(state.timestamp))
-      } catch (e) {
-        console.error('Error loading saved state:', e)
-      }
-    }
-  }, [])
+  // Toast notification helper
+  const showToastMessage = (message) => {
+    setToastMessage(message)
+    setShowToast(true)
+    setTimeout(() => setShowToast(false), 3000)
+  }
 
+  // Suppress unused-var warning — showToastMessage kept for future use
+  void showToastMessage
+
+  const currentTab = TABS[activeTab]
   useEffect(() => {
     const state = {
-      projectName,
       activeTab,
       summaryData,
       timestamp: new Date().toISOString()
     }
     localStorage.setItem('dwCalc_state', JSON.stringify(state))
-    setLastSaved(new Date())
-  }, [projectName, activeTab, summaryData])
-
-  const saveTemplate = () => {
-    const name = prompt('Enter a name for this template:', projectName)
-    if (!name) return
-
-    const templates = JSON.parse(localStorage.getItem('dwCalc_templates') || '[]')
-    templates.push({
-      name,
-      projectName,
-      summaryData,
-      savedAt: new Date().toISOString()
-    })
-
-    localStorage.setItem('dwCalc_templates', JSON.stringify(templates))
-    alert(`Template "${name}" saved successfully!`)
-  }
-
-  const loadTemplate = () => {
-    const templates = JSON.parse(localStorage.getItem('dwCalc_templates') || '[]')
-
-    if (templates.length === 0) {
-      alert('No saved templates found. Save your current configuration first.')
-      return
-    }
-
-    const options = templates.map((t, i) => 
-      `${i + 1}. ${t.name} (${new Date(t.savedAt).toLocaleDateString()})`
-    ).join('\n')
-    
-    const choice = prompt(`Select a template to load:\n\n${options}\n\nEnter number:`)
-    if (!choice) return
-
-    const index = parseInt(choice) - 1
-    if (index >= 0 && index < templates.length) {
-      const template = templates[index]
-      setProjectName(template.projectName || 'Loaded Project')
-      if (template.summaryData) setSummaryData(template.summaryData)
-      alert('Template loaded! Note: You may need to switch between tabs to see updated values.')
-    } else {
-      alert('Invalid selection')
-    }
-  }
-
-  const getTimeSince = () => {
-    if (!lastSaved) return 'Never'
-    
-    const now = new Date()
-    const diffMs = now - lastSaved
-    const diffMins = Math.floor(diffMs / 60000)
-
-    if (diffMins < 1) return 'Just now'
-    if (diffMins < 60) return `${diffMins} min ago`
-    if (diffMins < 1440) return `${Math.floor(diffMins / 60)} hr ago`
-    return lastSaved.toLocaleDateString()
-  }
+  }, [activeTab, summaryData])
 
   return (
-    <div className="max-w-5xl mx-auto p-4 md:p-6">
-      {/* Project header */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
-        <div className="flex-1">
-          <input
-            type="text"
-            value={projectName}
-            onChange={e => setProjectName(e.target.value)}
-            className="text-xl font-semibold bg-transparent border-none outline-none text-gray-900 dark:text-gray-100 w-full md:w-auto"
-          />
-          <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-            Last saved: {getTimeSince()}
-          </div>
-        </div>
-        <div className="flex gap-2 w-full md:w-auto">
-          <button
-            onClick={saveTemplate}
-            className="flex-1 md:flex-none px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+    <div className="w-full">
+      {/* Toast Notification */}
+      <AnimatePresence>
+        {showToast && (
+          <Motion.div
+            variants={toastVariants}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            className="fixed top-6 left-1/2 -translate-x-1/2 z-50"
           >
-            💾 Save
-          </button>
-          <button
-            onClick={loadTemplate}
-            className="flex-1 md:flex-none px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
-          >
-            📂 Load
-          </button>
-        </div>
-      </div>
-
-      {/* Tab navigation */}
-      <div className="mb-6 overflow-x-auto -mx-4 px-4 md:mx-0 md:px-0">
-        <div className="flex gap-1 bg-gray-100 dark:bg-gray-800 rounded-lg p-1 min-w-max md:min-w-0">
-          {TABS.map((tab, index) => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(index)}
-              className={`flex-1 px-3 py-2 text-sm font-medium rounded-md transition-all whitespace-nowrap ${
-                activeTab === index
-                  ? 'bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 shadow-sm'
-                  : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100'
-              }`}
-            >
-              <span className="mr-1">{tab.icon}</span>
-              {tab.label}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Calculator panels — always mounted, hidden via CSS to preserve state on tab switch */}
-      <div
-        className="bg-white dark:bg-gray-900 rounded-lg shadow-sm border border-gray-200 dark:border-gray-800 p-4 md:p-6"
-        onTouchStart={handleTouchStart}
-        onTouchMove={handleTouchMove}
-        onTouchEnd={handleTouchEnd}
-      >
-        <div className={activeTab !== 0 ? 'hidden' : ''} role="tabpanel" aria-label="Drywall sheets calculator">
-          <SheetCalculator onUpdate={handleSheetUpdate} />
-        </div>
-        <div className={activeTab !== 1 ? 'hidden' : ''} role="tabpanel" aria-label="Joint compound calculator">
-          <MudCalculator onUpdate={handleMudUpdate} />
-        </div>
-        <div className={activeTab !== 2 ? 'hidden' : ''} role="tabpanel" aria-label="Tape calculator">
-          <TapeCalculator onUpdate={handleTapeUpdate} />
-        </div>
-        <div className={activeTab !== 3 ? 'hidden' : ''} role="tabpanel" aria-label="Corner bead calculator">
-          <CornerBeadCalculator onUpdate={handleBeadUpdate} />
-        </div>
-        <div className={activeTab !== 4 ? 'hidden' : ''} role="tabpanel" aria-label="Screw and fastener calculator">
-          <ScrewCalculator onUpdate={handleScrewUpdate} />
-        </div>
-        {activeTab === 5 && (
-          <div role="tabpanel" aria-label="Material summary">
-            <SummaryView data={{ ...summaryData, projectName }} />
-          </div>
+            <div className="bg-primary-600 text-white px-6 py-3 rounded-2xl shadow-2xl flex items-center gap-3 backdrop-blur-xl border border-primary-500/30">
+              <CheckCircle2 className="w-5 h-5" />
+              <span className="font-medium">{toastMessage}</span>
+            </div>
+          </Motion.div>
         )}
+      </AnimatePresence>
+
+      {/* ── Page header + floating tab nav ── */}
+      <div className="w-full max-w-xl mx-auto px-4 pt-6 pb-3 sm:pt-8 sm:pb-4">
+        {/* Heading */}
+        <div className="mb-4">
+          <h1 className="text-2xl font-bold text-gray-900 tracking-tight">
+            Drywall Calculators
+          </h1>
+          <p className="text-sm text-gray-500 mt-1">
+            Estimate sheets, tape, corner bead, and screws — live, on any device.
+          </p>
+        </div>
+
+        {/* Floating pill tab nav */}
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-200 px-2 py-2">
+          <div
+            className="flex overflow-x-auto scrollbar-none gap-1"
+            style={{ WebkitOverflowScrolling: 'touch', scrollSnapType: 'x mandatory' }}
+          >
+            {TABS.map((tab, index) => {
+              const isActive = activeTab === index
+              return (
+                <Motion.button
+                  key={tab.id}
+                  onClick={() => changeTab(index, index > activeTab ? 1 : -1)}
+                  whileTap={{ scale: 0.94 }}
+                  style={{ scrollSnapAlign: 'start' }}
+                  className={`relative flex items-center px-3.5 py-1.5 rounded-xl text-sm font-medium whitespace-nowrap shrink-0 transition-all duration-200 ${
+                    isActive
+                      ? 'bg-primary-600 text-white shadow-sm'
+                      : 'text-gray-500 hover:text-gray-900 hover:bg-gray-100'
+                  }`}
+                >
+                  {tab.shortLabel}
+                </Motion.button>
+              )
+            })}
+          </div>
+        </div>
       </div>
 
-      {/* Mobile swipe hint */}
-      <div className="mt-4 text-center text-xs text-gray-400 dark:text-gray-600 md:hidden">
-        👆 Swipe left/right to switch tabs
+      {/* ── Calculator panel ── */}
+      <div className="w-full max-w-xl mx-auto px-4 pb-8">
+        <div
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
+          className="relative"
+        >
+          <AnimatePresence mode="wait" custom={direction}>
+            <Motion.div
+              key={activeTab}
+              custom={direction}
+              variants={pageTransition}
+              initial="initial"
+              animate="animate"
+              exit="exit"
+              className="bg-white rounded-2xl shadow-sm border border-gray-200 p-5 sm:p-7 overflow-hidden"
+            >
+              {/* Active tab accent line */}
+              <div className={`h-px w-10 bg-linear-to-r ${currentTab.gradient} rounded-full mb-5`} />
+
+              {activeTab === 0 && <SheetCalculator onUpdate={handleSheetUpdate} />}
+              {activeTab === 1 && <MudCalculator onUpdate={handleMudUpdate} />}
+              {activeTab === 2 && <TapeCalculator onUpdate={handleTapeUpdate} />}
+              {activeTab === 3 && <CornerBeadCalculator onUpdate={handleBeadUpdate} />}
+              {activeTab === 4 && <ScrewCalculator onUpdate={handleScrewUpdate} />}
+              {activeTab === 5 && <SummaryView data={summaryData} />}
+            </Motion.div>
+          </AnimatePresence>
+        </div>
       </div>
     </div>
   )

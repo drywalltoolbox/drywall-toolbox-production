@@ -518,3 +518,11 @@ html {
   .scroll-button-right { right: -52px; }
 }
 
+/* ── Utility: hide scrollbar while keeping scroll behaviour ── */
+.scrollbar-none {
+  scrollbar-width: none;          /* Firefox */
+  -ms-overflow-style: none;       /* IE/Edge */
+}
+.scrollbar-none::-webkit-scrollbar {
+  display: none;                  /* Chrome/Safari/Opera */
+}

@@ -111,8 +111,7 @@ export default function MudCalculator({ onUpdate }) {
     const result = []
     // Distribute volume across coats using COAT_SPLIT (cycle through for coats > 3)
     let remaining = totalGallons
-    for (let i = 0; i < coats; i++) {
-      const splitIdx = Math.min(i, COAT_SPLIT.length - 1)
+      for (let i = 0; i < coats; i++) {
       // For levels with 4+ coats, level out the final coats
       const share = coats <= 3
         ? COAT_SPLIT[i]
@@ -161,11 +160,11 @@ export default function MudCalculator({ onUpdate }) {
     <div className="space-y-6">
       {/* Area Input */}
       <div>
-        <h3 className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3">
+        <h3 className="text-[11px] font-semibold text-gray-400 uppercase tracking-widest mb-3">
           Project Area
         </h3>
         <div>
-          <label htmlFor="mud-area" className="block text-xs text-gray-600 dark:text-gray-400 mb-1">
+          <label htmlFor="mud-area" className="block text-xs font-medium text-gray-600 mb-1.5">
             Total drywall area (sq ft)
           </label>
           <input
@@ -174,9 +173,9 @@ export default function MudCalculator({ onUpdate }) {
             value={area}
             min={1}
             onChange={e => setArea(+e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
+            className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-xl bg-white text-gray-900 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition"
           />
-          <span className="text-xs text-gray-500 dark:text-gray-400 mt-1 block">
+          <span className="text-xs text-gray-500 mt-1.5 block leading-snug">
             Use the net area from the Sheets tab (walls + ceiling after deductions)
           </span>
         </div>
@@ -184,7 +183,7 @@ export default function MudCalculator({ onUpdate }) {
 
       {/* Finish Level */}
       <div>
-        <h3 className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3">
+        <h3 className="text-[11px] font-semibold text-gray-400 uppercase tracking-widest mb-3">
           Finish Level <span className="normal-case font-normal text-gray-400">(GA-214-2022)</span>
         </h3>
         <div className="space-y-2">
@@ -192,18 +191,18 @@ export default function MudCalculator({ onUpdate }) {
             <button
               key={level.value}
               onClick={() => setFinishLevel(level.value)}
-              className={`w-full text-left px-4 py-3 rounded-lg border transition-all ${
+              className={`w-full text-left px-4 py-3 rounded-xl border transition-all ${
                 finishLevel === level.value
-                  ? 'border-primary-500 bg-primary-50 dark:bg-primary-950 text-primary-900 dark:text-primary-100'
-                  : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 text-gray-700 dark:text-gray-300'
+                  ? 'border-primary-600 bg-primary-600 text-white shadow-sm'
+                  : 'border-gray-200 bg-white hover:border-gray-300 text-gray-700'
               }`}
             >
               <div className="flex justify-between items-start gap-2">
                 <div className="flex-1">
                   <span className="text-sm font-medium block">{level.label}</span>
-                  <span className="text-xs text-gray-500 dark:text-gray-400 mt-0.5 block">{level.application}</span>
+                  <span className={`text-xs mt-0.5 block ${finishLevel === level.value ? 'text-primary-200' : 'text-gray-400'}`}>{level.application}</span>
                 </div>
-                <span className="text-xs font-mono shrink-0 mt-0.5 text-gray-500 dark:text-gray-400">
+                <span className={`text-xs font-mono shrink-0 mt-0.5 ${finishLevel === level.value ? 'text-primary-200' : 'text-gray-400'}`}>
                   {level.coats === 0 ? 'no mud' : `${level.coats} coat${level.coats > 1 ? 's' : ''}`}
                 </span>
               </div>
@@ -214,7 +213,7 @@ export default function MudCalculator({ onUpdate }) {
 
       {/* Compound Type */}
       <div>
-        <h3 className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3">
+        <h3 className="text-[11px] font-semibold text-gray-400 uppercase tracking-widest mb-3">
           Compound Type
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
@@ -222,10 +221,10 @@ export default function MudCalculator({ onUpdate }) {
             <button
               key={type.value}
               onClick={() => setCompoundType(type.value)}
-              className={`text-left px-3 py-2.5 rounded-md border text-sm transition-all ${
+              className={`text-left px-3 py-2.5 rounded-xl border text-sm transition-all ${
                 compoundType === type.value
-                  ? 'border-primary-500 bg-primary-50 dark:bg-primary-950 text-primary-900 dark:text-primary-100'
-                  : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 text-gray-700 dark:text-gray-300'
+                  ? 'border-primary-600 bg-primary-600 text-white shadow-sm'
+                  : 'border-gray-200 bg-white hover:border-gray-300 text-gray-700'
               }`}
             >
               <span className="font-medium block">{type.label}</span>
@@ -233,16 +232,16 @@ export default function MudCalculator({ onUpdate }) {
           ))}
         </div>
         {compoundInfo && (
-          <p className="text-xs text-gray-500 dark:text-gray-400 mt-2 px-1">
+          <p className="text-xs text-gray-500 mt-2 px-1">
             {compoundInfo.note}
           </p>
         )}
       </div>
 
       {/* Results */}
-      <div className="border-t border-gray-200 dark:border-gray-700 pt-6">
+      <div className="border-t border-gray-200 pt-6">
         <div
-          className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4"
+          className="grid grid-cols-2 gap-2 sm:gap-3 mb-4"
           aria-live="polite"
           aria-label="Joint compound calculator results"
         >
@@ -271,25 +270,25 @@ export default function MudCalculator({ onUpdate }) {
 
         {/* Per-coat breakdown */}
         {coatBreakdown.length > 0 && (
-          <div className="mb-4 bg-gray-50 dark:bg-gray-800 rounded-lg p-4">
-            <p className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3">
+          <div className="mb-4 bg-gray-50 border border-gray-200 rounded-xl p-4">
+            <p className="text-[11px] font-semibold text-gray-400 uppercase tracking-widest mb-2">
               Per-Coat Breakdown
             </p>
             <div className="space-y-2">
               {coatBreakdown.map((coat, i) => (
                 <div key={i} className="flex justify-between items-center text-sm">
-                  <span className="text-gray-700 dark:text-gray-300">Coat {i + 1} — {coat.label}</span>
-                  <span className="font-medium text-gray-900 dark:text-gray-100">
+                  <span className="text-gray-700">Coat {i + 1} — {coat.label}</span>
+                  <span className="font-medium text-gray-900">
                     {coat.gallons} gal
                   </span>
                 </div>
               ))}
-              <div className="flex justify-between items-center text-sm border-t border-gray-200 dark:border-gray-700 pt-2 mt-2">
-                <span className="font-medium text-gray-700 dark:text-gray-300">Total</span>
-                <span className="font-semibold text-gray-900 dark:text-gray-100">{totalGallons.toFixed(1)} gal</span>
+              <div className="flex justify-between items-center text-sm border-t border-gray-200 pt-2 mt-2">
+                <span className="font-medium text-gray-700">Total</span>
+                <span className="font-semibold text-gray-900">{totalGallons.toFixed(1)} gal</span>
               </div>
             </div>
-            <p className="text-xs text-gray-400 dark:text-gray-500 mt-2">
+            <p className="text-xs text-gray-400 mt-2">
               Allow 24h dry time between coats. Let each coat dry fully before sanding or re-coating.
             </p>
           </div>
@@ -301,15 +300,16 @@ export default function MudCalculator({ onUpdate }) {
           {finishLevel === 2 && 'Level 2: tape embedded + one fill coat on joints and fasteners. Surface must be free of excess compound. Used under tile.'}
           {finishLevel === 3 && `Level 3: ${selectedLevel?.description} Apply primer-sealer before texture.`}
           {finishLevel === 4 && 'Level 4 is the industry standard for most residential interiors. Always prime before painting to prevent photographic panning (variation in sheen).'}
-          {finishLevel === 5 && '⚠ Level 5 requires a full-surface skim coat and uses nearly 50% more compound than Level 4. Consider hiring a professional finisher for this level.'}
+          {finishLevel === 5 && 'Level 5 requires a full-surface skim coat and uses nearly 50% more compound than Level 4. Consider hiring a professional finisher for this level.'}
         </InfoBox>
       </div>
 
       {/* Standards reference */}
-      <div className="text-xs text-gray-400 dark:text-gray-600 border-t border-gray-100 dark:border-gray-800 pt-3">
+      <div className="text-xs text-gray-400 border-t border-gray-100 pt-3">
         Coverage rates per GA-214-2022 (Gypsum Association) and USG/National Gypsum manufacturer specifications.
         1 gal ready-mixed compound ≈ 100–120 sq ft per coat at Level 4.
       </div>
     </div>
   )
 }
+

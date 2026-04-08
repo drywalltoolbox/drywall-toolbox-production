@@ -10,17 +10,7 @@ export default function Calculators() {
         canonical="https://drywalltoolbox.com/calculators"
       />
       <div className="page-wrapper">
-        <div style={{ maxWidth: '1100px', margin: '0 auto', padding: '2rem 1rem' }}>
-          <div style={{ marginBottom: '1.5rem' }}>
-            <h1 style={{ fontSize: '1.5rem', fontWeight: 700, color: 'var(--color-text-primary)', margin: 0 }}>
-              Drywall Calculators
-            </h1>
-            <p style={{ fontSize: '0.875rem', color: 'var(--color-text-secondary)', marginTop: '0.25rem' }}>
-              Estimate sheets, tape, corner bead, and screws — live, on any device.
-            </p>
-          </div>
-          <CalculatorHub />
-        </div>
+        <CalculatorHub />
       </div>
     </>
   )

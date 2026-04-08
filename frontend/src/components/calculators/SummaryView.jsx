@@ -64,109 +64,96 @@ export default function SummaryView({ data }) {
   const appLabels = { wall: 'Walls', ceiling: 'Ceiling', both: 'Walls + Ceiling' }
 
   return (
-    <div className="space-y-6">
-      <div className="space-y-4">
-        {/* Sheets Summary */}
-        <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-4">
-          <div className="flex justify-between items-center mb-3 pb-3 border-b border-gray-300 dark:border-gray-700">
-            <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
-              📋 Drywall Sheets
-            </span>
-            <span className="text-lg font-semibold text-primary-600">
-              {sheets.sheets || '—'} sheets
-            </span>
-          </div>
-          <div className="space-y-2">
-            <SummaryItem label="Sheet size" value={sheetSizeLabels[sheets.sheetSize] || '—'} />
-            <SummaryItem label="Hang direction" value={hangDirLabels[sheets.hangDir] || '—'} />
-            <SummaryItem label="Total wall area" value={`${sheets.gross || '—'} sq ft`} />
-            <SummaryItem label="Net area (after openings)" value={`${sheets.net || '—'} sq ft`} />
-            <SummaryItem label="Waste factor" value={`${(sheets.wastePct * 100).toFixed(0)}%`} />
-          </div>
-        </div>
+    <div className="space-y-4">
 
-        {/* Tape Summary */}
-        <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-4">
-          <div className="flex justify-between items-center mb-3 pb-3 border-b border-gray-300 dark:border-gray-700">
-            <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
-              📏 Joint Tape
-            </span>
-            <span className="text-lg font-semibold text-primary-600">
-              {tape.rolls || '—'} rolls
-            </span>
-          </div>
-          <div className="space-y-2">
-            <SummaryItem label="Tape type" value={tapeTypeLabels[tape.tapeType] || '—'} />
-            <SummaryItem label="Roll size" value={`${tape.rollSize || '—'} ft`} />
-            <SummaryItem label="Total linear feet" value={`${tape.totalFeet || '—'} ft`} />
-            <SummaryItem label="Seam footage" value={`${tape.seamFeet || '—'} ft`} />
-            <SummaryItem label="Corner footage" value={`${tape.cornerFeet || '—'} ft`} />
-          </div>
-        </div>
+      {/* Sheets */}
+      <SummaryCard
+        title="Drywall Sheets"
+        result={`${sheets.sheets || '—'} sheets`}
+      >
+        <SummaryItem label="Sheet size"              value={sheetSizeLabels[sheets.sheetSize] || '—'} />
+        <SummaryItem label="Hang direction"          value={hangDirLabels[sheets.hangDir] || '—'} />
+        <SummaryItem label="Total wall area"         value={`${sheets.gross || '—'} sq ft`} />
+        <SummaryItem label="Net area (after openings)" value={`${sheets.net || '—'} sq ft`} />
+        <SummaryItem label="Waste factor"            value={sheets.wastePct != null ? `${(sheets.wastePct * 100).toFixed(0)}%` : '—'} />
+      </SummaryCard>
 
-        {/* Bead Summary */}
-        <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-4">
-          <div className="flex justify-between items-center mb-3 pb-3 border-b border-gray-300 dark:border-gray-700">
-            <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
-              📐 Corner Bead
-            </span>
-            <span className="text-lg font-semibold text-primary-600">
-              {bead.sections || '—'} sections
-            </span>
-          </div>
-          <div className="space-y-2">
-            <SummaryItem label="Bead type" value={beadTypeLabels[bead.beadType] || '—'} />
-            <SummaryItem label="Stock length" value={`${bead.stockLength || '—'} ft`} />
-            <SummaryItem label="Total linear feet" value={`${bead.totalFeet || '—'} ft`} />
-            <SummaryItem label="Standard corners" value={`${bead.standardFeet || '—'} ft`} />
-            <SummaryItem label="Arch bead" value={`${bead.archFeet || '—'} ft`} />
-          </div>
-        </div>
+      {/* Tape */}
+      <SummaryCard
+        title="Joint Tape"
+        result={`${tape.rolls || '—'} rolls`}
+      >
+        <SummaryItem label="Tape type"        value={tapeTypeLabels[tape.tapeType] || '—'} />
+        <SummaryItem label="Roll size"        value={`${tape.rollSize || '—'} ft`} />
+        <SummaryItem label="Total linear feet" value={`${tape.totalFeet || '—'} ft`} />
+        <SummaryItem label="Seam footage"     value={`${tape.seamFeet || '—'} ft`} />
+        <SummaryItem label="Corner footage"   value={`${tape.cornerFeet || '—'} ft`} />
+      </SummaryCard>
 
-        {/* Screws Summary */}
-        <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-4">
-          <div className="flex justify-between items-center mb-3 pb-3 border-b border-gray-300 dark:border-gray-700">
-            <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
-              🔩 Drywall Screws
-            </span>
-            <span className="text-lg font-semibold text-primary-600">
-              {screws.boxes || '—'} boxes
-            </span>
-          </div>
-          <div className="space-y-2">
-            <SummaryItem label="Screw length" value={screws.screwLength || '—'} />
-            <SummaryItem label="Box size" value={`${screws.boxSize || '—'} screws`} />
-            <SummaryItem label="Total screws needed" value={screws.totalScrews?.toLocaleString() || '—'} />
-            <SummaryItem label="Screws per sheet" value={screws.perSheet || '—'} />
-            <SummaryItem label="Application" value={appLabels[screws.application] || '—'} />
-          </div>
-        </div>
-      </div>
+      {/* Corner Bead */}
+      <SummaryCard
+        title="Corner Bead"
+        result={`${bead.sections || '—'} sections`}
+      >
+        <SummaryItem label="Bead type"        value={beadTypeLabels[bead.beadType] || '—'} />
+        <SummaryItem label="Stock length"     value={`${bead.stockLength || '—'} ft`} />
+        <SummaryItem label="Total linear feet" value={`${bead.totalFeet || '—'} ft`} />
+        <SummaryItem label="Standard corners" value={`${bead.standardFeet || '—'} ft`} />
+        <SummaryItem label="Arch bead"        value={`${bead.archFeet || '—'} ft`} />
+      </SummaryCard>
+
+      {/* Screws */}
+      <SummaryCard
+        title="Drywall Screws"
+        result={`${screws.boxes || '—'} boxes`}
+      >
+        <SummaryItem label="Screw length"       value={screws.screwLength || '—'} />
+        <SummaryItem label="Box size"           value={`${screws.boxSize || '—'} screws`} />
+        <SummaryItem label="Total screws needed" value={screws.totalScrews?.toLocaleString() || '—'} />
+        <SummaryItem label="Screws per sheet"   value={screws.perSheet || '—'} />
+        <SummaryItem label="Application"        value={appLabels[screws.application] || '—'} />
+      </SummaryCard>
 
       {/* Action buttons */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 pt-2">
         <button
           onClick={exportEstimate}
-          className="px-4 py-3 bg-primary-600 hover:bg-primary-700 text-white font-medium rounded-md transition-colors"
+          className="px-4 py-2.5 bg-primary-600 hover:bg-primary-700 text-white text-sm font-medium rounded-xl transition-colors"
         >
-          📄 Export Estimate
+          Export Estimate
         </button>
         <button
           onClick={() => window.print()}
-          className="px-4 py-3 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100 font-medium rounded-md transition-colors"
+          className="px-4 py-2.5 bg-white hover:bg-gray-50 border border-gray-300 text-gray-700 text-sm font-medium rounded-xl transition-colors"
         >
-          🖨️ Print
+          Print
         </button>
         <button
           onClick={shareEstimate}
-          className="px-4 py-3 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100 font-medium rounded-md transition-colors"
+          className="px-4 py-2.5 bg-white hover:bg-gray-50 border border-gray-300 text-gray-700 text-sm font-medium rounded-xl transition-colors"
         >
-          🔗 Share Link
+          Share Link
         </button>
       </div>
 
-      <div className="bg-blue-50 dark:bg-blue-950 border-l-4 border-blue-500 rounded-lg p-4 text-sm text-blue-800 dark:text-blue-200">
+      {/* Disclaimer */}
+      <div className="border border-primary-200 bg-primary-50 rounded-xl p-4 text-sm text-primary-800 leading-relaxed">
         All calculations are based on industry standards and IRC building codes. Always verify local code requirements and add appropriate safety margins for your specific job conditions.
+      </div>
+
+    </div>
+  )
+}
+
+function SummaryCard({ title, result, children }) {
+  return (
+    <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
+      <div className="flex justify-between items-center px-4 py-3 border-b border-gray-100">
+        <h3 className="text-sm font-semibold text-gray-900">{title}</h3>
+        <span className="text-sm font-semibold text-primary-600">{result}</span>
+      </div>
+      <div className="px-4 py-3 space-y-2">
+        {children}
       </div>
     </div>
   )
@@ -175,8 +162,9 @@ export default function SummaryView({ data }) {
 function SummaryItem({ label, value }) {
   return (
     <div className="flex justify-between items-center text-sm">
-      <span className="text-gray-600 dark:text-gray-400">{label}</span>
-      <span className="font-medium text-gray-900 dark:text-gray-100">{value}</span>
+      <span className="text-gray-500">{label}</span>
+      <span className="font-medium text-gray-900">{value}</span>
     </div>
   )
 }
+

@@ -1,12 +1,43 @@
 import { useState, useMemo, useEffect } from 'react'
 import ResultCard from './shared/ResultCard'
 import InfoBox from './shared/InfoBox'
+import CalcDropdown from './shared/CalcDropdown'
 
 const LS_KEY = 'dwCalc_screws'
 
 function loadSaved() {
   try { return JSON.parse(localStorage.getItem(LS_KEY)) || {} } catch { return {} }
 }
+
+const spacingOptions = [
+  { value: '16', label: '16" on center', description: 'Standard framing' },
+  { value: '24', label: '24" on center', description: 'Wide-bay framing' },
+]
+
+const applicationOptions = [
+  { value: 'wall',    label: 'Walls',           description: '16" field spacing' },
+  { value: 'ceiling', label: 'Ceiling',          description: '12" field spacing (ASTM C840)' },
+  { value: 'both',    label: 'Walls + ceiling',  description: 'Average density' },
+]
+
+const sheetSizeOptions = [
+  { value: 32, label: '4×8 ft',  description: '32 sq ft' },
+  { value: 40, label: '4×10 ft', description: '40 sq ft' },
+  { value: 48, label: '4×12 ft', description: '48 sq ft' },
+]
+
+const screwLengthOptions = [
+  { value: '1-1/4"', label: '1-1/4"', description: 'Single layer on wood' },
+  { value: '1-5/8"', label: '1-5/8"', description: 'Standard single layer' },
+  { value: '2-1/2"', label: '2-1/2"', description: 'Double layer / thick' },
+  { value: '3"',     label: '3"',      description: 'Through thick framing' },
+]
+
+const boxSizeOptions = [
+  { value: 175,  label: '1 lb box',  description: '~175 screws' },
+  { value: 875,  label: '5 lb box',  description: '~875 screws' },
+  { value: 1750, label: '10 lb box', description: '~1,750 screws' },
+]
 
 export default function ScrewCalculator({ onUpdate }) {
   const saved = loadSaved()
@@ -76,133 +107,96 @@ export default function ScrewCalculator({ onUpdate }) {
     }
   }, [results, screwLength, boxSize, application, onUpdate])
 
-  const screwLengths = [
-    { value: '1-1/4"', label: '1-1/4" — single layer on wood' },
-    { value: '1-5/8"', label: '1-5/8" — standard single layer' },
-    { value: '2-1/2"', label: '2-1/2" — double layer / thick' },
-    { value: '3"', label: '3" — through thick framing' },
-  ]
-
-  const boxSizes = [
-    // 1-5/8" #6 coarse thread: ~175 screws/lb (industry standard)
-    { value: 175, label: '1 lb (~175 screws)' },
-    { value: 875, label: '5 lb (~875 screws)' },
-    { value: 1750, label: '10 lb (~1,750 screws)' },
-  ]
-
   const appLabel = {
-    wall: 'walls (16" field spacing)',
+    wall:    'walls (16" field spacing)',
     ceiling: 'ceilings (12" field spacing)',
-    both: 'walls + ceiling'
+    both:    'walls + ceiling'
   }
 
   return (
     <div className="space-y-6">
       <div>
-        <h3 className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3">
+        <h3 className="text-[11px] font-semibold text-gray-400 uppercase tracking-widest mb-3">
           Job Details
         </h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <div className="grid grid-cols-2 gap-2 sm:gap-3">
           <div>
-            <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">
-              Number of drywall sheets
+            <label className="block text-xs font-medium text-gray-600 mb-1.5">
+              Sheets to hang
             </label>
             <input
               type="number"
               value={sheets}
               min={1}
               onChange={e => setSheets(+e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
+              className="w-full px-3 py-2.5 border border-gray-300 rounded-xl bg-white text-gray-900 text-sm focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition"
             />
           </div>
           <div>
-            <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">
+            <label className="block text-xs font-medium text-gray-600 mb-1.5">
               Stud / joist spacing
             </label>
-            <select
+            <CalcDropdown
               value={spacing}
-              onChange={e => setSpacing(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
-            >
-              <option value="16">16" on center</option>
-              <option value="24">24" on center</option>
-            </select>
+              onChange={setSpacing}
+              options={spacingOptions}
+            />
           </div>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+      <div className="grid grid-cols-2 gap-2 sm:gap-3">
         <div>
-          <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">
+          <label className="block text-xs font-medium text-gray-600 mb-1.5">
             Application
           </label>
-          <select
+          <CalcDropdown
             value={application}
-            onChange={e => setApplication(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
-          >
-            <option value="wall">Walls</option>
-            <option value="ceiling">Ceiling</option>
-            <option value="both">Walls + ceiling</option>
-          </select>
-          <span className="text-xs text-gray-500 dark:text-gray-400 mt-1 block">
+            onChange={setApplication}
+            options={applicationOptions}
+          />
+          <span className="text-xs text-gray-500 mt-1.5 block leading-snug">
             Ceilings need closer spacing
           </span>
         </div>
         <div>
-          <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">
+          <label className="block text-xs font-medium text-gray-600 mb-1.5">
             Sheet size
           </label>
-          <select
+          <CalcDropdown
             value={sheetSize}
-            onChange={e => setSheetSize(+e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
-          >
-            <option value={32}>4×8 ft (32 sq ft)</option>
-            <option value={40}>4×10 ft (40 sq ft)</option>
-            <option value={48}>4×12 ft (48 sq ft)</option>
-          </select>
+            onChange={v => setSheetSize(+v)}
+            options={sheetSizeOptions}
+          />
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+      <div className="grid grid-cols-2 gap-2 sm:gap-3">
         <div>
-          <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">
+          <label className="block text-xs font-medium text-gray-600 mb-1.5">
             Screw length
           </label>
-          <select
+          <CalcDropdown
             value={screwLength}
-            onChange={e => setScrewLength(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
-          >
-            {screwLengths.map(length => (
-              <option key={length.value} value={length.value}>
-                {length.label}
-              </option>
-            ))}
-          </select>
+            onChange={setScrewLength}
+            options={screwLengthOptions}
+          />
         </div>
         <div>
-          <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">
+          <label className="block text-xs font-medium text-gray-600 mb-1.5">
             Box size
           </label>
-          <select
+          <CalcDropdown
             value={boxSize}
-            onChange={e => setBoxSize(+e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
-          >
-            {boxSizes.map(size => (
-              <option key={size.value} value={size.value}>
-                {size.label}
-              </option>
-            ))}
-          </select>
+            onChange={v => setBoxSize(+v)}
+            options={boxSizeOptions}
+          />
         </div>
       </div>
 
-      <div className="border-t border-gray-200 dark:border-gray-700 pt-6">
+      <div className="border-t border-gray-200 pt-6">
         <div
-          className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4"
+          className="grid grid-cols-2 gap-2 sm:gap-3 mb-4"
           aria-live="polite"
           aria-label="Screw calculator results"
         >
@@ -236,3 +230,4 @@ export default function ScrewCalculator({ onUpdate }) {
     </div>
   )
 }
+
