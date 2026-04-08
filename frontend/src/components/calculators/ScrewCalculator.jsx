@@ -55,7 +55,6 @@ export default function ScrewCalculator({ onUpdate, sheetData }) {
 
   const results = useMemo(() => {
     const size = +effectiveSheetSize
-    const size = +sheetSize
     // Per-sheet screw counts per ASTM C840-23:
     // Walls:    edges 8" OC,  field 16" OC
     // Ceilings: edges 7" OC,  field 12" OC (tighter per ASTM C840-23 to prevent sag)
