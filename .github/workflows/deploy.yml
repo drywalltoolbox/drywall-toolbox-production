@@ -64,6 +64,23 @@ jobs:
           VITE_SITE_URL: 'https://elliotttmiller.github.io/drywall-toolbox'
           VITE_APP_ENV: development
 
+      # ── Inject product catalog CSV for GitHub Pages ─────────────────────────
+      # scraped_results/wp-catalog.csv is the canonical offline product catalog.
+      # It is NOT bundled by webpack (scraped_results/ is excluded from the
+      # CopyWebpackPlugin glob), so we copy it manually into dist/ here.
+      # On GitHub Pages this file is served at <origin>/wp-catalog.csv, which
+      # is exactly what catalog.js Attempt 0 fetches when USE_LOCAL_CSV=true.
+      # Production (HostGator) is unaffected — it never sets USE_LOCAL_CSV.
+      - name: Copy product catalog CSV into dist for GitHub Pages
+        run: |
+          if [ -f "scraped_results/wp-catalog.csv" ]; then
+            cp scraped_results/wp-catalog.csv dist/wp-catalog.csv
+            echo "✓ Copied scraped_results/wp-catalog.csv → dist/wp-catalog.csv ($(wc -l < scraped_results/wp-catalog.csv) rows)"
+          else
+            echo "⚠ scraped_results/wp-catalog.csv not found — catalog will be empty on GitHub Pages"
+            exit 1
+          fi
+
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:

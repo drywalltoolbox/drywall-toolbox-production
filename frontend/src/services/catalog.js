@@ -5,27 +5,28 @@
  *
  * Loading strategy (attempted in order, first success wins):
  *
+ *   0. Static CSV shortcut  — when REACT_APP_USE_LOCAL_CSV=true
+ *      • Local dev:     served from frontend/public/wp-catalog.csv via webpack-dev-server
+ *      • GitHub Pages:  scraped_results/wp-catalog.csv copied into dist/ by CI workflow
+ *      URL resolves to: <origin><PUBLIC_URL>/wp-catalog.csv
+ *      Production (HostGator) never sets this flag — always skips to step 1.
+ *
  *   1. WooCommerce REST API  — /wp-json/wc/v3/products
- *      Credentials come from VITE_WC_AUTH_USER / VITE_WC_AUTH_PASS (build-time)
+ *      Credentials come from REACT_APP_WC_AUTH_USER / REACT_APP_WC_AUTH_PASS (build-time)
  *      or from the runtime bootstrap in src/api/client.js (/dtb/v1/config).
  *
  *   2. PHP proxy CSV endpoint — fetched through the WP REST proxy at:
- *        VITE_WC_CSV_URL  (explicit env var override, checked first)
+ *        REACT_APP_WC_CSV_URL  (explicit env var override, checked first)
  *        OR  GET /wp-json/dtb/v1/catalog  (PHP returns the proxy URL)
  *        OR  <origin>/wp-json/dtb/v1/products-csv  (hard proxy fallback)
  *      Server file: public_html/drywalltoolbox/wp/wp-content/uploads/wc-imports/
- *                   product-wp-catalog-c7p3my05pn.csv
  *
  *   3. Web-root CSV — direct fetch of <origin>/wp-catalog.csv
  *      (public_html/drywalltoolbox/wp-catalog.csv on HostGator).
  *      Used when the WP REST stack is unavailable (maintenance, cold boot, etc.).
  *
- * Results are cached in memory for the page lifetime so navigating between
- * /products, /all-products, /parts-shop, and /product/:id never triggers a
- * second network request.
- *
- * All paths return objects in the normalizeProduct() shape defined in
- * src/services/api.js, so every existing component works without changes.
+ * Results are cached in memory for the page lifetime.
+ * All paths return objects in the normalizeProduct() shape from services/api.js.
  */
 
 import { getProducts as apiGetProducts, getProduct as apiGetProduct } from './api.js';
@@ -128,21 +129,32 @@ function loadCatalog() {
   if (_cache) return _cache;
 
   _cache = (async () => {
-    // --- Attempt 0 (Dev Only): Local CSV at /public/wp-catalog.csv --------
-    // When VITE_USE_LOCAL_CSV=true or REACT_APP_USE_LOCAL_CSV=true is set,
-    // we prioritize the local CSV file. This is ONLY for local development
-    // (npm run dev with .env.local) and never affects production builds.
+    // --- Attempt 0 (Dev Only): Local CSV at /wp-catalog.csv --------
+    // When REACT_APP_USE_LOCAL_CSV=true the catalog is loaded from a static
+    // wp-catalog.csv file served at the site root.  This covers two cases:
+    //
+    //   • Local dev    — file copied to frontend/public/wp-catalog.csv,
+    //                    served by webpack-dev-server at <origin>/wp-catalog.csv
+    //
+    //   • GitHub Pages — file copied from scraped_results/wp-catalog.csv into
+    //                    dist/ by the CI workflow step, then served at
+    //                    <origin>/<PUBLIC_URL>/wp-catalog.csv
+    //
+    // PUBLIC_URL is injected at build time by DefinePlugin (process.env.PUBLIC_URL).
+    // It is '' on localhost and '/drywall-toolbox' on GitHub Pages.
     const useLocal = process.env.REACT_APP_USE_LOCAL_CSV === 'true';
-    
+
     if (useLocal) {
       try {
-        const origin = typeof window !== 'undefined' ? window.location.origin : '';
-        const products = await fetchFromCsv(`${origin}/wp-catalog.csv`);
+        const origin    = typeof window !== 'undefined' ? window.location.origin : '';
+        const publicUrl = (process.env.PUBLIC_URL || '').replace(/\/+$/, '');
+        const csvUrl    = `${origin}${publicUrl}/wp-catalog.csv`;
+        const products  = await fetchFromCsv(csvUrl);
         _source = 'local-csv';
-        console.info(`[catalog] DEV MODE: Loaded ${products.length} products from local /wp-catalog.csv`);
+        console.info(`[catalog] Loaded ${products.length} products from static CSV: ${csvUrl}`);
         return products;
       } catch (localErr) {
-        console.warn('[catalog] Local CSV dev mode failed, falling back to standard resolution:', localErr.message);
+        console.warn('[catalog] Static CSV load failed, falling back to standard resolution:', localErr.message);
         // Continue to normal resolution below
       }
     }

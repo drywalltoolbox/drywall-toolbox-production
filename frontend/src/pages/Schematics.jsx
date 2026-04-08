@@ -2466,19 +2466,20 @@ export default function Parts() {
                   </button>
                 )}
               </div>
-              {/* Transform wrapper — sized by the image's natural aspect ratio.
-                  Hotspots are absolutely positioned inside here so they scale
-                  and pan with the image on every zoom level and screen size. */}
+              {/* Transform wrapper — sized by the image's natural aspect ratio on
+                  mobile (so hotspot % coords land accurately before the image loads),
+                  and flex-fills the full container height on desktop so wide
+                  schematics use the entire viewport instead of rendering tiny. */}
               <div 
                 ref={schematicImageRef}
                 className="schematic-image-wrapper"
                 style={{ 
                   position: 'relative',
-                  width: '100%',
-                  // Pre-allocate the correct proportional height before the image
-                  // loads so hotspot percentage coordinates land accurately on every
-                  // device and screen size, even on slow mobile connections.
-                  aspectRatio: currentPageAspectRatio,
+                  // On mobile: pre-allocate height via aspect-ratio so hotspots
+                  // land correctly even on slow connections.
+                  // On desktop: CSS flex: 1 1 auto fills remaining height instead —
+                  // setting aspectRatio here would fight that and make the image tiny.
+                  ...(isMobile && currentPageAspectRatio ? { aspectRatio: currentPageAspectRatio } : {}),
                   transform: `scale(${scale}) translate(${position.x / scale}px, ${position.y / scale}px)`,
                   transformOrigin: 'center center',
                   transition: gestureActiveRef.current ? 'none' : 'transform 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
@@ -2493,8 +2494,10 @@ export default function Parts() {
                     src={schematicImageSrc} 
                     alt={currentSchematic.title}
                     style={{ 
-                      width: '100%', 
-                      height: 'auto',
+                      width: isMobile ? '100%' : 'auto',
+                      height: isMobile ? 'auto' : '100%',
+                      maxWidth: '100%',
+                      maxHeight: '100%',
                       display: 'block', 
                       pointerEvents: 'none',
                       imageRendering: 'auto',

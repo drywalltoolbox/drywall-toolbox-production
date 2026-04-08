@@ -296,6 +296,17 @@ module.exports = (envFlags, argv) => {
               ],
             },
           },
+          // ── GitHub Pages / offline mode: inject the product catalog CSV ──────
+          // When REACT_APP_USE_LOCAL_CSV=true (set in deploy.yml for GH Pages or
+          // locally via .env.development) copy scraped_results/wp-catalog.csv into
+          // dist/ so catalog.js Attempt 0 can fetch it at <origin>/wp-catalog.csv.
+          // Production builds never set this flag, so the CSV is never shipped to
+          // the HostGator server.
+          ...(env('REACT_APP_USE_LOCAL_CSV') === 'true' ? [{
+            from:  path.resolve(__dirname, '..', 'scraped_results', 'wp-catalog.csv'),
+            to:    'wp-catalog.csv',
+            noErrorOnMissing: false,
+          }] : []),
         ],
       }),
 

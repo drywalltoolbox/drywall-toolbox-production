@@ -230,6 +230,31 @@
   width: 100%;
 }
 
+/* Desktop (769px+): let the wrapper fill all remaining container height so
+   wide-aspect schematics use the full viewport instead of rendering tiny.
+   The img becomes height-constrained (height: 100%) with object-fit: contain
+   so it stays proportional and never overflows. */
+@media (min-width: 769px) {
+  .schematic-image-wrapper {
+    flex: 1 1 auto;
+    min-height: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    overflow: hidden;
+  }
+
+  .schematic-image-wrapper img {
+    width: auto !important;
+    height: 100% !important;
+    max-width: 100% !important;
+    max-height: 100% !important;
+    object-fit: contain !important;
+    display: block !important;
+  }
+}
+
 /* Ultra-small phones (320px - 480px): Compact sizing */
 @media (max-width: 480px) {
   .schematic-container {
@@ -292,15 +317,16 @@
     flex: 1 !important;
     display: flex !important;
     flex-direction: column !important;
-    justify-content: center !important;
+    justify-content: flex-start !important;
     align-items: stretch !important;
   }
 
   .schematic-container img {
     display: block !important;
-    width: 100% !important;
-    height: auto !important;
+    width: auto !important;
+    height: 100% !important;
     max-width: 100% !important;
+    max-height: 100% !important;
     object-fit: contain !important;
     pointer-events: none !important;
     image-rendering: auto !important;
@@ -791,6 +817,7 @@
 .viewer-active .schematic-container {
   min-height: 0;
   height: 100%;
+  justify-content: flex-start;
 }
 
 /* Legacy fullscreen rules — kept for backward compat but
