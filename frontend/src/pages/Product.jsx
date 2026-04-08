@@ -5,9 +5,11 @@ import { useCart } from '../context/CartContext';
 import ProductDetail from '../components/ProductDetail';
 import Toast from '../components/Toast';
 import LoadingSpinner from '../components/LoadingSpinner';
+import SEOHead from '../components/SEOHead';
+import { buildProductSchema, buildBreadcrumbSchema, stripHtml } from '../utils/schema';
 
 export default function Product() {
-  const { partNumber, id } = useParams();
+  const { slug, partNumber } = useParams();
   const navigate = useNavigate();
   const { addToCart } = useCart();
   const [product, setProduct] = useState(null);
@@ -25,11 +27,12 @@ export default function Product() {
 
   useEffect(() => {
     let mounted = true;
-    // Support both /product/:partNumber (legacy) and /products/:id (WooCommerce)
-    const key = id || partNumber;
+    // Support both /products/:slug (current) and /product/:partNumber (legacy)
+    const key = slug || partNumber;
 
     const load = async () => {
-      // catalog service handles API-first → CSV-fallback transparently
+      // catalog service handles API-first → CSV-fallback transparently,
+      // and resolves by numeric ID, slug, SKU, or part_number.
       return getProductById(key);
     };
 
@@ -39,15 +42,21 @@ export default function Product() {
       .finally(() => { if (mounted) setLoading(false); });
 
     return () => { mounted = false; };
-  }, [partNumber, id]);
+  }, [slug, partNumber]);
 
   if (loading) {
-    return <LoadingSpinner fullPage size="lg" label="Loading product" />;
+    return (
+      <>
+        <SEOHead noindex title="Loading product…" />
+        <LoadingSpinner fullPage size="lg" label="Loading product" />
+      </>
+    );
   }
 
   if (!product) {
     return (
       <div className="min-h-screen container mx-auto px-4 py-16">
+        <SEOHead noindex title="Product not found" />
         <div className="text-center">
           <h2 className="text-2xl font-bold mb-4">Product not found</h2>
           <p className="text-gray-600 mb-6">We couldn't find the product you're looking for.</p>
@@ -60,8 +69,43 @@ export default function Product() {
     );
   }
 
+  // Read _dtb_seo_* overrides from WooCommerce product meta_data
+  const metaMap = {};
+  if (Array.isArray(product.meta_data)) {
+    product.meta_data.forEach(({ key: metaKey, value: metaValue }) => { metaMap[metaKey] = metaValue; });
+  }
+
+  const seoTitle    = metaMap['_dtb_seo_title']       || product.name || '';
+  const seoDesc     = metaMap['_dtb_seo_description'] || stripHtml(product.short_description || product.description || '');
+  const seoCanon    = metaMap['_dtb_seo_canonical']   || '';
+  const seoNoindex  = !!metaMap['_dtb_seo_noindex'];
+
+  const heroImage = (Array.isArray(product.images) && product.images[0])
+    ? (typeof product.images[0] === 'string' ? product.images[0] : product.images[0].src)
+    : product.image || '';
+
+  const productSchema   = buildProductSchema(product);
+  // Canonical slug for the breadcrumb: prefer WooCommerce slug, then SKU, then
+  // the URL param we resolved with — keeps breadcrumb links consistent with
+  // the canonical URLs emitted by the schema builder and the route definition.
+  const productSlug     = product.slug || product.sku || slug || partNumber || String(product.id);
+  const breadcrumbSchema = buildBreadcrumbSchema([
+    { label: 'Home',       path: '/'         },
+    { label: 'Products',   path: '/products' },
+    { label: product.name, path: `/products/${productSlug}` },
+  ]);
+
   return (
     <div className="min-h-screen bg-gray-50 page-wrapper">
+      <SEOHead
+        title={seoTitle}
+        description={seoDesc}
+        canonical={seoCanon}
+        noindex={seoNoindex}
+        og={{ type: 'product', image: heroImage, imageAlt: product.name }}
+        schema={[productSchema, breadcrumbSchema].filter(Boolean)}
+        links={heroImage ? [{ rel: 'preload', href: heroImage, as: 'image' }] : []}
+      />
       <div className="container mx-auto px-4 py-12">
         <ProductDetail 
           product={product} 
