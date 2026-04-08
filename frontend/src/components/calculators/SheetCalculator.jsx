@@ -1,0 +1,289 @@
+import { useState, useMemo, useEffect } from 'react'
+import ResultCard from './shared/ResultCard'
+import InfoBox from './shared/InfoBox'
+import WasteSelector from './shared/WasteSelector'
+import RoomPresets from './shared/RoomPresets'
+
+const DEFAULT_WALLS = [
+  { id: 1, length: 12 },
+  { id: 2, length: 14 },
+  { id: 3, length: 12 },
+  { id: 4, length: 14 },
+]
+
+export default function SheetCalculator({ onUpdate }) {
+  const [walls, setWalls] = useState(DEFAULT_WALLS)
+  const [ceilHeight, setCeilHeight] = useState(9)
+  const [sheetSize, setSheetSize] = useState(48)
+  const [hangDir, setHangDir] = useState('horizontal')
+  const [doors, setDoors] = useState(1)
+  const [windows, setWindows] = useState(2)
+  const [wastePct, setWastePct] = useState(0.05)
+
+  // All calculation logic lives in useMemo — recalculates only when inputs change
+  const results = useMemo(() => {
+    const gross = walls.reduce((sum, w) => sum + (w.length || 0) * ceilHeight, 0)
+    const deductions = doors * 20 + windows * 15
+    const net = Math.max(0, gross - deductions)
+    const withWaste = net * (1 + wastePct)
+    const sheets = Math.ceil(withWaste / sheetSize)
+    return { gross, net, withWaste, sheets }
+  }, [walls, ceilHeight, sheetSize, doors, windows, wastePct])
+
+  // Notify parent of updates for summary tab
+  useEffect(() => {
+    if (onUpdate) {
+      onUpdate({
+        sheets: results.sheets,
+        sheetSize,
+        hangDir,
+        gross: Math.round(results.gross),
+        net: Math.round(results.net),
+        wastePct,
+        numWalls: walls.length,
+        doors,
+        windows
+      })
+    }
+  }, [results, sheetSize, hangDir, wastePct, walls.length, doors, windows, onUpdate])
+
+  const addWall = () =>
+    setWalls(prev => [...prev, { id: Date.now(), length: 10 }])
+
+  const removeWall = (id) =>
+    setWalls(prev => prev.filter(w => w.id !== id))
+
+  const updateWallLength = (id, length) =>
+    setWalls(prev => prev.map(w => w.id === id ? { ...w, length: +length } : w))
+
+  const applyRoomPreset = (preset) => {
+    setWalls([
+      { id: Date.now() + 1, length: preset.length },
+      { id: Date.now() + 2, length: preset.width },
+      { id: Date.now() + 3, length: preset.length },
+      { id: Date.now() + 4, length: preset.width },
+    ])
+  }
+
+  const sheetSizes = [
+    { value: 32, label: '4×8 ft (32 sq ft)' },
+    { value: 48, label: '4×12 ft (48 sq ft)' },
+    { value: 54, label: '4×13.5 ft (54 sq ft)' },
+  ]
+
+  const wasteLabel = ['5%', '10%', '15%', '20%'][[0.05, 0.10, 0.15, 0.20].indexOf(wastePct)]
+
+  return (
+    <div className="space-y-6">
+      {/* Room presets */}
+      <div>
+        <h3 className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3">
+          Room Presets
+        </h3>
+        <RoomPresets onApply={applyRoomPreset} />
+      </div>
+
+      {/* Sheet size + hang direction */}
+      <div>
+        <h3 className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3">
+          Sheet Size & Hang Direction
+        </h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <div>
+            <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">
+              Sheet size
+            </label>
+            <select
+              value={sheetSize}
+              onChange={e => setSheetSize(+e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
+            >
+              {sheetSizes.map(size => (
+                <option key={size.value} value={size.value}>
+                  {size.label}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">
+              Hang direction
+            </label>
+            <select
+              value={hangDir}
+              onChange={e => setHangDir(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
+            >
+              <option value="horizontal">Horizontal (recommended)</option>
+              <option value="vertical">Vertical</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      {/* Wall list */}
+      <div>
+        <h3 className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3">
+          Walls — enter each wall length
+        </h3>
+        <div className="space-y-2">
+          {walls.map((wall, index) => (
+            <div
+              key={wall.id}
+              className="bg-gray-100 dark:bg-gray-800 rounded-lg p-3"
+            >
+              <div className="flex justify-between items-center mb-2">
+                <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                  Wall {index + 1}
+                </span>
+                <span className="text-xs text-gray-500 dark:text-gray-400">
+                  {Math.round((wall.length || 0) * ceilHeight)} sq ft
+                </span>
+                {walls.length > 1 && (
+                  <button
+                    onClick={() => removeWall(wall.id)}
+                    className="text-red-600 dark:text-red-400 text-xl leading-none hover:text-red-700 dark:hover:text-red-300"
+                  >
+                    ×
+                  </button>
+                )}
+              </div>
+              <div className="grid grid-cols-3 gap-2">
+                <div>
+                  <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">
+                    Length (ft)
+                  </label>
+                  <input
+                    type="number"
+                    value={wall.length}
+                    min={1}
+                    step={0.5}
+                    onChange={e => updateWallLength(wall.id, e.target.value)}
+                    className="w-full px-2 py-1 text-sm border border-gray-300 dark:border-gray-700 rounded bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">
+                    Height (ft)
+                  </label>
+                  <input
+                    type="number"
+                    value={ceilHeight}
+                    readOnly
+                    className="w-full px-2 py-1 text-sm border border-gray-300 dark:border-gray-700 rounded bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">
+                    Area (sq ft)
+                  </label>
+                  <input
+                    type="number"
+                    value={Math.round((wall.length || 0) * ceilHeight)}
+                    readOnly
+                    className="w-full px-2 py-1 text-sm border border-gray-300 dark:border-gray-700 rounded bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100"
+                  />
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+        <button
+          onClick={addWall}
+          className="w-full mt-2 px-4 py-2 border border-dashed border-gray-400 dark:border-gray-600 rounded-md text-sm text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950 transition-colors"
+        >
+          + Add another wall
+        </button>
+      </div>
+
+      {/* Openings + ceiling height */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+        <div>
+          <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">
+            Ceiling height (ft)
+          </label>
+          <input
+            type="number"
+            value={ceilHeight}
+            min={6}
+            max={20}
+            step={0.5}
+            onChange={e => setCeilHeight(+e.target.value)}
+            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
+          />
+        </div>
+        <div>
+          <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">
+            Door openings
+          </label>
+          <input
+            type="number"
+            value={doors}
+            min={0}
+            onChange={e => setDoors(+e.target.value)}
+            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
+          />
+          <span className="text-xs text-gray-500 dark:text-gray-400 mt-1 block">
+            Each deducts 20 sq ft
+          </span>
+        </div>
+        <div>
+          <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">
+            Window openings
+          </label>
+          <input
+            type="number"
+            value={windows}
+            min={0}
+            onChange={e => setWindows(+e.target.value)}
+            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
+          />
+          <span className="text-xs text-gray-500 dark:text-gray-400 mt-1 block">
+            Each deducts 15 sq ft
+          </span>
+        </div>
+      </div>
+
+      {/* Waste selector */}
+      <div>
+        <label className="block text-xs text-gray-600 dark:text-gray-400 mb-2">
+          Waste factor
+        </label>
+        <WasteSelector value={wastePct} onChange={setWastePct} />
+      </div>
+
+      {/* Results */}
+      <div className="border-t border-gray-200 dark:border-gray-700 pt-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
+          <ResultCard
+            label="Sheets to order"
+            value={results.sheets}
+            sub={`${sheetSize} sq ft per sheet`}
+            hero
+          />
+          <ResultCard
+            label="Net wall area"
+            value={Math.round(results.net)}
+            sub="sq ft after openings"
+          />
+          <ResultCard
+            label="Gross area"
+            value={Math.round(results.gross)}
+            sub="sq ft before deductions"
+          />
+          <ResultCard
+            label="With waste"
+            value={Math.round(results.withWaste)}
+            sub="sq ft to cover"
+          />
+        </div>
+
+        <InfoBox>
+          {results.sheets > 0
+            ? `${results.sheets} sheets covers ${Math.round(results.net)} sq ft net across ${walls.length} wall(s) — ${doors} door(s) and ${windows} window(s) deducted, with ${wasteLabel} waste added.`
+            : 'Add your wall lengths above to see the sheet count.'}
+        </InfoBox>
+      </div>
+    </div>
+  )
+}

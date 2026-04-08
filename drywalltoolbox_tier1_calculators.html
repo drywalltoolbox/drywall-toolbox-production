@@ -1,0 +1,1090 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:var(--font-sans);}
+.wrap{padding:1rem 0;}
+.tabs{display:flex;gap:3px;background:var(--color-background-secondary);border-radius:var(--border-radius-lg);padding:4px;margin-bottom:1.5rem;}
+.tab{flex:1;padding:8px 4px;border:none;background:none;border-radius:var(--border-radius-md);font-size:13px;cursor:pointer;color:var(--color-text-secondary);font-family:var(--font-sans);transition:all .15s;}
+.tab.on{background:var(--color-background-primary);color:var(--color-text-primary);font-weight:500;border:0.5px solid var(--color-border-tertiary);}
+.panel{display:none;}
+.panel.on{display:block;}
+.field-label{font-size:12px;color:var(--color-text-secondary);margin-bottom:4px;display:block;}
+.field-hint{font-size:11px;color:var(--color-text-tertiary);margin-top:2px;}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;}
+.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px;}
+.fgroup{display:flex;flex-direction:column;gap:3px;}
+.fgroup input,.fgroup select{width:100%;}
+.wall-block{background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:10px 12px;margin-bottom:8px;}
+.wall-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
+.wall-title{font-size:13px;font-weight:500;color:var(--color-text-primary);}
+.wall-area{font-size:12px;color:var(--color-text-secondary);}
+.wall-inputs{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;}
+.rmv{background:none;border:none;color:var(--color-text-danger);font-size:20px;cursor:pointer;line-height:1;padding:0 2px;}
+.add-btn{width:100%;padding:9px;border:0.5px dashed var(--color-border-secondary);border-radius:var(--border-radius-md);background:none;font-size:13px;color:var(--color-text-info);cursor:pointer;margin-bottom:16px;font-family:var(--font-sans);}
+.add-btn:hover{background:var(--color-background-info);}
+.divider{border:none;border-top:0.5px solid var(--color-border-tertiary);margin:16px 0;}
+.results{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;}
+.rcard{background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:12px 14px;}
+.rcard.hero{border-left:3px solid #1D9E75;border-radius:0 var(--border-radius-md) var(--border-radius-md) 0;}
+.rlabel{font-size:11px;color:var(--color-text-secondary);margin-bottom:3px;text-transform:uppercase;letter-spacing:.04em;}
+.rvalue{font-size:24px;font-weight:500;color:var(--color-text-primary);line-height:1.1;}
+.rsub{font-size:11px;color:var(--color-text-secondary);margin-top:3px;}
+.infobox{background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:10px 14px;font-size:13px;color:var(--color-text-secondary);border-left:3px solid #378ADD;border-radius:0 var(--border-radius-md) var(--border-radius-md) 0;}
+.warn{border-left-color:#EF9F27;}
+.section-head{font-size:11px;font-weight:500;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px;}
+.summary-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:0.5px solid var(--color-border-tertiary);font-size:14px;}
+.summary-row:last-child{border-bottom:none;font-weight:500;font-size:15px;padding-top:10px;}
+.summary-row .si{color:var(--color-text-secondary);}
+.summary-row .sv{color:var(--color-text-primary);}
+.toggle-row{display:flex;gap:4px;margin-bottom:12px;}
+.tgl{flex:1;padding:7px;border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);background:none;font-size:13px;cursor:pointer;color:var(--color-text-secondary);font-family:var(--font-sans);}
+.tgl.on{background:var(--color-background-primary);color:var(--color-text-primary);font-weight:500;border-color:var(--color-border-secondary);}
+.room-presets{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:6px;margin-bottom:16px;}
+.preset-btn{padding:8px 10px;border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);background:var(--color-background-secondary);font-size:12px;cursor:pointer;color:var(--color-text-primary);font-family:var(--font-sans);text-align:left;transition:all .15s;}
+.preset-btn:hover{background:var(--color-background-primary);border-color:var(--color-border-secondary);}
+.preset-btn .pname{font-weight:500;display:block;margin-bottom:2px;}
+.preset-btn .pdim{font-size:11px;color:var(--color-text-secondary);}
+.action-bar{display:flex;gap:8px;margin-bottom:16px;}
+.action-btn{flex:1;padding:10px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);background:var(--color-background-primary);font-size:13px;cursor:pointer;color:var(--color-text-primary);font-family:var(--font-sans);font-weight:500;transition:all .15s;}
+.action-btn:hover{background:var(--color-background-secondary);}
+.action-btn.primary{background:#1D9E75;color:white;border-color:#1D9E75;}
+.action-btn.primary:hover{background:#178866;}
+.summary-section{margin-bottom:24px;}
+.summary-card{background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:14px 16px;margin-bottom:12px;}
+.summary-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;padding-bottom:10px;border-bottom:0.5px solid var(--color-border-tertiary);}
+.summary-title{font-size:14px;font-weight:500;color:var(--color-text-primary);}
+.summary-total{font-size:18px;font-weight:600;color:#1D9E75;}
+.summary-items{display:flex;flex-direction:column;gap:8px;}
+.summary-item{display:flex;justify-content:space-between;align-items:center;font-size:13px;}
+.summary-item .label{color:var(--color-text-secondary);}
+.summary-item .value{color:var(--color-text-primary);font-weight:500;}
+.project-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;}
+.project-name{font-size:16px;font-weight:600;color:var(--color-text-primary);}
+.project-meta{font-size:12px;color:var(--color-text-secondary);}
+@media (max-width: 768px) {
+  .tabs{overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
+  .tabs::-webkit-scrollbar{display:none;}
+  .tab{min-width:80px;white-space:nowrap;}
+  .row2,.row3{grid-template-columns:1fr;gap:12px;}
+  .wall-inputs{grid-template-columns:1fr 1fr;gap:6px;}
+  .results{grid-template-columns:1fr;}
+  .action-bar{flex-direction:column;}
+  .toggle-row{flex-wrap:wrap;}
+  .tgl{min-width:calc(50% - 2px);}
+  .room-presets{grid-template-columns:1fr 1fr;}
+}
+@media (min-width: 769px) and (max-width: 1024px) {
+  .results{grid-template-columns:1fr 1fr;}
+}
+@media print {
+  .tabs,.action-bar,.add-btn,.rmv,.preset-btn{display:none !important;}
+  .panel{display:block !important;}
+  .project-header{margin-bottom:20px;border-bottom:2px solid #000;padding-bottom:10px;}
+  .summary-card{page-break-inside:avoid;border:1px solid #000;margin-bottom:20px;}
+  body{font-size:12pt;}
+  .infobox{border:1px solid #000;}
+}
+</style>
+
+<div class="wrap">
+<h2 class="sr-only">Four Tier 1 drywall calculators: sheets, tape, corner bead, and screws</h2>
+
+<div class="project-header">
+  <div>
+    <input type="text" id="project-name" class="project-name" value="New Project" style="border:none;background:none;outline:none;font-family:var(--font-sans);" onchange="saveState()">
+    <div class="project-meta" id="project-meta">Last saved: Never</div>
+  </div>
+  <div class="action-bar" style="margin:0;width:auto;">
+    <button class="action-btn" onclick="saveTemplate()">💾 Save</button>
+    <button class="action-btn" onclick="loadTemplate()">📂 Load</button>
+    <button class="action-btn" onclick="exportEstimate()">📄 Export</button>
+  </div>
+</div>
+
+<div class="tabs">
+  <button class="tab on" onclick="switchTab(0)">Sheets</button>
+  <button class="tab" onclick="switchTab(1)">Tape</button>
+  <button class="tab" onclick="switchTab(2)">Corner bead</button>
+  <button class="tab" onclick="switchTab(3)">Screws</button>
+  <button class="tab" onclick="switchTab(4)">Summary</button>
+</div>
+
+<div id="p0" class="panel on">
+  <p class="section-head">Room presets</p>
+  <div class="room-presets">
+    <button class="preset-btn" onclick="applyRoomPreset('bedroom',12,14)">
+      <span class="pname">Bedroom</span>
+      <span class="pdim">12×14 ft</span>
+    </button>
+    <button class="preset-btn" onclick="applyRoomPreset('master',16,18)">
+      <span class="pname">Master BR</span>
+      <span class="pdim">16×18 ft</span>
+    </button>
+    <button class="preset-btn" onclick="applyRoomPreset('living',18,20)">
+      <span class="pname">Living Room</span>
+      <span class="pdim">18×20 ft</span>
+    </button>
+    <button class="preset-btn" onclick="applyRoomPreset('kitchen',12,16)">
+      <span class="pname">Kitchen</span>
+      <span class="pdim">12×16 ft</span>
+    </button>
+    <button class="preset-btn" onclick="applyRoomPreset('bathroom',8,10)">
+      <span class="pname">Bathroom</span>
+      <span class="pdim">8×10 ft</span>
+    </button>
+    <button class="preset-btn" onclick="applyRoomPreset('garage',20,24)">
+      <span class="pname">Garage</span>
+      <span class="pdim">20×24 ft</span>
+    </button>
+  </div>
+
+  <p class="section-head">Sheet size & hang direction</p>
+  <div class="row2">
+    <div class="fgroup">
+      <label class="field-label">Sheet size</label>
+      <select id="sh-size" onchange="calcSheets()">
+        <option value="32">4×8 ft (32 sq ft)</option>
+        <option value="48" selected>4×12 ft (48 sq ft)</option>
+        <option value="54">4×13.5 ft (54 sq ft)</option>
+      </select>
+    </div>
+    <div class="fgroup">
+      <label class="field-label">Hang direction</label>
+      <select id="sh-dir" onchange="calcSheets()">
+        <option value="h" selected>Horizontal (recommended)</option>
+        <option value="v">Vertical</option>
+      </select>
+    </div>
+  </div>
+
+  <p class="section-head">Walls — enter each wall length</p>
+  <div id="walls-list"></div>
+  <button class="add-btn" onclick="addWall()">+ Add another wall</button>
+
+  <div class="row3">
+    <div class="fgroup">
+      <label class="field-label">Ceiling height (ft)</label>
+      <input type="number" id="sh-ceil" value="9" min="6" max="20" step="0.5" oninput="syncCeilHeight();calcSheets()">
+    </div>
+    <div class="fgroup">
+      <label class="field-label">Door openings</label>
+      <input type="number" id="sh-doors" value="1" min="0" max="20" oninput="calcSheets()">
+      <span class="field-hint">Each deducts 20 sq ft</span>
+    </div>
+    <div class="fgroup">
+      <label class="field-label">Window openings</label>
+      <input type="number" id="sh-wins" value="2" min="0" max="30" oninput="calcSheets()">
+      <span class="field-hint">Each deducts 15 sq ft</span>
+    </div>
+  </div>
+
+  <div class="fgroup" style="margin-bottom:16px;">
+    <label class="field-label">Waste factor</label>
+    <div class="toggle-row">
+      <button class="tgl on" onclick="setWaste(this,0.05)">5% simple</button>
+      <button class="tgl" onclick="setWaste(this,0.10)">10% standard</button>
+      <button class="tgl" onclick="setWaste(this,0.15)">15% complex</button>
+      <button class="tgl" onclick="setWaste(this,0.20)">20% heavy</button>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+  <div class="results">
+    <div class="rcard hero">
+      <div class="rlabel">Sheets to order</div>
+      <div class="rvalue" id="r-sheets">—</div>
+      <div class="rsub" id="r-sheets-sub"></div>
+    </div>
+    <div class="rcard">
+      <div class="rlabel">Net wall area</div>
+      <div class="rvalue" id="r-net">—</div>
+      <div class="rsub">sq ft after openings</div>
+    </div>
+    <div class="rcard">
+      <div class="rlabel">Gross area</div>
+      <div class="rvalue" id="r-gross">—</div>
+      <div class="rsub">sq ft before deductions</div>
+    </div>
+    <div class="rcard">
+      <div class="rlabel">With waste</div>
+      <div class="rvalue" id="r-withwaste">—</div>
+      <div class="rsub">sq ft to cover</div>
+    </div>
+  </div>
+  <div class="infobox" id="sh-tip">Add your walls above to see results.</div>
+</div>
+
+<div id="p1" class="panel">
+  <p class="section-head">Wall & ceiling area</p>
+  <div class="row2">
+    <div class="fgroup">
+      <label class="field-label">Total drywall area (sq ft)</label>
+      <input type="number" id="tp-area" value="800" min="1" oninput="calcTape()">
+      <span class="field-hint">Walls + ceiling combined</span>
+    </div>
+    <div class="fgroup">
+      <label class="field-label">Outside corners</label>
+      <input type="number" id="tp-corners" value="4" min="0" oninput="calcTape()">
+      <span class="field-hint">Adds corner tape length</span>
+    </div>
+  </div>
+  <div class="row2">
+    <div class="fgroup">
+      <label class="field-label">Sheet size used</label>
+      <select id="tp-sheet" onchange="calcTape()">
+        <option value="32">4×8 ft</option>
+        <option value="48" selected>4×12 ft</option>
+        <option value="54">4×13.5 ft</option>
+      </select>
+    </div>
+    <div class="fgroup">
+      <label class="field-label">Tape type</label>
+      <select id="tp-type" onchange="calcTape()">
+        <option value="paper" selected>Paper tape (standard seams)</option>
+        <option value="mesh">Fiberglass mesh tape</option>
+        <option value="flex">Flexible corner tape</option>
+      </select>
+    </div>
+  </div>
+  <div class="fgroup" style="margin-bottom:16px;">
+    <label class="field-label">Roll size</label>
+    <div class="toggle-row">
+      <button class="tgl" onclick="setRollSize(this,75)">75 ft</button>
+      <button class="tgl" onclick="setRollSize(this,150)">150 ft</button>
+      <button class="tgl on" onclick="setRollSize(this,500)">500 ft</button>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+  <div class="results">
+    <div class="rcard hero">
+      <div class="rlabel">Tape rolls needed</div>
+      <div class="rvalue" id="r-rolls">—</div>
+      <div class="rsub" id="r-roll-sub"></div>
+    </div>
+    <div class="rcard">
+      <div class="rlabel">Total linear feet</div>
+      <div class="rvalue" id="r-tapeft">—</div>
+      <div class="rsub">ft of tape total</div>
+    </div>
+    <div class="rcard">
+      <div class="rlabel">Seam tape</div>
+      <div class="rvalue" id="r-seamft">—</div>
+      <div class="rsub">ft for field seams</div>
+    </div>
+    <div class="rcard">
+      <div class="rlabel">Corner tape</div>
+      <div class="rvalue" id="r-cornerft">—</div>
+      <div class="rsub">ft for outside corners</div>
+    </div>
+  </div>
+  <div class="infobox" id="tp-tip">Paper tape is standard for flat seams. Use mesh for patches and repairs.</div>
+</div>
+
+<div id="p2" class="panel">
+  <p class="section-head">Outside corners</p>
+  <div class="row2">
+    <div class="fgroup">
+      <label class="field-label">Number of outside corners</label>
+      <input type="number" id="cb-corners" value="4" min="0" oninput="calcBead()">
+      <span class="field-hint">Standard 90° outside corners</span>
+    </div>
+    <div class="fgroup">
+      <label class="field-label">Wall/ceiling height (ft)</label>
+      <input type="number" id="cb-height" value="9" min="1" step="0.5" oninput="calcBead()">
+    </div>
+  </div>
+  <div class="row2">
+    <div class="fgroup">
+      <label class="field-label">Archways / curved corners</label>
+      <input type="number" id="cb-arches" value="0" min="0" oninput="calcBead()">
+      <span class="field-hint">Uses flexible arch bead</span>
+    </div>
+    <div class="fgroup">
+      <label class="field-label">Arch height (ft)</label>
+      <input type="number" id="cb-arch-h" value="7" min="1" step="0.5" oninput="calcBead()">
+    </div>
+  </div>
+
+  <p class="section-head" style="margin-top:4px;">Bead type & stock length</p>
+  <div class="row2">
+    <div class="fgroup">
+      <label class="field-label">Corner bead type</label>
+      <select id="cb-type" onchange="calcBead()">
+        <option value="standard" selected>Standard metal corner bead</option>
+        <option value="bullnose">Bullnose corner bead</option>
+        <option value="vinyl">Vinyl corner bead</option>
+        <option value="flex">Flexible / arch bead</option>
+      </select>
+    </div>
+    <div class="fgroup">
+      <label class="field-label">Stock bead length (ft)</label>
+      <select id="cb-stock" onchange="calcBead()">
+        <option value="8" selected>8 ft sections</option>
+        <option value="10">10 ft sections</option>
+        <option value="12">12 ft sections</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+  <div class="results">
+    <div class="rcard hero">
+      <div class="rlabel">Bead sections to buy</div>
+      <div class="rvalue" id="r-beadsections">—</div>
+      <div class="rsub" id="r-bead-sub"></div>
+    </div>
+    <div class="rcard">
+      <div class="rlabel">Total linear ft</div>
+      <div class="rvalue" id="r-beadft">—</div>
+      <div class="rsub">corner bead needed</div>
+    </div>
+    <div class="rcard">
+      <div class="rlabel">Standard corners</div>
+      <div class="rvalue" id="r-stdft">—</div>
+      <div class="rsub">ft of straight bead</div>
+    </div>
+    <div class="rcard">
+      <div class="rlabel">Arch bead</div>
+      <div class="rvalue" id="r-archft">—</div>
+      <div class="rsub">ft of flex bead</div>
+    </div>
+  </div>
+  <div class="infobox" id="cb-tip">Metal bead is the industry standard. Vinyl is preferred in high-humidity areas like bathrooms.</div>
+</div>
+
+<div id="p3" class="panel">
+  <p class="section-head">Job details</p>
+  <div class="row2">
+    <div class="fgroup">
+      <label class="field-label">Number of drywall sheets</label>
+      <input type="number" id="sc-sheets" value="20" min="1" oninput="calcScrews()">
+    </div>
+    <div class="fgroup">
+      <label class="field-label">Stud / joist spacing</label>
+      <select id="sc-spacing" onchange="calcScrews()">
+        <option value="16" selected>16" on center</option>
+        <option value="24">24" on center</option>
+      </select>
+    </div>
+  </div>
+  <div class="row2">
+    <div class="fgroup">
+      <label class="field-label">Application</label>
+      <select id="sc-app" onchange="calcScrews()">
+        <option value="wall" selected>Walls</option>
+        <option value="ceiling">Ceiling</option>
+        <option value="both">Walls + ceiling</option>
+      </select>
+      <span class="field-hint">Ceilings need closer spacing</span>
+    </div>
+    <div class="fgroup">
+      <label class="field-label">Sheet size</label>
+      <select id="sc-sheetsize" onchange="calcScrews()">
+        <option value="32">4×8 ft (32 sq ft)</option>
+        <option value="48" selected>4×12 ft (48 sq ft)</option>
+      </select>
+    </div>
+  </div>
+  <div class="row2">
+    <div class="fgroup">
+      <label class="field-label">Screw length</label>
+      <select id="sc-len" onchange="calcScrews()">
+        <option value='1-1/4"'>1-1/4" — single layer on wood</option>
+        <option value='1-5/8"' selected>1-5/8" — standard single layer</option>
+        <option value='2-1/2"'>2-1/2" — double layer / thick</option>
+        <option value='3"'>3" — through thick framing</option>
+      </select>
+    </div>
+    <div class="fgroup">
+      <label class="field-label">Box size</label>
+      <select id="sc-box" onchange="calcScrews()">
+        <option value="145">1 lb (~145 screws)</option>
+        <option value="725" selected>5 lb (~725 screws)</option>
+        <option value="1450">10 lb (~1,450 screws)</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+  <div class="results">
+    <div class="rcard hero">
+      <div class="rlabel">Boxes to buy</div>
+      <div class="rvalue" id="r-scboxes">—</div>
+      <div class="rsub" id="r-scbox-sub"></div>
+    </div>
+    <div class="rcard">
+      <div class="rlabel">Total screws needed</div>
+      <div class="rvalue" id="r-sctotal">—</div>
+      <div class="rsub">includes 10% overage</div>
+    </div>
+    <div class="rcard">
+      <div class="rlabel">Screws per sheet</div>
+      <div class="rvalue" id="r-scper">—</div>
+      <div class="rsub">avg per sheet</div>
+    </div>
+    <div class="rcard">
+      <div class="rlabel">Screw length</div>
+      <div class="rvalue" id="r-sclen">—</div>
+      <div class="rsub">coarse thread</div>
+    </div>
+  </div>
+  <div class="infobox" id="sc-tip">IRC code: edges 8" apart, field 12" (ceiling) or 16" (walls). Always use coarse thread for wood framing, fine thread for metal.</div>
+</div>
+
+<div id="p4" class="panel">
+  <div class="summary-section">
+    <div class="summary-card">
+      <div class="summary-header">
+        <span class="summary-title">📋 Drywall Sheets</span>
+        <span class="summary-total" id="sum-sheets-total">—</span>
+      </div>
+      <div class="summary-items">
+        <div class="summary-item">
+          <span class="label">Sheet size</span>
+          <span class="value" id="sum-sheet-size">—</span>
+        </div>
+        <div class="summary-item">
+          <span class="label">Hang direction</span>
+          <span class="value" id="sum-hang-dir">—</span>
+        </div>
+        <div class="summary-item">
+          <span class="label">Total wall area</span>
+          <span class="value" id="sum-wall-area">—</span>
+        </div>
+        <div class="summary-item">
+          <span class="label">Net area (after openings)</span>
+          <span class="value" id="sum-net-area">—</span>
+        </div>
+        <div class="summary-item">
+          <span class="label">Waste factor</span>
+          <span class="value" id="sum-waste">—</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="summary-card">
+      <div class="summary-header">
+        <span class="summary-title">📏 Joint Tape</span>
+        <span class="summary-total" id="sum-tape-total">—</span>
+      </div>
+      <div class="summary-items">
+        <div class="summary-item">
+          <span class="label">Tape type</span>
+          <span class="value" id="sum-tape-type">—</span>
+        </div>
+        <div class="summary-item">
+          <span class="label">Roll size</span>
+          <span class="value" id="sum-roll-size">—</span>
+        </div>
+        <div class="summary-item">
+          <span class="label">Total linear feet</span>
+          <span class="value" id="sum-tape-feet">—</span>
+        </div>
+        <div class="summary-item">
+          <span class="label">Seam footage</span>
+          <span class="value" id="sum-seam-feet">—</span>
+        </div>
+        <div class="summary-item">
+          <span class="label">Corner footage</span>
+          <span class="value" id="sum-corner-feet">—</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="summary-card">
+      <div class="summary-header">
+        <span class="summary-title">📐 Corner Bead</span>
+        <span class="summary-total" id="sum-bead-total">—</span>
+      </div>
+      <div class="summary-items">
+        <div class="summary-item">
+          <span class="label">Bead type</span>
+          <span class="value" id="sum-bead-type">—</span>
+        </div>
+        <div class="summary-item">
+          <span class="label">Stock length</span>
+          <span class="value" id="sum-stock-len">—</span>
+        </div>
+        <div class="summary-item">
+          <span class="label">Total linear feet</span>
+          <span class="value" id="sum-bead-feet">—</span>
+        </div>
+        <div class="summary-item">
+          <span class="label">Standard corners</span>
+          <span class="value" id="sum-std-corners">—</span>
+        </div>
+        <div class="summary-item">
+          <span class="label">Arch bead</span>
+          <span class="value" id="sum-arch-bead">—</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="summary-card">
+      <div class="summary-header">
+        <span class="summary-title">🔩 Drywall Screws</span>
+        <span class="summary-total" id="sum-screw-total">—</span>
+      </div>
+      <div class="summary-items">
+        <div class="summary-item">
+          <span class="label">Screw length</span>
+          <span class="value" id="sum-screw-len">—</span>
+        </div>
+        <div class="summary-item">
+          <span class="label">Box size</span>
+          <span class="value" id="sum-box-size">—</span>
+        </div>
+        <div class="summary-item">
+          <span class="label">Total screws needed</span>
+          <span class="value" id="sum-total-screws">—</span>
+        </div>
+        <div class="summary-item">
+          <span class="label">Screws per sheet</span>
+          <span class="value" id="sum-per-sheet">—</span>
+        </div>
+        <div class="summary-item">
+          <span class="label">Application</span>
+          <span class="value" id="sum-application">—</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="action-bar">
+    <button class="action-btn primary" onclick="exportEstimate()">📄 Export Estimate</button>
+    <button class="action-btn" onclick="printEstimate()">🖨️ Print</button>
+    <button class="action-btn" onclick="shareEstimate()">🔗 Share Link</button>
+  </div>
+
+  <div class="infobox">
+    All calculations are based on industry standards and IRC building codes. Always verify local code requirements and add appropriate safety margins for your specific job conditions.
+  </div>
+</div>
+
+</div>
+
+<script>
+let walls=[{l:12},{l:14},{l:12},{l:14}];
+let wasteFactor=0.05;
+let rollSize=500;
+let beadRollSize=8;
+let currentTab=0;
+let touchStartX=0;
+let touchEndX=0;
+
+// Load saved state on page load
+window.addEventListener('DOMContentLoaded', function() {
+  loadState();
+  setupTouchGestures();
+});
+
+// Touch gesture support for mobile
+function setupTouchGestures() {
+  const tabsContainer = document.querySelector('.wrap');
+  
+  tabsContainer.addEventListener('touchstart', function(e) {
+    touchStartX = e.changedTouches[0].screenX;
+  }, {passive: true});
+  
+  tabsContainer.addEventListener('touchend', function(e) {
+    touchEndX = e.changedTouches[0].screenX;
+    handleSwipe();
+  }, {passive: true});
+}
+
+function handleSwipe() {
+  const swipeThreshold = 50;
+  const diff = touchStartX - touchEndX;
+  
+  if (Math.abs(diff) > swipeThreshold) {
+    if (diff > 0 && currentTab < 4) {
+      // Swipe left - next tab
+      switchTab(currentTab + 1);
+    } else if (diff < 0 && currentTab > 0) {
+      // Swipe right - previous tab
+      switchTab(currentTab - 1);
+    }
+  }
+}
+
+function switchTab(i){
+  currentTab = i;
+  document.querySelectorAll('.tab').forEach((t,j)=>t.classList.toggle('on',i===j));
+  document.querySelectorAll('.panel').forEach((p,j)=>p.classList.toggle('on',i===j));
+  if(i===4) updateSummary();
+  saveState();
+}
+
+// Room preset functionality
+function applyRoomPreset(name, width, length) {
+  const h = +document.getElementById('sh-ceil').value || 9;
+  walls = [
+    {l: length, h},
+    {l: width, h},
+    {l: length, h},
+    {l: width, h}
+  ];
+  renderWalls();
+  calcSheets();
+  saveState();
+}
+
+// Save/Load state to localStorage
+function saveState() {
+  const state = {
+    projectName: document.getElementById('project-name').value,
+    walls,
+    wasteFactor,
+    rollSize,
+    currentTab,
+    ceilingHeight: +document.getElementById('sh-ceil').value,
+    sheetSize: document.getElementById('sh-size').value,
+    hangDir: document.getElementById('sh-dir').value,
+    doors: +document.getElementById('sh-doors').value,
+    windows: +document.getElementById('sh-wins').value,
+    tapeArea: +document.getElementById('tp-area').value,
+    tapeCorners: +document.getElementById('tp-corners').value,
+    tapeSheet: document.getElementById('tp-sheet').value,
+    tapeType: document.getElementById('tp-type').value,
+    beadCorners: +document.getElementById('cb-corners').value,
+    beadHeight: +document.getElementById('cb-height').value,
+    beadArches: +document.getElementById('cb-arches').value,
+    beadArchHeight: +document.getElementById('cb-arch-h').value,
+    beadType: document.getElementById('cb-type').value,
+    beadStock: +document.getElementById('cb-stock').value,
+    screwSheets: +document.getElementById('sc-sheets').value,
+    screwSpacing: document.getElementById('sc-spacing').value,
+    screwApp: document.getElementById('sc-app').value,
+    screwSize: document.getElementById('sc-sheetsize').value,
+    screwLen: document.getElementById('sc-len').value,
+    screwBox: +document.getElementById('sc-box').value,
+    timestamp: new Date().toISOString()
+  };
+  
+  localStorage.setItem('dwCalc_current', JSON.stringify(state));
+  updateSavedTime();
+}
+
+function loadState() {
+  const saved = localStorage.getItem('dwCalc_current');
+  if (!saved) return;
+  
+  try {
+    const state = JSON.parse(saved);
+    
+    // Restore project name
+    if (state.projectName) {
+      document.getElementById('project-name').value = state.projectName;
+    }
+    
+    // Restore walls
+    if (state.walls) {
+      walls = state.walls;
+      renderWalls();
+    }
+    
+    // Restore sheet calculator
+    if (state.ceilingHeight) document.getElementById('sh-ceil').value = state.ceilingHeight;
+    if (state.sheetSize) document.getElementById('sh-size').value = state.sheetSize;
+    if (state.hangDir) document.getElementById('sh-dir').value = state.hangDir;
+    if (state.doors !== undefined) document.getElementById('sh-doors').value = state.doors;
+    if (state.windows !== undefined) document.getElementById('sh-wins').value = state.windows;
+    if (state.wasteFactor !== undefined) wasteFactor = state.wasteFactor;
+    
+    // Restore tape calculator
+    if (state.tapeArea) document.getElementById('tp-area').value = state.tapeArea;
+    if (state.tapeCorners !== undefined) document.getElementById('tp-corners').value = state.tapeCorners;
+    if (state.tapeSheet) document.getElementById('tp-sheet').value = state.tapeSheet;
+    if (state.tapeType) document.getElementById('tp-type').value = state.tapeType;
+    if (state.rollSize) rollSize = state.rollSize;
+    
+    // Restore bead calculator
+    if (state.beadCorners !== undefined) document.getElementById('cb-corners').value = state.beadCorners;
+    if (state.beadHeight) document.getElementById('cb-height').value = state.beadHeight;
+    if (state.beadArches !== undefined) document.getElementById('cb-arches').value = state.beadArches;
+    if (state.beadArchHeight) document.getElementById('cb-arch-h').value = state.beadArchHeight;
+    if (state.beadType) document.getElementById('cb-type').value = state.beadType;
+    if (state.beadStock) document.getElementById('cb-stock').value = state.beadStock;
+    
+    // Restore screw calculator
+    if (state.screwSheets) document.getElementById('sc-sheets').value = state.screwSheets;
+    if (state.screwSpacing) document.getElementById('sc-spacing').value = state.screwSpacing;
+    if (state.screwApp) document.getElementById('sc-app').value = state.screwApp;
+    if (state.screwSize) document.getElementById('sc-sheetsize').value = state.screwSize;
+    if (state.screwLen) document.getElementById('sc-len').value = state.screwLen;
+    if (state.screwBox) document.getElementById('sc-box').value = state.screwBox;
+    
+    // Update all calculations
+    calcSheets();
+    calcTape();
+    calcBead();
+    calcScrews();
+    
+    updateSavedTime();
+  } catch (e) {
+    console.error('Error loading saved state:', e);
+  }
+}
+
+function updateSavedTime() {
+  const saved = localStorage.getItem('dwCalc_current');
+  if (saved) {
+    try {
+      const state = JSON.parse(saved);
+      if (state.timestamp) {
+        const date = new Date(state.timestamp);
+        const now = new Date();
+        const diffMs = now - date;
+        const diffMins = Math.floor(diffMs / 60000);
+        
+        let timeStr;
+        if (diffMins < 1) timeStr = 'Just now';
+        else if (diffMins < 60) timeStr = `${diffMins} min ago`;
+        else if (diffMins < 1440) timeStr = `${Math.floor(diffMins/60)} hr ago`;
+        else timeStr = date.toLocaleDateString();
+        
+        document.getElementById('project-meta').textContent = `Last saved: ${timeStr}`;
+      }
+    } catch (e) {
+      console.error('Error updating saved time:', e);
+    }
+  }
+}
+
+// Template management
+function saveTemplate() {
+  const name = prompt('Enter a name for this template:', document.getElementById('project-name').value);
+  if (!name) return;
+  
+  const templates = JSON.parse(localStorage.getItem('dwCalc_templates') || '[]');
+  const state = JSON.parse(localStorage.getItem('dwCalc_current'));
+  
+  templates.push({
+    name,
+    ...state,
+    savedAt: new Date().toISOString()
+  });
+  
+  localStorage.setItem('dwCalc_templates', JSON.stringify(templates));
+  alert(`Template "${name}" saved successfully!`);
+}
+
+function loadTemplate() {
+  const templates = JSON.parse(localStorage.getItem('dwCalc_templates') || '[]');
+  
+  if (templates.length === 0) {
+    alert('No saved templates found. Save your current configuration first.');
+    return;
+  }
+  
+  const options = templates.map((t, i) => `${i + 1}. ${t.name} (${new Date(t.savedAt).toLocaleDateString()})`).join('\n');
+  const choice = prompt(`Select a template to load:\n\n${options}\n\nEnter number:`);
+  
+  if (!choice) return;
+  
+  const index = parseInt(choice) - 1;
+  if (index >= 0 && index < templates.length) {
+    localStorage.setItem('dwCalc_current', JSON.stringify(templates[index]));
+    location.reload();
+  } else {
+    alert('Invalid selection');
+  }
+}
+
+// Export functionality
+function exportEstimate() {
+  updateSummary();
+  
+  const projectName = document.getElementById('project-name').value;
+  const date = new Date().toLocaleDateString();
+  
+  let text = `DRYWALL MATERIAL ESTIMATE\n`;
+  text += `Project: ${projectName}\n`;
+  text += `Date: ${date}\n`;
+  text += `${'='.repeat(50)}\n\n`;
+  
+  text += `DRYWALL SHEETS\n`;
+  text += `  Quantity: ${document.getElementById('r-sheets').textContent} sheets\n`;
+  text += `  Size: ${document.getElementById('sum-sheet-size').textContent}\n`;
+  text += `  Direction: ${document.getElementById('sum-hang-dir').textContent}\n`;
+  text += `  Wall Area: ${document.getElementById('sum-wall-area').textContent}\n\n`;
+  
+  text += `JOINT TAPE\n`;
+  text += `  Quantity: ${document.getElementById('r-rolls').textContent} rolls\n`;
+  text += `  Type: ${document.getElementById('sum-tape-type').textContent}\n`;
+  text += `  Roll Size: ${document.getElementById('sum-roll-size').textContent}\n`;
+  text += `  Total Footage: ${document.getElementById('sum-tape-feet').textContent}\n\n`;
+  
+  text += `CORNER BEAD\n`;
+  text += `  Quantity: ${document.getElementById('r-beadsections').textContent} sections\n`;
+  text += `  Type: ${document.getElementById('sum-bead-type').textContent}\n`;
+  text += `  Stock Length: ${document.getElementById('sum-stock-len').textContent}\n`;
+  text += `  Total Footage: ${document.getElementById('sum-bead-feet').textContent}\n\n`;
+  
+  text += `DRYWALL SCREWS\n`;
+  text += `  Quantity: ${document.getElementById('r-scboxes').textContent} boxes\n`;
+  text += `  Length: ${document.getElementById('sum-screw-len').textContent}\n`;
+  text += `  Box Size: ${document.getElementById('sum-box-size').textContent}\n`;
+  text += `  Total Screws: ${document.getElementById('sum-total-screws').textContent}\n\n`;
+  
+  text += `${'='.repeat(50)}\n`;
+  text += `Generated by Drywall Toolbox Calculator\n`;
+  
+  // Create download
+  const blob = new Blob([text], { type: 'text/plain' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `${projectName.replace(/\s+/g, '_')}_estimate_${new Date().toISOString().split('T')[0]}.txt`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function printEstimate() {
+  updateSummary();
+  window.print();
+}
+
+function shareEstimate() {
+  const state = localStorage.getItem('dwCalc_current');
+  if (!state) {
+    alert('Save your project first before sharing.');
+    return;
+  }
+  
+  // Encode state to URL
+  const encoded = btoa(state);
+  const url = `${window.location.origin}${window.location.pathname}?data=${encoded}`;
+  
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(url).then(() => {
+      alert('Share link copied to clipboard!');
+    }).catch(() => {
+      prompt('Copy this link to share:', url);
+    });
+  } else {
+    prompt('Copy this link to share:', url);
+  }
+}
+
+// Load from URL if shared
+window.addEventListener('DOMContentLoaded', function() {
+  const params = new URLSearchParams(window.location.search);
+  const data = params.get('data');
+  
+  if (data) {
+    try {
+      const decoded = atob(data);
+      localStorage.setItem('dwCalc_current', decoded);
+      window.history.replaceState({}, '', window.location.pathname);
+      location.reload();
+    } catch (e) {
+      console.error('Error loading shared data:', e);
+    }
+  }
+});
+
+// Update summary tab
+function updateSummary() {
+  // Sheets
+  const sheetSizes = {'32': '4×8 ft', '48': '4×12 ft', '54': '4×13.5 ft'};
+  const hangDirs = {'h': 'Horizontal', 'v': 'Vertical'};
+  const wasteLabels = {0.05: '5%', 0.10: '10%', 0.15: '15%', 0.20: '20%'};
+  
+  document.getElementById('sum-sheets-total').textContent = document.getElementById('r-sheets').textContent + ' sheets';
+  document.getElementById('sum-sheet-size').textContent = sheetSizes[document.getElementById('sh-size').value];
+  document.getElementById('sum-hang-dir').textContent = hangDirs[document.getElementById('sh-dir').value];
+  document.getElementById('sum-wall-area').textContent = document.getElementById('r-gross').textContent + ' sq ft';
+  document.getElementById('sum-net-area').textContent = document.getElementById('r-net').textContent + ' sq ft';
+  document.getElementById('sum-waste').textContent = wasteLabels[wasteFactor];
+  
+  // Tape
+  const tapeTypes = {'paper': 'Paper tape', 'mesh': 'Fiberglass mesh', 'flex': 'Flexible corner'};
+  document.getElementById('sum-tape-total').textContent = document.getElementById('r-rolls').textContent + ' rolls';
+  document.getElementById('sum-tape-type').textContent = tapeTypes[document.getElementById('tp-type').value];
+  document.getElementById('sum-roll-size').textContent = rollSize + ' ft';
+  document.getElementById('sum-tape-feet').textContent = document.getElementById('r-tapeft').textContent + ' ft';
+  document.getElementById('sum-seam-feet').textContent = document.getElementById('r-seamft').textContent + ' ft';
+  document.getElementById('sum-corner-feet').textContent = document.getElementById('r-cornerft').textContent + ' ft';
+  
+  // Bead
+  const beadTypes = {'standard': 'Standard metal', 'bullnose': 'Bullnose', 'vinyl': 'Vinyl', 'flex': 'Flexible/arch'};
+  document.getElementById('sum-bead-total').textContent = document.getElementById('r-beadsections').textContent + ' sections';
+  document.getElementById('sum-bead-type').textContent = beadTypes[document.getElementById('cb-type').value];
+  document.getElementById('sum-stock-len').textContent = document.getElementById('cb-stock').value + ' ft';
+  document.getElementById('sum-bead-feet').textContent = document.getElementById('r-beadft').textContent + ' ft';
+  document.getElementById('sum-std-corners').textContent = document.getElementById('r-stdft').textContent + ' ft';
+  document.getElementById('sum-arch-bead').textContent = document.getElementById('r-archft').textContent + ' ft';
+  
+  // Screws
+  const appTypes = {'wall': 'Walls', 'ceiling': 'Ceiling', 'both': 'Walls + Ceiling'};
+  document.getElementById('sum-screw-total').textContent = document.getElementById('r-scboxes').textContent + ' boxes';
+  document.getElementById('sum-screw-len').textContent = document.getElementById('r-sclen').textContent;
+  document.getElementById('sum-box-size').textContent = document.getElementById('sc-box').value + ' screws';
+  document.getElementById('sum-total-screws').textContent = document.getElementById('r-sctotal').textContent;
+  document.getElementById('sum-per-sheet').textContent = document.getElementById('r-scper').textContent;
+  document.getElementById('sum-application').textContent = appTypes[document.getElementById('sc-app').value];
+}
+
+function setWaste(el,v){
+  wasteFactor=v;
+  document.querySelectorAll('#p0 .tgl').forEach(b=>b.classList.remove('on'));
+  el.classList.add('on');
+  calcSheets();
+  saveState();
+}
+
+function setRollSize(el,v){
+  rollSize=v;
+  document.querySelectorAll('#p1 .tgl').forEach(b=>b.classList.remove('on'));
+  el.classList.add('on');
+  calcTape();
+  saveState();
+}
+
+function syncCeilHeight(){
+  const h=+document.getElementById('sh-ceil').value||9;
+  walls.forEach(w=>w.h=h);
+  renderWalls();
+  saveState();
+}
+
+function renderWalls(){
+  const h=+document.getElementById('sh-ceil').value||9;
+  const c=document.getElementById('walls-list');
+  c.innerHTML=walls.map((w,i)=>`
+    <div class="wall-block">
+      <div class="wall-header">
+        <span class="wall-title">Wall ${i+1}</span>
+        <span class="wall-area">${Math.round((w.l||0)*h)} sq ft</span>
+        ${walls.length>1?`<button class="rmv" onclick="removeWall(${i})">×</button>`:'<span></span>'}
+      </div>
+      <div class="wall-inputs">
+        <div class="fgroup">
+          <label class="field-label">Length (ft)</label>
+          <input type="number" value="${w.l}" min="1" step="0.5" oninput="walls[${i}].l=+this.value;renderWalls();calcSheets()">
+        </div>
+        <div class="fgroup">
+          <label class="field-label">Height (ft)</label>
+          <input type="number" value="${h}" min="1" step="0.5" readonly style="background:var(--color-background-secondary);">
+        </div>
+        <div class="fgroup">
+          <label class="field-label">Area (sq ft)</label>
+          <input type="number" value="${Math.round((w.l||0)*h)}" readonly style="background:var(--color-background-secondary);">
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+function addWall(){
+  const h=+document.getElementById('sh-ceil').value||9;
+  walls.push({l:10,h});
+  renderWalls();
+  calcSheets();
+  saveState();
+}
+function removeWall(i){
+  walls.splice(i,1);
+  renderWalls();
+  calcSheets();
+  saveState();
+}
+
+function calcSheets(){
+  const h=+document.getElementById('sh-ceil').value||9;
+  const shSqFt=+document.getElementById('sh-size').value;
+  const doors=+document.getElementById('sh-doors').value||0;
+  const wins=+document.getElementById('sh-wins').value||0;
+  const gross=walls.reduce((s,w)=>s+(w.l||0)*h,0);
+  const deduct=doors*20+wins*15;
+  const net=Math.max(0,gross-deduct);
+  const withWaste=net*(1+wasteFactor);
+  const sheets=Math.ceil(withWaste/shSqFt);
+  document.getElementById('r-sheets').textContent=sheets||'—';
+  document.getElementById('r-sheets-sub').textContent=sheets?`${shSqFt} sq ft per sheet`:'';
+  document.getElementById('r-net').textContent=Math.round(net)||'—';
+  document.getElementById('r-gross').textContent=Math.round(gross)||'—';
+  document.getElementById('r-withwaste').textContent=Math.round(withWaste)||'—';
+  const wLabel=['5%','10%','15%','20%'][[0.05,0.10,0.15,0.20].indexOf(wasteFactor)];
+  if(gross>0){
+    document.getElementById('sh-tip').textContent=`${sheets} sheets covers ${Math.round(net)} sq ft net across ${walls.length} wall(s) — ${doors} door(s) and ${wins} window(s) deducted, with ${wLabel} waste added.`;
+  } else {
+    document.getElementById('sh-tip').textContent='Add your wall lengths above to see the sheet count.';
+  }
+  saveState();
+}
+
+function calcTape(){
+  const area=+document.getElementById('tp-area').value||0;
+  const corners=+document.getElementById('tp-corners').value||0;
+  const shSqFt=+document.getElementById('tp-sheet').value;
+  const h=+document.getElementById('sh-ceil').value||9;
+  const seamFt=Math.round(area/3.8);
+  const cornerFt=Math.round(corners*h);
+  const total=seamFt+cornerFt;
+  const rolls=Math.ceil(total/rollSize);
+  document.getElementById('r-rolls').textContent=rolls||'—';
+  document.getElementById('r-roll-sub').textContent=rolls?`${rollSize} ft rolls`:'';
+  document.getElementById('r-tapeft').textContent=total.toLocaleString()||'—';
+  document.getElementById('r-seamft').textContent=seamFt.toLocaleString();
+  document.getElementById('r-cornerft').textContent=cornerFt.toLocaleString();
+  const type=document.getElementById('tp-type').value;
+  const tips={paper:'Paper tape requires embedding in mud. Run it tight to the seam with no wrinkles — bubbles cause cracking.',mesh:'Mesh tape self-adheres and is faster to apply, but requires setting-type compound for strength.',flex:'Flexible corner tape works on both inside and outside corners — great for rounded transitions.'};
+  document.getElementById('tp-tip').textContent=tips[type];
+  saveState();
+}
+
+function calcBead(){
+  const corners=+document.getElementById('cb-corners').value||0;
+  const height=+document.getElementById('cb-height').value||9;
+  const arches=+document.getElementById('cb-arches').value||0;
+  const archH=+document.getElementById('cb-arch-h').value||7;
+  const stockLen=+document.getElementById('cb-stock').value;
+  const stdFt=Math.round(corners*height);
+  const archFt=Math.round(arches*archH*2);
+  const totalFt=stdFt+archFt;
+  const sections=Math.ceil(totalFt/stockLen);
+  document.getElementById('r-beadsections').textContent=sections||'—';
+  document.getElementById('r-bead-sub').textContent=sections?`${stockLen} ft sections`:'';
+  document.getElementById('r-beadft').textContent=totalFt||'—';
+  document.getElementById('r-stdft').textContent=stdFt;
+  document.getElementById('r-archft').textContent=archFt;
+  const type=document.getElementById('cb-type').value;
+  const tips={standard:'Standard metal bead is the most durable option. Fasten every 6–9" alternating sides.',bullnose:'Bullnose gives a rounded profile — popular in modern and contemporary builds.',vinyl:'Vinyl bead resists rust in wet areas. Use vinyl-specific compound for best adhesion.',flex:'Flexible bead bends to any radius. Score lightly before bending to prevent kinking.'};
+  document.getElementById('cb-tip').textContent=tips[type];
+  saveState();
+}
+
+function calcScrews(){
+  const sheets=+document.getElementById('sc-sheets').value||0;
+  const spacing=+document.getElementById('sc-spacing').value;
+  const app=document.getElementById('sc-app').value;
+  const shSqFt=+document.getElementById('sc-sheetsize').value;
+  const boxSize=+document.getElementById('sc-box').value;
+  const len=document.getElementById('sc-len').options[document.getElementById('sc-len').selectedIndex].value;
+  let perSheet;
+  if(shSqFt===32){
+    perSheet=spacing===16?(app==='ceiling'?36:28):(app==='ceiling'?26:20);
+  } else {
+    perSheet=spacing===16?(app==='ceiling'?52:40):(app==='ceiling'?38:30);
+  }
+  if(app==='both') perSheet=Math.round(perSheet*1.35);
+  const total=Math.ceil(sheets*perSheet*1.10);
+  const boxes=Math.ceil(total/boxSize);
+  document.getElementById('r-scboxes').textContent=boxes||'—';
+  document.getElementById('r-scbox-sub').textContent=boxes?`${boxSize.toLocaleString()} screws/box`:'';
+  document.getElementById('r-sctotal').textContent=total.toLocaleString()||'—';
+  document.getElementById('r-scper').textContent=perSheet;
+  document.getElementById('r-sclen').textContent=len;
+  const appLabel={wall:'walls (16" field spacing)',ceiling:'ceilings (12" field spacing)',both:'walls + ceiling'};
+  document.getElementById('sc-tip').textContent=`For ${appLabel[app]} at ${spacing}" OC with ${shSqFt===32?'4×8':'4×12'} sheets — ${perSheet} screws per sheet including edges. IRC code compliant. 10% overage already included.`;
+  saveState();
+}
+
+renderWalls();
+calcSheets();
+calcTape();
+calcBead();
+calcScrews();
+</script>
