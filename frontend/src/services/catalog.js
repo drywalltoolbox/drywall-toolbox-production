@@ -46,12 +46,8 @@ const CSV_FILENAME = 'product-wp-catalog-c7p3my05pn.csv';
 let _csvUrlPromise = null;
 
 async function getCsvUrl() {
-  // process.env.REACT_APP_WC_CSV_URL  — injected by DefinePlugin (CRA-style, primary)
-  // import.meta.env.VITE_WC_CSV_URL   — DefinePlugin shim (VITE-style, secondary)
-  const explicit =
-    process.env.REACT_APP_WC_CSV_URL ||
-    import.meta.env.VITE_WC_CSV_URL  ||
-    '';
+  // process.env.REACT_APP_WC_CSV_URL — injected by DefinePlugin at build time
+  const explicit = process.env.REACT_APP_WC_CSV_URL || '';
   if (explicit) return explicit;
 
   if (!_csvUrlPromise) {
@@ -136,9 +132,7 @@ function loadCatalog() {
     // When VITE_USE_LOCAL_CSV=true or REACT_APP_USE_LOCAL_CSV=true is set,
     // we prioritize the local CSV file. This is ONLY for local development
     // (npm run dev with .env.local) and never affects production builds.
-    const useLocal =
-      process.env.REACT_APP_USE_LOCAL_CSV === 'true' ||
-      import.meta.env.VITE_USE_LOCAL_CSV === 'true';
+    const useLocal = process.env.REACT_APP_USE_LOCAL_CSV === 'true';
     
     if (useLocal) {
       try {

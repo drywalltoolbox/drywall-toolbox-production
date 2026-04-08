@@ -955,7 +955,7 @@ aside input[type="range"],
        to nudge further in/out as needed. */
     .header-left,
     .header-right {
-        max-width: 280px;
+        max-width: 420px;
     }
     
     .header-center {

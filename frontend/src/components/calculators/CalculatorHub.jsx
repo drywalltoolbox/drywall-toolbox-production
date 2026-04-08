@@ -113,7 +113,6 @@ export default function CalculatorHub() {
   })
   const [showToast, setShowToast] = useState(false)
   const [toastMessage, setToastMessage] = useState('')
-  const [direction, setDirection] = useState(0)
   const [touchStart, setTouchStart] = useState(null)
   const [touchEnd, setTouchEnd] = useState(null)
 
@@ -153,12 +152,10 @@ export default function CalculatorHub() {
   }
 
   // Enhanced tab changing with direction tracking
-  const changeTab = (newTab, dir = 0) => {
+  const changeTab = (newTab) => {
     if (newTab === activeTab) return
-    setDirection(dir || (newTab > activeTab ? 1 : -1))
     setActiveTab(newTab)
   }
-
   // Update handlers for each calculator
   const handleSheetUpdate = useCallback((data) => {
     setSummaryData(prev => ({ ...prev, sheets: data }))
@@ -221,73 +218,77 @@ export default function CalculatorHub() {
       </AnimatePresence>
 
       {/* ── Page header + floating tab nav ── */}
-      <div className="w-full max-w-xl mx-auto px-4 pt-6 pb-3 sm:pt-8 sm:pb-4">
-        {/* Heading */}
-        <div className="mb-4">
-          <h1 className="text-2xl font-bold text-gray-900 tracking-tight">
-            Drywall Calculators
-          </h1>
-          <p className="text-sm text-gray-500 mt-1">
-            Estimate sheets, tape, corner bead, and screws — live, on any device.
-          </p>
-        </div>
+      <div className="w-full px-4 pt-6 pb-3 sm:pt-8 sm:pb-4">
+        <div className="mx-auto" style={{ maxWidth: 'clamp(320px, 100%, 1200px)' }}>
+          {/* Heading */}
+          <div className="mb-4">
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 tracking-tight">
+              Drywall Calculators
+            </h1>
+            <p className="text-sm text-gray-500 mt-1">
+              Estimate sheets, tape, corner bead, and screws — live, on any device.
+            </p>
+          </div>
 
-        {/* Floating pill tab nav */}
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-200 px-2 py-2">
-          <div
-            className="flex overflow-x-auto scrollbar-none gap-1"
-            style={{ WebkitOverflowScrolling: 'touch', scrollSnapType: 'x mandatory' }}
-          >
-            {TABS.map((tab, index) => {
-              const isActive = activeTab === index
-              return (
-                <Motion.button
-                  key={tab.id}
-                  onClick={() => changeTab(index, index > activeTab ? 1 : -1)}
-                  whileTap={{ scale: 0.94 }}
-                  style={{ scrollSnapAlign: 'start' }}
-                  className={`relative flex items-center px-3.5 py-1.5 rounded-xl text-sm font-medium whitespace-nowrap shrink-0 transition-all duration-200 ${
-                    isActive
-                      ? 'bg-primary-600 text-white shadow-sm'
-                      : 'text-gray-500 hover:text-gray-900 hover:bg-gray-100'
-                  }`}
-                >
-                  {tab.shortLabel}
-                </Motion.button>
-              )
-            })}
+          {/* Floating pill tab nav */}
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-200 px-2 py-2">
+            <div
+              className="flex overflow-x-auto scrollbar-none gap-1"
+              style={{ WebkitOverflowScrolling: 'touch', scrollSnapType: 'x mandatory' }}
+            >
+              {TABS.map((tab, index) => {
+                const isActive = activeTab === index
+                return (
+                  <Motion.button
+                    key={tab.id}
+                    onClick={() => changeTab(index, index > activeTab ? 1 : -1)}
+                    whileTap={{ scale: 0.94 }}
+                    style={{ scrollSnapAlign: 'start' }}
+                    className={`relative flex items-center px-3.5 py-1.5 rounded-xl text-sm font-medium whitespace-nowrap shrink-0 transition-all duration-200 ${
+                      isActive
+                        ? 'bg-primary-600 text-white shadow-sm'
+                        : 'text-gray-500 hover:text-gray-900 hover:bg-gray-100'
+                    }`}
+                  >
+                    {tab.shortLabel}
+                  </Motion.button>
+                )
+              })}
+            </div>
           </div>
         </div>
       </div>
 
       {/* ── Calculator panel ── */}
-      <div className="w-full max-w-xl mx-auto px-4 pb-8">
-        <div
-          onTouchStart={handleTouchStart}
-          onTouchMove={handleTouchMove}
-          onTouchEnd={handleTouchEnd}
-          className="relative"
-        >
-          <AnimatePresence mode="wait">
-            <Motion.div
-              key={activeTab}
-              variants={pageTransition}
-              initial="initial"
-              animate="animate"
-              exit="exit"
-              className="bg-white rounded-2xl shadow-sm border border-gray-200 p-5 sm:p-7 overflow-hidden"
-            >
-              {/* Active tab accent line */}
-              <div className={`h-px w-10 bg-linear-to-r ${currentTab.gradient} rounded-full mb-5`} />
+      <div className="w-full px-4 pb-8">
+        <div className="mx-auto" style={{ maxWidth: 'clamp(320px, 100%, 1200px)' }}>
+          <div
+            onTouchStart={handleTouchStart}
+            onTouchMove={handleTouchMove}
+            onTouchEnd={handleTouchEnd}
+            className="relative"
+          >
+            <AnimatePresence mode="wait">
+              <Motion.div
+                key={activeTab}
+                variants={pageTransition}
+                initial="initial"
+                animate="animate"
+                exit="exit"
+                className="bg-white rounded-2xl shadow-sm border border-gray-200 p-5 sm:p-7 overflow-hidden"
+              >
+                {/* Active tab accent line */}
+                <div className={`h-px w-10 bg-linear-to-r ${currentTab.gradient} rounded-full mb-5`} />
 
-              {activeTab === 0 && <SheetCalculator onUpdate={handleSheetUpdate} />}
-              {activeTab === 1 && <MudCalculator onUpdate={handleMudUpdate} sheetData={summaryData.sheets} />}
-              {activeTab === 2 && <TapeCalculator onUpdate={handleTapeUpdate} sheetData={summaryData.sheets} />}
-              {activeTab === 3 && <CornerBeadCalculator onUpdate={handleBeadUpdate} />}
-              {activeTab === 4 && <ScrewCalculator onUpdate={handleScrewUpdate} sheetData={summaryData.sheets} />}
-              {activeTab === 5 && <SummaryView data={summaryData} />}
-            </Motion.div>
-          </AnimatePresence>
+                {activeTab === 0 && <SheetCalculator onUpdate={handleSheetUpdate} />}
+                {activeTab === 1 && <MudCalculator onUpdate={handleMudUpdate} sheetData={summaryData.sheets} />}
+                {activeTab === 2 && <TapeCalculator onUpdate={handleTapeUpdate} sheetData={summaryData.sheets} />}
+                {activeTab === 3 && <CornerBeadCalculator onUpdate={handleBeadUpdate} />}
+                {activeTab === 4 && <ScrewCalculator onUpdate={handleScrewUpdate} sheetData={summaryData.sheets} />}
+                {activeTab === 5 && <SummaryView data={summaryData} />}
+              </Motion.div>
+            </AnimatePresence>
+          </div>
         </div>
       </div>
     </div>

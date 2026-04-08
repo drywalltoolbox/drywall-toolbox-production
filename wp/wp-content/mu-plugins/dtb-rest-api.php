@@ -672,36 +672,53 @@ function dtb_route_config(): WP_REST_Response {
 function dtb_route_catalog(): WP_REST_Response {
 	$config = dtb_get_config();
 	return rest_ensure_response( [
-		'csv_url'  => rest_url( 'dtb/v1/products-csv' ),
-		'filename' => $config['csv_filename'],
+		'csv_url'       => rest_url( 'dtb/v1/products-csv' ),
+		'filename'      => $config['csv_filename'],
+		'filenames'     => $config['csv_filenames'],
 	] );
 }
 
-/** GET /dtb/v1/products-csv — stream the catalog CSV through PHP */
+/**
+ * GET /dtb/v1/products-csv
+ *
+ * Streams one or more WooCommerce product CSVs to the browser as a single
+ * merged CSV.  When multiple files are configured the header row is taken
+ * from the first file only; subsequent files have their header rows stripped
+ * so the browser receives a single well-formed CSV document.
+ */
 function dtb_route_products_csv(): void {
 	$config      = dtb_get_config();
 	$upload_dir  = wp_upload_dir();
 	$uploads_dir = trailingslashit( $upload_dir['basedir'] );
-	$file_path   = $uploads_dir . 'wc-imports/' . $config['csv_filename'];
+	$filenames   = $config['csv_filenames'];
 
-	$real_path    = realpath( $file_path );
-	$real_uploads = realpath( $uploads_dir );
+	// Validate every file before we start streaming so we never send a partial response.
+	$file_paths = [];
+	foreach ( $filenames as $filename ) {
+		$file_path = $uploads_dir . 'wc-imports/' . $filename;
+		$real_path    = realpath( $file_path );
+		$real_uploads = realpath( $uploads_dir );
 
-	if (
-		false === $real_path ||
-		false === $real_uploads ||
-		0 !== strpos( $real_path, trailingslashit( $real_uploads ) ) ||
-		! file_exists( $real_path )
-	) {
-		wp_send_json_error( dtb_error_envelope( 'csv_not_found', 'Product CSV file not found on server.', 404 ), 404 );
+		if (
+			false === $real_path ||
+			false === $real_uploads ||
+			0 !== strpos( $real_path, trailingslashit( $real_uploads ) ) ||
+			! file_exists( $real_path )
+		) {
+			wp_send_json_error( dtb_error_envelope( 'csv_not_found', 'Product CSV file not found: ' . $filename, 404 ), 404 );
+		}
+		$file_paths[] = $real_path;
 	}
 
 	$raw_origin = isset( $_SERVER['HTTP_ORIGIN'] )
 		? (string) wp_unslash( $_SERVER['HTTP_ORIGIN'] ) // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 		: '';
 
+	// Use the first filename for the Content-Disposition header.
+	$display_name = count( $filenames ) === 1 ? $filenames[0] : 'wp-catalog-merged.csv';
+
 	header( 'Content-Type: text/csv; charset=UTF-8' );
-	header( 'Content-Disposition: inline; filename="' . $config['csv_filename'] . '"' );
+	header( 'Content-Disposition: inline; filename="' . $display_name . '"' );
 	header( 'Cache-Control: public, max-age=3600' );
 
 	if ( $raw_origin && in_array( rtrim( $raw_origin, '/' ), dtb_allowed_origins(), true ) ) {
@@ -709,12 +726,30 @@ function dtb_route_products_csv(): void {
 		header( 'Vary: Origin' );
 	}
 
-	// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_readfile
-	readfile( $real_path );
+	$first = true;
+	foreach ( $file_paths as $path ) {
+		$handle = fopen( $path, 'rb' ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fopen
+		if ( false === $handle ) {
+			continue;
+		}
+		if ( $first ) {
+			// Output the first file in full (header row included).
+			// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fpassthru
+			fpassthru( $handle );
+			$first = false;
+		} else {
+			// Skip the header row of subsequent files so the merged CSV
+			// has exactly one header row at the top.
+			fgets( $handle ); // discard header line
+			// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fpassthru
+			fpassthru( $handle );
+		}
+		fclose( $handle ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fclose
+	}
 	exit;
 }
 
-/** POST /dtb/v1/import-catalog — trigger WC CSV import */
+/** POST /dtb/v1/import-catalog — trigger WC CSV import for all configured files */
 function dtb_route_import_catalog( WP_REST_Request $request ) {
 	$config   = dtb_get_config();
 	$provided = (string) ( $request->get_param( 'secret' ) ?? '' );
@@ -724,25 +759,54 @@ function dtb_route_import_catalog( WP_REST_Request $request ) {
 		return new WP_Error( 'forbidden', 'Invalid or missing import secret.', [ 'status' => 403 ] );
 	}
 
-	$upload_dir = wp_upload_dir();
-	$file_path  = trailingslashit( $upload_dir['basedir'] ) . 'wc-imports/' . $config['csv_filename'];
+	$upload_dir  = wp_upload_dir();
+	$uploads_dir = trailingslashit( $upload_dir['basedir'] );
+	$filenames   = $config['csv_filenames'];
 
-	if ( ! file_exists( $file_path ) ) {
-		return new WP_Error( 'csv_not_found', 'Product CSV not found. Ensure the deploy step has uploaded it to wc-imports/.', [ 'status' => 404 ] );
+	// Validate all files exist before scheduling anything.
+	$file_paths = [];
+	foreach ( $filenames as $filename ) {
+		$file_path = $uploads_dir . 'wc-imports/' . $filename;
+		if ( ! file_exists( $file_path ) ) {
+			return new WP_Error(
+				'csv_not_found',
+				'Product CSV not found: ' . $filename . '. Ensure the deploy step has uploaded it to wc-imports/.',
+				[ 'status' => 404 ]
+			);
+		}
+		$file_paths[] = $file_path;
 	}
 
+	// Use Action Scheduler when available — schedule one job per file.
 	if ( function_exists( 'as_unschedule_all_actions' ) && function_exists( 'as_schedule_single_action' ) ) {
 		as_unschedule_all_actions( 'dtb_run_catalog_import', [], 'dtb-catalog-sync' );
-		$action_id = as_schedule_single_action( time(), 'dtb_run_catalog_import', [ $file_path ], 'dtb-catalog-sync' );
+		$action_ids = [];
+		foreach ( $file_paths as $file_path ) {
+			$action_ids[] = as_schedule_single_action( time(), 'dtb_run_catalog_import', [ $file_path ], 'dtb-catalog-sync' );
+		}
 		return rest_ensure_response( [
-			'status'    => 'scheduled',
-			'action_id' => $action_id,
-			'file'      => basename( $file_path ),
-			'message'   => 'WooCommerce product import scheduled as background job.',
+			'status'     => 'scheduled',
+			'action_ids' => $action_ids,
+			'files'      => array_map( 'basename', $file_paths ),
+			'message'    => count( $file_paths ) . ' WooCommerce product import(s) scheduled as background jobs.',
 		] );
 	}
 
-	return dtb_run_catalog_import_sync( $file_path );
+	// No Action Scheduler — run synchronously, accumulate results.
+	$all_results = [];
+	foreach ( $file_paths as $file_path ) {
+		$result = dtb_run_catalog_import_sync( $file_path );
+		if ( is_wp_error( $result ) ) {
+			return $result;
+		}
+		$all_results[] = $result->get_data();
+	}
+
+	return rest_ensure_response( [
+		'status'  => 'completed',
+		'results' => $all_results,
+		'message' => count( $all_results ) . ' catalog file(s) imported.',
+	] );
 }
 
 /** POST /dtb/v1/create-app-password */

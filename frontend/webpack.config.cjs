@@ -233,7 +233,11 @@ module.exports = (envFlags, argv) => {
           test: /\.(png|jpe?g|gif|ico|webp)$/i,
           type: 'asset',
           parser: { dataUrlCondition: { maxSize: 4 * 1024 } },
-          generator: { filename: 'assets/images/[name].[hash:8][ext]' },
+          generator: { 
+            filename: 'assets/images/[name].[hash:8][ext]',
+            // Don't inline large images; always reference them as separate files
+          },
+          // NOTE: Schematic PNGs (4+ MiB) should be CDN-served, not bundled
         },
         {
           test: /\.svg$/i,
@@ -278,9 +282,17 @@ module.exports = (envFlags, argv) => {
             globOptions: {
               dot: true,
               ignore: [
+                // HTML handled by HtmlWebpackPlugin
                 '**/index.html',
+                // CSV data files — served via API, not bundled
+                '**/*.csv',
+                '**/*.bak',
                 '**/products_catalog.csv',
                 '**/products_catalog_*.csv',
+                // Dev/build scripts — never ship to dist
+                '**/scripts/**',
+                // Scraped product data — source files only, not for dist
+                '**/scraped_results/**',
               ],
             },
           },
@@ -304,6 +316,7 @@ module.exports = (envFlags, argv) => {
       minimize: !isDev,
       minimizer: [
         new TerserPlugin({
+          parallel: true,
           terserOptions: {
             compress: {
               drop_console: true,
@@ -319,21 +332,24 @@ module.exports = (envFlags, argv) => {
 
       splitChunks: {
         chunks: 'all',
-        maxInitialRequests: 25,
-        maxAsyncRequests:   30,
+        maxInitialRequests: 4,
+        maxAsyncRequests:   5,
         minSize: 20_000,
+        minRemainingSize: 0,
         cacheGroups: {
           reactVendor: {
             test:     /[\\/]node_modules[\\/](react|react-dom|react-router(-dom)?)[\\/]/,
             name:     'vendor-react',
-            chunks:   'all',
-            priority: 30,
+            chunks:   'initial',
+            priority: 40,
+            reuseExistingChunk: true,
           },
           vendor: {
             test:     /[\\/]node_modules[\\/]/,
             name:     'vendor',
-            chunks:   'all',
+            chunks:   'initial',
             priority: 20,
+            reuseExistingChunk: true,
           },
           common: {
             name:               'common',
@@ -387,8 +403,11 @@ module.exports = (envFlags, argv) => {
 
     performance: {
       hints:             isDev ? false : 'warning',
-      maxEntrypointSize: 500_000,
-      maxAssetSize:      1_000_000,
+      maxEntrypointSize: 600_000,
+      maxAssetSize:      512_000,
+      // Only warn on JS and CSS — images/fonts/media are expected to be large
+      assetFilter: (assetFilename) =>
+        /\.(js|css)$/.test(assetFilename) && !assetFilename.endsWith('.map'),
     },
 
     stats: isDev ? 'errors-warnings' : {

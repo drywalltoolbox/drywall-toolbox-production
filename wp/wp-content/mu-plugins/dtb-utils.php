@@ -49,7 +49,8 @@ function dtb_is_rest_api_request(): bool {
  *   webhook_secret    HMAC secret for webhook validation        (WC_WEBHOOK_SECRET)
  *   import_secret     CI/CD catalog-import auth token          (DTB_IMPORT_SECRET)
  *   jwt_secret        JWT signing secret                        (DRYWALL_JWT_SECRET)
- *   csv_filename      Product CSV filename                      (DTB_WC_CSV_FILENAME)
+ *   csv_filename      Product CSV filename (single, legacy)         (DTB_WC_CSV_FILENAME)
+ *   csv_filenames     Product CSV filenames (array, preferred)       (DTB_WC_CSV_FILENAMES)
  *   webhook_delivery  Webhook delivery URL                      (DTB_WEBHOOK_DELIVERY_URL)
  *
  * @return array<string,string>
@@ -57,6 +58,24 @@ function dtb_is_rest_api_request(): bool {
 function dtb_get_config(): array {
 	if ( isset( $GLOBALS['_dtb_config_cache'] ) ) {
 		return $GLOBALS['_dtb_config_cache'];
+	}
+
+	// ── Resolve CSV filenames ────────────────────────────────────────────────
+	// Priority:
+	//   1. DTB_WC_CSV_FILENAMES  — JSON array of filenames (preferred for multi-file catalogs)
+	//                               e.g. '["product-wc-tapetech-abc.csv","product-wc-columbia-xyz.csv"]'
+	//   2. DTB_WC_CSV_FILENAME   — legacy single-filename string (still supported)
+	//   3. Hard-coded fallback   — the original single filename.
+	$csv_filenames = [];
+	if ( defined( 'DTB_WC_CSV_FILENAMES' ) ) {
+		$decoded = json_decode( DTB_WC_CSV_FILENAMES, true );
+		if ( is_array( $decoded ) && count( $decoded ) > 0 ) {
+			$csv_filenames = array_values( array_filter( array_map( 'sanitize_file_name', $decoded ) ) );
+		}
+	}
+	if ( empty( $csv_filenames ) ) {
+		$single = defined( 'DTB_WC_CSV_FILENAME' ) ? DTB_WC_CSV_FILENAME : 'product-wp-catalog-c7p3my05pn.csv';
+		$csv_filenames = [ sanitize_file_name( $single ) ];
 	}
 
 	$GLOBALS['_dtb_config_cache'] = [
@@ -67,7 +86,10 @@ function dtb_get_config(): array {
 		'webhook_secret'   => defined( 'WC_WEBHOOK_SECRET' )        ? WC_WEBHOOK_SECRET        : '',
 		'import_secret'    => defined( 'DTB_IMPORT_SECRET' )        ? DTB_IMPORT_SECRET        : '',
 		'jwt_secret'       => defined( 'DRYWALL_JWT_SECRET' )       ? DRYWALL_JWT_SECRET       : '',
-		'csv_filename'     => defined( 'DTB_WC_CSV_FILENAME' )      ? DTB_WC_CSV_FILENAME      : 'product-wp-catalog-c7p3my05pn.csv',
+		// Legacy single-filename key — first entry in the array for backward compat.
+		'csv_filename'     => $csv_filenames[0],
+		// Full ordered list — used by the multi-file import and products-csv merge.
+		'csv_filenames'    => $csv_filenames,
 		'webhook_delivery' => defined( 'DTB_WEBHOOK_DELIVERY_URL' ) ? DTB_WEBHOOK_DELIVERY_URL : 'https://drywalltoolbox.com/wp-json/drywall/v1/webhooks/products',
 	];
 

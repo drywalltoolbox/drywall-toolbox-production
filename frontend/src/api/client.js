@@ -24,22 +24,28 @@ import { getToken, clearToken } from '../auth/tokenStore.js';
 export const API_BASE_URL =
   ( process.env.REACT_APP_API_BASE_URL || '' ).replace( /\/+$/, '' );
 
-const WP_API_BASE =
-  import.meta.env.VITE_WP_API_BASE ||
-  ( typeof window !== 'undefined' ? `${ window.location.origin }/wp-json/` : '' );
+// WordPress REST API root — e.g. https://drywalltoolbox.com/wp/wp-json
+// Built from REACT_APP_WP_BASE_URL (e.g. https://drywalltoolbox.com/wp).
+// Falls back to origin/wp-json when the variable is not set (local dev without .env).
+const _wpBase = ( process.env.REACT_APP_WP_BASE_URL || '' ).replace( /\/+$/, '' );
+const WP_API_BASE = _wpBase
+  ? ( _wpBase.endsWith( '/wp-json' ) ? _wpBase : `${ _wpBase }/wp-json` )
+  : ( typeof window !== 'undefined' ? `${ window.location.origin }/wp-json` : '' );
 
+// WooCommerce REST API v3 base — e.g. https://drywalltoolbox.com/wp/wp-json/wc/v3
+// Built from REACT_APP_WC_BASE_URL; falls back to origin/wp-json/wc/v3.
 const WC_API_BASE =
-  import.meta.env.VITE_WC_API_BASE ||
+  process.env.REACT_APP_WC_BASE_URL ||
   ( typeof window !== 'undefined' ? `${ window.location.origin }/wp-json/wc/v3` : '' );
 
-let WC_AUTH_USER = import.meta.env.VITE_WC_AUTH_USER || '';
-let WC_AUTH_PASS = import.meta.env.VITE_WC_AUTH_PASS || '';
+let WC_AUTH_USER = process.env.REACT_APP_WC_AUTH_USER || '';
+let WC_AUTH_PASS = process.env.REACT_APP_WC_AUTH_PASS || '';
 
 // ─── Runtime credential bootstrap (backward compat) ──────────────────────────
 
 let _credentialsReady = ( WC_AUTH_USER && WC_AUTH_PASS )
   ? Promise.resolve()
-  : fetch( `${ WP_API_BASE.replace( /\/?$/, '/' ) }dtb/v1/config` )
+  : fetch( `${ WP_API_BASE.replace( /\/+$/, '' ) }/dtb/v1/config` )
       .then( ( r ) => r.json() )
       .then( ( data ) => {
         if ( data && data.wc_auth_user && data.wc_auth_pass ) {
@@ -136,7 +142,7 @@ export async function apiClient( endpoint, options = {} ) {
   let response;
   try {
     response = await fetch( url, { ...options, method, headers, credentials: 'include' } );
-  } catch ( networkError ) {
+  } catch {
     throw { code: 'network_error', message: 'Network request failed.', status: 0 };
   }
 

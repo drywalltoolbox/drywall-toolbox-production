@@ -54,8 +54,8 @@ function getAuthHeader() {
   if (live) return { Authorization: live };
 
   // Second choice: build-time env vars (works when dotenv is properly wired)
-  const user = process.env.REACT_APP_WC_AUTH_USER || import.meta.env.VITE_WC_AUTH_USER || '';
-  const pass = process.env.REACT_APP_WC_AUTH_PASS || import.meta.env.VITE_WC_AUTH_PASS || '';
+  const user = process.env.REACT_APP_WC_AUTH_USER || '';
+  const pass = process.env.REACT_APP_WC_AUTH_PASS || '';
   if (user && pass) return { Authorization: 'Basic ' + btoa(`${user}:${pass}`) };
 
   // No credentials available — request will 401 and catalog.js will fall back to CSV

@@ -3,9 +3,11 @@ import { Link } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import Reviews from './Reviews';
+import TechnicalSpecifications from './TechnicalSpecifications';
 import { useCart } from '../context/CartContext';
 import { Heart, Plus, Minus, X, ShoppingCart } from 'lucide-react';
 import ProductImageGallery from './ProductImageGallery';
+import { getProductSpecifications } from '../utils/productSpecifications';
 import columbiaLogo from '/brands/Columbia/columbia_taping_tools_logo.svg';
 import tapeTechLogo from '/brands/TapeTech/tapetech_logo.svg';
 import surproLogo from '/brands/SurPro/surpro_logo.svg';
@@ -246,6 +248,9 @@ export default function ProductDetail({ product, onAddToCart, onClose }) {
                   ) : (
                     <p className="text-gray-500">No description available.</p>
                   )}
+
+                  {/* Technical Specifications Table */}
+                  <TechnicalSpecifications specs={getProductSpecifications(product)} />
 
                   {/* Replacement Parts Section */}
                   {partsUrl && (

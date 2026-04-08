@@ -1774,7 +1774,7 @@ export default function Parts() {
             price: parseFloat(wcProduct.price) || 0,
             part_number: wcProduct.sku || part.sku,
             sku: wcProduct.sku || part.sku,
-            image: wcProduct.images?.[0]?.src || '/no-image-placeholder.webp',
+            image: wcProduct.images?.[0] || '/no-image-placeholder.webp',
             permalink: wcProduct.permalink || '',
             _wcProduct: wcProduct,
           }
@@ -2577,10 +2577,10 @@ export default function Parts() {
                   >
                     {/* Desktop inline modal (hidden on mobile via CSS) */}
                     <div className="part-modal" onClick={(e) => e.stopPropagation()}>
-                    {activeHotspot === hotspotKey && hotspotProduct?.images?.[0]?.src && (
+                    {activeHotspot === hotspotKey && hotspotProduct?.images?.[0] && (
                       <img
-                        src={hotspotProduct.images[0].src}
-                        alt={hotspotProduct.images[0].alt || part.name}
+                        src={hotspotProduct.images[0]}
+                        alt={part.name}
                         className="hotspot-modal-image"
                       />
                     )}
@@ -2701,10 +2701,10 @@ export default function Parts() {
                   left: `${modalPosition.left}px`,
                 }}
               >
-                {hotspotProduct?.images?.[0]?.src && (
+                {hotspotProduct?.images?.[0] && (
                   <img
-                    src={hotspotProduct.images[0].src}
-                    alt={hotspotProduct.images[0].alt || activeHotspotPart.name}
+                    src={hotspotProduct.images[0]}
+                    alt={activeHotspotPart.name}
                     className="hotspot-modal-image"
                   />
                 )}

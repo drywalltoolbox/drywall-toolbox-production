@@ -9,6 +9,7 @@
  */
 
 import { apiClient, wcClient } from './client.js';
+import { normalizeProduct } from '../services/api.js';
 
 // ─── drywall/v1 proxy helpers ─────────────────────────────────────────────────
 
@@ -147,7 +148,11 @@ export async function getProductBySku( sku ) {
   try {
     const result = await fetchProducts( { sku, per_page: 1 } );
     const products = Array.isArray( result ) ? result : result?.products ?? [];
-    return products.length > 0 ? products[ 0 ] : null;
+    if ( products.length === 0 ) return null;
+    // Normalize the raw WC/proxy response to the internal product shape so
+    // callers (e.g. the schematic hotspot modal) can reliably access
+    // .stock_status, .images, .price, .name, .sku, etc.
+    return normalizeProduct( products[ 0 ] );
   } catch {
     return null;
   }

@@ -108,7 +108,7 @@ export default function TapeCalculator({ onUpdate, sheetData }) {
         <h3 className="text-[11px] font-semibold text-gray-400 uppercase tracking-widest mb-3">
           Wall &amp; Ceiling Area
         </h3>
-        <div className="grid grid-cols-2 gap-2 sm:gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
           <div>
             <label htmlFor="tp-area" className="block text-xs font-medium text-gray-600 mb-1.5">
               Total drywall area (sq ft)
@@ -150,7 +150,7 @@ export default function TapeCalculator({ onUpdate, sheetData }) {
       </div>
 
       {/* ── Section 2: Height + Sheet size + Tape type ───────── */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-3">
         <div>
           <label htmlFor="tp-ceil" className="block text-xs font-medium text-gray-600 mb-1.5">
             Ceiling height (ft)
@@ -226,7 +226,7 @@ export default function TapeCalculator({ onUpdate, sheetData }) {
       {/* ── Results ───────────────────────────────────────────── */}
       <div className="border-t border-gray-200 pt-6">
         <div
-          className="grid grid-cols-2 gap-2 sm:gap-3 mb-4"
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-3 mb-4"
           aria-live="polite"
           aria-label="Tape calculator results"
         >

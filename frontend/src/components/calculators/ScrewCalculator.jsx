@@ -138,7 +138,7 @@ export default function ScrewCalculator({ onUpdate, sheetData }) {
         <h3 className="text-[11px] font-semibold text-gray-400 uppercase tracking-widest mb-3">
           Job Details
         </h3>
-        <div className="grid grid-cols-2 gap-2 sm:gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
           <div>
             <label className="block text-xs font-medium text-gray-600 mb-1.5">
               Sheets to hang
@@ -174,7 +174,7 @@ export default function ScrewCalculator({ onUpdate, sheetData }) {
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-2 sm:gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
         <div>
           <label className="block text-xs font-medium text-gray-600 mb-1.5">
             Application
@@ -200,7 +200,7 @@ export default function ScrewCalculator({ onUpdate, sheetData }) {
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-2 sm:gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
         <div>
           <label className="block text-xs font-medium text-gray-600 mb-1.5">
             Screw length
@@ -225,7 +225,7 @@ export default function ScrewCalculator({ onUpdate, sheetData }) {
 
       <div className="border-t border-gray-200 pt-6">
         <div
-          className="grid grid-cols-2 gap-2 sm:gap-3 mb-4"
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-3 mb-4"
           aria-live="polite"
           aria-label="Screw calculator results"
         >

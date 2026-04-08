@@ -79,7 +79,7 @@ export default function CornerBeadCalculator({ onUpdate }) {
         <h3 className="text-[11px] font-semibold text-gray-400 uppercase tracking-widest mb-3">
           Outside Corners
         </h3>
-        <div className="grid grid-cols-2 gap-2 sm:gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
           <div>
             <label htmlFor="cb-corners" className="block text-xs font-medium text-gray-600 mb-1.5">
               Straight outside corners
@@ -113,7 +113,7 @@ export default function CornerBeadCalculator({ onUpdate }) {
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-2 sm:gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
         <div>
           <label htmlFor="cb-arches" className="block text-xs font-medium text-gray-600 mb-1.5">
             Curved / arch corners
@@ -150,7 +150,7 @@ export default function CornerBeadCalculator({ onUpdate }) {
         <h3 className="text-[11px] font-semibold text-gray-400 uppercase tracking-widest mb-3">
           Bead Type &amp; Stock Length
         </h3>
-        <div className="grid grid-cols-2 gap-2 sm:gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
           <div>
             <label htmlFor="cb-type" className="block text-xs font-medium text-gray-600 mb-1.5">
               Corner bead type
@@ -178,7 +178,7 @@ export default function CornerBeadCalculator({ onUpdate }) {
 
       <div className="border-t border-gray-200 pt-6">
         <div
-          className="grid grid-cols-2 gap-2 sm:gap-3 mb-4"
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-3 mb-4"
           aria-live="polite"
           aria-label="Corner bead calculator results"
         >
