@@ -449,8 +449,9 @@ function dtb_veeqo_route_inventory( WP_REST_Request $request ): WP_REST_Response
  * Receives Veeqo order-status webhook events and propagates them to
  * the matching WooCommerce order.
  *
- * Veeqo signs webhook requests with an HMAC-SHA256 of the raw body using
- * DTB_VEEQO_WEBHOOK_SECRET. Signature is passed in the X-Veeqo-Signature header.
+ * Veeqo signs webhook requests with an HMAC-SHA256 of the raw body keyed with
+ * DTB_VEEQO_WEBHOOK_SECRET and delivers the signature as a lowercase hex digest
+ * in the X-Veeqo-Signature header (no base64 encoding, no binary prefix).
  *
  * Supported Veeqo status → WC status mappings:
  *   awaiting_fulfillment → processing
@@ -477,7 +478,7 @@ function dtb_veeqo_route_webhook_order( WP_REST_Request $request ): WP_REST_Resp
 			);
 		}
 
-		$expected = base64_encode( hash_hmac( 'sha256', $raw_body, $secret, true ) ); // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_encode
+		$expected = hash_hmac( 'sha256', $raw_body, $secret ); // hex digest — matches Veeqo's X-Veeqo-Signature format
 		if ( ! hash_equals( $expected, $sig ) ) {
 			dtb_veeqo_log( 'warn', 'webhook_bad_signature', 'Veeqo webhook HMAC mismatch.' );
 			return new WP_REST_Response(
@@ -655,10 +656,17 @@ function dtb_veeqo_sync_order_status( int $order_id, string $old_status, string 
 	}
 
 	// Map WC status to Veeqo status.
+	// 'completed' maps to 'shipped' ONLY when a tracking number is present on
+	// the order.  If WC marks the order complete without a tracking number
+	// (e.g. a manual admin click), push 'awaiting_fulfillment' instead so
+	// Veeqo can still perform fulfillment and generate a shipment record.
+	$tracking_number = trim( (string) $order->get_meta( '_tracking_number' ) );
+	$completed_veeqo = ( '' !== $tracking_number ) ? 'shipped' : 'awaiting_fulfillment';
+
 	$wc_to_veeqo = [
 		'processing' => 'awaiting_fulfillment',
 		'on-hold'    => 'awaiting_fulfillment',
-		'completed'  => 'shipped',
+		'completed'  => $completed_veeqo,
 		'cancelled'  => 'cancelled',
 		'refunded'   => 'refunded',
 	];
@@ -666,6 +674,15 @@ function dtb_veeqo_sync_order_status( int $order_id, string $old_status, string 
 	$veeqo_status = $wc_to_veeqo[ $new_status ] ?? null;
 	if ( null === $veeqo_status ) {
 		return;
+	}
+
+	// Log a debug notice when WC "completed" is mapped to awaiting_fulfillment
+	// due to missing tracking — makes it easy to spot in the Veeqo log.
+	if ( 'completed' === $new_status && 'awaiting_fulfillment' === $veeqo_status ) {
+		dtb_veeqo_log( 'debug', 'completed_no_tracking', 'WC order completed without tracking number; Veeqo status set to awaiting_fulfillment.', [
+			'wc_order_id'    => $order_id,
+			'veeqo_order_id' => $veeqo_order_id,
+		] );
 	}
 
 	$result = dtb_veeqo_request( 'PUT', '/orders/' . $veeqo_order_id, [], [ 'status' => $veeqo_status ] );
