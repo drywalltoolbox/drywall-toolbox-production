@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import SEOHead from '../components/SEOHead';
 import { SCHEMATIC_DEFINITIONS } from '../data/schematicMappings';
@@ -7,7 +7,7 @@ import { SCHEMATIC_DEFINITIONS } from '../data/schematicMappings';
    Brands & tools sourced from schematicMappings — the single source of truth
    for every tool we carry schematics / repair support for.
    ───────────────────────────────────────────────────────────────────────── */
-const SUPPORTED_BRANDS = Object.keys(SCHEMATIC_DEFINITIONS); // e.g. Columbia, TapeTech, Asgard, Level5, Platinum
+const SUPPORTED_BRANDS = Object.keys(SCHEMATIC_DEFINITIONS).sort((a, b) => a.localeCompare(b)); // alphabetical
 
 /**
  * Returns the sorted list of unique categories for a given brand.
@@ -192,11 +192,277 @@ function ReviewRow({ label, value }) {
 }
 
 /* ─────────────────────────────────────────────────────────────────────────────
+   Photo uploader — mobile-first, supports camera capture + file picker
+   ───────────────────────────────────────────────────────────────────────── */
+const MAX_PHOTOS = 6;
+const MAX_FILE_MB = 10;
+
+function PhotoUploader({ photos, onChange }) {
+  const fileInputRef = useRef(null);
+  const cameraInputRef = useRef(null);
+  const [dragging, setDragging] = useState(false);
+
+  const addFiles = useCallback((files) => {
+    const MAX_BYTES = MAX_FILE_MB * 1024 * 1024;
+    const incoming = Array.from(files).filter((f) => {
+      if (!f.type.startsWith('image/')) return false;
+      if (f.size > MAX_BYTES) {
+        alert(`"${f.name}" exceeds the ${MAX_FILE_MB} MB limit and was not added.`);
+        return false;
+      }
+      return true;
+    });
+    const remaining = MAX_PHOTOS - photos.length;
+    if (remaining <= 0) return;
+    const toAdd = incoming.slice(0, remaining).map((file) => ({
+      id: crypto.randomUUID(),
+      file,
+      preview: URL.createObjectURL(file),
+      name: file.name,
+      size: file.size,
+    }));
+    onChange([...photos, ...toAdd]);
+  }, [photos, onChange]);
+
+  const remove = useCallback((id) => {
+    const next = photos.filter((p) => p.id !== id);
+    const removed = photos.find((p) => p.id === id);
+    if (removed) URL.revokeObjectURL(removed.preview);
+    onChange(next);
+  }, [photos, onChange]);
+
+  const handleDrop = useCallback((e) => {
+    e.preventDefault();
+    setDragging(false);
+    addFiles(e.dataTransfer.files);
+  }, [addFiles]);
+
+  const handleDragOver = (e) => { e.preventDefault(); setDragging(true); };
+  const handleDragLeave = () => setDragging(false);
+
+  const full = photos.length >= MAX_PHOTOS;
+
+  return (
+    <div>
+      {/* Drop / tap zone */}
+      {!full && (
+        <div
+          onClick={() => fileInputRef.current?.click()}
+          onDrop={handleDrop}
+          onDragOver={handleDragOver}
+          onDragLeave={handleDragLeave}
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => e.key === 'Enter' && fileInputRef.current?.click()}
+          aria-label="Upload photos"
+          style={{
+            border: `2px dashed ${dragging ? 'var(--primary-600)' : 'rgba(15,23,42,0.18)'}`,
+            borderRadius: '8px',
+            background: dragging ? 'rgba(59,130,246,0.05)' : 'rgba(15,23,42,0.02)',
+            padding: 'clamp(18px,4vw,28px) 16px',
+            textAlign: 'center',
+            cursor: 'pointer',
+            transition: 'border-color 0.2s, background 0.2s',
+            outline: 'none',
+            userSelect: 'none',
+          }}
+        >
+          {/* Camera icon */}
+          <div style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            width: '48px',
+            height: '48px',
+            borderRadius: '50%',
+            background: 'var(--primary-600)',
+            marginBottom: '12px',
+          }}>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+              <circle cx="12" cy="13" r="4"/>
+            </svg>
+          </div>
+          <p style={{ margin: '0 0 4px 0', fontWeight: 700, fontSize: '0.875rem', color: 'black' }}>
+            Tap to take or upload a photo
+          </p>
+          <p style={{ margin: 0, fontSize: '0.75rem', color: 'rgba(15,23,42,0.45)' }}>
+            JPG, PNG, HEIC, WebP · up to {MAX_FILE_MB} MB each · max {MAX_PHOTOS} photos
+          </p>
+          {/* Action row — two buttons: Camera (mobile) + Browse */}
+          <div style={{ display: 'flex', justifyContent: 'center', gap: '10px', marginTop: '14px', flexWrap: 'wrap' }}>
+            <button
+              type="button"
+              onClick={(e) => { e.stopPropagation(); cameraInputRef.current?.click(); }}
+              style={{
+                display: 'inline-flex', alignItems: 'center', gap: '6px',
+                padding: '9px 16px',
+                borderRadius: '4px',
+                border: '1.5px solid var(--primary-600)',
+                background: 'var(--primary-600)',
+                color: 'white',
+                fontSize: '0.8rem', fontWeight: 700,
+                cursor: 'pointer',
+                letterSpacing: '0.03em',
+              }}
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+                <circle cx="12" cy="13" r="4"/>
+              </svg>
+              Take Photo
+            </button>
+            <button
+              type="button"
+              onClick={(e) => { e.stopPropagation(); fileInputRef.current?.click(); }}
+              style={{
+                display: 'inline-flex', alignItems: 'center', gap: '6px',
+                padding: '9px 16px',
+                borderRadius: '4px',
+                border: '1.5px solid rgba(15,23,42,0.2)',
+                background: 'white',
+                color: 'rgba(15,23,42,0.7)',
+                fontSize: '0.8rem', fontWeight: 700,
+                cursor: 'pointer',
+                letterSpacing: '0.03em',
+              }}
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                <polyline points="17 8 12 3 7 8"/>
+                <line x1="12" y1="3" x2="12" y2="15"/>
+              </svg>
+              Browse Files
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Hidden inputs */}
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/*"
+        multiple
+        style={{ display: 'none' }}
+        onChange={(e) => { addFiles(e.target.files); e.target.value = ''; }}
+      />
+      {/* Camera-capture input (mobile opens rear camera directly) */}
+      <input
+        ref={cameraInputRef}
+        type="file"
+        accept="image/*"
+        capture="environment"
+        style={{ display: 'none' }}
+        onChange={(e) => { addFiles(e.target.files); e.target.value = ''; }}
+      />
+
+      {/* Thumbnail grid */}
+      {photos.length > 0 && (
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fill, minmax(90px, 1fr))',
+          gap: '10px',
+          marginTop: '14px',
+        }}>
+          {photos.map((p) => (
+            <div key={p.id} style={{ position: 'relative', borderRadius: '6px', overflow: 'hidden' }}>
+              <img
+                src={p.preview}
+                alt={p.name}
+                style={{
+                  width: '100%',
+                  aspectRatio: '1 / 1',
+                  objectFit: 'cover',
+                  display: 'block',
+                  background: 'rgba(15,23,42,0.06)',
+                }}
+              />
+              {/* Remove button */}
+              <button
+                type="button"
+                onClick={() => remove(p.id)}
+                aria-label={`Remove ${p.name}`}
+                style={{
+                  position: 'absolute',
+                  top: '4px', right: '4px',
+                  width: '22px', height: '22px',
+                  borderRadius: '50%',
+                  border: 'none',
+                  background: 'rgba(0,0,0,0.6)',
+                  color: 'white',
+                  cursor: 'pointer',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  padding: 0,
+                  lineHeight: 1,
+                }}
+              >
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+                </svg>
+              </button>
+              {/* File size label */}
+              <div style={{
+                position: 'absolute', bottom: 0, left: 0, right: 0,
+                background: 'rgba(0,0,0,0.45)',
+                fontSize: '0.6rem', color: 'white',
+                padding: '2px 4px',
+                textAlign: 'center',
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+              }}>
+                {p.size >= 1024 * 1024
+                  ? `${(p.size / 1024 / 1024).toFixed(1)} MB`
+                  : `${Math.round(p.size / 1024)} KB`}
+              </div>
+            </div>
+          ))}
+          {/* Add more tile — shown when <MAX_PHOTOS */}
+          {photos.length < MAX_PHOTOS && (
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              aria-label="Add more photos"
+              style={{
+                aspectRatio: '1 / 1',
+                borderRadius: '6px',
+                border: '2px dashed rgba(15,23,42,0.18)',
+                background: 'rgba(15,23,42,0.02)',
+                cursor: 'pointer',
+                display: 'flex', flexDirection: 'column',
+                alignItems: 'center', justifyContent: 'center',
+                gap: '4px',
+                color: 'rgba(15,23,42,0.4)',
+                fontSize: '0.65rem', fontWeight: 600,
+              }}
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+              </svg>
+              Add
+            </button>
+          )}
+        </div>
+      )}
+
+      {photos.length > 0 && (
+        <p style={{ fontSize: '0.72rem', color: 'rgba(15,23,42,0.4)', marginTop: '8px', margin: '8px 0 0 0' }}>
+          {photos.length} of {MAX_PHOTOS} photo{photos.length !== 1 ? 's' : ''} attached
+          {full && ' — maximum reached'}
+        </p>
+      )}
+    </div>
+  );
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
    Main Repairs page
    ───────────────────────────────────────────────────────────────────────── */
 export default function Repairs() {
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState(BLANK_FORM);
+  const [photos, setPhotos] = useState([]);
   const [errors, setErrors] = useState({});
   const [submitted, setSubmitted] = useState(false);
   const formRef = useRef(null);
@@ -255,7 +521,9 @@ export default function Repairs() {
   }
 
   function resetForm() {
+    photos.forEach((p) => URL.revokeObjectURL(p.preview));
     setFormData(BLANK_FORM);
+    setPhotos([]);
     setStep(1);
     setErrors({});
     setSubmitted(false);
@@ -775,36 +1043,99 @@ export default function Repairs() {
                       {errors.issueDescription && <p style={errStyle}>{errors.issueDescription}</p>}
                     </Field>
 
-                    <Field label="Preferred Contact Method">
-                      <div style={{ display: 'flex', gap: '24px', flexWrap: 'wrap', paddingTop: '4px' }}>
-                        {[{ val: 'email', label: 'Email' }, { val: 'phone', label: 'Phone Call' }, { val: 'either', label: 'Either' }].map((opt) => (
-                          <label key={opt.val} style={{
-                            display: 'flex', alignItems: 'center', gap: '8px',
-                            cursor: 'pointer', fontSize: '0.875rem', color: 'black',
-                          }}>
-                            <input
-                              type="radio"
-                              name="contactPreference"
-                              value={opt.val}
-                              checked={formData.contactPreference === opt.val}
-                              onChange={set('contactPreference')}
-                              style={{ accentColor: 'var(--primary-600)', width: '16px', height: '16px' }}
-                            />
-                            {opt.label}
-                          </label>
-                        ))}
+                    <Field label="Preferred Contact Method" hint="How should we reach you when your repair is ready to discuss?">
+                      <div style={{
+                        display: 'grid',
+                        gridTemplateColumns: 'repeat(3, 1fr)',
+                        gap: '10px',
+                      }}>
+                        {[
+                          {
+                            val: 'email',
+                            label: 'Email',
+                            sub: 'Written updates',
+                            icon: (
+                              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                                <polyline points="22,6 12,13 2,6"/>
+                              </svg>
+                            ),
+                          },
+                          {
+                            val: 'phone',
+                            label: 'Phone',
+                            sub: 'Direct call',
+                            icon: (
+                              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                                <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.59 1.18h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L7.91 8.9a16 16 0 0 0 5.56 5.56l.92-.92a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 21 16.92z"/>
+                              </svg>
+                            ),
+                          },
+                          {
+                            val: 'either',
+                            label: 'Either',
+                            sub: 'Your choice',
+                            icon: (
+                              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                                <circle cx="12" cy="12" r="10"/>
+                                <polyline points="12 8 16 12 12 16"/>
+                                <line x1="8" y1="12" x2="16" y2="12"/>
+                              </svg>
+                            ),
+                          },
+                        ].map((opt) => {
+                          const active = formData.contactPreference === opt.val;
+                          return (
+                            <button
+                              key={opt.val}
+                              type="button"
+                              onClick={() => setFormData((prev) => ({ ...prev, contactPreference: opt.val }))}
+                              style={{
+                                display: 'flex',
+                                flexDirection: 'column',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                gap: '6px',
+                                padding: 'clamp(12px,3vw,16px) 8px',
+                                borderRadius: '8px',
+                                border: active
+                                  ? '2px solid var(--primary-600)'
+                                  : '2px solid rgba(15,23,42,0.12)',
+                                background: active ? '#eff6ff' : 'white',
+                                color: active ? 'var(--primary-600)' : 'rgba(15,23,42,0.55)',
+                                cursor: 'pointer',
+                                transition: 'border-color 0.18s, background 0.18s, color 0.18s',
+                                outline: 'none',
+                                WebkitTapHighlightColor: 'transparent',
+                              }}
+                              aria-pressed={active}
+                            >
+                              <span style={{ lineHeight: 1 }}>{opt.icon}</span>
+                              <span style={{ fontWeight: 700, fontSize: '0.8rem', letterSpacing: '0.02em' }}>
+                                {opt.label}
+                              </span>
+                              <span style={{ fontSize: '0.68rem', opacity: 0.7, letterSpacing: '0.01em' }}>
+                                {opt.sub}
+                              </span>
+                            </button>
+                          );
+                        })}
                       </div>
                     </Field>
 
-                    <Field label="Additional Notes" hint="Optional — anything else we should know">
+                    <Field label="Additional Notes" hint="Optional — any special instructions or previous repair history">
                       <textarea
                         rows="3"
                         className="machined-textarea text-black"
-                        placeholder="Any special instructions, previous repair history, or photos you'd like to reference…"
+                        placeholder="Any special instructions, previous repair history, or context about the issue…"
                         value={formData.additionalNotes}
                         onChange={set('additionalNotes')}
                         style={{ resize: 'vertical', minHeight: '80px' }}
                       />
+                    </Field>
+
+                    <Field label="Attach Photos" hint="Optional — photos help our technicians diagnose the issue faster">
+                      <PhotoUploader photos={photos} onChange={setPhotos} />
                     </Field>
                   </div>
                 )}
@@ -838,7 +1169,7 @@ export default function Repairs() {
                       <ReviewRow label="Email"       value={formData.email} />
                       <ReviewRow label="Phone"       value={formData.phone} />
                       <ReviewRow label="Company"     value={formData.company} />
-                      <ReviewRow label="Contact Via" value={formData.contactPreference === 'email' ? 'Email' : formData.contactPreference === 'phone' ? 'Phone Call' : 'Either'} />
+                      <ReviewRow label="Contact Via" value={formData.contactPreference === 'email' ? 'Email' : formData.contactPreference === 'phone' ? 'Phone' : 'Either'} />
                     </div>
 
                     {/* Tool section */}
@@ -883,6 +1214,45 @@ export default function Repairs() {
                       <ReviewRow label="Issue Start"    value={formData.issueStart} />
                       <ReviewRow label="Description"    value={formData.issueDescription} />
                       <ReviewRow label="Notes"          value={formData.additionalNotes} />
+                      {photos.length > 0 && (
+                        <div style={{
+                          display: 'flex',
+                          gap: '12px',
+                          alignItems: 'flex-start',
+                          padding: '10px 0',
+                          borderBottom: '1px solid rgba(15,23,42,0.06)',
+                        }}>
+                          <span style={{
+                            minWidth: '130px',
+                            fontSize: '0.72rem',
+                            fontWeight: 700,
+                            textTransform: 'uppercase',
+                            letterSpacing: '0.08em',
+                            color: 'rgba(15,23,42,0.45)',
+                            paddingTop: '2px',
+                          }}>
+                            Photos
+                          </span>
+                          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                            {photos.map((p) => (
+                              <img
+                                key={p.id}
+                                src={p.preview}
+                                alt={p.name}
+                                style={{
+                                  width: '60px', height: '60px',
+                                  objectFit: 'cover',
+                                  borderRadius: '4px',
+                                  border: '1px solid rgba(15,23,42,0.12)',
+                                }}
+                              />
+                            ))}
+                            <span style={{ fontSize: '0.78rem', color: 'rgba(15,23,42,0.5)', alignSelf: 'center' }}>
+                              {photos.length} photo{photos.length !== 1 ? 's' : ''} attached
+                            </span>
+                          </div>
+                        </div>
+                      )}
                     </div>
 
                     {/* Disclaimer */}
