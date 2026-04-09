@@ -247,7 +247,25 @@ export function htmlToMarkdown(html) {
   // A paragraph whose content looks like a pipe-table becomes a bare table
   // block (no surrounding blank-line paragraphs needed).
   md = md.replace(/<p[^>]*>([\s\S]*?)<\/p>/gi, (_, inner) => {
-    const text = inner.trim();
+    let text = inner.trim();
+
+    // WooCommerce CSV sometimes stores all table rows on a single line with
+    // consecutive pipes as the only row separator, e.g.:
+    //   | Specification | Detail | | :--- | :--- | | SKU | TACSET |
+    // Only apply when the content is a single line (no existing newlines) AND
+    // contains a GFM alignment cell (| :--- |), so we don't accidentally split
+    // multi-line tables or paragraphs that happen to contain pipe characters.
+    if (
+      text.startsWith('|') &&
+      text.endsWith('|') &&
+      !text.includes('\n') &&
+      /\|\s*:?-+:?\s*\|/.test(text)
+    ) {
+      // At a row boundary the last cell ends with `|` and the next row starts
+      // with `|`, giving `| |` (two pipes separated only by whitespace).
+      // Within a row, adjacent pipes always have cell content between them.
+      text = text.replace(/\|\s*\|/g, '|\n|');
+    }
 
     // Detect pipe-table: every non-empty line starts with |
     const lines = text.split('\n').map(l => l.trim()).filter(Boolean);
