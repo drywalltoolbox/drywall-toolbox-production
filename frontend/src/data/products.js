@@ -4,10 +4,10 @@
 export async function loadProducts() {
   try {
     // Get WooCommerce configuration from environment variables
-    const wcBaseUrl = process.env.REACT_APP_WC_BASE_URL || process.env.VITE_WC_BASE_URL || 
+    const wcBaseUrl = process.env.REACT_APP_WC_BASE_URL || process.env.REACT_APP_WC_API_BASE ||
                       `${window.location.origin}/wp-json/wc/v3`;
-    const authUser = process.env.REACT_APP_WC_AUTH_USER || process.env.VITE_WC_AUTH_USER || '';
-    const authPass = process.env.REACT_APP_WC_AUTH_PASS || process.env.VITE_WC_AUTH_PASS || '';
+    const authUser = process.env.REACT_APP_WC_AUTH_USER || '';
+    const authPass = process.env.REACT_APP_WC_AUTH_PASS || '';
     
     // Build Basic Auth header if credentials available
     const headers = {};

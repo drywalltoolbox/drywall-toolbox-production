@@ -32,7 +32,7 @@ const KNOWN_BRANDS = [
 
 // ─── Auth header (lazy, runtime-safe) ────────────────────────────────────────
 //
-// Build-time env vars (REACT_APP_WC_AUTH_USER / VITE_WC_AUTH_USER) are baked
+// Build-time env vars (REACT_APP_WC_AUTH_USER / REACT_APP_WC_AUTH_PASS) are baked
 // in by webpack DefinePlugin.  If the deploy predates dotenv being wired up,
 // they will be empty strings.
 //
@@ -45,8 +45,8 @@ const KNOWN_BRANDS = [
 //
 // Resolution order:
 //   1. wcClient.defaults.headers.common['Authorization']  (patched by bootstrap)
-//   2. build-time REACT_APP_WC_AUTH_USER / VITE_WC_AUTH_USER env vars
-//   3. build-time REACT_APP_WC_AUTH_PASS / VITE_WC_AUTH_PASS env vars
+//   2. build-time REACT_APP_WC_AUTH_USER env var
+//   3. build-time REACT_APP_WC_AUTH_PASS env var
 
 function getAuthHeader() {
   // First choice: whatever client.js has set (may be bootstrap-patched at runtime)

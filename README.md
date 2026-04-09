@@ -96,8 +96,8 @@ For WooCommerce API credentials, create `frontend/.env.local` (gitignored):
 
 ```
 # frontend/.env.local — never commit this file
-VITE_WC_AUTH_USER=your_wp_application_password_username
-VITE_WC_AUTH_PASS=your_wp_application_password
+REACT_APP_WC_AUTH_USER=your_wp_application_password_username
+REACT_APP_WC_AUTH_PASS=your_wp_application_password
 ```
 
 ### Commands
@@ -142,19 +142,19 @@ npm run lint
 
 ## API Architecture
 
-### Environment Variables (VITE_*)
+### Environment Variables (`REACT_APP_*`)
 
 | Variable | Description |
 |----------|-------------|
-| `VITE_WP_API_BASE` | WordPress REST API base (e.g. `https://drywalltoolbox.com/wp/wp-json/wp/v2`) |
-| `VITE_WC_API_BASE` | WooCommerce REST API base (e.g. `.../wp/wp-json/wc/v3`) |
-| `VITE_JWT_ENDPOINT` | JWT token endpoint |
-| `VITE_SITE_URL` | Site root URL |
-| `VITE_WC_AUTH_USER` | WooCommerce Application Password username (**secret**) |
-| `VITE_WC_AUTH_PASS` | WooCommerce Application Password (**secret**) |
+| `REACT_APP_WP_API_BASE` | WordPress REST API base (e.g. `https://drywalltoolbox.com/wp/wp-json/wp/v2`) |
+| `REACT_APP_WC_API_BASE` | WooCommerce REST API base (e.g. `.../wp/wp-json/wc/v3`) |
+| `REACT_APP_JWT_ENDPOINT` | JWT token endpoint |
+| `REACT_APP_SITE_URL` | Site root URL |
+| `REACT_APP_WC_AUTH_USER` | WooCommerce Application Password username (**secret**) |
+| `REACT_APP_WC_AUTH_PASS` | WooCommerce Application Password (**secret**) |
 
 Non-secret URL variables are in `frontend/.env.production` and `frontend/.env.development`.  
-Credentials (`VITE_WC_AUTH_USER`, `VITE_WC_AUTH_PASS`) live in GitHub Actions secrets only.
+Credentials (`REACT_APP_WC_AUTH_USER`, `REACT_APP_WC_AUTH_PASS`) live in GitHub Actions secrets only.
 
 ### API Clients (`frontend/src/api/`)
 
@@ -262,19 +262,20 @@ Trigger: push to `main` when `frontend/**` or `wp/**` changes.
 | `HOSTGATOR_FTP_USER` | HostGator cPanel FTP username |
 | `HOSTGATOR_FTP_PASS` | HostGator cPanel FTP password |
 | `HOSTGATOR_FTP_PORT` | FTP port (usually `21`) |
-| `VITE_WP_API_BASE` | WordPress REST API base URL |
-| `VITE_WC_API_BASE` | WooCommerce REST API base URL |
-| `VITE_JWT_ENDPOINT` | JWT token endpoint URL |
-| `VITE_SITE_URL` | Production site URL |
-| `VITE_WC_AUTH_USER` | WooCommerce Application Password username |
-| `VITE_WC_AUTH_PASS` | WooCommerce Application Password |
+| `REACT_APP_WP_API_BASE` | WordPress REST API base URL |
+| `REACT_APP_WC_API_BASE` | WooCommerce REST API base URL |
+| `REACT_APP_JWT_ENDPOINT` | JWT token endpoint URL |
+| `REACT_APP_SITE_URL` | Production site URL |
+| `REACT_APP_WC_AUTH_USER` | WooCommerce Application Password username |
+| `REACT_APP_WC_AUTH_PASS` | WooCommerce Application Password |
 | `REACT_APP_WP_BASE_URL` | WordPress root URL (legacy compat) |
 | `REACT_APP_WC_BASE_URL` | WooCommerce REST API base (legacy compat) |
-| `REACT_APP_WC_CONSUMER_KEY` | WooCommerce consumer key (legacy compat) |
-| `REACT_APP_WC_CONSUMER_SECRET` | WooCommerce consumer secret (legacy compat) |
-| `VITE_WOOCOMMERCE_STORE_URL` | WooCommerce store URL (legacy compat) |
-| `VITE_WOOCOMMERCE_CONSUMER_KEY` | WooCommerce consumer key (legacy compat) |
-| `VITE_WOOCOMMERCE_CONSUMER_SECRET` | WooCommerce consumer secret (legacy compat) |
+| `REACT_APP_WOOCOMMERCE_STORE_URL` | WooCommerce store URL (legacy compat) |
+| `REACT_APP_WOOCOMMERCE_CONSUMER_KEY` | WooCommerce consumer key (legacy compat) |
+| `REACT_APP_WOOCOMMERCE_CONSUMER_SECRET` | WooCommerce consumer secret (legacy compat) |
+| `REACT_APP_VEEQO_CLIENT_ID` | Veeqo OAuth client ID |
+| `REACT_APP_VEEQO_CLIENT_SECRET` | Veeqo OAuth client secret |
+| `REACT_APP_VEEQO_REDIRECT_URI` | Veeqo OAuth redirect URI |
 
 ---
 
@@ -291,7 +292,7 @@ After deploying to production, verify:
 - [ ] React Router client-side navigation works on all routes (no 404 on refresh)
 - [ ] CORS headers present on all `/wp/wp-json/` responses
 - [ ] OPTIONS preflight requests return 200 with correct headers
-- [ ] No `VITE_*` secrets exposed in compiled JS bundle (verify in browser DevTools)
+- [ ] No `REACT_APP_*` secrets exposed in compiled JS bundle (verify in browser DevTools)
 - [ ] Schematic diagrams on Parts page load WebP images from WP Media Library
 - [ ] GitHub Actions deploy runs on push to `main`, builds cleanly, deploys to `dist/`
 

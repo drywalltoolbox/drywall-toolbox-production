@@ -16,9 +16,9 @@ class WooCommerceService {
     try {
       const config = localStorage.getItem('woocommerce_config');
       return config ? JSON.parse(config) : {
-        storeUrl: import.meta.env.VITE_WOOCOMMERCE_STORE_URL || '',
-        consumerKey: import.meta.env.VITE_WOOCOMMERCE_CONSUMER_KEY || '',
-        consumerSecret: import.meta.env.VITE_WOOCOMMERCE_CONSUMER_SECRET || '',
+        storeUrl: process.env.REACT_APP_WOOCOMMERCE_STORE_URL || '',
+        consumerKey: process.env.REACT_APP_WOOCOMMERCE_CONSUMER_KEY || '',
+        consumerSecret: process.env.REACT_APP_WOOCOMMERCE_CONSUMER_SECRET || '',
         version: 'wc/v3',
         enabled: false
       };

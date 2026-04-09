@@ -40,7 +40,7 @@ const CSV_FILENAME = 'product-wp-catalog-c7p3my05pn.csv';
 /**
  * Resolve the CSV URL.
  * Priority:
- *   1. VITE_WC_CSV_URL build-time env var
+ *   1. REACT_APP_WC_CSV_URL build-time env var
  *   2. GET /wp-json/dtb/v1/catalog  (PHP endpoint returns the proxy URL)
  *   3. /wp-json/dtb/v1/products-csv  (hard fallback proxy — never a direct file path)
  */

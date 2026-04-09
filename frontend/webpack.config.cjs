@@ -88,42 +88,37 @@ module.exports = (envFlags, argv) => {
     'process.env.REACT_APP_WC_AUTH_USER':       JSON.stringify(env('REACT_APP_WC_AUTH_USER')),
     'process.env.REACT_APP_WC_AUTH_PASS':       JSON.stringify(env('REACT_APP_WC_AUTH_PASS')),
 
-    // Vite-compat shims — replaces import.meta.env.* at compile time
-    // NOTE: We're using Webpack (not Vite), but our source code uses import.meta.env.VITE_*
-    // naming conventions. DefinePlugin below handles these automatically at build time.
-    // No separate Vite config needed — this is standard Webpack practice for compatibility.
+    // import.meta.env shims — Webpack DefinePlugin replaces these at compile time.
+    // All variables follow the REACT_APP_* convention (process.env.REACT_APP_*).
     'import.meta.env.BASE_URL':                         JSON.stringify(publicPath),
     'import.meta.env.MODE':                             JSON.stringify(mode),
     'import.meta.env.DEV':                              JSON.stringify(isDev),
     'import.meta.env.PROD':                             JSON.stringify(!isDev),
 
-    // New VITE_* vars for headless WP + WooCommerce architecture
-    // (These are just naming conventions; DefinePlugin replaces them at build time)
-    'import.meta.env.VITE_WP_API_BASE':                 JSON.stringify(env('VITE_WP_API_BASE')),
-    'import.meta.env.VITE_WC_API_BASE':                 JSON.stringify(env('VITE_WC_API_BASE')),
-    'import.meta.env.VITE_JWT_ENDPOINT':                JSON.stringify(env('VITE_JWT_ENDPOINT')),
-    'import.meta.env.VITE_SITE_URL':                    JSON.stringify(env('VITE_SITE_URL')),
-    'import.meta.env.VITE_APP_ENV':                     JSON.stringify(env('VITE_APP_ENV')),
-    'import.meta.env.VITE_WC_AUTH_USER':                JSON.stringify(env('VITE_WC_AUTH_USER')),
-    'import.meta.env.VITE_WC_AUTH_PASS':                JSON.stringify(env('VITE_WC_AUTH_PASS')),
+    // Headless WP + WooCommerce architecture
+    'process.env.REACT_APP_WP_API_BASE':                JSON.stringify(env('REACT_APP_WP_API_BASE')),
+    'process.env.REACT_APP_WC_API_BASE':                JSON.stringify(env('REACT_APP_WC_API_BASE')),
+    'process.env.REACT_APP_JWT_ENDPOINT':               JSON.stringify(env('REACT_APP_JWT_ENDPOINT')),
+    'process.env.REACT_APP_SITE_URL':                   JSON.stringify(env('REACT_APP_SITE_URL')),
+    'process.env.REACT_APP_APP_ENV':                    JSON.stringify(env('REACT_APP_APP_ENV')),
 
-    // Legacy vars — kept for backward compat with existing source files
-    'import.meta.env.VITE_WOOCOMMERCE_STORE_URL':       JSON.stringify(env('VITE_WOOCOMMERCE_STORE_URL')),
-    'import.meta.env.VITE_WOOCOMMERCE_CONSUMER_KEY':    JSON.stringify(env('VITE_WOOCOMMERCE_CONSUMER_KEY')),
-    'import.meta.env.VITE_WOOCOMMERCE_CONSUMER_SECRET': JSON.stringify(env('VITE_WOOCOMMERCE_CONSUMER_SECRET')),
-    'import.meta.env.VITE_VEEQO_CLIENT_ID':             JSON.stringify(env('VITE_VEEQO_CLIENT_ID')),
-    'import.meta.env.VITE_VEEQO_CLIENT_SECRET':         JSON.stringify(env('VITE_VEEQO_CLIENT_SECRET')),
-    'import.meta.env.VITE_VEEQO_REDIRECT_URI':          JSON.stringify(env('VITE_VEEQO_REDIRECT_URI')),
+    // WooCommerce legacy compat (previously VITE_WOOCOMMERCE_*)
+    'process.env.REACT_APP_WOOCOMMERCE_STORE_URL':      JSON.stringify(env('REACT_APP_WOOCOMMERCE_STORE_URL')),
+    'process.env.REACT_APP_WOOCOMMERCE_CONSUMER_KEY':   JSON.stringify(env('REACT_APP_WOOCOMMERCE_CONSUMER_KEY')),
+    'process.env.REACT_APP_WOOCOMMERCE_CONSUMER_SECRET':JSON.stringify(env('REACT_APP_WOOCOMMERCE_CONSUMER_SECRET')),
+
+    // Veeqo OAuth (admin integration)
+    'process.env.REACT_APP_VEEQO_CLIENT_ID':            JSON.stringify(env('REACT_APP_VEEQO_CLIENT_ID')),
+    'process.env.REACT_APP_VEEQO_CLIENT_SECRET':        JSON.stringify(env('REACT_APP_VEEQO_CLIENT_SECRET')),
+    'process.env.REACT_APP_VEEQO_REDIRECT_URI':         JSON.stringify(env('REACT_APP_VEEQO_REDIRECT_URI')),
 
     // Product catalog CSV fallback URL
     'process.env.REACT_APP_WC_CSV_URL':                 JSON.stringify(env('REACT_APP_WC_CSV_URL')),
-    'import.meta.env.VITE_WC_CSV_URL':                  JSON.stringify(env('VITE_WC_CSV_URL')),
 
     // ─── Local Development Mode ───────────────────────────────────────────────
     // When set, frontend loads from /public/wp-catalog.csv instead of live API.
     // Only used in 'npm run dev' with .env.local; never affects production builds.
     'process.env.REACT_APP_USE_LOCAL_CSV':              JSON.stringify(env('REACT_APP_USE_LOCAL_CSV')),
-    'import.meta.env.VITE_USE_LOCAL_CSV':               JSON.stringify(env('VITE_USE_LOCAL_CSV')),
 
     // ─── Headless WooCommerce proxy (drywall/v1) ──────────────────────────────
     // Read from the environment-specific .env file loaded above.

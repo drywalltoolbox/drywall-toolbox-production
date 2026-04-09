@@ -59,25 +59,21 @@ jobs:
         env:
           NODE_ENV: production
           # Frontend build configuration
-          REACT_APP_WP_BASE_URL:            ${{ secrets.REACT_APP_WP_BASE_URL }}
-          REACT_APP_WC_BASE_URL:            ${{ secrets.REACT_APP_WC_BASE_URL }}
-          REACT_APP_WC_AUTH_USER:           ${{ secrets.REACT_APP_WC_AUTH_USER }}
-          REACT_APP_WC_AUTH_PASS:           ${{ secrets.REACT_APP_WC_AUTH_PASS }}
-          # Note: Webpack DefinePlugin automatically handles import.meta.env.* references
-          # No Vite config needed — these VITE_* names are just env var conventions
-          VITE_WP_API_BASE:                 ${{ secrets.VITE_WP_API_BASE || 'https://drywalltoolbox.com/wp-json' }}
-          VITE_WC_API_BASE:                 ${{ secrets.VITE_WC_API_BASE || 'https://drywalltoolbox.com/wp-json/wc/v3' }}
-          VITE_JWT_ENDPOINT:                ${{ secrets.VITE_JWT_ENDPOINT }}
-          VITE_SITE_URL:                    ${{ secrets.VITE_SITE_URL }}
-          VITE_APP_ENV:                     production
-          VITE_WC_AUTH_USER:                ${{ secrets.VITE_WC_AUTH_USER || secrets.REACT_APP_WC_AUTH_USER }}
-          VITE_WC_AUTH_PASS:                ${{ secrets.VITE_WC_AUTH_PASS || secrets.REACT_APP_WC_AUTH_PASS }}
-          VITE_WOOCOMMERCE_STORE_URL:       ${{ secrets.VITE_WOOCOMMERCE_STORE_URL }}
-          VITE_WOOCOMMERCE_CONSUMER_KEY:    ${{ secrets.VITE_WOOCOMMERCE_CONSUMER_KEY }}
-          VITE_WOOCOMMERCE_CONSUMER_SECRET: ${{ secrets.VITE_WOOCOMMERCE_CONSUMER_SECRET }}
-          VITE_VEEQO_CLIENT_ID:             ${{ secrets.VITE_VEEQO_CLIENT_ID }}
-          VITE_VEEQO_CLIENT_SECRET:         ${{ secrets.VITE_VEEQO_CLIENT_SECRET }}
-          VITE_VEEQO_REDIRECT_URI:          ${{ secrets.VITE_VEEQO_REDIRECT_URI }}
+          REACT_APP_WP_BASE_URL:                   ${{ secrets.REACT_APP_WP_BASE_URL }}
+          REACT_APP_WC_BASE_URL:                   ${{ secrets.REACT_APP_WC_BASE_URL }}
+          REACT_APP_WC_AUTH_USER:                  ${{ secrets.REACT_APP_WC_AUTH_USER }}
+          REACT_APP_WC_AUTH_PASS:                  ${{ secrets.REACT_APP_WC_AUTH_PASS }}
+          REACT_APP_WP_API_BASE:                   ${{ secrets.REACT_APP_WP_API_BASE || 'https://drywalltoolbox.com/wp-json' }}
+          REACT_APP_WC_API_BASE:                   ${{ secrets.REACT_APP_WC_API_BASE || 'https://drywalltoolbox.com/wp-json/wc/v3' }}
+          REACT_APP_JWT_ENDPOINT:                  ${{ secrets.REACT_APP_JWT_ENDPOINT }}
+          REACT_APP_SITE_URL:                      ${{ secrets.REACT_APP_SITE_URL }}
+          REACT_APP_APP_ENV:                       production
+          REACT_APP_WOOCOMMERCE_STORE_URL:         ${{ secrets.REACT_APP_WOOCOMMERCE_STORE_URL }}
+          REACT_APP_WOOCOMMERCE_CONSUMER_KEY:      ${{ secrets.REACT_APP_WOOCOMMERCE_CONSUMER_KEY }}
+          REACT_APP_WOOCOMMERCE_CONSUMER_SECRET:   ${{ secrets.REACT_APP_WOOCOMMERCE_CONSUMER_SECRET }}
+          REACT_APP_VEEQO_CLIENT_ID:               ${{ secrets.REACT_APP_VEEQO_CLIENT_ID }}
+          REACT_APP_VEEQO_CLIENT_SECRET:           ${{ secrets.REACT_APP_VEEQO_CLIENT_SECRET }}
+          REACT_APP_VEEQO_REDIRECT_URI:            ${{ secrets.REACT_APP_VEEQO_REDIRECT_URI }}
 
       - name: Validate build output
         run: |

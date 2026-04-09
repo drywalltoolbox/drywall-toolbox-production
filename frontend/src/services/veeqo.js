@@ -56,9 +56,9 @@ class VeeqoService {
     try {
       const config = localStorage.getItem('veeqo_config');
       return config ? JSON.parse(config) : {
-        clientId: import.meta.env.VITE_VEEQO_CLIENT_ID || '',
-        clientSecret: import.meta.env.VITE_VEEQO_CLIENT_SECRET || '',
-        redirectUri: import.meta.env.VITE_VEEQO_REDIRECT_URI || `${window.location.origin}/veeqo/callback`,
+        clientId: process.env.REACT_APP_VEEQO_CLIENT_ID || '',
+        clientSecret: process.env.REACT_APP_VEEQO_CLIENT_SECRET || '',
+        redirectUri: process.env.REACT_APP_VEEQO_REDIRECT_URI || `${window.location.origin}/veeqo/callback`,
         enabled: false
       };
     } catch (error) {
