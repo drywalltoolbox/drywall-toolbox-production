@@ -1877,7 +1877,7 @@ export default function Parts() {
     if (!container || !hotspotRect) return;
 
     const containerRect = container.getBoundingClientRect();
-    const MODAL_ESTIMATED_HEIGHT = 260; // conservative fallback before first render (includes product image)
+    const MODAL_ESTIMATED_HEIGHT = 320; // generous fallback before first render (img + padding + buttons)
     // Derive dimensions from the rendered modal element when available so the
     // calculation stays in sync with any future CSS width/height changes.
     const MODAL_WIDTH  = detachedModalRef.current ? detachedModalRef.current.offsetWidth  : 280;
@@ -2487,7 +2487,12 @@ export default function Parts() {
               ref={schematicContainerRef}
               onMouseDown={handleMouseDown}
               style={{
-                overflow: 'hidden',
+                // On desktop keep overflow visible so the detached modal (position:absolute
+                // inside this container) is never clipped by the boundary.
+                // The .schematic-image-wrapper already carries overflow:hidden in CSS
+                // on desktop, which clips the pan-transformed image instead.
+                // On mobile we keep overflow:hidden to prevent pan bleed-through.
+                overflow: isMobile ? 'hidden' : 'visible',
                 touchAction: scale > 1 ? 'none' : 'auto',
                 cursor: scale > 1 ? (isPanning || isDragging ? 'grabbing' : 'grab') : 'default',
                 WebkitUserSelect: 'none',
@@ -2548,12 +2553,30 @@ export default function Parts() {
                   willChange: scale > 1 || gestureActiveRef.current ? 'transform' : 'auto',
                 }}
               >
+                {/* Bounds layer — on desktop this div is sized to exactly match the
+                    rendered image (height:100% + aspect-ratio) so that every hotspot's
+                    percentage-based top/left is computed against the image dimensions
+                    rather than the full-width wrapper div.  On mobile the aspect-ratio
+                    is already applied to the wrapper itself so we leave this as a
+                    transparent pass-through (position:relative, width:100%). */}
+                <div
+                  className="schematic-image-bounds"
+                  style={!isMobile && currentPageAspectRatio ? {
+                    position: 'relative',
+                    height: '100%',
+                    aspectRatio: currentPageAspectRatio,
+                    flexShrink: 0,
+                  } : {
+                    position: 'relative',
+                    width: '100%',
+                  }}
+                >
                 {schematicImageSrc ? (
                   <img 
                     src={schematicImageSrc} 
                     alt={currentSchematic.title}
                     style={{ 
-                      width: isMobile ? '100%' : 'auto',
+                      width: isMobile ? '100%' : '100%',
                       height: isMobile ? 'auto' : '100%',
                       maxWidth: '100%',
                       maxHeight: '100%',
@@ -2746,6 +2769,7 @@ export default function Parts() {
                     </div>
                   ))
                 }
+                </div>{/* end .schematic-image-bounds */}
             </div>
             {/* Desktop detached modal — lives inside schematic-container but OUTSIDE
                 the transform wrapper so it is never scaled or clipped by the viewer.
