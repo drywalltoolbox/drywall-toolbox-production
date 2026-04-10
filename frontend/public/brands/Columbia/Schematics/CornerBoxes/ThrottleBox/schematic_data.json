@@ -8,33 +8,33 @@
   "parts": [
     {
       "id": "CFB5B",
-      "name": "CFB5B",
+      "name": "Columbia Cone Ball End (Small - Fits Angle Heads)",
       "quantity": 1,
-      "sku": ""
+      "sku": "CFB5B"
     },
     {
       "id": "CFB5A",
-      "name": "CFB5A",
+      "name": "Columbia Corner Box Cone Ball End (Large)",
       "quantity": 1,
-      "sku": ""
+      "sku": "CFB5A"
     },
     {
       "id": "CFB5C",
-      "name": "CFB5C",
+      "name": "Columbia Corner Box Cone Ball End (Standard)",
       "quantity": 1,
-      "sku": ""
+      "sku": "CFB5C"
     },
     {
       "id": "FA219",
       "name": "Columbia 4-40 x ½ Fillister Slot (FA219)",
       "quantity": 1,
-      "sku": ""
+      "sku": "FA219"
     },
     {
       "id": "CFB1 8\"",
-      "name": "CFB1 8\"",
+      "name": "Columbia Rear Plate 8 in",
       "quantity": 1,
-      "sku": ""
+      "sku": "CFB1-8"
     },
     {
       "id": "FA247",
@@ -58,19 +58,19 @@
       "id": "FA228",
       "name": "Columbia #6 Flat Washer (FA228)",
       "quantity": 1,
-      "sku": ""
+      "sku": "FA228"
     },
     {
       "id": "FFB32",
-      "name": "FFB32",
+      "name": "Columbia Thumb Release Clip",
       "quantity": 1,
-      "sku": ""
+      "sku": "FFB32"
     },
     {
       "id": "FA280",
-      "name": "FA280",
+      "name": "Columbia #10 Belleville Washer",
       "quantity": 1,
-      "sku": ""
+      "sku": "FA280"
     },
     {
       "id": "FFB32A",
@@ -86,27 +86,27 @@
     },
     {
       "id": "CFB3 8\"",
-      "name": "CFB3 8\"",
+      "name": "Columbia Side Plate 8 in",
       "quantity": 1,
-      "sku": ""
+      "sku": "CFB3-8"
     },
     {
       "id": "FA241",
       "name": "Columbia 6-32 x 3/8 Binder Slot (FA241)",
       "quantity": 1,
-      "sku": ""
+      "sku": "FA241"
     },
     {
       "id": "AB45",
-      "name": "AB45",
+      "name": "Columbia Automatic Box Throttle Set Screw",
       "quantity": 1,
-      "sku": ""
+      "sku": "AB45"
     },
     {
       "id": "AB49",
-      "name": "AB49",
+      "name": "Columbia Automatic Box Handle Mount",
       "quantity": 1,
-      "sku": ""
+      "sku": "AB49"
     },
     {
       "id": "CFB7 8\"",
@@ -158,9 +158,9 @@
     },
     {
       "id": "FA242",
-      "name": "FA242",
+      "name": "Columbia 6-32 x 3/8 Pan Head Screw",
       "quantity": 1,
-      "sku": ""
+      "sku": "FA242"
     },
     {
       "id": "FA253",
@@ -184,7 +184,7 @@
       "id": "FA258",
       "name": "Columbia 8-32 x ¼ Half Dog Set (FA258)",
       "quantity": 1,
-      "sku": ""
+      "sku": "FA258"
     },
     {
       "id": "CT98",
@@ -200,9 +200,9 @@
     },
     {
       "id": "CFB6",
-      "name": "CFB6",
+      "name": "Columbia Mud Supply Valve Unit",
       "quantity": 1,
-      "sku": ""
+      "sku": "CFB6"
     },
     {
       "id": "FA234",
@@ -226,31 +226,31 @@
       "id": "FA238",
       "name": "Columbia 6-32 x 3/16 Fillister Slot (FA238)",
       "quantity": 1,
-      "sku": ""
+      "sku": "FA238"
     },
     {
       "id": "AB44",
-      "name": "AB44",
+      "name": "Columbia Automatic Box Clutch Spring",
       "quantity": 1,
-      "sku": ""
+      "sku": "AB44"
     },
     {
       "id": "AB44A",
-      "name": "AB44A",
+      "name": "Columbia Automatic Box Clutch Spring Short",
       "quantity": 1,
-      "sku": ""
+      "sku": "AB44A"
     },
     {
       "id": "AB44B",
-      "name": "AB44B",
+      "name": "Columbia Automatic Box Clutch Spring Long",
       "quantity": 1,
-      "sku": ""
+      "sku": "AB44B"
     },
     {
       "id": "FA263",
-      "name": "FA263",
+      "name": "Columbia 8-32 x 5/8 Flat Head Screw",
       "quantity": 1,
-      "sku": ""
+      "sku": "FA263"
     },
     {
       "id": "CT39",
@@ -260,9 +260,9 @@
     },
     {
       "id": "FA309",
-      "name": "FA309",
+      "name": "Columbia 5/16-18 x 1/2 Socket Head Screw",
       "quantity": 1,
-      "sku": ""
+      "sku": "FA309"
     }
   ],
   "coordinates": {
