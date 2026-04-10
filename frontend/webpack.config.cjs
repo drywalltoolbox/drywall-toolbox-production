@@ -107,11 +107,6 @@ module.exports = (envFlags, argv) => {
     'process.env.REACT_APP_WOOCOMMERCE_CONSUMER_KEY':   JSON.stringify(env('REACT_APP_WOOCOMMERCE_CONSUMER_KEY')),
     'process.env.REACT_APP_WOOCOMMERCE_CONSUMER_SECRET':JSON.stringify(env('REACT_APP_WOOCOMMERCE_CONSUMER_SECRET')),
 
-    // Veeqo OAuth (admin integration)
-    'process.env.REACT_APP_VEEQO_CLIENT_ID':            JSON.stringify(env('REACT_APP_VEEQO_CLIENT_ID')),
-    'process.env.REACT_APP_VEEQO_CLIENT_SECRET':        JSON.stringify(env('REACT_APP_VEEQO_CLIENT_SECRET')),
-    'process.env.REACT_APP_VEEQO_REDIRECT_URI':         JSON.stringify(env('REACT_APP_VEEQO_REDIRECT_URI')),
-
     // Product catalog CSV fallback URL
     'process.env.REACT_APP_WC_CSV_URL':                 JSON.stringify(env('REACT_APP_WC_CSV_URL')),
 

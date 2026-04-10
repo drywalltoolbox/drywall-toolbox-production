@@ -165,7 +165,7 @@
  *   What it does : The Veeqo channel ID (= Store ID) that corresponds to this
  *                  WooCommerce store.  Used when creating orders so Veeqo can
  *                  attribute sales to the correct sales channel.
- *   Where to get : Auto-discovered automatically from GET /stores when you
+ *   Where to get : Auto-discovered automatically from GET /channels when you
  *                  save the API key under WooCommerce → Settings →
  *                  Integrations → Drywall Toolbox Veeqo.  Alternatively,
  *                  you can find the ID in Veeqo → Settings → Channels →

@@ -131,6 +131,15 @@ import platinumFlatBoxData            from '/brands/Platinum/Schematics/FlatBox/
 import platinumOutsideCornerRollerData from '/brands/Platinum/Schematics/OutsideCornerRoller/schematic_data.json';
 
 // ---------------------------------------------------------------------------
+// Dura-Stilts schematic JSON data imports
+// schematic_data2.json → Model IV 18″–30″ range (with hotspots)
+// schematic_data3.json → Model IV 24″–40″ range (with hotspots)
+// The 14″–22″ range has no hotspot data file; only the diagram image is shown.
+// ---------------------------------------------------------------------------
+import duraStiltsModelIV1830Data from '/brands/Dura-Stilts/Schematics/Model-IV/schematic_data2.json';
+import duraStiltsModelIV2440Data from '/brands/Dura-Stilts/Schematics/Model-IV/schematic_data3.json';
+
+// ---------------------------------------------------------------------------
 // Schematic image paths — static fallbacks served from public/brands/…
 // Primary source: WordPress Media Library WebP images (via useSchematicMedia).
 // Fallback: original PNG/JPG files from public/brands/ (used before WP upload).
@@ -487,6 +496,18 @@ const _fallbacks = {
     pages:   { 1: `${_BASE}brands/Platinum/Schematics/OutsideCornerRoller/platinum_outside_cornerroller-page-001.webp` },
     preview: `${_BASE}brands/Platinum/Schematics/OutsideCornerRoller/platinum_outside_cornerroller_preview.webp`,
   },
+
+  // ── Dura-Stilts ──────────────────────────────────────────────────────────
+  // Three height-range pages for the Model IV stilt.
+  // Pages 1 (14-22) is diagram-only; pages 2 (18-30) and 3 (24-40) have hotspots.
+  'dura-stilts-model-iv': {
+    pages: {
+      1: `${_BASE}brands/Dura-Stilts/Schematics/Model-IV/model-4-14-22.webp`,
+      2: `${_BASE}brands/Dura-Stilts/Schematics/Model-IV/model-4-18-30.webp`,
+      3: `${_BASE}brands/Dura-Stilts/Schematics/Model-IV/model-4-24-40.webp`,
+    },
+    preview: `${_BASE}brands/Dura-Stilts/Schematics/Model-IV/model_iv.webp`,
+  },
 };
 
 // Brand name ↔ URL slug maps so navigation produces readable URLs like
@@ -794,6 +815,13 @@ export default function Parts() {
   const platinumCompoundPumpParts       = buildPartsFromData(platinumCompoundPumpData);
   const platinumFlatBoxParts            = buildPartsFromData(platinumFlatBoxData);
   const platinumOutsideCornerRollerParts = buildPartsFromData(platinumOutsideCornerRollerData);
+
+  // Dura-Stilts parts arrays
+  // Page 1 (14″–22″) has no hotspot JSON — parts array is empty.
+  // Page 2 (18″–30″) → schematic_data2.json
+  // Page 3 (24″–40″) → schematic_data3.json
+  const duraStiltsModelIV1830Parts = buildPartsFromData(duraStiltsModelIV1830Data);
+  const duraStiltsModelIV2440Parts = buildPartsFromData(duraStiltsModelIV2440Data);
 
   const schematics = [
     {
@@ -1712,6 +1740,37 @@ export default function Parts() {
       imagePages: { 1: schImg('platinum-outside-corner-roller', 1) },
       previewImage: schPrev('platinum-outside-corner-roller'),
       parts: platinumOutsideCornerRollerParts,
+    },
+
+    // ── Dura-Stilts ──────────────────────────────────────────────────────────
+    // Model IV stilt schematic — three height-range pages in a single viewer.
+    //   Page 1: 14″–22″  (diagram image only, no hotspot data)
+    //   Page 2: 18″–30″  (hotspots from schematic_data2.json, pageNumber remapped to 2)
+    //   Page 3: 24″–40″  (hotspots from schematic_data3.json, pageNumber remapped to 3)
+    {
+      id: 'dura-stilts-model-iv',
+      title: 'Model IV Drywall Stilts',
+      description: 'Dura-Stilts Model IV drywall stilt schematic diagrams with parts hotspots',
+      brand: 'Dura-Stilts',
+      category: 'Stilts',
+      diagramPages: [1, 2, 3],
+      pageLabels: {
+        1: '14″–22″',
+        2: '18″–30″',
+        3: '24″–40″',
+      },
+      imagePages: {
+        1: schImg('dura-stilts-model-iv', 1),
+        2: schImg('dura-stilts-model-iv', 2),
+        3: schImg('dura-stilts-model-iv', 3),
+      },
+      previewImage: schPrev('dura-stilts-model-iv'),
+      // Remap pageNumber from the raw JSON (always 1) to the correct viewer page
+      // so hotspots render against the right schematic image.
+      parts: [
+        ...duraStiltsModelIV1830Parts.map(p => ({ ...p, pageNumber: 2 })),
+        ...duraStiltsModelIV2440Parts.map(p => ({ ...p, pageNumber: 3 })),
+      ],
     },
   ];
 

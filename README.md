@@ -273,9 +273,6 @@ Trigger: push to `main` when `frontend/**` or `wp/**` changes.
 | `REACT_APP_WOOCOMMERCE_STORE_URL` | WooCommerce store URL (legacy compat) |
 | `REACT_APP_WOOCOMMERCE_CONSUMER_KEY` | WooCommerce consumer key (legacy compat) |
 | `REACT_APP_WOOCOMMERCE_CONSUMER_SECRET` | WooCommerce consumer secret (legacy compat) |
-| `REACT_APP_VEEQO_CLIENT_ID` | Veeqo OAuth client ID |
-| `REACT_APP_VEEQO_CLIENT_SECRET` | Veeqo OAuth client secret |
-| `REACT_APP_VEEQO_REDIRECT_URI` | Veeqo OAuth redirect URI |
 
 ---
 

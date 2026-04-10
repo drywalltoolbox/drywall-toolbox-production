@@ -89,7 +89,10 @@ export const SCHEMATIC_DEFINITIONS = {
     { id: 'platinum-compound-pump',          title: 'Compound Pump',         mpn: 'PDT-CP',  category: 'Pumps'             },
     { id: 'platinum-flat-box',               title: 'Flat Box',              mpn: 'PDT-FB',  category: 'Finishing Boxes'   },
     { id: 'platinum-outside-corner-roller',  title: 'Outside Corner Roller', mpn: 'PDT-OCR', category: 'Corner Rollers'    },
-  ]
+  ],
+  'Dura-Stilts': [
+    { id: 'dura-stilts-model-iv', title: 'Model IV Drywall Stilts', mpn: 'DS-M4', category: 'Stilts' },
+  ],
 };
 
 // Mapping of schematic titles/keywords to product catalog search terms
@@ -440,6 +443,7 @@ const BRAND_TO_SLUG = {
   'TapeTech': 'tapetech',
   'Asgard': 'asgard',
   'Level5': 'level5',
+  'Dura-Stilts': 'dura-stilts',
 };
 
 // Reverse-lookup: schematic ID → brand name (built once from SCHEMATIC_DEFINITIONS)

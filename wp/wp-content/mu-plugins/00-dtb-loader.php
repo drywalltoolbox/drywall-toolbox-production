@@ -88,17 +88,45 @@ function dtb_check_origin(): bool {
 
 $_dtb_dir = __DIR__;
 
-require_once $_dtb_dir . '/dtb-utils.php';
-require_once $_dtb_dir . '/dtb-auth.php';
-require_once $_dtb_dir . '/dtb-cache.php';
-require_once $_dtb_dir . '/dtb-rest-api.php';
-require_once $_dtb_dir . '/dtb-rewards.php';       // WPLoyalty REST bridge (loads after dtb-auth)
-require_once $_dtb_dir . '/dtb-image-sync.php';    // media-library sync for uploads/YYYY/MM/ images
-require_once $_dtb_dir . '/dtb-woocommerce.php';
-require_once $_dtb_dir . '/dtb-veeqo.php';         // Veeqo API proxy, order/inventory sync, shipping rates
-require_once $_dtb_dir . '/dtb-schematics-api.php';
-require_once $_dtb_dir . '/dtb-coming-soon.php';
-require_once $_dtb_dir . '/dtb-seo.php';           // WooCommerce product SEO meta fields
-require_once $_dtb_dir . '/dtb-config-reference.php';
+/**
+ * Safely require a mu-plugin file.
+ *
+ * Uses require_once when the file exists. When it is missing (e.g. a file has
+ * not yet been deployed to this server) the error is written to the PHP error
+ * log and an admin-visible notice is queued — but WordPress continues to boot
+ * so that wp-admin remains accessible and the missing file can be uploaded.
+ *
+ * @param string $path Absolute path to the file.
+ */
+function _dtb_require( string $path ): void {
+	if ( file_exists( $path ) ) {
+		require_once $path;
+		return;
+	}
+
+	$filename = basename( $path );
+	error_log( "[DTB] mu-plugin not found — file has not been deployed to this server: {$path}" );
+
+	// Queue an admin notice so the missing file is visible in wp-admin.
+	add_action( 'admin_notices', static function () use ( $filename ): void {
+		echo '<div class="notice notice-error"><p>'
+			. '<strong>Drywall Toolbox:</strong> mu-plugin file <code>'
+			. esc_html( $filename )
+			. '</code> is missing from the server. Deploy it via CI/CD or FTP.</p></div>';
+	} );
+}
+
+_dtb_require( $_dtb_dir . '/dtb-utils.php' );
+_dtb_require( $_dtb_dir . '/dtb-auth.php' );
+_dtb_require( $_dtb_dir . '/dtb-cache.php' );
+_dtb_require( $_dtb_dir . '/dtb-rest-api.php' );
+_dtb_require( $_dtb_dir . '/dtb-rewards.php' );       // WPLoyalty REST bridge (loads after dtb-auth)
+_dtb_require( $_dtb_dir . '/dtb-image-sync.php' );    // media-library sync for uploads/YYYY/MM/ images
+_dtb_require( $_dtb_dir . '/dtb-woocommerce.php' );
+_dtb_require( $_dtb_dir . '/dtb-veeqo.php' );         // Veeqo API proxy, order/inventory sync, shipping rates
+_dtb_require( $_dtb_dir . '/dtb-schematics-api.php' );
+_dtb_require( $_dtb_dir . '/dtb-coming-soon.php' );
+_dtb_require( $_dtb_dir . '/dtb-seo.php' );           // WooCommerce product SEO meta fields
+_dtb_require( $_dtb_dir . '/dtb-config-reference.php' );
 
 unset( $_dtb_dir );

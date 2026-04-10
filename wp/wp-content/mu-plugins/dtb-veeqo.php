@@ -1596,7 +1596,7 @@ function dtb_veeqo_send_repair_confirmation( WC_Order $order, string $tool_desc,
 //   • Webhook Secret — stored in woocommerce_dtb_veeqo_settings[webhook_secret]
 //
 // Read-only display (auto-discovered on save):
-//   • Channel ID   — populated from GET /stores  (Channel ID = Store ID per Veeqo docs)
+//   • Channel ID   — populated from GET /channels (first channel returned)
 //   • Warehouse ID — populated from GET /warehouses (first warehouse)
 //
 // wp-config.php constants (DTB_VEEQO_*) still take precedence over stored
@@ -1604,7 +1604,7 @@ function dtb_veeqo_send_repair_confirmation( WC_Order $order, string $tool_desc,
 // =============================================================================
 
 /**
- * Discover the Veeqo channel_id (from GET /stores) and warehouse_id
+ * Discover the Veeqo channel_id (from GET /channels) and warehouse_id
  * (from GET /warehouses) using the currently-active API key, then persist
  * both values to the woocommerce_dtb_veeqo_settings wp_option.
  *
@@ -1621,21 +1621,37 @@ function dtb_veeqo_discover_ids(): array {
 	$warehouse_id = 0;
 	$errors       = [];
 
-	// ── Channel ID from GET /stores ───────────────────────────────────────────
-	// Per Veeqo developer docs: the Channel ID corresponds to the Store ID.
-	$stores_result = dtb_veeqo_request( 'GET', '/stores' );
+	// ── Channel ID from GET /channels ────────────────────────────────────────
+	// The correct Veeqo endpoint is /channels (GET /stores returns 404).
+	// The response is a flat array of channel objects. We prefer the first
+	// channel whose type_code is 'woocommerce'; fall back to the first
+	// channel with a valid id if no WooCommerce channel is found.
+	$stores_result = dtb_veeqo_request( 'GET', '/channels' );
 	if ( $stores_result['ok'] && is_array( $stores_result['data'] ) ) {
+		$first_id = 0;
 		foreach ( $stores_result['data'] as $store ) {
-			if ( isset( $store['id'] ) && (int) $store['id'] > 0 ) {
+			if ( ! isset( $store['id'] ) || (int) $store['id'] <= 0 ) {
+				continue;
+			}
+			// Capture the very first valid id as a fallback.
+			if ( 0 === $first_id ) {
+				$first_id = (int) $store['id'];
+			}
+			// Prefer the WooCommerce-type channel.
+			if ( isset( $store['type_code'] ) && 'woocommerce' === $store['type_code'] ) {
 				$channel_id = (int) $store['id'];
 				break;
 			}
 		}
+		// Use the fallback id if no WooCommerce channel was found.
+		if ( 0 === $channel_id && $first_id > 0 ) {
+			$channel_id = $first_id;
+		}
 		if ( 0 === $channel_id ) {
-			$errors[] = 'GET /stores returned no stores.';
+			$errors[] = 'GET /channels returned no channels.';
 		}
 	} else {
-		$errors[] = 'GET /stores failed: ' . $stores_result['error'];
+		$errors[] = 'GET /channels failed: ' . $stores_result['error'];
 	}
 
 	// ── Warehouse ID from GET /warehouses ─────────────────────────────────────
@@ -1744,7 +1760,7 @@ add_filter( 'woocommerce_integrations', function ( array $integrations ): array 
 						(int) $opt['channel_id']
 					);
 				} else {
-					$channel_note = __( 'Will be auto-discovered via <code>GET /stores</code> when you save the API Key.', 'woocommerce' );
+					$channel_note = __( 'Will be auto-discovered via <code>GET /channels</code> when you save the API Key.', 'woocommerce' );
 				}
 
 				// ── Warehouse ID display note ─────────────────────────────────
