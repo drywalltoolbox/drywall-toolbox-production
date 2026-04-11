@@ -42,6 +42,12 @@ export function useAuth() {
     let cancelled = false;
 
     async function validateSession() {
+      // Skip the validate call entirely when no API base URL is configured
+      // (e.g. GitHub Pages static build) — avoids 405/404 against wrong origin.
+      if ( ! _base ) {
+        if ( ! cancelled ) setIsLoading( false );
+        return;
+      }
       setIsLoading( true );
       try {
         const res = await fetch( `${ DTB_AUTH_BASE }/validate`, {

@@ -42,20 +42,24 @@ let WC_AUTH_USER = process.env.REACT_APP_WC_AUTH_USER || '';
 let WC_AUTH_PASS = process.env.REACT_APP_WC_AUTH_PASS || '';
 
 // ─── Runtime credential bootstrap (backward compat) ──────────────────────────
+// Only attempt the config fetch when a WP base URL is explicitly configured.
+// On GitHub Pages, _wpBase is empty — skip entirely to avoid 404 noise.
 
 let _credentialsReady = ( WC_AUTH_USER && WC_AUTH_PASS )
   ? Promise.resolve()
-  : fetch( `${ WP_API_BASE.replace( /\/+$/, '' ) }/dtb/v1/config` )
-      .then( ( r ) => r.json() )
-      .then( ( data ) => {
-        if ( data && data.wc_auth_user && data.wc_auth_pass ) {
-          WC_AUTH_USER = data.wc_auth_user;
-          WC_AUTH_PASS = data.wc_auth_pass;
-          const encoded = btoa( `${ WC_AUTH_USER }:${ WC_AUTH_PASS }` );
-          wcClient.defaults.headers.common[ 'Authorization' ] = `Basic ${ encoded }`;
-        }
-      } )
-      .catch( () => {} );
+  : _wpBase
+    ? fetch( `${ WP_API_BASE.replace( /\/+$/, '' ) }/dtb/v1/config` )
+        .then( ( r ) => r.json() )
+        .then( ( data ) => {
+          if ( data && data.wc_auth_user && data.wc_auth_pass ) {
+            WC_AUTH_USER = data.wc_auth_user;
+            WC_AUTH_PASS = data.wc_auth_pass;
+            const encoded = btoa( `${ WC_AUTH_USER }:${ WC_AUTH_PASS }` );
+            wcClient.defaults.headers.common[ 'Authorization' ] = `Basic ${ encoded }`;
+          }
+        } )
+        .catch( () => {} )
+    : Promise.resolve();
 
 export const credentialsReady = () => _credentialsReady;
 
