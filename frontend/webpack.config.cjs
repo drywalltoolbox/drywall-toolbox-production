@@ -287,24 +287,15 @@ module.exports = (envFlags, argv) => {
               ],
             },
           },
-          // ── Product catalog CSV: always bundle for fallback ────────────────
-          // The frontend's catalog.js will try the remote CSV first
-          // (REACT_APP_WC_CSV_URL), but if that fails due to CORS or network
-          // issues, it falls back to this bundled CSV for offline access.
+          // ── Product catalog CSV: bundle for GitHub Pages + dev ────────────────
+          // Copy wp-catalog.csv (dev/test catalog with all products) into dist/
+          // for use on GitHub Pages and offline environments.
+          // catalog.js will load this as a fallback when APIs are unavailable.
           {
-            from:  path.resolve(__dirname, 'public', 'product-wp-catalog-yu1a5xf58h.csv'),
-            to:    'product-wp-catalog-yu1a5xf58h.csv',
-            noErrorOnMissing: false,
-          },
-          // ── GitHub Pages / offline mode: legacy CSV fallback ────────────────
-          // When REACT_APP_USE_LOCAL_CSV=true (set in deploy.yml for GH Pages or
-          // locally via .env.development) also copy wp-catalog.csv as a secondary
-          // fallback for backward compatibility.
-          ...(env('REACT_APP_USE_LOCAL_CSV') === 'true' ? [{
-            from:  path.resolve(__dirname, '..', 'scraped_results', 'wp-catalog.csv'),
+            from:  path.resolve(__dirname, 'public', 'wp-catalog.csv'),
             to:    'wp-catalog.csv',
             noErrorOnMissing: false,
-          }] : []),
+          },
         ],
       }),
 

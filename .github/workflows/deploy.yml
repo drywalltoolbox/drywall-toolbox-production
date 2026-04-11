@@ -42,11 +42,9 @@ jobs:
           NODE_ENV: production
           # GitHub Pages sub-path (repo name); adjust if the Pages site uses a custom domain
           PUBLIC_URL: /drywall-toolbox
-          # ── GitHub Pages: use bundled CSV only (remote CSV returns 403) ─────
-          # Server blocks cross-origin fetches — leave blank so catalog.js
-          # skips the remote attempt and goes straight to the bundled file.
+          # ── GitHub Pages: use bundled dev catalog (wp-catalog.csv) ─────
+          # No remote CSV — webpack bundles wp-catalog.csv into dist/ during build.
           REACT_APP_WC_CSV_URL: ''
-          # Keep local CSV bundled as fallback
           REACT_APP_USE_LOCAL_CSV: 'true'
           # ── Stub out WP/WC endpoints (not available on GH Pages) ─────────────
           REACT_APP_WP_BASE_URL: ''
@@ -59,18 +57,16 @@ jobs:
           REACT_APP_SITE_URL: 'https://elliotttmiller.github.io/drywall-toolbox'
           REACT_APP_APP_ENV: development
 
-      # ── Inject product catalog CSV for GitHub Pages ─────────────────────────
-      # frontend/public/product-wp-catalog-yu1a5xf58h.csv is copied into dist/
-      # by CopyWebpackPlugin during the build. It serves as a fallback when the
-      # remote CSV fetch fails (CORS, network, etc.). The frontend will attempt
-      # the remote URL first (REACT_APP_WC_CSV_URL), then fall back to the
-      # bundled local copy at <origin>/wp-catalog.csv.
-      - name: Verify product catalog was bundled into dist
+      # ── Verify dev catalog was bundled into dist ────────────────────
+      # wp-catalog.csv is copied into dist/ by webpack during the build.
+      # This serves as the primary data source for GitHub Pages.
+      - name: Verify dev catalog was bundled into dist
         run: |
-          if [ -f "dist/product-wp-catalog-yu1a5xf58h.csv" ]; then
-            echo "✓ Product catalog bundled successfully ($(wc -l < dist/product-wp-catalog-yu1a5xf58h.csv) rows)"
+          if [ -f "dist/wp-catalog.csv" ]; then
+            echo "✓ Dev catalog bundled successfully ($(wc -l < dist/wp-catalog.csv) rows)"
           else
-            echo "⚠ Product catalog not found in dist/ — remote fetch will be the only source"
+            echo "✗ Dev catalog not found in dist/ — catalog.js will fail to load products"
+            exit 1
           fi
 
       - name: Upload Pages artifact

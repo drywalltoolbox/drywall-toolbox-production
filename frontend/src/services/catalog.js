@@ -152,41 +152,24 @@ function loadCatalog() {
       }
     }
 
-    // --- Attempt 1: Local bundled product CSV (primary fallback) --------
-    // The webpack build always copies product-wp-catalog-yu1a5xf58h.csv into
-    // dist/, providing a fallback when the remote fetch fails (CORS, network, etc).
-    // This is independent of REACT_APP_USE_LOCAL_CSV—it's always available.
+    // --- Attempt 1: Bundled dev/test catalog CSV (primary) --------
+    // The webpack build copies wp-catalog.csv into dist/ as the primary
+    // data source for GitHub Pages and offline environments.
     // PUBLIC_URL is injected at build time: '' on localhost, '/drywall-toolbox' on GitHub Pages.
     const origin    = typeof window !== 'undefined' ? window.location.origin : '';
     const publicUrl = (process.env.PUBLIC_URL || '').replace(/\/+$/, '');
     
     try {
-      const csvUrl    = `${origin}${publicUrl}/product-wp-catalog-yu1a5xf58h.csv`;
+      const csvUrl    = `${origin}${publicUrl}/wp-catalog.csv`;
       const products  = await fetchFromCsv(csvUrl);
       _source = 'bundled-csv';
-      console.info(`[catalog] Loaded ${products.length} products from bundled CSV: ${csvUrl}`);
+      console.info(`[catalog] Loaded ${products.length} products from bundled dev catalog: ${csvUrl}`);
       return products;
-    } catch (primaryErr) {
-      console.warn('[catalog] Bundled product CSV failed, trying legacy wp-catalog.csv:', primaryErr.message);
+    } catch (bundledErr) {
+      console.warn('[catalog] Bundled dev catalog failed, falling back to REST API:', bundledErr.message);
     }
 
-    // --- Attempt 2: Legacy bundled CSV fallback --------
-    // When REACT_APP_USE_LOCAL_CSV=true the legacy wp-catalog.csv is also bundled
-    // as a secondary fallback for backward compatibility.
-    const useLocal = process.env.REACT_APP_USE_LOCAL_CSV === 'true';
-    if (useLocal) {
-      try {
-        const csvUrl    = `${origin}${publicUrl}/wp-catalog.csv`;
-        const products  = await fetchFromCsv(csvUrl);
-        _source = 'local-csv';
-        console.info(`[catalog] Loaded ${products.length} products from legacy CSV: ${csvUrl}`);
-        return products;
-      } catch (fallbackErr) {
-        console.warn('[catalog] Legacy CSV load failed, falling back to REST API:', fallbackErr.message);
-      }
-    }
-
-    // --- Attempt 3: WooCommerce REST API ------------------------------------
+    // --- Attempt 2: WooCommerce REST API ------------------------------------
     try {
       const products = await fetchFromApi();
       if (products.length > 0) {
