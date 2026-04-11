@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { createPortal } from 'react-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion as Motion, AnimatePresence } from 'framer-motion';
 import { ChevronLeft, ChevronRight, X, ZoomIn } from 'lucide-react';
 
 // Sits above the product modal (10002) and its backdrop (10001)
@@ -19,7 +19,7 @@ const slideTransition = {
 };
 
 // Shared className for the lightbox prev/next nav buttons
-const LB_NAV_BTN_CLASS = 'absolute top-1/2 -translate-y-1/2 z-10 flex items-center justify-center w-11 h-11 rounded-full bg-white/10 hover:bg-white/[0.22] text-white transition-all hover:scale-105 active:scale-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-white';
+const LB_NAV_BTN_CLASS = 'absolute top-1/2 -translate-y-1/2 z-10 flex items-center justify-center w-11 h-11 rounded-full bg-white/10 hover:bg-white/[0.22] text-white transition-all hover:scale-105 active:scale-95 focus-visible:outline-2 focus-visible:outline-white';
 
 export default function ProductImageGallery({ product }) {
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -31,9 +31,7 @@ export default function ProductImageGallery({ product }) {
   const galleryRef = useRef(null);
   // Refs for latest values — avoids stale closures in event handlers
   const currentIndexRef = useRef(currentIndex);
-  currentIndexRef.current = currentIndex;
   const lightboxRef = useRef(lightbox);
-  lightboxRef.current = lightbox;
   // Touch swipe refs
   const touchStartX = useRef(null);
   const touchStartY = useRef(null);
@@ -49,10 +47,9 @@ export default function ProductImageGallery({ product }) {
     const arr = Array.isArray(product?.images) && product.images.length
       ? product.images
       : product?.image ? [product.image] : [];
-    return arr.length ? arr : ['/no-image-placeholder.webp'];
+    return arr.length ? arr : ['https://www.drywalltoolbox.com/wp/wp-content/uploads/2026/04/no-image-placeholder.webp'];
   })();
   const imagesRef = useRef(images);
-  imagesRef.current = images;
   const hasMultiple = images.length > 1;
 
   // ── Reset on product change (during render, avoids effect warning) ────────
@@ -154,6 +151,13 @@ export default function ProductImageGallery({ product }) {
     }
   }, [lightbox.open]);
 
+  // ── Update refs outside of render ────────────────────────────────────────
+  useEffect(() => {
+    currentIndexRef.current = currentIndex;
+    lightboxRef.current = lightbox;
+    imagesRef.current = images;
+  }, [currentIndex, lightbox, images]);
+
   // ── Preload the next/prev images so swiping feels instant ────────────────
   useEffect(() => {
     if (images.length <= 1) return;
@@ -168,8 +172,6 @@ export default function ProductImageGallery({ product }) {
       img.src = src;
     });
   }, [currentIndex, images]);
-
-  // ── Non-passive touchmove to prevent vertical scroll during horizontal swipe
   useEffect(() => {
     const el = galleryRef.current;
     if (!el) return;
@@ -239,12 +241,12 @@ export default function ProductImageGallery({ product }) {
         >
           {/* Per-image skeleton loader */}
           {!imgLoaded[currentIndex] && (
-            <div className="absolute inset-0 bg-gradient-to-br from-gray-100 to-gray-200 animate-pulse z-0" />
+            <div className="absolute inset-0 bg-linear-to-br from-gray-100 to-gray-200 animate-pulse z-0" />
           )}
 
           {/* Slide-animated image */}
           <AnimatePresence initial={false} custom={direction}>
-            <motion.img
+            <Motion.img
               key={currentIndex}
               src={images[currentIndex]}
               alt={`${product?.name || 'Product'} — image ${currentIndex + 1} of ${images.length}`}
@@ -262,7 +264,7 @@ export default function ProductImageGallery({ product }) {
               onLoad={() => setImgLoaded(prev => ({ ...prev, [currentIndex]: true }))}
               onError={(e) => {
                 e.currentTarget.onerror = null;
-                e.currentTarget.src = '/no-image-placeholder.webp';
+                e.currentTarget.src = 'https://www.drywalltoolbox.com/wp/wp-content/uploads/2026/04/no-image-placeholder.webp';
                 setImgLoaded(prev => ({ ...prev, [currentIndex]: true }));
               }}
             />
@@ -346,7 +348,7 @@ export default function ProductImageGallery({ product }) {
                   loading="lazy"
                   decoding="async"
                   className="w-full h-full object-contain bg-white p-1"
-                  onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = '/no-image-placeholder.webp'; }}
+                  onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = 'https://www.drywalltoolbox.com/wp/wp-content/uploads/2026/04/no-image-placeholder.webp'; }}
                 />
               </button>
             ))}
@@ -358,7 +360,7 @@ export default function ProductImageGallery({ product }) {
       {typeof document !== 'undefined' && createPortal(
         <AnimatePresence>
           {lightbox.open && (
-            <motion.div
+            <Motion.div
               className="fixed inset-0 flex items-center justify-center"
               style={{ zIndex: LIGHTBOX_Z_INDEX }}
               role="dialog"
@@ -377,7 +379,7 @@ export default function ProductImageGallery({ product }) {
               />
 
               {/* Inner — spring-scale entrance */}
-              <motion.div
+              <Motion.div
                 className="relative flex items-center justify-center w-full h-full"
                 initial={{ scale: 0.9, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
@@ -388,7 +390,7 @@ export default function ProductImageGallery({ product }) {
               >
                 {/* Slide-animated lightbox image */}
                 <AnimatePresence initial={false} custom={lightbox.dir}>
-                  <motion.img
+                  <Motion.img
                     key={lightbox.index}
                     src={images[lightbox.index]}
                     alt={`${product?.name || 'Product'} — image ${lightbox.index + 1} of ${images.length}`}
@@ -408,7 +410,7 @@ export default function ProductImageGallery({ product }) {
                 <button
                   ref={lbCloseBtnRef}
                   onClick={closeLb}
-                  className="absolute top-4 right-4 z-10 flex items-center justify-center w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 text-white transition-all hover:scale-105 active:scale-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-white"
+                  className="absolute top-4 right-4 z-10 flex items-center justify-center w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 text-white transition-all hover:scale-105 active:scale-95 focus-visible:outline-2 focus-visible:outline-white"
                   aria-label="Close fullscreen image"
                 >
                   <X size={20} />
@@ -472,8 +474,8 @@ export default function ProductImageGallery({ product }) {
                     </div>
                   )}
                 </div>
-              </motion.div>
-            </motion.div>
+              </Motion.div>
+            </Motion.div>
           )}
         </AnimatePresence>,
         document.body

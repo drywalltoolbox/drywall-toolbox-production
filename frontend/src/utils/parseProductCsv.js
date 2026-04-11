@@ -314,12 +314,16 @@ export function htmlToMarkdown(html) {
  */
 function normalizeRow(row, idx) {
   // Images: pipe-separated URLs. CSV columns may contain "Images" or "Images (comma separated)"
+  const NO_IMAGE = 'https://www.drywalltoolbox.com/wp/wp-content/uploads/2026/04/no-image-placeholder.webp';
+
   const rawImages = row['Images'] || row['Images (comma separated)'] || '';
   const images = rawImages
     .split('|')
     .map(u => u.trim())
-    .filter(Boolean);
-  if (images.length === 0) images.push('/no-image-placeholder.webp');
+    // Strip known third-party placeholder SVGs (e.g. BigCommerce ProductDefault.svg)
+    .filter(u => u && !u.includes('ProductDefault.svg'))
+    .map(u => u || NO_IMAGE);
+  if (images.length === 0) images.push(NO_IMAGE);
 
   // Brand: prefer the WooCommerce "Brands" taxonomy column (most authoritative,
   // e.g. "Platinum Drywall Tools"), then fall back to "Attribute 1 value(s)"

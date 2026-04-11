@@ -33,7 +33,7 @@
  */
 import { useState } from 'react';
 
-const PLACEHOLDER = '/no-image-placeholder.webp';
+const PLACEHOLDER = 'https://www.drywalltoolbox.com/wp/wp-content/uploads/2026/04/no-image-placeholder.webp';
 
 // Easing curve: fast start, decelerate to rest — feels natural and physical.
 const EASE_OUT_EXPO = 'cubic-bezier(0.22, 1, 0.36, 1)';

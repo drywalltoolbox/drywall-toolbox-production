@@ -103,7 +103,7 @@ export default function CategoryPage() {
                       className="w-full h-full object-contain p-4"
                       onError={(e) => {
                         e.currentTarget.onerror = null;
-                        e.currentTarget.src = '/no-image-placeholder.webp';
+                        e.currentTarget.src = 'https://www.drywalltoolbox.com/wp/wp-content/uploads/2026/04/no-image-placeholder.webp';
                       }}
                     />
                   ) : (

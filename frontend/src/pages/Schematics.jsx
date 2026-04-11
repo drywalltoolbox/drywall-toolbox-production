@@ -1835,7 +1835,7 @@ export default function Parts() {
             price: parseFloat(wcProduct.price) || 0,
             part_number: wcProduct.sku || part.sku,
             sku: wcProduct.sku || part.sku,
-            image: wcProduct.images?.[0] || '/no-image-placeholder.webp',
+            image: wcProduct.images?.[0] || 'https://www.drywalltoolbox.com/wp/wp-content/uploads/2026/04/no-image-placeholder.webp',
             permalink: wcProduct.permalink || '',
             _wcProduct: wcProduct,
           }
@@ -1847,7 +1847,7 @@ export default function Parts() {
             price: part.price || 0,
             part_number: part.sku,
             sku: part.sku,
-            image: '/no-image-placeholder.webp',
+            image: 'https://www.drywalltoolbox.com/wp/wp-content/uploads/2026/04/no-image-placeholder.webp',
           };
 
       addToCart(cartProduct, 1);
