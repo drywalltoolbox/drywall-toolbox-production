@@ -64,20 +64,17 @@ jobs:
           REACT_APP_APP_ENV: development
 
       # ── Inject product catalog CSV for GitHub Pages ─────────────────────────
-      # scraped_results/wp-catalog.csv is the canonical offline product catalog.
-      # It is NOT bundled by webpack (scraped_results/ is excluded from the
-      # CopyWebpackPlugin glob), so we copy it manually into dist/ here.
-      # On GitHub Pages this file is served at <origin>/wp-catalog.csv, which
-      # is exactly what catalog.js Attempt 0 fetches when USE_LOCAL_CSV=true.
-      # Production (HostGator) is unaffected — it never sets USE_LOCAL_CSV.
-      - name: Copy product catalog CSV into dist for GitHub Pages
+      # frontend/public/product-wp-catalog-yu1a5xf58h.csv is copied into dist/
+      # by CopyWebpackPlugin during the build. It serves as a fallback when the
+      # remote CSV fetch fails (CORS, network, etc.). The frontend will attempt
+      # the remote URL first (REACT_APP_WC_CSV_URL), then fall back to the
+      # bundled local copy at <origin>/wp-catalog.csv.
+      - name: Verify product catalog was bundled into dist
         run: |
-          if [ -f "scraped_results/wp-catalog.csv" ]; then
-            cp scraped_results/wp-catalog.csv dist/wp-catalog.csv
-            echo "✓ Copied scraped_results/wp-catalog.csv → dist/wp-catalog.csv ($(wc -l < scraped_results/wp-catalog.csv) rows)"
+          if [ -f "dist/product-wp-catalog-yu1a5xf58h.csv" ]; then
+            echo "✓ Product catalog bundled successfully ($(wc -l < dist/product-wp-catalog-yu1a5xf58h.csv) rows)"
           else
-            echo "⚠ scraped_results/wp-catalog.csv not found — catalog will be empty on GitHub Pages"
-            exit 1
+            echo "⚠ Product catalog not found in dist/ — remote fetch will be the only source"
           fi
 
       - name: Upload Pages artifact

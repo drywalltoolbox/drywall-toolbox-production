@@ -155,30 +155,40 @@ function loadCatalog() {
 
     // --- Attempt 1: Local bundled CSV --------
     // When REACT_APP_USE_LOCAL_CSV=true the catalog is loaded from a static
-    // wp-catalog.csv file served at the site root.  This covers two cases:
+    // CSV file served at the site root. The webpack build copies files from
+    // frontend/public/ into dist/, so both filenames may be present:
     //
-    //   • Local dev    — file copied to frontend/public/wp-catalog.csv,
-    //                    served by webpack-dev-server at <origin>/wp-catalog.csv
-    //
-    //   • GitHub Pages — file copied from scraped_results/wp-catalog.csv into
-    //                    dist/ by the CI workflow step, then served at
-    //                    <origin>/<PUBLIC_URL>/wp-catalog.csv
+    //   • product-wp-catalog-yu1a5xf58h.csv — primary bundled product catalog
+    //   • wp-catalog.csv — fallback for compatibility
     //
     // PUBLIC_URL is injected at build time by DefinePlugin (process.env.PUBLIC_URL).
     // It is '' on localhost and '/drywall-toolbox' on GitHub Pages.
     const useLocal = process.env.REACT_APP_USE_LOCAL_CSV === 'true';
 
     if (useLocal) {
+      const origin    = typeof window !== 'undefined' ? window.location.origin : '';
+      const publicUrl = (process.env.PUBLIC_URL || '').replace(/\/+$/, '');
+      
+      // Try the primary product catalog first
       try {
-        const origin    = typeof window !== 'undefined' ? window.location.origin : '';
-        const publicUrl = (process.env.PUBLIC_URL || '').replace(/\/+$/, '');
+        const csvUrl    = `${origin}${publicUrl}/product-wp-catalog-yu1a5xf58h.csv`;
+        const products  = await fetchFromCsv(csvUrl);
+        _source = 'local-csv';
+        console.info(`[catalog] Loaded ${products.length} products from bundled CSV: ${csvUrl}`);
+        return products;
+      } catch (primaryErr) {
+        console.warn('[catalog] Primary bundled CSV failed, trying fallback wp-catalog.csv:', primaryErr.message);
+      }
+      
+      // Fall back to legacy wp-catalog.csv
+      try {
         const csvUrl    = `${origin}${publicUrl}/wp-catalog.csv`;
         const products  = await fetchFromCsv(csvUrl);
         _source = 'local-csv';
-        console.info(`[catalog] Loaded ${products.length} products from static CSV: ${csvUrl}`);
+        console.info(`[catalog] Loaded ${products.length} products from fallback CSV: ${csvUrl}`);
         return products;
-      } catch (localErr) {
-        console.warn('[catalog] Static CSV load failed, falling back to standard resolution:', localErr.message);
+      } catch (fallbackErr) {
+        console.warn('[catalog] Fallback CSV load failed, falling back to standard resolution:', fallbackErr.message);
         // Continue to normal resolution below
       }
     }
