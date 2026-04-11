@@ -274,7 +274,8 @@ module.exports = (envFlags, argv) => {
               ignore: [
                 // HTML handled by HtmlWebpackPlugin
                 '**/index.html',
-                // CSV data files — served via API, not bundled
+                // CSV data files — most are served via API, not bundled
+                // (except product catalog which is handled separately below)
                 '**/*.csv',
                 '**/*.bak',
                 '**/products_catalog.csv',
@@ -286,12 +287,19 @@ module.exports = (envFlags, argv) => {
               ],
             },
           },
-          // ── GitHub Pages / offline mode: inject the product catalog CSV ──────
+          // ── Product catalog CSV: always bundle for fallback ────────────────
+          // The frontend's catalog.js will try the remote CSV first
+          // (REACT_APP_WC_CSV_URL), but if that fails due to CORS or network
+          // issues, it falls back to this bundled CSV for offline access.
+          {
+            from:  path.resolve(__dirname, 'public', 'product-wp-catalog-yu1a5xf58h.csv'),
+            to:    'product-wp-catalog-yu1a5xf58h.csv',
+            noErrorOnMissing: false,
+          },
+          // ── GitHub Pages / offline mode: legacy CSV fallback ────────────────
           // When REACT_APP_USE_LOCAL_CSV=true (set in deploy.yml for GH Pages or
-          // locally via .env.development) copy scraped_results/wp-catalog.csv into
-          // dist/ so catalog.js Attempt 0 can fetch it at <origin>/wp-catalog.csv.
-          // Production builds never set this flag, so the CSV is never shipped to
-          // the HostGator server.
+          // locally via .env.development) also copy wp-catalog.csv as a secondary
+          // fallback for backward compatibility.
           ...(env('REACT_APP_USE_LOCAL_CSV') === 'true' ? [{
             from:  path.resolve(__dirname, '..', 'scraped_results', 'wp-catalog.csv'),
             to:    'wp-catalog.csv',
