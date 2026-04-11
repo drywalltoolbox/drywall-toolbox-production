@@ -117,7 +117,7 @@ async function fetchFromApi() {
  */
 async function fetchFromCsv(urlOverride) {
   const url = urlOverride || (await getCsvUrl());
-  const res = await fetch(url);
+  const res = await fetch(url, { mode: 'cors' });
   if (!res.ok) throw new Error(`CSV fetch failed: ${res.status} ${url}`);
   const text = await res.text();
   return parseProductCsv(text);
