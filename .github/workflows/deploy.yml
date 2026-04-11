@@ -45,14 +45,13 @@ jobs:
           NODE_ENV: production
           # GitHub Pages sub-path (repo name); adjust if the Pages site uses a custom domain
           PUBLIC_URL: /drywall-toolbox
-          # ── Use remote CSV on GitHub Pages ───────────────────────────────
-          # Instead of bundling a local CSV, instruct the built frontend to
-          # fetch the canonical CSV from drywalltoolbox.com at runtime.
-          # This value takes priority in frontend/src/services/catalog.js
-          # because getCsvUrl() checks REACT_APP_WC_CSV_URL first.
+          # ── GitHub Pages: Try remote CSV with local fallback ───────────────
+          # The frontend will attempt to fetch the remote CSV first (priority in
+          # getCsvUrl()). If that fails (network, CORS, etc.), catalog.js falls
+          # back to the bundled local CSV.
           REACT_APP_WC_CSV_URL: 'https://drywalltoolbox.com//wp/wp-content/uploads/wc-imporrts/product-wp-catalog-yu1a5xf58h.csv'
-          # Ensure we don't use the local bundled CSV on GitHub Pages
-          REACT_APP_USE_LOCAL_CSV: 'false'
+          # Keep local CSV bundled as fallback
+          REACT_APP_USE_LOCAL_CSV: 'true'
           # ── Stub out WP/WC endpoints (not available on GH Pages) ─────────────
           REACT_APP_WP_BASE_URL: ''
           REACT_APP_WC_BASE_URL: ''

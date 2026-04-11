@@ -5,23 +5,28 @@
  *
  * Loading strategy (attempted in order, first success wins):
  *
- *   0. Static CSV shortcut  — when REACT_APP_USE_LOCAL_CSV=true
+ *   0. Explicit remote CSV  — when REACT_APP_WC_CSV_URL is set
+ *      Set by GitHub Pages build to prioritize a live remote catalog
+ *      (e.g., https://drywalltoolbox.com/.../product-wp-catalog.csv).
+ *      Falls back to other attempts on network/CORS error.
+ *
+ *   1. Static CSV shortcut  — when REACT_APP_USE_LOCAL_CSV=true
  *      • Local dev:     served from frontend/public/wp-catalog.csv via webpack-dev-server
  *      • GitHub Pages:  scraped_results/wp-catalog.csv copied into dist/ by CI workflow
  *      URL resolves to: <origin><PUBLIC_URL>/wp-catalog.csv
- *      Production (HostGator) never sets this flag — always skips to step 1.
+ *      Used as fallback if explicit remote CSV fails (GitHub Pages availability).
+ *      Production (HostGator) never sets this flag — always skips to step 2.
  *
- *   1. WooCommerce REST API  — /wp-json/wc/v3/products
+ *   2. WooCommerce REST API  — /wp-json/wc/v3/products
  *      Credentials come from REACT_APP_WC_AUTH_USER / REACT_APP_WC_AUTH_PASS (build-time)
  *      or from the runtime bootstrap in src/api/client.js (/dtb/v1/config).
  *
- *   2. PHP proxy CSV endpoint — fetched through the WP REST proxy at:
- *        REACT_APP_WC_CSV_URL  (explicit env var override, checked first)
- *        OR  GET /wp-json/dtb/v1/catalog  (PHP returns the proxy URL)
+ *   3. PHP proxy CSV endpoint — fetched through the WP REST proxy at:
+ *        GET /wp-json/dtb/v1/catalog  (PHP returns the proxy URL)
  *        OR  <origin>/wp-json/dtb/v1/products-csv  (hard proxy fallback)
  *      Server file: public_html/drywalltoolbox/wp/wp-content/uploads/wc-imports/
  *
- *   3. Web-root CSV — direct fetch of <origin>/wp-catalog.csv
+ *   4. Web-root CSV — direct fetch of <origin>/wp-catalog.csv
  *      (public_html/drywalltoolbox/wp-catalog.csv on HostGator).
  *      Used when the WP REST stack is unavailable (maintenance, cold boot, etc.).
  *
@@ -40,16 +45,18 @@ const CSV_FILENAME = 'product-wp-catalog-c7p3my05pn.csv';
 /**
  * Resolve the CSV URL.
  * Priority:
- *   1. REACT_APP_WC_CSV_URL build-time env var
+ *   1. REACT_APP_WC_CSV_URL build-time env var (explicit remote CSV for GitHub Pages)
  *   2. GET /wp-json/dtb/v1/catalog  (PHP endpoint returns the proxy URL)
  *   3. /wp-json/dtb/v1/products-csv  (hard fallback proxy — never a direct file path)
+ *
+ * @param {boolean} [skipExplicit] - If true, skip REACT_APP_WC_CSV_URL and try PHP endpoints
  */
 let _csvUrlPromise = null;
 
-async function getCsvUrl() {
+async function getCsvUrl(skipExplicit = false) {
   // process.env.REACT_APP_WC_CSV_URL — injected by DefinePlugin at build time
   const explicit = process.env.REACT_APP_WC_CSV_URL || '';
-  if (explicit) return explicit;
+  if (explicit && !skipExplicit) return explicit;
 
   if (!_csvUrlPromise) {
     const origin = typeof window !== 'undefined' ? window.location.origin : '';
@@ -129,7 +136,24 @@ function loadCatalog() {
   if (_cache) return _cache;
 
   _cache = (async () => {
-    // --- Attempt 0 (Dev Only): Local CSV at /wp-catalog.csv --------
+    // --- Attempt 0: Explicit remote CSV (highest priority) --------
+    // When REACT_APP_WC_CSV_URL is set (e.g., on GitHub Pages), try the
+    // remote URL first. If it fails (network, CORS, server error), fall
+    // through to other attempts.
+    const explicitUrl = process.env.REACT_APP_WC_CSV_URL || '';
+    if (explicitUrl) {
+      try {
+        const products = await fetchFromCsv(explicitUrl);
+        _source = 'remote-csv';
+        console.info(`[catalog] Loaded ${products.length} products from explicit remote CSV: ${explicitUrl}`);
+        return products;
+      } catch (remoteErr) {
+        console.warn('[catalog] Explicit remote CSV failed, falling back:', remoteErr.message);
+        // Continue to other attempts below
+      }
+    }
+
+    // --- Attempt 1: Local bundled CSV --------
     // When REACT_APP_USE_LOCAL_CSV=true the catalog is loaded from a static
     // wp-catalog.csv file served at the site root.  This covers two cases:
     //
@@ -159,7 +183,7 @@ function loadCatalog() {
       }
     }
 
-    // --- Attempt 1: WooCommerce REST API ------------------------------------
+    // --- Attempt 2: WooCommerce REST API ------------------------------------
     try {
       const products = await fetchFromApi();
       if (products.length > 0) {
@@ -173,9 +197,9 @@ function loadCatalog() {
       console.warn('[catalog] WooCommerce API unavailable, falling back to CSV:', apiErr.message);
     }
 
-    // --- Attempt 2: CSV via PHP proxy endpoint ------------------------------
+    // --- Attempt 3: CSV via PHP proxy endpoint ------------------------------
     try {
-      const products = await fetchFromCsv();
+      const products = await fetchFromCsv(await getCsvUrl(true)); // skip explicit URL, try PHP
       _source = 'csv';
       console.info(`[catalog] Loaded ${products.length} products from PHP proxy CSV`);
       return products;
@@ -183,7 +207,7 @@ function loadCatalog() {
       console.warn('[catalog] PHP proxy CSV failed, trying web-root wp-catalog.csv:', csvErr.message);
     }
 
-    // --- Attempt 3: Web-root wp-catalog.csv ---------------------------------
+    // --- Attempt 4: Web-root wp-catalog.csv ---------------------------------
     // public_html/drywalltoolbox/wp-catalog.csv → served at <origin>/wp-catalog.csv
     try {
       const origin = typeof window !== 'undefined' ? window.location.origin : '';
