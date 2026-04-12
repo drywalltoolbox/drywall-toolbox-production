@@ -101,6 +101,7 @@ export default function Product() {
         title={seoTitle}
         description={seoDesc}
         canonical={seoCanon}
+        noSuffix={!!metaMap['_dtb_seo_title']}
         noindex={seoNoindex}
         og={{ type: 'product', image: heroImage, imageAlt: product.name }}
         schema={[productSchema, breadcrumbSchema].filter(Boolean)}

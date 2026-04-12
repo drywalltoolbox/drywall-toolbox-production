@@ -12,6 +12,7 @@
  *   canonical   {string}          — canonical URL override
  *   og          {object}          — Open Graph overrides: { type, image, imageAlt }
  *   schema      {object|object[]} — JSON-LD schema block(s) to inject
+ *   noSuffix    {boolean}         — skip "| Drywall Toolbox" suffix (use for product pages with full custom titles)
  *   noindex     {boolean}         — emit noindex, nofollow when true
  *   links       {object[]}        — extra <link> tag objects: [{ rel, href, as, type, crossOrigin }]
  */
@@ -28,12 +29,14 @@ export default function SEOHead({
   canonical   = '',
   og          = {},
   schema      = null,
+  noSuffix    = false,
   noindex     = false,
   links       = [],
 }) {
-  // Build final title
+  // Build final title — product pages with a full custom title pass noSuffix=true
+  // to use their full 60-char budget. All other pages get "| Drywall Toolbox" appended.
   const fullTitle = title
-    ? `${title} | ${SITE_NAME}`
+    ? (noSuffix ? title : `${title} | ${SITE_NAME}`)
     : SITE_NAME;
 
   // Truncate description
