@@ -57,22 +57,21 @@ export default function TrendingProducts() {
       // ── Diversified Trending Selection: Automatic Tapers prioritized ─────
       // We specifically look for Automatic Taper products across all brands
       // and ensure they are mixed for diversity.
-      
+
       const taperKeywords = ['automatic taper', 'taper', 'taping tool'];
-      // Exclude Level5 products for now as requested
-      const withPrice = allProducts.filter(p => (p.price || 0) > 0 && (p.brand || '').toLowerCase() !== 'level5');
-      
+      const withPrice = allProducts.filter(p => (p.price || 0) > 0);
+
       // Categorize products into "Tapers" and "Other Main Tools"
       const groupedByBrand = {};
-      
+
       withPrice.forEach(p => {
         const brandName = p.brand || 'Other';
         if (!groupedByBrand[brandName]) {
           groupedByBrand[brandName] = { tapers: [], others: [] };
         }
-        
-        const isTaper = taperKeywords.some(key => 
-          (p.name || '').toLowerCase().includes(key) || 
+
+        const isTaper = taperKeywords.some(key =>
+          (p.name || '').toLowerCase().includes(key) ||
           (p.category || '').toLowerCase().includes(key)
         );
 
@@ -108,10 +107,10 @@ export default function TrendingProducts() {
       balancedSelection.sort((a, b) => {
         const aIsTaper = taperKeywords.some(key => (a.name || '').toLowerCase().includes(key));
         const bIsTaper = taperKeywords.some(key => (b.name || '').toLowerCase().includes(key));
-        
+
         if (aIsTaper && !bIsTaper) return -1;
         if (!aIsTaper && bIsTaper) return 1;
-        
+
         // Equal priority (both tapers or both others): Compare price with brand spacing
         if (Math.abs((b.price || 0) - (a.price || 0)) > 50) {
           return (b.price || 0) - (a.price || 0);

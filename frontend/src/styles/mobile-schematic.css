@@ -14,14 +14,14 @@
   --spacing-md: clamp(16px, 3vw, 24px);
   --spacing-lg: clamp(20px, 4vw, 32px);
   --spacing-xl: clamp(28px, 5vw, 40px);
-  
+
   /* Responsive text sizing */
   --text-xs: clamp(12px, 2vw, 14px);
   --text-sm: clamp(13px, 2.2vw, 16px);
   --text-base: clamp(14px, 2.5vw, 18px);
   --text-lg: clamp(16px, 3vw, 20px);
   --text-xl: clamp(18px, 3.5vw, 24px);
-  
+
   /* Responsive border radius */
   --radius-sm: clamp(4px, 1vw, 6px);
   --radius-md: clamp(6px, 1.5vw, 8px);
@@ -1042,12 +1042,6 @@
   object-fit: contain;
   flex-shrink: 0;
   max-width: clamp(90px, 14vw, 140px);
-}
-
-/* Level5 logo is wider — allow more horizontal room */
-.viewer-brand-logo--level5 {
-  height: clamp(26px, 3.8vw, 38px);
-  max-width: clamp(110px, 16vw, 170px);
 }
 
 /* Columbia logo needs more room too */

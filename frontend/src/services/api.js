@@ -24,7 +24,6 @@ const KNOWN_BRANDS = [
   'TapeTech',
   'Columbia Taping Tools',
   'Asgard',
-  'Level5',
   'SurPro',
   'Graco',
   'Platinum Drywall Tools',

@@ -26,7 +26,7 @@ export default function ToolSelector({ brand, brandLogo, tools, onSelectTool, on
   return (
     <div className="tool-selector">
       <div className="tool-selector-header">
-        <BackButton 
+        <BackButton
           onClick={selectedCategory ? () => {
             setSelectedCategory(null);
             setTimeout(() => window.scrollTo({ top: 0, behavior: 'smooth' }), 0);
@@ -41,7 +41,6 @@ export default function ToolSelector({ brand, brandLogo, tools, onSelectTool, on
               className={[
                 'brand-header-logo',
                 brand === 'Columbia Taping Tools' ? 'brand-header-logo--columbia' : '',
-                brand === 'Level5'                ? 'brand-header-logo--level5'   : '',
               ].filter(Boolean).join(' ')}
             />
           )}
@@ -81,13 +80,13 @@ export default function ToolSelector({ brand, brandLogo, tools, onSelectTool, on
               {/* Image Background */}
               <div className="tool-card-image-bg">
                 {tool.previewImage ? (
-                  <img 
-                    src={tool.previewImage} 
+                  <img
+                    src={tool.previewImage}
                     alt={tool.title}
                   />
                 ) : tool.imagePages && Object.keys(tool.imagePages).length > 0 ? (
-                  <img 
-                    src={tool.imagePages[Object.keys(tool.imagePages)[0]]} 
+                  <img
+                    src={tool.imagePages[Object.keys(tool.imagePages)[0]]}
                     alt={tool.title}
                   />
                 ) : (
@@ -131,13 +130,13 @@ export default function ToolSelector({ brand, brandLogo, tools, onSelectTool, on
               {/* Image Background */}
               <div className="tool-card-image-bg">
                 {tool.previewImage ? (
-                  <img 
-                    src={tool.previewImage} 
+                  <img
+                    src={tool.previewImage}
                     alt={tool.title}
                   />
                 ) : tool.imagePages && Object.keys(tool.imagePages).length > 0 ? (
-                  <img 
-                    src={tool.imagePages[Object.keys(tool.imagePages)[0]]} 
+                  <img
+                    src={tool.imagePages[Object.keys(tool.imagePages)[0]]}
                     alt={tool.title}
                   />
                 ) : (

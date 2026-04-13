@@ -13,9 +13,9 @@ import ProductCardImage from '../components/ProductCardImage';
 import { X } from 'lucide-react';
 import { getProducts } from '../services/catalog';
 import { useCart } from '../context/CartContext';
-import { 
-  ShoppingCart, 
-  Filter, 
+import {
+  ShoppingCart,
+  Filter,
   SlidersHorizontal,
   Heart
 } from 'lucide-react';
@@ -36,7 +36,6 @@ const ALLOWED_BRANDS = [
   'TapeTech',
   'Columbia Taping Tools',
   'Asgard',
-  'Level5',
   'SurPro',
   'Graco',
   'Platinum Drywall Tools',
@@ -97,8 +96,8 @@ export default function AllProducts() {
   }, []);
 
   const toggleBrand = (brand) => {
-    const newBrands = selectedBrands.includes(brand) 
-      ? selectedBrands.filter(b => b !== brand) 
+    const newBrands = selectedBrands.includes(brand)
+      ? selectedBrands.filter(b => b !== brand)
       : [...selectedBrands, brand];
     setSelectedBrands(newBrands);
   };
@@ -186,28 +185,28 @@ export default function AllProducts() {
         if (aBadgePriority !== bBadgePriority) {
           return aBadgePriority - bBadgePriority;
         }
-        
+
         // 2. Sort by number of reviews (more reviews = more popular)
         const aReviews = a.reviews || 0;
         const bReviews = b.reviews || 0;
         if (aReviews !== bReviews) {
           return bReviews - aReviews;
         }
-        
+
         // 3. Sort by rating (higher rating = more popular)
         const aRating = a.rating || 0;
         const bRating = b.rating || 0;
         if (aRating !== bRating) {
           return bRating - aRating;
         }
-        
+
         // 4. Prioritize main products over parts (products with price > $50 are likely main tools)
         const aIsMainTool = (a.price || 0) > 50;
         const bIsMainTool = (b.price || 0) > 50;
         if (aIsMainTool !== bIsMainTool) {
           return aIsMainTool ? -1 : 1;
         }
-        
+
         // 5. Sort by price (higher price main products first, lower price parts)
         return (b.price || 0) - (a.price || 0);
       }
@@ -228,7 +227,7 @@ export default function AllProducts() {
     <div className="min-h-screen bg-gray-50 page-wrapper">
       <SEOHead
         title="All Products"
-        description="Browse our complete collection of professional drywall tools and equipment from top brands including TapeTech, Level5, Columbia, Asgard, and more."
+        description="Browse our complete collection of professional drywall tools and equipment from top brands including TapeTech, Columbia, Asgard, and more."
         canonical="https://drywalltoolbox.com/all-products"
         schema={buildSiteLinksSearchBoxSchema()}
       />
@@ -240,7 +239,7 @@ export default function AllProducts() {
         </div>
 
         {/* Search Bar */}
-        <SearchBar 
+        <SearchBar
           placeholder="Search products by name, SKU, or brand..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
@@ -303,8 +302,8 @@ export default function AllProducts() {
                 >
                   {/* Product Image Container */}
                   <div className="relative bg-gray-50 aspect-square overflow-hidden shrink-0">
-                    <button 
-                      onClick={() => openModal(product)} 
+                    <button
+                      onClick={() => openModal(product)}
                       className="absolute inset-0 w-full h-full"
                     >
                       <ProductCardImage
@@ -313,7 +312,7 @@ export default function AllProducts() {
                         padding="8px"
                       />
                     </button>
-                    
+
                     {/* Badge */}
                     {product.badge && (
                       <div className={`absolute top-2 left-2 px-2 py-1 rounded-md text-xs font-semibold text-white ${
@@ -325,7 +324,7 @@ export default function AllProducts() {
                         {product.badge}
                       </div>
                     )}
-                    
+
                     {/* Wishlist Button */}
                     <button className="absolute top-2 right-2 p-1.5 bg-white/95 rounded-full hover:bg-white transition-all opacity-0 group-hover:opacity-100 shadow-sm hover:shadow-md">
                       <Heart size={16} className="text-gray-500 hover:text-red-500 transition-colors" />
@@ -336,14 +335,14 @@ export default function AllProducts() {
                   <div className="p-3 sm:p-4 flex flex-col grow">
                     {/* Brand */}
                     <p className="text-xs text-gray-500 mb-1 font-medium uppercase tracking-wide">{product.brand}</p>
-                    
+
                     {/* Title */}
                     <h3 className="text-sm sm:text-base font-semibold text-gray-900 mb-2 line-clamp-2 group-hover:text-primary-600 transition-colors grow">
                       <button onClick={() => openModal(product)} className="block text-left w-full hover:text-primary-600">
                         {product.name || product.part_number}
                       </button>
                     </h3>
-                    
+
                     {/* SKU/UPC - Mobile optimized */}
                     <div className="flex flex-wrap gap-2 mb-3 text-xs text-gray-500">
                       {product.sku && (
@@ -414,7 +413,7 @@ export default function AllProducts() {
           </div>
         </div>
       </div>
-      
+
       {/* Toast Notification */}
       {toast && (
         <Toast
@@ -423,7 +422,7 @@ export default function AllProducts() {
           onClose={() => setToast(null)}
         />
       )}
-      
+
       {/* Product Detail Modal */}
       <ProductModal isOpen={isModalOpen && !!modalProduct} product={modalProduct} onClose={closeModal}>
         {modalProduct && (

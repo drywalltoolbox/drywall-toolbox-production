@@ -5,7 +5,7 @@
  * the WooCommerce catalog (products whose `is_parts` flag is true).
  *
  * Includes:
- *   • Brand filter chips (TapeTech, Columbia, Asgard, Level5, Graco)
+ *   • Brand filter chips (TapeTech, Columbia, Asgard, Graco)
  *   • Full-text search (name, SKU, UPC, brand)
  *   • Sort dropdown (popular, price ↑, price ↓)
  *   • Responsive product grid (2–4 columns)
@@ -36,7 +36,6 @@ const PARTS_BRANDS = [
   'TapeTech',
   'Columbia Taping Tools',
   'Asgard',
-  'Level5',
   'Graco',
   'Platinum Drywall Tools',
   'Dura-Stilts',
@@ -48,7 +47,6 @@ const BRAND_TO_SLUG = {
   'TapeTech':              'tapetech',
   'Columbia Taping Tools': 'columbia-taping-tools',
   'Asgard':                'asgard',
-  'Level5':                'level5',
   'Graco':                 'graco',
   'Platinum Drywall Tools': 'platinum',
   'Dura-Stilts':           'dura-stilts',
@@ -189,7 +187,7 @@ export default function Parts() {
     <div className="min-h-screen bg-gray-50 page-wrapper">
       <SEOHead
         title="Replacement Parts"
-        description="Genuine repair kits, replacement parts, and accessories for professional drywall finishing tools. Shop TapeTech, Columbia, Asgard, Level5, and Graco parts."
+        description="Genuine repair kits, replacement parts, and accessories for professional drywall finishing tools. Shop TapeTech, Columbia, Asgard, Graco, and other parts."
         canonical="https://drywalltoolbox.com/parts"
         schema={buildBreadcrumbSchema([
           { label: 'Home',  path: '/'      },

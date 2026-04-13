@@ -68,23 +68,6 @@ export const SCHEMATIC_DEFINITIONS = {
     { id: 'asgard-cr01-ad',  title: 'Inside Corner Roller',                  mpn: 'CR01-AD',  category: 'Rollers'         },
     { id: 'asgard-ns03-ad',  title: '3″ Nail Spotter',                       mpn: 'NS03-AD',  category: 'Spotters'        },
   ],
-  'Level5': [
-    { id: 'level5-corner-roller-4-707',                  title: 'Corner Roller',              mpn: '4-707', category: 'Corner Rollers'    },
-    { id: 'level5-9333-cutter-chain-assembly',            title: 'Cutter Chain Assembly',      mpn: '9333',  category: 'Automatic Tapers'  },
-    { id: 'level5-7097-drive-dog-assembly',               title: 'Drive Dog Assembly',         mpn: '7097',  category: 'Automatic Tapers'  },
-    { id: 'level5-7293-gooser-assembly',                  title: 'Gooser Assembly',            mpn: '7293',  category: 'Automatic Tapers'  },
-    { id: 'level5-7218-taper-wheel-assembly',             title: 'Taper Wheel Assembly',       mpn: '7218',  category: 'Automatic Tapers'  },
-    { id: 'level5-7377-cover-plate-assembly-old-style',   title: 'Cover Plate Assembly',       mpn: '7377',  category: 'Automatic Tapers'  },
-    { id: 'level5-4-734-3-5-corner-finisher',             title: '3.5" Corner Finisher',       mpn: '4-734', category: 'Corner Finishers'  },
-    { id: 'level5-7-inch-flat-box-4-764',                 title: '7" Flat Box',                mpn: '4-764', category: 'Finishing Boxes'   },
-    { id: 'level5-7-inch-mega-flat-box-4-767',            title: '7" Mega Flat Box',           mpn: '4-767', category: 'Finishing Boxes'   },
-    { id: 'level5-10-inch-flat-box-4-765',                title: '10" Flat Box',               mpn: '4-765', category: 'Finishing Boxes'   },
-    { id: 'level5-10-inch-mega-flat-box-4-768',           title: '10" Mega Flat Box',          mpn: '4-768', category: 'Finishing Boxes'   },
-    { id: 'level5-12-inch-flat-box-4-766',                title: '12" Flat Box',               mpn: '4-766', category: 'Finishing Boxes'   },
-    { id: 'level5-12-inch-mega-box-4-769',                title: '12" Mega Box',               mpn: '4-769', category: 'Finishing Boxes'   },
-    { id: 'level5-14-inch-flat-box-4-770',                title: '14" Flat Box',               mpn: '4-770', category: 'Finishing Boxes'   },
-    { id: 'level5-compound-pump-4-771',                   title: 'Compound Pump',              mpn: '4-771', category: 'Pumps'             },
-  ],
   'Platinum Drywall Tools': [
     { id: 'platinum-compound-pump',          title: 'Compound Pump',         mpn: 'PDT-CP',  category: 'Pumps'             },
     { id: 'platinum-flat-box',               title: 'Flat Box',              mpn: 'PDT-FB',  category: 'Finishing Boxes'   },
@@ -133,7 +116,7 @@ export const PRODUCT_SEARCH_MAPPINGS = {
 export function filterProductsWithSchematics(allProducts, brand = null) {
   const targetBrand = brand || 'Columbia Taping Tools';
   const schematicsForBrand = SCHEMATIC_DEFINITIONS[targetBrand];
-  
+
   if (!schematicsForBrand) return [];
 
   // Create search terms from all schematic titles
@@ -150,9 +133,9 @@ export function filterProductsWithSchematics(allProducts, brand = null) {
   // Filter products where brand matches and name/description contains search terms
   return allProducts.filter(product => {
     if (product.brand !== targetBrand) return false;
-    
+
     const searchText = `${product.name} ${product.short_description || ''} ${product.description_full || ''}`.toLowerCase();
-    
+
     // Check if any search term appears in product
     return searchTerms.some(term => searchText.includes(term.toLowerCase()));
   });
@@ -165,12 +148,12 @@ export function filterProductsWithSchematics(allProducts, brand = null) {
  */
 export function getAllProductsWithSchematics(allProducts) {
   let result = [];
-  
+
   Object.keys(SCHEMATIC_DEFINITIONS).forEach(brand => {
     const brandProducts = filterProductsWithSchematics(allProducts, brand);
     result = [...result, ...brandProducts];
   });
-  
+
   // Remove duplicates by SKU
   const uniqueProducts = {};
   result.forEach(product => {
@@ -178,7 +161,7 @@ export function getAllProductsWithSchematics(allProducts) {
       uniqueProducts[product.sku] = product;
     }
   });
-  
+
   return Object.values(uniqueProducts);
 }
 
@@ -190,36 +173,36 @@ export function getAllProductsWithSchematics(allProducts) {
  */
 export function getSchematicToProductMap(allProducts) {
   const map = {};
-  
+
   Object.entries(SCHEMATIC_DEFINITIONS).forEach(([brand, schematics]) => {
     const brandProducts = filterProductsWithSchematics(allProducts, brand);
-    
+
     schematics.forEach(schematic => {
       // Find first matching product for this schematic
       const matchingProduct = brandProducts.find(product => {
         const searchText = `${product.name} ${product.short_description || ''} ${product.description_full || ''}`.toLowerCase();
         const mapping = PRODUCT_SEARCH_MAPPINGS[schematic.title];
-        
+
         if (mapping) {
           return mapping.some(term => searchText.includes(term.toLowerCase()));
         }
-        
+
         return searchText.includes(schematic.title.toLowerCase());
       });
-      
+
       if (matchingProduct) {
         map[schematic.id] = matchingProduct;
       }
     });
   });
-  
+
   return map;
 }
 
 /**
  * Returns the schematic ID that best matches the given product, or null if
  * no schematic exists for it.  Covers Columbia Taping Tools, TapeTech,
- * Asgard, and Level5.
+ * Asgard, and more.
  *
  * Matching priority: SKU-exact match first (most reliable), then
  * more-specific keyword checks before catch-all checks for the same family.
@@ -305,14 +288,6 @@ export function getSchematicIdForProduct(product) {
     if (name.includes('compound loading pump') || (name.includes('loading pump'))) return 'asgard-lp01-ad';
     if (name.includes('inside corner roller')) return 'asgard-cr01-ad';
     if (name.includes('nail spotter') || name.includes('nailspotter')) return 'asgard-ns03-ad';
-    return null;
-  }
-
-  // ── Level5 ────────────────────────────────────────────────────────────────
-  if (brand === 'Level5') {
-    if (sku.includes('4-707') || sku.includes('4707') || name.includes('corner roller')) {
-      return 'level5-corner-roller-4-707';
-    }
     return null;
   }
 
@@ -442,7 +417,6 @@ const BRAND_TO_SLUG = {
   'Columbia Taping Tools': 'columbia-taping-tools',
   'TapeTech': 'tapetech',
   'Asgard': 'asgard',
-  'Level5': 'level5',
   'Dura-Stilts': 'dura-stilts',
 };
 

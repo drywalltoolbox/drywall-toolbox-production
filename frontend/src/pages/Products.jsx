@@ -13,9 +13,9 @@ import ProductCardImage from '../components/ProductCardImage';
 import { X } from 'lucide-react';
 import { getProducts } from '../services/catalog';
 import { useCart } from '../context/CartContext';
-import { 
-  ShoppingCart, 
-  Filter, 
+import {
+  ShoppingCart,
+  Filter,
   Heart
 } from 'lucide-react';
 import tapeTechLogo from '/brands/TapeTech/tapetech_logo.svg';
@@ -23,7 +23,6 @@ import columbiaLogo from '/brands/Columbia/columbia_taping_tools_logo.svg';
 import surproLogo from '/brands/SurPro/surpro_logo.svg';
 import asgardLogo from '/brands/Asgard/asgard_logo.svg';
 import gracoLogo from '/brands/Graco/graco_logo.svg';
-import level5Logo from '/brands/Level5/Level5.svg';
 import platinumLogo from '/brands/Platinum/platinum_logo.svg';
 import duraStiltsLogo from '/brands/Dura-Stilts/dura-stilts-logo.svg';
 import SEOHead from '../components/SEOHead';
@@ -44,7 +43,6 @@ const ALLOWED_BRANDS = [
   'TapeTech',
   'Columbia Taping Tools',
   'Asgard',
-  'Level5',
   'SurPro',
   'Graco',
   'Platinum Drywall Tools',
@@ -60,7 +58,6 @@ const BRAND_TO_SLUG = {
   'TapeTech':              'tapetech',
   'Columbia Taping Tools': 'columbia-taping-tools',
   'Asgard':                'asgard',
-  'Level5':                'level5',
   'SurPro':                'surpro',
   'Graco':                 'graco',
   'Platinum Drywall Tools': 'platinum',
@@ -76,7 +73,6 @@ const brandLogos = {
   'SurPro': surproLogo,
   'Asgard': asgardLogo,
   'Graco': gracoLogo,
-  'Level5': level5Logo,
   'Platinum Drywall Tools': platinumLogo,
   'Dura-Stilts': duraStiltsLogo,
 };
@@ -91,7 +87,7 @@ export default function Products() {
   const brandParam = params.get('brand');
   const searchParam = params.get('search');
   const pageParam = parseInt(params.get('page') || '1', 10);
-  const initialSelectedBrands = brandParam 
+  const initialSelectedBrands = brandParam
     ? brandParam
         .split(',')
         .map(b => b.trim())
@@ -139,11 +135,11 @@ export default function Products() {
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
   }, []);
-  
+
 
   const toggleBrand = (brand) => {
-    const newBrands = selectedBrands.includes(brand) 
-      ? selectedBrands.filter(b => b !== brand) 
+    const newBrands = selectedBrands.includes(brand)
+      ? selectedBrands.filter(b => b !== brand)
       : [...selectedBrands, brand];
     setSelectedBrands(newBrands);
   };
@@ -178,14 +174,14 @@ export default function Products() {
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const brandParam = params.get('brand');
-    const brandsFromUrl = brandParam 
+    const brandsFromUrl = brandParam
       ? brandParam.split(',').map(b => decodeURIComponent(b.trim())).filter(Boolean).filter(brand => ALLOWED_BRANDS.includes(brand))
       : [];
-    
+
     // Compare as sorted sets to avoid order issues (create copies to avoid mutation)
     const urlBrandsSet = [...brandsFromUrl].sort().join(',');
     const currentBrandsSet = [...selectedBrands].sort().join(',');
-    
+
     if (urlBrandsSet !== currentBrandsSet) {
       // Defer the state update to avoid synchronous setState inside an effect
       // which can cause cascading renders. Scheduling the update asynchronously
@@ -202,7 +198,7 @@ export default function Products() {
     const currentSearchParam = params.get('search') || '';
     const currentPageParam   = params.get('page')   || '';
 
-    const expectedBrandParam  = selectedBrands.length > 0 
+    const expectedBrandParam  = selectedBrands.length > 0
       ? selectedBrands.map(b => encodeURIComponent(b)).join(',')
       : '';
     const expectedSearchParam = searchQuery ? encodeURIComponent(searchQuery) : '';
@@ -272,28 +268,28 @@ export default function Products() {
         if (aBadgePriority !== bBadgePriority) {
           return aBadgePriority - bBadgePriority;
         }
-        
+
         // 2. Sort by number of reviews (more reviews = more popular)
         const aReviews = a.reviews || 0;
         const bReviews = b.reviews || 0;
         if (aReviews !== bReviews) {
           return bReviews - aReviews;
         }
-        
+
         // 3. Sort by rating (higher rating = more popular)
         const aRating = a.rating || 0;
         const bRating = b.rating || 0;
         if (aRating !== bRating) {
           return bRating - aRating;
         }
-        
+
         // 4. Prioritize main products over parts (products with price > $50 are likely main tools)
         const aIsMainTool = (a.price || 0) > 50;
         const bIsMainTool = (b.price || 0) > 50;
         if (aIsMainTool !== bIsMainTool) {
           return aIsMainTool ? -1 : 1;
         }
-        
+
         // 5. Sort by price (higher price main products first, lower price parts)
         return (b.price || 0) - (a.price || 0);
       }
@@ -314,7 +310,7 @@ export default function Products() {
     <div className="min-h-screen bg-gray-50 page-wrapper">
       <SEOHead
         title="Products"
-        description="Shop professional drywall tools from TapeTech, Level5, Columbia, Asgard, Graco, SurPro and more. Automatic taping tools, finishing tools, mud boxes, and replacement parts."
+        description="Shop professional drywall tools from TapeTech, Columbia, Asgard, Graco, SurPro and more. Automatic taping tools, finishing tools, mud boxes, and replacement parts."
         canonical="https://drywalltoolbox.com/products"
         schema={buildSiteLinksSearchBoxSchema()}
       />
@@ -322,7 +318,7 @@ export default function Products() {
         {/* Back to Brands button - shows when brand is selected (moved above header) */}
         {selectedBrands.length > 0 && (
           <div className="mb-6">
-            <BackButton 
+            <BackButton
               onClick={resetToBrandList}
               label="Brands"
             />
@@ -337,7 +333,7 @@ export default function Products() {
 
         {/* Search Bar - Only shown when brand is selected */}
         {selectedBrands.length > 0 && (
-          <SearchBar 
+          <SearchBar
             placeholder="Search products by name, SKU, or brand..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
@@ -384,7 +380,7 @@ export default function Products() {
                     src={brandLogos[brand]}
                     alt={`${brand} logo`}
                     style={{
-                      height: ['Columbia Taping Tools', 'Graco', 'Level5'].includes(brand)
+                      height: ['Columbia Taping Tools', 'Graco'].includes(brand)
                         ? 'clamp(5.5rem, 16vw, 8rem)'
                         : 'clamp(4rem, 12vw, 6rem)',
                       width: 'auto',
@@ -465,8 +461,8 @@ export default function Products() {
                 >
                   {/* Product Image Container */}
                   <div className="relative bg-gray-50 aspect-square overflow-hidden shrink-0">
-                    <button 
-                      onClick={() => openModal(product)} 
+                    <button
+                      onClick={() => openModal(product)}
                       className="absolute inset-0 w-full h-full"
                     >
                       <ProductCardImage
@@ -475,7 +471,7 @@ export default function Products() {
                         padding="8px"
                       />
                     </button>
-                    
+
                     {/* Badge */}
                     {product.badge && (
                       <div className={`absolute top-2 left-2 px-2 py-1 rounded-md text-xs font-semibold text-white ${
@@ -487,7 +483,7 @@ export default function Products() {
                         {product.badge}
                       </div>
                     )}
-                    
+
                     {/* Wishlist Button */}
                     <button className="absolute top-2 right-2 p-1.5 bg-white/95 rounded-full hover:bg-white transition-all opacity-0 group-hover:opacity-100 shadow-sm hover:shadow-md">
                       <Heart size={16} className="text-gray-500 hover:text-red-500 transition-colors" />
@@ -498,14 +494,14 @@ export default function Products() {
                   <div className="p-3 sm:p-4 flex flex-col grow">
                     {/* Brand */}
                     <p className="text-xs text-gray-500 mb-1 font-medium uppercase tracking-wide">{product.brand}</p>
-                    
+
                     {/* Title */}
                     <h3 className="text-sm sm:text-base font-semibold text-gray-900 mb-2 line-clamp-2 group-hover:text-primary-600 transition-colors grow">
                       <button onClick={() => openModal(product)} className="block text-left w-full hover:text-primary-600">
                         {product.name || product.part_number}
                       </button>
                     </h3>
-                    
+
                     {/* SKU/UPC - Mobile optimized */}
                     <div className="flex flex-wrap gap-2 mb-3 text-xs text-gray-500">
                       {product.sku && (
@@ -578,7 +574,7 @@ export default function Products() {
           </div>
         )}
       </div>
-      
+
       {/* Toast Notification */}
       {toast && (
         <Toast
@@ -587,7 +583,7 @@ export default function Products() {
           onClose={() => setToast(null)}
         />
       )}
-      
+
       {/* Product Detail Modal */}
       <ProductModal isOpen={isModalOpen && !!modalProduct} product={modalProduct} onClose={closeModal}>
         {modalProduct && (

@@ -3,7 +3,6 @@ import columbiaLogo from '/brands/Columbia/columbia_taping_tools_logo.svg';
 import surproLogo from '/brands/SurPro/surpro_logo.svg';
 import asgardLogo from '/brands/Asgard/asgard_logo.svg';
 import gracoLogo from '/brands/Graco/graco_logo.svg';
-import level5Logo from '/brands/Level5/Level5.svg';
 import platinumLogo from '/brands/Platinum/platinum_logo.svg';
 import duraStiltsLogo from '/brands/Dura-Stilts/dura-stilts-logo.svg';
 import SearchBar from './SearchBar';
@@ -14,7 +13,6 @@ const brandLogos = {
   'SurPro': surproLogo,
   'Asgard': asgardLogo,
   'Graco': gracoLogo,
-  'Level5': level5Logo,
   'Platinum Drywall Tools': platinumLogo,
   'Dura-Stilts': duraStiltsLogo,
 };
@@ -182,7 +180,7 @@ export default function BrandSelector({
                 src={brandLogos[brand]}
                 alt={`${brand} logo`}
                 style={{
-                  height: ['Columbia Taping Tools', 'Graco', 'Level5'].includes(brand)
+                  height: ['Columbia Taping Tools', 'Graco'].includes(brand)
                     ? 'clamp(5.5rem, 16vw, 8rem)'
                     : 'clamp(4rem, 12vw, 6rem)',
                   width: 'auto',

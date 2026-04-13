@@ -17,7 +17,6 @@ import columbiaLogo from '/brands/Columbia/columbia_taping_tools_logo.svg';
 import surproLogo from '/brands/SurPro/surpro_logo.svg';
 import asgardLogo from '/brands/Asgard/asgard_logo.svg';
 import gracoLogo from '/brands/Graco/graco_logo.svg';
-import level5Logo from '/brands/Level5/Level5.svg';
 import platinumLogo from '/brands/Platinum/platinum_logo.svg';
 import duraStiltsLogo from '/brands/Dura-Stilts/dura-stilts-logo.svg';
 
@@ -27,7 +26,6 @@ const brandLogos = {
   'SurPro': surproLogo,
   'Asgard': asgardLogo,
   'Graco': gracoLogo,
-  'Level5': level5Logo,
   'Platinum Drywall Tools': platinumLogo,
   'Dura-Stilts': duraStiltsLogo,
 };
@@ -104,25 +102,6 @@ import asgardLP01ADData    from '/brands/Asgard/Schematics/Pumps/LP01-AD/schemat
 import asgardCR01ADData    from '/brands/Asgard/Schematics/Rollers/CR01-AD/schematic_data.json';
 import asgardNS03ADData    from '/brands/Asgard/Schematics/Spotters/NS03-AD/schematic_data.json';
 import asgardAT01ADData    from '/brands/Asgard/Schematics/Tapers/AT01-AD/schematic_data.json';
-
-// ---------------------------------------------------------------------------
-// Level5 schematic JSON data imports
-// ---------------------------------------------------------------------------
-import level5CornerRollerData         from '/brands/Level5/Schematics/CornerRollers/Corner-Roller/schematic_data.json';
-import level5CutterChainAssemblyData  from '/brands/Level5/Schematics/AutomaticTapers/Cutter-Chain-Assembly/schematic_data.json';
-import level5DriveDogAssemblyData     from '/brands/Level5/Schematics/AutomaticTapers/Drive-Dog-Assembly/schematic_data.json';
-import level5GooserAssemblyData       from '/brands/Level5/Schematics/AutomaticTapers/Gooser-Assembly/schematic_data.json';
-import level5TaperWheelAssemblyData   from '/brands/Level5/Schematics/AutomaticTapers/Taper-Wheel-Assembly/schematic_data.json';
-import level5CoverPlateAssemblyData   from '/brands/Level5/Schematics/AutomaticTapers/Cover-Plate-Assembly/schematic_data.json';
-import level5CornerFinisher35Data     from '/brands/Level5/Schematics/CornerFinishers/3.5-inch-Corner-Finisher/schematic_data.json';
-import level57inFlatBoxData           from '/brands/Level5/Schematics/FinishingBoxes/7-inch-Flat-Box/schematic_data.json';
-import level57inMegaFlatBoxData       from '/brands/Level5/Schematics/FinishingBoxes/7-inch-Mega-Flat-Box/schematic_data.json';
-import level510inFlatBoxData          from '/brands/Level5/Schematics/FinishingBoxes/10-inch-Flat-Box/schematic_data.json';
-import level510inMegaFlatBoxData      from '/brands/Level5/Schematics/FinishingBoxes/10-inch-Mega-Flat-Box/schematic_data.json';
-import level512inFlatBoxData          from '/brands/Level5/Schematics/FinishingBoxes/12-inch-Flat-Box/schematic_data.json';
-import level512inMegaBoxData          from '/brands/Level5/Schematics/FinishingBoxes/12-inch-Mega-Box/schematic_data.json';
-import level514inFlatBoxData          from '/brands/Level5/Schematics/FinishingBoxes/14-inch-Flat-Box/schematic_data.json';
-import level5CompoundPumpData         from '/brands/Level5/Schematics/Pumps/Compound-Pump/schematic_data.json';
 
 // ---------------------------------------------------------------------------
 // Platinum schematic JSON data imports
@@ -421,69 +400,6 @@ const _fallbacks = {
     preview: `${_BASE}brands/Asgard/Schematics/Tapers/AT01-AD/images/AT01-AD_preview.webp`,
   },
 
-  // ── Level5 ────────────────────────────────────────────────────────────────
-  'level5-corner-roller-4-707': {
-    pages:   { 1: `${_BASE}brands/Level5/Schematics/CornerRollers/Corner-Roller/4-707_SCH-page-001.webp` },
-    preview: `${_BASE}brands/Level5/Schematics/CornerRollers/Corner-Roller/4-707_preview.webp`,
-  },
-  'level5-9333-cutter-chain-assembly': {
-    pages:   { 1: `${_BASE}brands/Level5/Schematics/AutomaticTapers/Cutter-Chain-Assembly/9333_SCH-page-001.webp` },
-    preview: `${_BASE}brands/Level5/Schematics/AutomaticTapers/Cutter-Chain-Assembly/9333_SCH-page-001.webp`,
-  },
-  'level5-7097-drive-dog-assembly': {
-    pages:   { 1: `${_BASE}brands/Level5/Schematics/AutomaticTapers/Drive-Dog-Assembly/7097_SCH-page-001.webp` },
-    preview: `${_BASE}brands/Level5/Schematics/AutomaticTapers/Drive-Dog-Assembly/7097_SCH-page-001.webp`,
-  },
-  'level5-7293-gooser-assembly': {
-    pages:   { 1: `${_BASE}brands/Level5/Schematics/AutomaticTapers/Gooser-Assembly/7293_SCH-page-001.webp` },
-    preview: `${_BASE}brands/Level5/Schematics/AutomaticTapers/Gooser-Assembly/7293_SCH-page-001.webp`,
-  },
-  'level5-7218-taper-wheel-assembly': {
-    pages:   { 1: `${_BASE}brands/Level5/Schematics/AutomaticTapers/Taper-Wheel-Assembly/7218_SCH-page-001.webp` },
-    preview: `${_BASE}brands/Level5/Schematics/AutomaticTapers/Taper-Wheel-Assembly/7218_SCH-page-001.webp`,
-  },
-  'level5-7377-cover-plate-assembly-old-style': {
-    pages:   { 1: `${_BASE}brands/Level5/Schematics/AutomaticTapers/Cover-Plate-Assembly/7377_SCH-page-001.webp` },
-    preview: `${_BASE}brands/Level5/Schematics/AutomaticTapers/Cover-Plate-Assembly/7377_SCH-page-001.webp`,
-  },
-  'level5-4-734-3-5-corner-finisher': {
-    pages:   { 1: `${_BASE}brands/Level5/Schematics/CornerFinishers/3.5-inch-Corner-Finisher/4-734_SCH-page-001.webp` },
-    preview: `${_BASE}brands/Level5/Schematics/CornerFinishers/3.5-inch-Corner-Finisher/4-734_SCH-page-001.webp`,
-  },
-  'level5-7-inch-flat-box-4-764': {
-    pages:   { 1: `${_BASE}brands/Level5/Schematics/FinishingBoxes/7-inch-Flat-Box/4-764_SCH-page-001.webp` },
-    preview: `${_BASE}brands/Level5/Schematics/FinishingBoxes/7-inch-Flat-Box/4-764_SCH-page-001.webp`,
-  },
-  'level5-7-inch-mega-flat-box-4-767': {
-    pages:   { 1: `${_BASE}brands/Level5/Schematics/FinishingBoxes/7-inch-Mega-Flat-Box/4-767_SCH-page-001.webp` },
-    preview: `${_BASE}brands/Level5/Schematics/FinishingBoxes/7-inch-Mega-Flat-Box/4-767_SCH-page-001.webp`,
-  },
-  'level5-10-inch-flat-box-4-765': {
-    pages:   { 1: `${_BASE}brands/Level5/Schematics/FinishingBoxes/10-inch-Flat-Box/4-765_SCH-page-001.webp` },
-    preview: `${_BASE}brands/Level5/Schematics/FinishingBoxes/10-inch-Flat-Box/4-765_SCH-page-001.webp`,
-  },
-  'level5-10-inch-mega-flat-box-4-768': {
-    pages:   { 1: `${_BASE}brands/Level5/Schematics/FinishingBoxes/10-inch-Mega-Flat-Box/4-768_SCH-page-001.webp` },
-    preview: `${_BASE}brands/Level5/Schematics/FinishingBoxes/10-inch-Mega-Flat-Box/4-768_SCH-page-001.webp`,
-  },
-  'level5-12-inch-flat-box-4-766': {
-    pages:   { 1: `${_BASE}brands/Level5/Schematics/FinishingBoxes/12-inch-Flat-Box/4-766_SCH-page-001.webp` },
-    preview: `${_BASE}brands/Level5/Schematics/FinishingBoxes/12-inch-Flat-Box/4-766_SCH-page-001.webp`,
-  },
-  'level5-12-inch-mega-box-4-769': {
-    pages:   { 1: `${_BASE}brands/Level5/Schematics/FinishingBoxes/12-inch-Mega-Box/4-769_SCH-page-001.webp` },
-    preview: `${_BASE}brands/Level5/Schematics/FinishingBoxes/12-inch-Mega-Box/4-769_SCH-page-001.webp`,
-  },
-  // 14" Flat Box has no static image yet; entry kept for WP Media Library pickup
-  'level5-14-inch-flat-box-4-770': {
-    pages:   {},
-    preview: undefined,
-  },
-  'level5-compound-pump-4-771': {
-    pages:   { 1: `${_BASE}brands/Level5/Schematics/Pumps/Compound-Pump/4-771_SCH-page-001.webp` },
-    preview: `${_BASE}brands/Level5/Schematics/Pumps/Compound-Pump/4-771_SCH-page-001.webp`,
-  },
-
   // ── Platinum ──────────────────────────────────────────────────────────────
   'platinum-compound-pump': {
     pages:   { 1: `${_BASE}brands/Platinum/Schematics/CompoundPump/PT-Compound-Pump-page-001.webp` },
@@ -517,7 +433,6 @@ const BRAND_TO_SLUG = {
   'TapeTech':              'tapetech',
   'Columbia Taping Tools': 'columbia-taping-tools',
   'Asgard':                'asgard',
-  'Level5':                'level5',
   'SurPro':                'surpro',
   'Graco':                 'graco',
   'Platinum Drywall Tools': 'platinum',
@@ -537,18 +452,15 @@ Object.entries(SCHEMATIC_DEFINITIONS).forEach(([brand, list]) => {
 
 export default function Parts() {
   // Allowed brands to display
-  const ALLOWED_BRANDS = [
-    'TapeTech',
-    'Columbia Taping Tools',
-    'Asgard',
-    'Level5',
-    'SurPro',
-    'Graco',
-    'Platinum Drywall Tools',
-    'Dura-Stilts',
-  ];
-
-  const location = useLocation();
+const ALLOWED_BRANDS = [
+  'TapeTech',
+  'Columbia Taping Tools',
+  'Asgard',
+  'SurPro',
+  'Graco',
+  'Platinum Drywall Tools',
+  'Dura-Stilts',
+];  const location = useLocation();
   const navigate = useNavigate();
 
   // WP Media Library schematic manifest (WebP, preferred over static fallbacks)
@@ -582,7 +494,7 @@ export default function Parts() {
     () => _initSchematicId ?? null
   );
   const [searchQuery, setSearchQuery] = useState('');
-  
+
   // Schematic viewer state
   const [activeHotspot, setActiveHotspot] = useState(null);
   const [activeHotspotPart, setActiveHotspotPart] = useState(null);
@@ -594,16 +506,16 @@ export default function Parts() {
   const [toast, setToast] = useState(null);
   const [brands, setBrands] = useState([]);
   const { addToCart } = useCart();
-  
+
   // Mobile zoom/pan state
   const [scale, setScale] = useState(1);
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [isMobile, setIsMobile] = useState(typeof window !== 'undefined' ? window.innerWidth <= 768 : false);
   const [isPanning, setIsPanning] = useState(false);
-  
+
   // Fullscreen is always enabled on mobile, never on desktop
   const isFullscreen = isMobile;
-  
+
   // Track window resize for mobile detection
   useEffect(() => {
     const handleResize = () => {
@@ -622,7 +534,7 @@ export default function Parts() {
   const pinchRef = useRef({ active: false, initDist: 0, initScale: 1, initPanX: 0, initPanY: 0, centerX: 0, centerY: 0 });
   // Ref to track any active gesture for synchronous transition control
   const gestureActiveRef = useRef(false);
-  
+
   const schematicContainerRef = useRef(null);
   const schematicImageRef = useRef(null);
   // Ref to the detached desktop part-modal rendered outside the transform context
@@ -795,23 +707,6 @@ export default function Parts() {
   const asgardCR01ADParts    = buildPartsFromData(asgardCR01ADData);
   const asgardNS03ADParts    = buildPartsFromData(asgardNS03ADData);
   const asgardAT01ADParts    = buildPartsFromData(asgardAT01ADData);
-
-  // Level5 parts arrays
-  const level5CornerRollerParts        = buildPartsFromData(level5CornerRollerData);
-  const level5CutterChainAssemblyParts = buildPartsFromData(level5CutterChainAssemblyData);
-  const level5DriveDogAssemblyParts    = buildPartsFromData(level5DriveDogAssemblyData);
-  const level5GooserAssemblyParts      = buildPartsFromData(level5GooserAssemblyData);
-  const level5TaperWheelAssemblyParts  = buildPartsFromData(level5TaperWheelAssemblyData);
-  const level5CoverPlateAssemblyParts  = buildPartsFromData(level5CoverPlateAssemblyData);
-  const level5CornerFinisher35Parts    = buildPartsFromData(level5CornerFinisher35Data);
-  const level57inFlatBoxParts          = buildPartsFromData(level57inFlatBoxData);
-  const level57inMegaFlatBoxParts      = buildPartsFromData(level57inMegaFlatBoxData);
-  const level510inFlatBoxParts         = buildPartsFromData(level510inFlatBoxData);
-  const level510inMegaFlatBoxParts     = buildPartsFromData(level510inMegaFlatBoxData);
-  const level512inFlatBoxParts         = buildPartsFromData(level512inFlatBoxData);
-  const level512inMegaBoxParts         = buildPartsFromData(level512inMegaBoxData);
-  const level514inFlatBoxParts         = buildPartsFromData(level514inFlatBoxData);
-  const level5CompoundPumpParts        = buildPartsFromData(level5CompoundPumpData);
 
   // Platinum parts arrays
   const platinumCompoundPumpParts       = buildPartsFromData(platinumCompoundPumpData);
@@ -1542,172 +1437,6 @@ export default function Parts() {
       parts: asgardNS03ADParts
     },
 
-    // ── Level5 ───────────────────────────────────────────────────────────────
-    {
-      id: 'level5-corner-roller-4-707',
-      title: 'Corner Roller',
-      description: 'Level5 Corner Roller schematic diagram with parts hotspots',
-      brand: 'Level5',
-      category: 'Corner Rollers',
-      diagramPages: [1],
-      imagePages: { 1: schImg('level5-corner-roller-4-707', 1) },
-      previewImage: schPrev('level5-corner-roller-4-707'),
-      parts: level5CornerRollerParts
-    },
-    {
-      id: 'level5-9333-cutter-chain-assembly',
-      title: 'Cutter Chain Assembly',
-      description: 'Level5 Cutter Chain Assembly schematic diagram with parts hotspots',
-      brand: 'Level5',
-      category: 'Automatic Tapers',
-      diagramPages: [1],
-      imagePages: { 1: schImg('level5-9333-cutter-chain-assembly', 1) },
-      previewImage: schPrev('level5-9333-cutter-chain-assembly'),
-      parts: level5CutterChainAssemblyParts
-    },
-    {
-      id: 'level5-7097-drive-dog-assembly',
-      title: 'Drive Dog Assembly',
-      description: 'Level5 Drive Dog Assembly schematic diagram with parts hotspots',
-      brand: 'Level5',
-      category: 'Automatic Tapers',
-      diagramPages: [1],
-      imagePages: { 1: schImg('level5-7097-drive-dog-assembly', 1) },
-      previewImage: schPrev('level5-7097-drive-dog-assembly'),
-      parts: level5DriveDogAssemblyParts
-    },
-    {
-      id: 'level5-7293-gooser-assembly',
-      title: 'Gooser Assembly',
-      description: 'Level5 Gooser Assembly schematic diagram with parts hotspots',
-      brand: 'Level5',
-      category: 'Automatic Tapers',
-      diagramPages: [1],
-      imagePages: { 1: schImg('level5-7293-gooser-assembly', 1) },
-      previewImage: schPrev('level5-7293-gooser-assembly'),
-      parts: level5GooserAssemblyParts
-    },
-    {
-      id: 'level5-7218-taper-wheel-assembly',
-      title: 'Taper Wheel Assembly',
-      description: 'Level5 Taper Wheel Assembly schematic diagram with parts hotspots',
-      brand: 'Level5',
-      category: 'Automatic Tapers',
-      diagramPages: [1],
-      imagePages: { 1: schImg('level5-7218-taper-wheel-assembly', 1) },
-      previewImage: schPrev('level5-7218-taper-wheel-assembly'),
-      parts: level5TaperWheelAssemblyParts
-    },
-    {
-      id: 'level5-7377-cover-plate-assembly-old-style',
-      title: 'Cover Plate Assembly',
-      description: 'Level5 Cover Plate Assembly schematic diagram',
-      brand: 'Level5',
-      category: 'Automatic Tapers',
-      diagramPages: [1],
-      imagePages: { 1: schImg('level5-7377-cover-plate-assembly-old-style', 1) },
-      previewImage: schPrev('level5-7377-cover-plate-assembly-old-style'),
-      parts: level5CoverPlateAssemblyParts
-    },
-    {
-      id: 'level5-4-734-3-5-corner-finisher',
-      title: '3.5" Corner Finisher',
-      description: 'Level5 3.5" Corner Finisher schematic diagram with parts hotspots',
-      brand: 'Level5',
-      category: 'Corner Finishers',
-      diagramPages: [1],
-      imagePages: { 1: schImg('level5-4-734-3-5-corner-finisher', 1) },
-      previewImage: schPrev('level5-4-734-3-5-corner-finisher'),
-      parts: level5CornerFinisher35Parts
-    },
-    {
-      id: 'level5-7-inch-flat-box-4-764',
-      title: '7" Flat Box',
-      description: 'Level5 7" Flat Box schematic diagram',
-      brand: 'Level5',
-      category: 'Finishing Boxes',
-      diagramPages: [1],
-      imagePages: { 1: schImg('level5-7-inch-flat-box-4-764', 1) },
-      previewImage: schPrev('level5-7-inch-flat-box-4-764'),
-      parts: level57inFlatBoxParts
-    },
-    {
-      id: 'level5-7-inch-mega-flat-box-4-767',
-      title: '7" Mega Flat Box',
-      description: 'Level5 7" Mega Flat Box schematic diagram',
-      brand: 'Level5',
-      category: 'Finishing Boxes',
-      diagramPages: [1],
-      imagePages: { 1: schImg('level5-7-inch-mega-flat-box-4-767', 1) },
-      previewImage: schPrev('level5-7-inch-mega-flat-box-4-767'),
-      parts: level57inMegaFlatBoxParts
-    },
-    {
-      id: 'level5-10-inch-flat-box-4-765',
-      title: '10" Flat Box',
-      description: 'Level5 10" Flat Box schematic diagram',
-      brand: 'Level5',
-      category: 'Finishing Boxes',
-      diagramPages: [1],
-      imagePages: { 1: schImg('level5-10-inch-flat-box-4-765', 1) },
-      previewImage: schPrev('level5-10-inch-flat-box-4-765'),
-      parts: level510inFlatBoxParts
-    },
-    {
-      id: 'level5-10-inch-mega-flat-box-4-768',
-      title: '10" Mega Flat Box',
-      description: 'Level5 10" Mega Flat Box schematic diagram',
-      brand: 'Level5',
-      category: 'Finishing Boxes',
-      diagramPages: [1],
-      imagePages: { 1: schImg('level5-10-inch-mega-flat-box-4-768', 1) },
-      previewImage: schPrev('level5-10-inch-mega-flat-box-4-768'),
-      parts: level510inMegaFlatBoxParts
-    },
-    {
-      id: 'level5-12-inch-flat-box-4-766',
-      title: '12" Flat Box',
-      description: 'Level5 12" Flat Box schematic diagram',
-      brand: 'Level5',
-      category: 'Finishing Boxes',
-      diagramPages: [1],
-      imagePages: { 1: schImg('level5-12-inch-flat-box-4-766', 1) },
-      previewImage: schPrev('level5-12-inch-flat-box-4-766'),
-      parts: level512inFlatBoxParts
-    },
-    {
-      id: 'level5-12-inch-mega-box-4-769',
-      title: '12" Mega Box',
-      description: 'Level5 12" Mega Box schematic diagram',
-      brand: 'Level5',
-      category: 'Finishing Boxes',
-      diagramPages: [1],
-      imagePages: { 1: schImg('level5-12-inch-mega-box-4-769', 1) },
-      previewImage: schPrev('level5-12-inch-mega-box-4-769'),
-      parts: level512inMegaBoxParts
-    },
-    {
-      id: 'level5-14-inch-flat-box-4-770',
-      title: '14" Flat Box',
-      description: 'Level5 14" Flat Box schematic diagram',
-      brand: 'Level5',
-      category: 'Finishing Boxes',
-      diagramPages: [1],
-      imagePages: { 1: schImg('level5-14-inch-flat-box-4-770', 1) },
-      previewImage: schPrev('level5-14-inch-flat-box-4-770'),
-      parts: level514inFlatBoxParts
-    },
-    {
-      id: 'level5-compound-pump-4-771',
-      title: 'Compound Pump',
-      description: 'Level5 Compound Pump schematic diagram',
-      brand: 'Level5',
-      category: 'Pumps',
-      diagramPages: [1],
-      imagePages: { 1: schImg('level5-compound-pump-4-771', 1) },
-      previewImage: schPrev('level5-compound-pump-4-771'),
-      parts: level5CompoundPumpParts
-    },
 
     // ── Platinum ────────────────────────────────────────────────────────────
     {
@@ -2057,7 +1786,7 @@ export default function Parts() {
         touch.clientX - touchStartPos.x,
         touch.clientY - touchStartPos.y
       );
-      
+
       if (moveDistance > 10) {
         // Only preventDefault if user is actually dragging (threshold: 10px)
         if (!hasMoved) {
@@ -2068,18 +1797,18 @@ export default function Parts() {
           gestureActiveRef.current = true;
           setForceUpdate(prev => prev + 1);
         }
-        
+
         // Pan when zoomed - smooth panning with dynamic bounds
         const newX = touch.clientX - startPanPosition.x;
         const newY = touch.clientY - startPanPosition.y;
-        
+
         // Constrain pan based on scale and container size
         const container = schematicContainerRef.current;
         const containerW = container ? container.offsetWidth : 400;
         const containerH = container ? container.offsetHeight : 400;
         const maxPanX = Math.max(0, ((scale - 1) * containerW) / 2);
         const maxPanY = Math.max(0, ((scale - 1) * containerH) / 2);
-        
+
         setPosition({
           x: Math.min(Math.max(newX, -maxPanX), maxPanX),
           y: Math.min(Math.max(newY, -maxPanY), maxPanY),
@@ -2094,7 +1823,7 @@ export default function Parts() {
       const wasActive = gestureActiveRef.current;
       gestureActiveRef.current = false;
       if (wasActive) setForceUpdate(prev => prev + 1);
-      
+
       // Double-tap to zoom
       if (!hasMoved && e.changedTouches.length === 1) {
         const now = Date.now();
@@ -2103,7 +1832,7 @@ export default function Parts() {
         const tapY = touch.clientY;
         const timeSinceLastTap = now - lastTapTime;
         const distanceFromLastTap = Math.hypot(tapX - lastTapPos.x, tapY - lastTapPos.y);
-        
+
         if (timeSinceLastTap < 300 && distanceFromLastTap < 30) {
           // Double tap detected - zoom in/out
           e.preventDefault();
@@ -2112,7 +1841,7 @@ export default function Parts() {
             const rect = container.getBoundingClientRect();
             const centerX = tapX - (rect.left + rect.width / 2);
             const centerY = tapY - (rect.top + rect.height / 2);
-            
+
             if (scale === 1) {
               // Zoom in to 2.5x at tap point
               const newScale = 2.5;
@@ -2123,7 +1852,7 @@ export default function Parts() {
               const newPanY = centerY - (centerY - position.y) * ratio;
               const maxPanX = Math.max(0, ((newScale - 1) * containerW) / 2);
               const maxPanY = Math.max(0, ((newScale - 1) * containerH) / 2);
-              
+
               setScale(newScale);
               setPosition({
                 x: Math.min(Math.max(newPanX, -maxPanX), maxPanX),
@@ -2141,7 +1870,7 @@ export default function Parts() {
           setLastTapPos({ x: tapX, y: tapY });
         }
       }
-      
+
       setIsPanning(false);
       setHasMoved(false);
     } else if (e.touches.length === 1 && pinchRef.current.active) {
@@ -2307,8 +2036,8 @@ export default function Parts() {
   };
 
   return (
-    <section 
-      style={{ 
+    <section
+      style={{
         ...(selectedSchematic ? {
           height: 'calc(100vh - var(--header-height, 70px))',
           display: 'flex',
@@ -2318,13 +2047,13 @@ export default function Parts() {
           minHeight: '100vh',
         }),
         backgroundColor: '#f9fafb'
-      }} 
+      }}
       className={`page-wrapper ${selectedSchematic ? 'viewer-active' : ''} ${isFullscreen ? 'fullscreen-mode' : ''}`}
       onClick={closeModal}
     >
       <SEOHead
         title="Tool Schematics & Diagrams"
-        description="Interactive exploded-view schematics and part diagrams for professional drywall finishing tools. Find replacement parts for TapeTech, Columbia, Asgard, Level5, and more."
+        description="Interactive exploded-view schematics and part diagrams for professional drywall finishing tools. Find replacement parts for TapeTech, Columbia, Asgard, and more."
         canonical="https://drywalltoolbox.com/schematics"
         schema={buildBreadcrumbSchema([
           { label: 'Home',       path: '/'            },
@@ -2413,7 +2142,6 @@ export default function Parts() {
                   alt={`${currentSchematic.brand} logo`}
                   className={[
                     'viewer-brand-logo',
-                    currentSchematic.brand === 'Level5' ? 'viewer-brand-logo--level5' : '',
                     currentSchematic.brand === 'Columbia Taping Tools' ? 'viewer-brand-logo--columbia' : '',
                   ].filter(Boolean).join(' ')}
                 />
@@ -2493,7 +2221,7 @@ export default function Parts() {
             }}
             onClick={(e) => e.stopPropagation()}
           >
-            <div 
+            <div
               className="schematic-container"
               ref={schematicContainerRef}
               onMouseDown={handleMouseDown}
@@ -2545,10 +2273,10 @@ export default function Parts() {
                   mobile (so hotspot % coords land accurately before the image loads),
                   and flex-fills the full container height on desktop so wide
                   schematics use the entire viewport instead of rendering tiny. */}
-              <div 
+              <div
                 ref={schematicImageRef}
                 className="schematic-image-wrapper"
-                style={{ 
+                style={{
                   position: 'relative',
                   // On mobile: pre-allocate height via aspect-ratio so hotspots
                   // land correctly even on slow connections.
@@ -2583,15 +2311,15 @@ export default function Parts() {
                   }}
                 >
                 {schematicImageSrc ? (
-                  <img 
-                    src={schematicImageSrc} 
+                  <img
+                    src={schematicImageSrc}
                     alt={currentSchematic.title}
-                    style={{ 
+                    style={{
                       width: isMobile ? '100%' : '100%',
                       height: isMobile ? 'auto' : '100%',
                       maxWidth: '100%',
                       maxHeight: '100%',
-                      display: 'block', 
+                      display: 'block',
                       pointerEvents: 'none',
                       imageRendering: 'auto',
                       WebkitTouchCallout: 'none',
@@ -2604,7 +2332,7 @@ export default function Parts() {
                 ) : (
                   currentSchematic.svg
                 )}
-                
+
                 {/* Hotspots rendered INSIDE the transformed container so they scale and pan with the image */}
                 {currentSchematic.parts.filter(part => !part.pageNumber || part.pageNumber === currentPage).map((part, index) => {
                   // Use a composite key so duplicate part IDs (e.g. shared fasteners
