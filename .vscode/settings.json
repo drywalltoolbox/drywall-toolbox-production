@@ -141,7 +141,7 @@
   "terminal.integrated.scrollback": 5000,
 
   // ─── Explorer ─────────────────────────────────────────────────────────────
-  "explorer.confirmDelete": true,
+  "explorer.confirmDelete": false,
   "explorer.confirmDragAndDrop": false,
   "explorer.sortOrder": "type",
 

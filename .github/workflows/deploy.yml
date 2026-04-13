@@ -42,31 +42,34 @@ jobs:
           NODE_ENV: production
           # GitHub Pages sub-path (repo name); adjust if the Pages site uses a custom domain
           PUBLIC_URL: /drywall-toolbox
-          # ── GitHub Pages: use bundled dev catalog (wp-catalog.csv) ─────
-          # No remote CSV — webpack bundles wp-catalog.csv into dist/ during build.
+          # ── GitHub Pages: fetch live catalog from drywalltoolbox.com ──────────
+          # catalog.js will fetch from the live WC REST API / PHP proxy endpoints.
+          # The bundled wp-catalog.csv serves as a fallback if the remote is down.
           REACT_APP_WC_CSV_URL: ''
-          REACT_APP_USE_LOCAL_CSV: 'true'
-          # ── Stub out WP/WC endpoints (not available on GH Pages) ─────────────
-          REACT_APP_WP_BASE_URL: ''
-          REACT_APP_WC_BASE_URL: ''
-          REACT_APP_WC_AUTH_USER: ''
-          REACT_APP_WC_AUTH_PASS: ''
-          REACT_APP_WP_API_BASE: ''
-          REACT_APP_WC_API_BASE: ''
-          REACT_APP_JWT_ENDPOINT: ''
+          REACT_APP_USE_LOCAL_CSV: 'false'
+          # ── Live backend endpoints ─────────────────────────────────────────────
+          REACT_APP_WP_BASE_URL: 'https://drywalltoolbox.com/wp'
+          REACT_APP_WC_BASE_URL: 'https://drywalltoolbox.com/wp/wp-json/wc/v3'
+          REACT_APP_WC_AUTH_USER: ${{ secrets.WC_AUTH_USER }}
+          REACT_APP_WC_AUTH_PASS: ${{ secrets.WC_AUTH_PASS }}
+          REACT_APP_WP_API_BASE: 'https://drywalltoolbox.com/wp/wp-json'
+          REACT_APP_WC_API_BASE: 'https://drywalltoolbox.com/wp/wp-json/wc/v3'
+          REACT_APP_JWT_ENDPOINT: 'https://drywalltoolbox.com/wp/wp-json/simple-jwt-login/v1/auth'
+          REACT_APP_API_BASE_URL: 'https://drywalltoolbox.com'
+          REACT_APP_STORE_API_BASE: '/wp/wp-json/wc/store/v1'
           REACT_APP_SITE_URL: 'https://elliotttmiller.github.io/drywall-toolbox'
           REACT_APP_APP_ENV: development
+          REACT_APP_ENV: development
 
-      # ── Verify dev catalog was bundled into dist ────────────────────
+      # ── Verify bundled CSV fallback exists in dist ──────────────────
       # wp-catalog.csv is copied into dist/ by webpack during the build.
-      # This serves as the primary data source for GitHub Pages.
-      - name: Verify dev catalog was bundled into dist
+      # It acts as the offline/fallback catalog if the live API is unreachable.
+      - name: Verify bundled CSV fallback exists in dist
         run: |
           if [ -f "dist/wp-catalog.csv" ]; then
-            echo "✓ Dev catalog bundled successfully ($(wc -l < dist/wp-catalog.csv) rows)"
+            echo "✓ Fallback catalog bundled successfully ($(wc -l < dist/wp-catalog.csv) rows)"
           else
-            echo "✗ Dev catalog not found in dist/ — catalog.js will fail to load products"
-            exit 1
+            echo "⚠ Fallback catalog not found in dist/ — live API is the only data source"
           fi
 
       - name: Upload Pages artifact
