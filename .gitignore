@@ -1,7 +1,14 @@
 node_modules/
 .DS_Store
 *.log
-.vscode/
+
+# VS Code — ignore personal/local overrides but commit shared workspace settings
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+!.vscode/launch.json
+!.vscode/tasks.json
+
 .idea/
 dist/
 build/
