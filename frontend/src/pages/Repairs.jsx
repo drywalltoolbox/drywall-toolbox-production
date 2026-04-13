@@ -575,14 +575,6 @@ export default function Repairs() {
             KEEP YOUR TOOLS<br />
             <span style={{ color: '#93c5fd' }}>RUNNING STRONG.</span>
           </h1>
-          <p style={{
-            color: 'rgba(255,255,255,0.7)',
-            fontSize: 'clamp(0.95rem, 2vw, 1.1rem)',
-            maxWidth: '600px', lineHeight: 1.6, margin: '0 0 32px 0',
-          }}>
-            Professional repair and maintenance services for all your drywall tools.
-            From emergency fixes to scheduled maintenance — we keep your crew working.
-          </p>
           <button
             className="alloy-button"
             style={{ background: 'white', color: '#1e3a8a', border: 'none', cursor: 'pointer' }}
