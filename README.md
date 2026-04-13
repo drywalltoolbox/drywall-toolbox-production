@@ -5,7 +5,7 @@ Headless React storefront for Drywalltoolbox.com — powered by WordPress + WooC
 **Architecture:** React SPA (`frontend/`) → builds to `dist/` → served from domain root  
 **Backend:** WordPress + WooCommerce in `/wp/` subdirectory → REST API only  
 **Hosting:** HostGator shared hosting, deployed via GitHub Actions FTPS
-
+---
 
 ## 🚀 Deployment Guides
 
