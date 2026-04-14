@@ -1105,46 +1105,6 @@ export default function Repairs() {
                 </button>
               </div>
             </div>
-
-            {/* Right: stat cards */}
-            <div style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(2, 1fr)',
-              gap: '12px',
-            }}>
-              {[
-                { value: '24 hr', label: 'Quote turnaround', sub: 'Photo quote included' },
-                { value: '90-day', label: 'Workmanship warranty', sub: 'Premium overhaul tier' },
-              ].map((stat, i) => (
-                <div
-                  key={i}
-                  style={{
-                    background: 'rgba(255,255,255,0.07)',
-                    border: '1px solid rgba(255,255,255,0.12)',
-                    borderRadius: '10px',
-                    padding: 'clamp(14px, 2.5vw, 20px)',
-                    backdropFilter: 'blur(10px)',
-                  }}
-                >
-                  <div style={{
-                    fontSize: 'clamp(1.4rem, 3vw, 2rem)',
-                    fontWeight: 900,
-                    color: '#93c5fd',
-                    letterSpacing: '-0.03em',
-                    lineHeight: 1,
-                    marginBottom: '6px',
-                  }}>
-                    {stat.value}
-                  </div>
-                  <div style={{ fontSize: '0.78rem', fontWeight: 700, color: 'rgba(255,255,255,0.8)', marginBottom: '2px' }}>
-                    {stat.label}
-                  </div>
-                  <div style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.45)' }}>
-                    {stat.sub}
-                  </div>
-                </div>
-              ))}
-            </div>
           </div>
         </div>
       </section>
