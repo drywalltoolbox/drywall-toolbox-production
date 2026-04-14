@@ -1994,10 +1994,12 @@ const ALLOWED_BRANDS = [
         const newX = touch.clientX - startPanPosition.x;
         const newY = touch.clientY - startPanPosition.y;
 
-        // Constrain pan based on scale and container size
+        // Constrain pan based on scale and image size (NOT container — container can be
+        // taller than the rendered image which would allow panning the image off-screen).
         const container = schematicContainerRef.current;
+        const imageDiv   = schematicImageRef.current;
         const containerW = container ? container.offsetWidth : 400;
-        const containerH = container ? container.offsetHeight : 400;
+        const containerH = imageDiv ? imageDiv.offsetHeight : (container ? container.offsetHeight : 400);
         const maxPanX = Math.max(0, ((scale - 1) * containerW) / 2);
         const maxPanY = Math.max(0, ((scale - 1) * containerH) / 2);
 
@@ -2037,8 +2039,9 @@ const ALLOWED_BRANDS = [
             if (scale === 1) {
               // Zoom in to 2.5x at tap point
               const newScale = 2.5;
+              const imageDiv   = schematicImageRef.current;
               const containerW = container.offsetWidth;
-              const containerH = container.offsetHeight;
+              const containerH = imageDiv ? imageDiv.offsetHeight : container.offsetHeight;
               const ratio = newScale / scale;
               const newPanX = centerX - (centerX - position.x) * ratio;
               const newPanY = centerY - (centerY - position.y) * ratio;
@@ -2424,7 +2427,7 @@ const ALLOWED_BRANDS = [
                 // on desktop, which clips the pan-transformed image instead.
                 // On mobile we keep overflow:hidden to prevent pan bleed-through.
                 overflow: isMobile ? 'hidden' : 'visible',
-                touchAction: scale > 1 ? 'none' : 'auto',
+                touchAction: scale > 1 ? 'none' : 'manipulation',
                 cursor: scale > 1 ? (isPanning || isDragging ? 'grabbing' : 'grab') : 'default',
                 WebkitUserSelect: 'none',
                 userSelect: 'none',
@@ -2461,20 +2464,16 @@ const ALLOWED_BRANDS = [
                   </button>
                 )}
               </div>
-              {/* Transform wrapper — sized by the image's natural aspect ratio on
-                  mobile (so hotspot % coords land accurately before the image loads),
-                  and flex-fills the full container height on desktop so wide
-                  schematics use the entire viewport instead of rendering tiny. */}
+              {/* Transform wrapper — fills remaining viewer height on desktop (flex:1 1 auto
+                  from CSS), centers the bounds div inside itself, and applies the
+                  zoom/pan transform.  The aspect-ratio is NOT set here — it lives on
+                  the inner schematic-image-bounds so the coordinate space for hotspot
+                  percentages is always that div, not the full-width wrapper. */}
               <div
                 ref={schematicImageRef}
                 className="schematic-image-wrapper"
                 style={{
                   position: 'relative',
-                  // On mobile: pre-allocate height via aspect-ratio so hotspots
-                  // land correctly even on slow connections.
-                  // On desktop: CSS flex: 1 1 auto fills remaining height instead —
-                  // setting aspectRatio here would fight that and make the image tiny.
-                  ...(isMobile && currentPageAspectRatio ? { aspectRatio: currentPageAspectRatio } : {}),
                   transform: `scale(${scale}) translate(${position.x / scale}px, ${position.y / scale}px)`,
                   transformOrigin: 'center center',
                   transition: gestureActiveRef.current ? 'none' : 'transform 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
@@ -2484,33 +2483,41 @@ const ALLOWED_BRANDS = [
                   willChange: scale > 1 || gestureActiveRef.current ? 'transform' : 'auto',
                 }}
               >
-                {/* Bounds layer — on desktop this div is sized to exactly match the
-                    rendered image (height:100% + aspect-ratio) so that every hotspot's
-                    percentage-based top/left is computed against the image dimensions
-                    rather than the full-width wrapper div.  On mobile the aspect-ratio
-                    is already applied to the wrapper itself so we leave this as a
-                    transparent pass-through (position:relative, width:100%). */}
+                {/* ── Schematic image bounds ─────────────────────────────────────────────
+                    This div must be EXACTLY the same pixel area as the rendered image so
+                    that all hotspot top/left percentages reference the correct coordinate
+                    space.
+
+                    Desktop: CSS gives it max-height:100% + width:auto.  We supply only
+                    the aspectRatio inline so the browser sizes it proportionally within
+                    the flex-centered wrapper.  height:'100%' / flexShrink are NOT set
+                    here — they fought max-height:100% and caused the bounds to exceed
+                    the available space.
+
+                    Mobile: width:100%, height follows the img (height:auto from CSS).
+                    ─────────────────────────────────────────────────────────────────── */}
                 <div
                   className="schematic-image-bounds"
-                  style={!isMobile && currentPageAspectRatio ? {
+                  style={currentPageAspectRatio ? {
                     position: 'relative',
-                    height: '100%',
                     aspectRatio: currentPageAspectRatio,
-                    flexShrink: 0,
+                    // Mobile: full width, let height be natural (img height:auto)
+                    // Desktop: max-height:100% + width:auto come from CSS
+                    ...(isMobile ? { width: '100%' } : {}),
                   } : {
                     position: 'relative',
                     width: '100%',
                   }}
+                  onClick={(e) => e.stopPropagation()}
                 >
                 {schematicImageSrc ? (
                   <img
                     src={schematicImageSrc}
                     alt={currentSchematic.title}
                     style={{
-                      width: isMobile ? '100%' : '100%',
-                      height: isMobile ? 'auto' : '100%',
-                      maxWidth: '100%',
-                      maxHeight: '100%',
+                      // Let CSS own all size rules for the img.
+                      // On mobile: .schematic-container img sets width:100% height:auto
+                      // On desktop: .schematic-image-bounds img sets width:100% height:100%
                       display: 'block',
                       pointerEvents: 'none',
                       imageRendering: 'auto',
@@ -2531,22 +2538,33 @@ const ALLOWED_BRANDS = [
                   // that appear twice on a schematic) each get an independent active
                   // state — only the clicked instance highlights, not all copies.
                   const hotspotKey = `${part.id}::${index}`;
+                  // Determine if this hotspot has precise pixel-derived dimensions.
+                  // When true, a CSS class prevents any min-width/min-height override
+                  // from expanding it beyond its exact schematic footprint.
+                  const hasPreciseSize = !!(
+                    part.widthPx && part.heightPx &&
+                    part.imageNaturalWidth && part.imageNaturalHeight
+                  );
                   return (
                   <div
                     key={`${part.id}-${part.position.top}-${part.position.left}-${index}`}
-                    className={`hotspot hotspot-${part.shape || 'circle'} ${activeHotspot === hotspotKey ? 'active' : ''}`}
+                    className={`hotspot hotspot-${part.shape || 'circle'} ${activeHotspot === hotspotKey ? 'active' : ''} ${hasPreciseSize ? 'hotspot-precise' : ''}`}
                     style={{
                       position: 'absolute',
                       top: part.position.top,
                       left: part.position.left,
                       transform: part.rotation ? `translate(-50%, -50%) rotate(${part.rotation}deg)` : 'translate(-50%, -50%)',
                       zIndex: activeHotspot === hotspotKey ? 1001 : 100,
-                      pointerEvents: 'auto',
+                      // Disable pointer events during active pinch/pan to prevent
+                      // accidental modal opens mid-gesture.  gestureActiveRef is a ref
+                      // (not state) but setForceUpdate calls at gesture start/end ensure
+                      // this re-evaluates at the right moments.
+                      pointerEvents: gestureActiveRef.current ? 'none' : 'auto',
                       // Convert pixel-based hotspot dimensions to scale-independent
                       // percentages using the source image's natural dimensions so
                       // the hotspot always covers the same portion of the image
                       // regardless of the screen size or device pixel ratio.
-                      ...(part.widthPx && part.heightPx && part.imageNaturalWidth && part.imageNaturalHeight ? {
+                      ...(hasPreciseSize ? {
                         width:  `${(part.widthPx  / part.imageNaturalWidth)  * 100}%`,
                         height: `${(part.heightPx / part.imageNaturalHeight) * 100}%`,
                       } : part.widthPx && part.heightPx ? {
@@ -2558,8 +2576,32 @@ const ALLOWED_BRANDS = [
                         height: `${part.height}%`,
                       } : {})
                     }}
-                    onClick={(e) => {
+                    // ── Precise touch/pointer handling ──────────────────────────
+                    // We use onPointerDown + onPointerUp instead of onClick to
+                    // avoid the browser's ~300ms touch-to-click delay and, more
+                    // importantly, to prevent pan gestures from accidentally
+                    // activating hotspots.  The displacement guard (8 px) means
+                    // a finger that slid even slightly during the press is ignored.
+                    onPointerDown={(e) => {
+                      // Only handle primary pointer (finger 0 or left-click).
+                      if (!e.isPrimary) return;
                       e.stopPropagation();
+                      // Record where the press began so we can measure drift.
+                      e.currentTarget.dataset.pdX = e.clientX;
+                      e.currentTarget.dataset.pdY = e.clientY;
+                      // Capture so pointerup fires on this element even if the
+                      // finger drifts slightly off the edge of the hotspot.
+                      e.currentTarget.setPointerCapture(e.pointerId);
+                    }}
+                    onPointerUp={(e) => {
+                      if (!e.isPrimary) return;
+                      e.stopPropagation();
+                      // Measure how far the pointer drifted from the down position.
+                      const downX = parseFloat(e.currentTarget.dataset.pdX ?? e.clientX);
+                      const downY = parseFloat(e.currentTarget.dataset.pdY ?? e.clientY);
+                      const drift = Math.hypot(e.clientX - downX, e.clientY - downY);
+                      // 8 px threshold: anything larger is a pan/scroll, not a tap.
+                      if (drift > 8) return;
                       // Check if this is a navigation hotspot
                       if (part.name === 'SEE HEAD DETAIL') {
                         setCurrentPage(2);
@@ -2589,6 +2631,9 @@ const ALLOWED_BRANDS = [
                         setActiveHotspotPart(part);
                       }
                     }}
+                    // Suppress the synthesized click that follows touch so it
+                    // doesn't double-fire the action or bubble to the container.
+                    onClick={(e) => e.stopPropagation()}
                     title={`${part.name} (${part.sku})`}
                   >
                     {/* Desktop inline modal (hidden on mobile via CSS) */}

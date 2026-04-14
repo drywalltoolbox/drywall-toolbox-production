@@ -818,14 +818,29 @@ aside input[type="range"],
         z-index: 1000;
     }
 
-    /* Expand the effective hit area for touch without changing visual size */
-    .hotspot::after {
+    /* Precise hotspots must NOT get touch-action:manipulation — that lets the
+       browser intercept gestures.  touch-action:none (set in mobile-schematic.css)
+       must win so Pointer Events fire immediately without any browser delay. */
+    .hotspot.hotspot-precise {
+        touch-action: none;
+    }
+
+    /* Expand the effective hit area for touch without changing visual size.
+       NOT applied to precise hotspots — their hit area IS their visual area;
+       the invisible ring would overlap adjacent hotspots and cause wrong taps. */
+    .hotspot:not(.hotspot-precise)::after {
         content: '';
         position: absolute;
         inset: -12px;
         background: transparent;
         border-radius: inherit;
         pointer-events: auto;
+    }
+
+    /* Ensure precise hotspot ::after is fully suppressed (belt-and-suspenders) */
+    .hotspot.hotspot-precise::after {
+        display: none !important;
+        content: none !important;
     }
 
     /* Hide in-hotspot modal on mobile — overlay handles it */
