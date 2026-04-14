@@ -18,6 +18,7 @@
  *   dtb-utils.php          — shared helper functions
  *   dtb-auth.php           — JWT generation / verification / REST auth routes
  *   dtb-cache.php          — transient cache helpers and diagnostic route
+ *   dtb-cache-admin.php    — wp-admin cache management page
  *   dtb-rest-api.php       — WC proxy + site-management REST routes + CORS
  *   dtb-rewards.php        — WPLoyalty REST bridge (dtb/v1/rewards/* endpoints)
  *   dtb-image-sync.php     — media-library sync for uploads/2026/04/ images
@@ -120,6 +121,7 @@ function _dtb_require( string $path ): void {
 _dtb_require( $_dtb_dir . '/dtb-utils.php' );
 _dtb_require( $_dtb_dir . '/dtb-auth.php' );
 _dtb_require( $_dtb_dir . '/dtb-cache.php' );
+_dtb_require( $_dtb_dir . '/dtb-cache-admin.php' );
 _dtb_require( $_dtb_dir . '/dtb-rest-api.php' );
 _dtb_require( $_dtb_dir . '/dtb-rewards.php' );       // WPLoyalty REST bridge (loads after dtb-auth)
 _dtb_require( $_dtb_dir . '/dtb-membership.php' );    // ProCare membership tiers & REST endpoints
