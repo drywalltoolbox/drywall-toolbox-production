@@ -16,7 +16,6 @@ import tapeTechLogo from '/brands/TapeTech/tapetech_logo.svg';
 import columbiaLogo from '/brands/Columbia/columbia_taping_tools_logo.svg';
 import surproLogo from '/brands/SurPro/surpro_logo.svg';
 import asgardLogo from '/brands/Asgard/asgard_logo.svg';
-import gracoLogo from '/brands/Graco/graco_logo.svg';
 import platinumLogo from '/brands/Platinum/platinum_logo.svg';
 import duraStiltsLogo from '/brands/Dura-Stilts/dura-stilts-logo.svg';
 
@@ -25,7 +24,6 @@ const brandLogos = {
   'Columbia Taping Tools': columbiaLogo,
   'SurPro': surproLogo,
   'Asgard': asgardLogo,
-  'Graco': gracoLogo,
   'Platinum Drywall Tools': platinumLogo,
   'Dura-Stilts': duraStiltsLogo,
 };
@@ -72,7 +70,6 @@ import columbiaMatrixBoxHandlePinchboxData from '/brands/Columbia/Schematics/Han
 import columbiaMatrixBoxHandleExtensionHousingData from '/brands/Columbia/Schematics/Handles/MatrixBoxHandle/ExtensionHousing/schematic_data.json';
 import columbiaFlatBoxHandleData from '/brands/Columbia/Schematics/Handles/FlatBoxHandle/schematic_data.json';
 import columbiaLongExtendableHandleData from '/brands/Columbia/Schematics/Handles/LongExtendableHandle/schematic_data.json';
-import tapeTechExtendableSupportHandleData from '/brands/TapeTech/Schematics/ExtendableSupportHandle/schematic_data.json';
 
 // ---------------------------------------------------------------------------
 // Asgard schematic JSON data imports
@@ -149,10 +146,6 @@ const _fallbacks = {
       2: `${_BASE}brands/Columbia/Schematics/AutomaticTapers/PredatorTaper/Head/predator_taper_head.webp`,
     },
     preview: `${_BASE}brands/Columbia/Schematics/AutomaticTapers/PredatorTaper/predator_taper.webp`,
-  },
-  'tapetech-extendable-support-handle': {
-    pages: { 1: `${_BASE}brands/TapeTech/Schematics/ExtendableSupportHandle/XHTT_SCH.webp` },
-    preview: `${_BASE}brands/TapeTech/Schematics/ExtendableSupportHandle/XHTT_02-300x300.webp`,
   },
   'columbia-2-way-internal-corner': {
     pages: { 1: `${_BASE}brands/Columbia/Schematics/Applicators/TwoWayInternalCorner/2_Way_Internal_Corner_Applicator-1-enhanced.webp` },
@@ -434,7 +427,6 @@ const BRAND_TO_SLUG = {
   'Columbia Taping Tools': 'columbia-taping-tools',
   'Asgard':                'asgard',
   'SurPro':                'surpro',
-  'Graco':                 'graco',
   'Platinum Drywall Tools': 'platinum',
   'Dura-Stilts':           'dura-stilts',
 };
@@ -457,7 +449,6 @@ const ALLOWED_BRANDS = [
   'Columbia Taping Tools',
   'Asgard',
   'SurPro',
-  'Graco',
   'Platinum Drywall Tools',
   'Dura-Stilts',
 ];  const location = useLocation();
@@ -679,7 +670,6 @@ const ALLOWED_BRANDS = [
   const matrixBoxHandleExtensionHousingParts = buildPartsFromData(columbiaMatrixBoxHandleExtensionHousingData);
   const flatBoxHandleParts = buildPartsFromData(columbiaFlatBoxHandleData);
   const longExtendableHandleParts = buildPartsFromData(columbiaLongExtendableHandleData);
-  const tapeTechExtendableSupportHandleParts = buildPartsFromData(tapeTechExtendableSupportHandleData);
 
   // Asgard parts arrays
   const asgardFA01ADParts    = buildPartsFromData(asgardFA01ADData);
@@ -773,18 +763,6 @@ const ALLOWED_BRANDS = [
         ...(columbiaPredatorTaperHeadData.navHotspots || []),
       ],
       parts: [...predatorTaperBodyParts, ...predatorTaperHeadParts]
-    },
-    // TapeTech Extendable Support Handle schematic
-    {
-      id: 'tapetech-extendable-support-handle',
-      title: 'Extendable Support Handle',
-      description: 'TapeTech Extendable Support Handle schematic diagram with parts hotspots',
-      brand: 'TapeTech',
-      category: 'Handles',
-      diagramPages: [1],
-      imagePages: { 1: schImg('tapetech-extendable-support-handle', 1) },
-      previewImage: schPrev('tapetech-extendable-support-handle'),
-      parts: tapeTechExtendableSupportHandleParts
     },
     {
       id: 'columbia-2-way-internal-corner',

@@ -2,9 +2,9 @@
 import TrendingProducts from '../components/TrendingProducts';
 import tapeTechLogo from '/brands/TapeTech/tapetech_logo.svg';
 import columbiaLogo from '/brands/Columbia/columbia_taping_tools_logo.svg';
+import columbiaLogoWhite from '/brands/Columbia/columbia_logo_white.svg';
 import surproLogo from '/brands/SurPro/surpro_logo.svg';
 import asgardLogo from '/brands/Asgard/asgard_logo.svg';
-import gracoLogo from '/brands/Graco/graco_logo.svg';
 import platinumLogo from '/brands/Platinum/platinum_logo.svg';
 import duraStiltsLogo from '/brands/Dura-Stilts/dura-stilts-logo.svg';
 import SEOHead from '../components/SEOHead';
@@ -46,9 +46,18 @@ const brandLogos = [
   { name: 'Columbia', src: columbiaLogo },
   { name: 'SurPro', src: surproLogo },
   { name: 'Asgard', src: asgardLogo },
-  { name: 'Graco', src: gracoLogo },
-  { name: 'Platinum Drywall Tools', src: platinumLogo },
   { name: 'Dura-Stilts', src: duraStiltsLogo },
+  { name: 'Platinum Drywall Tools', src: platinumLogo },
+];
+
+// Desktop hero brands - Columbia uses white logo for better contrast on dark background
+const desktopHeroBrands = [
+  { name: 'TapeTech', src: tapeTechLogo },
+  { name: 'Columbia', src: columbiaLogoWhite },
+  { name: 'SurPro', src: surproLogo },
+  { name: 'Asgard', src: asgardLogo },
+  { name: 'Dura-Stilts', src: duraStiltsLogo },
+  { name: 'Platinum Drywall Tools', src: platinumLogo },
 ];
 
 export default function Home() {
@@ -117,66 +126,26 @@ export default function Home() {
             <p className="dtb-hero-subtitle">
               Production-grade taping, finishing, and sanding equipment from the industry&apos;s most trusted brands — at unbeatable prices with lightning-fast shipping.
             </p>
-
-            <div className="dtb-hero-actions">
-              <Link to="/all-products" className="dtb-hero-cta-primary">
-                Shop All Products <ChevronRight size={15} />
-              </Link>
-              <Link to="/parts" className="dtb-hero-cta-secondary">
-                Replacement Parts
-              </Link>
-            </div>
-
-            <div className="dtb-hero-stats">
-              <div className="dtb-hero-stat">
-                <span className="dtb-hero-stat-num">7+</span>
-                <span className="dtb-hero-stat-label">Pro Brands</span>
-              </div>
-              <span className="dtb-hero-stat-divider" />
-              <div className="dtb-hero-stat">
-                <span className="dtb-hero-stat-num">Fast</span>
-                <span className="dtb-hero-stat-label">Shipping</span>
-              </div>
-              <span className="dtb-hero-stat-divider" />
-              <div className="dtb-hero-stat">
-                <span className="dtb-hero-stat-num">OEM</span>
-                <span className="dtb-hero-stat-label">Certified Parts</span>
-              </div>
-            </div>
           </div>
 
-          {/* Right: quick-navigate category cards */}
+          {/* Right: Trusted Brands (desktop only) */}
           <div className="dtb-hero-visual">
-            <p className="dtb-hero-visual-label">Shop by Category</p>
-            <div className="dtb-hero-categories">
-              <Link to="/products?category=taping" className="dtb-hero-cat-card">
-                <div className="dtb-hero-cat-icon"><Wrench size={18} /></div>
-                <div>
-                  <span className="dtb-hero-cat-name">Taping Tools</span>
-                  <span className="dtb-hero-cat-sub">Automatic tapers &amp; more</span>
-                </div>
-              </Link>
-              <Link to="/products?category=finishing" className="dtb-hero-cat-card">
-                <div className="dtb-hero-cat-icon"><Layers size={18} /></div>
-                <div>
-                  <span className="dtb-hero-cat-name">Finishing Tools</span>
-                  <span className="dtb-hero-cat-sub">Boxes, pumps &amp; knives</span>
-                </div>
-              </Link>
-              <Link to="/products?category=sanding" className="dtb-hero-cat-card">
-                <div className="dtb-hero-cat-icon"><Star size={18} /></div>
-                <div>
-                  <span className="dtb-hero-cat-name">Sanding Tools</span>
-                  <span className="dtb-hero-cat-sub">Sanders &amp; dust control</span>
-                </div>
-              </Link>
-              <Link to="/parts" className="dtb-hero-cat-card">
-                <div className="dtb-hero-cat-icon"><FileText size={18} /></div>
-                <div>
-                  <span className="dtb-hero-cat-name">Parts &amp; Schematics</span>
-                  <span className="dtb-hero-cat-sub">OEM parts &amp; diagrams</span>
-                </div>
-              </Link>
+            <div className="dtb-hero-brands">
+              {desktopHeroBrands.map((brand) => (
+                <Link
+                  key={brand.name}
+                  to={`/products?brand=${encodeURIComponent(brand.name === 'Columbia' ? 'Columbia Taping Tools' : brand.name)}`}
+                  className="dtb-hero-brand-link"
+                >
+                  <img
+                    src={brand.src}
+                    alt={brand.name}
+                    loading="lazy"
+                    decoding="async"
+                    className="dtb-hero-brand-logo"
+                  />
+                </Link>
+              ))}
             </div>
           </div>
         </div>
@@ -219,8 +188,8 @@ export default function Home() {
       {/* ─── TRENDING PRODUCTS ─── */}
       <TrendingProducts />
 
-      {/* ─── TRUST BADGES ─── */}
-      <section className="home-trust-section">
+      {/* ─── TRUST BADGES (mobile only) ─── */}
+      <section className="home-trust-section dtb-mobile-only">
         <div className="trust-badges-grid">
           {trustBadges.map((badge) => (
             <div
@@ -250,8 +219,8 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ─── BRAND LOGOS ─── */}
-      <section className="home-brands-section">
+      {/* ─── BRAND LOGOS (mobile only) ─── */}
+      <section className="home-brands-section dtb-mobile-only">
         <div style={{
           display: 'flex',
           flexDirection: 'column',
