@@ -101,12 +101,12 @@ Options +FollowSymLinks
     # ONLY apply origin guard if ALL of these are true:
     # 1. Origin header is present (cross-origin request)
     RewriteCond %{HTTP:Origin} .+ [NC]
-    # 2. Origin is NOT production domain
-    RewriteCond %{HTTP:Origin} !^https?://(www\.)?drywalltoolbox\.com(/)?$ [NC]
+    # 2. Origin is NOT production domain (allow www and non-www)
+    RewriteCond %{HTTP:Origin} !^https?://(www\.)?drywalltoolbox\.com(:|/|$) [NC]
     # 3. Origin is NOT localhost/loopback (dev)
-    RewriteCond %{HTTP:Origin} !^http://(localhost|127\.0\.0\.1)(:[0-9]+)?(/)?$ [NC]
+    RewriteCond %{HTTP:Origin} !^http://(localhost|127\.0\.0\.1)(:|$) [NC]
     # 4. Origin is NOT GitHub Pages dev build
-    RewriteCond %{HTTP:Origin} !^https://elliotttmiller\.github\.io(/)?$ [NC]
+    RewriteCond %{HTTP:Origin} !^https://elliotttmiller\.github\.io(:|/|$) [NC]
     # THEN deny cross-origin REST/DTB requests
     RewriteRule ^(wp-json|dtb)/ - [F,L]
 </IfModule>
