@@ -1,0 +1,783 @@
+{
+  "id": "1776151631727",
+  "title": "68TT_SCH",
+  "diagramPages": [
+    1
+  ],
+  "legendPages": [],
+  "parts": [
+    {
+      "id": "1",
+      "name": "3\" BODY ASSEMBLY",
+      "quantity": 1,
+      "sku": "688001"
+    },
+    {
+      "id": "2",
+      "name": "6-32 X 1/4 BIND HEAD SCREW SST",
+      "quantity": 4,
+      "sku": "359005"
+    },
+    {
+      "id": "3",
+      "name": "SPECIAL RIVET",
+      "quantity": 1,
+      "sku": "602029F"
+    },
+    {
+      "id": "4",
+      "name": "SKID",
+      "quantity": 1,
+      "sku": "650007"
+    },
+    {
+      "id": "5",
+      "name": "4- 3/8 FLAT HEAD SCREW SST",
+      "quantity": 1,
+      "sku": "609048"
+    },
+    {
+      "id": "6",
+      "name": "4-40X1/2 FILLISTER HEAD MS",
+      "quantity": 1,
+      "sku": "609008"
+    },
+    {
+      "id": "7",
+      "name": "3\" FACING",
+      "quantity": 1,
+      "sku": "680009"
+    },
+    {
+      "id": "8",
+      "name": "BLADE CLAMP ASSY",
+      "quantity": 1,
+      "sku": "654036"
+    },
+    {
+      "id": "9",
+      "name": "3\" NAIL SPOTTER BLADE",
+      "quantity": 1,
+      "sku": "650005F"
+    },
+    {
+      "id": "10",
+      "name": "SERRATED HEX FLANGE NUT (REPLACES 609043)",
+      "quantity": 5,
+      "sku": "609049"
+    },
+    {
+      "id": "11",
+      "name": "6-32 X 3/32 S CRES SLOTTED RD",
+      "quantity": 5,
+      "sku": "609050"
+    },
+    {
+      "id": "12",
+      "name": "ADJUSTABLE STOP",
+      "quantity": 1,
+      "sku": "602035"
+    },
+    {
+      "id": "13",
+      "name": "PLASTIC WASHER",
+      "quantity": 1,
+      "sku": "639020"
+    },
+    {
+      "id": "14",
+      "name": "3\" WIPER",
+      "quantity": 1,
+      "sku": "680015"
+    },
+    {
+      "id": "15",
+      "name": "#10 LOCKWASHER (REPAIR ONLY)",
+      "quantity": 1,
+      "sku": "709050"
+    },
+    {
+      "id": "16",
+      "name": "3\" PRESSURE PLATE ASSEMBLY",
+      "quantity": 1,
+      "sku": "684028"
+    },
+    {
+      "id": "17",
+      "name": "WASHER",
+      "quantity": 4,
+      "sku": "609018"
+    },
+    {
+      "id": "18",
+      "name": "SPECIAL WASHER",
+      "quantity": 1,
+      "sku": "602045F"
+    },
+    {
+      "id": "19",
+      "name": "WASHER SPECIAL",
+      "quantity": 1,
+      "sku": "650040"
+    },
+    {
+      "id": "20",
+      "name": "10-32 LOCKNUT",
+      "quantity": 2,
+      "sku": "059225"
+    },
+    {
+      "id": "20",
+      "name": "10-32 LOCKNUT",
+      "quantity": 2,
+      "sku": "059225"
+    },
+    {
+      "id": "21",
+      "name": "#10 BRASS WASHER",
+      "quantity": 1,
+      "sku": "209042"
+    },
+    {
+      "id": "22",
+      "name": "FRICTION WASHER",
+      "quantity": 1,
+      "sku": "609020"
+    },
+    {
+      "id": "23",
+      "name": "#8 LOCKWASHER",
+      "quantity": 2,
+      "sku": "809017"
+    },
+    {
+      "id": "24",
+      "name": "8-32X3/8 BIND HEAD SCREW",
+      "quantity": 2,
+      "sku": "729064"
+    },
+    {
+      "id": "25",
+      "name": "ADAPTOR",
+      "quantity": 2,
+      "sku": "603027"
+    },
+    {
+      "id": "25",
+      "name": "ADAPTOR",
+      "quantity": 2,
+      "sku": "603027"
+    },
+    {
+      "id": "26",
+      "name": "NUT SPECIAL",
+      "quantity": 2,
+      "sku": "603031"
+    },
+    {
+      "id": "27",
+      "name": "27",
+      "quantity": 1,
+      "sku": "27"
+    },
+    {
+      "id": "28",
+      "name": "10-32X3/4' FLAT HEAD SCREW SST",
+      "quantity": 2,
+      "sku": "609032"
+    },
+    {
+      "id": "29",
+      "name": "ROUND HEAD SCREW",
+      "quantity": 3,
+      "sku": "609011"
+    },
+    {
+      "id": "30",
+      "name": "4-40 X 3/16 BIND HEAD SCREW SST",
+      "quantity": 2,
+      "sku": "059057"
+    },
+    {
+      "id": "31",
+      "name": "10-32X3/4 ROUND HEAD SCREW (REPAIR ONLY)",
+      "quantity": 1,
+      "sku": "659021"
+    },
+    {
+      "id": "32",
+      "name": "NUT BLOCK",
+      "quantity": 1,
+      "sku": "609015"
+    },
+    {
+      "id": "33",
+      "name": "3\" HINGE BLOCK",
+      "quantity": 1,
+      "sku": "680010"
+    },
+    {
+      "id": "34",
+      "name": "3\" INSERT",
+      "quantity": 1,
+      "sku": "680030"
+    },
+    {
+      "id": "35",
+      "name": "4-40 STOPNUT ELASTIC SST",
+      "quantity": 1,
+      "sku": "609012"
+    },
+    {
+      "id": "36",
+      "name": "10-32X1/2 BHMS",
+      "quantity": 1,
+      "sku": "509008"
+    },
+    {
+      "id": "37",
+      "name": "PRESSURE PLATE TAB (REPAIR ONLY)",
+      "quantity": 1,
+      "sku": "630017"
+    },
+    {
+      "id": "38",
+      "name": "SPRING",
+      "quantity": 2,
+      "sku": "602026F"
+    },
+    {
+      "id": "39",
+      "name": "3\" LATCH",
+      "quantity": 1,
+      "sku": "680002"
+    },
+    {
+      "id": "41",
+      "name": "CONNECTOR",
+      "quantity": 2,
+      "sku": "650022"
+    },
+    {
+      "id": "42",
+      "name": "# 6-32 LOCKNUT",
+      "quantity": 2,
+      "sku": "059018"
+    },
+    {
+      "id": "43",
+      "name": "6-32 X 3/8 FILLISTER SCREW SST",
+      "quantity": 2,
+      "sku": "059012"
+    }
+  ],
+  "coordinates": {
+    "1": {
+      "id": "1",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 0,
+      "y_pct": 0,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0,
+      "widthPx": 100,
+      "heightPx": 40
+    },
+    "2": {
+      "id": "2",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 0,
+      "y_pct": 0,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0,
+      "widthPx": 100,
+      "heightPx": 40
+    },
+    "3": {
+      "id": "3",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 0,
+      "y_pct": 0,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0,
+      "widthPx": 100,
+      "heightPx": 40
+    },
+    "4": {
+      "id": "4",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 0,
+      "y_pct": 0,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0,
+      "widthPx": 100,
+      "heightPx": 40
+    },
+    "5": {
+      "id": "5",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 0,
+      "y_pct": 0,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0,
+      "widthPx": 100,
+      "heightPx": 40
+    },
+    "6": {
+      "id": "6",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 0,
+      "y_pct": 0,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0,
+      "widthPx": 100,
+      "heightPx": 40
+    },
+    "7": {
+      "id": "7",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 0,
+      "y_pct": 0,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0,
+      "widthPx": 100,
+      "heightPx": 40
+    },
+    "8": {
+      "id": "8",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 0,
+      "y_pct": 0,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0,
+      "widthPx": 100,
+      "heightPx": 40
+    },
+    "9": {
+      "id": "9",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 0,
+      "y_pct": 0,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0,
+      "widthPx": 100,
+      "heightPx": 40
+    },
+    "10": {
+      "id": "10",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 0,
+      "y_pct": 0,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0,
+      "widthPx": 100,
+      "heightPx": 40
+    },
+    "11": {
+      "id": "11",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 0,
+      "y_pct": 0,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0,
+      "widthPx": 100,
+      "heightPx": 40
+    },
+    "12": {
+      "id": "12",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 0,
+      "y_pct": 0,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0,
+      "widthPx": 100,
+      "heightPx": 40
+    },
+    "13": {
+      "id": "13",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 0,
+      "y_pct": 0,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0,
+      "widthPx": 100,
+      "heightPx": 40
+    },
+    "14": {
+      "id": "14",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 0,
+      "y_pct": 0,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0,
+      "widthPx": 100,
+      "heightPx": 40
+    },
+    "15": {
+      "id": "15",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 0,
+      "y_pct": 0,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0,
+      "widthPx": 100,
+      "heightPx": 40
+    },
+    "16": {
+      "id": "16",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 0,
+      "y_pct": 0,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0,
+      "widthPx": 100,
+      "heightPx": 40
+    },
+    "17": {
+      "id": "17",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 0,
+      "y_pct": 0,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0,
+      "widthPx": 100,
+      "heightPx": 40
+    },
+    "18": {
+      "id": "18",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 0,
+      "y_pct": 0,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0,
+      "widthPx": 100,
+      "heightPx": 40
+    },
+    "19": {
+      "id": "19",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 0,
+      "y_pct": 0,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0,
+      "widthPx": 100,
+      "heightPx": 40
+    },
+    "20": {
+      "id": "20",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 0,
+      "y_pct": 0,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0,
+      "widthPx": 100,
+      "heightPx": 40
+    },
+    "21": {
+      "id": "21",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 0,
+      "y_pct": 0,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0,
+      "widthPx": 100,
+      "heightPx": 40
+    },
+    "22": {
+      "id": "22",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 0,
+      "y_pct": 0,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0,
+      "widthPx": 100,
+      "heightPx": 40
+    },
+    "23": {
+      "id": "23",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 0,
+      "y_pct": 0,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0,
+      "widthPx": 100,
+      "heightPx": 40
+    },
+    "24": {
+      "id": "24",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 0,
+      "y_pct": 0,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0,
+      "widthPx": 100,
+      "heightPx": 40
+    },
+    "25": {
+      "id": "25",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 0,
+      "y_pct": 0,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0,
+      "widthPx": 100,
+      "heightPx": 40
+    },
+    "26": {
+      "id": "26",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 0,
+      "y_pct": 0,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0,
+      "widthPx": 100,
+      "heightPx": 40
+    },
+    "27": {
+      "id": "27",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 0,
+      "y_pct": 0,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0,
+      "widthPx": 100,
+      "heightPx": 40
+    },
+    "28": {
+      "id": "28",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 0,
+      "y_pct": 0,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0,
+      "widthPx": 100,
+      "heightPx": 40
+    },
+    "29": {
+      "id": "29",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 0,
+      "y_pct": 0,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0,
+      "widthPx": 100,
+      "heightPx": 40
+    },
+    "30": {
+      "id": "30",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 0,
+      "y_pct": 0,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0,
+      "widthPx": 100,
+      "heightPx": 40
+    },
+    "31": {
+      "id": "31",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 0,
+      "y_pct": 0,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0,
+      "widthPx": 100,
+      "heightPx": 40
+    },
+    "32": {
+      "id": "32",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 0,
+      "y_pct": 0,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0,
+      "widthPx": 100,
+      "heightPx": 40
+    },
+    "33": {
+      "id": "33",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 0,
+      "y_pct": 0,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0,
+      "widthPx": 100,
+      "heightPx": 40
+    },
+    "34": {
+      "id": "34",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 0,
+      "y_pct": 0,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0,
+      "widthPx": 100,
+      "heightPx": 40
+    },
+    "35": {
+      "id": "35",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 0,
+      "y_pct": 0,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0,
+      "widthPx": 100,
+      "heightPx": 40
+    },
+    "36": {
+      "id": "36",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 0,
+      "y_pct": 0,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0,
+      "widthPx": 100,
+      "heightPx": 40
+    },
+    "37": {
+      "id": "37",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 0,
+      "y_pct": 0,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0,
+      "widthPx": 100,
+      "heightPx": 40
+    },
+    "38": {
+      "id": "38",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 0,
+      "y_pct": 0,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0,
+      "widthPx": 100,
+      "heightPx": 40
+    },
+    "39": {
+      "id": "39",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 0,
+      "y_pct": 0,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0,
+      "widthPx": 100,
+      "heightPx": 40
+    },
+    "41": {
+      "id": "41",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 0,
+      "y_pct": 0,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0,
+      "widthPx": 100,
+      "heightPx": 40
+    },
+    "42": {
+      "id": "42",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 0,
+      "y_pct": 0,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0,
+      "widthPx": 100,
+      "heightPx": 40
+    },
+    "43": {
+      "id": "43",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 0,
+      "y_pct": 0,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0,
+      "widthPx": 100,
+      "heightPx": 40
+    }
+  },
+  "schema_version": "1.0",
+  "image_natural_width": 2527,
+  "image_natural_height": 1836
+}

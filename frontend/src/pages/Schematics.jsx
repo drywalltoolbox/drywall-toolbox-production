@@ -108,6 +108,22 @@ import platinumFlatBoxData            from '/brands/Platinum/Schematics/FlatBox/
 import platinumOutsideCornerRollerData from '/brands/Platinum/Schematics/OutsideCornerRoller/schematic_data.json';
 
 // ---------------------------------------------------------------------------
+// TapeTech schematic JSON data imports
+// ---------------------------------------------------------------------------
+import tapeTech17TTData  from '/brands/TapeTech/Schematics/17TT/schematic_data.json';
+import tapeTech20TTXData from '/brands/TapeTech/Schematics/20TTX/schematic_data.json';
+import tapeTech25TTXData from '/brands/TapeTech/Schematics/25TTX/schematic_data.json';
+import tapeTech30TTXData from '/brands/TapeTech/Schematics/30TTX/schematic_data.json';
+import tapeTech35TTData  from '/brands/TapeTech/Schematics/35TT/schematic_data.json';
+import tapeTech40TTData  from '/brands/TapeTech/Schematics/40TT/schematic_data.json';
+import tapeTech42TTData  from '/brands/TapeTech/Schematics/42TT/schematic_data.json';
+import tapeTech45TTData  from '/brands/TapeTech/Schematics/45TT/schematic_data.json';
+import tapeTech48TTData  from '/brands/TapeTech/Schematics/48TT/schematic_data.json';
+import tapeTech50TTData  from '/brands/TapeTech/Schematics/50TT/schematic_data.json';
+import tapeTech63TTData  from '/brands/TapeTech/Schematics/63TT/schematic_data.json';
+import tapeTech68TTData  from '/brands/TapeTech/Schematics/68TT/schematic_data.json';
+
+// ---------------------------------------------------------------------------
 // Dura-Stilts schematic JSON data imports
 // schematic_data2.json → Model IV 18″–30″ range (with hotspots)
 // schematic_data3.json → Model IV 24″–40″ range (with hotspots)
@@ -407,6 +423,56 @@ const _fallbacks = {
     preview: `${_BASE}brands/Platinum/Schematics/OutsideCornerRoller/platinum_outside_cornerroller_preview.webp`,
   },
 
+  // ── TapeTech ────────────────────────────────────────────────────────────
+  'tapetech-17tt': {
+    pages:   { 1: `${_BASE}brands/TapeTech/Schematics/17TT/schematic_page_1.png` },
+    preview: `${_BASE}brands/TapeTech/Schematics/17TT/17tt.png`,
+  },
+  'tapetech-20ttx': {
+    pages:   { 1: `${_BASE}brands/TapeTech/Schematics/20TTX/schematic_page_1.png` },
+    preview: `${_BASE}brands/TapeTech/Schematics/20TTX/20ttx.png`,
+  },
+  'tapetech-25ttx': {
+    pages:   { 1: `${_BASE}brands/TapeTech/Schematics/25TTX/schematic_page_1-.png` },
+    preview: `${_BASE}brands/TapeTech/Schematics/25TTX/25ttx.png`,
+  },
+  'tapetech-30ttx': {
+    pages:   { 1: `${_BASE}brands/TapeTech/Schematics/30TTX/schematic_page_1.png` },
+    preview: `${_BASE}brands/TapeTech/Schematics/30TTX/30ttx.png`,
+  },
+  'tapetech-35tt': {
+    pages:   { 1: `${_BASE}brands/TapeTech/Schematics/35TT/schematic_page_1.png` },
+    preview: `${_BASE}brands/TapeTech/Schematics/35TT/35tt.png`,
+  },
+  'tapetech-40tt': {
+    pages:   { 1: `${_BASE}brands/TapeTech/Schematics/40TT/schematic_page_1.png` },
+    preview: `${_BASE}brands/TapeTech/Schematics/40TT/40tt.png`,
+  },
+  'tapetech-42tt': {
+    pages:   { 1: `${_BASE}brands/TapeTech/Schematics/42TT/schematic_page_1.png` },
+    preview: `${_BASE}brands/TapeTech/Schematics/42TT/42tt.png`,
+  },
+  'tapetech-45tt': {
+    pages:   { 1: `${_BASE}brands/TapeTech/Schematics/45TT/schematic_page_1.png` },
+    preview: `${_BASE}brands/TapeTech/Schematics/45TT/45tt.png`,
+  },
+  'tapetech-48tt': {
+    pages:   { 1: `${_BASE}brands/TapeTech/Schematics/48TT/schematic_page_1.png` },
+    preview: `${_BASE}brands/TapeTech/Schematics/48TT/48tt.png`,
+  },
+  'tapetech-50tt': {
+    pages:   { 1: `${_BASE}brands/TapeTech/Schematics/50TT/schematic_page_1.png` },
+    preview: `${_BASE}brands/TapeTech/Schematics/50TT/50tt.png`,
+  },
+  'tapetech-63tt': {
+    pages:   { 1: `${_BASE}brands/TapeTech/Schematics/63TT/schematic_page_1.png` },
+    preview: `${_BASE}brands/TapeTech/Schematics/63TT/63tt.png`,
+  },
+  'tapetech-68tt': {
+    pages:   { 1: `${_BASE}brands/TapeTech/Schematics/68TT/schematic_page_1.png` },
+    preview: `${_BASE}brands/TapeTech/Schematics/68TT/68tt.png`,
+  },
+
   // ── Dura-Stilts ──────────────────────────────────────────────────────────
   // Three height-range pages for the Model IV stilt.
   // Pages 1 (14-22) is diagram-only; pages 2 (18-30) and 3 (24-40) have hotspots.
@@ -702,6 +768,20 @@ const ALLOWED_BRANDS = [
   const platinumCompoundPumpParts       = buildPartsFromData(platinumCompoundPumpData);
   const platinumFlatBoxParts            = buildPartsFromData(platinumFlatBoxData);
   const platinumOutsideCornerRollerParts = buildPartsFromData(platinumOutsideCornerRollerData);
+
+  // TapeTech parts arrays
+  const tapeTech17TTParts  = buildPartsFromData(tapeTech17TTData);
+  const tapeTech20TTXParts = buildPartsFromData(tapeTech20TTXData);
+  const tapeTech25TTXParts = buildPartsFromData(tapeTech25TTXData);
+  const tapeTech30TTXParts = buildPartsFromData(tapeTech30TTXData);
+  const tapeTech35TTParts  = buildPartsFromData(tapeTech35TTData);
+  const tapeTech40TTParts  = buildPartsFromData(tapeTech40TTData);
+  const tapeTech42TTParts  = buildPartsFromData(tapeTech42TTData);
+  const tapeTech45TTParts  = buildPartsFromData(tapeTech45TTData);
+  const tapeTech48TTParts  = buildPartsFromData(tapeTech48TTData);
+  const tapeTech50TTParts  = buildPartsFromData(tapeTech50TTData);
+  const tapeTech63TTParts  = buildPartsFromData(tapeTech63TTData);
+  const tapeTech68TTParts  = buildPartsFromData(tapeTech68TTData);
 
   // Dura-Stilts parts arrays
   // Page 1 (14″–22″) has no hotspot JSON — parts array is empty.
@@ -1449,6 +1529,140 @@ const ALLOWED_BRANDS = [
       imagePages: { 1: schImg('platinum-outside-corner-roller', 1) },
       previewImage: schPrev('platinum-outside-corner-roller'),
       parts: platinumOutsideCornerRollerParts,
+    },
+
+    // ── TapeTech ────────────────────────────────────────────────────────────
+    {
+      id: 'tapetech-17tt',
+      title: '17TT',
+      description: 'TapeTech 17TT schematic diagram with replacement parts',
+      brand: 'TapeTech',
+      category: 'Tools',
+      diagramPages: [1],
+      imagePages: { 1: schImg('tapetech-17tt', 1) },
+      previewImage: schPrev('tapetech-17tt'),
+      parts: tapeTech17TTParts,
+    },
+    {
+      id: 'tapetech-20ttx',
+      title: '20TTX',
+      description: 'TapeTech 20TTX schematic diagram with replacement parts',
+      brand: 'TapeTech',
+      category: 'Tools',
+      diagramPages: [1],
+      imagePages: { 1: schImg('tapetech-20ttx', 1) },
+      previewImage: schPrev('tapetech-20ttx'),
+      parts: tapeTech20TTXParts,
+    },
+    {
+      id: 'tapetech-25ttx',
+      title: '25TTX',
+      description: 'TapeTech 25TTX schematic diagram with replacement parts',
+      brand: 'TapeTech',
+      category: 'Tools',
+      diagramPages: [1],
+      imagePages: { 1: schImg('tapetech-25ttx', 1) },
+      previewImage: schPrev('tapetech-25ttx'),
+      parts: tapeTech25TTXParts,
+    },
+    {
+      id: 'tapetech-30ttx',
+      title: '30TTX',
+      description: 'TapeTech 30TTX schematic diagram with replacement parts',
+      brand: 'TapeTech',
+      category: 'Tools',
+      diagramPages: [1],
+      imagePages: { 1: schImg('tapetech-30ttx', 1) },
+      previewImage: schPrev('tapetech-30ttx'),
+      parts: tapeTech30TTXParts,
+    },
+    {
+      id: 'tapetech-35tt',
+      title: '35TT',
+      description: 'TapeTech 35TT schematic diagram with replacement parts',
+      brand: 'TapeTech',
+      category: 'Tools',
+      diagramPages: [1],
+      imagePages: { 1: schImg('tapetech-35tt', 1) },
+      previewImage: schPrev('tapetech-35tt'),
+      parts: tapeTech35TTParts,
+    },
+    {
+      id: 'tapetech-40tt',
+      title: '40TT',
+      description: 'TapeTech 40TT schematic diagram with replacement parts',
+      brand: 'TapeTech',
+      category: 'Tools',
+      diagramPages: [1],
+      imagePages: { 1: schImg('tapetech-40tt', 1) },
+      previewImage: schPrev('tapetech-40tt'),
+      parts: tapeTech40TTParts,
+    },
+    {
+      id: 'tapetech-42tt',
+      title: '42TT',
+      description: 'TapeTech 42TT schematic diagram with replacement parts',
+      brand: 'TapeTech',
+      category: 'Tools',
+      diagramPages: [1],
+      imagePages: { 1: schImg('tapetech-42tt', 1) },
+      previewImage: schPrev('tapetech-42tt'),
+      parts: tapeTech42TTParts,
+    },
+    {
+      id: 'tapetech-45tt',
+      title: '45TT',
+      description: 'TapeTech 45TT schematic diagram with replacement parts',
+      brand: 'TapeTech',
+      category: 'Tools',
+      diagramPages: [1],
+      imagePages: { 1: schImg('tapetech-45tt', 1) },
+      previewImage: schPrev('tapetech-45tt'),
+      parts: tapeTech45TTParts,
+    },
+    {
+      id: 'tapetech-48tt',
+      title: '48TT',
+      description: 'TapeTech 48TT schematic diagram with replacement parts',
+      brand: 'TapeTech',
+      category: 'Tools',
+      diagramPages: [1],
+      imagePages: { 1: schImg('tapetech-48tt', 1) },
+      previewImage: schPrev('tapetech-48tt'),
+      parts: tapeTech48TTParts,
+    },
+    {
+      id: 'tapetech-50tt',
+      title: '50TT',
+      description: 'TapeTech 50TT schematic diagram with replacement parts',
+      brand: 'TapeTech',
+      category: 'Tools',
+      diagramPages: [1],
+      imagePages: { 1: schImg('tapetech-50tt', 1) },
+      previewImage: schPrev('tapetech-50tt'),
+      parts: tapeTech50TTParts,
+    },
+    {
+      id: 'tapetech-63tt',
+      title: '63TT',
+      description: 'TapeTech 63TT schematic diagram with replacement parts',
+      brand: 'TapeTech',
+      category: 'Tools',
+      diagramPages: [1],
+      imagePages: { 1: schImg('tapetech-63tt', 1) },
+      previewImage: schPrev('tapetech-63tt'),
+      parts: tapeTech63TTParts,
+    },
+    {
+      id: 'tapetech-68tt',
+      title: '68TT',
+      description: 'TapeTech 68TT schematic diagram with replacement parts',
+      brand: 'TapeTech',
+      category: 'Tools',
+      diagramPages: [1],
+      imagePages: { 1: schImg('tapetech-68tt', 1) },
+      previewImage: schPrev('tapetech-68tt'),
+      parts: tapeTech68TTParts,
     },
 
     // ── Dura-Stilts ──────────────────────────────────────────────────────────
