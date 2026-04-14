@@ -1094,26 +1094,22 @@ export default function Repairs() {
                 </button>
                 <button
                   type="button"
+                  className="alloy-button"
                   style={{
-                    display: 'inline-flex', alignItems: 'center', gap: '6px',
-                    padding: '12px 20px',
                     background: 'transparent',
-                    border: '1.5px solid rgba(255,255,255,0.35)',
-                    borderRadius: '4px',
-                    color: 'rgba(255,255,255,0.85)',
+                    color: 'white',
+                    border: '1.5px solid rgba(255,255,255,0.5)',
                     cursor: 'pointer',
-                    fontSize: '0.875rem', fontWeight: 700,
-                    transition: 'border-color 0.2s, color 0.2s',
-                    letterSpacing: '0.02em',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '6px',
                   }}
                   onClick={() => {
                     document.getElementById('pricing-tabs-section')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
                   }}
-                  onMouseEnter={(e) => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.7)'; e.currentTarget.style.color = 'white'; }}
-                  onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.35)'; e.currentTarget.style.color = 'rgba(255,255,255,0.85)'; }}
                 >
                   View Pricing
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                     <polyline points="6 9 12 15 18 9"/>
                   </svg>
                 </button>
