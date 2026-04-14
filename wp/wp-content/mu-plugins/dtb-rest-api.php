@@ -38,6 +38,12 @@ defined( 'ABSPATH' ) || exit;
 add_action( 'rest_api_init', 'dtb_register_all_routes', 10 );
 add_action( 'rest_api_init', 'dtb_cors_init', 15 );
 
+// Remove WordPress core CORS handler at the EARLIEST opportunity (priority -999)
+// This ensures our handler is the only one that runs.
+add_action( 'rest_api_init', function () {
+	remove_filter( 'rest_pre_serve_request', 'rest_send_cors_headers' );
+}, -999 );
+
 // Override WooCommerce's own CORS handler so native /wc/v3/* endpoints also
 // respect our allowlist (e.g. requests from https://elliotttmiller.github.io).
 add_action( 'woocommerce_init', 'dtb_wc_cors_early', 1 );
