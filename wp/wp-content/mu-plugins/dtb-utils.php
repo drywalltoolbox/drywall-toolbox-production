@@ -65,7 +65,9 @@ function dtb_get_config(): array {
 	//   1. DTB_WC_CSV_FILENAMES  — JSON array of filenames (preferred for multi-file catalogs)
 	//                               e.g. '["product-wc-tapetech-abc.csv","product-wc-columbia-xyz.csv"]'
 	//   2. DTB_WC_CSV_FILENAME   — legacy single-filename string (still supported)
-	//   3. Hard-coded fallback   — the original single filename.
+	//   3. Auto-discovery        — glob wc-imports/ for product-wc-*.csv, newest file per brand prefix.
+	//                               Eliminates the need to update wp-config.php after every CSV upload.
+	//   4. Hard-coded fallback   — the original single filename.
 	$csv_filenames = [];
 	if ( defined( 'DTB_WC_CSV_FILENAMES' ) ) {
 		$decoded = json_decode( DTB_WC_CSV_FILENAMES, true );
@@ -73,9 +75,39 @@ function dtb_get_config(): array {
 			$csv_filenames = array_values( array_filter( array_map( 'sanitize_file_name', $decoded ) ) );
 		}
 	}
+	if ( empty( $csv_filenames ) && defined( 'DTB_WC_CSV_FILENAME' ) ) {
+		$csv_filenames = [ sanitize_file_name( DTB_WC_CSV_FILENAME ) ];
+	}
 	if ( empty( $csv_filenames ) ) {
-		$single = defined( 'DTB_WC_CSV_FILENAME' ) ? DTB_WC_CSV_FILENAME : 'product-wp-catalog-c7p3my05pn.csv';
-		$csv_filenames = [ sanitize_file_name( $single ) ];
+		// Auto-discover: scan wc-imports/ for files matching product-wc-*.csv.
+		// When multiple files share the same brand prefix (e.g. after re-uploads),
+		// keep only the newest one per prefix so stale duplicates are ignored.
+		$upload_dir    = wp_upload_dir();
+		$wc_imports    = trailingslashit( $upload_dir['basedir'] ) . 'wc-imports/';
+		$found         = glob( $wc_imports . 'product-wc-*.csv' );
+		if ( ! empty( $found ) ) {
+			// Group by brand prefix: everything before the last random suffix token.
+			// e.g. "product-wc-tapetech-cczyksx7op.csv" → prefix "product-wc-tapetech"
+			$by_prefix = [];
+			foreach ( $found as $path ) {
+				$base   = basename( $path, '.csv' );
+				$parts  = explode( '-', $base );
+				// Drop the last segment (random suffix) to get the brand prefix.
+				array_pop( $parts );
+				$prefix = implode( '-', $parts );
+				// Keep only the file with the highest mtime per prefix.
+				if ( ! isset( $by_prefix[ $prefix ] ) || filemtime( $path ) > filemtime( $by_prefix[ $prefix ] ) ) {
+					$by_prefix[ $prefix ] = $path;
+				}
+			}
+			// Sort by prefix name for deterministic ordering.
+			ksort( $by_prefix );
+			$csv_filenames = array_values( array_map( 'basename', $by_prefix ) );
+		}
+	}
+	if ( empty( $csv_filenames ) ) {
+		// Final hard-coded fallback — only reached when wc-imports/ is empty.
+		$csv_filenames = [ 'product-wp-catalog-c7p3my05pn.csv' ];
 	}
 
 	$GLOBALS['_dtb_config_cache'] = [

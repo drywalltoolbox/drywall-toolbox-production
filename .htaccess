@@ -97,6 +97,8 @@ Options +FollowSymLinks
     RewriteCond %{HTTP:Origin} !^https?://(www\.)?drywalltoolbox\.com$ [NC]
     # …and NOT a localhost/loopback origin (dev builds)…
     RewriteCond %{HTTP:Origin} !^http://(localhost|127\.0\.0\.1)(:[0-9]+)?$ [NC]
+    # …and NOT the GitHub Pages dev/preview origin…
+    RewriteCond %{HTTP:Origin} !^https://elliotttmiller\.github\.io$ [NC]
     # …then deny the REST API and DTB namespace routes with 403 Forbidden.
     RewriteRule ^(wp-json|dtb)/ - [F,L]
 </IfModule>
