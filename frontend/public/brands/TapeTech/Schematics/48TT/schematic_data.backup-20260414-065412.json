@@ -190,7 +190,9 @@
       "y_pct": 50.2,
       "shape": "rectangle",
       "pageNumber": 1,
-      "rotation": 0
+      "rotation": 0,
+      "widthPx": 100,
+      "heightPx": 40
     },
     "402006": {
       "id": "402006",
@@ -200,7 +202,9 @@
       "y_pct": 44.900000000000006,
       "shape": "rectangle",
       "pageNumber": 1,
-      "rotation": 0
+      "rotation": 0,
+      "widthPx": 100,
+      "heightPx": 40
     },
     "402012": {
       "id": "402012",
@@ -210,7 +214,9 @@
       "y_pct": 24.950000000000003,
       "shape": "rectangle",
       "pageNumber": 1,
-      "rotation": 0
+      "rotation": 0,
+      "widthPx": 100,
+      "heightPx": 40
     },
     "409010": {
       "id": "409010",
@@ -220,7 +226,9 @@
       "y_pct": 18.95,
       "shape": "rectangle",
       "pageNumber": 1,
-      "rotation": 0
+      "rotation": 0,
+      "widthPx": 100,
+      "heightPx": 40
     },
     "409011": {
       "id": "409011",
@@ -230,7 +238,9 @@
       "y_pct": 72.45,
       "shape": "rectangle",
       "pageNumber": 1,
-      "rotation": 0
+      "rotation": 0,
+      "widthPx": 100,
+      "heightPx": 40
     },
     "480005": {
       "id": "480005",
@@ -240,7 +250,9 @@
       "y_pct": 34.6,
       "shape": "rectangle",
       "pageNumber": 1,
-      "rotation": 0
+      "rotation": 0,
+      "widthPx": 100,
+      "heightPx": 40
     },
     "480021": {
       "id": "480021",
@@ -250,7 +262,9 @@
       "y_pct": 33.55,
       "shape": "rectangle",
       "pageNumber": 1,
-      "rotation": 0
+      "rotation": 0,
+      "widthPx": 100,
+      "heightPx": 40
     },
     "480026": {
       "id": "480026",
@@ -260,7 +274,9 @@
       "y_pct": 72.7,
       "shape": "rectangle",
       "pageNumber": 1,
-      "rotation": 0
+      "rotation": 0,
+      "widthPx": 100,
+      "heightPx": 40
     },
     "480027": {
       "id": "480027",
@@ -270,7 +286,9 @@
       "y_pct": 71.43324811077925,
       "shape": "rectangle",
       "pageNumber": 1,
-      "rotation": 0
+      "rotation": 0,
+      "widthPx": 100,
+      "heightPx": 40
     },
     "489013": {
       "id": "489013",
@@ -280,7 +298,9 @@
       "y_pct": 40.25,
       "shape": "rectangle",
       "pageNumber": 1,
-      "rotation": 0
+      "rotation": 0,
+      "widthPx": 100,
+      "heightPx": 40
     },
     "489020": {
       "id": "489020",
@@ -290,7 +310,9 @@
       "y_pct": 59.14999999999999,
       "shape": "rectangle",
       "pageNumber": 1,
-      "rotation": 0
+      "rotation": 0,
+      "widthPx": 100,
+      "heightPx": 40
     },
     "489022": {
       "id": "489022",
@@ -300,7 +322,9 @@
       "y_pct": 37.45,
       "shape": "rectangle",
       "pageNumber": 1,
-      "rotation": 0
+      "rotation": 0,
+      "widthPx": 100,
+      "heightPx": 40
     },
     "489023": {
       "id": "489023",
@@ -310,7 +334,9 @@
       "y_pct": 64.2,
       "shape": "rectangle",
       "pageNumber": 1,
-      "rotation": 0
+      "rotation": 0,
+      "widthPx": 100,
+      "heightPx": 40
     },
     "489028": {
       "id": "489028",
@@ -320,7 +346,9 @@
       "y_pct": 68.80000000000001,
       "shape": "rectangle",
       "pageNumber": 1,
-      "rotation": 0
+      "rotation": 0,
+      "widthPx": 100,
+      "heightPx": 40
     },
     "489029": {
       "id": "489029",
@@ -330,7 +358,9 @@
       "y_pct": 78.48326111923535,
       "shape": "rectangle",
       "pageNumber": 1,
-      "rotation": 0
+      "rotation": 0,
+      "widthPx": 100,
+      "heightPx": 40
     },
     "059091": {
       "id": "059091",
@@ -340,7 +370,9 @@
       "y_pct": 16.8,
       "shape": "rectangle",
       "pageNumber": 1,
-      "rotation": 0
+      "rotation": 0,
+      "widthPx": 100,
+      "heightPx": 40
     },
     "402002F": {
       "id": "402002F",
@@ -350,7 +382,9 @@
       "y_pct": 22.849999999999998,
       "shape": "rectangle",
       "pageNumber": 1,
-      "rotation": 0
+      "rotation": 0,
+      "widthPx": 100,
+      "heightPx": 40
     },
     "480002F": {
       "id": "480002F",
@@ -360,7 +394,9 @@
       "y_pct": 30.18332772558246,
       "shape": "rectangle",
       "pageNumber": 1,
-      "rotation": 0
+      "rotation": 0,
+      "widthPx": 100,
+      "heightPx": 40
     },
     "480008F": {
       "id": "480008F",
@@ -370,7 +406,9 @@
       "y_pct": 32.216660830028005,
       "shape": "rectangle",
       "pageNumber": 1,
-      "rotation": 0
+      "rotation": 0,
+      "widthPx": 100,
+      "heightPx": 40
     },
     "480001F": {
       "id": "480001F",
@@ -380,7 +418,9 @@
       "y_pct": 34.599986991543894,
       "shape": "rectangle",
       "pageNumber": 1,
-      "rotation": 0
+      "rotation": 0,
+      "widthPx": 100,
+      "heightPx": 40
     },
     "480015F": {
       "id": "480015F",
@@ -390,7 +430,9 @@
       "y_pct": 36.816647821571905,
       "shape": "rectangle",
       "pageNumber": 1,
-      "rotation": 0
+      "rotation": 0,
+      "widthPx": 100,
+      "heightPx": 40
     },
     "480007F": {
       "id": "480007F",
@@ -400,7 +442,9 @@
       "y_pct": 59.8,
       "shape": "rectangle",
       "pageNumber": 1,
-      "rotation": 0
+      "rotation": 0,
+      "widthPx": 100,
+      "heightPx": 40
     },
     "059037": {
       "id": "059037",
@@ -410,7 +454,9 @@
       "y_pct": 66.85,
       "shape": "rectangle",
       "pageNumber": 1,
-      "rotation": 0
+      "rotation": 0,
+      "widthPx": 100,
+      "heightPx": 40
     },
     "450009F": {
       "id": "450009F",
@@ -420,7 +466,9 @@
       "y_pct": 70.25,
       "shape": "rectangle",
       "pageNumber": 1,
-      "rotation": 0
+      "rotation": 0,
+      "widthPx": 100,
+      "heightPx": 40
     },
     "480016F": {
       "id": "480016F",
@@ -430,7 +478,9 @@
       "y_pct": 80,
       "shape": "rectangle",
       "pageNumber": 1,
-      "rotation": 0
+      "rotation": 0,
+      "widthPx": 100,
+      "heightPx": 40
     },
     "484014F": {
       "id": "484014F",
@@ -440,7 +490,9 @@
       "y_pct": 76.6,
       "shape": "rectangle",
       "pageNumber": 1,
-      "rotation": 0
+      "rotation": 0,
+      "widthPx": 100,
+      "heightPx": 40
     },
     "059084": {
       "id": "059084",
@@ -450,7 +502,9 @@
       "y_pct": 43.9,
       "shape": "rectangle",
       "pageNumber": 1,
-      "rotation": 0
+      "rotation": 0,
+      "widthPx": 100,
+      "heightPx": 40
     },
     "480017F": {
       "id": "480017F",
@@ -460,7 +514,9 @@
       "y_pct": 38.2,
       "shape": "rectangle",
       "pageNumber": 1,
-      "rotation": 0
+      "rotation": 0,
+      "widthPx": 100,
+      "heightPx": 40
     }
   },
   "schema_version": "1.0",
