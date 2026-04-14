@@ -2498,31 +2498,16 @@ export default function Repairs() {
                 to: '/parts',
                 title: 'Parts & Schematics',
                 description: 'Browse interactive part diagrams and order replacement parts for all major brands.',
-                icon: (
-                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--primary-600)" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                    <circle cx="12" cy="12" r="3"/><path d="M19.07 4.93l-1.41 1.41M4.93 4.93l1.41 1.41M20 12h1M3 12H2M19.07 19.07l-1.41-1.41M4.93 19.07l1.41-1.41M12 20v1M12 3V2"/>
-                  </svg>
-                ),
               },
               {
                 to: '/products',
                 title: 'Shop Replacement Tools',
                 description: 'Upgrade your toolkit — browse our full catalog of professional drywall tools and accessories.',
-                icon: (
-                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--primary-600)" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/>
-                  </svg>
-                ),
               },
               {
                 to: '/contact',
                 title: 'Talk to an Expert',
                 description: 'Our industry veterans are ready to help — no bots, no runaround, just real support.',
-                icon: (
-                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--primary-600)" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.59 1.18h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L7.91 8.9a16 16 0 0 0 5.56 5.56l.92-.92a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 21 16.92z"/>
-                  </svg>
-                ),
               },
             ].map((ql) => (
               <Link key={ql.to} to={ql.to} style={{ textDecoration: 'none' }}>
@@ -2549,16 +2534,6 @@ export default function Repairs() {
                     e.currentTarget.style.transform = 'translateY(0)';
                   }}
                 >
-                  <div style={{
-                    width: '44px', height: '44px',
-                    background: 'rgba(37,99,235,0.07)',
-                    border: '1px solid rgba(37,99,235,0.15)',
-                    borderRadius: '10px',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    marginBottom: '14px', flexShrink: 0,
-                  }}>
-                    {ql.icon}
-                  </div>
                   <h3 style={{ fontSize: '1rem', fontWeight: 800, color: '#0f172a', margin: '0 0 8px 0' }}>{ql.title}</h3>
                   <p style={{ fontSize: '0.825rem', color: 'rgba(15,23,42,0.6)', margin: '0 0 16px 0', lineHeight: 1.5, flex: 1 }}>{ql.description}</p>
                   <div style={{
