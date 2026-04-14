@@ -160,6 +160,44 @@ export function useAuth() {
     } catch { /**/ }
   }, [] );
 
+  // ── forgotPassword ────────────────────────────────────────────────────────
+  const forgotPassword = useCallback( async ( email ) => {
+    setError( null );
+    try {
+      const res = await fetch( `${ DTB_AUTH_BASE }/forgot-password`, {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify( { email } ),
+      } );
+      return await res.json();
+    } catch ( err ) {
+      setError( err.message || 'Request failed.' );
+      throw err;
+    }
+  }, [] );
+
+  // ── resetPassword ─────────────────────────────────────────────────────────
+  const resetPassword = useCallback( async ( key, login, password ) => {
+    setError( null );
+    try {
+      const res = await fetch( `${ DTB_AUTH_BASE }/reset-password`, {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify( { key, login, password } ),
+      } );
+      const data = await res.json();
+      if ( ! res.ok ) {
+        const msg = data?.message || 'Password reset failed.';
+        setError( msg );
+        throw new Error( msg );
+      }
+      return data;
+    } catch ( err ) {
+      setError( err.message || 'Password reset failed.' );
+      throw err;
+    }
+  }, [] );
+
   return {
     user,
     isAuthenticated: Boolean( user ),
@@ -167,6 +205,8 @@ export function useAuth() {
     login,
     logout,
     register,
+    forgotPassword,
+    resetPassword,
     error,
   };
 }

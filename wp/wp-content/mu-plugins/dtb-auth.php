@@ -248,6 +248,70 @@ function dtb_register_auth_routes(): void {
 		'callback'            => 'dtb_auth_validate',
 		'permission_callback' => '__return_true',
 	] );
+
+	register_rest_route( $ns, '/auth/register', [
+		'methods'             => 'POST',
+		'callback'            => 'dtb_auth_register',
+		'permission_callback' => '__return_true',
+		'args'                => [
+			'email'      => [
+				'required'          => true,
+				'sanitize_callback' => 'sanitize_email',
+				'description'       => 'New user e-mail address.',
+			],
+			'password'   => [
+				'required'          => true,
+				'sanitize_callback' => 'sanitize_text_field',
+				'description'       => 'New user password (minimum 8 characters).',
+			],
+			'first_name' => [
+				'required'          => false,
+				'sanitize_callback' => 'sanitize_text_field',
+				'default'           => '',
+			],
+			'last_name'  => [
+				'required'          => false,
+				'sanitize_callback' => 'sanitize_text_field',
+				'default'           => '',
+			],
+		],
+	] );
+
+	register_rest_route( $ns, '/auth/forgot-password', [
+		'methods'             => 'POST',
+		'callback'            => 'dtb_auth_forgot_password',
+		'permission_callback' => '__return_true',
+		'args'                => [
+			'email' => [
+				'required'          => true,
+				'sanitize_callback' => 'sanitize_email',
+				'description'       => 'E-mail address to send the reset link to.',
+			],
+		],
+	] );
+
+	register_rest_route( $ns, '/auth/reset-password', [
+		'methods'             => 'POST',
+		'callback'            => 'dtb_auth_reset_password',
+		'permission_callback' => '__return_true',
+		'args'                => [
+			'key'      => [
+				'required'          => true,
+				'sanitize_callback' => 'sanitize_text_field',
+				'description'       => 'Password reset key from the reset e-mail.',
+			],
+			'login'    => [
+				'required'          => true,
+				'sanitize_callback' => 'sanitize_user',
+				'description'       => 'User login (username or e-mail).',
+			],
+			'password' => [
+				'required'          => true,
+				'sanitize_callback' => 'sanitize_text_field',
+				'description'       => 'New password (minimum 8 characters).',
+			],
+		],
+	] );
 }
 
 // =============================================================================
@@ -307,6 +371,225 @@ function dtb_auth_login( WP_REST_Request $request ): WP_REST_Response {
 	return $response;
 }
 
+/**
+ * POST /dtb/v1/auth/register
+ *
+ * Creates a new WordPress user and a matching WooCommerce customer record,
+ * then auto-logs in the new user by setting the dtb_auth cookie.
+ *
+ * Expected JSON body: { email, password, first_name, last_name }
+ *
+ * Success: HTTP 201  { success: true, user: { id, email, display_name, roles } }
+ * Errors:
+ *   422 — validation failure (email format, password length)
+ *   409 — e-mail already registered
+ *   500 — unexpected user-creation failure
+ *
+ * @param WP_REST_Request $request Incoming request.
+ * @return WP_REST_Response
+ */
+function dtb_auth_register( WP_REST_Request $request ): WP_REST_Response {
+	$rl = dtb_rate_limit( $request, 'auth_register' );
+	if ( $rl ) {
+		return $rl;
+	}
+
+	$email      = sanitize_email( (string) $request->get_param( 'email' ) );
+	$password   = (string) $request->get_param( 'password' );
+	$first_name = sanitize_text_field( (string) $request->get_param( 'first_name' ) );
+	$last_name  = sanitize_text_field( (string) $request->get_param( 'last_name' ) );
+
+	// ── Server-side validation ──────────────────────────────────────────────
+	if ( ! is_email( $email ) ) {
+		return new WP_REST_Response(
+			dtb_error_envelope( 'invalid_email', 'Please provide a valid email address.', 422 ),
+			422
+		);
+	}
+
+	if ( strlen( $password ) < 8 ) {
+		return new WP_REST_Response(
+			dtb_error_envelope( 'weak_password', 'Password must be at least 8 characters.', 422 ),
+			422
+		);
+	}
+
+	if ( email_exists( $email ) ) {
+		return new WP_REST_Response(
+			dtb_error_envelope( 'email_exists', 'An account with this email address already exists.', 409 ),
+			409
+		);
+	}
+
+	// ── Create WordPress user ───────────────────────────────────────────────
+	$display_name = trim( $first_name . ' ' . $last_name ) ?: $email;
+
+	$user_id = wp_insert_user( [
+		'user_login'   => $email,   // use email as login for uniqueness
+		'user_email'   => $email,
+		'user_pass'    => $password,
+		'first_name'   => $first_name,
+		'last_name'    => $last_name,
+		'display_name' => $display_name,
+		'role'         => 'customer',
+	] );
+
+	if ( is_wp_error( $user_id ) ) {
+		return new WP_REST_Response(
+			dtb_error_envelope( 'registration_failed', $user_id->get_error_message(), 500 ),
+			500
+		);
+	}
+
+	// ── Create WooCommerce customer record ──────────────────────────────────
+	// Guard against WooCommerce being inactive to prevent fatal errors.
+	if ( class_exists( 'WC_Customer' ) ) {
+		try {
+			$wc_customer = new WC_Customer( $user_id );
+			$wc_customer->set_email( $email );
+			$wc_customer->set_first_name( $first_name );
+			$wc_customer->set_last_name( $last_name );
+			$wc_customer->set_billing_email( $email );
+			$wc_customer->set_billing_first_name( $first_name );
+			$wc_customer->set_billing_last_name( $last_name );
+			$wc_customer->save();
+		} catch ( Exception $e ) {
+			// WC customer creation is best-effort; user is already created.
+			error_log( '[DTB] WC_Customer save failed for user ' . $user_id . ': ' . $e->getMessage() );
+		}
+	}
+
+	// ── Auto-login: generate JWT and set the auth cookie ───────────────────
+	$user = get_user_by( 'id', $user_id );
+	$jwt  = dtb_generate_jwt( $user );
+	dtb_set_auth_cookie( $jwt, 7 * DAY_IN_SECONDS );
+
+	// ── Send WordPress new-user notification email ──────────────────────────
+	wp_new_user_notification( $user_id, null, 'user' );
+
+	$response = new WP_REST_Response( [
+		'success' => true,
+		'user'    => [
+			'id'           => $user->ID,
+			'email'        => $user->user_email,
+			'display_name' => $user->display_name,
+			'roles'        => array_values( (array) $user->roles ),
+		],
+	], 201 );
+	$response->header( 'Cache-Control', 'private, no-store' );
+	return $response;
+}
+
+/**
+ * POST /dtb/v1/auth/forgot-password
+ *
+ * Accepts an email address.  If a matching WP user exists, generates a
+ * password reset key and sends a reset link pointing to the React SPA
+ * at /reset-password?key={key}&login={login} (NOT wp-login.php).
+ *
+ * Always returns HTTP 200 with the same message regardless of whether the
+ * email matched a real account (prevents user enumeration).
+ *
+ * @param WP_REST_Request $request Incoming request.
+ * @return WP_REST_Response
+ */
+function dtb_auth_forgot_password( WP_REST_Request $request ): WP_REST_Response {
+	$email = sanitize_email( (string) $request->get_param( 'email' ) );
+
+	$generic = new WP_REST_Response( [
+		'success' => true,
+		'message' => 'If an account with that address exists, a reset link has been sent.',
+	], 200 );
+	$generic->header( 'Cache-Control', 'private, no-store' );
+
+	if ( ! is_email( $email ) ) {
+		return $generic; // do not reveal format issues
+	}
+
+	$user = get_user_by( 'email', $email );
+	if ( ! $user ) {
+		return $generic; // user enumeration prevention
+	}
+
+	// Generate a native WP password reset key.
+	$reset_key = get_password_reset_key( $user );
+	if ( is_wp_error( $reset_key ) ) {
+		error_log( '[DTB] get_password_reset_key failed for user ' . $user->ID . ': ' . $reset_key->get_error_message() );
+		return $generic; // fail silently — still return generic message
+	}
+
+	// Build the reset URL pointing to the React SPA (not wp-login.php).
+	$spa_origin = defined( 'WP_HOME' ) ? rtrim( WP_HOME, '/' ) : '';
+	$reset_url  = add_query_arg(
+		[
+			'key'   => rawurlencode( $reset_key ),
+			'login' => rawurlencode( $user->user_login ),
+		],
+		$spa_origin . '/reset-password'
+	);
+
+	$site_name = get_bloginfo( 'name' ) ?: 'Drywall Toolbox';
+	$subject   = sprintf( '[%s] Password Reset Request', $site_name );
+
+	$message  = sprintf( "Hi %s,\r\n\r\n", $user->display_name ?: $user->user_login );
+	$message .= "We received a request to reset the password for your account.\r\n\r\n";
+	$message .= "Click the link below to set a new password. This link expires in 24 hours.\r\n\r\n";
+	$message .= $reset_url . "\r\n\r\n";
+	$message .= "If you did not request this, you can safely ignore this email.\r\n\r\n";
+	$message .= '— ' . $site_name;
+
+	wp_mail( $user->user_email, $subject, $message );
+
+	return $generic;
+}
+
+/**
+ * POST /dtb/v1/auth/reset-password
+ *
+ * Validates a password reset key, enforces the minimum password length,
+ * and resets the user's password using the native WP function.
+ *
+ * Expected JSON body: { key, login, password }
+ *
+ * Success: HTTP 200  { success: true, message: '...' }
+ * Errors:
+ *   400 — invalid / expired key, or validation failure
+ *
+ * @param WP_REST_Request $request Incoming request.
+ * @return WP_REST_Response
+ */
+function dtb_auth_reset_password( WP_REST_Request $request ): WP_REST_Response {
+	$key      = sanitize_text_field( (string) $request->get_param( 'key' ) );
+	$login    = sanitize_user( (string) $request->get_param( 'login' ) );
+	$password = (string) $request->get_param( 'password' );
+
+	if ( strlen( $password ) < 8 ) {
+		return new WP_REST_Response(
+			dtb_error_envelope( 'weak_password', 'Password must be at least 8 characters.', 400 ),
+			400
+		);
+	}
+
+	// Validate the reset key using the native WP function.
+	$user = check_password_reset_key( $key, $login );
+
+	if ( is_wp_error( $user ) ) {
+		return new WP_REST_Response(
+			dtb_error_envelope( 'invalid_key', 'This reset link is invalid or has expired. Please request a new one.', 400 ),
+			400
+		);
+	}
+
+	// Reset the password using native WP — this also invalidates the key.
+	reset_password( $user, $password );
+
+	$response = new WP_REST_Response( [
+		'success' => true,
+		'message' => 'Your password has been reset. You can now sign in with your new password.',
+	], 200 );
+	$response->header( 'Cache-Control', 'private, no-store' );
+	return $response;
+}
 /**
  * DELETE /dtb/v1/auth/logout
  *

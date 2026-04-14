@@ -1,0 +1,106 @@
+{
+  "17TT_SCH/schematic_page_1.png": {
+    "parts": [
+      {
+        "label": "150004F",
+        "description": "Pin, Swivel Coupling",
+        "partNumber": "150004F"
+      },
+      {
+        "label": "170002",
+        "description": "Block",
+        "partNumber": "170002"
+      },
+      {
+        "label": "179004",
+        "description": "6-32 X 3/16 Hex Soc Setscrew Cup Pt 18-8",
+        "partNumber": "179004"
+      },
+      {
+        "label": "059143",
+        "description": "Cotter Pin 1/16 X 1/2 SST.",
+        "partNumber": "059143"
+      },
+      {
+        "label": "150009",
+        "description": "Swivel Axle",
+        "partNumber": "150009"
+      },
+      {
+        "label": "359005",
+        "description": "Screw: 6-32 X 1/4 Bind Hd.",
+        "partNumber": "359005"
+      },
+      {
+        "label": "176001",
+        "description": "Bracket, No Logo, Serialized",
+        "partNumber": "176001"
+      },
+      {
+        "label": "171005",
+        "description": "Universal Roller",
+        "partNumber": "171005"
+      },
+      {
+        "label": "170003",
+        "description": "Axle",
+        "partNumber": "170003"
+      },
+      {
+        "label": "150003F",
+        "description": "Coupling",
+        "partNumber": "150003F"
+      },
+      {
+        "label": "154007",
+        "description": "Swivel Ass'Y",
+        "partNumber": "154007"
+      },
+      {
+        "label": "179010",
+        "description": ".312 Ext. Retainer \"E\" Ring, 18-8 S.S.",
+        "partNumber": "179010"
+      },
+      {
+        "label": "359046",
+        "description": "Nut, Hex 10-32",
+        "partNumber": "359046"
+      },
+      {
+        "label": "179006",
+        "description": "#10 Medium Lockwasher 18-8 S.S.",
+        "partNumber": "179006"
+      },
+      {
+        "label": "179007",
+        "description": "#10 Flat Washer, 18-8 S.S.",
+        "partNumber": "179007"
+      },
+      {
+        "label": "059025",
+        "description": "Cotter Pin. 5/64 X 1/2 S.S",
+        "partNumber": "059025"
+      },
+      {
+        "label": "179009",
+        "description": "5L10-Fk Type 6 Nyliner",
+        "partNumber": "179009"
+      },
+      {
+        "label": "164348",
+        "description": "Corner Roller Handle Assembly, Sold",
+        "partNumber": "164348"
+      },
+      {
+        "label": "179008",
+        "description": "5/16 Flat Washer",
+        "partNumber": "179008"
+      },
+      {
+        "label": "164348",
+        "description": "Corner Roller Handle Assembly, Sold",
+        "partNumber": "164348"
+      }
+    ]
+  }
+}

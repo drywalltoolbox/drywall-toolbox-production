@@ -11,6 +11,7 @@ import { AuthProvider } from './auth/AuthContext.js';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import CartSidebar from './components/CartSidebar';
+import ProtectedRoute from './components/ProtectedRoute';
 
 // ─── Lazy page imports ────────────────────────────────────────────────────────
 // Each import() becomes its own chunk file. Webpack only loads a chunk when
@@ -33,6 +34,8 @@ const WooCommerceSettings = lazy(() => import('./pages/WooCommerceSettings'));
 // Auth + account pages — lazy-loaded, isolated from WP admin
 const Login              = lazy(() => import('./pages/Login'));
 const Register           = lazy(() => import('./pages/Register'));
+const ForgotPassword     = lazy(() => import('./pages/ForgotPassword'));
+const ResetPassword      = lazy(() => import('./pages/ResetPassword'));
 const Dashboard          = lazy(() => import('./pages/Dashboard'));
 const Orders             = lazy(() => import('./pages/Orders'));
 const Rewards            = lazy(() => import('./pages/Rewards'));
@@ -109,7 +112,9 @@ function AppRoutes() {
           {/* Auth + account pages — dev-only, standalone, no WP admin changes */}
           <Route path="/login"                 element={<Login />} />
           <Route path="/register"              element={<Register />} />
-          <Route path="/dashboard"             element={<Dashboard />} />
+          <Route path="/forgot-password"       element={<ForgotPassword />} />
+          <Route path="/reset-password"        element={<ResetPassword />} />
+          <Route path="/dashboard"             element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
           <Route path="/orders"                element={<Orders />} />
           <Route path="/rewards"               element={<Rewards />} />
           <Route path="/pro-membership"        element={<ProMembership />} />

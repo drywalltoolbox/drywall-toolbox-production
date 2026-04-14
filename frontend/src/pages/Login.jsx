@@ -24,7 +24,7 @@
  */
 
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { motion as Motion, AnimatePresence } from 'framer-motion';
 import { Eye, EyeOff, LogIn, AlertCircle, ShoppingCart } from 'lucide-react';
 
@@ -76,6 +76,7 @@ function BreathingLoader( { label = 'Signing in…' } ) {
 
 export default function Login() {
   const navigate             = useNavigate();
+  const location             = useLocation();
   const { login, isLoading } = useAuthContext();
 
   const [ email,       setEmail       ] = useState( '' );
@@ -84,13 +85,17 @@ export default function Login() {
   const [ submitError, setSubmitError ] = useState( null );
   const [ submitting,  setSubmitting  ] = useState( false );
 
+  // Where to redirect after a successful login.
+  // Comes from ProtectedRoute via router location state; falls back to /dashboard.
+  const from = location.state?.from?.pathname || '/dashboard';
+
   const handleSubmit = async ( e ) => {
     e.preventDefault();
     setSubmitError( null );
     setSubmitting( true );
     try {
       await login( email, password );
-      navigate( '/dashboard', { replace: true } );
+      navigate( from, { replace: true } );
     } catch ( err ) {
       setSubmitError( err.message || 'Login failed. Please try again.' );
     } finally {
@@ -368,6 +373,24 @@ export default function Login() {
                 >
                   { busy ? <BreathingLoader /> : 'Sign In' }
                 </button>
+              </Motion.div>
+
+              {/* Forgot password link */}
+              <Motion.div
+                custom={ 3 }
+                variants={ fieldVariants }
+                initial="hidden"
+                animate="visible"
+                style={ { textAlign: 'center', marginTop: '14px' } }
+              >
+                <Link
+                  to="/forgot-password"
+                  style={ { fontSize: '0.8rem', color: 'rgba(15,23,42,0.5)', textDecoration: 'none' } }
+                  onMouseEnter={ ( e ) => { e.currentTarget.style.color = '#2563eb'; } }
+                  onMouseLeave={ ( e ) => { e.currentTarget.style.color = 'rgba(15,23,42,0.5)'; } }
+                >
+                  Forgot your password?
+                </Link>
               </Motion.div>
             </form>
 
