@@ -39,11 +39,22 @@ if ( function_exists( 'opcache_get_status' ) ) {
 
 // Step 3: Load WordPress fresh
 echo "\n[ 3/4 ] Loading WordPress (triggers mu-plugins reload)...\n";
-if ( file_exists( dirname( __FILE__ ) . '/wp/wp-load.php' ) ) {
-	require_once dirname( __FILE__ ) . '/wp/wp-load.php';
-	echo "        ✅ WordPress loaded\n";
+
+// Handle both:
+// 1. Script in root: /public_html/clear-opcache.php → /wp/wp-load.php
+// 2. Script in /wp/: /public_html/wp/clear-opcache.php → /wp-load.php
+$wp_load = dirname( __FILE__ ) . '/wp/wp-load.php';
+if ( ! file_exists( $wp_load ) ) {
+	$wp_load = dirname( __FILE__ ) . '/wp-load.php';
+}
+
+if ( file_exists( $wp_load ) ) {
+	require_once $wp_load;
+	echo "        ✅ WordPress loaded from: $wp_load\n";
 } else {
-	echo "        ❌ wp-load.php not found\n";
+	echo "        ❌ wp-load.php not found at either location:\n";
+	echo "           - " . dirname( __FILE__ ) . '/wp/wp-load.php' . "\n";
+	echo "           - " . dirname( __FILE__ ) . '/wp-load.php' . "\n";
 	exit( 1 );
 }
 
