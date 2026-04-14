@@ -71,24 +71,6 @@ const STEPS = [
 /* ─────────────────────────────────────────────────────────────────────────────
    Service cards shown above the form
    ───────────────────────────────────────────────────────────────────────── */
-const services = [
-  {
-    title: 'Preventative Maintenance',
-    description: 'Annual tune-ups cost ~1/3 of emergency rebuilds and extend tool life 2–3×. Scheduled inspections, lubrication, seal replacements, and performance tuning.',
-    items: ['Usage-based service intervals', 'Lubrication & fluid replacement', 'Seal & gasket replacements', 'Calibration & adjustment'],
-  },
-  {
-    title: 'Repair & Rebuild',
-    description: 'Full overhauls, head rebuilds, and targeted repairs for automatic tapers, flat boxes, angle boxes, and mud pumps. Labor-only quotes provided upfront.',
-    items: ['Automatic taper head rebuilds', 'Flat & angle box repairs', 'Mud pump overhauls', 'Blade, cable & parts replacement'],
-  },
-  {
-    title: 'Warranty & Service Guarantee',
-    description: 'Every repair comes with a workmanship warranty. We stand behind our work — if a repair fails, we make it right.',
-    items: ['1-year warranty on replaced parts', 'Free rework if repair fails', 'Transparent labor + parts invoicing', 'No charges until you approve a quote'],
-  },
-];
-
 // ─── Authoritative repair pricing — sourced from DTB_Strategy_Overview.md ────
 // Display rules:
 //   • "Best Value" tag on the recommended tier per category
@@ -1256,114 +1238,6 @@ export default function Repairs() {
         </div>
       </section>
 
-      {/* ── Services ─────────────────────────────────────────────────────── */}
-      <section style={{
-        padding: 'clamp(3rem, 6vw, 5rem) clamp(1.5rem, 5vw, 3rem)',
-        maxWidth: '1400px', margin: '0 auto',
-      }}>
-        <div style={{ textAlign: 'center', marginBottom: 'clamp(2rem, 4vw, 3rem)' }}>
-          <div style={{
-            display: 'inline-block',
-            background: 'rgba(37,99,235,0.08)',
-            border: '1px solid rgba(37,99,235,0.2)',
-            borderRadius: '99px', padding: '5px 16px',
-            fontSize: '0.68rem', fontWeight: 700,
-            letterSpacing: '0.12em', textTransform: 'uppercase',
-            color: 'var(--primary-600)', marginBottom: '14px',
-          }}>
-            What We Do
-          </div>
-          <h2 style={{
-            fontSize: 'clamp(1.75rem, 4vw, 2.5rem)',
-            fontWeight: 900, color: '#0f172a',
-            margin: '0 0 12px 0', letterSpacing: '-0.025em',
-          }}>Our Repair Services</h2>
-          <p style={{ color: 'rgba(15,23,42,0.55)', fontSize: '1rem', margin: 0, maxWidth: '520px', marginLeft: 'auto', marginRight: 'auto' }}>
-            Comprehensive coverage for all professional drywall equipment, from tapers to accessories.
-          </p>
-        </div>
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 260px), 1fr))',
-          gap: '20px',
-        }}>
-          {[
-            {
-              icon: (
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--primary-600)" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                  <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
-                </svg>
-              ),
-              ...services[0],
-            },
-            {
-              icon: (
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--primary-600)" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>
-                </svg>
-              ),
-              ...services[1],
-            },
-            {
-              icon: (
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--primary-600)" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-                </svg>
-              ),
-              ...services[2],
-            },
-          ].map((svc) => (
-            <div key={svc.title}
-              style={{
-                background: 'white',
-                border: '1px solid var(--machined-border)',
-                borderRadius: '12px',
-                padding: 'clamp(1.5rem, 3vw, 2rem)',
-                transition: 'box-shadow 0.22s, transform 0.22s',
-                display: 'flex',
-                flexDirection: 'column',
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.boxShadow = '0 10px 40px rgba(37,99,235,0.12)';
-                e.currentTarget.style.transform = 'translateY(-3px)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.boxShadow = 'none';
-                e.currentTarget.style.transform = 'translateY(0)';
-              }}
-            >
-              {/* Icon */}
-              <div style={{
-                width: '48px', height: '48px',
-                background: 'rgba(37,99,235,0.07)',
-                border: '1px solid rgba(37,99,235,0.15)',
-                borderRadius: '10px',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                marginBottom: '16px', flexShrink: 0,
-              }}>
-                {svc.icon}
-              </div>
-              <h3 style={{ fontSize: '1.05rem', fontWeight: 800, color: '#0f172a', margin: '0 0 10px 0', letterSpacing: '-0.01em' }}>
-                {svc.title}
-              </h3>
-              <p style={{ fontSize: '0.85rem', color: 'rgba(15,23,42,0.6)', margin: '0 0 18px 0', lineHeight: 1.6, flex: 1 }}>
-                {svc.description}
-              </p>
-              <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '7px' }}>
-                {svc.items.map((item) => (
-                  <li key={item} style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', fontSize: '0.82rem', color: 'rgba(15,23,42,0.7)', lineHeight: 1.4 }}>
-                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--primary-600)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0, marginTop: '2px' }}>
-                      <polyline points="20 6 9 17 4 12"/>
-                    </svg>
-                    {item}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
-        </div>
-      </section>
-
       {/* ── Pricing Tabs ────────────────────────────────────────────────── */}
       <section
         id="pricing-tabs-section"
@@ -1432,19 +1306,19 @@ export default function Repairs() {
           </div>
 
           {/* Maintenance schedule table */}
-          <div style={{ overflowX: 'auto', borderRadius: '12px', border: '1px solid var(--machined-border)', boxShadow: '0 2px 12px rgba(15,23,42,0.06)' }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse', background: 'white', fontSize: '0.9rem' }}>
+          <div style={{ overflowX: 'auto', borderRadius: '16px', border: '1px solid var(--machined-border)', boxShadow: '0 4px 24px rgba(15,23,42,0.08)' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', background: 'white', fontSize: '0.925rem', minWidth: '480px' }}>
               <thead>
-                <tr style={{ background: '#0f172a' }}>
-                  {['Usage Level', 'Typical Usage', 'Recommended Interval', 'Priority'].map((heading) => (
+                <tr style={{ background: 'var(--alloy-deep)' }}>
+                  {['Usage Level & Priority', 'Typical Usage', 'Service Interval'].map((heading) => (
                     <th key={heading} style={{
-                      padding: '14px 20px',
+                      padding: '16px 24px',
                       textAlign: 'left',
-                      fontSize: '0.68rem',
+                      fontSize: '0.7rem',
                       fontWeight: 700,
                       letterSpacing: '0.1em',
                       textTransform: 'uppercase',
-                      color: 'rgba(255,255,255,0.75)',
+                      color: 'rgba(255,255,255,0.92)',
                       whiteSpace: 'nowrap',
                     }}>
                       {heading}
@@ -1456,32 +1330,36 @@ export default function Repairs() {
                 {MAINTENANCE_SCHEDULE.map((row, idx) => {
                   const badgeColors = {
                     Heavy:   { bg: '#fef2f2', border: '#fca5a5', text: '#dc2626' },
-                    Regular: { bg: 'rgba(37,99,235,0.06)', border: 'rgba(37,99,235,0.25)', text: 'var(--primary-600)' },
+                    Regular: { bg: 'var(--primary-100)', border: 'rgba(37,99,235,0.3)', text: 'var(--primary-700)' },
                     Light:   { bg: '#f0fdf4', border: '#86efac', text: '#16a34a' },
                   };
                   const colors = badgeColors[row.badge] || badgeColors.Regular;
                   return (
-                    <tr key={row.level} style={{ borderTop: idx === 0 ? 'none' : '1px solid var(--machined-border)', background: idx % 2 === 0 ? 'white' : 'var(--alloy-base, #f8fafc)' }}>
-                      <td style={{ padding: '16px 20px', fontWeight: 700, color: '#0f172a' }}>{row.level}</td>
-                      <td style={{ padding: '16px 20px', color: 'rgba(15,23,42,0.6)' }}>{row.usage}</td>
-                      <td style={{ padding: '16px 20px', fontWeight: 700, color: '#0f172a' }}>{row.interval}</td>
-                      <td style={{ padding: '16px 20px' }}>
-                        <span style={{
-                          display: 'inline-block',
-                          background: colors.bg,
-                          border: `1px solid ${colors.border}`,
-                          borderRadius: '99px',
-                          padding: '3px 12px',
-                          fontSize: '0.68rem',
-                          fontWeight: 800,
-                          letterSpacing: '0.08em',
-                          textTransform: 'uppercase',
-                          color: colors.text,
-                          whiteSpace: 'nowrap',
-                        }}>
-                          {row.badge} Use
-                        </span>
+                    <tr key={row.level} style={{ borderTop: idx === 0 ? 'none' : '1px solid var(--machined-border)', background: idx % 2 === 0 ? 'white' : 'var(--alloy-base)' }}>
+                      <td style={{ padding: '20px 24px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+                          <span style={{
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            background: colors.bg,
+                            border: `1px solid ${colors.border}`,
+                            borderRadius: '99px',
+                            padding: '3px 10px',
+                            fontSize: '0.62rem',
+                            fontWeight: 800,
+                            letterSpacing: '0.1em',
+                            textTransform: 'uppercase',
+                            color: colors.text,
+                            whiteSpace: 'nowrap',
+                            flexShrink: 0,
+                          }}>
+                            {row.badge}
+                          </span>
+                          <span style={{ fontWeight: 700, color: '#0f172a' }}>{row.level}</span>
+                        </div>
                       </td>
+                      <td style={{ padding: '20px 24px', color: 'rgba(15,23,42,0.6)', lineHeight: 1.5 }}>{row.usage}</td>
+                      <td style={{ padding: '20px 24px', fontWeight: 700, color: 'var(--primary-700)' }}>{row.interval}</td>
                     </tr>
                   );
                 })}
