@@ -609,33 +609,6 @@ function PricingTabs() {
         </div>
       </div>
 
-      {/* Anchor banner for Auto Tapers */}
-      {tab.anchor && (
-        <div style={{
-          background: 'linear-gradient(135deg, #0f172a 0%, #1e3a8a 60%, #2563eb 100%)',
-          borderRadius: '10px',
-          padding: 'clamp(14px, 3vw, 20px) clamp(16px, 3vw, 24px)',
-          marginBottom: '24px',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '12px',
-          flexWrap: 'wrap',
-          justifyContent: 'center',
-        }}>
-          <span style={{ color: 'rgba(255,255,255,0.6)', fontSize: '0.8rem', fontWeight: 600 }}>New Taper</span>
-          <span style={{ color: 'rgba(255,255,255,0.45)', fontSize: '0.85rem', fontWeight: 700 }}>{tab.anchor.newPrice}</span>
-          <span style={{ color: 'rgba(255,255,255,0.3)', fontSize: '0.8rem' }}>vs.</span>
-          <span style={{ color: '#60a5fa', fontWeight: 900, fontSize: 'clamp(1rem, 2.5vw, 1.2rem)', letterSpacing: '-0.02em' }}>REBUILD {tab.anchor.rebuildPrice}</span>
-          <span style={{
-            background: '#16a34a', color: 'white',
-            borderRadius: '999px', padding: '3px 12px',
-            fontSize: '0.72rem', fontWeight: 800, letterSpacing: '0.04em',
-          }}>
-            SAVE {tab.anchor.savePct}
-          </span>
-        </div>
-      )}
-
       {/* Note bar */}
       {tab.note && (
         <div style={{
@@ -823,8 +796,6 @@ export default function Repairs() {
     if (/handle|corner|nail|gooseneck|flusher|spotter/i.test(cat)) return 'handles';
     return 'diagnostic';
   }, [formData.toolCategory]);
-
-  const isAutoTaper = repairCategory === 'autoTaper';
 
   // Pricing tier selection helper
   function selectTier(tier) {
@@ -1577,34 +1548,6 @@ export default function Repairs() {
                     <p style={{ fontSize: '0.825rem', color: 'rgba(15,23,42,0.5)', margin: '0 0 28px 0' }}>
                       Tell us what kind of service you need and describe the issue in as much detail as possible.
                     </p>
-
-                    {/* Auto Taper anchor banner */}
-                    {isAutoTaper && (
-                      <div style={{
-                        background: 'linear-gradient(135deg, #0f172a, #1e3a8a)',
-                        borderRadius: '8px',
-                        padding: '14px 20px',
-                        marginBottom: '20px',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '12px',
-                        flexWrap: 'wrap',
-                      }}>
-                        <span style={{ color: 'rgba(255,255,255,0.6)', fontSize: '0.78rem', fontWeight: 600 }}>
-                          NEW TAPER
-                        </span>
-                        <span style={{ color: 'rgba(255,255,255,0.4)', fontSize: '0.8rem' }}>~$1,899</span>
-                        <span style={{ color: 'rgba(255,255,255,0.3)' }}>vs.</span>
-                        <span style={{ color: '#60a5fa', fontWeight: 800, fontSize: '1rem' }}>REBUILD $299</span>
-                        <span style={{
-                          background: '#16a34a', color: 'white',
-                          borderRadius: '999px', padding: '2px 10px',
-                          fontSize: '0.72rem', fontWeight: 700,
-                        }}>
-                          SAVE 84%
-                        </span>
-                      </div>
-                    )}
 
                     {/* Service Tier Cards */}
                     <div style={{ marginBottom: '24px' }}>

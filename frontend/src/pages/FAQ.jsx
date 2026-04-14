@@ -1,28 +1,103 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { AnimatePresence, motion as Motion } from 'framer-motion';
 import SEOHead from '../components/SEOHead';
-
-/* ─────────────────────────────────────────────────────────────────────────────
-   Maintenance schedule data (mirrored from Repairs.jsx)
-   ───────────────────────────────────────────────────────────────────────── */
-const MAINTENANCE_SCHEDULE = [
-  { level: 'High-Volume Pro',  usage: '6+ rolls (500 ft) / day',  interval: 'Every 6 months',       badge: 'Heavy'   },
-  { level: 'Standard Pro',     usage: '4–10 rolls / week',        interval: 'Annually',              badge: 'Regular' },
-  { level: 'Occasional User',  usage: '<4 rolls / week',          interval: 'Every 18–24 months',    badge: 'Light'   },
-];
 
 /* ─────────────────────────────────────────────────────────────────────────────
    FAQ data — grouped by category
    ───────────────────────────────────────────────────────────────────────── */
 const FAQ_CATEGORIES = [
   {
-    id: 'repair-process',
-    label: 'Repair Process',
+    id: 'shipping-orders',
+    label: 'Shipping & Orders',
+    questions: [
+      {
+        q: 'Where do you ship?',
+        a: 'We ship to all 50 US states and Canada. International orders outside North America are handled on a case-by-case basis — contact us before placing an international order to confirm eligibility and get a shipping quote.',
+      },
+      {
+        q: 'How long does order processing take?',
+        a: 'In-stock tools and parts are typically picked, packed, and handed to the carrier within 1 business day of order placement. Orders placed before 12:00 PM CT on business days are prioritized for same-day processing.',
+      },
+      {
+        q: 'What shipping carriers and service levels do you offer?',
+        a: 'We ship via UPS and USPS. Available service levels at checkout include Standard Ground (3–5 business days), Expedited 2-Day, and Overnight. Carrier and cost are calculated at checkout based on package weight, dimensions, and destination.',
+      },
+      {
+        q: 'Do you offer free shipping?',
+        a: 'Yes — orders over $150 qualify for free Standard Ground shipping to the contiguous 48 states. Alaska, Hawaii, and Canada are excluded from the free shipping threshold and calculated at actual carrier rate.',
+      },
+      {
+        q: 'How do I track my shipment?',
+        a: 'A tracking number is emailed automatically the moment your order ships. You can also find live tracking and full order history in your Account Dashboard under Order History.',
+      },
+      {
+        q: 'Can I modify or cancel my order after it\'s placed?',
+        a: 'Order modifications and cancellations can be made within 2 hours of placement, provided the order has not yet been picked. Contact us immediately via the order confirmation page or by phone. Once a shipping label is generated, cancellation is no longer possible and a return must be initiated after delivery.',
+      },
+      {
+        q: 'What if an item in my order is backordered?',
+        a: 'If a product is out of stock at the time of your order, we will notify you by email with an estimated restock date and give you the option to hold the order, substitute an equivalent item, or receive a full refund for that line item. Backordered parts never delay in-stock items in the same order — they ship separately at no additional shipping charge.',
+      },
+      {
+        q: 'Do you offer local pickup?',
+        a: 'Yes — local pickup is available by appointment at our facility. Select "Local Pickup" at checkout and we\'ll send a ready-for-pickup notification. Bring your order confirmation and a valid ID.',
+      },
+      {
+        q: 'How are large or heavy tools packaged for shipping?',
+        a: 'Larger tools and complete sets are double-boxed with industrial foam inserts and corner protection. All outbound shipments are photographed before sealing and are fully insured at declared value. If an item requires a freight carrier (LTL), we will contact you to coordinate before shipping.',
+      },
+    ],
+  },
+  {
+    id: 'warranty-returns',
+    label: 'Warranty & Returns',
+    questions: [
+      {
+        q: 'What is your standard return policy for tools and parts?',
+        a: 'New, unused products in original, unaltered packaging may be returned within 30 days of delivery for a full refund to the original payment method. Items must be in resalable condition — free of installation marks, compound residue, or field use. Return shipping is the customer\'s responsibility unless the item is defective or we made a fulfillment error.',
+      },
+      {
+        q: 'Which items are non-returnable?',
+        a: 'The following are non-returnable: electrical components (motors, circuit boards, solenoids), special-order or custom-configured parts, items marked "Final Sale," and any product that has been installed, modified, or used in the field. If you\'re unsure whether an item qualifies, contact us before returning.',
+      },
+      {
+        q: 'How do I initiate a return?',
+        a: 'Log in to your Account Dashboard and select the order you\'d like to return, then choose "Request Return." You\'ll receive a Return Merchandise Authorization (RMA) number and instructions within 1 business day. Returns sent without an RMA number may be refused or delayed. Refunds are processed within 3–5 business days of receiving the returned item.',
+      },
+      {
+        q: 'What if my order arrives damaged or incorrect?',
+        a: 'All outbound shipments are insured and photographed before sealing. If your order arrives damaged or contains the wrong item, photograph the outer packaging and contents immediately and contact us within 48 hours of delivery. We will file the carrier claim on your behalf and dispatch a replacement at no additional charge — you will not be asked to return a damaged item.',
+      },
+      {
+        q: 'Do new tools carry a manufacturer warranty?',
+        a: 'Yes. All new tools sold by Drywall Toolbox are covered by the full manufacturer warranty. Warranty terms vary by brand: TapeTech and Columbia typically carry a 1-year limited warranty on defects in materials and workmanship; other brands may vary. Warranty claims are processed directly through us — you do not need to contact the manufacturer separately.',
+      },
+      {
+        q: 'What does the manufacturer warranty cover?',
+        a: 'Manufacturer warranties cover defects in materials and workmanship under normal use. They do not cover damage from misuse, improper maintenance, field modifications, accidental damage, or normal wear items such as blades, gates, cables, and rubber components. If a claim is denied under warranty, we will provide a transparent written explanation.',
+      },
+      {
+        q: 'How do I file a warranty claim on a tool I purchased?',
+        a: 'Contact us with your order number, a description of the defect, and photos or video of the issue. We will evaluate the claim and either facilitate a manufacturer repair, issue a replacement part, or arrange a full unit exchange depending on the nature and severity of the defect. Most warranty claims are resolved within 5–7 business days.',
+      },
+      {
+        q: 'Do replacement parts carry a warranty?',
+        a: 'OEM replacement parts carry a 90-day defect warranty from the date of delivery. If a part fails due to a manufacturing defect within 90 days, we will send a replacement at no charge. This does not apply to wear items (blades, seals, o-rings, springs) which are consumables by design.',
+      },
+      {
+        q: 'What is your price match policy?',
+        a: 'We match verified current prices from authorized US dealers on identical, in-stock items. Price match requests must be submitted before purchase and include a direct link or screenshot to the competitor listing. We do not match marketplace sellers (Amazon third-party, eBay), liquidation prices, or prices contingent on bundle deals.',
+      },
+    ],
+  },
+  {
+    id: 'repair-services',
+    label: 'Repair Services',
     questions: [
       {
         q: 'How do I submit a repair request?',
-        a: 'Head to our Repair Services page and fill out the multi-step repair request form. You\'ll describe your tool, the issue, and upload photos if available. Our service team responds within one business day with a written quote and estimated turnaround.',
+        a: 'Go to the Repair Services page and complete the multi-step request form. You\'ll describe your tool and the issue, and can upload photos. Our team responds within one business day with an itemized quote and estimated turnaround.',
       },
       {
         q: 'Is there a diagnostic or bench fee?',
@@ -34,41 +109,27 @@ const FAQ_CATEGORIES = [
       },
       {
         q: 'How long does a typical repair take?',
-        a: 'Most standard rebuilds are completed within 5–7 business days after you approve the quote. Premium overhauls and heavy-damage repairs can take 10–14 business days depending on parts availability. Rush service is available — contact us before submitting.',
+        a: 'Most standard rebuilds complete within 5–7 business days after quote approval. Premium overhauls and heavy-damage repairs can take 10–14 business days depending on parts availability. Rush service is available — contact us before submitting.',
       },
-      {
-        q: 'Do you work on all brands?',
-        a: 'We service TapeTech, Columbia, Asgard, Graco, Level 5, Platinum, SurPro, and Dura-Stilts tools. If your brand is not listed, contact us — we evaluate requests on a case-by-case basis.',
-      },
-      {
-        q: 'Can I ship my tool in for repair?',
-        a: 'Yes. Pack your tool securely and ship it to our service address (provided after you submit your request). We provide pre-paid return shipping labels for approved repairs. You\'re responsible for inbound shipping costs.',
-      },
-    ],
-  },
-  {
-    id: 'pricing-warranty',
-    label: 'Pricing & Warranty',
-    questions: [
       {
         q: 'How is repair pricing determined?',
-        a: 'Pricing is based on tool category, service tier, and parts required. All labor and parts are itemized on your written quote — no bundled or hidden fees. See our Repair Pricing section for standard tier ranges by tool type.',
+        a: 'Pricing is based on tool category, service tier, and parts required. All labor and parts are itemized on your written quote — no bundled or hidden fees. Visit the Repair Services page to explore tier pricing by tool type.',
       },
       {
         q: 'Are parts prices locked after the quote?',
-        a: 'Hard parts are capped at 20% above the quoted amount. If a parts cost changes significantly, we notify you before proceeding. You retain full approval authority at every stage.',
+        a: 'Hard parts are capped at 20% above the quoted amount. If a cost changes significantly we notify you before proceeding. You retain full approval authority at every stage.',
       },
       {
-        q: 'Do you offer member discounts on repairs?',
-        a: 'Yes. Standard Pro members receive a 10% discount on all repair labor. Premium Pro members receive 15% off labor plus priority queue placement. Discounts apply automatically when you submit a repair request while logged in.',
+        q: 'What brands do you repair?',
+        a: 'We service TapeTech, Columbia, Asgard, Graco, Level 5, Platinum, SurPro, and Dura-Stilts tools. If your brand isn\'t listed, contact us — we evaluate requests on a case-by-case basis.',
       },
       {
-        q: 'What does the 90-day workmanship warranty cover?',
-        a: 'Our Premium Overhaul tier carries a 90-day workmanship warranty on labor and installed parts. If the same issue recurs within 90 days of the repair completion date, we re-service the tool at no additional labor charge. Warranty does not cover new damage, misuse, or normal wear.',
+        q: 'What warranty comes with a repair?',
+        a: 'Premium Overhaul tier carries a 90-day workmanship warranty. Quick Fix and Standard Rebuild tiers carry 30 days. The warranty covers the same issue recurring — it does not cover new damage, misuse, or normal wear.',
       },
       {
-        q: 'Do lower service tiers carry a warranty?',
-        a: 'Quick Fix and Standard Rebuild tiers carry a 30-day workmanship warranty. Factory Tune-Up and Diagnostic services do not carry a repair warranty but we stand behind all work performed.',
+        q: 'Do Pro Members get a discount on repairs?',
+        a: 'Yes. Standard Pro members receive 10% off repair labor; Premium Pro members receive 15% off plus priority queue placement. Discounts apply automatically when you\'re logged in at submission.',
       },
     ],
   },
@@ -78,7 +139,7 @@ const FAQ_CATEGORIES = [
     questions: [
       {
         q: 'How often should I service my automatic taper?',
-        a: 'High-volume pros running 6+ rolls per day should service every 6 months. Standard pros (4–10 rolls/week) annually. Occasional users every 18–24 months. See the full maintenance schedule below.',
+        a: 'High-volume pros running 6+ rolls per day: every 6 months. Standard pros (4–10 rolls/week): annually. Occasional users (under 4 rolls/week): every 18–24 months.',
       },
       {
         q: 'What does a standard service include?',
@@ -97,48 +158,30 @@ const FAQ_CATEGORIES = [
         a: 'Drain all mud, flush with warm water, dry thoroughly, and apply a light coat of tool oil to all moving metal parts. Store in a dry, temperature-stable environment. Never store with mud sitting in the taping head or pump body.',
       },
       {
-        q: 'What type of lubrication should I use on my flat boxes and handles?',
+        q: 'What lubricant should I use on flat boxes and handles?',
         a: 'Use a non-silicone, water-soluble tool lubricant on blade hinges and spring pivots. Avoid WD-40 on internal drive components — it displaces moisture short-term but leaves a residue that attracts dried compound. Ask us for brand-specific recommendations when you book a service.',
       },
     ],
   },
   {
-    id: 'shipping-returns',
-    label: 'Shipping & Returns',
+    id: 'account-membership',
+    label: 'Account & Membership',
     questions: [
       {
-        q: 'How is my repaired tool shipped back?',
-        a: 'We ship via UPS or FedEx Ground by default. Expedited return shipping is available at cost. All outbound shipments include tracking and are packed in double-wall corrugated boxes with foam padding.',
+        q: 'Do I need an account to place an order?',
+        a: 'No — guest checkout is available. However, creating an account gives you order history, tracking, saved addresses, Pro Membership discounts, and access to the repair request form.',
       },
       {
-        q: 'What if my tool is damaged in transit?',
-        a: 'All outbound shipments are covered by declared-value insurance. If your tool arrives damaged, photograph the packaging and tool immediately and contact us within 48 hours. We will file the claim and arrange re-service or replacement at no charge to you.',
+        q: 'What is Pro Membership?',
+        a: 'Pro Membership is our trade program for working drywall contractors and finishers. Members receive discounts on all tools, parts, and repair labor, plus early access to new inventory and priority repair queue placement.',
       },
       {
-        q: 'Can I pick up my tool locally?',
-        a: 'Yes — local pickup is available by appointment. Select "Local Pickup" as your shipping option in the repair request form and we\'ll coordinate a pickup window once the repair is complete.',
+        q: 'How do I sign up for Pro Membership?',
+        a: 'Visit the Pro Membership page, select your tier, and complete the short verification form. Standard membership is open to all trade professionals. Premium tier requires proof of active business.',
       },
       {
-        q: 'Do you ship internationally?',
-        a: 'Currently we service tools shipped from within the contiguous United States and Canada. International shipping is evaluated on a case-by-case basis — contact us before submitting.',
-      },
-    ],
-  },
-  {
-    id: 'parts-schematics',
-    label: 'Parts & Schematics',
-    questions: [
-      {
-        q: 'Can I order replacement parts without sending in my tool?',
-        a: 'Yes. Our Parts & Schematics section has interactive diagrams for all major brands. You can identify the exact part you need by reference number and add it to your cart directly. Most stocked parts ship within 1–2 business days.',
-      },
-      {
-        q: 'What if a part I need is out of stock?',
-        a: 'Out-of-stock parts show an estimated restock date where available. You can request a back-order notification from the part detail page. For urgent repair needs, contact us — we often have service-stock parts not listed in the public catalog.',
-      },
-      {
-        q: 'Are your schematics brand-authorized?',
-        a: 'Our schematics are sourced from manufacturer service documentation and supplemented with our own field-verified diagrams. They are intended for identification and ordering purposes. Always follow manufacturer service guidelines for assembly procedures.',
+        q: 'How do I view my past orders?',
+        a: 'Log in and go to your Account Dashboard. All orders, invoices, and repair requests are listed there with full detail and live tracking where applicable.',
       },
     ],
   },
@@ -147,7 +190,7 @@ const FAQ_CATEGORIES = [
 /* ─────────────────────────────────────────────────────────────────────────────
    Single accordion item
    ───────────────────────────────────────────────────────────────────────── */
-function AccordionItem({ question, answer, isOpen, onToggle }) {
+function AccordionItem({ question, answer, isOpen, onToggle, isMobile }) {
   return (
     <div style={{
       borderBottom: '1px solid var(--machined-border)',
@@ -212,7 +255,7 @@ function AccordionItem({ question, answer, isOpen, onToggle }) {
               fontSize: 'clamp(0.875rem, 2vw, 0.95rem)',
               color: 'rgba(15,23,42,0.65)',
               lineHeight: 1.7,
-              paddingRight: '44px',
+              paddingRight: isMobile ? '0' : '44px',
             }}>
               {answer}
             </p>
@@ -228,7 +271,17 @@ function AccordionItem({ question, answer, isOpen, onToggle }) {
    ───────────────────────────────────────────────────────────────────────── */
 export default function FAQ() {
   const [openItems, setOpenItems] = useState({});
-  const [activeCategory, setActiveCategory] = useState('repair-process');
+  const [activeCategory, setActiveCategory] = useState('shipping-orders');
+  const [isMobile, setIsMobile] = useState(() =>
+    typeof window !== 'undefined' ? window.innerWidth < 768 : false
+  );
+
+  useEffect(() => {
+    const mq = window.matchMedia('(max-width: 767px)');
+    const handler = (e) => setIsMobile(e.matches);
+    mq.addEventListener('change', handler);
+    return () => mq.removeEventListener('change', handler);
+  }, []);
 
   const toggle = (catId, qIdx) => {
     const key = `${catId}-${qIdx}`;
@@ -237,11 +290,7 @@ export default function FAQ() {
 
   const activeData = FAQ_CATEGORIES.find((c) => c.id === activeCategory);
 
-  const badgeColors = {
-    Heavy:   { bg: '#fef2f2', border: '#fca5a5', text: '#dc2626' },
-    Regular: { bg: 'var(--primary-100)', border: 'rgba(37,99,235,0.3)', text: 'var(--primary-700)' },
-    Light:   { bg: '#f0fdf4', border: '#86efac', text: '#16a34a' },
-  };
+
 
   return (
     <div style={{ minHeight: '100vh' }} className="page-wrapper">
@@ -258,7 +307,6 @@ export default function FAQ() {
         position: 'relative',
         overflow: 'hidden',
       }}>
-        {/* Decorative grid overlay */}
         <div style={{
           position: 'absolute', inset: 0,
           backgroundImage: 'linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px)',
@@ -303,197 +351,180 @@ export default function FAQ() {
 
       {/* ── Category Nav + Accordion ─────────────────────────────────────── */}
       <section style={{
-        padding: 'clamp(3rem, 6vw, 5rem) clamp(1.5rem, 5vw, 3rem)',
+        padding: 'clamp(2rem, 5vw, 5rem) clamp(1rem, 4vw, 3rem)',
         background: 'white',
       }}>
-        <div style={{ maxWidth: '1100px', margin: '0 auto', display: 'flex', gap: 'clamp(2rem, 5vw, 4rem)', alignItems: 'flex-start' }}>
-
-          {/* ── Sticky category sidebar ── */}
-          <nav style={{
-            flexShrink: 0,
-            width: '210px',
-            position: 'sticky',
-            top: '100px',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '4px',
-          }}
-            aria-label="FAQ categories"
-          >
-            <p style={{
-              fontSize: '0.62rem', fontWeight: 800, letterSpacing: '0.12em',
-              textTransform: 'uppercase', color: 'rgba(15,23,42,0.4)',
-              margin: '0 0 10px 0',
-            }}>
-              Categories
-            </p>
-            {FAQ_CATEGORIES.map((cat) => {
-              const active = cat.id === activeCategory;
-              return (
-                <button
-                  key={cat.id}
-                  type="button"
-                  onClick={() => setActiveCategory(cat.id)}
-                  style={{
-                    background: active ? 'rgba(37,99,235,0.08)' : 'none',
-                    border: 'none',
-                    borderLeft: active ? '3px solid var(--primary-600)' : '3px solid transparent',
-                    borderRadius: '0 6px 6px 0',
-                    padding: '9px 12px',
-                    textAlign: 'left',
-                    cursor: 'pointer',
-                    fontSize: '0.875rem',
-                    fontWeight: active ? 700 : 500,
-                    color: active ? 'var(--primary-700)' : 'rgba(15,23,42,0.6)',
-                    transition: 'all 0.15s',
-                    lineHeight: 1.4,
-                  }}
-                >
-                  {cat.label}
-                </button>
-              );
-            })}
-          </nav>
-
-          {/* ── Questions panel ── */}
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ marginBottom: '28px' }}>
-              <h2 style={{
-                fontSize: 'clamp(1.25rem, 3vw, 1.6rem)',
-                fontWeight: 900, color: '#0f172a',
-                margin: '0 0 4px 0', letterSpacing: '-0.02em',
-              }}>
-                {activeData?.label}
-              </h2>
-              <p style={{ fontSize: '0.8rem', color: 'rgba(15,23,42,0.45)', margin: 0 }}>
-                {activeData?.questions.length} questions
-              </p>
-            </div>
-
-            <AnimatePresence mode="wait">
-              <Motion.div
-                key={activeCategory}
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -8 }}
-                transition={{ duration: 0.18 }}
-              >
-                <div style={{ borderTop: '1px solid var(--machined-border)' }}>
-                  {activeData?.questions.map((item, idx) => (
-                    <AccordionItem
-                      key={idx}
-                      question={item.q}
-                      answer={item.a}
-                      isOpen={!!openItems[`${activeCategory}-${idx}`]}
-                      onToggle={() => toggle(activeCategory, idx)}
-                    />
-                  ))}
-                </div>
-              </Motion.div>
-            </AnimatePresence>
-          </div>
-        </div>
-      </section>
-
-      {/* ── Maintenance Schedule ─────────────────────────────────────────── */}
-      <section style={{
-        padding: 'clamp(3rem, 6vw, 5rem) clamp(1.5rem, 5vw, 3rem)',
-        background: 'var(--alloy-base)',
-        borderTop: '1px solid var(--machined-border)',
-      }}>
         <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
-          <div style={{ textAlign: 'center', marginBottom: 'clamp(2rem, 4vw, 3rem)' }}>
-            <div style={{
-              display: 'inline-block',
-              background: 'rgba(37,99,235,0.08)',
-              border: '1px solid rgba(37,99,235,0.2)',
-              borderRadius: '99px', padding: '5px 16px',
-              fontSize: '0.68rem', fontWeight: 700,
-              letterSpacing: '0.12em', textTransform: 'uppercase',
-              color: 'var(--primary-600)', marginBottom: '14px',
-            }}>
-              Service Intervals
-            </div>
-            <h2 style={{
-              fontSize: 'clamp(1.75rem, 4vw, 2.5rem)',
-              fontWeight: 900, color: '#0f172a',
-              margin: '0 0 12px 0', letterSpacing: '-0.025em',
-            }}>
-              Maintenance Schedule
-            </h2>
-            <p style={{
-              color: 'rgba(15,23,42,0.55)',
-              fontSize: 'clamp(0.875rem, 2vw, 1rem)',
-              margin: '0 auto',
-              maxWidth: '520px',
-            }}>
-              Industry-recommended service intervals based on your usage level
-            </p>
-          </div>
 
-          <div style={{
-            overflowX: 'auto',
-            borderRadius: '16px',
-            border: '1px solid var(--machined-border)',
-            boxShadow: '0 4px 24px rgba(15,23,42,0.08)',
-          }}>
-            <table style={{
-              width: '100%', borderCollapse: 'collapse',
-              background: 'white', fontSize: '0.925rem', minWidth: '480px',
-            }}>
-              <thead>
-                <tr style={{ background: 'var(--alloy-deep)' }}>
-                  {['Usage Level & Priority', 'Typical Usage', 'Service Interval'].map((heading) => (
-                    <th key={heading} style={{
-                      padding: '16px 24px',
-                      textAlign: 'left',
-                      fontSize: '0.7rem',
-                      fontWeight: 700,
-                      letterSpacing: '0.1em',
-                      textTransform: 'uppercase',
-                      color: 'rgba(255,255,255,0.92)',
-                      whiteSpace: 'nowrap',
-                    }}>
-                      {heading}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {MAINTENANCE_SCHEDULE.map((row, idx) => {
-                  const colors = badgeColors[row.badge] || badgeColors.Regular;
+          {isMobile ? (
+            /* ── Mobile: horizontal pill tabs + stacked accordion ── */
+            <>
+              {/* Scrollable pill category row */}
+              <div style={{
+                overflowX: 'auto',
+                WebkitOverflowScrolling: 'touch',
+                marginBottom: '24px',
+                /* hide scrollbar visually */
+                msOverflowStyle: 'none',
+                scrollbarWidth: 'none',
+              }}>
+                <div style={{
+                  display: 'flex',
+                  gap: '8px',
+                  minWidth: 'max-content',
+                  paddingBottom: '4px',
+                }}>
+                  {FAQ_CATEGORIES.map((cat) => {
+                    const active = cat.id === activeCategory;
+                    return (
+                      <button
+                        key={cat.id}
+                        type="button"
+                        onClick={() => setActiveCategory(cat.id)}
+                        style={{
+                          background: active ? 'var(--primary-600)' : 'rgba(15,23,42,0.05)',
+                          border: active ? 'none' : '1px solid var(--machined-border)',
+                          borderRadius: '99px',
+                          padding: '8px 16px',
+                          fontSize: '0.8rem',
+                          fontWeight: active ? 700 : 500,
+                          color: active ? 'white' : 'rgba(15,23,42,0.65)',
+                          cursor: 'pointer',
+                          whiteSpace: 'nowrap',
+                          transition: 'all 0.15s',
+                          flexShrink: 0,
+                        }}
+                      >
+                        {cat.label}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Active category heading */}
+              <div style={{ marginBottom: '16px' }}>
+                <h2 style={{
+                  fontSize: 'clamp(1.15rem, 4vw, 1.4rem)',
+                  fontWeight: 900, color: '#0f172a',
+                  margin: '0 0 2px 0', letterSpacing: '-0.02em',
+                }}>
+                  {activeData?.label}
+                </h2>
+                <p style={{ fontSize: '0.75rem', color: 'rgba(15,23,42,0.45)', margin: 0 }}>
+                  {activeData?.questions.length} questions
+                </p>
+              </div>
+
+              {/* Accordion */}
+              <AnimatePresence mode="wait">
+                <Motion.div
+                  key={activeCategory}
+                  initial={{ opacity: 0, y: 6 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -6 }}
+                  transition={{ duration: 0.16 }}
+                >
+                  <div style={{ borderTop: '1px solid var(--machined-border)' }}>
+                    {activeData?.questions.map((item, idx) => (
+                      <AccordionItem
+                        key={idx}
+                        question={item.q}
+                        answer={item.a}
+                        isOpen={!!openItems[`${activeCategory}-${idx}`]}
+                        onToggle={() => toggle(activeCategory, idx)}
+                        isMobile
+                      />
+                    ))}
+                  </div>
+                </Motion.div>
+              </AnimatePresence>
+            </>
+          ) : (
+            /* ── Desktop: sticky sidebar + questions panel ── */
+            <div style={{ display: 'flex', gap: 'clamp(2rem, 5vw, 4rem)', alignItems: 'flex-start' }}>
+              <nav style={{
+                flexShrink: 0,
+                width: '210px',
+                position: 'sticky',
+                top: '100px',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '4px',
+              }} aria-label="FAQ categories">
+                <p style={{
+                  fontSize: '0.62rem', fontWeight: 800, letterSpacing: '0.12em',
+                  textTransform: 'uppercase', color: 'rgba(15,23,42,0.4)',
+                  margin: '0 0 10px 0',
+                }}>
+                  Categories
+                </p>
+                {FAQ_CATEGORIES.map((cat) => {
+                  const active = cat.id === activeCategory;
                   return (
-                    <tr
-                      key={row.level}
+                    <button
+                      key={cat.id}
+                      type="button"
+                      onClick={() => setActiveCategory(cat.id)}
                       style={{
-                        borderTop: idx === 0 ? 'none' : '1px solid var(--machined-border)',
-                        background: idx % 2 === 0 ? 'white' : 'var(--alloy-base)',
+                        background: active ? 'rgba(37,99,235,0.08)' : 'none',
+                        border: 'none',
+                        borderLeft: active ? '3px solid var(--primary-600)' : '3px solid transparent',
+                        borderRadius: '0 6px 6px 0',
+                        padding: '9px 12px',
+                        textAlign: 'left',
+                        cursor: 'pointer',
+                        fontSize: '0.875rem',
+                        fontWeight: active ? 700 : 500,
+                        color: active ? 'var(--primary-700)' : 'rgba(15,23,42,0.6)',
+                        transition: 'all 0.15s',
+                        lineHeight: 1.4,
                       }}
                     >
-                      <td style={{ padding: '20px 24px' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
-                          <span style={{
-                            display: 'inline-flex', alignItems: 'center',
-                            background: colors.bg,
-                            border: `1px solid ${colors.border}`,
-                            borderRadius: '99px', padding: '3px 10px',
-                            fontSize: '0.62rem', fontWeight: 800,
-                            letterSpacing: '0.1em', textTransform: 'uppercase',
-                            color: colors.text, whiteSpace: 'nowrap', flexShrink: 0,
-                          }}>
-                            {row.badge}
-                          </span>
-                          <span style={{ fontWeight: 700, color: '#0f172a' }}>{row.level}</span>
-                        </div>
-                      </td>
-                      <td style={{ padding: '20px 24px', color: 'rgba(15,23,42,0.6)', lineHeight: 1.5 }}>{row.usage}</td>
-                      <td style={{ padding: '20px 24px', fontWeight: 700, color: 'var(--primary-700)' }}>{row.interval}</td>
-                    </tr>
+                      {cat.label}
+                    </button>
                   );
                 })}
-              </tbody>
-            </table>
-          </div>
+              </nav>
+
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ marginBottom: '28px' }}>
+                  <h2 style={{
+                    fontSize: 'clamp(1.25rem, 3vw, 1.6rem)',
+                    fontWeight: 900, color: '#0f172a',
+                    margin: '0 0 4px 0', letterSpacing: '-0.02em',
+                  }}>
+                    {activeData?.label}
+                  </h2>
+                  <p style={{ fontSize: '0.8rem', color: 'rgba(15,23,42,0.45)', margin: 0 }}>
+                    {activeData?.questions.length} questions
+                  </p>
+                </div>
+
+                <AnimatePresence mode="wait">
+                  <Motion.div
+                    key={activeCategory}
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -8 }}
+                    transition={{ duration: 0.18 }}
+                  >
+                    <div style={{ borderTop: '1px solid var(--machined-border)' }}>
+                      {activeData?.questions.map((item, idx) => (
+                        <AccordionItem
+                          key={idx}
+                          question={item.q}
+                          answer={item.a}
+                          isOpen={!!openItems[`${activeCategory}-${idx}`]}
+                          onToggle={() => toggle(activeCategory, idx)}
+                        />
+                      ))}
+                    </div>
+                  </Motion.div>
+                </AnimatePresence>
+              </div>
+            </div>
+          )}
         </div>
       </section>
 
@@ -503,9 +534,7 @@ export default function FAQ() {
         background: 'white',
         borderTop: '1px solid var(--machined-border)',
       }}>
-        <div style={{
-          maxWidth: '640px', margin: '0 auto', textAlign: 'center',
-        }}>
+        <div style={{ maxWidth: '640px', margin: '0 auto', textAlign: 'center' }}>
           <h2 style={{
             fontSize: 'clamp(1.5rem, 3vw, 2rem)',
             fontWeight: 900, color: '#0f172a',
@@ -534,7 +563,6 @@ export default function FAQ() {
                 padding: '12px 28px',
                 borderRadius: '6px',
                 textDecoration: 'none',
-                transition: 'background 0.18s',
               }}
             >
               Contact Us
@@ -553,7 +581,6 @@ export default function FAQ() {
                 borderRadius: '6px',
                 border: '1.5px solid rgba(37,99,235,0.3)',
                 textDecoration: 'none',
-                transition: 'border-color 0.18s',
               }}
             >
               Repair Services
