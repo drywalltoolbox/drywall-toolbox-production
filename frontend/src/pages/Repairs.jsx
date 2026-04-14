@@ -1251,12 +1251,8 @@ export default function Repairs() {
               fontWeight: 900, color: '#0f172a',
               margin: '0 0 12px 0', letterSpacing: '-0.025em',
             }}>
-              Transparent Repair Pricing
+              Repair Pricing
             </h2>
-            <p style={{ color: 'rgba(15,23,42,0.55)', fontSize: 'clamp(0.875rem, 2vw, 1rem)', margin: 0, maxWidth: '580px', marginLeft: 'auto', marginRight: 'auto', lineHeight: 1.6 }}>
-              Industry-standard labor and parts ranges across all service categories.
-              Select a tab to explore tier options, features, and target use cases.
-            </p>
           </div>
           <PricingTabs />
         </div>
