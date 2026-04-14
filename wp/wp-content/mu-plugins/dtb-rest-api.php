@@ -356,6 +356,10 @@ function dtb_emit_cors_headers( string $raw_origin ): void {
 	) );
 
 	if ( $is_allowed ) {
+		// Ensure no existing Access-Control-Allow-Origin header is present
+		header_remove('Access-Control-Allow-Origin');
+
+		// Set the Access-Control-Allow-Origin header explicitly
 		header( 'Access-Control-Allow-Origin: ' . esc_url_raw( $raw_origin ) );
 	} else {
 		header( 'Access-Control-Allow-Origin: https://drywalltoolbox.com' );
@@ -367,6 +371,9 @@ function dtb_emit_cors_headers( string $raw_origin ): void {
 	header( 'Access-Control-Expose-Headers: X-WC-Store-API-Nonce' );
 	header( 'Access-Control-Max-Age: 86400' );
 	header( 'Vary: Origin' );
+
+	// Log the final headers for debugging
+	error_log('[CORS] Final headers: ' . json_encode(headers_list()));
 }
 
 // =============================================================================

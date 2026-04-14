@@ -40,22 +40,24 @@ if ( function_exists( 'opcache_get_status' ) ) {
 // Step 3: Load WordPress fresh
 echo "\n[ 3/4 ] Loading WordPress (triggers mu-plugins reload)...\n";
 
-// Handle both:
-// 1. Script in root: /public_html/clear-opcache.php → /wp/wp-load.php
-// 2. Script in /wp/: /public_html/wp/clear-opcache.php → /wp-load.php
-$wp_load = dirname( __FILE__ ) . '/wp/wp-load.php';
-if ( ! file_exists( $wp_load ) ) {
-	$wp_load = dirname( __FILE__ ) . '/wp-load.php';
+// Dynamically determine the correct path to wp-load.php
+$wp_load = dirname( __FILE__ );
+
+// Check if the script is in the root directory or inside the /wp/ directory
+if (basename($wp_load) === 'wp') {
+    $wp_load .= '/wp-load.php';
+} else {
+    $wp_load .= '/wp/wp-load.php';
 }
 
-if ( file_exists( $wp_load ) ) {
-	require_once $wp_load;
-	echo "        ✅ WordPress loaded from: $wp_load\n";
+if (file_exists($wp_load)) {
+    require_once $wp_load;
+    echo "        ✅ WordPress loaded from: $wp_load\n";
 } else {
-	echo "        ❌ wp-load.php not found at either location:\n";
-	echo "           - " . dirname( __FILE__ ) . '/wp/wp-load.php' . "\n";
-	echo "           - " . dirname( __FILE__ ) . '/wp-load.php' . "\n";
-	exit( 1 );
+    echo "        ❌ wp-load.php not found at either location:\n";
+    echo "           - " . dirname(__FILE__) . '/wp/wp-load.php' . "\n";
+    echo "           - " . dirname(__FILE__) . '/wp-load.php' . "\n";
+    exit(1);
 }
 
 // Step 4: Validate CORS functions loaded
