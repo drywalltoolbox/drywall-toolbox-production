@@ -254,6 +254,13 @@ function dtb_register_config_routes(): void {
 		],
 	] );
 
+	// ── Diagnostic: GET /dtb/v1/cors-test — CORS debugging endpoint ──────────
+	register_rest_route( $ns, '/cors-test', [
+		'methods'             => 'GET',
+		'callback'            => 'dtb_route_cors_test',
+		'permission_callback' => '__return_true',
+	] );
+
 	// ── WC-Admin onboarding profile shim (suppresses core-profiler crash) ────
 	register_rest_route( 'wc-admin', '/profile', [
 		'methods'             => 'GET',
@@ -335,7 +342,20 @@ function dtb_emit_cors_headers( string $raw_origin ): void {
 		? array_unique( array_merge( $local_allowlist, dtb_allowed_origins() ) )
 		: $local_allowlist;
 
-	if ( $raw_origin && in_array( rtrim( $raw_origin, '/' ), $allowed, true ) ) {
+	// Debug: Log what we're checking
+	$trimmed_origin = rtrim( $raw_origin, '/' );
+	$is_allowed = $raw_origin && in_array( $trimmed_origin, $allowed, true );
+	
+	// Always log CORS decisions to debug.log for troubleshooting
+	error_log( sprintf(
+		'[CORS] raw_origin=%s, trimmed=%s, is_allowed=%s, allowed_list=%s',
+		$raw_origin,
+		$trimmed_origin,
+		$is_allowed ? 'true' : 'false',
+		json_encode( $allowed )
+	) );
+
+	if ( $is_allowed ) {
 		header( 'Access-Control-Allow-Origin: ' . esc_url_raw( $raw_origin ) );
 	} else {
 		header( 'Access-Control-Allow-Origin: https://drywalltoolbox.com' );
