@@ -110,6 +110,7 @@ import platinumOutsideCornerRollerData from '/brands/Platinum/Schematics/Outside
 // ---------------------------------------------------------------------------
 // TapeTech schematic JSON data imports
 // ---------------------------------------------------------------------------
+import tapeTech8054TTData from '/brands/TapeTech/Schematics/8054TT/schematic_data.json';
 import tapeTech17TTData  from '/brands/TapeTech/Schematics/17TT/schematic_data.json';
 import tapeTech20TTXData from '/brands/TapeTech/Schematics/20TTX/schematic_data.json';
 import tapeTech25TTXData from '/brands/TapeTech/Schematics/25TTX/schematic_data.json';
@@ -424,6 +425,10 @@ const _fallbacks = {
   },
 
   // ── TapeTech ────────────────────────────────────────────────────────────
+  'tapetech-8054tt': {
+    pages:   { 1: `${_BASE}brands/TapeTech/Schematics/8054TT/schematic_page_1.png` },
+    preview: `${_BASE}brands/TapeTech/Schematics/8054TT/8054tt.png`,
+  },
   'tapetech-17tt': {
     pages:   { 1: `${_BASE}brands/TapeTech/Schematics/17TT/schematic_page_1.png` },
     preview: `${_BASE}brands/TapeTech/Schematics/17TT/17tt.png`,
@@ -770,6 +775,7 @@ const ALLOWED_BRANDS = [
   const platinumOutsideCornerRollerParts = buildPartsFromData(platinumOutsideCornerRollerData);
 
   // TapeTech parts arrays
+  const tapeTech8054TTParts = buildPartsFromData(tapeTech8054TTData);
   const tapeTech17TTParts  = buildPartsFromData(tapeTech17TTData);
   const tapeTech20TTXParts = buildPartsFromData(tapeTech20TTXData);
   const tapeTech25TTXParts = buildPartsFromData(tapeTech25TTXData);
@@ -1532,6 +1538,17 @@ const ALLOWED_BRANDS = [
     },
 
     // ── TapeTech ────────────────────────────────────────────────────────────
+    {
+      id: 'tapetech-8054tt',
+      title: '8054TT',
+      description: 'TapeTech 8054TT schematic diagram with replacement parts',
+      brand: 'TapeTech',
+      category: 'Tools',
+      diagramPages: [1],
+      imagePages: { 1: schImg('tapetech-8054tt', 1) },
+      previewImage: schPrev('tapetech-8054tt'),
+      parts: tapeTech8054TTParts,
+    },
     {
       id: 'tapetech-17tt',
       title: '17TT',
