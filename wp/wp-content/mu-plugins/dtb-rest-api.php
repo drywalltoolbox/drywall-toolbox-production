@@ -38,6 +38,46 @@ defined( 'ABSPATH' ) || exit;
 add_action( 'rest_api_init', 'dtb_register_all_routes', 10 );
 add_action( 'rest_api_init', 'dtb_cors_init', 15 );
 
+// Override WooCommerce's own CORS handler so native /wc/v3/* endpoints also
+// respect our allowlist (e.g. requests from https://elliotttmiller.github.io).
+add_action( 'woocommerce_init', 'dtb_wc_cors_early', 1 );
+
+/**
+ * Fires before WooCommerce sends its own CORS headers on /wc/v3/* routes.
+ * Removes WC's built-in handler and replaces it with ours.
+ */
+function dtb_wc_cors_early(): void {
+	remove_filter( 'rest_pre_serve_request', 'rest_send_cors_headers' );
+	add_filter( 'rest_pre_serve_request', function ( $value ) {
+		$raw_origin = isset( $_SERVER['HTTP_ORIGIN'] )
+			? (string) wp_unslash( $_SERVER['HTTP_ORIGIN'] )
+			: '';
+		dtb_emit_cors_headers( $raw_origin );
+		return $value;
+	}, 5 );
+}
+
+/**
+ * Handle OPTIONS preflight for direct WC REST API requests (/wc/v3/*).
+ * WooCommerce blocks OPTIONS before rest_api_init fires, so we intercept early.
+ */
+add_action( 'init', function () {
+	if (
+		isset( $_SERVER['REQUEST_METHOD'] ) &&
+		'OPTIONS' === strtoupper( sanitize_text_field( wp_unslash( $_SERVER['REQUEST_METHOD'] ) ) ) &&
+		isset( $_SERVER['HTTP_ORIGIN'] )
+	) {
+		$raw_origin = rtrim( (string) wp_unslash( $_SERVER['HTTP_ORIGIN'] ), '/' );
+		if ( function_exists( 'dtb_allowed_origins' ) && in_array( $raw_origin, dtb_allowed_origins(), true ) ) {
+			dtb_emit_cors_headers( $raw_origin );
+			header( 'Content-Length: 0' );
+			header( 'Content-Type: text/plain' );
+			http_response_code( 200 );
+			exit;
+		}
+	}
+}, 1 );
+
 function dtb_register_all_routes(): void {
 	dtb_register_proxy_routes();
 	dtb_register_config_routes();
@@ -272,7 +312,24 @@ function dtb_cors_init(): void {
  * @param string $raw_origin Raw value from the HTTP_ORIGIN server variable.
  */
 function dtb_emit_cors_headers( string $raw_origin ): void {
-	if ( $raw_origin && in_array( rtrim( $raw_origin, '/' ), dtb_allowed_origins(), true ) ) {
+	// Local fallback list so this function works even if 00-dtb-loader.php
+	// hasn't been uploaded yet or OPcache is serving a stale version.
+	$local_allowlist = [
+		'https://drywalltoolbox.com',
+		'https://www.drywalltoolbox.com',
+		'https://elliotttmiller.github.io',
+		'http://localhost:3000',
+		'http://localhost:5173',
+		'http://127.0.0.1:3000',
+		'http://127.0.0.1:5173',
+	];
+
+	// Merge with dtb_allowed_origins() if available (adds wp-config override + filter).
+	$allowed = function_exists( 'dtb_allowed_origins' )
+		? array_unique( array_merge( $local_allowlist, dtb_allowed_origins() ) )
+		: $local_allowlist;
+
+	if ( $raw_origin && in_array( rtrim( $raw_origin, '/' ), $allowed, true ) ) {
 		header( 'Access-Control-Allow-Origin: ' . esc_url_raw( $raw_origin ) );
 	} else {
 		header( 'Access-Control-Allow-Origin: https://drywalltoolbox.com' );

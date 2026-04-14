@@ -20,18 +20,19 @@
  * }
  */
 
-// Derive the WP REST API root from the build-time env var.
-// REACT_APP_WP_BASE_URL is the WordPress site root including the /wp subdir,
-// e.g. https://drywalltoolbox.com/wp
-// We strip any trailing slash then append /wp-json so the endpoint URL is always correct.
-const _rawBase = ( process.env.REACT_APP_WP_BASE_URL || '' ).trim();
+// Use REACT_APP_API_BASE_URL (e.g. https://drywalltoolbox.com) — the same
+// base used by all other dtb/v1 endpoints.  This resolves to the canonical
+// /wp-json/ alias at the domain root, which is properly handled by the root
+// .htaccess rewrite and our CORS mu-plugin.
+//
+// Avoid REACT_APP_WP_BASE_URL here: that points to /wp (the WP subdirectory),
+// causing the URL to become /wp/wp-json/ which bypasses the rewrite alias and
+// can return 404 on shared hosting where /wp/wp-json/ isn't a real directory.
+const _apiBase = ( process.env.REACT_APP_API_BASE_URL || '' ).trim().replace( /\/+$/, '' );
 
-// Strip trailing slashes, then append /wp-json if not already present.
-const _base = _rawBase.replace( /\/+$/, '' );
-
-const WP_API_BASE = _base
-  ? ( _base.endsWith( '/wp-json' ) || _base.includes( '/wp-json/' ) ? _base : `${ _base }/wp-json` )
-  : 'https://drywalltoolbox.com/wp/wp-json';
+const WP_API_BASE = _apiBase
+  ? `${ _apiBase }/wp-json`
+  : 'https://drywalltoolbox.com/wp-json';
 
 /** Full URL of the schematics manifest endpoint. */
 export const SCHEMATICS_MEDIA_URL = `${WP_API_BASE}/dtb/v1/schematics/media`;

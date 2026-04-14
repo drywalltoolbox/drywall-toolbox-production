@@ -49,6 +49,7 @@ function dtb_allowed_origins(): array {
 	$origins = [
 		'https://drywalltoolbox.com',
 		'https://www.drywalltoolbox.com',
+		'https://elliotttmiller.github.io', // GitHub Pages dev/preview build
 		'http://localhost:3000',
 		'http://localhost:5173',
 		'http://127.0.0.1:3000',

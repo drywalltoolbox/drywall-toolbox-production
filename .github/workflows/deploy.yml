@@ -48,13 +48,16 @@ jobs:
           REACT_APP_WC_CSV_URL: ''
           REACT_APP_USE_LOCAL_CSV: 'false'
           # ── Live backend endpoints ─────────────────────────────────────────────
-          REACT_APP_WP_BASE_URL: 'https://drywalltoolbox.com/wp'
-          REACT_APP_WC_BASE_URL: 'https://drywalltoolbox.com/wp/wp-json/wc/v3'
+          # Use the domain-root canonical URLs — the root .htaccess rewrites
+          # /wp-json/* → /wp/wp-json/* so our CORS mu-plugin intercepts correctly.
+          # Avoid /wp/wp-json/ directly: it bypasses the rewrite alias and CORS handler.
+          REACT_APP_WP_BASE_URL: 'https://drywalltoolbox.com'
+          REACT_APP_WC_BASE_URL: 'https://drywalltoolbox.com/wp-json/wc/v3'
           REACT_APP_WC_AUTH_USER: ${{ secrets.WC_AUTH_USER }}
           REACT_APP_WC_AUTH_PASS: ${{ secrets.WC_AUTH_PASS }}
-          REACT_APP_WP_API_BASE: 'https://drywalltoolbox.com/wp/wp-json'
-          REACT_APP_WC_API_BASE: 'https://drywalltoolbox.com/wp/wp-json/wc/v3'
-          REACT_APP_JWT_ENDPOINT: 'https://drywalltoolbox.com/wp/wp-json/simple-jwt-login/v1/auth'
+          REACT_APP_WP_API_BASE: 'https://drywalltoolbox.com/wp-json'
+          REACT_APP_WC_API_BASE: 'https://drywalltoolbox.com/wp-json/wc/v3'
+          REACT_APP_JWT_ENDPOINT: 'https://drywalltoolbox.com/wp-json/simple-jwt-login/v1/auth'
           REACT_APP_API_BASE_URL: 'https://drywalltoolbox.com'
           REACT_APP_STORE_API_BASE: '/wp/wp-json/wc/store/v1'
           REACT_APP_SITE_URL: 'https://elliotttmiller.github.io/drywall-toolbox'

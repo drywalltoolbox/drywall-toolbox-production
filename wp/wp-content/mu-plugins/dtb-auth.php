@@ -177,19 +177,31 @@ function dtb_jwt_permission( WP_REST_Request $request ) {
 // =============================================================================
 
 /**
- * Emit the dtb_auth JWT as an HttpOnly, SameSite=Strict cookie.
+ * Emit the dtb_auth JWT as an HttpOnly cookie.
+ *
+ * SameSite policy:
+ *   - Same-origin requests (production domain) → SameSite=Strict (most secure).
+ *   - Cross-origin requests from an allowlisted origin (e.g. GitHub Pages dev
+ *     preview) → SameSite=None; Secure so the browser will actually send the
+ *     cookie back on subsequent cross-origin credentialed fetches.
+ *
+ * Without SameSite=None, browsers silently drop the cookie on cross-site
+ * requests regardless of CORS headers, making login from GitHub Pages
+ * permanently impossible.
  *
  * @param string $jwt     Signed JWT string.
  * @param int    $ttl_sec Cookie lifetime in seconds (default: 7 days).
  */
 function dtb_set_auth_cookie( string $jwt, int $ttl_sec = 604800 ): void {
+	$cross_origin = dtb_is_cross_origin_request();
+
 	setcookie( DTB_AUTH_COOKIE, $jwt, [
 		'expires'  => time() + $ttl_sec,
 		'path'     => '/',
-		'domain'   => '',        // current domain only
-		'secure'   => is_ssl(), // HTTPS-only in production
-		'httponly' => true,      // not accessible from JS
-		'samesite' => 'Strict',  // protects against CSRF
+		'domain'   => '',
+		'secure'   => true,   // always true — SameSite=None requires Secure
+		'httponly' => true,
+		'samesite' => $cross_origin ? 'None' : 'Strict',
 	] );
 }
 
@@ -197,14 +209,41 @@ function dtb_set_auth_cookie( string $jwt, int $ttl_sec = 604800 ): void {
  * Clear the dtb_auth cookie (logout).
  */
 function dtb_clear_auth_cookie(): void {
+	$cross_origin = dtb_is_cross_origin_request();
+
 	setcookie( DTB_AUTH_COOKIE, '', [
 		'expires'  => time() - 3600,
 		'path'     => '/',
 		'domain'   => '',
-		'secure'   => is_ssl(),
+		'secure'   => true,
 		'httponly' => true,
-		'samesite' => 'Strict',
+		'samesite' => $cross_origin ? 'None' : 'Strict',
 	] );
+}
+
+/**
+ * Return true when the current request comes from a cross-origin allowlisted
+ * source (e.g. the GitHub Pages dev build).
+ *
+ * Used to decide whether to issue SameSite=None cookies.
+ */
+function dtb_is_cross_origin_request(): bool {
+	$raw_origin = isset( $_SERVER['HTTP_ORIGIN'] )
+		? rtrim( (string) wp_unslash( $_SERVER['HTTP_ORIGIN'] ), '/' ) // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+		: '';
+
+	if ( '' === $raw_origin ) {
+		return false;
+	}
+
+	// Same-origin: the production domain itself.
+	$home = rtrim( (string) ( defined( 'WP_HOME' ) ? WP_HOME : home_url() ), '/' );
+	if ( $raw_origin === $home || $raw_origin === 'https://www.drywalltoolbox.com' ) {
+		return false;
+	}
+
+	// Any other allowlisted origin is cross-origin (dev / staging / GitHub Pages).
+	return in_array( $raw_origin, dtb_allowed_origins(), true );
 }
 
 // =============================================================================
