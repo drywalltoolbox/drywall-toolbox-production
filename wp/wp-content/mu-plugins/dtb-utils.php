@@ -49,8 +49,8 @@ function dtb_is_rest_api_request(): bool {
  *   webhook_secret    HMAC secret for webhook validation        (WC_WEBHOOK_SECRET)
  *   import_secret     CI/CD catalog-import auth token          (DTB_IMPORT_SECRET)
  *   jwt_secret        JWT signing secret                        (DRYWALL_JWT_SECRET)
- *   csv_filename      Product CSV filename (single, legacy)         (DTB_WC_CSV_FILENAME)
- *   csv_filenames     Product CSV filenames (array, preferred)       (DTB_WC_CSV_FILENAMES)
+ *   csv_filename      Resolved catalog CSV filename (auto-discovered or fallback)
+ *   csv_filenames     Always a single-element array wrapping csv_filename
  *   webhook_delivery  Webhook delivery URL                      (DTB_WEBHOOK_DELIVERY_URL)
  *
  * @return array<string,string>
@@ -60,50 +60,35 @@ function dtb_get_config(): array {
 		return $GLOBALS['_dtb_config_cache'];
 	}
 
-	// ── Resolve CSV filenames ────────────────────────────────────────────────
-	// Priority:
-	//   1. DTB_WC_CSV_FILENAMES  — JSON array of filenames (preferred for multi-file catalogs)
-	//                               e.g. '["product-wc-tapetech-abc.csv","product-wc-columbia-xyz.csv"]'
-	//   2. DTB_WC_CSV_FILENAME   — legacy single-filename string (still supported)
-	//   3. Auto-discovery        — glob wc-imports/ for product-wc-*.csv, newest file per brand prefix.
-	//                               Eliminates the need to update wp-config.php after every CSV upload.
-	$csv_filenames = [];
-	if ( defined( 'DTB_WC_CSV_FILENAMES' ) ) {
-		$decoded = json_decode( DTB_WC_CSV_FILENAMES, true );
-		if ( is_array( $decoded ) && count( $decoded ) > 0 ) {
-			$csv_filenames = array_values( array_filter( array_map( 'sanitize_file_name', $decoded ) ) );
+	// ── Resolve catalog CSV filename ─────────────────────────────────────────
+	// Auto-discovery: scan wc-imports/ for all product-wc-*.csv files and pick
+	// the single most-recently modified one (Last Modified / filemtime).
+	// Fallback: wp-catalog.csv — used when no product-wc-*.csv file exists yet.
+	// No wp-config.php constant needed; simply upload a new product-wc-*.csv
+	// via cPanel or WooCommerce → Products → Import and it is picked up
+	// automatically on the next request.
+	$upload_dir  = wp_upload_dir();
+	$wc_imports  = trailingslashit( $upload_dir['basedir'] ) . 'wc-imports/';
+	$found       = glob( $wc_imports . 'product-wc-*.csv' ) ?: [];
+
+	$csv_filename = '';
+	if ( ! empty( $found ) ) {
+		// Sort descending by Last Modified (filemtime) — pick the newest file.
+		usort( $found, static function ( string $a, string $b ): int {
+			return filemtime( $b ) <=> filemtime( $a );
+		} );
+		$csv_filename = basename( $found[0] );
+	}
+
+	// Fallback to the stable wp-catalog.csv when auto-discovery finds nothing.
+	if ( '' === $csv_filename ) {
+		$fallback = $wc_imports . 'wp-catalog.csv';
+		if ( file_exists( $fallback ) ) {
+			$csv_filename = 'wp-catalog.csv';
 		}
 	}
-	if ( empty( $csv_filenames ) && defined( 'DTB_WC_CSV_FILENAME' ) ) {
-		$csv_filenames = [ sanitize_file_name( DTB_WC_CSV_FILENAME ) ];
-	}
-	if ( empty( $csv_filenames ) ) {
-		// Auto-discover: scan wc-imports/ for files matching product-wc-*.csv.
-		// When multiple files share the same brand prefix (e.g. after re-uploads),
-		// keep only the newest one per prefix so stale duplicates are ignored.
-		$upload_dir    = wp_upload_dir();
-		$wc_imports    = trailingslashit( $upload_dir['basedir'] ) . 'wc-imports/';
-		$found         = glob( $wc_imports . 'product-wc-*.csv' );
-		if ( ! empty( $found ) ) {
-			// Group by brand prefix: everything before the last random suffix token.
-			// e.g. "product-wc-tapetech-cczyksx7op.csv" → prefix "product-wc-tapetech"
-			$by_prefix = [];
-			foreach ( $found as $path ) {
-				$base   = basename( $path, '.csv' );
-				$parts  = explode( '-', $base );
-				// Drop the last segment (random suffix) to get the brand prefix.
-				array_pop( $parts );
-				$prefix = implode( '-', $parts );
-				// Keep only the file with the highest mtime per prefix.
-				if ( ! isset( $by_prefix[ $prefix ] ) || filemtime( $path ) > filemtime( $by_prefix[ $prefix ] ) ) {
-					$by_prefix[ $prefix ] = $path;
-				}
-			}
-			// Sort by prefix name for deterministic ordering.
-			ksort( $by_prefix );
-			$csv_filenames = array_values( array_map( 'basename', $by_prefix ) );
-		}
-	}
+
+	$csv_filenames = '' !== $csv_filename ? [ $csv_filename ] : [];
 
 	$GLOBALS['_dtb_config_cache'] = [
 		'wc_proxy_key'     => defined( 'WC_PROXY_CONSUMER_KEY' )    ? WC_PROXY_CONSUMER_KEY    : '',
@@ -113,9 +98,9 @@ function dtb_get_config(): array {
 		'webhook_secret'   => defined( 'WC_WEBHOOK_SECRET' )        ? WC_WEBHOOK_SECRET        : '',
 		'import_secret'    => defined( 'DTB_IMPORT_SECRET' )        ? DTB_IMPORT_SECRET        : '',
 		'jwt_secret'       => defined( 'DRYWALL_JWT_SECRET' )       ? DRYWALL_JWT_SECRET       : '',
-		// Legacy single-filename key — first entry in the array for backward compat.
-		'csv_filename'     => $csv_filenames[0] ?? '',
-		// Full ordered list — used by the multi-file import and products-csv merge.
+		// Resolved filename — auto-discovered product-wc-*.csv or wp-catalog.csv fallback.
+		'csv_filename'     => $csv_filename,
+		// Single-element array for compatibility with multi-file import/stream routes.
 		'csv_filenames'    => $csv_filenames,
 		'webhook_delivery' => defined( 'DTB_WEBHOOK_DELIVERY_URL' ) ? DTB_WEBHOOK_DELIVERY_URL : 'https://drywalltoolbox.com/wp-json/drywall/v1/webhooks/products',
 	];
