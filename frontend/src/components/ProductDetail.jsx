@@ -237,7 +237,13 @@ export default function ProductDetail({ product, onAddToCart, onClose }) {
                   {product.description_full ? (
                     <div className="product-description prose prose-sm max-w-none">
                       {/^\s*<[a-z]/i.test(product.description_full)
-                        ? <div dangerouslySetInnerHTML={{ __html: product.description_full }} />
+                        ? <div dangerouslySetInnerHTML={{ __html:
+                            // Strip the pipe-table <p> block and its "Specifications:" heading
+                            // so specs don't render twice (TechnicalSpecifications handles them).
+                            product.description_full
+                              .replace(/<p[^>]*>\s*<(?:strong|b)[^>]*>Specifications?:?<\/(?:strong|b)>\s*<\/p>\s*/gi, '')
+                              .replace(/<p[^>]*>(?:\s*\|[^<]*)+<\/p>/gi, '')
+                          }} />
                         : (
                             <ReactMarkdown remarkPlugins={[remarkGfm]}>
                               {product.description_full}

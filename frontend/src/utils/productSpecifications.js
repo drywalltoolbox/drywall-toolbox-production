@@ -67,8 +67,33 @@ export function parseSpecificationsFromDescription(htmlDescription) {
   }
 
   const specs = [];
-  
-  // Look for HTML table with "Technical Specifications" or "Specification" heading
+
+  // ── Path 1: pipe-table inside a <p> element (WooCommerce CSV export format) ──
+  // e.g. <p>| Specification | Detail | | :--- | :--- | | Brand | Platinum | ...</p>
+  for (const match of htmlDescription.matchAll(/<p[^>]*>([\s\S]*?)<\/p>/gi)) {
+    const inner = match[1].replace(/<br\s*\/?>/gi, '\n').trim();
+    if (!inner.startsWith('|') || !/\|\s*:?-+:?\s*\|/.test(inner)) continue;
+    if (!/specification|detail|sku|brand|model/i.test(inner)) continue;
+
+    const rows = inner
+      .replace(/\|\s*\|/g, '|\n|')
+      .split('\n')
+      .map(r => r.trim())
+      .filter(Boolean);
+
+    if (rows.length < 3) continue; // need header + alignment + data
+
+    for (let i = 2; i < rows.length; i++) {
+      const cells = rows[i].split('|').map(c => c.trim());
+      if (cells.length >= 3 && cells[1]) {
+        specs.push({ label: cells[1], value: cells[2] || '' });
+      }
+    }
+
+    if (specs.length > 0) return specs;
+  }
+
+  // ── Path 2: real <table> element (legacy Asgard HTML descriptions) ──────────
   const tableRegex = /<table[^>]*>[\s\S]*?<\/table>/gi;
   const tables = htmlDescription.match(tableRegex);
 

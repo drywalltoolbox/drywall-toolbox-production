@@ -60,6 +60,7 @@ export async function loadProducts() {
         images: images.length > 0 ? images : ['https://www.drywalltoolbox.com/wp/wp-content/uploads/2026/04/no-image-placeholder.webp'],
         short_description: wcProduct.short_description || '',
         description_full: wcProduct.description || '',
+        meta_data: Array.isArray(wcProduct.meta_data) ? wcProduct.meta_data : [],
         category: wcProduct.categories && wcProduct.categories[0] ? 
                  wcProduct.categories[0].name : '',
         specifications: wcProduct.meta_data ? 
