@@ -74,6 +74,18 @@ function dtb_image_sync_register_routes(): void {
 				'sanitize_callback' => 'rest_sanitize_boolean',
 				'description'       => 'When true, scan and report without writing to the database.',
 			],
+			'limit'   => [
+				'required'          => false,
+				'default'           => 0,
+				'sanitize_callback' => 'absint',
+				'description'       => 'Max files to process in this request. 0 = no limit (default). Use with offset for batching.',
+			],
+			'offset'  => [
+				'required'          => false,
+				'default'           => 0,
+				'sanitize_callback' => 'absint',
+				'description'       => 'Number of files to skip before processing. Use with limit for batching.',
+			],
 		],
 	] );
 
@@ -112,6 +124,10 @@ function dtb_image_sync_permission(): bool {
  * link each image to its WooCommerce product by SKU.
  */
 function dtb_route_sync_images( WP_REST_Request $request ): WP_REST_Response|WP_Error {
+	// This operation can be slow for large directories — extend PHP limits.
+	@ini_set( 'memory_limit', '512M' );
+	@set_time_limit( 300 ); // 5 minutes
+
 	$year    = ltrim( (string) $request->get_param( 'year' ),  '/' );
 	$month   = ltrim( (string) $request->get_param( 'month' ), '/' );
 	$dry_run = (bool) $request->get_param( 'dry_run' );
@@ -145,7 +161,15 @@ function dtb_route_sync_images( WP_REST_Request $request ): WP_REST_Response|WP_
 	}
 
 	$image_extensions = [ 'webp', 'jpg', 'jpeg', 'png', 'gif', 'svg', 'avif' ];
-	$files            = dtb_list_images_in_dir( $scan_dir, $image_extensions );
+	$all_files        = dtb_list_images_in_dir( $scan_dir, $image_extensions );
+	$total            = count( $all_files );
+
+	// Apply offset/limit for batched processing.
+	$offset = (int) $request->get_param( 'offset' );
+	$limit  = (int) $request->get_param( 'limit' );
+	$files  = ( $limit > 0 )
+		? array_slice( $all_files, $offset, $limit )
+		: array_slice( $all_files, $offset );
 
 	$registered = 0;
 	$linked     = 0;
@@ -188,14 +212,18 @@ function dtb_route_sync_images( WP_REST_Request $request ): WP_REST_Response|WP_
 	}
 
 	return rest_ensure_response( [
-		'status'     => $dry_run ? 'dry_run' : 'completed',
-		'directory'  => "wp-content/uploads/$year/$month",
-		'scanned'    => count( $files ),
-		'registered' => $registered,
-		'linked'     => $linked,
-		'skipped'    => $skipped,
-		'errors'     => $errors,
-		'dry_run'    => $dry_run,
+		'status'      => $dry_run ? 'dry_run' : 'completed',
+		'directory'   => "wp-content/uploads/$year/$month",
+		'total_files' => $total,
+		'offset'      => $offset,
+		'limit'       => $limit,
+		'scanned'     => count( $files ),
+		'registered'  => $registered,
+		'linked'      => $linked,
+		'skipped'     => $skipped,
+		'errors'      => $errors,
+		'dry_run'     => $dry_run,
+		'next_offset' => ( $limit > 0 && ( $offset + $limit ) < $total ) ? $offset + $limit : null,
 	] );
 }
 
