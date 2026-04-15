@@ -136,8 +136,9 @@ export default function Header({ onCartToggle }) {
 
   return (
     <>
-      <header className="site-header" role="banner">
-      {/* ── Mobile-only shipping bar — sits at very top of fixed header ── */}
+      <header className={`site-header${location.pathname !== '/' ? ' site-header--no-ticker' : ''}`} role="banner">
+      {/* ── Mobile-only shipping ticker — homepage only ── */}
+      { location.pathname === '/' && (
       <div className="dtb-mobile-shipping-bar dtb-mobile-shipping-bar--header" aria-label="Promotions">
         <div className="dtb-ticker-track" aria-hidden="true">
           {/* Items duplicated so the loop is seamless */}
@@ -167,6 +168,7 @@ export default function Header({ onCartToggle }) {
           ))}
         </div>
       </div>
+      ) }
       <div className="site-header-inner">
   {/* Mobile Layout */}
   <div className="flex md:hidden items-center w-full header-mobile-layout" style={{ display: isTablet ? 'flex' : undefined }}>

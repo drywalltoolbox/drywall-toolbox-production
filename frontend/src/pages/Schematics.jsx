@@ -2294,7 +2294,7 @@ const ALLOWED_BRANDS = [
       <div style={{
         maxWidth: selectedSchematic ? '100%' : '1280px',
         margin: '0 auto',
-        padding: selectedSchematic ? '0' : (isFullscreen ? '16px' : '2px 16px 24px'),
+        padding: selectedSchematic ? '0' : (isFullscreen ? '16px' : 'clamp(20px, 3vw, 36px) 16px 24px'),
         ...(selectedSchematic ? { flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', minHeight: 0 } : {})
       }}>
       {/* Show BrandSelector if no brand selected */}

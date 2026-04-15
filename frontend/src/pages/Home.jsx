@@ -6,6 +6,7 @@ import columbiaLogoWhite from '/brands/Columbia/columbia_logo_white.svg';
 import surproLogo from '/brands/SurPro/surpro_logo.svg';
 import asgardLogo from '/brands/Asgard/asgard_logo.svg';
 import platinumLogo from '/brands/Platinum/platinum_logo.svg';
+import platinumLogoWhite from '/brands/Platinum/platinum_logo_white.svg';
 import duraStiltsLogo from '/brands/Dura-Stilts/dura-stilts-logo.svg';
 import SEOHead from '../components/SEOHead';
 import { buildOrganizationSchema, buildSiteLinksSearchBoxSchema } from '../utils/schema';
@@ -50,14 +51,14 @@ const brandLogos = [
   { name: 'Platinum Drywall Tools', src: platinumLogo },
 ];
 
-// Desktop hero brands - Columbia uses white logo for better contrast on dark background
+// Desktop hero brands - Columbia + Platinum use white logos for better contrast on dark background
 const desktopHeroBrands = [
   { name: 'TapeTech', src: tapeTechLogo },
   { name: 'Columbia', src: columbiaLogoWhite },
   { name: 'SurPro', src: surproLogo },
   { name: 'Asgard', src: asgardLogo },
   { name: 'Dura-Stilts', src: duraStiltsLogo },
-  { name: 'Platinum Drywall Tools', src: platinumLogo },
+  { name: 'Platinum Drywall Tools', src: platinumLogoWhite },
 ];
 
 export default function Home() {

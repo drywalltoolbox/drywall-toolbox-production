@@ -1358,6 +1358,11 @@ aside input[type="range"],
         --header-height: calc(28px + 76px + env(safe-area-inset-top, 0px));
     }
 
+    /* No ticker on non-homepage pages — header is nav bar only (76px) */
+    :root:has(.site-header--no-ticker) {
+        --header-height: calc(76px + env(safe-area-inset-top, 0px));
+    }
+
     .site-header {
         min-height: var(--header-height);
         padding: env(safe-area-inset-top, 0px) 0 0;
@@ -1473,6 +1478,11 @@ aside input[type="range"],
     :root {
         /* 28px shipping bar + fluid nav bar + safe area */
         --header-height: calc(28px + clamp(56px, 8vw, 80px) + env(safe-area-inset-top, 0px));
+    }
+
+    /* No ticker on non-homepage pages */
+    :root:has(.site-header--no-ticker) {
+        --header-height: calc(clamp(56px, 8vw, 80px) + env(safe-area-inset-top, 0px));
     }
 
     .site-header {
