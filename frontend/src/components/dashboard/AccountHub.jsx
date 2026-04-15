@@ -258,18 +258,6 @@ export default function AccountHub() {
                     { user.first_name || displayName }
                   </span>
                 </h1>
-
-                { user?.email && (
-                  <p style={ {
-                    margin:      '6px 0 0',
-                    fontSize:    '0.78rem',
-                    color:       'rgba(255,255,255,0.45)',
-                    fontWeight:  400,
-                    letterSpacing: '0.01em',
-                  } }>
-                    { user.email }
-                  </p>
-                ) }
               </div>
             </div>
 
