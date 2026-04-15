@@ -17,7 +17,7 @@
  */
 
 import { useState, useEffect, useRef } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { motion as Motion, AnimatePresence } from 'framer-motion';
 import {
   LayoutDashboard, Package, Star, Shield, MapPin, Settings, LogOut, User,
@@ -68,11 +68,9 @@ const DOT_GRID = {
 export default function AccountHub() {
   const navigate                                      = useNavigate();
   const { user, isAuthenticated, isLoading, logout }  = useAuthContext();
-  const [ , setSearchParams ]                         = useSearchParams();
 
   // Resolve initial tab from URL param → localStorage → 0.
-  // This runs once at mount; searchParams is read directly from the initial
-  // URLSearchParams snapshot so no stale-closure risk here.
+  // Reads window.location.search directly (no hook) so it never triggers re-renders.
   const resolveInitialTab = () => {
     const urlTab = new URLSearchParams( window.location.search ).get( 'tab' );
     if ( urlTab ) {
@@ -102,20 +100,21 @@ export default function AccountHub() {
     }
   }, [ isLoading, isAuthenticated, navigate ] );
 
-  // Sync URL param when tab changes
+  // Sync URL param when tab changes — uses history.replaceState directly
+  // so it never triggers a React re-render (avoids setSearchParams loop).
   useEffect( () => {
     const tabId = TABS[ activeTab ]?.id ?? 'overview';
-    setSearchParams( ( prev ) => {
-      const next = new URLSearchParams( prev );
+    try {
+      const url = new URL( window.location.href );
       if ( tabId === 'overview' ) {
-        next.delete( 'tab' );
+        url.searchParams.delete( 'tab' );
       } else {
-        next.set( 'tab', tabId );
+        url.searchParams.set( 'tab', tabId );
       }
-      return next;
-    }, { replace: true } );
-    try { localStorage.setItem( 'dtb_dashboard_tab', JSON.stringify( activeTab ) ); } catch { /* noop */ }
-  }, [ activeTab, setSearchParams ] );
+      window.history.replaceState( null, '', url.toString() );
+      localStorage.setItem( 'dtb_dashboard_tab', JSON.stringify( activeTab ) );
+    } catch { /* noop */ }
+  }, [ activeTab ] );
 
   // Fetch shared data once when user changes
   useEffect( () => {
