@@ -2,7 +2,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useCart } from '../context/CartContext';
 import { useAuthContext } from '../auth/AuthContext.js';
-import { ShoppingCart, Menu, X, ChevronDown, User, LogIn, UserPlus, LogOut, Search, Truck, Phone } from 'lucide-react';
+import { ShoppingCart, Menu, X, ChevronDown, User, LogIn, UserPlus, LogOut, Search, Truck, Phone, Shield, Wrench } from 'lucide-react';
 import Logo from '/logo2.svg';
 import MobileSearch from './MobileSearch';
 import NotificationsBell from './NotificationsBell';
@@ -138,8 +138,34 @@ export default function Header({ onCartToggle }) {
     <>
       <header className="site-header" role="banner">
       {/* ── Mobile-only shipping bar — sits at very top of fixed header ── */}
-      <div className="dtb-mobile-shipping-bar dtb-mobile-shipping-bar--header">
-        <span>FREE SHIPPING ON ALL ORDERS $50+ (Contiguous USA Only)</span>
+      <div className="dtb-mobile-shipping-bar dtb-mobile-shipping-bar--header" aria-label="Promotions">
+        <div className="dtb-ticker-track" aria-hidden="true">
+          {/* Items duplicated so the loop is seamless */}
+          {[0, 1].map((copy) => (
+            <div key={copy} className="dtb-ticker-set">
+              <span className="dtb-ticker-item">
+                <Truck size={11} className="dtb-ticker-icon" />
+                Free Shipping on Orders $50+
+              </span>
+              <span className="dtb-ticker-sep" aria-hidden="true">·</span>
+              <span className="dtb-ticker-item">
+                <Shield size={11} className="dtb-ticker-icon" />
+                Contiguous USA Only
+              </span>
+              <span className="dtb-ticker-sep" aria-hidden="true">·</span>
+              <span className="dtb-ticker-item">
+                <Phone size={11} className="dtb-ticker-icon" />
+                Expert Support — Real Pros
+              </span>
+              <span className="dtb-ticker-sep" aria-hidden="true">·</span>
+              <span className="dtb-ticker-item">
+                <Wrench size={11} className="dtb-ticker-icon" />
+                Professional Repair Services
+              </span>
+              <span className="dtb-ticker-sep" aria-hidden="true">·</span>
+            </div>
+          ))}
+        </div>
       </div>
       <div className="site-header-inner">
   {/* Mobile Layout */}

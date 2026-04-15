@@ -50,6 +50,7 @@ function dtb_allowed_origins(): array {
 	$origins = [
 		'https://drywalltoolbox.com',
 		'https://www.drywalltoolbox.com',
+		'https://drywalltoolbox.com/staging/7157', // Staging environment
 		'https://elliotttmiller.github.io', // GitHub Pages dev/preview build
 		'http://localhost:3000',
 		'http://localhost:5173',

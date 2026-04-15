@@ -94,6 +94,40 @@ function dtb_image_sync_register_routes(): void {
 		'callback'            => 'dtb_route_sync_images_status',
 		'permission_callback' => 'dtb_image_sync_permission',
 	] );
+
+	register_rest_route( $ns, '/sync-images/purge-unlinked', [
+		'methods'             => 'POST',
+		'callback'            => 'dtb_route_purge_unlinked_attachments',
+		'permission_callback' => 'dtb_image_sync_permission',
+		'args'                => [
+			'year'    => [
+				'required'          => false,
+				'default'           => '2026',
+				'sanitize_callback' => 'sanitize_text_field',
+			],
+			'month'   => [
+				'required'          => false,
+				'default'           => '04',
+				'sanitize_callback' => 'sanitize_text_field',
+			],
+			'dry_run' => [
+				'required'          => false,
+				'default'           => true,
+				'sanitize_callback' => 'rest_sanitize_boolean',
+				'description'       => 'Default TRUE — must explicitly pass false to actually delete.',
+			],
+			'limit'   => [
+				'required'          => false,
+				'default'           => 500,
+				'sanitize_callback' => 'absint',
+			],
+			'offset'  => [
+				'required'          => false,
+				'default'           => 0,
+				'sanitize_callback' => 'absint',
+			],
+		],
+	] );
 }
 
 /**
@@ -122,6 +156,13 @@ function dtb_image_sync_permission(): bool {
 /**
  * Scan uploads/<year>/<month>/, register new images as WP attachments, and
  * link each image to its WooCommerce product by SKU.
+ *
+ * Strategy: SKU-first (fast path).
+ *   1. Fetch all product SKUs from the DB in one query.
+ *   2. For each SKU, probe for a matching image file in the upload directory
+ *      (tries each allowed extension in order).
+ *   3. Only register files that actually match a SKU — skips tens of thousands
+ *      of WC-generated thumbnail variants with no matching product.
  */
 function dtb_route_sync_images( WP_REST_Request $request ): WP_REST_Response|WP_Error {
 	// This operation can be slow for large directories — extend PHP limits.
@@ -137,9 +178,9 @@ function dtb_route_sync_images( WP_REST_Request $request ): WP_REST_Response|WP_
 		return new WP_Error( 'invalid_params', 'year and month must be numeric.', [ 'status' => 400 ] );
 	}
 
-	$upload_dir  = wp_upload_dir();
-	$scan_dir    = trailingslashit( $upload_dir['basedir'] ) . "$year/$month";
-	$scan_url    = trailingslashit( $upload_dir['baseurl'] ) . "$year/$month";
+	$upload_dir = wp_upload_dir();
+	$scan_dir   = trailingslashit( $upload_dir['basedir'] ) . "$year/$month";
+	$scan_url   = trailingslashit( $upload_dir['baseurl'] ) . "$year/$month";
 
 	if ( ! is_dir( $scan_dir ) ) {
 		return new WP_Error(
@@ -160,70 +201,210 @@ function dtb_route_sync_images( WP_REST_Request $request ): WP_REST_Response|WP_
 		require_once ABSPATH . 'wp-admin/includes/media.php';
 	}
 
-	$image_extensions = [ 'webp', 'jpg', 'jpeg', 'png', 'gif', 'svg', 'avif' ];
-	$all_files        = dtb_list_images_in_dir( $scan_dir, $image_extensions );
-	$total            = count( $all_files );
+	// ── 1. Fetch all product SKUs from DB (one query) ───────────────────────
+	global $wpdb;
+	// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
+	$sku_rows = $wpdb->get_results(
+		"SELECT p.ID AS product_id, pm.meta_value AS sku
+		 FROM {$wpdb->posts} p
+		 INNER JOIN {$wpdb->postmeta} pm ON pm.post_id = p.ID AND pm.meta_key = '_sku'
+		 WHERE p.post_type = 'product'
+		   AND p.post_status != 'trash'
+		   AND pm.meta_value != ''",
+		ARRAY_A
+	);
 
-	// Apply offset/limit for batched processing.
-	$offset = (int) $request->get_param( 'offset' );
-	$limit  = (int) $request->get_param( 'limit' );
-	$files  = ( $limit > 0 )
-		? array_slice( $all_files, $offset, $limit )
-		: array_slice( $all_files, $offset );
+	// Build a map: lowercase_sku => product_id
+	$sku_map = [];
+	foreach ( $sku_rows as $row ) {
+		$sku_map[ strtolower( $row['sku'] ) ] = (int) $row['product_id'];
+	}
+
+	$total = count( $sku_map );
+
+	// Apply offset/limit for batched processing over the SKU list.
+	$offset   = (int) $request->get_param( 'offset' );
+	$limit    = (int) $request->get_param( 'limit' );
+	$sku_keys = array_keys( $sku_map );
+	$batch    = ( $limit > 0 )
+		? array_slice( $sku_keys, $offset, $limit )
+		: array_slice( $sku_keys, $offset );
+
+	$image_extensions = [ 'webp', 'jpg', 'jpeg', 'png', 'gif', 'avif' ];
 
 	$registered = 0;
 	$linked     = 0;
 	$skipped    = 0;
+	$no_file    = 0;
 	$errors     = [];
 
-	foreach ( $files as $file_path ) {
-		$filename  = basename( $file_path );
-		$file_url  = trailingslashit( $scan_url ) . $filename;
-		$stem      = strtolower( pathinfo( $filename, PATHINFO_FILENAME ) );
+	foreach ( $batch as $sku_lower ) {
+		$product_id = $sku_map[ $sku_lower ];
 
-		// ── 1. Find or create attachment ────────────────────────────────────
+		// ── 2. Find image file matching this SKU ────────────────────────────
+		$file_path = null;
+		$file_url  = null;
+		foreach ( $image_extensions as $ext ) {
+			$candidate_path = trailingslashit( $scan_dir ) . $sku_lower . '.' . $ext;
+			if ( file_exists( $candidate_path ) ) {
+				$file_path = $candidate_path;
+				$file_url  = trailingslashit( $scan_url ) . $sku_lower . '.' . $ext;
+				break;
+			}
+			// Also try the original-case SKU (some filenames preserve case).
+			$orig_sku   = strtolower( (string) array_search( $product_id, $sku_map, true ) );
+			$candidate2 = trailingslashit( $scan_dir ) . $orig_sku . '.' . $ext;
+			if ( $candidate2 !== $candidate_path && file_exists( $candidate2 ) ) {
+				$file_path = $candidate2;
+				$file_url  = trailingslashit( $scan_url ) . $orig_sku . '.' . $ext;
+				break;
+			}
+		}
+
+		if ( ! $file_path ) {
+			++$no_file; // product exists but no matching image found on disk
+			continue;
+		}
+
+		// ── 3. Find or create attachment ────────────────────────────────────
 		$attachment_id = dtb_find_attachment_by_url( $file_url );
 
 		if ( ! $attachment_id ) {
 			if ( $dry_run ) {
-				++$registered; // would register
+				++$registered;
 			} else {
 				$attachment_id = dtb_register_existing_upload( $file_path, $file_url );
 				if ( is_wp_error( $attachment_id ) ) {
-					$errors[] = "register [{$filename}]: " . $attachment_id->get_error_message();
+					$errors[] = "register [{$sku_lower}]: " . $attachment_id->get_error_message();
 					continue;
 				}
 				++$registered;
 			}
 		} else {
-			++$skipped; // already in media library
+			++$skipped;
 		}
 
-		// ── 2. Link to WooCommerce product by SKU ───────────────────────────
+		// ── 4. Link attachment to product ───────────────────────────────────
 		if ( $attachment_id || $dry_run ) {
-			$product_id = dtb_find_product_by_sku_stem( $stem );
-			if ( $product_id ) {
-				if ( ! $dry_run ) {
-					dtb_link_image_to_product( $product_id, $attachment_id );
-				}
-				++$linked;
+			if ( ! $dry_run ) {
+				// Always set the thumbnail — SKU-first match is authoritative.
+				set_post_thumbnail( $product_id, $attachment_id );
 			}
+			++$linked;
 		}
 	}
 
 	return rest_ensure_response( [
 		'status'      => $dry_run ? 'dry_run' : 'completed',
 		'directory'   => "wp-content/uploads/$year/$month",
-		'total_files' => $total,
+		'total_skus'  => $total,
 		'offset'      => $offset,
 		'limit'       => $limit,
-		'scanned'     => count( $files ),
+		'scanned'     => count( $batch ),
 		'registered'  => $registered,
 		'linked'      => $linked,
 		'skipped'     => $skipped,
+		'no_file'     => $no_file,
 		'errors'      => $errors,
 		'dry_run'     => $dry_run,
 		'next_offset' => ( $limit > 0 && ( $offset + $limit ) < $total ) ? $offset + $limit : null,
+	] );
+}
+
+// =============================================================================
+// POST /dtb/v1/sync-images/purge-unlinked
+// =============================================================================
+
+/**
+ * Delete attachment records from uploads/2026/04/ that are NOT set as the
+ * _thumbnail_id on any product. This undoes the runaway batch that registered
+ * ~84k WC thumbnail variants which have no matching product.
+ *
+ * Defaults to dry_run=true for safety. Pass dry_run=false to actually delete.
+ * Use limit+offset to page through in safe batches.
+ */
+function dtb_route_purge_unlinked_attachments( WP_REST_Request $request ): WP_REST_Response|WP_Error {
+	@ini_set( 'memory_limit', '512M' );
+	@set_time_limit( 120 );
+
+	$year    = ltrim( sanitize_text_field( (string) $request->get_param( 'year' ) ),  '/' );
+	$month   = ltrim( sanitize_text_field( (string) $request->get_param( 'month' ) ), '/' );
+	$dry_run = (bool) $request->get_param( 'dry_run' );
+	$limit   = max( 1, (int) $request->get_param( 'limit' ) );
+	$offset  = (int) $request->get_param( 'offset' );
+
+	if ( ! ctype_digit( $year ) || ! ctype_digit( $month ) ) {
+		return new WP_Error( 'invalid_params', 'year and month must be numeric.', [ 'status' => 400 ] );
+	}
+
+	$upload_dir = wp_upload_dir();
+	$base_url   = trailingslashit( $upload_dir['baseurl'] ) . "$year/$month/";
+
+	global $wpdb;
+
+	// Find attachments from this directory that are NOT used as any product's thumbnail.
+	// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
+	$attachment_ids = $wpdb->get_col( $wpdb->prepare(
+		"SELECT a.ID
+		 FROM {$wpdb->posts} a
+		 WHERE a.post_type   = 'attachment'
+		   AND a.post_status = 'inherit'
+		   AND a.guid LIKE %s
+		   AND a.ID NOT IN (
+		       SELECT CAST(pm.meta_value AS UNSIGNED)
+		       FROM {$wpdb->postmeta} pm
+		       WHERE pm.meta_key = '_thumbnail_id'
+		   )
+		 ORDER BY a.ID ASC
+		 LIMIT %d OFFSET %d",
+		$wpdb->esc_like( $base_url ) . '%',
+		$limit,
+		$offset
+	) );
+
+	// Get the total unlinked count (for next_offset calculation).
+	// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
+	$total_unlinked = (int) $wpdb->get_var( $wpdb->prepare(
+		"SELECT COUNT(*)
+		 FROM {$wpdb->posts} a
+		 WHERE a.post_type   = 'attachment'
+		   AND a.post_status = 'inherit'
+		   AND a.guid LIKE %s
+		   AND a.ID NOT IN (
+		       SELECT CAST(pm.meta_value AS UNSIGNED)
+		       FROM {$wpdb->postmeta} pm
+		       WHERE pm.meta_key = '_thumbnail_id'
+		   )",
+		$wpdb->esc_like( $base_url ) . '%'
+	) );
+
+	$deleted = 0;
+	$errors  = [];
+
+	if ( ! $dry_run ) {
+		foreach ( $attachment_ids as $id ) {
+			$result = wp_delete_attachment( (int) $id, true ); // true = force delete, skip trash
+			if ( $result ) {
+				++$deleted;
+			} else {
+				$errors[] = "Failed to delete attachment ID $id";
+			}
+		}
+	}
+
+	return rest_ensure_response( [
+		'status'          => $dry_run ? 'dry_run' : 'completed',
+		'directory'       => "wp-content/uploads/$year/$month",
+		'total_unlinked'  => $total_unlinked,
+		'batch_size'      => count( $attachment_ids ),
+		'deleted'         => $dry_run ? 0 : $deleted,
+		'offset'          => $offset,
+		'limit'           => $limit,
+		'errors'          => $errors,
+		'dry_run'         => $dry_run,
+		'next_offset'     => ( count( $attachment_ids ) === $limit && $total_unlinked > $offset + $limit )
+			? $offset + $limit
+			: null,
 	] );
 }
 

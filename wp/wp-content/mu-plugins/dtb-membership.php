@@ -138,7 +138,7 @@ function dtb_membership_get_tiers(): WP_REST_Response {
  * Returns the authenticated user's current membership tier, expiry,
  * remaining free diagnostics, and applied discount rates.
  */
-function dtb_membership_get_status( WP_REST_Request $request ): WP_REST_Response|WP_Error {
+function dtb_membership_get_status( WP_REST_Request $request ) {
 	$user_id = absint( $request['id'] );
 
 	if ( ! get_user_by( 'id', $user_id ) ) {
@@ -182,7 +182,7 @@ function dtb_membership_get_status( WP_REST_Request $request ): WP_REST_Response
  *
  * Body: { user_id: int, tier: string, founding_member?: bool }
  */
-function dtb_membership_enroll( WP_REST_Request $request ): WP_REST_Response|WP_Error {
+function dtb_membership_enroll( WP_REST_Request $request ) {
 	$params          = $request->get_json_params();
 	$user_id         = absint( $params['user_id'] ?? 0 );
 	$tier            = sanitize_key( $params['tier'] ?? '' );

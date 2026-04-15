@@ -171,11 +171,6 @@ add_action( 'rest_api_init', 'dtb_rewards_register_routes', 10 );
 
 function dtb_rewards_register_routes(): void {
 
-	// Bail gracefully if WPLoyalty is not yet active — no fatal errors.
-	if ( ! class_exists( 'WLR\Plugin\Helpers\App' ) ) {
-		return;
-	}
-
 	$ns = 'dtb/v1';
 
 	// ── GET /dtb/v1/rewards/balance/{id} ─────────────────────────────────────
@@ -271,7 +266,21 @@ function dtb_rewards_admin_permission( WP_REST_Request $request ) {
  */
 function dtb_rewards_get_balance( WP_REST_Request $request ) {
 	$user_id = (int) $request['id'];
-	$data    = dtb_wlr_get_user_points( $user_id );
+
+	// WPLoyalty not yet installed — return a zero-balance stub so the
+	// dashboard renders instead of crashing.
+	if ( ! class_exists( 'WLR\Plugin\Helpers\App' ) ) {
+		return rest_ensure_response( [
+			'user_id'          => $user_id,
+			'points'           => 0,
+			'points_earned'    => 0,
+			'points_redeemed'  => 0,
+			'points_value_usd' => 0.00,
+			'_note'            => 'Rewards program not yet configured.',
+		] );
+	}
+
+	$data = dtb_wlr_get_user_points( $user_id );
 
 	if ( is_wp_error( $data ) ) {
 		return $data;
@@ -298,7 +307,18 @@ function dtb_rewards_get_history( WP_REST_Request $request ) {
 	$user_id = (int) $request['id'];
 	$limit   = max( 1, min( 100, (int) $request['limit'] ) );
 	$offset  = max( 0, (int) $request['offset'] );
-	$result  = dtb_wlr_get_history( $user_id, $limit, $offset );
+
+	// WPLoyalty not yet installed — return an empty history stub.
+	if ( ! class_exists( 'WLR\Plugin\Helpers\App' ) ) {
+		return rest_ensure_response( [
+			'user_id' => $user_id,
+			'total'   => 0,
+			'events'  => [],
+			'_note'   => 'Rewards program not yet configured.',
+		] );
+	}
+
+	$result = dtb_wlr_get_history( $user_id, $limit, $offset );
 
 	if ( is_wp_error( $result ) ) {
 		return $result;
@@ -318,6 +338,10 @@ function dtb_rewards_get_history( WP_REST_Request $request ) {
  * @return WP_REST_Response|WP_Error
  */
 function dtb_rewards_redeem( WP_REST_Request $request ) {
+	if ( ! class_exists( 'WLR\Plugin\Helpers\App' ) ) {
+		return new WP_Error( 'not_configured', 'Rewards program not yet configured.', [ 'status' => 503 ] );
+	}
+
 	$params           = $request->get_json_params();
 	$user_id          = (int) ( $params['user_id'] ?? 0 );
 	$points_to_redeem = (int) ( $params['points_to_redeem'] ?? 0 );
@@ -369,6 +393,10 @@ function dtb_rewards_redeem( WP_REST_Request $request ) {
  * @return WP_REST_Response|WP_Error
  */
 function dtb_rewards_admin_adjust( WP_REST_Request $request ) {
+	if ( ! class_exists( 'WLR\Plugin\Helpers\App' ) ) {
+		return new WP_Error( 'not_configured', 'Rewards program not yet configured.', [ 'status' => 503 ] );
+	}
+
 	$params       = $request->get_json_params();
 	$user_id      = (int) ( $params['user_id'] ?? 0 );
 	$points_delta = (int) ( $params['points_delta'] ?? 0 );

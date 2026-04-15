@@ -2720,26 +2720,76 @@ aside input[type="range"],
    the fixed <header>). On mobile, it renders as the topmost
    row inside .site-header, above the nav bar row.
    ─────────────────────────────────────────────────────── */
+
+/* ── Ticker keyframe — scrolls exactly one full set width so the
+   duplicate second set creates a seamless infinite loop ── */
+@keyframes dtb-ticker-scroll {
+    0%   { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+}
+
 .dtb-mobile-shipping-bar {
     display: flex;
     align-items: center;
-    justify-content: center;
-    gap: 7px;
     width: 100%;
     background: #0b1220;
     color: rgba(255,255,255,0.85);
-    font-size: 0.58rem;
-    font-weight: 700;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
     height: 28px;
-    padding: 0 1rem;
-    text-align: center;
-    white-space: nowrap;
     overflow: hidden;
     /* Negative margin cancels the page-wrapper padding so bar sits flush */
     margin-left: calc(-1 * var(--page-h-pad, 0px));
     margin-right: calc(-1 * var(--page-h-pad, 0px));
+}
+
+/* The moving track — wide enough to hold two copies side by side */
+.dtb-ticker-track {
+    display: flex;
+    align-items: center;
+    white-space: nowrap;
+    /* Smooth constant-speed scroll; natural feel comes from the pace (22 s) */
+    animation: dtb-ticker-scroll 22s linear infinite;
+    will-change: transform;
+}
+
+/* Pause on hover / focus — desktop pointer devices only.
+   Mobile screens cannot hover, so the :hover rule is intentionally
+   excluded here and restricted to pointer: fine devices only. */
+@media (hover: hover) and (pointer: fine) {
+    .dtb-mobile-shipping-bar:hover .dtb-ticker-track {
+        animation-play-state: paused;
+    }
+}
+
+/* One copy of all items */
+.dtb-ticker-set {
+    display: inline-flex;
+    align-items: center;
+    gap: 0;
+}
+
+.dtb-ticker-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.585rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 0 1.4rem;
+    flex-shrink: 0;
+}
+
+.dtb-ticker-icon {
+    color: var(--primary-400, #60a5fa);
+    flex-shrink: 0;
+}
+
+.dtb-ticker-sep {
+    color: rgba(255,255,255,0.28);
+    font-size: 0.75rem;
+    font-weight: 400;
+    flex-shrink: 0;
+    /* No extra padding — items already have side padding */
 }
 
 .dtb-mobile-shipping-bar svg {
@@ -2758,6 +2808,24 @@ aside input[type="range"],
 /* Hide on desktop — the fixed header bar handles it there */
 @media (min-width: 1025px) {
     .dtb-mobile-shipping-bar { display: none; }
+}
+
+/* Respect reduced-motion preference */
+@media (prefers-reduced-motion: reduce) {
+    .dtb-ticker-track {
+        animation: none;
+    }
+    /* Show just the first item statically */
+    .dtb-ticker-set:last-child {
+        display: none;
+    }
+    .dtb-ticker-item:not(:first-child),
+    .dtb-ticker-sep {
+        display: none;
+    }
+    .dtb-mobile-shipping-bar {
+        justify-content: center;
+    }
 }
 
 /* ─────────────────────────────────────────────────────────────────────────────
