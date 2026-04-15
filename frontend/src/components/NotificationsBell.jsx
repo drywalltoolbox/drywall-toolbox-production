@@ -24,7 +24,6 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Bell, Package, Star, Shield, Tag, CheckCheck, ChevronRight } from 'lucide-react';
 import { useAuthContext } from '../auth/AuthContext.js';
-
 // ─── Notification type config ─────────────────────────────────────────────────
 
 const TYPE_CFG = {
@@ -59,8 +58,46 @@ export default function NotificationsBell() {
   const [ open,          setOpen    ] = useState( false );
   const [ notifications, setNotifs  ] = useState( STUB_NOTIFICATIONS );
   const containerRef                  = useRef( null );
+  const buttonRef                     = useRef( null );
+  const [ dropdownStyle,  setDropdownStyle ] = useState( {} );
 
   const unreadCount = notifications.filter( ( n ) => ! n.read ).length;
+
+  // On mobile, compute dropdown position to keep it on-screen and right-aligned
+  useEffect( () => {
+    if ( ! open || ! buttonRef.current ) return;
+    
+    const isMobile = window.innerWidth < 768;
+    if ( ! isMobile ) {
+      return; // Use default CSS positioning on desktop
+    }
+
+    // On mobile: position dropdown to stay within viewport
+    const rect = buttonRef.current.getBoundingClientRect();
+    const gap = 10; // space between button and dropdown
+    
+    // Panel width on mobile (narrower for better UX)
+    const panelWidth = Math.min( 320, window.innerWidth - 16 ); // max 320px with 8px margin on each side
+    
+    // Right edge of button
+    const buttonRight = window.innerWidth - rect.right;
+    
+    // Compute right position: align panel's right edge near the button's right edge,
+    // but ensure it doesn't overflow left
+    const minLeftMargin = 8;
+    let computedRight = buttonRight - (rect.width / 2) - 4; // roughly centered to button
+    
+    // Clamp so panel doesn't go off-screen left
+    const maxRight = window.innerWidth - minLeftMargin - panelWidth;
+    computedRight = Math.min( computedRight, maxRight );
+    
+    setDropdownStyle( {
+      position: 'fixed',
+      top: `calc(var(--header-height, 68px) + ${gap}px)`,
+      right: `${Math.max( 8, computedRight )}px`,
+      width: `${panelWidth}px`,
+    } );
+  }, [ open ] );
 
   // Close on outside click
   useEffect( () => {
@@ -109,6 +146,7 @@ export default function NotificationsBell() {
 
       {/* Bell button */}
       <button
+        ref={ buttonRef }
         type="button"
         aria-label={ `Notifications${ unreadCount > 0 ? ` (${ unreadCount } unread)` : '' }` }
         aria-expanded={ open }
@@ -163,10 +201,12 @@ export default function NotificationsBell() {
       {/* Dropdown */}
       <div
         style={ {
-          position:        'absolute',
-          top:             'calc(100% + 10px)',
-          right:           '-8px',
-          width:           'min(360px, calc(100vw - 32px))',
+          ...( dropdownStyle?.position === 'fixed' ? dropdownStyle : {
+            position:        'absolute',
+            top:             'calc(100% + 10px)',
+            right:           '-8px',
+            width:           'min(360px, calc(100vw - 32px))',
+          } ),
           background:      'white',
           border:          '1px solid rgba(15,23,42,0.09)',
           borderRadius:    '14px',

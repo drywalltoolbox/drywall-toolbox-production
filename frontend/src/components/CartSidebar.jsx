@@ -1,55 +1,85 @@
-import { X, Trash2 } from 'lucide-react';
+import { X, Trash2, ShoppingCart } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { Link } from 'react-router-dom';
 
 export default function CartSidebar({ isOpen, onClose }) {
   const { cartItems, removeFromCart, getCartTotal } = useCart();
 
-  if (!isOpen) return null;
-
+  // Always render — visibility is controlled by CSS classes so the
+  // slide-in/out transition can play both on open AND close.
   return (
     <div 
-      className={`cart-overlay ${isOpen ? 'active' : ''}`}
+      className={`cart-overlay${isOpen ? ' active' : ''}`}
       onClick={onClose}
+      aria-hidden={!isOpen}
     >
       <div 
         className="cart-panel"
         onClick={(e) => e.stopPropagation()}
+        role="dialog"
+        aria-label="Shopping cart"
+        aria-modal="true"
       >
-        <div style={{ 
-          display: 'flex', 
-          justifyContent: 'space-between', 
-          alignItems: 'center', 
-          marginBottom: '40px' 
-        }}>
-          <h3 style={{ 
-            textTransform: 'uppercase', 
-            letterSpacing: '0.1em' 
-          }}>
-            Your Toolbox
-          </h3>
+        {/* Header bar */}
+        <div className="cart-panel-header">
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <ShoppingCart size={18} strokeWidth={2} style={{ color: 'var(--primary-600)' }} />
+            <h3 style={{ 
+              textTransform: 'uppercase', 
+              letterSpacing: '0.1em',
+              fontSize: '0.85rem',
+              fontWeight: 800,
+              margin: 0,
+            }}>
+              Your Toolbox
+            </h3>
+            {cartItems.length > 0 && (
+              <span style={{
+                background: 'var(--primary-600)',
+                color: 'white',
+                borderRadius: '999px',
+                fontSize: '0.65rem',
+                fontWeight: 800,
+                padding: '1px 7px',
+                lineHeight: 1.6,
+              }}>{cartItems.length}</span>
+            )}
+          </div>
           <button 
             onClick={onClose} 
             style={{ 
               background: 'none', 
               border: 'none', 
-              cursor: 'pointer' 
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              padding: '6px',
+              borderRadius: '6px',
+              color: '#475569',
             }}
             aria-label="Close cart"
           >
-            <X size={24} />
+            <X size={20} />
           </button>
         </div>
 
-        <div id="cart-items-list">
+        {/* Items */}
+        <div id="cart-items-list" className="cart-panel-items">
           {cartItems.length === 0 ? (
-            <p style={{ 
-              opacity: 0.5, 
-              textAlign: 'center', 
-              marginTop: '40px' 
+            <div style={{ 
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '12px',
+              padding: '48px 24px',
+              opacity: 0.45,
+              textAlign: 'center',
             }}>
-              Your cart is empty.
-            </p>
+              <ShoppingCart size={36} strokeWidth={1.5} />
+              <p style={{ fontSize: '0.85rem', fontWeight: 600, margin: 0 }}>Your cart is empty.</p>
+            </div>
           ) : (
             cartItems.map((item) => (
               <div key={item.id} className="cart-item">
@@ -58,14 +88,14 @@ export default function CartSidebar({ isOpen, onClose }) {
                     src={item.image}
                     alt={item.name}
                     style={{
-                      width: '44px',
-                      height: '44px',
+                      width: '48px',
+                      height: '48px',
                       objectFit: 'contain',
                       borderRadius: '6px',
                       background: '#f8fafc',
                       border: '1px solid #e2e8f0',
                       flexShrink: 0,
-                      marginRight: '10px',
+                      marginRight: '12px',
                     }}
                     loading="lazy"
                     decoding="async"
@@ -75,16 +105,17 @@ export default function CartSidebar({ isOpen, onClose }) {
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ 
                     fontWeight: 600, 
-                    fontSize: '0.9rem',
-                    color: '#0f172a' /* force black, not brand blue */
+                    fontSize: '0.85rem',
+                    color: '#0f172a',
+                    lineHeight: 1.3,
+                    marginBottom: '3px',
                   }}>
                     {item.name}
                   </div>
                   <div style={{ 
                     fontFamily: 'var(--font-mono)', 
-                    fontSize: '0.75rem', 
-                    opacity: 0.6,
-                    color: '#0f172a' /* ensure price text is black */
+                    fontSize: '0.72rem', 
+                    color: 'rgba(15,23,42,0.5)',
                   }}>
                     ${item.price ? item.price.toFixed(2) : '0.00'} × {item.quantity}
                   </div>
@@ -95,34 +126,34 @@ export default function CartSidebar({ isOpen, onClose }) {
                   style={{ 
                     background: 'none', 
                     border: 'none', 
-                    color: 'red', 
-                    fontSize: '0.7rem', 
+                    color: '#ef4444', 
                     cursor: 'pointer',
                     display: 'inline-flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    padding: '6px'
+                    padding: '6px',
+                    borderRadius: '6px',
+                    flexShrink: 0,
+                    marginLeft: '4px',
                   }}
                 >
-                  <Trash2 size={16} />
+                  <Trash2 size={15} />
                 </button>
               </div>
             ))
           )}
         </div>
 
-        <div style={{ 
-          marginTop: '40px', 
-          borderTop: '2px solid var(--alloy-deep)', 
-          paddingTop: '20px' 
-        }}>
+        {/* Footer */}
+        <div className="cart-panel-footer">
           <div style={{ 
             display: 'flex', 
-            justifyContent: 'space-between', 
-            marginBottom: '24px' 
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            marginBottom: '16px',
           }}>
-            <span style={{ fontWeight: 800, color: '#0f172a' }}>SUBTOTAL</span>
-            <span style={{ fontFamily: 'var(--font-mono)', color: '#0f172a', fontWeight: 800 }}>
+            <span style={{ fontWeight: 800, fontSize: '0.8rem', letterSpacing: '0.06em', textTransform: 'uppercase', color: '#0f172a' }}>Subtotal</span>
+            <span style={{ fontFamily: 'var(--font-mono)', color: '#0f172a', fontWeight: 800, fontSize: '1rem' }}>
               ${getCartTotal().toFixed(2)}
             </span>
           </div>
@@ -133,7 +164,8 @@ export default function CartSidebar({ isOpen, onClose }) {
             style={{ 
               width: '100%', 
               justifyContent: 'center',
-              textDecoration: 'none'
+              textDecoration: 'none',
+              display: 'flex',
             }}
           >
             Finalize Order

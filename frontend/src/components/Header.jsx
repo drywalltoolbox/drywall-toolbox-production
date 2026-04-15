@@ -138,23 +138,25 @@ export default function Header({ onCartToggle }) {
     <header className="site-header" role="banner">
       <div className="site-header-inner">
   {/* Mobile Layout */}
-  <div className="flex md:hidden items-center justify-between w-full header-mobile-layout" style={{ display: isTablet ? 'flex' : undefined }}>
-          {/* Menu Icon - Far Left */}
-          <button 
-            onClick={toggleMobileMenu}
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors header-icon"
-            aria-label="Toggle menu"
-          >
-            {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
-          </button>
+  <div className="flex md:hidden items-center w-full header-mobile-layout" style={{ display: isTablet ? 'flex' : undefined }}>
+          {/* Left slot — fixed width so logo stays truly centered */}
+          <div className="header-mobile-slot header-mobile-slot--left">
+            <button 
+              onClick={toggleMobileMenu}
+              className="p-2 hover:bg-gray-100 rounded-lg transition-colors header-icon"
+              aria-label="Toggle menu"
+            >
+              {mobileMenuOpen ? <X size={22} /> : <Menu size={22} />}
+            </button>
+          </div>
 
           {/* Centered Logo */}
-          <Link to="/" className="flex items-center justify-center" onClick={closeMobileMenu}>
+          <Link to="/" className="flex items-center justify-center flex-1" onClick={closeMobileMenu}>
             <img src={Logo} alt="Drywall Toolbox Logo" className="logo-image-mobile" />
           </Link>
 
-          {/* Right: Notifications Bell + Cart */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '2px' }}>
+          {/* Right slot — fixed width matching left slot */}
+          <div className="header-mobile-slot header-mobile-slot--right">
             <NotificationsBell />
             <button 
               onClick={onCartToggle} 
@@ -579,7 +581,6 @@ export default function Header({ onCartToggle }) {
       {/* ── Free Shipping Bar — desktop only, sits below the nav bar ── */}
       <div className="dtb-promo-bar" aria-label="Free shipping announcement">
         <div className="dtb-promo-bar-inner">
-          <Truck size={13} aria-hidden="true" />
           <span>FREE SHIPPING ON ALL ORDERS $50+ (Contiguous USA Only)</span>
         </div>
       </div>

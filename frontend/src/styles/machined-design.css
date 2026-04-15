@@ -24,10 +24,10 @@
     --accent-500: var(--color-accent-500, #2563eb);
 
     /* Fluid header height — keep in sync with .site-header actual rendered height.
-       Desktop: min-height clamp(80px, 12vw, 140px) + 12px top padding (0.75rem)
+       Desktop: min-height clamp(56px, 8vw, 100px) + ~7px top padding (0.4rem)
        Mobile (≤767px) and tablet (641-1024px) override this with their own values.
        This is used for body padding-top to prevent content from hiding behind fixed header. */
-    --header-height: calc(clamp(80px, 12vw, 140px) + 12px + env(safe-area-inset-top, 0px));
+    --header-height: calc(clamp(56px, 8vw, 100px) + 7px + env(safe-area-inset-top, 0px));
 }
 
 * {
@@ -271,18 +271,15 @@ body {
 
 /* --- CART OVERLAY --- */
 /*
-  backdrop-filter: blur() removed — it forces the GPU to composite every
-  element behind it on every animation frame, which is extremely expensive on
-  mobile CPUs and causes dropped frames when the panel slides in/out.
-  A semi-transparent background achieves the same "dimming" UX without the
-  compositing cost.
-  Cart panel transition shortened 500ms → 300ms which feels snappier on mobile.
+  The overlay covers the full viewport but the panel itself is offset downward
+  by --header-height so it sits flush below the fixed header on all breakpoints.
+  Always rendered (no unmount) so slide-in and slide-out transitions both play.
 */
 .cart-overlay {
     position: fixed;
     inset: 0;
     background: rgba(15, 23, 42, 0.45);
-    z-index: 2000;
+    z-index: 9998; /* just below the fixed header (9999) */
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.25s ease;
@@ -296,27 +293,56 @@ body {
 .cart-panel {
     position: absolute;
     right: 0;
-    top: 0;
+    top: var(--header-height, 68px);  /* starts below the fixed header */
     bottom: 0;
-    width: 400px;
-    max-width: 100%;
+    width: 380px;
+    max-width: 100vw;
     background: white;
-    padding: 40px;
+    display: flex;
+    flex-direction: column;
     transform: translateX(100%);
     transition: transform 0.3s var(--ease-tension);
-    overflow-y: auto;
+    overflow: hidden;
     will-change: transform;
+    box-shadow: -4px 0 24px rgba(15,23,42,0.12);
 }
 
 .cart-overlay.active .cart-panel {
     transform: translateX(0);
 }
 
+/* Sticky header row inside the cart panel */
+.cart-panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 20px;
+    border-bottom: 1px solid rgba(15,23,42,0.08);
+    flex-shrink: 0;
+    background: white;
+}
+
+/* Scrollable items area */
+.cart-panel-items {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0 20px;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* Sticky footer with subtotal + CTA */
+.cart-panel-footer {
+    flex-shrink: 0;
+    background: white;
+    padding: 16px 20px 20px;
+    border-top: 2px solid var(--alloy-deep);
+}
+
 .cart-item {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 16px 0;
+    padding: 14px 0;
     border-bottom: 1px solid var(--machined-border);
 }
 
@@ -919,13 +945,13 @@ aside input[type="range"],
     left: 0;
     right: 0;
     width: 100%;
-    min-height: clamp(80px, 12vw, 140px);
+    min-height: clamp(56px, 8vw, 100px);
     background: var(--surface-glass);
     backdrop-filter: blur(18px);
     border-bottom: 1px solid var(--machined-border);
     z-index: 9999;
     overflow: visible;
-    padding: 0.75rem 0;
+    padding: 0.4rem 0;
 }
 
 /* Desktop Layout - Grid with centered branding */
@@ -1079,14 +1105,14 @@ aside input[type="range"],
 .cart-area {
     display: flex;
     align-items: center;
-    margin-left: 12px;
+    margin-left: 8px;
 }
 
 .cart-toggle {
     background: none;
     border: none;
     cursor: pointer;
-    padding: 8px;
+    padding: 10px;
     position: relative;
     display: inline-flex;
     align-items: center;
@@ -1295,52 +1321,55 @@ aside input[type="range"],
 /* Mobile Layout - Flexbox with centered branding */
 @media (max-width: 767px) {
     :root {
-        --header-height: calc(90px + env(safe-area-inset-top, 0px));
+        --header-height: calc(68px + env(safe-area-inset-top, 0px));
     }
 
     .site-header {
-        /* On mobile the header height is determined entirely by site-header-inner
-           (height: 90px below) + safe-area-inset-top.  Override the desktop
-           0.75rem top/bottom padding so actual rendered height == --header-height
-           and content is not accidentally hidden behind the fixed bar. */
         min-height: var(--header-height);
         padding: env(safe-area-inset-top, 0px) 0 0;
     }
 
     .site-header-inner {
-        height: 90px;
+        height: 68px;
         display: flex;
         justify-content: space-between;
         align-items: center;
-        padding: 0 12px;
-        gap: 12px;
+        padding: 0 6px;
+        gap: 0;
     }
 
     body {
-        padding-top: var(--header-height, 90px);
+        padding-top: var(--header-height, 68px);
     }
 
-    /* Center logo link between the two icon buttons */
-    .site-header .header-mobile-layout a {
-        flex: 1;
+    /* Equal-width side slots so logo is always perfectly centered */
+    .header-mobile-slot {
         display: flex;
         align-items: center;
-        justify-content: center;
+        flex: 0 0 auto;
+        width: 80px; /* accommodates bell + cart on the right; menu on left */
     }
 
-    /* Left icon (Menu) - positioned on far left */
-    .site-header .header-mobile-layout button:first-of-type {
-        flex: 0 0 auto;
+    .header-mobile-slot--left {
+        justify-content: flex-start;
+        padding-left: 4px;
     }
 
-    /* Right icon (Cart) - positioned on far right */
-    .site-header .header-mobile-layout button:last-of-type {
-        flex: 0 0 auto;
+    .header-mobile-slot--right {
+        justify-content: flex-end;
+        gap: 2px;
+        padding-right: 4px;
+    }
+
+    /* Slightly bigger tap targets for the icon buttons */
+    .header-mobile-slot button,
+    .header-mobile-slot .notification-bell-btn {
+        padding: 10px !important;
     }
 
     .logo-image-mobile {
-        width: 260px;
-        max-width: 260px;
+        width: 155px;
+        max-width: 155px;
         height: auto;
     }
 
@@ -1405,7 +1434,7 @@ aside input[type="range"],
        behind the fixed header on 641-1024px viewports.
        Also reset top/bottom padding so actual header height == --header-height. */
     :root {
-        --header-height: calc(clamp(80px, 12vw, 120px) + env(safe-area-inset-top, 0px));
+        --header-height: calc(clamp(56px, 8vw, 80px) + env(safe-area-inset-top, 0px));
     }
 
     .site-header {
@@ -1499,9 +1528,9 @@ aside input[type="range"],
 
     /* Icon sizing and spacing */
     .header-icon {
-        width: 44px;
-        height: 44px;
-        padding: 8px;
+        width: 46px;
+        height: 46px;
+        padding: 10px;
         border-radius: 8px;
         display: flex;
         align-items: center;
@@ -2041,11 +2070,12 @@ aside input[type="range"],
         align-items: center;
         justify-content: center;
         gap: 8px;
-        font-size: 0.7rem;
+        font-size: 0.65rem;
         font-weight: 700;
         letter-spacing: 0.1em;
         text-transform: uppercase;
         color: rgba(255,255,255,0.85);
+        white-space: nowrap;
     }
 
     .dtb-promo-bar-inner svg {
@@ -2061,7 +2091,7 @@ aside input[type="range"],
    search / account / cart stay on the right.
    ─────────────────────────────────────────────────────── */
 @media (min-width: 1025px) {
-    :root { --header-height: 140px; }
+    :root { --header-height: 100px; }
 
     .site-header {
         display: flex;
@@ -2600,13 +2630,15 @@ aside input[type="range"],
     width: 100%;
     background: #0b1220;
     color: rgba(255,255,255,0.85);
-    font-size: 0.62rem;
+    font-size: 0.58rem;
     font-weight: 700;
     letter-spacing: 0.1em;
     text-transform: uppercase;
-    height: 32px;
+    height: 28px;
     padding: 0 1rem;
     text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
     /* Negative margin cancels the page-wrapper padding so bar sits flush */
     margin-left: calc(-1 * var(--page-h-pad, 0px));
     margin-right: calc(-1 * var(--page-h-pad, 0px));

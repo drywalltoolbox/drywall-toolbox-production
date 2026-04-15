@@ -73,9 +73,6 @@ export default function Home() {
 
       {/* ── Mobile/Tablet Free Shipping Bar (hidden on desktop where Header handles it) ── */}
       <div className="dtb-mobile-shipping-bar">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-          <rect x="1" y="3" width="15" height="13" rx="1"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/>
-        </svg>
         <span>FREE SHIPPING ON ALL ORDERS $50+ (Contiguous USA Only)</span>
       </div>
 
