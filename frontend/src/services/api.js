@@ -109,19 +109,40 @@ const wcFetch = async (endpoint, params = {}) => {
 // existing UI components (ProductDetail, ProductCard, TrendingProducts, etc.).
 // This avoids touching every component when the data source changes.
 
-// Parts leaf category names — must match isPartsRow() in parseProductCsv.js
-const PARTS_LEAF_NAMES = ['parts & accessories', 'repair kits & parts', 'pumps & parts'];
+// Parts category name stems (decoded, lowercase) — brand-agnostic.
+// Any category whose decoded name matches one of these is a parts category,
+// regardless of which brand it belongs to.
+const PARTS_LEAF_NAMES = [
+  'parts & accessories',
+  'repair kits & parts',
+  'pumps & parts',
+  'replacement parts',
+  'spare parts',
+];
 
-// WooCommerce auto-generates slugs by lowercasing and hyphenating the name.
-// Include additional slug variants that may appear in different WC installs.
-const PARTS_LEAF_SLUGS = [
+// Parts slug prefixes — brand-agnostic.
+// WooCommerce de-duplicates duplicate category names by appending a brand
+// suffix, e.g. "parts-accessories" → "parts-accessories-columbia-taping-tools".
+// Matching by prefix means every brand's parts category is caught automatically
+// without needing brand-specific entries.
+const PARTS_SLUG_PREFIXES = [
   'parts-accessories',
   'repair-kits-parts',
   'pumps-parts',
   'replacement-parts',
   'spare-parts',
-  'parts',
 ];
+
+/** Decode common HTML entities that WooCommerce embeds in category names via the REST API. */
+function decodeHtmlEntities(str) {
+  return (str || '')
+    .replace(/&amp;/g,  '&')
+    .replace(/&lt;/g,   '<')
+    .replace(/&gt;/g,   '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&#039;/g, "'")
+    .replace(/&nbsp;/g, ' ');
+}
 
 /**
  * Map a WooCommerce REST API categories array to our internal category key.
@@ -138,24 +159,35 @@ const PARTS_LEAF_SLUGS = [
 function mapApiCategory(wcCategories) {
   if (!wcCategories || !wcCategories.length) return '';
   for (const cat of wcCategories) {
-    const key = CATEGORY_MAP[(cat.name || '').toLowerCase()];
+    const key = CATEGORY_MAP[decodeHtmlEntities(cat.name).toLowerCase()];
     if (key) return key;
   }
-  return (wcCategories[0].name || '').toLowerCase();
+  return decodeHtmlEntities(wcCategories[0].name).toLowerCase();
 }
 
 /**
  * Return true when the product belongs to a replacement-parts category.
+ *
+ * Brand-agnostic: works for all brands without needing brand-specific entries.
+ *   • Name check: decodes HTML entities ("&amp;" → "&") then matches against
+ *     PARTS_LEAF_NAMES — handles all brands equally.
+ *   • Slug check: prefix match on PARTS_SLUG_PREFIXES — catches WooCommerce's
+ *     auto-suffixed slugs like "parts-accessories-columbia-taping-tools" and
+ *     "parts-accessories-level5" without any brand-specific configuration.
  *
  * @param {Array<{id:number, name:string, slug:string}>} wcCategories
  * @returns {boolean}
  */
 function isPartsFromApi(wcCategories) {
   if (!wcCategories || !wcCategories.length) return false;
-  return wcCategories.some(cat =>
-    PARTS_LEAF_NAMES.includes((cat.name || '').toLowerCase()) ||
-    PARTS_LEAF_SLUGS.includes((cat.slug || '').toLowerCase())
-  );
+  return wcCategories.some(cat => {
+    const name = decodeHtmlEntities(cat.name).toLowerCase();
+    const slug = (cat.slug || '').toLowerCase();
+    return (
+      PARTS_LEAF_NAMES.includes(name) ||
+      PARTS_SLUG_PREFIXES.some(prefix => slug.startsWith(prefix))
+    );
+  });
 }
 
 /**
@@ -204,7 +236,7 @@ function extractBrand(wcProduct) {
   //    importing via CSV, so "TapeTech" appears as a category object.)
   if (wcProduct.categories && wcProduct.categories.length) {
     for (const cat of wcProduct.categories) {
-      const catName = cat.name || '';
+      const catName = decodeHtmlEntities(cat.name);
       // Try exact canonical match first, then alias normalization
       const match = KNOWN_BRANDS.find(b => b.toLowerCase() === catName.toLowerCase());
       if (match) return match;

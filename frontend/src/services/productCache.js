@@ -32,7 +32,7 @@ const FRESH_TTL_MS  = 5 * 60 * 1000;
 // Hard-expire after 24 hours — force a blocking refresh.
 const STALE_TTL_MS  = 24 * 60 * 60 * 1000;
 // App version stamp — bump this to bust the cache on breaking schema changes.
-const APP_VERSION   = '1.0.0';
+const APP_VERSION   = '1.0.2';
 
 // ─── IndexedDB helpers ────────────────────────────────────────────────────────
 

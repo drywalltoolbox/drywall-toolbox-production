@@ -135,10 +135,14 @@ export const CATEGORY_MAP = {
   'spray tips & nozzles':  'texture',
   'hoses & fittings':      'texture',
   'cleaning accessories':  'texture',
-  // Parts — all "repair / replacement" leaf categories
+  // Parts — all "repair / replacement" leaf categories, brand-agnostic
   'parts & accessories':   'parts',
   'repair kits & parts':   'parts',
   'pumps & parts':         'parts',
+  'replacement parts':     'parts',
+  'spare parts':           'parts',
+  // Generic tool leaf (box fillers, adapters, misc accessories)
+  'tools':                 'finishing',
 };
 
 /**
@@ -187,7 +191,9 @@ export function isPartsRow(categoriesCell) {
   const leaf  = first.split('>').pop().trim().toLowerCase();
   return leaf === 'parts & accessories' ||
          leaf === 'repair kits & parts' ||
-         leaf === 'pumps & parts';
+         leaf === 'pumps & parts'       ||
+         leaf === 'replacement parts'   ||
+         leaf === 'spare parts';
 }
 
 // ─── HTML → Markdown converter ───────────────────────────────────────────────
