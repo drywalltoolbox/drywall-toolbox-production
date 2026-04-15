@@ -153,8 +153,24 @@ function dtb_jwt_permission( WP_REST_Request $request ) {
 	}
 
 	// 2. Fall back to Authorization: Bearer header.
+	// On HostGator (Apache CGI/FastCGI), the Authorization header is not
+	// automatically populated in $_SERVER. The .htaccess RewriteRule that sets
+	// HTTP_AUTHORIZATION handles the common case; REDIRECT_HTTP_AUTHORIZATION
+	// is a second env var Apache may use when the request passed through a
+	// RewriteRule redirect before reaching PHP.
 	if ( ! $token ) {
 		$auth = $request->get_header( 'authorization' );
+
+		// CGI fallback 1: set by our .htaccess RewriteRule.
+		if ( ! $auth && ! empty( $_SERVER['HTTP_AUTHORIZATION'] ) ) {
+			$auth = sanitize_text_field( wp_unslash( $_SERVER['HTTP_AUTHORIZATION'] ) );
+		}
+
+		// CGI fallback 2: set by Apache when request was internally redirected.
+		if ( ! $auth && ! empty( $_SERVER['REDIRECT_HTTP_AUTHORIZATION'] ) ) {
+			$auth = sanitize_text_field( wp_unslash( $_SERVER['REDIRECT_HTTP_AUTHORIZATION'] ) );
+		}
+
 		if ( $auth && preg_match( '/^Bearer\s+(\S+)$/i', $auth, $m ) ) {
 			$token = $m[1];
 		}
@@ -366,7 +382,8 @@ function dtb_register_auth_routes(): void {
 /**
  * POST /dtb/v1/auth/login
  *
- * Accepts { email, password }. Authenticates via wp_authenticate(), generates a
+ * Accepts { email, password } or { login, password } where login is a
+ * WordPress username.  Authenticates via wp_authenticate(), generates a
  * JWT, and sets it as an HttpOnly SameSite=Strict cookie valid for 7 days.
  *
  * Success: { success: true, user: { id, email, display_name, roles } }
@@ -381,17 +398,20 @@ function dtb_auth_login( WP_REST_Request $request ): WP_REST_Response {
 		return $rl;
 	}
 
-	$email    = sanitize_email( (string) $request->get_param( 'email' ) );
+	// Accept either 'email' or 'login' (WP username) as the identity field.
+	$login    = sanitize_text_field( (string) ( $request->get_param( 'login' ) ?? '' ) );
+	$email    = sanitize_email( (string) ( $request->get_param( 'email' ) ?? '' ) );
+	$identity = $login ?: $email;  // login takes precedence; email is the fallback
 	$password = (string) $request->get_param( 'password' );
 
-	if ( empty( $email ) || empty( $password ) ) {
+	if ( empty( $identity ) || empty( $password ) ) {
 		return new WP_REST_Response(
-			dtb_error_envelope( 'missing_credentials', 'Email and password are required.', 400 ),
+			dtb_error_envelope( 'missing_credentials', 'Email (or login) and password are required.', 400 ),
 			400
 		);
 	}
 
-	$user = wp_authenticate( $email, $password );
+	$user = wp_authenticate( $identity, $password );
 
 	if ( is_wp_error( $user ) ) {
 		return new WP_REST_Response(

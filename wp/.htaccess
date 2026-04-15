@@ -14,7 +14,12 @@
 <IfModule mod_rewrite.c>
     RewriteEngine On
     RewriteBase /wp/
-    
+
+    # Pass the Authorization header through to PHP on CGI/FastCGI hosts
+    # (HostGator shared hosting strips it by default).
+    RewriteCond %{HTTP:Authorization} .
+    RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+
     # Don't rewrite index.php itself
     RewriteRule ^index\.php$ - [L]
     

@@ -69,6 +69,28 @@ function dtb_theme_setup(): void {
 	add_image_size( 'product-zoom',    1600, 1600,  false ); // Lightbox / zoom.
 	add_image_size( 'category-banner', 1440,  480,  true  ); // Category page headers.
 
+	// Suppress WooCommerce's default PHP-storefront sizes — this site is headless.
+	// WC registers: woocommerce_thumbnail (600), woocommerce_single (600),
+	// woocommerce_gallery_thumbnail (100), woocommerce_product_full_size (1200).
+	// None of these are requested by the React SPA; removing them saves ~4 files
+	// per product image (≈ 12 000+ files across the full catalogue).
+	add_filter(
+		'woocommerce_image_sizes',
+		static function (): array { return []; }
+	);
+
+	// Suppress WordPress core intermediate sizes not consumed by the SPA.
+	// 'thumbnail' (150×150) and 'medium' (300×300) are kept because WP core and
+	// some plugins hard-reference them. 'medium_large' (768px wide) and 'large'
+	// (1024px) are not used by any component; strip them at generation time.
+	add_filter(
+		'intermediate_image_sizes_advanced',
+		static function ( array $sizes ): array {
+			unset( $sizes['medium_large'], $sizes['large'] );
+			return $sizes;
+		}
+	);
+
 	// Navigation menus exposed via REST API for React dynamic navigation.
 	register_nav_menus(
 		[

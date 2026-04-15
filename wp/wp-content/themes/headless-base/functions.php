@@ -67,6 +67,23 @@ function hb_theme_setup(): void {
 	add_image_size( 'product-zoom',   1600, 1600,  false ); // Lightbox / zoom.
 	add_image_size( 'category-banner', 1440, 480,  true  ); // Category page headers.
 
+	// Suppress WooCommerce's default PHP-storefront sizes — headless site.
+	add_filter(
+		'woocommerce_image_sizes',
+		static function (): array { return []; }
+	);
+
+	// Suppress WordPress core intermediate sizes not used by the SPA.
+	// Keep 'thumbnail' and 'medium' (hard-referenced by WP core/plugins).
+	// Remove 'medium_large' (768px) and 'large' (1024px) — not consumed.
+	add_filter(
+		'intermediate_image_sizes_advanced',
+		static function ( array $sizes ): array {
+			unset( $sizes['medium_large'], $sizes['large'] );
+			return $sizes;
+		}
+	);
+
 	// Navigation menus exposed via REST API for dynamic React navigation rendering.
 	register_nav_menus(
 		[

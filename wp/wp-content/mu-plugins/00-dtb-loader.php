@@ -21,7 +21,7 @@
  *   dtb-cache-admin.php    — wp-admin cache management page
  *   dtb-rest-api.php       — WC proxy + site-management REST routes + CORS
  *   dtb-rewards.php        — WPLoyalty REST bridge (dtb/v1/rewards/* endpoints)
- *   dtb-image-sync.php     — media-library sync for uploads/2026/04/ images
+ *   dtb-image-sync.php     — media-library sync for uploads/YYYY/MM/ images
  *   dtb-woocommerce.php    — WC configuration and webhook auto-creation
  *   dtb-veeqo.php          — Veeqo API proxy, order/inventory sync, shipping rates
  *   dtb-schematics-api.php — schematics media REST route
