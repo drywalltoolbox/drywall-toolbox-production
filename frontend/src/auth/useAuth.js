@@ -74,13 +74,26 @@ export function useAuth() {
     return () => { cancelled = true; };
   }, [] );
 
+  // ── logout ───────────────────────────────────────────────────────────────────
+  const logout = useCallback( async () => {
+    setUser( null );
+    setError( null );
+
+    // Clear the HttpOnly cookie server-side.
+    try {
+      await fetch( `${ DTB_AUTH_BASE }/logout`, {
+        method:      'DELETE',
+        credentials: 'include',
+      } );
+    } catch { /**/ }
+  }, [] );
+
   // ── auth:expired listener ────────────────────────────────────────────────────
   useEffect( () => {
     const handler = () => logout();
     window.addEventListener( 'auth:expired', handler );
     return () => window.removeEventListener( 'auth:expired', handler );
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [] );
+  }, [ logout ] );
 
   // ── login ────────────────────────────────────────────────────────────────────
   const login = useCallback( async ( email, password ) => {
@@ -144,20 +157,6 @@ export function useAuth() {
     } finally {
       setIsLoading( false );
     }
-  }, [] );
-
-  // ── logout ───────────────────────────────────────────────────────────────────
-  const logout = useCallback( async () => {
-    setUser( null );
-    setError( null );
-
-    // Clear the HttpOnly cookie server-side.
-    try {
-      await fetch( `${ DTB_AUTH_BASE }/logout`, {
-        method:      'DELETE',
-        credentials: 'include',
-      } );
-    } catch { /**/ }
   }, [] );
 
   // ── forgotPassword ────────────────────────────────────────────────────────

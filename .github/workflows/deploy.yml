@@ -60,6 +60,8 @@ jobs:
           REACT_APP_SITE_URL: 'https://elliotttmiller.github.io/drywall-toolbox'
           REACT_APP_APP_ENV: development
           REACT_APP_ENV: development
+          # Founding-member promo window — ISO-8601 date; leave blank to disable
+          REACT_APP_STORE_LAUNCH_DATE: ''
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3

@@ -116,6 +116,9 @@ module.exports = (envFlags, argv) => {
 
     // Build timestamp — set once at config evaluation time (not per-module).
     'process.env.BUILD_TIMESTAMP':                      JSON.stringify(new Date().toISOString()),
+
+    // Founding-member promo window (ISO-8601 date string, e.g. "2026-06-01T00:00:00Z")
+    'process.env.REACT_APP_STORE_LAUNCH_DATE':          JSON.stringify(env('REACT_APP_STORE_LAUNCH_DATE')),
   };
 
   // ─── Inline asset manifest plugin ───────────────────────────────────────
