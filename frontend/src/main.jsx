@@ -7,6 +7,14 @@ import './styles/technical-specifications.css'
 import App from './App.jsx'
 import ErrorBoundary from './components/ErrorBoundary.jsx'
 
+// ─── Pre-warm product catalog cache ──────────────────────────────────────────
+// Kick off the catalog fetch immediately — before React even renders.
+// On first visit:  begins the API fetch immediately so it's ready sooner.
+// On return visits: reads from IndexedDB instantly and optionally revalidates
+//                   in the background — product pages load with 0ms wait.
+import { prewarmCatalog } from './services/catalog.js';
+prewarmCatalog();
+
 // ===== Mobile Viewport Optimization =====
 // Prevent iOS Safari from auto-zooming on input focus.
 // The correct fix is font-size: 16px on all inputs (done in index.css).

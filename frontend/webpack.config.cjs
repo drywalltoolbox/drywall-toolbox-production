@@ -370,9 +370,17 @@ module.exports = (envFlags, argv) => {
       ],
       proxy: [
         {
-          context: ['/wp-json'],
-          target: 'http://localhost',
+          // Proxy all WP/WC REST and DTB API paths to the live backend.
+          // This lets the dev server add the correct Origin and rewrite
+          // CORS headers so the browser never sees a cross-origin request.
+          context: [
+            '/wp-json',       // canonical WP REST alias
+            '/wp/wp-json',    // WP in /wp subdir
+            '/wp-admin',      // WP admin-ajax etc.
+          ],
+          target: 'https://drywalltoolbox.com',
           changeOrigin: true,
+          secure: true,
         },
       ],
       client: {

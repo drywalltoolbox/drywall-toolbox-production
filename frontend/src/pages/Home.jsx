@@ -71,11 +71,6 @@ export default function Home() {
       />
       <div style={{ background: 'white' }} className="page-wrapper">
 
-      {/* ── Mobile/Tablet Free Shipping Bar (hidden on desktop where Header handles it) ── */}
-      <div className="dtb-mobile-shipping-bar">
-        <span>FREE SHIPPING ON ALL ORDERS $50+ (Contiguous USA Only)</span>
-      </div>
-
       {/* ─── MOBILE/TABLET HERO (hidden on desktop ≥ 1025px) ─── */}
       <div className="dtb-hero-mobile-wrapper">
       <section
@@ -155,6 +150,14 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {/* ─── DESKTOP SHIPPING BAR (appears below hero on desktop only) ─── */}
+      <div className="dtb-desktop-shipping-bar">
+        <div className="dtb-promo-bar-inner">
+          <Truck size={16} />
+          <span>FREE SHIPPING ON ALL ORDERS $50+ (CONTIGUOUS USA ONLY)</span>
+        </div>
+      </div>
 
       {/* ─── DESKTOP FEATURE STRIP (hidden on mobile/tablet) ─── */}
       <div className="dtb-feature-strip" aria-hidden="true">

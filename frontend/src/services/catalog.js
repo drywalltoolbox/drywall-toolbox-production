@@ -3,25 +3,28 @@
  *
  * Single source-of-truth for all product data.
  *
- * Loading strategy (attempted in order, first success wins):
+ * Loading strategy — Stale-While-Revalidate (SWR):
  *
- *   1. WooCommerce REST API  — /wp-json/wc/v3/products
- *      Credentials come from REACT_APP_WC_AUTH_USER / REACT_APP_WC_AUTH_PASS (build-time)
- *      or from the runtime bootstrap in src/api/client.js (/dtb/v1/config).
- *      This is the authoritative live source — all product data comes directly
- *      from the WooCommerce / WP Admin backend.
+ *   1. IndexedDB hit (fresh  < 5 min)  → return instantly, NO network call.
+ *   2. IndexedDB hit (stale  < 24 h)   → return instantly, fire background refresh.
+ *   3. IndexedDB miss / expired        → fetch from WooCommerce REST API, cache result.
  *
- * Results are cached in memory for the page lifetime.
+ * This guarantees that every visit after the first loads products with
+ * ZERO network wait time — the UI renders immediately from the local cache
+ * while fresh data silently updates in the background.
+ *
  * All paths return objects in the normalizeProduct() shape from services/api.js.
  */
 
 import { getProducts as apiGetProducts, getProduct as apiGetProduct } from './api.js';
 import { credentialsReady } from '../api/client.js';
+import { readCache, writeCache, bustCache, isCacheAvailable } from './productCache.js';
 
-// ─── In-memory cache ──────────────────────────────────────────────────────────
+// ─── In-memory promise cache ──────────────────────────────────────────────────
+// Prevents duplicate in-flight requests within the same page session.
 
-let _cache = null;   // Promise<Product[]> once populated
-let _source = null;  // 'api' — for diagnostics
+let _cache  = null;   // Promise<Product[]> once populated this session
+let _source = null;   // 'idb-fresh' | 'idb-stale' | 'api'
 
 export function getCatalogSource() { return _source; }
 
@@ -32,7 +35,6 @@ export function getCatalogSource() { return _source; }
  * Throws on network or auth error.
  */
 async function fetchFromApi() {
-  // Wait for runtime credential bootstrap (no-op if build-time creds exist)
   await credentialsReady();
 
   let all   = [];
@@ -45,8 +47,6 @@ async function fetchFromApi() {
     try {
       batch = await apiGetProducts({ per_page: PER, page, status: 'publish' });
     } catch (pageErr) {
-      // If earlier pages already loaded, return those rather than discarding everything.
-      // Propagate the error only when we have nothing at all so the outer catch can handle it.
       if (all.length > 0) break;
       throw pageErr;
     }
@@ -55,25 +55,73 @@ async function fetchFromApi() {
     page++;
   }
 
-  return all; // already normalized by apiGetProducts → normalizeProduct()
+  return all;
+}
+
+/**
+ * Background revalidation — fetch fresh data and update IndexedDB + memory.
+ * Never throws; failures are silently swallowed.
+ */
+function revalidateInBackground() {
+  fetchFromApi()
+    .then((fresh) => {
+      if (!Array.isArray(fresh) || fresh.length === 0) return;
+      _source = 'api';
+      _cache  = Promise.resolve(fresh);
+      writeCache(fresh).catch(() => {});
+      console.info(`[catalog] Background revalidated: ${fresh.length} products`);
+    })
+    .catch((err) => {
+      console.warn('[catalog] Background revalidation failed:', err.message);
+    });
 }
 
 // ─── Cache loader ─────────────────────────────────────────────────────────────
 
 /**
- * Populate (or return already-populated) the product cache.
- * Fetches exclusively from the live WooCommerce REST API.
+ * Populate (or return already-populated) the product catalog.
+ *
+ * SWR flow:
+ *   fresh IDB → return instantly
+ *   stale IDB → return instantly + trigger background refresh
+ *   miss/expired → block on API fetch, then cache
  *
  * @returns {Promise<Object[]>}
  */
-function loadCatalog() {
+export function loadCatalog() {
+  // Already resolved this session — return the in-memory promise immediately.
   if (_cache) return _cache;
 
   _cache = (async () => {
+    // ── 1. Try IndexedDB ────────────────────────────────────────────────────
+    if (isCacheAvailable()) {
+      const cached = await readCache();
+
+      if (cached && !cached.isExpired) {
+        _source = cached.isFresh ? 'idb-fresh' : 'idb-stale';
+        console.info(
+          `[catalog] Served ${cached.data.length} products from IndexedDB ` +
+          `(${_source}, age ${Math.round(cached.age / 1000)}s)`
+        );
+
+        // If stale, kick off a background refresh so the next navigation is faster.
+        if (!cached.isFresh) {
+          revalidateInBackground();
+        }
+
+        return cached.data;
+      }
+    }
+
+    // ── 2. IndexedDB miss / expired — fetch from API ────────────────────────
     try {
       const products = await fetchFromApi();
       _source = 'api';
       console.info(`[catalog] Loaded ${products.length} products from WooCommerce REST API`);
+
+      // Persist to IndexedDB for future visits (non-blocking).
+      writeCache(products).catch(() => {});
+
       return products;
     } catch (apiErr) {
       console.error('[catalog] WooCommerce API unavailable:', apiErr.message);
@@ -89,11 +137,20 @@ function loadCatalog() {
 
 /**
  * Return all published products (cached).
+ * On return visits this resolves instantly from IndexedDB.
  *
  * @returns {Promise<Object[]>}
  */
 export async function getProducts() {
   return loadCatalog();
+}
+
+/**
+ * Pre-warm the catalog cache. Call this at app boot (main.jsx) so data is
+ * ready before the user navigates to any product page.
+ */
+export function prewarmCatalog() {
+  loadCatalog().catch(() => {});
 }
 
 /**
@@ -173,10 +230,11 @@ export async function getProductsByCategory(categoryKey) {
 }
 
 /**
- * Force a full reload of the catalog (clears the cache).
+ * Force a full reload of the catalog (clears both memory and IndexedDB cache).
  * Useful after a WooCommerce product sync.
  */
 export function invalidateCatalog() {
   _cache  = null;
   _source = null;
+  bustCache().catch(() => {});
 }

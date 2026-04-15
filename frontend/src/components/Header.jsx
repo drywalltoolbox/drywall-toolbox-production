@@ -135,7 +135,12 @@ export default function Header({ onCartToggle }) {
   }, []);
 
   return (
-    <header className="site-header" role="banner">
+    <>
+      <header className="site-header" role="banner">
+      {/* ── Mobile-only shipping bar — sits at very top of fixed header ── */}
+      <div className="dtb-mobile-shipping-bar dtb-mobile-shipping-bar--header">
+        <span>FREE SHIPPING ON ALL ORDERS $50+ (Contiguous USA Only)</span>
+      </div>
       <div className="site-header-inner">
   {/* Mobile Layout */}
   <div className="flex md:hidden items-center w-full header-mobile-layout" style={{ display: isTablet ? 'flex' : undefined }}>
@@ -276,21 +281,21 @@ export default function Header({ onCartToggle }) {
                     display:        'flex',
                     alignItems:     'center',
                     justifyContent: 'center',
-                    width:          '36px',
-                    height:         '36px',
-                    borderRadius:   '50%',
-                    border:         isAuthenticated ? '2px solid #2563eb' : '1.5px solid #cbd5e1',
-                    background:     isAuthenticated ? 'linear-gradient(135deg, #1d4ed8, #2563eb)' : 'white',
+                    width:          'auto',
+                    height:         'auto',
+                    borderRadius:   0,
+                    border:         'none',
+                    background:     'transparent',
                     cursor:         'pointer',
                     padding:        0,
                     flexShrink:     0,
-                    transition:     'box-shadow 150ms',
-                    boxShadow:      accountDropdownOpen ? '0 0 0 3px rgba(37,99,235,0.18)' : 'none',
+                    transition:     'opacity 150ms',
+                    boxShadow:      'none',
                   }}
-                  onMouseEnter={(e) => { if (!accountDropdownOpen) e.currentTarget.style.boxShadow = '0 0 0 3px rgba(37,99,235,0.12)'; }}
-                  onMouseLeave={(e) => { if (!accountDropdownOpen) e.currentTarget.style.boxShadow = 'none'; }}
+                  onMouseEnter={(e) => { e.currentTarget.style.opacity = '0.6'; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.opacity = '1'; }}
                 >
-                  <User size={16} style={{ color: isAuthenticated ? 'white' : '#475569' }} />
+                  <User size={20} style={{ color: '#0f172a' }} />
                 </button>
 
                 <div
@@ -504,8 +509,13 @@ export default function Header({ onCartToggle }) {
                 isAuthenticated ? (
                   /* ── Logged-in ── */
                   <>
-                    {/* User identity card */}
-                    <div className="mobile-nav-user-card">
+                    {/* User identity card — clickable to go to dashboard */}
+                    <Link
+                      to="/dashboard"
+                      onClick={closeMobileMenu}
+                      className="mobile-nav-user-card"
+                      style={{ textDecoration: 'none', cursor: 'pointer' }}
+                    >
                       <div className="mobile-nav-avatar">
                         <User size={17} style={{ color: 'white' }} />
                       </div>
@@ -519,26 +529,7 @@ export default function Header({ onCartToggle }) {
                           <span className="mobile-nav-user-email">{user.email}</span>
                         )}
                       </div>
-                    </div>
-
-                    {/* Action rows */}
-                    <div className="mobile-nav-actions">
-                      <Link
-                        to="/dashboard"
-                        onClick={closeMobileMenu}
-                        className={`mobile-nav-action-row${isActive('/dashboard') ? ' active' : ''}`}
-                      >
-                        <User size={15} style={{ flexShrink: 0, opacity: 0.6 }} />
-                        My Dashboard
-                      </Link>
-                      <button
-                        onClick={async () => { await logout(); closeMobileMenu(); }}
-                        className="mobile-nav-action-row mobile-nav-action-row--danger"
-                      >
-                        <LogOut size={15} style={{ flexShrink: 0 }} />
-                        Sign Out
-                      </button>
-                    </div>
+                    </Link>
                   </>
                 ) : (
                   /* ── Guest ── */
@@ -578,13 +569,14 @@ export default function Header({ onCartToggle }) {
         }
       `}</style>
 
-      {/* ── Free Shipping Bar — desktop only, sits below the nav bar ── */}
-      <div className="dtb-promo-bar" aria-label="Free shipping announcement">
-        <div className="dtb-promo-bar-inner">
-          <span>FREE SHIPPING ON ALL ORDERS $50+ (Contiguous USA Only)</span>
-        </div>
-      </div>
-
     </header>
+
+    {/* ── Free Shipping Bar — desktop only, positioned above the fixed header ── */}
+    <div className="dtb-promo-bar" aria-label="Free shipping announcement">
+      <div className="dtb-promo-bar-inner">
+        <span>FREE SHIPPING ON ALL ORDERS $50+ (Contiguous USA Only)</span>
+      </div>
+    </div>
+    </>
   );
 }

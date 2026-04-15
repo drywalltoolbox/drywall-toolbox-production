@@ -29,7 +29,7 @@
  *   className {string}   — extra classes forwarded to the <img>
  *   width     {number}   — intrinsic width for CLS prevention (default 400)
  *   height    {number}   — intrinsic height for CLS prevention (default 400)
- *   eager     {boolean}  — loading="eager" + fetchpriority="high" for hero/LCP images
+ *   eager     {boolean}  — loading="eager" + fetchPriority="high" for hero/LCP images
  */
 import { useState } from 'react';
 
@@ -86,7 +86,7 @@ export default function ProductCardImage({
         width={width}
         height={height}
         loading={eager ? 'eager' : 'lazy'}
-        fetchpriority={eager ? 'high' : 'auto'}
+        fetchPriority={eager ? 'high' : 'auto'}
         decoding="async"
         className={className}
         style={{

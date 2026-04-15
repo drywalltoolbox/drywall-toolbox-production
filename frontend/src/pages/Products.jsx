@@ -10,6 +10,7 @@ import Toast from '../components/Toast';
 import Pagination from '../components/Pagination';
 import LoadingSpinner from '../components/LoadingSpinner';
 import ProductCardImage from '../components/ProductCardImage';
+import { ProductSkeletonGrid } from '../components/ProductSkeletonCard';
 import { X } from 'lucide-react';
 import { getProducts } from '../services/catalog';
 import { useCart } from '../context/CartContext';
@@ -445,19 +446,18 @@ export default function Products() {
               </button>
             </div>
 
-            {/* Loading State */}
+            {/* Loading State — skeleton grid matches real card layout exactly */}
             {loading ? (
-              <div className="flex justify-center py-20">
-                <LoadingSpinner />
-              </div>
+              <ProductSkeletonGrid count={24} />
             ) : (
             <>
             {/* Products Grid */}
             <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-5 lg:gap-6">
-              {pageProducts.map(product => (
+              {pageProducts.map((product, index) => (
                 <div
                   key={product.id}
-                  className="bg-white rounded-lg shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden group border border-gray-100 hover:border-primary-300 flex flex-col h-full"
+                  className="product-card-enter bg-white rounded-lg shadow-sm hover:shadow-lg transition-shadow duration-300 overflow-hidden group border border-gray-100 hover:border-primary-300 flex flex-col h-full"
+                  style={{ '--card-index': index }}
                 >
                   {/* Product Image Container */}
                   <div className="relative bg-gray-50 aspect-square overflow-hidden shrink-0">

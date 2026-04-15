@@ -16,7 +16,7 @@
  *   - Shared data (points, membership, recent orders) fetched once and passed to tabs
  */
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { motion as Motion, AnimatePresence } from 'framer-motion';
 import {
@@ -68,7 +68,7 @@ const DOT_GRID = {
 export default function AccountHub() {
   const navigate                                      = useNavigate();
   const { user, isAuthenticated, isLoading, logout }  = useAuthContext();
-  const [ searchParams, setSearchParams ]             = useSearchParams();
+  const [ , setSearchParams ]                         = useSearchParams();
 
   // Resolve initial tab from URL param → localStorage → 0.
   // This runs once at mount; searchParams is read directly from the initial
@@ -117,21 +117,24 @@ export default function AccountHub() {
     try { localStorage.setItem( 'dtb_dashboard_tab', JSON.stringify( activeTab ) ); } catch { /* noop */ }
   }, [ activeTab, setSearchParams ] );
 
-  // Fetch shared data once we have a user ID
-  const loadSharedData = useCallback( () => {
+  // Fetch shared data once when user changes
+  useEffect( () => {
     if ( ! user?.id ) return;
+    let cancelled = false;
 
-    getUserPoints( user.id ).then( setPointsData ).catch( () => {} );
-    getMembershipStatus( user.id ).then( setMembershipData ).catch( () => {} );
+    getUserPoints( user.id ).then( ( d ) => { if ( ! cancelled ) setPointsData( d ); } ).catch( () => {} );
+    getMembershipStatus( user.id ).then( ( d ) => { if ( ! cancelled ) setMembershipData( d ); } ).catch( () => {} );
 
-    setOrdersLoading( true );
     getCustomerOrders( user.id, 1, 5 )
-      .then( ( data ) => setRecentOrders( Array.isArray( data ) ? data : ( data?.orders ?? [] ) ) )
-      .catch( () => {} )
-      .finally( () => setOrdersLoading( false ) );
-  }, [ user?.id ] );
+      .then( ( data ) => {
+        if ( cancelled ) return;
+        setRecentOrders( Array.isArray( data ) ? data : ( data?.orders ?? [] ) );
+        setOrdersLoading( false );
+      } )
+      .catch( () => { if ( ! cancelled ) setOrdersLoading( false ); } );
 
-  useEffect( () => { loadSharedData(); }, [ loadSharedData ] );
+    return () => { cancelled = true; };
+  }, [ user?.id ] );
 
   function changeTab( idx ) {
     if ( idx === activeTab ) return;
@@ -188,74 +191,110 @@ export default function AccountHub() {
 
       {/* ── Hero ── */}
       <div style={ {
-        background: 'linear-gradient(135deg, #0f172a 0%, #1e3a8a 55%, #1d4ed8 100%)',
-        padding:    'clamp(1.75rem, 4.5vw, 3rem) clamp(1.25rem, 5vw, 3rem)',
+        background: 'linear-gradient(140deg, #0b1120 0%, #0f2150 45%, #1a3fa8 100%)',
         position:   'relative',
         overflow:   'hidden',
       } }>
+        {/* Dot-grid overlay */}
         <div style={ DOT_GRID } />
-        <div style={ { position: 'relative', zIndex: 1, maxWidth: '1200px', margin: '0 auto' } }>
+
+        {/* Radial glow behind avatar */}
+        <div style={ {
+          position:         'absolute',
+          top:              '-60px',
+          left:             '50%',
+          transform:        'translateX(-50%)',
+          width:            '320px',
+          height:           '320px',
+          borderRadius:     '50%',
+          background:       'radial-gradient(circle, rgba(59,130,246,0.18) 0%, transparent 70%)',
+          pointerEvents:    'none',
+        } } />
+
+        <div style={ { position: 'relative', zIndex: 1, maxWidth: '1200px', margin: '0 auto', padding: 'clamp(1.75rem, 4.5vw, 3rem) clamp(1.25rem, 5vw, 3rem)' } }>
           <Motion.div
-            initial={ { opacity: 0, y: 12 } }
+            initial={ { opacity: 0, y: 14 } }
             animate={ { opacity: 1, y: 0  } }
             transition={ { duration: 0.45, ease: [ 0.16, 1, 0.3, 1 ] } }
           >
-            <div style={ { display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' } }>
-              <div style={ { display: 'flex', alignItems: 'center', gap: '14px' } }>
-                {/* Avatar */}
-                <div style={ {
-                  width:          '52px',
-                  height:         '52px',
-                  borderRadius:   '50%',
-                  background:     'linear-gradient(135deg, #3b82f6, #1d4ed8)',
-                  display:        'flex',
-                  alignItems:     'center',
-                  justifyContent: 'center',
-                  fontSize:       '1.05rem',
-                  fontWeight:     800,
-                  color:          'white',
-                  border:         '2.5px solid rgba(255,255,255,0.22)',
-                  flexShrink:     0,
-                  letterSpacing:  '-0.02em',
-                } }>
-                  { initials || <User size={ 22 } /> }
-                </div>
+            {/* ── Desktop layout: avatar + text side by side ── */}
+            <div className="dash-hero-inner">
 
-                <div>
-                  <div style={ { display: 'inline-block', background: 'rgba(255,255,255,0.12)', border: '1px solid rgba(255,255,255,0.2)', borderRadius: '4px', padding: '2px 9px', fontSize: '0.6rem', fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.72)', marginBottom: '5px' } }>
-                    My Account
-                  </div>
-                  <h1 style={ { color: 'white', fontSize: 'clamp(1.1rem, 2.8vw, 1.6rem)', fontWeight: 800, margin: 0, letterSpacing: '-0.025em' } }>
-                    Welcome back, { user.first_name || displayName }!
-                  </h1>
-                </div>
+              {/* Avatar */}
+              <div className="dash-hero-avatar">
+                { initials || <User size={ 28 } /> }
               </div>
 
-              {/* Logout — desktop only (hidden on mobile via CSS) */}
-              <button
-                type="button"
-                onClick={ handleLogout }
-                className="dash-logout-btn"
-                style={ {
-                  display:     'flex',
-                  alignItems:  'center',
-                  gap:         '6px',
-                  padding:     '7px 14px',
-                  borderRadius:'8px',
-                  border:      '1px solid rgba(255,255,255,0.18)',
-                  background:  'rgba(255,255,255,0.1)',
-                  color:       'rgba(255,255,255,0.75)',
-                  fontSize:    '0.78rem',
-                  fontWeight:  650,
-                  cursor:      'pointer',
-                  transition:  'background 0.15s, color 0.15s',
-                } }
-                onMouseEnter={ ( e ) => { e.currentTarget.style.background = 'rgba(255,255,255,0.18)'; e.currentTarget.style.color = 'white'; } }
-                onMouseLeave={ ( e ) => { e.currentTarget.style.background = 'rgba(255,255,255,0.1)'; e.currentTarget.style.color = 'rgba(255,255,255,0.75)'; } }
-              >
-                <LogOut size={ 13 } /> Sign out
-              </button>
+              {/* Text block */}
+              <div className="dash-hero-text">
+                <div style={ {
+                  display:       'inline-flex',
+                  alignItems:    'center',
+                  gap:           '5px',
+                  background:    'rgba(255,255,255,0.1)',
+                  border:        '1px solid rgba(255,255,255,0.18)',
+                  borderRadius:  '5px',
+                  padding:       '2px 10px',
+                  fontSize:      '0.58rem',
+                  fontWeight:    700,
+                  letterSpacing: '0.14em',
+                  textTransform: 'uppercase',
+                  color:         'rgba(255,255,255,0.7)',
+                  marginBottom:  '8px',
+                } }>
+                  My Account
+                </div>
+
+                <h1 style={ {
+                  color:         'white',
+                  fontSize:      'clamp(1.25rem, 3.5vw, 1.75rem)',
+                  fontWeight:    800,
+                  margin:        0,
+                  letterSpacing: '-0.03em',
+                  lineHeight:    1.15,
+                } }>
+                  Welcome back,<br className="dash-hero-br" />
+                  <span style={ { color: '#93c5fd' } }>
+                    { user.first_name || displayName }
+                  </span>
+                </h1>
+
+                { user?.email && (
+                  <p style={ {
+                    margin:      '6px 0 0',
+                    fontSize:    '0.78rem',
+                    color:       'rgba(255,255,255,0.45)',
+                    fontWeight:  400,
+                    letterSpacing: '0.01em',
+                  } }>
+                    { user.email }
+                  </p>
+                ) }
+              </div>
             </div>
+
+            {/* ── Stat strip ── */}
+            <div className="dash-hero-stats">
+              <div className="dash-hero-stat">
+                <span className="dash-hero-stat-val">{ recentOrders.length }</span>
+                <span className="dash-hero-stat-lbl">Orders</span>
+              </div>
+              <div className="dash-hero-stat-divider" />
+              <div className="dash-hero-stat">
+                <span className="dash-hero-stat-val">
+                  { membershipData?.tier ? membershipData.tier : 'Free' }
+                </span>
+                <span className="dash-hero-stat-lbl">Plan</span>
+              </div>
+              <div className="dash-hero-stat-divider" />
+              <div className="dash-hero-stat">
+                <span className="dash-hero-stat-val">
+                  { pointsData?.points ?? '—' }
+                </span>
+                <span className="dash-hero-stat-lbl">Points</span>
+              </div>
+            </div>
+
           </Motion.div>
         </div>
       </div>
@@ -294,7 +333,6 @@ export default function AccountHub() {
                       boxShadow:     isActive ? '0 2px 8px rgba(29,78,216,0.35)' : 'none',
                     } }
                   >
-                    <tab.Icon size={ 14 } />
                     <span className="dash-tab-label">{ tab.label }</span>
                   </Motion.button>
                 );
@@ -352,12 +390,12 @@ export default function AccountHub() {
         </div>
       </div>
 
-      {/* ── Mobile logout button (bottom of page) ── */}
+      {/* ── Sign out button (bottom of page) ── */}
       <div style={ { padding: '0 clamp(1.25rem, 5vw, 3rem) clamp(2rem, 4vw, 3rem)', maxWidth: '1200px', margin: '0 auto' } }>
         <button
           type="button"
           onClick={ handleLogout }
-          className="dash-logout-mobile"
+          className="dash-logout-btn"
           style={ {
             display:        'flex',
             alignItems:     'center',
@@ -383,14 +421,115 @@ export default function AccountHub() {
 
       {/* ── Responsive CSS ── */}
       <style>{ `
-        /* Hide the desktop logout in the hero on mobile — the bottom button handles it */
-        .dash-logout-btn { display: none; }
-        @media (min-width: 640px) {
-          .dash-logout-btn    { display: flex !important; }
-          .dash-logout-mobile { display: none !important; }
+        /* ── Hero layout ── */
+        .dash-hero-inner {
+          display:        flex;
+          align-items:    center;
+          gap:            16px;
+          margin-bottom:  20px;
         }
 
-        /* Show shorter labels on very small screens */
+        .dash-hero-avatar {
+          width:           68px;
+          height:          68px;
+          border-radius:   50%;
+          background:      linear-gradient(135deg, #3b82f6, #1d4ed8);
+          display:         flex;
+          align-items:     center;
+          justify-content: center;
+          font-size:       1.35rem;
+          font-weight:     800;
+          color:           white;
+          border:          2.5px solid rgba(255,255,255,0.2);
+          flex-shrink:     0;
+          letter-spacing:  -0.02em;
+          box-shadow:      0 0 0 6px rgba(59,130,246,0.15);
+        }
+
+        .dash-hero-text {
+          display:        flex;
+          flex-direction: column;
+          min-width:      0;
+        }
+
+        /* line break only on mobile */
+        .dash-hero-br { display: none; }
+
+        /* ── Stat strip ── */
+        .dash-hero-stats {
+          display:          flex;
+          align-items:      center;
+          gap:              0;
+          background:       rgba(255,255,255,0.06);
+          border:           1px solid rgba(255,255,255,0.1);
+          border-radius:    12px;
+          padding:          12px 0;
+          margin-top:       4px;
+        }
+
+        .dash-hero-stat {
+          flex:             1;
+          display:          flex;
+          flex-direction:   column;
+          align-items:      center;
+          gap:              3px;
+        }
+
+        .dash-hero-stat-val {
+          font-size:     1.1rem;
+          font-weight:   800;
+          color:         white;
+          letter-spacing: -0.02em;
+          line-height:   1;
+        }
+
+        .dash-hero-stat-lbl {
+          font-size:     0.65rem;
+          font-weight:   600;
+          color:         rgba(255,255,255,0.45);
+          text-transform: uppercase;
+          letter-spacing: 0.08em;
+        }
+
+        .dash-hero-stat-divider {
+          width:            1px;
+          height:           32px;
+          background:       rgba(255,255,255,0.12);
+          flex-shrink:      0;
+        }
+
+        /* ── Mobile overrides (≤ 639px) ── */
+        @media (max-width: 639px) {
+          .dash-hero-inner {
+            flex-direction: column;
+            align-items:    center;
+            text-align:     center;
+            gap:            14px;
+            margin-bottom:  22px;
+          }
+
+          .dash-hero-avatar {
+            width:      80px;
+            height:     80px;
+            font-size:  1.6rem;
+            box-shadow: 0 0 0 8px rgba(59,130,246,0.14);
+          }
+
+          .dash-hero-text {
+            align-items: center;
+          }
+
+          .dash-hero-br { display: inline; }
+
+          .dash-hero-stats {
+            border-radius: 14px;
+            padding:       14px 0;
+          }
+
+          .dash-hero-stat-val { font-size: 1.2rem; }
+        }
+
+        /* ── Show shorter tab labels on very small screens ── */
         @media (max-width: 430px) {
           .dash-tab-label { font-size: 0.76rem; }
         }

@@ -291,9 +291,9 @@ body {
 }
 
 .cart-panel {
-    position: absolute;
+    position: fixed;
     right: 0;
-    top: var(--header-height, 68px);  /* starts below the fixed header */
+    top: var(--header-height, 104px);  /* starts below header + promo bar on desktop, below header on mobile */
     bottom: 0;
     width: 380px;
     max-width: 100vw;
@@ -305,6 +305,8 @@ body {
     overflow: hidden;
     will-change: transform;
     box-shadow: -4px 0 24px rgba(15,23,42,0.12);
+    z-index: 9997; /* below header and overlay */
+    margin-top: 12px;
 }
 
 .cart-overlay.active .cart-panel {
@@ -1135,20 +1137,51 @@ aside input[type="range"],
 
 .cart-badge {
     position: absolute;
-    top: -4px;
-    right: -4px;
     background: var(--tension-accent);
     color: #fff;
-    font-size: 10px;
     font-weight: 700;
     font-family: var(--font-mono);
-    min-width: 18px;
-    height: 18px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     border-radius: 999px;
-    padding: 0 5px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+}
+
+/* Mobile cart badge sizing (≤ 768px) */
+@media (max-width: 768px) {
+    .cart-badge {
+        top: -6px;
+        right: -6px;
+        font-size: 9px;
+        min-width: 18px;
+        height: 18px;
+        padding: 0 3px;
+    }
+}
+
+/* Tablet cart badge sizing (641px - 1024px) */
+@media (min-width: 641px) and (max-width: 1024px) {
+    .cart-badge {
+        top: -8px;
+        right: -8px;
+        font-size: 9px;
+        min-width: 19px;
+        height: 19px;
+        padding: 0 3px;
+    }
+}
+
+/* Desktop cart badge sizing (≥ 1025px) */
+@media (min-width: 1025px) {
+    .cart-badge {
+        top: -10px;
+        right: -10px;
+        font-size: 10px;
+        min-width: 20px;
+        height: 20px;
+        padding: 0 4px;
+    }
 }
 
 /* Mobile Menu Dropdown Styles */
@@ -1321,16 +1354,20 @@ aside input[type="range"],
 /* Mobile Layout - Flexbox with centered branding */
 @media (max-width: 767px) {
     :root {
-        --header-height: calc(68px + env(safe-area-inset-top, 0px));
+        /* 28px shipping bar + 76px nav + safe area */
+        --header-height: calc(28px + 76px + env(safe-area-inset-top, 0px));
     }
 
     .site-header {
         min-height: var(--header-height);
         padding: env(safe-area-inset-top, 0px) 0 0;
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
     }
 
     .site-header-inner {
-        height: 68px;
+        height: 76px;
         display: flex;
         justify-content: space-between;
         align-items: center;
@@ -1339,7 +1376,7 @@ aside input[type="range"],
     }
 
     body {
-        padding-top: var(--header-height, 68px);
+        padding-top: var(--header-height, 104px);
     }
 
     /* Equal-width side slots so logo is always perfectly centered */
@@ -1434,12 +1471,16 @@ aside input[type="range"],
        behind the fixed header on 641-1024px viewports.
        Also reset top/bottom padding so actual header height == --header-height. */
     :root {
-        --header-height: calc(clamp(56px, 8vw, 80px) + env(safe-area-inset-top, 0px));
+        /* 28px shipping bar + fluid nav bar + safe area */
+        --header-height: calc(28px + clamp(56px, 8vw, 80px) + env(safe-area-inset-top, 0px));
     }
 
     .site-header {
-        padding: env(safe-area-inset-top, 0px) clamp(0.75rem, 3vw, 1.5rem) 0;
+        padding: env(safe-area-inset-top, 0px) 0 0;
         min-height: var(--header-height);
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
     }
 
     .site-header .site-header-inner {
@@ -2047,14 +2088,17 @@ aside input[type="range"],
 }
 
 /* ── FREE SHIPPING BAR ──────────────────────────────────
-   Slim full-width bar below the nav on desktop (≥1025px).
-   Hidden on mobile/tablet — those breakpoints render the
-   bar as a static element in Home.jsx instead.
+   On desktop: displayed below hero section in Home.jsx.
+   On mobile/tablet: rendered as inline bar in Home.jsx.
+   Hidden everywhere else (other pages).
    ─────────────────────────────────────────────────────── */
 .dtb-promo-bar { display: none; }
 
+/* Desktop shipping bar positioned below hero (Home page only) */
+.dtb-desktop-shipping-bar { display: none; }
+
 @media (min-width: 1025px) {
-    .dtb-promo-bar {
+    .dtb-desktop-shipping-bar {
         display: flex;
         align-items: center;
         justify-content: center;
@@ -2085,24 +2129,29 @@ aside input[type="range"],
 }
 
 /* ── HEADER: Desktop Compact Restructure ───────────────
-   Collapses the large logo-centric header into a compact
-   64 px nav bar + 36 px promo bar  = 100 px total.
+   Compact 64px nav bar positioned at top on desktop.
+   Promo bar now appears below hero on home page only.
    Logo moves to the left; all nav links to the center;
    search / account / cart stay on the right.
    ─────────────────────────────────────────────────────── */
 @media (min-width: 1025px) {
-    :root { --header-height: 100px; }
+    :root { --header-height: calc(64px + env(safe-area-inset-top, 0px)); } /* nav bar only */
 
     .site-header {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
         display: flex;
         flex-direction: column;
-        min-height: var(--header-height);
+        min-height: 64px; /* nav bar only */
         padding: 0;
+        z-index: 9999;
     }
 
     .site-header-inner {
-        height: 100px !important;
-        min-height: 100px !important;
+        height: 64px !important;
+        min-height: 64px !important;
         flex: 1;
         display: grid !important;
         grid-template-columns: auto 1fr auto !important;
@@ -2137,7 +2186,13 @@ aside input[type="range"],
     }
 
     /* Actions: right-aligned, hide old duplicate right-side nav */
-    .header-right { justify-self: end; gap: 4px; }
+    .header-right { 
+        justify-self: end; 
+        gap: 24px;
+        display: flex;
+        align-items: center;
+        padding-right: 8px;
+    }
 
     .header-right > .nav-links { display: none !important; }
 
@@ -2146,22 +2201,75 @@ aside input[type="range"],
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
-        border: 1.5px solid rgba(15,23,42,0.1);
+        width: auto;
+        height: auto;
+        border-radius: 0;
+        border: none;
         background: transparent;
         cursor: pointer;
         color: #0f172a;
-        transition: background 150ms, border-color 150ms;
+        transition: opacity 150ms;
         text-decoration: none;
         flex-shrink: 0;
     }
 
     .dtb-search-btn:hover {
-        background: var(--alloy-base, #f8fafc);
-        border-color: rgba(37,99,235,0.25);
+        background: transparent;
+        border-color: transparent;
+        opacity: 0.6;
         color: var(--primary-600, #2563eb);
+    }
+
+    /* Desktop icon buttons - flat style without circles */
+    .header-icon {
+        width: auto;
+        height: auto;
+        padding: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 0;
+        border: none;
+        background: transparent;
+        transition: opacity 150ms;
+        flex-shrink: 0;
+        color: #0f172a;
+    }
+
+    .header-icon:hover {
+        background: transparent;
+        border-color: transparent;
+        opacity: 0.6;
+    }
+
+    /* Cart area with better spacing */
+    .cart-area {
+        display: flex;
+        align-items: center;
+        margin-left: 4px;
+    }
+
+    .cart-toggle {
+        width: auto;
+        height: auto;
+        padding: 0 !important;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 0;
+        border: none;
+        background: transparent;
+        transition: opacity 150ms;
+        position: relative;
+        flex-shrink: 0;
+        color: #0f172a;
+        cursor: pointer;
+    }
+
+    .cart-toggle:hover {
+        background: transparent;
+        border-color: transparent;
+        opacity: 0.6;
     }
 }
 
@@ -2492,28 +2600,18 @@ aside input[type="range"],
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        gap: 14px;
+        gap: 8px;
         padding: 28px 24px;
         border-right: 1px solid var(--machined-border);
-        transition: background 180ms;
         text-align: center;
     }
 
     .dtb-feature-item:last-child { border-right: none; }
 
-    .dtb-feature-item:hover { background: var(--alloy-base, #f8fafc); }
+    .dtb-feature-item:hover { background: transparent; }
 
     .dtb-feature-icon {
-        width: 40px;
-        height: 40px;
-        border-radius: 6px;
-        background: rgba(37,99,235,0.09);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        flex-shrink: 0;
-        color: var(--primary-600, #2563eb);
-        transition: background 180ms;
+        display: none;
     }
 
     .dtb-feature-item:hover .dtb-feature-icon {
@@ -2619,8 +2717,8 @@ aside input[type="range"],
 /* ── MOBILE FREE SHIPPING BAR ───────────────────────────
    Slim full-width banner shown on mobile/tablet only (the
    desktop header already renders the shipping bar inside
-   the fixed <header>). Appears as the first element inside
-   the Home page content area, flush below the fixed header.
+   the fixed <header>). On mobile, it renders as the topmost
+   row inside .site-header, above the nav bar row.
    ─────────────────────────────────────────────────────── */
 .dtb-mobile-shipping-bar {
     display: flex;
@@ -2649,7 +2747,134 @@ aside input[type="range"],
     flex-shrink: 0;
 }
 
+/* When rendered inside .site-header on mobile — flush full-width strip,
+   no margin overrides needed (header is already edge-to-edge) */
+.site-header .dtb-mobile-shipping-bar--header {
+    margin-left: 0;
+    margin-right: 0;
+    flex-shrink: 0;
+}
+
 /* Hide on desktop — the fixed header bar handles it there */
 @media (min-width: 1025px) {
     .dtb-mobile-shipping-bar { display: none; }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   PRODUCT SKELETON CARDS & STAGGERED FADE-IN
+   Industry-standard shimmer placeholders that match the real product grid
+   layout exactly — zero layout shift when real cards replace them.
+   ───────────────────────────────────────────────────────────────────────────── */
+
+/* ── Shimmer keyframe ── */
+@keyframes skeleton-shimmer {
+    0%   { background-position: -400px 0; }
+    100% { background-position:  400px 0; }
+}
+
+/* ── Applied to every shimmer element ── */
+.skeleton-shimmer {
+    background: linear-gradient(
+        90deg,
+        #f0f0f0 25%,
+        #e8e8e8 37%,
+        #f0f0f0 63%
+    );
+    background-size: 800px 100%;
+    animation: skeleton-shimmer 1.4s ease-in-out infinite;
+    border-radius: 4px;
+}
+
+/* ── Card shell ── */
+.product-skeleton-card {
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+/* ── Image placeholder — same aspect ratio as real card images ── */
+.product-skeleton-img {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    border-radius: 0;
+    flex-shrink: 0;
+}
+
+/* ── Text placeholders ── */
+.product-skeleton-body {
+    padding: 12px 14px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    flex: 1;
+}
+
+.product-skeleton-brand {
+    height: 10px;
+    width: 55%;
+}
+
+.product-skeleton-name {
+    height: 14px;
+    width: 90%;
+}
+
+.product-skeleton-name--short {
+    width: 65%;
+}
+
+.product-skeleton-sku {
+    height: 10px;
+    width: 40%;
+    margin-top: 2px;
+}
+
+.product-skeleton-price {
+    height: 18px;
+    width: 45%;
+    margin-top: 4px;
+}
+
+/* ── Skeleton grid — mirrors the real product grid breakpoints ── */
+.product-skeleton-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+}
+
+@media (min-width: 640px) {
+    .product-skeleton-grid { grid-template-columns: repeat(2, 1fr); gap: 16px; }
+}
+@media (min-width: 768px) {
+    .product-skeleton-grid { grid-template-columns: repeat(3, 1fr); gap: 20px; }
+}
+@media (min-width: 1024px) {
+    .product-skeleton-grid { grid-template-columns: repeat(4, 1fr); gap: 24px; }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   STAGGERED PRODUCT CARD FADE-IN
+   Product cards ease in naturally once data replaces the skeleton.
+   Apply .product-card-enter to each card wrapper and set
+   --card-index via style to get the stagger delay.
+   ───────────────────────────────────────────────────────────────────────────── */
+
+@keyframes card-fade-up {
+    from {
+        opacity: 0;
+        transform: translateY(12px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.product-card-enter {
+    animation: card-fade-up 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
+    /* Each card delays by 30ms × its index, capped at 24 cards (720ms max). */
+    animation-delay: calc(var(--card-index, 0) * 30ms);
 }
