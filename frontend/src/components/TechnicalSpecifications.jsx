@@ -29,7 +29,7 @@ function getIcon(label) {
 // Short single values rendered as pill badges
 const SHORT_VALUE_LABELS = new Set(['sku', 'brand', 'model', 'upc', 'mpn', 'part number']);
 
-export default function TechnicalSpecifications({ specs = [], title = 'Technical Specifications', onItemClick }) {
+export default function TechnicalSpecifications({ specs = [], title = 'Specifications', onItemClick }) {
   if (!specs || specs.length === 0) return null;
 
   return (

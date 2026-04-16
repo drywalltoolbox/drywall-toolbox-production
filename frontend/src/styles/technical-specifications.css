@@ -31,8 +31,8 @@
   width:  2rem;
   height: 2rem;
   border-radius:   0.5rem;
-  background:      #f1f5f9;
-  color:           #475569;
+  background:      #e2e8f0;
+  color:           #0f172a;
 }
 
 .tech-specs__header-icon svg {
@@ -41,18 +41,18 @@
 }
 
 .tech-specs__title {
-  font-size:      0.6875rem;        /* 11px */
+  font-size:      0.6875rem;
   font-weight:    700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color:          #64748b;
+  color:          #0f172a;
   line-height:    1.2;
   margin:         0;
 }
 
 .tech-specs__subtitle {
   font-size:  0.6875rem;
-  color:      #94a3b8;
+  color:      #374151;
   margin:     0.1rem 0 0;
   line-height: 1;
 }
@@ -72,16 +72,16 @@
 
 /* ── Individual spec row ────────────────────────────────────────────────── */
 /*
- * Mobile-first: label stacked above value.
- * On sm+ (640px): two-column grid side-by-side.
+ * Mobile: label on its own line (uppercase tag style), value below it.
+ * Desktop (640px+): two-column grid side-by-side.
  */
 .tech-specs__row {
   display:        flex;
   flex-direction: column;
-  gap:            0.25rem;
+  gap:            0;
   padding:        0.875rem 1rem;
   border-bottom:  1px solid #f1f5f9;
-  transition:     background-color 120ms ease;
+  /* No transition — hover is desktop-only */
 }
 
 .tech-specs__row:last-child {
@@ -96,16 +96,12 @@
   background-color: #ffffff;
 }
 
-.tech-specs__row:hover {
-  background-color: #f0f9ff !important;
-}
-
 /* List rows get more breathing room */
 .tech-specs__row--list {
   align-items: flex-start;
 }
 
-/* Desktop: side-by-side */
+/* Desktop: side-by-side — hover only on non-touch devices */
 @media (min-width: 640px) {
   .tech-specs__row {
     display:               grid;
@@ -113,6 +109,11 @@
     align-items:           start;
     gap:                   0.5rem 1.25rem;
     padding:               0.75rem 1.25rem;
+    transition:            background-color 120ms ease;
+  }
+
+  .tech-specs__row:hover {
+    background-color: #f0f9ff !important;
   }
 }
 
@@ -128,12 +129,27 @@
   display:     flex;
   align-items: center;
   gap:         0.4rem;
-  font-size:   0.75rem;
-  font-weight: 600;
-  color:       #64748b;
-  line-height: 1.5;
+  font-size:   0.6875rem;   /* mobile: small uppercase tag */
+  font-weight: 700;
+  color:       #0f172a;
+  line-height: 1.4;
   white-space: nowrap;
   flex-shrink: 0;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  margin-bottom: 0.25rem;
+}
+
+/* Desktop: standard sizing */
+@media (min-width: 640px) {
+  .tech-specs__label {
+    font-size:      0.75rem;
+    font-weight:    700;
+    color:          #0f172a;
+    letter-spacing: normal;
+    text-transform: none;
+    margin-bottom:  0;
+  }
 }
 
 .tech-specs__label-icon {
@@ -141,7 +157,14 @@
   align-items:     center;
   justify-content: center;
   flex-shrink:     0;
-  color:           #94a3b8;
+  color:           #374151;
+}
+
+/* Hide label icons on mobile — saves space */
+@media (max-width: 639px) {
+  .tech-specs__label-icon {
+    display: none;
+  }
 }
 
 .tech-specs__label-icon svg {
@@ -152,9 +175,16 @@
 /* ── Value (dd) ─────────────────────────────────────────────────────────── */
 .tech-specs__value {
   margin:      0;
-  font-size:   0.875rem;
-  color:       #1e293b;
-  line-height: 1.55;
+  font-size:   0.9375rem;   /* slightly larger on mobile for readability */
+  color:       #0f172a;
+  line-height: 1.5;
+  font-weight: 500;
+}
+
+@media (min-width: 640px) {
+  .tech-specs__value {
+    font-size: 0.875rem;
+  }
 }
 
 /* Plain text value */
@@ -169,12 +199,12 @@
   padding:        0.2rem 0.625rem;
   border-radius:  9999px;
   font-size:      0.8125rem;
-  font-weight:    600;
+  font-weight:    700;
   font-family:    ui-monospace, SFMono-Regular, 'SF Mono', Menlo, monospace;
   letter-spacing: 0.02em;
-  background:     #f1f5f9;
-  color:          #334155;
-  border:         1px solid #e2e8f0;
+  background:     #e2e8f0;
+  color:          #0f172a;
+  border:         1px solid #cbd5e1;
 }
 
 /* ── Includes list ──────────────────────────────────────────────────────── */
@@ -185,6 +215,13 @@
   display:    flex;
   flex-direction: column;
   gap:        0.3rem;
+}
+
+/* Mobile: slightly more gap between include items */
+@media (max-width: 639px) {
+  .tech-specs__includes {
+    gap: 0.5rem;
+  }
 }
 
 /* Wrap into two columns on wider screens when list is large */
@@ -214,22 +251,33 @@
   line-height: 1.4;
   border-radius: 0.25rem;
   padding:     0.1rem 0;
-  transition:  color 120ms ease;
 }
 
 .tech-specs__include-link {
   color:           #2563eb;
   text-decoration: none;
-}
-
-.tech-specs__include-link:hover {
-  color:           #1d4ed8;
-  text-decoration: underline;
-  text-underline-offset: 2px;
+  /* No transition on mobile — desktop-only */
 }
 
 .tech-specs__include-plain {
-  color: #374151;
+  color: #0f172a;
+}
+
+/* Desktop-only hover effects */
+@media (min-width: 640px) {
+  .tech-specs__include-link {
+    transition: color 120ms ease;
+  }
+
+  .tech-specs__include-link:hover {
+    color:           #1d4ed8;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+
+  .tech-specs__include-link:hover .tech-specs__include-arrow {
+    opacity: 1;
+  }
 }
 
 /* Coloured dot bullet */
@@ -255,8 +303,28 @@
   opacity:     0.6;
 }
 
-.tech-specs__include-link:hover .tech-specs__include-arrow {
-  opacity: 1;
+/* ─── Mobile-specific row divider between label and value ─────────────────
+   A thin separator makes the stacked layout feel intentional rather than
+   just two lines of text running together.
+   ─────────────────────────────────────────────────────────────────────── */
+@media (max-width: 639px) {
+  .tech-specs__row {
+    padding: 0.75rem 1rem;
+  }
+
+  .tech-specs__value {
+    padding-top: 0.125rem;
+  }
+
+  /* Tighten card border radius on small screens */
+  .tech-specs__card {
+    border-radius: 0.625rem;
+  }
+
+  /* Slightly more contrast on alternating rows for small screens */
+  .tech-specs__row--even {
+    background-color: #f8fafc;
+  }
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════ */
@@ -294,13 +362,19 @@
 
 .product-description tbody tr {
   border-bottom: 1px solid #f1f5f9;
-  transition:    background-color 150ms ease;
 }
 
 .product-description tbody tr:last-child  { border-bottom: none; }
 .product-description tbody tr:nth-child(odd)  { background-color: #ffffff; }
 .product-description tbody tr:nth-child(even) { background-color: #f8fafc; }
-.product-description tbody tr:hover           { background-color: #f0f9ff; }
+
+/* Desktop-only hover on product description tables */
+@media (min-width: 640px) {
+  .product-description tbody tr {
+    transition: background-color 150ms ease;
+  }
+  .product-description tbody tr:hover { background-color: #f0f9ff; }
+}
 
 .product-description td {
   padding:     0.75rem 1rem;
@@ -336,11 +410,15 @@
 .product-description table a {
   color:           #2563eb;
   text-decoration: underline;
-  transition:      color 150ms ease;
 }
 
-.product-description table a:hover { color: #1d4ed8; }
-
+/* Desktop-only hover for description table links */
+@media (min-width: 640px) {
+  .product-description table a {
+    transition: color 150ms ease;
+  }
+  .product-description table a:hover { color: #1d4ed8; }
+}
 
 .product-description table code {
   background-color: #f3f4f6;
