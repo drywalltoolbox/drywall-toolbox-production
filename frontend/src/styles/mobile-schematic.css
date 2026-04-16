@@ -178,6 +178,68 @@
   margin-bottom: 10px;
 }
 
+/* =============================================
+   DESKTOP DETACHED MODAL — COMPACT HORIZONTAL LAYOUT
+   CSS Grid: fixed 72px image column on the left, content column on the right.
+   Image spans all rows so title/meta/price stack naturally in the right column.
+   All rules are scoped to min-width:769px so mobile is never affected.
+   ============================================= */
+@media (min-width: 769px) {
+  /* 2-column grid: [thumb] [content] */
+  .part-modal-detached {
+    display: grid;
+    grid-template-columns: 72px 1fr;
+    grid-template-rows: auto;
+    column-gap: 12px;
+    row-gap: 0;
+    width: 260px;
+    padding: 14px;
+    align-items: start;
+  }
+
+  /* Image button: fixed square, spans all rows in column 1 */
+  .part-modal-detached .hotspot-modal-image-btn {
+    grid-column: 1;
+    grid-row: 1 / -1;
+    width: 72px;
+    height: 72px;
+    border-radius: 8px;
+    overflow: hidden;
+    background: #f1f5f9;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    align-self: start;
+  }
+
+  /* Image fills the square, no bottom margin */
+  .part-modal-detached .hotspot-modal-image {
+    width: 100%;
+    height: 100%;
+    max-height: none;
+    object-fit: contain;
+    border-radius: 6px;
+    margin-bottom: 0;
+    background: transparent;
+  }
+
+  /* Skeleton: same fixed square, spans column 1 / all rows */
+  .part-modal-detached .hotspot-modal-image-skeleton--desktop {
+    grid-column: 1;
+    grid-row: 1 / -1;
+    width: 72px;
+    height: 72px;
+    margin-bottom: 0;
+    align-self: start;
+  }
+
+  /* All other direct children (h4, .part-meta, price/button div) flow into column 2 */
+  .part-modal-detached > *:not(.hotspot-modal-image-btn):not(.hotspot-modal-image-skeleton--desktop) {
+    grid-column: 2;
+    min-width: 0;
+  }
+}
+
 @keyframes skeletonShimmer {
   0%   { background-position: 200% 0; }
   100% { background-position: -200% 0; }
