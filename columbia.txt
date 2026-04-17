@@ -1,0 +1,219 @@
+<div id="primary" class="content-area"><main id="main" class="site-main" role="main"><nav class="woocommerce-breadcrumb" aria-label="Breadcrumb"><a href="https://www.columbiatools.com">Home</a>&nbsp;/&nbsp;<a href="https://www.columbiatools.com/columbia-tools/compound-tubes/">Compound Tubes</a>&nbsp;/&nbsp;Cam Lock Tube</nav>
+					
+			<div class="woocommerce-notices-wrapper"></div>
+<div id="product-2190" class="product type-product post-2190 status-publish first instock product_cat-compound-tubes has-post-thumbnail taxable shipping-taxable product-type-simple">
+			<div data-elementor-type="jet-woo-builder" data-elementor-id="3038" class="elementor elementor-3038" data-elementor-post-type="jet-woo-builder">
+						<section class="elementor-section elementor-top-section elementor-element elementor-element-c2a8dd0 elementor-section-boxed elementor-section-height-default elementor-section-height-default jltma-glass-effect-no" data-id="c2a8dd0" data-element_type="section" data-e-type="section" data-settings="{&quot;background_background&quot;:&quot;classic&quot;}">
+						<div class="elementor-container elementor-column-gap-no">
+					<div class="elementor-column elementor-col-50 elementor-top-column elementor-element elementor-element-45ec73e jltma-glass-effect-no" data-id="45ec73e" data-element_type="column" data-e-type="column">
+			<div class="elementor-widget-wrap elementor-element-populated">
+						<div class="elementor-element elementor-element-67061dc jltma-glass-effect-no elementor-widget elementor-widget-woocommerce-breadcrumb" data-id="67061dc" data-element_type="widget" data-e-type="widget" data-widget_type="woocommerce-breadcrumb.default">
+				<div class="elementor-widget-container">
+					<nav class="woocommerce-breadcrumb" aria-label="Breadcrumb"><a href="https://www.columbiatools.com">Home</a>&nbsp;/&nbsp;<a href="https://www.columbiatools.com/columbia-tools/compound-tubes/">Compound Tubes</a>&nbsp;/&nbsp;Cam Lock Tube</nav>				</div>
+				</div>
+				<div class="elementor-element elementor-element-e26e858 jltma-glass-effect-no elementor-widget elementor-widget-woocommerce-product-images" data-id="e26e858" data-element_type="widget" data-e-type="widget" data-widget_type="woocommerce-product-images.default">
+				<div class="elementor-widget-container">
+					<div class="woocommerce-product-gallery woocommerce-product-gallery--with-images woocommerce-product-gallery--columns-4 images" data-columns="4" style="opacity: 1; transition: opacity 0.25s ease-in-out;">
+	<div class="woocommerce-product-gallery__wrapper">
+					<div class="feat_image">
+									<a href="https://www.columbiatools.com/wp-content/uploads/2022/03/camlocktubesquare.jpg" class="html5lightbox" data-group="mygroup">
+						<img loading="eager" src="https://www.columbiatools.com/wp-content/uploads/2022/03/camlocktubesquare.jpg" data-id="2190" class="html5lightbox" data-group="mygroup">
+					</a>
+				
+			</div>
+			
+			<div class="thumbnails Addify_Product_Videos-thumbnails solo columns-4"><a href="https://www.columbiatools.com/wp-content/uploads/2022/03/camlocktubesquare2.jpg" class="zoom first html5lightbox" data-group="mygroup"><img loading="lazy" width="100" height="100" src="https://www.columbiatools.com/wp-content/uploads/2022/03/camlocktubesquare2-100x100.jpg" class="attachment-shop_thumbnail size-shop_thumbnail" alt=""></a><a href="https://www.columbiatools.com/wp-content/uploads/2022/03/5yearwarrantysmall-1.jpg" class="zoom html5lightbox" data-group="mygroup"><img loading="lazy" width="100" height="100" src="https://www.columbiatools.com/wp-content/uploads/2022/03/5yearwarrantysmall-1-100x100.jpg" class="attachment-shop_thumbnail size-shop_thumbnail" alt=""></a><a href="https://www.youtube.com/embed/ob6kBtz_RY0?rel=1&amp;controls=1&amp;showinfo=0&amp;autoplay=1&amp;mute=1" class="zoom html5lightbox" data-group="mygroup"><img loading="lazy" width="auto" height="auto" src="https://www.columbiatools.com/wp-content/uploads/2022/03/hqdefault-12-1.jpg"></a><a href="https://www.youtube.com/embed/xokMkPEpNBA?rel=1&amp;controls=1&amp;showinfo=0&amp;autoplay=1&amp;mute=1" class="zoom html5lightbox" data-group="mygroup"><img loading="lazy" width="auto" height="auto" src="https://www.columbiatools.com/wp-content/uploads/2022/03/hqdefault-11-1.jpg"></a></div>	</div>
+</div>
+				</div>
+				</div>
+					</div>
+		</div>
+				<div class="elementor-column elementor-col-50 elementor-top-column elementor-element elementor-element-3ae5b37 jltma-glass-effect-no" data-id="3ae5b37" data-element_type="column" data-e-type="column">
+			<div class="elementor-widget-wrap elementor-element-populated">
+						<div class="elementor-element elementor-element-ae20d2e jltma-glass-effect-no elementor-widget elementor-widget-woocommerce-product-title elementor-page-title elementor-widget-heading" data-id="ae20d2e" data-element_type="widget" data-e-type="widget" data-widget_type="woocommerce-product-title.default">
+				<div class="elementor-widget-container">
+					<h2 class="product_title entry-title elementor-heading-title elementor-size-default">Cam Lock Tube</h2>				</div>
+				</div>
+				<div class="elementor-element elementor-element-5769ba8 jltma-glass-effect-no elementor-widget elementor-widget-jet-single-price" data-id="5769ba8" data-element_type="widget" data-e-type="widget" data-widget_type="jet-single-price.default">
+				<div class="elementor-widget-container">
+					<div class="elementor-jet-single-price jet-woo-builder"><p class="price"></p>
+</div>				</div>
+				</div>
+				<div class="elementor-element elementor-element-0b234a4 jltma-glass-effect-no elementor-widget elementor-widget-jet-single-add-to-cart" data-id="0b234a4" data-element_type="widget" data-e-type="widget" data-widget_type="jet-single-add-to-cart.default">
+				<div class="elementor-widget-container">
+					<div class="elementor-jet-single-add-to-cart jet-woo-builder"><div class="jet-woo-builder-single-ajax-add-to-cart"></div></div>				</div>
+				</div>
+				<div class="elementor-element elementor-element-c8a326b jltma-glass-effect-no elementor-widget elementor-widget-woocommerce-product-content" data-id="c8a326b" data-element_type="widget" data-e-type="widget" data-widget_type="woocommerce-product-content.default">
+				<div class="elementor-widget-container">
+					<div class="product"><p>(CLT24, CLT32, CLT42, CLT55)</p>
+<p>Our Cam Lock Tube is so simple and so positive we would not recommend using any other tube when it comes to fast set compounds. The brass cams easily find and lock to the stainless ring using the same technology as a firehose.</p>
+<h4>FEATURES:</h4>
+<ul>
+<li>Brass cams on a stainless steel lock ring</li>
+<li>Quick remove bottom for complete cleaning</li>
+<li>Hand made from U.S. aluminum and steel components</li>
+<li>Machined in our state of the art facility in Canada</li>
+</ul>
+<h4>DOWNLOAD:</h4>
+<p><button class="download-btn"><a href="https://www.columbiatools.com/wp-content/uploads/2022/03/Cam_Lock_Tube_2019.pdf" target="_blank" rel="noopener"> CAM LOCK TUBE SCHEMATIC </a></button></p>
+</div>				</div>
+				</div>
+					</div>
+		</div>
+					</div>
+		</section>
+				<section class="elementor-section elementor-top-section elementor-element elementor-element-cc4c119 elementor-section-boxed elementor-section-height-default elementor-section-height-default jltma-glass-effect-no" data-id="cc4c119" data-element_type="section" data-e-type="section" data-settings="{&quot;background_background&quot;:&quot;classic&quot;}">
+						<div class="elementor-container elementor-column-gap-no">
+					<div class="elementor-column elementor-col-100 elementor-top-column elementor-element elementor-element-cdc7039 jltma-glass-effect-no" data-id="cdc7039" data-element_type="column" data-e-type="column">
+			<div class="elementor-widget-wrap elementor-element-populated">
+						<div class="elementor-element elementor-element-9dd4d78 jltma-glass-effect-no elementor-widget elementor-widget-jet-single-upsells" data-id="9dd4d78" data-element_type="widget" data-e-type="widget" data-widget_type="jet-single-upsells.default">
+				<div class="elementor-widget-container">
+					<div class="elementor-jet-single-upsells jet-woo-builder">
+	<section class="up-sells upsells products">
+					<h2>You may also like…</h2>
+		
+		<ul class="jet-woo-builder-products--columns products jet-woo-builder-layout-3041">
+			
+				<style id="elementor-post-dynamic-3041">.elementor-3041 .elementor-element.elementor-element-2df507c:not(.elementor-motion-effects-element-type-background), .elementor-3041 .elementor-element.elementor-element-2df507c > .elementor-motion-effects-container > .elementor-motion-effects-layer{background-image:url("https://www.columbiatools.com/wp-content/uploads/2022/03/compoundtubesquare.jpg");}.elementor-3041 .elementor-element.elementor-element-2724ff5 .elementor-flip-box__front{background-image:url("https://www.columbiatools.com/wp-content/uploads/2022/03/compoundtubesquare.jpg");}.elementor-3041 .elementor-element.elementor-element-2724ff5 .elementor-flip-box__back{background-image:url("https://www.columbiatools.com/wp-content/uploads/2022/03/compoundtubesquare.jpg");}</style>
+<li class="jet-woo-builder-product jet-woo-builder-archive-item-2182 product type-product post-2182 status-publish first instock product_cat-compound-tubes has-post-thumbnail taxable shipping-taxable product-type-simple" data-product-id="2182">
+	<style type="text/css">.jet-woo-builder-archive-item-2182 .elementor-element.elementor-element-2df507c:not(.elementor-motion-effects-element-type-background), .jet-woo-builder-archive-item-2182 .elementor-element.elementor-element-2df507c > .elementor-motion-effects-container > .elementor-motion-effects-layer{background-image:url("https://www.columbiatools.com/wp-content/uploads/2022/03/compoundtubesquare.jpg");}.jet-woo-builder-archive-item-2182 .elementor-element.elementor-element-2724ff5 .elementor-flip-box__front{background-image:url("https://www.columbiatools.com/wp-content/uploads/2022/03/compoundtubesquare.jpg");}.jet-woo-builder-archive-item-2182 .elementor-element.elementor-element-2724ff5 .elementor-flip-box__back{background-image:url("https://www.columbiatools.com/wp-content/uploads/2022/03/compoundtubesquare.jpg");}</style>		<div data-elementor-type="jet-woo-builder-archive" data-elementor-id="3041" class="elementor elementor-3041" data-elementor-settings="{&quot;template_columns_count&quot;:&quot;3&quot;,&quot;template_columns_count_tablet&quot;:&quot;3&quot;,&quot;template_columns_horizontal_gutter&quot;:{&quot;unit&quot;:&quot;px&quot;,&quot;size&quot;:10,&quot;sizes&quot;:[]},&quot;template_columns_horizontal_gutter_tablet&quot;:{&quot;unit&quot;:&quot;px&quot;,&quot;size&quot;:&quot;&quot;,&quot;sizes&quot;:[]},&quot;template_columns_horizontal_gutter_mobile&quot;:{&quot;unit&quot;:&quot;px&quot;,&quot;size&quot;:&quot;&quot;,&quot;sizes&quot;:[]},&quot;template_columns_vertical_gutter&quot;:{&quot;unit&quot;:&quot;px&quot;,&quot;size&quot;:10,&quot;sizes&quot;:[]},&quot;template_columns_vertical_gutter_tablet&quot;:{&quot;unit&quot;:&quot;px&quot;,&quot;size&quot;:&quot;&quot;,&quot;sizes&quot;:[]},&quot;template_columns_vertical_gutter_mobile&quot;:{&quot;unit&quot;:&quot;px&quot;,&quot;size&quot;:&quot;&quot;,&quot;sizes&quot;:[]}}" data-elementor-post-type="jet-woo-builder">
+						<section class="elementor-section elementor-top-section elementor-element elementor-element-2df507c elementor-section-full_width elementor-section-height-min-height elementor-section-items-top elementor-section-height-default jltma-glass-effect-no" data-id="2df507c" data-element_type="section" data-e-type="section" data-settings="{&quot;background_background&quot;:&quot;classic&quot;}">
+							<div class="elementor-background-overlay"></div>
+							<div class="elementor-container elementor-column-gap-no">
+					<div class="elementor-column elementor-col-100 elementor-top-column elementor-element elementor-element-de324bd jltma-glass-effect-no" data-id="de324bd" data-element_type="column" data-e-type="column">
+			<div class="elementor-widget-wrap elementor-element-populated">
+						<div class="elementor-element elementor-element-2724ff5 elementor-flip-box--effect-fade jltma-glass-effect-no elementor-widget elementor-widget-flip-box" data-id="2724ff5" data-element_type="widget" data-e-type="widget" data-widget_type="flip-box.default">
+				<div class="elementor-widget-container">
+							<div class="elementor-flip-box" tabindex="0">
+			<div class="elementor-flip-box__layer elementor-flip-box__front">
+				<div class="elementor-flip-box__layer__overlay">
+					<div class="elementor-flip-box__layer__inner">
+													<div class="elementor-icon-wrapper elementor-view-default">
+								<div class="elementor-icon">
+																	</div>
+							</div>
+						
+													<h3 class="elementor-flip-box__layer__title">
+								Compound Tubes							</h3>
+						
+											</div>
+				</div>
+			</div>
+			<a class="elementor-flip-box__layer elementor-flip-box__back" href="https://www.columbiatools.com/columbia-tools/compound-tubes/compound-tubes/">
+			<div class="elementor-flip-box__layer__overlay">
+				<div class="elementor-flip-box__layer__inner">
+					
+					
+											<span class="elementor-flip-box__button elementor-button elementor-size-md">
+							See More						</span>
+								</div>
+		</div>
+		</a>
+		</div>
+						</div>
+				</div>
+					</div>
+		</div>
+					</div>
+		</section>
+				</div>
+		</li>
+
+			
+				
+<li class="jet-woo-builder-product jet-woo-builder-archive-item-1791 product type-product post-1791 status-publish instock product_cat-automatic-tapers has-post-thumbnail taxable shipping-taxable product-type-simple" data-product-id="1791">
+	<style type="text/css">.jet-woo-builder-archive-item-1791 .elementor-element.elementor-element-2df507c:not(.elementor-motion-effects-element-type-background), .jet-woo-builder-archive-item-1791 .elementor-element.elementor-element-2df507c > .elementor-motion-effects-container > .elementor-motion-effects-layer{background-image:url("https://www.columbiatools.com/wp-content/uploads/2022/03/tapersquare.jpg");}.jet-woo-builder-archive-item-1791 .elementor-element.elementor-element-2724ff5 .elementor-flip-box__front{background-image:url("https://www.columbiatools.com/wp-content/uploads/2022/03/tapersquare.jpg");}.jet-woo-builder-archive-item-1791 .elementor-element.elementor-element-2724ff5 .elementor-flip-box__back{background-image:url("https://www.columbiatools.com/wp-content/uploads/2022/03/tapersquare.jpg");}</style>		<div data-elementor-type="jet-woo-builder-archive" data-elementor-id="3041" class="elementor elementor-3041" data-elementor-settings="{&quot;template_columns_count&quot;:&quot;3&quot;,&quot;template_columns_count_tablet&quot;:&quot;3&quot;,&quot;template_columns_horizontal_gutter&quot;:{&quot;unit&quot;:&quot;px&quot;,&quot;size&quot;:10,&quot;sizes&quot;:[]},&quot;template_columns_horizontal_gutter_tablet&quot;:{&quot;unit&quot;:&quot;px&quot;,&quot;size&quot;:&quot;&quot;,&quot;sizes&quot;:[]},&quot;template_columns_horizontal_gutter_mobile&quot;:{&quot;unit&quot;:&quot;px&quot;,&quot;size&quot;:&quot;&quot;,&quot;sizes&quot;:[]},&quot;template_columns_vertical_gutter&quot;:{&quot;unit&quot;:&quot;px&quot;,&quot;size&quot;:10,&quot;sizes&quot;:[]},&quot;template_columns_vertical_gutter_tablet&quot;:{&quot;unit&quot;:&quot;px&quot;,&quot;size&quot;:&quot;&quot;,&quot;sizes&quot;:[]},&quot;template_columns_vertical_gutter_mobile&quot;:{&quot;unit&quot;:&quot;px&quot;,&quot;size&quot;:&quot;&quot;,&quot;sizes&quot;:[]}}" data-elementor-post-type="jet-woo-builder">
+						<section class="elementor-section elementor-top-section elementor-element elementor-element-2df507c elementor-section-full_width elementor-section-height-min-height elementor-section-items-top elementor-section-height-default jltma-glass-effect-no" data-id="2df507c" data-element_type="section" data-e-type="section" data-settings="{&quot;background_background&quot;:&quot;classic&quot;}">
+							<div class="elementor-background-overlay"></div>
+							<div class="elementor-container elementor-column-gap-no">
+					<div class="elementor-column elementor-col-100 elementor-top-column elementor-element elementor-element-de324bd jltma-glass-effect-no" data-id="de324bd" data-element_type="column" data-e-type="column">
+			<div class="elementor-widget-wrap elementor-element-populated">
+						<div class="elementor-element elementor-element-2724ff5 elementor-flip-box--effect-fade jltma-glass-effect-no elementor-widget elementor-widget-flip-box" data-id="2724ff5" data-element_type="widget" data-e-type="widget" data-widget_type="flip-box.default">
+				<div class="elementor-widget-container">
+							<div class="elementor-flip-box" tabindex="0">
+			<div class="elementor-flip-box__layer elementor-flip-box__front">
+				<div class="elementor-flip-box__layer__overlay">
+					<div class="elementor-flip-box__layer__inner">
+													<div class="elementor-icon-wrapper elementor-view-default">
+								<div class="elementor-icon">
+																	</div>
+							</div>
+						
+													<h3 class="elementor-flip-box__layer__title">
+								Automatic Taper							</h3>
+						
+											</div>
+				</div>
+			</div>
+			<a class="elementor-flip-box__layer elementor-flip-box__back" href="https://www.columbiatools.com/columbia-tools/automatic-tapers/automatic-taper/">
+			<div class="elementor-flip-box__layer__overlay">
+				<div class="elementor-flip-box__layer__inner">
+					
+					
+											<span class="elementor-flip-box__button elementor-button elementor-size-md">
+							See More						</span>
+								</div>
+		</div>
+		</a>
+		</div>
+						</div>
+				</div>
+					</div>
+		</div>
+					</div>
+		</section>
+				</div>
+		</li>
+
+			
+		</ul>
+
+	</section>
+
+	</div>				</div>
+				</div>
+					</div>
+		</div>
+					</div>
+		</section>
+				<section class="elementor-section elementor-top-section elementor-element elementor-element-99ec38e elementor-reverse-tablet elementor-reverse-mobile elementor-section-boxed elementor-section-height-default elementor-section-height-default jltma-glass-effect-no" data-id="99ec38e" data-element_type="section" data-e-type="section" data-settings="{&quot;background_background&quot;:&quot;classic&quot;}">
+						<div class="elementor-container elementor-column-gap-no">
+					<div class="elementor-column elementor-col-50 elementor-top-column elementor-element elementor-element-00d34a3 jltma-glass-effect-no" data-id="00d34a3" data-element_type="column" data-e-type="column">
+			<div class="elementor-widget-wrap elementor-element-populated">
+						<div class="elementor-element elementor-element-d442dc9 jltma-glass-effect-no elementor-widget elementor-widget-heading" data-id="d442dc9" data-element_type="widget" data-e-type="widget" data-widget_type="heading.default">
+				<div class="elementor-widget-container">
+					<h2 class="elementor-heading-title elementor-size-default">We're Available around the world and online</h2>				</div>
+				</div>
+				<div class="elementor-element elementor-element-92763a8 jltma-glass-effect-no elementor-widget elementor-widget-text-editor" data-id="92763a8" data-element_type="widget" data-e-type="widget" data-widget_type="text-editor.default">
+				<div class="elementor-widget-container">
+									<p>Columbia has Dealers located across the globe and on many online drywall tool vendor sites. Our family of Dealers is ready to provide you the highest level of service and support. Please visit our ‘Find a Dealer’ page to see all our dealers and find the one most convenient for you.</p>								</div>
+				</div>
+				<div class="elementor-element elementor-element-02e7ec8 elementor-align-left elementor-mobile-align-center jltma-glass-effect-no elementor-widget elementor-widget-button" data-id="02e7ec8" data-element_type="widget" data-e-type="widget" data-widget_type="button.default">
+				<div class="elementor-widget-container">
+									<div class="elementor-button-wrapper">
+					<a class="elementor-button elementor-button-link elementor-size-sm" href="https://www.columbiatools.com/find-a-dealer/">
+						<span class="elementor-button-content-wrapper">
+									<span class="elementor-button-text">Find the dealer closest to you</span>
+					</span>
+					</a>
+				</div>
+								</div>
+				</div>
+					</div>
+		</div>
+				<div class="elementor-column elementor-col-50 elementor-top-column elementor-element elementor-element-01f75f2 jltma-glass-effect-no" data-id="01f75f2" data-element_type="column" data-e-type="column">
+			<div class="elementor-widget-wrap elementor-element-populated">
+						<div class="elementor-element elementor-element-ee26f9d jltma-glass-effect-no elementor-widget elementor-widget-image" data-id="ee26f9d" data-element_type="widget" data-e-type="widget" data-widget_type="image.default">
+				<div class="elementor-widget-container">
+															<img loading="lazy" width="743" height="367" src="https://www.columbiatools.com/wp-content/uploads/2022/03/smallmap_03.png" class="attachment-full size-full wp-image-1449" alt="" srcset="https://www.columbiatools.com/wp-content/uploads/2022/03/smallmap_03.png 743w, https://www.columbiatools.com/wp-content/uploads/2022/03/smallmap_03-600x296.png 600w, https://www.columbiatools.com/wp-content/uploads/2022/03/smallmap_03-300x148.png 300w" sizes="(max-width: 743px) 100vw, 743px">															</div>
+				</div>
+					</div>
+		</div>
+					</div>
+		</section>
+				</div>
+		</div>
+
+
+		
+	</main></div>
