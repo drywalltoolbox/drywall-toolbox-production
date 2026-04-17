@@ -28,6 +28,7 @@ import platinumLogo from '/brands/Platinum/platinum_logo.svg';
 import duraStiltsLogo from '/brands/Dura-Stilts/dura-stilts-logo.svg';
 import SEOHead from '../components/SEOHead';
 import { buildSiteLinksSearchBoxSchema } from '../utils/schema';
+import '../styles/tool-selector.css';
 
 // products will be loaded from WooCommerce REST API at runtime
 // brands list will be derived from loaded products
@@ -252,7 +253,9 @@ export default function Products() {
     );
   };
 
-  const filteredProducts = (products || []).filter(product => {
+  const nonPartsProducts = (products || []).filter(product => !product.is_parts);
+
+  const filteredProducts = nonPartsProducts.filter(product => {
     if (selectedBrands.length > 0 && !selectedBrands.includes(product.brand)) return false;
     if (selectedCategories.length > 0 && !selectedCategories.includes(product.category)) return false;
     // WC leaf-category drill-down (category cards layer)
@@ -275,7 +278,7 @@ export default function Products() {
   // Only computed when we're in the brand→category intermediate view.
   const brandCategoryCards = (() => {
     if (selectedBrands.length === 0) return [];
-    const brandProducts = (products || []).filter(p => selectedBrands.includes(p.brand));
+    const brandProducts = nonPartsProducts.filter(p => selectedBrands.includes(p.brand));
     const seen = new Set();
     const cards = [];
     for (const p of brandProducts) {
@@ -430,15 +433,16 @@ export default function Products() {
           /* ── Category cards (brand → category drill-down) ─────────────── */
           <div>
             {/* Brand logo / header */}
-            <div className="flex items-center gap-4 mb-6">
+            <div className="flex items-center justify-center mb-8">
               {brandLogos[selectedBrands[0]] && (
                 <img
                   src={brandLogos[selectedBrands[0]]}
                   alt={`${selectedBrands[0]} logo`}
                   style={{
+                    // Columbia and Graco logos are wide/horizontal so need more height to remain visible
                     height: ['Columbia Taping Tools', 'Graco'].includes(selectedBrands[0])
-                      ? 'clamp(2.5rem, 8vw, 4rem)'
-                      : 'clamp(2rem, 6vw, 3rem)',
+                      ? 'clamp(4.5rem, 15vw, 7rem)'
+                      : 'clamp(3.75rem, 13vw, 6rem)',
                     width: 'auto',
                     objectFit: 'contain',
                   }}
@@ -448,7 +452,7 @@ export default function Products() {
             <div className="categories-grid">
               {brandCategoryCards.map((cat, index) => {
                 // Count products for this category
-                const count = (products || []).filter(
+                const count = nonPartsProducts.filter(
                   p => selectedBrands.includes(p.brand) && p.display_category === cat.name
                 ).length;
                 return (

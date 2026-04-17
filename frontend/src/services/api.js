@@ -133,6 +133,13 @@ const PARTS_SLUG_PREFIXES = [
   'spare-parts',
 ];
 
+// Generic catch-all category labels that should be treated as lowest priority
+// when a more specific mapped category is also present on the same product.
+// NOTE: names are lowercase because category-name normalization lowercases first.
+const GENERIC_MAPPED_CATEGORY_NAMES = new Set([
+  'tools',
+]);
+
 /** Decode common HTML entities that WooCommerce embeds in category names via the REST API. */
 function decodeHtmlEntities(str) {
   return (str || '')
@@ -158,10 +165,24 @@ function decodeHtmlEntities(str) {
  */
 function mapApiCategory(wcCategories) {
   if (!wcCategories || !wcCategories.length) return '';
-  for (const cat of wcCategories) {
-    const key = CATEGORY_MAP[decodeHtmlEntities(cat.name).toLowerCase()];
-    if (key) return key;
+
+  const mapped = wcCategories
+    .map((cat) => {
+      const normalizedName = decodeHtmlEntities(cat.name).toLowerCase();
+      const key = CATEGORY_MAP[normalizedName];
+      return key ? { key, normalizedName } : null;
+    })
+    .filter(Boolean);
+
+  if (mapped.length > 0) {
+    const nonGenericMapped = mapped.filter(({ normalizedName }) => !GENERIC_MAPPED_CATEGORY_NAMES.has(normalizedName));
+    const preferred = nonGenericMapped.length > 0 ? nonGenericMapped : mapped;
+    // WooCommerce category arrays are typically ordered broad → specific.
+    // Use the last preferred mapped category so generic ancestors like "Tools"
+    // don't override specific leaves like "Tool Sets & Bundles" or parts leaves.
+    return preferred[preferred.length - 1].key;
   }
+
   return decodeHtmlEntities(wcCategories[0].name).toLowerCase();
 }
 
@@ -202,10 +223,22 @@ function isPartsFromApi(wcCategories) {
  */
 function extractDisplayCategory(wcCategories) {
   if (!wcCategories || !wcCategories.length) return '';
-  for (const cat of wcCategories) {
-    const name = decodeHtmlEntities(cat.name);
-    if (CATEGORY_MAP[name.toLowerCase()]) return name;
+
+  const mapped = wcCategories
+    .map((cat) => {
+      const name = decodeHtmlEntities(cat.name);
+      const normalizedName = name.toLowerCase();
+      return CATEGORY_MAP[normalizedName] ? { name, normalizedName } : null;
+    })
+    .filter(Boolean);
+
+  if (mapped.length > 0) {
+    const nonGenericMapped = mapped.filter(({ normalizedName }) => !GENERIC_MAPPED_CATEGORY_NAMES.has(normalizedName));
+    const preferred = nonGenericMapped.length > 0 ? nonGenericMapped : mapped;
+    // Keep the human-readable mapped leaf category for category-card UI grouping.
+    return preferred[preferred.length - 1].name;
   }
+
   return '';
 }
 
