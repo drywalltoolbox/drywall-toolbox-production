@@ -1,0 +1,532 @@
+{
+  "brand": "TapeTech",
+  "scraped_at": "2026-03-05T04:46:11.806250+00:00",
+  "total_files": 77,
+  "downloaded": 77,
+  "skipped": 0,
+  "failed": 0,
+  "source_urls": [
+    "https://www.tapetech.com/schematics"
+  ],
+  "files": [
+    {
+      "filename": "07TT_SCH_v11.pdf",
+      "source_url": "https://tapetech.com/wp-content/uploads/2022/06/07TT_SCH_v11.pdf",
+      "size_bytes": 1027698
+    },
+    {
+      "filename": "14TT_SCH.pdf",
+      "source_url": "https://tapetech.com/wp-content/uploads/2022/07/14TT_SCH.pdf",
+      "size_bytes": 11288893
+    },
+    {
+      "filename": "15TTE_SCH.pdf",
+      "source_url": "https://tapetech.com/wp-content/uploads/2022/07/15TTE_SCH.pdf",
+      "size_bytes": 1074757
+    },
+    {
+      "filename": "16TT_SCH.pdf",
+      "source_url": "https://tapetech.com/wp-content/uploads/2022/07/16TT_SCH.pdf",
+      "size_bytes": 1302480
+    },
+    {
+      "filename": "16TT90_SCH.pdf",
+      "source_url": "https://tapetech.com/wp-content/uploads/2022/07/16TT90_SCH.pdf",
+      "size_bytes": 1805352
+    },
+    {
+      "filename": "17TT_SCH.pdf",
+      "source_url": "https://tapetech.com/wp-content/uploads/2022/07/17TT_SCH.pdf",
+      "size_bytes": 300362
+    },
+    {
+      "filename": "17TTE_SCH.pdf",
+      "source_url": "https://tapetech.com/wp-content/uploads/2022/07/17TTE_SCH.pdf",
+      "size_bytes": 305848
+    },
+    {
+      "filename": "20TTX_SCH.pdf",
+      "source_url": "https://tapetech.com/wp-content/uploads/2024/05/20TTX_SCH.pdf",
+      "size_bytes": 281991
+    },
+    {
+      "filename": "25TTX_SCH.pdf",
+      "source_url": "https://tapetech.com/wp-content/uploads/2024/05/25TTX_SCH.pdf",
+      "size_bytes": 280126
+    },
+    {
+      "filename": "30TTX_SCH.pdf",
+      "source_url": "https://tapetech.com/wp-content/uploads/2024/05/30TTX_SCH.pdf",
+      "size_bytes": 333806
+    },
+    {
+      "filename": "35TT_SCH.pdf",
+      "source_url": "https://tapetech.com/wp-content/uploads/2024/05/35TT_SCH.pdf",
+      "size_bytes": 236853
+    },
+    {
+      "filename": "40TT_SCH.pdf",
+      "source_url": "https://tapetech.com/wp-content/uploads/2024/05/40TT_SCH.pdf",
+      "size_bytes": 76305
+    },
+    {
+      "filename": "42TT_SCH.pdf",
+      "source_url": "https://tapetech.com/wp-content/uploads/2022/07/42TT_SCH.pdf",
+      "size_bytes": 799091
+    },
+    {
+      "filename": "45TT_SCH.pdf",
+      "source_url": "https://tapetech.com/wp-content/uploads/2024/05/45TT_SCH.pdf",
+      "size_bytes": 63900
+    },
+    {
+      "filename": "48TT_SCH.pdf",
+      "source_url": "https://tapetech.com/wp-content/uploads/2022/07/48TT_SCH.pdf",
+      "size_bytes": 424226
+    },
+    {
+      "filename": "48XTT_SCH.pdf",
+      "source_url": "https://tapetech.com/wp-content/uploads/2022/07/48XTT_SCH.pdf",
+      "size_bytes": 200187
+    },
+    {
+      "filename": "50TT_SCH.pdf",
+      "source_url": "https://tapetech.com/wp-content/uploads/2024/05/50TT_SCH.pdf",
+      "size_bytes": 231728
+    },
+    {
+      "filename": "63TT_SCH.pdf",
+      "source_url": "https://tapetech.com/wp-content/uploads/2024/05/63TT_SCH.pdf",
+      "size_bytes": 2211863
+    },
+    {
+      "filename": "68TT_SCH.pdf",
+      "source_url": "https://tapetech.com/wp-content/uploads/2024/05/68TT_SCH.pdf",
+      "size_bytes": 2204450
+    },
+    {
+      "filename": "76TT-rE.pdf",
+      "source_url": "https://tapetech.com/wp-content/uploads/2025/02/76TT-rE.pdf",
+      "size_bytes": 329437
+    },
+    {
+      "filename": "76TT-CA_SCH.pdf",
+      "source_url": "https://tapetech.com/wp-content/uploads/2023/10/76TT-CA_SCH.pdf",
+      "size_bytes": 2822892
+    },
+    {
+      "filename": "8000TT-PA_SCH.pdf",
+      "source_url": "https://tapetech.com/wp-content/uploads/2023/10/8000TT-PA_SCH.pdf",
+      "size_bytes": 2248060
+    },
+    {
+      "filename": "8034TT_SCH.pdf",
+      "source_url": "https://tapetech.com/wp-content/uploads/2022/07/8034TT_SCH.pdf",
+      "size_bytes": 476853
+    },
+    {
+      "filename": "8042TT_SCH.pdf",
+      "source_url": "https://tapetech.com/wp-content/uploads/2022/07/8042TT_SCH.pdf",
+      "size_bytes": 476853
+    },
+    {
+      "filename": "8054TT_SCH.pdf",
+      "source_url": "https://tapetech.com/wp-content/uploads/2022/07/8054TT_SCH.pdf",
+      "size_bytes": 476853
+    },
+    {
+      "filename": "8072TT_SCH.pdf",
+      "source_url": "https://tapetech.com/wp-content/uploads/2022/07/8072TT_SCH.pdf",
+      "size_bytes": 476853
+    },
+    {
+      "filename": "8134TT_SCH.pdf",
+      "source_url": "https://tapetech.com/wp-content/uploads/2022/07/8134TT_SCH.pdf",
+      "size_bytes": 401097
+    },
+    {
+      "filename": "8142TT_SCH.pdf",
+      "source_url": "https://tapetech.com/wp-content/uploads/2022/07/8142TT_SCH.pdf",
+      "size_bytes": 401097
+    },
+    {
+      "filename": "8154TT_SCH.pdf",
+      "source_url": "https://tapetech.com/wp-content/uploads/2022/07/8154TT_SCH.pdf",
+      "size_bytes": 401097
+    },
+    {
+      "filename": "8172TT_SCH.pdf",
+      "source_url": "https://tapetech.com/wp-content/uploads/2022/07/8172TT_SCH.pdf",
+      "size_bytes": 401097
+    },
+    {
+      "filename": "85T_SCH.pdf",
+      "source_url": "https://tapetech.com/wp-content/uploads/2022/07/85T_SCH.pdf",
+      "size_bytes": 1653218
+    },
+    {
+      "filename": "88TTA_SCH.pdf",
+      "source_url": "https://tapetech.com/wp-content/uploads/2024/05/88TTA_SCH.pdf",
+      "size_bytes": 2125956
+    },
+    {
+      "filename": "88TTE_SCH.pdf",
+      "source_url": "https://tapetech.com/wp-content/uploads/2022/07/88TTE_SCH.pdf",
+      "size_bytes": 9456855
+    },
+    {
+      "filename": "88TTF_SCH.pdf",
+      "source_url": "https://tapetech.com/wp-content/uploads/2024/05/88TTF_SCH.pdf",
+      "size_bytes": 2142578
+    },
+    {
+      "filename": "88TTN_SCH.pdf",
+      "source_url": "https://tapetech.com/wp-content/uploads/2024/05/88TTN_SCH.pdf",
+      "size_bytes": 2058475
+    },
+    {
+      "filename": "88TTR_SCH.pdf",
+      "source_url": "https://tapetech.com/wp-content/uploads/2024/05/88TTR_SCH.pdf",
+      "size_bytes": 2090240
+    },
+    {
+      "filename": "90T_SCH.pdf",
+      "source_url": "https://tapetech.com/wp-content/uploads/2022/07/90T_SCH.pdf",
+      "size_bytes": 686461
+    },
+    {
+      "filename": "90T_SCH_pre2014.pdf",
+      "source_url": "https://tapetech.com/wp-content/uploads/2022/07/90T_SCH_pre2014.pdf",
+      "size_bytes": 311507
+    },
+    {
+      "filename": "CA07TT_SCH.pdf",
+      "source_url": "https://tapetech.com/wp-content/uploads/2022/07/CA07TT_SCH.pdf",
+      "size_bytes": 2263946
+    },
+    {
+      "filename": "CA08TT_SCH.pdf",
+      "source_url": "https://tapetech.com/wp-content/uploads/2022/07/CA08TT_SCH.pdf",
+      "size_bytes": 2312655
+    },
+    {
+      "filename": "CF07H_SCH.pdf",
+      "source_url": "https://tapetech.com/wp-content/uploads/2022/07/CF07H_SCH.pdf",
+      "size_bytes": 1686245
+    },
+    {
+      "filename": "CF12H_SCH.pdf",
+      "source_url": "https://tapetech.com/wp-content/uploads/2022/07/CF12H_SCH.pdf",
+      "size_bytes": 1718435
+    },
+    {
+      "filename": "CF25TT_SCH.pdf",
+      "source_url": "https://tapetech.com/wp-content/uploads/2023/10/CF25TT_SCH.pdf",
+      "size_bytes": 1819807
+    },
+    {
+      "filename": "CF30TT_SCH.pdf",
+      "source_url": "https://tapetech.com/wp-content/uploads/2023/10/CF30TT_SCH.pdf",
+      "size_bytes": 1771612
+    },
+    {
+      "filename": "CF35TT_SCH.pdf",
+      "source_url": "https://tapetech.com/wp-content/uploads/2023/10/CF35TT_SCH.pdf",
+      "size_bytes": 1771681
+    },
+    {
+      "filename": "CF40TT_SCH.pdf",
+      "source_url": "https://tapetech.com/wp-content/uploads/2023/10/CF40TT_SCH.pdf",
+      "size_bytes": 1792075
+    },
+    {
+      "filename": "CFHTT-rA.pdf",
+      "source_url": "https://tapetech.com/wp-content/uploads/2022/07/CFHTT-rA.pdf",
+      "size_bytes": 4158253
+    },
+    {
+      "filename": "CH55TT_SCH.pdf",
+      "source_url": "https://tapetech.com/wp-content/uploads/2023/10/CH55TT_SCH.pdf",
+      "size_bytes": 707762
+    },
+    {
+      "filename": "CH75TT_SCH.pdf",
+      "source_url": "https://tapetech.com/wp-content/uploads/2023/10/CH75TT_SCH.pdf",
+      "size_bytes": 731400
+    },
+    {
+      "filename": "CH83TT_SCH.pdf",
+      "source_url": "https://tapetech.com/wp-content/uploads/2023/10/CH83TT_SCH.pdf",
+      "size_bytes": 738880
+    },
+    {
+      "filename": "CH90TT_SCH.pdf",
+      "source_url": "https://tapetech.com/wp-content/uploads/2023/10/CH90TT_SCH.pdf",
+      "size_bytes": 742165
+    },
+    {
+      "filename": "CT24TT_SCH.pdf",
+      "source_url": "https://tapetech.com/wp-content/uploads/2023/10/CT24TT_SCH.pdf",
+      "size_bytes": 2904364
+    },
+    {
+      "filename": "CT36TT_SCH.pdf",
+      "source_url": "https://tapetech.com/wp-content/uploads/2023/10/CT36TT_SCH.pdf",
+      "size_bytes": 3672769
+    },
+    {
+      "filename": "CT42TT_SCH.pdf",
+      "source_url": "https://tapetech.com/wp-content/uploads/2023/10/CT42TT_SCH.pdf",
+      "size_bytes": 4029341
+    },
+    {
+      "filename": "CTPMP_SCH.pdf",
+      "source_url": "https://tapetech.com/wp-content/uploads/2022/07/CTPMP_SCH.pdf",
+      "size_bytes": 2096398
+    },
+    {
+      "filename": "EHC07_SCH.pdf",
+      "source_url": "https://tapetech.com/wp-content/uploads/2022/07/EHC07_SCH.pdf",
+      "size_bytes": 848872
+    },
+    {
+      "filename": "EHC10_SCH.pdf",
+      "source_url": "https://tapetech.com/wp-content/uploads/2022/07/EHC10_SCH.pdf",
+      "size_bytes": 849206
+    },
+    {
+      "filename": "EHC12_SCH.pdf",
+      "source_url": "https://tapetech.com/wp-content/uploads/2022/07/EHC12_SCH.pdf",
+      "size_bytes": 960199
+    },
+    {
+      "filename": "EZ07TT_SCH.pdf",
+      "source_url": "https://tapetech.com/wp-content/uploads/2022/07/EZ07TT_SCH.pdf",
+      "size_bytes": 202860
+    },
+    {
+      "filename": "EZ10TT_SCH.pdf",
+      "source_url": "https://tapetech.com/wp-content/uploads/2022/07/EZ10TT_SCH.pdf",
+      "size_bytes": 417531
+    },
+    {
+      "filename": "EZ12TT_SCH.pdf",
+      "source_url": "https://tapetech.com/wp-content/uploads/2022/07/EZ12TT_SCH.pdf",
+      "size_bytes": 275659
+    },
+    {
+      "filename": "FHTT_SCH.pdf",
+      "source_url": "https://tapetech.com/wp-content/uploads/2022/07/FHTT_SCH.pdf",
+      "size_bytes": 1073834
+    },
+    {
+      "filename": "HA_SCH.pdf",
+      "source_url": "https://tapetech.com/wp-content/uploads/2024/05/HA_SCH.pdf",
+      "size_bytes": 45558
+    },
+    {
+      "filename": "HF_SCH.pdf",
+      "source_url": "https://tapetech.com/wp-content/uploads/2024/05/HF_SCH.pdf",
+      "size_bytes": 47604
+    },
+    {
+      "filename": "HN_SCH.pdf",
+      "source_url": "https://tapetech.com/wp-content/uploads/2024/05/HN_SCH.pdf",
+      "size_bytes": 60734
+    },
+    {
+      "filename": "HR_SCH.pdf",
+      "source_url": "https://tapetech.com/wp-content/uploads/2024/05/HR_SCH.pdf",
+      "size_bytes": 44810
+    },
+    {
+      "filename": "NS02TT_SCH.pdf",
+      "source_url": "https://tapetech.com/wp-content/uploads/2022/07/NS02TT_SCH.pdf",
+      "size_bytes": 1259516
+    },
+    {
+      "filename": "NS03TT_SCH.pdf",
+      "source_url": "https://tapetech.com/wp-content/uploads/2024/01/NS03TT_SCH.pdf",
+      "size_bytes": 1443332
+    },
+    {
+      "filename": "PA07H_SCH.pdf",
+      "source_url": "https://tapetech.com/wp-content/uploads/2024/05/PA07H_SCH.pdf",
+      "size_bytes": 848490
+    },
+    {
+      "filename": "PA10H_SCH.pdf",
+      "source_url": "https://tapetech.com/wp-content/uploads/2024/05/PA10H_SCH.pdf",
+      "size_bytes": 824272
+    },
+    {
+      "filename": "PA12H_SCH.pdf",
+      "source_url": "https://tapetech.com/wp-content/uploads/2024/05/PA12H_SCH.pdf",
+      "size_bytes": 819272
+    },
+    {
+      "filename": "PAHC07_SCH.pdf",
+      "source_url": "https://tapetech.com/wp-content/uploads/2022/07/PAHC07_SCH.pdf",
+      "size_bytes": 1045148
+    },
+    {
+      "filename": "PAHC10_SCH_v2.pdf",
+      "source_url": "https://tapetech.com/wp-content/uploads/2025/02/PAHC10_SCH_v2.pdf",
+      "size_bytes": 1018230
+    },
+    {
+      "filename": "PAHC12_SCH.pdf",
+      "source_url": "https://tapetech.com/wp-content/uploads/2022/07/PAHC12_SCH.pdf",
+      "size_bytes": 1563301
+    },
+    {
+      "filename": "QB06-QSX_SCH.pdf",
+      "source_url": "https://tapetech.com/wp-content/uploads/2022/07/QB06-QSX_SCH.pdf",
+      "size_bytes": 1236930
+    },
+    {
+      "filename": "T05CF_SCH.pdf",
+      "source_url": "https://tapetech.com/wp-content/uploads/2022/07/T05CF_SCH.pdf",
+      "size_bytes": 2943918
+    },
+    {
+      "filename": "XHTT_SCH.pdf",
+      "source_url": "https://tapetech.com/wp-content/uploads/2022/07/XHTT_SCH.pdf",
+      "size_bytes": 310353
+    }
+  ],
+  "cleaned_at": "2026-03-13T19:05:02.737068+00:00",
+  "cleanup": {
+    "date": "2026-03-13",
+    "summary": "Removed 45 schematic PDFs whose model numbers are not in 'TapeTech UPC Codes, Weights & Dimensions.csv'. Retained 77 PDFs that match CSV models. CFHTT-rA.pdf retained because TapeTech tags it as covering T14CF (in CSV). CTPMP_SCH.pdf covers all CFS pump regional variants (CTEPMP, CTAPMP, CTUPMP).",
+    "models_without_schematics": [
+      "058707",
+      "144001",
+      "200",
+      "215",
+      "335",
+      "340",
+      "42TT",
+      "501A",
+      "501B1",
+      "501BH",
+      "501C10",
+      "501C12",
+      "501C7",
+      "501F25A",
+      "501F2A",
+      "501F3A",
+      "501F4A",
+      "501F4AX",
+      "501H",
+      "501H1",
+      "501J",
+      "501RD",
+      "501RSE",
+      "502A",
+      "502ACF",
+      "502BH",
+      "502CN",
+      "502F2",
+      "502F25",
+      "502F3",
+      "502F4",
+      "502F4X",
+      "502H",
+      "505C10",
+      "505C12",
+      "505C7",
+      "8000TT",
+      "BX07TT",
+      "BX10TT",
+      "BX14TT",
+      "BX18TT",
+      "BX24TT",
+      "BX32TT",
+      "BX40TT",
+      "BX48TT",
+      "BXEH40TT",
+      "CAA-TT",
+      "CF10H",
+      "CFA-TT",
+      "CFK01TT",
+      "CFK02TT",
+      "CFSKIT1",
+      "CFSKIT2",
+      "CFSKIT3",
+      "CTAPMP",
+      "CTBXC",
+      "CTEPMP",
+      "CTUPMP",
+      "CTVLV",
+      "EZROLL KIT",
+      "EZROLL10-A",
+      "EZROLL10-B",
+      "EZROLL12-A",
+      "EZROLL12-B",
+      "EZROLL7-A",
+      "EZROLL7-B",
+      "GSR-TT",
+      "NSA-TT",
+      "QB6003 - 5",
+      "QB6023 - 5",
+      "QB6033 - 5",
+      "QB6043 - 5",
+      "T14EC",
+      "T8034",
+      "T8042",
+      "T8054",
+      "T8072",
+      "TTCFIN",
+      "TTCTAP"
+    ],
+    "models_without_schematics_note": "These CSV models have no published schematics on tapetech.com or any other source. Includes: regional pump variants (same schematic as CTPMP), accessories, replacement kits, premium knives, cases, and handles.",
+    "removed_files": [
+      "03TT_SCH.pdf",
+      "04TT_SCH.pdf",
+      "05TT_SCH.pdf",
+      "07TTC_SCH_v2.pdf",
+      "10TT_SCH.pdf",
+      "12TT_SCH.pdf",
+      "13TT_SCH.pdf",
+      "15TT_SCH.pdf",
+      "16TTBN_SCH.pdf",
+      "16TTIO_SCH.pdf",
+      "16TTL_SCH.pdf",
+      "16TTOO_SCH.pdf",
+      "18TT_SCH.pdf",
+      "19TT_SCH.pdf",
+      "22TT_SCH.pdf",
+      "24TT_SCH.pdf",
+      "27TT_SCH.pdf",
+      "28TT_SCH.pdf",
+      "32TT_SCH.pdf",
+      "33TT_SCH.pdf",
+      "40XTT_SCH.pdf",
+      "72TT_SCH.pdf",
+      "73TT_SCH.pdf",
+      "76XLTT_SCH.pdf",
+      "88TT_SCH.pdf",
+      "98TT_SCH.pdf",
+      "ATX01TT_SCH.pdf",
+      "B74TT_SCH.pdf",
+      "B75TT_01.pdf",
+      "B89TT_SCH.pdf",
+      "BHE_SCH.pdf",
+      "BH_SCH.pdf",
+      "CFS8034TT_SCH.pdf",
+      "CFS8047TT_SCH.pdf",
+      "CFS8060TT_SCH.pdf",
+      "CFS8072TT_SCH.pdf",
+      "EZ07H_SCH.pdf",
+      "EZ10H_SCH.pdf",
+      "EZ12H_SCH.pdf",
+      "EZ15TT_SCH.pdf",
+      "FHTT-CC_SCH.pdf",
+      "MR01TT_SCH.pdf",
+      "MWS-TT-r5.pdf",
+      "QB08-QSX_SCH.pdf",
+      "TC01TT_SCH.pdf"
+    ]
+  }
+}

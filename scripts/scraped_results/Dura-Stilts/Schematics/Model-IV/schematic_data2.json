@@ -1,0 +1,1051 @@
+{
+  "id": "1775486780529",
+  "title": "model-4-18-30",
+  "diagramPages": [
+    1
+  ],
+  "legendPages": [],
+  "parts": [
+    {
+      "id": "63",
+      "name": "63",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "63",
+      "name": "63",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "62",
+      "name": "62",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "37.4",
+      "name": "37.4",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "65",
+      "name": "65",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "60.1",
+      "name": "60.1",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "60.1",
+      "name": "60.1",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "61.2",
+      "name": "61.2",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "35.4 (4)",
+      "name": "35.4 (4)",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "66.2",
+      "name": "66.2",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "36",
+      "name": "36",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "60.2",
+      "name": "60.2",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "61.1",
+      "name": "61.1",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "64.1",
+      "name": "64.1",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "64.2",
+      "name": "64.2",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "9",
+      "name": "9",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "13",
+      "name": "13",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "12",
+      "name": "12",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "13",
+      "name": "13",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "14",
+      "name": "14",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "11",
+      "name": "11",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "12",
+      "name": "12",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "15",
+      "name": "15",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "15",
+      "name": "15",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "16",
+      "name": "16",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "12",
+      "name": "12",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "13",
+      "name": "13",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "22",
+      "name": "22",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "20",
+      "name": "20",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "19",
+      "name": "19",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "20",
+      "name": "20",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "47.2",
+      "name": "47.2",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "44",
+      "name": "44",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "18",
+      "name": "18",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "15",
+      "name": "15",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "12",
+      "name": "12",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "14",
+      "name": "14",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "42",
+      "name": "42",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "49",
+      "name": "49",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "48",
+      "name": "48",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "78.1",
+      "name": "78.1",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "78.2",
+      "name": "78.2",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "69",
+      "name": "69",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "68",
+      "name": "68",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "27",
+      "name": "27",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "71",
+      "name": "71",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "70",
+      "name": "70",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "79",
+      "name": "79",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "80",
+      "name": "80",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "76",
+      "name": "76",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "74",
+      "name": "74",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "73",
+      "name": "73",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "75",
+      "name": "75",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "72",
+      "name": "72",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "13",
+      "name": "13",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "12",
+      "name": "12",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "77",
+      "name": "77",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "72.2",
+      "name": "72.2",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "42",
+      "name": "42",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "49",
+      "name": "49",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "48",
+      "name": "48",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "50.118",
+      "name": "50.118",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "50.218",
+      "name": "50.218",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "72.2",
+      "name": "72.2",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "51.2",
+      "name": "51.2",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "24",
+      "name": "24",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "24",
+      "name": "24",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "27",
+      "name": "27",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "37",
+      "name": "37",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "46",
+      "name": "46",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "13",
+      "name": "13",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "12",
+      "name": "12",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "11",
+      "name": "11",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "12",
+      "name": "12",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "12",
+      "name": "12",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "12",
+      "name": "12",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "13",
+      "name": "13",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "26.2",
+      "name": "26.2",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "26.1",
+      "name": "26.1",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "61",
+      "name": "61",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "82",
+      "name": "82",
+      "quantity": 1,
+      "sku": ""
+    }
+  ],
+  "coordinates": {
+    "9": {
+      "id": "9",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 20.5,
+      "y_pct": 30.7,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "11": {
+      "id": "11",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 34.25,
+      "y_pct": 88.3,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "12": {
+      "id": "12",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 52.8,
+      "y_pct": 81.69999999999999,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "13": {
+      "id": "13",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 55,
+      "y_pct": 82.2,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "14": {
+      "id": "14",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 40.15,
+      "y_pct": 60.199999999999996,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "15": {
+      "id": "15",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 40.15,
+      "y_pct": 55.8,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "16": {
+      "id": "16",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 39.95,
+      "y_pct": 32.7,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "18": {
+      "id": "18",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 40.1,
+      "y_pct": 54.300000000000004,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "19": {
+      "id": "19",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 30.136442164935914,
+      "y_pct": 37.8,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "20": {
+      "id": "20",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 26.3,
+      "y_pct": 41.8,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "22": {
+      "id": "22",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 41.75,
+      "y_pct": 40,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "24": {
+      "id": "24",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 87.25,
+      "y_pct": 67.2,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "27": {
+      "id": "27",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 26.3,
+      "y_pct": 86.2,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "36": {
+      "id": "36",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 16.2,
+      "y_pct": 26.700000000000003,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "37": {
+      "id": "37",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 14.35,
+      "y_pct": 91,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "42": {
+      "id": "42",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 61.4,
+      "y_pct": 47.7,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "44": {
+      "id": "44",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 40.25,
+      "y_pct": 49.8,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "46": {
+      "id": "46",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 35.1,
+      "y_pct": 92.2,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "48": {
+      "id": "48",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 57.34640129318228,
+      "y_pct": 56.833343505859375,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "49": {
+      "id": "49",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 57.99461535081759,
+      "y_pct": 50.8,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "61": {
+      "id": "61",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 67.45000000000002,
+      "y_pct": 76.8,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "62": {
+      "id": "62",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 14.900000000000002,
+      "y_pct": 15.600000000000001,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "63": {
+      "id": "63",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 29.339285623054117,
+      "y_pct": 12.4,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "65": {
+      "id": "65",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 41.400000000000006,
+      "y_pct": 14.8,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "68": {
+      "id": "68",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 56.3,
+      "y_pct": 33.2,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "69": {
+      "id": "69",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 56.25,
+      "y_pct": 26.200000000000003,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "70": {
+      "id": "70",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 67.15,
+      "y_pct": 37,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "71": {
+      "id": "71",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 63.650000000000006,
+      "y_pct": 38,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "72": {
+      "id": "72",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 84.54,
+      "y_pct": 26.663343505859373,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "73": {
+      "id": "73",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 82.98035718847295,
+      "y_pct": 17.3,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "74": {
+      "id": "74",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 79.52324151834478,
+      "y_pct": 14.5,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "75": {
+      "id": "75",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 87.91964281152705,
+      "y_pct": 24.666671752929688,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "76": {
+      "id": "76",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 70.46284345811821,
+      "y_pct": 19.296664123535155,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "77": {
+      "id": "77",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 73.15,
+      "y_pct": 34,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "79": {
+      "id": "79",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 71.03391502353703,
+      "y_pct": 11.866656494140624,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "80": {
+      "id": "80",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 61.09355783506408,
+      "y_pct": 18.3,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "82": {
+      "id": "82",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 67.55000000000001,
+      "y_pct": 79.5,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "37.4": {
+      "id": "37.4",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 37.55,
+      "y_pct": 18.2,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "60.1": {
+      "id": "60.1",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 8.743557835064081,
+      "y_pct": 22.666664123535156,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "61.2": {
+      "id": "61.2",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 8.971435140103262,
+      "y_pct": 24.5,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "35.4 (4)": {
+      "id": "35.4 (4)",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 19.55,
+      "y_pct": 21.7,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "66.2": {
+      "id": "66.2",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 25,
+      "y_pct": 21.950000000000003,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "60.2": {
+      "id": "60.2",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 16.8,
+      "y_pct": 28.200000000000003,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "61.1": {
+      "id": "61.1",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 17.2,
+      "y_pct": 29.7,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "64.1": {
+      "id": "64.1",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 29.3,
+      "y_pct": 23.7,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "64.2": {
+      "id": "64.2",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 29.3,
+      "y_pct": 25.200000000000003,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "47.2": {
+      "id": "47.2",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 29.400000000000002,
+      "y_pct": 47.3,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "78.1": {
+      "id": "78.1",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 58.75,
+      "y_pct": 22.7,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "78.2": {
+      "id": "78.2",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 58.75,
+      "y_pct": 24.200000000000003,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "72.2": {
+      "id": "72.2",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 76.8,
+      "y_pct": 52.5,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "50.118": {
+      "id": "50.118",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 69.35,
+      "y_pct": 51.7,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "50.218": {
+      "id": "50.218",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 69.4,
+      "y_pct": 58.199999999999996,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "51.2": {
+      "id": "51.2",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 44.95,
+      "y_pct": 64.8,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "26.2": {
+      "id": "26.2",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 63.05,
+      "y_pct": 86.3,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "26.1": {
+      "id": "26.1",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 52.55,
+      "y_pct": 90.7,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    }
+  },
+  "schema_version": "1.0",
+  "image_natural_width": 3584,
+  "image_natural_height": 4800
+}
