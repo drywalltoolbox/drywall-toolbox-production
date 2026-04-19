@@ -1,0 +1,1073 @@
+{
+  "count": 1188,
+  "samples": [
+    {
+      "line": 5,
+      "SKU": "AGFLATEXT",
+      "issue": "short_too_long",
+      "length": 191
+    },
+    {
+      "line": 7,
+      "SKU": "AH25-AD",
+      "issue": "short_missing"
+    },
+    {
+      "line": 8,
+      "SKU": "AH30-AD",
+      "issue": "short_missing"
+    },
+    {
+      "line": 9,
+      "SKU": "AH35-AD",
+      "issue": "short_missing"
+    },
+    {
+      "line": 10,
+      "SKU": "BBH-AD",
+      "issue": "short_too_long",
+      "length": 205
+    },
+    {
+      "line": 11,
+      "SKU": "CA08-AD",
+      "issue": "short_too_long",
+      "length": 291
+    },
+    {
+      "line": 12,
+      "SKU": "CFA-AD",
+      "issue": "short_too_long",
+      "length": 196
+    },
+    {
+      "line": 13,
+      "SKU": "CR01-AD",
+      "issue": "short_too_long",
+      "length": 228
+    },
+    {
+      "line": 14,
+      "SKU": "EHC10-AD",
+      "issue": "short_too_long",
+      "length": 185
+    },
+    {
+      "line": 15,
+      "SKU": "EZ07-AD",
+      "issue": "short_missing"
+    },
+    {
+      "line": 16,
+      "SKU": "EZ10-AD",
+      "issue": "short_missing"
+    },
+    {
+      "line": 17,
+      "SKU": "EZ12-AD",
+      "issue": "short_missing"
+    },
+    {
+      "line": 19,
+      "SKU": "FA01-AD",
+      "issue": "short_too_long",
+      "length": 302
+    },
+    {
+      "line": 20,
+      "SKU": "FBHE-AD",
+      "issue": "short_too_long",
+      "length": 231
+    },
+    {
+      "line": 21,
+      "SKU": "FH-AD",
+      "issue": "short_too_long",
+      "length": 199
+    },
+    {
+      "line": 22,
+      "SKU": "GN01-AD",
+      "issue": "short_too_long",
+      "length": 303
+    },
+    {
+      "line": 23,
+      "SKU": "HU-OI6G-88Y4",
+      "issue": "short_too_long",
+      "length": 174
+    },
+    {
+      "line": 24,
+      "SKU": "LP01-AD",
+      "issue": "short_too_long",
+      "length": 295
+    },
+    {
+      "line": 25,
+      "SKU": "NS03-AD",
+      "issue": "short_too_long",
+      "length": 330
+    },
+    {
+      "line": 26,
+      "SKU": "PA07-AD",
+      "issue": "short_missing"
+    },
+    {
+      "line": 27,
+      "SKU": "PA10-AD",
+      "issue": "short_missing"
+    },
+    {
+      "line": 28,
+      "SKU": "PA12-AD",
+      "issue": "short_missing"
+    },
+    {
+      "line": 30,
+      "SKU": "TF-DVKN-31Q3",
+      "issue": "short_too_long",
+      "length": 181
+    },
+    {
+      "line": 31,
+      "SKU": "XH-AD",
+      "issue": "short_too_long",
+      "length": 275
+    },
+    {
+      "line": 32,
+      "SKU": "10FBB",
+      "issue": "short_missing"
+    },
+    {
+      "line": 33,
+      "SKU": "10FBBA",
+      "issue": "short_missing"
+    },
+    {
+      "line": 34,
+      "SKU": "10FFB",
+      "issue": "short_missing"
+    },
+    {
+      "line": 35,
+      "SKU": "10FFBA",
+      "issue": "short_missing"
+    },
+    {
+      "line": 36,
+      "SKU": "10ITFB",
+      "issue": "short_missing"
+    },
+    {
+      "line": 37,
+      "SKU": "12FBB",
+      "issue": "short_missing"
+    },
+    {
+      "line": 38,
+      "SKU": "12FBBA",
+      "issue": "short_missing"
+    },
+    {
+      "line": 39,
+      "SKU": "12FFB",
+      "issue": "short_missing"
+    },
+    {
+      "line": 40,
+      "SKU": "12FFBA",
+      "issue": "short_missing"
+    },
+    {
+      "line": 41,
+      "SKU": "12ITFB",
+      "issue": "short_missing"
+    },
+    {
+      "line": 42,
+      "SKU": "14FFB",
+      "issue": "short_missing"
+    },
+    {
+      "line": 43,
+      "SKU": "14FFBA",
+      "issue": "short_missing"
+    },
+    {
+      "line": 44,
+      "SKU": "25AH",
+      "issue": "short_missing"
+    },
+    {
+      "line": 45,
+      "SKU": "25CSF",
+      "issue": "short_missing"
+    },
+    {
+      "line": 46,
+      "SKU": "25DF",
+      "issue": "short_missing"
+    },
+    {
+      "line": 47,
+      "SKU": "25SF",
+      "issue": "short_missing"
+    },
+    {
+      "line": 48,
+      "SKU": "2AH",
+      "issue": "short_missing"
+    },
+    {
+      "line": 49,
+      "SKU": "2NS",
+      "issue": "short_missing"
+    },
+    {
+      "line": 50,
+      "SKU": "35AH",
+      "issue": "short_missing"
+    },
+    {
+      "line": 51,
+      "SKU": "35CSF",
+      "issue": "short_missing"
+    },
+    {
+      "line": 52,
+      "SKU": "35DF",
+      "issue": "short_missing"
+    },
+    {
+      "line": 53,
+      "SKU": "35SF",
+      "issue": "short_missing"
+    },
+    {
+      "line": 54,
+      "SKU": "3AH",
+      "issue": "short_missing"
+    },
+    {
+      "line": 55,
+      "SKU": "3BBH",
+      "issue": "short_missing"
+    },
+    {
+      "line": 56,
+      "SKU": "3BH",
+      "issue": "short_missing"
+    },
+    {
+      "line": 57,
+      "SKU": "3CSF",
+      "issue": "short_missing"
+    },
+    {
+      "line": 58,
+      "SKU": "3DF",
+      "issue": "short_missing"
+    },
+    {
+      "line": 59,
+      "SKU": "3NS",
+      "issue": "short_missing"
+    },
+    {
+      "line": 60,
+      "SKU": "3SF",
+      "issue": "short_missing"
+    },
+    {
+      "line": 63,
+      "SKU": "42BBH",
+      "issue": "short_missing"
+    },
+    {
+      "line": 64,
+      "SKU": "42BH",
+      "issue": "short_missing"
+    },
+    {
+      "line": 65,
+      "SKU": "4BBH",
+      "issue": "short_missing"
+    },
+    {
+      "line": 66,
+      "SKU": "4BH",
+      "issue": "short_missing"
+    },
+    {
+      "line": 67,
+      "SKU": "55FBB",
+      "issue": "short_missing"
+    },
+    {
+      "line": 68,
+      "SKU": "55FFB",
+      "issue": "short_missing"
+    },
+    {
+      "line": 69,
+      "SKU": "5BBH",
+      "issue": "short_missing"
+    },
+    {
+      "line": 70,
+      "SKU": "5BH",
+      "issue": "short_missing"
+    },
+    {
+      "line": 71,
+      "SKU": "6BBH",
+      "issue": "short_missing"
+    },
+    {
+      "line": 72,
+      "SKU": "6BH",
+      "issue": "short_missing"
+    },
+    {
+      "line": 73,
+      "SKU": "7CFB",
+      "issue": "short_missing"
+    },
+    {
+      "line": 74,
+      "SKU": "7FFB",
+      "issue": "short_missing"
+    },
+    {
+      "line": 75,
+      "SKU": "8CFB",
+      "issue": "short_missing"
+    },
+    {
+      "line": 76,
+      "SKU": "8FBB",
+      "issue": "short_missing"
+    },
+    {
+      "line": 77,
+      "SKU": "8FBBA",
+      "issue": "short_missing"
+    },
+    {
+      "line": 78,
+      "SKU": "8FFB",
+      "issue": "short_missing"
+    },
+    {
+      "line": 79,
+      "SKU": "8FFBA",
+      "issue": "short_missing"
+    },
+    {
+      "line": 80,
+      "SKU": "8ITFB",
+      "issue": "short_missing"
+    },
+    {
+      "line": 81,
+      "SKU": "AH32",
+      "issue": "short_missing"
+    },
+    {
+      "line": 82,
+      "SKU": "AH325",
+      "issue": "short_missing"
+    },
+    {
+      "line": 83,
+      "SKU": "AH33",
+      "issue": "short_missing"
+    },
+    {
+      "line": 84,
+      "SKU": "AH335",
+      "issue": "short_missing"
+    },
+    {
+      "line": 87,
+      "SKU": "AH72",
+      "issue": "short_missing"
+    },
+    {
+      "line": 88,
+      "SKU": "AH725",
+      "issue": "short_missing"
+    },
+    {
+      "line": 89,
+      "SKU": "AH73",
+      "issue": "short_missing"
+    },
+    {
+      "line": 90,
+      "SKU": "AH735",
+      "issue": "short_missing"
+    },
+    {
+      "line": 94,
+      "SKU": "AHRBK2",
+      "issue": "short_missing"
+    },
+    {
+      "line": 95,
+      "SKU": "AHRBK25",
+      "issue": "short_missing"
+    },
+    {
+      "line": 96,
+      "SKU": "AHRBK3",
+      "issue": "short_missing"
+    },
+    {
+      "line": 97,
+      "SKU": "AHRBK35",
+      "issue": "short_missing"
+    },
+    {
+      "line": 99,
+      "SKU": "AUTOMATICFLATBOXES",
+      "issue": "short_too_long",
+      "length": 200
+    },
+    {
+      "line": 108,
+      "SKU": "C12MPX6",
+      "issue": "short_missing"
+    },
+    {
+      "line": 109,
+      "SKU": "C14MPX6",
+      "issue": "short_missing"
+    },
+    {
+      "line": 112,
+      "SKU": "C1HS",
+      "issue": "short_missing"
+    },
+    {
+      "line": 131,
+      "SKU": "CLOSETMONSTERFLATBOXHANDLE",
+      "issue": "short_too_long",
+      "length": 200
+    },
+    {
+      "line": 132,
+      "SKU": "CLT",
+      "issue": "short_too_long",
+      "length": 196
+    },
+    {
+      "line": 133,
+      "SKU": "CLT24",
+      "issue": "short_missing"
+    },
+    {
+      "line": 134,
+      "SKU": "CLT32",
+      "issue": "short_missing"
+    },
+    {
+      "line": 135,
+      "SKU": "CLT42",
+      "issue": "short_missing"
+    },
+    {
+      "line": 136,
+      "SKU": "CLT55",
+      "issue": "short_missing"
+    },
+    {
+      "line": 140,
+      "SKU": "CMT",
+      "issue": "short_too_long",
+      "length": 199
+    },
+    {
+      "line": 141,
+      "SKU": "CMT24",
+      "issue": "short_missing"
+    },
+    {
+      "line": 142,
+      "SKU": "CMT32",
+      "issue": "short_missing"
+    },
+    {
+      "line": 143,
+      "SKU": "CMT42",
+      "issue": "short_missing"
+    },
+    {
+      "line": 144,
+      "SKU": "CMT55",
+      "issue": "short_missing"
+    },
+    {
+      "line": 146,
+      "SKU": "COBCRE",
+      "issue": "short_too_long",
+      "length": 191
+    },
+    {
+      "line": 172,
+      "SKU": "COLUMBIAMUDPANS3",
+      "issue": "short_too_long",
+      "length": 198
+    },
+    {
+      "line": 173,
+      "SKU": "COMBOFLUSHER",
+      "issue": "short_too_long",
+      "length": 199
+    },
+    {
+      "line": 182,
+      "SKU": "CSH",
+      "issue": "short_missing"
+    },
+    {
+      "line": 278,
+      "SKU": "CTK10",
+      "issue": "short_missing"
+    },
+    {
+      "line": 279,
+      "SKU": "CTK12",
+      "issue": "short_missing"
+    },
+    {
+      "line": 280,
+      "SKU": "CTK14",
+      "issue": "short_missing"
+    },
+    {
+      "line": 281,
+      "SKU": "CTK8",
+      "issue": "short_missing"
+    },
+    {
+      "line": 285,
+      "SKU": "DIRECTCORNERFLUSHER",
+      "issue": "short_too_long",
+      "length": 194
+    },
+    {
+      "line": 332,
+      "SKU": "FATBOYBOXES",
+      "issue": "short_too_long",
+      "length": 199
+    },
+    {
+      "line": 333,
+      "SKU": "FATBOYSMOOTHINGBLADES",
+      "issue": "short_too_long",
+      "length": 200
+    },
+    {
+      "line": 337,
+      "SKU": "FINISHINGHAWKS",
+      "issue": "short_too_long",
+      "length": 198
+    },
+    {
+      "line": 338,
+      "SKU": "FLATBOXES",
+      "issue": "short_too_long",
+      "length": 200
+    },
+    {
+      "line": 339,
+      "SKU": "FLATBOXHANDLE",
+      "issue": "short_too_long",
+      "length": 196
+    },
+    {
+      "line": 341,
+      "SKU": "GN",
+      "issue": "short_missing"
+    },
+    {
+      "line": 345,
+      "SKU": "ICA",
+      "issue": "short_too_long",
+      "length": 198
+    },
+    {
+      "line": 349,
+      "SKU": "ITC-K",
+      "issue": "short_too_long",
+      "length": 197
+    },
+    {
+      "line": 359,
+      "SKU": "MUDPANS",
+      "issue": "short_too_long",
+      "length": 200
+    },
+    {
+      "line": 363,
+      "SKU": "ONEPIECEPUTTYKNIVESCOPY",
+      "issue": "short_too_long",
+      "length": 198
+    },
+    {
+      "line": 364,
+      "SKU": "OUTSIDE90GROOVEDMUDHEADS",
+      "issue": "short_too_long",
+      "length": 200
+    },
+    {
+      "line": 382,
+      "SKU": "SB212",
+      "issue": "short_missing"
+    },
+    {
+      "line": 383,
+      "SKU": "SB214",
+      "issue": "short_missing"
+    },
+    {
+      "line": 384,
+      "SKU": "SB218",
+      "issue": "short_missing"
+    },
+    {
+      "line": 385,
+      "SKU": "SB224",
+      "issue": "short_missing"
+    },
+    {
+      "line": 386,
+      "SKU": "SB232",
+      "issue": "short_missing"
+    },
+    {
+      "line": 387,
+      "SKU": "SB27",
+      "issue": "short_missing"
+    },
+    {
+      "line": 392,
+      "SKU": "SSB-SIZE",
+      "issue": "short_too_long",
+      "length": 196
+    },
+    {
+      "line": 393,
+      "SKU": "SSB10",
+      "issue": "short_missing"
+    },
+    {
+      "line": 394,
+      "SKU": "SSB12",
+      "issue": "short_missing"
+    },
+    {
+      "line": 395,
+      "SKU": "SSB14",
+      "issue": "short_missing"
+    },
+    {
+      "line": 396,
+      "SKU": "SSB16",
+      "issue": "short_missing"
+    },
+    {
+      "line": 397,
+      "SKU": "SSB18",
+      "issue": "short_missing"
+    },
+    {
+      "line": 398,
+      "SKU": "SSB24",
+      "issue": "short_missing"
+    },
+    {
+      "line": 400,
+      "SKU": "SSB40",
+      "issue": "short_missing"
+    },
+    {
+      "line": 401,
+      "SKU": "SSB48",
+      "issue": "short_missing"
+    },
+    {
+      "line": 402,
+      "SKU": "SSB7",
+      "issue": "short_missing"
+    },
+    {
+      "line": 403,
+      "SKU": "STANDARDCORNERFLUSHER",
+      "issue": "short_too_long",
+      "length": 196
+    },
+    {
+      "line": 407,
+      "SKU": "TBGN",
+      "issue": "short_missing"
+    },
+    {
+      "line": 411,
+      "SKU": "THREEWAYKNIVESCOPY",
+      "issue": "short_too_long",
+      "length": 197
+    },
+    {
+      "line": 414,
+      "SKU": "TSB-SIZE",
+      "issue": "short_too_long",
+      "length": 195
+    },
+    {
+      "line": 415,
+      "SKU": "TSB10",
+      "issue": "short_missing"
+    },
+    {
+      "line": 416,
+      "SKU": "TSB12",
+      "issue": "short_missing"
+    },
+    {
+      "line": 417,
+      "SKU": "TSB18",
+      "issue": "short_missing"
+    },
+    {
+      "line": 418,
+      "SKU": "TSB24",
+      "issue": "short_missing"
+    },
+    {
+      "line": 419,
+      "SKU": "TSB32",
+      "issue": "short_missing"
+    },
+    {
+      "line": 420,
+      "SKU": "TSB40",
+      "issue": "short_missing"
+    },
+    {
+      "line": 421,
+      "SKU": "TSB7",
+      "issue": "short_missing"
+    },
+    {
+      "line": 423,
+      "SKU": "PT-10FB",
+      "issue": "short_missing"
+    },
+    {
+      "line": 424,
+      "SKU": "PT-14FB",
+      "issue": "short_missing"
+    },
+    {
+      "line": 425,
+      "SKU": "PT-2.5CF",
+      "issue": "short_too_long",
+      "length": 166
+    },
+    {
+      "line": 426,
+      "SKU": "PT-2NS",
+      "issue": "short_missing"
+    },
+    {
+      "line": 427,
+      "SKU": "PT-3.5CF",
+      "issue": "short_too_long",
+      "length": 212
+    },
+    {
+      "line": 428,
+      "SKU": "PT-3CF",
+      "issue": "short_missing"
+    },
+    {
+      "line": 429,
+      "SKU": "PT-3NS",
+      "issue": "short_missing"
+    },
+    {
+      "line": 430,
+      "SKU": "PT-8FB",
+      "issue": "short_missing"
+    },
+    {
+      "line": 431,
+      "SKU": "PT-AICA",
+      "issue": "short_too_long",
+      "length": 206
+    },
+    {
+      "line": 432,
+      "SKU": "PT-BF",
+      "issue": "short_too_long",
+      "length": 202
+    },
+    {
+      "line": 433,
+      "SKU": "PT-BH",
+      "issue": "short_too_long",
+      "length": 167
+    },
+    {
+      "line": 434,
+      "SKU": "PT-BH34",
+      "issue": "short_missing"
+    },
+    {
+      "line": 435,
+      "SKU": "PT-BH42",
+      "issue": "short_missing"
+    },
+    {
+      "line": 436,
+      "SKU": "PT-BH54",
+      "issue": "short_missing"
+    },
+    {
+      "line": 437,
+      "SKU": "PT-CA8",
+      "issue": "short_too_long",
+      "length": 285
+    },
+    {
+      "line": 438,
+      "SKU": "PT-CAH50",
+      "issue": "short_too_long",
+      "length": 260
+    },
+    {
+      "line": 439,
+      "SKU": "PT-CF",
+      "issue": "short_too_long",
+      "length": 197
+    },
+    {
+      "line": 440,
+      "SKU": "PT-CF2.5",
+      "issue": "short_missing"
+    },
+    {
+      "line": 441,
+      "SKU": "PT-CF3.5",
+      "issue": "short_missing"
+    },
+    {
+      "line": 442,
+      "SKU": "PT-CFH50",
+      "issue": "short_too_long",
+      "length": 186
+    },
+    {
+      "line": 443,
+      "SKU": "PT-CP",
+      "issue": "short_too_long",
+      "length": 248
+    },
+    {
+      "line": 444,
+      "SKU": "PT-CR",
+      "issue": "short_too_long",
+      "length": 249
+    },
+    {
+      "line": 445,
+      "SKU": "PT-CRE",
+      "issue": "short_too_long",
+      "length": 185
+    },
+    {
+      "line": 446,
+      "SKU": "PT-CRH50",
+      "issue": "short_too_long",
+      "length": 257
+    },
+    {
+      "line": 447,
+      "SKU": "PT-CT",
+      "issue": "short_too_long",
+      "length": 214
+    },
+    {
+      "line": 448,
+      "SKU": "PT-CT24",
+      "issue": "short_missing"
+    },
+    {
+      "line": 449,
+      "SKU": "PT-CT36",
+      "issue": "short_missing"
+    },
+    {
+      "line": 450,
+      "SKU": "PT-CT42",
+      "issue": "short_missing"
+    },
+    {
+      "line": 451,
+      "SKU": "PT-EBH",
+      "issue": "short_too_long",
+      "length": 266
+    },
+    {
+      "line": 452,
+      "SKU": "PT-EXT3IN1-1",
+      "issue": "short_too_long",
+      "length": 195
+    },
+    {
+      "line": 453,
+      "SKU": "PT-FA",
+      "issue": "short_too_long",
+      "length": 224
+    },
+    {
+      "line": 454,
+      "SKU": "PT-FB",
+      "issue": "short_too_long",
+      "length": 255
+    },
+    {
+      "line": 455,
+      "SKU": "PT-FB12",
+      "issue": "short_missing"
+    },
+    {
+      "line": 457,
+      "SKU": "PT-ICA",
+      "issue": "short_too_long",
+      "length": 208
+    },
+    {
+      "line": 458,
+      "SKU": "PT-MNBH",
+      "issue": "short_too_long",
+      "length": 248
+    },
+    {
+      "line": 459,
+      "SKU": "PT-NS",
+      "issue": "short_too_long",
+      "length": 271
+    },
+    {
+      "line": 460,
+      "SKU": "PT-OCA",
+      "issue": "short_too_long",
+      "length": 265
+    },
+    {
+      "line": 461,
+      "SKU": "PT-OCR",
+      "issue": "short_too_long",
+      "length": 179
+    },
+    {
+      "line": 462,
+      "SKU": "PT-TP",
+      "issue": "short_too_long",
+      "length": 197
+    },
+    {
+      "line": 463,
+      "SKU": "SURS2M2030",
+      "issue": "short_too_long",
+      "length": 224
+    },
+    {
+      "line": 470,
+      "SKU": "SURSS1006",
+      "issue": "short_too_long",
+      "length": 178
+    },
+    {
+      "line": 471,
+      "SKU": "SURSS1007",
+      "issue": "short_too_long",
+      "length": 170
+    },
+    {
+      "line": 473,
+      "SKU": "SURSS1009",
+      "issue": "short_too_long",
+      "length": 166
+    },
+    {
+      "line": 475,
+      "SKU": "SURSS1010R",
+      "issue": "short_too_long",
+      "length": 164
+    },
+    {
+      "line": 477,
+      "SKU": "SURSS1012",
+      "issue": "short_too_long",
+      "length": 171
+    },
+    {
+      "line": 478,
+      "SKU": "SURSS124",
+      "issue": "short_too_long",
+      "length": 172
+    },
+    {
+      "line": 482,
+      "SKU": "010249",
+      "issue": "short_missing"
+    },
+    {
+      "line": 483,
+      "SKU": "032219",
+      "issue": "short_missing"
+    },
+    {
+      "line": 484,
+      "SKU": "032249",
+      "issue": "short_missing"
+    },
+    {
+      "line": 485,
+      "SKU": "032409",
+      "issue": "short_missing"
+    },
+    {
+      "line": 486,
+      "SKU": "036248G",
+      "issue": "short_missing"
+    },
+    {
+      "line": 488,
+      "SKU": "041050F",
+      "issue": "short_missing"
+    },
+    {
+      "line": 489,
+      "SKU": "050003-6",
+      "issue": "short_missing"
+    },
+    {
+      "line": 490,
+      "SKU": "050004",
+      "issue": "short_missing"
+    },
+    {
+      "line": 491,
+      "SKU": "050017",
+      "issue": "short_missing"
+    }
+  ]
+}

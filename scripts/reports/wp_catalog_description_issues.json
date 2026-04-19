@@ -1,0 +1,230 @@
+{
+  "count": 45,
+  "samples": [
+    {
+      "line": 138,
+      "SKU": "CLTHA",
+      "issue": "generic_text"
+    },
+    {
+      "line": 153,
+      "SKU": "COL-BH",
+      "issue": "generic_text"
+    },
+    {
+      "line": 168,
+      "SKU": "COL-SB2",
+      "issue": "generic_text"
+    },
+    {
+      "line": 172,
+      "SKU": "COLUMBIAMUDPANS3",
+      "issue": "generic_text"
+    },
+    {
+      "line": 176,
+      "SKU": "CPFP",
+      "issue": "generic_text"
+    },
+    {
+      "line": 333,
+      "SKU": "FATBOYSMOOTHINGBLADES",
+      "issue": "generic_text"
+    },
+    {
+      "line": 337,
+      "SKU": "FINISHINGHAWKS",
+      "issue": "generic_text"
+    },
+    {
+      "line": 359,
+      "SKU": "MUDPANS",
+      "issue": "generic_text"
+    },
+    {
+      "line": 363,
+      "SKU": "ONEPIECEPUTTYKNIVESCOPY",
+      "issue": "generic_text"
+    },
+    {
+      "line": 380,
+      "SKU": "SACS",
+      "issue": "generic_text"
+    },
+    {
+      "line": 411,
+      "SKU": "THREEWAYKNIVESCOPY",
+      "issue": "generic_text"
+    },
+    {
+      "line": 465,
+      "SKU": "SURSS1002B",
+      "issue": "generic_text"
+    },
+    {
+      "line": 466,
+      "SKU": "SURSS1003",
+      "issue": "generic_text"
+    },
+    {
+      "line": 469,
+      "SKU": "SURSS1005P",
+      "issue": "generic_text"
+    },
+    {
+      "line": 472,
+      "SKU": "SURSS1008",
+      "issue": "generic_text"
+    },
+    {
+      "line": 473,
+      "SKU": "SURSS1009",
+      "issue": "generic_text"
+    },
+    {
+      "line": 474,
+      "SKU": "SURSS1010L",
+      "issue": "generic_text"
+    },
+    {
+      "line": 475,
+      "SKU": "SURSS1010R",
+      "issue": "generic_text"
+    },
+    {
+      "line": 476,
+      "SKU": "SURSS1011B",
+      "issue": "generic_text"
+    },
+    {
+      "line": 479,
+      "SKU": "SURSS132",
+      "issue": "generic_text"
+    },
+    {
+      "line": 480,
+      "SKU": "SURSS134",
+      "issue": "generic_text"
+    },
+    {
+      "line": 675,
+      "SKU": "054209F-6",
+      "issue": "generic_text"
+    },
+    {
+      "line": 791,
+      "SKU": "122267",
+      "issue": "generic_text"
+    },
+    {
+      "line": 1078,
+      "SKU": "40XTT",
+      "issue": "generic_text"
+    },
+    {
+      "line": 1454,
+      "SKU": "CA-TT",
+      "issue": "generic_text"
+    },
+    {
+      "line": 1455,
+      "SKU": "CA07TT",
+      "issue": "generic_text"
+    },
+    {
+      "line": 1456,
+      "SKU": "CA08TT",
+      "issue": "generic_text"
+    },
+    {
+      "line": 1471,
+      "SKU": "CFSTCC",
+      "issue": "generic_text"
+    },
+    {
+      "line": 1477,
+      "SKU": "CN-TT",
+      "issue": "generic_text"
+    },
+    {
+      "line": 1489,
+      "SKU": "CTBXC",
+      "issue": "generic_text"
+    },
+    {
+      "line": 1492,
+      "SKU": "CTVLV",
+      "issue": "generic_text"
+    },
+    {
+      "line": 1507,
+      "SKU": "EIFSAND-FLEXDRIVE",
+      "issue": "generic_text"
+    },
+    {
+      "line": 1516,
+      "SKU": "EZ12TT",
+      "issue": "generic_text"
+    },
+    {
+      "line": 1553,
+      "SKU": "PFB-TT",
+      "issue": "generic_text"
+    },
+    {
+      "line": 1554,
+      "SKU": "PFB07",
+      "issue": "generic_text"
+    },
+    {
+      "line": 1555,
+      "SKU": "PFB12",
+      "issue": "generic_text"
+    },
+    {
+      "line": 1556,
+      "SKU": "PFB14",
+      "issue": "generic_text"
+    },
+    {
+      "line": 1557,
+      "SKU": "PFB18",
+      "issue": "generic_text"
+    },
+    {
+      "line": 1558,
+      "SKU": "PFB24",
+      "issue": "generic_text"
+    },
+    {
+      "line": 1559,
+      "SKU": "PFB32",
+      "issue": "generic_text"
+    },
+    {
+      "line": 1560,
+      "SKU": "PFB40",
+      "issue": "generic_text"
+    },
+    {
+      "line": 1561,
+      "SKU": "PFB48",
+      "issue": "generic_text"
+    },
+    {
+      "line": 1572,
+      "SKU": "PK-AT02",
+      "issue": "generic_text"
+    },
+    {
+      "line": 1573,
+      "SKU": "PK-PFK",
+      "issue": "generic_text"
+    },
+    {
+      "line": 1583,
+      "SKU": "QB08-QSX",
+      "issue": "generic_text"
+    }
+  ]
+}

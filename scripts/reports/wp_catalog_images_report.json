@@ -1,0 +1,132 @@
+{
+  "total_rows": 1654,
+  "rows_with_external_images": [],
+  "rows_with_placeholder": [
+    {
+      "line": 38,
+      "SKU": "12FBBA",
+      "Images": ""
+    },
+    {
+      "line": 79,
+      "SKU": "8FFBA",
+      "Images": ""
+    },
+    {
+      "line": 89,
+      "SKU": "AH73",
+      "Images": ""
+    },
+    {
+      "line": 91,
+      "SKU": "AH8",
+      "Images": ""
+    },
+    {
+      "line": 207,
+      "SKU": "CT128A",
+      "Images": ""
+    },
+    {
+      "line": 214,
+      "SKU": "CT20",
+      "Images": ""
+    },
+    {
+      "line": 225,
+      "SKU": "CT35",
+      "Images": ""
+    },
+    {
+      "line": 236,
+      "SKU": "CT5",
+      "Images": ""
+    },
+    {
+      "line": 269,
+      "SKU": "CT97",
+      "Images": ""
+    },
+    {
+      "line": 1454,
+      "SKU": "CA-TT",
+      "Images": ""
+    },
+    {
+      "line": 1457,
+      "SKU": "CAVH-TT",
+      "Images": ""
+    },
+    {
+      "line": 1465,
+      "SKU": "CFBOX-TT",
+      "Images": ""
+    },
+    {
+      "line": 1479,
+      "SKU": "CROLL-TT",
+      "Images": ""
+    },
+    {
+      "line": 1485,
+      "SKU": "CT-TT",
+      "Images": ""
+    },
+    {
+      "line": 1503,
+      "SKU": "EFBH-TT",
+      "Images": ""
+    },
+    {
+      "line": 1518,
+      "SKU": "EZFB-TT",
+      "Images": ""
+    },
+    {
+      "line": 1520,
+      "SKU": "FBH-TT",
+      "Images": ""
+    },
+    {
+      "line": 1535,
+      "SKU": "JKSS-TT",
+      "Images": ""
+    },
+    {
+      "line": 1536,
+      "SKU": "MAXXBOX-TT",
+      "Images": ""
+    },
+    {
+      "line": 1545,
+      "SKU": "NS-TT",
+      "Images": ""
+    },
+    {
+      "line": 1553,
+      "SKU": "PFB-TT",
+      "Images": ""
+    },
+    {
+      "line": 1562,
+      "SKU": "PFK-TT",
+      "Images": ""
+    },
+    {
+      "line": 1575,
+      "SKU": "QB-QSX",
+      "Images": ""
+    },
+    {
+      "line": 1629,
+      "SKU": "TKBS-TT",
+      "Images": ""
+    },
+    {
+      "line": 1630,
+      "SKU": "TKSS-TT",
+      "Images": ""
+    }
+  ],
+  "delimiter_issues": []
+}
