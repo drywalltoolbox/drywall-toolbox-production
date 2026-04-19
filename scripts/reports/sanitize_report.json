@@ -1,0 +1,1501 @@
+{
+  "source": "C:\\Users\\Elliott\\drywall-toolbox\\frontend\\public\\wp-reduced.csv",
+  "output": "C:\\Users\\Elliott\\drywall-toolbox\\frontend\\public\\wp-reduced-clean.csv",
+  "total_rows": 1069,
+  "encoding_and_whitespace_fixes": 21,
+  "html_hygiene_fixes": 790,
+  "image_needed_tags_removed": 25,
+  "media_team_flags": {
+    "count": 50,
+    "rows": [
+      {
+        "line": 38,
+        "SKU": "12FBBA",
+        "reason": "empty_images_field"
+      },
+      {
+        "line": 38,
+        "SKU": "12FBBA",
+        "reason": "image-needed_tag"
+      },
+      {
+        "line": 79,
+        "SKU": "8FFBA",
+        "reason": "empty_images_field"
+      },
+      {
+        "line": 79,
+        "SKU": "8FFBA",
+        "reason": "image-needed_tag"
+      },
+      {
+        "line": 89,
+        "SKU": "AH73",
+        "reason": "empty_images_field"
+      },
+      {
+        "line": 89,
+        "SKU": "AH73",
+        "reason": "image-needed_tag"
+      },
+      {
+        "line": 91,
+        "SKU": "AH8",
+        "reason": "empty_images_field"
+      },
+      {
+        "line": 91,
+        "SKU": "AH8",
+        "reason": "image-needed_tag"
+      },
+      {
+        "line": 207,
+        "SKU": "CT128A",
+        "reason": "empty_images_field"
+      },
+      {
+        "line": 207,
+        "SKU": "CT128A",
+        "reason": "image-needed_tag"
+      },
+      {
+        "line": 214,
+        "SKU": "CT20",
+        "reason": "empty_images_field"
+      },
+      {
+        "line": 214,
+        "SKU": "CT20",
+        "reason": "image-needed_tag"
+      },
+      {
+        "line": 225,
+        "SKU": "CT35",
+        "reason": "empty_images_field"
+      },
+      {
+        "line": 225,
+        "SKU": "CT35",
+        "reason": "image-needed_tag"
+      },
+      {
+        "line": 236,
+        "SKU": "CT5",
+        "reason": "empty_images_field"
+      },
+      {
+        "line": 236,
+        "SKU": "CT5",
+        "reason": "image-needed_tag"
+      },
+      {
+        "line": 269,
+        "SKU": "CT97",
+        "reason": "empty_images_field"
+      },
+      {
+        "line": 269,
+        "SKU": "CT97",
+        "reason": "image-needed_tag"
+      },
+      {
+        "line": 948,
+        "SKU": "CA-TT",
+        "reason": "empty_images_field"
+      },
+      {
+        "line": 948,
+        "SKU": "CA-TT",
+        "reason": "image-needed_tag"
+      },
+      {
+        "line": 949,
+        "SKU": "CAVH-TT",
+        "reason": "empty_images_field"
+      },
+      {
+        "line": 949,
+        "SKU": "CAVH-TT",
+        "reason": "image-needed_tag"
+      },
+      {
+        "line": 954,
+        "SKU": "CFBOX-TT",
+        "reason": "empty_images_field"
+      },
+      {
+        "line": 954,
+        "SKU": "CFBOX-TT",
+        "reason": "image-needed_tag"
+      },
+      {
+        "line": 963,
+        "SKU": "CROLL-TT",
+        "reason": "empty_images_field"
+      },
+      {
+        "line": 963,
+        "SKU": "CROLL-TT",
+        "reason": "image-needed_tag"
+      },
+      {
+        "line": 966,
+        "SKU": "CT-TT",
+        "reason": "empty_images_field"
+      },
+      {
+        "line": 966,
+        "SKU": "CT-TT",
+        "reason": "image-needed_tag"
+      },
+      {
+        "line": 981,
+        "SKU": "EFBH-TT",
+        "reason": "empty_images_field"
+      },
+      {
+        "line": 981,
+        "SKU": "EFBH-TT",
+        "reason": "image-needed_tag"
+      },
+      {
+        "line": 990,
+        "SKU": "EZFB-TT",
+        "reason": "empty_images_field"
+      },
+      {
+        "line": 990,
+        "SKU": "EZFB-TT",
+        "reason": "image-needed_tag"
+      },
+      {
+        "line": 992,
+        "SKU": "FBH-TT",
+        "reason": "empty_images_field"
+      },
+      {
+        "line": 992,
+        "SKU": "FBH-TT",
+        "reason": "image-needed_tag"
+      },
+      {
+        "line": 1001,
+        "SKU": "JKSS-TT",
+        "reason": "empty_images_field"
+      },
+      {
+        "line": 1001,
+        "SKU": "JKSS-TT",
+        "reason": "image-needed_tag"
+      },
+      {
+        "line": 1002,
+        "SKU": "MAXXBOX-TT",
+        "reason": "empty_images_field"
+      },
+      {
+        "line": 1002,
+        "SKU": "MAXXBOX-TT",
+        "reason": "image-needed_tag"
+      },
+      {
+        "line": 1011,
+        "SKU": "NS-TT",
+        "reason": "empty_images_field"
+      },
+      {
+        "line": 1011,
+        "SKU": "NS-TT",
+        "reason": "image-needed_tag"
+      },
+      {
+        "line": 1014,
+        "SKU": "PFB-TT",
+        "reason": "empty_images_field"
+      },
+      {
+        "line": 1014,
+        "SKU": "PFB-TT",
+        "reason": "image-needed_tag"
+      },
+      {
+        "line": 1015,
+        "SKU": "PFK-TT",
+        "reason": "empty_images_field"
+      },
+      {
+        "line": 1015,
+        "SKU": "PFK-TT",
+        "reason": "image-needed_tag"
+      },
+      {
+        "line": 1020,
+        "SKU": "QB-QSX",
+        "reason": "empty_images_field"
+      },
+      {
+        "line": 1020,
+        "SKU": "QB-QSX",
+        "reason": "image-needed_tag"
+      },
+      {
+        "line": 1045,
+        "SKU": "TKBS-TT",
+        "reason": "empty_images_field"
+      },
+      {
+        "line": 1045,
+        "SKU": "TKBS-TT",
+        "reason": "image-needed_tag"
+      },
+      {
+        "line": 1046,
+        "SKU": "TKSS-TT",
+        "reason": "empty_images_field"
+      },
+      {
+        "line": 1046,
+        "SKU": "TKSS-TT",
+        "reason": "image-needed_tag"
+      }
+    ]
+  },
+  "generic_or_empty_description": {
+    "count": 245,
+    "rows": [
+      {
+        "line": 98,
+        "SKU": "ANGLEHEADMAINTENANCEKITS",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 100,
+        "SKU": "AUTOMATICTAPERMAINTENANCEKITS",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 106,
+        "SKU": "BH4",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 112,
+        "SKU": "C1HS",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 118,
+        "SKU": "CFB15",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 121,
+        "SKU": "CFB28",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 122,
+        "SKU": "CFB47",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 123,
+        "SKU": "CFB48",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 128,
+        "SKU": "CFB8A",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 150,
+        "SKU": "COL-AHRBK",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 175,
+        "SKU": "CPFGN",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 185,
+        "SKU": "CT103",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 186,
+        "SKU": "CT105",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 188,
+        "SKU": "CT107",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 189,
+        "SKU": "CT109",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 192,
+        "SKU": "CT111",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 193,
+        "SKU": "CT112",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 194,
+        "SKU": "CT113",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 195,
+        "SKU": "CT115",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 197,
+        "SKU": "CT116A",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 201,
+        "SKU": "CT120",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 202,
+        "SKU": "CT122A",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 205,
+        "SKU": "CT125A",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 210,
+        "SKU": "CT14A",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 212,
+        "SKU": "CT19",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 214,
+        "SKU": "CT20",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 216,
+        "SKU": "CT23",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 225,
+        "SKU": "CT35",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 230,
+        "SKU": "CT41",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 232,
+        "SKU": "CT45",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 234,
+        "SKU": "CT48",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 235,
+        "SKU": "CT49",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 238,
+        "SKU": "CT51",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 239,
+        "SKU": "CT53",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 240,
+        "SKU": "CT57",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 245,
+        "SKU": "CT67",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 246,
+        "SKU": "CT68",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 249,
+        "SKU": "CT71",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 250,
+        "SKU": "CT73",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 251,
+        "SKU": "CT77",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 258,
+        "SKU": "CT86",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 261,
+        "SKU": "CT88",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 262,
+        "SKU": "CT89",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 265,
+        "SKU": "CT93",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 271,
+        "SKU": "CTA107",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 273,
+        "SKU": "CTA41",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 274,
+        "SKU": "CTA59",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 275,
+        "SKU": "CTA84",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 287,
+        "SKU": "FA208",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 288,
+        "SKU": "FA215",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 293,
+        "SKU": "FA231",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 294,
+        "SKU": "FA232",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 295,
+        "SKU": "FA234",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 297,
+        "SKU": "FA247",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 307,
+        "SKU": "FA273",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 309,
+        "SKU": "FA275",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 312,
+        "SKU": "FA279",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 314,
+        "SKU": "FA281",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 317,
+        "SKU": "FA290",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 318,
+        "SKU": "FA292",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 320,
+        "SKU": "FA295",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 321,
+        "SKU": "FA296",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 322,
+        "SKU": "FA298",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 323,
+        "SKU": "FA300",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 325,
+        "SKU": "FA305",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 326,
+        "SKU": "FA306",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 329,
+        "SKU": "FA314",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 336,
+        "SKU": "FINISHINGBOXMAINTENANCEKITS",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 351,
+        "SKU": "MH17",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 352,
+        "SKU": "MH21",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 354,
+        "SKU": "MH25",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 355,
+        "SKU": "MH9",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 361,
+        "SKU": "NAILSPOTTERMAINTENANCEKITS",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 371,
+        "SKU": "PHA",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 486,
+        "SKU": "050023F",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 487,
+        "SKU": "050027",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 488,
+        "SKU": "050030",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 490,
+        "SKU": "050034F",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 491,
+        "SKU": "050043F",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 492,
+        "SKU": "050050F",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 496,
+        "SKU": "050072F",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 499,
+        "SKU": "050083F",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 501,
+        "SKU": "050094F",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 503,
+        "SKU": "050109F",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 507,
+        "SKU": "050137F",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 512,
+        "SKU": "050150F",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 515,
+        "SKU": "050200",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 518,
+        "SKU": "050212F",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 519,
+        "SKU": "050244",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 521,
+        "SKU": "050402B",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 531,
+        "SKU": "051135",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 532,
+        "SKU": "052011",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 534,
+        "SKU": "052051",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 535,
+        "SKU": "052052",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 537,
+        "SKU": "052080",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 539,
+        "SKU": "052150",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 541,
+        "SKU": "052226",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 542,
+        "SKU": "052229",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 543,
+        "SKU": "052400B",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 544,
+        "SKU": "052403",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 545,
+        "SKU": "052404B",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 548,
+        "SKU": "054028",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 549,
+        "SKU": "054032F",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 552,
+        "SKU": "054075",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 555,
+        "SKU": "054101",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 556,
+        "SKU": "054104",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 557,
+        "SKU": "054114F",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 558,
+        "SKU": "054116F",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 560,
+        "SKU": "054219",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 561,
+        "SKU": "054245F",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 568,
+        "SKU": "059005",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 574,
+        "SKU": "059044",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 576,
+        "SKU": "059060",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 578,
+        "SKU": "059067",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 579,
+        "SKU": "059074",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 591,
+        "SKU": "059206",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 593,
+        "SKU": "059225",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 598,
+        "SKU": "059331",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 604,
+        "SKU": "101249",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 605,
+        "SKU": "122267",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 607,
+        "SKU": "130001",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 608,
+        "SKU": "130002",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 614,
+        "SKU": "140005",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 615,
+        "SKU": "140006",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 616,
+        "SKU": "140007",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 617,
+        "SKU": "140008",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 619,
+        "SKU": "140010",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 623,
+        "SKU": "140015",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 624,
+        "SKU": "140017",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 627,
+        "SKU": "140038",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 628,
+        "SKU": "140039",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 630,
+        "SKU": "142016",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 632,
+        "SKU": "145011",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 633,
+        "SKU": "149021",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 634,
+        "SKU": "149022",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 635,
+        "SKU": "149023",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 641,
+        "SKU": "150003F",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 645,
+        "SKU": "152025",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 646,
+        "SKU": "154007",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 649,
+        "SKU": "159026",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 657,
+        "SKU": "190002",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 658,
+        "SKU": "190033",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 659,
+        "SKU": "190034",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 661,
+        "SKU": "191001",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 663,
+        "SKU": "191007",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 664,
+        "SKU": "196003",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 666,
+        "SKU": "200009",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 670,
+        "SKU": "202021",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 676,
+        "SKU": "206003",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 678,
+        "SKU": "209006",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 682,
+        "SKU": "209047",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 685,
+        "SKU": "209058",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 689,
+        "SKU": "210058F",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 691,
+        "SKU": "210060",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 692,
+        "SKU": "210071",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 695,
+        "SKU": "212081",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 697,
+        "SKU": "212084",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 698,
+        "SKU": "212085",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 699,
+        "SKU": "212086",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 700,
+        "SKU": "212087",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 701,
+        "SKU": "212089",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 703,
+        "SKU": "213083",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 711,
+        "SKU": "250009",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 717,
+        "SKU": "254005",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 723,
+        "SKU": "260071",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 727,
+        "SKU": "300009",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 732,
+        "SKU": "304005",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 737,
+        "SKU": "310071",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 749,
+        "SKU": "356001G",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 751,
+        "SKU": "359046",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 755,
+        "SKU": "402006",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 758,
+        "SKU": "402019",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 759,
+        "SKU": "402033",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 764,
+        "SKU": "420015",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 765,
+        "SKU": "420016",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 771,
+        "SKU": "480002F",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 773,
+        "SKU": "480007F",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 774,
+        "SKU": "480008F",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 775,
+        "SKU": "480015F",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 776,
+        "SKU": "480016F",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 781,
+        "SKU": "480215",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 782,
+        "SKU": "480216",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 810,
+        "SKU": "502005F",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 811,
+        "SKU": "502006",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 812,
+        "SKU": "502007",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 821,
+        "SKU": "506001G",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 822,
+        "SKU": "506009",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 829,
+        "SKU": "600007",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 830,
+        "SKU": "600022",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 831,
+        "SKU": "602029F",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 832,
+        "SKU": "602035",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 835,
+        "SKU": "609015",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 838,
+        "SKU": "609049",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 840,
+        "SKU": "630002",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 841,
+        "SKU": "630009",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 842,
+        "SKU": "630010",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 844,
+        "SKU": "630030",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 848,
+        "SKU": "638001",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 851,
+        "SKU": "650007",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 852,
+        "SKU": "650022",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 855,
+        "SKU": "680002",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 856,
+        "SKU": "680009",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 857,
+        "SKU": "680010",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 858,
+        "SKU": "680030",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 861,
+        "SKU": "688001",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 862,
+        "SKU": "700002F",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 863,
+        "SKU": "700004F",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 865,
+        "SKU": "700015F",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 866,
+        "SKU": "700032F",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 867,
+        "SKU": "700036",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 868,
+        "SKU": "700037",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 869,
+        "SKU": "700042",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 872,
+        "SKU": "709006",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 873,
+        "SKU": "709023",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 874,
+        "SKU": "709024",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 875,
+        "SKU": "709027",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 876,
+        "SKU": "709043",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 877,
+        "SKU": "709052",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 878,
+        "SKU": "709056",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 883,
+        "SKU": "724061F",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 892,
+        "SKU": "800008",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 895,
+        "SKU": "800027",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 897,
+        "SKU": "802016",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 898,
+        "SKU": "804003F",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 899,
+        "SKU": "808015F",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 901,
+        "SKU": "809011",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 903,
+        "SKU": "810027",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 905,
+        "SKU": "810029",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 907,
+        "SKU": "814234",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 908,
+        "SKU": "814242",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 909,
+        "SKU": "814254",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 910,
+        "SKU": "814272",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 919,
+        "SKU": "861014",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 921,
+        "SKU": "880006F",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 923,
+        "SKU": "880038",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 925,
+        "SKU": "880053",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 926,
+        "SKU": "881005",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 928,
+        "SKU": "882002",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 930,
+        "SKU": "882016",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 932,
+        "SKU": "883020",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 936,
+        "SKU": "889027",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 939,
+        "SKU": "889055",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 940,
+        "SKU": "889062",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 1005,
+        "SKU": "MRCASE",
+        "issue": "generic_or_empty"
+      },
+      {
+        "line": 1012,
+        "SKU": "NSA-TT",
+        "issue": "generic_or_empty"
+      }
+    ]
+  },
+  "missing_short_description": {
+    "count": 0,
+    "rows": []
+  },
+  "orphan_variations": {
+    "count": 0,
+    "rows": []
+  }
+}

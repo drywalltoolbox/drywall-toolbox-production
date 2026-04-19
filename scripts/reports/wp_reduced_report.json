@@ -1,0 +1,28 @@
+{
+  "source": "C:\\Users\\Elliott\\drywall-toolbox\\frontend\\public\\wp-catalog.csv",
+  "output": "C:\\Users\\Elliott\\drywall-toolbox\\frontend\\public\\wp-reduced.csv",
+  "total_rows_read": 1069,
+  "total_rows_written": 1069,
+  "source_columns_count": 51,
+  "out_columns": [
+    "Brands",
+    "Type",
+    "SKU",
+    "MPN",
+    "Name",
+    "Short description",
+    "Description",
+    "Weight (lbs)",
+    "Length (in)",
+    "Width (in)",
+    "Height (in)",
+    "Categories",
+    "Tags",
+    "Images",
+    "Parent",
+    "Attribute 1 name",
+    "Attribute 1 value(s)",
+    "Attribute 2 name",
+    "Attribute 2 value(s)"
+  ]
+}
