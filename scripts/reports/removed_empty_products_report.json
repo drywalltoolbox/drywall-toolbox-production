@@ -1,0 +1,413 @@
+{
+  "timestamp": "2026-04-19T11:11:02.558261",
+  "wp_path": "C:\\Users\\Elliott\\drywall-toolbox\\frontend\\public\\wp-catalog.csv",
+  "wp_backup_path": "C:\\Users\\Elliott\\drywall-toolbox\\frontend\\public\\wp-catalog.csv.bak_20260419_111102",
+  "total_rows_before": 1654,
+  "total_rows_after": 1069,
+  "rows_removed_count": 585,
+  "sample_removed": [
+    {
+      "SKU": "010249",
+      "Brand": null,
+      "row_preview": {
+        "Name": "",
+        "Short description": ""
+      }
+    },
+    {
+      "SKU": "032219",
+      "Brand": null,
+      "row_preview": {
+        "Name": "",
+        "Short description": ""
+      }
+    },
+    {
+      "SKU": "032249",
+      "Brand": null,
+      "row_preview": {
+        "Name": "",
+        "Short description": ""
+      }
+    },
+    {
+      "SKU": "032409",
+      "Brand": null,
+      "row_preview": {
+        "Name": "",
+        "Short description": ""
+      }
+    },
+    {
+      "SKU": "036248G",
+      "Brand": null,
+      "row_preview": {
+        "Name": "",
+        "Short description": ""
+      }
+    },
+    {
+      "SKU": "041050F",
+      "Brand": null,
+      "row_preview": {
+        "Name": "",
+        "Short description": ""
+      }
+    },
+    {
+      "SKU": "050003-6",
+      "Brand": null,
+      "row_preview": {
+        "Name": "",
+        "Short description": ""
+      }
+    },
+    {
+      "SKU": "050041F",
+      "Brand": null,
+      "row_preview": {
+        "Name": "",
+        "Short description": ""
+      }
+    },
+    {
+      "SKU": "050046",
+      "Brand": null,
+      "row_preview": {
+        "Name": "",
+        "Short description": ""
+      }
+    },
+    {
+      "SKU": "050053",
+      "Brand": null,
+      "row_preview": {
+        "Name": "",
+        "Short description": ""
+      }
+    },
+    {
+      "SKU": "050058",
+      "Brand": null,
+      "row_preview": {
+        "Name": "",
+        "Short description": ""
+      }
+    },
+    {
+      "SKU": "050068-6",
+      "Brand": null,
+      "row_preview": {
+        "Name": "",
+        "Short description": ""
+      }
+    },
+    {
+      "SKU": "050071F",
+      "Brand": null,
+      "row_preview": {
+        "Name": "",
+        "Short description": ""
+      }
+    },
+    {
+      "SKU": "050080F",
+      "Brand": null,
+      "row_preview": {
+        "Name": "",
+        "Short description": ""
+      }
+    },
+    {
+      "SKU": "050081F-6",
+      "Brand": null,
+      "row_preview": {
+        "Name": "",
+        "Short description": ""
+      }
+    },
+    {
+      "SKU": "050090F",
+      "Brand": null,
+      "row_preview": {
+        "Name": "",
+        "Short description": ""
+      }
+    },
+    {
+      "SKU": "050093F-6",
+      "Brand": null,
+      "row_preview": {
+        "Name": "",
+        "Short description": ""
+      }
+    },
+    {
+      "SKU": "050110F",
+      "Brand": null,
+      "row_preview": {
+        "Name": "",
+        "Short description": ""
+      }
+    },
+    {
+      "SKU": "050115F-6",
+      "Brand": null,
+      "row_preview": {
+        "Name": "",
+        "Short description": ""
+      }
+    },
+    {
+      "SKU": "050132F",
+      "Brand": null,
+      "row_preview": {
+        "Name": "",
+        "Short description": ""
+      }
+    },
+    {
+      "SKU": "050133-6",
+      "Brand": null,
+      "row_preview": {
+        "Name": "",
+        "Short description": ""
+      }
+    },
+    {
+      "SKU": "050134-6",
+      "Brand": null,
+      "row_preview": {
+        "Name": "",
+        "Short description": ""
+      }
+    },
+    {
+      "SKU": "050203-6",
+      "Brand": null,
+      "row_preview": {
+        "Name": "",
+        "Short description": ""
+      }
+    },
+    {
+      "SKU": "050418-6",
+      "Brand": null,
+      "row_preview": {
+        "Name": "",
+        "Short description": ""
+      }
+    },
+    {
+      "SKU": "050538",
+      "Brand": null,
+      "row_preview": {
+        "Name": "",
+        "Short description": ""
+      }
+    },
+    {
+      "SKU": "050556",
+      "Brand": null,
+      "row_preview": {
+        "Name": "",
+        "Short description": ""
+      }
+    },
+    {
+      "SKU": "050572",
+      "Brand": null,
+      "row_preview": {
+        "Name": "",
+        "Short description": ""
+      }
+    },
+    {
+      "SKU": "050573",
+      "Brand": null,
+      "row_preview": {
+        "Name": "",
+        "Short description": ""
+      }
+    },
+    {
+      "SKU": "050576",
+      "Brand": null,
+      "row_preview": {
+        "Name": "",
+        "Short description": ""
+      }
+    },
+    {
+      "SKU": "050594",
+      "Brand": null,
+      "row_preview": {
+        "Name": "",
+        "Short description": ""
+      }
+    },
+    {
+      "SKU": "050599",
+      "Brand": null,
+      "row_preview": {
+        "Name": "",
+        "Short description": ""
+      }
+    },
+    {
+      "SKU": "050700",
+      "Brand": null,
+      "row_preview": {
+        "Name": "",
+        "Short description": ""
+      }
+    },
+    {
+      "SKU": "050701",
+      "Brand": null,
+      "row_preview": {
+        "Name": "",
+        "Short description": ""
+      }
+    },
+    {
+      "SKU": "050702",
+      "Brand": null,
+      "row_preview": {
+        "Name": "",
+        "Short description": ""
+      }
+    },
+    {
+      "SKU": "050703",
+      "Brand": null,
+      "row_preview": {
+        "Name": "",
+        "Short description": ""
+      }
+    },
+    {
+      "SKU": "050707",
+      "Brand": null,
+      "row_preview": {
+        "Name": "",
+        "Short description": ""
+      }
+    },
+    {
+      "SKU": "050710",
+      "Brand": null,
+      "row_preview": {
+        "Name": "",
+        "Short description": ""
+      }
+    },
+    {
+      "SKU": "050712",
+      "Brand": null,
+      "row_preview": {
+        "Name": "",
+        "Short description": ""
+      }
+    },
+    {
+      "SKU": "050713",
+      "Brand": null,
+      "row_preview": {
+        "Name": "",
+        "Short description": ""
+      }
+    },
+    {
+      "SKU": "050715",
+      "Brand": null,
+      "row_preview": {
+        "Name": "",
+        "Short description": ""
+      }
+    },
+    {
+      "SKU": "050718",
+      "Brand": null,
+      "row_preview": {
+        "Name": "",
+        "Short description": ""
+      }
+    },
+    {
+      "SKU": "050719",
+      "Brand": null,
+      "row_preview": {
+        "Name": "",
+        "Short description": ""
+      }
+    },
+    {
+      "SKU": "050720",
+      "Brand": null,
+      "row_preview": {
+        "Name": "",
+        "Short description": ""
+      }
+    },
+    {
+      "SKU": "050721A",
+      "Brand": null,
+      "row_preview": {
+        "Name": "",
+        "Short description": ""
+      }
+    },
+    {
+      "SKU": "050722",
+      "Brand": null,
+      "row_preview": {
+        "Name": "",
+        "Short description": ""
+      }
+    },
+    {
+      "SKU": "050723",
+      "Brand": null,
+      "row_preview": {
+        "Name": "",
+        "Short description": ""
+      }
+    },
+    {
+      "SKU": "050725",
+      "Brand": null,
+      "row_preview": {
+        "Name": "",
+        "Short description": ""
+      }
+    },
+    {
+      "SKU": "050726",
+      "Brand": null,
+      "row_preview": {
+        "Name": "",
+        "Short description": ""
+      }
+    },
+    {
+      "SKU": "050727",
+      "Brand": null,
+      "row_preview": {
+        "Name": "",
+        "Short description": ""
+      }
+    },
+    {
+      "SKU": "050728",
+      "Brand": null,
+      "row_preview": {
+        "Name": "",
+        "Short description": ""
+      }
+    }
+  ],
+  "images_src": "C:\\Users\\Elliott\\drywall-toolbox\\scripts\\scraped_results\\TapeTech\\images",
+  "images_moved": true,
+  "images_dst": "C:\\Users\\Elliott\\drywall-toolbox\\scripts\\scraped_results\\TapeTech\\images.deleted_20260419_111102"
+}

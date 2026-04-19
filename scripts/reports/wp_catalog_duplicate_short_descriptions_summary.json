@@ -1,0 +1,7 @@
+{
+  "total_rows_scanned": 1654,
+  "groups_with_duplicates": 81,
+  "duplicate_rows_total": 723,
+  "output_csv": "C:\\Users\\Elliott\\drywall-toolbox\\scripts\\reports\\wp_catalog_duplicate_short_descriptions.csv",
+  "note": "normalized_short is lowercased, HTML tags removed; <EMPTY> means no short description present"
+}

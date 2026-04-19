@@ -1,0 +1,510 @@
+{
+  "timestamp": "2026-04-19T11:13:46.671132",
+  "wc_path": "C:\\Users\\Elliott\\drywall-toolbox\\frontend\\public\\wc-catalog.csv",
+  "wc_backup_path": "C:\\Users\\Elliott\\drywall-toolbox\\frontend\\public\\wc-catalog.csv.bak_20260419_111346",
+  "total_rows_before": 1468,
+  "total_rows_after": 949,
+  "rows_removed_count": 519,
+  "sample_removed": [
+    {
+      "SKU": "010249",
+      "Name": "",
+      "Short description": ""
+    },
+    {
+      "SKU": "032219",
+      "Name": "",
+      "Short description": ""
+    },
+    {
+      "SKU": "032249",
+      "Name": "",
+      "Short description": ""
+    },
+    {
+      "SKU": "032409",
+      "Name": "",
+      "Short description": ""
+    },
+    {
+      "SKU": "036248G",
+      "Name": "",
+      "Short description": ""
+    },
+    {
+      "SKU": "041050F",
+      "Name": "",
+      "Short description": ""
+    },
+    {
+      "SKU": "050003-6",
+      "Name": "",
+      "Short description": ""
+    },
+    {
+      "SKU": "050041F",
+      "Name": "",
+      "Short description": ""
+    },
+    {
+      "SKU": "050046",
+      "Name": "",
+      "Short description": ""
+    },
+    {
+      "SKU": "050053",
+      "Name": "",
+      "Short description": ""
+    },
+    {
+      "SKU": "050058",
+      "Name": "",
+      "Short description": ""
+    },
+    {
+      "SKU": "050068-6",
+      "Name": "",
+      "Short description": ""
+    },
+    {
+      "SKU": "050071F",
+      "Name": "",
+      "Short description": ""
+    },
+    {
+      "SKU": "050080F",
+      "Name": "",
+      "Short description": ""
+    },
+    {
+      "SKU": "050081F-6",
+      "Name": "",
+      "Short description": ""
+    },
+    {
+      "SKU": "050090F",
+      "Name": "",
+      "Short description": ""
+    },
+    {
+      "SKU": "050093F-6",
+      "Name": "",
+      "Short description": ""
+    },
+    {
+      "SKU": "050110F",
+      "Name": "",
+      "Short description": ""
+    },
+    {
+      "SKU": "050115F-6",
+      "Name": "",
+      "Short description": ""
+    },
+    {
+      "SKU": "050132F",
+      "Name": "",
+      "Short description": ""
+    },
+    {
+      "SKU": "050133-6",
+      "Name": "",
+      "Short description": ""
+    },
+    {
+      "SKU": "050134-6",
+      "Name": "",
+      "Short description": ""
+    },
+    {
+      "SKU": "050203-6",
+      "Name": "",
+      "Short description": ""
+    },
+    {
+      "SKU": "050418-6",
+      "Name": "",
+      "Short description": ""
+    },
+    {
+      "SKU": "050538",
+      "Name": "",
+      "Short description": ""
+    },
+    {
+      "SKU": "050556",
+      "Name": "",
+      "Short description": ""
+    },
+    {
+      "SKU": "050572",
+      "Name": "",
+      "Short description": ""
+    },
+    {
+      "SKU": "050573",
+      "Name": "",
+      "Short description": ""
+    },
+    {
+      "SKU": "050576",
+      "Name": "",
+      "Short description": ""
+    },
+    {
+      "SKU": "050594",
+      "Name": "",
+      "Short description": ""
+    },
+    {
+      "SKU": "050599",
+      "Name": "",
+      "Short description": ""
+    },
+    {
+      "SKU": "050700",
+      "Name": "",
+      "Short description": ""
+    },
+    {
+      "SKU": "050701",
+      "Name": "",
+      "Short description": ""
+    },
+    {
+      "SKU": "050702",
+      "Name": "",
+      "Short description": ""
+    },
+    {
+      "SKU": "050703",
+      "Name": "",
+      "Short description": ""
+    },
+    {
+      "SKU": "050707",
+      "Name": "",
+      "Short description": ""
+    },
+    {
+      "SKU": "050710",
+      "Name": "",
+      "Short description": ""
+    },
+    {
+      "SKU": "050712",
+      "Name": "",
+      "Short description": ""
+    },
+    {
+      "SKU": "050713",
+      "Name": "",
+      "Short description": ""
+    },
+    {
+      "SKU": "050715",
+      "Name": "",
+      "Short description": ""
+    },
+    {
+      "SKU": "050718",
+      "Name": "",
+      "Short description": ""
+    },
+    {
+      "SKU": "050719",
+      "Name": "",
+      "Short description": ""
+    },
+    {
+      "SKU": "050720",
+      "Name": "",
+      "Short description": ""
+    },
+    {
+      "SKU": "050721A",
+      "Name": "",
+      "Short description": ""
+    },
+    {
+      "SKU": "050722",
+      "Name": "",
+      "Short description": ""
+    },
+    {
+      "SKU": "050723",
+      "Name": "",
+      "Short description": ""
+    },
+    {
+      "SKU": "050725",
+      "Name": "",
+      "Short description": ""
+    },
+    {
+      "SKU": "050726",
+      "Name": "",
+      "Short description": ""
+    },
+    {
+      "SKU": "050727",
+      "Name": "",
+      "Short description": ""
+    },
+    {
+      "SKU": "050728",
+      "Name": "",
+      "Short description": ""
+    },
+    {
+      "SKU": "050729",
+      "Name": "",
+      "Short description": ""
+    },
+    {
+      "SKU": "050730",
+      "Name": "",
+      "Short description": ""
+    },
+    {
+      "SKU": "050737",
+      "Name": "",
+      "Short description": ""
+    },
+    {
+      "SKU": "050738",
+      "Name": "",
+      "Short description": ""
+    },
+    {
+      "SKU": "050742",
+      "Name": "",
+      "Short description": ""
+    },
+    {
+      "SKU": "050743",
+      "Name": "",
+      "Short description": ""
+    },
+    {
+      "SKU": "050744",
+      "Name": "",
+      "Short description": ""
+    },
+    {
+      "SKU": "050745A",
+      "Name": "",
+      "Short description": ""
+    },
+    {
+      "SKU": "050748",
+      "Name": "",
+      "Short description": ""
+    },
+    {
+      "SKU": "050750",
+      "Name": "",
+      "Short description": ""
+    },
+    {
+      "SKU": "050752",
+      "Name": "",
+      "Short description": ""
+    },
+    {
+      "SKU": "050754",
+      "Name": "",
+      "Short description": ""
+    },
+    {
+      "SKU": "050757",
+      "Name": "",
+      "Short description": ""
+    },
+    {
+      "SKU": "050758",
+      "Name": "",
+      "Short description": ""
+    },
+    {
+      "SKU": "050760",
+      "Name": "",
+      "Short description": ""
+    },
+    {
+      "SKU": "050764",
+      "Name": "",
+      "Short description": ""
+    },
+    {
+      "SKU": "050770",
+      "Name": "",
+      "Short description": ""
+    },
+    {
+      "SKU": "050771",
+      "Name": "",
+      "Short description": ""
+    },
+    {
+      "SKU": "050772",
+      "Name": "",
+      "Short description": ""
+    },
+    {
+      "SKU": "050773",
+      "Name": "",
+      "Short description": ""
+    },
+    {
+      "SKU": "050774",
+      "Name": "",
+      "Short description": ""
+    },
+    {
+      "SKU": "050775",
+      "Name": "",
+      "Short description": ""
+    },
+    {
+      "SKU": "050776",
+      "Name": "",
+      "Short description": ""
+    },
+    {
+      "SKU": "050777",
+      "Name": "",
+      "Short description": ""
+    },
+    {
+      "SKU": "050778",
+      "Name": "",
+      "Short description": ""
+    },
+    {
+      "SKU": "050779",
+      "Name": "",
+      "Short description": ""
+    },
+    {
+      "SKU": "050780",
+      "Name": "",
+      "Short description": ""
+    },
+    {
+      "SKU": "050781",
+      "Name": "",
+      "Short description": ""
+    },
+    {
+      "SKU": "050782",
+      "Name": "",
+      "Short description": ""
+    },
+    {
+      "SKU": "050784",
+      "Name": "",
+      "Short description": ""
+    },
+    {
+      "SKU": "050785",
+      "Name": "",
+      "Short description": ""
+    },
+    {
+      "SKU": "050786",
+      "Name": "",
+      "Short description": ""
+    },
+    {
+      "SKU": "050787",
+      "Name": "",
+      "Short description": ""
+    },
+    {
+      "SKU": "050788",
+      "Name": "",
+      "Short description": ""
+    },
+    {
+      "SKU": "050789",
+      "Name": "",
+      "Short description": ""
+    },
+    {
+      "SKU": "050790",
+      "Name": "",
+      "Short description": ""
+    },
+    {
+      "SKU": "050803",
+      "Name": "",
+      "Short description": ""
+    },
+    {
+      "SKU": "050804",
+      "Name": "",
+      "Short description": ""
+    },
+    {
+      "SKU": "050805",
+      "Name": "",
+      "Short description": ""
+    },
+    {
+      "SKU": "051094",
+      "Name": "",
+      "Short description": ""
+    },
+    {
+      "SKU": "051243",
+      "Name": "",
+      "Short description": ""
+    },
+    {
+      "SKU": "051248",
+      "Name": "",
+      "Short description": ""
+    },
+    {
+      "SKU": "051250",
+      "Name": "",
+      "Short description": ""
+    },
+    {
+      "SKU": "051251",
+      "Name": "",
+      "Short description": ""
+    },
+    {
+      "SKU": "051252",
+      "Name": "",
+      "Short description": ""
+    },
+    {
+      "SKU": "051262",
+      "Name": "",
+      "Short description": ""
+    },
+    {
+      "SKU": "051410B",
+      "Name": "",
+      "Short description": ""
+    },
+    {
+      "SKU": "051415",
+      "Name": "",
+      "Short description": ""
+    },
+    {
+      "SKU": "051750",
+      "Name": "",
+      "Short description": ""
+    },
+    {
+      "SKU": "051759",
+      "Name": "",
+      "Short description": ""
+    }
+  ]
+}

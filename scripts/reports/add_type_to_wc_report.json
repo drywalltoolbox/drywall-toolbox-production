@@ -1,0 +1,160 @@
+{
+  "timestamp": "2026-04-19T11:53:44.191560",
+  "wp_path": "C:\\Users\\Elliott\\drywall-toolbox\\frontend\\public\\wp-catalog.csv",
+  "wc_path": "C:\\Users\\Elliott\\drywall-toolbox\\frontend\\public\\wc-catalog.csv",
+  "wc_backup": "C:\\Users\\Elliott\\drywall-toolbox\\frontend\\public\\wc-catalog.csv.bak_20260419_115344",
+  "total_wc_rows": 949,
+  "rows_with_type_added_or_changed": 948,
+  "sample_changes": [
+    {
+      "SKU": "4I-SJ80-1WRW",
+      "old": "",
+      "new": "simple"
+    },
+    {
+      "SKU": "4K-S6F6-8HQ6",
+      "old": "",
+      "new": "simple"
+    },
+    {
+      "SKU": "9R-PIR7-OTNL",
+      "old": "",
+      "new": "simple"
+    },
+    {
+      "SKU": "AGFLATEXT",
+      "old": "",
+      "new": "simple"
+    },
+    {
+      "SKU": "AH-AD",
+      "old": "",
+      "new": "variable"
+    },
+    {
+      "SKU": "BBH-AD",
+      "old": "",
+      "new": "simple"
+    },
+    {
+      "SKU": "CA08-AD",
+      "old": "",
+      "new": "simple"
+    },
+    {
+      "SKU": "CFA-AD",
+      "old": "",
+      "new": "simple"
+    },
+    {
+      "SKU": "CR01-AD",
+      "old": "",
+      "new": "simple"
+    },
+    {
+      "SKU": "EHC10-AD",
+      "old": "",
+      "new": "simple"
+    },
+    {
+      "SKU": "EZFB-AD",
+      "old": "",
+      "new": "variable"
+    },
+    {
+      "SKU": "FA01-AD",
+      "old": "",
+      "new": "simple"
+    },
+    {
+      "SKU": "FBHE-AD",
+      "old": "",
+      "new": "simple"
+    },
+    {
+      "SKU": "FH-AD",
+      "old": "",
+      "new": "simple"
+    },
+    {
+      "SKU": "GN01-AD",
+      "old": "",
+      "new": "simple"
+    },
+    {
+      "SKU": "HU-OI6G-88Y4",
+      "old": "",
+      "new": "simple"
+    },
+    {
+      "SKU": "LP01-AD",
+      "old": "",
+      "new": "simple"
+    },
+    {
+      "SKU": "NS03-AD",
+      "old": "",
+      "new": "simple"
+    },
+    {
+      "SKU": "PAFB-AD",
+      "old": "",
+      "new": "variable"
+    },
+    {
+      "SKU": "TF-DVKN-31Q3",
+      "old": "",
+      "new": "simple"
+    },
+    {
+      "SKU": "XH-AD",
+      "old": "",
+      "new": "simple"
+    },
+    {
+      "SKU": "3WTDF",
+      "old": "",
+      "new": "simple"
+    },
+    {
+      "SKU": "3WTSF",
+      "old": "",
+      "new": "simple"
+    },
+    {
+      "SKU": "AH4",
+      "old": "",
+      "new": "simple"
+    },
+    {
+      "SKU": "AH6A",
+      "old": "",
+      "new": "simple"
+    },
+    {
+      "SKU": "AH8",
+      "old": "",
+      "new": "simple"
+    },
+    {
+      "SKU": "AH9",
+      "old": "",
+      "new": "simple"
+    },
+    {
+      "SKU": "AHA",
+      "old": "",
+      "new": "simple"
+    },
+    {
+      "SKU": "ANGLEHEADMAINTENANCEKITS",
+      "old": "",
+      "new": "simple"
+    },
+    {
+      "SKU": "AUTOMATICFLATBOXES",
+      "old": "",
+      "new": "simple"
+    }
+  ]
+}
