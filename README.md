@@ -1,79 +1,59 @@
 # Drywall Toolbox
 
-Headless React storefront for Drywalltoolbox.com — powered by WordPress + WooCommerce as the headless CMS/API backend.
+Headless React storefront for drywalltoolbox.com — powered by WordPress + WooCommerce as the headless CMS/API backend.
 
 **Architecture:** React SPA (`frontend/`) → builds to `dist/` → served from domain root  
 **Backend:** WordPress + WooCommerce in `/wp/` subdirectory → REST API only  
 **Hosting:** HostGator shared hosting, deployed via GitHub Actions FTPS
----
-
-## 🚀 Deployment Guides
-
-**Choose based on your experience level:**
-
-- **👤 Non-Technical / First Time?** → Start with [BEGINNER_DEPLOYMENT_GUIDE.md](./BEGINNER_DEPLOYMENT_GUIDE.md)
-  - Simple step-by-step instructions
-  - No jargon, just copy-paste files
-  - About 1-2 hours to complete
-
-- **👨‍💻 Technical / Full Details?** → See [docs/README.md](./docs/README.md)
-  - Complete architecture documentation
-  - Detailed troubleshooting
-  - 7 specialized guides for different aspects
 
 ---
 
 ## Repository Layout
 
 ```
-├── frontend/                  ← React source + build tooling (canonical)
+drywall-toolbox/
+├── frontend/                  ← React SPA (canonical source)
 │   ├── src/
-│   │   ├── api/               ← API clients: client.js, auth.js, products.js, cart.js, schematics.js
+│   │   ├── api/               ← Axios API clients (client.js, auth.js, products.js, cart.js, …)
+│   │   ├── auth/              ← AuthContext.js, tokenStore.js (in-memory JWT), useAuth.js
 │   │   ├── components/
-│   │   ├── context/
-│   │   ├── hooks/             ← useFetch.js, useSchematicMedia.js
-│   │   ├── pages/
+│   │   │   ├── calculators/   ← CalculatorHub + 5 calculators + shared primitives
+│   │   │   └── dashboard/     ← AccountHub + tab components
+│   │   ├── context/           ← CartContext.jsx, WooCommerceContext.jsx
+│   │   ├── data/              ← products.js (WC loader), schematicMappings.js
+│   │   ├── hooks/             ← useFetch, useProducts, useProduct, useCategories, useCart, useSchematicMedia
+│   │   ├── pages/             ← All route-level pages (lazy-loaded)
 │   │   ├── services/          ← Legacy API modules (kept for compat)
-│   │   └── styles/
+│   │   ├── styles/            ← Component-scoped CSS files
+│   │   ├── utils/             ← apiError.js, parseProductCsv.js, productSpecifications.js, schema.js
+│   │   ├── App.jsx            ← Root component, router, providers
+│   │   └── main.jsx           ← Entry point
 │   ├── public/                ← Static assets copied verbatim into dist/
-│   ├── server/                ← Reviews dev server (not deployed)
-│   ├── webpack.config.cjs     ← Build config (outputs to ../dist/)
-│   ├── vite.config.js         ← Vite config (alternative build tool)
-│   ├── .env.production        ← Non-secret production URLs (committed)
+│   │   └── brands/            ← Per-brand logos (SVG) and schematic JSON metadata
+│   ├── server/                ← Dev-only mock reviews server (not deployed)
+│   ├── webpack.config.cjs     ← Primary build config (outputs to ../dist/)
+│   ├── tailwind.config.js     ← Tailwind CSS v4 config
+│   ├── postcss.config.js      ← PostCSS config
+│   ├── eslint.config.js       ← ESLint 9 flat config
+│   ├── babel.config.json      ← Babel config
 │   ├── .env.development       ← Non-secret dev URLs (committed)
+│   ├── .env.production        ← Non-secret prod URLs (committed)
 │   └── package.json
-├── public/                    ← Static brand assets served by webpack
-│   └── brands/
-│       ├── Columbia/          ← Logo SVG + Schematics/ (JSON metadata only; images in WP)
-│       ├── TapeTech/          ← Logo SVG + Schematics/ (JSON metadata only; images in WP)
-│       ├── Asgard/            ← Logo SVG
-│       ├── Graco/             ← Logo SVG
-│       └── SurPro/            ← Logo SVG
-├── dist/                      ← CI build output only (gitignored)
-│   ├── index.html
-│   └── assets/
-├── wp/                        ← WordPress installation (at /wp/ subpath)
-│   ├── wp-content/            ← Custom WordPress content (deployed to server wp/wp-content/)
-│   │   ├── themes/
-│   │   │   ├── drywall-toolbox/   ← Legacy theme (kept until headless-base validated)
-│   │   │   └── headless-base/     ← Active minimal headless theme (zero frontend output)
-│   │   └── mu-plugins/
-│   │       ├── dtb-cors.php           ← CORS proxy mu-plugin (auto-loaded)
-│   │       └── dtb-schematics-api.php ← Schematic image manifest REST endpoint
-│   ├── .htaccess              ← WordPress internal mod_rewrite rules
-│   ├── index.php              ← WordPress bootstrap entry point
-│   └── wp-config-sample.php   ← Configuration template (copy to wp-config.php on server)
-├── scripts/
-│   ├── audit_merge_columbia_catalogs.py ← Cross-reference + merge Columbia/TSW Woo CSV + image mappings
-│   ├── audit_catalog_images.py        ← Audit/fix wp-catalog image URLs + WebP conversion
-│   ├── convert_schematics_to_webp.py  ← Batch PNG/JPG → WebP conversion
-│   ├── upload_schematics_to_wp.py     ← Batch upload to WP Media Library
-│   └── convert_to_woocommerce.py      ← Catalog CSV utility
-├── archive/                   ← Legacy root files (historical reference only)
-├── .htaccess                  ← Root traffic director (HTTPS, WP routing, SPA catch-all)
-├── index.php                  ← Thin passthrough
-└── .github/workflows/
-    └── deploy.yml             ← CI: build frontend → deploy dist/ + wp/wp-content/
+├── wp/                        ← WordPress installation at /wp/ subpath
+│   └── wp-content/
+│       ├── themes/
+│       │   ├── headless-base/     ← Active minimal headless theme (zero frontend output)
+│       │   └── drywall-toolbox/   ← Legacy theme (kept for reference)
+│       └── mu-plugins/
+│           ├── dtb-cors.php           ← CORS headers mu-plugin (auto-loaded)
+│           └── dtb-schematics-api.php ← Schematic image manifest REST endpoint
+├── scripts/                   ← Python utility scripts (catalog, image processing)
+├── docs/                      ← Architecture docs, strategy, research
+├── dist/                      ← CI build output (gitignored)
+├── .github/workflows/
+│   └── deploy.yml             ← CI: build → deploy via FTPS to HostGator
+├── .htaccess                  ← Root: HTTPS redirect, WP routing, SPA catch-all
+└── index.php                  ← Thin passthrough
 ```
 
 ---
@@ -87,13 +67,11 @@ Headless React storefront for Drywalltoolbox.com — powered by WordPress + WooC
 ### Setup
 
 ```bash
-# Install frontend dependencies
 cd frontend
 npm install
 ```
 
-Development env vars are pre-configured in `frontend/.env.development` (localhost defaults, no secrets).  
-For WooCommerce API credentials, create `frontend/.env.local` (gitignored):
+Dev env vars are pre-configured in `frontend/.env.development`. For WooCommerce API credentials, create `frontend/.env.local` (gitignored):
 
 ```
 # frontend/.env.local — never commit this file
@@ -106,79 +84,63 @@ REACT_APP_WC_AUTH_PASS=your_wp_application_password
 ```bash
 cd frontend
 
-# Start webpack dev server on http://localhost:5173
-npm run dev
+npm run dev             # Webpack dev server → http://localhost:5173
+npm run build           # Production build → ../dist/
+npm run lint            # ESLint src/
+npm run reviews-server  # Start mock reviews server (dev only)
 
-# Production build → outputs to ../dist/ (repo root)
-npm run build
-
-# Lint source files
-npm run lint
+ANALYZE=true npm run build  # Build with bundle analyzer
 ```
 
 ---
 
-## Deployment — HostGator / cPanel
+## Environment Variables
 
-### 🚀 READY TO DEPLOY?
-
-**→ [QUICK_START.md](./QUICK_START.md)** — 8-step flow to get live (2-3 hours)
-
-**→ [DEPLOY_NOW.md](./DEPLOY_NOW.md)** — Detailed guide with every step explained
-
-**Verification:**
-- **[HOSTGATOR_COMPLIANCE.md](./HOSTGATOR_COMPLIANCE.md)** — ✅ All official HostGator requirements met
-- **[FILE_MANAGER_GUIDE.md](./FILE_MANAGER_GUIDE.md)** — Before/after directory structure
-- **[DIRECTORY_CHECKLIST.md](./DIRECTORY_CHECKLIST.md)** — Quick verification checklist
-
-**Reference:**
-- **[WORDPRESS_IMPLEMENTATION.md](./docs/WORDPRESS_IMPLEMENTATION.md)** — WordPress /wp/ details
-- **[GITHUB_ACTIONS_SECRETS.md](./docs/GITHUB_ACTIONS_SECRETS.md)** — Auto-deployment setup
-- **[TROUBLESHOOTING_CHECKLIST.md](./docs/TROUBLESHOOTING_CHECKLIST.md)** — Debugging help
-- **[ARCHITECTURE_VISUAL_GUIDE.md](./docs/ARCHITECTURE_VISUAL_GUIDE.md)** — Architecture explained
-
-
-
----
-
-## API Architecture
-
-### Environment Variables (`REACT_APP_*`)
+All prefixed `REACT_APP_*`. Statically replaced at compile time by webpack `DefinePlugin`.
 
 | Variable | Description |
 |----------|-------------|
-| `REACT_APP_WP_API_BASE` | WordPress REST API base (e.g. `https://drywalltoolbox.com/wp/wp-json/wp/v2`) |
-| `REACT_APP_WC_API_BASE` | WooCommerce REST API base (e.g. `.../wp/wp-json/wc/v3`) |
+| `REACT_APP_WP_API_BASE` | WordPress REST API base URL |
+| `REACT_APP_WC_API_BASE` | WooCommerce REST API base URL |
 | `REACT_APP_JWT_ENDPOINT` | JWT token endpoint |
 | `REACT_APP_SITE_URL` | Site root URL |
 | `REACT_APP_WC_AUTH_USER` | WooCommerce Application Password username (**secret**) |
 | `REACT_APP_WC_AUTH_PASS` | WooCommerce Application Password (**secret**) |
+| `REACT_APP_STORE_LAUNCH_DATE` | Founding-member promo window date |
 
-Non-secret URL variables are in `frontend/.env.production` and `frontend/.env.development`.  
-Credentials (`REACT_APP_WC_AUTH_USER`, `REACT_APP_WC_AUTH_PASS`) live in GitHub Actions secrets only.
+Non-secret URLs live in `frontend/.env.production` / `frontend/.env.development`.  
+Credentials live in GitHub Actions secrets only — never committed.
 
-### API Clients (`frontend/src/api/`)
+---
+
+## API Layer (`frontend/src/api/`)
 
 | File | Description |
 |------|-------------|
-| `client.js` | Axios base clients: `wpClient` (JWT) and `wcClient` (App Password) |
+| `client.js` | Axios instances: `wpClient` (JWT Bearer) and `wcClient` (App Password Basic auth) |
 | `auth.js` | `login()`, `logout()`, `refreshToken()`, `getCurrentUser()` |
 | `products.js` | `getProducts()`, `getProductById()`, `getProductsByCategory()`, `searchProducts()` |
 | `cart.js` | WooCommerce Store API: `getCart()`, `addToCart()`, `updateCartItem()`, `removeCartItem()`, `clearCart()` |
-| `schematics.js` | `fetchSchematicMediaManifest()` — fetches WebP image manifest from WP Media Library |
+| `schematics.js` | `fetchSchematicMediaManifest()` — WebP image manifest from WP Media Library |
+| `orders.js` | Order history and detail |
+| `customers.js` | Customer profile management |
+| `rewards.js` | Rewards/points system |
+| `membership.js` | Pro membership tier |
+| `coupons.js` | Coupon validation |
+| `wordpress.js` | Generic WP REST API calls |
+
+On 401: both Axios clients call `clearToken()` and dispatch `window.dispatchEvent(new Event('auth:expired'))`.
 
 ---
 
 ## WordPress Setup
 
-WordPress lives in `/wp/` on the server (not at the domain root). Configuration:
+WordPress lives in `/wp/` on the server (not at the domain root).
 
 - `WP_HOME` = `https://drywalltoolbox.com`
 - `WP_SITEURL` = `https://drywalltoolbox.com/wp`
 
-See `wp/wp-config-sample.php` for the full configuration template.
-
-### Active Plugins Required
+### Required Plugins
 
 - WooCommerce
 - JWT Authentication for WP REST API (`jwt-authentication-for-wp-rest-api`)
@@ -187,55 +149,35 @@ See `wp/wp-config-sample.php` for the full configuration template.
 
 | File | Purpose |
 |------|---------|
-| `wp/wp-content/mu-plugins/dtb-cors.php` | CORS headers for all REST API responses |
-| `wp/wp-content/mu-plugins/dtb-schematics-api.php` | `GET /wp-json/dtb/v1/schematics/media` manifest endpoint |
-
-No activation needed — mu-plugins load automatically.
+| `dtb-cors.php` | CORS headers for all REST API responses (auto-loaded) |
+| `dtb-schematics-api.php` | `GET /wp-json/dtb/v1/schematics/media` manifest endpoint |
 
 ### Headless Theme
 
-`wp/wp-content/themes/headless-base/` — minimal headless theme with no frontend output.  
+`headless-base/` — minimal theme with zero frontend output.  
 REST API menu endpoint: `GET /wp-json/headless/v1/menus/<location>`
 
 ---
 
-## Schematic Images — WordPress Media Library Migration
+## Schematic Images — WordPress Media Library
 
-Schematic diagrams and preview images are managed in the **WordPress Media Library as WebP** rather than tracked as static files in the repository.
-
-### Why WebP + WP Media?
-
-- **Smaller files** — WebP is typically 25–35% smaller than equivalent PNG/JPG
-- **CDN-ready** — WP media URLs integrate cleanly with caching plugins and CDNs
-- **Admin-managed** — Images can be swapped in `wp-admin` without a code deploy
-- **Leaner git repo** — 57 MB of binary images removed from version control
-
-### Migration Steps
+Schematic diagrams are stored as WebP in the WordPress Media Library (not tracked in git).
 
 ```bash
-# 1. Convert existing PNG/JPG schematic images to WebP
+# 1. Convert PNG/JPG → WebP
 python scripts/convert_schematics_to_webp.py
 
-# 2. Set WP credentials (use Application Password from wp-admin → Profile)
+# 2. Upload to WP Media Library
 export WP_BASE_URL=https://drywalltoolbox.com/wp
 export WP_AUTH_USER=admin
 export WP_AUTH_PASS="xxxx xxxx xxxx xxxx xxxx xxxx"
-
-# 3. Dry-run first to see what would be uploaded
-python scripts/upload_schematics_to_wp.py --dry-run
-
-# 4. Upload all schematics to WP Media Library
 python scripts/upload_schematics_to_wp.py
 
-# 5. Verify the manifest endpoint returns all images
+# 3. Verify manifest endpoint
 curl https://drywalltoolbox.com/wp/wp-json/dtb/v1/schematics/media | python3 -m json.tool
-
-# 6. Once confirmed, delete original PNG/JPG from public/brands/*/Schematics/
-#    (schematic_data.json files remain — they contain parts metadata, not images)
 ```
 
-The React frontend uses `useSchematicMedia()` hook to fetch the manifest at runtime.  
-If WP is unavailable, it falls back to static PNG/JPG paths automatically.
+The `useSchematicMedia()` hook fetches the manifest at runtime and falls back to static PNG/JPG paths if WP is unavailable.
 
 ---
 
@@ -244,16 +186,8 @@ If WP is unavailable, it falls back to static PNG/JPG paths automatically.
 Workflow: `.github/workflows/deploy.yml`  
 Trigger: push to `main` when `frontend/**` or `wp/**` changes.
 
-**Build job:**
-1. `cd frontend && npm ci`
-2. `cd frontend && npm run build` → output to `dist/`
-3. Validate `dist/index.html` exists
-4. Prune `.map` files
-5. Upload `dist/` as workflow artifact
-
-**Deploy job:**
-1. Deploy `dist/` → `drywalltoolbox/dist/` via FTPS
-2. Deploy `wp/wp-content/` → `drywalltoolbox/wp/wp-content/` via FTPS
+**Steps:** `npm ci` → `npm run build` → validate `dist/index.html` → prune `.map` files → FTPS deploy  
+**Deploys:** `dist/` → `drywalltoolbox/dist/` and `wp/wp-content/` → `drywalltoolbox/wp/wp-content/`
 
 ### Required GitHub Secrets
 
@@ -269,42 +203,33 @@ Trigger: push to `main` when `frontend/**` or `wp/**` changes.
 | `REACT_APP_SITE_URL` | Production site URL |
 | `REACT_APP_WC_AUTH_USER` | WooCommerce Application Password username |
 | `REACT_APP_WC_AUTH_PASS` | WooCommerce Application Password |
-| `REACT_APP_WP_BASE_URL` | WordPress root URL (legacy compat) |
-| `REACT_APP_WC_BASE_URL` | WooCommerce REST API base (legacy compat) |
-| `REACT_APP_WOOCOMMERCE_STORE_URL` | WooCommerce store URL (legacy compat) |
-| `REACT_APP_WOOCOMMERCE_CONSUMER_KEY` | WooCommerce consumer key (legacy compat) |
-| `REACT_APP_WOOCOMMERCE_CONSUMER_SECRET` | WooCommerce consumer secret (legacy compat) |
 
 ---
 
-## Validation Checklist
+## Post-Deploy Verification
 
-After deploying to production, verify:
-
-- [ ] `https://drywalltoolbox.com` loads React app (`dist/index.html`)
+- [ ] `https://drywalltoolbox.com` loads React app
 - [ ] `https://drywalltoolbox.com/wp/wp-admin/` loads WordPress admin
-- [ ] `https://drywalltoolbox.com/wp/wp-json/` returns WP REST API index JSON
+- [ ] `https://drywalltoolbox.com/wp/wp-json/` returns WP REST API index
 - [ ] `https://drywalltoolbox.com/wp/wp-json/wc/v3/products` returns product data
 - [ ] `https://drywalltoolbox.com/wp/wp-json/jwt-auth/v1/token` accepts POST, returns token
-- [ ] `https://drywalltoolbox.com/wp/wp-json/dtb/v1/schematics/media` returns schematic image manifest
+- [ ] `https://drywalltoolbox.com/wp/wp-json/dtb/v1/schematics/media` returns schematic manifest
 - [ ] React Router client-side navigation works on all routes (no 404 on refresh)
 - [ ] CORS headers present on all `/wp/wp-json/` responses
-- [ ] OPTIONS preflight requests return 200 with correct headers
-- [ ] No `REACT_APP_*` secrets exposed in compiled JS bundle (verify in browser DevTools)
-- [ ] Schematic diagrams on Parts page load WebP images from WP Media Library
-- [ ] GitHub Actions deploy runs on push to `main`, builds cleanly, deploys to `dist/`
+- [ ] No `REACT_APP_*` secrets exposed in compiled JS bundle
+- [ ] Schematic diagrams load WebP images from WP Media Library
 
 ---
 
 ## Security
 
-- No credentials, passwords, or API keys committed to the repository.
-- `wp-config.php` is gitignored — configure manually in cPanel using `wp/wp-config-sample.php` as the template.
-- All secrets are GitHub Actions secrets only.
-- CORS restricted to `drywalltoolbox.com` and `localhost:5173` (dev).
-- Security headers set in `.htaccess` (X-Frame-Options, X-Content-Type-Options, etc.).
-- XML-RPC disabled in WordPress theme.
-- JWT tokens stored in `localStorage`, cleared on 401.
+- No credentials committed — all secrets via GitHub Actions secrets only
+- `wp-config.php` is gitignored — configure manually on server using `wp-config-sample.php`
+- JWT stored in **module-level variable only** (`tokenStore.js`) — never `localStorage` or `sessionStorage`
+- Token cleared immediately on any 401 response; `auth:expired` event dispatched globally
+- All HTML from WP REST API sanitized with DOMPurify before `dangerouslySetInnerHTML`
+- CORS restricted to `drywalltoolbox.com` and `localhost:5173` (dev)
+- Security headers set in `.htaccess` (X-Frame-Options, X-Content-Type-Options, etc.)
 
 ---
 
