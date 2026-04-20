@@ -337,12 +337,16 @@ function dtb_route_sync_images( WP_REST_Request $request ): WP_REST_Response|WP_
 	global $wpdb;
 	// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
 	$sku_rows = $wpdb->get_results(
-		"SELECT p.ID AS product_id, pm.meta_value AS sku
+		"SELECT CASE
+		          WHEN p.post_type = 'product_variation' AND p.post_parent > 0 THEN p.post_parent
+		          ELSE p.ID
+		        END AS product_id,
+		        pm.meta_value AS sku
 		 FROM {$wpdb->posts} p
 		 INNER JOIN {$wpdb->postmeta} pm
 		         ON pm.post_id  = p.ID
 		        AND pm.meta_key = '_sku'
-		 WHERE p.post_type   = 'product'
+		 WHERE p.post_type   IN ('product', 'product_variation')
 		   AND p.post_status != 'trash'
 		   AND pm.meta_value != ''
 		 ORDER BY p.ID ASC",
@@ -354,13 +358,25 @@ function dtb_route_sync_images( WP_REST_Request $request ): WP_REST_Response|WP_
 		$sku_map[ strtolower( trim( $row['sku'] ) ) ] = (int) $row['product_id'];
 	}
 
-	$total    = count( $sku_map );
-	$sku_keys = array_keys( $sku_map );
-	$batch    = ( $limit > 0 )
+	$extensions = [ 'webp', 'jpg', 'jpeg', 'png', 'avif', 'gif' ];
+	$total_skus = count( $sku_map );
+	$total      = $total_skus;
+	$batch_mode = 'sku';
+	$sku_keys   = array_keys( $sku_map );
+	$batch      = ( $limit > 0 )
 		? array_slice( $sku_keys, $offset, $limit )
 		: array_slice( $sku_keys, $offset );
 
-	$extensions = [ 'webp', 'jpg', 'jpeg', 'png', 'avif', 'gif' ];
+	// Fallback mode: if there are no product SKUs in the DB yet, still register
+	// images found on disk so WooCommerce import can resolve them by URL/GUID.
+	if ( 0 === $total_skus ) {
+		$batch_mode = 'file';
+		$disk_files = dtb_list_images_in_dir( $scan_dir, $extensions );
+		$total      = count( $disk_files );
+		$batch      = ( $limit > 0 )
+			? array_slice( $disk_files, $offset, $limit )
+			: array_slice( $disk_files, $offset );
+	}
 
 	$registered     = 0;
 	$linked         = 0;
@@ -369,7 +385,64 @@ function dtb_route_sync_images( WP_REST_Request $request ): WP_REST_Response|WP_
 	$gallery_images = 0;
 	$errors         = [];
 
-	foreach ( $batch as $sku_lower ) {
+	foreach ( $batch as $batch_item ) {
+		if ( 'file' === $batch_mode ) {
+			$file_path = (string) $batch_item;
+			$filename  = basename( $file_path );
+			$file_url  = trailingslashit( $scan_url ) . $filename;
+			$stem      = strtolower( pathinfo( $filename, PATHINFO_FILENAME ) );
+
+			// Map gallery/hash filename variants back to their base SKU stem.
+			// _NN = numeric gallery image suffix, _{hex} = hashed image suffix.
+			$file_suffix_pattern = '/^(.+?)(?:_\d{2}|_[0-9a-f]{6,16})$/';
+			$product_stem = $stem;
+			$suffix_matched = 1 === preg_match( $file_suffix_pattern, $stem, $m );
+			if ( $suffix_matched ) {
+				$product_stem = $m[1];
+			}
+
+			$product_id = dtb_find_product_by_sku_stem( $product_stem ) ?? 0;
+			$is_primary = ! $suffix_matched;
+
+			if ( $dry_run ) {
+				$exists = attachment_url_to_postid( $file_url );
+				$exists ? ++$skipped : ++$registered;
+				if ( $product_id > 0 && $is_primary ) {
+					++$linked;
+				}
+				continue;
+			}
+
+			$att_id = attachment_url_to_postid( $file_url );
+			if ( ! $att_id || $force ) {
+				$att_id = dtb_register_image_attachment( $file_path, $file_url, $product_id );
+				if ( is_wp_error( $att_id ) ) {
+					$errors[] = "[{$stem}] register: " . $att_id->get_error_message();
+					dtb_image_sync_log( "image_sync register error [{$stem}]: " . $att_id->get_error_message() );
+					continue;
+				}
+				++$registered;
+			} else {
+				if ( $product_id > 0 ) {
+					wp_update_post( [ 'ID' => (int) $att_id, 'post_parent' => $product_id ] );
+				}
+				++$skipped;
+			}
+
+			if ( $product_id > 0 && $is_primary ) {
+				$link_result = dtb_link_images_to_product( $product_id, (int) $att_id, [] );
+				if ( is_wp_error( $link_result ) ) {
+					$errors[] = "[{$stem}] link: " . $link_result->get_error_message();
+					dtb_image_sync_log( "image_sync link error [{$stem}]: " . $link_result->get_error_message() );
+				} else {
+					++$linked;
+				}
+			}
+
+			continue;
+		}
+
+		$sku_lower  = (string) $batch_item;
 		$product_id = $sku_map[ $sku_lower ];
 
 		// ── Probe for primary image: {sku}.{ext} ────────────────────────────
@@ -479,7 +552,7 @@ function dtb_route_sync_images( WP_REST_Request $request ): WP_REST_Response|WP_
 	return rest_ensure_response( [
 		'status'         => $dry_run ? 'dry_run' : 'completed',
 		'directory'      => "wp-content/uploads/$year/$month",
-		'total_skus'     => $total,
+		'total_skus'     => $total_skus,
 		'offset'         => $offset,
 		'limit'          => $limit,
 		'scanned'        => count( $batch ),
@@ -493,6 +566,7 @@ function dtb_route_sync_images( WP_REST_Request $request ): WP_REST_Response|WP_
 		'next_offset'    => ( $limit > 0 && ( $offset + $limit ) < $total )
 			? $offset + $limit
 			: null,
+		'file_based_sync' => ( 'file' === $batch_mode ),
 	] );
 }
 
