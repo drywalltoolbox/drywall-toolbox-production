@@ -384,8 +384,56 @@ function dtb_route_sync_images( WP_REST_Request $request ): WP_REST_Response|WP_
 	$no_file        = 0;
 	$gallery_images = 0;
 	$errors         = [];
+	$batch_total    = count( $batch );
+	$processed      = 0;
+	$last_item      = '';
+	$last_sku       = '';
+	$last_product   = 0;
+
+	$sync_progress_updater = static function () use (
+		&$last_item,
+		&$last_sku,
+		&$last_product,
+		&$processed,
+		&$registered,
+		&$linked,
+		&$skipped,
+		&$no_file,
+		&$gallery_images,
+		&$errors,
+		$batch_total,
+		$total,
+		$offset,
+		$limit,
+		$batch_mode,
+		$dry_run
+	): void {
+		set_transient( DTB_SYNC_PROGRESS_KEY, [
+			'last_item'      => $last_item,
+			'last_sku'       => $last_sku,
+			'last_product'   => $last_product,
+			'processed'      => $processed,
+			'batch_total'    => $batch_total,
+			'total'          => $total,
+			'offset'         => $offset,
+			'limit'          => $limit,
+			'batch_mode'     => $batch_mode,
+			'registered'     => $registered,
+			'linked'         => $linked,
+			'skipped'        => $skipped,
+			'no_file'        => $no_file,
+			'gallery_images' => $gallery_images,
+			'errors'         => count( $errors ),
+			'dry_run'        => $dry_run,
+			'updated_at'     => gmdate( 'c' ),
+		], DTB_SYNC_LOCK_TTL );
+	};
+
+	$sync_progress_updater();
 
 	foreach ( $batch as $batch_item ) {
+		++$processed;
+
 		if ( 'file' === $batch_mode ) {
 			$file_path = (string) $batch_item;
 			$filename  = basename( $file_path );
@@ -403,6 +451,9 @@ function dtb_route_sync_images( WP_REST_Request $request ): WP_REST_Response|WP_
 
 			$product_id = dtb_find_product_by_sku_stem( $product_stem ) ?? 0;
 			$is_primary = ! $suffix_matched;
+			$last_item  = $filename;
+			$last_sku   = $product_stem;
+			$last_product = $product_id;
 
 			if ( $dry_run ) {
 				$exists = attachment_url_to_postid( $file_url );
@@ -410,6 +461,7 @@ function dtb_route_sync_images( WP_REST_Request $request ): WP_REST_Response|WP_
 				if ( $product_id > 0 && $is_primary ) {
 					++$linked;
 				}
+				$sync_progress_updater();
 				continue;
 			}
 
@@ -419,6 +471,7 @@ function dtb_route_sync_images( WP_REST_Request $request ): WP_REST_Response|WP_
 				if ( is_wp_error( $att_id ) ) {
 					$errors[] = "[{$stem}] register: " . $att_id->get_error_message();
 					dtb_image_sync_log( "image_sync register error [{$stem}]: " . $att_id->get_error_message() );
+					$sync_progress_updater();
 					continue;
 				}
 				++$registered;
@@ -439,11 +492,15 @@ function dtb_route_sync_images( WP_REST_Request $request ): WP_REST_Response|WP_
 				}
 			}
 
+			$sync_progress_updater();
 			continue;
 		}
 
 		$sku_lower  = (string) $batch_item;
 		$product_id = $sku_map[ $sku_lower ];
+		$last_item  = $sku_lower;
+		$last_sku   = $sku_lower;
+		$last_product = $product_id;
 
 		// ── Probe for primary image: {sku}.{ext} ────────────────────────────
 		[ $primary_path, $primary_url ] = dtb_probe_image( $scan_dir, $scan_url, $sku_lower, $extensions );
@@ -474,6 +531,7 @@ function dtb_route_sync_images( WP_REST_Request $request ): WP_REST_Response|WP_
 
 		if ( ! $primary_path ) {
 			++$no_file;
+			$sync_progress_updater();
 			continue;
 		}
 
@@ -482,6 +540,7 @@ function dtb_route_sync_images( WP_REST_Request $request ): WP_REST_Response|WP_
 			$exists ? ++$skipped : ++$registered;
 			++$linked;
 			$gallery_images += count( $gallery_pairs );
+			$sync_progress_updater();
 			continue;
 		}
 
@@ -492,6 +551,7 @@ function dtb_route_sync_images( WP_REST_Request $request ): WP_REST_Response|WP_
 			if ( is_wp_error( $primary_att ) ) {
 				$errors[] = "[{$sku_lower}] primary: " . $primary_att->get_error_message();
 				dtb_image_sync_log( "image_sync primary error [{$sku_lower}]: " . $primary_att->get_error_message() );
+				$sync_progress_updater();
 				continue;
 			}
 			++$registered;
@@ -525,20 +585,12 @@ function dtb_route_sync_images( WP_REST_Request $request ): WP_REST_Response|WP_
 		if ( is_wp_error( $result ) ) {
 			$errors[] = "[{$sku_lower}] link: " . $result->get_error_message();
 			dtb_image_sync_log( "image_sync link error [{$sku_lower}]: " . $result->get_error_message() );
+			$sync_progress_updater();
 			continue;
 		}
 		++$linked;
 
-		// ── Update progress for resumable batches ────────────────────────────
-		set_transient( DTB_SYNC_PROGRESS_KEY, [
-			'last_sku'       => $sku_lower,
-			'last_product'   => $product_id,
-			'registered'     => $registered,
-			'linked'         => $linked,
-			'no_file'        => $no_file,
-			'errors'         => count( $errors ),
-			'updated_at'     => gmdate( 'c' ),
-		], DTB_SYNC_LOCK_TTL );
+		$sync_progress_updater();
 	}
 
 	// ── Bump WC product cache version so REST responses reflect new images ──
@@ -553,6 +605,7 @@ function dtb_route_sync_images( WP_REST_Request $request ): WP_REST_Response|WP_
 		'status'         => $dry_run ? 'dry_run' : 'completed',
 		'directory'      => "wp-content/uploads/$year/$month",
 		'total_skus'     => $total_skus,
+		'total'          => $total,
 		'offset'         => $offset,
 		'limit'          => $limit,
 		'scanned'        => count( $batch ),
@@ -1565,7 +1618,7 @@ function dtb_render_image_sync_admin_page(): void {
 
 		<div class="card" style="max-width:100%;margin:20px 0;padding:20px;">
 			<h2 style="margin-top:0;">⚙️ Run Image Sync</h2>
-			<form method="post" action="">
+			<form method="post" action="" id="dtb-image-sync-form">
 				<?php wp_nonce_field( 'dtb_image_sync_admin', 'dtb_image_sync_nonce' ); ?>
 				<table class="form-table" role="presentation">
 					<tr>
@@ -1627,6 +1680,14 @@ function dtb_render_image_sync_admin_page(): void {
 						style="margin-left:auto;">⚠️ Run Reset</button>
 				</p>
 			</form>
+
+			<div id="dtb-live-runner" class="notice notice-info" style="display:none;margin:14px 0 0;padding:12px;">
+				<p id="dtb-live-status" style="margin:0 0 8px;"><strong>Ready.</strong></p>
+				<div style="width:100%;max-width:760px;height:12px;background:#dcdcde;border-radius:8px;overflow:hidden;">
+					<div id="dtb-live-bar" style="width:0%;height:100%;background:#2271b1;transition:width .3s ease;"></div>
+				</div>
+				<pre id="dtb-live-log" style="white-space:pre-wrap;margin:10px 0 0;background:#f6f7f7;padding:10px;border-radius:4px;max-height:240px;overflow:auto;font-size:12px;"></pre>
+			</div>
 		</div>
 
 		<?php if ( null !== $result_data ) : ?>
@@ -1654,5 +1715,213 @@ function dtb_render_image_sync_admin_page(): void {
 			</ol>
 		</div>
 	</div>
+	<?php
+	$ns                = defined( 'DTB_API_NAMESPACE' ) ? DTB_API_NAMESPACE : 'dtb/v1';
+	$rest_sync_url     = rest_url( $ns . '/sync-images' );
+	$rest_fix_url      = rest_url( $ns . '/sync-images/fix-renamed' );
+	$rest_progress_url = rest_url( $ns . '/sync-images/progress' );
+	?>
+	<script>
+	( function () {
+		const form = document.getElementById( 'dtb-image-sync-form' );
+		const runner = document.getElementById( 'dtb-live-runner' );
+		const statusEl = document.getElementById( 'dtb-live-status' );
+		const barEl = document.getElementById( 'dtb-live-bar' );
+		const logEl = document.getElementById( 'dtb-live-log' );
+		if ( ! form || ! runner || ! statusEl || ! barEl || ! logEl ) {
+			return;
+		}
+
+		const api = {
+			sync: <?php echo wp_json_encode( esc_url_raw( $rest_sync_url ) ); ?>,
+			fix: <?php echo wp_json_encode( esc_url_raw( $rest_fix_url ) ); ?>,
+			progress: <?php echo wp_json_encode( esc_url_raw( $rest_progress_url ) ); ?>,
+			nonce: <?php echo wp_json_encode( wp_create_nonce( 'wp_rest' ) ); ?>
+		};
+
+		const MAX_BATCHES = 1000;
+
+		let submittedAction = '';
+		let pollTimer = null;
+		let pollBusy = false;
+
+		const parseBool = ( value ) => {
+			const v = typeof value === 'string' ? value.toLowerCase() : value;
+			return v === '1' || v === 'true' || v === true;
+		};
+		const parseIntOrDefault = ( value, fallback ) => {
+			const parsed = Number.parseInt( String( value ?? '' ), 10 );
+			return Number.isNaN( parsed ) ? fallback : parsed;
+		};
+		const setStatus = ( text, isError = false ) => {
+			statusEl.textContent = text;
+			statusEl.style.color = isError ? '#b32d2e' : '#1d2327';
+		};
+		const setBar = ( ratio ) => {
+			const pct = Math.max( 0, Math.min( 100, Math.round( ratio * 100 ) ) );
+			barEl.style.width = pct + '%';
+		};
+		const appendLog = ( text ) => {
+			logEl.textContent += ( logEl.textContent ? '\n' : '' ) + text;
+			logEl.scrollTop = logEl.scrollHeight;
+		};
+		const readProgress = async () => {
+			if ( pollBusy ) {
+				return;
+			}
+			pollBusy = true;
+			try {
+				const res = await fetch( api.progress, {
+					method: 'GET',
+					credentials: 'same-origin',
+					headers: { 'X-WP-Nonce': api.nonce }
+				} );
+				if ( ! res.ok ) {
+					return;
+				}
+				const payload = await res.json();
+				const p = payload && payload.progress ? payload.progress : null;
+				if ( ! p ) {
+					return;
+				}
+				const processed = parseIntOrDefault( p.processed, 0 );
+				const batchTotal = parseIntOrDefault( p.batch_total, 0 );
+				const pct = batchTotal > 0 ? processed / batchTotal : 0;
+				const label = p.last_item || p.last_sku || 'working';
+				setBar( pct );
+				setStatus( `Running… ${processed}/${batchTotal > 0 ? batchTotal : '?'} (${Math.round( pct * 100 )}%) · ${label}` );
+			} catch ( err ) {
+				// Ignore transient polling errors while request is active.
+			} finally {
+				pollBusy = false;
+			}
+		};
+		const startPolling = () => {
+			if ( pollTimer ) {
+				return;
+			}
+			pollTimer = window.setInterval( readProgress, 1500 );
+			void readProgress();
+		};
+		const stopPolling = () => {
+			if ( pollTimer ) {
+				window.clearInterval( pollTimer );
+				pollTimer = null;
+			}
+		};
+		const postJson = async ( url, body ) => {
+			const res = await fetch( url, {
+				method: 'POST',
+				credentials: 'same-origin',
+				headers: {
+					'Content-Type': 'application/json',
+					'X-WP-Nonce': api.nonce
+				},
+				body: JSON.stringify( body )
+			} );
+			const data = await res.json().catch( () => null );
+			if ( ! res.ok ) {
+				const message = ( data && data.message ) ? data.message : `Request failed (${res.status})`;
+				throw new Error( message );
+			}
+			return data;
+		};
+		const setButtonsDisabled = ( disabled ) => {
+			form.querySelectorAll( 'button[type="submit"]' ).forEach( ( button ) => {
+				button.disabled = disabled;
+			} );
+		};
+
+		form.addEventListener( 'click', ( event ) => {
+			const button = event.target.closest( 'button[name="dtb_image_sync_action"]' );
+			if ( button ) {
+				submittedAction = button.value || '';
+			}
+		} );
+
+		form.addEventListener( 'submit', async ( event ) => {
+			if ( submittedAction !== 'sync' && submittedAction !== 'pipeline' ) {
+				return;
+			}
+			event.preventDefault();
+
+			const formData = new FormData( form );
+			const year = String( formData.get( 'dtb_year' ) || '' );
+			const month = String( formData.get( 'dtb_month' ) || '' );
+			const limit = Math.max( 1, parseIntOrDefault( formData.get( 'dtb_limit' ), 100 ) );
+			const dryRun = parseBool( formData.get( 'dtb_dry_run' ) );
+			const force = parseBool( formData.get( 'dtb_force' ) );
+			let currentOffset = Math.max( 0, parseIntOrDefault( formData.get( 'dtb_offset' ), 0 ) );
+			const startOffset = currentOffset;
+
+			setButtonsDisabled( true );
+			runner.style.display = 'block';
+			logEl.textContent = '';
+			setBar( 0 );
+			setStatus( 'Starting…' );
+			appendLog( `Starting ${submittedAction} for ${year}/${month} (limit ${limit}, offset ${currentOffset})` );
+
+			try {
+				if ( submittedAction === 'pipeline' ) {
+					setStatus( 'Running Fix Renamed…' );
+					const fixResult = await postJson( api.fix, {
+						year: year,
+						month: month,
+						dry_run: dryRun
+					} );
+					appendLog( `Fix Renamed complete · renamed ${parseIntOrDefault( fixResult.renamed, 0 )}` );
+				}
+
+				let batchCount = 0;
+				while ( true ) {
+					batchCount += 1;
+					if ( batchCount > MAX_BATCHES ) {
+						throw new Error( 'Maximum batch limit exceeded.' );
+					}
+					setStatus( `Running sync batch ${batchCount}…` );
+					startPolling();
+					const batch = await postJson( api.sync, {
+						year: year,
+						month: month,
+						dry_run: dryRun,
+						force: force,
+						limit: limit,
+						offset: currentOffset
+					} );
+					stopPolling();
+
+					const scanned = parseIntOrDefault( batch.scanned, 0 );
+					const total = Math.max( scanned, parseIntOrDefault( batch.total, 0 ) );
+					const completed = Math.min( total, Math.max( 0, currentOffset - startOffset + scanned ) );
+					const pct = total > 0 ? completed / total : 1;
+					setBar( pct );
+					appendLog(
+						`Batch ${batchCount} done · scanned ${scanned}, registered ${parseIntOrDefault( batch.registered, 0 )}, linked ${parseIntOrDefault( batch.linked, 0 )}, errors ${Array.isArray( batch.errors ) ? batch.errors.length : 0}`
+					);
+
+					if ( batch.next_offset === null || typeof batch.next_offset === 'undefined' ) {
+						appendLog( 'Run complete.' );
+						setStatus( 'Completed successfully.' );
+						setBar( 1 );
+						break;
+					}
+
+					const nextOffset = Math.max( 0, parseIntOrDefault( batch.next_offset, currentOffset + scanned ) );
+					if ( nextOffset < currentOffset ) {
+						throw new Error( 'Sync returned a non-advancing next offset.' );
+					}
+					currentOffset = nextOffset;
+					appendLog( `Continuing to next batch at offset ${currentOffset}…` );
+				}
+			} catch ( err ) {
+				stopPolling();
+				setStatus( err && err.message ? err.message : 'Run failed.', true );
+				appendLog( `Error: ${err && err.message ? err.message : 'Run failed.'}` );
+			} finally {
+				setButtonsDisabled( false );
+			}
+		} );
+	} )();
+	</script>
 	<?php
 }
