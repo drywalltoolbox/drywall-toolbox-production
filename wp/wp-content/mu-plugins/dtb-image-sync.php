@@ -60,6 +60,15 @@ define( 'DTB_SYNC_PROGRESS_KEY', 'dtb_image_sync_progress' );
 /** Lock TTL in seconds — auto-expires to prevent a dead lock on crashes. */
 define( 'DTB_SYNC_LOCK_TTL', 600 );
 
+/**
+ * When true, skip the "fix renamed files" workflow entirely.
+ *
+ * Set this to true when your image files are already correctly named and
+ * you do not want the plugin to attempt renaming files on disk. To re-enable
+ * the behavior, set this to false or remove the define and reload.
+ */
+define( 'DTB_IMAGE_SYNC_DISABLE_RENAME', true );
+
 // ============================================================================
 // ROUTE REGISTRATION
 // ============================================================================
@@ -933,6 +942,19 @@ function dtb_route_reset_images( WP_REST_Request $request ): WP_REST_Response|WP
 		return new WP_Error( 'invalid_params', 'year and month must be numeric.', [ 'status' => 400 ] );
 	}
 
+	// Early-exit when renaming is globally disabled via constant.
+	if ( defined( 'DTB_IMAGE_SYNC_DISABLE_RENAME' ) && DTB_IMAGE_SYNC_DISABLE_RENAME ) {
+		return rest_ensure_response( [
+			'status'    => 'disabled',
+			'directory' => "wp-content/uploads/$year/$month",
+			'dry_run'   => $dry_run,
+			'renamed'   => 0,
+			'skipped'   => 0,
+			'preview'   => [],
+			'errors'    => [],
+		] );
+	}
+
 	global $wpdb;
 	$relative_prefix = $wpdb->esc_like( "$year/$month/" );
 
@@ -1640,13 +1662,18 @@ function dtb_render_image_sync_admin_page(): void {
 
 		} elseif ( 'pipeline' === $action ) {
 			// Phase 1 — fix any WP-renamed files (idempotent, non-destructive).
-			$fix_request = new WP_REST_Request();
-			$fix_request->set_param( 'year',    $year );
-			$fix_request->set_param( 'month',   $month );
-			$fix_request->set_param( 'dry_run', $dry_run );
-			$fix_result = dtb_route_fix_renamed_files( $fix_request );
+			// Can be disabled by setting DTB_IMAGE_SYNC_DISABLE_RENAME = true.
+			if ( ! ( defined( 'DTB_IMAGE_SYNC_DISABLE_RENAME' ) && DTB_IMAGE_SYNC_DISABLE_RENAME ) ) {
+				$fix_request = new WP_REST_Request();
+				$fix_request->set_param( 'year',    $year );
+				$fix_request->set_param( 'month',   $month );
+				$fix_request->set_param( 'dry_run', $dry_run );
+				$fix_result = dtb_route_fix_renamed_files( $fix_request );
 
-			$fix_data = is_wp_error( $fix_result ) ? [] : (array) $fix_result->get_data();
+				$fix_data = is_wp_error( $fix_result ) ? [] : (array) $fix_result->get_data();
+			} else {
+				$fix_data = [ 'renamed' => 0, 'errors' => [], 'disabled' => true ];
+			}
 
 			// Phase 2 — sync this batch.
 			$sync_request = new WP_REST_Request();
