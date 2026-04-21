@@ -1,0 +1,530 @@
+Import complete! 473 products imported. 131 variations imported. 528 products were skipped. View import log. File uploaded: product-wp-catalog-1elrymeeyv.csv
+Product	Reason for failure
+Asgard Angle Box w/ Handle (8" w/ Extendable Handle) (4I-SJ80-1WRW), SKU 4I-SJ80-1WRW	A product with this SKU already exists.
+Asgard Angle Box w/ Handle (8" w/ Fixed Handle) (4K-S6F6-8HQ6), SKU 4K-S6F6-8HQ6	A product with this SKU already exists.
+Asgard Starter Set (HU-OI6G-88Y4), SKU HU-OI6G-88Y4	A product with this SKU already exists.
+Columbia 3" Widetrack Direct Corner Flusher, SKU 3WTDF	A product with this SKU already exists.
+Columbia Angle Head Ball Holder Release Clip, SKU AH6A	A product with this SKU already exists.
+Columbia Angle Head Retainer Clip, SKU AH8	A product with this SKU already exists.
+Columbia Angle Head Retainer Clip, SKU AH9	A product with this SKU already exists.
+Columbia Anglehead Adaptor, SKU AHA	A product with this SKU already exists.
+Columbia Box Filler, SKU BF	A product with this SKU already exists.
+Columbia Box Handle Hinge Pin (180 Grip), SKU BH06	A product with this SKU already exists.
+Columbia Box Handle Cam Follower, SKU BH07	A product with this SKU already exists.
+Columbia Lower Brake Lever, SKU BH4	A product with this SKU already exists.
+Columbia 4' Extendable One Handle, SKU C1H	A product with this SKU already exists.
+Columbia 3'-5' Extendable One Handle, SKU C1HEXT	A product with this SKU already exists.
+Columbia Outside Bullnose Corner Roller, SKU CBNCR	A product with this SKU already exists.
+Columbia Corner Cobra Adjustable Roller, SKU CC	A product with this SKU already exists.
+Columbia External 90 Mud Applicator, SKU CEXT90	A product with this SKU already exists.
+Columbia Mud Supply Valve Unit, SKU CFB6	A product with this SKU already exists.
+Columbia Handle Mount Casting, SKU CFB8	A product with this SKU already exists.
+Columbia Flat Applicator, SKU CFLT	A product with this SKU already exists.
+Columbia 4-8' Long Extendible Handle, SKU CHXL	A product with this SKU already exists.
+Columbia Compound Tube Box Filler, SKU CLTBF	A product with this SKU already exists.
+Columbia Tomalock, SKU CLTHA	A product with this SKU already exists.
+Columbia 18" Closet Monster Flat Box Handle, SKU CMH	A product with this SKU already exists.
+Compound Tubes, SKU CMT	A product with this SKU already exists.
+Columbia Outside Corner Roller, SKU COBCR	A product with this SKU already exists.
+Columbia Wide Outside Corner Roller, SKU COBCRW	A product with this SKU already exists.
+Columbia Inside Corner Roller, SKU CR	A product with this SKU already exists.
+Columbia Handle Mounting Swivel, SKU CR6	A product with this SKU already exists.
+Columbia Sander Head, SKU CS	A product with this SKU already exists.
+Columbia Taper Head Casting, SKU CT1	A product with this SKU already exists.
+Columbia Taper Bearing Shaft, SKU CT106	A product with this SKU already exists.
+Columbia Taper Piston Body, SKU CT107	A product with this SKU already exists.
+Columbia Taper Cable Retaining Nut, SKU CT109	A product with this SKU already exists.
+Columbia Taper Mud Guard Plate, SKU CT11	A product with this SKU already exists.
+Columbia Taper Connecting Stud, SKU CT112	A product with this SKU already exists.
+Columbia Taper Gasket New Style End Ring, SKU CT115A	A product with this SKU already exists.
+Columbia Taper Tape Advance Release Bracket, SKU CT12	A product with this SKU already exists.
+Columbia Taper Extension Shaft Bracket, SKU CT127	A product with this SKU already exists.
+Columbia Taper Shaft Guide Roller Bushing, SKU CT128A	A product with this SKU already exists.
+Columbia Taper Separation Plate, SKU CT17	A product with this SKU already exists.
+Columbia Taper Insert Bushing, SKU CT2	A product with this SKU already exists.
+Columbia Taper Hinge Block, SKU CT20	A product with this SKU already exists.
+Columbia Taper Brass Bracket, SKU CT22	A product with this SKU already exists.
+Columbia Taper Reinforcing Rod, SKU CT23	A product with this SKU already exists.
+Columbia Taper Knife Guide Right Bracket, SKU CT26	A product with this SKU already exists.
+Columbia Taper Knife Guide Left Bracket, SKU CT27	A product with this SKU already exists.
+Columbia Taper Nylatron Chain Roller (Left), SKU CT29A	A product with this SKU already exists.
+Columbia Taper Chain Tension & Guide Bracket, SKU CT31	A product with this SKU already exists.
+Columbia Taper Cap Reinforcing Tab, SKU CT35	A product with this SKU already exists.
+Columbia Taper Return Spring Tube, SKU CT36	A product with this SKU already exists.
+Columbia Taper Tube Holding Bracket Upper, SKU CT37	A product with this SKU already exists.
+Columbia Taper Tube Holding Bracket Lower, SKU CT38	A product with this SKU already exists.
+Columbia Taper Crimping Arm Left, SKU CT48	A product with this SKU already exists.
+Columbia Taper Right Wafer Bushing, SKU CT5	A product with this SKU already exists.
+Columbia Taper Crimping Wheel Bushing, SKU CT50	A product with this SKU already exists.
+Columbia Taper Spacer Bar, SKU CT51	A product with this SKU already exists.
+Columbia Taper Tape Advance Carriage, SKU CT57	A product with this SKU already exists.
+Columbia Taper Guide Rod Bushing, SKU CT58	A product with this SKU already exists.
+Columbia Taper Needle Return Shaft, SKU CT64	A product with this SKU already exists.
+Columbia Taper Needle Return Spring, SKU CT65	A product with this SKU already exists.
+Columbia Taper Hub, SKU CT68	A product with this SKU already exists.
+Columbia Taper Side Plate Support Left, SKU CT7	A product with this SKU already exists.
+Columbia Taper Drive Sprocket Small, SKU CT71	A product with this SKU already exists.
+Columbia Taper Drive Chain, SKU CT78	A product with this SKU already exists.
+Columbia Taper Side Plate Support Right, SKU CT8	A product with this SKU already exists.
+Columbia Taper Clutch Return Spring, SKU CT81	A product with this SKU already exists.
+Columbia Taper Clutch Release Shaft, SKU CT85	A product with this SKU already exists.
+Columbia Taper Release Clip, SKU CT92	A product with this SKU already exists.
+Columbia Taper Mud Shut Off Upper Plate, SKU CT94	A product with this SKU already exists.
+Columbia Taper Control Valve, SKU CT95	A product with this SKU already exists.
+Columbia Taper Mud Shut Off Gasket, SKU CT96	A product with this SKU already exists.
+Columbia Taper Mud Supply Valve Body, SKU CT97	A product with this SKU already exists.
+Columbia 6-32 X 5/8" Hex Bolt, SKU FA247	A product with this SKU already exists.
+Columbia #8 Flat Washer, SKU FA253	A product with this SKU already exists.
+Columbia #8 Belleville Washer, SKU FA278	A product with this SKU already exists.
+Columbia #10 Belleville Washer, SKU FA280	A product with this SKU already exists.
+Columbia Mud Pump (Top Disconnect), SKU HMP	A product with this SKU already exists.
+Columbia Two Way Internal Corner Applicator, SKU ICATW	A product with this SKU already exists.
+Columbia Matrix Extendable Flat Box Handle, SKU MH	A product with this SKU already exists.
+Columbia Matrix 29-39" Extendable Flat Box Handle, SKU MHS	A product with this SKU already exists.
+Columbia Outside 90 Mud Head, SKU OA90	A product with this SKU already exists.
+Columbia Phantom Dustless Drywall Sander, SKU PDDM	A product with this SKU already exists.
+Columbia Predator Carbon Fiber Automatic Taper, SKU PTAPER	A product with this SKU already exists.
+Columbia Predator Tactical Set, SKU PTS	A product with this SKU already exists.
+Columbia Semi Automatic Taper, SKU SAT	A product with this SKU already exists.
+Columbia 32" Sabre Smoothing Blade, SKU SSB32	A product with this SKU already exists.
+Columbia Sawed Off Mini Automatic Taper, SKU STAPER	A product with this SKU already exists.
+Columbia Automatic Taper, SKU TAPER	A product with this SKU already exists.
+Columbia Tall Boy Mud Pump, SKU TBMP	A product with this SKU already exists.
+Columbia Tomahawk Warrior Set, SKU TWS	A product with this SKU already exists.
+SurPro 20-30" Magnesium Double Sided Stilt (SURS2M2030), SKU SURS2M2030	A product with this SKU already exists.
+SurPro Stilt Hardware Kit (SURSS1001), SKU SURSS1001	A product with this SKU already exists.
+SurPro Single Sided Stilts Strap Kit (SURSS1002B), SKU SURSS1002B	A product with this SKU already exists.
+SurPro Super Grip Floor Plate Kit (SURSS1003), SKU SURSS1003	A product with this SKU already exists.
+SurPro Main Body Spring Kit (SURSS1004O), SKU SURSS1004O	A product with this SKU already exists.
+SurPro Wraparound Leg Band Kit w/ Black Strap (SURSS1005FB), SKU SURSS1005FB	A product with this SKU already exists.
+SurPro Plastic Leg Band Kit for Single Sided Stilts (SURSS1005P), SKU SURSS1005P	A product with this SKU already exists.
+SurPro Key & Lock Side Pole Clamp & Bracket Kit (SURSS1006), SKU SURSS1006	A product with this SKU already exists.
+SurPro Nylon Sleeve Kit (SURSS1007), SKU SURSS1007	A product with this SKU already exists.
+SurPro Wing Bolt Kit (SURSS1008), SKU SURSS1008	A product with this SKU already exists.
+SurPro Heel Bracket Kit (SURSS1009), SKU SURSS1009	A product with this SKU already exists.
+SurPro Double Sided Stilts Leg Band Kit (SURSS1010L), SKU SURSS1010L	A product with this SKU already exists.
+SurPro Double Sided Right Leg Band Kit (SURSS1010R), SKU SURSS1010R	A product with this SKU already exists.
+SurPro Stilts Strap Kit w/ Black Laces (SURSS1011B), SKU SURSS1011B	A product with this SKU already exists.
+SurPro Foot Plate Kit (SURSS1012), SKU SURSS1012	A product with this SKU already exists.
+SurPro Stilts Lower Side Pole Bolt Kit (SURSS124), SKU SURSS124	A product with this SKU already exists.
+SurPro Stilts Side Pole Clam Bolt Kit (SURSS132), SKU SURSS132	A product with this SKU already exists.
+SurPro Stilts Leg Band Bolt Kit (SURSS134), SKU SURSS134	A product with this SKU already exists.
+SurPro Floor Plate w/ Super Grip Soles Kit (SURSS2007), SKU SURSS2007	A product with this SKU already exists.
+Cable Assembly, SKU 101249	A product with this SKU already exists.
+CFS Replacement Tire, SKU 122267	A product with this SKU already exists.
+E-Clip, #25, SKU 129061	A product with this SKU already exists.
+Cap, SKU 130001	A product with this SKU already exists.
+Outlet, SKU 130002	A product with this SKU already exists.
+Wiper, MudTube, SKU 139008	A product with this SKU already exists.
+Screw, 4-40 x 1-1/4 SHCS, SKU 139010	A product with this SKU already exists.
+Main Tube, SKU 140002C	A product with this SKU already exists.
+Tube Cap, SKU 140003	A product with this SKU already exists.
+Tube Adapter, SKU 140004	A product with this SKU already exists.
+End Plug, SKU 140005	A product with this SKU already exists.
+Pushrod, SKU 140006	A product with this SKU already exists.
+Needle Plug, SKU 140007	A product with this SKU already exists.
+Needle Pullrod, SKU 140008	A product with this SKU already exists.
+Control Tube(Tapetech), SKU 140009G	A product with this SKU already exists.
+Ball Outlet, SKU 140010	A product with this SKU already exists.
+Wiper Slide, SKU 140012	A product with this SKU already exists.
+Control Bushing, SKU 140013	A product with this SKU already exists.
+Control Tube Cap, SKU 140014	A product with this SKU already exists.
+Connector, SKU 140015	A product with this SKU already exists.
+Pushrod Cap, SKU 140017	A product with this SKU already exists.
+Spring, SKU 140018	A product with this SKU already exists.
+Main Tube Cap, SKU 140019	A product with this SKU already exists.
+Lock Block, SKU 140038	A product with this SKU already exists.
+Rotary Draw Latch, SKU 140039	A product with this SKU already exists.
+Tube, SKU 142001	A product with this SKU already exists.
+Piston, SKU 142016	A product with this SKU already exists.
+144001 Mudrunner *UPDATED* Plastic Tube Complete Assy, SKU 144001	A product with this SKU already exists.
+Band Assembly, SKU 145011	A product with this SKU already exists.
+Round Lip U-Cup, SKU 149021	A product with this SKU already exists.
+Round Lip U-Cup, SKU 149022	A product with this SKU already exists.
+Round Lip U-Cup, SKU 149023	A product with this SKU already exists.
+8-32 X 9/16 Torx Button Head Sst, SKU 149025	A product with this SKU already exists.
+#6 Nylon Bushing, SKU 149028	A product with this SKU already exists.
+O-Ring, Buna, -231, SKU 149032	A product with this SKU already exists.
+Washer, Nylon, SKU 149034	A product with this SKU already exists.
+Rod Wiper, SKU 149035	A product with this SKU already exists.
+Coupling, SKU 150003F	A product with this SKU already exists.
+Swivel Axle, SKU 150009	A product with this SKU already exists.
+Outer Roller Assembly, SKU 151005	A product with this SKU already exists.
+Stud, Corner Roller, SKU 152006	A product with this SKU already exists.
+Spacer, SKU 152025	A product with this SKU already exists.
+Swivel Ass'Y, SKU 154007	A product with this SKU already exists.
+Head, Corner Roller - no logo, SKU 156001F	A product with this SKU already exists.
+Nylon Washer, SKU 159023	A product with this SKU already exists.
+Long Nut, SKU 159026	A product with this SKU already exists.
+Washer, #8, No 807, SST, SKU 159027	A product with this SKU already exists.
+TapeTech CFS Replacement Hopper Filter, SKU 16C298	A product with this SKU already exists.
+Block, SKU 190002	A product with this SKU already exists.
+Adjuster, SKU 190033	A product with this SKU already exists.
+Coupler, SKU 190034	A product with this SKU already exists.
+Pin, SKU 190036	A product with this SKU already exists.
+Lever, SKU 191001	A product with this SKU already exists.
+Pin, SKU 191006	A product with this SKU already exists.
+Rod, SKU 191007	A product with this SKU already exists.
+Hinge Casting, No-Logo, SKU 196003	A product with this SKU already exists.
+8-32 X 3/8 Set Screw Fl. Point Hex. Soc., SKU 199010	A product with this SKU already exists.
+Shim, SKU 200009	A product with this SKU already exists.
+7" Wiper, SKU 200026F	A product with this SKU already exists.
+Shoulder Screw, SKU 200052F	A product with this SKU already exists.
+Spring Anchor, SKU 202020	A product with this SKU already exists.
+Nut, Special, SKU 202021	A product with this SKU already exists.
+Threaded Washer, SKU 202028	A product with this SKU already exists.
+Shoulder Screw, SKU 202036	A product with this SKU already exists.
+7 and 10 Inch Crown Spring, SKU 203010	A product with this SKU already exists.
+Blade Holder Assy., SKU 204002	A product with this SKU already exists.
+Blade Clamp Assy., SKU 204005	A product with this SKU already exists.
+Dial Assy., SKU 206003	A product with this SKU already exists.
+7" Pressure Plate, SKU 206027G	A product with this SKU already exists.
+Skid Cover, SKU 209006	A product with this SKU already exists.
+Screw 4-40 X 1/4 Fillister Head 18-8 S.S, SKU 209012	A product with this SKU already exists.
+Spring Clip, SKU 209041	A product with this SKU already exists.
+Washer, SKU 209046	A product with this SKU already exists.
+Bearing Nyliner, SKU 209047	A product with this SKU already exists.
+Screw, 4-40 X 1/8 Bind. Hd. S.S., SKU 209048	A product with this SKU already exists.
+Screw 6-32 X 5/16 Bind. Hd. S.S., SKU 209049	A product with this SKU already exists.
+6-32 Brass Nut, SKU 209058	A product with this SKU already exists.
+Screw, 6-32 x 1/2 Flat Hd, SKU 209755	A product with this SKU already exists.
+7" Wiper, SKU 210024F	A product with this SKU already exists.
+Latch, SKU 210058F	A product with this SKU already exists.
+Shoulder Screw, SKU 210059	A product with this SKU already exists.
+Pivot Bearing, SKU 210060	A product with this SKU already exists.
+Spacer Rod, SKU 210071	A product with this SKU already exists.
+Seal, 7", SKU 210096	A product with this SKU already exists.
+Arm (Power Assist), SKU 212081	A product with this SKU already exists.
+Bushing (Power Assist), SKU 212082	A product with this SKU already exists.
+Flange, Left (Power Assist), SKU 212084	A product with this SKU already exists.
+Flange, Right (Power Assist), SKU 212085	A product with this SKU already exists.
+Hook (Power Assist), SKU 212086	A product with this SKU already exists.
+Lock (Power Assist), SKU 212087	A product with this SKU already exists.
+Spacer (Power Assist), SKU 212089	A product with this SKU already exists.
+Spring (Power Assist), SKU 212090	A product with this SKU already exists.
+Cog (Power Assist), SKU 213083	A product with this SKU already exists.
+Screw, 6-32 X 5/8 Binder hd 18-8 SS, SKU 219080	A product with this SKU already exists.
+Screw - 6-32 X 7/16 Flat Head S.S., SKU 219081	A product with this SKU already exists.
+Spring, SKU 219091	A product with this SKU already exists.
+Washer, SKU 219095	A product with this SKU already exists.
+TapeTech CFS Z-Swivel Attachment, SKU 24D166	A product with this SKU already exists.
+Shim, SKU 250009	A product with this SKU already exists.
+10" Wiper, SKU 250026F	A product with this SKU already exists.
+Side Plate, Universal, SKU 251023G	A product with this SKU already exists.
+Side Plate, TT, SKU 251025G	A product with this SKU already exists.
+Extruded Radius Plate, 10", SKU 251032G	A product with this SKU already exists.
+Blade Holder Assy., SKU 254002	A product with this SKU already exists.
+Clamp Assy., SKU 254005	A product with this SKU already exists.
+10" Pressure Plate, SKU 256027G	A product with this SKU already exists.
+CFS 1/2" x 50' NPT Hose, SKU 257133	A product with this SKU already exists.
+10" Wiper, SKU 260024F	A product with this SKU already exists.
+10" Bottom Plate, SKU 260031G	A product with this SKU already exists.
+10" Spacer Rod, SKU 260071	A product with this SKU already exists.
+Seal, 10", SKU 260096	A product with this SKU already exists.
+Seal Plate, 10", SKU 260097	A product with this SKU already exists.
+10" Pressure Plate, SKU 280027G	A product with this SKU already exists.
+Shim, SKU 300009	A product with this SKU already exists.
+12" Wiper, SKU 300026F	A product with this SKU already exists.
+Extruded Radius Plate, 12", SKU 301032G	A product with this SKU already exists.
+12 Inch Crown Spring, SKU 303010	A product with this SKU already exists.
+Blade Holder Assy., SKU 304002	A product with this SKU already exists.
+Clamp Assy., SKU 304005	A product with this SKU already exists.
+Axle, 12" Standard, EasyRoll Wheels, SKU 305045G	A product with this SKU already exists.
+12" Pressure Plate, SKU 306027G	A product with this SKU already exists.
+12" Wiper, SKU 310024F	A product with this SKU already exists.
+12" Spacer Rod, SKU 310071	A product with this SKU already exists.
+Seal, 12", SKU 310096	A product with this SKU already exists.
+Seal Plate, 12", SKU 310097	A product with this SKU already exists.
+12" Pressure Plate, SKU 330027G	A product with this SKU already exists.
+12" Bottom Plate (Tapetech), SKU 330031G	A product with this SKU already exists.
+TapeTech Piston Assembly Kit 335, SKU 335	A product with this SKU already exists.
+15" Wiper, SKU 340026	A product with this SKU already exists.
+Axle, 15" Standard, EasyRoll Wheels, SKU 345045G	A product with this SKU already exists.
+Wiper, 8" Applicator, SKU 350008	A product with this SKU already exists.
+Seal Block, SKU 350033F	A product with this SKU already exists.
+Pressure Plate, SKU 350034	A product with this SKU already exists.
+Valve Holder, SKU 352002F	A product with this SKU already exists.
+8" Housing, SKU 356001G	A product with this SKU already exists.
+Screw: 6-32 X 1/4 Bind Hd., SKU 359005	A product with this SKU already exists.
+Nut, Hex 10-32, SKU 359046	A product with this SKU already exists.
+Blade Tension Spring S.S., SKU 400005	A product with this SKU already exists.
+Blade, Carbide, 2", SKU 400009F	A product with this SKU already exists.
+Spring Retainer, SKU 402002F	A product with this SKU already exists.
+Insert Socket, SKU 402006	A product with this SKU already exists.
+Ball Retainer, SKU 402012	A product with this SKU already exists.
+Center Clip, Short, SKU 402017F	A product with this SKU already exists.
+Frame Stop, SKU 402019	A product with this SKU already exists.
+C.F. Ball, Nylon, SKU 402033	A product with this SKU already exists.
+Spring, SKU 409010	A product with this SKU already exists.
+Spring, Retainer, SKU 409021	A product with this SKU already exists.
+Blade, Carbide, 2.5" C.F., SKU 420009	A product with this SKU already exists.
+EasyRoll Frame, 2.5", Left, SKU 420015	A product with this SKU already exists.
+EasyRoll Frame, 2.5", Right, SKU 420016	A product with this SKU already exists.
+EasyRoll Head, 2.5", Universal, SKU 426001	A product with this SKU already exists.
+Blade Tension Spring S.S., SKU 450005	A product with this SKU already exists.
+Blade, Carbide, 3" C.F., SKU 450009F	A product with this SKU already exists.
+Blade Tension Spring S.S., SKU 450021	A product with this SKU already exists.
+Wear Pad, SKU 480002F	A product with this SKU already exists.
+Outside Tension Spring, SKU 480005	A product with this SKU already exists.
+Adjust Arm, Right, SKU 480007F	A product with this SKU already exists.
+Adjust Arm, Left, SKU 480008F	A product with this SKU already exists.
+Easyroll Frame, Left, SKU 480015F	A product with this SKU already exists.
+Easyroll Frame, Right, SKU 480016F	A product with this SKU already exists.
+Inside Tension Spring, SKU 480021	A product with this SKU already exists.
+Wheel, Grooved, SKU 480026	A product with this SKU already exists.
+Bushing, SKU 480027	A product with this SKU already exists.
+Blade, Carbide, 3.5" CF, SKU 480209	A product with this SKU already exists.
+EasyRoll Frame, 3.5" CF, Left, SKU 480215	A product with this SKU already exists.
+EasyRoll Frame, 3.5" CF, Right, SKU 480216	A product with this SKU already exists.
+Inside Tension Spring, 3.5" CF, SKU 480221	A product with this SKU already exists.
+Head Frame Stop, SKU 480230	A product with this SKU already exists.
+3" Cf Head Easyroll, No Logo, SKU 486001F	A product with this SKU already exists.
+3.5" EasyRoll CF Head, No Logo, SKU 486201	A product with this SKU already exists.
+Screw, 4-40 X 5/16 Nylock Pan Hd., SKU 489020	A product with this SKU already exists.
+Screw, 4-40 X 31/64 Slotted Bind hd, SKU 489022	A product with this SKU already exists.
+Screw, 6-32 X 5/8 Soc. Hd Cap Scr. S.S., SKU 489029	A product with this SKU already exists.
+4-40 X 3/16 Flat Head Screw 18-8, SKU 499023	A product with this SKU already exists.
+6-32 X 1/2 Binder Head Screw 18-8, SKU 499025	A product with this SKU already exists.
+Pressure Plate, SKU 500018	A product with this SKU already exists.
+Wiper, 7" Wiper, SKU 500028	A product with this SKU already exists.
+TapeTech Taper Repair Kit, SKU 501A	A product with this SKU already exists.
+TapeTech Taper Wear Parts Kit - CFS, SKU 501ACF	A product with this SKU already exists.
+TapeTech 10" Flat Box Repair Kit 501C10, SKU 501C10	A product with this SKU already exists.
+TapeTech 12" Flat Box Repair Kit 501C12, SKU 501C12	A product with this SKU already exists.
+TapeTech TT501C15 15" Flat Box Repair Kit 501C15, SKU 501C15	A product with this SKU already exists.
+TapeTech 7" Flat Box Repair Kit 501C7, SKU 501C7	A product with this SKU already exists.
+TapeTech 2.5" Angle Head Repair Kit 501F25A, SKU 501F25A	A product with this SKU already exists.
+TapeTech 2" Angle Head Repair Kit 501F2A, SKU 501F2A	A product with this SKU already exists.
+TapeTech 3" Angle Head Repair Kit 501F3A, SKU 501F3A	A product with this SKU already exists.
+TapeTech 3" EasyRoll Angle Head Repair Kit 501F4A, SKU 501F4A	A product with this SKU already exists.
+TapeTech 3.5" Angle Head Repair Kit 501F4AX, SKU 501F4AX	A product with this SKU already exists.
+TapeTech Pump Repair Kit 501H, SKU 501H	A product with this SKU already exists.
+TapeTech Pump Maintenance Kit 501J, SKU 501J	A product with this SKU already exists.
+TapeTech Corner Roller Wheel Repair Kit 501RSE, SKU 501RSE	A product with this SKU already exists.
+Pivot, SKU 502005F	A product with this SKU already exists.
+Bearing, Pivot, SKU 502006	A product with this SKU already exists.
+5L7D-Type 4 Nyliner, SKU 502007	A product with this SKU already exists.
+TapeTech Taper Repair Kit, SKU 502A	A product with this SKU already exists.
+TapeTech Box Wheel Repair Kit 502CN, SKU 502CN	A product with this SKU already exists.
+TapeTech 2" Angle Head Blade Kit 502F2, SKU 502F2	A product with this SKU already exists.
+TapeTech 2.5" Angle Head Blade Kit 502F25, SKU 502F25	A product with this SKU already exists.
+TapeTech 3" Angle Head Blade Kit 502F3, SKU 502F3	A product with this SKU already exists.
+TapeTech 3" EasyRoll Angle Head Blade Kit 502F4, SKU 502F4	A product with this SKU already exists.
+TapeTech 3.5" Angle Head Blade Kit 502F4X, SKU 502F4X	A product with this SKU already exists.
+TapeTech Pump Rebuild Kit 502H, SKU 502H	A product with this SKU already exists.
+Cone, Stainless Steel, SKU 506009	A product with this SKU already exists.
+Screw, 10-32 X 1/2 Bind Hd S.S., SKU 509008	A product with this SKU already exists.
+Screw: 4-40 X 5/16 Fl. Hd. S.S., SKU 509010	A product with this SKU already exists.
+Screw, Hex Head, SKU 559017	A product with this SKU already exists.
+Blade, Carbide, 2" N.S., SKU 600005F	A product with this SKU already exists.
+2" Skid, SKU 600007	A product with this SKU already exists.
+Connector, SKU 600022	A product with this SKU already exists.
+Rivet, Special, SKU 602029F	A product with this SKU already exists.
+Adjustable Stop, SKU 602035	A product with this SKU already exists.
+Special Washer, SKU 602045F	A product with this SKU already exists.
+Blade Clamp Assy, SKU 604036	A product with this SKU already exists.
+Nut Block, SKU 609015	A product with this SKU already exists.
+Friction Washer, SKU 609020	A product with this SKU already exists.
+Screw 10-32 X 5/8 Rd. Hd., SKU 609021	A product with this SKU already exists.
+Serrated Hex Flange Nut, SKU 609049	A product with this SKU already exists.
+Screw,6-32 X 3/32 Slotted Rd Hd, SKU 609050	A product with this SKU already exists.
+Latch, 2" N.S., SKU 630002	A product with this SKU already exists.
+2" N.S. Facing, SKU 630009	A product with this SKU already exists.
+2" Hinge Block, SKU 630010	A product with this SKU already exists.
+Pressure Plate Tab, N.S., SKU 630017	A product with this SKU already exists.
+2" N.S. Insert, SKU 630030	A product with this SKU already exists.
+2" N.S. Wiper, SKU 631015	A product with this SKU already exists.
+Spring, Nail Spotters, Low Force, SKU 632026	A product with this SKU already exists.
+2"Press Plate Assy W/ New Style Tab, SKU 634028	A product with this SKU already exists.
+2" Easyclean Nail Spotter Body, No-Logo, SKU 638001	A product with this SKU already exists.
+Plastic Washer, SKU 639020	A product with this SKU already exists.
+Blade, Carbide, 3" N.S., SKU 650005F	A product with this SKU already exists.
+3" Skid, SKU 650007	A product with this SKU already exists.
+Connector, SKU 650022	A product with this SKU already exists.
+Special Washer, SKU 650040	A product with this SKU already exists.
+Blade Clamp Assy, SKU 654036	A product with this SKU already exists.
+Latch, 3" N.S., SKU 680002	A product with this SKU already exists.
+3" N.S. Facing, SKU 680009	A product with this SKU already exists.
+3" Hinge Block, SKU 680010	A product with this SKU already exists.
+3" N.S. Insert, SKU 680030	A product with this SKU already exists.
+3" N.S. Wiper, SKU 681015	A product with this SKU already exists.
+3" Press Plate Assy, SKU 684028	A product with this SKU already exists.
+3" Easyclean Nail Spotter Body, No-Logo, SKU 688001	A product with this SKU already exists.
+Piston Rod S.S., SKU 700002F	A product with this SKU already exists.
+Gland, SKU 700004F	A product with this SKU already exists.
+Valve Disk, SKU 700010F	A product with this SKU already exists.
+Link, SKU 700015F	A product with this SKU already exists.
+Screen, Fine Mesh, SKU 700032F	A product with this SKU already exists.
+Stud 5/16-24 1-7/16, SKU 700036	A product with this SKU already exists.
+Nut, Special, SKU 700037	A product with this SKU already exists.
+Lanyard, SKU 700042	A product with this SKU already exists.
+Handle Ball, SKU 702031F	A product with this SKU already exists.
+Filler Tube, Assy., SKU 704040	A product with this SKU already exists.
+1/4-20 x 5 /8 Capscrew Socket Hd., SKU 709006	A product with this SKU already exists.
+5/16-18 x 7/8 Capsrew Hex Hd. 18-8, SKU 709023	A product with this SKU already exists.
+Lockwasher, Med, SKU 709024	A product with this SKU already exists.
+Locknut Thin Pat. 18-8, SKU 709027	A product with this SKU already exists.
+#63 "S" Hook 18-8 S.S., SKU 709043	A product with this SKU already exists.
+Stopnut 1/4-20 Elastic Thin Pat, SKU 709052	A product with this SKU already exists.
+Hex Nut 10-24 S.S., SKU 709056	A product with this SKU already exists.
+Pump Cylinder, Universal, Gold, SKU 722003G	A product with this SKU already exists.
+Discharge Tube, SKU 722039	A product with this SKU already exists.
+Pump Foot Wireform, SKU 722070	A product with this SKU already exists.
+Pump Head Replacement, Universal, SKU 724001	A product with this SKU already exists.
+Draw Latch Assembly, SKU 724061F	A product with this SKU already exists.
+Pump Handle Assembly, SKU 726018	A product with this SKU already exists.
+Wiper, U-Cup, SKU 729009	A product with this SKU already exists.
+8-32 X 3/8 Slotted Binding Head Screw, S, SKU 729064	A product with this SKU already exists.
+Flange O-Ring, -322, SKU 729071	A product with this SKU already exists.
+Foot Valve, Universal, SKU 762011	A product with this SKU already exists.
+Pivot Arm, SKU 800008	A product with this SKU already exists.
+Connector Plate, Notched, SKU 800018F	A product with this SKU already exists.
+Pin, SKU 800021F	A product with this SKU already exists.
+Connector, Short, SKU 800027	A product with this SKU already exists.
+Coupling Pin, SKU 801009	A product with this SKU already exists.
+Quadrant, SKU 802016	A product with this SKU already exists.
+Grip Assembly, SKU 804003F	A product with this SKU already exists.
+Hinge Assy, SKU 808015F	A product with this SKU already exists.
+Washer:#14 Brass, SKU 809006	A product with this SKU already exists.
+Thumbscrew 5/16 - 18 X 3/4 Dog Point, SKU 809011	A product with this SKU already exists.
+Slotted Spring Pin 1/8 X 3/4 Sst., SKU 809025	A product with this SKU already exists.
+Short Connector, SKU 810027	A product with this SKU already exists.
+Swivel Axle, SKU 810028	A product with this SKU already exists.
+Connector Coupling, SKU 810029	A product with this SKU already exists.
+Connector Plate, Notched, SKU 811018	A product with this SKU already exists.
+34" Connector Assy, SKU 814234	A product with this SKU already exists.
+42" Connector Assy, SKU 814242	A product with this SKU already exists.
+54" Connector Assy, SKU 814254	A product with this SKU already exists.
+Grip Adjuster Spring, SKU 819038	A product with this SKU already exists.
+Gooseneck Spacer, SKU 861014	A product with this SKU already exists.
+Rear Brake Lever Bracket, SKU 880004	A product with this SKU already exists.
+Master Link, SKU 880006F	A product with this SKU already exists.
+Compression Spring, SKU 880028	A product with this SKU already exists.
+Connecting Rod, SKU 880038	A product with this SKU already exists.
+Rubber Grip Handle, SKU 880042	A product with this SKU already exists.
+Lock Block, SKU 880053	A product with this SKU already exists.
+Rear Brake Lever, SKU 881005	A product with this SKU already exists.
+Exterior Tube, TapeTech, SKU 882001G	A product with this SKU already exists.
+Profile Extrusion, SKU 882002	A product with this SKU already exists.
+Locking Pin, SKU 882013	A product with this SKU already exists.
+Guide Plug, SKU 882016	A product with this SKU already exists.
+Spring Housing, SKU 882039	A product with this SKU already exists.
+Extrusion Insert, SKU 883020	A product with this SKU already exists.
+5/32 X 1" Spring Pin. 18-8 S.S., SKU 889009	A product with this SKU already exists.
+1/4 X 1-1/4 Spring Pin, 18-8 S.S., SKU 889016	A product with this SKU already exists.
+Conical Spring, SKU 889017	A product with this SKU already exists.
+Lockwasher, Special, SKU 889027	A product with this SKU already exists.
+4-40 X 3/16 Fillister Head, 18-8 S.S/, SKU 889030	A product with this SKU already exists.
+6-32 X 1/4 Pan Head Screw 18-8 S.S., SKU 889035	A product with this SKU already exists.
+Nylon Spacer, SKU 889055	A product with this SKU already exists.
+10-32 x 3/4 Hex Soc Cap Scr, SST, SKU 889062	A product with this SKU already exists.
+TapeTech Cove Applicator Head, SKU CAVH-TT	A product with this SKU already exists.
+TapeTech Cove Applicator Head - 55mm, SKU CAVH-TT-55mm	A product with this SKU already exists.
+TapeTech Cove Applicator Head - 75mm, SKU CAVH-TT-75mm	A product with this SKU already exists.
+TapeTech Cove Applicator Head - 83mm, SKU CAVH-TT-83mm	A product with this SKU already exists.
+TapeTech Cove Applicator Head - 90mm, SKU CAVH-TT-90mm	A product with this SKU already exists.
+TapeTech Continuous Flow Finishing Box, SKU CFBOX-TT	A product with this SKU already exists.
+TapeTech Continuous Flow Finishing Box - 7", SKU CFBOX-TT-7	A product with this SKU already exists.
+TapeTech Continuous Flow Finishing Box - 10", SKU CFBOX-TT-10	A product with this SKU already exists.
+TapeTech Continuous Flow Finishing Box - 12", SKU CFBOX-TT-12	A product with this SKU already exists.
+TapeTech Bazooka CFS 40" Continuous Flow Support Handle, SKU CFH40TT	A product with this SKU already exists.
+TapeTech Bazooka CFS 66" Continuous Flow Support Handle, SKU CFH66TT	A product with this SKU already exists.
+TapeTech Corner Flusher Roller Kit, SKU CFK01TT	A product with this SKU already exists.
+TapeTech Corner Flusher Creaser Wheel Kit, SKU CFK02TT	A product with this SKU already exists.
+TapeTech Premium Compound Roller, SKU CROLL-TT	A product with this SKU already exists.
+TapeTech Premium Compound Roller - 4", SKU CROLL-TT-4	A product with this SKU already exists.
+TapeTech Premium Compound Roller - 9", SKU CROLL-TT-9	A product with this SKU already exists.
+TapeTech Premium Compound Roller - 12", SKU CROLL-TT-12	A product with this SKU already exists.
+TapeTech Compound Tube, SKU CT-TT	A product with this SKU already exists.
+TapeTech Compound Tube - 24", SKU CT-TT-24	A product with this SKU already exists.
+TapeTech Compound Tube - 36", SKU CT-TT-36	A product with this SKU already exists.
+TapeTech Compound Tube - 42", SKU CT-TT-42	A product with this SKU already exists.
+TapeTech CFS Radio Frequency Controller, SKU CTBXC	A product with this SKU already exists.
+TapeTech CFS Fill Kit, SKU CTFILL	A product with this SKU already exists.
+TapeTech CFS Inline Valve with Radio Frequency Controller, SKU CTVLV	A product with this SKU already exists.
+TapeTech EEX10090 1" 90 Outside Corner Edger, SKU EEX10090	A product with this SKU already exists.
+TapeTech EEX125135 1.25" 135 Outside Corner Edger, SKU EEX125135	A product with this SKU already exists.
+TapeTech EEX15090 1.5" 90 Outside Corner Edger, SKU EEX15090	A product with this SKU already exists.
+TapeTech EEX200135 2" 135 Outside Corner Edger, SKU EEX200135	A product with this SKU already exists.
+TapeTech EEX275135 2.75" 135 Outside Corner Edger, SKU EEX275135	A product with this SKU already exists.
+TapeTech EEX5090 0.5" 90 Outside Corner Edger, SKU EEX5090	A product with this SKU already exists.
+TapeTech EEX7590 0.75" 90 Outside Corner Edger, SKU EEX7590	A product with this SKU already exists.
+TapeTech Set of 3 - One Each of the 135° Outside Corner Edgers, SKU EEXSET3135	A product with this SKU already exists.
+TapeTech 5 Piece 90° Outside Corner Edger Set, SKU EEXSET590	A product with this SKU already exists.
+TapeTech EIN10090 1" 90 Inside Corner Edger, SKU EIN10090	A product with this SKU already exists.
+TapeTech EIN15090 1.5" 90 Inside Corner Edger, SKU EIN15090	A product with this SKU already exists.
+TapeTech EIN20090 2" 90 Inside Corner Edger, SKU EIN20090	A product with this SKU already exists.
+TapeTech EIN5090 0.5" 90 Inside Corner Edger, SKU EIN5090	A product with this SKU already exists.
+TapeTech EIN7590 0.75" 90 Inside Corner Edger, SKU EIN7590	A product with this SKU already exists.
+TapeTech 5 Piece 90° Inside Corner Edger Set, SKU EINSET590	A product with this SKU already exists.
+TapeTech EasyClean® Cover Plate Kit EZCOVER07, SKU EZCOVER07	A product with this SKU already exists.
+TapeTech EasyClean® Finishing Box, SKU EZFB-TT	A product with this SKU already exists.
+TapeTech EasyClean® Finishing Box - 7", SKU EZFB-TT-7	A product with this SKU already exists.
+TapeTech EasyClean® Finishing Box - 10", SKU EZFB-TT-10	A product with this SKU already exists.
+TapeTech EasyClean® Finishing Box - 12", SKU EZFB-TT-12	A product with this SKU already exists.
+TapeTech EasyRoll Flat Box Wheel Kit EZROLL-KIT, SKU EZROLL-KIT	A product with this SKU already exists.
+TapeTech Premium Stainless Steel Joint Knife, SKU JKSS-TT	A product with this SKU already exists.
+TapeTech Premium Stainless Steel Joint Knife - 1", SKU JKSS-TT-1	A product with this SKU already exists.
+TapeTech Premium Stainless Steel Joint Knife - 2", SKU JKSS-TT-2	A product with this SKU already exists.
+TapeTech Premium Stainless Steel Joint Knife - 3", SKU JKSS-TT-3	A product with this SKU already exists.
+TapeTech Premium Stainless Steel Joint Knife - 4", SKU JKSS-TT-4	A product with this SKU already exists.
+TapeTech Premium Stainless Steel Joint Knife - 5", SKU JKSS-TT-5	A product with this SKU already exists.
+TapeTech Premium Stainless Steel Joint Knife - 6", SKU JKSS-TT-6	A product with this SKU already exists.
+TapeTech MAXXBOX®, SKU MAXXBOX-TT	A product with this SKU already exists.
+TapeTech MAXXBOX® - 7", SKU MAXXBOX-TT-7	A product with this SKU already exists.
+TapeTech MAXXBOX® - 10", SKU MAXXBOX-TT-10	A product with this SKU already exists.
+TapeTech MAXXBOX® - 12", SKU MAXXBOX-TT-12	A product with this SKU already exists.
+TapeTech 14" Premium Mud Pan, SKU MP14TT	A product with this SKU already exists.
+TapeTech MudRunner® Pro Extension, SKU MRX01TT	A product with this SKU already exists.
+TapeTech MWS Accessory Kit, SKU MWS-ACC	A product with this SKU already exists.
+TapeTech EasyClean® Nail Spotter, SKU NS-TT	A product with this SKU already exists.
+TapeTech EasyClean® Nail Spotter - 2", SKU NS-TT-2	A product with this SKU already exists.
+TapeTech EasyClean® Nail Spotter - 3", SKU NS-TT-3	A product with this SKU already exists.
+TapeTech Nail Spotter Adapter, SKU NSA-TT	A product with this SKU already exists.
+TapeTech Wheel Kit - Nailspotter, SKU NSW01	A product with this SKU already exists.
+TapeTech PFK Replacement Blade 2/pk, SKU PFB-TT	A product with this SKU already exists.
+TapeTech PFK Replacement Blade 2/pk - 7", SKU PFB-TT-7	A product with this SKU already exists.
+TapeTech PFK Replacement Blade 2/pk - 12", SKU PFB-TT-12	A product with this SKU already exists.
+TapeTech PFK Replacement Blade 2/pk - 14", SKU PFB-TT-14	A product with this SKU already exists.
+TapeTech PFK Replacement Blade 2/pk - 18", SKU PFB-TT-18	A product with this SKU already exists.
+TapeTech PFK Replacement Blade 2/pk - 24", SKU PFB-TT-24	A product with this SKU already exists.
+TapeTech PFK Replacement Blade 2/pk - 32", SKU PFB-TT-32	A product with this SKU already exists.
+TapeTech PFK Replacement Blade 2/pk - 40", SKU PFB-TT-40	A product with this SKU already exists.
+TapeTech PFK Replacement Blade 2/pk - 48", SKU PFB-TT-48	A product with this SKU already exists.
+TapeTech Premium Finishing Knife, SKU PFK-TT	A product with this SKU already exists.
+TapeTech Premium Finishing Knife - 7", SKU PFK-TT-7	A product with this SKU already exists.
+TapeTech Premium Finishing Knife - 12", SKU PFK-TT-12	A product with this SKU already exists.
+TapeTech Premium Finishing Knife - 14", SKU PFK-TT-14	A product with this SKU already exists.
+TapeTech Premium Finishing Knife - 18", SKU PFK-TT-18	A product with this SKU already exists.
+TapeTech Premium Finishing Knife - 24", SKU PFK-TT-24	A product with this SKU already exists.
+TapeTech Premium Finishing Knife - 32", SKU PFK-TT-32	A product with this SKU already exists.
+TapeTech Premium Finishing Knife - 40", SKU PFK-TT-40	A product with this SKU already exists.
+TapeTech Premium Finishing Knife - 48", SKU PFK-TT-48	A product with this SKU already exists.
+TapeTech Taper Rebuild Kit PK-AT02, SKU PK-AT02	A product with this SKU already exists.
+TapeTech PK-PFK PFK End Caps Kit, SKU PK-PFK	A product with this SKU already exists.
+TapeTech QuickBox® QSX, SKU QB-QSX	A product with this SKU already exists.
+TapeTech QuickBox® QSX - 6.5", SKU QB-QSX-65	A product with this SKU already exists.
+TapeTech QuickBox® QSX - 8.5", SKU QB-QSX-85	A product with this SKU already exists.
+TapeTech 11" x 5" Premium Gold Stainless Steel Finishing Trowel - ProSoft Grip, SKU TG110565-PS	A product with this SKU already exists.
+TapeTech Premium Blue Steel Taping Knife, SKU TKBS-TT	A product with this SKU already exists.
+TapeTech Premium Blue Steel Taping Knife - 8", SKU TKBS-TT-8	A product with this SKU already exists.
+TapeTech Premium Blue Steel Taping Knife - 10", SKU TKBS-TT-10	A product with this SKU already exists.
+TapeTech Premium Blue Steel Taping Knife - 12", SKU TKBS-TT-12	A product with this SKU already exists.
+TapeTech Premium Blue Steel Taping Knife - 14", SKU TKBS-TT-14	A product with this SKU already exists.
+TapeTech Premium Stainless Steel Taping Knife, SKU TKSS-TT	A product with this SKU already exists.
+TapeTech Premium Stainless Steel Taping Knife - 8", SKU TKSS-TT-8	A product with this SKU already exists.
+TapeTech Premium Stainless Steel Taping Knife - 10", SKU TKSS-TT-10	A product with this SKU already exists.
+TapeTech Premium Stainless Steel Taping Knife - 12", SKU TKSS-TT-12	A product with this SKU already exists.
+TapeTech Premium Stainless Steel Taping Knife - 14", SKU TKSS-TT-14	A product with this SKU already exists.
+TapeTech Basic Taping Set TTBTS, SKU TTBTS	A product with this SKU already exists.
+TapeTech Corner Finishing Set TTCFS, SKU TTCFS	A product with this SKU already exists.
+TapeTech Paper Faced Bead Pro Set TTPFB, SKU TTPFB	A product with this SKU already exists.
+TapeTech Standard Full Set TTSFS, SKU TTSFS	A product with this SKU already exists.
+TapeTech VGAUGE180 7" Gauging Trowel, SKU VGAUGE180	A product with this SKU already exists.
+TapeTech VGAUGE200 8" Gauging Trowel, SKU VGAUGE200	A product with this SKU already exists.
+TapeTech VMARG05 5" x 2" Margin Trowel, SKU VMARG05	A product with this SKU already exists.
+TapeTech VMARG06 6" x 2" Margin Trowel, SKU VMARG06	A product with this SKU already exists.
+TapeTech VMARG08 8" x 2" Margin Trowel, SKU VMARG08	A product with this SKU already exists.
+TapeTech 5" and 6" Margin Trowel Set, SKU VMARGSET0506	A product with this SKU already exists.
+TapeTech 5.5" Mini Round Trowel, SKU VROUND55	A product with this SKU already exists.
+TapeTech 5.5" Mini Triangular Trowel, SKU VTRIAN55	A product with this SKU already exists.
