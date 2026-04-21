@@ -224,7 +224,7 @@ add_filter( 'woocommerce_show_admin_notice', function ( $show, $notice ) {
 // ============================================================================
 // SECTION 7 — WEBHOOK AUTO-CREATION
 //
-// On WordPress init, checks the WooCommerce webhooks table for the four
+// On WooCommerce init, checks the WooCommerce webhooks table for the four
 // product lifecycle webhooks. Any missing webhook is auto-created using
 // WC_Webhook with status active, the production delivery URL, and the
 // WC_WEBHOOK_SECRET constant from wp-config.php.
@@ -233,11 +233,41 @@ add_filter( 'woocommerce_show_admin_notice', function ( $show, $notice ) {
 // loads before this file. The function_exists guard below makes this safe
 // even if called out of order.
 // ============================================================================
-add_action( 'init', 'dtb_wc_ensure_webhooks', 20 );
+add_action( 'woocommerce_init', 'dtb_wc_ensure_webhooks', 20 );
+add_action( 'admin_init', 'dtb_wc_ensure_webhooks', 999 );
 
-function dtb_wc_ensure_webhooks(): void {
-	if ( ! function_exists( 'wc_get_webhooks' ) || ! class_exists( 'WC_Webhook' ) ) {
-		return;
+function dtb_wc_ensure_webhooks(): array {
+	$debug = [
+		'wc_get_webhooks' => function_exists( 'wc_get_webhooks' ),
+		'WC_Webhook'      => class_exists( 'WC_Webhook' ),
+		'WC_VERSION'      => defined( 'WC_VERSION' ) ? WC_VERSION : '',
+	];
+
+	if ( ! function_exists( 'wc_get_webhooks' ) && class_exists( 'WC_Webhook' ) ) {
+		$wc_path = '';
+		if ( defined( 'WC_PLUGIN_FILE' ) ) {
+			$wc_path = dirname( WC_PLUGIN_FILE );
+		} elseif ( function_exists( 'WC' ) && method_exists( WC(), 'plugin_path' ) ) {
+			$wc_path = WC()->plugin_path();
+		}
+
+		if ( $wc_path && file_exists( $wc_path . '/includes/wc-webhook-functions.php' ) ) {
+			require_once $wc_path . '/includes/wc-webhook-functions.php';
+			$debug['wc_get_webhooks'] = function_exists( 'wc_get_webhooks' );
+		}
+	}
+
+
+	if ( ! class_exists( 'WC_Webhook' ) ) {
+		return [
+			'status'    => 'skipped',
+			'reason'    => 'woocommerce_not_loaded',
+			'created'   => [],
+			'existing'  => [],
+			'delivery'  => '',
+			'secret'    => '',
+			'debug'     => $debug,
+		];
 	}
 
 	// Fallback config if dtb-utils.php hasn't loaded (should not happen in production).
@@ -253,7 +283,15 @@ function dtb_wc_ensure_webhooks(): void {
 	}
 
 	if ( '' === $secret || '' === $delivery_url ) {
-		return; // Cannot create functional webhooks — bail silently.
+		return [
+			'status'    => 'skipped',
+			'reason'    => empty( $secret ) ? 'missing_secret' : 'missing_delivery_url',
+			'created'   => [],
+			'existing'  => [],
+			'delivery'  => $delivery_url,
+			'secret'    => $secret,
+			'debug'     => $debug,
+		];
 	}
 
 	$required_topics = [
@@ -263,13 +301,18 @@ function dtb_wc_ensure_webhooks(): void {
 		'product.restored',
 	];
 
-	$existing_ids = wc_get_webhooks( [
-		'delivery_url' => $delivery_url,
-		'return'       => 'ids',
-		'limit'        => -1,
-	] );
+	if ( function_exists( 'wc_get_webhooks' ) ) {
+		$existing_ids = wc_get_webhooks( [
+			'delivery_url' => $delivery_url,
+			'return'       => 'ids',
+			'limit'        => -1,
+		] );
+	} else {
+		$existing_ids = dtb_wc_get_webhook_ids_by_delivery_url( $delivery_url );
+	}
 
 	$registered = [];
+	$created = [];
 	foreach ( $existing_ids as $id ) {
 		$webhook = new WC_Webhook( $id );
 		$registered[ $webhook->get_topic() ] = true;
@@ -290,7 +333,42 @@ function dtb_wc_ensure_webhooks(): void {
 
 		// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
 		error_log( '[DryWall Toolbox] Webhook created: ' . $topic );
+		$created[] = $topic;
 	}
+
+	return [
+		'status'   => 'completed',
+		'created'  => $created,
+		'existing' => array_keys( $registered ),
+		'delivery' => $delivery_url,
+		'secret'   => $secret,
+		'debug'    => $debug,
+	];
+}
+
+/**
+ * Return webhook IDs matching the given delivery URL using native post lookup.
+ *
+ * This fallback is used when WooCommerce has loaded the WC_Webhook class but
+ * not its helper function wc_get_webhooks().
+ */
+function dtb_wc_get_webhook_ids_by_delivery_url( string $delivery_url ): array {
+	$query = new WP_Query( [
+		'post_type'      => 'shop_webhook',
+		'post_status'    => 'any',
+		'posts_per_page' => -1,
+		'fields'         => 'ids',
+	] );
+
+	$ids = [];
+	foreach ( $query->posts as $webhook_id ) {
+		$webhook = new WC_Webhook( $webhook_id );
+		if ( $webhook->get_delivery_url() === $delivery_url ) {
+			$ids[] = $webhook_id;
+		}
+	}
+
+	return $ids;
 }
 
 

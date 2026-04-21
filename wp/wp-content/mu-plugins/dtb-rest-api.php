@@ -254,6 +254,20 @@ function dtb_register_config_routes(): void {
 		],
 	] );
 
+	// ── POST /dtb/v1/webhooks/ensure — create any missing DTB product webhooks ─
+	register_rest_route( $ns, '/webhooks/ensure', [
+		'methods'             => [ 'GET', 'POST' ],
+		'callback'            => 'dtb_route_ensure_webhooks',
+		'permission_callback' => 'dtb_route_ensure_webhooks_permission',
+		'args'                => [
+			'secret' => [
+				'required'          => false,
+				'sanitize_callback' => 'sanitize_text_field',
+				'description'       => 'Optional webhook secret for non-cookie auth.',
+			],
+		],
+	] );
+
 	// ── Diagnostic: GET /dtb/v1/cors-test — CORS debugging endpoint ──────────
 	register_rest_route( $ns, '/cors-test', [
 		'methods'             => 'GET',
@@ -1003,6 +1017,58 @@ function dtb_route_create_app_password( WP_REST_Request $request ): WP_REST_Resp
 			500
 		);
 	}
+}
+
+/** POST /dtb/v1/webhooks/ensure */
+function dtb_route_ensure_webhooks( WP_REST_Request $request ): WP_REST_Response {
+	if ( ! function_exists( 'dtb_wc_ensure_webhooks' ) ) {
+		return new WP_REST_Response(
+			dtb_error_envelope( 'not_available', 'Webhook creation is not available on this site.', 500 ),
+			500
+		);
+	}
+
+	$result = dtb_wc_ensure_webhooks();
+
+	if ( ! is_array( $result ) ) {
+		return new WP_REST_Response(
+			dtb_error_envelope( 'unexpected_result', 'Webhook creation returned an unexpected result.', 500 ),
+			500
+		);
+	}
+
+	if ( isset( $result['status'] ) && 'completed' !== $result['status'] ) {
+		return new WP_REST_Response( [
+			'success'  => false,
+			'message'  => 'Webhook creation skipped or failed.',
+			'result'   => $result,
+		], 200 );
+	}
+
+	return new WP_REST_Response( [
+		'success'  => true,
+		'message'  => 'Webhook creation completed.',
+		'result'   => $result,
+	], 200 );
+}
+
+/** Permission callback for POST /dtb/v1/webhooks/ensure */
+function dtb_route_ensure_webhooks_permission( WP_REST_Request $request ): bool {
+	if ( current_user_can( 'manage_woocommerce' ) || current_user_can( 'manage_options' ) ) {
+		return true;
+	}
+
+	$secret = $request->get_param( 'secret' );
+	if ( ! empty( $secret ) && defined( 'WC_WEBHOOK_SECRET' ) ) {
+		return hash_equals( (string) WC_WEBHOOK_SECRET, trim( (string) $secret ) );
+	}
+
+	$header_secret = $request->get_header( 'x-wc-webhook-secret' );
+	if ( ! empty( $header_secret ) && defined( 'WC_WEBHOOK_SECRET' ) ) {
+		return hash_equals( (string) WC_WEBHOOK_SECRET, trim( (string) $header_secret ) );
+	}
+
+	return false;
 }
 
 /** GET /wc-admin/profile — shim to suppress core-profiler crash */
