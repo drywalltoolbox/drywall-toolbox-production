@@ -1573,10 +1573,11 @@ if ( is_admin() ) {
 }
 
 /**
- * Register DTB Image Sync page under wp-admin Tools.
+ * Register DTB Image Sync page under the DTB Tools admin menu.
  */
 function dtb_image_sync_add_management_page(): void {
-	add_management_page(
+	add_submenu_page(
+		'dtb-toolbox',
 		'Drywall Toolbox Image Sync',
 		'DTB Image Sync',
 		'manage_woocommerce',
@@ -1586,7 +1587,7 @@ function dtb_image_sync_add_management_page(): void {
 }
 
 /**
- * Render the wp-admin Tools → DTB Image Sync page.
+ * Render the wp-admin DTB Tools → DTB Image Sync page.
  */
 function dtb_render_image_sync_admin_page(): void {
 	if ( ! current_user_can( 'manage_woocommerce' ) ) {
