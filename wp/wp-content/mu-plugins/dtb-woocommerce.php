@@ -565,6 +565,11 @@ add_filter( 'wp_check_filetype_and_ext', function ( array $data, string $file, s
 }, 10, 3 );
 
 // B — Increase batch size and execution time for the importer Ajax actions.
+//
+// On shared hosting the WP admin CSV importer can still stall or freeze while
+// resolving remote image URLs or processing large payloads. If the browser
+// import hangs, prefer the DTB backend import workflow with a CSV uploaded to
+// wp-content/uploads/wc-imports/ and images registered first via sync-images.
 add_filter( 'woocommerce_product_import_batch_size', function (): int {
 	return 100;
 } );
@@ -575,10 +580,11 @@ add_action( 'admin_init', function (): void {
 		: '';
 	if ( in_array( $action, [ 'woocommerce_do_ajax_product_import', 'woocommerce_ajax_import_products' ], true ) ) {
 		if ( function_exists( 'set_time_limit' ) ) {
-			set_time_limit( 120 );
+			set_time_limit( 300 );
 		}
 		if ( function_exists( 'ini_set' ) ) {
-			ini_set( 'memory_limit', '512M' ); // phpcs:ignore WordPress.PHP.IniSet.memory_limit_Blacklisted
+			ini_set( 'memory_limit', '768M' ); // phpcs:ignore WordPress.PHP.IniSet.memory_limit_Blacklisted
+			ini_set( 'default_socket_timeout', '60' ); // phpcs:ignore WordPress.PHP.IniSet.blacklist
 		}
 	}
 } );
