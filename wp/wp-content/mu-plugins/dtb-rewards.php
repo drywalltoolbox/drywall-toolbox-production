@@ -167,7 +167,9 @@ function dtb_rewards_reverse_points( int $order_id ): void {
 // WPLoyalty loads its classes on plugins_loaded before rest_api_init fires).
 // =============================================================================
 
-add_action( 'rest_api_init', 'dtb_rewards_register_routes', 10 );
+if ( dtb_is_rest_api_request() ) {
+	add_action( 'rest_api_init', 'dtb_rewards_register_routes', 10 );
+}
 
 function dtb_rewards_register_routes(): void {
 

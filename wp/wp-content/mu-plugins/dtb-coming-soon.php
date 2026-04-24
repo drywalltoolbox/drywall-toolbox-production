@@ -22,6 +22,11 @@
 
 defined( 'ABSPATH' ) || exit;
 
+// Only load this endpoint when handling REST or admin requests.
+if ( ! dtb_is_admin_or_rest_request() ) {
+	return;
+}
+
 // ─── Constants ────────────────────────────────────────────────────────────────
 
 /** WordPress option key used to persist the subscriber array. */

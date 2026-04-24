@@ -25,6 +25,11 @@
 
 defined( 'ABSPATH' ) || exit;
 
+// Only load cache helpers and routes on admin or REST API requests.
+if ( ! dtb_is_admin_or_rest_request() ) {
+	return;
+}
+
 // =============================================================================
 // CACHE PROXY
 // =============================================================================

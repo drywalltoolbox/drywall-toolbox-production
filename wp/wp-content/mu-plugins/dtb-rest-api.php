@@ -932,20 +932,24 @@ function dtb_route_import_catalog( WP_REST_Request $request ) {
 		] );
 	}
 
-	// No Action Scheduler — run synchronously, accumulate results.
-	$all_results = [];
+	// No Action Scheduler — schedule background WP-Cron events instead of
+	// running the heavy import synchronously. This keeps the REST route
+	// fast and avoids proxy timeouts (Cloudflare 524). Note: WP-Cron must
+	// be enabled (either via real traffic or a system cron calling
+	// wp-cron.php) for the jobs to run.
+	$scheduled = [];
 	foreach ( $file_paths as $file_path ) {
-		$result = dtb_run_catalog_import_sync( $file_path );
-		if ( is_wp_error( $result ) ) {
-			return $result;
+		// Avoid duplicate scheduling for the same file.
+		if ( ! wp_next_scheduled( 'dtb_run_catalog_import_wpcron', [ $file_path ] ) ) {
+			wp_schedule_single_event( time() + 5, 'dtb_run_catalog_import_wpcron', [ $file_path ] );
+			$scheduled[] = basename( $file_path );
 		}
-		$all_results[] = $result->get_data();
 	}
 
 	return rest_ensure_response( [
-		'status'  => 'completed',
-		'results' => $all_results,
-		'message' => count( $all_results ) . ' catalog file(s) imported.',
+		'status'  => 'scheduled',
+		'files'   => $scheduled,
+		'message' => count( $scheduled ) . ' WooCommerce product import(s) scheduled via WP-Cron. Ensure WP-Cron is running (system cron or background runner).',
 	] );
 }
 
@@ -1090,6 +1094,11 @@ function dtb_route_wc_admin_profile(): WP_REST_Response {
 
 add_action( 'dtb_run_catalog_import', function ( string $file_path ): void {
 	dtb_run_catalog_import_sync( $file_path );
+} );
+
+// Fallback WP-Cron action: runs when wp_schedule_single_event fires.
+add_action( 'dtb_run_catalog_import_wpcron', function ( string $file_path ): void {
+    dtb_run_catalog_import_sync( $file_path );
 } );
 
 /**

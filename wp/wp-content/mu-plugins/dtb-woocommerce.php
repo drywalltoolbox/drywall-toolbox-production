@@ -602,13 +602,12 @@ add_filter( 'wp_check_filetype_and_ext', function ( array $data, string $file, s
 }, 10, 3 );
 
 // B1 — Reduce batch size to 25 products per Ajax call.
-//
-// 25 products × avg 1.8 images × ~5 s sideload ≈ 225 s — fits within the
-// 300 s execution window we enforce below. When images are pre-registered in
-// the Media Library (recommended), each batch completes in < 1 s and the full
-// 1,150-product catalog imports in ~46 Ajax calls with no timeout risk.
+// 10 products × avg 1.8 images × ~5 s sideload ≈ 90 s — safe under Cloudflare's
+// 120 s proxy timeout and the 300 s PHP execution window enforced below.
+// When images are pre-registered in the Media Library, each batch is still
+// fast and the importer completes in more batches.
 add_filter( 'woocommerce_product_import_batch_size', function (): int {
-	return 25;
+	return 10;
 } );
 
 // B2 — Enforce execution time and memory limits for each import Ajax call.

@@ -153,7 +153,52 @@ define( 'DRYWALL_JWT_SECRET', 'your-jwt-signing-secret-here' );
 define( 'DISALLOW_FILE_EDIT', true );
 ```
 
----
+
+## Performance audit for mu-plugins
+
+Because files in `wp/wp-content/mu-plugins/` are loaded on every request, it is important to keep them lightweight.
+Use this checklist when auditing the mu-plugin suite:
+
+- Audit hook usage first.
+  - Search each mu-plugin for `admin_init`, `init`, `admin_enqueue_scripts`, `rest_api_init`, and `wp_ajax_*`.
+  - Pay special attention to any code that runs on `admin_init` or `init` without first checking whether the current request needs it.
+
+- Limit work to the pages or endpoints that need it.
+  - For admin UI tools such as `dtb-schematics-admin.php`, `dtb-product-mapping.php`, `dtb-cache-admin.php`, and `dtb-api-health-monitor.php`, ensure heavy processing only runs on the matching admin page.
+  - Example guard:
+    ```php
+    add_action( 'admin_enqueue_scripts', function ( $hook ) {
+        if ( $hook !== 'toplevel_page_dtb-toolbox' && strpos( $hook, 'dtb-' ) !== 0 ) {
+            return;
+        }
+        // enqueue scripts/styles only for DTB admin pages.
+    } );
+    ```
+  - For post editing, allow Heartbeat only on `post.php` / `post-new.php` and deregister it elsewhere.
+
+- Move non-essential admin-only utilities out of mu-plugins.
+  - `mu-plugins` should be reserved for bootstrap, routing, and essential site-level behavior.
+  - Tools like schematics manager, product mapping, image sync, and API health monitor can often be regular plugins or loaded conditionally so they do not add overhead to every request.
+
+- Profile admin requests.
+  - Use Query Monitor, New Relic, or another profiler to identify slow hook execution and long-running AJAX calls.
+  - Focus on `admin-ajax.php`, `load-scripts.php`, and `wp-admin` page loads.
+  - Look for repeated DB queries, `WP_Query` loops, and remote requests before the page finishes.
+
+- Prefer background scheduling for long work.
+  - Heavy imports or sync jobs should be scheduled by Action Scheduler or WP-Cron rather than executed inline during a request.
+  - Example: `dtb-rest-api.php` already schedules `/dtb/v1/import-catalog` as background work when Action Scheduler is available.
+
+### Files to inspect first
+
+- `dtb-rest-api.php` — REST route registration plus catalog import scheduling.
+- `dtb-woocommerce.php` — WooCommerce admin startup fixes and import timeout handling.
+- `dtb-image-sync.php` — image sync REST routes and batch work.
+- `dtb-schematics-admin.php` and `dtb-product-mapping.php` — admin UI tools that may run queries and load scripts.
+- `dtb-api-health-monitor.php` — admin AJAX diagnostics; ensure checks only run on demand.
+- `dtb-veeqo.php` — external API integration; ensure webhooks and health checks are not performed on every request.
+
+If you want a quick win, start by ensuring each mu-plugin checks the current request context before doing anything expensive. That will reduce admin load and keep wp-admin responsive.
 
 ## CORS allowed origins
 

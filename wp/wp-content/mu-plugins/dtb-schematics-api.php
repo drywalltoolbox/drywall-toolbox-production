@@ -27,6 +27,11 @@
 
 defined( 'ABSPATH' ) || exit;
 
+// Only load this REST endpoint on admin or REST API requests.
+if ( ! dtb_is_admin_or_rest_request() ) {
+	return;
+}
+
 // --- Meta field registration -----------------------------------------------
 
 add_action( 'init', 'dtb_register_schematic_meta' );

@@ -71,7 +71,9 @@ define( 'DTB_MEMBERSHIP_SKUS', [
 
 // ─── Route registration ───────────────────────────────────────────────────────
 
-add_action( 'rest_api_init', 'dtb_membership_register_routes' );
+if ( dtb_is_rest_api_request() ) {
+	add_action( 'rest_api_init', 'dtb_membership_register_routes' );
+}
 
 function dtb_membership_register_routes(): void {
 	$ns = 'dtb/v1';

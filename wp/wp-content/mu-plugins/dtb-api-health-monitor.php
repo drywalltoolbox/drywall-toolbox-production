@@ -10,6 +10,11 @@
 
 defined( 'ABSPATH' ) || exit;
 
+// Only load this admin UI tool when inside wp-admin or AJAX requests.
+if ( ! dtb_is_admin_or_ajax_request() ) {
+	return;
+}
+
 // ── Shared top-level DTB admin menu (registers once across all DTB mu-plugins) ──
 
 if ( ! function_exists( 'dtb_register_top_level_menu' ) ) {

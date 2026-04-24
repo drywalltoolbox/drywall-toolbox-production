@@ -32,6 +32,28 @@ function dtb_is_rest_api_request(): bool {
 	return defined( 'REST_REQUEST' ) && REST_REQUEST;
 }
 
+/**
+ * Return true when the current request is an admin or AJAX request.
+ */
+function dtb_is_admin_or_ajax_request(): bool {
+	if ( function_exists( 'is_admin' ) && is_admin() ) {
+		return true;
+	}
+
+	if ( function_exists( 'wp_doing_ajax' ) && wp_doing_ajax() ) {
+		return true;
+	}
+
+	return false;
+}
+
+/**
+ * Return true when the current request is admin, AJAX, or REST API.
+ */
+function dtb_is_admin_or_rest_request(): bool {
+	return dtb_is_admin_or_ajax_request() || dtb_is_rest_api_request();
+}
+
 // ─── Config cache ─────────────────────────────────────────────────────────────
 
 /**

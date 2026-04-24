@@ -47,6 +47,11 @@
 
 defined( 'ABSPATH' ) || exit;
 
+// Only load image sync helpers when handling admin, AJAX, or REST API requests.
+if ( ! dtb_is_admin_or_rest_request() ) {
+	return;
+}
+
 // ============================================================================
 // CONSTANTS
 // ============================================================================

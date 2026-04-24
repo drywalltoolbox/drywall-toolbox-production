@@ -24,6 +24,11 @@
 
 defined( 'ABSPATH' ) || exit;
 
+// Only load auth helpers and route registration on admin or REST API requests.
+if ( ! dtb_is_admin_or_rest_request() ) {
+	return;
+}
+
 // =============================================================================
 // CONSTANTS
 // =============================================================================
