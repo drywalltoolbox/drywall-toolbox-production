@@ -175,6 +175,7 @@ export default function CategoryPage() {
               setModalSelectedAttrs({});
             }}
             initialSelectedAttrs={modalSelectedAttrs}
+             initialVariations={cardVariationMap[modalProduct.id] || []}
           />
         )}
       </ProductModal>

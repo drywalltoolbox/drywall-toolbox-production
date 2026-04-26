@@ -650,6 +650,7 @@ export default function Products() {
             onAddToCart={handleAddToCart}
             onClose={closeModal}
             initialSelectedAttrs={modalSelectedAttrs}
+            initialVariations={cardVariationMap[modalProduct.id] || []}
           />
         )}
       </ProductModal>

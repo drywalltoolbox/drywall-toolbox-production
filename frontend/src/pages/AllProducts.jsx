@@ -413,6 +413,7 @@ export default function AllProducts() {
             onAddToCart={handleAddToCart}
             onClose={closeModal}
             initialSelectedAttrs={modalSelectedAttrs}
+            initialVariations={cardVariationMap[modalProduct.id] || []}
           />
         )}
       </ProductModal>

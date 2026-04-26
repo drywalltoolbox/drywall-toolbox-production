@@ -62,7 +62,7 @@ export default function ProductCard({
           type="button"
           className="dtb-plp-card__img-btn"
           onClick={onOpenModal}
-          aria-label={`View ${product.name || product.part_number || 'product'}`}
+          aria-label={`View ${effectiveProduct.name || effectiveProduct.part_number || product.name || product.part_number || 'product'}`}
           tabIndex={0}
         >
           <ProductCardImage
@@ -108,7 +108,7 @@ export default function ProductCard({
       <div className="dtb-plp-card__body">
         {/* Brand eyebrow */}
         {product.brand && (
-          <p className="dtb-plp-card__brand">{product.brand}</p>
+          <p className="dtb-plp-card__brand">{effectiveProduct.brand || product.brand}</p>
         )}
 
         {/* Product name */}
@@ -118,7 +118,7 @@ export default function ProductCard({
             onClick={onOpenModal}
             className="dtb-plp-card__name-btn"
           >
-            {product.name || product.part_number}
+              {effectiveProduct.name || effectiveProduct.part_number || product.name || product.part_number}
           </button>
         </h3>
 

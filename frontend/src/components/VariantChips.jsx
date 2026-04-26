@@ -1,9 +1,12 @@
+import { useState, useEffect, useRef } from 'react';
+import '../styles/sort-dropdown.css';
+
 /**
- * VariantChips — inline text-based variation selector for product cards.
- *
- * Renders text chips (≤ 6 options) or a dropdown (> 6 options) for a single
- * variation attribute such as "Size" or "Length".  Uses no colour swatches;
- * all labels are contractor-friendly text (e.g. 7", 10", 12").
+* VariantChips — dropdown-driven variation selector for product cards.
+*
+* Renders a styled dropdown list for each variation attribute such as "Size"
+* or "Length". Uses no colour swatches; all labels are contractor-friendly text
+* (e.g. 7", 10", 12").
  *
  * Props
  * ─────
@@ -18,6 +21,19 @@
  *   compact     boolean — when true, reduces padding (for use inside product cards)
  */
 export default function VariantChips({ attributes, selected, onSelect, compact = false }) {
+  const [openAttribute, setOpenAttribute] = useState(null);
+  const rootRef = useRef(null);
+
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (rootRef.current && !rootRef.current.contains(event.target)) {
+        setOpenAttribute(null);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
   if (!attributes || attributes.length === 0) return null;
 
   const normalizeOptions = (options) => {
@@ -35,14 +51,14 @@ export default function VariantChips({ attributes, selected, onSelect, compact =
   };
 
   return (
-    <div className="variant-chips-root" style={{ display: 'flex', flexDirection: 'column', gap: compact ? '4px' : '8px' }}>
+    <div ref={rootRef} className="variant-chips-root" style={{ display: 'flex', flexDirection: 'column', gap: compact ? '4px' : '8px' }}>
       {attributes.map((attr) => {
         const name = (attr.name || '').trim();
         if (!name || name.toLowerCase() === 'brand') return null;
         const options = normalizeOptions(attr.options);
         if (!options || options.length === 0) return null;
         const currentValue = selected?.[name] ?? '';
-        const useDropdown  = options.length > 6;
+        const isOpen = openAttribute === name;
 
         return (
           <div key={name} style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
@@ -58,62 +74,62 @@ export default function VariantChips({ attributes, selected, onSelect, compact =
               </span>
             )}
 
-            {useDropdown ? (
-              /* ── Dropdown for many options ────────────────────────────── */
-              <select
-                value={currentValue}
-                onChange={(e) => onSelect(name, e.target.value)}
-                onClick={(e) => e.stopPropagation()}
+            <div className="sort-dropdown-wrapper variant-dropdown-wrapper" style={{ width: '100%', maxWidth: '100%' }}>
+              <button
+                type="button"
+                className="sort-dropdown-button"
                 aria-label={`Select ${name}`}
-                style={{
-                  fontSize: '0.7rem',
-                  padding: compact ? '2px 6px' : '4px 8px',
-                  border: '1px solid #d1d5db',
-                  borderRadius: '6px',
-                  background: 'white',
-                  color: '#111827',
-                  cursor: 'pointer',
-                  maxWidth: '100%',
+                aria-expanded={isOpen}
+                aria-haspopup="listbox"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setOpenAttribute((prev) => (prev === name ? null : name));
                 }}
               >
-                <option value="">Select {name}</option>
-                {options.map((opt) => (
-                  <option key={opt} value={opt}>{opt}</option>
-                ))}
-              </select>
-            ) : (
-              /* ── Chip row for few options ─────────────────────────────── */
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
-                {options.map((opt) => {
-                  const isSelected = currentValue === opt;
-                  return (
-                    <button
-                      key={opt}
-                      type="button"
-                      onClick={(e) => { e.stopPropagation(); onSelect(name, opt); }}
-                      aria-pressed={isSelected}
-                      aria-label={`${name}: ${opt}`}
-                      style={{
-                        padding: compact ? '2px 7px' : '3px 9px',
-                        fontSize: '0.68rem',
-                        fontWeight: 600,
-                        lineHeight: 1.4,
-                        borderRadius: '5px',
-                        border: isSelected ? '1.5px solid #2563eb' : '1.5px solid #d1d5db',
-                        background: isSelected ? '#2563eb' : 'white',
-                        color: isSelected ? 'white' : '#374151',
-                        cursor: 'pointer',
-                        transition: 'background 0.12s, border-color 0.12s, color 0.12s',
-                        userSelect: 'none',
-                        whiteSpace: 'nowrap',
-                      }}
-                    >
-                      {opt}
-                    </button>
-                  );
-                })}
-              </div>
-            )}
+                <span className="sort-button-label">
+                  {currentValue || `Select ${name}`}
+                </span>
+                <span className={`sort-chevron ${isOpen ? 'open' : ''}`} />
+              </button>
+
+              {isOpen && (
+                <div className="sort-dropdown-menu" role="listbox">
+                  {options.map((opt) => {
+                    const isSelected = currentValue === opt;
+                    return (
+                      <button
+                        key={opt}
+                        type="button"
+                        role="option"
+                        aria-selected={isSelected}
+                        className={`sort-dropdown-item ${isSelected ? 'selected' : ''}`}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onSelect(name, opt);
+                          setOpenAttribute(null);
+                        }}
+                      >
+                        <div className="sort-item-content">
+                          <div className="sort-item-text">
+                            <div className="sort-item-label">{opt}</div>
+                          </div>
+                        </div>
+                        {isSelected && (
+                          <div className="sort-item-checkmark">
+                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                              <path
+                                d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                                fill="currentColor"
+                              />
+                            </svg>
+                          </div>
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
           </div>
         );
       })}

@@ -26,17 +26,21 @@ const BRAND_LOGOS = {
   'Graco': gracoLogo,
 };
 
-export default function ProductDetail({ product, onAddToCart, onClose, initialSelectedAttrs = {} }) {
+export default function ProductDetail({ product, onAddToCart, onClose, initialSelectedAttrs = {}, initialVariations = [] }) {
   const { addToCart } = useCart();
   const [quantity, setQuantity] = useState(1);
   const [isWishlisted, setIsWishlisted] = useState(false);
   const [activeTab, setActiveTab] = useState('description');
 
   // ── Variable product variations ──────────────────────────────────────────
-  const [variations, setVariations]             = useState([]);
-  const [variationsLoading, setVariationsLoading] = useState(false);
+  const initialVariationSelection = Object.keys(initialSelectedAttrs || {}).length > 0
+    ? initialSelectedAttrs
+    : getVariationSelectionMap((initialVariations || []).find((v) => v.stock_status !== 'outofstock') || (initialVariations || [])[0] || {});
+
+  const [variations, setVariations]             = useState(initialVariations || []);
+  const [variationsLoading, setVariationsLoading] = useState(Array.isArray(initialVariations) && initialVariations.length > 0 ? false : false);
   // selectedAttrs: { [attrName]: value } — tracks the user's chip selections
-  const [selectedAttrs, setSelectedAttrs]       = useState({});
+  const [selectedAttrs, setSelectedAttrs]       = useState(initialVariationSelection);
 
   // When a variable product is opened, fetch its variations from the API.
   // All state updates run asynchronously (via Promise chain) to satisfy the
@@ -45,6 +49,22 @@ export default function ProductDetail({ product, onAddToCart, onClose, initialSe
     if (!product?.is_variable || !product.id) return;
 
     let mounted = true;
+
+    const useInitialVariations = Array.isArray(initialVariations) && initialVariations.length > 0;
+
+    if (useInitialVariations) {
+      Promise.resolve().then(() => {
+        if (!mounted) return;
+        setVariations(initialVariations);
+        setSelectedAttrs(Object.keys(initialSelectedAttrs || {}).length > 0
+          ? initialSelectedAttrs
+          : getVariationSelectionMap(initialVariations.find((v) => v.stock_status !== 'outofstock') || initialVariations[0] || {})
+        );
+        setVariationsLoading(false);
+      });
+      return () => { mounted = false; };
+
+    }
 
     Promise.resolve()
       .then(() => {
@@ -71,7 +91,7 @@ export default function ProductDetail({ product, onAddToCart, onClose, initialSe
       .finally(() => { if (mounted) setVariationsLoading(false); });
 
     return () => { mounted = false; };
-  }, [product?.id, product?.is_variable, initialSelectedAttrs]); // is_variable must be listed — a product could share an id across type changes
+  }, [product?.id, product?.is_variable, initialSelectedAttrs, initialVariations]); // is_variable must be listed — a product could share an id across type changes
 
   // Find the variation that matches the current chip selections
   const selectedVariation = product?.is_variable
