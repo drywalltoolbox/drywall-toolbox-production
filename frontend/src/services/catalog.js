@@ -16,8 +16,7 @@
  * All paths return objects in the normalizeProduct() shape from services/api.js.
  */
 
-import { getProducts as apiGetProducts, getProduct as apiGetProduct } from './api.js';
-import { credentialsReady } from '../api/client.js';
+import { fetchProducts as proxyFetchProducts, fetchProduct as proxyFetchProduct } from '../api/products.js';
 import { readCache, writeCache, bustCache, isCacheAvailable } from './productCache.js';
 
 // ─── In-memory promise cache ──────────────────────────────────────────────────
@@ -35,7 +34,8 @@ export function getCatalogSource() { return _source; }
  * Throws on network or auth error.
  */
 async function fetchFromApi() {
-  await credentialsReady();
+  // Use the server-side drywall/v1 proxy for WooCommerce product loading.
+  // This avoids relying on client-side WC auth credentials in the browser.
 
   let all   = [];
   let page  = 1;
@@ -45,7 +45,8 @@ async function fetchFromApi() {
   while (!done) {
     let batch;
     try {
-      batch = await apiGetProducts({ per_page: PER, page, status: 'publish' });
+      const result = await proxyFetchProducts({ per_page: PER, page, status: 'publish' });
+      batch = Array.isArray(result) ? result : result?.products || [];
     } catch (pageErr) {
       if (all.length > 0) break;
       throw pageErr;
@@ -167,8 +168,7 @@ export async function getProductById(idOrSku) {
   // Direct API lookup for numeric IDs (fastest path)
   if (/^\d+$/.test(key)) {
     try {
-      await credentialsReady();
-      const p = await apiGetProduct(key);
+      const p = await proxyFetchProduct(key);
       if (p) { _source = 'api'; return p; }
     } catch {
       // fall through to catalog search
@@ -198,8 +198,7 @@ export async function searchProducts(query) {
 
   // Try REST search
   try {
-    await credentialsReady();
-    const { searchProducts: apiSearch } = await import('./api.js');
+    const { searchProducts: apiSearch } = await import('../api/products.js');
     const results = await apiSearch(query);
     if (results.length > 0) return results;
   } catch {

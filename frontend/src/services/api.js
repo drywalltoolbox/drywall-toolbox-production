@@ -13,11 +13,9 @@
  * WooCommerce REST API docs: https://woocommerce.github.io/woocommerce-rest-api-docs/
  */
 
-import { wcClient } from '../api/client.js';
+import { apiClient } from '../api/client.js';
 import { CATEGORY_MAP } from '../utils/parseProductCsv.js';
 
-// Prefer build-time env injection, fall back to runtime-origin based paths
-const WC_BASE = process.env.REACT_APP_WC_BASE_URL || (typeof window !== 'undefined' ? `${window.location.origin}/wp-json/wc/v3` : '');
 
 // ─── Known brand names (kept in sync with ALLOWED_BRANDS in Products.jsx) ────
 const KNOWN_BRANDS = [
@@ -46,8 +44,6 @@ const BRAND_ALIASES = {
   'sur pro':                   'SurPro',
 };
 
-// ─── Auth header (lazy, runtime-safe) ────────────────────────────────────────
-//
 // Build-time env vars (REACT_APP_WC_AUTH_USER / REACT_APP_WC_AUTH_PASS) are baked
 // in by webpack DefinePlugin.  If the deploy predates dotenv being wired up,
 // they will be empty strings.
@@ -63,45 +59,6 @@ const BRAND_ALIASES = {
 //   1. wcClient.defaults.headers.common['Authorization']  (patched by bootstrap)
 //   2. build-time REACT_APP_WC_AUTH_USER env var
 //   3. build-time REACT_APP_WC_AUTH_PASS env var
-
-function getAuthHeader() {
-  // First choice: whatever client.js has set (may be bootstrap-patched at runtime)
-  const live = wcClient?.defaults?.headers?.common?.['Authorization'];
-  if (live) return { Authorization: live };
-
-  // Second choice: build-time env vars (works when dotenv is properly wired)
-  const user = process.env.REACT_APP_WC_AUTH_USER || '';
-  const pass = process.env.REACT_APP_WC_AUTH_PASS || '';
-  if (user && pass) return { Authorization: 'Basic ' + btoa(`${user}:${pass}`) };
-
-  // No credentials available — request will 401; ensure credentials are configured
-  return {};
-}
-
-/**
- * Core fetch helper — appends query params, authenticates, parses JSON,
- * and normalises errors.
- *
- * @param {string} endpoint  Path appended to WC_BASE, e.g. '/products'
- * @param {Object} params    Optional query parameters
- * @returns {Promise<any>}
- */
-const wcFetch = async (endpoint, params = {}) => {
-  const query = new URLSearchParams(params).toString();
-  const url   = `${WC_BASE}${endpoint}${query ? '?' + query : ''}`;
-  const res   = await fetch(url, { headers: getAuthHeader() });
-  if (!res.ok) {
-    let message = `WooCommerce API error ${res.status}: ${url}`;
-    try {
-      const body = await res.json();
-      if (body && body.message) message = body.message;
-    } catch {
-      // response was not JSON — keep status-line message
-    }
-    throw new Error(message);
-  }
-  return res.json();
-};
 
 // ─── Normalizer ──────────────────────────────────────────────────────────────
 //
@@ -460,7 +417,7 @@ export function normalizeProduct(wcProduct) {
  * @returns {Promise<Array>}
  */
 export const getProducts = (params = {}) =>
-  wcFetch('/products', { per_page: 100, status: 'publish', ...params })
+  apiClient(`/wp-json/drywall/v1/products?${new URLSearchParams({ per_page: 100, status: 'publish', ...params }).toString()}`)
     .then((list) => list.map(normalizeProduct));
 
 /**
@@ -469,7 +426,8 @@ export const getProducts = (params = {}) =>
  * @returns {Promise<Object>}
  */
 export const getProduct = (id) =>
-  wcFetch(`/products/${id}`).then(normalizeProduct);
+  apiClient(`/wp-json/drywall/v1/products/${encodeURIComponent(id)}`)
+    .then(normalizeProduct);
 
 /**
  * Fetch products belonging to a category (by category ID).
@@ -478,7 +436,7 @@ export const getProduct = (id) =>
  * @returns {Promise<Array>}
  */
 export const getProductsByCategory = (categoryId, params = {}) =>
-  wcFetch('/products', { category: categoryId, per_page: 100, status: 'publish', ...params })
+  apiClient(`/wp-json/drywall/v1/products?${new URLSearchParams({ category: categoryId, per_page: 100, status: 'publish', ...params }).toString()}`)
     .then((list) => list.map(normalizeProduct));
 
 /**
@@ -487,7 +445,7 @@ export const getProductsByCategory = (categoryId, params = {}) =>
  * @returns {Promise<Array>}
  */
 export const searchProducts = (searchTerm) =>
-  wcFetch('/products', { search: searchTerm, per_page: 50, status: 'publish' })
+  apiClient(`/wp-json/drywall/v1/search?q=${encodeURIComponent(searchTerm)}&${new URLSearchParams({ per_page: 50, status: 'publish' }).toString()}`)
     .then((list) => list.map(normalizeProduct));
 
 /**
@@ -499,7 +457,7 @@ export const searchProducts = (searchTerm) =>
  * @returns {Promise<Array>}        Array of normalised variation objects
  */
 export const getProductVariations = (parentId) =>
-  wcFetch(`/products/${parentId}/variations`, { per_page: 100, status: 'publish' })
+  apiClient(`/wp-json/drywall/v1/products/${encodeURIComponent(parentId)}/variations?${new URLSearchParams({ per_page: 100, status: 'publish' }).toString()}`)
     .then((list) => list.map(normalizeProduct));
 
 // ─── Categories ──────────────────────────────────────────────────────────────
@@ -510,7 +468,7 @@ export const getProductVariations = (parentId) =>
  * @returns {Promise<Array>}
  */
 export const getCategories = (params = {}) =>
-  wcFetch('/products/categories', { per_page: 100, hide_empty: true, ...params });
+  apiClient(`/wp-json/drywall/v1/categories?${new URLSearchParams({ per_page: 100, hide_empty: true, ...params }).toString()}`);
 
 /**
  * Fetch a single category by ID.
@@ -518,4 +476,4 @@ export const getCategories = (params = {}) =>
  * @returns {Promise<Object>}
  */
 export const getCategory = (id) =>
-  wcFetch(`/products/categories/${id}`);
+  apiClient(`/wp-json/drywall/v1/categories/${encodeURIComponent(id)}`);

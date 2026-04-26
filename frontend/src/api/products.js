@@ -8,7 +8,7 @@
  * (getProductBySku, getProductCategories, etc.).
  */
 
-import { apiClient, wcClient } from './client.js';
+import { apiClient } from './client.js';
 import { normalizeProduct } from '../services/api.js';
 import { getProductById as getCatalogProductById } from '../services/catalog.js';
 
@@ -88,8 +88,7 @@ export async function searchProducts( query, params = {} ) {
  * @returns {Promise<Array>}
  */
 export async function getProducts( params = {} ) {
-  const response = await wcClient.get( '/products', { params: { per_page: 20, ...params } } );
-  return response.data;
+  return apiClient( `/wp-json/drywall/v1/products?${ new URLSearchParams({ per_page: 20, ...params }).toString() }` );
 }
 
 /**
@@ -99,8 +98,7 @@ export async function getProducts( params = {} ) {
  * @returns {Promise<Object>}
  */
 export async function getProduct( id ) {
-  const response = await wcClient.get( `/products/${ id }` );
-  return response.data;
+  return apiClient( `/wp-json/drywall/v1/products/${ encodeURIComponent( id ) }` );
 }
 
 /**
@@ -116,10 +114,7 @@ export const getProductById = getProduct;
  * @returns {Promise<Array>}
  */
 export async function getProductsByCategory( categoryId, params = {} ) {
-  const response = await wcClient.get( '/products', {
-    params: { category: categoryId, per_page: 20, ...params },
-  } );
-  return response.data;
+  return apiClient( `/wp-json/drywall/v1/products?${ new URLSearchParams({ category: categoryId, per_page: 20, ...params }).toString() }` );
 }
 
 /**
@@ -129,10 +124,7 @@ export async function getProductsByCategory( categoryId, params = {} ) {
  * @returns {Promise<Array>}
  */
 export async function getProductCategories( params = {} ) {
-  const response = await wcClient.get( '/products/categories', {
-    params: { per_page: 100, ...params },
-  } );
-  return response.data;
+  return apiClient( `/wp-json/drywall/v1/categories?${ new URLSearchParams({ per_page: 100, ...params }).toString() }` );
 }
 
 /**
