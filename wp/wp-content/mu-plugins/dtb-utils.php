@@ -84,27 +84,20 @@ function dtb_is_admin_or_rest_request(): bool {
  *   webhook_secret    HMAC secret for webhook validation        (WC_WEBHOOK_SECRET)
  *   import_secret     CI/CD catalog-import auth token          (DTB_IMPORT_SECRET)
  *   jwt_secret        JWT signing secret                        (DRYWALL_JWT_SECRET)
- *   csv_filename      Resolved catalog CSV filename (auto-discovered or fallback)
- *   csv_filenames     Always a single-element array wrapping csv_filename
+ *   csv_filename      Primary resolved catalog CSV filename
+ *   csv_filenames     Resolved catalog CSV filename list
+ *   csv_source        configured, auto, fallback, or missing
+ *   csv_missing       Configured CSV filenames that were not readable
  *   webhook_delivery  Webhook delivery URL                      (DTB_WEBHOOK_DELIVERY_URL)
  *
- * @return array<string,string>
+ * @return array<string,mixed>
  */
 function dtb_get_config(): array {
 	if ( isset( $GLOBALS['_dtb_config_cache'] ) ) {
 		return $GLOBALS['_dtb_config_cache'];
 	}
 
-	// ── Resolve catalog CSV filename ─────────────────────────────────────────
-	// Force the stable wp-catalog.csv as the active import source.
-	// This bypasses the product-wc-*.csv auto-discovery logic so the image
-	// sync and catalog import always use the canonical CSV file.
-	$upload_dir  = wp_upload_dir();
-	$wc_imports  = trailingslashit( $upload_dir['basedir'] ) . 'wc-imports/';
-	$forced_csv  = $wc_imports . 'wp-catalog.csv';
-	$csv_filename = file_exists( $forced_csv ) ? 'wp-catalog.csv' : '';
-
-	$csv_filenames = '' !== $csv_filename ? [ $csv_filename ] : [];
+	$csv_config = dtb_resolve_catalog_csv_config();
 
 	$GLOBALS['_dtb_config_cache'] = [
 		'wc_proxy_key'     => defined( 'WC_PROXY_CONSUMER_KEY' )    ? WC_PROXY_CONSUMER_KEY    : '',
@@ -114,14 +107,88 @@ function dtb_get_config(): array {
 		'webhook_secret'   => defined( 'WC_WEBHOOK_SECRET' )        ? WC_WEBHOOK_SECRET        : '',
 		'import_secret'    => defined( 'DTB_IMPORT_SECRET' )        ? DTB_IMPORT_SECRET        : '',
 		'jwt_secret'       => defined( 'DRYWALL_JWT_SECRET' )       ? DRYWALL_JWT_SECRET       : '',
-		// Resolved filename — auto-discovered product-wc-*.csv or wp-catalog.csv fallback.
-		'csv_filename'     => $csv_filename,
-		// Single-element array for compatibility with multi-file import/stream routes.
-		'csv_filenames'    => $csv_filenames,
+		'csv_filename'     => $csv_config['filename'],
+		'csv_filenames'    => $csv_config['filenames'],
+		'csv_source'       => $csv_config['source'],
+		'csv_missing'      => $csv_config['missing'],
 		'webhook_delivery' => defined( 'DTB_WEBHOOK_DELIVERY_URL' ) ? DTB_WEBHOOK_DELIVERY_URL : 'https://drywalltoolbox.com/wp-json/drywall/v1/webhooks/products',
 	];
 
 	return $GLOBALS['_dtb_config_cache'];
+}
+
+/**
+ * Resolve the active WooCommerce product CSV configuration.
+ *
+ * Priority:
+ *   1. DTB_WC_CSV_FILENAME when defined. It may contain one filename or a
+ *      comma/pipe-separated list. Each entry is reduced to basename().
+ *   2. Newest readable product-*.csv file in uploads/wc-imports/.
+ *   3. Readable uploads/wc-imports/wp-catalog.csv fallback.
+ *
+ * @return array{filename:string,filenames:string[],source:string,missing:string[]}
+ */
+function dtb_resolve_catalog_csv_config(): array {
+	$upload_dir = wp_upload_dir();
+	$imports_dir = trailingslashit( $upload_dir['basedir'] ) . 'wc-imports/';
+
+	$result = [
+		'filename'  => '',
+		'filenames' => [],
+		'source'    => 'missing',
+		'missing'   => [],
+	];
+
+	$configured_csv = defined( 'DTB_WC_CSV_FILENAME' ) ? trim( (string) DTB_WC_CSV_FILENAME ) : '';
+	if ( '' !== $configured_csv ) {
+		$requested = preg_split( '/\s*[,|]\s*/', $configured_csv ) ?: [];
+		foreach ( $requested as $filename ) {
+			$basename = basename( trim( (string) $filename ) );
+			if ( '' === $basename ) {
+				continue;
+			}
+
+			$path = $imports_dir . $basename;
+			if ( is_readable( $path ) && is_file( $path ) ) {
+				$result['filenames'][] = $basename;
+			} else {
+				$result['missing'][] = $basename;
+			}
+		}
+
+		$result['filenames'] = array_values( array_unique( $result['filenames'] ) );
+		if ( ! empty( $result['filenames'] ) ) {
+			$result['filename'] = $result['filenames'][0];
+			$result['source']   = 'configured';
+			return $result;
+		}
+	}
+
+	if ( is_dir( $imports_dir ) ) {
+		$product_csvs = glob( $imports_dir . 'product-*.csv' ) ?: [];
+		$product_csvs = array_values( array_filter( $product_csvs, static fn( $path ) => is_file( $path ) && is_readable( $path ) ) );
+
+		if ( ! empty( $product_csvs ) ) {
+			usort( $product_csvs, static function ( string $a, string $b ): int {
+				$mtime_compare = filemtime( $b ) <=> filemtime( $a );
+				return 0 !== $mtime_compare ? $mtime_compare : strcmp( basename( $a ), basename( $b ) );
+			} );
+
+			$result['filename']  = basename( $product_csvs[0] );
+			$result['filenames'] = [ $result['filename'] ];
+			$result['source']    = 'auto';
+			return $result;
+		}
+	}
+
+	$fallback = $imports_dir . 'wp-catalog.csv';
+	if ( is_readable( $fallback ) && is_file( $fallback ) ) {
+		$result['filename']  = 'wp-catalog.csv';
+		$result['filenames'] = [ 'wp-catalog.csv' ];
+		$result['source']    = 'fallback';
+	}
+
+	return $result;
 }
 
 // ─── Credential helpers ───────────────────────────────────────────────────────

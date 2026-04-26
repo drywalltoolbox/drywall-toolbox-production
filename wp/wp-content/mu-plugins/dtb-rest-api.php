@@ -815,6 +815,8 @@ function dtb_route_catalog(): WP_REST_Response {
 		'csv_url'       => rest_url( 'dtb/v1/products-csv' ),
 		'filename'      => $config['csv_filename'],
 		'filenames'     => $config['csv_filenames'],
+		'source'        => $config['csv_source'] ?? '',
+		'missing'       => $config['csv_missing'] ?? [],
 	] );
 }
 

@@ -328,9 +328,8 @@ function dtb_image_sync_permission( WP_REST_Request $request ): bool {
  *
  * Sync strategy (SKU-first):
  *   1. Load all product SKUs from the DB in one indexed query.
- *   2. For each SKU, probe for {sku}.{ext} (primary) and
- *      {sku}_01.{ext} … {sku}_20.{ext} (gallery) on disk.
- *   3. Register any unregistered files via dtb_register_image_attachment().
+ *   2. For each SKU, match exact image basenames from the active import CSV.
+ *   3. Register any unregistered files found on disk via dtb_register_image_attachment().
  *   4. Link thumbnail + gallery to each product via the WC_Product API.
  *   5. Flush WC product transients so REST responses reflect new images.
  */
@@ -413,6 +412,7 @@ function dtb_route_sync_images( WP_REST_Request $request ): WP_REST_Response|WP_
 	}
 
 	$extensions = [ 'webp', 'jpg', 'jpeg', 'png', 'avif', 'gif' ];
+	$config = function_exists( 'dtb_get_config' ) ? dtb_get_config() : [];
 	$catalog_images_by_sku = dtb_get_catalog_image_pairs_by_sku( $scan_dir, $scan_url, $extensions );
 	$catalog_expected_files_by_sku = dtb_get_catalog_image_filenames_by_sku();
 	$catalog_missing_files_by_sku = dtb_get_catalog_missing_image_filenames_by_sku( $scan_dir, $scan_url, $extensions );
@@ -439,6 +439,8 @@ function dtb_route_sync_images( WP_REST_Request $request ): WP_REST_Response|WP_
 	$linked         = 0;
 	$skipped        = 0;
 	$no_file        = 0;
+	$no_catalog_image = 0;
+	$missing_disk_file = 0;
 	$gallery_images = 0;
 	$errors         = [];
 	$missing_files  = [];
@@ -558,8 +560,7 @@ function dtb_route_sync_images( WP_REST_Request $request ): WP_REST_Response|WP_
 
 		$sku_lower  = (string) $batch_item;
 		$product_id = $sku_map[ $sku_lower ];
-		$last_item  = $sku_lower;
-		$last_sku   = $sku_lower;
+		$last_item  = '';
 		$last_product = $product_id;
 
 		$expected_files = $catalog_expected_files_by_sku[ $sku_lower ] ?? [];
@@ -571,35 +572,19 @@ function dtb_route_sync_images( WP_REST_Request $request ): WP_REST_Response|WP_
 			$primary_url   = $first['url'];
 			$gallery_pairs = $catalog_pairs;
 		} else {
-			// Fallback for legacy image sets named {sku}.ext and {sku}_01.ext.
-			[ $primary_path, $primary_url ] = dtb_probe_image( $scan_dir, $scan_url, $sku_lower, $extensions );
-
+			$primary_path  = null;
+			$primary_url   = null;
 			$gallery_pairs = [];
-			for ( $i = 1; $i <= 20; $i++ ) {
-				$suffix = '_' . str_pad( (string) $i, 2, '0', STR_PAD_LEFT );
-				[ $gpath, $gurl ] = dtb_probe_image( $scan_dir, $scan_url, $sku_lower . $suffix, $extensions );
-				if ( $gpath ) {
-					$gallery_pairs[] = [ 'path' => $gpath, 'url' => $gurl ];
-				}
-			}
 		}
 
-		// ── Fallback: glob for {sku}_{hash}.{ext} (e.g. Platinum pt-10fb_7316520b.webp) ──
-		// If neither an exact primary nor numeric gallery were found, scan the
-		// directory for any file whose stem matches /^{sku}_[0-9a-f]{6,}$/i.
-		// The first sorted match becomes primary; the rest become gallery images.
-		if ( ! $primary_path && empty( $gallery_pairs ) ) {
-			$hash_matches = dtb_probe_image_hash_variants( $scan_dir, $scan_url, $sku_lower, $extensions );
-			if ( ! empty( $hash_matches ) ) {
-				$first         = array_shift( $hash_matches );
-				$primary_path  = $first['path'];
-				$primary_url   = $first['url'];
-				$gallery_pairs = $hash_matches; // remaining = gallery
-			}
-		}
 
 		if ( ! $primary_path ) {
 			++$no_file;
+			if ( empty( $expected_files ) ) {
+				++$no_catalog_image;
+			} else {
+				++$missing_disk_file;
+			}
 			$missing_files[] = [
 				'sku'      => $sku_lower,
 				'expected' => $expected_files,
@@ -702,7 +687,12 @@ function dtb_route_sync_images( WP_REST_Request $request ): WP_REST_Response|WP_
 		'linked'         => $linked,
 		'skipped'        => $skipped,
 		'no_file'        => $no_file,
+		'no_catalog_image' => $no_catalog_image,
+		'missing_disk_file' => $missing_disk_file,
 		'gallery_images' => $gallery_images,
+		'active_csv'     => $config['csv_filename'] ?? '',
+		'csv_source'     => $config['csv_source'] ?? '',
+		'csv_missing'    => $config['csv_missing'] ?? [],
 		'missing_files'  => $missing_files,
 		'errors'         => $errors,
 		'dry_run'        => $dry_run,
@@ -718,7 +708,8 @@ function dtb_route_sync_images( WP_REST_Request $request ): WP_REST_Response|WP_
  * Link already-registered image attachments to WooCommerce products by SKU.
  *
  * This mode does not register files. It is intended for the post-import step
- * after products from wp-catalog.csv exist in WooCommerce and image files were
+ * after products from the active WooCommerce import CSV exist in WooCommerce
+ * and image files were already registered in the Media Library.
  * already registered in the Media Library.
  */
 function dtb_route_link_registered_images( WP_REST_Request $request ): WP_REST_Response|WP_Error {
@@ -799,26 +790,9 @@ function dtb_route_link_registered_images( WP_REST_Request $request ): WP_REST_R
 			$primary_url   = $first['url'];
 			$gallery_pairs = $catalog_pairs;
 		} else {
-			[ $primary_path, $primary_url ] = dtb_probe_image( $scan_dir, $scan_url, $sku_lower, $extensions );
-
+			$primary_path  = null;
+			$primary_url   = null;
 			$gallery_pairs = [];
-			for ( $i = 1; $i <= 20; $i++ ) {
-				$suffix = '_' . str_pad( (string) $i, 2, '0', STR_PAD_LEFT );
-				[ $gpath, $gurl ] = dtb_probe_image( $scan_dir, $scan_url, $sku_lower . $suffix, $extensions );
-				if ( $gpath ) {
-					$gallery_pairs[] = [ 'path' => $gpath, 'url' => $gurl ];
-				}
-			}
-		}
-
-		if ( ! $primary_path && empty( $gallery_pairs ) ) {
-			$hash_matches = dtb_probe_image_hash_variants( $scan_dir, $scan_url, $sku_lower, $extensions );
-			if ( ! empty( $hash_matches ) ) {
-				$first         = array_shift( $hash_matches );
-				$primary_path  = $first['path'];
-				$primary_url   = $first['url'];
-				$gallery_pairs = $hash_matches;
-			}
 		}
 
 		if ( ! $primary_path || ! $primary_url ) {
@@ -927,6 +901,7 @@ function dtb_route_sync_images_status( WP_REST_Request $request ): WP_REST_Respo
 	$dir_exists     = is_dir( $scan_dir );
 	$image_exts     = [ 'webp', 'jpg', 'jpeg', 'png', 'avif', 'gif', 'svg' ];
 	$files_on_disk  = $dir_exists ? dtb_list_images_in_dir( $scan_dir, $image_exts ) : [];
+	$config         = function_exists( 'dtb_get_config' ) ? dtb_get_config() : [];
 
 	global $wpdb;
 
@@ -979,6 +954,9 @@ function dtb_route_sync_images_status( WP_REST_Request $request ): WP_REST_Respo
 		'registered_in_db'    => $registered_count,
 		'linked_products'     => $linked_count,
 		'gallery_products'    => $gallery_product_count,
+		'active_csv'          => $config['csv_filename'] ?? '',
+		'csv_source'          => $config['csv_source'] ?? '',
+		'csv_missing'         => $config['csv_missing'] ?? [],
 		'sync_locked'         => (bool) get_transient( DTB_SYNC_LOCK_KEY ),
 	] );
 }
@@ -1439,54 +1417,184 @@ function dtb_get_catalog_image_pairs_by_sku( string $dir, string $url, array $ex
 		if ( ! is_readable( $csv_path ) ) {
 			continue;
 		}
-
-		$handle = fopen( $csv_path, 'r' ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fopen
-		if ( false === $handle ) {
-			continue;
+		$parsed_pairs = dtb_parse_catalog_csv_image_pairs( $csv_path, $by_basename, $file_index );
+		foreach ( $parsed_pairs as $sku => $pairs ) {
+			$cache[ $cache_key ][ $sku ] = $pairs;
 		}
+	}
 
-		$header = fgetcsv( $handle );
-		if ( ! is_array( $header ) ) {
-			fclose( $handle );
-			continue;
-		}
-
-		$sku_index    = array_search( 'SKU', $header, true );
-		$images_index = array_search( 'Images', $header, true );
-		if ( false === $sku_index || false === $images_index ) {
-			fclose( $handle );
-			continue;
-		}
-
-		while ( false !== ( $row = fgetcsv( $handle ) ) ) {
-			$sku = isset( $row[ $sku_index ] ) ? strtolower( trim( (string) $row[ $sku_index ] ) ) : '';
-			if ( '' === $sku ) {
-				continue;
-			}
-
-			$image_field = isset( $row[ $images_index ] ) ? trim( (string) $row[ $images_index ] ) : '';
-			if ( '' === $image_field ) {
-				continue;
-			}
-
-			$pairs = [];
-			foreach ( explode( '|', $image_field ) as $image_url ) {
-				$basename = strtolower( basename( strtok( trim( $image_url ), '?' ) ?: '' ) );
-				if ( '' === $basename || ! isset( $by_basename[ $basename ] ) ) {
-					continue;
-				}
-				$pairs[] = $by_basename[ $basename ];
-			}
-
-			if ( ! empty( $pairs ) ) {
+	// Only use wp-catalog.csv when no product-wc-*.csv import file is configured
+	// or discovered. This enforces exact image filenames from the active
+	// WooCommerce import CSV and prevents legacy fallback from mixing in an
+	// older wp-catalog.csv import file.
+	if ( empty( $filenames ) ) {
+		$fallback = $imports_dir . 'wp-catalog.csv';
+		if ( is_readable( $fallback ) ) {
+			$parsed_pairs = dtb_parse_catalog_csv_image_pairs( $fallback, $by_basename, $file_index );
+			foreach ( $parsed_pairs as $sku => $pairs ) {
 				$cache[ $cache_key ][ $sku ] = $pairs;
 			}
 		}
-
-		fclose( $handle );
 	}
 
 	return $cache[ $cache_key ];
+}
+
+/**
+ * Parse a single product CSV for SKU => image pairs.
+ *
+ * @param string $csv_path Absolute CSV path.
+ * @param array<string,array{path:string,url:string}> $by_basename Index of filenames by lowercase basename.
+ * @param array<int,array{path:string,url:string,filename:string,stem:string,normalized_stem:string,ext:string}> $file_index Indexed files from the scan directory.
+ * @return array<string,array<int,array{path:string,url:string}>>
+ */
+function dtb_parse_catalog_csv_image_pairs( string $csv_path, array $by_basename, array $file_index = [] ): array {
+	$result = [];
+	$handle = fopen( $csv_path, 'r' ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fopen
+	if ( false === $handle ) {
+		return $result;
+	}
+
+	$header = fgetcsv( $handle );
+	if ( ! is_array( $header ) ) {
+		fclose( $handle );
+		return $result;
+	}
+
+	$sku_index    = array_search( 'SKU', $header, true );
+	$images_index = array_search( 'Images', $header, true );
+	if ( false === $sku_index || false === $images_index ) {
+		fclose( $handle );
+		return $result;
+	}
+
+	while ( false !== ( $row = fgetcsv( $handle ) ) ) {
+		$sku = isset( $row[ $sku_index ] ) ? strtolower( trim( (string) $row[ $sku_index ] ) ) : '';
+		if ( '' === $sku ) {
+			continue;
+		}
+
+		$image_field = isset( $row[ $images_index ] ) ? trim( (string) $row[ $images_index ] ) : '';
+		if ( '' === $image_field ) {
+			continue;
+		}
+
+		$pairs = [];
+		foreach ( dtb_split_catalog_image_field( $image_field ) as $image_url ) {
+			$pair = dtb_find_catalog_image_pair( $image_url, $sku, $by_basename, $file_index );
+			if ( null === $pair ) {
+				continue;
+			}
+			$pairs[] = $pair;
+		}
+
+		if ( ! empty( $pairs ) ) {
+			$result[ $sku ] = $pairs;
+		}
+	}
+
+	fclose( $handle );
+
+	return $result;
+}
+
+/**
+ * Split a WooCommerce Images field into individual image URL/path values.
+ *
+ * Current DTB catalogs use a pipe separator. Older or manually-exported
+ * WooCommerce files may use comma-separated image values, so handle both.
+ *
+ * @param string $image_field Raw Images column value.
+ * @return string[]
+ */
+function dtb_split_catalog_image_field( string $image_field ): array {
+	$image_field = trim( $image_field );
+	if ( '' === $image_field ) {
+		return [];
+	}
+
+	$delimiter = str_contains( $image_field, '|' ) ? '/\s*\|\s*/' : '/\s*,\s*/';
+	$parts     = preg_split( $delimiter, $image_field ) ?: [];
+
+	return array_values( array_filter( array_map( 'trim', $parts ), static fn( $value ) => '' !== $value ) );
+}
+
+/**
+ * Resolve a catalog image URL/path to a physical file found in the scan dir.
+ *
+ * Exact basename matching is preferred. If SEO slug text in the CSV drifts from
+ * the actual file on disk, fall back to the stable suffix convention:
+ * {anything}-{SKU}-{NN}.{ext}.
+ *
+ * @param string $image_url Catalog image URL or path.
+ * @param string $sku_lower Lower-case product SKU.
+ * @param array<string,array{path:string,url:string}> $by_basename Index of exact basenames.
+ * @param array<int,array{path:string,url:string,filename:string,stem:string,normalized_stem:string,ext:string}> $file_index Indexed files from the scan directory.
+ * @return array{path:string,url:string}|null
+ */
+function dtb_find_catalog_image_pair( string $image_url, string $sku_lower, array $by_basename, array $file_index ): ?array {
+	$path_part = strtok( trim( $image_url ), '?' );
+	$basename  = strtolower( rawurldecode( basename( false !== $path_part ? $path_part : '' ) ) );
+	if ( '' === $basename ) {
+		return null;
+	}
+
+	if ( isset( $by_basename[ $basename ] ) ) {
+		return $by_basename[ $basename ];
+	}
+
+	$ext      = strtolower( pathinfo( $basename, PATHINFO_EXTENSION ) );
+	$stem     = strtolower( pathinfo( $basename, PATHINFO_FILENAME ) );
+	$ordinal  = null;
+	$stem_without_ordinal = '';
+	if ( 1 === preg_match( '/(?:^|[-_])(\d{2})$/', $stem, $m ) ) {
+		$ordinal = $m[1];
+		$stem_without_ordinal = preg_replace( '/[-_]' . preg_quote( $ordinal, '/' ) . '$/', '', $stem ) ?: '';
+	}
+
+	if ( null === $ordinal || '' === $sku_lower ) {
+		return null;
+	}
+
+	$suffix_candidates = [
+		str_replace( '_', '-', $sku_lower ),
+		str_replace( '-', '_', $sku_lower ),
+		strtolower( rawurldecode( $sku_lower ) ),
+	];
+
+	// Variable products often point at variation image filenames. In that case
+	// the stable suffix in the CSV filename is the variation SKU, not the parent
+	// row SKU. Try increasingly long tail segments before the final -NN ordinal.
+	$normalized_expected_stem = str_replace( '_', '-', $stem_without_ordinal );
+	$parts = array_values( array_filter( explode( '-', $normalized_expected_stem ), static fn( $part ) => '' !== $part ) );
+	$max_tail_parts = min( 8, count( $parts ) );
+	for ( $take = 1; $take <= $max_tail_parts; $take++ ) {
+		$suffix_candidates[] = implode( '-', array_slice( $parts, -$take ) );
+	}
+
+	$suffix_candidates = array_values( array_unique( array_filter( $suffix_candidates ) ) );
+
+	foreach ( $file_index as $file ) {
+		if ( $ext && $file['ext'] !== $ext ) {
+			continue;
+		}
+
+		foreach ( $suffix_candidates as $candidate ) {
+			$normalized_candidate = str_replace( '_', '-', $candidate );
+			$underscore_candidate = str_replace( '-', '_', $candidate );
+			if (
+				str_ends_with( $file['normalized_stem'], '-' . $normalized_candidate . '-' . $ordinal )
+				|| str_ends_with( $file['stem'], '_' . $underscore_candidate . '_' . $ordinal )
+			) {
+				return [
+					'path' => $file['path'],
+					'url'  => $file['url'],
+				];
+			}
+		}
+	}
+
+	return null;
 }
 
 /**
@@ -1508,9 +1616,6 @@ function dtb_get_catalog_image_filenames_by_sku(): array {
 
 	$config    = dtb_get_config();
 	$filenames = $config['csv_filenames'] ?? [];
-	if ( empty( $filenames ) ) {
-		return $cache;
-	}
 
 	$upload_dir  = wp_upload_dir();
 	$imports_dir = trailingslashit( $upload_dir['basedir'] ) . 'wc-imports/';
@@ -1520,53 +1625,78 @@ function dtb_get_catalog_image_filenames_by_sku(): array {
 		if ( ! is_readable( $csv_path ) ) {
 			continue;
 		}
-
-		$handle = fopen( $csv_path, 'r' ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fopen
-		if ( false === $handle ) {
-			continue;
+		$parsed_filenames = dtb_parse_catalog_csv_image_filenames( $csv_path );
+		foreach ( $parsed_filenames as $sku => $images ) {
+			$cache[ $sku ] = $images;
 		}
+	}
 
-		$header = fgetcsv( $handle );
-		if ( ! is_array( $header ) ) {
-			fclose( $handle );
-			continue;
-		}
-
-		$sku_index    = array_search( 'SKU', $header, true );
-		$images_index = array_search( 'Images', $header, true );
-		if ( false === $sku_index || false === $images_index ) {
-			fclose( $handle );
-			continue;
-		}
-
-		while ( false !== ( $row = fgetcsv( $handle ) ) ) {
-			$sku = isset( $row[ $sku_index ] ) ? strtolower( trim( (string) $row[ $sku_index ] ) ) : '';
-			if ( '' === $sku ) {
-				continue;
-			}
-
-			$image_field = isset( $row[ $images_index ] ) ? trim( (string) $row[ $images_index ] ) : '';
-			if ( '' === $image_field ) {
-				continue;
-			}
-
-			$image_filenames = [];
-			foreach ( explode( '|', $image_field ) as $image_url ) {
-				$basename = basename( strtok( trim( $image_url ), '?' ) ?: '' );
-				if ( '' !== $basename ) {
-					$image_filenames[] = $basename;
-				}
-			}
-
-			if ( ! empty( $image_filenames ) ) {
-				$cache[ $sku ] = $image_filenames;
+	if ( empty( $filenames ) ) {
+		$fallback = $imports_dir . 'wp-catalog.csv';
+		if ( is_readable( $fallback ) ) {
+			$parsed_filenames = dtb_parse_catalog_csv_image_filenames( $fallback );
+			foreach ( $parsed_filenames as $sku => $images ) {
+				$cache[ $sku ] = $images;
 			}
 		}
-
-		fclose( $handle );
 	}
 
 	return $cache;
+}
+
+/**
+ * Parse a single product CSV for SKU => image filename lists.
+ *
+ * @param string $csv_path Absolute CSV path.
+ * @return array<string,string[]>
+ */
+function dtb_parse_catalog_csv_image_filenames( string $csv_path ): array {
+	$result = [];
+	$handle = fopen( $csv_path, 'r' ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fopen
+	if ( false === $handle ) {
+		return $result;
+	}
+
+	$header = fgetcsv( $handle );
+	if ( ! is_array( $header ) ) {
+		fclose( $handle );
+		return $result;
+	}
+
+	$sku_index    = array_search( 'SKU', $header, true );
+	$images_index = array_search( 'Images', $header, true );
+	if ( false === $sku_index || false === $images_index ) {
+		fclose( $handle );
+		return $result;
+	}
+
+	while ( false !== ( $row = fgetcsv( $handle ) ) ) {
+		$sku = isset( $row[ $sku_index ] ) ? strtolower( trim( (string) $row[ $sku_index ] ) ) : '';
+		if ( '' === $sku ) {
+			continue;
+		}
+
+		$image_field = isset( $row[ $images_index ] ) ? trim( (string) $row[ $images_index ] ) : '';
+		if ( '' === $image_field ) {
+			continue;
+		}
+
+		$image_filenames = [];
+		foreach ( dtb_split_catalog_image_field( $image_field ) as $image_url ) {
+			$basename = basename( strtok( trim( $image_url ), '?' ) ?: '' );
+			if ( '' !== $basename ) {
+				$image_filenames[] = $basename;
+			}
+		}
+
+		if ( ! empty( $image_filenames ) ) {
+			$result[ $sku ] = $image_filenames;
+		}
+	}
+
+	fclose( $handle );
+
+	return $result;
 }
 
 /**
@@ -1584,14 +1714,24 @@ function dtb_get_catalog_missing_image_filenames_by_sku( string $dir, string $ur
 	}
 
 	$present = [];
-	foreach ( dtb_get_image_file_index( $dir, $url, $extensions ) as $file ) {
+	$file_index = dtb_get_image_file_index( $dir, $url, $extensions );
+	$by_basename = [];
+	foreach ( $file_index as $file ) {
 		$present[ strtolower( $file['filename'] ) ] = true;
+		$by_basename[ strtolower( $file['filename'] ) ] = [
+			'path' => $file['path'],
+			'url'  => $file['url'],
+		];
 	}
 
 	$missing = [];
 	foreach ( $expected as $sku => $filenames ) {
 		foreach ( $filenames as $filename ) {
-			if ( ! isset( $present[ strtolower( $filename ) ] ) ) {
+			$filename_lower = strtolower( $filename );
+			if (
+				! isset( $present[ $filename_lower ] )
+				&& null === dtb_find_catalog_image_pair( $filename, $sku, $by_basename, $file_index )
+			) {
 				$missing[ $sku ][] = $filename;
 			}
 		}
@@ -1621,10 +1761,14 @@ function dtb_get_image_file_index( string $dir, string $url, array $extensions )
 		return $cache[ $cache_key ];
 	}
 
-	$files = [];
-	$it    = new DirectoryIterator( $dir );
+	$files    = [];
+	$base_dir = trailingslashit( $dir );
+	$base_url = trailingslashit( $url );
+	$it       = new RecursiveIteratorIterator(
+		new RecursiveDirectoryIterator( $dir, FilesystemIterator::SKIP_DOTS )
+	);
 	foreach ( $it as $file ) {
-		if ( $file->isDot() || ! $file->isFile() ) {
+		if ( ! $file->isFile() ) {
 			continue;
 		}
 
@@ -1637,10 +1781,11 @@ function dtb_get_image_file_index( string $dir, string $url, array $extensions )
 		if ( preg_match( '/-\d+x\d+$/', $stem ) ) {
 			continue;
 		}
+		$relative_path = str_replace( '\\', '/', substr( $file->getPathname(), strlen( $base_dir ) ) );
 
 		$files[] = [
 			'path'            => $file->getPathname(),
-			'url'             => trailingslashit( $url ) . $file->getFilename(),
+			'url'             => $base_url . $relative_path,
 			'filename'        => $file->getFilename(),
 			'stem'            => $stem,
 			'normalized_stem' => str_replace( '_', '-', $stem ),
@@ -1914,9 +2059,11 @@ function dtb_find_product_by_sku_stem( string $stem ): ?int {
  */
 function dtb_list_images_in_dir( string $dir, array $extensions ): array {
 	$files = [];
-	$it    = new DirectoryIterator( $dir );
+	$it    = new RecursiveIteratorIterator(
+		new RecursiveDirectoryIterator( $dir, FilesystemIterator::SKIP_DOTS )
+	);
 	foreach ( $it as $file ) {
-		if ( $file->isDot() || ! $file->isFile() ) {
+		if ( ! $file->isFile() ) {
 			continue;
 		}
 		if ( ! in_array( strtolower( $file->getExtension() ), $extensions, true ) ) {
@@ -2413,7 +2560,7 @@ function dtb_render_image_sync_admin_page(): void {
 				const processed = parseIntOrDefault( p.processed, 0 );
 				const batchTotal = parseIntOrDefault( p.batch_total, 0 );
 				const pct = batchTotal > 0 ? processed / batchTotal : 0;
-				const label = p.last_item || p.last_sku || 'working';
+				const label = p.last_item || 'working';
 				setBar( pct );
 				setStatus( `Running… ${processed}/${batchTotal > 0 ? batchTotal : '?'} (${Math.round( pct * 100 )}%) · ${label}` );
 			} catch ( err ) {
@@ -2537,16 +2684,34 @@ function dtb_render_image_sync_admin_page(): void {
 						`linked ${parseIntOrDefault( batch.linked, 0 )}`,
 						`skipped ${parseIntOrDefault( batch.skipped, 0 )}`,
 						`no_file ${parseIntOrDefault( batch.no_file, 0 )}`,
+						`no_catalog_image ${parseIntOrDefault( batch.no_catalog_image, 0 )}`,
+						`missing_disk_file ${parseIntOrDefault( batch.missing_disk_file, 0 )}`,
 						`missing_attachments ${parseIntOrDefault( batch.missing_attachments, 0 )}`
 					];
 					if ( 'registered' in batch ) {
 						batchSummary.push( `registered ${parseIntOrDefault( batch.registered, 0 )}` );
+					}
+					if ( batch.active_csv ) {
+						batchSummary.push( `active_csv ${batch.active_csv}` );
+					}
+					if ( batch.csv_source ) {
+						batchSummary.push( `csv_source ${batch.csv_source}` );
 					}
 					batchSummary.push( `errors ${Array.isArray( batch.errors ) ? batch.errors.length : 0}` );
 					appendLog( batchSummary.join( ' · ' ) );
 
 					if ( Array.isArray( batch.missing_files ) ) {
 						batch.missing_files.forEach( ( item ) => missingFiles.push( item ) );
+						batch.missing_files.slice( 0, 10 ).forEach( ( item ) => {
+							const sku = item && item.sku ? item.sku : '(unknown sku)';
+							const expected = Array.isArray( item.expected ) && item.expected.length
+								? item.expected.join( ', ' )
+								: '(no Images filename found in active CSV)';
+							appendLog( `  no_file ${sku}: ${expected}` );
+						} );
+						if ( batch.missing_files.length > 10 ) {
+							appendLog( `  ...${batch.missing_files.length - 10} more no_file SKU(s) in this batch` );
+						}
 					}
 
 					if ( batch.next_offset === null || typeof batch.next_offset === 'undefined' ) {
