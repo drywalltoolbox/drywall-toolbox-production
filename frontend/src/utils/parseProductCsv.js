@@ -525,6 +525,7 @@ function normalizeRow(row, idx, attrIndexes = []) {
       const vals  = (row[`Attribute ${n} value(s)`]  || '').trim();
       const usedForVar = (row[`Attribute ${n} used for variations`] || '0').trim();
       if (!name || !vals || usedForVar !== '1') continue;
+      if (name.toLowerCase() === 'brand') continue;
       const options = vals.split('|').map(v => v.trim()).filter(Boolean);
       if (options.length > 0) result.push({ id: n, name, options });
     }

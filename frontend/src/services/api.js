@@ -340,7 +340,7 @@ export function normalizeProduct(wcProduct) {
   // Each entry: { name: 'Size', options: ['7"', '10"', '12"'], id: 1 }
   const variation_attributes = isVariable
     ? (wcProduct.attributes || [])
-        .filter((a) => a.variation)
+        .filter((a) => a.variation && (a.name || '').trim().toLowerCase() !== 'brand')
         .map((a) => ({
           id: a.id || 0,
           name: a.name || '',
