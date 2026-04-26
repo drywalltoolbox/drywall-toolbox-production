@@ -157,7 +157,7 @@ WordPress lives in `/wp/` on the server (not at the domain root).
 `headless-base/` — minimal theme with zero frontend output.  
 REST API menu endpoint: `GET /wp-json/headless/v1/menus/<location>`
 
----
+
 
 ## Schematic Images — WordPress Media Library
 
