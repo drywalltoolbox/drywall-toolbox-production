@@ -148,6 +148,29 @@ def rebuild_images(rows: list[dict[str, str]], by_sku: dict[str, list[str]]) -> 
         if row.get("Type") == "variation" and row.get("Parent"):
             children_by_parent[normalize_sku(row["Parent"])].append(row)
 
+    variable_gallery_by_sku: dict[str, list[str]] = {}
+    for row in rows:
+        if row.get("Type") != "variable":
+            continue
+
+        sku = normalize_sku(row.get("SKU", ""))
+        seen: set[str] = set()
+        gallery: list[str] = []
+
+        for filename in by_sku.get(sku, []):
+            if filename not in seen:
+                seen.add(filename)
+                gallery.append(filename)
+
+        for child in children_by_parent.get(sku, []):
+            child_sku = normalize_sku(child.get("SKU", ""))
+            for filename in by_sku.get(child_sku, []):
+                if filename not in seen:
+                    seen.add(filename)
+                    gallery.append(filename)
+
+        variable_gallery_by_sku[sku] = gallery
+
     changed = 0
     rows_with_images = 0
     rows_without_files = 0
@@ -158,19 +181,12 @@ def rebuild_images(rows: list[dict[str, str]], by_sku: dict[str, list[str]]) -> 
         filenames: list[str] = []
 
         if row_type == "variable":
-            seen: set[str] = set()
-            for filename in by_sku.get(sku, []):
-                if filename not in seen:
-                    seen.add(filename)
-                    filenames.append(filename)
-            for child in children_by_parent.get(sku, []):
-                child_sku = normalize_sku(child.get("SKU", ""))
-                for filename in by_sku.get(child_sku, []):
-                    if filename not in seen:
-                        seen.add(filename)
-                        filenames.append(filename)
+            filenames = variable_gallery_by_sku.get(sku, [])
         else:
             filenames = by_sku.get(sku, [])
+            if not filenames and row_type == "variation" and row.get("Parent"):
+                parent_sku = normalize_sku(row.get("Parent", ""))
+                filenames = by_sku.get(parent_sku, []) or variable_gallery_by_sku.get(parent_sku, [])
 
         new_images = "|".join(BASE_URL + filename for filename in filenames)
         if new_images:

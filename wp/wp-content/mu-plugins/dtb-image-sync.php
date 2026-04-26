@@ -390,10 +390,9 @@ function dtb_route_sync_images( WP_REST_Request $request ): WP_REST_Response|WP_
 	global $wpdb;
 	// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
 	$sku_rows = $wpdb->get_results(
-		"SELECT CASE
-		          WHEN p.post_type = 'product_variation' AND p.post_parent > 0 THEN p.post_parent
-		          ELSE p.ID
-		        END AS product_id,
+		"SELECT p.ID AS product_id,
+		        p.post_type,
+		        p.post_parent,
 		        pm.meta_value AS sku
 		 FROM {$wpdb->posts} p
 		 INNER JOIN {$wpdb->postmeta} pm
@@ -408,7 +407,11 @@ function dtb_route_sync_images( WP_REST_Request $request ): WP_REST_Response|WP_
 
 	$sku_map = [];
 	foreach ( $sku_rows as $row ) {
-		$sku_map[ strtolower( trim( $row['sku'] ) ) ] = (int) $row['product_id'];
+		$sku_map[ strtolower( trim( $row['sku'] ) ) ] = [
+			'product_id' => (int) $row['product_id'],
+			'post_type'  => (string) $row['post_type'],
+			'parent_id'  => (int) $row['post_parent'],
+		];
 	}
 
 	$extensions = [ 'webp', 'jpg', 'jpeg', 'png', 'avif', 'gif' ];
@@ -559,7 +562,9 @@ function dtb_route_sync_images( WP_REST_Request $request ): WP_REST_Response|WP_
 		}
 
 		$sku_lower  = (string) $batch_item;
-		$product_id = $sku_map[ $sku_lower ];
+		$product_record = $sku_map[ $sku_lower ];
+		$product_id = (int) $product_record['product_id'];
+		$is_variation = 'product_variation' === $product_record['post_type'];
 		$last_item  = '';
 		$last_product = $product_id;
 
@@ -570,7 +575,7 @@ function dtb_route_sync_images( WP_REST_Request $request ): WP_REST_Response|WP_
 			$first         = array_shift( $catalog_pairs );
 			$primary_path  = $first['path'];
 			$primary_url   = $first['url'];
-			$gallery_pairs = $catalog_pairs;
+			$gallery_pairs = $is_variation ? [] : $catalog_pairs;
 		} else {
 			$primary_path  = null;
 			$primary_url   = null;
@@ -579,16 +584,16 @@ function dtb_route_sync_images( WP_REST_Request $request ): WP_REST_Response|WP_
 
 
 		if ( ! $primary_path ) {
-			++$no_file;
 			if ( empty( $expected_files ) ) {
 				++$no_catalog_image;
 			} else {
+				++$no_file;
 				++$missing_disk_file;
+				$missing_files[] = [
+					'sku'      => $sku_lower,
+					'expected' => $expected_files,
+				];
 			}
-			$missing_files[] = [
-				'sku'      => $sku_lower,
-				'expected' => $expected_files,
-			];
 			$sync_progress_updater();
 			continue;
 		}
@@ -745,10 +750,9 @@ function dtb_route_link_registered_images( WP_REST_Request $request ): WP_REST_R
 	global $wpdb;
 	// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
 	$sku_rows = $wpdb->get_results(
-		"SELECT CASE
-		          WHEN p.post_type = 'product_variation' AND p.post_parent > 0 THEN p.post_parent
-		          ELSE p.ID
-		        END AS product_id,
+		"SELECT p.ID AS product_id,
+		        p.post_type,
+		        p.post_parent,
 		        pm.meta_value AS sku
 		 FROM {$wpdb->posts} p
 		 INNER JOIN {$wpdb->postmeta} pm
@@ -763,7 +767,11 @@ function dtb_route_link_registered_images( WP_REST_Request $request ): WP_REST_R
 
 	$sku_map = [];
 	foreach ( $sku_rows as $row ) {
-		$sku_map[ strtolower( trim( $row['sku'] ) ) ] = (int) $row['product_id'];
+		$sku_map[ strtolower( trim( $row['sku'] ) ) ] = [
+			'product_id' => (int) $row['product_id'],
+			'post_type'  => (string) $row['post_type'],
+			'parent_id'  => (int) $row['post_parent'],
+		];
 	}
 
 	$sku_keys = array_keys( $sku_map );
@@ -781,14 +789,16 @@ function dtb_route_link_registered_images( WP_REST_Request $request ): WP_REST_R
 	$catalog_images_by_sku = dtb_get_catalog_image_pairs_by_sku( $scan_dir, $scan_url, $extensions );
 
 	foreach ( $batch as $sku_lower ) {
-		$product_id = $sku_map[ $sku_lower ];
+		$product_record = $sku_map[ $sku_lower ];
+		$product_id = (int) $product_record['product_id'];
+		$is_variation = 'product_variation' === $product_record['post_type'];
 
 		$catalog_pairs = $catalog_images_by_sku[ $sku_lower ] ?? [];
 		if ( ! empty( $catalog_pairs ) ) {
 			$first         = array_shift( $catalog_pairs );
 			$primary_path  = $first['path'];
 			$primary_url   = $first['url'];
-			$gallery_pairs = $catalog_pairs;
+			$gallery_pairs = $is_variation ? [] : $catalog_pairs;
 		} else {
 			$primary_path  = null;
 			$primary_url   = null;
@@ -821,11 +831,14 @@ function dtb_route_link_registered_images( WP_REST_Request $request ): WP_REST_R
 
 		if ( ! $force ) {
 			$current_thumb      = (int) get_post_thumbnail_id( $product_id );
-			$current_gallery    = get_post_meta( $product_id, '_product_image_gallery', true );
-			$current_gallery_ids_raw = explode( ',', (string) $current_gallery );
-			$current_gallery_ids = array_map( 'absint', $current_gallery_ids_raw );
-			$current_gallery_ids = array_values( array_filter( $current_gallery_ids ) );
-			if ( $current_thumb === $primary_att && $current_gallery_ids === $gallery_att_ids ) {
+			$current_gallery_ids = [];
+			if ( ! $is_variation ) {
+				$current_gallery    = get_post_meta( $product_id, '_product_image_gallery', true );
+				$current_gallery_ids_raw = explode( ',', (string) $current_gallery );
+				$current_gallery_ids = array_map( 'absint', $current_gallery_ids_raw );
+				$current_gallery_ids = array_values( array_filter( $current_gallery_ids ) );
+			}
+			if ( $current_thumb === $primary_att && ( $is_variation || $current_gallery_ids === $gallery_att_ids ) ) {
 				++$skipped;
 				continue;
 			}
@@ -2000,7 +2013,9 @@ function dtb_link_images_to_product( int $product_id, int $attachment_id, array 
 	}
 
 	$product->set_image_id( $attachment_id );
-	$product->set_gallery_image_ids( $gallery_ids );
+	if ( method_exists( $product, 'set_gallery_image_ids' ) ) {
+		$product->set_gallery_image_ids( $gallery_ids );
+	}
 	$product->save();
 
 	// Flush product transients so REST API reflects the new images immediately.
