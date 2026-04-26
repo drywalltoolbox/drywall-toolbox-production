@@ -76,6 +76,8 @@ module.exports = (envFlags, argv) => {
     ? path.resolve(__dirname, 'dist')
     : path.resolve(__dirname, '..', 'dist');
 
+  const DEV_PROXY_TARGET = env('REACT_APP_API_BASE_URL') || 'https://drywalltoolbox.com';
+
   // ─── DefinePlugin values ────────────────────────────────────────────────
   const defines = {
     // Node / CRA conventions
@@ -381,7 +383,7 @@ module.exports = (envFlags, argv) => {
             '/wp/wp-json',    // WP in /wp subdir
             '/wp-admin',      // WP admin-ajax etc.
           ],
-          target: 'https://drywalltoolbox.com',
+          target: DEV_PROXY_TARGET,
           changeOrigin: true,
           secure: true,
         },
