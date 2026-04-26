@@ -128,6 +128,16 @@ function dtb_register_proxy_routes(): void {
 		'args'                => [ 'id' => [ 'validate_callback' => 'is_numeric' ] ],
 	] );
 
+	register_rest_route( $ns, '/products/(?P<parent_id>\d+)/variations/(?P<id>\d+)', [
+		'methods'             => 'GET',
+		'callback'            => 'dtb_proxy_product_variation_by_id',
+		'permission_callback' => '__return_true',
+		'args'                => [
+			'parent_id' => [ 'validate_callback' => 'is_numeric' ],
+			'id'        => [ 'validate_callback' => 'is_numeric' ],
+		],
+	] );
+
 	register_rest_route( $ns, '/categories', [
 		'methods'             => 'GET',
 		'callback'            => 'dtb_proxy_categories',
@@ -643,6 +653,7 @@ function dtb_app_password_rate_limit(): ?WP_REST_Response {
 /** GET /drywall/v1/products */
 function dtb_proxy_products( WP_REST_Request $request ): WP_REST_Response {
 	$allowed = [ 'page', 'per_page', 'category', 'search', 'orderby', 'order', 'min_price', 'max_price', 'stock_status', 'sku' ];
+	$allowed[] = 'parent';
 	$params  = [];
 	foreach ( $allowed as $k ) {
 		$v = $request->get_param( $k );
@@ -661,6 +672,13 @@ function dtb_proxy_product_by_id( WP_REST_Request $request ): WP_REST_Response {
 /** GET /drywall/v1/products/slug/{slug} */
 function dtb_proxy_product_by_slug( WP_REST_Request $request ): WP_REST_Response {
 	return dtb_cached_wc_get( 'wc/v3/products', [ 'slug' => sanitize_title( $request->get_param( 'slug' ) ) ] );
+}
+
+/** GET /drywall/v1/products/{parent_id}/variations/{id} */
+function dtb_proxy_product_variation_by_id( WP_REST_Request $request ): WP_REST_Response {
+	$parent_id    = absint( $request->get_param( 'parent_id' ) );
+	$variation_id = absint( $request->get_param( 'id' ) );
+	return dtb_cached_wc_get( 'wc/v3/products/' . $parent_id . '/variations/' . $variation_id, [] );
 }
 
 /** GET /drywall/v1/products/{id}/variations */

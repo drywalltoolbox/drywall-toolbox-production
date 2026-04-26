@@ -448,6 +448,44 @@ export const getProduct = (id) =>
   apiClient(`/wp-json/drywall/v1/products/${encodeURIComponent(id)}`)
     .then(normalizeProduct);
 
+async function fetchVariationsByIds(parentId, variationIds = []) {
+  const ids = Array.isArray(variationIds) && variationIds.length > 0
+    ? variationIds
+    : null;
+  const parent = ids ? null : await getProduct(parentId);
+  const variationsToFetch = ids || (parent && Array.isArray(parent.variations) ? parent.variations : []);
+  if (!variationsToFetch || variationsToFetch.length === 0) {
+    return [];
+  }
+
+  const variations = await Promise.all(
+    variationsToFetch.map(async (variationId) => {
+      try {
+        const variation = await apiClient(
+          `/wp-json/drywall/v1/products/${encodeURIComponent(parentId)}/variations/${encodeURIComponent(variationId)}`,
+        );
+        return normalizeProduct(variation);
+      } catch {
+        return null;
+      }
+    }),
+  );
+
+  return variations.filter(Boolean);
+}
+
+async function fetchVariationsByParentList(parentId) {
+  try {
+    const list = await apiClient(
+      `/wp-json/drywall/v1/products?${new URLSearchParams({ parent: parentId, per_page: 100, status: 'publish' }).toString()}`,
+    );
+    return Array.isArray(list) ? list.map(normalizeProduct) : [];
+  } catch (err) {
+    console.warn(`Failed to fetch variations by parent list for ${parentId}:`, err?.message || err);
+    return [];
+  }
+}
+
 /**
  * Fetch products belonging to a category (by category ID).
  * @param {number|string} categoryId
@@ -477,7 +515,15 @@ export const searchProducts = (searchTerm) =>
  */
 export const getProductVariations = (parentId) =>
   apiClient(`/wp-json/drywall/v1/products/${encodeURIComponent(parentId)}/variations?${new URLSearchParams({ per_page: 100, status: 'publish' }).toString()}`)
-    .then((list) => list.map(normalizeProduct));
+    .then((list) => list.map(normalizeProduct))
+    .catch(async (err) => {
+      console.warn(`Failed to fetch variations for parent ${parentId}:`, err?.message || err);
+      const byParent = await fetchVariationsByParentList(parentId);
+      if (byParent.length > 0) {
+        return byParent;
+      }
+      return fetchVariationsByIds(parentId);
+    });
 
 // ─── Categories ──────────────────────────────────────────────────────────────
 

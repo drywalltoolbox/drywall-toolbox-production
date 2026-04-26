@@ -92,6 +92,15 @@ export default function ProductDetail({ product, onAddToCart, onClose, initialSe
 
   if (!product) return null;
 
+  const stripSpecsFromHtml = (html) => {
+    if (!html || typeof html !== 'string') return html;
+
+    return html
+      .replace(/<p[^>]*>\s*<(?:strong|b)[^>]*>Specifications?:?<\/\s*(?:strong|b)>\s*<\/p>\s*/gi, '')
+      .replace(/<p[^>]*>(?:\s*\|[^<]*)+<\/p>/gi, '')
+      .replace(/<table[^>]*>([\s\S]*?)(?:Specification|Detail|DETAIL|SPECIFICATION)([\s\S]*?)<\/table>/gi, '');
+  };
+
   // Determine if this product has a matching schematic diagram
   const schematicId = getSchematicIdForProduct(product);
   const partsUrl = schematicId ? buildSchematicsUrl(schematicId) : null;
@@ -324,20 +333,18 @@ export default function ProductDetail({ product, onAddToCart, onClose, initialSe
                   <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-3 sm:mb-4">Description</h3>
                   {product.description_full ? (
                     <div className="product-description prose prose-sm max-w-none">
-                      {/^\s*<[a-z]/i.test(product.description_full)
-                        ? <div dangerouslySetInnerHTML={{ __html:
-                            // Strip the pipe-table <p> block and its "Specifications:" heading
-                            // so specs don't render twice (TechnicalSpecifications handles them).
-                            product.description_full
-                              .replace(/<p[^>]*>\s*<(?:strong|b)[^>]*>Specifications?:?<\/(?:strong|b)>\s*<\/p>\s*/gi, '')
-                              .replace(/<p[^>]*>(?:\s*\|[^<]*)+<\/p>/gi, '')
-                          }} />
-                        : (
-                            <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                              {product.description_full}
-                            </ReactMarkdown>
-                          )
-                      }
+                      {/^[\s\S]*<[a-z]/i.test(product.description_full)
+                        ? (
+                          <div
+                            dangerouslySetInnerHTML={{
+                              __html: stripSpecsFromHtml(product.description_full),
+                            }}
+                          />
+                        ) : (
+                          <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                            {stripSpecsFromHtml(product.description_full)}
+                          </ReactMarkdown>
+                        )}
                     </div>
                   ) : (
                     <p className="text-gray-500">No description available.</p>
