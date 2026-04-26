@@ -48,7 +48,8 @@ IMAGE_BASE_URL = "https://drywalltoolbox.com/wp/wp-content/uploads/2026/04/"
 BRAND_SLUG: dict[str, str] = {
     "Asgard":                 "asgard",
     "Columbia Taping Tools":  "columbia",
-    "Platinum Drywall Tools": "platinum",
+    "Platinum Drywall Tools": "platinum-drywall-tools",
+    "Platinum":              "platinum-drywall-tools",
     "SurPro":                 "surpro",
     "TapeTech":               "tapetech",
 }
@@ -432,12 +433,21 @@ def copy_renamed_images(
             skipped += 1
             continue
 
-        if dst.exists() and dst.stat().st_size == src.stat().st_size:
-            skipped += 1  # identical already present
+        if dst.exists():
+            if dst.stat().st_size == src.stat().st_size:
+                # Target already exists from a prior run; remove the duplicate old file.
+                if not dry_run:
+                    src.unlink()
+                skipped += 1
+                continue
+            warnings.append(
+                f"DESTINATION EXISTS DIFFERENT: {old_name} -> {new_name}"
+            )
+            skipped += 1
             continue
 
         if not dry_run:
-            shutil.copy2(src, dst)
+            shutil.move(src, dst)
         copied += 1
 
     return copied, skipped, warnings
@@ -456,6 +466,28 @@ def write_manifest(
         for old, new in sorted(mapping.items()):
             w.writerow([old, new])
     print(f"  Manifest written → {manifest_path.relative_to(REPO_ROOT)}")
+
+
+def cleanup_legacy_platinum_files(products_dir: Path, dry_run: bool) -> tuple[int, list[str]]:
+    """
+    Delete any legacy Platinum image files that do not use the canonical
+    platinum-drywall-tools prefix.
+    """
+    deleted = 0
+    warnings: list[str] = []
+    for path in products_dir.glob('platinum*.webp'):
+        if path.name.startswith('platinum-drywall-tools-'):
+            continue
+        if dry_run:
+            warnings.append(f"WILL DELETE: {path.name}")
+            deleted += 1
+            continue
+        try:
+            path.unlink()
+            deleted += 1
+        except OSError as exc:
+            warnings.append(f"FAILED DELETE: {path.name} ({exc})")
+    return deleted, warnings
 
 
 # ---------------------------------------------------------------------------
@@ -569,6 +601,16 @@ def main() -> None:
     if warnings:
         print(f"  Warnings ({len(warnings)}):")
         for w in warnings[:10]:
+            print(f"    {w}")
+
+    # ------------------------------------------------------------------
+    # Apply: remove legacy platinum image files that are not canonical.
+    print("Cleaning legacy Platinum image files …")
+    deleted, cleanup_warnings = cleanup_legacy_platinum_files(PRODUCTS_DIR, dry_run=False)
+    print(f"  Deleted legacy files: {deleted:,}")
+    if cleanup_warnings:
+        print(f"  Cleanup warnings ({len(cleanup_warnings)}):")
+        for w in cleanup_warnings[:10]:
             print(f"    {w}")
 
     # ------------------------------------------------------------------
