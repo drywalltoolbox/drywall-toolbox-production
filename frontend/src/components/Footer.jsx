@@ -29,11 +29,11 @@ export default function Footer() {
       }} className="footer-grid">
 
         {/* Brand column */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', alignItems: 'center', width: 'auto' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', alignItems: 'center', width: '100%' }}>
           <Link to="/" style={{ display: 'inline-block' }}>
             <img src={Logo} alt="Drywall Toolbox" className="footer-logo" style={{ height: '80px', width: 'auto', display: 'block' }} />
           </Link>
-          <div style={{ display: 'flex', gap: '6px', marginTop: '0px', justifyContent: 'center', alignItems: 'center' }}>
+          <div style={{ display: 'flex', gap: '6px', marginTop: '0px', justifyContent: 'center', alignItems: 'center', width: '100%' }}>
             <a
               href="https://www.instagram.com/drywalltoolbox"
               target="_blank"

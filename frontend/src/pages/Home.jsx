@@ -61,6 +61,15 @@ const desktopHeroBrands = [
   { name: 'SurPro', src: surproLogo },
 ];
 
+const mobileBrandLogoStyles = {
+  TapeTech: { height: 'clamp(32px, 6vw, 46px)', maxWidth: '150px' },
+  Columbia: { height: 'clamp(56px, 10vw, 86px)', maxWidth: '250px' },
+  Level5: { height: 'clamp(22px, 4vw, 30px)', maxWidth: '130px' },
+  'Platinum Drywall Tools': { height: 'clamp(28px, 5vw, 42px)', maxWidth: '180px' },
+  Asgard: { height: 'clamp(34px, 6vw, 48px)', maxWidth: '160px' },
+  SurPro: { height: 'clamp(34px, 6vw, 50px)', maxWidth: '170px' },
+};
+
 export default function Home() {
   return (
     <>
@@ -231,10 +240,10 @@ export default function Home() {
                 alt={brand.name}
                 loading="lazy"
                 decoding="async"
-                style={{ 
-                  height: brand.name === 'Columbia' ? 'clamp(60px, 10vw, 100px)' : brand.name === 'Asgard' || brand.name === 'Graco' ? 'clamp(32px, 5vw, 50px)' : brand.name === 'Platinum Drywall Tools' ? 'clamp(28px, 4.5vw, 44px)' : 'clamp(24px, 4vw, 40px)',
-                  maxWidth: brand.name === 'Columbia' ? '300px' : brand.name === 'Asgard' || brand.name === 'Graco' ? '150px' : ['Platinum Drywall Tools', 'Level5'].includes(brand.name) ? '180px' : '120px',
-                  objectFit: 'contain' 
+                style={{
+                  ...(mobileBrandLogoStyles[brand.name] || { height: 'clamp(28px, 5vw, 42px)', maxWidth: '150px' }),
+                  width: 'auto',
+                  objectFit: 'contain'
                 }}
               />
             </Link>
