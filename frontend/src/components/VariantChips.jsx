@@ -20,10 +20,26 @@
 export default function VariantChips({ attributes, selected, onSelect, compact = false }) {
   if (!attributes || attributes.length === 0) return null;
 
+  const normalizeOptions = (options) => {
+    if (!options) return [];
+    if (Array.isArray(options)) {
+      return options.flatMap((value) => {
+        if (typeof value !== 'string') return [];
+        return value.split('|').map((item) => item.trim()).filter(Boolean);
+      });
+    }
+    if (typeof options === 'string') {
+      return options.split('|').map((item) => item.trim()).filter(Boolean);
+    }
+    return [];
+  };
+
   return (
     <div className="variant-chips-root" style={{ display: 'flex', flexDirection: 'column', gap: compact ? '4px' : '8px' }}>
       {attributes.map((attr) => {
-        const { name, options } = attr;
+        const name = (attr.name || '').trim();
+        if (!name || name.toLowerCase() === 'brand') return null;
+        const options = normalizeOptions(attr.options);
         if (!options || options.length === 0) return null;
         const currentValue = selected?.[name] ?? '';
         const useDropdown  = options.length > 6;
