@@ -157,11 +157,22 @@ def name_slug(brand: str, name: str) -> str:
     """
     # Remove trailing (SKU) — uppercase heavy
     cleaned = _TRAILING_SKU.sub('', name).strip()
-    # Remove brand prefix (case-insensitive)
+    # Remove leading brand prefix (case-insensitive). This avoids duplicate
+    # brand terms in SEO filenames like "platinum-platinum-...".
     cleaned_lower = cleaned.lower()
-    prefixes_to_strip = [brand.lower(), 'columbia', 'columbia taping tools', 'columbia tools']
-    for prefix in prefixes_to_strip:
-        if cleaned_lower.startswith(prefix):
+    prefixes_to_strip = {
+        brand.lower(),
+        'asgard',
+        'columbia',
+        'columbia taping tools',
+        'columbia tools',
+        'platinum',
+        'platinum drywall tools',
+        'surpro',
+        'tapetech',
+    }
+    for prefix in sorted(prefixes_to_strip, key=len, reverse=True):
+        if prefix and cleaned_lower.startswith(prefix):
             cleaned = cleaned[len(prefix):].strip()
             cleaned_lower = cleaned.lower()
             break

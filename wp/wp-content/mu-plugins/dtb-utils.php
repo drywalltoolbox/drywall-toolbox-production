@@ -96,32 +96,13 @@ function dtb_get_config(): array {
 	}
 
 	// ── Resolve catalog CSV filename ─────────────────────────────────────────
-	// Auto-discovery: scan wc-imports/ for all product-wc-*.csv files and pick
-	// the single most-recently modified one (Last Modified / filemtime).
-	// Fallback: wp-catalog.csv — used when no product-wc-*.csv file exists yet.
-	// No wp-config.php constant needed; simply upload a new product-wc-*.csv
-	// via cPanel or WooCommerce → Products → Import and it is picked up
-	// automatically on the next request.
+	// Force the stable wp-catalog.csv as the active import source.
+	// This bypasses the product-wc-*.csv auto-discovery logic so the image
+	// sync and catalog import always use the canonical CSV file.
 	$upload_dir  = wp_upload_dir();
 	$wc_imports  = trailingslashit( $upload_dir['basedir'] ) . 'wc-imports/';
-	$found       = glob( $wc_imports . 'product-wc-*.csv' ) ?: [];
-
-	$csv_filename = '';
-	if ( ! empty( $found ) ) {
-		// Sort descending by Last Modified (filemtime) — pick the newest file.
-		usort( $found, static function ( string $a, string $b ): int {
-			return filemtime( $b ) <=> filemtime( $a );
-		} );
-		$csv_filename = basename( $found[0] );
-	}
-
-	// Fallback to the stable wp-catalog.csv when auto-discovery finds nothing.
-	if ( '' === $csv_filename ) {
-		$fallback = $wc_imports . 'wp-catalog.csv';
-		if ( file_exists( $fallback ) ) {
-			$csv_filename = 'wp-catalog.csv';
-		}
-	}
+	$forced_csv  = $wc_imports . 'wp-catalog.csv';
+	$csv_filename = file_exists( $forced_csv ) ? 'wp-catalog.csv' : '';
 
 	$csv_filenames = '' !== $csv_filename ? [ $csv_filename ] : [];
 
