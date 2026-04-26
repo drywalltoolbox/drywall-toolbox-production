@@ -123,9 +123,9 @@ export default function ProductCard({
         </h3>
 
         {/* SKU — monospace, muted */}
-        {(effectiveProduct.sku || product.sku) && (
+          {(effectiveProduct.sku || product.sku || effectiveProduct.part_number) && (
           <p className="dtb-plp-card__sku">
-            SKU:&nbsp;{effectiveProduct.sku || product.sku}
+              SKU:&nbsp;{effectiveProduct.sku || product.sku || effectiveProduct.part_number}
           </p>
         )}
 

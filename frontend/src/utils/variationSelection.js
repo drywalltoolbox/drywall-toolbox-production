@@ -7,6 +7,23 @@
 function hasSelectedValue([, value]) {
   return value != null && `${value}`.trim() !== '';
 }
+function normalizeAttributeKey(value) {
+  return `${value || ''}`
+    .trim()
+    .toLowerCase()
+    .replace(/^attribute(_pa)?_/, '')
+    .replace(/^pa_/, '')
+    .replace(/\s+/g, ' ');
+}
+
+function normalizeAttributeValue(value) {
+  return `${value || ''}`
+    .replace(/[‘’]/g, "'")
+    .replace(/[“”]/g, '"')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .toLowerCase();
+}
 
 /**
  * Build an attribute-name → selected-option map from a variation record.
@@ -28,6 +45,14 @@ export function getVariationSelectionMap(variation) {
     const option = (attr?.option || '').trim();
     if (name && option) selected[name] = option;
   });
+
+  if (Object.keys(selected).length === 0 && Array.isArray(variation.variation_attribute_values)) {
+    variation.variation_attribute_values.forEach((attr) => {
+      const name = (attr?.name || '').trim();
+      const option = (attr?.option || '').trim();
+      if (name && option) selected[name] = option;
+    });
+  }
 
   if (Object.keys(selected).length === 0 && variation.variation_attribute) {
     const name = (variation.variation_attribute.name || '').trim();
@@ -56,7 +81,10 @@ export function findMatchingVariation(variations, selectedAttrs) {
 
   return variations.find((variation) => {
     const selected = getVariationSelectionMap(variation);
-    return targetEntries.every(([name, value]) => selected[name] === value);
+    return targetEntries.every(([name, value]) =>
+      normalizeAttributeKey(selected[name]) === normalizeAttributeKey(name) &&
+      normalizeAttributeValue(selected[name]) === normalizeAttributeValue(value)
+    );
   }) || null;
 }
 
