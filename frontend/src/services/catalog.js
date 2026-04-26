@@ -17,6 +17,7 @@
  */
 
 import { fetchProducts as proxyFetchProducts, fetchProduct as proxyFetchProduct } from '../api/products.js';
+import { normalizeProduct } from '../services/api.js';
 import { readCache, writeCache, bustCache, isCacheAvailable } from './productCache.js';
 
 // ─── In-memory promise cache ──────────────────────────────────────────────────
@@ -47,6 +48,7 @@ async function fetchFromApi() {
     try {
       const result = await proxyFetchProducts({ per_page: PER, page, status: 'publish' });
       batch = Array.isArray(result) ? result : result?.products || [];
+      batch = batch.map(normalizeProduct).filter(Boolean);
     } catch (pageErr) {
       if (all.length > 0) break;
       throw pageErr;
