@@ -302,8 +302,9 @@ export function normalizeProduct(wcProduct) {
   const image = images[0];
 
   // Price: prefer numeric parse; keep string fallback
-  const priceRaw = wcProduct.price || wcProduct.regular_price || '';
-  const price    = priceRaw !== '' ? (parseFloat(priceRaw) || priceRaw) : '';
+  const priceRaw = wcProduct.price ?? wcProduct.regular_price ?? '';
+  const priceNum = parseFloat(priceRaw);
+  const price    = Number.isFinite(priceNum) ? priceNum : 0;
 
   // Category: map to internal key (e.g. "finishing") using the same CATEGORY_MAP
   // the CSV parser uses, so filtering works identically regardless of data source.

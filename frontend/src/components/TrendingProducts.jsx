@@ -59,7 +59,7 @@ export default function TrendingProducts() {
       // and ensure they are mixed for diversity.
 
       const taperKeywords = ['automatic taper', 'taper', 'taping tool'];
-      const withPrice = allProducts.filter(p => (p.price || 0) > 0);
+  const withPrice = allProducts.filter(p => (Number(p.price) || 0) > 0);
 
       // Categorize products into "Tapers" and "Other Main Tools"
       const groupedByBrand = {};
@@ -206,8 +206,15 @@ export default function TrendingProducts() {
                   {/* Price row */}
                   <div className="dtb-trending-card-footer">
                     <span className="dtb-trending-card-price">
-                      ${product.price.toFixed(2)}
-                    </span>
+                        ${
+                          (() => {
+                            const value = typeof product.price === 'number'
+                              ? product.price
+                              : parseFloat(product.price || 0);
+                            return (Number.isFinite(value) ? value : 0).toFixed(2);
+                          })()
+                        }
+                      </span>
                   </div>
                 </div>
               </div>
