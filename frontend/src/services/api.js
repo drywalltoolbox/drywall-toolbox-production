@@ -282,6 +282,20 @@ function resolveVariationAttribute(productType, variation_attribute_values, rawA
   return null;
 }
 
+function normalizeVariationAttributeOptions(options) {
+  if (!options) return [];
+  if (Array.isArray(options)) {
+    return options.flatMap((value) => {
+      if (typeof value !== 'string') return [];
+      return value.split('|').map((item) => item.trim()).filter(Boolean);
+    });
+  }
+  if (typeof options === 'string') {
+    return options.split('|').map((item) => item.trim()).filter(Boolean);
+  }
+  return [];
+}
+
 /**
  * Normalise a WooCommerce product object to the internal product shape used
  * throughout the UI.
@@ -327,7 +341,11 @@ export function normalizeProduct(wcProduct) {
   const variation_attributes = isVariable
     ? (wcProduct.attributes || [])
         .filter((a) => a.variation)
-        .map((a) => ({ id: a.id || 0, name: a.name, options: a.options || [] }))
+        .map((a) => ({
+          id: a.id || 0,
+          name: a.name || '',
+          options: normalizeVariationAttributeOptions(a.options),
+        }))
     : [];
 
   // For variable products, WC returns price_html with min/max range.

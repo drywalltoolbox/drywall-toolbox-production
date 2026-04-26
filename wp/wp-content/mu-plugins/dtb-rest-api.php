@@ -121,6 +121,13 @@ function dtb_register_proxy_routes(): void {
 		'args'                => [ 'id' => [ 'validate_callback' => 'is_numeric' ] ],
 	] );
 
+	register_rest_route( $ns, '/products/(?P<id>\d+)/variations', [
+		'methods'             => 'GET',
+		'callback'            => 'dtb_proxy_product_variations',
+		'permission_callback' => '__return_true',
+		'args'                => [ 'id' => [ 'validate_callback' => 'is_numeric' ] ],
+	] );
+
 	register_rest_route( $ns, '/categories', [
 		'methods'             => 'GET',
 		'callback'            => 'dtb_proxy_categories',
@@ -654,6 +661,18 @@ function dtb_proxy_product_by_id( WP_REST_Request $request ): WP_REST_Response {
 /** GET /drywall/v1/products/slug/{slug} */
 function dtb_proxy_product_by_slug( WP_REST_Request $request ): WP_REST_Response {
 	return dtb_cached_wc_get( 'wc/v3/products', [ 'slug' => sanitize_title( $request->get_param( 'slug' ) ) ] );
+}
+
+/** GET /drywall/v1/products/{id}/variations */
+function dtb_proxy_product_variations( WP_REST_Request $request ): WP_REST_Response {
+	$params = [];
+	foreach ( [ 'page', 'per_page', 'status' ] as $k ) {
+		$v = $request->get_param( $k );
+		if ( null !== $v ) {
+			$params[ $k ] = sanitize_text_field( $v );
+		}
+	}
+	return dtb_cached_wc_get( 'wc/v3/products/' . absint( $request->get_param( 'id' ) ) . '/variations', $params );
 }
 
 /** GET /drywall/v1/categories */
