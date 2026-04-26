@@ -584,7 +584,7 @@ export default function Products() {
                       cardVariants={cardVariants[product.id] || {}}
                       onVariantSelect={(attrName, value) => handleVariantSelect(product.id, attrName, value)}
                       onOpenModal={() => openModal(product)}
-                      onAddToCart={() => handleAddToCart(product, 1)}
+                      onAddToCart={() => handleAddToCart(cardProduct, 1)}
                       index={index}
                     />
                   );

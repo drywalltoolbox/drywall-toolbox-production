@@ -148,17 +148,27 @@ export default function ProductCard({
           </p>
 
           {product.is_variable ? (
-            /* Variable → "Options" text CTA */
-            <button
-              type="button"
-              className="dtb-plp-card__cta dtb-plp-card__cta--options"
-              onClick={(e) => { e.stopPropagation(); onOpenModal(); }}
-              aria-label="View options"
-            >
-              Options&nbsp;<ChevronRight size={11} aria-hidden="true" />
-            </button>
+            hasSelectedVariation ? (
+              <button
+                type="button"
+                className="dtb-plp-card__cta dtb-plp-card__cta--cart"
+                onClick={(e) => { e.stopPropagation(); onAddToCart(); }}
+                disabled={isOutOfStock}
+                aria-label="Add selected variation to cart"
+              >
+                <ShoppingCart size={15} aria-hidden="true" />
+              </button>
+            ) : (
+              <button
+                type="button"
+                className="dtb-plp-card__cta dtb-plp-card__cta--options"
+                onClick={(e) => { e.stopPropagation(); onOpenModal(); }}
+                aria-label="View options"
+              >
+                Options&nbsp;<ChevronRight size={11} aria-hidden="true" />
+              </button>
+            )
           ) : (
-            /* Simple → cart icon button */
             <button
               type="button"
               className="dtb-plp-card__cta dtb-plp-card__cta--cart"

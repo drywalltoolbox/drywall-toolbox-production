@@ -148,7 +148,7 @@ export default function CategoryPage() {
                       setModalSelectedAttrs(cardVariants[product.id] || {});
                       setModalProduct(product);
                     }}
-                    onAddToCart={() => handleAddToCart(product)}
+                      onAddToCart={() => handleAddToCart(cardProduct, 1)}
                     index={index}
                   />
                 );
