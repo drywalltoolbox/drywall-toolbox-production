@@ -1,4 +1,5 @@
-﻿import { Link } from 'react-router-dom';
+﻿import ShippingTicker from '../components/ShippingTicker';
+import { Link } from 'react-router-dom';
 import TrendingProducts from '../components/TrendingProducts';
 import tapeTechLogo from '/brands/TapeTech/tapetech_logo.svg';
 import columbiaLogo from '/brands/Columbia/columbia_taping_tools_logo.svg';
@@ -62,9 +63,11 @@ const desktopHeroBrands = [
 ];
 
 const mobileBrandLogoStyles = {
-  TapeTech: { height: 'clamp(32px, 6vw, 46px)', maxWidth: '150px' },
+  // Slightly reduced TapeTech and Level5 sizes to better match the visual weight
+  // of the other trusted brand logos on small screens.
+  TapeTech: { height: 'clamp(26px, 5.2vw, 38px)', maxWidth: '120px' },
   Columbia: { height: 'clamp(56px, 10vw, 86px)', maxWidth: '250px' },
-  Level5: { height: 'clamp(22px, 4vw, 30px)', maxWidth: '130px' },
+  Level5: { height: 'clamp(18px, 3.5vw, 26px)', maxWidth: '110px' },
   'Platinum Drywall Tools': { height: 'clamp(28px, 5vw, 42px)', maxWidth: '180px' },
   Asgard: { height: 'clamp(34px, 6vw, 48px)', maxWidth: '160px' },
   SurPro: { height: 'clamp(34px, 6vw, 50px)', maxWidth: '170px' },
@@ -163,10 +166,16 @@ export default function Home() {
 
       {/* ─── DESKTOP SHIPPING BAR (appears below hero on desktop only) ─── */}
       <div className="dtb-desktop-shipping-bar">
-        <div className="dtb-promo-bar-inner">
-          <Truck size={16} />
-          <span>FREE SHIPPING ON ALL ORDERS $50+ (CONTIGUOUS USA ONLY)</span>
-        </div>
+        <ShippingTicker
+          items={[
+            { icon: <Truck size={14} />, text: 'FREE SHIPPING ON ALL ORDERS $50+ (CONTIGUOUS USA ONLY)' },
+            { icon: <Shield size={14} />, text: 'Contiguous USA Only' },
+            { icon: <Phone size={14} />, text: 'Expert Support — Real Pros' },
+            { icon: <Wrench size={14} />, text: 'Professional Repair Services' },
+          ]}
+          duration={22}
+          className="dtb-desktop-shipping-bar"
+        />
       </div>
 
       {/* ─── DESKTOP FEATURE STRIP (hidden on mobile/tablet) ─── */}

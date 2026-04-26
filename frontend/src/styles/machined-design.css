@@ -2055,7 +2055,7 @@ aside input[type="range"],
 .prose code {
     display: inline;
     padding: 0.2em 0.4em;
-    background-color: #f3f4f6;
+    justify-content: center;
     border-radius: 0.25em;
     font-size: 0.875em;
     color: var(--tw-prose-code);
@@ -2111,12 +2111,55 @@ aside input[type="range"],
     .dtb-desktop-shipping-bar {
         display: flex;
         align-items: center;
-        justify-content: center;
-        background: #0b1220;
+        justify-content: flex-start;
+        background: #0b1220; /* same dark background as mobile */
         height: 36px;
         width: 100%;
         flex-shrink: 0;
+        overflow: hidden;
         padding: 0 clamp(1rem, 3vw, 2.5rem);
+    }
+
+    .dtb-desktop-shipping-bar .dtb-ticker-track {
+        width: max-content;
+        /* Enable the same smooth continuous scroll used on mobile.
+           The keyframes move the track -50% so two repeated sets
+           (rendered in JSX) create a seamless loop. */
+        animation: dtb-ticker-scroll 22s linear infinite;
+        -webkit-animation: dtb-ticker-scroll 22s linear infinite;
+        animation-play-state: running;
+        -webkit-animation-play-state: running;
+        will-change: transform;
+        transform: translate3d(0, 0, 0);
+        -webkit-transform: translate3d(0, 0, 0);
+        backface-visibility: hidden;
+        transform-origin: 0 0;
+        display: inline-flex;
+        align-items: center;
+        white-space: nowrap;
+        min-width: max-content;
+        width: auto;
+    }
+
+    .dtb-desktop-shipping-bar .dtb-ticker-item {
+        font-size: 0.585rem;
+        font-weight: 700;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        padding: 0 1.4rem;
+        color: rgba(255,255,255,0.85);
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        flex-shrink: 0;
+    }
+
+    .dtb-desktop-shipping-bar .dtb-ticker-icon {
+        color: var(--primary-400, #60a5fa);
+    }
+
+    .dtb-desktop-shipping-bar .dtb-ticker-sep {
+        color: rgba(255,255,255,0.28);
     }
 
     .dtb-promo-bar-inner {
@@ -2128,7 +2171,7 @@ aside input[type="range"],
         font-weight: 700;
         letter-spacing: 0.1em;
         text-transform: uppercase;
-        color: rgba(255,255,255,0.85);
+        color: rgba(255,255,255,0.95); /* match mobile contrast */
         white-space: nowrap;
     }
 
@@ -2370,7 +2413,10 @@ aside input[type="range"],
         line-height: 1.05;
         letter-spacing: -0.03em;
         color: white;
-        margin: 0;
+          transform: translate3d(0, 0, 0);
+          -webkit-transform: translate3d(0, 0, 0);
+          backface-visibility: hidden;
+          transform-origin: 0 0;
     }
 
     .dtb-hero-title span { color: var(--primary-400, #60a5fa); }
@@ -2758,15 +2804,26 @@ aside input[type="range"],
 
 /* ── Ticker keyframe — scrolls exactly one full set width so the
    duplicate second set creates a seamless infinite loop ── */
+/* Ticker scroll: by default move one full set width.
+   Uses CSS variable --dtb-ticker-translate (px or %) with a fallback to -50%.
+   JS will calculate and set --dtb-ticker-translate to ensure the track
+   translates exactly the width of one .dtb-ticker-set so the loop is seamless. */
 @keyframes dtb-ticker-scroll {
-    0%   { transform: translateX(0); }
-    100% { transform: translateX(-50%); }
+    0%   { transform: translate3d(0,0,0); }
+    100% { transform: translate3d(var(--dtb-ticker-translate, -50%),0,0); }
+}
+
+/* WebKit-prefixed keyframes for broader mobile browser support (iOS Safari, older WebViews) */
+@-webkit-keyframes dtb-ticker-scroll {
+    0%   { -webkit-transform: translate3d(0,0,0); transform: translate3d(0,0,0); }
+    100% { -webkit-transform: translate3d(var(--dtb-ticker-translate, -50%),0,0); transform: translate3d(var(--dtb-ticker-translate, -50%),0,0); }
 }
 
 .dtb-mobile-shipping-bar {
     display: flex;
     align-items: center;
     width: 100%;
+    justify-content: flex-start;
     background: #0b1220;
     color: rgba(255,255,255,0.85);
     height: 28px;
@@ -2776,21 +2833,31 @@ aside input[type="range"],
     margin-right: calc(-1 * var(--page-h-pad, 0px));
 }
 
-/* The moving track — wide enough to hold two copies side by side */
+/* The moving track — wide enough to hold repeated copies side by side */
 .dtb-ticker-track {
-    display: flex;
+    display: inline-flex;
     align-items: center;
     white-space: nowrap;
-    /* Smooth constant-speed scroll; natural feel comes from the pace (22 s) */
-    animation: dtb-ticker-scroll 22s linear infinite;
+    min-width: max-content;
+    width: auto;
     will-change: transform;
+}
+
+/* Only run animation when the JS component has measured and set variables */
+.dtb-ticker-track.dtb-ticker--ready {
+    /* use CSS variable for duration with fallback */
+    animation: dtb-ticker-scroll var(--dtb-ticker-duration, 22s) linear infinite;
+    -webkit-animation: dtb-ticker-scroll var(--dtb-ticker-duration, 22s) linear infinite;
+    animation-play-state: running;
+    -webkit-animation-play-state: running;
 }
 
 /* Pause on hover / focus — desktop pointer devices only.
    Mobile screens cannot hover, so the :hover rule is intentionally
    excluded here and restricted to pointer: fine devices only. */
 @media (hover: hover) and (pointer: fine) {
-    .dtb-mobile-shipping-bar:hover .dtb-ticker-track {
+    .dtb-mobile-shipping-bar:hover .dtb-ticker-track,
+    .dtb-desktop-shipping-bar:hover .dtb-ticker-track {
         animation-play-state: paused;
     }
 }
@@ -2838,6 +2905,21 @@ aside input[type="range"],
     margin-left: 0;
     margin-right: 0;
     flex-shrink: 0;
+}
+
+/* Ensure mobile header ticker animates reliably on WebKit/Chrome mobile.
+   Some mobile browsers require explicit -webkit-animation & transform
+   promotion when the element is inside a fixed/transformed header. */
+.site-header .dtb-mobile-shipping-bar--header .dtb-ticker-track {
+    display: inline-flex;
+    width: max-content;
+    animation: dtb-ticker-scroll 22s linear infinite;
+    -webkit-animation: dtb-ticker-scroll 22s linear infinite;
+    animation-play-state: running;
+    -webkit-animation-play-state: running;
+    will-change: transform;
+    transform: translate3d(0,0,0);
+    -webkit-transform: translate3d(0,0,0);
 }
 
 /* Hide on desktop — the fixed header bar handles it there */
@@ -3126,6 +3208,7 @@ aside input[type="range"],
     overflow: hidden;
     display: -webkit-box;
     -webkit-line-clamp: 2;
+    line-clamp: 2;
     -webkit-box-orient: vertical;
     min-height: 2.28em; /* reserve 2 lines */
 }
@@ -3182,7 +3265,7 @@ aside input[type="range"],
     background: var(--primary-600);
     border-color: var(--primary-600);
     color: white;
-    box-shadow: 0 4px 16px rgba(37, 99, 235, 0.30);
+    box-shadow: 0 4px 16px rgba(37,99,235,0.30);
 }
 
 .dtb-scroll-btn--left  { left:  -48px; }
@@ -3246,7 +3329,6 @@ aside input[type="range"],
     aspect-ratio: 1;
     cursor: pointer;
     box-shadow: var(--dtb-shadow-card);
-    width: 100%;
 }
 
 .dtb-brand-card:hover {

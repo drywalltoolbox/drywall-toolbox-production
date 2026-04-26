@@ -1316,7 +1316,7 @@
   display: flex;
   align-items: center;
   gap: 5px;
-  padding: 7px 12px 7px 8px;
+  padding: 6px 10px 6px 8px;
   border-radius: 8px;
   background: rgba(15, 23, 42, 0.07);
   border: 1px solid rgba(15, 23, 42, 0.10);
@@ -1326,9 +1326,22 @@
   font-weight: 600;
   min-height: 38px;
   min-width: 0;
+  max-width: 100px;
+  overflow: hidden;
+  text-overflow: ellipsis;
   transition: background 150ms ease, border-color 150ms ease;
   white-space: nowrap;
   z-index: 1;
+}
+
+.viewer-top-bar .back-button span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.viewer-top-bar .viewer-title-group {
+  z-index: 0;
 }
 
 .viewer-top-bar .back-button:hover {
@@ -1342,23 +1355,28 @@
   background: rgba(15, 23, 42, 0.16);
 }
 
-.viewer-top-bar .back-button svg {
-  width: 16px;
-  height: 16px;
+ .viewer-top-bar .back-button svg {
+  width: 15px;
+  height: 15px;
   flex-shrink: 0;
 }
 
 @media (max-width: 480px) {
   .viewer-top-bar .back-button {
-    padding: 6px 10px 6px 7px;
+    padding: 5px 8px;
     min-height: 38px;
     font-size: 0.82rem;
     gap: 4px;
+    max-width: 80px;
   }
 
   .viewer-top-bar .back-button svg {
-    width: 15px;
-    height: 15px;
+    width: 14px;
+    height: 14px;
+  }
+
+  .viewer-top-bar .back-button span {
+    display: none;
   }
 }
 

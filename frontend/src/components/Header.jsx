@@ -6,6 +6,7 @@ import { ShoppingCart, Menu, X, ChevronDown, User, LogIn, UserPlus, LogOut, Sear
 import Logo from '/logo2.svg';
 import MobileSearch from './MobileSearch';
 import NotificationsBell from './NotificationsBell';
+import ShippingTicker from './ShippingTicker';
 
 export default function Header({ onCartToggle }) {
   const location = useLocation();
@@ -138,37 +139,18 @@ export default function Header({ onCartToggle }) {
     <>
       <header className={`site-header${location.pathname !== '/' ? ' site-header--no-ticker' : ''}`} role="banner">
       {/* ── Mobile-only shipping ticker — homepage only ── */}
-      { location.pathname === '/' && (
-      <div className="dtb-mobile-shipping-bar dtb-mobile-shipping-bar--header" aria-label="Promotions">
-        <div className="dtb-ticker-track" aria-hidden="true">
-          {/* Items duplicated so the loop is seamless */}
-          {[0, 1].map((copy) => (
-            <div key={copy} className="dtb-ticker-set">
-              <span className="dtb-ticker-item">
-                <Truck size={11} className="dtb-ticker-icon" />
-                Free Shipping on Orders $50+
-              </span>
-              <span className="dtb-ticker-sep" aria-hidden="true">·</span>
-              <span className="dtb-ticker-item">
-                <Shield size={11} className="dtb-ticker-icon" />
-                Contiguous USA Only
-              </span>
-              <span className="dtb-ticker-sep" aria-hidden="true">·</span>
-              <span className="dtb-ticker-item">
-                <Phone size={11} className="dtb-ticker-icon" />
-                Expert Support — Real Pros
-              </span>
-              <span className="dtb-ticker-sep" aria-hidden="true">·</span>
-              <span className="dtb-ticker-item">
-                <Wrench size={11} className="dtb-ticker-icon" />
-                Professional Repair Services
-              </span>
-              <span className="dtb-ticker-sep" aria-hidden="true">·</span>
-            </div>
-          ))}
-        </div>
-      </div>
-      ) }
+      {location.pathname === '/' && (
+        <ShippingTicker
+          items={[
+            { icon: <Truck size={11} />, text: 'FREE SHIPPING ON ALL ORDERS $50+ (CONTIGUOUS USA ONLY)' },
+            { icon: <Shield size={11} />, text: 'Contiguous USA Only' },
+            { icon: <Phone size={11} />, text: 'Expert Support — Real Pros' },
+            { icon: <Wrench size={11} />, text: 'Professional Repair Services' },
+          ]}
+          duration={22}
+          className="dtb-mobile-shipping-bar--header"
+        />
+      )}
       <div className="site-header-inner">
   {/* Mobile Layout */}
   <div className="flex md:hidden items-center w-full header-mobile-layout" style={{ display: isTablet ? 'flex' : undefined }}>

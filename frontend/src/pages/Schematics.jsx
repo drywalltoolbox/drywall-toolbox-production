@@ -2885,6 +2885,7 @@ const ALLOWED_BRANDS = [
                       // Only handle primary pointer (finger 0 or left-click).
                       if (!e.isPrimary) return;
                       e.stopPropagation();
+                      e.preventDefault();
                       // Record where the press began so we can measure drift.
                       e.currentTarget.dataset.pdX = e.clientX;
                       e.currentTarget.dataset.pdY = e.clientY;
@@ -2895,6 +2896,7 @@ const ALLOWED_BRANDS = [
                     onPointerUp={(e) => {
                       if (!e.isPrimary) return;
                       e.stopPropagation();
+                      e.preventDefault();
                       // Measure how far the pointer drifted from the down position.
                       const downX = parseFloat(e.currentTarget.dataset.pdX ?? e.clientX);
                       const downY = parseFloat(e.currentTarget.dataset.pdY ?? e.clientY);
@@ -2925,9 +2927,11 @@ const ALLOWED_BRANDS = [
                           top: r.top, left: r.left, bottom: r.bottom,
                           right: r.right, width: r.width, height: r.height,
                         };
-                        calculateAndSetModalPosition(lastHotspotRectRef.current);
-                        setActiveHotspot(hotspotKey);
-                        setActiveHotspotPart(part);
+                        window.setTimeout(() => {
+                          calculateAndSetModalPosition(lastHotspotRectRef.current);
+                          setActiveHotspot(hotspotKey);
+                          setActiveHotspotPart(part);
+                        }, 0);
                       }
                     }}
                     // Suppress the synthesized click that follows touch so it
