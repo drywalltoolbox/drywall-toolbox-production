@@ -88,6 +88,22 @@ export const SCHEMATIC_DEFINITIONS = {
   'Dura-Stilts': [
     { id: 'dura-stilts-model-iv', title: 'Model IV Drywall Stilts', mpn: 'DS-M4', category: 'Stilts' },
   ],
+  'Level5': [
+    { id: 'level5-7377-cover-plate-assembly-old-style', title: 'Cover Plate Assembly (Old Style)', mpn: '7377', category: 'Automatic Tapers' },
+    { id: 'level5-9333-cutter-chain-assembly',          title: 'Cutter Chain Assembly',            mpn: '9333', category: 'Automatic Tapers' },
+    { id: 'level5-7097-drive-dog-assembly',             title: 'Drive Dog Assembly',               mpn: '7097', category: 'Automatic Tapers' },
+    { id: 'level5-7293-gooser-assembly',                title: 'Gooser Assembly',                  mpn: '7293', category: 'Automatic Tapers' },
+    { id: 'level5-7218-taper-wheel-assembly',           title: 'Taper Wheel Assembly',             mpn: '7218', category: 'Automatic Tapers' },
+    { id: 'level5-4-734-3-5-corner-finisher',           title: '3.5" Corner Finisher',             mpn: '4-734', category: 'Corner Finishers' },
+    { id: 'level5-corner-roller-4-707',                 title: 'Corner Roller',                    mpn: '4-707', category: 'Corner Rollers' },
+    { id: 'level5-7-inch-flat-box-4-764',               title: '7" Flat Box',                      mpn: '4-764', category: 'Finishing Boxes' },
+    { id: 'level5-10-inch-flat-box-4-765',              title: '10" Flat Box',                     mpn: '4-765', category: 'Finishing Boxes' },
+    { id: 'level5-12-inch-flat-box-4-766',              title: '12" Flat Box',                     mpn: '4-766', category: 'Finishing Boxes' },
+    { id: 'level5-7-inch-mega-flat-box-4-767',          title: '7" Mega Flat Box',                 mpn: '4-767', category: 'Finishing Boxes' },
+    { id: 'level5-10-inch-mega-flat-box-4-768',         title: '10" Mega Flat Box',                mpn: '4-768', category: 'Finishing Boxes' },
+    { id: 'level5-12-inch-mega-box-4-769',              title: '12" Mega Flat Box',                mpn: '4-769', category: 'Finishing Boxes' },
+    { id: 'level5-compound-pump-4-771',                 title: 'Compound Pump',                    mpn: '4-771', category: 'Pumps' },
+  ],
 };
 
 // Mapping of schematic titles/keywords to product catalog search terms
@@ -459,6 +475,7 @@ const BRAND_TO_SLUG = {
   'TapeTech': 'tapetech',
   'Asgard': 'asgard',
   'Dura-Stilts': 'dura-stilts',
+  'Level5': 'level5',
 };
 
 // Reverse-lookup: schematic ID → brand name (built once from SCHEMATIC_DEFINITIONS)

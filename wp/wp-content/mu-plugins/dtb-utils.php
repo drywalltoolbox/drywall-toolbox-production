@@ -23,13 +23,26 @@ defined( 'ABSPATH' ) || exit;
 /**
  * Return true when the current request is a WordPress REST API request.
  *
- * WordPress sets REST_REQUEST early in wp-includes/rest-api.php, so this
- * constant is reliable from plugins_loaded onward.
+ * MU plugins load before WordPress always defines REST_REQUEST, so this also
+ * checks the two canonical REST entry shapes early: /wp-json/... permalinks
+ * and ?rest_route=/... fallback URLs.
  *
  * @return bool
  */
 function dtb_is_rest_api_request(): bool {
-	return defined( 'REST_REQUEST' ) && REST_REQUEST;
+	if ( defined( 'REST_REQUEST' ) && REST_REQUEST ) {
+		return true;
+	}
+
+	if ( isset( $_GET['rest_route'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		return true;
+	}
+
+	$request_uri = isset( $_SERVER['REQUEST_URI'] )
+		? (string) wp_unslash( $_SERVER['REQUEST_URI'] ) // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+		: '';
+
+	return false !== strpos( $request_uri, '/wp-json/' );
 }
 
 /**

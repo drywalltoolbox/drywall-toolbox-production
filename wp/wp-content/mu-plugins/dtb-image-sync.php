@@ -89,14 +89,14 @@ function dtb_image_sync_register_routes(): void {
 			'required'          => false,
 			'default'           => gmdate( 'Y' ),
 			'sanitize_callback' => 'sanitize_text_field',
-			'validate_callback' => fn( $v ) => ctype_digit( ltrim( (string) $v, '/' ) ),
+			'validate_callback' => fn( $v ) => 1 === preg_match( '/^\d{4}$/', ltrim( (string) $v, '/' ) ),
 			'description'       => 'Year folder in wp-content/uploads/. Defaults to current year.',
 		],
 		'month' => [
 			'required'          => false,
 			'default'           => gmdate( 'm' ),
 			'sanitize_callback' => 'sanitize_text_field',
-			'validate_callback' => fn( $v ) => ctype_digit( ltrim( (string) $v, '/' ) ),
+			'validate_callback' => fn( $v ) => 1 === preg_match( '/^(0[1-9]|1[0-2])$/', ltrim( (string) $v, '/' ) ),
 			'description'       => 'Zero-padded month folder. Defaults to current month.',
 		],
 	];
@@ -130,6 +130,12 @@ function dtb_image_sync_register_routes(): void {
 				'default'           => false,
 				'sanitize_callback' => 'rest_sanitize_boolean',
 				'description'       => 'When true, re-register and re-link already-synced images.',
+			],
+			'register_only' => [
+				'required'          => false,
+				'default'           => false,
+				'sanitize_callback' => 'rest_sanitize_boolean',
+				'description'       => 'When true, register attachments but do not link them to products.',
 			],
 		] ),
 	] );
@@ -352,6 +358,7 @@ function dtb_route_sync_images( WP_REST_Request $request ): WP_REST_Response|WP_
 	$month   = ltrim( (string) $request->get_param( 'month' ), '/' );
 	$dry_run = (bool) $request->get_param( 'dry_run' );
 	$force   = (bool) $request->get_param( 'force' );
+	$register_only = (bool) $request->get_param( 'register_only' );
 	$offset  = (int) $request->get_param( 'offset' );
 	$limit   = (int) $request->get_param( 'limit' );
 
@@ -406,6 +413,9 @@ function dtb_route_sync_images( WP_REST_Request $request ): WP_REST_Response|WP_
 	}
 
 	$extensions = [ 'webp', 'jpg', 'jpeg', 'png', 'avif', 'gif' ];
+	$catalog_images_by_sku = dtb_get_catalog_image_pairs_by_sku( $scan_dir, $scan_url, $extensions );
+	$catalog_expected_files_by_sku = dtb_get_catalog_image_filenames_by_sku();
+	$catalog_missing_files_by_sku = dtb_get_catalog_missing_image_filenames_by_sku( $scan_dir, $scan_url, $extensions );
 	$total_skus = count( $sku_map );
 	$total      = $total_skus;
 	$batch_mode = 'sku';
@@ -431,6 +441,7 @@ function dtb_route_sync_images( WP_REST_Request $request ): WP_REST_Response|WP_
 	$no_file        = 0;
 	$gallery_images = 0;
 	$errors         = [];
+	$missing_files  = [];
 	$batch_total    = count( $batch );
 	$processed      = 0;
 	$last_item      = '';
@@ -453,7 +464,8 @@ function dtb_route_sync_images( WP_REST_Request $request ): WP_REST_Response|WP_
 		$offset,
 		$limit,
 		$batch_mode,
-		$dry_run
+		$dry_run,
+		$register_only
 	): void {
 		set_transient( DTB_SYNC_PROGRESS_KEY, [
 			'last_item'      => $last_item,
@@ -472,6 +484,7 @@ function dtb_route_sync_images( WP_REST_Request $request ): WP_REST_Response|WP_
 			'gallery_images' => $gallery_images,
 			'errors'         => count( $errors ),
 			'dry_run'        => $dry_run,
+			'register_only'  => $register_only,
 			'updated_at'     => gmdate( 'c' ),
 		], DTB_SYNC_LOCK_TTL );
 	};
@@ -505,7 +518,7 @@ function dtb_route_sync_images( WP_REST_Request $request ): WP_REST_Response|WP_
 			if ( $dry_run ) {
 				$exists = attachment_url_to_postid( $file_url );
 				$exists ? ++$skipped : ++$registered;
-				if ( $product_id > 0 && $is_primary ) {
+				if ( ! $register_only && $product_id > 0 && $is_primary ) {
 					++$linked;
 				}
 				$sync_progress_updater();
@@ -529,7 +542,7 @@ function dtb_route_sync_images( WP_REST_Request $request ): WP_REST_Response|WP_
 				++$skipped;
 			}
 
-			if ( $product_id > 0 && $is_primary ) {
+			if ( ! $register_only && $product_id > 0 && $is_primary ) {
 				$link_result = dtb_link_images_to_product( $product_id, (int) $att_id, [] );
 				if ( is_wp_error( $link_result ) ) {
 					$errors[] = "[{$stem}] link: " . $link_result->get_error_message();
@@ -549,16 +562,25 @@ function dtb_route_sync_images( WP_REST_Request $request ): WP_REST_Response|WP_
 		$last_sku   = $sku_lower;
 		$last_product = $product_id;
 
-		// ── Probe for primary image: {sku}.{ext} ────────────────────────────
-		[ $primary_path, $primary_url ] = dtb_probe_image( $scan_dir, $scan_url, $sku_lower, $extensions );
+		$expected_files = $catalog_expected_files_by_sku[ $sku_lower ] ?? [];
+		$missing_expected_files = $catalog_missing_files_by_sku[ $sku_lower ] ?? [];
+		$catalog_pairs = $catalog_images_by_sku[ $sku_lower ] ?? [];
+		if ( ! empty( $catalog_pairs ) ) {
+			$first         = array_shift( $catalog_pairs );
+			$primary_path  = $first['path'];
+			$primary_url   = $first['url'];
+			$gallery_pairs = $catalog_pairs;
+		} else {
+			// Fallback for legacy image sets named {sku}.ext and {sku}_01.ext.
+			[ $primary_path, $primary_url ] = dtb_probe_image( $scan_dir, $scan_url, $sku_lower, $extensions );
 
-		// ── Probe for gallery images: {sku}_01.{ext} … {sku}_20.{ext} ───────
-		$gallery_pairs = [];
-		for ( $i = 1; $i <= 20; $i++ ) {
-			$suffix = '_' . str_pad( (string) $i, 2, '0', STR_PAD_LEFT );
-			[ $gpath, $gurl ] = dtb_probe_image( $scan_dir, $scan_url, $sku_lower . $suffix, $extensions );
-			if ( $gpath ) {
-				$gallery_pairs[] = [ 'path' => $gpath, 'url' => $gurl ];
+			$gallery_pairs = [];
+			for ( $i = 1; $i <= 20; $i++ ) {
+				$suffix = '_' . str_pad( (string) $i, 2, '0', STR_PAD_LEFT );
+				[ $gpath, $gurl ] = dtb_probe_image( $scan_dir, $scan_url, $sku_lower . $suffix, $extensions );
+				if ( $gpath ) {
+					$gallery_pairs[] = [ 'path' => $gpath, 'url' => $gurl ];
+				}
 			}
 		}
 
@@ -578,14 +600,29 @@ function dtb_route_sync_images( WP_REST_Request $request ): WP_REST_Response|WP_
 
 		if ( ! $primary_path ) {
 			++$no_file;
+			$missing_files[] = [
+				'sku'      => $sku_lower,
+				'expected' => $expected_files,
+			];
 			$sync_progress_updater();
 			continue;
 		}
 
+		if ( ! empty( $missing_expected_files ) ) {
+			$missing_files[] = [
+				'sku'      => $sku_lower,
+				'expected' => $missing_expected_files,
+			];
+		}
+
+		$last_item = basename( $primary_path );
+
 		if ( $dry_run ) {
 			$exists = attachment_url_to_postid( $primary_url );
 			$exists ? ++$skipped : ++$registered;
-			++$linked;
+			if ( ! $register_only ) {
+				++$linked;
+			}
 			$gallery_images += count( $gallery_pairs );
 			$sync_progress_updater();
 			continue;
@@ -627,6 +664,11 @@ function dtb_route_sync_images( WP_REST_Request $request ): WP_REST_Response|WP_
 			$gallery_att_ids[] = (int) $gatt;
 		}
 
+		if ( $register_only ) {
+			$sync_progress_updater();
+			continue;
+		}
+
 		// ── Link images to product via WC_Product API ────────────────────────
 		$result = dtb_link_images_to_product( $product_id, (int) $primary_att, $gallery_att_ids );
 		if ( is_wp_error( $result ) ) {
@@ -661,8 +703,10 @@ function dtb_route_sync_images( WP_REST_Request $request ): WP_REST_Response|WP_
 		'skipped'        => $skipped,
 		'no_file'        => $no_file,
 		'gallery_images' => $gallery_images,
+		'missing_files'  => $missing_files,
 		'errors'         => $errors,
 		'dry_run'        => $dry_run,
+		'register_only'  => $register_only,
 		'next_offset'    => ( $limit > 0 && ( $offset + $limit ) < $total )
 			? $offset + $limit
 			: null,
@@ -697,6 +741,15 @@ function dtb_route_link_registered_images( WP_REST_Request $request ): WP_REST_R
 	if ( ! is_dir( $scan_dir ) ) {
 		return new WP_Error( 'dir_not_found', "Directory not found: wp-content/uploads/$year/$month", [ 'status' => 404 ] );
 	}
+
+	if ( get_transient( DTB_SYNC_LOCK_KEY ) ) {
+		return new WP_Error(
+			'sync_locked',
+			'A sync is already in progress. Use /release-lock if the previous run crashed.',
+			[ 'status' => 423 ]
+		);
+	}
+	set_transient( DTB_SYNC_LOCK_KEY, true, DTB_SYNC_LOCK_TTL );
 
 	global $wpdb;
 	// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
@@ -734,18 +787,27 @@ function dtb_route_link_registered_images( WP_REST_Request $request ): WP_REST_R
 	$missing_attachment_count = 0;
 	$errors             = [];
 	$extensions         = [ 'webp', 'jpg', 'jpeg', 'png', 'avif', 'gif' ];
+	$catalog_images_by_sku = dtb_get_catalog_image_pairs_by_sku( $scan_dir, $scan_url, $extensions );
 
 	foreach ( $batch as $sku_lower ) {
 		$product_id = $sku_map[ $sku_lower ];
 
-		[ $primary_path, $primary_url ] = dtb_probe_image( $scan_dir, $scan_url, $sku_lower, $extensions );
+		$catalog_pairs = $catalog_images_by_sku[ $sku_lower ] ?? [];
+		if ( ! empty( $catalog_pairs ) ) {
+			$first         = array_shift( $catalog_pairs );
+			$primary_path  = $first['path'];
+			$primary_url   = $first['url'];
+			$gallery_pairs = $catalog_pairs;
+		} else {
+			[ $primary_path, $primary_url ] = dtb_probe_image( $scan_dir, $scan_url, $sku_lower, $extensions );
 
-		$gallery_pairs = [];
-		for ( $i = 1; $i <= 20; $i++ ) {
-			$suffix = '_' . str_pad( (string) $i, 2, '0', STR_PAD_LEFT );
-			[ $gpath, $gurl ] = dtb_probe_image( $scan_dir, $scan_url, $sku_lower . $suffix, $extensions );
-			if ( $gpath ) {
-				$gallery_pairs[] = [ 'path' => $gpath, 'url' => $gurl ];
+			$gallery_pairs = [];
+			for ( $i = 1; $i <= 20; $i++ ) {
+				$suffix = '_' . str_pad( (string) $i, 2, '0', STR_PAD_LEFT );
+				[ $gpath, $gurl ] = dtb_probe_image( $scan_dir, $scan_url, $sku_lower . $suffix, $extensions );
+				if ( $gpath ) {
+					$gallery_pairs[] = [ 'path' => $gpath, 'url' => $gurl ];
+				}
 			}
 		}
 
@@ -813,6 +875,9 @@ function dtb_route_link_registered_images( WP_REST_Request $request ): WP_REST_R
 	if ( ! $dry_run && class_exists( 'WC_Cache_Helper' ) ) {
 		WC_Cache_Helper::get_transient_version( 'product', true );
 	}
+
+	delete_transient( DTB_SYNC_LOCK_KEY );
+	delete_transient( DTB_SYNC_PROGRESS_KEY );
 
 	return rest_ensure_response( [
 		'status'              => $dry_run ? 'dry_run' : 'completed',
@@ -947,17 +1012,12 @@ function dtb_route_reset_images( WP_REST_Request $request ): WP_REST_Response|WP
 		return new WP_Error( 'invalid_params', 'year and month must be numeric.', [ 'status' => 400 ] );
 	}
 
-	// Early-exit when renaming is globally disabled via constant.
-	if ( defined( 'DTB_IMAGE_SYNC_DISABLE_RENAME' ) && DTB_IMAGE_SYNC_DISABLE_RENAME ) {
-		return rest_ensure_response( [
-			'status'    => 'disabled',
-			'directory' => "wp-content/uploads/$year/$month",
-			'dry_run'   => $dry_run,
-			'renamed'   => 0,
-			'skipped'   => 0,
-			'preview'   => [],
-			'errors'    => [],
-		] );
+	if ( get_transient( DTB_SYNC_LOCK_KEY ) ) {
+		return new WP_Error(
+			'sync_locked',
+			'A sync is already in progress. Use /release-lock if the previous run crashed.',
+			[ 'status' => 423 ]
+		);
 	}
 
 	global $wpdb;
@@ -1048,6 +1108,14 @@ function dtb_route_purge_unlinked_attachments( WP_REST_Request $request ): WP_RE
 
 	if ( ! ctype_digit( $year ) || ! ctype_digit( $month ) ) {
 		return new WP_Error( 'invalid_params', 'year and month must be numeric.', [ 'status' => 400 ] );
+	}
+
+	if ( get_transient( DTB_SYNC_LOCK_KEY ) ) {
+		return new WP_Error(
+			'sync_locked',
+			'A sync is already in progress. Use /release-lock if the previous run crashed.',
+			[ 'status' => 423 ]
+		);
 	}
 
 	global $wpdb;
@@ -1168,6 +1236,27 @@ function dtb_route_fix_renamed_files( WP_REST_Request $request ): WP_REST_Respon
 		return new WP_Error( 'invalid_params', 'year and month must be numeric.', [ 'status' => 400 ] );
 	}
 
+	if ( get_transient( DTB_SYNC_LOCK_KEY ) ) {
+		return new WP_Error(
+			'sync_locked',
+			'A sync is already in progress. Use /release-lock if the previous run crashed.',
+			[ 'status' => 423 ]
+		);
+	}
+
+	// Early-exit when renaming is globally disabled via constant.
+	if ( defined( 'DTB_IMAGE_SYNC_DISABLE_RENAME' ) && DTB_IMAGE_SYNC_DISABLE_RENAME ) {
+		return rest_ensure_response( [
+			'status'    => 'disabled',
+			'directory' => "wp-content/uploads/$year/$month",
+			'dry_run'   => $dry_run,
+			'renamed'   => 0,
+			'skipped'   => 0,
+			'preview'   => [],
+			'errors'    => [],
+		] );
+	}
+
 	$upload_dir = wp_upload_dir();
 	$scan_dir   = trailingslashit( $upload_dir['basedir'] ) . "$year/$month";
 
@@ -1262,13 +1351,307 @@ function dtb_route_fix_renamed_files( WP_REST_Request $request ): WP_REST_Respon
  * @return array{0: string|null, 1: string|null} [absolute_path, public_url] or [null, null].
  */
 function dtb_probe_image( string $dir, string $url, string $stem, array $extensions ): array {
+	$index = dtb_get_image_file_index( $dir, $url, $extensions );
+	if ( empty( $index ) ) {
+		return [ null, null ];
+	}
+
+	$stem_lower      = strtolower( $stem );
+	$normalized_stem = str_replace( '_', '-', $stem_lower );
+	$ordinal         = null;
+	$base_stem       = $normalized_stem;
+
+	if ( 1 === preg_match( '/^(.+)[_-](\d{2})$/', $stem_lower, $m ) ) {
+		$base_stem = str_replace( '_', '-', $m[1] );
+		$ordinal   = $m[2];
+	}
+
 	foreach ( $extensions as $ext ) {
-		$path = trailingslashit( $dir ) . $stem . '.' . $ext;
-		if ( file_exists( $path ) ) {
-			return [ $path, trailingslashit( $url ) . $stem . '.' . $ext ];
+		$ext = strtolower( $ext );
+		foreach ( $index as $file ) {
+			if ( $file['ext'] !== $ext ) {
+				continue;
+			}
+
+			if ( $file['stem'] === $stem_lower || $file['normalized_stem'] === $normalized_stem ) {
+				return [ $file['path'], $file['url'] ];
+			}
+
+			// Current catalog filenames are SEO slugs ending in -{SKU}-01.webp.
+			if ( null === $ordinal && str_ends_with( $file['normalized_stem'], '-' . $base_stem . '-01' ) ) {
+				return [ $file['path'], $file['url'] ];
+			}
+
+			if ( null !== $ordinal && str_ends_with( $file['normalized_stem'], '-' . $base_stem . '-' . $ordinal ) ) {
+				return [ $file['path'], $file['url'] ];
+			}
 		}
 	}
+
 	return [ null, null ];
+}
+
+/**
+ * Load exact image filenames from the active WooCommerce import CSV.
+ *
+ * The catalog is the source of truth for current product images. Its Images
+ * column contains full URLs; this helper maps SKU => local upload file pairs
+ * by basename so sync/link-only do not infer filenames from SKU conventions.
+ *
+ * @param string   $dir        Absolute path to the upload directory.
+ * @param string   $url        Public base URL for the directory.
+ * @param string[] $extensions Allowed image extensions.
+ * @return array<string,array<int,array{path:string,url:string}>>
+ */
+function dtb_get_catalog_image_pairs_by_sku( string $dir, string $url, array $extensions ): array {
+	static $cache = [];
+
+	$cache_key = md5( trailingslashit( $dir ) . '|' . trailingslashit( $url ) . '|' . implode( ',', $extensions ) );
+	if ( isset( $cache[ $cache_key ] ) ) {
+		return $cache[ $cache_key ];
+	}
+
+	$cache[ $cache_key ] = [];
+	if ( ! function_exists( 'dtb_get_config' ) || ! is_dir( $dir ) ) {
+		return $cache[ $cache_key ];
+	}
+
+	$config    = dtb_get_config();
+	$filenames = $config['csv_filenames'] ?? [];
+	if ( empty( $filenames ) ) {
+		return $cache[ $cache_key ];
+	}
+
+	$upload_dir = wp_upload_dir();
+	$imports_dir = trailingslashit( $upload_dir['basedir'] ) . 'wc-imports/';
+	$file_index  = dtb_get_image_file_index( $dir, $url, $extensions );
+	$by_basename = [];
+
+	foreach ( $file_index as $file ) {
+		$by_basename[ strtolower( $file['filename'] ) ] = [
+			'path' => $file['path'],
+			'url'  => $file['url'],
+		];
+	}
+
+	foreach ( $filenames as $filename ) {
+		$csv_path = $imports_dir . basename( (string) $filename );
+		if ( ! is_readable( $csv_path ) ) {
+			continue;
+		}
+
+		$handle = fopen( $csv_path, 'r' ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fopen
+		if ( false === $handle ) {
+			continue;
+		}
+
+		$header = fgetcsv( $handle );
+		if ( ! is_array( $header ) ) {
+			fclose( $handle );
+			continue;
+		}
+
+		$sku_index    = array_search( 'SKU', $header, true );
+		$images_index = array_search( 'Images', $header, true );
+		if ( false === $sku_index || false === $images_index ) {
+			fclose( $handle );
+			continue;
+		}
+
+		while ( false !== ( $row = fgetcsv( $handle ) ) ) {
+			$sku = isset( $row[ $sku_index ] ) ? strtolower( trim( (string) $row[ $sku_index ] ) ) : '';
+			if ( '' === $sku ) {
+				continue;
+			}
+
+			$image_field = isset( $row[ $images_index ] ) ? trim( (string) $row[ $images_index ] ) : '';
+			if ( '' === $image_field ) {
+				continue;
+			}
+
+			$pairs = [];
+			foreach ( explode( '|', $image_field ) as $image_url ) {
+				$basename = strtolower( basename( strtok( trim( $image_url ), '?' ) ?: '' ) );
+				if ( '' === $basename || ! isset( $by_basename[ $basename ] ) ) {
+					continue;
+				}
+				$pairs[] = $by_basename[ $basename ];
+			}
+
+			if ( ! empty( $pairs ) ) {
+				$cache[ $cache_key ][ $sku ] = $pairs;
+			}
+		}
+
+		fclose( $handle );
+	}
+
+	return $cache[ $cache_key ];
+}
+
+/**
+ * Return exact image basenames from the active import CSV, keyed by SKU.
+ *
+ * @return array<string,string[]>
+ */
+function dtb_get_catalog_image_filenames_by_sku(): array {
+	static $cache = null;
+
+	if ( null !== $cache ) {
+		return $cache;
+	}
+
+	$cache = [];
+	if ( ! function_exists( 'dtb_get_config' ) ) {
+		return $cache;
+	}
+
+	$config    = dtb_get_config();
+	$filenames = $config['csv_filenames'] ?? [];
+	if ( empty( $filenames ) ) {
+		return $cache;
+	}
+
+	$upload_dir  = wp_upload_dir();
+	$imports_dir = trailingslashit( $upload_dir['basedir'] ) . 'wc-imports/';
+
+	foreach ( $filenames as $filename ) {
+		$csv_path = $imports_dir . basename( (string) $filename );
+		if ( ! is_readable( $csv_path ) ) {
+			continue;
+		}
+
+		$handle = fopen( $csv_path, 'r' ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fopen
+		if ( false === $handle ) {
+			continue;
+		}
+
+		$header = fgetcsv( $handle );
+		if ( ! is_array( $header ) ) {
+			fclose( $handle );
+			continue;
+		}
+
+		$sku_index    = array_search( 'SKU', $header, true );
+		$images_index = array_search( 'Images', $header, true );
+		if ( false === $sku_index || false === $images_index ) {
+			fclose( $handle );
+			continue;
+		}
+
+		while ( false !== ( $row = fgetcsv( $handle ) ) ) {
+			$sku = isset( $row[ $sku_index ] ) ? strtolower( trim( (string) $row[ $sku_index ] ) ) : '';
+			if ( '' === $sku ) {
+				continue;
+			}
+
+			$image_field = isset( $row[ $images_index ] ) ? trim( (string) $row[ $images_index ] ) : '';
+			if ( '' === $image_field ) {
+				continue;
+			}
+
+			$image_filenames = [];
+			foreach ( explode( '|', $image_field ) as $image_url ) {
+				$basename = basename( strtok( trim( $image_url ), '?' ) ?: '' );
+				if ( '' !== $basename ) {
+					$image_filenames[] = $basename;
+				}
+			}
+
+			if ( ! empty( $image_filenames ) ) {
+				$cache[ $sku ] = $image_filenames;
+			}
+		}
+
+		fclose( $handle );
+	}
+
+	return $cache;
+}
+
+/**
+ * Return catalog image basenames that are expected but absent from disk.
+ *
+ * @param string   $dir        Absolute path to the upload directory.
+ * @param string   $url        Public base URL for the directory.
+ * @param string[] $extensions Allowed image extensions.
+ * @return array<string,string[]>
+ */
+function dtb_get_catalog_missing_image_filenames_by_sku( string $dir, string $url, array $extensions ): array {
+	$expected = dtb_get_catalog_image_filenames_by_sku();
+	if ( empty( $expected ) ) {
+		return [];
+	}
+
+	$present = [];
+	foreach ( dtb_get_image_file_index( $dir, $url, $extensions ) as $file ) {
+		$present[ strtolower( $file['filename'] ) ] = true;
+	}
+
+	$missing = [];
+	foreach ( $expected as $sku => $filenames ) {
+		foreach ( $filenames as $filename ) {
+			if ( ! isset( $present[ strtolower( $filename ) ] ) ) {
+				$missing[ $sku ][] = $filename;
+			}
+		}
+	}
+
+	return $missing;
+}
+
+/**
+ * Build a request-local index of top-level image files in a directory.
+ *
+ * @param string   $dir        Absolute path to the upload directory.
+ * @param string   $url        Public base URL for the directory.
+ * @param string[] $extensions Allowed image extensions.
+ * @return array<int,array{path:string,url:string,filename:string,stem:string,normalized_stem:string,ext:string}>
+ */
+function dtb_get_image_file_index( string $dir, string $url, array $extensions ): array {
+	static $cache = [];
+
+	if ( ! is_dir( $dir ) ) {
+		return [];
+	}
+
+	$extensions = array_map( 'strtolower', $extensions );
+	$cache_key  = md5( trailingslashit( $dir ) . '|' . trailingslashit( $url ) . '|' . implode( ',', $extensions ) );
+	if ( isset( $cache[ $cache_key ] ) ) {
+		return $cache[ $cache_key ];
+	}
+
+	$files = [];
+	$it    = new DirectoryIterator( $dir );
+	foreach ( $it as $file ) {
+		if ( $file->isDot() || ! $file->isFile() ) {
+			continue;
+		}
+
+		$ext = strtolower( $file->getExtension() );
+		if ( ! in_array( $ext, $extensions, true ) ) {
+			continue;
+		}
+
+		$stem = strtolower( $file->getBasename( '.' . $ext ) );
+		if ( preg_match( '/-\d+x\d+$/', $stem ) ) {
+			continue;
+		}
+
+		$files[] = [
+			'path'            => $file->getPathname(),
+			'url'             => trailingslashit( $url ) . $file->getFilename(),
+			'filename'        => $file->getFilename(),
+			'stem'            => $stem,
+			'normalized_stem' => str_replace( '_', '-', $stem ),
+			'ext'             => $ext,
+		];
+	}
+
+	usort( $files, static fn( $a, $b ) => strcmp( $a['path'], $b['path'] ) );
+	$cache[ $cache_key ] = $files;
+
+	return $files;
 }
 
 /**
@@ -1290,40 +1673,35 @@ function dtb_probe_image( string $dir, string $url, string $stem, array $extensi
  * @return array<int, array{path: string, url: string}>
  */
 function dtb_probe_image_hash_variants( string $dir, string $url, string $sku_lower, array $extensions ): array {
-	$matches = [];
-	$prefix  = $sku_lower . '_';
+	static $cache = [];
 
 	if ( ! is_dir( $dir ) ) {
-		return $matches;
+		return [];
 	}
 
-	$it = new DirectoryIterator( $dir );
-	foreach ( $it as $file ) {
-		if ( $file->isDot() || ! $file->isFile() ) {
-			continue;
-		}
-		$ext = strtolower( $file->getExtension() );
-		if ( ! in_array( $ext, $extensions, true ) ) {
-			continue;
-		}
-		$stem = strtolower( $file->getBasename( '.' . $ext ) );
-
-		// Must start with "{sku}_" and the suffix must look like a hex hash (6–16 chars).
-		if ( str_starts_with( $stem, $prefix ) ) {
-			$hash = substr( $stem, strlen( $prefix ) );
-			if ( preg_match( '/^[0-9a-f]{6,16}$/', $hash ) ) {
-				$matches[] = [
-					'path' => $file->getPathname(),
-					'url'  => trailingslashit( $url ) . $file->getFilename(),
-				];
+	$cache_key = md5( trailingslashit( $dir ) . '|' . trailingslashit( $url ) . '|' . implode( ',', $extensions ) );
+	if ( ! isset( $cache[ $cache_key ] ) ) {
+		$index = [];
+		foreach ( dtb_get_image_file_index( $dir, $url, $extensions ) as $file ) {
+			if ( 1 !== preg_match( '/^(.+)_([0-9a-f]{6,16})$/', $file['stem'], $m ) ) {
+				continue;
 			}
+
+			$index[ $m[1] ][] = [
+				'path' => $file['path'],
+				'url'  => $file['url'],
+			];
 		}
+
+		foreach ( $index as &$matches ) {
+			usort( $matches, static fn( $a, $b ) => strcmp( $a['path'], $b['path'] ) );
+		}
+		unset( $matches );
+
+		$cache[ $cache_key ] = $index;
 	}
 
-	// Sort deterministically by filename so primary image is consistent.
-	usort( $matches, static fn( $a, $b ) => strcmp( $a['path'], $b['path'] ) );
-
-	return $matches;
+	return $cache[ $cache_key ][ $sku_lower ] ?? [];
 }
 
 /**
@@ -1631,7 +2009,7 @@ function dtb_render_image_sync_admin_page(): void {
 	$month_candidate = '' !== $month_digits ? absint( $month_digits ) : (int) gmdate( 'm' );
 	$month_int       = ( $month_candidate >= 1 && $month_candidate <= 12 ) ? $month_candidate : (int) gmdate( 'm' );
 	$month     = str_pad( (string) $month_int, 2, '0', STR_PAD_LEFT );
-	$limit     = max( 1, absint( $get_post_field( 'dtb_limit', '100' ) ) );
+	$limit     = max( 1, absint( $get_post_field( 'dtb_limit', '25' ) ) );
 	$offset    = absint( $get_post_field( 'dtb_offset', '0' ) );
 	$dry_run   = $get_post_bool( 'dtb_dry_run', false );
 	$force     = $get_post_bool( 'dtb_force', false );
@@ -1650,11 +2028,18 @@ function dtb_render_image_sync_admin_page(): void {
 		$request->set_param( 'year', $year );
 		$request->set_param( 'month', $month );
 
-		if ( in_array( $action, [ 'sync', 'pipeline', 'link_only', 'reset', 'fix_renamed' ], true ) ) {
+		if ( in_array( $action, [ 'register_only', 'sync', 'pipeline', 'link_only', 'reset', 'fix_renamed' ], true ) ) {
 			$request->set_param( 'dry_run', $dry_run );
 		}
 
-		if ( 'sync' === $action ) {
+		if ( 'register_only' === $action ) {
+			$request->set_param( 'limit', $limit );
+			$request->set_param( 'offset', $offset );
+			$request->set_param( 'force', $force );
+			$request->set_param( 'register_only', true );
+			$action_result = dtb_route_sync_images( $request );
+
+		} elseif ( 'sync' === $action ) {
 			$request->set_param( 'limit', $limit );
 			$request->set_param( 'offset', $offset );
 			$request->set_param( 'force', $force );
@@ -1689,6 +2074,7 @@ function dtb_render_image_sync_admin_page(): void {
 			$sync_request->set_param( 'force',   $force );
 			$sync_request->set_param( 'limit',   $limit );
 			$sync_request->set_param( 'offset',  $offset );
+			$sync_request->set_param( 'register_only', false );
 			$sync_result = dtb_route_sync_images( $sync_request );
 
 			if ( is_wp_error( $sync_result ) ) {
@@ -1835,7 +2221,9 @@ function dtb_render_image_sync_admin_page(): void {
 		if ( null !== $next_offset ) :
 			$next_action = ! empty( $result_data['pipeline'] )
 				? 'pipeline'
-				: ( ! empty( $result_data['link_only'] ) ? 'link_only' : 'sync' );
+				: ( ! empty( $result_data['link_only'] )
+					? 'link_only'
+					: ( ! empty( $result_data['register_only'] ) ? 'register_only' : 'sync' ) );
 			?>
 			<div class="notice notice-info" style="display:flex;align-items:center;gap:16px;">
 				<p style="margin:0;">More batches remaining. Next offset: <strong><?php echo esc_html( (string) $next_offset ); ?></strong></p>
@@ -1876,8 +2264,8 @@ function dtb_render_image_sync_admin_page(): void {
 					<tr>
 						<th scope="row"><label for="dtb_limit">Batch limit</label></th>
 						<td>
-							<input id="dtb_limit" name="dtb_limit" type="number" min="1" max="1000" class="small-text" value="<?php echo esc_attr( (string) $limit ); ?>" />
-							<p class="description">Products per batch. Lower values are safer on shared hosting.</p>
+							<input id="dtb_limit" name="dtb_limit" type="number" min="1" max="250" class="small-text" value="<?php echo esc_attr( (string) $limit ); ?>" />
+							<p class="description">Products per batch. 25 is safer while registering thumbnails on shared hosting.</p>
 						</td>
 					</tr>
 					<tr>
@@ -1906,15 +2294,11 @@ function dtb_render_image_sync_admin_page(): void {
 				</fieldset>
 
 				<p class="submit" style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
-					<button type="submit" class="button button-hero button-primary" name="dtb_image_sync_action" value="pipeline"
-						title="Runs Fix Renamed → Sync batch in one click">
-						🚀 Run Full Pipeline
-					</button>
-					<span style="color:#646970;padding:0 4px;">or individually:</span>
 					<button type="submit" class="button" name="dtb_image_sync_action" value="status">Check Status</button>
 					<button type="submit" class="button" name="dtb_image_sync_action" value="fix_renamed">Fix Renamed Files</button>
+					<button type="submit" class="button button-primary" name="dtb_image_sync_action" value="register_only">Register Images Only</button>
 					<button type="submit" class="button button-secondary" name="dtb_image_sync_action" value="link_only">Link Registered Images</button>
-					<button type="submit" class="button button-primary" name="dtb_image_sync_action" value="sync">Run Sync Batch</button>
+					<button type="submit" class="button button-primary" name="dtb_image_sync_action" value="sync">Register + Link</button>
 					<button type="submit" class="button button-link-delete" name="dtb_image_sync_action" value="reset"
 						style="margin-left:auto;">⚠️ Run Reset</button>
 				</p>
@@ -2082,7 +2466,7 @@ function dtb_render_image_sync_admin_page(): void {
 		} );
 
 		form.addEventListener( 'submit', async ( event ) => {
-			if ( submittedAction !== 'sync' && submittedAction !== 'pipeline' && submittedAction !== 'link_only' ) {
+			if ( submittedAction !== 'register_only' && submittedAction !== 'sync' && submittedAction !== 'pipeline' && submittedAction !== 'link_only' ) {
 				return;
 			}
 			event.preventDefault();
@@ -2090,7 +2474,7 @@ function dtb_render_image_sync_admin_page(): void {
 			const formData = new FormData( form );
 			const year = String( formData.get( 'dtb_year' ) || '' );
 			const month = String( formData.get( 'dtb_month' ) || '' );
-			const limit = Math.max( 1, parseIntOrDefault( formData.get( 'dtb_limit' ), 100 ) );
+			const limit = Math.max( 1, Math.min( 250, parseIntOrDefault( formData.get( 'dtb_limit' ), 25 ) ) );
 			const dryRun = parseBool( formData.get( 'dtb_dry_run' ) );
 			const force = parseBool( formData.get( 'dtb_force' ) );
 			let currentOffset = Math.max( 0, parseIntOrDefault( formData.get( 'dtb_offset' ), 0 ) );
@@ -2101,7 +2485,10 @@ function dtb_render_image_sync_admin_page(): void {
 			logEl.textContent = '';
 			setBar( 0 );
 			setStatus( 'Starting…' );
-			appendLog( `Starting ${submittedAction} for ${year}/${month} (limit ${limit}, offset ${currentOffset})` );
+			const actionLabel = submittedAction === 'register_only'
+				? 'Register Images Only'
+				: ( submittedAction === 'link_only' ? 'Link Registered Images' : 'Register + Link' );
+			appendLog( `Starting ${actionLabel} for ${year}/${month} (limit ${limit}, offset ${currentOffset})` );
 
 			try {
 				if ( submittedAction === 'pipeline' ) {
@@ -2115,13 +2502,14 @@ function dtb_render_image_sync_admin_page(): void {
 				}
 
 				let batchCount = 0;
+				const missingFiles = [];
 				const syncEndpoint = submittedAction === 'link_only' ? api.link : api.sync;
 				while ( true ) {
 					batchCount += 1;
 					if ( batchCount > MAX_BATCHES ) {
 						throw new Error( 'Maximum batch limit exceeded.' );
 					}
-					setStatus( `Running ${submittedAction === 'link_only' ? 'link only' : 'sync'} batch ${batchCount}…` );
+					setStatus( `Running ${actionLabel} batch ${batchCount}…` );
 					if ( submittedAction !== 'link_only' ) {
 						startPolling();
 					}
@@ -2130,6 +2518,7 @@ function dtb_render_image_sync_admin_page(): void {
 						month: month,
 						dry_run: dryRun,
 						force: force,
+						register_only: submittedAction === 'register_only',
 						limit: limit,
 						offset: currentOffset
 					} );
@@ -2146,6 +2535,8 @@ function dtb_render_image_sync_admin_page(): void {
 						`Batch ${batchCount} done`,
 						`scanned ${scanned}`,
 						`linked ${parseIntOrDefault( batch.linked, 0 )}`,
+						`skipped ${parseIntOrDefault( batch.skipped, 0 )}`,
+						`no_file ${parseIntOrDefault( batch.no_file, 0 )}`,
 						`missing_attachments ${parseIntOrDefault( batch.missing_attachments, 0 )}`
 					];
 					if ( 'registered' in batch ) {
@@ -2154,7 +2545,22 @@ function dtb_render_image_sync_admin_page(): void {
 					batchSummary.push( `errors ${Array.isArray( batch.errors ) ? batch.errors.length : 0}` );
 					appendLog( batchSummary.join( ' · ' ) );
 
+					if ( Array.isArray( batch.missing_files ) ) {
+						batch.missing_files.forEach( ( item ) => missingFiles.push( item ) );
+					}
+
 					if ( batch.next_offset === null || typeof batch.next_offset === 'undefined' ) {
+						if ( missingFiles.length > 0 ) {
+							appendLog( '' );
+							appendLog( `Missing image files (${missingFiles.length}):` );
+							missingFiles.forEach( ( item ) => {
+								const sku = item && item.sku ? item.sku : '(unknown sku)';
+								const expected = Array.isArray( item.expected ) && item.expected.length
+									? item.expected.join( ', ' )
+									: '(no Images filename found in catalog)';
+								appendLog( `${sku}: ${expected}` );
+							} );
+						}
 						appendLog( 'Run complete.' );
 						setStatus( 'Completed successfully.' );
 						setBar( 1 );

@@ -237,8 +237,14 @@ add_action( 'woocommerce_init', 'dtb_wc_ensure_webhooks', 20 );
 add_action( 'admin_init', 'dtb_wc_ensure_webhooks', 999 );
 
 function dtb_wc_ensure_webhooks(): array {
+	static $result = null;
+
+	if ( null !== $result ) {
+		return $result;
+	}
+
 	if ( defined( 'DTB_DISABLE_PRODUCT_WEBHOOKS' ) && DTB_DISABLE_PRODUCT_WEBHOOKS ) {
-		return [
+		$result = [
 			'status'    => 'skipped',
 			'reason'    => 'product_webhooks_disabled',
 			'created'   => [],
@@ -249,6 +255,8 @@ function dtb_wc_ensure_webhooks(): array {
 				'disabled_by_constant' => true,
 			],
 		];
+
+		return $result;
 	}
 
 	$debug = [
@@ -273,7 +281,7 @@ function dtb_wc_ensure_webhooks(): array {
 
 
 	if ( ! class_exists( 'WC_Webhook' ) ) {
-		return [
+		$result = [
 			'status'    => 'skipped',
 			'reason'    => 'woocommerce_not_loaded',
 			'created'   => [],
@@ -282,6 +290,8 @@ function dtb_wc_ensure_webhooks(): array {
 			'secret'    => '',
 			'debug'     => $debug,
 		];
+
+		return $result;
 	}
 
 	// Fallback config if dtb-utils.php hasn't loaded (should not happen in production).
@@ -292,12 +302,12 @@ function dtb_wc_ensure_webhooks(): array {
 	} else {
 		$secret       = defined( 'WC_WEBHOOK_SECRET' ) ? WC_WEBHOOK_SECRET : '';
 		$delivery_url = defined( 'DRYWALL_ALLOWED_ORIGIN' )
-			? rtrim( DRYWALL_ALLOWED_ORIGIN, '/' ) . '/wp-json/dtb/v1/webhooks/products'
+			? rtrim( DRYWALL_ALLOWED_ORIGIN, '/' ) . '/wp-json/drywall/v1/webhooks/products'
 			: '';
 	}
 
 	if ( '' === $secret || '' === $delivery_url ) {
-		return [
+		$result = [
 			'status'    => 'skipped',
 			'reason'    => empty( $secret ) ? 'missing_secret' : 'missing_delivery_url',
 			'created'   => [],
@@ -306,6 +316,8 @@ function dtb_wc_ensure_webhooks(): array {
 			'secret'    => $secret,
 			'debug'     => $debug,
 		];
+
+		return $result;
 	}
 
 	$required_topics = [
@@ -315,15 +327,7 @@ function dtb_wc_ensure_webhooks(): array {
 		'product.restored',
 	];
 
-	if ( function_exists( 'wc_get_webhooks' ) ) {
-		$existing_ids = wc_get_webhooks( [
-			'delivery_url' => $delivery_url,
-			'return'       => 'ids',
-			'limit'        => -1,
-		] );
-	} else {
-		$existing_ids = dtb_wc_get_webhook_ids_by_delivery_url( $delivery_url );
-	}
+	$existing_ids = dtb_wc_get_webhook_ids_by_delivery_url( $delivery_url );
 
 	$registered = [];
 	$created = [];
@@ -350,7 +354,7 @@ function dtb_wc_ensure_webhooks(): array {
 		$created[] = $topic;
 	}
 
-	return [
+	$result = [
 		'status'   => 'completed',
 		'created'  => $created,
 		'existing' => array_keys( $registered ),
@@ -358,15 +362,51 @@ function dtb_wc_ensure_webhooks(): array {
 		'secret'   => $secret,
 		'debug'    => $debug,
 	];
+
+	return $result;
 }
 
 /**
- * Return webhook IDs matching the given delivery URL using native post lookup.
+ * Return webhook IDs matching the given delivery URL.
  *
- * This fallback is used when WooCommerce has loaded the WC_Webhook class but
- * not its helper function wc_get_webhooks().
+ * WooCommerce stores webhooks in a dedicated wc_webhooks table on current
+ * versions. Query that table directly because wc_get_webhooks() does not
+ * reliably support delivery_url filtering across storage implementations.
  */
 function dtb_wc_get_webhook_ids_by_delivery_url( string $delivery_url ): array {
+	global $wpdb;
+
+	$table_name = $wpdb->prefix . 'wc_webhooks';
+	$table_like = $wpdb->esc_like( $table_name );
+	$table      = $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $table_like ) );
+
+	if ( $table === $table_name ) {
+		return array_map(
+			'absint',
+			$wpdb->get_col(
+				$wpdb->prepare(
+					"SELECT webhook_id FROM {$table_name} WHERE delivery_url = %s",
+					$delivery_url
+				)
+			)
+		);
+	}
+
+	if ( function_exists( 'wc_get_webhooks' ) ) {
+		$webhooks = wc_get_webhooks( [
+			'limit' => -1,
+		] );
+
+		$ids = [];
+		foreach ( $webhooks as $webhook ) {
+			if ( $webhook instanceof WC_Webhook && $webhook->get_delivery_url() === $delivery_url ) {
+				$ids[] = absint( $webhook->get_id() );
+			}
+		}
+
+		return $ids;
+	}
+
 	$query = new WP_Query( [
 		'post_type'      => 'shop_webhook',
 		'post_status'    => 'any',

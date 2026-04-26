@@ -18,6 +18,7 @@ import surproLogo from '/brands/SurPro/surpro_logo.svg';
 import asgardLogo from '/brands/Asgard/asgard_logo.svg';
 import platinumLogo from '/brands/Platinum/platinum_logo.svg';
 import duraStiltsLogo from '/brands/Dura-Stilts/dura-stilts-logo.svg';
+import level5Logo from '/brands/Level5/Level5.svg';
 
 const brandLogos = {
   'TapeTech': tapeTechLogo,
@@ -26,6 +27,7 @@ const brandLogos = {
   'Asgard': asgardLogo,
   'Platinum Drywall Tools': platinumLogo,
   'Dura-Stilts': duraStiltsLogo,
+  'Level5': level5Logo,
 };
 
 // ---------------------------------------------------------------------------
@@ -132,6 +134,24 @@ import tapeTech68TTData  from '/brands/TapeTech/Schematics/68TT/schematic_data.j
 // ---------------------------------------------------------------------------
 import duraStiltsModelIV1830Data from '/brands/Dura-Stilts/Schematics/Model-IV/schematic_data2.json';
 import duraStiltsModelIV2440Data from '/brands/Dura-Stilts/Schematics/Model-IV/schematic_data3.json';
+
+// ---------------------------------------------------------------------------
+// Level5 schematic JSON data imports
+// ---------------------------------------------------------------------------
+import level5CoverPlateAssemblyData from '/brands/Level5/Schematics/AutomaticTapers/Cover-Plate-Assembly/schematic_data.json';
+import level5CutterChainAssemblyData from '/brands/Level5/Schematics/AutomaticTapers/Cutter-Chain-Assembly/schematic_data.json';
+import level5DriveDogAssemblyData from '/brands/Level5/Schematics/AutomaticTapers/Drive-Dog-Assembly/schematic_data.json';
+import level5GooserAssemblyData from '/brands/Level5/Schematics/AutomaticTapers/Gooser-Assembly/schematic_data.json';
+import level5TaperWheelAssemblyData from '/brands/Level5/Schematics/AutomaticTapers/Taper-Wheel-Assembly/schematic_data.json';
+import level5CornerFinisher35Data from '/brands/Level5/Schematics/CornerFinishers/3.5-inch-Corner-Finisher/schematic_data.json';
+import level5CornerRollerData from '/brands/Level5/Schematics/CornerRollers/Corner-Roller/schematic_data.json';
+import level5FlatBox7Data from '/brands/Level5/Schematics/FinishingBoxes/7-inch-Flat-Box/schematic_data.json';
+import level5FlatBox10Data from '/brands/Level5/Schematics/FinishingBoxes/10-inch-Flat-Box/schematic_data.json';
+import level5FlatBox12Data from '/brands/Level5/Schematics/FinishingBoxes/12-inch-Flat-Box/schematic_data.json';
+import level5MegaFlatBox7Data from '/brands/Level5/Schematics/FinishingBoxes/7-inch-Mega-Flat-Box/schematic_data.json';
+import level5MegaFlatBox10Data from '/brands/Level5/Schematics/FinishingBoxes/10-inch-Mega-Flat-Box/schematic_data.json';
+import level5MegaFlatBox12Data from '/brands/Level5/Schematics/FinishingBoxes/12-inch-Mega-Box/schematic_data.json';
+import level5CompoundPumpData from '/brands/Level5/Schematics/Pumps/Compound-Pump/schematic_data.json';
 
 // ---------------------------------------------------------------------------
 // Schematic image paths — static fallbacks served from public/brands/…
@@ -478,6 +498,64 @@ const _fallbacks = {
     preview: `${_BASE}brands/TapeTech/Schematics/68TT/68tt.png`,
   },
 
+  // ── Level5 ───────────────────────────────────────────────────────────────
+  'level5-7377-cover-plate-assembly-old-style': {
+    pages: { 1: `${_BASE}brands/Level5/Schematics/AutomaticTapers/Cover-Plate-Assembly/7377_SCH-page-001.webp` },
+    preview: `${_BASE}brands/Level5/Schematics/AutomaticTapers/Cover-Plate-Assembly/7377_SCH-page-001.webp`,
+  },
+  'level5-9333-cutter-chain-assembly': {
+    pages: { 1: `${_BASE}brands/Level5/Schematics/AutomaticTapers/Cutter-Chain-Assembly/9333_SCH-page-001.webp` },
+    preview: `${_BASE}brands/Level5/Schematics/AutomaticTapers/Cutter-Chain-Assembly/9333_SCH-page-001.webp`,
+  },
+  'level5-7097-drive-dog-assembly': {
+    pages: { 1: `${_BASE}brands/Level5/Schematics/AutomaticTapers/Drive-Dog-Assembly/7097_SCH-page-001.webp` },
+    preview: `${_BASE}brands/Level5/Schematics/AutomaticTapers/Drive-Dog-Assembly/7097_SCH-page-001.webp`,
+  },
+  'level5-7293-gooser-assembly': {
+    pages: { 1: `${_BASE}brands/Level5/Schematics/AutomaticTapers/Gooser-Assembly/7293_SCH-page-001.webp` },
+    preview: `${_BASE}brands/Level5/Schematics/AutomaticTapers/Gooser-Assembly/7293_SCH-page-001.webp`,
+  },
+  'level5-7218-taper-wheel-assembly': {
+    pages: { 1: `${_BASE}brands/Level5/Schematics/AutomaticTapers/Taper-Wheel-Assembly/7218_SCH-page-001.webp` },
+    preview: `${_BASE}brands/Level5/Schematics/AutomaticTapers/Taper-Wheel-Assembly/7218_SCH-page-001.webp`,
+  },
+  'level5-4-734-3-5-corner-finisher': {
+    pages: { 1: `${_BASE}brands/Level5/Schematics/CornerFinishers/3.5-inch-Corner-Finisher/4-734_SCH-page-001.webp` },
+    preview: `${_BASE}brands/Level5/Schematics/CornerFinishers/3.5-inch-Corner-Finisher/4-734_SCH-page-001.webp`,
+  },
+  'level5-corner-roller-4-707': {
+    pages: { 1: `${_BASE}brands/Level5/Schematics/CornerRollers/Corner-Roller/4-707_SCH-page-001.webp` },
+    preview: `${_BASE}brands/Level5/Schematics/CornerRollers/Corner-Roller/4-707_preview.webp`,
+  },
+  'level5-7-inch-flat-box-4-764': {
+    pages: { 1: `${_BASE}brands/Level5/Schematics/FinishingBoxes/7-inch-Flat-Box/4-764_SCH-page-001.webp` },
+    preview: `${_BASE}brands/Level5/Schematics/FinishingBoxes/7-inch-Flat-Box/4-764_SCH-page-001.webp`,
+  },
+  'level5-10-inch-flat-box-4-765': {
+    pages: { 1: `${_BASE}brands/Level5/Schematics/FinishingBoxes/10-inch-Flat-Box/4-765_SCH-page-001.webp` },
+    preview: `${_BASE}brands/Level5/Schematics/FinishingBoxes/10-inch-Flat-Box/4-765_SCH-page-001.webp`,
+  },
+  'level5-12-inch-flat-box-4-766': {
+    pages: { 1: `${_BASE}brands/Level5/Schematics/FinishingBoxes/12-inch-Flat-Box/4-766_SCH-page-001.webp` },
+    preview: `${_BASE}brands/Level5/Schematics/FinishingBoxes/12-inch-Flat-Box/4-766_SCH-page-001.webp`,
+  },
+  'level5-7-inch-mega-flat-box-4-767': {
+    pages: { 1: `${_BASE}brands/Level5/Schematics/FinishingBoxes/7-inch-Mega-Flat-Box/4-767_SCH-page-001.webp` },
+    preview: `${_BASE}brands/Level5/Schematics/FinishingBoxes/7-inch-Mega-Flat-Box/4-767_SCH-page-001.webp`,
+  },
+  'level5-10-inch-mega-flat-box-4-768': {
+    pages: { 1: `${_BASE}brands/Level5/Schematics/FinishingBoxes/10-inch-Mega-Flat-Box/4-768_SCH-page-001.webp` },
+    preview: `${_BASE}brands/Level5/Schematics/FinishingBoxes/10-inch-Mega-Flat-Box/4-768_SCH-page-001.webp`,
+  },
+  'level5-12-inch-mega-box-4-769': {
+    pages: { 1: `${_BASE}brands/Level5/Schematics/FinishingBoxes/12-inch-Mega-Box/4-769_SCH-page-001.webp` },
+    preview: `${_BASE}brands/Level5/Schematics/FinishingBoxes/12-inch-Mega-Box/4-769_SCH-page-001.webp`,
+  },
+  'level5-compound-pump-4-771': {
+    pages: { 1: `${_BASE}brands/Level5/Schematics/Pumps/Compound-Pump/4-771_SCH-page-001.webp` },
+    preview: `${_BASE}brands/Level5/Schematics/Pumps/Compound-Pump/4-771_SCH-page-001.webp`,
+  },
+
   // ── Dura-Stilts ──────────────────────────────────────────────────────────
   // Three height-range pages for the Model IV stilt.
   // Pages 1 (14-22) is diagram-only; pages 2 (18-30) and 3 (24-40) have hotspots.
@@ -500,6 +578,7 @@ const BRAND_TO_SLUG = {
   'SurPro':                'surpro',
   'Platinum Drywall Tools': 'platinum',
   'Dura-Stilts':           'dura-stilts',
+  'Level5':                'level5',
 };
 const SLUG_TO_BRAND = Object.fromEntries(
   Object.entries(BRAND_TO_SLUG).map(([name, slug]) => [slug, name])
@@ -522,6 +601,7 @@ const ALLOWED_BRANDS = [
   'SurPro',
   'Platinum Drywall Tools',
   'Dura-Stilts',
+  'Level5',
 ];  const location = useLocation();
   const navigate = useNavigate();
 
@@ -800,6 +880,22 @@ const ALLOWED_BRANDS = [
   const tapeTech50TTParts  = buildPartsFromData(tapeTech50TTData);
   const tapeTech63TTParts  = buildPartsFromData(tapeTech63TTData);
   const tapeTech68TTParts  = buildPartsFromData(tapeTech68TTData);
+
+  // Level5 parts arrays
+  const level5CoverPlateAssemblyParts = buildPartsFromData(level5CoverPlateAssemblyData);
+  const level5CutterChainAssemblyParts = buildPartsFromData(level5CutterChainAssemblyData);
+  const level5DriveDogAssemblyParts = buildPartsFromData(level5DriveDogAssemblyData);
+  const level5GooserAssemblyParts = buildPartsFromData(level5GooserAssemblyData);
+  const level5TaperWheelAssemblyParts = buildPartsFromData(level5TaperWheelAssemblyData);
+  const level5CornerFinisher35Parts = buildPartsFromData(level5CornerFinisher35Data);
+  const level5CornerRollerParts = buildPartsFromData(level5CornerRollerData);
+  const level5FlatBox7Parts = buildPartsFromData(level5FlatBox7Data);
+  const level5FlatBox10Parts = buildPartsFromData(level5FlatBox10Data);
+  const level5FlatBox12Parts = buildPartsFromData(level5FlatBox12Data);
+  const level5MegaFlatBox7Parts = buildPartsFromData(level5MegaFlatBox7Data);
+  const level5MegaFlatBox10Parts = buildPartsFromData(level5MegaFlatBox10Data);
+  const level5MegaFlatBox12Parts = buildPartsFromData(level5MegaFlatBox12Data);
+  const level5CompoundPumpParts = buildPartsFromData(level5CompoundPumpData);
 
   // Dura-Stilts parts arrays
   // Page 1 (14″–22″) has no hotspot JSON — parts array is empty.
@@ -1692,6 +1788,162 @@ const ALLOWED_BRANDS = [
       imagePages: { 1: schImg('tapetech-68tt', 1) },
       previewImage: schPrev('tapetech-68tt'),
       parts: tapeTech68TTParts,
+    },
+
+    // ── Level5 ──────────────────────────────────────────────────────────────
+    {
+      id: 'level5-7377-cover-plate-assembly-old-style',
+      title: 'Cover Plate Assembly (Old Style)',
+      description: 'Level5 Cover Plate Assembly schematic diagram with replacement parts',
+      brand: 'Level5',
+      category: 'Automatic Tapers',
+      diagramPages: [1],
+      imagePages: { 1: schImg('level5-7377-cover-plate-assembly-old-style', 1) },
+      previewImage: schPrev('level5-7377-cover-plate-assembly-old-style'),
+      parts: level5CoverPlateAssemblyParts,
+    },
+    {
+      id: 'level5-9333-cutter-chain-assembly',
+      title: 'Cutter Chain Assembly',
+      description: 'Level5 Cutter Chain Assembly schematic diagram with replacement parts',
+      brand: 'Level5',
+      category: 'Automatic Tapers',
+      diagramPages: [1],
+      imagePages: { 1: schImg('level5-9333-cutter-chain-assembly', 1) },
+      previewImage: schPrev('level5-9333-cutter-chain-assembly'),
+      parts: level5CutterChainAssemblyParts,
+    },
+    {
+      id: 'level5-7097-drive-dog-assembly',
+      title: 'Drive Dog Assembly',
+      description: 'Level5 Drive Dog Assembly schematic diagram with replacement parts',
+      brand: 'Level5',
+      category: 'Automatic Tapers',
+      diagramPages: [1],
+      imagePages: { 1: schImg('level5-7097-drive-dog-assembly', 1) },
+      previewImage: schPrev('level5-7097-drive-dog-assembly'),
+      parts: level5DriveDogAssemblyParts,
+    },
+    {
+      id: 'level5-7293-gooser-assembly',
+      title: 'Gooser Assembly',
+      description: 'Level5 Gooser Assembly schematic diagram with replacement parts',
+      brand: 'Level5',
+      category: 'Automatic Tapers',
+      diagramPages: [1],
+      imagePages: { 1: schImg('level5-7293-gooser-assembly', 1) },
+      previewImage: schPrev('level5-7293-gooser-assembly'),
+      parts: level5GooserAssemblyParts,
+    },
+    {
+      id: 'level5-7218-taper-wheel-assembly',
+      title: 'Taper Wheel Assembly',
+      description: 'Level5 Taper Wheel Assembly schematic diagram with replacement parts',
+      brand: 'Level5',
+      category: 'Automatic Tapers',
+      diagramPages: [1],
+      imagePages: { 1: schImg('level5-7218-taper-wheel-assembly', 1) },
+      previewImage: schPrev('level5-7218-taper-wheel-assembly'),
+      parts: level5TaperWheelAssemblyParts,
+    },
+    {
+      id: 'level5-4-734-3-5-corner-finisher',
+      title: '3.5" Corner Finisher',
+      description: 'Level5 3.5" Corner Finisher schematic diagram with replacement parts',
+      brand: 'Level5',
+      category: 'Corner Finishers',
+      diagramPages: [1],
+      imagePages: { 1: schImg('level5-4-734-3-5-corner-finisher', 1) },
+      previewImage: schPrev('level5-4-734-3-5-corner-finisher'),
+      parts: level5CornerFinisher35Parts,
+    },
+    {
+      id: 'level5-corner-roller-4-707',
+      title: 'Corner Roller',
+      description: 'Level5 Corner Roller schematic diagram with replacement parts',
+      brand: 'Level5',
+      category: 'Corner Rollers',
+      diagramPages: [1],
+      imagePages: { 1: schImg('level5-corner-roller-4-707', 1) },
+      previewImage: schPrev('level5-corner-roller-4-707'),
+      parts: level5CornerRollerParts,
+    },
+    {
+      id: 'level5-7-inch-flat-box-4-764',
+      title: '7" Flat Box',
+      description: 'Level5 7" Flat Box schematic diagram with replacement parts',
+      brand: 'Level5',
+      category: 'Finishing Boxes',
+      diagramPages: [1],
+      imagePages: { 1: schImg('level5-7-inch-flat-box-4-764', 1) },
+      previewImage: schPrev('level5-7-inch-flat-box-4-764'),
+      parts: level5FlatBox7Parts,
+    },
+    {
+      id: 'level5-10-inch-flat-box-4-765',
+      title: '10" Flat Box',
+      description: 'Level5 10" Flat Box schematic diagram with replacement parts',
+      brand: 'Level5',
+      category: 'Finishing Boxes',
+      diagramPages: [1],
+      imagePages: { 1: schImg('level5-10-inch-flat-box-4-765', 1) },
+      previewImage: schPrev('level5-10-inch-flat-box-4-765'),
+      parts: level5FlatBox10Parts,
+    },
+    {
+      id: 'level5-12-inch-flat-box-4-766',
+      title: '12" Flat Box',
+      description: 'Level5 12" Flat Box schematic diagram with replacement parts',
+      brand: 'Level5',
+      category: 'Finishing Boxes',
+      diagramPages: [1],
+      imagePages: { 1: schImg('level5-12-inch-flat-box-4-766', 1) },
+      previewImage: schPrev('level5-12-inch-flat-box-4-766'),
+      parts: level5FlatBox12Parts,
+    },
+    {
+      id: 'level5-7-inch-mega-flat-box-4-767',
+      title: '7" Mega Flat Box',
+      description: 'Level5 7" Mega Flat Box schematic diagram with replacement parts',
+      brand: 'Level5',
+      category: 'Finishing Boxes',
+      diagramPages: [1],
+      imagePages: { 1: schImg('level5-7-inch-mega-flat-box-4-767', 1) },
+      previewImage: schPrev('level5-7-inch-mega-flat-box-4-767'),
+      parts: level5MegaFlatBox7Parts,
+    },
+    {
+      id: 'level5-10-inch-mega-flat-box-4-768',
+      title: '10" Mega Flat Box',
+      description: 'Level5 10" Mega Flat Box schematic diagram with replacement parts',
+      brand: 'Level5',
+      category: 'Finishing Boxes',
+      diagramPages: [1],
+      imagePages: { 1: schImg('level5-10-inch-mega-flat-box-4-768', 1) },
+      previewImage: schPrev('level5-10-inch-mega-flat-box-4-768'),
+      parts: level5MegaFlatBox10Parts,
+    },
+    {
+      id: 'level5-12-inch-mega-box-4-769',
+      title: '12" Mega Flat Box',
+      description: 'Level5 12" Mega Flat Box schematic diagram with replacement parts',
+      brand: 'Level5',
+      category: 'Finishing Boxes',
+      diagramPages: [1],
+      imagePages: { 1: schImg('level5-12-inch-mega-box-4-769', 1) },
+      previewImage: schPrev('level5-12-inch-mega-box-4-769'),
+      parts: level5MegaFlatBox12Parts,
+    },
+    {
+      id: 'level5-compound-pump-4-771',
+      title: 'Compound Pump',
+      description: 'Level5 Compound Pump schematic diagram with replacement parts',
+      brand: 'Level5',
+      category: 'Pumps',
+      diagramPages: [1],
+      imagePages: { 1: schImg('level5-compound-pump-4-771', 1) },
+      previewImage: schPrev('level5-compound-pump-4-771'),
+      parts: level5CompoundPumpParts,
     },
 
     // ── Dura-Stilts ──────────────────────────────────────────────────────────

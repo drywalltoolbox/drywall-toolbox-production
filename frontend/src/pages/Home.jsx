@@ -7,7 +7,7 @@ import surproLogo from '/brands/SurPro/surpro_logo.svg';
 import asgardLogo from '/brands/Asgard/asgard_logo.svg';
 import platinumLogo from '/brands/Platinum/platinum_logo.svg';
 import platinumLogoWhite from '/brands/Platinum/platinum_logo_white.svg';
-import duraStiltsLogo from '/brands/Dura-Stilts/dura-stilts-logo.svg';
+import level5Logo from '/brands/Level5/Level5.svg';
 import SEOHead from '../components/SEOHead';
 import { buildOrganizationSchema, buildSiteLinksSearchBoxSchema } from '../utils/schema';
 import { ShoppingBag, Wrench, Layers, FileText, Truck, Shield, Phone, ChevronRight, Star } from 'lucide-react';
@@ -45,20 +45,20 @@ const trustBadges = [
 const brandLogos = [
   { name: 'TapeTech', src: tapeTechLogo },
   { name: 'Columbia', src: columbiaLogo },
-  { name: 'SurPro', src: surproLogo },
-  { name: 'Asgard', src: asgardLogo },
-  { name: 'Dura-Stilts', src: duraStiltsLogo },
+  { name: 'Level5', src: level5Logo },
   { name: 'Platinum Drywall Tools', src: platinumLogo },
+  { name: 'Asgard', src: asgardLogo },
+  { name: 'SurPro', src: surproLogo },
 ];
 
 // Desktop hero brands - Columbia + Platinum use white logos for better contrast on dark background
 const desktopHeroBrands = [
   { name: 'TapeTech', src: tapeTechLogo },
   { name: 'Columbia', src: columbiaLogoWhite },
-  { name: 'SurPro', src: surproLogo },
-  { name: 'Asgard', src: asgardLogo },
-  { name: 'Dura-Stilts', src: duraStiltsLogo },
+  { name: 'Level5', src: level5Logo },
   { name: 'Platinum Drywall Tools', src: platinumLogoWhite },
+  { name: 'Asgard', src: asgardLogo },
+  { name: 'SurPro', src: surproLogo },
 ];
 
 export default function Home() {
@@ -233,7 +233,7 @@ export default function Home() {
                 decoding="async"
                 style={{ 
                   height: brand.name === 'Columbia' ? 'clamp(60px, 10vw, 100px)' : brand.name === 'Asgard' || brand.name === 'Graco' ? 'clamp(32px, 5vw, 50px)' : brand.name === 'Platinum Drywall Tools' ? 'clamp(28px, 4.5vw, 44px)' : 'clamp(24px, 4vw, 40px)',
-                  maxWidth: brand.name === 'Columbia' ? '300px' : brand.name === 'Asgard' || brand.name === 'Graco' ? '150px' : brand.name === 'Platinum Drywall Tools' ? '180px' : '120px',
+                  maxWidth: brand.name === 'Columbia' ? '300px' : brand.name === 'Asgard' || brand.name === 'Graco' ? '150px' : ['Platinum Drywall Tools', 'Level5'].includes(brand.name) ? '180px' : '120px',
                   objectFit: 'contain' 
                 }}
               />

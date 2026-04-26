@@ -27,6 +27,7 @@ import asgardLogo from '/brands/Asgard/asgard_logo.svg';
 import gracoLogo from '/brands/Graco/graco_logo.svg';
 import platinumLogo from '/brands/Platinum/platinum_logo.svg';
 import duraStiltsLogo from '/brands/Dura-Stilts/dura-stilts-logo.svg';
+import level5Logo from '/brands/Level5/Level5.svg';
 import SEOHead from '../components/SEOHead';
 import { buildSiteLinksSearchBoxSchema } from '../utils/schema';
 import { findMatchingVariation, fetchVariationsBatched } from '../utils/variationSelection';
@@ -50,7 +51,8 @@ const ALLOWED_BRANDS = [
   'SurPro',
   'Graco',
   'Platinum Drywall Tools',
-  'Dura-Stilts'
+  'Dura-Stilts',
+  'Level5'
 ];
 
 const MAX_PRICE = 3000;
@@ -66,6 +68,7 @@ const BRAND_TO_SLUG = {
   'Graco':                 'graco',
   'Platinum Drywall Tools': 'platinum',
   'Dura-Stilts':           'dura-stilts',
+  'Level5':                'level5',
 };
 const SLUG_TO_BRAND = Object.fromEntries(
   Object.entries(BRAND_TO_SLUG).map(([name, slug]) => [slug, name])
@@ -79,6 +82,7 @@ const brandLogos = {
   'Graco': gracoLogo,
   'Platinum Drywall Tools': platinumLogo,
   'Dura-Stilts': duraStiltsLogo,
+  'Level5': level5Logo,
 };
 
 export default function Products() {
