@@ -237,6 +237,20 @@ add_action( 'woocommerce_init', 'dtb_wc_ensure_webhooks', 20 );
 add_action( 'admin_init', 'dtb_wc_ensure_webhooks', 999 );
 
 function dtb_wc_ensure_webhooks(): array {
+	if ( defined( 'DTB_DISABLE_PRODUCT_WEBHOOKS' ) && DTB_DISABLE_PRODUCT_WEBHOOKS ) {
+		return [
+			'status'    => 'skipped',
+			'reason'    => 'product_webhooks_disabled',
+			'created'   => [],
+			'existing'  => [],
+			'delivery'  => '',
+			'secret'    => '',
+			'debug'     => [
+				'disabled_by_constant' => true,
+			],
+		];
+	}
+
 	$debug = [
 		'wc_get_webhooks' => function_exists( 'wc_get_webhooks' ),
 		'WC_Webhook'      => class_exists( 'WC_Webhook' ),
@@ -601,14 +615,64 @@ add_filter( 'wp_check_filetype_and_ext', function ( array $data, string $file, s
 	return $data;
 }, 10, 3 );
 
-// B1 — Reduce batch size to 25 products per Ajax call.
-// 10 products × avg 1.8 images × ~5 s sideload ≈ 90 s — safe under Cloudflare's
-// 120 s proxy timeout and the 300 s PHP execution window enforced below.
-// When images are pre-registered in the Media Library, each batch is still
-// fast and the importer completes in more batches.
+/**
+ * Detect the built-in WooCommerce product importer across both page loads and
+ * importer AJAX batches.
+ */
+function dtb_is_wc_product_import_request(): bool {
+	$action = isset( $_REQUEST['action'] )
+		? sanitize_text_field( wp_unslash( $_REQUEST['action'] ) ) // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		: '';
+
+	if ( in_array( $action, [ 'woocommerce_do_ajax_product_import', 'woocommerce_ajax_import_products' ], true ) ) {
+		return true;
+	}
+
+	$page = isset( $_GET['page'] )
+		? sanitize_text_field( wp_unslash( $_GET['page'] ) ) // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		: '';
+
+	return 'product_importer' === $page;
+}
+
+/**
+ * Shared-hosting safe import mode.
+ *
+ * The catalog already points at files hosted on this same server, but
+ * WooCommerce still performs full sideload/media handling for each image during
+ * import. On a site with a very large Action Scheduler backlog, that first AJAX
+ * batch becomes fragile enough to appear "stuck" in the importer UI.
+ *
+ * We keep the explicit option as an override, but default built-in imports to
+ * skip images. Images can then be linked in a separate pass via dtb-image-sync.
+ */
+function dtb_should_skip_import_images(): bool {
+	if ( get_option( 'dtb_import_skip_images' ) ) {
+		return true;
+	}
+
+	return dtb_is_wc_product_import_request();
+}
+
+// B1 — Keep batch sizes small when image sideloading is enabled, but allow
+// larger batches when we are in the shared-hosting safe "skip images" mode.
 add_filter( 'woocommerce_product_import_batch_size', function (): int {
-	return 10;
+	return dtb_should_skip_import_images() ? 25 : 5;
 } );
+
+// B1.5 — Prevent Action Scheduler's default queue runner from competing with
+// the importer request. Action Scheduler documents that its queue is initiated
+// by WP-Cron and the shutdown hook on admin requests, which is a poor fit for a
+// long-running importer AJAX batch on a site with a massive overdue queue.
+add_action( 'init', function (): void {
+	if ( ! dtb_is_wc_product_import_request() ) {
+		return;
+	}
+
+	if ( class_exists( 'ActionScheduler' ) ) {
+		remove_action( 'action_scheduler_run_queue', [ ActionScheduler::runner(), 'run' ] );
+	}
+}, 20 );
 
 // B2 — Enforce execution time and memory limits for each import Ajax call.
 //
@@ -621,10 +685,7 @@ add_filter( 'woocommerce_product_import_batch_size', function (): int {
 // are also set in wp/.user.ini to override the host php.ini on HostGator
 // without relying on ini_set() or set_time_limit() being available.
 add_action( 'admin_init', function (): void {
-	$action = isset( $_REQUEST['action'] )
-		? sanitize_text_field( wp_unslash( $_REQUEST['action'] ) ) // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-		: '';
-	if ( in_array( $action, [ 'woocommerce_do_ajax_product_import', 'woocommerce_ajax_import_products' ], true ) ) {
+	if ( dtb_is_wc_product_import_request() ) {
 		if ( function_exists( 'set_time_limit' ) ) {
 			set_time_limit( 300 );
 		}
@@ -669,7 +730,7 @@ add_action( 'woocommerce_product_import_start', function (): void {
 // ============================================================================
 
 add_filter( 'woocommerce_product_importer_parsed_data', function ( array $data ): array {
-	if ( get_option( 'dtb_import_skip_images' ) ) {
+	if ( dtb_should_skip_import_images() ) {
 		unset( $data['images'] );
 		unset( $data['thumbnail'] );
 	}
@@ -682,9 +743,24 @@ add_filter( 'woocommerce_product_importer_parsed_data', function ( array $data )
 // is clean (no image IDs) when meta is written. This also prevents edge cases
 // where woocommerce_product_importer_parsed_data fired after sideloading.
 add_filter( 'woocommerce_product_import_pre_insert_product_object', function ( \WC_Product $product, array $data ): \WC_Product {
-	if ( get_option( 'dtb_import_skip_images' ) ) {
+	if ( dtb_should_skip_import_images() ) {
 		$product->set_image_id( '' );
 		$product->set_gallery_image_ids( [] );
 	}
 	return $product;
 }, 5, 2 );
+
+// Surface the safe-mode behavior so the importer UI matches what the backend
+// is doing. This only shows on the mapping/upload screens, not during the AJAX
+// batch itself.
+add_action( 'admin_notices', function (): void {
+	if ( ! is_admin() || ! dtb_is_wc_product_import_request() ) {
+		return;
+	}
+
+	if ( get_option( 'dtb_import_skip_images' ) ) {
+		return;
+	}
+
+	echo '<div class="notice notice-warning"><p><strong>DTB import safe mode is active.</strong> This WooCommerce CSV import will skip image sideloading to avoid shared-hosting timeouts. After the products import, run DTB image linking to attach the registered images by SKU.</p></div>';
+} );
