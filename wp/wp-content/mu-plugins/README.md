@@ -190,7 +190,7 @@ Use this checklist when auditing the mu-plugin suite:
   - Example: `dtb-rest-api.php` already schedules `/dtb/v1/import-catalog` as background work when Action Scheduler is available.
 
 ### Files to inspect first
-
+-
 - `dtb-rest-api.php` — REST route registration plus catalog import scheduling.
 - `dtb-woocommerce.php` — WooCommerce admin startup fixes and import timeout handling.
 - `dtb-image-sync.php` — image sync REST routes and batch work.
