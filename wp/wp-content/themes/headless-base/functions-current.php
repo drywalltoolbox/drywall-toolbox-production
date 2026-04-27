@@ -260,6 +260,7 @@ function hb_send_cors_headers( mixed $served ): mixed {
 			home_url(),
 			'https://drywalltoolbox.com',
 			'https://www.drywalltoolbox.com',
+			'https://elliotttmiller.github.io',
 			'http://localhost:3000',   // CRA dev server.
 			'http://localhost:5173',   // Vite dev server.
 			'http://127.0.0.1:5173',

@@ -486,6 +486,7 @@ function dtb_send_cors_headers( mixed $served ): mixed {
 		rtrim( home_url(), '/' ),
 		'https://drywalltoolbox.com',
 		'https://www.drywalltoolbox.com',
+		'https://elliotttmiller.github.io',
 		'http://localhost:3000',   // CRA local dev.
 		'http://localhost:5173',   // Vite local dev.
 		'http://127.0.0.1:5173',

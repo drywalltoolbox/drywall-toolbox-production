@@ -38,6 +38,14 @@ defined( 'ABSPATH' ) || exit;
 add_action( 'rest_api_init', 'dtb_register_all_routes', 10 );
 add_action( 'rest_api_init', 'dtb_cors_init', 15 );
 
+// Ensure CORS headers are emitted as early as possible for wp-json requests,
+// even if a later error prevents the normal REST response hooks from running.
+add_action( 'init', 'dtb_emit_cors_headers_early', 0 );
+
+// Emit CORS headers for all REST requests early, even if response handling
+// bypasses the normal rest_pre_serve_request chain.
+add_action( 'send_headers', 'dtb_send_rest_cors_headers', 1 );
+
 // Remove WordPress core CORS handler at the EARLIEST opportunity (priority -999)
 // This ensures our handler is the only one that runs.
 add_action( 'rest_api_init', function () {
@@ -344,6 +352,70 @@ function dtb_cors_init(): void {
 		dtb_emit_cors_headers( $raw_origin );
 		return $value;
 	} );
+}
+
+/**
+ * Emit CORS headers early for requests targeting the REST API.
+ *
+ * This prevents cases where a fatal error or an early exit happens before
+ * the normal REST response handling can attach the headers.
+ */
+function dtb_emit_cors_headers_early(): void {
+	if ( ! dtb_is_rest_request() ) {
+		return;
+	}
+
+	$raw_origin = isset( $_SERVER['HTTP_ORIGIN'] )
+		? (string) wp_unslash( $_SERVER['HTTP_ORIGIN'] )
+		: '';
+
+	if ( $raw_origin && ! in_array( rtrim( $raw_origin, '/' ), dtb_allowed_origins(), true ) ) {
+		return;
+	}
+
+	dtb_emit_cors_headers( $raw_origin );
+}
+
+/**
+ * Emit CORS headers on the send_headers hook for REST requests.
+ *
+ * This protects against cases where the response is sent before the
+ * rest_pre_serve_request filter is applied, such as early errors or
+ * response short-circuiting from other plugins.
+ */
+function dtb_send_rest_cors_headers(): void {
+	if ( ! dtb_is_rest_request() ) {
+		return;
+	}
+
+	$raw_origin = isset( $_SERVER['HTTP_ORIGIN'] )
+		? (string) wp_unslash( $_SERVER['HTTP_ORIGIN'] )
+		: '';
+
+	if ( $raw_origin && ! in_array( rtrim( $raw_origin, '/' ), dtb_allowed_origins(), true ) ) {
+		$raw_origin = '';
+	}
+
+	dtb_emit_cors_headers( $raw_origin );
+}
+
+/**
+ * Return true when the current request is targeting the REST API.
+ *
+ * `REST_REQUEST` may not be defined in some error/early-exit paths, so we
+ * also fall back to checking the request URI for /wp-json/.
+ */
+function dtb_is_rest_request(): bool {
+	if ( defined( 'REST_REQUEST' ) && REST_REQUEST ) {
+		return true;
+	}
+
+	if ( empty( $_SERVER['REQUEST_URI'] ) ) {
+		return false;
+	}
+
+	$uri = (string) wp_unslash( $_SERVER['REQUEST_URI'] );
+	return strpos( $uri, '/wp-json/' ) !== false || strpos( $uri, '/wp-json' ) !== false;
 }
 
 /**
