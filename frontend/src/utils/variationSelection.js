@@ -100,4 +100,4 @@ export function findMatchingVariation(variations, selectedAttrs) {
   }) || null;
 }
 
-export { fetchVariationsBatched } from './variationCache';
+export { fetchVariationsBatched } from './variationCache.js';

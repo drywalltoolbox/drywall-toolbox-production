@@ -350,7 +350,6 @@ export default function ProductDetail({ product, onAddToCart, onClose, initialSe
                       />
                     </div>
                   )}
-                  <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-3 sm:mb-4">Description</h3>
                   {product.description_full ? (
                     <div className="product-description prose prose-sm max-w-none">
                       {/^[\s\S]*<[a-z]/i.test(product.description_full)
