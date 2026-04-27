@@ -1,0 +1,398 @@
+{
+  "normalized_row_count": 134,
+  "converted_to_webp_count": 20,
+  "renamed_count": 134,
+  "unresolved_count": 65,
+  "unresolved": [
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/hand-tools/one-piece-putty-knives-copy/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2025/11/5-scaled.png",
+      "saved_path": "hand-tools/one-piece-putty-knives-copy/one-piece-putty-knives-copy_01.png",
+      "reason": "current_file_not_found"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/hand-tools/one-piece-putty-knives-copy/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2025/11/CTK14-scaled.png",
+      "saved_path": "hand-tools/one-piece-putty-knives-copy/one-piece-putty-knives-copy_02.png",
+      "reason": "current_file_not_found"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/hand-tools/one-piece-putty-knives-copy/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2025/11/CTK12-scaled.png",
+      "saved_path": "hand-tools/one-piece-putty-knives-copy/one-piece-putty-knives-copy_03.png",
+      "reason": "current_file_not_found"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/hand-tools/one-piece-putty-knives-copy/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2025/11/CTK10-scaled.png",
+      "saved_path": "hand-tools/one-piece-putty-knives-copy/one-piece-putty-knives-copy_04.png",
+      "reason": "current_file_not_found"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/hand-tools/one-piece-putty-knives-copy/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2025/11/CTK8-scaled.png",
+      "saved_path": "hand-tools/one-piece-putty-knives-copy/one-piece-putty-knives-copy_05.png",
+      "reason": "current_file_not_found"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/hand-tools/mud-pans/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2024/11/12inchmudpan.png",
+      "saved_path": "hand-tools/mud-pans/mud-pans_01.png",
+      "reason": "current_file_not_found"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/hand-tools/mud-pans/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2024/11/14INCHMUDPAN.png",
+      "saved_path": "hand-tools/mud-pans/mud-pans_02.png",
+      "reason": "current_file_not_found"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/hand-tools/mud-pans/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2024/11/16INCHMUDPAN.png",
+      "saved_path": "hand-tools/mud-pans/mud-pans_03.png",
+      "reason": "current_file_not_found"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/hand-tools/columbia-mud-pans-3/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2025/03/12gproflex-scaled.png",
+      "saved_path": "hand-tools/columbia-mud-pans-3/columbia-mud-pans-3_01.png",
+      "reason": "current_file_not_found"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/hand-tools/columbia-mud-pans-3/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2025/03/1222silvercurved-scaled.png",
+      "saved_path": "hand-tools/columbia-mud-pans-3/columbia-mud-pans-3_02.png",
+      "reason": "current_file_not_found"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/hand-tools/columbia-mud-pans-3/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2025/03/1222gsuperflex-scaled.png",
+      "saved_path": "hand-tools/columbia-mud-pans-3/columbia-mud-pans-3_03.png",
+      "reason": "current_file_not_found"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/hand-tools/columbia-mud-pans-3/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2025/03/1222gcurved-scaled.png",
+      "saved_path": "hand-tools/columbia-mud-pans-3/columbia-mud-pans-3_04.png",
+      "reason": "current_file_not_found"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/hand-tools/columbia-mud-pans-3/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2025/03/1422gcurved-scaled.png",
+      "saved_path": "hand-tools/columbia-mud-pans-3/columbia-mud-pans-3_05.png",
+      "reason": "current_file_not_found"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/hand-tools/finishing-hawks/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2025/03/hawk-scaled.png",
+      "saved_path": "hand-tools/finishing-hawks/finishing-hawks_01.png",
+      "reason": "no_candidates_for_tool_url"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/hand-tools/finishing-hawks/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2025/03/hawkbox-scaled.png",
+      "saved_path": "hand-tools/finishing-hawks/finishing-hawks_02.png",
+      "reason": "no_candidates_for_tool_url"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/tool-sets/the-tactical-set/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/tacticalset.jpg",
+      "saved_path": "tool-sets/the-tactical-set/the-tactical-set_01.jpg",
+      "reason": "single_candidate"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/tool-sets/the-tactical-set/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/5yearwarrantysmall.jpg",
+      "saved_path": "tool-sets/the-tactical-set/the-tactical-set_02.jpg",
+      "reason": "single_candidate"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/tool-sets/the-tactical-set/",
+      "source_url": "https://www.columbiatools.com/wp-content/plugins/product-video-for-woocommerce//images/video_icon.png",
+      "saved_path": "tool-sets/the-tactical-set/the-tactical-set_03.png",
+      "reason": "single_candidate"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/tool-sets/the-commando-set/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/commando-1.jpg",
+      "saved_path": "tool-sets/the-commando-set/the-commando-set_01.jpg",
+      "reason": "single_candidate"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/tool-sets/the-commando-set/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/commandosmall2-1.jpg",
+      "saved_path": "tool-sets/the-commando-set/the-commando-set_02.jpg",
+      "reason": "single_candidate"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/tool-sets/the-predator-tactical-set/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/predtact2.jpg",
+      "saved_path": "tool-sets/the-predator-tactical-set/the-predator-tactical-set_01.jpg",
+      "reason": "single_candidate"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/tool-sets/the-predator-tactical-set/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/5yearwarrantysmall.jpg",
+      "saved_path": "tool-sets/the-predator-tactical-set/the-predator-tactical-set_02.jpg",
+      "reason": "single_candidate"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/tool-sets/the-warrior-set/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/warriorsmallsqaure.jpg",
+      "saved_path": "tool-sets/the-warrior-set/the-warrior-set_01.jpg",
+      "reason": "single_candidate"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/tool-sets/the-warrior-set/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/commandosmall2-1.jpg",
+      "saved_path": "tool-sets/the-warrior-set/the-warrior-set_02.jpg",
+      "reason": "single_candidate"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/tool-sets/the-warrior-set/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/5yearwarrantysmall.jpg",
+      "saved_path": "tool-sets/the-warrior-set/the-warrior-set_03.jpg",
+      "reason": "single_candidate"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/tool-sets/the-sabre-set/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2024/11/SABERSET-1.png",
+      "saved_path": "tool-sets/the-sabre-set/the-sabre-set_01.png",
+      "reason": "single_candidate"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/tool-sets/the-sabre-set/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2024/11/SABERCASE-1.png",
+      "saved_path": "tool-sets/the-sabre-set/the-sabre-set_02.png",
+      "reason": "single_candidate"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/the-predator-family/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2024/06/Screenshot-2024-06-03-at-12.37.02\u202fPM-4.png",
+      "saved_path": "columbia-tools/the-predator-family/the-predator-family_01.png",
+      "reason": "single_candidate"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/the-predator-family/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2024/06/Predator-Cam-Lock-Tube.png",
+      "saved_path": "columbia-tools/the-predator-family/the-predator-family_02.png",
+      "reason": "single_candidate"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/the-predator-family/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2024/06/Predator-Compound-Tube.png",
+      "saved_path": "columbia-tools/the-predator-family/the-predator-family_03.png",
+      "reason": "single_candidate"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/the-predator-family/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2024/06/Predator-Columbia-One-Handle.png",
+      "saved_path": "columbia-tools/the-predator-family/the-predator-family_04.png",
+      "reason": "single_candidate"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/the-predator-family/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2024/06/Predator-Extendable.png",
+      "saved_path": "columbia-tools/the-predator-family/the-predator-family_05.png",
+      "reason": "single_candidate"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/the-predator-family/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2024/06/Predator-Long-Extendable.png",
+      "saved_path": "columbia-tools/the-predator-family/the-predator-family_06.png",
+      "reason": "single_candidate"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/the-predator-family/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2024/06/Predator-Matrix-Handle.png",
+      "saved_path": "columbia-tools/the-predator-family/the-predator-family_07.png",
+      "reason": "single_candidate"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/the-predator-family/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2024/06/Predator-Mud-Pump.png",
+      "saved_path": "columbia-tools/the-predator-family/the-predator-family_08.png",
+      "reason": "single_candidate"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/tool-cases/the-road-case/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/roadcase1.jpg",
+      "saved_path": "tool-cases/the-road-case/the-road-case_01.jpg",
+      "reason": "single_candidate"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/tool-cases/the-road-case/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/roadcasefront1.jpg",
+      "saved_path": "tool-cases/the-road-case/the-road-case_02.jpg",
+      "reason": "single_candidate"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/tool-cases/the-road-case/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/roadcasefront.jpg",
+      "saved_path": "tool-cases/the-road-case/the-road-case_03.jpg",
+      "reason": "single_candidate"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/tool-cases/the-road-case/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/5yearwarrantysmall.jpg",
+      "saved_path": "tool-cases/the-road-case/the-road-case_04.jpg",
+      "reason": "single_candidate"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/tool-cases/the-semi-automatic-case/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/guncase2.jpg",
+      "saved_path": "tool-cases/the-semi-automatic-case/the-semi-automatic-case_01.jpg",
+      "reason": "single_candidate"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/tool-cases/the-semi-automatic-case/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/guncase.jpg",
+      "saved_path": "tool-cases/the-semi-automatic-case/the-semi-automatic-case_02.jpg",
+      "reason": "single_candidate"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/tomahawk-smoothing-blades/tomahawk-smoothing-blades/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/tomahawkmatrix.jpg",
+      "saved_path": "tomahawk-smoothing-blades/tomahawk-smoothing-blades/tomahawk-smoothing-blades_01.jpg",
+      "reason": "no_candidates_for_tool_url"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/tomahawk-smoothing-blades/tomahawk-smoothing-blades/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/smoothingbladesfamsmall.jpg",
+      "saved_path": "tomahawk-smoothing-blades/tomahawk-smoothing-blades/tomahawk-smoothing-blades_02.jpg",
+      "reason": "no_candidates_for_tool_url"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/tomahawk-smoothing-blades/tomahawk-smoothing-blades/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/TomahawkTomalock.jpg",
+      "saved_path": "tomahawk-smoothing-blades/tomahawk-smoothing-blades/tomahawk-smoothing-blades_03.jpg",
+      "reason": "no_candidates_for_tool_url"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/tomahawk-smoothing-blades/tomahawk-smoothing-blades/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/clthasmall.jpg",
+      "saved_path": "tomahawk-smoothing-blades/tomahawk-smoothing-blades/tomahawk-smoothing-blades_04.jpg",
+      "reason": "no_candidates_for_tool_url"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/tomahawk-smoothing-blades/tomahawk-smoothing-blades/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/5yearwarrantysmall.jpg",
+      "saved_path": "tomahawk-smoothing-blades/tomahawk-smoothing-blades/tomahawk-smoothing-blades_05.jpg",
+      "reason": "no_candidates_for_tool_url"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/tomahawk-smoothing-blades/tomalock/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/tomalock1.jpg",
+      "saved_path": "tomahawk-smoothing-blades/tomalock/tomalock_01.jpg",
+      "reason": "single_candidate"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/tomahawk-smoothing-blades/tomalock/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/TomahawkTomalock-1.jpg",
+      "saved_path": "tomahawk-smoothing-blades/tomalock/tomalock_02.jpg",
+      "reason": "single_candidate"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/tomahawk-smoothing-blades/tomalock/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/clthasmall-1.jpg",
+      "saved_path": "tomahawk-smoothing-blades/tomalock/tomalock_03.jpg",
+      "reason": "single_candidate"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/tomahawk-smoothing-blades/tomalock/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/5yearwarrantysmall.jpg",
+      "saved_path": "tomahawk-smoothing-blades/tomalock/tomalock_04.jpg",
+      "reason": "single_candidate"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/smoothing-blades/sabre-smoothing-blades/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2024/11/Untitled-3-1-1.png",
+      "saved_path": "smoothing-blades/sabre-smoothing-blades/sabre-smoothing-blades_01.png",
+      "reason": "single_candidate"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/smoothing-blades/sabre-smoothing-blades/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2024/11/Untitled-51-1.png",
+      "saved_path": "smoothing-blades/sabre-smoothing-blades/sabre-smoothing-blades_02.png",
+      "reason": "single_candidate"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/smoothing-blades/sabre-smoothing-blades/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2024/11/SABERCLAW.png",
+      "saved_path": "smoothing-blades/sabre-smoothing-blades/sabre-smoothing-blades_03.png",
+      "reason": "single_candidate"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/finishing-boxes/automatic-flat-boxes/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/automaticbox-1.jpg",
+      "saved_path": "finishing-boxes/automatic-flat-boxes/automatic-flat-boxes_01.jpg",
+      "reason": "no_candidates_for_tool_url"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/finishing-boxes/automatic-flat-boxes/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/5yearwarrantysmall.jpg",
+      "saved_path": "finishing-boxes/automatic-flat-boxes/automatic-flat-boxes_02.jpg",
+      "reason": "no_candidates_for_tool_url"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/sanders/sander-head/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/sanderwhandlesquaresmall.jpg",
+      "saved_path": "sanders/sander-head/sander-head_01.jpg",
+      "reason": "sequential_candidate_fallback"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/sanders/sander-head/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/sanderscrewsquaresmall.jpg",
+      "saved_path": "sanders/sander-head/sander-head_02.jpg",
+      "reason": "sequential_candidate_fallback"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/sanders/the-phantom-sander/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/phantom.jpg",
+      "saved_path": "sanders/the-phantom-sander/the-phantom-sander_01.jpg",
+      "reason": "single_candidate"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/sanders/the-phantom-sander/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/phantomhead.jpg",
+      "saved_path": "sanders/the-phantom-sander/the-phantom-sander_02.jpg",
+      "reason": "single_candidate"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/sanders/the-phantom-sander/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/5yearwarrantysmall-7.jpg",
+      "saved_path": "sanders/the-phantom-sander/the-phantom-sander_03.jpg",
+      "reason": "single_candidate"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/handles/closet-monster-flat-box-handle/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/closet_monster_copy.jpg",
+      "saved_path": "handles/closet-monster-flat-box-handle/closet-monster-flat-box-handle_01.jpg",
+      "reason": "no_candidates_for_tool_url"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/handles/closet-monster-flat-box-handle/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/5yearwarrantysmall-3.jpg",
+      "saved_path": "handles/closet-monster-flat-box-handle/closet-monster-flat-box-handle_02.jpg",
+      "reason": "no_candidates_for_tool_url"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/handles/flat-box-handle/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/boxhandle.jpg",
+      "saved_path": "handles/flat-box-handle/flat-box-handle_01.jpg",
+      "reason": "no_candidates_for_tool_url"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/handles/flat-box-handle/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/5yearwarrantysmall-4.jpg",
+      "saved_path": "handles/flat-box-handle/flat-box-handle_02.jpg",
+      "reason": "no_candidates_for_tool_url"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/grooved-mud-heads/outside-90-grooved-mud-heads/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/OA90.jpg",
+      "saved_path": "grooved-mud-heads/outside-90-grooved-mud-heads/outside-90-grooved-mud-heads_01.jpg",
+      "reason": "no_candidates_for_tool_url"
+    }
+  ]
+}

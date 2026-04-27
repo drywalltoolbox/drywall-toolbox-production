@@ -9,6 +9,7 @@ from collections import Counter, defaultdict
 from dataclasses import dataclass
 from pathlib import Path
 from urllib.parse import urlparse
+import hashlib
 
 from PIL import Image
 
@@ -20,7 +21,7 @@ STRUCTURE_JSON = REPO_ROOT / "scripts/scraped_results/Columbia/columbia_tools_st
 READY_CSV = REPO_ROOT / "scripts/scraped_results/Columbia/columbia_tools_structure/wp-columbia-ready.csv"
 REPORT_JSON = IMAGES_ROOT / "normalize-report.json"
 REPORT_CSV = IMAGES_ROOT / "normalized-manifest.csv"
-BRAND_SLUG = "columbia"
+BRAND_SLUG = "columbia-taping-tools"
 
 _INCH_PATTERN = re.compile(r'(\d+(?:\.\d+)?)\s*"')
 _WF_PATTERN = re.compile(r'\bw/', re.IGNORECASE)
@@ -36,6 +37,7 @@ class CatalogRow:
     sku: str
     name: str
     row_type: str
+    brand: str
     parent: str
 
 
@@ -45,14 +47,14 @@ class Candidate:
     label: str
 
 
-def slugify(text: str, max_len: int = 60) -> str:
+def slugify(text: str, max_len: int | None = 60) -> str:
     text = _INCH_PATTERN.sub(r'\1-inch', text)
     text = _WF_PATTERN.sub('with', text)
     text = _AMP_PATTERN.sub(' and ', text)
     text = text.lower()
     text = _NON_WORD.sub('-', text)
     text = _MULTI_DASH.sub('-', text).strip('-')
-    if len(text) <= max_len:
+    if max_len is None or len(text) <= max_len:
         return text
     cut = text[:max_len].rstrip('-')
     return cut or text[:max_len]
@@ -64,8 +66,6 @@ def compact(text: str) -> str:
 
 def canonical_name(name: str) -> str:
     name = name.strip()
-    if name.lower().startswith("columbia "):
-        name = name[len("columbia ") :]
     name = _PARENS.sub("", name).strip()
     return name
 
@@ -80,10 +80,20 @@ def load_ready_rows() -> dict[str, CatalogRow]:
             rows[sku] = CatalogRow(
                 sku=sku,
                 name=(row.get("Name") or "").strip(),
+                brand=(row.get("Brands") or "").strip(),
                 row_type=(row.get("Type") or "").strip(),
                 parent=(row.get("Parent") or "").strip(),
             )
     return rows
+
+
+def resolve_brand_slug(ready_rows: dict[str, CatalogRow]) -> str:
+    brands = {row.brand for row in ready_rows.values() if row.brand}
+    if not brands:
+        return BRAND_SLUG
+    if len(brands) == 1:
+        return slugify(next(iter(brands)), max_len=None)
+    return slugify(max(sorted(brands), key=len), max_len=None)
 
 
 def load_tool_candidates() -> dict[str, list[Candidate]]:
@@ -210,13 +220,62 @@ def choose_candidate(
     return candidates[0].sku, "first_candidate_fallback"
 
 
-def target_name(row: CatalogRow, ordinal: int) -> str:
-    name_slug = slugify(canonical_name(row.name))
-    return f"{BRAND_SLUG}-{name_slug}-{row.sku}-{ordinal:02d}.webp"
+def target_name(row: CatalogRow, ordinal: int, brand_slug: str) -> str:
+    name_slug = slugify(canonical_name(row.name), max_len=None)
+    return f"{brand_slug}-{name_slug}-{row.sku}-{ordinal:02d}.webp"
+
+
+def sha256(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as handle:
+        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def scan_existing_ordinals(ready_rows: dict[str, CatalogRow]) -> Counter[str]:
+    counters: Counter[str] = Counter()
+    sku_list = sorted(ready_rows.keys(), key=len, reverse=True)
+    for path in IMAGES_ROOT.rglob("*.webp"):
+        name = path.name[:-5]
+        for sku in sku_list:
+            suffix = f"-{sku}-"
+            if suffix not in name:
+                continue
+            match = re.search(rf"-{re.escape(sku)}-(\d{{2}})$", path.stem)
+            if match:
+                counters[sku] = max(counters[sku], int(match.group(1)))
+                break
+    return counters
+
+
+def choose_next_available_target(base_target: Path, source_path: Path) -> tuple[Path, bool]:
+    if not base_target.exists() or base_target.resolve() == source_path.resolve():
+        return base_target, False
+    if sha256(base_target) == sha256(source_path):
+        return base_target, False
+
+    stem = base_target.stem
+    match = re.match(r"^(.*)-(\d{2})$", stem)
+    if not match:
+        raise RuntimeError(f"Unable to allocate alternate target for {base_target}")
+
+    prefix = match.group(1)
+    start = int(match.group(2))
+    parent = base_target.parent
+    for ordinal in range(start + 1, 1000):
+        candidate = parent / f"{prefix}-{ordinal:02d}{base_target.suffix}"
+        if not candidate.exists():
+            return candidate, True
+        if sha256(candidate) == sha256(source_path):
+            return candidate, False
+
+    raise RuntimeError(f"Unable to allocate alternate target for {base_target}")
 
 
 def main() -> int:
     ready_rows = load_ready_rows()
+    brand_slug = resolve_brand_slug(ready_rows)
     tool_candidates = load_tool_candidates()
 
     with MANIFEST_PATH.open(encoding="utf-8-sig", newline="") as handle:
@@ -227,7 +286,7 @@ def main() -> int:
     for row in manifest_rows:
         rows_by_tool[row["tool_url"]].append(row)
 
-    per_sku_ordinal: Counter[str] = Counter()
+    per_sku_ordinal: Counter[str] = scan_existing_ordinals(ready_rows)
     normalized_rows: list[dict[str, str]] = []
     unresolved: list[dict[str, str]] = []
     conversion_count = 0
@@ -269,13 +328,19 @@ def main() -> int:
                 conversion_count += 1
 
             per_sku_ordinal[sku] += 1
-            final_filename = target_name(ready_rows[sku], per_sku_ordinal[sku])
-            final_path = normalized_path.with_name(final_filename)
+            final_filename = target_name(ready_rows[sku], per_sku_ordinal[sku], brand_slug)
+            final_path, advanced = choose_next_available_target(normalized_path.with_name(final_filename), normalized_path)
+            if advanced:
+                ordinal_match = re.search(r"-(\d{2})\.webp$", final_path.name)
+                if ordinal_match:
+                    per_sku_ordinal[sku] = max(per_sku_ordinal[sku], int(ordinal_match.group(1)))
             if normalized_path.name != final_filename:
                 if final_path.exists() and final_path.resolve() != normalized_path.resolve():
-                    raise RuntimeError(f"Refusing to overwrite existing file: {final_path}")
-                normalized_path.rename(final_path)
-                rename_count += 1
+                    if sha256(final_path) == sha256(normalized_path):
+                        normalized_path.unlink()
+                else:
+                    normalized_path.rename(final_path)
+                    rename_count += 1
             else:
                 final_path = normalized_path
 
