@@ -20,6 +20,7 @@ export default function CategoryPage() {
   const [pageState, setPageState] = useState({ loading: true, products: [], category: null, error: null });
   const [modalProduct, setModalProduct] = useState(null);
   const [modalSelectedAttrs, setModalSelectedAttrs] = useState({});
+  const [modalResolvedVariation, setModalResolvedVariation] = useState(null);
   const [toast, setToast]         = useState(null);
 
   const showToast = (message, type = 'cart') => setToast({ message, type });
@@ -174,6 +175,7 @@ export default function CategoryPage() {
                     isVariationLoading={Boolean(loadingVariationIds[product.id])}
                     onOpenModal={() => {
                       setModalSelectedAttrs(cardVariants[product.id] || {});
+                      setModalResolvedVariation(hasSelectedVariation ? cardProduct : null);
                       setModalProduct(product);
                     }}
                       onAddToCart={() => handleAddToCart(cardProduct, 1)}
@@ -192,18 +194,22 @@ export default function CategoryPage() {
         onClose={() => {
           setModalProduct(null);
           setModalSelectedAttrs({});
+          setModalResolvedVariation(null);
         }}
       >
         {modalProduct && (
           <ProductDetail
+            key={`${modalProduct.id}:${modalResolvedVariation?.id || 0}`}
             product={modalProduct}
             onAddToCart={handleAddToCart}
             onClose={() => {
               setModalProduct(null);
               setModalSelectedAttrs({});
+              setModalResolvedVariation(null);
             }}
             initialSelectedAttrs={modalSelectedAttrs}
-             initialVariations={cardVariationMap[modalProduct.id] || []}
+            initialResolvedVariation={modalResolvedVariation}
+            initialVariations={cardVariationMap[modalProduct.id] || []}
           />
         )}
       </ProductModal>

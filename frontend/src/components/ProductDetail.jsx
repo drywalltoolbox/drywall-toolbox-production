@@ -26,19 +26,43 @@ const BRAND_LOGOS = {
   'Graco': gracoLogo,
 };
 
-export default function ProductDetail({ product, onAddToCart, onClose, initialSelectedAttrs = {}, initialVariations = [] }) {
+function buildSeedVariations(initialVariations = [], initialResolvedVariation = null) {
+  const seeded = [];
+  const seen = new Set();
+
+  const pushVariation = (variation) => {
+    if (!variation?.id || seen.has(variation.id)) return;
+    seen.add(variation.id);
+    seeded.push(variation);
+  };
+
+  pushVariation(initialResolvedVariation);
+  (Array.isArray(initialVariations) ? initialVariations : []).forEach(pushVariation);
+
+  return seeded;
+}
+
+export default function ProductDetail({
+  product,
+  onAddToCart,
+  onClose,
+  initialSelectedAttrs = {},
+  initialVariations = [],
+  initialResolvedVariation = null,
+}) {
   const { addToCart } = useCart();
   const [quantity, setQuantity] = useState(1);
   const [isWishlisted, setIsWishlisted] = useState(false);
   const [activeTab, setActiveTab] = useState('description');
 
   // ── Variable product variations ──────────────────────────────────────────
+  const seededVariations = buildSeedVariations(initialVariations, initialResolvedVariation);
   const initialVariationSelection = Object.keys(initialSelectedAttrs || {}).length > 0
     ? initialSelectedAttrs
-    : getVariationSelectionMap((initialVariations || []).find((v) => v.stock_status !== 'outofstock') || (initialVariations || [])[0] || {});
+    : getVariationSelectionMap(seededVariations.find((v) => v.stock_status !== 'outofstock') || seededVariations[0] || {});
 
-  const [variations, setVariations]             = useState(initialVariations || []);
-  const [variationsLoading, setVariationsLoading] = useState(Array.isArray(initialVariations) && initialVariations.length > 0 ? false : false);
+  const [variations, setVariations]             = useState(seededVariations);
+  const [variationsLoading, setVariationsLoading] = useState(false);
   // selectedAttrs: { [attrName]: value } — tracks the user's chip selections
   const [selectedAttrs, setSelectedAttrs]       = useState(initialVariationSelection);
 
@@ -50,28 +74,28 @@ export default function ProductDetail({ product, onAddToCart, onClose, initialSe
 
     let mounted = true;
 
-    const useInitialVariations = Array.isArray(initialVariations) && initialVariations.length > 0;
+    const hasFullInitialVariations = Array.isArray(initialVariations) && initialVariations.length > 0;
 
-    if (useInitialVariations) {
-      Promise.resolve().then(() => {
-        if (!mounted) return;
-        setVariations(initialVariations);
-        setSelectedAttrs(Object.keys(initialSelectedAttrs || {}).length > 0
+    Promise.resolve().then(() => {
+      if (!mounted) return;
+      setVariations(seededVariations);
+      setSelectedAttrs(
+        Object.keys(initialSelectedAttrs || {}).length > 0
           ? initialSelectedAttrs
-          : getVariationSelectionMap(initialVariations.find((v) => v.stock_status !== 'outofstock') || initialVariations[0] || {})
-        );
-        setVariationsLoading(false);
-      });
-      return () => { mounted = false; };
+          : getVariationSelectionMap(
+              seededVariations.find((v) => v.stock_status !== 'outofstock') || seededVariations[0] || {}
+            )
+      );
+      setVariationsLoading(!hasFullInitialVariations);
+    });
 
+    if (hasFullInitialVariations) {
+      return () => { mounted = false; };
     }
 
     Promise.resolve()
       .then(() => {
         if (!mounted) return;
-        setVariations([]);
-        setSelectedAttrs({});
-        setVariationsLoading(true);
         return fetchCachedVariations(product.id, getProductVariations);
       })
       .then((vars) => {
@@ -91,7 +115,7 @@ export default function ProductDetail({ product, onAddToCart, onClose, initialSe
       .finally(() => { if (mounted) setVariationsLoading(false); });
 
     return () => { mounted = false; };
-  }, [product?.id, product?.is_variable, initialSelectedAttrs, initialVariations]); // is_variable must be listed — a product could share an id across type changes
+  }, [product?.id, product?.is_variable, initialResolvedVariation, initialSelectedAttrs, initialVariations]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Find the variation that matches the current chip selections
   const selectedVariation = product?.is_variable

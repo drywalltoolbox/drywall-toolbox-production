@@ -69,6 +69,7 @@ export default function AllProducts() {
   const [showFilters, setShowFilters] = useState(false);
   const [modalProduct, setModalProduct] = useState(null);
   const [modalSelectedAttrs, setModalSelectedAttrs] = useState({});
+  const [modalResolvedVariation, setModalResolvedVariation] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [toast, setToast] = useState(null);
   const [cardVariants, setCardVariants] = useState({});
@@ -91,9 +92,10 @@ export default function AllProducts() {
     }));
   }, []);
 
-  const openModal = (product) => {
+  const openModal = (product, resolvedVariation = null) => {
     setModalProduct(product);
     setModalSelectedAttrs(cardVariants[product.id] || {});
+    setModalResolvedVariation(resolvedVariation?.id && resolvedVariation.id !== product.id ? resolvedVariation : null);
     setIsModalOpen(true);
   };
 
@@ -101,6 +103,7 @@ export default function AllProducts() {
     setIsModalOpen(false);
     setModalProduct(null);
     setModalSelectedAttrs({});
+    setModalResolvedVariation(null);
   };
 
   // close on escape
@@ -376,7 +379,7 @@ export default function AllProducts() {
                       cardVariants={cardVariants[product.id] || {}}
                       onVariantSelect={(attrName, value) => handleVariantSelect(product.id, attrName, value)}
                       isVariationLoading={Boolean(loadingVariationIds[product.id])}
-                      onOpenModal={() => openModal(product)}
+                      onOpenModal={() => openModal(product, hasSelectedVariation ? cardProduct : null)}
                       onAddToCart={() => handleAddToCart(cardProduct, 1)}
                       index={index}
                     />
@@ -437,10 +440,12 @@ export default function AllProducts() {
       <ProductModal isOpen={isModalOpen && !!modalProduct} product={modalProduct} onClose={closeModal}>
         {modalProduct && (
           <ProductDetail
+            key={`${modalProduct.id}:${modalResolvedVariation?.id || 0}`}
             product={modalProduct}
             onAddToCart={handleAddToCart}
             onClose={closeModal}
             initialSelectedAttrs={modalSelectedAttrs}
+            initialResolvedVariation={modalResolvedVariation}
             initialVariations={cardVariationMap[modalProduct.id] || []}
           />
         )}
