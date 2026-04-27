@@ -19,8 +19,10 @@ import '../styles/sort-dropdown.css';
  *               Called whenever the user picks a new option.
  *
  *   compact     boolean — when true, reduces padding (for use inside product cards)
+ *   disabled    boolean — disable selection while variations are loading
+ *   loading     boolean — show loading state when options are not ready
  */
-export default function VariantChips({ attributes, selected, onSelect, compact = false }) {
+export default function VariantChips({ attributes, selected, onSelect, compact = false, disabled = false, loading = false }) {
   const [openAttribute, setOpenAttribute] = useState(null);
   const rootRef = useRef(null);
 
@@ -81,13 +83,14 @@ export default function VariantChips({ attributes, selected, onSelect, compact =
                 aria-label={`Select ${name}`}
                 aria-expanded={isOpen}
                 aria-haspopup="listbox"
+                disabled={disabled}
                 onClick={(e) => {
                   e.stopPropagation();
                   setOpenAttribute((prev) => (prev === name ? null : name));
                 }}
               >
                 <span className="sort-button-label">
-                  {currentValue || `Select ${name}`}
+                  {loading ? 'Loading...' : (currentValue || `Select ${name}`)}
                 </span>
                 <span className={`sort-chevron ${isOpen ? 'open' : ''}`} />
               </button>
@@ -105,6 +108,7 @@ export default function VariantChips({ attributes, selected, onSelect, compact =
                         className={`sort-dropdown-item ${isSelected ? 'selected' : ''}`}
                         onClick={(e) => {
                           e.stopPropagation();
+                          if (disabled) return;
                           onSelect(name, opt);
                           setOpenAttribute(null);
                         }}

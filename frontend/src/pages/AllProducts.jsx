@@ -63,6 +63,7 @@ export default function AllProducts() {
   const [selectedCategories, setSelectedCategories] = useState([]);
   const [searchQuery, setSearchQuery] = useState(searchParam ? decodeURIComponent(searchParam) : '');
   const [priceRange, setPriceRange] = useState([0, MAX_PRICE]);
+  const [loadingVariationIds, setLoadingVariationIds] = useState({});
   const [sortBy, setSortBy] = useState('popular');
   const [currentPage, setCurrentPage] = useState(pageParam);
   const [showFilters, setShowFilters] = useState(false);
@@ -242,6 +243,12 @@ export default function AllProducts() {
       .map((p) => p.id);
     if (variableIds.length === 0) return;
 
+    setLoadingVariationIds((prev) => {
+      const next = { ...prev };
+      variableIds.forEach((id) => { next[id] = true; });
+      return next;
+    });
+
     let mounted = true;
     fetchVariationsBatched(variableIds, getProductVariations).then((pairs) => {
       if (!mounted) return;
@@ -250,6 +257,19 @@ export default function AllProducts() {
         next[id] = vars;
       });
       setCardVariationMap((prev) => ({ ...prev, ...next }));
+      setLoadingVariationIds((prev) => {
+        const next = { ...prev };
+        variableIds.forEach((id) => { delete next[id]; });
+        return next;
+      });
+    }).catch(() => {
+      if (mounted) {
+        setLoadingVariationIds((prev) => {
+          const next = { ...prev };
+          variableIds.forEach((id) => { delete next[id]; });
+          return next;
+        });
+      }
     });
 
     return () => { mounted = false; };
@@ -348,6 +368,7 @@ export default function AllProducts() {
                       hasSelectedVariation={hasSelectedVariation}
                       cardVariants={cardVariants[product.id] || {}}
                       onVariantSelect={(attrName, value) => handleVariantSelect(product.id, attrName, value)}
+                      isVariationLoading={Boolean(loadingVariationIds[product.id])}
                       onOpenModal={() => openModal(product)}
                       onAddToCart={() => handleAddToCart(cardProduct, 1)}
                       index={index}

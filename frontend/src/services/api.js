@@ -477,7 +477,7 @@ async function fetchVariationsByIds(parentId, variationIds = []) {
 async function fetchVariationsByParentList(parentId) {
   try {
     const list = await apiClient(
-      `/wp-json/drywall/v1/products?${new URLSearchParams({ parent: parentId, per_page: 100, status: 'publish' }).toString()}`,
+        `/wp-json/drywall/v1/products?${new URLSearchParams({ parent: parentId, per_page: 100 }).toString()}`
     );
     return Array.isArray(list) ? list.map(normalizeProduct) : [];
   } catch (err) {
@@ -514,8 +514,8 @@ export const searchProducts = (searchTerm) =>
  * @returns {Promise<Array>}        Array of normalised variation objects
  */
 export const getProductVariations = (parentId) =>
-  apiClient(`/wp-json/drywall/v1/products/${encodeURIComponent(parentId)}/variations?${new URLSearchParams({ per_page: 100, status: 'publish' }).toString()}`)
-    .then((list) => list.map(normalizeProduct))
+  apiClient(`/wp-json/drywall/v1/products/${encodeURIComponent(parentId)}/variations?${new URLSearchParams({ per_page: 100 }).toString()}`)
+  .then((list) => list.map(normalizeProduct))
     .catch(async (err) => {
       console.warn(`Failed to fetch variations for parent ${parentId}:`, err?.message || err);
       const byParent = await fetchVariationsByParentList(parentId);

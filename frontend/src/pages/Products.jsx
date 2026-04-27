@@ -124,6 +124,7 @@ export default function Products() {
   const [cardVariants, setCardVariants] = useState({});
   // Cached variations per variable parent product ID
   const [cardVariationMap, setCardVariationMap] = useState({});
+  const [loadingVariationIds, setLoadingVariationIds] = useState({});
   const cardVariationMapRef = useRef({});
 
   const showToast = (message, type = 'cart') => {
@@ -365,6 +366,12 @@ export default function Products() {
       .map((p) => p.id);
     if (variableIds.length === 0) return;
 
+    setLoadingVariationIds((prev) => {
+      const next = { ...prev };
+      variableIds.forEach((id) => { next[id] = true; });
+      return next;
+    });
+
     let mounted = true;
     fetchVariationsBatched(variableIds, getProductVariations).then((pairs) => {
       if (!mounted) return;
@@ -373,6 +380,19 @@ export default function Products() {
         next[id] = vars;
       });
       setCardVariationMap((prev) => ({ ...prev, ...next }));
+      setLoadingVariationIds((prev) => {
+        const next = { ...prev };
+        variableIds.forEach((id) => { delete next[id]; });
+        return next;
+      });
+    }).catch(() => {
+      if (mounted) {
+        setLoadingVariationIds((prev) => {
+          const next = { ...prev };
+          variableIds.forEach((id) => { delete next[id]; });
+          return next;
+        });
+      }
     });
 
     return () => { mounted = false; };
@@ -583,6 +603,7 @@ export default function Products() {
                       hasSelectedVariation={hasSelectedVariation}
                       cardVariants={cardVariants[product.id] || {}}
                       onVariantSelect={(attrName, value) => handleVariantSelect(product.id, attrName, value)}
+                      isVariationLoading={Boolean(loadingVariationIds[product.id])}
                       onOpenModal={() => openModal(product)}
                       onAddToCart={() => handleAddToCart(cardProduct, 1)}
                       index={index}

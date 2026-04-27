@@ -13,6 +13,7 @@
  *   onVariantSelect   (attrName, value) => void — chip change handler.
  *   onOpenModal       () => void — opens the full product detail modal.
  *   onAddToCart       () => void — direct add-to-cart (simple products).
+ *   isVariationLoading boolean — disables variant selection while options load.
  *   index             Integer card index — used for staggered fade-in animation.
  */
 
@@ -30,6 +31,7 @@ export default function ProductCard({
   onVariantSelect,
   onOpenModal,
   onAddToCart,
+  isVariationLoading = false,
   index = 0,
 }) {
   // ── Derived display values ────────────────────────────────────────────────
@@ -136,6 +138,8 @@ export default function ProductCard({
               attributes={product.variation_attributes}
               selected={cardVariants}
               onSelect={onVariantSelect}
+              disabled={isVariationLoading}
+              loading={isVariationLoading}
               compact
             />
           </div>

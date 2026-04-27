@@ -684,13 +684,13 @@ function dtb_proxy_product_variation_by_id( WP_REST_Request $request ): WP_REST_
 /** GET /drywall/v1/products/{id}/variations */
 function dtb_proxy_product_variations( WP_REST_Request $request ): WP_REST_Response {
 	$params = [];
-	foreach ( [ 'page', 'per_page', 'status' ] as $k ) {
-		$v = $request->get_param( $k );
+	foreach ( [ 'page', 'per_page' ] as $k ) {
+		$v = $request->get_param( $k ); 
 		if ( null !== $v ) {
 			$params[ $k ] = sanitize_text_field( $v );
 		}
 	}
-	return dtb_cached_wc_get( 'wc/v3/products/' . absint( $request->get_param( 'id' ) ) . '/variations', $params );
+ 	return dtb_cached_wc_get( 'wc/v3/products/' . absint( $request->get_param( 'id' ) ) . '/variations', $params ); // Updated to include variations
 }
 
 /** GET /drywall/v1/categories */
