@@ -21,7 +21,13 @@ STRUCTURE_JSON = REPO_ROOT / "scripts/scraped_results/Columbia/columbia_tools_st
 READY_CSV = REPO_ROOT / "scripts/scraped_results/Columbia/columbia_tools_structure/wp-columbia-ready.csv"
 REPORT_JSON = IMAGES_ROOT / "normalize-report.json"
 REPORT_CSV = IMAGES_ROOT / "normalized-manifest.csv"
-BRAND_SLUG = "columbia-taping-tools"
+BRAND_SLUG: dict[str, str] = {
+    "Columbia Taping Tools": "columbia",
+}
+
+FAMILY_TOOL_OVERRIDES: dict[str, str] = {
+    "https://www.columbiatools.com/columbia-tools/smoothing-blades/sabre-smoothing-blades/": "SSB",
+}
 
 _INCH_PATTERN = re.compile(r'(\d+(?:\.\d+)?)\s*"')
 _WF_PATTERN = re.compile(r'\bw/', re.IGNORECASE)
@@ -29,6 +35,7 @@ _AMP_PATTERN = re.compile(r'\s*&(?:amp;)?\s*')
 _NON_WORD = re.compile(r'[^a-z0-9]+')
 _MULTI_DASH = re.compile(r'-{2,}')
 _PARENS = re.compile(r"\s*\([^)]*\)\s*$")
+_TRAILING_SKU = re.compile(r'\s*\([A-Z0-9][\w\-/]{2,}\)\s*$')
 _SIZE_RE = re.compile(r'(\d+(?:\.\d+)?)')
 
 
@@ -50,7 +57,7 @@ class Candidate:
 def slugify(text: str, max_len: int | None = 60) -> str:
     text = _INCH_PATTERN.sub(r'\1-inch', text)
     text = _WF_PATTERN.sub('with', text)
-    text = _AMP_PATTERN.sub(' and ', text)
+    text = _AMP_PATTERN.sub('-and-', text)
     text = text.lower()
     text = _NON_WORD.sub('-', text)
     text = _MULTI_DASH.sub('-', text).strip('-')
@@ -58,6 +65,33 @@ def slugify(text: str, max_len: int | None = 60) -> str:
         return text
     cut = text[:max_len].rstrip('-')
     return cut or text[:max_len]
+
+
+def name_slug(brand: str, name: str) -> str:
+    cleaned = _TRAILING_SKU.sub('', name).strip()
+    cleaned_lower = cleaned.lower()
+    prefixes_to_strip = {
+        brand.lower(),
+        'asgard',
+        'columbia',
+        'columbia taping tools',
+        'columbia tools',
+        'platinum',
+        'platinum drywall tools',
+        'surpro',
+        'tapetech',
+    }
+    for prefix in sorted(prefixes_to_strip, key=len, reverse=True):
+        if prefix and cleaned_lower.startswith(prefix):
+            cleaned = cleaned[len(prefix):].strip()
+            cleaned_lower = cleaned.lower()
+            break
+    cleaned = re.sub(r'\([^)]*\)', ' ', cleaned).strip()
+    return slugify(cleaned, max_len=45)
+
+
+def sku_to_slug(sku: str) -> str:
+    return re.sub(r'[^A-Za-z0-9\-]', '-', sku).strip('-')
 
 
 def compact(text: str) -> str:
@@ -87,18 +121,36 @@ def load_ready_rows() -> dict[str, CatalogRow]:
     return rows
 
 
+def load_fake_ready_rows(rows: dict[str, CatalogRow]) -> dict[str, CatalogRow]:
+    fake_rows = dict(rows)
+    if "SSB" not in fake_rows:
+        fake_rows["SSB"] = CatalogRow(
+            sku="SSB",
+            name="Columbia Sabre Smoothing Blades",
+            row_type="variable",
+            brand="Columbia Taping Tools",
+            parent="",
+        )
+    return fake_rows
+
+
 def resolve_brand_slug(ready_rows: dict[str, CatalogRow]) -> str:
     brands = {row.brand for row in ready_rows.values() if row.brand}
     if not brands:
-        return BRAND_SLUG
+        return "columbia"
     if len(brands) == 1:
-        return slugify(next(iter(brands)), max_len=None)
+        return BRAND_SLUG.get(next(iter(brands)), slugify(next(iter(brands)), max_len=None))
     return slugify(max(sorted(brands), key=len), max_len=None)
 
 
 def load_tool_candidates() -> dict[str, list[Candidate]]:
     payload = json.loads(STRUCTURE_JSON.read_text(encoding="utf-8"))
     mapping: dict[str, list[Candidate]] = {}
+    ready_rows = load_ready_rows()
+    ready_variants_by_parent: dict[str, list[CatalogRow]] = defaultdict(list)
+    for row in ready_rows.values():
+        if row.parent:
+            ready_variants_by_parent[compact(row.parent)].append(row)
     for category in payload.get("categories", []):
         for child in category.get("children", []):
             tool_url = (child.get("tool_url") or "").strip()
@@ -122,8 +174,22 @@ def load_tool_candidates() -> dict[str, list[Candidate]]:
                     continue
                 seen.add(candidate.sku)
                 deduped.append(candidate)
+            if tool_url in FAMILY_TOOL_OVERRIDES:
+                mapping[tool_url] = [Candidate(sku=FAMILY_TOOL_OVERRIDES[tool_url], label=child.get("tool_title") or "")]
+                continue
+            if not deduped or (len(deduped) == 1 and deduped[0].sku not in ready_rows):
+                fallback = resolve_family_variants(child.get("tool_title") or "", ready_variants_by_parent)
+                if fallback:
+                    deduped = fallback
             mapping[tool_url] = deduped
     return mapping
+    
+def resolve_family_variants(tool_title: str, ready_variants_by_parent: dict[str, list[CatalogRow]]) -> list[Candidate]:
+    if not tool_title:
+        return []
+    parent_key = compact(tool_title)
+    rows = ready_variants_by_parent.get(parent_key, [])
+    return [Candidate(sku=row.sku, label=row.name) for row in rows]
 
 
 def source_basename(path_or_url: str) -> str:
@@ -159,13 +225,68 @@ def score_candidate(candidate: Candidate, source_key: str, row_name: str) -> int
     return score
 
 
-def resolve_file_path(saved_path: str) -> Path | None:
+def load_normalized_manifest() -> dict[str, str]:
+    if not REPORT_CSV.exists():
+        return {}
+    mapping: dict[str, str] = {}
+    with REPORT_CSV.open(encoding="utf-8-sig", newline="") as handle:
+        for row in csv.DictReader(handle):
+            saved_path = (row.get("saved_path") or "").strip()
+            normalized = (row.get("normalized_path") or "").strip()
+            if saved_path and normalized:
+                mapping[saved_path] = normalized
+    return mapping
+
+
+def build_hash_index() -> dict[str, Path]:
+    index: dict[str, Path] = {}
+    for path in IMAGES_ROOT.rglob('*'):
+        if not path.is_file():
+            continue
+        if path.suffix.lower() not in {'.png', '.jpg', '.jpeg', '.webp'}:
+            continue
+        try:
+            index.setdefault(sha256(path), path)
+        except OSError:
+            continue
+    return index
+
+
+def resolve_file_path(
+    saved_path: str,
+    gallery_index: str | None = None,
+    expected_sha256: str | None = None,
+    hash_index: dict[str, Path] | None = None,
+    normalized_path: str | None = None,
+) -> Path | None:
     expected = IMAGES_ROOT / Path(saved_path)
     if expected.exists():
         return expected
     for candidate in expected.parent.glob(expected.stem + ".*"):
         if candidate.exists():
             return candidate
+    if normalized_path:
+        normalized = IMAGES_ROOT / Path(normalized_path)
+        if normalized.exists():
+            return normalized
+    if expected_sha256:
+        if hash_index is None:
+            hash_index = build_hash_index()
+        return hash_index.get(expected_sha256)
+    if gallery_index:
+        try:
+            index_value = int(gallery_index)
+        except ValueError:
+            index_value = None
+        if index_value is not None and expected.parent.exists():
+            suffix = f"-{index_value:02d}"
+            for candidate in expected.parent.iterdir():
+                if not candidate.is_file():
+                    continue
+                stem = candidate.stem
+                if stem.endswith(suffix):
+                    return candidate
+    return None
     return None
 
 
@@ -221,8 +342,8 @@ def choose_candidate(
 
 
 def target_name(row: CatalogRow, ordinal: int, brand_slug: str) -> str:
-    name_slug = slugify(canonical_name(row.name), max_len=None)
-    return f"{brand_slug}-{name_slug}-{row.sku}-{ordinal:02d}.webp"
+    name_segment = name_slug(row.brand, row.name)
+    return f"{brand_slug}-{name_segment}-{sku_to_slug(row.sku)}-{ordinal:02d}.webp"
 
 
 def sha256(path: Path) -> str:
@@ -274,9 +395,11 @@ def choose_next_available_target(base_target: Path, source_path: Path) -> tuple[
 
 
 def main() -> int:
-    ready_rows = load_ready_rows()
+    ready_rows = load_fake_ready_rows(load_ready_rows())
     brand_slug = resolve_brand_slug(ready_rows)
     tool_candidates = load_tool_candidates()
+    hash_index = build_hash_index()
+    normalized_lookup = load_normalized_manifest()
 
     with MANIFEST_PATH.open(encoding="utf-8-sig", newline="") as handle:
         manifest_rows = list(csv.DictReader(handle))
@@ -298,7 +421,13 @@ def main() -> int:
         assignments_for_tool: dict[int, str] = {}
 
         for idx, row in enumerate(tool_rows):
-            current_path = resolve_file_path(row["saved_path"])
+            current_path = resolve_file_path(
+                row["saved_path"],
+                row.get("gallery_index"),
+                row.get("sha256"),
+                hash_index,
+                normalized_lookup.get(row["saved_path"]),
+            )
             if not current_path:
                 unresolved.append(
                     {

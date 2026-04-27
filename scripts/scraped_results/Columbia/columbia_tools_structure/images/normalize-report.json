@@ -1,8 +1,8 @@
 {
-  "normalized_row_count": 134,
-  "converted_to_webp_count": 20,
-  "renamed_count": 134,
-  "unresolved_count": 65,
+  "normalized_row_count": 9,
+  "converted_to_webp_count": 0,
+  "renamed_count": 9,
+  "unresolved_count": 190,
   "unresolved": [
     {
       "tool_url": "https://www.columbiatools.com/columbia-tools/hand-tools/one-piece-putty-knives-copy/",
@@ -83,6 +83,36 @@
       "reason": "current_file_not_found"
     },
     {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/hand-tools/columbia-mud-pans-3/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2025/03/1422gproflex-scaled.png",
+      "saved_path": "hand-tools/columbia-mud-pans-3/columbia-mud-pans-3_06.png",
+      "reason": "current_file_not_found"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/hand-tools/columbia-mud-pans-3/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2025/03/1422gsuperflex-scaled.png",
+      "saved_path": "hand-tools/columbia-mud-pans-3/columbia-mud-pans-3_07.png",
+      "reason": "current_file_not_found"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/hand-tools/columbia-mud-pans-3/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2025/03/1422silvercurved-scaled.png",
+      "saved_path": "hand-tools/columbia-mud-pans-3/columbia-mud-pans-3_08.png",
+      "reason": "current_file_not_found"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/hand-tools/columbia-mud-pans-3/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2025/03/1622gproflex-scaled.png",
+      "saved_path": "hand-tools/columbia-mud-pans-3/columbia-mud-pans-3_09.png",
+      "reason": "current_file_not_found"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/hand-tools/columbia-mud-pans-3/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2025/03/1822-scaled.png",
+      "saved_path": "hand-tools/columbia-mud-pans-3/columbia-mud-pans-3_10.png",
+      "reason": "current_file_not_found"
+    },
+    {
       "tool_url": "https://www.columbiatools.com/columbia-tools/hand-tools/finishing-hawks/",
       "source_url": "https://www.columbiatools.com/wp-content/uploads/2025/03/hawk-scaled.png",
       "saved_path": "hand-tools/finishing-hawks/finishing-hawks_01.png",
@@ -93,6 +123,30 @@
       "source_url": "https://www.columbiatools.com/wp-content/uploads/2025/03/hawkbox-scaled.png",
       "saved_path": "hand-tools/finishing-hawks/finishing-hawks_02.png",
       "reason": "no_candidates_for_tool_url"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/hand-tools/three-way-knives-copy/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2025/11/7-scaled.png",
+      "saved_path": "hand-tools/three-way-knives-copy/three-way-knives-copy_01.png",
+      "reason": "current_file_not_found"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/hand-tools/three-way-knives-copy/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2025/11/OB8A0261-scaled.png",
+      "saved_path": "hand-tools/three-way-knives-copy/three-way-knives-copy_02.png",
+      "reason": "current_file_not_found"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/hand-tools/three-way-knives-copy/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2025/11/OB8A0403-scaled.png",
+      "saved_path": "hand-tools/three-way-knives-copy/three-way-knives-copy_03.png",
+      "reason": "current_file_not_found"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/hand-tools/three-way-knives-copy/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2025/11/IMG_8996-copy-scaled.png",
+      "saved_path": "hand-tools/three-way-knives-copy/three-way-knives-copy_04.png",
+      "reason": "current_file_not_found"
     },
     {
       "tool_url": "https://www.columbiatools.com/columbia-tools/tool-sets/the-tactical-set/",
@@ -110,7 +164,7 @@
       "tool_url": "https://www.columbiatools.com/columbia-tools/tool-sets/the-tactical-set/",
       "source_url": "https://www.columbiatools.com/wp-content/plugins/product-video-for-woocommerce//images/video_icon.png",
       "saved_path": "tool-sets/the-tactical-set/the-tactical-set_03.png",
-      "reason": "single_candidate"
+      "reason": "current_file_not_found"
     },
     {
       "tool_url": "https://www.columbiatools.com/columbia-tools/tool-sets/the-commando-set/",
@@ -167,6 +221,96 @@
       "reason": "single_candidate"
     },
     {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/automatic-tapers/columbia-one-predator-taper/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/predatorfull.jpg",
+      "saved_path": "automatic-tapers/columbia-one-predator-taper/columbia-one-predator-taper_01.jpg",
+      "reason": "current_file_not_found"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/automatic-tapers/columbia-one-predator-taper/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/predhead.jpg",
+      "saved_path": "automatic-tapers/columbia-one-predator-taper/columbia-one-predator-taper_02.jpg",
+      "reason": "current_file_not_found"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/automatic-tapers/columbia-one-predator-taper/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/predatorhead.jpg",
+      "saved_path": "automatic-tapers/columbia-one-predator-taper/columbia-one-predator-taper_03.jpg",
+      "reason": "current_file_not_found"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/automatic-tapers/columbia-one-predator-taper/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/5yearwarrantysmall.jpg",
+      "saved_path": "automatic-tapers/columbia-one-predator-taper/columbia-one-predator-taper_04.jpg",
+      "reason": "current_file_not_found"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/automatic-tapers/automatic-taper/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/tapersquare.jpg",
+      "saved_path": "automatic-tapers/automatic-taper/automatic-taper_01.jpg",
+      "reason": "current_file_not_found"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/automatic-tapers/automatic-taper/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/taper.jpg",
+      "saved_path": "automatic-tapers/automatic-taper/automatic-taper_02.jpg",
+      "reason": "current_file_not_found"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/automatic-tapers/automatic-taper/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/taperhead.jpg",
+      "saved_path": "automatic-tapers/automatic-taper/automatic-taper_03.jpg",
+      "reason": "current_file_not_found"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/automatic-tapers/automatic-taper/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/pumpactionsquare.jpg",
+      "saved_path": "automatic-tapers/automatic-taper/automatic-taper_04.jpg",
+      "reason": "current_file_not_found"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/automatic-tapers/automatic-taper/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/TAPER_3.jpg",
+      "saved_path": "automatic-tapers/automatic-taper/automatic-taper_05.jpg",
+      "reason": "current_file_not_found"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/automatic-tapers/automatic-taper/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/TAPER_14.jpg",
+      "saved_path": "automatic-tapers/automatic-taper/automatic-taper_06.jpg",
+      "reason": "current_file_not_found"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/automatic-tapers/sawed-off-taper/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/sawedofftapersquare.jpg",
+      "saved_path": "automatic-tapers/sawed-off-taper/sawed-off-taper_01.jpg",
+      "reason": "current_file_not_found"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/automatic-tapers/sawed-off-taper/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/taperhead-1.jpg",
+      "saved_path": "automatic-tapers/sawed-off-taper/sawed-off-taper_02.jpg",
+      "reason": "current_file_not_found"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/automatic-tapers/sawed-off-taper/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/TAPER_3-1.jpg",
+      "saved_path": "automatic-tapers/sawed-off-taper/sawed-off-taper_03.jpg",
+      "reason": "current_file_not_found"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/automatic-tapers/sawed-off-taper/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/TAPER_14-1.jpg",
+      "saved_path": "automatic-tapers/sawed-off-taper/sawed-off-taper_04.jpg",
+      "reason": "current_file_not_found"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/automatic-tapers/sawed-off-taper/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/5yearwarrantysmall.jpg",
+      "saved_path": "automatic-tapers/sawed-off-taper/sawed-off-taper_05.jpg",
+      "reason": "current_file_not_found"
+    },
+    {
       "tool_url": "https://www.columbiatools.com/columbia-tools/the-predator-family/",
       "source_url": "https://www.columbiatools.com/wp-content/uploads/2024/06/Screenshot-2024-06-03-at-12.37.02\u202fPM-4.png",
       "saved_path": "columbia-tools/the-predator-family/the-predator-family_01.png",
@@ -215,6 +359,66 @@
       "reason": "single_candidate"
     },
     {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/pumps/tall-boy-mud-pump/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/TallBoyPump.jpg",
+      "saved_path": "pumps/tall-boy-mud-pump/tall-boy-mud-pump_01.jpg",
+      "reason": "current_file_not_found"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/pumps/tall-boy-mud-pump/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/5yearwarrantysmall.jpg",
+      "saved_path": "pumps/tall-boy-mud-pump/tall-boy-mud-pump_02.jpg",
+      "reason": "current_file_not_found"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/pumps/mud-pump/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/TallBoyMudpumps.jpg",
+      "saved_path": "pumps/mud-pump/mud-pump_01.jpg",
+      "reason": "current_file_not_found"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/pumps/mud-pump/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/5yearwarrantysmall.jpg",
+      "saved_path": "pumps/mud-pump/mud-pump_02.jpg",
+      "reason": "current_file_not_found"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/pumps/gooseneck/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/goosenecksquare.jpg",
+      "saved_path": "pumps/gooseneck/gooseneck_01.jpg",
+      "reason": "current_file_not_found"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/pumps/gooseneck/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/5yearwarrantysmall.jpg",
+      "saved_path": "pumps/gooseneck/gooseneck_02.jpg",
+      "reason": "current_file_not_found"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/pumps/box-filler/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/boxfiller.jpg",
+      "saved_path": "pumps/box-filler/box-filler_01.jpg",
+      "reason": "current_file_not_found"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/pumps/box-filler/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/5yearwarrantysmall.jpg",
+      "saved_path": "pumps/box-filler/box-filler_02.jpg",
+      "reason": "current_file_not_found"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/pumps/columbiapowerfill/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2024/11/OB8A8143-1.png",
+      "saved_path": "pumps/columbiapowerfill/columbiapowerfill_01.png",
+      "reason": "current_file_not_found"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/pumps/columbiapowerfill/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2024/11/CGBUCKET-1.png",
+      "saved_path": "pumps/columbiapowerfill/columbiapowerfill_02.png",
+      "reason": "current_file_not_found"
+    },
+    {
       "tool_url": "https://www.columbiatools.com/columbia-tools/tool-cases/the-road-case/",
       "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/roadcase1.jpg",
       "saved_path": "tool-cases/the-road-case/the-road-case_01.jpg",
@@ -251,36 +455,6 @@
       "reason": "single_candidate"
     },
     {
-      "tool_url": "https://www.columbiatools.com/columbia-tools/tomahawk-smoothing-blades/tomahawk-smoothing-blades/",
-      "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/tomahawkmatrix.jpg",
-      "saved_path": "tomahawk-smoothing-blades/tomahawk-smoothing-blades/tomahawk-smoothing-blades_01.jpg",
-      "reason": "no_candidates_for_tool_url"
-    },
-    {
-      "tool_url": "https://www.columbiatools.com/columbia-tools/tomahawk-smoothing-blades/tomahawk-smoothing-blades/",
-      "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/smoothingbladesfamsmall.jpg",
-      "saved_path": "tomahawk-smoothing-blades/tomahawk-smoothing-blades/tomahawk-smoothing-blades_02.jpg",
-      "reason": "no_candidates_for_tool_url"
-    },
-    {
-      "tool_url": "https://www.columbiatools.com/columbia-tools/tomahawk-smoothing-blades/tomahawk-smoothing-blades/",
-      "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/TomahawkTomalock.jpg",
-      "saved_path": "tomahawk-smoothing-blades/tomahawk-smoothing-blades/tomahawk-smoothing-blades_03.jpg",
-      "reason": "no_candidates_for_tool_url"
-    },
-    {
-      "tool_url": "https://www.columbiatools.com/columbia-tools/tomahawk-smoothing-blades/tomahawk-smoothing-blades/",
-      "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/clthasmall.jpg",
-      "saved_path": "tomahawk-smoothing-blades/tomahawk-smoothing-blades/tomahawk-smoothing-blades_04.jpg",
-      "reason": "no_candidates_for_tool_url"
-    },
-    {
-      "tool_url": "https://www.columbiatools.com/columbia-tools/tomahawk-smoothing-blades/tomahawk-smoothing-blades/",
-      "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/5yearwarrantysmall.jpg",
-      "saved_path": "tomahawk-smoothing-blades/tomahawk-smoothing-blades/tomahawk-smoothing-blades_05.jpg",
-      "reason": "no_candidates_for_tool_url"
-    },
-    {
       "tool_url": "https://www.columbiatools.com/columbia-tools/tomahawk-smoothing-blades/tomalock/",
       "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/tomalock1.jpg",
       "saved_path": "tomahawk-smoothing-blades/tomalock/tomalock_01.jpg",
@@ -305,22 +479,58 @@
       "reason": "single_candidate"
     },
     {
-      "tool_url": "https://www.columbiatools.com/columbia-tools/smoothing-blades/sabre-smoothing-blades/",
-      "source_url": "https://www.columbiatools.com/wp-content/uploads/2024/11/Untitled-3-1-1.png",
-      "saved_path": "smoothing-blades/sabre-smoothing-blades/sabre-smoothing-blades_01.png",
-      "reason": "single_candidate"
+      "tool_url": "https://www.columbiatools.com/columbia-tools/smoothing-blades/fatboy-smoothing-blades/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2025/12/OB8A9659-scaled.png",
+      "saved_path": "smoothing-blades/fatboy-smoothing-blades/fatboy-smoothing-blades_01.png",
+      "reason": "current_file_not_found"
     },
     {
-      "tool_url": "https://www.columbiatools.com/columbia-tools/smoothing-blades/sabre-smoothing-blades/",
-      "source_url": "https://www.columbiatools.com/wp-content/uploads/2024/11/Untitled-51-1.png",
-      "saved_path": "smoothing-blades/sabre-smoothing-blades/sabre-smoothing-blades_02.png",
-      "reason": "single_candidate"
+      "tool_url": "https://www.columbiatools.com/columbia-tools/smoothing-blades/fatboy-smoothing-blades/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2025/12/Untitled-13.png",
+      "saved_path": "smoothing-blades/fatboy-smoothing-blades/fatboy-smoothing-blades_02.png",
+      "reason": "current_file_not_found"
     },
     {
-      "tool_url": "https://www.columbiatools.com/columbia-tools/smoothing-blades/sabre-smoothing-blades/",
-      "source_url": "https://www.columbiatools.com/wp-content/uploads/2024/11/SABERCLAW.png",
-      "saved_path": "smoothing-blades/sabre-smoothing-blades/sabre-smoothing-blades_03.png",
-      "reason": "single_candidate"
+      "tool_url": "https://www.columbiatools.com/columbia-tools/smoothing-blades/fatboy-smoothing-blades/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2025/12/FSBA3-Rinoa-Nina-Ramirez-1-scaled.png",
+      "saved_path": "smoothing-blades/fatboy-smoothing-blades/fatboy-smoothing-blades_03.png",
+      "reason": "current_file_not_found"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/finishing-boxes/flat-boxes/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/2023flatbox.jpg",
+      "saved_path": "finishing-boxes/flat-boxes/flat-boxes_01.jpg",
+      "reason": "current_file_not_found"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/finishing-boxes/flat-boxes/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/beadwheelonbox.jpg",
+      "saved_path": "finishing-boxes/flat-boxes/flat-boxes_02.jpg",
+      "reason": "current_file_not_found"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/finishing-boxes/flat-boxes/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/5yearwarrantysmall.jpg",
+      "saved_path": "finishing-boxes/flat-boxes/flat-boxes_03.jpg",
+      "reason": "current_file_not_found"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/finishing-boxes/fat-boy-boxes/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/InsideTrackBoxFrontSmall.png",
+      "saved_path": "finishing-boxes/fat-boy-boxes/fat-boy-boxes_01.png",
+      "reason": "current_file_not_found"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/finishing-boxes/fat-boy-boxes/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/beadwheelonbox-1.jpg",
+      "saved_path": "finishing-boxes/fat-boy-boxes/fat-boy-boxes_02.jpg",
+      "reason": "current_file_not_found"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/finishing-boxes/fat-boy-boxes/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/5yearwarrantysmall.jpg",
+      "saved_path": "finishing-boxes/fat-boy-boxes/fat-boy-boxes_03.jpg",
+      "reason": "current_file_not_found"
     },
     {
       "tool_url": "https://www.columbiatools.com/columbia-tools/finishing-boxes/automatic-flat-boxes/",
@@ -333,6 +543,324 @@
       "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/5yearwarrantysmall.jpg",
       "saved_path": "finishing-boxes/automatic-flat-boxes/automatic-flat-boxes_02.jpg",
       "reason": "no_candidates_for_tool_url"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/finishing-boxes/inside-track-boxes/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2023/05/itc-ksmall.jpg",
+      "saved_path": "finishing-boxes/inside-track-boxes/inside-track-boxes_01.jpg",
+      "reason": "current_file_not_found"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/finishing-boxes/inside-track-boxes/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/InsideTrackBoxFrontSmall.png",
+      "saved_path": "finishing-boxes/inside-track-boxes/inside-track-boxes_02.png",
+      "reason": "current_file_not_found"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/finishing-boxes/inside-track-boxes/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/Insidetrackboxsmall.jpg",
+      "saved_path": "finishing-boxes/inside-track-boxes/inside-track-boxes_03.jpg",
+      "reason": "current_file_not_found"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/finishing-boxes/inside-track-boxes/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/5yearwarrantysmall-1.jpg",
+      "saved_path": "finishing-boxes/inside-track-boxes/inside-track-boxes_04.jpg",
+      "reason": "current_file_not_found"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/finishing-boxes/inside-track-boxes/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/INSIDE.png",
+      "saved_path": "finishing-boxes/inside-track-boxes/inside-track-boxes_05.png",
+      "reason": "current_file_not_found"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/corner-rollers/corner-cobra/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/NEWCORNERCOBRA-scaled.png",
+      "saved_path": "corner-rollers/corner-cobra/corner-cobra_01.png",
+      "reason": "current_file_not_found"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/corner-rollers/corner-cobra/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/5yearwarrantysmall-1.jpg",
+      "saved_path": "corner-rollers/corner-cobra/corner-cobra_02.jpg",
+      "reason": "current_file_not_found"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/corner-rollers/inside-corner-roller/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/cornerroller.jpg",
+      "saved_path": "corner-rollers/inside-corner-roller/inside-corner-roller_01.jpg",
+      "reason": "current_file_not_found"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/corner-rollers/inside-corner-roller/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/5yearwarrantysmall-1.jpg",
+      "saved_path": "corner-rollers/inside-corner-roller/inside-corner-roller_02.jpg",
+      "reason": "current_file_not_found"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/corner-rollers/outside-corner-rollers/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/COBCR.jpg",
+      "saved_path": "corner-rollers/outside-corner-rollers/outside-corner-rollers_01.jpg",
+      "reason": "current_file_not_found"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/corner-rollers/outside-corner-rollers/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/5yearwarrantysmall-1.jpg",
+      "saved_path": "corner-rollers/outside-corner-rollers/outside-corner-rollers_02.jpg",
+      "reason": "current_file_not_found"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/corner-rollers/bullnose-outside-corner-roller/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/CBNCR.jpg",
+      "saved_path": "corner-rollers/bullnose-outside-corner-roller/bullnose-outside-corner-roller_01.jpg",
+      "reason": "current_file_not_found"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/corner-rollers/wide-outside-corner-roller/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/COBCRW.jpg",
+      "saved_path": "corner-rollers/wide-outside-corner-roller/wide-outside-corner-roller_01.jpg",
+      "reason": "current_file_not_found"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/corner-rollers/wide-outside-corner-roller/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/5yearwarrantysmall-1.jpg",
+      "saved_path": "corner-rollers/wide-outside-corner-roller/wide-outside-corner-roller_02.jpg",
+      "reason": "current_file_not_found"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/corner-rollers/european-micro-outside-corner-roller/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/COBCRE.jpg",
+      "saved_path": "corner-rollers/european-micro-outside-corner-roller/european-micro-outside-corner-roller_01.jpg",
+      "reason": "current_file_not_found"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/angleheads/2-anglehead/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/2_Angle_Head_2CF.jpg",
+      "saved_path": "angleheads/2-anglehead/2-anglehead_01.jpg",
+      "reason": "current_file_not_found"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/angleheads/2-anglehead/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/angleheadbacksquare.jpg",
+      "saved_path": "angleheads/2-anglehead/2-anglehead_02.jpg",
+      "reason": "current_file_not_found"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/angleheads/2-anglehead/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/Angle_Head_all_Sizes_AH_-1.jpg",
+      "saved_path": "angleheads/2-anglehead/2-anglehead_03.jpg",
+      "reason": "current_file_not_found"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/angleheads/2-anglehead/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/5yearwarrantysmall-1.jpg",
+      "saved_path": "angleheads/2-anglehead/2-anglehead_04.jpg",
+      "reason": "current_file_not_found"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/angleheads/2-5-anglehead/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/2.5_Angle_Head_2.5CF.jpg",
+      "saved_path": "angleheads/2-5-anglehead/2-5-anglehead_01.jpg",
+      "reason": "current_file_not_found"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/angleheads/2-5-anglehead/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/angleheadbacksquare-1.jpg",
+      "saved_path": "angleheads/2-5-anglehead/2-5-anglehead_02.jpg",
+      "reason": "current_file_not_found"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/angleheads/2-5-anglehead/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/Angle_Head_all_Sizes_AH_-1-1.jpg",
+      "saved_path": "angleheads/2-5-anglehead/2-5-anglehead_03.jpg",
+      "reason": "current_file_not_found"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/angleheads/2-5-anglehead/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/5yearwarrantysmall-1.jpg",
+      "saved_path": "angleheads/2-5-anglehead/2-5-anglehead_04.jpg",
+      "reason": "current_file_not_found"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/angleheads/3-anglehead/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/3_Angle_Head_3CF.jpg",
+      "saved_path": "angleheads/3-anglehead/3-anglehead_01.jpg",
+      "reason": "current_file_not_found"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/angleheads/3-anglehead/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/angleheadbacksquare-2.jpg",
+      "saved_path": "angleheads/3-anglehead/3-anglehead_02.jpg",
+      "reason": "current_file_not_found"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/angleheads/3-anglehead/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/Angle_Head_all_Sizes_AH_-1-2.jpg",
+      "saved_path": "angleheads/3-anglehead/3-anglehead_03.jpg",
+      "reason": "current_file_not_found"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/angleheads/3-anglehead/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/5yearwarrantysmall-1.jpg",
+      "saved_path": "angleheads/3-anglehead/3-anglehead_04.jpg",
+      "reason": "current_file_not_found"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/angleheads/3-5-anglehead/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/3.5_Angle_Head_3.5CF.jpg",
+      "saved_path": "angleheads/3-5-anglehead/3-5-anglehead_01.jpg",
+      "reason": "current_file_not_found"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/angleheads/3-5-anglehead/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/angleheadbacksquare-1.jpg",
+      "saved_path": "angleheads/3-5-anglehead/3-5-anglehead_02.jpg",
+      "reason": "current_file_not_found"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/angleheads/3-5-anglehead/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/Angle_Head_all_Sizes_AH_-1-1.jpg",
+      "saved_path": "angleheads/3-5-anglehead/3-5-anglehead_03.jpg",
+      "reason": "current_file_not_found"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/angleheads/3-5-anglehead/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/5yearwarrantysmall-1.jpg",
+      "saved_path": "angleheads/3-5-anglehead/3-5-anglehead_04.jpg",
+      "reason": "current_file_not_found"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/angleheads/anglehead-adaptor/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/aha.jpg",
+      "saved_path": "angleheads/anglehead-adaptor/anglehead-adaptor_01.jpg",
+      "reason": "current_file_not_found"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/angleheads/anglehead-adaptor/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/5yearwarrantysmall-1.jpg",
+      "saved_path": "angleheads/anglehead-adaptor/anglehead-adaptor_02.jpg",
+      "reason": "current_file_not_found"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/nailspotters/2-nailspotter/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/2023Nailspotter2inch.jpg",
+      "saved_path": "nailspotters/2-nailspotter/2-nailspotter_01.jpg",
+      "reason": "current_file_not_found"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/nailspotters/2-nailspotter/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/5yearwarrantysmall-1.jpg",
+      "saved_path": "nailspotters/2-nailspotter/2-nailspotter_02.jpg",
+      "reason": "current_file_not_found"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/nailspotters/3-nailspotter/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/2023Nailspotter3inch.jpg",
+      "saved_path": "nailspotters/3-nailspotter/3-nailspotter_01.jpg",
+      "reason": "current_file_not_found"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/nailspotters/3-nailspotter/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/5yearwarrantysmall-1.jpg",
+      "saved_path": "nailspotters/3-nailspotter/3-nailspotter_02.jpg",
+      "reason": "current_file_not_found"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/corner-boxes/8-throttle-box/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/throttlebox8small.jpg",
+      "saved_path": "corner-boxes/8-throttle-box/8-throttle-box_01.jpg",
+      "reason": "current_file_not_found"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/corner-boxes/8-throttle-box/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/throttleboxhandlesmall.jpg",
+      "saved_path": "corner-boxes/8-throttle-box/8-throttle-box_02.jpg",
+      "reason": "current_file_not_found"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/corner-boxes/8-throttle-box/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/throttleboxbacksmall.jpg",
+      "saved_path": "corner-boxes/8-throttle-box/8-throttle-box_03.jpg",
+      "reason": "current_file_not_found"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/corner-boxes/8-throttle-box/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/5yearwarrantysmall-1.jpg",
+      "saved_path": "corner-boxes/8-throttle-box/8-throttle-box_04.jpg",
+      "reason": "current_file_not_found"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/corner-boxes/7-inch-throttle-box/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/throttlebox7small.jpg",
+      "saved_path": "corner-boxes/7-inch-throttle-box/7-inch-throttle-box_01.jpg",
+      "reason": "current_file_not_found"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/corner-boxes/7-inch-throttle-box/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/throttleboxbacksmall-1.jpg",
+      "saved_path": "corner-boxes/7-inch-throttle-box/7-inch-throttle-box_02.jpg",
+      "reason": "current_file_not_found"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/corner-boxes/7-inch-throttle-box/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/throttleboxhandlesmall-1.jpg",
+      "saved_path": "corner-boxes/7-inch-throttle-box/7-inch-throttle-box_03.jpg",
+      "reason": "current_file_not_found"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/corner-boxes/7-inch-throttle-box/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/5yearwarrantysmall-1.jpg",
+      "saved_path": "corner-boxes/7-inch-throttle-box/7-inch-throttle-box_04.jpg",
+      "reason": "current_file_not_found"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/corner-flushers/standard-corner-flusher/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/3inchflusher.png",
+      "saved_path": "corner-flushers/standard-corner-flusher/standard-corner-flusher_01.png",
+      "reason": "current_file_not_found"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/corner-flushers/standard-corner-flusher/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/2.5inchflusher-e1732573761504.png",
+      "saved_path": "corner-flushers/standard-corner-flusher/standard-corner-flusher_02.png",
+      "reason": "current_file_not_found"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/corner-flushers/standard-corner-flusher/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/5yearwarrantysmall-1.jpg",
+      "saved_path": "corner-flushers/standard-corner-flusher/standard-corner-flusher_03.jpg",
+      "reason": "current_file_not_found"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/corner-flushers/direct-corner-flusher/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/2.5_Direct_Flusher_2.5DF.jpg",
+      "saved_path": "corner-flushers/direct-corner-flusher/direct-corner-flusher_01.jpg",
+      "reason": "current_file_not_found"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/corner-flushers/direct-corner-flusher/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/Wide_Track_Direct_Flusher_3WTDF.jpg",
+      "saved_path": "corner-flushers/direct-corner-flusher/direct-corner-flusher_02.jpg",
+      "reason": "current_file_not_found"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/corner-flushers/direct-corner-flusher/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/5yearwarrantysmall-1.jpg",
+      "saved_path": "corner-flushers/direct-corner-flusher/direct-corner-flusher_03.jpg",
+      "reason": "current_file_not_found"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/corner-flushers/combo-flusher/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/combo_flusher.jpg",
+      "saved_path": "corner-flushers/combo-flusher/combo-flusher_01.jpg",
+      "reason": "current_file_not_found"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/semi-automatic-taper/semi-automatic-taper/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/semiautotapersquare.jpg",
+      "saved_path": "semi-automatic-taper/semi-automatic-taper/semi-automatic-taper_01.jpg",
+      "reason": "current_file_not_found"
     },
     {
       "tool_url": "https://www.columbiatools.com/columbia-tools/sanders/sander-head/",
@@ -365,6 +893,144 @@
       "reason": "single_candidate"
     },
     {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/applicators/external-corner-applicator/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/External_90_Aplicator_CEXT90_-_FRONT.jpg",
+      "saved_path": "applicators/external-corner-applicator/external-corner-applicator_01.jpg",
+      "reason": "current_file_not_found"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/applicators/external-corner-applicator/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/External_90_Applicator_CEXT90_-_BACK.jpg",
+      "saved_path": "applicators/external-corner-applicator/external-corner-applicator_02.jpg",
+      "reason": "current_file_not_found"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/applicators/external-corner-applicator/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/5yearwarrantysmall-1.jpg",
+      "saved_path": "applicators/external-corner-applicator/external-corner-applicator_03.jpg",
+      "reason": "current_file_not_found"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/applicators/inside-corner-applicator/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/Inside_Corner_Applicator_4_Wheels_ICA1-4_-_BACK.jpg",
+      "saved_path": "applicators/inside-corner-applicator/inside-corner-applicator_01.jpg",
+      "reason": "current_file_not_found"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/applicators/inside-corner-applicator/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/Inside_Corner_Applicator_4_Wheels_ICA1-4_-_FRONT.jpg",
+      "saved_path": "applicators/inside-corner-applicator/inside-corner-applicator_02.jpg",
+      "reason": "current_file_not_found"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/applicators/inside-corner-applicator/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/Inside_Corner_Applicator_2_Wheels_ICA1-2_-BACK.jpg",
+      "saved_path": "applicators/inside-corner-applicator/inside-corner-applicator_03.jpg",
+      "reason": "current_file_not_found"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/applicators/inside-corner-applicator/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/Inside_Corner_Applicator_2_Wheels_ICA-4_-_FRONT.jpg",
+      "saved_path": "applicators/inside-corner-applicator/inside-corner-applicator_04.jpg",
+      "reason": "current_file_not_found"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/applicators/two-way-internal-corner-applicator/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/Two-Way_Internal_Corner_Applicator_ICATW_-_BACK.jpg",
+      "saved_path": "applicators/two-way-internal-corner-applicator/two-way-internal-corner-applicator_01.jpg",
+      "reason": "current_file_not_found"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/applicators/two-way-internal-corner-applicator/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/Two_Way_Internal_Corner_Applicator_ICATW_-_FRONT.jpg",
+      "saved_path": "applicators/two-way-internal-corner-applicator/two-way-internal-corner-applicator_02.jpg",
+      "reason": "current_file_not_found"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/applicators/flat-applicators/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/flatapplicatorsquare.jpg",
+      "saved_path": "applicators/flat-applicators/flat-applicators_01.jpg",
+      "reason": "current_file_not_found"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/handles/columbia-one/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/C1H.jpg",
+      "saved_path": "handles/columbia-one/columbia-one_01.jpg",
+      "reason": "current_file_not_found"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/handles/columbia-one/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/columbiaonesquare.jpg",
+      "saved_path": "handles/columbia-one/columbia-one_02.jpg",
+      "reason": "current_file_not_found"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/handles/columbia-one/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/stubbysmall.jpg",
+      "saved_path": "handles/columbia-one/columbia-one_03.jpg",
+      "reason": "current_file_not_found"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/handles/columbia-one/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/columbiaonesquaredisplay.jpg",
+      "saved_path": "handles/columbia-one/columbia-one_04.jpg",
+      "reason": "current_file_not_found"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/handles/columbia-one/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/5yearwarrantysmall-2.jpg",
+      "saved_path": "handles/columbia-one/columbia-one_05.jpg",
+      "reason": "current_file_not_found"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/handles/the-matrix-box-handles/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/matrixsquare.jpg",
+      "saved_path": "handles/the-matrix-box-handles/the-matrix-box-handles_01.jpg",
+      "reason": "current_file_not_found"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/handles/the-matrix-box-handles/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/Untitled-1-1.jpg",
+      "saved_path": "handles/the-matrix-box-handles/the-matrix-box-handles_02.jpg",
+      "reason": "current_file_not_found"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/handles/the-matrix-box-handles/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/matrix2.jpg",
+      "saved_path": "handles/the-matrix-box-handles/the-matrix-box-handles_03.jpg",
+      "reason": "current_file_not_found"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/handles/the-matrix-box-handles/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/matrix4.jpg",
+      "saved_path": "handles/the-matrix-box-handles/the-matrix-box-handles_04.jpg",
+      "reason": "current_file_not_found"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/handles/the-matrix-box-handles/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/matrix3.jpg",
+      "saved_path": "handles/the-matrix-box-handles/the-matrix-box-handles_05.jpg",
+      "reason": "current_file_not_found"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/handles/the-matrix-box-handles/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/5yearwarrantysmall-1-1.jpg",
+      "saved_path": "handles/the-matrix-box-handles/the-matrix-box-handles_06.jpg",
+      "reason": "current_file_not_found"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/handles/long-extendible-handle/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/corner_roller_handle_extendible_copy.jpg",
+      "saved_path": "handles/long-extendible-handle/long-extendible-handle_01.jpg",
+      "reason": "current_file_not_found"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/handles/long-extendible-handle/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/5yearwarrantysmall-2-1.jpg",
+      "saved_path": "handles/long-extendible-handle/long-extendible-handle_02.jpg",
+      "reason": "current_file_not_found"
+    },
+    {
       "tool_url": "https://www.columbiatools.com/columbia-tools/handles/closet-monster-flat-box-handle/",
       "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/closet_monster_copy.jpg",
       "saved_path": "handles/closet-monster-flat-box-handle/closet-monster-flat-box-handle_01.jpg",
@@ -375,6 +1041,18 @@
       "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/5yearwarrantysmall-3.jpg",
       "saved_path": "handles/closet-monster-flat-box-handle/closet-monster-flat-box-handle_02.jpg",
       "reason": "no_candidates_for_tool_url"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/handles/twist-lock-handle/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/twistlocksquare.jpg",
+      "saved_path": "handles/twist-lock-handle/twist-lock-handle_01.jpg",
+      "reason": "current_file_not_found"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/handles/twist-lock-handle/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/twistlockheadsquare.jpg",
+      "saved_path": "handles/twist-lock-handle/twist-lock-handle_02.jpg",
+      "reason": "current_file_not_found"
     },
     {
       "tool_url": "https://www.columbiatools.com/columbia-tools/handles/flat-box-handle/",
@@ -389,10 +1067,82 @@
       "reason": "no_candidates_for_tool_url"
     },
     {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/compound-tubes/compound-tubes/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/compoundtubesquare.jpg",
+      "saved_path": "compound-tubes/compound-tubes/compound-tubes_01.jpg",
+      "reason": "current_file_not_found"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/compound-tubes/compound-tubes/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/5yearwarrantysmall-1.jpg",
+      "saved_path": "compound-tubes/compound-tubes/compound-tubes_02.jpg",
+      "reason": "current_file_not_found"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/compound-tubes/cam-lock-tube/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/camlocktubesquare.jpg",
+      "saved_path": "compound-tubes/cam-lock-tube/cam-lock-tube_01.jpg",
+      "reason": "current_file_not_found"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/compound-tubes/cam-lock-tube/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/camlocktubesquare2.jpg",
+      "saved_path": "compound-tubes/cam-lock-tube/cam-lock-tube_02.jpg",
+      "reason": "current_file_not_found"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/compound-tubes/cam-lock-tube/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/5yearwarrantysmall-1.jpg",
+      "saved_path": "compound-tubes/cam-lock-tube/cam-lock-tube_03.jpg",
+      "reason": "current_file_not_found"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/compound-tubes/cam-lock-tube-box-filler/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/boxfillerattachment4smallsquare.jpg",
+      "saved_path": "compound-tubes/cam-lock-tube-box-filler/cam-lock-tube-box-filler_01.jpg",
+      "reason": "current_file_not_found"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/compound-tubes/cam-lock-tube-box-filler/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/boxfillerattachmentsmallsquare.jpg",
+      "saved_path": "compound-tubes/cam-lock-tube-box-filler/cam-lock-tube-box-filler_02.jpg",
+      "reason": "current_file_not_found"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/compound-tubes/cam-lock-tube-box-filler/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/boxfillerattachment2smallsquare.jpg",
+      "saved_path": "compound-tubes/cam-lock-tube-box-filler/cam-lock-tube-box-filler_03.jpg",
+      "reason": "current_file_not_found"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/compound-tubes/cam-lock-tube-box-filler/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/boxfillerattachment3smallsquare.jpg",
+      "saved_path": "compound-tubes/cam-lock-tube-box-filler/cam-lock-tube-box-filler_04.jpg",
+      "reason": "current_file_not_found"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/compound-tubes/cam-lock-tube-box-filler/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/5yearwarrantysmall-1.jpg",
+      "saved_path": "compound-tubes/cam-lock-tube-box-filler/cam-lock-tube-box-filler_05.jpg",
+      "reason": "current_file_not_found"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/grooved-mud-heads/inside-90-grooved-mud-heads/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/mudheadsquare.jpg",
+      "saved_path": "grooved-mud-heads/inside-90-grooved-mud-heads/inside-90-grooved-mud-heads_01.jpg",
+      "reason": "current_file_not_found"
+    },
+    {
       "tool_url": "https://www.columbiatools.com/columbia-tools/grooved-mud-heads/outside-90-grooved-mud-heads/",
       "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/OA90.jpg",
       "saved_path": "grooved-mud-heads/outside-90-grooved-mud-heads/outside-90-grooved-mud-heads_01.jpg",
       "reason": "no_candidates_for_tool_url"
+    },
+    {
+      "tool_url": "https://www.columbiatools.com/columbia-tools/grooved-mud-heads/flat-grooved-mud-heads/",
+      "source_url": "https://www.columbiatools.com/wp-content/uploads/2022/03/FMH.jpg",
+      "saved_path": "grooved-mud-heads/flat-grooved-mud-heads/flat-grooved-mud-heads_01.jpg",
+      "reason": "current_file_not_found"
     }
   ]
 }
