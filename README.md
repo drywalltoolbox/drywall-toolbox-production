@@ -162,7 +162,7 @@ REST API menu endpoint: `GET /wp-json/headless/v1/menus/<location>`
 ## Schematic Images — WordPress Media Library
 
 Schematic diagrams are stored as WebP in the WordPress Media Library (not tracked in git).
-
+-
 ```bash
 # 1. Convert PNG/JPG → WebP
 python scripts/convert_schematics_to_webp.py

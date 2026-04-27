@@ -1,0 +1,40 @@
+{
+  "tool_count": 74,
+  "downloaded_asset_count": 199,
+  "families_with_assets": 66,
+  "families_missing_assets": [
+    {
+      "tool_title": "Putty Knives",
+      "tool_url": "https://www.columbiatools.com/columbia-tools/hand-tools/putty-knives/"
+    },
+    {
+      "tool_title": "Automatic Taper Maintenance Kits",
+      "tool_url": "https://www.columbiatools.com/columbia-tools/maintenance-kits/automatic-taper-maintenance-kits/"
+    },
+    {
+      "tool_title": "Finishing Box Maintenance Kits",
+      "tool_url": "https://www.columbiatools.com/columbia-tools/maintenance-kits/finishing-box-maintenance-kits/"
+    },
+    {
+      "tool_title": "Nailspotter Maintenance Kits",
+      "tool_url": "https://www.columbiatools.com/columbia-tools/maintenance-kits/nailspotter-maintenance-kits/"
+    },
+    {
+      "tool_title": "Anglehead Maintenance Kits",
+      "tool_url": "https://www.columbiatools.com/columbia-tools/maintenance-kits/anglehead-maintenance-kits/"
+    },
+    {
+      "tool_title": "Corner Roller Maintenance Kits",
+      "tool_url": "https://www.columbiatools.com/columbia-tools/maintenance-kits/corner-roller-maintenance-kits/"
+    },
+    {
+      "tool_title": "Handle Maintenance Kits",
+      "tool_url": "https://www.columbiatools.com/columbia-tools/maintenance-kits/handle-maintenance-kits/"
+    },
+    {
+      "tool_title": "Mud Pump Maintenance Kit",
+      "tool_url": "https://www.columbiatools.com/columbia-tools/maintenance-kits/mud-pump-maintenance-kit/"
+    }
+  ],
+  "download_failures": []
+}
