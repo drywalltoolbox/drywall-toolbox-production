@@ -315,10 +315,15 @@ export function normalizeProduct(wcProduct) {
   if (images.length === 0) images.push('https://www.drywalltoolbox.com/wp/wp-content/uploads/2026/04/no-image-placeholder.webp');
   const image = images[0];
 
+  const productType = wcProduct.type || 'simple';
+  const isVariable  = productType === 'variable';
+
   // Price: prefer numeric parse; keep string fallback
   const priceRaw = wcProduct.price ?? wcProduct.regular_price ?? '';
   const priceNum = parseFloat(priceRaw);
-  const price    = Number.isFinite(priceNum) ? priceNum : 0;
+  let price    = Number.isFinite(priceNum)
+    ? priceNum
+    : 0;
 
   // Category: map to internal key (e.g. "finishing") using the same CATEGORY_MAP
   // the CSV parser uses, so filtering works identically regardless of data source.
@@ -333,8 +338,7 @@ export function normalizeProduct(wcProduct) {
   // ── Variable-product support ───────────────────────────────────────────────
   // WooCommerce REST API returns type: 'variable' for variable products and
   // type: 'variation' for individual variation records.
-  const productType = wcProduct.type || 'simple';
-  const isVariable  = productType === 'variable';
+  // Variation-attribute options (only populated for variable products).
 
   // Variation-attribute options (only populated for variable products).
   // Each entry: { name: 'Size', options: ['7"', '10"', '12"'], id: 1 }
@@ -353,6 +357,9 @@ export function normalizeProduct(wcProduct) {
   const min_price = wcProduct.min_price
     ? (parseFloat(wcProduct.min_price) || 0)
     : (isVariable ? (parseFloat(wcProduct.price) || 0) : null);
+  if (isVariable && price === 0 && Number.isFinite(min_price) && min_price > 0) {
+    price = min_price;
+  }
   const max_price = wcProduct.max_price
     ? (parseFloat(wcProduct.max_price) || 0)
     : null;

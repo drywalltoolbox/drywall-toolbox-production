@@ -223,17 +223,14 @@ export default function ProductDetail({ product, onAddToCart, onClose, initialSe
               {/* Variation selector — visible for variable products */}
               {product.is_variable && product.variation_attributes && product.variation_attributes.length > 0 && (
                 <div className="mb-4 sm:mb-5">
-                  {variationsLoading ? (
-                    <p className="text-xs text-gray-400">Loading options…</p>
-                  ) : (
-                    <VariantChips
-                      attributes={product.variation_attributes}
-                      selected={selectedAttrs}
-                      onSelect={(attrName, value) =>
-                        setSelectedAttrs(prev => ({ ...prev, [attrName]: value }))
-                      }
-                    />
-                  )}
+                  <VariantChips
+                    attributes={product.variation_attributes}
+                    selected={selectedAttrs}
+                    onSelect={(attrName, value) =>
+                      setSelectedAttrs(prev => ({ ...prev, [attrName]: value }))
+                    }
+                    disabled={variationsLoading}
+                  />
                   {/* Out-of-stock notice for the selected variation */}
                   {selectedVariation && selectedVariation.stock_status === 'outofstock' && (
                     <p className="mt-2 text-xs font-semibold text-red-600">

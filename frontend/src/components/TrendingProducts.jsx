@@ -59,7 +59,10 @@ export default function TrendingProducts() {
       // and ensure they are mixed for diversity.
 
       const taperKeywords = ['automatic taper', 'taper', 'taping tool'];
-  const withPrice = allProducts.filter(p => (Number(p.price) || 0) > 0);
+      const withPrice = allProducts.filter(p => {
+        const price = Number(p.price) || Number(p.min_price) || 0;
+        return price > 0;
+      });
 
       // Categorize products into "Tapers" and "Other Main Tools"
       const groupedByBrand = {};
@@ -70,6 +73,7 @@ export default function TrendingProducts() {
           groupedByBrand[brandName] = { tapers: [], others: [] };
         }
 
+        const productPrice = Number(p.price) || Number(p.min_price) || 0;
         const isTaper = taperKeywords.some(key =>
           (p.name || '').toLowerCase().includes(key) ||
           (p.category || '').toLowerCase().includes(key)
@@ -77,7 +81,7 @@ export default function TrendingProducts() {
 
         if (isTaper) {
           groupedByBrand[brandName].tapers.push(p);
-        } else if (p.price > 100) { // Keep high-value tools as secondary options
+        } else if (productPrice > 100) { // Keep high-value tools as secondary options
           groupedByBrand[brandName].others.push(p);
         }
       });
@@ -89,7 +93,11 @@ export default function TrendingProducts() {
       brandKeys.forEach(brand => {
         const brandGroup = groupedByBrand[brand];
         // Sort tapers by price descending (main tools first)
-        brandGroup.tapers.sort((a, b) => (b.price || 0) - (a.price || 0));
+        brandGroup.tapers.sort((a, b) => {
+          const aPrice = Number(a.price) || Number(a.min_price) || 0;
+          const bPrice = Number(b.price) || Number(b.min_price) || 0;
+          return bPrice - aPrice;
+        });
         // Take up to 3 tapers per brand
         balancedSelection.push(...brandGroup.tapers.slice(0, 3));
       });
@@ -98,7 +106,11 @@ export default function TrendingProducts() {
       if (balancedSelection.length < 12) {
         brandKeys.forEach(brand => {
           const brandGroup = groupedByBrand[brand];
-          brandGroup.others.sort((a, b) => (b.price || 0) - (a.price || 0));
+          brandGroup.others.sort((a, b) => {
+            const aPrice = Number(a.price) || Number(a.min_price) || 0;
+            const bPrice = Number(b.price) || Number(b.min_price) || 0;
+            return bPrice - aPrice;
+          });
           balancedSelection.push(...brandGroup.others.slice(0, 2));
         });
       }
