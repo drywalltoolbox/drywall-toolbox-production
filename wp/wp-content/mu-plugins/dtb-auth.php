@@ -732,35 +732,47 @@ function dtb_auth_validate( WP_REST_Request $request ): WP_REST_Response {
 	}
 
 	if ( ! $token ) {
-		return new WP_REST_Response(
-			dtb_error_envelope( 'missing_token', 'No active session.', 401 ),
-			401
-		);
+		$response = new WP_REST_Response( [
+			'success'       => true,
+			'authenticated' => false,
+			'user'          => null,
+		], 200 );
+		$response->header( 'Cache-Control', 'private, no-store' );
+		return $response;
 	}
 
 	$payload = dtb_verify_jwt( $token );
 
 	if ( is_wp_error( $payload ) ) {
 		dtb_clear_auth_cookie();
-		return new WP_REST_Response(
-			dtb_error_envelope( 'invalid_token', 'Session expired. Please log in again.', 401 ),
-			401
-		);
+		$response = new WP_REST_Response( [
+			'success'       => true,
+			'authenticated' => false,
+			'user'          => null,
+			'message'       => 'Session expired. Please log in again.',
+		], 200 );
+		$response->header( 'Cache-Control', 'private, no-store' );
+		return $response;
 	}
 
 	$user = get_user_by( 'id', (int) $payload->sub );
 
 	if ( ! $user ) {
 		dtb_clear_auth_cookie();
-		return new WP_REST_Response(
-			dtb_error_envelope( 'user_not_found', 'User account not found.', 401 ),
-			401
-		);
+		$response = new WP_REST_Response( [
+			'success'       => true,
+			'authenticated' => false,
+			'user'          => null,
+			'message'       => 'User account not found.',
+		], 200 );
+		$response->header( 'Cache-Control', 'private, no-store' );
+		return $response;
 	}
 
 	$response = new WP_REST_Response( [
-		'success' => true,
-		'user'    => [
+		'success'       => true,
+		'authenticated' => true,
+		'user'          => [
 			'id'           => $user->ID,
 			'email'        => $user->user_email,
 			'display_name' => $user->display_name,

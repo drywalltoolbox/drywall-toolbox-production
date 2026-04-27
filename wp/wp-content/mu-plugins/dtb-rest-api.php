@@ -512,7 +512,7 @@ function dtb_cached_wc_get( string $wc_path, array $params ): WP_REST_Response {
 		return new WP_REST_Response( dtb_error_envelope( 'forbidden_origin', 'Origin not allowed.', 403 ), 403 );
 	}
 
-	$rl = dtb_rate_limit_get();
+	$rl = dtb_rate_limit_get( $wc_path );
 	if ( $rl ) {
 		return $rl;
 	}
@@ -598,7 +598,7 @@ function dtb_wc_get( string $wc_path, array $params = [] ): WP_REST_Response {
 		return new WP_REST_Response( dtb_error_envelope( 'forbidden_origin', 'Origin not allowed.', 403 ), 403 );
 	}
 
-	$rl = dtb_rate_limit_get();
+	$rl = dtb_rate_limit_get( $wc_path );
 	if ( $rl ) {
 		return $rl;
 	}
@@ -668,22 +668,46 @@ function dtb_rate_limit( WP_REST_Request $request, string $route_key ): ?WP_REST
  *
  * @return WP_REST_Response|null  Response to return immediately, or null to continue.
  */
-function dtb_rate_limit_get(): ?WP_REST_Response {
-	if ( empty( $_SERVER['REMOTE_ADDR'] ) ) {
+function dtb_get_public_get_rate_limit_config( string $route_key ): array {
+	$normalized = ltrim( strtolower( $route_key ), '/' );
+
+	if ( false !== strpos( $normalized, '/variations' ) ) {
+		return [ 'key' => 'products_variations', 'limit' => 300, 'window' => 60 ];
+	}
+
+	if ( 0 === strpos( $normalized, 'wc/v3/products/categories' ) ) {
+		return [ 'key' => 'products_categories', 'limit' => 180, 'window' => 60 ];
+	}
+
+	if ( 0 === strpos( $normalized, 'wc/v3/products/attributes' ) ) {
+		return [ 'key' => 'products_attributes', 'limit' => 180, 'window' => 60 ];
+	}
+
+	if ( 0 === strpos( $normalized, 'wc/v3/products' ) ) {
+		return [ 'key' => 'products', 'limit' => 240, 'window' => 60 ];
+	}
+
+	return [ 'key' => 'public_get', 'limit' => 120, 'window' => 60 ];
+}
+
+function dtb_rate_limit_get( string $route_key = 'public_get' ): ?WP_REST_Response {
+	$ip = dtb_get_client_ip();
+	if ( '0.0.0.0' === $ip ) {
 		return new WP_REST_Response( dtb_error_envelope( 'bad_request', 'Unable to identify request origin.', 400 ), 400 );
 	}
-	$ip    = sanitize_text_field( wp_unslash( $_SERVER['REMOTE_ADDR'] ) );
-	$key   = 'drywall_rl_get_' . md5( $ip );
-	$count = (int) get_transient( $key );
-	if ( $count >= 100 ) {
+
+	$config = dtb_get_public_get_rate_limit_config( $route_key );
+	$key    = 'drywall_rl_get_' . md5( $ip ) . '_' . md5( $config['key'] );
+	$count  = (int) get_transient( $key );
+	if ( $count >= $config['limit'] ) {
 		$resp = new WP_REST_Response(
 			dtb_error_envelope( 'rate_limited', 'Too many requests. Please try again later.', 429 ),
 			429
 		);
-		$resp->header( 'Retry-After', '60' );
+		$resp->header( 'Retry-After', (string) $config['window'] );
 		return $resp;
 	}
-	set_transient( $key, $count + 1, 60 );
+	set_transient( $key, $count + 1, $config['window'] );
 	return null;
 }
 

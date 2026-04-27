@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Search, X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { searchProducts } from '../services/catalog';
@@ -9,25 +9,39 @@ export default function MobileSearch({ onClose = () => {} }) {
   const [results, setResults] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+  const searchRequestIdRef = useRef(0);
 
-  const handleSearch = async (query) => {
-    setSearchQuery(query);
-    
-    if (!query.trim()) {
+  useEffect(() => {
+    const query = searchQuery.trim();
+    const requestId = searchRequestIdRef.current + 1;
+    searchRequestIdRef.current = requestId;
+
+    if (!query) {
       setResults([]);
+      setIsLoading(false);
       return;
     }
 
-    setIsLoading(true);
-    try {
-      const filtered = (await searchProducts(query)).slice(0, 5); // Limit to 5 results for mobile
-      
-      setResults(filtered);
-    } catch (error) {
-      console.error('Search error:', error);
-    }
-    setIsLoading(false);
-  };
+    const timer = setTimeout(async () => {
+      setIsLoading(true);
+      try {
+        const filtered = (await searchProducts(query)).slice(0, 5);
+        if (searchRequestIdRef.current === requestId) {
+          setResults(filtered);
+        }
+      } catch (error) {
+        if (searchRequestIdRef.current === requestId) {
+          console.error('Search error:', error);
+        }
+      } finally {
+        if (searchRequestIdRef.current === requestId) {
+          setIsLoading(false);
+        }
+      }
+    }, 200);
+
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
 
   const handleProductClick = (productId) => {
     navigate(`/product/${productId}`);
@@ -53,7 +67,7 @@ export default function MobileSearch({ onClose = () => {} }) {
             type="text"
             placeholder="Search products..."
             value={searchQuery}
-            onChange={(e) => handleSearch(e.target.value)}
+            onChange={(e) => setSearchQuery(e.target.value)}
             onFocus={() => setIsOpen(true)}
             className="mobile-search-input"
           />

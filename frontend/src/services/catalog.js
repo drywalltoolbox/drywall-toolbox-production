@@ -24,7 +24,7 @@ import { readCache, writeCache, bustCache, isCacheAvailable } from './productCac
 // Prevents duplicate in-flight requests within the same page session.
 
 let _cache  = null;   // Promise<Product[]> once populated this session
-let _source = null;   // 'idb-fresh' | 'idb-stale' | 'api'
+let _source = null;   // 'idb-fresh' | 'idb-stale' | 'idb-expired-fallback' | 'api'
 
 export function getCatalogSource() { return _source; }
 
@@ -97,8 +97,9 @@ export function loadCatalog() {
 
   _cache = (async () => {
     // ── 1. Try IndexedDB ────────────────────────────────────────────────────
+    let cached = null;
     if (isCacheAvailable()) {
-      const cached = await readCache();
+      cached = await readCache();
 
       if (cached && !cached.isExpired) {
         _source = cached.isFresh ? 'idb-fresh' : 'idb-stale';
@@ -128,6 +129,13 @@ export function loadCatalog() {
       return products;
     } catch (apiErr) {
       console.error('[catalog] WooCommerce API unavailable:', apiErr.message);
+      if (cached?.data?.length) {
+        _source = 'idb-expired-fallback';
+        console.warn(
+          `[catalog] Falling back to expired IndexedDB cache (${cached.data.length} products, age ${Math.round(cached.age / 1000)}s)`
+        );
+        return cached.data;
+      }
       _cache = null; // allow retry on next call
       return [];
     }
@@ -190,22 +198,13 @@ export async function getProductById(idOrSku) {
 
 /**
  * Full-text product search across name, SKU, UPC, and brand.
- * Tries the REST API search first; falls back to in-memory filter.
+ * Uses the local catalog to avoid per-keystroke API traffic.
  *
  * @param {string} query
  * @returns {Promise<Object[]>}
  */
 export async function searchProducts(query) {
   if (!query) return getProducts();
-
-  // Try REST search
-  try {
-    const { searchProducts: apiSearch } = await import('../api/products.js');
-    const results = await apiSearch(query);
-    if (results.length > 0) return results;
-  } catch {
-    // fall through
-  }
 
   // In-memory fallback
   const q   = query.toLowerCase();

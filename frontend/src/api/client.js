@@ -19,6 +19,9 @@
 import axios from 'axios';
 import { getToken, clearToken } from '../auth/tokenStore.js';
 
+const inflightGetRequests = new Map();
+const getCooldowns = new Map();
+
 // ─── Base URLs ────────────────────────────────────────────────────────────────
 
 export const API_BASE_URL =
@@ -143,55 +146,86 @@ export async function apiClient( endpoint, options = {} ) {
     headers[ 'Authorization' ] = `Bearer ${ token }`;
   }
 
-  let response;
-  try {
-    response = await fetch( url, { ...options, method, headers, credentials: 'include' } );
-  } catch {
-    throw { code: 'network_error', message: 'Network request failed.', status: 0 };
-  }
+  const requestKey = `${ method } ${ url } ${ headers[ 'Authorization' ] || '' }`;
+  const now = Date.now();
 
-  // Handle 401 — dispatch auth:expired, clear token.
-  if ( response.status === 401 ) {
-    clearToken();
-    if ( typeof window !== 'undefined' ) {
-      window.dispatchEvent( new Event( 'auth:expired' ) );
+  if ( method === 'GET' ) {
+    const cooldownUntil = getCooldowns.get( requestKey ) || 0;
+    if ( cooldownUntil > now ) {
+      throw {
+        code: 'rate_limited',
+        message: 'Request is cooling down after a 429 response.',
+        status: 429,
+        retryAfter: cooldownUntil - now,
+      };
     }
-    let envelope = {};
-    try { envelope = await response.json(); } catch { /**/ }
-    throw {
-      code:    envelope.code    || 'unauthorized',
-      message: envelope.message || 'Authentication required.',
-      status:  401,
-    };
+
+    if ( inflightGetRequests.has( requestKey ) ) {
+      return inflightGetRequests.get( requestKey );
+    }
   }
 
-  // Handle 429 — include Retry-After in ms.
-  if ( response.status === 429 ) {
-    let envelope = {};
-    try { envelope = await response.json(); } catch { /**/ }
-    const retryAfterSec = parseInt( response.headers.get( 'Retry-After' ) || '60', 10 );
-    throw {
-      code:       envelope.code    || 'rate_limited',
-      message:    envelope.message || 'Too many requests.',
-      status:     429,
-      retryAfter: retryAfterSec * 1000,
-    };
+  const execute = async () => {
+    let response;
+    try {
+      response = await fetch( url, { ...options, method, headers, credentials: 'include' } );
+    } catch {
+      throw { code: 'network_error', message: 'Network request failed.', status: 0 };
+    }
+
+    if ( response.status === 401 ) {
+      clearToken();
+      if ( typeof window !== 'undefined' ) {
+        window.dispatchEvent( new Event( 'auth:expired' ) );
+      }
+      let envelope = {};
+      try { envelope = await response.json(); } catch { /**/ }
+      throw {
+        code:    envelope.code    || 'unauthorized',
+        message: envelope.message || 'Authentication required.',
+        status:  401,
+      };
+    }
+
+    if ( response.status === 429 ) {
+      let envelope = {};
+      try { envelope = await response.json(); } catch { /**/ }
+      const retryAfterSec = parseInt( response.headers.get( 'Retry-After' ) || '60', 10 );
+      const retryAfterMs = retryAfterSec * 1000;
+      if ( method === 'GET' ) {
+        getCooldowns.set( requestKey, Date.now() + retryAfterMs );
+      }
+      throw {
+        code:       envelope.code    || 'rate_limited',
+        message:    envelope.message || 'Too many requests.',
+        status:     429,
+        retryAfter: retryAfterMs,
+      };
+    }
+
+    if ( ! response.ok ) {
+      let envelope = {};
+      try { envelope = await response.json(); } catch { /**/ }
+      throw {
+        code:    envelope.code    || 'api_error',
+        message: envelope.message || `Request failed with status ${ response.status }.`,
+        status:  response.status,
+      };
+    }
+
+    if ( response.status === 204 ) return null;
+
+    return response.json();
+  };
+
+  if ( method !== 'GET' ) {
+    return execute();
   }
 
-  // Handle non-2xx — parse error envelope from section 1.6.
-  if ( ! response.ok ) {
-    let envelope = {};
-    try { envelope = await response.json(); } catch { /**/ }
-    throw {
-      code:    envelope.code    || 'api_error',
-      message: envelope.message || `Request failed with status ${ response.status }.`,
-      status:  response.status,
-    };
-  }
-
-  // 204 No Content.
-  if ( response.status === 204 ) return null;
-
-  return response.json();
+  const promise = execute().finally( () => {
+    inflightGetRequests.delete( requestKey );
+  } );
+  inflightGetRequests.set( requestKey, promise );
+  return promise;
 }
 
