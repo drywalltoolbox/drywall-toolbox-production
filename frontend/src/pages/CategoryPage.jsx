@@ -40,6 +40,9 @@ export default function CategoryPage() {
     }));
   }, []);
 
+  // Depend on the visible variable-product ID set instead of the products
+  // array identity so the effect does not re-fire on equivalent renders.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     let mounted = true;
 
@@ -60,6 +63,10 @@ export default function CategoryPage() {
   }, [slug]);
 
   const { loading, products, category, error } = pageState;
+  const pageVariableIdsKey = products
+    .filter((p) => p.is_variable && p.id)
+    .map((p) => String(p.id))
+    .join(',');
 
   useEffect(() => {
     cardVariationMapRef.current = cardVariationMap;
@@ -101,7 +108,7 @@ export default function CategoryPage() {
     });
 
     return () => { mounted = false; };
-  }, [products]);
+  }, [pageVariableIdsKey]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const getCardDisplayProduct = useCallback((product) => {
     if (!product?.is_variable) return product;

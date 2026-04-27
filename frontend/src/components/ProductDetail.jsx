@@ -10,7 +10,7 @@ import ProductImageGallery from './ProductImageGallery';
 import VariantChips from './VariantChips';
 import { getProductSpecifications } from '../utils/productSpecifications';
 import { getProductVariations } from '../services/api';
-import { findMatchingVariation, getVariationSelectionMap } from '../utils/variationSelection';
+import { fetchCachedVariations, findMatchingVariation, getVariationSelectionMap } from '../utils/variationSelection';
 import columbiaLogo from '/brands/Columbia/columbia_taping_tools_logo.svg';
 import tapeTechLogo from '/brands/TapeTech/tapetech_logo.svg';
 import surproLogo from '/brands/SurPro/surpro_logo.svg';
@@ -72,7 +72,7 @@ export default function ProductDetail({ product, onAddToCart, onClose, initialSe
         setVariations([]);
         setSelectedAttrs({});
         setVariationsLoading(true);
-        return getProductVariations(product.id);
+        return fetchCachedVariations(product.id, getProductVariations);
       })
       .then((vars) => {
         if (!mounted || !vars) return;

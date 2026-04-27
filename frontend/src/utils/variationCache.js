@@ -6,6 +6,7 @@
  */
 
 const variationCache = new Map();
+const variationRequestCache = new Map();
 
 export function getCachedVariations(parentId) {
   return variationCache.get(String(parentId)) || null;
@@ -17,6 +18,36 @@ export function setCachedVariations(parentId, variations = []) {
 
 export function hasCachedVariations(parentId) {
   return variationCache.has(String(parentId));
+}
+
+export async function fetchCachedVariations(parentId, fetchFn) {
+  const key = String(parentId);
+
+  if (variationCache.has(key)) {
+    return variationCache.get(key) || [];
+  }
+
+  if (variationRequestCache.has(key)) {
+    return variationRequestCache.get(key);
+  }
+
+  const request = Promise.resolve()
+    .then(() => fetchFn(parentId))
+    .then((vars) => {
+      const normalized = Array.isArray(vars) ? vars : [];
+      variationCache.set(key, normalized);
+      return normalized;
+    })
+    .catch(() => {
+      variationCache.set(key, []);
+      return [];
+    })
+    .finally(() => {
+      variationRequestCache.delete(key);
+    });
+
+  variationRequestCache.set(key, request);
+  return request;
 }
 
 export async function fetchVariationsBatched(ids, fetchFn, concurrency = 5) {
@@ -33,9 +64,7 @@ export async function fetchVariationsBatched(ids, fetchFn, concurrency = 5) {
     const batch = idsToFetch.slice(i, i + concurrency);
     const batchResults = await Promise.all(
       batch.map((id) =>
-        fetchFn(id)
-          .then((vars) => [id, Array.isArray(vars) ? vars : []])
-          .catch(() => [id, []])
+        fetchCachedVariations(id, fetchFn).then((vars) => [id, vars])
       )
     );
     fetched.push(...batchResults);

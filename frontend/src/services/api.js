@@ -522,12 +522,16 @@ export const searchProducts = (searchTerm) =>
  */
 export const getProductVariations = (parentId) =>
   apiClient(`/wp-json/drywall/v1/products/${encodeURIComponent(parentId)}/variations?${new URLSearchParams({ per_page: 100 }).toString()}`)
-  .then((list) => list.map(normalizeProduct))
+    .then((list) => list.map(normalizeProduct))
     .catch(async (err) => {
       console.warn(`Failed to fetch variations for parent ${parentId}:`, err?.message || err);
+      const status = Number(err?.status || 0);
       const byParent = await fetchVariationsByParentList(parentId);
       if (byParent.length > 0) {
         return byParent;
+      }
+      if (status >= 500 || status === 429 || status === 401 || status === 403 || status === 0) {
+        return [];
       }
       return fetchVariationsByIds(parentId);
     });

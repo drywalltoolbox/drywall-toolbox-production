@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { getProducts } from '../services/catalog';
+import { getProductVariations } from '../services/api';
 import { ShoppingCart, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import Toast from './Toast';
@@ -8,9 +9,11 @@ import ProductDetail from './ProductDetail';
 import ProductModal from './ProductModal';
 import LoadingSpinner from './LoadingSpinner';
 import ProductCardImage from './ProductCardImage';
+import { fetchVariationsBatched } from '../utils/variationSelection';
 
 export default function TrendingProducts() {
   const [products, setProducts] = useState([]);
+  const [variationMap, setVariationMap] = useState({});
   const [loading, setLoading] = useState(true);
   const [toast, setToast] = useState(null);
   const [modalProduct, setModalProduct] = useState(null);
@@ -140,6 +143,30 @@ export default function TrendingProducts() {
     return () => { mounted = false; };
   }, []);
 
+  const trendingVariableIdsKey = products
+    .filter((product) => product.is_variable && product.id)
+    .map((product) => String(product.id))
+    .join(',');
+
+  useEffect(() => {
+    const variableIds = products
+      .filter((product) => product.is_variable && product.id && !variationMap[product.id])
+      .map((product) => product.id);
+    if (variableIds.length === 0) return;
+
+    let mounted = true;
+    fetchVariationsBatched(variableIds, getProductVariations).then((pairs) => {
+      if (!mounted) return;
+      const next = {};
+      pairs.forEach(([id, vars]) => {
+        next[id] = vars;
+      });
+      setVariationMap((prev) => ({ ...prev, ...next }));
+    });
+
+    return () => { mounted = false; };
+  }, [trendingVariableIdsKey]); // eslint-disable-line react-hooks/exhaustive-deps
+
   const scroll = (direction) => {
     if (scrollContainerRef.current) {
       const scrollAmount = 320; // card width + gap
@@ -257,7 +284,12 @@ export default function TrendingProducts() {
       {/* Product detail modal */}
       <ProductModal isOpen={isModalOpen && !!modalProduct} product={modalProduct} onClose={closeModal}>
         {modalProduct && (
-          <ProductDetail product={modalProduct} onAddToCart={handleAddToCart} onClose={closeModal} />
+          <ProductDetail
+            product={modalProduct}
+            onAddToCart={handleAddToCart}
+            onClose={closeModal}
+            initialVariations={variationMap[modalProduct.id] || []}
+          />
         )}
       </ProductModal>
     </section>

@@ -157,6 +157,9 @@ export default function Products() {
   };
 
   // close on escape
+  // Depend on the current page's variable-product ID set instead of the
+  // freshly sliced pageProducts array to avoid duplicate fetch bursts.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     const onKey = (e) => { if (e.key === 'Escape') closeModal(); };
     window.addEventListener('keydown', onKey);
@@ -355,6 +358,10 @@ export default function Products() {
   const safePage     = Math.min(currentPage, totalPages);
   const pageStart    = (safePage - 1) * ITEMS_PER_PAGE;
   const pageProducts = sortedProducts.slice(pageStart, pageStart + ITEMS_PER_PAGE);
+  const pageVariableIdsKey = pageProducts
+    .filter((p) => p.is_variable && p.id)
+    .map((p) => String(p.id))
+    .join(',');
 
   useEffect(() => {
     cardVariationMapRef.current = cardVariationMap;
@@ -396,7 +403,7 @@ export default function Products() {
     });
 
     return () => { mounted = false; };
-  }, [pageProducts]);
+  }, [pageVariableIdsKey]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const getCardDisplayProduct = useCallback((product) => {
     if (!product?.is_variable) return product;
