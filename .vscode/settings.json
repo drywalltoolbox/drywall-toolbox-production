@@ -58,14 +58,6 @@
         "/^sort\\b.*-(o|S)\\b/": false,
         "tree": true,
         "/^tree\\b.*-o\\b/": false,
-        "/\\(.+\\)/s": {
-            "approve": false,
-            "matchCommandLine": true
-        },
-        "/\\{.+\\}/s": {
-            "approve": false,
-            "matchCommandLine": true
-        },
         "/`.+`/s": {
             "approve": false,
             "matchCommandLine": true
@@ -91,6 +83,28 @@
         "Invoke-WebRequest": true,
         "irm": false,
         "iwr": false,
+        "python -c": true,
+        "python -m": true,
+        "python3 -c": true,
+        "python3 -m": true,
+        "py -c": true,
+        "py -m": true,
+        "/^python(?:3)?(?:\\.exe)?\\s+(-c|-m)\\b/": true,
+        "/^py(?:\\.exe)?\\s+(-c|-m)\\b/": true,
+        "cmd.exe": true,
+        "/^cmd(?:\\.exe)?\\s+\\/c\\b/": true,
+        "/\\bpython(?:3(?:\\.\\d+)?)?(?:\\.exe)?\\b.*\\b(-c|-m)\\b/": true,
+        "/\\bpy(?:\\.exe)?\\b.*\\b(-c|-m)\\b/": true,
+    "/\\bpython(?:3(?:\\.\\d+)?)?(?:\\.exe)?\\b/": true,
+    "/\\bpy(?:\\.exe)?\\b/": true,
+    "/^.*\\bpython(?:3(?:\\.\\d+)?)?(?:\\.exe)?\\b.*\\b(-c|-m)\\b/": true,
+    "/^.*\\bpy(?:\\.exe)?\\b.*\\b(-c|-m)\\b/": true,
+    "/^.*\\b(?:pwsh|powershell|cmd(?:\\.exe)?)\\b.*\\bpython(?:3(?:\\.\\d+)?)?(?:\\.exe)?\\b.*\\b(-c|-m)\\b/": true,
+    "/^.*\\b(?:pwsh|powershell|cmd(?:\\.exe)?)\\b.*\\bpy(?:\\.exe)?\\b.*\\b(-c|-m)\\b/": true,
+    "pwsh": true,
+    "powershell": true,
+    "/^(pwsh|powershell)(?:\\.exe)?\\b/": true,
+    "/^(pwsh|powershell)(?:\\.exe)?\\s+(-NoProfile|-Command|/c)\\b/": true,
         "chmod": false,
         "chown": false,
         "Set-ItemProperty": false,
