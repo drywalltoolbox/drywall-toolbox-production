@@ -117,6 +117,27 @@ COLUMBIA_VARIATION_CATEGORY_OVERRIDES = {
     "PHMP": category_path("Columbia Taping Tools", "Predator Family", "Mud Pump"),
 }
 
+TAPETECH_PARTS_FALLBACK_CATEGORY = category_path("TapeTech", "Replacement Parts")
+COLUMBIA_PARTS_FALLBACK_CATEGORY = category_path("Columbia Taping Tools", "Repair Kits & Parts")
+
+
+def fallback_parts_category(row: dict[str, str]) -> str | None:
+    brand = (row.get("Brands") or "").strip()
+    category = (row.get("Categories") or "").strip()
+    name = (row.get("Name") or "").strip().lower()
+    row_type = (row.get("Type") or "").strip().lower()
+
+    if row_type != "simple":
+        return None
+
+    if brand == "TapeTech" and not category:
+        return TAPETECH_PARTS_FALLBACK_CATEGORY
+
+    if brand == "Columbia Taping Tools" and not category:
+        return COLUMBIA_PARTS_FALLBACK_CATEGORY
+
+    return None
+
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
@@ -269,6 +290,12 @@ def repair_rows(rows: list[dict[str, str]], image_files: list[str], base_url: st
         if canonical_category and (row.get("Categories") or "").strip() != canonical_category:
             row["Categories"] = canonical_category
             counts["category_rows_aligned"] += 1
+            continue
+
+        fallback_category = fallback_parts_category(row)
+        if fallback_category and (row.get("Categories") or "").strip() != fallback_category:
+            row["Categories"] = fallback_category
+            counts["parts_fallback_categories_assigned"] += 1
 
     by_parent: dict[str, list[dict[str, str]]] = defaultdict(list)
     for row in rows:
@@ -406,6 +433,7 @@ def print_summary(csv_path: Path, counts: dict[str, int], validation: dict[str, 
         "variation_parents_repaired",
         "attribute_rows_normalized",
         "category_rows_aligned",
+        "parts_fallback_categories_assigned",
         "malformed_image_rows_normalized",
         "image_rows_updated",
     ):
