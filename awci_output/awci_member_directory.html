@@ -54,6 +54,32 @@
     color: var(--muted);
   }
 
+
+  .cover-page {
+    max-width: 1280px;
+    min-height: 72vh;
+    margin: 0 auto 20px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 24px;
+    page-break-after: always;
+    break-after: page;
+  }
+
+  .cover-page h1 {
+    font-size: 44px;
+    line-height: 1.15;
+    color: #0f172a;
+    letter-spacing: 0.2px;
+    margin: 0;
+  }
+
   table {
     width: 100%;
     max-width: 1280px;
@@ -253,6 +279,20 @@
   }
 
   @media print {
+
+    .cover-page {
+      min-height: 100vh;
+      margin: 0;
+      border: 0;
+      box-shadow: none;
+      border-radius: 0;
+      background: #fff;
+    }
+
+    .cover-page h1 {
+      font-size: 42px;
+    }
+
     @page {
       size: Letter portrait;
       margin: 0.45in;
@@ -344,6 +384,9 @@
 </style>
 </head>
 <body>
+<div class="cover-page">
+  <h1>AWCI Member Directory</h1>
+</div>
 <div class="page-header">
   <h1>AWCI Member Directory</h1>
   <p>813 members &mdash; sorted alphabetically by company name within each category</p>
