@@ -19,11 +19,11 @@ DEFAULT_CSV = REPO_ROOT / "reports" / "wp-catalog-new.csv"
 DEFAULT_OUTPUT = REPO_ROOT / "reports" / "catalog-mapping.html"
 
 BRAND_COLORS = {
-    "Asgard": "#8f3b29",
-    "Columbia Taping Tools": "#145b7d",
-    "Dura-Stilts": "#7c4d16",
-    "Graco": "#0d5e54",
-    "TapeTech": "#203e8a",
+    "Asgard": "#111111",
+    "Columbia Taping Tools": "#111111",
+    "Dura-Stilts": "#111111",
+    "Graco": "#111111",
+    "TapeTech": "#111111",
 }
 
 
@@ -375,28 +375,22 @@ def render_overview(brands: dict[str, dict[str, object]], stats: dict[str, int],
     brand_links = []
     for brand, info in sorted(brands.items()):
         brand_slug = slugify(brand)
-        color = BRAND_COLORS.get(brand, "#355c7d")
         brand_stats = info["stats"]
         brand_links.append(
-            f'<a class="brand-chip" href="#{escape(brand_slug)}" style="--brand-color: {escape(color)}">'
+            f'<a class="brand-chip" href="#{escape(brand_slug)}">'
             f"<strong>{escape(brand)}</strong>"
             f"<span>{brand_stats['rows']} rows</span>"
             "</a>"
         )
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M")
     return (
-        '<section class="hero">'
-        '<div class="hero-copy">'
-        '<span class="hero-kicker">Catalog mapping report</span>'
-        '<h1>Brand, category, and variable-family view of the entire product catalog</h1>'
-        '<p>This report is generated directly from the current WooCommerce import CSV and is organized to make brand structure, taxonomy, and variable-to-variation relationships easy to audit.</p>'
-        '<div class="source-strip">'
-        f"<span>Source CSV: <code>{escape(str(csv_path.relative_to(REPO_ROOT)))}</code></span>"
+        '<section class="overview-strip">'
+        '<div class="overview-meta">'
+        f"<span>Source: <code>{escape(str(csv_path.relative_to(REPO_ROOT)))}</code></span>"
         f"<span>Generated: <code>{escape(timestamp)}</code></span>"
         "</div>"
-        "</div>"
-        f'<div class="hero-stats">{cards}</div>'
-        f'<div class="brand-rail">{"".join(brand_links)}</div>'
+        f'<div class="overview-stats">{cards}</div>'
+        f'<nav class="brand-rail">{"".join(brand_links)}</nav>'
         "</section>"
     )
 
@@ -416,18 +410,18 @@ def render_page(brands: dict[str, dict[str, object]], stats: dict[str, int], csv
   <title>Catalog Mapping Report</title>
   <style>
     :root {{
-      --bg: #edf1f5;
-      --paper: rgba(255, 255, 255, 0.92);
+      --bg: #f4f6f8;
+      --paper: rgba(255, 255, 255, 0.96);
       --ink: #14202b;
       --muted: #5f6f7f;
       --line: rgba(20, 32, 43, 0.10);
       --line-strong: rgba(20, 32, 43, 0.16);
-      --shadow: 0 18px 48px rgba(17, 27, 38, 0.08);
-      --accent: #1f5f8b;
-      --accent-soft: rgba(31, 95, 139, 0.10);
+      --shadow: 0 14px 34px rgba(17, 27, 38, 0.06);
+      --accent: #111111;
+      --accent-soft: rgba(17, 17, 17, 0.06);
       --simple: #445566;
-      --variable: #8b5e1a;
-      --variation: #1f5f8b;
+      --variable: #4f5f6d;
+      --variation: #243645;
       --rose: #8d3149;
       --stone: #6d665d;
     }}
@@ -437,15 +431,13 @@ def render_page(brands: dict[str, dict[str, object]], stats: dict[str, int], csv
       margin: 0;
       color: var(--ink);
       font-family: "Aptos", "Segoe UI Variable Text", "Trebuchet MS", sans-serif;
-      background:
-        radial-gradient(circle at top left, rgba(31, 95, 139, 0.08), transparent 30%),
-        linear-gradient(180deg, #f7f9fb 0%, #edf1f5 55%, #e7edf2 100%);
+      background: linear-gradient(180deg, #f8fafb 0%, #f1f4f7 100%);
       line-height: 1.45;
     }}
     .page {{
-      width: min(1440px, calc(100vw - 32px));
+      width: min(1380px, calc(100vw - 28px));
       margin: 0 auto;
-      padding: 28px 0 80px;
+      padding: 18px 0 56px;
       position: relative;
       z-index: 1;
     }}
@@ -455,15 +447,15 @@ def render_page(brands: dict[str, dict[str, object]], stats: dict[str, int], csv
       z-index: 20;
       display: flex;
       flex-wrap: wrap;
-      gap: 12px;
+      gap: 10px;
       align-items: center;
       justify-content: space-between;
-      padding: 12px 16px;
-      margin-bottom: 20px;
+      padding: 10px 14px;
+      margin-bottom: 14px;
       background: rgba(255, 255, 255, 0.82);
       backdrop-filter: blur(16px);
       border: 1px solid var(--line);
-      border-radius: 16px;
+      border-radius: 14px;
       box-shadow: var(--shadow);
     }}
     .toolbar-controls {{
@@ -473,88 +465,81 @@ def render_page(brands: dict[str, dict[str, object]], stats: dict[str, int], csv
       align-items: center;
     }}
     .search-input {{
-      min-width: min(440px, 100%);
-      padding: 12px 14px;
+      min-width: min(360px, 100%);
+      padding: 10px 12px;
       border: 1px solid var(--line-strong);
       border-radius: 10px;
       background: rgba(250, 252, 253, 0.98);
       color: var(--ink);
       font: inherit;
+      font-size: 0.92rem;
     }}
     .toolbar button {{
       border: 0;
-      border-radius: 10px;
-      padding: 10px 14px;
+      border-radius: 9px;
+      padding: 9px 12px;
       background: #f2f6fa;
       border: 1px solid var(--line);
       color: var(--accent);
       font: inherit;
+      font-size: 0.88rem;
       font-weight: 700;
       cursor: pointer;
     }}
     .toolbar .toolbar-note {{
       color: var(--muted);
-      font-size: 0.93rem;
+      font-size: 0.84rem;
     }}
-    .hero {{
+    .overview-strip {{
       display: grid;
-      gap: 22px;
-      margin-bottom: 24px;
-      padding: 28px;
+      gap: 12px;
+      margin-bottom: 16px;
+      padding: 14px 16px;
       border: 1px solid var(--line);
-      border-radius: 24px;
-      background: linear-gradient(180deg, rgba(255,255,255,0.96), rgba(248,250,252,0.92));
+      border-radius: 16px;
+      background: rgba(255,255,255,0.90);
       box-shadow: var(--shadow);
     }}
-    .hero-kicker, .brand-kicker {{
-      display: inline-block;
-      font-size: 0.76rem;
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
-      color: var(--accent);
-      font-weight: 800;
-      margin-bottom: 10px;
-    }}
+    .hero-kicker, .brand-kicker {{ display: none; }}
     h1, h2, h3, h4, h5 {{
       margin: 0;
       font-family: "Georgia", "Iowan Old Style", "Palatino Linotype", serif;
       letter-spacing: -0.02em;
     }}
-    h1 {{ font-size: clamp(2.1rem, 5vw, 4rem); max-width: 18ch; }}
-    h2 {{ font-size: clamp(1.8rem, 3vw, 2.8rem); }}
-    h3 {{ font-size: 1.35rem; }}
-    h4 {{ font-size: 1.05rem; }}
-    h5 {{ font-size: 1rem; }}
+    h1 {{ font-size: 1.8rem; max-width: 18ch; }}
+    h2 {{ font-size: 1.35rem; }}
+    h3 {{ font-size: 1rem; }}
+    h4 {{ font-size: 0.92rem; }}
+    h5 {{ font-size: 0.92rem; }}
     p {{ margin: 0; color: var(--muted); max-width: 72ch; }}
-    .source-strip {{
+    .overview-meta {{
       display: flex;
       flex-wrap: wrap;
-      gap: 16px;
-      margin-top: 14px;
-      color: var(--muted);
-      font-size: 0.92rem;
-    }}
-    .hero-stats, .brand-stats {{
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
       gap: 12px;
+      color: var(--muted);
+      font-size: 0.82rem;
+    }}
+    .overview-stats, .brand-stats {{
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap: 10px;
     }}
     .stat-card {{
-      padding: 14px 16px;
-      border-radius: 16px;
+      padding: 10px 12px;
+      border-radius: 12px;
       background: rgba(248, 251, 253, 0.88);
       border: 1px solid var(--line);
     }}
     .stat-label {{
       color: var(--muted);
-      font-size: 0.82rem;
+      font-size: 0.72rem;
       text-transform: uppercase;
       letter-spacing: 0.08em;
       font-weight: 700;
     }}
     .stat-value {{
-      margin-top: 8px;
-      font-size: 1.8rem;
+      margin-top: 4px;
+      font-size: 1.2rem;
       font-weight: 800;
       color: var(--ink);
     }}
@@ -572,41 +557,40 @@ def render_page(brands: dict[str, dict[str, object]], stats: dict[str, int], csv
       display: inline-flex;
       flex-direction: column;
       gap: 2px;
-      min-width: 168px;
-      padding: 12px 14px;
-      border-radius: 14px;
-      background: linear-gradient(180deg, rgba(255,255,255,0.95), color-mix(in srgb, white 92%, var(--brand-color, #355c7d) 8%));
-      border: 1px solid color-mix(in srgb, white 45%, var(--brand-color, #355c7d) 55%);
+      min-width: 140px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      background: #fbfcfd;
+      border: 1px solid var(--line);
       color: var(--ink);
       text-decoration: none;
-      box-shadow: inset 0 1px 0 rgba(255,255,255,0.5);
     }}
     .brand-chip span {{
       color: var(--muted);
-      font-size: 0.9rem;
+      font-size: 0.8rem;
     }}
     .brand-section {{
-      margin-top: 28px;
-      padding: 22px;
-      border-radius: 24px;
+      margin-top: 16px;
+      padding: 16px;
+      border-radius: 18px;
       background: rgba(255, 255, 255, 0.76);
       border: 1px solid var(--line);
       box-shadow: var(--shadow);
     }}
     .brand-banner {{
       display: grid;
-      gap: 18px;
-      margin-bottom: 18px;
+      gap: 12px;
+      margin-bottom: 12px;
     }}
     .brand-intro {{
-      padding-bottom: 12px;
+      padding-bottom: 8px;
       border-bottom: 1px solid rgba(20, 33, 44, 0.10);
     }}
     .brand-section h2 {{
-      color: var(--brand-color);
+      color: #111111;
     }}
     details {{
-      border-radius: 18px;
+      border-radius: 14px;
     }}
     summary {{
       list-style: none;
@@ -614,7 +598,7 @@ def render_page(brands: dict[str, dict[str, object]], stats: dict[str, int], csv
     }}
     summary::-webkit-details-marker {{ display: none; }}
     .category-panel, .subcategory-panel, .family-card {{
-      margin-top: 14px;
+      margin-top: 10px;
       border: 1px solid var(--line);
       background: rgba(255,255,255,0.80);
       overflow: hidden;
@@ -623,18 +607,18 @@ def render_page(brands: dict[str, dict[str, object]], stats: dict[str, int], csv
       display: flex;
       justify-content: space-between;
       align-items: center;
-      gap: 14px;
-      padding: 15px 18px;
+      gap: 12px;
+      padding: 12px 14px;
     }}
     .category-summary {{
-      border-left: 4px solid var(--brand-color);
-      background: linear-gradient(90deg, color-mix(in srgb, white 94%, var(--brand-color) 6%), rgba(255,255,255,0.92));
+      border-left: 3px solid #111111;
+      background: #fbfcfd;
     }}
     .subcategory-summary {{
-      background: rgba(247, 250, 252, 0.96);
+      background: #fcfdfe;
     }}
     .family-summary {{
-      background: linear-gradient(90deg, rgba(255,255,255,0.98), rgba(246,249,251,0.96));
+      background: #ffffff;
     }}
     .summary-badges {{
       display: flex;
@@ -643,20 +627,20 @@ def render_page(brands: dict[str, dict[str, object]], stats: dict[str, int], csv
       justify-content: flex-end;
     }}
     .category-body, .subcategory-body, .family-body {{
-      padding: 0 14px 14px;
+      padding: 0 10px 10px;
     }}
     .sub-path, .family-path {{
-      margin-top: 4px;
+      margin-top: 2px;
       color: var(--muted);
-      font-size: 0.92rem;
+      font-size: 0.78rem;
     }}
     .badge {{
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      padding: 6px 10px;
+      padding: 5px 8px;
       border-radius: 999px;
-      font-size: 0.78rem;
+      font-size: 0.7rem;
       font-weight: 800;
       letter-spacing: 0.02em;
       white-space: nowrap;
@@ -670,32 +654,32 @@ def render_page(brands: dict[str, dict[str, object]], stats: dict[str, int], csv
       display: flex;
       flex-wrap: wrap;
       gap: 8px;
-      margin-top: 8px;
+      margin-top: 6px;
       align-items: center;
     }}
     code {{
       font-family: "IBM Plex Mono", "Consolas", monospace;
       font-size: 0.9em;
       background: rgba(20, 32, 43, 0.05);
-      padding: 2px 6px;
-      border-radius: 8px;
+      padding: 2px 5px;
+      border-radius: 6px;
     }}
     .family-grid {{
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-      gap: 10px;
-      margin-bottom: 12px;
+      gap: 8px;
+      margin-bottom: 10px;
     }}
     .family-grid > div {{
-      padding: 12px 14px;
-      border-radius: 14px;
+      padding: 10px 12px;
+      border-radius: 10px;
       border: 1px solid var(--line);
       background: rgba(248,251,253,0.9);
     }}
     .meta-label {{
       display: block;
-      margin-bottom: 6px;
-      font-size: 0.78rem;
+      margin-bottom: 4px;
+      font-size: 0.7rem;
       color: var(--muted);
       text-transform: uppercase;
       letter-spacing: 0.06em;
@@ -709,19 +693,20 @@ def render_page(brands: dict[str, dict[str, object]], stats: dict[str, int], csv
     .table-shell {{
       overflow: auto;
       border: 1px solid var(--line);
-      border-radius: 14px;
+      border-radius: 12px;
       background: rgba(255,255,255,0.90);
     }}
     table {{
       width: 100%;
       border-collapse: collapse;
-      min-width: 760px;
+      min-width: 680px;
     }}
     th, td {{
-      padding: 11px 12px;
+      padding: 9px 10px;
       text-align: left;
       vertical-align: top;
       border-bottom: 1px solid rgba(20, 33, 44, 0.08);
+      font-size: 0.84rem;
     }}
     th {{
       position: sticky;
@@ -729,7 +714,7 @@ def render_page(brands: dict[str, dict[str, object]], stats: dict[str, int], csv
       z-index: 1;
       background: rgba(245, 249, 252, 0.98);
       color: var(--ink);
-      font-size: 0.82rem;
+      font-size: 0.72rem;
       text-transform: uppercase;
       letter-spacing: 0.06em;
     }}
@@ -741,8 +726,8 @@ def render_page(brands: dict[str, dict[str, object]], stats: dict[str, int], csv
     }}
     .empty-state {{
       margin-top: 14px;
-      padding: 20px;
-      border-radius: 18px;
+      padding: 18px;
+      border-radius: 14px;
       border: 1px dashed rgba(20, 33, 44, 0.18);
       color: var(--muted);
       background: rgba(255,255,255,0.55);
@@ -750,7 +735,7 @@ def render_page(brands: dict[str, dict[str, object]], stats: dict[str, int], csv
     }}
     [hidden] {{ display: none !important; }}
     @media (max-width: 920px) {{
-      .page {{ width: min(100vw - 18px, 1480px); padding-top: 16px; }}
+      .page {{ width: min(100vw - 14px, 1480px); padding-top: 12px; }}
       .toolbar {{ top: 8px; padding: 12px; }}
       .search-input {{ min-width: 0; width: 100%; }}
       .category-summary, .subcategory-summary, .family-summary {{
@@ -758,7 +743,7 @@ def render_page(brands: dict[str, dict[str, object]], stats: dict[str, int], csv
         align-items: flex-start;
       }}
       .summary-badges {{ justify-content: flex-start; }}
-      table {{ min-width: 640px; }}
+      table {{ min-width: 560px; }}
     }}
   </style>
 </head>
