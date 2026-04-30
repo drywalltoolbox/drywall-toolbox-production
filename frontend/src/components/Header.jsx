@@ -4,6 +4,7 @@ import { useCart } from '../context/CartContext';
 import { useAuthContext } from '../auth/AuthContext.js';
 import { ShoppingCart, Menu, X, ChevronDown, User, LogIn, UserPlus, LogOut, Search, Truck, Phone, Shield, Wrench } from 'lucide-react';
 import Logo from '/logo.svg';
+import LogoWhite from '/logo-white.svg';
 import MobileSearch from './MobileSearch';
 import NotificationsBell from './NotificationsBell';
 import ShippingTicker from './ShippingTicker';
@@ -192,7 +193,7 @@ export default function Header({ onCartToggle }) {
           {/* Logo — Left */}
           <div className="header-left">
             <Link to="/" style={{ display: 'flex', alignItems: 'center' }}>
-              <img src={Logo} alt="Drywall Toolbox Logo" className="logo-image" />
+              <img src={LogoWhite} alt="Drywall Toolbox Logo" className="logo-image" />
             </Link>
           </div>
 

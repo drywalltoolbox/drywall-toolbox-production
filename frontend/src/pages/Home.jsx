@@ -3,11 +3,9 @@ import { Link } from 'react-router-dom';
 import TrendingProducts from '../components/TrendingProducts';
 import tapeTechLogo from '/brands/TapeTech/tapetech_logo.svg';
 import columbiaLogo from '/brands/Columbia/columbia_taping_tools_logo.svg';
-import columbiaLogoWhite from '/brands/Columbia/columbia_logo_white.svg';
 import surproLogo from '/brands/SurPro/surpro_logo.svg';
 import asgardLogo from '/brands/Asgard/asgard_logo.svg';
 import platinumLogo from '/brands/Platinum/platinum_logo.svg';
-import platinumLogoWhite from '/brands/Platinum/platinum_logo_white.svg';
 import level5Logo from '/brands/Level5/Level5.svg';
 import SEOHead from '../components/SEOHead';
 import { buildOrganizationSchema, buildSiteLinksSearchBoxSchema } from '../utils/schema';
@@ -52,12 +50,11 @@ const brandLogos = [
   { name: 'SurPro', src: surproLogo },
 ];
 
-// Desktop hero brands - Columbia + Platinum use white logos for better contrast on dark background
 const desktopHeroBrands = [
   { name: 'TapeTech', src: tapeTechLogo },
-  { name: 'Columbia', src: columbiaLogoWhite },
+  { name: 'Columbia', src: columbiaLogo },
   { name: 'Level5', src: level5Logo },
-  { name: 'Platinum Drywall Tools', src: platinumLogoWhite },
+  { name: 'Platinum Drywall Tools', src: platinumLogo },
   { name: 'Asgard', src: asgardLogo },
   { name: 'SurPro', src: surproLogo },
 ];
