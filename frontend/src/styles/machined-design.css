@@ -491,7 +491,7 @@ aside input[type="range"],
 .site-footer .footer-logo {
     max-width: none !important;
     width: auto !important;
-    height: auto;
+    height: clamp(56px, 5.5vw, 66px) !important;
     image-rendering: -webkit-optimize-contrast;
     image-rendering: crisp-edges;
     shape-rendering: geometricPrecision;
@@ -570,9 +570,9 @@ aside input[type="range"],
     }
 
     .site-footer img.footer-logo {
-        max-width: 140px;
+        max-width: 118px;
         width: 80%;
-        height: auto;
+        height: auto !important;
     }
 
     .site-footer input.machined-input {
@@ -2939,16 +2939,22 @@ aside input[type="range"],
     .site-footer .footer-col {
         align-items: flex-start !important;
         text-align: left !important;
+        gap: 8px !important;
     }
 
     /* Left-align footer lists */
     .site-footer .footer-list-shop,
     .site-footer .footer-list-support {
         align-items: flex-start !important;
+        gap: 8px !important;
+        margin-top: 0 !important;
     }
 
     /* Show column heading h5 on desktop */
-    .site-footer .footer-col h5 { display: block !important; }
+    .site-footer .footer-col h5 {
+        display: block !important;
+        margin: 0 0 8px 0 !important;
+    }
 
     /* Hide the mobile accordion button on desktop */
     .site-footer .footer-header-mobile { display: none !important; }

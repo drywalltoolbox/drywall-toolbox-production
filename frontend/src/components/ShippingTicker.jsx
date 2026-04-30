@@ -68,7 +68,14 @@ export default function ShippingTicker({ items = [], duration = 22, className = 
     </div>
   );
 
-  const wrapperClass = className && className.length > 0 ? 'dtb-mobile-shipping-bar ' + className : 'dtb-mobile-shipping-bar';
+  // Desktop usage passes className="dtb-desktop-shipping-bar".
+  // In that case we must NOT include the mobile class, otherwise the desktop
+  // media query that hides .dtb-mobile-shipping-bar will hide the live ticker.
+  const wrapperClass = className && className.length > 0
+    ? (className.includes('dtb-desktop-shipping-bar')
+      ? className
+      : `dtb-mobile-shipping-bar ${className}`)
+    : 'dtb-mobile-shipping-bar';
 
   return (
     <div className={wrapperClass} aria-label={ariaLabel}>

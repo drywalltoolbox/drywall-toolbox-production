@@ -57,6 +57,39 @@ const SLUG_TO_BRAND = Object.fromEntries(
 
 const ITEMS_PER_PAGE = 24;
 
+// Strict parts taxonomy guard:
+// only include products whose leaf categories are truly parts-oriented.
+const PARTS_LEAF_NAMES = new Set([
+  'parts & accessories',
+  'repair kits & parts',
+  'pumps & parts',
+  'replacement parts',
+  'spare parts',
+]);
+
+const PARTS_SLUG_PREFIXES = [
+  'parts-accessories',
+  'repair-kits-parts',
+  'pumps-parts',
+  'replacement-parts',
+  'spare-parts',
+];
+
+function isStrictPartProduct(product) {
+  if (!product?.is_parts) return false;
+
+  // Fast path when normalized category is already explicitly "parts".
+  if (String(product.category || '').toLowerCase() === 'parts') return true;
+
+  // Fallback: inspect raw WC categories for a true parts leaf/prefix.
+  const categories = Array.isArray(product.categories) ? product.categories : [];
+  return categories.some((cat) => {
+    const name = String(cat?.name || '').toLowerCase().trim();
+    const slug = String(cat?.slug || '').toLowerCase().trim();
+    return PARTS_LEAF_NAMES.has(name) || PARTS_SLUG_PREFIXES.some((prefix) => slug.startsWith(prefix));
+  });
+}
+
 export default function Parts() {
   const location = useLocation();
   const navigate = useNavigate();
@@ -93,7 +126,7 @@ export default function Parts() {
     let mounted = true;
     getProducts().then(list => {
       if (!mounted) return;
-      const parts = list.filter(p => p.is_parts);
+      const parts = list.filter(isStrictPartProduct);
       setAllParts(parts);
       // Always show every PARTS_BRAND in the filter regardless of whether
       // the catalog has parts for it yet (e.g. Platinum has no products yet).
