@@ -9,7 +9,7 @@ import platinumLogo from '/brands/Platinum/platinum_logo.svg';
 import level5Logo from '/brands/Level5/Level5.svg';
 import SEOHead from '../components/SEOHead';
 import { buildOrganizationSchema, buildSiteLinksSearchBoxSchema } from '../utils/schema';
-import { ShoppingBag, Wrench, Layers, FileText, Truck, Shield, Phone, ChevronRight, Star } from 'lucide-react';
+import { ShoppingBag, Wrench, Layers, FileText, Truck, Shield, Phone, ChevronRight } from 'lucide-react';
 
 const trustBadges = [
   {
@@ -122,11 +122,6 @@ export default function Home() {
         <div className="dtb-desktop-hero-inner">
           {/* Left: headline + CTAs + trust stats */}
           <div className="dtb-hero-content">
-            <span className="dtb-hero-eyebrow">
-              <Star size={11} />
-              Professional Grade · Trade Trusted
-            </span>
-
             <h1 className="dtb-hero-title">
               The Pros&apos;<br />
               <span>One-Stop Shop</span><br />

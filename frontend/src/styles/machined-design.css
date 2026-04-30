@@ -2564,7 +2564,7 @@ aside input[type="range"],
         align-items: center;
         position: relative;
         z-index: 1;
-        padding: 32px 0;
+        padding: 24px 0;
     }
 
     /* ── Left: headline + CTAs + stats ── */
@@ -2596,6 +2596,7 @@ aside input[type="range"],
         line-height: 1.05;
         letter-spacing: -0.03em;
         color: #0f172a;
+        margin: 0;
           transform: translate3d(0, 0, 0);
           -webkit-transform: translate3d(0, 0, 0);
           backface-visibility: hidden;
