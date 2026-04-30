@@ -322,10 +322,6 @@ export default function Header({ onCartToggle }) {
 
               <Link to="/schematics" className={`nav-link ${isActive('/schematics') ? 'active' : ''}`} style={{ color: 'var(--color-primary-600)' }}>Schematics</Link>
               <Link to="/calculators" className={`nav-link ${isActive('/calculators') ? 'active' : ''}`} style={{ color: 'var(--color-primary-600)' }}>Calculators</Link>
-
-              {/* Visual separator */}
-              <span style={{ width: '1px', height: '18px', background: 'rgba(15,23,42,0.1)', flexShrink: 0, margin: '0 4px' }} aria-hidden="true" />
-
               <Link to="/repairs" className={`nav-link ${isActive('/repairs') ? 'active' : ''}`} style={{ color: 'var(--color-primary-600)' }}>Repairs</Link>
               <Link to="/faq" className={`nav-link ${isActive('/faq') ? 'active' : ''}`} style={{ color: 'var(--color-primary-600)' }}>FAQ</Link>
               <Link to="/contact" className={`nav-link ${isActive('/contact') ? 'active' : ''}`} style={{ color: 'var(--color-primary-600)' }}>Contact</Link>

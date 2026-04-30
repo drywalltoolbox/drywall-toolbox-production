@@ -2243,6 +2243,28 @@ aside input[type="range"],
 
     .header-center .nav-links { gap: 2px; }
 
+    /* Divider between every desktop nav item */
+    .header-center .nav-links > * {
+        position: relative;
+    }
+
+    .header-center .nav-links > * + * {
+        margin-left: 6px;
+        padding-left: 14px;
+    }
+
+    .header-center .nav-links > * + *::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 1px;
+        height: 18px;
+        background: rgba(255,255,255,0.25);
+        pointer-events: none;
+    }
+
     .header-center .nav-link {
         font-size: 0.88rem;
         padding: 8px 12px;
