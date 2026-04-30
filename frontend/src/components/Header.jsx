@@ -8,6 +8,7 @@ import LogoWhite from '/logo-white.svg';
 import MobileSearch from './MobileSearch';
 import NotificationsBell from './NotificationsBell';
 import ShippingTicker from './ShippingTicker';
+import { searchProducts } from '../services/catalog';
 
 export default function Header({ onCartToggle }) {
   const location = useLocation();
@@ -17,7 +18,14 @@ export default function Header({ onCartToggle }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [shopDropdownOpen, setShopDropdownOpen] = useState(false);
   const [accountDropdownOpen, setAccountDropdownOpen] = useState(false);
+  const [desktopSearchOpen, setDesktopSearchOpen] = useState(false);
+  const [desktopSearchQuery, setDesktopSearchQuery] = useState('');
+  const [desktopSearchResults, setDesktopSearchResults] = useState([]);
+  const [desktopSearchLoading, setDesktopSearchLoading] = useState(false);
   const accountDropdownRef = useRef(null);
+  const desktopSearchRef = useRef(null);
+  const desktopSearchInputRef = useRef(null);
+  const desktopSearchRequestIdRef = useRef(0);
   const [isTablet, setIsTablet] = useState(() => {
     try {
       return typeof window !== 'undefined' && window.matchMedia('(min-width: 641px) and (max-width: 1024px)').matches;
@@ -40,6 +48,7 @@ export default function Header({ onCartToggle }) {
     setShopDropdownOpen(false);
     setMobileMenuOpen(false);
     setAccountDropdownOpen(false);
+    setDesktopSearchOpen(false);
   };
 
   // Handle dropdown close with small delay to prevent flicker
@@ -82,6 +91,7 @@ export default function Header({ onCartToggle }) {
       setShopDropdownOpen(false);
       setMobileMenuOpen(false);
       setAccountDropdownOpen(false);
+      setDesktopSearchOpen(false);
     }, 0);
     return () => clearTimeout(t);
   }, [location.pathname]);
@@ -125,16 +135,70 @@ export default function Header({ onCartToggle }) {
       const header = document.querySelector('.site-header');
       if (header && !header.contains(e.target)) {
         setShopDropdownOpen(false);
+        setDesktopSearchOpen(false);
       }
       // Close account dropdown if clicking outside its container
       if (accountDropdownRef.current && !accountDropdownRef.current.contains(e.target)) {
         setAccountDropdownOpen(false);
+      }
+      if (desktopSearchRef.current && !desktopSearchRef.current.contains(e.target)) {
+        setDesktopSearchOpen(false);
       }
     };
 
     document.addEventListener('click', handleClickOutside);
     return () => document.removeEventListener('click', handleClickOutside);
   }, []);
+
+  useEffect(() => {
+    const query = desktopSearchQuery.trim();
+    const requestId = desktopSearchRequestIdRef.current + 1;
+    desktopSearchRequestIdRef.current = requestId;
+
+    if (!query) {
+      setDesktopSearchResults([]);
+      setDesktopSearchLoading(false);
+      return;
+    }
+
+    const t = setTimeout(async () => {
+      setDesktopSearchLoading(true);
+      try {
+        const found = (await searchProducts(query)).slice(0, 6);
+        if (desktopSearchRequestIdRef.current === requestId) {
+          setDesktopSearchResults(found);
+        }
+      } catch (err) {
+        if (desktopSearchRequestIdRef.current === requestId) {
+          console.error('Desktop search error:', err);
+        }
+      } finally {
+        if (desktopSearchRequestIdRef.current === requestId) {
+          setDesktopSearchLoading(false);
+        }
+      }
+    }, 180);
+
+    return () => clearTimeout(t);
+  }, [desktopSearchQuery]);
+
+  const openDesktopSearch = () => {
+    setDesktopSearchOpen(true);
+    setTimeout(() => desktopSearchInputRef.current?.focus(), 50);
+  };
+
+  const handleDesktopResultClick = (productId) => {
+    navigate(`/product/${productId}`);
+    setDesktopSearchOpen(false);
+    setDesktopSearchQuery('');
+    setDesktopSearchResults([]);
+  };
+
+  const handleDesktopViewAll = () => {
+    const q = desktopSearchQuery.trim();
+    navigate(`/all-products${q ? `?search=${encodeURIComponent(q)}` : ''}`);
+    setDesktopSearchOpen(false);
+  };
 
   return (
     <>
@@ -271,15 +335,65 @@ export default function Header({ onCartToggle }) {
           {/* Actions — Right: Search + Account + Cart */}
           <div className="header-right">
 
-            {/* Search icon */}
-            <button
-              onClick={() => navigate('/all-products')}
-              className="dtb-search-btn header-icon"
-              aria-label="Search products"
-              title="Search products"
-            >
-              <Search size={16} />
-            </button>
+            {/* Desktop search: expandable live-search input */}
+            <div ref={desktopSearchRef} className={`dtb-desktop-search ${desktopSearchOpen ? 'is-open' : ''}`}>
+              <button
+                onClick={() => (desktopSearchOpen ? setDesktopSearchOpen(false) : openDesktopSearch())}
+                className="dtb-search-btn header-icon"
+                aria-label="Search products"
+                title="Search products"
+              >
+                <Search size={16} />
+              </button>
+
+              <div className="dtb-desktop-search-input-wrap">
+                <input
+                  ref={desktopSearchInputRef}
+                  type="text"
+                  value={desktopSearchQuery}
+                  onChange={(e) => setDesktopSearchQuery(e.target.value)}
+                  placeholder="Search products..."
+                  className="dtb-desktop-search-input"
+                />
+              </div>
+
+              {desktopSearchOpen && (
+                <div className="dtb-desktop-search-dropdown">
+                  {desktopSearchLoading ? (
+                    <div className="dtb-desktop-search-state">Loading...</div>
+                  ) : desktopSearchResults.length > 0 ? (
+                    <>
+                      <div className="dtb-desktop-search-results">
+                        {desktopSearchResults.map((product) => (
+                          <button
+                            key={product.id}
+                            className="dtb-desktop-search-item"
+                            onClick={() => handleDesktopResultClick(product.id)}
+                          >
+                            <div className="dtb-desktop-search-thumb">
+                              {product.image ? <img src={product.image} alt={product.name} /> : null}
+                            </div>
+                            <div className="dtb-desktop-search-meta">
+                              <span className="dtb-desktop-search-name">{product.name}</span>
+                              <span className="dtb-desktop-search-price">
+                                {typeof product.price === 'number' ? `$${product.price.toFixed(2)}` : 'View product'}
+                              </span>
+                            </div>
+                          </button>
+                        ))}
+                      </div>
+                      <button className="dtb-desktop-search-view-all" onClick={handleDesktopViewAll}>
+                        View All Results
+                      </button>
+                    </>
+                  ) : desktopSearchQuery.trim() ? (
+                    <div className="dtb-desktop-search-state">No products found</div>
+                  ) : (
+                    <div className="dtb-desktop-search-state">Start typing to search...</div>
+                  )}
+                </div>
+              )}
+            </div>
 
             {/* ── Account icon + dropdown ── */}
             {!isLoading && (
