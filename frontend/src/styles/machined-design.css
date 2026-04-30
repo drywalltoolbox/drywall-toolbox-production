@@ -2230,9 +2230,9 @@ aside input[type="range"],
 
     .logo-image {
         width: auto;
-        height: 82px;
-        max-height: 82px;
-        max-width: 360px;
+        height: clamp(42px, 3vw, 56px);
+        max-height: 56px;
+        max-width: clamp(220px, 20vw, 320px);
     }
 
     /* Nav: all links in center, tighter spacing */

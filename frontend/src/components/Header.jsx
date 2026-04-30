@@ -207,7 +207,7 @@ export default function Header({ onCartToggle }) {
               >
                 <button
                   className={`nav-link flex items-center gap-1 ${isActive('/products') || isActive('/all-products') || isActive('/parts') ? 'active' : ''}`}
-                  style={{ color: isActive('/products') || isActive('/all-products') || isActive('/parts') ? 'var(--color-primary-600)' : 'black', background: 'none', border: 'none', cursor: 'pointer', fontSize: 'inherit' }}
+                  style={{ color: 'var(--color-primary-600)', background: 'none', border: 'none', cursor: 'pointer', fontSize: 'inherit' }}
                 >
                   Shop
                   <ChevronDown size={14} style={{ transition: 'transform 200ms ease-out', transform: shopDropdownOpen ? 'rotate(180deg)' : 'rotate(0deg)' }} />
@@ -255,15 +255,15 @@ export default function Header({ onCartToggle }) {
                 </div>
               </div>
 
-              <Link to="/schematics" className={`nav-link ${isActive('/schematics') ? 'active' : ''}`} style={{ color: isActive('/schematics') ? 'var(--color-primary-600)' : 'black' }}>Schematics</Link>
-              <Link to="/calculators" className={`nav-link ${isActive('/calculators') ? 'active' : ''}`} style={{ color: isActive('/calculators') ? 'var(--color-primary-600)' : 'black' }}>Calculators</Link>
+              <Link to="/schematics" className={`nav-link ${isActive('/schematics') ? 'active' : ''}`} style={{ color: 'var(--color-primary-600)' }}>Schematics</Link>
+              <Link to="/calculators" className={`nav-link ${isActive('/calculators') ? 'active' : ''}`} style={{ color: 'var(--color-primary-600)' }}>Calculators</Link>
 
               {/* Visual separator */}
               <span style={{ width: '1px', height: '18px', background: 'rgba(15,23,42,0.1)', flexShrink: 0, margin: '0 4px' }} aria-hidden="true" />
 
-              <Link to="/repairs" className={`nav-link ${isActive('/repairs') ? 'active' : ''}`} style={{ color: isActive('/repairs') ? 'var(--color-primary-600)' : 'black' }}>Repairs</Link>
-              <Link to="/faq" className={`nav-link ${isActive('/faq') ? 'active' : ''}`} style={{ color: isActive('/faq') ? 'var(--color-primary-600)' : 'black' }}>FAQ</Link>
-              <Link to="/contact" className={`nav-link ${isActive('/contact') ? 'active' : ''}`} style={{ color: isActive('/contact') ? 'var(--color-primary-600)' : 'black' }}>Contact</Link>
+              <Link to="/repairs" className={`nav-link ${isActive('/repairs') ? 'active' : ''}`} style={{ color: 'var(--color-primary-600)' }}>Repairs</Link>
+              <Link to="/faq" className={`nav-link ${isActive('/faq') ? 'active' : ''}`} style={{ color: 'var(--color-primary-600)' }}>FAQ</Link>
+              <Link to="/contact" className={`nav-link ${isActive('/contact') ? 'active' : ''}`} style={{ color: 'var(--color-primary-600)' }}>Contact</Link>
             </nav>
           </div>
 
