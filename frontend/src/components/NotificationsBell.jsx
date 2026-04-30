@@ -148,6 +148,7 @@ export default function NotificationsBell() {
       <button
         ref={ buttonRef }
         type="button"
+        className="notification-bell-btn"
         aria-label={ `Notifications${ unreadCount > 0 ? ` (${ unreadCount } unread)` : '' }` }
         aria-expanded={ open }
         onClick={ () => setOpen( ( o ) => ! o ) }
@@ -165,10 +166,9 @@ export default function NotificationsBell() {
           padding:    0,
           flexShrink: 0,
           transition: 'background 0.15s',
-          color:      open ? '#0f172a' : '#475569',
         } }
-        onMouseEnter={ ( e ) => { if ( ! open ) e.currentTarget.style.background = '#f1f5f9'; e.currentTarget.style.color = '#0f172a'; } }
-        onMouseLeave={ ( e ) => { if ( ! open ) e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = open ? '#0f172a' : '#475569'; } }
+        onMouseEnter={ ( e ) => { if ( ! open ) e.currentTarget.style.background = '#f1f5f9'; } }
+        onMouseLeave={ ( e ) => { if ( ! open ) e.currentTarget.style.background = 'transparent'; } }
       >
         <Bell size={ 18 } />
 

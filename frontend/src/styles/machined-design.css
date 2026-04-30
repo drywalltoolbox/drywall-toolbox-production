@@ -2338,6 +2338,14 @@ aside input[type="range"],
         opacity: 0.6;
     }
 
+    .notification-bell-btn {
+        color: rgba(255,255,255,0.92) !important;
+    }
+
+    .notification-bell-btn:hover {
+        background: rgba(255,255,255,0.12) !important;
+    }
+
     .header-center nav > span[aria-hidden="true"] {
         background: rgba(255,255,255,0.25) !important;
     }

@@ -306,7 +306,7 @@ export default function Header({ onCartToggle }) {
                   onMouseEnter={(e) => { e.currentTarget.style.opacity = '0.6'; }}
                   onMouseLeave={(e) => { e.currentTarget.style.opacity = '1'; }}
                 >
-                  <User size={20} style={{ color: '#0f172a' }} />
+                  <User size={20} style={{ color: 'rgba(255,255,255,0.92)' }} />
                 </button>
 
                 <div
