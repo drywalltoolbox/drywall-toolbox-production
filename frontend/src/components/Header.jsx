@@ -2,7 +2,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useCart } from '../context/CartContext';
 import { useAuthContext } from '../auth/AuthContext.js';
-import { ShoppingCart, Menu, X, ChevronDown, User, LogIn, UserPlus, LogOut, Search, Truck, Phone, Shield, Wrench } from 'lucide-react';
+import { ShoppingCart, Menu, X, ChevronDown, User, LogIn, UserPlus, LogOut, Search, Truck, Phone, Wrench } from 'lucide-react';
 import LogoBlack from '/logo-black.svg';
 import LogoWhite from '/logo-white.svg';
 import MobileSearch from './MobileSearch';
@@ -208,11 +208,10 @@ export default function Header({ onCartToggle }) {
         <ShippingTicker
           items={[
             { icon: <Truck size={11} />, text: 'FREE SHIPPING ON ALL ORDERS $50+ (CONTIGUOUS USA ONLY)' },
-            { icon: <Shield size={11} />, text: 'Contiguous USA Only' },
             { icon: <Phone size={11} />, text: 'Expert Support — Real Pros' },
             { icon: <Wrench size={11} />, text: 'Professional Repair Services' },
           ]}
-          duration={22}
+          duration={28}
           className="dtb-mobile-shipping-bar--header"
         />
       )}
@@ -695,7 +694,7 @@ export default function Header({ onCartToggle }) {
     {/* ── Free Shipping Bar — desktop only, positioned above the fixed header ── */}
     <div className="dtb-promo-bar" aria-label="Free shipping announcement">
       <div className="dtb-promo-bar-inner">
-        <span>FREE SHIPPING ON ALL ORDERS $50+ (Contiguous USA Only)</span>
+        <span>FREE SHIPPING ON ALL ORDERS $50+</span>
       </div>
     </div>
     </>

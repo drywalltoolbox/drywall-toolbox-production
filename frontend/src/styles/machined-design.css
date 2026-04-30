@@ -2122,11 +2122,11 @@ aside input[type="range"],
         align-items: center;
         justify-content: flex-start;
         background: #0b1220; /* same dark background as mobile */
-        height: 36px;
+        height: 38px;
         width: 100%;
         flex-shrink: 0;
         overflow: hidden;
-        padding: 0 clamp(1rem, 3vw, 2.5rem);
+        padding: 0 clamp(1.25rem, 3.5vw, 3rem);
     }
 
     .dtb-desktop-shipping-bar .dtb-ticker-track {
@@ -2134,8 +2134,8 @@ aside input[type="range"],
         /* Enable the same smooth continuous scroll used on mobile.
            The keyframes move the track -50% so two repeated sets
            (rendered in JSX) create a seamless loop. */
-        animation: dtb-ticker-scroll 22s linear infinite;
-        -webkit-animation: dtb-ticker-scroll 22s linear infinite;
+        animation: dtb-ticker-scroll var(--dtb-ticker-duration, 28s) linear infinite;
+        -webkit-animation: dtb-ticker-scroll var(--dtb-ticker-duration, 28s) linear infinite;
         animation-play-state: running;
         -webkit-animation-play-state: running;
         will-change: transform;
@@ -2151,15 +2151,15 @@ aside input[type="range"],
     }
 
     .dtb-desktop-shipping-bar .dtb-ticker-item {
-        font-size: 0.585rem;
+        font-size: 0.62rem;
         font-weight: 700;
-        letter-spacing: 0.1em;
+        letter-spacing: 0.095em;
         text-transform: uppercase;
-        padding: 0 1.4rem;
+        padding: 0 2rem;
         color: rgba(255,255,255,0.85);
         display: inline-flex;
         align-items: center;
-        gap: 5px;
+        gap: 7px;
         flex-shrink: 0;
     }
 
@@ -3016,7 +3016,7 @@ aside input[type="range"],
     justify-content: flex-start;
     background: #0b1220;
     color: rgba(255,255,255,0.85);
-    height: 28px;
+    height: 30px;
     overflow: hidden;
     /* Negative margin cancels the page-wrapper padding so bar sits flush */
     margin-left: calc(-1 * var(--page-h-pad, 0px));
@@ -3036,8 +3036,8 @@ aside input[type="range"],
 /* Only run animation when the JS component has measured and set variables */
 .dtb-ticker-track.dtb-ticker--ready {
     /* use CSS variable for duration with fallback */
-    animation: dtb-ticker-scroll var(--dtb-ticker-duration, 22s) linear infinite;
-    -webkit-animation: dtb-ticker-scroll var(--dtb-ticker-duration, 22s) linear infinite;
+    animation: dtb-ticker-scroll var(--dtb-ticker-duration, 28s) linear infinite;
+    -webkit-animation: dtb-ticker-scroll var(--dtb-ticker-duration, 28s) linear infinite;
     animation-play-state: running;
     -webkit-animation-play-state: running;
 }
@@ -3062,12 +3062,12 @@ aside input[type="range"],
 .dtb-ticker-item {
     display: inline-flex;
     align-items: center;
-    gap: 5px;
-    font-size: 0.585rem;
+    gap: 6px;
+    font-size: 0.6rem;
     font-weight: 700;
-    letter-spacing: 0.1em;
+    letter-spacing: 0.095em;
     text-transform: uppercase;
-    padding: 0 1.4rem;
+    padding: 0 1.7rem;
     flex-shrink: 0;
 }
 
@@ -3081,7 +3081,7 @@ aside input[type="range"],
     font-size: 0.75rem;
     font-weight: 400;
     flex-shrink: 0;
-    /* No extra padding — items already have side padding */
+    padding: 0 0.45rem;
 }
 
 .dtb-mobile-shipping-bar svg {
@@ -3103,8 +3103,8 @@ aside input[type="range"],
 .site-header .dtb-mobile-shipping-bar--header .dtb-ticker-track {
     display: inline-flex;
     width: max-content;
-    animation: dtb-ticker-scroll 22s linear infinite;
-    -webkit-animation: dtb-ticker-scroll 22s linear infinite;
+    animation: dtb-ticker-scroll var(--dtb-ticker-duration, 28s) linear infinite;
+    -webkit-animation: dtb-ticker-scroll var(--dtb-ticker-duration, 28s) linear infinite;
     animation-play-state: running;
     -webkit-animation-play-state: running;
     will-change: transform;
