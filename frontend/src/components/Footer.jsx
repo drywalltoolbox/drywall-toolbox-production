@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import { useState } from 'react';
 import { Instagram, Facebook, Twitter, ChevronDown, Mail, Phone, MapPin, Clock } from 'lucide-react';
-import Logo from '/logo.svg';
+import LogoBlack from '/logo-black.svg';
 
 export default function Footer() {
   const [expandedMobile, setExpandedMobile] = useState(null);
@@ -31,7 +31,7 @@ export default function Footer() {
         {/* Brand column */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', alignItems: 'center', width: '100%' }}>
           <Link to="/" style={{ display: 'inline-block' }}>
-            <img src={Logo} alt="Drywall Toolbox" className="footer-logo" style={{ height: '64px', width: 'auto', display: 'block' }} />
+            <img src={LogoBlack} alt="Drywall Toolbox" className="footer-logo" style={{ height: '64px', width: 'auto', display: 'block' }} />
           </Link>
           <div style={{ display: 'flex', gap: '6px', marginTop: '0px', justifyContent: 'center', alignItems: 'center', width: '100%' }}>
             <a

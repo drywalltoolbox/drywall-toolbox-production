@@ -3,7 +3,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useCart } from '../context/CartContext';
 import { useAuthContext } from '../auth/AuthContext.js';
 import { ShoppingCart, Menu, X, ChevronDown, User, LogIn, UserPlus, LogOut, Search, Truck, Phone, Shield, Wrench } from 'lucide-react';
-import Logo from '/logo.svg';
+import LogoBlack from '/logo-black.svg';
 import LogoWhite from '/logo-white.svg';
 import MobileSearch from './MobileSearch';
 import NotificationsBell from './NotificationsBell';
@@ -232,7 +232,7 @@ export default function Header({ onCartToggle }) {
 
           {/* Centered Logo */}
           <Link to="/" className="flex items-center justify-center flex-1" onClick={closeMobileMenu}>
-            <img src={Logo} alt="Drywall Toolbox Logo" className="logo-image-mobile" />
+            <img src={LogoBlack} alt="Drywall Toolbox Logo" className="logo-image-mobile" />
           </Link>
 
           {/* Right slot — fixed width matching left slot */}
