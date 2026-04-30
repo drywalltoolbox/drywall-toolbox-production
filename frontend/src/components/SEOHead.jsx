@@ -20,7 +20,7 @@ import { Helmet } from 'react-helmet-async';
 
 const SITE_NAME      = 'Drywall Toolbox';
 const SITE_URL       = 'https://drywalltoolbox.com';
-const DEFAULT_OG_IMG = `${SITE_URL}/logo-white.svg`;
+const DEFAULT_OG_IMG = `${SITE_URL}/logo.svg`;
 const MAX_DESC_LEN   = 160;
 
 export default function SEOHead({

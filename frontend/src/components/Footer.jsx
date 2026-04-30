@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import { useState } from 'react';
 import { Instagram, Facebook, Twitter, ChevronDown, Mail, Phone, MapPin, Clock } from 'lucide-react';
-import Logo from '/logo2.svg';
+import Logo from '/logo.svg';
 
 export default function Footer() {
   const [expandedMobile, setExpandedMobile] = useState(null);

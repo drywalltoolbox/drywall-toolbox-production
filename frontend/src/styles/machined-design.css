@@ -492,6 +492,9 @@ aside input[type="range"],
     max-width: none !important;
     width: auto !important;
     height: auto;
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+    shape-rendering: geometricPrecision;
 }
 
 @media (max-width: 640px) {
@@ -1035,6 +1038,9 @@ aside input[type="range"],
     display: block;
     transition: transform 0.2s ease;
     line-height: 1;
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+    shape-rendering: geometricPrecision;
 }
 
 .logo-image:hover {
@@ -1052,6 +1058,9 @@ aside input[type="range"],
     display: block;
     transition: transform 0.2s ease;
     line-height: 1;
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+    shape-rendering: geometricPrecision;
 }
 
 .logo-image-mobile:hover {

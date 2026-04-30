@@ -3,7 +3,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useCart } from '../context/CartContext';
 import { useAuthContext } from '../auth/AuthContext.js';
 import { ShoppingCart, Menu, X, ChevronDown, User, LogIn, UserPlus, LogOut, Search, Truck, Phone, Shield, Wrench } from 'lucide-react';
-import Logo from '/logo2.svg';
+import Logo from '/logo.svg';
 import MobileSearch from './MobileSearch';
 import NotificationsBell from './NotificationsBell';
 import ShippingTicker from './ShippingTicker';

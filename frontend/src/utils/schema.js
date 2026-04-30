@@ -132,7 +132,7 @@ export function buildOrganizationSchema() {
     '@type':      'Organization',
     name:         SITE_NAME,
     url:          SITE_URL,
-    logo:         `${SITE_URL}/logo-white.svg`,
+    logo:         `${SITE_URL}/logo.svg`,
     description:  'Professional drywall tools and equipment from top brands. Shop automatic taping tools, mud boxes, finishing tools, and more.',
     contactPoint: {
       '@type':            'ContactPoint',

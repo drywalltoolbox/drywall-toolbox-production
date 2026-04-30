@@ -1,0 +1,4038 @@
+{
+  "base_url": "https://www.columbiatools.com/columbia-tools/",
+  "category_count": 22,
+  "raw_entry_count": 87,
+  "family_count": 79,
+  "categories": [
+    {
+      "name": "New Releases",
+      "url": "https://www.columbiatools.com/columbia-tools/new-releases/",
+      "child_count": 10,
+      "children": [
+        {
+          "category_name": "New Releases",
+          "category_url": "https://www.columbiatools.com/columbia-tools/new-releases/",
+          "subcategory_or_tool": "Columbia One Predator Taper",
+          "tool_title": "Columbia One Predator Taper",
+          "tool_url": "https://www.columbiatools.com/columbia-tools/automatic-tapers/columbia-one-predator-taper/",
+          "sku_count": 1,
+          "sku_list": [
+            "PTAPER"
+          ],
+          "variant_count": 1,
+          "variants": [
+            {
+              "label": "Columbia One Predator Taper",
+              "sku": "PTAPER"
+            }
+          ]
+        },
+        {
+          "category_name": "New Releases",
+          "category_url": "https://www.columbiatools.com/columbia-tools/new-releases/",
+          "subcategory_or_tool": "Mud Pans",
+          "tool_title": "Mud Pans",
+          "tool_url": "https://www.columbiatools.com/columbia-tools/hand-tools/mud-pans/",
+          "sku_count": 0,
+          "sku_list": [],
+          "variant_count": 3,
+          "variants": [
+            {
+              "label": "12” Columbia Mud Pan 6 Pack",
+              "sku": "C12MP-6"
+            },
+            {
+              "label": "14” Columbia Mud Pan 6 Pack",
+              "sku": "C14MP-6"
+            },
+            {
+              "label": "16” Columbia Mud Pan 6 Pack",
+              "sku": "C16MP-6"
+            }
+          ]
+        },
+        {
+          "category_name": "New Releases",
+          "category_url": "https://www.columbiatools.com/columbia-tools/new-releases/",
+          "subcategory_or_tool": "Nylon Putty Knives",
+          "tool_title": "Nylon Putty Knives",
+          "tool_url": "https://www.columbiatools.com/columbia-tools/hand-tools/nylon-putty-knives/",
+          "sku_count": 0,
+          "sku_list": [],
+          "variant_count": 11,
+          "variants": [
+            {
+              "label": "1.5″ Nylon Putty Knife",
+              "sku": "NPK1.5"
+            },
+            {
+              "label": "2″ Nylon Putty Knife",
+              "sku": "NPK2"
+            },
+            {
+              "label": "3″ Nylon Putty Knife",
+              "sku": "NPK3"
+            },
+            {
+              "label": "4″ Nylon Putty Knife",
+              "sku": "NPK4"
+            },
+            {
+              "label": "5″ Nylon Putty Knife",
+              "sku": "NPK5"
+            },
+            {
+              "label": "6″ Nylon Putty Knife",
+              "sku": "NPK6"
+            },
+            {
+              "label": "8″ Nylon Putty Knife",
+              "sku": "NPK8"
+            },
+            {
+              "label": "10″ Nylon Putty Knife",
+              "sku": "NPK10"
+            },
+            {
+              "label": "3.5″ Pointing Joint Knife",
+              "sku": "PJK3.5"
+            },
+            {
+              "label": "6″ Clipped Joint Knife",
+              "sku": "CJK6"
+            },
+            {
+              "label": "9 in 1 Multi Tool",
+              "sku": "9-1MT"
+            }
+          ]
+        },
+        {
+          "category_name": "New Releases",
+          "category_url": "https://www.columbiatools.com/columbia-tools/new-releases/",
+          "subcategory_or_tool": "Trowels",
+          "tool_title": "Trowels",
+          "tool_url": "https://www.columbiatools.com/columbia-tools/hand-tools/columbia-mud-pans-3/",
+          "sku_count": 0,
+          "sku_list": [],
+          "variant_count": 11,
+          "variants": [
+            {
+              "label": "12″ GOLD FINISHING TROWEL",
+              "sku": "12-4.7-0.7-G-C"
+            },
+            {
+              "label": "14″ GOLD FINISHING TROWEL",
+              "sku": "14-4.7-0.7-G-C"
+            },
+            {
+              "label": "16″ GOLD FINISHING TROWEL",
+              "sku": "16-4.7-0.7-G-C"
+            },
+            {
+              "label": "18″ GOLD FINISHING TROWEL",
+              "sku": "18-4.7-0.7-G-C"
+            },
+            {
+              "label": "12″ GOLD CURVE TROWEL",
+              "sku": "12-4.7-0.7-G-C-C"
+            },
+            {
+              "label": "14″ GOLD CURVE TROWEL",
+              "sku": "14-4.7-0.7-G-C-C"
+            },
+            {
+              "label": "16″ GOLD CURVE TROWEL",
+              "sku": "16-4.7-0.7-G-C-C"
+            },
+            {
+              "label": "12″ SILVER CURVE TROWEL",
+              "sku": "12-4.7-0.4-S-C-C"
+            },
+            {
+              "label": "14″ SILVER CURVE TROWEL",
+              "sku": "14-4.7-0.4-S-C-C"
+            },
+            {
+              "label": "12″ GOLD FINISHING TROWEL .3MM",
+              "sku": "12-4.3-0.3-G-C"
+            },
+            {
+              "label": "14″ GOLD FINISHING TROWEL .3MM",
+              "sku": "14-4.3-0.3-G-C"
+            }
+          ]
+        },
+        {
+          "category_name": "New Releases",
+          "category_url": "https://www.columbiatools.com/columbia-tools/new-releases/",
+          "subcategory_or_tool": "Finishing Hawks",
+          "tool_title": "Finishing Hawks",
+          "tool_url": "https://www.columbiatools.com/columbia-tools/hand-tools/finishing-hawks/",
+          "sku_count": 0,
+          "sku_list": [],
+          "variant_count": 0,
+          "variants": []
+        },
+        {
+          "category_name": "New Releases",
+          "category_url": "https://www.columbiatools.com/columbia-tools/new-releases/",
+          "subcategory_or_tool": "One Piece Putty Knives",
+          "tool_title": "One Piece Putty Knives",
+          "tool_url": "https://www.columbiatools.com/columbia-tools/hand-tools/nylon-putty-knives-copy/",
+          "sku_count": 0,
+          "sku_list": [],
+          "variant_count": 8,
+          "variants": [
+            {
+              "label": "Putty Knives 1.5” One Piece Putty Knife (stainless steel)",
+              "sku": "OPPK1.5"
+            },
+            {
+              "label": "2” One Piece Putty Knife (stainless steel)",
+              "sku": "OPPK2"
+            },
+            {
+              "label": "3” One Piece Putty Knife (stainless steel)",
+              "sku": "OPPK3"
+            },
+            {
+              "label": "4” One Piece Putty Knife (stainless steel)",
+              "sku": "OPPK4"
+            },
+            {
+              "label": "5” One Piece Putty Knife (stainless steel)",
+              "sku": "OPPK5"
+            },
+            {
+              "label": "6” One Piece Putty Knife (stainless steel)",
+              "sku": "OPPK6"
+            },
+            {
+              "label": "8” One Piece Putty Knife (stainless steel)",
+              "sku": "OPPK8"
+            },
+            {
+              "label": "10-IN-1” One Piece Multi Tool (stainless steel)",
+              "sku": "OPPK10-1"
+            }
+          ]
+        },
+        {
+          "category_name": "New Releases",
+          "category_url": "https://www.columbiatools.com/columbia-tools/new-releases/",
+          "subcategory_or_tool": "Taping Knives",
+          "tool_title": "Taping Knives",
+          "tool_url": "https://www.columbiatools.com/columbia-tools/hand-tools/one-piece-putty-knives-copy/",
+          "sku_count": 0,
+          "sku_list": [],
+          "variant_count": 4,
+          "variants": [
+            {
+              "label": "8” Columbia Taping Knife",
+              "sku": "CTK8"
+            },
+            {
+              "label": "10” Columbia Taping Knife",
+              "sku": "CTK10"
+            },
+            {
+              "label": "12” Columbia Taping Knife",
+              "sku": "CTK12"
+            },
+            {
+              "label": "14” Columbia Taping Knife",
+              "sku": "CTK14"
+            }
+          ]
+        },
+        {
+          "category_name": "New Releases",
+          "category_url": "https://www.columbiatools.com/columbia-tools/new-releases/",
+          "subcategory_or_tool": "Three Way Knives",
+          "tool_title": "Three Way Knives",
+          "tool_url": "https://www.columbiatools.com/columbia-tools/hand-tools/three-way-knives/",
+          "sku_count": 0,
+          "sku_list": [],
+          "variant_count": 3,
+          "variants": [
+            {
+              "label": "4” Three-Way Nylon Handle Putty Knife",
+              "sku": "3NPK4"
+            },
+            {
+              "label": "5” Three-Way Nylon Handle Putty Knife",
+              "sku": "3NPK5"
+            },
+            {
+              "label": "6” Three-Way Nylon Handle Putty Knife",
+              "sku": "3NPK6"
+            }
+          ]
+        },
+        {
+          "category_name": "New Releases",
+          "category_url": "https://www.columbiatools.com/columbia-tools/new-releases/",
+          "subcategory_or_tool": "Bucket Scoops",
+          "tool_title": "Bucket Scoops",
+          "tool_url": "https://www.columbiatools.com/columbia-tools/hand-tools/three-way-knives-copy/",
+          "sku_count": 0,
+          "sku_list": [],
+          "variant_count": 3,
+          "variants": [
+            {
+              "label": "6” One Piece Bucket Scoop (stainless steel)",
+              "sku": "OPBS"
+            },
+            {
+              "label": "6” Comfort Grip Bucket Scoop (stainless steel)",
+              "sku": "CBS2K"
+            },
+            {
+              "label": "6″ Cork Handle Bucket Scoop (stainless steel)",
+              "sku": "BCNC"
+            }
+          ]
+        },
+        {
+          "category_name": "New Releases",
+          "category_url": "https://www.columbiatools.com/columbia-tools/new-releases/",
+          "subcategory_or_tool": "Fat Boy Smoothing Blades",
+          "tool_title": "Fat Boy Smoothing Blades",
+          "tool_url": "https://www.columbiatools.com/columbia-tools/smoothing-blades/fatboy-smoothing-blades/",
+          "sku_count": 0,
+          "sku_list": [],
+          "variant_count": 11,
+          "variants": [
+            {
+              "label": "Fat Boy Smoothing Blades Fat Boy Smoothing Blade 7”",
+              "sku": "FSB7"
+            },
+            {
+              "label": "Fat Boy Smoothing Blade 10”",
+              "sku": "FSB10"
+            },
+            {
+              "label": "Fat Boy Smoothing Blade 12”",
+              "sku": "FSB12"
+            },
+            {
+              "label": "Fat Boy Smoothing Blade 14”",
+              "sku": "FSB14"
+            },
+            {
+              "label": "Fat Boy Smoothing Blade 16”",
+              "sku": "FSB16"
+            },
+            {
+              "label": "Fat Boy Smoothing Blade 18”",
+              "sku": "FSB18"
+            },
+            {
+              "label": "Fat Boy Smoothing Blade 24”",
+              "sku": "FSB24"
+            },
+            {
+              "label": "Fat Boy Smoothing Blade 32”",
+              "sku": "FSB32"
+            },
+            {
+              "label": "Fat Boy Smoothing Blade 40”",
+              "sku": "FSB40"
+            },
+            {
+              "label": "Fat Boy Smoothing Blade 48”",
+              "sku": "FSB48"
+            },
+            {
+              "label": "Fat Boy Smoothing Blade Claw",
+              "sku": "FSBC"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Hand Tools",
+      "url": "https://www.columbiatools.com/columbia-tools/hand-tools/",
+      "child_count": 6,
+      "children": [
+        {
+          "category_name": "Hand Tools",
+          "category_url": "https://www.columbiatools.com/columbia-tools/hand-tools/",
+          "subcategory_or_tool": "Putty Knives",
+          "tool_title": "Putty Knives",
+          "tool_url": "https://www.columbiatools.com/columbia-tools/hand-tools/putty-knives/",
+          "sku_count": 0,
+          "sku_list": [],
+          "variant_count": 0,
+          "variants": []
+        },
+        {
+          "category_name": "Hand Tools",
+          "category_url": "https://www.columbiatools.com/columbia-tools/hand-tools/",
+          "subcategory_or_tool": "Taping Knives",
+          "tool_title": "Taping Knives",
+          "tool_url": "https://www.columbiatools.com/columbia-tools/hand-tools/one-piece-putty-knives-copy/",
+          "sku_count": 0,
+          "sku_list": [],
+          "variant_count": 4,
+          "variants": [
+            {
+              "label": "8” Columbia Taping Knife",
+              "sku": "CTK8"
+            },
+            {
+              "label": "10” Columbia Taping Knife",
+              "sku": "CTK10"
+            },
+            {
+              "label": "12” Columbia Taping Knife",
+              "sku": "CTK12"
+            },
+            {
+              "label": "14” Columbia Taping Knife",
+              "sku": "CTK14"
+            }
+          ]
+        },
+        {
+          "category_name": "Hand Tools",
+          "category_url": "https://www.columbiatools.com/columbia-tools/hand-tools/",
+          "subcategory_or_tool": "Mud Pans",
+          "tool_title": "Mud Pans",
+          "tool_url": "https://www.columbiatools.com/columbia-tools/hand-tools/mud-pans/",
+          "sku_count": 0,
+          "sku_list": [],
+          "variant_count": 3,
+          "variants": [
+            {
+              "label": "12” Columbia Mud Pan 6 Pack",
+              "sku": "C12MP-6"
+            },
+            {
+              "label": "14” Columbia Mud Pan 6 Pack",
+              "sku": "C14MP-6"
+            },
+            {
+              "label": "16” Columbia Mud Pan 6 Pack",
+              "sku": "C16MP-6"
+            }
+          ]
+        },
+        {
+          "category_name": "Hand Tools",
+          "category_url": "https://www.columbiatools.com/columbia-tools/hand-tools/",
+          "subcategory_or_tool": "Trowels",
+          "tool_title": "Trowels",
+          "tool_url": "https://www.columbiatools.com/columbia-tools/hand-tools/columbia-mud-pans-3/",
+          "sku_count": 0,
+          "sku_list": [],
+          "variant_count": 11,
+          "variants": [
+            {
+              "label": "12″ GOLD FINISHING TROWEL",
+              "sku": "12-4.7-0.7-G-C"
+            },
+            {
+              "label": "14″ GOLD FINISHING TROWEL",
+              "sku": "14-4.7-0.7-G-C"
+            },
+            {
+              "label": "16″ GOLD FINISHING TROWEL",
+              "sku": "16-4.7-0.7-G-C"
+            },
+            {
+              "label": "18″ GOLD FINISHING TROWEL",
+              "sku": "18-4.7-0.7-G-C"
+            },
+            {
+              "label": "12″ GOLD CURVE TROWEL",
+              "sku": "12-4.7-0.7-G-C-C"
+            },
+            {
+              "label": "14″ GOLD CURVE TROWEL",
+              "sku": "14-4.7-0.7-G-C-C"
+            },
+            {
+              "label": "16″ GOLD CURVE TROWEL",
+              "sku": "16-4.7-0.7-G-C-C"
+            },
+            {
+              "label": "12″ SILVER CURVE TROWEL",
+              "sku": "12-4.7-0.4-S-C-C"
+            },
+            {
+              "label": "14″ SILVER CURVE TROWEL",
+              "sku": "14-4.7-0.4-S-C-C"
+            },
+            {
+              "label": "12″ GOLD FINISHING TROWEL .3MM",
+              "sku": "12-4.3-0.3-G-C"
+            },
+            {
+              "label": "14″ GOLD FINISHING TROWEL .3MM",
+              "sku": "14-4.3-0.3-G-C"
+            }
+          ]
+        },
+        {
+          "category_name": "Hand Tools",
+          "category_url": "https://www.columbiatools.com/columbia-tools/hand-tools/",
+          "subcategory_or_tool": "Finishing Hawks",
+          "tool_title": "Finishing Hawks",
+          "tool_url": "https://www.columbiatools.com/columbia-tools/hand-tools/finishing-hawks/",
+          "sku_count": 0,
+          "sku_list": [],
+          "variant_count": 0,
+          "variants": []
+        },
+        {
+          "category_name": "Hand Tools",
+          "category_url": "https://www.columbiatools.com/columbia-tools/hand-tools/",
+          "subcategory_or_tool": "Bucket Scoops",
+          "tool_title": "Bucket Scoops",
+          "tool_url": "https://www.columbiatools.com/columbia-tools/hand-tools/three-way-knives-copy/",
+          "sku_count": 0,
+          "sku_list": [],
+          "variant_count": 3,
+          "variants": [
+            {
+              "label": "6” One Piece Bucket Scoop (stainless steel)",
+              "sku": "OPBS"
+            },
+            {
+              "label": "6” Comfort Grip Bucket Scoop (stainless steel)",
+              "sku": "CBS2K"
+            },
+            {
+              "label": "6″ Cork Handle Bucket Scoop (stainless steel)",
+              "sku": "BCNC"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "The Predator Family is Expanding",
+      "url": "https://www.columbiatools.com/columbia-tools/the-predator-family/",
+      "child_count": 3,
+      "children": [
+        {
+          "category_name": "The Predator Family is Expanding",
+          "category_url": "https://www.columbiatools.com/columbia-tools/the-predator-family/",
+          "subcategory_or_tool": "Tall Boy Mud Pump",
+          "tool_title": "Tall Boy Mud Pump",
+          "tool_url": "https://www.columbiatools.com/columbia-tools/pumps/tall-boy-mud-pump/",
+          "sku_count": 1,
+          "sku_list": [
+            "TBMP"
+          ],
+          "variant_count": 1,
+          "variants": [
+            {
+              "label": "Tall Boy Mud Pump",
+              "sku": "TBMP"
+            }
+          ]
+        },
+        {
+          "category_name": "The Predator Family is Expanding",
+          "category_url": "https://www.columbiatools.com/columbia-tools/the-predator-family/",
+          "subcategory_or_tool": "Automatic Taper",
+          "tool_title": "Automatic Taper",
+          "tool_url": "https://www.columbiatools.com/columbia-tools/automatic-tapers/automatic-taper/",
+          "sku_count": 1,
+          "sku_list": [
+            "TAPER"
+          ],
+          "variant_count": 1,
+          "variants": [
+            {
+              "label": "Automatic Taper",
+              "sku": "TAPER"
+            }
+          ]
+        },
+        {
+          "category_name": "The Predator Family is Expanding",
+          "category_url": "https://www.columbiatools.com/columbia-tools/the-predator-family/",
+          "subcategory_or_tool": "Mud Pump",
+          "tool_title": "Mud Pump",
+          "tool_url": "https://www.columbiatools.com/columbia-tools/pumps/mud-pump/",
+          "sku_count": 1,
+          "sku_list": [
+            "HMP"
+          ],
+          "variant_count": 1,
+          "variants": [
+            {
+              "label": "Mud Pump",
+              "sku": "HMP"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "The Tool Sets",
+      "url": "https://www.columbiatools.com/columbia-tools/tool-sets/",
+      "child_count": 5,
+      "children": [
+        {
+          "category_name": "The Tool Sets",
+          "category_url": "https://www.columbiatools.com/columbia-tools/tool-sets/",
+          "subcategory_or_tool": "The Tactical Set",
+          "tool_title": "The Tactical Set",
+          "tool_url": "https://www.columbiatools.com/columbia-tools/tool-sets/the-tactical-set/",
+          "sku_count": 1,
+          "sku_list": [
+            "TS"
+          ],
+          "variant_count": 1,
+          "variants": [
+            {
+              "label": "The Tactical Set",
+              "sku": "TS"
+            }
+          ]
+        },
+        {
+          "category_name": "The Tool Sets",
+          "category_url": "https://www.columbiatools.com/columbia-tools/tool-sets/",
+          "subcategory_or_tool": "The Commando Set",
+          "tool_title": "The Commando Set",
+          "tool_url": "https://www.columbiatools.com/columbia-tools/tool-sets/the-commando-set/",
+          "sku_count": 1,
+          "sku_list": [
+            "SACS"
+          ],
+          "variant_count": 1,
+          "variants": [
+            {
+              "label": "The Commando Set",
+              "sku": "SACS"
+            }
+          ]
+        },
+        {
+          "category_name": "The Tool Sets",
+          "category_url": "https://www.columbiatools.com/columbia-tools/tool-sets/",
+          "subcategory_or_tool": "The Predator Tactical Set",
+          "tool_title": "The Predator Tactical Set",
+          "tool_url": "https://www.columbiatools.com/columbia-tools/tool-sets/the-predator-tactical-set/",
+          "sku_count": 1,
+          "sku_list": [
+            "PTS"
+          ],
+          "variant_count": 1,
+          "variants": [
+            {
+              "label": "The Predator Tactical Set",
+              "sku": "PTS"
+            }
+          ]
+        },
+        {
+          "category_name": "The Tool Sets",
+          "category_url": "https://www.columbiatools.com/columbia-tools/tool-sets/",
+          "subcategory_or_tool": "The Warrior Set",
+          "tool_title": "The Warrior Set",
+          "tool_url": "https://www.columbiatools.com/columbia-tools/tool-sets/the-warrior-set/",
+          "sku_count": 1,
+          "sku_list": [
+            "TWS"
+          ],
+          "variant_count": 1,
+          "variants": [
+            {
+              "label": "The Warrior Set",
+              "sku": "TWS"
+            }
+          ]
+        },
+        {
+          "category_name": "The Tool Sets",
+          "category_url": "https://www.columbiatools.com/columbia-tools/tool-sets/",
+          "subcategory_or_tool": "The Sabre Set",
+          "tool_title": "The Sabre Set",
+          "tool_url": "https://www.columbiatools.com/columbia-tools/tool-sets/the-sabre-set/",
+          "sku_count": 1,
+          "sku_list": [
+            "SBSET"
+          ],
+          "variant_count": 1,
+          "variants": [
+            {
+              "label": "The Sabre Set",
+              "sku": "SBSET"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Automatic Tapers",
+      "url": "https://www.columbiatools.com/columbia-tools/automatic-tapers/",
+      "child_count": 4,
+      "children": [
+        {
+          "category_name": "Automatic Tapers",
+          "category_url": "https://www.columbiatools.com/columbia-tools/automatic-tapers/",
+          "subcategory_or_tool": "Columbia One Predator Taper",
+          "tool_title": "Columbia One Predator Taper",
+          "tool_url": "https://www.columbiatools.com/columbia-tools/automatic-tapers/columbia-one-predator-taper/",
+          "sku_count": 1,
+          "sku_list": [
+            "PTAPER"
+          ],
+          "variant_count": 1,
+          "variants": [
+            {
+              "label": "Columbia One Predator Taper",
+              "sku": "PTAPER"
+            }
+          ]
+        },
+        {
+          "category_name": "Automatic Tapers",
+          "category_url": "https://www.columbiatools.com/columbia-tools/automatic-tapers/",
+          "subcategory_or_tool": "Automatic Taper",
+          "tool_title": "Automatic Taper",
+          "tool_url": "https://www.columbiatools.com/columbia-tools/automatic-tapers/automatic-taper/",
+          "sku_count": 1,
+          "sku_list": [
+            "TAPER"
+          ],
+          "variant_count": 1,
+          "variants": [
+            {
+              "label": "Automatic Taper",
+              "sku": "TAPER"
+            }
+          ]
+        },
+        {
+          "category_name": "Automatic Tapers",
+          "category_url": "https://www.columbiatools.com/columbia-tools/automatic-tapers/",
+          "subcategory_or_tool": "Sawed Off Taper",
+          "tool_title": "Sawed Off Taper",
+          "tool_url": "https://www.columbiatools.com/columbia-tools/automatic-tapers/sawed-off-taper/",
+          "sku_count": 2,
+          "sku_list": [
+            "STAPER",
+            "SPTAPER"
+          ],
+          "variant_count": 2,
+          "variants": [
+            {
+              "label": "39\"",
+              "sku": "STAPER"
+            },
+            {
+              "label": "53\"",
+              "sku": "SPTAPER"
+            }
+          ]
+        },
+        {
+          "category_name": "Automatic Tapers",
+          "category_url": "https://www.columbiatools.com/columbia-tools/automatic-tapers/",
+          "subcategory_or_tool": "The Predator Family is Expanding",
+          "tool_title": "The Predator Family is Expanding",
+          "tool_url": "https://www.columbiatools.com/columbia-tools/the-predator-family/",
+          "sku_count": 1,
+          "sku_list": [
+            "PCMT42"
+          ],
+          "variant_count": 1,
+          "variants": [
+            {
+              "label": "The Predator Family is Expanding",
+              "sku": "PCMT42"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "SUGGESTED SETS",
+      "url": "https://www.columbiatools.com/columbia-tools/suggested-tool-sets/",
+      "child_count": 0,
+      "children": []
+    },
+    {
+      "name": "Pumps",
+      "url": "https://www.columbiatools.com/columbia-tools/pumps/",
+      "child_count": 5,
+      "children": [
+        {
+          "category_name": "Pumps",
+          "category_url": "https://www.columbiatools.com/columbia-tools/pumps/",
+          "subcategory_or_tool": "Tall Boy Mud Pump",
+          "tool_title": "Tall Boy Mud Pump",
+          "tool_url": "https://www.columbiatools.com/columbia-tools/pumps/tall-boy-mud-pump/",
+          "sku_count": 1,
+          "sku_list": [
+            "TBMP"
+          ],
+          "variant_count": 1,
+          "variants": [
+            {
+              "label": "Tall Boy Mud Pump",
+              "sku": "TBMP"
+            }
+          ]
+        },
+        {
+          "category_name": "Pumps",
+          "category_url": "https://www.columbiatools.com/columbia-tools/pumps/",
+          "subcategory_or_tool": "Mud Pump",
+          "tool_title": "Mud Pump",
+          "tool_url": "https://www.columbiatools.com/columbia-tools/pumps/mud-pump/",
+          "sku_count": 1,
+          "sku_list": [
+            "HMP"
+          ],
+          "variant_count": 1,
+          "variants": [
+            {
+              "label": "Mud Pump",
+              "sku": "HMP"
+            }
+          ]
+        },
+        {
+          "category_name": "Pumps",
+          "category_url": "https://www.columbiatools.com/columbia-tools/pumps/",
+          "subcategory_or_tool": "Gooseneck",
+          "tool_title": "Gooseneck",
+          "tool_url": "https://www.columbiatools.com/columbia-tools/pumps/gooseneck/",
+          "sku_count": 2,
+          "sku_list": [
+            "GN",
+            "TBGN"
+          ],
+          "variant_count": 2,
+          "variants": [
+            {
+              "label": "GN",
+              "sku": "GN"
+            },
+            {
+              "label": "TBGN",
+              "sku": "TBGN"
+            }
+          ]
+        },
+        {
+          "category_name": "Pumps",
+          "category_url": "https://www.columbiatools.com/columbia-tools/pumps/",
+          "subcategory_or_tool": "Box Filler",
+          "tool_title": "Box Filler",
+          "tool_url": "https://www.columbiatools.com/columbia-tools/pumps/box-filler/",
+          "sku_count": 2,
+          "sku_list": [
+            "BF",
+            "TBBF"
+          ],
+          "variant_count": 2,
+          "variants": [
+            {
+              "label": "BF",
+              "sku": "BF"
+            },
+            {
+              "label": "TBBF",
+              "sku": "TBBF"
+            }
+          ]
+        },
+        {
+          "category_name": "Pumps",
+          "category_url": "https://www.columbiatools.com/columbia-tools/pumps/",
+          "subcategory_or_tool": "Columbia X Graco PowerFill 3.5",
+          "tool_title": "Columbia X Graco PowerFill 3.5",
+          "tool_url": "https://www.columbiatools.com/columbia-tools/pumps/columbiapowerfill/",
+          "sku_count": 1,
+          "sku_list": [
+            "CPFP"
+          ],
+          "variant_count": 2,
+          "variants": [
+            {
+              "label": "Columbia PowerFill Pump (comes with box filler)",
+              "sku": "CPFP"
+            },
+            {
+              "label": "Columbia PowerFill Gooseneck (sold seperately)",
+              "sku": "CPFGN"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Tool Cases",
+      "url": "https://www.columbiatools.com/columbia-tools/tool-cases/",
+      "child_count": 2,
+      "children": [
+        {
+          "category_name": "Tool Cases",
+          "category_url": "https://www.columbiatools.com/columbia-tools/tool-cases/",
+          "subcategory_or_tool": "The Road Case",
+          "tool_title": "The Road Case",
+          "tool_url": "https://www.columbiatools.com/columbia-tools/tool-cases/the-road-case/",
+          "sku_count": 1,
+          "sku_list": [
+            "RC"
+          ],
+          "variant_count": 1,
+          "variants": [
+            {
+              "label": "The Road Case",
+              "sku": "RC"
+            }
+          ]
+        },
+        {
+          "category_name": "Tool Cases",
+          "category_url": "https://www.columbiatools.com/columbia-tools/tool-cases/",
+          "subcategory_or_tool": "The Semi-Automatic Case",
+          "tool_title": "The Semi-Automatic Case",
+          "tool_url": "https://www.columbiatools.com/columbia-tools/tool-cases/the-semi-automatic-case/",
+          "sku_count": 1,
+          "sku_list": [
+            "TCS"
+          ],
+          "variant_count": 1,
+          "variants": [
+            {
+              "label": "The Semi-Automatic Case",
+              "sku": "TCS"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Smoothing Blades",
+      "url": "https://www.columbiatools.com/columbia-tools/smoothing-blades/",
+      "child_count": 4,
+      "children": [
+        {
+          "category_name": "Smoothing Blades",
+          "category_url": "https://www.columbiatools.com/columbia-tools/smoothing-blades/",
+          "subcategory_or_tool": "Tomahawk Smoothing Blades",
+          "tool_title": "Tomahawk Smoothing Blades",
+          "tool_url": "https://www.columbiatools.com/columbia-tools/tomahawk-smoothing-blades/tomahawk-smoothing-blades/",
+          "sku_count": 0,
+          "sku_list": [],
+          "variant_count": 0,
+          "variants": []
+        },
+        {
+          "category_name": "Smoothing Blades",
+          "category_url": "https://www.columbiatools.com/columbia-tools/smoothing-blades/",
+          "subcategory_or_tool": "Tomalock",
+          "tool_title": "Tomalock",
+          "tool_url": "https://www.columbiatools.com/columbia-tools/tomahawk-smoothing-blades/tomalock/",
+          "sku_count": 1,
+          "sku_list": [
+            "CLTHA"
+          ],
+          "variant_count": 1,
+          "variants": [
+            {
+              "label": "Tomalock",
+              "sku": "CLTHA"
+            }
+          ]
+        },
+        {
+          "category_name": "Smoothing Blades",
+          "category_url": "https://www.columbiatools.com/columbia-tools/smoothing-blades/",
+          "subcategory_or_tool": "Sabre Smoothing Blades",
+          "tool_title": "Sabre Smoothing Blades",
+          "tool_url": "https://www.columbiatools.com/columbia-tools/smoothing-blades/sabre-smoothing-blades/",
+          "sku_count": 1,
+          "sku_list": [
+            "SBC"
+          ],
+          "variant_count": 1,
+          "variants": [
+            {
+              "label": "Sabre Smoothing Blades",
+              "sku": "SBC"
+            }
+          ]
+        },
+        {
+          "category_name": "Smoothing Blades",
+          "category_url": "https://www.columbiatools.com/columbia-tools/smoothing-blades/",
+          "subcategory_or_tool": "Fat Boy Smoothing Blades",
+          "tool_title": "Fat Boy Smoothing Blades",
+          "tool_url": "https://www.columbiatools.com/columbia-tools/smoothing-blades/fatboy-smoothing-blades/",
+          "sku_count": 0,
+          "sku_list": [],
+          "variant_count": 11,
+          "variants": [
+            {
+              "label": "Fat Boy Smoothing Blades Fat Boy Smoothing Blade 7”",
+              "sku": "FSB7"
+            },
+            {
+              "label": "Fat Boy Smoothing Blade 10”",
+              "sku": "FSB10"
+            },
+            {
+              "label": "Fat Boy Smoothing Blade 12”",
+              "sku": "FSB12"
+            },
+            {
+              "label": "Fat Boy Smoothing Blade 14”",
+              "sku": "FSB14"
+            },
+            {
+              "label": "Fat Boy Smoothing Blade 16”",
+              "sku": "FSB16"
+            },
+            {
+              "label": "Fat Boy Smoothing Blade 18”",
+              "sku": "FSB18"
+            },
+            {
+              "label": "Fat Boy Smoothing Blade 24”",
+              "sku": "FSB24"
+            },
+            {
+              "label": "Fat Boy Smoothing Blade 32”",
+              "sku": "FSB32"
+            },
+            {
+              "label": "Fat Boy Smoothing Blade 40”",
+              "sku": "FSB40"
+            },
+            {
+              "label": "Fat Boy Smoothing Blade 48”",
+              "sku": "FSB48"
+            },
+            {
+              "label": "Fat Boy Smoothing Blade Claw",
+              "sku": "FSBC"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Finishing Boxes",
+      "url": "https://www.columbiatools.com/columbia-tools/finishing-boxes/",
+      "child_count": 4,
+      "children": [
+        {
+          "category_name": "Finishing Boxes",
+          "category_url": "https://www.columbiatools.com/columbia-tools/finishing-boxes/",
+          "subcategory_or_tool": "Flat Boxes",
+          "tool_title": "Flat Boxes",
+          "tool_url": "https://www.columbiatools.com/columbia-tools/finishing-boxes/flat-boxes/",
+          "sku_count": 6,
+          "sku_list": [
+            "5.5FFB",
+            "7FFB",
+            "8FFB",
+            "10FFB",
+            "12FFB",
+            "14FFB"
+          ],
+          "variant_count": 6,
+          "variants": [
+            {
+              "label": "5.5\"",
+              "sku": "5.5FFB"
+            },
+            {
+              "label": "7\"",
+              "sku": "7FFB"
+            },
+            {
+              "label": "8\"",
+              "sku": "8FFB"
+            },
+            {
+              "label": "10\"",
+              "sku": "10FFB"
+            },
+            {
+              "label": "12\"",
+              "sku": "12FFB"
+            },
+            {
+              "label": "14\"",
+              "sku": "14FFB"
+            }
+          ]
+        },
+        {
+          "category_name": "Finishing Boxes",
+          "category_url": "https://www.columbiatools.com/columbia-tools/finishing-boxes/",
+          "subcategory_or_tool": "Fat Boy Boxes",
+          "tool_title": "Fat Boy Boxes",
+          "tool_url": "https://www.columbiatools.com/columbia-tools/finishing-boxes/fat-boy-boxes/",
+          "sku_count": 3,
+          "sku_list": [
+            "8FBB",
+            "10FBB",
+            "12FBB"
+          ],
+          "variant_count": 3,
+          "variants": [
+            {
+              "label": "8\"",
+              "sku": "8FBB"
+            },
+            {
+              "label": "10\"",
+              "sku": "10FBB"
+            },
+            {
+              "label": "12\"",
+              "sku": "12FBB"
+            }
+          ]
+        },
+        {
+          "category_name": "Finishing Boxes",
+          "category_url": "https://www.columbiatools.com/columbia-tools/finishing-boxes/",
+          "subcategory_or_tool": "Automatic Flat Boxes",
+          "tool_title": "Automatic Flat Boxes",
+          "tool_url": "https://www.columbiatools.com/columbia-tools/finishing-boxes/automatic-flat-boxes/",
+          "sku_count": 0,
+          "sku_list": [],
+          "variant_count": 0,
+          "variants": []
+        },
+        {
+          "category_name": "Finishing Boxes",
+          "category_url": "https://www.columbiatools.com/columbia-tools/finishing-boxes/",
+          "subcategory_or_tool": "Inside Track Conversion Kits",
+          "tool_title": "Inside Track Conversion Kits",
+          "tool_url": "https://www.columbiatools.com/columbia-tools/finishing-boxes/inside-track-boxes/",
+          "sku_count": 1,
+          "sku_list": [
+            "ITC-K"
+          ],
+          "variant_count": 1,
+          "variants": [
+            {
+              "label": "Inside Track Conversion Kits",
+              "sku": "ITC-K"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Corner Rollers",
+      "url": "https://www.columbiatools.com/columbia-tools/corner-rollers/",
+      "child_count": 6,
+      "children": [
+        {
+          "category_name": "Corner Rollers",
+          "category_url": "https://www.columbiatools.com/columbia-tools/corner-rollers/",
+          "subcategory_or_tool": "Corner Cobra",
+          "tool_title": "Corner Cobra",
+          "tool_url": "https://www.columbiatools.com/columbia-tools/corner-rollers/corner-cobra/",
+          "sku_count": 1,
+          "sku_list": [
+            "CC"
+          ],
+          "variant_count": 1,
+          "variants": [
+            {
+              "label": "Corner Cobra",
+              "sku": "CC"
+            }
+          ]
+        },
+        {
+          "category_name": "Corner Rollers",
+          "category_url": "https://www.columbiatools.com/columbia-tools/corner-rollers/",
+          "subcategory_or_tool": "Inside Corner Roller",
+          "tool_title": "Inside Corner Roller",
+          "tool_url": "https://www.columbiatools.com/columbia-tools/corner-rollers/inside-corner-roller/",
+          "sku_count": 1,
+          "sku_list": [
+            "CR"
+          ],
+          "variant_count": 1,
+          "variants": [
+            {
+              "label": "Inside Corner Roller",
+              "sku": "CR"
+            }
+          ]
+        },
+        {
+          "category_name": "Corner Rollers",
+          "category_url": "https://www.columbiatools.com/columbia-tools/corner-rollers/",
+          "subcategory_or_tool": "Standard Outside Corner Roller",
+          "tool_title": "Standard Outside Corner Roller",
+          "tool_url": "https://www.columbiatools.com/columbia-tools/corner-rollers/outside-corner-rollers/",
+          "sku_count": 1,
+          "sku_list": [
+            "COBCR"
+          ],
+          "variant_count": 1,
+          "variants": [
+            {
+              "label": "Standard Outside Corner Roller",
+              "sku": "COBCR"
+            }
+          ]
+        },
+        {
+          "category_name": "Corner Rollers",
+          "category_url": "https://www.columbiatools.com/columbia-tools/corner-rollers/",
+          "subcategory_or_tool": "Bullnose Outside Corner Roller",
+          "tool_title": "Bullnose Outside Corner Roller",
+          "tool_url": "https://www.columbiatools.com/columbia-tools/corner-rollers/bullnose-outside-corner-roller/",
+          "sku_count": 1,
+          "sku_list": [
+            "CBNCR"
+          ],
+          "variant_count": 1,
+          "variants": [
+            {
+              "label": "Bullnose Outside Corner Roller",
+              "sku": "CBNCR"
+            }
+          ]
+        },
+        {
+          "category_name": "Corner Rollers",
+          "category_url": "https://www.columbiatools.com/columbia-tools/corner-rollers/",
+          "subcategory_or_tool": "Wide Outside Corner Roller",
+          "tool_title": "Wide Outside Corner Roller",
+          "tool_url": "https://www.columbiatools.com/columbia-tools/corner-rollers/wide-outside-corner-roller/",
+          "sku_count": 1,
+          "sku_list": [
+            "COBCRW"
+          ],
+          "variant_count": 1,
+          "variants": [
+            {
+              "label": "Wide Outside Corner Roller",
+              "sku": "COBCRW"
+            }
+          ]
+        },
+        {
+          "category_name": "Corner Rollers",
+          "category_url": "https://www.columbiatools.com/columbia-tools/corner-rollers/",
+          "subcategory_or_tool": "European/Micro Outside Corner Roller",
+          "tool_title": "European/Micro Outside Corner Roller",
+          "tool_url": "https://www.columbiatools.com/columbia-tools/corner-rollers/european-micro-outside-corner-roller/",
+          "sku_count": 1,
+          "sku_list": [
+            "COBCRE"
+          ],
+          "variant_count": 1,
+          "variants": [
+            {
+              "label": "European/Micro Outside Corner Roller",
+              "sku": "COBCRE"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Angleheads",
+      "url": "https://www.columbiatools.com/columbia-tools/angle-heads/",
+      "child_count": 5,
+      "children": [
+        {
+          "category_name": "Angleheads",
+          "category_url": "https://www.columbiatools.com/columbia-tools/angle-heads/",
+          "subcategory_or_tool": "2″ Anglehead",
+          "tool_title": "2″ Anglehead",
+          "tool_url": "https://www.columbiatools.com/columbia-tools/angleheads/2-anglehead/",
+          "sku_count": 1,
+          "sku_list": [
+            "2AH"
+          ],
+          "variant_count": 1,
+          "variants": [
+            {
+              "label": "2″ Anglehead",
+              "sku": "2AH"
+            }
+          ]
+        },
+        {
+          "category_name": "Angleheads",
+          "category_url": "https://www.columbiatools.com/columbia-tools/angle-heads/",
+          "subcategory_or_tool": "2.5″ AngleHead",
+          "tool_title": "2.5″ AngleHead",
+          "tool_url": "https://www.columbiatools.com/columbia-tools/angleheads/2-5-anglehead/",
+          "sku_count": 1,
+          "sku_list": [
+            "2.5AH"
+          ],
+          "variant_count": 1,
+          "variants": [
+            {
+              "label": "2.5″ AngleHead",
+              "sku": "2.5AH"
+            }
+          ]
+        },
+        {
+          "category_name": "Angleheads",
+          "category_url": "https://www.columbiatools.com/columbia-tools/angle-heads/",
+          "subcategory_or_tool": "3″ Anglehead",
+          "tool_title": "3″ Anglehead",
+          "tool_url": "https://www.columbiatools.com/columbia-tools/angleheads/3-anglehead/",
+          "sku_count": 1,
+          "sku_list": [
+            "3AH"
+          ],
+          "variant_count": 1,
+          "variants": [
+            {
+              "label": "3″ Anglehead",
+              "sku": "3AH"
+            }
+          ]
+        },
+        {
+          "category_name": "Angleheads",
+          "category_url": "https://www.columbiatools.com/columbia-tools/angle-heads/",
+          "subcategory_or_tool": "3.5″ Anglehead",
+          "tool_title": "3.5″ Anglehead",
+          "tool_url": "https://www.columbiatools.com/columbia-tools/angleheads/3-5-anglehead/",
+          "sku_count": 1,
+          "sku_list": [
+            "3.5AH"
+          ],
+          "variant_count": 1,
+          "variants": [
+            {
+              "label": "3.5″ Anglehead",
+              "sku": "3.5AH"
+            }
+          ]
+        },
+        {
+          "category_name": "Angleheads",
+          "category_url": "https://www.columbiatools.com/columbia-tools/angle-heads/",
+          "subcategory_or_tool": "Anglehead Adaptor",
+          "tool_title": "Anglehead Adaptor",
+          "tool_url": "https://www.columbiatools.com/columbia-tools/angleheads/anglehead-adaptor/",
+          "sku_count": 1,
+          "sku_list": [
+            "AHA"
+          ],
+          "variant_count": 1,
+          "variants": [
+            {
+              "label": "Anglehead Adaptor",
+              "sku": "AHA"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Nailspotters",
+      "url": "https://www.columbiatools.com/columbia-tools/nailspotters/",
+      "child_count": 2,
+      "children": [
+        {
+          "category_name": "Nailspotters",
+          "category_url": "https://www.columbiatools.com/columbia-tools/nailspotters/",
+          "subcategory_or_tool": "2″ Nailspotter",
+          "tool_title": "2″ Nailspotter",
+          "tool_url": "https://www.columbiatools.com/columbia-tools/nailspotters/2-nailspotter/",
+          "sku_count": 1,
+          "sku_list": [
+            "2NS"
+          ],
+          "variant_count": 1,
+          "variants": [
+            {
+              "label": "2″ Nailspotter",
+              "sku": "2NS"
+            }
+          ]
+        },
+        {
+          "category_name": "Nailspotters",
+          "category_url": "https://www.columbiatools.com/columbia-tools/nailspotters/",
+          "subcategory_or_tool": "3″ Nailspotter",
+          "tool_title": "3″ Nailspotter",
+          "tool_url": "https://www.columbiatools.com/columbia-tools/nailspotters/3-nailspotter/",
+          "sku_count": 1,
+          "sku_list": [
+            "3NS"
+          ],
+          "variant_count": 1,
+          "variants": [
+            {
+              "label": "3″ Nailspotter",
+              "sku": "3NS"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Corner Tools",
+      "url": "https://www.columbiatools.com/columbia-tools/corner-tools/",
+      "child_count": 2,
+      "children": [
+        {
+          "category_name": "Corner Tools",
+          "category_url": "https://www.columbiatools.com/columbia-tools/corner-tools/",
+          "subcategory_or_tool": "8 Inch Throttle Box",
+          "tool_title": "8 Inch Throttle Box",
+          "tool_url": "https://www.columbiatools.com/columbia-tools/corner-boxes/8-throttle-box/",
+          "sku_count": 1,
+          "sku_list": [
+            "8CFB"
+          ],
+          "variant_count": 1,
+          "variants": [
+            {
+              "label": "8 Inch Throttle Box",
+              "sku": "8CFB"
+            }
+          ]
+        },
+        {
+          "category_name": "Corner Tools",
+          "category_url": "https://www.columbiatools.com/columbia-tools/corner-tools/",
+          "subcategory_or_tool": "7 Inch Throttle Box",
+          "tool_title": "7 Inch Throttle Box",
+          "tool_url": "https://www.columbiatools.com/columbia-tools/corner-boxes/7-inch-throttle-box/",
+          "sku_count": 1,
+          "sku_list": [
+            "7CFB"
+          ],
+          "variant_count": 1,
+          "variants": [
+            {
+              "label": "7 Inch Throttle Box",
+              "sku": "7CFB"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Corner Flushers",
+      "url": "https://www.columbiatools.com/columbia-tools/corner-flushers/",
+      "child_count": 3,
+      "children": [
+        {
+          "category_name": "Corner Flushers",
+          "category_url": "https://www.columbiatools.com/columbia-tools/corner-flushers/",
+          "subcategory_or_tool": "Standard Corner Flusher",
+          "tool_title": "Standard Corner Flusher",
+          "tool_url": "https://www.columbiatools.com/columbia-tools/corner-flushers/standard-corner-flusher/",
+          "sku_count": 5,
+          "sku_list": [
+            "2.5SF",
+            "3SF",
+            "3.5SF",
+            "4SF",
+            "3WTSF"
+          ],
+          "variant_count": 5,
+          "variants": [
+            {
+              "label": "2.5\"",
+              "sku": "2.5SF"
+            },
+            {
+              "label": "3\"",
+              "sku": "3SF"
+            },
+            {
+              "label": "3.5\"",
+              "sku": "3.5SF"
+            },
+            {
+              "label": "4\"",
+              "sku": "4SF"
+            },
+            {
+              "label": "3\"",
+              "sku": "3WTSF"
+            }
+          ]
+        },
+        {
+          "category_name": "Corner Flushers",
+          "category_url": "https://www.columbiatools.com/columbia-tools/corner-flushers/",
+          "subcategory_or_tool": "Direct Corner Flusher",
+          "tool_title": "Direct Corner Flusher",
+          "tool_url": "https://www.columbiatools.com/columbia-tools/corner-flushers/direct-corner-flusher/",
+          "sku_count": 5,
+          "sku_list": [
+            "2.5DF",
+            "3DF",
+            "3.5DF",
+            "4DF",
+            "3WTDF"
+          ],
+          "variant_count": 5,
+          "variants": [
+            {
+              "label": "2.5\"",
+              "sku": "2.5DF"
+            },
+            {
+              "label": "3\"",
+              "sku": "3DF"
+            },
+            {
+              "label": "3.5\"",
+              "sku": "3.5DF"
+            },
+            {
+              "label": "4\"",
+              "sku": "4DF"
+            },
+            {
+              "label": "3\"",
+              "sku": "3WTDF"
+            }
+          ]
+        },
+        {
+          "category_name": "Corner Flushers",
+          "category_url": "https://www.columbiatools.com/columbia-tools/corner-flushers/",
+          "subcategory_or_tool": "Combo Flusher",
+          "tool_title": "Combo Flusher",
+          "tool_url": "https://www.columbiatools.com/columbia-tools/corner-flushers/combo-flusher/",
+          "sku_count": 4,
+          "sku_list": [
+            "2.5CSF",
+            "3CSF",
+            "3.5CSF",
+            "3WTCSF"
+          ],
+          "variant_count": 4,
+          "variants": [
+            {
+              "label": "2.5\"",
+              "sku": "2.5CSF"
+            },
+            {
+              "label": "3\"",
+              "sku": "3CSF"
+            },
+            {
+              "label": "3.5\"",
+              "sku": "3.5CSF"
+            },
+            {
+              "label": "3\"",
+              "sku": "3WTCSF"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Semi Automatic Taper",
+      "url": "https://www.columbiatools.com/columbia-tools/semi-automatic-taper/",
+      "child_count": 1,
+      "children": [
+        {
+          "category_name": "Semi Automatic Taper",
+          "category_url": "https://www.columbiatools.com/columbia-tools/semi-automatic-taper/",
+          "subcategory_or_tool": "Semi Automatic Taper",
+          "tool_title": "Semi Automatic Taper",
+          "tool_url": "https://www.columbiatools.com/columbia-tools/semi-automatic-taper/semi-automatic-taper/",
+          "sku_count": 1,
+          "sku_list": [
+            "SAT"
+          ],
+          "variant_count": 1,
+          "variants": [
+            {
+              "label": "Semi Automatic Taper",
+              "sku": "SAT"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Sanders",
+      "url": "https://www.columbiatools.com/columbia-tools/sanders/",
+      "child_count": 2,
+      "children": [
+        {
+          "category_name": "Sanders",
+          "category_url": "https://www.columbiatools.com/columbia-tools/sanders/",
+          "subcategory_or_tool": "Sander Head",
+          "tool_title": "Sander Head",
+          "tool_url": "https://www.columbiatools.com/columbia-tools/sanders/sander-head/",
+          "sku_count": 2,
+          "sku_list": [
+            "CS",
+            "CSH"
+          ],
+          "variant_count": 2,
+          "variants": [
+            {
+              "label": "CS",
+              "sku": "CS"
+            },
+            {
+              "label": "CSH",
+              "sku": "CSH"
+            }
+          ]
+        },
+        {
+          "category_name": "Sanders",
+          "category_url": "https://www.columbiatools.com/columbia-tools/sanders/",
+          "subcategory_or_tool": "The Phantom Sander",
+          "tool_title": "The Phantom Sander",
+          "tool_url": "https://www.columbiatools.com/columbia-tools/sanders/the-phantom-sander/",
+          "sku_count": 1,
+          "sku_list": [
+            "PDDM"
+          ],
+          "variant_count": 1,
+          "variants": [
+            {
+              "label": "The Phantom Sander",
+              "sku": "PDDM"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Applicators",
+      "url": "https://www.columbiatools.com/columbia-tools/applicators/",
+      "child_count": 4,
+      "children": [
+        {
+          "category_name": "Applicators",
+          "category_url": "https://www.columbiatools.com/columbia-tools/applicators/",
+          "subcategory_or_tool": "External Corner Applicator",
+          "tool_title": "External Corner Applicator",
+          "tool_url": "https://www.columbiatools.com/columbia-tools/applicators/external-corner-applicator/",
+          "sku_count": 1,
+          "sku_list": [
+            "CEXT90"
+          ],
+          "variant_count": 1,
+          "variants": [
+            {
+              "label": "External Corner Applicator",
+              "sku": "CEXT90"
+            }
+          ]
+        },
+        {
+          "category_name": "Applicators",
+          "category_url": "https://www.columbiatools.com/columbia-tools/applicators/",
+          "subcategory_or_tool": "Inside Corner Applicator",
+          "tool_title": "Inside Corner Applicator",
+          "tool_url": "https://www.columbiatools.com/columbia-tools/applicators/inside-corner-applicator/",
+          "sku_count": 2,
+          "sku_list": [
+            "ICA2-1",
+            "ICA4-1"
+          ],
+          "variant_count": 2,
+          "variants": [
+            {
+              "label": "2\"",
+              "sku": "ICA2-1"
+            },
+            {
+              "label": "4\"",
+              "sku": "ICA4-1"
+            }
+          ]
+        },
+        {
+          "category_name": "Applicators",
+          "category_url": "https://www.columbiatools.com/columbia-tools/applicators/",
+          "subcategory_or_tool": "Two Way Internal Corner Applicator",
+          "tool_title": "Two Way Internal Corner Applicator",
+          "tool_url": "https://www.columbiatools.com/columbia-tools/applicators/two-way-internal-corner-applicator/",
+          "sku_count": 1,
+          "sku_list": [
+            "ICATW"
+          ],
+          "variant_count": 1,
+          "variants": [
+            {
+              "label": "Two Way Internal Corner Applicator",
+              "sku": "ICATW"
+            }
+          ]
+        },
+        {
+          "category_name": "Applicators",
+          "category_url": "https://www.columbiatools.com/columbia-tools/applicators/",
+          "subcategory_or_tool": "Flat Applicators",
+          "tool_title": "Flat Applicators",
+          "tool_url": "https://www.columbiatools.com/columbia-tools/applicators/flat-applicators/",
+          "sku_count": 1,
+          "sku_list": [
+            "CFLT"
+          ],
+          "variant_count": 1,
+          "variants": [
+            {
+              "label": "Flat Applicators",
+              "sku": "CFLT"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Handles",
+      "url": "https://www.columbiatools.com/columbia-tools/handles/",
+      "child_count": 6,
+      "children": [
+        {
+          "category_name": "Handles",
+          "category_url": "https://www.columbiatools.com/columbia-tools/handles/",
+          "subcategory_or_tool": "Columbia One",
+          "tool_title": "Columbia One",
+          "tool_url": "https://www.columbiatools.com/columbia-tools/handles/columbia-one/",
+          "sku_count": 3,
+          "sku_list": [
+            "C1H",
+            "C1HEXT",
+            "C1HS"
+          ],
+          "variant_count": 3,
+          "variants": [
+            {
+              "label": "1\"",
+              "sku": "C1H"
+            },
+            {
+              "label": "1\"",
+              "sku": "C1HEXT"
+            },
+            {
+              "label": "1\"",
+              "sku": "C1HS"
+            }
+          ]
+        },
+        {
+          "category_name": "Handles",
+          "category_url": "https://www.columbiatools.com/columbia-tools/handles/",
+          "subcategory_or_tool": "The Matrix Box Handles",
+          "tool_title": "The Matrix Box Handles",
+          "tool_url": "https://www.columbiatools.com/columbia-tools/handles/the-matrix-box-handles/",
+          "sku_count": 3,
+          "sku_list": [
+            "MHS",
+            "MH",
+            "MHL"
+          ],
+          "variant_count": 3,
+          "variants": [
+            {
+              "label": "29\"",
+              "sku": "MHS"
+            },
+            {
+              "label": "39\"",
+              "sku": "MH"
+            },
+            {
+              "label": "40\"",
+              "sku": "MHL"
+            }
+          ]
+        },
+        {
+          "category_name": "Handles",
+          "category_url": "https://www.columbiatools.com/columbia-tools/handles/",
+          "subcategory_or_tool": "Long Extendible Handle",
+          "tool_title": "Long Extendible Handle",
+          "tool_url": "https://www.columbiatools.com/columbia-tools/handles/long-extendible-handle/",
+          "sku_count": 1,
+          "sku_list": [
+            "CHXL"
+          ],
+          "variant_count": 1,
+          "variants": [
+            {
+              "label": "Long Extendible Handle",
+              "sku": "CHXL"
+            }
+          ]
+        },
+        {
+          "category_name": "Handles",
+          "category_url": "https://www.columbiatools.com/columbia-tools/handles/",
+          "subcategory_or_tool": "Closet Monster Flat Box Handle",
+          "tool_title": "Closet Monster Flat Box Handle",
+          "tool_url": "https://www.columbiatools.com/columbia-tools/handles/closet-monster-flat-box-handle/",
+          "sku_count": 0,
+          "sku_list": [],
+          "variant_count": 0,
+          "variants": []
+        },
+        {
+          "category_name": "Handles",
+          "category_url": "https://www.columbiatools.com/columbia-tools/handles/",
+          "subcategory_or_tool": "Twist Lock Handle",
+          "tool_title": "Twist Lock Handle",
+          "tool_url": "https://www.columbiatools.com/columbia-tools/handles/twist-lock-handle/",
+          "sku_count": 1,
+          "sku_list": [
+            "TL3-8"
+          ],
+          "variant_count": 1,
+          "variants": [
+            {
+              "label": "Twist Lock Handle",
+              "sku": "TL3-8"
+            }
+          ]
+        },
+        {
+          "category_name": "Handles",
+          "category_url": "https://www.columbiatools.com/columbia-tools/handles/",
+          "subcategory_or_tool": "Flat Box Handle",
+          "tool_title": "Flat Box Handle",
+          "tool_url": "https://www.columbiatools.com/columbia-tools/handles/flat-box-handle/",
+          "sku_count": 0,
+          "sku_list": [],
+          "variant_count": 0,
+          "variants": []
+        }
+      ]
+    },
+    {
+      "name": "Compound Tubes",
+      "url": "https://www.columbiatools.com/columbia-tools/compound-tubes/",
+      "child_count": 3,
+      "children": [
+        {
+          "category_name": "Compound Tubes",
+          "category_url": "https://www.columbiatools.com/columbia-tools/compound-tubes/",
+          "subcategory_or_tool": "Compound Tubes",
+          "tool_title": "Compound Tubes",
+          "tool_url": "https://www.columbiatools.com/columbia-tools/compound-tubes/compound-tubes/",
+          "sku_count": 4,
+          "sku_list": [
+            "CMT24",
+            "CMT32",
+            "CMT42",
+            "CMT55"
+          ],
+          "variant_count": 4,
+          "variants": [
+            {
+              "label": "24\"",
+              "sku": "CMT24"
+            },
+            {
+              "label": "32\"",
+              "sku": "CMT32"
+            },
+            {
+              "label": "42\"",
+              "sku": "CMT42"
+            },
+            {
+              "label": "55\"",
+              "sku": "CMT55"
+            }
+          ]
+        },
+        {
+          "category_name": "Compound Tubes",
+          "category_url": "https://www.columbiatools.com/columbia-tools/compound-tubes/",
+          "subcategory_or_tool": "Cam Lock Tube",
+          "tool_title": "Cam Lock Tube",
+          "tool_url": "https://www.columbiatools.com/columbia-tools/compound-tubes/cam-lock-tube/",
+          "sku_count": 4,
+          "sku_list": [
+            "CLT24",
+            "CLT32",
+            "CLT42",
+            "CLT55"
+          ],
+          "variant_count": 4,
+          "variants": [
+            {
+              "label": "24\"",
+              "sku": "CLT24"
+            },
+            {
+              "label": "32\"",
+              "sku": "CLT32"
+            },
+            {
+              "label": "42\"",
+              "sku": "CLT42"
+            },
+            {
+              "label": "55\"",
+              "sku": "CLT55"
+            }
+          ]
+        },
+        {
+          "category_name": "Compound Tubes",
+          "category_url": "https://www.columbiatools.com/columbia-tools/compound-tubes/",
+          "subcategory_or_tool": "Cam Lock Tube Box Filler",
+          "tool_title": "Cam Lock Tube Box Filler",
+          "tool_url": "https://www.columbiatools.com/columbia-tools/compound-tubes/cam-lock-tube-box-filler/",
+          "sku_count": 1,
+          "sku_list": [
+            "CLTBF"
+          ],
+          "variant_count": 1,
+          "variants": [
+            {
+              "label": "Cam Lock Tube Box Filler",
+              "sku": "CLTBF"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Maintenance Kits",
+      "url": "https://www.columbiatools.com/columbia-tools/maintenance-kits/",
+      "child_count": 7,
+      "children": [
+        {
+          "category_name": "Maintenance Kits",
+          "category_url": "https://www.columbiatools.com/columbia-tools/maintenance-kits/",
+          "subcategory_or_tool": "Automatic Taper Maintenance Kits",
+          "tool_title": "Automatic Taper Maintenance Kits",
+          "tool_url": "https://www.columbiatools.com/columbia-tools/maintenance-kits/automatic-taper-maintenance-kits/",
+          "sku_count": 0,
+          "sku_list": [],
+          "variant_count": 0,
+          "variants": []
+        },
+        {
+          "category_name": "Maintenance Kits",
+          "category_url": "https://www.columbiatools.com/columbia-tools/maintenance-kits/",
+          "subcategory_or_tool": "Finishing Box Maintenance Kits",
+          "tool_title": "Finishing Box Maintenance Kits",
+          "tool_url": "https://www.columbiatools.com/columbia-tools/maintenance-kits/finishing-box-maintenance-kits/",
+          "sku_count": 0,
+          "sku_list": [],
+          "variant_count": 0,
+          "variants": []
+        },
+        {
+          "category_name": "Maintenance Kits",
+          "category_url": "https://www.columbiatools.com/columbia-tools/maintenance-kits/",
+          "subcategory_or_tool": "Nailspotter Maintenance Kits",
+          "tool_title": "Nailspotter Maintenance Kits",
+          "tool_url": "https://www.columbiatools.com/columbia-tools/maintenance-kits/nailspotter-maintenance-kits/",
+          "sku_count": 0,
+          "sku_list": [],
+          "variant_count": 0,
+          "variants": []
+        },
+        {
+          "category_name": "Maintenance Kits",
+          "category_url": "https://www.columbiatools.com/columbia-tools/maintenance-kits/",
+          "subcategory_or_tool": "Anglehead Maintenance Kits",
+          "tool_title": "Anglehead Maintenance Kits",
+          "tool_url": "https://www.columbiatools.com/columbia-tools/maintenance-kits/anglehead-maintenance-kits/",
+          "sku_count": 0,
+          "sku_list": [],
+          "variant_count": 0,
+          "variants": []
+        },
+        {
+          "category_name": "Maintenance Kits",
+          "category_url": "https://www.columbiatools.com/columbia-tools/maintenance-kits/",
+          "subcategory_or_tool": "Corner Roller Maintenance Kits",
+          "tool_title": "Corner Roller Maintenance Kits",
+          "tool_url": "https://www.columbiatools.com/columbia-tools/maintenance-kits/corner-roller-maintenance-kits/",
+          "sku_count": 0,
+          "sku_list": [],
+          "variant_count": 0,
+          "variants": []
+        },
+        {
+          "category_name": "Maintenance Kits",
+          "category_url": "https://www.columbiatools.com/columbia-tools/maintenance-kits/",
+          "subcategory_or_tool": "Handle Maintenance Kits",
+          "tool_title": "Handle Maintenance Kits",
+          "tool_url": "https://www.columbiatools.com/columbia-tools/maintenance-kits/handle-maintenance-kits/",
+          "sku_count": 0,
+          "sku_list": [],
+          "variant_count": 0,
+          "variants": []
+        },
+        {
+          "category_name": "Maintenance Kits",
+          "category_url": "https://www.columbiatools.com/columbia-tools/maintenance-kits/",
+          "subcategory_or_tool": "Mud Pump Maintenance Kit",
+          "tool_title": "Mud Pump Maintenance Kit",
+          "tool_url": "https://www.columbiatools.com/columbia-tools/maintenance-kits/mud-pump-maintenance-kit/",
+          "sku_count": 0,
+          "sku_list": [],
+          "variant_count": 0,
+          "variants": []
+        }
+      ]
+    },
+    {
+      "name": "Grooved Mud Heads",
+      "url": "https://www.columbiatools.com/columbia-tools/mud-heads/",
+      "child_count": 3,
+      "children": [
+        {
+          "category_name": "Grooved Mud Heads",
+          "category_url": "https://www.columbiatools.com/columbia-tools/mud-heads/",
+          "subcategory_or_tool": "Inside 90 Grooved Mud Heads",
+          "tool_title": "Inside 90 Grooved Mud Heads",
+          "tool_url": "https://www.columbiatools.com/columbia-tools/grooved-mud-heads/inside-90-grooved-mud-heads/",
+          "sku_count": 1,
+          "sku_list": [
+            "IA90"
+          ],
+          "variant_count": 1,
+          "variants": [
+            {
+              "label": "Inside 90 Grooved Mud Heads",
+              "sku": "IA90"
+            }
+          ]
+        },
+        {
+          "category_name": "Grooved Mud Heads",
+          "category_url": "https://www.columbiatools.com/columbia-tools/mud-heads/",
+          "subcategory_or_tool": "Outside 90 Grooved Mud Heads",
+          "tool_title": "Outside 90 Grooved Mud Heads",
+          "tool_url": "https://www.columbiatools.com/columbia-tools/grooved-mud-heads/outside-90-grooved-mud-heads/",
+          "sku_count": 0,
+          "sku_list": [],
+          "variant_count": 0,
+          "variants": []
+        },
+        {
+          "category_name": "Grooved Mud Heads",
+          "category_url": "https://www.columbiatools.com/columbia-tools/mud-heads/",
+          "subcategory_or_tool": "Flat Grooved Mud Heads",
+          "tool_title": "Flat Grooved Mud Heads",
+          "tool_url": "https://www.columbiatools.com/columbia-tools/grooved-mud-heads/flat-grooved-mud-heads/",
+          "sku_count": 1,
+          "sku_list": [
+            "FMH"
+          ],
+          "variant_count": 1,
+          "variants": [
+            {
+              "label": "Flat Grooved Mud Heads",
+              "sku": "FMH"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "families": [
+    {
+      "category_name": "Angleheads",
+      "family_name": "Anglehead Adaptor",
+      "attribute_name": "",
+      "family_type": "single-page",
+      "member_count": 1,
+      "member_titles": [
+        "Anglehead Adaptor"
+      ],
+      "member_urls": [
+        "https://www.columbiatools.com/columbia-tools/angleheads/anglehead-adaptor/"
+      ],
+      "variants": [
+        {
+          "label": "Anglehead Adaptor",
+          "sku": "AHA"
+        }
+      ]
+    },
+    {
+      "category_name": "Angleheads",
+      "family_name": "Angleheads",
+      "attribute_name": "Size",
+      "family_type": "grouped-pages",
+      "member_count": 4,
+      "member_titles": [
+        "2″ Anglehead",
+        "2.5″ AngleHead",
+        "3″ Anglehead",
+        "3.5″ Anglehead"
+      ],
+      "member_urls": [
+        "https://www.columbiatools.com/columbia-tools/angleheads/2-anglehead/",
+        "https://www.columbiatools.com/columbia-tools/angleheads/2-5-anglehead/",
+        "https://www.columbiatools.com/columbia-tools/angleheads/3-anglehead/",
+        "https://www.columbiatools.com/columbia-tools/angleheads/3-5-anglehead/"
+      ],
+      "variants": [
+        {
+          "label": "2\"",
+          "sku": "2AH",
+          "url": "https://www.columbiatools.com/columbia-tools/angleheads/2-anglehead/"
+        },
+        {
+          "label": "2.5\"",
+          "sku": "2.5AH",
+          "url": "https://www.columbiatools.com/columbia-tools/angleheads/2-5-anglehead/"
+        },
+        {
+          "label": "3\"",
+          "sku": "3AH",
+          "url": "https://www.columbiatools.com/columbia-tools/angleheads/3-anglehead/"
+        },
+        {
+          "label": "3.5\"",
+          "sku": "3.5AH",
+          "url": "https://www.columbiatools.com/columbia-tools/angleheads/3-5-anglehead/"
+        }
+      ]
+    },
+    {
+      "category_name": "Applicators",
+      "family_name": "External Corner Applicator",
+      "attribute_name": "",
+      "family_type": "single-page",
+      "member_count": 1,
+      "member_titles": [
+        "External Corner Applicator"
+      ],
+      "member_urls": [
+        "https://www.columbiatools.com/columbia-tools/applicators/external-corner-applicator/"
+      ],
+      "variants": [
+        {
+          "label": "External Corner Applicator",
+          "sku": "CEXT90"
+        }
+      ]
+    },
+    {
+      "category_name": "Applicators",
+      "family_name": "Flat Applicators",
+      "attribute_name": "",
+      "family_type": "single-page",
+      "member_count": 1,
+      "member_titles": [
+        "Flat Applicators"
+      ],
+      "member_urls": [
+        "https://www.columbiatools.com/columbia-tools/applicators/flat-applicators/"
+      ],
+      "variants": [
+        {
+          "label": "Flat Applicators",
+          "sku": "CFLT"
+        }
+      ]
+    },
+    {
+      "category_name": "Applicators",
+      "family_name": "Inside Corner Applicator",
+      "attribute_name": "Size",
+      "family_type": "single-page",
+      "member_count": 1,
+      "member_titles": [
+        "Inside Corner Applicator"
+      ],
+      "member_urls": [
+        "https://www.columbiatools.com/columbia-tools/applicators/inside-corner-applicator/"
+      ],
+      "variants": [
+        {
+          "label": "2\"",
+          "sku": "ICA2-1"
+        },
+        {
+          "label": "4\"",
+          "sku": "ICA4-1"
+        }
+      ]
+    },
+    {
+      "category_name": "Applicators",
+      "family_name": "Two Way Internal Corner Applicator",
+      "attribute_name": "",
+      "family_type": "single-page",
+      "member_count": 1,
+      "member_titles": [
+        "Two Way Internal Corner Applicator"
+      ],
+      "member_urls": [
+        "https://www.columbiatools.com/columbia-tools/applicators/two-way-internal-corner-applicator/"
+      ],
+      "variants": [
+        {
+          "label": "Two Way Internal Corner Applicator",
+          "sku": "ICATW"
+        }
+      ]
+    },
+    {
+      "category_name": "Automatic Tapers",
+      "family_name": "Automatic Taper",
+      "attribute_name": "",
+      "family_type": "single-page",
+      "member_count": 1,
+      "member_titles": [
+        "Automatic Taper"
+      ],
+      "member_urls": [
+        "https://www.columbiatools.com/columbia-tools/automatic-tapers/automatic-taper/"
+      ],
+      "variants": [
+        {
+          "label": "Automatic Taper",
+          "sku": "TAPER"
+        }
+      ]
+    },
+    {
+      "category_name": "Automatic Tapers",
+      "family_name": "Columbia One Predator Taper",
+      "attribute_name": "",
+      "family_type": "single-page",
+      "member_count": 1,
+      "member_titles": [
+        "Columbia One Predator Taper"
+      ],
+      "member_urls": [
+        "https://www.columbiatools.com/columbia-tools/automatic-tapers/columbia-one-predator-taper/"
+      ],
+      "variants": [
+        {
+          "label": "Columbia One Predator Taper",
+          "sku": "PTAPER"
+        }
+      ]
+    },
+    {
+      "category_name": "Automatic Tapers",
+      "family_name": "Sawed Off Taper",
+      "attribute_name": "Size",
+      "family_type": "single-page",
+      "member_count": 1,
+      "member_titles": [
+        "Sawed Off Taper"
+      ],
+      "member_urls": [
+        "https://www.columbiatools.com/columbia-tools/automatic-tapers/sawed-off-taper/"
+      ],
+      "variants": [
+        {
+          "label": "39\"",
+          "sku": "STAPER"
+        },
+        {
+          "label": "53\"",
+          "sku": "SPTAPER"
+        }
+      ]
+    },
+    {
+      "category_name": "Automatic Tapers",
+      "family_name": "The Predator Family is Expanding",
+      "attribute_name": "",
+      "family_type": "single-page",
+      "member_count": 1,
+      "member_titles": [
+        "The Predator Family is Expanding"
+      ],
+      "member_urls": [
+        "https://www.columbiatools.com/columbia-tools/the-predator-family/"
+      ],
+      "variants": [
+        {
+          "label": "The Predator Family is Expanding",
+          "sku": "PCMT42"
+        }
+      ]
+    },
+    {
+      "category_name": "Compound Tubes",
+      "family_name": "Cam Lock Tube",
+      "attribute_name": "Size",
+      "family_type": "single-page",
+      "member_count": 1,
+      "member_titles": [
+        "Cam Lock Tube"
+      ],
+      "member_urls": [
+        "https://www.columbiatools.com/columbia-tools/compound-tubes/cam-lock-tube/"
+      ],
+      "variants": [
+        {
+          "label": "24\"",
+          "sku": "CLT24"
+        },
+        {
+          "label": "32\"",
+          "sku": "CLT32"
+        },
+        {
+          "label": "42\"",
+          "sku": "CLT42"
+        },
+        {
+          "label": "55\"",
+          "sku": "CLT55"
+        }
+      ]
+    },
+    {
+      "category_name": "Compound Tubes",
+      "family_name": "Cam Lock Tube Box Filler",
+      "attribute_name": "",
+      "family_type": "single-page",
+      "member_count": 1,
+      "member_titles": [
+        "Cam Lock Tube Box Filler"
+      ],
+      "member_urls": [
+        "https://www.columbiatools.com/columbia-tools/compound-tubes/cam-lock-tube-box-filler/"
+      ],
+      "variants": [
+        {
+          "label": "Cam Lock Tube Box Filler",
+          "sku": "CLTBF"
+        }
+      ]
+    },
+    {
+      "category_name": "Compound Tubes",
+      "family_name": "Compound Tubes",
+      "attribute_name": "Size",
+      "family_type": "single-page",
+      "member_count": 1,
+      "member_titles": [
+        "Compound Tubes"
+      ],
+      "member_urls": [
+        "https://www.columbiatools.com/columbia-tools/compound-tubes/compound-tubes/"
+      ],
+      "variants": [
+        {
+          "label": "24\"",
+          "sku": "CMT24"
+        },
+        {
+          "label": "32\"",
+          "sku": "CMT32"
+        },
+        {
+          "label": "42\"",
+          "sku": "CMT42"
+        },
+        {
+          "label": "55\"",
+          "sku": "CMT55"
+        }
+      ]
+    },
+    {
+      "category_name": "Corner Flushers",
+      "family_name": "Combo Flusher",
+      "attribute_name": "Size",
+      "family_type": "single-page",
+      "member_count": 1,
+      "member_titles": [
+        "Combo Flusher"
+      ],
+      "member_urls": [
+        "https://www.columbiatools.com/columbia-tools/corner-flushers/combo-flusher/"
+      ],
+      "variants": [
+        {
+          "label": "2.5\"",
+          "sku": "2.5CSF"
+        },
+        {
+          "label": "3\"",
+          "sku": "3CSF"
+        },
+        {
+          "label": "3.5\"",
+          "sku": "3.5CSF"
+        },
+        {
+          "label": "3\"",
+          "sku": "3WTCSF"
+        }
+      ]
+    },
+    {
+      "category_name": "Corner Flushers",
+      "family_name": "Direct Corner Flusher",
+      "attribute_name": "Size",
+      "family_type": "single-page",
+      "member_count": 1,
+      "member_titles": [
+        "Direct Corner Flusher"
+      ],
+      "member_urls": [
+        "https://www.columbiatools.com/columbia-tools/corner-flushers/direct-corner-flusher/"
+      ],
+      "variants": [
+        {
+          "label": "2.5\"",
+          "sku": "2.5DF"
+        },
+        {
+          "label": "3\"",
+          "sku": "3DF"
+        },
+        {
+          "label": "3.5\"",
+          "sku": "3.5DF"
+        },
+        {
+          "label": "4\"",
+          "sku": "4DF"
+        },
+        {
+          "label": "3\"",
+          "sku": "3WTDF"
+        }
+      ]
+    },
+    {
+      "category_name": "Corner Flushers",
+      "family_name": "Standard Corner Flusher",
+      "attribute_name": "Size",
+      "family_type": "single-page",
+      "member_count": 1,
+      "member_titles": [
+        "Standard Corner Flusher"
+      ],
+      "member_urls": [
+        "https://www.columbiatools.com/columbia-tools/corner-flushers/standard-corner-flusher/"
+      ],
+      "variants": [
+        {
+          "label": "2.5\"",
+          "sku": "2.5SF"
+        },
+        {
+          "label": "3\"",
+          "sku": "3SF"
+        },
+        {
+          "label": "3.5\"",
+          "sku": "3.5SF"
+        },
+        {
+          "label": "4\"",
+          "sku": "4SF"
+        },
+        {
+          "label": "3\"",
+          "sku": "3WTSF"
+        }
+      ]
+    },
+    {
+      "category_name": "Corner Rollers",
+      "family_name": "Corner Cobra",
+      "attribute_name": "",
+      "family_type": "single-page",
+      "member_count": 1,
+      "member_titles": [
+        "Corner Cobra"
+      ],
+      "member_urls": [
+        "https://www.columbiatools.com/columbia-tools/corner-rollers/corner-cobra/"
+      ],
+      "variants": [
+        {
+          "label": "Corner Cobra",
+          "sku": "CC"
+        }
+      ]
+    },
+    {
+      "category_name": "Corner Rollers",
+      "family_name": "Inside Corner Roller",
+      "attribute_name": "",
+      "family_type": "single-page",
+      "member_count": 1,
+      "member_titles": [
+        "Inside Corner Roller"
+      ],
+      "member_urls": [
+        "https://www.columbiatools.com/columbia-tools/corner-rollers/inside-corner-roller/"
+      ],
+      "variants": [
+        {
+          "label": "Inside Corner Roller",
+          "sku": "CR"
+        }
+      ]
+    },
+    {
+      "category_name": "Corner Rollers",
+      "family_name": "Outside Corner Roller",
+      "attribute_name": "Profile",
+      "family_type": "grouped-pages",
+      "member_count": 4,
+      "member_titles": [
+        "Standard Outside Corner Roller",
+        "Bullnose Outside Corner Roller",
+        "Wide Outside Corner Roller",
+        "European/Micro Outside Corner Roller"
+      ],
+      "member_urls": [
+        "https://www.columbiatools.com/columbia-tools/corner-rollers/outside-corner-rollers/",
+        "https://www.columbiatools.com/columbia-tools/corner-rollers/bullnose-outside-corner-roller/",
+        "https://www.columbiatools.com/columbia-tools/corner-rollers/wide-outside-corner-roller/",
+        "https://www.columbiatools.com/columbia-tools/corner-rollers/european-micro-outside-corner-roller/"
+      ],
+      "variants": [
+        {
+          "label": "Standard",
+          "sku": "COBCR",
+          "url": "https://www.columbiatools.com/columbia-tools/corner-rollers/outside-corner-rollers/"
+        },
+        {
+          "label": "Bullnose",
+          "sku": "CBNCR",
+          "url": "https://www.columbiatools.com/columbia-tools/corner-rollers/bullnose-outside-corner-roller/"
+        },
+        {
+          "label": "Wide",
+          "sku": "COBCRW",
+          "url": "https://www.columbiatools.com/columbia-tools/corner-rollers/wide-outside-corner-roller/"
+        },
+        {
+          "label": "European/Micro",
+          "sku": "COBCRE",
+          "url": "https://www.columbiatools.com/columbia-tools/corner-rollers/european-micro-outside-corner-roller/"
+        }
+      ]
+    },
+    {
+      "category_name": "Corner Tools",
+      "family_name": "Throttle Box",
+      "attribute_name": "Size",
+      "family_type": "grouped-pages",
+      "member_count": 2,
+      "member_titles": [
+        "7 Inch Throttle Box",
+        "8 Inch Throttle Box"
+      ],
+      "member_urls": [
+        "https://www.columbiatools.com/columbia-tools/corner-boxes/7-inch-throttle-box/",
+        "https://www.columbiatools.com/columbia-tools/corner-boxes/8-throttle-box/"
+      ],
+      "variants": [
+        {
+          "label": "7\"",
+          "sku": "7CFB",
+          "url": "https://www.columbiatools.com/columbia-tools/corner-boxes/7-inch-throttle-box/"
+        },
+        {
+          "label": "8\"",
+          "sku": "8CFB",
+          "url": "https://www.columbiatools.com/columbia-tools/corner-boxes/8-throttle-box/"
+        }
+      ]
+    },
+    {
+      "category_name": "Finishing Boxes",
+      "family_name": "Automatic Flat Boxes",
+      "attribute_name": "",
+      "family_type": "single-page",
+      "member_count": 1,
+      "member_titles": [
+        "Automatic Flat Boxes"
+      ],
+      "member_urls": [
+        "https://www.columbiatools.com/columbia-tools/finishing-boxes/automatic-flat-boxes/"
+      ],
+      "variants": []
+    },
+    {
+      "category_name": "Finishing Boxes",
+      "family_name": "Fat Boy Boxes",
+      "attribute_name": "Size",
+      "family_type": "single-page",
+      "member_count": 1,
+      "member_titles": [
+        "Fat Boy Boxes"
+      ],
+      "member_urls": [
+        "https://www.columbiatools.com/columbia-tools/finishing-boxes/fat-boy-boxes/"
+      ],
+      "variants": [
+        {
+          "label": "8\"",
+          "sku": "8FBB"
+        },
+        {
+          "label": "10\"",
+          "sku": "10FBB"
+        },
+        {
+          "label": "12\"",
+          "sku": "12FBB"
+        }
+      ]
+    },
+    {
+      "category_name": "Finishing Boxes",
+      "family_name": "Flat Boxes",
+      "attribute_name": "Size",
+      "family_type": "single-page",
+      "member_count": 1,
+      "member_titles": [
+        "Flat Boxes"
+      ],
+      "member_urls": [
+        "https://www.columbiatools.com/columbia-tools/finishing-boxes/flat-boxes/"
+      ],
+      "variants": [
+        {
+          "label": "5.5\"",
+          "sku": "5.5FFB"
+        },
+        {
+          "label": "7\"",
+          "sku": "7FFB"
+        },
+        {
+          "label": "8\"",
+          "sku": "8FFB"
+        },
+        {
+          "label": "10\"",
+          "sku": "10FFB"
+        },
+        {
+          "label": "12\"",
+          "sku": "12FFB"
+        },
+        {
+          "label": "14\"",
+          "sku": "14FFB"
+        }
+      ]
+    },
+    {
+      "category_name": "Finishing Boxes",
+      "family_name": "Inside Track Conversion Kits",
+      "attribute_name": "",
+      "family_type": "single-page",
+      "member_count": 1,
+      "member_titles": [
+        "Inside Track Conversion Kits"
+      ],
+      "member_urls": [
+        "https://www.columbiatools.com/columbia-tools/finishing-boxes/inside-track-boxes/"
+      ],
+      "variants": [
+        {
+          "label": "Inside Track Conversion Kits",
+          "sku": "ITC-K"
+        }
+      ]
+    },
+    {
+      "category_name": "Grooved Mud Heads",
+      "family_name": "Flat Grooved Mud Heads",
+      "attribute_name": "",
+      "family_type": "single-page",
+      "member_count": 1,
+      "member_titles": [
+        "Flat Grooved Mud Heads"
+      ],
+      "member_urls": [
+        "https://www.columbiatools.com/columbia-tools/grooved-mud-heads/flat-grooved-mud-heads/"
+      ],
+      "variants": [
+        {
+          "label": "Flat Grooved Mud Heads",
+          "sku": "FMH"
+        }
+      ]
+    },
+    {
+      "category_name": "Grooved Mud Heads",
+      "family_name": "Inside 90 Grooved Mud Heads",
+      "attribute_name": "",
+      "family_type": "single-page",
+      "member_count": 1,
+      "member_titles": [
+        "Inside 90 Grooved Mud Heads"
+      ],
+      "member_urls": [
+        "https://www.columbiatools.com/columbia-tools/grooved-mud-heads/inside-90-grooved-mud-heads/"
+      ],
+      "variants": [
+        {
+          "label": "Inside 90 Grooved Mud Heads",
+          "sku": "IA90"
+        }
+      ]
+    },
+    {
+      "category_name": "Grooved Mud Heads",
+      "family_name": "Outside 90 Grooved Mud Heads",
+      "attribute_name": "",
+      "family_type": "single-page",
+      "member_count": 1,
+      "member_titles": [
+        "Outside 90 Grooved Mud Heads"
+      ],
+      "member_urls": [
+        "https://www.columbiatools.com/columbia-tools/grooved-mud-heads/outside-90-grooved-mud-heads/"
+      ],
+      "variants": []
+    },
+    {
+      "category_name": "Hand Tools",
+      "family_name": "Bucket Scoops",
+      "attribute_name": "Size",
+      "family_type": "single-page",
+      "member_count": 1,
+      "member_titles": [
+        "Bucket Scoops"
+      ],
+      "member_urls": [
+        "https://www.columbiatools.com/columbia-tools/hand-tools/three-way-knives-copy/"
+      ],
+      "variants": [
+        {
+          "label": "6” One Piece Bucket Scoop (stainless steel)",
+          "sku": "OPBS"
+        },
+        {
+          "label": "6” Comfort Grip Bucket Scoop (stainless steel)",
+          "sku": "CBS2K"
+        },
+        {
+          "label": "6″ Cork Handle Bucket Scoop (stainless steel)",
+          "sku": "BCNC"
+        }
+      ]
+    },
+    {
+      "category_name": "Hand Tools",
+      "family_name": "Finishing Hawks",
+      "attribute_name": "",
+      "family_type": "single-page",
+      "member_count": 1,
+      "member_titles": [
+        "Finishing Hawks"
+      ],
+      "member_urls": [
+        "https://www.columbiatools.com/columbia-tools/hand-tools/finishing-hawks/"
+      ],
+      "variants": []
+    },
+    {
+      "category_name": "Hand Tools",
+      "family_name": "Mud Pans",
+      "attribute_name": "Size",
+      "family_type": "single-page",
+      "member_count": 1,
+      "member_titles": [
+        "Mud Pans"
+      ],
+      "member_urls": [
+        "https://www.columbiatools.com/columbia-tools/hand-tools/mud-pans/"
+      ],
+      "variants": [
+        {
+          "label": "12” Columbia Mud Pan 6 Pack",
+          "sku": "C12MP-6"
+        },
+        {
+          "label": "14” Columbia Mud Pan 6 Pack",
+          "sku": "C14MP-6"
+        },
+        {
+          "label": "16” Columbia Mud Pan 6 Pack",
+          "sku": "C16MP-6"
+        }
+      ]
+    },
+    {
+      "category_name": "Hand Tools",
+      "family_name": "Putty Knives",
+      "attribute_name": "",
+      "family_type": "single-page",
+      "member_count": 1,
+      "member_titles": [
+        "Putty Knives"
+      ],
+      "member_urls": [
+        "https://www.columbiatools.com/columbia-tools/hand-tools/putty-knives/"
+      ],
+      "variants": []
+    },
+    {
+      "category_name": "Hand Tools",
+      "family_name": "Taping Knives",
+      "attribute_name": "Size",
+      "family_type": "single-page",
+      "member_count": 1,
+      "member_titles": [
+        "Taping Knives"
+      ],
+      "member_urls": [
+        "https://www.columbiatools.com/columbia-tools/hand-tools/one-piece-putty-knives-copy/"
+      ],
+      "variants": [
+        {
+          "label": "8” Columbia Taping Knife",
+          "sku": "CTK8"
+        },
+        {
+          "label": "10” Columbia Taping Knife",
+          "sku": "CTK10"
+        },
+        {
+          "label": "12” Columbia Taping Knife",
+          "sku": "CTK12"
+        },
+        {
+          "label": "14” Columbia Taping Knife",
+          "sku": "CTK14"
+        }
+      ]
+    },
+    {
+      "category_name": "Hand Tools",
+      "family_name": "Trowels",
+      "attribute_name": "Size",
+      "family_type": "single-page",
+      "member_count": 1,
+      "member_titles": [
+        "Trowels"
+      ],
+      "member_urls": [
+        "https://www.columbiatools.com/columbia-tools/hand-tools/columbia-mud-pans-3/"
+      ],
+      "variants": [
+        {
+          "label": "12″ GOLD FINISHING TROWEL",
+          "sku": "12-4.7-0.7-G-C"
+        },
+        {
+          "label": "14″ GOLD FINISHING TROWEL",
+          "sku": "14-4.7-0.7-G-C"
+        },
+        {
+          "label": "16″ GOLD FINISHING TROWEL",
+          "sku": "16-4.7-0.7-G-C"
+        },
+        {
+          "label": "18″ GOLD FINISHING TROWEL",
+          "sku": "18-4.7-0.7-G-C"
+        },
+        {
+          "label": "12″ GOLD CURVE TROWEL",
+          "sku": "12-4.7-0.7-G-C-C"
+        },
+        {
+          "label": "14″ GOLD CURVE TROWEL",
+          "sku": "14-4.7-0.7-G-C-C"
+        },
+        {
+          "label": "16″ GOLD CURVE TROWEL",
+          "sku": "16-4.7-0.7-G-C-C"
+        },
+        {
+          "label": "12″ SILVER CURVE TROWEL",
+          "sku": "12-4.7-0.4-S-C-C"
+        },
+        {
+          "label": "14″ SILVER CURVE TROWEL",
+          "sku": "14-4.7-0.4-S-C-C"
+        },
+        {
+          "label": "12″ GOLD FINISHING TROWEL .3MM",
+          "sku": "12-4.3-0.3-G-C"
+        },
+        {
+          "label": "14″ GOLD FINISHING TROWEL .3MM",
+          "sku": "14-4.3-0.3-G-C"
+        }
+      ]
+    },
+    {
+      "category_name": "Handles",
+      "family_name": "Closet Monster Flat Box Handle",
+      "attribute_name": "",
+      "family_type": "single-page",
+      "member_count": 1,
+      "member_titles": [
+        "Closet Monster Flat Box Handle"
+      ],
+      "member_urls": [
+        "https://www.columbiatools.com/columbia-tools/handles/closet-monster-flat-box-handle/"
+      ],
+      "variants": []
+    },
+    {
+      "category_name": "Handles",
+      "family_name": "Columbia One",
+      "attribute_name": "Size",
+      "family_type": "single-page",
+      "member_count": 1,
+      "member_titles": [
+        "Columbia One"
+      ],
+      "member_urls": [
+        "https://www.columbiatools.com/columbia-tools/handles/columbia-one/"
+      ],
+      "variants": [
+        {
+          "label": "1\"",
+          "sku": "C1H"
+        },
+        {
+          "label": "1\"",
+          "sku": "C1HEXT"
+        },
+        {
+          "label": "1\"",
+          "sku": "C1HS"
+        }
+      ]
+    },
+    {
+      "category_name": "Handles",
+      "family_name": "Flat Box Handle",
+      "attribute_name": "",
+      "family_type": "single-page",
+      "member_count": 1,
+      "member_titles": [
+        "Flat Box Handle"
+      ],
+      "member_urls": [
+        "https://www.columbiatools.com/columbia-tools/handles/flat-box-handle/"
+      ],
+      "variants": []
+    },
+    {
+      "category_name": "Handles",
+      "family_name": "Long Extendible Handle",
+      "attribute_name": "",
+      "family_type": "single-page",
+      "member_count": 1,
+      "member_titles": [
+        "Long Extendible Handle"
+      ],
+      "member_urls": [
+        "https://www.columbiatools.com/columbia-tools/handles/long-extendible-handle/"
+      ],
+      "variants": [
+        {
+          "label": "Long Extendible Handle",
+          "sku": "CHXL"
+        }
+      ]
+    },
+    {
+      "category_name": "Handles",
+      "family_name": "The Matrix Box Handles",
+      "attribute_name": "Size",
+      "family_type": "single-page",
+      "member_count": 1,
+      "member_titles": [
+        "The Matrix Box Handles"
+      ],
+      "member_urls": [
+        "https://www.columbiatools.com/columbia-tools/handles/the-matrix-box-handles/"
+      ],
+      "variants": [
+        {
+          "label": "29\"",
+          "sku": "MHS"
+        },
+        {
+          "label": "39\"",
+          "sku": "MH"
+        },
+        {
+          "label": "40\"",
+          "sku": "MHL"
+        }
+      ]
+    },
+    {
+      "category_name": "Handles",
+      "family_name": "Twist Lock Handle",
+      "attribute_name": "",
+      "family_type": "single-page",
+      "member_count": 1,
+      "member_titles": [
+        "Twist Lock Handle"
+      ],
+      "member_urls": [
+        "https://www.columbiatools.com/columbia-tools/handles/twist-lock-handle/"
+      ],
+      "variants": [
+        {
+          "label": "Twist Lock Handle",
+          "sku": "TL3-8"
+        }
+      ]
+    },
+    {
+      "category_name": "Maintenance Kits",
+      "family_name": "Anglehead Maintenance Kits",
+      "attribute_name": "",
+      "family_type": "single-page",
+      "member_count": 1,
+      "member_titles": [
+        "Anglehead Maintenance Kits"
+      ],
+      "member_urls": [
+        "https://www.columbiatools.com/columbia-tools/maintenance-kits/anglehead-maintenance-kits/"
+      ],
+      "variants": []
+    },
+    {
+      "category_name": "Maintenance Kits",
+      "family_name": "Automatic Taper Maintenance Kits",
+      "attribute_name": "",
+      "family_type": "single-page",
+      "member_count": 1,
+      "member_titles": [
+        "Automatic Taper Maintenance Kits"
+      ],
+      "member_urls": [
+        "https://www.columbiatools.com/columbia-tools/maintenance-kits/automatic-taper-maintenance-kits/"
+      ],
+      "variants": []
+    },
+    {
+      "category_name": "Maintenance Kits",
+      "family_name": "Corner Roller Maintenance Kits",
+      "attribute_name": "",
+      "family_type": "single-page",
+      "member_count": 1,
+      "member_titles": [
+        "Corner Roller Maintenance Kits"
+      ],
+      "member_urls": [
+        "https://www.columbiatools.com/columbia-tools/maintenance-kits/corner-roller-maintenance-kits/"
+      ],
+      "variants": []
+    },
+    {
+      "category_name": "Maintenance Kits",
+      "family_name": "Finishing Box Maintenance Kits",
+      "attribute_name": "",
+      "family_type": "single-page",
+      "member_count": 1,
+      "member_titles": [
+        "Finishing Box Maintenance Kits"
+      ],
+      "member_urls": [
+        "https://www.columbiatools.com/columbia-tools/maintenance-kits/finishing-box-maintenance-kits/"
+      ],
+      "variants": []
+    },
+    {
+      "category_name": "Maintenance Kits",
+      "family_name": "Handle Maintenance Kits",
+      "attribute_name": "",
+      "family_type": "single-page",
+      "member_count": 1,
+      "member_titles": [
+        "Handle Maintenance Kits"
+      ],
+      "member_urls": [
+        "https://www.columbiatools.com/columbia-tools/maintenance-kits/handle-maintenance-kits/"
+      ],
+      "variants": []
+    },
+    {
+      "category_name": "Maintenance Kits",
+      "family_name": "Mud Pump Maintenance Kit",
+      "attribute_name": "",
+      "family_type": "single-page",
+      "member_count": 1,
+      "member_titles": [
+        "Mud Pump Maintenance Kit"
+      ],
+      "member_urls": [
+        "https://www.columbiatools.com/columbia-tools/maintenance-kits/mud-pump-maintenance-kit/"
+      ],
+      "variants": []
+    },
+    {
+      "category_name": "Maintenance Kits",
+      "family_name": "Nailspotter Maintenance Kits",
+      "attribute_name": "",
+      "family_type": "single-page",
+      "member_count": 1,
+      "member_titles": [
+        "Nailspotter Maintenance Kits"
+      ],
+      "member_urls": [
+        "https://www.columbiatools.com/columbia-tools/maintenance-kits/nailspotter-maintenance-kits/"
+      ],
+      "variants": []
+    },
+    {
+      "category_name": "Nailspotters",
+      "family_name": "Nailspotters",
+      "attribute_name": "Size",
+      "family_type": "grouped-pages",
+      "member_count": 2,
+      "member_titles": [
+        "2″ Nailspotter",
+        "3″ Nailspotter"
+      ],
+      "member_urls": [
+        "https://www.columbiatools.com/columbia-tools/nailspotters/2-nailspotter/",
+        "https://www.columbiatools.com/columbia-tools/nailspotters/3-nailspotter/"
+      ],
+      "variants": [
+        {
+          "label": "2\"",
+          "sku": "2NS",
+          "url": "https://www.columbiatools.com/columbia-tools/nailspotters/2-nailspotter/"
+        },
+        {
+          "label": "3\"",
+          "sku": "3NS",
+          "url": "https://www.columbiatools.com/columbia-tools/nailspotters/3-nailspotter/"
+        }
+      ]
+    },
+    {
+      "category_name": "New Releases",
+      "family_name": "Bucket Scoops",
+      "attribute_name": "Size",
+      "family_type": "single-page",
+      "member_count": 1,
+      "member_titles": [
+        "Bucket Scoops"
+      ],
+      "member_urls": [
+        "https://www.columbiatools.com/columbia-tools/hand-tools/three-way-knives-copy/"
+      ],
+      "variants": [
+        {
+          "label": "6” One Piece Bucket Scoop (stainless steel)",
+          "sku": "OPBS"
+        },
+        {
+          "label": "6” Comfort Grip Bucket Scoop (stainless steel)",
+          "sku": "CBS2K"
+        },
+        {
+          "label": "6″ Cork Handle Bucket Scoop (stainless steel)",
+          "sku": "BCNC"
+        }
+      ]
+    },
+    {
+      "category_name": "New Releases",
+      "family_name": "Columbia One Predator Taper",
+      "attribute_name": "",
+      "family_type": "single-page",
+      "member_count": 1,
+      "member_titles": [
+        "Columbia One Predator Taper"
+      ],
+      "member_urls": [
+        "https://www.columbiatools.com/columbia-tools/automatic-tapers/columbia-one-predator-taper/"
+      ],
+      "variants": [
+        {
+          "label": "Columbia One Predator Taper",
+          "sku": "PTAPER"
+        }
+      ]
+    },
+    {
+      "category_name": "New Releases",
+      "family_name": "Fat Boy Smoothing Blades",
+      "attribute_name": "Size",
+      "family_type": "single-page-override",
+      "member_count": 1,
+      "member_titles": [
+        "Fat Boy Smoothing Blades"
+      ],
+      "member_urls": [
+        "https://www.columbiatools.com/columbia-tools/smoothing-blades/fatboy-smoothing-blades/"
+      ],
+      "variants": [
+        {
+          "label": "7\"",
+          "sku": "FSB7"
+        },
+        {
+          "label": "10\"",
+          "sku": "FSB10"
+        },
+        {
+          "label": "12\"",
+          "sku": "FSB12"
+        },
+        {
+          "label": "14\"",
+          "sku": "FSB14"
+        },
+        {
+          "label": "16\"",
+          "sku": "FSB16"
+        },
+        {
+          "label": "18\"",
+          "sku": "FSB18"
+        },
+        {
+          "label": "24\"",
+          "sku": "FSB24"
+        },
+        {
+          "label": "32\"",
+          "sku": "FSB32"
+        },
+        {
+          "label": "40\"",
+          "sku": "FSB40"
+        },
+        {
+          "label": "48\"",
+          "sku": "FSB48"
+        }
+      ]
+    },
+    {
+      "category_name": "New Releases",
+      "family_name": "Finishing Hawks",
+      "attribute_name": "",
+      "family_type": "single-page",
+      "member_count": 1,
+      "member_titles": [
+        "Finishing Hawks"
+      ],
+      "member_urls": [
+        "https://www.columbiatools.com/columbia-tools/hand-tools/finishing-hawks/"
+      ],
+      "variants": []
+    },
+    {
+      "category_name": "New Releases",
+      "family_name": "Mud Pans",
+      "attribute_name": "Size",
+      "family_type": "single-page",
+      "member_count": 1,
+      "member_titles": [
+        "Mud Pans"
+      ],
+      "member_urls": [
+        "https://www.columbiatools.com/columbia-tools/hand-tools/mud-pans/"
+      ],
+      "variants": [
+        {
+          "label": "12” Columbia Mud Pan 6 Pack",
+          "sku": "C12MP-6"
+        },
+        {
+          "label": "14” Columbia Mud Pan 6 Pack",
+          "sku": "C14MP-6"
+        },
+        {
+          "label": "16” Columbia Mud Pan 6 Pack",
+          "sku": "C16MP-6"
+        }
+      ]
+    },
+    {
+      "category_name": "New Releases",
+      "family_name": "Nylon Putty Knives",
+      "attribute_name": "Size",
+      "family_type": "single-page",
+      "member_count": 1,
+      "member_titles": [
+        "Nylon Putty Knives"
+      ],
+      "member_urls": [
+        "https://www.columbiatools.com/columbia-tools/hand-tools/nylon-putty-knives/"
+      ],
+      "variants": [
+        {
+          "label": "1.5″ Nylon Putty Knife",
+          "sku": "NPK1.5"
+        },
+        {
+          "label": "2″ Nylon Putty Knife",
+          "sku": "NPK2"
+        },
+        {
+          "label": "3″ Nylon Putty Knife",
+          "sku": "NPK3"
+        },
+        {
+          "label": "4″ Nylon Putty Knife",
+          "sku": "NPK4"
+        },
+        {
+          "label": "5″ Nylon Putty Knife",
+          "sku": "NPK5"
+        },
+        {
+          "label": "6″ Nylon Putty Knife",
+          "sku": "NPK6"
+        },
+        {
+          "label": "8″ Nylon Putty Knife",
+          "sku": "NPK8"
+        },
+        {
+          "label": "10″ Nylon Putty Knife",
+          "sku": "NPK10"
+        },
+        {
+          "label": "3.5″ Pointing Joint Knife",
+          "sku": "PJK3.5"
+        },
+        {
+          "label": "6″ Clipped Joint Knife",
+          "sku": "CJK6"
+        },
+        {
+          "label": "9 in 1 Multi Tool",
+          "sku": "9-1MT"
+        }
+      ]
+    },
+    {
+      "category_name": "New Releases",
+      "family_name": "One Piece Putty Knives",
+      "attribute_name": "Size",
+      "family_type": "single-page",
+      "member_count": 1,
+      "member_titles": [
+        "One Piece Putty Knives"
+      ],
+      "member_urls": [
+        "https://www.columbiatools.com/columbia-tools/hand-tools/nylon-putty-knives-copy/"
+      ],
+      "variants": [
+        {
+          "label": "Putty Knives 1.5” One Piece Putty Knife (stainless steel)",
+          "sku": "OPPK1.5"
+        },
+        {
+          "label": "2” One Piece Putty Knife (stainless steel)",
+          "sku": "OPPK2"
+        },
+        {
+          "label": "3” One Piece Putty Knife (stainless steel)",
+          "sku": "OPPK3"
+        },
+        {
+          "label": "4” One Piece Putty Knife (stainless steel)",
+          "sku": "OPPK4"
+        },
+        {
+          "label": "5” One Piece Putty Knife (stainless steel)",
+          "sku": "OPPK5"
+        },
+        {
+          "label": "6” One Piece Putty Knife (stainless steel)",
+          "sku": "OPPK6"
+        },
+        {
+          "label": "8” One Piece Putty Knife (stainless steel)",
+          "sku": "OPPK8"
+        },
+        {
+          "label": "10-IN-1” One Piece Multi Tool (stainless steel)",
+          "sku": "OPPK10-1"
+        }
+      ]
+    },
+    {
+      "category_name": "New Releases",
+      "family_name": "Taping Knives",
+      "attribute_name": "Size",
+      "family_type": "single-page",
+      "member_count": 1,
+      "member_titles": [
+        "Taping Knives"
+      ],
+      "member_urls": [
+        "https://www.columbiatools.com/columbia-tools/hand-tools/one-piece-putty-knives-copy/"
+      ],
+      "variants": [
+        {
+          "label": "8” Columbia Taping Knife",
+          "sku": "CTK8"
+        },
+        {
+          "label": "10” Columbia Taping Knife",
+          "sku": "CTK10"
+        },
+        {
+          "label": "12” Columbia Taping Knife",
+          "sku": "CTK12"
+        },
+        {
+          "label": "14” Columbia Taping Knife",
+          "sku": "CTK14"
+        }
+      ]
+    },
+    {
+      "category_name": "New Releases",
+      "family_name": "Three Way Knives",
+      "attribute_name": "Size",
+      "family_type": "single-page",
+      "member_count": 1,
+      "member_titles": [
+        "Three Way Knives"
+      ],
+      "member_urls": [
+        "https://www.columbiatools.com/columbia-tools/hand-tools/three-way-knives/"
+      ],
+      "variants": [
+        {
+          "label": "4” Three-Way Nylon Handle Putty Knife",
+          "sku": "3NPK4"
+        },
+        {
+          "label": "5” Three-Way Nylon Handle Putty Knife",
+          "sku": "3NPK5"
+        },
+        {
+          "label": "6” Three-Way Nylon Handle Putty Knife",
+          "sku": "3NPK6"
+        }
+      ]
+    },
+    {
+      "category_name": "New Releases",
+      "family_name": "Trowels",
+      "attribute_name": "Size",
+      "family_type": "single-page",
+      "member_count": 1,
+      "member_titles": [
+        "Trowels"
+      ],
+      "member_urls": [
+        "https://www.columbiatools.com/columbia-tools/hand-tools/columbia-mud-pans-3/"
+      ],
+      "variants": [
+        {
+          "label": "12″ GOLD FINISHING TROWEL",
+          "sku": "12-4.7-0.7-G-C"
+        },
+        {
+          "label": "14″ GOLD FINISHING TROWEL",
+          "sku": "14-4.7-0.7-G-C"
+        },
+        {
+          "label": "16″ GOLD FINISHING TROWEL",
+          "sku": "16-4.7-0.7-G-C"
+        },
+        {
+          "label": "18″ GOLD FINISHING TROWEL",
+          "sku": "18-4.7-0.7-G-C"
+        },
+        {
+          "label": "12″ GOLD CURVE TROWEL",
+          "sku": "12-4.7-0.7-G-C-C"
+        },
+        {
+          "label": "14″ GOLD CURVE TROWEL",
+          "sku": "14-4.7-0.7-G-C-C"
+        },
+        {
+          "label": "16″ GOLD CURVE TROWEL",
+          "sku": "16-4.7-0.7-G-C-C"
+        },
+        {
+          "label": "12″ SILVER CURVE TROWEL",
+          "sku": "12-4.7-0.4-S-C-C"
+        },
+        {
+          "label": "14″ SILVER CURVE TROWEL",
+          "sku": "14-4.7-0.4-S-C-C"
+        },
+        {
+          "label": "12″ GOLD FINISHING TROWEL .3MM",
+          "sku": "12-4.3-0.3-G-C"
+        },
+        {
+          "label": "14″ GOLD FINISHING TROWEL .3MM",
+          "sku": "14-4.3-0.3-G-C"
+        }
+      ]
+    },
+    {
+      "category_name": "Pumps",
+      "family_name": "Box Filler",
+      "attribute_name": "Size",
+      "family_type": "single-page",
+      "member_count": 1,
+      "member_titles": [
+        "Box Filler"
+      ],
+      "member_urls": [
+        "https://www.columbiatools.com/columbia-tools/pumps/box-filler/"
+      ],
+      "variants": [
+        {
+          "label": "BF",
+          "sku": "BF"
+        },
+        {
+          "label": "TBBF",
+          "sku": "TBBF"
+        }
+      ]
+    },
+    {
+      "category_name": "Pumps",
+      "family_name": "Columbia X Graco PowerFill 3.5",
+      "attribute_name": "Size",
+      "family_type": "single-page",
+      "member_count": 1,
+      "member_titles": [
+        "Columbia X Graco PowerFill 3.5"
+      ],
+      "member_urls": [
+        "https://www.columbiatools.com/columbia-tools/pumps/columbiapowerfill/"
+      ],
+      "variants": [
+        {
+          "label": "Columbia PowerFill Pump (comes with box filler)",
+          "sku": "CPFP"
+        },
+        {
+          "label": "Columbia PowerFill Gooseneck (sold seperately)",
+          "sku": "CPFGN"
+        }
+      ]
+    },
+    {
+      "category_name": "Pumps",
+      "family_name": "Gooseneck",
+      "attribute_name": "Size",
+      "family_type": "single-page",
+      "member_count": 1,
+      "member_titles": [
+        "Gooseneck"
+      ],
+      "member_urls": [
+        "https://www.columbiatools.com/columbia-tools/pumps/gooseneck/"
+      ],
+      "variants": [
+        {
+          "label": "GN",
+          "sku": "GN"
+        },
+        {
+          "label": "TBGN",
+          "sku": "TBGN"
+        }
+      ]
+    },
+    {
+      "category_name": "Pumps",
+      "family_name": "Mud Pump",
+      "attribute_name": "",
+      "family_type": "single-page",
+      "member_count": 1,
+      "member_titles": [
+        "Mud Pump"
+      ],
+      "member_urls": [
+        "https://www.columbiatools.com/columbia-tools/pumps/mud-pump/"
+      ],
+      "variants": [
+        {
+          "label": "Mud Pump",
+          "sku": "HMP"
+        }
+      ]
+    },
+    {
+      "category_name": "Pumps",
+      "family_name": "Tall Boy Mud Pump",
+      "attribute_name": "",
+      "family_type": "single-page",
+      "member_count": 1,
+      "member_titles": [
+        "Tall Boy Mud Pump"
+      ],
+      "member_urls": [
+        "https://www.columbiatools.com/columbia-tools/pumps/tall-boy-mud-pump/"
+      ],
+      "variants": [
+        {
+          "label": "Tall Boy Mud Pump",
+          "sku": "TBMP"
+        }
+      ]
+    },
+    {
+      "category_name": "Sanders",
+      "family_name": "Sander Head",
+      "attribute_name": "Size",
+      "family_type": "single-page",
+      "member_count": 1,
+      "member_titles": [
+        "Sander Head"
+      ],
+      "member_urls": [
+        "https://www.columbiatools.com/columbia-tools/sanders/sander-head/"
+      ],
+      "variants": [
+        {
+          "label": "CS",
+          "sku": "CS"
+        },
+        {
+          "label": "CSH",
+          "sku": "CSH"
+        }
+      ]
+    },
+    {
+      "category_name": "Sanders",
+      "family_name": "The Phantom Sander",
+      "attribute_name": "",
+      "family_type": "single-page",
+      "member_count": 1,
+      "member_titles": [
+        "The Phantom Sander"
+      ],
+      "member_urls": [
+        "https://www.columbiatools.com/columbia-tools/sanders/the-phantom-sander/"
+      ],
+      "variants": [
+        {
+          "label": "The Phantom Sander",
+          "sku": "PDDM"
+        }
+      ]
+    },
+    {
+      "category_name": "Semi Automatic Taper",
+      "family_name": "Semi Automatic Taper",
+      "attribute_name": "",
+      "family_type": "single-page",
+      "member_count": 1,
+      "member_titles": [
+        "Semi Automatic Taper"
+      ],
+      "member_urls": [
+        "https://www.columbiatools.com/columbia-tools/semi-automatic-taper/semi-automatic-taper/"
+      ],
+      "variants": [
+        {
+          "label": "Semi Automatic Taper",
+          "sku": "SAT"
+        }
+      ]
+    },
+    {
+      "category_name": "Smoothing Blades",
+      "family_name": "Fat Boy Smoothing Blades",
+      "attribute_name": "Size",
+      "family_type": "single-page-override",
+      "member_count": 1,
+      "member_titles": [
+        "Fat Boy Smoothing Blades"
+      ],
+      "member_urls": [
+        "https://www.columbiatools.com/columbia-tools/smoothing-blades/fatboy-smoothing-blades/"
+      ],
+      "variants": [
+        {
+          "label": "7\"",
+          "sku": "FSB7"
+        },
+        {
+          "label": "10\"",
+          "sku": "FSB10"
+        },
+        {
+          "label": "12\"",
+          "sku": "FSB12"
+        },
+        {
+          "label": "14\"",
+          "sku": "FSB14"
+        },
+        {
+          "label": "16\"",
+          "sku": "FSB16"
+        },
+        {
+          "label": "18\"",
+          "sku": "FSB18"
+        },
+        {
+          "label": "24\"",
+          "sku": "FSB24"
+        },
+        {
+          "label": "32\"",
+          "sku": "FSB32"
+        },
+        {
+          "label": "40\"",
+          "sku": "FSB40"
+        },
+        {
+          "label": "48\"",
+          "sku": "FSB48"
+        }
+      ]
+    },
+    {
+      "category_name": "Smoothing Blades",
+      "family_name": "Sabre Smoothing Blades",
+      "attribute_name": "Size",
+      "family_type": "single-page-override",
+      "member_count": 1,
+      "member_titles": [
+        "Sabre Smoothing Blades"
+      ],
+      "member_urls": [
+        "https://www.columbiatools.com/columbia-tools/smoothing-blades/sabre-smoothing-blades/"
+      ],
+      "variants": [
+        {
+          "label": "7\"",
+          "sku": "SSB7"
+        },
+        {
+          "label": "10\"",
+          "sku": "SSB10"
+        },
+        {
+          "label": "12\"",
+          "sku": "SSB12"
+        },
+        {
+          "label": "14\"",
+          "sku": "SSB14"
+        },
+        {
+          "label": "16\"",
+          "sku": "SSB16"
+        },
+        {
+          "label": "18\"",
+          "sku": "SSB18"
+        },
+        {
+          "label": "24\"",
+          "sku": "SSB24"
+        },
+        {
+          "label": "32\"",
+          "sku": "SSB32"
+        },
+        {
+          "label": "40\"",
+          "sku": "SSB40"
+        },
+        {
+          "label": "48\"",
+          "sku": "SSB48"
+        }
+      ]
+    },
+    {
+      "category_name": "Smoothing Blades",
+      "family_name": "Tomahawk Smoothing Blades",
+      "attribute_name": "Size",
+      "family_type": "single-page-override",
+      "member_count": 1,
+      "member_titles": [
+        "Tomahawk Smoothing Blades"
+      ],
+      "member_urls": [
+        "https://www.columbiatools.com/columbia-tools/tomahawk-smoothing-blades/tomahawk-smoothing-blades/"
+      ],
+      "variants": [
+        {
+          "label": "7\"",
+          "sku": "TSB7"
+        },
+        {
+          "label": "10\"",
+          "sku": "TSB10"
+        },
+        {
+          "label": "12\"",
+          "sku": "TSB12"
+        },
+        {
+          "label": "14\"",
+          "sku": "TSB14"
+        },
+        {
+          "label": "18\"",
+          "sku": "TSB18"
+        },
+        {
+          "label": "24\"",
+          "sku": "TSB24"
+        },
+        {
+          "label": "32\"",
+          "sku": "TSB32"
+        },
+        {
+          "label": "40\"",
+          "sku": "TSB40"
+        },
+        {
+          "label": "48\"",
+          "sku": "TSB48"
+        }
+      ]
+    },
+    {
+      "category_name": "Smoothing Blades",
+      "family_name": "Tomalock",
+      "attribute_name": "",
+      "family_type": "single-page",
+      "member_count": 1,
+      "member_titles": [
+        "Tomalock"
+      ],
+      "member_urls": [
+        "https://www.columbiatools.com/columbia-tools/tomahawk-smoothing-blades/tomalock/"
+      ],
+      "variants": [
+        {
+          "label": "Tomalock",
+          "sku": "CLTHA"
+        }
+      ]
+    },
+    {
+      "category_name": "The Predator Family is Expanding",
+      "family_name": "Automatic Taper",
+      "attribute_name": "",
+      "family_type": "single-page",
+      "member_count": 1,
+      "member_titles": [
+        "Automatic Taper"
+      ],
+      "member_urls": [
+        "https://www.columbiatools.com/columbia-tools/automatic-tapers/automatic-taper/"
+      ],
+      "variants": [
+        {
+          "label": "Automatic Taper",
+          "sku": "TAPER"
+        }
+      ]
+    },
+    {
+      "category_name": "The Predator Family is Expanding",
+      "family_name": "Mud Pump",
+      "attribute_name": "",
+      "family_type": "single-page",
+      "member_count": 1,
+      "member_titles": [
+        "Mud Pump"
+      ],
+      "member_urls": [
+        "https://www.columbiatools.com/columbia-tools/pumps/mud-pump/"
+      ],
+      "variants": [
+        {
+          "label": "Mud Pump",
+          "sku": "HMP"
+        }
+      ]
+    },
+    {
+      "category_name": "The Predator Family is Expanding",
+      "family_name": "Tall Boy Mud Pump",
+      "attribute_name": "",
+      "family_type": "single-page",
+      "member_count": 1,
+      "member_titles": [
+        "Tall Boy Mud Pump"
+      ],
+      "member_urls": [
+        "https://www.columbiatools.com/columbia-tools/pumps/tall-boy-mud-pump/"
+      ],
+      "variants": [
+        {
+          "label": "Tall Boy Mud Pump",
+          "sku": "TBMP"
+        }
+      ]
+    },
+    {
+      "category_name": "The Tool Sets",
+      "family_name": "The Commando Set",
+      "attribute_name": "",
+      "family_type": "single-page",
+      "member_count": 1,
+      "member_titles": [
+        "The Commando Set"
+      ],
+      "member_urls": [
+        "https://www.columbiatools.com/columbia-tools/tool-sets/the-commando-set/"
+      ],
+      "variants": [
+        {
+          "label": "The Commando Set",
+          "sku": "SACS"
+        }
+      ]
+    },
+    {
+      "category_name": "The Tool Sets",
+      "family_name": "The Predator Tactical Set",
+      "attribute_name": "",
+      "family_type": "single-page",
+      "member_count": 1,
+      "member_titles": [
+        "The Predator Tactical Set"
+      ],
+      "member_urls": [
+        "https://www.columbiatools.com/columbia-tools/tool-sets/the-predator-tactical-set/"
+      ],
+      "variants": [
+        {
+          "label": "The Predator Tactical Set",
+          "sku": "PTS"
+        }
+      ]
+    },
+    {
+      "category_name": "The Tool Sets",
+      "family_name": "The Sabre Set",
+      "attribute_name": "",
+      "family_type": "single-page",
+      "member_count": 1,
+      "member_titles": [
+        "The Sabre Set"
+      ],
+      "member_urls": [
+        "https://www.columbiatools.com/columbia-tools/tool-sets/the-sabre-set/"
+      ],
+      "variants": [
+        {
+          "label": "The Sabre Set",
+          "sku": "SBSET"
+        }
+      ]
+    },
+    {
+      "category_name": "The Tool Sets",
+      "family_name": "The Tactical Set",
+      "attribute_name": "",
+      "family_type": "single-page",
+      "member_count": 1,
+      "member_titles": [
+        "The Tactical Set"
+      ],
+      "member_urls": [
+        "https://www.columbiatools.com/columbia-tools/tool-sets/the-tactical-set/"
+      ],
+      "variants": [
+        {
+          "label": "The Tactical Set",
+          "sku": "TS"
+        }
+      ]
+    },
+    {
+      "category_name": "The Tool Sets",
+      "family_name": "The Warrior Set",
+      "attribute_name": "",
+      "family_type": "single-page",
+      "member_count": 1,
+      "member_titles": [
+        "The Warrior Set"
+      ],
+      "member_urls": [
+        "https://www.columbiatools.com/columbia-tools/tool-sets/the-warrior-set/"
+      ],
+      "variants": [
+        {
+          "label": "The Warrior Set",
+          "sku": "TWS"
+        }
+      ]
+    },
+    {
+      "category_name": "Tool Cases",
+      "family_name": "The Road Case",
+      "attribute_name": "",
+      "family_type": "single-page",
+      "member_count": 1,
+      "member_titles": [
+        "The Road Case"
+      ],
+      "member_urls": [
+        "https://www.columbiatools.com/columbia-tools/tool-cases/the-road-case/"
+      ],
+      "variants": [
+        {
+          "label": "The Road Case",
+          "sku": "RC"
+        }
+      ]
+    },
+    {
+      "category_name": "Tool Cases",
+      "family_name": "The Semi-Automatic Case",
+      "attribute_name": "",
+      "family_type": "single-page",
+      "member_count": 1,
+      "member_titles": [
+        "The Semi-Automatic Case"
+      ],
+      "member_urls": [
+        "https://www.columbiatools.com/columbia-tools/tool-cases/the-semi-automatic-case/"
+      ],
+      "variants": [
+        {
+          "label": "The Semi-Automatic Case",
+          "sku": "TCS"
+        }
+      ]
+    }
+  ]
+}
