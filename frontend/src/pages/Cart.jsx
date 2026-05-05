@@ -55,9 +55,14 @@ export default function Cart() {
           {/* Cart Items */}
           <div className="lg:col-span-2">
             <div className="bg-white rounded-lg shadow-md overflow-hidden border border-gray-200">
-              {cartItems.map((item, index) => (
+              {cartItems.map((item, index) => {
+                const itemKey = item.cartKey || item.id;
+                const optionText = Array.isArray(item.variation_attribute_values)
+                  ? item.variation_attribute_values.map((attr) => attr.option).filter(Boolean).join(' / ')
+                  : '';
+                return (
                 <div
-                  key={item.id}
+                  key={itemKey}
                   className={`p-4 sm:p-6 flex flex-row sm:flex-row gap-4 sm:gap-6 dtb-cart-item ${
                     index !== cartItems.length - 1 ? 'border-b border-gray-200' : ''
                   }`}
@@ -77,9 +82,12 @@ export default function Cart() {
                       <div className="min-w-0 pr-2">
                         <p className="text-xs text-gray-500 mb-0.5">{item.brand}</p>
                         <h3 className="text-sm sm:text-lg font-semibold text-gray-900 leading-snug">{item.name}</h3>
+                        {optionText && (
+                          <p className="text-xs sm:text-sm font-semibold text-gray-600 mt-1">{optionText}</p>
+                        )}
                       </div>
                       <button
-                        onClick={() => removeFromCart(item.id)}
+                        onClick={() => removeFromCart(itemKey)}
                         className="shrink-0 p-1.5 sm:p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
                         aria-label="Remove item"
                       >
@@ -93,7 +101,7 @@ export default function Cart() {
                         <span className="text-xs sm:text-sm text-gray-600">Qty:</span>
                         <div className="flex items-center border border-gray-300 rounded-lg overflow-hidden">
                           <button
-                            onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                            onClick={() => updateQuantity(itemKey, item.quantity - 1)}
                             className="p-1.5 sm:p-2 hover:bg-gray-100 transition-colors"
                             aria-label="Decrease quantity"
                           >
@@ -101,7 +109,7 @@ export default function Cart() {
                           </button>
                           <span className="px-2 sm:px-4 font-semibold text-sm">{item.quantity}</span>
                           <button
-                            onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                            onClick={() => updateQuantity(itemKey, item.quantity + 1)}
                             className="p-1.5 sm:p-2 hover:bg-gray-100 transition-colors"
                             aria-label="Increase quantity"
                           >
@@ -120,7 +128,8 @@ export default function Cart() {
                     </div>
                   </div>
                 </div>
-              ))}
+                );
+              })}
             </div>
 
             {/* Continue Shopping */}

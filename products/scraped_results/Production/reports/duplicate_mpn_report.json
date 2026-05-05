@@ -1,0 +1,842 @@
+[
+  {
+    "mpn": "BH1",
+    "count": 2,
+    "occurrences": [
+      {
+        "brand": "Columbia",
+        "product_title": "Columbia 180 Grip Box Handle Repair Parts",
+        "variant_title": "BH1 - Mounting Plate",
+        "sku": "BH1__COLUMBIA-180-GRIP-BOX-HANDLE-REPAIR-PARTS"
+      },
+      {
+        "brand": "Columbia",
+        "product_title": "Columbia Hydra-Reach Box Handle Repair Parts",
+        "variant_title": "BH1 - Mounting Plate",
+        "sku": "BH1__COLUMBIA-HYDRA-REACH-BOX-HANDLE-REPAIR-PARTS"
+      }
+    ]
+  },
+  {
+    "mpn": "BH5",
+    "count": 2,
+    "occurrences": [
+      {
+        "brand": "Columbia",
+        "product_title": "Columbia 180 Grip Box Handle Repair Parts",
+        "variant_title": "BH5 - Upper Mounting Bracket",
+        "sku": "BH5__COLUMBIA-180-GRIP-BOX-HANDLE-REPAIR-PARTS"
+      },
+      {
+        "brand": "Columbia",
+        "product_title": "Columbia Hydra-Reach Box Handle Repair Parts",
+        "variant_title": "BH5 - Upper Mounting Bracket",
+        "sku": "BH5__COLUMBIA-HYDRA-REACH-BOX-HANDLE-REPAIR-PARTS"
+      }
+    ]
+  },
+  {
+    "mpn": "BH6",
+    "count": 2,
+    "occurrences": [
+      {
+        "brand": "Columbia",
+        "product_title": "Columbia 180 Grip Box Handle Repair Parts",
+        "variant_title": "BH6 - Hinge Pin",
+        "sku": "BH6__COLUMBIA-180-GRIP-BOX-HANDLE-REPAIR-PARTS"
+      },
+      {
+        "brand": "Columbia",
+        "product_title": "Columbia Hydra-Reach Box Handle Repair Parts",
+        "variant_title": "BH6 - Hinge Pin",
+        "sku": "BH6__COLUMBIA-HYDRA-REACH-BOX-HANDLE-REPAIR-PARTS"
+      }
+    ]
+  },
+  {
+    "mpn": "CFB5B",
+    "count": 2,
+    "occurrences": [
+      {
+        "brand": "Columbia",
+        "product_title": "Columbia Cone Ball",
+        "variant_title": "Default Title",
+        "sku": "CFB5B__COLUMBIA-CONE-BALL"
+      },
+      {
+        "brand": "Columbia",
+        "product_title": "Columbia Corner Flusher Box Repair Parts",
+        "variant_title": "CFB5B - Cone Ball",
+        "sku": "CFB5B__COLUMBIA-CORNER-FLUSHER-BOX-REPAIR-PARTS"
+      }
+    ]
+  },
+  {
+    "mpn": "CT72",
+    "count": 2,
+    "occurrences": [
+      {
+        "brand": "Columbia",
+        "product_title": "Columbia Automatic Taper Body Repair Parts",
+        "variant_title": "CT72 - Cable",
+        "sku": "CT72__COLUMBIA-AUTOMATIC-TAPER-BODY-REPAIR-PARTS"
+      },
+      {
+        "brand": "Columbia",
+        "product_title": "Columbia Automatic Taper Head Repair Parts",
+        "variant_title": "CT72 - Cable",
+        "sku": "CT72__COLUMBIA-AUTOMATIC-TAPER-HEAD-REPAIR-PARTS"
+      }
+    ]
+  },
+  {
+    "mpn": "FA207",
+    "count": 2,
+    "occurrences": [
+      {
+        "brand": "Columbia",
+        "product_title": "Columbia Automatic Taper Body Repair Parts",
+        "variant_title": "FA207 - 4-40 Nyloc Nut",
+        "sku": "FA207__COLUMBIA-AUTOMATIC-TAPER-BODY-REPAIR-PARTS"
+      },
+      {
+        "brand": "Columbia",
+        "product_title": "Columbia Automatic Taper Head Repair Parts",
+        "variant_title": "FA207 - 4-40 Nyloc Nut",
+        "sku": "FA207__COLUMBIA-AUTOMATIC-TAPER-HEAD-REPAIR-PARTS"
+      }
+    ]
+  },
+  {
+    "mpn": "FA208",
+    "count": 2,
+    "occurrences": [
+      {
+        "brand": "Columbia",
+        "product_title": "Columbia Automatic Taper Body Repair Parts",
+        "variant_title": "FA208 - 4-40 x 1/8\" Binder Slot",
+        "sku": "FA208__COLUMBIA-AUTOMATIC-TAPER-BODY-REPAIR-PARTS"
+      },
+      {
+        "brand": "Columbia",
+        "product_title": "Columbia Automatic Taper Head Repair Parts",
+        "variant_title": "FA208 - 4-40 x 1/8\" Binder Slot",
+        "sku": "FA208__COLUMBIA-AUTOMATIC-TAPER-HEAD-REPAIR-PARTS"
+      }
+    ]
+  },
+  {
+    "mpn": "FA213",
+    "count": 2,
+    "occurrences": [
+      {
+        "brand": "Columbia",
+        "product_title": "Columbia Automatic Taper Head Repair Parts",
+        "variant_title": "FA213 - 4-40 x 1/4\" Binder Slot",
+        "sku": "FA213__COLUMBIA-AUTOMATIC-TAPER-HEAD-REPAIR-PARTS"
+      },
+      {
+        "brand": "Columbia",
+        "product_title": "Columbia Corner Flusher Box Repair Parts",
+        "variant_title": "FA213 - 4-40 x 1/4\" Binder Slot",
+        "sku": "FA213__COLUMBIA-CORNER-FLUSHER-BOX-REPAIR-PARTS"
+      }
+    ]
+  },
+  {
+    "mpn": "FA219",
+    "count": 3,
+    "occurrences": [
+      {
+        "brand": "Columbia",
+        "product_title": "Columbia Automatic Taper Body Repair Parts",
+        "variant_title": "FA219 - 4-40 x 1/2\" Fillister Slot",
+        "sku": "FA219__COLUMBIA-AUTOMATIC-TAPER-BODY-REPAIR-PARTS"
+      },
+      {
+        "brand": "Columbia",
+        "product_title": "Columbia Automatic Taper Head Repair Parts",
+        "variant_title": "FA219 - 4-40 x 1/2\" Fillister Slot",
+        "sku": "FA219__COLUMBIA-AUTOMATIC-TAPER-HEAD-REPAIR-PARTS"
+      },
+      {
+        "brand": "Columbia",
+        "product_title": "Columbia Corner Flusher Box Repair Parts",
+        "variant_title": "FA219 - 4-40 X 1/2\" Fillister Slot",
+        "sku": "FA219__COLUMBIA-CORNER-FLUSHER-BOX-REPAIR-PARTS"
+      }
+    ]
+  },
+  {
+    "mpn": "FA220",
+    "count": 2,
+    "occurrences": [
+      {
+        "brand": "Columbia",
+        "product_title": "Columbia Automatic Taper Body Repair Parts",
+        "variant_title": "FA220 - 4-40 x 3/4\" Hex Bolt",
+        "sku": "FA220__COLUMBIA-AUTOMATIC-TAPER-BODY-REPAIR-PARTS"
+      },
+      {
+        "brand": "Columbia",
+        "product_title": "Columbia Automatic Taper Head Repair Parts",
+        "variant_title": "FA220 - 4-40 x 3/4\" Hex Bolt",
+        "sku": "FA220__COLUMBIA-AUTOMATIC-TAPER-HEAD-REPAIR-PARTS"
+      }
+    ]
+  },
+  {
+    "mpn": "FA228",
+    "count": 3,
+    "occurrences": [
+      {
+        "brand": "Columbia",
+        "product_title": "Columbia Automatic Taper Head Repair Parts",
+        "variant_title": "FA228 - #6 Flat Washer",
+        "sku": "FA228__COLUMBIA-AUTOMATIC-TAPER-HEAD-REPAIR-PARTS"
+      },
+      {
+        "brand": "Columbia",
+        "product_title": "Columbia Corner Flusher Box Repair Parts",
+        "variant_title": "FA228 - #6 Flat Washer",
+        "sku": "FA228__COLUMBIA-CORNER-FLUSHER-BOX-REPAIR-PARTS"
+      },
+      {
+        "brand": "Columbia",
+        "product_title": "Columbia Hinged Nailspotter Repair Parts",
+        "variant_title": "FA228 - #6 Flat Washer",
+        "sku": "FA228__COLUMBIA-HINGED-NAILSPOTTER-REPAIR-PARTS"
+      }
+    ]
+  },
+  {
+    "mpn": "FA229",
+    "count": 2,
+    "occurrences": [
+      {
+        "brand": "Columbia",
+        "product_title": "Columbia Automatic Taper Head Repair Parts",
+        "variant_title": "FA229 - #6 Lock Washer",
+        "sku": "FA229__COLUMBIA-AUTOMATIC-TAPER-HEAD-REPAIR-PARTS"
+      },
+      {
+        "brand": "Columbia",
+        "product_title": "Columbia Matrix Handle Repair Parts",
+        "variant_title": "FA229 - #6 Lock Washer",
+        "sku": "FA229__COLUMBIA-MATRIX-HANDLE-REPAIR-PARTS"
+      }
+    ]
+  },
+  {
+    "mpn": "FA231",
+    "count": 3,
+    "occurrences": [
+      {
+        "brand": "Columbia",
+        "product_title": "Columbia Corner Flusher Box Repair Parts",
+        "variant_title": "FA231 - 6-32 x 3/8\" Hex Bolt",
+        "sku": "FA231__COLUMBIA-CORNER-FLUSHER-BOX-REPAIR-PARTS"
+      },
+      {
+        "brand": "Columbia",
+        "product_title": "Columbia Flat Finishing Box Repair Parts",
+        "variant_title": "FA231 - 6-32 x 3/8\" Hex Bolt",
+        "sku": "FA231__COLUMBIA-FLAT-FINISHING-BOX-REPAIR-PARTS"
+      },
+      {
+        "brand": "Columbia",
+        "product_title": "Columbia Hinged Nailspotter Repair Parts",
+        "variant_title": "FA231 - 6-32 x 3/8\" Hex Bolt",
+        "sku": "FA231__COLUMBIA-HINGED-NAILSPOTTER-REPAIR-PARTS"
+      }
+    ]
+  },
+  {
+    "mpn": "FA232",
+    "count": 2,
+    "occurrences": [
+      {
+        "brand": "Columbia",
+        "product_title": "Columbia Corner Flusher Box Repair Parts",
+        "variant_title": "FA232 - 6-32 Hex Nut",
+        "sku": "FA232__COLUMBIA-CORNER-FLUSHER-BOX-REPAIR-PARTS"
+      },
+      {
+        "brand": "Columbia",
+        "product_title": "Columbia Flat Finishing Box Repair Parts",
+        "variant_title": "FA232 - 6-32 Hex Nut",
+        "sku": "FA232__COLUMBIA-FLAT-FINISHING-BOX-REPAIR-PARTS"
+      }
+    ]
+  },
+  {
+    "mpn": "FA233",
+    "count": 2,
+    "occurrences": [
+      {
+        "brand": "Columbia",
+        "product_title": "Columbia Automatic Taper Head Repair Parts",
+        "variant_title": "FA233 - 6-32 Nyloc Nut",
+        "sku": "FA233__COLUMBIA-AUTOMATIC-TAPER-HEAD-REPAIR-PARTS"
+      },
+      {
+        "brand": "Columbia",
+        "product_title": "Columbia Flat Finishing Box Repair Parts",
+        "variant_title": "FA233 - 6-32 Nyloc Nut",
+        "sku": "FA233__COLUMBIA-FLAT-FINISHING-BOX-REPAIR-PARTS"
+      }
+    ]
+  },
+  {
+    "mpn": "FA238",
+    "count": 3,
+    "occurrences": [
+      {
+        "brand": "Columbia",
+        "product_title": "Columbia Automatic Taper Head Repair Parts",
+        "variant_title": "FA238 - 6-32 x 3/16\" Fillister Slot",
+        "sku": "FA238__COLUMBIA-AUTOMATIC-TAPER-HEAD-REPAIR-PARTS"
+      },
+      {
+        "brand": "Columbia",
+        "product_title": "Columbia Corner Flusher Box Repair Parts",
+        "variant_title": "FA238 - 6-32 X 3/16\" Fillister Slot",
+        "sku": "FA238__COLUMBIA-CORNER-FLUSHER-BOX-REPAIR-PARTS"
+      },
+      {
+        "brand": "Columbia",
+        "product_title": "Columbia Flat Finishing Box Repair Parts",
+        "variant_title": "FA238 - 6-32 X 3/16\" Fillister Slot",
+        "sku": "FA238__COLUMBIA-FLAT-FINISHING-BOX-REPAIR-PARTS"
+      }
+    ]
+  },
+  {
+    "mpn": "FA239",
+    "count": 3,
+    "occurrences": [
+      {
+        "brand": "Columbia",
+        "product_title": "Columbia Automatic Taper Body Repair Parts",
+        "variant_title": "FA239 - 6-32 x 1/4\" Binder Slot",
+        "sku": "FA239__COLUMBIA-AUTOMATIC-TAPER-BODY-REPAIR-PARTS"
+      },
+      {
+        "brand": "Columbia",
+        "product_title": "Columbia Automatic Taper Head Repair Parts",
+        "variant_title": "FA239 - 6-32 x 1/4\" Binder Slot",
+        "sku": "FA239__COLUMBIA-AUTOMATIC-TAPER-HEAD-REPAIR-PARTS"
+      },
+      {
+        "brand": "Columbia",
+        "product_title": "Columbia Flat Finishing Box Repair Parts",
+        "variant_title": "FA239 - 6-32 X 1/4\" Binder Slot",
+        "sku": "FA239__COLUMBIA-FLAT-FINISHING-BOX-REPAIR-PARTS"
+      }
+    ]
+  },
+  {
+    "mpn": "FA241",
+    "count": 4,
+    "occurrences": [
+      {
+        "brand": "Columbia",
+        "product_title": "Columbia Automatic Taper Head Repair Parts",
+        "variant_title": "FA241 - 6-32 x 3/8\" Binder Slot",
+        "sku": "FA241__COLUMBIA-AUTOMATIC-TAPER-HEAD-REPAIR-PARTS"
+      },
+      {
+        "brand": "Columbia",
+        "product_title": "Columbia Corner Flusher Box Repair Parts",
+        "variant_title": "FA241 - 6-32 X 3/8\" Binder Slot",
+        "sku": "FA241__COLUMBIA-CORNER-FLUSHER-BOX-REPAIR-PARTS"
+      },
+      {
+        "brand": "Columbia",
+        "product_title": "Columbia Flat Finishing Box Repair Parts",
+        "variant_title": "FA241 - 6-32 X 3/8\" Binder Slot",
+        "sku": "FA241__COLUMBIA-FLAT-FINISHING-BOX-REPAIR-PARTS"
+      },
+      {
+        "brand": "Columbia",
+        "product_title": "Columbia Hinged Nailspotter Repair Parts",
+        "variant_title": "FA241 - 6-32 X 3/8\" Binder Slot",
+        "sku": "FA241__COLUMBIA-HINGED-NAILSPOTTER-REPAIR-PARTS"
+      }
+    ]
+  },
+  {
+    "mpn": "FA245",
+    "count": 2,
+    "occurrences": [
+      {
+        "brand": "Columbia",
+        "product_title": "Columbia Angle Head Repair Parts",
+        "variant_title": "FA245 - 6-32 X 1/2\" Fillister Slot",
+        "sku": "FA245__COLUMBIA-ANGLE-HEAD-REPAIR-PARTS"
+      },
+      {
+        "brand": "Columbia",
+        "product_title": "Columbia Automatic Taper Head Repair Parts",
+        "variant_title": "FA245 - 6-32 x 1/2\" Fillister Slot",
+        "sku": "FA245__COLUMBIA-AUTOMATIC-TAPER-HEAD-REPAIR-PARTS"
+      }
+    ]
+  },
+  {
+    "mpn": "FA247",
+    "count": 3,
+    "occurrences": [
+      {
+        "brand": "Columbia",
+        "product_title": "Columbia Corner Flusher Box Repair Parts",
+        "variant_title": "FA247 -  6-32 X 5/8\" Hex Bolt",
+        "sku": "FA247__COLUMBIA-CORNER-FLUSHER-BOX-REPAIR-PARTS"
+      },
+      {
+        "brand": "Columbia",
+        "product_title": "Columbia Flat Finishing Box Repair Parts",
+        "variant_title": "FA247 -  6-32 X 5/8\" Hex Bolt",
+        "sku": "FA247__COLUMBIA-FLAT-FINISHING-BOX-REPAIR-PARTS"
+      },
+      {
+        "brand": "Columbia",
+        "product_title": "Columbia Hinged Nailspotter Repair Parts",
+        "variant_title": "FA247 -  6-32 X 5/8\" Hex Bolt",
+        "sku": "FA247__COLUMBIA-HINGED-NAILSPOTTER-REPAIR-PARTS"
+      }
+    ]
+  },
+  {
+    "mpn": "FA249",
+    "count": 2,
+    "occurrences": [
+      {
+        "brand": "Columbia",
+        "product_title": "Columbia Automatic Taper Body Repair Parts",
+        "variant_title": "FA249 - 8-32 x 3/16\" Set Screw",
+        "sku": "FA249__COLUMBIA-AUTOMATIC-TAPER-BODY-REPAIR-PARTS"
+      },
+      {
+        "brand": "Columbia",
+        "product_title": "Columbia Hot Mud Pump Repair Parts",
+        "variant_title": "FA249 - 8-32X3/16\" Set Screw",
+        "sku": "FA249__COLUMBIA-HOT-MUD-PUMP-REPAIR-PARTS"
+      }
+    ]
+  },
+  {
+    "mpn": "FA252",
+    "count": 2,
+    "occurrences": [
+      {
+        "brand": "Columbia",
+        "product_title": "Columbia Hinged Nailspotter Repair Parts",
+        "variant_title": "FA252 - #8 Star Washer",
+        "sku": "FA252__COLUMBIA-HINGED-NAILSPOTTER-REPAIR-PARTS"
+      },
+      {
+        "brand": "Columbia",
+        "product_title": "Columbia Hydra-Reach Box Handle Repair Parts",
+        "variant_title": "FA252 - #8 Star Washer",
+        "sku": "FA252__COLUMBIA-HYDRA-REACH-BOX-HANDLE-REPAIR-PARTS"
+      }
+    ]
+  },
+  {
+    "mpn": "FA253",
+    "count": 2,
+    "occurrences": [
+      {
+        "brand": "Columbia",
+        "product_title": "Columbia Automatic Taper Head Repair Parts",
+        "variant_title": "FA253 - #8 Flat Washer",
+        "sku": "FA253__COLUMBIA-AUTOMATIC-TAPER-HEAD-REPAIR-PARTS"
+      },
+      {
+        "brand": "Columbia",
+        "product_title": "Columbia Corner Flusher Box Repair Parts",
+        "variant_title": "FA253 - #8 Flat Washer",
+        "sku": "FA253__COLUMBIA-CORNER-FLUSHER-BOX-REPAIR-PARTS"
+      }
+    ]
+  },
+  {
+    "mpn": "FA254",
+    "count": 2,
+    "occurrences": [
+      {
+        "brand": "Columbia",
+        "product_title": "Columbia Automatic Taper Head Repair Parts",
+        "variant_title": "FA254 - 8-32 Nyloc Nut",
+        "sku": "FA254__COLUMBIA-AUTOMATIC-TAPER-HEAD-REPAIR-PARTS"
+      },
+      {
+        "brand": "Columbia",
+        "product_title": "Columbia Hinged Nailspotter Repair Parts",
+        "variant_title": "FA254 - 8-32 Nyloc Nut",
+        "sku": "FA254__COLUMBIA-HINGED-NAILSPOTTER-REPAIR-PARTS"
+      }
+    ]
+  },
+  {
+    "mpn": "FA256",
+    "count": 3,
+    "occurrences": [
+      {
+        "brand": "Columbia",
+        "product_title": "Columbia Hot Mud Pump Repair Parts",
+        "variant_title": "FA256 - 8-32 X 3/16\" Pan Slot",
+        "sku": "FA256__COLUMBIA-HOT-MUD-PUMP-REPAIR-PARTS"
+      },
+      {
+        "brand": "Columbia",
+        "product_title": "Columbia Hydra-Reach Box Handle Repair Parts",
+        "variant_title": "FA256 - 8-32 X 3/16\" Pan Slot",
+        "sku": "FA256__COLUMBIA-HYDRA-REACH-BOX-HANDLE-REPAIR-PARTS"
+      },
+      {
+        "brand": "Columbia",
+        "product_title": "Columbia Matrix Handle Repair Parts",
+        "variant_title": "FA256 - 8-32 x 3/16\" Pan Slot",
+        "sku": "FA256__COLUMBIA-MATRIX-HANDLE-REPAIR-PARTS"
+      }
+    ]
+  },
+  {
+    "mpn": "FA257",
+    "count": 2,
+    "occurrences": [
+      {
+        "brand": "Columbia",
+        "product_title": "Columbia 180 Grip Box Handle Repair Parts",
+        "variant_title": "FA257 - 8-32 X 1/4\" Fillister Slot",
+        "sku": "FA257__COLUMBIA-180-GRIP-BOX-HANDLE-REPAIR-PARTS"
+      },
+      {
+        "brand": "Columbia",
+        "product_title": "Columbia Automatic Taper Head Repair Parts",
+        "variant_title": "FA257 - 8-32 x 1/4\" Fillister Slot",
+        "sku": "FA257__COLUMBIA-AUTOMATIC-TAPER-HEAD-REPAIR-PARTS"
+      }
+    ]
+  },
+  {
+    "mpn": "FA258",
+    "count": 5,
+    "occurrences": [
+      {
+        "brand": "Columbia",
+        "product_title": "Columbia Angle Head Repair Parts",
+        "variant_title": "FA258 - 8-32X 1/4 Half Dog Set",
+        "sku": "FA258__COLUMBIA-ANGLE-HEAD-REPAIR-PARTS"
+      },
+      {
+        "brand": "Columbia",
+        "product_title": "Columbia Automatic Taper Head Repair Parts",
+        "variant_title": "FA258 - 8-32 X 1/4\" Half Dog Set",
+        "sku": "FA258__COLUMBIA-AUTOMATIC-TAPER-HEAD-REPAIR-PARTS"
+      },
+      {
+        "brand": "Columbia",
+        "product_title": "Columbia Corner Flusher Box Repair Parts",
+        "variant_title": "FA258 - 8-32X 1/4 Half Dog Set",
+        "sku": "FA258__COLUMBIA-CORNER-FLUSHER-BOX-REPAIR-PARTS"
+      },
+      {
+        "brand": "Columbia",
+        "product_title": "Columbia Flat Finishing Box Repair Parts",
+        "variant_title": "FA258 - 8-32X 1/4 Half Dog Set",
+        "sku": "FA258__COLUMBIA-FLAT-FINISHING-BOX-REPAIR-PARTS"
+      },
+      {
+        "brand": "Columbia",
+        "product_title": "Columbia Matrix Handle Repair Parts",
+        "variant_title": "FA258 - 8-32 x 1/4\" Half Dog Set",
+        "sku": "FA258__COLUMBIA-MATRIX-HANDLE-REPAIR-PARTS"
+      }
+    ]
+  },
+  {
+    "mpn": "FA260",
+    "count": 3,
+    "occurrences": [
+      {
+        "brand": "Columbia",
+        "product_title": "Columbia 180 Grip Box Handle Repair Parts",
+        "variant_title": "FA260 - 8-32 x 3/8\" Pan Slot",
+        "sku": "FA260__COLUMBIA-180-GRIP-BOX-HANDLE-REPAIR-PARTS"
+      },
+      {
+        "brand": "Columbia",
+        "product_title": "Columbia Hinged Nailspotter Repair Parts",
+        "variant_title": "FA260 - 8-32 x 3/8\" Pan Slot",
+        "sku": "FA260__COLUMBIA-HINGED-NAILSPOTTER-REPAIR-PARTS"
+      },
+      {
+        "brand": "Columbia",
+        "product_title": "Columbia Hot Mud Pump Repair Parts",
+        "variant_title": "FA260 - 8-32 x 3/8\" Pan Slot",
+        "sku": "FA260__COLUMBIA-HOT-MUD-PUMP-REPAIR-PARTS"
+      }
+    ]
+  },
+  {
+    "mpn": "FA262",
+    "count": 2,
+    "occurrences": [
+      {
+        "brand": "Columbia",
+        "product_title": "Columbia Corner Flusher Box Repair Parts",
+        "variant_title": "FA262 - 8-32 x 1/2\" Socket",
+        "sku": "FA262__COLUMBIA-CORNER-FLUSHER-BOX-REPAIR-PARTS"
+      },
+      {
+        "brand": "Columbia",
+        "product_title": "Columbia Corner Roller Repair Parts",
+        "variant_title": "FA262 - 8-32 x 1/2\" Socket",
+        "sku": "FA262__COLUMBIA-CORNER-ROLLER-REPAIR-PARTS"
+      }
+    ]
+  },
+  {
+    "mpn": "FA265",
+    "count": 2,
+    "occurrences": [
+      {
+        "brand": "Columbia",
+        "product_title": "Columbia 180 Grip Box Handle Repair Parts",
+        "variant_title": "FA265 - 8-32 X 3/4\" Truss Slot",
+        "sku": "FA265__COLUMBIA-180-GRIP-BOX-HANDLE-REPAIR-PARTS"
+      },
+      {
+        "brand": "Columbia",
+        "product_title": "Columbia Automatic Taper Head Repair Parts",
+        "variant_title": "FA265 - 8-32 x 3/4\" Truss Slot",
+        "sku": "FA265__COLUMBIA-AUTOMATIC-TAPER-HEAD-REPAIR-PARTS"
+      }
+    ]
+  },
+  {
+    "mpn": "FA268",
+    "count": 2,
+    "occurrences": [
+      {
+        "brand": "Columbia",
+        "product_title": "Columbia 180 Grip Box Handle Repair Parts",
+        "variant_title": "FA268 - #10 Flat Washer",
+        "sku": "FA268__COLUMBIA-180-GRIP-BOX-HANDLE-REPAIR-PARTS"
+      },
+      {
+        "brand": "Columbia",
+        "product_title": "Columbia Flat Finishing Box Repair Parts",
+        "variant_title": "FA268 - #10 Flat Washer",
+        "sku": "FA268__COLUMBIA-FLAT-FINISHING-BOX-REPAIR-PARTS"
+      }
+    ]
+  },
+  {
+    "mpn": "FA271",
+    "count": 3,
+    "occurrences": [
+      {
+        "brand": "Columbia",
+        "product_title": "Columbia Flat Finishing Box Repair Parts",
+        "variant_title": "FA271 - 10-24 Nyloc Nut",
+        "sku": "FA271__COLUMBIA-FLAT-FINISHING-BOX-REPAIR-PARTS"
+      },
+      {
+        "brand": "Columbia",
+        "product_title": "Columbia Hinged Nailspotter Repair Parts",
+        "variant_title": "FA271 - 10-24 Nyloc Nut",
+        "sku": "FA271__COLUMBIA-HINGED-NAILSPOTTER-REPAIR-PARTS"
+      },
+      {
+        "brand": "Columbia",
+        "product_title": "Columbia Hot Mud Pump Repair Parts",
+        "variant_title": "FA271 - 10-24 Nyloc Nut",
+        "sku": "FA271__COLUMBIA-HOT-MUD-PUMP-REPAIR-PARTS"
+      }
+    ]
+  },
+  {
+    "mpn": "FA280",
+    "count": 3,
+    "occurrences": [
+      {
+        "brand": "Columbia",
+        "product_title": "Columbia Corner Flusher Box Repair Parts",
+        "variant_title": "FA280 - #10 Belleville Washer",
+        "sku": "FA280__COLUMBIA-CORNER-FLUSHER-BOX-REPAIR-PARTS"
+      },
+      {
+        "brand": "Columbia",
+        "product_title": "Columbia Flat Finishing Box Repair Parts",
+        "variant_title": "FA280 - #10 Belleville Washer",
+        "sku": "FA280__COLUMBIA-FLAT-FINISHING-BOX-REPAIR-PARTS"
+      },
+      {
+        "brand": "Columbia",
+        "product_title": "Columbia Hinged Nailspotter Repair Parts",
+        "variant_title": "FA280 - #10 Belleville Washer",
+        "sku": "FA280__COLUMBIA-HINGED-NAILSPOTTER-REPAIR-PARTS"
+      }
+    ]
+  },
+  {
+    "mpn": "FA292",
+    "count": 2,
+    "occurrences": [
+      {
+        "brand": "Columbia",
+        "product_title": "Columbia Automatic Taper Body Repair Parts",
+        "variant_title": "FA292 - 1/4-20 Nyloc Jam Nut",
+        "sku": "FA292__COLUMBIA-AUTOMATIC-TAPER-BODY-REPAIR-PARTS"
+      },
+      {
+        "brand": "Columbia",
+        "product_title": "Columbia Hot Mud Pump Repair Parts",
+        "variant_title": "FA292 1/4-20 Nyloc Jam Nut",
+        "sku": "FA292__COLUMBIA-HOT-MUD-PUMP-REPAIR-PARTS"
+      }
+    ]
+  },
+  {
+    "mpn": "FA311",
+    "count": 2,
+    "occurrences": [
+      {
+        "brand": "Columbia",
+        "product_title": "Columbia 180 Grip Box Handle Repair Parts",
+        "variant_title": "FA311 1/4-28 X 1/2\" Socket Head",
+        "sku": "FA311__COLUMBIA-180-GRIP-BOX-HANDLE-REPAIR-PARTS"
+      },
+      {
+        "brand": "Columbia",
+        "product_title": "Columbia Hydra-Reach Box Handle Repair Parts",
+        "variant_title": "FA311 - 1/4-28 X 1/2\" Socket Head",
+        "sku": "FA311__COLUMBIA-HYDRA-REACH-BOX-HANDLE-REPAIR-PARTS"
+      }
+    ]
+  },
+  {
+    "mpn": "FA312",
+    "count": 2,
+    "occurrences": [
+      {
+        "brand": "Columbia",
+        "product_title": "Columbia 180 Grip Box Handle Repair Parts",
+        "variant_title": "FA312 - 10-24 X 1/4\" Socket Hand Set",
+        "sku": "FA312__COLUMBIA-180-GRIP-BOX-HANDLE-REPAIR-PARTS"
+      },
+      {
+        "brand": "Columbia",
+        "product_title": "Columbia Hydra-Reach Box Handle Repair Parts",
+        "variant_title": "FA312 - 10-24 X 1/4\" Socket Hand Set",
+        "sku": "FA312__COLUMBIA-HYDRA-REACH-BOX-HANDLE-REPAIR-PARTS"
+      }
+    ]
+  },
+  {
+    "mpn": "FFB32",
+    "count": 3,
+    "occurrences": [
+      {
+        "brand": "Columbia",
+        "product_title": "Columbia Corner Flusher Box Repair Parts",
+        "variant_title": "FFB32 - Door Stop",
+        "sku": "FFB32__COLUMBIA-CORNER-FLUSHER-BOX-REPAIR-PARTS"
+      },
+      {
+        "brand": "Columbia",
+        "product_title": "Columbia Flat Finishing Box Repair Parts",
+        "variant_title": "FFB32 - Door Stop",
+        "sku": "FFB32__COLUMBIA-FLAT-FINISHING-BOX-REPAIR-PARTS"
+      },
+      {
+        "brand": "Columbia",
+        "product_title": "Columbia Hinged Nailspotter Repair Parts",
+        "variant_title": "FFB32 - Door Stop",
+        "sku": "FFB32__COLUMBIA-HINGED-NAILSPOTTER-REPAIR-PARTS"
+      }
+    ]
+  },
+  {
+    "mpn": "FFB32A",
+    "count": 3,
+    "occurrences": [
+      {
+        "brand": "Columbia",
+        "product_title": "Columbia Corner Flusher Box Repair Parts",
+        "variant_title": "FFB32A - Thumb Release Clip Screw",
+        "sku": "FFB32A__COLUMBIA-CORNER-FLUSHER-BOX-REPAIR-PARTS"
+      },
+      {
+        "brand": "Columbia",
+        "product_title": "Columbia Flat Finishing Box Repair Parts",
+        "variant_title": "FFB32A - Thumb Release Clip Screw",
+        "sku": "FFB32A__COLUMBIA-FLAT-FINISHING-BOX-REPAIR-PARTS"
+      },
+      {
+        "brand": "Columbia",
+        "product_title": "Columbia Hinged Nailspotter Repair Parts",
+        "variant_title": "FFB32A - Thumb Release Clip Screw",
+        "sku": "FFB32A__COLUMBIA-HINGED-NAILSPOTTER-REPAIR-PARTS"
+      }
+    ]
+  },
+  {
+    "mpn": "HH35",
+    "count": 2,
+    "occurrences": [
+      {
+        "brand": "Columbia",
+        "product_title": "Columbia Hydra-Reach Box Handle Repair Parts",
+        "variant_title": "HH35 - Handle Grip",
+        "sku": "HH35__COLUMBIA-HYDRA-REACH-BOX-HANDLE-REPAIR-PARTS"
+      },
+      {
+        "brand": "Columbia",
+        "product_title": "Columbia Matrix Handle Repair Parts",
+        "variant_title": "HH35 - Handle Grip",
+        "sku": "HH35__COLUMBIA-MATRIX-HANDLE-REPAIR-PARTS"
+      }
+    ]
+  },
+  {
+    "mpn": "HH8",
+    "count": 2,
+    "occurrences": [
+      {
+        "brand": "Columbia",
+        "product_title": "Columbia Hydra-Reach Box Handle Repair Parts",
+        "variant_title": "HH8 - Hydra Reach Handle Tube",
+        "sku": "HH8__COLUMBIA-HYDRA-REACH-BOX-HANDLE-REPAIR-PARTS"
+      },
+      {
+        "brand": "Columbia",
+        "product_title": "Columbia Matrix Handle Repair Parts",
+        "variant_title": "HH8 - Handle Tube",
+        "sku": "HH8__COLUMBIA-MATRIX-HANDLE-REPAIR-PARTS"
+      }
+    ]
+  },
+  {
+    "mpn": "MP23A",
+    "count": 2,
+    "occurrences": [
+      {
+        "brand": "Columbia",
+        "product_title": "Columbia Box Filler Adaptor Parts",
+        "variant_title": "MP23A - O-Ring",
+        "sku": "MP23A__COLUMBIA-BOX-FILLER-ADAPTOR-PARTS"
+      },
+      {
+        "brand": "Columbia",
+        "product_title": "Columbia Hot Mud Pump Repair Parts",
+        "variant_title": "MP23A - O-Ring",
+        "sku": "MP23A__COLUMBIA-HOT-MUD-PUMP-REPAIR-PARTS"
+      }
+    ]
+  }
+]

@@ -32,20 +32,38 @@ export function CartProvider({ children }) {
     }
   }, [cartItems]);
 
+  const getCartItemKey = (product) => {
+    if (!product) return '';
+    const parent = product.parent_id ? `parent:${product.parent_id}` : '';
+    const selectedAttrs = Array.isArray(product.variation_attribute_values)
+      ? product.variation_attribute_values
+          .map((attr) => `${attr.name}:${attr.option}`)
+          .join('|')
+      : '';
+    return [
+      product.id || '',
+      product.sku || product.part_number || '',
+      parent,
+      selectedAttrs,
+    ].filter(Boolean).join('::');
+  };
+
   const addToCart = (product, quantity = 1) => {
     setCartItems(prevItems => {
-      const existingItem = prevItems.find(item => item.id === product.id);
+      const itemKey = getCartItemKey(product);
+      const existingItem = prevItems.find(item => String(item.cartKey || item.id) === itemKey);
       
       if (existingItem) {
         // Update quantity if item already in cart
         return prevItems.map(item =>
-          item.id === product.id
+          String(item.cartKey || item.id) === itemKey
             ? { ...item, quantity: item.quantity + quantity }
             : item
         );
       } else {
         // Add new item to cart
         return [...prevItems, {
+          cartKey: itemKey,
           id: product.id,
           name: product.name,
           brand: product.brand,
@@ -53,6 +71,8 @@ export function CartProvider({ children }) {
           image: product.image,
           part_number: product.part_number,
           sku: product.sku || product.part_number || '',
+          parent_id: product.parent_id || null,
+          variation_attribute_values: product.variation_attribute_values || null,
           quantity
         }];
       }
@@ -60,7 +80,8 @@ export function CartProvider({ children }) {
   };
 
   const removeFromCart = (productId) => {
-    setCartItems(prevItems => prevItems.filter(item => item.id !== productId));
+    const key = String(productId);
+    setCartItems(prevItems => prevItems.filter(item => String(item.id) !== key && String(item.cartKey || '') !== key));
   };
 
   const updateQuantity = (productId, newQuantity) => {
@@ -71,7 +92,7 @@ export function CartProvider({ children }) {
     
     setCartItems(prevItems =>
       prevItems.map(item =>
-        item.id === productId
+        String(item.id) === String(productId) || String(item.cartKey || '') === String(productId)
           ? { ...item, quantity: newQuantity }
           : item
       )

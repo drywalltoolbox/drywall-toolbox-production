@@ -1,0 +1,45 @@
+{
+  "generated_at": "2026-05-05T15:16:08+00:00",
+  "products_scanned": 1914,
+  "filtered_product_count": 369,
+  "filtered_variant_count": 1165,
+  "target_brands": [
+    "Asgard",
+    "Columbia",
+    "Level 5",
+    "TapeTech"
+  ],
+  "target_product_types": [
+    "Automatic Taping Tools",
+    "Parts",
+    "Semi Automatic Taping Tools",
+    "Taping & Finishing Tools"
+  ],
+  "product_counts_by_brand": {
+    "Asgard": 17,
+    "Columbia": 172,
+    "Level 5": 86,
+    "TapeTech": 94
+  },
+  "variant_counts_by_brand": {
+    "Asgard": 25,
+    "Columbia": 726,
+    "Level 5": 233,
+    "TapeTech": 181
+  },
+  "product_counts_by_catalog_product_type": {
+    "Automatic Taping Tools": 136,
+    "Parts": 67,
+    "Semi Automatic Taping Tools": 34,
+    "Taping & Finishing Tools": 132
+  },
+  "duplicate_mpn_count": 41,
+  "outputs": {
+    "manifest_json": "products\\scraped_results\\Production\\manifests\\product_manifest.json",
+    "product_catalog": "products\\scraped_results\\Production\\catalogs\\product_catalog.csv",
+    "woocommerce_catalog": "products\\scraped_results\\Production\\catalogs\\woocommerce_catalog.csv",
+    "duplicate_mpn_report_json": "products\\scraped_results\\Production\\reports\\duplicate_mpn_report.json",
+    "summary_json": "products\\scraped_results\\Production\\reports\\catalog_summary.json",
+    "readme": "products\\scraped_results\\Production\\README.md"
+  }
+}

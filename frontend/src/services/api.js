@@ -22,6 +22,8 @@ const KNOWN_BRANDS = [
   'TapeTech',
   'Columbia Taping Tools',
   'Asgard',
+  'Level 5',
+  'Level5',
   'SurPro',
   'Graco',
   'Platinum Drywall Tools',
@@ -38,6 +40,8 @@ const BRAND_ALIASES = {
   'dura_stilts':               'Dura-Stilts',
   'columbia':                  'Columbia Taping Tools',
   'columbia taping':           'Columbia Taping Tools',
+  'level 5':                   'Level 5',
+  'level5':                    'Level 5',
   'tapetech':                  'TapeTech',
   'tape tech':                 'TapeTech',
   'surpro':                    'SurPro',
@@ -296,6 +300,14 @@ function normalizeVariationAttributeOptions(options) {
   return [];
 }
 
+function isVariationAttribute(attr) {
+  if (!attr) return false;
+  const name = `${attr.name || ''}`.trim().toLowerCase();
+  if (!name || name === 'brand') return false;
+  const options = normalizeVariationAttributeOptions(attr.options);
+  return Boolean(attr.variation) || options.length > 1;
+}
+
 /**
  * Normalise a WooCommerce product object to the internal product shape used
  * throughout the UI.
@@ -344,7 +356,7 @@ export function normalizeProduct(wcProduct) {
   // Each entry: { name: 'Size', options: ['7"', '10"', '12"'], id: 1 }
   const variation_attributes = isVariable
     ? (wcProduct.attributes || [])
-        .filter((a) => a.variation && (a.name || '').trim().toLowerCase() !== 'brand')
+        .filter(isVariationAttribute)
         .map((a) => ({
           id: a.id || 0,
           name: a.name || '',

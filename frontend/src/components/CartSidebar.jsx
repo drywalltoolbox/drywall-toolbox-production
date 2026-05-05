@@ -81,8 +81,13 @@ export default function CartSidebar({ isOpen, onClose }) {
               <p style={{ fontSize: '0.85rem', fontWeight: 600, margin: 0 }}>Your cart is empty.</p>
             </div>
           ) : (
-            cartItems.map((item) => (
-              <div key={item.id} className="cart-item">
+            cartItems.map((item) => {
+              const itemKey = item.cartKey || item.id;
+              const optionText = Array.isArray(item.variation_attribute_values)
+                ? item.variation_attribute_values.map((attr) => attr.option).filter(Boolean).join(' / ')
+                : '';
+              return (
+              <div key={itemKey} className="cart-item">
                 {item.image && (
                   <img
                     src={item.image}
@@ -112,6 +117,16 @@ export default function CartSidebar({ isOpen, onClose }) {
                   }}>
                     {item.name}
                   </div>
+                  {optionText && (
+                    <div style={{
+                      fontSize: '0.72rem',
+                      color: '#475569',
+                      fontWeight: 700,
+                      marginBottom: '3px',
+                    }}>
+                      {optionText}
+                    </div>
+                  )}
                   <div style={{ 
                     fontFamily: 'var(--font-mono)', 
                     fontSize: '0.72rem', 
@@ -121,7 +136,7 @@ export default function CartSidebar({ isOpen, onClose }) {
                   </div>
                 </div>
                 <button 
-                  onClick={() => removeFromCart(item.id)}
+                  onClick={() => removeFromCart(itemKey)}
                   aria-label={`Remove ${item.name}`}
                   style={{ 
                     background: 'none', 
@@ -140,7 +155,8 @@ export default function CartSidebar({ isOpen, onClose }) {
                   <Trash2 size={15} />
                 </button>
               </div>
-            ))
+              );
+            })
           )}
         </div>
 

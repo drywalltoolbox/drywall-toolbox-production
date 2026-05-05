@@ -1,13 +1,12 @@
-import { useState, useEffect } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import Reviews from './Reviews';
 import TechnicalSpecifications from './TechnicalSpecifications';
 import { useCart } from '../context/CartContext';
-import { Heart, Plus, Minus, X, ShoppingCart } from 'lucide-react';
+import { Heart, Plus, Minus, X, ShoppingCart, CheckCircle2, PackageCheck } from 'lucide-react';
 import ProductImageGallery from './ProductImageGallery';
-import VariantChips from './VariantChips';
 import { getProductSpecifications } from '../utils/productSpecifications';
 import { getProductVariations } from '../services/api';
 import { fetchCachedVariations, findMatchingVariation, getVariationSelectionMap } from '../utils/variationSelection';
@@ -40,6 +39,20 @@ function buildSeedVariations(initialVariations = [], initialResolvedVariation = 
   (Array.isArray(initialVariations) ? initialVariations : []).forEach(pushVariation);
 
   return seeded;
+}
+
+function money(value) {
+  const parsed = typeof value === 'number' ? value : parseFloat(value || 0);
+  return Number.isFinite(parsed) ? parsed.toFixed(2) : '0.00';
+}
+
+function attributeLabel(attr) {
+  return (attr?.name || '').replace(/^pa_/i, '').replace(/[_-]+/g, ' ').trim();
+}
+
+function getVariantStatus(variation) {
+  if (!variation) return 'unavailable';
+  return variation.stock_status === 'outofstock' ? 'sold-out' : 'available';
 }
 
 export default function ProductDetail({
@@ -118,13 +131,48 @@ export default function ProductDetail({
   }, [product?.id, product?.is_variable, initialResolvedVariation, initialSelectedAttrs, initialVariations]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Find the variation that matches the current chip selections
-  const selectedVariation = product?.is_variable
-    ? findMatchingVariation(variations, selectedAttrs)
-    : null;
+  const selectedVariation = useMemo(
+    () => product?.is_variable ? findMatchingVariation(variations, selectedAttrs) : null,
+    [product?.is_variable, variations, selectedAttrs]
+  );
+
+  const variationAttributes = useMemo(
+    () => Array.isArray(product?.variation_attributes)
+      ? product.variation_attributes.filter((attr) =>
+          attr?.name && attr.name.toLowerCase() !== 'brand' && Array.isArray(attr.options) && attr.options.length > 0
+        )
+      : [],
+    [product?.variation_attributes]
+  );
+
+  const variantOptionMeta = useMemo(() => {
+    const meta = {};
+    variationAttributes.forEach((attr) => {
+      const name = attr.name;
+      const options = Array.isArray(attr.options) ? attr.options : [];
+      meta[name] = options.map((option) => {
+        const candidateSelection = { ...selectedAttrs, [name]: option };
+        const exact = findMatchingVariation(variations, candidateSelection);
+        const fallback = exact || variations.find((variation) => {
+          const map = getVariationSelectionMap(variation);
+          return Object.entries(map).some(([attrName, attrValue]) =>
+            attrName.toLowerCase() === name.toLowerCase() && `${attrValue}` === `${option}`
+          );
+        });
+        return {
+          value: option,
+          variation: fallback || null,
+          status: getVariantStatus(fallback),
+          price: fallback?.price ?? null,
+        };
+      });
+    });
+    return meta;
+  }, [variationAttributes, variations, selectedAttrs]);
 
   // Lock body scroll while this detail panel is mounted
   useEffect(() => {
-    if (!product) return;
+    if (!product || !onClose) return;
     const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
     document.body.style.overflow = 'hidden';
     if (scrollbarWidth > 0) document.body.style.paddingRight = `${scrollbarWidth}px`;
@@ -132,7 +180,7 @@ export default function ProductDetail({
       document.body.style.overflow = '';
       document.body.style.paddingRight = '';
     };
-  }, [product]);
+  }, [product, onClose]);
 
   if (!product) return null;
 
@@ -154,8 +202,12 @@ export default function ProductDetail({
   const effectiveSku   = effectiveProduct.sku || product.sku || '';
   const effectiveStock = effectiveProduct.stock_status || product.stock_status || 'instock';
   const isOutOfStock   = effectiveStock === 'outofstock';
+  const needsVariation = product.is_variable && variationAttributes.length > 0;
+  const hasCompleteSelection = !needsVariation || variationAttributes.every((attr) => selectedAttrs?.[attr.name]);
+  const canAddToCart = !isOutOfStock && (!needsVariation || Boolean(selectedVariation && hasCompleteSelection));
 
   const handleAddToCart = () => {
+    if (!canAddToCart) return;
     const productToAdd = selectedVariation || product;
     if (onAddToCart) {
       onAddToCart(productToAdd, quantity);
@@ -178,10 +230,12 @@ export default function ProductDetail({
   const rawPrice = selectedVariation
     ? (selectedVariation.price || 0)
     : (product.is_variable && product.min_price != null ? product.min_price : (product.price || 0));
-  const displayPrice = typeof rawPrice === 'number'
-    ? rawPrice.toFixed(2)
-    : parseFloat(rawPrice || 0).toFixed(2);
+  const displayPrice = money(rawPrice);
   const pricePrefix = product.is_variable && !selectedVariation ? 'From $' : '$';
+  const compareAt = selectedVariation?.regular_price || product.regular_price;
+  const selectedVariationName = selectedVariation
+    ? Object.values(getVariationSelectionMap(selectedVariation)).filter(Boolean).join(' / ')
+    : '';
 
   return (
     <div
@@ -211,12 +265,15 @@ export default function ProductDetail({
             <div className="flex flex-col">
               {/* Stock Badge & Brand */}
               <div className="flex items-center flex-wrap gap-2 sm:gap-3 mb-3 sm:mb-4">
-                <span className={`inline-block px-2.5 py-1 sm:px-3 text-white text-xs font-semibold rounded ${
+                <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 sm:px-3 text-white text-xs font-semibold rounded ${
                   isOutOfStock ? 'bg-red-500' : 'bg-black'
                 }`}>
+                  {isOutOfStock ? <PackageCheck size={13} aria-hidden="true" /> : <CheckCircle2 size={13} aria-hidden="true" />}
                   {isOutOfStock ? 'Out of Stock' : 'In Stock'}
                 </span>
-                <span className="text-xs sm:text-sm text-gray-600">{product.brand}</span>
+                {product.brand && (
+                  <span className="text-xs sm:text-sm font-semibold uppercase tracking-wide text-gray-500">{product.brand}</span>
+                )}
               </div>
 
               {/* Product Title */}
@@ -239,26 +296,85 @@ export default function ProductDetail({
 
               {/* Price */}
               <div className="mb-4 sm:mb-6">
-                <span className="text-3xl sm:text-4xl font-bold text-gray-900">
-                  {pricePrefix}{displayPrice}
-                </span>
+                <div className="flex flex-wrap items-baseline gap-2">
+                  <span className="text-3xl sm:text-4xl font-bold text-gray-900">
+                    {pricePrefix}{displayPrice}
+                  </span>
+                  {compareAt && parseFloat(compareAt) > parseFloat(rawPrice || 0) && (
+                    <span className="text-base sm:text-lg text-gray-400 line-through">
+                      ${money(compareAt)}
+                    </span>
+                  )}
+                </div>
+                {needsVariation && (
+                  <p className="mt-1 text-xs sm:text-sm text-gray-500">
+                    {selectedVariationName ? selectedVariationName : 'Select an option for live price, SKU, and stock.'}
+                  </p>
+                )}
               </div>
 
               {/* Variation selector — visible for variable products */}
-              {product.is_variable && product.variation_attributes && product.variation_attributes.length > 0 && (
-                <div className="mb-4 sm:mb-5">
-                  <VariantChips
-                    attributes={product.variation_attributes}
-                    selected={selectedAttrs}
-                    onSelect={(attrName, value) =>
-                      setSelectedAttrs(prev => ({ ...prev, [attrName]: value }))
-                    }
-                    disabled={variationsLoading}
-                  />
-                  {/* Out-of-stock notice for the selected variation */}
+              {needsVariation && (
+                <div className="mb-5 sm:mb-6 space-y-4">
+                  {variationAttributes.map((attr) => (
+                    <div key={attr.name}>
+                      <div className="flex items-center justify-between gap-3 mb-2">
+                        <span className="text-sm font-bold text-gray-900 uppercase">
+                          {attributeLabel(attr)}
+                        </span>
+                        {selectedAttrs?.[attr.name] && (
+                          <span className="text-xs font-semibold text-gray-500">
+                            Selected: {selectedAttrs[attr.name]}
+                          </span>
+                        )}
+                      </div>
+                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                        {(variantOptionMeta[attr.name] || []).map((option) => {
+                          const selected = `${selectedAttrs?.[attr.name] || ''}` === `${option.value}`;
+                          const soldOut = option.status === 'sold-out';
+                          const unavailable = option.status === 'unavailable';
+                          const disabled = variationsLoading || unavailable;
+                          return (
+                            <button
+                              key={`${attr.name}-${option.value}`}
+                              type="button"
+                              onClick={() => setSelectedAttrs(prev => ({ ...prev, [attr.name]: option.value }))}
+                              disabled={disabled}
+                              className={`min-h-[58px] rounded-lg border px-3 py-2 text-left transition-all ${
+                                selected
+                                  ? 'border-blue-600 bg-blue-50 shadow-sm ring-2 ring-blue-100'
+                                  : 'border-gray-200 bg-white hover:border-gray-400 hover:bg-gray-50'
+                              } ${disabled ? 'cursor-not-allowed opacity-45 hover:border-gray-200 hover:bg-white' : ''}`}
+                              aria-pressed={selected}
+                            >
+                              <span className="block text-sm font-bold text-gray-900 leading-tight">
+                                {option.value}
+                              </span>
+                              <span className={`mt-1 block text-xs font-semibold ${
+                                soldOut ? 'text-red-600' : 'text-gray-500'
+                              }`}>
+                                {variationsLoading
+                                  ? 'Loading'
+                                  : soldOut
+                                    ? 'Sold out'
+                                    : option.price != null
+                                      ? `$${money(option.price)}`
+                                      : 'Unavailable'}
+                              </span>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  ))}
                   {selectedVariation && selectedVariation.stock_status === 'outofstock' && (
-                    <p className="mt-2 text-xs font-semibold text-red-600">
-                      This size is currently out of stock.
+                    <p className="text-xs font-semibold text-red-600">
+                      This option is currently out of stock.
+                    </p>
+                  )}
+                  {!variationsLoading && hasCompleteSelection && !selectedVariation && (
+                    <p className="text-xs font-semibold text-red-600">
+                      This option combination is not available.
                     </p>
                   )}
                 </div>
@@ -324,11 +440,15 @@ export default function ProductDetail({
               {/* Add to Cart — full width */}
               <button
                 onClick={handleAddToCart}
-                disabled={isOutOfStock}
+                disabled={!canAddToCart}
                 className="w-full flex items-center justify-center gap-2.5 h-12 px-6 bg-blue-600 hover:bg-blue-700 active:scale-[0.98] text-white font-semibold text-sm tracking-wide rounded-xl transition-all mb-4 sm:mb-6 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100"
               >
                 <ShoppingCart size={17} aria-hidden="true" />
-                {isOutOfStock ? 'OUT OF STOCK' : 'ADD TO CART'}
+                {isOutOfStock
+                  ? 'OUT OF STOCK'
+                  : needsVariation && !hasCompleteSelection
+                    ? 'SELECT OPTIONS'
+                    : 'ADD TO CART'}
               </button>
             </div>
           </div>
