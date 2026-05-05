@@ -1,0 +1,696 @@
+{
+  "catalog": "products\\Production\\catalogs\\woocommerce_catalog.csv",
+  "dry_run": false,
+  "updated_variation_skus": 98,
+  "duplicate_skus": 0,
+  "missing_variation_parents": 0,
+  "stale_variation_suffixes": 0,
+  "updates": [
+    {
+      "row": 32,
+      "name": "Columbia 180 Grip Box Handle Repair Parts",
+      "parent": "COL-180-GRIP-BOX-HDL-REPAIR-PARTS",
+      "old_sku": "BH1__COLUMBIA-180-GRIP-BOX-HANDLE-REPAIR-PARTS",
+      "new_sku": "BH1__COL-180-GRIP-BOX-HDL-REPAIR-PARTS"
+    },
+    {
+      "row": 39,
+      "name": "Columbia 180 Grip Box Handle Repair Parts",
+      "parent": "COL-180-GRIP-BOX-HDL-REPAIR-PARTS",
+      "old_sku": "BH5__COLUMBIA-180-GRIP-BOX-HANDLE-REPAIR-PARTS",
+      "new_sku": "BH5__COL-180-GRIP-BOX-HDL-REPAIR-PARTS"
+    },
+    {
+      "row": 40,
+      "name": "Columbia 180 Grip Box Handle Repair Parts",
+      "parent": "COL-180-GRIP-BOX-HDL-REPAIR-PARTS",
+      "old_sku": "BH6__COLUMBIA-180-GRIP-BOX-HANDLE-REPAIR-PARTS",
+      "new_sku": "BH6__COL-180-GRIP-BOX-HDL-REPAIR-PARTS"
+    },
+    {
+      "row": 48,
+      "name": "Columbia 180 Grip Box Handle Repair Parts",
+      "parent": "COL-180-GRIP-BOX-HDL-REPAIR-PARTS",
+      "old_sku": "FA257__COLUMBIA-180-GRIP-BOX-HANDLE-REPAIR-PARTS",
+      "new_sku": "FA257__COL-180-GRIP-BOX-HDL-REPAIR-PARTS"
+    },
+    {
+      "row": 49,
+      "name": "Columbia 180 Grip Box Handle Repair Parts",
+      "parent": "COL-180-GRIP-BOX-HDL-REPAIR-PARTS",
+      "old_sku": "FA260__COLUMBIA-180-GRIP-BOX-HANDLE-REPAIR-PARTS",
+      "new_sku": "FA260__COL-180-GRIP-BOX-HDL-REPAIR-PARTS"
+    },
+    {
+      "row": 50,
+      "name": "Columbia 180 Grip Box Handle Repair Parts",
+      "parent": "COL-180-GRIP-BOX-HDL-REPAIR-PARTS",
+      "old_sku": "FA265__COLUMBIA-180-GRIP-BOX-HANDLE-REPAIR-PARTS",
+      "new_sku": "FA265__COL-180-GRIP-BOX-HDL-REPAIR-PARTS"
+    },
+    {
+      "row": 51,
+      "name": "Columbia 180 Grip Box Handle Repair Parts",
+      "parent": "COL-180-GRIP-BOX-HDL-REPAIR-PARTS",
+      "old_sku": "FA268__COLUMBIA-180-GRIP-BOX-HANDLE-REPAIR-PARTS",
+      "new_sku": "FA268__COL-180-GRIP-BOX-HDL-REPAIR-PARTS"
+    },
+    {
+      "row": 54,
+      "name": "Columbia 180 Grip Box Handle Repair Parts",
+      "parent": "COL-180-GRIP-BOX-HDL-REPAIR-PARTS",
+      "old_sku": "FA311__COLUMBIA-180-GRIP-BOX-HANDLE-REPAIR-PARTS",
+      "new_sku": "FA311__COL-180-GRIP-BOX-HDL-REPAIR-PARTS"
+    },
+    {
+      "row": 55,
+      "name": "Columbia 180 Grip Box Handle Repair Parts",
+      "parent": "COL-180-GRIP-BOX-HDL-REPAIR-PARTS",
+      "old_sku": "FA312__COLUMBIA-180-GRIP-BOX-HANDLE-REPAIR-PARTS",
+      "new_sku": "FA312__COL-180-GRIP-BOX-HDL-REPAIR-PARTS"
+    },
+    {
+      "row": 116,
+      "name": "Columbia Angle Head Repair Parts",
+      "parent": "COL-ANGLE-HEAD-REPAIR-PARTS",
+      "old_sku": "FA245__COLUMBIA-ANGLE-HEAD-REPAIR-PARTS",
+      "new_sku": "FA245__COL-ANGLE-HEAD-REPAIR-PARTS"
+    },
+    {
+      "row": 117,
+      "name": "Columbia Angle Head Repair Parts",
+      "parent": "COL-ANGLE-HEAD-REPAIR-PARTS",
+      "old_sku": "FA258__COLUMBIA-ANGLE-HEAD-REPAIR-PARTS",
+      "new_sku": "FA258__COL-ANGLE-HEAD-REPAIR-PARTS"
+    },
+    {
+      "row": 134,
+      "name": "Columbia Automatic Taper Body Repair Parts",
+      "parent": "COL-AUTO-TAPER-BODY-REPAIR-PARTS",
+      "old_sku": "CT72__COLUMBIA-AUTOMATIC-TAPER-BODY-REPAIR-PARTS",
+      "new_sku": "CT72__COL-AUTO-TAPER-BODY-REPAIR-PARTS"
+    },
+    {
+      "row": 154,
+      "name": "Columbia Automatic Taper Body Repair Parts",
+      "parent": "COL-AUTO-TAPER-BODY-REPAIR-PARTS",
+      "old_sku": "FA207__COLUMBIA-AUTOMATIC-TAPER-BODY-REPAIR-PARTS",
+      "new_sku": "FA207__COL-AUTO-TAPER-BODY-REPAIR-PARTS"
+    },
+    {
+      "row": 155,
+      "name": "Columbia Automatic Taper Body Repair Parts",
+      "parent": "COL-AUTO-TAPER-BODY-REPAIR-PARTS",
+      "old_sku": "FA208__COLUMBIA-AUTOMATIC-TAPER-BODY-REPAIR-PARTS",
+      "new_sku": "FA208__COL-AUTO-TAPER-BODY-REPAIR-PARTS"
+    },
+    {
+      "row": 156,
+      "name": "Columbia Automatic Taper Body Repair Parts",
+      "parent": "COL-AUTO-TAPER-BODY-REPAIR-PARTS",
+      "old_sku": "FA219__COLUMBIA-AUTOMATIC-TAPER-BODY-REPAIR-PARTS",
+      "new_sku": "FA219__COL-AUTO-TAPER-BODY-REPAIR-PARTS"
+    },
+    {
+      "row": 157,
+      "name": "Columbia Automatic Taper Body Repair Parts",
+      "parent": "COL-AUTO-TAPER-BODY-REPAIR-PARTS",
+      "old_sku": "FA220__COLUMBIA-AUTOMATIC-TAPER-BODY-REPAIR-PARTS",
+      "new_sku": "FA220__COL-AUTO-TAPER-BODY-REPAIR-PARTS"
+    },
+    {
+      "row": 159,
+      "name": "Columbia Automatic Taper Body Repair Parts",
+      "parent": "COL-AUTO-TAPER-BODY-REPAIR-PARTS",
+      "old_sku": "FA239__COLUMBIA-AUTOMATIC-TAPER-BODY-REPAIR-PARTS",
+      "new_sku": "FA239__COL-AUTO-TAPER-BODY-REPAIR-PARTS"
+    },
+    {
+      "row": 160,
+      "name": "Columbia Automatic Taper Body Repair Parts",
+      "parent": "COL-AUTO-TAPER-BODY-REPAIR-PARTS",
+      "old_sku": "FA249__COLUMBIA-AUTOMATIC-TAPER-BODY-REPAIR-PARTS",
+      "new_sku": "FA249__COL-AUTO-TAPER-BODY-REPAIR-PARTS"
+    },
+    {
+      "row": 162,
+      "name": "Columbia Automatic Taper Body Repair Parts",
+      "parent": "COL-AUTO-TAPER-BODY-REPAIR-PARTS",
+      "old_sku": "FA292__COLUMBIA-AUTOMATIC-TAPER-BODY-REPAIR-PARTS",
+      "new_sku": "FA292__COL-AUTO-TAPER-BODY-REPAIR-PARTS"
+    },
+    {
+      "row": 210,
+      "name": "Columbia Automatic Taper Head Repair Parts",
+      "parent": "COL-AUTO-TAPER-HEAD-REPAIR-PARTS",
+      "old_sku": "CT72__COLUMBIA-AUTOMATIC-TAPER-HEAD-REPAIR-PARTS",
+      "new_sku": "CT72__COL-AUTO-TAPER-HEAD-REPAIR-PARTS"
+    },
+    {
+      "row": 238,
+      "name": "Columbia Automatic Taper Head Repair Parts",
+      "parent": "COL-AUTO-TAPER-HEAD-REPAIR-PARTS",
+      "old_sku": "FA207__COLUMBIA-AUTOMATIC-TAPER-HEAD-REPAIR-PARTS",
+      "new_sku": "FA207__COL-AUTO-TAPER-HEAD-REPAIR-PARTS"
+    },
+    {
+      "row": 239,
+      "name": "Columbia Automatic Taper Head Repair Parts",
+      "parent": "COL-AUTO-TAPER-HEAD-REPAIR-PARTS",
+      "old_sku": "FA208__COLUMBIA-AUTOMATIC-TAPER-HEAD-REPAIR-PARTS",
+      "new_sku": "FA208__COL-AUTO-TAPER-HEAD-REPAIR-PARTS"
+    },
+    {
+      "row": 242,
+      "name": "Columbia Automatic Taper Head Repair Parts",
+      "parent": "COL-AUTO-TAPER-HEAD-REPAIR-PARTS",
+      "old_sku": "FA213__COLUMBIA-AUTOMATIC-TAPER-HEAD-REPAIR-PARTS",
+      "new_sku": "FA213__COL-AUTO-TAPER-HEAD-REPAIR-PARTS"
+    },
+    {
+      "row": 245,
+      "name": "Columbia Automatic Taper Head Repair Parts",
+      "parent": "COL-AUTO-TAPER-HEAD-REPAIR-PARTS",
+      "old_sku": "FA219__COLUMBIA-AUTOMATIC-TAPER-HEAD-REPAIR-PARTS",
+      "new_sku": "FA219__COL-AUTO-TAPER-HEAD-REPAIR-PARTS"
+    },
+    {
+      "row": 246,
+      "name": "Columbia Automatic Taper Head Repair Parts",
+      "parent": "COL-AUTO-TAPER-HEAD-REPAIR-PARTS",
+      "old_sku": "FA220__COLUMBIA-AUTOMATIC-TAPER-HEAD-REPAIR-PARTS",
+      "new_sku": "FA220__COL-AUTO-TAPER-HEAD-REPAIR-PARTS"
+    },
+    {
+      "row": 248,
+      "name": "Columbia Automatic Taper Head Repair Parts",
+      "parent": "COL-AUTO-TAPER-HEAD-REPAIR-PARTS",
+      "old_sku": "FA228__COLUMBIA-AUTOMATIC-TAPER-HEAD-REPAIR-PARTS",
+      "new_sku": "FA228__COL-AUTO-TAPER-HEAD-REPAIR-PARTS"
+    },
+    {
+      "row": 249,
+      "name": "Columbia Automatic Taper Head Repair Parts",
+      "parent": "COL-AUTO-TAPER-HEAD-REPAIR-PARTS",
+      "old_sku": "FA229__COLUMBIA-AUTOMATIC-TAPER-HEAD-REPAIR-PARTS",
+      "new_sku": "FA229__COL-AUTO-TAPER-HEAD-REPAIR-PARTS"
+    },
+    {
+      "row": 251,
+      "name": "Columbia Automatic Taper Head Repair Parts",
+      "parent": "COL-AUTO-TAPER-HEAD-REPAIR-PARTS",
+      "old_sku": "FA233__COLUMBIA-AUTOMATIC-TAPER-HEAD-REPAIR-PARTS",
+      "new_sku": "FA233__COL-AUTO-TAPER-HEAD-REPAIR-PARTS"
+    },
+    {
+      "row": 253,
+      "name": "Columbia Automatic Taper Head Repair Parts",
+      "parent": "COL-AUTO-TAPER-HEAD-REPAIR-PARTS",
+      "old_sku": "FA238__COLUMBIA-AUTOMATIC-TAPER-HEAD-REPAIR-PARTS",
+      "new_sku": "FA238__COL-AUTO-TAPER-HEAD-REPAIR-PARTS"
+    },
+    {
+      "row": 254,
+      "name": "Columbia Automatic Taper Head Repair Parts",
+      "parent": "COL-AUTO-TAPER-HEAD-REPAIR-PARTS",
+      "old_sku": "FA239__COLUMBIA-AUTOMATIC-TAPER-HEAD-REPAIR-PARTS",
+      "new_sku": "FA239__COL-AUTO-TAPER-HEAD-REPAIR-PARTS"
+    },
+    {
+      "row": 255,
+      "name": "Columbia Automatic Taper Head Repair Parts",
+      "parent": "COL-AUTO-TAPER-HEAD-REPAIR-PARTS",
+      "old_sku": "FA241__COLUMBIA-AUTOMATIC-TAPER-HEAD-REPAIR-PARTS",
+      "new_sku": "FA241__COL-AUTO-TAPER-HEAD-REPAIR-PARTS"
+    },
+    {
+      "row": 258,
+      "name": "Columbia Automatic Taper Head Repair Parts",
+      "parent": "COL-AUTO-TAPER-HEAD-REPAIR-PARTS",
+      "old_sku": "FA245__COLUMBIA-AUTOMATIC-TAPER-HEAD-REPAIR-PARTS",
+      "new_sku": "FA245__COL-AUTO-TAPER-HEAD-REPAIR-PARTS"
+    },
+    {
+      "row": 259,
+      "name": "Columbia Automatic Taper Head Repair Parts",
+      "parent": "COL-AUTO-TAPER-HEAD-REPAIR-PARTS",
+      "old_sku": "FA253__COLUMBIA-AUTOMATIC-TAPER-HEAD-REPAIR-PARTS",
+      "new_sku": "FA253__COL-AUTO-TAPER-HEAD-REPAIR-PARTS"
+    },
+    {
+      "row": 260,
+      "name": "Columbia Automatic Taper Head Repair Parts",
+      "parent": "COL-AUTO-TAPER-HEAD-REPAIR-PARTS",
+      "old_sku": "FA254__COLUMBIA-AUTOMATIC-TAPER-HEAD-REPAIR-PARTS",
+      "new_sku": "FA254__COL-AUTO-TAPER-HEAD-REPAIR-PARTS"
+    },
+    {
+      "row": 261,
+      "name": "Columbia Automatic Taper Head Repair Parts",
+      "parent": "COL-AUTO-TAPER-HEAD-REPAIR-PARTS",
+      "old_sku": "FA257__COLUMBIA-AUTOMATIC-TAPER-HEAD-REPAIR-PARTS",
+      "new_sku": "FA257__COL-AUTO-TAPER-HEAD-REPAIR-PARTS"
+    },
+    {
+      "row": 262,
+      "name": "Columbia Automatic Taper Head Repair Parts",
+      "parent": "COL-AUTO-TAPER-HEAD-REPAIR-PARTS",
+      "old_sku": "FA258__COLUMBIA-AUTOMATIC-TAPER-HEAD-REPAIR-PARTS",
+      "new_sku": "FA258__COL-AUTO-TAPER-HEAD-REPAIR-PARTS"
+    },
+    {
+      "row": 264,
+      "name": "Columbia Automatic Taper Head Repair Parts",
+      "parent": "COL-AUTO-TAPER-HEAD-REPAIR-PARTS",
+      "old_sku": "FA265__COLUMBIA-AUTOMATIC-TAPER-HEAD-REPAIR-PARTS",
+      "new_sku": "FA265__COL-AUTO-TAPER-HEAD-REPAIR-PARTS"
+    },
+    {
+      "row": 301,
+      "name": "Columbia Box Filler Adaptor Parts",
+      "parent": "COL-BOX-FILLER-ADAPTOR-PARTS",
+      "old_sku": "MP23A__COLUMBIA-BOX-FILLER-ADAPTOR-PARTS",
+      "new_sku": "MP23A__COL-BOX-FILLER-ADAPTOR-PARTS"
+    },
+    {
+      "row": 333,
+      "name": "Columbia Corner Flusher Box Repair Parts",
+      "parent": "COL-CORNER-FLUSHER-BOX-REPAIR-PARTS",
+      "old_sku": "CFB5B__COLUMBIA-CORNER-FLUSHER-BOX-REPAIR-PARTS",
+      "new_sku": "CFB5B__COL-CORNER-FLUSHER-BOX-REPAIR-PARTS"
+    },
+    {
+      "row": 343,
+      "name": "Columbia Corner Flusher Box Repair Parts",
+      "parent": "COL-CORNER-FLUSHER-BOX-REPAIR-PARTS",
+      "old_sku": "FA213__COLUMBIA-CORNER-FLUSHER-BOX-REPAIR-PARTS",
+      "new_sku": "FA213__COL-CORNER-FLUSHER-BOX-REPAIR-PARTS"
+    },
+    {
+      "row": 344,
+      "name": "Columbia Corner Flusher Box Repair Parts",
+      "parent": "COL-CORNER-FLUSHER-BOX-REPAIR-PARTS",
+      "old_sku": "FA219__COLUMBIA-CORNER-FLUSHER-BOX-REPAIR-PARTS",
+      "new_sku": "FA219__COL-CORNER-FLUSHER-BOX-REPAIR-PARTS"
+    },
+    {
+      "row": 345,
+      "name": "Columbia Corner Flusher Box Repair Parts",
+      "parent": "COL-CORNER-FLUSHER-BOX-REPAIR-PARTS",
+      "old_sku": "FA228__COLUMBIA-CORNER-FLUSHER-BOX-REPAIR-PARTS",
+      "new_sku": "FA228__COL-CORNER-FLUSHER-BOX-REPAIR-PARTS"
+    },
+    {
+      "row": 346,
+      "name": "Columbia Corner Flusher Box Repair Parts",
+      "parent": "COL-CORNER-FLUSHER-BOX-REPAIR-PARTS",
+      "old_sku": "FA231__COLUMBIA-CORNER-FLUSHER-BOX-REPAIR-PARTS",
+      "new_sku": "FA231__COL-CORNER-FLUSHER-BOX-REPAIR-PARTS"
+    },
+    {
+      "row": 347,
+      "name": "Columbia Corner Flusher Box Repair Parts",
+      "parent": "COL-CORNER-FLUSHER-BOX-REPAIR-PARTS",
+      "old_sku": "FA232__COLUMBIA-CORNER-FLUSHER-BOX-REPAIR-PARTS",
+      "new_sku": "FA232__COL-CORNER-FLUSHER-BOX-REPAIR-PARTS"
+    },
+    {
+      "row": 348,
+      "name": "Columbia Corner Flusher Box Repair Parts",
+      "parent": "COL-CORNER-FLUSHER-BOX-REPAIR-PARTS",
+      "old_sku": "FA238__COLUMBIA-CORNER-FLUSHER-BOX-REPAIR-PARTS",
+      "new_sku": "FA238__COL-CORNER-FLUSHER-BOX-REPAIR-PARTS"
+    },
+    {
+      "row": 349,
+      "name": "Columbia Corner Flusher Box Repair Parts",
+      "parent": "COL-CORNER-FLUSHER-BOX-REPAIR-PARTS",
+      "old_sku": "FA241__COLUMBIA-CORNER-FLUSHER-BOX-REPAIR-PARTS",
+      "new_sku": "FA241__COL-CORNER-FLUSHER-BOX-REPAIR-PARTS"
+    },
+    {
+      "row": 350,
+      "name": "Columbia Corner Flusher Box Repair Parts",
+      "parent": "COL-CORNER-FLUSHER-BOX-REPAIR-PARTS",
+      "old_sku": "FA247__COLUMBIA-CORNER-FLUSHER-BOX-REPAIR-PARTS",
+      "new_sku": "FA247__COL-CORNER-FLUSHER-BOX-REPAIR-PARTS"
+    },
+    {
+      "row": 351,
+      "name": "Columbia Corner Flusher Box Repair Parts",
+      "parent": "COL-CORNER-FLUSHER-BOX-REPAIR-PARTS",
+      "old_sku": "FA253__COLUMBIA-CORNER-FLUSHER-BOX-REPAIR-PARTS",
+      "new_sku": "FA253__COL-CORNER-FLUSHER-BOX-REPAIR-PARTS"
+    },
+    {
+      "row": 352,
+      "name": "Columbia Corner Flusher Box Repair Parts",
+      "parent": "COL-CORNER-FLUSHER-BOX-REPAIR-PARTS",
+      "old_sku": "FA258__COLUMBIA-CORNER-FLUSHER-BOX-REPAIR-PARTS",
+      "new_sku": "FA258__COL-CORNER-FLUSHER-BOX-REPAIR-PARTS"
+    },
+    {
+      "row": 354,
+      "name": "Columbia Corner Flusher Box Repair Parts",
+      "parent": "COL-CORNER-FLUSHER-BOX-REPAIR-PARTS",
+      "old_sku": "FA262__COLUMBIA-CORNER-FLUSHER-BOX-REPAIR-PARTS",
+      "new_sku": "FA262__COL-CORNER-FLUSHER-BOX-REPAIR-PARTS"
+    },
+    {
+      "row": 355,
+      "name": "Columbia Corner Flusher Box Repair Parts",
+      "parent": "COL-CORNER-FLUSHER-BOX-REPAIR-PARTS",
+      "old_sku": "FA280__COLUMBIA-CORNER-FLUSHER-BOX-REPAIR-PARTS",
+      "new_sku": "FA280__COL-CORNER-FLUSHER-BOX-REPAIR-PARTS"
+    },
+    {
+      "row": 357,
+      "name": "Columbia Corner Flusher Box Repair Parts",
+      "parent": "COL-CORNER-FLUSHER-BOX-REPAIR-PARTS",
+      "old_sku": "FFB32__COLUMBIA-CORNER-FLUSHER-BOX-REPAIR-PARTS",
+      "new_sku": "FFB32__COL-CORNER-FLUSHER-BOX-REPAIR-PARTS"
+    },
+    {
+      "row": 358,
+      "name": "Columbia Corner Flusher Box Repair Parts",
+      "parent": "COL-CORNER-FLUSHER-BOX-REPAIR-PARTS",
+      "old_sku": "FFB32A__COLUMBIA-CORNER-FLUSHER-BOX-REPAIR-PARTS",
+      "new_sku": "FFB32A__COL-CORNER-FLUSHER-BOX-REPAIR-PARTS"
+    },
+    {
+      "row": 370,
+      "name": "Columbia Corner Roller Repair Parts",
+      "parent": "COL-CORNER-ROLLER-REPAIR-PARTS",
+      "old_sku": "FA262__COLUMBIA-CORNER-ROLLER-REPAIR-PARTS",
+      "new_sku": "FA262__COL-CORNER-ROLLER-REPAIR-PARTS"
+    },
+    {
+      "row": 420,
+      "name": "Columbia Flat Finishing Box Repair Parts",
+      "parent": "COL-FLAT-FIN-BOX-REPAIR-PARTS",
+      "old_sku": "FA231__COLUMBIA-FLAT-FINISHING-BOX-REPAIR-PARTS",
+      "new_sku": "FA231__COL-FLAT-FIN-BOX-REPAIR-PARTS"
+    },
+    {
+      "row": 421,
+      "name": "Columbia Flat Finishing Box Repair Parts",
+      "parent": "COL-FLAT-FIN-BOX-REPAIR-PARTS",
+      "old_sku": "FA232__COLUMBIA-FLAT-FINISHING-BOX-REPAIR-PARTS",
+      "new_sku": "FA232__COL-FLAT-FIN-BOX-REPAIR-PARTS"
+    },
+    {
+      "row": 422,
+      "name": "Columbia Flat Finishing Box Repair Parts",
+      "parent": "COL-FLAT-FIN-BOX-REPAIR-PARTS",
+      "old_sku": "FA233__COLUMBIA-FLAT-FINISHING-BOX-REPAIR-PARTS",
+      "new_sku": "FA233__COL-FLAT-FIN-BOX-REPAIR-PARTS"
+    },
+    {
+      "row": 423,
+      "name": "Columbia Flat Finishing Box Repair Parts",
+      "parent": "COL-FLAT-FIN-BOX-REPAIR-PARTS",
+      "old_sku": "FA238__COLUMBIA-FLAT-FINISHING-BOX-REPAIR-PARTS",
+      "new_sku": "FA238__COL-FLAT-FIN-BOX-REPAIR-PARTS"
+    },
+    {
+      "row": 424,
+      "name": "Columbia Flat Finishing Box Repair Parts",
+      "parent": "COL-FLAT-FIN-BOX-REPAIR-PARTS",
+      "old_sku": "FA239__COLUMBIA-FLAT-FINISHING-BOX-REPAIR-PARTS",
+      "new_sku": "FA239__COL-FLAT-FIN-BOX-REPAIR-PARTS"
+    },
+    {
+      "row": 425,
+      "name": "Columbia Flat Finishing Box Repair Parts",
+      "parent": "COL-FLAT-FIN-BOX-REPAIR-PARTS",
+      "old_sku": "FA241__COLUMBIA-FLAT-FINISHING-BOX-REPAIR-PARTS",
+      "new_sku": "FA241__COL-FLAT-FIN-BOX-REPAIR-PARTS"
+    },
+    {
+      "row": 426,
+      "name": "Columbia Flat Finishing Box Repair Parts",
+      "parent": "COL-FLAT-FIN-BOX-REPAIR-PARTS",
+      "old_sku": "FA247__COLUMBIA-FLAT-FINISHING-BOX-REPAIR-PARTS",
+      "new_sku": "FA247__COL-FLAT-FIN-BOX-REPAIR-PARTS"
+    },
+    {
+      "row": 427,
+      "name": "Columbia Flat Finishing Box Repair Parts",
+      "parent": "COL-FLAT-FIN-BOX-REPAIR-PARTS",
+      "old_sku": "FA258__COLUMBIA-FLAT-FINISHING-BOX-REPAIR-PARTS",
+      "new_sku": "FA258__COL-FLAT-FIN-BOX-REPAIR-PARTS"
+    },
+    {
+      "row": 428,
+      "name": "Columbia Flat Finishing Box Repair Parts",
+      "parent": "COL-FLAT-FIN-BOX-REPAIR-PARTS",
+      "old_sku": "FA268__COLUMBIA-FLAT-FINISHING-BOX-REPAIR-PARTS",
+      "new_sku": "FA268__COL-FLAT-FIN-BOX-REPAIR-PARTS"
+    },
+    {
+      "row": 429,
+      "name": "Columbia Flat Finishing Box Repair Parts",
+      "parent": "COL-FLAT-FIN-BOX-REPAIR-PARTS",
+      "old_sku": "FA271__COLUMBIA-FLAT-FINISHING-BOX-REPAIR-PARTS",
+      "new_sku": "FA271__COL-FLAT-FIN-BOX-REPAIR-PARTS"
+    },
+    {
+      "row": 432,
+      "name": "Columbia Flat Finishing Box Repair Parts",
+      "parent": "COL-FLAT-FIN-BOX-REPAIR-PARTS",
+      "old_sku": "FA280__COLUMBIA-FLAT-FINISHING-BOX-REPAIR-PARTS",
+      "new_sku": "FA280__COL-FLAT-FIN-BOX-REPAIR-PARTS"
+    },
+    {
+      "row": 457,
+      "name": "Columbia Flat Finishing Box Repair Parts",
+      "parent": "COL-FLAT-FIN-BOX-REPAIR-PARTS",
+      "old_sku": "FFB32__COLUMBIA-FLAT-FINISHING-BOX-REPAIR-PARTS",
+      "new_sku": "FFB32__COL-FLAT-FIN-BOX-REPAIR-PARTS"
+    },
+    {
+      "row": 458,
+      "name": "Columbia Flat Finishing Box Repair Parts",
+      "parent": "COL-FLAT-FIN-BOX-REPAIR-PARTS",
+      "old_sku": "FFB32A__COLUMBIA-FLAT-FINISHING-BOX-REPAIR-PARTS",
+      "new_sku": "FFB32A__COL-FLAT-FIN-BOX-REPAIR-PARTS"
+    },
+    {
+      "row": 479,
+      "name": "Columbia Hinged Nailspotter Repair Parts",
+      "parent": "COL-HINGED-NAIL-SPOTTER-REPAIR-PARTS",
+      "old_sku": "FA228__COLUMBIA-HINGED-NAILSPOTTER-REPAIR-PARTS",
+      "new_sku": "FA228__COL-HINGED-NAIL-SPOTTER-REPAIR-PARTS"
+    },
+    {
+      "row": 480,
+      "name": "Columbia Hinged Nailspotter Repair Parts",
+      "parent": "COL-HINGED-NAIL-SPOTTER-REPAIR-PARTS",
+      "old_sku": "FA231__COLUMBIA-HINGED-NAILSPOTTER-REPAIR-PARTS",
+      "new_sku": "FA231__COL-HINGED-NAIL-SPOTTER-REPAIR-PARTS"
+    },
+    {
+      "row": 481,
+      "name": "Columbia Hinged Nailspotter Repair Parts",
+      "parent": "COL-HINGED-NAIL-SPOTTER-REPAIR-PARTS",
+      "old_sku": "FA241__COLUMBIA-HINGED-NAILSPOTTER-REPAIR-PARTS",
+      "new_sku": "FA241__COL-HINGED-NAIL-SPOTTER-REPAIR-PARTS"
+    },
+    {
+      "row": 482,
+      "name": "Columbia Hinged Nailspotter Repair Parts",
+      "parent": "COL-HINGED-NAIL-SPOTTER-REPAIR-PARTS",
+      "old_sku": "FA247__COLUMBIA-HINGED-NAILSPOTTER-REPAIR-PARTS",
+      "new_sku": "FA247__COL-HINGED-NAIL-SPOTTER-REPAIR-PARTS"
+    },
+    {
+      "row": 483,
+      "name": "Columbia Hinged Nailspotter Repair Parts",
+      "parent": "COL-HINGED-NAIL-SPOTTER-REPAIR-PARTS",
+      "old_sku": "FA252__COLUMBIA-HINGED-NAILSPOTTER-REPAIR-PARTS",
+      "new_sku": "FA252__COL-HINGED-NAIL-SPOTTER-REPAIR-PARTS"
+    },
+    {
+      "row": 484,
+      "name": "Columbia Hinged Nailspotter Repair Parts",
+      "parent": "COL-HINGED-NAIL-SPOTTER-REPAIR-PARTS",
+      "old_sku": "FA254__COLUMBIA-HINGED-NAILSPOTTER-REPAIR-PARTS",
+      "new_sku": "FA254__COL-HINGED-NAIL-SPOTTER-REPAIR-PARTS"
+    },
+    {
+      "row": 485,
+      "name": "Columbia Hinged Nailspotter Repair Parts",
+      "parent": "COL-HINGED-NAIL-SPOTTER-REPAIR-PARTS",
+      "old_sku": "FA260__COLUMBIA-HINGED-NAILSPOTTER-REPAIR-PARTS",
+      "new_sku": "FA260__COL-HINGED-NAIL-SPOTTER-REPAIR-PARTS"
+    },
+    {
+      "row": 486,
+      "name": "Columbia Hinged Nailspotter Repair Parts",
+      "parent": "COL-HINGED-NAIL-SPOTTER-REPAIR-PARTS",
+      "old_sku": "FA271__COLUMBIA-HINGED-NAILSPOTTER-REPAIR-PARTS",
+      "new_sku": "FA271__COL-HINGED-NAIL-SPOTTER-REPAIR-PARTS"
+    },
+    {
+      "row": 487,
+      "name": "Columbia Hinged Nailspotter Repair Parts",
+      "parent": "COL-HINGED-NAIL-SPOTTER-REPAIR-PARTS",
+      "old_sku": "FA280__COLUMBIA-HINGED-NAILSPOTTER-REPAIR-PARTS",
+      "new_sku": "FA280__COL-HINGED-NAIL-SPOTTER-REPAIR-PARTS"
+    },
+    {
+      "row": 488,
+      "name": "Columbia Hinged Nailspotter Repair Parts",
+      "parent": "COL-HINGED-NAIL-SPOTTER-REPAIR-PARTS",
+      "old_sku": "FFB32__COLUMBIA-HINGED-NAILSPOTTER-REPAIR-PARTS",
+      "new_sku": "FFB32__COL-HINGED-NAIL-SPOTTER-REPAIR-PARTS"
+    },
+    {
+      "row": 489,
+      "name": "Columbia Hinged Nailspotter Repair Parts",
+      "parent": "COL-HINGED-NAIL-SPOTTER-REPAIR-PARTS",
+      "old_sku": "FFB32A__COLUMBIA-HINGED-NAILSPOTTER-REPAIR-PARTS",
+      "new_sku": "FFB32A__COL-HINGED-NAIL-SPOTTER-REPAIR-PARTS"
+    },
+    {
+      "row": 508,
+      "name": "Columbia Hot Mud Pump Repair Parts",
+      "parent": "COL-HOT-MUD-PUMP-REPAIR-PARTS",
+      "old_sku": "FA249__COLUMBIA-HOT-MUD-PUMP-REPAIR-PARTS",
+      "new_sku": "FA249__COL-HOT-MUD-PUMP-REPAIR-PARTS"
+    },
+    {
+      "row": 509,
+      "name": "Columbia Hot Mud Pump Repair Parts",
+      "parent": "COL-HOT-MUD-PUMP-REPAIR-PARTS",
+      "old_sku": "FA256__COLUMBIA-HOT-MUD-PUMP-REPAIR-PARTS",
+      "new_sku": "FA256__COL-HOT-MUD-PUMP-REPAIR-PARTS"
+    },
+    {
+      "row": 510,
+      "name": "Columbia Hot Mud Pump Repair Parts",
+      "parent": "COL-HOT-MUD-PUMP-REPAIR-PARTS",
+      "old_sku": "FA260__COLUMBIA-HOT-MUD-PUMP-REPAIR-PARTS",
+      "new_sku": "FA260__COL-HOT-MUD-PUMP-REPAIR-PARTS"
+    },
+    {
+      "row": 512,
+      "name": "Columbia Hot Mud Pump Repair Parts",
+      "parent": "COL-HOT-MUD-PUMP-REPAIR-PARTS",
+      "old_sku": "FA271__COLUMBIA-HOT-MUD-PUMP-REPAIR-PARTS",
+      "new_sku": "FA271__COL-HOT-MUD-PUMP-REPAIR-PARTS"
+    },
+    {
+      "row": 516,
+      "name": "Columbia Hot Mud Pump Repair Parts",
+      "parent": "COL-HOT-MUD-PUMP-REPAIR-PARTS",
+      "old_sku": "FA292__COLUMBIA-HOT-MUD-PUMP-REPAIR-PARTS",
+      "new_sku": "FA292__COL-HOT-MUD-PUMP-REPAIR-PARTS"
+    },
+    {
+      "row": 544,
+      "name": "Columbia Hot Mud Pump Repair Parts",
+      "parent": "COL-HOT-MUD-PUMP-REPAIR-PARTS",
+      "old_sku": "MP23A__COLUMBIA-HOT-MUD-PUMP-REPAIR-PARTS",
+      "new_sku": "MP23A__COL-HOT-MUD-PUMP-REPAIR-PARTS"
+    },
+    {
+      "row": 554,
+      "name": "Columbia Hydra-Reach Box Handle Repair Parts",
+      "parent": "COL-HYDRA-REACH-BOX-HDL-REPAIR-PARTS",
+      "old_sku": "BH1__COLUMBIA-HYDRA-REACH-BOX-HANDLE-REPAIR-PARTS",
+      "new_sku": "BH1__COL-HYDRA-REACH-BOX-HDL-REPAIR-PARTS"
+    },
+    {
+      "row": 555,
+      "name": "Columbia Hydra-Reach Box Handle Repair Parts",
+      "parent": "COL-HYDRA-REACH-BOX-HDL-REPAIR-PARTS",
+      "old_sku": "BH5__COLUMBIA-HYDRA-REACH-BOX-HANDLE-REPAIR-PARTS",
+      "new_sku": "BH5__COL-HYDRA-REACH-BOX-HDL-REPAIR-PARTS"
+    },
+    {
+      "row": 556,
+      "name": "Columbia Hydra-Reach Box Handle Repair Parts",
+      "parent": "COL-HYDRA-REACH-BOX-HDL-REPAIR-PARTS",
+      "old_sku": "BH6__COLUMBIA-HYDRA-REACH-BOX-HANDLE-REPAIR-PARTS",
+      "new_sku": "BH6__COL-HYDRA-REACH-BOX-HDL-REPAIR-PARTS"
+    },
+    {
+      "row": 557,
+      "name": "Columbia Hydra-Reach Box Handle Repair Parts",
+      "parent": "COL-HYDRA-REACH-BOX-HDL-REPAIR-PARTS",
+      "old_sku": "FA252__COLUMBIA-HYDRA-REACH-BOX-HANDLE-REPAIR-PARTS",
+      "new_sku": "FA252__COL-HYDRA-REACH-BOX-HDL-REPAIR-PARTS"
+    },
+    {
+      "row": 558,
+      "name": "Columbia Hydra-Reach Box Handle Repair Parts",
+      "parent": "COL-HYDRA-REACH-BOX-HDL-REPAIR-PARTS",
+      "old_sku": "FA256__COLUMBIA-HYDRA-REACH-BOX-HANDLE-REPAIR-PARTS",
+      "new_sku": "FA256__COL-HYDRA-REACH-BOX-HDL-REPAIR-PARTS"
+    },
+    {
+      "row": 560,
+      "name": "Columbia Hydra-Reach Box Handle Repair Parts",
+      "parent": "COL-HYDRA-REACH-BOX-HDL-REPAIR-PARTS",
+      "old_sku": "FA311__COLUMBIA-HYDRA-REACH-BOX-HANDLE-REPAIR-PARTS",
+      "new_sku": "FA311__COL-HYDRA-REACH-BOX-HDL-REPAIR-PARTS"
+    },
+    {
+      "row": 561,
+      "name": "Columbia Hydra-Reach Box Handle Repair Parts",
+      "parent": "COL-HYDRA-REACH-BOX-HDL-REPAIR-PARTS",
+      "old_sku": "FA312__COLUMBIA-HYDRA-REACH-BOX-HANDLE-REPAIR-PARTS",
+      "new_sku": "FA312__COL-HYDRA-REACH-BOX-HDL-REPAIR-PARTS"
+    },
+    {
+      "row": 567,
+      "name": "Columbia Hydra-Reach Box Handle Repair Parts",
+      "parent": "COL-HYDRA-REACH-BOX-HDL-REPAIR-PARTS",
+      "old_sku": "HH8__COLUMBIA-HYDRA-REACH-BOX-HANDLE-REPAIR-PARTS",
+      "new_sku": "HH8__COL-HYDRA-REACH-BOX-HDL-REPAIR-PARTS"
+    },
+    {
+      "row": 582,
+      "name": "Columbia Hydra-Reach Box Handle Repair Parts",
+      "parent": "COL-HYDRA-REACH-BOX-HDL-REPAIR-PARTS",
+      "old_sku": "HH35__COLUMBIA-HYDRA-REACH-BOX-HANDLE-REPAIR-PARTS",
+      "new_sku": "HH35__COL-HYDRA-REACH-BOX-HDL-REPAIR-PARTS"
+    },
+    {
+      "row": 595,
+      "name": "Columbia Matrix Handle Repair Parts",
+      "parent": "COL-MATRIX-HDL-REPAIR-PARTS",
+      "old_sku": "FA229__COLUMBIA-MATRIX-HANDLE-REPAIR-PARTS",
+      "new_sku": "FA229__COL-MATRIX-HDL-REPAIR-PARTS"
+    },
+    {
+      "row": 597,
+      "name": "Columbia Matrix Handle Repair Parts",
+      "parent": "COL-MATRIX-HDL-REPAIR-PARTS",
+      "old_sku": "FA256__COLUMBIA-MATRIX-HANDLE-REPAIR-PARTS",
+      "new_sku": "FA256__COL-MATRIX-HDL-REPAIR-PARTS"
+    },
+    {
+      "row": 598,
+      "name": "Columbia Matrix Handle Repair Parts",
+      "parent": "COL-MATRIX-HDL-REPAIR-PARTS",
+      "old_sku": "FA258__COLUMBIA-MATRIX-HANDLE-REPAIR-PARTS",
+      "new_sku": "FA258__COL-MATRIX-HDL-REPAIR-PARTS"
+    },
+    {
+      "row": 606,
+      "name": "Columbia Matrix Handle Repair Parts",
+      "parent": "COL-MATRIX-HDL-REPAIR-PARTS",
+      "old_sku": "HH8__COLUMBIA-MATRIX-HANDLE-REPAIR-PARTS",
+      "new_sku": "HH8__COL-MATRIX-HDL-REPAIR-PARTS"
+    },
+    {
+      "row": 611,
+      "name": "Columbia Matrix Handle Repair Parts",
+      "parent": "COL-MATRIX-HDL-REPAIR-PARTS",
+      "old_sku": "HH35__COLUMBIA-MATRIX-HANDLE-REPAIR-PARTS",
+      "new_sku": "HH35__COL-MATRIX-HDL-REPAIR-PARTS"
+    }
+  ]
+}

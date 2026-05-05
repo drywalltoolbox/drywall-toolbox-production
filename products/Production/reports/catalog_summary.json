@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-05T15:16:08+00:00",
+  "generated_at": "2026-05-05T15:24:37+00:00",
   "products_scanned": 1914,
   "filtered_product_count": 369,
   "filtered_variant_count": 1165,
@@ -35,11 +35,11 @@
   },
   "duplicate_mpn_count": 41,
   "outputs": {
-    "manifest_json": "products\\scraped_results\\Production\\manifests\\product_manifest.json",
-    "product_catalog": "products\\scraped_results\\Production\\catalogs\\product_catalog.csv",
-    "woocommerce_catalog": "products\\scraped_results\\Production\\catalogs\\woocommerce_catalog.csv",
-    "duplicate_mpn_report_json": "products\\scraped_results\\Production\\reports\\duplicate_mpn_report.json",
-    "summary_json": "products\\scraped_results\\Production\\reports\\catalog_summary.json",
-    "readme": "products\\scraped_results\\Production\\README.md"
+    "manifest_json": "products\\Production\\manifests\\product_manifest.json",
+    "product_catalog": "products\\Production\\catalogs\\product_catalog.csv",
+    "woocommerce_catalog": "products\\Production\\catalogs\\woocommerce_catalog.csv",
+    "duplicate_mpn_report_json": "products\\Production\\reports\\duplicate_mpn_report.json",
+    "summary_json": "products\\Production\\reports\\catalog_summary.json",
+    "readme": "products\\Production\\README.md"
   }
 }

@@ -1,0 +1,1628 @@
+{
+  "production_csv": "products\\Production\\catalogs\\woocommerce_catalog.csv",
+  "reference_csv": "products\\scraped_results\\wc-catalog.csv",
+  "dry_run": false,
+  "updated_product_rows": 97,
+  "variation_parent_references_updated": 154,
+  "parent_sku_changes": {
+    "ASG-ASGARD-ANGLE-HEAD": "AH-AD",
+    "ASG-ASGARD-FINISHING-BOX": "EZFB-AD",
+    "ASG-ASGARD-POWER-ASSIST-MAXXBOX-FINISHING-BOX": "PAFB-AD",
+    "COL-COLUMBIA-180-GRIP-FLAT-BOX-HANDLE-FIXED-LENGTH": "COL-BH",
+    "COL-COLUMBIA-3WAY-STAINLESS-STEEL-PUTTY-KNIVES-WITH-NYLON-HANDLE": "3NPK",
+    "COL-COLUMBIA-ANGLE-HEAD": "COL-AH",
+    "COL-COLUMBIA-ANGLE-HEAD-BLADE-REPAIR-KIT": "COL-AHRBK",
+    "COL-COLUMBIA-AUTOMATIC-FAT-BOY-FLAT-BOX": "COL-FBBA",
+    "COL-COLUMBIA-AUTOMATIC-FLAT-BOX": "COL-FFBA",
+    "COL-COLUMBIA-BENT-BOX-HANDLES-3-6": "COL-BBH",
+    "COL-COLUMBIA-CAM-LOCK-TUBE": "COL-CLT",
+    "COL-COLUMBIA-COMBO-FLUSHER": "COL-CSF",
+    "COL-COLUMBIA-COMPOUND-TUBE": "COL-CMT",
+    "COL-COLUMBIA-FAT-BOY-BOX": "COL-FFB",
+    "COL-COLUMBIA-FAT-BOY-SMOOTHING-BLADE": "FSB",
+    "COL-COLUMBIA-INSIDE-TRACK-FAT-BOY-BOX": "COL-ITFB",
+    "COL-COLUMBIA-MATRIX-BOX-HANDLE": "COL-MH",
+    "COL-COLUMBIA-NAIL-SPOTTER": "COL-NS",
+    "COL-COLUMBIA-ONE-PIECE-STAINLESS-STEEL-PUTTY-KNIVES": "OPPK",
+    "COL-COLUMBIA-SABRE-SMOOTHING-BLADE": "COL-SSB",
+    "COL-COLUMBIA-SPECIALTY-KNIFE-WITH-NYLON-HANDLE": "NPK",
+    "COL-COLUMBIOA-STAINLESS-STEEL-TAPING-KNIFE-WITH-SOFT-GRIP-HANDLE": "COL-CTK",
+    "COL-COLUMBIA-THROTTLE-BOX": "COL-CFB",
+    "COL-COLUMBIA-TOMAHAWK-SMOOTHING-BLADE": "COL-TSB",
+    "TT-TAPETECH-COMPOUND-ROLLER-FRAME": "TT-CRF",
+    "TT-TAPETECH-COMPOUND-TUBE": "CT-TT",
+    "TT-TAPETECH-EZ-ROLL-ADJUSTABLE-CORNER-FINISHER-KIT": "TT-EZCF",
+    "TT-TAPETECH-FINISHING-BOX-HANDLES-FIXED-LENGTH": "FBH-TT",
+    "TT-TAPETECH-GOLD-STAINLESS-STEEL-FLEXX-FINISHING-TROWEL": "TG-PS-TT",
+    "TT-TAPETECH-PREMIUM-BLUE-STEEL-TAPING-KNIFE": "TKBS-TT",
+    "TT-TAPETECH-PREMIUM-CARBON-STEEL-JOINT-KNIFE": "TT-JKCS",
+    "TT-TAPETECH-PREMIUM-FINISHING-KNIFE": "PFK-TT",
+    "TT-TAPETECH-PREMIUM-GOLD-FLEXX-ROUNDED-FRONT-POOL-TROWEL": "TGP-PS-TT",
+    "TT-TAPETECH-PREMIUM-GOLD-STAINLESS-STEEL-FLEXX-CURVED-FINISHING-TROWEL": "TGCU-PS-TT",
+    "TT-TAPETECH-PREMIUM-STAINLESS-STEEL-JOINT-KNIFE": "JKSS-TT",
+    "TT-TAPETECH-PREMIUM-STAINLESS-STEEL-TAPING-KNIFE": "TKSS-TT"
+  },
+  "skipped": [
+    {
+      "row": 411,
+      "current_sku": "COL-COLUMBIA-FLAT-FINISHING-BOXES",
+      "candidate_sku": "COL-FFB",
+      "reason": "candidate_sku_conflict",
+      "candidate_name": "Columbia Flat Finishing Box"
+    },
+    {
+      "row": 745,
+      "current_sku": "COL-COLUMBIA-STAINLESS-STEEL-PUTTY-KNIVES-WITH-NYLON-HANDLE",
+      "candidate_sku": "NPK",
+      "reason": "candidate_sku_conflict",
+      "candidate_name": "Columbia Nylon Putty Knives"
+    },
+    {
+      "row": 1191,
+      "current_sku": "TT-TAPETECH-GOLD-STAINLESS-STEEL-MAXFLEXX-FINISHING-TROWEL",
+      "candidate_sku": "TG-PS-TT",
+      "reason": "candidate_sku_conflict",
+      "candidate_name": "TapeTech Premium Gold Stainless Steel Finishing Trowel"
+    },
+    {
+      "row": 1196,
+      "current_sku": "TT-TAPETECH-GOLD-STAINLESS-STEEL-MIDFLEXX-FINISHING-TROWEL",
+      "candidate_sku": "TG-PS-TT",
+      "reason": "candidate_sku_conflict",
+      "candidate_name": "TapeTech Premium Gold Stainless Steel Finishing Trowel"
+    }
+  ],
+  "updates": [
+    {
+      "row": 2,
+      "type": "variable",
+      "brand": "Asgard",
+      "match_reason": "shared_variation_skus",
+      "match_score": 1.0,
+      "current_sku": "AH-AD",
+      "reference_sku": "AH-AD",
+      "current_name": "Asgard Angle Head",
+      "reference_name": "Asgard Angle Head",
+      "changed_fields": [
+        "Description",
+        "SKU",
+        "Short description"
+      ]
+    },
+    {
+      "row": 6,
+      "type": "simple",
+      "brand": "Asgard",
+      "match_reason": "exact_sku",
+      "match_score": 1.0,
+      "current_sku": "CFA-AD",
+      "reference_sku": "CFA-AD",
+      "current_name": "Asgard Angle Head Ball Adapter (CFA-AD)",
+      "reference_name": "Asgard Angle Head Ball Adapter (CFA-AD)",
+      "changed_fields": [
+        "Description",
+        "Name",
+        "Short description"
+      ]
+    },
+    {
+      "row": 7,
+      "type": "simple",
+      "brand": "Asgard",
+      "match_reason": "exact_sku",
+      "match_score": 1.0,
+      "current_sku": "CA08-AD",
+      "reference_sku": "CA08-AD",
+      "current_name": "Asgard 8\" Drywall Angle Box (CA08-AD)",
+      "reference_name": "Asgard 8\" Drywall Angle Box (CA08-AD)",
+      "changed_fields": [
+        "Description",
+        "Name",
+        "Short description"
+      ]
+    },
+    {
+      "row": 9,
+      "type": "simple",
+      "brand": "Asgard",
+      "match_reason": "exact_sku",
+      "match_score": 1.0,
+      "current_sku": "BBH-AD",
+      "reference_sku": "BBH-AD",
+      "current_name": "Asgard Brakeless Box Handle (BBH-AD)",
+      "reference_name": "Asgard Brakeless Box Handle (BBH-AD)",
+      "changed_fields": [
+        "Description",
+        "Name",
+        "Short description"
+      ]
+    },
+    {
+      "row": 11,
+      "type": "simple",
+      "brand": "Asgard",
+      "match_reason": "exact_sku",
+      "match_score": 1.0,
+      "current_sku": "FBHE-AD",
+      "reference_sku": "FBHE-AD",
+      "current_name": "Asgard Extendable Flat Box Handle (FBHE-AD)",
+      "reference_name": "Asgard Extendable Flat Box Handle (FBHE-AD)",
+      "changed_fields": [
+        "Description",
+        "Name",
+        "Short description"
+      ]
+    },
+    {
+      "row": 12,
+      "type": "simple",
+      "brand": "Asgard",
+      "match_reason": "exact_sku",
+      "match_score": 1.0,
+      "current_sku": "XH-AD",
+      "reference_sku": "XH-AD",
+      "current_name": "Asgard Extendable Support Handle (XH-AD)",
+      "reference_name": "Asgard Extendable Support Handle (XH-AD)",
+      "changed_fields": [
+        "Description",
+        "Name",
+        "Short description"
+      ]
+    },
+    {
+      "row": 13,
+      "type": "simple",
+      "brand": "Asgard",
+      "match_reason": "exact_sku",
+      "match_score": 1.0,
+      "current_sku": "FH-AD",
+      "reference_sku": "FH-AD",
+      "current_name": "Asgard Fiberglass Handle (FH-AD)",
+      "reference_name": "Asgard Fiberglass Handle (FH-AD)",
+      "changed_fields": [
+        "Description",
+        "Name",
+        "Short description"
+      ]
+    },
+    {
+      "row": 14,
+      "type": "variable",
+      "brand": "Asgard",
+      "match_reason": "shared_variation_skus",
+      "match_score": 1.0,
+      "current_sku": "EZFB-AD",
+      "reference_sku": "EZFB-AD",
+      "current_name": "Asgard Flat Box",
+      "reference_name": "Asgard Flat Box",
+      "changed_fields": [
+        "Description",
+        "Name",
+        "SKU",
+        "Short description"
+      ]
+    },
+    {
+      "row": 18,
+      "type": "simple",
+      "brand": "Asgard",
+      "match_reason": "exact_sku",
+      "match_score": 1.0,
+      "current_sku": "GN01-AD",
+      "reference_sku": "GN01-AD",
+      "current_name": "Asgard Gooseneck (GN01-AD)",
+      "reference_name": "Asgard Gooseneck (GN01-AD)",
+      "changed_fields": [
+        "Description",
+        "Name",
+        "Short description"
+      ]
+    },
+    {
+      "row": 19,
+      "type": "simple",
+      "brand": "Asgard",
+      "match_reason": "exact_sku",
+      "match_score": 1.0,
+      "current_sku": "CR01-AD",
+      "reference_sku": "CR01-AD",
+      "current_name": "Asgard Inside Corner Roller (CR01-AD)",
+      "reference_name": "Asgard Inside Corner Roller (CR01-AD)",
+      "changed_fields": [
+        "Description",
+        "Name",
+        "Short description"
+      ]
+    },
+    {
+      "row": 20,
+      "type": "simple",
+      "brand": "Asgard",
+      "match_reason": "exact_sku",
+      "match_score": 1.0,
+      "current_sku": "LP01-AD",
+      "reference_sku": "LP01-AD",
+      "current_name": "Asgard Loading Pump (LP01-AD)",
+      "reference_name": "Asgard Loading Pump (LP01-AD)",
+      "changed_fields": [
+        "Description",
+        "Name",
+        "Short description"
+      ]
+    },
+    {
+      "row": 26,
+      "type": "variable",
+      "brand": "Asgard",
+      "match_reason": "shared_variation_skus",
+      "match_score": 1.0,
+      "current_sku": "PAFB-AD",
+      "reference_sku": "PAFB-AD",
+      "current_name": "Asgard Power Assist Finishing Box",
+      "reference_name": "Asgard Power Assist Finishing Box",
+      "changed_fields": [
+        "Description",
+        "Name",
+        "SKU",
+        "Short description"
+      ]
+    },
+    {
+      "row": 56,
+      "type": "variable",
+      "brand": "Columbia",
+      "match_reason": "shared_variation_skus",
+      "match_score": 1.0,
+      "current_sku": "COL-BH",
+      "reference_sku": "COL-BH",
+      "current_name": "Columbia 180-Grip Flat Box Handle",
+      "reference_name": "Columbia 180-Grip Flat Box Handle",
+      "changed_fields": [
+        "Description",
+        "Name",
+        "SKU",
+        "Short description"
+      ]
+    },
+    {
+      "row": 69,
+      "type": "variable",
+      "brand": "Columbia",
+      "match_reason": "shared_variation_skus",
+      "match_score": 1.0,
+      "current_sku": "3NPK",
+      "reference_sku": "3NPK",
+      "current_name": "Columbia Three Way Knives",
+      "reference_name": "Columbia Three Way Knives",
+      "changed_fields": [
+        "Name",
+        "SKU",
+        "Short description"
+      ]
+    },
+    {
+      "row": 75,
+      "type": "simple",
+      "brand": "Columbia",
+      "match_reason": "exact_sku",
+      "match_score": 1.0,
+      "current_sku": "TBPTAPER",
+      "reference_sku": "TBPTAPER",
+      "current_name": "Columbia Tall Boy Predator Automatic Taper",
+      "reference_name": "Columbia Tall Boy Predator Automatic Taper",
+      "changed_fields": [
+        "Name",
+        "Short description"
+      ]
+    },
+    {
+      "row": 78,
+      "type": "variable",
+      "brand": "Columbia",
+      "match_reason": "shared_variation_skus",
+      "match_score": 0.947,
+      "current_sku": "COL-AH",
+      "reference_sku": "COL-AH",
+      "current_name": "Columbia Anglehead",
+      "reference_name": "Columbia Anglehead",
+      "changed_fields": [
+        "Description",
+        "Name",
+        "SKU",
+        "Short description"
+      ]
+    },
+    {
+      "row": 83,
+      "type": "simple",
+      "brand": "Columbia",
+      "match_reason": "exact_sku",
+      "match_score": 1.0,
+      "current_sku": "AHA",
+      "reference_sku": "AHA",
+      "current_name": "Columbia Anglehead Adaptor (AHA)",
+      "reference_name": "Columbia Anglehead Adaptor (AHA)",
+      "changed_fields": [
+        "Description",
+        "Name",
+        "Short description"
+      ]
+    },
+    {
+      "row": 84,
+      "type": "variable",
+      "brand": "Columbia",
+      "match_reason": "name_similarity",
+      "match_score": 0.984,
+      "current_sku": "COL-AHRBK",
+      "reference_sku": "COL-AHRBK",
+      "current_name": "Columbia Anglehead Blade Maintenance Kit",
+      "reference_name": "Columbia Anglehead Blade Maintenance Kit",
+      "changed_fields": [
+        "Description",
+        "Name",
+        "SKU",
+        "Short description"
+      ]
+    },
+    {
+      "row": 123,
+      "type": "variable",
+      "brand": "Columbia",
+      "match_reason": "shared_variation_skus",
+      "match_score": 1.0,
+      "current_sku": "COL-FBBA",
+      "reference_sku": "COL-FBBA",
+      "current_name": "Columbia Fat Boy Automatic Assist Drywall Flat Box",
+      "reference_name": "Columbia Fat Boy Automatic Assist Drywall Flat Box",
+      "changed_fields": [
+        "Description",
+        "Name",
+        "SKU",
+        "Short description"
+      ]
+    },
+    {
+      "row": 127,
+      "type": "variable",
+      "brand": "Columbia",
+      "match_reason": "shared_variation_skus",
+      "match_score": 1.0,
+      "current_sku": "COL-FFBA",
+      "reference_sku": "COL-FFBA",
+      "current_name": "Columbia Automatic Flat Box",
+      "reference_name": "Columbia Automatic Flat Box",
+      "changed_fields": [
+        "Description",
+        "Name",
+        "SKU",
+        "Short description"
+      ]
+    },
+    {
+      "row": 132,
+      "type": "simple",
+      "brand": "Columbia",
+      "match_reason": "exact_sku",
+      "match_score": 1.0,
+      "current_sku": "TAPER",
+      "reference_sku": "TAPER",
+      "current_name": "Columbia Automatic Taper (TAPER)",
+      "reference_name": "Columbia Automatic Taper (TAPER)",
+      "changed_fields": [
+        "Description",
+        "Name",
+        "Short description"
+      ]
+    },
+    {
+      "row": 266,
+      "type": "simple",
+      "brand": "Columbia",
+      "match_reason": "exact_sku",
+      "match_score": 1.0,
+      "current_sku": "CTA107",
+      "reference_sku": "CTA107",
+      "current_name": "Columbia Piston Assembly for Taper",
+      "reference_name": "Columbia Piston Assembly for Taper",
+      "changed_fields": [
+        "Description",
+        "Name",
+        "Short description"
+      ]
+    },
+    {
+      "row": 277,
+      "type": "variable",
+      "brand": "Columbia",
+      "match_reason": "shared_variation_skus",
+      "match_score": 1.0,
+      "current_sku": "COL-BBH",
+      "reference_sku": "COL-BBH",
+      "current_name": "Columbia 180-Grip Bent Flat Box Handle",
+      "reference_name": "Columbia 180-Grip Bent Flat Box Handle",
+      "changed_fields": [
+        "Description",
+        "Name",
+        "SKU",
+        "Short description"
+      ]
+    },
+    {
+      "row": 296,
+      "type": "simple",
+      "brand": "Columbia",
+      "match_reason": "exact_sku",
+      "match_score": 1.0,
+      "current_sku": "BF",
+      "reference_sku": "BF",
+      "current_name": "Columbia Box Filler",
+      "reference_name": "Columbia Box Filler",
+      "changed_fields": [
+        "Short description"
+      ]
+    },
+    {
+      "row": 307,
+      "type": "variable",
+      "brand": "Columbia",
+      "match_reason": "shared_variation_skus",
+      "match_score": 1.0,
+      "current_sku": "COL-CLT",
+      "reference_sku": "COL-CLT",
+      "current_name": "Columbia Cam Lock Tube",
+      "reference_name": "Columbia Cam Lock Tube",
+      "changed_fields": [
+        "Description",
+        "SKU",
+        "Short description"
+      ]
+    },
+    {
+      "row": 313,
+      "type": "simple",
+      "brand": "Columbia",
+      "match_reason": "exact_sku",
+      "match_score": 1.0,
+      "current_sku": "CMH",
+      "reference_sku": "CMH",
+      "current_name": "Columbia 18\" Closet Monster Flat Box Handle",
+      "reference_name": "Columbia 18\" Closet Monster Flat Box Handle",
+      "changed_fields": [
+        "Description",
+        "Name",
+        "Short description"
+      ]
+    },
+    {
+      "row": 314,
+      "type": "variable",
+      "brand": "Columbia",
+      "match_reason": "shared_variation_skus",
+      "match_score": 1.0,
+      "current_sku": "COL-CSF",
+      "reference_sku": "COL-CSF",
+      "current_name": "Columbia Combo Flusher",
+      "reference_name": "Columbia Combo Flusher",
+      "changed_fields": [
+        "Description",
+        "SKU",
+        "Short description"
+      ]
+    },
+    {
+      "row": 318,
+      "type": "simple",
+      "brand": "Columbia",
+      "match_reason": "exact_sku",
+      "match_score": 1.0,
+      "current_sku": "SACS",
+      "reference_sku": "SACS",
+      "current_name": "Columbia Semi Automatic Commando Set",
+      "reference_name": "Columbia Semi Automatic Commando Set",
+      "changed_fields": [
+        "Description",
+        "Name",
+        "Short description"
+      ]
+    },
+    {
+      "row": 320,
+      "type": "variable",
+      "brand": "Columbia",
+      "match_reason": "shared_variation_skus",
+      "match_score": 1.0,
+      "current_sku": "COL-CMT",
+      "reference_sku": "COL-CMT",
+      "current_name": "Columbia Compound Mud Tube",
+      "reference_name": "Columbia Compound Mud Tube",
+      "changed_fields": [
+        "Description",
+        "Name",
+        "SKU",
+        "Short description"
+      ]
+    },
+    {
+      "row": 326,
+      "type": "simple",
+      "brand": "Columbia",
+      "match_reason": "exact_sku",
+      "match_score": 1.0,
+      "current_sku": "CC",
+      "reference_sku": "CC",
+      "current_name": "Columbia Corner Cobra (CC)",
+      "reference_name": "Columbia Corner Cobra (CC)",
+      "changed_fields": [
+        "Description",
+        "Name",
+        "Short description"
+      ]
+    },
+    {
+      "row": 361,
+      "type": "simple",
+      "brand": "Columbia",
+      "match_reason": "exact_sku",
+      "match_score": 1.0,
+      "current_sku": "CR",
+      "reference_sku": "CR",
+      "current_name": "Columbia Inside Corner Roller (CR)",
+      "reference_name": "Columbia Inside Corner Roller (CR)",
+      "changed_fields": [
+        "Description",
+        "Name",
+        "Short description"
+      ]
+    },
+    {
+      "row": 382,
+      "type": "simple",
+      "brand": "Columbia",
+      "match_reason": "exact_sku",
+      "match_score": 1.0,
+      "current_sku": "CEXT90",
+      "reference_sku": "CEXT90",
+      "current_name": "Columbia External Corner Applicator (CEXT90)",
+      "reference_name": "Columbia External Corner Applicator (CEXT90)",
+      "changed_fields": [
+        "Description",
+        "Name",
+        "Short description"
+      ]
+    },
+    {
+      "row": 383,
+      "type": "variable",
+      "brand": "Columbia",
+      "match_reason": "name_similarity",
+      "match_score": 0.872,
+      "current_sku": "COL-FFB",
+      "reference_sku": "COL-FFB",
+      "current_name": "Columbia Flat Finishing Box",
+      "reference_name": "Columbia Flat Finishing Box",
+      "changed_fields": [
+        "Description",
+        "Name",
+        "SKU",
+        "Short description"
+      ]
+    },
+    {
+      "row": 391,
+      "type": "variable",
+      "brand": "Columbia",
+      "match_reason": "name_similarity",
+      "match_score": 0.979,
+      "current_sku": "FSB",
+      "reference_sku": "FSB",
+      "current_name": "Columbia Fat Boy Smoothing Blades",
+      "reference_name": "Columbia Fat Boy Smoothing Blades",
+      "changed_fields": [
+        "Name",
+        "SKU",
+        "Short description"
+      ]
+    },
+    {
+      "row": 407,
+      "type": "simple",
+      "brand": "Columbia",
+      "match_reason": "exact_sku",
+      "match_score": 1.0,
+      "current_sku": "CFLT",
+      "reference_sku": "CFLT",
+      "current_name": "Columbia Flat Applicators (CFLT)",
+      "reference_name": "Columbia Flat Applicators (CFLT)",
+      "changed_fields": [
+        "Description",
+        "Name",
+        "Short description"
+      ]
+    },
+    {
+      "row": 583,
+      "type": "simple",
+      "brand": "Columbia",
+      "match_reason": "exact_sku",
+      "match_score": 1.0,
+      "current_sku": "ITC-K",
+      "reference_sku": "ITC-K",
+      "current_name": "Columbia Inside Track Conversion Kits (ITC-K)",
+      "reference_name": "Columbia Inside Track Conversion Kits (ITC-K)",
+      "changed_fields": [
+        "Description",
+        "Name",
+        "Short description"
+      ]
+    },
+    {
+      "row": 584,
+      "type": "variable",
+      "brand": "Columbia",
+      "match_reason": "shared_variation_skus",
+      "match_score": 1.0,
+      "current_sku": "COL-ITFB",
+      "reference_sku": "COL-ITFB",
+      "current_name": "Columbia Inside Track Fat Boy Flat Box",
+      "reference_name": "Columbia Inside Track Fat Boy Flat Box",
+      "changed_fields": [
+        "Description",
+        "Name",
+        "SKU",
+        "Short description"
+      ]
+    },
+    {
+      "row": 588,
+      "type": "simple",
+      "brand": "Columbia",
+      "match_reason": "exact_sku",
+      "match_score": 1.0,
+      "current_sku": "CHXL",
+      "reference_sku": "CHXL",
+      "current_name": "Columbia Long Extendible Handle (CHXL)",
+      "reference_name": "Columbia Long Extendible Handle (CHXL)",
+      "changed_fields": [
+        "Description",
+        "Name",
+        "Short description"
+      ]
+    },
+    {
+      "row": 589,
+      "type": "variable",
+      "brand": "Columbia",
+      "match_reason": "shared_variation_skus",
+      "match_score": 1.0,
+      "current_sku": "COL-MH",
+      "reference_sku": "COL-MH",
+      "current_name": "Columbia Matrix Flat Box Handles",
+      "reference_name": "Columbia Matrix Flat Box Handles",
+      "changed_fields": [
+        "Description",
+        "Name",
+        "SKU",
+        "Short description"
+      ]
+    },
+    {
+      "row": 646,
+      "type": "variable",
+      "brand": "Columbia",
+      "match_reason": "shared_variation_skus",
+      "match_score": 1.0,
+      "current_sku": "COL-NS",
+      "reference_sku": "COL-NS",
+      "current_name": "Columbia Nailspotter",
+      "reference_name": "Columbia Nailspotter",
+      "changed_fields": [
+        "Description",
+        "Name",
+        "SKU",
+        "Short description"
+      ]
+    },
+    {
+      "row": 649,
+      "type": "simple",
+      "brand": "Columbia",
+      "match_reason": "exact_sku",
+      "match_score": 1.0,
+      "current_sku": "C1HEXT",
+      "reference_sku": "C1HEXT",
+      "current_name": "Columbia One 1\" (C1HEXT)",
+      "reference_name": "Columbia One 1\" (C1HEXT)",
+      "changed_fields": [
+        "Description",
+        "Name",
+        "Short description"
+      ]
+    },
+    {
+      "row": 656,
+      "type": "variable",
+      "brand": "Columbia",
+      "match_reason": "shared_variation_skus",
+      "match_score": 0.97,
+      "current_sku": "OPPK",
+      "reference_sku": "OPPK",
+      "current_name": "Columbia One Piece Putty Knives",
+      "reference_name": "Columbia One Piece Putty Knives",
+      "changed_fields": [
+        "Name",
+        "SKU",
+        "Short description"
+      ]
+    },
+    {
+      "row": 667,
+      "type": "simple",
+      "brand": "Columbia",
+      "match_reason": "exact_sku",
+      "match_score": 1.0,
+      "current_sku": "CBNCR",
+      "reference_sku": "CBNCR",
+      "current_name": "Columbia Bullnose Outside Corner Roller (CBNCR)",
+      "reference_name": "Columbia Bullnose Outside Corner Roller (CBNCR)",
+      "changed_fields": [
+        "Description",
+        "Name",
+        "Short description"
+      ]
+    },
+    {
+      "row": 668,
+      "type": "simple",
+      "brand": "Columbia",
+      "match_reason": "exact_sku",
+      "match_score": 1.0,
+      "current_sku": "COBCR",
+      "reference_sku": "COBCR",
+      "current_name": "Columbia Standard Outside Corner Roller (COBCR)",
+      "reference_name": "Columbia Standard Outside Corner Roller (COBCR)",
+      "changed_fields": [
+        "Description",
+        "Name",
+        "Short description"
+      ]
+    },
+    {
+      "row": 673,
+      "type": "simple",
+      "brand": "Columbia",
+      "match_reason": "exact_sku",
+      "match_score": 1.0,
+      "current_sku": "CPFP",
+      "reference_sku": "CPFP",
+      "current_name": "Columbia X Graco PowerFill 3.5 Columbia PowerFill Pump (comes with box filler) (CPFP)",
+      "reference_name": "Columbia X Graco PowerFill 3.5 Columbia PowerFill Pump (comes with box filler) (CPFP)",
+      "changed_fields": [
+        "Description",
+        "Name",
+        "Short description"
+      ]
+    },
+    {
+      "row": 674,
+      "type": "simple",
+      "brand": "Columbia",
+      "match_reason": "exact_sku",
+      "match_score": 1.0,
+      "current_sku": "CPFGN",
+      "reference_sku": "CPFGN",
+      "current_name": "Columbia X Graco PowerFill 3.5 Columbia PowerFill Gooseneck (sold seperately) (CPFGN)",
+      "reference_name": "Columbia X Graco PowerFill 3.5 Columbia PowerFill Gooseneck (sold seperately) (CPFGN)",
+      "changed_fields": [
+        "Description",
+        "Name",
+        "Short description"
+      ]
+    },
+    {
+      "row": 675,
+      "type": "simple",
+      "brand": "Columbia",
+      "match_reason": "exact_sku",
+      "match_score": 1.0,
+      "current_sku": "PCLT42",
+      "reference_sku": "PCLT42",
+      "current_name": "Columbia Predator Cam-Lock Tube 42\" (PCLT42)",
+      "reference_name": "Columbia Predator Cam-Lock Tube 42\" (PCLT42)",
+      "changed_fields": [
+        "Description",
+        "Name",
+        "Short description"
+      ]
+    },
+    {
+      "row": 677,
+      "type": "simple",
+      "brand": "Columbia",
+      "match_reason": "exact_sku",
+      "match_score": 1.0,
+      "current_sku": "PCMT42",
+      "reference_sku": "PCMT42",
+      "current_name": "Columbia Predator Compound Tube 42\" (PCMT42)",
+      "reference_name": "Columbia Predator Compound Tube 42\" (PCMT42)",
+      "changed_fields": [
+        "Description",
+        "Name",
+        "Short description"
+      ]
+    },
+    {
+      "row": 679,
+      "type": "simple",
+      "brand": "Columbia",
+      "match_reason": "exact_sku",
+      "match_score": 1.0,
+      "current_sku": "PCHXL",
+      "reference_sku": "PCHXL",
+      "current_name": "Columbia Predator Columbia Handle XL (4-8') (PCHXL)",
+      "reference_name": "Columbia Predator Columbia Handle XL (4-8') (PCHXL)",
+      "changed_fields": [
+        "Name",
+        "Short description"
+      ]
+    },
+    {
+      "row": 684,
+      "type": "simple",
+      "brand": "Columbia",
+      "match_reason": "exact_sku",
+      "match_score": 1.0,
+      "current_sku": "PC1HEXT",
+      "reference_sku": "PC1HEXT",
+      "current_name": "Columbia Predator Columbia One Handle Extendable (3-5') (PC1HEXT)",
+      "reference_name": "Columbia Predator Columbia One Handle Extendable (3-5') (PC1HEXT)",
+      "changed_fields": [
+        "Description",
+        "Name",
+        "Short description"
+      ]
+    },
+    {
+      "row": 685,
+      "type": "simple",
+      "brand": "Columbia",
+      "match_reason": "exact_sku",
+      "match_score": 1.0,
+      "current_sku": "PC1H",
+      "reference_sku": "PC1H",
+      "current_name": "Columbia Predator Columbia One Handle (PC1H)",
+      "reference_name": "Columbia Predator Columbia One Handle (PC1H)",
+      "changed_fields": [
+        "Description",
+        "Name",
+        "Short description"
+      ]
+    },
+    {
+      "row": 686,
+      "type": "simple",
+      "brand": "Columbia",
+      "match_reason": "exact_sku",
+      "match_score": 1.0,
+      "current_sku": "PHMP",
+      "reference_sku": "PHMP",
+      "current_name": "Columbia Predator Hot Mud Pump (PHMP)",
+      "reference_name": "Columbia Predator Hot Mud Pump (PHMP)",
+      "changed_fields": [
+        "Name",
+        "Short description"
+      ]
+    },
+    {
+      "row": 688,
+      "type": "simple",
+      "brand": "Columbia",
+      "match_reason": "exact_sku",
+      "match_score": 1.0,
+      "current_sku": "PTS",
+      "reference_sku": "PTS",
+      "current_name": "Columbia Predator Tactical Set",
+      "reference_name": "Columbia Predator Tactical Set",
+      "changed_fields": [
+        "Short description"
+      ]
+    },
+    {
+      "row": 701,
+      "type": "simple",
+      "brand": "Columbia",
+      "match_reason": "exact_sku",
+      "match_score": 1.0,
+      "current_sku": "HMP",
+      "reference_sku": "HMP",
+      "current_name": "Columbia Mud Pump (HMP)",
+      "reference_name": "Columbia Mud Pump (HMP)",
+      "changed_fields": [
+        "Name",
+        "Short description"
+      ]
+    },
+    {
+      "row": 702,
+      "type": "simple",
+      "brand": "Columbia",
+      "match_reason": "exact_sku",
+      "match_score": 1.0,
+      "current_sku": "RC",
+      "reference_sku": "RC",
+      "current_name": "Columbia Road Case",
+      "reference_name": "Columbia Road Case",
+      "changed_fields": [
+        "Description",
+        "Short description"
+      ]
+    },
+    {
+      "row": 704,
+      "type": "variable",
+      "brand": "Columbia",
+      "match_reason": "shared_variation_skus",
+      "match_score": 1.0,
+      "current_sku": "COL-SSB",
+      "reference_sku": "COL-SSB",
+      "current_name": "Columbia Sabre Smoothing Blade",
+      "reference_name": "Columbia Sabre Smoothing Blade",
+      "changed_fields": [
+        "Description",
+        "SKU",
+        "Short description"
+      ]
+    },
+    {
+      "row": 715,
+      "type": "simple",
+      "brand": "Columbia",
+      "match_reason": "exact_sku",
+      "match_score": 1.0,
+      "current_sku": "SBC",
+      "reference_sku": "SBC",
+      "current_name": "Columbia Sabre Smoothing Blade Claw Adapter",
+      "reference_name": "Columbia Sabre Smoothing Blade Claw Adapter",
+      "changed_fields": [
+        "Description",
+        "Name",
+        "Short description"
+      ]
+    },
+    {
+      "row": 716,
+      "type": "simple",
+      "brand": "Columbia",
+      "match_reason": "exact_sku",
+      "match_score": 1.0,
+      "current_sku": "SBP",
+      "reference_sku": "SBP",
+      "current_name": "Columbia 41-75\" Sabre Smoothing Blade Extension Pole",
+      "reference_name": "Columbia 41-75\" Sabre Smoothing Blade Extension Pole",
+      "changed_fields": [
+        "Description",
+        "Name",
+        "Short description"
+      ]
+    },
+    {
+      "row": 717,
+      "type": "simple",
+      "brand": "Columbia",
+      "match_reason": "exact_sku",
+      "match_score": 1.0,
+      "current_sku": "SBSET",
+      "reference_sku": "SBSET",
+      "current_name": "Columbia Sabre Set",
+      "reference_name": "Columbia Sabre Set",
+      "changed_fields": [
+        "Description",
+        "Name",
+        "Short description"
+      ]
+    },
+    {
+      "row": 718,
+      "type": "simple",
+      "brand": "Columbia",
+      "match_reason": "exact_sku",
+      "match_score": 1.0,
+      "current_sku": "STAPER",
+      "reference_sku": "STAPER",
+      "current_name": "Columbia Sawed Off Taper 39\" (STAPER)",
+      "reference_name": "Columbia Sawed Off Taper 39\" (STAPER)",
+      "changed_fields": [
+        "Name",
+        "Short description"
+      ]
+    },
+    {
+      "row": 719,
+      "type": "simple",
+      "brand": "Columbia",
+      "match_reason": "exact_sku",
+      "match_score": 1.0,
+      "current_sku": "SPTAPER",
+      "reference_sku": "SPTAPER",
+      "current_name": "Columbia Sawed Off Taper 53\" (SPTAPER)",
+      "reference_name": "Columbia Sawed Off Taper 53\" (SPTAPER)",
+      "changed_fields": [
+        "Description",
+        "Name",
+        "Short description"
+      ]
+    },
+    {
+      "row": 720,
+      "type": "simple",
+      "brand": "Columbia",
+      "match_reason": "exact_sku",
+      "match_score": 1.0,
+      "current_sku": "SAT",
+      "reference_sku": "SAT",
+      "current_name": "Columbia Semi Automatic Taper (SAT)",
+      "reference_name": "Columbia Semi Automatic Taper (SAT)",
+      "changed_fields": [
+        "Description",
+        "Name",
+        "Short description"
+      ]
+    },
+    {
+      "row": 721,
+      "type": "simple",
+      "brand": "Columbia",
+      "match_reason": "exact_sku",
+      "match_score": 1.0,
+      "current_sku": "TCS",
+      "reference_sku": "TCS",
+      "current_name": "Columbia Semi Automatic Tool Case",
+      "reference_name": "Columbia Semi Automatic Tool Case",
+      "changed_fields": [
+        "Description",
+        "Name",
+        "Short description"
+      ]
+    },
+    {
+      "row": 729,
+      "type": "variable",
+      "brand": "Columbia",
+      "match_reason": "shared_variation_skus",
+      "match_score": 0.88,
+      "current_sku": "NPK",
+      "reference_sku": "NPK",
+      "current_name": "Columbia Nylon Putty Knives",
+      "reference_name": "Columbia Nylon Putty Knives",
+      "changed_fields": [
+        "Description",
+        "Name",
+        "SKU",
+        "Short description"
+      ]
+    },
+    {
+      "row": 755,
+      "type": "variable",
+      "brand": "Columbia",
+      "match_reason": "shared_variation_skus",
+      "match_score": 1.0,
+      "current_sku": "COL-CTK",
+      "reference_sku": "COL-CTK",
+      "current_name": "Columbia Stainless Steel Comfort Grip Taping Knife",
+      "reference_name": "Columbia Stainless Steel Comfort Grip Taping Knife",
+      "changed_fields": [
+        "Description",
+        "Name",
+        "SKU",
+        "Short description"
+      ]
+    },
+    {
+      "row": 777,
+      "type": "simple",
+      "brand": "Columbia",
+      "match_reason": "exact_sku",
+      "match_score": 1.0,
+      "current_sku": "TS",
+      "reference_sku": "TS",
+      "current_name": "Columbia Tactical Set",
+      "reference_name": "Columbia Tactical Set",
+      "changed_fields": [
+        "Short description"
+      ]
+    },
+    {
+      "row": 780,
+      "type": "simple",
+      "brand": "Columbia",
+      "match_reason": "exact_sku",
+      "match_score": 1.0,
+      "current_sku": "TBMP",
+      "reference_sku": "TBMP",
+      "current_name": "Columbia Tall Boy Mud Pump (TBMP)",
+      "reference_name": "Columbia Tall Boy Mud Pump (TBMP)",
+      "changed_fields": [
+        "Name",
+        "Short description"
+      ]
+    },
+    {
+      "row": 786,
+      "type": "variable",
+      "brand": "Columbia",
+      "match_reason": "shared_variation_skus",
+      "match_score": 1.0,
+      "current_sku": "COL-CFB",
+      "reference_sku": "COL-CFB",
+      "current_name": "Columbia Throttle Box",
+      "reference_name": "Columbia Throttle Box",
+      "changed_fields": [
+        "Description",
+        "SKU",
+        "Short description"
+      ]
+    },
+    {
+      "row": 800,
+      "type": "variable",
+      "brand": "Columbia",
+      "match_reason": "name_similarity",
+      "match_score": 1.0,
+      "current_sku": "COL-TSB",
+      "reference_sku": "COL-TSB",
+      "current_name": "Columbia Tomahawk Smoothing Blade",
+      "reference_name": "Columbia Tomahawk Smoothing Blade",
+      "changed_fields": [
+        "Description",
+        "SKU",
+        "Short description"
+      ]
+    },
+    {
+      "row": 810,
+      "type": "simple",
+      "brand": "Columbia",
+      "match_reason": "exact_sku",
+      "match_score": 1.0,
+      "current_sku": "TWS",
+      "reference_sku": "TWS",
+      "current_name": "Columbia Tomahawk Warrior Set",
+      "reference_name": "Columbia Tomahawk Warrior Set",
+      "changed_fields": [
+        "Description",
+        "Short description"
+      ]
+    },
+    {
+      "row": 811,
+      "type": "simple",
+      "brand": "Columbia",
+      "match_reason": "exact_sku",
+      "match_score": 1.0,
+      "current_sku": "CLTHA",
+      "reference_sku": "CLTHA",
+      "current_name": "Columbia Tomalock (CLTHA)",
+      "reference_name": "Columbia Tomalock (CLTHA)",
+      "changed_fields": [
+        "Description",
+        "Name",
+        "Short description"
+      ]
+    },
+    {
+      "row": 813,
+      "type": "simple",
+      "brand": "Columbia",
+      "match_reason": "exact_sku",
+      "match_score": 1.0,
+      "current_sku": "ICATW",
+      "reference_sku": "ICATW",
+      "current_name": "Columbia Two Way Internal Corner Applicator (ICATW)",
+      "reference_name": "Columbia Two Way Internal Corner Applicator (ICATW)",
+      "changed_fields": [
+        "Description",
+        "Name",
+        "Short description"
+      ]
+    },
+    {
+      "row": 1096,
+      "type": "simple",
+      "brand": "TapeTech",
+      "match_reason": "exact_sku",
+      "match_score": 1.0,
+      "current_sku": "CROLL02",
+      "reference_sku": "CROLL02",
+      "current_name": "TapeTech 2\" Premium Inside Corner Compound Roller with Frame",
+      "reference_name": "TapeTech 2\" Premium Inside Corner Compound Roller with Frame",
+      "changed_fields": [
+        "Description",
+        "Name",
+        "Short description"
+      ]
+    },
+    {
+      "row": 1104,
+      "type": "simple",
+      "brand": "TapeTech",
+      "match_reason": "exact_sku",
+      "match_score": 1.0,
+      "current_sku": "HWK001-PS",
+      "reference_sku": "HWK001-PS",
+      "current_name": "TapeTech 13\" x 13\" Aluminum Hawk",
+      "reference_name": "TapeTech 13\" x 13\" Aluminum Hawk",
+      "changed_fields": [
+        "Description",
+        "Name",
+        "Short description"
+      ]
+    },
+    {
+      "row": 1112,
+      "type": "simple",
+      "brand": "TapeTech",
+      "match_reason": "exact_sku",
+      "match_score": 1.0,
+      "current_sku": "BHE",
+      "reference_sku": "BHE",
+      "current_name": "TapeTech Brakeless Box Handle - Extendable",
+      "reference_name": "TapeTech Brakeless Box Handle - Extendable",
+      "changed_fields": [
+        "Name"
+      ]
+    },
+    {
+      "row": 1113,
+      "type": "simple",
+      "brand": "TapeTech",
+      "match_reason": "exact_sku",
+      "match_score": 1.0,
+      "current_sku": "BH",
+      "reference_sku": "BH",
+      "current_name": "TapeTech Brakeless Box Handle - Fixed Length",
+      "reference_name": "TapeTech Brakeless Box Handle - Fixed Length",
+      "changed_fields": [
+        "Name"
+      ]
+    },
+    {
+      "row": 1116,
+      "type": "simple",
+      "brand": "TapeTech",
+      "match_reason": "exact_sku",
+      "match_score": 1.0,
+      "current_sku": "CN-TT",
+      "reference_sku": "CN-TT",
+      "current_name": "TapeTech Cleaning Nozzle",
+      "reference_name": "TapeTech Cleaning Nozzle",
+      "changed_fields": [
+        "Description",
+        "Short description"
+      ]
+    },
+    {
+      "row": 1117,
+      "type": "simple",
+      "brand": "TapeTech",
+      "match_reason": "exact_sku",
+      "match_score": 1.0,
+      "current_sku": "CNA-TT",
+      "reference_sku": "CNA-TT",
+      "current_name": "TapeTech Cleaning Nozzle Adapter",
+      "reference_name": "TapeTech Cleaning Nozzle Adapter",
+      "changed_fields": [
+        "Description",
+        "Name",
+        "Short description"
+      ]
+    },
+    {
+      "row": 1118,
+      "type": "variable",
+      "brand": "TapeTech",
+      "match_reason": "shared_variation_skus",
+      "match_score": 1.0,
+      "current_sku": "TT-CRF",
+      "reference_sku": "TT-CRF",
+      "current_name": "TapeTech Compound Roller Frames",
+      "reference_name": "TapeTech Compound Roller Frames",
+      "changed_fields": [
+        "Name",
+        "SKU",
+        "Short description"
+      ]
+    },
+    {
+      "row": 1122,
+      "type": "simple",
+      "brand": "TapeTech",
+      "match_reason": "exact_sku",
+      "match_score": 1.0,
+      "current_sku": "CROLLHAN2",
+      "reference_sku": "CROLLHAN2",
+      "current_name": "TapeTech Compound Roller Support Handle 44\" - 79\" (2m)",
+      "reference_name": "TapeTech Compound Roller Support Handle 44\" - 79\" (2m)",
+      "changed_fields": [
+        "Description",
+        "Name",
+        "Short description"
+      ]
+    },
+    {
+      "row": 1123,
+      "type": "variable",
+      "brand": "TapeTech",
+      "match_reason": "name_similarity",
+      "match_score": 1.0,
+      "current_sku": "CT-TT",
+      "reference_sku": "CT-TT",
+      "current_name": "TapeTech Compound Tube",
+      "reference_name": "TapeTech Compound Tube",
+      "changed_fields": [
+        "Description",
+        "SKU",
+        "Short description"
+      ]
+    },
+    {
+      "row": 1152,
+      "type": "simple",
+      "brand": "TapeTech",
+      "match_reason": "exact_sku",
+      "match_score": 1.0,
+      "current_sku": "EZCOVER07",
+      "reference_sku": "EZCOVER07",
+      "current_name": "TapeTech EasyClean® Cover Plate Kit EZCOVER07",
+      "reference_name": "TapeTech EasyClean® Cover Plate Kit EZCOVER07",
+      "changed_fields": [
+        "Description",
+        "Name",
+        "Short description"
+      ]
+    },
+    {
+      "row": 1167,
+      "type": "variable",
+      "brand": "TapeTech",
+      "match_reason": "name_similarity",
+      "match_score": 0.877,
+      "current_sku": "TT-EZCF",
+      "reference_sku": "TT-EZCF",
+      "current_name": "TapeTech EasyRoll® Adjustable Corner Finisher",
+      "reference_name": "TapeTech EasyRoll® Adjustable Corner Finisher",
+      "changed_fields": [
+        "Description",
+        "Name",
+        "SKU",
+        "Short description"
+      ]
+    },
+    {
+      "row": 1171,
+      "type": "simple",
+      "brand": "TapeTech",
+      "match_reason": "exact_sku",
+      "match_score": 1.0,
+      "current_sku": "FHTT-CC",
+      "reference_sku": "FHTT-CC",
+      "current_name": "TapeTech Closet Crusher Fiberglass Handle",
+      "reference_name": "TapeTech Closet Crusher Fiberglass Handle",
+      "changed_fields": [
+        "Description",
+        "Name",
+        "Short description"
+      ]
+    },
+    {
+      "row": 1172,
+      "type": "variable",
+      "brand": "TapeTech",
+      "match_reason": "name_similarity",
+      "match_score": 0.976,
+      "current_sku": "FBH-TT",
+      "reference_sku": "FBH-TT",
+      "current_name": "TapeTech Finishing Box Handle",
+      "reference_name": "TapeTech Finishing Box Handle",
+      "changed_fields": [
+        "Description",
+        "Name",
+        "SKU",
+        "Short description"
+      ]
+    },
+    {
+      "row": 1185,
+      "type": "variable",
+      "brand": "TapeTech",
+      "match_reason": "shared_variation_skus",
+      "match_score": 0.97,
+      "current_sku": "TG-PS-TT",
+      "reference_sku": "TG-PS-TT",
+      "current_name": "TapeTech Premium Gold Stainless Steel Finishing Trowel",
+      "reference_name": "TapeTech Premium Gold Stainless Steel Finishing Trowel",
+      "changed_fields": [
+        "Description",
+        "Name",
+        "SKU",
+        "Short description"
+      ]
+    },
+    {
+      "row": 1208,
+      "type": "simple",
+      "brand": "TapeTech",
+      "match_reason": "exact_sku",
+      "match_score": 1.0,
+      "current_sku": "MR01TT",
+      "reference_sku": "MR01TT",
+      "current_name": "TapeTech MudRunner® Pro",
+      "reference_name": "TapeTech MudRunner® Pro",
+      "changed_fields": [
+        "Description",
+        "Name"
+      ]
+    },
+    {
+      "row": 1209,
+      "type": "simple",
+      "brand": "TapeTech",
+      "match_reason": "exact_sku",
+      "match_score": 1.0,
+      "current_sku": "BAN001-TT",
+      "reference_sku": "BAN001-TT",
+      "current_name": "TapeTech MudDog™ Premium Banjo Taper",
+      "reference_name": "TapeTech MudDog™ Premium Banjo Taper",
+      "changed_fields": [
+        "Description",
+        "Name",
+        "Short description"
+      ]
+    },
+    {
+      "row": 1212,
+      "type": "simple",
+      "brand": "TapeTech",
+      "match_reason": "exact_sku",
+      "match_score": 1.0,
+      "current_sku": "MRX01TT",
+      "reference_sku": "MRX01TT",
+      "current_name": "TapeTech MudRunner® Pro Extension",
+      "reference_name": "TapeTech MudRunner® Pro Extension",
+      "changed_fields": [
+        "Description",
+        "Name"
+      ]
+    },
+    {
+      "row": 1220,
+      "type": "variable",
+      "brand": "TapeTech",
+      "match_reason": "name_similarity",
+      "match_score": 1.0,
+      "current_sku": "TKBS-TT",
+      "reference_sku": "TKBS-TT",
+      "current_name": "TapeTech Premium Blue Steel Taping Knife",
+      "reference_name": "TapeTech Premium Blue Steel Taping Knife",
+      "changed_fields": [
+        "Description",
+        "SKU",
+        "Short description"
+      ]
+    },
+    {
+      "row": 1225,
+      "type": "variable",
+      "brand": "TapeTech",
+      "match_reason": "shared_variation_skus",
+      "match_score": 1.0,
+      "current_sku": "TT-JKCS",
+      "reference_sku": "TT-JKCS",
+      "current_name": "TapeTech Premium Carbon Steel Joint Knives",
+      "reference_name": "TapeTech Premium Carbon Steel Joint Knives",
+      "changed_fields": [
+        "Name",
+        "SKU",
+        "Short description"
+      ]
+    },
+    {
+      "row": 1233,
+      "type": "variable",
+      "brand": "TapeTech",
+      "match_reason": "name_similarity",
+      "match_score": 1.0,
+      "current_sku": "PFK-TT",
+      "reference_sku": "PFK-TT",
+      "current_name": "TapeTech Premium Finishing Knife",
+      "reference_name": "TapeTech Premium Finishing Knife",
+      "changed_fields": [
+        "Description",
+        "Name",
+        "SKU",
+        "Short description"
+      ]
+    },
+    {
+      "row": 1244,
+      "type": "variable",
+      "brand": "TapeTech",
+      "match_reason": "shared_variation_skus",
+      "match_score": 1.0,
+      "current_sku": "TGP-PS-TT",
+      "reference_sku": "TGP-PS-TT",
+      "current_name": "TapeTech Premium Gold Stainless Steel Rounded Front Pool Trowel",
+      "reference_name": "TapeTech Premium Gold Stainless Steel Rounded Front Pool Trowel",
+      "changed_fields": [
+        "Description",
+        "Name",
+        "SKU",
+        "Short description"
+      ]
+    },
+    {
+      "row": 1249,
+      "type": "variable",
+      "brand": "TapeTech",
+      "match_reason": "shared_variation_skus",
+      "match_score": 0.945,
+      "current_sku": "TGCU-PS-TT",
+      "reference_sku": "TGCU-PS-TT",
+      "current_name": "TapeTech Premium Gold Stainless Steel Curved Finishing Trowel",
+      "reference_name": "TapeTech Premium Gold Stainless Steel Curved Finishing Trowel",
+      "changed_fields": [
+        "Description",
+        "Name",
+        "SKU",
+        "Short description"
+      ]
+    },
+    {
+      "row": 1257,
+      "type": "variable",
+      "brand": "TapeTech",
+      "match_reason": "name_similarity",
+      "match_score": 1.0,
+      "current_sku": "JKSS-TT",
+      "reference_sku": "JKSS-TT",
+      "current_name": "TapeTech Premium Stainless Steel Joint Knife",
+      "reference_name": "TapeTech Premium Stainless Steel Joint Knife",
+      "changed_fields": [
+        "Description",
+        "SKU",
+        "Short description"
+      ]
+    },
+    {
+      "row": 1264,
+      "type": "variable",
+      "brand": "TapeTech",
+      "match_reason": "name_similarity",
+      "match_score": 1.0,
+      "current_sku": "TKSS-TT",
+      "reference_sku": "TKSS-TT",
+      "current_name": "TapeTech Premium Stainless Steel Taping Knife",
+      "reference_name": "TapeTech Premium Stainless Steel Taping Knife",
+      "changed_fields": [
+        "Description",
+        "SKU",
+        "Short description"
+      ]
+    },
+    {
+      "row": 1285,
+      "type": "simple",
+      "brand": "TapeTech",
+      "match_reason": "exact_sku",
+      "match_score": 1.0,
+      "current_sku": "BHE-SW",
+      "reference_sku": "BHE-SW",
+      "current_name": "TapeTech SideWinder™ Extendable Brakeless Box Handle",
+      "reference_name": "TapeTech SideWinder™ Extendable Brakeless Box Handle",
+      "changed_fields": [
+        "Description",
+        "Name"
+      ]
+    }
+  ]
+}

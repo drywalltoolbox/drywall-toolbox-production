@@ -16,7 +16,7 @@ from bs4 import BeautifulSoup
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
-OUT_DIR = REPO_ROOT / "products" / "scraped_results" / "Production"
+OUT_DIR = REPO_ROOT / "products" / "Production"
 CATALOGS_DIR = OUT_DIR / "catalogs"
 MANIFESTS_DIR = OUT_DIR / "manifests"
 REPORTS_DIR = OUT_DIR / "reports"

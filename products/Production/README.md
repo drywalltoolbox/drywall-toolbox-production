@@ -1,6 +1,6 @@
 # Brand Catalog Export
 
-Generated: 2026-05-05T15:16:08+00:00
+Generated: 2026-05-05T15:24:37+00:00
 
 Scope:
 - Brands: Asgard, Columbia, Level 5, TapeTech
@@ -27,11 +27,11 @@ Products by catalog product type:
 - Taping & Finishing Tools: 132
 
 Files:
-- Manifest JSON: `products\scraped_results\Production\manifests\product_manifest.json`
-- Product/variant catalog: `products\scraped_results\Production\catalogs\product_catalog.csv`
-- WooCommerce import catalog: `products\scraped_results\Production\catalogs\woocommerce_catalog.csv`
-- Duplicate MPN report: `products\scraped_results\Production\reports\duplicate_mpn_report.json`
-- Summary JSON: `products\scraped_results\Production\reports\catalog_summary.json`
+- Manifest JSON: `products\Production\manifests\product_manifest.json`
+- Product/variant catalog: `products\Production\catalogs\product_catalog.csv`
+- WooCommerce import catalog: `products\Production\catalogs\woocommerce_catalog.csv`
+- Duplicate MPN report: `products\Production\reports\duplicate_mpn_report.json`
+- Summary JSON: `products\Production\reports\catalog_summary.json`
 
 SKU handling:
 - `mpn` and `Meta: _mpn` preserve the real brand part number with the source-store leading `08` prefix removed.
