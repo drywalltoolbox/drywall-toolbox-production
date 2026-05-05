@@ -25,6 +25,8 @@ import Pagination from '../components/Pagination';
 import { ShoppingCart, Filter, Heart, Wrench } from 'lucide-react';
 import FilterPanel from '../components/FilterPanel';
 import { getProducts } from '../services/catalog';
+import { getProductVariations } from '../services/api';
+import { fetchVariationsBatched } from '../utils/variationSelection';
 import { useCart } from '../context/CartContext';
 import LoadingSpinner from '../components/LoadingSpinner';
 import ProductCardImage from '../components/ProductCardImage';
@@ -124,18 +126,81 @@ export default function Parts() {
   // ── Load parts products ────────────────────────────────────────────────────
   useEffect(() => {
     let mounted = true;
+
     getProducts().then(list => {
       if (!mounted) return;
+
       const parts = list.filter(isStrictPartProduct);
-      setAllParts(parts);
+
+      // Simple / already-resolved variation products show immediately.
+      // Variable parents are placeholders until their variations are loaded.
+      const simpleParts    = parts.filter(p => !p.is_variable);
+      const variableParents = parts.filter(p => p.is_variable);
+
+      // Show whatever we have right away so the page isn't blank.
+      setAllParts([...simpleParts, ...variableParents]);
+
       // Always show every PARTS_BRAND in the filter regardless of whether
       // the catalog has parts for it yet (e.g. Platinum has no products yet).
       const unique = Array.from(new Set(parts.map(p => p.brand).filter(Boolean)));
-      const inCatalog = PARTS_BRANDS.filter(b => unique.includes(b));
+      const inCatalog    = PARTS_BRANDS.filter(b =>  unique.includes(b));
       const notInCatalog = PARTS_BRANDS.filter(b => !unique.includes(b));
       setBrands([...inCatalog, ...notInCatalog]);
       setLoading(false);
+
+      // ── Expand variable parents into individual variation cards ────────────
+      // WooCommerce's /products endpoint never returns variation-type children;
+      // they must be fetched separately.  We replace each variable parent with
+      // its individual variation children so that every part SKU is searchable
+      // and directly add-to-cart-able on this page.
+      if (variableParents.length === 0) return;
+
+      const variableIds = variableParents.map(p => p.id);
+
+      fetchVariationsBatched(variableIds, getProductVariations)
+        .then(pairs => {
+          if (!mounted) return;
+
+          // Build a lookup: parentId → parent product (for brand/category fallback)
+          const parentById = Object.fromEntries(
+            variableParents.map(p => [String(p.id), p])
+          );
+
+          // Flatten all fetched variations, inheriting parent meta where needed.
+          const fetchedVariations = pairs.flatMap(([parentId, vars]) => {
+            const parent = parentById[String(parentId)];
+            return (Array.isArray(vars) ? vars : []).map(v => ({
+              ...v,
+              is_parts:   true,
+              brand:      v.brand      || parent?.brand      || '',
+              categories: v.categories?.length
+                ? v.categories
+                : (parent?.categories || []),
+            }));
+          });
+
+          if (fetchedVariations.length === 0) return;
+
+          setAllParts(prev => {
+            // Drop variable parents whose variations have arrived; keep any
+            // whose fetch yielded nothing (so the page isn't left empty).
+            const expandedParentIds = new Set(
+              pairs
+                .filter(([, vars]) => Array.isArray(vars) && vars.length > 0)
+                .map(([id]) => String(id))
+            );
+            const withoutExpandedParents = prev.filter(
+              p => !(p.is_variable && expandedParentIds.has(String(p.id)))
+            );
+            // Deduplicate by id in case a variation was already in the list.
+            const existingIds = new Set(withoutExpandedParents.map(p => p.id));
+            const newVars = fetchedVariations.filter(v => !existingIds.has(v.id));
+            return [...withoutExpandedParents, ...newVars];
+          });
+        })
+        .catch(() => { /* variations are non-critical; parents stay visible */ });
     }).catch(() => { if (mounted) setLoading(false); });
+
     return () => { mounted = false; };
   }, []);
 
@@ -190,10 +255,11 @@ export default function Parts() {
     if (searchQuery) {
       const q = searchQuery.toLowerCase();
       return (
-        (p.name  || '').toLowerCase().includes(q) ||
-        (p.sku   || '').toLowerCase().includes(q) ||
-        (p.upc   || '').toLowerCase().includes(q) ||
-        (p.brand || '').toLowerCase().includes(q)
+        (p.name        || '').toLowerCase().includes(q) ||
+        (p.sku         || '').toLowerCase().includes(q) ||
+        (p.part_number || '').toLowerCase().includes(q) ||
+        (p.upc         || '').toLowerCase().includes(q) ||
+        (p.brand       || '').toLowerCase().includes(q)
       );
     }
     return true;
