@@ -1,224 +1,497 @@
 {
-  "id": "1777933053470",
-  "title": "76TT-rE",
+  "id": "1777973897602",
+  "title": "76TT-page_1",
   "diagramPages": [
     1
   ],
   "legendPages": [],
   "parts": [
     {
-      "id": "762011",
-      "name": "Unknown Part",
+      "id": "724061F X 2",
+      "name": "724061F X 2",
       "quantity": 1,
       "sku": ""
     },
     {
-      "id": "209030",
-      "name": "Unknown Part",
-      "quantity": 1,
-      "sku": ""
-    },
-    {
-      "id": "709056",
-      "name": "Unknown Part",
-      "quantity": 1,
-      "sku": ""
-    },
-    {
-      "id": "700010F",
-      "name": "Unknown Part",
-      "quantity": 1,
-      "sku": ""
-    },
-    {
-      "id": "722070",
-      "name": "Unknown Part",
-      "quantity": 1,
-      "sku": ""
-    },
-    {
-      "id": "709055",
-      "name": "Unknown Part",
-      "quantity": 1,
-      "sku": ""
-    },
-    {
-      "id": "709012",
-      "name": "Unknown Part",
+      "id": "729063 X 4",
+      "name": "729063 X 4",
       "quantity": 1,
       "sku": ""
     },
     {
       "id": "722003G",
-      "name": "Unknown Part",
+      "name": "722003G",
       "quantity": 1,
       "sku": ""
     },
     {
-      "id": "729063",
-      "name": "Unknown Part",
-      "quantity": 4,
-      "sku": ""
-    },
-    {
-      "id": "724061F",
-      "name": "Unknown Part",
-      "quantity": 2,
-      "sku": ""
-    },
-    {
-      "id": "709006",
-      "name": "Unknown Part",
-      "quantity": 1,
-      "sku": ""
-    },
-    {
-      "id": "729071",
-      "name": "Unknown Part",
-      "quantity": 1,
-      "sku": ""
-    },
-    {
-      "id": "700037",
-      "name": "Unknown Part",
-      "quantity": 2,
-      "sku": ""
-    },
-    {
-      "id": "700036",
-      "name": "Unknown Part",
-      "quantity": 2,
-      "sku": ""
-    },
-    {
-      "id": "724001",
-      "name": "Unknown Part",
-      "quantity": 1,
-      "sku": ""
-    },
-    {
-      "id": "729072",
-      "name": "Unknown Part",
-      "quantity": 1,
-      "sku": ""
-    },
-    {
-      "id": "709007",
-      "name": "Unknown Part",
+      "id": "709055",
+      "name": "709055",
       "quantity": 1,
       "sku": ""
     },
     {
       "id": "700010F",
-      "name": "Unknown Part",
+      "name": "700010F",
       "quantity": 1,
       "sku": ""
     },
     {
-      "id": "700002F",
-      "name": "Unknown Part",
+      "id": "762011",
+      "name": "762011",
       "quantity": 1,
       "sku": ""
     },
     {
-      "id": "722045",
-      "name": "Unknown Part",
+      "id": "209030",
+      "name": "209030",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "709056",
+      "name": "709056",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "722070",
+      "name": "722070",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "729027",
+      "name": "729027",
       "quantity": 1,
       "sku": ""
     },
     {
       "id": "729009",
-      "name": "Unknown Part",
+      "name": "729009",
       "quantity": 1,
       "sku": ""
     },
     {
-      "id": "709027",
-      "name": "Unknown Part",
+      "id": "720045",
+      "name": "720045",
       "quantity": 1,
       "sku": ""
     },
     {
-      "id": "706020B",
-      "name": "Unknown Part",
+      "id": "700010F",
+      "name": "700010F",
       "quantity": 1,
       "sku": ""
     },
     {
-      "id": "724061F",
-      "name": "Unknown Part",
+      "id": "700002F",
+      "name": "700002F",
       "quantity": 1,
       "sku": ""
     },
     {
-      "id": "729064",
-      "name": "Unknown Part",
-      "quantity": 2,
-      "sku": ""
-    },
-    {
-      "id": "709024",
-      "name": "Unknown Part",
-      "quantity": 2,
-      "sku": ""
-    },
-    {
-      "id": "709023",
-      "name": "Unknown Part",
-      "quantity": 2,
-      "sku": ""
-    },
-    {
-      "id": "724065",
-      "name": "Unknown Part",
+      "id": "709007",
+      "name": "709007",
       "quantity": 1,
       "sku": ""
     },
     {
-      "id": "700015F",
-      "name": "Unknown Part",
+      "id": "729072",
+      "name": "729072",
       "quantity": 1,
       "sku": ""
     },
     {
-      "id": "729051",
-      "name": "Unknown Part",
-      "quantity": 2,
-      "sku": ""
-    },
-    {
-      "id": "709052",
-      "name": "Unknown Part",
-      "quantity": 2,
-      "sku": ""
-    },
-    {
-      "id": "700005",
-      "name": "Unknown Part",
+      "id": "706030B",
+      "name": "706030B",
       "quantity": 1,
       "sku": ""
     },
     {
-      "id": "700029",
-      "name": "Unknown Part",
+      "id": "709024 X 2",
+      "name": "709024 X 2",
       "quantity": 1,
       "sku": ""
     },
     {
-      "id": "700004F",
-      "name": "Unknown Part",
+      "id": "709023 X 2",
+      "name": "709023 X 2",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "729064 X 2 (LOCTITE 243)",
+      "name": "729064 X 2 (LOCTITE 243)",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "PART OF 724061F",
+      "name": "PART OF 724061F",
       "quantity": 1,
       "sku": ""
     },
     {
       "id": "726018",
-      "name": "Unknown Part",
+      "name": "726018",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "729061 X 2",
+      "name": "729061 X 2",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "700015F",
+      "name": "700015F",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "709052 X 2",
+      "name": "709052 X 2",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "700005",
+      "name": "700005",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "700004F",
+      "name": "700004F",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "700029",
+      "name": "700029",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "724065",
+      "name": "724065",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "729071",
+      "name": "729071",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "700037 X 2",
+      "name": "700037 X 2",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "700036 X 2",
+      "name": "700036 X 2",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "724001",
+      "name": "724001",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "709006",
+      "name": "709006",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "709012",
+      "name": "709012",
       "quantity": 1,
       "sku": ""
     }
   ],
-  "coordinates": {},
+  "coordinates": {
+    "209030": {
+      "id": "209030",
+      "x_pct": 11.350000000000001,
+      "y_pct": 75.15,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "700005": {
+      "id": "700005",
+      "x_pct": 83.25,
+      "y_pct": 35.35,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "700029": {
+      "id": "700029",
+      "x_pct": 83.25,
+      "y_pct": 20.65,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "709006": {
+      "id": "709006",
+      "x_pct": 55.35,
+      "y_pct": 26,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "709007": {
+      "id": "709007",
+      "x_pct": 49.95,
+      "y_pct": 60.55,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "709012": {
+      "id": "709012",
+      "x_pct": 25.05862602164789,
+      "y_pct": 60.57131297890595,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "709055": {
+      "id": "709055",
+      "x_pct": 16.467252043295783,
+      "y_pct": 43.410656489452975,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "709056": {
+      "id": "709056",
+      "x_pct": 15.8,
+      "y_pct": 69.9,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "720045": {
+      "id": "720045",
+      "x_pct": 35.55,
+      "y_pct": 54.45,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "722070": {
+      "id": "722070",
+      "x_pct": 21.19839849790148,
+      "y_pct": 64.73934351054703,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "724001": {
+      "id": "724001",
+      "x_pct": 64.25,
+      "y_pct": 38.5,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "724065": {
+      "id": "724065",
+      "x_pct": 75.45,
+      "y_pct": 21.9,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "726018": {
+      "id": "726018",
+      "x_pct": 80.75,
+      "y_pct": 56.35,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "729009": {
+      "id": "729009",
+      "x_pct": 32.2,
+      "y_pct": 75.15,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "729027": {
+      "id": "729027",
+      "x_pct": 25.75,
+      "y_pct": 82.55,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "729071": {
+      "id": "729071",
+      "x_pct": 64.55000000000001,
+      "y_pct": 22.35,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "729072": {
+      "id": "729072",
+      "x_pct": 42.95,
+      "y_pct": 50.15,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "762011": {
+      "id": "762011",
+      "x_pct": 6.6,
+      "y_pct": 51.96065648945297,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "724061F X 2": {
+      "id": "724061F X 2",
+      "x_pct": 48.05,
+      "y_pct": 20.75,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "729063 X 4": {
+      "id": "729063 X 4",
+      "x_pct": 37.95,
+      "y_pct": 25.150000000000002,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "722003G": {
+      "id": "722003G",
+      "x_pct": 24.849999999999998,
+      "y_pct": 32.271312978905954,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "700010F": {
+      "id": "700010F",
+      "x_pct": 43.75,
+      "y_pct": 65.45,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "700002F": {
+      "id": "700002F",
+      "x_pct": 43.55,
+      "y_pct": 60.55,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "706030B": {
+      "id": "706030B",
+      "x_pct": 64.5,
+      "y_pct": 72.3,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "709024 X 2": {
+      "id": "709024 X 2",
+      "x_pct": 69.95,
+      "y_pct": 69.4,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "709023 X 2": {
+      "id": "709023 X 2",
+      "x_pct": 72.37137397835211,
+      "y_pct": 65.70803053164109,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "729064 X 2 (LOCTITE 243)": {
+      "id": "729064 X 2 (LOCTITE 243)",
+      "x_pct": 66.65,
+      "y_pct": 55.4,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "PART OF 724061F": {
+      "id": "PART OF 724061F",
+      "x_pct": 66.75,
+      "y_pct": 52.7,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "729061 X 2": {
+      "id": "729061 X 2",
+      "x_pct": 77.95,
+      "y_pct": 51.650000000000006,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "700015F": {
+      "id": "700015F",
+      "x_pct": 70.5,
+      "y_pct": 49.9,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "709052 X 2": {
+      "id": "709052 X 2",
+      "x_pct": 81.5,
+      "y_pct": 40.599999999999994,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "700004F": {
+      "id": "700004F",
+      "x_pct": 88.5,
+      "y_pct": 31.5,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "700037 X 2": {
+      "id": "700037 X 2",
+      "x_pct": 65.15,
+      "y_pct": 29.5,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "700036 X 2": {
+      "id": "700036 X 2",
+      "x_pct": 65.15,
+      "y_pct": 33.8,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    }
+  },
   "schema_version": "1.0",
-  "image_natural_width": 1224,
-  "image_natural_height": 792
+  "image_natural_width": 4800,
+  "image_natural_height": 3584
 }
