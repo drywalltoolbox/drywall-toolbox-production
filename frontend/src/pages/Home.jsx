@@ -1,4 +1,4 @@
-﻿import ShippingTicker from '../components/ShippingTicker';
+import ShippingTicker from '../components/ShippingTicker';
 import { Link } from 'react-router-dom';
 import TrendingProducts from '../components/TrendingProducts';
 import tapeTechLogo from '/brands/TapeTech/tapetech_logo.svg';
@@ -81,7 +81,7 @@ export default function Home() {
       />
       <div style={{ background: 'white' }} className="page-wrapper">
 
-      {/* ─── MOBILE/TABLET HERO (hidden on desktop ≥ 1025px) ─── */}
+      {/* --- MOBILE/TABLET HERO (hidden on desktop = 1025px) --- */}
       <div className="dtb-hero-mobile-wrapper">
       <section
         className="section-enter home-hero-section"
@@ -117,7 +117,7 @@ export default function Home() {
       </section>
       </div>
 
-      {/* ─── DESKTOP HERO (hidden on mobile/tablet ≤ 1024px) ─── */}
+      {/* --- DESKTOP HERO (hidden on mobile/tablet = 1024px) --- */}
       <section className="dtb-desktop-hero section-enter" aria-label="Hero">
         <div className="dtb-desktop-hero-inner">
           {/* Left: headline + CTAs + trust stats */}
@@ -129,7 +129,7 @@ export default function Home() {
             </h1>
 
             <p className="dtb-hero-subtitle">
-              Production-grade taping, finishing, and sanding equipment from the industry&apos;s most trusted brands — at unbeatable prices with lightning-fast shipping.
+              Production-grade taping, finishing, and sanding equipment from the industry&apos;s most trusted brands � at unbeatable prices with lightning-fast shipping.
             </p>
           </div>
 
@@ -156,12 +156,12 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ─── DESKTOP SHIPPING BAR (appears below hero on desktop only) ─── */}
+      {/* --- DESKTOP SHIPPING BAR (appears below hero on desktop only) --- */}
       <div className="dtb-desktop-shipping-bar">
         <ShippingTicker
           items={[
             { icon: <Truck size={14} />, text: 'FREE SHIPPING ON ORDERS $150+ (CONTIGUOUS USA ONLY)' },
-            { icon: <Phone size={14} />, text: 'Expert Support — Real Pros' },
+            { icon: <Phone size={14} />, text: 'Expert Support � Real Pros' },
             { icon: <Wrench size={14} />, text: 'Professional Repair Services' },
           ]}
           duration={28}
@@ -169,7 +169,7 @@ export default function Home() {
         />
       </div>
 
-      {/* ─── DESKTOP FEATURE STRIP (hidden on mobile/tablet) ─── */}
+      {/* --- DESKTOP FEATURE STRIP (hidden on mobile/tablet) --- */}
       <div className="dtb-feature-strip" aria-hidden="true">
         <div className="dtb-feature-strip-inner">
           <div className="dtb-feature-item">
@@ -203,10 +203,10 @@ export default function Home() {
         </div>
       </div>
 
-      {/* ─── TRENDING PRODUCTS ─── */}
+      {/* --- TRENDING PRODUCTS --- */}
       <TrendingProducts />
 
-      {/* ─── TRUST BADGES (mobile only) ─── */}
+      {/* --- TRUST BADGES (mobile only) --- */}
       <section className="home-trust-section dtb-mobile-only">
         <div className="trust-badges-grid">
           {trustBadges.map((badge) => (
@@ -221,7 +221,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ─── BRAND LOGOS (mobile only) ─── */}
+      {/* --- BRAND LOGOS (mobile only) --- */}
       <section className="home-brands-section dtb-mobile-only">
         <div className="dtb-trending-header">
           <p className="dtb-section-eyebrow">Trusted Brands</p>

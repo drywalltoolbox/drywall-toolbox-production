@@ -6,7 +6,7 @@
  */
 import { useState, useMemo } from 'react';
 
-const PLACEHOLDER = 'https://www.drywalltoolbox.com/wp/wp-content/uploads/2026/04/no-image-placeholder.webp';
+const PLACEHOLDER = 'https://www.drywalltoolbox.com/wp/wp-content/uploads/2026/05/no-image-placeholder.webp';
 const EASE_OUT_EXPO = 'cubic-bezier(0.22, 1, 0.36, 1)';
 
 const resolveImage = (product, src) => {

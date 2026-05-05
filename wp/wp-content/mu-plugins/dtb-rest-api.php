@@ -796,14 +796,26 @@ function dtb_proxy_product_variation_by_id( WP_REST_Request $request ): WP_REST_
 
 /** GET /drywall/v1/products/{id}/variations */
 function dtb_proxy_product_variations( WP_REST_Request $request ): WP_REST_Response {
-	$params = [];
+	$product_id = absint( $request->get_param( 'id' ) );
+	$params     = [];
 	foreach ( [ 'page', 'per_page' ] as $k ) {
-		$v = $request->get_param( $k ); 
+		$v = $request->get_param( $k );
 		if ( null !== $v ) {
 			$params[ $k ] = sanitize_text_field( $v );
 		}
 	}
- 	return dtb_cached_wc_get( 'wc/v3/products/' . absint( $request->get_param( 'id' ) ) . '/variations', $params ); // Updated to include variations
+
+	$response = dtb_cached_wc_get( 'wc/v3/products/' . $product_id . '/variations', $params );
+
+	// Variations are non-critical UI data.  When WooCommerce returns a 5xx
+	// (e.g. product has no variations in the DB, memory limit, or a data
+	// inconsistency), return an empty array with 200 so the SPA degrades
+	// gracefully instead of logging console errors and blocking rendering.
+	if ( $response->get_status() >= 500 ) {
+		return new WP_REST_Response( [], 200 );
+	}
+
+	return $response;
 }
 
 /** GET /drywall/v1/categories */

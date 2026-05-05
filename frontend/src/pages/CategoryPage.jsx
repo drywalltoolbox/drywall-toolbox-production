@@ -82,7 +82,13 @@ export default function CategoryPage() {
     return () => { mounted = false; };
   }, [pageVariableIdsKey]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const getCardDisplayProduct = useCallback((product) => product, []);
+  const getCardDisplayProduct = useCallback((product) => {
+    if (!product.is_variable) return product;
+    const vars = cardVariationMap[product.id];
+    if (!Array.isArray(vars) || vars.length === 0) return product;
+    // Prefer first in-stock variation; fall back to first variation overall.
+    return vars.find(v => v.stock_status !== 'outofstock') || vars[0] || product;
+  }, [cardVariationMap]);
 
   if (loading) {
     return (

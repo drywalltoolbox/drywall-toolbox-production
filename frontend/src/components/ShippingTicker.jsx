@@ -1,4 +1,4 @@
-﻿import React, { useLayoutEffect, useRef, useState } from 'react';
+import React, { useLayoutEffect, useRef, useState } from 'react';
 
 export default function ShippingTicker({ items = [], duration = 22, className = '', ariaLabel = 'Promotions' }) {
   const trackRef = useRef(null);
@@ -57,7 +57,7 @@ export default function ShippingTicker({ items = [], duration = 22, className = 
       {items.map((item, index) => (
         <React.Fragment key={index}>
           {index > 0 && (
-            <span className="dtb-ticker-sep" aria-hidden="true">·</span>
+            <span className="dtb-ticker-sep" aria-hidden="true">�</span>
           )}
           <span className="dtb-ticker-item">
             {item.icon ? <span className="dtb-ticker-icon">{item.icon}</span> : null}

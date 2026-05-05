@@ -1,4 +1,4 @@
-ï»¿import { useState } from 'react';
+import { useState } from 'react';
 import SEOHead from '../components/SEOHead';
 import { apiClient } from '../api/client';
 
@@ -20,7 +20,7 @@ const contactInfo = [
       </svg>
     ),
     label: 'Hours',
-    value: 'Mon â€“ Fri: 8am â€“ 6pm EST',
+    value: 'Mon – Fri: 8am – 6pm EST',
     href: null
   }
 ];
@@ -131,7 +131,7 @@ export default function Contact() {
             maxWidth: '500px',
             lineHeight: 1.6
           }}>
-            Technical support, bulk orders, or custom tool fabrication inquiries â€” our team of industry veterans has you covered.
+            Technical support, bulk orders, or custom tool fabrication inquiries — our team of industry veterans has you covered.
           </p>
         </div>
       </section>
@@ -365,7 +365,7 @@ export default function Contact() {
                   disabled={submitting}
                   style={{ opacity: submitting ? 0.7 : 1, cursor: submitting ? 'not-allowed' : 'pointer' }}
                 >
-                  {submitting ? 'Sendingâ€¦' : 'Submit Inquiry'}
+                  {submitting ? 'Sending…' : 'Submit Inquiry'}
                 </button>
               </form>
             )}

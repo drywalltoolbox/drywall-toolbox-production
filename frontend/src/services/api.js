@@ -350,7 +350,7 @@ export function normalizeProduct(wcProduct) {
   const images = (wcProduct.images || [])
     .map((img) => (typeof img === 'string' ? img : (img?.src ?? '')))
     .filter(Boolean);
-  if (images.length === 0) images.push('https://www.drywalltoolbox.com/wp/wp-content/uploads/2026/04/no-image-placeholder.webp');
+  if (images.length === 0) images.push('https://www.drywalltoolbox.com/wp/wp-content/uploads/2026/05/no-image-placeholder.webp');
   const image = images[0];
 
   const productType = wcProduct.type || 'simple';
@@ -519,18 +519,6 @@ async function fetchVariationsByIds(parentId, variationIds = []) {
   return variations.filter(Boolean);
 }
 
-async function fetchVariationsByParentList(parentId) {
-  try {
-    const list = await apiClient(
-        `/wp-json/drywall/v1/products?${new URLSearchParams({ parent: parentId, per_page: 100 }).toString()}`
-    );
-    return Array.isArray(list) ? list.map(normalizeProduct) : [];
-  } catch (err) {
-    console.warn(`Failed to fetch variations by parent list for ${parentId}:`, err?.message || err);
-    return [];
-  }
-}
-
 /**
  * Fetch products belonging to a category (by category ID).
  * @param {number|string} categoryId
@@ -560,18 +548,19 @@ export const searchProducts = (searchTerm) =>
  */
 export const getProductVariations = (parentId) =>
   apiClient(`/wp-json/drywall/v1/products/${encodeURIComponent(parentId)}/variations?${new URLSearchParams({ per_page: 100 }).toString()}`)
-    .then((list) => list.map(normalizeProduct))
+    .then((list) => Array.isArray(list) ? list.map(normalizeProduct) : [])
     .catch(async (err) => {
-      console.warn(`Failed to fetch variations for parent ${parentId}:`, err?.message || err);
       const status = Number(err?.status || 0);
-      const byParent = await fetchVariationsByParentList(parentId);
-      if (byParent.length > 0) {
-        return byParent;
-      }
-      if (status >= 500 || status === 429 || status === 401 || status === 403 || status === 0) {
+      // 5xx / auth / rate-limit — server can't serve this right now; bail early
+      // so we don't pile on with secondary requests.  The proxy already
+      // returns 200 [] for 500s, so this path mainly handles 401/403/429.
+      if (status >= 400) {
         return [];
       }
-      return fetchVariationsByIds(parentId);
+      // Network-level failure (status 0) or unexpected client error:
+      // fall back to fetching each variation ID individually via the parent's
+      // `variations` array (requires one extra product fetch).
+      return fetchVariationsByIds(parentId).catch(() => []);
     });
 
 // ─── Categories ──────────────────────────────────────────────────────────────

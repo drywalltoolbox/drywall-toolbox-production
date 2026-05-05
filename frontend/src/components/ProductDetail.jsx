@@ -342,7 +342,7 @@ export default function ProductDetail({
                               type="button"
                               onClick={() => setSelectedAttrs(prev => ({ ...prev, [attr.name]: option.value }))}
                               disabled={disabled}
-                              className={`min-h-[58px] rounded-lg border px-3 py-2 text-left transition-all ${
+                              className={`min-h-14 rounded-lg border px-3 py-2 text-left transition-all ${
                                 selected
                                   ? 'border-blue-600 bg-blue-50 shadow-sm ring-2 ring-blue-100'
                                   : 'border-gray-200 bg-white hover:border-gray-400 hover:bg-gray-50'

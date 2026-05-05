@@ -1,4 +1,4 @@
-﻿import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useState, useEffect, useRef } from 'react';
 import { useCart } from '../context/CartContext';
 import { useAuthContext } from '../auth/AuthContext.js';
@@ -203,12 +203,12 @@ export default function Header({ onCartToggle }) {
   return (
     <>
       <header className={`site-header${location.pathname !== '/' ? ' site-header--no-ticker' : ''}`} role="banner">
-      {/* ── Mobile-only shipping ticker — homepage only ── */}
+      {/* -- Mobile-only shipping ticker � homepage only -- */}
       {location.pathname === '/' && (
         <ShippingTicker
           items={[
             { icon: <Truck size={11} />, text: 'FREE SHIPPING ON ALL ORDERS $50+ (CONTIGUOUS USA ONLY)' },
-            { icon: <Phone size={11} />, text: 'Expert Support — Real Pros' },
+            { icon: <Phone size={11} />, text: 'Expert Support � Real Pros' },
             { icon: <Wrench size={11} />, text: 'Professional Repair Services' },
           ]}
           duration={28}
@@ -218,7 +218,7 @@ export default function Header({ onCartToggle }) {
       <div className="site-header-inner">
   {/* Mobile Layout */}
   <div className="flex md:hidden items-center w-full header-mobile-layout" style={{ display: isTablet ? 'flex' : undefined }}>
-          {/* Left slot — fixed width so logo stays truly centered */}
+          {/* Left slot � fixed width so logo stays truly centered */}
           <div className="header-mobile-slot header-mobile-slot--left">
             <button 
               onClick={toggleMobileMenu}
@@ -234,7 +234,7 @@ export default function Header({ onCartToggle }) {
             <img src={LogoBlack} alt="Drywall Toolbox Logo" className="logo-image-mobile" />
           </Link>
 
-          {/* Right slot — fixed width matching left slot */}
+          {/* Right slot � fixed width matching left slot */}
           <div className="header-mobile-slot header-mobile-slot--right">
             <NotificationsBell />
             <button 
@@ -250,17 +250,17 @@ export default function Header({ onCartToggle }) {
           </div>
         </div>
 
-  {/* ── Desktop Layout — restructured: Logo Left | Nav Center | Actions Right ── */}
+  {/* -- Desktop Layout � restructured: Logo Left | Nav Center | Actions Right -- */}
   <div className="hidden md:contents header-desktop-layout" style={{ display: isTablet ? 'none' : undefined }}>
 
-          {/* Logo — Left */}
+          {/* Logo � Left */}
           <div className="header-left">
             <Link to="/" style={{ display: 'flex', alignItems: 'center' }}>
               <img src={LogoWhite} alt="Drywall Toolbox Logo" className="logo-image" />
             </Link>
           </div>
 
-          {/* Primary Nav — Center (all links combined) */}
+          {/* Primary Nav � Center (all links combined) */}
           <div className="header-center">
             <nav className="nav-links" aria-label="Primary">
               {/* Shop dropdown */}
@@ -301,7 +301,7 @@ export default function Header({ onCartToggle }) {
                 >
                   {[
                     { to: '/all-products', label: 'All Products', sub: 'Browse our full catalog' },
-                    { to: '/products', label: 'Shop by Brand', sub: 'TapeTech, Columbia, SurPro…' },
+                    { to: '/products', label: 'Shop by Brand', sub: 'TapeTech, Columbia, SurPro�' },
                     { to: '/parts', label: 'Replacement Parts', sub: 'Parts, kits & schematics' },
                   ].map(({ to, label, sub }) => (
                     <Link
@@ -327,7 +327,7 @@ export default function Header({ onCartToggle }) {
             </nav>
           </div>
 
-          {/* Actions — Right: Search + Account + Cart */}
+          {/* Actions � Right: Search + Account + Cart */}
           <div className="header-right">
 
             {/* Desktop search: expandable live-search input */}
@@ -390,7 +390,7 @@ export default function Header({ onCartToggle }) {
               )}
             </div>
 
-            {/* ── Account icon + dropdown ── */}
+            {/* -- Account icon + dropdown -- */}
             {!isLoading && (
               <div ref={accountDropdownRef} style={{ position: 'relative' }}>
                 <button
@@ -515,7 +515,7 @@ export default function Header({ onCartToggle }) {
               </div>
             )}
 
-            {/* ── Notifications Bell ── */}
+            {/* -- Notifications Bell -- */}
             {!isLoading && isAuthenticated && <NotificationsBell />}
 
             <div className="cart-area">
@@ -623,13 +623,13 @@ export default function Header({ onCartToggle }) {
               FAQ
             </Link>
 
-            {/* ── Account / Auth — bottom of mobile menu ─────────────────── */}
+            {/* -- Account / Auth � bottom of mobile menu ------------------- */}
             <div className="mobile-nav-account">
               {!isLoading && (
                 isAuthenticated ? (
-                  /* ── Logged-in ── */
+                  /* -- Logged-in -- */
                   <>
-                    {/* User identity card — clickable to go to dashboard */}
+                    {/* User identity card � clickable to go to dashboard */}
                     <Link
                       to="/dashboard"
                       onClick={closeMobileMenu}
@@ -652,7 +652,7 @@ export default function Header({ onCartToggle }) {
                     </Link>
                   </>
                 ) : (
-                  /* ── Guest ── */
+                  /* -- Guest -- */
                   <div className="mobile-nav-guest">
                     <Link
                       to="/login"
@@ -691,7 +691,7 @@ export default function Header({ onCartToggle }) {
 
     </header>
 
-    {/* ── Free Shipping Bar — desktop only, positioned above the fixed header ── */}
+    {/* -- Free Shipping Bar � desktop only, positioned above the fixed header -- */}
     <div className="dtb-promo-bar" aria-label="Free shipping announcement">
       <div className="dtb-promo-bar-inner">
         <span>FREE SHIPPING ON ALL ORDERS $50+</span>

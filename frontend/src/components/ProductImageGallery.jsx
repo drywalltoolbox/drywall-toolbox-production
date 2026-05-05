@@ -54,7 +54,7 @@ export default function ProductImageGallery({ product }) {
     const arr = Array.isArray(product?.images) && product.images.length
       ? product.images.map(toImgUrl).filter(Boolean)
       : product?.image ? [toImgUrl(product.image)] : [];
-    return arr.length ? arr : ['https://www.drywalltoolbox.com/wp/wp-content/uploads/2026/04/no-image-placeholder.webp'];
+    return arr.length ? arr : ['https://www.drywalltoolbox.com/wp/wp-content/uploads/2026/05/no-image-placeholder.webp'];
   })();
   const imagesRef = useRef(images);
   const hasMultiple = images.length > 1;
@@ -282,7 +282,7 @@ export default function ProductImageGallery({ product }) {
               onLoad={() => setImgLoaded(prev => ({ ...prev, [currentIndex]: true }))}
               onError={(e) => {
                 e.currentTarget.onerror = null;
-                e.currentTarget.src = 'https://www.drywalltoolbox.com/wp/wp-content/uploads/2026/04/no-image-placeholder.webp';
+                e.currentTarget.src = 'https://www.drywalltoolbox.com/wp/wp-content/uploads/2026/05/no-image-placeholder.webp';
                 setImgLoaded(prev => ({ ...prev, [currentIndex]: true }));
               }}
             />
@@ -366,7 +366,7 @@ export default function ProductImageGallery({ product }) {
                   loading="lazy"
                   decoding="async"
                   className="w-full h-full object-contain bg-white p-1"
-                  onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = 'https://www.drywalltoolbox.com/wp/wp-content/uploads/2026/04/no-image-placeholder.webp'; }}
+                  onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = 'https://www.drywalltoolbox.com/wp/wp-content/uploads/2026/05/no-image-placeholder.webp'; }}
                 />
               </button>
             ))}

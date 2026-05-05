@@ -22,14 +22,15 @@ import SearchBar from '../components/SearchBar';
 import SortDropdown from '../components/SortDropdown';
 import Toast from '../components/Toast';
 import Pagination from '../components/Pagination';
-import { ShoppingCart, Filter, Heart, Wrench } from 'lucide-react';
+import { Filter, Wrench } from 'lucide-react';
 import FilterPanel from '../components/FilterPanel';
 import { getProducts } from '../services/catalog';
 import { getProductVariations } from '../services/api';
 import { fetchVariationsBatched } from '../utils/variationSelection';
 import { useCart } from '../context/CartContext';
 import LoadingSpinner from '../components/LoadingSpinner';
-import ProductCardImage from '../components/ProductCardImage';
+import ProductCard from '../components/ProductCard';
+import { ProductSkeletonGrid } from '../components/ProductSkeletonCard';
 import SEOHead from '../components/SEOHead';
 import { buildBreadcrumbSchema } from '../utils/schema';
 
@@ -62,6 +63,7 @@ const ITEMS_PER_PAGE = 24;
 // Strict parts taxonomy guard:
 // only include products whose leaf categories are truly parts-oriented.
 const PARTS_LEAF_NAMES = new Set([
+  'parts',
   'parts & accessories',
   'repair kits & parts',
   'pumps & parts',
@@ -115,13 +117,14 @@ export default function Parts() {
       .map(slug => SLUG_TO_BRAND[slug] || slug)  // Convert slug to full name, keep unknown names as-is for backward-compat
       .filter(b => PARTS_BRANDS.includes(b));
   });
-  const [searchQuery, setSearchQuery]   = useState(decodeURIComponent(searchParam));
+  const [searchQuery, setSearchQuery]   = useState(searchParam);
   const [sortBy, setSortBy]             = useState('popular');
   const [currentPage, setCurrentPage]   = useState(pageParam);
   const [showFilters, setShowFilters]   = useState(false);
   const [modalProduct, setModalProduct] = useState(null);
   const [isModalOpen, setIsModalOpen]   = useState(false);
   const [toast, setToast]               = useState(null);
+  const [cardVariationMap, setCardVariationMap] = useState({});
 
   // ── Load parts products ────────────────────────────────────────────────────
   useEffect(() => {
@@ -197,6 +200,16 @@ export default function Parts() {
             const newVars = fetchedVariations.filter(v => !existingIds.has(v.id));
             return [...withoutExpandedParents, ...newVars];
           });
+
+          // Cache variations for the modal so ProductDetail gets initialVariations
+          // without a cold fetch (covers variable parents still visible during loading).
+          const varMap = {};
+          pairs.forEach(([parentId, vars]) => {
+            if (Array.isArray(vars) && vars.length > 0) varMap[String(parentId)] = vars;
+          });
+          if (Object.keys(varMap).length > 0) {
+            setCardVariationMap(prev => ({ ...prev, ...varMap }));
+          }
         })
         .catch(() => { /* variations are non-critical; parents stay visible */ });
     }).catch(() => { if (mounted) setLoading(false); });
@@ -205,18 +218,25 @@ export default function Parts() {
   }, []);
 
   // ── Helpers ───────────────────────────────────────────────────────────────
-  const toggleBrand = (brand) =>
+  const toggleBrand = (brand) => {
     setSelectedBrands(prev =>
       prev.includes(brand) ? prev.filter(b => b !== brand) : [...prev, brand]
     );
+    setCurrentPage(1); // Reset page when brand filter changes
+  };
 
   const clearFilters = () => {
     setSelectedBrands([]);
     setSearchQuery('');
-    setCurrentPage(1);
+    setCurrentPage(1); // Reset page when filters are cleared
   };
 
-  const openModal  = (product) => { setModalProduct(product); setIsModalOpen(true); };
+  const handleSearchChange = (query) => {
+    setSearchQuery(query);
+    setCurrentPage(1); // Reset page when search query changes
+  };
+
+  const openModal  = useCallback((product) => { setModalProduct(product); setIsModalOpen(true); }, []);
   const closeModal = useCallback(() => { setIsModalOpen(false); setModalProduct(null); }, []);
 
   // ── Escape key closes modal ────────────────────────────────────────────────
@@ -233,16 +253,11 @@ export default function Parts() {
       const brandSlugs = selectedBrands.map(b => BRAND_TO_SLUG[b] || b);
       p.set('brand', brandSlugs.join(','));
     }
-    if (searchQuery)                p.set('search', encodeURIComponent(searchQuery));
+  // Removed the useEffect for resetting the page
     if (currentPage > 1)            p.set('page', String(currentPage));
     const qs = p.toString();
     navigate(qs ? `/parts?${qs}` : '/parts', { replace: true });
   }, [selectedBrands, searchQuery, currentPage, navigate]);
-
-  // ── Reset to page 1 when filters / search change ──────────────────────────
-  // This is an appropriate use case for setState in effect - reset pagination when filters change
-  // eslint-disable-next-line
-  useEffect(() => { setCurrentPage(1); }, [selectedBrands, searchQuery]);
 
   const handleAddToCart = (product, quantity = 1) => {
     addToCart(product, quantity);
@@ -300,17 +315,10 @@ export default function Parts() {
           <div className="flex items-center gap-3 mb-2">
             <h1 className="text-4xl font-bold text-gray-900">Replacement Parts</h1>
           </div>
-          <p className="text-gray-600">
-            Genuine repair kits, replacement parts, and accessories for professional
-            drywall finishing tools.
-          </p>
-        </div>
-
-        {/* ── Search bar ───────────────────────────────────────────────────── */}
         <SearchBar
           placeholder="Search parts by name, SKU, or brand…"
           value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
+          onChange={(e) => handleSearchChange(e.target.value)}
         />
 
         <div className="flex flex-col lg:flex-row gap-8">
@@ -363,84 +371,22 @@ export default function Parts() {
             </div>
 
             {/* Loading skeleton */}
-            {loading && (
-              <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
-                {Array.from({ length: 8 }).map((_, i) => (
-                  <div key={i} className="bg-white rounded-lg border border-gray-100 overflow-hidden animate-pulse">
-                    <div className="aspect-square bg-gray-200" />
-                    <div className="p-3 space-y-2">
-                      <div className="h-3 bg-gray-200 rounded w-1/3" />
-                      <div className="h-4 bg-gray-200 rounded w-3/4" />
-                      <div className="h-4 bg-gray-200 rounded w-1/2" />
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
+            {loading && <ProductSkeletonGrid count={24} />}
 
             {/* Product grid */}
             {!loading && paginated.length > 0 && (
               <>
                 <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-5 lg:gap-6">
-                  {paginated.map(product => (
-                    <div
+                  {paginated.map((product, index) => (
+                    <ProductCard
                       key={product.id}
-                      className="bg-white rounded-lg shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden group border border-gray-100 hover:border-primary-300 flex flex-col h-full"
-                    >
-                      {/* Image */}
-                      <div className="relative bg-gray-50 aspect-square overflow-hidden shrink-0">
-                        <button
-                          onClick={() => openModal(product)}
-                          className="absolute inset-0 w-full h-full"
-                        >
-                          <ProductCardImage
-                            src={product.image}
-                            alt={product.name}
-                            padding="8px"
-                          />
-                        </button>
-
-                        {/* Wishlist hint */}
-                        <button className="absolute top-2 right-2 p-1.5 bg-white/95 rounded-full hover:bg-white transition-all opacity-0 group-hover:opacity-100 shadow-sm hover:shadow-md">
-                          <Heart size={16} className="text-gray-500 hover:text-red-500 transition-colors" />
-                        </button>
-                      </div>
-
-                      {/* Info */}
-                      <div className="p-3 sm:p-4 flex flex-col grow">
-                        <p className="text-xs text-gray-500 mb-1 font-medium uppercase tracking-wide">
-                          {product.brand}
-                        </p>
-                        <h3 className="text-sm sm:text-base font-semibold text-gray-900 mb-2 line-clamp-2 group-hover:text-primary-600 transition-colors grow">
-                          <button
-                            onClick={() => openModal(product)}
-                            className="block text-left w-full hover:text-primary-600"
-                          >
-                            {product.name || product.sku}
-                          </button>
-                        </h3>
-
-                        <div className="flex flex-wrap gap-1.5 mb-3 text-xs text-gray-500">
-                          {product.sku && <span>SKU: {product.sku}</span>}
-                          {product.upc && <span className="hidden sm:inline">UPC: {product.upc}</span>}
-                        </div>
-
-                        <div className="flex items-center justify-between gap-2 pt-2 border-t border-gray-100">
-                          <p className="text-base sm:text-lg font-bold text-gray-900 shrink-0">
-                            {product.price > 0
-                              ? `$${parseFloat(product.price).toFixed(2)}`
-                              : <span className="text-sm font-normal text-gray-400">Call for price</span>
-                            }
-                          </p>
-                          <button
-                            onClick={(e) => { e.stopPropagation(); handleAddToCart(product, 1); }}
-                            className="shrink-0 p-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-all hover:scale-110 active:scale-95"
-                          >
-                            <ShoppingCart size={18} />
-                          </button>
-                        </div>
-                      </div>
-                    </div>
+                      product={product}
+                      cardProduct={product}
+                      hasSelectedVariation={false}
+                      onOpenModal={() => openModal(product)}
+                      onAddToCart={() => handleAddToCart(product, 1)}
+                      index={index}
+                    />
                   ))}
                 </div>
 
@@ -486,9 +432,16 @@ export default function Parts() {
       {/* Product detail modal */}
       <ProductModal isOpen={isModalOpen && !!modalProduct} product={modalProduct} onClose={closeModal}>
         {modalProduct && (
-          <ProductDetail product={modalProduct} onAddToCart={handleAddToCart} onClose={closeModal} />
+          <ProductDetail
+            key={modalProduct.id}
+            product={modalProduct}
+            onAddToCart={handleAddToCart}
+            onClose={closeModal}
+            initialVariations={cardVariationMap[String(modalProduct.id)] || []}
+          />
         )}
       </ProductModal>
+      </div>
     </div>
   );
 }
