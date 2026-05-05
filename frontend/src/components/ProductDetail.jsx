@@ -142,7 +142,7 @@ export default function ProductDetail({
           attr?.name && attr.name.toLowerCase() !== 'brand' && Array.isArray(attr.options) && attr.options.length > 0
         )
       : [],
-    [product?.variation_attributes]
+    [product]
   );
 
   const variantOptionMeta = useMemo(() => {
