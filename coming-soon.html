@@ -5,9 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="theme-color" content="#0f172a">
     <meta name="description" content="Professional drywall tools and equipment from top brands. Sign up for early access.">
+    <!-- PWA install capability — mobile-web-app-capable is the modern standard; apple- kept for older iOS -->
+    <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Drywall Toolbox">
+    <!-- Favicon + PWA icons (files live at /drywall-toolbox/ — the built frontend base) -->
+    <link rel="icon" type="image/x-icon"  href="/drywall-toolbox/favicon.ico">
+    <link rel="icon" type="image/png" sizes="16x16" href="/drywall-toolbox/favicon-16x16.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/drywall-toolbox/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="48x48" href="/drywall-toolbox/favicon-48x48.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/drywall-toolbox/apple-touch-icon.png">
+    <link rel="manifest" href="/drywall-toolbox/site.webmanifest">
     <title>Drywall Toolbox | Coming Soon</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -54,25 +63,35 @@
         .ambient { position:fixed; inset:0; z-index:1; pointer-events:none; overflow:hidden; }
         .blob { position:absolute; border-radius:50%; filter:blur(88px); }
         .blob--a {
-            width:min(60vw,560px); height:min(60vw,560px);
-            background:radial-gradient(circle,rgba(37,99,235,.28) 0%,rgba(30,58,138,.13) 55%,transparent 100%);
-            top:-14%; left:-8%; animation:blobDrift 15s ease-in-out infinite;
+            width:min(65vw,600px); height:min(65vw,600px);
+            background:radial-gradient(circle,rgba(37,99,235,.34) 0%,rgba(30,58,138,.15) 55%,transparent 100%);
+            top:-16%; left:-10%; animation:blobDrift 15s ease-in-out infinite;
         }
         .blob--b {
-            width:min(52vw,480px); height:min(52vw,480px);
-            background:radial-gradient(circle,rgba(29,78,216,.22) 0%,rgba(30,58,138,.10) 55%,transparent 100%);
-            bottom:-14%; right:-8%; animation:blobDrift 19s ease-in-out infinite reverse; animation-delay:-8s;
+            width:min(58vw,520px); height:min(58vw,520px);
+            background:radial-gradient(circle,rgba(29,78,216,.28) 0%,rgba(30,58,138,.12) 55%,transparent 100%);
+            bottom:-16%; right:-10%; animation:blobDrift 19s ease-in-out infinite reverse; animation-delay:-8s;
         }
         .blob--c {
-            width:min(32vw,300px); height:min(32vw,300px);
-            background:radial-gradient(circle,rgba(59,130,246,.11) 0%,transparent 70%);
+            width:min(40vw,360px); height:min(40vw,360px);
+            background:radial-gradient(circle,rgba(59,130,246,.14) 0%,transparent 70%);
             top:44%; left:55%; transform:translate(-50%,-50%);
             animation:blobDrift 22s ease-in-out infinite; animation-delay:-5s;
+        }
+        .blob--d {
+            width:min(50vw,440px); height:min(50vw,440px);
+            background:radial-gradient(circle,rgba(96,165,250,.08) 0%,transparent 65%);
+            top:50%; left:50%; transform:translate(-50%,-50%);
+            animation:blobPulse 9s ease-in-out infinite;
         }
         @keyframes blobDrift {
             0%,100%{transform:translate(0,0) scale(1)}
             33%{transform:translate(2%,4%) scale(1.04)}
             66%{transform:translate(-2%,-2%) scale(.97)}
+        }
+        @keyframes blobPulse {
+            0%,100%{opacity:.45;transform:translate(-50%,-50%) scale(1)}
+            50%{opacity:1;transform:translate(-50%,-50%) scale(1.18)}
         }
 
         .grid-overlay {
@@ -86,13 +105,13 @@
         .card-outer {
             position:relative; width:100%; border-radius:20px; padding:1.5px;
             background:conic-gradient(from var(--ba),
-                rgba(37,99,235,.05) 0deg,rgba(37,99,235,.60) 50deg,
-                rgba(59,130,246,.80) 95deg,rgba(37,99,235,.60) 140deg,
-                rgba(37,99,235,.05) 195deg,rgba(37,99,235,.05) 360deg);
+                rgba(37,99,235,.04) 0deg,rgba(59,130,246,.68) 45deg,
+                rgba(147,197,253,.90) 90deg,rgba(59,130,246,.68) 135deg,
+                rgba(37,99,235,.04) 185deg,rgba(37,99,235,.04) 360deg);
             box-shadow:
-                0 0 0 1px rgba(37,99,235,.14),
-                0 28px 70px rgba(0,0,0,.80),
-                0 0 55px rgba(37,99,235,.06);
+                0 0 0 1px rgba(37,99,235,.16),
+                0 30px 75px rgba(0,0,0,.88),
+                0 0 90px rgba(37,99,235,.10);
             animation:cardIn .9s cubic-bezier(.16,1,.3,1) both,spinBorder 5.5s linear infinite;
             will-change:transform;
         }
@@ -142,11 +161,12 @@
         }
         .logo-img {
             display:block; width:100%; max-width:195px; height:auto;
-            filter:drop-shadow(0 0 20px rgba(37,99,235,.45)) brightness(1.05);
+            filter:drop-shadow(0 0 22px rgba(37,99,235,.52)) brightness(1.05);
             animation:logoFloat 7s ease-in-out infinite;
             transition:filter .4s ease;
+            position:relative; z-index:1;
         }
-        .logo-wrap:hover .logo-img{filter:drop-shadow(0 0 34px rgba(59,130,246,.65)) brightness(1.1)}
+        .logo-wrap:hover .logo-img{filter:drop-shadow(0 0 38px rgba(59,130,246,.72)) brightness(1.12)}
         @keyframes logoFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
 
         .headline {
@@ -163,32 +183,80 @@
         .sub-headline {
             font-size:clamp(.85rem,2.6vw,1rem); font-weight:400;
             color:var(--txt-muted); line-height:1.68;
-            max-width:380px; margin:0 auto 1.625rem;
+            max-width:380px; margin:0 auto 1.5rem;
             position:relative; z-index:1; animation-delay:.32s;
         }
 
-        .countdown-wrap{position:relative;z-index:1;margin-bottom:1.625rem;animation-delay:.40s}
-        .countdown{display:inline-flex;align-items:flex-start;gap:clamp(.3rem,1.2vw,.55rem)}
-        .cd-unit{display:flex;flex-direction:column;align-items:center;gap:.25rem}
-        .cd-num {
-            display:flex; align-items:center; justify-content:center;
-            min-width:clamp(44px,10.5vw,62px);
-            padding:clamp(.38rem,1.2vw,.55rem) .2rem;
-            background:rgba(37,99,235,.07); border:1px solid rgba(37,99,235,.17);
-            border-radius:9px;
-            font-size:clamp(1.1rem,4vw,1.6rem); font-weight:700; letter-spacing:-.02em;
-            font-variant-numeric:tabular-nums; color:var(--white);
-            box-shadow:0 0 16px rgba(37,99,235,.05),inset 0 1px 0 rgba(255,255,255,.04);
+        /* ── Noise grain overlay ── */
+        .noise {
+            position:fixed; inset:0; z-index:3; pointer-events:none; opacity:.030;
+            background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.88' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+            background-size:192px 192px;
         }
-        .cd-num.flipping{animation:numFlip .26s cubic-bezier(.34,1.56,.64,1)}
-        .cd-label{font-size:clamp(.52rem,1.3vw,.6rem);font-weight:600;letter-spacing:.13em;text-transform:uppercase;color:var(--txt-faint)}
-        .cd-sep{
-            font-size:clamp(1.1rem,4vw,1.6rem);font-weight:700;
-            color:rgba(37,99,235,.48);margin-top:clamp(.32rem,1.2vw,.50rem);
-            animation:blink 1s step-end infinite;line-height:1;
+
+        /* ── Aurora sweep beams ── */
+        .aurora { position:fixed; inset:0; z-index:1; pointer-events:none; overflow:hidden; }
+        .aurora__beam {
+            position:absolute; left:-25%; width:150%; height:1px;
+            background:linear-gradient(90deg,
+                transparent 0%,rgba(59,130,246,0) 12%,rgba(99,160,255,.52) 40%,
+                rgba(147,197,253,.80) 50%,rgba(99,160,255,.52) 60%,
+                rgba(37,99,235,0) 88%,transparent 100%);
+            filter:blur(2.5px);
         }
-        @keyframes numFlip{0%{transform:translateY(-9px);opacity:0}100%{transform:translateY(0);opacity:1}}
-        @keyframes blink{0%,100%{opacity:1}50%{opacity:.15}}
+        .aurora__beam--1 { top:26%; animation:auroraSweep 13s ease-in-out infinite; }
+        .aurora__beam--2 { top:71%; animation:auroraSweep 17s ease-in-out infinite; animation-delay:-7.5s; opacity:.50; }
+        @keyframes auroraSweep {
+            0%   { transform:translateX(-35%) scaleY(1);   opacity:0; }
+            12%  { opacity:1; }
+            50%  { transform:translateX(0%)   scaleY(3.5); opacity:.85; }
+            88%  { opacity:1; }
+            100% { transform:translateX(35%)  scaleY(1);   opacity:0; }
+        }
+
+        /* ── Scan line ── */
+        .scan-line {
+            position:fixed; left:0; top:-2px; width:100%; height:1.5px;
+            z-index:4; pointer-events:none;
+            background:linear-gradient(90deg,transparent 0%,rgba(59,130,246,.14) 25%,rgba(147,197,253,.28) 50%,rgba(59,130,246,.14) 75%,transparent 100%);
+            animation:scanDown 12s linear infinite;
+        }
+        @keyframes scanDown {
+            0%  { top:-2px;  opacity:0; }
+            4%  { opacity:1; }
+            92% { opacity:.55; }
+            100%{ top:100vh; opacity:0; }
+        }
+
+        /* ── Card inner mouse spotlight ── */
+        .card-spotlight {
+            position:absolute; inset:0; border-radius:18.5px;
+            pointer-events:none; z-index:0; opacity:0;
+            background:radial-gradient(420px circle at var(--mx,50%) var(--my,50%),rgba(59,130,246,.075) 0%,transparent 70%);
+            transition:opacity .35s ease;
+        }
+        .content-card:hover .card-spotlight { opacity:1; }
+
+        /* ── Logo sonar rings ── */
+        .logo-rings {
+            position:absolute; top:50%; left:50%;
+            width:0; height:0; pointer-events:none; z-index:0;
+        }
+        .logo-ring {
+            position:absolute; border-radius:50%;
+            border:1px solid rgba(59,130,246,.55);
+            top:0; left:0;
+            transform:translate(-50%,-50%) scale(.2);
+            opacity:0;
+            animation:ringPulse 3.2s ease-out infinite;
+        }
+        .logo-ring:nth-child(1) { width:200px; height:64px;  animation-delay:0s; }
+        .logo-ring:nth-child(2) { width:290px; height:92px;  animation-delay:.85s;  border-color:rgba(59,130,246,.30); }
+        .logo-ring:nth-child(3) { width:380px; height:120px; animation-delay:1.70s; border-color:rgba(59,130,246,.14); }
+        @keyframes ringPulse {
+            0%   { transform:translate(-50%,-50%) scale(.25); opacity:.9; }
+            100% { transform:translate(-50%,-50%) scale(1);   opacity:0; }
+        }
 
         .divider {
             width:100%; height:1px;
@@ -297,14 +365,14 @@
             animation-delay:0s !important;
         }
         [data-preview] .logo-img,[data-preview] .eyebrow-dot,
-        [data-preview] .status-dot,[data-preview] .cd-sep,
-        [data-preview] .cd-num{animation:none !important}
+        [data-preview] .status-dot,[data-preview] .aurora__beam,
+        [data-preview] .scan-line,[data-preview] .logo-ring{animation:none !important}
 
         /* Reduced motion */
         @media(prefers-reduced-motion:reduce){
             *,*::before,*::after{animation-duration:.01ms !important;animation-iteration-count:1 !important;transition-duration:.01ms !important}
             .submit-btn:hover,.popup-dismiss:hover{transform:none}
-            .logo-img{animation:none}
+            .logo-img,.aurora__beam,.scan-line,.logo-ring{animation:none}
         }
     </style>
 </head>
@@ -312,17 +380,29 @@
 
     <canvas id="bg-canvas" aria-hidden="true"></canvas>
 
+    <!-- Aurora horizontal light sweeps -->
+    <div class="aurora" aria-hidden="true">
+        <div class="aurora__beam aurora__beam--1"></div>
+        <div class="aurora__beam aurora__beam--2"></div>
+    </div>
+
     <div class="ambient" aria-hidden="true">
         <div class="blob blob--a"></div>
         <div class="blob blob--b"></div>
         <div class="blob blob--c"></div>
+        <div class="blob blob--d"></div>
     </div>
 
     <div class="grid-overlay" aria-hidden="true"></div>
+    <div class="noise"        aria-hidden="true"></div>
+    <div class="scan-line"    aria-hidden="true"></div>
 
     <main>
         <div class="card-outer">
-            <div class="content-card">
+            <div class="content-card" id="dtb_card">
+
+                <!-- Mouse-tracking inner spotlight -->
+                <div class="card-spotlight" id="dtb_spotlight"></div>
 
                 <div class="eyebrow fadeup" aria-hidden="true">
                     <span class="eyebrow-dot"></span>
@@ -330,8 +410,14 @@
                 </div>
 
                 <div class="logo-wrap fadeup">
+                    <!-- Sonar rings expand from behind the logo -->
+                    <div class="logo-rings" aria-hidden="true">
+                        <div class="logo-ring"></div>
+                        <div class="logo-ring"></div>
+                        <div class="logo-ring"></div>
+                    </div>
                     <img
-                        src="logos/drywall-logo-white.png"
+                        src="https://drywalltoolbox.com/logos/drywall-logo-white.png"
                         alt="Drywall Toolbox"
                         class="logo-img"
                         width="320"
@@ -346,30 +432,6 @@
                 <p class="sub-headline fadeup">
                     Sign up and be the first to know when we launch.
                 </p>
-
-                <div class="countdown-wrap fadeup">
-                    <div class="countdown" role="timer" aria-label="Countdown to launch" aria-live="off">
-                        <div class="cd-unit">
-                            <span class="cd-num" id="cd-days">--</span>
-                            <span class="cd-label">Days</span>
-                        </div>
-                        <span class="cd-sep" aria-hidden="true">:</span>
-                        <div class="cd-unit">
-                            <span class="cd-num" id="cd-hours">--</span>
-                            <span class="cd-label">Hours</span>
-                        </div>
-                        <span class="cd-sep" aria-hidden="true">:</span>
-                        <div class="cd-unit">
-                            <span class="cd-num" id="cd-mins">--</span>
-                            <span class="cd-label">Mins</span>
-                        </div>
-                        <span class="cd-sep" aria-hidden="true">:</span>
-                        <div class="cd-unit">
-                            <span class="cd-num" id="cd-secs">--</span>
-                            <span class="cd-label">Secs</span>
-                        </div>
-                    </div>
-                </div>
 
                 <div class="divider fadeup" aria-hidden="true"></div>
 
@@ -462,36 +524,66 @@
 
 
     <script>
-        /* PARTICLE CANVAS */
+        /* ── PARTICLE CANVAS — glow, size variation, mouse repulsion ─────────── */
         (function(){
             var canvas=document.getElementById('bg-canvas');
             if(!canvas||!canvas.getContext)return;
             var ctx=canvas.getContext('2d');
-            var COUNT=window.innerWidth<600?42:75;
+            var isMobile=window.innerWidth<600;
+            var COUNT=isMobile?55:100;
             var p=[];
+            var mouse={x:-9999,y:-9999};
             function resize(){canvas.width=window.innerWidth;canvas.height=window.innerHeight}
             resize();
             window.addEventListener('resize',resize,{passive:true});
-            for(var i=0;i<COUNT;i++)p.push({x:Math.random()*window.innerWidth,y:Math.random()*window.innerHeight,r:Math.random()*1.35+.35,dx:(Math.random()-.5)*.26,dy:(Math.random()-.5)*.26,a:Math.random()*.42+.08});
-            var LINK=108;
+            window.addEventListener('mousemove',function(e){mouse.x=e.clientX;mouse.y=e.clientY},{passive:true});
+            for(var i=0;i<COUNT;i++){
+                var big=Math.random()<.12;
+                p.push({
+                    x:Math.random()*window.innerWidth,
+                    y:Math.random()*window.innerHeight,
+                    r:big?Math.random()*1.8+1.2:Math.random()*1.1+.3,
+                    dx:(Math.random()-.5)*(big?.16:.26),
+                    dy:(Math.random()-.5)*(big?.16:.26),
+                    a:big?Math.random()*.28+.14:Math.random()*.36+.06,
+                    glow:big
+                });
+            }
+            var LINK=isMobile?82:112;
             function draw(){
                 ctx.clearRect(0,0,canvas.width,canvas.height);
-                for(var i=0;i<p.length;i++){var q=p[i];q.x+=q.dx;q.y+=q.dy;if(q.x<0)q.x=canvas.width;if(q.x>canvas.width)q.x=0;if(q.y<0)q.y=canvas.height;if(q.y>canvas.height)q.y=0;ctx.beginPath();ctx.arc(q.x,q.y,q.r,0,Math.PI*2);ctx.fillStyle='rgba(59,130,246,'+q.a+')';ctx.fill()}
+                for(var i=0;i<p.length;i++){
+                    var q=p[i];
+                    var mdx=q.x-mouse.x,mdy=q.y-mouse.y,md=Math.sqrt(mdx*mdx+mdy*mdy);
+                    if(md<130&&md>0){var f=(130-md)/130*.38;q.x+=mdx/md*f;q.y+=mdy/md*f}
+                    q.x+=q.dx;q.y+=q.dy;
+                    if(q.x<0)q.x=canvas.width; if(q.x>canvas.width)q.x=0;
+                    if(q.y<0)q.y=canvas.height;if(q.y>canvas.height)q.y=0;
+                    if(q.glow){ctx.shadowBlur=12;ctx.shadowColor='rgba(99,160,255,.65)'}else{ctx.shadowBlur=0}
+                    ctx.beginPath();ctx.arc(q.x,q.y,q.r,0,Math.PI*2);
+                    ctx.fillStyle='rgba(59,130,246,'+q.a+')';ctx.fill();
+                }
+                ctx.shadowBlur=0;
                 ctx.lineWidth=.6;
-                for(var i=0;i<p.length-1;i++)for(var j=i+1;j<p.length;j++){var dx=p[i].x-p[j].x,dy=p[i].y-p[j].y,d=Math.sqrt(dx*dx+dy*dy);if(d<LINK){ctx.beginPath();ctx.moveTo(p[i].x,p[i].y);ctx.lineTo(p[j].x,p[j].y);ctx.strokeStyle='rgba(37,99,235,'+(0.052*(1-d/LINK))+')';ctx.stroke()}}
+                for(var i=0;i<p.length-1;i++)for(var j=i+1;j<p.length;j++){
+                    var dx=p[i].x-p[j].x,dy=p[i].y-p[j].y,d=Math.sqrt(dx*dx+dy*dy);
+                    if(d<LINK){ctx.beginPath();ctx.moveTo(p[i].x,p[i].y);ctx.lineTo(p[j].x,p[j].y);ctx.strokeStyle='rgba(37,99,235,'+(0.058*(1-d/LINK))+')';ctx.stroke()}
+                }
                 requestAnimationFrame(draw);
             }
             if(!window.matchMedia('(prefers-reduced-motion:reduce)').matches)draw();
         })();
 
-        /* COUNTDOWN */
+        /* ── CARD INNER SPOTLIGHT — radial glow tracks cursor ────────────────── */
         (function(){
-            var LAUNCH=new Date('2026-09-01T09:00:00');
-            var elD=document.getElementById('cd-days'),elH=document.getElementById('cd-hours'),elM=document.getElementById('cd-mins'),elS=document.getElementById('cd-secs');
-            function pad(n){return n<10?'0'+n:String(n)}
-            function set(el,val){if(!el||el.textContent===val)return;el.textContent=val;el.classList.remove('flipping');void el.offsetWidth;el.classList.add('flipping')}
-            function tick(){var diff=LAUNCH.getTime()-Date.now();if(diff<=0){set(elD,'00');set(elH,'00');set(elM,'00');set(elS,'00');return}set(elD,pad(Math.floor(diff/86400000)));set(elH,pad(Math.floor((diff%86400000)/3600000)));set(elM,pad(Math.floor((diff%3600000)/60000)));set(elS,pad(Math.floor((diff%60000)/1000)))}
-            tick();setInterval(tick,1000);
+            var card=document.getElementById('dtb_card');
+            var spot=document.getElementById('dtb_spotlight');
+            if(!card||!spot)return;
+            card.addEventListener('mousemove',function(e){
+                var r=card.getBoundingClientRect();
+                spot.style.setProperty('--mx',((e.clientX-r.left)/r.width*100).toFixed(1)+'%');
+                spot.style.setProperty('--my',((e.clientY-r.top)/r.height*100).toFixed(1)+'%');
+            },{passive:true});
         })();
 
         /* MOUSE PARALLAX */
