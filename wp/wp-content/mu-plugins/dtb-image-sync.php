@@ -2133,6 +2133,57 @@ function dtb_image_sync_log( string $message ): void {
 
 if ( is_admin() ) {
 	add_action( 'admin_menu', 'dtb_image_sync_add_management_page' );
+	add_action( 'wp_ajax_dtb_image_sync', 'dtb_ajax_image_sync_handler' );
+}
+
+/**
+ * Admin-AJAX handler for the DTB Image Sync admin page.
+ *
+ * Used instead of the WP REST API because HostGator shared hosting strips
+ * session cookies on /wp-json/ requests, causing "Cookie check failed" 403s
+ * across all REST endpoints.  admin-ajax.php uses the standard PHP session
+ * and check_ajax_referer(), which is unaffected by this server behaviour.
+ *
+ * @return never — always terminates via wp_send_json_*().
+ */
+function dtb_ajax_image_sync_handler(): void {
+	// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+	check_ajax_referer( 'dtb_image_sync_admin', 'nonce' );
+
+	if ( ! dtb_image_sync_can_manage() ) {
+		wp_send_json_error( [ 'message' => 'Unauthorized' ], 403 );
+	}
+
+	// phpcs:ignore WordPress.Security.NonceVerification.Missing
+	$sync_action = sanitize_key( wp_unslash( $_POST['sync_action'] ?? '' ) );
+
+	$request = new WP_REST_Request();
+	// phpcs:disable WordPress.Security.NonceVerification.Missing
+	$request->set_param( 'year',          sanitize_text_field( wp_unslash( $_POST['year']             ?? gmdate( 'Y' ) ) ) );
+	$request->set_param( 'month',         sanitize_text_field( wp_unslash( $_POST['month']            ?? gmdate( 'm' ) ) ) );
+	$request->set_param( 'dry_run',       rest_sanitize_boolean( wp_unslash( $_POST['dry_run']        ?? false ) ) );
+	$request->set_param( 'force',         rest_sanitize_boolean( wp_unslash( $_POST['force']          ?? false ) ) );
+	$request->set_param( 'register_only', rest_sanitize_boolean( wp_unslash( $_POST['register_only']  ?? false ) ) );
+	$request->set_param( 'limit',         max( 1, absint( $_POST['limit']  ?? 25 ) ) );
+	$request->set_param( 'offset',        max( 0, absint( $_POST['offset'] ?? 0 ) ) );
+	// phpcs:enable WordPress.Security.NonceVerification.Missing
+
+	if ( 'progress' === $sync_action ) {
+		$result = dtb_route_sync_images_progress();
+	} elseif ( 'link_only' === $sync_action ) {
+		$result = dtb_route_link_registered_images( $request );
+	} elseif ( 'fix_renamed' === $sync_action ) {
+		$result = dtb_route_fix_renamed_files( $request );
+	} else {
+		// Default: register (+ link unless register_only).
+		$result = dtb_route_sync_images( $request );
+	}
+
+	if ( is_wp_error( $result ) ) {
+		wp_send_json_error( [ 'message' => $result->get_error_message() ], 400 );
+	}
+
+	wp_send_json_success( $result->get_data() );
 }
 
 /**
@@ -2520,11 +2571,11 @@ function dtb_render_image_sync_admin_page(): void {
 		</div>
 	</div>
 	<?php
-	$ns                = defined( 'DTB_API_NAMESPACE' ) ? DTB_API_NAMESPACE : 'dtb/v1';
-	$rest_sync_url     = rest_url( $ns . '/sync-images' );
-	$rest_link_url     = rest_url( $ns . '/sync-images/link-only' );
-	$rest_fix_url      = rest_url( $ns . '/sync-images/fix-renamed' );
-	$rest_progress_url = rest_url( $ns . '/sync-images/progress' );
+	// Use admin-ajax.php instead of the WP REST API.
+	// Reason: HostGator shared hosting returns 403 "Cookie check failed" on all
+	// /wp-json/ requests because the server strips session cookies before they
+	// reach PHP.  admin-ajax.php goes through the normal WP session and
+	// check_ajax_referer(), which is immune to this server-level behaviour.
 	?>
 	<script>
 	( function () {
@@ -2538,11 +2589,8 @@ function dtb_render_image_sync_admin_page(): void {
 		}
 
 		const api = {
-			sync: <?php echo wp_json_encode( esc_url_raw( $rest_sync_url ) ); ?>,
-			link: <?php echo wp_json_encode( esc_url_raw( $rest_link_url ) ); ?>,
-			fix: <?php echo wp_json_encode( esc_url_raw( $rest_fix_url ) ); ?>,
-			progress: <?php echo wp_json_encode( esc_url_raw( $rest_progress_url ) ); ?>,
-			nonce: <?php echo wp_json_encode( wp_create_nonce( 'wp_rest' ) ); ?>
+			ajaxUrl: <?php echo wp_json_encode( esc_url_raw( admin_url( 'admin-ajax.php' ) ) ); ?>,
+			nonce:   <?php echo wp_json_encode( wp_create_nonce( 'dtb_image_sync_admin' ) ); ?>
 		};
 
 		const MAX_BATCHES = 1000;
@@ -2577,15 +2625,21 @@ function dtb_render_image_sync_admin_page(): void {
 			}
 			pollBusy = true;
 			try {
-				const res = await fetch( api.progress, {
-					method: 'GET',
+				const body = new URLSearchParams( {
+					action:      'dtb_image_sync',
+					nonce:       api.nonce,
+					sync_action: 'progress'
+				} );
+				const res = await fetch( api.ajaxUrl, {
+					method:      'POST',
 					credentials: 'same-origin',
-					headers: { 'X-WP-Nonce': api.nonce }
+					body
 				} );
 				if ( ! res.ok ) {
 					return;
 				}
-				const payload = await res.json();
+				const envelope = await res.json();
+				const payload = envelope && envelope.success ? envelope.data : null;
 				const p = payload && payload.progress ? payload.progress : null;
 				if ( ! p ) {
 					return;
@@ -2615,22 +2669,26 @@ function dtb_render_image_sync_admin_page(): void {
 				pollTimer = null;
 			}
 		};
-		const postJson = async ( url, body ) => {
-			const res = await fetch( url, {
-				method: 'POST',
-				credentials: 'same-origin',
-				headers: {
-					'Content-Type': 'application/json',
-					'X-WP-Nonce': api.nonce
-				},
-				body: JSON.stringify( body )
+		const postJson = async ( syncAction, body ) => {
+			const params = new URLSearchParams( {
+				action:      'dtb_image_sync',
+				nonce:       api.nonce,
+				sync_action: syncAction
 			} );
-			const data = await res.json().catch( () => null );
-			if ( ! res.ok ) {
-				const message = ( data && data.message ) ? data.message : `Request failed (${res.status})`;
+			Object.entries( body ).forEach( ( [ k, v ] ) => params.set( k, String( v ?? '' ) ) );
+			const res = await fetch( api.ajaxUrl, {
+				method:      'POST',
+				credentials: 'same-origin',
+				body:        params
+			} );
+			const envelope = await res.json().catch( () => null );
+			if ( ! res.ok || ( envelope && ! envelope.success ) ) {
+				const message = ( envelope && envelope.data && envelope.data.message )
+					? envelope.data.message
+					: `Request failed (${res.status})`;
 				throw new Error( message );
 			}
-			return data;
+			return envelope ? envelope.data : null;
 		};
 		const setButtonsDisabled = ( disabled ) => {
 			form.querySelectorAll( 'button[type="submit"]' ).forEach( ( button ) => {
@@ -2673,7 +2731,7 @@ function dtb_render_image_sync_admin_page(): void {
 			try {
 				if ( submittedAction === 'pipeline' ) {
 					setStatus( 'Running Fix Renamed…' );
-					const fixResult = await postJson( api.fix, {
+					const fixResult = await postJson( 'fix_renamed', {
 						year: year,
 						month: month,
 						dry_run: dryRun
@@ -2683,7 +2741,7 @@ function dtb_render_image_sync_admin_page(): void {
 
 				let batchCount = 0;
 				const missingFiles = [];
-				const syncEndpoint = submittedAction === 'link_only' ? api.link : api.sync;
+				const syncAction = submittedAction === 'link_only' ? 'link_only' : 'sync';
 				while ( true ) {
 					batchCount += 1;
 					if ( batchCount > MAX_BATCHES ) {
@@ -2693,7 +2751,7 @@ function dtb_render_image_sync_admin_page(): void {
 					if ( submittedAction !== 'link_only' ) {
 						startPolling();
 					}
-					const batch = await postJson( syncEndpoint, {
+					const batch = await postJson( syncAction, {
 						year: year,
 						month: month,
 						dry_run: dryRun,
