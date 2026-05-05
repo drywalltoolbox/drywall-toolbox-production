@@ -1,0 +1,52 @@
+{
+  "brand": "Level5",
+  "group_name": "Automatic Taper",
+  "group_slug": "auto-taper",
+  "directory_name": "4-760 - Drive Dog Assembly, 2nd Gen [#7097]",
+  "schematic_name": "Drive Dog Assembly, 2nd Gen [#7097]",
+  "schematic_reference": "7097",
+  "compatible_skus": [
+    "4-760"
+  ],
+  "compatible_skus_display": "Compatible with SKU(s): 4-760",
+  "pdf_filename": "7097-Drive-Dog-Assembly.pdf",
+  "parts_count": 6,
+  "parts": [
+    {
+      "schematic_number": "1",
+      "part_number": "7094",
+      "description": "Spring Drive Dog",
+      "price_display": "$3.14"
+    },
+    {
+      "schematic_number": "2",
+      "part_number": "7269",
+      "description": "Drive Dog Body",
+      "price_display": "$0"
+    },
+    {
+      "schematic_number": "3",
+      "part_number": "7060",
+      "description": "Drive Dog Screw 8-32",
+      "price_display": "$1.79"
+    },
+    {
+      "schematic_number": "4",
+      "part_number": "7116",
+      "description": "1/16 x 1/2in Cotter Pin Fastenal 74268",
+      "price_display": "$1.79"
+    },
+    {
+      "schematic_number": "5",
+      "part_number": "7100",
+      "description": "Cable Drum Shaft",
+      "price_display": "$36.89"
+    },
+    {
+      "schematic_number": "6",
+      "part_number": "7089",
+      "description": "Drive dog roller",
+      "price_display": "$0"
+    }
+  ]
+}

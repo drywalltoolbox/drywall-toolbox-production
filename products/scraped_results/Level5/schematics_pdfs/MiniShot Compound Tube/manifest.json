@@ -1,0 +1,20 @@
+{
+  "brand": "Level5",
+  "group_name": "MiniShot Compound Tube",
+  "group_slug": "minishot",
+  "directory_name": "MiniShot Compound Tube",
+  "schematic_count": 1,
+  "unique_pdf_count": 1,
+  "schematics": [
+    {
+      "schematic_name": "MiniShot",
+      "schematic_reference": "4-772",
+      "compatible_skus": [
+        "4-772"
+      ],
+      "schematic_directory_name": "4-772 - MiniShot",
+      "pdf_filename": "4-772-MiniShot.pdf",
+      "parts_count": 38
+    }
+  ]
+}

@@ -1,0 +1,80 @@
+{
+  "brand": "Level5",
+  "group_name": "Automatic Taper",
+  "group_slug": "auto-taper",
+  "directory_name": "Automatic Taper",
+  "schematic_count": 7,
+  "unique_pdf_count": 7,
+  "schematics": [
+    {
+      "schematic_name": "Drive Dog Assembly, 2nd Gen [#7097]",
+      "schematic_reference": "7097",
+      "compatible_skus": [
+        "4-760"
+      ],
+      "schematic_directory_name": "4-760 - Drive Dog Assembly, 2nd Gen [#7097]",
+      "pdf_filename": "7097-Drive-Dog-Assembly.pdf",
+      "parts_count": 6
+    },
+    {
+      "schematic_name": "Taper Wheel Assembly, 2nd Gen [#7218]",
+      "schematic_reference": "7218",
+      "compatible_skus": [
+        "4-760"
+      ],
+      "schematic_directory_name": "4-760 - Taper Wheel Assembly, 2nd Gen [#7218]",
+      "pdf_filename": "7218-Taper-Wheel-Assembly.pdf",
+      "parts_count": 5
+    },
+    {
+      "schematic_name": "Gooser Assembly, 2nd Gen [#7293]",
+      "schematic_reference": "7293",
+      "compatible_skus": [
+        "4-760"
+      ],
+      "schematic_directory_name": "4-760 - Gooser Assembly, 2nd Gen [#7293]",
+      "pdf_filename": "7293-Gooser-Assembly.pdf",
+      "parts_count": 10
+    },
+    {
+      "schematic_name": "Cutter Chain Assembly, 2nd Gen [#9333]",
+      "schematic_reference": "9333",
+      "compatible_skus": [
+        "4-760"
+      ],
+      "schematic_directory_name": "4-760 - Cutter Chain Assembly, 2nd Gen [#9333]",
+      "pdf_filename": "9333-Cutter-Chain-Assembly.pdf",
+      "parts_count": 10
+    },
+    {
+      "schematic_name": "Cover Plate Assembly, 1st Gen",
+      "schematic_reference": "7377",
+      "compatible_skus": [
+        "4-760"
+      ],
+      "schematic_directory_name": "4-760 - Cover Plate Assembly, 1st Gen",
+      "pdf_filename": "7377-Cover-Plate-AssemblyOld-Style.pdf",
+      "parts_count": 14
+    },
+    {
+      "schematic_name": "Taper Head Assembly, 2nd Gen two",
+      "schematic_reference": "4-760",
+      "compatible_skus": [
+        "4-760"
+      ],
+      "schematic_directory_name": "4-760 - Taper Head Assembly, 2nd Gen two",
+      "pdf_filename": "Taper-Head-Assembly-New-Style-4-760.pdf",
+      "parts_count": 57
+    },
+    {
+      "schematic_name": "Taper Tube Assembly, 2nd Gen one",
+      "schematic_reference": null,
+      "compatible_skus": [
+        "4-760"
+      ],
+      "schematic_directory_name": "4-760 - Taper Tube Assembly, 2nd Gen one",
+      "pdf_filename": "Taper-Tube-Assembly.pdf",
+      "parts_count": 28
+    }
+  ]
+}

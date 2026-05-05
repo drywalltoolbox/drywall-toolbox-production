@@ -1,0 +1,30 @@
+{
+  "brand": "Level5",
+  "group_name": "Corner Applicators",
+  "group_slug": "corner-applicator",
+  "directory_name": "Corner Applicators",
+  "schematic_count": 2,
+  "unique_pdf_count": 2,
+  "schematics": [
+    {
+      "schematic_name": "7in Corner Applicator",
+      "schematic_reference": "7",
+      "compatible_skus": [
+        "4-701"
+      ],
+      "schematic_directory_name": "4-701 - 7in Corner Applicator",
+      "pdf_filename": "7-inch-Corner-Applicator-4-701.pdf",
+      "parts_count": 22
+    },
+    {
+      "schematic_name": "8in Corner Applicator",
+      "schematic_reference": "8",
+      "compatible_skus": [
+        "4-702"
+      ],
+      "schematic_directory_name": "4-702 - 8in Corner Applicator",
+      "pdf_filename": "8-inch-Corner-Applicator-4-702-.pdf",
+      "parts_count": 22
+    }
+  ]
+}

@@ -1,0 +1,47 @@
+{
+  "brand": "Level5",
+  "pdf_filename": "4-764-765-766-770-New-Hinge-box-Final.pdf",
+  "schematic_page_count": 4,
+  "referenced_by": [
+    {
+      "group_name": "Flat Boxes",
+      "group_slug": "flat-boxes",
+      "schematic_name": "7in Standard Flat Box, 2nd Gen",
+      "schematic_reference": "4-764-765-766-770",
+      "compatible_skus": [
+        "4-764"
+      ],
+      "schematic_directory_name": "4-764 - 7in Standard Flat Box, 2nd Gen"
+    },
+    {
+      "group_name": "Flat Boxes",
+      "group_slug": "flat-boxes",
+      "schematic_name": "10in Standard Flat Box, 2nd Gen",
+      "schematic_reference": "4-764-765-766-770",
+      "compatible_skus": [
+        "4-765"
+      ],
+      "schematic_directory_name": "4-765 - 10in Standard Flat Box, 2nd Gen"
+    },
+    {
+      "group_name": "Flat Boxes",
+      "group_slug": "flat-boxes",
+      "schematic_name": "12in Standard Flat Box, 2nd Gen",
+      "schematic_reference": "4-764-765-766-770",
+      "compatible_skus": [
+        "4-766"
+      ],
+      "schematic_directory_name": "4-766 - 12in Standard Flat Box, 2nd Gen"
+    },
+    {
+      "group_name": "Flat Boxes",
+      "group_slug": "flat-boxes",
+      "schematic_name": "Standard Flat Boxes, 2nd Gen",
+      "schematic_reference": "4-764-765-766-770",
+      "compatible_skus": [
+        "4-770"
+      ],
+      "schematic_directory_name": "4-770 - Standard Flat Boxes, 2nd Gen"
+    }
+  ]
+}

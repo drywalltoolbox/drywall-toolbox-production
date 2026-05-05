@@ -1,0 +1,17 @@
+{
+  "brand": "Level5",
+  "pdf_filename": "4-734-3.5-Corner-Finisher.pdf",
+  "schematic_page_count": 1,
+  "referenced_by": [
+    {
+      "group_name": "Corner Finishers",
+      "group_slug": "corner-finisher",
+      "schematic_name": "3.5in Corner Finisher",
+      "schematic_reference": "4-734-3",
+      "compatible_skus": [
+        "4-734"
+      ],
+      "schematic_directory_name": "4-734 - 3.5in Corner Finisher"
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "brand": "Level5",
+  "pdf_filename": "3-inch-Corner-Finisher-4-733.pdf",
+  "schematic_page_count": 1,
+  "referenced_by": [
+    {
+      "group_name": "Corner Finishers",
+      "group_slug": "corner-finisher",
+      "schematic_name": "3in Corner Finisher",
+      "schematic_reference": "3",
+      "compatible_skus": [
+        "4-733"
+      ],
+      "schematic_directory_name": "4-733 - 3in Corner Finisher"
+    }
+  ]
+}

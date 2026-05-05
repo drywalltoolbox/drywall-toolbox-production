@@ -1,0 +1,286 @@
+{
+  "brand": "Level5",
+  "group_name": "Flat Boxes",
+  "group_slug": "flat-boxes",
+  "directory_name": "4-770 - Standard Flat Boxes, 2nd Gen",
+  "schematic_name": "Standard Flat Boxes, 2nd Gen",
+  "schematic_reference": "4-764-765-766-770",
+  "compatible_skus": [
+    "4-770"
+  ],
+  "compatible_skus_display": "Compatible with SKU(s): 4-770",
+  "pdf_filename": "4-764-765-766-770-New-Hinge-box-Final.pdf",
+  "parts_count": 45,
+  "parts": [
+    {
+      "schematic_number": "1",
+      "part_number": "7273",
+      "description": "14in Flat Box Blade",
+      "price_display": "$7.25"
+    },
+    {
+      "schematic_number": "2",
+      "part_number": "7274",
+      "description": "14in Blade Holder Assembly",
+      "price_display": "$180.00"
+    },
+    {
+      "schematic_number": "3",
+      "part_number": "7217",
+      "description": "#4-40 x 1/4 Fillister Head Screw",
+      "price_display": "$1.00"
+    },
+    {
+      "schematic_number": "4",
+      "part_number": "9219",
+      "description": "Flat box Screw (#4)",
+      "price_display": "$1.00"
+    },
+    {
+      "schematic_number": "5",
+      "part_number": "7552",
+      "description": "14in Blade Holder Bracket",
+      "price_display": "$5.50"
+    },
+    {
+      "schematic_number": "6",
+      "part_number": "7244",
+      "description": "14in Front Plate",
+      "price_display": "$95.00"
+    },
+    {
+      "schematic_number": "7",
+      "part_number": "7015",
+      "description": "#6-32 Thin Pattern Locknut",
+      "price_display": "$1.00"
+    },
+    {
+      "schematic_number": "8",
+      "part_number": "9613",
+      "description": "FB Washer",
+      "price_display": "$1.00"
+    },
+    {
+      "schematic_number": "9",
+      "part_number": "7792",
+      "description": "Latch",
+      "price_display": "$4.75"
+    },
+    {
+      "schematic_number": "10",
+      "part_number": "7798",
+      "description": "Spring Washer",
+      "price_display": "$1.00"
+    },
+    {
+      "schematic_number": "11",
+      "part_number": "7793",
+      "description": "Shoulder Screw",
+      "price_display": "$5.00"
+    },
+    {
+      "schematic_number": "12",
+      "part_number": "7255",
+      "description": "Std Left Side Plate",
+      "price_display": "$65.00"
+    },
+    {
+      "schematic_number": "13",
+      "part_number": "7224",
+      "description": "Repair Clip",
+      "price_display": "$1.00"
+    },
+    {
+      "schematic_number": "14",
+      "part_number": "7239",
+      "description": "Skid Cover Left Side Universal",
+      "price_display": "$2.00"
+    },
+    {
+      "schematic_number": "15",
+      "part_number": "7012",
+      "description": "#6-32 x 1/4 Fillister Head",
+      "price_display": "$1.00"
+    },
+    {
+      "schematic_number": "16",
+      "part_number": "7349",
+      "description": "Hinged Flat Box Screw",
+      "price_display": "$1.00"
+    },
+    {
+      "schematic_number": "17",
+      "part_number": "7229",
+      "description": "14in Bottom Plate",
+      "price_display": "$95.00"
+    },
+    {
+      "schematic_number": "18",
+      "part_number": "8302",
+      "description": "#10-32 Lock Nut",
+      "price_display": "$1.00"
+    },
+    {
+      "schematic_number": "19",
+      "part_number": "7177",
+      "description": "#10 Brass Washer",
+      "price_display": "$1.00"
+    },
+    {
+      "schematic_number": "20",
+      "part_number": "7063",
+      "description": "Bearing Nyliner",
+      "price_display": "$1.50"
+    },
+    {
+      "schematic_number": "21",
+      "part_number": "8301",
+      "description": "#10-32 Hex Head Shoulder Screw",
+      "price_display": "$4.00"
+    },
+    {
+      "schematic_number": "22",
+      "part_number": "7119",
+      "description": "Nyliner Bearing-Straight",
+      "price_display": "$2.75"
+    },
+    {
+      "schematic_number": "23",
+      "part_number": "9685",
+      "description": "FB Box Tire",
+      "price_display": "$1.50"
+    },
+    {
+      "schematic_number": "24",
+      "part_number": "9719",
+      "description": "FB Box Wheel, Black",
+      "price_display": "$6.00"
+    },
+    {
+      "schematic_number": "25",
+      "part_number": "7278",
+      "description": "14in Axle",
+      "price_display": "$45.00"
+    },
+    {
+      "schematic_number": "26",
+      "part_number": "7178",
+      "description": "#14 Brass Washer",
+      "price_display": "$1.00"
+    },
+    {
+      "schematic_number": "27",
+      "part_number": "9237",
+      "description": "FB Bolt (holds axle on)",
+      "price_display": "$5.00"
+    },
+    {
+      "schematic_number": "28",
+      "part_number": "7383",
+      "description": "14in Rubber Hinge Pin Sham",
+      "price_display": "$6.50"
+    },
+    {
+      "schematic_number": "29",
+      "part_number": "7256",
+      "description": "Stnd Right Side Plate",
+      "price_display": "$65.00"
+    },
+    {
+      "schematic_number": "30",
+      "part_number": "7212",
+      "description": "Skid Cover Rt Side, Universal",
+      "price_display": "$2.00"
+    },
+    {
+      "schematic_number": "31",
+      "part_number": "7388",
+      "description": "Pivot for Box Plate Hinge",
+      "price_display": "$8.00"
+    },
+    {
+      "schematic_number": "32",
+      "part_number": "7397",
+      "description": "14in Hinged Pressure Plate",
+      "price_display": "$90.00"
+    },
+    {
+      "schematic_number": "33",
+      "part_number": "8306",
+      "description": "Pressure Plate Nut",
+      "price_display": "$3.00"
+    },
+    {
+      "schematic_number": "34",
+      "part_number": "8232",
+      "description": "T-Nut",
+      "price_display": "$5.00"
+    },
+    {
+      "schematic_number": "35",
+      "part_number": "9916",
+      "description": "AT Wing Nut",
+      "price_display": "$1.00"
+    },
+    {
+      "schematic_number": "36",
+      "part_number": "8303",
+      "description": "#10-32 X 1in SHC Screw",
+      "price_display": "$1.00"
+    },
+    {
+      "schematic_number": "37",
+      "part_number": "8273",
+      "description": "Pressure Plate Ext. Spring",
+      "price_display": "$6.00"
+    },
+    {
+      "schematic_number": "38",
+      "part_number": "9273",
+      "description": "Lightweight Pressure Plate Spring",
+      "price_display": "$5.00"
+    },
+    {
+      "schematic_number": "39",
+      "part_number": "8305",
+      "description": "Spring Anchor",
+      "price_display": "$4.00"
+    },
+    {
+      "schematic_number": "40",
+      "part_number": "8291",
+      "description": "8-32 X 3/8, BHC Screw",
+      "price_display": "$1.00"
+    },
+    {
+      "schematic_number": "41",
+      "part_number": "7393",
+      "description": "14in Hinged Flat Box Gasket",
+      "price_display": "$40.00"
+    },
+    {
+      "schematic_number": "42",
+      "part_number": "7251",
+      "description": "Dial Assembly",
+      "price_display": "$20.00"
+    },
+    {
+      "schematic_number": "43",
+      "part_number": "7275",
+      "description": "12/14in Crown Spring",
+      "price_display": "$10.00"
+    },
+    {
+      "schematic_number": "44",
+      "part_number": "7223",
+      "description": "Dial Adjustment Nut",
+      "price_display": "$4.00"
+    },
+    {
+      "schematic_number": "45",
+      "part_number": "7213",
+      "description": "Brass Pins",
+      "price_display": "$8.00"
+    }
+  ]
+}

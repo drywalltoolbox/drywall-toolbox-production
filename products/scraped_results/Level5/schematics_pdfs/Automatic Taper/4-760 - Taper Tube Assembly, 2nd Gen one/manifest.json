@@ -1,0 +1,184 @@
+{
+  "brand": "Level5",
+  "group_name": "Automatic Taper",
+  "group_slug": "auto-taper",
+  "directory_name": "4-760 - Taper Tube Assembly, 2nd Gen one",
+  "schematic_name": "Taper Tube Assembly, 2nd Gen one",
+  "schematic_reference": null,
+  "compatible_skus": [
+    "4-760"
+  ],
+  "compatible_skus_display": "Compatible with SKU(s): 4-760",
+  "pdf_filename": "Taper-Tube-Assembly.pdf",
+  "parts_count": 28,
+  "parts": [
+    {
+      "schematic_number": "1",
+      "part_number": "7170",
+      "description": "6-32 x 3/16 Round Head",
+      "price_display": "$1.79"
+    },
+    {
+      "schematic_number": "2",
+      "part_number": "7169",
+      "description": "Tube Protector",
+      "price_display": "$23.39"
+    },
+    {
+      "schematic_number": "3",
+      "part_number": "9998",
+      "description": "AT Tape Roll Holder",
+      "price_display": "$51.74"
+    },
+    {
+      "schematic_number": "4",
+      "part_number": "7235",
+      "description": "Taper Band Screw",
+      "price_display": "$2.24"
+    },
+    {
+      "schematic_number": "5",
+      "part_number": "8288",
+      "description": "#8-32, SS, Nylon lock, Hex nut",
+      "price_display": "$1.79"
+    },
+    {
+      "schematic_number": "6",
+      "part_number": "7164",
+      "description": "Tape Spool",
+      "price_display": "$16.64"
+    },
+    {
+      "schematic_number": "7",
+      "part_number": "7287",
+      "description": "Control Tube Assembly",
+      "price_display": "$113.00"
+    },
+    {
+      "schematic_number": "8",
+      "part_number": "9999",
+      "description": "AT Extension Arm Guide",
+      "price_display": "$5.84"
+    },
+    {
+      "schematic_number": "9",
+      "part_number": "7144",
+      "description": "Control Extension Arm",
+      "price_display": "$47.24"
+    },
+    {
+      "schematic_number": "10",
+      "part_number": "7315",
+      "description": "Washer Retaining",
+      "price_display": "$1.79"
+    },
+    {
+      "schematic_number": "11",
+      "part_number": "7055",
+      "description": "Gooser & Cutter Chain",
+      "price_display": "$5.39"
+    },
+    {
+      "schematic_number": "12",
+      "part_number": "7117",
+      "description": "Cutter Chain Tube",
+      "price_display": "$13.94"
+    },
+    {
+      "schematic_number": "13",
+      "part_number": "7116",
+      "description": "1/16 x 1/2in Cotter Pin Fastenal 74268",
+      "price_display": "$1.79"
+    },
+    {
+      "schematic_number": "14",
+      "part_number": "7344",
+      "description": "Taper Head Assembly",
+      "price_display": "$600.00"
+    },
+    {
+      "schematic_number": "15",
+      "part_number": "7013",
+      "description": "#6 Lockwasher Medium",
+      "price_display": "$1.79"
+    },
+    {
+      "schematic_number": "16",
+      "part_number": "7012",
+      "description": "#6-32 x 1/4 Fillister Head",
+      "price_display": "$1.79"
+    },
+    {
+      "schematic_number": "17",
+      "part_number": "7198",
+      "description": "Creaser Connector Assembly",
+      "price_display": "$38.24"
+    },
+    {
+      "schematic_number": "18",
+      "part_number": "7137",
+      "description": "Cable",
+      "price_display": "$10.79"
+    },
+    {
+      "schematic_number": "19",
+      "part_number": "7135",
+      "description": "1/4-20 Hex Nut",
+      "price_display": "$3.00"
+    },
+    {
+      "schematic_number": "20",
+      "part_number": "7131",
+      "description": "1/4-20 Hex Castle Nut",
+      "price_display": "$7.25"
+    },
+    {
+      "schematic_number": "21",
+      "part_number": "7133",
+      "description": "Plunger Cup Washer",
+      "price_display": "$7.25"
+    },
+    {
+      "schematic_number": "22",
+      "part_number": "7132",
+      "description": "Plunger Cup",
+      "price_display": "$39.14"
+    },
+    {
+      "schematic_number": "23",
+      "part_number": "7130",
+      "description": "Plunger",
+      "price_display": "$43.64"
+    },
+    {
+      "schematic_number": "24",
+      "part_number": "7134",
+      "description": "1/4-20 X 3/4in HH Screw",
+      "price_display": "$4.00"
+    },
+    {
+      "schematic_number": "25",
+      "part_number": "7168",
+      "description": "S-Hook",
+      "price_display": "$3.14"
+    },
+    {
+      "schematic_number": "26",
+      "part_number": "7166",
+      "description": "Taper Tube",
+      "price_display": "$350.99"
+    },
+    {
+      "schematic_number": "27",
+      "part_number": "7178",
+      "description": "#14 Brass Washer",
+      "price_display": "$1.79"
+    },
+    {
+      "schematic_number": "28",
+      "part_number": "7165",
+      "description": "Creaser Trigger",
+      "price_display": "$57.14"
+    }
+  ]
+}

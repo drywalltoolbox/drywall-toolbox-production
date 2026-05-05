@@ -1,0 +1,76 @@
+{
+  "brand": "Level5",
+  "group_name": "Automatic Taper",
+  "group_slug": "auto-taper",
+  "directory_name": "4-760 - Cutter Chain Assembly, 2nd Gen [#9333]",
+  "schematic_name": "Cutter Chain Assembly, 2nd Gen [#9333]",
+  "schematic_reference": "9333",
+  "compatible_skus": [
+    "4-760"
+  ],
+  "compatible_skus_display": "Compatible with SKU(s): 4-760",
+  "pdf_filename": "9333-Cutter-Chain-Assembly.pdf",
+  "parts_count": 10,
+  "parts": [
+    {
+      "schematic_number": "1",
+      "part_number": "7116",
+      "description": "1/16 x 1/2in Cotter Pin Fastenal 74268",
+      "price_display": "$1.79"
+    },
+    {
+      "schematic_number": "2",
+      "part_number": "7332",
+      "description": "Cutter Chain without Spring",
+      "price_display": "$88.19"
+    },
+    {
+      "schematic_number": "3",
+      "part_number": "7136",
+      "description": "4-40 x 6.3MM FLH Screw, Phillips",
+      "price_display": "$4.49"
+    },
+    {
+      "schematic_number": "4",
+      "part_number": "7111",
+      "description": "Pyramid Blade",
+      "price_display": "$3.14"
+    },
+    {
+      "schematic_number": "5",
+      "part_number": "7112",
+      "description": "Cutter Block Clamp",
+      "price_display": "$15.29"
+    },
+    {
+      "schematic_number": "6",
+      "part_number": "9108",
+      "description": "Cutter Chain Spring",
+      "price_display": "$16.64"
+    },
+    {
+      "schematic_number": "7",
+      "part_number": "7054",
+      "description": "Key Ring",
+      "price_display": "$1.79"
+    },
+    {
+      "schematic_number": "8",
+      "part_number": "9917",
+      "description": "AT Key Ring Holder",
+      "price_display": "$22.04"
+    },
+    {
+      "schematic_number": "9",
+      "part_number": "7177",
+      "description": "#10 Brass Washer",
+      "price_display": "$1.79"
+    },
+    {
+      "schematic_number": "10",
+      "part_number": "9916",
+      "description": "AT Wing Nut",
+      "price_display": "$1.79"
+    }
+  ]
+}

@@ -1,0 +1,40 @@
+{
+  "brand": "Level5",
+  "group_name": "Nail Spotters",
+  "group_slug": "spotter",
+  "directory_name": "Nail Spotters",
+  "schematic_count": 3,
+  "unique_pdf_count": 2,
+  "schematics": [
+    {
+      "schematic_name": "Nail Spotters, 2nd Gen",
+      "schematic_reference": "4-754-4-755",
+      "compatible_skus": [
+        "4-754"
+      ],
+      "schematic_directory_name": "4-754 - Nail Spotters, 2nd Gen",
+      "pdf_filename": "4-754-4-755-N.Spotter-Final.pdf",
+      "parts_count": 47
+    },
+    {
+      "schematic_name": "Nail Spotters, 2nd Gen",
+      "schematic_reference": "4-754-4-755",
+      "compatible_skus": [
+        "4-755"
+      ],
+      "schematic_directory_name": "4-755 - Nail Spotters, 2nd Gen",
+      "pdf_filename": "4-754-4-755-N.Spotter-Final.pdf",
+      "parts_count": 47
+    },
+    {
+      "schematic_name": "2in Nail Spotter (Discontinued)",
+      "schematic_reference": "2",
+      "compatible_skus": [
+        "4-754"
+      ],
+      "schematic_directory_name": "4-754 - 2in Nail Spotter (Discontinued)",
+      "pdf_filename": "2-inch-Nail-Spotter-4-754-old-style.pdf",
+      "parts_count": 34
+    }
+  ]
+}

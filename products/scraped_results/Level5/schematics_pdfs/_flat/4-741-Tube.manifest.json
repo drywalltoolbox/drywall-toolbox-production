@@ -1,0 +1,17 @@
+{
+  "brand": "Level5",
+  "pdf_filename": "4-741-Tube.pdf",
+  "schematic_page_count": 1,
+  "referenced_by": [
+    {
+      "group_name": "Compound Tube",
+      "group_slug": "tube",
+      "schematic_name": "Compound Tube",
+      "schematic_reference": "4-741",
+      "compatible_skus": [
+        "4-741"
+      ],
+      "schematic_directory_name": "4-741 - Compound Tube"
+    }
+  ]
+}

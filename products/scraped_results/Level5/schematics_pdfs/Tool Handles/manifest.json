@@ -1,0 +1,60 @@
+{
+  "brand": "Level5",
+  "group_name": "Tool Handles",
+  "group_slug": "handles",
+  "directory_name": "Tool Handles",
+  "schematic_count": 5,
+  "unique_pdf_count": 5,
+  "schematics": [
+    {
+      "schematic_name": "Extendable Flat Box Handle, 40in - 62in",
+      "schematic_reference": "4-780",
+      "compatible_skus": [
+        "4-780"
+      ],
+      "schematic_directory_name": "4-780 - Extendable Flat Box Handle, 40in - 62in",
+      "pdf_filename": "4-780-EXT-BOX-Handle-Final-Revision.pdf",
+      "parts_count": 33
+    },
+    {
+      "schematic_name": "Extendable Flat Box Handle, 30in - 42in",
+      "schematic_reference": "4-781",
+      "compatible_skus": [
+        "4-781"
+      ],
+      "schematic_directory_name": "4-781 - Extendable Flat Box Handle, 30in - 42in",
+      "pdf_filename": "4-781-EXT-BOX-Handle-Final-Revision.pdf",
+      "parts_count": 33
+    },
+    {
+      "schematic_name": "Extendable Flat Box Handle, 23in - 32in",
+      "schematic_reference": "4-782",
+      "compatible_skus": [
+        "4-782"
+      ],
+      "schematic_directory_name": "4-782 - Extendable Flat Box Handle, 23in - 32in",
+      "pdf_filename": "4-782-EXT-BOX-Handle-Final-Revision.pdf",
+      "parts_count": 33
+    },
+    {
+      "schematic_name": "Extendable Handle Only, 31in - 50in",
+      "schematic_reference": "52",
+      "compatible_skus": [
+        "4-880"
+      ],
+      "schematic_directory_name": "4-880 - Extendable Handle Only, 31in - 50in",
+      "pdf_filename": "52-inch-Extendable-Accessory-Handle-4-880.pdf",
+      "parts_count": 21
+    },
+    {
+      "schematic_name": "Extendable Handle Only, 43in - 72in",
+      "schematic_reference": "72",
+      "compatible_skus": [
+        "4-881"
+      ],
+      "schematic_directory_name": "4-881 - Extendable Handle Only, 43in - 72in",
+      "pdf_filename": "72-inch-Extendable-Accessory-Handle-4-881.pdf",
+      "parts_count": 21
+    }
+  ]
+}

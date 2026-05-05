@@ -1,0 +1,17 @@
+{
+  "brand": "Level5",
+  "pdf_filename": "7-inch-Mega-Flat-Box-4-767.pdf",
+  "schematic_page_count": 1,
+  "referenced_by": [
+    {
+      "group_name": "Flat Boxes",
+      "group_slug": "flat-boxes",
+      "schematic_name": "7in MEGA Flat Box, 1st Gen",
+      "schematic_reference": "7",
+      "compatible_skus": [
+        "4-767"
+      ],
+      "schematic_directory_name": "4-767 - 7in MEGA Flat Box, 1st Gen"
+    }
+  ]
+}

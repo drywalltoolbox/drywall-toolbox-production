@@ -1,0 +1,154 @@
+{
+  "brand": "Level5",
+  "group_name": "Corner Finishers",
+  "group_slug": "corner-finisher",
+  "directory_name": "4-732 - 2.5in Corner Finisher",
+  "schematic_name": "2.5in Corner Finisher",
+  "schematic_reference": "2",
+  "compatible_skus": [
+    "4-732"
+  ],
+  "compatible_skus_display": "Compatible with SKU(s): 4-732",
+  "pdf_filename": "2.5-inch-Corner-Finisher-4-732.pdf",
+  "parts_count": 23,
+  "parts": [
+    {
+      "schematic_number": "1",
+      "part_number": "9510",
+      "description": "CF Screw 6-32x15",
+      "price_display": "$4.49"
+    },
+    {
+      "schematic_number": "2",
+      "part_number": "9511",
+      "description": "CF SS Flat Washer",
+      "price_display": "$4.49"
+    },
+    {
+      "schematic_number": "3",
+      "part_number": "9512",
+      "description": "CF Rubber Tire",
+      "price_display": "$1.79"
+    },
+    {
+      "schematic_number": "4",
+      "part_number": "9513",
+      "description": "CF Wheel Bushing",
+      "price_display": "$5.84"
+    },
+    {
+      "schematic_number": "5",
+      "part_number": "9514",
+      "description": "Finisher Wheels",
+      "price_display": "$12.59"
+    },
+    {
+      "schematic_number": "6",
+      "part_number": "7190",
+      "description": "CF Slotted Screw 8-32 x 6.35",
+      "price_display": "$1.79"
+    },
+    {
+      "schematic_number": "7",
+      "part_number": "9192",
+      "description": "CF Bottom Clip 2.5in & 3in",
+      "price_display": "$15.29"
+    },
+    {
+      "schematic_number": "8",
+      "part_number": "9702",
+      "description": "CF 2.5in Body",
+      "price_display": "$0"
+    },
+    {
+      "schematic_number": "9",
+      "part_number": "9714",
+      "description": "CF 2.5in Left Frame",
+      "price_display": "$82.00"
+    },
+    {
+      "schematic_number": "10",
+      "part_number": "9189",
+      "description": "CF 2.5in and 3in Skid",
+      "price_display": "$20.69"
+    },
+    {
+      "schematic_number": "11",
+      "part_number": "9191",
+      "description": "CF 6-32 x 1/8 SS Hex",
+      "price_display": "$1.79"
+    },
+    {
+      "schematic_number": "12",
+      "part_number": "9706",
+      "description": "CF 2.5in Blade",
+      "price_display": "$24.74"
+    },
+    {
+      "schematic_number": "13",
+      "part_number": "9509",
+      "description": "CF Frame Tabs",
+      "price_display": "$3.14"
+    },
+    {
+      "schematic_number": "14",
+      "part_number": "9508",
+      "description": "CF Screw",
+      "price_display": "$1.79"
+    },
+    {
+      "schematic_number": "15",
+      "part_number": "9195",
+      "description": "CF Top Clip 2.5in & 3in",
+      "price_display": "$8.54"
+    },
+    {
+      "schematic_number": "16",
+      "part_number": "9524",
+      "description": "CF 2.5in Spring",
+      "price_display": "$8.00"
+    },
+    {
+      "schematic_number": "17",
+      "part_number": "7741",
+      "description": "CF Ball Locking Clip",
+      "price_display": "$23.39"
+    },
+    {
+      "schematic_number": "18",
+      "part_number": "7740",
+      "description": "CF Lock Clip Spring",
+      "price_display": "$1.79"
+    },
+    {
+      "schematic_number": "19",
+      "part_number": "7742",
+      "description": "CF Locking Clip Tab",
+      "price_display": "$15.29"
+    },
+    {
+      "schematic_number": "20",
+      "part_number": "7075",
+      "description": "6-32 x 1/2 FillisterHeadScrew",
+      "price_display": "$1.00"
+    },
+    {
+      "schematic_number": "21",
+      "part_number": "7183",
+      "description": "Insert Socket",
+      "price_display": "$27.44"
+    },
+    {
+      "schematic_number": "22",
+      "part_number": "7312",
+      "description": "CF 6-32 X 1/4 Bind Head Screw SST",
+      "price_display": "$1.79"
+    },
+    {
+      "schematic_number": "23",
+      "part_number": "9708",
+      "description": "CF 2.5in Right Frame",
+      "price_display": "$111.14"
+    }
+  ]
+}

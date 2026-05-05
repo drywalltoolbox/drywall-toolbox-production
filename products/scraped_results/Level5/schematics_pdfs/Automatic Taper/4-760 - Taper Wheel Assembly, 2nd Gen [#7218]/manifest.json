@@ -1,0 +1,46 @@
+{
+  "brand": "Level5",
+  "group_name": "Automatic Taper",
+  "group_slug": "auto-taper",
+  "directory_name": "4-760 - Taper Wheel Assembly, 2nd Gen [#7218]",
+  "schematic_name": "Taper Wheel Assembly, 2nd Gen [#7218]",
+  "schematic_reference": "7218",
+  "compatible_skus": [
+    "4-760"
+  ],
+  "compatible_skus_display": "Compatible with SKU(s): 4-760",
+  "pdf_filename": "7218-Taper-Wheel-Assembly.pdf",
+  "parts_count": 5,
+  "parts": [
+    {
+      "schematic_number": "1",
+      "part_number": "7047",
+      "description": "4-40 x3/16 Bind Head Screw",
+      "price_display": "$1.79"
+    },
+    {
+      "schematic_number": "2",
+      "part_number": "7077",
+      "description": "Taper Wheel",
+      "price_display": "$19.34"
+    },
+    {
+      "schematic_number": "3",
+      "part_number": "7090",
+      "description": "Drive hub",
+      "price_display": "$20.69"
+    },
+    {
+      "schematic_number": "4",
+      "part_number": "7078",
+      "description": "Taper Wheel Spool",
+      "price_display": "$38.69"
+    },
+    {
+      "schematic_number": "5",
+      "part_number": "7070",
+      "description": "8-32 x 1/4 FH Screw",
+      "price_display": "$1.79"
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "brand": "Level5",
+  "pdf_filename": "7218-Taper-Wheel-Assembly.pdf",
+  "schematic_page_count": 1,
+  "referenced_by": [
+    {
+      "group_name": "Automatic Taper",
+      "group_slug": "auto-taper",
+      "schematic_name": "Taper Wheel Assembly, 2nd Gen [#7218]",
+      "schematic_reference": "7218",
+      "compatible_skus": [
+        "4-760"
+      ],
+      "schematic_directory_name": "4-760 - Taper Wheel Assembly, 2nd Gen [#7218]"
+    }
+  ]
+}
