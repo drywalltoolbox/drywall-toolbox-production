@@ -1,0 +1,212 @@
+{
+  "id": "1777935057955",
+  "title": "8142TT",
+  "diagramPages": [
+    11
+  ],
+  "legendPages": [],
+  "parts": [
+    {
+      "id": "809025",
+      "name": "Slotted Spring Pin 1/8 X 3/4 Sst.",
+      "quantity": 1,
+      "sku": "809025"
+    },
+    {
+      "id": "814234",
+      "name": "34\" Connector Assy",
+      "quantity": 1,
+      "sku": "814234"
+    },
+    {
+      "id": "814242",
+      "name": "42\" Connector Assy",
+      "quantity": 1,
+      "sku": "814242"
+    },
+    {
+      "id": "814254",
+      "name": "54\" Connector Assy",
+      "quantity": 1,
+      "sku": "814254"
+    },
+    {
+      "id": "814272",
+      "name": "72\" Connector Assy",
+      "quantity": 1,
+      "sku": "814272"
+    },
+    {
+      "id": "702031F",
+      "name": "Handle Ball",
+      "quantity": 1,
+      "sku": "702031F"
+    },
+    {
+      "id": "804003F",
+      "name": "Grip Assembly",
+      "quantity": 1,
+      "sku": "804003F"
+    },
+    {
+      "id": "809024",
+      "name": "Stscrew 1/4-28X1/4",
+      "quantity": 2,
+      "sku": "809024"
+    },
+    {
+      "id": "809011",
+      "name": "Thumbscrew 5/16 - 18 X 3/4 Dog Point",
+      "quantity": 1,
+      "sku": "809011"
+    },
+    {
+      "id": "818134G",
+      "name": "34\" Curved Handle Tube, Gold",
+      "quantity": 1,
+      "sku": "818134G"
+    },
+    {
+      "id": "818142G",
+      "name": "42\" Curved Handle Tube, Gold",
+      "quantity": 1,
+      "sku": "818142G"
+    },
+    {
+      "id": "818154G",
+      "name": "54\" Curved Handle Tube, Gold",
+      "quantity": 1,
+      "sku": "818154G"
+    },
+    {
+      "id": "818172G",
+      "name": "72\" Curved Handle Tube, Gold",
+      "quantity": 1,
+      "sku": "818172G"
+    },
+    {
+      "id": "609012",
+      "name": "Stopnut 4-40 S.S",
+      "quantity": 2,
+      "sku": "609012"
+    },
+    {
+      "id": "059217",
+      "name": "Screw 4-40 X 3/8 Bind. Hd. S.S.",
+      "quantity": 2,
+      "sku": "059217"
+    },
+    {
+      "id": "810027",
+      "name": "Short Connector",
+      "quantity": 1,
+      "sku": "810027"
+    },
+    {
+      "id": "810028",
+      "name": "Swivel Axle",
+      "quantity": 1,
+      "sku": "810028"
+    },
+    {
+      "id": "810029",
+      "name": "Connector Coupling",
+      "quantity": 2,
+      "sku": "810029"
+    },
+    {
+      "id": "808015F",
+      "name": "Hinge Assy",
+      "quantity": 1,
+      "sku": "808015F"
+    },
+    {
+      "id": "059143",
+      "name": "Cotter Pin 1/16 X 1/2 SST.",
+      "quantity": 1,
+      "sku": "059143"
+    },
+    {
+      "id": "809012",
+      "name": "8-32 X 3/8 Hex Socket Capscrew 18-8 S.S.",
+      "quantity": 4,
+      "sku": "809012"
+    },
+    {
+      "id": "809017",
+      "name": "#8 Reg. Spring Helical Lockwasher, Sst.",
+      "quantity": 4,
+      "sku": "809017"
+    },
+    {
+      "id": "800021F",
+      "name": "Pin",
+      "quantity": 1,
+      "sku": "800021F"
+    },
+    {
+      "id": "059012",
+      "name": "Screw 6-32 X 3/8 Fil. Hd. S.S.",
+      "quantity": 1,
+      "sku": "059012"
+    },
+    {
+      "id": "800008",
+      "name": "Pivot Arm",
+      "quantity": 1,
+      "sku": "800008"
+    },
+    {
+      "id": "801009",
+      "name": "Unknown Part",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "059260",
+      "name": "Nut 8-32 Hex. H.D. S.S",
+      "quantity": 1,
+      "sku": "059260"
+    },
+    {
+      "id": "809024",
+      "name": "Stscrew 1/4-28X1/4",
+      "quantity": 2,
+      "sku": "809024"
+    },
+    {
+      "id": "809004",
+      "name": "8-32 x 3/4 Hex Soc Set Screw",
+      "quantity": 1,
+      "sku": "809004"
+    },
+    {
+      "id": "800018F",
+      "name": "Connector Plate, Notched",
+      "quantity": 1,
+      "sku": "800018F"
+    },
+    {
+      "id": "800016",
+      "name": "Quadrant",
+      "quantity": 1,
+      "sku": "800016"
+    },
+    {
+      "id": "809017",
+      "name": "#8 Reg. Spring Helical Lockwasher, Sst.",
+      "quantity": 4,
+      "sku": "809017"
+    },
+    {
+      "id": "809012",
+      "name": "8-32 X 3/8 Hex Socket Capscrew 18-8 S.S.",
+      "quantity": 4,
+      "sku": "809012"
+    }
+  ],
+  "coordinates": {},
+  "schema_version": "1.0",
+  "image_natural_width": 1000,
+  "image_natural_height": 1000
+}

@@ -1,0 +1,38 @@
+{
+  "id": "1777933053470",
+  "title": "85T",
+  "diagramPages": [
+    1
+  ],
+  "legendPages": [],
+  "parts": [
+    {
+      "id": "859016",
+      "name": "Unknown Part",
+      "quantity": 2,
+      "sku": ""
+    },
+    {
+      "id": "709034",
+      "name": "Unknown Part",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "861014",
+      "name": "Unknown Part",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "856003F",
+      "name": "Unknown Part",
+      "quantity": 1,
+      "sku": ""
+    }
+  ],
+  "coordinates": {},
+  "schema_version": "1.0",
+  "image_natural_width": 1224,
+  "image_natural_height": 792
+}

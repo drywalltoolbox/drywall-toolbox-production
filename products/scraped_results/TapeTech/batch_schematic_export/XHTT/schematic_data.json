@@ -1,0 +1,122 @@
+{
+  "id": "1777936233847",
+  "title": "XHTT",
+  "diagramPages": [
+    17
+  ],
+  "legendPages": [],
+  "parts": [
+    {
+      "id": "059619",
+      "name": "Unknown Part",
+      "quantity": 2,
+      "sku": ""
+    },
+    {
+      "id": "880061",
+      "name": "Unknown Part",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "882039",
+      "name": "Unknown Part",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "883002",
+      "name": "Unknown Part",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "059619",
+      "name": "Unknown Part",
+      "quantity": 2,
+      "sku": ""
+    },
+    {
+      "id": "883020",
+      "name": "Unknown Part",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "499023",
+      "name": "Unknown Part",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "883011",
+      "name": "Unknown Part",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "883014",
+      "name": "Unknown Part",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "882013",
+      "name": "Unknown Part",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "889017",
+      "name": "Unknown Part",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "059037",
+      "name": "Unknown Part",
+      "quantity": 2,
+      "sku": ""
+    },
+    {
+      "id": "883001G",
+      "name": "Unknown Part",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "880053",
+      "name": "Unknown Part",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "883003",
+      "name": "Unknown Part",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "889057",
+      "name": "Unknown Part",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "883005",
+      "name": "Unknown Part",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "880060",
+      "name": "Unknown Part",
+      "quantity": 1,
+      "sku": ""
+    }
+  ],
+  "coordinates": {},
+  "schema_version": "1.0",
+  "image_natural_width": 1000,
+  "image_natural_height": 1000
+}

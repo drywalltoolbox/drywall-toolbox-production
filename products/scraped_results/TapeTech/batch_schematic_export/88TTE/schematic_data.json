@@ -1,0 +1,273 @@
+{
+  "id": "1777933053471",
+  "title": "88TTE",
+  "diagramPages": [
+    1,
+    2
+  ],
+  "legendPages": [],
+  "parts": [
+    {
+      "id": "889062",
+      "name": "Unknown Part",
+      "quantity": 2,
+      "sku": ""
+    },
+    {
+      "id": "191006",
+      "name": "Unknown Part",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "191001",
+      "name": "Unknown Part",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "219080",
+      "name": "Unknown Part",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "059018",
+      "name": "Unknown Part",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "191007",
+      "name": "Unknown Part",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "880028",
+      "name": "Unknown Part",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "059127",
+      "name": "Unknown Part",
+      "quantity": 2,
+      "sku": ""
+    },
+    {
+      "id": "196003",
+      "name": "Unknown Part",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "190002",
+      "name": "Unknown Part",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "199011",
+      "name": "Unknown Part",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "199010",
+      "name": "Unknown Part",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "811018",
+      "name": "Unknown Part",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "889027",
+      "name": "Unknown Part",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "880006F",
+      "name": "Unknown Part",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "880038",
+      "name": "Unknown Part",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "882039",
+      "name": "Unknown Part",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "889035",
+      "name": "Unknown Part",
+      "quantity": 2,
+      "sku": ""
+    },
+    {
+      "id": "889035",
+      "name": "Unknown Part",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "882002",
+      "name": "Unknown Part",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "882001G",
+      "name": "Unknown Part",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "889035",
+      "name": "Unknown Part",
+      "quantity": 4,
+      "sku": ""
+    },
+    {
+      "id": "880042",
+      "name": "Unknown Part",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "190034",
+      "name": "Unknown Part",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "819038",
+      "name": "Unknown Part",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "889055",
+      "name": "Unknown Part",
+      "quantity": 2,
+      "sku": ""
+    },
+    {
+      "id": "190036",
+      "name": "Unknown Part",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "190033",
+      "name": "Unknown Part",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "880006F",
+      "name": "Unknown Part",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "889016",
+      "name": "Unknown Part",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "880004",
+      "name": "Unknown Part",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "881005",
+      "name": "Unknown Part",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "882016",
+      "name": "Unknown Part",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "889015",
+      "name": "Unknown Part",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "883011",
+      "name": "Unknown Part",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "059037",
+      "name": "Unknown Part",
+      "quantity": 2,
+      "sku": ""
+    },
+    {
+      "id": "889017",
+      "name": "Unknown Part",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "880053",
+      "name": "Unknown Part",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "889057",
+      "name": "Unknown Part",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "499023",
+      "name": "Unknown Part",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "883014",
+      "name": "Unknown Part",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "882013",
+      "name": "Unknown Part",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "883003",
+      "name": "Unknown Part",
+      "quantity": 1,
+      "sku": ""
+    }
+  ],
+  "coordinates": {},
+  "schema_version": "1.0",
+  "image_natural_width": 1224,
+  "image_natural_height": 792
+}

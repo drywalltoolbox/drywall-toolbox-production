@@ -1,0 +1,110 @@
+{
+  "id": "1777935057955",
+  "title": "CT24TT",
+  "diagramPages": [
+    15
+  ],
+  "legendPages": [],
+  "parts": [
+    {
+      "id": "130004",
+      "name": "Spring Latch",
+      "quantity": 4,
+      "sku": "130004"
+    },
+    {
+      "id": "139009",
+      "name": "Nut, 4-40 Small Pattern, SST",
+      "quantity": 2,
+      "sku": "139009"
+    },
+    {
+      "id": "139011",
+      "name": "O-Ring, dash 225",
+      "quantity": 1,
+      "sku": "139011"
+    },
+    {
+      "id": "130001",
+      "name": "Cap",
+      "quantity": 1,
+      "sku": "130001"
+    },
+    {
+      "id": "130002",
+      "name": "Outlet",
+      "quantity": 1,
+      "sku": "130002"
+    },
+    {
+      "id": "130003",
+      "name": "Tube Band",
+      "quantity": 2,
+      "sku": "130003"
+    },
+    {
+      "id": "059801",
+      "name": "Screw, 4-40 x 9/16, Bind Hd, SST",
+      "quantity": 2,
+      "sku": "059801"
+    },
+    {
+      "id": "130024",
+      "name": "Main Tube, 24\"",
+      "quantity": 1,
+      "sku": "130024"
+    },
+    {
+      "id": "139010",
+      "name": "Screw, 4-40 x 1-1/4 SHCS",
+      "quantity": 2,
+      "sku": "139010"
+    },
+    {
+      "id": "130006",
+      "name": "Ball",
+      "quantity": 1,
+      "sku": "130006"
+    },
+    {
+      "id": "130005",
+      "name": "Guide",
+      "quantity": 1,
+      "sku": "130005"
+    },
+    {
+      "id": "130124",
+      "name": "Push Rod, 24\"",
+      "quantity": 1,
+      "sku": "130124"
+    },
+    {
+      "id": "139010",
+      "name": "Screw, 4-40 x 1-1/4 SHCS",
+      "quantity": 2,
+      "sku": "139010"
+    },
+    {
+      "id": "139008",
+      "name": "Wiper, MudTube",
+      "quantity": 2,
+      "sku": "139008"
+    },
+    {
+      "id": "130007",
+      "name": "Piston",
+      "quantity": 1,
+      "sku": "130007"
+    },
+    {
+      "id": "609012",
+      "name": "Stopnut 4-40 S.S",
+      "quantity": 1,
+      "sku": "609012"
+    }
+  ],
+  "coordinates": {},
+  "schema_version": "1.0",
+  "image_natural_width": 1000,
+  "image_natural_height": 1000
+}

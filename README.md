@@ -56,7 +56,7 @@ drywall-toolbox/
 └── index.php                  ← Thin passthrough
 ```
 
----
+----
 
 ## Quick Start — Local Development
 

@@ -1,0 +1,266 @@
+{
+  "id": "1777936233843",
+  "title": "NS03TT",
+  "diagramPages": [
+    3
+  ],
+  "legendPages": [],
+  "parts": [
+    {
+      "id": "059225",
+      "name": "Nut 10-32 Elastic",
+      "quantity": 2,
+      "sku": "059225"
+    },
+    {
+      "id": "209042",
+      "name": "#10 Brass Washer",
+      "quantity": 1,
+      "sku": "209042"
+    },
+    {
+      "id": "650040",
+      "name": "Special Washer",
+      "quantity": 1,
+      "sku": "650040"
+    },
+    {
+      "id": "602045F",
+      "name": "Special Washer",
+      "quantity": 1,
+      "sku": "602045F"
+    },
+    {
+      "id": "609020",
+      "name": "Friction Washer",
+      "quantity": 1,
+      "sku": "609020"
+    },
+    {
+      "id": "600022",
+      "name": "Connector",
+      "quantity": 2,
+      "sku": "600022"
+    },
+    {
+      "id": "883022",
+      "name": "NS Adapter",
+      "quantity": 1,
+      "sku": "883022"
+    },
+    {
+      "id": "883021",
+      "name": "NS Adapter Jam Nut",
+      "quantity": 1,
+      "sku": "883021"
+    },
+    {
+      "id": "883023",
+      "name": "NS Adapter Clamp",
+      "quantity": 1,
+      "sku": "883023"
+    },
+    {
+      "id": "209755",
+      "name": "Screw, 6-32 x 1/2 Flat Hd",
+      "quantity": 2,
+      "sku": "209755"
+    },
+    {
+      "id": "609011",
+      "name": "Screw, Rnd. Hd. S.S.",
+      "quantity": 3,
+      "sku": "609011"
+    },
+    {
+      "id": "059057",
+      "name": "Screw 4-40 x 3/16 Bind Hd. S.S",
+      "quantity": 2,
+      "sku": "059057"
+    },
+    {
+      "id": "709050",
+      "name": "Unknown Part",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "609018",
+      "name": "Washer (Plastic)",
+      "quantity": 4,
+      "sku": "609018"
+    },
+    {
+      "id": "684028",
+      "name": "3\" Press Plate Assy",
+      "quantity": 1,
+      "sku": "684028"
+    },
+    {
+      "id": "809017",
+      "name": "Unknown Part",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "630017",
+      "name": "Unknown Part",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "729064",
+      "name": "Unknown Part",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "681015",
+      "name": "3\" N.S. Wiper",
+      "quantity": 1,
+      "sku": "681015"
+    },
+    {
+      "id": "609050",
+      "name": "Screw,6-32 X 3/32 Slotted Rd Hd",
+      "quantity": 5,
+      "sku": "609050"
+    },
+    {
+      "id": "602035",
+      "name": "Adjustable Stop",
+      "quantity": 1,
+      "sku": "602035"
+    },
+    {
+      "id": "639020",
+      "name": "Plastic Washer",
+      "quantity": 1,
+      "sku": "639020"
+    },
+    {
+      "id": "680002",
+      "name": "Latch, 3\" N.S.",
+      "quantity": 1,
+      "sku": "680002"
+    },
+    {
+      "id": "059225",
+      "name": "Nut 10-32 Elastic",
+      "quantity": 2,
+      "sku": "059225"
+    },
+    {
+      "id": "609049",
+      "name": "Serrated Hex Flange Nut",
+      "quantity": 5,
+      "sku": "609049"
+    },
+    {
+      "id": "650005F",
+      "name": "Blade, Carbide, 3\" N.S.",
+      "quantity": 1,
+      "sku": "650005F"
+    },
+    {
+      "id": "654036",
+      "name": "Blade Clamp Assy",
+      "quantity": 1,
+      "sku": "654036"
+    },
+    {
+      "id": "680009",
+      "name": "3\" N.S. Facing",
+      "quantity": 1,
+      "sku": "680009"
+    },
+    {
+      "id": "609048",
+      "name": "4-40X3/8 Flat Head S.S. Screw",
+      "quantity": 1,
+      "sku": "609048"
+    },
+    {
+      "id": "609008",
+      "name": "Screw 4-40 X 1/2 Flat Hd. S.S.",
+      "quantity": 1,
+      "sku": "609008"
+    },
+    {
+      "id": "650007",
+      "name": "3\" Skid",
+      "quantity": 1,
+      "sku": "650007"
+    },
+    {
+      "id": "359005",
+      "name": "Screw: 6-32 X 1/4 Bind Hd.",
+      "quantity": 4,
+      "sku": "359005"
+    },
+    {
+      "id": "602029F",
+      "name": "Rivet, Special",
+      "quantity": 1,
+      "sku": "602029F"
+    },
+    {
+      "id": "688001",
+      "name": "3\" Easyclean Nail Spotter Body, No-Logo",
+      "quantity": 1,
+      "sku": "688001"
+    },
+    {
+      "id": "359005",
+      "name": "Screw: 6-32 X 1/4 Bind Hd.",
+      "quantity": 4,
+      "sku": "359005"
+    },
+    {
+      "id": "632026",
+      "name": "Spring, Nail Spotters",
+      "quantity": 2,
+      "sku": "632026"
+    },
+    {
+      "id": "609015",
+      "name": "Nut Block",
+      "quantity": 1,
+      "sku": "609015"
+    },
+    {
+      "id": "609012",
+      "name": "Stopnut 4-40 S.S",
+      "quantity": 1,
+      "sku": "609012"
+    },
+    {
+      "id": "509008",
+      "name": "Screw, 10-32 X 1/2 Bind Hd S.S.",
+      "quantity": 1,
+      "sku": "509008"
+    },
+    {
+      "id": "659021",
+      "name": "Unknown Part",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "680030",
+      "name": "3\" N.S. Insert",
+      "quantity": 1,
+      "sku": "680030"
+    },
+    {
+      "id": "680010",
+      "name": "3\" Hinge Block",
+      "quantity": 1,
+      "sku": "680010"
+    }
+  ],
+  "coordinates": {},
+  "schema_version": "1.0",
+  "image_natural_width": 1000,
+  "image_natural_height": 1000
+}
