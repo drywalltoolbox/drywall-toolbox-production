@@ -1,0 +1,74 @@
+{
+  "generated_at": "2026-05-05T01:50:37.556543+00:00",
+  "source_built_catalog": "D:\\AMD\\projects\\drywall-toolbox\\products\\reports\\TapeTech\\wc-catalog.tapetech-drywall-built.csv",
+  "source_old_production_catalog": "D:\\AMD\\projects\\drywall-toolbox\\products\\scraped_results\\wp-catalog.csv.bak",
+  "audit_report": "D:\\AMD\\projects\\drywall-toolbox\\products\\reports\\TapeTech\\wc-catalog.tapetech-variable-normalization-audit.csv",
+  "parent_rows_changed": 43,
+  "parent_sku_updates": 11,
+  "parent_mpn_updates": 43,
+  "variation_rows_changed": 75,
+  "variation_parent_updates": 32,
+  "variation_mpn_updates": 52,
+  "variation_mpn_unresolved": 4,
+  "variation_mpn_sources": {
+    "old_and_description_match": 1,
+    "description_code": 22,
+    "strip_tapetech_prefix": 4,
+    "description_code_pack_suffix": 17,
+    "description_code_format_normalization": 8
+  },
+  "unresolved_variation_rows": [
+    {
+      "record_type": "variation",
+      "row_number": "1687",
+      "name": "TapeTech 24\" Finishing Knife and 12\" Compound Roller Set w/ Support Handle/Adapter",
+      "current_sku": "72052",
+      "proposed_sku": "72052",
+      "current_parent": "TapeTechFinishingKnifeand12CompoundRollerSetwSupportHandleAdapter",
+      "proposed_parent": "TapeTechFinishingKnifeand12CompoundRollerSetwSupportHandleAdapter",
+      "current_mpn": "",
+      "proposed_mpn": "",
+      "source": "unresolved",
+      "notes": ""
+    },
+    {
+      "record_type": "variation",
+      "row_number": "1688",
+      "name": "TapeTech 32\" Finishing Knife and 12\" Compound Roller Set w/ Support Handle/Adapter",
+      "current_sku": "72054",
+      "proposed_sku": "72054",
+      "current_parent": "TapeTechFinishingKnifeand12CompoundRollerSetwSupportHandleAdapter",
+      "proposed_parent": "TapeTechFinishingKnifeand12CompoundRollerSetwSupportHandleAdapter",
+      "current_mpn": "",
+      "proposed_mpn": "",
+      "source": "unresolved",
+      "notes": ""
+    },
+    {
+      "record_type": "variation",
+      "row_number": "1689",
+      "name": "TapeTech 24\" Premium Finishing Knife w/ Support Handle/Adapter",
+      "current_sku": "72056",
+      "proposed_sku": "72056",
+      "current_parent": "TapeTechPremiumFinishingKnifewSupportHandleAdapter",
+      "proposed_parent": "TapeTechPremiumFinishingKnifewSupportHandleAdapter",
+      "current_mpn": "",
+      "proposed_mpn": "",
+      "source": "unresolved",
+      "notes": ""
+    },
+    {
+      "record_type": "variation",
+      "row_number": "1690",
+      "name": "TapeTech 32\" Premium Finishing Knife w/ Support Handle/Adapter",
+      "current_sku": "72061",
+      "proposed_sku": "72061",
+      "current_parent": "TapeTechPremiumFinishingKnifewSupportHandleAdapter",
+      "proposed_parent": "TapeTechPremiumFinishingKnifewSupportHandleAdapter",
+      "current_mpn": "",
+      "proposed_mpn": "",
+      "source": "unresolved",
+      "notes": ""
+    }
+  ]
+}
