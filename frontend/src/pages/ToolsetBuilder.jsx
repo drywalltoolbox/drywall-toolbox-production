@@ -54,7 +54,7 @@ import '../styles/toolset-builder.css';
 // ─── Constants ────────────────────────────────────────────────────────────────
 
 const PLACEHOLDER =
-  'https://www.drywalltoolbox.com/wp/wp-content/uploads/2026/05/no-image-placeholder.webp';
+  'https://drywalltoolbox.com/logos/no-image-placeholder.webp';
 
 const BRAND_LOGOS = {
   'TapeTech':              tapeTechLogo,
