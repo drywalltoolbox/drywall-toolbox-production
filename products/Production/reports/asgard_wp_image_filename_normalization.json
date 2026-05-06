@@ -1,0 +1,105 @@
+{
+  "directory": "products/Production/wp-images",
+  "alias_count": 24,
+  "removed_alias_files": 24,
+  "skipped_alias_files": 0,
+  "removed": [
+    {
+      "alias": "asgard-ag05-asgard-the-hammer-automatic-taper-AT01-AD-01.webp",
+      "canonical": "asgard-the-hammer-automatic-taper-AT01-AD-01.webp"
+    },
+    {
+      "alias": "asgard-ag15-asgard-corner-roller-with-fixed-handle-CR01-AD-FH-AD-01.webp",
+      "canonical": "asgard-corner-roller-with-fixed-handle-CR01-AD-FH-AD-01.webp"
+    },
+    {
+      "alias": "asgard-ag15a-asgard-inside-corner-roller-head-CR01-AD-01.webp",
+      "canonical": "asgard-inside-corner-roller-head-CR01-AD-01.webp"
+    },
+    {
+      "alias": "asgard-ag15ext-asgard-corner-roller-with-extendable-handle-CR01-AD-XH-AD-01.webp",
+      "canonical": "asgard-corner-roller-with-extendable-handle-CR01-AD-XH-AD-01.webp"
+    },
+    {
+      "alias": "asgard-ag20-asgard-finishing-box-EZ07-AD-01.webp",
+      "canonical": "asgard-finishing-box-EZ07-AD-01.webp"
+    },
+    {
+      "alias": "asgard-ag22-asgard-maxxbox-finishing-box-EHC07-AD-01.webp",
+      "canonical": "asgard-maxxbox-finishing-box-EHC07-AD-01.webp"
+    },
+    {
+      "alias": "asgard-ag24-asgard-power-assist-finishing-box-PA07-AD-01.webp",
+      "canonical": "asgard-power-assist-finishing-box-PA07-AD-01.webp"
+    },
+    {
+      "alias": "asgard-ag25-asgard-finishing-box-EZ10-AD-01.webp",
+      "canonical": "asgard-finishing-box-EZ10-AD-01.webp"
+    },
+    {
+      "alias": "asgard-ag26-asgard-maxxbox-finishing-box-EHC10-AD-01.webp",
+      "canonical": "asgard-maxxbox-finishing-box-EHC10-AD-01.webp"
+    },
+    {
+      "alias": "asgard-ag28-asgard-power-assist-finishing-box-PA10-AD-01.webp",
+      "canonical": "asgard-power-assist-finishing-box-PA10-AD-01.webp"
+    },
+    {
+      "alias": "asgard-ag30-asgard-finishing-box-EZ12-AD-01.webp",
+      "canonical": "asgard-finishing-box-EZ12-AD-01.webp"
+    },
+    {
+      "alias": "asgard-ag31-asgard-maxxbox-finishing-box-EHC12-AD-01.webp",
+      "canonical": "asgard-maxxbox-finishing-box-EHC12-AD-01.webp"
+    },
+    {
+      "alias": "asgard-ag33-asgard-power-assist-finishing-box-PA12-AD-01.webp",
+      "canonical": "asgard-power-assist-finishing-box-PA12-AD-01.webp"
+    },
+    {
+      "alias": "asgard-ag35-asgard-angle-box-with-fixed-handle-CA08-AD-FH-AD-01.webp",
+      "canonical": "asgard-angle-box-with-fixed-handle-CA08-AD-FH-AD-01.webp"
+    },
+    {
+      "alias": "asgard-ag35a-asgard-corner-applicator-CA08-AD-01.webp",
+      "canonical": "asgard-corner-applicator-CA08-AD-01.webp"
+    },
+    {
+      "alias": "asgard-ag35ext-asgard-angle-box-with-extendable-handle-CA08-AD-XH-AD-01.webp",
+      "canonical": "asgard-angle-box-with-extendable-handle-CA08-AD-XH-AD-01.webp"
+    },
+    {
+      "alias": "asgard-ag42-asgard-angle-head-AH25-AD-01.webp",
+      "canonical": "asgard-angle-head-AH25-AD-01.webp"
+    },
+    {
+      "alias": "asgard-ag48-asgard-3-angle-head-AH30-AD-01.webp",
+      "canonical": "asgard-3-angle-head-AH30-AD-01.webp"
+    },
+    {
+      "alias": "asgard-ag48x-asgard-angle-head-AH35-AD-01.webp",
+      "canonical": "asgard-angle-head-AH35-AD-01.webp"
+    },
+    {
+      "alias": "asgard-ag68a-asgard-nail-spotter-NS03-AD-01.webp",
+      "canonical": "asgard-nail-spotter-NS03-AD-01.webp"
+    },
+    {
+      "alias": "asgard-ag72-asgard-loading-pump-LP01-AD-01.webp",
+      "canonical": "asgard-loading-pump-LP01-AD-01.webp"
+    },
+    {
+      "alias": "asgard-ag85-asgard-gooseneck-GN01-AD-01.webp",
+      "canonical": "asgard-gooseneck-GN01-AD-01.webp"
+    },
+    {
+      "alias": "asgard-ag88-asgard-finishing-box-handle-extendable-FBHE-AD-01.webp",
+      "canonical": "asgard-finishing-box-handle-extendable-FBHE-AD-01.webp"
+    },
+    {
+      "alias": "asgard-ag90-asgard-filler-adapter-FA01-AD-01.webp",
+      "canonical": "asgard-filler-adapter-FA01-AD-01.webp"
+    }
+  ],
+  "skipped": []
+}
