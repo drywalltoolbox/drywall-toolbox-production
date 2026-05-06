@@ -1,0 +1,10 @@
+{
+  "catalog_path": "products\\Production\\catalogs\\product_catalog_parts_temp.csv",
+  "live_raw_path": "products\\Production\\reports\\columbia_repair_parts_live_raw.csv",
+  "non_columbia_rows_kept": 27,
+  "columbia_rows_written": 362,
+  "final_catalog_rows": 389,
+  "live_raw_rows": 418,
+  "unique_skus": 362,
+  "duplicate_sku_groups": 39
+}

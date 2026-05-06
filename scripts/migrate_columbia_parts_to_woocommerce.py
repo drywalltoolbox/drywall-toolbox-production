@@ -12,9 +12,18 @@ CATALOGS_DIR = REPO_ROOT / "products" / "Production" / "catalogs"
 REPORTS_DIR = REPO_ROOT / "products" / "Production" / "reports"
 
 TEMP_PARTS_PATH = CATALOGS_DIR / "product_catalog_parts_temp.csv"
-WC_PATH = CATALOGS_DIR / "woocommerce_catalog.csv"
+DEFAULT_WC_PATH = CATALOGS_DIR / "woocommerce_catalog.csv"
+OFFICIAL_WC_PATH = CATALOGS_DIR / "official" / "woocommerce_catalog.csv"
 
 SUMMARY_PATH = REPORTS_DIR / "columbia_parts_woocommerce_migration_summary.json"
+
+
+def resolve_wc_path() -> Path:
+    if DEFAULT_WC_PATH.exists():
+        return DEFAULT_WC_PATH
+    if OFFICIAL_WC_PATH.exists():
+        return OFFICIAL_WC_PATH
+    raise FileNotFoundError(f"WooCommerce catalog not found at {DEFAULT_WC_PATH} or {OFFICIAL_WC_PATH}")
 
 
 def read_csv(path: Path) -> tuple[list[str], list[dict[str, str]]]:
@@ -146,8 +155,9 @@ def backup_file(path: Path) -> Path:
 
 
 def migrate() -> dict[str, object]:
+    wc_path = resolve_wc_path()
     temp_header, temp_rows = read_csv(TEMP_PARTS_PATH)
-    wc_header, wc_rows = read_csv(WC_PATH)
+    wc_header, wc_rows = read_csv(wc_path)
 
     columbia_temp_rows = [row for row in temp_rows if clean_space(row.get("brand", "")) == "Columbia"]
     existing_columbia_parts_rows = [row for row in wc_rows if is_columbia_parts_wc_row(row)]
@@ -163,13 +173,13 @@ def migrate() -> dict[str, object]:
     first_parts_index = next((index for index, row in enumerate(wc_rows) if is_columbia_parts_wc_row(row)), len(kept_rows))
     final_rows = kept_rows[:first_parts_index] + replacement_rows + kept_rows[first_parts_index:]
 
-    backup_path = backup_file(WC_PATH)
-    write_csv(WC_PATH, wc_header, final_rows)
+    backup_path = backup_file(wc_path)
+    write_csv(wc_path, wc_header, final_rows)
 
     final_columbia_parts = [row for row in final_rows if is_columbia_parts_wc_row(row)]
     summary = {
         "temp_parts_path": str(TEMP_PARTS_PATH.relative_to(REPO_ROOT)),
-        "woocommerce_catalog_path": str(WC_PATH.relative_to(REPO_ROOT)),
+        "woocommerce_catalog_path": str(wc_path.relative_to(REPO_ROOT)),
         "backup_path": str(backup_path.relative_to(REPO_ROOT)),
         "source_columbia_temp_rows": len(columbia_temp_rows),
         "removed_existing_columbia_parts_rows": len(existing_columbia_parts_rows),
