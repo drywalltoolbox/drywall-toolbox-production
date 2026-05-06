@@ -33,7 +33,7 @@ export default function Footer() {
           <Link to="/" style={{ display: 'inline-block' }}>
             <img src={LogoBlack} alt="Drywall Toolbox" className="footer-logo" style={{ display: 'block' }} />
           </Link>
-          <div style={{ display: 'flex', gap: '6px', marginTop: '0px', justifyContent: 'center', alignItems: 'center', width: '100%' }}>
+          <div style={{ display: 'flex', gap: '6px', marginTop: '16px', justifyContent: 'center', alignItems: 'center', width: '100%' }}>
             <a
               href="https://www.instagram.com/drywalltoolbox"
               target="_blank"

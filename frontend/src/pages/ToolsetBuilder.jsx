@@ -30,7 +30,7 @@
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import {
-  Check, ChevronRight, ChevronLeft,
+  Check, ChevronRight, ChevronLeft, ChevronDown,
   ShoppingCart, Package, Wrench, Search, X, Trash2,
   CheckCircle2, Layers, Tag, Truck, AlertCircle,
   SplitSquareHorizontal, Star, Zap, Box,
@@ -38,7 +38,9 @@ import {
 import SEOHead from '../components/SEOHead';
 import Toast from '../components/Toast';
 import { getProducts } from '../services/catalog';
+import { getProductVariations } from '../services/api';
 import { useCart } from '../context/CartContext';
+import { fetchVariationsBatched } from '../utils/variationSelection';
 import {
   SET_TEMPLATES, SCOPE_LABELS, SCOPE_COLORS,
   BUILDER_BRANDS, getSlotProducts,
@@ -105,9 +107,9 @@ const WORKFLOW_TYPES = [
 
 // Stage labels
 const STAGES = [
-  { id: 1, label: 'Choose Your Kit' },
-  { id: 2, label: 'Build Your Kit'  },
-  { id: 3, label: 'Review & Buy'    },
+  { id: 1, label: 'Choose Kit' },
+  { id: 2, label: 'Build Kit'  },
+  { id: 3, label: 'Review & Buy' },
 ];
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -115,14 +117,18 @@ const STAGES = [
 const img   = (p) => p?.image || p?.featured_image || p?.images?.[0]?.src || p?.thumbnail || PLACEHOLDER;
 const price = (p) => {
   if (!p) return 0;
+  // For variation products, use their specific price
+  if (p.type === 'variation' && p.price != null) {
+    return typeof p.price === 'number' ? p.price : parseFloat(p.price || 0);
+  }
+  // For variable products, use min_price as fallback
   if (p.is_variable && p.min_price != null) return Number(p.min_price);
   return typeof p.price === 'number' ? p.price : parseFloat(p.price || 0);
 };
 const fmtPrice = (p) => {
   if (!p) return '';
   const n = price(p);
-  const prefix = p.is_variable && p.min_price != null ? 'From ' : '';
-  return `${prefix}$${n.toFixed(2)}`;
+  return `$${n.toFixed(2)}`;
 };
 
 // ─── Stage bar ────────────────────────────────────────────────────────────────
@@ -154,28 +160,27 @@ function StageBar({ stage, onBack }) {
   );
 }
 
-// ─── Stage 1: Workflow intent + Brand ─────────────────────────────────────────
-// The key difference from GLTT: user picks what they want to ACCOMPLISH first,
-// then chooses brand. GLTT forces you to scroll through 19 brand+set combos.
+// ─── Stage 1: Unified Brand + Kit Selection ───────────────────────────────────
+// Shows brands, then that brand's available kits as category-style cards
 
 function Stage1({ allProducts, loading, onConfigure }) {
-  const [selectedScope, setSelectedScope] = useState(null);
   const [selectedBrand, setSelectedBrand] = useState(null);
+  const [brandDropdownOpen, setBrandDropdownOpen] = useState(false);
+  const brandPickerRef = useRef(null);
 
-  // Which brands have templates for the selected scope?
-  const brandsForScope = useMemo(() => {
-    if (!selectedScope) return BUILDER_BRANDS;
-    return BUILDER_BRANDS.filter((b) =>
-      SET_TEMPLATES.some((t) => t.brand === b && t.scope === selectedScope)
-    );
-  }, [selectedScope]);
+  // Close dropdown on outside click / tap
+  useEffect(() => {
+    if (!brandDropdownOpen) return;
+    const handleOutside = (e) => {
+      if (brandPickerRef.current && !brandPickerRef.current.contains(e.target)) {
+        setBrandDropdownOpen(false);
+      }
+    };
+    document.addEventListener('pointerdown', handleOutside, true);
+    return () => document.removeEventListener('pointerdown', handleOutside, true);
+  }, [brandDropdownOpen]);
 
-  const activeSelectedBrand = useMemo(() => {
-    if (!selectedBrand) return null;
-    return brandsForScope.includes(selectedBrand) ? selectedBrand : null;
-  }, [brandsForScope, selectedBrand]);
-
-  // Product counts per brand (to show availability)
+  // Product counts per brand
   const brandCounts = useMemo(() => {
     const counts = {};
     allProducts.forEach((p) => {
@@ -185,83 +190,115 @@ function Stage1({ allProducts, loading, onConfigure }) {
     return counts;
   }, [allProducts]);
 
-  const canProceed = selectedScope && activeSelectedBrand;
+  // Get available templates for selected brand
+  const brandTemplates = useMemo(() => {
+    if (!selectedBrand) return [];
+    return SET_TEMPLATES.filter((t) => t.brand === selectedBrand);
+  }, [selectedBrand]);
 
-  const handleConfigure = () => {
-    if (!canProceed) return;
-    const template = SET_TEMPLATES.find(
-      (t) => t.brand === activeSelectedBrand && t.scope === selectedScope
-    );
-    if (template) onConfigure(template);
+  const handleBrandSelect = (brand) => {
+    setSelectedBrand(brand);
+    setBrandDropdownOpen(false);
+  };
+
+  const handleTemplateSelect = (template) => {
+    onConfigure(template);
   };
 
   return (
     <div className="tsb-stage1">
-      {/* ── Split layout: workflow type (left) + brand (right) ── */}
       <div className="tsb-stage1-layout">
-
-        {/* Left: Workflow intent */}
-        <div className="tsb-panel tsb-panel--workflow">
-          <div className="tsb-panel-header">
-            <span className="tsb-panel-step">Step 1</span>
-            <h2>What are you building?</h2>
-            <p>Choose the type of kit that matches your job.</p>
-          </div>
-          <div className="tsb-workflow-grid">
-            {WORKFLOW_TYPES.map((wf) => {
-              const Icon      = wf.icon;
-              const isActive  = selectedScope === wf.scope;
-              const available = BUILDER_BRANDS.some((b) =>
-                SET_TEMPLATES.some((t) => t.brand === b && t.scope === wf.scope)
-              );
-              return (
-                <button
-                  key={wf.scope}
-                  className={`tsb-workflow-card${isActive ? ' --selected' : ''}`}
-                  style={isActive ? { '--wf-color': wf.color, '--wf-highlight': wf.highlight } : {}}
-                  onClick={() => setSelectedScope(isActive ? null : wf.scope)}
-                  disabled={!available}
-                >
-                  <div className="tsb-wf-icon" style={isActive ? { background: wf.color } : {}}>
-                    <Icon size={20} color={isActive ? '#fff' : wf.color} strokeWidth={1.75} />
-                  </div>
-                  <div className="tsb-wf-text">
-                    <span className="tsb-wf-label">{wf.label}</span>
-                    <span className="tsb-wf-tagline">{wf.tagline}</span>
-                    <span className="tsb-wf-desc">{wf.description}</span>
-                  </div>
-                  <span className="tsb-wf-check" aria-hidden="true">
-                    {isActive && <Check size={13} strokeWidth={3} />}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Right: Brand selection */}
+        {/* Brand selection */}
         <div className="tsb-panel tsb-panel--brand">
           <div className="tsb-panel-header">
-            <span className="tsb-panel-step">Step 2</span>
-            <h2>Choose your brand</h2>
-            <p>
-              {selectedScope
-                ? `${brandsForScope.length} brand${brandsForScope.length !== 1 ? 's' : ''} offer a ${SCOPE_LABELS[selectedScope] || 'kit'}.`
-                : 'Select a kit type first to filter by availability.'}
-            </p>
+            <span className="tsb-panel-step">Step 1</span>
+            <h2>Choose your kit</h2>
+            <p>Select a brand to see available toolset configurations.</p>
           </div>
+          
+          {/* ── Custom animated brand dropdown (mobile) ── */}
+          <div className="tsb-brand-custom-picker" ref={brandPickerRef}>
+            <button
+              type="button"
+              className={`tsb-brand-trigger${selectedBrand ? ' --has-value' : ''}`}
+              onClick={() => setBrandDropdownOpen((o) => !o)}
+              aria-haspopup="listbox"
+              aria-expanded={brandDropdownOpen}
+            >
+              <div className="tsb-brand-trigger-inner">
+                {selectedBrand && BRAND_LOGOS[selectedBrand] ? (
+                  <img
+                    src={BRAND_LOGOS[selectedBrand]}
+                    alt=""
+                    className="tsb-brand-trigger-logo"
+                    onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                  />
+                ) : (
+                  <div className="tsb-brand-trigger-logo-placeholder" />
+                )}
+                <span className="tsb-brand-trigger-text">
+                  {selectedBrand || 'Select a brand'}
+                </span>
+              </div>
+              <ChevronDown size={16} className={`tsb-brand-chevron${brandDropdownOpen ? ' --open' : ''}`} />
+            </button>
+            
+            <div
+              className={`tsb-brand-dropdown${brandDropdownOpen ? ' --open' : ''}`}
+              role="listbox"
+              aria-hidden={!brandDropdownOpen}
+            >
+              <div className="tsb-brand-dropdown-inner">
+                <div className="tsb-brand-dropdown-list">
+                  {BUILDER_BRANDS.map((brand) => {
+                    const count    = brandCounts[brand] || 0;
+                    const isActive = selectedBrand === brand;
+                    return (
+                      <button
+                        key={brand}
+                        type="button"
+                        role="option"
+                        aria-selected={isActive}
+                        className={`tsb-brand-dropdown-item${isActive ? ' --selected' : ''}`}
+                        onClick={() => handleBrandSelect(brand)}
+                      >
+                        <div className="tsb-brand-dropdown-logo">
+                          {BRAND_LOGOS[brand] ? (
+                            <img
+                              src={BRAND_LOGOS[brand]}
+                              alt={brand}
+                              onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                            />
+                          ) : (
+                            <span className="tsb-brand-dropdown-logo-fallback">{brand[0]}</span>
+                          )}
+                        </div>
+                        <div className="tsb-brand-dropdown-info">
+                          <span className="tsb-brand-dropdown-name">{brand}</span>
+                          <span className="tsb-brand-dropdown-count">
+                            {loading ? 'Loading…' : count > 0 ? `${count} products` : 'Coming soon'}
+                          </span>
+                        </div>
+                        {isActive && <Check size={14} strokeWidth={3} className="tsb-brand-dropdown-check" />}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          {/* Desktop brand list */}
           <div className="tsb-brand-list">
             {BUILDER_BRANDS.map((brand) => {
-              const isSupported = brandsForScope.includes(brand);
-              const isActive    = activeSelectedBrand === brand;
-              const count       = brandCounts[brand] || 0;
+              const isActive = selectedBrand === brand;
+              const count    = brandCounts[brand] || 0;
               return (
                 <button
                   key={brand}
-                  className={`tsb-brand-option${isActive ? ' --selected' : ''}${!isSupported ? ' --dim' : ''}`}
-                  onClick={() => isSupported && setSelectedBrand(isActive ? null : brand)}
-                  disabled={!isSupported || (loading && count === 0)}
-                  title={!isSupported ? `No ${SCOPE_LABELS[selectedScope] || 'kit'} available for this brand` : undefined}
+                  className={`tsb-brand-option${isActive ? ' --selected' : ''}`}
+                  onClick={() => setSelectedBrand(brand)}
+                  disabled={loading && count === 0}
                 >
                   <div className="tsb-brand-option-logo">
                     {BRAND_LOGOS[brand] ? (
@@ -280,9 +317,6 @@ function Stage1({ allProducts, loading, onConfigure }) {
                       {loading ? 'Loading…' : count > 0 ? `${count} products` : 'Coming soon'}
                     </span>
                   </div>
-                  {!isSupported && selectedScope && (
-                    <span className="tsb-brand-na-pill">No {SCOPE_LABELS[selectedScope]}</span>
-                  )}
                   <span className="tsb-brand-option-check" aria-hidden="true">
                     {isActive && <Check size={12} strokeWidth={3} />}
                   </span>
@@ -290,98 +324,46 @@ function Stage1({ allProducts, loading, onConfigure }) {
               );
             })}
           </div>
-        </div>
-      </div>
 
-      {/* ── Bottom CTA ─────────────────────────────────────────── */}
-      <div className="tsb-stage1-footer">
-        {canProceed && (
-          <div className="tsb-stage1-selection-summary">
-            <span className="tsb-selection-pill" style={{ background: WORKFLOW_TYPES.find(w => w.scope === selectedScope)?.color || '#1d4ed8' }}>
-              {SCOPE_LABELS[selectedScope]}
-            </span>
-            <span style={{ color: '#94a3b8', fontSize: '0.8rem' }}>·</span>
-            <span className="tsb-selection-pill tsb-selection-pill--brand">
-              {BRAND_LOGOS[activeSelectedBrand] && (
-                <img
-                  src={BRAND_LOGOS[activeSelectedBrand]}
-                  alt=""
-                  style={{ height: '14px', maxWidth: '48px', objectFit: 'contain', filter: 'brightness(0) invert(1)' }}
-                  onError={(e) => { e.currentTarget.style.display = 'none'; }}
-                />
-              )}
-              {activeSelectedBrand}
-            </span>
-          </div>
-        )}
-        <button
-          className="tsb-cta-btn"
-          disabled={!canProceed}
-          onClick={handleConfigure}
-        >
-          Build Your Kit <ChevronRight size={16} />
-        </button>
-        {!canProceed && (
-          <p className="tsb-cta-hint">
-            {!selectedScope ? 'Select a kit type above to get started.' : 'Now choose your brand →'}
-          </p>
-        )}
-      </div>
-    </div>
-  );
-}
-
-// ─── Kit Canvas ───────────────────────────────────────────────────────────────
-// Unique to DTB. A horizontal strip of circular slot nodes that visualize
-// the kit building up in real time as you configure each slot.
-
-function KitCanvas({ template, slotSelections, activeSlotIdx, onNodeClick }) {
-  const containerRef = useRef(null);
-
-  // Scroll active node into view
-  useEffect(() => {
-    if (!containerRef.current) return;
-    const node = containerRef.current.querySelector(`[data-slot-idx="${activeSlotIdx}"]`);
-    if (node) node.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
-  }, [activeSlotIdx]);
-
-  return (
-    <div className="tsb-canvas-wrap">
-      <div className="tsb-canvas" ref={containerRef}>
-        {template.slots.map((slot, idx) => {
-          const product  = slotSelections[slot.id];
-          const isActive = idx === activeSlotIdx;
-          const isDone   = Boolean(product);
-
-          return (
-            <button
-              key={slot.id}
-              data-slot-idx={idx}
-              className={`tsb-canvas-node${isActive ? ' --active' : ''}${isDone ? ' --done' : ''}${!slot.required ? ' --optional' : ''}`}
-              onClick={() => onNodeClick(idx)}
-              title={slot.label}
-            >
-              <div className="tsb-canvas-node-ring">
-                {isDone ? (
-                  <img
-                    src={img(product)}
-                    alt={product.name}
-                    className="tsb-canvas-node-img"
-                    onError={(e) => { e.currentTarget.src = PLACEHOLDER; }}
-                  />
-                ) : (
-                  <SlotGlyph icon={slot.icon} dim={!slot.required} />
-                )}
-                {isDone && (
-                  <span className="tsb-canvas-node-check" aria-hidden="true">
-                    <Check size={9} strokeWidth={3.5} />
-                  </span>
-                )}
+          {/* Kit type cards (category-card style) - shown after brand selection */}
+          {selectedBrand && brandTemplates.length > 0 && (
+            <div className="tsb-kit-selection">
+              <h3 className="tsb-kit-selection-heading">{selectedBrand} Toolsets</h3>
+              <div className="categories-grid">
+                {brandTemplates.map((template, index) => {
+                  // Use a representative image for each kit type
+                  const kitImage = template.scope === 'full' 
+                    ? 'https://drywalltoolbox.com/products/automatic-taping-tools-placeholder.jpg'
+                    : template.scope === 'finishing'
+                    ? 'https://drywalltoolbox.com/products/finishing-boxes-placeholder.jpg'
+                    : template.scope === 'taping'
+                    ? 'https://drywalltoolbox.com/products/taper-placeholder.jpg'
+                    : 'https://drywalltoolbox.com/products/flat-box-placeholder.jpg';
+                  
+                  return (
+                    <button
+                      key={template.id}
+                      className="category-card"
+                      style={{ animationDelay: `${(index + 1) * 0.07}s` }}
+                      onClick={() => handleTemplateSelect(template)}
+                      aria-label={`Configure ${template.name}`}
+                    >
+                      {/* Background image with dark overlay */}
+                      <div className="category-card-bg" style={{ backgroundImage: `url(${kitImage})` }} />
+                      <div className="category-card-scrim" />
+                      <div className="category-card-content">
+                        <div className="category-card-text">
+                          <h3 className="category-name">{template.name.replace(/^(TapeTech|Columbia|Level 5|Asgard)\s+(Custom\s+)?/i, '')}</h3>
+                          <span className="category-count">{template.description}</span>
+                        </div>
+                      </div>
+                    </button>
+                  );
+                })}
               </div>
-              <span className="tsb-canvas-node-label">{slot.label.replace(' (Optional)', '').replace(' #1', '').replace(' #2', ' 2').replace('Select', '')}</span>
-            </button>
-          );
-        })}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
@@ -452,6 +434,7 @@ function Stage2({ template, allProducts, slotSelections, onSlotSelect, onBack, o
   const [searchQuery,   setSearchQuery]   = useState('');
   const [compareItems,  setCompareItems]  = useState([]);
   const [showCompare,   setShowCompare]   = useState(false);
+  const [slotVariationMap, setSlotVariationMap] = useState({});
 
   const activeSlot = template.slots[activeSlotIdx];
 
@@ -461,21 +444,80 @@ function Stage2({ template, allProducts, slotSelections, onSlotSelect, onBack, o
     return getSlotProducts(allProducts, template.brand, activeSlot.filter);
   }, [allProducts, template.brand, activeSlot]);
 
+  const slotVariableIdsKey = useMemo(
+    () => slotProducts
+      .filter((p) => p.is_variable && p.id)
+      .map((p) => String(p.id))
+      .sort()
+      .join(','),
+    [slotProducts],
+  );
+
+  useEffect(() => {
+    const variableIds = slotProducts
+      .filter((p) => p.is_variable && p.id && !Object.prototype.hasOwnProperty.call(slotVariationMap, p.id))
+      .map((p) => p.id);
+    if (variableIds.length === 0) return;
+
+    let mounted = true;
+    fetchVariationsBatched(variableIds, getProductVariations)
+      .then((pairs) => {
+        if (!mounted) return;
+        const next = {};
+        pairs.forEach(([id, vars]) => {
+          next[id] = Array.isArray(vars) ? vars : [];
+        });
+        setSlotVariationMap((prev) => ({ ...prev, ...next }));
+      })
+      .catch(() => { /* variable parents fall back to parent products */ });
+
+    return () => { mounted = false; };
+  }, [slotProducts, slotVariableIdsKey, slotVariationMap]);
+
+  const slotOptions = useMemo(() => {
+    if (!activeSlot) return [];
+
+    return slotProducts.flatMap((product) => {
+      if (!product?.is_variable || !product?.id) return [product];
+
+      const variations = slotVariationMap[product.id];
+      if (!Array.isArray(variations) || variations.length === 0) {
+        return [product];
+      }
+
+      const matchingVariations = variations.filter((variation) => {
+        const name = (variation?.name || '').toLowerCase();
+        return !name || activeSlot.filter(name);
+      });
+
+      if (matchingVariations.length === 0) {
+        return [product];
+      }
+
+      return matchingVariations.map((variation) => ({
+        ...product,
+        ...variation,
+        parent_id: variation.parent_id || product.id,
+        parent_name: product.name,
+      }));
+    });
+  }, [activeSlot, slotProducts, slotVariationMap]);
+
   const filteredProducts = useMemo(() => {
-    if (!searchQuery.trim()) return slotProducts;
+    if (!searchQuery.trim()) return slotOptions;
     const q = searchQuery.toLowerCase();
-    return slotProducts.filter(
-      (p) => (p.name || '').toLowerCase().includes(q) || (p.sku || '').toLowerCase().includes(q)
+    return slotOptions.filter(
+      (p) =>
+        (p.name || '').toLowerCase().includes(q) ||
+        (p.sku || '').toLowerCase().includes(q) ||
+        (p.parent_name || '').toLowerCase().includes(q)
     );
-  }, [slotProducts, searchQuery]);
+  }, [slotOptions, searchQuery]);
 
   // Required completion count
   const requiredSlots = template.slots.filter((s) => s.required);
   const filledCount   = requiredSlots.filter((s) => slotSelections[s.id]).length;
   const allFilled     = filledCount === requiredSlots.length;
-
-  // Total running price
-  const runningTotal = Object.values(slotSelections).reduce((sum, p) => sum + price(p), 0);
 
   const goToSlot = useCallback((idx) => {
     setActiveSlotIdx(idx);
@@ -514,33 +556,6 @@ function Stage2({ template, allProducts, slotSelections, onSlotSelect, onBack, o
 
   return (
     <div className="tsb-stage2">
-
-      {/* ── Top bar: brand + kit name + live total ─────────── */}
-      <div className="tsb-kit-bar">
-        <div className="tsb-kit-bar-left">
-          {BRAND_LOGOS[template.brand] && (
-            <img src={BRAND_LOGOS[template.brand]} alt={template.brand} className="tsb-kit-bar-logo"
-              onError={(e) => { e.currentTarget.style.display = 'none'; }} />
-          )}
-          <div>
-            <p className="tsb-kit-bar-name">{template.name}</p>
-            <p className="tsb-kit-bar-progress">{filledCount}/{requiredSlots.length} required slots filled</p>
-          </div>
-        </div>
-        <div className="tsb-kit-bar-right">
-          <div className="tsb-live-total">
-            <span className="tsb-live-total-label">Running Total</span>
-            <span className="tsb-live-total-val">${runningTotal.toFixed(2)}</span>
-          </div>
-          <button
-            className="tsb-review-btn"
-            disabled={!allFilled}
-            onClick={onReview}
-          >
-            <ShoppingCart size={14} /> Review Kit
-          </button>
-        </div>
-      </div>
 
       {/* ── Body: slot nav sidebar + product picker ─────────── */}
       <div className="tsb-builder-body">
@@ -592,29 +607,6 @@ function Stage2({ template, allProducts, slotSelections, onSlotSelect, onBack, o
 
         {/* Product picker */}
         <div className="tsb-picker">
-
-          {/* Slot header */}
-          <div className="tsb-picker-header">
-            <div className="tsb-picker-header-left">
-              <div className="tsb-slot-icon-box">
-                <SlotGlyph icon={activeSlot?.icon} size={17} />
-              </div>
-              <div>
-                <h3 className="tsb-picker-title">
-                  {activeSlot?.label}
-                  <span className={`tsb-req-pill${activeSlot?.required ? '' : ' --optional'}`}>
-                    {activeSlot?.required ? 'Required' : 'Optional'}
-                  </span>
-                </h3>
-                {activeSlot?.hint && <p className="tsb-picker-hint">{activeSlot.hint}</p>}
-              </div>
-            </div>
-            <div className="tsb-picker-nav">
-              <button className="tsb-nav-arrow" disabled={activeSlotIdx === 0} onClick={() => goToSlot(activeSlotIdx - 1)}><ChevronLeft size={14} /></button>
-              <span className="tsb-nav-count">{activeSlotIdx + 1} / {template.slots.length}</span>
-              <button className="tsb-nav-arrow" disabled={activeSlotIdx === template.slots.length - 1} onClick={() => goToSlot(activeSlotIdx + 1)}><ChevronRight size={14} /></button>
-            </div>
-          </div>
 
           {/* Selected product banner */}
           {slotSelections[activeSlot?.id] && (
@@ -694,7 +686,15 @@ function Stage2({ template, allProducts, slotSelections, onSlotSelect, onBack, o
 
                     {/* Info */}
                     <div className="tsb-product-info">
+                      {product.type === 'variation' && product.variation_attribute?.option && (
+                        <p className="tsb-product-variant-chip">
+                          {product.variation_attribute.name || 'Option'}: {product.variation_attribute.option}
+                        </p>
+                      )}
                       <p className="tsb-product-name">{product.name}</p>
+                      {product.parent_name && product.parent_name !== product.name && (
+                        <p className="tsb-product-parent">{product.parent_name}</p>
+                      )}
                       {product.sku && <p className="tsb-product-sku">{product.sku}</p>}
 
                       <div className="tsb-product-row">
@@ -727,16 +727,16 @@ function Stage2({ template, allProducts, slotSelections, onSlotSelect, onBack, o
           {/* Footer nav */}
           <div className="tsb-picker-footer">
             <button className="tsb-back-btn" onClick={onBack}><ChevronLeft size={13} /> Change Kit</button>
-            <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
-              {activeSlotIdx < template.slots.length - 1 && (
-                <button className="tsb-next-slot-btn" onClick={() => goToSlot(activeSlotIdx + 1)}>
-                  Next Slot <ChevronRight size={13} />
-                </button>
-              )}
-              <button className="tsb-review-cta-btn" disabled={!allFilled} onClick={onReview}>
-                <ShoppingCart size={13} /> Review Kit {allFilled && `(${Object.keys(slotSelections).length})`}
+            <button className="tsb-review-cta-btn" disabled={!allFilled} onClick={onReview}>
+              Review Kit {allFilled && `(${Object.keys(slotSelections).length})`}
+            </button>
+            {activeSlotIdx < template.slots.length - 1 ? (
+              <button className="tsb-next-slot-btn" onClick={() => goToSlot(activeSlotIdx + 1)}>
+                Next Slot <ChevronRight size={13} />
               </button>
-            </div>
+            ) : (
+              <div style={{ width: '100px' }} />
+            )}
           </div>
         </div>
       </div>
@@ -780,13 +780,6 @@ function Stage3({ template, slotSelections, onRemove, onBack, onAddToCart, succe
 
   return (
     <div className="tsb-stage3">
-      <div className="tsb-stage3-header">
-        <div>
-          <h2>Your Complete Kit</h2>
-          <p>{selectedItems.length} configured tool{selectedItems.length !== 1 ? 's' : ''} · ${totalCost.toFixed(2)} estimated</p>
-        </div>
-        <button className="tsb-back-btn" onClick={onBack}><ChevronLeft size={13} /> Edit Kit</button>
-      </div>
 
       {/* Configured tools mosaic */}
       <h3 className="tsb-review-section-title">Configured Tools</h3>
@@ -805,11 +798,13 @@ function Stage3({ template, slotSelections, onRemove, onBack, onAddToCart, succe
                     <span className="tsb-review-tile-slot">{slot.label}</span>
                     <p className="tsb-review-tile-name">{product.name}</p>
                     {product.sku && <p className="tsb-review-tile-sku">{product.sku}</p>}
+                  </div>
+                  <div className="tsb-review-tile-price-wrap">
                     <p className="tsb-review-tile-price">{fmtPrice(product)}</p>
                   </div>
                   <button className="tsb-review-tile-remove" onClick={() => onRemove(slot.id)}
                     aria-label={`Remove ${slot.label}`}>
-                    <Trash2 size={13} />
+                    <X size={11} strokeWidth={2.5} />
                   </button>
                 </>
               ) : (
@@ -886,7 +881,7 @@ export default function ToolsetBuilder() {
   useEffect(() => {
     let cancelled = false;
     getProducts()
-      .then((products) => { if (!cancelled) { setAllProducts(products.filter((p) => p.type !== 'variation')); setLoading(false); } })
+      .then((products) => { if (!cancelled) { setAllProducts(products); setLoading(false); } })
       .catch(() => { if (!cancelled) setLoading(false); });
     return () => { cancelled = true; };
   }, []);
@@ -934,22 +929,58 @@ export default function ToolsetBuilder() {
 
       <div className="tsb-page">
 
-        {/* Hero */}
-        <div className="tsb-hero">
-          <div className="tsb-hero-content">
-            <span className="tsb-hero-eyebrow"><Wrench size={10} /> Kit Builder</span>
-            <h1>Build Your Drywall Kit</h1>
-            <p>Configure every tool by slot with real images and prices. Compare options side-by-side. Add your complete kit to cart in one click.</p>
-            <div className="tsb-hero-pills">
-              <span><Truck size={11} /> Free Shipping</span>
-              <span><Tag size={11} /> Bundle Savings</span>
-              <span><SplitSquareHorizontal size={11} /> Compare Tools</span>
-              <span><Check size={11} strokeWidth={3} /> Free Accessories Included</span>
+        {/* Hero - only show on Stage 1 */}
+        {stage === 1 && (
+          <div className="tsb-hero">
+            <div className="tsb-hero-content">
+              <span className="tsb-hero-eyebrow"><Wrench size={10} /> Kit Builder</span>
+              <h1>Build Your Drywall Kit</h1>
+              <p>Configure every tool by slot with real images and prices. Compare options side-by-side. Add your complete kit to cart in one click.</p>
             </div>
           </div>
-        </div>
+        )}
 
+        {/* Stage Bar - always visible */}
         <StageBar stage={stage} onBack={handleBack} />
+
+        {/* Kit summary bar - show below StageBar in stages 2 & 3 */}
+        {stage >= 2 && template && (
+          <div className="tsb-kit-bar">
+            <div className="tsb-kit-bar-left">
+              {BRAND_LOGOS[template.brand] && (
+                <img src={BRAND_LOGOS[template.brand]} alt={template.brand} className="tsb-kit-bar-logo"
+                  onError={(e) => { e.currentTarget.style.display = 'none'; }} />
+              )}
+              <div>
+                <p className="tsb-kit-bar-name">{template.name}</p>
+                <p className="tsb-kit-bar-progress">
+                  {stage === 2 
+                    ? `${template.slots.filter((s) => s.required && slotSelections[s.id]).length}/${template.slots.filter((s) => s.required).length} required slots filled`
+                    : `${Object.keys(slotSelections).length} tool${Object.keys(slotSelections).length !== 1 ? 's' : ''} configured`}
+                </p>
+              </div>
+            </div>
+            <div className="tsb-kit-bar-right">
+              {stage === 2 && (
+                <>
+                  <div className="tsb-live-total">
+                    <span className="tsb-live-total-label">Running Total</span>
+                    <span className="tsb-live-total-val">
+                      ${Object.values(slotSelections).reduce((sum, p) => sum + price(p), 0).toFixed(2)}
+                    </span>
+                  </div>
+                  <button
+                    className="tsb-review-btn"
+                    disabled={template.slots.filter((s) => s.required).some((s) => !slotSelections[s.id])}
+                    onClick={() => { setStage(3); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+                  >
+                    <ShoppingCart size={14} /> Review Kit
+                  </button>
+                </>
+              )}
+            </div>
+          </div>
+        )}
 
         <div className="tsb-body">
           {stage === 1 && (

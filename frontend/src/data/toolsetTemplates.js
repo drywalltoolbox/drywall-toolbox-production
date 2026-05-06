@@ -479,7 +479,6 @@ export function getSlotProducts(products, brand, filterFn) {
   return products.filter((p) => {
     const b = (p.brand || p.dtb_brand || '').trim();
     if (b !== brand) return false;
-    if (p.type === 'variation') return false;
     // Exclude parts
     const cats = (p.categories || []).map((c) =>
       typeof c === 'string' ? c.toLowerCase() : (c.name || c.slug || '').toLowerCase()

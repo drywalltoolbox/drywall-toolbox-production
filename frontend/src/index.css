@@ -65,6 +65,7 @@
     @apply bg-white text-gray-900 antialiased;
     margin: 0;
     padding: 0;
+    background: linear-gradient(to bottom, #fafbfc 0%, #ffffff 100%);
   }
 
   main {
@@ -196,6 +197,9 @@ html {
   padding: clamp(1.5rem, 5vw, 3rem) clamp(1rem, 5vw, 2.5rem);
   max-width: 1400px;
   margin: 0 auto;
+  background: rgba(249, 250, 251, 0.6);
+  border: 1.5px solid rgba(37, 99, 235, 0.2);
+  border-radius: clamp(8px, 2vw, 12px);
 }
 
 /* Track wrapper: hides overflow so arrows are clipped on desktop,
@@ -352,15 +356,17 @@ html {
 @media (max-width: 767px) {
   /* Section: tighter horizontal padding, let cards bleed to edge */
   .trending-products-section {
-    padding-left: 0;
-    padding-right: 0;
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
     overflow: hidden;
+    border-left: 1.5px solid rgba(37, 99, 235, 0.15);
+    border-right: 1.5px solid rgba(37, 99, 235, 0.15);
   }
 
   /* Track: break out to full viewport width */
   .trending-track-wrapper {
     overflow: visible;
-    margin: 0 -16px; /* counteract any parent padding */
+    margin: 0 -8px; /* counteract any parent padding */
   }
 
   /* Scroll container: add edge padding so first/last card have breathing room */
@@ -415,6 +421,25 @@ html {
   padding: clamp(1.5rem, 4vw, 2.5rem) clamp(1rem, 5vw, 2.5rem);
   max-width: 1400px;
   margin: 0 auto;
+  background: rgba(248, 250, 252, 0.5);
+  border: 1.5px solid rgba(37, 99, 235, 0.2);
+  border-radius: clamp(8px, 2vw, 12px);
+}
+
+@media (max-width: 767px) {
+  .home-trust-section {
+    padding-left: 1rem;
+    padding-right: 1rem;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+  }
+  
+  .trending-products-section {
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+  }
 }
 
 /* Brands section wrapper */
@@ -436,6 +461,13 @@ html {
   .trust-badges-grid {
     grid-template-columns: 1fr;
     gap: 10px;
+    max-width: 420px;
+    margin: 0 auto;
+    place-items: center;
+  }
+  
+  .dtb-trust-badge {
+    width: 100%;
   }
 }
 
