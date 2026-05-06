@@ -44,10 +44,10 @@ import {
   BUILDER_BRANDS, getSlotProducts,
 } from '../data/toolsetTemplates';
 
-import tapeTechLogo  from '/brands/TapeTech/tapetech_logo.svg';
-import columbiaLogo  from '/brands/Columbia/columbia_taping_tools_logo.svg';
-import level5Logo    from '/brands/Level5/Level5.svg';
-import asgardLogo    from '/brands/Asgard/asgard_logo.svg';
+const tapeTechLogo  = 'https://drywalltoolbox.com/logos/tapetech_logo.svg';
+const columbiaLogo  = 'https://drywalltoolbox.com/logos/columbia_taping_tools_logo.svg';
+const level5Logo    = 'https://drywalltoolbox.com/logos/Level5.svg';
+const asgardLogo    = 'https://drywalltoolbox.com/logos/asgard_logo.svg';
 
 import '../styles/toolset-builder.css';
 
@@ -541,14 +541,6 @@ function Stage2({ template, allProducts, slotSelections, onSlotSelect, onBack, o
           </button>
         </div>
       </div>
-
-      {/* ── Kit Canvas ─────────────────────────────────────── */}
-      <KitCanvas
-        template={template}
-        slotSelections={slotSelections}
-        activeSlotIdx={activeSlotIdx}
-        onNodeClick={goToSlot}
-      />
 
       {/* ── Body: slot nav sidebar + product picker ─────────── */}
       <div className="tsb-builder-body">
