@@ -1,6 +1,6 @@
 # Brand Catalog Export
 
-Generated: 2026-05-05T15:24:37+00:00
+Generated: 2026-05-06T02:06:42+00:00
 
 Scope:
 - Brands: Asgard, Columbia, Level 5, TapeTech
@@ -9,7 +9,7 @@ Scope:
 - Catalog outputs intentionally omit source-store IDs, source URLs, product URLs, image URLs, source SKUs, handles, and timestamp metadata.
 
 Counts:
-- Products scanned: 1914
+- Products scanned: 1913
 - Filtered products: 369
 - Filtered variants: 1165
 - Duplicate real MPNs found in source data: 41

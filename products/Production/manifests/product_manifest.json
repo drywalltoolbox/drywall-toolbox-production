@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-05T15:24:37+00:00",
+  "generated_at": "2026-05-06T02:06:42+00:00",
   "filtered_product_count": 369,
   "filtered_variant_count": 1165,
   "target_brands": [
@@ -80,8 +80,8 @@
           "attribute_2": "",
           "attribute_3": "",
           "available": true,
-          "price": "348.00",
-          "compare_at_price": "348.00",
+          "price": "349.00",
+          "compare_at_price": "349.00",
           "weight_grams": 454
         },
         {
@@ -106,8 +106,8 @@
           "attribute_2": "",
           "attribute_3": "",
           "available": false,
-          "price": "392.00",
-          "compare_at_price": "392.00",
+          "price": "393.00",
+          "compare_at_price": "393.00",
           "weight_grams": 522
         }
       ]
@@ -232,8 +232,8 @@
           "attribute_2": "",
           "attribute_3": "",
           "available": true,
-          "price": "293.00",
-          "compare_at_price": "293.00",
+          "price": "294.00",
+          "compare_at_price": "294.00",
           "weight_grams": 1746
         }
       ]
@@ -273,8 +273,8 @@
           "attribute_2": "",
           "attribute_3": "",
           "available": true,
-          "price": "141.00",
-          "compare_at_price": "141.00",
+          "price": "142.00",
+          "compare_at_price": "142.00",
           "weight_grams": 1338
         }
       ]
@@ -316,8 +316,8 @@
           "attribute_2": "",
           "attribute_3": "",
           "available": false,
-          "price": "1244.00",
-          "compare_at_price": "1464.00",
+          "price": "1246.00",
+          "compare_at_price": "1466.00",
           "weight_grams": 0
         }
       ]
@@ -492,8 +492,8 @@
           "attribute_2": "",
           "attribute_3": "",
           "available": true,
-          "price": "345.00",
-          "compare_at_price": "345.00",
+          "price": "346.00",
+          "compare_at_price": "346.00",
           "weight_grams": 1497
         },
         {
@@ -672,8 +672,8 @@
           "attribute_2": "",
           "attribute_3": "",
           "available": true,
-          "price": "402.00",
-          "compare_at_price": "402.00",
+          "price": "403.00",
+          "compare_at_price": "403.00",
           "weight_grams": 1814
         },
         {
@@ -685,8 +685,8 @@
           "attribute_2": "",
           "attribute_3": "",
           "available": true,
-          "price": "412.00",
-          "compare_at_price": "412.00",
+          "price": "413.00",
+          "compare_at_price": "413.00",
           "weight_grams": 2041
         },
         {
@@ -698,8 +698,8 @@
           "attribute_2": "",
           "attribute_3": "",
           "available": true,
-          "price": "457.00",
-          "compare_at_price": "457.00",
+          "price": "458.00",
+          "compare_at_price": "458.00",
           "weight_grams": 2268
         }
       ]
@@ -814,8 +814,8 @@
           "attribute_2": "",
           "attribute_3": "",
           "available": true,
-          "price": "487.00",
-          "compare_at_price": "487.00",
+          "price": "488.00",
+          "compare_at_price": "488.00",
           "weight_grams": 1361
         },
         {
@@ -865,8 +865,8 @@
           "attribute_2": "",
           "attribute_3": "",
           "available": true,
-          "price": "1400.00",
-          "compare_at_price": "1400.00",
+          "price": "1402.00",
+          "compare_at_price": "1402.00",
           "weight_grams": 4196
         }
       ]
@@ -1331,8 +1331,8 @@
           "attribute_2": "",
           "attribute_3": "",
           "available": true,
-          "price": "177.00",
-          "compare_at_price": "177.00",
+          "price": "178.00",
+          "compare_at_price": "178.00",
           "weight_grams": 2268
         }
       ]
@@ -1620,7 +1620,7 @@
           "attribute_2": "",
           "attribute_3": "",
           "available": true,
-          "price": "43.00",
+          "price": "44.00",
           "compare_at_price": "46.00",
           "weight_grams": 0
         }
@@ -1680,8 +1680,8 @@
           "attribute_2": "",
           "attribute_3": "",
           "available": true,
-          "price": "16.00",
-          "compare_at_price": "16.00",
+          "price": "17.00",
+          "compare_at_price": "17.00",
           "weight_grams": 227
         },
         {
@@ -1809,8 +1809,8 @@
           "attribute_2": "",
           "attribute_3": "",
           "available": true,
-          "price": "1917.00",
-          "compare_at_price": "1917.00",
+          "price": "1919.00",
+          "compare_at_price": "1919.00",
           "weight_grams": 9072
         }
       ]
@@ -1845,8 +1845,8 @@
           "attribute_2": "",
           "attribute_3": "",
           "available": true,
-          "price": "2129.00",
-          "compare_at_price": "2480.00",
+          "price": "2132.00",
+          "compare_at_price": "2483.00",
           "weight_grams": 0
         }
       ]
@@ -1960,8 +1960,8 @@
           "attribute_2": "",
           "attribute_3": "",
           "available": true,
-          "price": "362.00",
-          "compare_at_price": "362.00",
+          "price": "363.00",
+          "compare_at_price": "363.00",
           "weight_grams": 907
         },
         {
@@ -1973,8 +1973,8 @@
           "attribute_2": "",
           "attribute_3": "",
           "available": true,
-          "price": "366.00",
-          "compare_at_price": "366.00",
+          "price": "367.00",
+          "compare_at_price": "367.00",
           "weight_grams": 907
         },
         {
@@ -2020,7 +2020,7 @@
           "attribute_1": "",
           "attribute_2": "",
           "attribute_3": "",
-          "available": false,
+          "available": true,
           "price": "19.00",
           "compare_at_price": "19.00",
           "weight_grams": 454
@@ -2672,8 +2672,8 @@
           "attribute_2": "",
           "attribute_3": "",
           "available": true,
-          "price": "430.00",
-          "compare_at_price": "430.00",
+          "price": "431.00",
+          "compare_at_price": "431.00",
           "weight_grams": 1361
         },
         {
@@ -2685,8 +2685,8 @@
           "attribute_2": "",
           "attribute_3": "",
           "available": true,
-          "price": "434.00",
-          "compare_at_price": "434.00",
+          "price": "435.00",
+          "compare_at_price": "435.00",
           "weight_grams": 1361
         },
         {
@@ -2758,8 +2758,8 @@
           "attribute_2": "",
           "attribute_3": "",
           "available": true,
-          "price": "396.00",
-          "compare_at_price": "396.00",
+          "price": "397.00",
+          "compare_at_price": "397.00",
           "weight_grams": 1361
         },
         {
@@ -2771,8 +2771,8 @@
           "attribute_2": "",
           "attribute_3": "",
           "available": true,
-          "price": "400.00",
-          "compare_at_price": "400.00",
+          "price": "401.00",
+          "compare_at_price": "401.00",
           "weight_grams": 1361
         },
         {
@@ -2837,8 +2837,8 @@
           "attribute_2": "",
           "attribute_3": "",
           "available": true,
-          "price": "1680.00",
-          "compare_at_price": "1680.00",
+          "price": "1683.00",
+          "compare_at_price": "1683.00",
           "weight_grams": 68
         }
       ]
@@ -3874,8 +3874,8 @@
           "attribute_2": "",
           "attribute_3": "",
           "available": true,
-          "price": "83.00",
-          "compare_at_price": "83.00",
+          "price": "84.00",
+          "compare_at_price": "84.00",
           "weight_grams": 100
         },
         {
@@ -4787,8 +4787,8 @@
           "attribute_2": "",
           "attribute_3": "",
           "available": true,
-          "price": "1417.00",
-          "compare_at_price": "1645.00",
+          "price": "1419.00",
+          "compare_at_price": "1647.00",
           "weight_grams": 0
         }
       ]
@@ -4899,9 +4899,9 @@
           "attribute_1": "",
           "attribute_2": "",
           "attribute_3": "",
-          "available": false,
-          "price": "687.00",
-          "compare_at_price": "777.00",
+          "available": true,
+          "price": "688.00",
+          "compare_at_price": "778.00",
           "weight_grams": 0
         }
       ]
@@ -5019,8 +5019,8 @@
           "attribute_2": "",
           "attribute_3": "",
           "available": false,
-          "price": "57.00",
-          "compare_at_price": "57.00",
+          "price": "58.00",
+          "compare_at_price": "58.00",
           "weight_grams": 68
         }
       ]
@@ -5110,8 +5110,8 @@
           "attribute_2": "",
           "attribute_3": "",
           "available": true,
-          "price": "205.00",
-          "compare_at_price": "205.00",
+          "price": "206.00",
+          "compare_at_price": "206.00",
           "weight_grams": 2268
         },
         {
@@ -5123,8 +5123,8 @@
           "attribute_2": "",
           "attribute_3": "",
           "available": true,
-          "price": "206.00",
-          "compare_at_price": "206.00",
+          "price": "207.00",
+          "compare_at_price": "207.00",
           "weight_grams": 2268
         }
       ]
@@ -5608,8 +5608,8 @@
           "attribute_2": "",
           "attribute_3": "",
           "available": true,
-          "price": "235.00",
-          "compare_at_price": "235.00",
+          "price": "236.00",
+          "compare_at_price": "236.00",
           "weight_grams": 2268
         },
         {
@@ -5647,8 +5647,8 @@
           "attribute_2": "",
           "attribute_3": "",
           "available": true,
-          "price": "219.00",
-          "compare_at_price": "219.00",
+          "price": "220.00",
+          "compare_at_price": "220.00",
           "weight_grams": 2268
         }
       ]
@@ -5793,8 +5793,8 @@
           "attribute_2": "",
           "attribute_3": "",
           "available": true,
-          "price": "149.00",
-          "compare_at_price": "149.00",
+          "price": "150.00",
+          "compare_at_price": "150.00",
           "weight_grams": 454
         },
         {
@@ -5850,8 +5850,8 @@
           "attribute_2": "",
           "attribute_3": "",
           "available": false,
-          "price": "918.00",
-          "compare_at_price": "918.00",
+          "price": "919.00",
+          "compare_at_price": "919.00",
           "weight_grams": 9525
         }
       ]
@@ -5951,8 +5951,8 @@
           "attribute_2": "",
           "attribute_3": "",
           "available": true,
-          "price": "166.00",
-          "compare_at_price": "166.00",
+          "price": "167.00",
+          "compare_at_price": "167.00",
           "weight_grams": 2268
         },
         {
@@ -6057,8 +6057,8 @@
           "attribute_2": "",
           "attribute_3": "",
           "available": true,
-          "price": "400.00",
-          "compare_at_price": "400.00",
+          "price": "401.00",
+          "compare_at_price": "401.00",
           "weight_grams": 2268
         }
       ]
@@ -6974,8 +6974,8 @@
           "attribute_2": "",
           "attribute_3": "",
           "available": true,
-          "price": "97.00",
-          "compare_at_price": "97.00",
+          "price": "98.00",
+          "compare_at_price": "98.00",
           "weight_grams": 454
         },
         {
@@ -7000,8 +7000,8 @@
           "attribute_2": "",
           "attribute_3": "",
           "available": true,
-          "price": "103.00",
-          "compare_at_price": "103.00",
+          "price": "104.00",
+          "compare_at_price": "104.00",
           "weight_grams": 454
         },
         {
@@ -7084,8 +7084,8 @@
           "attribute_2": "",
           "attribute_3": "",
           "available": true,
-          "price": "97.00",
-          "compare_at_price": "97.00",
+          "price": "98.00",
+          "compare_at_price": "98.00",
           "weight_grams": 454
         }
       ]
@@ -7150,8 +7150,8 @@
           "attribute_2": "",
           "attribute_3": "",
           "available": true,
-          "price": "400.00",
-          "compare_at_price": "400.00",
+          "price": "401.00",
+          "compare_at_price": "401.00",
           "weight_grams": 1361
         },
         {
@@ -7176,8 +7176,8 @@
           "attribute_2": "",
           "attribute_3": "",
           "available": true,
-          "price": "413.00",
-          "compare_at_price": "413.00",
+          "price": "414.00",
+          "compare_at_price": "414.00",
           "weight_grams": 1361
         }
       ]
@@ -7288,8 +7288,8 @@
           "attribute_2": "",
           "attribute_3": "",
           "available": true,
-          "price": "37.00",
-          "compare_at_price": "37.00",
+          "price": "38.00",
+          "compare_at_price": "38.00",
           "weight_grams": 454
         },
         {
@@ -7750,8 +7750,8 @@
           "attribute_2": "",
           "attribute_3": "",
           "available": true,
-          "price": "362.00",
-          "compare_at_price": "362.00",
+          "price": "363.00",
+          "compare_at_price": "363.00",
           "weight_grams": 2268
         },
         {
@@ -7763,8 +7763,8 @@
           "attribute_2": "",
           "attribute_3": "",
           "available": true,
-          "price": "366.00",
-          "compare_at_price": "366.00",
+          "price": "367.00",
+          "compare_at_price": "367.00",
           "weight_grams": 2268
         },
         {
@@ -7776,8 +7776,8 @@
           "attribute_2": "",
           "attribute_3": "",
           "available": true,
-          "price": "370.00",
-          "compare_at_price": "370.00",
+          "price": "371.00",
+          "compare_at_price": "371.00",
           "weight_grams": 2268
         },
         {
@@ -7802,8 +7802,8 @@
           "attribute_2": "",
           "attribute_3": "",
           "available": true,
-          "price": "379.00",
-          "compare_at_price": "379.00",
+          "price": "380.00",
+          "compare_at_price": "380.00",
           "weight_grams": 2268
         },
         {
@@ -7815,8 +7815,8 @@
           "attribute_2": "",
           "attribute_3": "",
           "available": false,
-          "price": "383.00",
-          "compare_at_price": "383.00",
+          "price": "384.00",
+          "compare_at_price": "384.00",
           "weight_grams": 2268
         }
       ]
@@ -8488,7 +8488,7 @@
           "attribute_1": "HFFB3 - Hinge Box End Plate-Right",
           "attribute_2": "",
           "attribute_3": "",
-          "available": true,
+          "available": false,
           "price": "37.00",
           "compare_at_price": "37.00",
           "weight_grams": 10
@@ -8615,8 +8615,8 @@
           "attribute_2": "",
           "attribute_3": "",
           "available": false,
-          "price": "1345.00",
-          "compare_at_price": "1540.00",
+          "price": "1347.00",
+          "compare_at_price": "1542.00",
           "weight_grams": 0
         }
       ]
@@ -8659,8 +8659,8 @@
           "attribute_2": "",
           "attribute_3": "",
           "available": true,
-          "price": "3691.00",
-          "compare_at_price": "4508.00",
+          "price": "3697.00",
+          "compare_at_price": "4514.00",
           "weight_grams": 0
         }
       ]
@@ -9114,8 +9114,8 @@
           "attribute_2": "",
           "attribute_3": "",
           "available": true,
-          "price": "45.00",
-          "compare_at_price": "45.00",
+          "price": "46.00",
+          "compare_at_price": "46.00",
           "weight_grams": 10
         },
         {
@@ -10368,8 +10368,8 @@
           "attribute_2": "",
           "attribute_3": "",
           "available": true,
-          "price": "400.00",
-          "compare_at_price": "400.00",
+          "price": "401.00",
+          "compare_at_price": "401.00",
           "weight_grams": 1361
         },
         {
@@ -10394,8 +10394,8 @@
           "attribute_2": "",
           "attribute_3": "",
           "available": false,
-          "price": "413.00",
-          "compare_at_price": "413.00",
+          "price": "414.00",
+          "compare_at_price": "414.00",
           "weight_grams": 1361
         }
       ]
@@ -10440,8 +10440,8 @@
           "attribute_2": "",
           "attribute_3": "",
           "available": true,
-          "price": "149.00",
-          "compare_at_price": "149.00",
+          "price": "150.00",
+          "compare_at_price": "150.00",
           "weight_grams": 2268
         }
       ]
@@ -10520,8 +10520,8 @@
           "attribute_2": "",
           "attribute_3": "",
           "available": true,
-          "price": "494.00",
-          "compare_at_price": "494.00",
+          "price": "495.00",
+          "compare_at_price": "495.00",
           "weight_grams": 3175
         }
       ]
@@ -10852,8 +10852,8 @@
           "attribute_2": "",
           "attribute_3": "",
           "available": false,
-          "price": "76.00",
-          "compare_at_price": "76.00",
+          "price": "77.00",
+          "compare_at_price": "77.00",
           "weight_grams": 454
         },
         {
@@ -11225,8 +11225,8 @@
           "attribute_2": "",
           "attribute_3": "",
           "available": true,
-          "price": "211.00",
-          "compare_at_price": "222.00",
+          "price": "212.00",
+          "compare_at_price": "223.00",
           "weight_grams": 0
         }
       ]
@@ -11857,8 +11857,8 @@
           "attribute_2": "",
           "attribute_3": "",
           "available": true,
-          "price": "1893.00",
-          "compare_at_price": "1893.00",
+          "price": "1896.00",
+          "compare_at_price": "1896.00",
           "weight_grams": 9072
         }
       ]
@@ -11904,8 +11904,8 @@
           "attribute_2": "",
           "attribute_3": "",
           "available": true,
-          "price": "525.00",
-          "compare_at_price": "525.00",
+          "price": "526.00",
+          "compare_at_price": "526.00",
           "weight_grams": 4536
         }
       ]
@@ -11950,8 +11950,8 @@
           "attribute_2": "",
           "attribute_3": "",
           "available": true,
-          "price": "660.00",
-          "compare_at_price": "660.00",
+          "price": "661.00",
+          "compare_at_price": "661.00",
           "weight_grams": 4536
         }
       ]
@@ -12075,8 +12075,8 @@
           "attribute_2": "",
           "attribute_3": "",
           "available": true,
-          "price": "97.00",
-          "compare_at_price": "97.00",
+          "price": "98.00",
+          "compare_at_price": "98.00",
           "weight_grams": 454
         },
         {
@@ -12088,8 +12088,8 @@
           "attribute_2": "",
           "attribute_3": "",
           "available": true,
-          "price": "97.00",
-          "compare_at_price": "97.00",
+          "price": "98.00",
+          "compare_at_price": "98.00",
           "weight_grams": 454
         },
         {
@@ -12101,8 +12101,8 @@
           "attribute_2": "",
           "attribute_3": "",
           "available": true,
-          "price": "97.00",
-          "compare_at_price": "97.00",
+          "price": "98.00",
+          "compare_at_price": "98.00",
           "weight_grams": 454
         }
       ]
@@ -12153,8 +12153,8 @@
           "attribute_2": "",
           "attribute_3": "",
           "available": true,
-          "price": "1470.00",
-          "compare_at_price": "1470.00",
+          "price": "1473.00",
+          "compare_at_price": "1473.00",
           "weight_grams": 7711
         }
       ]
@@ -12286,8 +12286,8 @@
           "attribute_2": "",
           "attribute_3": "",
           "available": true,
-          "price": "2152.00",
-          "compare_at_price": "2505.00",
+          "price": "2155.00",
+          "compare_at_price": "2509.00",
           "weight_grams": 0
         }
       ]
@@ -12380,8 +12380,8 @@
           "attribute_2": "",
           "attribute_3": "",
           "available": false,
-          "price": "1387.00",
-          "compare_at_price": "1585.00",
+          "price": "1389.00",
+          "compare_at_price": "1587.00",
           "weight_grams": 0
         }
       ]
@@ -12550,8 +12550,8 @@
           "attribute_2": "",
           "attribute_3": "",
           "available": true,
-          "price": "137.00",
-          "compare_at_price": "137.00",
+          "price": "138.00",
+          "compare_at_price": "138.00",
           "weight_grams": 2268
         }
       ]
@@ -12647,8 +12647,8 @@
           "attribute_2": "",
           "attribute_3": "",
           "available": true,
-          "price": "375.00",
-          "compare_at_price": "375.00",
+          "price": "376.00",
+          "compare_at_price": "376.00",
           "weight_grams": 3629
         }
       ]
@@ -12693,8 +12693,8 @@
           "attribute_2": "",
           "attribute_3": "",
           "available": false,
-          "price": "961.00",
-          "compare_at_price": "1082.00",
+          "price": "962.00",
+          "compare_at_price": "1084.00",
           "weight_grams": 0
         }
       ]
@@ -12729,8 +12729,8 @@
           "attribute_2": "",
           "attribute_3": "",
           "available": true,
-          "price": "5852.00",
-          "compare_at_price": "5852.00",
+          "price": "5861.00",
+          "compare_at_price": "5861.00",
           "weight_grams": 38555
         }
       ]
@@ -12769,9 +12769,9 @@
           "attribute_1": "",
           "attribute_2": "",
           "attribute_3": "",
-          "available": true,
-          "price": "633.00",
-          "compare_at_price": "703.00",
+          "available": false,
+          "price": "634.00",
+          "compare_at_price": "704.00",
           "weight_grams": 0
         }
       ]
@@ -12847,8 +12847,8 @@
           "attribute_2": "",
           "attribute_3": "",
           "available": true,
-          "price": "73.00",
-          "compare_at_price": "73.00",
+          "price": "74.00",
+          "compare_at_price": "74.00",
           "weight_grams": 454
         }
       ]
@@ -12958,8 +12958,8 @@
           "attribute_2": "",
           "attribute_3": "",
           "available": true,
-          "price": "73.00",
-          "compare_at_price": "73.00",
+          "price": "74.00",
+          "compare_at_price": "74.00",
           "weight_grams": 454
         },
         {
@@ -13043,8 +13043,8 @@
           "attribute_2": "",
           "attribute_3": "",
           "available": true,
-          "price": "362.00",
-          "compare_at_price": "362.00",
+          "price": "363.00",
+          "compare_at_price": "363.00",
           "weight_grams": 3629
         }
       ]
@@ -13091,8 +13091,8 @@
           "attribute_2": "",
           "attribute_3": "",
           "available": true,
-          "price": "991.00",
-          "compare_at_price": "991.00",
+          "price": "992.00",
+          "compare_at_price": "992.00",
           "weight_grams": 13154
         }
       ]
@@ -13481,8 +13481,8 @@
           "attribute_2": "",
           "attribute_3": "",
           "available": false,
-          "price": "1680.00",
-          "compare_at_price": "1680.00",
+          "price": "1683.00",
+          "compare_at_price": "1683.00",
           "weight_grams": 2359
         }
       ]
@@ -13528,8 +13528,8 @@
           "attribute_2": "",
           "attribute_3": "",
           "available": false,
-          "price": "1893.00",
-          "compare_at_price": "1893.00",
+          "price": "1896.00",
+          "compare_at_price": "1896.00",
           "weight_grams": 9072
         }
       ]
@@ -13606,8 +13606,8 @@
           "attribute_2": "",
           "attribute_3": "",
           "available": true,
-          "price": "177.00",
-          "compare_at_price": "177.00",
+          "price": "178.00",
+          "compare_at_price": "178.00",
           "weight_grams": 4536
         }
       ]
@@ -13652,8 +13652,8 @@
           "attribute_2": "",
           "attribute_3": "",
           "available": false,
-          "price": "902.00",
-          "compare_at_price": "1019.00",
+          "price": "903.00",
+          "compare_at_price": "1021.00",
           "weight_grams": 0
         }
       ]
@@ -13834,8 +13834,8 @@
           "attribute_2": "",
           "attribute_3": "",
           "available": false,
-          "price": "2936.00",
-          "compare_at_price": "3451.00",
+          "price": "2940.00",
+          "compare_at_price": "3456.00",
           "weight_grams": 0
         }
       ]
@@ -14153,7 +14153,7 @@
           "attribute_3": "",
           "available": true,
           "price": "110.00",
-          "compare_at_price": "121.00",
+          "compare_at_price": "122.00",
           "weight_grams": 0
         }
       ]
@@ -14339,8 +14339,8 @@
           "attribute_2": "",
           "attribute_3": "",
           "available": true,
-          "price": "16.00",
-          "compare_at_price": "16.00",
+          "price": "17.00",
+          "compare_at_price": "17.00",
           "weight_grams": 227
         },
         {
@@ -14665,9 +14665,9 @@
           "attribute_1": "2.5\"",
           "attribute_2": "",
           "attribute_3": "",
-          "available": false,
-          "price": "169.00",
-          "compare_at_price": "178.00",
+          "available": true,
+          "price": "170.00",
+          "compare_at_price": "179.00",
           "weight_grams": 0
         },
         {
@@ -14678,9 +14678,9 @@
           "attribute_1": "3\"",
           "attribute_2": "",
           "attribute_3": "",
-          "available": false,
+          "available": true,
           "price": "174.00",
-          "compare_at_price": "183.00",
+          "compare_at_price": "184.00",
           "weight_grams": 0
         },
         {
@@ -14691,7 +14691,7 @@
           "attribute_1": "3\" Widetrack",
           "attribute_2": "",
           "attribute_3": "",
-          "available": false,
+          "available": true,
           "price": "175.00",
           "compare_at_price": "184.00",
           "weight_grams": 0
@@ -14704,8 +14704,8 @@
           "attribute_1": "3.5\"",
           "attribute_2": "",
           "attribute_3": "",
-          "available": false,
-          "price": "178.00",
+          "available": true,
+          "price": "179.00",
           "compare_at_price": "188.00",
           "weight_grams": 0
         },
@@ -14717,8 +14717,8 @@
           "attribute_1": "4\"",
           "attribute_2": "",
           "attribute_3": "",
-          "available": false,
-          "price": "186.00",
+          "available": true,
+          "price": "187.00",
           "compare_at_price": "196.00",
           "weight_grams": 0
         }
@@ -14752,9 +14752,9 @@
           "attribute_1": "",
           "attribute_2": "",
           "attribute_3": "",
-          "available": false,
-          "price": "593.00",
-          "compare_at_price": "652.00",
+          "available": true,
+          "price": "594.00",
+          "compare_at_price": "653.00",
           "weight_grams": 0
         }
       ]
@@ -14848,7 +14848,7 @@
           "attribute_3": "",
           "available": true,
           "price": "174.00",
-          "compare_at_price": "183.00",
+          "compare_at_price": "184.00",
           "weight_grams": 0
         }
       ]
@@ -14884,8 +14884,8 @@
           "attribute_2": "",
           "attribute_3": "",
           "available": true,
-          "price": "5427.00",
-          "compare_at_price": "5427.00",
+          "price": "5435.00",
+          "compare_at_price": "5435.00",
           "weight_grams": 43091
         }
       ]
@@ -15216,8 +15216,8 @@
           "attribute_2": "",
           "attribute_3": "",
           "available": true,
-          "price": "298.00",
-          "compare_at_price": "298.00",
+          "price": "299.00",
+          "compare_at_price": "299.00",
           "weight_grams": 907
         },
         {
@@ -15271,8 +15271,8 @@
           "attribute_2": "",
           "attribute_3": "",
           "available": true,
-          "price": "904.00",
-          "compare_at_price": "904.00",
+          "price": "905.00",
+          "compare_at_price": "905.00",
           "weight_grams": 4536
         }
       ]
@@ -15546,7 +15546,7 @@
           "attribute_1": "18\"",
           "attribute_2": "",
           "attribute_3": "",
-          "available": true,
+          "available": false,
           "price": "91.00",
           "compare_at_price": "91.00",
           "weight_grams": 1814
@@ -15890,8 +15890,8 @@
           "attribute_2": "",
           "attribute_3": "",
           "available": true,
-          "price": "1592.00",
-          "compare_at_price": "1592.00",
+          "price": "1594.00",
+          "compare_at_price": "1594.00",
           "weight_grams": 9072
         }
       ]
@@ -15988,8 +15988,8 @@
           "attribute_2": "",
           "attribute_3": "",
           "available": true,
-          "price": "163.00",
-          "compare_at_price": "163.00",
+          "price": "164.00",
+          "compare_at_price": "164.00",
           "weight_grams": 50
         },
         {
@@ -16001,8 +16001,8 @@
           "attribute_2": "",
           "attribute_3": "",
           "available": true,
-          "price": "141.00",
-          "compare_at_price": "141.00",
+          "price": "142.00",
+          "compare_at_price": "142.00",
           "weight_grams": 50
         },
         {
@@ -16583,8 +16583,8 @@
           "attribute_2": "",
           "attribute_3": "",
           "available": true,
-          "price": "60.00",
-          "compare_at_price": "60.00",
+          "price": "61.00",
+          "compare_at_price": "61.00",
           "weight_grams": 1361
         },
         {
@@ -16703,7 +16703,7 @@
           "attribute_3": "",
           "available": true,
           "price": "282.00",
-          "compare_at_price": "296.00",
+          "compare_at_price": "297.00",
           "weight_grams": 4536
         }
       ]
@@ -16753,7 +16753,7 @@
           "attribute_2": "",
           "attribute_3": "",
           "available": true,
-          "price": "309.00",
+          "price": "310.00",
           "compare_at_price": "364.00",
           "weight_grams": 4536
         }
@@ -16891,8 +16891,8 @@
           "attribute_2": "",
           "attribute_3": "",
           "available": true,
-          "price": "499.00",
-          "compare_at_price": "499.00",
+          "price": "500.00",
+          "compare_at_price": "500.00",
           "weight_grams": 6804
         }
       ]
@@ -17136,8 +17136,8 @@
           "attribute_2": "",
           "attribute_3": "",
           "available": true,
-          "price": "438.00",
-          "compare_at_price": "438.00",
+          "price": "439.00",
+          "compare_at_price": "439.00",
           "weight_grams": 2268
         },
         {
@@ -17149,8 +17149,8 @@
           "attribute_2": "",
           "attribute_3": "",
           "available": true,
-          "price": "448.00",
-          "compare_at_price": "448.00",
+          "price": "449.00",
+          "compare_at_price": "449.00",
           "weight_grams": 2268
         },
         {
@@ -17175,8 +17175,8 @@
           "attribute_2": "",
           "attribute_3": "",
           "available": true,
-          "price": "469.00",
-          "compare_at_price": "469.00",
+          "price": "470.00",
+          "compare_at_price": "470.00",
           "weight_grams": 2268
         }
       ]
@@ -17222,8 +17222,8 @@
           "attribute_2": "",
           "attribute_3": "",
           "available": true,
-          "price": "89.00",
-          "compare_at_price": "89.00",
+          "price": "90.00",
+          "compare_at_price": "90.00",
           "weight_grams": 5
         },
         {
@@ -17685,7 +17685,7 @@
           "attribute_3": "",
           "available": true,
           "price": "254.00",
-          "compare_at_price": "298.00",
+          "compare_at_price": "299.00",
           "weight_grams": 5897
         }
       ]
@@ -17899,8 +17899,8 @@
           "attribute_2": "52\"",
           "attribute_3": "",
           "available": true,
-          "price": "193.00",
-          "compare_at_price": "193.00",
+          "price": "194.00",
+          "compare_at_price": "194.00",
           "weight_grams": 2268
         },
         {
@@ -17925,8 +17925,8 @@
           "attribute_2": "52\"",
           "attribute_3": "",
           "available": true,
-          "price": "206.00",
-          "compare_at_price": "206.00",
+          "price": "207.00",
+          "compare_at_price": "207.00",
           "weight_grams": 2268
         },
         {
@@ -18216,8 +18216,8 @@
           "attribute_2": "",
           "attribute_3": "",
           "available": true,
-          "price": "335.00",
-          "compare_at_price": "335.00",
+          "price": "336.00",
+          "compare_at_price": "336.00",
           "weight_grams": 4536
         },
         {
@@ -18229,8 +18229,8 @@
           "attribute_2": "",
           "attribute_3": "",
           "available": true,
-          "price": "345.00",
-          "compare_at_price": "345.00",
+          "price": "346.00",
+          "compare_at_price": "346.00",
           "weight_grams": 4536
         }
       ]
@@ -18275,8 +18275,8 @@
           "attribute_2": "",
           "attribute_3": "",
           "available": true,
-          "price": "193.00",
-          "compare_at_price": "193.00",
+          "price": "194.00",
+          "compare_at_price": "194.00",
           "weight_grams": 4536
         },
         {
@@ -18621,8 +18621,8 @@
           "attribute_2": "",
           "attribute_3": "",
           "available": true,
-          "price": "418.00",
-          "compare_at_price": "418.00",
+          "price": "419.00",
+          "compare_at_price": "419.00",
           "weight_grams": 2268
         },
         {
@@ -18647,8 +18647,8 @@
           "attribute_2": "",
           "attribute_3": "",
           "available": true,
-          "price": "439.00",
-          "compare_at_price": "439.00",
+          "price": "440.00",
+          "compare_at_price": "440.00",
           "weight_grams": 2268
         },
         {
@@ -18660,8 +18660,8 @@
           "attribute_2": "",
           "attribute_3": "",
           "available": true,
-          "price": "455.00",
-          "compare_at_price": "455.00",
+          "price": "456.00",
+          "compare_at_price": "456.00",
           "weight_grams": 2268
         }
       ]
@@ -18772,8 +18772,8 @@
           "attribute_2": "",
           "attribute_3": "",
           "available": true,
-          "price": "124.00",
-          "compare_at_price": "124.00",
+          "price": "125.00",
+          "compare_at_price": "125.00",
           "weight_grams": 1361
         }
       ]
@@ -18887,8 +18887,8 @@
           "attribute_2": "",
           "attribute_3": "",
           "available": true,
-          "price": "1476.00",
-          "compare_at_price": "1845.00",
+          "price": "1478.00",
+          "compare_at_price": "1848.00",
           "weight_grams": 11340
         }
       ]
@@ -18929,8 +18929,8 @@
           "attribute_2": "",
           "attribute_3": "",
           "available": true,
-          "price": "1601.00",
-          "compare_at_price": "2001.00",
+          "price": "1603.00",
+          "compare_at_price": "2003.00",
           "weight_grams": 13608
         }
       ]
@@ -18973,8 +18973,8 @@
           "attribute_2": "",
           "attribute_3": "",
           "available": true,
-          "price": "4240.00",
-          "compare_at_price": "5300.00",
+          "price": "4247.00",
+          "compare_at_price": "5308.00",
           "weight_grams": 22680
         }
       ]
@@ -19017,8 +19017,8 @@
           "attribute_2": "",
           "attribute_3": "",
           "available": true,
-          "price": "4639.00",
-          "compare_at_price": "5799.00",
+          "price": "4646.00",
+          "compare_at_price": "5807.00",
           "weight_grams": 22680
         }
       ]
@@ -19076,8 +19076,8 @@
           "attribute_2": "",
           "attribute_3": "",
           "available": true,
-          "price": "439.00",
-          "compare_at_price": "439.00",
+          "price": "440.00",
+          "compare_at_price": "440.00",
           "weight_grams": 2268
         },
         {
@@ -19102,8 +19102,8 @@
           "attribute_2": "",
           "attribute_3": "",
           "available": true,
-          "price": "465.00",
-          "compare_at_price": "465.00",
+          "price": "466.00",
+          "compare_at_price": "466.00",
           "weight_grams": 2268
         }
       ]
@@ -19189,8 +19189,8 @@
           "attribute_2": "",
           "attribute_3": "",
           "available": true,
-          "price": "1030.00",
-          "compare_at_price": "1030.00",
+          "price": "1031.00",
+          "compare_at_price": "1031.00",
           "weight_grams": 3629
         }
       ]
@@ -19969,8 +19969,8 @@
           "attribute_2": "",
           "attribute_3": "",
           "available": true,
-          "price": "58.00",
-          "compare_at_price": "58.00",
+          "price": "59.00",
+          "compare_at_price": "59.00",
           "weight_grams": 2268
         },
         {
@@ -20128,8 +20128,8 @@
           "attribute_2": "",
           "attribute_3": "",
           "available": true,
-          "price": "58.00",
-          "compare_at_price": "58.00",
+          "price": "59.00",
+          "compare_at_price": "59.00",
           "weight_grams": 2268
         },
         {
@@ -20254,8 +20254,8 @@
           "attribute_2": "",
           "attribute_3": "",
           "available": true,
-          "price": "599.00",
-          "compare_at_price": "705.00",
+          "price": "600.00",
+          "compare_at_price": "706.00",
           "weight_grams": 9072
         }
       ]
@@ -20309,8 +20309,8 @@
           "attribute_2": "",
           "attribute_3": "",
           "available": true,
-          "price": "63.00",
-          "compare_at_price": "63.00",
+          "price": "64.00",
+          "compare_at_price": "64.00",
           "weight_grams": 907
         },
         {
@@ -20477,7 +20477,7 @@
           "attribute_2": "",
           "attribute_3": "",
           "available": true,
-          "price": "349.00",
+          "price": "350.00",
           "compare_at_price": "368.00",
           "weight_grams": 4536
         }
@@ -20527,7 +20527,7 @@
           "attribute_3": "",
           "available": true,
           "price": "394.00",
-          "compare_at_price": "463.00",
+          "compare_at_price": "464.00",
           "weight_grams": 4536
         }
       ]
@@ -21605,7 +21605,7 @@
           "attribute_3": "",
           "available": true,
           "price": "56.00",
-          "compare_at_price": "65.00",
+          "compare_at_price": "66.00",
           "weight_grams": 1361
         }
       ]
@@ -21778,8 +21778,8 @@
           "attribute_2": "",
           "attribute_3": "",
           "available": true,
-          "price": "74.00",
-          "compare_at_price": "74.00",
+          "price": "75.00",
+          "compare_at_price": "75.00",
           "weight_grams": 91
         }
       ]
@@ -22053,8 +22053,8 @@
           "attribute_2": "",
           "attribute_3": "",
           "available": true,
-          "price": "1955.00",
-          "compare_at_price": "1955.00",
+          "price": "1958.00",
+          "compare_at_price": "1958.00",
           "weight_grams": 2359
         }
       ]
@@ -22096,8 +22096,8 @@
           "attribute_2": "",
           "attribute_3": "",
           "available": true,
-          "price": "1761.00",
-          "compare_at_price": "1761.00",
+          "price": "1764.00",
+          "compare_at_price": "1764.00",
           "weight_grams": 2359
         }
       ]
@@ -22136,8 +22136,8 @@
           "attribute_2": "",
           "attribute_3": "",
           "available": true,
-          "price": "1960.00",
-          "compare_at_price": "1960.00",
+          "price": "1963.00",
+          "compare_at_price": "1963.00",
           "weight_grams": 2359
         }
       ]
@@ -22177,8 +22177,8 @@
           "attribute_2": "",
           "attribute_3": "",
           "available": true,
-          "price": "1083.00",
-          "compare_at_price": "1083.00",
+          "price": "1084.00",
+          "compare_at_price": "1084.00",
           "weight_grams": 4536
         }
       ]
@@ -22434,8 +22434,8 @@
           "attribute_2": "",
           "attribute_3": "",
           "available": true,
-          "price": "726.00",
-          "compare_at_price": "726.00",
+          "price": "727.00",
+          "compare_at_price": "727.00",
           "weight_grams": 5443
         }
       ]
@@ -22579,8 +22579,8 @@
           "attribute_2": "",
           "attribute_3": "",
           "available": true,
-          "price": "87.00",
-          "compare_at_price": "87.00",
+          "price": "88.00",
+          "compare_at_price": "88.00",
           "weight_grams": 454
         }
       ]
@@ -22788,8 +22788,8 @@
           "attribute_2": "",
           "attribute_3": "",
           "available": false,
-          "price": "1549.00",
-          "compare_at_price": "1822.00",
+          "price": "1551.00",
+          "compare_at_price": "1824.00",
           "weight_grams": 0
         }
       ]
@@ -22984,8 +22984,8 @@
           "attribute_2": "",
           "attribute_3": "",
           "available": true,
-          "price": "54.00",
-          "compare_at_price": "54.00",
+          "price": "55.00",
+          "compare_at_price": "55.00",
           "weight_grams": 454
         }
       ]
@@ -23304,8 +23304,8 @@
           "attribute_2": "",
           "attribute_3": "",
           "available": true,
-          "price": "347.00",
-          "compare_at_price": "347.00",
+          "price": "348.00",
+          "compare_at_price": "348.00",
           "weight_grams": 907
         },
         {
@@ -23411,8 +23411,8 @@
           "attribute_2": "",
           "attribute_3": "",
           "available": true,
-          "price": "473.00",
-          "compare_at_price": "473.00",
+          "price": "474.00",
+          "compare_at_price": "474.00",
           "weight_grams": 907
         },
         {
@@ -23424,8 +23424,8 @@
           "attribute_2": "",
           "attribute_3": "",
           "available": true,
-          "price": "484.00",
-          "compare_at_price": "484.00",
+          "price": "485.00",
+          "compare_at_price": "485.00",
           "weight_grams": 907
         }
       ]
@@ -23531,8 +23531,8 @@
           "attribute_2": "",
           "attribute_3": "",
           "available": true,
-          "price": "99.00",
-          "compare_at_price": "99.00",
+          "price": "100.00",
+          "compare_at_price": "100.00",
           "weight_grams": 68
         }
       ]
@@ -23740,8 +23740,8 @@
           "attribute_2": "",
           "attribute_3": "",
           "available": false,
-          "price": "155.00",
-          "compare_at_price": "155.00",
+          "price": "156.00",
+          "compare_at_price": "156.00",
           "weight_grams": 68
         }
       ]
@@ -23905,8 +23905,8 @@
           "attribute_2": "",
           "attribute_3": "",
           "available": true,
-          "price": "473.00",
-          "compare_at_price": "473.00",
+          "price": "474.00",
+          "compare_at_price": "474.00",
           "weight_grams": 907
         }
       ]
@@ -24216,8 +24216,8 @@
           "attribute_2": "",
           "attribute_3": "",
           "available": true,
-          "price": "65.00",
-          "compare_at_price": "65.00",
+          "price": "66.00",
+          "compare_at_price": "66.00",
           "weight_grams": 2268
         }
       ]
@@ -24319,8 +24319,8 @@
           "attribute_2": "",
           "attribute_3": "",
           "available": true,
-          "price": "258.00",
-          "compare_at_price": "258.00",
+          "price": "259.00",
+          "compare_at_price": "259.00",
           "weight_grams": 2268
         },
         {
@@ -24423,8 +24423,8 @@
           "attribute_2": "",
           "attribute_3": "",
           "available": true,
-          "price": "1414.00",
-          "compare_at_price": "1663.00",
+          "price": "1416.00",
+          "compare_at_price": "1666.00",
           "weight_grams": 0
         }
       ]
@@ -24566,8 +24566,8 @@
           "attribute_2": "",
           "attribute_3": "",
           "available": true,
-          "price": "4493.00",
-          "compare_at_price": "5616.00",
+          "price": "4499.00",
+          "compare_at_price": "5624.00",
           "weight_grams": 0
         }
       ]
@@ -24750,8 +24750,8 @@
           "attribute_2": "",
           "attribute_3": "",
           "available": true,
-          "price": "73.00",
-          "compare_at_price": "73.00",
+          "price": "74.00",
+          "compare_at_price": "74.00",
           "weight_grams": 635
         },
         {
@@ -24829,8 +24829,8 @@
           "attribute_2": "",
           "attribute_3": "",
           "available": true,
-          "price": "56.00",
-          "compare_at_price": "56.00",
+          "price": "57.00",
+          "compare_at_price": "57.00",
           "weight_grams": 544
         },
         {
@@ -24957,8 +24957,8 @@
           "attribute_2": "",
           "attribute_3": "",
           "available": true,
-          "price": "217.00",
-          "compare_at_price": "217.00",
+          "price": "218.00",
+          "compare_at_price": "218.00",
           "weight_grams": 45
         }
       ]
@@ -25013,8 +25013,8 @@
           "attribute_2": "",
           "attribute_3": "",
           "available": true,
-          "price": "462.00",
-          "compare_at_price": "462.00",
+          "price": "463.00",
+          "compare_at_price": "463.00",
           "weight_grams": 1361
         },
         {
@@ -25026,8 +25026,8 @@
           "attribute_2": "",
           "attribute_3": "",
           "available": true,
-          "price": "462.00",
-          "compare_at_price": "462.00",
+          "price": "463.00",
+          "compare_at_price": "463.00",
           "weight_grams": 1361
         },
         {
@@ -25039,8 +25039,8 @@
           "attribute_2": "",
           "attribute_3": "",
           "available": true,
-          "price": "489.00",
-          "compare_at_price": "489.00",
+          "price": "490.00",
+          "compare_at_price": "490.00",
           "weight_grams": 1361
         }
       ]
@@ -25080,8 +25080,8 @@
           "attribute_2": "",
           "attribute_3": "",
           "available": true,
-          "price": "1211.00",
-          "compare_at_price": "1211.00",
+          "price": "1212.00",
+          "compare_at_price": "1212.00",
           "weight_grams": 4536
         }
       ]
@@ -25201,8 +25201,8 @@
           "attribute_2": "",
           "attribute_3": "",
           "available": true,
-          "price": "1887.00",
-          "compare_at_price": "2220.00",
+          "price": "1890.00",
+          "compare_at_price": "2223.00",
           "weight_grams": 0
         }
       ]
@@ -25280,8 +25280,8 @@
           "attribute_2": "",
           "attribute_3": "",
           "available": false,
-          "price": "660.00",
-          "compare_at_price": "660.00",
+          "price": "661.00",
+          "compare_at_price": "661.00",
           "weight_grams": 15422
         }
       ]
@@ -25416,8 +25416,8 @@
           "attribute_2": "",
           "attribute_3": "",
           "available": true,
-          "price": "506.00",
-          "compare_at_price": "506.00",
+          "price": "507.00",
+          "compare_at_price": "507.00",
           "weight_grams": 1361
         },
         {
@@ -25429,8 +25429,8 @@
           "attribute_2": "",
           "attribute_3": "",
           "available": true,
-          "price": "517.00",
-          "compare_at_price": "517.00",
+          "price": "518.00",
+          "compare_at_price": "518.00",
           "weight_grams": 1361
         },
         {
@@ -25442,8 +25442,8 @@
           "attribute_2": "",
           "attribute_3": "",
           "available": true,
-          "price": "528.00",
-          "compare_at_price": "528.00",
+          "price": "529.00",
+          "compare_at_price": "529.00",
           "weight_grams": 1361
         }
       ]
@@ -25785,8 +25785,8 @@
           "attribute_2": "",
           "attribute_3": "",
           "available": true,
-          "price": "34.00",
-          "compare_at_price": "34.00",
+          "price": "35.00",
+          "compare_at_price": "35.00",
           "weight_grams": 2268
         },
         {
@@ -25811,8 +25811,8 @@
           "attribute_2": "",
           "attribute_3": "",
           "available": true,
-          "price": "59.00",
-          "compare_at_price": "59.00",
+          "price": "60.00",
+          "compare_at_price": "60.00",
           "weight_grams": 2268
         },
         {
@@ -25824,8 +25824,8 @@
           "attribute_2": "",
           "attribute_3": "",
           "available": true,
-          "price": "78.00",
-          "compare_at_price": "78.00",
+          "price": "79.00",
+          "compare_at_price": "79.00",
           "weight_grams": 2268
         },
         {
@@ -25850,8 +25850,8 @@
           "attribute_2": "",
           "attribute_3": "",
           "available": true,
-          "price": "113.00",
-          "compare_at_price": "113.00",
+          "price": "114.00",
+          "compare_at_price": "114.00",
           "weight_grams": 2268
         }
       ]
@@ -25889,8 +25889,8 @@
           "attribute_2": "",
           "attribute_3": "",
           "available": true,
-          "price": "456.00",
-          "compare_at_price": "536.00",
+          "price": "457.00",
+          "compare_at_price": "537.00",
           "weight_grams": 0
         }
       ]
@@ -25927,7 +25927,7 @@
           "attribute_3": "",
           "available": true,
           "price": "169.00",
-          "compare_at_price": "208.00",
+          "compare_at_price": "209.00",
           "weight_grams": 0
         }
       ]
@@ -26712,8 +26712,8 @@
           "attribute_2": "",
           "attribute_3": "",
           "available": true,
-          "price": "58.00",
-          "compare_at_price": "58.00",
+          "price": "59.00",
+          "compare_at_price": "59.00",
           "weight_grams": 907
         },
         {

@@ -1,0 +1,15 @@
+{
+  "temp_parts_path": "products\\Production\\catalogs\\product_catalog_parts_temp.csv",
+  "woocommerce_catalog_path": "products\\Production\\catalogs\\woocommerce_catalog.csv",
+  "backup_path": "products\\Production\\catalogs\\woocommerce_catalog.pre-columbia-parts-simple-migration-20260505-225653.csv",
+  "source_columbia_temp_rows": 381,
+  "removed_existing_columbia_parts_rows": 502,
+  "removed_existing_columbia_parts_variable_rows": 21,
+  "removed_existing_columbia_parts_variation_rows": 461,
+  "removed_existing_columbia_parts_simple_rows": 20,
+  "inserted_columbia_parts_simple_rows": 381,
+  "final_columbia_parts_rows": 381,
+  "final_columbia_parts_simple_rows": 381,
+  "final_columbia_parts_variable_rows": 0,
+  "final_columbia_parts_variation_rows": 0
+}
