@@ -9,7 +9,8 @@ import { Heart, Plus, Minus, X, ShoppingCart, CheckCircle2, PackageCheck } from 
 import ProductImageGallery from './ProductImageGallery';
 import { getProductSpecifications } from '../utils/productSpecifications';
 import { getProductVariations } from '../services/api';
-import { fetchCachedVariations, findMatchingVariation, getVariationSelectionMap } from '../utils/variationSelection';
+import { findMatchingVariation, getVariationSelectionMap } from '../utils/variationSelection';
+import { setCachedVariations } from '../utils/variationCache';
 import columbiaLogo from '/brands/Columbia/columbia_taping_tools_logo.svg';
 import tapeTechLogo from '/brands/TapeTech/tapetech_logo.svg';
 import surproLogo from '/brands/SurPro/surpro_logo.svg';
@@ -111,10 +112,22 @@ export default function ProductDetail({
     Promise.resolve()
       .then(() => {
         if (!mounted) return;
-        return fetchCachedVariations(product.id, getProductVariations);
+        // Bypass the shared variation cache for modal-triggered fetches.
+        // The background card-prefetch caches only successful (non-empty)
+        // results now, but calling the API directly here guarantees the modal
+        // always gets a fresh response — critical if the user opens a product
+        // before the prefetch has completed or if WooCommerce has since updated
+        // the variation data.  A successful response is written back to the
+        // cache so card display and future prefetches benefit from the data.
+        return getProductVariations(product.id);
       })
       .then((vars) => {
         if (!mounted || !vars) return;
+        // Update the shared cache so card display and future prefetches stay
+        // in sync with the authoritative result from this modal fetch.
+        if (Array.isArray(vars) && vars.length > 0) {
+          setCachedVariations(product.id, vars);
+        }
         setVariations(vars);
         // Use card-selected attributes when available; otherwise default to the
         // first in-stock variation.  setVariationsLoading(false) is always
