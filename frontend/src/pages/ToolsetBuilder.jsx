@@ -170,6 +170,11 @@ function Stage1({ allProducts, loading, onConfigure }) {
     );
   }, [selectedScope]);
 
+  const activeSelectedBrand = useMemo(() => {
+    if (!selectedBrand) return null;
+    return brandsForScope.includes(selectedBrand) ? selectedBrand : null;
+  }, [brandsForScope, selectedBrand]);
+
   // Product counts per brand (to show availability)
   const brandCounts = useMemo(() => {
     const counts = {};
@@ -180,19 +185,12 @@ function Stage1({ allProducts, loading, onConfigure }) {
     return counts;
   }, [allProducts]);
 
-  // When scope changes, deselect brand if brand no longer supports it
-  useEffect(() => {
-    if (selectedBrand && !brandsForScope.includes(selectedBrand)) {
-      setSelectedBrand(null);
-    }
-  }, [brandsForScope, selectedBrand]);
-
-  const canProceed = selectedScope && selectedBrand;
+  const canProceed = selectedScope && activeSelectedBrand;
 
   const handleConfigure = () => {
     if (!canProceed) return;
     const template = SET_TEMPLATES.find(
-      (t) => t.brand === selectedBrand && t.scope === selectedScope
+      (t) => t.brand === activeSelectedBrand && t.scope === selectedScope
     );
     if (template) onConfigure(template);
   };
@@ -255,7 +253,7 @@ function Stage1({ allProducts, loading, onConfigure }) {
           <div className="tsb-brand-list">
             {BUILDER_BRANDS.map((brand) => {
               const isSupported = brandsForScope.includes(brand);
-              const isActive    = selectedBrand === brand;
+              const isActive    = activeSelectedBrand === brand;
               const count       = brandCounts[brand] || 0;
               return (
                 <button
@@ -304,15 +302,15 @@ function Stage1({ allProducts, loading, onConfigure }) {
             </span>
             <span style={{ color: '#94a3b8', fontSize: '0.8rem' }}>·</span>
             <span className="tsb-selection-pill tsb-selection-pill--brand">
-              {BRAND_LOGOS[selectedBrand] && (
+              {BRAND_LOGOS[activeSelectedBrand] && (
                 <img
-                  src={BRAND_LOGOS[selectedBrand]}
+                  src={BRAND_LOGOS[activeSelectedBrand]}
                   alt=""
                   style={{ height: '14px', maxWidth: '48px', objectFit: 'contain', filter: 'brightness(0) invert(1)' }}
                   onError={(e) => { e.currentTarget.style.display = 'none'; }}
                 />
               )}
-              {selectedBrand}
+              {activeSelectedBrand}
             </span>
           </div>
         )}
@@ -408,7 +406,6 @@ function SlotGlyph({ icon, size = 16, dim = false }) {
 
 function CompareDrawer({ items, onClose, onSelect, activeSlotId, slotSelections }) {
   if (items.length < 2) return null;
-  const [a, b] = items;
   return (
     <div className="tsb-compare-backdrop" onClick={onClose}>
       <div className="tsb-compare-drawer" onClick={(e) => e.stopPropagation()}>
@@ -483,6 +480,7 @@ function Stage2({ template, allProducts, slotSelections, onSlotSelect, onBack, o
   const goToSlot = useCallback((idx) => {
     setActiveSlotIdx(idx);
     setSearchQuery('');
+    setShowCompare(false);
     setCompareItems([]);
   }, []);
 
@@ -501,20 +499,18 @@ function Stage2({ template, allProducts, slotSelections, onSlotSelect, onBack, o
 
   const toggleCompare = useCallback((product) => {
     setCompareItems((prev) => {
-      if (prev.find((p) => p.id === product.id)) return prev.filter((p) => p.id !== product.id);
-      if (prev.length >= 2) return [prev[1], product];
-      return [...prev, product];
+      let nextItems;
+      if (prev.find((p) => p.id === product.id)) {
+        nextItems = prev.filter((p) => p.id !== product.id);
+      } else if (prev.length >= 2) {
+        nextItems = [prev[1], product];
+      } else {
+        nextItems = [...prev, product];
+      }
+      setShowCompare(nextItems.length === 2);
+      return nextItems;
     });
   }, []);
-
-  // Trigger compare drawer when 2 are queued
-  useEffect(() => {
-    if (compareItems.length === 2) setShowCompare(true);
-    else setShowCompare(false);
-  }, [compareItems]);
-
-  // Reset compare when slot changes
-  useEffect(() => { setCompareItems([]); }, [activeSlotIdx]);
 
   return (
     <div className="tsb-stage2">
@@ -648,7 +644,7 @@ function Stage2({ template, allProducts, slotSelections, onSlotSelect, onBack, o
                   Compare Now <ChevronRight size={11} />
                 </button>
               )}
-              <button className="tsb-compare-strip-clear" onClick={() => setCompareItems([])}><X size={11} /></button>
+              <button className="tsb-compare-strip-clear" onClick={() => { setShowCompare(false); setCompareItems([]); }}><X size={11} /></button>
             </div>
           )}
 

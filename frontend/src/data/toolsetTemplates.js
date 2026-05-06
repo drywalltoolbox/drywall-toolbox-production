@@ -21,9 +21,6 @@
 // ── Keyword-based slot product filters ──────────────────────────────────────────
 // Each filter receives a normalized product name (lowercase) and returns boolean.
 
-function nameContains(str) {
-  return (name) => name.includes(str);
-}
 function nameContainsAny(...strs) {
   return (name) => strs.some((s) => name.includes(s));
 }
