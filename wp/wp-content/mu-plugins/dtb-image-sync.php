@@ -445,9 +445,10 @@ function dtb_route_sync_images( WP_REST_Request $request ): WP_REST_Response|WP_
 		? array_slice( $sku_keys, $offset, $limit )
 		: array_slice( $sku_keys, $offset );
 
-	// Fallback mode: if there are no product SKUs in the DB yet, still register
-	// images found on disk so WooCommerce import can resolve them by URL/GUID.
-	if ( 0 === $total_skus ) {
+	// Fallback mode: if there are no product SKUs in the DB yet, OR if running
+	// register_only mode, batch by files on disk instead of by SKU so WooCommerce
+	// import can resolve them by URL/GUID.
+	if ( 0 === $total_skus || $register_only ) {
 		$batch_mode = 'file';
 		$disk_files = dtb_list_images_in_dir( $scan_dir, $extensions );
 		$total      = count( $disk_files );
