@@ -10,37 +10,43 @@
       "id": "CT119",
       "name": "Spool Retaining Spring (CT-119)",
       "quantity": 1,
-      "sku": "CT-119"
+      "sku": "CT119",
+      "source_sku": "CT-119"
     },
     {
       "id": "CT119A",
       "name": "Spool Retaining Spring (CT-119)",
       "quantity": 1,
-      "sku": "CT-119"
+      "sku": "CT119",
+      "source_sku": "CT-119"
     },
     {
       "id": "CT121B",
       "name": "Tape Spool Shaft (Quick Release)",
       "quantity": 1,
-      "sku": "CT-121B"
+      "sku": "",
+      "source_sku": "CT-121B"
     },
     {
       "id": "FA362",
       "name": "10-24 x 3/4 Flat Head Screw (FA362)",
       "quantity": 1,
-      "sku": "FA362"
+      "sku": "",
+      "source_sku": "FA362"
     },
     {
       "id": "CT120",
       "name": "Taper Tape Spool (CT-120)",
       "quantity": 1,
-      "sku": "CT-120"
+      "sku": "CT120",
+      "source_sku": "CT-120"
     },
     {
       "id": "CT118A",
       "name": "Retaining Spring Clip(Quick Realease)",
       "quantity": 1,
-      "sku": "CT118A"
+      "sku": "",
+      "source_sku": "CT118A"
     },
     {
       "id": "FA292",
@@ -52,13 +58,15 @@
       "id": "CT106A",
       "name": "Taper Bearing Shaft - CT106 (CT-106A)",
       "quantity": 1,
-      "sku": "CT-106A"
+      "sku": "",
+      "source_sku": "CT-106A"
     },
     {
       "id": "FA298",
       "name": "1/4-20 X 7/8in Flat Socket (FA-298)",
       "quantity": 1,
-      "sku": "FA-298"
+      "sku": "FA298",
+      "source_sku": "FA-298"
     },
     {
       "id": "CT115",
@@ -70,49 +78,57 @@
       "id": "CT123A",
       "name": "Taper Retaining Spring Shaft (CT-123)",
       "quantity": 1,
-      "sku": "CT-123"
+      "sku": "",
+      "source_sku": "CT-123"
     },
     {
       "id": "MP23A",
       "name": "Mud Pump Mud Pump Seal (MP-23)",
       "quantity": 1,
-      "sku": "MP-23"
+      "sku": "MP23",
+      "source_sku": "MP-23"
     },
     {
       "id": "CT117A",
       "name": "Base-New (CT117A)",
       "quantity": 1,
-      "sku": "CT117A"
+      "sku": "",
+      "source_sku": "CT117A"
     },
     {
       "id": "CT122A",
       "name": "Taper Strap - CT122 (CT-122A)",
       "quantity": 1,
-      "sku": "CT-122A"
+      "sku": "",
+      "source_sku": "CT-122A"
     },
     {
       "id": "CT116A",
       "name": "Taper Strap (CT-116A)",
       "quantity": 1,
-      "sku": "CT-116A"
+      "sku": "CT116A",
+      "source_sku": "CT-116A"
     },
     {
       "id": "CT116A",
       "name": "Taper Strap (CT-116A)",
       "quantity": 1,
-      "sku": "CT-116A"
+      "sku": "CT116A",
+      "source_sku": "CT-116A"
     },
     {
       "id": "CT116A",
       "name": "Taper Strap (CT-116A)",
       "quantity": 1,
-      "sku": "CT-116A"
+      "sku": "CT116A",
+      "source_sku": "CT-116A"
     },
     {
       "id": "CT115A",
       "name": "Taper Gasket New Style End Ring (CT115A)",
       "quantity": 1,
-      "sku": "CT115A"
+      "sku": "",
+      "source_sku": "CT115A"
     },
     {
       "id": "FA237",
@@ -124,25 +140,29 @@
       "id": "MP9C",
       "name": "Connecting Link (MP9C)",
       "quantity": 1,
-      "sku": "MP9C"
+      "sku": "",
+      "source_sku": "MP9C"
     },
     {
       "id": "CT104",
       "name": "Taper Connection Strap (CT-104)",
       "quantity": 1,
-      "sku": "CT-104"
+      "sku": "CT104",
+      "source_sku": "CT-104"
     },
     {
       "id": "CT105",
       "name": "Taper Crimper Lever (CT-105)",
       "quantity": 1,
-      "sku": "CT-105"
+      "sku": "CT105",
+      "source_sku": "CT-105"
     },
     {
       "id": "CT130",
       "name": "Taper Extension Shaft (CT-130)",
       "quantity": 1,
-      "sku": "CT-130"
+      "sku": "CT130",
+      "source_sku": "CT-130"
     },
     {
       "id": "FA249",
@@ -172,7 +192,8 @@
       "id": "CTA128",
       "name": "Predator Taper Shaft Guide Roller Bushing Assembly (CTA128)",
       "quantity": 1,
-      "sku": "CTA128"
+      "sku": "",
+      "source_sku": "CTA128"
     },
     {
       "id": "FA234",
@@ -184,7 +205,8 @@
       "id": "CT103",
       "name": "Taper Barrel Main Body (CT-103)",
       "quantity": 1,
-      "sku": "CT-103"
+      "sku": "CT103",
+      "source_sku": "CT-103"
     },
     {
       "id": "FA295",
@@ -196,13 +218,15 @@
       "id": "FA342",
       "name": "1/4-20 x 3/4 Hex Bolt (FA342)",
       "quantity": 1,
-      "sku": "FA342"
+      "sku": "",
+      "source_sku": "FA342"
     },
     {
       "id": "CT128A",
       "name": "Taper Shaft Guide Roller Bushing (CT128A)",
       "quantity": 1,
-      "sku": "CT128A"
+      "sku": "",
+      "source_sku": "CT128A"
     },
     {
       "id": "FA291",
@@ -238,19 +262,22 @@
       "id": "CT110",
       "name": "Piston Cup Relief Washer (CT110)",
       "quantity": 1,
-      "sku": "CT110"
+      "sku": "",
+      "source_sku": "CT110"
     },
     {
       "id": "CT111",
       "name": "Taper Piston Cup (CT-111)",
       "quantity": 1,
-      "sku": "CT-111"
+      "sku": "CT111",
+      "source_sku": "CT-111"
     },
     {
       "id": "CT109",
       "name": "¼ -20 Hex Nut (Castle Nut) (CT109)",
       "quantity": 1,
-      "sku": "Castle Nut"
+      "sku": "CT109",
+      "source_sku": "Castle Nut"
     },
     {
       "id": "CT72",
@@ -262,31 +289,36 @@
       "id": "CT126PA",
       "name": "Hand Grip Body Pump Action (CT126PA)",
       "quantity": 1,
-      "sku": "CT126PA"
+      "sku": "",
+      "source_sku": "CT126PA"
     },
     {
       "id": "CPT125B",
       "name": "Teflon Threaded Insert (CPT125B)",
       "quantity": 1,
-      "sku": "CPT125B"
+      "sku": "",
+      "source_sku": "CPT125B"
     },
     {
       "id": "CT124B",
       "name": "Grip Guard Ring Bottom (CT124B)",
       "quantity": 1,
-      "sku": "CT124B"
+      "sku": "",
+      "source_sku": "CT124B"
     },
     {
       "id": "CT124A",
       "name": "Grip Guard Ring Top (CT124A)",
       "quantity": 1,
-      "sku": "CT124A"
+      "sku": "",
+      "source_sku": "CT124A"
     },
     {
       "id": "FA374",
       "name": "10-32 x 1/4 Flat Head Screw (FA374)",
       "quantity": 1,
-      "sku": "FA374"
+      "sku": "",
+      "source_sku": "FA374"
     },
     {
       "id": "FA207",

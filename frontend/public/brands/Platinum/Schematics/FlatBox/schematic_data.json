@@ -3,7 +3,9 @@
   "title": "Platinum_Flat_Box_SCH",
   "product_name": "Flat Box",
   "sku": "",
-  "diagramPages": [1],
+  "diagramPages": [
+    1
+  ],
   "legendPages": [],
   "parts": [],
   "coordinates": {},

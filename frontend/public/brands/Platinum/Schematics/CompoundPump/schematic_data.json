@@ -3,7 +3,9 @@
   "title": "PT-Compound-Pump_SCH",
   "product_name": "Compound Pump",
   "sku": "",
-  "diagramPages": [1],
+  "diagramPages": [
+    1
+  ],
   "legendPages": [],
   "parts": [],
   "coordinates": {},

@@ -12,7 +12,8 @@
       "id": "402033",
       "name": "402033 Ball Coupling - Threaded Angle Head Ball",
       "quantity": 1,
-      "sku": "4814"
+      "sku": "",
+      "source_sku": "4814"
     },
     {
       "id": "883024",
@@ -24,7 +25,8 @@
       "id": "883021",
       "name": "NS Adapter Jam Nut",
       "quantity": 1,
-      "sku": "883021"
+      "sku": "",
+      "source_sku": "883021"
     }
   ],
   "coordinates": {

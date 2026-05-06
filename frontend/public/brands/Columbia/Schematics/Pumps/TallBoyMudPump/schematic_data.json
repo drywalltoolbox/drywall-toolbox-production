@@ -10,7 +10,8 @@
       "id": "MP23A",
       "name": "Mud Pump Mud Pump Seal (MP-23)",
       "quantity": 1,
-      "sku": "MP-23"
+      "sku": "MP23",
+      "source_sku": "MP-23"
     },
     {
       "id": "MP5",
@@ -22,19 +23,22 @@
       "id": "MP23",
       "name": "Mud Pump Mud Pump Seal (MP-23)",
       "quantity": 1,
-      "sku": "MP-23"
+      "sku": "MP23",
+      "source_sku": "MP-23"
     },
     {
       "id": "HP48",
       "name": "Handle Pin (HP48)",
       "quantity": 1,
-      "sku": "HP48"
+      "sku": "",
+      "source_sku": "HP48"
     },
     {
       "id": "MP33A",
       "name": "Mud Pump Spring Assembly (MP33A)",
       "quantity": 1,
-      "sku": "MP33A"
+      "sku": "",
+      "source_sku": "MP33A"
     },
     {
       "id": "FA294",
@@ -52,13 +56,15 @@
       "id": "HB48B",
       "name": "Hot Mud Pump Handle B (HB48B)",
       "quantity": 1,
-      "sku": "HB48B"
+      "sku": "",
+      "source_sku": "HB48B"
     },
     {
       "id": "HP48A",
       "name": "Hot Mud Pump HP48 Body A (HP48A)",
       "quantity": 1,
-      "sku": "HP48A"
+      "sku": "",
+      "source_sku": "HP48A"
     },
     {
       "id": "MP25",
@@ -82,13 +88,15 @@
       "id": "MP36",
       "name": "Mud Pump Nylatron Bushing (MP-36)",
       "quantity": 1,
-      "sku": "MP-36"
+      "sku": "MP36",
+      "source_sku": "MP-36"
     },
     {
       "id": "HP4",
       "name": "Hot Mud Pump Piston Assembly (HP4)",
       "quantity": 1,
-      "sku": "HP4"
+      "sku": "",
+      "source_sku": "HP4"
     },
     {
       "id": "FA301",
@@ -100,7 +108,8 @@
       "id": "FA290",
       "name": "1/4-20 Nyloc Nut (FA290)",
       "quantity": 1,
-      "sku": "FA290"
+      "sku": "",
+      "source_sku": "FA290"
     },
     {
       "id": "MP6",
@@ -112,7 +121,8 @@
       "id": "TBMP8B",
       "name": "Tall Boy Loading Pump (TBMP)",
       "quantity": 1,
-      "sku": "TBMP"
+      "sku": "",
+      "source_sku": "TBMP"
     },
     {
       "id": "FA303",
@@ -124,7 +134,8 @@
       "id": "FA346",
       "name": "1/4 Star Washer (FA346)",
       "quantity": 1,
-      "sku": "FA346"
+      "sku": "",
+      "source_sku": "FA346"
     },
     {
       "id": "FA300",
@@ -148,61 +159,71 @@
       "id": "HP47",
       "name": "Draw Latch Assembly (HP-47)",
       "quantity": 1,
-      "sku": "HP-47"
+      "sku": "HP47",
+      "source_sku": "HP-47"
     },
     {
       "id": "TBMP1",
       "name": "Tall Boy Loading Pump (TBMP)",
       "quantity": 1,
-      "sku": "TBMP"
+      "sku": "",
+      "source_sku": "TBMP"
     },
     {
       "id": "TBMP8C",
       "name": "Tall Boy Lef Stabilizer (TBMP8C)",
       "quantity": 1,
-      "sku": "TBMP8C"
+      "sku": "",
+      "source_sku": "TBMP8C"
     },
     {
       "id": "FA304",
       "name": "5/16 Flat Washer (FA-304)",
       "quantity": 1,
-      "sku": "FA-304"
+      "sku": "",
+      "source_sku": "FA-304"
     },
     {
       "id": "MP7D",
       "name": "Special Nut for Pump Handle (MP7D)",
       "quantity": 1,
-      "sku": "MP7D"
+      "sku": "",
+      "source_sku": "MP7D"
     },
     {
       "id": "MP7C",
       "name": "Mud Pump O-Ring Retainer C (replaces MP7D)",
       "quantity": 1,
-      "sku": "MP7C"
+      "sku": "",
+      "source_sku": "MP7C"
     },
     {
       "id": "MP7A",
       "name": "Mud Pump Foot Valve A (MP7A)",
       "quantity": 1,
-      "sku": "MP7A"
+      "sku": "",
+      "source_sku": "MP7A"
     },
     {
       "id": "FA287",
       "name": "1/4 x 5/8 Split Pin (FA287)",
       "quantity": 1,
-      "sku": "FA287"
+      "sku": "",
+      "source_sku": "FA287"
     },
     {
       "id": "FFH14",
       "name": "Handle Grip (FFH14)",
       "quantity": 1,
-      "sku": "FFH14"
+      "sku": "",
+      "source_sku": "FFH14"
     },
     {
       "id": "TBMP11",
       "name": "Tall Boy Loading Pump (TBMP)",
       "quantity": 1,
-      "sku": "TBMP"
+      "sku": "",
+      "source_sku": "TBMP"
     },
     {
       "id": "MP3",
@@ -214,13 +235,15 @@
       "id": "FA308",
       "name": "33/64 X 7/8in Flat Washer (FA-308)",
       "quantity": 1,
-      "sku": "FA-308"
+      "sku": "FA308",
+      "source_sku": "FA-308"
     },
     {
       "id": "MP13A",
       "name": "Mud Pump Piston Backing Washer (Small)",
       "quantity": 1,
-      "sku": "MP-13A"
+      "sku": "MP13A",
+      "source_sku": "MP-13A"
     },
     {
       "id": "MP39",
@@ -232,31 +255,36 @@
       "id": "MP14",
       "name": "Piston Cup (MP-14)",
       "quantity": 1,
-      "sku": "MP-14"
+      "sku": "MP14",
+      "source_sku": "MP-14"
     },
     {
       "id": "MP13",
       "name": "Mud Pump Piston Backing Washer (Large)",
       "quantity": 1,
-      "sku": "MP-13"
+      "sku": "MP13",
+      "source_sku": "MP-13"
     },
     {
       "id": "MP13",
       "name": "Mud Pump Piston Backing Washer (Large)",
       "quantity": 1,
-      "sku": "MP-13"
+      "sku": "MP13",
+      "source_sku": "MP-13"
     },
     {
       "id": "HB48B",
       "name": "Hot Mud Pump Handle B (HB48B)",
       "quantity": 1,
-      "sku": "HB48B"
+      "sku": "",
+      "source_sku": "HB48B"
     },
     {
       "id": "HP48A",
       "name": "Hot Mud Pump HP48 Body A (HP48A)",
       "quantity": 1,
-      "sku": "HP48A"
+      "sku": "",
+      "source_sku": "HP48A"
     },
     {
       "id": "FA303",
@@ -268,7 +296,8 @@
       "id": "FA306",
       "name": "5/16-18 x 1 1/4\" Hex Bolt (FA-306)",
       "quantity": 1,
-      "sku": "FA-306"
+      "sku": "FA306",
+      "source_sku": "FA-306"
     },
     {
       "id": "FA270",
@@ -292,25 +321,29 @@
       "id": "TBMP2",
       "name": "Tall Boy Loading Pump (TBMP)",
       "quantity": 1,
-      "sku": "TBMP"
+      "sku": "",
+      "source_sku": "TBMP"
     },
     {
       "id": "FA350",
       "name": "5/16-18 x 7/8 Socket Head Screw (FA350)",
       "quantity": 1,
-      "sku": "FA350"
+      "sku": "",
+      "source_sku": "FA350"
     },
     {
       "id": "HP48L",
       "name": "Hot Mud Pump HP48 Long Body (HP48L)",
       "quantity": 1,
-      "sku": "HP48L"
+      "sku": "",
+      "source_sku": "HP48L"
     },
     {
       "id": "TBMP24",
       "name": "Tall Boy Loading Pump (TBMP)",
       "quantity": 1,
-      "sku": "TBMP"
+      "sku": "",
+      "source_sku": "TBMP"
     },
     {
       "id": "FA210",
@@ -322,7 +355,8 @@
       "id": "TBMP8",
       "name": "Tall Boy Loading Pump (TBMP)",
       "quantity": 1,
-      "sku": "TBMP"
+      "sku": "",
+      "source_sku": "TBMP"
     },
     {
       "id": "FA313",
@@ -334,13 +368,15 @@
       "id": "MP7E",
       "name": "Mud Pump Foot Valve E (MP7E)",
       "quantity": 1,
-      "sku": "MP7E"
+      "sku": "",
+      "source_sku": "MP7E"
     },
     {
       "id": "MP8A",
       "name": "Mud Pump Valve Spring A (MP8A)",
       "quantity": 1,
-      "sku": "MP8A"
+      "sku": "",
+      "source_sku": "MP8A"
     }
   ],
   "coordinates": {

@@ -16,73 +16,85 @@
       "id": "190036",
       "name": "TapeTech Pin (190036)",
       "quantity": 1,
-      "sku": "10008"
+      "sku": "",
+      "source_sku": "10008"
     },
     {
       "id": "190033",
       "name": "TapeTech Adjuster (190033)",
       "quantity": 1,
-      "sku": "4585"
+      "sku": "",
+      "source_sku": "4585"
     },
     {
       "id": "190034",
       "name": "TapeTech Coupler (190034)",
       "quantity": 1,
-      "sku": "4586"
+      "sku": "",
+      "source_sku": "4586"
     },
     {
       "id": "819038",
       "name": "TapeTech Grip Adjuster Spring (819038)",
       "quantity": 1,
-      "sku": "12248"
+      "sku": "",
+      "source_sku": "12248"
     },
     {
       "id": "880006F",
       "name": "TapeTech Master Link (880006)",
       "quantity": 1,
-      "sku": "4702"
+      "sku": "",
+      "source_sku": "4702"
     },
     {
       "id": "880004",
       "name": "TapeTech Rear Brake Lever Bracket (880004)",
       "quantity": 1,
-      "sku": "4700"
+      "sku": "",
+      "source_sku": "4700"
     },
     {
       "id": "881005",
       "name": "TapeTech Rear Brake Lever (880005)",
       "quantity": 1,
-      "sku": "4701"
+      "sku": "",
+      "source_sku": "4701"
     },
     {
       "id": "889016",
       "name": "TapeTech Roll Pin (889016)",
       "quantity": 1,
-      "sku": "5005"
+      "sku": "",
+      "source_sku": "5005"
     },
     {
       "id": "882016",
       "name": "TapeTech Guide Plug (882016)",
       "quantity": 1,
-      "sku": "10009"
+      "sku": "",
+      "source_sku": "10009"
     },
     {
       "id": "889015 LOCTITE",
       "name": "TapeTech 6-32 X 3/8 Cap Screw(Replaces 889051) (889015)",
       "quantity": 1,
-      "sku": "5004"
+      "sku": "",
+      "source_sku": "5004"
     },
     {
       "id": "882013",
       "name": "TapeTech Locking Pin (882013)",
       "quantity": 1,
-      "sku": "10202"
+      "sku": "",
+      "source_sku": "10202"
     },
     {
       "id": "499023",
       "name": "TapeTech Screw, 4-40 x 3/16, Flat Head, SST (499023)",
       "quantity": 1,
-      "sku": "12031"
+      "sku": "",
+      "source_sku": "12031"
     },
     {
       "id": "883014",
@@ -94,7 +106,8 @@
       "id": "882013",
       "name": "TapeTech Locking Pin (882013)",
       "quantity": 1,
-      "sku": "10202"
+      "sku": "",
+      "source_sku": "10202"
     },
     {
       "id": "883011",
@@ -112,13 +125,15 @@
       "id": "889017",
       "name": "TapeTech Conical Spring (889017)",
       "quantity": 1,
-      "sku": "10199"
+      "sku": "",
+      "source_sku": "10199"
     },
     {
       "id": "880053",
       "name": "TapeTech Lock Block (880053)",
       "quantity": 1,
-      "sku": "5001"
+      "sku": "",
+      "source_sku": "5001"
     },
     {
       "id": "883003",

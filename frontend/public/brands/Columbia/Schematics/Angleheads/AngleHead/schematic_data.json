@@ -16,7 +16,8 @@
       "id": "AH 6",
       "name": "Funnel Retainer Spring (AH6)",
       "quantity": 1,
-      "sku": "AH6"
+      "sku": "",
+      "source_sku": "AH6"
     },
     {
       "id": "AH 7-2.5\"",
@@ -46,7 +47,8 @@
       "id": "AH 3-3\"",
       "name": "3\" Angle Head Carbide Blade (AH33)",
       "quantity": 1,
-      "sku": "AH33"
+      "sku": "AH3-3",
+      "source_sku": "AH33"
     },
     {
       "id": "FA 239",
@@ -64,13 +66,15 @@
       "id": "AH 3-3\"",
       "name": "3\" Angle Head Carbide Blade (AH33)",
       "quantity": 1,
-      "sku": "AH33"
+      "sku": "AH3-3",
+      "source_sku": "AH33"
     },
     {
       "id": "AH 16",
       "name": "Retaining Spring Backer (AH16)",
       "quantity": 1,
-      "sku": "AH16"
+      "sku": "",
+      "source_sku": "AH16"
     },
     {
       "id": "FA 245",
@@ -100,7 +104,8 @@
       "id": "AH 2-3\" L",
       "name": "Left Frame Sub-Assembly 3 in (AHA2-3L)",
       "quantity": 1,
-      "sku": "AHA2-3L"
+      "sku": "",
+      "source_sku": "AHA2-3L"
     },
     {
       "id": "AH 8",
@@ -130,7 +135,8 @@
       "id": "AH 2-3\" R",
       "name": "Right Frame Sub-Assembly 3 in (AHA2-3R)",
       "quantity": 1,
-      "sku": "AHA2-3R"
+      "sku": "",
+      "source_sku": "AHA2-3R"
     },
     {
       "id": "AH 4",
@@ -142,19 +148,22 @@
       "id": "FA 221",
       "name": "#6 Belleville Washer (FA221)",
       "quantity": 1,
-      "sku": "FA221"
+      "sku": "",
+      "source_sku": "FA221"
     },
     {
       "id": "AH 11",
       "name": "Return Spring Post Angle Head (AH11)",
       "quantity": 1,
-      "sku": "AH11"
+      "sku": "",
+      "source_sku": "AH11"
     },
     {
       "id": "FA 221",
       "name": "#6 Belleville Washer (FA221)",
       "quantity": 1,
-      "sku": "FA221"
+      "sku": "",
+      "source_sku": "FA221"
     },
     {
       "id": "AH 12",
@@ -178,7 +187,8 @@
       "id": "AH 23",
       "name": "Angle Head Frame Retaining Pin (AH23)",
       "quantity": 1,
-      "sku": "AH23"
+      "sku": "",
+      "source_sku": "AH23"
     },
     {
       "id": "FA 228",
@@ -190,19 +200,22 @@
       "id": "AH 21",
       "name": "Angle Head Hinge Spacer (AH21)",
       "quantity": 1,
-      "sku": "AH21"
+      "sku": "",
+      "source_sku": "AH21"
     },
     {
       "id": "AH 20",
       "name": "Angle Head Pivot Pin (AH20)",
       "quantity": 1,
-      "sku": "AH20"
+      "sku": "",
+      "source_sku": "AH20"
     },
     {
       "id": "AH 22",
       "name": "Angle Head Frame Clamp (AH22)",
       "quantity": 1,
-      "sku": "AH22"
+      "sku": "",
+      "source_sku": "AH22"
     },
     {
       "id": "AH 1",

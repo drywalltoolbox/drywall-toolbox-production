@@ -12,7 +12,8 @@
       "id": "202021",
       "name": "202021 - Special Nut",
       "quantity": 1,
-      "sku": "4599"
+      "sku": "",
+      "source_sku": "4599"
     },
     {
       "id": "260003",
@@ -24,25 +25,29 @@
       "id": "202010",
       "name": "202010 - Crown Spring- 7\" & 10\" Flat Box",
       "quantity": 1,
-      "sku": "4597"
+      "sku": "",
+      "source_sku": "4597"
     },
     {
       "id": "209058",
       "name": "209058 - 6-32 Brass Nut",
       "quantity": 1,
-      "sku": "10006"
+      "sku": "",
+      "source_sku": "10006"
     },
     {
       "id": "209012",
       "name": "209012 - 4-40 X 1/4 Head Screw",
       "quantity": 1,
-      "sku": "4614"
+      "sku": "",
+      "source_sku": "4614"
     },
     {
       "id": "254005",
       "name": "254005 - 10\" Clamp Assembly",
       "quantity": 1,
-      "sku": "4742"
+      "sku": "",
+      "source_sku": "4742"
     },
     {
       "id": "209018",
@@ -54,19 +59,22 @@
       "id": "254002",
       "name": "254002 - 10\" Blade Holder Assembly",
       "quantity": 1,
-      "sku": "4741"
+      "sku": "",
+      "source_sku": "4741"
     },
     {
       "id": "489023",
       "name": "489023 - #6 SS Flat Washer",
       "quantity": 1,
-      "sku": "4849"
+      "sku": "",
+      "source_sku": "4849"
     },
     {
       "id": "250001",
       "name": "250001 - 10\" Box Blade",
       "quantity": 1,
-      "sku": "4736"
+      "sku": "",
+      "source_sku": "4736"
     },
     {
       "id": "203007",
@@ -78,13 +86,15 @@
       "id": "059018",
       "name": "6-32 Thin Pattern Stopnut - 059018",
       "quantity": 1,
-      "sku": "4392"
+      "sku": "",
+      "source_sku": "4392"
     },
     {
       "id": "059018",
       "name": "6-32 Thin Pattern Stopnut - 059018",
       "quantity": 1,
-      "sku": "4392"
+      "sku": "",
+      "source_sku": "4392"
     },
     {
       "id": "219054",
@@ -96,7 +106,8 @@
       "id": "210059",
       "name": "210059 - Shoulder Screw",
       "quantity": 1,
-      "sku": "4720"
+      "sku": "",
+      "source_sku": "4720"
     },
     {
       "id": "502054",
@@ -114,7 +125,8 @@
       "id": "260024F",
       "name": "10\" Wiper",
       "quantity": 1,
-      "sku": "4747"
+      "sku": "",
+      "source_sku": "4747"
     },
     {
       "id": "26002B",
@@ -138,7 +150,8 @@
       "id": "202044F",
       "name": "202044 - Pressure Plate Spring",
       "quantity": 1,
-      "sku": "4605"
+      "sku": "",
+      "source_sku": "4605"
     },
     {
       "id": "260027B",
@@ -150,19 +163,22 @@
       "id": "209046",
       "name": "209046 - Flat Box Washer",
       "quantity": 1,
-      "sku": "4712"
+      "sku": "",
+      "source_sku": "4712"
     },
     {
       "id": "209017",
       "name": "209017 - 10-24 Nylock Nut",
       "quantity": 1,
-      "sku": "4616"
+      "sku": "",
+      "source_sku": "4616"
     },
     {
       "id": "219081",
       "name": "219081 - 6-32 Flat Head Screw",
       "quantity": 1,
-      "sku": "4732"
+      "sku": "",
+      "source_sku": "4732"
     },
     {
       "id": "240023B",
@@ -174,7 +190,8 @@
       "id": "059161",
       "name": "059161 - 4-40 X 3/8 Fillister Head Screw",
       "quantity": 1,
-      "sku": "4435"
+      "sku": "",
+      "source_sku": "4435"
     },
     {
       "id": "059058",
@@ -186,19 +203,22 @@
       "id": "059015",
       "name": "6-32 X 1/4 Fillister Hd Screw - 059015",
       "quantity": 1,
-      "sku": "4390"
+      "sku": "",
+      "source_sku": "4390"
     },
     {
       "id": "260071",
       "name": "260071 - 10 Inch Spacer Rod",
       "quantity": 1,
-      "sku": "11838"
+      "sku": "",
+      "source_sku": "11838"
     },
     {
       "id": "209006",
       "name": "209006  - Right Skid Cover",
       "quantity": 1,
-      "sku": "4613"
+      "sku": "",
+      "source_sku": "4613"
     },
     {
       "id": "200022",
@@ -210,7 +230,8 @@
       "id": "059102",
       "name": "059102 - 4-40 X 1/4 Flat Hd Screw",
       "quantity": 1,
-      "sku": "4420"
+      "sku": "",
+      "source_sku": "4420"
     },
     {
       "id": "240039",
@@ -228,31 +249,36 @@
       "id": "059020",
       "name": "6-32 X 3/8 Bind Hd Screw - 059020",
       "quantity": 1,
-      "sku": "4393"
+      "sku": "",
+      "source_sku": "4393"
     },
     {
       "id": "059016",
       "name": "#6 Med. Spring Lockwasher - 059016",
       "quantity": 1,
-      "sku": "4391"
+      "sku": "",
+      "source_sku": "4391"
     },
     {
       "id": "202020",
       "name": "202020 - Spring Anchor",
       "quantity": 1,
-      "sku": "4598"
+      "sku": "",
+      "source_sku": "4598"
     },
     {
       "id": "210060",
       "name": "210060 - Flat Box Pivot Bearing",
       "quantity": 1,
-      "sku": "4721"
+      "sku": "",
+      "source_sku": "4721"
     },
     {
       "id": "209148",
       "name": "209148 - Nyliner Bearing",
       "quantity": 1,
-      "sku": "209148"
+      "sku": "",
+      "source_sku": "209148"
     },
     {
       "id": "280009B",
@@ -270,19 +296,22 @@
       "id": "889030",
       "name": "889030 - 4-40 X 3/16 Fill. Head Screw",
       "quantity": 1,
-      "sku": "5009"
+      "sku": "",
+      "source_sku": "5009"
     },
     {
       "id": "260097",
       "name": "260097 - Seal Plate (10\" EC/PA Boxes)",
       "quantity": 1,
-      "sku": "12457"
+      "sku": "",
+      "source_sku": "12457"
     },
     {
       "id": "260096",
       "name": "260096 - 10\" Seal for PowerAssist /Easy Clean Flat Boxes",
       "quantity": 1,
-      "sku": "12393"
+      "sku": "",
+      "source_sku": "12393"
     },
     {
       "id": "260030B",
@@ -306,7 +335,8 @@
       "id": "209148",
       "name": "209148 - Nyliner Bearing",
       "quantity": 1,
-      "sku": "209148"
+      "sku": "",
+      "source_sku": "209148"
     },
     {
       "id": "289148",
@@ -342,7 +372,8 @@
       "id": "310051F",
       "name": "310051 - Flat Box Wheel",
       "quantity": 1,
-      "sku": "310051F"
+      "sku": "",
+      "source_sku": "310051F"
     },
     {
       "id": "280045",
@@ -354,7 +385,8 @@
       "id": "809006",
       "name": "809006 - #14 S Brass Washer",
       "quantity": 1,
-      "sku": "4684"
+      "sku": "",
+      "source_sku": "4684"
     },
     {
       "id": "200036",

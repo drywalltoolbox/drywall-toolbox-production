@@ -10,175 +10,204 @@
       "id": "059084",
       "name": "Setscrew",
       "quantity": 2,
-      "sku": "059084"
+      "sku": "",
+      "source_sku": "059084"
     },
     {
       "id": "059091",
       "name": "Screw 6-32 X 1/2 Slotted Fil. Hd., S.S.",
       "quantity": 1,
-      "sku": "059091"
+      "sku": "",
+      "source_sku": "059091"
     },
     {
       "id": "359005",
       "name": "Screw: 6-32 X 1/4 Bind Hd.",
       "quantity": 2,
-      "sku": "359005"
+      "sku": "",
+      "source_sku": "359005"
     },
     {
       "id": "402002F",
       "name": "4800Spring Retainer",
       "quantity": 1,
-      "sku": "402002F"
+      "sku": "",
+      "source_sku": "402002F"
     },
     {
       "id": "402006",
       "name": "Insert Socket",
       "quantity": 1,
-      "sku": "402006"
+      "sku": "",
+      "source_sku": "402006"
     },
     {
       "id": "402012",
       "name": "Ball Retainer",
       "quantity": 1,
-      "sku": "402012"
+      "sku": "",
+      "source_sku": "402012"
     },
     {
       "id": "409010",
       "name": "Spring",
       "quantity": 1,
-      "sku": "409010"
+      "sku": "",
+      "source_sku": "409010"
     },
     {
       "id": "450009F",
       "name": "Blade, Carbide, 3\" C.F.",
       "quantity": 2,
-      "sku": "450009F"
+      "sku": "",
+      "source_sku": "450009F"
     },
     {
       "id": "480002F",
       "name": "4040Wear Pad",
       "quantity": 2,
-      "sku": "480002F"
+      "sku": "",
+      "source_sku": "480002F"
     },
     {
       "id": "480005",
       "name": "Outside Tension Spring",
       "quantity": 1,
-      "sku": "480005"
+      "sku": "",
+      "source_sku": "480005"
     },
     {
       "id": "480007F",
       "name": "Adjust Arm, Right",
       "quantity": 1,
-      "sku": "480007F"
+      "sku": "",
+      "source_sku": "480007F"
     },
     {
       "id": "480008F",
       "name": "Adjust Arm, Left",
       "quantity": 1,
-      "sku": "480008F"
+      "sku": "",
+      "source_sku": "480008F"
     },
     {
       "id": "480015F",
       "name": "Easyroll Frame, Left",
       "quantity": 1,
-      "sku": "480015F"
+      "sku": "",
+      "source_sku": "480015F"
     },
     {
       "id": "480016F",
       "name": "Easyroll Frame, Right",
       "quantity": 1,
-      "sku": "480016F"
+      "sku": "",
+      "source_sku": "480016F"
     },
     {
       "id": "480017F",
       "name": "Center Clip",
       "quantity": 1,
-      "sku": "480017F"
+      "sku": "",
+      "source_sku": "480017F"
     },
     {
       "id": "480021",
       "name": "Inside Tension Spring",
       "quantity": 1,
-      "sku": "480021"
+      "sku": "",
+      "source_sku": "480021"
     },
     {
       "id": "480026",
       "name": "Wheel, Grooved",
       "quantity": 2,
-      "sku": "480026"
+      "sku": "",
+      "source_sku": "480026"
     },
     {
       "id": "480027",
       "name": "Bushing",
       "quantity": 2,
-      "sku": "480027"
+      "sku": "",
+      "source_sku": "480027"
     },
     {
       "id": "484014F",
       "name": "Center Clip Ass'Y",
       "quantity": 1,
-      "sku": "484014F"
+      "sku": "",
+      "source_sku": "484014F"
     },
     {
       "id": "486001F",
       "name": "3\" Cf Head Easyroll, No Logo",
       "quantity": 1,
-      "sku": "486001F"
+      "sku": "",
+      "source_sku": "486001F"
     },
     {
       "id": "489013",
       "name": "6-32 X 1/8 Setscrew",
       "quantity": 12,
-      "sku": "489013"
+      "sku": "",
+      "source_sku": "489013"
     },
     {
       "id": "489020",
       "name": "Screw, 4-40 X 5/16 Nylock Pan Hd.",
       "quantity": 2,
-      "sku": "489020"
+      "sku": "",
+      "source_sku": "489020"
     },
     {
       "id": "489022",
       "name": "Screw, 4-40 X 31/64",
       "quantity": 2,
-      "sku": "489022"
+      "sku": "",
+      "source_sku": "489022"
     },
     {
       "id": "489023",
       "name": "Flat Washer, #6 S.S.",
       "quantity": 4,
-      "sku": "489023"
+      "sku": "",
+      "source_sku": "489023"
     },
     {
       "id": "489023",
       "name": "Flat Washer, #6 S.S.",
       "quantity": 4,
-      "sku": "489023"
+      "sku": "",
+      "source_sku": "489023"
     },
     {
       "id": "489028",
       "name": "O\"Ring 568-108",
       "quantity": 4,
-      "sku": "489028"
+      "sku": "",
+      "source_sku": "489028"
     },
     {
       "id": "489029",
       "name": "Screw, 6-32 X 5/8 Soc. Hd. S.S.",
       "quantity": 2,
-      "sku": "489029"
+      "sku": "",
+      "source_sku": "489029"
     },
     {
       "id": "059037",
       "name": "Screw 4-40 X 1/4 Bind Hd. S.S",
       "quantity": 2,
-      "sku": "059037"
+      "sku": "",
+      "source_sku": "059037"
     },
     {
       "id": "409011",
       "name": "Skid",
       "quantity": 2,
-      "sku": "409011"
+      "sku": "",
+      "source_sku": "409011"
     }
   ],
   "coordinates": {

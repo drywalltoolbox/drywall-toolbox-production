@@ -12,37 +12,43 @@
       "id": "722039",
       "name": "Discharge Tube",
       "quantity": 1,
-      "sku": "4671"
+      "sku": "",
+      "source_sku": "4671"
     },
     {
       "id": "709043",
       "name": "709043 - S-Hook",
       "quantity": 1,
-      "sku": "4655"
+      "sku": "",
+      "source_sku": "4655"
     },
     {
       "id": "709034",
       "name": "709034 - Filler O-Ring Kit 5-Pack",
       "quantity": 1,
-      "sku": "4654"
+      "sku": "",
+      "source_sku": "4654"
     },
     {
       "id": "700042",
       "name": "700042 - Connector for Filler",
       "quantity": 1,
-      "sku": "4642"
+      "sku": "",
+      "source_sku": "4642"
     },
     {
       "id": "709043",
       "name": "709043 - S-Hook",
       "quantity": 1,
-      "sku": "4655"
+      "sku": "",
+      "source_sku": "4655"
     },
     {
       "id": "704040",
       "name": "704040 - Filler Tube Assembly",
       "quantity": 1,
-      "sku": "4641"
+      "sku": "",
+      "source_sku": "4641"
     }
   ],
   "coordinates": {

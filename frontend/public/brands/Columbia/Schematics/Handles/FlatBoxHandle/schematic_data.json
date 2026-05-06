@@ -16,7 +16,8 @@
       "id": "BH 7",
       "name": "Box Handle Cam Follower - BH7 (BH07)",
       "quantity": 1,
-      "sku": "BH07"
+      "sku": "BH7",
+      "source_sku": "BH07"
     },
     {
       "id": "FA 268",
@@ -52,7 +53,8 @@
       "id": "BH 1",
       "name": "Box Handle Mounting Plate (BH01)",
       "quantity": 1,
-      "sku": "BH01"
+      "sku": "BH1",
+      "source_sku": "BH01"
     },
     {
       "id": "FA 265",
@@ -76,7 +78,8 @@
       "id": "BH 5",
       "name": "Box Handle Upper Mounting Bracket - BH5 (BH-5)",
       "quantity": 1,
-      "sku": "BH-5"
+      "sku": "BH5",
+      "source_sku": "BH-5"
     },
     {
       "id": "FA 311",
@@ -88,7 +91,8 @@
       "id": "BH 8-3'",
       "name": "3 ft Box Handle 8 in (BH8-3)",
       "quantity": 1,
-      "sku": "BH8-3"
+      "sku": "",
+      "source_sku": "BH8-3"
     },
     {
       "id": "BH 9-3'",
@@ -124,7 +128,8 @@
       "id": "BH 11",
       "name": "Flat Box Handle Strap Connecting Pin - BH11 (BH-11)",
       "quantity": 1,
-      "sku": "BH-11"
+      "sku": "BH11",
+      "source_sku": "BH-11"
     },
     {
       "id": "FA 276",

@@ -12,13 +12,15 @@
       "id": "350008",
       "name": "350008 - Wiper for 8\" Angle Box",
       "quantity": 1,
-      "sku": "4764"
+      "sku": "",
+      "source_sku": "4764"
     },
     {
       "id": "350034",
       "name": "350034 - Pressure Plate for 8\" Angle Box",
       "quantity": 1,
-      "sku": "4766"
+      "sku": "",
+      "source_sku": "4766"
     },
     {
       "id": "551005",
@@ -30,19 +32,22 @@
       "id": "559017",
       "name": "559017 - 1/4-20 X 5/8\" Hex Hd Screw",
       "quantity": 1,
-      "sku": "4870"
+      "sku": "",
+      "source_sku": "4870"
     },
     {
       "id": "502006",
       "name": "502006 - Pivot Bearing",
       "quantity": 1,
-      "sku": "4857"
+      "sku": "",
+      "source_sku": "4857"
     },
     {
       "id": "502005F",
       "name": "502005 - Pivot",
       "quantity": 1,
-      "sku": "4856"
+      "sku": "",
+      "source_sku": "4856"
     },
     {
       "id": "559051",
@@ -54,55 +59,64 @@
       "id": "809011",
       "name": "809011 - Dog Point 5/16-18x7/8 Thumb Screw",
       "quantity": 1,
-      "sku": "4685"
+      "sku": "",
+      "source_sku": "4685"
     },
     {
       "id": "354003F",
       "name": "354003 - Filler Body Assembly",
       "quantity": 1,
-      "sku": "354003F"
+      "sku": "",
+      "source_sku": "354003F"
     },
     {
       "id": "050064",
       "name": "TapeTech Valve (050064)",
       "quantity": 1,
-      "sku": "4509"
+      "sku": "",
+      "source_sku": "4509"
     },
     {
       "id": "609021",
       "name": "609021 - 10-32 X 5/8 Rd Hd Sst Screw",
       "quantity": 1,
-      "sku": "4893"
+      "sku": "",
+      "source_sku": "4893"
     },
     {
       "id": "609020",
       "name": "609020 - Friction Washer Disc",
       "quantity": 1,
-      "sku": "4892"
+      "sku": "",
+      "source_sku": "4892"
     },
     {
       "id": "502034",
       "name": "502034 - Corner Box Latch",
       "quantity": 1,
-      "sku": "4860"
+      "sku": "",
+      "source_sku": "4860"
     },
     {
       "id": "609018",
       "name": "609018 - 3/16 Plastic Washer",
       "quantity": 1,
-      "sku": "4891"
+      "sku": "",
+      "source_sku": "4891"
     },
     {
       "id": "059225",
       "name": "059225 - 10-32 Thin Pattern Stop Nut",
       "quantity": 1,
-      "sku": "4446"
+      "sku": "",
+      "source_sku": "4446"
     },
     {
       "id": "502007",
       "name": "502007 - Bearing",
       "quantity": 1,
-      "sku": "4858"
+      "sku": "",
+      "source_sku": "4858"
     },
     {
       "id": "356001B",
@@ -114,73 +128,85 @@
       "id": "059084",
       "name": "059084 - 8-32 X 1/4 1/2 Dog Setscrew",
       "quantity": 1,
-      "sku": "4414"
+      "sku": "",
+      "source_sku": "4414"
     },
     {
       "id": "059060",
       "name": "059060 - 3-48 Stop Nut",
       "quantity": 1,
-      "sku": "4408"
+      "sku": "",
+      "source_sku": "4408"
     },
     {
       "id": "059061F",
       "name": "059061 - Valve Spring",
       "quantity": 1,
-      "sku": "4409"
+      "sku": "",
+      "source_sku": "4409"
     },
     {
       "id": "352002F",
       "name": "352002F - Valve Holder",
       "quantity": 1,
-      "sku": "4768"
+      "sku": "",
+      "source_sku": "4768"
     },
     {
       "id": "502019",
       "name": "502019 - Replacement Seal",
       "quantity": 1,
-      "sku": "4859"
+      "sku": "",
+      "source_sku": "4859"
     },
     {
       "id": "350033F",
       "name": "350033F - 8\" Seal Holder",
       "quantity": 1,
-      "sku": "4765"
+      "sku": "",
+      "source_sku": "4765"
     },
     {
       "id": "509010",
       "name": "509010 - 4-40 X 5/16 Flat Hd Screw",
       "quantity": 1,
-      "sku": "4864"
+      "sku": "",
+      "source_sku": "4864"
     },
     {
       "id": "059012",
       "name": "6-32 X 3/8 Fillister Hd  - 059012",
       "quantity": 1,
-      "sku": "4387"
+      "sku": "",
+      "source_sku": "4387"
     },
     {
       "id": "059156",
       "name": "059156 - 4-40 X 5/16 Bind Hd Screw",
       "quantity": 1,
-      "sku": "4434"
+      "sku": "",
+      "source_sku": "4434"
     },
     {
       "id": "609012",
       "name": "609012 - 4-40 Elastic Stopnut",
       "quantity": 1,
-      "sku": "4889"
+      "sku": "",
+      "source_sku": "4889"
     },
     {
       "id": "506009",
       "name": "506009 - Cone Assembly",
       "quantity": 1,
-      "sku": "4862"
+      "sku": "",
+      "source_sku": "4862"
     },
     {
       "id": "509008",
       "name": "509008 - 10-32 X 1/2 Bd Hd Screw",
       "quantity": 1,
-      "sku": "4863"
+      "sku": "",
+      "source_sku": "4863"
     },
     {
       "id": "559005",
@@ -192,13 +218,15 @@
       "id": "359005",
       "name": "359005 - 6-32 X 1/4 Bind Hd Screw",
       "quantity": 1,
-      "sku": "4771"
+      "sku": "",
+      "source_sku": "4771"
     },
     {
       "id": "059012",
       "name": "6-32 X 3/8 Fillister Hd  - 059012",
       "quantity": 1,
-      "sku": "4387"
+      "sku": "",
+      "source_sku": "4387"
     }
   ],
   "coordinates": {

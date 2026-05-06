@@ -12,64 +12,73 @@
       "id": "1",
       "name": "Pump Foot Bracket",
       "quantity": 1,
-      "sku": "9751",
-      "price": 120.0
+      "sku": "",
+      "price": 120.0,
+      "source_sku": "9751"
     },
     {
       "id": "2",
       "name": "Wrench",
       "quantity": 1,
-      "sku": "7550",
-      "price": 5.39
+      "sku": "",
+      "price": 5.39,
+      "source_sku": "7550"
     },
     {
       "id": "3",
       "name": "Screw",
       "quantity": 1,
-      "sku": "7551",
-      "price": 0.89
+      "sku": "",
+      "price": 0.89,
+      "source_sku": "7551"
     },
     {
       "id": "4",
       "name": "Wrench Bracket",
       "quantity": 1,
-      "sku": "7554",
-      "price": 5.0
+      "sku": "",
+      "price": 5.0,
+      "source_sku": "7554"
     },
     {
       "id": "5",
       "name": "1/4-20 Lock Nut",
       "quantity": 1,
-      "sku": "7364",
-      "price": 1.79
+      "sku": "",
+      "price": 1.79,
+      "source_sku": "7364"
     },
     {
       "id": "6",
       "name": "Pump Link",
       "quantity": 1,
-      "sku": "9334",
-      "price": 34.19
+      "sku": "",
+      "price": 34.19,
+      "source_sku": "9334"
     },
     {
       "id": "7",
       "name": "Black Plastic Washer (Link)",
       "quantity": 1,
-      "sku": "7553",
-      "price": 3.14
+      "sku": "",
+      "price": 3.14,
+      "source_sku": "7553"
     },
     {
       "id": "8",
       "name": "Metal Link Washer",
       "quantity": 1,
-      "sku": "7555",
-      "price": 1.79
+      "sku": "",
+      "price": 1.79,
+      "source_sku": "7555"
     },
     {
       "id": "9",
       "name": "1/4-20x2 Hex Head Screw",
       "quantity": 1,
-      "sku": "7363",
-      "price": 4.49
+      "sku": "",
+      "price": 4.49,
+      "source_sku": "7363"
     },
     {
       "id": "10",
@@ -89,112 +98,128 @@
       "id": "12",
       "name": "Handle Ball",
       "quantity": 1,
-      "sku": "7347",
-      "price": 23.39
+      "sku": "",
+      "price": 23.39,
+      "source_sku": "7347"
     },
     {
       "id": "13",
       "name": "Pumpball Screw",
       "quantity": 1,
-      "sku": "7128",
-      "price": 1.79
+      "sku": "",
+      "price": 1.79,
+      "source_sku": "7128"
     },
     {
       "id": "14",
       "name": "Pump Handle",
       "quantity": 1,
-      "sku": "7738"
+      "sku": "",
+      "source_sku": "7738"
     },
     {
       "id": "15",
       "name": "5/16-18 x 7/8 Hex Head Screw",
       "quantity": 1,
-      "sku": "7341",
-      "price": 3.0
+      "sku": "",
+      "price": 3.0,
+      "source_sku": "7341"
     },
     {
       "id": "16",
       "name": "5/16 Lockwasher",
       "quantity": 1,
-      "sku": "7342",
-      "price": 1.0
+      "sku": "",
+      "price": 1.0,
+      "source_sku": "7342"
     },
     {
       "id": "17",
       "name": "Pump O-Ring",
       "quantity": 1,
-      "sku": "7633",
-      "price": 3.14
+      "sku": "",
+      "price": 3.14,
+      "source_sku": "7633"
     },
     {
       "id": "18",
       "name": "Pump Head",
       "quantity": 1,
-      "sku": "9635",
-      "price": 114.74
+      "sku": "",
+      "price": 114.74,
+      "source_sku": "9635"
     },
     {
       "id": "19",
       "name": "U-Seal",
       "quantity": 1,
-      "sku": "7324",
-      "price": 4.49
+      "sku": "",
+      "price": 4.49,
+      "source_sku": "7324"
     },
     {
       "id": "20",
       "name": "Gland",
       "quantity": 1,
-      "sku": "7323",
-      "price": 32.84
+      "sku": "",
+      "price": 32.84,
+      "source_sku": "7323"
     },
     {
       "id": "21",
       "name": "Bushing Liner",
       "quantity": 1,
-      "sku": "7345",
-      "price": 3.14
+      "sku": "",
+      "price": 3.14,
+      "source_sku": "7345"
     },
     {
       "id": "22",
       "name": "1/4-20 x 5/8 Socket Head Screw",
       "quantity": 1,
-      "sku": "7325",
-      "price": 1.79
+      "sku": "",
+      "price": 1.79,
+      "source_sku": "7325"
     },
     {
       "id": "23",
       "name": "5/16-24 Hex Head",
       "quantity": 1,
-      "sku": "7326",
-      "price": 1.79
+      "sku": "",
+      "price": 1.79,
+      "source_sku": "7326"
     },
     {
       "id": "24",
       "name": "5-16-24 x 1 7/16 Std Screw",
       "quantity": 1,
-      "sku": "7352",
-      "price": 11.24
+      "sku": "",
+      "price": 11.24,
+      "source_sku": "7352"
     },
     {
       "id": "25",
       "name": "Gasket",
       "quantity": 1,
-      "sku": "7362",
-      "price": 5.84
+      "sku": "",
+      "price": 5.84,
+      "source_sku": "7362"
     },
     {
       "id": "26",
       "name": "Filler Body",
       "quantity": 1,
-      "sku": "7355",
-      "price": 54.44
+      "sku": "",
+      "price": 54.44,
+      "source_sku": "7355"
     },
     {
       "id": "27",
       "name": "Special Nut",
       "quantity": 1,
-      "sku": "7353",
-      "price": 11.24
+      "sku": "",
+      "price": 11.24,
+      "source_sku": "7353"
     },
     {
       "id": "28",
@@ -207,141 +232,161 @@
       "id": "29",
       "name": "S-Hook",
       "quantity": 1,
-      "sku": "7168",
-      "price": 3.14
+      "sku": "",
+      "price": 3.14,
+      "source_sku": "7168"
     },
     {
       "id": "30",
       "name": "Chain Assembly (W/ 1 S Hook)",
       "quantity": 1,
-      "sku": "7358",
-      "price": 20.24
+      "sku": "",
+      "price": 20.24,
+      "source_sku": "7358"
     },
     {
       "id": "31",
       "name": "Discharge Tube",
       "quantity": 1,
-      "sku": "7356",
-      "price": 27.44
+      "sku": "",
+      "price": 27.44,
+      "source_sku": "7356"
     },
     {
       "id": "32",
       "name": "Piston Rod",
       "quantity": 1,
-      "sku": "7321",
-      "price": 58.49
+      "sku": "",
+      "price": 58.49,
+      "source_sku": "7321"
     },
     {
       "id": "33",
       "name": "Valve Disc",
       "quantity": 1,
-      "sku": "7329",
-      "price": 8.54
+      "sku": "",
+      "price": 8.54,
+      "source_sku": "7329"
     },
     {
       "id": "34",
       "name": "Retainer",
       "quantity": 1,
-      "sku": "7359",
-      "price": 9.89
+      "sku": "",
+      "price": 9.89,
+      "source_sku": "7359"
     },
     {
       "id": "35",
       "name": "Piston Cups",
       "quantity": 1,
-      "sku": "7328",
-      "price": 12.59
+      "sku": "",
+      "price": 12.59,
+      "source_sku": "7328"
     },
     {
       "id": "36",
       "name": "Retainer, Large",
       "quantity": 1,
-      "sku": "7327",
-      "price": 13.94
+      "sku": "",
+      "price": 13.94,
+      "source_sku": "7327"
     },
     {
       "id": "37",
       "name": "Lock Clip",
       "quantity": 1,
-      "sku": "7360",
-      "price": 4.49
+      "sku": "",
+      "price": 4.49,
+      "source_sku": "7360"
     },
     {
       "id": "38",
       "name": "3/8-16 Lock Nut",
       "quantity": 1,
-      "sku": "7343",
-      "price": 1.79
+      "sku": "",
+      "price": 1.79,
+      "source_sku": "7343"
     },
     {
       "id": "39",
       "name": "8-32 x 3/16 BH Screw",
       "quantity": 1,
-      "sku": "7625",
-      "price": 1.79
+      "sku": "",
+      "price": 1.79,
+      "source_sku": "7625"
     },
     {
       "id": "40",
       "name": "New pump latches",
       "quantity": 1,
-      "sku": "9623",
-      "price": 27.44
+      "sku": "",
+      "price": 27.44,
+      "source_sku": "9623"
     },
     {
       "id": "41",
       "name": "Pump Tube",
       "quantity": 1,
-      "sku": "9624",
-      "price": 162.44
+      "sku": "",
+      "price": 162.44,
+      "source_sku": "9624"
     },
     {
       "id": "42",
       "name": "AT Wing Nut",
       "quantity": 1,
-      "sku": "9916",
-      "price": 1.79
+      "sku": "",
+      "price": 1.79,
+      "source_sku": "9916"
     },
     {
       "id": "43",
       "name": "Metal Washer",
       "quantity": 1,
-      "sku": "7556",
-      "price": 1.79
+      "sku": "",
+      "price": 1.79,
+      "source_sku": "7556"
     },
     {
       "id": "44",
       "name": "Foot Valve Spacer",
       "quantity": 1,
-      "sku": "7557",
-      "price": 7.19
+      "sku": "",
+      "price": 7.19,
+      "source_sku": "7557"
     },
     {
       "id": "45",
       "name": "Pin",
       "quantity": 1,
-      "sku": "7621",
-      "price": 20.69
+      "sku": "",
+      "price": 20.69,
+      "source_sku": "7621"
     },
     {
       "id": "46",
       "name": "Pump Tube Foot",
       "quantity": 1,
-      "sku": "9330",
-      "price": 17.09
+      "sku": "",
+      "price": 17.09,
+      "source_sku": "9330"
     },
     {
       "id": "47",
       "name": "Screw",
       "quantity": 1,
-      "sku": "7558",
-      "price": 0.89
+      "sku": "",
+      "price": 0.89,
+      "source_sku": "7558"
     },
     {
       "id": "48",
       "name": "Screen for New Pump",
       "quantity": 1,
-      "sku": "9348",
-      "price": 5.39
+      "sku": "",
+      "price": 5.39,
+      "source_sku": "9348"
     }
   ]
 }

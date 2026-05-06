@@ -12,70 +12,80 @@
       "id": "1",
       "name": "6-32X3/16 Fillister Head Screw",
       "quantity": 1,
-      "sku": "7042",
-      "price": 1.79
+      "sku": "",
+      "price": 1.79,
+      "source_sku": "7042"
     },
     {
       "id": "2",
       "name": "Gooser Needle Holder",
       "quantity": 1,
-      "sku": "7041",
-      "price": 13.04
+      "sku": "",
+      "price": 13.04,
+      "source_sku": "7041"
     },
     {
       "id": "3",
       "name": "Gooser Body",
       "quantity": 1,
-      "sku": "7023"
+      "sku": "",
+      "source_sku": "7023"
     },
     {
       "id": "4",
       "name": "Needle Spring",
       "quantity": 1,
-      "sku": "7019",
-      "price": 4.49
+      "sku": "",
+      "price": 4.49,
+      "source_sku": "7019"
     },
     {
       "id": "5",
       "name": "Magnet Assembly",
       "quantity": 1,
-      "sku": "7025",
-      "price": 13.94
+      "sku": "",
+      "price": 13.94,
+      "source_sku": "7025"
     },
     {
       "id": "6",
       "name": "4-40 x 1/4 Bind Head Screw",
       "quantity": 1,
-      "sku": "7030",
-      "price": 1.79
+      "sku": "",
+      "price": 1.79,
+      "source_sku": "7030"
     },
     {
       "id": "7",
       "name": "#4 Lock Washer",
       "quantity": 1,
-      "sku": "7031",
-      "price": 1.79
+      "sku": "",
+      "price": 1.79,
+      "source_sku": "7031"
     },
     {
       "id": "8",
       "name": "6-32 x 5/16 Round Head Screw",
       "quantity": 1,
-      "sku": "7010",
-      "price": 1.79
+      "sku": "",
+      "price": 1.79,
+      "source_sku": "7010"
     },
     {
       "id": "9",
       "name": "Needle Holder Lock",
       "quantity": 1,
-      "sku": "7022",
-      "price": 3.59
+      "sku": "",
+      "price": 3.59,
+      "source_sku": "7022"
     },
     {
       "id": "10",
       "name": "Needle Gooser",
       "quantity": 1,
-      "sku": "7040",
-      "price": 1.79
+      "sku": "",
+      "price": 1.79,
+      "source_sku": "7040"
     }
   ],
   "coordinates": {

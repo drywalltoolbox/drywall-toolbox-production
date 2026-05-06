@@ -12,7 +12,8 @@
       "id": "059091",
       "name": "059091 - 6-32 X 1/2 Fill. Hd Screw",
       "quantity": 1,
-      "sku": "4417"
+      "sku": "",
+      "source_sku": "4417"
     },
     {
       "id": "402002B",
@@ -24,43 +25,50 @@
       "id": "409010",
       "name": "409010 - Retainer Spring",
       "quantity": 1,
-      "sku": "4820"
+      "sku": "",
+      "source_sku": "4820"
     },
     {
       "id": "402012",
       "name": "402012 - Ball Retainer",
       "quantity": 1,
-      "sku": "12501"
+      "sku": "",
+      "source_sku": "12501"
     },
     {
       "id": "480021",
       "name": "480021 - Blade Tension Spring (Small)",
       "quantity": 1,
-      "sku": "4841"
+      "sku": "",
+      "source_sku": "4841"
     },
     {
       "id": "480017F",
       "name": "480017 - Center Clip (Short)",
       "quantity": 1,
-      "sku": "4839"
+      "sku": "",
+      "source_sku": "4839"
     },
     {
       "id": "402019",
       "name": "402019 - Blade Holder Stop",
       "quantity": 1,
-      "sku": "4813"
+      "sku": "",
+      "source_sku": "4813"
     },
     {
       "id": "059084",
       "name": "059084 - 8-32 X 1/4 1/2 Dog Setscrew",
       "quantity": 1,
-      "sku": "4414"
+      "sku": "",
+      "source_sku": "4414"
     },
     {
       "id": "420016",
       "name": "420016 - 2.5in Frame (Right)",
       "quantity": 1,
-      "sku": "13900"
+      "sku": "",
+      "source_sku": "13900"
     },
     {
       "id": "480002B",
@@ -72,79 +80,92 @@
       "id": "484014F",
       "name": "484014F - Center Clip Assy",
       "quantity": 1,
-      "sku": "4844"
+      "sku": "",
+      "source_sku": "4844"
     },
     {
       "id": "359005",
       "name": "359005 - 6-32 X 1/4 Bind Hd Screw",
       "quantity": 1,
-      "sku": "4771"
+      "sku": "",
+      "source_sku": "4771"
     },
     {
       "id": "059037",
       "name": "059037 - 4-40 X 1/4 Bind Hd Screw",
       "quantity": 1,
-      "sku": "4399"
+      "sku": "",
+      "source_sku": "4399"
     },
     {
       "id": "489022",
       "name": "489022 - Screw, 4-40 X 31/64",
       "quantity": 1,
-      "sku": "12373"
+      "sku": "",
+      "source_sku": "12373"
     },
     {
       "id": "480230",
       "name": "480230 - Head Frame Stop",
       "quantity": 1,
-      "sku": "12368"
+      "sku": "",
+      "source_sku": "12368"
     },
     {
       "id": "489013",
       "name": "489013 - 6-32x1/8 Socket Hd Setscrew",
       "quantity": 1,
-      "sku": "4847"
+      "sku": "",
+      "source_sku": "4847"
     },
     {
       "id": "420009",
       "name": "420009 - Carbide Blade 2.5in",
       "quantity": 1,
-      "sku": "13898"
+      "sku": "",
+      "source_sku": "13898"
     },
     {
       "id": "409011",
       "name": "409011 - Skid Blade",
       "quantity": 1,
-      "sku": "4821"
+      "sku": "",
+      "source_sku": "4821"
     },
     {
       "id": "420015",
       "name": "420015 - 2.5in Frame (Left)",
       "quantity": 1,
-      "sku": "13899"
+      "sku": "",
+      "source_sku": "13899"
     },
     {
       "id": "402019",
       "name": "402019 - Blade Holder Stop",
       "quantity": 1,
-      "sku": "4813"
+      "sku": "",
+      "source_sku": "4813"
     },
     {
       "id": "059037",
       "name": "059037 - 4-40 X 1/4 Bind Hd Screw",
       "quantity": 1,
-      "sku": "4399"
+      "sku": "",
+      "source_sku": "4399"
     },
     {
       "id": "402006",
       "name": "402006 - Insert Socket",
       "quantity": 1,
-      "sku": "4811"
+      "sku": "",
+      "source_sku": "4811"
     },
     {
       "id": "359005",
       "name": "359005 - 6-32 X 1/4 Bind Hd Screw",
       "quantity": 1,
-      "sku": "4771"
+      "sku": "",
+      "source_sku": "4771"
     }
   ],
   "coordinates": {

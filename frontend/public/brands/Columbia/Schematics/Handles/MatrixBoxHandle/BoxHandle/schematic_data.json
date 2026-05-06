@@ -16,7 +16,8 @@
       "id": "MH 10",
       "name": "Matrix Extendable Flat Box Handle (MH)",
       "quantity": 1,
-      "sku": "MH"
+      "sku": "MH10",
+      "source_sku": "MH"
     },
     {
       "id": "SEE PINCHBOX DETAIL",
@@ -34,7 +35,8 @@
       "id": "MH 9A",
       "name": "CTTMH9 (MH9)",
       "quantity": 1,
-      "sku": "MH9"
+      "sku": "MH9A",
+      "source_sku": "MH9"
     },
     {
       "id": "SEE EXTENSION HOUSING DETAIL",
@@ -64,7 +66,8 @@
       "id": "MH 9",
       "name": "CTTMH9 (MH9)",
       "quantity": 1,
-      "sku": "MH9"
+      "sku": "",
+      "source_sku": "MH9"
     },
     {
       "id": "FA 237",
@@ -82,13 +85,15 @@
       "id": "FA 383",
       "name": "1/4-20 x 3/8 Flat Head Screw (FA383)",
       "quantity": 1,
-      "sku": "FA383"
+      "sku": "",
+      "source_sku": "FA383"
     },
     {
       "id": "FA 319",
       "name": "3/8-16 Hex Nut (FA319)",
       "quantity": 1,
-      "sku": "FA319"
+      "sku": "",
+      "source_sku": "FA319"
     },
     {
       "id": "SEE HEAD DETAIL",

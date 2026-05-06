@@ -10,109 +10,127 @@
       "id": "1",
       "name": "CENTER CLIP",
       "quantity": 1,
-      "sku": "402017F"
+      "sku": "",
+      "source_sku": "402017F"
     },
     {
       "id": "2",
       "name": "2\" HEAD",
       "quantity": 1,
-      "sku": "406001"
+      "sku": "",
+      "source_sku": "406001"
     },
     {
       "id": "3",
       "name": "8-32 X 1/4 SETSCREW 1/2 DOG SST",
       "quantity": 2,
-      "sku": "059084"
+      "sku": "",
+      "source_sku": "059084"
     },
     {
       "id": "4",
       "name": "CENTER CLIP ASSY",
       "quantity": 1,
-      "sku": "404014F"
+      "sku": "",
+      "source_sku": "404014F"
     },
     {
       "id": "6",
       "name": "2\" CARBIDE BLADE",
       "quantity": 2,
-      "sku": "400009F"
+      "sku": "",
+      "source_sku": "400009F"
     },
     {
       "id": "7",
       "name": "SKID",
       "quantity": 2,
-      "sku": "409011"
+      "sku": "",
+      "source_sku": "409011"
     },
     {
       "id": "8",
       "name": "2\" FRAME RIGHT",
       "quantity": 1,
-      "sku": "404016"
+      "sku": "",
+      "source_sku": "404016"
     },
     {
       "id": "9",
       "name": "4-40X1/8 SET SCREW",
       "quantity": 12,
-      "sku": "409013"
+      "sku": "",
+      "source_sku": "409013"
     },
     {
       "id": "10",
       "name": "INSERT SOCKET",
       "quantity": 1,
-      "sku": "402006"
+      "sku": "",
+      "source_sku": "402006"
     },
     {
       "id": "11",
       "name": "6-32 X 1/4 BIND HEAD SCREW SST",
       "quantity": 2,
-      "sku": "359005"
+      "sku": "",
+      "source_sku": "359005"
     },
     {
       "id": "14",
       "name": "2\" FRAME LEFT",
       "quantity": 1,
-      "sku": "404015"
+      "sku": "",
+      "source_sku": "404015"
     },
     {
       "id": "15",
       "name": "4-40 X 3/16 BIND HEAD SCREW SST",
       "quantity": 4,
-      "sku": "059057"
+      "sku": "",
+      "source_sku": "059057"
     },
     {
       "id": "16",
       "name": "BLADE HOLDER STOP",
       "quantity": 2,
-      "sku": "402019"
+      "sku": "",
+      "source_sku": "402019"
     },
     {
       "id": "17",
       "name": "BLADE TENSION SPRING",
       "quantity": 1,
-      "sku": "400005"
+      "sku": "",
+      "source_sku": "400005"
     },
     {
       "id": "18",
       "name": "SPRING RETAINER",
       "quantity": 1,
-      "sku": "402002F"
+      "sku": "",
+      "source_sku": "402002F"
     },
     {
       "id": "19",
       "name": "6-32 X 1/2 FILLISTER HEAD SCREW SST",
       "quantity": 1,
-      "sku": "059091"
+      "sku": "",
+      "source_sku": "059091"
     },
     {
       "id": "20",
       "name": "20",
       "quantity": 1,
-      "sku": "20"
+      "sku": "",
+      "source_sku": "20"
     },
     {
       "id": "21",
       "name": "RETAINER SPRING (2\" CORNER FINISHER HEAD)",
       "quantity": 1,
-      "sku": "409021"
+      "sku": "",
+      "source_sku": "409021"
     }
   ],
   "coordinates": {

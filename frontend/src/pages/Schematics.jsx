@@ -2022,48 +2022,56 @@ const ALLOWED_BRANDS = [
 
   const handleAddToCart = async (part) => {
     if (addingToCart) return; // prevent double-click
+    if (!part?.sku) {
+      setToast({
+        message: 'This hotspot is reference-only until it is linked to a live product.',
+        type: 'error',
+      });
+      return;
+    }
     setAddingToCart(part.id);
+    let added = false;
 
     try {
       // Look up the live WooCommerce product by SKU so we use the real price,
       // product ID, and image from the store instead of stale JSON values.
       const wcProduct = part.sku ? await getProductBySku(part.sku) : null;
 
-      const cartProduct = wcProduct
-        ? {
-            id: wcProduct.id,
-            name: wcProduct.name || part.name,
-            brand: currentSchematic?.brand || selectedBrand || 'Parts',
-            price: parseFloat(wcProduct.price) || 0,
-            part_number: wcProduct.sku || part.sku,
-            sku: wcProduct.sku || part.sku,
-            image: wcProduct.images?.[0] || 'https://www.drywalltoolbox.com/wp/wp-content/uploads/2026/05/no-image-placeholder.webp',
-            permalink: wcProduct.permalink || '',
-            _wcProduct: wcProduct,
-          }
-        : {
-            // Fallback: WC product not found — use schematic JSON data as-is
-            id: part.sku || part.id,
-            name: part.name,
-            brand: currentSchematic?.brand || selectedBrand || 'Parts',
-            price: part.price || 0,
-            part_number: part.sku,
-            sku: part.sku,
-            image: 'https://www.drywalltoolbox.com/wp/wp-content/uploads/2026/05/no-image-placeholder.webp',
-          };
+      if (!wcProduct?.id) {
+        setToast({
+          message: 'This hotspot is not linked to a live product yet.',
+          type: 'error',
+        });
+        return;
+      }
+
+      const cartProduct = {
+        id: wcProduct.id,
+        name: wcProduct.name || part.name,
+        brand: currentSchematic?.brand || selectedBrand || 'Parts',
+        price: parseFloat(wcProduct.price) || 0,
+        part_number: wcProduct.sku || part.sku,
+        sku: wcProduct.sku || part.sku,
+        image: wcProduct.images?.[0] || 'https://www.drywalltoolbox.com/wp/wp-content/uploads/2026/05/no-image-placeholder.webp',
+        permalink: wcProduct.permalink || '',
+        _wcProduct: wcProduct,
+      };
 
       addToCart(cartProduct, 1);
       setToast({
         message: `${cartProduct.name} added to cart!`,
         type: 'cart',
       });
+      added = true;
     } catch {
       setToast({ message: 'Could not add item to cart. Try again.', type: 'error' });
     } finally {
       setAddingToCart(null);
-      setActiveHotspot(null);
-      setActiveHotspotPart(null);
-      setHotspotProduct(null);
+      if (added) {
+        setActiveHotspot(null);
+        setActiveHotspotPart(null);
+        setHotspotProduct(null);
+      }
     }
   };
 
@@ -2072,6 +2080,19 @@ const ALLOWED_BRANDS = [
     setActiveHotspotPart(null);
     setHotspotProduct(null);
     setHotspotLightbox(false);
+  };
+
+  const getHotspotDisplayCode = (part) => part?.sku || part?.source_sku || '';
+  const getHotspotCodeLabel = (part) => (part?.sku ? 'SKU' : part?.source_sku ? 'Ref' : 'SKU');
+  const getHotspotPriceLabel = (part) => {
+    const livePrice = parseFloat(hotspotProduct?.price);
+    if (Number.isFinite(livePrice) && livePrice > 0) {
+      return `$${livePrice.toFixed(2)}`;
+    }
+    if (part?.sku && hotspotStockStatus === null) {
+      return '...';
+    }
+    return 'Unavailable';
   };
 
   // Close hotspot image lightbox on Escape
@@ -2975,7 +2996,7 @@ const ALLOWED_BRANDS = [
                       )}
                     </h4>
                     <div className="part-meta">
-                      SKU: {part.sku}
+                      {getHotspotCodeLabel(part)}: {getHotspotDisplayCode(part)}
                       {part.quantity > 1 && ` | Qty: ${part.quantity}`}
                       {activeHotspot === hotspotKey && (
                         <span style={{
@@ -3001,8 +3022,7 @@ const ALLOWED_BRANDS = [
                         fontFamily: 'var(--font-mono)',
                         fontWeight: 800
                       }}>
-                        {/* Show live WC price when available; fall back to JSON-static price */}
-                        ${(parseFloat(hotspotProduct?.price) > 0 ? parseFloat(hotspotProduct.price) : part.price).toFixed(2)}
+                        {getHotspotPriceLabel(part)}
                       </span>
                       <button
                         className="alloy-button"
@@ -3010,13 +3030,13 @@ const ALLOWED_BRANDS = [
                           padding: '8px 16px',
                           fontSize: '0.6rem'
                         }}
-                        disabled={!part.sku || addingToCart === part.id}
+                        disabled={!hotspotProduct?.id || hotspotStockStatus === null || addingToCart === part.id}
                         onClick={(e) => {
                           e.stopPropagation();
                           handleAddToCart(part);
                         }}
                       >
-                        {addingToCart === part.id ? '…' : part.sku ? 'Add' : 'Unavailable'}
+                        {addingToCart === part.id ? '…' : hotspotStockStatus === null && part.sku ? 'Resolving…' : hotspotProduct?.id ? 'Add' : 'Unavailable'}
                       </button>
                     </div>
                   </div>
@@ -3120,7 +3140,7 @@ const ALLOWED_BRANDS = [
                   )}
                 </h4>
                 <div className="part-meta">
-                  SKU: {activeHotspotPart.sku}
+                  {getHotspotCodeLabel(activeHotspotPart)}: {getHotspotDisplayCode(activeHotspotPart)}
                   {activeHotspotPart.quantity > 1 && ` | Qty: ${activeHotspotPart.quantity}`}
                   <span style={{
                     marginLeft: '6px',
@@ -3144,8 +3164,7 @@ const ALLOWED_BRANDS = [
                     fontFamily: 'var(--font-mono)',
                     fontWeight: 800
                   }}>
-                    {/* Show live WC price when available; fall back to JSON-static price */}
-                    ${(parseFloat(hotspotProduct?.price) > 0 ? parseFloat(hotspotProduct.price) : activeHotspotPart.price).toFixed(2)}
+                    {getHotspotPriceLabel(activeHotspotPart)}
                   </span>
                   <button
                     className="alloy-button"
@@ -3153,13 +3172,13 @@ const ALLOWED_BRANDS = [
                       padding: '8px 16px',
                       fontSize: '0.6rem'
                     }}
-                    disabled={!activeHotspotPart.sku || addingToCart === activeHotspotPart.id}
+                    disabled={!hotspotProduct?.id || hotspotStockStatus === null || addingToCart === activeHotspotPart.id}
                     onClick={(e) => {
                       e.stopPropagation();
                       handleAddToCart(activeHotspotPart);
                     }}
                   >
-                    {addingToCart === activeHotspotPart.id ? '…' : activeHotspotPart.sku ? 'Add' : 'Unavailable'}
+                    {addingToCart === activeHotspotPart.id ? '…' : hotspotStockStatus === null && activeHotspotPart.sku ? 'Resolving…' : hotspotProduct?.id ? 'Add' : 'Unavailable'}
                   </button>
                 </div>
               </div>
@@ -3252,7 +3271,7 @@ const ALLOWED_BRANDS = [
                   )}
                 </h4>
                 <div className="part-meta" style={{ fontSize: '0.75rem' }}>
-                  SKU: {activeHotspotPart.sku}
+                  {getHotspotCodeLabel(activeHotspotPart)}: {getHotspotDisplayCode(activeHotspotPart)}
                   {activeHotspotPart.quantity > 1 && ` | Qty: ${activeHotspotPart.quantity}`}
                   <span style={{
                     marginLeft: '6px',
@@ -3283,8 +3302,7 @@ const ALLOWED_BRANDS = [
                 fontSize: '1.3rem',
                 color: 'var(--tension-accent)'
               }}>
-                {/* Show live WC price when available; fall back to JSON-static price */}
-                ${(parseFloat(hotspotProduct?.price) > 0 ? parseFloat(hotspotProduct.price) : activeHotspotPart.price).toFixed(2)}
+                {getHotspotPriceLabel(activeHotspotPart)}
               </span>
               <button
                 className="alloy-button"
@@ -3295,13 +3313,13 @@ const ALLOWED_BRANDS = [
                   clipPath: 'none',
                   fontWeight: '700'
                 }}
-                disabled={!activeHotspotPart?.sku || addingToCart === activeHotspotPart?.id}
+                disabled={!hotspotProduct?.id || hotspotStockStatus === null || addingToCart === activeHotspotPart?.id}
                 onClick={(e) => {
                   e.stopPropagation();
                   handleAddToCart(activeHotspotPart);
                 }}
               >
-                {addingToCart === activeHotspotPart?.id ? 'Adding…' : activeHotspotPart?.sku ? 'Add to Cart' : 'Unavailable'}
+                {addingToCart === activeHotspotPart?.id ? 'Adding…' : hotspotStockStatus === null && activeHotspotPart?.sku ? 'Resolving…' : hotspotProduct?.id ? 'Add to Cart' : 'Unavailable'}
               </button>
             </div>
           </div>

@@ -10,49 +10,57 @@
       "id": "CF 4L",
       "name": "Ball Spring Long Flusher (CF4L)",
       "quantity": 1,
-      "sku": "CF4L"
+      "sku": "",
+      "source_sku": "CF4L"
     },
     {
       "id": "CEXT 3",
       "name": "Wheel for ICATW (CEXT3)",
       "quantity": 1,
-      "sku": "CEXT3"
+      "sku": "",
+      "source_sku": "CEXT3"
     },
     {
       "id": "CEXT 3",
       "name": "Wheel for ICATW (CEXT3)",
       "quantity": 1,
-      "sku": "CEXT3"
+      "sku": "",
+      "source_sku": "CEXT3"
     },
     {
       "id": "CEXT 2",
       "name": "External Corner Applicator Wheel Small (CEXT2)",
       "quantity": 1,
-      "sku": "CEXT2"
+      "sku": "",
+      "source_sku": "CEXT2"
     },
     {
       "id": "CEXT 2",
       "name": "External Corner Applicator Wheel Small (CEXT2)",
       "quantity": 1,
-      "sku": "CEXT2"
+      "sku": "",
+      "source_sku": "CEXT2"
     },
     {
       "id": "CEXT 3",
       "name": "Wheel for ICATW (CEXT3)",
       "quantity": 1,
-      "sku": "CEXT3"
+      "sku": "",
+      "source_sku": "CEXT3"
     },
     {
       "id": "CEXT 3",
       "name": "Wheel for ICATW (CEXT3)",
       "quantity": 1,
-      "sku": "CEXT3"
+      "sku": "",
+      "source_sku": "CEXT3"
     },
     {
       "id": "CEXT 1",
       "name": "External Corner Applicator Wheel Large (CEXT1)",
       "quantity": 1,
-      "sku": "CEXT1"
+      "sku": "",
+      "source_sku": "CEXT1"
     }
   ],
   "coordinates": {

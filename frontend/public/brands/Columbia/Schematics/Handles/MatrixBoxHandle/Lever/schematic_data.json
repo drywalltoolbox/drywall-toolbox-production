@@ -10,13 +10,15 @@
       "id": "MH 4",
       "name": "Matrix Extendable Flat Box Handle (MH)",
       "quantity": 1,
-      "sku": "MH"
+      "sku": "MH4",
+      "source_sku": "MH"
     },
     {
       "id": "MH 23",
       "name": "Matrix Extendable Flat Box Handle (MH)",
       "quantity": 1,
-      "sku": "MH"
+      "sku": "MH23",
+      "source_sku": "MH"
     },
     {
       "id": "MH 21",
@@ -28,7 +30,8 @@
       "id": "MH 22",
       "name": "Matrix Extendable Flat Box Handle (MH)",
       "quantity": 1,
-      "sku": "MH"
+      "sku": "MH22",
+      "source_sku": "MH"
     },
     {
       "id": "FA 376",
@@ -40,7 +43,8 @@
       "id": "MH 3A",
       "name": "Matrix Extendable Flat Box Handle (MH)",
       "quantity": 1,
-      "sku": "MH"
+      "sku": "MH3A",
+      "source_sku": "MH"
     },
     {
       "id": "FA 365",
@@ -52,13 +56,15 @@
       "id": "MH 11",
       "name": "Matrix Extendable Flat Box Handle (MH)",
       "quantity": 1,
-      "sku": "MH"
+      "sku": "MH11",
+      "source_sku": "MH"
     },
     {
       "id": "MH 3",
       "name": "Matrix Extendable Flat Box Handle (MH)",
       "quantity": 1,
-      "sku": "MH"
+      "sku": "MH3",
+      "source_sku": "MH"
     }
   ],
   "coordinates": {

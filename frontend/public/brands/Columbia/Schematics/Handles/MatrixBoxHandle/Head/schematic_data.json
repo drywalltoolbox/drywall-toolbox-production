@@ -10,19 +10,22 @@
       "id": "MH 6",
       "name": "Matrix Extendable Flat Box Handle (MH)",
       "quantity": 1,
-      "sku": "MH"
+      "sku": "MH6",
+      "source_sku": "MH"
     },
     {
       "id": "MH 5",
       "name": "Matrix Extendable Flat Box Handle (MH)",
       "quantity": 1,
-      "sku": "MH"
+      "sku": "MH5",
+      "source_sku": "MH"
     },
     {
       "id": "FA 362",
       "name": "10-24 x 3/4 Flat Head Screw (FA362)",
       "quantity": 1,
-      "sku": "FA362"
+      "sku": "",
+      "source_sku": "FA362"
     },
     {
       "id": "FA 258",
@@ -34,43 +37,50 @@
       "id": "MH 13",
       "name": "Matrix Extendable Flat Box Handle (MH)",
       "quantity": 1,
-      "sku": "MH"
+      "sku": "MH13",
+      "source_sku": "MH"
     },
     {
       "id": "MH 1",
       "name": "Matrix Extendable Flat Box Handle (MH)",
       "quantity": 1,
-      "sku": "MH"
+      "sku": "MH1",
+      "source_sku": "MH"
     },
     {
       "id": "MH 20",
       "name": "Matrix Extendable Flat Box Handle (MH)",
       "quantity": 1,
-      "sku": "MH"
+      "sku": "MH20",
+      "source_sku": "MH"
     },
     {
       "id": "MH 7",
       "name": "Matrix Extendable Flat Box Handle (MH)",
       "quantity": 1,
-      "sku": "MH"
+      "sku": "MH7",
+      "source_sku": "MH"
     },
     {
       "id": "MH 14",
       "name": "Matrix Extendable Flat Box Handle (MH)",
       "quantity": 1,
-      "sku": "MH"
+      "sku": "",
+      "source_sku": "MH"
     },
     {
       "id": "MH 8",
       "name": "Matrix Extendable Flat Box Handle (MH)",
       "quantity": 1,
-      "sku": "MH"
+      "sku": "MH8",
+      "source_sku": "MH"
     },
     {
       "id": "MH 2",
       "name": "Matrix Extendable Flat Box Handle (MH)",
       "quantity": 1,
-      "sku": "MH"
+      "sku": "MH2",
+      "source_sku": "MH"
     }
   ],
   "coordinates": {

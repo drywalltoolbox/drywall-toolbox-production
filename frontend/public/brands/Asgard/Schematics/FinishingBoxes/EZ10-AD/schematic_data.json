@@ -24,13 +24,15 @@
       "id": "250001",
       "name": "250001 - 10\" Box Blade",
       "quantity": 1,
-      "sku": "4736"
+      "sku": "",
+      "source_sku": "4736"
     },
     {
       "id": "254002",
       "name": "254002 - 10\" Blade Holder Assembly",
       "quantity": 1,
-      "sku": "4741"
+      "sku": "",
+      "source_sku": "4741"
     },
     {
       "id": "250040F",
@@ -42,7 +44,8 @@
       "id": "251032G",
       "name": "251032G - 10\" Radius Plate (Gold)",
       "quantity": 1,
-      "sku": "4745"
+      "sku": "",
+      "source_sku": "4745"
     },
     {
       "id": "2",
@@ -66,7 +69,8 @@
       "id": "209039",
       "name": "209039 - Left Skid Cover",
       "quantity": 1,
-      "sku": "4709"
+      "sku": "",
+      "source_sku": "4709"
     },
     {
       "id": "4",
@@ -78,7 +82,8 @@
       "id": "251025G",
       "name": "251025G - Right Side Plate",
       "quantity": 1,
-      "sku": "4610"
+      "sku": "",
+      "source_sku": "4610"
     },
     {
       "id": "209050 ASSEMBLE WITH LOCTITE 243 TORQUE 10-12 IN-LB",
@@ -108,7 +113,8 @@
       "id": "256027G",
       "name": "256027 - 10\" Pressure Plate (Gold)",
       "quantity": 1,
-      "sku": "4744"
+      "sku": "",
+      "source_sku": "4744"
     },
     {
       "id": "2",
@@ -120,7 +126,8 @@
       "id": "200052F",
       "name": "200052 - Shoulder Screw",
       "quantity": 1,
-      "sku": "4595"
+      "sku": "",
+      "source_sku": "4595"
     },
     {
       "id": "2",
@@ -132,7 +139,8 @@
       "id": "310051F",
       "name": "310051 - Flat Box Wheel",
       "quantity": 1,
-      "sku": "310051F"
+      "sku": "",
+      "source_sku": "310051F"
     },
     {
       "id": "2",
@@ -162,31 +170,36 @@
       "id": "059018",
       "name": "6-32 Thin Pattern Stopnut - 059018",
       "quantity": 1,
-      "sku": "4392"
+      "sku": "",
+      "source_sku": "4392"
     },
     {
       "id": "202021",
       "name": "202021 - Special Nut",
       "quantity": 1,
-      "sku": "4599"
+      "sku": "",
+      "source_sku": "4599"
     },
     {
       "id": "206003",
       "name": "206003 - Dial Assembly",
       "quantity": 1,
-      "sku": "4609"
+      "sku": "",
+      "source_sku": "4609"
     },
     {
       "id": "203010",
       "name": "203010 - Flat Box Crown Spring",
       "quantity": 1,
-      "sku": "4597"
+      "sku": "",
+      "source_sku": "4597"
     },
     {
       "id": "254005",
       "name": "254005 - 10\" Clamp Assembly",
       "quantity": 1,
-      "sku": "4742"
+      "sku": "",
+      "source_sku": "4742"
     },
     {
       "id": "2",
@@ -228,7 +241,8 @@
       "id": "250026F",
       "name": "250026 10\" Flat Box Wiper",
       "quantity": 1,
-      "sku": "4738"
+      "sku": "",
+      "source_sku": "4738"
     },
     {
       "id": "2",
@@ -246,25 +260,29 @@
       "id": "209006",
       "name": "209006  - Right Skid Cover",
       "quantity": 1,
-      "sku": "4613"
+      "sku": "",
+      "source_sku": "4613"
     },
     {
       "id": "251023G",
       "name": "251023G - Flat Box Left Side Plate",
       "quantity": 1,
-      "sku": "4601"
+      "sku": "",
+      "source_sku": "4601"
     },
     {
       "id": "209048",
       "name": "209048 - 4-40 X 1/8 Bind Hd Screw",
       "quantity": 1,
-      "sku": "4714"
+      "sku": "",
+      "source_sku": "4714"
     },
     {
       "id": "250009",
       "name": "250009 - TapeTech Replacement Shim 10\"",
       "quantity": 1,
-      "sku": "4737"
+      "sku": "",
+      "source_sku": "4737"
     },
     {
       "id": "2",
@@ -312,19 +330,22 @@
       "id": "059225",
       "name": "059225 - 10-32 Thin Pattern Stop Nut",
       "quantity": 1,
-      "sku": "4446"
+      "sku": "",
+      "source_sku": "4446"
     },
     {
       "id": "209042",
       "name": "209042 - #10 Brass Washer",
       "quantity": 1,
-      "sku": "4711"
+      "sku": "",
+      "source_sku": "4711"
     },
     {
       "id": "209047",
       "name": "209047 - Nyliner Bearing",
       "quantity": 1,
-      "sku": "4713"
+      "sku": "",
+      "source_sku": "4713"
     },
     {
       "id": "809046",
@@ -336,7 +357,8 @@
       "id": "202036",
       "name": "202036 - Shoulder Screw",
       "quantity": 1,
-      "sku": "4603"
+      "sku": "",
+      "source_sku": "4603"
     }
   ],
   "coordinates": {

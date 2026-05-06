@@ -28,7 +28,8 @@
       "id": "811018",
       "name": "TapeTech 88TTE Connector Plate (811018)",
       "quantity": 1,
-      "sku": "4694"
+      "sku": "",
+      "source_sku": "4694"
     },
     {
       "id": "192006",
@@ -46,7 +47,8 @@
       "id": "811018",
       "name": "TapeTech 88TTE Connector Plate (811018)",
       "quantity": 1,
-      "sku": "4694"
+      "sku": "",
+      "source_sku": "4694"
     },
     {
       "id": "883003",
@@ -58,19 +60,22 @@
       "id": "882013",
       "name": "TapeTech Locking Pin (882013)",
       "quantity": 1,
-      "sku": "10202"
+      "sku": "",
+      "source_sku": "10202"
     },
     {
       "id": "889017",
       "name": "TapeTech Conical Spring (889017)",
       "quantity": 1,
-      "sku": "10199"
+      "sku": "",
+      "source_sku": "10199"
     },
     {
       "id": "882013",
       "name": "TapeTech Locking Pin (882013)",
       "quantity": 1,
-      "sku": "10202"
+      "sku": "",
+      "source_sku": "10202"
     },
     {
       "id": "883014",
@@ -88,7 +93,8 @@
       "id": "499023",
       "name": "TapeTech Screw, 4-40 x 3/16, Flat Head, SST (499023)",
       "quantity": 1,
-      "sku": "12031"
+      "sku": "",
+      "source_sku": "12031"
     }
   ],
   "coordinates": {

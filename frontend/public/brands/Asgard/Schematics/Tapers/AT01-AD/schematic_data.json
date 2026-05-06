@@ -41,67 +41,78 @@
       "id": "709043",
       "name": "709043 - S-Hook",
       "quantity": 1,
-      "sku": "4655"
+      "sku": "",
+      "source_sku": "4655"
     },
     {
       "id": "059143",
       "name": "059143 - Cotter Pin",
       "quantity": 1,
-      "sku": "4430"
+      "sku": "",
+      "source_sku": "4430"
     },
     {
       "id": "809006",
       "name": "809006 - #14 S Brass Washer",
       "quantity": 1,
-      "sku": "4684"
+      "sku": "",
+      "source_sku": "4684"
     },
     {
       "id": "054245F",
       "name": "Creaser Trigger Assembly - 054245",
       "quantity": 1,
-      "sku": "4378"
+      "sku": "",
+      "source_sku": "4378"
     },
     {
       "id": "050249",
       "name": "Creaser Connector - 050249",
       "quantity": 1,
-      "sku": "4566"
+      "sku": "",
+      "source_sku": "4566"
     },
     {
       "id": "059143",
       "name": "059143 - Cotter Pin",
       "quantity": 1,
-      "sku": "4430"
+      "sku": "",
+      "source_sku": "4430"
     },
     {
       "id": "054032F",
       "name": "Push Rod Assembly - 054032",
       "quantity": 1,
-      "sku": "4363"
+      "sku": "",
+      "source_sku": "4363"
     },
     {
       "id": "050144F",
       "name": "Cutter Chain Tube Link - 050144",
       "quantity": 1,
-      "sku": "4541"
+      "sku": "",
+      "source_sku": "4541"
     },
     {
       "id": "059333",
       "name": "O Ring - 5/32 ID x 9/16 OD x 1/16 Wide",
       "quantity": 1,
-      "sku": "059333"
+      "sku": "",
+      "source_sku": "059333"
     },
     {
       "id": "052148",
       "name": "Nyliner Bushing - 052148",
       "quantity": 1,
-      "sku": "052148"
+      "sku": "",
+      "source_sku": "052148"
     },
     {
       "id": "059074",
       "name": "059074 - 8-32 Hex Nylock Nut",
       "quantity": 1,
-      "sku": "4411"
+      "sku": "",
+      "source_sku": "4411"
     },
     {
       "id": "CUTTER PARTS ASSY",
@@ -113,25 +124,29 @@
       "id": "056133",
       "name": "Pyramid Blade, SST",
       "quantity": 1,
-      "sku": "12896"
+      "sku": "",
+      "source_sku": "12896"
     },
     {
       "id": "050068",
       "name": "Gooser & Cutter Chain Stop - 050068",
       "quantity": 1,
-      "sku": "4510"
+      "sku": "",
+      "source_sku": "4510"
     },
     {
       "id": "059025",
       "name": "059025 - Cotter Pin",
       "quantity": 1,
-      "sku": "4397"
+      "sku": "",
+      "source_sku": "4397"
     },
     {
       "id": "050163",
       "name": "Main Chain Guard - 050163",
       "quantity": 1,
-      "sku": "4546"
+      "sku": "",
+      "source_sku": "4546"
     },
     {
       "id": "MAIN WHEEL ASSY",
@@ -143,31 +158,36 @@
       "id": "059078",
       "name": "059078 - Nyliner Bearing",
       "quantity": 1,
-      "sku": "4412"
+      "sku": "",
+      "source_sku": "4412"
     },
     {
       "id": "059084",
       "name": "059084 - 8-32 X 1/4 1/2 Dog Setscrew",
       "quantity": 1,
-      "sku": "4414"
+      "sku": "",
+      "source_sku": "4414"
     },
     {
       "id": "059084",
       "name": "059084 - 8-32 X 1/4 1/2 Dog Setscrew",
       "quantity": 1,
-      "sku": "4414"
+      "sku": "",
+      "source_sku": "4414"
     },
     {
       "id": "050083F",
       "name": "Cable Drum - 050083F",
       "quantity": 1,
-      "sku": "4518"
+      "sku": "",
+      "source_sku": "4518"
     },
     {
       "id": "059217",
       "name": "059217 - 4-40 X 3/8 Bind Head Screw",
       "quantity": 1,
-      "sku": "4443"
+      "sku": "",
+      "source_sku": "4443"
     },
     {
       "id": "COVER PLATE ASSY",
@@ -179,19 +199,22 @@
       "id": "059156",
       "name": "059156 - 4-40 X 5/16 Bind Hd Screw",
       "quantity": 1,
-      "sku": "4434"
+      "sku": "",
+      "source_sku": "4434"
     },
     {
       "id": "059082",
       "name": "Drum Washer - 059082",
       "quantity": 1,
-      "sku": "4413"
+      "sku": "",
+      "source_sku": "4413"
     },
     {
       "id": "054114F",
       "name": "Sprocket Driver Assembly - 054114F",
       "quantity": 1,
-      "sku": "4372"
+      "sku": "",
+      "source_sku": "4372"
     },
     {
       "id": "DRIVE DOG ASSY",
@@ -203,19 +226,22 @@
       "id": "058126F",
       "name": "Main Chain - 058126F",
       "quantity": 1,
-      "sku": "4383"
+      "sku": "",
+      "source_sku": "4383"
     },
     {
       "id": "052148",
       "name": "Nyliner Bushing - 052148",
       "quantity": 1,
-      "sku": "052148"
+      "sku": "",
+      "source_sku": "052148"
     },
     {
       "id": "052149",
       "name": "Tenite Bearing - 052149",
       "quantity": 1,
-      "sku": "052149"
+      "sku": "",
+      "source_sku": "052149"
     },
     {
       "id": "052125",

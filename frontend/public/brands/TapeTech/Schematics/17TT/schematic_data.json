@@ -10,121 +10,141 @@
       "id": "170002",
       "name": "Block",
       "quantity": 1,
-      "sku": "170002"
+      "sku": "",
+      "source_sku": "170002"
     },
     {
       "id": "150004F",
       "name": "Pin, Swivel Coupling",
       "quantity": 1,
-      "sku": "150004F"
+      "sku": "",
+      "source_sku": "150004F"
     },
     {
       "id": "179004",
       "name": "6-32 X 3/16 Hex Soc Setscrew Cup Pt 18-8",
       "quantity": 1,
-      "sku": "179004"
+      "sku": "",
+      "source_sku": "179004"
     },
     {
       "id": "059143",
       "name": "Cotter Pin 1/16 X 1/2 SST.",
       "quantity": 1,
-      "sku": "059143"
+      "sku": "",
+      "source_sku": "059143"
     },
     {
       "id": "150009",
       "name": "Swivel Axle",
       "quantity": 1,
-      "sku": "150009"
+      "sku": "",
+      "source_sku": "150009"
     },
     {
       "id": "359005",
       "name": "Screw: 6-32 X 1/4 Bind Hd.",
       "quantity": 1,
-      "sku": "359005"
+      "sku": "",
+      "source_sku": "359005"
     },
     {
       "id": "176001",
       "name": "Bracket, No Logo, Serialized",
       "quantity": 1,
-      "sku": "176001"
+      "sku": "",
+      "source_sku": "176001"
     },
     {
       "id": "150003F",
       "name": "Coupling",
       "quantity": 1,
-      "sku": "150003F"
+      "sku": "",
+      "source_sku": "150003F"
     },
     {
       "id": "154007",
       "name": "Swivel Ass'Y",
       "quantity": 1,
-      "sku": "154007"
+      "sku": "",
+      "source_sku": "154007"
     },
     {
       "id": "171005",
       "name": "Universal Roller",
       "quantity": 1,
-      "sku": "171005"
+      "sku": "",
+      "source_sku": "171005"
     },
     {
       "id": "170003",
       "name": "Axle",
       "quantity": 1,
-      "sku": "170003"
+      "sku": "",
+      "source_sku": "170003"
     },
     {
       "id": "359046",
       "name": "Nut, Hex 10-32",
       "quantity": 1,
-      "sku": "359046"
+      "sku": "",
+      "source_sku": "359046"
     },
     {
       "id": "179006",
       "name": "#10 Medium Lockwasher 18-8 S.S.",
       "quantity": 1,
-      "sku": "179006"
+      "sku": "",
+      "source_sku": "179006"
     },
     {
       "id": "179007",
       "name": "#10 Flat Washer, 18-8 S.S.",
       "quantity": 1,
-      "sku": "179007"
+      "sku": "",
+      "source_sku": "179007"
     },
     {
       "id": "179010",
       "name": ".312 Ext. Retainer \"E\" Ring, 18-8 S.S.",
       "quantity": 1,
-      "sku": "179010"
+      "sku": "",
+      "source_sku": "179010"
     },
     {
       "id": "059025",
       "name": "Cotter Pin. 5/64 X 1/2 S.S",
       "quantity": 1,
-      "sku": "059025"
+      "sku": "",
+      "source_sku": "059025"
     },
     {
       "id": "164348",
       "name": "Corner Roller Handle Assembly, Sold",
       "quantity": 1,
-      "sku": "164348"
+      "sku": "",
+      "source_sku": "164348"
     },
     {
       "id": "179009",
       "name": "5L10-Fk Type 6 Nyliner",
       "quantity": 1,
-      "sku": "179009"
+      "sku": "",
+      "source_sku": "179009"
     },
     {
       "id": "179008",
       "name": "5/16 Flat Washer",
       "quantity": 1,
-      "sku": "179008"
+      "sku": "",
+      "source_sku": "179008"
     },
     {
       "id": "164348",
       "name": "Corner Roller Handle Assembly, Sold",
       "quantity": 1,
-      "sku": "164348"
+      "sku": "",
+      "source_sku": "164348"
     }
   ],
   "coordinates": {

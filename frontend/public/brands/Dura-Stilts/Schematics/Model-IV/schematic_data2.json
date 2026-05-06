@@ -100,7 +100,8 @@
       "id": "9",
       "name": "TapeTech 18 Gauge Work Glove, M (9) (PWG18-M)",
       "quantity": 1,
-      "sku": "18487"
+      "sku": "",
+      "source_sku": "18487"
     },
     {
       "id": "13",
@@ -112,7 +113,8 @@
       "id": "12",
       "name": "TapeTech in AMES Feather-Lite Stainless Steel Pan (12)",
       "quantity": 1,
-      "sku": "18490"
+      "sku": "",
+      "source_sku": "18490"
     },
     {
       "id": "13",
@@ -130,13 +132,15 @@
       "id": "11",
       "name": "TapeTech 18 Gauge Work Glove, XL (11) (PWG18-XL)",
       "quantity": 1,
-      "sku": "18489"
+      "sku": "",
+      "source_sku": "18489"
     },
     {
       "id": "12",
       "name": "TapeTech in AMES Feather-Lite Stainless Steel Pan (12)",
       "quantity": 1,
-      "sku": "18490"
+      "sku": "",
+      "source_sku": "18490"
     },
     {
       "id": "15",
@@ -160,7 +164,8 @@
       "id": "12",
       "name": "TapeTech in AMES Feather-Lite Stainless Steel Pan (12)",
       "quantity": 1,
-      "sku": "18490"
+      "sku": "",
+      "source_sku": "18490"
     },
     {
       "id": "13",
@@ -184,7 +189,8 @@
       "id": "19",
       "name": "Level5 Screw (#19) (7927)",
       "quantity": 1,
-      "sku": "7927"
+      "sku": "",
+      "source_sku": "7927"
     },
     {
       "id": "20",
@@ -220,7 +226,8 @@
       "id": "12",
       "name": "TapeTech in AMES Feather-Lite Stainless Steel Pan (12)",
       "quantity": 1,
-      "sku": "18490"
+      "sku": "",
+      "source_sku": "18490"
     },
     {
       "id": "14",
@@ -340,7 +347,8 @@
       "id": "12",
       "name": "TapeTech in AMES Feather-Lite Stainless Steel Pan (12)",
       "quantity": 1,
-      "sku": "18490"
+      "sku": "",
+      "source_sku": "18490"
     },
     {
       "id": "77",
@@ -436,31 +444,36 @@
       "id": "12",
       "name": "TapeTech in AMES Feather-Lite Stainless Steel Pan (12)",
       "quantity": 1,
-      "sku": "18490"
+      "sku": "",
+      "source_sku": "18490"
     },
     {
       "id": "11",
       "name": "TapeTech 18 Gauge Work Glove, XL (11) (PWG18-XL)",
       "quantity": 1,
-      "sku": "18489"
+      "sku": "",
+      "source_sku": "18489"
     },
     {
       "id": "12",
       "name": "TapeTech in AMES Feather-Lite Stainless Steel Pan (12)",
       "quantity": 1,
-      "sku": "18490"
+      "sku": "",
+      "source_sku": "18490"
     },
     {
       "id": "12",
       "name": "TapeTech in AMES Feather-Lite Stainless Steel Pan (12)",
       "quantity": 1,
-      "sku": "18490"
+      "sku": "",
+      "source_sku": "18490"
     },
     {
       "id": "12",
       "name": "TapeTech in AMES Feather-Lite Stainless Steel Pan (12)",
       "quantity": 1,
-      "sku": "18490"
+      "sku": "",
+      "source_sku": "18490"
     },
     {
       "id": "13",

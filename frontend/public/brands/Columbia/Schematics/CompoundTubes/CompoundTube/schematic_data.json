@@ -10,13 +10,15 @@
       "id": "FA323",
       "name": "1/4-20 X 1\" Hex Bolt (FA323)",
       "quantity": 1,
-      "sku": "FA323"
+      "sku": "",
+      "source_sku": "FA323"
     },
     {
       "id": "CMT8",
       "name": "Mastic Tube Washer (CMT8)",
       "quantity": 1,
-      "sku": "CMT8"
+      "sku": "",
+      "source_sku": "CMT8"
     },
     {
       "id": "FA286",
@@ -28,25 +30,29 @@
       "id": "CT111",
       "name": "Taper Piston Cup (CT-111)",
       "quantity": 1,
-      "sku": "CT-111"
+      "sku": "CT111",
+      "source_sku": "CT-111"
     },
     {
       "id": "CT110",
       "name": "Piston Cup Relief Washer (CT110)",
       "quantity": 1,
-      "sku": "CT110"
+      "sku": "",
+      "source_sku": "CT110"
     },
     {
       "id": "CT111",
       "name": "Taper Piston Cup (CT-111)",
       "quantity": 1,
-      "sku": "CT-111"
+      "sku": "CT111",
+      "source_sku": "CT-111"
     },
     {
       "id": "CMT8",
       "name": "Mastic Tube Washer (CMT8)",
       "quantity": 1,
-      "sku": "CMT8"
+      "sku": "",
+      "source_sku": "CMT8"
     },
     {
       "id": "FA286",
@@ -58,13 +64,15 @@
       "id": "FA284",
       "name": "3/16 x 3/8 SS Pop Rivet (FA284)",
       "quantity": 1,
-      "sku": "FA284"
+      "sku": "",
+      "source_sku": "FA284"
     },
     {
       "id": "CMT4",
       "name": "Plunger Housing (CMT4)",
       "quantity": 1,
-      "sku": "CMT4"
+      "sku": "",
+      "source_sku": "CMT4"
     },
     {
       "id": "FA256",
@@ -76,13 +84,15 @@
       "id": "CMT1A-24\"",
       "name": "Draw Tube - 24\" (CMT1A-24)",
       "quantity": 1,
-      "sku": "CMT1A-24"
+      "sku": "",
+      "source_sku": "CMT1A-24"
     },
     {
       "id": "EXT35",
       "name": "Extension Tube 35 in (EXT35)",
       "quantity": 1,
-      "sku": "EXT35"
+      "sku": "",
+      "source_sku": "EXT35"
     },
     {
       "id": "CFB5B",
@@ -94,25 +104,29 @@
       "id": "CFB5A",
       "name": "Corner Box Cone Ball End (Large)",
       "quantity": 1,
-      "sku": "CFB5A"
+      "sku": "",
+      "source_sku": "CFB5A"
     },
     {
       "id": "CFB5C",
       "name": "Corner Box Cone Ball End (Standard)",
       "quantity": 1,
-      "sku": "CFB5C"
+      "sku": "",
+      "source_sku": "CFB5C"
     },
     {
       "id": "CMT2",
       "name": "Cone insert(Bottom)",
       "quantity": 1,
-      "sku": "CMT2"
+      "sku": "",
+      "source_sku": "CMT2"
     },
     {
       "id": "CT115A",
       "name": "Taper Gasket New Style End Ring (CT115A)",
       "quantity": 1,
-      "sku": "CT115A"
+      "sku": "",
+      "source_sku": "CT115A"
     },
     {
       "id": "FA219",
@@ -130,13 +144,15 @@
       "id": "CMT1-24\"",
       "name": "Barrel Main Body 24 in (CMT1-24)",
       "quantity": 1,
-      "sku": "CMT1-24"
+      "sku": "",
+      "source_sku": "CMT1-24"
     },
     {
       "id": "CMT5",
       "name": "Plastic Handle Collar (CMT5)",
       "quantity": 1,
-      "sku": "CMT5"
+      "sku": "",
+      "source_sku": "CMT5"
     },
     {
       "id": "FA239",
@@ -154,7 +170,8 @@
       "id": "CMT6",
       "name": "Cone insert(Top)",
       "quantity": 1,
-      "sku": "CMT6"
+      "sku": "",
+      "source_sku": "CMT6"
     }
   ],
   "coordinates": {

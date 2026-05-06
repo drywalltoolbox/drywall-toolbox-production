@@ -18,19 +18,22 @@
       "id": "856003F",
       "name": "856003F - Gooseneck Assembly",
       "quantity": 1,
-      "sku": "856003F"
+      "sku": "",
+      "source_sku": "856003F"
     },
     {
       "id": "709034",
       "name": "709034 - Filler O-Ring Kit 5-Pack",
       "quantity": 1,
-      "sku": "4654"
+      "sku": "",
+      "source_sku": "4654"
     },
     {
       "id": "861014",
       "name": "861014 - Gooseneck Spacer",
       "quantity": 1,
-      "sku": "4696"
+      "sku": "",
+      "source_sku": "4696"
     }
   ],
   "coordinates": {

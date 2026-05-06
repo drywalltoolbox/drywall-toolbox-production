@@ -34,7 +34,8 @@
       "id": "FFB1B",
       "name": "Flat Box Body 1B (FFB1B)",
       "quantity": 1,
-      "sku": "FFB1B"
+      "sku": "",
+      "source_sku": "FFB1B"
     },
     {
       "id": "HFFB14-10\"",
@@ -46,7 +47,8 @@
       "id": "FFB40-10\"",
       "name": "Flat Box Door Gasket 10 in (FFB40-10)",
       "quantity": 1,
-      "sku": "FFB40-10"
+      "sku": "",
+      "source_sku": "FFB40-10"
     },
     {
       "id": "FFB38",
@@ -58,7 +60,8 @@
       "id": "FFB4C",
       "name": "Flat Box Corner Blade Assembly 4 in (FFB4C)",
       "quantity": 1,
-      "sku": "FFB4C"
+      "sku": "",
+      "source_sku": "FFB4C"
     },
     {
       "id": "FFB16",
@@ -100,19 +103,22 @@
       "id": "FFB7A",
       "name": "Flat Box Shoe (Left)",
       "quantity": 1,
-      "sku": "FFB-7A"
+      "sku": "FFB7A",
+      "source_sku": "FFB-7A"
     },
     {
       "id": "HFFB1-10'",
       "name": "10 in Heavy Flat Box Body (HFFB1-10)",
       "quantity": 1,
-      "sku": "HFFB1-10"
+      "sku": "",
+      "source_sku": "HFFB1-10"
     },
     {
       "id": "FFB43",
       "name": "Bead Wheel Bushing (FFB43)",
       "quantity": 1,
-      "sku": "FFB43"
+      "sku": "",
+      "source_sku": "FFB43"
     },
     {
       "id": "FA268",
@@ -124,7 +130,8 @@
       "id": "FFB41",
       "name": "Flat Box Axle Assembly (FFB41)",
       "quantity": 1,
-      "sku": "FFB41"
+      "sku": "",
+      "source_sku": "FFB41"
     },
     {
       "id": "FFB37",
@@ -136,13 +143,15 @@
       "id": "FFB44",
       "name": "Flat Box Door Pivot Pin (FFB44)",
       "quantity": 1,
-      "sku": "FFB44"
+      "sku": "",
+      "source_sku": "FFB44"
     },
     {
       "id": "FFB17",
       "name": "Rear Plate 7\" (FFB1-7)",
       "quantity": 1,
-      "sku": "FFB1-7"
+      "sku": "FFB17",
+      "source_sku": "FFB1-7"
     },
     {
       "id": "FFB5A",
@@ -154,7 +163,8 @@
       "id": "FFB42",
       "name": "Flat Box Door Pivot (FFB 42)",
       "quantity": 1,
-      "sku": "FFB 42"
+      "sku": "",
+      "source_sku": "FFB 42"
     },
     {
       "id": "FA271",
@@ -166,7 +176,8 @@
       "id": "FA327",
       "name": "8-32 x 1/4 Pan Head Screw (FA327)",
       "quantity": 1,
-      "sku": "FA327"
+      "sku": "",
+      "source_sku": "FA327"
     },
     {
       "id": "FA272",
@@ -202,7 +213,8 @@
       "id": "HFFB4-10'",
       "name": "10 in Heavy Flat Box Door (HFFB4-10)",
       "quantity": 1,
-      "sku": "HFFB4-10"
+      "sku": "",
+      "source_sku": "HFFB4-10"
     },
     {
       "id": "FA241",
@@ -214,7 +226,8 @@
       "id": "HFFB3",
       "name": "Hinge box end plate (Right - New Style)",
       "quantity": 1,
-      "sku": "HFFB3-RIGHT"
+      "sku": "HFFB3",
+      "source_sku": "HFFB3-RIGHT"
     },
     {
       "id": "FFB8",
@@ -226,7 +239,8 @@
       "id": "FFB7",
       "name": "Flat Box Shoe (Right)",
       "quantity": 1,
-      "sku": "FFB-7"
+      "sku": "FFB7",
+      "source_sku": "FFB-7"
     },
     {
       "id": "FFB32A",
@@ -262,19 +276,22 @@
       "id": "FFB12",
       "name": "Adjuster Dial Assembly 12 in (FFB12)",
       "quantity": 1,
-      "sku": "FFB12"
+      "sku": "",
+      "source_sku": "FFB12"
     },
     {
       "id": "FFB35",
       "name": "Flat Box Spring Assembly (FFB35)",
       "quantity": 1,
-      "sku": "FFB35"
+      "sku": "",
+      "source_sku": "FFB35"
     },
     {
       "id": "FFB18",
       "name": "Rear Plate 8\" (FFB1-8)",
       "quantity": 1,
-      "sku": "FFB1-8"
+      "sku": "",
+      "source_sku": "FFB1-8"
     },
     {
       "id": "FFB11-10'",
@@ -292,7 +309,8 @@
       "id": "FFB25-10'",
       "name": "Flat Box Rubber Gasket Retainer 10in (FFB-25-10)",
       "quantity": 1,
-      "sku": "FFB-25-10"
+      "sku": "FFB25-10",
+      "source_sku": "FFB-25-10"
     },
     {
       "id": "FA258",
@@ -304,7 +322,8 @@
       "id": "FA221",
       "name": "#6 Belleville Washer (FA221)",
       "quantity": 1,
-      "sku": "FA221"
+      "sku": "",
+      "source_sku": "FA221"
     },
     {
       "id": "FA230",
@@ -322,7 +341,8 @@
       "id": "FFB2A",
       "name": "Bushing (FFB2A)",
       "quantity": 1,
-      "sku": "FFB2A"
+      "sku": "",
+      "source_sku": "FFB2A"
     },
     {
       "id": "FA233",
@@ -334,19 +354,22 @@
       "id": "FFB2-10'",
       "name": "Roll Face 10\" (FFB2-10)",
       "quantity": 1,
-      "sku": "FFB2-10"
+      "sku": "",
+      "source_sku": "FFB2-10"
     },
     {
       "id": "FFB19",
       "name": "Brass Adjuster Pin (FFB19)",
       "quantity": 1,
-      "sku": "FFB19"
+      "sku": "",
+      "source_sku": "FFB19"
     },
     {
       "id": "FFB10-10'",
       "name": "Flat Box Side Cover 10 in (FFB10-10)",
       "quantity": 1,
-      "sku": "FFB10-10"
+      "sku": "",
+      "source_sku": "FFB10-10"
     },
     {
       "id": "FFB9-10'",
