@@ -1,0 +1,110 @@
+{
+  "csv_path": "products/Production/catalogs/official/tapetech_woocommerce_catalog_production_ready.csv",
+  "rows": 255,
+  "changed_rows": 12,
+  "changed_skus": [
+    "TG12053-PS",
+    "TG12054-PS",
+    "TG14053-PS",
+    "TG14054-PS",
+    "TG16053-PS",
+    "TG16054-PS",
+    "TG18053-PS",
+    "TG18054-PS",
+    "72052",
+    "72054",
+    "72055",
+    "72060"
+  ],
+  "before_duplicate_base_name_groups": {
+    "TapeTech X Premium Gold Stainless Steel Finishing Trowel \u2013 12\"": [
+      "TG12053-PS",
+      "TG12054-PS"
+    ],
+    "TapeTech X Premium Gold Stainless Steel Finishing Trowel \u2013 14\"": [
+      "TG14053-PS",
+      "TG14054-PS"
+    ],
+    "TapeTech X Premium Gold Stainless Steel Finishing Trowel \u2013 16\"": [
+      "TG16053-PS",
+      "TG16054-PS"
+    ],
+    "TapeTech X Premium Gold Stainless Steel Finishing Trowel \u2013 18\"": [
+      "TG18053-PS",
+      "TG18054-PS"
+    ],
+    "TapeTech Premium Finishing Knife & Compound Roller Set \u2013 24\"": [
+      "72052",
+      "72055"
+    ],
+    "TapeTech Premium Finishing Knife & Compound Roller Set \u2013 32\"": [
+      "72054",
+      "72060"
+    ]
+  },
+  "before_exact_duplicate_names": {},
+  "after_duplicate_base_name_groups": {},
+  "after_exact_duplicate_names": {},
+  "changes": [
+    {
+      "sku": "TG12053-PS",
+      "old_name": "TapeTech X Premium Gold Stainless Steel Finishing Trowel \u2013 12\" (TG12053-PS)",
+      "new_name": "TapeTech 12\" x 4.3\" Premium Gold Stainless Steel Finishing Trowel"
+    },
+    {
+      "sku": "TG12054-PS",
+      "old_name": "TapeTech X Premium Gold Stainless Steel Finishing Trowel \u2013 12\" (TG12054-PS)",
+      "new_name": "TapeTech 12\" x 4.7\" Premium Gold Stainless Steel Finishing Trowel"
+    },
+    {
+      "sku": "TG14053-PS",
+      "old_name": "TapeTech X Premium Gold Stainless Steel Finishing Trowel \u2013 14\" (TG14053-PS)",
+      "new_name": "TapeTech 14\" x 4.3\" Premium Gold Stainless Steel Finishing Trowel"
+    },
+    {
+      "sku": "TG14054-PS",
+      "old_name": "TapeTech X Premium Gold Stainless Steel Finishing Trowel \u2013 14\" (TG14054-PS)",
+      "new_name": "TapeTech 14\" x 4.7\" Premium Gold Stainless Steel Finishing Trowel"
+    },
+    {
+      "sku": "TG16053-PS",
+      "old_name": "TapeTech X Premium Gold Stainless Steel Finishing Trowel \u2013 16\" (TG16053-PS)",
+      "new_name": "TapeTech 16\" x 4.3\" Premium Gold Stainless Steel Finishing Trowel"
+    },
+    {
+      "sku": "TG16054-PS",
+      "old_name": "TapeTech X Premium Gold Stainless Steel Finishing Trowel \u2013 16\" (TG16054-PS)",
+      "new_name": "TapeTech 16\" x 4.7\" Premium Gold Stainless Steel Finishing Trowel"
+    },
+    {
+      "sku": "TG18053-PS",
+      "old_name": "TapeTech X Premium Gold Stainless Steel Finishing Trowel \u2013 18\" (TG18053-PS)",
+      "new_name": "TapeTech 18\" x 4.3\" Premium Gold Stainless Steel Finishing Trowel"
+    },
+    {
+      "sku": "TG18054-PS",
+      "old_name": "TapeTech X Premium Gold Stainless Steel Finishing Trowel \u2013 18\" (TG18054-PS)",
+      "new_name": "TapeTech 18\" x 4.7\" Premium Gold Stainless Steel Finishing Trowel"
+    },
+    {
+      "sku": "72052",
+      "old_name": "TapeTech Premium Finishing Knife & Compound Roller Set \u2013 24\" (72052)",
+      "new_name": "TapeTech 24\" Finishing Knife and 12\" Compound Roller Set w/ Support Handle/Adapter"
+    },
+    {
+      "sku": "72054",
+      "old_name": "TapeTech Premium Finishing Knife & Compound Roller Set \u2013 32\" (72054)",
+      "new_name": "TapeTech 32\" Finishing Knife and 12\" Compound Roller Set w/ Support Handle/Adapter"
+    },
+    {
+      "sku": "72055",
+      "old_name": "TapeTech Premium Finishing Knife & Compound Roller Set \u2013 24\" (72055)",
+      "new_name": "TapeTech 24\" Premium Finishing Knife and 9\" Compound Roller Set w/ Support Handle/Adapter"
+    },
+    {
+      "sku": "72060",
+      "old_name": "TapeTech Premium Finishing Knife & Compound Roller Set \u2013 32\" (72060)",
+      "new_name": "TapeTech 32\" Premium Finishing Knife and 9\" Compound Roller Kit w/ Support Handle/Adapter"
+    }
+  ]
+}

@@ -1,0 +1,110 @@
+﻿{
+  "directory": "products/Production/wp-images",
+  "candidate_renames": 778,
+  "files_renamed": 357,
+  "text_files_updated": 11,
+  "reference_replacements": 897,
+  "rename_map_csv": "products/Production/reports/wp_image_recanonicalization_map.csv",
+  "sample_renames": [
+    {
+      "old": "asgard-AH25-AD-01.webp",
+      "new": "asgard-AH25-AD-01.webp"
+    },
+    {
+      "old": "asgard-AH30-AD-01.webp",
+      "new": "asgard-AH25-AD-01.webp"
+    },
+    {
+      "old": "asgard-AH35-AD-01.webp",
+      "new": "asgard-AH25-AD-01.webp"
+    },
+    {
+      "old": "asgard-AT01-AD-01.webp",
+      "new": "asgard-AH25-AD-01.webp"
+    },
+    {
+      "old": "asgard-BBH-AD-01.webp",
+      "new": "asgard-AH25-AD-01.webp"
+    },
+    {
+      "old": "asgard-BBHE-AD-01.webp",
+      "new": "asgard-AH25-AD-01.webp"
+    },
+    {
+      "old": "asgard-CA08-AD-01.webp",
+      "new": "asgard-AH25-AD-01.webp"
+    },
+    {
+      "old": "asgard-FH-AD-01.webp",
+      "new": "asgard-AH25-AD-01.webp"
+    },
+    {
+      "old": "asgard-XH-AD-01.webp",
+      "new": "asgard-AH25-AD-01.webp"
+    },
+    {
+      "old": "asgard-CFA-AD-01.webp",
+      "new": "asgard-AH25-AD-01.webp"
+    },
+    {
+      "old": "asgard-CR01-AD-01.webp",
+      "new": "asgard-AH25-AD-01.webp"
+    },
+    {
+      "old": "asgard-FH-AD-01.webp",
+      "new": "asgard-AH25-AD-01.webp"
+    },
+    {
+      "old": "asgard-XH-AD-01.webp",
+      "new": "asgard-AH25-AD-01.webp"
+    },
+    {
+      "old": "asgard-EHC07-AD-01.webp",
+      "new": "asgard-AH25-AD-01.webp"
+    },
+    {
+      "old": "asgard-EHC10-AD-01.webp",
+      "new": "asgard-AH25-AD-01.webp"
+    },
+    {
+      "old": "asgard-EHC12-AD-01.webp",
+      "new": "asgard-AH25-AD-01.webp"
+    },
+    {
+      "old": "asgard-EZ07-AD-01.webp",
+      "new": "asgard-AH25-AD-01.webp"
+    },
+    {
+      "old": "asgard-EZ10-AD-01.webp",
+      "new": "asgard-AH25-AD-01.webp"
+    },
+    {
+      "old": "asgard-EZ12-AD-01.webp",
+      "new": "asgard-AH25-AD-01.webp"
+    },
+    {
+      "old": "asgard-FA01-AD-01.webp",
+      "new": "asgard-AH25-AD-01.webp"
+    },
+    {
+      "old": "asgard-FBHE-AD-01.webp",
+      "new": "asgard-AH25-AD-01.webp"
+    },
+    {
+      "old": "asgard-FH-AD-01.webp",
+      "new": "asgard-AH25-AD-01.webp"
+    },
+    {
+      "old": "asgard-GN01-AD-01.webp",
+      "new": "asgard-AH25-AD-01.webp"
+    },
+    {
+      "old": "asgard-LP01-AD-01.webp",
+      "new": "asgard-AH25-AD-01.webp"
+    },
+    {
+      "old": "asgard-NS03-AD-01.webp",
+      "new": "asgard-AH25-AD-01.webp"
+    }
+  ]
+}

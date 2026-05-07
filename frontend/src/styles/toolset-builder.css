@@ -307,6 +307,7 @@
   font-size: 0.68rem; color: #94a3b8;
   line-height: 1.45; margin-top: 5px;
   display: -webkit-box;
+  line-clamp: 3;
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
@@ -470,7 +471,14 @@
 .tsb-brand-dropdown-logo-fallback {
   font-size: 1rem; font-weight: 900; color: #94a3b8;
 }
-.tsb-brand-dropdown-info { flex: 1; min-width: 0; }
+.tsb-brand-dropdown-info { 
+  flex: 1; 
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 2px;
+}
 .tsb-brand-dropdown-name {
   display: block;
   font-size: 0.88rem; font-weight: 800;
@@ -479,7 +487,7 @@
 .tsb-brand-dropdown-item.--selected .tsb-brand-dropdown-name { color: #1d4ed8; }
 .tsb-brand-dropdown-count {
   display: block;
-  font-size: 0.7rem; color: #94a3b8; margin-top: 1px;
+  font-size: 0.7rem; color: #94a3b8; margin-top: 0;
 }
 .tsb-brand-dropdown-check { color: #2563eb; flex-shrink: 0; }
 
@@ -525,13 +533,20 @@
 .tsb-brand-option-fallback {
   font-size: 1.1rem; font-weight: 900; color: #94a3b8;
 }
-.tsb-brand-option-info { flex: 1; min-width: 0; }
+.tsb-brand-option-info { 
+  flex: 1; 
+  min-width: 0; 
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 3px;
+}
 .tsb-brand-option-name {
   font-size: 0.87rem; font-weight: 800;
   color: #0f172a; line-height: 1.2;
 }
 .tsb-brand-option-count {
-  font-size: 0.7rem; color: #94a3b8; margin-top: 1px;
+  font-size: 0.7rem; color: #94a3b8; margin-top: 0;
 }
 .tsb-brand-na-pill {
   font-size: 0.63rem; font-weight: 700;
@@ -1211,7 +1226,7 @@
 .tsb-product-name {
   font-size: 0.84rem; font-weight: 700; color: #0f172a;
   margin: 0; line-height: 1.35;
-  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+  display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
 }
 .tsb-product-parent {
   font-size: 0.67rem;
@@ -1541,6 +1556,7 @@
   line-height: 1.35;
   display: -webkit-box;
   -webkit-line-clamp: 2;
+  line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }

@@ -1,0 +1,216 @@
+{
+  "directory": "products/Production/Images",
+  "catalog": "products/Production/catalogs/official/woocommerce_catalog.csv",
+  "candidate_renames": 0,
+  "files_renamed": 0,
+  "reference_map_entries": 0,
+  "text_files_updated": 0,
+  "reference_replacements": 0,
+  "dup_files_remaining": 0,
+  "unmatched_files": 119,
+  "rename_map_csv": "products/Production/reports/production_images_rename_map.csv",
+  "sample_renames": [],
+  "sample_unmatched": [
+    {
+      "file_name": "tapetech-10-continuous-flow-flat-box-cf10h-media-01.webp",
+      "reason": "sku_not_resolved"
+    },
+    {
+      "file_name": "tapetech-10-continuous-flow-flat-box-cf10h-media-02.webp",
+      "reason": "sku_not_resolved"
+    },
+    {
+      "file_name": "tapetech-10-continuous-flow-flat-box-cf10h-media-03.webp",
+      "reason": "sku_not_resolved"
+    },
+    {
+      "file_name": "tapetech-10-continuous-flow-flat-box-cf10h-media-04.webp",
+      "reason": "sku_not_resolved"
+    },
+    {
+      "file_name": "tapetech-10-continuous-flow-flat-box-cf10h-media-06.webp",
+      "reason": "sku_not_resolved"
+    },
+    {
+      "file_name": "tapetech-10-in-replacement-flat-box-axle-for-250045-tapetech-10-in-replacement-flat--01.webp",
+      "reason": "sku_not_resolved"
+    },
+    {
+      "file_name": "tapetech-12-14-18-24-32-finishing-knife-set-tapetech-12-14-18-24-32-finishin-01.webp",
+      "reason": "sku_not_resolved"
+    },
+    {
+      "file_name": "tapetech-12-14-18-24-32-premium-finishing-knife-set-iii-tapetech-12-14-18-24-32-premium--01.webp",
+      "reason": "sku_not_resolved"
+    },
+    {
+      "file_name": "tapetech-12-14-24-premium-finishing-knives-w-support-handle-adapter-tapetech-12-14-24-premium-finish-01.webp",
+      "reason": "sku_not_resolved"
+    },
+    {
+      "file_name": "tapetech-12-18-24-finishing-knife-set-tapetech-12-18-24-finishing-knif-01.webp",
+      "reason": "sku_not_resolved"
+    },
+    {
+      "file_name": "tapetech-12-24-32-finishing-knives-w-support-handle-adapter-tapetech-12-24-32-finishing-kniv-01.webp",
+      "reason": "sku_not_resolved"
+    },
+    {
+      "file_name": "tapetech-12-24-32-premium-finishing-knife-set-ii-tapetech-12-24-32-premium-finish-01.webp",
+      "reason": "sku_not_resolved"
+    },
+    {
+      "file_name": "tapetech-12-continuous-flow-flat-box-cf12h-media-01.webp",
+      "reason": "sku_not_resolved"
+    },
+    {
+      "file_name": "tapetech-12-continuous-flow-flat-box-cf12h-media-02.webp",
+      "reason": "sku_not_resolved"
+    },
+    {
+      "file_name": "tapetech-12-continuous-flow-flat-box-cf12h-media-03.webp",
+      "reason": "sku_not_resolved"
+    },
+    {
+      "file_name": "tapetech-2-5-angle-head-blade-kit-502f25-media-01.webp",
+      "reason": "sku_not_resolved"
+    },
+    {
+      "file_name": "tapetech-2-nail-spotter-w-extendable-handle-tt63ext-media-01.webp",
+      "reason": "sku_not_resolved"
+    },
+    {
+      "file_name": "tapetech-24-finishing-knife-and-12-compound-roller-set-w-support-handle-adapter-tapetech-24-finishing-knife-and--01.webp",
+      "reason": "sku_not_resolved"
+    },
+    {
+      "file_name": "tapetech-3-5-angle-head-blade-kit-502f4x-media-01.webp",
+      "reason": "sku_not_resolved"
+    },
+    {
+      "file_name": "tapetech-3-5-angle-head-repair-kit-501f4ax-media-01.webp",
+      "reason": "sku_not_resolved"
+    },
+    {
+      "file_name": "tapetech-3-nail-spotter-w-extendable-handle-tt68ext-media-01.webp",
+      "reason": "sku_not_resolved"
+    },
+    {
+      "file_name": "tapetech-32-finishing-knife-and-12-compound-roller-set-w-support-handle-adapter-tapetech-32-finishing-knife-and--01.webp",
+      "reason": "sku_not_resolved"
+    },
+    {
+      "file_name": "tapetech-34-continuous-flow-flat-box-handle-cfs8034tt-media-01.webp",
+      "reason": "sku_not_resolved"
+    },
+    {
+      "file_name": "tapetech-4-5-6-carbon-steel-joint-knife-kit-tapetech-4-5-6-carbon-steel-join-01.webp",
+      "reason": "sku_not_resolved"
+    },
+    {
+      "file_name": "tapetech-47-continuous-flow-flat-box-handle-cfs8047tt-media-01.webp",
+      "reason": "sku_not_resolved"
+    },
+    {
+      "file_name": "tapetech-55-mm-cove-applicator-head-ch55tt-media-01.webp",
+      "reason": "sku_not_resolved"
+    },
+    {
+      "file_name": "tapetech-55-mm-cove-applicator-head-ch55tt-media-02.webp",
+      "reason": "sku_not_resolved"
+    },
+    {
+      "file_name": "tapetech-55-mm-cove-applicator-head-ch55tt-media-03.webp",
+      "reason": "sku_not_resolved"
+    },
+    {
+      "file_name": "tapetech-55-mm-cove-applicator-head-ch55tt-media-04.webp",
+      "reason": "sku_not_resolved"
+    },
+    {
+      "file_name": "tapetech-60-continuous-flow-flat-box-handle-cfs8060tt-media-01.webp",
+      "reason": "sku_not_resolved"
+    },
+    {
+      "file_name": "tapetech-60-continuous-flow-flat-box-handle-cfs8060tt-media-03.webp",
+      "reason": "sku_not_resolved"
+    },
+    {
+      "file_name": "tapetech-60-continuous-flow-flat-box-handle-cfs8060tt-media-04.webp",
+      "reason": "sku_not_resolved"
+    },
+    {
+      "file_name": "tapetech-7-12-18-finishing-knife-set-tapetech-7-12-18-finishing-knife-01.webp",
+      "reason": "sku_not_resolved"
+    },
+    {
+      "file_name": "tapetech-7-12-18-premium-finishing-knife-set-tapetech-7-12-18-premium-finishi-01.webp",
+      "reason": "sku_not_resolved"
+    },
+    {
+      "file_name": "tapetech-7-continuous-flow-flat-box-cf07h-media-01.webp",
+      "reason": "sku_not_resolved"
+    },
+    {
+      "file_name": "tapetech-7-continuous-flow-flat-box-cf07h-media-02.webp",
+      "reason": "sku_not_resolved"
+    },
+    {
+      "file_name": "tapetech-7-continuous-flow-flat-box-cf07h-media-03.webp",
+      "reason": "sku_not_resolved"
+    },
+    {
+      "file_name": "tapetech-7-continuous-flow-flat-box-cf07h-media-05.webp",
+      "reason": "sku_not_resolved"
+    },
+    {
+      "file_name": "tapetech-72-continuous-flow-flat-box-handle-cfs8072tt-media-01.webp",
+      "reason": "sku_not_resolved"
+    },
+    {
+      "file_name": "tapetech-72-continuous-flow-flat-box-handle-cfs8072tt-media-02.webp",
+      "reason": "sku_not_resolved"
+    },
+    {
+      "file_name": "tapetech-75-mm-cove-applicator-head-ch75tt-media-01.webp",
+      "reason": "sku_not_resolved"
+    },
+    {
+      "file_name": "tapetech-75-mm-cove-applicator-head-ch75tt-media-02.webp",
+      "reason": "sku_not_resolved"
+    },
+    {
+      "file_name": "tapetech-75-mm-cove-applicator-head-ch75tt-media-03.webp",
+      "reason": "sku_not_resolved"
+    },
+    {
+      "file_name": "tapetech-8-10-12-blue-steel-taping-knife-kit-tapetech-8-10-12-blue-steel-tapi-01.webp",
+      "reason": "sku_not_resolved"
+    },
+    {
+      "file_name": "tapetech-8-10-12-stainless-taping-knife-kit-tapetech-8-10-12-stainless-tapin-01.webp",
+      "reason": "sku_not_resolved"
+    },
+    {
+      "file_name": "tapetech-83-mm-cove-applicator-head-ch83tt-media-01.webp",
+      "reason": "sku_not_resolved"
+    },
+    {
+      "file_name": "tapetech-83-mm-cove-applicator-head-ch83tt-media-02.webp",
+      "reason": "sku_not_resolved"
+    },
+    {
+      "file_name": "tapetech-83-mm-cove-applicator-head-ch83tt-media-03.webp",
+      "reason": "sku_not_resolved"
+    },
+    {
+      "file_name": "tapetech-90-mm-cove-applicator-head-ch90tt-media-01.webp",
+      "reason": "sku_not_resolved"
+    },
+    {
+      "file_name": "tapetech-90-mm-cove-applicator-head-ch90tt-media-02.webp",
+      "reason": "sku_not_resolved"
+    }
+  ],
+  "sample_dup_remaining": []
+}
