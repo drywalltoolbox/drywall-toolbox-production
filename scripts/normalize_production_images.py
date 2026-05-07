@@ -169,6 +169,25 @@ def choose_seq_width(items: list[dict[str, object]]) -> int:
     return 2
 
 
+def descriptive_target_name(filename: str) -> str | None:
+    match = re.match(
+        r"^(?P<brand>[a-z0-9]+)-(?P<body>.+)_(?P<seq>\d{2,3})\.webp$",
+        filename,
+        re.IGNORECASE,
+    )
+    if not match:
+        return None
+
+    brand_slug = match.group("brand").lower()
+    body = match.group("body").replace("_", "-")
+    seq_text = match.group("seq")
+    return f"{brand_slug}-{body}-{seq_text}.webp"
+
+
+def is_normalized_descriptive_body(body: str) -> bool:
+    return body == body.lower() and bool(re.fullmatch(r"[a-z0-9-]+", body)) and bool(re.search(r"[a-z]", body))
+
+
 def build_rename_map(sku_case_by_brand: dict[str, dict[str, str]]) -> tuple[dict[str, str], list[dict[str, str]]]:
     family_groups: dict[tuple[str, str], list[dict[str, object]]] = defaultdict(list)
     unmatched: list[dict[str, str]] = []
@@ -182,6 +201,8 @@ def build_rename_map(sku_case_by_brand: dict[str, dict[str, str]]) -> tuple[dict
         brand_slug, body, seq_value, dup_value = parsed
         canonical_sku = resolve_sku(brand_slug, body, sku_case_by_brand)
         if not canonical_sku:
+            if is_normalized_descriptive_body(body):
+                continue
             unmatched.append({"file_name": path.name, "reason": "sku_not_resolved"})
             continue
 
@@ -252,6 +273,17 @@ def build_rename_map(sku_case_by_brand: dict[str, dict[str, str]]) -> tuple[dict
 
             if source_name != target_name:
                 rename_map[source_name] = target_name
+
+    remaining_unmatched: list[dict[str, str]] = []
+    for item in unmatched:
+        source_name = item["file_name"]
+        target_name = descriptive_target_name(source_name)
+        if target_name and source_name != target_name:
+            rename_map[source_name] = target_name
+            continue
+        remaining_unmatched.append(item)
+
+    unmatched = remaining_unmatched
 
     # Clean unresolved `-dup` files by assigning the next sequence within their current stem family.
     unresolved_dup_groups: dict[tuple[str, str], list[tuple[str, int, int]]] = defaultdict(list)

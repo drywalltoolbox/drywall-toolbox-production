@@ -1,0 +1,15 @@
+{
+  "directory": "products/Production/Images",
+  "catalog": "products/Production/catalogs/official/woocommerce_catalog.csv",
+  "candidate_renames": 0,
+  "files_renamed": 0,
+  "reference_map_entries": 0,
+  "text_files_updated": 0,
+  "reference_replacements": 0,
+  "dup_files_remaining": 0,
+  "unmatched_files": 0,
+  "rename_map_csv": "products/Production/reports/production_images_rename_map.csv",
+  "sample_renames": [],
+  "sample_unmatched": [],
+  "sample_dup_remaining": []
+}
