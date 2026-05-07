@@ -1,0 +1,17 @@
+{
+  "catalog_path": "products/Production/catalogs/official/woocommerce_catalog_production.csv",
+  "images_path": "products/Production/Images",
+  "product_report_csv": "products/Production/reports/tapetech_columbia_image_remap.csv",
+  "image_report_csv": "products/Production/reports/tapetech_columbia_image_coverage.csv",
+  "target_brands": [
+    "columbia",
+    "tapetech"
+  ],
+  "catalog_rows_considered": 1297,
+  "image_files_considered": 1639,
+  "mapped_catalog_rows": 597,
+  "parent_fallback_only_rows": 37,
+  "unmapped_catalog_rows": 663,
+  "orphan_image_files": 699,
+  "manual_override_image_groups": 10
+}
