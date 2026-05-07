@@ -1,0 +1,15 @@
+{
+  "directory": "products/Production/Images",
+  "file_count": 3847,
+  "candidate_hash_groups": 452,
+  "visual_duplicate_groups": 324,
+  "files_in_visual_duplicate_groups": 648,
+  "duplicate_files_excluding_canonicals": 324,
+  "already_hardlinked_duplicates": 0,
+  "rmse_threshold": 1.0,
+  "p999_threshold": 8,
+  "estimated_bytes_saved_if_deduped": 3882096,
+  "csv_report": "products/Production/reports/production_image_visual_duplicate_groups.csv",
+  "files_replaced_with_hardlinks_this_run": 324,
+  "files_already_hardlinked": 0
+}
