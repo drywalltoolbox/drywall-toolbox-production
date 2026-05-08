@@ -261,6 +261,7 @@ export default function ProductDetail({
   const selectedVariationName = selectedVariation
     ? Object.values(getVariationSelectionMap(selectedVariation)).filter(Boolean).join(' / ')
     : '';
+  const productSpecifications = getProductSpecifications(product);
 
   return (
     <div
@@ -492,6 +493,16 @@ export default function ProductDetail({
                 DESCRIPTION
               </button>
               <button
+                onClick={() => setActiveTab('specifications')}
+                className={`pb-2 sm:pb-3 font-semibold text-xs sm:text-sm md:text-base transition-colors relative whitespace-nowrap ${
+                  activeTab === 'specifications'
+                    ? 'text-blue-600 after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:bg-blue-600'
+                    : 'text-gray-500 hover:text-gray-700'
+                }`}
+              >
+                SPECIFICATIONS
+              </button>
+              <button
                 onClick={() => setActiveTab('reviews')}
                 className={`pb-2 sm:pb-3 font-semibold text-xs sm:text-sm md:text-base transition-colors relative whitespace-nowrap ${
                   activeTab === 'reviews'
@@ -528,15 +539,12 @@ export default function ProductDetail({
                         ) : (
                           <ReactMarkdown remarkPlugins={[remarkGfm]}>
                             {stripSpecsFromHtml(product.description_full)}
-                          </ReactMarkdown>
+                      </ReactMarkdown>
                         )}
                     </div>
                   ) : (
                     <p className="text-gray-500">No description available.</p>
                   )}
-
-                  {/* Technical Specifications Table */}
-                  <TechnicalSpecifications specs={getProductSpecifications(product)} onItemClick={onClose} />
 
                   {/* Replacement Parts Section */}
                   {partsUrl && (
@@ -559,6 +567,16 @@ export default function ProductDetail({
                         View Schematic &amp; Parts Diagram
                       </Link>
                     </div>
+                  )}
+                </div>
+              )}
+
+              {activeTab === 'specifications' && (
+                <div>
+                  {productSpecifications.length > 0 ? (
+                    <TechnicalSpecifications specs={productSpecifications} onItemClick={onClose} />
+                  ) : (
+                    <p className="text-gray-500">No specifications available for this product yet.</p>
                   )}
                 </div>
               )}
