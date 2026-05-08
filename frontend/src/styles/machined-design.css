@@ -1830,7 +1830,10 @@ aside input[type="range"],
     }
 
     .site-header {
-        min-height: var(--header-height);
+        /* Keep the fixed header sized to the actual nav row only.
+           --header-height remains the page offset and includes the top ticker
+           on the home page. */
+        min-height: calc(76px + env(safe-area-inset-top, 0px));
         padding: env(safe-area-inset-top, 0px) 0 0;
         display: flex;
         flex-direction: column;
@@ -1848,6 +1851,19 @@ aside input[type="range"],
 
     body {
         padding-top: var(--header-height, 104px);
+    }
+
+    .header-mobile-menu {
+        display: block !important;
+        padding: 0.75rem 0;
+        border-top: 1px solid rgba(15, 23, 42, 0.06);
+    }
+
+    .header-mobile-menu nav {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        padding: 0.75rem 0;
     }
 
     /* Equal-width side slots so logo is always perfectly centered */
@@ -1953,7 +1969,10 @@ aside input[type="range"],
 
     .site-header {
         padding: env(safe-area-inset-top, 0px) 0 0;
-        min-height: var(--header-height);
+        /* Same rule as mobile: actual header height is only the nav row.
+           The top ticker is a separate fixed strip and stays accounted for in
+           --header-height for page spacing. */
+        min-height: calc(clamp(56px, 8vw, 80px) + env(safe-area-inset-top, 0px));
         display: flex;
         flex-direction: column;
         align-items: stretch;
