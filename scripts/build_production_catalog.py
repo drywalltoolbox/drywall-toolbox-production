@@ -146,6 +146,13 @@ def clean_space(value: str) -> str:
     return re.sub(r"\s+", " ", (value or "").replace("\xa0", " ")).strip()
 
 
+def normalize_display_name(value: str) -> str:
+    value = clean_space(value)
+    # Some source titles end with a dangling hyphen delimiter; trim only the tail.
+    value = re.sub(r"\s+-\s*$", "", value)
+    return value
+
+
 def csv_safe(value: Any) -> str:
     if value is None:
         return ""
@@ -328,7 +335,7 @@ def normalize_product(product: dict[str, Any], sku_index: dict[tuple[int, int], 
         "id": product.get("id"),
         "handle": product.get("handle"),
         "url": product_url(product.get("handle", "")),
-        "title": product.get("title"),
+        "title": normalize_display_name(product.get("title", "")),
         "parent_sku": parent_sku(product),
         "is_variable_product": is_variable(product),
         "short_description": parsed["short_description"],

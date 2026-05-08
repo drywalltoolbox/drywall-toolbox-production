@@ -554,29 +554,27 @@ add_action( 'woocommerce_after_checkout_validation', function ( $data, $errors )
 // ============================================================================
 // SECTION 12 — CSV IMPORTER: CUSTOM COLUMN MAPPING
 //
-// Maps non-standard wp-catalog.csv columns to WooCommerce product fields:
+// Maps non-standard CSV columns to WooCommerce product fields:
 //
-//   MPN    → persisted to `_mpn` product meta key.
-//   Brands → persisted to `_dtb_brand` product meta key.
-//            The "Brands" column is the first column in wp-catalog.csv and is
-//            NOT a built-in WooCommerce field. Without an explicit mapping it
-//            would be silently ignored by the importer. Storing it as meta lets
-//            dtb-rest-api.php expose it and the frontend filter by brand.
+//   MPN           → persisted to `_mpn` product meta key.
+//   Brands        → should use the site's native WooCommerce brand taxonomy
+//                   mapping. After import we mirror imported product_brand
+//                   terms into `_dtb_brand` for backward compatibility with the
+//                   existing frontend and API code.
+//   Slug          → imported into the product's `post_name`.
 // ============================================================================
 
 add_filter( 'woocommerce_csv_product_import_mapping_options', function ( array $options ): array {
-	$options['mpn']       = __( 'MPN', 'woocommerce' );
-	$options['dtb_brand'] = __( 'Brand (DTB)', 'woocommerce' );
+	$options['mpn']  = __( 'MPN', 'woocommerce' );
+	$options['slug'] = __( 'Slug', 'woocommerce' );
 	return $options;
 } );
 
 add_filter( 'woocommerce_csv_product_import_mapping_default_columns', function ( array $columns ): array {
-	$columns['MPN']    = 'mpn';
-	$columns['mpn']    = 'mpn';
-	$columns['Brands'] = 'dtb_brand';
-	$columns['brands'] = 'dtb_brand';
-	$columns['Brand']  = 'dtb_brand';
-	$columns['brand']  = 'dtb_brand';
+	$columns['MPN']  = 'mpn';
+	$columns['mpn']  = 'mpn';
+	$columns['Slug'] = 'slug';
+	$columns['slug'] = 'slug';
 	return $columns;
 } );
 
@@ -587,9 +585,25 @@ add_filter( 'woocommerce_product_import_pre_insert_product_object', function ( \
 	if ( ! empty( $data['mpn'] ) ) {
 		$product->update_meta_data( '_mpn', sanitize_text_field( (string) $data['mpn'] ) );
 	}
-	if ( ! empty( $data['dtb_brand'] ) ) {
-		$product->update_meta_data( '_dtb_brand', sanitize_text_field( (string) $data['dtb_brand'] ) );
+	if ( ! empty( $data['slug'] ) ) {
+		$product->set_slug( sanitize_title( (string) $data['slug'] ) );
 	}
+	return $product;
+}, 10, 2 );
+
+add_filter( 'woocommerce_product_import_inserted_product_object', function ( \WC_Product $product, array $data ): \WC_Product {
+	if ( ! taxonomy_exists( 'product_brand' ) ) {
+		return $product;
+	}
+
+	$brands = wp_get_post_terms( $product->get_id(), 'product_brand', [ 'fields' => 'names' ] );
+	if ( is_wp_error( $brands ) || empty( $brands ) ) {
+		return $product;
+	}
+
+	$product->update_meta_data( '_dtb_brand', sanitize_text_field( implode( ', ', $brands ) ) );
+	$product->save_meta_data();
+
 	return $product;
 }, 10, 2 );
 

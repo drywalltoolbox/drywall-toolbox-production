@@ -97,7 +97,16 @@ def parse_image_file(path: Path) -> dict[str, object] | None:
 
 def build_row_aliases(row: dict[str, str], brand_key: str) -> set[str]:
     aliases: set[str] = set()
-    for field in ("Slug", "Name", "Product family", "Series", "Model"):
+    for field in (
+        "Slug",
+        "Name",
+        "meta:product_family",
+        "meta:series",
+        "meta:model",
+        "Product family",
+        "Series",
+        "Model",
+    ):
         value = row.get(field, "")
         if not value:
             continue
