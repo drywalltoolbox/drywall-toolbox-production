@@ -976,13 +976,10 @@ aside input[type="range"],
     right: 0;
     width: 100%;
     min-height: 56px;
-    background: 
-        radial-gradient(ellipse 90% 150% at 15% -30%, rgba(59, 130, 246, 0.5) 0%, transparent 40%),
-        radial-gradient(ellipse 120% 100% at 85% 150%, rgba(37, 99, 235, 0.35) 0%, transparent 50%),
-        radial-gradient(ellipse 100% 80% at 50% 50%, rgba(59, 130, 246, 0.2) 0%, transparent 60%),
-        linear-gradient(135deg, #0a0e27 0%, #0f1535 20%, #0a1130 40%, #050a1f 60%, #020408 100%);
-    background-size: 300% 300%, 300% 300%, 300% 300%, 100% 100%;
-    animation: dtb-mesh-wave 18s ease-in-out infinite;
+    background:
+        radial-gradient(circle at 50% 0%, rgba(29,78,216,0.32) 0%, transparent 55%),
+        radial-gradient(circle at 50% 110%, rgba(56,189,248,0.13) 0%, transparent 55%),
+        #070d1c;
     border-bottom: 1px solid rgba(59, 130, 246, 0.15);
     box-shadow:
         inset 0 1px 0 rgba(255,255,255,0.04),
@@ -1477,14 +1474,11 @@ aside input[type="range"],
         display: flex;
         align-items: center;
         justify-self: end;
-        gap: 16px;
+        gap: 10px;
     }
 
-    /* Limit the side columns so nav items sit closer to the centered brand mark
-       without changing the overall responsive layout. Tweak the max-width value
-       to nudge further in/out as needed. */
-    .header-left,
-    .header-right {
+    /* Limit only the left column; let the right column size naturally */
+    .header-left {
         max-width: 420px;
     }
     
@@ -1508,14 +1502,14 @@ aside input[type="range"],
     }
     
     .header-desktop-layout {
-        gap: 32px;
+        gap: 0 32px;
         min-height: 100%;
         align-items: center;
     }
     
     .header-left,
     .header-right {
-        gap: 20px;
+        gap: 10px;
     }
 }
 
@@ -2750,20 +2744,15 @@ aside input[type="range"],
         min-height: 120px; /* taller nav bar */
         padding: 0;
         z-index: 9999;
-        /* Black and blue animated mesh background */
-        background: 
-            radial-gradient(ellipse 90% 150% at 15% -30%, rgba(59, 130, 246, 0.5) 0%, transparent 40%),
-            radial-gradient(ellipse 120% 100% at 85% 150%, rgba(37, 99, 235, 0.35) 0%, transparent 50%),
-            radial-gradient(ellipse 100% 80% at 50% 50%, rgba(59, 130, 246, 0.2) 0%, transparent 60%),
-            linear-gradient(135deg, #0a0e27 0%, #0f1535 20%, #0a1130 40%, #050a1f 60%, #020408 100%);
-        background-size: 300% 300%, 300% 300%, 300% 300%, 100% 100%;
-        animation: dtb-mesh-wave 18s ease-in-out infinite;
+        background:
+            radial-gradient(circle at 50% 0%, rgba(29,78,216,0.32) 0%, transparent 55%),
+            radial-gradient(circle at 50% 110%, rgba(56,189,248,0.13) 0%, transparent 55%),
+            #070d1c;
         border-bottom: 1px solid rgba(59, 130, 246, 0.2);
         box-shadow:
             inset 0 1px 0 rgba(255,255,255,0.04),
-            inset 0 0 60px rgba(59, 130, 246, 0.12),
-            0 4px 32px rgba(0,0,0,0.5),
-            0 1px 8px rgba(18,40,120,0.2);
+            inset 0 0 60px rgba(59, 130, 246, 0.08),
+            0 4px 32px rgba(0,0,0,0.5);
     }
 
     .site-header-inner {
@@ -2771,7 +2760,7 @@ aside input[type="range"],
         min-height: 120px !important;
         flex: 1;
         display: flex !important;
-        padding: 1.5rem clamp(1rem, 3vw, 2.5rem) !important;
+        padding: 1.5rem clamp(1.5rem, 3vw, 3rem) !important;
         align-items: center;
     }
 
@@ -2779,7 +2768,8 @@ aside input[type="range"],
         display: grid !important;
         grid-template-columns: auto minmax(0, 1fr) auto;
         align-items: center;
-        gap: 40px;
+        justify-content: space-between;
+        gap: 0 24px;
         width: 100%;
         height: 100%;
     }
@@ -2839,11 +2829,13 @@ aside input[type="range"],
 
     /* Actions: right-aligned, hide old duplicate right-side nav */
     .header-right { 
-        justify-self: end; 
-        gap: 24px;
+        justify-self: end;
+        margin-left: auto;
+        gap: 10px;
         display: flex;
         align-items: center;
-        padding-right: 8px;
+        padding-right: 0;
+        grid-column: 3;
     }
 
     .header-right > .nav-links { display: none !important; }
@@ -2958,60 +2950,45 @@ aside input[type="range"],
         width: clamp(220px, 26vw, 380px);
     }
 
-    .dtb-desktop-search-input {
-        width: 100%;
-        padding: 0 44px 0 18px;
-        height: 38px;
-        border-radius: 9999px;
-        border: 1px solid rgba(255,255,255,0.22);
-        background: rgba(255,255,255,0.10);
-        color: #ffffff;
-        font-size: 0.82rem;
-        outline: none;
-        transition: border-color 150ms ease, box-shadow 150ms ease, background 150ms ease;
-    }
-
-    .dtb-desktop-search-input::placeholder {
-        color: rgba(255,255,255,0.55);
-    }
-
-    .dtb-desktop-search-input:focus {
-        border-color: rgba(255,255,255,0.40);
-        background: rgba(255,255,255,0.14);
-        box-shadow: 0 0 0 3px rgba(99,102,241,0.30);
-    }
-
-    /* ── Blue circle submit button ── */
-    .dtb-desktop-search-submit {
+    /* Leading icon container */
+    .dtb-desktop-search-icon-wrap {
         position: absolute;
-        right: 5px;
+        left: 13px;
         top: 50%;
         transform: translateY(-50%);
         display: flex;
         align-items: center;
-        justify-content: center;
-        width: 28px;
-        height: 28px;
-        border-radius: 50%;
-        background: #4f46e5;
-        border: none;
-        cursor: pointer;
-        color: #ffffff;
-        flex-shrink: 0;
-        transition: background 150ms ease, transform 150ms ease;
-        padding: 0;
-        min-width: unset;
-        min-height: unset;
-    }
-
-    .dtb-desktop-search-submit:hover {
-        background: #4338ca;
-        transform: translateY(-50%) scale(1.06);
+        pointer-events: none;
+        color: rgba(255,255,255,0.55);
     }
 
     .dtb-desktop-search-icon {
-        width: 14px;
-        height: 14px;
+        width: 16px;
+        height: 16px;
+    }
+
+    .dtb-desktop-search-input {
+        width: 100%;
+        padding: 0 14px;
+        height: 38px;
+        border-radius: 16px;
+        border: 1px solid rgba(255,255,255,0.20);
+        background: rgba(255,255,255,0.10);
+        color: #ffffff;
+        font-size: 0.82rem;
+        outline: none;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+        transition: border-color 150ms ease, box-shadow 150ms ease, background 150ms ease;
+    }
+
+    .dtb-desktop-search-input::placeholder {
+        color: rgba(255,255,255,0.50);
+    }
+
+    .dtb-desktop-search-input:focus {
+        border-color: rgba(255,255,255,0.38);
+        background: rgba(255,255,255,0.15);
+        box-shadow: 0 0 0 3px rgba(255,255,255,0.08), 0 1px 3px rgba(0,0,0,0.08);
     }
 
     .dtb-desktop-search-dropdown {
@@ -3121,321 +3098,49 @@ aside input[type="range"],
    The mobile centered-text hero is hidden at ≥ 1025px and
    replaced by a full-width dark split-layout hero.
    ─────────────────────────────────────────────────────── */
-.dtb-hero-mobile-wrapper { display: block; }
 
-@media (min-width: 1025px) {
-    .dtb-hero-mobile-wrapper { display: none !important; }
+/* Mobile home page — soft white/silver gradient background */
+.dtb-home-page {
+    position: relative;
+    /* Gradient paints on the element itself so it scrolls with content */
+    background:
+        radial-gradient(ellipse 140% 55% at 50% 0%, rgba(186,200,220,0.55) 0%, transparent 60%),
+        radial-gradient(ellipse 90% 45% at 95% 25%, rgba(210,220,235,0.40) 0%, transparent 55%),
+        radial-gradient(ellipse 80% 40% at 5% 65%, rgba(200,212,230,0.35) 0%, transparent 55%),
+        linear-gradient(170deg, #eef1f6 0%, #e8ecf3 30%, #e4e9f0 60%, #eaecf2 100%);
+    background-attachment: scroll;
 }
 
-.dtb-desktop-hero { display: none; }
-
-@media (min-width: 1025px) {
-    .dtb-desktop-hero {
-        display: block;
-        min-height: 0;
-        background: transparent;
-        position: relative;
-        overflow: hidden;
-        padding: 0;
-        border-bottom: none;
+/* On mobile: strip the opaque backgrounds off sections so the page gradient shows through */
+@media (max-width: 1024px) {
+    .dtb-home-page .trending-products-section,
+    .dtb-home-page .home-trust-section,
+    .dtb-home-page .dtb-trending-section {
+        background: transparent !important;
+        border-color: rgba(37, 99, 235, 0.12) !important;
     }
-
-    /* Subtle dot-grid texture */
-    .dtb-desktop-hero::before {
-        display: none;
+    .dtb-home-page .dtb-ui-trusted-brands {
+        background: transparent !important;
+        border-top-color: rgba(15, 23, 42, 0.08) !important;
+        border-bottom-color: rgba(15, 23, 42, 0.08) !important;
     }
-
-    /* Right-side radial blue glow */
-    .dtb-desktop-hero::after {
-        display: none;
+    /* Re-key the marquee fade edges to match the page gradient colour */
+    .dtb-home-page .dtb-ui-trusted-brands [style*="linear-gradient(to right"] {
+        background: linear-gradient(to right, #e8ecf3 0%, transparent 100%) !important;
     }
-
-    .dtb-home-desktop-hero {
-        border-bottom: 1px solid var(--machined-border);
-    }
-
-    .dtb-desktop-hero-inner {
-        max-width: 1400px;
-        margin: 0 auto;
-        width: 100%;
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 48px;
-        align-items: center;
-        position: relative;
-        z-index: 1;
-        padding: 24px 0;
-    }
-
-    /* ── Left: headline + CTAs + stats ── */
-    .dtb-hero-content {
-        display: flex;
-        flex-direction: column;
-        gap: 12px;
-    }
-
-    .dtb-hero-eyebrow {
-        display: inline-flex;
-        align-items: center;
-        gap: 7px;
-        background: rgba(37,99,235,0.10);
-        border: 1px solid rgba(37,99,235,0.32);
-        border-radius: 999px;
-        padding: 5px 14px;
-        font-size: 0.68rem;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 0.1em;
-        color: var(--primary-700, #1d4ed8);
-        width: fit-content;
-    }
-
-    .dtb-hero-title {
-        font-size: clamp(1.9rem, 3vw, 2.8rem);
-        font-weight: 900;
-        line-height: 1.05;
-        letter-spacing: -0.03em;
-        color: #0f172a;
-        margin: 0;
-          transform: translate3d(0, 0, 0);
-          -webkit-transform: translate3d(0, 0, 0);
-          backface-visibility: hidden;
-          transform-origin: 0 0;
-    }
-
-    .dtb-hero-title span { color: var(--primary-600, #2563eb); }
-
-    .dtb-hero-subtitle {
-        font-size: 0.88rem;
-        color: rgba(15,23,42,0.72);
-        line-height: 1.6;
-        max-width: 420px;
-        margin: 0;
-    }
-
-    .dtb-hero-actions {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        flex-wrap: wrap;
-    }
-
-    .dtb-hero-cta-primary {
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        padding: 13px 28px;
-        background: var(--primary-600, #2563eb);
-        color: white;
-        font-weight: 700;
-        font-size: 0.83rem;
-        text-transform: uppercase;
-        letter-spacing: 0.07em;
-        border-radius: 6px;
-        text-decoration: none;
-        transition: background 180ms, transform 180ms, box-shadow 180ms;
-        box-shadow: 0 8px 24px rgba(37,99,235,0.38);
-        border: none;
-        cursor: pointer;
-    }
-
-    .dtb-hero-cta-primary:hover {
-        background: var(--primary-700, #1d4ed8);
-        transform: translateY(-2px);
-        box-shadow: 0 14px 36px rgba(37,99,235,0.48);
-    }
-
-    .dtb-hero-cta-secondary {
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        padding: 12px 22px;
-        background: transparent;
-        color: rgba(255,255,255,0.8);
-        font-weight: 600;
-        font-size: 0.83rem;
-        text-transform: uppercase;
-        letter-spacing: 0.07em;
-        border-radius: 6px;
-        text-decoration: none;
-        border: 1.5px solid rgba(255,255,255,0.22);
-        transition: border-color 180ms, color 180ms, background 180ms;
-    }
-
-    .dtb-hero-cta-secondary:hover {
-        border-color: rgba(255,255,255,0.45);
-        color: white;
-        background: rgba(255,255,255,0.06);
-    }
-
-    .dtb-hero-stats {
-        display: flex;
-        align-items: center;
-        gap: 18px;
-        padding-top: 3px;
-        border-top: 1px solid rgba(255,255,255,0.09);
-    }
-
-    .dtb-hero-stat {
-        display: flex;
-        flex-direction: column;
-        gap: 2px;
-    }
-
-    .dtb-hero-stat-num {
-        font-size: 1.35rem;
-        font-weight: 900;
-        color: white;
-        line-height: 1;
-        font-family: var(--font-mono, monospace);
-        letter-spacing: -0.02em;
-    }
-
-    .dtb-hero-stat-label {
-        font-size: 0.62rem;
-        text-transform: uppercase;
-        letter-spacing: 0.08em;
-        color: rgba(255,255,255,0.38);
-        font-weight: 600;
-    }
-
-    .dtb-hero-stat-divider {
-        width: 1px;
-        height: 34px;
-        background: rgba(255,255,255,0.1);
-        flex-shrink: 0;
-    }
-
-    /* ── Right: category quick-link cards ── */
-    .dtb-hero-visual {
-        display: flex;
-        flex-direction: column;
-        gap: 4px;
-    }
-
-    .dtb-hero-visual-label {
-        font-size: 0.63rem;
-        text-transform: uppercase;
-        letter-spacing: 0.12em;
-        font-weight: 700;
-        color: rgba(255,255,255,0.3);
-        margin-bottom: 3px;
-    }
-
-    .dtb-hero-categories {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 6px;
-    }
-
-    .dtb-hero-cat-card {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        padding: 11px 13px;
-        background: rgba(255,255,255,0.055);
-        border: 1px solid rgba(255,255,255,0.09);
-        border-radius: 8px;
-        text-decoration: none;
-        transition: background 200ms, border-color 200ms, transform 200ms;
-    }
-
-    .dtb-hero-cat-card:hover {
-        background: rgba(37,99,235,0.16);
-        border-color: rgba(37,99,235,0.38);
-        transform: translateY(-2px);
-    }
-
-    .dtb-hero-cat-icon {
-        width: 32px;
-        height: 32px;
-        border-radius: 6px;
-        background: rgba(37,99,235,0.22);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        flex-shrink: 0;
-        color: var(--primary-300, #93c5fd);
-    }
-
-    .dtb-hero-cat-name {
-        font-size: 0.75rem;
-        font-weight: 700;
-        color: rgba(255,255,255,0.88);
-        line-height: 1.2;
-        display: block;
-    }
-
-    .dtb-hero-cat-sub {
-        font-size: 0.6rem;
-        color: rgba(255,255,255,0.38);
-        font-weight: 500;
-        display: block;
-        margin-top: 0px;
-    }
-
-    /* ── Desktop hero: Brand logos grid ── */
-    .dtb-hero-brands {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 14px;
-        align-items: center;
-        justify-items: center;
-    }
-
-    .dtb-hero-brand-link {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        text-decoration: none;
-        opacity: 1;
-        transition: opacity 200ms, transform 200ms;
-        padding: 6px;
-    }
-
-    .dtb-hero-brand-link:hover {
-        opacity: 0.75;
-        transform: scale(1.05);
-    }
-
-    .dtb-hero-brand-logo {
-        height: clamp(34px, 5vw, 50px);
-        width: auto;
-        max-width: 150px;
-        object-fit: contain;
-        object-position: center;
-    }
-
-    .dtb-hero-brand-link:has(img[alt="TapeTech"]) .dtb-hero-brand-logo {
-        height: clamp(42px, 5.5vw, 58px);
-        max-width: 180px;
-    }
-
-    .dtb-hero-brand-link:has(img[alt="Columbia"]) .dtb-hero-brand-logo {
-        height: clamp(66px, 8vw, 92px);
-        max-width: 240px;
-    }
-
-    .dtb-hero-brand-link:has(img[alt="Level5"]) .dtb-hero-brand-logo {
-        height: clamp(26px, 3.2vw, 34px);
-        max-width: 132px;
-    }
-
-    .dtb-hero-brand-link:has(img[alt="Platinum Drywall Tools"]) .dtb-hero-brand-logo {
-        height: clamp(38px, 4.5vw, 52px);
-        max-width: 180px;
-    }
-
-    .dtb-hero-brand-link:has(img[alt="Asgard"]) .dtb-hero-brand-logo {
-        height: clamp(42px, 5vw, 58px);
-        max-width: 170px;
-    }
-
-    .dtb-hero-brand-link:has(img[alt="SurPro"]) .dtb-hero-brand-logo {
-        height: clamp(40px, 5vw, 56px);
-        max-width: 180px;
+    .dtb-home-page .dtb-ui-trusted-brands [style*="linear-gradient(to left"] {
+        background: linear-gradient(to left, #e8ecf3 0%, transparent 100%) !important;
     }
 }
+
+@media (min-width: 1025px) {
+    /* Desktop hero has its own dark background — keep the page clean below it */
+    .dtb-home-page {
+        background: #ffffff;
+    }
+}
+
+/* Hero split wrappers removed — HeroSection handles all breakpoints */
 
 /* ── FEATURE STRIP ──────────────────────────────────────
    Four feature-benefit pillars displayed below the hero
@@ -3906,7 +3611,7 @@ aside input[type="range"],
 }
 
 .dtb-trending-card-wrap > .dtb-plp-card .dtb-plp-card__img-wrap {
-    aspect-ratio: 1;
+    height: 170px;
 }
 
 .dtb-trending-card {
@@ -3932,7 +3637,7 @@ aside input[type="range"],
 .dtb-trending-card-img {
     width: 100%;
     aspect-ratio: 1;
-    background: #f8fafc;
+    background: #ffffff;
     overflow: hidden;
     position: relative;
     flex-shrink: 0;
@@ -4160,10 +3865,20 @@ aside input[type="range"],
 .dtb-plp-card__img-wrap {
     position: relative;
     width: 100%;
-    aspect-ratio: 1;
-    background: #f8fafc;
+    height: 190px;
+    background: #ffffff;
     overflow: hidden;
     flex-shrink: 0;
+}
+
+/* Scale image on card hover */
+.dtb-plp-card:hover .dtb-plp-card__img-btn img,
+.dtb-plp-card:hover .dtb-plp-card__img-btn > div > img {
+    transform: scale(1.06);
+}
+.dtb-plp-card__img-btn img,
+.dtb-plp-card__img-btn > div > img {
+    transition: transform 350ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 /* Full-area image button — no visible focus ring on click, only on keyboard nav */
@@ -4426,20 +4141,35 @@ aside input[type="range"],
 }
 
 /* =============================================================================
-   MOBILE OVERRIDES for dtb-plp-card (≤ 479px)
+   MOBILE OVERRIDES for dtb-plp-card (≤ 767px)
    ============================================================================= */
+@media (max-width: 767px) {
+    /* Trending context: shorter image on mobile */
+    .dtb-trending-card-wrap > .dtb-plp-card .dtb-plp-card__img-wrap {
+        height: 148px;
+    }
+
+    /* Catalog grid cards: slightly shorter image too */
+    .dtb-plp-card:not(.dtb-trending-card-wrap > .dtb-plp-card) .dtb-plp-card__img-wrap {
+        height: 160px;
+    }
+}
+
 @media (max-width: 479px) {
     .dtb-plp-card {
         border-radius: 10px;
     }
 
-    .dtb-plp-card__body {
-        padding: 8px 9px 10px;
+    .dtb-plp-card__img-wrap {
+        height: 140px;
     }
 
-    /* Hide SKU on xs phones — saves precious vertical space */
-    .dtb-plp-card__sku {
-        display: none;
+    .dtb-trending-card-wrap > .dtb-plp-card .dtb-plp-card__img-wrap {
+        height: 130px;
+    }
+
+    .dtb-plp-card__body {
+        padding: 8px 9px 10px;
     }
 
     .dtb-plp-card__name {

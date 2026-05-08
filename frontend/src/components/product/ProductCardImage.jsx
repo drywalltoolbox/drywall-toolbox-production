@@ -40,14 +40,14 @@ export default function ProductCardImage({
   const [loaded, setLoaded] = useState(false);
 
   return (
-    <div style={{ position: 'relative', width: '100%', height: '100%' }}>
+    <div style={{ position: 'absolute', inset: padding }}>
 
       <div
         aria-hidden="true"
         style={{
           position: 'absolute',
           inset: 0,
-          background: 'linear-gradient(90deg, #f1f5f9 25%, #e8eef5 50%, #f1f5f9 75%)',
+          background: 'linear-gradient(90deg, #f5f5f5 25%, #ebebeb 50%, #f5f5f5 75%)',
           backgroundSize: '200% 100%',
           animation: loaded ? 'none' : 'dtb-shimmer 1.4s ease-in-out infinite',
           opacity: loaded ? 0 : 1,
@@ -73,7 +73,6 @@ export default function ProductCardImage({
           height: '100%',
           objectFit: 'contain',
           objectPosition: 'center',
-          padding,
           opacity: loaded ? 1 : 0,
           transform: loaded ? 'translateY(0)' : 'translateY(6px)',
           transition: loaded

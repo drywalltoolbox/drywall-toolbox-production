@@ -83,16 +83,6 @@ export default function MobileSearch({ onClose = () => {} }) {
               <X size={15} />
             </button>
           )}
-          <button
-            type="button"
-            onClick={() => { if (searchQuery.trim()) handleViewAllResults(); }}
-            className="mobile-search-submit"
-            aria-label="Submit search"
-          >
-            <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg>
-          </button>
         </div>
 
         {isOpen && (
@@ -157,37 +147,49 @@ export default function MobileSearch({ onClose = () => {} }) {
           width: 100%;
         }
 
+        /* Leading icon */
+        .mobile-search-icon-wrap {
+          position: absolute;
+          left: 14px;
+          top: 50%;
+          transform: translateY(-50%);
+          display: flex;
+          align-items: center;
+          pointer-events: none;
+          color: #9ca3af;
+        }
+
         .mobile-search-input {
           flex: 1;
           width: 100%;
-          padding: 0 88px 0 18px; /* right room for clear + submit */
-          height: 42px;
-          border-radius: 9999px;
-          border: 1.5px solid #e5e7eb;
-          background: #f9fafb;
+          padding: 0 44px 0 16px; /* right room for clear button */
+          height: 44px;
+          border-radius: 16px;
+          border: 1.5px solid #e4e7eb;
+          background: #ffffff;
           font-size: 16px !important; /* prevent iOS zoom */
           font-family: inherit;
           color: #1f2937;
           outline: none;
           -webkit-appearance: none;
           appearance: none;
-          transition: border-color 150ms ease, box-shadow 150ms ease, background 150ms ease;
+          box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+          transition: border-color 150ms ease, box-shadow 150ms ease;
         }
 
         .mobile-search-input::placeholder {
-          color: #9ca3af;
+          color: #a1a9b4;
         }
 
         .mobile-search-input:focus {
-          background: #ffffff;
-          border-color: #4f46e5;
-          box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+          border-color: #71717a;
+          box-shadow: 0 0 0 3px rgba(113,113,122,0.10), 0 1px 3px rgba(0,0,0,0.06);
         }
 
-        /* Clear X button — sits inside the pill, right of text */
+        /* Clear X button */
         .mobile-search-clear {
           position: absolute;
-          right: 44px;
+          right: 10px;
           top: 50%;
           transform: translateY(-50%);
           display: flex;
@@ -209,33 +211,6 @@ export default function MobileSearch({ onClose = () => {} }) {
         .mobile-search-clear:active {
           background: #d1d5db;
           color: #1f2937;
-        }
-
-        /* Blue circle submit button */
-        .mobile-search-submit {
-          position: absolute;
-          right: 6px;
-          top: 50%;
-          transform: translateY(-50%);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          width: 30px;
-          height: 30px;
-          border-radius: 50%;
-          background: #4f46e5;
-          border: none;
-          cursor: pointer;
-          color: #ffffff;
-          padding: 0;
-          min-width: unset;
-          min-height: unset;
-          flex-shrink: 0;
-          transition: background 150ms ease;
-        }
-
-        .mobile-search-submit:active {
-          background: #4338ca;
         }
 
         /* Dropdown */

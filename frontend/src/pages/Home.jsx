@@ -1,12 +1,11 @@
 import TrendingProducts from '../components/catalog/TrendingProducts';
 import FeatureSection from '../components/ui/FeatureSection';
 import HeroSection from '../components/ui/HeroSection';
-import TrustedBrands from '../components/ui/TrustedBrands';
 import tapeTechLogo from '/brands/TapeTech/tapetech_logo.svg';
-import columbiaLogo from '/brands/Columbia/columbia_taping_tools_logo.svg';
+import columbiaLogo from '/brands/Columbia/columbia_logo_white.svg';
 import surproLogo from '/brands/SurPro/surpro_logo.svg';
 import asgardLogo from '/brands/Asgard/asgard_logo.svg';
-import platinumLogo from '/brands/Platinum/platinum_logo.svg';
+import platinumLogo from '/brands/Platinum/platinum_logo_white.svg';
 import level5Logo from '/brands/Level5/Level5.svg';
 import SEOHead from '../components/shared/SEOHead';
 import { buildOrganizationSchema, buildSiteLinksSearchBoxSchema } from '../utils/schema';
@@ -67,54 +66,18 @@ export default function Home() {
         canonical="https://drywalltoolbox.com/"
         schema={[buildOrganizationSchema(), buildSiteLinksSearchBoxSchema()]}
       />
-      <div style={{ background: 'white' }} className="page-wrapper">
+      <div className="page-wrapper dtb-home-page">
 
-      {/* --- MOBILE/TABLET HERO (hidden on desktop = 1025px) --- */}
-      <div className="dtb-hero-mobile-wrapper">
-      <section
-        className="section-enter home-hero-section"
-      >
-        <div
-          className="home-hero-grid"
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'center',
-            alignItems: 'center',
-            gap: 'clamp(1.25rem, 4vw, 2rem)',
-            maxWidth: '1400px',
-            margin: '0 auto',
-          }}
-        >
-          <div style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 'clamp(1.25rem, 4vw, 2rem)' }}>
-            <h1 className="machined-title" style={{ marginBottom: 0, color: 'var(--primary-600)', lineHeight: 1.1 }}>
-              TOP TRUSTED<br />ONE-STOP SHOP.
-            </h1>
-            <p style={{
-              maxWidth: '700px',
-              marginBottom: 0,
-              fontSize: 'clamp(0.95rem, 2.5vw, 1.1rem)',
-              opacity: 0.7,
-              color: 'black',
-              lineHeight: 1.6
-            }}>
-              Everything you need to ensure a flawless finish every time. Get production-grade tools and parts at unbeatable prices with lightning-fast shipping.
-            </p>
-          </div>
-        </div>
-      </section>
-      </div>
-
-      {/* --- DESKTOP HERO (hidden on mobile/tablet = 1024px) --- */}
-      <div className="dtb-desktop-hero section-enter" aria-label="Hero">
-        <HeroSection
-          className="dtb-home-desktop-hero"
-          title={<>The Pros&apos; One-Stop Shop for Drywall Tools.</>}
-          subtitle="Production-grade taping, finishing, and sanding equipment from the industry's most trusted brands at unbeatable prices with lightning-fast shipping."
-        />
-      </div>
-
-      <TrustedBrands brands={brandLogos} title="Trusted Brands" speed={32} />
+      {/* --- HERO (all breakpoints) --- */}
+      <HeroSection
+        title={<>The Pros&apos; One-Stop Shop<br />for Drywall Tools.</>}
+        subtitle="Production-grade taping, finishing, and sanding equipment from the industry's most trusted brands at unbeatable prices with lightning-fast shipping."
+        ctaLinks={[
+          { to: '/all-products', label: 'Shop All Products' },
+          { to: '/schematics',   label: 'View Schematics'  },
+        ]}
+        brands={brandLogos}
+      />
 
       {/* --- DESKTOP FEATURE SECTION (hidden on mobile/tablet) --- */}
       <div className="dtb-feature-strip" aria-label="Key features">

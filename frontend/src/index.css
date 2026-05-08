@@ -382,6 +382,15 @@ html {
     max-width: 72vw;
   }
 
+  /* Tighter info padding */
+  .trending-card-info {
+    padding: 9px 12px;
+  }
+
+  .trending-card-price-row {
+    padding-top: 6px;
+  }
+
   /* Hide desktop scroll arrows on mobile — swipe is the UX */
   .scroll-button-left,
   .scroll-button-right {

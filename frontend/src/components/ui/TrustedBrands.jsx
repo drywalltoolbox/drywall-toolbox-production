@@ -22,7 +22,7 @@ const BRAND_SIZE_MAP = {
   SurPro: { height: 'clamp(28px, 5vw, 44px)', maxWidth: '150px' },
 };
 
-function BrandLogo({ brand }) {
+function BrandLogo({ brand, dark = false }) {
   const sizeStyle = BRAND_SIZE_MAP[brand.name] || { height: 'clamp(24px, 4vw, 38px)', maxWidth: '140px' };
   return (
     <Link
@@ -36,11 +36,11 @@ function BrandLogo({ brand }) {
         justifyContent: 'center',
         padding: '0 clamp(16px, 3vw, 28px)',
         flexShrink: 0,
-        opacity: 0.65,
+        opacity: dark ? 0.45 : 0.65,
         transition: 'opacity 0.22s',
       }}
-      onMouseEnter={(e) => { e.currentTarget.style.opacity = '1'; }}
-      onMouseLeave={(e) => { e.currentTarget.style.opacity = '0.65'; }}
+      onMouseEnter={(e) => { e.currentTarget.style.opacity = dark ? '0.85' : '1'; }}
+      onMouseLeave={(e) => { e.currentTarget.style.opacity = dark ? '0.45' : '0.65'; }}
     >
       <img
         src={brand.src}
@@ -57,17 +57,28 @@ function BrandLogo({ brand }) {
   );
 }
 
-export default function TrustedBrands({ brands = [], title = 'Trusted Brands', speed = 30 }) {
+export default function TrustedBrands({ brands = [], title = 'Trusted Brands', speed = 30, dark = false, transparent = false }) {
   if (!brands.length) return null;
+
+  const bg = transparent
+    ? 'transparent'
+    : dark
+      ? 'radial-gradient(circle at 50% 0%, rgba(29,78,216,0.32) 0%, transparent 55%), radial-gradient(circle at 50% 110%, rgba(56,189,248,0.13) 0%, transparent 55%), #070d1c'
+      : '#f8fafc';
+  const fadeColor = dark || transparent ? '#070d1c' : '#f8fafc';
+  const titleColor = dark || transparent ? 'rgba(148,163,184,0.40)' : 'rgba(15,23,42,0.35)';
+  const isLight = !dark && !transparent;
 
   return (
     <section
       className="dtb-ui-trusted-brands"
       style={{
-        background: '#f8fafc',
-        borderTop: '1px solid var(--machined-border)',
-        borderBottom: '1px solid var(--machined-border)',
-        padding: 'clamp(1.5rem, 3vw, 2.5rem) 0',
+        background: bg,
+        borderTop:    isLight ? '1px solid var(--machined-border)' : 'none',
+        borderBottom: isLight ? '1px solid var(--machined-border)' : 'none',
+        padding: isLight
+          ? 'clamp(1.5rem, 3vw, 2.5rem) 0'
+          : 'clamp(1rem, 2vw, 1.75rem) 0 clamp(2rem, 4vw, 3rem)',
         overflow: 'hidden',
       }}
     >
@@ -83,7 +94,8 @@ export default function TrustedBrands({ brands = [], title = 'Trusted Brands', s
             fontWeight: 800,
             letterSpacing: '0.14em',
             textTransform: 'uppercase',
-            color: 'rgba(15,23,42,0.35)',
+            color: titleColor,
+            fontFamily: !isLight ? 'var(--font-mono, monospace)' : undefined,
             margin: '0 0 clamp(1rem, 2vw, 1.5rem)',
           }}
         >
@@ -96,13 +108,13 @@ export default function TrustedBrands({ brands = [], title = 'Trusted Brands', s
         {/* Left fade */}
         <div style={{
           position: 'absolute', left: 0, top: 0, bottom: 0, width: '80px', zIndex: 2,
-          background: 'linear-gradient(to right, #f8fafc 0%, transparent 100%)',
+          background: `linear-gradient(to right, ${fadeColor} 0%, transparent 100%)`,
           pointerEvents: 'none',
         }} />
         {/* Right fade */}
         <div style={{
           position: 'absolute', right: 0, top: 0, bottom: 0, width: '80px', zIndex: 2,
-          background: 'linear-gradient(to left, #f8fafc 0%, transparent 100%)',
+          background: `linear-gradient(to left, ${fadeColor} 0%, transparent 100%)`,
           pointerEvents: 'none',
         }} />
 
@@ -117,7 +129,7 @@ export default function TrustedBrands({ brands = [], title = 'Trusted Brands', s
         >
           {/* Duplicate twice for seamless loop */}
           {[...brands, ...brands].map((brand, i) => (
-            <BrandLogo key={`${brand.name}-${i}`} brand={brand} />
+            <BrandLogo key={`${brand.name}-${i}`} brand={brand} dark={dark} />
           ))}
         </div>
       </div>

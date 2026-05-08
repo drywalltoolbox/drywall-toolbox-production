@@ -69,7 +69,6 @@ export default function ProductShoppingCard({
           position: 'relative',
           borderRadius: '12px 12px 0 0',
           overflow: 'hidden',
-          background: '#f8fafc',
         }}
       >
         {/* Clickable overlay — opens modal */}
@@ -82,7 +81,7 @@ export default function ProductShoppingCard({
           <ProductCardImage
             src={effectiveProduct.image || product.image}
             alt={effectiveProduct.name || product.name}
-            padding="12px"
+            padding="0"
           />
         </button>
 
