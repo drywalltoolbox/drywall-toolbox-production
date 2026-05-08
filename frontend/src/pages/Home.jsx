@@ -70,12 +70,8 @@ export default function Home() {
 
       {/* --- HERO (all breakpoints) --- */}
       <HeroSection
-        titleLines={["The Pros\u2019 One-Stop Shop", "for Drywall Tools."]}
-        subtitle="Production-grade taping, finishing, and sanding equipment from the industry's most trusted brands at unbeatable prices with lightning-fast shipping."
-        ctaLinks={[
-          { to: '/all-products', label: 'Shop All Products' },
-          { to: '/schematics',   label: 'View Schematics'  },
-        ]}
+        titleLines={["Pro-Grade Drywall Tools", "Built for Faster Finishes."]}
+        subtitle="Shop trusted taping, finishing, and sanding tools from top brands—with competitive pricing and fast shipping."
         brands={brandLogos}
       />
 

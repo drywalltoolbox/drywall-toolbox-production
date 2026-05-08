@@ -81,6 +81,15 @@ const TABLET_BREAKPOINT = 460;
 const DESKTOP_VISIBLE_CARDS = 3;
 const TABLET_VISIBLE_CARDS = 2.2;
 const MOBILE_VISIBLE_CARDS = 1.6;
+const AUTO_SLIDE_INTERVAL_MILLISECONDS = 4600;
+
+const CARD_3D_ROTATION_FACTOR = -12;
+const CARD_3D_BASE_TRANSLATE_Z = 22;
+const CARD_3D_TRANSLATE_Z_STEP = 10;
+const CARD_3D_MIN_SCALE = 0.84;
+const CARD_3D_SCALE_STEP = 0.08;
+const CARD_3D_MIN_OPACITY = 0.58;
+const CARD_3D_OPACITY_STEP = 0.16;
 
 /* Arrow button horizontal clearance */
 const DESKTOP_SIDE_PADDING = 52;
@@ -153,6 +162,13 @@ function NavCard({ card, width }) {
     }
   };
 
+  const depth = card.depth ?? 0;
+  const absDepth = Math.abs(depth);
+  const rotateY = depth * CARD_3D_ROTATION_FACTOR;
+  const translateZ = Math.max(0, CARD_3D_BASE_TRANSLATE_Z - absDepth * CARD_3D_TRANSLATE_Z_STEP);
+  const scale = Math.max(CARD_3D_MIN_SCALE, 1 - absDepth * CARD_3D_SCALE_STEP);
+  const depthOpacity = Math.max(CARD_3D_MIN_OPACITY, 1 - absDepth * CARD_3D_OPACITY_STEP);
+
   return (
     <div
       role="button"
@@ -171,8 +187,8 @@ function NavCard({ card, width }) {
         border: `1px solid ${hov ? 'rgba(99,149,255,0.35)' : 'rgba(99,149,255,0.13)'}`,
         background: hov ? 'rgba(255,255,255,0.09)' : 'rgba(255,255,255,0.04)',
         cursor: 'pointer',
-        transition: 'background 0.18s, border-color 0.18s, transform 0.2s, box-shadow 0.2s',
-        transform: hov ? 'translateY(-3px)' : 'translateY(0)',
+        transition: 'background 0.22s, border-color 0.22s, transform 0.32s ease, box-shadow 0.22s, opacity 0.26s',
+        transform: `${hov ? 'translateY(-3px)' : 'translateY(0)'} rotateY(${rotateY}deg) translateZ(${translateZ}px) scale(${scale})`,
         boxShadow: hov ? '0 8px 24px rgba(37,99,235,0.20)' : 'none',
         backdropFilter: 'blur(12px)',
         WebkitBackdropFilter: 'blur(12px)',
@@ -183,6 +199,7 @@ function NavCard({ card, width }) {
         gap: '10px',
         minHeight: '108px',
         outline: 'none',
+        opacity: depthOpacity,
       }}
     >
       {/* Icon container */}
@@ -228,6 +245,7 @@ function NavCard({ card, width }) {
 export default function NavigationCarousel() {
   const [active, setActive] = useState(0);
   const [containerW, setContainerW] = useState(0);
+  const [paused, setPaused] = useState(false);
   const clipRef = useRef(null);
   const dragOffsetRef = useRef(0);
 
@@ -254,18 +272,19 @@ export default function NavigationCarousel() {
   const totalCards = NAV_CARDS.length;
   const maxActive = Math.max(0, totalCards - Math.floor(visible));
   const isMobile = containerW > 0 && containerW <= DESKTOP_BREAKPOINT;
+  const focalIndex = active + Math.floor(visible / 2);
 
   const prev = useCallback(
-    () => setActive((a) => Math.max(0, a - 1)),
-    [],
+    () => setActive((a) => (a <= 0 ? maxActive : a - 1)),
+    [maxActive],
   );
   const next = useCallback(
-    () => setActive((a) => Math.min(maxActive, a + 1)),
+    () => setActive((a) => (a >= maxActive ? 0 : a + 1)),
     [maxActive],
   );
 
-  const canPrev = active > 0;
-  const canNext = active < maxActive;
+  const canPrev = maxActive > 0;
+  const canNext = maxActive > 0;
 
   /* Translate the track based on active index */
   const trackX = -(active * (cardW + CARD_GAP));
@@ -288,6 +307,14 @@ export default function NavigationCarousel() {
     }
     dragOffsetRef.current = 0;
   };
+
+  useEffect(() => {
+    if (paused || maxActive <= 0) return;
+    const id = setInterval(() => {
+      next();
+    }, AUTO_SLIDE_INTERVAL_MILLISECONDS);
+    return () => clearInterval(id);
+  }, [paused, maxActive, next]);
 
   /* Horizontal padding for arrow clearance */
   const sidePad = isMobile ? MOBILE_SIDE_PADDING : DESKTOP_SIDE_PADDING;
@@ -315,12 +342,19 @@ export default function NavigationCarousel() {
         margin: '0 auto',
         padding: `0 ${sidePad}px`,
         position: 'relative',
+        perspective: '1200px',
       }}>
 
         <ArrowBtn direction="left" onClick={prev} disabled={!canPrev} isMobile={isMobile} />
 
         {/* Clip + track */}
-        <div ref={clipRef} style={{ overflow: 'hidden' }}>
+        <div
+          ref={clipRef}
+          style={{ overflow: 'hidden' }}
+          onMouseEnter={() => setPaused(true)}
+          onMouseLeave={() => setPaused(false)}
+          onPointerDown={() => setPaused(true)}
+        >
           <Motion.div
             drag="x"
             dragConstraints={{ left: 0, right: 0 }}
@@ -338,13 +372,16 @@ export default function NavigationCarousel() {
             }}
             whileDrag={{ cursor: 'grabbing' }}
           >
-            {NAV_CARDS.map((card) => (
-              <NavCard
-                key={card.id}
-                card={card}
-                width={cardW}
-              />
-            ))}
+            {NAV_CARDS.map((card, index) => {
+              const depth = cardW > 0 ? index - focalIndex : 0;
+              return (
+                <NavCard
+                  key={card.id}
+                  card={{ ...card, depth }}
+                  width={cardW}
+                />
+              );
+            })}
           </Motion.div>
         </div>
 
