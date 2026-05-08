@@ -4,7 +4,7 @@
  * Description: Registers pre-placed product images into the WordPress Media
  *              Library and links them to WooCommerce products by SKU.
  *              Uses only public WP/WC APIs. Safe for HostGator shared hosting.
- * Version: 2.0.0
+ * Version: 2.1.3
  * Author: Drywall Toolbox
  *
  * Must-use plugin: wp/wp-content/mu-plugins/dtb-image-sync.php
@@ -74,6 +74,76 @@ define( 'DTB_SYNC_LOCK_TTL', 600 );
  */
 define( 'DTB_IMAGE_SYNC_DISABLE_RENAME', true );
 
+/**
+ * Relative uploads path to scan by default.
+ *
+ * This should be a path relative to wp-content/uploads/, for example
+ * "2026/media".
+ */
+if ( ! defined( 'DTB_IMAGE_SYNC_DEFAULT_UPLOAD_RELATIVE_PATH' ) ) {
+	define( 'DTB_IMAGE_SYNC_DEFAULT_UPLOAD_RELATIVE_PATH', '2026/media' );
+}
+
+/**
+ * Sanitize and validate a relative upload path.
+ */
+function dtb_image_sync_validate_upload_path( string $value ): bool {
+	$value = trim( (string) $value, " \t\n\r\0\x0B/" );
+	if ( '' === $value ) {
+		return true;
+	}
+	if ( preg_match( '#(^|/)\.{1,2}(/|$)#', $value ) ) {
+		return false;
+	}
+	return 1 === preg_match( '/^[a-z0-9-]+(?:\/[a-z0-9-]+)*$/', $value );
+}
+
+/**
+ * Resolve the relative uploads path to scan for this request.
+ *
+ * Priority:
+ *   1. upload_path request parameter
+ *   2. legacy year/month request parameters
+ *   3. default constant path
+ */
+function dtb_image_sync_resolve_relative_upload_path( WP_REST_Request $request ) {
+	$upload_path = $request->get_param( 'upload_path' );
+	if ( is_string( $upload_path ) ) {
+		$upload_path = trim( $upload_path, '/' );
+		if ( '' !== $upload_path ) {
+			if ( ! dtb_image_sync_validate_upload_path( $upload_path ) ) {
+				return new WP_Error( 'invalid_upload_path', 'upload_path must be a relative path with allowed characters only.', [ 'status' => 400 ] );
+			}
+			return $upload_path;
+		}
+	}
+
+	$year  = trim( (string) $request->get_param( 'year' ) );
+	$month = trim( (string) $request->get_param( 'month' ) );
+
+	if ( '' !== $year || '' !== $month ) {
+		if ( ! ctype_digit( $year ) || ! ctype_digit( $month ) ) {
+			return new WP_Error( 'invalid_params', 'year and month must be numeric when upload_path is not provided.', [ 'status' => 400 ] );
+		}
+		return sprintf( '%s/%s', $year, $month );
+	}
+
+	return DTB_IMAGE_SYNC_DEFAULT_UPLOAD_RELATIVE_PATH;
+}
+
+/**
+ * Resolve an absolute uploads directory and base URL for a relative path.
+ */
+function dtb_image_sync_resolve_upload_directory( string $relative_path ): array {
+	$upload_dir = wp_upload_dir();
+	$relative_path = trim( $relative_path, '/' );
+	return [
+		'basedir'  => trailingslashit( $upload_dir['basedir'] ) . $relative_path,
+		'baseurl'  => trailingslashit( $upload_dir['baseurl'] ) . $relative_path,
+		'relative' => $relative_path,
+	];
+}
+
 // ============================================================================
 // ROUTE REGISTRATION
 // ============================================================================
@@ -85,19 +155,25 @@ function dtb_image_sync_register_routes(): void {
 
 	// Shared year/month args used across multiple routes.
 	$dir_args = [
+		'upload_path' => [
+			'required'          => false,
+			'sanitize_callback' => 'sanitize_text_field',
+			'validate_callback' => 'dtb_image_sync_validate_upload_path',
+			'description'       => 'Relative uploads path under wp-content/uploads/. Defaults to the production media path if omitted.',
+		],
 		'year'  => [
 			'required'          => false,
-			'default'           => gmdate( 'Y' ),
+			'default'           => '',
 			'sanitize_callback' => 'sanitize_text_field',
-			'validate_callback' => fn( $v ) => 1 === preg_match( '/^\d{4}$/', ltrim( (string) $v, '/' ) ),
-			'description'       => 'Year folder in wp-content/uploads/. Defaults to current year.',
+			'validate_callback' => fn( $v ) => '' === $v || 1 === preg_match( '/^\d{4}$/', ltrim( (string) $v, '/' ) ),
+			'description'       => 'Legacy year folder in wp-content/uploads/. Use upload_path instead.',
 		],
 		'month' => [
 			'required'          => false,
-			'default'           => gmdate( 'm' ),
+			'default'           => '',
 			'sanitize_callback' => 'sanitize_text_field',
-			'validate_callback' => fn( $v ) => 1 === preg_match( '/^(0[1-9]|1[0-2])$/', ltrim( (string) $v, '/' ) ),
-			'description'       => 'Zero-padded month folder. Defaults to current month.',
+			'validate_callback' => fn( $v ) => '' === $v || 1 === preg_match( '/^(0[1-9]|1[0-2])$/', ltrim( (string) $v, '/' ) ),
+			'description'       => 'Legacy zero-padded month folder. Use upload_path instead.',
 		],
 	];
 
@@ -341,15 +417,23 @@ function dtb_image_sync_permission( WP_REST_Request $request ): bool {
 // ============================================================================
 
 /**
- * Main sync route. Scans uploads/<year>/<month>/, registers image files as WP
- * attachments, and links each to its WooCommerce product by SKU.
+ * Main sync route. Scans uploads/2026/media/ (or the upload_path param),
+ * registers image files as WP attachments, and links each to its WooCommerce
+ * product by SKU.
  *
- * Sync strategy (SKU-first):
+ * Image file naming convention: {Slug}-{SKU}-{Seq}.webp
+ * Example: columbia-10-24-nyloc-nut-FA271-2.webp
+ * CSV Images column uses the full URL, e.g.:
+ *   https://drywalltoolbox.com/wp-content/uploads/2026/media/columbia-10-24-nyloc-nut-FA271-2.webp
+ *
+ * Sync strategy (exact-filename, SKU-first):
  *   1. Load all product SKUs from the DB in one indexed query.
- *   2. For each SKU, match exact image basenames from the active import CSV.
- *   3. Register any unregistered files found on disk via dtb_register_image_attachment().
- *   4. Link thumbnail + gallery to each product via the WC_Product API.
- *   5. Flush WC product transients so REST responses reflect new images.
+ *   2. Build disk index: basename_lower => { path, url } from the scan dir.
+ *   3. For each SKU, match exact image basenames from the active import CSV
+ *      against the disk index — no fuzzy guessing, no stem scanning.
+ *   4. Register any unregistered files found on disk via dtb_register_image_attachment().
+ *   5. Link thumbnail + gallery to each product via the WC_Product API.
+ *   6. Flush WC product transients so REST responses reflect new images.
  */
 function dtb_route_sync_images( WP_REST_Request $request ): WP_REST_Response|WP_Error {
 
@@ -371,17 +455,24 @@ function dtb_route_sync_images( WP_REST_Request $request ): WP_REST_Response|WP_
 		set_time_limit( 300 ); // phpcs:ignore
 	}
 
-	$year    = ltrim( (string) $request->get_param( 'year' ), '/' );
-	$month   = ltrim( (string) $request->get_param( 'month' ), '/' );
+	$relative_path = dtb_image_sync_resolve_relative_upload_path( $request );
+	if ( is_wp_error( $relative_path ) ) {
+		delete_transient( DTB_SYNC_LOCK_KEY );
+		return $relative_path;
+	}
+
+	$upload_path_info = dtb_image_sync_resolve_upload_directory( $relative_path );
+	$scan_dir   = trailingslashit( $upload_path_info['basedir'] );
+	$scan_url   = trailingslashit( $upload_path_info['baseurl'] );
+	$relative_directory = $upload_path_info['relative'];
 	$dry_run = (bool) $request->get_param( 'dry_run' );
 	$force   = (bool) $request->get_param( 'force' );
 	$register_only = (bool) $request->get_param( 'register_only' );
 	$offset  = (int) $request->get_param( 'offset' );
 	$limit   = (int) $request->get_param( 'limit' );
 
+	// wp_upload_dir() used only for the traversal base check below.
 	$upload_dir = wp_upload_dir();
-	$scan_dir   = trailingslashit( $upload_dir['basedir'] ) . "$year/$month";
-	$scan_url   = trailingslashit( $upload_dir['baseurl'] ) . "$year/$month";
 
 	// ── Validate path (prevent directory traversal) ─────────────────────────
 	$real_scan = realpath( $scan_dir );
@@ -393,7 +484,7 @@ function dtb_route_sync_images( WP_REST_Request $request ): WP_REST_Response|WP_
 
 	if ( ! is_dir( $scan_dir ) ) {
 		delete_transient( DTB_SYNC_LOCK_KEY );
-		return new WP_Error( 'dir_not_found', "Directory not found: wp-content/uploads/$year/$month", [ 'status' => 404 ] );
+		return new WP_Error( 'dir_not_found', "Directory not found: wp-content/uploads/{$relative_directory}", [ 'status' => 404 ] );
 	}
 
 	// ── Load WP admin image functions ────────────────────────────────────────
@@ -404,7 +495,23 @@ function dtb_route_sync_images( WP_REST_Request $request ): WP_REST_Response|WP_
 		require_once ABSPATH . 'wp-admin/includes/media.php';
 	}
 
-	// ── Fetch all product SKUs in one query ──────────────────────────────────
+	// ── Build exact catalog filename map from CSV ────────────────────────────
+	// csv_sku_files: sku_lower => [basename1, basename2, ...] ordered, first = primary.
+	// These are the EXACT basenames from the CSV Images column. No guessing.
+	$config        = function_exists( 'dtb_get_config' ) ? dtb_get_config() : [];
+	$extensions    = [ 'webp', 'jpg', 'jpeg', 'png', 'avif', 'gif' ];
+	$csv_sku_files = dtb_get_catalog_image_filenames_by_sku();
+
+	// ── Build disk index: basename_lower => { path, url } ────────────────────
+	$disk_index = [];
+	foreach ( dtb_get_image_file_index( $scan_dir, $scan_url, $extensions ) as $file ) {
+		$disk_index[ strtolower( $file['filename'] ) ] = [
+			'path' => $file['path'],
+			'url'  => $file['url'],
+		];
+	}
+
+	// ── Load WooCommerce product SKU → product_id map ─────────────────────────
 	global $wpdb;
 	// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
 	$sku_rows = $wpdb->get_results(
@@ -432,45 +539,56 @@ function dtb_route_sync_images( WP_REST_Request $request ): WP_REST_Response|WP_
 		];
 	}
 
-	$extensions = [ 'webp', 'jpg', 'jpeg', 'png', 'avif', 'gif' ];
-	$config = function_exists( 'dtb_get_config' ) ? dtb_get_config() : [];
-	$catalog_images_by_sku = dtb_get_catalog_image_pairs_by_sku( $scan_dir, $scan_url, $extensions );
-	$catalog_expected_files_by_sku = dtb_get_catalog_image_filenames_by_sku();
-	$catalog_missing_files_by_sku = dtb_get_catalog_missing_image_filenames_by_sku( $scan_dir, $scan_url, $extensions );
 	$total_skus = count( $sku_map );
-	$total      = $total_skus;
-	$batch_mode = 'sku';
-	$sku_keys   = array_keys( $sku_map );
-	$batch      = ( $limit > 0 )
-		? array_slice( $sku_keys, $offset, $limit )
-		: array_slice( $sku_keys, $offset );
 
-	// Fallback mode: if there are no product SKUs in the DB yet, OR if running
-	// register_only mode, batch by files on disk instead of by SKU so WooCommerce
-	// import can resolve them by URL/GUID.
+	// ── Determine batch strategy ──────────────────────────────────────────────
+	// register_only OR no WC products yet → batch by every file found on disk.
+	// Normal mode → batch by SKUs whose CSV images have at least one exact disk match.
+	$batch_mode = 'sku';
 	if ( 0 === $total_skus || $register_only ) {
-		$batch_mode = 'file';
-		$disk_files = dtb_list_images_in_dir( $scan_dir, $extensions );
-		$total      = count( $disk_files );
-		$batch      = ( $limit > 0 )
+		// File-first mode: register every image on disk so WooCommerce import
+		// can resolve them by URL/GUID without needing products to exist yet.
+		$batch_mode  = 'file';
+		$disk_files  = array_keys( $disk_index ); // basename_lower keys
+		$total       = count( $disk_files );
+		$batch       = ( $limit > 0 )
 			? array_slice( $disk_files, $offset, $limit )
 			: array_slice( $disk_files, $offset );
+	} else {
+		// SKU mode: only include SKUs that (a) exist in WooCommerce AND
+		// (b) have at least one exact-basename CSV file present on disk.
+		$active_sku_keys = [];
+		foreach ( array_keys( $csv_sku_files ) as $sku_lower ) {
+			if ( ! isset( $sku_map[ $sku_lower ] ) ) {
+				continue; // SKU is in CSV but not yet in WooCommerce — skip.
+			}
+			foreach ( $csv_sku_files[ $sku_lower ] as $basename ) {
+				if ( isset( $disk_index[ strtolower( $basename ) ] ) ) {
+					$active_sku_keys[] = $sku_lower;
+					break; // At least one exact file found on disk — include SKU.
+				}
+			}
+		}
+		$total = count( $active_sku_keys );
+		$batch = ( $limit > 0 )
+			? array_slice( $active_sku_keys, $offset, $limit )
+			: array_slice( $active_sku_keys, $offset );
 	}
 
+	$last_item    = '';
+	$last_sku     = '';
+	$last_product = 0;
+
+	// ── Initialise all counters referenced by the progress-updater closure ──
+	$processed      = 0;
 	$registered     = 0;
 	$linked         = 0;
 	$skipped        = 0;
 	$no_file        = 0;
-	$no_catalog_image = 0;
-	$missing_disk_file = 0;
 	$gallery_images = 0;
 	$errors         = [];
 	$missing_files  = [];
 	$batch_total    = count( $batch );
-	$processed      = 0;
-	$last_item      = '';
-	$last_sku       = '';
-	$last_product   = 0;
 
 	$sync_progress_updater = static function () use (
 		&$last_item,
@@ -506,7 +624,6 @@ function dtb_route_sync_images( WP_REST_Request $request ): WP_REST_Response|WP_
 			'skipped'        => $skipped,
 			'no_file'        => $no_file,
 			'gallery_images' => $gallery_images,
-			'errors'         => count( $errors ),
 			'dry_run'        => $dry_run,
 			'register_only'  => $register_only,
 			'updated_at'     => gmdate( 'c' ),
@@ -516,170 +633,144 @@ function dtb_route_sync_images( WP_REST_Request $request ): WP_REST_Response|WP_
 	$sync_progress_updater();
 
 	foreach ( $batch as $batch_item ) {
-		++$processed;
-
+		// ── File-based batch ──────────────────────────────────────────────────
+		// register_only mode or no WC products in DB yet: register every disk file.
+		// No SKU matching — just register all images so WooCommerce import can
+		// resolve them by URL/GUID.
 		if ( 'file' === $batch_mode ) {
-			$file_path = (string) $batch_item;
-			$filename  = basename( $file_path );
-			$file_url  = trailingslashit( $scan_url ) . $filename;
-			$stem      = strtolower( pathinfo( $filename, PATHINFO_FILENAME ) );
+			$basename_lower = $batch_item; // already a basename_lower key from disk_index
+			$entry          = $disk_index[ $basename_lower ] ?? null;
+			$last_item      = $basename_lower;
 
-			// Map gallery/hash filename variants back to their base SKU stem.
-			// _NN = numeric gallery image suffix, _{hex} = hashed image suffix.
-			$file_suffix_pattern = '/^(.+?)(?:_\d{2}|_[0-9a-f]{6,16})$/';
-			$product_stem = $stem;
-			$suffix_matched = 1 === preg_match( $file_suffix_pattern, $stem, $m );
-			if ( $suffix_matched ) {
-				$product_stem = $m[1];
-			}
-
-			$product_id = dtb_find_product_by_sku_stem( $product_stem ) ?? 0;
-			$is_primary = ! $suffix_matched;
-			$last_item  = $filename;
-			$last_sku   = $product_stem;
-			$last_product = $product_id;
-
-			if ( $dry_run ) {
-				$exists = attachment_url_to_postid( $file_url );
-				$exists ? ++$skipped : ++$registered;
-				if ( ! $register_only && $product_id > 0 && $is_primary ) {
-					++$linked;
-				}
+			if ( ! $entry ) {
+				++$processed;
 				$sync_progress_updater();
 				continue;
 			}
 
-			$att_id = attachment_url_to_postid( $file_url );
-			if ( ! $att_id || $force ) {
-				$att_id = dtb_register_image_attachment( $file_path, $file_url, $product_id );
-				if ( is_wp_error( $att_id ) ) {
-					$errors[] = "[{$stem}] register: " . $att_id->get_error_message();
-					dtb_image_sync_log( "image_sync register error [{$stem}]: " . $att_id->get_error_message() );
-					$sync_progress_updater();
-					continue;
-				}
+			if ( $dry_run ) {
 				++$registered;
 			} else {
-				if ( $product_id > 0 ) {
-					wp_update_post( [ 'ID' => (int) $att_id, 'post_parent' => $product_id ] );
-				}
-				++$skipped;
-			}
-
-			if ( ! $register_only && $product_id > 0 && $is_primary ) {
-				$link_result = dtb_link_images_to_product( $product_id, (int) $att_id, [] );
-				if ( is_wp_error( $link_result ) ) {
-					$errors[] = "[{$stem}] link: " . $link_result->get_error_message();
-					dtb_image_sync_log( "image_sync link error [{$stem}]: " . $link_result->get_error_message() );
+				$existing = attachment_url_to_postid( $entry['url'] );
+				if ( ! $existing || $force ) {
+					$att = dtb_register_image_attachment( $entry['path'], $entry['url'], 0 );
+					if ( is_wp_error( $att ) ) {
+						$errors[] = $basename_lower . ': ' . $att->get_error_message();
+						dtb_image_sync_log( 'image_sync file error [' . $basename_lower . ']: ' . $att->get_error_message() );
+					} else {
+						++$registered;
+					}
 				} else {
-					++$linked;
+					++$skipped;
 				}
 			}
-
+			++$processed;
 			$sync_progress_updater();
 			continue;
 		}
 
-		$sku_lower  = (string) $batch_item;
+		// ── SKU-based batch: register + link using exact filenames only ───────
+		// Source of truth: CSV Images column basenames matched against disk_index
+		// by exact case-folded basename. No SKU-stem guessing, no fuzzy matching.
+		$sku_lower      = $batch_item;
+		$last_sku       = $sku_lower;
 		$product_record = $sku_map[ $sku_lower ];
-		$product_id = (int) $product_record['product_id'];
-		$is_variation = 'product_variation' === $product_record['post_type'];
-		$last_item  = '';
-		$last_product = $product_id;
+		$product_id     = (int) $product_record['product_id'];
+		$is_variation   = 'product_variation' === $product_record['post_type'];
+		$last_item      = '';
+		$last_product   = $product_id;
+		++$processed;
 
-		$expected_files = $catalog_expected_files_by_sku[ $sku_lower ] ?? [];
-		$missing_expected_files = $catalog_missing_files_by_sku[ $sku_lower ] ?? [];
-		$catalog_pairs = $catalog_images_by_sku[ $sku_lower ] ?? [];
-		if ( ! empty( $catalog_pairs ) ) {
-			$first         = array_shift( $catalog_pairs );
-			$primary_path  = $first['path'];
-			$primary_url   = $first['url'];
-			$gallery_pairs = $is_variation ? [] : $catalog_pairs;
-		} else {
-			$primary_path  = null;
-			$primary_url   = null;
-			$gallery_pairs = [];
-		}
-
-
-		if ( ! $primary_path ) {
-			if ( empty( $expected_files ) ) {
-				++$no_catalog_image;
-			} else {
-				++$no_file;
-				++$missing_disk_file;
-				$missing_files[] = [
-					'sku'      => $sku_lower,
-					'expected' => $expected_files,
-				];
-			}
+		// Get the exact basenames this SKU expects (direct from the CSV).
+		$csv_basenames = $csv_sku_files[ $sku_lower ] ?? [];
+		if ( empty( $csv_basenames ) ) {
+			++$no_file;
 			$sync_progress_updater();
 			continue;
 		}
 
-		if ( ! empty( $missing_expected_files ) ) {
-			$missing_files[] = [
-				'sku'      => $sku_lower,
-				'expected' => $missing_expected_files,
-			];
+		// Match each CSV filename against disk_index using exact basename only.
+		$matched         = [];
+		$missing_on_disk = [];
+		foreach ( $csv_basenames as $csv_idx => $basename ) {
+			$bl = strtolower( $basename );
+			if ( isset( $disk_index[ $bl ] ) ) {
+				// Variations only get a primary image (index 0), no gallery.
+				if ( $csv_idx > 0 && $is_variation ) {
+					continue;
+				}
+				$matched[] = [
+					'basename' => $bl,
+					'path'     => $disk_index[ $bl ]['path'],
+					'url'      => $disk_index[ $bl ]['url'],
+				];
+			} else {
+				$missing_on_disk[] = $basename;
+			}
 		}
 
-		$last_item = basename( $primary_path );
+		if ( empty( $matched ) ) {
+			++$no_file;
+			$missing_files[] = [ 'sku' => $sku_lower, 'expected' => $csv_basenames ];
+			$sync_progress_updater();
+			continue;
+		}
+
+		if ( ! empty( $missing_on_disk ) ) {
+			$missing_files[] = [ 'sku' => $sku_lower, 'expected' => $missing_on_disk ];
+		}
+
+		$last_item = $matched[0]['basename'];
 
 		if ( $dry_run ) {
-			$exists = attachment_url_to_postid( $primary_url );
+			$exists = attachment_url_to_postid( $matched[0]['url'] );
 			$exists ? ++$skipped : ++$registered;
 			if ( ! $register_only ) {
 				++$linked;
 			}
-			$gallery_images += count( $gallery_pairs );
+			$gallery_images += max( 0, count( $matched ) - 1 );
 			$sync_progress_updater();
 			continue;
 		}
 
-		// ── Register primary attachment ──────────────────────────────────────
-		$primary_att = attachment_url_to_postid( $primary_url );
-		if ( ! $primary_att || $force ) {
-			$primary_att = dtb_register_image_attachment( $primary_path, $primary_url, $product_id );
-			if ( is_wp_error( $primary_att ) ) {
-				$errors[] = "[{$sku_lower}] primary: " . $primary_att->get_error_message();
-				dtb_image_sync_log( "image_sync primary error [{$sku_lower}]: " . $primary_att->get_error_message() );
-				$sync_progress_updater();
-				continue;
-			}
-			++$registered;
-		} else {
-			// Update post_parent in case it was registered without a parent before.
-			wp_update_post( [ 'ID' => $primary_att, 'post_parent' => $product_id ] );
-			++$skipped;
-		}
-
-		// ── Register gallery attachments ─────────────────────────────────────
-		$gallery_att_ids = [];
-		foreach ( $gallery_pairs as $pair ) {
-			$gatt = attachment_url_to_postid( $pair['url'] );
-			if ( ! $gatt || $force ) {
-				$gatt = dtb_register_image_attachment( $pair['path'], $pair['url'], $product_id );
-				if ( is_wp_error( $gatt ) ) {
-					$errors[] = "[{$sku_lower}] gallery: " . $gatt->get_error_message();
-					dtb_image_sync_log( "image_sync gallery error [{$sku_lower}]: " . $gatt->get_error_message() );
+		// ── Register each matched file ────────────────────────────────────────
+		$att_ids = [];
+		foreach ( $matched as $idx => $mf ) {
+			$existing_att = (int) attachment_url_to_postid( $mf['url'] );
+			if ( $existing_att && ! $force ) {
+				// Already registered — update post_parent only.
+				wp_update_post( [ 'ID' => $existing_att, 'post_parent' => $product_id ] );
+				$att_ids[] = $existing_att;
+				if ( 0 === $idx ) {
+					++$skipped;
+				} else {
+					++$gallery_images;
+				}
+			} else {
+				$att = dtb_register_image_attachment( $mf['path'], $mf['url'], $product_id );
+				if ( is_wp_error( $att ) ) {
+					$errors[] = "[{$sku_lower}] {$mf['basename']}: " . $att->get_error_message();
+					dtb_image_sync_log( "image_sync error [{$sku_lower}] {$mf['basename']}: " . $att->get_error_message() );
 					continue;
 				}
+				$att_ids[] = (int) $att;
 				++$registered;
-				++$gallery_images;
-			} else {
-				wp_update_post( [ 'ID' => $gatt, 'post_parent' => $product_id ] );
+				if ( $idx > 0 ) {
+					++$gallery_images;
+				}
 			}
-			$gallery_att_ids[] = (int) $gatt;
 		}
 
-		if ( $register_only ) {
+		if ( empty( $att_ids ) || $register_only ) {
 			$sync_progress_updater();
 			continue;
 		}
 
-		// ── Link images to product via WC_Product API ────────────────────────
-		$result = dtb_link_images_to_product( $product_id, (int) $primary_att, $gallery_att_ids );
+		// ── Link primary + gallery to product via WC_Product API ─────────────
+		$primary_att     = $att_ids[0];
+		$gallery_att_ids = array_slice( $att_ids, 1 );
+
+		$result = dtb_link_images_to_product( $product_id, $primary_att, $gallery_att_ids );
 		if ( is_wp_error( $result ) ) {
 			$errors[] = "[{$sku_lower}] link: " . $result->get_error_message();
 			dtb_image_sync_log( "image_sync link error [{$sku_lower}]: " . $result->get_error_message() );
@@ -700,28 +791,26 @@ function dtb_route_sync_images( WP_REST_Request $request ): WP_REST_Response|WP_
 	delete_transient( DTB_SYNC_PROGRESS_KEY );
 
 	return rest_ensure_response( [
-		'status'         => $dry_run ? 'dry_run' : 'completed',
-		'directory'      => "wp-content/uploads/$year/$month",
-		'total_skus'     => $total_skus,
-		'total'          => $total,
-		'offset'         => $offset,
-		'limit'          => $limit,
-		'scanned'        => count( $batch ),
-		'registered'     => $registered,
-		'linked'         => $linked,
-		'skipped'        => $skipped,
-		'no_file'        => $no_file,
-		'no_catalog_image' => $no_catalog_image,
-		'missing_disk_file' => $missing_disk_file,
-		'gallery_images' => $gallery_images,
-		'active_csv'     => $config['csv_filename'] ?? '',
-		'csv_source'     => $config['csv_source'] ?? '',
-		'csv_missing'    => $config['csv_missing'] ?? [],
-		'missing_files'  => $missing_files,
-		'errors'         => $errors,
-		'dry_run'        => $dry_run,
-		'register_only'  => $register_only,
-		'next_offset'    => ( $limit > 0 && ( $offset + $limit ) < $total )
+		'status'          => $dry_run ? 'dry_run' : 'completed',
+		'directory'       => "wp-content/uploads/{$relative_directory}",
+		'total_skus'      => $total_skus,
+		'total'           => $total,
+		'offset'          => $offset,
+		'limit'           => $limit,
+		'scanned'         => count( $batch ),
+		'registered'      => $registered,
+		'linked'          => $linked,
+		'skipped'         => $skipped,
+		'no_file'         => $no_file,
+		'gallery_images'  => $gallery_images,
+		'active_csv'      => $config['csv_filename'] ?? '',
+		'csv_source'      => $config['csv_source'] ?? '',
+		'csv_missing'     => $config['csv_missing'] ?? [],
+		'missing_files'   => $missing_files,
+		'errors'          => $errors,
+		'dry_run'         => $dry_run,
+		'register_only'   => $register_only,
+		'next_offset'     => ( $limit > 0 && ( $offset + $limit ) < $total )
 			? $offset + $limit
 			: null,
 		'file_based_sync' => ( 'file' === $batch_mode ),
@@ -737,16 +826,22 @@ function dtb_route_sync_images( WP_REST_Request $request ): WP_REST_Response|WP_
  * already registered in the Media Library.
  */
 function dtb_route_link_registered_images( WP_REST_Request $request ): WP_REST_Response|WP_Error {
-	$year    = ltrim( (string) $request->get_param( 'year' ), '/' );
-	$month   = ltrim( (string) $request->get_param( 'month' ), '/' );
+	$relative_path = dtb_image_sync_resolve_relative_upload_path( $request );
+	if ( is_wp_error( $relative_path ) ) {
+		return $relative_path;
+	}
+
+	$upload_path_info = dtb_image_sync_resolve_upload_directory( $relative_path );
+	$scan_dir   = trailingslashit( $upload_path_info['basedir'] );
+	$scan_url   = trailingslashit( $upload_path_info['baseurl'] );
+	$relative_directory = $upload_path_info['relative'];
 	$dry_run = (bool) $request->get_param( 'dry_run' );
 	$force   = (bool) $request->get_param( 'force' );
 	$offset  = (int) $request->get_param( 'offset' );
 	$limit   = (int) $request->get_param( 'limit' );
 
+	// wp_upload_dir() used only for the traversal base check below.
 	$upload_dir = wp_upload_dir();
-	$scan_dir   = trailingslashit( $upload_dir['basedir'] ) . "$year/$month";
-	$scan_url   = trailingslashit( $upload_dir['baseurl'] ) . "$year/$month";
 
 	$real_scan = realpath( $scan_dir );
 	$real_base = realpath( $upload_dir['basedir'] );
@@ -754,7 +849,7 @@ function dtb_route_link_registered_images( WP_REST_Request $request ): WP_REST_R
 		return new WP_Error( 'invalid_path', 'Resolved path is outside the uploads directory.', [ 'status' => 400 ] );
 	}
 	if ( ! is_dir( $scan_dir ) ) {
-		return new WP_Error( 'dir_not_found', "Directory not found: wp-content/uploads/$year/$month", [ 'status' => 404 ] );
+		return new WP_Error( 'dir_not_found', "Directory not found: wp-content/uploads/{$relative_directory}", [ 'status' => 404 ] );
 	}
 
 	if ( get_transient( DTB_SYNC_LOCK_KEY ) ) {
@@ -793,55 +888,82 @@ function dtb_route_link_registered_images( WP_REST_Request $request ): WP_REST_R
 		];
 	}
 
-	$sku_keys = array_keys( $sku_map );
-	$total    = count( $sku_keys );
-	$batch    = ( $limit > 0 )
-		? array_slice( $sku_keys, $offset, $limit )
-		: array_slice( $sku_keys, $offset );
+	// Exact catalog basenames per SKU (from CSV Images column — no guessing).
+	$extensions    = [ 'webp', 'jpg', 'jpeg', 'png', 'avif', 'gif' ];
+	$csv_sku_files = dtb_get_catalog_image_filenames_by_sku();
 
-	$linked             = 0;
-	$skipped            = 0;
-	$no_file            = 0;
+	// Disk URL index: basename_lower => { path, url } for resolving attachment IDs.
+	$disk_index = [];
+	foreach ( dtb_get_image_file_index( $scan_dir, $scan_url, $extensions ) as $file ) {
+		$disk_index[ strtolower( $file['filename'] ) ] = [
+			'path' => $file['path'],
+			'url'  => $file['url'],
+		];
+	}
+
+	// Collect SKUs that (a) exist in WooCommerce and (b) have at least one
+	// exact-basename CSV file present on disk.
+	$active_sku_keys = [];
+	foreach ( array_keys( $csv_sku_files ) as $sku_lower ) {
+		if ( ! isset( $sku_map[ $sku_lower ] ) ) {
+			continue;
+		}
+		foreach ( $csv_sku_files[ $sku_lower ] as $basename ) {
+			if ( isset( $disk_index[ strtolower( $basename ) ] ) ) {
+				$active_sku_keys[] = $sku_lower;
+				break;
+			}
+		}
+	}
+
+	$total = count( $active_sku_keys );
+	$batch = ( $limit > 0 )
+		? array_slice( $active_sku_keys, $offset, $limit )
+		: array_slice( $active_sku_keys, $offset );
+
+	$linked                   = 0;
+	$skipped                  = 0;
+	$no_file                  = 0;
 	$missing_attachment_count = 0;
-	$errors             = [];
-	$extensions         = [ 'webp', 'jpg', 'jpeg', 'png', 'avif', 'gif' ];
-	$catalog_images_by_sku = dtb_get_catalog_image_pairs_by_sku( $scan_dir, $scan_url, $extensions );
+	$errors                   = [];
 
 	foreach ( $batch as $sku_lower ) {
 		$product_record = $sku_map[ $sku_lower ];
-		$product_id = (int) $product_record['product_id'];
-		$is_variation = 'product_variation' === $product_record['post_type'];
+		$product_id     = (int) $product_record['product_id'];
+		$is_variation   = 'product_variation' === $product_record['post_type'];
 
-		$catalog_pairs = $catalog_images_by_sku[ $sku_lower ] ?? [];
-		if ( ! empty( $catalog_pairs ) ) {
-			$first         = array_shift( $catalog_pairs );
-			$primary_path  = $first['path'];
-			$primary_url   = $first['url'];
-			$gallery_pairs = $is_variation ? [] : $catalog_pairs;
-		} else {
-			$primary_path  = null;
-			$primary_url   = null;
-			$gallery_pairs = [];
-		}
-
-		if ( ! $primary_path || ! $primary_url ) {
+		$csv_basenames = $csv_sku_files[ $sku_lower ] ?? [];
+		if ( empty( $csv_basenames ) ) {
 			++$no_file;
 			continue;
 		}
 
-		$primary_att = (int) attachment_url_to_postid( $primary_url );
-		if ( $primary_att <= 0 ) {
-			++$missing_attachment_count;
+		// Resolve attachment IDs using exact basenames only.
+		$att_ids = [];
+		foreach ( $csv_basenames as $csv_idx => $basename ) {
+			// Variations only get a primary image (index 0), no gallery.
+			if ( $csv_idx > 0 && $is_variation ) {
+				continue;
+			}
+			$bl = strtolower( $basename );
+			if ( ! isset( $disk_index[ $bl ] ) ) {
+				continue; // File absent from disk — skip.
+			}
+			$att = (int) attachment_url_to_postid( $disk_index[ $bl ]['url'] );
+			if ( $att > 0 ) {
+				$att_ids[] = $att;
+			} else {
+				++$missing_attachment_count;
+			}
+		}
+
+		if ( empty( $att_ids ) ) {
+			++$no_file;
 			continue;
 		}
 
-		$gallery_att_ids = [];
-		foreach ( $gallery_pairs as $pair ) {
-			$gatt = (int) attachment_url_to_postid( $pair['url'] );
-			if ( $gatt > 0 ) {
-				$gallery_att_ids[] = $gatt;
-			}
-		}
+		$primary_att     = $att_ids[0];
+		$gallery_att_ids = array_slice( $att_ids, 1 );
 
 		if ( $dry_run ) {
 			++$linked;
@@ -849,13 +971,11 @@ function dtb_route_link_registered_images( WP_REST_Request $request ): WP_REST_R
 		}
 
 		if ( ! $force ) {
-			$current_thumb      = (int) get_post_thumbnail_id( $product_id );
+			$current_thumb       = (int) get_post_thumbnail_id( $product_id );
 			$current_gallery_ids = [];
 			if ( ! $is_variation ) {
-				$current_gallery    = get_post_meta( $product_id, '_product_image_gallery', true );
-				$current_gallery_ids_raw = explode( ',', (string) $current_gallery );
-				$current_gallery_ids = array_map( 'absint', $current_gallery_ids_raw );
-				$current_gallery_ids = array_values( array_filter( $current_gallery_ids ) );
+				$current_gallery     = get_post_meta( $product_id, '_product_image_gallery', true );
+				$current_gallery_ids = array_values( array_filter( array_map( 'absint', explode( ',', (string) $current_gallery ) ) ) );
 			}
 			if ( $current_thumb === $primary_att && ( $is_variation || $current_gallery_ids === $gallery_att_ids ) ) {
 				++$skipped;
@@ -887,7 +1007,7 @@ function dtb_route_link_registered_images( WP_REST_Request $request ): WP_REST_R
 
 	return rest_ensure_response( [
 		'status'              => $dry_run ? 'dry_run' : 'completed',
-		'directory'           => "wp-content/uploads/$year/$month",
+		'directory'           => "wp-content/uploads/{$relative_directory}",
 		'total'               => $total,
 		'offset'              => $offset,
 		'limit'               => $limit,
@@ -923,12 +1043,15 @@ function dtb_route_sync_images_progress(): WP_REST_Response {
 // ============================================================================
 
 function dtb_route_sync_images_status( WP_REST_Request $request ): WP_REST_Response {
-	$year  = ltrim( sanitize_text_field( (string) ( $request->get_param( 'year' )  ?? gmdate( 'Y' ) ) ), '/' );
-	$month = ltrim( sanitize_text_field( (string) ( $request->get_param( 'month' ) ?? gmdate( 'm' ) ) ), '/' );
+	$relative_path = dtb_image_sync_resolve_relative_upload_path( $request );
+	if ( is_wp_error( $relative_path ) ) {
+		return $relative_path;
+	}
 
-	$upload_dir = wp_upload_dir();
-	$scan_dir   = trailingslashit( $upload_dir['basedir'] ) . "$year/$month";
-	$base_url   = trailingslashit( $upload_dir['baseurl'] ) . "$year/$month/";
+	$upload_path_info = dtb_image_sync_resolve_upload_directory( $relative_path );
+	$scan_dir   = trailingslashit( $upload_path_info['basedir'] );
+	$base_url   = trailingslashit( $upload_path_info['baseurl'] );
+	$relative_directory = $upload_path_info['relative'];
 
 	$dir_exists     = is_dir( $scan_dir );
 	$image_exts     = [ 'webp', 'jpg', 'jpeg', 'png', 'avif', 'gif', 'svg' ];
@@ -938,7 +1061,7 @@ function dtb_route_sync_images_status( WP_REST_Request $request ): WP_REST_Respo
 	global $wpdb;
 
 	// Attachments registered from this directory (indexed _wp_attached_file path).
-	$relative_prefix = $wpdb->esc_like( "$year/$month/" );
+	$relative_prefix = $wpdb->esc_like( $relative_directory . '/' );
 	// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
 	$registered_count = (int) $wpdb->get_var( $wpdb->prepare(
 		"SELECT COUNT(*) FROM {$wpdb->postmeta}
@@ -980,7 +1103,7 @@ function dtb_route_sync_images_status( WP_REST_Request $request ): WP_REST_Respo
 	) );
 
 	return rest_ensure_response( [
-		'directory'           => "wp-content/uploads/$year/$month",
+		'directory'           => "wp-content/uploads/{$relative_directory}",
 		'dir_exists'          => $dir_exists,
 		'files_on_disk'       => count( $files_on_disk ),
 		'registered_in_db'    => $registered_count,
@@ -1014,12 +1137,16 @@ function dtb_route_reset_images( WP_REST_Request $request ): WP_REST_Response|WP
 		set_time_limit( 300 ); // phpcs:ignore
 	}
 
-	$year    = ltrim( sanitize_text_field( (string) $request->get_param( 'year' ) ),  '/' );
-	$month   = ltrim( sanitize_text_field( (string) $request->get_param( 'month' ) ), '/' );
+	$relative_path = dtb_image_sync_resolve_relative_upload_path( $request );
+	if ( is_wp_error( $relative_path ) ) {
+		return $relative_path;
+	}
+
+	$relative_prefix = ltrim( $relative_path, '/' ) . '/';
 	$dry_run = (bool) $request->get_param( 'dry_run' );
 
-	if ( ! ctype_digit( $year ) || ! ctype_digit( $month ) ) {
-		return new WP_Error( 'invalid_params', 'year and month must be numeric.', [ 'status' => 400 ] );
+	if ( '' === $relative_path ) {
+		return new WP_Error( 'invalid_params', 'upload_path or legacy year/month must be provided.', [ 'status' => 400 ] );
 	}
 
 	if ( get_transient( DTB_SYNC_LOCK_KEY ) ) {
@@ -1031,7 +1158,9 @@ function dtb_route_reset_images( WP_REST_Request $request ): WP_REST_Response|WP
 	}
 
 	global $wpdb;
-	$relative_prefix = $wpdb->esc_like( "$year/$month/" );
+	// $relative_prefix was set above from the resolved upload path; escape it
+	// for use in a LIKE parameter.
+	$like_prefix = $wpdb->esc_like( $relative_prefix );
 
 	// Find ALL attachments from this directory via indexed _wp_attached_file meta.
 	// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
@@ -1041,7 +1170,7 @@ function dtb_route_reset_images( WP_REST_Request $request ): WP_REST_Response|WP
 		 WHERE meta_key = '_wp_attached_file'
 		   AND meta_value LIKE %s
 		 ORDER BY post_id ASC",
-		$relative_prefix . '%'
+		$like_prefix . '%'
 	) );
 
 	$total_attachments = count( $attachment_ids );
@@ -1078,12 +1207,12 @@ function dtb_route_reset_images( WP_REST_Request $request ): WP_REST_Response|WP
 			WC_Cache_Helper::get_transient_version( 'product', true );
 		}
 
-		dtb_image_sync_log( "image_sync reset: deleted {$deleted_atts} attachments from uploads/{$year}/{$month}" );
+		dtb_image_sync_log( "image_sync reset: deleted {$deleted_atts} attachments from uploads/{$relative_path}" );
 	}
 
 	return rest_ensure_response( [
 		'status'            => $dry_run ? 'dry_run' : 'completed',
-		'directory'         => "wp-content/uploads/$year/$month",
+		'directory'         => "wp-content/uploads/{$relative_path}",
 		'dry_run'           => $dry_run,
 		'total_attachments' => $total_attachments,
 		'deleted_atts'      => $dry_run ? 0 : $deleted_atts,
@@ -1554,79 +1683,23 @@ function dtb_split_catalog_image_field( string $image_field ): array {
 /**
  * Resolve a catalog image URL/path to a physical file found in the scan dir.
  *
- * Exact basename matching is preferred. If SEO slug text in the CSV drifts from
- * the actual file on disk, fall back to the stable suffix convention:
- * {anything}-{SKU}-{NN}.{ext}.
+ * Exact basename matching ONLY. The basename of $image_url (after URL-decoding
+ * and case-folding) must match a key in $by_basename — no fuzzy SKU-stem
+ * guessing, no ordinal suffix scanning.
  *
- * @param string $image_url Catalog image URL or path.
- * @param string $sku_lower Lower-case product SKU.
+ * @param string $image_url  Catalog image URL or path.
+ * @param string $sku_lower  Lower-case product SKU (unused; retained for signature compatibility).
  * @param array<string,array{path:string,url:string}> $by_basename Index of exact basenames.
- * @param array<int,array{path:string,url:string,filename:string,stem:string,normalized_stem:string,ext:string}> $file_index Indexed files from the scan directory.
+ * @param array<int,array<string,string>> $file_index Unused; retained for signature compatibility.
  * @return array{path:string,url:string}|null
  */
-function dtb_find_catalog_image_pair( string $image_url, string $sku_lower, array $by_basename, array $file_index ): ?array {
+function dtb_find_catalog_image_pair( string $image_url, string $sku_lower, array $by_basename, array $file_index = [] ): ?array {
 	$path_part = strtok( trim( $image_url ), '?' );
 	$basename  = strtolower( rawurldecode( basename( false !== $path_part ? $path_part : '' ) ) );
 	if ( '' === $basename ) {
 		return null;
 	}
-
-	if ( isset( $by_basename[ $basename ] ) ) {
-		return $by_basename[ $basename ];
-	}
-
-	$ext      = strtolower( pathinfo( $basename, PATHINFO_EXTENSION ) );
-	$stem     = strtolower( pathinfo( $basename, PATHINFO_FILENAME ) );
-	$ordinal  = null;
-	$stem_without_ordinal = '';
-	if ( 1 === preg_match( '/(?:^|[-_])(\d{2})$/', $stem, $m ) ) {
-		$ordinal = $m[1];
-		$stem_without_ordinal = preg_replace( '/[-_]' . preg_quote( $ordinal, '/' ) . '$/', '', $stem ) ?: '';
-	}
-
-	if ( null === $ordinal || '' === $sku_lower ) {
-		return null;
-	}
-
-	$suffix_candidates = [
-		str_replace( '_', '-', $sku_lower ),
-		str_replace( '-', '_', $sku_lower ),
-		strtolower( rawurldecode( $sku_lower ) ),
-	];
-
-	// Variable products often point at variation image filenames. In that case
-	// the stable suffix in the CSV filename is the variation SKU, not the parent
-	// row SKU. Try increasingly long tail segments before the final -NN ordinal.
-	$normalized_expected_stem = str_replace( '_', '-', $stem_without_ordinal );
-	$parts = array_values( array_filter( explode( '-', $normalized_expected_stem ), static fn( $part ) => '' !== $part ) );
-	$max_tail_parts = min( 8, count( $parts ) );
-	for ( $take = 1; $take <= $max_tail_parts; $take++ ) {
-		$suffix_candidates[] = implode( '-', array_slice( $parts, -$take ) );
-	}
-
-	$suffix_candidates = array_values( array_unique( array_filter( $suffix_candidates ) ) );
-
-	foreach ( $file_index as $file ) {
-		if ( $ext && $file['ext'] !== $ext ) {
-			continue;
-		}
-
-		foreach ( $suffix_candidates as $candidate ) {
-			$normalized_candidate = str_replace( '_', '-', $candidate );
-			$underscore_candidate = str_replace( '-', '_', $candidate );
-			if (
-				str_ends_with( $file['normalized_stem'], '-' . $normalized_candidate . '-' . $ordinal )
-				|| str_ends_with( $file['stem'], '_' . $underscore_candidate . '_' . $ordinal )
-			) {
-				return [
-					'path' => $file['path'],
-					'url'  => $file['url'],
-				];
-			}
-		}
-	}
-
-	return null;
+	return $by_basename[ $basename ] ?? null;
 }
 
 /**
@@ -1931,8 +2004,14 @@ function dtb_register_image_attachment( string $file_path, string $file_url, int
 		return new WP_Error( 'invalid_filetype', "Unrecognised file type: {$filename}" );
 	}
 
-	$title = sanitize_text_field(
-		preg_replace( '/[_\-]+/', ' ', pathinfo( $filename, PATHINFO_FILENAME ) ) ?? $filename
+	// Build a clean Media Library title from the {Slug}-{SKU}-{Seq}.webp naming
+	// convention used in dtb catalogs (e.g. columbia-10-24-nyloc-nut-FA271-2.webp).
+	// Strip the trailing sequence number suffix (-1, -2, …) so the resulting title
+	// reads as "columbia 10-24 nyloc nut FA271" rather than including the index.
+	$stem_raw = pathinfo( $filename, PATHINFO_FILENAME );                       // e.g. columbia-10-24-nyloc-nut-FA271-2
+	$stem_raw = (string) preg_replace( '/-\d+$/', '', $stem_raw );             // → columbia-10-24-nyloc-nut-FA271
+	$title    = sanitize_text_field(
+		(string) preg_replace( '/[_]+/', ' ', str_replace( '-', ' ', $stem_raw ) )
 	);
 
 	// ── 1. Create the attachment post record ─────────────────────────────────
@@ -2164,8 +2243,8 @@ function dtb_ajax_image_sync_handler(): void {
 
 	$request = new WP_REST_Request();
 	// phpcs:disable WordPress.Security.NonceVerification.Missing
-	$request->set_param( 'year',          sanitize_text_field( wp_unslash( $_POST['year']          ?? gmdate( 'Y' ) ) ) );
-	$request->set_param( 'month',         sanitize_text_field( wp_unslash( $_POST['month']         ?? gmdate( 'm' ) ) ) );
+	$_ajax_default_path = defined( 'DTB_IMAGE_SYNC_DEFAULT_UPLOAD_RELATIVE_PATH' ) ? DTB_IMAGE_SYNC_DEFAULT_UPLOAD_RELATIVE_PATH : '2026/media';
+	$request->set_param( 'upload_path',   sanitize_text_field( wp_unslash( $_POST['upload_path'] ?? $_ajax_default_path ) ) );
 	$request->set_param( 'dry_run',       rest_sanitize_boolean( wp_unslash( $_POST['dry_run']     ?? false ) ) );
 	$request->set_param( 'force',         rest_sanitize_boolean( wp_unslash( $_POST['force']       ?? false ) ) );
 	$request->set_param( 'register_only', rest_sanitize_boolean( wp_unslash( $_POST['register_only'] ?? false ) ) );
@@ -2206,6 +2285,81 @@ function dtb_image_sync_add_management_page(): void {
 }
 
 /**
+ * Scan wp-content/uploads/ and return all real subdirectories two levels deep
+ * (e.g. "2026/media", "2026/05") as relative paths, sorted newest-year first.
+ * Only directories that actually contain at least one image file are included.
+ *
+ * @return string[] Relative paths like ['2026/media', '2026/05', '2025/12']
+ */
+function dtb_get_upload_subdirectories(): array {
+	$upload_dir = wp_upload_dir();
+	$base       = trailingslashit( $upload_dir['basedir'] );
+	$results    = [];
+
+	if ( ! is_dir( $base ) ) {
+		return $results;
+	}
+
+	$image_extensions = [ 'webp', 'jpg', 'jpeg', 'png', 'avif', 'gif' ];
+
+	// Iterate year-level directories (e.g. 2026/, 2025/).
+	$year_dirs = glob( $base . '*', GLOB_ONLYDIR );
+	if ( ! is_array( $year_dirs ) ) {
+		return $results;
+	}
+
+	rsort( $year_dirs ); // newest year first
+
+	foreach ( $year_dirs as $year_dir ) {
+		$year_name = basename( $year_dir );
+		// Skip non-year-like dirs (must be purely numeric, 4 digits).
+		if ( ! preg_match( '/^\d{4}$/', $year_name ) ) {
+			continue;
+		}
+
+		// Iterate subdirectories one level below the year dir.
+		$sub_dirs = glob( trailingslashit( $year_dir ) . '*', GLOB_ONLYDIR );
+		if ( ! is_array( $sub_dirs ) ) {
+			continue;
+		}
+
+		foreach ( $sub_dirs as $sub_dir ) {
+			$sub_name     = basename( $sub_dir );
+			$relative     = $year_name . '/' . $sub_name;
+
+			// Validate path segment (matches dtb_image_sync_validate_upload_path pattern).
+			if ( ! preg_match( '/^[a-z0-9-]+$/', $sub_name ) ) {
+				continue;
+			}
+
+			// Only include if the directory actually contains image files.
+			$has_images = false;
+			try {
+				$it = new DirectoryIterator( $sub_dir );
+				foreach ( $it as $file ) {
+					if ( ! $file->isFile() ) {
+						continue;
+					}
+					$ext = strtolower( $file->getExtension() );
+					if ( in_array( $ext, $image_extensions, true ) ) {
+						$has_images = true;
+						break;
+					}
+				}
+			} catch ( Exception $e ) {
+				continue;
+			}
+
+			if ( $has_images ) {
+				$results[] = $relative;
+			}
+		}
+	}
+
+	return $results;
+}
+
+/**
  * Render the wp-admin DTB Tools → DTB Image Sync page.
  */
 function dtb_render_image_sync_admin_page(): void {
@@ -2237,18 +2391,30 @@ function dtb_render_image_sync_admin_page(): void {
 		return rest_sanitize_boolean( wp_unslash( (string) $_POST[ $key ] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
 	};
 
-	$year_digits  = preg_replace( '/\D+/', '', $get_post_field( 'dtb_year', gmdate( 'Y' ) ) );
-	$month_digits = preg_replace( '/\D+/', '', $get_post_field( 'dtb_month', gmdate( 'm' ) ) );
-	$year_digits  = is_string( $year_digits ) ? $year_digits : '';
-	$month_digits = is_string( $month_digits ) ? $month_digits : '';
-	$year         = '' !== $year_digits ? $year_digits : gmdate( 'Y' );
-	$month_candidate = '' !== $month_digits ? absint( $month_digits ) : (int) gmdate( 'm' );
-	$month_int       = ( $month_candidate >= 1 && $month_candidate <= 12 ) ? $month_candidate : (int) gmdate( 'm' );
-	$month     = str_pad( (string) $month_int, 2, '0', STR_PAD_LEFT );
-	$limit     = max( 1, absint( $get_post_field( 'dtb_limit', '25' ) ) );
-	$offset    = absint( $get_post_field( 'dtb_offset', '0' ) );
-	$dry_run   = $get_post_bool( 'dtb_dry_run', false );
-	$force     = $get_post_bool( 'dtb_force', false );
+	$default_upload_path = defined( 'DTB_IMAGE_SYNC_DEFAULT_UPLOAD_RELATIVE_PATH' )
+		? DTB_IMAGE_SYNC_DEFAULT_UPLOAD_RELATIVE_PATH
+		: '2026/media';
+	$upload_path_raw = trim( $get_post_field( 'dtb_upload_path', $default_upload_path ), '/' );
+	// If the user selected "Enter custom path…" from the dropdown, use the manual text field instead.
+	if ( '__custom__' === $upload_path_raw ) {
+		$upload_path_raw = trim( $get_post_field( 'dtb_upload_path_custom', $default_upload_path ), '/' );
+	}
+	$upload_path = ( '' !== $upload_path_raw && dtb_image_sync_validate_upload_path( $upload_path_raw ) )
+		? $upload_path_raw
+		: $default_upload_path;
+
+	// Scan actual upload subdirectories from disk for the directory selector.
+	$available_dirs = dtb_get_upload_subdirectories();
+	// Ensure the current selection is always present in the list, even if the
+	// directory is empty (e.g. the default path before any files are uploaded).
+	if ( ! in_array( $upload_path, $available_dirs, true ) ) {
+		array_unshift( $available_dirs, $upload_path );
+	}
+
+	$limit   = max( 1, absint( $get_post_field( 'dtb_limit', '25' ) ) );
+	$offset  = absint( $get_post_field( 'dtb_offset', '0' ) );
+	$dry_run = $get_post_bool( 'dtb_dry_run', false );
+	$force   = $get_post_bool( 'dtb_force', false );
 
 	// Which action was submitted (null = no form post yet, show status only).
 	$action         = null;
@@ -2261,8 +2427,7 @@ function dtb_render_image_sync_admin_page(): void {
 		$action = sanitize_key( wp_unslash( (string) $_POST['dtb_image_sync_action'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
 
 		$request = new WP_REST_Request();
-		$request->set_param( 'year', $year );
-		$request->set_param( 'month', $month );
+		$request->set_param( 'upload_path', $upload_path );
 
 		if ( in_array( $action, [ 'register_only', 'sync', 'pipeline', 'link_only', 'reset', 'fix_renamed' ], true ) ) {
 			$request->set_param( 'dry_run', $dry_run );
@@ -2292,8 +2457,7 @@ function dtb_render_image_sync_admin_page(): void {
 			// Can be disabled by setting DTB_IMAGE_SYNC_DISABLE_RENAME = true.
 			if ( ! ( defined( 'DTB_IMAGE_SYNC_DISABLE_RENAME' ) && DTB_IMAGE_SYNC_DISABLE_RENAME ) ) {
 				$fix_request = new WP_REST_Request();
-				$fix_request->set_param( 'year',    $year );
-				$fix_request->set_param( 'month',   $month );
+				$fix_request->set_param( 'upload_path', $upload_path );
 				$fix_request->set_param( 'dry_run', $dry_run );
 				$fix_result = dtb_route_fix_renamed_files( $fix_request );
 
@@ -2304,8 +2468,7 @@ function dtb_render_image_sync_admin_page(): void {
 
 			// Phase 2 — sync this batch.
 			$sync_request = new WP_REST_Request();
-			$sync_request->set_param( 'year',    $year );
-			$sync_request->set_param( 'month',   $month );
+			$sync_request->set_param( 'upload_path', $upload_path );
 			$sync_request->set_param( 'dry_run', $dry_run );
 			$sync_request->set_param( 'force',   $force );
 			$sync_request->set_param( 'limit',   $limit );
@@ -2355,8 +2518,7 @@ function dtb_render_image_sync_admin_page(): void {
 	// Initial page load (no action submitted) — show live status for context.
 	$status_data = null;
 	$status_request = new WP_REST_Request();
-	$status_request->set_param( 'year', $year );
-	$status_request->set_param( 'month', $month );
+	$status_request->set_param( 'upload_path', $upload_path );
 	$status_result = dtb_route_sync_images_status( $status_request );
 	if ( ! is_wp_error( $status_result ) ) {
 		$status_data = $status_result->get_data();
@@ -2381,7 +2543,7 @@ function dtb_render_image_sync_admin_page(): void {
 	?>
 	<div class="wrap">
 		<h1>🖼️ DTB Image Sync</h1>
-		<p>Register, link, and optimize product images in <code>wp-content/uploads/<?php echo esc_html( $year . '/' . $month ); ?>/</code> for WooCommerce import readiness.</p>
+		<p>Register, link, and optimize product images in <code>wp-content/uploads/<?php echo esc_html( $upload_path ); ?>/</code> for WooCommerce import readiness.</p>
 
 		<?php
 		// ── Live status bar ────────────────────────────────────────────────────
@@ -2394,7 +2556,7 @@ function dtb_render_image_sync_admin_page(): void {
 			$reg_pct             = $files_on_disk > 0 ? round( ( $registered_in_db / $files_on_disk ) * 100 ) : 0;
 			?>
 			<div class="card" style="max-width:100%;margin:0 0 20px;padding:20px 20px 12px;">
-				<h2 style="margin-top:0;">📊 Directory Status — <code><?php echo esc_html( "uploads/{$year}/{$month}" ); ?></code></h2>
+				<h2 style="margin-top:0;">📊 Directory Status — <code><?php echo esc_html( "uploads/{$upload_path}" ); ?></code></h2>
 				<table class="widefat fixed" style="width:auto;min-width:400px;">
 					<tbody>
 						<tr><td><strong>Files on disk</strong></td><td><?php echo esc_html( (string) $files_on_disk ); ?></td></tr>
@@ -2465,8 +2627,7 @@ function dtb_render_image_sync_admin_page(): void {
 				<p style="margin:0;">More batches remaining. Next offset: <strong><?php echo esc_html( (string) $next_offset ); ?></strong></p>
 				<form method="post" action="" style="margin:0;">
 					<?php wp_nonce_field( 'dtb_image_sync_admin', 'dtb_image_sync_nonce' ); ?>
-					<input type="hidden" name="dtb_year"   value="<?php echo esc_attr( $year ); ?>" />
-					<input type="hidden" name="dtb_month"  value="<?php echo esc_attr( $month ); ?>" />
+					<input type="hidden" name="dtb_upload_path" value="<?php echo esc_attr( $upload_path ); ?>" />
 					<input type="hidden" name="dtb_limit"  value="<?php echo esc_attr( (string) $limit ); ?>" />
 					<input type="hidden" name="dtb_offset" value="<?php echo esc_attr( (string) $next_offset ); ?>" />
 					<?php if ( $dry_run ) : ?><input type="hidden" name="dtb_dry_run" value="1" /><?php endif; ?>
@@ -2484,17 +2645,30 @@ function dtb_render_image_sync_admin_page(): void {
 				<?php wp_nonce_field( 'dtb_image_sync_admin', 'dtb_image_sync_nonce' ); ?>
 				<table class="form-table" role="presentation">
 					<tr>
-						<th scope="row"><label for="dtb_year">Year</label></th>
+						<th scope="row"><label for="dtb_upload_path">Upload Directory</label></th>
 						<td>
-							<input id="dtb_year" name="dtb_year" type="text" class="small-text" value="<?php echo esc_attr( $year ); ?>" maxlength="4" />
-							<p class="description">Upload year folder (e.g. 2026)</p>
-						</td>
-					</tr>
-					<tr>
-						<th scope="row"><label for="dtb_month">Month</label></th>
-						<td>
-							<input id="dtb_month" name="dtb_month" type="text" class="small-text" value="<?php echo esc_attr( $month ); ?>" maxlength="2" />
-							<p class="description">Zero-padded month (01–12)</p>
+							<?php if ( ! empty( $available_dirs ) ) : ?>
+								<select id="dtb_upload_path" name="dtb_upload_path" class="regular-text" onchange="document.getElementById('dtb_upload_path_manual').style.display=this.value==='__custom__'?'block':'none';">
+									<?php foreach ( $available_dirs as $dir ) : ?>
+										<option value="<?php echo esc_attr( $dir ); ?>"<?php selected( $dir, $upload_path ); ?>>
+											<?php echo esc_html( 'wp-content/uploads/' . $dir ); ?>
+											<?php echo ( $dir === $default_upload_path ) ? ' ✦ default' : ''; ?>
+										</option>
+									<?php endforeach; ?>
+									<option value="__custom__">— Enter custom path…</option>
+								</select>
+								<div id="dtb_upload_path_manual" style="display:none;margin-top:8px;">
+									<input type="text" name="dtb_upload_path_custom" class="regular-text"
+										placeholder="e.g. 2026/media"
+										value="" />
+									<p class="description">Custom relative path under <code>wp-content/uploads/</code></p>
+								</div>
+							<?php else : ?>
+								<input id="dtb_upload_path" name="dtb_upload_path" type="text" class="regular-text"
+									value="<?php echo esc_attr( $upload_path ); ?>"
+									placeholder="e.g. 2026/media" />
+								<p class="description">No subdirectories found on disk yet. Enter path manually — e.g. <code>2026/media</code></p>
+							<?php endif; ?>
 						</td>
 					</tr>
 					<tr>
@@ -2535,6 +2709,8 @@ function dtb_render_image_sync_admin_page(): void {
 					<button type="submit" class="button button-primary" name="dtb_image_sync_action" value="register_only">Register Images Only</button>
 					<button type="submit" class="button button-secondary" name="dtb_image_sync_action" value="link_only">Link Registered Images</button>
 					<button type="submit" class="button button-primary" name="dtb_image_sync_action" value="sync">Register + Link</button>
+					<button type="submit" class="button button-primary" name="dtb_image_sync_action" value="pipeline"
+						style="background:#2e7d32;border-color:#1b5e20;">🚀 Run Full Pipeline</button>
 					<button type="submit" class="button button-link-delete" name="dtb_image_sync_action" value="reset"
 						style="margin-left:auto;">⚠️ Run Reset</button>
 				</p>
@@ -2566,7 +2742,7 @@ function dtb_render_image_sync_admin_page(): void {
 		<div class="card" style="max-width:100%;margin:20px 0;background:#f6f7f7;padding:16px 20px;">
 			<h3 style="margin-top:0;">📖 Quick Guide</h3>
 			<ol style="margin-left:20px;margin-bottom:0;">
-				<li>Set <strong>Year</strong> / <strong>Month</strong> to match your image upload folder (e.g. 2026 / 04).</li>
+				<li>Select your <strong>Upload Directory</strong> from the dropdown — it lists every real subdirectory found under <code>wp-content/uploads/2026/</code> on disk.</li>
 				<li>Click <strong>🚀 Run Full Pipeline</strong> — it fixes any WP-renamed files, then registers and links images for this batch.</li>
 				<li>If a <em>Continue Next Batch</em> button appears, click it to advance until all SKUs are processed.</li>
 				<li>Run <strong>Check Status</strong> any time to see how many files are registered and linked.</li>
@@ -2729,8 +2905,7 @@ function dtb_render_image_sync_admin_page(): void {
 			event.preventDefault();
 
 			const formData = new FormData( form );
-			const year = String( formData.get( 'dtb_year' ) || '' );
-			const month = String( formData.get( 'dtb_month' ) || '' );
+			const uploadPath = String( formData.get( 'dtb_upload_path' ) || '' );
 			const limit = Math.max( 1, Math.min( 250, parseIntOrDefault( formData.get( 'dtb_limit' ), 25 ) ) );
 			const dryRun = parseBool( formData.get( 'dtb_dry_run' ) );
 			const force = parseBool( formData.get( 'dtb_force' ) );
@@ -2745,14 +2920,13 @@ function dtb_render_image_sync_admin_page(): void {
 			const actionLabel = submittedAction === 'register_only'
 				? 'Register Images Only'
 				: ( submittedAction === 'link_only' ? 'Link Registered Images' : 'Register + Link' );
-			appendLog( `Starting ${actionLabel} for ${year}/${month} (limit ${limit}, offset ${currentOffset})` );
+			appendLog( `Starting ${actionLabel} for ${uploadPath} (limit ${limit}, offset ${currentOffset})` );
 
 			try {
 				if ( submittedAction === 'pipeline' ) {
 					setStatus( 'Running Fix Renamed…' );
 					const fixResult = await postJson( 'fix_renamed', {
-						year: year,
-						month: month,
+						upload_path: uploadPath,
 						dry_run: dryRun
 					} );
 					appendLog( `Fix Renamed complete · renamed ${parseIntOrDefault( fixResult.renamed, 0 )}` );
@@ -2771,8 +2945,7 @@ function dtb_render_image_sync_admin_page(): void {
 						startPolling();
 					}
 					const batch = await postJson( syncAction, {
-						year: year,
-						month: month,
+						upload_path: uploadPath,
 						dry_run: dryRun,
 						force: force,
 						register_only: submittedAction === 'register_only',

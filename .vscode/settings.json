@@ -123,5 +123,9 @@
             "source": "PowerShell",
             "icon": "terminal-powershell"
         }
+    },
+    "github.copilot.enable": {
+        "markdown": true,
+        "plaintext": true
     }
 }
