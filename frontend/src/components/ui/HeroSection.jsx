@@ -165,7 +165,7 @@ export default function HeroSection({
               background: '#60a5fa', flexShrink: 0,
               animation: 'dtb-hero-pulse 2.2s ease-in-out infinite',
             }} />
-            Pro Drywall Tools
+            Top Brands. One Place.
           </span>
         </Motion.div>
 
