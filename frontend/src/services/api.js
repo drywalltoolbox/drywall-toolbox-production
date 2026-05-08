@@ -72,29 +72,17 @@ const BRAND_ALIASES = {
 // existing UI components (ProductDetail, ProductCard, TrendingProducts, etc.).
 // This avoids touching every component when the data source changes.
 
-// Parts category name stems (decoded, lowercase) — brand-agnostic.
-// Any category whose decoded name matches one of these is a parts category,
-// regardless of which brand it belongs to.
+// Parts category name stems (decoded, lowercase) — production catalog only.
+// The WooCommerce production catalog uses a single canonical parts leaf: "Parts".
 const PARTS_LEAF_NAMES = [
   'parts',
-  'parts & accessories',
-  'repair kits & parts',
-  'pumps & parts',
-  'replacement parts',
-  'spare parts',
 ];
 
-// Parts slug prefixes — brand-agnostic.
-// WooCommerce de-duplicates duplicate category names by appending a brand
-// suffix, e.g. "parts-accessories" → "parts-accessories-columbia-taping-tools".
-// Matching by prefix means every brand's parts category is caught automatically
-// without needing brand-specific entries.
+// Parts slug prefixes — production catalog only.
+// Keep a light prefix fallback because WooCommerce may de-duplicate identical
+// leaf slugs across brands (for example "parts-2").
 const PARTS_SLUG_PREFIXES = [
-  'parts-accessories',
-  'repair-kits-parts',
-  'pumps-parts',
-  'replacement-parts',
-  'spare-parts',
+  'parts',
 ];
 
 // Generic catch-all category labels that should be treated as lowest priority
@@ -151,14 +139,12 @@ function mapApiCategory(wcCategories) {
 }
 
 /**
- * Return true when the product belongs to a replacement-parts category.
+ * Return true when the product belongs to the canonical production-catalog
+ * replacement-parts category.
  *
- * Brand-agnostic: works for all brands without needing brand-specific entries.
- *   • Name check: decodes HTML entities ("&amp;" → "&") then matches against
- *     PARTS_LEAF_NAMES — handles all brands equally.
- *   • Slug check: prefix match on PARTS_SLUG_PREFIXES — catches WooCommerce's
- *     auto-suffixed slugs like "parts-accessories-columbia-taping-tools" and
- *     "parts-accessories-level5" without any brand-specific configuration.
+ *   • Name check: decodes HTML entities ("&amp;" → "&") then matches "parts".
+ *   • Slug check: prefix match catches WooCommerce slug de-duplication such as
+ *     "parts-2" while remaining aligned to the single canonical leaf.
  *
  * @param {Array<{id:number, name:string, slug:string}>} wcCategories
  * @returns {boolean}

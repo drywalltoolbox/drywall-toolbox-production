@@ -141,13 +141,8 @@ export const CATEGORY_MAP = {
   'spray tips & nozzles':  'texture',
   'hoses & fittings':      'texture',
   'cleaning accessories':  'texture',
-  // Parts — all "repair / replacement" leaf categories, brand-agnostic
+  // Parts — production catalog canonical leaf
   'parts':                 'parts',
-  'parts & accessories':   'parts',
-  'repair kits & parts':   'parts',
-  'pumps & parts':         'parts',
-  'replacement parts':     'parts',
-  'spare parts':           'parts',
   // Generic tool leaf (box fillers, adapters, misc accessories)
   'tools':                 'finishing',
 };
@@ -186,7 +181,7 @@ function extractBrandFromCategory(categoriesCell) {
 
 /**
  * Return true when the category leaf marks this product as a replacement
- * part / repair kit rather than a complete tool.
+ * part rather than a complete tool.
  * Exported so api.js can reuse this for REST API categories.
  *
  * @param {string} categoriesCell
@@ -196,12 +191,7 @@ export function isPartsRow(categoriesCell) {
   if (!categoriesCell) return false;
   const first = categoriesCell.split('|')[0].trim();
   const leaf  = first.split('>').pop().trim().toLowerCase();
-  return leaf === 'parts'              ||
-         leaf === 'parts & accessories' ||
-         leaf === 'repair kits & parts' ||
-         leaf === 'pumps & parts'       ||
-         leaf === 'replacement parts'   ||
-         leaf === 'spare parts';
+  return leaf === 'parts';
 }
 
 // ─── HTML → Markdown converter ───────────────────────────────────────────────

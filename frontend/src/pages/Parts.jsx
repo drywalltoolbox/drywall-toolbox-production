@@ -34,11 +34,12 @@ import { ProductSkeletonGrid } from '../components/ProductSkeletonCard';
 import SEOHead from '../components/SEOHead';
 import { buildBreadcrumbSchema } from '../utils/schema';
 
-// Brands that carry repair-kit / parts items in the catalog
+// Brands that carry parts in the production WooCommerce catalog
 const PARTS_BRANDS = [
   'TapeTech',
   'Columbia Taping Tools',
   'Asgard',
+  'Level 5',
   'Graco',
   'Platinum Drywall Tools',
   'Dura-Stilts',
@@ -50,6 +51,7 @@ const BRAND_TO_SLUG = {
   'TapeTech':              'tapetech',
   'Columbia Taping Tools': 'columbia-taping-tools',
   'Asgard':                'asgard',
+  'Level 5':               'level-5',
   'Graco':                 'graco',
   'Platinum Drywall Tools': 'platinum',
   'Dura-Stilts':           'dura-stilts',
@@ -60,23 +62,14 @@ const SLUG_TO_BRAND = Object.fromEntries(
 
 const ITEMS_PER_PAGE = 24;
 
-// Strict parts taxonomy guard:
-// only include products whose leaf categories are truly parts-oriented.
+// Strict production-catalog parts taxonomy guard:
+// only include products whose canonical leaf category is "Parts".
 const PARTS_LEAF_NAMES = new Set([
   'parts',
-  'parts & accessories',
-  'repair kits & parts',
-  'pumps & parts',
-  'replacement parts',
-  'spare parts',
 ]);
 
 const PARTS_SLUG_PREFIXES = [
-  'parts-accessories',
-  'repair-kits-parts',
-  'pumps-parts',
-  'replacement-parts',
-  'spare-parts',
+  'parts',
 ];
 
 function isStrictPartProduct(product) {

@@ -45,13 +45,15 @@ add_filter( 'http_request_args', function ( $args, $url ) {
 
 
 // ============================================================================
-// SECTION 2 — REST URL REWRITING (frontend only)
+// SECTION 2 — REST URL REWRITING
 //
 // Rewrites /wp/wp-json/ → /wp-json/ so the React SPA can call /wp-json/
-// from the domain root. The is_admin() guard is critical: without it,
-// WooCommerce Admin JS receives rewritten URLs that don't resolve, causing
-// the "Cannot read properties of undefined (reading 'title')" crash in
-// core-profiler.js.
+// from the domain root.
+//
+// In wp-admin, do the inverse when WordPress is installed in /wp/: force admin
+// REST URLs through site_url('/wp-json/...') so browser requests include the
+// WordPress auth cookies that may be scoped to /wp. Without this, Woo Admin can
+// repeatedly 403 on /wp-json/wp/v2/users/me, /wc-admin/*, and /wc-analytics/*.
 //
 // The rest_url_prefix filter is intentionally absent. Changing the prefix
 // corrupts wpApiSettings.root — the base URL injected into @wordpress/api-fetch
@@ -59,12 +61,31 @@ add_filter( 'http_request_args', function ( $args, $url ) {
 // resolves to the full settings group, returning ~22 kB that JS reads as a
 // single setting object and crashes.
 // ============================================================================
-add_filter( 'rest_url', function ( $url ) {
-	if ( is_admin() ) {
+add_filter( 'rest_url', function ( $url, $path, $blog_id, $scheme ) {
+	if ( is_admin() || ( function_exists( 'wp_doing_ajax' ) && wp_doing_ajax() ) ) {
+		return dtb_wc_admin_rest_url( $url );
+	}
+
+	return str_replace( '/wp/wp-json/', '/wp-json/', $url );
+}, 10, 4 );
+
+function dtb_wc_admin_rest_url( string $url ): string {
+	$home_path = wp_parse_url( home_url( '/' ), PHP_URL_PATH ) ?: '/';
+	$site_path = wp_parse_url( site_url( '/' ), PHP_URL_PATH ) ?: '/';
+
+	if ( untrailingslashit( $home_path ) === untrailingslashit( $site_path ) ) {
 		return $url;
 	}
-	return str_replace( '/wp/wp-json/', '/wp-json/', $url );
-} );
+
+	$home_rest = trailingslashit( home_url( 'wp-json' ) );
+	$site_rest = trailingslashit( site_url( 'wp-json' ) );
+
+	if ( str_starts_with( $url, $home_rest ) ) {
+		return $site_rest . ltrim( substr( $url, strlen( $home_rest ) ), '/' );
+	}
+
+	return $url;
+}
 
 
 // ============================================================================
