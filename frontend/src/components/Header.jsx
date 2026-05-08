@@ -224,7 +224,7 @@ export default function Header({ onCartToggle, hasTopTicker = false }) {
       <div className="site-header-inner">
   {/* Mobile Layout */}
   <div className="flex md:hidden items-center w-full header-mobile-layout" style={{ display: isTablet ? 'flex' : undefined }}>
-          {/* Left slot � fixed width so logo stays truly centered */}
+          {/* Left slot - fixed width so logo stays truly centered */}
           <div className="header-mobile-slot header-mobile-slot--left">
             <button 
               onClick={toggleMobileMenu}
@@ -240,7 +240,7 @@ export default function Header({ onCartToggle, hasTopTicker = false }) {
             <img src={LogoBlack} alt="Drywall Toolbox Logo" className="logo-image-mobile" />
           </Link>
 
-          {/* Right slot � fixed width matching left slot */}
+          {/* Right slot - fixed width matching left slot */}
           <div className="header-mobile-slot header-mobile-slot--right">
             <NotificationsBell />
             <button 
@@ -256,17 +256,17 @@ export default function Header({ onCartToggle, hasTopTicker = false }) {
           </div>
         </div>
 
-  {/* -- Desktop Layout � restructured: Logo Left | Nav Center | Actions Right -- */}
+  {/* -- Desktop Layout - restructured: Logo Left | Nav Center | Actions Right -- */}
   <div className="hidden md:contents header-desktop-layout" style={{ display: isTablet ? 'none' : undefined }}>
 
-          {/* Logo � Left */}
+          {/* Logo - Left */}
           <div className="header-left">
             <Link to="/" style={{ display: 'flex', alignItems: 'center' }}>
               <img src={LogoWhite} alt="Drywall Toolbox Logo" className="logo-image" />
             </Link>
           </div>
 
-          {/* Primary Nav � Center (all links combined) */}
+          {/* Primary Nav - Center (all links combined) */}
           <div className="header-center">
             <nav className="nav-links" aria-label="Primary">
               {/* Shop dropdown */}
@@ -357,7 +357,7 @@ export default function Header({ onCartToggle, hasTopTicker = false }) {
             </nav>
           </div>
 
-          {/* Actions � Right: Search + Account + Cart */}
+          {/* Actions - Right: Search + Account + Cart */}
           <div className="header-right">
 
             {/* Desktop search: expandable live-search input */}
@@ -660,13 +660,13 @@ export default function Header({ onCartToggle, hasTopTicker = false }) {
               FAQ
             </Link>
 
-            {/* -- Account / Auth � bottom of mobile menu ------------------- */}
+            {/* -- Account / Auth - bottom of mobile menu ------------------- */}
             <div className="mobile-nav-account">
               {!isLoading && (
                 isAuthenticated ? (
                   /* -- Logged-in -- */
                   <>
-                    {/* User identity card � clickable to go to dashboard */}
+                    {/* User identity card - clickable to go to dashboard */}
                     <Link
                       to="/dashboard"
                       onClick={closeMobileMenu}
@@ -728,7 +728,7 @@ export default function Header({ onCartToggle, hasTopTicker = false }) {
 
     </header>
 
-    {/* -- Free Shipping Bar � desktop only, positioned above the fixed header -- */}
+    {/* -- Free Shipping Bar - desktop only, positioned above the fixed header -- */}
     <div className="dtb-promo-bar" aria-label="Free shipping announcement">
       <div className="dtb-promo-bar-inner">
         <span>FREE SHIPPING ON ALL ORDERS $75+</span>

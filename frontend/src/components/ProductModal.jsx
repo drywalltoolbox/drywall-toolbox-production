@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { motion as Motion, AnimatePresence } from 'framer-motion';
 
@@ -34,6 +34,8 @@ const panelTransition = { duration: 0.24, ease: [0.22, 1, 0.36, 1] };
 export default function ProductModal({ isOpen, product, onClose, children }) {
   const scrollRef   = useRef(null);
   const openerRef   = useRef(null);  // element that triggered open
+  const scrollHideTimerRef = useRef(null);
+  const [isScrollActive, setIsScrollActive] = useState(false);
 
   // ── Remember caller focus so we can restore it on close ────────────────
   useEffect(() => {
@@ -64,6 +66,24 @@ export default function ProductModal({ isOpen, product, onClose, children }) {
       scrollRef.current.scrollTop = 0;
     }
   }, [product?.id, isOpen]);
+
+  useEffect(() => {
+    if (!isOpen) {
+      setIsScrollActive(false);
+      if (scrollHideTimerRef.current) {
+        clearTimeout(scrollHideTimerRef.current);
+        scrollHideTimerRef.current = null;
+      }
+    }
+  }, [isOpen]);
+
+  useEffect(() => {
+    return () => {
+      if (scrollHideTimerRef.current) {
+        clearTimeout(scrollHideTimerRef.current);
+      }
+    };
+  }, []);
 
   // ── Escape key — closes modal (but NOT when the lightbox handles it first) ─
   useEffect(() => {
@@ -103,8 +123,8 @@ export default function ProductModal({ isOpen, product, onClose, children }) {
           <Motion.div
             key="product-modal-panel"
             ref={scrollRef}
-            className="fixed left-0 right-0 bottom-0 overflow-y-auto overscroll-contain outline-none"
-            style={{ zIndex: 10002, top: 'var(--header-height, 100px)', willChange: 'transform, opacity' }}
+            className={`product-modal-scroll-shell fixed left-0 right-0 bottom-0 overflow-y-auto overscroll-contain outline-none${isScrollActive ? ' product-modal-scroll-shell--active' : ''}`}
+            style={{ zIndex: 10002, willChange: 'transform, opacity' }}
             role="dialog"
             aria-modal="true"
             aria-label={product?.name || 'Product detail'}
@@ -114,10 +134,17 @@ export default function ProductModal({ isOpen, product, onClose, children }) {
             animate="visible"
             exit="exit"
             transition={panelTransition}
+            onScroll={() => {
+              setIsScrollActive(true);
+              if (scrollHideTimerRef.current) clearTimeout(scrollHideTimerRef.current);
+              scrollHideTimerRef.current = setTimeout(() => {
+                setIsScrollActive(false);
+              }, 900);
+            }}
           >
             {/* Inner centering wrapper — click-outside backdrop */}
             <div
-              className="flex items-start justify-center min-h-full px-3 py-4 sm:p-4 sm:py-6"
+              className="product-modal-scroll-inner flex items-start justify-center min-h-full px-3 py-4 sm:p-4 sm:py-6"
               onClick={onClose}
             >
               {/* Card wrapper — stop propagation so clicks on card don't close */}
@@ -129,6 +156,49 @@ export default function ProductModal({ isOpen, product, onClose, children }) {
               </div>
             </div>
           </Motion.div>
+          <style>{`
+            .product-modal-scroll-shell {
+              top: var(--header-height, 100px);
+              scrollbar-width: none;
+              scrollbar-color: transparent transparent;
+            }
+            .product-modal-scroll-shell::-webkit-scrollbar {
+              width: 0;
+              background: transparent;
+            }
+            .product-modal-scroll-shell::-webkit-scrollbar-track {
+              background: transparent;
+            }
+            .product-modal-scroll-shell::-webkit-scrollbar-thumb {
+              background: transparent;
+              border-radius: 999px;
+            }
+            @media (min-width: 1025px) {
+              .product-modal-scroll-shell {
+                top: 0;
+                scrollbar-width: thin;
+                scrollbar-color: transparent transparent;
+              }
+              .product-modal-scroll-inner {
+                padding-top: 16px;
+                padding-bottom: 16px;
+              }
+              .product-modal-scroll-shell::-webkit-scrollbar {
+                width: 10px;
+              }
+              .product-modal-scroll-shell.product-modal-scroll-shell--active::-webkit-scrollbar-thumb {
+                background: rgba(148, 163, 184, 0.28);
+                border: 2px solid transparent;
+                background-clip: padding-box;
+              }
+              .product-modal-scroll-shell.product-modal-scroll-shell--active::-webkit-scrollbar-track {
+                background: transparent;
+              }
+              .product-modal-scroll-shell.product-modal-scroll-shell--active {
+                scrollbar-color: rgba(148, 163, 184, 0.28) transparent;
+              }
+            }
+          `}</style>
         </>
       )}
     </AnimatePresence>,

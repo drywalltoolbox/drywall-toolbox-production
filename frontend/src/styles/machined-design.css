@@ -3311,6 +3311,15 @@ aside input[type="range"],
     cursor: pointer;
 }
 
+.dtb-trending-card-wrap > .dtb-plp-card {
+    width: 100%;
+    min-width: 0;
+}
+
+.dtb-trending-card-wrap > .dtb-plp-card .dtb-plp-card__img-wrap {
+    aspect-ratio: 1;
+}
+
 .dtb-trending-card {
     background: white;
     border: 1.5px solid rgba(37, 99, 235, 0.25);

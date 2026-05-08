@@ -1,14 +1,13 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { Link } from 'react-router-dom';
 import { getProducts } from '../services/catalog';
 import { getProductVariations } from '../services/api';
-import { ShoppingCart, ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import Toast from './Toast';
 import ProductDetail from './ProductDetail';
 import ProductModal from './ProductModal';
 import LoadingSpinner from './LoadingSpinner';
-import ProductCardImage from './ProductCardImage';
+import ProductShoppingCard from './ui/ProductShoppingCard';
 import { fetchVariationsBatched } from '../utils/variationSelection';
 
 export default function TrendingProducts() {
@@ -206,57 +205,19 @@ export default function TrendingProducts() {
           ref={scrollContainerRef}
           className="dtb-trending-scroll"
         >
-          {products.map((product) => (
+          {products.map((product, index) => (
             <div
-              key={product.sku}
-              onClick={() => openModal(product)}
+              key={product.sku || product.id}
               className="dtb-trending-card-wrap"
             >
-              <div className="dtb-trending-card">
-                {/* Product Image */}
-                <div className="dtb-trending-card-img">
-                  <ProductCardImage
-                    src={product.image}
-                    alt={product.name}
-                    padding="10px"
-                  />
-                </div>
-
-                {/* Product Info */}
-                <div className="dtb-trending-card-body">
-                  {/* Brand */}
-                  <div className="dtb-trending-card-brand">{product.brand}</div>
-
-                  {/* Name */}
-                  <h3 className="dtb-trending-card-name">{product.name}</h3>
-
-                  {/* SKU & UPC */}
-                  {product.sku && (
-                    <div className="dtb-trending-card-meta">
-                      <span style={{ fontWeight: 600 }}>SKU:</span> {product.sku}
-                    </div>
-                  )}
-                  {product.upc && (
-                    <div className="dtb-trending-card-meta">
-                      <span style={{ fontWeight: 600 }}>UPC:</span> {product.upc}
-                    </div>
-                  )}
-
-                  {/* Price row */}
-                  <div className="dtb-trending-card-footer">
-                    <span className="dtb-trending-card-price">
-                        ${
-                          (() => {
-                            const value = typeof product.price === 'number'
-                              ? product.price
-                              : parseFloat(product.price || 0);
-                            return (Number.isFinite(value) ? value : 0).toFixed(2);
-                          })()
-                        }
-                      </span>
-                  </div>
-                </div>
-              </div>
+              <ProductShoppingCard
+                product={product}
+                cardProduct={product}
+                hasSelectedVariation={false}
+                onOpenModal={() => openModal(product)}
+                onAddToCart={() => handleAddToCart(product)}
+                index={index}
+              />
             </div>
           ))}
         </div>

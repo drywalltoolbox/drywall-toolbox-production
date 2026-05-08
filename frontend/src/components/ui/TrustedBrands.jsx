@@ -28,6 +28,7 @@ function BrandLogo({ brand }) {
     <Link
       to={brand.to}
       aria-label={brand.name}
+      className="dtb-trusted-brand-link"
       style={{
         textDecoration: 'none',
         display: 'flex',
@@ -128,6 +129,15 @@ export default function TrustedBrands({ brands = [], title = 'Trusted Brands', s
         }
         .dtb-brands-track:hover {
           animation-play-state: paused;
+        }
+        @media (min-width: 1025px) {
+          .dtb-trusted-brand-link {
+            padding: 0 clamp(30px, 5vw, 64px) !important;
+            min-width: clamp(160px, 15vw, 240px);
+          }
+          .dtb-brands-track {
+            padding: 0 clamp(16px, 3vw, 32px);
+          }
         }
       `}</style>
     </section>

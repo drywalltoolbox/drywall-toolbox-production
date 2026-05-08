@@ -280,7 +280,7 @@ export default function ProductDetail({
       )}
 
       {/* Scrollable Content */}
-      <div className="overflow-y-auto overflow-x-hidden custom-scrollbar">
+      <div className="overflow-x-hidden">
         <div className="p-4 sm:p-6 md:p-8 lg:p-12 max-w-full">
           {/* Top Section — Image left, details right */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 md:gap-8 mb-6 sm:mb-8">
@@ -595,21 +595,6 @@ export default function ProductDetail({
         </div>
       </div>
 
-      {/* Custom Scrollbar Styles */}
-      <style>{`
-        .custom-scrollbar {
-          scrollbar-width: thin;
-          scrollbar-color: rgba(156, 163, 175, 0.3) transparent;
-        }
-        .custom-scrollbar::-webkit-scrollbar { width: 8px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-          background-color: rgba(156, 163, 175, 0.3);
-          border-radius: 10px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background-color: rgba(156, 163, 175, 0.5); }
-        .custom-scrollbar::-webkit-scrollbar-thumb:active { background-color: rgba(156, 163, 175, 0.7); }
-      `}</style>
     </div>
   );
 }
