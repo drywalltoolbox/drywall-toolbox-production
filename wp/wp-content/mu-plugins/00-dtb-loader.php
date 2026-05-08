@@ -19,7 +19,10 @@
  *   dtb-auth.php           — JWT generation / verification / REST auth routes
  *   dtb-cache.php          — transient cache helpers and diagnostic route
  *   dtb-cache-admin.php    — wp-admin cache management page
- *   dtb-rest-api.php       — WC proxy + site-management REST routes + CORS
+ *   dtb-rest-api.php       — WC proxy + site-management REST routes
+ *   dtb-api-security.php   — REST/CORS policy, public WC read, nonce refresh
+ *   dtb-frontend-security.php — frontend headers and public hardening
+ *   dtb-admin-security.php — wp-admin/Woo Admin diagnostics and compatibility
  *   dtb-rewards.php        — WPLoyalty REST bridge (dtb/v1/rewards/* endpoints)
  *   dtb-image-sync.php     — media-library sync for uploads/YYYY/MM/ images
  *   dtb-woocommerce.php    — WC configuration and webhook auto-creation
@@ -33,6 +36,58 @@
  */
 
 defined( 'ABSPATH' ) || exit;
+
+/**
+ * Central feature-flag helper for production-safe hardening rollouts.
+ *
+ * Define a constant as true/false to override, or filter
+ * dtb_feature_enabled_{CONSTANT_NAME} from plugins/tests.
+ */
+function dtb_feature_enabled( string $constant_name, bool $default = true ): bool {
+	if ( defined( $constant_name ) ) {
+		return filter_var( constant( $constant_name ), FILTER_VALIDATE_BOOLEAN );
+	}
+
+	return (bool) apply_filters( 'dtb_feature_enabled_' . $constant_name, $default );
+}
+
+/**
+ * Structured, redacted security logging for denied origins/permissions.
+ */
+function dtb_security_log( string $event, array $context = [] ): void {
+	if ( ! dtb_feature_enabled( 'DTB_SECURITY_LOGGING', true ) ) {
+		return;
+	}
+
+	$safe_context = [];
+
+	foreach ( $context as $key => $value ) {
+		if ( is_scalar( $value ) || null === $value ) {
+			$safe_context[ sanitize_key( (string) $key ) ] = is_bool( $value )
+				? $value
+				: sanitize_text_field( (string) $value );
+		}
+	}
+
+	$safe_context += [
+		'user_id' => function_exists( 'get_current_user_id' ) ? (int) get_current_user_id() : 0,
+		'method'  => isset( $_SERVER['REQUEST_METHOD'] ) ? sanitize_text_field( (string) wp_unslash( $_SERVER['REQUEST_METHOD'] ) ) : '',
+		'uri'     => isset( $_SERVER['REQUEST_URI'] ) ? esc_url_raw( (string) wp_unslash( $_SERVER['REQUEST_URI'] ) ) : '',
+		'origin'  => isset( $_SERVER['HTTP_ORIGIN'] ) ? esc_url_raw( (string) wp_unslash( $_SERVER['HTTP_ORIGIN'] ) ) : '',
+		'ip'      => isset( $_SERVER['REMOTE_ADDR'] ) ? sanitize_text_field( (string) wp_unslash( $_SERVER['REMOTE_ADDR'] ) ) : '',
+	];
+
+	error_log(
+		wp_json_encode(
+			[
+				'source'  => 'dtb-security',
+				'event'   => sanitize_key( $event ),
+				'context' => $safe_context,
+			],
+			JSON_UNESCAPED_SLASHES
+		)
+	);
+}
 
 /**
  * Return the list of CORS-allowed origins for the Drywall Toolbox SPA.
@@ -97,7 +152,13 @@ function dtb_check_origin(): bool {
 		return true; // no Origin → not a cross-origin browser request
 	}
 
-	return in_array( rtrim( $raw_origin, '/' ), dtb_allowed_origins(), true );
+	$allowed = in_array( rtrim( $raw_origin, '/' ), dtb_allowed_origins(), true );
+
+	if ( ! $allowed ) {
+		dtb_security_log( 'origin_denied', [ 'denied_origin' => $raw_origin ] );
+	}
+
+	return $allowed;
 }
 
 // ─── Explicit load order ──────────────────────────────────────────────────────
@@ -137,6 +198,9 @@ _dtb_require( $_dtb_dir . '/dtb-auth.php' );
 _dtb_require( $_dtb_dir . '/dtb-cache.php' );
 _dtb_require( $_dtb_dir . '/dtb-cache-admin.php' );
 _dtb_require( $_dtb_dir . '/dtb-rest-api.php' );
+_dtb_require( $_dtb_dir . '/dtb-api-security.php' );
+_dtb_require( $_dtb_dir . '/dtb-frontend-security.php' );
+_dtb_require( $_dtb_dir . '/dtb-admin-security.php' );
 _dtb_require( $_dtb_dir . '/dtb-rewards.php' );       // WPLoyalty REST bridge (loads after dtb-auth)
 _dtb_require( $_dtb_dir . '/dtb-membership.php' );    // ProCare membership tiers & REST endpoints
 _dtb_require( $_dtb_dir . '/dtb-image-sync.php' );    // media-library sync for uploads/YYYY/MM/ images

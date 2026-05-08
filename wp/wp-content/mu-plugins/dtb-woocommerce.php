@@ -23,10 +23,23 @@ defined( 'ABSPATH' ) || exit;
 // depends on synchronous responses.
 // ============================================================================
 add_filter( 'http_request_args', function ( $args, $url ) {
-	if ( str_starts_with( $url, home_url() ) ) {
-		$args['sslverify'] = false;
-		$args['timeout']   = 30; // 30s — HostGator shared hosting is slow under load.
+	$request_host = wp_parse_url( $url, PHP_URL_HOST );
+	$site_host    = wp_parse_url( home_url(), PHP_URL_HOST );
+	$request_path = (string) wp_parse_url( $url, PHP_URL_PATH );
+	$is_loopback  = $request_host && $site_host && strtolower( $request_host ) === strtolower( $site_host );
+	$is_wp_target = str_starts_with( $request_path, '/wp-json/' )
+		|| str_starts_with( $request_path, '/wp/wp-json/' )
+		|| str_ends_with( $request_path, '/wp-admin/admin-ajax.php' )
+		|| str_ends_with( $request_path, '/wp-cron.php' );
+
+	if ( $is_loopback && $is_wp_target ) {
+		if ( dtb_feature_enabled( 'DTB_RELAX_LOOPBACK_SSLVERIFY', true ) ) {
+			$args['sslverify'] = false;
+		}
+
+		$args['timeout'] = max( (int) ( $args['timeout'] ?? 5 ), 30 ); // HostGator shared hosting is slow under load.
 	}
+
 	return $args;
 }, 10, 2 );
 

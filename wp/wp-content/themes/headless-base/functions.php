@@ -11,15 +11,14 @@
  *  1. Theme feature registration (WooCommerce, menus, image sizes).
  *  2. Block all frontend PHP template rendering.
  *  3. Strip all unnecessary WordPress head output.
- *  4. Security hardening (XML-RPC, author enumeration, user endpoint, headers).
- *  5. CORS for cross-origin REST API access.
- *  6. REST API configuration, caching headers, and index filtering.
- *  7. Custom REST endpoint: navigation menus.
- *  8. Custom REST endpoint: site settings / bootstrap data.
- *  9. Featured image enrichment on post/page/product REST responses.
- * 10. WooCommerce product field enrichment (gallery, availability, pricing).
- * 11. WooCommerce public read-access for product endpoints.
- * 12. WordPress performance tuning for headless context.
+ *  4. REST API configuration, caching headers, and index filtering.
+ *  5. Custom REST endpoint: navigation menus.
+ *  6. Custom REST endpoint: site settings / bootstrap data.
+ *  7. Featured image enrichment on post/page/product REST responses.
+ *  8. WooCommerce product field enrichment (gallery, availability, pricing).
+ *
+ * Cross-cutting security, CORS, Woo public read, admin compatibility, and
+ * performance policy lives in mu-plugins so theme swaps are production-safe.
  *
  * @package headless-base
  * @version 2.0.0
@@ -161,136 +160,8 @@ function hb_clean_head(): void {
 }
 
 
-// =============================================================================
-// 4. SECURITY HARDENING
-// =============================================================================
-
-// Disable XML-RPC entirely — no legitimate use in a headless setup.
-add_filter( 'xmlrpc_enabled',  '__return_false' );
-add_filter( 'xmlrpc_methods',  fn() => [] );
-add_action( 'xmlrpc_call',     fn() => wp_die( 'XML-RPC is disabled.', '', [ 'response' => 403 ] ) );
-
-// Remove X-Pingback header — leaks WordPress presence.
-add_filter( 'wp_headers', 'hb_strip_unsafe_headers' );
-function hb_strip_unsafe_headers( array $headers ): array {
-	unset( $headers['X-Pingback'] );
-	unset( $headers['X-Powered-By'] );
-	return $headers;
-}
-
-// Hide wp-admin bar on any frontend request that escapes template blocking.
-add_filter( 'show_admin_bar', '__return_false' );
-
-// Prevent author enumeration via /?author=N URL parameter.
-add_action( 'template_redirect', 'hb_block_author_enumeration' );
-function hb_block_author_enumeration(): void {
-	if ( isset( $_GET['author'] ) || is_author() ) {
-		wp_redirect( home_url( '/' ), 301 );
-		exit;
-	}
-}
-
-// Restrict the /wp/v2/users endpoint — prevents username harvesting.
-add_filter( 'rest_endpoints', 'hb_restrict_user_endpoints' );
-function hb_restrict_user_endpoints( array $endpoints ): array {
-	$restricted = [
-		'/wp/v2/users',
-		'/wp/v2/users/(?P<id>[\d]+)',
-	];
-	foreach ( $restricted as $route ) {
-		if ( ! isset( $endpoints[ $route ] ) ) {
-			continue;
-		}
-		foreach ( $endpoints[ $route ] as $index => $handler ) {
-			if ( isset( $handler['methods'] ) ) {
-				$endpoints[ $route ][ $index ]['permission_callback'] = fn() => current_user_can( 'list_users' );
-			}
-		}
-	}
-	return $endpoints;
-}
-
-// Disable file editing from wp-admin (defence-in-depth; also set in wp-config.php).
-if ( ! defined( 'DISALLOW_FILE_EDIT' ) ) {
-	define( 'DISALLOW_FILE_EDIT', true );
-}
-
-// Security headers on all non-admin responses.
-add_action( 'send_headers', 'hb_security_headers' );
-function hb_security_headers(): void {
-	if ( is_admin() ) {
-		return;
-	}
-	header( 'X-Content-Type-Options: nosniff' );
-	header( 'X-Frame-Options: SAMEORIGIN' );
-	header( 'Referrer-Policy: strict-origin-when-cross-origin' );
-	header( 'Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=()' );
-	// X-XSS-Protection is deprecated in modern browsers but harmless for older ones.
-	header( 'X-XSS-Protection: 1; mode=block' );
-}
-
-
-// =============================================================================
-// 5. CORS — Cross-Origin Resource Sharing
-// Allows the React SPA to call WordPress REST API endpoints. Restricted to
-// known production and development origins — never a wildcard.
-//
-// To add staging or preview URLs, append them to $allowed_origins below.
-// =============================================================================
-
-add_action( 'rest_api_init', 'hb_register_cors', 15 );
-
-function hb_register_cors(): void {
-	// Remove WordPress default CORS handler — we replace it entirely.
-	remove_filter( 'rest_pre_serve_request', 'rest_send_cors_headers' );
-	add_filter( 'rest_pre_serve_request', 'hb_send_cors_headers' );
-}
-
-/**
- * Emit CORS headers scoped to an explicit origin allowlist.
- *
- * @param mixed $served Whether the request has already been served.
- * @return mixed        Unchanged $served value (we only add headers).
- */
-function hb_send_cors_headers( mixed $served ): mixed {
-	$allowed_origins = array_map(
-		'rtrim',
-		[
-			home_url(),
-			'https://drywalltoolbox.com',
-			'https://www.drywalltoolbox.com',
-			'https://elliotttmiller.github.io',
-			'http://localhost:3000',   // CRA dev server.
-			'http://localhost:5173',   // Vite dev server.
-			'http://127.0.0.1:5173',
-			// 'https://staging.drywalltoolbox.com', // Uncomment for staging.
-		],
-		array_fill( 0, 7, '/' )
-	);
-
-	$raw_origin = isset( $_SERVER['HTTP_ORIGIN'] )
-		? rtrim( wp_unslash( $_SERVER['HTTP_ORIGIN'] ), '/' )
-		: '';
-
-	$origin_to_send = in_array( $raw_origin, $allowed_origins, true )
-		? $raw_origin
-		: 'https://drywalltoolbox.com'; // Safe fallback for same-origin requests.
-
-	header( 'Access-Control-Allow-Origin: '      . esc_url_raw( $origin_to_send ) );
-	header( 'Access-Control-Allow-Methods: GET, POST, PUT, PATCH, DELETE, OPTIONS' );
-	header( 'Access-Control-Allow-Credentials: true' );
-	header( 'Access-Control-Allow-Headers: Authorization, Content-Type, X-WP-Nonce, X-Requested-With' );
-	header( 'Access-Control-Max-Age: 600' );
-	header( 'Vary: Origin' );
-
-	// Respond to preflight OPTIONS requests immediately and exit.
-	if ( 'OPTIONS' === ( $_SERVER['REQUEST_METHOD'] ?? '' ) ) {
-		status_header( 204 );
-		exit;
-	}
-
-	return $served;
-}
+// Theme policy is intentionally thin: security/CORS/admin compatibility lives
+// in mu-plugins so theme swaps do not change production hardening behavior.
 
 
 // =============================================================================
@@ -792,61 +663,5 @@ function hb_get_product_meta( array $post ): array {
 }
 
 
-// =============================================================================
-// 11. WOOCOMMERCE: PUBLIC READ ACCESS
-// Allow unauthenticated GET requests to product, category, tag, and attribute
-// endpoints. All write operations (create/update/delete) remain authenticated.
-// =============================================================================
-
-add_filter( 'woocommerce_rest_check_permissions', 'hb_wc_rest_public_read', 10, 4 );
-function hb_wc_rest_public_read(
-	bool   $permission,
-	string $context,
-	int    $object_id,
-	string $post_type
-): bool {
-	$public_types = [ 'product', 'product_cat', 'product_tag', 'product_attribute', 'product_variation' ];
-	if ( 'read' === $context && in_array( $post_type, $public_types, true ) ) {
-		return true;
-	}
-	return $permission;
-}
-
-
-// =============================================================================
-// 12. WORDPRESS PERFORMANCE TUNING FOR HEADLESS CONTEXT
-// Disable features that add overhead but serve no purpose without a frontend.
-// =============================================================================
-
-// Disable oEmbed provider — React handles its own embed rendering.
-add_filter( 'embed_oembed_discover',    '__return_false' );
-remove_action( 'rest_api_init',         'wp_oembed_register_route' );
-remove_filter( 'oembed_dataparse',      'wp_filter_oembed_result' );
-remove_action( 'wp_head',              'wp_oembed_add_discovery_links' );
-remove_action( 'wp_head',              'wp_oembed_add_host_js' );
-
-// Disable heartbeat API on non-admin pages — frees server resources.
-add_action( 'init', 'hb_disable_heartbeat', 1 );
-function hb_disable_heartbeat(): void {
-	if ( ! is_admin() ) {
-		wp_deregister_script( 'heartbeat' );
-	}
-}
-
-// Disable application passwords UI if not needed — reduces attack surface.
-// Comment out if you use Application Passwords for REST authentication.
-// add_filter( 'wp_is_application_passwords_available', '__return_false' );
-
-// Limit post revisions to reduce database bloat.
-if ( ! defined( 'WP_POST_REVISIONS' ) ) {
-	define( 'WP_POST_REVISIONS', 5 );
-}
-
-// Reduce autosave interval to every 5 minutes (default is 60 seconds).
-if ( ! defined( 'AUTOSAVE_INTERVAL' ) ) {
-	define( 'AUTOSAVE_INTERVAL', 300 );
-}
-
-// Disable WooCommerce marketing hub and suggestions — not needed in production.
-add_filter( 'woocommerce_allow_marketplace_suggestions', '__return_false' );
-add_filter( 'woocommerce_show_admin_notice',             '__return_false' );
+// Theme-specific REST shape/enrichment stays here. Cross-cutting Woo public read,
+// admin notice policy, oEmbed, heartbeat, revisions, and autosave live in mu-plugins.

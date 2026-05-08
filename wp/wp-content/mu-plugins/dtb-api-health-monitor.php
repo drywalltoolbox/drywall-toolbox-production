@@ -235,6 +235,25 @@ function dtb_ajax_run_health_checks() {
 		];
 	}
 
+	if ( function_exists( 'dtb_admin_security_smoke_results' ) ) {
+		foreach ( dtb_admin_security_smoke_results() as $smoke ) {
+			$results[] = [
+				'label'        => $smoke['label'],
+				'url'          => rest_url( ltrim( $smoke['route'], '/' ) ),
+				'method'       => 'GET',
+				'group'        => 'Woo Admin',
+				'status'       => (int) $smoke['status'],
+				'expects'      => [ 200 ],
+				'time_ms'      => null,
+				'error'        => null,
+				'pass'         => (bool) $smoke['ok'],
+				'cors'         => null,
+				'note'         => 'Internal admin compatibility smoke check.',
+				'body_preview' => '',
+			];
+		}
+	}
+
 	wp_send_json_success( [
 		'results'    => $results,
 		'checked_at' => current_time( 'mysql' ),
