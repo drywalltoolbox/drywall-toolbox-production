@@ -14,7 +14,7 @@ import LogoWhite from '/logo-white.svg';
 const FOOTER_LINK_STYLE = {
   textDecoration: 'none',
   fontSize: '0.875rem',
-  color: 'rgba(255,255,255,0.55)',
+  color: 'rgba(255,255,255,0.90)',
   transition: 'color 0.18s',
   display: 'flex',
   alignItems: 'center',
@@ -28,7 +28,7 @@ function FooterLink({ to, children }) {
       to={to}
       style={{
         ...FOOTER_LINK_STYLE,
-        color: hovered ? '#93c5fd' : 'rgba(255,255,255,0.55)',
+        color: hovered ? '#93c5fd' : 'rgba(255,255,255,0.90)',
       }}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
@@ -87,7 +87,7 @@ export default function Footer() {
           <Link to="/" style={{ display: 'inline-block' }}>
             <img src={LogoWhite} alt="Drywall Toolbox" className="footer-logo" style={{ display: 'block' }} />
           </Link>
-          <p style={{ fontSize: '0.78rem', color: 'rgba(255,255,255,0.4)', lineHeight: 1.6, textAlign: 'center', maxWidth: '180px', margin: 0 }}>
+          <p style={{ fontSize: '0.78rem', color: 'rgba(255,255,255,0.70)', lineHeight: 1.6, textAlign: 'center', maxWidth: '180px', margin: 0 }}>
             Professional drywall tools &amp; expert support.
           </p>
           {/* Social links */}
@@ -111,7 +111,7 @@ export default function Footer() {
                   borderRadius: '8px',
                   background: 'rgba(255,255,255,0.07)',
                   border: '1px solid rgba(255,255,255,0.1)',
-                  color: 'rgba(255,255,255,0.55)',
+                  color: '#ffffff',
                   textDecoration: 'none',
                 }}
               >
@@ -123,16 +123,16 @@ export default function Footer() {
 
         {/* Shop column */}
         <div className="footer-col" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px' }}>
-          <h5 style={{ display: 'none', textTransform: 'uppercase', fontSize: '0.67rem', letterSpacing: '0.12em', margin: '0 0 16px 0', fontWeight: 800, color: 'rgba(255,255,255,0.35)' }}>
+          <h5 style={{ display: 'none', textTransform: 'uppercase', fontSize: '0.67rem', letterSpacing: '0.12em', margin: '0 0 16px 0', fontWeight: 800, color: '#ffffff' }}>
             Shop
           </h5>
           <button
             onClick={() => toggleMobileSection('shop')}
             className="footer-header-mobile"
-            style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', padding: 0, textTransform: 'uppercase', fontSize: '0.67rem', letterSpacing: '0.12em', fontWeight: 800, color: 'rgba(255,255,255,0.35)', width: '100%' }}
+            style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', padding: 0, textTransform: 'uppercase', fontSize: '0.67rem', letterSpacing: '0.12em', fontWeight: 800, color: '#ffffff', width: '100%' }}
           >
             Shop
-            <ChevronDown size={14} style={{ transition: 'transform 0.25s', transform: expandedMobile === 'shop' ? 'rotate(180deg)' : 'rotate(0deg)', color: 'rgba(255,255,255,0.35)' }} />
+            <ChevronDown size={14} style={{ transition: 'transform 0.25s', transform: expandedMobile === 'shop' ? 'rotate(180deg)' : 'rotate(0deg)', color: '#ffffff' }} />
           </button>
           <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: expandedMobile === 'shop' ? 'flex' : 'none', flexDirection: 'column', gap: '10px', alignItems: 'center' }} className="footer-list-shop">
             {[
@@ -149,16 +149,16 @@ export default function Footer() {
 
         {/* Support column */}
         <div className="footer-col" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px' }}>
-          <h5 style={{ display: 'none', textTransform: 'uppercase', fontSize: '0.67rem', letterSpacing: '0.12em', margin: '0 0 16px 0', fontWeight: 800, color: 'rgba(255,255,255,0.35)' }}>
+          <h5 style={{ display: 'none', textTransform: 'uppercase', fontSize: '0.67rem', letterSpacing: '0.12em', margin: '0 0 16px 0', fontWeight: 800, color: '#ffffff' }}>
             Support
           </h5>
           <button
             onClick={() => toggleMobileSection('support')}
             className="footer-header-mobile"
-            style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', padding: 0, textTransform: 'uppercase', fontSize: '0.67rem', letterSpacing: '0.12em', fontWeight: 800, color: 'rgba(255,255,255,0.35)', width: '100%' }}
+            style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', padding: 0, textTransform: 'uppercase', fontSize: '0.67rem', letterSpacing: '0.12em', fontWeight: 800, color: '#ffffff', width: '100%' }}
           >
             Support
-            <ChevronDown size={14} style={{ transition: 'transform 0.25s', transform: expandedMobile === 'support' ? 'rotate(180deg)' : 'rotate(0deg)', color: 'rgba(255,255,255,0.35)' }} />
+            <ChevronDown size={14} style={{ transition: 'transform 0.25s', transform: expandedMobile === 'support' ? 'rotate(180deg)' : 'rotate(0deg)', color: '#ffffff' }} />
           </button>
           <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: expandedMobile === 'support' ? 'flex' : 'none', flexDirection: 'column', gap: '10px', alignItems: 'center' }} className="footer-list-support">
             {[
@@ -175,7 +175,7 @@ export default function Footer() {
 
         {/* Contact column — desktop only */}
         <div className="dtb-footer-contact-col" style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-          <h5 style={{ textTransform: 'uppercase', fontSize: '0.67rem', letterSpacing: '0.12em', margin: '0 0 6px 0', fontWeight: 800, color: 'rgba(255,255,255,0.35)' }}>
+          <h5 style={{ textTransform: 'uppercase', fontSize: '0.67rem', letterSpacing: '0.12em', margin: '0 0 6px 0', fontWeight: 800, color: '#ffffff' }}>
             Contact &amp; Support
           </h5>
           {[
@@ -185,8 +185,8 @@ export default function Footer() {
             { Icon: MapPin, to: '/repairs', text: 'Tool Repair Services' },
           ].map(({ Icon, href, to, text }) => {
             const inner = (
-              <span style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.82rem', color: 'rgba(255,255,255,0.5)', transition: 'color 0.18s' }}>
-                <Icon size={13} style={{ flexShrink: 0, color: 'rgba(255,255,255,0.35)' }} />
+              <span style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.82rem', color: 'rgba(255,255,255,0.85)', transition: 'color 0.18s' }}>
+                <Icon size={13} style={{ flexShrink: 0, color: 'rgba(255,255,255,0.65)' }} />
                 {text}
               </span>
             );
@@ -223,7 +223,7 @@ export default function Footer() {
         gap: '10px',
         textAlign: 'center',
       }}>
-        <p style={{ fontSize: '0.775rem', color: 'rgba(255,255,255,0.25)', margin: 0, fontWeight: 500 }}>
+        <p style={{ fontSize: '0.775rem', color: 'rgba(255,255,255,0.60)', margin: 0, fontWeight: 500 }}>
           © 2026 Drywall Toolbox. All rights reserved.
         </p>
         <div style={{ display: 'flex', gap: '16px', justifyContent: 'center', flexWrap: 'wrap' }}>
@@ -231,9 +231,9 @@ export default function Footer() {
             <Link
               key={item}
               to="#"
-              style={{ fontSize: '0.775rem', color: 'rgba(255,255,255,0.25)', textDecoration: 'none', transition: 'color 0.18s' }}
+              style={{ fontSize: '0.775rem', color: 'rgba(255,255,255,0.60)', textDecoration: 'none', transition: 'color 0.18s' }}
               onMouseEnter={(e) => { e.currentTarget.style.color = '#93c5fd'; }}
-              onMouseLeave={(e) => { e.currentTarget.style.color = 'rgba(255,255,255,0.25)'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.color = 'rgba(255,255,255,0.60)'; }}
             >
               {item}
             </Link>

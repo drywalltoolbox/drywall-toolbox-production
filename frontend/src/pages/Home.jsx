@@ -111,11 +111,6 @@ export default function Home() {
           className="dtb-home-desktop-hero"
           title={<>The Pros&apos; One-Stop Shop for Drywall Tools.</>}
           subtitle="Production-grade taping, finishing, and sanding equipment from the industry's most trusted brands at unbeatable prices with lightning-fast shipping."
-          stats={[
-            { value: '$75+', label: 'Free Shipping' },
-            { value: 'Fast', label: 'Repair Turnaround' },
-            { value: 'Real', label: 'Expert Support' },
-          ]}
         />
       </div>
 

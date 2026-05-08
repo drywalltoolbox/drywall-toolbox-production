@@ -949,6 +949,19 @@ aside input[type="range"],
 
 /* --- SITE HEADER --- */
 
+/* Keyframe: animated blue mesh wave effect */
+@keyframes dtb-mesh-wave {
+    0% {
+        background-position: 0% 0%, 0% 0%;
+    }
+    50% {
+        background-position: 100% 100%, -100% -100%;
+    }
+    100% {
+        background-position: 0% 0%, 0% 0%;
+    }
+}
+
 /* Keyframe: slow gradient flow for the header shimmer effect */
 @keyframes dtb-header-flow {
     0%   { background-position: 0% 50%; }
@@ -962,25 +975,31 @@ aside input[type="range"],
     left: 0;
     right: 0;
     width: 100%;
-    min-height: clamp(56px, 8vw, 100px);
-    background: linear-gradient(135deg,
-        #02060f 0%,
-        #050d20 15%,
-        #091830 30%,
-        #0d2258 50%,
-        #091830 70%,
-        #050d20 85%,
-        #02060f 100%
-    );
-    background-size: 400% 400%;
-    animation: dtb-header-flow 22s ease infinite;
-    border-bottom: 1px solid rgba(255,255,255,0.12);
+    min-height: 56px;
+    background: 
+        radial-gradient(ellipse 90% 150% at 15% -30%, rgba(59, 130, 246, 0.5) 0%, transparent 40%),
+        radial-gradient(ellipse 120% 100% at 85% 150%, rgba(37, 99, 235, 0.35) 0%, transparent 50%),
+        radial-gradient(ellipse 100% 80% at 50% 50%, rgba(59, 130, 246, 0.2) 0%, transparent 60%),
+        linear-gradient(135deg, #0a0e27 0%, #0f1535 20%, #0a1130 40%, #050a1f 60%, #020408 100%);
+    background-size: 300% 300%, 300% 300%, 300% 300%, 100% 100%;
+    animation: dtb-mesh-wave 18s ease-in-out infinite;
+    border-bottom: 1px solid rgba(59, 130, 246, 0.15);
     box-shadow:
-        inset 0 1px 0 rgba(255,255,255,0.08),
-        0 4px 24px rgba(0,0,0,0.4);
+        inset 0 1px 0 rgba(255,255,255,0.04),
+        inset 0 0 40px rgba(59, 130, 246, 0.08),
+        0 4px 24px rgba(0,0,0,0.5);
     z-index: 9999;
     overflow: visible;
-    padding: 0.4rem 0;
+    padding: 0.75rem 0;
+    display: flex;
+    align-items: center;
+}
+
+@media (min-width: 1025px) {
+    .site-header {
+        min-height: 100px;
+        padding: 1.5rem 0;
+    }
 }
 
 .site-header.site-header--with-top-ticker {
@@ -989,7 +1008,7 @@ aside input[type="range"],
 
 @media (min-width: 1025px) {
     .site-header.site-header--with-top-ticker {
-        top: 38px;
+        top: 22px;
     }
 }
 
@@ -998,8 +1017,7 @@ aside input[type="range"],
     max-width: 1400px;
     margin: 0 auto;
     width: 100%;
-    height: auto;
-    min-height: 100%;
+    height: 100%;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -1045,7 +1063,7 @@ aside input[type="range"],
 
 .header-mobile-shop-toggle {
     width: 100%;
-    display: flex;
+    display: flex !important;
     align-items: center;
     justify-content: space-between;
     text-align: left;
@@ -1481,6 +1499,23 @@ aside input[type="range"],
 
     .header-mobile-layout {
         display: none !important;
+    }
+}
+
+@media (min-width: 1025px) {
+    .site-header-inner {
+        gap: 32px;
+    }
+    
+    .header-desktop-layout {
+        gap: 32px;
+        min-height: 100%;
+        align-items: center;
+    }
+    
+    .header-left,
+    .header-right {
+        gap: 20px;
     }
 }
 
@@ -2180,8 +2215,8 @@ aside input[type="range"],
     }
 
     .site-footer a:hover {
-        color: var(--primary-600);
-        text-decoration: underline;
+        color: #93c5fd;
+        text-decoration: none;
     }
 
     /* Footer input sizing */
@@ -2339,17 +2374,20 @@ aside input[type="range"],
     }
 }
 
-/* Footer social media links - static dark blue color, no hover effects */
+/* Footer links — white text to match the dark gradient background */
 .site-footer a {
-    color: var(--alloy-deep) !important;
+    color: rgba(255, 255, 255, 0.90);
 }
 
 .site-footer a:link,
-.site-footer a:visited,
+.site-footer a:visited {
+    color: rgba(255, 255, 255, 0.90);
+}
+
 .site-footer a:hover,
 .site-footer a:active,
 .site-footer a:focus {
-    color: var(--alloy-deep) !important;
+    color: #93c5fd;
 }
 
 /* --- PRODUCT DETAIL MODAL --- */
@@ -2661,7 +2699,7 @@ aside input[type="range"],
 }
 
 .dtb-top-shipping-bar .dtb-ticker-item {
-    font-size: 0.62rem;
+    font-size: 0.55rem;
     font-weight: 700;
     letter-spacing: 0.095em;
     text-transform: uppercase;
@@ -2683,19 +2721,24 @@ aside input[type="range"],
 
 @media (min-width: 1025px) {
     .dtb-top-shipping-bar {
-        height: 38px;
+        height: 22px;
         padding: 0 clamp(1.25rem, 3.5vw, 3rem);
+    }
+    
+    .dtb-top-shipping-bar .dtb-ticker-item {
+        font-size: 0.50rem;
+        padding: 0 1.5rem;
     }
 }
 
 /* ── HEADER: Desktop Compact Restructure ───────────────
-   Compact 64px nav bar positioned at top on desktop.
+   Taller nav bar positioned at top on desktop.
    Promo bar now appears above the fixed header on the home page.
    Logo moves to the left; all nav links to the center;
    search / account / cart stay on the right.
    ─────────────────────────────────────────────────────── */
 @media (min-width: 1025px) {
-    :root { --header-height: calc(64px + env(safe-area-inset-top, 0px)); } /* nav bar only */
+    :root { --header-height: calc(120px + env(safe-area-inset-top, 0px)); } /* taller nav bar */
 
     .site-header {
         position: fixed;
@@ -2704,37 +2747,31 @@ aside input[type="range"],
         right: 0;
         display: flex;
         flex-direction: column;
-        min-height: 64px; /* nav bar only */
+        min-height: 120px; /* taller nav bar */
         padding: 0;
         z-index: 9999;
-        /* Enhanced desktop gradient — richer depth with animated flow */
-        background: linear-gradient(135deg,
-            #02060f 0%,
-            #05101f 10%,
-            #081628 20%,
-            #0b1c3a 30%,
-            #0e2252 45%,
-            #122878 60%,
-            #0e2252 75%,
-            #081628 88%,
-            #02060f 100%
-        );
-        background-size: 400% 400%;
-        animation: dtb-header-flow 22s ease infinite;
-        border-bottom: 1px solid rgba(255,255,255,0.14);
+        /* Black and blue animated mesh background */
+        background: 
+            radial-gradient(ellipse 90% 150% at 15% -30%, rgba(59, 130, 246, 0.5) 0%, transparent 40%),
+            radial-gradient(ellipse 120% 100% at 85% 150%, rgba(37, 99, 235, 0.35) 0%, transparent 50%),
+            radial-gradient(ellipse 100% 80% at 50% 50%, rgba(59, 130, 246, 0.2) 0%, transparent 60%),
+            linear-gradient(135deg, #0a0e27 0%, #0f1535 20%, #0a1130 40%, #050a1f 60%, #020408 100%);
+        background-size: 300% 300%, 300% 300%, 300% 300%, 100% 100%;
+        animation: dtb-mesh-wave 18s ease-in-out infinite;
+        border-bottom: 1px solid rgba(59, 130, 246, 0.2);
         box-shadow:
-            inset 0 1px 0 rgba(255,255,255,0.10),
-            inset 0 -1px 0 rgba(0,0,0,0.20),
-            0 4px 32px rgba(0,0,0,0.45),
-            0 1px 8px rgba(18,40,120,0.30);
+            inset 0 1px 0 rgba(255,255,255,0.04),
+            inset 0 0 60px rgba(59, 130, 246, 0.12),
+            0 4px 32px rgba(0,0,0,0.5),
+            0 1px 8px rgba(18,40,120,0.2);
     }
 
     .site-header-inner {
-        height: 64px !important;
-        min-height: 64px !important;
+        height: 120px !important;
+        min-height: 120px !important;
         flex: 1;
         display: flex !important;
-        padding: 0 clamp(1rem, 3vw, 2.5rem) !important;
+        padding: 1.5rem clamp(1rem, 3vw, 2.5rem) !important;
         align-items: center;
     }
 
@@ -2744,6 +2781,7 @@ aside input[type="range"],
         align-items: center;
         gap: 40px;
         width: 100%;
+        height: 100%;
     }
 
     /* Logo: compact, left-anchored */
@@ -2754,9 +2792,9 @@ aside input[type="range"],
 
     .logo-image {
         width: auto;
-        height: clamp(42px, 3vw, 56px);
-        max-height: 56px;
-        max-width: clamp(220px, 20vw, 320px);
+        height: clamp(50px, 4vw, 70px);
+        max-height: 70px;
+        max-width: clamp(240px, 22vw, 340px);
     }
 
     /* Nav: all links in center, tighter spacing */

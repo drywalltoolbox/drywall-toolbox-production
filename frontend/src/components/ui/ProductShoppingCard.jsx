@@ -15,7 +15,7 @@
  */
 
 import { motion as Motion } from 'framer-motion';
-import { ShoppingCart, Heart, ChevronRight, Eye } from 'lucide-react';
+import { ShoppingCart, Heart, ChevronRight } from 'lucide-react';
 import ProductCardImage from '../product/ProductCardImage';
 
 const STOCK_STATUS_OUT_OF_STOCK = 'outofstock';
@@ -145,32 +145,6 @@ export default function ProductShoppingCard({
         >
           <Heart size={13} />
         </button>
-
-        {/* Quick-view hover CTA */}
-        <button
-          type="button"
-          onClick={onOpenModal}
-          aria-label="Quick view"
-          style={{
-            position: 'absolute', bottom: '10px', left: '50%',
-            transform: 'translateX(-50%)',
-            background: 'rgba(15,23,42,0.82)',
-            color: 'white',
-            border: 'none',
-            borderRadius: '999px',
-            padding: '6px 16px',
-            fontSize: '0.7rem', fontWeight: 700,
-            letterSpacing: '0.05em',
-            cursor: 'pointer',
-            display: 'flex', alignItems: 'center', gap: '5px',
-            backdropFilter: 'blur(4px)',
-            opacity: 0,
-            transition: 'opacity 0.18s',
-          }}
-          className="dtb-plp-card__quickview"
-        >
-          <Eye size={11} /> Quick View
-        </button>
       </div>
 
       {/* ── Card body ────────────────────────────────────────────────────────── */}
@@ -266,12 +240,6 @@ export default function ProductShoppingCard({
           )}
         </div>
       </div>
-
-      <style>{`
-        .dtb-plp-card:hover .dtb-plp-card__quickview {
-          opacity: 1 !important;
-        }
-      `}</style>
     </Motion.div>
   );
 }
