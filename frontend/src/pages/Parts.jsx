@@ -19,8 +19,9 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import ProductDetail from '../components/ProductDetail';
 import ProductModal from '../components/ProductModal';
 import SearchBar from '../components/SearchBar';
-import SortDropdown from '../components/SortDropdown';
-import Toast from '../components/Toast';
+import Dropdown from '../components/ui/Dropdown';
+import { SORT_OPTIONS } from '../constants/sortOptions';
+import Toast from '../components/ui/Toast';
 import Pagination from '../components/Pagination';
 import { Filter, Wrench } from 'lucide-react';
 import FilterPanel from '../components/FilterPanel';
@@ -29,7 +30,7 @@ import { getProductVariations } from '../services/api';
 import { fetchVariationsBatched } from '../utils/variationSelection';
 import { useCart } from '../context/CartContext';
 import LoadingSpinner from '../components/LoadingSpinner';
-import ProductCard from '../components/ProductCard';
+import ProductShoppingCard from '../components/ui/ProductShoppingCard';
 import { ProductSkeletonGrid } from '../components/ProductSkeletonCard';
 import SEOHead from '../components/SEOHead';
 import { buildBreadcrumbSchema } from '../utils/schema';
@@ -61,6 +62,7 @@ const SLUG_TO_BRAND = Object.fromEntries(
 );
 
 const ITEMS_PER_PAGE = 24;
+
 
 // Strict production-catalog parts taxonomy guard:
 // only include products whose canonical leaf category is "Parts".
@@ -339,7 +341,7 @@ export default function Parts() {
             {/* Sort bar + mobile filter toggle */}
             <div className="flex flex-row items-center justify-between gap-4 mb-6">
               <div className="flex items-center gap-3">
-                <SortDropdown value={sortBy} onChange={setSortBy} />
+                <Dropdown value={sortBy} onChange={setSortBy} options={SORT_OPTIONS} />
                 <span className="hidden sm:inline text-sm text-gray-500">
                   {loading
                     ? <LoadingSpinner size="sm" label="Loading parts" />
@@ -371,7 +373,7 @@ export default function Parts() {
               <>
                 <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-5 lg:gap-6">
                   {paginated.map((product, index) => (
-                    <ProductCard
+                    <ProductShoppingCard
                       key={product.id}
                       product={product}
                       cardProduct={product}
