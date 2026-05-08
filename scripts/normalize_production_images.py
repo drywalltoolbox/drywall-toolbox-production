@@ -349,14 +349,16 @@ def update_catalog_images(catalog_index: dict[str, dict[str, object]]) -> tuple[
                 if image_name not in new_images:
                     new_images.append(image_name)
 
-        images_value = " | ".join(f"{url_prefix}{image_name}" for image_name in new_images)
-        variation_image_value = f"{url_prefix}{new_images[0]}" if new_images and row_type == "variation" else ""
+        if row_type == "variation" and new_images:
+            images_value = f"{url_prefix}{new_images[0]}"
+        else:
+            images_value = " | ".join(f"{url_prefix}{image_name}" for image_name in new_images)
 
         if row.get("Images", "") != images_value:
             row["Images"] = images_value
             rows_updated += 1
-        if row.get("Variation image", "") != variation_image_value:
-            row["Variation image"] = variation_image_value
+        if "Variation image" in row and row.get("Variation image", ""):
+            row["Variation image"] = ""
             rows_updated += 1
 
         image_references += len(new_images)
