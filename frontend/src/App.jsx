@@ -2,9 +2,11 @@ import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-route
 import { useState, useEffect, lazy, Suspense } from 'react';
 import PageTransition from './components/PageTransition';
 import LoadingSpinner from './components/LoadingSpinner';
+import ShippingTicker from './components/ShippingTicker';
 import { CartProvider } from './context/CartContext';
 import { WooCommerceProvider } from './context/WooCommerceContext';
 import { AuthProvider } from './auth/AuthContext.js';
+import { Truck, Phone, Wrench } from 'lucide-react';
 
 // Layout components load eagerly — they're on every page so there's no benefit
 // to lazy loading them. Keeping them in the main bundle is correct.
@@ -156,32 +158,61 @@ function App() {
       <WooCommerceProvider>
           <CartProvider>
           <Router basename={basename}>
-            <ScrollToTop />
-
-            {/* Background texture */}
-            <div className="machined-bg" />
-
-            <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
-              <Header onCartToggle={toggleCart} />
-
-              <main style={{ flexGrow: 1 }} className="main-content">
-                {/*
-                  AppRoutes renders all page routes wrapped in PageTransition,
-                  giving every route a consistent smooth fade+lift enter/exit.
-                  Suspense (inside AppRoutes) shows PageLoader for lazy chunks.
-                  Header and Footer remain visible during all transitions.
-                */}
-                <AppRoutes />
-              </main>
-
-              <Footer />
-            </div>
-
-            <CartSidebar isOpen={cartOpen} onClose={closeCart} />
+            <AppShell
+              cartOpen={cartOpen}
+              toggleCart={toggleCart}
+              closeCart={closeCart}
+            />
           </Router>
           </CartProvider>
         </WooCommerceProvider>
     </AuthProvider>
+  );
+}
+
+function AppShell({ cartOpen, toggleCart, closeCart }) {
+  const location = useLocation();
+  const isHomePage = location.pathname === '/';
+
+  return (
+    <>
+      <ScrollToTop />
+
+      {/* Background texture */}
+      <div className="machined-bg" />
+
+      <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+        {isHomePage && (
+          <div className="site-top-ticker">
+            <ShippingTicker
+              items={[
+                { icon: <Truck size={11} />, text: 'FREE SHIPPING ON ALL ORDERS $75+ (CONTIGUOUS USA ONLY)' },
+                { icon: <Phone size={11} />, text: 'Expert Support - Real Pros' },
+                { icon: <Wrench size={11} />, text: 'Professional Repair Services' },
+              ]}
+              duration={28}
+              className="dtb-desktop-shipping-bar dtb-top-shipping-bar"
+            />
+          </div>
+        )}
+
+        <Header onCartToggle={toggleCart} hasTopTicker={isHomePage} />
+
+        <main style={{ flexGrow: 1 }} className="main-content">
+          {/*
+            AppRoutes renders all page routes wrapped in PageTransition,
+            giving every route a consistent smooth fade+lift enter/exit.
+            Suspense (inside AppRoutes) shows PageLoader for lazy chunks.
+            Header and Footer remain visible during all transitions.
+          */}
+          <AppRoutes />
+        </main>
+
+        <Footer />
+      </div>
+
+      <CartSidebar isOpen={cartOpen} onClose={closeCart} />
+    </>
   );
 }
 

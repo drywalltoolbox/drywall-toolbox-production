@@ -2,13 +2,12 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useState, useEffect, useRef } from 'react';
 import { useCart } from '../context/CartContext';
 import { useAuthContext } from '../auth/AuthContext.js';
-import { ShoppingCart, Menu, X, ChevronDown, User, LogIn, UserPlus, LogOut, Search, Truck, Phone, Wrench, Layers, Settings, Star } from 'lucide-react';
+import { ShoppingCart, Menu, X, ChevronDown, User, LogIn, UserPlus, LogOut, Search, Wrench, Layers, Settings, Star } from 'lucide-react';
 import { motion as Motion, AnimatePresence } from 'framer-motion';
 import LogoBlack from '/logo-black.svg';
 import LogoWhite from '/logo-white.svg';
 import MobileSearch from './MobileSearch';
 import NotificationsBell from './NotificationsBell';
-import ShippingTicker from './ShippingTicker';
 import { searchProducts } from '../services/catalog';
 
 // Mega menu shop items organized by column
@@ -29,7 +28,7 @@ const MEGA_MENU_ITEMS = [
   },
 ];
 
-export default function Header({ onCartToggle }) {
+export default function Header({ onCartToggle, hasTopTicker = false }) {
   const location = useLocation();
   const navigate = useNavigate();
   const { getCartCount } = useCart();
@@ -221,19 +220,7 @@ export default function Header({ onCartToggle }) {
 
   return (
     <>
-      <header className={`site-header${location.pathname !== '/' ? ' site-header--no-ticker' : ''}`} role="banner">
-      {/* -- Mobile-only shipping ticker � homepage only -- */}
-      {location.pathname === '/' && (
-        <ShippingTicker
-          items={[
-            { icon: <Truck size={11} />, text: 'FREE SHIPPING ON ALL ORDERS $75+ (CONTIGUOUS USA ONLY)' },
-            { icon: <Phone size={11} />, text: 'Expert Support � Real Pros' },
-            { icon: <Wrench size={11} />, text: 'Professional Repair Services' },
-          ]}
-          duration={28}
-          className="dtb-mobile-shipping-bar--header"
-        />
-      )}
+      <header className={`site-header${hasTopTicker ? ' site-header--with-top-ticker' : ' site-header--no-ticker'}`} role="banner">
       <div className="site-header-inner">
   {/* Mobile Layout */}
   <div className="flex md:hidden items-center w-full header-mobile-layout" style={{ display: isTablet ? 'flex' : undefined }}>

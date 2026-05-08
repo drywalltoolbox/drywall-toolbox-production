@@ -30,6 +30,10 @@
     --header-height: calc(clamp(56px, 8vw, 100px) + 7px + env(safe-area-inset-top, 0px));
 }
 
+:root:has(.site-top-ticker) {
+    --header-height: calc(38px + clamp(56px, 8vw, 100px) + 7px + env(safe-area-inset-top, 0px));
+}
+
 * {
     -webkit-font-smoothing: antialiased;
     box-sizing: border-box;
@@ -959,6 +963,16 @@ aside input[type="range"],
     padding: 0.4rem 0;
 }
 
+.site-header.site-header--with-top-ticker {
+    top: 28px;
+}
+
+@media (min-width: 1025px) {
+    .site-header.site-header--with-top-ticker {
+        top: 38px;
+    }
+}
+
 /* Desktop Layout - Grid with centered branding */
 .site-header-inner {
     max-width: 1400px;
@@ -1367,7 +1381,7 @@ aside input[type="range"],
         --header-height: calc(28px + 76px + env(safe-area-inset-top, 0px));
     }
 
-    /* No ticker on non-homepage pages — header is nav bar only (76px) */
+    /* No homepage top ticker on non-home pages — header is nav bar only (76px) */
     :root:has(.site-header--no-ticker) {
         --header-height: calc(76px + env(safe-area-inset-top, 0px));
     }
@@ -1489,7 +1503,7 @@ aside input[type="range"],
         --header-height: calc(28px + clamp(56px, 8vw, 80px) + env(safe-area-inset-top, 0px));
     }
 
-    /* No ticker on non-homepage pages */
+    /* No homepage top ticker on non-home pages */
     :root:has(.site-header--no-ticker) {
         --header-height: calc(clamp(56px, 8vw, 80px) + env(safe-area-inset-top, 0px));
     }
@@ -2107,68 +2121,72 @@ aside input[type="range"],
 }
 
 /* ── FREE SHIPPING BAR ──────────────────────────────────
-   On desktop: displayed below hero section in Home.jsx.
-   On mobile/tablet: rendered as inline bar in Home.jsx.
-   Hidden everywhere else (other pages).
+   Rendered above the fixed header on the homepage.
    ─────────────────────────────────────────────────────── */
 .dtb-promo-bar { display: none; }
 
-/* Desktop shipping bar positioned below hero (Home page only) */
-.dtb-desktop-shipping-bar { display: none; }
+.site-top-ticker {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 10000;
+}
+
+.dtb-top-shipping-bar {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    background: #0b1220;
+    height: 28px;
+    width: 100%;
+    flex-shrink: 0;
+    overflow: hidden;
+}
+
+.dtb-top-shipping-bar .dtb-ticker-track {
+    width: max-content;
+    animation: dtb-ticker-scroll var(--dtb-ticker-duration, 28s) linear infinite;
+    -webkit-animation: dtb-ticker-scroll var(--dtb-ticker-duration, 28s) linear infinite;
+    animation-play-state: running;
+    -webkit-animation-play-state: running;
+    will-change: transform;
+    transform: translate3d(0, 0, 0);
+    -webkit-transform: translate3d(0, 0, 0);
+    backface-visibility: hidden;
+    transform-origin: 0 0;
+    display: inline-flex;
+    align-items: center;
+    white-space: nowrap;
+    min-width: max-content;
+    width: auto;
+}
+
+.dtb-top-shipping-bar .dtb-ticker-item {
+    font-size: 0.62rem;
+    font-weight: 700;
+    letter-spacing: 0.095em;
+    text-transform: uppercase;
+    padding: 0 2rem;
+    color: rgba(255,255,255,0.85);
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    flex-shrink: 0;
+}
+
+.dtb-top-shipping-bar .dtb-ticker-icon {
+    color: var(--primary-400, #60a5fa);
+}
+
+.dtb-top-shipping-bar .dtb-ticker-sep {
+    color: rgba(255,255,255,0.28);
+}
 
 @media (min-width: 1025px) {
-    .dtb-desktop-shipping-bar {
-        display: flex;
-        align-items: center;
-        justify-content: flex-start;
-        background: #0b1220; /* same dark background as mobile */
+    .dtb-top-shipping-bar {
         height: 38px;
-        width: 100%;
-        flex-shrink: 0;
-        overflow: hidden;
         padding: 0 clamp(1.25rem, 3.5vw, 3rem);
-    }
-
-    .dtb-desktop-shipping-bar .dtb-ticker-track {
-        width: max-content;
-        /* Enable the same smooth continuous scroll used on mobile.
-           The keyframes move the track -50% so two repeated sets
-           (rendered in JSX) create a seamless loop. */
-        animation: dtb-ticker-scroll var(--dtb-ticker-duration, 28s) linear infinite;
-        -webkit-animation: dtb-ticker-scroll var(--dtb-ticker-duration, 28s) linear infinite;
-        animation-play-state: running;
-        -webkit-animation-play-state: running;
-        will-change: transform;
-        transform: translate3d(0, 0, 0);
-        -webkit-transform: translate3d(0, 0, 0);
-        backface-visibility: hidden;
-        transform-origin: 0 0;
-        display: inline-flex;
-        align-items: center;
-        white-space: nowrap;
-        min-width: max-content;
-        width: auto;
-    }
-
-    .dtb-desktop-shipping-bar .dtb-ticker-item {
-        font-size: 0.62rem;
-        font-weight: 700;
-        letter-spacing: 0.095em;
-        text-transform: uppercase;
-        padding: 0 2rem;
-        color: rgba(255,255,255,0.85);
-        display: inline-flex;
-        align-items: center;
-        gap: 7px;
-        flex-shrink: 0;
-    }
-
-    .dtb-desktop-shipping-bar .dtb-ticker-icon {
-        color: var(--primary-400, #60a5fa);
-    }
-
-    .dtb-desktop-shipping-bar .dtb-ticker-sep {
-        color: rgba(255,255,255,0.28);
     }
 
     .dtb-promo-bar-inner {
@@ -2192,7 +2210,7 @@ aside input[type="range"],
 
 /* ── HEADER: Desktop Compact Restructure ───────────────
    Compact 64px nav bar positioned at top on desktop.
-   Promo bar now appears below hero on home page only.
+   Promo bar now appears above the fixed header on the home page.
    Logo moves to the left; all nav links to the center;
    search / account / cart stay on the right.
    ─────────────────────────────────────────────────────── */
@@ -2534,14 +2552,13 @@ aside input[type="range"],
 
 @media (min-width: 1025px) {
     .dtb-desktop-hero {
-        display: flex;
-        align-items: center;
-        min-height: 340px;
-        background: #ffffff;
+        display: block;
+        min-height: 0;
+        background: transparent;
         position: relative;
         overflow: hidden;
-        padding: 0 clamp(2rem, 5vw, 5rem);
-        border-bottom: 1px solid var(--machined-border);
+        padding: 0;
+        border-bottom: none;
     }
 
     /* Subtle dot-grid texture */
@@ -2552,6 +2569,10 @@ aside input[type="range"],
     /* Right-side radial blue glow */
     .dtb-desktop-hero::after {
         display: none;
+    }
+
+    .dtb-home-desktop-hero {
+        border-bottom: 1px solid var(--machined-border);
     }
 
     .dtb-desktop-hero-inner {
@@ -2996,7 +3017,7 @@ aside input[type="range"],
    excluded here and restricted to pointer: fine devices only. */
 @media (hover: hover) and (pointer: fine) {
     .dtb-mobile-shipping-bar:hover .dtb-ticker-track,
-    .dtb-desktop-shipping-bar:hover .dtb-ticker-track {
+    .dtb-top-shipping-bar:hover .dtb-ticker-track {
         animation-play-state: paused;
     }
 }

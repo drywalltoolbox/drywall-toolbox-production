@@ -1,7 +1,6 @@
-import ShippingTicker from '../components/ShippingTicker';
-import { Link } from 'react-router-dom';
 import TrendingProducts from '../components/TrendingProducts';
 import FeatureSection from '../components/ui/FeatureSection';
+import HeroSection from '../components/ui/HeroSection';
 import TrustedBrands from '../components/ui/TrustedBrands';
 import tapeTechLogo from '/brands/TapeTech/tapetech_logo.svg';
 import columbiaLogo from '/brands/Columbia/columbia_taping_tools_logo.svg';
@@ -11,7 +10,7 @@ import platinumLogo from '/brands/Platinum/platinum_logo.svg';
 import level5Logo from '/brands/Level5/Level5.svg';
 import SEOHead from '../components/SEOHead';
 import { buildOrganizationSchema, buildSiteLinksSearchBoxSchema } from '../utils/schema';
-import { ShoppingBag, Wrench, Layers, FileText, Truck, Shield, Phone, ChevronRight } from 'lucide-react';
+import { Truck, Shield, Phone, Wrench } from 'lucide-react';
 
 const trustBadges = [
   {
@@ -51,15 +50,6 @@ const brandLogos = [
   { name: 'Asgard',                src: asgardLogo,    to: '/products?brand=Asgard' },
   { name: 'SurPro',                src: surproLogo,    to: '/products?brand=SurPro' },
 ];
-
-const mobileBrandLogoStyles = {
-  TapeTech: { height: 'clamp(26px, 5.2vw, 38px)', maxWidth: '120px' },
-  Columbia: { height: 'clamp(56px, 10vw, 86px)', maxWidth: '250px' },
-  Level5: { height: 'clamp(18px, 3.5vw, 26px)', maxWidth: '110px' },
-  'Platinum Drywall Tools': { height: 'clamp(28px, 5vw, 42px)', maxWidth: '180px' },
-  Asgard: { height: 'clamp(34px, 6vw, 48px)', maxWidth: '160px' },
-  SurPro: { height: 'clamp(34px, 6vw, 50px)', maxWidth: '170px' },
-};
 
 const HOME_FEATURES = [
   { icon: Truck,   title: 'Free Shipping',    description: 'On all qualifying orders $75+ to the contiguous USA.' },
@@ -116,56 +106,20 @@ export default function Home() {
       </div>
 
       {/* --- DESKTOP HERO (hidden on mobile/tablet = 1024px) --- */}
-      <section className="dtb-desktop-hero section-enter" aria-label="Hero">
-        <div className="dtb-desktop-hero-inner">
-          {/* Left: headline + CTAs + trust stats */}
-          <div className="dtb-hero-content">
-            <h1 className="dtb-hero-title">
-              The Pros&apos;<br />
-              <span>One-Stop Shop</span><br />
-              for Drywall Tools.
-            </h1>
-
-            <p className="dtb-hero-subtitle">
-              Production-grade taping, finishing, and sanding equipment from the industry&apos;s most trusted brands � at unbeatable prices with lightning-fast shipping.
-            </p>
-          </div>
-
-          {/* Right: Trusted Brands (desktop only) */}
-          <div className="dtb-hero-visual">
-            <div className="dtb-hero-brands">
-              {brandLogos.map((brand) => (
-                <Link
-                  key={brand.name}
-                  to={`/products?brand=${encodeURIComponent(brand.name === 'Columbia' ? 'Columbia Taping Tools' : brand.name)}`}
-                  className="dtb-hero-brand-link"
-                >
-                  <img
-                    src={brand.src}
-                    alt={brand.name}
-                    loading="lazy"
-                    decoding="async"
-                    className="dtb-hero-brand-logo"
-                  />
-                </Link>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* --- DESKTOP SHIPPING BAR (appears below hero on desktop only) --- */}
-      <div className="dtb-desktop-shipping-bar">
-        <ShippingTicker
-          items={[
-            { icon: <Truck size={14} />, text: 'FREE SHIPPING ON ORDERS $75+ (CONTIGUOUS USA ONLY)' },
-            { icon: <Phone size={14} />, text: 'Expert Support � Real Pros' },
-            { icon: <Wrench size={14} />, text: 'Professional Repair Services' },
+      <div className="dtb-desktop-hero section-enter" aria-label="Hero">
+        <HeroSection
+          className="dtb-home-desktop-hero"
+          title={<>The Pros&apos; One-Stop Shop for Drywall Tools.</>}
+          subtitle="Production-grade taping, finishing, and sanding equipment from the industry's most trusted brands at unbeatable prices with lightning-fast shipping."
+          stats={[
+            { value: '$75+', label: 'Free Shipping' },
+            { value: 'Fast', label: 'Repair Turnaround' },
+            { value: 'Real', label: 'Expert Support' },
           ]}
-          duration={28}
-          className="dtb-desktop-shipping-bar"
         />
       </div>
+
+      <TrustedBrands brands={brandLogos} title="Trusted Brands" speed={32} />
 
       {/* --- DESKTOP FEATURE SECTION (hidden on mobile/tablet) --- */}
       <div className="dtb-feature-strip" aria-label="Key features">
@@ -177,9 +131,6 @@ export default function Home() {
 
       {/* --- TRENDING PRODUCTS --- */}
       <TrendingProducts />
-
-      {/* --- TRUSTED BRANDS (all viewports — replaces separate mobile/desktop brand sections) --- */}
-      <TrustedBrands brands={brandLogos} title="Trusted Brands" speed={32} />
 
       {/* --- TRUST BADGES (mobile only) --- */}
       <section className="home-trust-section dtb-mobile-only">
@@ -196,35 +147,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* --- BRAND LOGOS (mobile only) --- */}
-      <section className="home-brands-section dtb-mobile-only">
-        <div className="dtb-trending-header">
-          <p className="dtb-section-eyebrow">Trusted Brands</p>
-        </div>
-        <div className="brand-logos-row">
-          {brandLogos.map((brand) => (
-            <Link
-              key={brand.name}
-              to={`/products?brand=${encodeURIComponent(brand.name === 'Columbia' ? 'Columbia Taping Tools' : brand.name)}`}
-              style={{ textDecoration: 'none', opacity: 1, transition: 'opacity 0.2s' }}
-              onMouseEnter={(e) => (e.currentTarget.style.opacity = '0.8')}
-              onMouseLeave={(e) => (e.currentTarget.style.opacity = '1')}
-            >
-              <img
-                src={brand.src}
-                alt={brand.name}
-                loading="lazy"
-                decoding="async"
-                style={{
-                  ...(mobileBrandLogoStyles[brand.name] || { height: 'clamp(28px, 5vw, 42px)', maxWidth: '150px' }),
-                  width: 'auto',
-                  objectFit: 'contain'
-                }}
-              />
-            </Link>
-          ))}
-        </div>
-      </section>
       </div>
     </>
   );
