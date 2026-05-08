@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { ChevronRight } from 'lucide-react';
-import '../styles/tool-selector.css';
+import '../../styles/tool-selector.css';
 import BackButton from '../shared/BackButton';
 
 export default function ToolSelector({ brand, brandLogo, tools, onSelectTool, onBack }) {

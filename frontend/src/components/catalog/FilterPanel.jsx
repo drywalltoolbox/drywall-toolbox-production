@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { X, ChevronDown, Sliders, RefreshCw } from 'lucide-react';
-import '../styles/filter-panel.css';
+import '../../styles/filter-panel.css';
 
 export default function FilterPanel({
   isOpen,
