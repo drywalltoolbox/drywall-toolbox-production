@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { Search, X } from 'lucide-react';
+import { X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { searchProducts } from '../../services/catalog';
 
@@ -61,28 +61,38 @@ export default function MobileSearch({ onClose = () => {} }) {
   return (
     <div className="mobile-search-container">
       <div className="mobile-search-wrapper">
-        <div className="mobile-search-input-group">
-          <Search size={18} className="mobile-search-icon" />
+        <div className="mobile-search-pill">
           <input
             type="text"
             placeholder="Search products..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             onFocus={() => setIsOpen(true)}
+            onKeyDown={(e) => { if (e.key === 'Enter' && searchQuery.trim()) handleViewAllResults(); }}
             className="mobile-search-input"
+            autoComplete="off"
+            autoCorrect="off"
+            spellCheck="false"
           />
           {searchQuery && (
             <button
-              onClick={() => {
-                setSearchQuery('');
-                setResults([]);
-              }}
+              onClick={() => { setSearchQuery(''); setResults([]); }}
               className="mobile-search-clear"
               aria-label="Clear search"
             >
-              <X size={18} />
+              <X size={15} />
             </button>
           )}
+          <button
+            type="button"
+            onClick={() => { if (searchQuery.trim()) handleViewAllResults(); }}
+            className="mobile-search-submit"
+            aria-label="Submit search"
+          >
+            <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+          </button>
         </div>
 
         {isOpen && (
@@ -121,9 +131,7 @@ export default function MobileSearch({ onClose = () => {} }) {
               </>
             ) : searchQuery.trim() ? (
               <div className="mobile-search-no-results">No products found</div>
-            ) : (
-              <div className="mobile-search-placeholder">Start typing to search...</div>
-            )}
+            ) : null}
           </div>
         )}
       </div>
@@ -141,75 +149,108 @@ export default function MobileSearch({ onClose = () => {} }) {
           width: 100%;
         }
 
-        .mobile-search-input-group {
+        /* ── Pill row ── */
+        .mobile-search-pill {
+          position: relative;
           display: flex;
           align-items: center;
-          gap: 10px;
-          padding: 10px 12px;
-          background: #f9fafb;
-          border: 1.5px solid #e5e7eb;
-          border-radius: 10px;
-          transition: all 0.2s ease-out;
-        }
-
-        .mobile-search-input-group:focus-within {
-          background: #ffffff;
-          border-color: #2563eb;
-          box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
-        }
-
-        .mobile-search-icon {
-          color: rgba(15, 23, 42, 0.5);
-          flex-shrink: 0;
+          width: 100%;
         }
 
         .mobile-search-input {
           flex: 1;
-          background: none;
-          border: none;
-          outline: none;
-          font-size: 16px;
+          width: 100%;
+          padding: 0 88px 0 18px; /* right room for clear + submit */
+          height: 42px;
+          border-radius: 9999px;
+          border: 1.5px solid #e5e7eb;
+          background: #f9fafb;
+          font-size: 16px !important; /* prevent iOS zoom */
           font-family: inherit;
           color: #1f2937;
-          padding: 8px 4px;
+          outline: none;
           -webkit-appearance: none;
           appearance: none;
+          transition: border-color 150ms ease, box-shadow 150ms ease, background 150ms ease;
         }
 
         .mobile-search-input::placeholder {
           color: #9ca3af;
         }
 
+        .mobile-search-input:focus {
+          background: #ffffff;
+          border-color: #4f46e5;
+          box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+        }
+
+        /* Clear X button — sits inside the pill, right of text */
         .mobile-search-clear {
-          background: none;
-          border: none;
-          padding: 4px;
-          cursor: pointer;
-          color: #6b7280;
+          position: absolute;
+          right: 44px;
+          top: 50%;
+          transform: translateY(-50%);
           display: flex;
           align-items: center;
           justify-content: center;
-          transition: color 0.2s ease;
+          width: 26px;
+          height: 26px;
+          border-radius: 50%;
+          background: #e5e7eb;
+          border: none;
+          cursor: pointer;
+          color: #6b7280;
+          padding: 0;
+          min-width: unset;
+          min-height: unset;
+          transition: background 150ms ease;
         }
 
         .mobile-search-clear:active {
+          background: #d1d5db;
           color: #1f2937;
         }
 
+        /* Blue circle submit button */
+        .mobile-search-submit {
+          position: absolute;
+          right: 6px;
+          top: 50%;
+          transform: translateY(-50%);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 30px;
+          height: 30px;
+          border-radius: 50%;
+          background: #4f46e5;
+          border: none;
+          cursor: pointer;
+          color: #ffffff;
+          padding: 0;
+          min-width: unset;
+          min-height: unset;
+          flex-shrink: 0;
+          transition: background 150ms ease;
+        }
+
+        .mobile-search-submit:active {
+          background: #4338ca;
+        }
+
+        /* Dropdown */
         .mobile-search-dropdown {
           position: absolute;
-          top: 100%;
+          top: calc(100% + 6px);
           left: 0;
           right: 0;
           background: #ffffff;
           border: 1.5px solid #e5e7eb;
-          border-top: none;
-          border-radius: 0 0 10px 10px;
-          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+          border-radius: 12px;
+          box-shadow: 0 4px 16px rgba(0, 0, 0, 0.10);
           max-height: 400px;
           overflow-y: auto;
           z-index: 50;
-          margin-top: -2px;
         }
 
         .mobile-search-results {
@@ -218,32 +259,33 @@ export default function MobileSearch({ onClose = () => {} }) {
 
         .mobile-search-result-item {
           width: 100%;
-          padding: 12px 16px;
+          padding: 10px 14px;
           display: flex;
           gap: 12px;
           align-items: center;
           background: none;
           border: none;
           cursor: pointer;
-          transition: background-color 0.2s ease;
+          transition: background-color 0.15s ease;
           text-align: left;
-          font-family: inherit;
+          font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans-serif;
         }
 
         .mobile-search-result-item:active {
-          background-color: #f9fafb;
+          background-color: #f5f7ff;
         }
 
         .mobile-search-result-image {
-          width: 48px;
-          height: 48px;
-          background: #f3f4f6;
-          border-radius: 6px;
+          width: 44px;
+          height: 44px;
+          background: #f1f5f9;
+          border-radius: 8px;
           display: flex;
           align-items: center;
           justify-content: center;
           flex-shrink: 0;
           overflow: hidden;
+          border: 1px solid #e2e8f0;
         }
 
         .mobile-search-result-image img {
@@ -256,56 +298,65 @@ export default function MobileSearch({ onClose = () => {} }) {
         .mobile-search-result-info {
           flex: 1;
           min-width: 0;
+          display: flex;
+          flex-direction: column;
+          gap: 2px;
         }
 
         .mobile-search-result-name {
-          font-size: 13px;
-          font-weight: 500;
-          color: #1f2937;
+          font-size: 13.5px;
+          font-weight: 600;
+          color: #0f172a;
           white-space: nowrap;
           overflow: hidden;
           text-overflow: ellipsis;
+          letter-spacing: -0.01em;
+          line-height: 1.35;
         }
 
         .mobile-search-result-price {
           font-size: 12px;
-          color: #6b7280;
-          margin-top: 2px;
+          font-weight: 500;
+          color: #64748b;
+          letter-spacing: 0.01em;
         }
 
         .mobile-search-view-all {
           width: 100%;
-          padding: 12px 16px;
-          font-size: 14px;
-          font-weight: 500;
-          color: #2563eb;
-          background: #f9fafb;
+          padding: 11px 16px;
+          font-size: 13px;
+          font-weight: 700;
+          color: #4f46e5;
+          background: #fafafa;
           border: none;
-          border-top: 1px solid #e5e7eb;
+          border-top: 1px solid #f1f5f9;
           cursor: pointer;
-          font-family: inherit;
-          transition: background-color 0.2s ease;
+          font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans-serif;
+          letter-spacing: 0.01em;
+          text-transform: uppercase;
+          transition: background-color 0.15s ease;
         }
 
         .mobile-search-view-all:active {
-          background-color: #f3f4f6;
+          background-color: #f1f5f9;
         }
 
         .mobile-search-no-results,
-        .mobile-search-placeholder,
         .mobile-search-loading {
-          padding: 16px;
+          padding: 18px 16px;
           text-align: center;
           font-size: 13px;
-          color: #9ca3af;
+          font-weight: 500;
+          color: #94a3b8;
+          font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans-serif;
+          letter-spacing: 0.01em;
         }
 
         .mobile-search-loading {
-          color: #6b7280;
-          font-weight: 500;
+          color: #64748b;
+          font-weight: 600;
         }
 
-        /* Mobile scrollbar styling */
         .mobile-search-dropdown::-webkit-scrollbar {
           width: 4px;
         }
@@ -317,10 +368,6 @@ export default function MobileSearch({ onClose = () => {} }) {
         .mobile-search-dropdown::-webkit-scrollbar-thumb {
           background: #d1d5db;
           border-radius: 2px;
-        }
-
-        .mobile-search-dropdown::-webkit-scrollbar-thumb:hover {
-          background: #9ca3af;
         }
       `}</style>
     </div>

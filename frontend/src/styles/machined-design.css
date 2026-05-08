@@ -2943,42 +2943,75 @@ aside input[type="range"],
         position: relative;
         display: flex;
         align-items: center;
-        gap: 8px;
     }
 
-    .dtb-desktop-search-input-wrap {
-        width: 0;
-        opacity: 0;
-        overflow: hidden;
-        transition: width 220ms ease, opacity 180ms ease;
+    /* ── Pill wrapper ── */
+    .dtb-desktop-search-pill {
+        position: relative;
+        display: flex;
+        align-items: center;
+        width: clamp(200px, 22vw, 340px);
+        transition: width 200ms ease;
     }
 
-    .dtb-desktop-search.is-open .dtb-desktop-search-input-wrap {
-        width: clamp(220px, 28vw, 380px);
-        opacity: 1;
+    .dtb-desktop-search-pill:focus-within {
+        width: clamp(220px, 26vw, 380px);
     }
 
     .dtb-desktop-search-input {
         width: 100%;
-        height: 34px;
-        border-radius: 9px;
-        border: 1px solid rgba(255,255,255,0.25);
-        background: rgba(255,255,255,0.12);
+        padding: 0 44px 0 18px;
+        height: 38px;
+        border-radius: 9999px;
+        border: 1px solid rgba(255,255,255,0.22);
+        background: rgba(255,255,255,0.10);
         color: #ffffff;
         font-size: 0.82rem;
-        padding: 0 12px;
         outline: none;
         transition: border-color 150ms ease, box-shadow 150ms ease, background 150ms ease;
     }
 
     .dtb-desktop-search-input::placeholder {
-        color: rgba(255,255,255,0.72);
+        color: rgba(255,255,255,0.55);
     }
 
     .dtb-desktop-search-input:focus {
-        border-color: rgba(255,255,255,0.45);
-        background: rgba(255,255,255,0.16);
-        box-shadow: 0 0 0 3px rgba(147,197,253,0.24);
+        border-color: rgba(255,255,255,0.40);
+        background: rgba(255,255,255,0.14);
+        box-shadow: 0 0 0 3px rgba(99,102,241,0.30);
+    }
+
+    /* ── Blue circle submit button ── */
+    .dtb-desktop-search-submit {
+        position: absolute;
+        right: 5px;
+        top: 50%;
+        transform: translateY(-50%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        background: #4f46e5;
+        border: none;
+        cursor: pointer;
+        color: #ffffff;
+        flex-shrink: 0;
+        transition: background 150ms ease, transform 150ms ease;
+        padding: 0;
+        min-width: unset;
+        min-height: unset;
+    }
+
+    .dtb-desktop-search-submit:hover {
+        background: #4338ca;
+        transform: translateY(-50%) scale(1.06);
+    }
+
+    .dtb-desktop-search-icon {
+        width: 14px;
+        height: 14px;
     }
 
     .dtb-desktop-search-dropdown {

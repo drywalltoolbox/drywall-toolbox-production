@@ -2,7 +2,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useState, useEffect, useRef } from 'react';
 import { useCart } from '../../context/CartContext';
 import { useAuthContext } from '../../auth/AuthContext.js';
-import { ShoppingCart, Menu, X, ChevronDown, User, LogIn, UserPlus, LogOut, Search, Wrench, Layers, Settings, Star } from 'lucide-react';
+import { ShoppingCart, Menu, X, ChevronDown, User, LogIn, UserPlus, LogOut, Wrench, Layers, Settings, Star } from 'lucide-react';
 import { motion as Motion, AnimatePresence } from 'framer-motion';
 import LogoBlack from '/logo-black.svg';
 import LogoWhite from '/logo-white.svg';
@@ -215,11 +215,6 @@ export default function Header({ onCartToggle, hasTopTicker = false }) {
     return () => clearTimeout(t);
   }, [desktopSearchQuery]);
 
-  const openDesktopSearch = () => {
-    setDesktopSearchOpen(true);
-    setTimeout(() => desktopSearchInputRef.current?.focus(), 50);
-  };
-
   const handleDesktopResultClick = (productId) => {
     navigate(`/product/${productId}`);
     setDesktopSearchOpen(false);
@@ -342,25 +337,30 @@ export default function Header({ onCartToggle, hasTopTicker = false }) {
             </div>
 
             <div className="header-right header-desktop-actions">
-              <div ref={desktopSearchRef} className={`dtb-desktop-search ${desktopSearchOpen ? 'is-open' : ''}`}>
-                <button
-                  onClick={() => (desktopSearchOpen ? setDesktopSearchOpen(false) : openDesktopSearch())}
-                  className="dtb-search-btn header-icon"
-                  aria-label="Search products"
-                  title="Search products"
-                >
-                  <Search size={16} />
-                </button>
-
-                <div className="dtb-desktop-search-input-wrap">
+              <div ref={desktopSearchRef} className="dtb-desktop-search">
+                <div className="dtb-desktop-search-pill">
                   <input
                     ref={desktopSearchInputRef}
                     type="text"
                     value={desktopSearchQuery}
                     onChange={(e) => setDesktopSearchQuery(e.target.value)}
+                    onFocus={() => setDesktopSearchOpen(true)}
+                    onKeyDown={(e) => { if (e.key === 'Enter') handleDesktopViewAll(); }}
                     placeholder="Search products..."
                     className="dtb-desktop-search-input"
+                    aria-label="Search products"
+                    autoComplete="off"
                   />
+                  <button
+                    type="button"
+                    onClick={handleDesktopViewAll}
+                    className="dtb-desktop-search-submit"
+                    aria-label="Submit search"
+                  >
+                    <svg className="dtb-desktop-search-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                  </button>
                 </div>
 
                 {desktopSearchOpen && (
@@ -394,9 +394,7 @@ export default function Header({ onCartToggle, hasTopTicker = false }) {
                       </>
                     ) : desktopSearchQuery.trim() ? (
                       <div className="dtb-desktop-search-state">No products found</div>
-                    ) : (
-                      <div className="dtb-desktop-search-state">Start typing to search...</div>
-                    )}
+                    ) : null}
                   </div>
                 )}
               </div>

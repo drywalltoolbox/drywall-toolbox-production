@@ -1383,34 +1383,35 @@
 /* Mobile: ensure the back button outside viewer context is visible */
 @media (max-width: 768px) {
   .back-button {
-    position: relative;
-    background: rgba(255, 255, 255, 0.95);
-    padding: 10px 14px;
+    padding: 8px 14px 8px 10px;
     border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+    background: rgba(15, 23, 42, 0.07);
+    border: 1px solid rgba(15, 23, 42, 0.10);
     color: var(--text-primary);
-    font-size: 0.9rem;
-    min-height: 44px;
-    display: flex;
+    font-size: 0.875rem;
+    font-weight: 600;
+    min-height: 40px;
+    display: inline-flex;
     align-items: center;
     gap: 6px;
-    transition: none;
-    border: none;
     cursor: pointer;
+    transition: background 150ms ease, border-color 150ms ease;
+    box-shadow: none;
   }
 
   .back-button:hover {
     transform: none;
-    background: rgba(255, 255, 255, 0.98);
+    background: rgba(15, 23, 42, 0.11);
+    border-color: rgba(15, 23, 42, 0.16);
   }
 
   .back-button:active {
-    background: rgba(255, 255, 255, 0.9);
+    background: rgba(15, 23, 42, 0.16);
   }
 
   .back-button svg {
-    width: 18px;
-    height: 18px;
+    width: 16px;
+    height: 16px;
   }
 }
 
