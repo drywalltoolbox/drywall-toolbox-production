@@ -1,5 +1,5 @@
 /**
- * frontend/src/components/NotificationsBell.jsx
+ * frontend/src/components/shell/NotificationsBell.jsx
  *
  * Notifications bell icon with animated dropdown — rendered in the Header.
  *
@@ -23,7 +23,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Bell, Package, Star, Shield, Tag, CheckCheck, ChevronRight } from 'lucide-react';
-import { useAuthContext } from '../auth/AuthContext.js';
+import { useAuthContext } from '../../auth/AuthContext.js';
 // ─── Notification type config ─────────────────────────────────────────────────
 
 const TYPE_CFG = {

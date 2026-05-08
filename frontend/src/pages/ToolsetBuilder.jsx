@@ -35,7 +35,7 @@ import {
   CheckCircle2, Layers, Tag, Truck, AlertCircle,
   SplitSquareHorizontal, Star, Zap, Box,
 } from 'lucide-react';
-import SEOHead from '../components/SEOHead';
+import SEOHead from '../components/shared/SEOHead';
 import Toast from '../components/ui/Toast';
 import { getProducts } from '../services/catalog';
 import { getProductVariations } from '../services/api';

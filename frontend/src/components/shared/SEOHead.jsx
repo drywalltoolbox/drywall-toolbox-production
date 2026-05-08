@@ -1,5 +1,5 @@
 /**
- * frontend/src/components/SEOHead.jsx
+ * frontend/src/components/shared/SEOHead.jsx
  *
  * Reusable document-head manager powered by react-helmet-async.
  * Drop this component anywhere in a page tree to control that page's

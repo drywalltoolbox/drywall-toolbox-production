@@ -3,13 +3,13 @@ import { createPortal } from 'react-dom';
 import { useLocation, useNavigate, Link } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import Toast from '../components/ui/Toast';
-import BrandSelector from '../components/BrandSelector';
-import ToolSelector from '../components/ToolSelector';
+import BrandSelector from '../components/schematics/BrandSelector';
+import ToolSelector from '../components/schematics/ToolSelector';
 import { getProductBySku } from '../api/products';
 import { SCHEMATIC_DEFINITIONS } from '../data/schematicMappings';
 import { useSchematicMedia } from '../hooks/useSchematicMedia';
 import '../styles/mobile-schematic.css';
-import SEOHead from '../components/SEOHead';
+import SEOHead from '../components/shared/SEOHead';
 import { buildBreadcrumbSchema } from '../utils/schema';
 
 import tapeTechLogo from '/brands/TapeTech/tapetech_logo.svg';

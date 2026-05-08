@@ -21,7 +21,7 @@ import {
   RotateCcw, Shield, Truck, CreditCard, Phone,
   CheckCircle, AlertCircle, ArrowRight, Info,
 } from 'lucide-react';
-import SEOHead from '../components/SEOHead';
+import SEOHead from '../components/shared/SEOHead';
 
 /* ─── Return shipping responsibility table ───────────────────────────────────── */
 const RETURN_SHIPPING_ROWS = [

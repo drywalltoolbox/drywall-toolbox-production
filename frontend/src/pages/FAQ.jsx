@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { AnimatePresence, motion as Motion } from 'framer-motion';
-import SEOHead from '../components/SEOHead';
+import SEOHead from '../components/shared/SEOHead';
 import NavbarTabs from '../components/ui/NavbarTabs';
 
 /* ─────────────────────────────────────────────────────────────────────────────

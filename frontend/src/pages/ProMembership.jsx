@@ -15,7 +15,7 @@ import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion as Motion } from 'framer-motion';
 import { Shield } from 'lucide-react';
-import SEOHead from '../components/SEOHead';
+import SEOHead from '../components/shared/SEOHead';
 import { useAuthContext } from '../auth/AuthContext.js';
 import {
   MEMBERSHIP_TIERS,

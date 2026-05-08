@@ -11,8 +11,8 @@
 
 import { motion as Motion } from 'framer-motion';
 import { User, Lock, Bell } from 'lucide-react';
-import AccountLayout from '../components/AccountLayout.jsx';
-import SEOHead from '../components/SEOHead';
+import AccountLayout from '../components/account/AccountLayout.jsx';
+import SEOHead from '../components/shared/SEOHead';
 
 const fadeUp = {
   hidden:  { opacity: 0, y: 14 },

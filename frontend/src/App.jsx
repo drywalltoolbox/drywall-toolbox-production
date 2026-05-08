@@ -1,8 +1,8 @@
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import { useState, useEffect, lazy, Suspense } from 'react';
-import PageTransition from './components/PageTransition';
-import LoadingSpinner from './components/LoadingSpinner';
-import ShippingTicker from './components/ShippingTicker';
+import PageTransition from './components/routing/PageTransition';
+import LoadingSpinner from './components/shared/LoadingSpinner';
+import ShippingTicker from './components/shell/ShippingTicker';
 import { CartProvider } from './context/CartContext';
 import { WooCommerceProvider } from './context/WooCommerceContext';
 import { AuthProvider } from './auth/AuthContext.js';
@@ -10,10 +10,10 @@ import { Truck, Phone, Wrench } from 'lucide-react';
 
 // Layout components load eagerly — they're on every page so there's no benefit
 // to lazy loading them. Keeping them in the main bundle is correct.
-import Header from './components/Header';
-import Footer from './components/Footer';
-import CartSidebar from './components/CartSidebar';
-import ProtectedRoute from './components/ProtectedRoute';
+import Header from './components/shell/Header';
+import Footer from './components/shell/Footer';
+import CartSidebar from './components/shell/CartSidebar';
+import ProtectedRoute from './components/routing/ProtectedRoute';
 
 // ─── Lazy page imports ────────────────────────────────────────────────────────
 // Each import() becomes its own chunk file. Webpack only loads a chunk when

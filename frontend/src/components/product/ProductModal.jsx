@@ -69,11 +69,14 @@ export default function ProductModal({ isOpen, product, onClose, children }) {
 
   useEffect(() => {
     if (!isOpen) {
-      setIsScrollActive(false);
       if (scrollHideTimerRef.current) {
         clearTimeout(scrollHideTimerRef.current);
         scrollHideTimerRef.current = null;
       }
+      const resetId = setTimeout(() => {
+        setIsScrollActive(false);
+      }, 0);
+      return () => clearTimeout(resetId);
     }
   }, [isOpen]);
 

@@ -1,5 +1,5 @@
 /**
- * frontend/src/components/AccountLayout.jsx
+ * frontend/src/components/account/AccountLayout.jsx
  *
  * Shared layout wrapper for all authenticated account sub-pages.
  *
@@ -19,7 +19,7 @@ import { useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion as Motion } from 'framer-motion';
 import { ChevronLeft, Loader } from 'lucide-react';
-import { useAuthContext } from '../auth/AuthContext.js';
+import { useAuthContext } from '../../auth/AuthContext.js';
 
 // Dot-grid overlay reused across all account pages
 const DOT_GRID = {

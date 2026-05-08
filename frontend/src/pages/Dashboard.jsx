@@ -11,7 +11,7 @@
  */
 
 import { AccountHub } from '../components/dashboard';
-import SEOHead from '../components/SEOHead';
+import SEOHead from '../components/shared/SEOHead';
 
 export default function Dashboard() {
   return (

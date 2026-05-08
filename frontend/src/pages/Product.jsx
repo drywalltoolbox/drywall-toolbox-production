@@ -2,10 +2,10 @@ import { useEffect, useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { getProductById } from '../services/catalog';
 import { useCart } from '../context/CartContext';
-import ProductDetail from '../components/ProductDetail';
+import ProductDetail from '../components/product/ProductDetail';
 import Toast from '../components/ui/Toast';
-import LoadingSpinner from '../components/LoadingSpinner';
-import SEOHead from '../components/SEOHead';
+import LoadingSpinner from '../components/shared/LoadingSpinner';
+import SEOHead from '../components/shared/SEOHead';
 import { buildProductSchema, buildBreadcrumbSchema, stripHtml } from '../utils/schema';
 
 export default function Product() {

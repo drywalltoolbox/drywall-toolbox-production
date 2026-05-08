@@ -13,7 +13,7 @@ import {
   CreditCard,
   ShoppingBag
 } from 'lucide-react';
-import SEOHead from '../components/SEOHead';
+import SEOHead from '../components/shared/SEOHead';
 
 export default function WooCommerceSettings() {
   const { 

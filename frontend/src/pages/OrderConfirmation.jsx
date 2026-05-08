@@ -24,7 +24,7 @@ import {
   ArrowLeft,
   Star,
 } from 'lucide-react';
-import SEOHead from '../components/SEOHead';
+import SEOHead from '../components/shared/SEOHead';
 import { calculatePointsEarned, pointsToUsd } from '../api/rewards.js';
 
 // ─── Status badge helpers ──────────────────────────────────────────────────────

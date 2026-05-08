@@ -16,7 +16,7 @@
 
 import { motion as Motion } from 'framer-motion';
 import { ShoppingCart, Heart, ChevronRight, Eye } from 'lucide-react';
-import ProductCardImage from '../ProductCardImage';
+import ProductCardImage from '../product/ProductCardImage';
 
 const STOCK_STATUS_OUT_OF_STOCK = 'outofstock';
 

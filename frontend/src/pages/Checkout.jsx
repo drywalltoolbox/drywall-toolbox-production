@@ -31,7 +31,7 @@ import DOMPurify from 'dompurify';
 import { useCart } from '../context/CartContext';
 import { syncAndPlace } from '../api/cart.js';
 import veeqoService from '../services/veeqo';
-import SEOHead from '../components/SEOHead';
+import SEOHead from '../components/shared/SEOHead';
 import { useAuthContext } from '../auth/AuthContext.js';
 import { FREE_SHIP_THRESHOLD, ESTIMATED_SHIP_RATE } from '../constants/shipping';
 import {

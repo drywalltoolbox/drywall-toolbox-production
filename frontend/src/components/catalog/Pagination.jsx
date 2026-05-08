@@ -1,5 +1,5 @@
 /**
- * frontend/src/components/Pagination.jsx
+ * frontend/src/components/catalog/Pagination.jsx
  *
  * Reusable pagination bar used by AllProducts, Products (brand view),
  * and PartsShop.  Renders:

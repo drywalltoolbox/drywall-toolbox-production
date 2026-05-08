@@ -1,5 +1,5 @@
 import { X, Trash2, ShoppingCart } from 'lucide-react';
-import { useCart } from '../context/CartContext';
+import { useCart } from '../../context/CartContext';
 import { Link } from 'react-router-dom';
 
 export default function CartSidebar({ isOpen, onClose }) {

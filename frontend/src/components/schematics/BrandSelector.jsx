@@ -6,7 +6,7 @@ import gracoLogo from '/brands/Graco/graco_logo.svg';
 import platinumLogo from '/brands/Platinum/platinum_logo.svg';
 import duraStiltsLogo from '/brands/Dura-Stilts/dura-stilts-logo.svg';
 import level5Logo from '/brands/Level5/Level5.svg';
-import SearchBar from './SearchBar';
+import SearchBar from '../catalog/SearchBar';
 
 const brandLogos = {
   'TapeTech': tapeTechLogo,

@@ -5,7 +5,7 @@ import './index.css'
 import './styles/machined-design.css'
 import './styles/technical-specifications.css'
 import App from './App.jsx'
-import ErrorBoundary from './components/ErrorBoundary.jsx'
+import ErrorBoundary from './components/errors/ErrorBoundary.jsx'
 
 // ─── Pre-warm product catalog cache ──────────────────────────────────────────
 // Kick off the catalog fetch immediately — before React even renders.

@@ -1,14 +1,14 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { getProducts } from '../services/catalog';
-import { getProductVariations } from '../services/api';
+import { getProducts } from '../../services/catalog';
+import { getProductVariations } from '../../services/api';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { useCart } from '../context/CartContext';
-import Toast from './Toast';
-import ProductDetail from './ProductDetail';
-import ProductModal from './ProductModal';
-import LoadingSpinner from './LoadingSpinner';
-import ProductShoppingCard from './ui/ProductShoppingCard';
-import { fetchVariationsBatched } from '../utils/variationSelection';
+import { useCart } from '../../context/CartContext';
+import ProductDetail from '../product/ProductDetail';
+import ProductModal from '../product/ProductModal';
+import LoadingSpinner from '../shared/LoadingSpinner';
+import ProductShoppingCard from '../ui/ProductShoppingCard';
+import Toast from '../ui/Toast';
+import { fetchVariationsBatched } from '../../utils/variationSelection';
 
 export default function TrendingProducts() {
   const [products, setProducts] = useState([]);

@@ -16,23 +16,23 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import ProductDetail from '../components/ProductDetail';
-import ProductModal from '../components/ProductModal';
-import SearchBar from '../components/SearchBar';
+import ProductDetail from '../components/product/ProductDetail';
+import ProductModal from '../components/product/ProductModal';
+import SearchBar from '../components/catalog/SearchBar';
 import Dropdown from '../components/ui/Dropdown';
 import { SORT_OPTIONS } from '../constants/sortOptions';
 import Toast from '../components/ui/Toast';
-import Pagination from '../components/Pagination';
+import Pagination from '../components/catalog/Pagination';
 import { Filter, Wrench } from 'lucide-react';
-import FilterPanel from '../components/FilterPanel';
+import FilterPanel from '../components/catalog/FilterPanel';
 import { getProducts } from '../services/catalog';
 import { getProductVariations } from '../services/api';
 import { fetchVariationsBatched } from '../utils/variationSelection';
 import { useCart } from '../context/CartContext';
-import LoadingSpinner from '../components/LoadingSpinner';
+import LoadingSpinner from '../components/shared/LoadingSpinner';
 import ProductShoppingCard from '../components/ui/ProductShoppingCard';
-import { ProductSkeletonGrid } from '../components/ProductSkeletonCard';
-import SEOHead from '../components/SEOHead';
+import { ProductSkeletonGrid } from '../components/catalog/ProductShoppingCardSkeleton';
+import SEOHead from '../components/shared/SEOHead';
 import { buildBreadcrumbSchema } from '../utils/schema';
 
 // Brands that carry parts in the production WooCommerce catalog

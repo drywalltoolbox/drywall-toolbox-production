@@ -1,5 +1,5 @@
 /**
- * frontend/src/components/ProtectedRoute.jsx
+ * frontend/src/components/routing/ProtectedRoute.jsx
  *
  * Route guard for pages that require authentication.
  *
@@ -25,8 +25,8 @@
  */
 
 import { Navigate, useLocation } from 'react-router-dom';
-import { useAuthContext } from '../auth/AuthContext.js';
-import LoadingSpinner from './LoadingSpinner';
+import { useAuthContext } from '../../auth/AuthContext.js';
+import LoadingSpinner from '../shared/LoadingSpinner';
 
 export default function ProtectedRoute( { children } ) {
   const { isAuthenticated, isLoading } = useAuthContext();

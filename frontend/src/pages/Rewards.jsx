@@ -15,8 +15,8 @@ import { Link } from 'react-router-dom';
 import { motion as Motion } from 'framer-motion';
 import { Star, ArrowRight, ChevronRight, Loader } from 'lucide-react';
 import { useAuthContext } from '../auth/AuthContext.js';
-import AccountLayout from '../components/AccountLayout.jsx';
-import SEOHead from '../components/SEOHead';
+import AccountLayout from '../components/account/AccountLayout.jsx';
+import SEOHead from '../components/shared/SEOHead';
 import {
   getUserPoints,
   getPointsHistory,

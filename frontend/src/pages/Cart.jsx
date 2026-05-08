@@ -9,7 +9,7 @@ import {
   ShoppingBag,
   Truck
 } from 'lucide-react';
-import SEOHead from '../components/SEOHead';
+import SEOHead from '../components/shared/SEOHead';
 import { FREE_SHIP_THRESHOLD, ESTIMATED_SHIP_RATE } from '../constants/shipping';
 
 export default function Cart() {

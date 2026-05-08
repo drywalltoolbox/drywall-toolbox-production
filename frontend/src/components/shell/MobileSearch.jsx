@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Search, X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { searchProducts } from '../services/catalog';
+import { searchProducts } from '../../services/catalog';
 
 export default function MobileSearch({ onClose = () => {} }) {
   const [searchQuery, setSearchQuery] = useState('');

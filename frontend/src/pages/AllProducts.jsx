@@ -1,16 +1,16 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import ProductDetail from '../components/ProductDetail';
-import ProductModal from '../components/ProductModal';
+import ProductDetail from '../components/product/ProductDetail';
+import ProductModal from '../components/product/ProductModal';
 import ProductShoppingCard from '../components/ui/ProductShoppingCard';
-import BackButton from '../components/BackButton';
-import SearchBar from '../components/SearchBar';
+import BackButton from '../components/shared/BackButton';
+import SearchBar from '../components/catalog/SearchBar';
 import Toast from '../components/ui/Toast';
 import Dropdown from '../components/ui/Dropdown';
 import { SORT_OPTIONS } from '../constants/sortOptions';
-import FilterPanel from '../components/FilterPanel';
-import Pagination from '../components/Pagination';
-import { ProductSkeletonGrid } from '../components/ProductSkeletonCard';
+import FilterPanel from '../components/catalog/FilterPanel';
+import Pagination from '../components/catalog/Pagination';
+import { ProductSkeletonGrid } from '../components/catalog/ProductShoppingCardSkeleton';
 import { getProducts } from '../services/catalog';
 import { getProductVariations } from '../services/api';
 import { useCart } from '../context/CartContext';
@@ -19,7 +19,7 @@ import {
   Filter,
   SlidersHorizontal,
 } from 'lucide-react';
-import SEOHead from '../components/SEOHead';
+import SEOHead from '../components/shared/SEOHead';
 import { buildSiteLinksSearchBoxSchema } from '../utils/schema';
 import { fetchVariationsBatched } from '../utils/variationSelection';
 

@@ -16,7 +16,7 @@ import { Link } from 'react-router-dom';
 import {
   Package, CheckCircle, AlertCircle, ArrowRight, ArrowLeft, Loader, RotateCcw,
 } from 'lucide-react';
-import SEOHead from '../components/SEOHead';
+import SEOHead from '../components/shared/SEOHead';
 import { apiClient } from '../api/client';
 
 /* ─── Return reason options ──────────────────────────────────────────────────── */

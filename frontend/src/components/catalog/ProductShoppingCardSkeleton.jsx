@@ -1,12 +1,15 @@
 /**
- * ProductSkeletonCard.jsx
+ * ProductShoppingCardSkeleton.jsx
  *
- * Shimmer placeholder that exactly mirrors the real product card layout.
+ * Shimmer placeholder for catalog grids that render ui/ProductShoppingCard.
+ * This stays outside components/ui because it is a catalog-loading helper,
+ * not a general-purpose interactive card primitive.
+ *
  * Rendered while the catalog is loading so the page never shows a spinner
  * in an empty void — the layout is stable and the transition to real cards
  * is seamless.
  */
-export default function ProductSkeletonCard() {
+export default function ProductShoppingCardSkeleton() {
   return (
     <div className="product-skeleton-card" aria-hidden="true">
       {/* Image area */}
@@ -32,7 +35,7 @@ export default function ProductSkeletonCard() {
 }
 
 /**
- * Renders a responsive grid of skeleton cards matching the real product grid.
+ * Renders a responsive grid of skeleton cards matching the ProductShoppingCard grid.
  *
  * @param {number} count  Number of cards to show (default 24 — matches ITEMS_PER_PAGE)
  */
@@ -40,7 +43,7 @@ export function ProductSkeletonGrid({ count = 24 }) {
   return (
     <div className="product-skeleton-grid">
       {Array.from({ length: count }, (_, i) => (
-        <ProductSkeletonCard key={i} />
+        <ProductShoppingCardSkeleton key={i} />
       ))}
     </div>
   );

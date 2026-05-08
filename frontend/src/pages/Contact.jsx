@@ -1,5 +1,5 @@
 ﻿import { useState } from 'react';
-import SEOHead from '../components/SEOHead';
+import SEOHead from '../components/shared/SEOHead';
 import { apiClient } from '../api/client';
 
 const contactInfo = [

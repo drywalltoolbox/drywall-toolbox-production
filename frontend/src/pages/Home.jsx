@@ -1,4 +1,4 @@
-import TrendingProducts from '../components/TrendingProducts';
+import TrendingProducts from '../components/catalog/TrendingProducts';
 import FeatureSection from '../components/ui/FeatureSection';
 import HeroSection from '../components/ui/HeroSection';
 import TrustedBrands from '../components/ui/TrustedBrands';
@@ -8,7 +8,7 @@ import surproLogo from '/brands/SurPro/surpro_logo.svg';
 import asgardLogo from '/brands/Asgard/asgard_logo.svg';
 import platinumLogo from '/brands/Platinum/platinum_logo.svg';
 import level5Logo from '/brands/Level5/Level5.svg';
-import SEOHead from '../components/SEOHead';
+import SEOHead from '../components/shared/SEOHead';
 import { buildOrganizationSchema, buildSiteLinksSearchBoxSchema } from '../utils/schema';
 import { Truck, Shield, Phone, Wrench } from 'lucide-react';
 

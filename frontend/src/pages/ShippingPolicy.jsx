@@ -10,7 +10,7 @@
 
 import { Link } from 'react-router-dom';
 import { Truck, Clock, Package, Globe, CheckCircle, AlertCircle, ArrowRight } from 'lucide-react';
-import SEOHead from '../components/SEOHead';
+import SEOHead from '../components/shared/SEOHead';
 
 /* ─── Shipping rate table data ───────────────────────────────────────────────── */
 const SHIPPING_RATES = [

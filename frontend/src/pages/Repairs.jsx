@@ -1,7 +1,7 @@
 import { useState, useRef, useCallback, useMemo, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion as Motion, AnimatePresence } from 'framer-motion';
-import SEOHead from '../components/SEOHead';
+import SEOHead from '../components/shared/SEOHead';
 import { SCHEMATIC_DEFINITIONS } from '../data/schematicMappings';
 import veeqoService from '../services/veeqo';
 import { useAuthContext } from '../auth/AuthContext.js';

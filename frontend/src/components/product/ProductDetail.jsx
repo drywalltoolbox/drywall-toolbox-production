@@ -4,20 +4,20 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import Reviews from './Reviews';
 import TechnicalSpecifications from './TechnicalSpecifications';
-import { useCart } from '../context/CartContext';
+import { useCart } from '../../context/CartContext';
 import { Heart, Plus, Minus, X, ShoppingCart, CheckCircle2, PackageCheck } from 'lucide-react';
 import ProductImageGallery from './ProductImageGallery';
-import { getProductSpecifications } from '../utils/productSpecifications';
-import { getProductVariations } from '../services/api';
-import { findMatchingVariation, getVariationSelectionMap } from '../utils/variationSelection';
-import { setCachedVariations } from '../utils/variationCache';
+import { getProductSpecifications } from '../../utils/productSpecifications';
+import { getProductVariations } from '../../services/api';
+import { findMatchingVariation, getVariationSelectionMap } from '../../utils/variationSelection';
+import { setCachedVariations } from '../../utils/variationCache';
 import columbiaLogo from '/brands/Columbia/columbia_taping_tools_logo.svg';
 import tapeTechLogo from '/brands/TapeTech/tapetech_logo.svg';
 import surproLogo from '/brands/SurPro/surpro_logo.svg';
 import asgardLogo from '/brands/Asgard/asgard_logo.svg';
 import gracoLogo from '/brands/Graco/graco_logo.svg';
 import level5Logo from '/brands/Level5/Level5.svg';
-import { getSchematicIdForProduct, buildSchematicsUrl } from '../data/schematicMappings';
+import { getSchematicIdForProduct, buildSchematicsUrl } from '../../data/schematicMappings';
 
 const BRAND_LOGOS = {
   'Columbia Taping Tools': columbiaLogo,
