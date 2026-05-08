@@ -481,10 +481,10 @@ export default function ProductDetail({
 
           {/* Bottom Section — Full Width Tabs */}
           <div className="border-t border-gray-200 pt-4 sm:pt-6 md:pt-8">
-            <div className="flex gap-4 sm:gap-6 md:gap-8 border-b border-gray-200 mb-4 sm:mb-6 overflow-x-auto">
+            <div className="grid grid-cols-3 gap-3 sm:gap-4 border-b border-gray-200 mb-4 sm:mb-6">
               <button
                 onClick={() => setActiveTab('description')}
-                className={`pb-2 sm:pb-3 font-semibold text-xs sm:text-sm md:text-base transition-colors relative whitespace-nowrap ${
+                className={`pb-2 sm:pb-3 font-semibold text-xs sm:text-sm md:text-base transition-colors relative text-center ${
                   activeTab === 'description'
                     ? 'text-blue-600 after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:bg-blue-600'
                     : 'text-gray-500 hover:text-gray-700'
@@ -494,7 +494,7 @@ export default function ProductDetail({
               </button>
               <button
                 onClick={() => setActiveTab('specifications')}
-                className={`pb-2 sm:pb-3 font-semibold text-xs sm:text-sm md:text-base transition-colors relative whitespace-nowrap ${
+                className={`pb-2 sm:pb-3 font-semibold text-xs sm:text-sm md:text-base transition-colors relative text-center ${
                   activeTab === 'specifications'
                     ? 'text-blue-600 after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:bg-blue-600'
                     : 'text-gray-500 hover:text-gray-700'
@@ -504,13 +504,13 @@ export default function ProductDetail({
               </button>
               <button
                 onClick={() => setActiveTab('reviews')}
-                className={`pb-2 sm:pb-3 font-semibold text-xs sm:text-sm md:text-base transition-colors relative whitespace-nowrap ${
+                className={`pb-2 sm:pb-3 font-semibold text-xs sm:text-sm md:text-base transition-colors relative text-center ${
                   activeTab === 'reviews'
                     ? 'text-blue-600 after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:bg-blue-600'
                     : 'text-gray-500 hover:text-gray-700'
                 }`}
               >
-                PRODUCT REVIEWS
+                REVIEWS
               </button>
             </div>
 
