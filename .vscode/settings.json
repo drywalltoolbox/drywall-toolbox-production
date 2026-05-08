@@ -116,4 +116,12 @@
         "Invoke-Expression": false,
         "iex": false
     }
+,
+    "terminal.integrated.defaultProfile.windows": "PowerShell Extension",
+    "terminal.integrated.profiles.windows": {
+        "PowerShell Extension": {
+            "source": "PowerShell",
+            "icon": "terminal-powershell"
+        }
+    }
 }
