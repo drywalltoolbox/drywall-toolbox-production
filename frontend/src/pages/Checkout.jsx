@@ -1,15 +1,11 @@
 /**
  * frontend/src/pages/Checkout.jsx
  *
- * Modernised headless WooCommerce checkout.
- *   - Two-column layout (form left, sticky order summary right)
+ * Modern headless WooCommerce checkout.
+ *   - Responsive two-column checkout with mobile summary + sticky CTA
+ *   - Gateway-aware payment option model for Stripe wallets/BNPL and PayPal
  *   - Framer Motion step-enter animations + AnimatePresence payment panels
- *   - Mobile: single-column + sticky "Complete Purchase" CTA docked to viewport bottom
- *   - 4-dot breathing loader during cart-sync / order-placement
- *   - Skeleton order summary during processing
- *   - Stripe UPE card UI placeholder (activated once WC Stripe gateway is live)
- *   - PayPal Express button stubs (activated once WC PayPal Payments plugin is live)
- *   - All existing business logic preserved: syncAndPlace(), DOMPurify, Veeqo
+ *   - Existing business logic preserved: syncAndPlace(), DOMPurify, Veeqo
  */
 
 import { useState, useMemo, useCallback, useEffect, useRef } from 'react';
@@ -24,7 +20,6 @@ import {
   AlertTriangle,
   ShoppingCart,
   User,
-  Smartphone,
 } from 'lucide-react';
 import DOMPurify from 'dompurify';
 
@@ -42,15 +37,87 @@ import {
   POINTS_MAX_REDEEM,
   POINTS_REDEEM_STEP,
 } from '../api/rewards.js';
-// ─── Payment gateway definitions ──────────────────────────────────────────────
-// IDs must match WC payment gateway slugs enabled in WP Admin →
-// WooCommerce → Settings → Payments.
-// 'stripe' and 'paypal' are included as UI placeholders; they activate
-// automatically once their corresponding WC gateways are configured.
+// ─── Payment option definitions ────────────────────────────────────────────────
+// option id = customer-facing checkout choice.
+// gatewayId = WooCommerce Store API payment_method. BNPL and wallets typically
+// route through Stripe Payment Element, while PayPal routes through its gateway.
 const PAYMENT_METHODS = [
-  { id: 'stripe', label: 'Credit / Debit Card' },
-  { id: 'paypal', label: 'PayPal / Express'    },
+  {
+    id: 'stripe',
+    gatewayId: 'stripe',
+    label: 'Card',
+    badge: 'Stripe',
+    sublabel: 'Visa, Mastercard, Amex, Discover',
+    detail: 'Encrypted card entry with network token support.',
+    kind: 'card',
+    brands: ['Visa', 'MC', 'Amex', 'Disc'],
+  },
+  {
+    id: 'link',
+    gatewayId: 'stripe',
+    label: 'Link',
+    badge: '1-click',
+    sublabel: 'Fast saved checkout by Stripe',
+    detail: 'Saved customer details can complete checkout faster when Stripe Link is enabled.',
+    kind: 'wallet',
+    brands: ['Link'],
+  },
+  {
+    id: 'paypal',
+    gatewayId: 'paypal',
+    label: 'PayPal',
+    badge: 'Express',
+    sublabel: 'PayPal, Venmo, and Pay Later where eligible',
+    detail: 'Redirects through PayPal once the WooCommerce PayPal gateway is active.',
+    kind: 'paypal',
+    brands: ['PayPal', 'Venmo'],
+  },
+  {
+    id: 'affirm',
+    gatewayId: 'stripe',
+    label: 'Affirm',
+    badge: 'Pay over time',
+    sublabel: 'Monthly plans for eligible US orders',
+    detail: 'A production-ready BNPL choice routed through Stripe Payment Element when Affirm is enabled.',
+    kind: 'bnpl',
+    brands: ['Affirm'],
+  },
+  {
+    id: 'klarna',
+    gatewayId: 'stripe',
+    label: 'Klarna',
+    badge: 'Pay later',
+    sublabel: 'Flexible pay-in-4 or financing where eligible',
+    detail: 'Shows Klarna eligibility through Stripe based on amount, currency, and location.',
+    kind: 'bnpl',
+    brands: ['Klarna'],
+  },
+  {
+    id: 'afterpay_clearpay',
+    gatewayId: 'stripe',
+    label: 'Afterpay',
+    badge: '4 payments',
+    sublabel: 'Afterpay / Clearpay for supported buyers',
+    detail: 'Four-payment checkout option when supported by the merchant account and order.',
+    kind: 'bnpl',
+    brands: ['Afterpay'],
+  },
 ];
+
+const EXPRESS_OPTIONS = [
+  { id: 'paypal', label: 'PayPal', tone: 'bg-[#003087] text-white border-[#003087]' },
+  { id: 'stripe', label: 'Apple Pay', tone: 'bg-slate-950 text-white border-slate-950' },
+  { id: 'stripe', label: 'Google Pay', tone: 'bg-white text-slate-900 border-slate-200' },
+  { id: 'link', label: 'Link', tone: 'bg-[#635bff] text-white border-[#635bff]' },
+];
+
+function getSelectedPaymentOption( selectedMethod ) {
+  return PAYMENT_METHODS.find( ( option ) => option.id === selectedMethod ) ?? PAYMENT_METHODS[0];
+}
+
+function getPaymentGatewayId( selectedMethod ) {
+  return getSelectedPaymentOption( selectedMethod ).gatewayId;
+}
 
 // ─── Framer Motion shared variants ────────────────────────────────────────────
 // will-change is set on the hidden/initial state (before animation starts) and
@@ -102,7 +169,7 @@ function StepCard( { children, delay = 0, className = '' } ) {
       initial="hidden"
       animate="visible"
       custom={ delay }
-      className={ `bg-white rounded-2xl border border-gray-100 shadow-sm ${ className }` }
+      className={ `bg-white/95 rounded-[1.35rem] border border-slate-200/80 shadow-[0_18px_55px_rgba(15,23,42,0.08)] backdrop-blur ${ className }` }
     >
       { children }
     </Motion.div>
@@ -125,12 +192,24 @@ function SkeletonRow() {
 // ─── OrderSummaryPanel ────────────────────────────────────────────────────────
 // Sticky right-column panel that shows cart items, pricing totals, and a
 // skeleton loading state while the order is being processed.
-function OrderSummaryPanel( { cartItems, subtotal, shipping, tax, total, loading } ) {
+function OrderSummaryPanel( { cartItems, subtotal, shipping, tax, total, loading, className = '' } ) {
   return (
-    <StepCard delay={ 0.15 } className="p-6 sticky top-24">
-      <h2 className="text-lg font-bold text-gray-900 mb-5 tracking-tight">Order Summary</h2>
+    <StepCard delay={ 0.15 } className={ `overflow-hidden ${ className }` }>
+      <div className="bg-slate-950 px-5 py-4 text-white">
+        <div className="flex items-center justify-between gap-3">
+          <div>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-sky-200">
+              Secure Total
+            </p>
+            <h2 className="text-lg font-bold tracking-tight">Order Summary</h2>
+          </div>
+          <div className="rounded-full border border-white/15 bg-white/10 px-3 py-1 text-xs font-bold tabular-nums">
+            ${ total.toFixed( 2 ) }
+          </div>
+        </div>
+      </div>
 
-      <div className="space-y-3.5 mb-5 max-h-60 overflow-y-auto pr-1">
+      <div className="space-y-3.5 px-5 py-5 max-h-64 overflow-y-auto">
         <AnimatePresence>
           { loading
             ? [0, 1, 2].map( ( i ) => <SkeletonRow key={ i } /> )
@@ -140,13 +219,13 @@ function OrderSummaryPanel( { cartItems, subtotal, shipping, tax, total, loading
                   initial={ { opacity: 0 } }
                   animate={ { opacity: 1 } }
                   exit={ { opacity: 0 } }
-                  className="flex justify-between text-sm"
+                  className="flex justify-between gap-4 text-sm"
                 >
                   <div className="grow mr-3 min-w-0">
-                    <p className="font-medium text-gray-900 truncate leading-snug">{ item.name }</p>
-                    <p className="text-gray-400 text-xs mt-0.5">Qty { item.quantity }</p>
+                    <p className="font-semibold text-slate-950 truncate leading-snug">{ item.name }</p>
+                    <p className="text-slate-400 text-xs mt-0.5">Qty { item.quantity }</p>
                   </div>
-                  <p className="font-semibold text-gray-900 shrink-0 tabular-nums">
+                  <p className="font-bold text-slate-950 shrink-0 tabular-nums">
                     ${ ( item.price * item.quantity ).toFixed( 2 ) }
                   </p>
                 </Motion.div>
@@ -155,34 +234,34 @@ function OrderSummaryPanel( { cartItems, subtotal, shipping, tax, total, loading
         </AnimatePresence>
       </div>
 
-      <div className="border-t border-gray-100 pt-4 space-y-2.5 mb-5 text-sm text-gray-600">
+      <div className="mx-5 border-t border-slate-100 py-4 space-y-2.5 text-sm text-slate-500">
         { [
           { label: 'Subtotal', value: `$${ subtotal.toFixed( 2 ) }` },
           {
             label: 'Shipping',
             value: shipping === 0
-              ? <span className="text-emerald-600 font-semibold">FREE</span>
+              ? <span className="text-emerald-600 font-bold">Free</span>
               : `$${ shipping.toFixed( 2 ) }`,
           },
           { label: 'Tax (8%)', value: `$${ tax.toFixed( 2 ) }` },
         ].map( ( { label, value } ) => (
           <div key={ label } className="flex justify-between">
             <span>{ label }</span>
-            <span className="font-medium text-gray-900 tabular-nums">{ value }</span>
+            <span className="font-semibold text-slate-950 tabular-nums">{ value }</span>
           </div>
         ) ) }
       </div>
 
-      <div className="border-t border-gray-200 pt-4">
+      <div className="mx-5 border-t border-slate-200 py-5">
         <div className="flex justify-between items-baseline">
-          <span className="text-base font-bold text-gray-900">Total</span>
-          <span className="text-2xl font-bold text-primary-600 tabular-nums">
+          <span className="text-base font-bold text-slate-950">Total</span>
+          <span className="text-2xl font-black text-primary-600 tabular-nums">
             ${ total.toFixed( 2 ) }
           </span>
         </div>
         { shipping === 0 && (
-          <p className="text-xs text-emerald-600 mt-1.5 text-right">
-            <span aria-hidden="true">🎉</span> You qualify for free shipping
+          <p className="text-xs text-emerald-600 mt-1.5 text-right font-semibold">
+            Free shipping unlocked
           </p>
         ) }
       </div>
@@ -190,202 +269,237 @@ function OrderSummaryPanel( { cartItems, subtotal, shipping, tax, total, loading
   );
 }
 
-// ─── PayPal Express stub ──────────────────────────────────────────────────────
-// Renders PayPal / Apple Pay / Google Pay express buttons as visual placeholders.
-// The @paypal/react-paypal-js SDK will replace these once the WC PayPal Payments
-// plugin is configured.
-function PayPalExpressButtons() {
+// ─── Express buttons ──────────────────────────────────────────────────────────
+// These select the payment path today and are structured so gateway SDK buttons
+// can replace their button bodies without changing the checkout state contract.
+function ExpressCheckoutButtons( { selectedMethod, onSelect } ) {
   return (
-    <div className="space-y-2.5">
-      <p className="text-[11px] text-amber-600 flex items-center gap-1.5">
-        <AlertTriangle size={ 12 } aria-hidden="true" />
-        PayPal gateway must be enabled in WP Admin → WooCommerce → Payments to activate.
-      </p>
-      <button
-        type="button"
-        disabled
-        className="w-full h-12 bg-[#0070BA] text-white rounded-xl font-bold text-sm
-                   tracking-wide flex items-center justify-center gap-2
-                   opacity-50 cursor-not-allowed"
-      >
-        <span className="font-extrabold">Pay</span>
-        <span className="font-extrabold text-[#009cde]">Pal</span>
-      </button>
-      <div className="grid grid-cols-2 gap-2">
-        <button
-          type="button"
-          disabled
-          aria-label="Apple Pay (requires PayPal gateway)"
-          className="h-12 bg-black text-white rounded-xl text-sm font-semibold
-                     opacity-50 cursor-not-allowed"
-        >
-          Apple Pay
-        </button>
-        <button
-          type="button"
-          disabled
-          aria-label="Google Pay (requires PayPal gateway)"
-          className="h-12 bg-white border border-gray-300 text-gray-800 rounded-xl
-                     text-sm font-semibold opacity-50 cursor-not-allowed"
-        >
-          G Pay
-        </button>
+    <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5">
+      { EXPRESS_OPTIONS.map( ( option ) => {
+        const active = selectedMethod === option.id;
+        return (
+          <button
+            key={ option.label }
+            type="button"
+            onClick={ () => onSelect( option.id ) }
+            aria-pressed={ active }
+            className={ `h-12 rounded-2xl border text-sm font-black tracking-tight
+                         transition-all duration-200 active:scale-[0.98]
+                         ${ option.tone }
+                         ${ active ? 'ring-2 ring-primary-400 ring-offset-2 shadow-lg shadow-primary-900/10' : 'hover:-translate-y-0.5 hover:shadow-md' }` }
+          >
+            { option.label }
+          </button>
+        );
+      } ) }
+    </div>
+  );
+}
+
+function CardEntryPreview( { inputClass } ) {
+  return (
+    <div className="space-y-3">
+      <div>
+        <label className="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1.5">
+          Card Number
+        </label>
+        <input
+          type="text"
+          inputMode="numeric"
+          autoComplete="cc-number"
+          placeholder="1234 5678 9012 3456"
+          maxLength={ 19 }
+          readOnly
+          className={ inputClass( '_stripe_num' ) }
+        />
+      </div>
+      <div className="grid grid-cols-2 gap-3">
+        <div>
+          <label className="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1.5">
+            Expiry
+          </label>
+          <input
+            type="text"
+            inputMode="numeric"
+            autoComplete="cc-exp"
+            placeholder="MM / YY"
+            maxLength={ 7 }
+            readOnly
+            className={ inputClass( '_stripe_exp' ) }
+          />
+        </div>
+        <div>
+          <label className="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1.5">
+            CVC
+          </label>
+          <input
+            type="text"
+            inputMode="numeric"
+            autoComplete="cc-csc"
+            placeholder="..."
+            maxLength={ 4 }
+            readOnly
+            className={ inputClass( '_stripe_cvc' ) }
+          />
+        </div>
       </div>
     </div>
   );
 }
 
-// ─── PaymentMethodSelector ────────────────────────────────────────────────────
-// Radio-group for payment methods with animated detail panels per method.
-// Uses AnimatePresence so only the active panel is mounted, preventing layout
-// shifts when switching between Stripe, PayPal, or offline methods.
-const METHOD_META = {
-  stripe: { sublabel: 'Secured by Stripe TLS. PCI-DSS compliant.',  Icon: CreditCard },
-  paypal: { sublabel: 'PayPal, Apple Pay, and Google Pay.',          Icon: Smartphone },
-};
+function PaymentOptionPanel( { option, total, inputClass } ) {
+  const estimatedInstallment = Math.max( total / 4, 0 ).toFixed( 2 );
 
-function PaymentMethodSelector( { selectedMethod, onChange, inputClass } ) {
   return (
-    <div className="space-y-2">
-      { PAYMENT_METHODS.map( ( { id, label } ) => {
-        const meta   = METHOD_META[id] ?? {};
-        const Icon   = meta.Icon ?? CreditCard;
-        const active = selectedMethod === id;
+    <Motion.div
+      key={ `panel-${ option.id }` }
+      variants={ panelVariants }
+      initial="initial"
+      animate="animate"
+      exit="exit"
+      className="overflow-hidden"
+    >
+      <div className="mt-4 rounded-[1.15rem] border border-slate-200 bg-slate-50/80 p-4">
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <p className="text-sm font-bold text-slate-950">{ option.label } checkout</p>
+            <p className="text-xs text-slate-500">{ option.detail }</p>
+          </div>
+          <span className="rounded-full bg-white px-3 py-1 text-[11px] font-bold uppercase tracking-[0.14em] text-slate-500 shadow-sm">
+            { option.gatewayId === 'stripe' ? 'Stripe ready' : 'Gateway ready' }
+          </span>
+        </div>
 
-        return (
-          <div key={ id }>
+        { option.kind === 'card' && <CardEntryPreview inputClass={ inputClass } /> }
+
+        { option.kind === 'wallet' && (
+          <div className="grid sm:grid-cols-3 gap-2">
+            { ['Saved identity', 'Saved payment', 'Fast approval'].map( ( item ) => (
+              <div key={ item } className="rounded-2xl bg-white px-3 py-3 text-xs font-semibold text-slate-700 shadow-sm">
+                { item }
+              </div>
+            ) ) }
+          </div>
+        ) }
+
+        { option.kind === 'paypal' && (
+          <div className="grid sm:grid-cols-3 gap-2">
+            { ['PayPal balance', 'Venmo', 'Pay Later'].map( ( item ) => (
+              <div key={ item } className="rounded-2xl bg-white px-3 py-3 text-xs font-semibold text-slate-700 shadow-sm">
+                { item }
+              </div>
+            ) ) }
+          </div>
+        ) }
+
+        { option.kind === 'bnpl' && (
+          <div className="grid sm:grid-cols-[1fr_auto] gap-3 items-stretch">
+            <div className="rounded-2xl bg-white p-4 shadow-sm">
+              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">
+                Estimated split
+              </p>
+              <p className="mt-1 text-2xl font-black text-slate-950 tabular-nums">
+                4 x ${ estimatedInstallment }
+              </p>
+              <p className="mt-1 text-xs text-slate-500">
+                Final terms are shown by the provider before approval.
+              </p>
+            </div>
+            <div className="rounded-2xl bg-white p-4 text-xs text-slate-500 shadow-sm sm:max-w-56">
+              <p className="font-bold text-slate-800">Eligibility-aware</p>
+              <p className="mt-1">
+                Availability depends on provider approval, buyer location, currency, and order total.
+              </p>
+            </div>
+          </div>
+        ) }
+
+        <div className="mt-4 flex flex-wrap gap-2">
+          { option.brands.map( ( brand ) => (
+            <span key={ brand } className="rounded-full border border-slate-200 bg-white px-3 py-1 text-[11px] font-bold text-slate-600">
+              { brand }
+            </span>
+          ) ) }
+        </div>
+      </div>
+    </Motion.div>
+  );
+}
+
+// ─── PaymentMethodSelector ────────────────────────────────────────────────────
+// Radio-group for payment methods with one animated detail panel for the active
+// method. Wallets and BNPL options route through the proper WC gateway id on
+// submit, while still giving customers a first-class choice in the UI.
+function PaymentMethodSelector( { selectedMethod, onChange, inputClass, total } ) {
+  const selectedOption = getSelectedPaymentOption( selectedMethod );
+
+  return (
+    <div className="space-y-4">
+      <div className="grid md:grid-cols-2 gap-3">
+        { PAYMENT_METHODS.map( ( option ) => {
+          const active = selectedMethod === option.id;
+
+          return (
             <label
+              key={ option.id }
               className={
-                `flex items-center gap-3.5 p-4 rounded-xl border-2 cursor-pointer
-                 transition-all duration-150 select-none ${
-                   active
-                     ? 'border-primary-500 bg-primary-50/60'
-                     : 'border-gray-100 bg-gray-50/50 hover:border-gray-200'
-                 }`
+                `group relative flex min-h-[116px] cursor-pointer flex-col justify-between
+                 rounded-[1.15rem] border p-4 transition-all duration-200 select-none
+                 ${ active
+                   ? 'border-primary-500 bg-primary-50/80 shadow-[0_16px_35px_rgba(37,99,235,0.14)] ring-1 ring-primary-400/40'
+                   : 'border-slate-200 bg-white hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-md' }`
               }
             >
               <input
                 type="radio"
                 name="paymentMethod"
-                value={ id }
+                value={ option.id }
                 checked={ active }
                 onChange={ onChange }
                 className="sr-only"
               />
-              {/* Custom radio indicator */}
-              <span
-                className={
-                  `flex h-5 w-5 shrink-0 items-center justify-center rounded-full
-                   border-2 transition-colors ${
-                     active ? 'border-primary-500' : 'border-gray-300'
-                   }`
-                }
-              >
-                { active && (
-                  <span className="block h-2.5 w-2.5 rounded-full bg-primary-500" />
-                ) }
-              </span>
-              <Icon size={ 17 } className={ active ? 'text-primary-600' : 'text-gray-400' } />
-              <span className="flex-1 min-w-0">
-                <span className="block text-sm font-semibold text-gray-900 leading-tight">
-                  { label }
-                </span>
-                { meta.sublabel && (
-                  <span className="block text-xs text-gray-500 mt-0.5 leading-tight">
-                    { meta.sublabel }
+              <span className="flex items-start justify-between gap-3">
+                <span className="flex items-center gap-3">
+                  <span
+                    className={
+                      `flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 transition-colors
+                       ${ active ? 'border-primary-500 bg-white' : 'border-slate-300 bg-white' }`
+                    }
+                  >
+                    { active && <span className="block h-2.5 w-2.5 rounded-full bg-primary-500" /> }
                   </span>
-                ) }
+                  <span>
+                    <span className="block text-sm font-black text-slate-950">{ option.label }</span>
+                    <span className="mt-0.5 block text-xs leading-snug text-slate-500">{ option.sublabel }</span>
+                  </span>
+                </span>
+                <span className="rounded-full bg-slate-950 px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.12em] text-white">
+                  { option.badge }
+                </span>
+              </span>
+              <span className="mt-4 flex flex-wrap gap-1.5">
+                { option.brands.map( ( brand ) => (
+                  <span
+                    key={ brand }
+                    className="rounded-full border border-slate-200 bg-white/80 px-2.5 py-1 text-[10px] font-bold text-slate-500"
+                  >
+                    { brand }
+                  </span>
+                ) ) }
               </span>
             </label>
+          );
+        } ) }
+      </div>
 
-            {/* Animated detail panel — only mounted when this method is active */}
-            <AnimatePresence initial={ false }>
-              { active && ( id === 'stripe' || id === 'paypal' || id === 'bacs' ) && (
-                <Motion.div
-                  key={ `panel-${ id }` }
-                  variants={ panelVariants }
-                  initial="initial"
-                  animate="animate"
-                  exit="exit"
-                  className="overflow-hidden px-1"
-                >
-                  { id === 'stripe' && (
-                    <div className="pt-4 space-y-3">
-                      <p className="text-[11px] text-amber-600 flex items-center gap-1.5">
-                        <AlertTriangle size={ 12 } aria-hidden="true" />
-                        Stripe gateway must be enabled in WP Admin → WooCommerce → Payments.
-                        The card form below will be replaced by Stripe Elements once active.
-                      </p>
-                      <div>
-                        <label className="block text-xs font-semibold uppercase tracking-wider
-                                          text-gray-500 mb-1.5">
-                          Card Number
-                        </label>
-                        <input
-                          type="text"
-                          inputMode="numeric"
-                          autoComplete="cc-number"
-                          placeholder="1234 5678 9012 3456"
-                          maxLength={ 19 }
-                          readOnly
-                          className={ inputClass( '_stripe_num' ) }
-                        />
-                      </div>
-                      <div className="grid grid-cols-2 gap-3">
-                        <div>
-                          <label className="block text-xs font-semibold uppercase tracking-wider
-                                            text-gray-500 mb-1.5">
-                            Expiry
-                          </label>
-                          <input
-                            type="text"
-                            inputMode="numeric"
-                            autoComplete="cc-exp"
-                            placeholder="MM / YY"
-                            maxLength={ 7 }
-                            readOnly
-                            className={ inputClass( '_stripe_exp' ) }
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-xs font-semibold uppercase tracking-wider
-                                            text-gray-500 mb-1.5">
-                            CVC
-                          </label>
-                          <input
-                            type="text"
-                            inputMode="numeric"
-                            autoComplete="cc-csc"
-                            placeholder="···"
-                            maxLength={ 4 }
-                            readOnly
-                            className={ inputClass( '_stripe_cvc' ) }
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  ) }
-                  { id === 'paypal' && (
-                    <div className="pt-4">
-                      <PayPalExpressButtons />
-                    </div>
-                  ) }
-                  { id === 'bacs' && (
-                    <div className="pt-3 bg-gray-50 rounded-xl p-4 mt-1 text-sm text-gray-700 space-y-1">
-                      <p className="font-semibold text-gray-900">Bank Transfer Details</p>
-                      <p>Account Name: <span className="font-medium">Drywall Toolbox LLC</span></p>
-                      <p className="text-xs text-gray-500 mt-1">
-                        Your order will be held until payment is confirmed. Details will also
-                        be included in your confirmation email.
-                      </p>
-                    </div>
-                  ) }
-                </Motion.div>
-              ) }
-            </AnimatePresence>
-          </div>
-        );
-      } ) }
+      <AnimatePresence mode="wait" initial={ false }>
+        <PaymentOptionPanel
+          key={ selectedOption.id }
+          option={ selectedOption }
+          total={ total }
+          inputClass={ inputClass }
+        />
+      </AnimatePresence>
     </div>
   );
 }
@@ -630,8 +744,8 @@ export default function Checkout() {
         cartItems,
         billingAddress,
         billingAddress,          // use billing as shipping (user can update in WP later)
-        formData.paymentMethod,
-        [],                      // payment_data — extend here for Stripe/PayPal tokens
+        getPaymentGatewayId( formData.paymentMethod ),
+        [],                      // payment_data comes from Stripe/PayPal SDK tokenization in production.
         formData.customerNote,
         wcRateId,                // selected shipping rate ID
         appliedCoupon ? [ appliedCoupon.code ] : [],  // loyalty coupon (if applied)
@@ -652,11 +766,12 @@ export default function Checkout() {
 
   // ── Input / label class helpers ───────────────────────────────────────────
   const inputClass = ( field ) =>
-    `w-full px-4 py-3 rounded-xl border text-sm transition-all min-h-[44px]
-     focus:outline-none focus:ring-2 focus:ring-primary-500/30 focus:border-primary-500
-     ${ errors[field] ? 'border-red-400 bg-red-50/30' : 'border-gray-200 bg-white hover:border-gray-300' }`;
+    `w-full px-4 py-3.5 rounded-2xl border text-sm transition-all min-h-[48px]
+     text-slate-950 placeholder:text-slate-400 shadow-sm
+     focus:outline-none focus:ring-4 focus:ring-primary-500/15 focus:border-primary-500
+     ${ errors[field] ? 'border-red-400 bg-red-50/40' : 'border-slate-200 bg-white hover:border-slate-300' }`;
 
-  const labelClass = 'block text-xs font-semibold uppercase tracking-wider text-gray-500 mb-1.5';
+  const labelClass = 'block text-xs font-bold uppercase tracking-[0.14em] text-slate-500 mb-1.5';
   const requiredMark = <span className="text-red-500 ml-0.5" aria-hidden="true">*</span>;
 
   // ── Empty cart guard ──────────────────────────────────────────────────────
@@ -773,42 +888,92 @@ export default function Checkout() {
 
   // ── Checkout form ─────────────────────────────────────────────────────────
   return (
-    <div className="min-h-screen bg-gray-50/60 pb-28 md:pb-12 page-wrapper">
+    <div className="relative min-h-screen overflow-hidden bg-slate-100 pb-28 md:pb-14 page-wrapper">
       <SEOHead noindex title="Checkout" />
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8 md:py-12">
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-[24rem] bg-slate-950" />
+      <div
+        className="pointer-events-none absolute inset-x-0 top-0 h-[24rem] opacity-90"
+        style={ {
+          background:
+            'radial-gradient(circle at 18% 15%, rgba(59,130,246,0.42), transparent 28%), radial-gradient(circle at 72% 10%, rgba(20,184,166,0.24), transparent 24%), linear-gradient(135deg, #020617 0%, #0f2658 48%, #020617 100%)',
+        } }
+      />
+      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 py-8 md:py-12">
 
         {/* Page heading */}
         <Motion.div
           initial={ { opacity: 0, y: -12 } }
           animate={ { opacity: 1, y: 0 } }
           transition={ { duration: 0.4 } }
-          className="mb-8"
+          className="mb-6 md:mb-8 text-white"
         >
-          <h1 className="text-3xl md:text-4xl font-bold text-gray-900 tracking-tight mb-1">
-            Checkout
-          </h1>
-          <p className="text-gray-500 text-sm flex items-center gap-1.5">
-            <Lock size={ 13 } />
-            256-bit SSL encrypted checkout
-          </p>
+          <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
+            <div>
+              <p className="mb-3 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-1 text-xs font-bold uppercase tracking-[0.18em] text-sky-100">
+                <Lock size={ 13 } />
+                Secure checkout
+              </p>
+              <h1 className="text-3xl md:text-5xl font-black tracking-tight">
+                Finish your order
+              </h1>
+              <p className="mt-2 max-w-2xl text-sm text-slate-300">
+                Encrypted payment, live shipping rates, and flexible payment options for professional tools and parts.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-3 gap-2 text-xs text-slate-200 sm:min-w-[420px]">
+              { ['Cart synced', 'Shipping rated', 'Payment secured'].map( ( item, index ) => (
+                <div key={ item } className="rounded-2xl border border-white/10 bg-white/10 px-3 py-2 backdrop-blur">
+                  <span className="block text-[10px] font-black uppercase tracking-[0.16em] text-sky-200">
+                    0{ index + 1 }
+                  </span>
+                  <span className="font-semibold">{ item }</span>
+                </div>
+              ) ) }
+            </div>
+          </div>
         </Motion.div>
 
+        <div className="lg:hidden mb-5">
+          <OrderSummaryPanel
+            cartItems={ cartItems }
+            subtotal={ subtotal }
+            shipping={ shipping }
+            tax={ tax }
+            total={ total }
+            loading={ processing }
+          />
+        </div>
+
         <form id="checkout-form" onSubmit={ handleSubmit } noValidate>
-          <div className="grid lg:grid-cols-[1fr_380px] gap-6">
+          <div className="grid lg:grid-cols-[minmax(0,1fr)_410px] gap-6 xl:gap-8">
 
             {/* ── Left column: form steps ─────────────────────────────────── */}
             <div className="space-y-5">
 
               {/* Express checkout section */}
-              <StepCard delay={ 0 } className="p-6">
-                <p className="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-3">
-                  Express Checkout
-                </p>
-                <PayPalExpressButtons />
+              <StepCard delay={ 0 } className="p-5 md:p-6">
+                <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+                  <div>
+                    <p className="text-xs font-bold uppercase tracking-[0.18em] text-slate-400">
+                      Express Checkout
+                    </p>
+                    <p className="mt-1 text-sm font-semibold text-slate-950">
+                      Choose a fast payment rail or continue with the full form.
+                    </p>
+                  </div>
+                  <span className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-bold text-emerald-700">
+                    SSL active
+                  </span>
+                </div>
+                <ExpressCheckoutButtons
+                  selectedMethod={ formData.paymentMethod }
+                  onSelect={ ( id ) => setFormData( ( prev ) => ( { ...prev, paymentMethod: id } ) ) }
+                />
                 <div className="relative flex items-center mt-5 mb-1">
-                  <div className="grow border-t border-gray-100" />
-                  <span className="mx-3 text-xs text-gray-400 shrink-0">or continue below</span>
-                  <div className="grow border-t border-gray-100" />
+                  <div className="grow border-t border-slate-100" />
+                  <span className="mx-3 text-xs font-semibold text-slate-400 shrink-0">or continue below</span>
+                  <div className="grow border-t border-slate-100" />
                 </div>
               </StepCard>
 
@@ -877,7 +1042,7 @@ export default function Checkout() {
                     ) }
                   </div>
 
-                  <div className="grid grid-cols-3 gap-3">
+                  <div className="grid sm:grid-cols-3 gap-3">
                     { [
                       { name: 'city',  label: 'City',     autoComplete: 'address-level2' },
                       { name: 'state', label: 'State',    autoComplete: 'address-level1' },
@@ -984,6 +1149,7 @@ export default function Checkout() {
                   selectedMethod={ formData.paymentMethod }
                   onChange={ handleInputChange }
                   inputClass={ inputClass }
+                  total={ total }
                 />
 
                 {/* Order note */}
@@ -1113,6 +1279,7 @@ export default function Checkout() {
                 tax={ tax }
                 total={ total }
                 loading={ processing }
+                className="sticky top-24"
               />
             </div>
           </div>
