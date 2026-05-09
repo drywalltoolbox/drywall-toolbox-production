@@ -18,7 +18,6 @@ import { motion as Motion } from 'framer-motion';
 import TrustedBrands from './TrustedBrands';
 import NavigationCarousel from './NavigationCarousel';
 
-/* ── Stagger variants for the overall content block ───────────────────────── */
 const container = {
   hidden: {},
   visible: { transition: { staggerChildren: 0.09 } },
@@ -28,7 +27,6 @@ const item = {
   visible: { opacity: 1, y: 0, transition: { duration: 0.55, ease: [0.16, 1, 0.3, 1] } },
 };
 
-/* ── Per-character slide-in variants ──────────────────────────────────────── */
 const charContainer = {
   hidden: {},
   visible: {
@@ -44,26 +42,15 @@ const charVariant = {
   },
 };
 
-/**
- * Returns the display value for a single character inside the animated title.
- * Spaces are replaced with a non-breaking space so that inline-block spans
- * don't collapse adjacent whitespace.
- */
 function formatCharForAnimation(char) {
   return char === ' ' ? '\u00A0' : char;
 }
 
-/**
- * SlideInTitle — renders each character of every line with a staggered
- * slide-up animation.  Lines are separated by a block-level <span> so
- * natural line-breaking is preserved without needing <br> elements.
- */
 function SlideInTitle({ lines }) {
   return (
     <Motion.h1
       className="dtb-hero-title-gradient"
       variants={charContainer}
-      /* SlideInTitle manages its own animation; skip the outer `item` variant */
       initial="hidden"
       animate="visible"
       style={{
@@ -82,7 +69,6 @@ function SlideInTitle({ lines }) {
               variants={charVariant}
               style={{
                 display: 'inline-block',
-                /* Replace space with non-breaking space so inline-block doesn't collapse it */
                 whiteSpace: 'pre',
               }}
             >
@@ -95,7 +81,6 @@ function SlideInTitle({ lines }) {
   );
 }
 
-/* ─── Component ───────────────────────────────────────────────────────────── */
 export default function HeroSection({
   title,
   titleLines,
@@ -121,18 +106,15 @@ export default function HeroSection({
         justifyContent: 'center',
       }}
     >
-      {/* ── Radial glow — top center (blue) ─────────────────────────────── */}
       <div style={{
         position: 'absolute', inset: 0, pointerEvents: 'none',
         background: 'radial-gradient(circle at 50% 0%, rgba(29,78,216,0.32) 0%, transparent 55%)',
       }} />
-      {/* ── Radial glow — bottom center (sky accent) ────────────────────── */}
       <div style={{
         position: 'absolute', inset: 0, pointerEvents: 'none',
         background: 'radial-gradient(circle at 50% 110%, rgba(56,189,248,0.13) 0%, transparent 55%)',
       }} />
 
-      {/* ── Content ─────────────────────────────────────────────────────── */}
       <Motion.div
         variants={container}
         initial="hidden"
@@ -145,7 +127,6 @@ export default function HeroSection({
           maxWidth: '860px', margin: '0 auto', width: '100%',
         }}
       >
-        {/* Eyebrow badge */}
         <Motion.div variants={item}>
           <span style={{
             display: 'inline-flex', alignItems: 'center', gap: '8px',
@@ -169,7 +150,6 @@ export default function HeroSection({
           </span>
         </Motion.div>
 
-        {/* Headline — per-character animation when titleLines is provided */}
         {titleLines && titleLines.length > 0
           ? <SlideInTitle lines={titleLines} />
           : (
@@ -189,7 +169,6 @@ export default function HeroSection({
           )
         }
 
-        {/* Subtitle */}
         {subtitle && (
           <Motion.p
             variants={item}
@@ -206,7 +185,6 @@ export default function HeroSection({
           </Motion.p>
         )}
 
-        {/* CTA buttons */}
         {ctaLinks.length > 0 && (
           <Motion.div
             variants={item}
@@ -232,14 +210,12 @@ export default function HeroSection({
         )}
       </Motion.div>
 
-      {/* ── Navigation carousel — above Trusted Brands ──────────────────── */}
       {showCarousel && (
         <div style={{ position: 'relative', zIndex: 1, width: '100%' }}>
           <NavigationCarousel />
         </div>
       )}
 
-      {/* Brand marquee — transparent so the hero background shows through */}
       {brands.length > 0 && (
         <TrustedBrands
           brands={brands}
@@ -263,13 +239,25 @@ export default function HeroSection({
 
         .dtb-hero-title-gradient {
           color: transparent;
-          background: linear-gradient(180deg, #ffffff 0%, #dbe3ef 55%, #bcc7d8 100%);
-          background-size: 220% 220%;
-          background-position: 50% 35%;
+          background:
+            linear-gradient(180deg,
+              #ffffff 0%,
+              #f8fafc 16%,
+              #e5e7eb 38%,
+              #cbd5e1 56%,
+              #f1f5f9 74%,
+              #aeb8c8 100%);
+          background-size: 180% 180%;
+          background-position: 50% 28%;
           background-clip: text;
           -webkit-background-clip: text;
           -webkit-text-fill-color: transparent;
-          animation: dtb-hero-title-sheen 8s ease-in-out infinite;
+          text-shadow:
+            0 1px 0 rgba(255,255,255,0.28),
+            0 14px 38px rgba(148,163,184,0.12),
+            0 0 44px rgba(96,165,250,0.08);
+          filter: drop-shadow(0 10px 22px rgba(2,6,23,0.22));
+          animation: dtb-hero-title-sheen 9s ease-in-out infinite;
         }
 
         .dtb-hero-cta--primary {
@@ -300,11 +288,10 @@ export default function HeroSection({
         }
 
         @keyframes dtb-hero-title-sheen {
-          0%, 100% { background-position: 50% 35%; }
-          50%      { background-position: 50% 65%; }
+          0%, 100% { background-position: 50% 28%; }
+          50%      { background-position: 50% 76%; }
         }
 
-        /* ── Mobile tweaks ───────────────────────────────────────────── */
         @media (max-width: 767px) {
           .dtb-ui-hero {
             min-height: unset !important;
@@ -334,6 +321,3 @@ export default function HeroSection({
     </section>
   );
 }
-
-
-
