@@ -48,6 +48,42 @@ const ALLOWED_BRANDS = [
 const MAX_PRICE = 3000;
 const ITEMS_PER_PAGE = 24;
 
+/**
+ * Normalizes category labels and slugs into a consistent URL-safe slug.
+ * - Lowercases all characters
+ * - Replaces "&" with "and"
+ * - Converts non-alphanumeric runs to a single hyphen
+ * - Removes leading and trailing hyphens
+ */
+const normalizeCategorySlug = (value) => (
+  String(value || '')
+    .trim()
+    .toLowerCase()
+    .replace(/&/g, ' and ')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+);
+
+const getCategoryParamFromSearch = (search) => (
+  normalizeCategorySlug(new URLSearchParams(search).get('category') || '')
+);
+
+const getProductCategorySlugs = (product) => {
+  const slugs = new Set();
+  const displaySlug = normalizeCategorySlug(product?.display_category);
+  if (displaySlug) slugs.add(displaySlug);
+
+  const categories = Array.isArray(product?.categories) ? product.categories : [];
+  categories.forEach((cat) => {
+    const nameSlug = normalizeCategorySlug(cat?.name);
+    const rawSlug = normalizeCategorySlug(cat?.slug);
+    if (nameSlug) slugs.add(nameSlug);
+    if (rawSlug) slugs.add(rawSlug);
+  });
+
+  return slugs;
+};
+
 
 export default function AllProducts() {
   const location = useLocation();
@@ -57,6 +93,7 @@ export default function AllProducts() {
   // Initialize search query from URL param for deep-linking (e.g. from MobileSearch)
   const urlParams = new URLSearchParams(location.search);
   const searchParam = urlParams.get('search');
+  const categoryParam = getCategoryParamFromSearch(location.search);
   const pageParam = parseInt(urlParams.get('page') || '1', 10);
 
   const [products, setProducts] = useState([]);
@@ -138,13 +175,18 @@ export default function AllProducts() {
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const currentSearchParam = params.get('search') || '';
+    const currentCategoryParam = normalizeCategorySlug(params.get('category') || '');
     const currentPageParam   = params.get('page')   || '';
     const expectedSearchParam = searchQuery ? encodeURIComponent(searchQuery) : '';
     const expectedPageParam   = currentPage > 1 ? String(currentPage) : '';
 
-    if (currentSearchParam !== expectedSearchParam || currentPageParam !== expectedPageParam) {
+    if (
+      currentSearchParam !== expectedSearchParam
+      || currentPageParam !== expectedPageParam
+    ) {
       const newParams = new URLSearchParams();
       if (searchQuery)    newParams.set('search', searchQuery);
+      if (currentCategoryParam) newParams.set('category', currentCategoryParam);
       if (currentPage > 1) newParams.set('page', String(currentPage));
       const newSearch = newParams.toString();
       navigate(newSearch ? `/all-products?${newSearch}` : '/all-products', { replace: true });
@@ -158,6 +200,7 @@ export default function AllProducts() {
   const filteredProducts = (products || []).filter(product => {
     if (selectedBrands.length > 0 && !selectedBrands.includes(product.brand)) return false;
     if (selectedCategories.length > 0 && !selectedCategories.includes(product.category)) return false;
+    if (categoryParam && !getProductCategorySlugs(product).has(categoryParam)) return false;
     // price may not be set on all products; ignore if missing
     if (product.price && (product.price < priceRange[0] || product.price > priceRange[1])) return false;
     // Search filter
