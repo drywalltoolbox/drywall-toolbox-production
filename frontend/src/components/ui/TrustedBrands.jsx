@@ -71,7 +71,7 @@ export default function TrustedBrands({ brands = [], title = 'Trusted Brands', s
       ? 'radial-gradient(circle at 50% 0%, rgba(29,78,216,0.32) 0%, transparent 55%), radial-gradient(circle at 50% 110%, rgba(56,189,248,0.13) 0%, transparent 55%), #070d1c'
       : '#f8fafc';
   const fadeColor = dark || transparent ? '#070d1c' : '#f8fafc';
-  const titleColor = dark || transparent ? 'rgba(148,163,184,0.40)' : 'rgba(15,23,42,0.35)';
+  const titleColor = dark || transparent ? 'rgba(226,232,240,0.75)' : 'rgba(15,23,42,0.35)';
   const isLight = !dark && !transparent;
 
   return (
