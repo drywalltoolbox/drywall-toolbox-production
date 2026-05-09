@@ -2809,23 +2809,21 @@ aside input[type="range"],
     font-weight: 700;
     letter-spacing: 0.095em;
     text-transform: uppercase;
-    padding: 0 2rem;
+    padding: 0 2.75rem;
     color: #0a1630;
     display: inline-flex;
     align-items: center;
-    gap: 7px;
     flex-shrink: 0;
-}
-
-.dtb-top-shipping-bar .dtb-ticker-icon {
-    color: #1d4ed8;
 }
 
 .dtb-top-shipping-bar .dtb-ticker-sep {
-    color: rgba(10,22,48,0.30);
-    font-size: 0.45rem;
+    color: rgba(10,22,48,0.28);
+    font-size: 0.42rem;
     line-height: 1;
     flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    margin: 0;
 }
 
 @media (min-width: 1025px) {
@@ -2833,10 +2831,14 @@ aside input[type="range"],
         height: 22px;
         padding: 0 clamp(1.25rem, 3.5vw, 3rem);
     }
-    
+
     .dtb-top-shipping-bar .dtb-ticker-item {
         font-size: 0.50rem;
-        padding: 0 1.5rem;
+        padding: 0 2.5rem;
+    }
+
+    .dtb-top-shipping-bar .dtb-ticker-sep {
+        font-size: 0.40rem;
     }
 }
 

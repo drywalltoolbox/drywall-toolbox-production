@@ -6,7 +6,6 @@ import ShippingTicker from './components/shell/ShippingTicker';
 import { CartProvider } from './context/CartContext';
 import { WooCommerceProvider } from './context/WooCommerceContext';
 import { AuthProvider } from './auth/AuthContext.js';
-import { Truck, Phone, Wrench } from 'lucide-react';
 
 // Layout components load eagerly — they're on every page so there's no benefit
 // to lazy loading them. Keeping them in the main bundle is correct.
@@ -188,9 +187,9 @@ function AppShell({ cartOpen, toggleCart, closeCart }) {
           <div className="site-top-ticker">
             <ShippingTicker
               items={[
-                { icon: <Truck size={11} />, text: 'FREE SHIPPING ON ALL ORDERS $75+ (CONTIGUOUS USA ONLY)' },
-                { icon: <Phone size={11} />, text: 'Expert Support - Real Pros' },
-                { icon: <Wrench size={11} />, text: 'Professional Repair Services' },
+                { text: 'FREE SHIPPING ON ALL ORDERS $75+ (CONTIGUOUS USA ONLY)' },
+                { text: 'Expert Support - Real Pros' },
+                { text: 'Professional Repair Services' },
               ]}
               duration={28}
               className="dtb-desktop-shipping-bar dtb-top-shipping-bar"
