@@ -2052,7 +2052,7 @@ const ALLOWED_BRANDS = [
         price: parseFloat(wcProduct.price) || 0,
         part_number: wcProduct.sku || part.sku,
         sku: wcProduct.sku || part.sku,
-        image: wcProduct.images?.[0] || 'https://www.drywalltoolbox.com/wp/wp-content/uploads/2026/05/no-image-placeholder.webp',
+        image: wcProduct.images?.[0] || 'https://www.drywalltoolbox.com/wp/wp-content/uploads/2026/media/no-image-placeholder.webp',
         permalink: wcProduct.permalink || '',
         _wcProduct: wcProduct,
       };

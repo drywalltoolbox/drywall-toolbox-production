@@ -456,7 +456,7 @@ function extractSpecsFromHtml(html) {
  */
 function normalizeRow(row, idx, attrIndexes = []) {
   // Images: pipe-separated URLs. CSV columns may contain "Images" or "Images (comma separated)"
-  const NO_IMAGE = 'https://www.drywalltoolbox.com/wp/wp-content/uploads/2026/05/no-image-placeholder.webp';
+  const NO_IMAGE = 'https://www.drywalltoolbox.com/wp/wp-content/uploads/2026/media/no-image-placeholder.webp';
 
   const rawImages = row['Images'] || row['Images (comma separated)'] || '';
   const images = rawImages
