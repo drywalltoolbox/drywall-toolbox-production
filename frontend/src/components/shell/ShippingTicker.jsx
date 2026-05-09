@@ -57,7 +57,7 @@ export default function ShippingTicker({ items = [], duration = 22, className = 
       {items.map((item, index) => (
         <React.Fragment key={index}>
           {index > 0 && (
-            <span className="dtb-ticker-sep" aria-hidden="true">·</span>
+            <span className="dtb-ticker-sep" aria-hidden="true">{'\u25C6'}</span>
           )}
           <span className="dtb-ticker-item">
             {item.icon ? <span className="dtb-ticker-icon">{item.icon}</span> : null}
