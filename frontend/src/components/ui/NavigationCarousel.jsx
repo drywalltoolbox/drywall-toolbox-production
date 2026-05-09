@@ -103,24 +103,11 @@ function getSlotTransform(offset, dragOffset, sideOffset, depth) {
 
 function NavCard({ card, cardW, cardH, isActive, slotStyle, onTap }) {
   const [hov, setHov] = useState(false);
-  const pressRef = useRef({ x: 0, y: 0 });
-
-  const onPointerDown = (e) => {
-    pressRef.current = { x: e.clientX, y: e.clientY };
-  };
-
-  const onPointerUp = (e) => {
-    const dx = Math.abs(e.clientX - pressRef.current.x);
-    const dy = Math.abs(e.clientY - pressRef.current.y);
-    if (isActive && dx < DRAG_TAP_LIMIT && dy < DRAG_TAP_LIMIT) onTap(card.to);
-  };
 
   return (
     <div
       role="button"
       tabIndex={isActive ? 0 : -1}
-      onPointerDown={onPointerDown}
-      onPointerUp={onPointerUp}
       onKeyDown={(e) => { if (isActive && (e.key === 'Enter' || e.key === ' ')) onTap(card.to); }}
       onMouseEnter={() => setHov(true)}
       onMouseLeave={() => setHov(false)}
@@ -256,10 +243,20 @@ export default function NavigationCarousel() {
       scene.releasePointerCapture?.(e.pointerId);
 
       const dx = e.clientX - dragStartRef.current.x;
+      const dy = e.clientY - dragStartRef.current.y;
       setDragOffset(0);
-      if (dx < -SWIPE_THRESHOLD) goNext();
-      else if (dx > SWIPE_THRESHOLD) goPrev();
-      else setCenteredIndex(activeIdxRef.current);
+      if (dx < -SWIPE_THRESHOLD) {
+        goNext();
+      } else if (dx > SWIPE_THRESHOLD) {
+        goPrev();
+      } else if (Math.abs(dx) < DRAG_TAP_LIMIT && Math.abs(dy) < DRAG_TAP_LIMIT) {
+        // Tap (not a swipe) — navigate to the active card.
+        // setPointerCapture() on the scene prevents NavCard.onPointerUp from firing,
+        // so navigation must be handled here instead.
+        navigate(NAV_CARDS[activeIdxRef.current].to);
+      } else {
+        setCenteredIndex(activeIdxRef.current);
+      }
     };
 
     scene.addEventListener('pointerdown', onPointerDown);
@@ -273,7 +270,7 @@ export default function NavigationCarousel() {
       scene.removeEventListener('pointerup', finishDrag);
       scene.removeEventListener('pointercancel', finishDrag);
     };
-  }, [goNext, goPrev, setCenteredIndex, sideOffset]);
+  }, [goNext, goPrev, navigate, setCenteredIndex, sideOffset]);
 
   const onEnter = useCallback(() => { pausedRef.current = true; }, []);
   const onLeave = useCallback(() => { pausedRef.current = false; }, []);
