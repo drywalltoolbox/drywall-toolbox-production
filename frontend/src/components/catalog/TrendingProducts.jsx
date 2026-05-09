@@ -38,7 +38,6 @@ export default function TrendingProducts() {
     setModalProduct(null);
   }, []);
 
-  // Escape key closes modal
   useEffect(() => {
     const onKey = (e) => { if (e.key === 'Escape') closeModal(); };
     window.addEventListener('keydown', onKey);
@@ -56,24 +55,17 @@ export default function TrendingProducts() {
     getProducts().then((allProducts) => {
       if (!mounted) return;
 
-      // ── Diversified Trending Selection: Automatic Tapers prioritized ─────
-      // We specifically look for Automatic Taper products across all brands
-      // and ensure they are mixed for diversity.
-
       const taperKeywords = ['automatic taper', 'taper', 'taping tool'];
       const withPrice = allProducts.filter(p => {
         const price = Number(p.price) || Number(p.min_price) || 0;
         return price > 0;
       });
 
-      // Categorize products into "Tapers" and "Other Main Tools"
       const groupedByBrand = {};
 
       withPrice.forEach(p => {
         const brandName = p.brand || 'Other';
-        if (!groupedByBrand[brandName]) {
-          groupedByBrand[brandName] = { tapers: [], others: [] };
-        }
+        if (!groupedByBrand[brandName]) groupedByBrand[brandName] = { tapers: [], others: [] };
 
         const productPrice = Number(p.price) || Number(p.min_price) || 0;
         const isTaper = taperKeywords.some(key =>
@@ -81,30 +73,23 @@ export default function TrendingProducts() {
           (p.category || '').toLowerCase().includes(key)
         );
 
-        if (isTaper) {
-          groupedByBrand[brandName].tapers.push(p);
-        } else if (productPrice > 100) { // Keep high-value tools as secondary options
-          groupedByBrand[brandName].others.push(p);
-        }
+        if (isTaper) groupedByBrand[brandName].tapers.push(p);
+        else if (productPrice > 100) groupedByBrand[brandName].others.push(p);
       });
 
       let balancedSelection = [];
       const brandKeys = Object.keys(groupedByBrand);
 
-      // Strategy: 1. Take tapers from every brand first
       brandKeys.forEach(brand => {
         const brandGroup = groupedByBrand[brand];
-        // Sort tapers by price descending (main tools first)
         brandGroup.tapers.sort((a, b) => {
           const aPrice = Number(a.price) || Number(a.min_price) || 0;
           const bPrice = Number(b.price) || Number(b.min_price) || 0;
           return bPrice - aPrice;
         });
-        // Take up to 3 tapers per brand
         balancedSelection.push(...brandGroup.tapers.slice(0, 3));
       });
 
-      // Strategy: 2. If we need more variety, add high-value tools from different brands
       if (balancedSelection.length < 12) {
         brandKeys.forEach(brand => {
           const brandGroup = groupedByBrand[brand];
@@ -117,7 +102,6 @@ export default function TrendingProducts() {
         });
       }
 
-      // Final Mix: Maintain a diverse mix of tapers at the front
       balancedSelection.sort((a, b) => {
         const aIsTaper = taperKeywords.some(key => (a.name || '').toLowerCase().includes(key));
         const bIsTaper = taperKeywords.some(key => (b.name || '').toLowerCase().includes(key));
@@ -125,10 +109,7 @@ export default function TrendingProducts() {
         if (aIsTaper && !bIsTaper) return -1;
         if (!aIsTaper && bIsTaper) return 1;
 
-        // Equal priority (both tapers or both others): Compare price with brand spacing
-        if (Math.abs((b.price || 0) - (a.price || 0)) > 50) {
-          return (b.price || 0) - (a.price || 0);
-        }
+        if (Math.abs((b.price || 0) - (a.price || 0)) > 50) return (b.price || 0) - (a.price || 0);
         return (a.brand || '').localeCompare(b.brand || '');
       });
 
@@ -157,9 +138,7 @@ export default function TrendingProducts() {
     fetchVariationsBatched(variableIds, getProductVariations).then((pairs) => {
       if (!mounted) return;
       const next = {};
-      pairs.forEach(([id, vars]) => {
-        next[id] = vars;
-      });
+      pairs.forEach(([id, vars]) => { next[id] = vars; });
       setVariationMap((prev) => ({ ...prev, ...next }));
     });
 
@@ -168,7 +147,8 @@ export default function TrendingProducts() {
 
   const scroll = (direction) => {
     if (scrollContainerRef.current) {
-      const scrollAmount = 320; // card width + gap
+      const card = scrollContainerRef.current.querySelector('.dtb-trending-card-wrap');
+      const scrollAmount = card ? card.getBoundingClientRect().width + 16 : 280;
       scrollContainerRef.current.scrollBy({
         left: direction === 'left' ? -scrollAmount : scrollAmount,
         behavior: 'smooth'
@@ -188,28 +168,18 @@ export default function TrendingProducts() {
     );
   }
 
-  if (products.length === 0) {
-    return null;
-  }
+  if (products.length === 0) return null;
 
   return (
     <section className="dtb-trending-section">
-      {/* Header */}
       <div className="dtb-trending-header">
         <h2 className="dtb-trending-title">Trending Products</h2>
       </div>
 
-      {/* Scrollable Container */}
       <div className="dtb-trending-scroll-wrapper">
-        <div
-          ref={scrollContainerRef}
-          className="dtb-trending-scroll"
-        >
+        <div ref={scrollContainerRef} className="dtb-trending-scroll">
           {products.map((product, index) => (
-            <div
-              key={product.sku || product.id}
-              className="dtb-trending-card-wrap"
-            >
+            <div key={product.sku || product.id} className="dtb-trending-card-wrap">
               <ProductShoppingCard
                 product={product}
                 cardProduct={product}
@@ -222,27 +192,17 @@ export default function TrendingProducts() {
           ))}
         </div>
 
-        {/* Scroll Controls — desktop only (hidden via CSS at narrow widths) */}
-        <button
-          onClick={() => scroll('left')}
-          className="dtb-scroll-btn dtb-scroll-btn--left scroll-button-left"
-          aria-label="Scroll left"
-        >
+        <button onClick={() => scroll('left')} className="dtb-scroll-btn dtb-scroll-btn--left scroll-button-left" aria-label="Scroll left">
           <ChevronLeft size={18} />
         </button>
 
-        <button
-          onClick={() => scroll('right')}
-          className="dtb-scroll-btn dtb-scroll-btn--right scroll-button-right"
-          aria-label="Scroll right"
-        >
+        <button onClick={() => scroll('right')} className="dtb-scroll-btn dtb-scroll-btn--right scroll-button-right" aria-label="Scroll right">
           <ChevronRight size={18} />
         </button>
       </div>
 
       {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
 
-      {/* Product detail modal */}
       <ProductModal isOpen={isModalOpen && !!modalProduct} product={modalProduct} onClose={closeModal}>
         {modalProduct && (
           <ProductDetail
@@ -253,6 +213,77 @@ export default function TrendingProducts() {
           />
         )}
       </ProductModal>
+
+      <style>{`
+        .dtb-trending-scroll {
+          scroll-snap-type: x mandatory;
+          scroll-padding-inline: clamp(16px, 4vw, 32px);
+        }
+
+        .dtb-trending-card-wrap {
+          flex: 0 0 clamp(248px, 23vw, 312px);
+          max-width: clamp(248px, 23vw, 312px);
+          scroll-snap-align: start;
+        }
+
+        .dtb-trending-card-wrap .dtb-plp-card {
+          width: 100%;
+          min-width: 0;
+        }
+
+        @media (max-width: 767px) {
+          .dtb-trending-section {
+            padding-left: 0;
+            padding-right: 0;
+          }
+
+          .dtb-trending-scroll-wrapper {
+            overflow: hidden;
+          }
+
+          .dtb-trending-scroll {
+            gap: 14px;
+            padding-left: 16px;
+            padding-right: 16px;
+            scroll-padding-inline: 16px;
+          }
+
+          .dtb-trending-card-wrap {
+            flex-basis: clamp(236px, 74vw, 286px);
+            max-width: clamp(236px, 74vw, 286px);
+            scroll-snap-align: start;
+          }
+
+          .dtb-trending-card-wrap .dtb-plp-card__img-wrap,
+          .dtb-trending-card-wrap .dtb-plp-card__img-btn {
+            min-height: 170px;
+            max-height: 190px;
+          }
+
+          .dtb-trending-card-wrap .dtb-plp-card__body {
+            padding: 12px 14px 14px !important;
+          }
+
+          .dtb-trending-card-wrap .dtb-plp-card__brand {
+            font-size: 0.58rem !important;
+            letter-spacing: 0.08em !important;
+          }
+
+          .dtb-trending-card-wrap .dtb-plp-card__name-btn {
+            font-size: 0.82rem !important;
+            line-height: 1.28 !important;
+          }
+
+          .dtb-trending-card-wrap .dtb-plp-card__sku {
+            font-size: 0.64rem !important;
+            margin-bottom: 10px !important;
+          }
+
+          .dtb-trending-card-wrap .dtb-plp-card__price {
+            font-size: 0.92rem !important;
+          }
+        }
+      `}</style>
     </section>
   );
 }
