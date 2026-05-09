@@ -219,8 +219,12 @@ export default function NavigationCarousel() {
   const pausedRef = useRef(false);
   const dragStartRef = useRef({ x: 0, y: 0 });
   const isDraggingRef = useRef(false);
-  const lastAutoRef = useRef(Date.now());
+  const lastAutoRef = useRef(0);
   const sceneRef = useRef(null);
+
+  useEffect(() => {
+    lastAutoRef.current = Date.now();
+  }, []);
 
   useEffect(() => {
     const el = sceneRef.current;
