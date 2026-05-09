@@ -1,5 +1,6 @@
 // products.js
 // Loads products from WooCommerce REST API
+import { PLACEHOLDER_IMAGE } from '../constants/images.js';
 
 export async function loadProducts() {
   try {
@@ -56,8 +57,8 @@ export async function loadProducts() {
         brand: wcProduct.meta_data ? 
                (wcProduct.meta_data.find(m => m.key === 'brand')?.value || '') : '',
         url: wcProduct.permalink || '',
-        image: images[0] || 'https://www.drywalltoolbox.com/wp/wp-content/uploads/2026/media/no-image-placeholder.webp',
-        images: images.length > 0 ? images : ['https://www.drywalltoolbox.com/wp/wp-content/uploads/2026/media/no-image-placeholder.webp'],
+        image: images[0] || PLACEHOLDER_IMAGE,
+        images: images.length > 0 ? images : [PLACEHOLDER_IMAGE],
         short_description: wcProduct.short_description || '',
         description_full: wcProduct.description || '',
         meta_data: Array.isArray(wcProduct.meta_data) ? wcProduct.meta_data : [],

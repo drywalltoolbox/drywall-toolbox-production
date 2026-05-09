@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { motion as Motion, AnimatePresence } from 'framer-motion';
 import { ChevronLeft, ChevronRight, X, ZoomIn } from 'lucide-react';
+import { PLACEHOLDER_IMAGE } from '../../constants/images.js';
 
 // Sits above the product modal (10002) and its backdrop (10001)
 const LIGHTBOX_Z_INDEX = 10010;
@@ -54,7 +55,7 @@ export default function ProductImageGallery({ product }) {
     const arr = Array.isArray(product?.images) && product.images.length
       ? product.images.map(toImgUrl).filter(Boolean)
       : product?.image ? [toImgUrl(product.image)] : [];
-    return arr.length ? arr : ['https://www.drywalltoolbox.com/wp/wp-content/uploads/2026/media/no-image-placeholder.webp'];
+    return arr.length ? arr : [PLACEHOLDER_IMAGE];
   })();
   const imagesRef = useRef(images);
   const hasMultiple = images.length > 1;
@@ -282,7 +283,7 @@ export default function ProductImageGallery({ product }) {
               onLoad={() => setImgLoaded(prev => ({ ...prev, [currentIndex]: true }))}
               onError={(e) => {
                 e.currentTarget.onerror = null;
-                e.currentTarget.src = 'https://www.drywalltoolbox.com/wp/wp-content/uploads/2026/media/no-image-placeholder.webp';
+                e.currentTarget.src = PLACEHOLDER_IMAGE;
                 setImgLoaded(prev => ({ ...prev, [currentIndex]: true }));
               }}
             />
@@ -366,7 +367,7 @@ export default function ProductImageGallery({ product }) {
                   loading="lazy"
                   decoding="async"
                   className="w-full h-full object-contain bg-white p-1"
-                  onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = 'https://www.drywalltoolbox.com/wp/wp-content/uploads/2026/media/no-image-placeholder.webp'; }}
+                  onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = PLACEHOLDER_IMAGE; }}
                 />
               </button>
             ))}

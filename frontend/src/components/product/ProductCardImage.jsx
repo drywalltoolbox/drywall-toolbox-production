@@ -5,8 +5,9 @@
  * Accepts either `src` OR full `product` object.
  */
 import { useState, useMemo } from 'react';
+import { PLACEHOLDER_IMAGE } from '../../constants/images.js';
 
-const PLACEHOLDER = 'https://www.drywalltoolbox.com/wp/wp-content/uploads/2026/media/no-image-placeholder.webp';
+const PLACEHOLDER = PLACEHOLDER_IMAGE;
 const EASE_OUT_EXPO = 'cubic-bezier(0.22, 1, 0.36, 1)';
 
 const resolveImage = (product, src) => {

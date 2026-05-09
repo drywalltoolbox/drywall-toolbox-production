@@ -454,9 +454,12 @@ function extractSpecsFromHtml(html) {
  * @param {number} idx  Row index (used as fallback ID)
  * @returns {Object}    Normalized product
  */
+
+import { PLACEHOLDER_IMAGE } from '../constants/images.js';
+
 function normalizeRow(row, idx, attrIndexes = []) {
   // Images: pipe-separated URLs. CSV columns may contain "Images" or "Images (comma separated)"
-  const NO_IMAGE = 'https://www.drywalltoolbox.com/wp/wp-content/uploads/2026/media/no-image-placeholder.webp';
+  const NO_IMAGE = PLACEHOLDER_IMAGE;
 
   const rawImages = row['Images'] || row['Images (comma separated)'] || '';
   const images = rawImages

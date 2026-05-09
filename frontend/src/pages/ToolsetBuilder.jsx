@@ -38,6 +38,7 @@ import {
 import SEOHead from '../components/shared/SEOHead';
 import Toast from '../components/ui/Toast';
 import { getProducts } from '../services/catalog';
+import { PLACEHOLDER_IMAGE } from '../constants/images.js';
 import { getProductVariations } from '../services/api';
 import { useCart } from '../context/CartContext';
 import { fetchVariationsBatched } from '../utils/variationSelection';
@@ -55,8 +56,7 @@ import '../styles/toolset-builder.css';
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
-const PLACEHOLDER =
-  'https://drywalltoolbox.com/logos/no-image-placeholder.webp';
+const PLACEHOLDER = PLACEHOLDER_IMAGE;
 
 const BRAND_LOGOS = {
   'TapeTech':              tapeTechLogo,

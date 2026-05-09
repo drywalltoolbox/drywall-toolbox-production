@@ -594,11 +594,11 @@ function dtb_proxy_product_variations( WP_REST_Request $request ): WP_REST_Respo
 
 	$response = dtb_cached_wc_get( 'wc/v3/products/' . $product_id . '/variations', $params );
 
-	// Variations are non-critical UI data.  When WooCommerce returns a 5xx
-	// (e.g. product has no variations in the DB, memory limit, or a data
-	// inconsistency), return an empty array with 200 so the SPA degrades
-	// gracefully instead of logging console errors and blocking rendering.
-	if ( $response->get_status() >= 500 ) {
+	// Variations are non-critical UI data.  When WooCommerce returns any error
+	// (5xx: memory/data inconsistency; 4xx: product has no variations in the DB),
+	// return an empty array with 200 so the SPA degrades gracefully instead of
+	// logging console errors and blocking rendering.
+	if ( $response->get_status() < 200 || $response->get_status() >= 300 ) {
 		return new WP_REST_Response( [], 200 );
 	}
 

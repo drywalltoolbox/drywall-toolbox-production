@@ -15,6 +15,7 @@
 
 import { apiClient } from '../api/client.js';
 import { CATEGORY_MAP } from '../utils/parseProductCsv.js';
+import { PLACEHOLDER_IMAGE } from '../constants/images.js';
 
 
 // ─── Known brand names (kept in sync with ALLOWED_BRANDS in Products.jsx) ────
@@ -336,7 +337,7 @@ export function normalizeProduct(wcProduct) {
   const images = (wcProduct.images || [])
     .map((img) => (typeof img === 'string' ? img : (img?.src ?? '')))
     .filter(Boolean);
-  if (images.length === 0) images.push('https://www.drywalltoolbox.com/wp/wp-content/uploads/2026/media/no-image-placeholder.webp');
+  if (images.length === 0) images.push(PLACEHOLDER_IMAGE);
   const image = images[0];
 
   const productType = wcProduct.type || 'simple';
