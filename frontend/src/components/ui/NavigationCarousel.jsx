@@ -11,12 +11,12 @@ import { useNavigate } from 'react-router-dom';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 const NAV_CARDS = [
-  { id: 'products', label: 'Products', to: '/all-products' },
-  { id: 'parts', label: 'Parts', to: '/parts' },
-  { id: 'schematics', label: 'Schematics', to: '/schematics' },
-  { id: 'calculator', label: 'Calculator', to: '/calculators' },
-  { id: 'toolsets', label: 'Tool Sets', to: '/toolset-builder' },
-  { id: 'repairs', label: 'Repairs', to: '/repairs' },
+  { id: 'products', label: 'PRODUCTS', to: '/all-products' },
+  { id: 'parts', label: 'PARTS', to: '/parts' },
+  { id: 'schematics', label: 'SCHEMATICS', to: '/schematics' },
+  { id: 'calculator', label: 'CALCULATOR', to: '/calculators' },
+  { id: 'toolsets', label: 'TOOL SETS', to: '/toolset-builder' },
+  { id: 'repairs', label: 'REPAIRS', to: '/repairs' },
 ];
 
 const TOTAL = NAV_CARDS.length;
@@ -160,10 +160,11 @@ function NavCard({ card, cardW, cardH, isActive, slotStyle, onTap }) {
       }}
     >
       <div style={{
-        fontSize: 'clamp(1.18rem, 4.9vw, 1.42rem)',
+        fontSize: 'clamp(1.12rem, 4.6vw, 1.34rem)',
         fontWeight: 800,
         color: hov ? '#ffffff' : '#f8fbff',
-        lineHeight: 1.06,
+        lineHeight: 1.04,
+        letterSpacing: '0.045em',
         transition: 'color 0.15s',
         whiteSpace: 'normal',
       }}>
