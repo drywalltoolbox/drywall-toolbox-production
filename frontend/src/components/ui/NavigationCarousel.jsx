@@ -1,9 +1,8 @@
 /**
- * ui/NavigationCarousel.jsx — Fixed-center 3D navigation carousel
+ * ui/NavigationCarousel.jsx — Slim fixed-center 3D navigation carousel
  *
- * The carousel uses deterministic 3D card slots instead of rotating the entire
- * wheel/container. This keeps the active card locked to the viewport center
- * while preserving a 3D angled-card effect for neighboring cards.
+ * Deterministic 3D card slots keep the active card locked to the viewport center
+ * while presenting low-profile horizontal cards for subtle page navigation.
  */
 
 import { useCallback, useEffect, useRef, useState } from 'react';
@@ -39,11 +38,11 @@ function shortestOffset(index, activeIndex) {
 
 function getSizing(w) {
   const viewportW = Math.max(320, w || 390);
-  const cardW = Math.round(Math.max(160, Math.min(200, viewportW * 0.48)));
-  const cardH = Math.round(cardW * 0.9);
-  const sideOffset = Math.round(Math.max(cardW * 0.74, Math.min(viewportW * 0.31, cardW * 0.9)));
-  const depth = Math.round(cardW * 0.4);
-  const persp = Math.round(Math.max(760, viewportW * 2.3));
+  const cardW = Math.round(Math.max(190, Math.min(264, viewportW * 0.62)));
+  const cardH = Math.round(Math.max(68, Math.min(86, cardW * 0.34)));
+  const sideOffset = Math.round(Math.max(cardW * 0.58, Math.min(viewportW * 0.33, cardW * 0.72)));
+  const depth = Math.round(cardW * 0.22);
+  const persp = Math.round(Math.max(820, viewportW * 2.5));
   return { cardW, cardH, sideOffset, depth, persp };
 }
 
@@ -61,22 +60,23 @@ function ArrowBtn({ direction, onClick, isMobile }) {
       onMouseLeave={() => setHov(false)}
       style={{
         position: 'absolute',
-        [direction === 'left' ? 'left' : 'right']: isMobile ? '10px' : 0,
+        [direction === 'left' ? 'left' : 'right']: isMobile ? '8px' : 0,
         top: '50%',
         transform: 'translateY(-50%)',
         zIndex: 30,
         width: `${sz}px`,
         height: `${sz}px`,
         borderRadius: '50%',
-        border: `1px solid ${hov ? 'rgba(99,149,255,0.40)' : 'rgba(99,149,255,0.22)'}`,
-        background: hov ? 'rgba(255,255,255,0.13)' : 'rgba(255,255,255,0.07)',
-        color: hov ? 'rgba(255,255,255,0.90)' : 'rgba(255,255,255,0.65)',
+        border: `1px solid ${hov ? 'rgba(226,232,240,0.48)' : 'rgba(148,163,184,0.28)'}`,
+        background: hov ? 'rgba(255,255,255,0.14)' : 'rgba(15,23,42,0.30)',
+        color: hov ? '#ffffff' : 'rgba(226,232,240,0.78)',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
         cursor: 'pointer',
         transition: 'background 0.18s, color 0.18s, border-color 0.18s',
         backdropFilter: 'blur(8px)',
+        WebkitBackdropFilter: 'blur(8px)',
         padding: 0,
       }}
     >
@@ -91,25 +91,24 @@ function getSlotTransform(offset, dragOffset, sideOffset, depth) {
   const clamped = Math.max(-2, Math.min(2, virtual));
   const x = clamped * sideOffset;
   const z = -Math.min(abs, 2) * depth;
-  const rotateY = Math.max(-46, Math.min(46, -clamped * 34));
-  const scale = Math.max(0.72, 1 - Math.min(abs, 2) * 0.14);
+  const rotateY = Math.max(-34, Math.min(34, -clamped * 24));
+  const scale = Math.max(0.8, 1 - Math.min(abs, 2) * 0.1);
 
   return {
     transform: `translate3d(calc(-50% + ${x.toFixed(2)}px), -50%, ${z.toFixed(2)}px) rotateY(${rotateY.toFixed(2)}deg) scale(${scale.toFixed(3)})`,
-    opacity: abs > 2.15 ? 0 : abs > 1.65 ? 0.32 : abs > 0.65 ? 0.58 : 1,
+    opacity: abs > 2.15 ? 0 : abs > 1.65 ? 0.36 : abs > 0.65 ? 0.64 : 1,
     zIndex: Math.round(100 - abs * 20),
     pointerEvents: abs < 0.42 ? 'auto' : 'none',
   };
 }
 
-function NavCard({ card, cardW, cardH, isActive, slotStyle, onTap }) {
+function NavCard({ card, cardW, cardH, isActive, slotStyle }) {
   const [hov, setHov] = useState(false);
 
   return (
     <div
       role="button"
       tabIndex={isActive ? 0 : -1}
-      onKeyDown={(e) => { if (isActive && (e.key === 'Enter' || e.key === ' ')) onTap(card.to); }}
       onMouseEnter={() => setHov(true)}
       onMouseLeave={() => setHov(false)}
       aria-label={`Navigate to ${card.label}`}
@@ -128,55 +127,70 @@ function NavCard({ card, cardW, cardH, isActive, slotStyle, onTap }) {
         transformStyle: 'preserve-3d',
         backfaceVisibility: 'hidden',
         WebkitBackfaceVisibility: 'hidden',
-        padding: '16px',
+        padding: '12px 18px',
         borderRadius: '18px',
-        border: `1px solid ${hov && isActive ? 'rgba(255,255,255,0.68)' : isActive ? 'rgba(226,232,240,0.56)' : 'rgba(226,232,240,0.28)'}`,
+        border: `1px solid ${hov && isActive ? 'rgba(255,255,255,0.72)' : isActive ? 'rgba(226,232,240,0.54)' : 'rgba(148,163,184,0.22)'}`,
         background: isActive
-          ? 'linear-gradient(160deg, rgba(255,255,255,0.30) 0%, rgba(232,240,250,0.20) 35%, rgba(203,213,225,0.13) 65%, rgba(255,255,255,0.30) 100%)'
-          : 'linear-gradient(160deg, rgba(255,255,255,0.20) 0%, rgba(232,240,250,0.12) 35%, rgba(203,213,225,0.09) 65%, rgba(255,255,255,0.20) 100%)',
+          ? 'linear-gradient(145deg, rgba(23,32,52,0.98) 0%, rgba(32,43,64,0.98) 46%, rgba(15,23,42,0.98) 100%)'
+          : 'linear-gradient(145deg, rgba(15,23,42,0.88) 0%, rgba(24,34,52,0.86) 50%, rgba(8,15,29,0.88) 100%)',
         cursor: isActive ? 'pointer' : 'default',
-        transition: 'transform 560ms cubic-bezier(0.18, 0.9, 0.25, 1), opacity 420ms ease, border-color 220ms ease, box-shadow 220ms ease',
+        transition: 'transform 520ms cubic-bezier(0.18, 0.9, 0.25, 1), opacity 360ms ease, border-color 200ms ease, box-shadow 200ms ease, background 200ms ease',
         boxShadow: isActive
           ? (hov
-              ? '0 16px 38px rgba(15,23,42,0.22), 0 0 0 1px rgba(255,255,255,0.56)'
-              : '0 12px 30px rgba(15,23,42,0.20), 0 0 0 1px rgba(255,255,255,0.40)')
-          : '0 8px 20px rgba(15,23,42,0.16)',
-        backdropFilter: 'blur(10px)',
-        WebkitBackdropFilter: 'blur(10px)',
+              ? '0 16px 36px rgba(2,6,23,0.34), inset 0 1px 0 rgba(255,255,255,0.26), 0 0 0 1px rgba(255,255,255,0.18)'
+              : '0 12px 28px rgba(2,6,23,0.30), inset 0 1px 0 rgba(255,255,255,0.20), 0 0 0 1px rgba(255,255,255,0.10)')
+          : '0 8px 22px rgba(2,6,23,0.24), inset 0 1px 0 rgba(255,255,255,0.10)',
         userSelect: 'none',
         display: 'flex',
-        flexDirection: 'column',
         justifyContent: 'center',
         alignItems: 'center',
         textAlign: 'center',
-        gap: '6px',
+        gap: '10px',
         outline: 'none',
         overflow: 'hidden',
         willChange: 'transform, opacity',
-        backgroundSize: '200% 200%',
-        animation: 'dtb-nav-metallic-shift 6s ease-in-out infinite',
       }}
     >
       <div style={{
-        fontSize: 'clamp(1rem, 4vw, 1.18rem)',
-        fontWeight: 800,
-        color: isActive ? (hov ? '#020617' : '#0f172a') : 'rgba(248,250,252,0.90)',
-        lineHeight: 1.08,
-        letterSpacing: '0.04em',
-        transition: 'color 0.15s',
-      }}>
-        {card.label}
-      </div>
+        position: 'absolute',
+        inset: 0,
+        background: 'linear-gradient(110deg, transparent 0%, rgba(255,255,255,0.10) 44%, rgba(255,255,255,0.22) 50%, rgba(255,255,255,0.08) 56%, transparent 100%)',
+        backgroundSize: '220% 100%',
+        opacity: isActive ? 0.7 : 0.32,
+        animation: 'dtb-nav-metallic-shift 7s ease-in-out infinite',
+        pointerEvents: 'none',
+      }} />
 
-      <div style={{
-        fontSize: 'clamp(0.62rem, 1.8vw, 0.72rem)',
-        fontWeight: 500,
-        color: isActive ? 'rgba(15,23,42,0.52)' : 'rgba(226,232,240,0.74)',
-        lineHeight: 1.3,
-        letterSpacing: '0.02em',
-        transition: 'color 0.15s',
-      }}>
-        {card.sub}
+      <div style={{ position: 'relative', zIndex: 1, minWidth: 0 }}>
+        <div style={{
+          fontSize: 'clamp(0.98rem, 3.8vw, 1.18rem)',
+          fontWeight: 850,
+          lineHeight: 1.02,
+          letterSpacing: '0.035em',
+          color: 'transparent',
+          background: 'linear-gradient(180deg, #ffffff 0%, #eef2f7 28%, #b8c2d2 58%, #f8fafc 100%)',
+          backgroundClip: 'text',
+          WebkitBackgroundClip: 'text',
+          WebkitTextFillColor: 'transparent',
+          textShadow: '0 1px 0 rgba(255,255,255,0.22), 0 10px 22px rgba(2,6,23,0.28)',
+          transition: 'filter 0.15s',
+          filter: hov && isActive ? 'brightness(1.14)' : 'brightness(1)',
+          whiteSpace: 'nowrap',
+        }}>
+          {card.label}
+        </div>
+
+        <div style={{
+          marginTop: '5px',
+          fontSize: 'clamp(0.62rem, 2.2vw, 0.72rem)',
+          fontWeight: 600,
+          color: isActive ? 'rgba(219,227,239,0.72)' : 'rgba(203,213,225,0.56)',
+          lineHeight: 1.15,
+          letterSpacing: '0.02em',
+          whiteSpace: 'nowrap',
+        }}>
+          {card.sub}
+        </div>
       </div>
     </div>
   );
@@ -271,9 +285,6 @@ export default function NavigationCarousel() {
       } else if (dx > SWIPE_THRESHOLD) {
         goPrev();
       } else if (Math.abs(dx) < DRAG_TAP_LIMIT && Math.abs(dy) < DRAG_TAP_LIMIT) {
-        // Tap (not a swipe) — navigate to the active card.
-        // setPointerCapture() on the scene prevents NavCard.onPointerUp from firing,
-        // so navigation must be handled here instead.
         navigate(NAV_CARDS[activeIdxRef.current].to);
       } else {
         setCenteredIndex(activeIdxRef.current);
@@ -297,14 +308,14 @@ export default function NavigationCarousel() {
   const onLeave = useCallback(() => { pausedRef.current = false; }, []);
 
   return (
-    <div style={{ width: '100%', position: 'relative', padding: '4px 0 28px', overflow: 'hidden' }}>
+    <div style={{ width: '100%', position: 'relative', padding: '0 0 18px', overflow: 'hidden' }}>
       <div style={{ maxWidth: '900px', margin: '0 auto', padding: `0 ${sidePad}px`, position: 'relative', overflow: 'visible' }}>
         <ArrowBtn direction="left" onClick={goPrev} isMobile={isMobile} />
         <div
           ref={sceneRef}
           style={{
             width: '100%',
-            height: `${cardH + 96}px`,
+            height: `${cardH + 54}px`,
             perspective: `${persp}px`,
             perspectiveOrigin: '50% 50%',
             position: 'relative',
@@ -312,20 +323,14 @@ export default function NavigationCarousel() {
             userSelect: 'none',
             touchAction: 'pan-y',
             overflow: 'visible',
-            clipPath: 'inset(-32px 0 -32px 0)',
+            clipPath: 'inset(-22px 0 -22px 0)',
             overscrollBehaviorX: 'contain',
             WebkitOverflowScrolling: 'touch',
           }}
           onMouseEnter={onEnter}
           onMouseLeave={onLeave}
         >
-          <div
-            style={{
-              position: 'absolute',
-              inset: 0,
-              transformStyle: 'preserve-3d',
-            }}
-          >
+          <div style={{ position: 'absolute', inset: 0, transformStyle: 'preserve-3d' }}>
             {NAV_CARDS.map((card, i) => {
               const offset = shortestOffset(i, activeIdx);
               const slotStyle = getSlotTransform(offset, dragOffset, sideOffset, depth);
@@ -337,7 +342,6 @@ export default function NavigationCarousel() {
                   cardH={cardH}
                   isActive={i === activeIdx}
                   slotStyle={slotStyle}
-                  onTap={(to) => navigate(to)}
                 />
               );
             })}
