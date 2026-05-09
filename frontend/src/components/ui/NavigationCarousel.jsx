@@ -204,7 +204,7 @@ export default function NavigationCarousel() {
 
   const isMobile = containerW > 0 && containerW <= 680;
   const { cardW, cardH, radius, persp } = getSizing(containerW);
-  const sidePad = isMobile ? 44 : 52;
+  const sidePad = isMobile ? 40 : 52;
 
   const setCenteredIndex = useCallback((rawIdx) => {
     const newIdx = ((Math.round(rawIdx) % TOTAL) + TOTAL) % TOTAL;
@@ -329,22 +329,22 @@ export default function NavigationCarousel() {
   const onLeave = useCallback(() => { pausedRef.current = false; }, []);
 
   return (
-    <div style={{ width: '100%', position: 'relative', padding: '4px 0 24px', overflow: 'hidden' }}>
-      <div style={{ maxWidth: '900px', margin: '0 auto', padding: `0 ${sidePad}px`, position: 'relative', overflow: 'hidden' }}>
+    <div style={{ width: '100%', position: 'relative', padding: '4px 0 28px', overflow: 'hidden' }}>
+      <div style={{ maxWidth: '900px', margin: '0 auto', padding: `0 ${sidePad}px`, position: 'relative', overflow: 'visible' }}>
         <ArrowBtn direction="left" onClick={goPrev} isMobile={isMobile} />
         <div
           ref={sceneRef}
           style={{
             width: '100%',
-            height: `${cardH + 24}px`,
+            height: `${cardH + 92}px`,
             perspective: `${persp}px`,
             perspectiveOrigin: '50% 50%',
             position: 'relative',
             cursor: isDragging ? 'grabbing' : 'grab',
             userSelect: 'none',
             touchAction: 'pan-y',
-            overflow: 'hidden',
-            contain: 'layout paint',
+            overflow: 'visible',
+            clipPath: 'inset(-28px 0 -28px 0)',
           }}
           onMouseEnter={onEnter}
           onMouseLeave={onLeave}
@@ -378,27 +378,6 @@ export default function NavigationCarousel() {
           </div>
         </div>
         <ArrowBtn direction="right" onClick={goNext} isMobile={isMobile} />
-      </div>
-
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '7px', marginTop: '10px' }}>
-        {NAV_CARDS.map((card, i) => (
-          <button
-            key={card.id}
-            type="button"
-            onClick={() => setCenteredIndex(i)}
-            aria-label={`Go to ${card.label}`}
-            style={{
-              width: i === activeIdx ? '26px' : '7px',
-              height: '7px',
-              borderRadius: '999px',
-              border: 'none',
-              background: i === activeIdx ? 'rgba(96,165,250,0.85)' : 'rgba(148,163,184,0.22)',
-              cursor: 'pointer',
-              padding: 0,
-              transition: 'width 0.28s ease, background 0.28s ease',
-            }}
-          />
-        ))}
       </div>
     </div>
   );
