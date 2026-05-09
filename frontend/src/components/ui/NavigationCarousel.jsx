@@ -27,20 +27,18 @@ const NAV_CARDS = [
 const TOTAL = NAV_CARDS.length;
 const ANGLE_STEP = 360 / TOTAL;
 const AUTO_SLIDE_MS = 4600;
-const LERP_ROT = 0.18;
-const LERP_TILT = 0.10;
-const TILT_MAX = 5;
-const ROT_PER_PX = 0.28;
-const SWIPE_THRESHOLD = 35;
+const LERP_ROT = 0.2;
+const ROT_PER_PX = 0.22;
+const SWIPE_THRESHOLD = 32;
 const DRAG_TAP_LIMIT = 8;
-const OPACITY_FADE_FACTOR = 0.76;
+const OPACITY_FADE_FACTOR = 0.78;
 
 function getSizing(w) {
   const viewportW = Math.max(320, w || 390);
-  const cardW = Math.round(Math.max(168, Math.min(224, viewportW * 0.56)));
-  const cardH = Math.round(cardW * 1.12);
-  const radius = Math.round(Math.max(cardW * 0.82, Math.min(viewportW * 0.48, cardW * 0.94)));
-  const persp = Math.round(radius * 5.2);
+  const cardW = Math.round(Math.max(136, Math.min(176, viewportW * 0.44)));
+  const cardH = Math.round(cardW * 1.04);
+  const radius = Math.round(Math.max(cardW * 0.7, Math.min(viewportW * 0.34, cardW * 0.82)));
+  const persp = Math.round(radius * 7.5);
   return { cardW, cardH, radius, persp };
 }
 
@@ -58,7 +56,7 @@ function ArrowBtn({ direction, onClick, isMobile }) {
       onMouseLeave={() => setHov(false)}
       style={{
         position: 'absolute',
-        [direction === 'left' ? 'left' : 'right']: isMobile ? '6px' : 0,
+        [direction === 'left' ? 'left' : 'right']: isMobile ? '10px' : 0,
         top: '50%',
         transform: 'translateY(-50%)',
         zIndex: 20,
@@ -117,13 +115,13 @@ function NavCard({ card, cardAngle, radius, cardW, cardH, isActive, onTap }) {
         transform: `rotateY(${cardAngle}deg) translateZ(${radius}px)`,
         backfaceVisibility: 'hidden',
         WebkitBackfaceVisibility: 'hidden',
-        padding: '18px',
-        borderRadius: '20px',
+        padding: '14px',
+        borderRadius: '18px',
         border: `1px solid ${hov && isActive ? 'rgba(99,149,255,0.50)' : isActive ? 'rgba(99,149,255,0.30)' : 'rgba(99,149,255,0.10)'}`,
         background: hov && isActive ? 'rgba(255,255,255,0.11)' : isActive ? 'rgba(255,255,255,0.07)' : 'rgba(255,255,255,0.03)',
         cursor: isActive ? 'pointer' : 'default',
         transition: 'background 0.22s, border-color 0.22s, box-shadow 0.22s',
-        boxShadow: isActive ? '0 0 28px rgba(37,99,235,0.16)' : 'none',
+        boxShadow: isActive ? '0 0 20px rgba(37,99,235,0.14)' : 'none',
         backdropFilter: 'blur(12px)',
         WebkitBackdropFilter: 'blur(12px)',
         userSelect: 'none',
@@ -131,16 +129,16 @@ function NavCard({ card, cardAngle, radius, cardW, cardH, isActive, onTap }) {
         flexDirection: 'column',
         justifyContent: 'center',
         alignItems: 'flex-start',
-        gap: '16px',
+        gap: '10px',
         outline: 'none',
         willChange: 'transform, opacity',
         overflow: 'hidden',
       }}
     >
       <div style={{
-        width: '54px',
-        height: '54px',
-        borderRadius: '16px',
+        width: '40px',
+        height: '40px',
+        borderRadius: '12px',
         background: hov && isActive ? 'rgba(37,99,235,0.32)' : 'rgba(37,99,235,0.16)',
         display: 'flex',
         alignItems: 'center',
@@ -148,25 +146,25 @@ function NavCard({ card, cardAngle, radius, cardW, cardH, isActive, onTap }) {
         transition: 'background 0.18s',
         flexShrink: 0,
       }}>
-        <Icon size={27} color="#60a5fa" strokeWidth={1.9} />
+        <Icon size={21} color="#60a5fa" strokeWidth={1.9} />
       </div>
 
       <div style={{ minWidth: 0, width: '100%' }}>
         <div style={{
-          fontSize: 'clamp(1.24rem, 5.4vw, 1.58rem)',
+          fontSize: 'clamp(1rem, 4vw, 1.18rem)',
           fontWeight: 800,
           color: hov ? '#ffffff' : '#f0f6ff',
           lineHeight: 1.08,
-          marginBottom: '8px',
+          marginBottom: '5px',
           transition: 'color 0.15s',
           whiteSpace: 'nowrap',
         }}>
           {card.label}
         </div>
         <div style={{
-          fontSize: 'clamp(0.9rem, 3.9vw, 1.08rem)',
+          fontSize: 'clamp(0.76rem, 3vw, 0.88rem)',
           color: 'rgba(163,192,255,0.58)',
-          lineHeight: 1.25,
+          lineHeight: 1.2,
         }}>
           {card.desc}
         </div>
@@ -184,8 +182,6 @@ export default function NavigationCarousel() {
   const activeIdxRef = useRef(0);
   const targetRotRef = useRef(0);
   const currentRotRef = useRef(0);
-  const tiltRef = useRef(0);
-  const targetTiltRef = useRef(0);
   const pausedRef = useRef(false);
   const isDraggingRef = useRef(false);
   const dragStartXRef = useRef(0);
@@ -208,7 +204,7 @@ export default function NavigationCarousel() {
 
   const isMobile = containerW > 0 && containerW <= 680;
   const { cardW, cardH, radius, persp } = getSizing(containerW);
-  const sidePad = isMobile ? 42 : 52;
+  const sidePad = isMobile ? 44 : 52;
 
   const setCenteredIndex = useCallback((rawIdx) => {
     const newIdx = ((Math.round(rawIdx) % TOTAL) + TOTAL) % TOTAL;
@@ -228,17 +224,16 @@ export default function NavigationCarousel() {
 
       const rotDiff = targetRotRef.current - currentRotRef.current;
       currentRotRef.current += Math.abs(rotDiff) > 0.02 ? rotDiff * LERP_ROT : rotDiff;
-      tiltRef.current += (targetTiltRef.current - tiltRef.current) * LERP_TILT;
 
       if (wheelRef.current) {
-        wheelRef.current.style.transform = `rotateX(${tiltRef.current.toFixed(3)}deg) rotateY(${currentRotRef.current.toFixed(3)}deg)`;
+        wheelRef.current.style.transform = `rotateY(${currentRotRef.current.toFixed(3)}deg)`;
         const children = wheelRef.current.children;
         for (let i = 0; i < children.length; i += 1) {
           const eff = ((i * ANGLE_STEP + currentRotRef.current) % 360 + 360) % 360;
           const dist = eff > 180 ? 360 - eff : eff;
-          const op = dist >= 88 ? 0 : 1 - (dist / 88) * OPACITY_FADE_FACTOR;
+          const op = dist >= 82 ? 0 : 1 - (dist / 82) * OPACITY_FADE_FACTOR;
           children[i].style.opacity = op.toFixed(3);
-          children[i].style.pointerEvents = dist < 14 ? 'auto' : 'none';
+          children[i].style.pointerEvents = dist < 12 ? 'auto' : 'none';
         }
       }
       animRef.current = requestAnimationFrame(animate);
@@ -247,24 +242,6 @@ export default function NavigationCarousel() {
     animRef.current = requestAnimationFrame(animate);
     return () => { if (animRef.current) cancelAnimationFrame(animRef.current); };
   }, [goNext]);
-
-  useEffect(() => {
-    const scene = sceneRef.current;
-    if (!scene) return;
-    const onMouseMove = (e) => {
-      if (isDraggingRef.current) return;
-      const { top, height } = scene.getBoundingClientRect();
-      const y = (e.clientY - top) / height - 0.5;
-      targetTiltRef.current = -y * TILT_MAX * 2;
-    };
-    const onMouseLeave = () => { targetTiltRef.current = 0; };
-    scene.addEventListener('mousemove', onMouseMove);
-    scene.addEventListener('mouseleave', onMouseLeave);
-    return () => {
-      scene.removeEventListener('mousemove', onMouseMove);
-      scene.removeEventListener('mouseleave', onMouseLeave);
-    };
-  }, []);
 
   useEffect(() => {
     const scene = sceneRef.current;
@@ -283,7 +260,7 @@ export default function NavigationCarousel() {
     const onMouseMove = (e) => {
       if (!isDraggingRef.current) return;
       const dx = e.clientX - dragStartXRef.current;
-      targetRotRef.current = dragBaseRotRef.current + Math.max(-ANGLE_STEP * 0.75, Math.min(ANGLE_STEP * 0.75, dx * ROT_PER_PX));
+      targetRotRef.current = dragBaseRotRef.current + Math.max(-ANGLE_STEP * 0.62, Math.min(ANGLE_STEP * 0.62, dx * ROT_PER_PX));
     };
     const onMouseUp = (e) => {
       if (!isDraggingRef.current) return;
@@ -325,7 +302,7 @@ export default function NavigationCarousel() {
       const dy = e.touches[0].clientY - pressStartRef.current.y;
       if (Math.abs(dx) > Math.abs(dy)) {
         e.preventDefault();
-        targetRotRef.current = dragBaseRotRef.current + Math.max(-ANGLE_STEP * 0.75, Math.min(ANGLE_STEP * 0.75, dx * ROT_PER_PX));
+        targetRotRef.current = dragBaseRotRef.current + Math.max(-ANGLE_STEP * 0.62, Math.min(ANGLE_STEP * 0.62, dx * ROT_PER_PX));
       }
     };
     const onTouchEnd = (e) => {
@@ -352,14 +329,14 @@ export default function NavigationCarousel() {
   const onLeave = useCallback(() => { pausedRef.current = false; }, []);
 
   return (
-    <div style={{ width: '100%', position: 'relative', padding: '8px 0 28px', overflow: 'hidden' }}>
+    <div style={{ width: '100%', position: 'relative', padding: '4px 0 24px', overflow: 'hidden' }}>
       <div style={{ maxWidth: '900px', margin: '0 auto', padding: `0 ${sidePad}px`, position: 'relative', overflow: 'hidden' }}>
         <ArrowBtn direction="left" onClick={goPrev} isMobile={isMobile} />
         <div
           ref={sceneRef}
           style={{
             width: '100%',
-            height: `${cardH + 34}px`,
+            height: `${cardH + 24}px`,
             perspective: `${persp}px`,
             perspectiveOrigin: '50% 50%',
             position: 'relative',
@@ -383,7 +360,7 @@ export default function NavigationCarousel() {
               marginLeft: `-${cardW / 2}px`,
               marginTop: `-${cardH / 2}px`,
               transformStyle: 'preserve-3d',
-              transform: 'rotateX(0deg) rotateY(0deg)',
+              transform: 'rotateY(0deg)',
             }}
           >
             {NAV_CARDS.map((card, i) => (
@@ -411,8 +388,8 @@ export default function NavigationCarousel() {
             onClick={() => setCenteredIndex(i)}
             aria-label={`Go to ${card.label}`}
             style={{
-              width: i === activeIdx ? '28px' : '8px',
-              height: '8px',
+              width: i === activeIdx ? '26px' : '7px',
+              height: '7px',
               borderRadius: '999px',
               border: 'none',
               background: i === activeIdx ? 'rgba(96,165,250,0.85)' : 'rgba(148,163,184,0.22)',
