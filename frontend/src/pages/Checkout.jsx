@@ -601,9 +601,9 @@ export default function Checkout() {
   return (
     <div className="relative min-h-screen overflow-hidden bg-slate-100 pb-28 md:pb-14 page-wrapper">
       <SEOHead noindex title="Checkout" />
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-[24rem] bg-slate-950" />
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-96 bg-slate-950" />
       <div
-        className="pointer-events-none absolute inset-x-0 top-0 h-[24rem] opacity-90"
+        className="pointer-events-none absolute inset-x-0 top-0 h-96 opacity-90"
         style={ {
           background:
             'radial-gradient(circle at 18% 15%, rgba(59,130,246,0.42), transparent 28%), radial-gradient(circle at 72% 10%, rgba(20,184,166,0.24), transparent 24%), linear-gradient(135deg, #020617 0%, #0f2658 48%, #020617 100%)',
