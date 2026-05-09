@@ -41,8 +41,9 @@ function BrandLogo({ brand, dark = false, transparent = false }) {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        padding: '0 clamp(16px, 3vw, 28px)',
+        padding: '0 clamp(26px, 6vw, 48px)',
         flexShrink: 0,
+        minWidth: 'clamp(132px, 28vw, 190px)',
         '--dtb-brand-base-opacity': baseOpacity,
       }}
     >
@@ -108,15 +109,12 @@ export default function TrustedBrands({ brands = [], title = 'Trusted Brands', s
         </Motion.p>
       )}
 
-      {/* Marquee container */}
       <div style={{ position: 'relative', overflow: 'hidden' }}>
-        {/* Left fade */}
         <div style={{
           position: 'absolute', left: 0, top: 0, bottom: 0, width: '80px', zIndex: 2,
           background: `linear-gradient(to right, ${fadeColor} 0%, transparent 100%)`,
           pointerEvents: 'none',
         }} />
-        {/* Right fade */}
         <div style={{
           position: 'absolute', right: 0, top: 0, bottom: 0, width: '80px', zIndex: 2,
           background: `linear-gradient(to left, ${fadeColor} 0%, transparent 100%)`,
@@ -132,7 +130,6 @@ export default function TrustedBrands({ brands = [], title = 'Trusted Brands', s
             animation: `dtb-marquee ${speed}s linear infinite`,
           }}
         >
-          {/* Duplicate twice for seamless loop */}
           {[...brands, ...brands].map((brand, i) => (
             <BrandLogo key={`${brand.name}-${i}`} brand={brand} dark={dark} transparent={transparent} />
           ))}
@@ -158,11 +155,19 @@ export default function TrustedBrands({ brands = [], title = 'Trusted Brands', s
 
         @media (min-width: 1025px) {
           .dtb-trusted-brand-link {
-            padding: 0 clamp(30px, 5vw, 64px) !important;
-            min-width: clamp(160px, 15vw, 240px);
+            padding: 0 clamp(42px, 6vw, 80px) !important;
+            min-width: clamp(190px, 17vw, 280px) !important;
           }
           .dtb-brands-track {
-            padding: 0 clamp(16px, 3vw, 32px);
+            padding: 0 clamp(24px, 4vw, 44px);
+          }
+        }
+
+        @media (max-width: 640px) {
+          .dtb-trusted-brand-link {
+            padding-left: clamp(28px, 8vw, 44px) !important;
+            padding-right: clamp(28px, 8vw, 44px) !important;
+            min-width: clamp(142px, 34vw, 184px) !important;
           }
         }
       `}</style>
