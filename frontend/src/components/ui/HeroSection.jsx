@@ -12,11 +12,36 @@
  *   className    string
  */
 
-import React from 'react';
+import React, { memo } from 'react';
 import { Link } from 'react-router-dom';
 import { motion as Motion } from 'framer-motion';
 import TrustedBrands from './TrustedBrands';
 import NavigationCarousel from './NavigationCarousel';
+
+const HERO_TITLE_AURORA_COLORS = ['#ffffff', '#f8fafc', '#dbe3ef', '#b8c2d2', '#f1f5f9'];
+
+const AuroraText = memo(function AuroraText({
+  children,
+  className = '',
+  colors = HERO_TITLE_AURORA_COLORS,
+  speed = 0.82,
+}) {
+  const gradientStyle = {
+    backgroundImage: `linear-gradient(135deg, ${colors.join(', ')}, ${colors[0]})`,
+    WebkitBackgroundClip: 'text',
+    WebkitTextFillColor: 'transparent',
+    animationDuration: `${10 / speed}s`,
+  };
+
+  return (
+    <span className={`dtb-aurora-text ${className}`}>
+      <span className="dtb-sr-only">{children}</span>
+      <span className="dtb-aurora-text__visible" style={gradientStyle} aria-hidden="true">
+        {children}
+      </span>
+    </span>
+  );
+});
 
 const container = {
   hidden: {},
@@ -46,6 +71,27 @@ function formatCharForAnimation(char) {
   return char === ' ' ? '\u00A0' : char;
 }
 
+function AnimatedAuroraLine({ line, lineIndex }) {
+  return (
+    <span style={{ display: 'block' }}>
+      <AuroraText>
+        {line.split('').map((char, charIndex) => (
+          <Motion.span
+            key={`${lineIndex}-${charIndex}`}
+            variants={charVariant}
+            style={{
+              display: 'inline-block',
+              whiteSpace: 'pre',
+            }}
+          >
+            {formatCharForAnimation(char)}
+          </Motion.span>
+        ))}
+      </AuroraText>
+    </span>
+  );
+}
+
 function SlideInTitle({ lines }) {
   return (
     <Motion.h1
@@ -62,20 +108,7 @@ function SlideInTitle({ lines }) {
       }}
     >
       {lines.map((line, li) => (
-        <span key={li} style={{ display: 'block' }}>
-          {line.split('').map((char, ci) => (
-            <Motion.span
-              key={`${li}-${ci}`}
-              variants={charVariant}
-              style={{
-                display: 'inline-block',
-                whiteSpace: 'pre',
-              }}
-            >
-              {formatCharForAnimation(char)}
-            </Motion.span>
-          ))}
-        </span>
+        <AnimatedAuroraLine key={li} line={line} lineIndex={li} />
       ))}
     </Motion.h1>
   );
@@ -164,7 +197,7 @@ export default function HeroSection({
                 letterSpacing: '-0.03em',
               }}
             >
-              {title}
+              <AuroraText>{title}</AuroraText>
             </Motion.h1>
           )
         }
@@ -226,6 +259,37 @@ export default function HeroSection({
       )}
 
       <style>{`
+        .dtb-sr-only {
+          position: absolute;
+          width: 1px;
+          height: 1px;
+          padding: 0;
+          margin: -1px;
+          overflow: hidden;
+          clip: rect(0, 0, 0, 0);
+          white-space: nowrap;
+          border: 0;
+        }
+
+        .dtb-aurora-text {
+          position: relative;
+          display: inline-block;
+        }
+
+        .dtb-aurora-text__visible {
+          position: relative;
+          display: inline-block;
+          color: transparent;
+          background-size: 220% auto;
+          background-position: 0% 50%;
+          background-clip: text;
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          animation-name: dtb-hero-aurora;
+          animation-timing-function: ease-in-out;
+          animation-iteration-count: infinite;
+        }
+
         .dtb-hero-cta {
           padding: 13px 30px;
           border-radius: 999px;
@@ -239,25 +303,11 @@ export default function HeroSection({
 
         .dtb-hero-title-gradient {
           color: transparent;
-          background:
-            linear-gradient(180deg,
-              #ffffff 0%,
-              #f8fafc 16%,
-              #e5e7eb 38%,
-              #cbd5e1 56%,
-              #f1f5f9 74%,
-              #aeb8c8 100%);
-          background-size: 180% 180%;
-          background-position: 50% 28%;
-          background-clip: text;
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
           text-shadow:
-            0 1px 0 rgba(255,255,255,0.28),
+            0 1px 0 rgba(255,255,255,0.24),
             0 14px 38px rgba(148,163,184,0.12),
             0 0 44px rgba(96,165,250,0.08);
           filter: drop-shadow(0 10px 22px rgba(2,6,23,0.22));
-          animation: dtb-hero-title-sheen 9s ease-in-out infinite;
         }
 
         .dtb-hero-cta--primary {
@@ -287,9 +337,14 @@ export default function HeroSection({
           50%       { opacity: 0.3; transform: scale(0.80); }
         }
 
-        @keyframes dtb-hero-title-sheen {
-          0%, 100% { background-position: 50% 28%; }
-          50%      { background-position: 50% 76%; }
+        @keyframes dtb-hero-aurora {
+          0%   { background-position: 0% 50%; }
+          50%  { background-position: 100% 50%; }
+          100% { background-position: 0% 50%; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+          .dtb-aurora-text__visible { animation: none; }
         }
 
         @media (max-width: 767px) {
