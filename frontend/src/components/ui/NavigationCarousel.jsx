@@ -1,8 +1,12 @@
 /**
- * ui/NavigationCarousel.jsx — Hero section 3D cylindrical navigation carousel
+ * ui/NavigationCarousel.jsx — Fixed-center 3D navigation carousel
+ *
+ * The carousel uses deterministic 3D card slots instead of rotating the entire
+ * wheel/container. This keeps the active card locked to the viewport center
+ * while preserving a 3D angled-card effect for neighboring cards.
  */
 
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   ShoppingBag,
@@ -25,21 +29,30 @@ const NAV_CARDS = [
 ];
 
 const TOTAL = NAV_CARDS.length;
-const ANGLE_STEP = 360 / TOTAL;
 const AUTO_SLIDE_MS = 4600;
-const LERP_ROT = 0.2;
-const ROT_PER_PX = 0.22;
-const SWIPE_THRESHOLD = 32;
+const SWIPE_THRESHOLD = 34;
 const DRAG_TAP_LIMIT = 8;
-const OPACITY_FADE_FACTOR = 0.78;
+const DRAG_RESISTANCE = 0.28;
+
+function wrapIndex(index) {
+  return ((index % TOTAL) + TOTAL) % TOTAL;
+}
+
+function shortestOffset(index, activeIndex) {
+  let offset = index - activeIndex;
+  if (offset > TOTAL / 2) offset -= TOTAL;
+  if (offset < -TOTAL / 2) offset += TOTAL;
+  return offset;
+}
 
 function getSizing(w) {
   const viewportW = Math.max(320, w || 390);
-  const cardW = Math.round(Math.max(136, Math.min(176, viewportW * 0.44)));
-  const cardH = Math.round(cardW * 1.04);
-  const radius = Math.round(Math.max(cardW * 0.7, Math.min(viewportW * 0.34, cardW * 0.82)));
-  const persp = Math.round(radius * 7.5);
-  return { cardW, cardH, radius, persp };
+  const cardW = Math.round(Math.max(154, Math.min(190, viewportW * 0.46)));
+  const cardH = Math.round(cardW * 1.08);
+  const sideOffset = Math.round(Math.max(cardW * 0.74, Math.min(viewportW * 0.31, cardW * 0.9)));
+  const depth = Math.round(cardW * 0.4);
+  const persp = Math.round(Math.max(760, viewportW * 2.3));
+  return { cardW, cardH, sideOffset, depth, persp };
 }
 
 function ArrowBtn({ direction, onClick, isMobile }) {
@@ -59,7 +72,7 @@ function ArrowBtn({ direction, onClick, isMobile }) {
         [direction === 'left' ? 'left' : 'right']: isMobile ? '10px' : 0,
         top: '50%',
         transform: 'translateY(-50%)',
-        zIndex: 20,
+        zIndex: 30,
         width: `${sz}px`,
         height: `${sz}px`,
         borderRadius: '50%',
@@ -80,7 +93,24 @@ function ArrowBtn({ direction, onClick, isMobile }) {
   );
 }
 
-function NavCard({ card, cardAngle, radius, cardW, cardH, isActive, onTap }) {
+function getSlotTransform(offset, dragOffset, sideOffset, depth) {
+  const virtual = offset + dragOffset;
+  const abs = Math.abs(virtual);
+  const clamped = Math.max(-2, Math.min(2, virtual));
+  const x = clamped * sideOffset;
+  const z = -Math.min(abs, 2) * depth;
+  const rotateY = Math.max(-46, Math.min(46, -clamped * 34));
+  const scale = Math.max(0.72, 1 - Math.min(abs, 2) * 0.14);
+
+  return {
+    transform: `translate3d(calc(-50% + ${x.toFixed(2)}px), -50%, ${z.toFixed(2)}px) rotateY(${rotateY.toFixed(2)}deg) scale(${scale.toFixed(3)})`,
+    opacity: abs > 2.15 ? 0 : abs > 1.65 ? 0.18 : abs > 0.65 ? 0.46 : 1,
+    zIndex: Math.round(100 - abs * 20),
+    pointerEvents: abs < 0.42 ? 'auto' : 'none',
+  };
+}
+
+function NavCard({ card, cardW, cardH, isActive, slotStyle, onTap }) {
   const [hov, setHov] = useState(false);
   const Icon = card.icon;
   const pressRef = useRef({ x: 0, y: 0 });
@@ -105,23 +135,28 @@ function NavCard({ card, cardAngle, radius, cardW, cardH, isActive, onTap }) {
       onMouseEnter={() => setHov(true)}
       onMouseLeave={() => setHov(false)}
       aria-label={`Navigate to ${card.label}`}
+      aria-hidden={!isActive}
       style={{
         position: 'absolute',
+        left: '50%',
+        top: '50%',
         boxSizing: 'border-box',
         width: `${cardW}px`,
         height: `${cardH}px`,
-        left: `-${cardW / 2}px`,
-        top: `-${cardH / 2}px`,
-        transform: `rotateY(${cardAngle}deg) translateZ(${radius}px)`,
+        transform: slotStyle.transform,
+        opacity: slotStyle.opacity,
+        zIndex: slotStyle.zIndex,
+        pointerEvents: slotStyle.pointerEvents,
+        transformStyle: 'preserve-3d',
         backfaceVisibility: 'hidden',
         WebkitBackfaceVisibility: 'hidden',
         padding: '14px',
         borderRadius: '18px',
         border: `1px solid ${hov && isActive ? 'rgba(99,149,255,0.50)' : isActive ? 'rgba(99,149,255,0.30)' : 'rgba(99,149,255,0.10)'}`,
-        background: hov && isActive ? 'rgba(255,255,255,0.11)' : isActive ? 'rgba(255,255,255,0.07)' : 'rgba(255,255,255,0.03)',
+        background: hov && isActive ? 'rgba(255,255,255,0.11)' : isActive ? 'rgba(255,255,255,0.075)' : 'rgba(255,255,255,0.035)',
         cursor: isActive ? 'pointer' : 'default',
-        transition: 'background 0.22s, border-color 0.22s, box-shadow 0.22s',
-        boxShadow: isActive ? '0 0 20px rgba(37,99,235,0.14)' : 'none',
+        transition: 'transform 440ms cubic-bezier(0.16, 1, 0.3, 1), opacity 320ms ease, background 180ms ease, border-color 180ms ease, box-shadow 180ms ease',
+        boxShadow: isActive ? '0 0 22px rgba(37,99,235,0.16)' : 'none',
         backdropFilter: 'blur(12px)',
         WebkitBackdropFilter: 'blur(12px)',
         userSelect: 'none',
@@ -131,8 +166,8 @@ function NavCard({ card, cardAngle, radius, cardW, cardH, isActive, onTap }) {
         alignItems: 'flex-start',
         gap: '10px',
         outline: 'none',
-        willChange: 'transform, opacity',
         overflow: 'hidden',
+        willChange: 'transform, opacity',
       }}
     >
       <div style={{
@@ -177,20 +212,15 @@ export default function NavigationCarousel() {
   const navigate = useNavigate();
   const [activeIdx, setActiveIdx] = useState(0);
   const [containerW, setContainerW] = useState(0);
+  const [dragOffset, setDragOffset] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
 
   const activeIdxRef = useRef(0);
-  const targetRotRef = useRef(0);
-  const currentRotRef = useRef(0);
   const pausedRef = useRef(false);
+  const dragStartRef = useRef({ x: 0, y: 0 });
   const isDraggingRef = useRef(false);
-  const dragStartXRef = useRef(0);
-  const dragBaseRotRef = useRef(0);
-  const pressStartRef = useRef({ x: 0, y: 0 });
-  const lastAutoRef = useRef(null);
-  const wheelRef = useRef(null);
+  const lastAutoRef = useRef(Date.now());
   const sceneRef = useRef(null);
-  const animRef = useRef(null);
 
   useEffect(() => {
     const el = sceneRef.current;
@@ -203,14 +233,14 @@ export default function NavigationCarousel() {
   }, []);
 
   const isMobile = containerW > 0 && containerW <= 680;
-  const { cardW, cardH, radius, persp } = getSizing(containerW);
+  const { cardW, cardH, sideOffset, depth, persp } = getSizing(containerW);
   const sidePad = isMobile ? 40 : 52;
 
   const setCenteredIndex = useCallback((rawIdx) => {
-    const newIdx = ((Math.round(rawIdx) % TOTAL) + TOTAL) % TOTAL;
+    const newIdx = wrapIndex(rawIdx);
     activeIdxRef.current = newIdx;
     setActiveIdx(newIdx);
-    targetRotRef.current = -newIdx * ANGLE_STEP;
+    setDragOffset(0);
     lastAutoRef.current = Date.now();
   }, []);
 
@@ -218,112 +248,62 @@ export default function NavigationCarousel() {
   const goPrev = useCallback(() => setCenteredIndex(activeIdxRef.current - 1), [setCenteredIndex]);
 
   useEffect(() => {
-    lastAutoRef.current = Date.now();
-    const animate = () => {
+    const id = window.setInterval(() => {
       if (!pausedRef.current && !isDraggingRef.current && Date.now() - lastAutoRef.current >= AUTO_SLIDE_MS) goNext();
-
-      const rotDiff = targetRotRef.current - currentRotRef.current;
-      currentRotRef.current += Math.abs(rotDiff) > 0.02 ? rotDiff * LERP_ROT : rotDiff;
-
-      if (wheelRef.current) {
-        wheelRef.current.style.transform = `rotateY(${currentRotRef.current.toFixed(3)}deg)`;
-        const children = wheelRef.current.children;
-        for (let i = 0; i < children.length; i += 1) {
-          const eff = ((i * ANGLE_STEP + currentRotRef.current) % 360 + 360) % 360;
-          const dist = eff > 180 ? 360 - eff : eff;
-          const op = dist >= 82 ? 0 : 1 - (dist / 82) * OPACITY_FADE_FACTOR;
-          children[i].style.opacity = op.toFixed(3);
-          children[i].style.pointerEvents = dist < 12 ? 'auto' : 'none';
-        }
-      }
-      animRef.current = requestAnimationFrame(animate);
-    };
-
-    animRef.current = requestAnimationFrame(animate);
-    return () => { if (animRef.current) cancelAnimationFrame(animRef.current); };
+    }, 250);
+    return () => window.clearInterval(id);
   }, [goNext]);
 
   useEffect(() => {
     const scene = sceneRef.current;
     if (!scene) return;
 
-    const onMouseDown = (e) => {
-      if (e.button !== 0) return;
-      e.preventDefault();
+    const onPointerDown = (e) => {
+      if (e.pointerType === 'mouse' && e.button !== 0) return;
       isDraggingRef.current = true;
       pausedRef.current = true;
       setIsDragging(true);
-      dragStartXRef.current = e.clientX;
-      dragBaseRotRef.current = targetRotRef.current;
-      pressStartRef.current = { x: e.clientX, y: e.clientY };
-    };
-    const onMouseMove = (e) => {
-      if (!isDraggingRef.current) return;
-      const dx = e.clientX - dragStartXRef.current;
-      targetRotRef.current = dragBaseRotRef.current + Math.max(-ANGLE_STEP * 0.62, Math.min(ANGLE_STEP * 0.62, dx * ROT_PER_PX));
-    };
-    const onMouseUp = (e) => {
-      if (!isDraggingRef.current) return;
-      isDraggingRef.current = false;
-      pausedRef.current = false;
-      setIsDragging(false);
-      const dx = e.clientX - dragStartXRef.current;
-      if (dx < -SWIPE_THRESHOLD) goNext();
-      else if (dx > SWIPE_THRESHOLD) goPrev();
-      else setCenteredIndex(activeIdxRef.current);
+      dragStartRef.current = { x: e.clientX, y: e.clientY };
+      scene.setPointerCapture?.(e.pointerId);
     };
 
-    scene.addEventListener('mousedown', onMouseDown);
-    window.addEventListener('mousemove', onMouseMove);
-    window.addEventListener('mouseup', onMouseUp);
-    return () => {
-      scene.removeEventListener('mousedown', onMouseDown);
-      window.removeEventListener('mousemove', onMouseMove);
-      window.removeEventListener('mouseup', onMouseUp);
-    };
-  }, [goNext, goPrev, setCenteredIndex]);
-
-  useEffect(() => {
-    const scene = sceneRef.current;
-    if (!scene) return;
-
-    const onTouchStart = (e) => {
-      isDraggingRef.current = true;
-      pausedRef.current = true;
-      setIsDragging(true);
-      dragStartXRef.current = e.touches[0].clientX;
-      dragBaseRotRef.current = targetRotRef.current;
-      pressStartRef.current = { x: e.touches[0].clientX, y: e.touches[0].clientY };
-      lastAutoRef.current = Date.now();
-    };
-    const onTouchMove = (e) => {
+    const onPointerMove = (e) => {
       if (!isDraggingRef.current) return;
-      const dx = e.touches[0].clientX - dragStartXRef.current;
-      const dy = e.touches[0].clientY - pressStartRef.current.y;
+      const dx = e.clientX - dragStartRef.current.x;
+      const dy = e.clientY - dragStartRef.current.y;
       if (Math.abs(dx) > Math.abs(dy)) {
         e.preventDefault();
-        targetRotRef.current = dragBaseRotRef.current + Math.max(-ANGLE_STEP * 0.62, Math.min(ANGLE_STEP * 0.62, dx * ROT_PER_PX));
+        const nextOffset = Math.max(-0.72, Math.min(0.72, (dx / Math.max(sideOffset, 1)) * DRAG_RESISTANCE));
+        setDragOffset(nextOffset);
       }
     };
-    const onTouchEnd = (e) => {
+
+    const finishDrag = (e) => {
+      if (!isDraggingRef.current) return;
       isDraggingRef.current = false;
       pausedRef.current = false;
       setIsDragging(false);
-      const dx = e.changedTouches[0].clientX - dragStartXRef.current;
+      scene.releasePointerCapture?.(e.pointerId);
+
+      const dx = e.clientX - dragStartRef.current.x;
+      setDragOffset(0);
       if (dx < -SWIPE_THRESHOLD) goNext();
       else if (dx > SWIPE_THRESHOLD) goPrev();
       else setCenteredIndex(activeIdxRef.current);
     };
 
-    scene.addEventListener('touchstart', onTouchStart, { passive: true });
-    scene.addEventListener('touchmove', onTouchMove, { passive: false });
-    scene.addEventListener('touchend', onTouchEnd);
+    scene.addEventListener('pointerdown', onPointerDown);
+    scene.addEventListener('pointermove', onPointerMove, { passive: false });
+    scene.addEventListener('pointerup', finishDrag);
+    scene.addEventListener('pointercancel', finishDrag);
+
     return () => {
-      scene.removeEventListener('touchstart', onTouchStart);
-      scene.removeEventListener('touchmove', onTouchMove);
-      scene.removeEventListener('touchend', onTouchEnd);
+      scene.removeEventListener('pointerdown', onPointerDown);
+      scene.removeEventListener('pointermove', onPointerMove);
+      scene.removeEventListener('pointerup', finishDrag);
+      scene.removeEventListener('pointercancel', finishDrag);
     };
-  }, [goNext, goPrev, setCenteredIndex]);
+  }, [goNext, goPrev, setCenteredIndex, sideOffset]);
 
   const onEnter = useCallback(() => { pausedRef.current = true; }, []);
   const onLeave = useCallback(() => { pausedRef.current = false; }, []);
@@ -336,7 +316,7 @@ export default function NavigationCarousel() {
           ref={sceneRef}
           style={{
             width: '100%',
-            height: `${cardH + 92}px`,
+            height: `${cardH + 96}px`,
             perspective: `${persp}px`,
             perspectiveOrigin: '50% 50%',
             position: 'relative',
@@ -344,37 +324,33 @@ export default function NavigationCarousel() {
             userSelect: 'none',
             touchAction: 'pan-y',
             overflow: 'visible',
-            clipPath: 'inset(-28px 0 -28px 0)',
+            clipPath: 'inset(-32px 0 -32px 0)',
           }}
           onMouseEnter={onEnter}
           onMouseLeave={onLeave}
         >
           <div
-            ref={wheelRef}
             style={{
               position: 'absolute',
-              left: '50%',
-              top: '50%',
-              width: `${cardW}px`,
-              height: `${cardH}px`,
-              marginLeft: `-${cardW / 2}px`,
-              marginTop: `-${cardH / 2}px`,
+              inset: 0,
               transformStyle: 'preserve-3d',
-              transform: 'rotateY(0deg)',
             }}
           >
-            {NAV_CARDS.map((card, i) => (
-              <NavCard
-                key={card.id}
-                card={card}
-                cardAngle={i * ANGLE_STEP}
-                radius={radius}
-                cardW={cardW}
-                cardH={cardH}
-                isActive={i === activeIdx}
-                onTap={(to) => navigate(to)}
-              />
-            ))}
+            {NAV_CARDS.map((card, i) => {
+              const offset = shortestOffset(i, activeIdx);
+              const slotStyle = getSlotTransform(offset, dragOffset, sideOffset, depth);
+              return (
+                <NavCard
+                  key={card.id}
+                  card={card}
+                  cardW={cardW}
+                  cardH={cardH}
+                  isActive={i === activeIdx}
+                  slotStyle={slotStyle}
+                  onTap={(to) => navigate(to)}
+                />
+              );
+            })}
           </div>
         </div>
         <ArrowBtn direction="right" onClick={goNext} isMobile={isMobile} />
