@@ -18,16 +18,25 @@ import { motion as Motion } from 'framer-motion';
 import TrustedBrands from './TrustedBrands';
 import NavigationCarousel from './NavigationCarousel';
 
-const HERO_TITLE_AURORA_COLORS = ['#ffffff', '#f8fafc', '#dbe3ef', '#b8c2d2', '#f1f5f9'];
+const HERO_TITLE_AURORA_COLORS = [
+  '#ffffff',
+  '#7f8794',
+  '#f8fafc',
+  '#b6bfcd',
+  '#3f4652',
+  '#eef2f7',
+  '#9aa5b5',
+  '#ffffff',
+];
 
 const AuroraText = memo(function AuroraText({
   children,
   className = '',
   colors = HERO_TITLE_AURORA_COLORS,
-  speed = 0.82,
+  speed = 0.62,
 }) {
   const gradientStyle = {
-    backgroundImage: `linear-gradient(135deg, ${colors.join(', ')}, ${colors[0]})`,
+    backgroundImage: `linear-gradient(110deg, ${colors.join(', ')}, ${colors[0]})`,
     WebkitBackgroundClip: 'text',
     WebkitTextFillColor: 'transparent',
     animationDuration: `${10 / speed}s`,
@@ -276,11 +285,31 @@ export default function HeroSection({
           display: inline-block;
         }
 
+        .dtb-aurora-text::after {
+          content: '';
+          position: absolute;
+          inset: 0;
+          pointer-events: none;
+          background:
+            linear-gradient(180deg,
+              rgba(255,255,255,0.92) 0%,
+              rgba(255,255,255,0.18) 13%,
+              rgba(8,13,24,0.18) 38%,
+              rgba(255,255,255,0.52) 52%,
+              rgba(13,20,34,0.28) 68%,
+              rgba(255,255,255,0.72) 100%);
+          background-clip: text;
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          mix-blend-mode: screen;
+          opacity: 0.58;
+        }
+
         .dtb-aurora-text__visible {
           position: relative;
           display: inline-block;
           color: transparent;
-          background-size: 220% auto;
+          background-size: 360% auto;
           background-position: 0% 50%;
           background-clip: text;
           -webkit-background-clip: text;
@@ -288,6 +317,10 @@ export default function HeroSection({
           animation-name: dtb-hero-aurora;
           animation-timing-function: ease-in-out;
           animation-iteration-count: infinite;
+          text-shadow:
+            0 1px 0 rgba(255,255,255,0.48),
+            0 -1px 0 rgba(15,23,42,0.62),
+            0 18px 42px rgba(148,163,184,0.14);
         }
 
         .dtb-hero-cta {
@@ -304,10 +337,13 @@ export default function HeroSection({
         .dtb-hero-title-gradient {
           color: transparent;
           text-shadow:
-            0 1px 0 rgba(255,255,255,0.24),
-            0 14px 38px rgba(148,163,184,0.12),
-            0 0 44px rgba(96,165,250,0.08);
-          filter: drop-shadow(0 10px 22px rgba(2,6,23,0.22));
+            0 1px 0 rgba(255,255,255,0.30),
+            0 -1px 0 rgba(2,6,23,0.72),
+            0 14px 38px rgba(148,163,184,0.18),
+            0 0 44px rgba(96,165,250,0.10);
+          filter:
+            drop-shadow(0 1px 0 rgba(255,255,255,0.18))
+            drop-shadow(0 12px 24px rgba(2,6,23,0.32));
         }
 
         .dtb-hero-cta--primary {
