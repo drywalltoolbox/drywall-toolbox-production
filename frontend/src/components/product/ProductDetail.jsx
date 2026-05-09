@@ -573,11 +573,7 @@ export default function ProductDetail({
 
               {activeTab === 'specifications' && (
                 <div>
-                  {productSpecifications.length > 0 ? (
-                    <TechnicalSpecifications specs={productSpecifications} onItemClick={onClose} />
-                  ) : (
-                    <p className="text-gray-500">No specifications available for this product yet.</p>
-                  )}
+                  <TechnicalSpecifications specs={productSpecifications} onItemClick={onClose} />
                 </div>
               )}
 
