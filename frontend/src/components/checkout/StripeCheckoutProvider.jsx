@@ -4,11 +4,12 @@ import { loadStripe } from '@stripe/stripe-js';
 
 const stripePublishableKey = process.env.REACT_APP_STRIPE_PUBLISHABLE_KEY;
 
-const stripePromise = stripePublishableKey
-  ? loadStripe( stripePublishableKey )
-  : null;
-
 export default function StripeCheckoutProvider( { clientSecret, children } ) {
+  const stripePromise = useMemo(
+    () => ( stripePublishableKey && clientSecret ? loadStripe( stripePublishableKey ) : null ),
+    [clientSecret],
+  );
+
   const options = useMemo( () => ( {
     clientSecret,
     appearance: {
