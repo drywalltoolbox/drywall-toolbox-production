@@ -191,7 +191,7 @@ function AppShell({ cartOpen, toggleCart, closeCart }) {
                 { text: 'Expert Support - Real Pros' },
                 { text: 'Professional Repair Services' },
               ]}
-              duration={28}
+              duration={33}
               className="dtb-desktop-shipping-bar dtb-top-shipping-bar"
             />
           </div>
