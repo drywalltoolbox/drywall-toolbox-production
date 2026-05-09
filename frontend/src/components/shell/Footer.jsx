@@ -8,7 +8,7 @@
 import { Link } from 'react-router-dom';
 import { useState } from 'react';
 import { Instagram, Facebook, Twitter, ChevronDown, Mail, Phone, MapPin, Clock } from 'lucide-react';
-import { motion as Motion, AnimatePresence } from 'framer-motion';
+import { motion as Motion } from 'framer-motion';
 import LogoWhite from '/logo-white.svg';
 
 const FOOTER_LINK_STYLE = {
@@ -59,18 +59,15 @@ export default function Footer() {
         overflow: 'hidden',
       }}
     >
-      {/* Dot-grid texture */}
       <div style={{
         position: 'absolute', inset: 0,
         backgroundImage: 'radial-gradient(circle at 2px 2px, rgba(255,255,255,0.04) 1px, transparent 0)',
         backgroundSize: '36px 36px',
         pointerEvents: 'none', zIndex: 0,
       }} />
-      {/* Glow orbs */}
       <div style={{ position: 'absolute', top: '-80px', left: '-80px', width: '320px', height: '320px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(37,99,235,0.12) 0%, transparent 70%)', pointerEvents: 'none', zIndex: 0 }} />
       <div style={{ position: 'absolute', bottom: '-60px', right: '-60px', width: '280px', height: '280px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(59,130,246,0.10) 0%, transparent 70%)', pointerEvents: 'none', zIndex: 0 }} />
 
-      {/* Main content */}
       <div style={{
         position: 'relative', zIndex: 1,
         padding: 'clamp(40px, 6vw, 72px) clamp(20px, 5vw, 40px)',
@@ -82,13 +79,11 @@ export default function Footer() {
         width: '100%',
       }} className="footer-grid">
 
-        {/* Brand column */}
         <div className="footer-brand-col" style={{ display: 'flex', flexDirection: 'column', gap: '16px', alignItems: 'center', width: '100%' }}>
           <Link to="/" style={{ display: 'inline-block' }}>
             <img src={LogoWhite} alt="Drywall Toolbox" className="footer-logo" style={{ display: 'block' }} />
           </Link>
-          {/* Social links */}
-          <div className="footer-social-links" style={{ display: 'flex', gap: '10px', justifyContent: 'center', alignItems: 'center' }}>
+          <div className="footer-social-links" style={{ display: 'flex', gap: '18px', justifyContent: 'center', alignItems: 'center' }}>
             {[
               { href: 'https://www.instagram.com/drywalltoolbox', Icon: Instagram, label: 'Instagram' },
               { href: 'https://facebook.com', Icon: Facebook, label: 'Facebook' },
@@ -103,22 +98,20 @@ export default function Footer() {
                 whileHover={{ y: -2, color: '#93c5fd' }}
                 transition={{ duration: 0.15 }}
                 style={{
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  width: '34px', height: '34px',
-                  borderRadius: '8px',
-                  background: 'rgba(255,255,255,0.07)',
-                  border: '1px solid rgba(255,255,255,0.1)',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
                   color: '#ffffff',
                   textDecoration: 'none',
+                  lineHeight: 1,
                 }}
               >
-                <Icon size={15} />
+                <Icon size={22} strokeWidth={1.9} />
               </Motion.a>
             ))}
           </div>
         </div>
 
-        {/* Shop column */}
         <div className="footer-col footer-col--shop" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px' }}>
           <h5 style={{ display: 'none', textTransform: 'uppercase', fontSize: '0.67rem', letterSpacing: '0.12em', margin: '0 0 16px 0', fontWeight: 800, color: '#ffffff' }}>
             Shop
@@ -144,7 +137,6 @@ export default function Footer() {
           </ul>
         </div>
 
-        {/* Support column */}
         <div className="footer-col footer-col--support" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px' }}>
           <h5 style={{ display: 'none', textTransform: 'uppercase', fontSize: '0.67rem', letterSpacing: '0.12em', margin: '0 0 16px 0', fontWeight: 800, color: '#ffffff' }}>
             Support
@@ -170,7 +162,6 @@ export default function Footer() {
           </ul>
         </div>
 
-        {/* Contact column — desktop only */}
         <div className="dtb-footer-contact-col" style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
           <h5 style={{ textTransform: 'uppercase', fontSize: '0.67rem', letterSpacing: '0.12em', margin: '0 0 6px 0', fontWeight: 800, color: '#ffffff' }}>
             Contact &amp; Support
@@ -206,10 +197,8 @@ export default function Footer() {
         </div>
       </div>
 
-      {/* Divider */}
       <div style={{ height: '1px', background: 'rgba(255,255,255,0.08)', position: 'relative', zIndex: 1, margin: '0 clamp(20px, 5vw, 40px)' }} />
 
-      {/* Copyright */}
       <div style={{
         position: 'relative', zIndex: 1,
         padding: '20px clamp(20px, 5vw, 40px)',
