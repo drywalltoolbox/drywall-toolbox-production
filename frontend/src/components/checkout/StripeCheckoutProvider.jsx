@@ -1,6 +1,11 @@
 import { useMemo } from 'react';
 import { Elements } from '@stripe/react-stripe-js';
-import { loadStripe } from '@stripe/stripe-js';
+// Use the "pure" entry point so @stripe/stripe-js does NOT automatically inject
+// stripe.js into the page on module import. The script only loads when loadStripe()
+// is explicitly called (i.e. when both a publishable key and clientSecret exist).
+// This eliminates the Edge/Safari Tracking Prevention warnings caused by Stripe's
+// cross-origin fraud-detection iframes loading before they are needed.
+import { loadStripe } from '@stripe/stripe-js/pure';
 
 const stripePublishableKey = process.env.REACT_APP_STRIPE_PUBLISHABLE_KEY;
 
