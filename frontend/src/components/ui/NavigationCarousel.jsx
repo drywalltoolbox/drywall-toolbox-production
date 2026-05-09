@@ -8,24 +8,15 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import {
-  ShoppingBag,
-  Settings,
-  Layers,
-  Calculator,
-  Briefcase,
-  Wrench,
-  ChevronLeft,
-  ChevronRight,
-} from 'lucide-react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 const NAV_CARDS = [
-  { id: 'products', label: 'Products', icon: ShoppingBag, to: '/all-products', desc: 'Browse all tools & equipment' },
-  { id: 'parts', label: 'Parts', icon: Settings, to: '/parts', desc: 'OEM replacement parts' },
-  { id: 'schematics', label: 'Schematics', icon: Layers, to: '/schematics', desc: 'Tool diagrams & parts lists' },
-  { id: 'calculator', label: 'Calculator', icon: Calculator, to: '/calculators', desc: 'Estimate your materials' },
-  { id: 'toolsets', label: 'Tool Sets', icon: Briefcase, to: '/toolset-builder', desc: 'Build your perfect kit' },
-  { id: 'repairs', label: 'Repairs', icon: Wrench, to: '/repairs', desc: 'Professional repair shop' },
+  { id: 'products', label: 'Products', to: '/all-products', desc: 'Browse all tools & equipment' },
+  { id: 'parts', label: 'Parts', to: '/parts', desc: 'OEM replacement parts' },
+  { id: 'schematics', label: 'Schematics', to: '/schematics', desc: 'Tool diagrams & parts lists' },
+  { id: 'calculator', label: 'Calculator', to: '/calculators', desc: 'Estimate your materials' },
+  { id: 'toolsets', label: 'Tool Sets', to: '/toolset-builder', desc: 'Build your perfect kit' },
+  { id: 'repairs', label: 'Repairs', to: '/repairs', desc: 'Professional repair shop' },
 ];
 
 const TOTAL = NAV_CARDS.length;
@@ -48,7 +39,7 @@ function shortestOffset(index, activeIndex) {
 function getSizing(w) {
   const viewportW = Math.max(320, w || 390);
   const cardW = Math.round(Math.max(154, Math.min(190, viewportW * 0.46)));
-  const cardH = Math.round(cardW * 1.08);
+  const cardH = Math.round(cardW * 0.92);
   const sideOffset = Math.round(Math.max(cardW * 0.74, Math.min(viewportW * 0.31, cardW * 0.9)));
   const depth = Math.round(cardW * 0.4);
   const persp = Math.round(Math.max(760, viewportW * 2.3));
@@ -104,7 +95,7 @@ function getSlotTransform(offset, dragOffset, sideOffset, depth) {
 
   return {
     transform: `translate3d(calc(-50% + ${x.toFixed(2)}px), -50%, ${z.toFixed(2)}px) rotateY(${rotateY.toFixed(2)}deg) scale(${scale.toFixed(3)})`,
-    opacity: abs > 2.15 ? 0 : abs > 1.65 ? 0.18 : abs > 0.65 ? 0.46 : 1,
+    opacity: abs > 2.15 ? 0 : abs > 1.65 ? 0.32 : abs > 0.65 ? 0.58 : 1,
     zIndex: Math.round(100 - abs * 20),
     pointerEvents: abs < 0.42 ? 'auto' : 'none',
   };
@@ -112,7 +103,6 @@ function getSlotTransform(offset, dragOffset, sideOffset, depth) {
 
 function NavCard({ card, cardW, cardH, isActive, slotStyle, onTap }) {
   const [hov, setHov] = useState(false);
-  const Icon = card.icon;
   const pressRef = useRef({ x: 0, y: 0 });
 
   const onPointerDown = (e) => {
@@ -150,56 +140,44 @@ function NavCard({ card, cardW, cardH, isActive, slotStyle, onTap }) {
         transformStyle: 'preserve-3d',
         backfaceVisibility: 'hidden',
         WebkitBackfaceVisibility: 'hidden',
-        padding: '14px',
+        padding: '16px',
         borderRadius: '18px',
-        border: `1px solid ${hov && isActive ? 'rgba(99,149,255,0.50)' : isActive ? 'rgba(99,149,255,0.30)' : 'rgba(99,149,255,0.10)'}`,
-        background: hov && isActive ? 'rgba(255,255,255,0.11)' : isActive ? 'rgba(255,255,255,0.075)' : 'rgba(255,255,255,0.035)',
+        border: `1px solid ${hov && isActive ? 'rgba(99,149,255,0.64)' : isActive ? 'rgba(99,149,255,0.42)' : 'rgba(99,149,255,0.20)'}`,
+        background: isActive
+          ? 'linear-gradient(180deg, rgba(24,35,58,0.98) 0%, rgba(18,28,48,0.98) 100%)'
+          : 'linear-gradient(180deg, rgba(16,24,42,0.94) 0%, rgba(11,20,36,0.94) 100%)',
         cursor: isActive ? 'pointer' : 'default',
         transition: 'transform 440ms cubic-bezier(0.16, 1, 0.3, 1), opacity 320ms ease, background 180ms ease, border-color 180ms ease, box-shadow 180ms ease',
-        boxShadow: isActive ? '0 0 22px rgba(37,99,235,0.16)' : 'none',
-        backdropFilter: 'blur(12px)',
-        WebkitBackdropFilter: 'blur(12px)',
+        boxShadow: isActive ? '0 0 26px rgba(37,99,235,0.22)' : '0 0 18px rgba(2,6,23,0.18)',
         userSelect: 'none',
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'center',
-        alignItems: 'flex-start',
-        gap: '10px',
+        alignItems: 'center',
+        textAlign: 'center',
         outline: 'none',
         overflow: 'hidden',
         willChange: 'transform, opacity',
       }}
     >
-      <div style={{
-        width: '40px',
-        height: '40px',
-        borderRadius: '12px',
-        background: hov && isActive ? 'rgba(37,99,235,0.32)' : 'rgba(37,99,235,0.16)',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        transition: 'background 0.18s',
-        flexShrink: 0,
-      }}>
-        <Icon size={21} color="#60a5fa" strokeWidth={1.9} />
-      </div>
-
       <div style={{ minWidth: 0, width: '100%' }}>
         <div style={{
-          fontSize: 'clamp(1rem, 4vw, 1.18rem)',
+          fontSize: 'clamp(1.08rem, 4.5vw, 1.28rem)',
           fontWeight: 800,
-          color: hov ? '#ffffff' : '#f0f6ff',
+          color: hov ? '#ffffff' : '#f8fbff',
           lineHeight: 1.08,
-          marginBottom: '5px',
+          marginBottom: '8px',
           transition: 'color 0.15s',
-          whiteSpace: 'nowrap',
+          whiteSpace: 'normal',
         }}>
           {card.label}
         </div>
         <div style={{
-          fontSize: 'clamp(0.76rem, 3vw, 0.88rem)',
-          color: 'rgba(163,192,255,0.58)',
-          lineHeight: 1.2,
+          fontSize: 'clamp(0.78rem, 3.2vw, 0.92rem)',
+          color: 'rgba(190,210,245,0.72)',
+          lineHeight: 1.22,
+          margin: '0 auto',
+          maxWidth: '13ch',
         }}>
           {card.desc}
         </div>
