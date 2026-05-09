@@ -11,12 +11,12 @@ import { useNavigate } from 'react-router-dom';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 const NAV_CARDS = [
-  { id: 'products', label: 'Products', to: '/all-products', desc: 'Browse all tools & equipment' },
-  { id: 'parts', label: 'Parts', to: '/parts', desc: 'OEM replacement parts' },
-  { id: 'schematics', label: 'Schematics', to: '/schematics', desc: 'Tool diagrams & parts lists' },
-  { id: 'calculator', label: 'Calculator', to: '/calculators', desc: 'Estimate your materials' },
-  { id: 'toolsets', label: 'Tool Sets', to: '/toolset-builder', desc: 'Build your perfect kit' },
-  { id: 'repairs', label: 'Repairs', to: '/repairs', desc: 'Professional repair shop' },
+  { id: 'products', label: 'Products', to: '/all-products' },
+  { id: 'parts', label: 'Parts', to: '/parts' },
+  { id: 'schematics', label: 'Schematics', to: '/schematics' },
+  { id: 'calculator', label: 'Calculator', to: '/calculators' },
+  { id: 'toolsets', label: 'Tool Sets', to: '/toolset-builder' },
+  { id: 'repairs', label: 'Repairs', to: '/repairs' },
 ];
 
 const TOTAL = NAV_CARDS.length;
@@ -39,7 +39,7 @@ function shortestOffset(index, activeIndex) {
 function getSizing(w) {
   const viewportW = Math.max(320, w || 390);
   const cardW = Math.round(Math.max(154, Math.min(190, viewportW * 0.46)));
-  const cardH = Math.round(cardW * 0.92);
+  const cardH = Math.round(cardW * 0.76);
   const sideOffset = Math.round(Math.max(cardW * 0.74, Math.min(viewportW * 0.31, cardW * 0.9)));
   const depth = Math.round(cardW * 0.4);
   const persp = Math.round(Math.max(760, viewportW * 2.3));
@@ -151,7 +151,6 @@ function NavCard({ card, cardW, cardH, isActive, slotStyle, onTap }) {
         boxShadow: isActive ? '0 0 26px rgba(37,99,235,0.22)' : '0 0 18px rgba(2,6,23,0.18)',
         userSelect: 'none',
         display: 'flex',
-        flexDirection: 'column',
         justifyContent: 'center',
         alignItems: 'center',
         textAlign: 'center',
@@ -160,27 +159,15 @@ function NavCard({ card, cardW, cardH, isActive, slotStyle, onTap }) {
         willChange: 'transform, opacity',
       }}
     >
-      <div style={{ minWidth: 0, width: '100%' }}>
-        <div style={{
-          fontSize: 'clamp(1.08rem, 4.5vw, 1.28rem)',
-          fontWeight: 800,
-          color: hov ? '#ffffff' : '#f8fbff',
-          lineHeight: 1.08,
-          marginBottom: '8px',
-          transition: 'color 0.15s',
-          whiteSpace: 'normal',
-        }}>
-          {card.label}
-        </div>
-        <div style={{
-          fontSize: 'clamp(0.78rem, 3.2vw, 0.92rem)',
-          color: 'rgba(190,210,245,0.72)',
-          lineHeight: 1.22,
-          margin: '0 auto',
-          maxWidth: '13ch',
-        }}>
-          {card.desc}
-        </div>
+      <div style={{
+        fontSize: 'clamp(1.18rem, 4.9vw, 1.42rem)',
+        fontWeight: 800,
+        color: hov ? '#ffffff' : '#f8fbff',
+        lineHeight: 1.06,
+        transition: 'color 0.15s',
+        whiteSpace: 'normal',
+      }}>
+        {card.label}
       </div>
     </div>
   );
