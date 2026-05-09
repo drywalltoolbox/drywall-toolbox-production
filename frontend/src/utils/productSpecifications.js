@@ -243,6 +243,17 @@ function enrichIncludesSpec(specs, meta_data) {
   // 1. Structured meta_data includes
   const structuredItems = extractStructuredIncludes(meta_data);
   if (structuredItems.length > 0) {
+    const includesSpec = specs.find(s => isIncludesLabel(s.label));
+    if (!includesSpec) {
+      return [
+        ...specs,
+        {
+          label: 'Set Includes',
+          value: structuredItems.map(item => item.sku ? `${item.name} (${item.sku})` : item.name).join(', '),
+          items: structuredItems,
+        },
+      ];
+    }
     return specs.map(spec =>
       isIncludesLabel(spec.label) ? { ...spec, items: structuredItems } : spec
     );

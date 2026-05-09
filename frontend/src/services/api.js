@@ -16,6 +16,16 @@
 import { apiClient } from '../api/client.js';
 import { CATEGORY_MAP } from '../utils/parseProductCsv.js';
 import { PLACEHOLDER_IMAGE } from '../constants/images.js';
+import {
+  buildSpecificationsFromApiProduct,
+  buildSpecsMetaFromRows,
+  mergeSpecMeta,
+} from '../utils/csvSpecificationMapping.js';
+import { buildIncludesMetaFromContent } from '../utils/includesExtraction.js';
+
+function hasStructuredIncludesMeta(metaItems = []) {
+  return metaItems.some(({ key }) => /^_includes_\d+_(name|sku)$/.test(String(key || '')));
+}
 
 
 // ─── Known brand names (kept in sync with ALLOWED_BRANDS in Products.jsx) ────
@@ -391,6 +401,30 @@ export function normalizeProduct(wcProduct) {
 
   // Human-readable leaf category name for category-card grouping (e.g. "Finishing Boxes").
   const display_category = extractDisplayCategory(wcProduct.categories);
+  const brand = extractBrand(wcProduct);
+
+  // Synthesize spec metadata from truthful live product fields so the UI can
+  // render a consistent specifications table even when curated _specs_* meta
+  // hasn't been written into WooCommerce yet.
+  const apiSpecRows = buildSpecificationsFromApiProduct(wcProduct, { brand });
+  const apiSpecsMeta = buildSpecsMetaFromRows(apiSpecRows);
+  const existingMeta = Array.isArray(wcProduct.meta_data) ? wcProduct.meta_data : [];
+  const inferredIncludes = buildIncludesMetaFromContent(wcProduct.description || '', {
+    sku: wcProduct.sku,
+  });
+  const mergedSpecMeta = mergeSpecMeta(
+    mergeSpecMeta(existingMeta, apiSpecsMeta),
+    inferredIncludes.specsMeta
+  );
+  const nonSpecMeta = existingMeta.filter(({ key }) => {
+    const normalizedKey = String(key || '');
+    return !/^_specs_\d+_(label|value)$/.test(normalizedKey)
+      && !/^_includes_\d+_(name|sku)$/.test(normalizedKey);
+  });
+  const includeMeta = hasStructuredIncludesMeta(existingMeta)
+    ? existingMeta.filter(({ key }) => /^_includes_\d+_(name|sku)$/.test(String(key || '')))
+    : inferredIncludes.includesMeta;
+  const meta_data = [...nonSpecMeta, ...mergedSpecMeta, ...includeMeta];
 
   // For individual variations: the parent product ID and selected attribute.
   const parent_id = wcProduct.parent_id || null;
@@ -413,7 +447,7 @@ export function normalizeProduct(wcProduct) {
 
     // Display
     name:         wcProduct.name || wcProduct.sku || String(wcProduct.id),
-    brand:        extractBrand(wcProduct),
+    brand,
     category,
     display_category,
     is_parts,
@@ -438,7 +472,7 @@ export function normalizeProduct(wcProduct) {
 
     // Attributes / meta (preserved for schematic / parts lookups)
     attributes: wcProduct.attributes || [],
-    meta_data:  wcProduct.meta_data  || [],
+    meta_data,
 
     // Variable-product fields
     type:                productType,

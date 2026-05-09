@@ -456,6 +456,16 @@ function extractSpecsFromHtml(html) {
  */
 
 import { PLACEHOLDER_IMAGE } from '../constants/images.js';
+import {
+  buildSpecificationsFromCsvRow,
+  buildSpecsMetaFromRows,
+  mergeSpecMeta,
+} from './csvSpecificationMapping.js';
+import { buildIncludesMetaFromContent } from './includesExtraction.js';
+
+function hasStructuredIncludes(metaItems = []) {
+  return metaItems.some(({ key }) => /^_includes_\d+_(name|sku)$/.test(String(key || '')));
+}
 
 function normalizeRow(row, idx, attrIndexes = []) {
   // Images: pipe-separated URLs. CSV columns may contain "Images" or "Images (comma separated)"
@@ -565,12 +575,25 @@ function normalizeRow(row, idx, attrIndexes = []) {
   // entries so the TechnicalSpecifications component can render them with proper
   // per-item formatting. The specs <p> block is stripped from the HTML so it
   // doesn't appear twice (once in the description and once in the specs table).
-  const { specsMeta, strippedHtml } = extractSpecsFromHtml(row['Description'] || '');
+  const rawDescription = row['Description'] || '';
+  const { specsMeta: htmlSpecsMeta, strippedHtml } = extractSpecsFromHtml(rawDescription);
+  const csvSpecRows = buildSpecificationsFromCsvRow(row, attrIndexes);
+  const csvSpecsMeta = buildSpecsMetaFromRows(csvSpecRows);
+  const inferredIncludes = buildIncludesMetaFromContent(rawDescription, { sku });
+  const specsMeta = mergeSpecMeta(
+    mergeSpecMeta(csvSpecsMeta, htmlSpecsMeta),
+    inferredIncludes.specsMeta
+  );
 
   // Build meta_data: UPC first (if present), then extracted spec entries
   const meta_data = [];
   if (upc) meta_data.push({ key: 'upc', value: upc });
   meta_data.push(...specsMeta);
+  if (hasStructuredIncludes(htmlSpecsMeta)) {
+    meta_data.push(...htmlSpecsMeta.filter(({ key }) => /^_includes_\d+_(name|sku)$/.test(String(key || ''))));
+  } else {
+    meta_data.push(...inferredIncludes.includesMeta);
+  }
 
   return {
     // Identity — use SKU; fall back to row index so IDs are always defined
