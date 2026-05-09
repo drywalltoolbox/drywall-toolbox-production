@@ -16,31 +16,31 @@ import {
 } from 'lucide-react';
 
 const NAV_CARDS = [
-  { id: 'products',   label: 'Products',   icon: ShoppingBag, to: '/all-products',    desc: 'Browse all tools & equipment' },
-  { id: 'parts',      label: 'Parts',      icon: Settings,    to: '/parts',           desc: 'OEM replacement parts'        },
-  { id: 'schematics', label: 'Schematics', icon: Layers,      to: '/schematics',      desc: 'Tool diagrams & parts lists'  },
-  { id: 'calculator', label: 'Calculator', icon: Calculator,  to: '/calculators',     desc: 'Estimate your materials'      },
-  { id: 'toolsets',   label: 'Tool Sets',  icon: Briefcase,   to: '/toolset-builder', desc: 'Build your perfect kit'       },
-  { id: 'repairs',    label: 'Repairs',    icon: Wrench,      to: '/repairs',         desc: 'Professional repair shop'     },
+  { id: 'products', label: 'Products', icon: ShoppingBag, to: '/all-products', desc: 'Browse all tools & equipment' },
+  { id: 'parts', label: 'Parts', icon: Settings, to: '/parts', desc: 'OEM replacement parts' },
+  { id: 'schematics', label: 'Schematics', icon: Layers, to: '/schematics', desc: 'Tool diagrams & parts lists' },
+  { id: 'calculator', label: 'Calculator', icon: Calculator, to: '/calculators', desc: 'Estimate your materials' },
+  { id: 'toolsets', label: 'Tool Sets', icon: Briefcase, to: '/toolset-builder', desc: 'Build your perfect kit' },
+  { id: 'repairs', label: 'Repairs', icon: Wrench, to: '/repairs', desc: 'Professional repair shop' },
 ];
 
 const TOTAL = NAV_CARDS.length;
 const ANGLE_STEP = 360 / TOTAL;
 const AUTO_SLIDE_MS = 4600;
-const LERP_ROT = 0.16;
+const LERP_ROT = 0.18;
 const LERP_TILT = 0.10;
-const TILT_MAX = 7;
-const ROT_PER_PX = 0.36;
+const TILT_MAX = 5;
+const ROT_PER_PX = 0.28;
 const SWIPE_THRESHOLD = 35;
 const DRAG_TAP_LIMIT = 8;
-const OPACITY_FADE_FACTOR = 0.72;
+const OPACITY_FADE_FACTOR = 0.76;
 
 function getSizing(w) {
   const viewportW = Math.max(320, w || 390);
-  const cardW = Math.round(Math.max(172, Math.min(252, viewportW * 0.62)));
-  const cardH = Math.round(cardW * 1.18);
-  const radius = Math.round(Math.max(cardW * 0.92, Math.min(viewportW * 0.64, cardW * 1.08)));
-  const persp = Math.round(radius * 4.8);
+  const cardW = Math.round(Math.max(168, Math.min(224, viewportW * 0.56)));
+  const cardH = Math.round(cardW * 1.12);
+  const radius = Math.round(Math.max(cardW * 0.82, Math.min(viewportW * 0.48, cardW * 0.94)));
+  const persp = Math.round(radius * 5.2);
   return { cardW, cardH, radius, persp };
 }
 
@@ -58,10 +58,10 @@ function ArrowBtn({ direction, onClick, isMobile }) {
       onMouseLeave={() => setHov(false)}
       style={{
         position: 'absolute',
-        [direction === 'left' ? 'left' : 'right']: isMobile ? '8px' : 0,
+        [direction === 'left' ? 'left' : 'right']: isMobile ? '6px' : 0,
         top: '50%',
         transform: 'translateY(-50%)',
-        zIndex: 10,
+        zIndex: 20,
         width: `${sz}px`,
         height: `${sz}px`,
         borderRadius: '50%',
@@ -117,54 +117,56 @@ function NavCard({ card, cardAngle, radius, cardW, cardH, isActive, onTap }) {
         transform: `rotateY(${cardAngle}deg) translateZ(${radius}px)`,
         backfaceVisibility: 'hidden',
         WebkitBackfaceVisibility: 'hidden',
-        padding: 'clamp(18px, 5vw, 28px)',
-        borderRadius: '22px',
-        border: `1px solid ${hov && isActive ? 'rgba(99,149,255,0.50)' : isActive ? 'rgba(99,149,255,0.28)' : 'rgba(99,149,255,0.10)'}`,
+        padding: '18px',
+        borderRadius: '20px',
+        border: `1px solid ${hov && isActive ? 'rgba(99,149,255,0.50)' : isActive ? 'rgba(99,149,255,0.30)' : 'rgba(99,149,255,0.10)'}`,
         background: hov && isActive ? 'rgba(255,255,255,0.11)' : isActive ? 'rgba(255,255,255,0.07)' : 'rgba(255,255,255,0.03)',
         cursor: isActive ? 'pointer' : 'default',
         transition: 'background 0.22s, border-color 0.22s, box-shadow 0.22s',
-        boxShadow: hov && isActive ? '0 10px 34px rgba(37,99,235,0.24)' : isActive ? '0 2px 18px rgba(37,99,235,0.14)' : 'none',
+        boxShadow: isActive ? '0 0 28px rgba(37,99,235,0.16)' : 'none',
         backdropFilter: 'blur(12px)',
         WebkitBackdropFilter: 'blur(12px)',
         userSelect: 'none',
-        display: 'grid',
-        gridTemplateRows: 'auto 1fr',
-        alignContent: 'start',
-        gap: 'clamp(16px, 4vw, 24px)',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'flex-start',
+        gap: '16px',
         outline: 'none',
         willChange: 'transform, opacity',
         overflow: 'hidden',
       }}
     >
       <div style={{
-        width: 'clamp(54px, 13vw, 72px)',
-        height: 'clamp(54px, 13vw, 72px)',
-        borderRadius: '18px',
+        width: '54px',
+        height: '54px',
+        borderRadius: '16px',
         background: hov && isActive ? 'rgba(37,99,235,0.32)' : 'rgba(37,99,235,0.16)',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
         transition: 'background 0.18s',
+        flexShrink: 0,
       }}>
-        <Icon size={cardW >= 220 ? 34 : 28} color="#60a5fa" strokeWidth={1.9} />
+        <Icon size={27} color="#60a5fa" strokeWidth={1.9} />
       </div>
 
-      <div style={{ minWidth: 0 }}>
+      <div style={{ minWidth: 0, width: '100%' }}>
         <div style={{
-          fontSize: 'clamp(1.55rem, 6vw, 2rem)',
+          fontSize: 'clamp(1.24rem, 5.4vw, 1.58rem)',
           fontWeight: 800,
           color: hov ? '#ffffff' : '#f0f6ff',
-          lineHeight: 1.05,
-          marginBottom: '10px',
+          lineHeight: 1.08,
+          marginBottom: '8px',
           transition: 'color 0.15s',
           whiteSpace: 'nowrap',
         }}>
           {card.label}
         </div>
         <div style={{
-          fontSize: 'clamp(1rem, 4.5vw, 1.35rem)',
+          fontSize: 'clamp(0.9rem, 3.9vw, 1.08rem)',
           color: 'rgba(163,192,255,0.58)',
-          lineHeight: 1.18,
+          lineHeight: 1.25,
         }}>
           {card.desc}
         </div>
@@ -206,14 +208,13 @@ export default function NavigationCarousel() {
 
   const isMobile = containerW > 0 && containerW <= 680;
   const { cardW, cardH, radius, persp } = getSizing(containerW);
-  const sidePad = isMobile ? 24 : 52;
+  const sidePad = isMobile ? 42 : 52;
 
   const setCenteredIndex = useCallback((rawIdx) => {
     const newIdx = ((Math.round(rawIdx) % TOTAL) + TOTAL) % TOTAL;
     activeIdxRef.current = newIdx;
     setActiveIdx(newIdx);
     targetRotRef.current = -newIdx * ANGLE_STEP;
-    currentRotRef.current = Number.isFinite(currentRotRef.current) ? currentRotRef.current : targetRotRef.current;
     lastAutoRef.current = Date.now();
   }, []);
 
@@ -235,9 +236,9 @@ export default function NavigationCarousel() {
         for (let i = 0; i < children.length; i += 1) {
           const eff = ((i * ANGLE_STEP + currentRotRef.current) % 360 + 360) % 360;
           const dist = eff > 180 ? 360 - eff : eff;
-          const op = dist >= 90 ? 0 : 1 - (dist / 90) * OPACITY_FADE_FACTOR;
+          const op = dist >= 88 ? 0 : 1 - (dist / 88) * OPACITY_FADE_FACTOR;
           children[i].style.opacity = op.toFixed(3);
-          children[i].style.pointerEvents = dist < 16 ? 'auto' : 'none';
+          children[i].style.pointerEvents = dist < 14 ? 'auto' : 'none';
         }
       }
       animRef.current = requestAnimationFrame(animate);
@@ -282,7 +283,7 @@ export default function NavigationCarousel() {
     const onMouseMove = (e) => {
       if (!isDraggingRef.current) return;
       const dx = e.clientX - dragStartXRef.current;
-      targetRotRef.current = dragBaseRotRef.current + Math.max(-ANGLE_STEP * 0.9, Math.min(ANGLE_STEP * 0.9, dx * ROT_PER_PX));
+      targetRotRef.current = dragBaseRotRef.current + Math.max(-ANGLE_STEP * 0.75, Math.min(ANGLE_STEP * 0.75, dx * ROT_PER_PX));
     };
     const onMouseUp = (e) => {
       if (!isDraggingRef.current) return;
@@ -324,7 +325,7 @@ export default function NavigationCarousel() {
       const dy = e.touches[0].clientY - pressStartRef.current.y;
       if (Math.abs(dx) > Math.abs(dy)) {
         e.preventDefault();
-        targetRotRef.current = dragBaseRotRef.current + Math.max(-ANGLE_STEP * 0.9, Math.min(ANGLE_STEP * 0.9, dx * ROT_PER_PX));
+        targetRotRef.current = dragBaseRotRef.current + Math.max(-ANGLE_STEP * 0.75, Math.min(ANGLE_STEP * 0.75, dx * ROT_PER_PX));
       }
     };
     const onTouchEnd = (e) => {
@@ -351,21 +352,22 @@ export default function NavigationCarousel() {
   const onLeave = useCallback(() => { pausedRef.current = false; }, []);
 
   return (
-    <div style={{ width: '100%', position: 'relative', padding: '0 0 32px', overflow: 'hidden' }}>
-      <div style={{ maxWidth: '900px', margin: '0 auto', padding: `0 ${sidePad}px`, position: 'relative' }}>
+    <div style={{ width: '100%', position: 'relative', padding: '8px 0 28px', overflow: 'hidden' }}>
+      <div style={{ maxWidth: '900px', margin: '0 auto', padding: `0 ${sidePad}px`, position: 'relative', overflow: 'hidden' }}>
         <ArrowBtn direction="left" onClick={goPrev} isMobile={isMobile} />
         <div
           ref={sceneRef}
           style={{
             width: '100%',
-            height: `${cardH + 88}px`,
+            height: `${cardH + 34}px`,
             perspective: `${persp}px`,
             perspectiveOrigin: '50% 50%',
             position: 'relative',
             cursor: isDragging ? 'grabbing' : 'grab',
             userSelect: 'none',
             touchAction: 'pan-y',
-            overflow: 'visible',
+            overflow: 'hidden',
+            contain: 'layout paint',
           }}
           onMouseEnter={onEnter}
           onMouseLeave={onLeave}
@@ -401,7 +403,7 @@ export default function NavigationCarousel() {
         <ArrowBtn direction="right" onClick={goNext} isMobile={isMobile} />
       </div>
 
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '7px', marginTop: '6px' }}>
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '7px', marginTop: '10px' }}>
         {NAV_CARDS.map((card, i) => (
           <button
             key={card.id}
