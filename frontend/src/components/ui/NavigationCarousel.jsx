@@ -20,7 +20,7 @@ const NAV_CARDS = [
 ];
 
 const TOTAL = NAV_CARDS.length;
-const AUTO_SLIDE_MS = 4600;
+const AUTO_SLIDE_MS = 10000;
 const SWIPE_THRESHOLD = 34;
 const DRAG_TAP_LIMIT = 8;
 const DRAG_RESISTANCE = 0.28;
