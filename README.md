@@ -180,6 +180,30 @@ The `useSchematicMedia()` hook fetches the manifest at runtime and falls back to
 
 ---
 
+## Production Catalog Hardening
+
+The production WooCommerce catalog is governed by a closed taxonomy policy at
+`products/Production/catalogs/config/production_taxonomy_policy.json`.
+
+Use these commands before publishing catalog changes:
+
+```bash
+python scripts/production_catalog/normalize_production_catalog.py
+python scripts/production_catalog/validate_production_catalog.py
+```
+
+The hardening layer enforces:
+
+- one canonical allowed category tree
+- exact category alias normalization into canonical values
+- explicit brand-to-category allowlists
+- deprecated parts labels blocked in controlled taxonomy fields only
+
+`Categories`, `meta:product_family`, and `meta:series` are treated as controlled taxonomy fields.
+Tags, descriptions, and SEO copy are intentionally not normalized by this validator.
+
+---
+
 ## CI/CD — GitHub Actions
 
 Workflow: `.github/workflows/deploy.yml`  
