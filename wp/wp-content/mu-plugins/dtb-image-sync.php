@@ -578,6 +578,9 @@ function dtb_route_sync_images( WP_REST_Request $request ): WP_REST_Response|WP_
 	$last_item    = '';
 	$last_sku     = '';
 	$last_product = 0;
+	$run_id       = function_exists( 'wp_generate_uuid4' ) ? wp_generate_uuid4() : uniqid( 'dtb-image-sync-', true );
+	$run_started_at = gmdate( 'c' );
+	$run_started_ts = microtime( true );
 
 	// ── Initialise all counters referenced by the progress-updater closure ──
 	$processed      = 0;
@@ -607,9 +610,23 @@ function dtb_route_sync_images( WP_REST_Request $request ): WP_REST_Response|WP_
 		$limit,
 		$batch_mode,
 		$dry_run,
-		$register_only
+		$register_only,
+		$run_id,
+		$run_started_at,
+		$run_started_ts
 	): void {
+		$elapsed_seconds   = max( 0, microtime( true ) - $run_started_ts );
+		$throughput_per_min = ( $elapsed_seconds > 0 && $processed > 0 )
+			? round( ( $processed / $elapsed_seconds ) * 60, 2 )
+			: 0.0;
+		$remaining         = max( 0, $batch_total - $processed );
+		$eta_seconds       = ( $throughput_per_min > 0 && $remaining > 0 )
+			? (int) round( ( $remaining / $throughput_per_min ) * 60 )
+			: null;
+
 		set_transient( DTB_SYNC_PROGRESS_KEY, [
+			'run_id'         => $run_id,
+			'started_at'     => $run_started_at,
 			'last_item'      => $last_item,
 			'last_sku'       => $last_sku,
 			'last_product'   => $last_product,
@@ -626,6 +643,9 @@ function dtb_route_sync_images( WP_REST_Request $request ): WP_REST_Response|WP_
 			'gallery_images' => $gallery_images,
 			'dry_run'        => $dry_run,
 			'register_only'  => $register_only,
+			'elapsed_seconds'=> (int) round( $elapsed_seconds ),
+			'throughput_per_min' => $throughput_per_min,
+			'eta_seconds'    => $eta_seconds,
 			'updated_at'     => gmdate( 'c' ),
 		], DTB_SYNC_LOCK_TTL );
 	};
@@ -1042,78 +1062,499 @@ function dtb_route_sync_images_progress(): WP_REST_Response {
 // GET /dtb/v1/sync-images/status
 // ============================================================================
 
+/**
+ * Parse a WooCommerce gallery meta string into normalized attachment IDs.
+ *
+ * @param string $gallery_meta Raw `_product_image_gallery` meta value.
+ * @return int[]
+ */
+function dtb_image_sync_parse_gallery_ids( string $gallery_meta ): array {
+	$ids = array_map( 'absint', explode( ',', $gallery_meta ) );
+	return array_values( array_filter( $ids ) );
+}
+
+/**
+ * Map a count-based health state to a stable label for UI rendering.
+ *
+ * @param int  $errors   Hard failures.
+ * @param int  $warnings Soft drift or cleanup signals.
+ * @param bool $running  Whether a sync is actively running.
+ * @param bool $blocked  Whether the state is blocked by a stuck lock.
+ * @return string
+ */
+function dtb_image_sync_health_label( int $errors, int $warnings, bool $running = false, bool $blocked = false ): string {
+	if ( $blocked ) {
+		return 'blocked';
+	}
+	if ( $running ) {
+		return 'running';
+	}
+	if ( $errors > 0 ) {
+		return 'error';
+	}
+	if ( $warnings > 0 ) {
+		return 'warning';
+	}
+	return 'healthy';
+}
+
+/**
+ * Build a full end-to-end reconciliation snapshot for the image sync dashboard.
+ *
+ * The snapshot reconciles:
+ *   1. active catalog CSV image expectations
+ *   2. files physically present on disk
+ *   3. registered media attachments
+ *   4. WooCommerce product image links
+ *
+ * @param string $relative_path Relative directory under wp-content/uploads/.
+ * @return array<string,mixed>
+ */
+function dtb_build_image_sync_snapshot( string $relative_path ): array {
+	$upload_path_info    = dtb_image_sync_resolve_upload_directory( $relative_path );
+	$scan_dir            = trailingslashit( $upload_path_info['basedir'] );
+	$base_url            = trailingslashit( $upload_path_info['baseurl'] );
+	$relative_directory  = $upload_path_info['relative'];
+	$dir_exists          = is_dir( $scan_dir );
+	$image_exts          = [ 'webp', 'jpg', 'jpeg', 'png', 'avif', 'gif', 'svg' ];
+	$file_index          = $dir_exists ? dtb_get_image_file_index( $scan_dir, $base_url, $image_exts ) : [];
+	$files_on_disk       = count( $file_index );
+	$config              = function_exists( 'dtb_get_config' ) ? dtb_get_config() : [];
+	$expected_by_sku     = dtb_get_catalog_image_filenames_by_sku();
+	$missing_disk_by_sku = $dir_exists ? dtb_get_catalog_missing_image_filenames_by_sku( $scan_dir, $base_url, $image_exts ) : $expected_by_sku;
+	$progress            = get_transient( DTB_SYNC_PROGRESS_KEY ) ?: null;
+	$sync_locked         = (bool) get_transient( DTB_SYNC_LOCK_KEY );
+
+	global $wpdb;
+
+	$disk_by_basename          = [];
+	$disk_basenames_present    = [];
+	$expected_unique_basenames = [];
+	$expected_image_refs_total = 0;
+
+	foreach ( $file_index as $file ) {
+		$basename_lower = strtolower( $file['filename'] );
+		$disk_by_basename[ $basename_lower ] = $file;
+		$disk_basenames_present[ $basename_lower ] = true;
+	}
+
+	foreach ( $expected_by_sku as $sku => $filenames ) {
+		$expected_image_refs_total += count( $filenames );
+		foreach ( $filenames as $filename ) {
+			$expected_unique_basenames[ strtolower( $filename ) ] = $filename;
+		}
+	}
+
+	$relative_prefix = $wpdb->esc_like( $relative_directory . '/' );
+
+	// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
+	$attachment_rows = $wpdb->get_results(
+		$wpdb->prepare(
+			"SELECT pm.post_id AS attachment_id,
+			        pm.meta_value AS attached_file,
+			        p.post_parent AS post_parent
+			 FROM {$wpdb->postmeta} pm
+			 INNER JOIN {$wpdb->posts} p
+			         ON p.ID = pm.post_id
+			        AND p.post_type = 'attachment'
+			 WHERE pm.meta_key = '_wp_attached_file'
+			   AND pm.meta_value LIKE %s",
+			$relative_prefix . '%'
+		),
+		ARRAY_A
+	);
+
+	$attachments_by_basename = [];
+	$attachment_id_lookup    = [];
+	foreach ( $attachment_rows as $row ) {
+		$attachment_id  = (int) $row['attachment_id'];
+		$attached_file  = (string) $row['attached_file'];
+		$basename_lower = strtolower( basename( $attached_file ) );
+		$record         = [
+			'attachment_id' => $attachment_id,
+			'attached_file' => $attached_file,
+			'post_parent'   => (int) $row['post_parent'],
+			'basename'      => basename( $attached_file ),
+		];
+		$attachments_by_basename[ $basename_lower ][] = $record;
+		$attachment_id_lookup[ $attachment_id ]       = $record;
+	}
+
+	$registered_count = count( $attachment_rows );
+
+	// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
+	$product_rows = $wpdb->get_results(
+		"SELECT p.ID AS product_id,
+		        p.post_type,
+		        p.post_parent,
+		        sku.meta_value   AS sku,
+		        thumb.meta_value AS thumbnail_id,
+		        gallery.meta_value AS gallery_meta
+		 FROM {$wpdb->posts} p
+		 INNER JOIN {$wpdb->postmeta} sku
+		         ON sku.post_id = p.ID
+		        AND sku.meta_key = '_sku'
+		 LEFT JOIN {$wpdb->postmeta} thumb
+		        ON thumb.post_id = p.ID
+		       AND thumb.meta_key = '_thumbnail_id'
+		 LEFT JOIN {$wpdb->postmeta} gallery
+		        ON gallery.post_id = p.ID
+		       AND gallery.meta_key = '_product_image_gallery'
+		 WHERE p.post_type IN ('product', 'product_variation')
+		   AND p.post_status != 'trash'
+		   AND sku.meta_value != ''
+		 ORDER BY p.ID ASC",
+		ARRAY_A
+	);
+
+	$sku_map = [];
+	foreach ( $product_rows as $row ) {
+		$sku_lower = strtolower( trim( (string) $row['sku'] ) );
+		$sku_map[ $sku_lower ] = [
+			'product_id'    => (int) $row['product_id'],
+			'post_type'     => (string) $row['post_type'],
+			'parent_id'     => (int) $row['post_parent'],
+			'thumbnail_id'  => absint( $row['thumbnail_id'] ?? 0 ),
+			'gallery_ids'   => dtb_image_sync_parse_gallery_ids( (string) ( $row['gallery_meta'] ?? '' ) ),
+		];
+	}
+
+	$missing_wc_skus            = [];
+	$missing_disk_samples       = [];
+	$missing_attachment_samples = [];
+	$primary_mismatch_samples   = [];
+	$gallery_mismatch_samples   = [];
+	$expected_present_refs      = 0;
+	$expected_missing_refs      = 0;
+	$expected_registered_refs   = 0;
+	$expected_missing_att_refs  = 0;
+	$wc_expected_skus           = 0;
+	$primary_ok                 = 0;
+	$primary_missing            = 0;
+	$gallery_ok                 = 0;
+	$gallery_partial            = 0;
+	$gallery_missing            = 0;
+	$variation_primary_missing  = 0;
+	$products_waiting_on_media  = 0;
+
+	foreach ( $expected_by_sku as $sku_lower => $expected_filenames ) {
+		$product = $sku_map[ $sku_lower ] ?? null;
+		if ( ! $product ) {
+			$missing_wc_skus[] = $sku_lower;
+			continue;
+		}
+
+		++$wc_expected_skus;
+		$is_variation = 'product_variation' === $product['post_type'];
+
+		$expected_attachment_ids = [];
+		$missing_for_this_sku    = [];
+
+		foreach ( $expected_filenames as $filename ) {
+			$basename_lower = strtolower( $filename );
+			if ( isset( $disk_basenames_present[ $basename_lower ] ) ) {
+				++$expected_present_refs;
+				$attachment_candidates = $attachments_by_basename[ $basename_lower ] ?? [];
+				if ( ! empty( $attachment_candidates ) ) {
+					++$expected_registered_refs;
+					$expected_attachment_ids[] = (int) $attachment_candidates[0]['attachment_id'];
+				} else {
+					++$expected_missing_att_refs;
+					$missing_for_this_sku[] = $filename;
+				}
+			} else {
+				++$expected_missing_refs;
+			}
+		}
+
+		if ( ! empty( $missing_disk_by_sku[ $sku_lower ] ) ) {
+			$missing_disk_samples[] = [
+				'sku'      => $sku_lower,
+				'expected' => array_values( $missing_disk_by_sku[ $sku_lower ] ),
+			];
+		}
+		if ( ! empty( $missing_for_this_sku ) ) {
+			$missing_attachment_samples[] = [
+				'sku'      => $sku_lower,
+				'expected' => array_values( $missing_for_this_sku ),
+			];
+		}
+
+		if ( empty( $expected_attachment_ids ) ) {
+			++$products_waiting_on_media;
+			if ( $is_variation ) {
+				++$variation_primary_missing;
+			} else {
+				++$primary_missing;
+			}
+			continue;
+		}
+
+		$expected_primary_id = (int) $expected_attachment_ids[0];
+		$current_thumb_id    = (int) $product['thumbnail_id'];
+		if ( $current_thumb_id === $expected_primary_id ) {
+			++$primary_ok;
+		} else {
+			if ( $is_variation ) {
+				++$variation_primary_missing;
+			} else {
+				++$primary_missing;
+			}
+			$primary_mismatch_samples[] = [
+				'sku'                   => $sku_lower,
+				'product_id'            => (int) $product['product_id'],
+				'current_thumbnail_id'  => $current_thumb_id,
+				'expected_attachment_id'=> $expected_primary_id,
+				'expected_filename'     => $expected_filenames[0] ?? '',
+			];
+		}
+
+		if ( $is_variation ) {
+			continue;
+		}
+
+		$expected_gallery_ids = array_values( array_map( 'intval', array_slice( $expected_attachment_ids, 1 ) ) );
+		$current_gallery_ids  = array_values( array_map( 'intval', $product['gallery_ids'] ) );
+
+		if ( empty( $expected_gallery_ids ) ) {
+			if ( empty( $current_gallery_ids ) ) {
+				++$gallery_ok;
+			} else {
+				++$gallery_partial;
+				$gallery_mismatch_samples[] = [
+					'sku'                 => $sku_lower,
+					'product_id'          => (int) $product['product_id'],
+					'current_gallery_ids' => $current_gallery_ids,
+					'expected_gallery_ids'=> $expected_gallery_ids,
+				];
+			}
+			continue;
+		}
+
+		if ( $current_gallery_ids === $expected_gallery_ids ) {
+			++$gallery_ok;
+		} elseif ( empty( $current_gallery_ids ) ) {
+			++$gallery_missing;
+			$gallery_mismatch_samples[] = [
+				'sku'                 => $sku_lower,
+				'product_id'          => (int) $product['product_id'],
+				'current_gallery_ids' => $current_gallery_ids,
+				'expected_gallery_ids'=> $expected_gallery_ids,
+			];
+		} else {
+			++$gallery_partial;
+			$gallery_mismatch_samples[] = [
+				'sku'                 => $sku_lower,
+				'product_id'          => (int) $product['product_id'],
+				'current_gallery_ids' => $current_gallery_ids,
+				'expected_gallery_ids'=> $expected_gallery_ids,
+			];
+		}
+	}
+
+	$unexpected_disk_files = [];
+	foreach ( $disk_by_basename as $basename_lower => $file ) {
+		if ( ! isset( $expected_unique_basenames[ $basename_lower ] ) ) {
+			$unexpected_disk_files[] = $file['filename'];
+		}
+	}
+
+	$orphan_attachments = [];
+	$duplicate_attachment_basenames = [];
+	foreach ( $attachments_by_basename as $basename_lower => $records ) {
+		if ( ! isset( $expected_unique_basenames[ $basename_lower ] ) ) {
+			foreach ( $records as $record ) {
+				$orphan_attachments[] = [
+					'basename'      => $record['basename'],
+					'attachment_id' => (int) $record['attachment_id'],
+					'post_parent'   => (int) $record['post_parent'],
+				];
+			}
+		}
+		if ( count( $records ) > 1 ) {
+			$duplicate_attachment_basenames[] = [
+				'basename'       => $records[0]['basename'],
+				'attachment_ids' => array_values( array_map( static fn( $record ) => (int) $record['attachment_id'], $records ) ),
+			];
+		}
+	}
+
+	$expected_unique_files_total   = count( $expected_unique_basenames );
+	$expected_present_unique_files = 0;
+	$expected_registered_unique    = 0;
+	foreach ( array_keys( $expected_unique_basenames ) as $basename_lower ) {
+		if ( isset( $disk_basenames_present[ $basename_lower ] ) ) {
+			++$expected_present_unique_files;
+		}
+		if ( ! empty( $attachments_by_basename[ $basename_lower ] ) ) {
+			++$expected_registered_unique;
+		}
+	}
+
+	$missing_disk_total       = array_sum( array_map( 'count', $missing_disk_by_sku ) );
+	$missing_wc_total         = count( $missing_wc_skus );
+	$missing_attachment_total = $expected_missing_att_refs;
+	$products_link_total      = $wc_expected_skus;
+	$primary_error_total      = $primary_missing + $variation_primary_missing;
+	$gallery_error_total      = $gallery_missing + $gallery_partial;
+
+	$recommendations = [];
+	if ( ! $dir_exists ) {
+		$recommendations[] = [
+			'severity' => 'error',
+			'label'    => 'Upload directory not found',
+			'action'   => 'Create or select a valid uploads directory before syncing.',
+		];
+	}
+	if ( $missing_wc_total > 0 ) {
+		$recommendations[] = [
+			'severity' => 'warning',
+			'label'    => 'Catalog SKUs are missing in WooCommerce',
+			'action'   => 'Import or publish the missing products before linking images.',
+		];
+	}
+	if ( $missing_disk_total > 0 ) {
+		$recommendations[] = [
+			'severity' => 'error',
+			'label'    => 'Expected image files are missing on disk',
+			'action'   => 'Upload the missing basenames listed below before running sync.',
+		];
+	}
+	if ( $missing_attachment_total > 0 ) {
+		$recommendations[] = [
+			'severity' => 'warning',
+			'label'    => 'Files exist on disk but are not registered as media attachments',
+			'action'   => 'Run Register Images Only or the full pipeline.',
+		];
+	}
+	if ( $primary_error_total > 0 || $gallery_error_total > 0 ) {
+		$recommendations[] = [
+			'severity' => 'warning',
+			'label'    => 'Registered media is not fully linked to WooCommerce products',
+			'action'   => 'Run Link Registered Images or the full pipeline.',
+		];
+	}
+	if ( $sync_locked ) {
+		$recommendations[] = [
+			'severity' => 'warning',
+			'label'    => 'Sync lock is active',
+			'action'   => 'Wait for the current run to finish or release the lock if the progress is stale.',
+		];
+	}
+
+	$elapsed_seconds = 0;
+	$throughput_per_min = 0.0;
+	$eta_seconds = null;
+	if ( is_array( $progress ) && ! empty( $progress['started_at'] ) ) {
+		$started_at = strtotime( (string) $progress['started_at'] );
+		if ( false !== $started_at ) {
+			$elapsed_seconds = max( 0, time() - $started_at );
+			$processed = (int) ( $progress['processed'] ?? 0 );
+			if ( $elapsed_seconds > 0 && $processed > 0 ) {
+				$throughput_per_min = round( ( $processed / $elapsed_seconds ) * 60, 2 );
+			}
+			$remaining = max( 0, (int) ( $progress['batch_total'] ?? 0 ) - $processed );
+			if ( $throughput_per_min > 0 && $remaining > 0 ) {
+				$eta_seconds = (int) round( ( $remaining / $throughput_per_min ) * 60 );
+			}
+		}
+	}
+
+	$disk_errors    = ( ! $dir_exists ? 1 : 0 ) + $missing_disk_total;
+	$disk_warnings  = count( $unexpected_disk_files );
+	$media_errors   = $missing_attachment_total;
+	$media_warnings = count( $duplicate_attachment_basenames ) + count( $orphan_attachments );
+	$link_errors    = $primary_error_total + $gallery_missing;
+	$link_warnings  = $gallery_partial;
+	$catalog_errors = count( $config['csv_missing'] ?? [] );
+	$catalog_warnings = $missing_wc_total;
+
+	$health = [
+		'catalog' => dtb_image_sync_health_label( $catalog_errors, $catalog_warnings ),
+		'disk'    => dtb_image_sync_health_label( $disk_errors, $disk_warnings ),
+		'media'   => dtb_image_sync_health_label( $media_errors, $media_warnings ),
+		'links'   => dtb_image_sync_health_label( $link_errors, $link_warnings ),
+		'run'     => dtb_image_sync_health_label( 0, 0, is_array( $progress ) && ! empty( $progress ), $sync_locked && empty( $progress ) ),
+	];
+	$health['overall'] = dtb_image_sync_health_label(
+		$catalog_errors + $disk_errors + $media_errors + $link_errors,
+		$catalog_warnings + $disk_warnings + $media_warnings + $link_warnings,
+		false,
+		$sync_locked && empty( $progress )
+	);
+
+	return [
+		'directory'        => "wp-content/uploads/{$relative_directory}",
+		'dir_exists'       => $dir_exists,
+		'files_on_disk'    => $files_on_disk,
+		'registered_in_db' => $registered_count,
+		'linked_products'  => $primary_ok,
+		'gallery_products' => $gallery_ok,
+		'active_csv'       => $config['csv_filename'] ?? '',
+		'csv_source'       => $config['csv_source'] ?? '',
+		'csv_missing'      => $config['csv_missing'] ?? [],
+		'sync_locked'      => $sync_locked,
+		'health'           => $health,
+		'catalog'          => [
+			'expected_skus_total'              => count( $expected_by_sku ),
+			'expected_wc_products_total'       => $wc_expected_skus,
+			'expected_missing_wc_products'     => $missing_wc_total,
+			'expected_image_references_total'  => $expected_image_refs_total,
+			'expected_unique_filenames_total'  => $expected_unique_files_total,
+		],
+		'disk'             => [
+			'files_on_disk_total'              => $files_on_disk,
+			'expected_present_references'      => $expected_present_refs,
+			'expected_missing_references'      => $expected_missing_refs,
+			'expected_present_unique_files'    => $expected_present_unique_files,
+			'unexpected_files_total'           => count( $unexpected_disk_files ),
+		],
+		'media'            => [
+			'registered_attachments_total'     => $registered_count,
+			'expected_registered_references'   => $expected_registered_refs,
+			'expected_missing_attachments'     => $missing_attachment_total,
+			'expected_registered_unique_files' => $expected_registered_unique,
+			'orphan_attachments_total'         => count( $orphan_attachments ),
+			'duplicate_filename_collisions'    => count( $duplicate_attachment_basenames ),
+		],
+		'links'            => [
+			'products_expected_total'          => $products_link_total,
+			'products_with_correct_primary'    => $primary_ok,
+			'products_missing_primary'         => $primary_missing,
+			'variations_missing_primary'       => $variation_primary_missing,
+			'products_waiting_on_media'        => $products_waiting_on_media,
+			'products_with_complete_gallery'   => $gallery_ok,
+			'products_missing_gallery'         => $gallery_missing,
+			'products_partial_gallery'         => $gallery_partial,
+		],
+		'run'              => [
+			'locked'               => $sync_locked,
+			'progress'             => $progress,
+			'elapsed_seconds'      => $elapsed_seconds,
+			'throughput_per_min'   => $throughput_per_min,
+			'eta_seconds'          => $eta_seconds,
+		],
+		'recommendations'  => $recommendations,
+		'samples'          => [
+			'missing_wc_skus'               => array_slice( $missing_wc_skus, 0, 20 ),
+			'missing_disk_files'            => array_slice( $missing_disk_samples, 0, 20 ),
+			'missing_attachments'           => array_slice( $missing_attachment_samples, 0, 20 ),
+			'primary_mismatches'            => array_slice( $primary_mismatch_samples, 0, 20 ),
+			'gallery_mismatches'            => array_slice( $gallery_mismatch_samples, 0, 20 ),
+			'unexpected_disk_files'         => array_slice( $unexpected_disk_files, 0, 20 ),
+			'orphan_attachments'            => array_slice( $orphan_attachments, 0, 20 ),
+			'duplicate_attachment_basenames'=> array_slice( $duplicate_attachment_basenames, 0, 20 ),
+		],
+	];
+}
+
 function dtb_route_sync_images_status( WP_REST_Request $request ): WP_REST_Response {
 	$relative_path = dtb_image_sync_resolve_relative_upload_path( $request );
 	if ( is_wp_error( $relative_path ) ) {
 		return $relative_path;
 	}
 
-	$upload_path_info = dtb_image_sync_resolve_upload_directory( $relative_path );
-	$scan_dir   = trailingslashit( $upload_path_info['basedir'] );
-	$base_url   = trailingslashit( $upload_path_info['baseurl'] );
-	$relative_directory = $upload_path_info['relative'];
-
-	$dir_exists     = is_dir( $scan_dir );
-	$image_exts     = [ 'webp', 'jpg', 'jpeg', 'png', 'avif', 'gif', 'svg' ];
-	$files_on_disk  = $dir_exists ? dtb_list_images_in_dir( $scan_dir, $image_exts ) : [];
-	$config         = function_exists( 'dtb_get_config' ) ? dtb_get_config() : [];
-
-	global $wpdb;
-
-	// Attachments registered from this directory (indexed _wp_attached_file path).
-	$relative_prefix = $wpdb->esc_like( $relative_directory . '/' );
-	// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
-	$registered_count = (int) $wpdb->get_var( $wpdb->prepare(
-		"SELECT COUNT(*) FROM {$wpdb->postmeta}
-		 WHERE meta_key = '_wp_attached_file'
-		   AND meta_value LIKE %s",
-		$relative_prefix . '%'
-	) );
-
-	// Products with a thumbnail from this directory.
-	// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
-	$linked_count = (int) $wpdb->get_var( $wpdb->prepare(
-		"SELECT COUNT(DISTINCT p.ID)
-		 FROM {$wpdb->posts} p
-		 INNER JOIN {$wpdb->postmeta} thumb ON thumb.post_id  = p.ID
-		                                   AND thumb.meta_key  = '_thumbnail_id'
-		 INNER JOIN {$wpdb->postmeta} af    ON af.post_id      = CAST(thumb.meta_value AS UNSIGNED)
-		                                   AND af.meta_key     = '_wp_attached_file'
-		 WHERE p.post_type = 'product'
-		   AND af.meta_value LIKE %s",
-		$relative_prefix . '%'
-	) );
-
-	// Products with gallery images from this directory.
-	// Uses a JOIN on a normalised gallery table to avoid slow FIND_IN_SET.
-	// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
-	$gallery_product_count = (int) $wpdb->get_var( $wpdb->prepare(
-		"SELECT COUNT(DISTINCT p.ID)
-		 FROM {$wpdb->posts} p
-		 INNER JOIN {$wpdb->postmeta} gm ON gm.post_id = p.ID
-		                                AND gm.meta_key = '_product_image_gallery'
-		 INNER JOIN {$wpdb->posts} ga     ON FIND_IN_SET(ga.ID, gm.meta_value) > 0
-		                                AND ga.post_type = 'attachment'
-		 INNER JOIN {$wpdb->postmeta} af  ON af.post_id  = ga.ID
-		                                AND af.meta_key  = '_wp_attached_file'
-		 WHERE p.post_type    = 'product'
-		   AND gm.meta_value != ''
-		   AND af.meta_value LIKE %s",
-		$relative_prefix . '%'
-	) );
-
-	return rest_ensure_response( [
-		'directory'           => "wp-content/uploads/{$relative_directory}",
-		'dir_exists'          => $dir_exists,
-		'files_on_disk'       => count( $files_on_disk ),
-		'registered_in_db'    => $registered_count,
-		'linked_products'     => $linked_count,
-		'gallery_products'    => $gallery_product_count,
-		'active_csv'          => $config['csv_filename'] ?? '',
-		'csv_source'          => $config['csv_source'] ?? '',
-		'csv_missing'         => $config['csv_missing'] ?? [],
-		'sync_locked'         => (bool) get_transient( DTB_SYNC_LOCK_KEY ),
-	] );
+	return rest_ensure_response( dtb_build_image_sync_snapshot( $relative_path ) );
 }
 
 // ============================================================================
@@ -2254,6 +2695,8 @@ function dtb_ajax_image_sync_handler(): void {
 
 	if ( 'progress' === $sync_action ) {
 		$result = dtb_route_sync_images_progress();
+	} elseif ( 'status' === $sync_action || 'status_snapshot' === $sync_action ) {
+		$result = dtb_route_sync_images_status( $request );
 	} elseif ( 'link_only' === $sync_action ) {
 		$result = dtb_route_link_registered_images( $request );
 	} elseif ( 'fix_renamed' === $sync_action ) {
@@ -2536,6 +2979,7 @@ function dtb_render_image_sync_admin_page(): void {
 			]
 			: $action_result->get_data()
 		);
+	$status_json = wp_json_encode( $status_data ?: [], JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT );
 
 	// Convenience: next-batch offset from a sync/pipeline result.
 	$next_offset = is_array( $result_data ) ? ( $result_data['next_offset'] ?? null ) : null;
@@ -2545,36 +2989,17 @@ function dtb_render_image_sync_admin_page(): void {
 		<h1>🖼️ DTB Image Sync</h1>
 		<p>Register, link, and optimize product images in <code>wp-content/uploads/<?php echo esc_html( $upload_path ); ?>/</code> for WooCommerce import readiness.</p>
 
-		<?php
-		// ── Live status bar ────────────────────────────────────────────────────
-		if ( is_array( $status_data ) ) :
-			$files_on_disk       = (int) ( $status_data['files_on_disk']    ?? 0 );
-			$registered_in_db    = (int) ( $status_data['registered_in_db'] ?? 0 );
-			$linked_products     = (int) ( $status_data['linked_products']  ?? 0 );
-			$gallery_products    = (int) ( $status_data['gallery_products'] ?? 0 );
-			$sync_locked         = ! empty( $status_data['sync_locked'] );
-			$reg_pct             = $files_on_disk > 0 ? round( ( $registered_in_db / $files_on_disk ) * 100 ) : 0;
-			?>
-			<div class="card" style="max-width:100%;margin:0 0 20px;padding:20px 20px 12px;">
-				<h2 style="margin-top:0;">📊 Directory Status — <code><?php echo esc_html( "uploads/{$upload_path}" ); ?></code></h2>
-				<table class="widefat fixed" style="width:auto;min-width:400px;">
-					<tbody>
-						<tr><td><strong>Files on disk</strong></td><td><?php echo esc_html( (string) $files_on_disk ); ?></td></tr>
-						<tr><td><strong>Registered in Media Library</strong></td><td><?php echo esc_html( "{$registered_in_db} ({$reg_pct}%)" ); ?></td></tr>
-						<tr><td><strong>Products with featured image</strong></td><td><?php echo esc_html( (string) $linked_products ); ?></td></tr>
-						<tr><td><strong>Products with gallery images</strong></td><td><?php echo esc_html( (string) $gallery_products ); ?></td></tr>
-						<tr>
-							<td><strong>Sync lock</strong></td>
-							<td><?php echo $sync_locked ? '<span style="color:#d63638;">🔒 Locked</span>' : '<span style="color:#00a32a;">✔ Free</span>'; ?></td>
-						</tr>
-					</tbody>
-				</table>
-				<?php if ( $sync_locked ) : ?>
-					<form method="post" action="" style="margin-top:10px;">
-						<?php wp_nonce_field( 'dtb_image_sync_admin', 'dtb_image_sync_nonce' ); ?>
-						<button type="submit" class="button" name="dtb_image_sync_action" value="release_lock">🔓 Release Stuck Lock</button>
-					</form>
-				<?php endif; ?>
+		<div id="dtb-status-dashboard" class="card" style="max-width:100%;margin:0 0 20px;padding:20px;">
+			<p style="margin:0;color:#50575e;">Loading image sync snapshot…</p>
+		</div>
+
+		<?php if ( is_array( $status_data ) && ! empty( $status_data['sync_locked'] ) ) : ?>
+			<div class="card" style="max-width:100%;margin:0 0 20px;padding:16px 20px;border-left:4px solid #d63638;">
+				<p style="margin:0 0 10px;"><strong>Sync lock is active.</strong> Release it only if the current run is stale or crashed.</p>
+				<form method="post" action="">
+					<?php wp_nonce_field( 'dtb_image_sync_admin', 'dtb_image_sync_nonce' ); ?>
+					<button type="submit" class="button" name="dtb_image_sync_action" value="release_lock">🔓 Release Stuck Lock</button>
+				</form>
 			</div>
 		<?php endif; ?>
 
@@ -2704,7 +3129,7 @@ function dtb_render_image_sync_admin_page(): void {
 				</fieldset>
 
 				<p class="submit" style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
-					<button type="submit" class="button" name="dtb_image_sync_action" value="status">Check Status</button>
+					<button type="submit" class="button" name="dtb_image_sync_action" value="status">Refresh Snapshot</button>
 					<button type="submit" class="button" name="dtb_image_sync_action" value="fix_renamed">Fix Renamed Files</button>
 					<button type="submit" class="button button-primary" name="dtb_image_sync_action" value="register_only">Register Images Only</button>
 					<button type="submit" class="button button-secondary" name="dtb_image_sync_action" value="link_only">Link Registered Images</button>
@@ -2745,7 +3170,7 @@ function dtb_render_image_sync_admin_page(): void {
 				<li>Select your <strong>Upload Directory</strong> from the dropdown — it lists every real subdirectory found under <code>wp-content/uploads/2026/</code> on disk.</li>
 				<li>Click <strong>🚀 Run Full Pipeline</strong> — it fixes any WP-renamed files, then registers and links images for this batch.</li>
 				<li>If a <em>Continue Next Batch</em> button appears, click it to advance until all SKUs are processed.</li>
-				<li>Run <strong>Check Status</strong> any time to see how many files are registered and linked.</li>
+				<li>Run <strong>Refresh Snapshot</strong> any time to reconcile catalog expectations, disk files, media attachments, and WooCommerce product links.</li>
 				<li>Flow A: click <strong>🚀 Run Full Pipeline</strong> to fix names, register images, and link products in one run.</li>
 				<li>Flow B: if your image library is already registered, import <code>wp-catalog.csv</code> via <a href="<?php echo esc_url( admin_url( 'edit.php?post_type=product&page=product_importer' ) ); ?>">WooCommerce → Products → Import</a>, then run <strong>Link Registered Images</strong>.</li>
 			</ol>
@@ -2756,11 +3181,12 @@ function dtb_render_image_sync_admin_page(): void {
 	<script>
 	( function () {
 		const form = document.getElementById( 'dtb-image-sync-form' );
+		const dashboardEl = document.getElementById( 'dtb-status-dashboard' );
 		const runner = document.getElementById( 'dtb-live-runner' );
 		const statusEl = document.getElementById( 'dtb-live-status' );
 		const barEl = document.getElementById( 'dtb-live-bar' );
 		const logEl = document.getElementById( 'dtb-live-log' );
-		if ( ! form || ! runner || ! statusEl || ! barEl || ! logEl ) {
+		if ( ! form || ! dashboardEl || ! runner || ! statusEl || ! barEl || ! logEl ) {
 			return;
 		}
 
@@ -2777,12 +3203,15 @@ function dtb_render_image_sync_admin_page(): void {
 			ajaxUrl: <?php echo wp_json_encode( esc_url_raw( admin_url( 'admin-ajax.php' ) ) ); ?>,
 			nonce:   <?php echo wp_json_encode( wp_create_nonce( 'dtb_image_sync_admin' ) ); ?>
 		};
+		const initialSnapshot = <?php echo $status_json ?: '{}'; ?>;
 
 		const MAX_BATCHES = 1000;
 
 		let submittedAction = '';
-		let pollTimer = null;
-		let pollBusy = false;
+		let progressPollTimer = null;
+		let snapshotPollTimer = null;
+		let progressPollBusy = false;
+		let snapshotPollBusy = false;
 
 		const parseBool = ( value ) => {
 			const v = typeof value === 'string' ? value.toLowerCase() : value;
@@ -2791,6 +3220,37 @@ function dtb_render_image_sync_admin_page(): void {
 		const parseIntOrDefault = ( value, fallback ) => {
 			const parsed = Number.parseInt( String( value ?? '' ), 10 );
 			return Number.isNaN( parsed ) ? fallback : parsed;
+		};
+		const escapeHtml = ( value ) => String( value ?? '' )
+			.replaceAll( '&', '&amp;' )
+			.replaceAll( '<', '&lt;' )
+			.replaceAll( '>', '&gt;' )
+			.replaceAll( '"', '&quot;' )
+			.replaceAll( "'", '&#039;' );
+		const formatNumber = ( value ) => new Intl.NumberFormat( 'en-US' ).format( parseIntOrDefault( value, 0 ) );
+		const formatPercent = ( num, den ) => {
+			const numerator = parseIntOrDefault( num, 0 );
+			const denominator = parseIntOrDefault( den, 0 );
+			if ( denominator <= 0 ) {
+				return '0%';
+			}
+			return Math.round( ( numerator / denominator ) * 100 ) + '%';
+		};
+		const formatDuration = ( totalSeconds ) => {
+			const seconds = parseIntOrDefault( totalSeconds, 0 );
+			if ( seconds <= 0 ) {
+				return '0s';
+			}
+			const hours = Math.floor( seconds / 3600 );
+			const minutes = Math.floor( ( seconds % 3600 ) / 60 );
+			const secs = seconds % 60;
+			if ( hours > 0 ) {
+				return `${hours}h ${minutes}m`;
+			}
+			if ( minutes > 0 ) {
+				return `${minutes}m ${secs}s`;
+			}
+			return `${secs}s`;
 		};
 		const setStatus = ( text, isError = false ) => {
 			statusEl.textContent = text;
@@ -2804,69 +3264,260 @@ function dtb_render_image_sync_admin_page(): void {
 			logEl.textContent += ( logEl.textContent ? '\n' : '' ) + text;
 			logEl.scrollTop = logEl.scrollHeight;
 		};
-		const readProgress = async () => {
-			if ( pollBusy ) {
+		const renderHealthBadge = ( state ) => {
+			const palette = {
+				healthy: { bg: '#edfaef', fg: '#155724', label: 'Healthy' },
+				warning: { bg: '#fff8e1', fg: '#8a6d1d', label: 'Warning' },
+				error:   { bg: '#fdecea', fg: '#b42318', label: 'Error' },
+				running: { bg: '#e8f1fe', fg: '#174ea6', label: 'Running' },
+				blocked: { bg: '#f3e8ff', fg: '#6b21a8', label: 'Blocked' }
+			};
+			const cfg = palette[ state ] || palette.warning;
+			return `<span style="display:inline-flex;align-items:center;padding:3px 8px;border-radius:999px;background:${cfg.bg};color:${cfg.fg};font-size:12px;font-weight:600;">${escapeHtml( cfg.label )}</span>`;
+		};
+		const renderMetricCard = ( title, state, metrics ) => `
+			<div style="border:1px solid #dcdcde;border-radius:10px;padding:16px;background:#fff;">
+				<div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px;">
+					<h3 style="margin:0;font-size:14px;line-height:1.3;">${escapeHtml( title )}</h3>
+					${renderHealthBadge( state )}
+				</div>
+				<div style="display:grid;gap:6px;">
+					${metrics.map( ( metric ) => `
+						<div style="display:flex;justify-content:space-between;gap:16px;font-size:12px;">
+							<span style="color:#50575e;">${escapeHtml( metric.label )}</span>
+							<strong>${escapeHtml( metric.value )}</strong>
+						</div>
+					` ).join( '' )}
+				</div>
+			</div>
+		`;
+		const renderSimpleList = ( title, items ) => `
+			<div style="border:1px solid #dcdcde;border-radius:10px;padding:16px;background:#fff;">
+				<h3 style="margin:0 0 12px;font-size:14px;">${escapeHtml( title )}</h3>
+				<ul style="margin:0;padding-left:18px;">
+					${items.map( ( item ) => `<li style="margin:0 0 6px;">${item}</li>` ).join( '' )}
+				</ul>
+			</div>
+		`;
+		const renderCodeList = ( title, items ) => `
+			<div style="border:1px solid #dcdcde;border-radius:10px;padding:16px;background:#fff;">
+				<h3 style="margin:0 0 12px;font-size:14px;">${escapeHtml( title )}</h3>
+				<div style="display:flex;flex-wrap:wrap;gap:8px;">
+					${items.map( ( item ) => `<code style="background:#f6f7f7;padding:4px 8px;border-radius:6px;">${escapeHtml( item )}</code>` ).join( '' )}
+				</div>
+			</div>
+		`;
+		const renderMappedList = ( title, items, formatter ) => `
+			<div style="border:1px solid #dcdcde;border-radius:10px;padding:16px;background:#fff;">
+				<h3 style="margin:0 0 12px;font-size:14px;">${escapeHtml( title )}</h3>
+				<div style="display:grid;gap:10px;">
+					${items.map( formatter ).join( '' )}
+				</div>
+			</div>
+		`;
+		const renderDashboard = ( snapshot ) => {
+			if ( ! snapshot || typeof snapshot !== 'object' ) {
+				dashboardEl.innerHTML = '<p style="margin:0;color:#b32d2e;">Unable to load image sync snapshot.</p>';
 				return;
 			}
-			pollBusy = true;
-			try {
-				// Use URLSearchParams (application/x-www-form-urlencoded) so
-				// admin-ajax.php can read params via $_POST.
-				const body = new URLSearchParams( {
-					action:      'dtb_image_sync',
-					nonce:       api.nonce,
-					sync_action: 'progress'
-				} );
-				const res = await fetch( api.ajaxUrl, {
-					method:      'POST',
-					credentials: 'same-origin',
-					body
-				} );
-				if ( ! res.ok ) {
-					return;
-				}
-				const envelope = await res.json();
-				// wp_send_json_success wraps data under envelope.data.
-				const payload = envelope && envelope.success ? envelope.data : null;
-				const p = payload && payload.progress ? payload.progress : null;
-				if ( ! p ) {
-					return;
-				}
-				const processed = parseIntOrDefault( p.processed, 0 );
-				const batchTotal = parseIntOrDefault( p.batch_total, 0 );
-				const pct = batchTotal > 0 ? processed / batchTotal : 0;
-				const label = p.last_item || 'working';
-				setBar( pct );
-				setStatus( `Running… ${processed}/${batchTotal > 0 ? batchTotal : '?'} (${Math.round( pct * 100 )}%) · ${label}` );
-			} catch ( err ) {
-				// Ignore transient polling errors while request is active.
-			} finally {
-				pollBusy = false;
+
+			const catalog = snapshot.catalog || {};
+			const disk = snapshot.disk || {};
+			const media = snapshot.media || {};
+			const links = snapshot.links || {};
+			const run = snapshot.run || {};
+			const health = snapshot.health || {};
+			const samples = snapshot.samples || {};
+			const recommendations = Array.isArray( snapshot.recommendations ) ? snapshot.recommendations : [];
+			const progress = run.progress || {};
+			const runMeta = [
+				{ label: 'Lock', value: snapshot.sync_locked ? 'Locked' : 'Free' },
+				{ label: 'Elapsed', value: formatDuration( run.elapsed_seconds ) },
+				{ label: 'Throughput', value: run.throughput_per_min ? `${run.throughput_per_min}/min` : 'n/a' },
+				{ label: 'ETA', value: run.eta_seconds ? formatDuration( run.eta_seconds ) : 'n/a' }
+			];
+			if ( progress.last_sku ) {
+				runMeta.push( { label: 'Last SKU', value: progress.last_sku } );
 			}
+
+			const sections = [];
+			if ( recommendations.length ) {
+				sections.push(
+					renderMappedList(
+						'Recommended Next Actions',
+						recommendations,
+						( item ) => `
+							<div style="padding:10px 12px;border-radius:8px;background:${item.severity === 'error' ? '#fdecea' : '#f6f7f7'};">
+								<div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:4px;">
+									<strong>${escapeHtml( item.label || 'Recommendation' )}</strong>
+									${renderHealthBadge( item.severity || 'warning' )}
+								</div>
+								<div style="font-size:12px;color:#50575e;">${escapeHtml( item.action || '' )}</div>
+							</div>
+						`
+					)
+				);
+			}
+			if ( Array.isArray( samples.missing_wc_skus ) && samples.missing_wc_skus.length ) {
+				sections.push( renderCodeList( 'Catalog SKUs Missing in WooCommerce', samples.missing_wc_skus ) );
+			}
+			if ( Array.isArray( samples.unexpected_disk_files ) && samples.unexpected_disk_files.length ) {
+				sections.push( renderCodeList( 'Unexpected Files on Disk', samples.unexpected_disk_files ) );
+			}
+			if ( Array.isArray( samples.missing_disk_files ) && samples.missing_disk_files.length ) {
+				sections.push(
+					renderMappedList(
+						'Expected Files Missing on Disk',
+						samples.missing_disk_files,
+						( item ) => `
+							<div style="padding:10px 12px;border-radius:8px;background:#f6f7f7;">
+								<strong>${escapeHtml( item.sku || '(unknown sku)' )}</strong>
+								<div style="font-size:12px;color:#50575e;margin-top:4px;">${escapeHtml( Array.isArray( item.expected ) ? item.expected.join( ', ' ) : '' )}</div>
+							</div>
+						`
+					)
+				);
+			}
+			if ( Array.isArray( samples.missing_attachments ) && samples.missing_attachments.length ) {
+				sections.push(
+					renderMappedList(
+						'Files Present But Not Registered as Media',
+						samples.missing_attachments,
+						( item ) => `
+							<div style="padding:10px 12px;border-radius:8px;background:#f6f7f7;">
+								<strong>${escapeHtml( item.sku || '(unknown sku)' )}</strong>
+								<div style="font-size:12px;color:#50575e;margin-top:4px;">${escapeHtml( Array.isArray( item.expected ) ? item.expected.join( ', ' ) : '' )}</div>
+							</div>
+						`
+					)
+				);
+			}
+			if ( Array.isArray( samples.primary_mismatches ) && samples.primary_mismatches.length ) {
+				sections.push(
+					renderMappedList(
+						'Primary Image Mismatches',
+						samples.primary_mismatches,
+						( item ) => `
+							<div style="padding:10px 12px;border-radius:8px;background:#f6f7f7;">
+								<strong>${escapeHtml( item.sku || '(unknown sku)' )}</strong>
+								<div style="font-size:12px;color:#50575e;margin-top:4px;">
+									product ${escapeHtml( item.product_id )} · current thumb ${escapeHtml( item.current_thumbnail_id )} · expected attachment ${escapeHtml( item.expected_attachment_id )} · expected file ${escapeHtml( item.expected_filename )}
+								</div>
+							</div>
+						`
+					)
+				);
+			}
+			if ( Array.isArray( samples.gallery_mismatches ) && samples.gallery_mismatches.length ) {
+				sections.push(
+					renderMappedList(
+						'Gallery Mismatches',
+						samples.gallery_mismatches,
+						( item ) => `
+							<div style="padding:10px 12px;border-radius:8px;background:#f6f7f7;">
+								<strong>${escapeHtml( item.sku || '(unknown sku)' )}</strong>
+								<div style="font-size:12px;color:#50575e;margin-top:4px;">
+									product ${escapeHtml( item.product_id )} · current [${escapeHtml( Array.isArray( item.current_gallery_ids ) ? item.current_gallery_ids.join( ', ' ) : '' )}] · expected [${escapeHtml( Array.isArray( item.expected_gallery_ids ) ? item.expected_gallery_ids.join( ', ' ) : '' )}]
+								</div>
+							</div>
+						`
+					)
+				);
+			}
+			if ( Array.isArray( samples.orphan_attachments ) && samples.orphan_attachments.length ) {
+				sections.push(
+					renderMappedList(
+						'Orphan Attachments in This Directory',
+						samples.orphan_attachments,
+						( item ) => `
+							<div style="padding:10px 12px;border-radius:8px;background:#f6f7f7;">
+								<strong>${escapeHtml( item.basename || '' )}</strong>
+								<div style="font-size:12px;color:#50575e;margin-top:4px;">attachment ${escapeHtml( item.attachment_id )} · parent ${escapeHtml( item.post_parent )}</div>
+							</div>
+						`
+					)
+				);
+			}
+			if ( Array.isArray( samples.duplicate_attachment_basenames ) && samples.duplicate_attachment_basenames.length ) {
+				sections.push(
+					renderMappedList(
+						'Duplicate Attachment Filename Collisions',
+						samples.duplicate_attachment_basenames,
+						( item ) => `
+							<div style="padding:10px 12px;border-radius:8px;background:#f6f7f7;">
+								<strong>${escapeHtml( item.basename || '' )}</strong>
+								<div style="font-size:12px;color:#50575e;margin-top:4px;">attachments [${escapeHtml( Array.isArray( item.attachment_ids ) ? item.attachment_ids.join( ', ' ) : '' )}]</div>
+							</div>
+						`
+					)
+				);
+			}
+
+			dashboardEl.innerHTML = `
+				<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:16px;">
+					<div>
+						<h2 style="margin:0 0 6px;">Image Sync Snapshot</h2>
+						<div style="font-size:13px;color:#50575e;">
+							<strong>Directory:</strong> <code>${escapeHtml( snapshot.directory || '' )}</code>
+							&nbsp;·&nbsp;
+							<strong>Active CSV:</strong> <code>${escapeHtml( snapshot.active_csv || '(none)' )}</code>
+						</div>
+					</div>
+					${renderHealthBadge( health.overall || 'warning' )}
+				</div>
+
+				<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-bottom:16px;">
+					${renderMetricCard( 'Catalog', health.catalog || 'warning', [
+						{ label: 'Expected SKUs', value: formatNumber( catalog.expected_skus_total ) },
+						{ label: 'Found in WooCommerce', value: formatNumber( catalog.expected_wc_products_total ) },
+						{ label: 'Missing in WooCommerce', value: formatNumber( catalog.expected_missing_wc_products ) },
+						{ label: 'Expected image refs', value: formatNumber( catalog.expected_image_references_total ) }
+					] )}
+					${renderMetricCard( 'Disk', health.disk || 'warning', [
+						{ label: 'Files on disk', value: formatNumber( disk.files_on_disk_total ) },
+						{ label: 'Expected refs present', value: `${formatNumber( disk.expected_present_references )} (${formatPercent( disk.expected_present_references, catalog.expected_image_references_total )})` },
+						{ label: 'Expected refs missing', value: formatNumber( disk.expected_missing_references ) },
+						{ label: 'Unexpected files', value: formatNumber( disk.unexpected_files_total ) }
+					] )}
+					${renderMetricCard( 'Media', health.media || 'warning', [
+						{ label: 'Registered attachments', value: formatNumber( media.registered_attachments_total ) },
+						{ label: 'Expected refs registered', value: `${formatNumber( media.expected_registered_references )} (${formatPercent( media.expected_registered_references, catalog.expected_image_references_total )})` },
+						{ label: 'Missing attachments', value: formatNumber( media.expected_missing_attachments ) },
+						{ label: 'Orphan attachments', value: formatNumber( media.orphan_attachments_total ) }
+					] )}
+					${renderMetricCard( 'Links', health.links || 'warning', [
+						{ label: 'Products expected', value: formatNumber( links.products_expected_total ) },
+						{ label: 'Correct primary', value: formatNumber( links.products_with_correct_primary ) },
+						{ label: 'Primary missing/mismatch', value: formatNumber( links.products_missing_primary + links.variations_missing_primary ) },
+						{ label: 'Complete galleries', value: formatNumber( links.products_with_complete_gallery ) },
+						{ label: 'Partial/missing galleries', value: formatNumber( links.products_partial_gallery + links.products_missing_gallery ) }
+					] )}
+					${renderMetricCard( 'Current Run', health.run || 'warning', runMeta )}
+				</div>
+
+				<div style="display:grid;gap:12px;">
+					${sections.length ? sections.join( '' ) : renderSimpleList( 'Snapshot Status', [ 'No current discrepancies detected in the sampled reconciliation layers.' ] )}
+				</div>
+
+				<details style="margin-top:16px;">
+					<summary style="cursor:pointer;font-weight:600;">Raw snapshot JSON</summary>
+					<pre style="white-space:pre-wrap;margin:12px 0 0;background:#f6f7f7;padding:12px;border-radius:6px;font-size:12px;overflow:auto;">${escapeHtml( JSON.stringify( snapshot, null, 2 ) )}</pre>
+				</details>
+			`;
 		};
-		const startPolling = () => {
-			if ( pollTimer ) {
-				return;
+		const resolveUploadPath = ( formData ) => {
+			const selected = String( formData.get( 'dtb_upload_path' ) || '' ).trim();
+			if ( selected === '__custom__' ) {
+				return String( formData.get( 'dtb_upload_path_custom' ) || '' ).trim();
 			}
-			pollTimer = window.setInterval( readProgress, 1500 );
-			void readProgress();
-		};
-		const stopPolling = () => {
-			if ( pollTimer ) {
-				window.clearInterval( pollTimer );
-				pollTimer = null;
-			}
+			return selected;
 		};
 		const postJson = async ( syncAction, body ) => {
-			// Build a URLSearchParams payload for admin-ajax.php.
-			// admin-ajax.php requires action + nonce in POST body; sync_action
-			// tells our handler which route to call.
 			const params = new URLSearchParams( {
 				action:      'dtb_image_sync',
 				nonce:       api.nonce,
 				sync_action: syncAction
 			} );
-			// Merge the caller's body fields (year, month, limit, etc.).
 			Object.entries( body ).forEach( ( [ k, v ] ) => {
 				params.set( k, String( v ?? '' ) );
 			} );
@@ -2882,14 +3533,87 @@ function dtb_render_image_sync_admin_page(): void {
 					: `Request failed (${res.status})`;
 				throw new Error( message );
 			}
-			// wp_send_json_success wraps the route data under envelope.data.
 			return envelope ? envelope.data : null;
+		};
+		const readProgress = async () => {
+			if ( progressPollBusy ) {
+				return;
+			}
+			progressPollBusy = true;
+			try {
+				const payload = await postJson( 'progress', {} );
+				const p = payload && payload.progress ? payload.progress : null;
+				if ( ! p ) {
+					return;
+				}
+				const processed = parseIntOrDefault( p.processed, 0 );
+				const batchTotal = parseIntOrDefault( p.batch_total, 0 );
+				const pct = batchTotal > 0 ? processed / batchTotal : 0;
+				const throughput = p.throughput_per_min ? `${p.throughput_per_min}/min` : 'n/a';
+				const eta = p.eta_seconds ? formatDuration( p.eta_seconds ) : 'n/a';
+				const label = p.last_sku || p.last_item || 'working';
+				setBar( pct );
+				setStatus( `Running… ${processed}/${batchTotal > 0 ? batchTotal : '?'} (${Math.round( pct * 100 )}%) · ${label} · ${throughput} · ETA ${eta}` );
+			} catch ( err ) {
+				// Ignore transient polling errors while a run is active.
+			} finally {
+				progressPollBusy = false;
+			}
+		};
+		const readSnapshot = async ( uploadPath ) => {
+			if ( snapshotPollBusy ) {
+				return;
+			}
+			snapshotPollBusy = true;
+			try {
+				const snapshot = await postJson( 'status', { upload_path: uploadPath } );
+				renderDashboard( snapshot );
+			} catch ( err ) {
+				// Keep the previous dashboard rendered if a single poll fails.
+			} finally {
+				snapshotPollBusy = false;
+			}
+		};
+		const startProgressPolling = () => {
+			if ( progressPollTimer ) {
+				return;
+			}
+			progressPollTimer = window.setInterval( readProgress, 1500 );
+			void readProgress();
+		};
+		const stopProgressPolling = () => {
+			if ( progressPollTimer ) {
+				window.clearInterval( progressPollTimer );
+				progressPollTimer = null;
+			}
+		};
+		const startSnapshotPolling = ( uploadPath ) => {
+			if ( snapshotPollTimer ) {
+				return;
+			}
+			snapshotPollTimer = window.setInterval( () => void readSnapshot( uploadPath ), 8000 );
+			void readSnapshot( uploadPath );
+		};
+		const stopSnapshotPolling = () => {
+			if ( snapshotPollTimer ) {
+				window.clearInterval( snapshotPollTimer );
+				snapshotPollTimer = null;
+			}
+		};
+		const stopAllPolling = () => {
+			stopProgressPolling();
+			stopSnapshotPolling();
 		};
 		const setButtonsDisabled = ( disabled ) => {
 			form.querySelectorAll( 'button[type="submit"]' ).forEach( ( button ) => {
 				button.disabled = disabled;
 			} );
 		};
+
+		renderDashboard( initialSnapshot );
+		if ( initialSnapshot && initialSnapshot.sync_locked ) {
+			startSnapshotPolling( String( initialSnapshot.directory || '' ).replace( /^wp-content\/uploads\//, '' ) );
+		}
 
 		form.addEventListener( 'click', ( event ) => {
 			const button = event.target.closest( 'button[name="dtb_image_sync_action"]' );
@@ -2899,13 +3623,25 @@ function dtb_render_image_sync_admin_page(): void {
 		} );
 
 		form.addEventListener( 'submit', async ( event ) => {
-			if ( submittedAction !== 'register_only' && submittedAction !== 'sync' && submittedAction !== 'pipeline' && submittedAction !== 'link_only' ) {
+			const handledActions = [ 'status', 'register_only', 'sync', 'pipeline', 'link_only' ];
+			if ( ! handledActions.includes( submittedAction ) ) {
 				return;
 			}
 			event.preventDefault();
 
 			const formData = new FormData( form );
-			const uploadPath = String( formData.get( 'dtb_upload_path' ) || '' );
+			const uploadPath = resolveUploadPath( formData ) || <?php echo wp_json_encode( $upload_path ); ?>;
+
+			if ( submittedAction === 'status' ) {
+				setButtonsDisabled( true );
+				try {
+					await readSnapshot( uploadPath );
+				} finally {
+					setButtonsDisabled( false );
+				}
+				return;
+			}
+
 			const limit = Math.max( 1, Math.min( 250, parseIntOrDefault( formData.get( 'dtb_limit' ), 25 ) ) );
 			const dryRun = parseBool( formData.get( 'dtb_dry_run' ) );
 			const force = parseBool( formData.get( 'dtb_force' ) );
@@ -2923,6 +3659,8 @@ function dtb_render_image_sync_admin_page(): void {
 			appendLog( `Starting ${actionLabel} for ${uploadPath} (limit ${limit}, offset ${currentOffset})` );
 
 			try {
+				startSnapshotPolling( uploadPath );
+
 				if ( submittedAction === 'pipeline' ) {
 					setStatus( 'Running Fix Renamed…' );
 					const fixResult = await postJson( 'fix_renamed', {
@@ -2930,6 +3668,7 @@ function dtb_render_image_sync_admin_page(): void {
 						dry_run: dryRun
 					} );
 					appendLog( `Fix Renamed complete · renamed ${parseIntOrDefault( fixResult.renamed, 0 )}` );
+					await readSnapshot( uploadPath );
 				}
 
 				let batchCount = 0;
@@ -2942,7 +3681,7 @@ function dtb_render_image_sync_admin_page(): void {
 					}
 					setStatus( `Running ${actionLabel} batch ${batchCount}…` );
 					if ( submittedAction !== 'link_only' ) {
-						startPolling();
+						startProgressPolling();
 					}
 					const batch = await postJson( syncAction, {
 						upload_path: uploadPath,
@@ -2952,9 +3691,8 @@ function dtb_render_image_sync_admin_page(): void {
 						limit: limit,
 						offset: currentOffset
 					} );
-					if ( submittedAction !== 'link_only' ) {
-						stopPolling();
-					}
+					stopProgressPolling();
+					await readSnapshot( uploadPath );
 
 					const scanned = parseIntOrDefault( batch.scanned, 0 );
 					const total = Math.max( scanned, parseIntOrDefault( batch.total, 0 ) );
@@ -3023,10 +3761,13 @@ function dtb_render_image_sync_admin_page(): void {
 					appendLog( `Continuing to next batch at offset ${currentOffset}…` );
 				}
 			} catch ( err ) {
-				stopPolling();
+				stopAllPolling();
 				setStatus( err && err.message ? err.message : 'Run failed.', true );
 				appendLog( `Error: ${err && err.message ? err.message : 'Run failed.'}` );
+				await readSnapshot( uploadPath );
 			} finally {
+				stopAllPolling();
+				await readSnapshot( uploadPath );
 				setButtonsDisabled( false );
 			}
 		} );
