@@ -341,10 +341,22 @@ function isVariationAttribute(attr) {
 export function normalizeProduct(wcProduct) {
   if (!wcProduct) return null;
 
+  const rawImages = Array.isArray(wcProduct.images) ? wcProduct.images : [];
+  const primaryRawImage = rawImages[0] ?? null;
+  const image_srcset = typeof primaryRawImage === 'string'
+    ? (wcProduct.image_srcset || '')
+    : (primaryRawImage?.srcset || wcProduct.image_srcset || '');
+  const image_sizes = typeof primaryRawImage === 'string'
+    ? (wcProduct.image_sizes || '')
+    : (primaryRawImage?.sizes || wcProduct.image_sizes || '');
+  const image_thumbnail = typeof primaryRawImage === 'string'
+    ? (wcProduct.image_thumbnail || '')
+    : (primaryRawImage?.thumbnail || wcProduct.image_thumbnail || '');
+
   // Images: prefer array of src strings; keep single `image` for legacy compat.
   // Handle both WooCommerce image objects ({ src, id, ... }) and plain string URLs
   // so that this function is idempotent even if called on an already-normalised product.
-  const images = (wcProduct.images || [])
+  const images = rawImages
     .map((img) => (typeof img === 'string' ? img : (img?.src ?? '')))
     .filter(Boolean);
   if (images.length === 0) images.push(PLACEHOLDER_IMAGE);
@@ -456,6 +468,9 @@ export function normalizeProduct(wcProduct) {
     // Media
     image,
     images,
+    image_srcset,
+    image_sizes,
+    image_thumbnail,
 
     // Pricing & inventory
     price,

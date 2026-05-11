@@ -126,6 +126,7 @@ export default function TrustedBrands({ brands = [], title = 'Trusted Brands', s
           style={{
             display: 'flex',
             alignItems: 'center',
+            gap: 'clamp(12px, 2vw, 24px)',
             width: 'max-content',
             animation: `dtb-marquee ${speed}s linear infinite`,
           }}
@@ -155,19 +156,36 @@ export default function TrustedBrands({ brands = [], title = 'Trusted Brands', s
 
         @media (min-width: 1025px) {
           .dtb-trusted-brand-link {
-            padding: 0 clamp(42px, 6vw, 80px) !important;
-            min-width: clamp(190px, 17vw, 280px) !important;
+            padding: 0 clamp(28px, 4vw, 54px) !important;
+            min-width: clamp(176px, 15vw, 236px) !important;
           }
           .dtb-brands-track {
+            gap: clamp(18px, 2.2vw, 34px);
             padding: 0 clamp(24px, 4vw, 44px);
           }
         }
 
-        @media (max-width: 640px) {
+        @media (max-width: 767px) {
+          .dtb-brands-track {
+            gap: clamp(18px, 4vw, 28px);
+            padding: 0 clamp(12px, 4vw, 20px);
+          }
           .dtb-trusted-brand-link {
-            padding-left: clamp(42px, 6vw, 80px) !important;
-            padding-right: clamp(42px, 6vw, 80px) !important;
-            min-width: clamp(190px, 17vw, 280px) !important;
+            padding-left: clamp(12px, 3.4vw, 18px) !important;
+            padding-right: clamp(12px, 3.4vw, 18px) !important;
+            min-width: clamp(126px, 32vw, 156px) !important;
+          }
+        }
+
+        @media (max-width: 479px) {
+          .dtb-brands-track {
+            gap: clamp(22px, 5vw, 30px);
+            padding: 0 18px;
+          }
+          .dtb-trusted-brand-link {
+            padding-left: 14px !important;
+            padding-right: 14px !important;
+            min-width: clamp(132px, 34vw, 162px) !important;
           }
         }
       `}</style>

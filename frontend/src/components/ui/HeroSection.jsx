@@ -270,9 +270,7 @@ export default function HeroSection({
           .dtb-ui-hero { min-height: unset !important; }
           .dtb-hero-cta { padding: 12px 24px; font-size: 0.84rem; width: 100%; max-width: 320px; }
           .dtb-hero-cta-wrap { flex-direction: column; align-items: center; }
-          .dtb-trusted-brand-link { padding: 0 clamp(10px, 3vw, 18px) !important; min-width: unset !important; }
         }
-        @media (max-width: 479px) { .dtb-trusted-brand-link { padding: 0 8px !important; } }
       `}</style>
     </section>
   );

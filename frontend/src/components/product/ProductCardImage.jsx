@@ -31,6 +31,10 @@ export default function ProductCardImage({
   alt = '',
   padding = '8px',
   className = '',
+  srcSet = '',
+  sizes,
+  fit = 'contain',
+  position = 'center',
   width = 400,
   height = 400,
   eager = false,
@@ -62,6 +66,8 @@ export default function ProductCardImage({
 
       <img
         src={imgSrc}
+        srcSet={srcSet || product?.image_srcset || undefined}
+        sizes={sizes || product?.image_sizes || undefined}
         alt={alt || product?.name || 'Product image'}
         width={width}
         height={height}
@@ -74,8 +80,8 @@ export default function ProductCardImage({
           inset: 0,
           width: '100%',
           height: '100%',
-          objectFit: 'contain',
-          objectPosition: 'center',
+          objectFit: fit,
+          objectPosition: position,
           opacity: loaded ? 1 : 0,
           transform: loaded ? 'translateY(0)' : 'translateY(6px)',
           transition: loaded

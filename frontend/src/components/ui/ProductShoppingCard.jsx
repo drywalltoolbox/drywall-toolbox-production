@@ -79,9 +79,14 @@ export default function ProductShoppingCard({
           aria-label={`View ${effectiveProduct.name || product.name || 'product'}`}
         >
           <ProductCardImage
+            product={effectiveProduct}
             src={effectiveProduct.image || product.image}
+            srcSet={effectiveProduct.image_srcset || product.image_srcset}
+            sizes="(max-width: 479px) 42vw, (max-width: 767px) 30vw, (max-width: 1023px) 22vw, 190px"
             alt={effectiveProduct.name || product.name}
             padding="0"
+            fit="cover"
+            eager={index < 4}
           />
         </button>
 
