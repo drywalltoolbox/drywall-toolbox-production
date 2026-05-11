@@ -30,6 +30,7 @@ import level5Logo from '/brands/Level5/Level5.svg';
 import SEOHead from '../components/shared/SEOHead';
 import { buildSiteLinksSearchBoxSchema } from '../utils/schema';
 import { fetchVariationsBatched } from '../utils/variationSelection';
+import { PLACEHOLDER_IMAGE } from '../constants/images.js';
 import '../styles/tool-selector.css';
 
 // products will be loaded from WooCommerce REST API at runtime
@@ -378,7 +379,22 @@ export default function Products() {
     const vars = cardVariationMap[product.id];
     if (!Array.isArray(vars) || vars.length === 0) return product;
     // Prefer first in-stock variation; fall back to first variation overall.
-    return vars.find(v => v.stock_status !== 'outofstock') || vars[0] || product;
+    const best = vars.find(v => v.stock_status !== 'outofstock') || vars[0];
+    if (!best) return product;
+    // WC variations with no custom image return images:[] which normalizeProduct()
+    // resolves to PLACEHOLDER_IMAGE. Inherit the parent's image fields so the
+    // card always shows the real product photo rather than the blank placeholder.
+    if (!best.image || best.image === PLACEHOLDER_IMAGE) {
+      return {
+        ...best,
+        image:           product.image,
+        images:          product.images,
+        image_thumbnail: product.image_thumbnail,
+        image_srcset:    product.image_srcset,
+        image_sizes:     product.image_sizes,
+      };
+    }
+    return best;
   }, [cardVariationMap]);
 
   const goToPage = (n) => {

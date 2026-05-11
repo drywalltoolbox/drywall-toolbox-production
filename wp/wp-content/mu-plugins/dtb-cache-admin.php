@@ -62,18 +62,13 @@ function dtb_render_cache_admin_page(): void {
 	// Get cache statistics
 	$log = dtb_get_cache_log();
 	$last_invalidated = null;
-	$cache_hits = 0;
-	$cache_misses = 0;
 
 	foreach ( $log as $entry ) {
 		if ( 'cache_invalidated' === ( $entry['event'] ?? '' ) ) {
 			if ( ! $last_invalidated ) {
 				$last_invalidated = $entry['timestamp'];
 			}
-		} elseif ( 'cache_hit' === ( $entry['event'] ?? '' ) ) {
-			$cache_hits++;
-		} elseif ( 'cache_miss' === ( $entry['event'] ?? '' ) ) {
-			$cache_misses++;
+			break;
 		}
 	}
 

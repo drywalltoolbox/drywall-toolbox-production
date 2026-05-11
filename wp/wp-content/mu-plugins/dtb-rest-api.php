@@ -578,7 +578,12 @@ function dtb_proxy_product_by_slug( WP_REST_Request $request ): WP_REST_Response
 function dtb_proxy_product_variation_by_id( WP_REST_Request $request ): WP_REST_Response {
 	$parent_id    = absint( $request->get_param( 'parent_id' ) );
 	$variation_id = absint( $request->get_param( 'id' ) );
-	return dtb_cached_wc_get( 'wc/v3/products/' . $parent_id . '/variations/' . $variation_id, [] );
+	return dtb_cached_wc_get(
+		'wc/v3/products/' . $parent_id . '/variations/' . $variation_id,
+		[
+			'_fields' => 'id,sku,slug,name,type,status,price,regular_price,sale_price,on_sale,stock_status,manage_stock,stock_quantity,images,attributes,meta_data,parent_id,description,short_description',
+		]
+	);
 }
 
 /** GET /drywall/v1/products/{id}/variations */
@@ -592,18 +597,49 @@ function dtb_proxy_product_variations( WP_REST_Request $request ): WP_REST_Respo
 		}
 	}
 
-	// Variations are fetched via the uncached dtb_wc_get() path (no transient
-	// storage) because serializing 100 fully-hydrated WC variation objects into
-	// wp_options can exceed the shared-host max_allowed_packet / PHP memory
-	// limit, producing a PHP fatal 500 before WordPress can return a response.
-	// The SPA already deduplicates variation fetches in its own in-memory
-	// variationCache.js, so server-side transient caching provides no benefit.
-	$response = dtb_wc_get( 'wc/v3/products/' . $product_id . '/variations', $params );
+	// Restrict the fields WooCommerce hydrates per variation.
+	//
+	// Without _fields, WooCommerce instantiates a full WC_Product_Variation
+	// object for every variation — loading description HTML, all downloads,
+	// dimensions, shipping meta, tax class objects, etc. (~50 KB of PHP objects
+	// per variation).  On a shared host with a 128 MB PHP memory limit this
+	// kills the process before the response is assembled, returning a raw 500.
+	//
+	// _fields instructs the WC REST controller to skip hydrating and serializing
+	// fields the SPA never reads.  normalizeProduct() only consumes the fields
+	// listed here; everything else (date_*, permalink, dimensions, shipping_*,
+	// download_*, button_text, tax_*, virtual, downloadable, purchase_note,
+	// menu_order, _links) is safely omitted.
+	$params['_fields'] = implode( ',', [
+		'id',
+		'sku',
+		'slug',
+		'name',
+		'type',
+		'status',
+		'price',
+		'regular_price',
+		'sale_price',
+		'on_sale',
+		'stock_status',
+		'manage_stock',
+		'stock_quantity',
+		'images',
+		'attributes',
+		'meta_data',
+		'parent_id',
+		'description',
+		'short_description',
+	] );
 
-	// Variations are non-critical UI data.  When WooCommerce returns any error
-	// (5xx: memory/data inconsistency; 4xx: product has no variations in the DB),
-	// return an empty array with 200 so the SPA degrades gracefully instead of
-	// logging console errors and blocking rendering.
+	// Use dtb_cached_wc_get — identical to all other proxy routes.
+	// With _fields active, the per-variation payload is ~2 KB (vs ~50 KB
+	// without), so the transient stored by dtb_cached_proxy is ~200 KB for
+	// 100 variations — well within shared-host limits.
+	$response = dtb_cached_wc_get( 'wc/v3/products/' . $product_id . '/variations', $params );
+
+	// Variations are non-critical UI data.  On any upstream error degrade
+	// gracefully so the SPA renders the parent product instead of crashing.
 	if ( $response->get_status() < 200 || $response->get_status() >= 300 ) {
 		return new WP_REST_Response( [], 200 );
 	}

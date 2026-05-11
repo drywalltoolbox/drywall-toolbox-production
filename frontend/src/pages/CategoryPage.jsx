@@ -10,6 +10,7 @@ import SEOHead from '../components/shared/SEOHead';
 import { buildBreadcrumbSchema } from '../utils/schema';
 import { getProductVariations } from '../services/api';
 import { fetchVariationsBatched } from '../utils/variationSelection';
+import { PLACEHOLDER_IMAGE } from '../constants/images.js';
 
 export default function CategoryPage() {
   const { slug } = useParams();
@@ -87,7 +88,22 @@ export default function CategoryPage() {
     const vars = cardVariationMap[product.id];
     if (!Array.isArray(vars) || vars.length === 0) return product;
     // Prefer first in-stock variation; fall back to first variation overall.
-    return vars.find(v => v.stock_status !== 'outofstock') || vars[0] || product;
+    const best = vars.find(v => v.stock_status !== 'outofstock') || vars[0];
+    if (!best) return product;
+    // WC variations with no custom image return images:[] which normalizeProduct()
+    // resolves to PLACEHOLDER_IMAGE. Inherit the parent's image fields so the
+    // card always shows the real product photo rather than the blank placeholder.
+    if (!best.image || best.image === PLACEHOLDER_IMAGE) {
+      return {
+        ...best,
+        image:           product.image,
+        images:          product.images,
+        image_thumbnail: product.image_thumbnail,
+        image_srcset:    product.image_srcset,
+        image_sizes:     product.image_sizes,
+      };
+    }
+    return best;
   }, [cardVariationMap]);
 
   if (loading) {
