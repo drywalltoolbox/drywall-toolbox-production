@@ -80,12 +80,13 @@ export default function ProductShoppingCard({
         >
           <ProductCardImage
             product={effectiveProduct}
-            src={effectiveProduct.image || product.image}
+            src={effectiveProduct.image_thumbnail || product.image_thumbnail || effectiveProduct.image || product.image}
             srcSet={effectiveProduct.image_srcset || product.image_srcset}
-            sizes="(max-width: 479px) 42vw, (max-width: 767px) 30vw, (max-width: 1023px) 22vw, 190px"
+            sizes="(max-width: 479px) calc(50vw - 22px), (max-width: 767px) calc(50vw - 28px), (max-width: 1023px) calc(33vw - 28px), 190px"
             alt={effectiveProduct.name || product.name}
             padding="0"
             fit="cover"
+            preferThumbnail
             eager={index < 4}
           />
         </button>

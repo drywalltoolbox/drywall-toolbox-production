@@ -25,6 +25,23 @@ const resolveImage = (product, src) => {
   );
 };
 
+const resolveCardImage = (product, src) => {
+  if (src) return src;
+  if (!product) return PLACEHOLDER;
+
+  return (
+    product.image_thumbnail ||
+    product.thumbnail ||
+    product.image ||
+    product.featured_image ||
+    product.images?.[0]?.thumbnail ||
+    product.images?.[0]?.src ||
+    product.images?.[0]?.url ||
+    product.src ||
+    PLACEHOLDER
+  );
+};
+
 export default function ProductCardImage({
   product,
   src,
@@ -35,11 +52,15 @@ export default function ProductCardImage({
   sizes,
   fit = 'contain',
   position = 'center',
+  preferThumbnail = false,
   width = 400,
   height = 400,
   eager = false,
 }) {
-  const initialSrc = useMemo(() => resolveImage(product, src), [product, src]);
+  const initialSrc = useMemo(
+    () => (preferThumbnail ? resolveCardImage(product, src) : resolveImage(product, src)),
+    [preferThumbnail, product, src],
+  );
 
   const [failedSrc, setFailedSrc] = useState(null);
   const [loadedSrc, setLoadedSrc] = useState(null);

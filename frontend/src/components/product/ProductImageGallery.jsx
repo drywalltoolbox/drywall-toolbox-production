@@ -50,13 +50,27 @@ export default function ProductImageGallery({ product }) {
   // Accepts both string URLs (normalizeProduct output) and WooCommerce image
   // objects ({ id, src, name, alt }) so that raw WC API responses render
   // correctly even if the product has not been passed through normalizeProduct().
-  const toImgUrl = (img) => (typeof img === 'string' ? img : (img?.src ?? ''));
-  const images = (() => {
+  const toImageMeta = (img, index = 0) => {
+    if (typeof img === 'string') {
+      return {
+        src: img,
+        srcSet: index === 0 ? (product?.image_srcset || '') : '',
+        sizes: index === 0 ? (product?.image_sizes || '') : '',
+      };
+    }
+    return {
+      src: img?.src ?? '',
+      srcSet: img?.srcset || '',
+      sizes: img?.sizes || '',
+    };
+  };
+  const imageMeta = (() => {
     const arr = Array.isArray(product?.images) && product.images.length
-      ? product.images.map(toImgUrl).filter(Boolean)
-      : product?.image ? [toImgUrl(product.image)] : [];
-    return arr.length ? arr : [PLACEHOLDER_IMAGE];
+      ? product.images.map((img, index) => toImageMeta(img, index)).filter((img) => img.src)
+      : product?.image ? [toImageMeta(product.image, 0)] : [];
+    return arr.length ? arr : [{ src: PLACEHOLDER_IMAGE, srcSet: '', sizes: '' }];
   })();
+  const images = imageMeta.map((img) => img.src);
   const imagesRef = useRef(images);
   const hasMultiple = images.length > 1;
 
@@ -237,7 +251,7 @@ export default function ProductImageGallery({ product }) {
         {/* Main image container */}
         <div
           ref={galleryRef}
-          className="relative w-full rounded-2xl overflow-hidden bg-gray-50 border border-gray-100 group cursor-zoom-in select-none"
+          className="relative w-full rounded-2xl overflow-hidden bg-white border border-gray-100 group cursor-zoom-in select-none"
           style={{ aspectRatio: '1 / 1' }}
           onClick={onGalleryClick}
           onTouchStart={onTouchStart}
@@ -252,7 +266,7 @@ export default function ProductImageGallery({ product }) {
             {!imgLoaded[currentIndex] && (
               <Motion.div
                 key={`skeleton-${currentIndex}`}
-                className="absolute inset-0 bg-linear-to-br from-gray-100 to-gray-200 animate-pulse"
+                className="absolute inset-0 bg-linear-to-br from-white to-gray-100 animate-pulse"
                 style={{ zIndex: 1 }}
                 initial={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
@@ -267,6 +281,8 @@ export default function ProductImageGallery({ product }) {
             <Motion.img
               key={currentIndex}
               src={images[currentIndex]}
+              srcSet={imageMeta[currentIndex]?.srcSet || undefined}
+              sizes={imageMeta[currentIndex]?.sizes || '(max-width: 767px) 92vw, 48vw'}
               alt={`${product?.name || 'Product'} — image ${currentIndex + 1} of ${images.length}`}
               custom={direction}
               variants={slideVariants}
@@ -279,7 +295,7 @@ export default function ProductImageGallery({ product }) {
               decoding="async"
               draggable={false}
               className="absolute inset-0 w-full h-full object-contain p-3 sm:p-4"
-              style={{ zIndex: 2, willChange: 'transform, opacity' }}
+              style={{ zIndex: 2, backfaceVisibility: 'hidden', WebkitBackfaceVisibility: 'hidden' }}
               onLoad={() => setImgLoaded(prev => ({ ...prev, [currentIndex]: true }))}
               onError={(e) => {
                 e.currentTarget.onerror = null;
@@ -346,7 +362,11 @@ export default function ProductImageGallery({ product }) {
 
         {/* ── Thumbnail strip (2+ images) ─────────────────────────────── */}
         {hasMultiple && (
-          <div ref={thumbsRef} className="flex gap-2 overflow-x-auto pb-1" style={{ scrollbarWidth: 'none' }}>
+          <div
+            ref={thumbsRef}
+            className="flex gap-2 overflow-x-auto rounded-2xl border border-gray-50 bg-white p-2 pb-2 shadow-[inset_0_1px_0_rgba(255,255,255,0.96)]"
+            style={{ scrollbarWidth: 'none' }}
+          >
             {images.map((img, i) => (
               <button
                 key={i}
@@ -355,8 +375,8 @@ export default function ProductImageGallery({ product }) {
                 aria-current={i === currentIndex ? 'true' : undefined}
                 className={`shrink-0 w-16 h-16 rounded-xl overflow-hidden border-2 transition-all duration-200 ${
                   i === currentIndex
-                    ? 'border-blue-600 ring-2 ring-blue-100 scale-[1.04]'
-                    : 'border-gray-200 hover:border-gray-400'
+                    ? 'border-blue-600 bg-white ring-2 ring-blue-100/80 scale-[1.04] shadow-sm'
+                    : 'border-gray-100 bg-white hover:border-gray-300'
                 }`}
               >
                 <img
@@ -413,6 +433,8 @@ export default function ProductImageGallery({ product }) {
                   <Motion.img
                     key={lightbox.index}
                     src={images[lightbox.index]}
+                    srcSet={imageMeta[lightbox.index]?.srcSet || undefined}
+                    sizes={imageMeta[lightbox.index]?.sizes || '100vw'}
                     alt={`${product?.name || 'Product'} — image ${lightbox.index + 1} of ${images.length}`}
                     custom={lightbox.dir}
                     variants={slideVariants}
@@ -422,7 +444,7 @@ export default function ProductImageGallery({ product }) {
                     transition={slideTransition}
                     className="max-w-[90vw] max-h-[78vh] w-auto h-auto object-contain select-none"
                     draggable={false}
-                    style={{ pointerEvents: 'none', willChange: 'transform, opacity' }}
+                    style={{ pointerEvents: 'none', backfaceVisibility: 'hidden', WebkitBackfaceVisibility: 'hidden' }}
                   />
                 </AnimatePresence>
 

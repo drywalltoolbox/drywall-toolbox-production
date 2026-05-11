@@ -8,9 +8,9 @@ const backdropVariants = {
 };
 
 const panelVariants = {
-  hidden:  { opacity: 0, y: 28, scale: 0.97 },
-  visible: { opacity: 1, y: 0,  scale: 1    },
-  exit:    { opacity: 0, y: 18, scale: 0.97 },
+  hidden:  { opacity: 0, y: 28 },
+  visible: { opacity: 1, y: 0  },
+  exit:    { opacity: 0, y: 18 },
 };
 
 const panelTransition = { duration: 0.24, ease: [0.22, 1, 0.36, 1] };
@@ -127,7 +127,7 @@ export default function ProductModal({ isOpen, product, onClose, children }) {
             key="product-modal-panel"
             ref={scrollRef}
             className={`product-modal-scroll-shell fixed left-0 right-0 bottom-0 overflow-y-auto overscroll-contain outline-none${isScrollActive ? ' product-modal-scroll-shell--active' : ''}`}
-            style={{ zIndex: 10002, willChange: 'transform, opacity' }}
+            style={{ zIndex: 10002 }}
             role="dialog"
             aria-modal="true"
             aria-label={product?.name || 'Product detail'}
