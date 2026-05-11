@@ -4,7 +4,7 @@
  * Updated: robust image resolution across inconsistent product shapes.
  * Accepts either `src` OR full `product` object.
  */
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect, useRef } from 'react';
 import { PLACEHOLDER_IMAGE } from '../../constants/images.js';
 
 const PLACEHOLDER = PLACEHOLDER_IMAGE;
@@ -64,8 +64,32 @@ export default function ProductCardImage({
 
   const [failedSrc, setFailedSrc] = useState(null);
   const [loadedSrc, setLoadedSrc] = useState(null);
+  const imgRef = useRef(null);
   const imgSrc = failedSrc === initialSrc ? PLACEHOLDER : initialSrc;
   const loaded = loadedSrc === imgSrc;
+
+  // When an image is already in the browser cache the browser fires onLoad
+  // synchronously while the <img> src is being set — before React has committed
+  // the element and attached its synthetic event listener. That means onLoad is
+  // silently missed, loadedSrc stays null, loaded stays false, and the image
+  // remains invisible at opacity:0 forever on repeat visits.
+  // Guard: after the src changes, schedule a microtask to check img.complete.
+  useEffect(() => {
+    const el = imgRef.current;
+    if (!el || !el.complete) return;
+    // Image was already decoded from the browser cache before React attached
+    // the synthetic onLoad listener — fire the same state transitions that
+    // onLoad/onError would have triggered, but deferred via queueMicrotask so
+    // we are not calling setState synchronously inside the effect body.
+    queueMicrotask(() => {
+      if (el.naturalWidth === 0) {
+        if (imgSrc !== PLACEHOLDER) setFailedSrc(initialSrc);
+        else setLoadedSrc(PLACEHOLDER);
+      } else {
+        setLoadedSrc(imgSrc);
+      }
+    });
+  }, [imgSrc, initialSrc]); // re-run whenever the resolved src changes
 
   return (
     <div style={{ position: 'absolute', inset: padding }}>
@@ -86,6 +110,7 @@ export default function ProductCardImage({
       />
 
       <img
+        ref={imgRef}
         src={imgSrc}
         srcSet={srcSet || product?.image_srcset || undefined}
         sizes={sizes || product?.image_sizes || undefined}
