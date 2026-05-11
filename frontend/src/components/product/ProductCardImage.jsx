@@ -4,7 +4,7 @@
  * Updated: robust image resolution across inconsistent product shapes.
  * Accepts either `src` OR full `product` object.
  */
-import { useState, useMemo } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { PLACEHOLDER_IMAGE } from '../../constants/images.js';
 
 const PLACEHOLDER = PLACEHOLDER_IMAGE;
@@ -39,6 +39,11 @@ export default function ProductCardImage({
 
   const [imgSrc, setImgSrc] = useState(initialSrc);
   const [loaded, setLoaded] = useState(false);
+
+  useEffect(() => {
+    setImgSrc(initialSrc);
+    setLoaded(false);
+  }, [initialSrc]);
 
   return (
     <div style={{ position: 'absolute', inset: padding }}>

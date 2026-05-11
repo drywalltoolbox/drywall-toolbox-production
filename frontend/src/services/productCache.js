@@ -32,8 +32,9 @@ const FRESH_TTL_MS  = 5 * 60 * 1000;
 // Hard-expire after 24 hours — force a blocking refresh.
 const STALE_TTL_MS  = 24 * 60 * 60 * 1000;
 // App version stamp — bump this to bust the cache on breaking schema changes.
-// Bumped 2026-04-15: full image re-sync (gallery images added to all products).
-const APP_VERSION   = '1.0.3';
+// Bumped 2026-05-10: invalidate cached placeholder-heavy product catalogs after
+// image sync and ProductCardImage src-state fix.
+const APP_VERSION   = '1.0.4';
 
 // ─── IndexedDB helpers ────────────────────────────────────────────────────────
 
