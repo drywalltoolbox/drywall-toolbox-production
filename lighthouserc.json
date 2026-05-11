@@ -16,7 +16,6 @@
       }
     },
     "assert": {
-      "preset": "lighthouse:no-pwa",
       "assertions": {
         "first-contentful-paint":     ["warn",  { "maxNumericValue": 1500 }],
         "largest-contentful-paint":   ["warn",  { "maxNumericValue": 2500 }],
