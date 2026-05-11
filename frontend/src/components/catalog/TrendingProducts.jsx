@@ -8,6 +8,7 @@ import ProductModal from '../product/ProductModal';
 import LoadingSpinner from '../shared/LoadingSpinner';
 import ProductShoppingCard from '../ui/ProductShoppingCard';
 import Toast from '../ui/Toast';
+import { PLACEHOLDER_IMAGE } from '../../constants/images.js';
 import { fetchVariationsBatched } from '../../utils/variationSelection';
 
 export default function TrendingProducts() {
@@ -180,14 +181,29 @@ export default function TrendingProducts() {
         <div ref={scrollContainerRef} className="dtb-trending-scroll">
           {products.map((product, index) => (
             <div key={product.sku || product.id} className="dtb-trending-card-wrap">
-              <ProductShoppingCard
-                product={product}
-                cardProduct={product}
-                hasSelectedVariation={false}
-                onOpenModal={() => openModal(product)}
-                onAddToCart={() => handleAddToCart(product)}
-                index={index}
-              />
+              {(() => {
+                // Variable products often have no image on the parent in WooCommerce —
+                // only the individual variations carry images. Fall back to the first
+                // variation image so the card never shows a broken placeholder.
+                const variations = variationMap[product.id] || [];
+                const firstVarImg = variations.find(
+                  (v) => v.image && v.image !== PLACEHOLDER_IMAGE
+                )?.image;
+                const cardProduct =
+                  (product.image === PLACEHOLDER_IMAGE || !product.image) && firstVarImg
+                    ? { ...product, image: firstVarImg, image_thumbnail: firstVarImg }
+                    : product;
+                return (
+                  <ProductShoppingCard
+                    product={product}
+                    cardProduct={cardProduct}
+                    hasSelectedVariation={false}
+                    onOpenModal={() => openModal(product)}
+                    onAddToCart={() => handleAddToCart(product)}
+                    index={index}
+                  />
+                );
+              })()}
             </div>
           ))}
         </div>
@@ -256,12 +272,12 @@ export default function TrendingProducts() {
 
           .dtb-trending-card-wrap .dtb-plp-card__img-wrap,
           .dtb-trending-card-wrap .dtb-plp-card__img-btn {
-            min-height: 170px;
-            max-height: 190px;
+            min-height: 185px;
+            max-height: 210px;
           }
 
           .dtb-trending-card-wrap .dtb-plp-card__body {
-            padding: 12px 14px 14px !important;
+            padding: 10px 14px 12px !important;
           }
 
           .dtb-trending-card-wrap .dtb-plp-card__brand {
@@ -276,7 +292,7 @@ export default function TrendingProducts() {
 
           .dtb-trending-card-wrap .dtb-plp-card__sku {
             font-size: 0.64rem !important;
-            margin-bottom: 10px !important;
+            margin-bottom: 4px !important;
           }
 
           .dtb-trending-card-wrap .dtb-plp-card__price {

@@ -189,7 +189,7 @@ export default function ProductShoppingCard({
         {(effectiveProduct.sku || product.sku || effectiveProduct.part_number) && (
           <p className="dtb-plp-card__sku" style={{
             fontSize: '0.7rem', fontFamily: 'var(--font-mono)',
-            color: 'rgba(15,23,42,0.4)', margin: '0 0 12px',
+            color: 'rgba(15,23,42,0.4)', margin: '0 0 6px',
           }}>
             SKU:&nbsp;{effectiveProduct.sku || product.sku || effectiveProduct.part_number}
           </p>
