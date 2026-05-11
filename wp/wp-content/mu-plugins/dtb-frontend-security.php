@@ -60,6 +60,23 @@ function dtb_frontend_security_headers(): void {
 	header( 'Referrer-Policy: strict-origin-when-cross-origin' );
 	header( 'X-Frame-Options: SAMEORIGIN' );
 	header( 'Permissions-Policy: geolocation=(), microphone=(), camera=()' );
+
+	// Content-Security-Policy: opt-in via DTB_ENABLE_CSP constant (default off).
+	if ( ! is_admin() && dtb_feature_enabled( 'DTB_ENABLE_CSP', false ) ) {
+		$csp = "default-src 'self'; "
+			. "script-src 'self' 'unsafe-inline' https://js.stripe.com; "
+			. "style-src 'self' 'unsafe-inline'; "
+			. "img-src 'self' data: https:; "
+			. "connect-src 'self' https://api.stripe.com https://drywalltoolbox.com https://www.drywalltoolbox.com; "
+			. "frame-src https://js.stripe.com;";
+		header( 'Content-Security-Policy: ' . $csp );
+	}
+
+	// Noindex on staging environments (WP_ENVIRONMENT_TYPE preferred; fallback to URL check).
+	$env = function_exists( 'wp_get_environment_type' ) ? wp_get_environment_type() : '';
+	if ( 'staging' === $env || ( '' === $env && false !== strpos( (string) get_option( 'siteurl', '' ), '.staging.' ) ) ) {
+		header( 'X-Robots-Tag: noindex' );
+	}
 }
 
 function dtb_frontend_security_cleanup_head(): void {
