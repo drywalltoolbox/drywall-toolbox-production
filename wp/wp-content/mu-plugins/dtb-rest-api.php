@@ -592,7 +592,13 @@ function dtb_proxy_product_variations( WP_REST_Request $request ): WP_REST_Respo
 		}
 	}
 
-	$response = dtb_cached_wc_get( 'wc/v3/products/' . $product_id . '/variations', $params );
+	// Variations are fetched via the uncached dtb_wc_get() path (no transient
+	// storage) because serializing 100 fully-hydrated WC variation objects into
+	// wp_options can exceed the shared-host max_allowed_packet / PHP memory
+	// limit, producing a PHP fatal 500 before WordPress can return a response.
+	// The SPA already deduplicates variation fetches in its own in-memory
+	// variationCache.js, so server-side transient caching provides no benefit.
+	$response = dtb_wc_get( 'wc/v3/products/' . $product_id . '/variations', $params );
 
 	// Variations are non-critical UI data.  When WooCommerce returns any error
 	// (5xx: memory/data inconsistency; 4xx: product has no variations in the DB),
