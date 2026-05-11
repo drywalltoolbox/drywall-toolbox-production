@@ -566,7 +566,15 @@ function dtb_proxy_products( WP_REST_Request $request ): WP_REST_Response {
 
 /** GET /drywall/v1/products/{id} */
 function dtb_proxy_product_by_id( WP_REST_Request $request ): WP_REST_Response {
-	return dtb_cached_wc_get( 'wc/v3/products/' . absint( $request->get_param( 'id' ) ), [] );
+	return dtb_cached_wc_get(
+		'wc/v3/products/' . absint( $request->get_param( 'id' ) ),
+		[
+			// Limit WC object hydration to fields the SPA actually uses.
+			// Without _fields, WC fully hydrates the product including all
+			// variation-related structures — OOM on shared hosting for variable products.
+			'_fields' => 'id,name,slug,permalink,type,status,featured,catalog_visibility,description,short_description,sku,price,regular_price,sale_price,on_sale,purchasable,total_sales,virtual,downloadable,tax_status,tax_class,manage_stock,stock_quantity,backorders,backorders_allowed,backordered,sold_individually,weight,dimensions,shipping_required,shipping_taxable,shipping_class,shipping_class_id,reviews_allowed,average_rating,rating_count,upsell_ids,cross_sell_ids,parent_id,categories,brands,tags,images,attributes,default_attributes,variations,menu_order,price_html,related_ids,stock_status,has_options,meta_data',
+		]
+	);
 }
 
 /** GET /drywall/v1/products/slug/{slug} */
@@ -588,63 +596,10 @@ function dtb_proxy_product_variation_by_id( WP_REST_Request $request ): WP_REST_
 
 /** GET /drywall/v1/products/{id}/variations */
 function dtb_proxy_product_variations( WP_REST_Request $request ): WP_REST_Response {
-	$product_id = absint( $request->get_param( 'id' ) );
-	$params     = [];
-	foreach ( [ 'page', 'per_page' ] as $k ) {
-		$v = $request->get_param( $k );
-		if ( null !== $v ) {
-			$params[ $k ] = sanitize_text_field( $v );
-		}
-	}
-
-	// Restrict the fields WooCommerce hydrates per variation.
-	//
-	// Without _fields, WooCommerce instantiates a full WC_Product_Variation
-	// object for every variation — loading description HTML, all downloads,
-	// dimensions, shipping meta, tax class objects, etc. (~50 KB of PHP objects
-	// per variation).  On a shared host with a 128 MB PHP memory limit this
-	// kills the process before the response is assembled, returning a raw 500.
-	//
-	// _fields instructs the WC REST controller to skip hydrating and serializing
-	// fields the SPA never reads.  normalizeProduct() only consumes the fields
-	// listed here; everything else (date_*, permalink, dimensions, shipping_*,
-	// download_*, button_text, tax_*, virtual, downloadable, purchase_note,
-	// menu_order, _links) is safely omitted.
-	$params['_fields'] = implode( ',', [
-		'id',
-		'sku',
-		'slug',
-		'name',
-		'type',
-		'status',
-		'price',
-		'regular_price',
-		'sale_price',
-		'on_sale',
-		'stock_status',
-		'manage_stock',
-		'stock_quantity',
-		'images',
-		'attributes',
-		'meta_data',
-		'parent_id',
-		'description',
-		'short_description',
-	] );
-
-	// Use dtb_cached_wc_get — identical to all other proxy routes.
-	// With _fields active, the per-variation payload is ~2 KB (vs ~50 KB
-	// without), so the transient stored by dtb_cached_proxy is ~200 KB for
-	// 100 variations — well within shared-host limits.
-	$response = dtb_cached_wc_get( 'wc/v3/products/' . $product_id . '/variations', $params );
-
-	// Variations are non-critical UI data.  On any upstream error degrade
-	// gracefully so the SPA renders the parent product instead of crashing.
-	if ( $response->get_status() < 200 || $response->get_status() >= 300 ) {
-		return new WP_REST_Response( [], 200 );
-	}
-
-	return $response;
+	// DIAGNOSTIC STUB — returns empty array immediately, no logic.
+	// If this still returns a critical error, the crash is not in this
+	// function but in a WordPress hook or filter firing on this route.
+	return new WP_REST_Response( [], 200 );
 }
 
 /** GET /drywall/v1/categories */

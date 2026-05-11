@@ -2,6 +2,9 @@ node_modules/
 .DS_Store
 *.log
 
+# API test harness debug output — timestamped per-run, local only
+scripts/reports/
+
 # VS Code — ignore personal/local overrides but commit shared workspace settings
 .vscode/*
 !.vscode/settings.json
