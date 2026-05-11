@@ -4,7 +4,7 @@
  * Updated: robust image resolution across inconsistent product shapes.
  * Accepts either `src` OR full `product` object.
  */
-import { useEffect, useState, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { PLACEHOLDER_IMAGE } from '../../constants/images.js';
 
 const PLACEHOLDER = PLACEHOLDER_IMAGE;
@@ -37,13 +37,10 @@ export default function ProductCardImage({
 }) {
   const initialSrc = useMemo(() => resolveImage(product, src), [product, src]);
 
-  const [imgSrc, setImgSrc] = useState(initialSrc);
-  const [loaded, setLoaded] = useState(false);
-
-  useEffect(() => {
-    setImgSrc(initialSrc);
-    setLoaded(false);
-  }, [initialSrc]);
+  const [failedSrc, setFailedSrc] = useState(null);
+  const [loadedSrc, setLoadedSrc] = useState(null);
+  const imgSrc = failedSrc === initialSrc ? PLACEHOLDER : initialSrc;
+  const loaded = loadedSrc === imgSrc;
 
   return (
     <div style={{ position: 'absolute', inset: padding }}>
@@ -87,12 +84,13 @@ export default function ProductCardImage({
           transitionDelay: loaded ? '50ms' : '0ms',
           zIndex: 1,
         }}
-        onLoad={() => setLoaded(true)}
+        onLoad={() => setLoadedSrc(imgSrc)}
         onError={() => {
           if (imgSrc !== PLACEHOLDER) {
-            setImgSrc(PLACEHOLDER);
+            setFailedSrc(initialSrc);
+            return;
           }
-          setLoaded(true);
+          setLoadedSrc(PLACEHOLDER);
         }}
       />
     </div>
