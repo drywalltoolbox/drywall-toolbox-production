@@ -1,7 +1,10 @@
 {
   "ci": {
     "collect": {
-      "url": ["https://drywalltoolbox.com/"],
+      "url": [
+        "https://drywalltoolbox.com/",
+        "https://elliotttmiller.github.io/drywall-toolbox/"
+      ],
       "numberOfRuns": 1,
       "settings": {
         "preset": "desktop",
