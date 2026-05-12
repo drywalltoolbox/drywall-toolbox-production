@@ -37,7 +37,7 @@ SELECT COUNT(*) AS total_attachments_2026_04
 FROM wp_posts
 WHERE post_type   = 'attachment'
   AND post_status = 'inherit'
-  AND guid LIKE '%/2026/04/%';
+  AND guid LIKE '%/2026/media/%';
 
 -- How many products currently have a thumbnail set?
 SELECT COUNT(*) AS products_with_thumbnail
