@@ -115,10 +115,6 @@ export default function ProductDetail({
       setVariationsLoading(!hasInitialVariations);
     });
 
-    if (hasInitialVariations) {
-      return () => { mounted = false; };
-    }
-
     Promise.resolve()
       .then(() => {
         if (!mounted) return;

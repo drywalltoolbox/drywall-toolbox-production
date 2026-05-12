@@ -129,7 +129,7 @@ function OrderSummaryPanel( { cartItems, subtotal, shipping, tax, total, loading
             ? [0, 1, 2].map( ( i ) => <SkeletonRow key={ i } /> )
             : cartItems.map( ( item ) => (
                 <Motion.div
-                  key={ item.id }
+                  key={ item.cartKey || item.id }
                   initial={ { opacity: 0 } }
                   animate={ { opacity: 1 } }
                   exit={ { opacity: 0 } }

@@ -9,7 +9,7 @@ import Toast from '../components/ui/Toast';
 import SEOHead from '../components/shared/SEOHead';
 import { buildBreadcrumbSchema } from '../utils/schema';
 import { getProductVariations } from '../services/api';
-import { fetchVariationsBatched } from '../utils/variationSelection';
+import { fetchVariationsBatched, getVariationSelectionMap } from '../utils/variationSelection';
 import { PLACEHOLDER_IMAGE } from '../constants/images.js';
 
 export default function CategoryPage() {
@@ -27,6 +27,17 @@ export default function CategoryPage() {
   const handleAddToCart = (product, quantity = 1) => {
     addToCart(product, quantity);
     showToast(`${product.name} added to cart!`, 'cart');
+  };
+
+  const openModal = (product, cardProduct = null) => {
+    const initialResolvedVariation = cardProduct?.parent_id ? cardProduct : null;
+    setModalProduct({
+      product,
+      initialResolvedVariation,
+      initialSelectedAttrs: initialResolvedVariation
+        ? getVariationSelectionMap(initialResolvedVariation)
+        : {},
+    });
   };
 
   const [cardVariationMap, setCardVariationMap] = useState({});
@@ -151,17 +162,14 @@ export default function CategoryPage() {
           <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-5 lg:gap-6">
             {products.map((product, index) => {
                 const cardProduct = getCardDisplayProduct(product);
-                const hasSelectedVariation = cardProduct.id !== product.id;
                 return (
                   <ProductShoppingCard
                     key={product.id}
                     product={product}
                     cardProduct={cardProduct}
-                    hasSelectedVariation={hasSelectedVariation}
-                    onOpenModal={() => {
-                      setModalProduct(product);
-                    }}
-                      onAddToCart={() => handleAddToCart(cardProduct, 1)}
+                    hasSelectedVariation={false}
+                    onOpenModal={() => openModal(product, cardProduct)}
+                    onAddToCart={() => openModal(product, cardProduct)}
                     index={index}
                   />
                 );
@@ -173,20 +181,22 @@ export default function CategoryPage() {
       {/* Product detail modal */}
       <ProductModal
         isOpen={!!modalProduct}
-        product={modalProduct}
+        product={modalProduct?.product || modalProduct}
         onClose={() => {
           setModalProduct(null);
         }}
       >
         {modalProduct && (
           <ProductDetail
-            key={modalProduct.id}
-            product={modalProduct}
+            key={`${modalProduct.product?.id || modalProduct.id}:${modalProduct.initialResolvedVariation?.id || 'parent'}`}
+            product={modalProduct.product || modalProduct}
             onAddToCart={handleAddToCart}
             onClose={() => {
               setModalProduct(null);
             }}
-            initialVariations={cardVariationMap[modalProduct.id] || []}
+            initialVariations={cardVariationMap[modalProduct.product?.id || modalProduct.id] || []}
+            initialResolvedVariation={modalProduct.initialResolvedVariation}
+            initialSelectedAttrs={modalProduct.initialSelectedAttrs}
           />
         )}
       </ProductModal>

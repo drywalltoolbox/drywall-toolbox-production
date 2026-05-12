@@ -38,10 +38,10 @@ export async function fetchCachedVariations(parentId, fetchFn) {
       variationCache.set(key, normalized);
       return normalized;
     })
-    .catch(() => {
+    .catch((error) => {
       // Do not cache on error — allow the next request to retry rather than
       // permanently serving a stale-empty result for the session.
-      return [];
+      throw error;
     })
     .finally(() => {
       variationRequestCache.delete(key);
@@ -64,14 +64,20 @@ export async function fetchVariationsBatched(ids, fetchFn, concurrency = 5) {
   for (let i = 0; i < idsToFetch.length; i += concurrency) {
     const batch = idsToFetch.slice(i, i + concurrency);
     const batchResults = await Promise.all(
-      batch.map((id) =>
-        fetchCachedVariations(id, fetchFn).then((vars) => [id, vars])
-      )
+      batch.map(async (id) => {
+        try {
+          const vars = await fetchCachedVariations(id, fetchFn);
+          return [id, vars, true];
+        } catch {
+          return [id, null, false];
+        }
+      })
     );
     fetched.push(...batchResults);
   }
 
-  fetched.forEach(([id, vars]) => {
+  fetched.forEach(([id, vars, ok]) => {
+    if (!ok) return;
     const key = String(id);
     variationCache.set(key, vars);
     resultsMap.set(key, vars);

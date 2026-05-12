@@ -618,7 +618,19 @@ function dtb_proxy_product_variations( WP_REST_Request $request ): WP_REST_Respo
 	if ( null !== $page )     $params['page']     = absint( $page );
 	if ( null !== $per_page ) $params['per_page'] = absint( $per_page );
 
-	return dtb_cached_wc_get( 'wc/v3/products/' . $parent_id . '/variations', $params );
+	$response = dtb_cached_wc_get( 'wc/v3/products/' . $parent_id . '/variations', $params );
+
+	// If WC returns a 5xx (e.g. corrupted variation data), return an empty
+	// array so the SPA degrades gracefully instead of crashing with a 500.
+	if ( $response->get_status() >= 500 ) {
+		dtb_log_cache_event( 'variations_upstream_error', [
+			'parent_id' => $parent_id,
+			'status'    => $response->get_status(),
+		] );
+		return new WP_REST_Response( [], 200 );
+	}
+
+	return $response;
 }
 
 /** GET /drywall/v1/categories */

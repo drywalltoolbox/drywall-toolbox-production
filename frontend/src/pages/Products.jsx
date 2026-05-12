@@ -29,7 +29,7 @@ import duraStiltsLogo from '/brands/Dura-Stilts/dura-stilts-logo.svg';
 import level5Logo from '/brands/Level5/Level5.svg';
 import SEOHead from '../components/shared/SEOHead';
 import { buildSiteLinksSearchBoxSchema } from '../utils/schema';
-import { fetchVariationsBatched } from '../utils/variationSelection';
+import { fetchVariationsBatched, getVariationSelectionMap } from '../utils/variationSelection';
 import { PLACEHOLDER_IMAGE } from '../constants/images.js';
 import '../styles/tool-selector.css';
 
@@ -135,8 +135,16 @@ export default function Products() {
     showToast(`${product.name} added to cart!`, 'cart');
   };
 
-  const openModal = (product) => {
-    setModalProduct(product);
+  const openModal = (product, cardProduct = null) => {
+    const initialResolvedVariation = cardProduct?.parent_id ? cardProduct : null;
+    
+    setModalProduct({
+      product,
+      initialResolvedVariation,
+      initialSelectedAttrs: initialResolvedVariation
+        ? getVariationSelectionMap(initialResolvedVariation)
+        : {},
+    });
     setIsModalOpen(true);
   };
 
@@ -587,15 +595,14 @@ export default function Products() {
             <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-5 lg:gap-6">
               {pageProducts.map((product, index) => {
                   const cardProduct = getCardDisplayProduct(product);
-                  const hasSelectedVariation = cardProduct.id !== product.id;
                   return (
                     <ProductShoppingCard
                       key={product.id}
                       product={product}
                       cardProduct={cardProduct}
-                      hasSelectedVariation={hasSelectedVariation}
-                      onOpenModal={() => openModal(product)}
-                      onAddToCart={() => handleAddToCart(cardProduct, 1)}
+                      hasSelectedVariation={false}
+                      onOpenModal={() => openModal(product, cardProduct)}
+                      onAddToCart={() => openModal(product, cardProduct)}
                       index={index}
                     />
                   );
@@ -654,14 +661,16 @@ export default function Products() {
       )}
 
       {/* Product Detail Modal */}
-      <ProductModal isOpen={isModalOpen && !!modalProduct} product={modalProduct} onClose={closeModal}>
+      <ProductModal isOpen={isModalOpen && !!modalProduct} product={modalProduct?.product || modalProduct} onClose={closeModal}>
         {modalProduct && (
           <ProductDetail
-            key={modalProduct.id}
-            product={modalProduct}
+            key={`${modalProduct.product?.id || modalProduct.id}:${modalProduct.initialResolvedVariation?.id || 'parent'}`}
+            product={modalProduct.product || modalProduct}
             onAddToCart={handleAddToCart}
             onClose={closeModal}
-            initialVariations={cardVariationMap[modalProduct.id] || []}
+            initialVariations={cardVariationMap[modalProduct.product?.id || modalProduct.id] || []}
+            initialResolvedVariation={modalProduct.initialResolvedVariation}
+            initialSelectedAttrs={modalProduct.initialSelectedAttrs}
           />
         )}
       </ProductModal>

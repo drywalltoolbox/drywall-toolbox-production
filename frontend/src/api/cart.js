@@ -257,6 +257,16 @@ export async function placeOrder(
   } );
 }
 
+function buildStoreApiVariation(variationAttributeValues) {
+  if ( !Array.isArray( variationAttributeValues ) ) return {};
+
+  return Object.fromEntries(
+    variationAttributeValues
+      .filter( ( attr ) => attr?.name && attr?.option )
+      .map( ( attr ) => [ attr.name, attr.option ] ),
+  );
+}
+
 /**
  * Synchronise the React CartContext items into the WC server-side cart and
  * submit the Store API checkout in one atomic operation.
@@ -299,7 +309,12 @@ export async function syncAndPlace(
   // Sync the local cart to the server.  Sequential to avoid race conditions on
   // the nonce — each response carries the updated nonce in the header.
   for ( const item of cartItems ) {
-    await addToCart( item.id, item.quantity );
+    if ( item.parent_id && !item.variation_attribute_values?.length ) {
+      throw new Error( `Variation item ${ item.sku || item.id } is missing selected attributes.` );
+    }
+
+    const variation = buildStoreApiVariation( item.variation_attribute_values );
+    await addToCart( item.id, item.quantity, variation );
   }
 
   // Apply any coupon codes (e.g. loyalty redemption coupons).

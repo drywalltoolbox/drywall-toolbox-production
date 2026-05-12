@@ -590,12 +590,16 @@ export const getProductVariations = (parentId) =>
       // 5xx / auth / rate-limit — server can't serve this right now; bail early
       // so we don't pile on with secondary requests.
       if (status >= 400) {
-        return [];
+        throw err;
       }
       // Network-level failure (status 0) or unexpected client error:
       // fall back to fetching each variation ID individually via the parent's
       // `variations` array (requires one extra product fetch).
-      return fetchVariationsByIds(parentId).catch(() => []);
+      try {
+        return await fetchVariationsByIds(parentId);
+      } catch {
+        throw err;
+      }
     });
 
 // ─── Categories ──────────────────────────────────────────────────────────────
