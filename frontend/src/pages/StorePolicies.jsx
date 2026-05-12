@@ -34,16 +34,12 @@ const RETURN_SHIPPING_ROWS = [
 
 /* ─── Manufacturer warranty table ────────────────────────────────────────────── */
 const WARRANTY_ROWS = [
-  { brand: 'Columbia Taping Tools',  coverage: '5 Years',     notes: 'Manufacturing defects; all components' },
-  { brand: 'Drywall Master Tools',   coverage: '5 Years',     notes: 'Manufacturing defects; all components' },
-  { brand: 'Platinum Drywall Tools', coverage: '5 Years',     notes: 'Manufacturing defects; stainless & anodized parts' },
-  { brand: 'TapeTech Tools',         coverage: 'Per mfr.',    notes: 'Contact us for current coverage details' },
-  { brand: 'DeWalt Power Tools',     coverage: '3 Years',     notes: 'Manufacturing defects; 1-yr free service' },
-  { brand: 'FLEX Power Tools',       coverage: '3 Years',     notes: 'Manufacturing defects' },
-  { brand: 'Festool',                coverage: '3 Years',     notes: 'Full service coverage (registered tools)' },
-  { brand: 'Graco Spray Equipment',  coverage: 'Per product', notes: 'Contact us; varies by model' },
-  { brand: 'Dura-Stilts',            coverage: 'Per product', notes: 'Manufacturing defects' },
-  { brand: 'Hand Tools (General)',   coverage: 'Lifetime / 1 yr', notes: 'Manufacturer\'s defect; varies by brand' },
+  { brand: 'Columbia Taping Tools',  warrantyUrl: 'https://www.columbiatools.com/warranty' },
+  { brand: 'TapeTech',               warrantyUrl: 'https://tapetech.com/support/warranty/' },
+  { brand: 'Platinum Drywall Tools', warrantyUrl: 'https://platinumdrywalltools.com/warranty/' },
+  { brand: 'Asgard',                 warrantyUrl: 'https://asgardtools.com/warranty/' },
+  { brand: 'SurPro',                 warrantyUrl: 'https://www.suprousa.com/support/warranty/' },
+  { brand: 'Dura-Stilts',            warrantyUrl: 'https://durastilt.com/warranty-registration/' },
 ];
 
 /* ─── Contact channels ───────────────────────────────────────────────────────── */
@@ -463,12 +459,20 @@ export default function StorePolicies() {
             provides <strong>active warranty support</strong> — we are your advocate with the manufacturer.
           </p>
           <PolicyTable
-            headers={['Brand / Product Type', 'Typical Coverage', 'Notes']}
-            columns="1.5fr 1fr 2fr"
-            rows={WARRANTY_ROWS.map(({ brand, coverage, notes }) => [
+            headers={['Brand / Product Type', 'Manufacturer Warranty']}
+            columns="1.5fr 2fr"
+            rows={WARRANTY_ROWS.map(({ brand, warrantyUrl }) => [
               <span key="b" style={{ fontWeight: 600, fontSize: '0.875rem', color: '#0f172a' }}>{brand}</span>,
-              <span key="c" style={{ fontSize: '0.85rem', color: 'var(--primary-600)', fontWeight: 600 }}>{coverage}</span>,
-              <span key="n" style={{ fontSize: '0.825rem', color: 'rgba(15,23,42,0.65)' }}>{notes}</span>,
+              <a
+                key="w"
+                href={warrantyUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ fontSize: '0.85rem', color: 'var(--primary-600)', fontWeight: 600, textDecoration: 'underline' }}
+                aria-label={`${brand} manufacturer warranty (opens in new tab)`}
+              >
+                View Warranty
+              </a>,
             ])}
           />
 
