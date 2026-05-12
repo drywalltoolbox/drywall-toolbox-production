@@ -1,10 +1,8 @@
-import { useState } from 'react';
 import { ChevronRight } from 'lucide-react';
 import '../../styles/tool-selector.css';
 import BackButton from '../shared/BackButton';
 
-export default function ToolSelector({ brand, brandLogo, tools, onSelectTool, onBack }) {
-  const [selectedCategory, setSelectedCategory] = useState(null);
+export default function ToolSelector({ brand, brandLogo, tools, onSelectTool, onBack, selectedCategory, onSelectCategory }) {
 
   // Group tools by category if they have categories defined
   const groupedTools = tools.reduce((acc, tool) => {
@@ -29,7 +27,7 @@ export default function ToolSelector({ brand, brandLogo, tools, onSelectTool, on
       <div className="tool-selector-header">
         <BackButton
           onClick={selectedCategory ? () => {
-            setSelectedCategory(null);
+            onSelectCategory(null);
             setTimeout(() => window.scrollTo({ top: 0, behavior: 'smooth' }), 0);
           } : onBack}
           label={selectedCategory ? "Categories" : "Brands"}
@@ -63,7 +61,7 @@ export default function ToolSelector({ brand, brandLogo, tools, onSelectTool, on
               className={`category-card${categoryImage ? '' : ' category-card--no-image'}`}
               style={{ animationDelay: `${(index + 1) * 0.07}s` }}
               onClick={() => {
-                setSelectedCategory(category);
+                onSelectCategory(category);
                 setTimeout(() => window.scrollTo({ top: 0, behavior: 'smooth' }), 0);
               }}
             >

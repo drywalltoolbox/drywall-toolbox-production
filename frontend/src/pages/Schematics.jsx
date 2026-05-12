@@ -627,6 +627,7 @@ const ALLOWED_BRANDS = [
   const _initParams = new URLSearchParams(location.search);
   const _initBrandSlug = _initParams.get('brand');
   const _initSchematicId = _initParams.get('schematic');
+  const _initCategorySlug = _initParams.get('category');
   const [selectedBrand, setSelectedBrand] = useState(
     () => {
       if (_initBrandSlug) return SLUG_TO_BRAND[_initBrandSlug] ?? null;
@@ -636,6 +637,9 @@ const ALLOWED_BRANDS = [
   );
   const [selectedSchematic, setSelectedSchematic] = useState(
     () => _initSchematicId ?? null
+  );
+  const [selectedCategory, setSelectedCategory] = useState(
+    () => _initCategorySlug ? decodeURIComponent(_initCategorySlug) : null
   );
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -702,15 +706,41 @@ const ALLOWED_BRANDS = [
   }, []);
 
   // Sync state → URL so the address bar always reflects where the user is.
-  // Uses replace:true so browser back-button steps back through real navigation
-  // points rather than every intermediate state change.
+  // Tracks navigation depth so forward steps push a new history entry (enabling
+  // browser back-button support through brand → category → tool selector),
+  // while backward steps (clearing selections) use replace to avoid duplicate
+  // history entries.
+  const _prevDepthRef = useRef(
+    (_initBrandSlug ? 1 : 0) + (_initCategorySlug ? 1 : 0) + (_initSchematicId ? 1 : 0)
+  );
   useEffect(() => {
     const params = new URLSearchParams();
     if (selectedBrand)    params.set('brand',     BRAND_TO_SLUG[selectedBrand] ?? selectedBrand);
+    if (selectedCategory) params.set('category',  encodeURIComponent(selectedCategory));
     if (selectedSchematic) params.set('schematic', selectedSchematic);
+    const depth = (selectedBrand ? 1 : 0) + (selectedCategory ? 1 : 0) + (selectedSchematic ? 1 : 0);
+    const isForward = depth > _prevDepthRef.current;
+    _prevDepthRef.current = depth;
     const qs = params.toString();
-    navigate(qs ? `/schematics?${qs}` : '/schematics', { replace: true });
-  }, [selectedBrand, selectedSchematic, navigate]);
+    navigate(qs ? `/schematics?${qs}` : '/schematics', { replace: !isForward });
+  }, [selectedBrand, selectedCategory, selectedSchematic, navigate]);
+
+  // Sync URL → state when the user navigates with the browser back/forward buttons.
+  // Without this, clicking browser-back changes the URL but not the React state.
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const brandSlug   = params.get('brand');
+    const categorySlug = params.get('category');
+    const schematicId  = params.get('schematic');
+    const newBrand     = brandSlug    ? (SLUG_TO_BRAND[brandSlug] ?? null) : null;
+    const newCategory  = categorySlug ? decodeURIComponent(categorySlug)    : null;
+    const newSchematic = schematicId  ?? null;
+    // Only call setters when values actually differ to avoid re-render loops.
+    setSelectedBrand(prev     => prev     === newBrand     ? prev     : newBrand);
+    setSelectedCategory(prev  => prev     === newCategory  ? prev     : newCategory);
+    setSelectedSchematic(prev => prev     === newSchematic ? prev     : newSchematic);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [location.search]);
 
   // Schematic data for tools
 
@@ -2590,6 +2620,7 @@ const ALLOWED_BRANDS = [
           onSelectBrand={(brand) => {
             setSelectedBrand(brand);
             setSelectedSchematic(null);
+            setSelectedCategory(null);
             window.scrollTo({ top: 0, behavior: 'smooth' });
           }}
           searchQuery={searchQuery}
@@ -2599,6 +2630,7 @@ const ALLOWED_BRANDS = [
             const firstPage = (schematic.diagramPages && schematic.diagramPages[0]) || 1;
             setSelectedBrand(schematic.brand);
             setSelectedSchematic(schematic.id);
+            setSelectedCategory(null);
             setCurrentPage(firstPage);
             setSearchQuery('');
             window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -2610,6 +2642,11 @@ const ALLOWED_BRANDS = [
           brand={selectedBrand}
           brandLogo={brandLogos[selectedBrand]}
           tools={allowedSchematics.filter(s => s.brand === selectedBrand)}
+          selectedCategory={selectedCategory}
+          onSelectCategory={(category) => {
+            setSelectedCategory(category);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          }}
           onSelectTool={(tool) => {
             setSelectedSchematic(tool.id);
             const s = allowedSchematics.find(sch => sch.id === tool.id);
@@ -2620,6 +2657,7 @@ const ALLOWED_BRANDS = [
           onBack={() => {
             setSelectedBrand(null);
             setSelectedSchematic(null);
+            setSelectedCategory(null);
             window.scrollTo({ top: 0, behavior: 'smooth' });
           }}
         />
