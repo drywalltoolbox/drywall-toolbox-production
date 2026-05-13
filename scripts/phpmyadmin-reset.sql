@@ -33,7 +33,7 @@ WHERE post_type IN ('product', 'product_variation')
   AND post_status != 'auto-draft';
 
 -- How many attachments from our upload directory exist?
-SELECT COUNT(*) AS total_attachments_2026_04
+SELECT COUNT(*) AS total_attachments_2026_media
 FROM wp_posts
 WHERE post_type   = 'attachment'
   AND post_status = 'inherit'
@@ -128,13 +128,13 @@ WHERE post_type IN ('product', 'product_variation')
 --   • Any attachments from other upload directories
 -- =============================================================================
 
--- 3a. Capture all attachment IDs from the 2026/04 directory
+-- 3a. Capture all attachment IDs from the 2026/media directory
 CREATE TEMPORARY TABLE IF NOT EXISTS _dtb_attachment_ids AS
 SELECT ID
 FROM wp_posts
 WHERE post_type   = 'attachment'
   AND post_status = 'inherit'
-  AND guid LIKE '%/wp-content/uploads/2026/04/%';
+  AND guid LIKE '%/wp-content/uploads/2026/media/%';
 
 -- 3b. Delete attachment postmeta (_wp_attachment_metadata, _wp_attached_file, alt text, etc.)
 DELETE pm
@@ -150,11 +150,11 @@ INNER JOIN _dtb_attachment_ids t ON t.ID = p.ID;
 DROP TEMPORARY TABLE IF EXISTS _dtb_attachment_ids;
 
 -- Confirm: should now be 0
-SELECT COUNT(*) AS remaining_attachments_2026_04
+SELECT COUNT(*) AS remaining_attachments_2026_media
 FROM wp_posts
 WHERE post_type   = 'attachment'
   AND post_status = 'inherit'
-  AND guid LIKE '%/2026/04/%';
+  AND guid LIKE '%/2026/media/%';
 
 
 -- =============================================================================
@@ -191,7 +191,7 @@ DEALLOCATE PREPARE stmt;
 -- 4d. Final verification — all four counts should be 0 or very small
 SELECT
     (SELECT COUNT(*) FROM wp_posts WHERE post_type IN ('product','product_variation') AND post_status != 'auto-draft') AS remaining_products,
-    (SELECT COUNT(*) FROM wp_posts WHERE post_type = 'attachment' AND guid LIKE '%/2026/04/%')                        AS remaining_attachments,
+    (SELECT COUNT(*) FROM wp_posts WHERE post_type = 'attachment' AND guid LIKE '%/2026/media/%')                       AS remaining_attachments,
     (SELECT COUNT(*) FROM wp_postmeta WHERE meta_key = '_thumbnail_id')                                               AS remaining_thumbnails,
     (SELECT COUNT(*) FROM wp_postmeta WHERE meta_key = '_product_image_gallery' AND meta_value != '')                 AS remaining_galleries;
 
