@@ -6,6 +6,7 @@ import ShippingTicker from './components/shell/ShippingTicker';
 import { CartProvider } from './context/CartContext';
 import { WooCommerceProvider } from './context/WooCommerceContext';
 import { AuthProvider } from './auth/AuthContext.js';
+import AppErrorBoundary from './components/system/AppErrorBoundary.jsx';
 
 // Layout components load eagerly — they're on every page so there's no benefit
 // to lazy loading them. Keeping them in the main bundle is correct.
@@ -101,6 +102,9 @@ function AppRoutes() {
         <Routes>
           <Route path="/"                      element={<Home />} />
           <Route path="/products"              element={<Products />} />
+          <Route path="/products/brands"       element={<Products />} />
+          <Route path="/products/brands/:brandSlug" element={<Products />} />
+          <Route path="/products/brands/:brandSlug/categories/:categorySlug" element={<Products />} />
           {/* Slug-based product detail with URL variant state machine */}
           <Route path="/products/:slug"        element={<ProductDetailPage />} />
           <Route path="/all-products"          element={<AllProducts />} />
@@ -156,19 +160,21 @@ function App() {
   const basename = (process.env.PUBLIC_URL || '').replace(/\/+$/, '') || '/';
 
   return (
-    <AuthProvider>
-      <WooCommerceProvider>
-          <CartProvider>
-          <Router basename={basename}>
-            <AppShell
-              cartOpen={cartOpen}
-              toggleCart={toggleCart}
-              closeCart={closeCart}
-            />
-          </Router>
-          </CartProvider>
-        </WooCommerceProvider>
-    </AuthProvider>
+    <AppErrorBoundary>
+      <AuthProvider>
+        <WooCommerceProvider>
+            <CartProvider>
+            <Router basename={basename}>
+              <AppShell
+                cartOpen={cartOpen}
+                toggleCart={toggleCart}
+                closeCart={closeCart}
+              />
+            </Router>
+            </CartProvider>
+          </WooCommerceProvider>
+      </AuthProvider>
+    </AppErrorBoundary>
   );
 }
 
