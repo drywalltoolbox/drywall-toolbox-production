@@ -5,7 +5,7 @@ import remarkGfm from 'remark-gfm';
 import Reviews from './Reviews';
 import TechnicalSpecifications from './TechnicalSpecifications';
 import { useCart } from '../../context/CartContext';
-import { Heart, Plus, Minus, X, ShoppingCart, CheckCircle2, PackageCheck } from 'lucide-react';
+import { Heart, Plus, Minus, X, ShoppingCart, CheckCircle2, PackageCheck, Truck, RotateCcw, PhoneCall } from 'lucide-react';
 import ProductImageGallery from './ProductImageGallery';
 import { getProductSpecifications } from '../../utils/productSpecifications';
 import { getProductVariations } from '../../services/api';
@@ -27,6 +27,12 @@ const BRAND_LOGOS = {
   'Graco': gracoLogo,
   'Level 5': level5Logo,
 };
+
+const TRUST_SIGNALS = [
+  { Icon: Truck,      label: 'Free Shipping', sub: '$199+' },
+  { Icon: RotateCcw, label: 'Easy Returns',  sub: null },
+  { Icon: PhoneCall, label: 'Expert',        sub: 'Support' },
+];
 
 function buildSeedVariations(initialVariations = [], initialResolvedVariation = null) {
   const seeded = [];
@@ -371,6 +377,9 @@ export default function ProductDetail({
                             >
                               <span className="block text-sm font-bold text-gray-900 leading-tight">
                                 {option.value}
+                                {selected && (
+                                  <span className="ml-1.5 inline-block w-2 h-2 rounded-full bg-gray-900 align-middle" aria-label="selected" />
+                                )}
                               </span>
                               <span className={`mt-1 block text-xs font-semibold ${
                                 soldOut ? 'text-red-600' : 'text-gray-500'
@@ -472,6 +481,17 @@ export default function ProductDetail({
                     ? 'SELECT OPTIONS'
                     : 'ADD TO CART'}
               </button>
+              {/* Trust signals */}
+              <div className="grid grid-cols-3 gap-2 pt-3 border-t border-gray-100">
+                {TRUST_SIGNALS.map(({ Icon, label, sub }) => (
+                  <div key={label} className="flex flex-col items-center gap-1 text-center">
+                    <Icon size={14} className="text-gray-400" aria-hidden="true" />
+                    <span className="text-[10px] sm:text-xs text-gray-500 font-medium leading-tight">
+                      {label}{sub ? <><br />{sub}</> : null}
+                    </span>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
 
@@ -584,6 +604,7 @@ export default function ProductDetail({
               )}
             </div>
           </div>
+
         </div>
       </div>
 
