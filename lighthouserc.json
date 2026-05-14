@@ -5,7 +5,7 @@
         "https://drywalltoolbox.com/",
         "https://elliotttmiller.github.io/drywall-toolbox/"
       ],
-      "numberOfRuns": 3,
+      "numberOfRuns": 2,
       "settings": {
         "preset": "desktop",
         "throttling": {
