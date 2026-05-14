@@ -11,6 +11,7 @@ import { getProductSpecifications } from '../../utils/productSpecifications';
 import { getProductVariations } from '../../services/api';
 import { findMatchingVariation, getVariationSelectionMap } from '../../utils/variationSelection';
 import { setCachedVariations } from '../../utils/variationCache';
+import { apiClient } from '../../api/client.js';
 import columbiaLogo from '/brands/Columbia/columbia_taping_tools_logo.svg';
 import tapeTechLogo from '/brands/TapeTech/tapetech_logo.svg';
 import surproLogo from '/brands/SurPro/surpro_logo.svg';
@@ -87,6 +88,8 @@ export default function ProductDetail({
   const [variationsLoading, setVariationsLoading] = useState(false);
   // selectedAttrs: { [attrName]: value } — tracks the user's chip selections
   const [selectedAttrs, setSelectedAttrs]       = useState(initialVariationSelection);
+  // computedData: server-side computed state from the detail endpoint, including available_option_matrix
+  const [computedData, setComputedData]         = useState(null);
 
   // Stable boolean dep: false until the parent has prefetched variations, then
   // true forever for this product.  Using the raw array as a dep would create a
@@ -110,6 +113,7 @@ export default function ProductDetail({
 
     Promise.resolve().then(() => {
       if (!mounted) return;
+      setComputedData(null);
       setVariations(currentSeeded);
       setSelectedAttrs(
         Object.keys(currentInitialAttrs || {}).length > 0
@@ -121,41 +125,61 @@ export default function ProductDetail({
       setVariationsLoading(!hasInitialVariations);
     });
 
+    // Primary: use the slug-based detail endpoint which returns server-computed
+    // available_option_matrix alongside properly-normalised variations.
+    const applyVariations = (vars) => {
+      if (!mounted || !Array.isArray(vars) || vars.length === 0) return false;
+      setVariations(vars);
+      if (Object.keys(currentInitialAttrs || {}).length > 0) {
+        setSelectedAttrs(currentInitialAttrs);
+      } else {
+        const firstInStock = vars.find((v) => v.stock_status !== 'outofstock') || vars[0];
+        setSelectedAttrs(getVariationSelectionMap(firstInStock));
+      }
+      return true;
+    };
+
     Promise.resolve()
-      .then(() => {
+      .then(async () => {
         if (!mounted) return;
-        // Bypass the shared variation cache for modal-triggered fetches.
-        // The background card-prefetch caches only successful (non-empty)
-        // results now, but calling the API directly here guarantees the modal
-        // always gets a fresh response — critical if the user opens a product
-        // before the prefetch has completed or if WooCommerce has since updated
-        // the variation data.  A successful response is written back to the
-        // cache so card display and future prefetches benefit from the data.
-        return getProductVariations(product.id);
-      })
-      .then((vars) => {
-        if (!mounted || !vars) return;
-        // Update the shared cache so card display and future prefetches stay
-        // in sync with the authoritative result from this modal fetch.
-        if (Array.isArray(vars) && vars.length > 0) {
+
+        // Try the detail endpoint first (proven path used by ProductDetailPage).
+        if (product.slug) {
+          try {
+            const data = await apiClient(
+              `/wp-json/drywall/v1/products/slug/${encodeURIComponent(product.slug)}/detail`
+            );
+            if (!mounted) return;
+            if (data?.computed) setComputedData(data.computed);
+            const detailVars = Array.isArray(data?.variations) && data.variations.length > 0
+              ? data.variations
+              : null;
+            if (detailVars) {
+              setCachedVariations(product.id, detailVars);
+              applyVariations(detailVars);
+              return;
+            }
+          } catch {
+            // fall through to getProductVariations
+            if (!mounted) return;
+          }
+        }
+
+        // Fallback: fetch variations directly and write non-empty results to the
+        // shared cache so card display and future prefetches stay in sync.
+        try {
+          const vars = await getProductVariations(product.id);
+          if (!mounted || !Array.isArray(vars) || vars.length === 0) return;
           setCachedVariations(product.id, vars);
-        }
-        setVariations(vars);
-        // Use card-selected attributes when available; otherwise default to the
-        // first in-stock variation.  setVariationsLoading(false) is always
-        // called by the .finally() handler below regardless of this branch.
-        if (Object.keys(currentInitialAttrs || {}).length > 0) {
-          setSelectedAttrs(currentInitialAttrs);
-        } else {
-          const firstInStock = vars.find((v) => v.stock_status !== 'outofstock') || vars[0];
-          setSelectedAttrs(getVariationSelectionMap(firstInStock));
+          applyVariations(vars);
+        } catch {
+          /* variations not critical — fail silently */
         }
       })
-      .catch(() => { /* variations not critical — fail silently */ })
       .finally(() => { if (mounted) setVariationsLoading(false); });
 
     return () => { mounted = false; };
-  }, [product?.id, product?.is_variable, hasInitialVariations]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [product?.id, product?.slug, product?.is_variable, hasInitialVariations]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Find the variation that matches the current chip selections
   const selectedVariation = useMemo(
@@ -174,10 +198,35 @@ export default function ProductDetail({
 
   const variantOptionMeta = useMemo(() => {
     const meta = {};
+    const matrix = computedData?.available_option_matrix ?? {};
+
     variationAttributes.forEach((attr) => {
       const name = attr.name;
       const options = Array.isArray(attr.options) ? attr.options : [];
+      const attrMatrix = matrix[name] ?? {};
+      const lowerMatrix = Object.entries(attrMatrix).reduce((acc, [key, value]) => {
+        acc[String(key).toLowerCase()] = value;
+        return acc;
+      }, {});
+
       meta[name] = options.map((option) => {
+        // Prefer the server-computed option matrix. It's keyed by the exact
+        // WooCommerce option value, with a case-insensitive fallback.
+        const matrixEntry = attrMatrix[option] ?? lowerMatrix[String(option).toLowerCase()];
+
+        if (matrixEntry) {
+          const matchedVariation = variations.find((v) => v.id === matrixEntry.variation_id) || null;
+          const status = !matrixEntry.purchasable
+            ? 'unavailable'
+            : matrixEntry.stock_status === 'outofstock' ? 'sold-out' : 'available';
+          return {
+            value: option,
+            variation: matchedVariation,
+            status,
+            price: matchedVariation?.price ?? null,
+          };
+        }
+
         const candidateSelection = { ...selectedAttrs, [name]: option };
         const exact = findMatchingVariation(variations, candidateSelection);
         const fallback = exact || variations.find((variation) => {
@@ -195,7 +244,7 @@ export default function ProductDetail({
       });
     });
     return meta;
-  }, [variationAttributes, variations, selectedAttrs]);
+  }, [variationAttributes, variations, selectedAttrs, computedData]);
 
   // Lock body scroll while this detail panel is mounted
   useEffect(() => {
@@ -235,7 +284,9 @@ export default function ProductDetail({
 
   const handleAddToCart = () => {
     if (!canAddToCart) return;
-    const productToAdd = selectedVariation || product;
+    const productToAdd = selectedVariation
+      ? { ...selectedVariation, name: selectedVariation.name || product.name }
+      : product;
     if (onAddToCart) {
       onAddToCart(productToAdd, quantity);
     } else {
@@ -299,30 +350,55 @@ export default function ProductDetail({
                   {isOutOfStock ? <PackageCheck size={13} aria-hidden="true" /> : <CheckCircle2 size={13} aria-hidden="true" />}
                   {isOutOfStock ? 'Out of Stock' : 'In Stock'}
                 </span>
-                {product.brand && (
+                {product.brand && BRAND_LOGOS[product.brand] ? (
+                  <img
+                    src={BRAND_LOGOS[product.brand]}
+                    alt={product.brand}
+                    className="h-5 sm:h-6 w-auto object-contain"
+                  />
+                ) : product.brand ? (
                   <span className="text-xs sm:text-sm font-semibold uppercase tracking-wide text-gray-500">{product.brand}</span>
-                )}
+                ) : null}
               </div>
 
               {/* Product Title — updates to variation name when a variation is selected */}
-              <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 mb-3 sm:mb-4 leading-tight pr-10">
+              <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 mb-1 leading-tight pr-10">
                 {(effectiveProduct.name || product.name) || product.sku || product.part_number}
               </h2>
 
-              {/* Rating — Placeholder */}
-              <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 mb-4 sm:mb-6 text-xs sm:text-sm">
-                <div className="flex" aria-label="0 out of 5 stars">
-                  {[...Array(5)].map((_, i) => (
-                    <svg key={i} className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-gray-300" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
-                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                    </svg>
-                  ))}
-                </div>
-                <span className="text-gray-500">No reviews yet</span>
-                <button className="text-blue-600 hover:underline">Write a Review</button>
+              {/* SKU & UPC — reflects selected variation when applicable */}
+              <div className="mb-3 sm:mb-4 space-y-1 text-xs sm:text-sm text-gray-500">
+                {effectiveSku && (
+                  <div>
+                    <span className="font-medium text-gray-400 mr-1">SKU:</span>
+                    <span className="font-mono">{effectiveSku}</span>
+                  </div>
+                )}
+                {product.upc && (
+                  <div>
+                    <span className="font-medium text-gray-400 mr-1">UPC:</span>
+                    <span className="font-mono">{product.upc}</span>
+                  </div>
+                )}
               </div>
 
-              {/* Price */}
+              {/* Rating — clickable stars open reviews tab */}
+              <button
+                type="button"
+                onClick={() => setActiveTab('reviews')}
+                className="flex items-center gap-0.5 mb-5 sm:mb-6 group cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 rounded"
+                aria-label="View reviews, 0 out of 5 stars, no reviews yet"
+              >
+                {[...Array(5)].map((_, i) => (
+                  <svg key={i} className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-gray-300 group-hover:text-yellow-400 transition-colors" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                  </svg>
+                ))}
+              </button>
+
+              {/* Price — separated from descriptive info by a hairline rule */}
+              <hr className="border-gray-100 mb-4 sm:mb-5" />
+
               <div className="mb-4 sm:mb-6">
                 <div className="flex flex-wrap items-baseline gap-2">
                   <span className="text-3xl sm:text-4xl font-bold text-gray-900">
@@ -334,9 +410,9 @@ export default function ProductDetail({
                     </span>
                   )}
                 </div>
-                {needsVariation && (
+                {needsVariation && selectedVariationName && (
                   <p className="mt-1 text-xs sm:text-sm text-gray-500">
-                    {selectedVariationName ? selectedVariationName : 'Select an option for live price, SKU, and stock.'}
+                    {selectedVariationName}
                   </p>
                 )}
               </div>
@@ -368,17 +444,17 @@ export default function ProductDetail({
                               type="button"
                               onClick={() => setSelectedAttrs(prev => ({ ...prev, [attr.name]: option.value }))}
                               disabled={disabled}
-                              className={`min-h-14 rounded-lg border px-3 py-2 text-left transition-all ${
+                              className={`min-h-14 rounded-2xl border-2 px-3 py-2 text-left transition-all ${
                                 selected
-                                  ? 'border-blue-600 bg-blue-50 shadow-sm ring-2 ring-blue-100'
-                                  : 'border-gray-200 bg-white hover:border-gray-400 hover:bg-gray-50'
-                              } ${disabled ? 'cursor-not-allowed opacity-45 hover:border-gray-200 hover:bg-white' : ''}`}
+                                  ? 'border-gray-900 bg-gray-50 shadow-sm'
+                                  : 'border-gray-200 bg-white hover:border-gray-500 hover:bg-gray-50'
+                              } ${disabled ? 'cursor-not-allowed opacity-40 hover:border-gray-200 hover:bg-white' : ''}`}
                               aria-pressed={selected}
                             >
                               <span className="block text-sm font-bold text-gray-900 leading-tight">
                                 {option.value}
                                 {selected && (
-                                  <span className="ml-1.5 inline-block w-2 h-2 rounded-full bg-gray-900 align-middle" aria-label="selected" />
+                                  <span className="ml-1.5 inline-block w-2 h-2 rounded-full bg-gray-900 align-middle" aria-hidden="true" />
                                 )}
                               </span>
                               <span className={`mt-1 block text-xs font-semibold ${
@@ -410,22 +486,6 @@ export default function ProductDetail({
                   )}
                 </div>
               )}
-
-              {/* SKU & UPC — reflects selected variation when applicable */}
-              <div className="mb-4 sm:mb-6 space-y-1 text-xs sm:text-sm text-gray-600">
-                {effectiveSku && (
-                  <div>
-                    <span className="font-medium">SKU:</span>{' '}
-                    <span className="font-mono">{effectiveSku}</span>
-                  </div>
-                )}
-                {product.upc && (
-                  <div>
-                    <span className="font-medium">UPC:</span>{' '}
-                    <span className="font-mono">{product.upc}</span>
-                  </div>
-                )}
-              </div>
 
               {/* Quantity + Wishlist row */}
               <div className="flex items-center gap-3 mb-4">
@@ -472,7 +532,7 @@ export default function ProductDetail({
               <button
                 onClick={handleAddToCart}
                 disabled={!canAddToCart}
-                className="w-full flex items-center justify-center gap-2.5 h-12 px-6 bg-blue-600 hover:bg-blue-700 active:scale-[0.98] text-white font-semibold text-sm tracking-wide rounded-xl transition-all mb-4 sm:mb-6 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100"
+                className="w-full flex items-center justify-center gap-2.5 h-12 px-6 bg-blue-600 hover:bg-blue-700 active:scale-[0.98] text-white font-semibold text-sm tracking-wide rounded-xl transition-all mb-4 sm:mb-5 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100"
               >
                 <ShoppingCart size={17} aria-hidden="true" />
                 {isOutOfStock
