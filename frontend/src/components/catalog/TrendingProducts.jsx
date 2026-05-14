@@ -56,62 +56,51 @@ export default function TrendingProducts() {
     getProducts().then((allProducts) => {
       if (!mounted) return;
 
-      const taperKeywords = ['automatic taper', 'taper', 'taping tool'];
-      const withPrice = allProducts.filter(p => {
+      // Filter to only TOOLS (exclude parts and accessories)
+      const toolsOnly = allProducts.filter(p => {
+        // Exclude products in the 'parts' category
+        return p.category !== 'parts';
+      });
+
+      // Filter for products with valid prices
+      const withPrice = toolsOnly.filter(p => {
         const price = Number(p.price) || Number(p.min_price) || 0;
         return price > 0;
       });
 
+      // Group all tools by brand
       const groupedByBrand = {};
-
       withPrice.forEach(p => {
         const brandName = p.brand || 'Other';
-        if (!groupedByBrand[brandName]) groupedByBrand[brandName] = { tapers: [], others: [] };
-
-        const productPrice = Number(p.price) || Number(p.min_price) || 0;
-        const isTaper = taperKeywords.some(key =>
-          (p.name || '').toLowerCase().includes(key) ||
-          (p.category || '').toLowerCase().includes(key)
-        );
-
-        if (isTaper) groupedByBrand[brandName].tapers.push(p);
-        else if (productPrice > 100) groupedByBrand[brandName].others.push(p);
+        if (!groupedByBrand[brandName]) {
+          groupedByBrand[brandName] = [];
+        }
+        groupedByBrand[brandName].push(p);
       });
 
       let balancedSelection = [];
       const brandKeys = Object.keys(groupedByBrand);
 
+      // For each brand, take the top 4 highest-priced tools and add them to selection
+      // This ensures brand variety while showing premium tools
       brandKeys.forEach(brand => {
-        const brandGroup = groupedByBrand[brand];
-        brandGroup.tapers.sort((a, b) => {
+        const brandTools = groupedByBrand[brand];
+        brandTools.sort((a, b) => {
           const aPrice = Number(a.price) || Number(a.min_price) || 0;
           const bPrice = Number(b.price) || Number(b.min_price) || 0;
-          return bPrice - aPrice;
+          return bPrice - aPrice; // Sort descending by price
         });
-        balancedSelection.push(...brandGroup.tapers.slice(0, 3));
+        balancedSelection.push(...brandTools.slice(0, 4));
       });
 
-      if (balancedSelection.length < 12) {
-        brandKeys.forEach(brand => {
-          const brandGroup = groupedByBrand[brand];
-          brandGroup.others.sort((a, b) => {
-            const aPrice = Number(a.price) || Number(a.min_price) || 0;
-            const bPrice = Number(b.price) || Number(b.min_price) || 0;
-            return bPrice - aPrice;
-          });
-          balancedSelection.push(...brandGroup.others.slice(0, 2));
-        });
-      }
-
+      // Final sort: by price descending within the balanced selection
       balancedSelection.sort((a, b) => {
-        const aIsTaper = taperKeywords.some(key => (a.name || '').toLowerCase().includes(key));
-        const bIsTaper = taperKeywords.some(key => (b.name || '').toLowerCase().includes(key));
-
-        if (aIsTaper && !bIsTaper) return -1;
-        if (!aIsTaper && bIsTaper) return 1;
-
-        if (Math.abs((b.price || 0) - (a.price || 0)) > 50) return (b.price || 0) - (a.price || 0);
-        return (a.brand || '').localeCompare(b.brand || '');
+        const aPrice = Number(a.price) || Number(a.min_price) || 0;
+        const bPrice = Number(b.price) || Number(b.min_price) || 0;
+        if (Math.abs(bPrice - aPrice) > 1) {
+          return bPrice - aPrice; // Higher priced first
+        }
+        return (a.brand || '').localeCompare(b.brand || ''); // Fallback to brand name
       });
 
       setProducts(balancedSelection.slice(0, 16));
