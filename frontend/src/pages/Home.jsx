@@ -30,7 +30,7 @@ export default function Home() {
 
       <div className="page-wrapper dtb-home-page">
         <HeroSection
-          titleLines={["The Pro Standard", "in Drywall."]}
+          titleLines={["The New Standard", "in Drywall."]}
           subtitle="Premium tools for every drywall job — unbeatable prices, lightning-fast shipping."
           brands={brandLogos}
         />
