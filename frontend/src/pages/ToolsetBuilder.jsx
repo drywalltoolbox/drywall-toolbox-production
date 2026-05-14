@@ -40,8 +40,8 @@ import Toast from '../components/ui/Toast';
 import { getProducts } from '../services/catalog';
 import { PLACEHOLDER_IMAGE } from '../constants/images.js';
 import { getProductVariations } from '../services/api';
+import { apiClient } from '../api/client.js';
 import { useCart } from '../context/CartContext';
-import { fetchVariationsBatched } from '../utils/variationSelection';
 import {
   SET_TEMPLATES, SCOPE_LABELS, SCOPE_COLORS,
   BUILDER_BRANDS, getSlotProducts,
@@ -129,6 +129,38 @@ const fmtPrice = (p) => {
   if (!p) return '';
   const n = price(p);
   return `$${n.toFixed(2)}`;
+};
+const productKey = (p) => `${p?.parent_id || 'p'}:${p?.id}`;
+const fetchBuilderVariations = async (product) => {
+  if (!product?.id) return [];
+
+  if (product.slug) {
+    try {
+      const data = await apiClient(
+        `/wp-json/drywall/v1/products/slug/${encodeURIComponent(product.slug)}/detail`
+      );
+      if (Array.isArray(data?.variations) && data.variations.length > 0) {
+        return data.variations;
+      }
+    } catch {
+      // Fall back to the legacy variations endpoint below.
+    }
+  }
+
+  const vars = await getProductVariations(product.id);
+  return Array.isArray(vars) ? vars : [];
+};
+const variationLabel = (p) => {
+  const attrs = Array.isArray(p?.variation_attribute_values)
+    ? p.variation_attribute_values
+    : p?.variation_attribute
+      ? [p.variation_attribute]
+      : [];
+
+  return attrs
+    .map((attr) => attr?.option)
+    .filter(Boolean)
+    .join(' / ');
 };
 
 // ─── Stage bar ────────────────────────────────────────────────────────────────
@@ -399,13 +431,15 @@ function CompareDrawer({ items, onClose, onSelect, activeSlotId, slotSelections 
         </div>
         <div className="tsb-compare-grid">
           {items.map((product) => {
-            const isSelected = slotSelections[activeSlotId]?.id === product.id;
+            const isSelected = productKey(slotSelections[activeSlotId]) === productKey(product);
+            const optionLabel = variationLabel(product);
             return (
-              <div key={product.id} className={`tsb-compare-col${isSelected ? ' --selected' : ''}`}>
+              <div key={productKey(product)} className={`tsb-compare-col${isSelected ? ' --selected' : ''}`}>
                 <div className="tsb-compare-img">
                   <img src={img(product)} alt={product.name} onError={(e) => { e.currentTarget.src = PLACEHOLDER; }} />
                 </div>
                 <p className="tsb-compare-name">{product.name}</p>
+                {optionLabel && <p className="tsb-compare-variant">{optionLabel}</p>}
                 {product.sku && <p className="tsb-compare-sku">{product.sku}</p>}
                 <p className="tsb-compare-price">{fmtPrice(product)}</p>
                 {product.short_description && (
@@ -459,7 +493,11 @@ function Stage2({ template, allProducts, slotSelections, onSlotSelect, onBack, o
     if (variableIds.length === 0) return;
 
     let mounted = true;
-    fetchVariationsBatched(variableIds, getProductVariations)
+    Promise.all(
+      slotProducts
+        .filter((p) => variableIds.includes(p.id))
+        .map((product) => fetchBuilderVariations(product).then((vars) => [product.id, vars]))
+    )
       .then((pairs) => {
         if (!mounted) return;
         const next = {};
@@ -484,20 +522,13 @@ function Stage2({ template, allProducts, slotSelections, onSlotSelect, onBack, o
         return [product];
       }
 
-      const matchingVariations = variations.filter((variation) => {
-        const name = (variation?.name || '').toLowerCase();
-        return !name || activeSlot.filter(name);
-      });
-
-      if (matchingVariations.length === 0) {
-        return [product];
-      }
-
-      return matchingVariations.map((variation) => ({
+      return variations.map((variation) => ({
         ...product,
         ...variation,
         parent_id: variation.parent_id || product.id,
         parent_name: product.name,
+        is_variable: false,
+        type: 'variation',
       }));
     });
   }, [activeSlot, slotProducts, slotVariationMap]);
@@ -541,8 +572,9 @@ function Stage2({ template, allProducts, slotSelections, onSlotSelect, onBack, o
   const toggleCompare = useCallback((product) => {
     setCompareItems((prev) => {
       let nextItems;
-      if (prev.find((p) => p.id === product.id)) {
-        nextItems = prev.filter((p) => p.id !== product.id);
+      const key = productKey(product);
+      if (prev.find((p) => productKey(p) === key)) {
+        nextItems = prev.filter((p) => productKey(p) !== key);
       } else if (prev.length >= 2) {
         nextItems = [prev[1], product];
       } else {
@@ -660,11 +692,13 @@ function Stage2({ template, allProducts, slotSelections, onSlotSelect, onBack, o
           ) : (
             <div className="tsb-product-grid">
               {filteredProducts.map((product, idx) => {
-                const isSelected = slotSelections[activeSlot.id]?.id === product.id;
-                const isComparing = compareItems.some((p) => p.id === product.id);
+                const selectedProduct = slotSelections[activeSlot.id];
+                const isSelected = selectedProduct && productKey(selectedProduct) === productKey(product);
+                const isComparing = compareItems.some((p) => productKey(p) === productKey(product));
+                const optionLabel = variationLabel(product);
                 return (
                   <div
-                    key={product.id}
+                    key={productKey(product)}
                     className={`tsb-product-card${isSelected ? ' --selected' : ''}${isComparing ? ' --comparing' : ''}`}
                     style={{ animationDelay: `${Math.min(idx, 10) * 0.04}s` }}
                   >
@@ -685,9 +719,9 @@ function Stage2({ template, allProducts, slotSelections, onSlotSelect, onBack, o
 
                     {/* Info */}
                     <div className="tsb-product-info">
-                      {product.type === 'variation' && product.variation_attribute?.option && (
+                      {product.type === 'variation' && optionLabel && (
                         <p className="tsb-product-variant-chip">
-                          {product.variation_attribute.name || 'Option'}: {product.variation_attribute.option}
+                          {optionLabel}
                         </p>
                       )}
                       <p className="tsb-product-name">{product.name}</p>
@@ -950,13 +984,15 @@ export default function ToolsetBuilder() {
                 <img src={BRAND_LOGOS[template.brand]} alt={template.brand} className="tsb-kit-bar-logo"
                   onError={(e) => { e.currentTarget.style.display = 'none'; }} />
               )}
+            </div>
+            <div className="tsb-kit-bar-center">
               <div>
                 <p className="tsb-kit-bar-name">{template.name}</p>
                 <p className="tsb-kit-bar-progress">
                   {stage === 2 
                     ? `${template.slots.filter((s) => s.required && slotSelections[s.id]).length}/${template.slots.filter((s) => s.required).length} required slots filled`
                     : `${Object.keys(slotSelections).length} tool${Object.keys(slotSelections).length !== 1 ? 's' : ''} configured`}
-                </p>
+                  </p>
               </div>
             </div>
             <div className="tsb-kit-bar-right">

@@ -30,11 +30,17 @@ function nameContainsAllOf(...strs) {
 function nameContainsButNot(must, ...nots) {
   return (name) => must.every((m) => name.includes(m)) && !nots.some((n) => name.includes(n));
 }
+function isFlatBoxTool(name) {
+  return (
+    nameContainsAny('flat box', 'finishing box', 'skimming box', 'fat boy')(name) &&
+    !nameContainsAny('handle', 'filler', 'pump', 'adapter', 'gooseneck', 'repair', 'replacement', 'part')(name)
+  );
+}
 
 // ── TapeTech slot filters ─────────────────────────────────────────────────────
 const TT = {
   taper:           nameContainsButNot(['taper'], 'angle', 'corner', 'roller', 'handle', 'pump', 'filler', 'gooseneck', 'adapter', 'part'),
-  flatBox:         nameContainsAny('flat box', 'finishing box', '7" box', '8" box', '10" box', '12" box', '14" box', '7-inch box', '10-inch box', '12-inch box'),
+  flatBox:         isFlatBoxTool,
   boxHandle:       (name) => (name.includes('box handle') || (name.includes('handle') && name.includes('box'))) && !name.includes('corner') && !name.includes('angle'),
   angleHead:       (name) => name.includes('angle head') && !name.includes('handle') && !name.includes('adapter') && !name.includes('part'),
   cornerApplicator:(name) => (name.includes('corner applicator') || (name.includes('corner box') && !name.includes('handle'))) && !name.includes('part'),
@@ -46,7 +52,7 @@ const TT = {
 // ── Columbia slot filters ─────────────────────────────────────────────────────
 const COL = {
   taper:         nameContainsButNot(['taper'], 'angle', 'corner', 'roller', 'handle', 'pump', 'filler', 'gooseneck', 'adapter', 'part'),
-  flatBox:       nameContainsAny('flat box', 'finishing box', '7"', '8"', '10"', '12"', '14"'),
+  flatBox:       isFlatBoxTool,
   boxHandle:     (name) => (name.includes('box handle') || (name.includes('handle') && name.includes('box'))) && !name.includes('corner') && !name.includes('angle'),
   angleHead:     (name) => name.includes('angle head') && !name.includes('handle') && !name.includes('adapter'),
   cornerBox:     (name) => name.includes('corner box') && !name.includes('handle'),
@@ -57,7 +63,7 @@ const COL = {
 
 // ── Level 5 slot filters ──────────────────────────────────────────────────────
 const L5 = {
-  flatBox:    nameContainsAny('flat box', 'finishing box', 'skimming box'),
+  flatBox:    isFlatBoxTool,
   boxHandle:  (name) => name.includes('handle') && (name.includes('box') || name.includes('flat')),
   angleHead:  (name) => name.includes('angle head') && !name.includes('handle'),
   cornerBox:  (name) => name.includes('corner') && !name.includes('handle'),
@@ -67,7 +73,7 @@ const L5 = {
 // ── Asgard slot filters ───────────────────────────────────────────────────────
 const ASG = {
   taper:      nameContainsButNot(['taper'], 'handle', 'part'),
-  flatBox:    nameContainsAny('flat box', 'finishing box'),
+  flatBox:    isFlatBoxTool,
   boxHandle:  (name) => name.includes('handle') && name.includes('box'),
   angleHead:  (name) => name.includes('angle head') && !name.includes('handle'),
   cornerBox:  (name) => name.includes('corner') && !name.includes('handle'),
