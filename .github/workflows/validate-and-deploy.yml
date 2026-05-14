@@ -60,10 +60,9 @@ jobs:
           # ── Live backend endpoints ─────────────────────────────────────────────
           # Use the domain-root canonical URLs — the root .htaccess rewrites
           # /wp-json/* → /wp/wp-json/* so our CORS mu-plugin intercepts correctly.
+          # Avoid /wp/wp-json/ directly: it bypasses the rewrite alias and CORS handler.
           REACT_APP_WP_BASE_URL: 'https://drywalltoolbox.com'
           REACT_APP_WC_BASE_URL: 'https://drywalltoolbox.com/wp-json/wc/v3'
-          REACT_APP_WC_AUTH_USER: ${{ secrets.REACT_APP_WC_AUTH_USER }}
-          REACT_APP_WC_AUTH_PASS: ${{ secrets.REACT_APP_WC_AUTH_PASS }}
           REACT_APP_WP_API_BASE: 'https://drywalltoolbox.com/wp-json'
           REACT_APP_WC_API_BASE: 'https://drywalltoolbox.com/wp-json/wc/v3'
           REACT_APP_JWT_ENDPOINT: 'https://drywalltoolbox.com/wp-json/simple-jwt-login/v1/auth'
@@ -74,7 +73,6 @@ jobs:
           REACT_APP_SITE_URL: 'https://elliotttmiller.github.io/drywall-toolbox'
           REACT_APP_APP_ENV: production
           REACT_APP_ENV: production
-          REACT_APP_STRIPE_PUBLISHABLE_KEY: ${{ secrets.REACT_APP_STRIPE_PUBLISHABLE_KEY }}
           # Founding-member promo window — ISO-8601 date; leave blank to disable
           REACT_APP_STORE_LAUNCH_DATE: ''
 
@@ -124,8 +122,6 @@ jobs:
           PUBLIC_URL: ''
           REACT_APP_WP_BASE_URL: 'https://drywalltoolbox.com'
           REACT_APP_WC_BASE_URL: 'https://drywalltoolbox.com/wp-json/wc/v3'
-          REACT_APP_WC_AUTH_USER: ${{ secrets.REACT_APP_WC_AUTH_USER }}
-          REACT_APP_WC_AUTH_PASS: ${{ secrets.REACT_APP_WC_AUTH_PASS }}
           REACT_APP_WP_API_BASE: 'https://drywalltoolbox.com/wp-json'
           REACT_APP_WC_API_BASE: 'https://drywalltoolbox.com/wp-json/wc/v3'
           REACT_APP_JWT_ENDPOINT: 'https://drywalltoolbox.com/wp-json/simple-jwt-login/v1/auth'
@@ -134,7 +130,6 @@ jobs:
           REACT_APP_SITE_URL: 'https://drywalltoolbox.com'
           REACT_APP_APP_ENV: production
           REACT_APP_ENV: production
-          REACT_APP_STRIPE_PUBLISHABLE_KEY: ${{ secrets.REACT_APP_STRIPE_PUBLISHABLE_KEY }}
           REACT_APP_STORE_LAUNCH_DATE: ''
 
       - name: Run Lighthouse CI
