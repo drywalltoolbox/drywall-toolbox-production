@@ -18,8 +18,8 @@ import { useCatalogProducts } from '../hooks/useCatalogProducts';
 import { useCart } from '../context/CartContext';
 import { buildSiteLinksSearchBoxSchema } from '../utils/schema';
 import { getVariationSelectionMap } from '../utils/variationSelection';
+import { getBrandLogo } from '../utils/brandAssets.js';
 import {
-  brandLogoFor,
   brandToSlug,
   buildCatalogUrl,
   canonicalBrandLabel,
@@ -104,9 +104,28 @@ function toBrandFacet(rawBrand = {}) {
     key: rawBrand.key || slug,
     label,
     slug,
-    logo: rawBrand.logo || rawBrand.image || rawBrand.imageUrl || brandLogoFor(label || slug),
+    logo: rawBrand.logo || rawBrand.image || rawBrand.imageUrl || getBrandLogo(label || slug),
     productCount: rawBrand.productCount || rawBrand.count || 0,
   };
+}
+
+function CatalogError({ title, message, details, onRetry }) {
+  return (
+    <div className="rounded-2xl border border-red-100 bg-red-50 p-6 text-red-900">
+      <h2 className="text-lg font-bold mb-2">{title}</h2>
+      <p className="text-sm mb-3">{message}</p>
+      {details && <pre className="text-xs whitespace-pre-wrap bg-white/70 rounded-lg p-3 mb-4 overflow-auto">{details}</pre>}
+      {onRetry && (
+        <button
+          type="button"
+          onClick={onRetry}
+          className="inline-flex items-center justify-center px-4 py-2 rounded-lg bg-red-600 text-white text-sm font-semibold hover:bg-red-700"
+        >
+          Reload catalog
+        </button>
+      )}
+    </div>
+  );
 }
 
 export default function ProductsCatalogPlatform({ forceProductGrid = false, title = 'Products' } = {}) {
@@ -131,11 +150,11 @@ export default function ProductsCatalogPlatform({ forceProductGrid = false, titl
 
   const selectedBrand = query.brands?.[0] || '';
 
-  const { facets, loading: facetsLoading } = useCatalogFacets({
+  const { facets, loading: facetsLoading, error: facetsError } = useCatalogFacets({
     isParts: 0,
     brand: selectedBrand,
   });
-  const { items, pagination, loading: itemsLoading } = useCatalogProducts({
+  const { items, pagination, loading: itemsLoading, error: productsError } = useCatalogProducts({
     ...query,
     isParts: 0,
   });
@@ -309,6 +328,24 @@ export default function ProductsCatalogPlatform({ forceProductGrid = false, titl
           <p className="text-gray-600">Browse our extensive collection of professional drywall tools</p>
         </div>
 
+        {facetsError && brandFacets.length === 0 && (
+          <CatalogError
+            title="Unable to load catalog brands"
+            message="The product brand selector depends on /wp-json/dtb/v1/catalog/facets. The request failed or returned an invalid response."
+            details={facetsError?.message || String(facetsError)}
+            onRetry={() => window.location.reload()}
+          />
+        )}
+
+        {productsError && !loading && mappedProducts.length === 0 && !showBrandLanding && (
+          <CatalogError
+            title="Unable to load products"
+            message="The product grid depends on /wp-json/dtb/v1/catalog/products. Check the live backend endpoint and WordPress error logs."
+            details={productsError?.message || String(productsError)}
+            onRetry={() => window.location.reload()}
+          />
+        )}
+
         {(selectedBrand || forceProductGrid) && (
           <SearchBar
             placeholder="Search products by name, SKU, or brand..."
@@ -354,6 +391,11 @@ export default function ProductsCatalogPlatform({ forceProductGrid = false, titl
                 </span>
               </button>
             ))}
+            {!facetsLoading && !facetsError && brandFacets.length === 0 && (
+              <div className="col-span-full text-center py-16 text-gray-600">
+                No product brands are currently available from the catalog facets endpoint.
+              </div>
+            )}
           </div>
         ) : showCategoryLanding ? (
           <div className="categories-grid">
@@ -455,7 +497,7 @@ export default function ProductsCatalogPlatform({ forceProductGrid = false, titl
                     </>
                   )}
 
-                  {mappedProducts.length === 0 && (
+                  {mappedProducts.length === 0 && !productsError && (
                     <div className="text-center py-16">
                       <ShoppingCart className="h-24 w-24 mx-auto mb-6 text-gray-300" />
                       <h2 className="text-2xl font-bold text-gray-900 mb-4">No products found</h2>
