@@ -17,7 +17,6 @@ import { useCatalogFacets } from '../hooks/useCatalogFacets';
 import { useCatalogProducts } from '../hooks/useCatalogProducts';
 import { useCart } from '../context/CartContext';
 import { buildSiteLinksSearchBoxSchema } from '../utils/schema';
-import { getVariationSelectionMap } from '../utils/variationSelection';
 import {
   buildCatalogUrl,
   parseCatalogQuery,
@@ -40,16 +39,20 @@ function toCardProduct(dto) {
     category: categoryKey,
     display_category: displayCategoryKey,
     display_category_label: dto?.displayCategory?.label || displayCategoryKey,
-    image: card?.image || dto?.media?.image || '',
+    image: dto?.media?.image || card?.image || '',
     images: dto?.media?.images || [],
     price: typeof price === 'number' ? price : parseFloat(String(price || 0)),
-    stock_status: card?.stockStatus || dto?.inventory?.stockStatus || 'instock',
+    stock_status: dto?.inventory?.stockStatus || card?.stockStatus || 'instock',
     is_variable: dto?.type === 'variable',
     is_parts: Boolean(dto?.isParts),
     min_price: dto?.price?.min ?? null,
     variation_attributes: dto?.variationAttributes || dto?.attributes || [],
   };
 
+  // Keep the backend-resolved default child available for non-visual flows, but
+  // do not use it to seed modal selection. Product-list cards and modal initial
+  // state must represent the variable parent; child data is activated only after
+  // an explicit user option selection inside ProductDetail.
   mapped.cardProduct = card
     ? {
         ...card,
@@ -209,15 +212,8 @@ export default function ProductsCatalogPlatform({ forceProductGrid = false, titl
     showToast(`${product.name} added to cart!`, 'cart');
   };
 
-  const openModal = (product, cardProduct = null) => {
-    const initialResolvedVariation = cardProduct?.parent_id ? cardProduct : null;
-    setModalProduct({
-      product,
-      initialResolvedVariation,
-      initialSelectedAttrs: initialResolvedVariation
-        ? getVariationSelectionMap(initialResolvedVariation)
-        : {},
-    });
+  const openModal = (product) => {
+    setModalProduct({ product });
     setIsModalOpen(true);
   };
 
@@ -392,9 +388,9 @@ export default function ProductsCatalogPlatform({ forceProductGrid = false, titl
                           key={product.id}
                           product={product}
                           cardProduct={cardProduct}
-                          hasSelectedVariation={Boolean(product.is_variable && cardProduct?.parent_id)}
-                          onOpenModal={() => openModal(product, cardProduct)}
-                          onAddToCart={() => openModal(product, cardProduct)}
+                          hasSelectedVariation={false}
+                          onOpenModal={() => openModal(product)}
+                          onAddToCart={() => openModal(product)}
                           index={index}
                         />
                       );
@@ -449,12 +445,12 @@ export default function ProductsCatalogPlatform({ forceProductGrid = false, titl
       <ProductModal isOpen={isModalOpen && !!modalProduct} product={modalProduct?.product || modalProduct} onClose={closeModal}>
         {modalProduct && (
           <ProductDetailPlatform
-            key={`${modalProduct.product?.id || modalProduct.id}:${modalProduct.initialResolvedVariation?.id || 'parent'}`}
+            key={`${modalProduct.product?.id || modalProduct.id}:parent`}
             product={modalProduct.product || modalProduct}
             onAddToCart={handleAddToCart}
             onClose={closeModal}
-            initialResolvedVariation={modalProduct.initialResolvedVariation}
-            initialSelectedAttrs={modalProduct.initialSelectedAttrs}
+            initialResolvedVariation={null}
+            initialSelectedAttrs={{}}
           />
         )}
       </ProductModal>
