@@ -53,11 +53,16 @@ function toCardProduct(dto) {
   mapped.cardProduct = card
     ? {
         ...card,
-        parent_id: card?.parentId || null,
-        stock_status: card?.stockStatus || mapped.stock_status,
+        parent_id: card?.parentId || card?.parent_id || null,
+        stock_status: card?.stockStatus || card?.stock_status || mapped.stock_status,
         image: card?.image || mapped.image,
+        images: card?.images || mapped.images,
+        image_thumbnail: card?.imageThumbnail || card?.image_thumbnail || mapped.image_thumbnail,
+        image_srcset: card?.imageSrcset || card?.image_srcset || mapped.image_srcset,
         price: card?.price ?? mapped.price,
         brand: mapped.brand,
+        parentName: mapped.name,
+        variation_label: card?.variationLabel || card?.variation_label || '',
       }
     : null;
 
@@ -88,7 +93,7 @@ function mergeDisplayCategories(displayCategoriesByBrand = {}) {
     .sort((a, b) => a.name.localeCompare(b.name));
 }
 
-export default function ProductsCatalogPlatform() {
+export default function ProductsCatalogPlatform({ forceProductGrid = false, title = 'Products' } = {}) {
   const location = useLocation();
   const navigate = useNavigate();
   const { brandSlug, categorySlug } = useParams();
@@ -252,10 +257,13 @@ export default function ProductsCatalogPlatform() {
     return product?.cardProduct || product;
   }, []);
 
+  const showBrandLanding = !forceProductGrid && !selectedBrand;
+  const showCategoryLanding = !forceProductGrid && selectedBrand && !query.displayCategory && brandCategoryCards.length > 1;
+
   return (
     <div className="min-h-screen bg-gray-50 page-wrapper">
       <SEOHead
-        title="Products"
+        title={title}
         description="Shop professional drywall tools from TapeTech, Columbia, Asgard, Graco, SurPro and more. Automatic taping tools, finishing tools, mud boxes, and replacement parts."
         canonical="https://drywalltoolbox.com/products"
         schema={buildSiteLinksSearchBoxSchema()}
@@ -271,11 +279,11 @@ export default function ProductsCatalogPlatform() {
         )}
 
         <div className="mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">Products</h1>
+          <h1 className="text-4xl font-bold text-gray-900 mb-2">{title}</h1>
           <p className="text-gray-600">Browse our extensive collection of professional drywall tools</p>
         </div>
 
-        {selectedBrand && (
+        {(selectedBrand || forceProductGrid) && (
           <SearchBar
             placeholder="Search products by name, SKU, or brand..."
             value={query.search || ''}
@@ -286,7 +294,7 @@ export default function ProductsCatalogPlatform() {
           />
         )}
 
-        {!selectedBrand ? (
+        {showBrandLanding ? (
           <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
             {brands.map((brand) => (
               <button
@@ -310,7 +318,7 @@ export default function ProductsCatalogPlatform() {
               </button>
             ))}
           </div>
-        ) : !query.displayCategory && brandCategoryCards.length > 1 ? (
+        ) : showCategoryLanding ? (
           <div className="categories-grid">
             {brandCategoryCards.map((cat, index) => (
               <button
