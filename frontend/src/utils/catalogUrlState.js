@@ -43,9 +43,8 @@ export const SLUG_TO_BRAND = Object.fromEntries(
   Object.entries(BRAND_TO_SLUG).map(([name, slug]) => [slug, name])
 );
 
-// Real brand logo assets should come from backend facet data or existing
-// public assets. Do not point to non-existent fallback URLs; 404s pollute the
-// console and obscure catalog/variation debugging.
+// Brand visual assets are owned by frontend/src/utils/brandAssets.js so bundled
+// imports can resolve through Webpack. Keep URL state free of asset imports.
 export const BRAND_LOGOS = {};
 
 // ── DTB category key → display label ─────────────────────────────────────────
@@ -219,8 +218,4 @@ export function brandToSlug(value) {
   const decoded = decodeURIComponent(String(value).trim());
   if (SLUG_TO_BRAND[decoded]) return decoded;
   return decoded.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
-}
-
-export function brandLogoFor(value) {
-  return BRAND_LOGOS[brandToSlug(value)] || '';
 }
