@@ -59,6 +59,12 @@ function getVariantStatus(variation) {
   return variation.stock_status === 'outofstock' ? 'sold-out' : 'available';
 }
 
+function buildInitialVariationSelection({ autoSelectDefaultVariation, initialSelectedAttrs, seededVariations }) {
+  if (Object.keys(initialSelectedAttrs || {}).length > 0) return initialSelectedAttrs;
+  if (!autoSelectDefaultVariation) return {};
+  return getVariationSelectionMap(seededVariations.find((v) => v.stock_status !== 'outofstock') || seededVariations[0] || {});
+}
+
 export default function ProductDetail({
   product,
   onAddToCart,
@@ -68,6 +74,7 @@ export default function ProductDetail({
   initialResolvedVariation = null,
   disableLegacyDetailFetch = false,
   initialComputedData = null,
+  autoSelectDefaultVariation = true,
 }) {
   const { addToCart } = useCart();
   const [quantity, setQuantity] = useState(1);
@@ -76,9 +83,11 @@ export default function ProductDetail({
 
   // ── Variable product variations ──────────────────────────────────────────
   const seededVariations = buildSeedVariations(initialVariations, initialResolvedVariation);
-  const initialVariationSelection = Object.keys(initialSelectedAttrs || {}).length > 0
-    ? initialSelectedAttrs
-    : getVariationSelectionMap(seededVariations.find((v) => v.stock_status !== 'outofstock') || seededVariations[0] || {});
+  const initialVariationSelection = buildInitialVariationSelection({
+    autoSelectDefaultVariation,
+    initialSelectedAttrs,
+    seededVariations,
+  });
 
   const [variations, setVariations]             = useState(seededVariations);
   const [variationsLoading, setVariationsLoading] = useState(false);
@@ -111,13 +120,11 @@ export default function ProductDetail({
       if (!mounted) return;
       setComputedData(initialComputedData);
       setVariations(currentSeeded);
-      setSelectedAttrs(
-        Object.keys(currentInitialAttrs || {}).length > 0
-          ? currentInitialAttrs
-          : getVariationSelectionMap(
-              currentSeeded.find((v) => v.stock_status !== 'outofstock') || currentSeeded[0] || {}
-            )
-      );
+      setSelectedAttrs(buildInitialVariationSelection({
+        autoSelectDefaultVariation,
+        initialSelectedAttrs: currentInitialAttrs,
+        seededVariations: currentSeeded,
+      }));
       setVariationsLoading(!hasInitialVariations && !disableLegacyDetailFetch);
     });
 
@@ -135,9 +142,11 @@ export default function ProductDetail({
       setVariations(vars);
       if (Object.keys(currentInitialAttrs || {}).length > 0) {
         setSelectedAttrs(currentInitialAttrs);
-      } else {
+      } else if (autoSelectDefaultVariation) {
         const firstInStock = vars.find((v) => v.stock_status !== 'outofstock') || vars[0];
         setSelectedAttrs(getVariationSelectionMap(firstInStock));
+      } else {
+        setSelectedAttrs({});
       }
       return true;
     };
