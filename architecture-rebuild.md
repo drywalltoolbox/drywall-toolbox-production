@@ -1,330 +1,292 @@
-# Live Import Readiness Audit
+Yes. The correct direction is **not** to add more systems. It is to make the existing catalog platform stricter, simpler, and more deterministic.
 
-I inspected the current repo architecture and your uploaded `wp-config.php`. I will not expose secret values.
-
-## Verdict
-
-You are **close enough to stage the new `mu-plugins/` directory**, but you are **not ready to freshly import the catalog CSV as a clean production-grade catalog** unless the CSV has been further enriched/fixed beyond the current `woocommerce_catalog_production_remapped.csv` report.
-
-Current readiness:
+Your target should be:
 
 ```text
-MU-plugin architecture:       Ready to stage carefully
-wp-config constants:          Mostly ready, missing key rollout/import constants
-Catalog CSV:                  Not yet clean for final production import
-Catalog platform frontend:    Keep disabled until import + metadata are verified
+One SKU policy.
+One parent/variation contract.
+One schematic/parts contract.
+One backend read model.
+One frontend detail/cart path.
+One CSV validator.
 ```
+
+No MPN layer. No legacy SKU aliases. No parallel relationship systems. No frontend keyword matching as the source of truth.
 
 ---
 
-# 1. `wp-config.php` Audit
+# Final Simplified Architecture
 
-## Present and good
+## 1. SKU identity
 
-Your uploaded `wp-config.php` has the core production constants needed for the current mu-plugin stack:
-
-```text
-WC_PROXY_CONSUMER_KEY          present
-WC_PROXY_CONSUMER_SECRET       present
-DTB_WC_AUTH_USER               present
-DTB_WC_AUTH_PASS               present
-WC_WEBHOOK_SECRET              present
-DTB_IMPORT_SECRET              present
-DRYWALL_JWT_SECRET             present
-DTB_WEBHOOK_DELIVERY_URL       present
-DTB_VEEQO_API_KEY              present
-DTB_VEEQO_WEBHOOK_SECRET       present
-DTB_VEEQO_WAREHOUSE_ID         present
-DTB_VEEQO_CHANNEL_ID           present
-```
-
-Your WordPress subdirectory config is also aligned with the project:
+Use only:
 
 ```text
-WP_HOME      = https://drywalltoolbox.com
-WP_SITEURL   = https://drywalltoolbox.com/wp
-WP_CONTENT_URL uses /wp/wp-content
+SKU
+Parent SKU
+Meta: _dtb_parent_product_sku
 ```
 
-Debug display is disabled, debug logging is enabled, SSL admin is forced, memory limits are high enough, and file editing is disabled. That is generally appropriate for production.
+Policy:
 
-## Missing / must add before import
-
-You should add these before deploying/importing:
-
-```php
-define( 'DTB_WC_CSV_FILENAME', 'woocommerce_catalog_production_remapped.csv' );
-define( 'DTB_CATALOG_PLATFORM_ENABLED', false );
+```text
+SKU = canonical product identity
+SKU format = uppercase, no hyphens, no spaces, no smart dashes
 ```
 
-Reason:
+Examples:
 
-`dtb-utils.php` resolves the active catalog CSV from `wp-content/uploads/wc-imports/` and uses `DTB_WC_CSV_FILENAME` when explicitly configured. 
-
-`DTB_CATALOG_PLATFORM_ENABLED=false` keeps the new catalog-platform backend present but prevents the new platform path from becoming live before the imported catalog data is confirmed clean.
-
-## Important current flag
-
-Your config currently has:
-
-```php
-define( 'DTB_DISABLE_PRODUCT_WEBHOOKS', true );
+```text
+FA-347   -> FA347
+AT01-AD  -> AT01AD
+AH25-AD  -> AH25AD
+4-734    -> 4734
 ```
 
-That can be acceptable during a bulk import to avoid excessive webhook churn, but after import you need a deliberate cache/invalidation plan. If product webhooks remain disabled, cache refresh and downstream sync behavior may not happen automatically.
+Do **not** add:
+
+```text
+_dtb_mpn
+_dtb_manufacturer_sku
+_dtb_legacy_sku
+_dtb_sku_aliases
+```
+
+Those are unnecessary for this phase and increase mapping risk.
 
 ---
 
-# 2. MU-Plugins Directory Readiness
+# 2. Variable / variation contract
 
-## Loader architecture is good
-
-`00-dtb-loader.php` now controls explicit load order. It loads `dtb-catalog-platform/bootstrap.php` immediately after `dtb-rest-api.php`, before catalog health, ops, Veeqo, QuickBooks, and other downstream consumers. It also loads `dtb-commerce/bootstrap.php` after WooCommerce. 
-
-That is the correct dependency order.
-
-## Catalog platform architecture is good
-
-`dtb-catalog-platform/bootstrap.php` loads:
+Your existing `ProductMeta.php` already has the right minimal variation keys:
 
 ```text
-Domain/
-Services/
-Rest/
-Admin/CLI
+_dtb_parent_product_sku
+_dtb_variation_axis
+_dtb_variation_value
+_dtb_variation_label
+_dtb_default_variation_id
+_dtb_inherit_parent_image
+_dtb_variation_sort
 ```
 
-including `ProductMeta`, `ToolFamilies`, `ToolsetData`, normalizers, repository, variation service, default variation resolver, facets service, toolset eligibility/validation, and REST controllers. 
 
-This is professionally mapped.
 
-## Product metadata registry is strong
-
-`ProductMeta.php` defines the canonical `_dtb_*` metadata contract for identity, classification, variation data, Toolset Builder, compatibility, and schematics. 
-
-This is the correct source-of-truth layer for the new architecture.
-
-## Remaining mu-plugin risk
-
-`dtb-commerce` currently sanitizes and allowlists toolset metadata before persisting it, but it does not fully validate that the submitted metadata represents a legitimate template/slot/product selection. 
-
-This does not block a controlled deployment if the platform frontend is disabled, but it should be fixed before relying on Toolset Builder orders operationally.
-
----
-
-# 3. Catalog CSV Import Readiness
-
-## Current CSV report status
-
-The remapped catalog report shows:
+Only one addition is worth making:
 
 ```text
-Original rows:        1,663 including header
-Remapped output rows: 1,538 including header
-Rows excluded:        125
-Rows relabeled:       167
-Remaining hard errors: 75
-Warning count:        1
+_dtb_default_variation_sku
 ```
 
-The remaining 75 hard errors are all `variation_missing_price` issues. 
+Reason: the CSV cannot reliably know WooCommerce variation IDs before import. SKU is stable; ID is not.
 
-## This blocks a clean production import
+## Parent variable row
 
-Do not import those rows as normal visible purchasable variations.
-
-Each missing-price variation needs one of these decisions:
+Required:
 
 ```text
-populate Regular price
-mark as quote_only / not_for_sale / hidden_reference
-exclude from current import
+Type = variable
+SKU = normalized parent SKU
+Attribute 1 name
+Attribute 1 value(s)
+Attribute 1 used for variations = 1
+Meta: _dtb_variation_axis
+Meta: _dtb_default_variation_sku
 ```
 
-If you import missing-price purchasable variations, you risk broken variation selectors, bad cart behavior, bad order line data, and Veeqo/QuickBooks sync problems.
+## Child variation row
 
-## Required CSV enrichment
-
-Before enabling the platform path, the catalog must include or be followed by backfill for the canonical `_dtb_*` fields:
+Required:
 
 ```text
-Meta: _dtb_brand_key
-Meta: _dtb_brand_label
-Meta: _dtb_product_kind
-Meta: _dtb_tool_family
-Meta: _dtb_tool_role
-Meta: _dtb_category_key
-Meta: _dtb_display_category_key
-Meta: _dtb_is_parts
+Type = variation
+SKU = normalized child SKU
+Parent SKU = normalized parent SKU
+Attribute 1 name
+Attribute 1 value(s)
+Regular price if purchasable
 Meta: _dtb_parent_product_sku
 Meta: _dtb_variation_axis
 Meta: _dtb_variation_value
 Meta: _dtb_variation_label
-Meta: _dtb_default_variation_id
-Meta: _dtb_builder_eligible
-Meta: _dtb_builder_slots
-Meta: _dtb_workflow_scopes
-Meta: _dtb_builder_rank
+Meta: _dtb_variation_sort
+Meta: _dtb_inherit_parent_image
 ```
 
-Those fields map directly to the backend `ProductMeta` registry. 
+That is enough. Do not create a separate variation registry.
 
 ---
 
-# 4. Required Before Copying New `mu-plugins/` to Live
+# 3. Schematic / parts contract
 
-## Must do first
-
-```text
-1. Full database backup.
-2. Full backup of existing wp-content/mu-plugins.
-3. Full WooCommerce product export backup.
-4. Backup current wp-content/uploads/wc-imports.
-5. Add DTB_WC_CSV_FILENAME to wp-config.php.
-6. Add DTB_CATALOG_PLATFORM_ENABLED=false to wp-config.php.
-7. Confirm all new mu-plugin files and folders are physically present.
-8. Confirm wp-admin and WooCommerce still boot after copy.
-```
-
-## Required live directory contents
-
-At minimum, live `wp-content/mu-plugins/` must include:
+Keep schematic/parts linking metadata minimal:
 
 ```text
-00-dtb-loader.php
-dtb-utils.php
-dtb-auth.php
-dtb-cache.php
-dtb-cache-admin.php
-dtb-rest-api.php
-dtb-catalog-platform/
-dtb-api-security.php
-dtb-frontend-security.php
-dtb-admin-security.php
-dtb-rewards.php
-dtb-image-sync.php
-dtb-woocommerce.php
-dtb-commerce/
-dtb-veeqo.php
-dtb-ops-dashboard.php
-dtb-catalog-health.php
-dtb-quickbooks.php
-dtb-schematics-api.php
-dtb-coming-soon.php
-dtb-seo.php
-dtb-config-reference.php
+Meta: _dtb_product_kind
+Meta: _dtb_is_parts
+Meta: _dtb_schematic_brand
+Meta: _dtb_schematic_group
+Meta: _dtb_schematic_position
+Meta: _dtb_replacement_part_for
+Meta: _dtb_compatible_tool_skus
 ```
 
-The loader has a missing-file fallback that logs and shows admin notices, but deployment should not depend on that fallback. 
+All SKU references must use normalized SKUs only.
+
+Example part:
+
+```text
+SKU = FA347
+Meta: _dtb_product_kind = part
+Meta: _dtb_is_parts = 1
+Meta: _dtb_schematic_brand = columbia
+Meta: _dtb_schematic_group = compound_tube
+Meta: _dtb_schematic_position = 14
+Meta: _dtb_replacement_part_for = COLCOMPOUNDTUBE
+Meta: _dtb_compatible_tool_skus = COLCOMPOUNDTUBE,COLCAMLOCKTUBE
+```
+
+No frontend keyword matching should be authoritative. Frontend can fallback to static mappings, but backend metadata should own the relationship.
 
 ---
 
-# 5. Required Before Fresh CSV Import
+# 4. CSV validator scope
 
-## Must fix or classify
+Do not build a massive validation framework yet. Extend the existing `scripts/validate_catalog.py`.
 
-```text
-1. Resolve the 75 missing variation prices.
-2. Confirm no duplicate SKUs.
-3. Confirm no duplicate slugs.
-4. Confirm no malformed encoded slugs/names.
-5. Normalize boolean fields to 1 / 0, not 1.0 / 0.0.
-6. Confirm every variation has a valid parent SKU.
-7. Confirm every variation parent is a variable product.
-8. Confirm every variable parent has at least one child.
-9. Confirm visible purchasable products have prices.
-10. Confirm visible parent products have images or intentional fallback image logic.
-```
-
-## Required CSV location
-
-Upload the import file to:
+Add only these blocker rules:
 
 ```text
-wp-content/uploads/wc-imports/woocommerce_catalog_production_remapped.csv
+sku_not_normalized
+parent_sku_not_normalized
+normalized_sku_collision
+variation_dtb_parent_product_sku_mismatch
+variation_missing_dtb_variation_axis
+variation_axis_mismatch_parent
+variation_missing_dtb_variation_value
+variation_missing_dtb_variation_label
+variation_missing_dtb_variation_sort
+default_variation_sku_not_child
+part_missing_schematic_group_when_schematic_position_present
+part_references_unknown_compatible_tool_sku
 ```
 
-Then `DTB_WC_CSV_FILENAME` should point to that basename. The config resolver expects that upload directory. 
+That is robust without being excessive.
 
 ---
 
-# 6. Required Before Enabling Catalog Platform Frontend
+# 5. Backend updates
 
-Keep this false until the following checks pass:
+Implement only what directly prevents data/runtime drift.
 
-```php
-define( 'DTB_CATALOG_PLATFORM_ENABLED', false );
-```
-
-The frontend platform flag also defaults to disabled unless `REACT_APP_DTB_CATALOG_PLATFORM=1` is set. 
-
-Only enable platform runtime after confirming:
+## Required
 
 ```text
-1. /wp-json/dtb/v1/catalog/facets returns brands/categories.
-2. /wp-json/dtb/v1/catalog/products returns products with cardProduct.
-3. /wp-json/dtb/v1/catalog/products?brand=tapetech returns expected rows.
-4. /wp-json/dtb/v1/catalog/products?is_parts=0 excludes parts.
-5. /wp-json/dtb/v1/catalog/products?builder_slot=flatBox returns eligible products only.
-6. Variable product cards show correct variation SKU/price/image.
-7. Toolset options are populated from _dtb_builder_slots.
-8. WooCommerce product admin still loads cleanly.
-9. No fatal errors or repeated warnings in debug.log.
+Add _dtb_default_variation_sku to ProductMeta.
+Update DefaultVariationResolver to resolve by SKU before fallback.
+Update VariationReadModelService to paginate variations beyond 100.
+Add backend compatible-parts lookup endpoint.
 ```
+
+Minimal endpoints:
+
+```text
+GET /wp-json/dtb/v1/products/:sku/compatible-parts
+GET /wp-json/dtb/v1/parts/:sku/compatible-tools
+```
+
+You do not need a complex graph database or relationship engine. Use product meta queries against normalized SKUs.
 
 ---
 
-# 7. Go / No-Go
+# 6. Frontend updates
 
-## Safe to copy new `mu-plugins/` to live if:
+Keep frontend simple.
+
+## Required
 
 ```text
-DTB_CATALOG_PLATFORM_ENABLED=false is set
-DTB_WC_CSV_FILENAME is set
-backup exists
-all files/folders are present
-wp-admin boots
-WooCommerce boots
-no fatal errors in debug.log
+Product detail/modal must use /wp-json/dtb/v1/catalog/products/:slug/detail.
+Variation selector must use _dtb_variation_value and _dtb_variation_label.
+Cart must add selected variation ID, not parent ID.
+Schematics/parts UI should query backend compatible-parts endpoints.
 ```
 
-## Not safe to freshly import the catalog CSV until:
+Do not duplicate variation matching logic in React.
+
+Frontend role:
 
 ```text
-75 missing variation prices are resolved or intentionally classified
-canonical _dtb_* fields are included or ready to backfill
-bad slugs/encoding issues are fixed
-visible purchasable rows have prices
-variable/variation relationships are confirmed
+render backend DTO
+select variation option
+submit selected child variation ID
 ```
 
-## Not safe to enable the new platform frontend until:
+Backend role:
 
 ```text
-imported products have _dtb_brand_key
-imported products have _dtb_category_key
-builder products have _dtb_tool_family and _dtb_builder_slots
-variable products have valid child variations
-catalog endpoints return correct DTOs
-manual product/detail/cart checks pass
+own parent/child relationships
+own default variation
+own compatibility mappings
 ```
 
 ---
 
-# Bottom Line
+# 7. What to avoid
 
-Your `wp-config.php` is mostly ready, and the `mu-plugins/` architecture is now strong enough to stage into live **with the platform disabled**.
-
-The blocker is the catalog import. The current remapped CSV still has documented variation price errors and must either be enriched with canonical `_dtb_*` metadata or followed immediately by a controlled metadata backfill. The cleanest path is:
+Avoid these for now:
 
 ```text
-1. Add missing config constants.
-2. Back up live.
-3. Copy new mu-plugins with platform disabled.
-4. Fix/enrich CSV.
-5. Upload CSV to wp-content/uploads/wc-imports.
-6. Import CSV.
-7. Run/backfill _dtb_* metadata if needed.
-8. Manually smoke-check key catalog endpoints/products.
-9. Enable catalog platform only after data is proven clean.
+SKU alias resolver
+legacy SKU layer
+MPN layer
+separate relationship database
+full validation service framework
+toolset-specific expansion
+complex import orchestration UI
+multi-version catalog registry
 ```
+
+Those may be useful later, but right now they would slow down the core catalog correction.
+
+---
+
+# Production-grade but not over-engineered target
+
+Your hardened path is:
+
+```text
+CSV
+  -> normalized SKU + variation + schematic metadata
+  -> validate_catalog.py blocks structural defects
+  -> WooCommerce import
+  -> dtb-catalog-platform normalizes DTOs
+  -> frontend consumes DTOs
+  -> cart uses real purchasable variation IDs
+  -> schematics use normalized SKU relationships
+```
+
+That is robust because every layer agrees on the same identifiers.
+
+It is not over-engineered because:
+
+```text
+No alias system.
+No MPN mapping system.
+No duplicate relationship layer.
+No frontend inference.
+No unnecessary database tables.
+```
+
+Bottom line:
+
+```text
+Normalize SKUs directly.
+Make Parent SKU exact.
+Add only the variation metadata needed for deterministic selection.
+Use normalized SKUs for schematic/parts relationships.
+Let the backend read model own relationships.
+Let the frontend render and submit selections.
+```
+
+That gives you a production-grade catalog platform without building a second catalog-management system inside WordPress.
