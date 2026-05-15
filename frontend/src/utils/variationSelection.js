@@ -40,20 +40,19 @@ function normalizeAttributeValue(value) {
 
 /**
  * Canonicalize option values across WooCommerce labels, slugs, and imported CSV
- * formatting. Woo frequently returns parent attribute labels like `7"` while
- * variation records can return slugs such as `7-inch` or `7-in`. Matching only
- * the raw normalized strings makes valid options look unavailable/disabled.
+ * formatting. The catalog platform commonly emits DTB labels like `14 in`,
+ * while WooCommerce parent options may be `14"` and selected UI values may be
+ * `14`. Matching must treat all three as the same purchasable child variation.
  *
  * @param {any} value
  * @returns {string}
  */
 function canonicalizeAttributeValue(value) {
   return normalizeAttributeValue(value)
-    .replace(/\b(inches|inch|in)\b/g, '"')
-    .replace(/\b(feet|foot|ft)\b/g, "'")
-    .replace(/\s*"\s*/g, '"')
-    .replace(/\s*'\s*/g, "'")
-    .replace(/[^a-z0-9"']+/g, '')
+    .replace(/\b(inches|inch|in)\b/g, '')
+    .replace(/\b(feet|foot|ft)\b/g, '')
+    .replace(/["']/g, '')
+    .replace(/[^a-z0-9]+/g, '')
     .trim();
 }
 
@@ -81,14 +80,14 @@ export function getVariationSelectionMap(variation) {
   const attrs = Array.isArray(variation.attributes) ? variation.attributes : [];
   attrs.forEach((attr) => {
     const name = (attr?.name || '').trim();
-    const option = (attr?.option || '').trim();
+    const option = (attr?.option || attr?.value || attr?.label || '').trim();
     if (name && option) selected[name] = option;
   });
 
   if (Object.keys(selected).length === 0 && Array.isArray(variation.variation_attribute_values)) {
     variation.variation_attribute_values.forEach((attr) => {
       const name = (attr?.name || '').trim();
-      const option = (attr?.option || '').trim();
+      const option = (attr?.option || attr?.value || attr?.label || '').trim();
       if (name && option) selected[name] = option;
     });
   }
