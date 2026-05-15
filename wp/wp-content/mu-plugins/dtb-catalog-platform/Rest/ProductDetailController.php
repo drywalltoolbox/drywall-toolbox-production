@@ -81,10 +81,11 @@ final class DTB_ProductDetailController {
 			'product'    => $product,
 			'variations' => $variations,
 			'computed'   => [
-				'defaultVariation'     => $default_var,
-				'hasInStockVariation'  => $in_stock_count > 0,
-				'variationCount'       => count( $variations ),
-				'inStockVariationCount'=> $in_stock_count,
+				'defaultVariation'      => $default_var,
+				'hasInStockVariation'   => $in_stock_count > 0,
+				'variationCount'        => count( $variations ),
+				'inStockVariationCount' => $in_stock_count,
+				'variationMatrix'       => self::build_variation_matrix( $variations ),
 			],
 		], 200 );
 	}
@@ -117,5 +118,62 @@ final class DTB_ProductDetailController {
 			'variations' => $variations,
 			'count'      => count( $variations ),
 		], 200 );
+	}
+
+	/**
+	 * Build a variation matrix from a normalized variations array.
+	 *
+	 * Returns an object with the shared variation axis and a flat options list.
+	 * The frontend can use this directly to render a variation selector without
+	 * re-deriving options from inconsistent WooCommerce attribute labels.
+	 *
+	 * Shape:
+	 *   {
+	 *     axis:    string,
+	 *     options: [{ value, label, variationId, sku, price, stockStatus, purchasable }]
+	 *   }
+	 *
+	 * @param  array[] $variations  Normalized DTB variation DTOs.
+	 * @return array|null           Null when no variations exist.
+	 */
+	private static function build_variation_matrix( array $variations ): ?array {
+		if ( empty( $variations ) ) {
+			return null;
+		}
+
+		// Infer the shared axis from the first variation that has one.
+		$axis = '';
+		foreach ( $variations as $v ) {
+			$candidate = (string) ( $v['variation']['axis'] ?? '' );
+			if ( '' !== $candidate ) {
+				$axis = $candidate;
+				break;
+			}
+		}
+
+		$options = [];
+		foreach ( $variations as $v ) {
+			$value = (string) ( $v['variation']['value'] ?? '' );
+			$label = (string) ( $v['variation']['label'] ?? $value );
+
+			if ( '' === $value ) {
+				continue; // skip variations without a canonical value
+			}
+
+			$options[] = [
+				'value'       => $value,
+				'label'       => $label,
+				'variationId' => (int) ( $v['id'] ?? 0 ),
+				'sku'         => (string) ( $v['sku'] ?? '' ),
+				'price'       => isset( $v['price']['value'] ) ? (float) $v['price']['value'] : null,
+				'stockStatus' => (string) ( $v['inventory']['stockStatus'] ?? 'instock' ),
+				'purchasable' => (bool) ( $v['inventory']['purchasable'] ?? true ),
+			];
+		}
+
+		return [
+			'axis'    => $axis,
+			'options' => $options,
+		];
 	}
 }

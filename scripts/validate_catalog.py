@@ -2,8 +2,8 @@
 """
 DTB Catalog Pre-Import Validator
 =================================
-Validates woocommerce_catalog_production_remapped.csv for parent/child invariants
-before any WooCommerce import is triggered.
+Validates the WooCommerce catalog production CSV for parent/child invariants,
+SKU normalization, and DTB variation metadata before any WooCommerce import.
 
 Exit codes:
   0  No hard errors (warnings may be present)
@@ -11,7 +11,7 @@ Exit codes:
 
 Usage:
   python3 scripts/validate_catalog.py
-  python3 scripts/validate_catalog.py --csv products/Production/catalogs/official/woocommerce_catalog_production_remapped.csv
+  python3 scripts/validate_catalog.py --csv products/Production/catalogs/official/woocommerce_catalog_production_optimized.csv
   python3 scripts/validate_catalog.py --json  # machine-readable JSON output
 """
 
@@ -25,7 +25,7 @@ from pathlib import Path
 
 # ── Default CSV path ──────────────────────────────────────────────────────────
 REPO_ROOT = Path(__file__).parent.parent
-DEFAULT_CSV = REPO_ROOT / "products" / "Production" / "catalogs" / "official" / "woocommerce_catalog_production_remapped.csv"
+DEFAULT_CSV = REPO_ROOT / "products" / "Production" / "catalogs" / "official" / "woocommerce_catalog_production_optimized.csv"
 
 # ── Column aliases ─────────────────────────────────────────────────────────────
 COL_TYPE       = "Type"
@@ -38,6 +38,18 @@ COL_IN_STOCK   = "In stock?"
 COL_PUBLISHED  = "Published"
 COL_VISIBILITY = "Visibility in catalog"
 COL_IMAGES     = "Images"
+
+# DTB variation meta column names (as they appear in the optimized CSV).
+COL_DTB_PARENT_SKU      = "Meta: _dtb_parent_product_sku"
+COL_DTB_VARIATION_AXIS  = "Meta: _dtb_variation_axis"
+COL_DTB_VARIATION_VALUE = "Meta: _dtb_variation_value"
+COL_DTB_VARIATION_LABEL = "Meta: _dtb_variation_label"
+COL_DTB_VARIATION_SORT  = "Meta: _dtb_variation_sort"
+COL_DTB_DEFAULT_VAR_SKU = "Meta: _dtb_default_variation_sku"
+
+# Regex that matches any character NOT allowed in a normalized SKU.
+# Normalized SKU: uppercase letters and digits only — no hyphens, spaces, slashes, smart dashes.
+_INVALID_SKU_CHARS = re.compile(r"[^A-Z0-9]")
 
 MAX_VARIATION_ATTRS = 6  # WooCommerce supports up to 3; be generous here
 MAX_BOOLEAN_ATTRS = 10
@@ -108,6 +120,14 @@ def is_visible(row):
 def has_invalid_percent_encoding(value):
     """Detect malformed %-encoding like '%' or '%2' instead of '%2F'."""
     return bool(re.search(r"%(?![0-9A-Fa-f]{2})", str(value or "")))
+
+
+def is_sku_normalized(sku: str) -> bool:
+    """
+    Return True iff the SKU contains only uppercase letters and digits.
+    Any hyphen, space, slash, smart dash, or lowercase letter is a violation.
+    """
+    return sku != "" and not bool(_INVALID_SKU_CHARS.search(sku))
 
 
 # =============================================================================
@@ -372,6 +392,175 @@ def validate(csv_path: Path):
                         "message":   f"Variation '{sku}' (line {line}) attribute name '{attr_name}' differs in case/spacing from parent attribute '{other_attr_name}'.",
                     })
 
+    # =========================================================================
+    # NEW RULES — Architecture-rebuild aligned
+    # =========================================================================
+
+    # ── Rule: SKU not normalized (blockers) ──────────────────────────────────
+    for row in all_rows:
+        sku = str(row.get(COL_SKU, "") or "").strip()
+        if not sku:
+            continue
+        if not is_sku_normalized(sku):
+            errors.append({
+                "rule": "sku_not_normalized",
+                "sku":  sku,
+                "line": row["__line__"],
+                "message": (
+                    f"SKU '{sku}' (line {row['__line__']}) is not normalized. "
+                    "SKUs must be uppercase letters and digits only (no hyphens, spaces, slashes, or smart dashes)."
+                ),
+            })
+
+    # ── Rule: Parent SKU not normalized ─────────────────────────────────────
+    for var in variations:
+        parent_sku = str(var.get(COL_PARENT_SKU, "") or "").strip()
+        if parent_sku and not is_sku_normalized(parent_sku):
+            errors.append({
+                "rule":       "parent_sku_not_normalized",
+                "sku":        str(var.get(COL_SKU, "") or "").strip(),
+                "parent_sku": parent_sku,
+                "line":       var["__line__"],
+                "message": (
+                    f"Variation '{var.get(COL_SKU, '').strip()}' (line {var['__line__']}) "
+                    f"has non-normalized Parent SKU '{parent_sku}'."
+                ),
+            })
+
+    # ── Rule: Normalized SKU collision ──────────────────────────────────────
+    # Two distinct raw SKUs that normalize to the same uppercase value would
+    # collide on import (WooCommerce treats SKUs case-insensitively).
+    normalized_sku_map: dict = {}  # normalized -> list of original skus
+    for row in all_rows:
+        sku = str(row.get(COL_SKU, "") or "").strip()
+        if not sku:
+            continue
+        key = sku.upper()
+        normalized_sku_map.setdefault(key, []).append(sku)
+    for norm_sku, originals in normalized_sku_map.items():
+        unique_originals = list(dict.fromkeys(originals))  # stable-order dedup
+        if len(unique_originals) > 1:
+            errors.append({
+                "rule":    "normalized_sku_collision",
+                "normalized_sku": norm_sku,
+                "originals":      unique_originals,
+                "message": (
+                    f"SKUs {unique_originals} all normalize to '{norm_sku}'. "
+                    "This will cause a collision on WooCommerce import."
+                ),
+            })
+
+    # ── Rule: _dtb_parent_product_sku mismatch ───────────────────────────────
+    for var in variations:
+        sku        = str(var.get(COL_SKU, "") or "").strip()
+        parent_sku = str(var.get(COL_PARENT_SKU, "") or "").strip()
+        dtb_parent = str(var.get(COL_DTB_PARENT_SKU, "") or "").strip()
+        if dtb_parent and parent_sku and dtb_parent != parent_sku:
+            errors.append({
+                "rule":       "variation_dtb_parent_product_sku_mismatch",
+                "sku":        sku,
+                "parent_sku": parent_sku,
+                "dtb_parent": dtb_parent,
+                "line":       var["__line__"],
+                "message": (
+                    f"Variation '{sku}' (line {var['__line__']}) has Meta: _dtb_parent_product_sku='{dtb_parent}' "
+                    f"but Parent SKU='{parent_sku}'. These must match."
+                ),
+            })
+
+    # ── Rule: variation missing _dtb_variation_axis ──────────────────────────
+    for var in variations:
+        sku  = str(var.get(COL_SKU, "") or "").strip()
+        axis = str(var.get(COL_DTB_VARIATION_AXIS, "") or "").strip()
+        if not axis:
+            errors.append({
+                "rule": "variation_missing_dtb_variation_axis",
+                "sku":  sku,
+                "line": var["__line__"],
+                "message": f"Variation '{sku}' (line {var['__line__']}) is missing Meta: _dtb_variation_axis.",
+            })
+
+    # ── Rule: variation axis mismatch with parent ────────────────────────────
+    # All children of a parent should share the same variation axis.
+    for parent_sku, children in parent_children.items():
+        axes = set()
+        for child in children:
+            axis = str(child.get(COL_DTB_VARIATION_AXIS, "") or "").strip()
+            if axis:
+                axes.add(axis)
+        if len(axes) > 1:
+            errors.append({
+                "rule":       "variation_axis_mismatch_parent",
+                "parent_sku": parent_sku,
+                "axes":       list(axes),
+                "message": (
+                    f"Variable parent '{parent_sku}' has children with conflicting "
+                    f"_dtb_variation_axis values: {sorted(axes)}. All children must share one axis."
+                ),
+            })
+
+    # ── Rule: variation missing _dtb_variation_value ─────────────────────────
+    for var in variations:
+        sku   = str(var.get(COL_SKU, "") or "").strip()
+        value = str(var.get(COL_DTB_VARIATION_VALUE, "") or "").strip()
+        if not value:
+            errors.append({
+                "rule": "variation_missing_dtb_variation_value",
+                "sku":  sku,
+                "line": var["__line__"],
+                "message": f"Variation '{sku}' (line {var['__line__']}) is missing Meta: _dtb_variation_value.",
+            })
+
+    # ── Rule: variation missing _dtb_variation_label ─────────────────────────
+    for var in variations:
+        sku   = str(var.get(COL_SKU, "") or "").strip()
+        label = str(var.get(COL_DTB_VARIATION_LABEL, "") or "").strip()
+        if not label:
+            warnings.append({
+                "rule": "variation_missing_dtb_variation_label",
+                "sku":  sku,
+                "line": var["__line__"],
+                "message": (
+                    f"Variation '{sku}' (line {var['__line__']}) is missing Meta: _dtb_variation_label. "
+                    "UI will fall back to raw variation value."
+                ),
+            })
+
+    # ── Rule: variation missing _dtb_variation_sort ──────────────────────────
+    for var in variations:
+        sku  = str(var.get(COL_SKU, "") or "").strip()
+        sort = str(var.get(COL_DTB_VARIATION_SORT, "") or "").strip()
+        if not sort:
+            warnings.append({
+                "rule": "variation_missing_dtb_variation_sort",
+                "sku":  sku,
+                "line": var["__line__"],
+                "message": (
+                    f"Variation '{sku}' (line {var['__line__']}) is missing Meta: _dtb_variation_sort. "
+                    "Display order within the variation selector will be unpredictable."
+                ),
+            })
+
+    # ── Rule: default_variation_sku_not_child ────────────────────────────────
+    for parent_sku, parent_row in parents.items():
+        default_var_sku = str(parent_row.get(COL_DTB_DEFAULT_VAR_SKU, "") or "").strip()
+        if not default_var_sku:
+            continue
+        child_skus = {str(c.get(COL_SKU, "") or "").strip() for c in parent_children.get(parent_sku, [])}
+        if default_var_sku not in child_skus:
+            errors.append({
+                "rule":            "default_variation_sku_not_child",
+                "parent_sku":      parent_sku,
+                "default_var_sku": default_var_sku,
+                "line":            parent_row["__line__"],
+                "message": (
+                    f"Variable parent '{parent_sku}' (line {parent_row['__line__']}) has "
+                    f"Meta: _dtb_default_variation_sku='{default_var_sku}' "
+                    f"but no child variation has that SKU. "
+                    f"Known child SKUs: {sorted(child_skus) if child_skus else '(none)'}."
+                ),
+            })
+
     return errors, warnings
 
 
@@ -427,7 +616,7 @@ def main():
         "--csv",
         type=Path,
         default=DEFAULT_CSV,
-        help="Path to woocommerce_catalog_production_remapped.csv",
+        help="Path to the WooCommerce catalog CSV (default: woocommerce_catalog_production_optimized.csv)",
     )
     parser.add_argument(
         "--json",

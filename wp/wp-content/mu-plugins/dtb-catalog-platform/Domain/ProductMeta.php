@@ -79,11 +79,26 @@ final class DTB_ProductMeta {
 	/** ID of the default variation for cards/modals. Stored on parent. */
 	const DEFAULT_VARIATION_ID = '_dtb_default_variation_id';
 
+	/**
+	 * SKU of the default variation for cards/modals. Stored on parent.
+	 * Preferred over DEFAULT_VARIATION_ID in CSV imports because WooCommerce
+	 * variation IDs are not stable before import; SKUs are.
+	 */
+	const DEFAULT_VARIATION_SKU = '_dtb_default_variation_sku';
+
 	/** Whether this variation should fall back to the parent's image (0 | 1). */
 	const INHERIT_PARENT_IMAGE = '_dtb_inherit_parent_image';
 
 	/** Sort weight within a variable product (lower = first). */
 	const VARIATION_SORT = '_dtb_variation_sort';
+
+	// ── Commerce keys ─────────────────────────────────────────────────────────
+
+	/**
+	 * Commerce mode for this product. Governs pricing, cart, and visibility.
+	 * Valid values: purchasable | quote_only | hidden_reference | repair_only | included_item
+	 */
+	const COMMERCE_MODE = '_dtb_commerce_mode';
 
 	// ── Toolset Builder keys ───────────────────────────────────────────────────
 
@@ -152,6 +167,7 @@ final class DTB_ProductMeta {
 		self::VARIATION_VALUE       => [ 'type' => 'string',  'description' => 'Canonical variation value (e.g. 7).' ],
 		self::VARIATION_LABEL       => [ 'type' => 'string',  'description' => 'Human-readable variation label (e.g. 7 in).' ],
 		self::DEFAULT_VARIATION_ID  => [ 'type' => 'integer', 'description' => 'ID of the default variation for card display.' ],
+		self::DEFAULT_VARIATION_SKU => [ 'type' => 'string',  'description' => 'SKU of the default variation (stable across imports; resolved before ID fallback).' ],
 		self::INHERIT_PARENT_IMAGE  => [ 'type' => 'boolean', 'description' => 'True when variation should inherit parent image.' ],
 		self::VARIATION_SORT        => [ 'type' => 'integer', 'description' => 'Sort weight within a variable product.' ],
 		self::BUILDER_ELIGIBLE      => [ 'type' => 'boolean', 'description' => 'True when eligible for Toolset Builder slots.' ],
@@ -165,6 +181,7 @@ final class DTB_ProductMeta {
 		self::SCHEMATIC_BRAND       => [ 'type' => 'string',  'description' => 'Schematics brand slug.' ],
 		self::SCHEMATIC_GROUP       => [ 'type' => 'string',  'description' => 'Schematics tool group identifier.' ],
 		self::SCHEMATIC_POSITION    => [ 'type' => 'integer', 'description' => 'Position number on schematic diagram.' ],
+		self::COMMERCE_MODE         => [ 'type' => 'string',  'description' => 'Commerce mode: purchasable | quote_only | hidden_reference | repair_only | included_item.' ],
 	];
 
 	/** Return all array-type meta keys. */

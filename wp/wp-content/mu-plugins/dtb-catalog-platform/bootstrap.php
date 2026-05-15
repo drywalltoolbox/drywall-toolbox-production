@@ -59,6 +59,7 @@ require_once $_dtb_cp . '/Services/ToolsetValidationService.php';
 require_once $_dtb_cp . '/Rest/CatalogFacetsController.php';
 require_once $_dtb_cp . '/Rest/CatalogProductsController.php';
 require_once $_dtb_cp . '/Rest/ProductDetailController.php';
+require_once $_dtb_cp . '/Rest/CompatiblePartsController.php';
 require_once $_dtb_cp . '/Rest/ToolsetTemplatesController.php';
 require_once $_dtb_cp . '/Rest/ToolsetOptionsController.php';
 require_once $_dtb_cp . '/Rest/ToolsetValidationController.php';
@@ -156,6 +157,7 @@ function dtb_catalog_platform_register_routes(): void {
 	DTB_CatalogFacetsController::register_routes();
 	DTB_CatalogProductsController::register_routes();
 	DTB_ProductDetailController::register_routes();
+	DTB_CompatiblePartsController::register_routes();
 	DTB_ToolsetTemplatesController::register_routes();
 	DTB_ToolsetOptionsController::register_routes();
 	DTB_ToolsetValidationController::register_routes();

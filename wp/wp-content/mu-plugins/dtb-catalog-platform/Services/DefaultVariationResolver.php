@@ -7,9 +7,10 @@
  *
  * Selection priority:
  *   1. Explicit _dtb_default_variation_id meta on the parent.
- *   2. First variation with an in-stock status that is also purchasable.
- *   3. First variation with in-stock status (regardless of purchasable flag).
- *   4. First variation in sort order (final fallback).
+ *   2. Explicit _dtb_default_variation_sku meta on the parent (stable across CSV imports).
+ *   3. First variation with an in-stock status that is also purchasable.
+ *   4. First variation with in-stock status (regardless of purchasable flag).
+ *   5. First variation in sort order (final fallback).
  *
  * The resolved variation is embedded in the parent's cardProduct DTO so the
  * frontend does not need to make a separate variation fetch for listing pages.
@@ -43,7 +44,17 @@ final class DTB_DefaultVariationResolver {
 			}
 		}
 
-		// 2. First in-stock and purchasable.
+		// 2. Explicit default variation SKU (stable across CSV imports; preferred when ID is stale).
+		$explicit_sku = (string) ( $product_dto['defaultVariationSku'] ?? '' );
+		if ( '' !== $explicit_sku ) {
+			foreach ( $variations as $v ) {
+				if ( (string) $v['sku'] === $explicit_sku ) {
+					return $v;
+				}
+			}
+		}
+
+		// 3. First in-stock and purchasable.
 		foreach ( $variations as $v ) {
 			if (
 				'outofstock' !== $v['inventory']['stockStatus'] &&
@@ -53,14 +64,14 @@ final class DTB_DefaultVariationResolver {
 			}
 		}
 
-		// 3. First in-stock (any purchasable state).
+		// 4. First in-stock (any purchasable state).
 		foreach ( $variations as $v ) {
 			if ( 'outofstock' !== $v['inventory']['stockStatus'] ) {
 				return $v;
 			}
 		}
 
-		// 4. First variation.
+		// 5. First variation.
 		return $variations[0];
 	}
 

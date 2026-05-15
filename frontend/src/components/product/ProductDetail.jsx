@@ -66,6 +66,8 @@ export default function ProductDetail({
   initialSelectedAttrs = {},
   initialVariations = [],
   initialResolvedVariation = null,
+  disableLegacyDetailFetch = false,
+  initialComputedData = null,
 }) {
   const { addToCart } = useCart();
   const [quantity, setQuantity] = useState(1);
@@ -83,7 +85,7 @@ export default function ProductDetail({
   // selectedAttrs: { [attrName]: value } — tracks the user's chip selections
   const [selectedAttrs, setSelectedAttrs]       = useState(initialVariationSelection);
   // computedData: server-side computed state from the detail endpoint, including available_option_matrix
-  const [computedData, setComputedData]         = useState(null);
+  const [computedData, setComputedData]         = useState(initialComputedData);
 
   // Stable boolean dep: false until the parent has prefetched variations, then
   // true forever for this product.  Using the raw array as a dep would create a
@@ -107,7 +109,7 @@ export default function ProductDetail({
 
     Promise.resolve().then(() => {
       if (!mounted) return;
-      setComputedData(null);
+      setComputedData(initialComputedData);
       setVariations(currentSeeded);
       setSelectedAttrs(
         Object.keys(currentInitialAttrs || {}).length > 0
@@ -116,8 +118,15 @@ export default function ProductDetail({
               currentSeeded.find((v) => v.stock_status !== 'outofstock') || currentSeeded[0] || {}
             )
       );
-      setVariationsLoading(!hasInitialVariations);
+      setVariationsLoading(!hasInitialVariations && !disableLegacyDetailFetch);
     });
+
+    // When the parent platform component has already fetched full DTB detail
+    // data (disableLegacyDetailFetch=true + initialComputedData), we only need
+    // variation objects which may have been pre-seeded.  Skip the REST round-trip.
+    if (disableLegacyDetailFetch && hasInitialVariations) {
+      return () => { mounted = false; };
+    }
 
     // Primary: use the slug-based detail endpoint which returns server-computed
     // available_option_matrix alongside properly-normalised variations.
@@ -137,8 +146,31 @@ export default function ProductDetail({
       .then(async () => {
         if (!mounted) return;
 
-        // Try the detail endpoint first (proven path used by ProductDetailPage).
+        // Try the DTB catalog detail endpoint first (canonical, returns
+        // server-computed variationMatrix + available_option_matrix).
         if (product.slug) {
+          try {
+            const data = await apiClient(
+              `/wp-json/dtb/v1/catalog/products/${encodeURIComponent(product.slug)}/detail`
+            );
+            if (!mounted) return;
+            if (data?.computed) setComputedData(data.computed);
+            const detailVars = Array.isArray(data?.variations) && data.variations.length > 0
+              ? data.variations
+              : null;
+            if (detailVars) {
+              setCachedVariations(product.id, detailVars);
+              applyVariations(detailVars);
+              return;
+            }
+          } catch {
+            // fall through to legacy endpoint
+            if (!mounted) return;
+          }
+        }
+
+        // Legacy fallback: /drywall/v1 detail endpoint.
+        if (product.slug && !disableLegacyDetailFetch) {
           try {
             const data = await apiClient(
               `/wp-json/drywall/v1/products/slug/${encodeURIComponent(product.slug)}/detail`
