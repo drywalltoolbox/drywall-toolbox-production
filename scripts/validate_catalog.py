@@ -40,12 +40,12 @@ COL_VISIBILITY = "Visibility in catalog"
 COL_IMAGES     = "Images"
 
 # DTB variation meta column names (as they appear in the optimized CSV).
-COL_DTB_PARENT_SKU      = "Meta: _dtb_parent_product_sku"
-COL_DTB_VARIATION_AXIS  = "Meta: _dtb_variation_axis"
-COL_DTB_VARIATION_VALUE = "Meta: _dtb_variation_value"
-COL_DTB_VARIATION_LABEL = "Meta: _dtb_variation_label"
-COL_DTB_VARIATION_SORT  = "Meta: _dtb_variation_sort"
-COL_DTB_DEFAULT_VAR_SKU = "Meta: _dtb_default_variation_sku"
+COL_DTB_PARENT_SKU      = "meta: _dtb_parent_product_sku"
+COL_DTB_VARIATION_AXIS  = "meta: _dtb_variation_axis"
+COL_DTB_VARIATION_VALUE = "meta: _dtb_variation_value"
+COL_DTB_VARIATION_LABEL = "meta: _dtb_variation_label"
+COL_DTB_VARIATION_SORT  = "meta: _dtb_variation_sort"
+COL_DTB_DEFAULT_VAR_SKU = "meta: _dtb_default_variation_sku"
 
 # Regex that matches any character NOT allowed in a normalized SKU.
 # Normalized SKU: uppercase letters and digits only — no hyphens, spaces, slashes, smart dashes.
@@ -463,7 +463,7 @@ def validate(csv_path: Path):
                 "dtb_parent": dtb_parent,
                 "line":       var["__line__"],
                 "message": (
-                    f"Variation '{sku}' (line {var['__line__']}) has Meta: _dtb_parent_product_sku='{dtb_parent}' "
+                    f"Variation '{sku}' (line {var['__line__']}) has meta: _dtb_parent_product_sku='{dtb_parent}' "
                     f"but Parent SKU='{parent_sku}'. These must match."
                 ),
             })
@@ -477,7 +477,7 @@ def validate(csv_path: Path):
                 "rule": "variation_missing_dtb_variation_axis",
                 "sku":  sku,
                 "line": var["__line__"],
-                "message": f"Variation '{sku}' (line {var['__line__']}) is missing Meta: _dtb_variation_axis.",
+                "message": f"Variation '{sku}' (line {var['__line__']}) is missing meta: _dtb_variation_axis.",
             })
 
     # ── Rule: variation axis mismatch with parent ────────────────────────────
@@ -508,7 +508,7 @@ def validate(csv_path: Path):
                 "rule": "variation_missing_dtb_variation_value",
                 "sku":  sku,
                 "line": var["__line__"],
-                "message": f"Variation '{sku}' (line {var['__line__']}) is missing Meta: _dtb_variation_value.",
+                "message": f"Variation '{sku}' (line {var['__line__']}) is missing meta: _dtb_variation_value.",
             })
 
     # ── Rule: variation missing _dtb_variation_label ─────────────────────────
@@ -521,7 +521,7 @@ def validate(csv_path: Path):
                 "sku":  sku,
                 "line": var["__line__"],
                 "message": (
-                    f"Variation '{sku}' (line {var['__line__']}) is missing Meta: _dtb_variation_label. "
+                    f"Variation '{sku}' (line {var['__line__']}) is missing meta: _dtb_variation_label. "
                     "UI will fall back to raw variation value."
                 ),
             })
@@ -536,7 +536,7 @@ def validate(csv_path: Path):
                 "sku":  sku,
                 "line": var["__line__"],
                 "message": (
-                    f"Variation '{sku}' (line {var['__line__']}) is missing Meta: _dtb_variation_sort. "
+                    f"Variation '{sku}' (line {var['__line__']}) is missing meta: _dtb_variation_sort. "
                     "Display order within the variation selector will be unpredictable."
                 ),
             })
@@ -555,7 +555,7 @@ def validate(csv_path: Path):
                 "line":            parent_row["__line__"],
                 "message": (
                     f"Variable parent '{parent_sku}' (line {parent_row['__line__']}) has "
-                    f"Meta: _dtb_default_variation_sku='{default_var_sku}' "
+                    f"meta: _dtb_default_variation_sku='{default_var_sku}' "
                     f"but no child variation has that SKU. "
                     f"Known child SKUs: {sorted(child_skus) if child_skus else '(none)'}."
                 ),
