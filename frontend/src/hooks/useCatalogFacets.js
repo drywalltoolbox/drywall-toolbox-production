@@ -1,85 +1,117 @@
 /**
  * frontend/src/hooks/useCatalogFacets.js
  *
- * Fetches catalog facets from GET /wp-json/dtb/v1/catalog/facets.
- *
- * Returns { brands, categories, displayCategoriesByBrand } for the
- * Products page filter UI.  Uses a module-level cache with a 5-minute TTL
- * so the facets are fetched once per session rather than on every render.
- *
- * Returns:
- *   {
- *     facets: { brands, categories, displayCategoriesByBrand } | null,
- *     loading: boolean,
- *     error:   Error | null,
- *   }
+ * Fetches scoped catalog facets from GET /wp-json/dtb/v1/catalog/facets.
+ * The product UI must use backend-owned display category metadata rather than
+ * hardcoded legacy category lists.
  */
 
-import { useState, useEffect } from 'react';
-import { apiClient }           from '../api/client.js';
+import { useMemo, useState, useEffect } from 'react';
+import { apiClient } from '../api/client.js';
 
-// Module-level cache (shared across all hook instances).
-let _cache    = null;
-let _cacheAt  = 0;
 const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 
-// In-flight promise shared across simultaneous callers.
-let _inflight = null;
+// Scope-keyed module cache shared across hook instances.
+const _cache = new Map();
+const _inflight = new Map();
 
-function isCacheFresh() {
-  return _cache !== null && ( Date.now() - _cacheAt ) < CACHE_TTL;
+function normalizeScope(scope = {}) {
+  const normalized = {};
+
+  if (scope.brand) normalized.brand = String(scope.brand);
+  if (scope.category) normalized.category = String(scope.category);
+  if (scope.displayCategory) normalized.display_category = String(scope.displayCategory);
+  if (scope.productKind) normalized.product_kind = String(scope.productKind);
+  if (scope.isParts !== undefined && scope.isParts !== null && scope.isParts !== '') {
+    normalized.is_parts = String(scope.isParts);
+  }
+
+  return normalized;
 }
 
-export function useCatalogFacets() {
-  // Initialize synchronously from cache when fresh — avoids an extra render.
-  const [ facets,  setFacets  ] = useState( () => isCacheFresh() ? _cache : null );
-  const [ loading, setLoading ] = useState( () => ! isCacheFresh() );
-  const [ error,   setError   ] = useState( null );
+function buildScopeKey(scope = {}) {
+  const normalized = normalizeScope(scope);
+  const entries = Object.entries(normalized).sort(([a], [b]) => a.localeCompare(b));
+  return JSON.stringify(entries);
+}
 
-  useEffect( () => {
-    // Cache was already valid at mount — nothing to do.
-    if ( isCacheFresh() ) {
+function buildFacetsUrl(scope = {}) {
+  const params = new URLSearchParams(normalizeScope(scope));
+  const qs = params.toString();
+  return `/wp-json/dtb/v1/catalog/facets${qs ? `?${qs}` : ''}`;
+}
+
+function getFreshCache(key) {
+  const entry = _cache.get(key);
+  if (!entry) return null;
+  if ((Date.now() - entry.cachedAt) >= CACHE_TTL) return null;
+  return entry.data;
+}
+
+export function useCatalogFacets(scope = {}) {
+  const scopeKey = useMemo(() => buildScopeKey(scope), [
+    scope?.brand,
+    scope?.category,
+    scope?.displayCategory,
+    scope?.productKind,
+    scope?.isParts,
+  ]);
+  const url = useMemo(() => buildFacetsUrl(scope), [scopeKey]);
+
+  const [facets, setFacets] = useState(() => getFreshCache(scopeKey));
+  const [loading, setLoading] = useState(() => !getFreshCache(scopeKey));
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const cached = getFreshCache(scopeKey);
+    if (cached) {
+      setFacets(cached);
+      setLoading(false);
       return;
     }
 
     let mounted = true;
+    setLoading(true);
+    setError(null);
 
-    if ( ! _inflight ) {
-      _inflight = apiClient( '/wp-json/dtb/v1/catalog/facets' )
-        .then( data => {
-          _cache   = data;
-          _cacheAt = Date.now();
-          _inflight = null;
-          return data;
-        } )
-        .catch( err => {
-          _inflight = null;
-          throw err;
-        } );
+    if (!_inflight.has(scopeKey)) {
+      _inflight.set(
+        scopeKey,
+        apiClient(url)
+          .then((data) => {
+            _cache.set(scopeKey, { data, cachedAt: Date.now() });
+            _inflight.delete(scopeKey);
+            return data;
+          })
+          .catch((err) => {
+            _inflight.delete(scopeKey);
+            throw err;
+          })
+      );
     }
 
-    _inflight
-      .then( data => {
-        if ( ! mounted ) return;
-        setFacets( data );
-        setLoading( false );
-      } )
-      .catch( err => {
-        if ( ! mounted ) return;
-        setError( err );
-        setLoading( false );
-      } );
+    _inflight.get(scopeKey)
+      .then((data) => {
+        if (!mounted) return;
+        setFacets(data);
+        setLoading(false);
+      })
+      .catch((err) => {
+        if (!mounted) return;
+        setError(err);
+        setLoading(false);
+      });
 
     return () => { mounted = false; };
-  }, [] );
+  }, [scopeKey, url]);
 
   return { facets, loading, error };
 }
 
 /** Invalidate the module-level facets cache (e.g. after an admin action). */
 export function invalidateCatalogFacetsCache() {
-  _cache   = null;
-  _cacheAt = 0;
+  _cache.clear();
+  _inflight.clear();
 }
 
 export default useCatalogFacets;
