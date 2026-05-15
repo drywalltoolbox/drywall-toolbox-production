@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client'
 import { HelmetProvider } from 'react-helmet-async'
 import './index.css'
 import './styles/machined-design.css'
+import './styles/tool-selector.css'
 import './styles/technical-specifications.css'
 import App from './App.jsx'
 import ErrorBoundary from './components/errors/ErrorBoundary.jsx'
@@ -62,7 +63,7 @@ if (typeof window !== 'undefined') {
         const hasInputs = Array.from(mutation.addedNodes).some(node => 
           node.querySelector && (
             node.querySelector('input') || 
-            node.querySelector('textarea') || 
+            node.querySelector('textarea') ||
             node.querySelector('select') ||
             node.tagName === 'INPUT' ||
             node.tagName === 'TEXTAREA' ||
