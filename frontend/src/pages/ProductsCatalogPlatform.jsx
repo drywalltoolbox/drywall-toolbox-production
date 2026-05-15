@@ -17,6 +17,7 @@ import { useCatalogFacets } from '../hooks/useCatalogFacets';
 import { useCatalogProducts } from '../hooks/useCatalogProducts';
 import { useCart } from '../context/CartContext';
 import { buildSiteLinksSearchBoxSchema } from '../utils/schema';
+import { getVariationSelectionMap } from '../utils/variationSelection';
 import {
   brandLogoFor,
   brandToSlug,
@@ -233,8 +234,15 @@ export default function ProductsCatalogPlatform({ forceProductGrid = false, titl
     showToast(`${product.name} added to cart!`, 'cart');
   };
 
-  const openModal = (product) => {
-    setModalProduct({ product });
+  const openModal = (product, cardProduct = null) => {
+    const initialResolvedVariation = cardProduct?.parent_id ? cardProduct : null;
+    setModalProduct({
+      product,
+      initialResolvedVariation,
+      initialSelectedAttrs: initialResolvedVariation
+        ? getVariationSelectionMap(initialResolvedVariation)
+        : {},
+    });
     setIsModalOpen(true);
   };
 
@@ -421,9 +429,9 @@ export default function ProductsCatalogPlatform({ forceProductGrid = false, titl
                           key={product.id}
                           product={product}
                           cardProduct={cardProduct}
-                          hasSelectedVariation={false}
-                          onOpenModal={() => openModal(product)}
-                          onAddToCart={() => openModal(product)}
+                          hasSelectedVariation={Boolean(product.is_variable && cardProduct?.parent_id)}
+                          onOpenModal={() => openModal(product, cardProduct)}
+                          onAddToCart={() => openModal(product, cardProduct)}
                           index={index}
                         />
                       );
@@ -478,12 +486,12 @@ export default function ProductsCatalogPlatform({ forceProductGrid = false, titl
       <ProductModal isOpen={isModalOpen && !!modalProduct} product={modalProduct?.product || modalProduct} onClose={closeModal}>
         {modalProduct && (
           <ProductDetailPlatform
-            key={`${modalProduct.product?.id || modalProduct.id}:parent`}
+            key={`${modalProduct.product?.id || modalProduct.id}:${modalProduct.initialResolvedVariation?.id || 'parent'}`}
             product={modalProduct.product || modalProduct}
             onAddToCart={handleAddToCart}
             onClose={closeModal}
-            initialResolvedVariation={null}
-            initialSelectedAttrs={{}}
+            initialResolvedVariation={modalProduct.initialResolvedVariation}
+            initialSelectedAttrs={modalProduct.initialSelectedAttrs}
           />
         )}
       </ProductModal>
