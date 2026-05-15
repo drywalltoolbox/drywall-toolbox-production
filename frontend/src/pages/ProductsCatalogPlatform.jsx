@@ -18,7 +18,10 @@ import { useCatalogProducts } from '../hooks/useCatalogProducts';
 import { useCart } from '../context/CartContext';
 import { buildSiteLinksSearchBoxSchema } from '../utils/schema';
 import {
+  brandLogoFor,
+  brandToSlug,
   buildCatalogUrl,
+  canonicalBrandLabel,
   parseCatalogQuery,
 } from '../utils/catalogUrlState.js';
 
@@ -49,10 +52,6 @@ function toCardProduct(dto) {
     variation_attributes: dto?.variationAttributes || dto?.attributes || [],
   };
 
-  // Keep the backend-resolved default child available for non-visual flows, but
-  // do not use it to seed modal selection. Product-list cards and modal initial
-  // state must represent the variable parent; child data is activated only after
-  // an explicit user option selection inside ProductDetail.
   mapped.cardProduct = card
     ? {
         ...card,
@@ -96,6 +95,19 @@ function mergeDisplayCategories(displayCategoriesByBrand = {}) {
     .sort((a, b) => a.name.localeCompare(b.name));
 }
 
+function toBrandFacet(rawBrand = {}) {
+  const label = canonicalBrandLabel(rawBrand.label || rawBrand.name || rawBrand.key || rawBrand.slug || '');
+  const slug = rawBrand.slug || rawBrand.key || brandToSlug(label);
+
+  return {
+    key: rawBrand.key || slug,
+    label,
+    slug,
+    logo: rawBrand.logo || rawBrand.image || rawBrand.imageUrl || brandLogoFor(label || slug),
+    productCount: rawBrand.productCount || rawBrand.count || 0,
+  };
+}
+
 export default function ProductsCatalogPlatform({ forceProductGrid = false, title = 'Products' } = {}) {
   const location = useLocation();
   const navigate = useNavigate();
@@ -127,24 +139,33 @@ export default function ProductsCatalogPlatform({ forceProductGrid = false, titl
     isParts: 0,
   });
 
-  const brands = useMemo(
-    () => (Array.isArray(facets?.brands) ? facets.brands.map((b) => b.label) : []),
+  const brandFacets = useMemo(
+    () => (Array.isArray(facets?.brands) ? facets.brands.map(toBrandFacet).filter((brand) => brand.label) : []),
     [facets]
   );
 
-  const selectedBrandFacet = useMemo(
-    () =>
-      Array.isArray(facets?.brands)
-        ? facets.brands.find((b) => b.label === selectedBrand || b.slug === selectedBrand || b.key === selectedBrand)
-        : null,
-    [facets, selectedBrand]
+  const brands = useMemo(
+    () => brandFacets.map((brand) => brand.label),
+    [brandFacets]
   );
+
+  const selectedBrandFacet = useMemo(() => {
+    if (!selectedBrand) return null;
+    const selectedSlug = brandToSlug(selectedBrand);
+    const selectedLabel = canonicalBrandLabel(selectedBrand);
+
+    return brandFacets.find((brand) =>
+      brand.label === selectedLabel ||
+      brand.slug === selectedSlug ||
+      brand.key === selectedSlug
+    ) || null;
+  }, [brandFacets, selectedBrand]);
 
   const filterCategories = useMemo(() => {
     if (!facets) return [];
 
     if (selectedBrandFacet?.key) {
-      const byBrand = facets.displayCategoriesByBrand?.[selectedBrandFacet.key];
+      const byBrand = facets.displayCategoriesByBrand?.[selectedBrandFacet.key] || facets.displayCategoriesByBrand?.[selectedBrandFacet.slug];
       if (!Array.isArray(byBrand)) return [];
       return byBrand
         .filter((cat) => (cat.productCount || 0) > 0)
@@ -163,7 +184,7 @@ export default function ProductsCatalogPlatform({ forceProductGrid = false, titl
 
   const brandCategoryCards = useMemo(() => {
     if (!selectedBrandFacet?.key) return [];
-    const byBrand = facets?.displayCategoriesByBrand?.[selectedBrandFacet.key];
+    const byBrand = facets?.displayCategoriesByBrand?.[selectedBrandFacet.key] || facets?.displayCategoriesByBrand?.[selectedBrandFacet.slug];
     if (!Array.isArray(byBrand)) return [];
     return [...byBrand]
       .filter((cat) => (cat.productCount || 0) > 0)
@@ -223,7 +244,8 @@ export default function ProductsCatalogPlatform({ forceProductGrid = false, titl
   };
 
   const toggleBrand = (brand) => {
-    const nextBrand = selectedBrand === brand ? '' : brand;
+    const canonical = canonicalBrandLabel(brand);
+    const nextBrand = canonicalBrandLabel(selectedBrand) === canonical ? '' : canonical;
     setQuery({
       brands: nextBrand ? [nextBrand] : [],
       displayCategory: '',
@@ -292,13 +314,24 @@ export default function ProductsCatalogPlatform({ forceProductGrid = false, titl
 
         {showBrandLanding ? (
           <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
-            {brands.map((brand) => (
+            {brandFacets.map((brand) => (
               <button
-                key={brand}
-                onClick={() => setQuery({ brands: [brand], displayCategory: '', category: '' })}
-                className="dtb-brand-card"
-                aria-label={`Shop ${brand}`}
+                key={brand.slug || brand.label}
+                onClick={() => setQuery({ brands: [brand.label], displayCategory: '', category: '' })}
+                className="dtb-brand-card flex flex-col items-center justify-center gap-4 p-6"
+                aria-label={`Shop ${brand.label}`}
               >
+                {brand.logo && (
+                  <img
+                    src={brand.logo}
+                    alt=""
+                    className="max-h-16 max-w-[80%] object-contain"
+                    loading="lazy"
+                    onError={(event) => {
+                      event.currentTarget.style.display = 'none';
+                    }}
+                  />
+                )}
                 <span
                   style={{
                     fontWeight: 700,
@@ -309,7 +342,7 @@ export default function ProductsCatalogPlatform({ forceProductGrid = false, titl
                     lineHeight: 1.2,
                   }}
                 >
-                  {brand}
+                  {brand.label}
                 </span>
               </button>
             ))}
@@ -343,7 +376,7 @@ export default function ProductsCatalogPlatform({ forceProductGrid = false, titl
               categories={filterCategories}
               brands={brands}
               maxPrice={0}
-              selectedBrands={selectedBrand ? [selectedBrand] : []}
+              selectedBrands={selectedBrand ? [canonicalBrandLabel(selectedBrand)] : []}
               selectedCategories={query.displayCategory ? [query.displayCategory] : []}
               priceRange={[0, 0]}
               onBrandChange={toggleBrand}
