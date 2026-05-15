@@ -5,10 +5,6 @@
  * Maps raw brand strings (from WC categories, attributes, meta, or CSV) into
  * the canonical DTB brand identity: { key, label, slug }.
  *
- * This is the single source of truth for brand normalization on the backend,
- * replacing the scattered BRAND_ALIASES / BRAND_TO_SLUG logic currently
- * duplicated in frontend/src/services/api.js and parseProductCsv.js.
- *
  * @package drywall-toolbox
  */
 
@@ -25,7 +21,6 @@ final class DTB_BrandNormalizer {
 	const BRAND_TO_SLUG = [
 		'TapeTech'               => 'tapetech',
 		'Columbia Taping Tools'  => 'columbia-taping-tools',
-		'Columbia'               => 'columbia-taping-tools',
 		'Asgard'                 => 'asgard',
 		'SurPro'                 => 'surpro',
 		'Graco'                  => 'graco',
@@ -43,6 +38,7 @@ final class DTB_BrandNormalizer {
 	const BRAND_ALIASES = [
 		'Columbia'                => 'Columbia Taping Tools',
 		'columbia'                => 'Columbia Taping Tools',
+		'COLUMBIA'                => 'Columbia Taping Tools',
 		'TAPETECH'                => 'TapeTech',
 		'Tape Tech'               => 'TapeTech',
 		'LEVEL 5'                 => 'Level 5',
@@ -63,10 +59,14 @@ final class DTB_BrandNormalizer {
 	 * Normalize a raw brand string to the canonical { key, label, slug } tuple.
 	 *
 	 * Resolution order:
-	 *   1. Exact match in BRAND_TO_SLUG → canonical label already.
-	 *   2. Match in BRAND_ALIASES → resolve to canonical label.
-	 *   3. Case-insensitive scan of BRAND_TO_SLUG.
+	 *   1. Alias → canonical label.
+	 *   2. Exact canonical label in BRAND_TO_SLUG.
+	 *   3. Case-insensitive alias/canonical scan.
 	 *   4. Unknown brand → derive slug from sanitize_title().
+	 *
+	 * Aliases intentionally run before canonical lookup so imported brand labels
+	 * such as "Columbia" collapse to the customer-facing canonical label
+	 * "Columbia Taping Tools" rather than creating a second frontend brand.
 	 *
 	 * @param  string $raw  Raw brand string.
 	 * @return array{ key: string, label: string, slug: string }
@@ -77,21 +77,27 @@ final class DTB_BrandNormalizer {
 			return [ 'key' => '', 'label' => '', 'slug' => '' ];
 		}
 
-		// 1. Exact match in BRAND_TO_SLUG (canonical label).
-		if ( isset( self::BRAND_TO_SLUG[ $raw ] ) ) {
-			$slug = self::BRAND_TO_SLUG[ $raw ];
-			return [ 'key' => $slug, 'label' => $raw, 'slug' => $slug ];
-		}
-
-		// 2. Alias → canonical label.
+		// 1. Alias → canonical label.
 		if ( isset( self::BRAND_ALIASES[ $raw ] ) ) {
 			$canonical = self::BRAND_ALIASES[ $raw ];
 			$slug      = self::BRAND_TO_SLUG[ $canonical ] ?? sanitize_title( $canonical );
 			return [ 'key' => $slug, 'label' => $canonical, 'slug' => $slug ];
 		}
 
-		// 3. Case-insensitive scan of canonical labels.
+		// 2. Exact canonical label.
+		if ( isset( self::BRAND_TO_SLUG[ $raw ] ) ) {
+			$slug = self::BRAND_TO_SLUG[ $raw ];
+			return [ 'key' => $slug, 'label' => $raw, 'slug' => $slug ];
+		}
+
+		// 3. Case-insensitive alias/canonical scan.
 		$lower = strtolower( $raw );
+		foreach ( self::BRAND_ALIASES as $alias => $canonical ) {
+			if ( strtolower( $alias ) === $lower ) {
+				$slug = self::BRAND_TO_SLUG[ $canonical ] ?? sanitize_title( $canonical );
+				return [ 'key' => $slug, 'label' => $canonical, 'slug' => $slug ];
+			}
+		}
 		foreach ( self::BRAND_TO_SLUG as $label => $slug ) {
 			if ( strtolower( $label ) === $lower ) {
 				return [ 'key' => $slug, 'label' => $label, 'slug' => $slug ];
