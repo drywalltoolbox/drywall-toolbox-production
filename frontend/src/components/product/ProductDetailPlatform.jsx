@@ -32,8 +32,7 @@ export default function ProductDetailPlatform({
         : []);
 
   const resolvedDefaultVariation =
-    computed?.defaultVariation ||
-    (initialResolvedVariation ? toLegacyVariationDTO(initialResolvedVariation, product || null) : null);
+    initialResolvedVariation ? toLegacyVariationDTO(initialResolvedVariation, product || null) : null;
 
   return (
     <ProductDetail
@@ -45,6 +44,7 @@ export default function ProductDetailPlatform({
       initialSelectedAttrs={initialSelectedAttrs}
       initialComputedData={computed}
       disableLegacyDetailFetch={status === 'ready'}
+      autoSelectDefaultVariation={false}
     />
   );
 }
