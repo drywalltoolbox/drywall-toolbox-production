@@ -6,6 +6,26 @@ import {
 } from '../../utils/catalogDtoAdapters.js';
 import { getVariationSelectionMap } from '../../utils/variationSelection.js';
 
+function VariationEndpointError({ error, onClose }) {
+  return (
+    <div className="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-3xl mx-auto">
+      <h2 className="text-xl font-bold text-gray-900 mb-2">Product variations unavailable</h2>
+      <p className="text-sm text-gray-600 mb-4">
+        The canonical catalog detail endpoint did not return attached variation rows for this variable product.
+        This usually means the WooCommerce import did not attach child variations to the parent SKU.
+      </p>
+      {error && <p className="text-xs text-gray-500 mb-4">{String(error)}</p>}
+      <button
+        type="button"
+        onClick={onClose}
+        className="inline-flex items-center justify-center px-4 py-2 rounded-lg bg-blue-600 text-white font-semibold"
+      >
+        Close
+      </button>
+    </div>
+  );
+}
+
 export default function ProductDetailPlatform({
   product,
   onAddToCart,
@@ -55,23 +75,8 @@ export default function ProductDetailPlatform({
     );
   }
 
-  if ((status === 'error' || status === 'not_found') && resolvedVariations.length === 0 && product?.is_variable) {
-    return (
-      <div className="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-3xl mx-auto">
-        <h2 className="text-xl font-bold text-gray-900 mb-2">Product variations unavailable</h2>
-        <p className="text-sm text-gray-600 mb-4">
-          The canonical product detail endpoint did not return variation data for this product.
-        </p>
-        {error && <p className="text-xs text-gray-500 mb-4">{String(error)}</p>}
-        <button
-          type="button"
-          onClick={onClose}
-          className="inline-flex items-center justify-center px-4 py-2 rounded-lg bg-blue-600 text-white font-semibold"
-        >
-          Close
-        </button>
-      </div>
-    );
+  if (product?.is_variable && resolvedVariations.length === 0) {
+    return <VariationEndpointError error={error} onClose={onClose} />;
   }
 
   return (
