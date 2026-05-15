@@ -32,10 +32,38 @@ function formatPrice(value) {
   return `$${asNumber(value, 0).toFixed(2)}`;
 }
 
+function getVariationLabel(cardProduct = {}) {
+  const direct = cardProduct?.variation_label || cardProduct?.variationLabel;
+  if (direct) return String(direct).trim();
+
+  const firstAttr = Array.isArray(cardProduct?.attributes) ? cardProduct.attributes[0] : null;
+  const fromAttr = firstAttr?.option || firstAttr?.value || firstAttr?.label;
+  return fromAttr ? String(fromAttr).trim() : '';
+}
+
+function composeVariationName(product = {}, cardProduct = {}) {
+  const parentName = product?.name || cardProduct?.parentName || '';
+  const variationLabel = getVariationLabel(cardProduct);
+  const rawName = cardProduct?.name || '';
+
+  if (parentName && variationLabel) {
+    const normalizedRaw = rawName.trim().toLowerCase();
+    const normalizedLabel = variationLabel.trim().toLowerCase();
+
+    if (!rawName || normalizedRaw === normalizedLabel || /^\d+(?:\.\d+)?(?:\s*(?:in|inch|inches|"))?$/i.test(rawName.trim())) {
+      return `${parentName} - ${variationLabel}`;
+    }
+  }
+
+  return rawName || parentName || '';
+}
+
 function getResolvedCardProduct(product, cardProduct) {
   if (!product?.is_variable) return cardProduct || product;
 
   if (cardProduct?.parent_id || cardProduct?.parentId || cardProduct?.id !== product?.id) {
+    const variationLabel = getVariationLabel(cardProduct);
+
     return {
       ...cardProduct,
       brand: cardProduct?.brand || product?.brand,
@@ -43,7 +71,8 @@ function getResolvedCardProduct(product, cardProduct) {
       images: cardProduct?.images || product?.images,
       image_thumbnail: cardProduct?.image_thumbnail || product?.image_thumbnail,
       image_srcset: cardProduct?.image_srcset || product?.image_srcset,
-      name: cardProduct?.name || product?.name,
+      name: composeVariationName(product, cardProduct),
+      variation_label: variationLabel,
       stock_status: cardProduct?.stock_status || cardProduct?.stockStatus || product?.stock_status || 'instock',
       price: cardProduct?.price ?? product?.min_price ?? product?.price ?? 0,
     };
