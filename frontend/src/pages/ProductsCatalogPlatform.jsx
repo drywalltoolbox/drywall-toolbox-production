@@ -47,6 +47,7 @@ function toCardProduct(dto) {
     is_variable: dto?.type === 'variable',
     is_parts: Boolean(dto?.isParts),
     min_price: dto?.price?.min ?? null,
+    variation_attributes: dto?.variationAttributes || dto?.attributes || [],
   };
 
   mapped.cardProduct = card
@@ -61,6 +62,30 @@ function toCardProduct(dto) {
     : null;
 
   return mapped;
+}
+
+function mergeDisplayCategories(displayCategoriesByBrand = {}) {
+  const merged = new Map();
+
+  Object.values(displayCategoriesByBrand || {}).forEach((items) => {
+    if (!Array.isArray(items)) return;
+    items.forEach((cat) => {
+      const id = cat?.slug || cat?.key;
+      if (!id) return;
+      const existing = merged.get(id);
+      merged.set(id, {
+        id,
+        key: cat.key || id,
+        slug: id,
+        name: cat.label || cat.key || id,
+        count: (existing?.count || 0) + (cat.productCount || 0),
+      });
+    });
+  });
+
+  return Array.from(merged.values())
+    .filter((cat) => cat.count > 0)
+    .sort((a, b) => a.name.localeCompare(b.name));
 }
 
 export default function ProductsCatalogPlatform() {
@@ -83,7 +108,12 @@ export default function ProductsCatalogPlatform() {
     [location.search, pathParams]
   );
 
-  const { facets, loading: facetsLoading } = useCatalogFacets();
+  const selectedBrand = query.brands?.[0] || '';
+
+  const { facets, loading: facetsLoading } = useCatalogFacets({
+    isParts: 0,
+    brand: selectedBrand,
+  });
   const { items, pagination, loading: itemsLoading } = useCatalogProducts({
     ...query,
     isParts: 0,
@@ -93,28 +123,42 @@ export default function ProductsCatalogPlatform() {
     () => (Array.isArray(facets?.brands) ? facets.brands.map((b) => b.label) : []),
     [facets]
   );
-  const categories = useMemo(
-    () =>
-      Array.isArray(facets?.categories)
-        ? facets.categories.map((c) => ({ id: c.key, name: c.label }))
-        : [],
-    [facets]
-  );
 
-  const selectedBrand = query.brands?.[0] || '';
   const selectedBrandFacet = useMemo(
     () =>
       Array.isArray(facets?.brands)
-        ? facets.brands.find((b) => b.label === selectedBrand)
+        ? facets.brands.find((b) => b.label === selectedBrand || b.slug === selectedBrand || b.key === selectedBrand)
         : null,
     [facets, selectedBrand]
   );
+
+  const filterCategories = useMemo(() => {
+    if (!facets) return [];
+
+    if (selectedBrandFacet?.key) {
+      const byBrand = facets.displayCategoriesByBrand?.[selectedBrandFacet.key];
+      if (!Array.isArray(byBrand)) return [];
+      return byBrand
+        .filter((cat) => (cat.productCount || 0) > 0)
+        .map((cat) => ({
+          id: cat.slug || cat.key,
+          key: cat.key,
+          slug: cat.slug || cat.key,
+          name: cat.label || cat.key,
+          count: cat.productCount || 0,
+        }))
+        .sort((a, b) => a.name.localeCompare(b.name));
+    }
+
+    return mergeDisplayCategories(facets.displayCategoriesByBrand);
+  }, [facets, selectedBrandFacet]);
 
   const brandCategoryCards = useMemo(() => {
     if (!selectedBrandFacet?.key) return [];
     const byBrand = facets?.displayCategoriesByBrand?.[selectedBrandFacet.key];
     if (!Array.isArray(byBrand)) return [];
     return [...byBrand]
+      .filter((cat) => (cat.productCount || 0) > 0)
       .map((cat) => ({
         key: cat.key,
         slug: cat.slug || cat.key,
@@ -189,8 +233,11 @@ export default function ProductsCatalogPlatform() {
     });
   };
 
-  const toggleCategory = (category) => {
-    setQuery({ category: query.category === category ? '' : category });
+  const toggleDisplayCategory = (displayCategory) => {
+    setQuery({
+      displayCategory: query.displayCategory === displayCategory ? '' : displayCategory,
+      category: '',
+    });
   };
 
   const resetToBrandList = () => {
@@ -289,14 +336,14 @@ export default function ProductsCatalogPlatform() {
             <FilterPanel
               isOpen={showFilters}
               onClose={() => setShowFilters(false)}
-              categories={categories}
+              categories={filterCategories}
               brands={brands}
               maxPrice={0}
               selectedBrands={selectedBrand ? [selectedBrand] : []}
-              selectedCategories={query.category ? [query.category] : []}
+              selectedCategories={query.displayCategory ? [query.displayCategory] : []}
               priceRange={[0, 0]}
               onBrandChange={toggleBrand}
-              onCategoryChange={toggleCategory}
+              onCategoryChange={toggleDisplayCategory}
               onPriceChange={() => {}}
               onClearFilters={() => {
                 if (selectedBrand) {
@@ -401,6 +448,7 @@ export default function ProductsCatalogPlatform() {
             initialVariations={[]}
             initialResolvedVariation={modalProduct.initialResolvedVariation}
             initialSelectedAttrs={modalProduct.initialSelectedAttrs}
+            disableLegacyDetailFetch
           />
         )}
       </ProductModal>
