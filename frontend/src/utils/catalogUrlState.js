@@ -43,16 +43,10 @@ export const SLUG_TO_BRAND = Object.fromEntries(
   Object.entries(BRAND_TO_SLUG).map(([name, slug]) => [slug, name])
 );
 
-export const BRAND_LOGOS = {
-  tapetech: '/brand-logos/tapetech.webp',
-  'columbia-taping-tools': '/brand-logos/columbia.webp',
-  asgard: '/brand-logos/asgard.webp',
-  surpro: '/brand-logos/surpro.webp',
-  graco: '/brand-logos/graco.webp',
-  platinum: '/brand-logos/platinum.webp',
-  'dura-stilts': '/brand-logos/dura-stilts.webp',
-  level5: '/brand-logos/level5.webp',
-};
+// Real brand logo assets should come from backend facet data or existing
+// public assets. Do not point to non-existent fallback URLs; 404s pollute the
+// console and obscure catalog/variation debugging.
+export const BRAND_LOGOS = {};
 
 // ── DTB category key → display label ─────────────────────────────────────────
 
