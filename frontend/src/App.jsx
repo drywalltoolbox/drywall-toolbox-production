@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useLocation, Navigate } from 'react-router-dom';
 import { useState, useEffect, lazy, Suspense } from 'react';
 import PageTransition from './components/routing/PageTransition';
 import LoadingSpinner from './components/shared/LoadingSpinner';
@@ -20,7 +20,6 @@ import ProtectedRoute from './components/routing/ProtectedRoute';
 // the user actually navigates to that route — keeping the initial bundle lean.
 const Home               = lazy(() => import('./pages/Home'));
 const Products           = lazy(() => import('./pages/Products'));
-const AllProducts        = lazy(() => import('./pages/AllProducts'));
 const Parts              = lazy(() => import('./pages/Parts'));
 const Product            = lazy(() => import('./pages/Product'));
 const ProductDetailPage  = lazy(() => import('./pages/ProductDetailPage'));
@@ -107,7 +106,7 @@ function AppRoutes() {
           <Route path="/products/brands/:brandSlug/categories/:categorySlug" element={<Products />} />
           {/* Slug-based product detail with URL variant state machine */}
           <Route path="/products/:slug"        element={<ProductDetailPage />} />
-          <Route path="/all-products"          element={<AllProducts />} />
+          <Route path="/all-products"          element={<Navigate to="/products" replace />} />
           <Route path="/parts"                 element={<Parts />} />
           {/* Legacy part-number route — kept for backward compatibility */}
           <Route path="/product/:partNumber"   element={<Product />} />
@@ -207,12 +206,6 @@ function AppShell({ cartOpen, toggleCart, closeCart }) {
         <Header onCartToggle={toggleCart} hasTopTicker={isHomePage} />
 
         <main style={{ flexGrow: 1 }} className="main-content">
-          {/*
-            AppRoutes renders all page routes wrapped in PageTransition,
-            giving every route a consistent smooth fade+lift enter/exit.
-            Suspense (inside AppRoutes) shows PageLoader for lazy chunks.
-            Header and Footer remain visible during all transitions.
-          */}
           <AppRoutes />
         </main>
 
