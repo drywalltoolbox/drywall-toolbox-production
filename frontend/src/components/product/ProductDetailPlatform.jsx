@@ -4,6 +4,7 @@ import {
   toLegacyProductCardDTO,
   toLegacyVariationDTO,
 } from '../../utils/catalogDtoAdapters.js';
+import { getVariationSelectionMap } from '../../utils/variationSelection.js';
 
 export default function ProductDetailPlatform({
   product,
@@ -19,6 +20,7 @@ export default function ProductDetailPlatform({
     variations,
     computed,
     status,
+    error,
   } = useCatalogProductDetail(slug);
 
   const fallbackProduct = product ? toLegacyProductCardDTO(product) : null;
@@ -31,8 +33,46 @@ export default function ProductDetailPlatform({
         ? initialVariations.map((variation) => toLegacyVariationDTO(variation, product || null))
         : []);
 
-  const resolvedDefaultVariation =
-    initialResolvedVariation ? toLegacyVariationDTO(initialResolvedVariation, product || null) : null;
+  const endpointDefaultVariation = computed?.defaultVariation || null;
+  const initialDefaultVariation = initialResolvedVariation
+    ? toLegacyVariationDTO(initialResolvedVariation, product || null)
+    : null;
+  const resolvedDefaultVariation = endpointDefaultVariation || initialDefaultVariation || null;
+
+  const resolvedSelectedAttrs = Object.keys(initialSelectedAttrs || {}).length > 0
+    ? initialSelectedAttrs
+    : (resolvedDefaultVariation ? getVariationSelectionMap(resolvedDefaultVariation) : {});
+
+  if (status === 'loading' && resolvedVariations.length === 0) {
+    return (
+      <div className="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-3xl mx-auto">
+        <div className="animate-pulse space-y-4">
+          <div className="h-8 bg-gray-200 rounded w-2/3" />
+          <div className="h-4 bg-gray-200 rounded w-1/3" />
+          <div className="h-24 bg-gray-100 rounded" />
+        </div>
+      </div>
+    );
+  }
+
+  if ((status === 'error' || status === 'not_found') && resolvedVariations.length === 0 && product?.is_variable) {
+    return (
+      <div className="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-3xl mx-auto">
+        <h2 className="text-xl font-bold text-gray-900 mb-2">Product variations unavailable</h2>
+        <p className="text-sm text-gray-600 mb-4">
+          The canonical product detail endpoint did not return variation data for this product.
+        </p>
+        {error && <p className="text-xs text-gray-500 mb-4">{String(error)}</p>}
+        <button
+          type="button"
+          onClick={onClose}
+          className="inline-flex items-center justify-center px-4 py-2 rounded-lg bg-blue-600 text-white font-semibold"
+        >
+          Close
+        </button>
+      </div>
+    );
+  }
 
   return (
     <ProductDetail
@@ -41,10 +81,10 @@ export default function ProductDetailPlatform({
       onClose={onClose}
       initialVariations={resolvedVariations}
       initialResolvedVariation={resolvedDefaultVariation}
-      initialSelectedAttrs={initialSelectedAttrs}
+      initialSelectedAttrs={resolvedSelectedAttrs}
       initialComputedData={computed}
-      disableLegacyDetailFetch={status === 'ready'}
-      autoSelectDefaultVariation={false}
+      disableLegacyDetailFetch
+      autoSelectDefaultVariation
     />
   );
 }
