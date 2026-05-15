@@ -2,12 +2,10 @@
 /**
  * DTB_CatalogFacetService
  *
- * Aggregates catalog facets (brands, categories, display categories) from all
- * published products and caches the result.  Provides the data behind
- * GET /wp-json/dtb/v1/catalog/facets.
- *
- * Cache is stored as a WP transient ('dtb_catalog_facets_v1') and invalidated
- * via the existing dtb_invalidate_product_cache() webhook path in dtb-cache.php.
+ * Aggregates scoped catalog facets (brands, broad categories, and display
+ * categories) from published WooCommerce products. The storefront uses display
+ * categories as the customer-facing product taxonomy; broad categories remain
+ * internal classification metadata.
  *
  * @package drywall-toolbox
  */
@@ -22,29 +20,81 @@ final class DTB_CatalogFacetService {
 	/**
 	 * Return cached facets or rebuild from WC.
 	 *
+	 * @param  array<string,mixed> $scope Optional facet scope.
 	 * @return array{ brands: array[], categories: array[], displayCategoriesByBrand: array }
 	 */
-	public static function get(): array {
-		$cached = get_transient( self::CACHE_KEY );
+	public static function get( array $scope = [] ): array {
+		$scope = self::normalize_scope( $scope );
+		$key   = self::cache_key( $scope );
+
+		$cached = get_transient( $key );
 		if ( is_array( $cached ) ) {
 			return $cached;
 		}
-		$facets = self::build();
-		set_transient( self::CACHE_KEY, $facets, self::CACHE_TTL );
+
+		$facets = self::build( $scope );
+		set_transient( $key, $facets, self::CACHE_TTL );
 		return $facets;
 	}
 
-	/** Invalidate the facets cache. Called by the product webhook handler. */
+	/** Invalidate all facets cache variants. */
 	public static function invalidate(): void {
+		global $wpdb;
+
 		delete_transient( self::CACHE_KEY );
+
+		// Scoped facet keys are md5-suffixed. Remove both timeout and value rows.
+		$like = $wpdb->esc_like( '_transient_' . self::CACHE_KEY . '_' ) . '%';
+		$wpdb->query(
+			$wpdb->prepare(
+				"DELETE FROM {$wpdb->options} WHERE option_name LIKE %s OR option_name LIKE %s",
+				$like,
+				$wpdb->esc_like( '_transient_timeout_' . self::CACHE_KEY . '_' ) . '%'
+			)
+		);
 	}
 
 	// ── Private ────────────────────────────────────────────────────────────────
 
-	private static function build(): array {
-		$brands              = [];
-		$categories          = [];
-		$display_by_brand    = [];
+	/**
+	 * @param array<string,mixed> $scope
+	 * @return array<string,string>
+	 */
+	private static function normalize_scope( array $scope ): array {
+		$normalized = [];
+
+		foreach ( [ 'brand', 'category', 'display_category', 'product_kind' ] as $key ) {
+			$value = isset( $scope[ $key ] ) ? sanitize_text_field( (string) $scope[ $key ] ) : '';
+			if ( '' !== $value ) {
+				$normalized[ $key ] = $value;
+			}
+		}
+
+		if ( array_key_exists( 'is_parts', $scope ) && null !== $scope['is_parts'] && '' !== $scope['is_parts'] ) {
+			$normalized['is_parts'] = filter_var( $scope['is_parts'], FILTER_VALIDATE_BOOLEAN ) ? '1' : '0';
+		}
+
+		ksort( $normalized );
+		return $normalized;
+	}
+
+	/** @param array<string,string> $scope */
+	private static function cache_key( array $scope ): string {
+		if ( empty( $scope ) ) {
+			return self::CACHE_KEY;
+		}
+
+		return self::CACHE_KEY . '_' . md5( wp_json_encode( $scope ) ?: '' );
+	}
+
+	/**
+	 * @param array<string,string> $scope
+	 * @return array{ brands: array[], categories: array[], displayCategoriesByBrand: array }
+	 */
+	private static function build( array $scope = [] ): array {
+		$brands           = [];
+		$categories       = [];
+		$display_by_brand = [];
 
 		$page     = 1;
 		$per_page = 100;
@@ -67,7 +117,12 @@ final class DTB_CatalogFacetService {
 			}
 
 			foreach ( $batch as $wc ) {
-				$dto     = DTB_CatalogProductNormalizer::normalize( $wc );
+				$dto = DTB_CatalogProductNormalizer::normalize( $wc );
+
+				if ( ! self::matches_scope( $dto, $scope ) ) {
+					continue;
+				}
+
 				$brand   = $dto['brand'];
 				$cat     = $dto['category'];
 				$dis_cat = $dto['displayCategory'];
@@ -125,6 +180,7 @@ final class DTB_CatalogFacetService {
 		$display_arr = [];
 		foreach ( $display_by_brand as $bk => $dcs ) {
 			$display_arr[ $bk ] = array_values( $dcs );
+			usort( $display_arr[ $bk ], static fn( $a, $b ) => strcmp( $a['label'], $b['label'] ) );
 		}
 
 		return [
@@ -132,5 +188,52 @@ final class DTB_CatalogFacetService {
 			'categories'               => $cats_arr,
 			'displayCategoriesByBrand' => $display_arr,
 		];
+	}
+
+	/**
+	 * @param array<string,mixed>  $dto
+	 * @param array<string,string> $scope
+	 */
+	private static function matches_scope( array $dto, array $scope ): bool {
+		if ( isset( $scope['is_parts'] ) ) {
+			$is_parts = ! empty( $dto['isParts'] ) ? '1' : '0';
+			if ( $is_parts !== $scope['is_parts'] ) {
+				return false;
+			}
+		}
+
+		if ( isset( $scope['brand'] ) && '' !== $scope['brand'] ) {
+			$needle = sanitize_title( $scope['brand'] );
+			$brand  = $dto['brand'] ?? [];
+			$values = array_filter([
+				sanitize_title( (string) ( $brand['key'] ?? '' ) ),
+				sanitize_title( (string) ( $brand['slug'] ?? '' ) ),
+				sanitize_title( (string) ( $brand['label'] ?? '' ) ),
+			]);
+			if ( ! in_array( $needle, $values, true ) ) {
+				return false;
+			}
+		}
+
+		if ( isset( $scope['category'] ) && '' !== $scope['category'] ) {
+			if ( ( $dto['category']['key'] ?? '' ) !== $scope['category'] ) {
+				return false;
+			}
+		}
+
+		if ( isset( $scope['display_category'] ) && '' !== $scope['display_category'] ) {
+			$display = $dto['displayCategory'] ?? [];
+			if ( ! in_array( $scope['display_category'], [ $display['key'] ?? '', $display['slug'] ?? '' ], true ) ) {
+				return false;
+			}
+		}
+
+		if ( isset( $scope['product_kind'] ) && '' !== $scope['product_kind'] ) {
+			if ( ( $dto['productKind'] ?? '' ) !== $scope['product_kind'] ) {
+				return false;
+			}
+		}
+
+		return true;
 	}
 }
