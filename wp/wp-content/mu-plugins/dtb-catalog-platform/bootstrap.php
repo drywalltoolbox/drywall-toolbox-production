@@ -28,8 +28,11 @@ if ( defined( 'DTB_CATALOG_PLATFORM_ENABLED' ) && ! DTB_CATALOG_PLATFORM_ENABLED
 	return;
 }
 
-// Only run on admin or REST API requests (mirrors dtb-cache.php guard).
-if ( ! dtb_is_admin_or_rest_request() ) {
+// Only run on admin/REST requests or WP-CLI context.
+if (
+	! dtb_is_admin_or_rest_request()
+	&& ! ( defined( 'WP_CLI' ) && WP_CLI )
+) {
 	return;
 }
 
@@ -45,6 +48,7 @@ require_once $_dtb_cp . '/Services/BrandNormalizer.php';
 require_once $_dtb_cp . '/Services/CategoryNormalizer.php';
 require_once $_dtb_cp . '/Services/ToolFamilyResolver.php';
 require_once $_dtb_cp . '/Services/CatalogProductNormalizer.php';
+require_once $_dtb_cp . '/Services/CatalogProductRepository.php';
 require_once $_dtb_cp . '/Services/VariationReadModelService.php';
 require_once $_dtb_cp . '/Services/DefaultVariationResolver.php';
 require_once $_dtb_cp . '/Services/CatalogFacetService.php';
