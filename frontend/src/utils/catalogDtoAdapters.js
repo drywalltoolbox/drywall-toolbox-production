@@ -8,11 +8,103 @@ function toLegacyVariationAttributeValues(attributes = []) {
   return attributes
     .map((attr) => {
       const name = (attr?.name || '').trim();
-      const option = (attr?.option || '').trim();
+      const option = (attr?.option || attr?.value || attr?.label || '').trim();
       if (!name || !option) return null;
       return { name, option };
     })
     .filter(Boolean);
+}
+
+function firstVariationAttribute(product = {}) {
+  const attrs = Array.isArray(product?.attributes) ? product.attributes : [];
+  return attrs.find((attr) => attr?.name && Array.isArray(attr?.options) && attr.options.length > 0) || null;
+}
+
+function firstVariationAxis(payloadProduct = {}, variations = [], computed = null) {
+  return (
+    firstVariationAttribute(payloadProduct)?.name ||
+    computed?.variationMatrix?.axis ||
+    variations.find((variation) => variation?.variation?.axis)?.variation?.axis ||
+    ''
+  );
+}
+
+function optionKeysForVariation(variation = {}, axis = '') {
+  const keys = [];
+  const attrs = Array.isArray(variation?.attributes) ? variation.attributes : [];
+
+  attrs.forEach((attr) => {
+    if (attr?.option) keys.push(attr.option);
+    if (attr?.value) keys.push(attr.value);
+    if (attr?.label) keys.push(attr.label);
+  });
+
+  const meta = variation?.variation || {};
+  if (meta.label) keys.push(meta.label);
+  if (meta.value) keys.push(meta.value);
+
+  if (axis && keys.length === 0 && variation?.variation_label) {
+    keys.push(variation.variation_label);
+  }
+
+  return Array.from(new Set(keys.filter(Boolean).map(String)));
+}
+
+function normalizeOptionKey(value) {
+  return String(value || '').trim().toLowerCase();
+}
+
+function matrixEntryForVariation(variation = {}) {
+  return {
+    variation_id: variation?.id ?? variation?.variationId ?? 0,
+    variationId: variation?.id ?? variation?.variationId ?? 0,
+    sku: variation?.sku || '',
+    stock_status: variation?.stock_status || variation?.inventory?.stockStatus || 'instock',
+    stockStatus: variation?.stock_status || variation?.inventory?.stockStatus || 'instock',
+    purchasable: variation?.purchasable ?? variation?.inventory?.purchasable ?? true,
+    price: toNumber(variation?.price?.value ?? variation?.price, 0),
+  };
+}
+
+function buildAvailableOptionMatrix(product, variations, computed = null) {
+  if (computed?.available_option_matrix && typeof computed.available_option_matrix === 'object') {
+    return computed.available_option_matrix;
+  }
+
+  const axis = firstVariationAxis(product, variations, computed);
+  if (!axis) return {};
+
+  const matrix = { [axis]: {} };
+
+  variations.forEach((variation) => {
+    const entry = matrixEntryForVariation(variation);
+    optionKeysForVariation(variation, axis).forEach((key) => {
+      matrix[axis][key] = entry;
+      matrix[axis][normalizeOptionKey(key)] = entry;
+    });
+  });
+
+  const options = computed?.variationMatrix?.options;
+  if (Array.isArray(options)) {
+    options.forEach((option) => {
+      const entry = {
+        variation_id: option.variationId || option.variation_id || 0,
+        variationId: option.variationId || option.variation_id || 0,
+        sku: option.sku || '',
+        stock_status: option.stockStatus || option.stock_status || 'instock',
+        stockStatus: option.stockStatus || option.stock_status || 'instock',
+        purchasable: option.purchasable ?? true,
+        price: toNumber(option.price, 0),
+      };
+
+      [option.value, option.label].filter(Boolean).forEach((key) => {
+        matrix[axis][key] = entry;
+        matrix[axis][normalizeOptionKey(key)] = entry;
+      });
+    });
+  }
+
+  return matrix;
 }
 
 export function toCatalogProductCardDTO(dto = {}) {
@@ -27,16 +119,26 @@ export function toCatalogProductCardDTO(dto = {}) {
     stock_status: card?.stockStatus || dto?.inventory?.stockStatus || 'instock',
     variation_label: card?.variationLabel || dto?.variation?.label || '',
     addToCartType: card?.addToCartType || (dto?.type === 'variable' ? 'variation' : 'simple'),
+    attributes: Array.isArray(card?.attributes) ? card.attributes : [],
+    variation_attribute_values: toLegacyVariationAttributeValues(card?.attributes || []),
   };
 }
 
 export function toLegacyVariationDTO(variationDto = {}, parentDto = null) {
-  const price = variationDto?.price || {};
+  const price = typeof variationDto?.price === 'object' ? variationDto.price : { value: variationDto?.price };
   const media = variationDto?.media || {};
+  const axis = variationDto?.variation?.axis || firstVariationAttribute(parentDto)?.name || '';
+  const sourceAttributes = Array.isArray(variationDto?.attributes) ? variationDto.attributes : [];
+  const attributes = sourceAttributes.length > 0
+    ? sourceAttributes
+    : (() => {
+        const label = variationDto?.variation?.label || variationDto?.variation?.value || variationDto?.variation_label || '';
+        return axis && label ? [{ name: axis, option: label }] : [];
+      })();
 
   return {
     id: variationDto?.id ?? 0,
-    parent_id: variationDto?.parentId ?? parentDto?.id ?? null,
+    parent_id: variationDto?.parentId ?? variationDto?.parent_id ?? parentDto?.id ?? null,
     name: variationDto?.name || parentDto?.name || '',
     slug: variationDto?.slug || '',
     sku: variationDto?.sku || parentDto?.sku || '',
@@ -45,11 +147,17 @@ export function toLegacyVariationDTO(variationDto = {}, parentDto = null) {
     regular_price: price?.regular != null ? String(price.regular) : '',
     sale_price: price?.sale != null ? String(price.sale) : '',
     on_sale: Boolean(price?.onSale),
-    stock_status: variationDto?.inventory?.stockStatus || 'instock',
-    image: media?.image || parentDto?.media?.image || '',
-    images: Array.isArray(media?.images) ? media.images : (Array.isArray(parentDto?.media?.images) ? parentDto.media.images : []),
-    attributes: Array.isArray(variationDto?.attributes) ? variationDto.attributes : [],
-    variation_attribute_values: toLegacyVariationAttributeValues(variationDto?.attributes),
+    stock_status: variationDto?.inventory?.stockStatus || variationDto?.stock_status || 'instock',
+    purchasable: variationDto?.inventory?.purchasable ?? variationDto?.purchasable ?? true,
+    image: media?.image || variationDto?.image || parentDto?.media?.image || parentDto?.image || '',
+    images: Array.isArray(media?.images)
+      ? media.images
+      : (Array.isArray(variationDto?.images)
+        ? variationDto.images
+        : (Array.isArray(parentDto?.media?.images) ? parentDto.media.images : [])),
+    attributes,
+    variation: variationDto?.variation || {},
+    variation_attribute_values: toLegacyVariationAttributeValues(attributes),
   };
 }
 
@@ -67,6 +175,7 @@ export function toLegacyProductCardDTO(dto = {}) {
     type: dto?.type || 'simple',
     name: dto?.name || '',
     description: dto?.description || '',
+    description_full: dto?.description || dto?.description_full || '',
     short_description: dto?.shortDescription || '',
     sku: dto?.sku || '',
     part_number: dto?.sku || '',
@@ -84,11 +193,13 @@ export function toLegacyProductCardDTO(dto = {}) {
     min_price: price?.min != null ? toNumber(price.min, 0) : null,
     stock_status: inventory?.stockStatus || 'instock',
     stock_quantity: inventory?.stockQuantity ?? null,
+    purchasable: inventory?.purchasable ?? true,
     image: media?.image || cardProduct.image || '',
     images: Array.isArray(media?.images) ? media.images : [],
     attributes: Array.isArray(dto?.attributes) ? dto.attributes : [],
     variation_attributes: Array.isArray(dto?.attributes) ? dto.attributes : [],
     variation_attribute_values: toLegacyVariationAttributeValues(dto?.attributes),
+    variation: dto?.variation || {},
     cardProduct: {
       ...cardProduct,
       brand: dto?.brand?.label || '',
@@ -108,16 +219,16 @@ export function toProductDetailDTO(payload = {}) {
   const defaultVariation = payload?.computed?.defaultVariation
     ? toLegacyVariationDTO(payload.computed.defaultVariation, payload?.product || null)
     : null;
+  const availableOptionMatrix = buildAvailableOptionMatrix(product, variations, payload?.computed || null);
 
   return {
     product,
     variations,
-    computed: payload?.computed
-      ? {
-          ...payload.computed,
-          defaultVariation,
-        }
-      : null,
+    computed: {
+      ...(payload?.computed || {}),
+      defaultVariation,
+      available_option_matrix: availableOptionMatrix,
+    },
   };
 }
 
