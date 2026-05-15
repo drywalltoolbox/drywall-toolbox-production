@@ -337,9 +337,6 @@ export default function ProductDetail({
   const displayPrice = money(rawPrice);
   const pricePrefix = product.is_variable && !selectedVariation ? 'From $' : '$';
   const compareAt = selectedVariation?.regular_price || product.regular_price;
-  const selectedVariationName = selectedVariation
-    ? Object.values(getVariationSelectionMap(selectedVariation)).filter(Boolean).join(' / ')
-    : '';
   const productSpecifications = getProductSpecifications(product);
 
   return (
@@ -436,11 +433,6 @@ export default function ProductDetail({
                     </span>
                   )}
                 </div>
-                {needsVariation && selectedVariationName && (
-                  <p className="mt-1 text-xs sm:text-sm text-gray-500">
-                    {selectedVariationName}
-                  </p>
-                )}
               </div>
 
               {/* Variation selector — visible for variable products */}
