@@ -1,10 +1,8 @@
 /**
  * frontend/src/hooks/useProductDetail.js
  *
- * Fetches the normalized product detail envelope from
- * GET /wp-json/dtb/v1/catalog/products/:slug/detail
- *
- * Falls back once to legacy /drywall/v1 route for rollout safety.
+ * Fetches the canonical product detail envelope from
+ * GET /wp-json/dtb/v1/catalog/products/:slug/detail.
  *
  * Returns:
  *   { product, variations, computed, status, error }
@@ -13,7 +11,7 @@
  *   'idle'      — no slug provided
  *   'loading'   — fetch in progress
  *   'ready'     — data loaded successfully
- *   'not_found' — server returned 404
+ *   'not_found' — server returned 404 or no product envelope
  *   'error'     — network or server error
  */
 
@@ -31,7 +29,7 @@ function reducer(_state, action) {
     case 'ready':
       return { product: action.product, variations: action.variations, computed: action.computed, status: 'ready', error: null };
     case 'not_found':
-      return { ...INIT, status: 'not_found' };
+      return { ...INIT, status: 'not_found', error: action.error || null };
     case 'error':
       return { ...INIT, status: 'error', error: action.error };
     default:
@@ -52,30 +50,20 @@ export function useProductDetail(slug) {
     dispatch({ type: 'reset' });
 
     const encodedSlug = encodeURIComponent(slug);
-    const primaryUrl = `/wp-json/dtb/v1/catalog/products/${encodedSlug}/detail`;
-    const legacyUrl = `/wp-json/drywall/v1/products/slug/${encodedSlug}/detail`;
+    const url = `/wp-json/dtb/v1/catalog/products/${encodedSlug}/detail`;
 
-    apiClient(primaryUrl)
-      .catch((primaryErr) => {
-        const shouldFallback =
-          primaryErr?.status === 404 ||
-          primaryErr?.status === 500 ||
-          /not found|404|route|rest_no_route/i.test(String(primaryErr?.message || ''));
-
-        if (!shouldFallback) throw primaryErr;
-        return apiClient(legacyUrl);
-      })
+    apiClient(url)
       .then((data) => {
         if (cancelled) return;
         if (!data || !data.product) {
-          dispatch({ type: 'not_found' });
+          dispatch({ type: 'not_found', error: 'Product not found.' });
           return;
         }
         dispatch({
           type: 'ready',
-          product:    data.product,
+          product: data.product,
           variations: Array.isArray(data.variations) ? data.variations : [],
-          computed:   data.computed ?? null,
+          computed: data.computed ?? null,
         });
       })
       .catch((err) => {
