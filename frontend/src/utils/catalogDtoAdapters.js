@@ -47,11 +47,54 @@ function optionKeysForVariation(variation = {}, axis = '') {
     keys.push(variation.variation_label);
   }
 
-  return Array.from(new Set(keys.filter(Boolean).map(String)));
+  return expandOptionAliases(keys);
 }
 
 function normalizeOptionKey(value) {
   return String(value || '').trim().toLowerCase();
+}
+
+function expandOptionAliases(values = []) {
+  const out = new Set();
+
+  values.filter(Boolean).forEach((raw) => {
+    const value = String(raw).trim();
+    if (!value) return;
+    out.add(value);
+    out.add(normalizeOptionKey(value));
+
+    const inchMatch = value.match(/^(\d+(?:\.\d+)?)\s*(?:in|inch|inches|")?$/i);
+    if (inchMatch) {
+      const n = inchMatch[1];
+      out.add(n);
+      out.add(`${n} in`);
+      out.add(`${n}"`);
+      out.add(normalizeOptionKey(n));
+      out.add(normalizeOptionKey(`${n} in`));
+      out.add(normalizeOptionKey(`${n}"`));
+    }
+
+    const normalizedInches = value.replace(/\b(inches|inch|in)\b/gi, 'in').replace(/\s+/g, ' ').trim();
+    if (normalizedInches !== value) {
+      out.add(normalizedInches);
+      out.add(normalizeOptionKey(normalizedInches));
+    }
+  });
+
+  return Array.from(out);
+}
+
+function splitParentOptions(options = []) {
+  if (!Array.isArray(options)) return [];
+  const split = [];
+  options.forEach((option) => {
+    String(option || '')
+      .split('|')
+      .map((part) => part.trim())
+      .filter(Boolean)
+      .forEach((part) => split.push(part));
+  });
+  return split;
 }
 
 function matrixEntryForVariation(variation = {}) {
@@ -97,7 +140,7 @@ function buildAvailableOptionMatrix(product, variations, computed = null) {
         price: toNumber(option.price, 0),
       };
 
-      [option.value, option.label].filter(Boolean).forEach((key) => {
+      expandOptionAliases([option.value, option.label]).forEach((key) => {
         matrix[axis][key] = entry;
         matrix[axis][normalizeOptionKey(key)] = entry;
       });
@@ -107,10 +150,30 @@ function buildAvailableOptionMatrix(product, variations, computed = null) {
   return matrix;
 }
 
+function buildVariationAttributes(dto = {}, computed = null) {
+  const attrs = Array.isArray(dto?.attributes) ? dto.attributes : [];
+  const axis = computed?.variationMatrix?.axis || firstVariationAttribute(dto)?.name || '';
+  const matrixOptions = Array.isArray(computed?.variationMatrix?.options) ? computed.variationMatrix.options : [];
+
+  if (axis && matrixOptions.length > 0) {
+    return [{
+      id: firstVariationAttribute(dto)?.id || 0,
+      name: axis.charAt(0).toUpperCase() + axis.slice(1),
+      slug: firstVariationAttribute(dto)?.slug || axis,
+      visible: true,
+      variation: true,
+      options: matrixOptions.map((option) => option.label || option.value).filter(Boolean),
+    }];
+  }
+
+  return attrs.map((attr) => ({
+    ...attr,
+    options: splitParentOptions(attr?.options),
+  }));
+}
+
 export function toCatalogProductCardDTO(dto = {}) {
   const card = dto?.cardProduct || null;
-  // WC returns cardProduct.name as the raw attribute option ("34", "2-5").
-  // Compose a proper display name from the parent dto name + variation label.
   const variationLabel = card?.variationLabel || dto?.variation?.label || '';
   const parentDtoName = dto?.name || '';
   const rawCardName = card?.name || dto?.name || '';
@@ -145,9 +208,6 @@ export function toLegacyVariationDTO(variationDto = {}, parentDto = null) {
         return axis && label ? [{ name: axis, option: label }] : [];
       })();
 
-  // Compose a proper display name: "Parent Name - Variation Label"
-  // WC REST API returns variation name as just the attribute option value (e.g. "34", "2-5"),
-  // which is unusable for display. Prefer the DTB variation label over the raw WC name.
   const variationLabel = variationDto?.variation?.label || variationDto?.variation?.value || '';
   const parentName = parentDto?.name || '';
   const rawName = variationDto?.name || '';
@@ -180,13 +240,14 @@ export function toLegacyVariationDTO(variationDto = {}, parentDto = null) {
   };
 }
 
-export function toLegacyProductCardDTO(dto = {}) {
+export function toLegacyProductCardDTO(dto = {}, computed = null) {
   const categoryKey = dto?.category?.key || '';
   const displayCategoryKey = dto?.displayCategory?.slug || dto?.displayCategory?.key || '';
   const price = dto?.price || {};
   const inventory = dto?.inventory || {};
   const media = dto?.media || {};
   const cardProduct = toCatalogProductCardDTO(dto);
+  const variationAttributes = buildVariationAttributes(dto, computed);
 
   return {
     id: dto?.id ?? 0,
@@ -215,9 +276,9 @@ export function toLegacyProductCardDTO(dto = {}) {
     purchasable: inventory?.purchasable ?? true,
     image: media?.image || cardProduct.image || '',
     images: Array.isArray(media?.images) ? media.images : [],
-    attributes: Array.isArray(dto?.attributes) ? dto.attributes : [],
-    variation_attributes: Array.isArray(dto?.attributes) ? dto.attributes : [],
-    variation_attribute_values: toLegacyVariationAttributeValues(dto?.attributes),
+    attributes: variationAttributes,
+    variation_attributes: variationAttributes,
+    variation_attribute_values: toLegacyVariationAttributeValues(variationAttributes),
     variation: dto?.variation || {},
     cardProduct: {
       ...cardProduct,
@@ -230,7 +291,7 @@ export function toLegacyProductCardDTO(dto = {}) {
 }
 
 export function toProductDetailDTO(payload = {}) {
-  const product = payload?.product ? toLegacyProductCardDTO(payload.product) : null;
+  const product = payload?.product ? toLegacyProductCardDTO(payload.product, payload?.computed || null) : null;
   const variations = Array.isArray(payload?.variations)
     ? payload.variations.map((variation) => toLegacyVariationDTO(variation, payload?.product || null))
     : [];
