@@ -65,6 +65,76 @@ function buildInitialVariationSelection({ autoSelectDefaultVariation, initialSel
   return getVariationSelectionMap(seededVariations.find((v) => v.stock_status !== 'outofstock') || seededVariations[0] || {});
 }
 
+function getSelectedVariationLabel(selectedVariation, selectedAttrs, variationAttributes) {
+  const selectedValues = variationAttributes
+    .map((attr) => selectedAttrs?.[attr.name])
+    .filter((value) => value != null && `${value}`.trim() !== '')
+    .map((value) => `${value}`.trim());
+
+  if (selectedValues.length > 0) return selectedValues.join(' / ');
+
+  const attrValues = getVariationSelectionMap(selectedVariation);
+  const variationValues = Object.values(attrValues)
+    .filter((value) => value != null && `${value}`.trim() !== '')
+    .map((value) => `${value}`.trim());
+
+  if (variationValues.length > 0) return variationValues.join(' / ');
+
+  return '';
+}
+
+function normalizeNameToken(value) {
+  return `${value || ''}`
+    .trim()
+    .toLowerCase()
+    .replace(/[“”]/g, '"')
+    .replace(/[‘’]/g, "'")
+    .replace(/\b(inches|inch|in)\b/g, '')
+    .replace(/["']/g, '')
+    .replace(/-/g, '.')
+    .replace(/[^a-z0-9.]+/g, '')
+    .replace(/\.0+$/g, '')
+    .trim();
+}
+
+function shouldComposeVariationName(parentProduct, selectedVariation, selectedLabel) {
+  if (!selectedVariation || !parentProduct?.name || !selectedLabel) return false;
+
+  const rawName = `${selectedVariation.name || ''}`.trim();
+  if (!rawName) return true;
+
+  const normalizedRaw = normalizeNameToken(rawName);
+  const normalizedLabel = normalizeNameToken(selectedLabel);
+  const normalizedParent = normalizeNameToken(parentProduct.name);
+
+  if (normalizedRaw === normalizedLabel) return true;
+  if (/^\d+(?:\.\d+)?$/.test(normalizedRaw)) return true;
+  if (normalizedParent && !normalizedRaw.includes(normalizedParent)) return true;
+
+  return false;
+}
+
+function composeEffectiveVariationProduct(parentProduct, selectedVariation, selectedLabel) {
+  if (!selectedVariation) return parentProduct;
+
+  const name = shouldComposeVariationName(parentProduct, selectedVariation, selectedLabel)
+    ? `${parentProduct.name} - ${selectedLabel}`
+    : (selectedVariation.name || parentProduct.name);
+
+  return {
+    ...selectedVariation,
+    brand: selectedVariation.brand || parentProduct.brand,
+    description: selectedVariation.description || parentProduct.description,
+    description_full: selectedVariation.description_full || parentProduct.description_full,
+    short_description: selectedVariation.short_description || parentProduct.short_description,
+    images: Array.isArray(selectedVariation.images) && selectedVariation.images.length > 0
+      ? selectedVariation.images
+      : parentProduct.images,
+    image: selectedVariation.image || parentProduct.image,
+    name,
+  };
+}
+
 export default function ProductDetail({
   product,
   onAddToCart,
@@ -308,8 +378,15 @@ export default function ProductDetail({
   const schematicId = getSchematicIdForProduct(product);
   const partsUrl = schematicId ? buildSchematicsUrl(schematicId) : null;
 
-  // Effective product data: use selected variation's data when available
-  const effectiveProduct = selectedVariation || product;
+  const selectedVariationLabel = getSelectedVariationLabel(selectedVariation, selectedAttrs, variationAttributes);
+
+  // Effective product data: use selected variation's data when available, but
+  // compose display-critical fields from the parent product and selected option.
+  // WooCommerce often stores the first/default variation name as a raw token
+  // such as `8` or `34`, which is not a valid customer-facing product title.
+  const effectiveProduct = selectedVariation
+    ? composeEffectiveVariationProduct(product, selectedVariation, selectedVariationLabel)
+    : product;
   const effectiveSku   = effectiveProduct.sku || product.sku || '';
   const effectiveStock = effectiveProduct.stock_status || product.stock_status || 'instock';
   const isOutOfStock   = effectiveStock === 'outofstock';
@@ -319,9 +396,7 @@ export default function ProductDetail({
 
   const handleAddToCart = () => {
     if (!canAddToCart) return;
-    const productToAdd = selectedVariation
-      ? { ...selectedVariation, name: selectedVariation.name || product.name }
-      : product;
+    const productToAdd = selectedVariation ? effectiveProduct : product;
     if (onAddToCart) {
       onAddToCart(productToAdd, quantity);
     } else {
