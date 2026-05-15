@@ -17,7 +17,13 @@
  * @module cartLineFactory
  */
 
-import { v4 as uuidv4 } from 'uuid';
+function generateToolsetInstanceId() {
+  if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+    return crypto.randomUUID();
+  }
+
+  return `dtb-toolset-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
+}
 
 // ── Simple / variable product lines ──────────────────────────────────────────
 
@@ -72,7 +78,7 @@ export function buildToolsetCartLines( {
   scope,
   selections,
 } ) {
-  const instanceId = uuidv4();
+  const instanceId = generateToolsetInstanceId();
   const lines      = [];
 
   for ( const [ slotId, selection ] of Object.entries( selections ) ) {

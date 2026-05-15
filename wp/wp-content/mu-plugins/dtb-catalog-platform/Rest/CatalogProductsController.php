@@ -36,54 +36,58 @@ final class DTB_CatalogProductsController {
 			return $rl;
 		}
 
-		$brand            = (string) ( $request->get_param( 'brand' )            ?? '' );
-		$category         = (string) ( $request->get_param( 'category' )         ?? '' );
-		$display_category = (string) ( $request->get_param( 'display_category' ) ?? '' );
-		$tool_family      = (string) ( $request->get_param( 'tool_family' )      ?? '' );
-		$product_kind     = (string) ( $request->get_param( 'product_kind' )     ?? '' );
-		$builder_slot     = (string) ( $request->get_param( 'builder_slot' )     ?? '' );
-		$workflow_scope   = (string) ( $request->get_param( 'workflow_scope' )   ?? '' );
-		$search           = (string) ( $request->get_param( 'search' )           ?? '' );
-		$page             = max( 1, absint( $request->get_param( 'page' )    ?? 1 ) );
-		$per_page         = min( 100, max( 1, absint( $request->get_param( 'per_page' ) ?? 24 ) ) );
-		$sort             = (string) ( $request->get_param( 'sort' ) ?? 'popular' );
+		$builder_eligible = $request->has_param( 'builder_eligible' )
+			? absint( $request->get_param( 'builder_eligible' ) )
+			: null;
 
-		// Filters that can be resolved natively by WC REST API.
-		$wc_params = [
-			'status'   => 'publish',
-			'per_page' => $per_page,
-			'page'     => $page,
-		];
+		$is_parts = $request->has_param( 'is_parts' )
+			? absint( $request->get_param( 'is_parts' ) )
+			: null;
 
-		if ( '' !== $search ) {
-			$wc_params['search'] = $search;
+		if ( null !== $builder_eligible && ! in_array( $builder_eligible, [ 0, 1 ], true ) ) {
+			$builder_eligible = null;
 		}
 
-		// Map DTB sort to WC orderby.
-		switch ( $sort ) {
-			case 'price-low':
-				$wc_params['orderby'] = 'price';
-				$wc_params['order']   = 'asc';
-				break;
-			case 'price-high':
-				$wc_params['orderby'] = 'price';
-				$wc_params['order']   = 'desc';
-				break;
-			case 'newest':
-				$wc_params['orderby'] = 'date';
-				$wc_params['order']   = 'desc';
-				break;
-			case 'az':
-				$wc_params['orderby'] = 'title';
-				$wc_params['order']   = 'asc';
-				break;
-			default:
-				$wc_params['orderby'] = 'menu_order';
-				$wc_params['order']   = 'asc';
-				break;
+		if ( null !== $is_parts && ! in_array( $is_parts, [ 0, 1 ], true ) ) {
+			$is_parts = null;
 		}
 
-		$response = dtb_cached_wc_get( 'wc/v3/products', $wc_params );
+		$query = DTB_CatalogProductRepository::find_ids( [
+			'brand'            => (string) ( $request->get_param( 'brand' ) ?? '' ),
+			'category'         => (string) ( $request->get_param( 'category' ) ?? '' ),
+			'display_category' => (string) ( $request->get_param( 'display_category' ) ?? '' ),
+			'tool_family'      => (string) ( $request->get_param( 'tool_family' ) ?? '' ),
+			'product_kind'     => (string) ( $request->get_param( 'product_kind' ) ?? '' ),
+			'builder_eligible' => $builder_eligible,
+			'builder_slot'     => (string) ( $request->get_param( 'builder_slot' ) ?? '' ),
+			'workflow_scope'   => (string) ( $request->get_param( 'workflow_scope' ) ?? '' ),
+			'is_parts'         => $is_parts,
+			'search'           => (string) ( $request->get_param( 'search' ) ?? '' ),
+			'page'             => max( 1, absint( $request->get_param( 'page' ) ?? 1 ) ),
+			'per_page'         => min( 100, max( 1, absint( $request->get_param( 'per_page' ) ?? 24 ) ) ),
+			'sort'             => (string) ( $request->get_param( 'sort' ) ?? 'popular' ),
+		] );
+
+		$ids = $query['ids'];
+		if ( empty( $ids ) ) {
+			return new WP_REST_Response( [
+				'items'      => [],
+				'pagination' => [
+					'page'       => $query['page'],
+					'perPage'    => $query['perPage'],
+					'total'      => $query['total'],
+					'totalPages' => $query['totalPages'],
+				],
+			], 200 );
+		}
+
+		$response = dtb_cached_wc_get( 'wc/v3/products', [
+			'include'  => implode( ',', $ids ),
+			'orderby'  => 'include',
+			'per_page' => count( $ids ),
+			'_fields'  => DTB_PRODUCT_DETAIL_FIELDS,
+		] );
+
 		if ( $response->get_status() !== 200 ) {
 			return $response;
 		}
@@ -96,59 +100,39 @@ final class DTB_CatalogProductsController {
 			);
 		}
 
-		// Normalize every product.
-		$items = array_map( [ DTB_CatalogProductNormalizer::class, 'normalize' ], $raw_products );
-
-		// Post-normalize filters (WC REST does not support these natively).
-		if ( '' !== $brand ) {
-			$items = array_values( array_filter( $items, static fn( $p ) =>
-				$p['brand']['slug'] === $brand || $p['brand']['key'] === $brand
-			) );
-		}
-		if ( '' !== $category ) {
-			$items = array_values( array_filter( $items, static fn( $p ) =>
-				$p['category']['key'] === $category
-			) );
-		}
-		if ( '' !== $display_category ) {
-			$items = array_values( array_filter( $items, static fn( $p ) =>
-				$p['displayCategory']['key'] === $display_category ||
-				$p['displayCategory']['slug'] === $display_category
-			) );
-		}
-		if ( '' !== $tool_family ) {
-			$items = array_values( array_filter( $items, static fn( $p ) =>
-				$p['toolFamily'] === $tool_family
-			) );
-		}
-		if ( '' !== $product_kind ) {
-			$items = array_values( array_filter( $items, static fn( $p ) =>
-				$p['productKind'] === $product_kind
-			) );
-		}
-		if ( '' !== $builder_slot ) {
-			$items = array_values( array_filter( $items, static fn( $p ) =>
-				in_array( $builder_slot, $p['builder']['slots'], true )
-			) );
-		}
-		if ( '' !== $workflow_scope ) {
-			$items = array_values( array_filter( $items, static fn( $p ) =>
-				in_array( $workflow_scope, $p['builder']['workflowScopes'], true )
-			) );
+		$raw_by_id = [];
+		foreach ( $raw_products as $raw ) {
+			if ( is_array( $raw ) && ! empty( $raw['id'] ) ) {
+				$raw_by_id[ absint( $raw['id'] ) ] = $raw;
+			}
 		}
 
-		// Read WC pagination headers.
-		$headers     = $response->get_headers();
-		$total       = (int) ( $headers['X-WP-Total'] ?? count( $items ) );
-		$total_pages = (int) ( $headers['X-WP-TotalPages'] ?? 1 );
+		$items = [];
+		foreach ( $ids as $id ) {
+			if ( ! isset( $raw_by_id[ $id ] ) ) {
+				continue;
+			}
+
+			$dto = DTB_CatalogProductNormalizer::normalize( $raw_by_id[ $id ] );
+
+			// Listing enrichment for variable products: resolve and apply the
+			// default variation directly into cardProduct for storefront cards.
+			if ( 'variable' === $dto['type'] ) {
+				$variations  = DTB_VariationReadModelService::get_normalized( $dto['id'], $raw_by_id[ $id ] );
+				$default_var = DTB_DefaultVariationResolver::resolve( $dto, $variations );
+				$dto         = DTB_DefaultVariationResolver::apply_to_card( $dto, $default_var );
+			}
+
+			$items[] = $dto;
+		}
 
 		return new WP_REST_Response( [
 			'items'      => $items,
 			'pagination' => [
-				'page'       => $page,
-				'perPage'    => $per_page,
-				'total'      => $total,
-				'totalPages' => $total_pages,
+				'page'       => $query['page'],
+				'perPage'    => $query['perPage'],
+				'total'      => $query['total'],
+				'totalPages' => $query['totalPages'],
 			],
 		], 200 );
 	}
@@ -160,10 +144,10 @@ final class DTB_CatalogProductsController {
 			'display_category' => [ 'type' => 'string', 'sanitize_callback' => 'sanitize_text_field' ],
 			'tool_family'      => [ 'type' => 'string', 'sanitize_callback' => 'sanitize_text_field' ],
 			'product_kind'     => [ 'type' => 'string', 'sanitize_callback' => 'sanitize_text_field' ],
-			'builder_eligible' => [ 'type' => 'integer', 'default' => 0 ],
+			'builder_eligible' => [ 'type' => 'integer' ],
 			'builder_slot'     => [ 'type' => 'string', 'sanitize_callback' => 'sanitize_text_field' ],
 			'workflow_scope'   => [ 'type' => 'string', 'sanitize_callback' => 'sanitize_text_field' ],
-			'is_parts'         => [ 'type' => 'integer', 'default' => -1 ],
+			'is_parts'         => [ 'type' => 'integer' ],
 			'search'           => [ 'type' => 'string', 'sanitize_callback' => 'sanitize_text_field' ],
 			'page'             => [ 'type' => 'integer', 'default' => 1, 'minimum' => 1 ],
 			'per_page'         => [ 'type' => 'integer', 'default' => 24, 'minimum' => 1, 'maximum' => 100 ],

@@ -2,7 +2,9 @@
  * frontend/src/hooks/useProductDetail.js
  *
  * Fetches the normalized product detail envelope from
- * GET /wp-json/drywall/v1/products/slug/:slug/detail
+ * GET /wp-json/dtb/v1/catalog/products/:slug/detail
+ *
+ * Falls back once to legacy /drywall/v1 route for rollout safety.
  *
  * Returns:
  *   { product, variations, computed, status, error }
@@ -49,7 +51,20 @@ export function useProductDetail(slug) {
     let cancelled = false;
     dispatch({ type: 'reset' });
 
-    apiClient(`/wp-json/drywall/v1/products/slug/${encodeURIComponent(slug)}/detail`)
+    const encodedSlug = encodeURIComponent(slug);
+    const primaryUrl = `/wp-json/dtb/v1/catalog/products/${encodedSlug}/detail`;
+    const legacyUrl = `/wp-json/drywall/v1/products/slug/${encodedSlug}/detail`;
+
+    apiClient(primaryUrl)
+      .catch((primaryErr) => {
+        const shouldFallback =
+          primaryErr?.status === 404 ||
+          primaryErr?.status === 500 ||
+          /not found|404|route|rest_no_route/i.test(String(primaryErr?.message || ''));
+
+        if (!shouldFallback) throw primaryErr;
+        return apiClient(legacyUrl);
+      })
       .then((data) => {
         if (cancelled) return;
         if (!data || !data.product) {
