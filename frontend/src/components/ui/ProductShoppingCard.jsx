@@ -32,25 +32,68 @@ function formatPrice(value) {
   return `$${asNumber(value, 0).toFixed(2)}`;
 }
 
-function getVariationLabel(cardProduct = {}) {
+function normalizeOptionToken(value) {
+  return String(value || '')
+    .trim()
+    .toLowerCase()
+    .replace(/[“”]/g, '"')
+    .replace(/[‘’]/g, "'")
+    .replace(/\b(inches|inch|in)\b/g, '')
+    .replace(/["']/g, '')
+    .replace(/-/g, '.')
+    .replace(/[^a-z0-9.]+/g, '')
+    .replace(/\.0+$/g, '')
+    .trim();
+}
+
+function flattenVariationOptions(product = {}) {
+  const attrs = Array.isArray(product?.variation_attributes)
+    ? product.variation_attributes
+    : (Array.isArray(product?.attributes) ? product.attributes : []);
+
+  return attrs.flatMap((attr) => {
+    if (!Array.isArray(attr?.options)) return [];
+    return attr.options
+      .flatMap((option) => String(option || '').split('|'))
+      .map((option) => option.trim())
+      .filter(Boolean);
+  });
+}
+
+function inferVariationLabelFromParentOptions(product = {}, rawValue = '') {
+  const raw = String(rawValue || '').trim();
+  if (!raw) return '';
+
+  const normalizedRaw = normalizeOptionToken(raw);
+  const matched = flattenVariationOptions(product).find((option) => normalizeOptionToken(option) === normalizedRaw);
+  if (matched) return matched;
+
+  if (/^\d+(?:\.\d+)?$/.test(normalizedRaw)) return `${normalizedRaw} in`;
+  return raw;
+}
+
+function getVariationLabel(product = {}, cardProduct = {}) {
   const direct = cardProduct?.variation_label || cardProduct?.variationLabel;
   if (direct) return String(direct).trim();
 
   const firstAttr = Array.isArray(cardProduct?.attributes) ? cardProduct.attributes[0] : null;
   const fromAttr = firstAttr?.option || firstAttr?.value || firstAttr?.label;
-  return fromAttr ? String(fromAttr).trim() : '';
+  if (fromAttr) return inferVariationLabelFromParentOptions(product, fromAttr);
+
+  return inferVariationLabelFromParentOptions(product, cardProduct?.name || '');
 }
 
 function composeVariationName(product = {}, cardProduct = {}) {
   const parentName = product?.name || cardProduct?.parentName || '';
-  const variationLabel = getVariationLabel(cardProduct);
-  const rawName = cardProduct?.name || '';
+  const variationLabel = getVariationLabel(product, cardProduct);
+  const rawName = String(cardProduct?.name || '').trim();
 
   if (parentName && variationLabel) {
-    const normalizedRaw = rawName.trim().toLowerCase();
-    const normalizedLabel = variationLabel.trim().toLowerCase();
+    const normalizedRaw = normalizeOptionToken(rawName);
+    const normalizedLabel = normalizeOptionToken(variationLabel);
+    const rawLooksLikeOption = !rawName || normalizedRaw === normalizedLabel || /^\d+(?:[.-]\d+)?(?:\s*(?:in|inch|inches|"))?$/i.test(rawName);
 
-    if (!rawName || normalizedRaw === normalizedLabel || /^\d+(?:\.\d+)?(?:\s*(?:in|inch|inches|"))?$/i.test(rawName.trim())) {
+    if (rawLooksLikeOption || !rawName.toLowerCase().includes(parentName.toLowerCase())) {
       return `${parentName} - ${variationLabel}`;
     }
   }
@@ -62,7 +105,7 @@ function getResolvedCardProduct(product, cardProduct) {
   if (!product?.is_variable) return cardProduct || product;
 
   if (cardProduct?.parent_id || cardProduct?.parentId || cardProduct?.id !== product?.id) {
-    const variationLabel = getVariationLabel(cardProduct);
+    const variationLabel = getVariationLabel(product, cardProduct);
 
     return {
       ...cardProduct,
