@@ -97,6 +97,46 @@ function splitParentOptions(options = []) {
   return split;
 }
 
+function normalizeNameToken(value) {
+  return String(value || '')
+    .trim()
+    .toLowerCase()
+    .replace(/[“”]/g, '"')
+    .replace(/[‘’]/g, "'")
+    .replace(/\b(inches|inch|in)\b/g, '')
+    .replace(/["']/g, '')
+    .replace(/-/g, '.')
+    .replace(/[^a-z0-9.]+/g, '')
+    .replace(/\.0+$/g, '')
+    .trim();
+}
+
+function isRawVariationToken(value) {
+  return /^\d+(?:[.-]\d+)?(?:\s*(?:in|inch|inches|"))?$/i.test(String(value || '').trim());
+}
+
+function shouldPreserveCatalogVariationName(rawName, parentName) {
+  if (!rawName) return false;
+  if (!parentName) return true;
+  if (isRawVariationToken(rawName)) return false;
+
+  const normalizedRaw = normalizeNameToken(rawName);
+  const normalizedParent = normalizeNameToken(parentName);
+  return Boolean(normalizedParent && normalizedRaw.includes(normalizedParent));
+}
+
+function composeVariationName(rawName, parentName, variationLabel) {
+  if (shouldPreserveCatalogVariationName(rawName, parentName)) {
+    return rawName;
+  }
+
+  if (parentName && variationLabel) {
+    return `${parentName} - ${variationLabel}`;
+  }
+
+  return rawName || parentName || '';
+}
+
 function matrixEntryForVariation(variation = {}) {
   return {
     variation_id: variation?.id ?? variation?.variationId ?? 0,
@@ -177,15 +217,13 @@ export function toCatalogProductCardDTO(dto = {}) {
   const variationLabel = card?.variationLabel || dto?.variation?.label || '';
   const parentDtoName = dto?.name || '';
   const rawCardName = card?.name || dto?.name || '';
-  const composedCardName = parentDtoName && variationLabel
-    ? `${parentDtoName} - ${variationLabel}`
-    : rawCardName;
+  const displayName = composeVariationName(rawCardName, parentDtoName, variationLabel);
 
   return {
     id: card?.id ?? dto?.id ?? 0,
     parent_id: card?.parentId ?? dto?.parentId ?? null,
     sku: card?.sku || dto?.sku || '',
-    name: composedCardName,
+    name: displayName,
     price: toNumber(card?.price ?? dto?.price?.value ?? 0, 0),
     image: card?.image || dto?.media?.image || '',
     stock_status: card?.stockStatus || dto?.inventory?.stockStatus || 'instock',
@@ -211,14 +249,12 @@ export function toLegacyVariationDTO(variationDto = {}, parentDto = null) {
   const variationLabel = variationDto?.variation?.label || variationDto?.variation?.value || '';
   const parentName = parentDto?.name || '';
   const rawName = variationDto?.name || '';
-  const composedName = parentName && variationLabel
-    ? `${parentName} - ${variationLabel}`
-    : rawName || parentName || '';
+  const displayName = composeVariationName(rawName, parentName, variationLabel);
 
   return {
     id: variationDto?.id ?? 0,
     parent_id: variationDto?.parentId ?? variationDto?.parent_id ?? parentDto?.id ?? null,
-    name: composedName,
+    name: displayName,
     slug: variationDto?.slug || '',
     sku: variationDto?.sku || parentDto?.sku || '',
     part_number: variationDto?.sku || parentDto?.sku || '',
