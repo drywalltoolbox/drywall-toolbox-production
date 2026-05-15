@@ -68,12 +68,12 @@
       "sort_order": 30,
       "parent_id": null,
       "description": "Automatic flat boxes (mud boxes) that dispense and feather joint compound over flat and butt joints in a single pass. Available in 5.5\" through 14\" widths for every coat stage.",
-      "wc_category_label": "Flat Boxes",
+      "wc_category_label": "Finishing Boxes",
       "brand_wc_paths": {
-        "Asgard":                "Drywall Finishing Tools > Asgard > Flat Boxes",
-        "Columbia":              "Drywall Finishing Tools > Columbia > Flat Boxes",
-        "Platinum Drywall Tools":"Drywall Finishing Tools > Platinum Drywall Tools > Flat Boxes",
-        "TapeTech":              "Drywall Finishing Tools > TapeTech > Flat Boxes"
+        "Asgard":                "Drywall Finishing Tools > Asgard > Finishing Boxes",
+        "Columbia":              "Drywall Finishing Tools > Columbia > Finishing Boxes",
+        "Platinum Drywall Tools":"Drywall Finishing Tools > Platinum Drywall Tools > Finishing Boxes",
+        "TapeTech":              "Drywall Finishing Tools > TapeTech > Finishing Boxes"
       },
       "columbia_families": [
         "Flat Boxes",
@@ -406,6 +406,36 @@
         "predator set", "sabre set", "tactical set", "warrior set",
         "SACS", "PTS", "SBSET", "TS", "TWS"
       ]
+    },
+
+    {
+      "id": "parts",
+      "slug": "parts",
+      "label": "Parts",
+      "label_plural": "Parts",
+      "sort_order": 100,
+      "parent_id": null,
+      "description": "Replacement parts, maintenance kits, and repair components for all automatic taping tools, finishing boxes, corner tools, handles, and pumps. Normalized from legacy labels including 'Repair Kits & Parts', 'Parts & Accessories', and 'Replacement Parts'.",
+      "wc_category_label": "Parts",
+      "brand_wc_paths": {
+        "Asgard":                "Drywall Finishing Tools > Asgard > Parts",
+        "Columbia":              "Drywall Finishing Tools > Columbia > Parts",
+        "Platinum Drywall Tools":"Drywall Finishing Tools > Platinum Drywall Tools > Parts",
+        "TapeTech":              "Drywall Finishing Tools > TapeTech > Parts"
+      },
+      "columbia_families": [
+        "Anglehead Maintenance Kits",
+        "Automatic Taper Maintenance Kits",
+        "Corner Roller Maintenance Kits",
+        "Finishing Box Maintenance Kits",
+        "Handle Maintenance Kits",
+        "Mud Pump Maintenance Kit",
+        "Nailspotter Maintenance Kits"
+      ],
+      "search_tags": [
+        "parts", "repair kit", "maintenance kit", "replacement part",
+        "spare part", "repair parts", "service kit"
+      ]
     }
 
   ],
@@ -421,7 +451,8 @@
       "angle-heads",
       "pumps",
       "nailspotters",
-      "toolsets"
+      "toolsets",
+      "parts"
     ],
     "Columbia": [
       "automatic-tapers",
@@ -437,7 +468,8 @@
       "pumps",
       "nailspotters",
       "smoothing-blades",
-      "toolsets"
+      "toolsets",
+      "parts"
     ],
     "Platinum Drywall Tools": [
       "automatic-tapers",
@@ -452,7 +484,8 @@
       "compound-tubes",
       "pumps",
       "nailspotters",
-      "toolsets"
+      "toolsets",
+      "parts"
     ],
     "TapeTech": [
       "automatic-tapers",
@@ -463,7 +496,8 @@
       "pumps",
       "nailspotters",
       "smoothing-blades",
-      "toolsets"
+      "toolsets",
+      "parts"
     ]
   },
 
@@ -471,7 +505,7 @@
     "_description": "Reverse index. Given a WooCommerce category path, returns the canonical category ID. Used by import scripts to normalize incoming data.",
     "Drywall Finishing Tools > Asgard > Automatic Taping Tools":             "automatic-tapers",
     "Drywall Finishing Tools > Asgard > Corner Tools":                       "corner-tools",
-    "Drywall Finishing Tools > Asgard > Flat Boxes":                         "finishing-boxes",
+    "Drywall Finishing Tools > Asgard > Finishing Boxes":                       "finishing-boxes",
     "Drywall Finishing Tools > Asgard > Handles & Extensions":               "handles",
     "Drywall Finishing Tools > Asgard > Mud Pans & Pumps":                   "pumps",
     "Drywall Finishing Tools > Asgard > Nail Spotters":                      "nailspotters",
@@ -479,7 +513,7 @@
     "Drywall Finishing Tools > Columbia > Accessories & Adapters":           "applicators",
     "Drywall Finishing Tools > Columbia > Automatic Taping Tools":           "automatic-tapers",
     "Drywall Finishing Tools > Columbia > Corner Tools":                     "corner-tools",
-    "Drywall Finishing Tools > Columbia > Flat Boxes":                       "finishing-boxes",
+    "Drywall Finishing Tools > Columbia > Finishing Boxes":                     "finishing-boxes",
     "Drywall Finishing Tools > Columbia > Handles & Extensions":             "handles",
     "Drywall Finishing Tools > Columbia > Knives & Blades":                  "smoothing-blades",
     "Drywall Finishing Tools > Columbia > Mud Pans & Pumps":                 "pumps",
@@ -487,7 +521,7 @@
     "Drywall Finishing Tools > Columbia > Tool Sets & Kits":                 "toolsets",
     "Drywall Finishing Tools > Platinum Drywall Tools > Automatic Taping Tools": "automatic-tapers",
     "Drywall Finishing Tools > Platinum Drywall Tools > Corner Tools":       "corner-tools",
-    "Drywall Finishing Tools > Platinum Drywall Tools > Flat Boxes":         "finishing-boxes",
+    "Drywall Finishing Tools > Platinum Drywall Tools > Finishing Boxes":       "finishing-boxes",
     "Drywall Finishing Tools > Platinum Drywall Tools > Handles & Extensions":"handles",
     "Drywall Finishing Tools > Platinum Drywall Tools > Mud Pans & Pumps":   "pumps",
     "Drywall Finishing Tools > Platinum Drywall Tools > Nail Spotters":      "nailspotters",
@@ -496,11 +530,15 @@
     "Drywall Finishing Tools > TapeTech > Accessories & Adapters":           "applicators",
     "Drywall Finishing Tools > TapeTech > Automatic Taping Tools":           "automatic-tapers",
     "Drywall Finishing Tools > TapeTech > Corner Tools":                     "corner-tools",
-    "Drywall Finishing Tools > TapeTech > Flat Boxes":                       "finishing-boxes",
+    "Drywall Finishing Tools > TapeTech > Finishing Boxes":                     "finishing-boxes",
     "Drywall Finishing Tools > TapeTech > Handles & Extensions":             "handles",
     "Drywall Finishing Tools > TapeTech > Knives & Blades":                  "smoothing-blades",
     "Drywall Finishing Tools > TapeTech > Mud Pans & Pumps":                 "pumps",
     "Drywall Finishing Tools > TapeTech > Nail Spotters":                    "nailspotters",
-    "Drywall Finishing Tools > TapeTech > Tool Sets & Kits":                 "toolsets"
+    "Drywall Finishing Tools > TapeTech > Tool Sets & Kits":                  "toolsets",
+    "Drywall Finishing Tools > Asgard > Parts":                              "parts",
+    "Drywall Finishing Tools > Columbia > Parts":                            "parts",
+    "Drywall Finishing Tools > Platinum Drywall Tools > Parts":              "parts",
+    "Drywall Finishing Tools > TapeTech > Parts":                            "parts"
   }
 }
