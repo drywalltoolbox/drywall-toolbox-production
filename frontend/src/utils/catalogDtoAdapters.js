@@ -109,15 +109,24 @@ function buildAvailableOptionMatrix(product, variations, computed = null) {
 
 export function toCatalogProductCardDTO(dto = {}) {
   const card = dto?.cardProduct || null;
+  // WC returns cardProduct.name as the raw attribute option ("34", "2-5").
+  // Compose a proper display name from the parent dto name + variation label.
+  const variationLabel = card?.variationLabel || dto?.variation?.label || '';
+  const parentDtoName = dto?.name || '';
+  const rawCardName = card?.name || dto?.name || '';
+  const composedCardName = parentDtoName && variationLabel
+    ? `${parentDtoName} - ${variationLabel}`
+    : rawCardName;
+
   return {
     id: card?.id ?? dto?.id ?? 0,
     parent_id: card?.parentId ?? dto?.parentId ?? null,
     sku: card?.sku || dto?.sku || '',
-    name: card?.name || dto?.name || '',
+    name: composedCardName,
     price: toNumber(card?.price ?? dto?.price?.value ?? 0, 0),
     image: card?.image || dto?.media?.image || '',
     stock_status: card?.stockStatus || dto?.inventory?.stockStatus || 'instock',
-    variation_label: card?.variationLabel || dto?.variation?.label || '',
+    variation_label: variationLabel,
     addToCartType: card?.addToCartType || (dto?.type === 'variable' ? 'variation' : 'simple'),
     attributes: Array.isArray(card?.attributes) ? card.attributes : [],
     variation_attribute_values: toLegacyVariationAttributeValues(card?.attributes || []),
@@ -136,10 +145,20 @@ export function toLegacyVariationDTO(variationDto = {}, parentDto = null) {
         return axis && label ? [{ name: axis, option: label }] : [];
       })();
 
+  // Compose a proper display name: "Parent Name - Variation Label"
+  // WC REST API returns variation name as just the attribute option value (e.g. "34", "2-5"),
+  // which is unusable for display. Prefer the DTB variation label over the raw WC name.
+  const variationLabel = variationDto?.variation?.label || variationDto?.variation?.value || '';
+  const parentName = parentDto?.name || '';
+  const rawName = variationDto?.name || '';
+  const composedName = parentName && variationLabel
+    ? `${parentName} - ${variationLabel}`
+    : rawName || parentName || '';
+
   return {
     id: variationDto?.id ?? 0,
     parent_id: variationDto?.parentId ?? variationDto?.parent_id ?? parentDto?.id ?? null,
-    name: variationDto?.name || parentDto?.name || '',
+    name: composedName,
     slug: variationDto?.slug || '',
     sku: variationDto?.sku || parentDto?.sku || '',
     part_number: variationDto?.sku || parentDto?.sku || '',
