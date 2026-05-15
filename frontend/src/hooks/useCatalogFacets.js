@@ -6,7 +6,7 @@
  * hardcoded legacy category lists.
  */
 
-import { useMemo, useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { apiClient } from '../api/client.js';
 
 const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
@@ -29,14 +29,13 @@ function normalizeScope(scope = {}) {
   return normalized;
 }
 
-function buildScopeKey(scope = {}) {
-  const normalized = normalizeScope(scope);
+function buildScopeKey(normalized = {}) {
   const entries = Object.entries(normalized).sort(([a], [b]) => a.localeCompare(b));
   return JSON.stringify(entries);
 }
 
-function buildFacetsUrl(scope = {}) {
-  const params = new URLSearchParams(normalizeScope(scope));
+function buildFacetsUrl(normalized = {}) {
+  const params = new URLSearchParams(normalized);
   const qs = params.toString();
   return `/wp-json/dtb/v1/catalog/facets${qs ? `?${qs}` : ''}`;
 }
@@ -49,30 +48,32 @@ function getFreshCache(key) {
 }
 
 export function useCatalogFacets(scope = {}) {
-  const scopeKey = useMemo(() => buildScopeKey(scope), [
-    scope?.brand,
-    scope?.category,
-    scope?.displayCategory,
-    scope?.productKind,
-    scope?.isParts,
-  ]);
-  const url = useMemo(() => buildFacetsUrl(scope), [scopeKey]);
+  const normalizedScope = normalizeScope(scope);
+  const scopeKey = buildScopeKey(normalizedScope);
+  const url = buildFacetsUrl(normalizedScope);
 
   const [facets, setFacets] = useState(() => getFreshCache(scopeKey));
   const [loading, setLoading] = useState(() => !getFreshCache(scopeKey));
   const [error, setError] = useState(null);
 
   useEffect(() => {
+    let mounted = true;
     const cached = getFreshCache(scopeKey);
+
     if (cached) {
-      setFacets(cached);
-      setLoading(false);
-      return;
+      Promise.resolve().then(() => {
+        if (!mounted) return;
+        setFacets(cached);
+        setLoading(false);
+      });
+      return () => { mounted = false; };
     }
 
-    let mounted = true;
-    setLoading(true);
-    setError(null);
+    Promise.resolve().then(() => {
+      if (!mounted) return;
+      setLoading(true);
+      setError(null);
+    });
 
     if (!_inflight.has(scopeKey)) {
       _inflight.set(
