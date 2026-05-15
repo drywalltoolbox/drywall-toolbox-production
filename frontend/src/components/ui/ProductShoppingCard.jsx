@@ -1,17 +1,13 @@
 /**
  * ui/ProductShoppingCard.jsx — IndoUI Shopping Card (drop-in for ProductCard.jsx)
  *
- * Props (identical to ProductCard.jsx):
+ * Props:
  *   product              Source product (parent for variable)
- *   cardProduct          Resolved display product
+ *   cardProduct          Backend-resolved display product/variation
  *   hasSelectedVariation boolean
  *   onOpenModal          () => void
  *   onAddToCart          () => void
  *   index                number (staggered animation delay)
- *
- * Visual shell replaced; all business logic identical.
- * Importing pages (Products.jsx, AllProducts.jsx, CategoryPage.jsx) only need
- * to swap the import path — no prop changes required.
  */
 
 import { motion as Motion } from 'framer-motion';
@@ -20,13 +16,41 @@ import ProductCardImage from '../product/ProductCardImage';
 
 const STOCK_STATUS_OUT_OF_STOCK = 'outofstock';
 
-// Badge configuration
 const BADGE_CONFIG = {
   'Best Seller': { bg: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)', color: '#fff' },
   Popular:       { bg: 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)', color: '#fff' },
   New:           { bg: 'linear-gradient(135deg, #10b981 0%, #059669 100%)', color: '#fff' },
   Sale:          { bg: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)', color: '#fff' },
 };
+
+function asNumber(value, fallback = 0) {
+  const parsed = typeof value === 'number' ? value : parseFloat(String(value ?? ''));
+  return Number.isFinite(parsed) ? parsed : fallback;
+}
+
+function formatPrice(value) {
+  return `$${asNumber(value, 0).toFixed(2)}`;
+}
+
+function getResolvedCardProduct(product, cardProduct) {
+  if (!product?.is_variable) return cardProduct || product;
+
+  if (cardProduct?.parent_id || cardProduct?.parentId || cardProduct?.id !== product?.id) {
+    return {
+      ...cardProduct,
+      brand: cardProduct?.brand || product?.brand,
+      image: cardProduct?.image || product?.image,
+      images: cardProduct?.images || product?.images,
+      image_thumbnail: cardProduct?.image_thumbnail || product?.image_thumbnail,
+      image_srcset: cardProduct?.image_srcset || product?.image_srcset,
+      name: cardProduct?.name || product?.name,
+      stock_status: cardProduct?.stock_status || cardProduct?.stockStatus || product?.stock_status || 'instock',
+      price: cardProduct?.price ?? product?.min_price ?? product?.price ?? 0,
+    };
+  }
+
+  return product;
+}
 
 export default function ProductShoppingCard({
   product,
@@ -36,18 +60,24 @@ export default function ProductShoppingCard({
   onAddToCart,
   index = 0,
 }) {
-  const effectiveProduct = cardProduct || product;
-  const isOutOfStock = (effectiveProduct?.stock_status || product.stock_status) === STOCK_STATUS_OUT_OF_STOCK;
-  const isOnSale = effectiveProduct?.on_sale || product.on_sale;
-  const badgeLabel = product.badge || (isOnSale && !product.badge ? 'Sale' : null);
+  const effectiveProduct = getResolvedCardProduct(product, cardProduct);
+  const resolvedHasVariation = Boolean(
+    product?.is_variable &&
+    effectiveProduct &&
+    effectiveProduct.id &&
+    effectiveProduct.id !== product.id
+  );
+  const canDirectAddVariation = hasSelectedVariation || resolvedHasVariation;
+  const stockStatus = effectiveProduct?.stock_status || effectiveProduct?.stockStatus || product?.stock_status || 'instock';
+  const isOutOfStock = stockStatus === STOCK_STATUS_OUT_OF_STOCK;
+  const isOnSale = effectiveProduct?.on_sale || product?.on_sale;
+  const badgeLabel = product?.badge || (isOnSale && !product?.badge ? 'Sale' : null);
   const badgeStyle = badgeLabel ? (BADGE_CONFIG[badgeLabel] || BADGE_CONFIG.Sale) : null;
-
-  const displayPrice = product.is_variable && !hasSelectedVariation && product.min_price != null
-    ? `From $${Number(product.min_price).toFixed(2)}`
-    : `$${typeof effectiveProduct.price === 'number'
-        ? effectiveProduct.price.toFixed(2)
-        : parseFloat(effectiveProduct.price || 0).toFixed(2)
-      }`;
+  const displayPrice = product?.is_variable && !resolvedHasVariation && product?.min_price != null
+    ? `From ${formatPrice(product.min_price)}`
+    : formatPrice(effectiveProduct?.price ?? product?.price ?? 0);
+  const displayName = effectiveProduct?.name || effectiveProduct?.part_number || product?.name || product?.part_number || 'Product';
+  const displaySku = effectiveProduct?.sku || product?.sku || effectiveProduct?.part_number || '';
 
   return (
     <Motion.div
@@ -62,7 +92,6 @@ export default function ProductShoppingCard({
       }}
       whileHover={{ y: -4 }}
     >
-      {/* ── Image area ──────────────────────────────────────────────────────── */}
       <div
         className="dtb-plp-card__img-wrap"
         style={{
@@ -71,19 +100,18 @@ export default function ProductShoppingCard({
           overflow: 'hidden',
         }}
       >
-        {/* Clickable overlay — opens modal */}
         <button
           type="button"
           className="dtb-plp-card__img-btn"
           onClick={onOpenModal}
-          aria-label={`View ${effectiveProduct.name || product.name || 'product'}`}
+          aria-label={`View ${displayName}`}
         >
           <ProductCardImage
             product={effectiveProduct}
-            src={effectiveProduct.image_thumbnail || product.image_thumbnail || effectiveProduct.image || product.image}
-            srcSet={effectiveProduct.image_srcset || product.image_srcset}
+            src={effectiveProduct?.image_thumbnail || product?.image_thumbnail || effectiveProduct?.image || product?.image}
+            srcSet={effectiveProduct?.image_srcset || product?.image_srcset}
             sizes="(max-width: 479px) calc(50vw - 22px), (max-width: 767px) calc(50vw - 28px), (max-width: 1023px) calc(33vw - 28px), 190px"
-            alt={effectiveProduct.name || product.name}
+            alt={displayName}
             padding="0"
             fit="cover"
             preferThumbnail
@@ -91,7 +119,6 @@ export default function ProductShoppingCard({
           />
         </button>
 
-        {/* Out-of-stock overlay */}
         {isOutOfStock && (
           <div style={{
             position: 'absolute', inset: 0,
@@ -110,7 +137,6 @@ export default function ProductShoppingCard({
           </div>
         )}
 
-        {/* Badge */}
         {badgeLabel && badgeStyle && (
           <span
             className={`dtb-plp-card__badge dtb-plp-card__badge--${badgeLabel === 'Best Seller' ? 'bestseller' : badgeLabel.toLowerCase()}`}
@@ -127,7 +153,6 @@ export default function ProductShoppingCard({
           </span>
         )}
 
-        {/* Wishlist */}
         <button
           type="button"
           className="dtb-plp-card__wishlist"
@@ -152,20 +177,17 @@ export default function ProductShoppingCard({
         </button>
       </div>
 
-      {/* ── Card body ────────────────────────────────────────────────────────── */}
       <div className="dtb-plp-card__body" style={{ padding: '14px 16px 16px' }}>
-        {/* Brand eyebrow */}
-        {(effectiveProduct.brand || product.brand) && (
+        {(effectiveProduct?.brand || product?.brand) && (
           <p className="dtb-plp-card__brand" style={{
             fontSize: '0.65rem', fontWeight: 700,
             letterSpacing: '0.09em', textTransform: 'uppercase',
             color: 'var(--primary-600)', margin: '0 0 5px',
           }}>
-            {effectiveProduct.brand || product.brand}
+            {effectiveProduct?.brand || product?.brand}
           </p>
         )}
 
-        {/* Product name */}
         <h3 className="dtb-plp-card__name" style={{ margin: '0 0 4px' }}>
           <button
             type="button"
@@ -181,21 +203,19 @@ export default function ProductShoppingCard({
             onMouseEnter={(e) => { e.currentTarget.style.color = 'var(--primary-600)'; }}
             onMouseLeave={(e) => { e.currentTarget.style.color = '#0f172a'; }}
           >
-            {effectiveProduct.name || effectiveProduct.part_number || product.name || product.part_number}
+            {displayName}
           </button>
         </h3>
 
-        {/* SKU */}
-        {(effectiveProduct.sku || product.sku || effectiveProduct.part_number) && (
+        {displaySku && (
           <p className="dtb-plp-card__sku" style={{
             fontSize: '0.7rem', fontFamily: 'var(--font-mono)',
             color: 'rgba(15,23,42,0.4)', margin: '0 0 6px',
           }}>
-            SKU:&nbsp;{effectiveProduct.sku || product.sku || effectiveProduct.part_number}
+            SKU:&nbsp;{displaySku}
           </p>
         )}
 
-        {/* Footer: price + CTA */}
         <div className="dtb-plp-card__footer" style={{
           display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px',
         }}>
@@ -208,8 +228,8 @@ export default function ProductShoppingCard({
             {displayPrice}
           </p>
 
-          {product.is_variable ? (
-            hasSelectedVariation ? (
+          {product?.is_variable ? (
+            canDirectAddVariation ? (
               <button
                 type="button"
                 className="dtb-plp-card__cta dtb-plp-card__cta--cart"
