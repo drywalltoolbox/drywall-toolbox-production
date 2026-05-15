@@ -6,10 +6,10 @@
  * Returns an array of DTB Catalog Variation DTOs sorted by _dtb_variation_sort,
  * then by variation ID as a stable tie-breaker.
  *
- * Native WooCommerce parent/child variation relationships remain the primary
- * source of truth. A metadata fallback is included for diagnostics and staged
- * imports where child rows have _dtb_parent_product_sku but WooCommerce did not
- * attach them under the parent product during CSV import.
+ * Resolution order:
+ *   1. Direct WooCommerce children via WC_Product::get_children().
+ *   2. WooCommerce REST child variation endpoint.
+ *   3. Detached variation candidates by imported _dtb_parent_product_sku.
  *
  * @package drywall-toolbox
  */
@@ -21,6 +21,9 @@ final class DTB_VariationReadModelService {
 	/** Fields requested from WC REST API for variations. */
 	const VARIATION_FIELDS = 'id,sku,slug,name,type,status,price,regular_price,sale_price,on_sale,purchasable,stock_status,manage_stock,stock_quantity,images,attributes,meta_data,parent_id,description,short_description,backorders_allowed,backordered';
 
+	/** @var array<string,mixed> */
+	private static array $last_diagnostics = [];
+
 	/**
 	 * Fetch and normalize all variations for a WC variable product.
 	 *
@@ -29,14 +32,40 @@ final class DTB_VariationReadModelService {
 	 * @return array[]           Array of DTB variation DTOs.
 	 */
 	public static function get_normalized( int $parent_id, array $parent_wc ): array {
+		self::$last_diagnostics = [
+			'parentId'                => $parent_id,
+			'parentSku'               => (string) ( $parent_wc['sku'] ?? '' ),
+			'directChildCount'        => 0,
+			'restChildCount'          => 0,
+			'parentSkuMetaMatchCount' => 0,
+			'normalizedCount'         => 0,
+			'source'                  => 'none',
+		];
+
 		if ( $parent_id <= 0 ) {
 			return [];
 		}
 
-		$raw_vars = self::fetch_native_variations( $parent_id );
+		$raw_vars = self::fetch_direct_children( $parent_id, $parent_wc );
+		self::$last_diagnostics['directChildCount'] = count( $raw_vars );
+		if ( ! empty( $raw_vars ) ) {
+			self::$last_diagnostics['source'] = 'direct_children';
+		}
+
+		if ( empty( $raw_vars ) ) {
+			$raw_vars = self::fetch_native_variations( $parent_id );
+			self::$last_diagnostics['restChildCount'] = count( $raw_vars );
+			if ( ! empty( $raw_vars ) ) {
+				self::$last_diagnostics['source'] = 'wc_rest_variations';
+			}
+		}
 
 		if ( empty( $raw_vars ) ) {
 			$raw_vars = self::fetch_variations_by_parent_sku_meta( $parent_wc );
+			self::$last_diagnostics['parentSkuMetaMatchCount'] = count( $raw_vars );
+			if ( ! empty( $raw_vars ) ) {
+				self::$last_diagnostics['source'] = 'parent_sku_meta';
+			}
 		}
 
 		$variations = [];
@@ -44,13 +73,10 @@ final class DTB_VariationReadModelService {
 			if ( ! is_array( $raw ) ) {
 				continue;
 			}
-			// Stamp the type so the normalizer knows it's a variation, even when
-			// recovered from a detached product row by _dtb_parent_product_sku.
 			$raw['type'] = 'variation';
 			$variations[] = DTB_CatalogProductNormalizer::normalize( $raw, $parent_wc );
 		}
 
-		// Sort by explicit sort weight, then by ID (stable ascending).
 		usort( $variations, static function ( array $a, array $b ): int {
 			$rank_a = $a['variation']['sort'] ?? 0;
 			$rank_b = $b['variation']['sort'] ?? 0;
@@ -60,7 +86,42 @@ final class DTB_VariationReadModelService {
 			return ( $a['id'] ?? 0 ) <=> ( $b['id'] ?? 0 );
 		} );
 
+		self::$last_diagnostics['normalizedCount'] = count( $variations );
 		return $variations;
+	}
+
+	/** Return diagnostics for the last variation read. */
+	public static function get_last_diagnostics(): array {
+		return self::$last_diagnostics;
+	}
+
+	/**
+	 * Fetch native child variations directly from WooCommerce's product graph.
+	 *
+	 * @param int   $parent_id
+	 * @param array $parent_wc
+	 * @return array<int,array<string,mixed>>
+	 */
+	private static function fetch_direct_children( int $parent_id, array $parent_wc ): array {
+		$parent = wc_get_product( $parent_id );
+		if ( ! $parent || ! method_exists( $parent, 'get_children' ) ) {
+			return [];
+		}
+
+		$children = array_map( 'absint', (array) $parent->get_children() );
+		if ( empty( $children ) ) {
+			return [];
+		}
+
+		$raw = [];
+		foreach ( $children as $child_id ) {
+			$child = wc_get_product( $child_id );
+			if ( $child ) {
+				$raw[] = self::wc_product_to_rest_array( $child, $parent_wc );
+			}
+		}
+
+		return $raw;
 	}
 
 	/**
@@ -78,7 +139,7 @@ final class DTB_VariationReadModelService {
 			]
 		);
 
-		if ( $response->get_status() !== 200 ) {
+		if ( ! is_object( $response ) || ! method_exists( $response, 'get_status' ) || $response->get_status() !== 200 ) {
 			return [];
 		}
 
@@ -88,11 +149,6 @@ final class DTB_VariationReadModelService {
 
 	/**
 	 * Recover detached variation candidates using the imported DTB parent SKU meta.
-	 *
-	 * This is not a replacement for correct WooCommerce parent/child imports. It
-	 * prevents the canonical read model from returning an empty variation list
-	 * when imported child rows exist but were not attached through Woo's Parent
-	 * column. It also makes the failure mode debuggable from the canonical API.
 	 *
 	 * @param array<string,mixed> $parent_wc
 	 * @return array<int,array<string,mixed>>
