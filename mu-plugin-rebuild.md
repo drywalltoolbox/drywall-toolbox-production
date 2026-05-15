@@ -1,1974 +1,1416 @@
-## Architecture / Approach
+## Architecture/Approach
 
-You need a **complete mu-plugin platform remap**, not just a new catalog tool folder.
+I audited the repo around the exact failure domain: **frontend product routes → product catalog loader → brand/category filters → variation handling → Toolset Builder templates → WooCommerce proxy/mu-plugin endpoints**.
 
-The correct rebuild is a **domain-oriented DTB backend platform** where:
+Current system shape: React owns the public UI, WordPress/WooCommerce owns product/catalog/order data, and mu-plugins expose custom REST endpoints. The repo documentation confirms this headless model: `frontend/` is the public SPA, `wp/` is the backend/admin layer, `products/` is the catalog workspace, and `scripts/` handles catalog/media transformation.  The project is explicitly a headless React + WordPress/WooCommerce ecommerce, schematics, repair, account, rewards, and catalog-ops platform.  The active stack is React 19, React Router 7, Webpack 5, WordPress, WooCommerce, and custom mu-plugins. 
+
+---
+
+# Executive Assessment
+
+Your current product/filter/toolset architecture is **functional but not production-grade as a unified merchandising system**.
+
+The core issue is not one UI bug. It is architectural drift:
+
+1. **Products page filtering is client-derived and URL-state fragile.**
+2. **Brand/category route definitions and actual filter logic are not aligned.**
+3. **Toolset Builder is hard-coded in the frontend and uses product-name keyword matching.**
+4. **WooCommerce is the catalog system of record, but it does not yet own the “toolset eligibility / slot mapping / workflow intent” metadata.**
+5. **Variation handling exists, but is duplicated and partially bolted on across Products, CategoryPage, ProductDetailPage, and ToolsetBuilder.**
+6. **The backend exposes generic WooCommerce proxy endpoints, but lacks a purpose-built catalog/facet/toolset API contract.**
+7. **There appears to be a critical backend route defect around `/products/slug/:slug/detail`: the route is registered, the frontend depends on it, but the callback function was not found in the inspected file.**
+
+The immediate production-grade correction is to move from **frontend inference** to a **canonical product merchandising contract**.
+
+---
+
+# 1. Runtime Product Architecture: Current Flow
+
+Current intended flow:
 
 ```text
-00-dtb-loader.php
-  -> dtb-core
-  -> dtb-security
-  -> dtb-admin
-  -> dtb-commerce
-  -> dtb-catalog
-  -> dtb-media
-  -> dtb-schematics
-  -> dtb-ops
-  -> dtb-integrations
-  -> legacy-shims
+Browser
+  -> React Router
+  -> Products / CategoryPage / ProductDetailPage / ToolsetBuilder
+  -> frontend/src/services/catalog.js or frontend/src/api/products.js
+  -> /wp-json/drywall/v1/*
+  -> WooCommerce REST API
+  -> normalized frontend product model
+  -> UI filters / cards / modals / cart
 ```
 
-The current repo still runs a flat-file mu-plugin chain. `00-dtb-loader.php` directly requires the existing root-level files such as `dtb-utils.php`, `dtb-auth.php`, `dtb-cache.php`, `dtb-rest-api.php`, `dtb-api-security.php`, `dtb-rewards.php`, `dtb-image-sync.php`, `dtb-woocommerce.php`, `dtb-veeqo.php`, `dtb-ops-dashboard.php`, `dtb-catalog-health.php`, `dtb-quickbooks.php`, `dtb-schematics-api.php`, `dtb-coming-soon.php`, and `dtb-seo.php`. 
+The main routes are declared in `frontend/src/App.jsx`. The app has route surfaces for `/products`, `/products/brands`, `/products/brands/:brandSlug`, `/products/brands/:brandSlug/categories/:categorySlug`, `/products/:slug`, `/category/:slug`, and `/toolset-builder`. 
 
-Your existing README confirms that the mu-plugin system already owns REST routes, admin menus, AJAX endpoints, cron jobs, security boundaries, catalog import, image sync, Veeqo, QuickBooks, rewards, schematics, and product mapping.  
+That route surface is more sophisticated than the current page logic. Several route shapes exist, but the actual Products page mostly uses query params and local component state, not path params.
 
-So the target is not “organize a few files.” The target is:
+---
+
+# 2. Product Listing / Filter Architecture Audit
+
+## Current Products page behavior
+
+`frontend/src/pages/Products.jsx`:
+
+* Loads all products via `getProducts()` from `../services/catalog`.
+* Builds brand list from loaded products.
+* Applies filtering client-side.
+* Uses hard-coded `ALLOWED_BRANDS`.
+* Uses hard-coded internal categories: `taping`, `finishing`, `corner`, `mudboxes`, `sanding`.
+* Uses `display_category` for brand category cards.
+* Fetches variations for visible variable products after pagination.
+* Displays a resolved “best” variation on product cards when possible.  
+
+The catalog loader claims to be the “single source-of-truth for all product data” and implements an IndexedDB stale-while-revalidate flow: fresh cache under 5 minutes, stale under 24 hours, otherwise fetch WooCommerce through the `/drywall/v1/products` proxy. 
+
+That is reasonable for return visits, but it does not solve cold-start correctness or first-load performance.
+
+## Critical URL-state defect
+
+In `Products.jsx`, `BRAND_TO_SLUG` and `SLUG_TO_BRAND` are declared. Initial state maps `brandParam` slugs to canonical brand names. But the later `useEffect` that reacts to `location.search` does **not** apply `SLUG_TO_BRAND`; it decodes the raw query value and filters it against `ALLOWED_BRANDS`. 
+
+That means URLs like:
 
 ```text
-A production-grade internal WordPress application platform
-with explicit module boundaries, stable public function shims,
-REST controllers, admin pages, service classes, repositories,
-DB migrations, audit logging, validation, queue-safe sync jobs,
-and legacy compatibility for existing routes/actions.
+/products?brand=tapetech
+/products?brand=columbia-taping-tools
+/products?brand=level5
+```
+
+can initialize correctly in one path, then later be interpreted as invalid brands because `tapetech` is not equal to `TapeTech`.
+
+This is likely causing “brand pages / filters not wiring up precisely.”
+
+## Critical route-contract mismatch
+
+`App.jsx` defines:
+
+```text
+/products/brands/:brandSlug
+/products/brands/:brandSlug/categories/:categorySlug
+```
+
+but `Products.jsx` only reads `location.search`, not route params.  
+
+So these routes exist architecturally, but they are not truly wired.
+
+Production implication:
+
+```text
+/products/brands/tapetech
+```
+
+renders the Products page, but the Products page does not consume `brandSlug`. Unless separate redirect logic exists elsewhere, the route is decorative.
+
+## CategoryPage architecture
+
+`CategoryPage.jsx` uses `/category/:slug`, calls `getProductsByCategory(slug)`, and then applies variation prefetching for variable products. 
+
+That is simpler and less fragile than the Products page, but it uses internal category keys rather than WooCommerce category slugs/facets. It is not integrated with the brand/category hierarchy used on `/products`.
+
+## Product card variation handling
+
+Products and CategoryPage both duplicate this logic:
+
+```text
+visible products
+  -> find variable products
+  -> fetch variations
+  -> select first in-stock variation or first variation
+  -> inherit parent image if variation lacks image
+```
+
+This pattern appears in both `Products.jsx` and `CategoryPage.jsx`.  
+
+This should be centralized into one hook or product-view-model API. Duplicated variation resolution is a correctness hazard because product cards, modals, product detail pages, and toolset slots can drift.
+
+---
+
+# 3. Product API / Backend Architecture Audit
+
+## Current frontend API layer
+
+`frontend/src/api/products.js` exposes:
+
+* `fetchProducts`
+* `fetchProduct`
+* `fetchProductBySlug`
+* `fetchCategories`
+* `fetchAttributes`
+* `searchProducts`
+* `fetchProductVariations`
+* legacy helpers for older flows
+
+These all route through `/wp-json/drywall/v1/*`. 
+
+This is the right direction: server-side WooCommerce proxy, no WC credentials in browser, one API namespace.
+
+## Current backend route layer
+
+`wp/wp-content/mu-plugins/dtb-rest-api.php` registers public product routes:
+
+```text
+GET /drywall/v1/products
+GET /drywall/v1/products/slug/:slug
+GET /drywall/v1/products/slug/:slug/detail
+GET /drywall/v1/products/:id
+GET /drywall/v1/products/:id/variations
+GET /drywall/v1/products/:parent_id/variations/:id
+GET /drywall/v1/categories
+GET /drywall/v1/attributes
+GET /drywall/v1/search
+```
+
+
+
+The backend proxies WooCommerce REST requests with server-side credentials and transient caching. 
+
+This is structurally correct, but the API is still too generic for the UI you are trying to build.
+
+## Critical backend issue: product detail route callback
+
+The route `/drywall/v1/products/slug/:slug/detail` is registered with callback `dtb_proxy_product_detail`. 
+
+The frontend product detail hook depends on that exact endpoint:
+
+```text
+GET /wp-json/drywall/v1/products/slug/:slug/detail
+```
+
+and expects:
+
+```js
+{
+  product,
+  variations,
+  computed
+}
+```
+
+
+
+In the inspected `dtb-rest-api.php`, I found registration for `dtb_proxy_product_detail`, but did not find the function definition. The file contains `dtb_proxy_product_by_slug`, `dtb_proxy_product_by_id`, and variation callbacks, but not the detail callback in the inspected ranges.  
+
+This is a high-priority backend defect. It can directly break:
+
+```text
+/products/:slug
+ToolsetBuilder variation detail fallback
+any component using useProductDetail()
+```
+
+## Possible PHP syntax defect
+
+In `dtb-rest-api.php`, the comment before `DTB_VARIATION_FIELDS` appears malformed in the fetched source:
+
+```php
+const DTB_PRODUCT_DETAIL_FIELDS = '...';
+ * Fields returned by the variation endpoints.
+ *
+ * Limits WooCommerce object hydration...
+ */
+const DTB_VARIATION_FIELDS = '...';
+```
+
+
+
+If that text is truly present in the deployed file outside a `/** ... */` block, PHP will parse-error. If this is only a connector display artifact, ignore it. But this should be checked directly in the repo/deployment because it is potentially catastrophic.
+
+---
+
+# 4. Product Normalization Audit
+
+`frontend/src/services/api.js` normalizes raw WooCommerce products into the frontend shape. It extracts:
+
+* brand from `_dtb_brand`, `dtb_brand`, Brand attribute, matching brand category, or matching brand tag
+* category via `CATEGORY_MAP`
+* display category
+* parts detection
+* UPC
+* variation attributes
+* min/max price
+* images
+* meta/spec/includes data
+
+ 
+
+This is a strong normalization layer, but it is doing too much on the frontend. Product identity, brand, category, parts/tool classification, display category, and variation summary should be returned already normalized from the backend.
+
+Current risk:
+
+```text
+WooCommerce product
+  -> backend generic proxy
+  -> frontend normalizeProduct()
+  -> Products filtering
+  -> Toolset keyword matching
+```
+
+Production-grade target:
+
+```text
+WooCommerce product + DTB product meta
+  -> backend normalized product read model
+  -> frontend consumes stable DTO
+```
+
+The frontend should not have to infer merchandising truth.
+
+---
+
+# 5. Toolset Builder Architecture Audit
+
+## Current Toolset Builder behavior
+
+`ToolsetBuilder.jsx` imports:
+
+```js
+getProducts from ../services/catalog
+getProductVariations from ../services/api
+apiClient from ../api/client.js
+SET_TEMPLATES / BUILDER_BRANDS / getSlotProducts from ../data/toolsetTemplates
+```
+
+
+
+The builder:
+
+1. Loads the whole catalog.
+2. Shows hard-coded builder brands.
+3. Shows hard-coded set templates.
+4. For a selected template and slot, calls `getSlotProducts(allProducts, template.brand, activeSlot.filter)`.
+5. Expands variable products into variation options when possible.
+6. Lets the user select one product per slot.
+7. Adds selected slot products to cart one by one.
+
+ 
+
+## Current template model
+
+`frontend/src/data/toolsetTemplates.js` defines all kit templates in frontend source. It includes:
+
+* brand names
+* kit scopes
+* slots
+* required/optional flags
+* “always included” accessories
+* slot filter functions
+* keyword matching helpers
+
+ 
+
+The file explicitly states that each slot uses a product-filter function matching real catalog products. 
+
+This is the largest architecture problem.
+
+## Why this is not production-grade
+
+Toolset Builder uses product **names** to determine slot eligibility.
+
+Examples:
+
+```js
+name.includes('flat box')
+name.includes('angle head')
+name.includes('handle') && name.includes('box')
+!name.includes('part')
+```
+
+
+
+This is brittle because product names are merchandising copy, not system truth. You are already actively optimizing product names and SKUs. Every rename risks changing Toolset Builder behavior.
+
+Failure modes:
+
+| Failure                               | Cause                                                                |
+| ------------------------------------- | -------------------------------------------------------------------- |
+| Correct product missing from slot     | Name lacks expected keyword                                          |
+| Wrong product included                | Name contains generic keyword like “handle”                          |
+| Parts included accidentally           | Parts exclusion only checks limited regex/category signals           |
+| Variations duplicated or confusing    | Variable parent and variations are flattened late                    |
+| Brand mismatch                        | Brand labels must exactly match template brand strings               |
+| Bundle accessories not actually added | `alwaysIncluded` is display-only                                     |
+| Discount messaging inaccurate         | `savingsLabel` is static text, not pricing logic                     |
+| Cart is not atomic                    | Selected kit is added as separate cart items with no bundle identity |
+
+## Critical Toolset Builder commerce defect
+
+`Stage3` displays `alwaysIncluded` accessories as free, but `handleAddToCart` only adds selected slot products:
+
+```js
+template.slots
+  .map((s) => slotSelections[s.id])
+  .filter(Boolean)
+  .forEach((p) => addToCart(p, 1));
+```
+
+
+
+So “Always Included” items are not cart line items, not inventory-reserved, not order-visible, and not fulfillment-visible unless some separate backend logic injects them later. In the inspected frontend path, they are UI-only.
+
+That is not acceptable for production ecommerce.
+
+---
+
+# 6. Root Cause Diagnosis
+
+The root problem is **missing canonical merchandising metadata**.
+
+Right now the system has product truth in WooCommerce, but Toolset Builder and filters need a second layer of truth:
+
+```text
+Brand
+Category
+Display category
+Tool family
+Tool role
+Workflow applicability
+Toolset slot eligibility
+Variation dimension
+Bundle inclusion behavior
+Default card variation
+Sort/ranking
+Compatibility rules
+```
+
+The frontend is currently reconstructing this from product names, categories, and local template code.
+
+That should be backend-owned.
+
+---
+
+# 7. Target Production Architecture
+
+## New canonical product read model
+
+Create a normalized product DTO returned by the backend.
+
+```ts
+type DtbCatalogProduct = {
+  id: number;
+  type: 'simple' | 'variable' | 'variation';
+  sku: string;
+  slug: string;
+  name: string;
+
+  brand: {
+    key: string;       // "tapetech"
+    label: string;     // "TapeTech"
+    slug: string;      // "tapetech"
+  };
+
+  category: {
+    key: string;       // "finishing"
+    label: string;     // "Finishing Tools"
+    slug: string;
+    path: string[];
+  };
+
+  merchandising: {
+    isParts: boolean;
+    toolFamily: string;        // "flat_box", "automatic_taper", "angle_head"
+    toolRole: string;          // "primary_tool", "handle", "pump", "accessory"
+    workflowScopes: string[];  // ["full", "finishing", "flatbox"]
+    builderEligible: boolean;
+    builderSlots: string[];    // ["flatBox", "flatBox2"]
+    defaultCardVariationId?: number;
+    rank?: number;
+  };
+
+  price: {
+    value: number;
+    min?: number;
+    max?: number;
+    regular?: number;
+    sale?: number;
+    onSale: boolean;
+  };
+
+  inventory: {
+    stockStatus: 'instock' | 'outofstock' | 'onbackorder';
+    stockQuantity?: number | null;
+  };
+
+  media: {
+    image: string;
+    images: string[];
+    thumbnail?: string;
+    srcset?: string;
+    sizes?: string;
+  };
+
+  variations?: DtbCatalogVariationSummary[];
+};
+```
+
+## New canonical facets endpoint
+
+Add:
+
+```text
+GET /wp-json/dtb/v1/catalog/facets
+```
+
+Response:
+
+```json
+{
+  "brands": [
+    {
+      "key": "tapetech",
+      "label": "TapeTech",
+      "slug": "tapetech",
+      "logo": "/brands/TapeTech/tapetech_logo.svg",
+      "productCount": 123
+    }
+  ],
+  "categories": [
+    {
+      "key": "finishing",
+      "label": "Finishing Tools",
+      "slug": "finishing-tools",
+      "productCount": 48
+    }
+  ],
+  "displayCategoriesByBrand": {
+    "tapetech": [
+      {
+        "key": "finishing-boxes",
+        "label": "Finishing Boxes",
+        "slug": "finishing-boxes",
+        "image": "...",
+        "productCount": 12
+      }
+    ]
+  }
+}
+```
+
+This eliminates hard-coded frontend brand/category duplication.
+
+## New server-side catalog query endpoint
+
+Add:
+
+```text
+GET /wp-json/dtb/v1/catalog/products
+```
+
+Supported query:
+
+```text
+brand=tapetech
+category=finishing-tools
+display_category=finishing-boxes
+tool_family=flat_box
+builder_slot=flatBox
+builder_scope=finishing
+search=...
+page=1
+per_page=24
+sort=popular
+include_variation_summary=1
+```
+
+This endpoint should return:
+
+```json
+{
+  "items": [],
+  "pagination": {
+    "page": 1,
+    "perPage": 24,
+    "total": 120,
+    "totalPages": 5
+  },
+  "facets": {}
+}
+```
+
+Products page should stop loading the entire catalog for first-visit filtering.
+
+## New Toolset Builder endpoint
+
+Add:
+
+```text
+GET /wp-json/dtb/v1/toolsets
+GET /wp-json/dtb/v1/toolsets/:templateId
+GET /wp-json/dtb/v1/toolsets/:templateId/options
+```
+
+Response shape:
+
+```json
+{
+  "template": {
+    "id": "tapetech-full",
+    "brand": "tapetech",
+    "scope": "full",
+    "name": "TapeTech Custom Full Set",
+    "slots": [
+      {
+        "id": "flatBox",
+        "label": "Flat Box #1",
+        "required": true,
+        "toolFamily": "flat_box",
+        "allowVariationSelection": true,
+        "minSelections": 1,
+        "maxSelections": 1
+      }
+    ],
+    "includedItems": [
+      {
+        "sku": "PUMP-SKU",
+        "quantity": 1,
+        "priceMode": "included",
+        "cartBehavior": "add_line_item"
+      }
+    ]
+  },
+  "optionsBySlot": {
+    "flatBox": [
+      {
+        "productId": 123,
+        "variationId": 456,
+        "sku": "..."
+      }
+    ]
+  }
+}
+```
+
+The frontend should render, not infer.
+
+---
+
+# 8. Required Implementation Plan
+
+## Phase 0 — Immediate Defect Fixes
+
+### 0.1 Fix Products URL brand normalization
+
+In `frontend/src/pages/Products.jsx`, every place that reads URL `brand` must normalize slug → canonical brand using `SLUG_TO_BRAND`.
+
+Current faulty pattern:
+
+```js
+brandParam.split(',')
+  .map(b => decodeURIComponent(b.trim()))
+  .filter(brand => ALLOWED_BRANDS.includes(brand))
+```
+
+Target behavior:
+
+```js
+brandParam.split(',')
+  .map(b => decodeURIComponent(b.trim()))
+  .map(b => SLUG_TO_BRAND[b] || b)
+  .filter(brand => ALLOWED_BRANDS.includes(brand))
+```
+
+### 0.2 Wire path params or remove dead routes
+
+Either:
+
+```text
+/products/brands/:brandSlug
+/products/brands/:brandSlug/categories/:categorySlug
+```
+
+must be consumed by `Products.jsx`, or those routes should redirect to the query-param version.
+
+Production-grade choice: consume path params and treat them as canonical SEO routes.
+
+### 0.3 Verify/fix `dtb_proxy_product_detail`
+
+`useProductDetail.js` depends on:
+
+```text
+/wp-json/drywall/v1/products/slug/:slug/detail
+```
+
+
+
+Confirm the PHP callback exists in deployed code. If missing, implement it immediately or temporarily switch `useProductDetail` to fetch parent by slug and variations separately.
+
+### 0.4 Validate `dtb-rest-api.php` syntax
+
+Check the malformed comment around `DTB_VARIATION_FIELDS`. 
+
+Run:
+
+```bash
+php -l wp/wp-content/mu-plugins/dtb-rest-api.php
+```
+
+This should be mandatory in CI.
+
+---
+
+## Phase 1 — Stop Frontend Template Inference
+
+### 1.1 Add product meta fields in WooCommerce
+
+Add canonical DTB meta fields:
+
+```text
+_dtb_brand_key
+_dtb_brand_label
+_dtb_category_key
+_dtb_display_category_key
+_dtb_tool_family
+_dtb_tool_role
+_dtb_workflow_scopes
+_dtb_builder_eligible
+_dtb_builder_slots
+_dtb_builder_rank
+_dtb_default_variation_id
+_dtb_is_parts
+```
+
+Example:
+
+```json
+{
+  "_dtb_tool_family": "flat_box",
+  "_dtb_tool_role": "primary_tool",
+  "_dtb_workflow_scopes": ["full", "finishing", "flatbox"],
+  "_dtb_builder_slots": ["flatBox", "flatBox2"],
+  "_dtb_builder_eligible": true
+}
+```
+
+### 1.2 Generate those fields during CSV/catalog build
+
+Do not manually maintain this in React.
+
+Your CSV/catalog pipeline should output these fields as WooCommerce meta columns:
+
+```csv
+Meta: _dtb_tool_family
+Meta: _dtb_tool_role
+Meta: _dtb_workflow_scopes
+Meta: _dtb_builder_slots
+Meta: _dtb_builder_eligible
+Meta: _dtb_builder_rank
+```
+
+### 1.3 Replace keyword filters
+
+Remove this class of logic from `toolsetTemplates.js`:
+
+```js
+name.includes('flat box')
+name.includes('angle head')
+name.includes('handle')
+```
+
+Replace it with:
+
+```js
+product.merchandising.builderSlots.includes(activeSlot.id)
 ```
 
 ---
 
-# 1. Current MU-Plugin Inventory
+## Phase 2 — Backend Product View Model
 
-## Root loader
+### 2.1 Create a backend normalizer
 
-```text
-wp/wp-content/mu-plugins/00-dtb-loader.php
-```
-
-Current responsibility:
+Add a mu-plugin module:
 
 ```text
-- loads first by filename
-- defines feature flag helper
-- defines security logging helper
-- defines allowed origins
-- defines origin check
-- defines _dtb_require()
-- explicitly requires DTB mu-plugin files
+wp/wp-content/mu-plugins/dtb-catalog-read-model.php
 ```
 
-This file currently does too much. It should become a thin platform bootstrapper. 
+Responsibilities:
+
+```text
+WC_Product -> DTB product DTO
+WC variation -> DTB variation DTO
+Meta extraction
+Brand/category normalization
+Toolset eligibility normalization
+Facet aggregation
+```
+
+### 2.2 Add catalog endpoints
+
+Add:
+
+```text
+GET /wp-json/dtb/v1/catalog/products
+GET /wp-json/dtb/v1/catalog/facets
+GET /wp-json/dtb/v1/catalog/products/:slug
+GET /wp-json/dtb/v1/catalog/products/:slug/detail
+```
+
+The frontend should gradually migrate from `/drywall/v1/products` to `/dtb/v1/catalog/products`.
+
+### 2.3 Cache the read model
+
+Use server-side transient/object-cache keys:
+
+```text
+dtb_catalog_facets_v1
+dtb_catalog_products_query_<hash>
+dtb_product_detail_<slug>
+dtb_toolset_options_<template_id>
+```
+
+Invalidate on:
+
+```text
+product.created
+product.updated
+product.deleted
+variation.updated
+category.updated
+catalog import complete
+```
+
+The existing product webhook invalidation is already in place conceptually. 
 
 ---
 
-## Current root-level DTB files
+## Phase 3 — Products Page Refactor
 
-These are the files that need to be remapped:
-
-```text
-wp/wp-content/mu-plugins/
-├─ 00-dtb-loader.php
-├─ README.md
-├─ dtb-utils.php
-├─ dtb-auth.php
-├─ dtb-cache.php
-├─ dtb-cache-admin.php
-├─ dtb-rest-api.php
-├─ dtb-api-security.php
-├─ dtb-frontend-security.php
-├─ dtb-admin-security.php
-├─ dtb-admin-performance.php
-├─ dtb-api-health-monitor.php
-├─ dtb-rewards.php
-├─ dtb-image-sync.php
-├─ dtb-image-sync.md
-├─ dtb-woocommerce.php
-├─ dtb-veeqo.php
-├─ dtb-ops-dashboard.php
-├─ dtb-catalog-health.php
-├─ dtb-quickbooks.php
-├─ dtb-schematics-api.php
-├─ dtb-schematics-admin.php
-├─ dtb-product-mapping.php
-├─ dtb-coming-soon.php
-├─ dtb-seo.php
-├─ dtb-config-reference.php
-├─ endurance-page-cache.php
-└─ sso.php
-```
-
-Host-provided files such as `endurance-page-cache.php` and `sso.php` should be left alone.
-
----
-
-# 2. Current Functional Domains
-
-## Core/config/helpers
-
-Current file:
-
-```text
-dtb-utils.php
-```
-
-Existing responsibilities include:
-
-```text
-- REST request detection
-- admin/AJAX request detection
-- admin/REST request detection
-- DTB config constant aggregation
-- WooCommerce credential lookup
-- CSV catalog config resolution
-- error envelope helpers
-- client IP helpers
-```
-
-`dtb-utils.php` currently provides helpers like `dtb_is_rest_api_request()`, `dtb_is_admin_or_ajax_request()`, `dtb_get_config()`, and `dtb_get_wc_credentials()`. 
-
----
-
-## Auth/security
-
-Current files:
-
-```text
-dtb-auth.php
-dtb-api-security.php
-dtb-frontend-security.php
-dtb-admin-security.php
-```
-
-Current responsibilities:
-
-```text
-- JWT auth
-- login/logout/validate/register/reset password routes
-- REST nonce route
-- CORS policy
-- admin hardening
-- frontend security headers
-- origin validation
-```
-
----
-
-## WooCommerce commerce layer
-
-Current files:
-
-```text
-dtb-rest-api.php
-dtb-woocommerce.php
-dtb-cache.php
-dtb-cache-admin.php
-dtb-seo.php
-```
-
-Current responsibilities:
-
-```text
-- WooCommerce proxy routes
-- product/category/search/order/customer/coupon REST behavior
-- catalog CSV import orchestration
-- product cache invalidation
-- webhook setup/handling
-- WooCommerce configuration
-- product SEO fields
-```
-
-The README documents current `drywall/v1` product/category/order/customer/coupon routes and `dtb/v1` catalog/import/config/webhook routes. 
-
----
-
-## Catalog operations
-
-Current files:
-
-```text
-dtb-product-mapping.php
-dtb-catalog-health.php
-```
-
-Current responsibilities:
-
-```text
-- variable product editing
-- variation creation/update/delete
-- parts compatibility mapping
-- upsells/cross-sells
-- variable product diagnostics
-- SKU/price/attribute health checks
-- CSV health export
-```
-
-`dtb-product-mapping.php` currently combines admin menu registration, AJAX handlers, WooCommerce mutation logic, inline CSS, inline JavaScript, variable product UI, parts compatibility UI, and relationship mapping.  
-
-`dtb-catalog-health.php` currently scans variable products for no children, missing variation SKUs, missing prices, missing variation attributes, no purchasable in-stock variations, and missing parent SKUs.  
-
----
-
-## Media/image operations
-
-Current file:
-
-```text
-dtb-image-sync.php
-```
-
-Current responsibilities from README:
-
-```text
-- sync images
-- status/progress
-- link-only mode
-- reset
-- purge unlinked
-- fix renamed
-- release lock
-```
-
-These are currently exposed under `dtb/v1/sync-images/*` style routes. 
-
----
-
-## Schematics
-
-Current files:
-
-```text
-dtb-schematics-api.php
-dtb-schematics-admin.php
-```
-
-Current responsibilities:
-
-```text
-- schematics media REST route
-- schematic admin listing/editing/saving/removing/purging
-- product search for schematic associations
-```
-
-The README documents `GET /dtb/v1/schematics/media` and multiple schematic AJAX endpoints. 
-
----
-
-## Ops/dashboard/audit
-
-Current files:
-
-```text
-dtb-ops-dashboard.php
-dtb-api-health-monitor.php
-dtb-admin-performance.php
-```
-
-Current responsibilities:
-
-```text
-- ops KPI dashboard
-- audit log table
-- audit log endpoint/page
-- health endpoint
-- cron KPI refresh
-- API health monitor
-- admin performance behavior
-```
-
-`dtb-ops-dashboard.php` defines custom capabilities such as `DTB_CAP_OPS_ADMIN`, `DTB_CAP_ACCOUNTING`, `DTB_CAP_SUPPORT`, and `DTB_CAP_CATALOG`; it also creates the `{prefix}dtb_audit_log` table and registers the DTB Ops menu. 
-
----
-
-## Integrations
-
-Current files:
-
-```text
-dtb-veeqo.php
-dtb-quickbooks.php
-dtb-rewards.php
-```
-
-Current responsibilities:
-
-```text
-- Veeqo status
-- shipping rates
-- inventory
-- Veeqo order webhook
-- repair request endpoint
-- QuickBooks OAuth/status/sync
-- daily QBO sync
-- rewards balance/history/redeem/admin adjust
-```
-
-The README documents Veeqo, QuickBooks, and rewards routes under `dtb/v1`. 
-
----
-
-## Marketing/utility
-
-Current file:
-
-```text
-dtb-coming-soon.php
-```
-
-Current responsibilities:
-
-```text
-- subscriber capture
-- subscribe nonce
-- subscribers admin route
-- unsubscribe
-- delete subscriber
-```
-
----
-
-# 3. Target End-State Directory
-
-This is the full target architecture.
-
-```text
-wp/wp-content/mu-plugins/
-├─ 00-dtb-loader.php
-├─ README.md
-│
-├─ dtb-core/
-│  ├─ bootstrap.php
-│  ├─ Autoloader.php
-│  ├─ Plugin.php
-│  ├─ Container.php
-│  ├─ Contracts/
-│  │  ├─ Bootable.php
-│  │  ├─ RestControllerInterface.php
-│  │  ├─ RepositoryInterface.php
-│  │  ├─ MigrationInterface.php
-│  │  └─ JobInterface.php
-│  ├─ Support/
-│  │  ├─ Config.php
-│  │  ├─ FeatureFlags.php
-│  │  ├─ Request.php
-│  │  ├─ Response.php
-│  │  ├─ Logger.php
-│  │  ├─ SecurityLogger.php
-│  │  ├─ Sanitizer.php
-│  │  ├─ Validator.php
-│  │  ├─ Nonce.php
-│  │  ├─ Capabilities.php
-│  │  ├─ DateTime.php
-│  │  ├─ Json.php
-│  │  └─ Filesystem.php
-│  ├─ Http/
-│  │  ├─ RestController.php
-│  │  ├─ RestRouteRegistrar.php
-│  │  ├─ Permissions.php
-│  │  ├─ ErrorEnvelope.php
-│  │  └─ Pagination.php
-│  ├─ Database/
-│  │  ├─ MigrationRunner.php
-│  │  ├─ Schema.php
-│  │  ├─ Table.php
-│  │  └─ Repository.php
-│  ├─ Jobs/
-│  │  ├─ JobDispatcher.php
-│  │  ├─ ActionSchedulerDispatcher.php
-│  │  └─ WpCronDispatcher.php
-│  └─ Legacy/
-│     └─ FunctionWrappers.php
-│
-├─ dtb-security/
-│  ├─ bootstrap.php
-│  ├─ Plugin.php
-│  ├─ Cors/
-│  │  ├─ CorsPolicy.php
-│  │  └─ OriginValidator.php
-│  ├─ Auth/
-│  │  ├─ JwtService.php
-│  │  ├─ AuthCookieService.php
-│  │  ├─ PasswordResetService.php
-│  │  └─ CustomerRegistrationService.php
-│  ├─ Admin/
-│  │  ├─ AdminHardening.php
-│  │  └─ AdminDiagnostics.php
-│  ├─ Frontend/
-│  │  ├─ SecurityHeaders.php
-│  │  └─ CspPolicy.php
-│  ├─ Rest/
-│  │  ├─ AuthController.php
-│  │  ├─ NonceController.php
-│  │  └─ SecurityController.php
-│  └─ Legacy/
-│     ├─ AuthRoutesBridge.php
-│     └─ SecurityFunctionsBridge.php
-│
-├─ dtb-admin/
-│  ├─ bootstrap.php
-│  ├─ Plugin.php
-│  ├─ Menu/
-│  │  ├─ MenuRegistry.php
-│  │  ├─ ToolsMenu.php
-│  │  ├─ OpsMenu.php
-│  │  ├─ CatalogMenu.php
-│  │  ├─ IntegrationsMenu.php
-│  │  └─ SettingsMenu.php
-│  ├─ Assets/
-│  │  ├─ AdminAssetRegistry.php
-│  │  ├─ NoticeService.php
-│  │  └─ ViewRenderer.php
-│  ├─ Pages/
-│  │  ├─ CachePage.php
-│  │  ├─ ApiHealthPage.php
-│  │  ├─ ConfigReferencePage.php
-│  │  └─ AdminPerformancePage.php
-│  └─ Rest/
-│     └─ AdminHealthController.php
-│
-├─ dtb-commerce/
-│  ├─ bootstrap.php
-│  ├─ Plugin.php
-│  ├─ WooCommerce/
-│  │  ├─ ProductRepository.php
-│  │  ├─ ProductReadRepository.php
-│  │  ├─ ProductMutationService.php
-│  │  ├─ CategoryRepository.php
-│  │  ├─ AttributeRepository.php
-│  │  ├─ OrderRepository.php
-│  │  ├─ CustomerRepository.php
-│  │  ├─ CouponRepository.php
-│  │  ├─ ProductCacheService.php
-│  │  ├─ WebhookService.php
-│  │  ├─ ProductTypeService.php
-│  │  └─ WooCommerceGuard.php
-│  ├─ Rest/
-│  │  ├─ ProductProxyController.php
-│  │  ├─ CategoryController.php
-│  │  ├─ AttributeController.php
-│  │  ├─ SearchController.php
-│  │  ├─ OrderController.php
-│  │  ├─ CustomerController.php
-│  │  ├─ CouponController.php
-│  │  ├─ CatalogController.php
-│  │  ├─ ImportController.php
-│  │  └─ WebhookController.php
-│  ├─ Import/
-│  │  ├─ CatalogImportService.php
-│  │  ├─ CatalogImportJob.php
-│  │  ├─ CsvResolver.php
-│  │  ├─ CsvParser.php
-│  │  ├─ ImportValidator.php
-│  │  └─ ImportReport.php
-│  ├─ Seo/
-│  │  ├─ ProductSeoService.php
-│  │  ├─ ProductSeoMetaBox.php
-│  │  └─ ProductSeoRestExtender.php
-│  ├─ Cache/
-│  │  ├─ CacheStatusController.php
-│  │  ├─ CacheAdminPage.php
-│  │  └─ CacheEventLogger.php
-│  └─ Legacy/
-│     ├─ RestApiRouteBridge.php
-│     ├─ WooCommerceHooksBridge.php
-│     ├─ CacheFunctionsBridge.php
-│     └─ SeoBridge.php
-│
-├─ dtb-catalog/
-│  ├─ bootstrap.php
-│  ├─ Plugin.php
-│  ├─ Admin/
-│  │  ├─ CatalogOverviewPage.php
-│  │  ├─ ProductMappingPage.php
-│  │  ├─ CategoryMappingPage.php
-│  │  ├─ VariationMappingPage.php
-│  │  ├─ CompatibilityMappingPage.php
-│  │  ├─ RelationshipMappingPage.php
-│  │  ├─ ValidationQueuePage.php
-│  │  ├─ CatalogHealthPage.php
-│  │  ├─ ImportExportPage.php
-│  │  └─ CatalogAuditPage.php
-│  ├─ Assets/
-│  │  ├─ catalog-admin.css
-│  │  ├─ catalog-admin.js
-│  │  ├─ product-grid.js
-│  │  ├─ mapping-drawer.js
-│  │  ├─ bulk-editor.js
-│  │  └─ validation-queue.js
-│  ├─ Database/
-│  │  ├─ Schema.php
-│  │  ├─ Migrations.php
-│  │  └─ Tables.php
-│  ├─ Domain/
-│  │  ├─ CatalogMapping.php
-│  │  ├─ CategoryRule.php
-│  │  ├─ ProductIdentity.php
-│  │  ├─ ProductRelationship.php
-│  │  ├─ CompatibilityMap.php
-│  │  ├─ MappingStatus.php
-│  │  ├─ ProductType.php
-│  │  ├─ ValidationIssue.php
-│  │  ├─ ValidationSeverity.php
-│  │  ├─ BulkMutation.php
-│  │  ├─ Snapshot.php
-│  │  └─ AuditAction.php
-│  ├─ Repositories/
-│  │  ├─ CatalogMappingRepository.php
-│  │  ├─ CategoryRuleRepository.php
-│  │  ├─ CompatibilityRepository.php
-│  │  ├─ RelationshipRepository.php
-│  │  ├─ ValidationIssueRepository.php
-│  │  ├─ SnapshotRepository.php
-│  │  └─ CatalogAuditRepository.php
-│  ├─ Services/
-│  │  ├─ ProductMappingService.php
-│  │  ├─ CategoryMappingService.php
-│  │  ├─ VariationMappingService.php
-│  │  ├─ CompatibilityMappingService.php
-│  │  ├─ RelationshipMappingService.php
-│  │  ├─ CatalogValidationService.php
-│  │  ├─ CatalogHealthService.php
-│  │  ├─ CatalogSyncService.php
-│  │  ├─ BulkMutationService.php
-│  │  ├─ SnapshotService.php
-│  │  ├─ RollbackService.php
-│  │  ├─ CsvExportService.php
-│  │  ├─ CsvImportPreviewService.php
-│  │  ├─ CategorySuggestionService.php
-│  │  ├─ SlugNormalizationService.php
-│  │  ├─ SkuNormalizationService.php
-│  │  └─ ProductNameNormalizationService.php
-│  ├─ Rest/
-│  │  ├─ ProductMappingController.php
-│  │  ├─ CategoryMappingController.php
-│  │  ├─ VariationMappingController.php
-│  │  ├─ CompatibilityController.php
-│  │  ├─ RelationshipController.php
-│  │  ├─ ValidationController.php
-│  │  ├─ BulkController.php
-│  │  ├─ HealthController.php
-│  │  ├─ ImportExportController.php
-│  │  └─ AuditController.php
-│  ├─ Jobs/
-│  │  ├─ BulkSyncJob.php
-│  │  ├─ CatalogHealthScanJob.php
-│  │  ├─ CsvImportPreviewJob.php
-│  │  └─ MappingReindexJob.php
-│  └─ Legacy/
-│     ├─ ProductMappingAjaxBridge.php
-│     └─ CatalogHealthAjaxBridge.php
-│
-├─ dtb-media/
-│  ├─ bootstrap.php
-│  ├─ Plugin.php
-│  ├─ Admin/
-│  │  └─ ImageSyncPage.php
-│  ├─ Domain/
-│  │  ├─ MediaSyncRun.php
-│  │  ├─ MediaLinkResult.php
-│  │  └─ MediaIssue.php
-│  ├─ Services/
-│  │  ├─ ImageSyncService.php
-│  │  ├─ ImageLinkingService.php
-│  │  ├─ ImagePurgeService.php
-│  │  ├─ ImageRenameRepairService.php
-│  │  ├─ MediaLockService.php
-│  │  └─ MediaManifestService.php
-│  ├─ Rest/
-│  │  ├─ ImageSyncController.php
-│  │  ├─ ImageSyncStatusController.php
-│  │  └─ ImageMaintenanceController.php
-│  ├─ Jobs/
-│  │  └─ ImageSyncJob.php
-│  └─ Legacy/
-│     └─ ImageSyncRouteBridge.php
-│
-├─ dtb-schematics/
-│  ├─ bootstrap.php
-│  ├─ Plugin.php
-│  ├─ Admin/
-│  │  └─ SchematicsAdminPage.php
-│  ├─ Domain/
-│  │  ├─ Schematic.php
-│  │  ├─ SchematicMedia.php
-│  │  └─ SchematicProductLink.php
-│  ├─ Repositories/
-│  │  ├─ SchematicRepository.php
-│  │  └─ SchematicMediaRepository.php
-│  ├─ Services/
-│  │  ├─ SchematicMediaManifestService.php
-│  │  ├─ SchematicAdminService.php
-│  │  ├─ SchematicProductSearchService.php
-│  │  └─ SchematicPurgeService.php
-│  ├─ Rest/
-│  │  ├─ SchematicMediaController.php
-│  │  └─ SchematicAdminController.php
-│  └─ Legacy/
-│     ├─ SchematicsApiBridge.php
-│     └─ SchematicsAjaxBridge.php
-│
-├─ dtb-ops/
-│  ├─ bootstrap.php
-│  ├─ Plugin.php
-│  ├─ Admin/
-│  │  ├─ OpsDashboardPage.php
-│  │  ├─ AuditLogPage.php
-│  │  ├─ HealthPage.php
-│  │  └─ IntegrationStatusPage.php
-│  ├─ Database/
-│  │  ├─ AuditLogSchema.php
-│  │  └─ OpsTables.php
-│  ├─ Domain/
-│  │  ├─ AuditEvent.php
-│  │  ├─ HealthCheck.php
-│  │  ├─ KpiSnapshot.php
-│  │  └─ SystemStatus.php
-│  ├─ Repositories/
-│  │  ├─ AuditLogRepository.php
-│  │  └─ KpiRepository.php
-│  ├─ Services/
-│  │  ├─ AuditLogService.php
-│  │  ├─ KpiService.php
-│  │  ├─ HealthService.php
-│  │  ├─ DiagnosticsService.php
-│  │  └─ RetentionService.php
-│  ├─ Rest/
-│  │  ├─ HealthController.php
-│  │  ├─ KpiController.php
-│  │  └─ AuditLogController.php
-│  ├─ Jobs/
-│  │  ├─ RefreshKpisJob.php
-│  │  └─ PurgeAuditLogJob.php
-│  └─ Legacy/
-│     └─ OpsDashboardBridge.php
-│
-├─ dtb-integrations/
-│  ├─ bootstrap.php
-│  ├─ Plugin.php
-│  ├─ veeqo/
-│  │  ├─ bootstrap.php
-│  │  ├─ Client/
-│  │  │  ├─ VeeqoClient.php
-│  │  │  └─ VeeqoRequest.php
-│  │  ├─ Domain/
-│  │  │  ├─ VeeqoInventoryItem.php
-│  │  │  ├─ VeeqoOrderEvent.php
-│  │  │  └─ ShippingRateRequest.php
-│  │  ├─ Services/
-│  │  │  ├─ VeeqoStatusService.php
-│  │  │  ├─ InventorySyncService.php
-│  │  │  ├─ ShippingRateService.php
-│  │  │  ├─ OrderWebhookService.php
-│  │  │  └─ RepairRequestService.php
-│  │  ├─ Rest/
-│  │  │  ├─ VeeqoStatusController.php
-│  │  │  ├─ ShippingRateController.php
-│  │  │  ├─ InventoryController.php
-│  │  │  ├─ OrderWebhookController.php
-│  │  │  └─ RepairRequestController.php
-│  │  ├─ Webhooks/
-│  │  │  └─ VeeqoWebhookVerifier.php
-│  │  ├─ Jobs/
-│  │  │  └─ VeeqoHealthCheckJob.php
-│  │  └─ Legacy/
-│  │     └─ VeeqoRouteBridge.php
-│  │
-│  ├─ quickbooks/
-│  │  ├─ bootstrap.php
-│  │  ├─ Client/
-│  │  │  ├─ QuickBooksClient.php
-│  │  │  └─ QuickBooksTokenStore.php
-│  │  ├─ OAuth/
-│  │  │  ├─ OAuthController.php
-│  │  │  ├─ OAuthService.php
-│  │  │  └─ TokenRefreshService.php
-│  │  ├─ Domain/
-│  │  │  ├─ QboSyncRequest.php
-│  │  │  └─ QboSyncResult.php
-│  │  ├─ Services/
-│  │  │  ├─ QuickBooksStatusService.php
-│  │  │  ├─ AccountingSyncService.php
-│  │  │  ├─ OrderSyncService.php
-│  │  │  └─ ProductSyncService.php
-│  │  ├─ Rest/
-│  │  │  ├─ QuickBooksStatusController.php
-│  │  │  └─ QuickBooksSyncController.php
-│  │  ├─ Jobs/
-│  │  │  └─ QuickBooksDailySyncJob.php
-│  │  └─ Legacy/
-│  │     └─ QuickBooksRouteBridge.php
-│  │
-│  └─ rewards/
-│     ├─ bootstrap.php
-│     ├─ Domain/
-│     │  ├─ RewardBalance.php
-│     │  ├─ RewardHistoryEntry.php
-│     │  └─ RewardRedemption.php
-│     ├─ Services/
-│     │  ├─ RewardsBalanceService.php
-│     │  ├─ RewardsHistoryService.php
-│     │  ├─ RewardsRedemptionService.php
-│     │  └─ RewardsAdminAdjustmentService.php
-│     ├─ Rest/
-│     │  ├─ RewardsBalanceController.php
-│     │  ├─ RewardsHistoryController.php
-│     │  ├─ RewardsRedemptionController.php
-│     │  └─ RewardsAdminController.php
-│     └─ Legacy/
-│        └─ RewardsRouteBridge.php
-│
-├─ dtb-marketing/
-│  ├─ bootstrap.php
-│  ├─ Plugin.php
-│  ├─ ComingSoon/
-│  │  ├─ SubscriberRepository.php
-│  │  ├─ SubscriberService.php
-│  │  ├─ SubscribeController.php
-│  │  ├─ SubscribeAdminPage.php
-│  │  └─ LegacySubscribeBridge.php
-│  └─ Rest/
-│     └─ SubscriberController.php
-│
-└─ legacy-shims/
-   ├─ dtb-utils.php
-   ├─ dtb-auth.php
-   ├─ dtb-cache.php
-   ├─ dtb-cache-admin.php
-   ├─ dtb-rest-api.php
-   ├─ dtb-api-security.php
-   ├─ dtb-frontend-security.php
-   ├─ dtb-admin-security.php
-   ├─ dtb-admin-performance.php
-   ├─ dtb-api-health-monitor.php
-   ├─ dtb-rewards.php
-   ├─ dtb-image-sync.php
-   ├─ dtb-woocommerce.php
-   ├─ dtb-veeqo.php
-   ├─ dtb-ops-dashboard.php
-   ├─ dtb-catalog-health.php
-   ├─ dtb-quickbooks.php
-   ├─ dtb-schematics-api.php
-   ├─ dtb-schematics-admin.php
-   ├─ dtb-product-mapping.php
-   ├─ dtb-coming-soon.php
-   └─ dtb-seo.php
-```
-
----
-
-# 4. Final Loader Remap
-
-## `wp/wp-content/mu-plugins/00-dtb-loader.php`
-
-Final responsibility:
-
-```text
-- define DTB_MU_PLUGIN_DIR
-- define DTB_MU_PLUGIN_VERSION
-- define _dtb_require()
-- load dtb-core/bootstrap.php
-- load modules in deterministic dependency order
-- load legacy shims only after new modules
-- emit admin notice if critical module missing
-```
-
-## Final load order
-
-```text
-1. dtb-core/bootstrap.php
-2. dtb-security/bootstrap.php
-3. dtb-admin/bootstrap.php
-4. dtb-commerce/bootstrap.php
-5. dtb-ops/bootstrap.php
-6. dtb-catalog/bootstrap.php
-7. dtb-media/bootstrap.php
-8. dtb-schematics/bootstrap.php
-9. dtb-integrations/bootstrap.php
-10. dtb-integrations/rewards/bootstrap.php
-11. dtb-integrations/veeqo/bootstrap.php
-12. dtb-integrations/quickbooks/bootstrap.php
-13. dtb-marketing/bootstrap.php
-14. legacy-shims/bootstrap.php
-```
-
-## Why this order is correct
-
-```text
-Core:
-Everything depends on config, request helpers, response helpers, DB migrations, capability helpers, and logging.
-
-Security:
-REST permission behavior, CORS, JWT, nonces, frontend/admin hardening must load before public/admin routes.
-
-Admin:
-Menus and asset registry should exist before individual modules register admin pages.
-
-Commerce:
-WooCommerce product/category/order abstractions are foundational.
-
-Ops:
-Audit and health should be available before catalog/integrations emit events.
-
-Catalog:
-Depends on commerce repositories and ops audit logging.
-
-Media:
-Depends on product/catalog identity for image linking.
-
-Schematics:
-Depends on product/catalog references and media.
-
-Integrations:
-Depend on commerce, ops, and security.
-
-Marketing:
-Independent, low-risk, loads late.
-
-Legacy shims:
-Load last so old function names, AJAX actions, and route callbacks can bridge to the new services.
-```
-
----
-
-# 5. Exact Current-to-New File Mapping
-
-## Core
-
-| Current file/functionality         | New module                            |
-| ---------------------------------- | ------------------------------------- |
-| `dtb-utils.php`                    | `dtb-core/Support/*`                  |
-| `dtb_get_config()`                 | `dtb-core/Support/Config.php`         |
-| `dtb_resolve_catalog_csv_config()` | `dtb-commerce/Import/CsvResolver.php` |
-| `dtb_is_rest_api_request()`        | `dtb-core/Support/Request.php`        |
-| `dtb_is_admin_or_ajax_request()`   | `dtb-core/Support/Request.php`        |
-| `dtb_error_envelope()`             | `dtb-core/Http/ErrorEnvelope.php`     |
-| client IP helpers                  | `dtb-core/Support/Request.php`        |
-| anonymization helpers              | `dtb-core/Support/Sanitizer.php`      |
-
-Keep `dtb-utils.php` as a shim until every old function call has been replaced.
-
----
-
-## Loader/shared security primitives
-
-| Current item            | New module                              |
-| ----------------------- | --------------------------------------- |
-| `dtb_feature_enabled()` | `dtb-core/Support/FeatureFlags.php`     |
-| `dtb_security_log()`    | `dtb-core/Support/SecurityLogger.php`   |
-| `dtb_allowed_origins()` | `dtb-security/Cors/CorsPolicy.php`      |
-| `dtb_check_origin()`    | `dtb-security/Cors/OriginValidator.php` |
-| `_dtb_require()`        | stays in `00-dtb-loader.php`            |
-
-The current loader defines these directly.  Move internals, preserve global wrappers.
-
----
-
-## Auth/security
-
-| Current file                | New module                                                                              |
-| --------------------------- | --------------------------------------------------------------------------------------- |
-| `dtb-auth.php`              | `dtb-security/Auth/*`, `dtb-security/Rest/AuthController.php`                           |
-| `dtb-api-security.php`      | `dtb-security/Rest/NonceController.php`, `dtb-security/Cors/*`                          |
-| `dtb-frontend-security.php` | `dtb-security/Frontend/SecurityHeaders.php`                                             |
-| `dtb-admin-security.php`    | `dtb-security/Admin/AdminHardening.php`                                                 |
-| `dtb-admin-performance.php` | `dtb-admin/Pages/AdminPerformancePage.php` or `dtb-security/Admin/AdminDiagnostics.php` |
-
----
-
-## WooCommerce / commerce
-
-| Current file          | New module                                                                 |
-| --------------------- | -------------------------------------------------------------------------- |
-| `dtb-rest-api.php`    | `dtb-commerce/Rest/*`                                                      |
-| `dtb-woocommerce.php` | `dtb-commerce/WooCommerce/*`                                               |
-| `dtb-cache.php`       | `dtb-commerce/WooCommerce/ProductCacheService.php`, `dtb-commerce/Cache/*` |
-| `dtb-cache-admin.php` | `dtb-commerce/Cache/CacheAdminPage.php`                                    |
-| `dtb-seo.php`         | `dtb-commerce/Seo/*`                                                       |
-
-Routes from `drywall/v1` must remain stable during migration. The current README documents the existing product/category/order/customer/coupon proxy routes. 
-
----
-
-## Catalog
-
-| Current file              | New module                                                                               |
-| ------------------------- | ---------------------------------------------------------------------------------------- |
-| `dtb-product-mapping.php` | `dtb-catalog/Admin/*`, `dtb-catalog/Services/*`, `dtb-catalog/Rest/*`                    |
-| variable product AJAX     | `dtb-catalog/Rest/VariationMappingController.php`                                        |
-| variation save/delete     | `dtb-catalog/Services/VariationMappingService.php`                                       |
-| parts compatibility       | `dtb-catalog/Services/CompatibilityMappingService.php`                                   |
-| upsells/cross-sells       | `dtb-catalog/Services/RelationshipMappingService.php`                                    |
-| `dtb-catalog-health.php`  | `dtb-catalog/Services/CatalogHealthService.php`, `dtb-catalog/Rest/HealthController.php` |
-| catalog health CSV export | `dtb-catalog/Services/CsvExportService.php`                                              |
-
----
-
-## Media
-
-| Current file         | New module                                        |
-| -------------------- | ------------------------------------------------- |
-| `dtb-image-sync.php` | `dtb-media/*`                                     |
-| sync images          | `dtb-media/Services/ImageSyncService.php`         |
-| link-only            | `dtb-media/Services/ImageLinkingService.php`      |
-| purge unlinked       | `dtb-media/Services/ImagePurgeService.php`        |
-| fix renamed          | `dtb-media/Services/ImageRenameRepairService.php` |
-| progress/status      | `dtb-media/Rest/ImageSyncStatusController.php`    |
-| lock/release-lock    | `dtb-media/Services/MediaLockService.php`         |
-
----
-
-## Schematics
-
-| Current file               | New module                                                  |
-| -------------------------- | ----------------------------------------------------------- |
-| `dtb-schematics-api.php`   | `dtb-schematics/Rest/SchematicMediaController.php`          |
-| `dtb-schematics-admin.php` | `dtb-schematics/Admin/SchematicsAdminPage.php`              |
-| schematic admin AJAX       | `dtb-schematics/Legacy/SchematicsAjaxBridge.php`            |
-| product search             | `dtb-schematics/Services/SchematicProductSearchService.php` |
-| media manifest             | `dtb-schematics/Services/SchematicMediaManifestService.php` |
-
----
-
-## Ops
-
-| Current file                 | New module                                                                     |
-| ---------------------------- | ------------------------------------------------------------------------------ |
-| `dtb-ops-dashboard.php`      | `dtb-ops/*`                                                                    |
-| audit table creation         | `dtb-ops/Database/AuditLogSchema.php`                                          |
-| audit logging                | `dtb-ops/Services/AuditLogService.php`                                         |
-| KPI dashboard                | `dtb-ops/Admin/OpsDashboardPage.php`, `dtb-ops/Services/KpiService.php`        |
-| health route                 | `dtb-ops/Rest/HealthController.php`                                            |
-| KPI cron                     | `dtb-ops/Jobs/RefreshKpisJob.php`                                              |
-| audit purge cron             | `dtb-ops/Jobs/PurgeAuditLogJob.php`                                            |
-| `dtb-api-health-monitor.php` | `dtb-admin/Pages/ApiHealthPage.php`, `dtb-ops/Services/DiagnosticsService.php` |
-
----
-
-## Integrations
-
-| Current file         | New module                      |
-| -------------------- | ------------------------------- |
-| `dtb-veeqo.php`      | `dtb-integrations/veeqo/*`      |
-| `dtb-quickbooks.php` | `dtb-integrations/quickbooks/*` |
-| `dtb-rewards.php`    | `dtb-integrations/rewards/*`    |
-
-Keep public route compatibility for:
-
-```text
-/dtb/v1/veeqo/status
-/dtb/v1/veeqo/shipping-rates
-/dtb/v1/veeqo/inventory
-/dtb/v1/veeqo/webhooks/order
-/dtb/v1/repair-request
-/dtb/v1/qbo/status
-/dtb/v1/qbo/sync
-/dtb/v1/rewards/*
-```
-
-These current routes are documented in the README. 
-
----
-
-## Marketing
-
-| Current file          | New module                   |
-| --------------------- | ---------------------------- |
-| `dtb-coming-soon.php` | `dtb-marketing/ComingSoon/*` |
-
----
-
-# 6. REST Namespace Remap
-
-## Preserve existing routes
-
-Do not break current consumers.
-
-Keep:
-
-```text
-drywall/v1/*
-dtb/v1/*
-wc-admin/profile shim
-```
-
-## Add new structured catalog routes
-
-```text
-dtb/v1/catalog/products
-dtb/v1/catalog/products/{id}
-dtb/v1/catalog/products/{id}/mapping
-dtb/v1/catalog/products/{id}/validate
-dtb/v1/catalog/products/{id}/approve
-dtb/v1/catalog/products/{id}/sync
-
-dtb/v1/catalog/categories
-dtb/v1/catalog/category-rules
-dtb/v1/catalog/variations
-dtb/v1/catalog/compatibility
-dtb/v1/catalog/relationships
-dtb/v1/catalog/health
-dtb/v1/catalog/validation
-dtb/v1/catalog/bulk/validate
-dtb/v1/catalog/bulk/approve
-dtb/v1/catalog/bulk/sync
-dtb/v1/catalog/bulk/rollback
-dtb/v1/catalog/audit
-dtb/v1/catalog/export
-dtb/v1/catalog/import-preview
-dtb/v1/catalog/import-commit
-```
-
-## Add new media routes
-
-```text
-dtb/v1/media/images/sync
-dtb/v1/media/images/status
-dtb/v1/media/images/progress
-dtb/v1/media/images/link-only
-dtb/v1/media/images/reset
-dtb/v1/media/images/purge-unlinked
-dtb/v1/media/images/fix-renamed
-dtb/v1/media/images/release-lock
-```
-
-Legacy `sync-images` routes should remain bridged until the frontend/admin UI stops using them.
-
----
-
-# 7. Admin Menu Remap
-
-## Current issue
-
-Current admin menus are spread across modules. The README documents `DTB Tools`, `DTB Ops`, cache pages, image sync pages, product mapping pages, API health pages, and schematics pages. 
-
-## Target admin menus
-
-```text
-DTB Ops
-├─ Dashboard
-├─ System Health
-├─ Audit Log
-├─ API Health
-├─ Cache
-└─ Integrations Status
-
-DTB Catalog
-├─ Overview
-├─ Product Mapping
-├─ Category Mapping
-├─ Variation Mapping
-├─ Parts Compatibility
-├─ Upsells / Cross-sells
-├─ Validation Queue
-├─ Catalog Health
-├─ Image Sync
-├─ Schematics
-├─ Import / Export
-└─ Catalog Audit
-
-DTB Integrations
-├─ Veeqo
-├─ QuickBooks
-└─ Rewards
-
-DTB Settings
-├─ Security
-├─ API
-├─ WooCommerce
-├─ Feature Flags
-└─ Config Reference
-```
-
-## Capability model
-
-Replace scattered `manage_options` / `manage_woocommerce` checks with domain capabilities.
-
-```text
-dtb_ops_read
-dtb_ops_admin
-
-dtb_catalog_read
-dtb_catalog_edit
-dtb_catalog_approve
-dtb_catalog_sync
-dtb_catalog_rollback
-dtb_catalog_admin
-
-dtb_media_read
-dtb_media_sync
-dtb_media_admin
-
-dtb_schematics_read
-dtb_schematics_edit
-dtb_schematics_admin
-
-dtb_integrations_read
-dtb_integrations_manage
-dtb_accounting_manage
-dtb_inventory_manage
-
-dtb_security_admin
-dtb_settings_admin
-```
-
-During transition, map these to existing admin roles and keep fallback checks to `manage_options` / `manage_woocommerce`.
-
----
-
-# 8. Database Remap
-
-## Existing table
-
-Current ops dashboard creates:
-
-```text
-{prefix}dtb_audit_log
-```
-
-The audit table currently lives in `dtb-ops-dashboard.php`. 
-
-Keep it, but move ownership to:
-
-```text
-dtb-ops/Database/AuditLogSchema.php
-```
-
-## New catalog tables
+### 3.1 Replace local filtering with query-state-driven hook
 
 Create:
 
 ```text
-{prefix}dtb_catalog_mappings
-{prefix}dtb_catalog_category_rules
-{prefix}dtb_catalog_validation_issues
-{prefix}dtb_catalog_snapshots
-{prefix}dtb_catalog_audit
-{prefix}dtb_catalog_import_batches
-{prefix}dtb_catalog_import_rows
+frontend/src/hooks/useCatalogProducts.js
+frontend/src/hooks/useCatalogFacets.js
+frontend/src/utils/catalogUrlState.js
 ```
 
-## New media tables, optional but recommended
+Single state contract:
 
-```text
-{prefix}dtb_media_sync_runs
-{prefix}dtb_media_sync_items
+```ts
+type CatalogQuery = {
+  brand?: string[];
+  category?: string[];
+  displayCategory?: string;
+  search?: string;
+  priceMin?: number;
+  priceMax?: number;
+  sort?: string;
+  page: number;
+};
 ```
 
-## New integration tables, optional depending on current implementation
+### 3.2 Make URL the source of truth
+
+No split-brain state like:
+
+```js
+selectedBrands
+selectedCategories
+selectedDisplayCategory
+searchQuery
+currentPage
+```
+
+unless all are derived from URL and committed back through one serializer.
+
+Target:
 
 ```text
-{prefix}dtb_integration_events
-{prefix}dtb_qbo_tokens
-{prefix}dtb_qbo_sync_runs
-{prefix}dtb_veeqo_webhook_events
+URL -> parseCatalogQuery()
+    -> useCatalogProducts(query)
+    -> render
+```
+
+State changes:
+
+```text
+UI action -> nextQuery -> navigate(buildCatalogUrl(nextQuery))
+```
+
+### 3.3 Unify query and path URLs
+
+Canonical examples:
+
+```text
+/products
+/products/brands/tapetech
+/products/brands/tapetech/categories/finishing-boxes
+/products?search=taper
+```
+
+Path segments should map into the same `CatalogQuery`.
+
+---
+
+## Phase 4 — Toolset Builder Refactor
+
+### 4.1 Move templates server-side or generated config
+
+Current frontend templates are too operationally sensitive. Keep a static frontend fallback only for emergency/offline degradation.
+
+Target backend-owned templates:
+
+```text
+wp/wp-content/mu-plugins/dtb-toolsets.php
+```
+
+or database-driven config:
+
+```text
+wp_options.dtb_toolset_templates
+```
+
+### 4.2 Add canonical Toolset API
+
+Endpoints:
+
+```text
+GET /wp-json/dtb/v1/toolsets
+GET /wp-json/dtb/v1/toolsets/:id
+GET /wp-json/dtb/v1/toolsets/:id/options
+POST /wp-json/dtb/v1/toolsets/validate
+POST /wp-json/dtb/v1/toolsets/cart
+```
+
+### 4.3 Validate selections server-side
+
+Before add-to-cart/order creation:
+
+```json
+{
+  "templateId": "tapetech-full",
+  "selections": {
+    "flatBox": { "productId": 123, "variationId": 456 },
+    "boxHandle": { "productId": 789 }
+  }
+}
+```
+
+Server validates:
+
+```text
+template exists
+required slots filled
+products are purchasable
+variations belong to parent
+products are eligible for slot
+stock status acceptable
+included items exist
+bundle discount valid
+```
+
+### 4.4 Add kit identity to cart
+
+Do not add anonymous separate items only.
+
+Cart line items should include:
+
+```json
+{
+  "dtb_toolset_id": "tapetech-full",
+  "dtb_toolset_instance_id": "uuid",
+  "dtb_toolset_slot": "flatBox",
+  "dtb_toolset_label": "TapeTech Custom Full Set"
+}
+```
+
+Included accessories must be added as:
+
+```text
+priceMode: included
+quantity: 1
+visibleInCart: true
+fulfillmentRequired: true
+```
+
+or inserted server-side at order creation.
+
+---
+
+# 9. Specific Failure Map
+
+| Area                 | Current Implementation                                           | Risk                                          | Fix                                      |
+| -------------------- | ---------------------------------------------------------------- | --------------------------------------------- | ---------------------------------------- |
+| Brand URLs           | Query slugs partly normalized, partly not                        | Brand filter resets/breaks                    | Central `normalizeBrandParam()`          |
+| Brand routes         | Path params defined but not consumed                             | `/products/brands/:slug` not truly wired      | Use `useParams()` or redirect            |
+| Categories           | Static internal category list + display categories from products | Inconsistent category UX                      | Backend facets                           |
+| Product loading      | Full catalog fetched client-side                                 | Cold cache latency and large payload          | Paginated server query endpoint          |
+| Variation cards      | Variation prefetch duplicated                                    | Drift and extra requests                      | Shared hook or backend variation summary |
+| Product detail       | Depends on `/detail` endpoint                                    | Fails if callback missing                     | Implement/verify callback                |
+| Toolset templates    | Frontend hard-coded                                              | Requires deployment for merchandising changes | Backend/generator-owned templates        |
+| Toolset slots        | Keyword name filters                                             | Incorrect product mapping                     | `_dtb_builder_slots` meta                |
+| Included accessories | UI-only                                                          | Fulfillment/order mismatch                    | Add to cart/order with metadata          |
+| Bundle pricing       | Static savings text                                              | Pricing inaccuracy                            | Server-side pricing/validation           |
+| Product normalizer   | Frontend-heavy                                                   | UI owns business truth                        | Backend read model                       |
+
+---
+
+# 10. Recommended Final Architecture
+
+```text
+WooCommerce Products
+  + DTB product meta
+  + DTB builder meta
+  + product variations
+        |
+        v
+wp/wp-content/mu-plugins/
+  dtb-catalog-read-model.php
+  dtb-catalog-api.php
+  dtb-toolsets.php
+        |
+        v
+REST DTOs
+  /dtb/v1/catalog/facets
+  /dtb/v1/catalog/products
+  /dtb/v1/catalog/products/:slug/detail
+  /dtb/v1/toolsets
+  /dtb/v1/toolsets/:id/options
+  /dtb/v1/toolsets/validate
+        |
+        v
+frontend/src/
+  hooks/useCatalogFacets.js
+  hooks/useCatalogProducts.js
+  hooks/useToolsetBuilder.js
+  utils/catalogUrlState.js
+        |
+        v
+Products.jsx
+CategoryPage.jsx
+ProductDetailPage.jsx
+ToolsetBuilder.jsx
 ```
 
 ---
 
-# 9. Legacy Compatibility Requirements
+# 11. Verification Checklist
 
-The rebuild must preserve:
+## Backend
 
-## Existing global functions
+Run:
 
-Keep wrappers for:
-
-```text
-dtb_feature_enabled()
-dtb_security_log()
-dtb_allowed_origins()
-dtb_check_origin()
-dtb_is_rest_api_request()
-dtb_is_admin_or_ajax_request()
-dtb_is_admin_or_rest_request()
-dtb_get_config()
-dtb_get_wc_credentials()
-dtb_error_envelope()
-dtb_invalidate_product_cache()
-dtb_log_cache_event()
-dtb_ops_cache_get()
-dtb_ops_cache_flush()
+```bash
+php -l wp/wp-content/mu-plugins/dtb-rest-api.php
+php -l wp/wp-content/mu-plugins/*.php
 ```
 
-## Existing AJAX actions
-
-Preserve or bridge:
+Test:
 
 ```text
-dtb_pm_search_products
-dtb_pm_get_variables
-dtb_pm_save_variation
-dtb_pm_delete_variation
-dtb_pm_get_compatibility
-dtb_pm_save_compatibility
-dtb_pm_get_parts
-dtb_pm_get_relationships
-dtb_pm_save_relationships
-
-dtb_catalog_health_scan
-dtb_catalog_health_flush
-dtb_catalog_health_export_csv
-
-dtb_schematics_list
-dtb_schematics_get
-dtb_schematics_save
-dtb_schematics_remove
-dtb_schematics_purge
-dtb_schematics_search_products
-
-dtb_ops_kpis
-dtb_ops_audit_log
-
-dtb_run_health_checks
-dtb_test_jwt_roundtrip
-dtb_save_wc_creds
-
-dtb_qbo_oauth_callback
+GET /wp-json/drywall/v1/products/slug/{slug}/detail
+GET /wp-json/drywall/v1/products/{id}/variations
+GET /wp-json/dtb/v1/catalog/facets
+GET /wp-json/dtb/v1/catalog/products?brand=tapetech
+GET /wp-json/dtb/v1/toolsets/tapetech-full/options
 ```
 
-These actions are documented in the current README. 
+## Frontend
 
-## Existing REST routes
-
-Preserve all current `drywall/v1` and `dtb/v1` routes.
-
----
-
-# 10. Migration Phases
-
-## Phase 0 — Baseline audit
-
-Deliverables:
+Test URLs:
 
 ```text
-- inventory every current mu-plugin file
-- inventory all functions
-- inventory all hooks/actions/filters
-- inventory all REST routes
-- inventory all AJAX actions
-- inventory all cron events
-- inventory all DB tables/options/transients
-- inventory all wp-config constants
-- document external consumers
+/products
+/products?brand=tapetech
+/products?brand=TapeTech
+/products/brands/tapetech
+/products/brands/columbia-taping-tools
+/products/brands/tapetech/categories/finishing-boxes
+/category/finishing
+/products/:slug
+/products/:slug?variant=123
+/toolset-builder
 ```
 
-Acceptance criteria:
+## Toolset Builder
+
+Test:
 
 ```text
-- no unknown current hook remains unmapped
-- no REST route missing from migration matrix
-- no AJAX action missing from migration matrix
-- no scheduled job missing from migration matrix
+brand with no eligible products
+required slot empty
+variable product with missing variation image
+variation out of stock
+same product selected in optional duplicate slot
+included accessories present in cart/order
+server rejects invalid slot/product pairing
+server rejects variation not belonging to parent
 ```
 
 ---
 
-## Phase 1 — Add core architecture without behavior changes
+# Bottom Line
 
-Create:
+Your repo has the right macro architecture: **React SPA + WordPress/WooCommerce backend + mu-plugin API layer**. The failure is in the product-merchandising contract.
 
-```text
-dtb-core/
-dtb-admin/
-legacy-shims/
-```
-
-Change loader to:
+The production-grade path is:
 
 ```text
-- load dtb-core first
-- still load existing flat files
-- no behavioral changes
+Stop deriving product/filter/toolset behavior from frontend name/category inference.
+Make WooCommerce + DTB meta the source of truth.
+Expose normalized catalog/facet/toolset APIs.
+Make URL state canonical.
+Make Toolset Builder server-validated and cart/order-aware.
 ```
 
-Acceptance criteria:
+The highest-priority fixes are:
+
+1. Fix brand slug normalization in `Products.jsx`.
+2. Wire or redirect `/products/brands/:brandSlug` routes.
+3. Verify and implement `dtb_proxy_product_detail`.
+4. Move Toolset Builder slot eligibility from keyword filters to canonical product meta.
+5. Add a backend catalog/facets/toolset API so product pages and Toolset Builder consume the same source of truth.
+
+
+My assessment: **the recommendation is directionally correct, but too large to execute as the next “update.”** Treat it as a **12–18 month backend platform target**, not the immediate fix for your frontend product/filter/toolset-builder integration issues.
+
+The proposal correctly identifies that the mu-plugin layer has become a flat application backend and should eventually be remapped into domains like `core`, `security`, `commerce`, `catalog`, `media`, `schematics`, `ops`, and `integrations`. The uploaded recommendation explicitly frames this as a “complete mu-plugin platform remap” into a domain-oriented DTB backend platform with legacy shims and stable compatibility.  That aligns with the actual repo: the current loader directly requires many root-level files in a strict order, including auth, cache, REST API, security, rewards, image sync, WooCommerce, Veeqo, ops, catalog health, QuickBooks, schematics, coming-soon, and SEO modules. 
+
+But I would **not** implement the full recommended tree first.
+
+## Verdict
+
+**Approve the architecture as a long-term target. Reject it as the immediate implementation plan.**
+
+The immediate business problem is:
 
 ```text
-- wp-admin loads
-- frontend API works
-- WooCommerce product routes work
-- auth works
-- cache status works
-- no fatal errors
+frontend products pages
+filters
+brand/category routes
+toolset builder
+WooCommerce catalog truth
 ```
+
+The proposed mu-plugin rebuild is much broader:
+
+```text
+auth
+security
+admin shell
+commerce proxy
+catalog ops
+media sync
+schematics
+ops dashboards
+QuickBooks
+Veeqo
+rewards
+marketing
+legacy shims
+database migrations
+capability model
+jobs
+audit logging
+```
+
+That is valid platform architecture, but it does not directly solve the highest-value issue fast enough.
 
 ---
 
-## Phase 2 — Move shared utilities
+# What I Like
 
-Move internals of:
+## 1. Domain separation is correct
 
-```text
-dtb-utils.php
-loader helper internals
-```
+The current loader confirms the backend is already a full application platform, not a small plugin chain. It defines shared functions, origin/CORS helpers, logging, `_dtb_require()`, then loads many DTB modules manually. 
 
-Into:
-
-```text
-dtb-core/Support/*
-dtb-security/Cors/*
-```
-
-Keep global wrappers.
-
-Acceptance criteria:
-
-```text
-- old functions still exist
-- all current modules still work
-- origin/CORS behavior unchanged
-- config resolution unchanged
-- CSV resolution unchanged
-```
-
----
-
-## Phase 3 — Move security/auth
-
-Move:
-
-```text
-dtb-auth.php
-dtb-api-security.php
-dtb-frontend-security.php
-dtb-admin-security.php
-```
-
-Into:
-
-```text
-dtb-security/
-```
-
-Keep existing routes and cookies.
-
-Acceptance criteria:
-
-```text
-- login works
-- logout works
-- JWT validation works
-- password reset works
-- customer registration works
-- nonce endpoint works
-- allowed origins unchanged
-- admin hardening does not block wp-admin
-```
-
----
-
-## Phase 4 — Move ops/audit
-
-Move:
-
-```text
-dtb-ops-dashboard.php
-dtb-api-health-monitor.php
-```
-
-Into:
-
-```text
-dtb-ops/
-dtb-admin/
-```
-
-Acceptance criteria:
-
-```text
-- audit table preserved
-- existing audit rows preserved
-- ops dashboard loads
-- health endpoint works
-- KPI cron still schedules
-- audit purge still schedules
-```
-
----
-
-## Phase 5 — Move WooCommerce commerce layer
-
-Move:
-
-```text
-dtb-rest-api.php
-dtb-woocommerce.php
-dtb-cache.php
-dtb-cache-admin.php
-dtb-seo.php
-```
-
-Into:
-
-```text
-dtb-commerce/
-```
-
-Acceptance criteria:
-
-```text
-- /drywall/v1/products works
-- product by slug works
-- product variations work
-- categories work
-- search works
-- orders work
-- customers work
-- coupons work
-- product webhooks work
-- catalog import works
-- cache invalidation works
-- SEO meta remains exposed
-```
-
-Do not start integration migration until this is stable.
-
----
-
-## Phase 6 — Move catalog operations
-
-Move:
-
-```text
-dtb-product-mapping.php
-dtb-catalog-health.php
-```
-
-Into:
-
-```text
-dtb-catalog/
-```
-
-Acceptance criteria:
-
-```text
-- old Product Mapping page still loads or redirects
-- old AJAX actions still work
-- new Catalog Console loads
-- variable product listing works
-- variation save/delete works
-- compatibility save works
-- upsell/cross-sell save works
-- health scan works
-- health CSV export works
-- new mapping tables installed
-- validation queue works
-- bulk dry-run works
-- sync requires approval
-```
-
----
-
-## Phase 7 — Move media/image sync
-
-Move:
-
-```text
-dtb-image-sync.php
-```
-
-Into:
-
-```text
-dtb-media/
-```
-
-Acceptance criteria:
-
-```text
-- image sync status works
-- progress works
-- link-only works
-- reset works
-- purge unlinked works
-- fix renamed works
-- lock release works
-- old routes remain bridged
-```
-
----
-
-## Phase 8 — Move schematics
-
-Move:
-
-```text
-dtb-schematics-api.php
-dtb-schematics-admin.php
-```
-
-Into:
-
-```text
-dtb-schematics/
-```
-
-Acceptance criteria:
-
-```text
-- /dtb/v1/schematics/media works
-- admin schematic listing works
-- schematic save works
-- schematic remove works
-- schematic purge works
-- schematic product search works
-```
-
----
-
-## Phase 9 — Move integrations
-
-Move:
-
-```text
-dtb-veeqo.php
-dtb-quickbooks.php
-dtb-rewards.php
-```
-
-Into:
-
-```text
-dtb-integrations/
-```
-
-Acceptance criteria:
-
-```text
-- Veeqo status works
-- Veeqo shipping rates work
-- Veeqo inventory works
-- Veeqo webhook verification works
-- repair-request endpoint works
-- QuickBooks status works
-- QuickBooks sync works
-- QuickBooks daily cron works
-- rewards balance works
-- rewards history works
-- rewards redeem works
-- rewards admin adjust works
-```
-
-This phase must be last because these files touch external systems.
-
----
-
-## Phase 10 — Move marketing
-
-Move:
-
-```text
-dtb-coming-soon.php
-```
-
-Into:
-
-```text
-dtb-marketing/
-```
-
-Acceptance criteria:
-
-```text
-- subscribe works
-- subscribe nonce works
-- subscribers admin works
-- unsubscribe works
-- delete subscriber works
-```
-
----
-
-## Phase 11 — Remove dead flat files
-
-Only after one stable release cycle:
-
-```text
-- replace old root-level files with shims
-- then remove shims only after all call sites/routes are verified
-```
-
-Do not delete immediately.
-
----
-
-# 11. New Catalog Tool/Tools To Add
-
-## Primary new tool
-
-```text
-DTB Catalog Operations Console
-```
-
-Location:
-
-```text
-dtb-catalog/Admin/CatalogOverviewPage.php
-```
-
-Admin menu:
-
-```text
-DTB Catalog → Overview
-```
-
-Capabilities:
-
-```text
-dtb_catalog_read
-```
-
----
-
-## Tool 1: Product Mapping
-
-```text
-DTB Catalog → Product Mapping
-```
-
-Owns:
-
-```text
-SKU
-MPN
-brand
-product family
-product type
-slug
-visibility
-source reference
-mapping status
-review status
-sync status
-```
-
----
-
-## Tool 2: Category Mapping
-
-```text
-DTB Catalog → Category Mapping
-```
-
-Owns:
-
-```text
-primary category
-secondary categories
-brand category
-tool category
-parts category
-repair/service category
-category rules
-category suggestions
-```
-
----
-
-## Tool 3: Variation Mapping
-
-```text
-DTB Catalog → Variation Mapping
-```
-
-Owns:
-
-```text
-parent products
-child variations
-variation attributes
-variation names
-default variation
-orphan variations
-duplicate variation SKUs
-invalid parent/child relationships
-```
-
----
-
-## Tool 4: Parts Compatibility
-
-```text
-DTB Catalog → Parts Compatibility
-```
-
-Owns:
-
-```text
-part -> compatible tools
-tool -> compatible parts
-bidirectional mapping
-repair flow compatibility
-schematic compatibility
-```
-
-This replaces the compatibility portion currently inside `dtb-product-mapping.php`. 
-
----
-
-## Tool 5: Relationship Mapping
-
-```text
-DTB Catalog → Upsells / Cross-sells
-```
-
-Owns:
-
-```text
-upsells
-cross-sells
-replacement parts
-recommended accessories
-repair/service suggestions
-```
-
-This replaces the upsell/cross-sell portion currently inside `dtb-product-mapping.php`. 
-
----
-
-## Tool 6: Validation Queue
-
-```text
-DTB Catalog → Validation Queue
-```
-
-Owns:
-
-```text
-missing SKU
-duplicate SKU
-missing MPN
-missing category
-invalid category
-orphan variation
-missing variation attribute
-missing image
-missing schematic relation
-invalid compatibility
-sync-blocking errors
-```
-
----
-
-## Tool 7: Catalog Health
-
-```text
-DTB Catalog → Catalog Health
-```
-
-Owns:
-
-```text
-variable product diagnostics
-stock anomalies
-variation purchasability checks
-price/attribute/SKU checks
-CSV export
-cache flush handoff
-```
-
-This absorbs `dtb-catalog-health.php`. 
-
----
-
-## Tool 8: Bulk Editor
-
-```text
-DTB Catalog → Bulk Editor
-```
-
-Owns:
-
-```text
-bulk category assignment
-bulk brand normalization
-bulk family assignment
-bulk status approval
-bulk sync
-bulk rollback
-dry-run preview
-field-level diff
-snapshot creation
-```
-
----
-
-## Tool 9: Import / Export
-
-```text
-DTB Catalog → Import / Export
-```
-
-Owns:
-
-```text
-CSV export
-CSV import preview
-CSV diff
-CSV staged commit
-CSV sync
-rollback batch export
-```
-
-CSV becomes a secondary interchange mechanism, not the primary source of truth.
-
----
-
-# 12. Production Acceptance Checklist
-
-The restructure is complete only when all of this passes.
-
-## Loader
-
-```text
-- 00-dtb-loader.php loads only bootstraps
-- missing critical module creates admin notice, not fatal
-- load order is documented and tested
-- README matches actual load order
-```
-
-## Compatibility
-
-```text
-- all old global helper functions exist
-- all old REST routes still resolve
-- all old AJAX actions still resolve
-- all old cron hooks still schedule/run
-- all old admin menu URLs either work or redirect
-```
-
-## WooCommerce
-
-```text
-- product list route works
-- product detail route works
-- slug route works
-- variations route works
-- category route works
-- attribute route works
-- order create/read works
-- customer create/read works
-- coupon route works
-- product cache invalidates
-- product webhook receiver works
-- catalog import still works
-```
-
-## Catalog
-
-```text
-- product mapping grid works
-- category mapping works
-- variation mapping works
-- compatibility mapping works
-- relationship mapping works
-- validation queue works
-- health scan works
-- CSV export works
-- import preview works
-- bulk dry-run works
-- approval/sync workflow works
-- rollback works
-- audit events written
-```
-
-## Integrations
-
-```text
-- Veeqo status works
-- Veeqo shipping rates work
-- Veeqo inventory works
-- Veeqo webhook validates HMAC
-- repair request endpoint works
-- QuickBooks OAuth/status/sync works
-- QuickBooks daily sync job remains scheduled
-- rewards balance/history/redeem/admin adjust works
-```
-
-## Security
-
-```text
-- CORS behavior unchanged
-- JWT behavior unchanged
-- nonce behavior unchanged
-- admin pages capability-gated
-- REST endpoints have permission_callback
-- all mutations validate nonce or auth
-- no direct unsanitized SQL
-- all output escaped
-```
-
-## Operations
-
-```text
-- audit table preserved
-- old audit events visible
-- new audit events written
-- health endpoint works
-- KPI refresh works
-- cache status works
-- image sync lock prevents concurrent runs
-```
-
----
-
-# 13. Final Target Mental Model
-
-After the restructure:
+So the proposal’s domain model is sensible:
 
 ```text
 dtb-core
-  = shared platform primitives
-
 dtb-security
-  = auth, CORS, nonces, hardening
-
 dtb-admin
-  = shared admin shell, menus, assets
-
 dtb-commerce
-  = WooCommerce API/proxy/import/cache/SEO
-
 dtb-catalog
-  = product/category/variation/compatibility mapping, health, validation, CSV, bulk sync
-
 dtb-media
-  = image sync, linking, purge, rename repair
-
 dtb-schematics
-  = schematic media/admin/product links
-
 dtb-ops
-  = audit, health, KPIs, diagnostics
-
 dtb-integrations
-  = Veeqo, QuickBooks, rewards
-
 dtb-marketing
-  = coming-soon/subscribers
-
 legacy-shims
-  = compatibility only
+```
+
+That is the right final shape.
+
+## 2. Legacy compatibility is mandatory
+
+The recommendation correctly says existing REST routes, AJAX actions, global helper functions, cron jobs, and admin pages must remain stable during migration. That is non-negotiable for WordPress mu-plugins.
+
+The current loader already tries to avoid fatal deployment failures by logging missing files and showing admin notices instead of immediately killing wp-admin.  Any rebuild must preserve that operational behavior.
+
+## 3. The migration phasing is mostly correct
+
+The proposed order is reasonable:
+
+```text
+core
+security
+admin
+commerce
+ops
+catalog
+media
+schematics
+integrations
+marketing
+legacy shims
+```
+
+The reasoning is sound: catalog depends on commerce/product identity; media and schematics depend on catalog/product identity; integrations should move late because they touch external systems.
+
+---
+
+# What I Would Change
+
+## 1. Do not start with the whole platform rebuild
+
+The full proposal is too broad for the current pain point. It risks creating a large backend refactor before you fix product mapping truth.
+
+Your first production-grade milestone should be:
+
+```text
+DTB Catalog Read Model + Toolset Builder Product Eligibility
+```
+
+Not:
+
+```text
+Full mu-plugin platform remap
+```
+
+The current frontend problem needs a canonical catalog contract:
+
+```text
+brand
+category
+display category
+tool family
+tool role
+toolset eligibility
+builder slot mapping
+default variation
+variation summary
+parts/tool classification
+```
+
+That belongs in a focused `dtb-catalog` + `dtb-commerce` slice first.
+
+## 2. The proposed tree is over-specified
+
+The target tree contains many classes before the actual boundaries are proven. For example:
+
+```text
+CatalogMapping.php
+CategoryRule.php
+ProductIdentity.php
+ProductRelationship.php
+CompatibilityMap.php
+MappingStatus.php
+ProductType.php
+ValidationIssue.php
+ValidationSeverity.php
+BulkMutation.php
+Snapshot.php
+AuditAction.php
+```
+
+Those may all become useful, but creating the full structure upfront can produce ceremony without solving runtime behavior.
+
+Use this rule:
+
+```text
+Create a class only when it owns behavior, persistence, or a stable contract.
+```
+
+Not just because it sounds architecturally clean.
+
+## 3. The proposal underweights frontend contract design
+
+The recommendation focuses heavily on PHP file organization. The bigger issue is the contract between:
+
+```text
+WooCommerce product data
+DTB catalog metadata
+React filters
+Toolset Builder slots
+Cart/order behavior
+```
+
+Before moving every mu-plugin file, define the DTOs and endpoint contracts:
+
+```text
+GET /wp-json/dtb/v1/catalog/facets
+GET /wp-json/dtb/v1/catalog/products
+GET /wp-json/dtb/v1/catalog/products/:slug/detail
+GET /wp-json/dtb/v1/toolsets
+GET /wp-json/dtb/v1/toolsets/:id/options
+POST /wp-json/dtb/v1/toolsets/validate
+```
+
+That is the actual integration seam.
+
+## 4. Database expansion should be staged
+
+The recommendation proposes many new tables:
+
+```text
+dtb_catalog_mappings
+dtb_catalog_category_rules
+dtb_catalog_validation_issues
+dtb_catalog_snapshots
+dtb_catalog_audit
+dtb_catalog_import_batches
+dtb_catalog_import_rows
+dtb_media_sync_runs
+dtb_media_sync_items
+dtb_integration_events
+...
+```
+
+I would not add all of these initially.
+
+Start with no new tables unless needed. Use product meta first for catalog fields:
+
+```text
+_dtb_brand_key
+_dtb_category_key
+_dtb_tool_family
+_dtb_tool_role
+_dtb_builder_eligible
+_dtb_builder_slots
+_dtb_default_variation_id
+```
+
+Add tables only when you need workflow state, audit history, snapshots, import batches, or many-to-many mappings that product meta cannot safely model.
+
+---
+
+# Recommended Revised Plan
+
+## Phase 1 — Stabilize current loader and critical REST defects
+
+Keep the existing flat files. Do not move everything yet.
+
+Do:
+
+```text
+php -l wp/wp-content/mu-plugins/*.php
+verify all registered REST callbacks exist
+verify /drywall/v1/products/slug/:slug/detail works
+fix brand URL normalization in Products.jsx
+wire /products/brands/:brandSlug route params
+```
+
+## Phase 2 — Add a small new catalog module beside the old files
+
+Create only:
+
+```text
+wp/wp-content/mu-plugins/dtb-catalog-platform/
+├─ bootstrap.php
+├─ CatalogProductNormalizer.php
+├─ CatalogFacetController.php
+├─ CatalogProductController.php
+├─ ToolsetTemplateController.php
+├─ ToolsetOptionsController.php
+└─ ToolsetValidationController.php
+```
+
+Load it from the existing `00-dtb-loader.php` after WooCommerce/cache are loaded.
+
+Do **not** replace the old files yet.
+
+## Phase 3 — Add canonical product metadata
+
+Add/import these fields:
+
+```text
+_dtb_brand_key
+_dtb_brand_label
+_dtb_category_key
+_dtb_display_category_key
+_dtb_tool_family
+_dtb_tool_role
+_dtb_workflow_scopes
+_dtb_builder_eligible
+_dtb_builder_slots
+_dtb_builder_rank
+_dtb_default_variation_id
+_dtb_is_parts
+```
+
+This directly fixes your product/filter/toolset mapping problem.
+
+## Phase 4 — Refactor frontend against the new API
+
+Replace frontend inference with backend truth.
+
+Current bad pattern:
+
+```text
+Toolset Builder slot = product name includes "flat box"
+```
+
+Target:
+
+```text
+Toolset Builder slot = product.meta._dtb_builder_slots contains "flatBox"
+```
+
+Current bad pattern:
+
+```text
+Products page derives brands/categories from all loaded products
+```
+
+Target:
+
+```text
+Products page consumes /dtb/v1/catalog/facets
+```
+
+## Phase 5 — Only then begin the broader mu-plugin remap
+
+Once catalog/product/toolset flows are stable, start migrating the rest of the mu-plugin stack in the proposed domain order.
+
+---
+
+# Production-Grade Sequencing
+
+Use this as the actual sequence:
+
+```text
+1. Fix current route/callback/syntax issues.
+2. Fix frontend brand/category URL state.
+3. Add dtb-catalog-platform as a parallel module.
+4. Add backend catalog/facet/toolset endpoints.
+5. Add product meta for tool family / builder eligibility.
+6. Refactor Toolset Builder to stop keyword matching.
+7. Refactor Products page to use canonical facets.
+8. Add server-side toolset validation.
+9. Add cart/order metadata for complete kits.
+10. Only after that, execute the full mu-plugin domain remap.
 ```
 
 ---
 
-# 14. Required Rule
+# Bottom Line
 
-Nothing critical gets deleted during the migration.
+The recommendation is **architecturally intelligent but operationally too aggressive**.
 
-Every old file becomes either:
+I would use it as the **north-star backend platform blueprint**, but I would not greenlight a full rebuild before solving the catalog/product/toolset contract.
 
-```text
-1. migrated into a new module,
-2. replaced by a compatibility shim,
-3. documented as host/system-owned,
-4. or intentionally deprecated after one stable release cycle.
-```
-
-For your repo, the only files that should not be migrated into DTB modules are likely:
+The immediate high-value build should be:
 
 ```text
-endurance-page-cache.php
-sso.php
+DTB Catalog Read Model
++ Catalog Facets API
++ Toolset Eligibility Metadata
++ Toolset Options API
++ Server-side Toolset Validation
++ Frontend filter/route cleanup
 ```
 
-Everything else should be remapped into the new architecture above.
+That gets you production-grade product page, filter, brand, category, and Toolset Builder wiring without destabilizing Veeqo, QuickBooks, rewards, schematics, media sync, and auth in the same migration.
+
