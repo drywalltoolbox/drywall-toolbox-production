@@ -9,7 +9,7 @@ import FilterPanel from '../components/catalog/FilterPanel';
 import Pagination from '../components/catalog/Pagination';
 import ProductShoppingCard from '../components/ui/ProductShoppingCard';
 import ProductModal from '../components/product/ProductModal';
-import ProductDetail from '../components/product/ProductDetail';
+import ProductDetailPlatform from '../components/product/ProductDetailPlatform';
 import Toast from '../components/ui/Toast';
 import { ProductSkeletonGrid } from '../components/catalog/ProductShoppingCardSkeleton';
 import { SORT_OPTIONS } from '../constants/sortOptions';
@@ -440,15 +440,13 @@ export default function ProductsCatalogPlatform() {
 
       <ProductModal isOpen={isModalOpen && !!modalProduct} product={modalProduct?.product || modalProduct} onClose={closeModal}>
         {modalProduct && (
-          <ProductDetail
+          <ProductDetailPlatform
             key={`${modalProduct.product?.id || modalProduct.id}:${modalProduct.initialResolvedVariation?.id || 'parent'}`}
             product={modalProduct.product || modalProduct}
             onAddToCart={handleAddToCart}
             onClose={closeModal}
-            initialVariations={[]}
             initialResolvedVariation={modalProduct.initialResolvedVariation}
             initialSelectedAttrs={modalProduct.initialSelectedAttrs}
-            disableLegacyDetailFetch
           />
         )}
       </ProductModal>
