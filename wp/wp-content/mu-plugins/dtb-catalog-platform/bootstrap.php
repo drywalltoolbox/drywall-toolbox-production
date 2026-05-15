@@ -63,6 +63,15 @@ require_once $_dtb_cp . '/Rest/ToolsetTemplatesController.php';
 require_once $_dtb_cp . '/Rest/ToolsetOptionsController.php';
 require_once $_dtb_cp . '/Rest/ToolsetValidationController.php';
 
+// ── Validation ────────────────────────────────────────────────────────────────
+require_once $_dtb_cp . '/Validation/CatalogValidationService.php';
+require_once $_dtb_cp . '/Validation/ProductMetaValidator.php';
+require_once $_dtb_cp . '/Validation/VariationValidator.php';
+require_once $_dtb_cp . '/Validation/ToolsetEligibilityValidator.php';
+require_once $_dtb_cp . '/Validation/PricingValidator.php';
+require_once $_dtb_cp . '/Validation/ImageValidator.php';
+require_once $_dtb_cp . '/Validation/SeoValidator.php';
+
 // ── Admin / CLI tools ─────────────────────────────────────────────────────────
 if ( is_admin() || ( defined( 'WP_CLI' ) && WP_CLI ) ) {
 	require_once $_dtb_cp . '/Admin/MetaBackfillTool.php';

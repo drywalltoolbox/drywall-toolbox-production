@@ -1,0 +1,1149 @@
+row_source_line,sku,raw_sku,type,name,status,issues,product_kind,commerce_mode,parent_sku,schematic_group
+29,TTBDL9,TTBDL9,simple,Asgard Classic Finishing Set,needs_review,visible_product_missing_image,kit,purchasable,,
+31,AB1,AB1,simple,Automatic Box Handle Body (AB1),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,finishing_box
+32,AB3ALEFT,AB3A-LEFT,simple,Automatic Box End Plate Left (AB3A LEFT),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,finishing_box
+33,AB3ARIGHT,AB3A-RIGHT,simple,Automatic Box End Plate Right (AB3A RIGHT),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,finishing_box
+34,AB40,AB40,simple,Automatic Box Air Valve Seat (AB40),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,finishing_box
+35,AB41,AB41,simple,Automatic Box Air Valve Stem (AB41),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,finishing_box
+36,AB42,AB42,simple,Automatic Box Air Valve Body (AB42),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,finishing_box
+37,AB43,AB43,simple,Automatic Box Throttle Housing (AB43),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,finishing_box
+38,AB44,AB44,simple,Automatic Box Clutch Spring (AB44),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,corner_box
+39,AB44A,AB44A,simple,Automatic Box Clutch Spring Short (AB44A),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,corner_box
+40,AB44B,AB44B,simple,Automatic Box Clutch Spring Long (AB44B),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,corner_box
+41,AB45,AB45,simple,Automatic Box Throttle Set Screw (AB45),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,corner_box
+42,AB46,AB46,simple,Automatic Box Throttle Pin (AB46),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,finishing_box
+43,AB47,AB47,simple,Automatic Box Thumb Valve (AB47),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,finishing_box
+44,AB48,AB48,simple,Automatic Box Air Valve O - Ring (AB48),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,finishing_box
+45,AB49,AB49,simple,Automatic Box Handle Mount (AB49),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,corner_box
+46,AB50,AB50,simple,Automatic Box Pressure Spring (AB50),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,finishing_box
+47,AB51,AB51,simple,Automatic Box Release Clip (AB51),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,finishing_box
+48,AB52,AB52,simple,Automatic Box Thumb Valve Seat (AB52),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,finishing_box
+49,AB54,AB54,simple,Automatic Box Air Valve Assembly (AB54),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,finishing_box
+50,AH1,AH-1,simple,Spring Housing Angle Head (AH1A),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,angle_head
+51,AH135IN,AH-1-3-5IN,simple,"AH1 - 3.5 - Head Casting - 3.5""",needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,angle_head
+52,AH11,AH-11,simple,Return Spring Post Angle Head (AH11),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,angle_head
+53,AH15,AH-15,simple,Handle Ball (AH15),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,handle
+54,AH16,AH-16,simple,Retaining Spring Backer (AH16),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,angle_head
+55,AH23INL,AH-2-3IN-L,simple,Left Frame Sub - Assembly 3 in (AHA2 - 3L),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,angle_head
+56,AH23INR,AH-2-3IN-R,simple,Right Frame Sub - Assembly 3 in (AHA2 - 3R),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,angle_head
+57,AH20,AH-20,simple,Angle Head Pivot Pin (AH20),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,angle_head
+58,AH21,AH-21,simple,Angle Head Hinge Spacer (AH21),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,angle_head
+59,AH22,AH-22,simple,Angle Head Frame Clamp (AH22),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,angle_head
+60,AH23,AH-23,simple,Angle Head Frame Retaining Pin (AH23),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,angle_head
+61,AH33IN,AH-3-3IN,simple,"AH3 - 3 - 3"" Top Blade",needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,angle_head
+62,AH6,AH-6,simple,Funnel Retainer Spring (AH6),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,angle_head
+63,AH725IN,AH-7-2-5IN,simple,"AH7 - 2.5 - Frame Tension Spring - 2.5""",needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,angle_head
+64,AH73IN,AH-7-3IN,simple,"AH7 - 3 - Framer Tention Spring - 3""",needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,angle_head
+65,AHBALL,AH-BALL,simple,Angle Head Ball Adapter (AHA),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,handle
+66,AH12,AH1-2,simple,"Head Casting - 2""",needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,angle_head
+67,AH125,AH1-2-5,simple,"Head Casting - 2.5""",needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,angle_head
+68,AH13,AH1-3,simple,"Head Casting - 3""",needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,angle_head
+69,AH135,AH1-3-5,simple,"Head Casting - 3.5""",needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,angle_head
+70,AH18,AH18,simple,Socket Wear Cap,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,angle_head
+71,AH1A,AH1A,simple,Spring Housing,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,angle_head
+72,AH1B,AH1B,simple,Return Spring,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,angle_head
+73,AH32,AH3-2,simple,"2"" Top Blade",needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,angle_head
+74,AH325,AH3-2-5,simple,"2.5"" Top Blade",needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,angle_head
+75,AH33,AH3-3,simple,"3"" Top Blade",needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,angle_head
+76,AH335,AH3-3-5,simple,"3.5"" Top Blade",needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,angle_head
+77,AH4,AH4,simple,Side Blade,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,angle_head
+78,AH5,AH5,simple,Frame Retainer Clip,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,angle_head
+79,AH6A,AH6A,simple,Funnel Retainer Clip,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,angle_head
+80,AH72,AH7-2,simple,"Frame Tension Spring - 2""",needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,angle_head
+81,AH725,AH7-2-5,simple,"Frame Tension Spring - 2.5""",needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,angle_head
+82,AH73,AH7-3,simple,"Framer Tention Spring - 3""",needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,angle_head
+83,AH735,AH7-3-5,simple,"Frame Tension Spring - 3.5""",needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,angle_head
+84,AH8,AH8,simple,Top Retainer Corner Clip,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,angle_head
+85,AH8A,AH8A,simple,"Top Retainer Corner Clip - 3.5"" or All Sizes Post 2014",needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,angle_head
+86,AH9,AH9,simple,Bottom Retainer Corner Clip,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,angle_head
+87,AH9A,AH9A,simple,"Bottom Retainer Corner Clip - 3.5"" or All Sizes Post 2014",needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,angle_head
+89,BH83,BH-8-3,simple,3 ft Box Handle 8 in (BH8 - 3),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,handle
+90,BH1,BH1,simple,Mounting Plate,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,180_grip_box_handle
+91,BH11,BH11,simple,Strap Connecting Pin,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,180_grip_box_handle
+92,BH2,BH2,simple,Plate,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,180_grip_box_handle
+93,BH24A,BH24A,simple,Bearing Sleeve,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,180_grip_box_handle
+94,BH26,BH26,simple,Cam,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,180_grip_box_handle
+95,BH3,BH3,simple,Lower Mounting Bracket,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,180_grip_box_handle
+96,BH4,BH4,simple,Lower Brake Lever,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,180_grip_box_handle
+97,BH5,BH5,simple,Upper Mounting Bracket,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,180_grip_box_handle
+98,BH6,BH6,simple,Hinge Pin,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,180_grip_box_handle
+99,BH7,BH7,simple,Cam Follower,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,180_grip_box_handle
+100,BH93,BH9-3,simple,Brake Connecting Strap - 3',needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,180_grip_box_handle
+101,BH94,BH9-4,simple,Brake Connecting Strap - 4',needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,180_grip_box_handle
+102,BH942,BH9-42,simple,"Brake Connecing Strap - 42""",needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,180_grip_box_handle
+103,BH95,BH9-5,simple,Brake Connecting Strap - 5',needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,180_grip_box_handle
+104,BH96,BH9-6,simple,Brake Connecting Strap - 6',needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,180_grip_box_handle
+105,C148,C148,simple,Predator Carbon Fiber Crimping Arm Left (C148),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,automatic_taper
+106,C154,C154,simple,Predator Carbon Fiber Cam Roller (C154),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,automatic_taper
+107,C159,C159,simple,Predator Carbon Fiber Magnet (C159),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,automatic_taper
+108,C779CS,C779-CS,simple,Predator Carbon Fiber Cover Plate Cork Seal (C779 - CS),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,automatic_taper
+109,C78S,C78S,simple,Predator Carbon Fiber Drive Chain Short (C78S),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,automatic_taper
+110,CA239,CA239,simple,Predator Taper Adjusting Screw (CA239),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,automatic_taper
+112,CC12,CC12,simple,Corner Cobra Adjustable Inside & Outside Corner Roller (CC),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,corner_roller
+113,CC16,CC16,simple,Corner Cobra Adjustable Inside & Outside Corner Roller (CC),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,corner_roller
+114,CC17,CC17,simple,Corner Cobra Adjustable Inside & Outside Corner Roller (CC),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,corner_roller
+115,CC18,CC18,simple,Corner Cobra Adjustable Inside & Outside Corner Roller (CC),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,corner_roller
+116,CC19,CC19,simple,Corner Cobra Adjustable Inside & Outside Corner Roller (CC),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,corner_roller
+117,CC1A,CC1A,simple,Corner Cobra Adjustable Inside & Outside Corner Roller (CC),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,corner_roller
+118,CC2,CC2,simple,Corner Cobra Adjustable Inside & Outside Corner Roller (CC),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,corner_roller
+119,CC3,CC3,simple,Corner Cobra Adjustable Inside & Outside Corner Roller (CC),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,corner_roller
+120,CEXT1,CEXT-1,simple,External Corner Applicator Wheel Large (CEXT1),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,applicator
+121,CEXT2,CEXT-2,simple,External Corner Applicator Wheel Small (CEXT2),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,applicator
+122,CEXT3,CEXT-3,simple,Wheel for ICATW (CEXT3),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,applicator
+123,CF1535IN,CF-15-3-5IN,simple,Corner Flusher Tension Spring 15 x 3.5 in (CF15 - 3.5),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,corner_flusher
+124,CF1C,CF-1C,simple,Corner Flusher Direct Plate C (CF1C),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,corner_flusher
+125,CF38,CF-38,simple,Corner Flusher Skid Long (CF38),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,corner_flusher
+126,CF4S,CF-4S,simple,Corner Flusher Ball Spring Short (CF4S),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,applicator
+127,CF53S,CF-5-3-S,simple,"Tension Spring 3.5"" - Flusher (CF5 - 3.5)",needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,corner_flusher
+128,CF6,CF-6,simple,Combo Flusher Wheel Holder - Flusher (CF6),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,corner_flusher
+129,CF7,CF-7,simple,Corner Flusher Housing Block (CF7),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,corner_flusher
+130,CF8,CF-8,simple,Corner Flusher Wheel Cap (CF8),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,corner_flusher
+131,CFTA,CF-TA,simple,Corner Flusher Taper Adapter (CFTA),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,corner_flusher
+132,CFTS35IN,CF-TS-3-5IN,simple,"Tension Spring 3.5"" - Flusher (CF5 - 3.5)",needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,corner_flusher
+133,CF1A,CF1A,simple,Direct Plate - Flusher (CF1B),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,corner_flusher
+134,CF1B,CF1B,simple,Direct Plate - Flusher (CF1B),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,corner_flusher
+135,CF2,CF2,simple,Corner Flusher Wheel Retainer (CF2),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,corner_flusher
+136,CF3,CF3,simple,Skid - Flusher (CF3),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,corner_flusher
+137,CF3A,CF3A,simple,Screw for Corner Flusher Wheel (CF3A),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,corner_flusher
+138,CF3B,CF3B,simple,Wheel for Corner Flusher (CF - 3B),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,corner_flusher
+139,CF4L,CF4L,simple,Ball Spring Long Flusher (CF4L),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,corner_flusher
+140,CF535IN,CF5-3-5IN,simple,"Tension Spring 3.5"" - Flusher (CF5 - 3.5)",needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,corner_flusher
+141,CFB18IN,CFB1-8IN,simple,Rear Plate 8 in (CFB1 - 8),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,corner_box
+142,CFB10,CFB10,simple,"5/16 - 18 x 3/4"" Thumb Screw",needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,corner_flusher_box
+143,CFB11A,CFB11A,simple,Door Stop,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,corner_flusher_box
+144,CFB15,CFB15,simple,Door Hinge,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,corner_flusher_box
+145,CFB15A,CFB15A,simple,Hinge Bushing (Plastic Washer),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,corner_flusher_box
+146,CFB16,CFB16,simple,Bearing Sleeve,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,corner_flusher_box
+147,CFB19,CFB19,simple,Angle Box Nylatron Bushing (CFB - 19),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,corner_box
+148,CFB1A,CFB1A,simple,Angle Box Hinge Seal (CFB - 1A),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,corner_box
+149,CFB28IN,CFB2-8IN,simple,"8"" Roll Face (CFB28)",needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,corner_box
+150,CFB28,CFB28,simple,"Columbia 8"" Roll Face",needs_review,part_missing_schematic_group,part,quote_only,,
+151,CFB37,CFB3-7,simple,"Side Plate 7""",needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,corner_flusher_box
+152,CFB38,CFB3-8,simple,"Side Plate 8""",needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,corner_flusher_box
+153,CFB38IN,CFB3-8IN,simple,"CFB3 - 8 - Side Plate 8""",needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,corner_box
+154,CFB47,CFB4-7,simple,"Columbia 7"" Pressure Door",needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,corner_flusher_box
+155,CFB48,CFB4-8,simple,"Columbia 8"" Pressure Door",needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,corner_flusher_box
+156,CFB48IN,CFB4-8IN,simple,"CFB4 - 8 - Door 8""",needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,corner_box
+159,CFB5A,CFB5A,simple,Corner Box Cone Ball End (Large),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,compound_tube
+160,CFB5B,CFB5B,simple,Cone Ball,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,corner_flusher_box
+161,CFB5C,CFB5C,simple,Corner Box Cone Ball End (Standard),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,compound_tube
+162,CFB6,CFB6,simple,Mud Supply Valve Unit,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,corner_flusher_box
+163,CFB77,CFB7-7,simple,"Columbia 7"" Angle Box Door Gasket",needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,corner_flusher_box
+164,CFB78,CFB7-8,simple,"Columbia 8"" Door Gasket for Angle Box",needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,corner_flusher_box
+165,CFB78IN,CFB7-8IN,simple,"CFB7 - 8 - Door Gasket 8""",needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,corner_box
+168,CFB8,CFB8,simple,Box Mount,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,corner_flusher_box
+169,CFB8A,CFB8A,simple,ONE Angle Box Door Adaptor #14499 (CFB8A),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,corner_box
+170,CLT12,CLT-12,simple,Cam Lock Tube Locking Sleeve (CLT12),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,compound_tube
+171,CLT13,CLT-13,simple,Cam Lock Tube Cam Body (CLT13),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,compound_tube
+172,CLT14,CLT-14,simple,Cam Lock Tube Locking Pin (CLT14),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,compound_tube
+173,CLT16,CLT-16,simple,Cam Lock Tube End Cap (CLT16),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,compound_tube
+174,CLT15,CLT15,simple,Cam Lock Tube Return Spring (CLT15),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,corner_roller
+175,CLTBF,CLTBF,simple,Columbia Compound Tube Box Filler,needs_review,part_missing_schematic_group,part,quote_only,,
+178,CMH2,CMH-2,simple,"Closet Monster 18"" Flat Box Handle (CMH)",needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,handle
+179,CMH8,CMH-8,simple,"Closet Monster 18"" Flat Box Handle (CMH)",needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,handle
+180,CMT124,CMT-1-24,simple,Barrel Main Body 24 in (CMT1 - 24),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,compound_tube
+181,CMT1A22,CMT-1A-22,simple,Draw Tube 22 in (CMT1A - 22),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,compound_tube
+182,CMT124IN,CMT1-24IN,simple,Barrel Main Body 24 in (CMT1 - 24),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,compound_tube
+183,CMT1A24IN,CMT1A-24IN,simple,"Draw Tube - 24"" (CMT1A - 24)",needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,compound_tube
+184,CMT2,CMT2,simple,Cone insert(Bottom),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,compound_tube
+185,CMT4,CMT4,simple,Plunger Housing (CMT4),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,compound_tube
+186,CMT5,CMT5,simple,Plastic Handle Collar (CMT5),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,compound_tube
+187,CMT6,CMT6,simple,Cone insert(Top),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,compound_tube
+188,CMT8,CMT8,simple,Mastic Tube Washer (CMT8),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,compound_tube
+197,25AH,2.5AH,variation,"Columbia Angle Head - 2.5""",needs_review,variation_missing_price_hidden_until_priced,variation,hidden_reference,COLANGLEHEAD,
+199,35AH,3.5AH,variation,"Columbia Angle Head - 3.5""",needs_review,variation_missing_price_hidden_until_priced,variation,hidden_reference,COLANGLEHEAD,
+211,PTAPER,PTAPER,variation,"Columbia Automatic Taper - Predator Carbon Fiber 53""",needs_review,variation_missing_price_hidden_until_priced,variation,hidden_reference,COLAUTOMATICTAPER,
+230,25CSF,2.5CSF,variation,"Columbia Combo Flusher - 2.5""",needs_review,variation_missing_price_hidden_until_priced,variation,hidden_reference,COLCOMBOFLUSHER,
+232,3WTCSF,3WTCSF,variation,"Columbia Combo Flusher - 3"" Widetrack",needs_review,variation_missing_price_hidden_until_priced,variation,hidden_reference,COLCOMBOFLUSHER,
+233,35CSF,3.5CSF,variation,"Columbia Combo Flusher - 3.5""",needs_review,variation_missing_price_hidden_until_priced,variation,hidden_reference,COLCOMBOFLUSHER,
+241,25DF,2.5DF,variation,"Columbia Direct Flusher - 2.5""",needs_review,variation_missing_price_hidden_until_priced,variation,hidden_reference,COLDIRECTFLUSHER,
+244,35DF,3.5DF,variation,"Columbia Direct Flusher - 3.5""",needs_review,variation_missing_price_hidden_until_priced,variation,hidden_reference,COLDIRECTFLUSHER,
+247,55FBB,5.5FBB,variation,"Columbia Fat Boy Finishing Box - 5.5""",needs_review,variation_missing_price_hidden_until_priced,variation,hidden_reference,COLFATBOYBOX,
+248,8FBB,8FBB,variation,"Columbia Fat Boy Finishing Box - 8""",needs_review,variation_missing_price_hidden_until_priced,variation,hidden_reference,COLFATBOYBOX,
+249,10FBB,10FBB,variation,"Columbia Fat Boy Finishing Box - 10""",needs_review,variation_missing_price_hidden_until_priced,variation,hidden_reference,COLFATBOYBOX,
+250,12FBB,12FBB,variation,"Columbia Fat Boy Finishing Box - 12""",needs_review,variation_missing_price_hidden_until_priced,variation,hidden_reference,COLFATBOYBOX,
+252,55FFB,5.5FFB,variation,"Columbia Flat Finishing Box - 5.5""",needs_review,variation_missing_price_hidden_until_priced,variation,hidden_reference,COLFLATFINISHINGBOXES,
+261,COLMATRIXBOXHANDLE,COL-MATRIX-BOX-HANDLE,variable,Columbia Matrix Box Handle,needs_review,visible_variable_parent_missing_image,tool,parent_container,,
+268,HMPC,HMP-C,variation,Columbia Mud Pump - Hot Mud Pump CDN,needs_review,variation_missing_price_hidden_until_priced,variation,hidden_reference,COLMUDPUMP,
+270,COLMUDROLLERREPLACEMENT,COL-MUD-ROLLER-REPLACEMENT,variable,Columbia Mud Roller Replacement,needs_review,visible_variable_parent_missing_image;part_missing_schematic_group,part,parent_container,,
+284,COBCRE,COBCRE,variation,Columbia Outside Corner Roller - European,needs_review,variation_missing_price_hidden_until_priced,variation,hidden_reference,COLOUTSIDECORNERROLLER,
+285,COBCRW,COBCRW,variation,Columbia Outside Corner Roller - Wide,needs_review,variation_missing_price_hidden_until_priced,variation,hidden_reference,COLOUTSIDECORNERROLLER,
+290,OA90325,OA90-325,variation,Columbia Plastic Mud Head Applicator - Outside 90° 325,needs_review,variation_missing_price_hidden_until_priced,variation,hidden_reference,COLPLASTICMUDHEADAPPLICATOR,
+300,25SF,2.5SF,variation,"Columbia Standard Flusher - 2.5""",needs_review,variation_missing_price_hidden_until_priced,variation,hidden_reference,COLSTANDARDFLUSHERS,
+303,35SF,3.5SF,variation,"Columbia Standard Flusher - 3.5""",needs_review,variation_missing_price_hidden_until_priced,variation,hidden_reference,COLSTANDARDFLUSHERS,
+310,TSB10,TSB-10,variation,"Columbia Tomahawk Smoothing Blade - 10""",needs_review,variation_missing_price_hidden_until_priced,variation,hidden_reference,COLTOMAHAWKSMOOTHINGBLADE,
+323,CPT125B,CPT125B,simple,Teflon Threaded Insert (CPT125B),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,automatic_taper
+325,CR2A,CR-2A,simple,Corner Roller (CR),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,corner_roller
+326,CR2B,CR-2B,simple,Corner Roller (CR),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,corner_roller
+327,CR3,CR-3,simple,CR3 - Bearing Sleeve,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,corner_roller
+328,CR1,CR1,simple,Head Casting,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,corner_roller
+329,CR11,CR11,simple,Handle Connecting Link,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,corner_roller
+330,CR12,CR12,simple,Swivel Coupling Pin,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,corner_roller
+331,CR2,CR2,simple,Roller (2 piece - nylatron/steel),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,corner_roller
+332,CR4,CR4,simple,Cut Washer,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,corner_roller
+333,CR6,CR6,simple,Handle Mounting Swivel,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,corner_roller
+334,CT140,CT-140,simple,Predator Taper Tape Advance Plate (CT140),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,automatic_taper
+335,CT00,CT00,simple,Predator Taper Head Cover Plate (CT00),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,automatic_taper
+336,CT02,CT02,simple,Predator Taper Insert Bushing (CT02),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,automatic_taper
+337,CT03,CT03,simple,Predator Taper Left Insert Bushing (CT03),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,automatic_taper
+338,CT054,CT054,simple,Predator Taper Toe Kicker Rail (CT054),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,automatic_taper
+339,CT10,CT10,simple,Taper Crimping Arm Bushing Right (CT10),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,automatic_taper
+340,CT101,CT101,simple,Return Spring,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,automatic_taper_head
+341,CT103,CT103,simple,Barrel - Main Body,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,automatic_taper_body
+342,CT104,CT104,simple,Connection Strap,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,automatic_taper_body
+343,CT105,CT105,simple,Crimper Lever,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,automatic_taper_body
+344,CT106A,CT106A,simple,Taper Bearing Shaft - CT106 (CT - 106A),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,automatic_taper
+345,CT107,CT107,simple,Piston Body,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,automatic_taper_body
+346,CT109,CT109,simple,1/4 - 20 Hex Nut,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,automatic_taper_body
+347,CT10A,CT10A,simple,Crimping Arm Shaft Bushing - L,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,automatic_taper_head
+348,CT10I,CT10I,simple,Taper Crimping Arm Bushing Right (CT10),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,automatic_taper
+349,CT110,CT110,simple,Piston Cup Relief Washer (CT110),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,automatic_taper
+350,CT111,CT111,simple,Piston Cup,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,automatic_taper_body
+351,CT112,CT112,simple,Connecting Stud,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,automatic_taper_body
+352,CT114,CT114,simple,Predator Taper Locking Block (CT114),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,automatic_taper
+353,CT115,CT115,simple,Guard Ring,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,automatic_taper_body
+354,CT115A,CT115A,simple,Taper Gasket New Style End Ring (CT115A),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,automatic_taper
+355,CT116A,CT116A,simple,Strap,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,automatic_taper_body
+356,CT117A,CT117A,simple,Base - New (CT117A),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,automatic_taper
+357,CT118A,CT118A,simple,Retaining Spring Clip(Quick Realease),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,automatic_taper
+358,CT119,CT119,simple,Spool Retaining Spring,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,automatic_taper_body
+359,CT119A,CT119A,simple,Spool Retaining Spring (CT - 119),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,automatic_taper
+360,CT12,CT12,simple,Tape Advance Release Bracket (CT12),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,automatic_taper
+361,CT120,CT120,simple,Tape Spool,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,automatic_taper_body
+362,CT121A,CT121A,simple,O - Ring,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,automatic_taper_body
+363,CT121B,CT121B,simple,Tape Spool Shaft (Quick Release),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,automatic_taper
+364,CT122A,CT122A,simple,Taper Strap - CT122 (CT - 122A),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,automatic_taper
+365,CT123,CT123,simple,Columbia Retaining Quick Release Spring Shaft,needs_review,part_missing_schematic_group,part,quote_only,,
+366,CT123A,CT123A,simple,Taper Retaining Spring Shaft (CT - 123),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,automatic_taper
+367,CT124,CT124,simple,Hand Grip Guard Ring,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,automatic_taper_body
+368,CT124A,CT124A,simple,Grip Guard Ring Top (CT124A),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,automatic_taper
+369,CT124B,CT124B,simple,Grip Guard Ring Bottom (CT124B),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,automatic_taper
+370,CT125,CT125,simple,Rollers,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,automatic_taper_body
+371,CT125A,CT125A,simple,Bearing,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,automatic_taper_body
+372,CT126,CT126,simple,Hand Grip Body,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,automatic_taper_body
+373,CT126PA,CT126PA,simple,Hand Grip Body Pump Action (CT126PA),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,automatic_taper
+374,CT127,CT127,simple,Extension Shaft Bracket,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,automatic_taper_body
+375,CT128A,CT128A,simple,Taper Shaft Guide Roller Bushing (CT128A),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,automatic_taper
+376,CT13,CT13,simple,Dog Base Bracket,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,automatic_taper_head
+377,CT130,CT130,simple,Extension Shaft,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,automatic_taper_body
+378,CT132,CT132,simple,Connecting Link,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,automatic_taper_body
+379,CT14A,CT14A,simple,Taper Adjustable Brake,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,automatic_taper_head
+380,CT15,CT15,simple,Ratchet Rod for Adjustable Brake,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,automatic_taper_head
+381,CT154,CT154,simple,Predator Taper Cam Roller (CT154),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,automatic_taper
+382,CT15A,CT15A,simple,Old Style Ratchet Rod (CT15A),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,automatic_taper
+383,CT16,CT16,simple,Brake Dog,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,automatic_taper_head
+384,CT17,CT17,simple,Separation Plate (CT17),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,automatic_taper
+385,CT18,CT18,simple,Predator Taper Guide Bracket (CT18),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,automatic_taper
+386,CT19,CT19,simple,Paper Feed Guide,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,automatic_taper_head
+387,CT1R,CT1R,simple,Head (No Holes for Cap) (CT1R),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,automatic_taper
+388,CT2,CT2,simple,Insert Bushing for CT#7A,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,automatic_taper_head
+389,CT20,CT20,simple,Hinge Block,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,automatic_taper_head
+390,CT22,CT22,simple,Taper Brass Bracket (CT22),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,automatic_taper
+391,CT23,CT23,simple,Reinforcing Rod (CT23),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,automatic_taper
+392,CT24,CT24,simple,Predator Taper Brass Bushing (CT24),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,automatic_taper
+393,CT240DL,CT240-DL,simple,Predator Taper Deep Lever Assembly (CT240 - DL),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,automatic_taper
+394,CT25,CT25,simple,Knife Guide Square Tube,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,automatic_taper_head
+395,CT27,CT27,simple,Knife Guide Bracket - Left,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,automatic_taper_head
+396,CT28,CT28,simple,Roller Bushing,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,automatic_taper_head
+397,CT29,CT29,simple,Right Nylatron Chain Roller (small),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,automatic_taper_head
+398,CT29A,CT29A,simple,Left Nylatron Chain Roller (large),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,automatic_taper_head
+399,CT3,CT3,simple,Right Insert Bushing (includes CT4),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,automatic_taper_head
+400,CT31,CT31,simple,Chain Tension & Guide Bracket,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,automatic_taper_head
+401,CT34,CT34,simple,Cover Plate Attachment Block (CT34),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,automatic_taper
+402,CT34CL,CT34CL,simple,Cam Lock Cap Side Block (CT34 - CL),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,automatic_taper
+403,CT34R,CT34R,simple,Columbia Removable Cover Plate Attachment Block,needs_review,part_missing_schematic_group,part,quote_only,,
+404,CT35,CT35,simple,Cap Reinforcing Tab,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,automatic_taper_head
+405,CT36,CT36,simple,Return Spring Tube,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,automatic_taper_head
+406,CT364,CT364,simple,Predator Taper Knife Guide Bracket (CT364),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,automatic_taper
+407,CT39,CT39,simple,Taper Knife Return Spring (CT39),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,corner_box
+408,CT3A,CT3A,simple,Left Insert Bushing,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,automatic_taper_head
+409,CT4,CT4,simple,Left Wafer Bushing,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,automatic_taper_head
+410,CT40,CT40,simple,Return Spring Ring,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,automatic_taper_head
+411,CT41,CT41,simple,Knife Retainer Block,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,automatic_taper_head
+412,CT41A,CT41A,simple,Knife Retainer Cap,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,automatic_taper_head
+413,CT42A,CT42A,simple,Diamond Blade,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,automatic_taper_head
+414,CT43,CT43,simple,Micro Chain,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,automatic_taper_head
+415,CT45,CT45,simple,Connecting Rod,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,automatic_taper_head
+416,CT47,CT47,simple,Crimping Wheel,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,automatic_taper_head
+417,CT49,CT49,simple,Taper Crimping Arm Right (CT49),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,automatic_taper
+418,CT5,CT5,simple,Right Wafer Bushing,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,automatic_taper_head
+419,CT50,CT50,simple,Crimping Wheel Bushing,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,automatic_taper_head
+420,CT52,CT52,simple,Predator Taper Spacer Bar (CT52),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,automatic_taper
+421,CT53,CT53,simple,Toe Kicker,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,automatic_taper_head
+422,CT54,CT54,simple,Return Spring,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,automatic_taper_head
+423,CT55,CT55,simple,Carriage Guide Rod,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,automatic_taper_head
+424,CT56,CT56,simple,Carriage Guide Rod Stop,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,automatic_taper_head
+425,CT57,CT57,simple,Tape Advance Carriage,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,automatic_taper_head
+426,CT58,CT58,simple,Guide Rod Bushing,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,automatic_taper_head
+427,CT59,CT59,simple,Magnet (CT59),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,automatic_taper
+428,CT6,CT6,simple,Taper Side Plate Right (CT - 6),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,automatic_taper
+429,CT62,CT62,simple,Needle Holding Shaft,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,automatic_taper_head
+430,CT624,CT624,simple,Predator Taper Needle Shaft Assembly (CT624),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,automatic_taper
+431,CT63,CT63,simple,Needle,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,automatic_taper_head
+432,CT64,CT64,simple,Needle Return Shaft,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,automatic_taper_head
+433,CT65,CT65,simple,Needle Return Spring,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,automatic_taper_head
+434,CT66,CT66,simple,Taper Drive Drum (CT66),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,automatic_taper
+435,CT67,CT67,simple,Ratchet Gear,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,automatic_taper_head
+436,CT68,CT68,simple,Hub,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,automatic_taper_head
+437,CT69,CT69,simple,Predator Taper Drive Cam (CT69),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,automatic_taper
+438,CT6A,CT6A,simple,Stainless Steel Side Plate - Left,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,automatic_taper_head
+439,CT6R,CT6R,simple,Taper Side Plate Right - CT6 (CT - 6),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,automatic_taper
+440,CT7,CT7,simple,Side Plate Support  Right (CT7),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,automatic_taper
+441,CT70,CT70,simple,Drive Shaft,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,automatic_taper_head
+442,CT71,CT71,simple,Drive Sprocket - Small,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,automatic_taper_head
+443,CT711A,CT711A,simple,Predator Taper Crimping Arm Bearing (CT711A),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,automatic_taper
+444,CT72,CT72,simple,Cable,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,automatic_taper_head
+445,CT726,CT726,simple,Predator Taper Drive Chain Predator (CT726),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,automatic_taper
+446,CT73,CT73,simple,Cable Drum,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,automatic_taper_head
+447,CT74,CT74,simple,Predator Taper Cable Guide Pulley (CT74),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,automatic_taper
+448,CT741A,CT741A,simple,Predator Taper Cutter Block Clamp (CT741A),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,automatic_taper
+449,CT747,CT747,simple,Predator Taper Crimping Wheel Bushing (CT747),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,automatic_taper
+450,CT759,CT759,simple,Predator Taper Hollow Shaft Predator (CT759),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,automatic_taper
+451,CT76,CT76,simple,Nylatron Washer,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,automatic_taper_head
+452,CT765,CT765,simple,Predator Taper Manual Drive Grip (CT765),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,automatic_taper
+453,CT768,CT768,simple,Predator Taper Clutch Lever (CT768),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,automatic_taper
+454,CT77,CT77,simple,Drive Sprocket - Large,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,automatic_taper_head
+455,CT771,CT771,simple,Predator Taper Drive Sprocket Small (CT771),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,automatic_taper
+456,CT776,CT776,simple,Predator Taper Drive Sprocket Large (CT776),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,automatic_taper
+457,CT77S,CT77S,simple,Taper Drive Sprocket Large (CT - 77),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,automatic_taper
+458,CT78,CT78,simple,Drive Chain,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,automatic_taper_head
+459,CT79,CT79,simple,Hollow Shaft,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,automatic_taper_head
+460,CT790,CT790,simple,Predator Taper Rod Sleeve Housing (CT790),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,automatic_taper
+461,CT794,CT794,simple,Predator Taper Mud Shut Off Upper Plate (CT794),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,automatic_taper
+462,CT7A,CT7A,simple,Side Plate Hub,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,automatic_taper_head
+463,CT8,CT8,simple,Side Plate Support  Left (CT8),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,automatic_taper
+464,CT80,CT80,simple,Manual Drive Grip,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,automatic_taper_head
+465,CT81,CT81,simple,Clutch Return Spring,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,automatic_taper_head
+466,CT82,CT82,simple,Clutch Lever,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,automatic_taper_head
+467,CT83,CT83,simple,Clutch Dog,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,automatic_taper_head
+468,CT840,CT840,simple,Predator Taper Control Valve Body (CT840),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,automatic_taper
+469,CT85,CT85,simple,Clutch Release Shaft,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,automatic_taper_head
+470,CT86,CT86,simple,CT86 – Toe Kicker Cable,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,automatic_taper_head
+471,CT87,CT87,simple,Engraved Cover Plate Cap,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,automatic_taper_head
+472,CT87CL,CT87-CL,simple,Cam Lock Taper Cap (CT87 - CL),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,automatic_taper
+473,CT87CS,CT87-CS,simple,Columbia Cover Plate Cork Seal,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,automatic_taper_head
+474,CT87A,CT87A,simple,Bracket Brace,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,automatic_taper_head
+476,CT88,CT88,simple,Clutch Release Rod,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,automatic_taper_head
+477,CT89,CT89,simple,Release Rod Sleeve,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,automatic_taper_head
+478,CT90,CT90,simple,Rod Sleeve Housing,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,automatic_taper_head
+479,CT92,CT92,simple,Release Clip Bushing,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,automatic_taper_head
+480,CT92A,CT92A,simple,Toe Kicker Caple Retainer Clip,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,automatic_taper_head
+481,CT93,CT93,simple,Taper Mud Shut Off Lever Arm (CT93),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,automatic_taper
+482,CT94,CT94,simple,Mud Shut - Off Upper Plate (CT94),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,automatic_taper
+483,CT95,CT95,simple,Control Valve (CT95),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,automatic_taper
+484,CT96,CT96,simple,Mud Shut - Off Gasket,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,automatic_taper_head
+485,CT97,CT97,simple,Mud Supply Valve Body,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,automatic_taper_head
+486,CT98,CT98,simple,Mud Supply Seal Plate & Shaft,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,automatic_taper_head
+487,CT99,CT99,simple,Removable Cover Plate Pin (CT - 99),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,automatic_taper
+488,CTA128,CTA128,simple,Predator Taper Shaft Guide Roller Bushing Assembly (CTA128),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,automatic_taper
+489,CTA1A,CTA1A,simple,Predator Taper Cutter Block Assembly (CTA1A),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,automatic_taper
+490,CTA84,CTA84,simple,Columbia Cable Pulley Guide,needs_review,part_missing_schematic_group,part,quote_only,,
+491,CTA87CL,CTA87CL,simple,Columbia Cover Plate Assembly,needs_review,part_missing_schematic_group,part,quote_only,,
+492,CTA99,CTA99,simple,Columbia Removable Cover Plate Pin,needs_review,part_missing_schematic_group,part,quote_only,,
+493,CTS6,CTS6,simple,Carriage Guide Rod Stop (CT56),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,automatic_taper
+494,CTS6A,CTS6A,simple,Carriage Guide Rod Stop A (CT56A),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,automatic_taper
+495,CTS9,CTS9,simple,Magnet (CT59),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,automatic_taper
+496,CTSAA,CTSAA,simple,Predator Taper Side Assembly Left (CTSAA),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,automatic_taper
+497,CTSS,CTSS,simple,Carriage Guide Rod (CT55),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,automatic_taper
+498,CTYS,CTYS,simple,Predator Taper Y - Cam Spring (CTYS),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,automatic_taper
+499,EACLS,EA-CLS,simple,Predator Taper Cam Lock Sleeve (EA:CLS),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,automatic_taper
+500,EA200,EA200,simple,Predator Taper External Adapter 200 (EA200),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,automatic_taper
+501,ER2LT,ER2LT,simple,Predator Taper Tension Rod Left (ER2LT),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,automatic_taper
+502,EXT35,EXT35,simple,Extension Tube 35 in (EXT35),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,compound_tube
+503,FA266,FA-266,simple,"8 - 32 X 1"" Flat Head Screw (FA266)",needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,corner_flusher
+504,FA279,FA-279,simple,10 - 24 X 1 - 1/4in Hex Bolt (FA279),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,finishing_box
+505,FA319,FA-319,simple,3/8 - 16 Hex Nut (FA319),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,handle
+506,FA321,FA-321,simple,3/8 - 16 x 3/4 Socket Head Screw (FA321),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,handle
+507,FA325,FA-325,simple,3/8 - 16 x 1 - 1/2 Socket Head Screw (FA325),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,handle
+508,FA326,FA-326,simple,Rivet - Flusher (FA326),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,corner_flusher
+509,FA347,FA-347,simple,1/4 - 20 Nyloc Nut (FA347),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,compound_tube
+510,FA348,FA-348,simple,1/4 Flat Washer (FA348),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,compound_tube
+511,FA383,FA-383,simple,1/4 - 20 x 3/8 Flat Head Screw (FA383),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,handle
+512,FAS26,FA-S26,simple,6 - 32 x 1/4 Set Screw (FA S26),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,corner_flusher
+513,FA199,FA199,simple,"2 - 56 x 3/16"" Binder Slot",needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,automatic_taper_head
+514,FA200,FA200,simple,"1/16 x 1/4"" Split Pin",needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,automatic_taper_head
+515,FA201,FA201,simple,"Columbia 1/16"" X 3/8"" Split Pin",needs_review,part_missing_schematic_group,part,quote_only,,
+516,FA202,FA202,simple,"1/16 X 1/2"" Cotter Pin",needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,180_grip_box_handle
+517,FA203,FA203,simple,"1/16 x 3/4"" Cotter Pin",needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,automatic_taper_head
+518,FA206,FA206,simple,4 - 40 Hex Nut,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,automatic_taper_head
+519,FA207,FA207,simple,4 - 40 Nyloc Nut,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,automatic_taper_head
+520,FA208,FA208,simple,"4 - 40 x 1/8"" Binder Slot",needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,automatic_taper_head
+521,FA20A,FA20A,simple,4 - 40 x 3/16 Flat Head Screw (FA20A),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,automatic_taper
+522,FA210,FA210,simple,"4 - 40 x 3/16"" Binder Slot",needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,automatic_taper_head
+523,FA212,FA212,simple,"4 - 40 x 3/16"" Truss Slot",needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,automatic_taper_head
+524,FA213,FA213,simple,"4 - 40 x 1/4"" Binder Slot",needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,automatic_taper_head
+525,FA214,FA214,simple,"4 - 40 x 1/4"" Flat Slot",needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,automatic_taper_head
+526,FA215,FA215,simple,"4 - 40 x 5/16"" Binder Slot",needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,automatic_taper_head
+527,FA216,FA216,simple,4 - 40 X 3/8” Fillister Slot,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,flat_finishing_box
+528,FA218,FA218,simple,"4 - 40 x 3/8"" Flat Slot",needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,hinged_nailspotter
+529,FA219,FA219,simple,"4 - 40 X 1/2"" Fillister Slot",needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,automatic_taper_head
+530,FA21A,FA21A,simple,4 - 40 X 1/2 in Fill. Head Screw (FA219),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,automatic_taper
+531,FA220,FA220,simple,"4 - 40 x 3/4"" Hex Bolt",needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,automatic_taper_head
+532,FA221,FA221,simple,#6 Belleville Washer (FA221),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,finishing_box
+533,FA222,FA222,simple,"Columbia 5-40 X 3/8"" Bind Head Screw",needs_review,part_missing_schematic_group,part,quote_only,,
+534,FA224,FA224,simple,"1/8"" x 3/8"" Split Pin",needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,automatic_taper_head
+535,FA225,FA225,simple,"1/8"" x 3/8"" Rivet Shoulder Washer",needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,automatic_taper_body
+536,FA227,FA227,simple,"6 - 32 X 1/4"" Flat Slot",needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,angle_head
+537,FA228,FA228,simple,#6 Flat Washer,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,automatic_taper_head
+538,FA229,FA229,simple,#6 Lock Washer,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,automatic_taper_head
+539,FA22K,FA22K,simple,4 - 40 Nyloc Nut (FA22K),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,automatic_taper
+540,FA230,FA230,simple,#6 Star Washer,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,automatic_taper_head
+541,FA231,FA231,simple,"6 - 32 x 3/8"" Hex Bolt",needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,flat_finishing_box
+542,FA232,FA232,simple,6 - 32 Hex Nut,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,flat_finishing_box
+543,FA233,FA233,simple,6 - 32 Nyloc Nut,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,flat_finishing_box
+544,FA234,FA234,simple,6 - 32 Nyloc Jam Nut,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,automatic_taper_head
+545,FA235,FA235,simple,"6 - 32 X 1/8"" Set Screw",needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,angle_head
+546,FA236,FA236,simple,"6 - 32 X 1/8"" Binder Slot",needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,angle_head
+547,FA237,FA237,simple,"6 - 32 x 3/16"" Binder Slot",needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,matrix_handle
+548,FA238,FA238,simple,"6 - 32 X 3/16"" Fillister Slot",needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,flat_finishing_box
+549,FA239,FA239,simple,"6 - 32 X 1/4"" Binder Slot",needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,flat_finishing_box
+550,FA241,FA241,simple,"6 - 32 X 3/8"" Binder Slot",needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,flat_finishing_box
+551,FA242,FA242,simple,6 - 32 x 3/8 Pan Head Screw (FA242),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,corner_box
+552,FA243,FA243,simple,"6 - 32 x 3/8"" Flat Slot",needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,automatic_taper_head
+553,FA244,FA244,simple,"6 - 32 x 1/2"" Pan Slot",needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,automatic_taper_head
+554,FA245,FA245,simple,"6 - 32 X 1/2"" Fillister Slot",needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,automatic_taper_head
+555,FA247,FA247,simple,"6 - 32 X 5/8"" Hex Bolt",needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,flat_finishing_box
+556,FA249,FA249,simple,"8 - 32 x 3/16"" Set Screw",needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,hot_mud_pump
+557,FA252,FA252,simple,#8 Star Washer,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,hinged_nailspotter
+558,FA253,FA253,simple,#8 Flat Washer,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,automatic_taper_head
+559,FA254,FA254,simple,8 - 32 Nyloc Nut,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,automatic_taper_head
+560,FA256,FA256,simple,"8 - 32 X 3/16"" Pan Slot",needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,hot_mud_pump
+561,FA257,FA257,simple,"8 - 32 X 1/4"" Fillister Slot",needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,automatic_taper_head
+562,FA258,FA258,simple,"8 - 32 X 1/4"" Half Dog Set",needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,flat_finishing_box
+563,FA259,FA259,simple,"FA259 8 - 32 X 5/16"" Binder Slot",needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,hydra_reach_box_handle
+564,FA260,FA260,simple,"8 - 32 x 3/8"" Pan Slot",needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,hot_mud_pump
+565,FA261,FA261,simple,"8 - 32 X 3/8"" Socket Screw",needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,corner_flusher_box
+566,FA262,FA262,simple,"8 - 32 x 1/2"" Socket",needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,corner_flusher_box
+567,FA263,FA263,simple,8 - 32 x 5/8 Flat Head Screw (FA263),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,corner_box
+568,FA264,FA264,simple,"8 - 32 x 5/8"" Truss Slot",needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,automatic_taper_head
+569,FA265,FA265,simple,"8 - 32 X 3/4"" Truss Slot",needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,automatic_taper_head
+571,FA267,FA267,simple,"8 - 32 x 1 1/2"" Pan Slot",needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,automatic_taper_head
+572,FA268,FA268,simple,#10 Flat Washer,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,flat_finishing_box
+573,FA270,FA270,simple,"#10 x 3/4"" Fender Washer",needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,hot_mud_pump
+574,FA271,FA271,simple,10 - 24 Nyloc Nut,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,flat_finishing_box
+575,FA272,FA272,simple,10 - 24 Wing Nut,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,flat_finishing_box
+576,FA273,FA273,simple,"10 - 24 x 1"" Hex Bolt",needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,hot_mud_pump
+577,FA274,FA274,simple,"10 - 24 x 3/8"" Socket",needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,hot_mud_pump
+578,FA275,FA275,simple,"10 - 24 x 7/8"" Hex Bolt",needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,flat_finishing_box
+579,FA276,FA276,simple,"10 - 24 x 7/8"" Pan Slot",needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,180_grip_box_handle
+580,FA278,FA278,simple,Columbia #8 Belleville Washer,needs_review,part_missing_schematic_group,part,quote_only,,
+582,FA27A,FA27A,simple,6 - 32 x 1/4 Pan Head Screw (FA27A),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,automatic_taper
+583,FA28,FA28,simple,#8 Lock Washer (FA28),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,corner_roller
+584,FA280,FA280,simple,#10 Belleville Washer,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,flat_finishing_box
+585,FA281,FA281,simple,Columbia 10-32 X Nyloc Jam Nut-2 per pack,needs_review,part_missing_schematic_group,part,quote_only,,
+586,FA283,FA283,simple,"4 - 40 X 3/4"" Hex Bolt (FA283)",needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,automatic_taper
+587,FA284,FA284,simple,3/16 x 3/8 SS Pop Rivet (FA284),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,compound_tube
+588,FA285,FA285,simple,"1/4"" Plastic Washer (FA285)",needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,semi_automatic_taper
+589,FA286,FA286,simple,"1/4"" x 1/2"" Flat Washer",needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,hot_mud_pump
+590,FA287,FA287,simple,1/4 x 5/8 Split Pin (FA287),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,pump
+591,FA288,FA288,simple,"1/4"" X 3/4"" Split Pin",needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,corner_roller
+592,FA289,FA289,simple,"Columbia Split Pin 1/4"" X 2""",needs_review,part_missing_schematic_group,part,quote_only,,
+593,FA290,FA290,simple,1/4 - 20 Nyloc Nut (FA290),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,automatic_taper
+594,FA291,FA291,simple,1/4 - 20 Hex Nut,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,automatic_taper_body
+595,FA292,FA292,simple,1/4 - 20 Nyloc Jam Nut,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,hot_mud_pump
+596,FA294,FA294,simple,"1/4 - 20 x 38"" Socket",needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,hot_mud_pump
+597,FA295,FA295,simple,"1/4 x 1/2"" Flathead Socket",needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,automatic_taper_body
+598,FA296,FA296,simple,"1/4 - 20 x 1/2"" Hex Bolt",needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,corner_flusher_box
+599,FA297,FA297,simple,"1/4 - 20 x 5/8"" Socket",needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,hot_mud_pump
+600,FA298,FA298,simple,"1/4 - 20 x 7/8"" Flat Socket",needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,automatic_taper_body
+601,FA299,FA299,simple,"1/4 - 20 x 1 1/2"" Pan Phillips",needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,corner_roller
+602,FA2AS,FA2AS,simple,1/4 in Plastic Washer (FA285),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,automatic_taper
+603,FA2J0,FA2J0,simple,#10 Belleville Washer (FA280),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,automatic_taper
+604,FA2L3,FA2L3,simple,"4 - 40 X 3/4"" Hex Bolt (FA283)",needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,automatic_taper
+605,FA300,FA300,simple,"1/4 - 20 x 2"" Hex Bolt",needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,hot_mud_pump
+606,FA301,FA301,simple,"1/4 - 20 x 2 1/4"" Hex Bolt",needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,hot_mud_pump
+607,FA302,FA302,simple,"1/4 - 28 x 1/4"" Set Screw",needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,180_grip_box_handle
+608,FA303,FA303,simple,5 - 16 Flat Washer,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,hot_mud_pump
+609,FA304,FA304,simple,5/16 Flat Washer (FA - 304),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,pump
+610,FA305,FA305,simple,"5/16 - 18 x 3/4"" Hex Bolt",needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,hot_mud_pump
+611,FA306,FA306,simple,"5/16 - 18 x 1 1/4"" Hex Bolt",needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,hot_mud_pump
+612,FA307,FA307,simple,5 - 16 x 24 Jam Nut,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,hot_mud_pump
+613,FA308,FA308,simple,"1/2"" x 7/8"" Flat Washer",needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,hot_mud_pump
+614,FA309,FA309,simple,5/16 - 18 x 1/2 Socket Head Screw (FA309),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,corner_box
+615,FA311,FA311,simple,"1/4 - 28 X 1/2"" Socket Head",needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,180_grip_box_handle
+616,FA312,FA312,simple,"10 - 24 X 1/4"" Socket Hand Set",needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,180_grip_box_handle
+617,FA313,FA313,simple,1/4 - 20 X 1/4 Socket Head Set Screw,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,hot_mud_pump
+618,FA314,FA314,simple,10 - 24 X 1 - 1/2 Pan Slot (FA314),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,nailspotter
+619,FA315,FA315,simple,"FA315 10 - 32 X 3/8"" Flat Socket Head",needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,hydra_reach_box_handle
+620,FA316,FA316,simple,"10 - 32 X 1/2"" Flat Socket Head",needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,hydra_reach_box_handle
+621,FA317,FA317,simple,"5/32"" x 7/8"" Roll Pin",needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,matrix_handle
+622,FA318,FA318,simple,3/8 - 16 x 1 - 1/4 Hex Bolt (FA318),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,finishing_box
+623,FA320,FA320,simple,"1/4 - 28 - 3/8"" Socket Set Screw",needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,hydra_reach_box_handle
+624,FA323,FA323,simple,"1/4 - 20 X 1"" Hex Bolt (FA323)",needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,compound_tube
+625,FA324,FA324,simple,10 - 24 x 1/4 Set Screw (FA324),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,corner_flusher
+626,FA327,FA327,simple,8 - 32 x 1/4 Pan Head Screw (FA327),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,finishing_box
+627,FA328,FA328,simple,3/8 Flat Washer (FA328),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,finishing_box
+628,FA32S,FA32S,simple,"1/4 - 20 X 1"" Hex Bolt (FA323)",needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,automatic_taper
+629,FA337,FA337,simple,1/4 - 20 x 5/8 Flat Socket Head (FA337),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,semi_automatic_taper
+630,FA340,FA340,simple,1/4 - 20 x 1 - 1/4 Socket Head (FA340),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,semi_automatic_taper
+631,FA341,FA341,simple,1/4 - 20 x 1 - 3/4 Hex Bolt (FA341),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,semi_automatic_taper
+632,FA342,FA342,simple,1/4 - 20 x 3/4 Hex Bolt (FA342),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,automatic_taper
+633,FA345,FA345,simple,1/4 x 1/4 Roll Pin (FA345),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,semi_automatic_taper
+634,FA346,FA346,simple,1/4 Star Washer (FA346),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,pump
+635,FA350,FA350,simple,5/16 - 18 x 7/8 Socket Head Screw (FA350),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,pump
+636,FA355,FA355,simple,3/8 - 16 x 5/8 Flat Head Screw (FA355),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,corner_roller
+637,FA358,FA358,simple,3/8 - 16 Nyloc Nut (FA358),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,corner_roller
+638,FA359,FA359,simple,3/8 x 1/2 Roll Pin (FA359),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,corner_roller
+639,FA360,FA360,simple,3/8 Lock Washer (FA360),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,corner_roller
+640,FA362,FA362,simple,10 - 24 x 3/4 Flat Head Screw (FA362),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,automatic_taper
+641,FA364,FA364,simple,8 - 32 x 5/8 Hex Bolt (FA364),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,sander
+642,FA365,FA365,simple,"3/16 x 1"" Sping Pin SS",needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,matrix_handle
+643,FA366,FA366,simple,8 - 32 x 3/8 Pan Head Screw (FA366),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,sander
+644,FA371,FA371,simple,10 - 24 x 7/8 Hex Bolt (FA371),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,nailspotter
+645,FA374,FA374,simple,10 - 32 x 1/4 Flat Head Screw (FA374),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,automatic_taper
+646,FA375,FA375,simple,10 - 32 x 3/8 Flat Head Screw (FA375),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,nailspotter
+647,FA376,FA376,simple,8 - 32 x 5/16 SS Socket Head,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,matrix_handle
+648,FA377,FA377,simple,6 - 32 x 1/4 Flat Head Screw (FA377),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,corner_flusher
+649,FA379,FA379,simple,"1/4"" SS E - Clip",needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,matrix_handle
+650,FA380,FA380,simple,"1/8"" SS E - Clip",needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,matrix_handle
+651,FA382,FA382,simple,"10 - 32 x 1/4"" SS Set Screw",needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,matrix_handle
+652,FA390,FA390,simple,6 - 32 x 7/8 Pan Head Screw (FA390),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,semi_automatic_taper
+653,FA391,FA391,simple,6 - 32 x 1 Pan Head Screw (FA391),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,semi_automatic_taper
+654,FA392,FA392,simple,6 - 32 x 1 - 1/4 Pan Head Screw (FA392),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,semi_automatic_taper
+655,FA393,FA393,simple,6 - 32 x 1 - 1/2 Pan Head Screw (FA393),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,finishing_box
+656,FA526,FA526,simple,3/8 - 16 x 1 Hex Bolt (FA526),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,automatic_taper
+657,FAJ144,FAJ144,simple,Predator Joint Fastener 14 - 4 (FAJ144),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,automatic_taper
+658,FAJ706,FAJ706,simple,Predator Joint Fastener 70 - 6 (FAJ706),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,automatic_taper
+659,FAS46,FAS46,simple,Predator Taper 4 - 40 x 5/16 Set Screw (FAS46),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,automatic_taper
+660,FAZ07,FAZ07,simple,Predator Taper 4 - 40 x 3/16 Binder Slot (FAZ07),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,automatic_taper
+661,FAZ0A,FAZ0A,simple,Predator Taper 4 - 40 Lock Washer (FAZ0A),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,automatic_taper
+662,FAZ10,FAZ10,simple,Predator Taper 4 - 40 x 1/4 Fillister Slot (FAZ10),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,automatic_taper
+663,FAZ14,FAZ14,simple,Predator Taper 4 - 40 x 3/8 Hex Bolt (FAZ14),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,automatic_taper
+664,FAZ1S,FAZ1S,simple,Predator Taper 4 - 40 x 1/8 Set Screw (FAZ1S),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,automatic_taper
+665,FAZ20,FAZ20,simple,Predator Taper 6 - 32 x 3/4 Hex Bolt (FAZ20),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,automatic_taper
+666,FAZ21S,FAZ21S,simple,Predator Taper 6 - 32 x 1/8 Set Screw (FAZ21S),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,automatic_taper
+667,FAZ2R,FAZ2R,simple,Predator Taper 6 - 32 Nyloc Nut (FAZ2R),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,automatic_taper
+668,FAZ48,FAZ48,simple,Predator Taper 5/16 - 18 x 3/4 Hex Bolt (FAZ48),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,automatic_taper
+669,FAZ54,FAZ54,simple,Predator Taper 3/8 - 16 x 3/4 Socket Head (FAZ54),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,automatic_taper
+670,FAZ5S,FAZ5S,simple,Predator Taper 8 - 32 x 1/4 Set Screw (FAZ5S),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,automatic_taper
+671,FAZ6S,FAZ6S,simple,Predator Taper 8 - 32 x 3/16 Set Screw (FAZ6S),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,automatic_taper
+672,FAZOR,FAZOR,simple,Predator Taper 4 - 40 O - Ring (FAZOR),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,automatic_taper
+673,FCMR15X18MM,FCMR1-5X18MM,simple,Columbia Corner Mud Roller Replacement,needs_review,part_missing_schematic_group,part,purchasable,,
+674,FF812,FF8-12,simple,"Adjuster Dial Assy (5.5,7,8,10)",needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,finishing_box
+675,FF819,FF8-19,simple,Brass Adjuster Pin (FFB19),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,finishing_box
+676,FF832,FF8-32,simple,Thumb Release Clip (FFB32),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,finishing_box
+677,FF84C,FF8-4C,simple,Flat Box Corner Blade Assembly 4 in (FFB4C),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,finishing_box
+678,FF8A1010,FF8A-10-10,simple,Blade Bar Assembly 10 in (FFBA10 - 10),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,finishing_box
+679,FFB16A,FFB-16A,simple,Flat Box Handle Bracket 16A (FFB 16A),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,finishing_box
+680,FFB2S10,FFB-2S-10,simple,Flat Box Side Plate 10 in Short (FFB 2S - 10),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,finishing_box
+681,FFBSA,FFB-SA,simple,Flat Box Side Arm Assembly (FFB SA),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,finishing_box
+682,FFB1010,FFB10-10,simple,Flat Box Side Cover 10 in (FFB10 - 10),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,finishing_box
+683,FFB11,FFB11,simple,"Adjuster Spring (7,8,10)",needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,finishing_box
+684,FFB1110,FFB11-10,simple,"Adjuster Spring - 10""",needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,flat_finishing_box
+685,FFB1112,FFB11-12,simple,"Adjuster Spring - 12""",needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,flat_finishing_box
+686,FFB118,FFB11-8,simple,"Adjuster Spring - 8""",needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,flat_finishing_box
+687,FFB12,FFB12,simple,Adjuster Dial Assembly 12 in (FFB12),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,finishing_box
+688,FFB16,FFB16,simple,Door Spring Nut,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,flat_finishing_box
+689,FFB17,FFB17,simple,Door Spring,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,flat_finishing_box
+690,FFB18,FFB18,simple,"Rear Plate 8"" (FFB1 - 8)",needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,finishing_box
+691,FFB19,FFB19,simple,Brass Adjuster Pin (FFB19),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,finishing_box
+692,FFB1A,FFB1A,simple,Nail Spotter Flat Plate 1A (FFB1A),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,nailspotter
+693,FFB1B,FFB1B,simple,Flat Box Body 1B (FFB1B),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,finishing_box
+694,FFB210,FFB2-10,simple,"Roll Face 10"" (FFB2 - 10)",needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,finishing_box
+695,FFB2410,FFB24-10,simple,Flat Box Wheel Axle 24 in 10 in (FFB24 - 10),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,finishing_box
+696,FFB2510,FFB25-10,simple,"10"" Rubber Gasket Retainer",needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,flat_finishing_box
+697,FFB2512,FFB25-12,simple,"12"" Rubber Gasket Retainer",needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,flat_finishing_box
+698,FFB2A,FFB2A,simple,Bushing (FFB2A),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,finishing_box
+699,FFB32,FFB32,simple,Door Stop,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,flat_finishing_box
+700,FFB32A,FFB32A,simple,Thumb Release Clip Screw,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,flat_finishing_box
+701,FFB35,FFB35,simple,Flat Box Spring Assembly (FFB35),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,finishing_box
+702,FFB36,FFB36,simple,Box Wheel,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,flat_finishing_box
+703,FFB37,FFB37,simple,Rubber for Box Wheel,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,flat_finishing_box
+704,FFB38,FFB38,simple,Nyliner Bearing,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,flat_finishing_box
+705,FFB39,FFB39,simple,Hex Bolt,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,flat_finishing_box
+706,FFB4010,FFB40-10,simple,Flat Box Door Gasket 10 in (FFB40 - 10),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,finishing_box
+707,FFB4010IN,FFB40-10IN,simple,Flat Box Door Gasket 10 in (FFB40 - 10),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,finishing_box
+708,FFB41,FFB41,simple,Flat Box Axle Assembly (FFB41),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,finishing_box
+709,FFB42,FFB42,simple,Flat Box Door Pivot (FFB 42),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,finishing_box
+710,FFB43,FFB43,simple,Bead Wheel Bushing (FFB43),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,finishing_box
+711,FFB44,FFB44,simple,Flat Box Door Pivot Pin (FFB44),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,finishing_box
+712,FFB4A,FFB4A,simple,Stainless Steel Washer,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,flat_finishing_box
+713,FFB4B,FFB4B,simple,Stainless Steel Backing Washer,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,flat_finishing_box
+714,FFB4C,FFB4C,simple,Flat Box Corner Blade Assembly 4 in (FFB4C),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,finishing_box
+715,FFB510,FFB5-10,simple,"Axle - 10""",needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,flat_finishing_box
+716,FFB512,FFB5-12,simple,"Axle - 12""",needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,flat_finishing_box
+717,FFB514,FFB5-14,simple,"Axle - 14""",needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,flat_finishing_box
+718,FFB57,FFB5-7,simple,"Axle - 7""",needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,flat_finishing_box
+719,FFB58,FFB5-8,simple,"Axle - 8""",needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,flat_finishing_box
+720,FFB5A,FFB5A,simple,Axel Bushing,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,flat_finishing_box
+721,FFB7,FFB7,simple,Shoe - Right,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,flat_finishing_box
+722,FFB7A,FFB7A,simple,Shoe - Left,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,flat_finishing_box
+723,FFB8,FFB8,simple,Bar Retainer Clip,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,flat_finishing_box
+724,FFB910,FFB9-10,simple,"Blade - 10""",needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,flat_finishing_box
+725,FFB912,FFB9-12,simple,"Blade - 12""",needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,flat_finishing_box
+726,FFB914,FFB9-14,simple,"Blade 14""",needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,flat_finishing_box
+727,FFB955,FFB9-5-5,simple,"Blade 5.5""",needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,flat_finishing_box
+728,FFB97,FFB9-7,simple,"Blade - 7""",needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,flat_finishing_box
+729,FFB98,FFB9-8,simple,"Blade - 8""",needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,flat_finishing_box
+730,FFH14,FFH14,simple,Handle Grip (FFH14),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,pump
+731,FG3A,FG-3A,simple,Flat Box Angle Guide 3A (FG3A),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,handle
+732,FG445,FG4-45,simple,Flat Box 45 Degree Corner Guide 4 in (FG4 - 45),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,handle
+733,FR258,FR258,simple,Predator Taper Frame Reinforcement (FR258),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,automatic_taper
+734,FRZ13,FRZ13,simple,Predator Taper Zinc Frame Rivet (FRZ13),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,automatic_taper
+735,FX242,FX242,simple,Predator Taper Flex Connector (FX242),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,automatic_taper
+736,H1,H-1,simple,Hot Mud Pump Cylinder (HP1),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,handle
+737,HB48B,HB48B,simple,Hot Mud Pump Handle B (HB48B),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,pump
+738,HFB17,HFB-17,simple,Heavy Flat Box Wheel Set (HFFB17),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,finishing_box
+739,HFBB1410,HFBB14-10,simple,Hinged Door Gasket 10 in Fat Boy (HFBB14 - 10),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,finishing_box
+740,HFFB1A,HFFB-1A,simple,Heavy Flat Box Body 1A (HFFB1A),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,finishing_box
+741,HFFB110,HFFB1-10,simple,10 in Heavy Flat Box Body (HFFB1 - 10),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,finishing_box
+742,HFFB1410,HFFB14-10,simple,"10"" Flat Box Hinged Door Gasket",needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,flat_finishing_box
+743,HFFB1410IN,HFFB14-10IN,simple,"HFFB14 - 10 - 10"" Flat Box Hinged Door Gasket",needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,finishing_box
+744,HFFB1412,HFFB14-12,simple,"12"" Flat Box Hinged Door Gasket",needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,flat_finishing_box
+745,HFFB1414,HFFB14-14,simple,"14"" Flat Box Hinged Door Gasket",needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,flat_finishing_box
+746,HFFB148,HFFB14-8,simple,"8"" Flat Box Hinged Door Gasket",needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,flat_finishing_box
+747,HFFB1A10,HFFB1A-10,simple,"Mud Seal Strip - 10""",needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,flat_finishing_box
+748,HFFB3,HFFB3,simple,Hinge Box End Plate - Right,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,flat_finishing_box
+749,HFFB3A,HFFB3A,simple,Hinge Box End Plate - Left,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,flat_finishing_box
+750,HFFB410,HFFB4-10,simple,10 in Heavy Flat Box Door (HFFB4 - 10),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,finishing_box
+751,HFFB4D,HFFB4D,simple,Nylatron Bushing,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,flat_finishing_box
+752,HH10EXTLONG,HH10-EXTLONG,simple,Octogon Tube for Hydro Handle for COL88 (HH10),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,handle
+753,HH10A,HH10A,simple,Top Cap,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,hydra_reach_box_handle
+754,HH10B,HH10B,simple,Bottom Cap,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,hydra_reach_box_handle
+755,HH12,HH12,simple,Brake Spring,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,hydra_reach_box_handle
+756,HH13,HH13,simple,Brake Pin,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,hydra_reach_box_handle
+757,HH14,HH14,simple,Brake Piston,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,hydra_reach_box_handle
+758,HH15,HH15,simple,Grip Sleeve Octagon,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,hydra_reach_box_handle
+759,HH16,HH16,simple,Piston Housing,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,hydra_reach_box_handle
+760,HH16A,HH16A,simple,Bleeder Screw,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,hydra_reach_box_handle
+761,HH17A,HH17A,simple,Brass Connector 1,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,hydra_reach_box_handle
+762,HH17B,HH17B,simple,Brass Connector 2,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,hydra_reach_box_handle
+763,HH17C,HH17C,simple,Line Pincher,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,hydra_reach_box_handle
+764,HH19,HH19,simple,Cap,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,hydra_reach_box_handle
+765,HH2,HH2,simple,Upper Mounting Bracket,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,hydra_reach_box_handle
+766,HH21,HH21,simple,Reservoir Piston Spring for COL88 (HH21),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,corner_roller
+767,HH23,HH23,simple,Piston O - Ring,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,hydra_reach_box_handle
+768,HH30,HH30,simple,Extension Release Trigger,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,matrix_handle
+769,HH31,HH31,simple,Release Clip Pin,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,matrix_handle
+770,HH32,HH32,simple,Release Clip Washer,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,matrix_handle
+771,HH33,HH33,simple,Rlease Trigger Spring,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,matrix_handle
+772,HH35,HH35,simple,Handle Grip,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,matrix_handle
+773,HH5,HH5,simple,Extension Housing,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,matrix_handle
+774,HH7,HH7,simple,Brake,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,hydra_reach_box_handle
+775,HH8,HH8,simple,Handle Tube,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,matrix_handle
+776,HH9,HH9,simple,Coiled Hydraulic Line,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,hydra_reach_box_handle
+777,HNS3,HNS-3,simple,Nail Spotter Front Plate (HNS3),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,nailspotter
+778,HNS10,HNS10,simple,Door Spring Long,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,hinged_nailspotter
+779,HNS10A,HNS10A,simple,Door Spring Short,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,hinged_nailspotter
+780,HNS12,HNS12,simple,Handle Clamp,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,hinged_nailspotter
+781,HNS12A,HNS12A,simple,Roll Pin,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,hinged_nailspotter
+782,HNS13,HNS13,simple,Roll Pin Bushing,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,hinged_nailspotter
+783,HNS14PR,HNS14-PR,simple,Nail Spotter 14 in Pad and Rod Assembly (HNS14PR),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,nailspotter
+784,HNS14A,HNS14A,simple,Handle Link New Style (HNS14A),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,nailspotter
+785,HNS152,HNS15-2,simple,"Door Gasket 2""",needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,hinged_nailspotter
+786,HNS153,HNS15-3,simple,"Door Gasket 3""",needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,hinged_nailspotter
+787,HNS17A,HNS17A,simple,Nail Spotter Handle Tightness Screw,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,hinged_nailspotter
+788,HNS18,HNS18,simple,Pivot,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,hinged_nailspotter
+789,HNS193,HNS19-3,simple,Triangle Shoe 3 in (HNS19 - 3”),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,nailspotter
+790,HNS23,HNS2-3,simple,Nail Spotter Front Plate (HNS3),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,nailspotter
+791,HNS20,HNS20,simple,Wedge,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,hinged_nailspotter
+792,HNS2A,HNS2A,simple,Rollface Post (HNS2A),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,nailspotter
+793,HNS42,HNS4-2,simple,"Door 2""",needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,hinged_nailspotter
+794,HNS43,HNS4-3,simple,"Door 3""",needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,hinged_nailspotter
+795,HNS72,HNS7-2,simple,"Blade 2""",needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,hinged_nailspotter
+796,HNS73,HNS7-3,simple,"Blade 3""",needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,hinged_nailspotter
+797,HNS82,HNS8-2,simple,"Blade Holder 2""",needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,hinged_nailspotter
+798,HNS83,HNS8-3,simple,"Blade Holder 3""",needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,hinged_nailspotter
+799,HNS93,HNS9-3,simple,Face Plate 3 in (HNS9 - 3”),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,nailspotter
+800,HNSA14,HNSA-14,simple,HNSA14 - Handle Link Assembly,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,hinged_nailspotter
+801,HP1,HP1,simple,Pump Cylinder,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,hot_mud_pump
+802,HP4,HP4,simple,Hot Mud Pump Piston Assembly (HP4),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,pump
+803,HP44,HP44,simple,Collar O - Ring,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,hot_mud_pump
+804,HP45,HP45,simple,O Ring Enclosure,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,hot_mud_pump
+805,HP46,HP46,simple,Latch Keeper,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,hot_mud_pump
+806,HP47,HP47,simple,Latch Clamp Assembly,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,hot_mud_pump
+807,HP48,HP48,simple,Handle Pin (HP48),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,pump
+808,HP48A,HP48A,simple,Hot Mud Pump HP48 Body A (HP48A),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,pump
+809,HP48B,HP48B,simple,Hot Mud Pump HP48 Body B (HP48B),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,pump
+810,HP48L,HP48L,simple,Hot Mud Pump HP48 Long Body (HP48L),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,pump
+811,HPA48,HPA-48,simple,HPA48 - Handle Pin Assembly,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,hot_mud_pump
+812,ICA1,ICA-1,simple,Inside Corner Applicator Body (ICA1),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,applicator
+813,ICA2,ICA-2,simple,Inside Corner Applicator Axle (ICA2),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,applicator
+814,ICA3,ICA-3,simple,Inside Corner Applicator Wheel (ICA3),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,applicator
+815,ICA4L,ICA-4L,simple,Inside Corner Applicator Left Frame Sub - Assembly (ICA4L),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,applicator
+816,ICA4R,ICA-4R,simple,Inside Corner Applicator Right Frame Sub - Assembly (ICA4R),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,applicator
+817,ICATW1,ICATW-1,simple,Inside 90 Applicator with Wheels (ICATW),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,applicator
+818,ICATW2,ICATW-2,simple,Inside 90 Applicator with Wheels (ICATW),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,applicator
+819,LT06,LT06,simple,Predator Taper Lightweight Frame Bracket (LT06),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,automatic_taper
+820,LT54,LT54,simple,Predator Taper Titanium Pull Rod 54 (LT54),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,automatic_taper
+821,MH14,MH-14,simple,Matrix Extendable Flat Box Handle (MH),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,handle
+822,MH9,MH-9,simple,CTTMH9 (MH9),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,handle
+823,MH1,MH1,simple,Handle Mount Plate,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,matrix_handle
+824,MH10,MH10,simple,Octagon,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,matrix_handle
+825,MH11,MH11,simple,Handle Grip Bushing,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,matrix_handle
+826,MH12,MH12,simple,PinchBrake Spring,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,matrix_handle
+827,MH13,MH13,simple,Large Nyliner Bushing,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,matrix_handle
+828,MH15,MH15,simple,Pinch Brake Activator,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,matrix_handle
+829,MH16,MH16,simple,Connecting Rod Housing,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,matrix_handle
+830,MH17,MH17,simple,Pinch Brake,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,matrix_handle
+831,MH18,MH18,simple,Pinch Brake Housing,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,matrix_handle
+832,MH19,MH19,simple,Pinch Brake Sleeve,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,matrix_handle
+833,MH2,MH2,simple,Matrix Handle Head,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,matrix_handle
+834,MH20,MH20,simple,Small Nyliner Bushing,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,matrix_handle
+835,MH21,MH21,simple,Grip Adjuster Housing,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,matrix_handle
+836,MH22,MH22,simple,Grip Adjustment Pin,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,matrix_handle
+837,MH23,MH23,simple,Grip Adjusting Fastener,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,matrix_handle
+838,MH24,MH24,simple,Pinch Brake Bushing,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,matrix_handle
+839,MH25,MH25,simple,Pinch Brake Stem,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,matrix_handle
+840,MH3,MH3,simple,Lower Mount Bracket,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,matrix_handle
+841,MH3A,MH3A,simple,Mounting Bracket Stem,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,matrix_handle
+842,MH4,MH4,simple,Handle Grip,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,matrix_handle
+843,MH5,MH5,simple,Connecting Link Pin,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,matrix_handle
+844,MH6,MH6,simple,Hinge Pin,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,matrix_handle
+845,MH7,MH7,simple,Connecting Link Fork,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,matrix_handle
+846,MH8,MH8,simple,Brake Rod Bushing,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,matrix_handle
+848,MH9A,MH9A,simple,Brake Activation Rod,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,matrix_handle
+849,MP27,MP-27,simple,Mud Pump O - Ring Retainer (MP27),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,pump
+850,MP27B,MP-27B,simple,Mud Pump O - Ring Retainer B (MP27B),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,pump
+851,MP27C,MP-27C,simple,Mud Pump O Ring Retainer - MP27C (MP - 27C),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,pump
+852,MP34,MP-34,simple,Adaptor (MP34),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,pump
+853,MP9,MP-9,simple,Standard Fitting (MP9),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,pump
+854,MP9A,MP-9A,simple,Connecting Chain (MP9A),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,pump
+855,MP11,MP11,simple,Piston Shaft,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,hot_mud_pump
+856,MP13,MP13,simple,Piston Backing Washer (Large),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,hot_mud_pump
+857,MP13A,MP13A,simple,Piston Backing Washer (Small),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,hot_mud_pump
+858,MP14,MP14,simple,Piston Cup,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,hot_mud_pump
+859,MP2,MP2,simple,Foot Valve Casting,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,hot_mud_pump
+860,MP23,MP23,simple,Mud Pump Seal,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,hot_mud_pump
+861,MP23A,MP23A,simple,O - Ring,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,hot_mud_pump
+862,MP24,MP24,simple,Mud Pump Screen,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,hot_mud_pump
+863,MP25,MP25,simple,Filler Studs,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,hot_mud_pump
+864,MP28,MP28,simple,Filler Nut,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,hot_mud_pump
+865,MP3,MP3,simple,Pump Flapper Valve,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,hot_mud_pump
+866,MP32,MP32,simple,Backing Washer Locator,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,hot_mud_pump
+867,MP33,MP33,simple,Filler Gasket,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,hot_mud_pump
+868,MP33A,MP33A,simple,Mud Pump Spring Assembly (MP33A),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,pump
+869,MP36,MP36,simple,Nylatron Bushing,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,hot_mud_pump
+870,MP39,MP39,simple,Sleeve,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,hot_mud_pump
+871,MP5,MP5,simple,Head Bushing,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,hot_mud_pump
+872,MP6,MP6,simple,Handle Link,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,hot_mud_pump
+873,MP7,MP7,simple,Pump Handle,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,hot_mud_pump
+874,MP7A,MP7A,simple,Mud Pump Foot Valve A (MP7A),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,pump
+875,MP7B,MP7B,simple,Mud Pump O - Ring Retainer B (MP7B),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,pump
+876,MP7C,MP7C,simple,Mud Pump O - Ring Retainer C (replaces MP7D),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,pump
+877,MP7D,MP7D,simple,Special Nut for Pump Handle (MP7D),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,pump
+878,MP7E,MP7E,simple,Mud Pump Foot Valve E (MP7E),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,pump
+879,MP8,MP8,simple,Leg,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,purchasable,,hot_mud_pump
+880,MP8A,MP8A,simple,Mud Pump Valve Spring A (MP8A),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,pump
+881,MP8B,MP8B,simple,Mud Pump Valve Spring B (MP8B),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,pump
+882,MP9C,MP9C,simple,Connecting Link (MP9C),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,automatic_taper
+883,MRR12,MRR12,simple,Columbia 2K Drywall Mud Roller Replacement,needs_review,part_missing_schematic_group,part,purchasable,,
+884,MRW,MRW,simple,Columbia Mud Roller Washer,needs_review,part_missing_schematic_group,part,purchasable,,
+885,NOLI,NOLI,simple,NOLI,needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,automatic_taper
+886,OCR1,OCR-1,simple,Corner Roller Head Casting CR1 (CR1),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,corner_roller
+887,OCR2A,OCR-2A,simple,Roller Wheel CR2 (CR2),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,corner_roller
+888,OCR2B,OCR-2B,simple,Roller Wheel CR2 (CR2),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,corner_roller
+889,OCR2C,OCR-2C,simple,Roller Wheel CR2 (CR2),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,corner_roller
+890,OCR2D,OCR-2D,simple,Roller Wheel CR2 (CR2),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,corner_roller
+891,OCR3,OCR-3,simple,Corner Roller Bearing Sleeve CR3 (CR3),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,corner_roller
+892,OCR3A,OCR-3A,simple,Corner Roller Bearing Sleeve CR3 (CR3),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,corner_roller
+893,OCR5,OCR-5,simple,Corner Roller Wheel CR5 (CR5),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,corner_roller
+894,OCR6,OCR-6,simple,Corner Roller Handle Mounting Swivel CR6 (CR6),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,corner_roller
+895,PA214,PA214,simple,Predator Taper Head Assembly 14 in (PA214),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,automatic_taper
+896,PA266,PA266,simple,Predator Taper Head Sub Assembly (PA266),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,automatic_taper
+897,PA277,PA277,simple,Predator Taper Creaser Arm Assembly (PA277),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,automatic_taper
+898,PA2LS,PA2LS,simple,Predator Taper Left Side Assembly (PA2LS),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,automatic_taper
+899,PA2S4,PA2S4,simple,Predator Taper Side Plate Assembly (PA2S4),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,automatic_taper
+900,PACTS,PACTS,simple,Predator Taper Cam Track Spring (PACTS),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,automatic_taper
+901,PAS07,PAS07,simple,Predator Taper Pivot Assembly Small (PAS07),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,automatic_taper
+902,PAS80,PAS80,simple,Predator Taper Pull Rod Assembly (PAS80),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,automatic_taper
+903,PASS9,PASS9,simple,Predator Taper Spring Set (PASS9),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,automatic_taper
+904,PAZ20,PAZ20,simple,Predator Taper Zinc Cam Roller (PAZ20),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,automatic_taper
+905,PAZ49,PAZ49,simple,Predator Taper Zinc Pivot Pin (PAZ49),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,automatic_taper
+906,S1,S1,simple,Sander Head Main Body (S1),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,sander
+907,S2,S2,simple,Sander Head Pivot Pin (S2),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,sander
+908,S3,S3,simple,Sander Head Return Spring (S3),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,sander
+909,S4,S4,simple,Sander Head Pivot Washer (S4),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,sander
+910,S5,S5,simple,Sander Head Retainer Clip (S5),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,sander
+911,S6,S6,simple,Sander Head Swivel Bearing (S6),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,sander
+913,SB112IN,SB1-12IN,simple,Tomahawk 12 in Smoothing Blade (SB1 - 12),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,smoothing_blade
+914,SB212IN,SB2-12IN,simple,"Replacement 12"" Blade for Tomahawk SB2 - 12 (SB2 - 12)",needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,smoothing_blade
+915,SB3LEFT,SB3-LEFT,simple,Tomahawk Left Arm Assembly (SB3 - LEFT),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,smoothing_blade
+916,SB4RIGHT,SB4-RIGHT,simple,Tomahawk Right Arm Assembly (SB4 - RIGHT),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,smoothing_blade
+917,SB5SB6,SB5-SB6,simple,Tomahawk Blade Holder Spring (SB5),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,smoothing_blade
+918,SB7,SB7,simple,Tomahawk Handle Fitting (SB7),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,smoothing_blade
+919,SF5,SF5,simple,Columbia Shrink Fit Comfort Grips for Welded Stainless Steel Joint Knives,needs_review,part_missing_schematic_group,part,purchasable,,
+920,VAZ10,VAZ10,simple,Predator Taper Valve Assembly Zinc (VAZ10),needs_review,schematic_group_present_compatible_tool_skus_needs_mapping,part,quote_only,,automatic_taper
+921,1,1,simple,Leg Band w/ Pads,needs_review,part_missing_schematic_group,part,quote_only,,
+922,10,10,simple,Adjustable Heel Piece,needs_review,part_missing_schematic_group,part,quote_only,,
+923,1000,1000,simple,Strap-on Adapters - Exterior,needs_review,part_missing_schematic_group,part,quote_only,,
+924,1092,1092,simple,NYLON FOOT PLATE KIT (C) (2 PACK),needs_review,part_missing_schematic_group,part,quote_only,,
+925,11,11,simple,Nylon Leg Bearing,needs_review,part_missing_schematic_group,part,quote_only,,
+926,1127,1127,simple,Bolt Nut Washer & Leg Bearing Dura-Pack,needs_review,part_missing_schematic_group,part,quote_only,,
+927,12,12,simple,"1/4"" Flat Washer",needs_review,part_missing_schematic_group,part,quote_only,,
+928,13,13,simple,"1/4"" - 20 Locknut",needs_review,part_missing_schematic_group,part,quote_only,,
+929,14,14,simple,"1/4"" - 20 Hexnut",needs_review,part_missing_schematic_group,part,quote_only,,
+931,1422US,1422US,variation,"Dura-III Stilts Uni-Strut - 14""- 22""",needs_review,variation_missing_price_hidden_until_priced,variation,hidden_reference,DSDURAIII,
+932,15,15,simple,Spring Adjuster,needs_review,part_missing_schematic_group,part,quote_only,,
+933,16,16,simple,Spring w/ Bearings,needs_review,part_missing_schematic_group,part,quote_only,,
+934,161,161,simple,2440 Upper Coil Spring w/ Green Bearings,needs_review,part_missing_schematic_group,part,quote_only,,
+935,1644,1644,simple,Coil Spring Part Pack,needs_review,part_missing_schematic_group,part,quote_only,,
+936,16441,16441,simple,Upper/Lower Spring Kit,needs_review,part_missing_schematic_group,part,quote_only,,
+937,18,18,simple,Nylon Spring Bearing,needs_review,part_missing_schematic_group,part,quote_only,,
+938,1830US,1830US,variation,"Dura-III Stilts Uni-Strut - 18""- 30""",needs_review,variation_missing_price_hidden_until_priced,variation,hidden_reference,DSDURAIII,
+939,19,19,simple,"#8 Self Threading Screw - 3/8""",needs_review,part_missing_schematic_group,part,quote_only,,
+940,2,2,simple,Leg Band Spacer,needs_review,part_missing_schematic_group,part,quote_only,,
+941,20,20,simple,Spring Divider #20,needs_review,part_missing_schematic_group,part,quote_only,,
+942,201,201,simple,Leg Band w/ Pads & Screws Part Pack,needs_review,part_missing_schematic_group,part,quote_only,,
+943,204,204,simple,Leg Strap and Buckle,needs_review,part_missing_schematic_group,part,quote_only,,
+944,21,21,simple,Large Leg Band Support Washer,needs_review,part_missing_schematic_group,part,quote_only,,
+945,210,210,simple,Adjustable Heel Bracket w/ Screws Part Pack,needs_review,part_missing_schematic_group,part,quote_only,,
+946,22,22,simple,1/4x7 1/8 Stud Bolt Threaded Both Ends,needs_review,part_missing_schematic_group,part,quote_only,,
+950,24,24,simple,"1/4-20x1/2"" Mach Bolt",needs_review,part_missing_schematic_group,part,quote_only,,
+951,2440US,2440US,variation,"Dura-III Stilts Uni-Strut - 24""- 40""",needs_review,variation_missing_price_hidden_until_priced,variation,hidden_reference,DSDURAIII,
+952,245,245,simple,Complete Spring Assembly Part Pack,needs_review,part_missing_schematic_group,part,quote_only,,
+953,26A,26A,simple,Floor Plate,needs_review,part_missing_schematic_group,part,quote_only,,
+954,26B,26B,simple,Floor Plate w/ Soles,needs_review,part_missing_schematic_group,part,quote_only,,
+955,27,27,simple,"1/4-20""x3 1/8 Cap Screw",needs_review,part_missing_schematic_group,part,quote_only,,
+956,278,278,simple,Arch Strap & Toe Strap Buckle Part Pack,needs_review,part_missing_schematic_group,part,quote_only,,
+957,28,28,simple,1/4-20x1 1/2 Cap Screw With Square Nut,needs_review,part_missing_schematic_group,part,quote_only,,
+959,3,3,simple,2 in Dura-Stilts Flat Head Machine Screw w/ Nut,needs_review,part_missing_schematic_group,part,quote_only,,
+962,32,32,simple,1/4-20x1 1/2 Cap Screw With Hex Nut,needs_review,part_missing_schematic_group,part,quote_only,,
+964,35,35,simple,Strap Mounting Screw w/ Nylon Washer,needs_review,part_missing_schematic_group,part,quote_only,,
+965,37,37,simple,"No. 8x3/8"" Screws For Soles",needs_review,part_missing_schematic_group,part,quote_only,,
+966,4,4,simple,Leg Strap & Buckle,needs_review,part_missing_schematic_group,part,quote_only,,
+967,42,42,simple,Wing Bolt,needs_review,part_missing_schematic_group,part,quote_only,,
+968,44,44,simple,Lower Coil Spring,needs_review,part_missing_schematic_group,part,quote_only,,
+969,441,441,simple,2440 Lower Coil Spring Bearing,needs_review,part_missing_schematic_group,part,quote_only,,
+970,442,442,simple,Wing Bolt Part Pack,needs_review,part_missing_schematic_group,part,quote_only,,
+971,446,446,simple,Sole w/ Screws,needs_review,part_missing_schematic_group,part,quote_only,,
+972,45,45,simple,Entire Spring Assembly,needs_review,part_missing_schematic_group,part,quote_only,,
+973,46A,46A,simple,Sole w/ Screw,needs_review,part_missing_schematic_group,part,quote_only,,
+974,47B,47B,simple,Adjustable Forward leg for DS 1830,needs_review,part_missing_schematic_group,part,quote_only,,
+975,47C,47C,simple,D24 Forward Leg,needs_review,part_missing_schematic_group,part,quote_only,,
+977,4849,4849,simple,Nylon Extension Tube Sleeve Part Pack,needs_review,part_missing_schematic_group,part,quote_only,,
+979,50A1,50A1,simple,ADJ LEFT REARLEG DS1422 (SILVER),needs_review,part_missing_schematic_group,part,quote_only,,
+980,50A2,50A2,simple,DS1422 Right Rear Adjustable Leg,needs_review,part_missing_schematic_group,part,quote_only,,
+981,50B1,50B1,simple,Adj Left Rear Leg DS1830 (silver),needs_review,part_missing_schematic_group,part,quote_only,,
+982,50B2,50B2,simple,Adjustable Right Rear Leg DS1830 (Silver),needs_review,part_missing_schematic_group,part,quote_only,,
+983,50C1,50C1,simple,Adjustable Left Rear Leg #2440,needs_review,part_missing_schematic_group,part,quote_only,,
+984,50C2,50C2,simple,Adjustable Right Rear Leg #2440,needs_review,part_missing_schematic_group,part,quote_only,,
+990,561,561,simple,"14""-22"" Forward Adjustable Leg",needs_review,part_missing_schematic_group,part,quote_only,,
+991,562,562,simple,18”-30” Forward Adjustable Leg,needs_review,part_missing_schematic_group,part,quote_only,,
+992,563,563,simple,24”-40” Forward Adjustable Leg,needs_review,part_missing_schematic_group,part,quote_only,,
+993,57138,57138,simple,Left Rear Adjustable Leg,needs_review,part_missing_schematic_group,part,quote_only,,
+996,6,6,simple,Truss Head Screw w/ Nut,needs_review,part_missing_schematic_group,part,quote_only,,
+997,7,7,simple,Arch Strap w/ Buckle,needs_review,part_missing_schematic_group,part,quote_only,,
+998,8,8,simple,Short Toe Strap w/ Buckle,needs_review,part_missing_schematic_group,part,quote_only,,
+1017,PTCT,PT-CT,variable,Platinum Compound Tube,needs_review,part_missing_schematic_group,part,parent_container,,
+1040,PT30CF,PT-3.0CF,variation,"Platinum Stainless Steel Corner Flusher - 3""",needs_review,variation_missing_price_hidden_until_priced,variation,hidden_reference,PTSSCF,
+1042,SS1001,SS1001,simple,Stilt Hardware Kit,needs_review,part_missing_schematic_group,part,quote_only,,
+1043,SS1002B,SS1002B,simple,Single Sided Stilts Strap Kit,needs_review,part_missing_schematic_group,part,quote_only,,
+1044,SS1003,SS1003,simple,Super Grip Floor Plate Kit,needs_review,part_missing_schematic_group,part,quote_only,,
+1045,SS1004O,SS1004O,simple,Main Body Spring Kit,needs_review,part_missing_schematic_group,part,quote_only,,
+1046,SS1005FB,SS1005FB,simple,Wraparound Leg Band Kit w/ Black Strap,needs_review,part_missing_schematic_group,part,quote_only,,
+1047,SS1005P,SS1005P,simple,Plastic Leg Band Kit for Single Sided Stilts,needs_review,part_missing_schematic_group,part,quote_only,,
+1050,SS1008,SS1008,simple,Wing Bolt Kit,needs_review,part_missing_schematic_group,part,quote_only,,
+1051,SS1010L,SS1010L,simple,Double Sided Stilts Leg Band Kit,needs_review,part_missing_schematic_group,part,quote_only,,
+1052,SS1010R,SS1010R,simple,Double Sided Right Leg Band Kit,needs_review,part_missing_schematic_group,part,quote_only,,
+1053,SS1011B,SS1011B,simple,Stilts Strap Kit w/ Black Laces,needs_review,part_missing_schematic_group,part,quote_only,,
+1054,SS1012,SS1012,simple,Foot Plate Kit,needs_review,part_missing_schematic_group,part,quote_only,,
+1055,SS124,SS124,simple,Stilts Lower Side Pole Bolt Kit,needs_review,part_missing_schematic_group,part,quote_only,,
+1056,SS132,SS132,simple,Stilts Side Pole Clam Bolt Kit,needs_review,part_missing_schematic_group,part,quote_only,,
+1057,SS134,SS134,simple,Stilts Leg Band Bolt Kit,needs_review,part_missing_schematic_group,part,quote_only,,
+1060,SS2007,SS2007,simple,Floor Plate w/ Super Grip Soles Kit,needs_review,part_missing_schematic_group,part,quote_only,,
+1062,050019,050019,simple,TapeTech Disengaging Cam,needs_review,part_missing_schematic_group,part,quote_only,,
+1063,050023F,050023F,simple,Spacer Bar,needs_review,part_missing_schematic_group,part,quote_only,,
+1064,050027,050027,simple,TapeTech 04TT Automatic Taper Replacement Needle Holder Lock,needs_review,part_missing_schematic_group,part,quote_only,,
+1065,050034F,050034F,simple,Disengaging Rod,needs_review,part_missing_schematic_group,part,quote_only,,
+1066,050041F,050041F,simple,Disengaging Rod Bearing,needs_review,part_missing_schematic_group,part,quote_only,,
+1067,050043F,050043F,simple,Anvil,needs_review,part_missing_schematic_group,part,quote_only,,
+1068,050058,050058,simple,TapeTech Control Valve,needs_review,part_missing_schematic_group,part,quote_only,,
+1069,050063,050063,simple,Cut Off Cover,needs_review,part_missing_schematic_group,part,quote_only,,
+1070,050064F,050064F,simple,Automatic Taper Valve,needs_review,part_missing_schematic_group,part,quote_only,,
+1071,050070F,050070F,simple,Axle Creaser Wheel,needs_review,part_missing_schematic_group,part,quote_only,,
+1073,050083F,050083F,simple,Cable Drum,needs_review,part_missing_schematic_group,part,quote_only,,
+1074,050086F,050086F,simple,Bushing Head,needs_review,part_missing_schematic_group,part,quote_only,,
+1076,050110F,050110F,simple,Driver Shaft,needs_review,part_missing_schematic_group,part,quote_only,,
+1077,050113F,050113F,simple,Cutter Block Tube,needs_review,part_missing_schematic_group,part,quote_only,,
+1078,050123,050123,simple,Related Products,needs_review,part_missing_schematic_group,part,quote_only,,
+1079,050128F,050128F,simple,Chain Roller Bushing,needs_review,part_missing_schematic_group,part,quote_only,,
+1080,050132F,050132F,simple,TapeTech Cut-Off Spring,needs_review,part_missing_schematic_group,part,quote_only,,
+1081,050141,050141,simple,Left Chain Support,needs_review,part_missing_schematic_group,part,quote_only,,
+1082,050145,050145,simple,TapeTech Creaser Chain,needs_review,part_missing_schematic_group,part,quote_only,,
+1083,050150F,050150F,simple,TapeTech Hub,needs_review,part_missing_schematic_group,part,quote_only,,
+1084,050152F,050152F,simple,Spacer Rod,needs_review,part_missing_schematic_group,part,quote_only,,
+1085,050154,050154,simple,Bearing Bracket,needs_review,part_missing_schematic_group,part,quote_only,,
+1086,050163,050163,simple,TapeTech Main Chain Guide,needs_review,part_missing_schematic_group,part,quote_only,,
+1087,050200,050200,simple,TapeTech Plastic Piston,needs_review,part_missing_schematic_group,part,quote_only,,
+1088,050204,050204,simple,Cup Washer,needs_review,part_missing_schematic_group,part,quote_only,,
+1089,050205,050205,simple,"Hex Head Cup Bolt 1/4-20X3 /4""",needs_review,part_missing_schematic_group,part,quote_only,,
+1090,050212F,050212F,simple,TapeTech Lock Block for 07TT,needs_review,part_missing_schematic_group,part,quote_only,,
+1091,050215,050215,simple,Control Tuber Roller,needs_review,part_missing_schematic_group,part,quote_only,,
+1092,050249,050249,simple,TapeTech Creaser Connector,needs_review,part_missing_schematic_group,part,quote_only,,
+1093,050251F,050251F,simple,Tube Protector,needs_review,part_missing_schematic_group,part,quote_only,,
+1094,050405B,050405B,simple,Keeper Axle - Black,needs_review,part_missing_schematic_group,part,quote_only,,
+1095,050410B,050410B,simple,TapeTech Control Tube Flange - Black,needs_review,part_missing_schematic_group,part,quote_only,,
+1096,050412,050412,simple,TapeTech Wheel Keeper Wire Form,needs_review,part_missing_schematic_group,part,quote_only,,
+1097,050413,050413,simple,TapeTech Control Tube Wheel,needs_review,part_missing_schematic_group,part,quote_only,,
+1098,0504186,0504186,simple,Roller Axle - 6 Pack,needs_review,part_missing_schematic_group,part,quote_only,,
+1099,050500,050500,simple,TapeTech Brake Roller,needs_review,part_missing_schematic_group,part,quote_only,,
+1100,051105,051105,simple,Side Plate- Stainless Steel,needs_review,part_missing_schematic_group,part,quote_only,,
+1101,051408B,051408B,simple,Black Slotted Spool Post,needs_review,part_missing_schematic_group,part,quote_only,,
+1102,052052,052052,simple,TapeTech Lock for 07TT,needs_review,part_missing_schematic_group,part,quote_only,,
+1103,052121F,052121F,simple,Driver Shaft,needs_review,part_missing_schematic_group,part,quote_only,,
+1104,052125,052125,simple,Sprocket Driver,needs_review,part_missing_schematic_group,part,quote_only,,
+1105,0521496,0521496,simple,Sprocket Bushing [6],needs_review,part_missing_schematic_group,part,quote_only,,
+1106,052150,052150,simple,Brake Adjuster,needs_review,part_missing_schematic_group,part,quote_only,,
+1107,052214,052214,simple,WHEEL ENCLOSURE,needs_review,part_missing_schematic_group,part,quote_only,,
+1108,052403,052403,simple,PLUNGER STOP LOCKING STRAP,needs_review,part_missing_schematic_group,part,quote_only,,
+1109,052404B,052404B,simple,Keeper Yoke,needs_review,part_missing_schematic_group,part,quote_only,,
+1110,052407B,052407B,simple,TapeTech Keeper Tube Cradle,needs_review,part_missing_schematic_group,part,quote_only,,
+1111,052409,052409,simple,TapeTech Keeper Wireform,needs_review,part_missing_schematic_group,part,quote_only,,
+1112,052576,052576,simple,Brake Spring Mount,needs_review,part_missing_schematic_group,part,quote_only,,
+1113,054028,054028,simple,Gooser Assembly,needs_review,part_missing_schematic_group,part,quote_only,,
+1114,054032F,054032F,simple,Push Rod Assembly,needs_review,part_missing_schematic_group,part,quote_only,,
+1115,054059F,054059F,simple,Filler Tube Assembly,needs_review,part_missing_schematic_group,part,quote_only,,
+1116,054075,054075,simple,Tape Runner Assembly,needs_review,part_missing_schematic_group,part,quote_only,,
+1117,054095F,054095F,simple,Long Creaser Assembly,needs_review,part_missing_schematic_group,part,quote_only,,
+1118,054096F,054096F,simple,Short Creaser Assembly,needs_review,part_missing_schematic_group,part,quote_only,,
+1119,054101,054101,simple,TapeTech Tape Guide Assembly,needs_review,part_missing_schematic_group,part,quote_only,,
+1120,054104,054104,simple,Tape Runner Assembly,needs_review,part_missing_schematic_group,part,quote_only,,
+1121,054110F,054110F,simple,Shaft Drive Assembly - Includes Sprocket,needs_review,part_missing_schematic_group,part,quote_only,,
+1122,054111F,054111F,simple,TapeTech Gooser Guide Bushing,needs_review,part_missing_schematic_group,part,quote_only,,
+1123,054116F,054116F,simple,Drive Dog Assembly,needs_review,part_missing_schematic_group,part,quote_only,,
+1124,054118F,054118F,simple,Drive Dog Holder Assembly,needs_review,part_missing_schematic_group,part,quote_only,,
+1126,055007,055007,simple,Tape Tech Automatic Taper Locking Roller Assembly Brake Part #055007,needs_review,part_missing_schematic_group,part,quote_only,,
+1127,056135,056135,simple,TapeTech Stainless Steel Cutter Chain Assembly,needs_review,part_missing_schematic_group,part,quote_only,,
+1128,056142F,056142F,simple,Cutter Chain,needs_review,part_missing_schematic_group,part,quote_only,,
+1133,059005,059005,simple,4-40 Hex S.S. Nut,needs_review,part_missing_schematic_group,part,quote_only,,
+1134,059013,059013,simple,Screw 6-32 X 5/16 Rd.,needs_review,part_missing_schematic_group,part,quote_only,,
+1135,059024,059024,simple,.15 Chain Keeper,needs_review,part_missing_schematic_group,part,quote_only,,
+1136,059029,059029,simple,Screw 6-32 X 5/8 Fl.,needs_review,part_missing_schematic_group,part,quote_only,,
+1137,059038,059038,simple,#4 TapeTech Medium Spring Lockwasher,needs_review,part_missing_schematic_group,part,quote_only,,
+1138,059040,059040,simple,O Ring 568-006 Buna,needs_review,part_missing_schematic_group,part,quote_only,,
+1139,059044,059044,simple,Insert,needs_review,part_missing_schematic_group,part,quote_only,,
+1140,059060,059060,simple,"Stopnut 3-48 Hex., Nyloc SST",needs_review,part_missing_schematic_group,part,quote_only,,
+1141,059061F,059061F,simple,Valve Spring,needs_review,part_missing_schematic_group,part,quote_only,,
+1142,059067,059067,simple,Key Ring,needs_review,part_missing_schematic_group,part,quote_only,,
+1143,059091,059091,simple,"6-32 X 1/2"" Fillister Head Sst Screw",needs_review,part_missing_schematic_group,part,quote_only,,
+1144,059092,059092,simple,"8-32"" x 1-1/2"" Round Head Screw SST",needs_review,part_missing_schematic_group,part,quote_only,,
+1145,059098,059098,simple,"Shim, Side Plate",needs_review,part_missing_schematic_group,part,quote_only,,
+1146,059107,059107,simple,1/4 in x 6-32 TapeTech Stainless Steel Flat Head Screw,needs_review,part_missing_schematic_group,part,quote_only,,
+1147,059117,059117,simple,"Screw Self Tap #8  x5/16""",needs_review,part_missing_schematic_group,part,quote_only,,
+1148,059119,059119,simple,Drive Dog Holder Pin,needs_review,part_missing_schematic_group,part,quote_only,,
+1149,059120,059120,simple,"Axle, Drive Dog",needs_review,part_missing_schematic_group,part,quote_only,,
+1150,059129,059129,simple,Cutter Block Pin,needs_review,part_missing_schematic_group,part,quote_only,,
+1151,059161,059161,simple,"4-40 X 3/8"" Fillister Head Sst Screw +",needs_review,part_missing_schematic_group,part,quote_only,,
+1152,059201,059201,simple,Screw 5-40 X 3/4 RD Head SST,needs_review,part_missing_schematic_group,part,quote_only,,
+1153,059217,059217,simple,"4-40 X 3/8"" BIND HEADSST SCREW",needs_review,part_missing_schematic_group,part,quote_only,,
+1162,140002C,140002C,simple,MudRunner Main Tube,needs_review,part_missing_schematic_group,part,quote_only,,
+1163,140003,140003,simple,Tube Cap,needs_review,part_missing_schematic_group,part,quote_only,,
+1164,142001,142001,simple,Tube Only for Mudrunner,needs_review,part_missing_schematic_group,part,quote_only,,
+1165,149021,149021,simple,TapeTech Round Lip U-Cup,needs_review,part_missing_schematic_group,part,quote_only,,
+1166,149028,149028,simple,Nylon Bushing #6,needs_review,part_missing_schematic_group,part,quote_only,,
+1167,149032,149032,simple,"O-Ring, Buna, 2-230",needs_review,part_missing_schematic_group,part,quote_only,,
+1168,149120,149120,simple,Tapetech Threaded Gas Spring,needs_review,part_missing_schematic_group,part,quote_only,,
+1170,151005,151005,simple,Wheel Angle Roller Roller,needs_review,part_missing_schematic_group,part,quote_only,,
+1171,151011,151011,simple,Inner Roller,needs_review,part_missing_schematic_group,part,quote_only,,
+1173,159023,159023,simple,Nylon Washer,needs_review,part_missing_schematic_group,part,quote_only,,
+1174,159024,159024,simple,External Retaining Ring,needs_review,part_missing_schematic_group,part,quote_only,,
+1175,159026,159026,simple,Long Nut,needs_review,part_missing_schematic_group,part,quote_only,,
+1176,159027,159027,simple,"Washer 3/8"" OD 3/16"" IDSST",needs_review,part_missing_schematic_group,part,quote_only,,
+1182,179009,179009,simple,Nyliner Type 6,needs_review,part_missing_schematic_group,part,quote_only,,
+1185,190002,190002,simple,Block,needs_review,part_missing_schematic_group,part,quote_only,,
+1186,190034,190034,simple,Coupler,needs_review,part_missing_schematic_group,part,quote_only,,
+1187,196003,196003,simple,TapeTech Hinge Casting Assembly,needs_review,part_missing_schematic_group,part,quote_only,,
+1189,200052F,200052F,simple,Finishing Box Shoulder Screw,needs_review,part_missing_schematic_group,part,quote_only,,
+1190,202020,202020,simple,Spring Anchor,needs_review,part_missing_schematic_group,part,quote_only,,
+1191,202028,202028,simple,TapeTech Flat Box Threaded Washer,needs_review,part_missing_schematic_group,part,quote_only,,
+1192,202036,202036,simple,Shoulder Screw,needs_review,part_missing_schematic_group,part,quote_only,,
+1193,203010,203010,simple,7 & 10 Inch Crown Spring,needs_review,part_missing_schematic_group,part,quote_only,,
+1194,209046,209046,simple,TapeTech Flat Box Washer,needs_review,part_missing_schematic_group,part,quote_only,,
+1195,209047,209047,simple,Flat Box Nyliner Bearing,needs_review,part_missing_schematic_group,part,quote_only,,
+1196,209050,209050,simple,Box Screw 209050,needs_review,part_missing_schematic_group,part,quote_only,,
+1197,209058,209058,simple,6-32 Brass Nut,needs_review,part_missing_schematic_group,part,quote_only,,
+1198,210024F,210024F,simple,"7"" Wiper For Power Assist ECH/TTEC Boxes",needs_review,part_missing_schematic_group,part,quote_only,,
+1199,210058F,210058F,simple,TapeTech Latch,needs_review,part_missing_schematic_group,part,quote_only,,
+1200,210059,210059,simple,Shoulder Screw,needs_review,part_missing_schematic_group,part,quote_only,,
+1201,212086,212086,simple,Power Assist Hook,needs_review,part_missing_schematic_group,part,quote_only,,
+1202,213051,213051,simple,"Box Wheel, side guide",needs_review,part_missing_schematic_group,part,quote_only,,
+1204,219091,219091,simple,Spring,needs_review,part_missing_schematic_group,part,quote_only,,
+1205,219092,219092,simple,"4-40 X 1"" Bind Head Screw",needs_review,part_missing_schematic_group,part,quote_only,,
+1206,219095,219095,simple,#4 NYLON FLAT WASHER,needs_review,part_missing_schematic_group,part,quote_only,,
+1207,250009,250009,simple,"10"" Shim",needs_review,part_missing_schematic_group,part,quote_only,,
+1208,250026F,250026F,simple,"New Wiper One Piece For 10"" Flat Box",needs_review,part_missing_schematic_group,part,quote_only,,
+1209,250040F,250040F,simple,"10"" Tie Rod",needs_review,part_missing_schematic_group,part,quote_only,,
+1210,251023G,251023G,simple,Side Plate,needs_review,part_missing_schematic_group,part,quote_only,,
+1211,251025G,251025G,simple,Side Plate,needs_review,part_missing_schematic_group,part,quote_only,,
+1212,254005,254005,simple,"TapeTech 10"" Clamp Assembly",needs_review,part_missing_schematic_group,part,quote_only,,
+1213,256027G,256027G,simple,"TapeTech 10"" Gold Pressure Plate",needs_review,part_missing_schematic_group,part,quote_only,,
+1214,260024F,260024F,simple,"10"" Wiper",needs_review,part_missing_schematic_group,part,quote_only,,
+1215,300009,300009,simple,"12"" Shim",needs_review,part_missing_schematic_group,part,quote_only,,
+1216,300026F,300026F,simple,12 in TapeTech Flat Box Wiper,needs_review,part_missing_schematic_group,part,quote_only,,
+1217,300040F,300040F,simple,"12"" Tie Rod",needs_review,part_missing_schematic_group,part,quote_only,,
+1218,306027G,306027G,simple,"TapeTech 12"" Pressure Plate (Gold)",needs_review,part_missing_schematic_group,part,quote_only,,
+1219,310024F,310024F,simple,"12"" Viton Wiper",needs_review,part_missing_schematic_group,part,quote_only,,
+1220,310051F,310051F,simple,TapeTech Flat Box Wheel,needs_review,part_missing_schematic_group,part,quote_only,,
+1221,310071,310071,simple,"TapeTech 12"" Spacer Rod",needs_review,part_missing_schematic_group,part,quote_only,,
+1222,310096,310096,simple,"12"" SEAL",needs_review,part_missing_schematic_group,part,quote_only,,
+1226,350033F,350033F,simple,Seal Block,needs_review,part_missing_schematic_group,part,quote_only,,
+1227,402002F,402002F,simple,4800 Spring Retainer,needs_review,part_missing_schematic_group,part,quote_only,,
+1229,402012,402012,simple,Ball Retainer,needs_review,part_missing_schematic_group,part,quote_only,,
+1230,402017F,402017F,simple,Center Clip (Short),needs_review,part_missing_schematic_group,part,quote_only,,
+1231,402033,402033,simple,Ball Coupling,needs_review,part_missing_schematic_group,part,quote_only,,
+1234,411003,411003,simple,Tape Tech Part 411003,needs_review,part_missing_schematic_group,part,quote_only,,
+1237,480002F,480002F,simple,4040 Wear Pad,needs_review,part_missing_schematic_group,part,quote_only,,
+1238,480005,480005,simple,Outside Tension Spring,needs_review,part_missing_schematic_group,part,quote_only,,
+1239,480021,480021,simple,Inside Tension Spring,needs_review,part_missing_schematic_group,part,quote_only,,
+1240,480027,480027,simple,Wheel Bushing,needs_review,part_missing_schematic_group,part,quote_only,,
+1242,486001F,486001F,simple,"3"" Easy Roll Head Casting",needs_review,part_missing_schematic_group,part,quote_only,,
+1245,499024,499024,simple,Washer - .188Id X,needs_review,part_missing_schematic_group,part,quote_only,,
+1246,500028,500028,simple,7 in TapeTech Wiper,needs_review,part_missing_schematic_group,part,quote_only,,
+1247,501A,501A,simple,TapeTech Taper Repair Kit,needs_review,part_missing_schematic_group,part,quote_only,,
+1248,501C10,501C10,simple,10 in TapeTech Flat Box Repair Kit,needs_review,part_missing_schematic_group,part,quote_only,,
+1249,501C12,501C12,simple,12 in TapeTech Flat Box Repair Kit,needs_review,part_missing_schematic_group,part,quote_only,,
+1251,501C7,501C7,simple,7 in TapeTech Flat Box Repair Kit,needs_review,part_missing_schematic_group,part,quote_only,,
+1253,501F2A,501F2A,simple,2 in TapeTech Corner Finisher Repair Kit,needs_review,part_missing_schematic_group,part,quote_only,,
+1254,501F3A,501F3A,simple,3 in TapeTech Corner Finisher Repair Kit,needs_review,part_missing_schematic_group,part,quote_only,,
+1256,501H,501H,simple,TapeTech #1 Pump Repair Kit,needs_review,part_missing_schematic_group,part,quote_only,,
+1258,501RSE,501RSE,simple,TapeTech Inside Corner Roller Repair Kit,needs_review,part_missing_schematic_group,part,quote_only,,
+1259,502005F,502005F,simple,"7"" Pivot Pressure Plate",needs_review,part_missing_schematic_group,part,quote_only,,
+1260,502006,502006,simple,PIVOTBEARING,needs_review,part_missing_schematic_group,part,quote_only,,
+1261,502007,502007,simple,Bearing,needs_review,part_missing_schematic_group,part,quote_only,,
+1262,502034,502034,simple,TapeTech Latch for Corner Box,needs_review,part_missing_schematic_group,part,quote_only,,
+1263,502A,502A,simple,TapeTech #2 Taper Repair Kit,needs_review,part_missing_schematic_group,part,quote_only,,
+1264,502CN,502CN,simple,TapeTech Flat Box Wheel Repair Kit,needs_review,part_missing_schematic_group,part,quote_only,,
+1269,502F4X,502F4X,simple,"3.5"" Easy Roll Corner Finisher Blade Repair Kit for 48XTT",needs_review,part_missing_schematic_group,part,quote_only,,
+1270,502H,502H,simple,TapeTech #2 Pump Repair Kit,needs_review,part_missing_schematic_group,part,quote_only,,
+1271,506009,506009,simple,Stainless Steel Cone,needs_review,part_missing_schematic_group,part,quote_only,,
+1272,509008,509008,simple,"10-32 X 1/2"" Bind Head Screw +",needs_review,part_missing_schematic_group,part,quote_only,,
+1276,632026,632026,simple,"Spring, Nail Spotter",needs_review,part_missing_schematic_group,part,quote_only,,
+1277,634028,634028,simple,"TapeTech 2"" Pressure Plate Assembly w/ New Style Tab",needs_review,part_missing_schematic_group,part,quote_only,,
+1278,650007,650007,simple,TapeTech Skid for NS03TT,needs_review,part_missing_schematic_group,part,quote_only,,
+1279,650040,650040,simple,TapeTech Special Washer,needs_review,part_missing_schematic_group,part,quote_only,,
+1281,681015,681015,simple,"3"" Wiper For EZ Clean Nailspotter",needs_review,part_missing_schematic_group,part,quote_only,,
+1282,700004F,700004F,simple,Gland,needs_review,part_missing_schematic_group,part,quote_only,,
+1283,700010F,700010F,simple,Valve Seal,needs_review,part_missing_schematic_group,part,quote_only,,
+1286,700036,700036,simple,5/16-24 X 1-7/16 Stud,needs_review,part_missing_schematic_group,part,quote_only,,
+1289,704040,704040,simple,TapeTech Filler Tube Assembly,needs_review,part_missing_schematic_group,part,quote_only,,
+1290,709007,709007,simple,"Hex Head Nut - 5/16"" X 24 - 6 Pack",needs_review,part_missing_schematic_group,part,quote_only,,
+1291,709046,709046,simple,Lock Clip,needs_review,part_missing_schematic_group,part,quote_only,,
+1292,720009,720009,simple,Piston Cup,needs_review,part_missing_schematic_group,part,quote_only,,
+1320,722039,722039,simple,Discharge Tube,needs_review,part_missing_schematic_group,part,quote_only,,
+1321,729009,729009,simple,"Wiper, U-Cup",needs_review,part_missing_schematic_group,part,quote_only,,
+1322,729060,729060,simple,TapeTech O-Ring Gasket - Large,needs_review,part_missing_schematic_group,part,quote_only,,
+1323,729072,729072,simple,TapeTech Head O-Ring,needs_review,part_missing_schematic_group,part,quote_only,,
+1324,762011,762011,simple,"Foot Valve, Universal",needs_review,part_missing_schematic_group,part,quote_only,,
+1329,800018F,800018F,simple,TapeTech Box Handle Notched Connector Plate,needs_review,part_missing_schematic_group,part,quote_only,,
+1330,800021F,800021F,simple,TapeTech Pin,needs_review,part_missing_schematic_group,part,quote_only,,
+1331,800027,800027,simple,TapeTech Short Connector,needs_review,part_missing_schematic_group,part,quote_only,,
+1522,8000TTPA,8000TT-PA,variation,TapeTech Wizard™ Compact Flat Box Handle - 8000TT-PA,needs_review,variation_missing_price_hidden_until_priced,variation,hidden_reference,TTWIZARDCOMPACTFLATBOXHANDLE,
+1333,801009,801009,simple,Coupling Pin (Repair Only Box Handles),needs_review,part_missing_schematic_group,part,quote_only,,
+1335,804234,804234,simple,"34"" Connector Assembly",needs_review,part_missing_schematic_group,part,quote_only,,
+1336,804254,804254,simple,54 in TapeTech Connector Assembly,needs_review,part_missing_schematic_group,part,quote_only,,
+1337,804272,804272,simple,"72"" Connector Assembly",needs_review,part_missing_schematic_group,part,quote_only,,
+1338,808015F,808015F,simple,"Hing Assy., Universal With Serial Number",needs_review,part_missing_schematic_group,part,quote_only,,
+1339,809011,809011,simple,3/4 in x 5/16-18 TapeTech Dog Point Thumbscrew,needs_review,part_missing_schematic_group,part,quote_only,,
+1340,811018,811018,simple,"Connector Plate, Notched",needs_review,part_missing_schematic_group,part,quote_only,,
+1341,819038,819038,simple,Grip Adjuster Spring,needs_review,part_missing_schematic_group,part,quote_only,,
+1342,857355,857355,simple,Gooseneck Cleaning Brush,needs_review,part_missing_schematic_group,part,quote_only,,
+1343,859016,859016,simple,"TapeTech Round Vinyl Black Cap, .315- ID, 2"" DP",needs_review,part_missing_schematic_group,part,quote_only,,
+1346,861014,861014,simple,Gooseneck Spacer,needs_review,part_missing_schematic_group,part,quote_only,,
+1347,880028,880028,simple,Compression Spring,needs_review,part_missing_schematic_group,part,quote_only,,
+1348,880038,880038,simple,CONNECTING ROD,needs_review,part_missing_schematic_group,part,quote_only,,
+1350,880053,880053,simple,Lock Block,needs_review,part_missing_schematic_group,part,quote_only,,
+1351,882012,882012,simple,Acutator Clip Pin,needs_review,part_missing_schematic_group,part,quote_only,,
+1352,882013,882013,simple,Locking Pin,needs_review,part_missing_schematic_group,part,quote_only,,
+1353,882014,882014,simple,TapeTech Locking Clip,needs_review,part_missing_schematic_group,part,quote_only,,
+1354,883020,883020,simple,TapeTech Extrusion Insert for XH-TT,needs_review,part_missing_schematic_group,part,quote_only,,
+1355,889017,889017,simple,Conical Spring,needs_review,part_missing_schematic_group,part,quote_only,,
+1356,889030,889030,simple,4-40 X 3/16 Fillisterhead Screw,needs_review,part_missing_schematic_group,part,quote_only,,
+1357,889035,889035,simple,6-32 x 1/4 Pan Head Screw,needs_review,part_missing_schematic_group,part,quote_only,,
+1358,889055,889055,simple,Nylon Spacer,needs_review,part_missing_schematic_group,part,quote_only,,
+1361,90TT,90TT,simple,TapeTech Filler Adapter,needs_review,part_missing_schematic_group,part,quote_only,,
+1362,920003,920003,simple,Ball Coupling,needs_review,part_missing_schematic_group,part,quote_only,,
+1363,AEM34491,AEM34491,simple,Mud Jam Clear Tool,needs_review,part_missing_schematic_group,part,quote_only,,
+1364,AMEMP0012,AMEMP0012,simple,12 in AMES Feather-Lite Stainless Steel Pan,needs_review,part_missing_schematic_group,part,quote_only,,
+1377,CNTT,CNTT,simple,Cleaning Nozzle,needs_review,part_missing_schematic_group,part,quote_only,,
+1383,EALFED48,EALFED48,simple,TapeTech 4′ Aluminum Featheredge,needs_review,part_missing_schematic_group,part,quote_only,,
+1384,EALFED60,EALFED60,simple,TapeTech 5′ Aluminum Featheredge,needs_review,part_missing_schematic_group,part,quote_only,,
+1385,EALFED72,EALFED72,simple,TapeTech 6′ Aluminum Featheredge,needs_review,part_missing_schematic_group,part,quote_only,,
+1389,EHWJS100,EHWJS100,simple,TapeTech Portable Hot Wire Foam Cutter,needs_review,part_missing_schematic_group,part,quote_only,,
+1390,EIFSAND0614,EIFSAND0614,simple,TapeTech 6″ x 14″ EIFS Vacuum Hand Rasp,needs_review,part_missing_schematic_group,part,quote_only,,
+1391,EIFSAND120,EIFSAND120,simple,TapeTech 120V Dual Disc Sander,needs_review,part_missing_schematic_group,part,quote_only,,
+1393,ERASP0214,ERASP0214,simple,TapeTech 2″ x 14″ Tungsten Carbide Rasp,needs_review,part_missing_schematic_group,part,quote_only,,
+1394,ERASP0414,ERASP0414,simple,TapeTech 4″ x 14″ Tungsten Carbide EIFS Rasp,needs_review,part_missing_schematic_group,part,quote_only,,
+1395,ERASP0614,ERASP0614,simple,TapeTech 6″ x 14″ Tungsten Carbide EIFS Rasp,needs_review,part_missing_schematic_group,part,quote_only,,
+1396,ERASP0814,ERASP0814,simple,TapeTech 8″ x 14″ Tungsten Carbide EIFS Rasp,needs_review,part_missing_schematic_group,part,quote_only,,
+1397,ERASPSERRATED0414,ERASPSERRATED0414,simple,TapeTech 4″ x 14″ Tungsten Carbide EIFS Claw Rasp,needs_review,part_missing_schematic_group,part,quote_only,,
+1398,ERASPSERRATED0614,ERASPSERRATED0614,simple,"TapeTech 6"" x 14"" Tungsten Carbide Claw Rasp",needs_review,part_missing_schematic_group,part,quote_only,,
+1399,ESAND0414,ESAND0414,simple,TapeTech 4″ x 14″ EIFSAND Rasp,needs_review,part_missing_schematic_group,part,quote_only,,
+1400,ESAND0614,ESAND0614,simple,TapeTech 6″ x 14″ EIFSAND Rasp,needs_review,part_missing_schematic_group,part,quote_only,,
+1401,ESAND0814,ESAND0814,simple,TapeTech 8″ x 14″ EIFSAND Rasp,needs_review,part_missing_schematic_group,part,quote_only,,
+1402,EZCOVER07,EZCOVER07,simple,EasyClean Cover Plate Conversion Kit,needs_review,part_missing_schematic_group,part,quote_only,,
+1403,EZROLLKIT,EZROLLKIT,simple,EasyRoll Wheel Replacement Kit,needs_review,part_missing_schematic_group,part,quote_only,,
+1410,GSRTT,GSRTT,simple,TapeTech Gooseneck Riser,needs_review,part_missing_schematic_group,part,quote_only,,
+1414,JCT01TT,JCT01TT,simple,TapeTech Jam Clearing Tool,needs_review,part_missing_schematic_group,part,quote_only,,
+1415,KRATL137,KRATL137,simple,Kraft Tools Carbide Scoring & Cutting Tool,needs_review,part_missing_schematic_group,part,quote_only,,
+1421,MWSACC,MWS-ACC,simple,TapeTech Mobile Wash Station Accessory Kit,needs_review,part_missing_schematic_group,part,quote_only,,
+1422,MWSPK01,MWS-PK01,simple,TapeTech Mobile Wash Station Spray Hose Kit,needs_review,part_missing_schematic_group,part,quote_only,,
+1423,MWS01LW,MWS01-LW,simple,TapeTech Locking Wheel Kit for Mobile Wash Station,needs_review,part_missing_schematic_group,part,quote_only,,
+1429,PWT46TT,PWT46TT,simple,Premium Work Trousers - Waist Size 30,needs_review,part_missing_schematic_group,part,quote_only,,
+1430,QCATT,QCATT,simple,Quick-Connect Adapter,needs_review,part_missing_schematic_group,part,quote_only,,
+1431,RGDRATS10L,RGDRATS10L,simple,10 in Renegade Tools Left Cut Aviation Snips - Red,needs_review,part_missing_schematic_group,part,quote_only,,
+1432,RTTCTT,RTTCTT,simple,Taper Cable Repair Tool,needs_review,part_missing_schematic_group,part,quote_only,,
+1433,SCP001WD,SCP001WD,simple,"TapeTech 7""X13"" Galvaniz Steel Bucket Scoop",needs_review,part_missing_schematic_group,part,quote_only,,
+1434,SSDAF,SSDAF,simple,TapeTech Dual Angle Sanding Sponge Fine-24 per box,needs_review,part_missing_schematic_group,part,quote_only,,
+1435,SSDAM,SSDAM,simple,TapeTech Dual Angle Sanding Sponge Medium-24 per box,needs_review,part_missing_schematic_group,part,quote_only,,
+1436,SSDAMF,SSDAMF,simple,TapeTech Dual Angle Sanding Sponge Med/Fine-24 per box,needs_review,part_missing_schematic_group,part,quote_only,,
+1437,SSSAF,SSSAF,simple,TapeTech Single Angle Sanding Sponge Fine-24 per box,needs_review,part_missing_schematic_group,part,quote_only,,
+1438,SSSAM,SSSAM,simple,TapeTech Single Angle Sanding Sponge Medium- 24 per box,needs_review,part_missing_schematic_group,part,quote_only,,
+1439,T032,T032,simple,TapeTech Gooser Release Cam,needs_review,part_missing_schematic_group,part,quote_only,,
+1440,TC01TT,TC01TT,simple,Tool Caddy,needs_review,part_missing_schematic_group,part,quote_only,,
+1443,EEX125135,EEX125135,variation,"TapeTech 135° Outside Corner Edger - 1.25""",needs_review,variation_missing_price_hidden_until_priced,variation,hidden_reference,TT135OUTSIDECORNEREDGER,
+1444,EEX200135,EEX200135,variation,"TapeTech 135° Outside Corner Edger - 2""",needs_review,variation_missing_price_hidden_until_priced,variation,hidden_reference,TT135OUTSIDECORNEREDGER,
+1445,EEX275135,EEX275135,variation,"TapeTech 135° Outside Corner Edger - 2.75""",needs_review,variation_missing_price_hidden_until_priced,variation,hidden_reference,TT135OUTSIDECORNEREDGER,
+1447,EEX10090,EEX10090,variation,"TapeTech 90° Outside Corner Edger - 1""",needs_review,variation_missing_price_hidden_until_priced,variation,hidden_reference,TT90OUTSIDECORNEREDGER,
+1448,EEX15090,EEX15090,variation,"TapeTech 90° Outside Corner Edger - 1.5""",needs_review,variation_missing_price_hidden_until_priced,variation,hidden_reference,TT90OUTSIDECORNEREDGER,
+1449,EEX20090,EEX20090,variation,"TapeTech 90° Outside Corner Edger - 2""",needs_review,variation_missing_price_hidden_until_priced,variation,hidden_reference,TT90OUTSIDECORNEREDGER,
+1450,EEX5090,EEX5090,variation,"TapeTech 90° Outside Corner Edger - 0.5""",needs_review,variation_missing_price_hidden_until_priced,variation,hidden_reference,TT90OUTSIDECORNEREDGER,
+1451,EEX7590,EEX7590,variation,"TapeTech 90° Outside Corner Edger - 0.75""",needs_review,variation_missing_price_hidden_until_priced,variation,hidden_reference,TT90OUTSIDECORNEREDGER,
+1452,TTANGLEBOXWITHFHTTHANDLE,TT-ANGLE-BOX-WITH-FHTT-HANDLE,variable,TapeTech Corner Applicator with FHTT Fiberglass Handle,needs_review,visible_variable_parent_missing_image,tool,parent_container,,
+1453,CA07FHTT,CA07-FHTT,variation,"TapeTech Corner Applicator with FHTT Fiberglass Handle - 7""",needs_review,variation_missing_price_hidden_until_priced,variation,hidden_reference,TTANGLEBOXWITHFHTTHANDLE,
+1454,CA08FHTT,CA08-FHTT,variation,"TapeTech Corner Applicator with FHTT Fiberglass Handle - 8""",needs_review,variation_missing_price_hidden_until_priced,variation,hidden_reference,TTANGLEBOXWITHFHTTHANDLE,
+1455,TTBASICFULLSETWITHANDBOXES,TT-BASIC-FULL-SET-WITH-AND-BOXES,variable,TapeTech Basic Full Set with Boxes,needs_review,visible_variable_parent_missing_image,kit,parent_container,,
+1456,TTFULL1012,TT-FULL-10-12,variation,"TapeTech Basic Full Set with Boxes - 10""",needs_review,variation_missing_price_hidden_until_priced,variation,hidden_reference,TTBASICFULLSETWITHANDBOXES,
+1457,TTFULL710,TT-FULL-7-10,variation,"TapeTech Basic Full Set with Boxes - 7""",needs_review,variation_missing_price_hidden_until_priced,variation,hidden_reference,TTBASICFULLSETWITHANDBOXES,
+1458,TTCOMBOFLUSHER,TT-COMBO-FLUSHER,variable,TapeTech Combo Corner Flusher,needs_review,visible_variable_parent_missing_image,tool,parent_container,,
+1463,TTCOMPOUNDROLLERWITHFRAME,TT-COMPOUND-ROLLER-WITH-FRAME,variable,TapeTech Premium Compound Roller with Frame,needs_review,visible_variable_parent_missing_image,tool,parent_container,,
+1464,CROLL04CG,CROLL04CG,variation,"TapeTech Premium Compound Roller with Frame - 4""",needs_review,variation_missing_price_hidden_until_priced,variation,hidden_reference,TTCOMPOUNDROLLERWITHFRAME,
+1465,CROLL09CG,CROLL09CG,variation,"TapeTech Premium Compound Roller with Frame - 9""",needs_review,variation_missing_price_hidden_until_priced,variation,hidden_reference,TTCOMPOUNDROLLERWITHFRAME,
+1466,CROLL12CG,CROLL12CG,variation,"TapeTech Premium Compound Roller with Frame - 12""",needs_review,variation_missing_price_hidden_until_priced,variation,hidden_reference,TTCOMPOUNDROLLERWITHFRAME,
+1468,CT24TT,CT24TT,variation,"TapeTech Compound Tube - 24""",needs_review,variation_missing_price_hidden_until_priced,variation,hidden_reference,TTCOMPOUNDTUBE,
+1469,CT36TT,CT36TT,variation,"TapeTech Compound Tube - 36""",needs_review,variation_missing_price_hidden_until_priced,variation,hidden_reference,TTCOMPOUNDTUBE,
+1470,CT42TT,CT42TT,variation,"TapeTech Compound Tube - 42""",needs_review,variation_missing_price_hidden_until_priced,variation,hidden_reference,TTCOMPOUNDTUBE,
+1472,CA07TT,CA07TT,variation,"TapeTech Corner Applicator - 7""",needs_review,variation_missing_price_hidden_until_priced,variation,hidden_reference,TTCORNERAPPLICATOR,
+1473,CA08TT,CA08TT,variation,"TapeTech Corner Applicator - 8""",needs_review,variation_missing_price_hidden_until_priced,variation,hidden_reference,TTCORNERAPPLICATOR,
+1474,TTDIRECTFLUSHER,TT-DIRECT-FLUSHER,variable,TapeTech Direct Corner Flusher,needs_review,visible_variable_parent_missing_image,tool,parent_container,,
+1480,8134TT,8134TT,variation,"TapeTech EasyFinish® Bent Flat Box Handle - 34""",needs_review,variation_missing_price_hidden_until_priced,variation,hidden_reference,TTEASYFINISHBENTFLATBOXHANDLE,
+1481,8142TT,8142TT,variation,"TapeTech EasyFinish® Bent Flat Box Handle - 42""",needs_review,variation_missing_price_hidden_until_priced,variation,hidden_reference,TTEASYFINISHBENTFLATBOXHANDLE,
+1482,8154TT,8154TT,variation,"TapeTech EasyFinish® Bent Flat Box Handle - 54""",needs_review,variation_missing_price_hidden_until_priced,variation,hidden_reference,TTEASYFINISHBENTFLATBOXHANDLE,
+1483,8172TT,8172TT,variation,"TapeTech EasyFinish® Bent Flat Box Handle - 72""",needs_review,variation_missing_price_hidden_until_priced,variation,hidden_reference,TTEASYFINISHBENTFLATBOXHANDLE,
+1485,EZ07TT,EZ07TT,variation,"TapeTech EasyClean® Finishing Box - 7""",needs_review,variation_missing_price_hidden_until_priced,variation,hidden_reference,TTEASYCLEANFINISHINGBOX,
+1486,EZ10TT,EZ10TT,variation,"TapeTech EasyClean® Finishing Box - 10""",needs_review,variation_missing_price_hidden_until_priced,variation,hidden_reference,TTEASYCLEANFINISHINGBOX,
+1487,EZ12TT,EZ12TT,variation,"TapeTech EasyClean® Finishing Box - 12""",needs_review,variation_missing_price_hidden_until_priced,variation,hidden_reference,TTEASYCLEANFINISHINGBOX,
+1488,EZ15TT,EZ15TT,variation,"TapeTech EasyClean® Finishing Box - 15""",needs_review,variation_missing_price_hidden_until_priced,variation,hidden_reference,TTEASYCLEANFINISHINGBOX,
+1490,NS02TT,NS02TT,variation,"TapeTech EasyClean® Nail Spotter - 2""",needs_review,variation_missing_price_hidden_until_priced,variation,hidden_reference,TTEASYCLEANNAILSPOTTER,
+1491,NS03TT,NS03TT,variation,"TapeTech EasyClean® Nail Spotter - 3""",needs_review,variation_missing_price_hidden_until_priced,variation,hidden_reference,TTEASYCLEANNAILSPOTTER,
+1492,TTEASYCLEANNAILSPOTTERWFHTTHANDLE,TT-EASYCLEAN-NAIL-SPOTTER-W-FHTT-HANDLE,variable,TapeTech EasyClean® Nail Spotter with FHTT Fiberglass Handle,needs_review,visible_variable_parent_missing_image,tool,parent_container,,
+1493,NS02FHTT,NS02-FHTT,variation,"TapeTech EasyClean® Nail Spotter with FHTT Fiberglass Handle - 2""",needs_review,variation_missing_price_hidden_until_priced,variation,hidden_reference,TTEASYCLEANNAILSPOTTERWFHTTHANDLE,
+1494,NS03FHTT,NS03-FHTT,variation,"TapeTech EasyClean® Nail Spotter with FHTT Fiberglass Handle - 3""",needs_review,variation_missing_price_hidden_until_priced,variation,hidden_reference,TTEASYCLEANNAILSPOTTERWFHTTHANDLE,
+1496,8034TT,8034TT,variation,"TapeTech Flat Box Handle - 34""",needs_review,variation_missing_price_hidden_until_priced,variation,hidden_reference,TTFLATBOXHANDLE,
+1497,8042TT,8042TT,variation,"TapeTech Flat Box Handle - 42""",needs_review,variation_missing_price_hidden_until_priced,variation,hidden_reference,TTFLATBOXHANDLE,
+1498,8054TT,8054TT,variation,"TapeTech Flat Box Handle - 54""",needs_review,variation_missing_price_hidden_until_priced,variation,hidden_reference,TTFLATBOXHANDLE,
+1499,8072TT,8072TT,variation,"TapeTech Flat Box Handle - 72""",needs_review,variation_missing_price_hidden_until_priced,variation,hidden_reference,TTFLATBOXHANDLE,
+1501,EHC07,EHC07,variation,"TapeTech MAXXBOX® High Capacity Finishing Box - 7""",needs_review,variation_missing_price_hidden_until_priced,variation,hidden_reference,TTMAXXBOX,
+1502,EHC10,EHC10,variation,"TapeTech MAXXBOX® High Capacity Finishing Box - 10""",needs_review,variation_missing_price_hidden_until_priced,variation,hidden_reference,TTMAXXBOX,
+1503,EHC12,EHC12,variation,"TapeTech MAXXBOX® High Capacity Finishing Box - 12""",needs_review,variation_missing_price_hidden_until_priced,variation,hidden_reference,TTMAXXBOX,
+1505,PAHC07,PAHC07,variation,"TapeTech Power Assist® MAXXBOX® Finishing Box - 7""",needs_review,variation_missing_price_hidden_until_priced,variation,hidden_reference,TTPOWERASSISTMAXXBOX,
+1506,PAHC10,PAHC10,variation,"TapeTech Power Assist® MAXXBOX® Finishing Box - 10""",needs_review,variation_missing_price_hidden_until_priced,variation,hidden_reference,TTPOWERASSISTMAXXBOX,
+1507,PAHC12,PAHC12,variation,"TapeTech Power Assist® MAXXBOX® Finishing Box - 12""",needs_review,variation_missing_price_hidden_until_priced,variation,hidden_reference,TTPOWERASSISTMAXXBOX,
+1512,EIN10090,EIN10090,variation,"TapeTech 90° Inside Corner Edger - 1""",needs_review,variation_missing_price_hidden_until_priced,variation,hidden_reference,TTSIDECORNEREDGER,
+1513,EIN15090,EIN15090,variation,"TapeTech 90° Inside Corner Edger - 1.5""",needs_review,variation_missing_price_hidden_until_priced,variation,hidden_reference,TTSIDECORNEREDGER,
+1514,EIN20090,EIN20090,variation,"TapeTech 90° Inside Corner Edger - 2""",needs_review,variation_missing_price_hidden_until_priced,variation,hidden_reference,TTSIDECORNEREDGER,
+1515,EIN5090,EIN5090,variation,"TapeTech 90° Inside Corner Edger - 0.5""",needs_review,variation_missing_price_hidden_until_priced,variation,hidden_reference,TTSIDECORNEREDGER,
+1516,EIN7590,EIN7590,variation,"TapeTech 90° Inside Corner Edger - 0.75""",needs_review,variation_missing_price_hidden_until_priced,variation,hidden_reference,TTSIDECORNEREDGER,
+1518,TTSFS,TTSFS,variation,TapeTech Standard Full Set - TTSFS,needs_review,variation_missing_price_hidden_until_priced,variation,hidden_reference,TTTTSFS,
+1519,TTSFS2,TTSFS-2,variation,TapeTech Standard Full Set - TTSFS-2,needs_review,variation_missing_price_hidden_until_priced,variation,hidden_reference,TTTTSFS,
+1521,8000TT,8000TT,variation,TapeTech Wizard™ Compact Flat Box Handle - 8000TT,needs_review,variation_missing_price_hidden_until_priced,variation,hidden_reference,TTWIZARDCOMPACTFLATBOXHANDLE,

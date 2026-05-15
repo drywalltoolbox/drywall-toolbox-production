@@ -40,6 +40,7 @@ final class DTB_CatalogValidationService {
 			'product'    => $product,
 			'post'       => get_post( $product_id ),
 			'meta'       => self::meta_lookup( $product_id ),
+			'children'   => $product->is_type( 'variable' ) ? $product->get_children() : [],
 		];
 
 		$issues = [];

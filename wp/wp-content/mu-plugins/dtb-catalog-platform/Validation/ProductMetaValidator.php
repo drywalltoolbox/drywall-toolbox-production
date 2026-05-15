@@ -50,6 +50,15 @@ final class DTB_ProductMetaValidator {
 			];
 		}
 
+		$commerce_mode = (string) ( $meta['_dtb_commerce_mode'] ?? '' );
+		if ( '' === $commerce_mode ) {
+			$issues[] = [
+				'severity' => 'warning',
+				'code'     => 'dtb_missing_commerce_mode',
+				'message'  => 'Product is missing _dtb_commerce_mode. Pricing, visibility, and cart behavior depend on this field. Expected: purchasable, quote_only, hidden_reference, repair_only, or included_item.',
+			];
+		}
+
 		return $issues;
 	}
 }

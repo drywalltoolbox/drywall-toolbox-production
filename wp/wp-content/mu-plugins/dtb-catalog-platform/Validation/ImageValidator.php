@@ -15,6 +15,7 @@ final class DTB_ImageValidator {
 	 */
 	public static function validate( array $context ): array {
 		$product = $context['product'] ?? null;
+		$meta    = $context['meta']    ?? [];
 		if ( ! $product ) {
 			return [];
 		}
@@ -26,6 +27,19 @@ final class DTB_ImageValidator {
 		$image_id = (int) $product->get_image_id();
 		if ( $image_id > 0 ) {
 			return [];
+		}
+
+		// Builder-eligible products without an image will have a broken slot card
+		// in the Toolset Builder UI — elevate to error.
+		$builder_eligible = (string) ( $meta['_dtb_builder_eligible'] ?? '' );
+		if ( '1' === $builder_eligible ) {
+			return [
+				[
+					'severity' => 'error',
+					'code'     => 'missing_builder_image',
+					'message'  => 'Builder-eligible product is missing a primary image. The Toolset Builder slot card will render without a product photo.',
+				],
+			];
 		}
 
 		return [

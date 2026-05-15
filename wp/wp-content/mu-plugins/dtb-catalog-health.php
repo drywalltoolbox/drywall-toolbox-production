@@ -509,6 +509,27 @@ function dtb_catalog_health_ajax_meta_scan(): void {
  * @return array[]
  */
 function dtb_catalog_health_run_dtb_meta_scan( int $page, int $per_page ): array {
+	// Delegate to the Catalog Validation Service when available.
+	// The service owns all DTB meta rule logic; this function is now a
+	// paged adapter that queries published product IDs and hands them off.
+	if ( class_exists( 'DTB_CatalogValidationService' ) ) {
+		$query = new WP_Query( [
+			'post_type'      => 'product',
+			'post_status'    => 'publish',
+			'posts_per_page' => $per_page,
+			'paged'          => $page,
+			'fields'         => 'ids',
+			'no_found_rows'  => false,
+		] );
+
+		$product_ids = array_map( 'intval', (array) $query->posts );
+		return DTB_CatalogValidationService::validate_products( $product_ids );
+	}
+
+	// ── Fallback (Validation module not loaded) ──────────────────────────────
+	// Inline implementation kept for environments where the catalog platform
+	// bootstrap has not run (e.g. CLI scans before the platform is activated).
+
 	$issues = [];
 
 	$query = new WP_Query( [
@@ -529,105 +550,38 @@ function dtb_catalog_health_run_dtb_meta_scan( int $page, int $per_page ): array
 		$name = $product->get_name();
 		$sku  = $product->get_sku();
 
-		$brand_key       = (string) get_post_meta( $product_id, '_dtb_brand_key',            true );
-		$category_key    = (string) get_post_meta( $product_id, '_dtb_category_key',         true );
-		$product_kind    = (string) get_post_meta( $product_id, '_dtb_product_kind',         true );
-		$tool_family     = (string) get_post_meta( $product_id, '_dtb_tool_family',          true );
-		$builder_eligible= (string) get_post_meta( $product_id, '_dtb_builder_eligible',    true );
-		$builder_slots   = (string) get_post_meta( $product_id, '_dtb_builder_slots',        true );
-		$default_var_id  = (string) get_post_meta( $product_id, '_dtb_default_variation_id', true );
+		$brand_key        = (string) get_post_meta( $product_id, '_dtb_brand_key',            true );
+		$category_key     = (string) get_post_meta( $product_id, '_dtb_category_key',         true );
+		$product_kind     = (string) get_post_meta( $product_id, '_dtb_product_kind',         true );
+		$tool_family      = (string) get_post_meta( $product_id, '_dtb_tool_family',          true );
+		$builder_eligible = (string) get_post_meta( $product_id, '_dtb_builder_eligible',     true );
+		$builder_slots    = (string) get_post_meta( $product_id, '_dtb_builder_slots',        true );
+		$default_var_id   = (string) get_post_meta( $product_id, '_dtb_default_variation_id', true );
 
-		// Error: missing brand key.
 		if ( '' === $brand_key ) {
-			$issues[] = [
-				'product_id'   => $product_id,
-				'product_name' => $name,
-				'sku'          => $sku ?: '(none)',
-				'severity'     => 'error',
-				'code'         => 'dtb_missing_brand_key',
-				'message'      => 'Product is published but has no _dtb_brand_key. Catalog facets and filters will not include this product.',
-			];
+			$issues[] = [ 'product_id' => $product_id, 'product_name' => $name, 'sku' => $sku ?: '(none)', 'severity' => 'error',   'code' => 'dtb_missing_brand_key',    'message' => 'Product is published but has no _dtb_brand_key.' ];
 		}
-
-		// Error: missing category key.
 		if ( '' === $category_key ) {
-			$issues[] = [
-				'product_id'   => $product_id,
-				'product_name' => $name,
-				'sku'          => $sku ?: '(none)',
-				'severity'     => 'error',
-				'code'         => 'dtb_missing_category_key',
-				'message'      => 'Product is published but has no _dtb_category_key. Category filters and display routing will not work.',
-			];
+			$issues[] = [ 'product_id' => $product_id, 'product_name' => $name, 'sku' => $sku ?: '(none)', 'severity' => 'error',   'code' => 'dtb_missing_category_key', 'message' => 'Product is published but has no _dtb_category_key.' ];
 		}
-
-		// Warning: missing product kind.
 		if ( '' === $product_kind ) {
-			$issues[] = [
-				'product_id'   => $product_id,
-				'product_name' => $name,
-				'sku'          => $sku ?: '(none)',
-				'severity'     => 'warning',
-				'code'         => 'dtb_missing_product_kind',
-				'message'      => 'Product is missing _dtb_product_kind (tool/part/accessory/service/kit). Toolset Builder eligibility may be inaccurate.',
-			];
+			$issues[] = [ 'product_id' => $product_id, 'product_name' => $name, 'sku' => $sku ?: '(none)', 'severity' => 'warning', 'code' => 'dtb_missing_product_kind',  'message' => 'Product is missing _dtb_product_kind.' ];
 		}
-
-		// Warning: builder eligible but missing tool family.
 		if ( '1' === $builder_eligible && '' === $tool_family ) {
-			$issues[] = [
-				'product_id'   => $product_id,
-				'product_name' => $name,
-				'sku'          => $sku ?: '(none)',
-				'severity'     => 'warning',
-				'code'         => 'dtb_builder_missing_family',
-				'message'      => 'Product is marked builder-eligible (_dtb_builder_eligible=1) but has no _dtb_tool_family. Toolset slot matching will fall back to keyword inference.',
-			];
+			$issues[] = [ 'product_id' => $product_id, 'product_name' => $name, 'sku' => $sku ?: '(none)', 'severity' => 'warning', 'code' => 'dtb_builder_missing_family', 'message' => 'Builder-eligible product has no _dtb_tool_family.' ];
 		}
-
-		// Warning: builder eligible but missing slots.
 		if ( '1' === $builder_eligible && '' === $builder_slots ) {
-			$issues[] = [
-				'product_id'   => $product_id,
-				'product_name' => $name,
-				'sku'          => $sku ?: '(none)',
-				'severity'     => 'warning',
-				'code'         => 'dtb_builder_missing_slots',
-				'message'      => 'Product is marked builder-eligible but has no _dtb_builder_slots. It will not appear in any Toolset Builder slot.',
-			];
+			$issues[] = [ 'product_id' => $product_id, 'product_name' => $name, 'sku' => $sku ?: '(none)', 'severity' => 'warning', 'code' => 'dtb_builder_missing_slots',  'message' => 'Builder-eligible product has no _dtb_builder_slots.' ];
 		}
-
-		// Warning: variable parent missing default variation ID.
 		if ( $product->is_type( 'variable' ) && '' === $default_var_id ) {
-			$issues[] = [
-				'product_id'   => $product_id,
-				'product_name' => $name,
-				'sku'          => $sku ?: '(none)',
-				'severity'     => 'warning',
-				'code'         => 'dtb_missing_default_var',
-				'message'      => 'Variable parent product has no _dtb_default_variation_id. Product cards will fall back to automatic default variation resolution.',
-			];
+			$issues[] = [ 'product_id' => $product_id, 'product_name' => $name, 'sku' => $sku ?: '(none)', 'severity' => 'warning', 'code' => 'dtb_missing_default_var',    'message' => 'Variable parent has no _dtb_default_variation_id.' ];
 		}
-
-		// Warning: variable parent — default variation ID invalid.
 		if ( $product->is_type( 'variable' ) && '' !== $default_var_id ) {
-			$var_product = wc_get_product( (int) $default_var_id );
-			if ( ! $var_product || ! in_array( (int) $default_var_id, $product->get_children(), true ) ) {
-				$issues[] = [
-					'product_id'   => $product_id,
-					'product_name' => $name,
-					'sku'          => $sku ?: '(none)',
-					'severity'     => 'warning',
-					'code'         => 'dtb_invalid_default_var',
-					'message'      => sprintf(
-						'_dtb_default_variation_id (%s) does not belong to this product.',
-						esc_html( $default_var_id )
-					),
-				];
+			if ( ! in_array( (int) $default_var_id, $product->get_children(), true ) ) {
+				$issues[] = [ 'product_id' => $product_id, 'product_name' => $name, 'sku' => $sku ?: '(none)', 'severity' => 'warning', 'code' => 'dtb_invalid_default_var', 'message' => sprintf( '_dtb_default_variation_id (%s) does not belong to this product.', esc_html( $default_var_id ) ) ];
 			}
 		}
 	}
 
 	return $issues;
 }
-
