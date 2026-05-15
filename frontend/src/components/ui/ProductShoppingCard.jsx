@@ -1,13 +1,10 @@
 /**
  * ui/ProductShoppingCard.jsx — IndoUI Shopping Card (drop-in for ProductCard.jsx)
  *
- * Props:
- *   product              Source product (parent for variable)
- *   cardProduct          Backend-resolved display product/variation
- *   hasSelectedVariation boolean
- *   onOpenModal          () => void
- *   onAddToCart          () => void
- *   index                number (staggered animation delay)
+ * Product-list cards intentionally render the catalog product only.
+ * For variable products, that means the parent product: parent name, parent SKU,
+ * parent image, and min-price range. Child variation state belongs in the
+ * product detail modal after the customer chooses an option.
  */
 
 import { motion as Motion } from 'framer-motion';
@@ -32,120 +29,26 @@ function formatPrice(value) {
   return `$${asNumber(value, 0).toFixed(2)}`;
 }
 
-function normalizeOptionToken(value) {
-  return String(value || '')
-    .trim()
-    .toLowerCase()
-    .replace(/[“”]/g, '"')
-    .replace(/[‘’]/g, "'")
-    .replace(/\b(inches|inch|in)\b/g, '')
-    .replace(/["']/g, '')
-    .replace(/-/g, '.')
-    .replace(/[^a-z0-9.]+/g, '')
-    .replace(/\.0+$/g, '')
-    .trim();
-}
-
-function flattenVariationOptions(product = {}) {
-  const attrs = Array.isArray(product?.variation_attributes)
-    ? product.variation_attributes
-    : (Array.isArray(product?.attributes) ? product.attributes : []);
-
-  return attrs.flatMap((attr) => {
-    if (!Array.isArray(attr?.options)) return [];
-    return attr.options
-      .flatMap((option) => String(option || '').split('|'))
-      .map((option) => option.trim())
-      .filter(Boolean);
-  });
-}
-
-function inferVariationLabelFromParentOptions(product = {}, rawValue = '') {
-  const raw = String(rawValue || '').trim();
-  if (!raw) return '';
-
-  const normalizedRaw = normalizeOptionToken(raw);
-  const matched = flattenVariationOptions(product).find((option) => normalizeOptionToken(option) === normalizedRaw);
-  if (matched) return matched;
-
-  if (/^\d+(?:\.\d+)?$/.test(normalizedRaw)) return `${normalizedRaw} in`;
-  return raw;
-}
-
-function getVariationLabel(product = {}, cardProduct = {}) {
-  const direct = cardProduct?.variation_label || cardProduct?.variationLabel;
-  if (direct) return String(direct).trim();
-
-  const firstAttr = Array.isArray(cardProduct?.attributes) ? cardProduct.attributes[0] : null;
-  const fromAttr = firstAttr?.option || firstAttr?.value || firstAttr?.label;
-  if (fromAttr) return inferVariationLabelFromParentOptions(product, fromAttr);
-
-  return inferVariationLabelFromParentOptions(product, cardProduct?.name || '');
-}
-
-function composeVariationName(product = {}, cardProduct = {}) {
-  const parentName = product?.name || cardProduct?.parentName || '';
-  const variationLabel = getVariationLabel(product, cardProduct);
-  const rawName = String(cardProduct?.name || '').trim();
-
-  if (parentName && variationLabel) {
-    const normalizedRaw = normalizeOptionToken(rawName);
-    const normalizedLabel = normalizeOptionToken(variationLabel);
-    const rawLooksLikeOption = !rawName || normalizedRaw === normalizedLabel || /^\d+(?:[.-]\d+)?(?:\s*(?:in|inch|inches|"))?$/i.test(rawName);
-
-    if (rawLooksLikeOption || !rawName.toLowerCase().includes(parentName.toLowerCase())) {
-      return `${parentName} - ${variationLabel}`;
-    }
-  }
-
-  return rawName || parentName || '';
-}
-
-function getResolvedCardProduct(product, cardProduct) {
-  if (!product?.is_variable) return cardProduct || product;
-
-  if (cardProduct?.parent_id || cardProduct?.parentId || cardProduct?.id !== product?.id) {
-    const variationLabel = getVariationLabel(product, cardProduct);
-
-    return {
-      ...cardProduct,
-      brand: cardProduct?.brand || product?.brand,
-      image: cardProduct?.image || product?.image,
-      images: cardProduct?.images || product?.images,
-      image_thumbnail: cardProduct?.image_thumbnail || product?.image_thumbnail,
-      image_srcset: cardProduct?.image_srcset || product?.image_srcset,
-      name: composeVariationName(product, cardProduct),
-      variation_label: variationLabel,
-      stock_status: cardProduct?.stock_status || cardProduct?.stockStatus || product?.stock_status || 'instock',
-      price: cardProduct?.price ?? product?.min_price ?? product?.price ?? 0,
-    };
-  }
-
-  return product;
+function getCatalogCardProduct(product) {
+  return product || {};
 }
 
 export default function ProductShoppingCard({
   product,
-  cardProduct,
-  hasSelectedVariation = false,
+  cardProduct: _cardProduct,
+  hasSelectedVariation: _hasSelectedVariation = false,
   onOpenModal,
   onAddToCart,
   index = 0,
 }) {
-  const effectiveProduct = getResolvedCardProduct(product, cardProduct);
-  const resolvedHasVariation = Boolean(
-    product?.is_variable &&
-    effectiveProduct &&
-    effectiveProduct.id &&
-    effectiveProduct.id !== product.id
-  );
-  const canDirectAddVariation = hasSelectedVariation || resolvedHasVariation;
-  const stockStatus = effectiveProduct?.stock_status || effectiveProduct?.stockStatus || product?.stock_status || 'instock';
+  const effectiveProduct = getCatalogCardProduct(product);
+  const stockStatus = effectiveProduct?.stock_status || effectiveProduct?.stockStatus || 'instock';
   const isOutOfStock = stockStatus === STOCK_STATUS_OUT_OF_STOCK;
   const isOnSale = effectiveProduct?.on_sale || product?.on_sale;
   const badgeLabel = product?.badge || (isOnSale && !product?.badge ? 'Sale' : null);
   const badgeStyle = badgeLabel ? (BADGE_CONFIG[badgeLabel] || BADGE_CONFIG.Sale) : null;
-  const displayPrice = product?.is_variable && !resolvedHasVariation && product?.min_price != null
+
+  const displayPrice = product?.is_variable && product?.min_price != null
     ? `From ${formatPrice(product.min_price)}`
     : formatPrice(effectiveProduct?.price ?? product?.price ?? 0);
   const displayName = effectiveProduct?.name || effectiveProduct?.part_number || product?.name || product?.part_number || 'Product';
@@ -180,8 +83,8 @@ export default function ProductShoppingCard({
         >
           <ProductCardImage
             product={effectiveProduct}
-            src={effectiveProduct?.image_thumbnail || product?.image_thumbnail || effectiveProduct?.image || product?.image}
-            srcSet={effectiveProduct?.image_srcset || product?.image_srcset}
+            src={effectiveProduct?.image_thumbnail || effectiveProduct?.image}
+            srcSet={effectiveProduct?.image_srcset}
             sizes="(max-width: 479px) calc(50vw - 22px), (max-width: 767px) calc(50vw - 28px), (max-width: 1023px) calc(33vw - 28px), 190px"
             alt={displayName}
             padding="0"
@@ -250,13 +153,13 @@ export default function ProductShoppingCard({
       </div>
 
       <div className="dtb-plp-card__body" style={{ padding: '14px 16px 16px' }}>
-        {(effectiveProduct?.brand || product?.brand) && (
+        {effectiveProduct?.brand && (
           <p className="dtb-plp-card__brand" style={{
             fontSize: '0.65rem', fontWeight: 700,
             letterSpacing: '0.09em', textTransform: 'uppercase',
             color: 'var(--primary-600)', margin: '0 0 5px',
           }}>
-            {effectiveProduct?.brand || product?.brand}
+            {effectiveProduct.brand}
           </p>
         )}
 
@@ -301,28 +204,15 @@ export default function ProductShoppingCard({
           </p>
 
           {product?.is_variable ? (
-            canDirectAddVariation ? (
-              <button
-                type="button"
-                className="dtb-plp-card__cta dtb-plp-card__cta--cart"
-                onClick={(e) => { e.stopPropagation(); onAddToCart(); }}
-                disabled={isOutOfStock}
-                aria-label="Add selected variation to cart"
-                style={ctaStyle(isOutOfStock, 'cart')}
-              >
-                <ShoppingCart size={15} />
-              </button>
-            ) : (
-              <button
-                type="button"
-                className="dtb-plp-card__cta dtb-plp-card__cta--options"
-                onClick={(e) => { e.stopPropagation(); onOpenModal(); }}
-                aria-label="View options"
-                style={ctaStyle(false, 'options')}
-              >
-                Options&nbsp;<ChevronRight size={11} />
-              </button>
-            )
+            <button
+              type="button"
+              className="dtb-plp-card__cta dtb-plp-card__cta--options"
+              onClick={(e) => { e.stopPropagation(); onOpenModal(); }}
+              aria-label="View options"
+              style={ctaStyle(false, 'options')}
+            >
+              Options&nbsp;<ChevronRight size={11} />
+            </button>
           ) : (
             <button
               type="button"
