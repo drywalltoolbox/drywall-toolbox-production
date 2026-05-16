@@ -7,84 +7,56 @@ import { CartProvider } from './context/CartContext';
 import { WooCommerceProvider } from './context/WooCommerceContext';
 import { AuthProvider } from './auth/AuthContext.js';
 import AppErrorBoundary from './components/system/AppErrorBoundary.jsx';
-
-// Layout components load eagerly — they're on every page so there's no benefit
-// to lazy loading them. Keeping them in the main bundle is correct.
 import Header from './components/shell/Header';
 import Footer from './components/shell/Footer';
 import CartSidebar from './components/shell/CartSidebar';
 import ProtectedRoute from './components/routing/ProtectedRoute';
 
-// ─── Lazy page imports ────────────────────────────────────────────────────────
-// Each import() becomes its own chunk file. Webpack only loads a chunk when
-// the user actually navigates to that route — keeping the initial bundle lean.
-const Home               = lazy(() => import('./pages/Home'));
-const Products           = lazy(() => import('./pages/Products'));
-const Parts              = lazy(() => import('./pages/Parts'));
-const Product            = lazy(() => import('./pages/Product'));
-const ProductDetailPage  = lazy(() => import('./pages/ProductDetailPage'));
-const CategoryPage       = lazy(() => import('./pages/CategoryPage'));
-const Schematics         = lazy(() => import('./pages/Schematics'));
-const Repairs            = lazy(() => import('./pages/Repairs'));
-const Cart               = lazy(() => import('./pages/Cart'));
-const Checkout           = lazy(() => import('./pages/Checkout'));
-const OrderConfirmation  = lazy(() => import('./pages/OrderConfirmation'));
-const Contact            = lazy(() => import('./pages/Contact'));
-// Admin/settings pages are rarely visited — ideal lazy candidates
+const Home = lazy(() => import('./pages/Home'));
+const Products = lazy(() => import('./pages/Products'));
+const Parts = lazy(() => import('./pages/Parts'));
+const Product = lazy(() => import('./pages/Product'));
+const ProductDetailPage = lazy(() => import('./pages/ProductDetailPage'));
+const CategoryPage = lazy(() => import('./pages/CategoryPage'));
+const Schematics = lazy(() => import('./pages/Schematics'));
+const Repairs = lazy(() => import('./pages/Repairs'));
+const Cart = lazy(() => import('./pages/Cart'));
+const Checkout = lazy(() => import('./pages/Checkout'));
+const OrderConfirmation = lazy(() => import('./pages/OrderConfirmation'));
+const Contact = lazy(() => import('./pages/Contact'));
 const WooCommerceSettings = lazy(() => import('./pages/WooCommerceSettings'));
-// Auth + account pages — lazy-loaded, isolated from WP admin
-const Login              = lazy(() => import('./pages/Login'));
-const Register           = lazy(() => import('./pages/Register'));
-const ForgotPassword     = lazy(() => import('./pages/ForgotPassword'));
-const ResetPassword      = lazy(() => import('./pages/ResetPassword'));
-const Dashboard          = lazy(() => import('./pages/Dashboard'));
-const Orders             = lazy(() => import('./pages/Orders'));
-const Rewards            = lazy(() => import('./pages/Rewards'));
-const AccountSettings    = lazy(() => import('./pages/AccountSettings'));
-const SavedAddresses     = lazy(() => import('./pages/SavedAddresses'));
-const Notifications      = lazy(() => import('./pages/Notifications'));
-const Calculators        = lazy(() => import('./pages/Calculators'));
-const FAQ                = lazy(() => import('./pages/FAQ'));
-const ShippingPolicy     = lazy(() => import('./pages/ShippingPolicy'));
-const ReturnPortal       = lazy(() => import('./pages/ReturnPortal'));
-const StorePolicies      = lazy(() => import('./pages/StorePolicies'));
-const ToolsetBuilder     = lazy(() => import('./pages/ToolsetBuilder'));
+const Login = lazy(() => import('./pages/Login'));
+const Register = lazy(() => import('./pages/Register'));
+const ForgotPassword = lazy(() => import('./pages/ForgotPassword'));
+const ResetPassword = lazy(() => import('./pages/ResetPassword'));
+const Dashboard = lazy(() => import('./pages/Dashboard'));
+const Orders = lazy(() => import('./pages/Orders'));
+const Rewards = lazy(() => import('./pages/Rewards'));
+const AccountSettings = lazy(() => import('./pages/AccountSettings'));
+const SavedAddresses = lazy(() => import('./pages/SavedAddresses'));
+const Notifications = lazy(() => import('./pages/Notifications'));
+const Calculators = lazy(() => import('./pages/Calculators'));
+const FAQ = lazy(() => import('./pages/FAQ'));
+const ShippingPolicy = lazy(() => import('./pages/ShippingPolicy'));
+const ReturnPortal = lazy(() => import('./pages/ReturnPortal'));
+const StorePolicies = lazy(() => import('./pages/StorePolicies'));
+const ToolsetBuilder = lazy(() => import('./pages/ToolsetBuilder'));
 const TechnicalSpecificationsPreview = lazy(() => import('./pages/TechnicalSpecificationsPreview'));
 
-// ─── 404 Not Found page ───────────────────────────────────────────────────────
-// Rendered for any URL that doesn't match a defined route.
 function NotFound() {
   return (
-    <div style={{
-      display:        'flex',
-      flexDirection:  'column',
-      alignItems:     'center',
-      justifyContent: 'center',
-      minHeight:      '60vh',
-      textAlign:      'center',
-      padding:        '2rem',
-      color:          '#888',
-    }}>
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '60vh', textAlign: 'center', padding: '2rem', color: '#888' }}>
       <h1 style={{ fontSize: '4rem', fontWeight: 700, margin: 0 }}>404</h1>
-      <p style={{ fontSize: '1.1rem', margin: '0.75rem 0 1.5rem' }}>
-        Page not found
-      </p>
-      <a href="/" style={{ color: '#3b82f6', textDecoration: 'underline' }}>
-        Return to home
-      </a>
+      <p style={{ fontSize: '1.1rem', margin: '0.75rem 0 1.5rem' }}>Page not found</p>
+      <a href="/" style={{ color: '#3b82f6', textDecoration: 'underline' }}>Return to home</a>
     </div>
   );
 }
 
-// ─── Loading fallback ─────────────────────────────────────────────────────────
-// Shown while a route chunk is being fetched inside the PageTransition wrapper.
 function PageLoader() {
-  return (
-    <LoadingSpinner size="md" label="Loading page…" fullPage />
-  );
+  return <LoadingSpinner size="md" label="Loading page…" fullPage />;
 }
 
-// ─── Scroll to top on route change ───────────────────────────────────────────
 function ScrollToTop() {
   const { pathname } = useLocation();
   useEffect(() => { window.scrollTo(0, 0); }, [pathname]);
@@ -96,87 +68,70 @@ function RedirectToProducts() {
   return <Navigate to={`/products${search || ''}`} replace />;
 }
 
-// ─── All page routes, wrapped with per-route transition ───────────────────────
-// Must be rendered inside <Router> so useLocation() is available.
 function AppRoutes() {
   const location = useLocation();
+  const productSelectorElement = <Products title="Products" isPartsFilter={null} />;
   return (
-    <PageTransition locationKey={ location.pathname }>
-      <Suspense fallback={ <PageLoader /> }>
+    <PageTransition locationKey={location.pathname}>
+      <Suspense fallback={<PageLoader />}>
         <Routes>
-          <Route path="/"                      element={<Home />} />
-          <Route path="/products"              element={<Products forceProductGrid title="Products" isPartsFilter={null} />} />
-          <Route path="/products/brands"       element={<Products />} />
-          <Route path="/products/brands/:brandSlug" element={<Products />} />
-          <Route path="/products/brands/:brandSlug/categories/:categorySlug" element={<Products />} />
-          {/* Slug-based product detail with URL variant state machine */}
-          <Route path="/products/:slug"        element={<ProductDetailPage />} />
-          <Route path="/all-products"          element={<RedirectToProducts />} />
-          <Route path="/parts"                 element={<Parts />} />
-          {/* Legacy part-number route — kept for backward compatibility */}
-          <Route path="/product/:partNumber"   element={<Product />} />
-          <Route path="/category/:slug"        element={<CategoryPage />} />
-          <Route path="/schematics"            element={<Schematics />} />
-          <Route path="/repairs"               element={<Repairs />} />
-          <Route path="/faq"                   element={<FAQ />} />
-          <Route path="/calculators"           element={<Calculators />} />
-          <Route path="/shipping-policy"       element={<ShippingPolicy />} />
-          <Route path="/returns"               element={<ReturnPortal />} />
-          <Route path="/policies"              element={<StorePolicies />} />
-          <Route path="/toolset-builder"       element={<ToolsetBuilder />} />
+          <Route path="/" element={<Home />} />
+          <Route path="/products" element={<Products forceProductGrid title="Products" isPartsFilter={null} />} />
+          <Route path="/products/brands" element={productSelectorElement} />
+          <Route path="/products/brands/:brandSlug" element={productSelectorElement} />
+          <Route path="/products/brands/:brandSlug/categories/:categorySlug" element={productSelectorElement} />
+          <Route path="/products/:slug" element={<ProductDetailPage />} />
+          <Route path="/all-products" element={<RedirectToProducts />} />
+          <Route path="/parts" element={<Parts />} />
+          <Route path="/product/:partNumber" element={<Product />} />
+          <Route path="/category/:slug" element={<CategoryPage />} />
+          <Route path="/schematics" element={<Schematics />} />
+          <Route path="/repairs" element={<Repairs />} />
+          <Route path="/faq" element={<FAQ />} />
+          <Route path="/calculators" element={<Calculators />} />
+          <Route path="/shipping-policy" element={<ShippingPolicy />} />
+          <Route path="/returns" element={<ReturnPortal />} />
+          <Route path="/policies" element={<StorePolicies />} />
+          <Route path="/toolset-builder" element={<ToolsetBuilder />} />
           <Route path="/preview/technical-specifications" element={<TechnicalSpecificationsPreview />} />
-          <Route path="/cart"                  element={<Cart />} />
-          <Route path="/checkout"              element={<Checkout />} />
-          <Route path="/order/:id"             element={<OrderConfirmation />} />
-          <Route path="/contact"               element={<Contact />} />
-          <Route path="/settings/woocommerce"  element={<ProtectedRoute><WooCommerceSettings /></ProtectedRoute>} />
-          {/* Auth + account pages — dev-only, standalone, no WP admin changes */}
-          <Route path="/login"                 element={<Login />} />
-          <Route path="/register"              element={<Register />} />
-          <Route path="/forgot-password"       element={<ForgotPassword />} />
-          <Route path="/reset-password"        element={<ResetPassword />} />
-          <Route path="/dashboard"             element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-          <Route path="/orders"                element={<ProtectedRoute><Orders /></ProtectedRoute>} />
-          <Route path="/rewards"               element={<ProtectedRoute><Rewards /></ProtectedRoute>} />
-          <Route path="/account-settings"      element={<ProtectedRoute><AccountSettings /></ProtectedRoute>} />
-          <Route path="/addresses"             element={<ProtectedRoute><SavedAddresses /></ProtectedRoute>} />
-          <Route path="/notifications"         element={<ProtectedRoute><Notifications /></ProtectedRoute>} />
-          {/* Catch-all: any unmatched route renders a 404 page */}
-          <Route path="*"                      element={<NotFound />} />
+          <Route path="/cart" element={<Cart />} />
+          <Route path="/checkout" element={<Checkout />} />
+          <Route path="/order/:id" element={<OrderConfirmation />} />
+          <Route path="/contact" element={<Contact />} />
+          <Route path="/settings/woocommerce" element={<ProtectedRoute><WooCommerceSettings /></ProtectedRoute>} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
+          <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+          <Route path="/orders" element={<ProtectedRoute><Orders /></ProtectedRoute>} />
+          <Route path="/rewards" element={<ProtectedRoute><Rewards /></ProtectedRoute>} />
+          <Route path="/account-settings" element={<ProtectedRoute><AccountSettings /></ProtectedRoute>} />
+          <Route path="/addresses" element={<ProtectedRoute><SavedAddresses /></ProtectedRoute>} />
+          <Route path="/notifications" element={<ProtectedRoute><Notifications /></ProtectedRoute>} />
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </Suspense>
     </PageTransition>
   );
 }
 
-// ─── App ─────────────────────────────────────────────────────────────────────
 function App() {
   const [cartOpen, setCartOpen] = useState(false);
-
   const toggleCart = () => setCartOpen(prev => !prev);
-  const closeCart  = () => setCartOpen(false);
-
-  // On GitHub Pages the site lives at /drywall-toolbox, so React Router needs
-  // the same sub-path as basename. PUBLIC_URL is injected at build time by
-  // webpack DefinePlugin from the PUBLIC_URL env var (set to /drywall-toolbox
-  // in the GH Actions workflow). In production on a custom domain PUBLIC_URL
-  // is '' (empty), which resolves to '/' here — correct for both cases.
+  const closeCart = () => setCartOpen(false);
   const basename = (process.env.PUBLIC_URL || '').replace(/\/+$/, '') || '/';
 
   return (
     <AppErrorBoundary>
       <AuthProvider>
         <WooCommerceProvider>
-            <CartProvider>
+          <CartProvider>
             <Router basename={basename}>
-              <AppShell
-                cartOpen={cartOpen}
-                toggleCart={toggleCart}
-                closeCart={closeCart}
-              />
+              <AppShell cartOpen={cartOpen} toggleCart={toggleCart} closeCart={closeCart} />
             </Router>
-            </CartProvider>
-          </WooCommerceProvider>
+          </CartProvider>
+        </WooCommerceProvider>
       </AuthProvider>
     </AppErrorBoundary>
   );
@@ -189,34 +144,17 @@ function AppShell({ cartOpen, toggleCart, closeCart }) {
   return (
     <>
       <ScrollToTop />
-
-      {/* Background texture */}
       <div className="machined-bg" />
-
       <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
         {isHomePage && (
           <div className="site-top-ticker">
-            <ShippingTicker
-              items={[
-                { text: 'FREE SHIPPING ON ALL ORDERS $75+ (CONTIGUOUS USA ONLY)' },
-                { text: 'Expert Support - Real Pros' },
-                { text: 'Professional Repair Services' },
-              ]}
-              duration={33}
-              className="dtb-desktop-shipping-bar dtb-top-shipping-bar"
-            />
+            <ShippingTicker items={[{ text: 'FREE SHIPPING ON ALL ORDERS $75+ (CONTIGUOUS USA ONLY)' }, { text: 'Expert Support - Real Pros' }, { text: 'Professional Repair Services' }]} duration={33} className="dtb-desktop-shipping-bar dtb-top-shipping-bar" />
           </div>
         )}
-
         <Header onCartToggle={toggleCart} hasTopTicker={isHomePage} />
-
-        <main style={{ flexGrow: 1 }} className="main-content">
-          <AppRoutes />
-        </main>
-
+        <main style={{ flexGrow: 1 }} className="main-content"><AppRoutes /></main>
         <Footer />
       </div>
-
       <CartSidebar isOpen={cartOpen} onClose={closeCart} />
     </>
   );
