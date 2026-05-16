@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useLocation, Navigate } from 'react-router-dom';
 import { useState, useEffect, lazy, Suspense } from 'react';
 import PageTransition from './components/routing/PageTransition';
 import LoadingSpinner from './components/shared/LoadingSpinner';
@@ -91,6 +91,11 @@ function ScrollToTop() {
   return null;
 }
 
+function RedirectToProducts() {
+  const { search } = useLocation();
+  return <Navigate to={`/products${search || ''}`} replace />;
+}
+
 // ─── All page routes, wrapped with per-route transition ───────────────────────
 // Must be rendered inside <Router> so useLocation() is available.
 function AppRoutes() {
@@ -106,7 +111,7 @@ function AppRoutes() {
           <Route path="/products/brands/:brandSlug/categories/:categorySlug" element={<Products />} />
           {/* Slug-based product detail with URL variant state machine */}
           <Route path="/products/:slug"        element={<ProductDetailPage />} />
-          <Route path="/all-products"          element={<Products forceProductGrid title="Products" isPartsFilter={null} />} />
+          <Route path="/all-products"          element={<RedirectToProducts />} />
           <Route path="/parts"                 element={<Parts />} />
           {/* Legacy part-number route — kept for backward compatibility */}
           <Route path="/product/:partNumber"   element={<Product />} />
