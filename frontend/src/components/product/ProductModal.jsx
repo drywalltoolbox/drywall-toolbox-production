@@ -1,66 +1,107 @@
 import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { motion as Motion, AnimatePresence } from 'framer-motion';
+import { motion as Motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 
 const backdropVariants = {
+  hidden:  { opacity: 0, backdropFilter: 'blur(0px)' },
+  visible: { opacity: 1, backdropFilter: 'blur(14px)' },
+};
+
+const desktopPanelVariants = {
+  hidden:  { opacity: 0, y: 18, scale: 0.985, filter: 'blur(5px)' },
+  visible: { opacity: 1, y: 0,  scale: 1,     filter: 'blur(0px)' },
+  exit:    { opacity: 0, y: 14, scale: 0.99,  filter: 'blur(3px)' },
+};
+
+const mobilePanelVariants = {
+  hidden:  { opacity: 0, y: 42, scale: 0.995 },
+  visible: { opacity: 1, y: 0,  scale: 1 },
+  exit:    { opacity: 0, y: 28, scale: 0.995 },
+};
+
+const reduceMotionPanelVariants = {
   hidden:  { opacity: 0 },
   visible: { opacity: 1 },
+  exit:    { opacity: 0 },
 };
 
-const panelVariants = {
-  hidden:  { opacity: 0, y: 28 },
-  visible: { opacity: 1, y: 0  },
-  exit:    { opacity: 0, y: 18 },
-};
+const backdropTransition = { duration: 0.22, ease: [0.4, 0, 0.2, 1] };
+const panelTransition = { duration: 0.32, ease: [0.22, 1, 0.36, 1] };
+const reducedTransition = { duration: 0.12, ease: 'linear' };
 
-const panelTransition = { duration: 0.24, ease: [0.22, 1, 0.36, 1] };
+function useIsMobileModal() {
+  const [isMobile, setIsMobile] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    return window.matchMedia('(max-width: 768px)').matches;
+  });
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return undefined;
+    const mediaQuery = window.matchMedia('(max-width: 768px)');
+    const onChange = () => setIsMobile(mediaQuery.matches);
+    onChange();
+    mediaQuery.addEventListener?.('change', onChange);
+    return () => mediaQuery.removeEventListener?.('change', onChange);
+  }, []);
+
+  return isMobile;
+}
 
 /**
  * ProductModal — shared animated overlay for all product-detail modals.
  *
- * Usage:
- *   <ProductModal isOpen={isOpen} product={product} onClose={handleClose}>
- *     <ProductDetail ... />
- *   </ProductModal>
- *
  * Features:
- *  • Framer-motion backdrop + slide-up panel animations
- *  • Keyboard: Escape closes the modal
- *  • focus() the panel on open; restores caller focus on close
- *  • Scrolls to top whenever the product changes while open
- *  • overscroll-behavior: contain so swipe-down doesn't navigate back on iOS
- *  • Renders via React portal so z-index stacking is always correct
+ *  • Framer-motion backdrop + panel/sheet animations
+ *  • Mobile-first bottom sheet behavior with desktop centered dialog behavior
+ *  • Keyboard Escape close
+ *  • Focus restoration
+ *  • Scroll containment for iOS
+ *  • Portal rendering for stable z-index stacking
  */
 export default function ProductModal({ isOpen, product, onClose, children }) {
   const scrollRef   = useRef(null);
-  const openerRef   = useRef(null);  // element that triggered open
+  const openerRef   = useRef(null);
   const scrollHideTimerRef = useRef(null);
   const [isScrollActive, setIsScrollActive] = useState(false);
+  const reduceMotion = useReducedMotion();
+  const isMobile = useIsMobileModal();
 
-  // ── Remember caller focus so we can restore it on close ────────────────
   useEffect(() => {
     if (isOpen) {
       openerRef.current = document.activeElement;
     } else {
-      // Small delay so the exit animation finishes before focus returns
       const id = setTimeout(() => {
         if (openerRef.current && typeof openerRef.current.focus === 'function') {
           openerRef.current.focus({ preventScroll: true });
         }
         openerRef.current = null;
-      }, 280);
+      }, reduceMotion ? 80 : 280);
       return () => clearTimeout(id);
     }
+  }, [isOpen, reduceMotion]);
+
+  useEffect(() => {
+    if (!isOpen || typeof document === 'undefined') return undefined;
+
+    const previousOverflow = document.body.style.overflow;
+    const previousTouchAction = document.body.style.touchAction;
+    document.body.style.overflow = 'hidden';
+    document.body.style.touchAction = 'none';
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      document.body.style.touchAction = previousTouchAction;
+    };
   }, [isOpen]);
 
-  // ── Move focus into the panel right after it opens ──────────────────────
   useEffect(() => {
     if (isOpen && scrollRef.current) {
-      scrollRef.current.focus({ preventScroll: true });
+      requestAnimationFrame(() => {
+        scrollRef.current?.focus({ preventScroll: true });
+      });
     }
   }, [isOpen]);
 
-  // ── Scroll to top whenever the displayed product changes ────────────────
   useEffect(() => {
     if (isOpen && scrollRef.current) {
       scrollRef.current.scrollTop = 0;
@@ -88,41 +129,41 @@ export default function ProductModal({ isOpen, product, onClose, children }) {
     };
   }, []);
 
-  // ── Escape key — closes modal (but NOT when the lightbox handles it first) ─
   useEffect(() => {
-    if (!isOpen) return;
+    if (!isOpen) return undefined;
     const handler = (e) => {
       if (e.key === 'Escape') {
         onClose();
       }
     };
-    // Bubble phase so ProductImageGallery's lightbox handler (which calls
-    // e.stopImmediatePropagation()) can run first when the lightbox is open.
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
   }, [isOpen, onClose]);
 
   if (typeof document === 'undefined') return null;
 
+  const panelVariants = reduceMotion
+    ? reduceMotionPanelVariants
+    : (isMobile ? mobilePanelVariants : desktopPanelVariants);
+  const transition = reduceMotion ? reducedTransition : panelTransition;
+
   return createPortal(
-    <AnimatePresence>
+    <AnimatePresence mode="wait">
       {isOpen && product && (
         <>
-          {/* ── Backdrop ───────────────────────────────────────────────── */}
           <Motion.div
             key="product-modal-backdrop"
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm"
+            className="fixed inset-0 bg-slate-950/55 product-modal-backdrop"
             style={{ zIndex: 10001 }}
             variants={backdropVariants}
             initial="hidden"
             animate="visible"
             exit="hidden"
-            transition={{ duration: 0.2, ease: [0.4, 0, 0.2, 1] }}
+            transition={reduceMotion ? reducedTransition : backdropTransition}
             onClick={onClose}
             aria-hidden="true"
           />
 
-          {/* ── Scroll container ───────────────────────────────────────── */}
           <Motion.div
             key="product-modal-panel"
             ref={scrollRef}
@@ -136,7 +177,7 @@ export default function ProductModal({ isOpen, product, onClose, children }) {
             initial="hidden"
             animate="visible"
             exit="exit"
-            transition={panelTransition}
+            transition={transition}
             onScroll={() => {
               setIsScrollActive(true);
               if (scrollHideTimerRef.current) clearTimeout(scrollHideTimerRef.current);
@@ -145,60 +186,69 @@ export default function ProductModal({ isOpen, product, onClose, children }) {
               }, 900);
             }}
           >
-            {/* Inner centering wrapper — click-outside backdrop */}
             <div
-              className="product-modal-scroll-inner flex items-start justify-center min-h-full px-3 py-4 sm:p-4 sm:py-6"
+              className="product-modal-scroll-inner flex items-end md:items-center justify-center min-h-full px-0 py-0 md:px-4 md:py-6 lg:px-6"
               onClick={onClose}
             >
-              {/* Card wrapper — stop propagation so clicks on card don't close */}
-              <div
-                className="w-full max-w-6xl"
+              <Motion.div
+                className="product-modal-card-shell w-full max-w-6xl"
+                layout
                 onClick={(e) => e.stopPropagation()}
               >
                 {children}
-              </div>
+              </Motion.div>
             </div>
           </Motion.div>
           <style>{`
+            .product-modal-backdrop {
+              -webkit-backdrop-filter: blur(14px) saturate(120%);
+              backdrop-filter: blur(14px) saturate(120%);
+            }
             .product-modal-scroll-shell {
-              top: var(--header-height, 100px);
+              top: var(--header-height, 96px);
               scrollbar-width: none;
               scrollbar-color: transparent transparent;
+              -webkit-overflow-scrolling: touch;
             }
             .product-modal-scroll-shell::-webkit-scrollbar {
               width: 0;
               background: transparent;
             }
-            .product-modal-scroll-shell::-webkit-scrollbar-track {
-              background: transparent;
+            .product-modal-card-shell > * {
+              border-radius: 26px 26px 0 0;
+              box-shadow: 0 -12px 40px rgba(15, 23, 42, 0.18);
+              overflow: hidden;
             }
-            .product-modal-scroll-shell::-webkit-scrollbar-thumb {
-              background: transparent;
-              border-radius: 999px;
-            }
-            @media (min-width: 1025px) {
+            @media (min-width: 769px) {
               .product-modal-scroll-shell {
                 top: 0;
                 scrollbar-width: thin;
                 scrollbar-color: transparent transparent;
               }
-              .product-modal-scroll-inner {
-                padding-top: 16px;
-                padding-bottom: 16px;
+              .product-modal-card-shell > * {
+                border-radius: 26px;
+                box-shadow: 0 32px 90px rgba(15, 23, 42, 0.28), 0 8px 22px rgba(15, 23, 42, 0.16);
               }
               .product-modal-scroll-shell::-webkit-scrollbar {
                 width: 10px;
               }
               .product-modal-scroll-shell.product-modal-scroll-shell--active::-webkit-scrollbar-thumb {
-                background: rgba(148, 163, 184, 0.28);
+                background: rgba(148, 163, 184, 0.32);
                 border: 2px solid transparent;
                 background-clip: padding-box;
+                border-radius: 999px;
               }
               .product-modal-scroll-shell.product-modal-scroll-shell--active::-webkit-scrollbar-track {
                 background: transparent;
               }
               .product-modal-scroll-shell.product-modal-scroll-shell--active {
-                scrollbar-color: rgba(148, 163, 184, 0.28) transparent;
+                scrollbar-color: rgba(148, 163, 184, 0.32) transparent;
+              }
+            }
+            @media (prefers-reduced-motion: reduce) {
+              .product-modal-backdrop {
+                -webkit-backdrop-filter: none;
+                backdrop-filter: none;
               }
             }
           `}</style>
