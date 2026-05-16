@@ -217,12 +217,22 @@ export default function ProductsCatalogPlatform({ forceProductGrid = false, titl
     : 'Browse our extensive collection of professional drywall tools';
   const isCategoryProductRoute = Boolean(selectedBrand && selectedCategoryLabel);
   const isPartsPage = isPartsFilter === 1;
+  const page = Number(pagination?.page || query.page || 1);
+  const totalPages = Math.max(1, Number(pagination?.totalPages || 1));
+  const total = Number(pagination?.total || mappedProducts.length || 0);
+  const perPage = Number(pagination?.perPage || query.perPage || 24);
+  const pageStart = (page - 1) * perPage;
   const desktopHeading = isCategoryProductRoute ? pageHeading : title;
   const desktopSubheading = isCategoryProductRoute
     ? pageSubheading
     : (isPartsPage
       ? 'Genuine replacement parts, kits, and service components from trusted drywall brands.'
       : pageSubheading);
+  const unifiedHeadingEyebrow = isPartsPage ? 'Parts' : 'Products';
+  const unifiedHeadingTitle = isCategoryProductRoute ? selectedCategoryLabel : desktopHeading;
+  const unifiedHeadingMeta = isCategoryProductRoute
+    ? `${selectedBrandFacet?.label || selectedBrand}${total > 0 ? ` · ${total.toLocaleString()} product${total === 1 ? '' : 's'}` : ''}`
+    : `${isPartsPage ? 'Replacement parts and service components' : 'All brands and categories'}${total > 0 ? ` · ${total.toLocaleString()} product${total === 1 ? '' : 's'}` : ''}`;
   const canonicalUrl = isPartsPage ? 'https://drywalltoolbox.com/parts' : 'https://drywalltoolbox.com/products';
   const seoDescription = isPartsPage
     ? 'Shop professional drywall replacement parts, service kits, and repair components from leading brands.'
@@ -233,12 +243,6 @@ export default function ProductsCatalogPlatform({ forceProductGrid = false, titl
     if (options.resetPage !== false) next.page = patch.page ?? 1;
     navigate(buildCatalogUrl(next, pathParams), { replace: options.replace ?? false });
   }, [navigate, pathParams, query]);
-
-  const page = Number(pagination?.page || query.page || 1);
-  const totalPages = Math.max(1, Number(pagination?.totalPages || 1));
-  const total = Number(pagination?.total || mappedProducts.length || 0);
-  const perPage = Number(pagination?.perPage || query.perPage || 24);
-  const pageStart = (page - 1) * perPage;
 
   const handleAddToCart = (product, quantity = 1) => {
     addToCart(product, quantity);
@@ -283,8 +287,8 @@ export default function ProductsCatalogPlatform({ forceProductGrid = false, titl
 
         {!showCategoryLanding && (
           <div className="mb-5 sm:mb-8">
-            {isCategoryProductRoute ? (
-              <div className="dtb-listing-heading dtb-listing-heading--category">
+            <div className="dtb-listing-heading dtb-listing-heading--standard">
+              {isCategoryProductRoute && (
                 <button
                   type="button"
                   onClick={query.displayCategory ? resetToCategoryCards : resetToBrandList}
@@ -293,19 +297,11 @@ export default function ProductsCatalogPlatform({ forceProductGrid = false, titl
                   <ArrowLeft size={14} aria-hidden="true" />
                   <span>{selectedBrandFacet?.label || selectedBrand}</span>
                 </button>
-                <span className="dtb-listing-heading__eyebrow">Products</span>
-                <h1 className="dtb-listing-heading__title">{selectedCategoryLabel}</h1>
-                <p className="dtb-listing-heading__meta">
-                  {(selectedBrandFacet?.label || selectedBrand)}
-                  {total > 0 ? ` · ${total.toLocaleString()} product${total === 1 ? '' : 's'}` : ''}
-                </p>
-              </div>
-            ) : (
-              <div className="dtb-listing-heading dtb-listing-heading--standard">
-                <h1 className="dtb-listing-heading__desktop-title">{desktopHeading}</h1>
-                <p className="dtb-listing-heading__desktop-subtitle">{desktopSubheading}</p>
-              </div>
-            )}
+              )}
+              <span className="dtb-listing-heading__eyebrow">{unifiedHeadingEyebrow}</span>
+              <h1 className="dtb-listing-heading__title">{unifiedHeadingTitle}</h1>
+              <p className="dtb-listing-heading__meta">{unifiedHeadingMeta}</p>
+            </div>
           </div>
         )}
 
@@ -358,9 +354,9 @@ export default function ProductsCatalogPlatform({ forceProductGrid = false, titl
 
               <div className="flex-1">
                 <div className="dtb-listing-toolbar mb-5 sm:mb-6">
-                  <button onClick={() => setShowFilters(!showFilters)} className="dtb-listing-toolbar__pill lg:hidden" aria-label="Toggle filters and sort">
+                  <button onClick={() => setShowFilters(!showFilters)} className="dtb-listing-toolbar__pill" aria-label="Toggle filters">
                     <Filter size={18} />
-                    <span>Filter &amp; Sort</span>
+                    <span>Filters</span>
                   </button>
                   <div className="dtb-listing-toolbar__sort">
                     <Dropdown value={query.sort} onChange={(value) => setQuery({ sort: value })} options={SORT_OPTIONS} />
@@ -368,10 +364,6 @@ export default function ProductsCatalogPlatform({ forceProductGrid = false, titl
                   <div className="dtb-listing-toolbar__count" aria-live="polite">
                     {itemsLoading ? 'Loading…' : `${total.toLocaleString()} result${total === 1 ? '' : 's'}`}
                   </div>
-                  <button onClick={() => setShowFilters(!showFilters)} className="dtb-listing-toolbar__pill hidden lg:inline-flex" aria-label="Toggle filters">
-                    <Filter size={18} />
-                    <span>Filters</span>
-                  </button>
                 </div>
 
                 {itemsLoading ? <ProductSkeletonGrid count={24} /> : (

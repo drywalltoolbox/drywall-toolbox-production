@@ -2,6 +2,7 @@ import { useMemo, useState, useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { X } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import Reviews from './Reviews';
 import { useCart } from '../../context/CartContext';
 import ProductImageGallery from './ProductImageGallery';
@@ -143,6 +144,26 @@ function getBrandLabel(product, effectiveProduct = null) {
     product?.brand ||
     effectiveProduct?.brand ||
     ''
+  );
+}
+
+function EmptyReviewsButton({ onClick, className = '' }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`dtb-pdp-header__reviews ${className}`.trim()}
+      aria-label="View reviews, 0 out of 5 stars, no reviews yet"
+    >
+      <span className="dtb-pdp-header__reviews-stars" role="img" aria-label="0 out of 5 stars">
+        {[...Array(5)].map((_, i) => (
+          <svg key={i} className="dtb-pdp-header__review-star" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+          </svg>
+        ))}
+      </span>
+      <span className="dtb-pdp-header__reviews-label">No reviews yet</span>
+    </button>
   );
 }
 
@@ -424,17 +445,12 @@ export default function ProductDetail({
 
       <div className="overflow-x-hidden">
         <div className="dtb-pdp__inner p-4 sm:p-6 md:p-8 lg:p-12 max-w-full">
-          <div className="dtb-pdp__topbar">
-            <span className="dtb-pdp__topbar-label">{brandLabel || 'Drywall Toolbox'}</span>
-            {effectiveSku ? <span className="dtb-pdp__topbar-meta">SKU {effectiveSku}</span> : null}
-          </div>
-
           <div className="dtb-pdp__hero grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 md:gap-8 mb-6 sm:mb-8">
             <div className="dtb-pdp-gallery">
               <ProductImageGallery product={effectiveProduct} />
             </div>
 
-            <div className="flex flex-col">
+            <div className="dtb-pdp__info-column flex flex-col">
               <ProductDetailHeader
                 product={product}
                 effectiveName={(effectiveProduct.name || product.name)}
@@ -449,6 +465,7 @@ export default function ProductDetail({
                 rawPrice={rawPrice}
                 onReviewsClick={() => setActiveTab('reviews')}
                 money={money}
+                reviewsClassName="dtb-pdp-mobile-relocate"
               />
 
               {needsVariation ? (
@@ -466,7 +483,7 @@ export default function ProductDetail({
                 />
               ) : null}
 
-              <p className={`dtb-pdp__stock-line${isOutOfStock ? ' is-out' : ''}`}>
+              <p className={`dtb-pdp__stock-line dtb-pdp-mobile-relocate${isOutOfStock ? ' is-out' : ''}`}>
                 {stockLine}
               </p>
 
@@ -488,7 +505,19 @@ export default function ProductDetail({
                 isWishlisted={isWishlisted}
                 onToggleWishlist={() => setIsWishlisted((prev) => !prev)}
                 partsUrl={partsUrl}
+                reviewNode={<EmptyReviewsButton onClick={() => setActiveTab('reviews')} className="dtb-pdp-header__reviews--mobile-inline" />}
               />
+
+              <div className="dtb-pdp-mobile-post-purchase">
+                <p className={`dtb-pdp__stock-line${isOutOfStock ? ' is-out' : ''}`}>
+                  {stockLine}
+                </p>
+                {partsUrl ? (
+                  <Link to={partsUrl} className="dtb-pdp-parts-link dtb-pdp-parts-link--mobile">
+                    View compatible schematics and parts
+                  </Link>
+                ) : null}
+              </div>
               {addToCartError ? (
                 <p className="text-sm text-red-600 mt-2" role="alert" aria-live="assertive">{addToCartError}</p>
               ) : null}
@@ -500,7 +529,7 @@ export default function ProductDetail({
             setActiveTab={setActiveTab}
             descriptionNode={descriptionNode}
             specsNode={<ProductSpecTable specs={productSpecifications} onItemClick={onClose} />}
-            reviewsNode={<Reviews />}
+            reviewsNode={<Reviews productId={effectiveProduct.id || product.id || effectiveSku || product.slug || product.name} />}
           />
 
         </div>

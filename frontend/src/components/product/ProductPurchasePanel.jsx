@@ -13,6 +13,7 @@ export default function ProductPurchasePanel({
   isWishlisted,
   onToggleWishlist,
   partsUrl,
+  reviewNode = null,
 }) {
   return (
     <div className="product-detail-purchase-panel dtb-pdp-purchase-panel">
@@ -51,8 +52,10 @@ export default function ProductPurchasePanel({
           <span>{isWishlisted ? 'Saved' : 'Save for later'}</span>
         </button>
 
+        {reviewNode}
+
         {partsUrl ? (
-          <Link to={partsUrl} className="dtb-pdp-parts-link">
+          <Link to={partsUrl} className="dtb-pdp-parts-link dtb-pdp-parts-link--desktop">
             View compatible schematics and parts
           </Link>
         ) : null}

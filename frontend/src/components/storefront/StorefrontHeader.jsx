@@ -11,6 +11,7 @@ import StorefrontMobileDrawer from './StorefrontMobileDrawer';
 import AccountHubSheet from '../account/AccountHubSheet.jsx';
 import { searchProducts } from '../../services/catalog';
 import { BRAND_TO_SLUG, sortBrandsBy } from '../../utils/catalogUrlState.js';
+import StorefrontSearchDock from './StorefrontSearchDock';
 
 const PRIMARY_NAV_LINKS = [
   { to: '/schematics', label: 'Schematics' },
@@ -73,6 +74,7 @@ export default function Header({ onCartToggle, cartOpen = false, hasTopTicker = 
   const accountDropdownRef = useRef(null);
   const desktopSearchRef = useRef(null);
   const desktopSearchInputRef = useRef(null);
+  const mobileSearchInputRef = useRef(null);
   const desktopSearchRequestIdRef = useRef(0);
   const searchOverlayRequestIdRef = useRef(0);
   const dropdownCloseTimerRef = useRef(null);
@@ -168,6 +170,35 @@ export default function Header({ onCartToggle, cartOpen = false, hasTopTicker = 
   }, []);
 
   useEffect(() => {
+    const root = document.documentElement;
+    const header = document.querySelector('.site-header');
+    if (!root || !header) return undefined;
+
+    const updateHeaderHeight = () => {
+      const { bottom } = header.getBoundingClientRect();
+      root.style.setProperty('--header-height', `${Math.ceil(bottom)}px`);
+    };
+
+    updateHeaderHeight();
+
+    const rafId = window.requestAnimationFrame(updateHeaderHeight);
+    const resizeObserver = typeof ResizeObserver !== 'undefined'
+      ? new ResizeObserver(() => updateHeaderHeight())
+      : null;
+
+    resizeObserver?.observe(header);
+    window.addEventListener('resize', updateHeaderHeight);
+    window.addEventListener('orientationchange', updateHeaderHeight);
+
+    return () => {
+      window.cancelAnimationFrame(rafId);
+      resizeObserver?.disconnect();
+      window.removeEventListener('resize', updateHeaderHeight);
+      window.removeEventListener('orientationchange', updateHeaderHeight);
+    };
+  }, [hasTopTicker, mobileMenuOpen, isTablet]);
+
+  useEffect(() => {
     const query = desktopSearchQuery.trim();
     const requestId = desktopSearchRequestIdRef.current + 1;
     desktopSearchRequestIdRef.current = requestId;
@@ -247,6 +278,12 @@ export default function Header({ onCartToggle, cartOpen = false, hasTopTicker = 
     navigate('/products/brands');
   };
 
+  const handleMobileViewAll = useCallback(() => {
+    const q = mobileSearchQuery.trim();
+    navigate(`/products${q ? `?search=${encodeURIComponent(q)}` : ''}`);
+    closeSearchOverlay();
+  }, [mobileSearchQuery, navigate, closeSearchOverlay]);
+
   return (
     <>
       <header className={`site-header${hasTopTicker ? ' site-header--with-top-ticker' : ' site-header--no-ticker'}`} role="banner">
@@ -307,113 +344,116 @@ export default function Header({ onCartToggle, cartOpen = false, hasTopTicker = 
           </div>
         </div>
 
-        {/* Mobile search dock — always visible below the nav bar on mobile */}
         <div className="header-mobile-search-dock">
-          <button
-            type="button"
-            className="header-search-dock-btn"
-            onClick={() => setSearchOverlayOpen(true)}
-            aria-label="Open search"
-          >
-            <Search size={15} aria-hidden="true" />
-            <span>Search products, brands, SKU…</span>
-          </button>
+          <StorefrontSearchDock
+            inputRef={mobileSearchInputRef}
+            value={mobileSearchQuery}
+            active={searchOverlayOpen}
+            onChange={(event) => {
+              if (!searchOverlayOpen) setSearchOverlayOpen(true);
+              setMobileSearchQuery(event.target.value);
+            }}
+            onFocus={() => {
+              setMobileMenuOpen(false);
+              setSearchOverlayOpen(true);
+            }}
+            onKeyDown={(event) => {
+              if (event.key === 'Enter') {
+                event.preventDefault();
+                handleMobileViewAll();
+              }
+            }}
+            endAdornment={searchOverlayOpen ? (
+              <button
+                type="button"
+                className="storefront-search-dock__clear"
+                onClick={(event) => {
+                  event.preventDefault();
+                  event.stopPropagation();
+                  closeSearchOverlay();
+                }}
+                aria-label="Close search"
+              >
+                <X size={16} />
+              </button>
+            ) : null}
+          />
         </div>
 
-        <StorefrontMobileDrawer isOpen={mobileMenuOpen} onClose={closeMobileMenu}>
-          <div className="storefront-mobile-drawer__top">
-            <Link to="/" className="storefront-mobile-drawer__logo" onClick={closeMobileMenu}>
-              <img src={LogoWhite} alt="Drywall Toolbox Logo" style={{ height: 28, width: 'auto' }} />
-            </Link>
-            <button type="button" onClick={closeMobileMenu} className="storefront-mobile-drawer__close" aria-label="Close menu">
-              <X size={20} />
-            </button>
-          </div>
-          <div className="storefront-mobile-drawer__search">
-            <button
-              type="button"
-              className="storefront-mobile-drawer__search-button"
-              onClick={() => {
-                setMobileMenuOpen(false);
-                setSearchOverlayOpen(true);
-              }}
-            >
-              <Search size={16} />
-              <span>Search products, brands, SKU…</span>
-            </button>
-          </div>
-          <nav className="storefront-mobile-drawer__nav" aria-label="Mobile navigation">
-            <div className="storefront-mobile-drawer__row-wrap">
-              <div className="storefront-mobile-drawer__row">
-                <button type="button" className="storefront-mobile-drawer__row-label" onClick={handleDrawerBrandsLanding}>
-                  Brands
-                </button>
-                <button
-                  type="button"
-                  className={`storefront-mobile-drawer__row-toggle${brandsExpanded ? ' is-expanded' : ''}`}
-                  onClick={() => setBrandsExpanded((open) => !open)}
-                  aria-label={`${brandsExpanded ? 'Collapse' : 'Expand'} brands`}
-                  aria-expanded={brandsExpanded}
-                  aria-controls="storefront-mobile-drawer-brands"
-                >
-                  <ChevronDown size={18} />
-                </button>
-              </div>
-              <div
-                id="storefront-mobile-drawer-brands"
-                className={`storefront-mobile-drawer__brands${brandsExpanded ? ' is-expanded' : ''}`}
-              >
-                {drawerBrands.map((brand) => (
-                  <button
-                    key={brand.slug}
-                    type="button"
-                    className="storefront-mobile-drawer__brand-link"
-                    onClick={() => handleDrawerBrandNavigate(brand.slug)}
-                  >
-                    {brand.name}
-                  </button>
-                ))}
-              </div>
-            </div>
-            {DRAWER_NAV_ROWS.map(({ to, label }) => (
-              <Link
-                key={to}
-                to={to}
-                className={`storefront-mobile-drawer__row-link${isActive(to) ? ' is-active' : ''}`}
-                onClick={closeMobileMenu}
-              >
-                <span>{label}</span>
-                <ChevronRight size={16} aria-hidden="true" />
-              </Link>
-            ))}
-          </nav>
-          <div className="storefront-mobile-drawer__account">
-            {!isLoading && (isAuthenticated ? (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                <button type="button" onClick={handleMobileAccountClick} className="storefront-mobile-drawer__account-link"><User size={14} />My Account</button>
-                <button type="button" onClick={async () => { closeMobileMenu(); await logout(); }} className="storefront-mobile-drawer__account-link storefront-mobile-drawer__account-link--danger"><LogOut size={14} />Sign Out</button>
-              </div>
-            ) : (
-              <div style={{ display: 'flex', gap: 8 }}>
-                <Link to="/login" onClick={closeMobileMenu} className="storefront-mobile-drawer__account-cta storefront-mobile-drawer__account-cta--ghost"><LogIn size={14} />Sign In</Link>
-                <Link to="/register" onClick={closeMobileMenu} className="storefront-mobile-drawer__account-cta storefront-mobile-drawer__account-cta--primary"><UserPlus size={14} />Register</Link>
-              </div>
-            ))}
-          </div>
-        </StorefrontMobileDrawer>
       </header>
+
+      <StorefrontMobileDrawer isOpen={mobileMenuOpen} onClose={closeMobileMenu}>
+        <nav className="storefront-mobile-drawer__nav" aria-label="Mobile navigation">
+          <div className="storefront-mobile-drawer__row-wrap">
+            <div className="storefront-mobile-drawer__row">
+              <button type="button" className="storefront-mobile-drawer__row-label" onClick={handleDrawerBrandsLanding}>
+                Brands
+              </button>
+              <button
+                type="button"
+                className={`storefront-mobile-drawer__row-toggle${brandsExpanded ? ' is-expanded' : ''}`}
+                onClick={() => setBrandsExpanded((open) => !open)}
+                aria-label={`${brandsExpanded ? 'Collapse' : 'Expand'} brands`}
+                aria-expanded={brandsExpanded}
+                aria-controls="storefront-mobile-drawer-brands"
+              >
+                <ChevronDown size={18} />
+              </button>
+            </div>
+            <div
+              id="storefront-mobile-drawer-brands"
+              className={`storefront-mobile-drawer__brands${brandsExpanded ? ' is-expanded' : ''}`}
+            >
+              {drawerBrands.map((brand) => (
+                <button
+                  key={brand.slug}
+                  type="button"
+                  className="storefront-mobile-drawer__brand-link"
+                  onClick={() => handleDrawerBrandNavigate(brand.slug)}
+                >
+                  {brand.name}
+                </button>
+              ))}
+            </div>
+          </div>
+          {DRAWER_NAV_ROWS.map(({ to, label }) => (
+            <Link
+              key={to}
+              to={to}
+              className={`storefront-mobile-drawer__row-link${isActive(to) ? ' is-active' : ''}`}
+              onClick={closeMobileMenu}
+            >
+              <span>{label}</span>
+              <ChevronRight size={16} aria-hidden="true" />
+            </Link>
+          ))}
+        </nav>
+        <div className="storefront-mobile-drawer__account">
+          {!isLoading && (isAuthenticated ? (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+              <button type="button" onClick={handleMobileAccountClick} className="storefront-mobile-drawer__account-link"><User size={14} />My Account</button>
+              <button type="button" onClick={async () => { closeMobileMenu(); await logout(); }} className="storefront-mobile-drawer__account-link storefront-mobile-drawer__account-link--danger"><LogOut size={14} />Sign Out</button>
+            </div>
+          ) : (
+            <div style={{ display: 'flex', gap: 8 }}>
+              <Link to="/login" onClick={closeMobileMenu} className="storefront-mobile-drawer__account-cta storefront-mobile-drawer__account-cta--ghost"><LogIn size={14} />Sign In</Link>
+              <Link to="/register" onClick={closeMobileMenu} className="storefront-mobile-drawer__account-cta storefront-mobile-drawer__account-cta--primary"><UserPlus size={14} />Register</Link>
+            </div>
+          ))}
+        </div>
+      </StorefrontMobileDrawer>
 
       <Motion.button className={`mobile-cart-fab${hideMobileCartFab ? ' mobile-cart-fab--hidden' : ''}`} onClick={onCartToggle} aria-label="Open cart" initial={{ scale: 0.7, opacity: 0 }} animate={{ scale: 1, opacity: hideMobileCartFab ? 0 : 1 }} transition={{ type: 'spring', stiffness: 340, damping: 24 }} whileTap={{ scale: 0.9 }}>
         <ShoppingCart size={22} />
         <span aria-live="polite" aria-atomic="true">{getCartCount() > 0 && <span className="mobile-cart-fab-badge" aria-label={`${getCartCount()} items in cart`}>{getCartCount()}</span>}</span>
       </Motion.button>
 
-      {/* Full-screen search overlay */}
       <StorefrontSearchOverlay
         isOpen={searchOverlayOpen}
         query={mobileSearchQuery}
         setQuery={setMobileSearchQuery}
         onClose={closeSearchOverlay}
+        onViewAll={handleMobileViewAll}
         loading={searchLoading}
         brands={drawerBrands.map((brand) => brand.name)}
         categories={['Automatic Taping Tools', 'Finishing Boxes', 'Corner Tools', 'Parts']}
@@ -431,30 +471,10 @@ export default function Header({ onCartToggle, cartOpen = false, hasTopTicker = 
         /* ── Mobile search dock ── */
         .header-mobile-search-dock {
           display: none;
-          padding: 8px 12px 10px;
-          background: var(--dtb-shell);
-        }
-
-        .header-search-dock-btn {
-          display: flex;
-          align-items: center;
-          gap: 9px;
           width: 100%;
-          padding: 0 14px;
-          height: 40px;
-          border-radius: 20px;
-          border: none;
-          background: rgba(255,255,255,0.10);
-          color: rgba(255,255,255,0.62);
-          font-size: 14px;
-          font-family: inherit;
-          cursor: pointer;
-          text-align: left;
-          transition: background 140ms ease;
-        }
-
-        .header-search-dock-btn:active {
-          background: rgba(255,255,255,0.16);
+          padding: 8px 12px 12px;
+          background: transparent;
+          border-top: 1px solid rgba(96, 165, 250, 0.08);
         }
 
         @media (max-width: 767px) {

@@ -5,6 +5,13 @@ export default function ProductDetailTabs({ activeTab, setActiveTab, description
     { key: 'reviews', label: 'Reviews' },
   ];
 
+  const activeTabConfig = tabs.find((tab) => tab.key === activeTab) || tabs[0];
+  const contentByTab = {
+    description: descriptionNode,
+    specs: specsNode,
+    reviews: reviewsNode,
+  };
+
   return (
     <div className="dtb-pdp-sections">
       <div className="dtb-pdp-tabs" role="tablist" aria-label="Product detail tabs">
@@ -25,37 +32,19 @@ export default function ProductDetailTabs({ activeTab, setActiveTab, description
         ))}
       </div>
 
-      <section className="dtb-pdp-section">
+      <section className="dtb-pdp-section" aria-live="polite">
         <div className="dtb-pdp-section__heading-wrap">
-          <h3 className="dtb-pdp-section__heading">Description</h3>
+          <h3 className="dtb-pdp-section__heading">{activeTabConfig.label}</h3>
           <span className="dtb-pdp-section__underline" aria-hidden="true" />
         </div>
         <div
           role="tabpanel"
-          id="product-tabpanel-description"
-          aria-labelledby="product-tab-description"
-          className={`dtb-pdp-section__content prose max-w-none text-sm text-gray-700 ${activeTab === 'description' ? 'dtb-pdp-section__content--active' : ''}`}
+          id={`product-tabpanel-${activeTabConfig.key}`}
+          aria-labelledby={`product-tab-${activeTabConfig.key}`}
+          className={`dtb-pdp-section__content ${activeTabConfig.key === 'description' ? 'prose max-w-none text-sm text-gray-700' : ''}`}
         >
-          {descriptionNode}
+          {contentByTab[activeTabConfig.key]}
         </div>
-      </section>
-
-      <section className="dtb-pdp-section">
-        <div className="dtb-pdp-section__heading-wrap">
-          <h3 className="dtb-pdp-section__heading">Specifications</h3>
-          <span className="dtb-pdp-section__underline" aria-hidden="true" />
-        </div>
-        <div role="tabpanel" id="product-tabpanel-specs" aria-labelledby="product-tab-specs" className={`dtb-pdp-section__content ${activeTab === 'specs' ? 'dtb-pdp-section__content--active' : ''}`}>
-          {specsNode}
-        </div>
-      </section>
-
-      <section className="dtb-pdp-section">
-        <div className="dtb-pdp-section__heading-wrap">
-          <h3 className="dtb-pdp-section__heading">Reviews</h3>
-          <span className="dtb-pdp-section__underline" aria-hidden="true" />
-        </div>
-        <div role="tabpanel" id="product-tabpanel-reviews" aria-labelledby="product-tab-reviews" className={`dtb-pdp-section__content ${activeTab === 'reviews' ? 'dtb-pdp-section__content--active' : ''}`}>{reviewsNode}</div>
       </section>
     </div>
   );

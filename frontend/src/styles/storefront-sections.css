@@ -376,6 +376,34 @@
   }
 
 @media (min-width: 768px) {
+  .dtb-listing-heading--standard {
+    display: grid;
+    gap: 0.45rem;
+  }
+
+  .dtb-listing-heading__eyebrow {
+    font-size: 0.74rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--dtb-primary);
+    font-weight: 800;
+  }
+
+  .dtb-listing-heading__title {
+    margin: 0;
+    font-size: clamp(2rem, 3.4vw, 3rem);
+    line-height: 1.05;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    color: #111827;
+  }
+
+  .dtb-listing-heading__meta {
+    margin: 0;
+    color: #64748b;
+    font-size: 1rem;
+  }
+
   .dtb-listing-heading__desktop-title {
     margin: 0 0 0.5rem;
     font-size: clamp(2rem, 3vw, 2.7rem);

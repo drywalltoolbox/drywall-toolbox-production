@@ -51,7 +51,7 @@ export default function Home() {
       />
 
       <div className="page-wrapper dtb-home-page storefront-shell">
-        <div className="container mx-auto px-4 py-4">
+        <div className="container mx-auto px-4 pt-8 pb-4 sm:pt-10">
 
           {/* ── Commerce Hero ── */}
           <StorefrontHero />

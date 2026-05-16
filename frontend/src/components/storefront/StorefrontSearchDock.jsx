@@ -1,21 +1,33 @@
 import { Search } from 'lucide-react';
 import { useId } from 'react';
 
-export default function StorefrontSearchDock({ value, onChange, onFocus, placeholder = 'Search products, brands, SKU...' }) {
+export default function StorefrontSearchDock({
+  value,
+  onChange,
+  onFocus,
+  onKeyDown,
+  inputRef,
+  placeholder = 'Search products, brands, SKU...',
+  active = false,
+  endAdornment = null,
+}) {
   const inputId = useId();
 
   return (
-    <label className="storefront-search-dock" htmlFor={inputId}>
+    <label className={`storefront-search-dock${active ? ' is-active' : ''}`} htmlFor={inputId}>
       <Search size={16} aria-hidden="true" />
       <input
         id={inputId}
+        ref={inputRef}
         type="search"
         value={value}
         onChange={onChange}
         onFocus={onFocus}
+        onKeyDown={onKeyDown}
         placeholder={placeholder}
         aria-label="Search for products"
       />
+      {endAdornment ? <span className="storefront-search-dock__action">{endAdornment}</span> : null}
     </label>
   );
 }
