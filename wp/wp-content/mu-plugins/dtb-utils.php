@@ -126,6 +126,11 @@ function dtb_get_config(): array {
  *   2. Newest readable product-*.csv file in uploads/wc-imports/.
  *   3. Readable uploads/wc-imports/wp-catalog.csv fallback.
  *
+ * Configured files are strict only when at least one configured file resolves.
+ * If all configured filenames are stale, the resolver falls back to the newest
+ * readable product-*.csv and clears the stale missing list so runtime health is
+ * based on the active canonical CSV, not an obsolete import artifact.
+ *
  * @return array{filename:string,filenames:string[],source:string,missing:string[]}
  */
 function dtb_resolve_catalog_csv_config(): array {
@@ -177,6 +182,7 @@ function dtb_resolve_catalog_csv_config(): array {
 			$result['filename']  = basename( $product_csvs[0] );
 			$result['filenames'] = [ $result['filename'] ];
 			$result['source']    = 'auto';
+			$result['missing']   = [];
 			return $result;
 		}
 	}
@@ -186,6 +192,7 @@ function dtb_resolve_catalog_csv_config(): array {
 		$result['filename']  = 'wp-catalog.csv';
 		$result['filenames'] = [ 'wp-catalog.csv' ];
 		$result['source']    = 'fallback';
+		$result['missing']   = [];
 	}
 
 	return $result;
