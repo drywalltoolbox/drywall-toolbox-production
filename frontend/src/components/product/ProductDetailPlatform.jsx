@@ -1,3 +1,4 @@
+import { motion as Motion, AnimatePresence } from 'framer-motion';
 import ProductDetail from './ProductDetail.jsx';
 import { useCatalogProductDetail } from '../../hooks/useCatalogProductDetail.js';
 import {
@@ -5,6 +6,105 @@ import {
   toLegacyVariationDTO,
 } from '../../utils/catalogDtoAdapters.js';
 import { getVariationSelectionMap } from '../../utils/variationSelection.js';
+
+const optimisticShellTransition = { duration: 0.22, ease: [0.22, 1, 0.36, 1] };
+
+function formatPrice(value) {
+  const numeric = Number(value || 0);
+  if (!Number.isFinite(numeric)) return '$0.00';
+  return `$${numeric.toFixed(2)}`;
+}
+
+function getOptimisticImage(product) {
+  return (
+    product?.image ||
+    product?.cardProduct?.image ||
+    product?.media?.image ||
+    product?.images?.[0]?.src ||
+    product?.images?.[0] ||
+    ''
+  );
+}
+
+function getOptimisticPrice(product) {
+  return (
+    product?.price ??
+    product?.cardProduct?.price ??
+    product?.min_price ??
+    product?.price?.current ??
+    product?.price?.value ??
+    0
+  );
+}
+
+function ProductDetailOptimisticShell({ product }) {
+  const image = getOptimisticImage(product);
+  const brand = product?.brand || product?.brandLabel || product?.brand?.label || '';
+  const sku = product?.sku || product?.cardProduct?.sku || '';
+  const price = getOptimisticPrice(product);
+
+  return (
+    <Motion.div
+      className="bg-white w-full max-w-6xl mx-auto overflow-hidden"
+      initial={{ opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -6 }}
+      transition={optimisticShellTransition}
+    >
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-0">
+        <div className="p-5 sm:p-6 lg:p-8">
+          <div className="aspect-square rounded-2xl bg-gray-50 border border-gray-100 flex items-center justify-center overflow-hidden">
+            {image ? (
+              <img
+                src={image}
+                alt={product?.name || 'Product'}
+                className="w-full h-full object-contain p-4"
+                loading="eager"
+              />
+            ) : (
+              <div className="w-full h-full bg-gradient-to-br from-gray-50 to-gray-100 animate-pulse" />
+            )}
+          </div>
+          <div className="mt-4 flex gap-2">
+            <div className="h-16 w-16 rounded-xl bg-gray-100 border border-gray-100 animate-pulse" />
+            <div className="h-16 w-16 rounded-xl bg-gray-100 border border-gray-100 animate-pulse" />
+            <div className="h-16 w-16 rounded-xl bg-gray-100 border border-gray-100 animate-pulse" />
+          </div>
+        </div>
+
+        <div className="p-5 sm:p-6 lg:p-8 flex flex-col justify-center">
+          {brand && (
+            <div className="text-xs font-extrabold tracking-[0.2em] text-blue-600 uppercase mb-3">
+              {brand}
+            </div>
+          )}
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-gray-950 tracking-tight leading-tight">
+            {product?.name || 'Loading product'}
+          </h2>
+          {sku && (
+            <p className="mt-3 text-sm sm:text-base text-gray-400 font-mono tracking-widest uppercase">
+              SKU: {sku}
+            </p>
+          )}
+          <div className="h-px bg-gray-100 my-6" />
+          <div className="text-4xl sm:text-5xl font-extrabold text-gray-950 tracking-tight">
+            {formatPrice(price)}
+          </div>
+          <div className="mt-8 space-y-3">
+            <div className="h-4 w-24 rounded-full bg-gray-200 animate-pulse" />
+            <div className="grid grid-cols-2 gap-3">
+              <div className="h-14 rounded-2xl bg-gray-100 animate-pulse" />
+              <div className="h-14 rounded-2xl bg-gray-100 animate-pulse" />
+              <div className="h-14 rounded-2xl bg-gray-100 animate-pulse" />
+              <div className="h-14 rounded-2xl bg-gray-100 animate-pulse" />
+            </div>
+          </div>
+          <div className="mt-8 h-14 rounded-2xl bg-blue-100 animate-pulse" />
+        </div>
+      </div>
+    </Motion.div>
+  );
+}
 
 function VariationEndpointError({ diagnostics, error, onClose }) {
   const hasDiagnostics = diagnostics && typeof diagnostics === 'object';
@@ -81,15 +181,13 @@ export default function ProductDetailPlatform({
     ? initialSelectedAttrs
     : (resolvedDefaultVariation ? getVariationSelectionMap(resolvedDefaultVariation) : {});
 
-  if (status === 'loading' && resolvedVariations.length === 0) {
+  const shouldShowOptimisticShell = status === 'loading' && resolvedVariations.length === 0;
+
+  if (shouldShowOptimisticShell) {
     return (
-      <div className="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-3xl mx-auto">
-        <div className="animate-pulse space-y-4">
-          <div className="h-8 bg-gray-200 rounded w-2/3" />
-          <div className="h-4 bg-gray-200 rounded w-1/3" />
-          <div className="h-24 bg-gray-100 rounded" />
-        </div>
-      </div>
+      <AnimatePresence mode="wait">
+        <ProductDetailOptimisticShell key={`optimistic-${product?.id || slug}`} product={fallbackProduct || product} />
+      </AnimatePresence>
     );
   }
 
@@ -104,16 +202,22 @@ export default function ProductDetailPlatform({
   }
 
   return (
-    <ProductDetail
-      product={resolvedProduct}
-      onAddToCart={onAddToCart}
-      onClose={onClose}
-      initialVariations={resolvedVariations}
-      initialResolvedVariation={resolvedDefaultVariation}
-      initialSelectedAttrs={resolvedSelectedAttrs}
-      initialComputedData={computed}
-      disableLegacyDetailFetch
-      autoSelectDefaultVariation
-    />
+    <Motion.div
+      initial={{ opacity: 0, y: 6 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={optimisticShellTransition}
+    >
+      <ProductDetail
+        product={resolvedProduct}
+        onAddToCart={onAddToCart}
+        onClose={onClose}
+        initialVariations={resolvedVariations}
+        initialResolvedVariation={resolvedDefaultVariation}
+        initialSelectedAttrs={resolvedSelectedAttrs}
+        initialComputedData={computed}
+        disableLegacyDetailFetch
+        autoSelectDefaultVariation
+      />
+    </Motion.div>
   );
 }
