@@ -1,0 +1,108 @@
+/* Modern product-detail UI polish: variation option cards and modal tab surfaces. */
+
+/* Variation selector: targets existing product-detail option buttons without requiring JSX churn. */
+button[aria-pressed][class*="rounded-2xl"][class*="border-2"] {
+  position: relative !important;
+  min-height: 4.75rem !important;
+  padding: 0.85rem 0.95rem !important;
+  border-radius: 1.15rem !important;
+  border-width: 1px !important;
+  border-color: rgba(203, 213, 225, 0.9) !important;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.98), rgba(248,250,252,0.96)) !important;
+  box-shadow:
+    0 1px 2px rgba(15, 23, 42, 0.04),
+    inset 0 1px 0 rgba(255, 255, 255, 0.85) !important;
+  isolation: isolate;
+  overflow: hidden;
+  transform: translateZ(0);
+  transition:
+    border-color 180ms cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 180ms cubic-bezier(0.22, 1, 0.36, 1),
+    background-color 180ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 180ms cubic-bezier(0.22, 1, 0.36, 1) !important;
+}
+
+button[aria-pressed][class*="rounded-2xl"][class*="border-2"]::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  opacity: 0;
+  background:
+    radial-gradient(circle at 18% 0%, rgba(37, 99, 235, 0.18), transparent 36%),
+    linear-gradient(135deg, rgba(37, 99, 235, 0.08), rgba(15, 23, 42, 0.035));
+  transition: opacity 180ms ease;
+}
+
+button[aria-pressed="true"][class*="rounded-2xl"][class*="border-2"] {
+  border-color: #0f172a !important;
+  background: #ffffff !important;
+  box-shadow:
+    0 14px 34px rgba(15, 23, 42, 0.12),
+    0 0 0 1px rgba(15, 23, 42, 0.9),
+    inset 0 1px 0 rgba(255, 255, 255, 0.95) !important;
+  transform: translateY(-1px) !important;
+}
+
+button[aria-pressed="true"][class*="rounded-2xl"][class*="border-2"]::before { opacity: 1; }
+
+button[aria-pressed][class*="rounded-2xl"][class*="border-2"]:not(:disabled):hover {
+  border-color: rgba(37, 99, 235, 0.5) !important;
+  box-shadow:
+    0 12px 30px rgba(15, 23, 42, 0.10),
+    inset 0 1px 0 rgba(255, 255, 255, 0.95) !important;
+  transform: translateY(-1px) !important;
+}
+
+button[aria-pressed][class*="rounded-2xl"][class*="border-2"]:not(:disabled):active {
+  transform: translateY(0) scale(0.985) !important;
+}
+
+button[aria-pressed][class*="rounded-2xl"][class*="border-2"]:disabled {
+  opacity: 0.44 !important;
+  filter: grayscale(0.2);
+}
+
+button[aria-pressed][class*="rounded-2xl"][class*="border-2"] > span:first-child {
+  display: flex !important;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.65rem;
+  font-size: 0.98rem !important;
+  line-height: 1.1 !important;
+  letter-spacing: -0.02em;
+}
+
+button[aria-pressed][class*="rounded-2xl"][class*="border-2"] > span:first-child > span[aria-hidden="true"] {
+  width: 1.15rem !important;
+  height: 1.15rem !important;
+  margin-left: 0 !important;
+  background: #0f172a !important;
+  box-shadow: 0 0 0 4px rgba(15, 23, 42, 0.08);
+}
+
+button[aria-pressed][class*="rounded-2xl"][class*="border-2"] > span:last-child {
+  margin-top: 0.5rem !important;
+  font-size: 0.82rem !important;
+  font-weight: 800 !important;
+  color: #64748b !important;
+}
+
+button[aria-pressed="true"][class*="rounded-2xl"][class*="border-2"] > span:last-child {
+  color: #2563eb !important;
+}
+
+@media (max-width: 640px) {
+  button[aria-pressed][class*="rounded-2xl"][class*="border-2"] {
+    min-height: 4.6rem !important;
+    padding: 0.85rem !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  button[aria-pressed][class*="rounded-2xl"][class*="border-2"],
+  button[aria-pressed][class*="rounded-2xl"][class*="border-2"]::before {
+    transition: none !important;
+  }
+}
