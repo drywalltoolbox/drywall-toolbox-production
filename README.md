@@ -55,7 +55,7 @@ drywall-toolbox/
 ├── .htaccess                  ← Root: HTTPS redirect, WP routing, SPA catch-all
 └── index.php                  ← Thin passthrough
 ```
-
+-
 
 ## Quick Start — Local Development
 
