@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useState } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
-import { ChevronRight, Filter, ShoppingCart } from 'lucide-react';
+import { Filter, ShoppingCart } from 'lucide-react';
 import SEOHead from '../components/shared/SEOHead';
 import BackButton from '../components/shared/BackButton';
 import SearchBar from '../components/catalog/SearchBar';
@@ -12,6 +12,8 @@ import ProductModal from '../components/product/ProductModal';
 import ProductDetailPlatform from '../components/product/ProductDetailPlatform';
 import Toast from '../components/ui/Toast';
 import { ProductSkeletonGrid } from '../components/catalog/ProductShoppingCardSkeleton';
+import ProductsBrandSelector from '../components/catalog/ProductsBrandSelector.jsx';
+import ProductsCategorySelector from '../components/catalog/ProductsCategorySelector.jsx';
 import { SORT_OPTIONS } from '../constants/sortOptions';
 import { useCatalogFacets } from '../hooks/useCatalogFacets';
 import { useCatalogProducts } from '../hooks/useCatalogProducts';
@@ -30,12 +32,7 @@ function toCardProduct(dto) {
   const card = dto?.cardProduct || null;
   const categoryKey = dto?.category?.key || '';
   const displayCategoryKey = dto?.displayCategory?.slug || dto?.displayCategory?.key || '';
-  const price =
-    dto?.price?.current ??
-    dto?.price?.value ??
-    dto?.price?.min ??
-    card?.price ??
-    0;
+  const price = dto?.price?.current ?? dto?.price?.value ?? dto?.price?.min ?? card?.price ?? 0;
 
   const mapped = {
     ...dto,
@@ -74,7 +71,6 @@ function toCardProduct(dto) {
 
 function mergeDisplayCategories(displayCategoriesByBrand = {}) {
   const merged = new Map();
-
   Object.values(displayCategoriesByBrand || {}).forEach((items) => {
     if (!Array.isArray(items)) return;
     items.forEach((cat) => {
@@ -99,7 +95,6 @@ function mergeDisplayCategories(displayCategoriesByBrand = {}) {
 function toBrandFacet(rawBrand = {}) {
   const label = canonicalBrandLabel(rawBrand.label || rawBrand.name || rawBrand.key || rawBrand.slug || '');
   const slug = rawBrand.slug || rawBrand.key || brandToSlug(label);
-
   return {
     key: rawBrand.key || slug,
     label,
@@ -116,11 +111,7 @@ function CatalogError({ title, message, details, onRetry }) {
       <p className="text-sm mb-3">{message}</p>
       {details && <pre className="text-xs whitespace-pre-wrap bg-white/70 rounded-lg p-3 mb-4 overflow-auto">{details}</pre>}
       {onRetry && (
-        <button
-          type="button"
-          onClick={onRetry}
-          className="inline-flex items-center justify-center px-4 py-2 rounded-lg bg-red-600 text-white text-sm font-semibold hover:bg-red-700"
-        >
+        <button type="button" onClick={onRetry} className="inline-flex items-center justify-center px-4 py-2 rounded-lg bg-red-600 text-white text-sm font-semibold hover:bg-red-700">
           Reload catalog
         </button>
       )}
@@ -139,22 +130,12 @@ export default function ProductsCatalogPlatform({ forceProductGrid = false, titl
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [toast, setToast] = useState(null);
 
-  const pathParams = useMemo(
-    () => ({ brandSlug, categorySlug }),
-    [brandSlug, categorySlug]
-  );
-  const query = useMemo(
-    () => parseCatalogQuery(new URLSearchParams(location.search), pathParams),
-    [location.search, pathParams]
-  );
-
+  const pathParams = useMemo(() => ({ brandSlug, categorySlug }), [brandSlug, categorySlug]);
+  const query = useMemo(() => parseCatalogQuery(new URLSearchParams(location.search), pathParams), [location.search, pathParams]);
   const selectedBrand = query.brands?.[0] || '';
-  const scopedFacets = isPartsFilter === null
-    ? { brand: selectedBrand }
-    : { isParts: isPartsFilter, brand: selectedBrand };
-  const productQuery = isPartsFilter === null
-    ? query
-    : { ...query, isParts: isPartsFilter };
+
+  const scopedFacets = isPartsFilter === null ? { brand: selectedBrand } : { isParts: isPartsFilter, brand: selectedBrand };
+  const productQuery = isPartsFilter === null ? query : { ...query, isParts: isPartsFilter };
 
   const { facets, loading: facetsLoading, error: facetsError } = useCatalogFacets(scopedFacets);
   const { items, pagination, loading: itemsLoading, error: productsError } = useCatalogProducts(productQuery);
@@ -163,42 +144,37 @@ export default function ProductsCatalogPlatform({ forceProductGrid = false, titl
     () => (Array.isArray(facets?.brands) ? facets.brands.map(toBrandFacet).filter((brand) => brand.label) : []),
     [facets]
   );
-
-  const brands = useMemo(
-    () => brandFacets.map((brand) => brand.label),
-    [brandFacets]
-  );
+  const brands = useMemo(() => brandFacets.map((brand) => brand.label), [brandFacets]);
 
   const selectedBrandFacet = useMemo(() => {
     if (!selectedBrand) return null;
     const selectedSlug = brandToSlug(selectedBrand);
     const selectedLabel = canonicalBrandLabel(selectedBrand);
-
-    return brandFacets.find((brand) =>
-      brand.label === selectedLabel ||
-      brand.slug === selectedSlug ||
-      brand.key === selectedSlug
-    ) || null;
+    return brandFacets.find((brand) => brand.label === selectedLabel || brand.slug === selectedSlug || brand.key === selectedSlug) || null;
   }, [brandFacets, selectedBrand]);
+
+  const mappedProducts = useMemo(() => (Array.isArray(items) ? items.map(toCardProduct) : []), [items]);
+
+  const categoryImageBySlug = useMemo(() => {
+    const images = new Map();
+    mappedProducts.forEach((product) => {
+      const slug = product.display_category;
+      const image = product.image || product.images?.[0];
+      if (slug && image && !images.has(slug)) images.set(slug, image);
+    });
+    return images;
+  }, [mappedProducts]);
 
   const filterCategories = useMemo(() => {
     if (!facets) return [];
-
     if (selectedBrandFacet?.key) {
       const byBrand = facets.displayCategoriesByBrand?.[selectedBrandFacet.key] || facets.displayCategoriesByBrand?.[selectedBrandFacet.slug];
       if (!Array.isArray(byBrand)) return [];
       return byBrand
         .filter((cat) => (cat.productCount || 0) > 0)
-        .map((cat) => ({
-          id: cat.slug || cat.key,
-          key: cat.key,
-          slug: cat.slug || cat.key,
-          name: cat.label || cat.key,
-          count: cat.productCount || 0,
-        }))
+        .map((cat) => ({ id: cat.slug || cat.key, key: cat.key, slug: cat.slug || cat.key, name: cat.label || cat.key, count: cat.productCount || 0 }))
         .sort((a, b) => a.name.localeCompare(b.name));
     }
-
     return mergeDisplayCategories(facets.displayCategoriesByBrand);
   }, [facets, selectedBrandFacet]);
 
@@ -208,34 +184,18 @@ export default function ProductsCatalogPlatform({ forceProductGrid = false, titl
     if (!Array.isArray(byBrand)) return [];
     return [...byBrand]
       .filter((cat) => (cat.productCount || 0) > 0)
-      .map((cat) => ({
-        key: cat.key,
-        slug: cat.slug || cat.key,
-        name: cat.label || cat.key,
-        count: cat.productCount || 0,
-      }))
+      .map((cat) => {
+        const slug = cat.slug || cat.key;
+        return { key: cat.key, slug, name: cat.label || cat.key, count: cat.productCount || 0, image: categoryImageBySlug.get(slug) || '' };
+      })
       .sort((a, b) => a.name.localeCompare(b.name));
-  }, [facets, selectedBrandFacet]);
+  }, [categoryImageBySlug, facets, selectedBrandFacet]);
 
-  const mappedProducts = useMemo(
-    () => (Array.isArray(items) ? items.map(toCardProduct) : []),
-    [items]
-  );
-
-  const setQuery = useCallback(
-    (patch, options = {}) => {
-      const next = {
-        ...query,
-        ...patch,
-      };
-      if (options.resetPage !== false) {
-        next.page = patch.page ?? 1;
-      }
-      const url = buildCatalogUrl(next, pathParams);
-      navigate(url, { replace: options.replace ?? false });
-    },
-    [navigate, pathParams, query]
-  );
+  const setQuery = useCallback((patch, options = {}) => {
+    const next = { ...query, ...patch };
+    if (options.resetPage !== false) next.page = patch.page ?? 1;
+    navigate(buildCatalogUrl(next, pathParams), { replace: options.replace ?? false });
+  }, [navigate, pathParams, query]);
 
   const loading = facetsLoading || itemsLoading;
   const page = Number(pagination?.page || query.page || 1);
@@ -244,24 +204,14 @@ export default function ProductsCatalogPlatform({ forceProductGrid = false, titl
   const perPage = Number(pagination?.perPage || query.perPage || 24);
   const pageStart = (page - 1) * perPage;
 
-  const showToast = (message, type = 'cart') => {
-    setToast({ message, type });
-  };
-
   const handleAddToCart = (product, quantity = 1) => {
     addToCart(product, quantity);
-    showToast(`${product.name} added to cart!`, 'cart');
+    setToast({ message: `${product.name} added to cart!`, type: 'cart' });
   };
 
   const openModal = (product, cardProduct = null) => {
     const initialResolvedVariation = cardProduct?.parent_id ? cardProduct : null;
-    setModalProduct({
-      product,
-      initialResolvedVariation,
-      initialSelectedAttrs: initialResolvedVariation
-        ? getVariationSelectionMap(initialResolvedVariation)
-        : {},
-    });
+    setModalProduct({ product, initialResolvedVariation, initialSelectedAttrs: initialResolvedVariation ? getVariationSelectionMap(initialResolvedVariation) : {} });
     setIsModalOpen(true);
   };
 
@@ -273,269 +223,126 @@ export default function ProductsCatalogPlatform({ forceProductGrid = false, titl
   const toggleBrand = (brand) => {
     const canonical = canonicalBrandLabel(brand);
     const nextBrand = canonicalBrandLabel(selectedBrand) === canonical ? '' : canonical;
-    setQuery({
-      brands: nextBrand ? [nextBrand] : [],
-      displayCategory: '',
-      category: '',
-      search: query.search || '',
-      sort: query.sort || 'popular',
-      perPage: query.perPage || 24,
-    });
+    setQuery({ brands: nextBrand ? [nextBrand] : [], displayCategory: '', category: '', search: query.search || '', sort: query.sort || 'popular', perPage: query.perPage || 24 });
   };
 
-  const toggleDisplayCategory = (displayCategory) => {
-    setQuery({
-      displayCategory: query.displayCategory === displayCategory ? '' : displayCategory,
-      category: '',
-    });
-  };
+  const toggleDisplayCategory = (displayCategory) => setQuery({ displayCategory: query.displayCategory === displayCategory ? '' : displayCategory, category: '' });
+  const resetToBrandList = () => navigate('/products/brands');
+  const resetToCategoryCards = () => navigate(`/products/brands/${brandToSlug(selectedBrand)}`);
+  const getCardDisplayProduct = useCallback((product) => product?.cardProduct || product, []);
 
-  const resetToBrandList = () => {
-    navigate('/products');
-  };
-
-  const resetToCategoryCards = () => {
-    setQuery({ displayCategory: '' });
-  };
-
-  const getCardDisplayProduct = useCallback((product) => {
-    return product?.cardProduct || product;
-  }, []);
-
-  const showBrandLanding = !forceProductGrid && !selectedBrand;
+  const showBrandLanding = !forceProductGrid && !selectedBrand && !query.search;
   const showCategoryLanding = !forceProductGrid && selectedBrand && !query.displayCategory && brandCategoryCards.length > 1;
 
   return (
     <div className="min-h-screen bg-gray-50 page-wrapper">
-      <SEOHead
-        title={title}
-        description="Shop professional drywall tools from TapeTech, Columbia, Asgard, Graco, SurPro and more. Automatic taping tools, finishing tools, mud boxes, and replacement parts."
-        canonical="https://drywalltoolbox.com/products"
-        schema={buildSiteLinksSearchBoxSchema()}
-      />
+      <SEOHead title={title} description="Shop professional drywall tools, parts, accessories, and replacement components from leading drywall brands." canonical="https://drywalltoolbox.com/products" schema={buildSiteLinksSearchBoxSchema()} />
       <div className="container mx-auto px-4 py-4 pt-6">
-        {selectedBrand && (
+        {!showCategoryLanding && selectedBrand && (
           <div className="mb-6">
-            <BackButton
-              onClick={query.displayCategory ? resetToCategoryCards : resetToBrandList}
-              label={query.displayCategory ? selectedBrand : 'Brands'}
-            />
+            <BackButton onClick={query.displayCategory ? resetToCategoryCards : resetToBrandList} label={query.displayCategory ? selectedBrand : 'Brands'} />
           </div>
         )}
 
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">{title}</h1>
-          <p className="text-gray-600">Browse our extensive collection of professional drywall tools</p>
-        </div>
+        {!showCategoryLanding && (
+          <div className="mb-8">
+            <h1 className="text-4xl font-bold text-gray-900 mb-2">{title}</h1>
+            <p className="text-gray-600">Browse our extensive collection of professional drywall tools</p>
+          </div>
+        )}
 
         {facetsError && brandFacets.length === 0 && (
-          <CatalogError
-            title="Unable to load catalog brands"
-            message="The product brand selector depends on /wp-json/dtb/v1/catalog/facets. The request failed or returned an invalid response."
-            details={facetsError?.message || String(facetsError)}
-            onRetry={() => window.location.reload()}
-          />
+          <CatalogError title="Unable to load catalog brands" message="The product brand selector depends on /wp-json/dtb/v1/catalog/facets. The request failed or returned an invalid response." details={facetsError?.message || String(facetsError)} onRetry={() => window.location.reload()} />
         )}
 
         {productsError && !loading && mappedProducts.length === 0 && !showBrandLanding && (
-          <CatalogError
-            title="Unable to load products"
-            message="The product grid depends on /wp-json/dtb/v1/catalog/products. Check the live backend endpoint and WordPress error logs."
-            details={productsError?.message || String(productsError)}
-            onRetry={() => window.location.reload()}
-          />
-        )}
-
-        {(selectedBrand || forceProductGrid) && (
-          <SearchBar
-            placeholder="Search products by name, SKU, or brand..."
-            value={query.search || ''}
-            onChange={(e) => {
-              const next = e.target.value;
-              setQuery({ search: next }, { replace: true });
-            }}
-          />
+          <CatalogError title="Unable to load products" message="The product grid depends on /wp-json/dtb/v1/catalog/products. Check the live backend endpoint and WordPress error logs." details={productsError?.message || String(productsError)} onRetry={() => window.location.reload()} />
         )}
 
         {showBrandLanding ? (
-          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
-            {brandFacets.map((brand) => (
-              <button
-                key={brand.slug || brand.label}
-                onClick={() => setQuery({ brands: [brand.label], displayCategory: '', category: '' })}
-                className="dtb-brand-card flex flex-col items-center justify-center gap-4 p-6"
-                aria-label={`Shop ${brand.label}`}
-              >
-                {brand.logo && (
-                  <img
-                    src={brand.logo}
-                    alt=""
-                    className="max-h-16 max-w-[80%] object-contain"
-                    loading="lazy"
-                    onError={(event) => {
-                      event.currentTarget.style.display = 'none';
-                    }}
-                  />
-                )}
-                <span
-                  style={{
-                    fontWeight: 700,
-                    fontSize: 'clamp(1.1rem, 3.5vw, 1.5rem)',
-                    letterSpacing: '-0.02em',
-                    color: '#1f2937',
-                    textAlign: 'center',
-                    lineHeight: 1.2,
-                  }}
-                >
-                  {brand.label}
-                </span>
-              </button>
-            ))}
-            {!facetsLoading && !facetsError && brandFacets.length === 0 && (
-              <div className="col-span-full text-center py-16 text-gray-600">
-                No product brands are currently available from the catalog facets endpoint.
-              </div>
-            )}
-          </div>
+          <ProductsBrandSelector
+            brands={brandFacets}
+            searchQuery={query.search || ''}
+            onSearchChange={(e) => setQuery({ search: e.target.value }, { replace: true })}
+            onSelectBrand={(brand) => navigate(`/products/brands/${brand.slug || brandToSlug(brand.label)}`)}
+          />
         ) : showCategoryLanding ? (
-          <div className="categories-grid">
-            {brandCategoryCards.map((cat, index) => (
-              <button
-                key={cat.key}
-                className="category-card category-card--no-image"
-                style={{ animationDelay: `${(index + 1) * 0.07}s` }}
-                onClick={() => setQuery({ displayCategory: cat.slug })}
-                aria-label={`Browse ${cat.name}`}
-              >
-                <div className="category-card-scrim" />
-                <div className="category-card-content">
-                  <div className="category-card-text">
-                    <h3 className="category-name">{cat.name}</h3>
-                    <span className="category-count">{cat.count} product{cat.count !== 1 ? 's' : ''}</span>
-                  </div>
-                  <ChevronRight className="category-card-chevron" size={18} />
-                </div>
-              </button>
-            ))}
-          </div>
+          <ProductsCategorySelector
+            brand={selectedBrandFacet?.label || selectedBrand}
+            brandLogo={selectedBrandFacet?.logo || getBrandLogo(selectedBrand)}
+            categories={brandCategoryCards}
+            onBack={resetToBrandList}
+            onSelectCategory={(cat) => navigate(`/products/brands/${selectedBrandFacet?.slug || brandToSlug(selectedBrand)}/categories/${cat.slug}`)}
+          />
         ) : (
-          <div className="flex flex-col lg:flex-row gap-8">
-            <FilterPanel
-              isOpen={showFilters}
-              onClose={() => setShowFilters(false)}
-              categories={filterCategories}
-              brands={brands}
-              maxPrice={0}
-              selectedBrands={selectedBrand ? [canonicalBrandLabel(selectedBrand)] : []}
-              selectedCategories={query.displayCategory ? [query.displayCategory] : []}
-              priceRange={[0, 0]}
-              onBrandChange={toggleBrand}
-              onCategoryChange={toggleDisplayCategory}
-              onPriceChange={() => {}}
-              onClearFilters={() => {
-                if (selectedBrand) {
-                  setQuery({ category: '', displayCategory: '', search: '', sort: 'popular' });
-                  return;
-                }
-                navigate('/products');
-              }}
-              resultsCount={total}
+          <>
+            <SearchBar
+              placeholder="Search products by name, SKU, or brand..."
+              value={query.search || ''}
+              onChange={(e) => setQuery({ search: e.target.value }, { replace: true })}
             />
+            <div className="flex flex-col lg:flex-row gap-8">
+              <FilterPanel
+                isOpen={showFilters}
+                onClose={() => setShowFilters(false)}
+                categories={filterCategories}
+                brands={brands}
+                maxPrice={0}
+                selectedBrands={selectedBrand ? [canonicalBrandLabel(selectedBrand)] : []}
+                selectedCategories={query.displayCategory ? [query.displayCategory] : []}
+                priceRange={[0, 0]}
+                onBrandChange={toggleBrand}
+                onCategoryChange={toggleDisplayCategory}
+                onPriceChange={() => {}}
+                onClearFilters={() => selectedBrand ? setQuery({ category: '', displayCategory: '', search: '', sort: 'popular' }) : navigate('/products')}
+                resultsCount={total}
+              />
 
-            <div className="flex-1">
-              <div className="flex flex-row justify-between items-center gap-4 mb-6">
-                <Dropdown
-                  value={query.sort}
-                  onChange={(value) => setQuery({ sort: value })}
-                  options={SORT_OPTIONS}
-                />
-                <button
-                  onClick={() => setShowFilters(!showFilters)}
-                  className="lg:hidden flex items-center gap-2 px-4 py-2.5 border border-gray-300 rounded-lg bg-white text-gray-900 hover:bg-gray-50 font-medium text-sm transition-colors"
-                  aria-label="Toggle Filters"
-                >
-                  <Filter size={18} />
-                  <span>Filters</span>
-                </button>
-              </div>
+              <div className="flex-1">
+                <div className="flex flex-row justify-between items-center gap-4 mb-6">
+                  <Dropdown value={query.sort} onChange={(value) => setQuery({ sort: value })} options={SORT_OPTIONS} />
+                  <button onClick={() => setShowFilters(!showFilters)} className="lg:hidden flex items-center gap-2 px-4 py-2.5 border border-gray-300 rounded-lg bg-white text-gray-900 hover:bg-gray-50 font-medium text-sm transition-colors" aria-label="Toggle Filters">
+                    <Filter size={18} />
+                    <span>Filters</span>
+                  </button>
+                </div>
 
-              {loading ? (
-                <ProductSkeletonGrid count={24} />
-              ) : (
-                <>
-                  <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-5 lg:gap-6">
-                    {mappedProducts.map((product, index) => {
-                      const cardProduct = getCardDisplayProduct(product);
-                      return (
-                        <ProductShoppingCard
-                          key={product.id}
-                          product={product}
-                          cardProduct={cardProduct}
-                          hasSelectedVariation={Boolean(product.is_variable && cardProduct?.parent_id)}
-                          onOpenModal={() => openModal(product, cardProduct)}
-                          onAddToCart={() => openModal(product, cardProduct)}
-                          index={index}
-                        />
-                      );
-                    })}
-                  </div>
-
-                  {mappedProducts.length > 0 && (
-                    <>
-                      <Pagination
-                        currentPage={page}
-                        totalPages={totalPages}
-                        onPageChange={(next) => {
-                          setQuery({ page: next }, { resetPage: false });
-                          if (typeof window !== 'undefined') window.scrollTo({ top: 0, behavior: 'smooth' });
-                        }}
-                        className="mt-8"
-                      />
-                      <p className="text-center text-sm text-gray-400 mt-2">
-                        Showing {pageStart + 1}–{Math.min(pageStart + mappedProducts.length, total)} of {total.toLocaleString()} results
-                      </p>
-                    </>
-                  )}
-
-                  {mappedProducts.length === 0 && !productsError && (
-                    <div className="text-center py-16">
-                      <ShoppingCart className="h-24 w-24 mx-auto mb-6 text-gray-300" />
-                      <h2 className="text-2xl font-bold text-gray-900 mb-4">No products found</h2>
-                      <p className="text-gray-600 mb-6">Try adjusting your filters to see more products.</p>
-                      <button
-                        onClick={() => navigate('/products')}
-                        className="inline-flex items-center gap-2 bg-primary-600 hover:bg-primary-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors"
-                      >
-                        Clear Filters
-                      </button>
+                {loading ? <ProductSkeletonGrid count={24} /> : (
+                  <>
+                    <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-5 lg:gap-6">
+                      {mappedProducts.map((product, index) => {
+                        const cardProduct = getCardDisplayProduct(product);
+                        return <ProductShoppingCard key={product.id} product={product} cardProduct={cardProduct} hasSelectedVariation={Boolean(product.is_variable && cardProduct?.parent_id)} onOpenModal={() => openModal(product, cardProduct)} onAddToCart={() => openModal(product, cardProduct)} index={index} />;
+                      })}
                     </div>
-                  )}
-                </>
-              )}
+
+                    {mappedProducts.length > 0 && (
+                      <>
+                        <Pagination currentPage={page} totalPages={totalPages} onPageChange={(next) => { setQuery({ page: next }, { resetPage: false }); if (typeof window !== 'undefined') window.scrollTo({ top: 0, behavior: 'smooth' }); }} className="mt-8" />
+                        <p className="text-center text-sm text-gray-400 mt-2">Showing {pageStart + 1}–{Math.min(pageStart + mappedProducts.length, total)} of {total.toLocaleString()} results</p>
+                      </>
+                    )}
+
+                    {mappedProducts.length === 0 && !productsError && (
+                      <div className="text-center py-16">
+                        <ShoppingCart className="h-24 w-24 mx-auto mb-6 text-gray-300" />
+                        <h2 className="text-2xl font-bold text-gray-900 mb-4">No products found</h2>
+                        <p className="text-gray-600 mb-6">Try adjusting your filters to see more products.</p>
+                        <button onClick={() => navigate('/products')} className="inline-flex items-center gap-2 bg-primary-600 hover:bg-primary-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors">Clear Filters</button>
+                      </div>
+                    )}
+                  </>
+                )}
+              </div>
             </div>
-          </div>
+          </>
         )}
       </div>
 
-      {toast && (
-        <Toast
-          message={toast.message}
-          type={toast.type}
-          onClose={() => setToast(null)}
-        />
-      )}
+      {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
 
       <ProductModal isOpen={isModalOpen && !!modalProduct} product={modalProduct?.product || modalProduct} onClose={closeModal}>
-        {modalProduct && (
-          <ProductDetailPlatform
-            key={`${modalProduct.product?.id || modalProduct.id}:${modalProduct.initialResolvedVariation?.id || 'parent'}`}
-            product={modalProduct.product || modalProduct}
-            onAddToCart={handleAddToCart}
-            onClose={closeModal}
-            initialResolvedVariation={modalProduct.initialResolvedVariation}
-            initialSelectedAttrs={modalProduct.initialSelectedAttrs}
-          />
-        )}
+        {modalProduct && <ProductDetailPlatform key={`${modalProduct.product?.id || modalProduct.id}:${modalProduct.initialResolvedVariation?.id || 'parent'}`} product={modalProduct.product || modalProduct} onAddToCart={handleAddToCart} onClose={closeModal} initialResolvedVariation={modalProduct.initialResolvedVariation} initialSelectedAttrs={modalProduct.initialSelectedAttrs} />}
       </ProductModal>
     </div>
   );
