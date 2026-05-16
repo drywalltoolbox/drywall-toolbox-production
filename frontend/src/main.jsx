@@ -5,6 +5,7 @@ import './index.css'
 import './styles/machined-design.css'
 import './styles/tool-selector.css'
 import './styles/technical-specifications.css'
+import './styles/product-detail-modern.css'
 import App from './App.jsx'
 import ErrorBoundary from './components/errors/ErrorBoundary.jsx'
 
