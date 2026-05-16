@@ -18,24 +18,24 @@ const PRIMARY_NAV_LINKS = [
 ];
 
 const SHOP_FEATURE_LINKS = [
-  { to: '/all-products', label: 'All Products', sub: 'Full drywall catalog' },
-  { to: '/products', label: 'Shop by Brand', sub: 'TapeTech, Columbia, Level 5, and more' },
+  { to: '/products', label: 'All Products', sub: 'Full drywall catalog' },
+  { to: '/products/brands', label: 'Shop by Brand', sub: 'TapeTech, Columbia, Level 5, and more' },
   { to: '/parts', label: 'Replacement Parts', sub: 'Parts, kits, and schematics' },
   { to: '/toolset-builder', label: 'Toolset Builder', sub: 'Configure a complete kit' },
 ];
 
 const SHOP_CATEGORY_LINKS = [
-  { to: '/all-products?category=automatic-taping-tools', label: 'Automatic Taping Tools' },
-  { to: '/all-products?category=semi-automatic-taping-tools', label: 'Semi-Automatic Taping Tools' },
-  { to: '/all-products?category=flat-boxes', label: 'Flat Boxes' },
-  { to: '/all-products?category=corner-tools', label: 'Corner Tools' },
-  { to: '/all-products?category=handles-extensions', label: 'Handles & Extensions' },
-  { to: '/all-products?category=knives-blades', label: 'Knives & Blades' },
-  { to: '/all-products?category=mud-pans-pumps', label: 'Mud Pans & Pumps' },
-  { to: '/all-products?category=nail-spotters', label: 'Nail Spotters' },
-  { to: '/all-products?category=tool-sets-kits', label: 'Tool Sets & Kits' },
-  { to: '/all-products?category=parts', label: 'Parts' },
-  { to: '/all-products?category=accessories-adapters', label: 'Accessories & Adapters' },
+  { to: '/products?display_category=automatic_taping_tools', label: 'Automatic Taping Tools' },
+  { to: '/products?display_category=semi_automatic_taping_tools', label: 'Semi-Automatic Taping Tools' },
+  { to: '/products?display_category=finishing_boxes', label: 'Flat Boxes' },
+  { to: '/products?display_category=corner_tools', label: 'Corner Tools' },
+  { to: '/products?display_category=handles_and_extensions', label: 'Handles & Extensions' },
+  { to: '/products?display_category=knives_and_blades', label: 'Knives & Blades' },
+  { to: '/products?display_category=mud_pans_and_pumps', label: 'Mud Pans & Pumps' },
+  { to: '/products?display_category=nail_spotters', label: 'Nail Spotters' },
+  { to: '/products?display_category=tool_sets_and_kits', label: 'Tool Sets & Kits' },
+  { to: '/products?display_category=parts', label: 'Parts' },
+  { to: '/products?display_category=accessories', label: 'Accessories & Adapters' },
 ];
 
 export default function Header({ onCartToggle, hasTopTicker = false }) {
@@ -65,7 +65,7 @@ export default function Header({ onCartToggle, hasTopTicker = false }) {
   });
 
   const isActive = (path) => location.pathname === path;
-  const shopActive = isActive('/products') || isActive('/all-products') || isActive('/parts') || isActive('/toolset-builder');
+  const shopActive = location.pathname.startsWith('/products') || isActive('/parts') || isActive('/toolset-builder');
 
   const toggleMobileMenu = () => setMobileMenuOpen((open) => !open);
   const closeMobileMenu = () => setMobileMenuOpen(false);
@@ -178,7 +178,7 @@ export default function Header({ onCartToggle, hasTopTicker = false }) {
 
   const handleDesktopViewAll = () => {
     const q = desktopSearchQuery.trim();
-    navigate(`/all-products${q ? `?search=${encodeURIComponent(q)}` : ''}`);
+    navigate(`/products${q ? `?search=${encodeURIComponent(q)}` : ''}`);
     setDesktopSearchOpen(false);
   };
 
@@ -251,7 +251,7 @@ export default function Header({ onCartToggle, hasTopTicker = false }) {
                       <div className="header-mega-section"><p className="header-mega-section-title">Shop Navigation</p><div className="header-mega-links">{SHOP_FEATURE_LINKS.map(({ to, label, sub }) => <Link key={to} to={to} onClick={() => setShopDropdownOpen(false)} className="header-mega-link"><span className="header-mega-link-copy"><span className="header-mega-link-title">{label}</span><span className="header-mega-link-sub">{sub}</span></span></Link>)}</div></div>
                       <div className="header-mega-section"><p className="header-mega-section-title">Drywall Industry Categories</p><div className="header-mega-category-grid">{SHOP_CATEGORY_LINKS.map(({ to, label }) => <Link key={to} to={to} onClick={() => setShopDropdownOpen(false)} className="header-mega-category-link">{label}</Link>)}</div></div>
                     </div>
-                    <div className="header-mega-footer"><div className="header-mega-footer-actions"><Link to="/all-products" onClick={() => setShopDropdownOpen(false)} className="header-mega-footer-link">View All Products</Link><Link to="/products" onClick={() => setShopDropdownOpen(false)} className="header-mega-footer-link header-mega-footer-link--secondary">Shop by Brand</Link></div></div>
+                    <div className="header-mega-footer"><div className="header-mega-footer-actions"><Link to="/products" onClick={() => setShopDropdownOpen(false)} className="header-mega-footer-link">View All Products</Link><Link to="/products/brands" onClick={() => setShopDropdownOpen(false)} className="header-mega-footer-link header-mega-footer-link--secondary">Shop by Brand</Link></div></div>
                   </div>
                 </div>
                 {PRIMARY_NAV_LINKS.map(({ to, label }) => <Link key={to} to={to} className={`nav-link ${isActive(to) ? 'active' : ''}`}>{label}</Link>)}
