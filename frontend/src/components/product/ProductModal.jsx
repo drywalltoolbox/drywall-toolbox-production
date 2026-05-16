@@ -207,7 +207,7 @@ export default function ProductModal({ isOpen, product, onClose, children }) {
               backdrop-filter: blur(14px) saturate(120%);
             }
             .product-modal-scroll-shell {
-              top: var(--header-height, 96px);
+              top: 0;
               scrollbar-width: none;
               scrollbar-color: transparent transparent;
               -webkit-overflow-scrolling: touch;

@@ -27,6 +27,19 @@ function getImages(product, selectedVariation) {
     return [variationImg, ...parentGallery.filter((img) => img.src !== variationImg.src)];
   }
 
+  // DTB catalog DTO shape — images nested under product.media
+  const mediaSrcs = product?.media?.images;
+  if (Array.isArray(mediaSrcs) && mediaSrcs.length) {
+    return mediaSrcs
+      .filter((s) => typeof s === 'string' && s)
+      .map((s, i) => ({ src: s, alt: product?.name || '', id: i }));
+  }
+  const mediaSingle = product?.media?.image;
+  if (typeof mediaSingle === 'string' && mediaSingle) {
+    return [{ src: mediaSingle, alt: product?.name || '', id: 'primary' }];
+  }
+
+  // WooCommerce / normalised shape
   if (Array.isArray(product?.images) && product.images.length > 0) {
     return product.images;
   }

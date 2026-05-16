@@ -739,7 +739,6 @@ const ALLOWED_BRANDS = [
     setSelectedBrand(prev     => prev     === newBrand     ? prev     : newBrand);
     setSelectedCategory(prev  => prev     === newCategory  ? prev     : newCategory);
     setSelectedSchematic(prev => prev     === newSchematic ? prev     : newSchematic);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.search]);
 
   // Schematic data for tools

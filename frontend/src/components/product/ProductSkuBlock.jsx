@@ -15,20 +15,17 @@ export default function ProductSkuBlock({ product, selectedVariation }) {
   if (!sku && !mpn) return null;
 
   return (
-    <div
-      className="product-sku-block"
-      style={{ fontSize: '0.78rem', color: '#64748b', fontFamily: 'var(--font-mono)', lineHeight: 1.6 }}
-    >
+    <div className="dtb-pdp-header__meta" style={{ marginTop: 0 }}>
       {sku && (
-        <span>
-          <span style={{ color: '#94a3b8', marginRight: '4px' }}>SKU:</span>
-          {sku}
+        <span className="dtb-pdp-header__meta-item">
+          <span className="dtb-pdp-header__meta-label">SKU</span>
+          <span className="dtb-pdp-header__meta-value">{sku}</span>
         </span>
       )}
       {mpn && (
-        <span style={{ marginLeft: sku ? '16px' : 0 }}>
-          <span style={{ color: '#94a3b8', marginRight: '4px' }}>MPN:</span>
-          {mpn}
+        <span className="dtb-pdp-header__meta-item">
+          <span className="dtb-pdp-header__meta-label">MPN</span>
+          <span className="dtb-pdp-header__meta-value">{mpn}</span>
         </span>
       )}
     </div>

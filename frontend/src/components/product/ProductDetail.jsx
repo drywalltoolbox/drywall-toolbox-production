@@ -16,22 +16,8 @@ import { getProductVariations } from '../../services/api';
 import { findMatchingVariation, getVariationSelectionMap } from '../../utils/variationSelection';
 import { setCachedVariations } from '../../utils/variationCache';
 import { apiClient } from '../../api/client.js';
-import columbiaLogo from '/brands/Columbia/columbia_taping_tools_logo.svg';
-import tapeTechLogo from '/brands/TapeTech/tapetech_logo.svg';
-import surproLogo from '/brands/SurPro/surpro_logo.svg';
-import asgardLogo from '/brands/Asgard/asgard_logo.svg';
-import gracoLogo from '/brands/Graco/graco_logo.svg';
-import level5Logo from '/brands/Level5/Level5.svg';
+import { getBrandLogo } from '../../utils/brandAssets.js';
 import { getSchematicIdForProduct, buildSchematicsUrl } from '../../data/schematicMappings';
-
-const BRAND_LOGOS = {
-  'Columbia Taping Tools': columbiaLogo,
-  TapeTech: tapeTechLogo,
-  SurPro: surproLogo,
-  Asgard: asgardLogo,
-  Graco: gracoLogo,
-  'Level 5': level5Logo,
-};
 
 function buildSeedVariations(initialVariations = [], initialResolvedVariation = null) {
   const seeded = [];
@@ -457,7 +443,7 @@ export default function ProductDetail({
                 effectiveSku={effectiveSku}
                 isOutOfStock={isOutOfStock}
                 brandLabel={brandLabel}
-                brandLogoSrc={brandLabel ? BRAND_LOGOS[brandLabel] : null}
+                brandLogoSrc={brandLabel ? getBrandLogo(brandLabel) : null}
                 brandLogoClassName={brandLogoClassName}
                 displayPrice={displayPrice}
                 pricePrefix={pricePrefix}
@@ -523,6 +509,16 @@ export default function ProductDetail({
               ) : null}
             </div>
           </div>
+
+          {getBrandLogo(brandLabel) ? (
+            <div className="dtb-pdp-brand-banner">
+              <img
+                src={getBrandLogo(brandLabel)}
+                alt={brandLabel}
+                className="dtb-pdp-brand-banner__logo"
+              />
+            </div>
+          ) : null}
 
           <ProductDetailTabs
             activeTab={activeTab}

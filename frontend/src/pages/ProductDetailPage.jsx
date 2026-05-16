@@ -131,7 +131,9 @@ export default function ProductDetailPage() {
   const seoCanon   = metaMap['_dtb_seo_canonical'] || '';
   const seoNoindex = !!metaMap['_dtb_seo_noindex'];
 
-  const heroImage = selectedVariation?.images?.[0] || selectedVariation?.image || product.images?.[0]?.src || product.image || '';
+  const heroImage = selectedVariation?.images?.[0] || selectedVariation?.image || selectedVariation?.media?.image
+    || product.media?.images?.[0] || product.media?.image
+    || product.images?.[0]?.src || product.image || '';
 
   const productSchema    = buildProductSchema({ ...product, ...effectiveProduct, name: effectiveProductName });
   const breadcrumbSchema = buildBreadcrumbSchema([

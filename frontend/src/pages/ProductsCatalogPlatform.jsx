@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, Filter, LayoutGrid, List, ShoppingCart } from 'lucide-react';
 import SEOHead from '../components/shared/SEOHead';
@@ -146,7 +146,11 @@ export default function ProductsCatalogPlatform({ forceProductGrid = false, titl
   const { addToCart } = useCart();
 
   const [showFilters, setShowFilters] = useState(false);
-  const [displayMode, setDisplayMode] = useState('grid');
+  const [displayMode, setDisplayMode] = useState(() => {
+    if (typeof window === 'undefined') return 'grid';
+    const saved = window.localStorage.getItem('dtb-catalog-display-mode');
+    return saved === 'grid' || saved === 'list' ? saved : 'grid';
+  });
   const [modalProduct, setModalProduct] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [toast, setToast] = useState(null);
@@ -213,9 +217,6 @@ export default function ProductsCatalogPlatform({ forceProductGrid = false, titl
   const pageHeading = selectedBrand && selectedCategoryLabel
     ? `${selectedBrandFacet?.label || selectedBrand} ${selectedCategoryLabel}`
     : title;
-  const pageSubheading = selectedBrand && selectedCategoryLabel
-    ? `Browse ${selectedCategoryLabel.toLowerCase()} from ${selectedBrandFacet?.label || selectedBrand}.`
-    : 'Browse our extensive collection of professional drywall tools';
   const isCategoryProductRoute = Boolean(selectedBrand && selectedCategoryLabel);
   const isPartsPage = isPartsFilter === 1;
   const page = Number(pagination?.page || query.page || 1);
@@ -224,14 +225,7 @@ export default function ProductsCatalogPlatform({ forceProductGrid = false, titl
   const perPage = Number(pagination?.perPage || query.perPage || 24);
   const pageStart = (page - 1) * perPage;
   const desktopHeading = isCategoryProductRoute ? pageHeading : title;
-  const desktopSubheading = isCategoryProductRoute
-    ? pageSubheading
-    : (isPartsPage
-      ? 'Genuine replacement parts, kits, and service components from trusted drywall brands.'
-      : pageSubheading);
-  const unifiedHeadingEyebrow = isPartsPage ? 'Parts' : 'Products';
   const unifiedHeadingTitle = isCategoryProductRoute ? selectedCategoryLabel : desktopHeading;
-  const showUnifiedHeadingEyebrow = unifiedHeadingEyebrow.toLowerCase() !== String(unifiedHeadingTitle || '').toLowerCase();
   const unifiedHeadingMeta = isCategoryProductRoute
     ? `${selectedBrandFacet?.label || selectedBrand}${total > 0 ? ` · ${total.toLocaleString()} product${total === 1 ? '' : 's'}` : ''}`
     : `${isPartsPage ? 'Replacement parts and service components' : 'All brands and categories'}${total > 0 ? ` · ${total.toLocaleString()} product${total === 1 ? '' : 's'}` : ''}`;
@@ -277,14 +271,6 @@ export default function ProductsCatalogPlatform({ forceProductGrid = false, titl
   const showCategoryLanding = !forceProductGrid && isBrandCategorySelectorRoute && !query.search;
   const showProductGrid = !showBrandLanding && !showCategoryLanding;
 
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-    const saved = window.localStorage.getItem('dtb-catalog-display-mode');
-    if (saved === 'grid' || saved === 'list') {
-      setDisplayMode(saved);
-    }
-  }, []);
-
   const handleDisplayModeChange = useCallback((mode) => {
     setDisplayMode(mode);
     if (typeof window !== 'undefined') {
@@ -315,9 +301,6 @@ export default function ProductsCatalogPlatform({ forceProductGrid = false, titl
                   <span>{selectedBrandFacet?.label || selectedBrand}</span>
                 </button>
               )}
-              {showUnifiedHeadingEyebrow ? (
-                <span className="dtb-listing-heading__eyebrow">{unifiedHeadingEyebrow}</span>
-              ) : null}
               <h1 className="dtb-listing-heading__title">{unifiedHeadingTitle}</h1>
               <p className="dtb-listing-heading__meta">{unifiedHeadingMeta}</p>
             </div>

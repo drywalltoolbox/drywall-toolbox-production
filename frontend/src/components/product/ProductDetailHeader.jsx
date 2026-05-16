@@ -33,13 +33,13 @@ export default function ProductDetailHeader({
         {effectiveSku ? (
           <span className="dtb-pdp-header__meta-item">
             <span className="dtb-pdp-header__meta-label">SKU</span>
-            <span className="font-mono">{effectiveSku}</span>
+            <span className="dtb-pdp-header__meta-value">{effectiveSku}</span>
           </span>
         ) : null}
         {product.upc ? (
           <span className="dtb-pdp-header__meta-item">
             <span className="dtb-pdp-header__meta-label">UPC</span>
-            <span className="font-mono">{product.upc}</span>
+            <span className="dtb-pdp-header__meta-value">{product.upc}</span>
           </span>
         ) : null}
       </div>

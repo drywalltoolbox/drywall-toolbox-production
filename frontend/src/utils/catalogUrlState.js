@@ -15,7 +15,7 @@ export const BRAND_TO_SLUG = {
   Asgard: 'asgard',
   SurPro: 'surpro',
   Graco: 'graco',
-  'Platinum Drywall Tools': 'platinum',
+  'Platinum Drywall Tools': 'platinum-drywall-tools',
   'Dura-Stilts': 'dura-stilts',
   'Level 5': 'level5',
 };

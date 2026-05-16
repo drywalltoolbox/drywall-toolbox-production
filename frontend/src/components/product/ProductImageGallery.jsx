@@ -47,9 +47,10 @@ export default function ProductImageGallery({ product }) {
   const lbPrevFocusRef = useRef(null);
 
   // ── Images normalisation ──────────────────────────────────────────────────
-  // Accepts both string URLs (normalizeProduct output) and WooCommerce image
-  // objects ({ id, src, name, alt }) so that raw WC API responses render
-  // correctly even if the product has not been passed through normalizeProduct().
+  // Accepts three shapes:
+  //   1. DTB catalog DTO  — product.media.images (string[]) + product.media.image
+  //   2. WooCommerce shape — product.images ([{ src, alt }]) + product.image (string)
+  //   3. Normalised shape  — product.image (string), product.image_srcset, etc.
   const toImageMeta = (img, index = 0) => {
     if (typeof img === 'string') {
       return {
@@ -65,9 +66,24 @@ export default function ProductImageGallery({ product }) {
     };
   };
   const imageMeta = (() => {
+    // Priority 1: DTB media DTO — product.media.images (string[])
+    const mediaSrcs = product?.media?.images;
+    if (Array.isArray(mediaSrcs) && mediaSrcs.length) {
+      const mapped = mediaSrcs.map((s, i) => toImageMeta(s, i)).filter((img) => img.src);
+      if (mapped.length) return mapped;
+    }
+
+    // Priority 2: DTB media DTO — product.media.image (single string)
+    const mediaSingle = product?.media?.image;
+    if (typeof mediaSingle === 'string' && mediaSingle) {
+      return [toImageMeta(mediaSingle, 0)];
+    }
+
+    // Priority 3: WC/normalised — product.images (array of strings or objects)
     const arr = Array.isArray(product?.images) && product.images.length
       ? product.images.map((img, index) => toImageMeta(img, index)).filter((img) => img.src)
       : product?.image ? [toImageMeta(product.image, 0)] : [];
+
     return arr.length ? arr : [{ src: PLACEHOLDER_IMAGE, srcSet: '', sizes: '' }];
   })();
   const images = imageMeta.map((img) => img.src);
