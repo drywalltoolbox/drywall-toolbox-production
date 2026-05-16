@@ -7,6 +7,11 @@
  * categories as the customer-facing product taxonomy; broad categories remain
  * internal classification metadata.
  *
+ * Customer-facing invariant:
+ * - Any product flagged as a replacement part is surfaced under the Parts
+ *   display bucket, regardless of its compatibility/tool-family metadata.
+ * - Tool display-category cards only represent tool products.
+ *
  * @package drywall-toolbox
  */
 
@@ -43,7 +48,6 @@ final class DTB_CatalogFacetService {
 
 		delete_transient( self::CACHE_KEY );
 
-		// Scoped facet keys are md5-suffixed. Remove both timeout and value rows.
 		$like = $wpdb->esc_like( '_transient_' . self::CACHE_KEY . '_' ) . '%';
 		$wpdb->query(
 			$wpdb->prepare(
@@ -104,7 +108,7 @@ final class DTB_CatalogFacetService {
 				'status'   => 'publish',
 				'per_page' => $per_page,
 				'page'     => $page,
-				'_fields'  => 'id,type,categories,meta_data,attributes,brands,name',
+				'_fields'  => 'id,type,categories,meta_data,attributes,brands,name,images',
 			] );
 
 			if ( $response->get_status() !== 200 ) {
@@ -125,7 +129,7 @@ final class DTB_CatalogFacetService {
 
 				$brand   = $dto['brand'];
 				$cat     = $dto['category'];
-				$dis_cat = $dto['displayCategory'];
+				$dis_cat = self::customer_display_category( $dto );
 
 				if ( '' !== $brand['key'] ) {
 					if ( ! isset( $brands[ $brand['key'] ] ) ) {
@@ -162,9 +166,17 @@ final class DTB_CatalogFacetService {
 							'label'        => $dis_cat['label'],
 							'slug'         => $dis_cat['slug'],
 							'productCount' => 0,
+							'image'        => '',
 						];
 					}
 					$display_by_brand[ $brand['key'] ][ $dk ]['productCount']++;
+
+					if ( empty( $display_by_brand[ $brand['key'] ][ $dk ]['image'] ) && empty( $dto['isParts'] ) ) {
+						$image = (string) ( $dto['media']['image'] ?? '' );
+						if ( '' !== $image ) {
+							$display_by_brand[ $brand['key'] ][ $dk ]['image'] = $image;
+						}
+					}
 				}
 			}
 
@@ -188,6 +200,24 @@ final class DTB_CatalogFacetService {
 			'categories'               => $cats_arr,
 			'displayCategoriesByBrand' => $display_arr,
 		];
+	}
+
+	/** Return the customer-facing display bucket for a normalized product. */
+	private static function customer_display_category( array $dto ): array {
+		if ( ! empty( $dto['isParts'] ) ) {
+			return [
+				'key'   => 'parts',
+				'label' => 'Parts',
+				'slug'  => 'parts',
+			];
+		}
+
+		$display = $dto['displayCategory'] ?? [];
+		if ( ! empty( $display['key'] ) ) {
+			return $display;
+		}
+
+		return [ 'key' => '', 'label' => '', 'slug' => '' ];
 	}
 
 	/**
@@ -222,7 +252,7 @@ final class DTB_CatalogFacetService {
 		}
 
 		if ( isset( $scope['display_category'] ) && '' !== $scope['display_category'] ) {
-			$display = $dto['displayCategory'] ?? [];
+			$display = self::customer_display_category( $dto );
 			if ( ! in_array( $scope['display_category'], [ $display['key'] ?? '', $display['slug'] ?? '' ], true ) ) {
 				return false;
 			}
