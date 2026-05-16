@@ -87,6 +87,7 @@
   cursor: pointer;
   display: -webkit-box;
   -webkit-line-clamp: 2;
+  line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
@@ -184,6 +185,7 @@
 .dtb-product-card--list .dtb-product-card__name {
   font-size: 1rem;
   -webkit-line-clamp: 3;
+  line-clamp: 3;
 }
 
 .dtb-product-card--list .dtb-product-card__sku {
@@ -208,6 +210,7 @@
 
 .dtb-product-card--rail .dtb-product-card__name {
   -webkit-line-clamp: 2;
+  line-clamp: 2;
   font-size: 0.86rem;
 }
 

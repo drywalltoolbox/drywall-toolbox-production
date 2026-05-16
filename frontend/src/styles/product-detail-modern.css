@@ -51,9 +51,11 @@
   margin: 0;
   font-size: clamp(1.25rem, 3.5vw, 2rem);
   line-height: 1.1;
-  font-weight: 700;
+  font-weight: 600;
   letter-spacing: -0.02em;
   color: #111827;
+  text-wrap: balance;
+  overflow-wrap: break-word;
 }
 
 .dtb-pdp-header__meta {
@@ -631,17 +633,18 @@
   }
 
   .dtb-pdp__info-column {
-    gap: 0.8rem;
+    gap: 0.55rem;
   }
 
   .dtb-pdp-header {
-    gap: 0.7rem;
+    gap: 0.45rem;
   }
 
   .dtb-pdp-header__title {
-    font-size: clamp(1.05rem, 5.5vw, 1.45rem);
-    line-height: 1.08;
-    letter-spacing: -0.02em;
+    font-size: 1.15rem;
+    font-weight: 600;
+    line-height: 1.1;
+    letter-spacing: -0.01em;
   }
 
   .dtb-pdp-header__meta {
