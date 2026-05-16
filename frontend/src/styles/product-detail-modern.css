@@ -2,9 +2,28 @@
  * product-detail-modern.css
  *
  * Mobile-first product-detail polish.
- * Current focus: slim horizontal variation selector controls without changing the
- * existing WooCommerce variation state, pricing, image, stock, or cart pipeline.
+ * Current focus: slim horizontal variation selector controls and readable brand
+ * marks without changing the WooCommerce variation, pricing, image, stock, or
+ * cart pipeline.
  */
+
+.product-detail-meta-row {
+  row-gap: 0.45rem !important;
+}
+
+.product-detail-brand-logo {
+  display: block;
+  width: auto;
+  height: clamp(1.25rem, 4.2vw, 1.9rem);
+  max-width: min(11rem, 46vw);
+  object-fit: contain;
+}
+
+.product-detail-brand-logo--columbia {
+  height: clamp(1.95rem, 6.8vw, 3rem);
+  max-width: min(13.5rem, 54vw);
+  transform: translateY(0.02rem);
+}
 
 /* Variation group header: keep the selected label useful without letting it
    dominate the mobile layout. */
@@ -195,6 +214,16 @@ button[aria-pressed="true"][class*="rounded-2xl"][class*="border-2"] > span:last
 }
 
 @media (max-width: 640px) {
+  .product-detail-brand-logo {
+    height: clamp(1.35rem, 5vw, 1.75rem);
+    max-width: 44vw;
+  }
+
+  .product-detail-brand-logo--columbia {
+    height: clamp(2.15rem, 8.5vw, 2.85rem);
+    max-width: 56vw;
+  }
+
   div:has(> button[aria-pressed][class*="rounded-2xl"][class*="border-2"]) {
     gap: 0.48rem !important;
     margin-inline: -0.25rem;
@@ -218,6 +247,11 @@ button[aria-pressed="true"][class*="rounded-2xl"][class*="border-2"] > span:last
 }
 
 @media (max-width: 390px) {
+  .product-detail-brand-logo--columbia {
+    height: 2rem;
+    max-width: 52vw;
+  }
+
   button[aria-pressed][class*="rounded-2xl"][class*="border-2"] {
     flex-basis: 7.85rem !important;
     width: 7.85rem !important;
