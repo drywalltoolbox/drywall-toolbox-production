@@ -7,7 +7,6 @@ import gracoLogo from '/brands/Graco/graco_logo.svg';
 import platinumLogo from '/brands/Platinum/platinum_logo.svg';
 import duraStiltsLogo from '/brands/Dura-Stilts/dura-stilts-logo.svg';
 import level5Logo from '/brands/Level5/Level5.svg';
-import { ArrowUpRight } from 'lucide-react';
 import { sortBrandsBy } from '../../utils/catalogUrlState.js';
 import './products-selector.css';
 
@@ -34,12 +33,16 @@ export default function ProductsBrandSelector({ brands, onSelectBrand }) {
 
   return (
     <div className="products-brand-selector">
-      <p className="products-brand-selector__breadcrumb">Home &gt; Collections</p>
       <h1 className="products-brand-selector__title">Brands</h1>
       <div className="products-brand-grid">
         {sortedBrands.map((brand) => {
           const label = brand.label || brand.key || '';
           const logo = resolveLogo(brand);
+          const logoClassName = [
+            'products-brand-card__logo',
+            ['Columbia Taping Tools', 'Columbia'].includes(label) ? 'products-brand-card__logo--columbia' : '',
+            ['Platinum Drywall Tools', 'Platinum'].includes(label) ? 'products-brand-card__logo--platinum' : '',
+          ].filter(Boolean).join(' ');
           return (
             <button
               key={brand.slug || brand.key || label}
@@ -51,17 +54,13 @@ export default function ProductsBrandSelector({ brands, onSelectBrand }) {
                   <img
                     src={logo}
                     alt={`${label} logo`}
-                    className="products-brand-card__logo"
+                    className={logoClassName}
                   />
                 ) : (
                   <span className="products-brand-card__fallback-label">{label}</span>
                 )}
               </span>
               <span className="products-brand-card__name">{label}</span>
-              <span className="products-brand-card__cta">
-                <span>View collection</span>
-                <span className="products-brand-card__cta-icon"><ArrowUpRight size={14} /></span>
-              </span>
             </button>
           );
         })}

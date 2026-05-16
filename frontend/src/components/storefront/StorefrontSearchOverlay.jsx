@@ -1,14 +1,6 @@
 import { Link } from 'react-router-dom';
 import { useEffect, useMemo } from 'react';
-import { ArrowRight } from 'lucide-react';
 import { brandToSlug } from '../../utils/catalogUrlState.js';
-
-const QUICK_LINKS = [
-  { to: '/products', label: 'All Products' },
-  { to: '/parts', label: 'Parts' },
-  { to: '/products/brands', label: 'Brands' },
-  { to: '/schematics', label: 'Schematics' },
-];
 
 function formatPrice(value) {
   const numeric = Number(value || 0);
@@ -50,32 +42,18 @@ export default function StorefrontSearchOverlay({
       <button type="button" className="storefront-mobile-drawer__backdrop" onClick={onClose} aria-label="Close search" />
       <div className="storefront-search-overlay__sheet">
         <div className="storefront-search-overlay__panel">
-          <div className="storefront-search-overlay__topline">
-            <p className="storefront-search-overlay__panel-label">
-              {hasQuery ? 'Search results' : 'Discover drywall tools'}
-            </p>
-            {hasQuery ? (
+          {hasQuery ? (
+            <div className="storefront-search-overlay__topline">
+              <p className="storefront-search-overlay__panel-label">Search results</p>
               <button type="button" className="storefront-search-overlay__view-all-inline" onClick={onViewAll}>
                 View all results for "{query.trim()}"
               </button>
-            ) : null}
-          </div>
+            </div>
+          ) : null}
 
-          <div className="storefront-search-overlay__body">
+          <div className={`storefront-search-overlay__body${hasQuery ? '' : ' is-browsing'}`}>
             {!hasQuery ? (
               <section className="storefront-search-overlay__empty-state">
-                <div className="storefront-search-overlay__section">
-                  <h3 className="storefront-search-overlay__section-title">Quick links</h3>
-                  <div className="storefront-search-overlay__quick-links">
-                    {QUICK_LINKS.map((item) => (
-                      <Link key={item.to} to={item.to} onClick={onClose} className="storefront-search-overlay__quick-link">
-                        <span>{item.label}</span>
-                        <ArrowRight size={14} />
-                      </Link>
-                    ))}
-                  </div>
-                </div>
-
                 {categories.length > 0 ? (
                   <div className="storefront-search-overlay__section">
                     <h3 className="storefront-search-overlay__section-title">Popular categories</h3>

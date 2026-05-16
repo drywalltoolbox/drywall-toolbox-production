@@ -285,7 +285,7 @@ export default function ProductsCatalogPlatform({ forceProductGrid = false, titl
           </div>
         )}
 
-        {!showCategoryLanding && (
+        {!showCategoryLanding && !showBrandLanding && (
           <div className="mb-5 sm:mb-8">
             <div className="dtb-listing-heading dtb-listing-heading--standard">
               {isCategoryProductRoute && (

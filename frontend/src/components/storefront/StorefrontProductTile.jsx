@@ -1,5 +1,5 @@
 import { motion as Motion } from 'framer-motion';
-import { ShoppingCart, ChevronRight } from 'lucide-react';
+import { ShoppingCart, SlidersHorizontal } from 'lucide-react';
 import ProductCardImage from '../product/ProductCardImage';
 
 function money(value) {
@@ -79,9 +79,14 @@ export default function StorefrontProductTile({
             {priceStr}
           </strong>
           {isVariable ? (
-            <button type="button" onClick={onOpenModal} className="dtb-product-card__action dtb-product-card__action--options">
-              <span>Options</span>
-              <ChevronRight size={13} />
+            <button
+              type="button"
+              onClick={onOpenModal}
+              className="dtb-product-card__action dtb-product-card__action--options"
+              aria-label={`Configure ${name}`}
+            >
+              <SlidersHorizontal size={14} />
+              <span>Configure</span>
             </button>
           ) : (
             <button type="button" onClick={onAddToCart} disabled={outOfStock} className="dtb-product-card__action" aria-label={`Add ${name} to cart`}>

@@ -1,18 +1,19 @@
 import TrendingProducts from '../components/catalog/TrendingProducts';
+import HeroSection from '../components/ui/HeroSection';
 import tapeTechLogo from '/brands/TapeTech/tapetech_logo.svg';
-import columbiaLogo from '/brands/Columbia/columbia_logo_white.svg';
+import columbiaLogo from '/brands/Columbia/columbia_taping_tools_logo.svg';
+import columbiaLogoWhite from '/brands/Columbia/columbia_logo_white.svg';
 import surproLogo from '/brands/SurPro/surpro_logo.svg';
 import asgardLogo from '/brands/Asgard/asgard_logo.svg';
-import platinumLogo from '/brands/Platinum/platinum_logo_white.svg';
+import platinumLogo from '/brands/Platinum/platinum_logo.svg';
+import platinumLogoWhite from '/brands/Platinum/platinum_logo_white.svg';
 import level5Logo from '/brands/Level5/Level5.svg';
 import SEOHead from '../components/shared/SEOHead';
 import { buildOrganizationSchema, buildSiteLinksSearchBoxSchema } from '../utils/schema';
 import StorefrontSection from '../components/storefront/StorefrontSection';
 import StorefrontRail from '../components/storefront/StorefrontRail';
-import StorefrontHero from '../components/storefront/StorefrontHero';
 import StorefrontCategoryTile from '../components/storefront/StorefrontCategoryTile';
 import StorefrontBrandTile from '../components/storefront/StorefrontBrandTile';
-import StorefrontCTA from '../components/storefront/StorefrontCTA';
 import StorefrontProductRail from '../components/storefront/StorefrontProductRail';
 
 const categories = [
@@ -33,11 +34,13 @@ const brands = [
   { name: 'SurPro', logo: surproLogo, to: '/products/brands/surpro' },
 ];
 
-const trustItems = [
-  { icon: '🚚', title: 'Free Shipping $75+', desc: 'Contiguous USA only. Same-day processing on in-stock orders.' },
-  { icon: '🔧', title: 'Expert Support', desc: 'Real pros answer your questions — no bots, no runaround.' },
-  { icon: '🔄', title: 'Easy Returns', desc: '30-day hassle-free return on most stocked items.' },
-  { icon: '🛡️', title: 'Secure Checkout', desc: 'SSL encrypted checkout with multiple payment options.' },
+const heroBrands = [
+  { name: 'TapeTech', src: tapeTechLogo, to: '/products?brand=TapeTech' },
+  { name: 'Columbia', src: columbiaLogoWhite, to: '/products?brand=Columbia%20Taping%20Tools' },
+  { name: 'Level5', src: level5Logo, to: '/products?brand=Level5' },
+  { name: 'Platinum Drywall Tools', src: platinumLogoWhite, to: '/products?brand=Platinum%20Drywall%20Tools' },
+  { name: 'Asgard', src: asgardLogo, to: '/products?brand=Asgard' },
+  { name: 'SurPro', src: surproLogo, to: '/products?brand=SurPro' },
 ];
 
 export default function Home() {
@@ -51,10 +54,13 @@ export default function Home() {
       />
 
       <div className="page-wrapper dtb-home-page storefront-shell">
-        <div className="container mx-auto px-4 pt-8 pb-4 sm:pt-10">
+        <HeroSection
+          titleLines={['The New Standard', 'in Drywall.']}
+          subtitle="Premium tools for every drywall job — unbeatable prices, lightning-fast shipping."
+          brands={heroBrands}
+        />
 
-          {/* ── Commerce Hero ── */}
-          <StorefrontHero />
+        <div className="container mx-auto px-5 pb-4 md:px-4">
 
           {/* ── Popular Categories ── */}
           <StorefrontSection
@@ -105,33 +111,6 @@ export default function Home() {
               ))}
             </StorefrontRail>
           </StorefrontSection>
-
-          {/* ── Repair & Schematics CTAs ── */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 py-4">
-            <StorefrontCTA
-              title="Professional Repair Services"
-              copy="Submit repair requests for your drywall tools. Fast turnaround from certified technicians."
-              to="/repairs"
-              action="Start repair request"
-            />
-            <StorefrontCTA
-              title="Parts & Schematics"
-              copy="Exploded diagrams and part references for TapeTech, Columbia, and more."
-              to="/schematics"
-              action="Browse schematics"
-            />
-          </div>
-
-          {/* ── Trust / Support blocks ── */}
-          <div className="storefront-trust-bar">
-            {trustItems.map((item) => (
-              <div key={item.title} className="storefront-trust-item">
-                <span className="storefront-trust-item__icon" aria-hidden="true">{item.icon}</span>
-                <strong className="storefront-trust-item__title">{item.title}</strong>
-                <p className="storefront-trust-item__desc">{item.desc}</p>
-              </div>
-            ))}
-          </div>
 
         </div>
       </div>

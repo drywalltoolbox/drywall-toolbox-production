@@ -392,6 +392,10 @@
     linear-gradient(180deg, rgba(8, 16, 33, 0.92), rgba(5, 11, 24, 0.96));
 }
 
+.storefront-search-overlay__body.is-browsing {
+  padding-top: 18px;
+}
+
 .storefront-search-overlay__empty-state,
 .storefront-search-overlay__results {
   display: grid;
@@ -549,6 +553,10 @@
 
   .storefront-search-overlay__body {
     padding-bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+  }
+
+  .storefront-search-overlay__body.is-browsing {
+    padding-top: 18px;
   }
 
   .storefront-search-overlay__quick-link,

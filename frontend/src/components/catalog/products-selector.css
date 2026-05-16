@@ -3,15 +3,8 @@
   margin: 0 auto;
 }
 
-.products-brand-selector__breadcrumb {
-  margin: 0;
-  color: #64748b;
-  font-size: 0.82rem;
-  font-weight: 600;
-}
-
 .products-brand-selector__title {
-  margin: 8px 0 20px;
+  margin: 0 0 20px;
   font-size: clamp(2rem, 8vw, 3.25rem);
   line-height: 1.02;
   font-weight: 800;
@@ -54,8 +47,18 @@
   object-fit: contain;
 }
 
+.products-brand-card__logo--columbia {
+  max-width: 94%;
+  max-height: 74%;
+}
+
+.products-brand-card__logo--platinum {
+  max-width: 92%;
+  max-height: 66%;
+}
+
 .products-brand-card__name {
-  margin-top: 18px;
+  margin-top: 16px;
   font-size: 1.1rem;
   font-weight: 800;
   color: #0f172a;
@@ -63,26 +66,6 @@
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
   overflow: hidden;
-}
-
-.products-brand-card__cta {
-  margin-top: 10px;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 1rem;
-  color: #334155;
-  font-weight: 700;
-}
-
-.products-brand-card__cta-icon {
-  width: 24px;
-  height: 24px;
-  border-radius: 999px;
-  border: 1px solid rgba(148, 163, 184, 0.6);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
 }
 
 .products-brand-card__fallback-label {

@@ -164,6 +164,7 @@ export default function TrendingProducts() {
     <section className="dtb-trending-section">
       <div className="dtb-trending-header">
         <h2 className="dtb-trending-title">Trending Products</h2>
+        <div className="dtb-trending-divider" aria-hidden="true" />
       </div>
 
       <div className="dtb-trending-scroll-wrapper">
@@ -249,9 +250,9 @@ export default function TrendingProducts() {
 
            .dtb-trending-scroll {
              gap: 12px;
-             padding-left: 16px;
-             padding-right: 16px;
-             scroll-padding-inline: 16px;
+             padding-left: 0;
+             padding-right: 0;
+             scroll-padding-inline: 0;
            }
 
            .dtb-trending-card-wrap {
