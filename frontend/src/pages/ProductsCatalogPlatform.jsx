@@ -105,6 +105,12 @@ function toBrandFacet(rawBrand = {}) {
   };
 }
 
+function formatCategoryLabel(value) {
+  return String(value || '')
+    .replace(/[_-]+/g, ' ')
+    .replace(/\b\w/g, (char) => char.toUpperCase());
+}
+
 function CatalogError({ title, message, details, onRetry }) {
   return (
     <div className="rounded-2xl border border-red-100 bg-red-50 p-6 text-red-900">
@@ -197,6 +203,19 @@ export default function ProductsCatalogPlatform({ forceProductGrid = false, titl
       .sort((a, b) => a.name.localeCompare(b.name));
   }, [facets, selectedBrandFacet]);
 
+  const selectedCategoryLabel = useMemo(() => {
+    if (!query.displayCategory) return '';
+    const match = [...filterCategories, ...brandCategoryCards].find((cat) => cat.slug === query.displayCategory || cat.key === query.displayCategory || cat.id === query.displayCategory);
+    return match?.name || formatCategoryLabel(query.displayCategory);
+  }, [brandCategoryCards, filterCategories, query.displayCategory]);
+
+  const pageHeading = selectedBrand && selectedCategoryLabel
+    ? `${selectedBrandFacet?.label || selectedBrand} ${selectedCategoryLabel}`
+    : title;
+  const pageSubheading = selectedBrand && selectedCategoryLabel
+    ? `Browse ${selectedCategoryLabel.toLowerCase()} from ${selectedBrandFacet?.label || selectedBrand}.`
+    : 'Browse our extensive collection of professional drywall tools';
+
   const setQuery = useCallback((patch, options = {}) => {
     const next = { ...query, ...patch };
     if (options.resetPage !== false) next.page = patch.page ?? 1;
@@ -242,7 +261,7 @@ export default function ProductsCatalogPlatform({ forceProductGrid = false, titl
 
   return (
     <div className="min-h-screen bg-gray-50 page-wrapper">
-      <SEOHead title={title} description="Shop professional drywall tools, parts, accessories, and replacement components from leading drywall brands." canonical="https://drywalltoolbox.com/products" schema={buildSiteLinksSearchBoxSchema()} />
+      <SEOHead title={pageHeading} description="Shop professional drywall tools, parts, accessories, and replacement components from leading drywall brands." canonical="https://drywalltoolbox.com/products" schema={buildSiteLinksSearchBoxSchema()} />
       <div className="container mx-auto px-4 py-4 pt-6">
         {!showCategoryLanding && selectedBrand && (
           <div className="mb-6">
@@ -252,8 +271,8 @@ export default function ProductsCatalogPlatform({ forceProductGrid = false, titl
 
         {!showCategoryLanding && (
           <div className="mb-8">
-            <h1 className="text-4xl font-bold text-gray-900 mb-2">{title}</h1>
-            <p className="text-gray-600">Browse our extensive collection of professional drywall tools</p>
+            <h1 className="text-4xl font-bold text-gray-900 mb-2">{pageHeading}</h1>
+            <p className="text-gray-600">{pageSubheading}</p>
           </div>
         )}
 
