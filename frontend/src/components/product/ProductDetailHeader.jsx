@@ -8,7 +8,6 @@ export default function ProductDetailHeader({
   displayPrice,
   pricePrefix,
   compareAt,
-  rawPrice,
   onReviewsClick,
   money,
   reviewsClassName = '',
@@ -49,7 +48,7 @@ export default function ProductDetailHeader({
           <span className="dtb-pdp-header__price">
             {pricePrefix}{displayPrice}
           </span>
-          {compareAt && parseFloat(compareAt) > parseFloat(rawPrice || 0) ? (
+          {compareAt && parseFloat(compareAt) > 0 ? (
             <span className="dtb-pdp-header__compare-at">
               ${money(compareAt)}
             </span>

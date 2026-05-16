@@ -410,11 +410,6 @@ export default function ProductDetail({
       {stripSpecsFromHtml(effectiveProduct.description_full || effectiveProduct.description || effectiveProduct.short_description || 'No description available.')}
     </ReactMarkdown>
   );
-  const stockLine = isOutOfStock
-    ? 'Currently unavailable'
-    : (selectedVariation
-      ? `${selectedVariationLabel || 'Selected option'} is ready to ship`
-      : 'Ready to ship while supplies last');
 
   return (
     <div className="dtb-pdp bg-white rounded-2xl shadow-2xl overflow-hidden w-full max-w-6xl mx-auto flex flex-col relative">
@@ -469,10 +464,6 @@ export default function ProductDetail({
                 />
               ) : null}
 
-              <p className={`dtb-pdp__stock-line dtb-pdp-mobile-relocate${isOutOfStock ? ' is-out' : ''}`}>
-                {stockLine}
-              </p>
-
               <ProductPurchasePanel
                 quantity={quantity}
                 onDecrease={() => {
@@ -499,9 +490,6 @@ export default function ProductDetail({
               />
 
               <div className="dtb-pdp-mobile-post-purchase">
-                <p className={`dtb-pdp__stock-line${isOutOfStock ? ' is-out' : ''}`}>
-                  {stockLine}
-                </p>
                 {partsUrl ? (
                   <Link to={partsUrl} className="dtb-pdp-parts-link dtb-pdp-parts-link--mobile">
                     View compatible schematics and parts

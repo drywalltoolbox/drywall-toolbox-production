@@ -1,5 +1,4 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { Star } from 'lucide-react';
 
 // Lightweight client-side reviews store with real-time sync via BroadcastChannel.
 import io from 'socket.io-client';
@@ -144,71 +143,103 @@ export default function Reviews({ productId, allowSubmit = true, filterVerified 
   }
 
   const avg = reviews.length ? (reviews.reduce((s, r) => s + (r.rating || 0), 0) / reviews.length) : 0;
-
-  // optionally filter to only verified reviews when requested
   const visibleReviews = filterVerified ? reviews.filter(r => !!r.verified) : reviews;
 
   return (
-    <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-sm mt-6">
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-2">
-          <div className="flex items-center gap-1">
-            <Star className="text-yellow-400" size={16} />
-            <span className="text-lg font-semibold">{avg ? avg.toFixed(1) : '—'}</span>
+    <div className="dtb-reviews">
+
+      {/* ── Summary bar ── */}
+      <div className="dtb-reviews__summary">
+        <div className="dtb-reviews__avg">
+          <span className="dtb-reviews__avg-score">{avg ? avg.toFixed(1) : '—'}</span>
+          <div className="dtb-reviews__avg-stars" aria-label={`${avg.toFixed(1)} out of 5 stars`}>
+            {[1,2,3,4,5].map(n => (
+              <svg key={n} className={`dtb-reviews__star${n <= Math.round(avg) ? ' is-filled' : ''}`} viewBox="0 0 20 20" aria-hidden="true">
+                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+              </svg>
+            ))}
           </div>
-          <div className="text-sm text-gray-500">{reviews.length} review{reviews.length !== 1 ? 's' : ''}</div>
+          <span className="dtb-reviews__count">{reviews.length} review{reviews.length !== 1 ? 's' : ''}</span>
         </div>
-        <div className="text-sm text-gray-500">Real-time reviews (local)</div>
       </div>
 
+      {/* ── Write a review form ── */}
       {allowSubmit && (
-        <form onSubmit={handleSubmit} className="mb-6">
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-          <div className="sm:col-span-3">
-            <label className="text-sm font-medium text-gray-700">Your rating</label>
-            <div className="flex items-center gap-1 mt-1">
+        <form onSubmit={handleSubmit} className="dtb-reviews__form">
+          <p className="dtb-reviews__form-heading">Write a review</p>
+
+          <div className="dtb-reviews__field">
+            <label className="dtb-reviews__label">Rating</label>
+            <div className="dtb-reviews__star-picker" role="group" aria-label="Select rating">
               {[1,2,3,4,5].map(n => (
-                <button type="button" key={n} onClick={() => setRating(n)} className={`p-1 rounded ${n <= rating ? 'bg-yellow-100' : 'bg-transparent'}`} aria-label={`Rate ${n}`}>
-                  <Star size={18} className={n <= rating ? 'text-yellow-400' : 'text-gray-300'} />
+                <button
+                  type="button"
+                  key={n}
+                  onClick={() => setRating(n)}
+                  className={`dtb-reviews__star-btn${n <= rating ? ' is-active' : ''}`}
+                  aria-label={`${n} star${n !== 1 ? 's' : ''}`}
+                  aria-pressed={n <= rating}
+                >
+                  <svg className="dtb-reviews__star" viewBox="0 0 20 20" aria-hidden="true">
+                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                  </svg>
                 </button>
               ))}
             </div>
           </div>
 
-          <div className="sm:col-span-2">
-            <label className="text-sm font-medium text-gray-700">Your name (optional)</label>
-            <input className="w-full px-3 py-2 rounded border border-gray-300 mt-1" value={author} onChange={(e)=>setAuthor(e.target.value)} placeholder="Your name" />
+          <div className="dtb-reviews__field">
+            <label className="dtb-reviews__label" htmlFor="dtb-review-author">Name <span className="dtb-reviews__label-opt">(optional)</span></label>
+            <input
+              id="dtb-review-author"
+              className="dtb-reviews__input"
+              type="text"
+              value={author}
+              onChange={(e) => setAuthor(e.target.value)}
+              placeholder="Your name"
+              autoComplete="name"
+            />
           </div>
 
-          <div className="sm:col-span-3">
-            <label className="text-sm font-medium text-gray-700">Your review</label>
-            <textarea className="w-full px-3 py-2 rounded border border-gray-300 mt-1" rows={4} value={text} onChange={(e)=>setText(e.target.value)} placeholder="Tell other buyers what you thought..." />
+          <div className="dtb-reviews__field">
+            <label className="dtb-reviews__label" htmlFor="dtb-review-text">Review</label>
+            <textarea
+              id="dtb-review-text"
+              className="dtb-reviews__textarea"
+              rows={4}
+              value={text}
+              onChange={(e) => setText(e.target.value)}
+              placeholder="Share your experience with this product…"
+            />
           </div>
-        </div>
 
-        <div className="mt-3">
-          <button type="submit" className="px-4 py-2 bg-primary-600 text-white rounded hover:bg-primary-700">Submit review</button>
-        </div>
+          <button type="submit" className="dtb-reviews__submit">Submit review</button>
         </form>
       )}
 
-      <div className="space-y-4">
-        {visibleReviews.length === 0 && <div className="text-sm text-gray-500">No reviews yet — no verified reviews available for this product.</div>}
-        {visibleReviews.map(r => (
-          <div key={r.id} className="border border-gray-100 rounded-lg p-3">
-            <div className="flex items-center justify-between mb-1">
-              <div className="flex items-center gap-3">
-                <div className="font-medium text-sm">{r.author}</div>
-                <div className="flex items-center gap-1 text-sm text-gray-600">
+      {/* ── Review list ── */}
+      <div className="dtb-reviews__list">
+        {visibleReviews.length === 0 ? (
+          <p className="dtb-reviews__empty">No reviews yet — be the first to share your experience.</p>
+        ) : visibleReviews.map(r => (
+          <article key={r.id} className="dtb-reviews__item">
+            <div className="dtb-reviews__item-header">
+              <div className="dtb-reviews__item-meta">
+                <span className="dtb-reviews__item-author">{r.author}</span>
+                <div className="dtb-reviews__item-stars" aria-label={`${r.rating} out of 5 stars`}>
                   {[...Array(5)].map((_, i) => (
-                    <Star key={i} size={14} className={i < r.rating ? 'text-yellow-400' : 'text-gray-300'} />
+                    <svg key={i} className={`dtb-reviews__star dtb-reviews__star--sm${i < r.rating ? ' is-filled' : ''}`} viewBox="0 0 20 20" aria-hidden="true">
+                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                    </svg>
                   ))}
                 </div>
               </div>
-              <div className="text-xs text-gray-400">{new Date(r.createdAt).toLocaleString()}</div>
+              <time className="dtb-reviews__item-date" dateTime={r.createdAt}>
+                {new Date(r.createdAt).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}
+              </time>
             </div>
-            <div className="text-sm text-gray-700">{r.text}</div>
-          </div>
+            <p className="dtb-reviews__item-text">{r.text}</p>
+          </article>
         ))}
       </div>
     </div>

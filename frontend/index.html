@@ -53,17 +53,16 @@
     <!--
       Non-render-blocking Google Fonts load (preload + onload swap).
       font-display=swap: browser immediately renders text in a fallback font and
-      swaps in Inter/JetBrains Mono once downloaded — eliminates FOIT (invisible
+      swaps in Geist/JetBrains Mono once downloaded — eliminates FOIT (invisible
       text) and prevents layout-blocking on slow mobile connections.
-      Loading only the weights actually used (400,600,700,800 for Inter;
-      400,700 for JetBrains Mono) cuts the font payload significantly vs the
-      previous 6-weight Inter request with no JetBrains Mono at all.
+      Geist: Vercel's modern geometric sans-serif. Full variable axis (100–900).
+      JetBrains Mono: monospace for SKUs, codes, and inline kbd hints.
       The preload/onload pattern prevents the stylesheet from blocking the
       initial render; the <noscript> fallback ensures fonts still load when
       JavaScript is disabled.
     -->
-    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,300..900;1,14..32,300..900&family=JetBrains+Mono:wght@400;700&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,300..900;1,14..32,300..900&family=JetBrains+Mono:wght@400;700&display=swap"></noscript>
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&family=JetBrains+Mono:wght@400;700&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&family=JetBrains+Mono:wght@400;700&display=swap"></noscript>
 
     <!-- Static Organization JSON-LD (supplements per-page dynamic schemas) -->
     <script type="application/ld+json">
