@@ -151,7 +151,6 @@ export default function ProductDetail({
   const [isWishlisted, setIsWishlisted] = useState(false);
   const [activeTab, setActiveTab] = useState('description');
 
-  // ── Variable product variations ──────────────────────────────────────────
   const seededVariations = buildSeedVariations(initialVariations, initialResolvedVariation);
   const initialVariationSelection = buildInitialVariationSelection({
     autoSelectDefaultVariation,
@@ -161,28 +160,15 @@ export default function ProductDetail({
 
   const [variations, setVariations]             = useState(seededVariations);
   const [variationsLoading, setVariationsLoading] = useState(false);
-  // selectedAttrs: { [attrName]: value } — tracks the user's chip selections
   const [selectedAttrs, setSelectedAttrs]       = useState(initialVariationSelection);
-  // computedData: server-side computed state from the detail endpoint, including available_option_matrix
   const [computedData, setComputedData]         = useState(initialComputedData);
 
-  // Stable boolean dep: false until the parent has prefetched variations, then
-  // true forever for this product.  Using the raw array as a dep would create a
-  // new reference every render ([] !== []) and trigger an infinite re-render
-  // loop via setSelectedAttrs/setVariations → re-render → new {} default for
-  // initialSelectedAttrs → effect re-fires → repeat.
   const hasInitialVariations = Array.isArray(initialVariations) && initialVariations.length > 0;
 
-  // When a variable product is opened, fetch its variations from the API.
-  // All state updates run asynchronously (via Promise chain) to satisfy the
-  // react-hooks/set-state-in-effect rule from eslint-plugin-react-hooks v7.
   useEffect(() => {
     if (!product?.is_variable || !product.id) return;
 
     let mounted = true;
-
-    // Capture the current seed values at the time this effect fires so the
-    // closure is consistent even if the parent re-renders before it completes.
     const currentSeeded = seededVariations;
     const currentInitialAttrs = initialSelectedAttrs;
 
@@ -198,15 +184,10 @@ export default function ProductDetail({
       setVariationsLoading(!hasInitialVariations && !disableLegacyDetailFetch);
     });
 
-    // When the parent platform component has already fetched full DTB detail
-    // data (disableLegacyDetailFetch=true + initialComputedData), we only need
-    // variation objects which may have been pre-seeded.  Skip the REST round-trip.
     if (disableLegacyDetailFetch && hasInitialVariations) {
       return () => { mounted = false; };
     }
 
-    // Primary: use the slug-based detail endpoint which returns server-computed
-    // available_option_matrix alongside properly-normalised variations.
     const applyVariations = (vars) => {
       if (!mounted || !Array.isArray(vars) || vars.length === 0) return false;
       setVariations(vars);
@@ -225,8 +206,6 @@ export default function ProductDetail({
       .then(async () => {
         if (!mounted) return;
 
-        // Try the DTB catalog detail endpoint first (canonical, returns
-        // server-computed variationMatrix + available_option_matrix).
         if (product.slug) {
           try {
             const data = await apiClient(
@@ -243,12 +222,10 @@ export default function ProductDetail({
               return;
             }
           } catch {
-            // fall through to legacy endpoint
             if (!mounted) return;
           }
         }
 
-        // Legacy fallback: /drywall/v1 detail endpoint.
         if (product.slug && !disableLegacyDetailFetch) {
           try {
             const data = await apiClient(
@@ -265,13 +242,10 @@ export default function ProductDetail({
               return;
             }
           } catch {
-            // fall through to getProductVariations
             if (!mounted) return;
           }
         }
 
-        // Fallback: fetch variations directly and write non-empty results to the
-        // shared cache so card display and future prefetches stay in sync.
         try {
           const vars = await getProductVariations(product.id);
           if (!mounted || !Array.isArray(vars) || vars.length === 0) return;
@@ -286,7 +260,6 @@ export default function ProductDetail({
     return () => { mounted = false; };
   }, [product?.id, product?.slug, product?.is_variable, hasInitialVariations]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Find the variation that matches the current chip selections
   const selectedVariation = useMemo(
     () => product?.is_variable ? findMatchingVariation(variations, selectedAttrs) : null,
     [product?.is_variable, variations, selectedAttrs]
@@ -315,8 +288,6 @@ export default function ProductDetail({
       }, {});
 
       meta[name] = options.map((option) => {
-        // Prefer the server-computed option matrix. It's keyed by the exact
-        // WooCommerce option value, with a case-insensitive fallback.
         const matrixEntry = attrMatrix[option] ?? lowerMatrix[String(option).toLowerCase()];
 
         if (matrixEntry) {
@@ -351,7 +322,6 @@ export default function ProductDetail({
     return meta;
   }, [variationAttributes, variations, selectedAttrs, computedData]);
 
-  // Lock body scroll while this detail panel is mounted
   useEffect(() => {
     if (!product || !onClose) return;
     const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
@@ -374,16 +344,10 @@ export default function ProductDetail({
       .replace(/<table[^>]*>([\s\S]*?)(?:Specification|Detail|DETAIL|SPECIFICATION)([\s\S]*?)<\/table>/gi, '');
   };
 
-  // Determine if this product has a matching schematic diagram
   const schematicId = getSchematicIdForProduct(product);
   const partsUrl = schematicId ? buildSchematicsUrl(schematicId) : null;
-
   const selectedVariationLabel = getSelectedVariationLabel(selectedVariation, selectedAttrs, variationAttributes);
 
-  // Effective product data: use selected variation's data when available, but
-  // compose display-critical fields from the parent product and selected option.
-  // WooCommerce often stores the first/default variation name as a raw token
-  // such as `8` or `34`, which is not a valid customer-facing product title.
   const effectiveProduct = selectedVariation
     ? composeEffectiveVariationProduct(product, selectedVariation, selectedVariationLabel)
     : product;
@@ -413,8 +377,6 @@ export default function ProductDetail({
 
   const incrementQuantity = () => setQuantity(prev => prev + 1);
   const decrementQuantity = () => setQuantity(prev => Math.max(1, prev - 1));
-
-  // Price: use variation price when selected, otherwise product min_price or regular price
   const rawPrice = selectedVariation
     ? (selectedVariation.price || 0)
     : (product.is_variable && product.min_price != null ? product.min_price : (product.price || 0));
@@ -423,11 +385,15 @@ export default function ProductDetail({
   const compareAt = selectedVariation?.regular_price || product.regular_price;
   const productSpecifications = getProductSpecifications(product);
 
+  const brandLogoClassName = [
+    'product-detail-brand-logo',
+    product.brand === 'Columbia Taping Tools' ? 'product-detail-brand-logo--columbia' : '',
+  ].filter(Boolean).join(' ');
+
   return (
     <div
       className="bg-white rounded-2xl shadow-2xl overflow-hidden w-full max-w-6xl mx-auto flex flex-col relative"
     >
-      {/* Close Button */}
       {onClose && (
         <button
           onClick={onClose}
@@ -439,18 +405,13 @@ export default function ProductDetail({
         </button>
       )}
 
-      {/* Scrollable Content */}
       <div className="overflow-x-hidden">
         <div className="p-4 sm:p-6 md:p-8 lg:p-12 max-w-full">
-          {/* Top Section — Image left, details right */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 md:gap-8 mb-6 sm:mb-8">
-            {/* Product Image Gallery */}
             <ProductImageGallery product={effectiveProduct} />
 
-            {/* Product Info */}
             <div className="flex flex-col">
-              {/* Stock Badge & Brand */}
-              <div className="flex items-center flex-wrap gap-2 sm:gap-3 mb-3 sm:mb-4">
+              <div className="product-detail-meta-row flex items-center flex-wrap gap-2 sm:gap-3 mb-3 sm:mb-4">
                 <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 sm:px-3 text-white text-xs font-semibold rounded ${
                   isOutOfStock ? 'bg-red-500' : 'bg-black'
                 }`}>
@@ -461,19 +422,17 @@ export default function ProductDetail({
                   <img
                     src={BRAND_LOGOS[product.brand]}
                     alt={product.brand}
-                    className="h-5 sm:h-6 w-auto object-contain"
+                    className={brandLogoClassName}
                   />
                 ) : product.brand ? (
                   <span className="text-xs sm:text-sm font-semibold uppercase tracking-wide text-gray-500">{product.brand}</span>
                 ) : null}
               </div>
 
-              {/* Product Title — updates to variation name when a variation is selected */}
               <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 mb-1 leading-tight pr-10">
                 {(effectiveProduct.name || product.name) || product.sku || product.part_number}
               </h2>
 
-              {/* SKU & UPC — reflects selected variation when applicable */}
               <div className="mb-3 sm:mb-4 space-y-1 text-xs sm:text-sm text-gray-500">
                 {effectiveSku && (
                   <div>
@@ -489,7 +448,6 @@ export default function ProductDetail({
                 )}
               </div>
 
-              {/* Rating — clickable stars open reviews tab */}
               <button
                 type="button"
                 onClick={() => setActiveTab('reviews')}
@@ -503,7 +461,6 @@ export default function ProductDetail({
                 ))}
               </button>
 
-              {/* Price — separated from descriptive info by a hairline rule */}
               <hr className="border-gray-100 mb-4 sm:mb-5" />
 
               <div className="mb-4 sm:mb-6">
@@ -518,247 +475,3 @@ export default function ProductDetail({
                   )}
                 </div>
               </div>
-
-              {/* Variation selector — visible for variable products */}
-              {needsVariation && (
-                <div className="mb-5 sm:mb-6 space-y-4">
-                  {variationAttributes.map((attr) => (
-                    <div key={attr.name}>
-                      <div className="flex items-center justify-between gap-3 mb-2">
-                        <span className="text-sm font-bold text-gray-900 uppercase">
-                          {attributeLabel(attr)}
-                        </span>
-                        {selectedAttrs?.[attr.name] && (
-                          <span className="text-xs font-semibold text-gray-500">
-                            Selected: {selectedAttrs[attr.name]}
-                          </span>
-                        )}
-                      </div>
-                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                        {(variantOptionMeta[attr.name] || []).map((option) => {
-                          const selected = `${selectedAttrs?.[attr.name] || ''}` === `${option.value}`;
-                          const soldOut = option.status === 'sold-out';
-                          const unavailable = option.status === 'unavailable';
-                          const disabled = variationsLoading || unavailable;
-                          return (
-                            <button
-                              key={`${attr.name}-${option.value}`}
-                              type="button"
-                              onClick={() => setSelectedAttrs(prev => ({ ...prev, [attr.name]: option.value }))}
-                              disabled={disabled}
-                              className={`min-h-14 rounded-2xl border-2 px-3 py-2 text-left transition-all ${
-                                selected
-                                  ? 'border-gray-900 bg-gray-50 shadow-sm'
-                                  : 'border-gray-200 bg-white hover:border-gray-500 hover:bg-gray-50'
-                              } ${disabled ? 'cursor-not-allowed opacity-40 hover:border-gray-200 hover:bg-white' : ''}`}
-                              aria-pressed={selected}
-                            >
-                              <span className="block text-sm font-bold text-gray-900 leading-tight">
-                                {option.value}
-                                {selected && (
-                                  <span className="ml-1.5 inline-block w-2 h-2 rounded-full bg-gray-900 align-middle" aria-hidden="true" />
-                                )}
-                              </span>
-                              <span className={`mt-1 block text-xs font-semibold ${
-                                soldOut ? 'text-red-600' : 'text-gray-500'
-                              }`}>
-                                {variationsLoading
-                                  ? 'Loading'
-                                  : soldOut
-                                    ? 'Sold out'
-                                    : option.price != null
-                                      ? `$${money(option.price)}`
-                                      : 'Unavailable'}
-                              </span>
-                            </button>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  ))}
-                  {selectedVariation && selectedVariation.stock_status === 'outofstock' && (
-                    <p className="text-xs font-semibold text-red-600">
-                      This option is currently out of stock.
-                    </p>
-                  )}
-                  {!variationsLoading && hasCompleteSelection && !selectedVariation && (
-                    <p className="text-xs font-semibold text-red-600">
-                      This option combination is not available.
-                    </p>
-                  )}
-                </div>
-              )}
-
-              {/* Quantity + Wishlist row */}
-              <div className="flex items-center gap-3 mb-4">
-                {/* Quantity Selector — pill style */}
-                <div
-                  role="group"
-                  aria-label="Quantity"
-                  className="inline-flex items-center h-11 rounded-xl border border-gray-200 bg-white overflow-hidden select-none"
-                >
-                  <button
-                    onClick={decrementQuantity}
-                    className="flex items-center justify-center w-11 h-11 text-gray-500 hover:bg-gray-50 active:bg-gray-100 transition-colors"
-                    aria-label="Decrease quantity"
-                  >
-                    <Minus size={14} strokeWidth={2.5} />
-                  </button>
-                  <span className="px-3 min-w-10 text-center text-sm font-bold text-gray-900 tabular-nums border-x border-gray-200">
-                    {quantity}
-                  </span>
-                  <button
-                    onClick={incrementQuantity}
-                    className="flex items-center justify-center w-11 h-11 text-gray-500 hover:bg-gray-50 active:bg-gray-100 transition-colors"
-                    aria-label="Increase quantity"
-                  >
-                    <Plus size={14} strokeWidth={2.5} />
-                  </button>
-                </div>
-
-                {/* Wishlist — visible on all screen sizes */}
-                <button
-                  onClick={() => setIsWishlisted(!isWishlisted)}
-                  className={`flex items-center justify-center w-11 h-11 rounded-xl border transition-colors ${
-                    isWishlisted
-                      ? 'bg-red-50 border-red-200 text-red-500'
-                      : 'border-gray-200 text-gray-400 hover:border-red-200 hover:text-red-400'
-                  }`}
-                  aria-label={isWishlisted ? 'Remove from wishlist' : 'Add to wishlist'}
-                >
-                  <Heart size={18} className={isWishlisted ? 'fill-current' : ''} />
-                </button>
-              </div>
-
-              {/* Add to Cart — full width */}
-              <button
-                onClick={handleAddToCart}
-                disabled={!canAddToCart}
-                className="w-full flex items-center justify-center gap-2.5 h-12 px-6 bg-blue-600 hover:bg-blue-700 active:scale-[0.98] text-white font-semibold text-sm tracking-wide rounded-xl transition-all mb-4 sm:mb-5 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100"
-              >
-                <ShoppingCart size={17} aria-hidden="true" />
-                {isOutOfStock
-                  ? 'OUT OF STOCK'
-                  : needsVariation && !hasCompleteSelection
-                    ? 'SELECT OPTIONS'
-                    : 'ADD TO CART'}
-              </button>
-            </div>
-          </div>
-
-          {/* Bottom Section — Full Width Tabs */}
-          <div className="border-t border-gray-200 pt-4 sm:pt-6 md:pt-8">
-            <div className="grid grid-cols-3 gap-3 sm:gap-4 border-b border-gray-200 mb-4 sm:mb-6">
-              <button
-                onClick={() => setActiveTab('description')}
-                className={`pb-2 sm:pb-3 font-semibold text-xs sm:text-sm md:text-base transition-colors relative text-center ${
-                  activeTab === 'description'
-                    ? 'text-blue-600 after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:bg-blue-600'
-                    : 'text-gray-500 hover:text-gray-700'
-                }`}
-              >
-                DESCRIPTION
-              </button>
-              <button
-                onClick={() => setActiveTab('specifications')}
-                className={`pb-2 sm:pb-3 font-semibold text-xs sm:text-sm md:text-base transition-colors relative text-center ${
-                  activeTab === 'specifications'
-                    ? 'text-blue-600 after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:bg-blue-600'
-                    : 'text-gray-500 hover:text-gray-700'
-                }`}
-              >
-                SPECIFICATIONS
-              </button>
-              <button
-                onClick={() => setActiveTab('reviews')}
-                className={`pb-2 sm:pb-3 font-semibold text-xs sm:text-sm md:text-base transition-colors relative text-center ${
-                  activeTab === 'reviews'
-                    ? 'text-blue-600 after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:bg-blue-600'
-                    : 'text-gray-500 hover:text-gray-700'
-                }`}
-              >
-                REVIEWS
-              </button>
-            </div>
-
-            {/* Tab Content */}
-            <div className="pb-4 sm:pb-6 md:pb-8">
-              {activeTab === 'description' && (
-                <div>
-                  {BRAND_LOGOS[product.brand] && (
-                    <div className="flex justify-center mb-5 sm:mb-6">
-                      <img
-                        src={BRAND_LOGOS[product.brand]}
-                        alt={`${product.brand} logo`}
-                        className="h-14 sm:h-16 md:h-20 w-auto object-contain"
-                      />
-                    </div>
-                  )}
-                  {product.description_full ? (
-                    <div className="product-description prose prose-sm max-w-none">
-                      {/^[\s\S]*<[a-z]/i.test(product.description_full)
-                        ? (
-                          <div
-                            dangerouslySetInnerHTML={{
-                              __html: stripSpecsFromHtml(product.description_full),
-                            }}
-                          />
-                        ) : (
-                          <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                            {stripSpecsFromHtml(product.description_full)}
-                      </ReactMarkdown>
-                        )}
-                    </div>
-                  ) : (
-                    <p className="text-gray-500">No description available.</p>
-                  )}
-
-                  {/* Replacement Parts Section */}
-                  {partsUrl && (
-                    <div className="mt-8 pt-6 border-t border-gray-200">
-                      <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-2">
-                        Find replacement parts for this tool here
-                      </h3>
-                      <p className="text-sm text-gray-600 mb-4">
-                        View the official schematic diagram to identify and order the exact replacement parts you need.
-                      </p>
-                      <Link
-                        to={partsUrl}
-                        onClick={onClose}
-                        className="inline-flex items-center gap-2 px-5 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors text-sm sm:text-base"
-                      >
-                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                          <circle cx="11" cy="11" r="8" />
-                          <line x1="21" y1="21" x2="16.65" y2="16.65" />
-                        </svg>
-                        View Schematic &amp; Parts Diagram
-                      </Link>
-                    </div>
-                  )}
-                </div>
-              )}
-
-              {activeTab === 'specifications' && (
-                <div>
-                  <TechnicalSpecifications specs={productSpecifications} onItemClick={onClose} />
-                </div>
-              )}
-
-              {activeTab === 'reviews' && (
-                <div>
-                  <Reviews
-                    productId={product.part_number || product.id || product.name}
-                    allowSubmit={true}
-                    filterVerified={false}
-                  />
-                </div>
-              )}
-            </div>
-          </div>
-
-        </div>
-      </div>
-
-    </div>
-  );
-}
