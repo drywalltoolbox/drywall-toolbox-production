@@ -106,7 +106,7 @@ function AppRoutes() {
           <Route path="/products/brands/:brandSlug/categories/:categorySlug" element={<Products />} />
           {/* Slug-based product detail with URL variant state machine */}
           <Route path="/products/:slug"        element={<ProductDetailPage />} />
-          <Route path="/all-products"          element={<Products forceProductGrid title="All Products" />} />
+          <Route path="/all-products"          element={<Products forceProductGrid title="All Products" isPartsFilter={null} />} />
           <Route path="/parts"                 element={<Parts />} />
           {/* Legacy part-number route — kept for backward compatibility */}
           <Route path="/product/:partNumber"   element={<Product />} />
