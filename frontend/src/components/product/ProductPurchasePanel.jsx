@@ -26,12 +26,6 @@ export default function ProductPurchasePanel({
   return (
     <div className="product-detail-purchase-panel dtb-pdp-purchase-panel">
 
-      {/* CSR-style stock status line */}
-      <p className={`dtb-pdp-stock-status${isOutOfStock ? ' is-out' : ''}`}>
-        <span className="dtb-pdp-stock-status__dot" aria-hidden="true" />
-        {isOutOfStock ? 'Out of stock' : 'In stock'}
-      </p>
-
       <div className="dtb-pdp-purchase-row">
         {/* Flat qty stepper */}
         <div className="dtb-pdp-qty-root" role="group" aria-label="Quantity">

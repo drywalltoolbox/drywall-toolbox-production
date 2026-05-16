@@ -9,6 +9,13 @@
   background: var(--dtb-surface);
   overflow: hidden;
   box-shadow: 0 12px 28px rgba(15, 23, 42, 0.06);
+  transition: box-shadow 200ms ease, transform 200ms ease, border-color 200ms ease;
+}
+
+.dtb-product-card:hover {
+  box-shadow: 0 20px 40px rgba(15, 23, 42, 0.12);
+  transform: translateY(-2px);
+  border-color: rgba(37, 99, 235, 0.22);
 }
 
 .dtb-product-card__image {
@@ -37,7 +44,6 @@
 .dtb-product-card__badge {
   position: absolute;
   top: 10px;
-  left: 10px;
   z-index: 2;
   padding: 4px 8px;
   border-radius: var(--dtb-radius-sm, 6px);
@@ -45,6 +51,15 @@
   font-weight: 800;
   letter-spacing: 0.06em;
   text-transform: uppercase;
+}
+
+/* Position variants — applied via JS based on card variant */
+.dtb-product-card__badge--right {
+  right: 10px;
+}
+
+.dtb-product-card__badge--left {
+  left: 10px;
 }
 
 .dtb-product-card__badge--sale {
@@ -63,6 +78,44 @@
   flex-direction: column;
   gap: 0.18rem;
   padding: 9px 11px 11px;
+  position: relative; /* anchor for heart button */
+}
+
+/* Description snippet — list variant only */
+.dtb-product-card__desc {
+  margin: 0;
+  color: #64748b;
+  font-size: 0.7rem;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Heart / save button — list variant, floated top-right of meta */
+.dtb-product-card__heart-btn {
+  position: absolute;
+  top: 9px;
+  right: 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: 0;
+  border-radius: var(--dtb-radius-sm, 6px);
+  background: none;
+  color: #94a3b8;
+  cursor: pointer;
+  padding: 0;
+  transition: color 150ms ease, background 150ms ease;
+}
+
+.dtb-product-card__heart-btn:hover {
+  color: #dc2626;
+  background: rgba(220, 38, 38, 0.08);
 }
 
 .dtb-product-card__brand {
@@ -262,7 +315,7 @@
   }
 }
 
-/* ─── Quick View Overlay ─────────────────────────────────────────────────── */
+/* ─── Quick View / Action Overlay ───────────────────────────────────────── */
 
 .dtb-product-card__qv-overlay {
   position: absolute;
@@ -270,30 +323,72 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(15, 23, 42, 0.42);
-  backdrop-filter: blur(3px);
-  -webkit-backdrop-filter: blur(3px);
+  background: rgba(15, 23, 42, 0.52);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
   border-radius: inherit;
   z-index: 3;
 }
 
+/* Three-button row: Heart · Quick View pill · Cart */
+.dtb-product-card__qv-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Circle icon buttons (Heart, Cart) */
+.dtb-product-card__qv-icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  color: #0f172a;
+  cursor: pointer;
+  box-shadow: 0 2px 10px rgba(15, 23, 42, 0.18);
+  transition: background 150ms ease, color 150ms ease, transform 120ms ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.dtb-product-card__qv-icon-btn:hover {
+  background: linear-gradient(135deg, #17365d, #2563eb);
+  color: #fff;
+}
+
+.dtb-product-card__qv-icon-btn:active {
+  transform: scale(0.94);
+}
+
+/* Quick View pill — center button */
 .dtb-product-card__qv-btn {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 9px 18px;
+  padding: 9px 16px;
   border: none;
   border-radius: var(--dtb-radius, 10px);
   background: rgba(255, 255, 255, 0.93);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   color: #0f172a;
-  font-size: 0.8rem;
+  font-size: 0.78rem;
   font-weight: 700;
   letter-spacing: 0.01em;
   box-shadow: 0 4px 16px rgba(15, 23, 42, 0.18);
   cursor: pointer;
+  white-space: nowrap;
+  transition: background 150ms ease, color 150ms ease, transform 120ms ease;
   -webkit-tap-highlight-color: transparent;
+}
+
+.dtb-product-card__qv-btn:hover {
+  background: #fff;
 }
 
 .dtb-product-card__qv-btn:active {

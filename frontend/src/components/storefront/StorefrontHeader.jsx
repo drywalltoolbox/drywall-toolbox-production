@@ -386,7 +386,9 @@ export default function Header({ onCartToggle, hasTopTicker = false }) {
               >
                 <X size={16} />
               </button>
-            ) : null}
+            ) : (
+              <span className="storefront-search-dock__kbd" aria-hidden="true">⌘K</span>
+            )}
           />
         </div>
 

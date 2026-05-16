@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion as Motion, AnimatePresence } from 'framer-motion';
-import { ShoppingCart, SlidersHorizontal, Eye } from 'lucide-react';
+import { ShoppingCart, SlidersHorizontal, Eye, Heart } from 'lucide-react';
 import ProductCardImage from '../product/ProductCardImage';
 
 function useIsMobile() {
@@ -22,6 +22,13 @@ function money(value) {
   return Number.isFinite(numeric) ? numeric.toFixed(2) : '0.00';
 }
 
+/** Strip HTML tags and return a plain-text excerpt for the list card description. */
+function stripHtml(html, maxLen = 72) {
+  if (!html) return '';
+  const plain = html.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+  return plain.length > maxLen ? plain.slice(0, maxLen).trimEnd() + '…' : plain;
+}
+
 export default function StorefrontProductTile({
   product,
   cardProduct,
@@ -36,6 +43,7 @@ export default function StorefrontProductTile({
   const outOfStock = stockStatus === 'outofstock';
   const name = resolved.name || product?.name || resolved.part_number || 'Product';
   const sku = resolved.sku || product?.sku || '';
+  const desc = stripHtml(resolved.short_description || resolved.description || '');
   const priceStr = isVariable && product?.min_price != null
     ? `From $${money(product.min_price)}`
     : `$${money(resolved.price ?? product?.price ?? 0)}`;
@@ -43,7 +51,8 @@ export default function StorefrontProductTile({
     && parseFloat(resolved.sale_price) < parseFloat(resolved.regular_price);
 
   const isMobile = useIsMobile();
-  const [quickViewActive, setQuickViewActive] = useState(false);
+  // Unified overlay state — activated by tap (mobile) or hover (desktop)
+  const [overlayActive, setOverlayActive] = useState(false);
   const cardRef = useRef(null);
   const navigate = useNavigate();
 
@@ -52,46 +61,66 @@ export default function StorefrontProductTile({
 
   // Dismiss when user taps/clicks outside the card
   useEffect(() => {
-    if (!quickViewActive) return undefined;
+    if (!overlayActive || !isMobile) return undefined;
     const handler = (e) => {
       if (cardRef.current && !cardRef.current.contains(e.target)) {
-        setQuickViewActive(false);
+        setOverlayActive(false);
       }
     };
     document.addEventListener('pointerdown', handler);
     return () => document.removeEventListener('pointerdown', handler);
-  }, [quickViewActive]);
+  }, [overlayActive, isMobile]);
 
   const handleImageClick = useCallback(() => {
     if (!isMobile) {
-      onOpenModal?.();
-      return;
-    }
-    if (quickViewActive) {
-      // Tapped image area again (not the QV pill) → navigate
-      setQuickViewActive(false);
+      // Desktop: image click navigates directly; overlay is hover-driven
       if (productUrl) navigate(productUrl);
       return;
     }
-    setQuickViewActive(true);
-  }, [isMobile, quickViewActive, onOpenModal, productUrl, navigate]);
+    if (overlayActive) {
+      // Second tap on image (not an overlay button) → navigate
+      setOverlayActive(false);
+      if (productUrl) navigate(productUrl);
+      return;
+    }
+    setOverlayActive(true);
+  }, [isMobile, overlayActive, productUrl, navigate]);
 
-  // When QV is active any card interaction other than the pill → navigate
+  // Desktop hover handlers
+  const handleMouseEnter = useCallback(() => {
+    if (!isMobile) setOverlayActive(true);
+  }, [isMobile]);
+  const handleMouseLeave = useCallback(() => {
+    if (!isMobile) setOverlayActive(false);
+  }, [isMobile]);
+
+  // When overlay is active any card interaction outside overlay buttons → navigate
   const handleCardInteract = useCallback((fallback) => (e) => {
-    if (isMobile && quickViewActive) {
+    if (isMobile && overlayActive) {
       e.stopPropagation();
-      setQuickViewActive(false);
+      setOverlayActive(false);
       if (productUrl) navigate(productUrl);
       return;
     }
     fallback?.(e);
-  }, [isMobile, quickViewActive, productUrl, navigate]);
+  }, [isMobile, overlayActive, productUrl, navigate]);
 
   const handleQuickView = useCallback((e) => {
     e.stopPropagation();
-    setQuickViewActive(false);
+    setOverlayActive(false);
     onOpenModal?.();
   }, [onOpenModal]);
+
+  const handleOverlayAddToCart = useCallback((e) => {
+    e.stopPropagation();
+    setOverlayActive(false);
+    onAddToCart?.();
+  }, [onAddToCart]);
+
+  // Badge is top-right on grid/rail, top-left on list (image stripe is narrow)
+  const badgePositionClass = variant === 'list'
+    ? 'dtb-product-card__badge--left'
+    : 'dtb-product-card__badge--right';
 
   const cardClassName = `dtb-product-card dtb-product-card--${variant} storefront-motion-card`;
 
@@ -99,6 +128,8 @@ export default function StorefrontProductTile({
     <Motion.article
       ref={cardRef}
       className={cardClassName}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.22, delay: Math.min(index, 8) * 0.03 }}
@@ -110,10 +141,14 @@ export default function StorefrontProductTile({
         aria-label={`View ${name}`}
       >
         {outOfStock && (
-          <span className="dtb-product-card__badge dtb-product-card__badge--out">Out of Stock</span>
+          <span className={`dtb-product-card__badge dtb-product-card__badge--out ${badgePositionClass}`}>
+            Out of Stock
+          </span>
         )}
         {onSale && !outOfStock && (
-          <span className="dtb-product-card__badge dtb-product-card__badge--sale">Sale</span>
+          <span className={`dtb-product-card__badge dtb-product-card__badge--sale ${badgePositionClass}`}>
+            Sale
+          </span>
         )}
         <ProductCardImage
           product={resolved}
@@ -134,9 +169,9 @@ export default function StorefrontProductTile({
           eager={index < 4}
         />
 
-        {/* Quick view overlay — mobile only */}
+        {/* Quick-view / action overlay — hover (desktop) or tap (mobile) */}
         <AnimatePresence>
-          {quickViewActive && (
+          {overlayActive && variant !== 'list' && (
             <Motion.div
               key="qv-overlay"
               className="dtb-product-card__qv-overlay"
@@ -145,31 +180,75 @@ export default function StorefrontProductTile({
               exit={{ opacity: 0 }}
               transition={{ duration: 0.18, ease: [0.4, 0, 0.2, 1] }}
               onClick={(e) => {
-                // Tap on the dim layer (not the pill) → navigate
+                // Tap on dim layer (not a button) → navigate
                 e.stopPropagation();
-                setQuickViewActive(false);
+                setOverlayActive(false);
                 if (productUrl) navigate(productUrl);
               }}
             >
-              <Motion.button
-                type="button"
-                className="dtb-product-card__qv-btn"
-                onClick={handleQuickView}
-                aria-label={`Quick view ${name}`}
-                initial={{ opacity: 0, scale: 0.88, y: 6 }}
+              <Motion.div
+                className="dtb-product-card__qv-actions"
+                initial={{ opacity: 0, scale: 0.88, y: 8 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.92, y: 4 }}
                 transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
               >
-                <Eye size={15} strokeWidth={2.2} />
-                <span>Quick View</span>
-              </Motion.button>
+                {/* Heart / Save */}
+                <button
+                  type="button"
+                  className="dtb-product-card__qv-icon-btn"
+                  onClick={(e) => e.stopPropagation()}
+                  aria-label={`Save ${name} for later`}
+                >
+                  <Heart size={15} strokeWidth={2.2} />
+                </button>
+
+                {/* Quick View pill */}
+                <button
+                  type="button"
+                  className="dtb-product-card__qv-btn"
+                  onClick={handleQuickView}
+                  aria-label={`Quick view ${name}`}
+                >
+                  <Eye size={14} strokeWidth={2.2} />
+                  <span>Quick View</span>
+                </button>
+
+                {/* Add to Cart / Configure */}
+                {!outOfStock && (
+                  <button
+                    type="button"
+                    className="dtb-product-card__qv-icon-btn"
+                    onClick={isVariable ? handleQuickView : handleOverlayAddToCart}
+                    aria-label={isVariable ? `Configure ${name}` : `Add ${name} to cart`}
+                  >
+                    {isVariable
+                      ? <SlidersHorizontal size={15} strokeWidth={2.2} />
+                      : <ShoppingCart size={15} strokeWidth={2.2} />
+                    }
+                  </button>
+                )}
+              </Motion.div>
             </Motion.div>
           )}
         </AnimatePresence>
       </button>
 
+      {/* ── Meta area ─────────────────────────────────────────────── */}
       <div className="dtb-product-card__meta">
+
+        {/* List variant: heart button floated to top-right */}
+        {variant === 'list' && (
+          <button
+            type="button"
+            className="dtb-product-card__heart-btn"
+            onClick={(e) => e.stopPropagation()}
+            aria-label={`Save ${name} for later`}
+          >
+            <Heart size={14} strokeWidth={2} />
+          </button>
+        )}
+
         {resolved.brand ? <span className="dtb-product-card__brand">{resolved.brand}</span> : null}
         <button
           type="button"
@@ -179,7 +258,18 @@ export default function StorefrontProductTile({
         >
           {name}
         </button>
-        {sku ? <span className="dtb-product-card__sku">SKU: {sku}</span> : null}
+
+        {/* List variant: description snippet; others: SKU */}
+        {variant === 'list'
+          ? desc
+            ? <p className="dtb-product-card__desc">{desc}</p>
+            : sku
+              ? <span className="dtb-product-card__sku">SKU: {sku}</span>
+              : null
+          : sku
+            ? <span className="dtb-product-card__sku">SKU: {sku}</span>
+            : null
+        }
 
         <div className="dtb-product-card__divider" />
 
@@ -217,4 +307,6 @@ export default function StorefrontProductTile({
     </Motion.article>
   );
 }
+
+
 

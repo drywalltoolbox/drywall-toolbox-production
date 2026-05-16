@@ -4,6 +4,7 @@ export default function ProductDetailHeader({
   effectiveName,
   effectiveSku,
   brandLabel,
+  isOutOfStock,
   displayPrice,
   pricePrefix,
   compareAt,
@@ -21,6 +22,11 @@ export default function ProductDetailHeader({
       </h2>
 
       <div className="dtb-pdp-header__meta">
+        {/* Stock dot — first element, far left */}
+        <span className={`dtb-pdp-header__meta-stock${isOutOfStock ? ' is-out' : ''}`}>
+          <span className="dtb-pdp-header__meta-stock-dot" aria-hidden="true" />
+          {isOutOfStock ? 'Out of stock' : 'In stock'}
+        </span>
         {brandLabel ? (
           <span className="dtb-pdp-header__meta-brand">{brandLabel}</span>
         ) : null}

@@ -33,10 +33,6 @@ export default function ProductDetailTabs({ activeTab, setActiveTab, description
       </div>
 
       <section className="dtb-pdp-section" aria-live="polite">
-        <div className="dtb-pdp-section__heading-wrap">
-          <h3 className="dtb-pdp-section__heading">{activeTabConfig.label}</h3>
-          <span className="dtb-pdp-section__underline" aria-hidden="true" />
-        </div>
         <div
           role="tabpanel"
           id={`product-tabpanel-${activeTabConfig.key}`}

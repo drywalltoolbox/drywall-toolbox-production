@@ -124,12 +124,6 @@ export default function TechnicalSpecifications({
   if (visibleSpecs.length === 0) {
     return (
       <section className="ts-root" aria-label={title}>
-        <header className="ts-header">
-          <span className="ts-header__eyebrow">Product data</span>
-          <h3 className="ts-header__title">{title}</h3>
-          <p className="ts-header__copy">Structured specifications for this product are being added.</p>
-        </header>
-
         <div className="ts-table-shell" role="table" aria-label="Product specifications placeholder">
           <div className="ts-table-head" role="row">
             <span role="columnheader">Specification</span>
@@ -148,12 +142,6 @@ export default function TechnicalSpecifications({
 
   return (
     <section className="ts-root" aria-label={title}>
-      <header className="ts-header">
-        <span className="ts-header__eyebrow">Product data</span>
-        <h3 className="ts-header__title">{title}</h3>
-        <p className="ts-header__copy">Verified product attributes, identifiers, and fitment data.</p>
-      </header>
-
       <div className="ts-table-shell" role="table" aria-label="Product specifications">
         <div className="ts-table-head" role="row">
           <span role="columnheader">Specification</span>
