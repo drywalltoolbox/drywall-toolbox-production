@@ -6,14 +6,32 @@ import {
 } from '../../utils/catalogDtoAdapters.js';
 import { getVariationSelectionMap } from '../../utils/variationSelection.js';
 
-function VariationEndpointError({ error, onClose }) {
+function VariationEndpointError({ diagnostics, error, onClose }) {
+  const hasDiagnostics = diagnostics && typeof diagnostics === 'object';
+
   return (
     <div className="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-3xl mx-auto">
       <h2 className="text-xl font-bold text-gray-900 mb-2">Product variations unavailable</h2>
       <p className="text-sm text-gray-600 mb-4">
         The canonical catalog detail endpoint did not return attached variation rows for this variable product.
-        This usually means the WooCommerce import did not attach child variations to the parent SKU.
+        This usually means WooCommerce did not create child variation rows, did not attach them to the parent,
+        or did not import <code className="font-mono">_dtb_parent_product_sku</code> on detached children.
       </p>
+
+      {hasDiagnostics && (
+        <div className="mb-4 rounded-xl border border-gray-200 bg-gray-50 p-3 text-xs text-gray-700">
+          <div className="font-semibold text-gray-900 mb-2">Variation read diagnostics</div>
+          <dl className="grid grid-cols-2 gap-x-4 gap-y-1">
+            <dt>Source</dt><dd className="font-mono">{diagnostics.source || 'none'}</dd>
+            <dt>Parent SKU</dt><dd className="font-mono">{diagnostics.parentSku || '—'}</dd>
+            <dt>Direct children</dt><dd className="font-mono">{diagnostics.directChildCount ?? 0}</dd>
+            <dt>REST children</dt><dd className="font-mono">{diagnostics.restChildCount ?? 0}</dd>
+            <dt>Parent-SKU meta matches</dt><dd className="font-mono">{diagnostics.parentSkuMetaMatchCount ?? 0}</dd>
+            <dt>Normalized</dt><dd className="font-mono">{diagnostics.normalizedCount ?? 0}</dd>
+          </dl>
+        </div>
+      )}
+
       {error && <p className="text-xs text-gray-500 mb-4">{String(error)}</p>}
       <button
         type="button"
@@ -76,7 +94,13 @@ export default function ProductDetailPlatform({
   }
 
   if (product?.is_variable && resolvedVariations.length === 0) {
-    return <VariationEndpointError error={error} onClose={onClose} />;
+    return (
+      <VariationEndpointError
+        diagnostics={computed?.variationDiagnostics}
+        error={error}
+        onClose={onClose}
+      />
+    );
   }
 
   return (
