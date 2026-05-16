@@ -34,9 +34,7 @@ final class DTB_ProductDetailController {
 		] );
 	}
 
-	/**
-	 * GET /dtb/v1/catalog/products/:slug/detail
-	 */
+	/** GET /dtb/v1/catalog/products/:slug/detail */
 	public static function handle_detail( WP_REST_Request $request ): WP_REST_Response {
 		$slug = sanitize_title( $request->get_param( 'slug' ) );
 
@@ -77,6 +75,10 @@ final class DTB_ProductDetailController {
 			'outofstock' !== $v['inventory']['stockStatus']
 		) );
 
+		$variation_diagnostics = method_exists( 'DTB_VariationReadModelService', 'get_last_diagnostics' )
+			? DTB_VariationReadModelService::get_last_diagnostics()
+			: [ 'available' => false ];
+
 		return new WP_REST_Response( [
 			'product'    => $product,
 			'variations' => $variations,
@@ -86,13 +88,12 @@ final class DTB_ProductDetailController {
 				'variationCount'        => count( $variations ),
 				'inStockVariationCount' => $in_stock_count,
 				'variationMatrix'       => self::build_variation_matrix( $variations ),
+				'variationDiagnostics'  => $variation_diagnostics,
 			],
 		], 200 );
 	}
 
-	/**
-	 * GET /dtb/v1/catalog/products/:id/variations
-	 */
+	/** GET /dtb/v1/catalog/products/:id/variations */
 	public static function handle_variations( WP_REST_Request $request ): WP_REST_Response {
 		$product_id = absint( $request->get_param( 'id' ) );
 
@@ -100,7 +101,6 @@ final class DTB_ProductDetailController {
 			return new WP_REST_Response( dtb_error_envelope( 'invalid_id', 'Valid product ID required.', 400 ), 400 );
 		}
 
-		// Fetch parent to validate it exists and for image/meta fallback.
 		$parent_response = dtb_cached_wc_get( 'wc/v3/products/' . $product_id, [] );
 		if ( $parent_response->get_status() !== 200 ) {
 			return $parent_response;
@@ -112,26 +112,20 @@ final class DTB_ProductDetailController {
 		}
 
 		$variations = DTB_VariationReadModelService::get_normalized( $product_id, $wc_parent );
+		$variation_diagnostics = method_exists( 'DTB_VariationReadModelService', 'get_last_diagnostics' )
+			? DTB_VariationReadModelService::get_last_diagnostics()
+			: [ 'available' => false ];
 
 		return new WP_REST_Response( [
-			'productId'  => $product_id,
-			'variations' => $variations,
-			'count'      => count( $variations ),
+			'productId'   => $product_id,
+			'variations'  => $variations,
+			'count'       => count( $variations ),
+			'diagnostics' => $variation_diagnostics,
 		], 200 );
 	}
 
 	/**
 	 * Build a variation matrix from a normalized variations array.
-	 *
-	 * Returns an object with the shared variation axis and a flat options list.
-	 * The frontend can use this directly to render a variation selector without
-	 * re-deriving options from inconsistent WooCommerce attribute labels.
-	 *
-	 * Shape:
-	 *   {
-	 *     axis:    string,
-	 *     options: [{ value, label, variationId, sku, price, stockStatus, purchasable }]
-	 *   }
 	 *
 	 * @param  array[] $variations  Normalized DTB variation DTOs.
 	 * @return array|null           Null when no variations exist.
@@ -141,7 +135,6 @@ final class DTB_ProductDetailController {
 			return null;
 		}
 
-		// Infer the shared axis from the first variation that has one.
 		$axis = '';
 		foreach ( $variations as $v ) {
 			$candidate = (string) ( $v['variation']['axis'] ?? '' );
@@ -157,7 +150,7 @@ final class DTB_ProductDetailController {
 			$label = (string) ( $v['variation']['label'] ?? $value );
 
 			if ( '' === $value ) {
-				continue; // skip variations without a canonical value
+				continue;
 			}
 
 			$options[] = [
