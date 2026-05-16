@@ -128,7 +128,7 @@ function CatalogError({ title, message, details, onRetry }) {
   );
 }
 
-export default function ProductsCatalogPlatform({ forceProductGrid = false, title = 'Products' } = {}) {
+export default function ProductsCatalogPlatform({ forceProductGrid = false, title = 'Products', isPartsFilter = 0 } = {}) {
   const location = useLocation();
   const navigate = useNavigate();
   const { brandSlug, categorySlug } = useParams();
@@ -149,15 +149,15 @@ export default function ProductsCatalogPlatform({ forceProductGrid = false, titl
   );
 
   const selectedBrand = query.brands?.[0] || '';
+  const scopedFacets = isPartsFilter === null
+    ? { brand: selectedBrand }
+    : { isParts: isPartsFilter, brand: selectedBrand };
+  const productQuery = isPartsFilter === null
+    ? query
+    : { ...query, isParts: isPartsFilter };
 
-  const { facets, loading: facetsLoading, error: facetsError } = useCatalogFacets({
-    isParts: 0,
-    brand: selectedBrand,
-  });
-  const { items, pagination, loading: itemsLoading, error: productsError } = useCatalogProducts({
-    ...query,
-    isParts: 0,
-  });
+  const { facets, loading: facetsLoading, error: facetsError } = useCatalogFacets(scopedFacets);
+  const { items, pagination, loading: itemsLoading, error: productsError } = useCatalogProducts(productQuery);
 
   const brandFacets = useMemo(
     () => (Array.isArray(facets?.brands) ? facets.brands.map(toBrandFacet).filter((brand) => brand.label) : []),
