@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion as Motion, AnimatePresence } from 'framer-motion';
-import { ShoppingCart, SlidersHorizontal, Eye, Heart } from 'lucide-react';
+import { ShoppingCart, Eye, Heart } from 'lucide-react';
 import ProductCardImage from '../product/ProductCardImage';
 
 function useIsMobile() {
@@ -193,15 +193,17 @@ export default function StorefrontProductTile({
                 exit={{ opacity: 0, scale: 0.92, y: 4 }}
                 transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
               >
-                {/* Heart / Save */}
-                <button
-                  type="button"
-                  className="dtb-product-card__qv-icon-btn"
-                  onClick={(e) => e.stopPropagation()}
-                  aria-label={`Save ${name} for later`}
-                >
-                  <Heart size={15} strokeWidth={2.2} />
-                </button>
+                {/* Heart / Save — desktop only */}
+                {!isMobile && (
+                  <button
+                    type="button"
+                    className="dtb-product-card__qv-icon-btn"
+                    onClick={(e) => e.stopPropagation()}
+                    aria-label={`Save ${name} for later`}
+                  >
+                    <Heart size={15} strokeWidth={2.2} />
+                  </button>
+                )}
 
                 {/* Quick View pill */}
                 <button
@@ -214,18 +216,22 @@ export default function StorefrontProductTile({
                   <span>Quick View</span>
                 </button>
 
-                {/* Add to Cart / Configure */}
-                {!outOfStock && (
+                {/* Add to Cart — simple products only; variable opens via Quick View.
+                    Mobile: always visible, greyed + disabled when out of stock.
+                    Desktop: hidden when out of stock (icon-only pill). */}
+                {!isVariable && (isMobile || !outOfStock) && (
                   <button
                     type="button"
-                    className="dtb-product-card__qv-icon-btn"
-                    onClick={isVariable ? handleQuickView : handleOverlayAddToCart}
-                    aria-label={isVariable ? `Configure ${name}` : `Add ${name} to cart`}
-                  >
-                    {isVariable
-                      ? <SlidersHorizontal size={15} strokeWidth={2.2} />
-                      : <ShoppingCart size={15} strokeWidth={2.2} />
+                    disabled={outOfStock}
+                    className={isMobile
+                      ? `dtb-product-card__qv-btn${outOfStock ? ' dtb-product-card__qv-btn--disabled' : ''}`
+                      : 'dtb-product-card__qv-icon-btn'
                     }
+                    onClick={outOfStock ? (e) => e.stopPropagation() : handleOverlayAddToCart}
+                    aria-label={outOfStock ? `${name} is out of stock` : `Add ${name} to cart`}
+                  >
+                    <ShoppingCart size={isMobile ? 14 : 15} strokeWidth={2.2} />
+                    {isMobile && <span>{outOfStock ? 'Out of Stock' : 'Add to Cart'}</span>}
                   </button>
                 )}
               </Motion.div>
@@ -280,22 +286,12 @@ export default function StorefrontProductTile({
           >
             {priceStr}
           </strong>
-          {isVariable ? (
-            <button
-              type="button"
-              onClick={handleCardInteract(onOpenModal)}
-              className="dtb-product-card__action dtb-product-card__action--options"
-              aria-label={`Configure ${name}`}
-            >
-              <SlidersHorizontal size={14} />
-              <span>Configure</span>
-            </button>
-          ) : (
+          {!isVariable && (
             <button
               type="button"
               onClick={handleCardInteract(onAddToCart)}
               disabled={outOfStock}
-              className="dtb-product-card__action"
+              className={`dtb-product-card__action${isMobile ? ' dtb-product-card__action--hidden-mobile' : ''}`}
               aria-label={`Add ${name} to cart`}
             >
               <ShoppingCart size={14} />
