@@ -83,6 +83,7 @@ function mergeDisplayCategories(displayCategoriesByBrand = {}) {
         slug: id,
         name: cat.label || cat.key || id,
         count: (existing?.count || 0) + (cat.productCount || 0),
+        image: existing?.image || cat.image || '',
       });
     });
   });
@@ -119,6 +120,19 @@ function CatalogError({ title, message, details, onRetry }) {
   );
 }
 
+function SelectorSkeleton({ mode = 'brands' }) {
+  const count = mode === 'categories' ? 8 : 6;
+  return (
+    <div className={mode === 'categories' ? 'product-categories-grid' : 'grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6'}>
+      {Array.from({ length: count }).map((_, index) => (
+        <div key={index} className={mode === 'categories' ? 'product-category-card product-category-card--no-image animate-pulse' : 'product-brand-selector-card animate-pulse'}>
+          {mode === 'brands' && <div className="h-16 w-28 rounded-xl bg-gray-100" />}
+        </div>
+      ))}
+    </div>
+  );
+}
+
 export default function ProductsCatalogPlatform({ forceProductGrid = false, title = 'Products', isPartsFilter = 0 } = {}) {
   const location = useLocation();
   const navigate = useNavigate();
@@ -134,11 +148,16 @@ export default function ProductsCatalogPlatform({ forceProductGrid = false, titl
   const query = useMemo(() => parseCatalogQuery(new URLSearchParams(location.search), pathParams), [location.search, pathParams]);
   const selectedBrand = query.brands?.[0] || '';
 
+  const isBrandSelectorRoute = location.pathname === '/products/brands';
+  const isBrandCategorySelectorRoute = Boolean(brandSlug) && !categorySlug && location.pathname.startsWith('/products/brands/');
+  const isSelectorRoute = !forceProductGrid && (isBrandSelectorRoute || isBrandCategorySelectorRoute);
+  const productsEnabled = !isSelectorRoute || Boolean(query.search);
+
   const scopedFacets = isPartsFilter === null ? { brand: selectedBrand } : { isParts: isPartsFilter, brand: selectedBrand };
   const productQuery = isPartsFilter === null ? query : { ...query, isParts: isPartsFilter };
 
   const { facets, loading: facetsLoading, error: facetsError } = useCatalogFacets(scopedFacets);
-  const { items, pagination, loading: itemsLoading, error: productsError } = useCatalogProducts(productQuery);
+  const { items, pagination, loading: itemsLoading, error: productsError } = useCatalogProducts(productQuery, { enabled: productsEnabled });
 
   const brandFacets = useMemo(
     () => (Array.isArray(facets?.brands) ? facets.brands.map(toBrandFacet).filter((brand) => brand.label) : []),
@@ -155,16 +174,6 @@ export default function ProductsCatalogPlatform({ forceProductGrid = false, titl
 
   const mappedProducts = useMemo(() => (Array.isArray(items) ? items.map(toCardProduct) : []), [items]);
 
-  const categoryImageBySlug = useMemo(() => {
-    const images = new Map();
-    mappedProducts.forEach((product) => {
-      const slug = product.display_category;
-      const image = product.image || product.images?.[0];
-      if (slug && image && !images.has(slug)) images.set(slug, image);
-    });
-    return images;
-  }, [mappedProducts]);
-
   const filterCategories = useMemo(() => {
     if (!facets) return [];
     if (selectedBrandFacet?.key) {
@@ -172,7 +181,7 @@ export default function ProductsCatalogPlatform({ forceProductGrid = false, titl
       if (!Array.isArray(byBrand)) return [];
       return byBrand
         .filter((cat) => (cat.productCount || 0) > 0)
-        .map((cat) => ({ id: cat.slug || cat.key, key: cat.key, slug: cat.slug || cat.key, name: cat.label || cat.key, count: cat.productCount || 0 }))
+        .map((cat) => ({ id: cat.slug || cat.key, key: cat.key, slug: cat.slug || cat.key, name: cat.label || cat.key, count: cat.productCount || 0, image: cat.image || '' }))
         .sort((a, b) => a.name.localeCompare(b.name));
     }
     return mergeDisplayCategories(facets.displayCategoriesByBrand);
@@ -184,12 +193,9 @@ export default function ProductsCatalogPlatform({ forceProductGrid = false, titl
     if (!Array.isArray(byBrand)) return [];
     return [...byBrand]
       .filter((cat) => (cat.productCount || 0) > 0)
-      .map((cat) => {
-        const slug = cat.slug || cat.key;
-        return { key: cat.key, slug, name: cat.label || cat.key, count: cat.productCount || 0, image: categoryImageBySlug.get(slug) || '' };
-      })
+      .map((cat) => ({ key: cat.key, slug: cat.slug || cat.key, name: cat.label || cat.key, count: cat.productCount || 0, image: cat.image || '' }))
       .sort((a, b) => a.name.localeCompare(b.name));
-  }, [categoryImageBySlug, facets, selectedBrandFacet]);
+  }, [facets, selectedBrandFacet]);
 
   const setQuery = useCallback((patch, options = {}) => {
     const next = { ...query, ...patch };
@@ -197,7 +203,6 @@ export default function ProductsCatalogPlatform({ forceProductGrid = false, titl
     navigate(buildCatalogUrl(next, pathParams), { replace: options.replace ?? false });
   }, [navigate, pathParams, query]);
 
-  const loading = facetsLoading || itemsLoading;
   const page = Number(pagination?.page || query.page || 1);
   const totalPages = Math.max(1, Number(pagination?.totalPages || 1));
   const total = Number(pagination?.total || mappedProducts.length || 0);
@@ -231,8 +236,9 @@ export default function ProductsCatalogPlatform({ forceProductGrid = false, titl
   const resetToCategoryCards = () => navigate(`/products/brands/${brandToSlug(selectedBrand)}`);
   const getCardDisplayProduct = useCallback((product) => product?.cardProduct || product, []);
 
-  const showBrandLanding = !forceProductGrid && !selectedBrand && !query.search;
-  const showCategoryLanding = !forceProductGrid && selectedBrand && !query.displayCategory && brandCategoryCards.length > 1;
+  const showBrandLanding = !forceProductGrid && isBrandSelectorRoute && !query.search;
+  const showCategoryLanding = !forceProductGrid && isBrandCategorySelectorRoute && !query.search;
+  const showProductGrid = !showBrandLanding && !showCategoryLanding;
 
   return (
     <div className="min-h-screen bg-gray-50 page-wrapper">
@@ -255,32 +261,32 @@ export default function ProductsCatalogPlatform({ forceProductGrid = false, titl
           <CatalogError title="Unable to load catalog brands" message="The product brand selector depends on /wp-json/dtb/v1/catalog/facets. The request failed or returned an invalid response." details={facetsError?.message || String(facetsError)} onRetry={() => window.location.reload()} />
         )}
 
-        {productsError && !loading && mappedProducts.length === 0 && !showBrandLanding && (
+        {productsError && !itemsLoading && mappedProducts.length === 0 && showProductGrid && (
           <CatalogError title="Unable to load products" message="The product grid depends on /wp-json/dtb/v1/catalog/products. Check the live backend endpoint and WordPress error logs." details={productsError?.message || String(productsError)} onRetry={() => window.location.reload()} />
         )}
 
         {showBrandLanding ? (
-          <ProductsBrandSelector
-            brands={brandFacets}
-            searchQuery={query.search || ''}
-            onSearchChange={(e) => setQuery({ search: e.target.value }, { replace: true })}
-            onSelectBrand={(brand) => navigate(`/products/brands/${brand.slug || brandToSlug(brand.label)}`)}
-          />
+          facetsLoading ? <SelectorSkeleton mode="brands" /> : (
+            <ProductsBrandSelector
+              brands={brandFacets}
+              searchQuery={query.search || ''}
+              onSearchChange={(e) => setQuery({ search: e.target.value }, { replace: true })}
+              onSelectBrand={(brand) => navigate(`/products/brands/${brand.slug || brandToSlug(brand.label)}`)}
+            />
+          )
         ) : showCategoryLanding ? (
-          <ProductsCategorySelector
-            brand={selectedBrandFacet?.label || selectedBrand}
-            brandLogo={selectedBrandFacet?.logo || getBrandLogo(selectedBrand)}
-            categories={brandCategoryCards}
-            onBack={resetToBrandList}
-            onSelectCategory={(cat) => navigate(`/products/brands/${selectedBrandFacet?.slug || brandToSlug(selectedBrand)}/categories/${cat.slug}`)}
-          />
+          facetsLoading ? <SelectorSkeleton mode="categories" /> : (
+            <ProductsCategorySelector
+              brand={selectedBrandFacet?.label || selectedBrand}
+              brandLogo={selectedBrandFacet?.logo || getBrandLogo(selectedBrand)}
+              categories={brandCategoryCards}
+              onBack={resetToBrandList}
+              onSelectCategory={(cat) => navigate(`/products/brands/${selectedBrandFacet?.slug || brandToSlug(selectedBrand)}/categories/${cat.slug}`)}
+            />
+          )
         ) : (
           <>
-            <SearchBar
-              placeholder="Search products by name, SKU, or brand..."
-              value={query.search || ''}
-              onChange={(e) => setQuery({ search: e.target.value }, { replace: true })}
-            />
+            <SearchBar placeholder="Search products by name, SKU, or brand..." value={query.search || ''} onChange={(e) => setQuery({ search: e.target.value }, { replace: true })} />
             <div className="flex flex-col lg:flex-row gap-8">
               <FilterPanel
                 isOpen={showFilters}
@@ -307,7 +313,7 @@ export default function ProductsCatalogPlatform({ forceProductGrid = false, titl
                   </button>
                 </div>
 
-                {loading ? <ProductSkeletonGrid count={24} /> : (
+                {itemsLoading ? <ProductSkeletonGrid count={24} /> : (
                   <>
                     <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-5 lg:gap-6">
                       {mappedProducts.map((product, index) => {
