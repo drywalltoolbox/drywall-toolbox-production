@@ -330,7 +330,7 @@
 
   .dtb-listing-toolbar {
     display: grid;
-    grid-template-columns: auto 1fr;
+    grid-template-columns: auto 1fr auto;
     align-items: center;
     gap: 0.75rem;
   }
@@ -343,6 +343,43 @@
     grid-column: 1 / -1;
     font-size: 0.8rem;
     color: #64748b;
+  }
+
+  .dtb-listing-toolbar__view-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 4px;
+    border: 1px solid rgba(148, 163, 184, 0.38);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.9);
+    box-shadow: 0 10px 22px rgba(15, 23, 42, 0.05);
+  }
+
+  .dtb-listing-toolbar__view-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.3rem;
+    min-width: 38px;
+    min-height: 34px;
+    padding: 0 10px;
+    border: 0;
+    border-radius: 999px;
+    background: transparent;
+    color: #64748b;
+    font-size: 0.76rem;
+    font-weight: 800;
+  }
+
+  .dtb-listing-toolbar__view-button span {
+    display: none;
+  }
+
+  .dtb-listing-toolbar__view-button.is-active {
+    background: #0f172a;
+    color: #ffffff;
+    box-shadow: 0 10px 18px rgba(15, 23, 42, 0.18);
   }
 
   .dtb-listing-toolbar__pill {
@@ -365,6 +402,10 @@
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 12px;
+  }
+
+  .dtb-product-grid--list {
+    grid-template-columns: 1fr;
   }
 
   .dtb-product-grid--single {
@@ -438,7 +479,8 @@
     display: flex;
     align-items: center;
     gap: 0.75rem;
-    justify-content: space-between;
+    justify-content: flex-start;
+    flex-wrap: wrap;
   }
 
   .dtb-listing-toolbar__sort {
@@ -449,6 +491,37 @@
     margin-left: auto;
     font-size: 0.88rem;
     color: #64748b;
+  }
+
+  .dtb-listing-toolbar__view-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 4px;
+    border: 1px solid rgba(148, 163, 184, 0.38);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.9);
+  }
+
+  .dtb-listing-toolbar__view-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.42rem;
+    min-height: 34px;
+    padding: 0 12px;
+    border: 0;
+    border-radius: 999px;
+    background: transparent;
+    color: #64748b;
+    font-size: 0.78rem;
+    font-weight: 800;
+  }
+
+  .dtb-listing-toolbar__view-button.is-active {
+    background: #0f172a;
+    color: #ffffff;
+    box-shadow: 0 10px 18px rgba(15, 23, 42, 0.18);
   }
 
   .dtb-listing-toolbar__pill {
@@ -469,6 +542,10 @@
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 14px;
+  }
+
+  .dtb-product-grid--list {
+    grid-template-columns: 1fr;
   }
 }
 

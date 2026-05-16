@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { useEffect, useMemo } from 'react';
 import { brandToSlug } from '../../utils/catalogUrlState.js';
+import ProductCardImage from '../product/ProductCardImage.jsx';
 
 function formatPrice(value) {
   const numeric = Number(value || 0);
@@ -130,7 +131,15 @@ export default function StorefrontSearchOverlay({
                   {suggestions.map((product) => (
                     <Link key={product.id} to={`/products/${product.slug || product.id}`} onClick={onClose} className="storefront-search-overlay__result">
                       <div className="storefront-search-overlay__result-thumb">
-                        {product.image ? <img src={product.image} alt={product.name} loading="lazy" /> : null}
+                        <ProductCardImage
+                          product={product}
+                          alt={product.name}
+                          padding="8px"
+                          fit="contain"
+                          width={144}
+                          height={144}
+                          className="storefront-search-overlay__result-thumb-image"
+                        />
                       </div>
                       <div className="storefront-search-overlay__result-copy">
                         <span className="storefront-search-overlay__result-brand">{product.brand || 'Product'}</span>

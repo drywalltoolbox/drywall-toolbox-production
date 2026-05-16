@@ -1,6 +1,6 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
-import { ArrowLeft, Filter, ShoppingCart } from 'lucide-react';
+import { ArrowLeft, Filter, LayoutGrid, List, ShoppingCart } from 'lucide-react';
 import SEOHead from '../components/shared/SEOHead';
 import BackButton from '../components/shared/BackButton';
 import SearchBar from '../components/catalog/SearchBar';
@@ -146,6 +146,7 @@ export default function ProductsCatalogPlatform({ forceProductGrid = false, titl
   const { addToCart } = useCart();
 
   const [showFilters, setShowFilters] = useState(false);
+  const [displayMode, setDisplayMode] = useState('grid');
   const [modalProduct, setModalProduct] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [toast, setToast] = useState(null);
@@ -230,6 +231,7 @@ export default function ProductsCatalogPlatform({ forceProductGrid = false, titl
       : pageSubheading);
   const unifiedHeadingEyebrow = isPartsPage ? 'Parts' : 'Products';
   const unifiedHeadingTitle = isCategoryProductRoute ? selectedCategoryLabel : desktopHeading;
+  const showUnifiedHeadingEyebrow = unifiedHeadingEyebrow.toLowerCase() !== String(unifiedHeadingTitle || '').toLowerCase();
   const unifiedHeadingMeta = isCategoryProductRoute
     ? `${selectedBrandFacet?.label || selectedBrand}${total > 0 ? ` · ${total.toLocaleString()} product${total === 1 ? '' : 's'}` : ''}`
     : `${isPartsPage ? 'Replacement parts and service components' : 'All brands and categories'}${total > 0 ? ` · ${total.toLocaleString()} product${total === 1 ? '' : 's'}` : ''}`;
@@ -275,6 +277,21 @@ export default function ProductsCatalogPlatform({ forceProductGrid = false, titl
   const showCategoryLanding = !forceProductGrid && isBrandCategorySelectorRoute && !query.search;
   const showProductGrid = !showBrandLanding && !showCategoryLanding;
 
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const saved = window.localStorage.getItem('dtb-catalog-display-mode');
+    if (saved === 'grid' || saved === 'list') {
+      setDisplayMode(saved);
+    }
+  }, []);
+
+  const handleDisplayModeChange = useCallback((mode) => {
+    setDisplayMode(mode);
+    if (typeof window !== 'undefined') {
+      window.localStorage.setItem('dtb-catalog-display-mode', mode);
+    }
+  }, []);
+
   return (
     <div className="min-h-screen bg-gray-50 page-wrapper">
       <SEOHead title={pageHeading} description={seoDescription} canonical={canonicalUrl} schema={buildSiteLinksSearchBoxSchema()} />
@@ -298,7 +315,9 @@ export default function ProductsCatalogPlatform({ forceProductGrid = false, titl
                   <span>{selectedBrandFacet?.label || selectedBrand}</span>
                 </button>
               )}
-              <span className="dtb-listing-heading__eyebrow">{unifiedHeadingEyebrow}</span>
+              {showUnifiedHeadingEyebrow ? (
+                <span className="dtb-listing-heading__eyebrow">{unifiedHeadingEyebrow}</span>
+              ) : null}
               <h1 className="dtb-listing-heading__title">{unifiedHeadingTitle}</h1>
               <p className="dtb-listing-heading__meta">{unifiedHeadingMeta}</p>
             </div>
@@ -361,6 +380,26 @@ export default function ProductsCatalogPlatform({ forceProductGrid = false, titl
                   <div className="dtb-listing-toolbar__sort">
                     <Dropdown value={query.sort} onChange={(value) => setQuery({ sort: value })} options={SORT_OPTIONS} />
                   </div>
+                  <div className="dtb-listing-toolbar__view-toggle" role="group" aria-label="Product display mode">
+                    <button
+                      type="button"
+                      className={`dtb-listing-toolbar__view-button${displayMode === 'list' ? ' is-active' : ''}`}
+                      onClick={() => handleDisplayModeChange('list')}
+                      aria-pressed={displayMode === 'list'}
+                    >
+                      <List size={16} />
+                      <span>List</span>
+                    </button>
+                    <button
+                      type="button"
+                      className={`dtb-listing-toolbar__view-button${displayMode === 'grid' ? ' is-active' : ''}`}
+                      onClick={() => handleDisplayModeChange('grid')}
+                      aria-pressed={displayMode === 'grid'}
+                    >
+                      <LayoutGrid size={16} />
+                      <span>Grid</span>
+                    </button>
+                  </div>
                   <div className="dtb-listing-toolbar__count" aria-live="polite">
                     {itemsLoading ? 'Loading…' : `${total.toLocaleString()} result${total === 1 ? '' : 's'}`}
                   </div>
@@ -368,10 +407,10 @@ export default function ProductsCatalogPlatform({ forceProductGrid = false, titl
 
                 {itemsLoading ? <ProductSkeletonGrid count={24} /> : (
                   <>
-                    <div className={`dtb-product-grid${mappedProducts.length === 1 ? ' dtb-product-grid--single' : ''}`}>
+                    <div className={`dtb-product-grid dtb-product-grid--${displayMode}${mappedProducts.length === 1 ? ' dtb-product-grid--single' : ''}`}>
                       {mappedProducts.map((product, index) => {
                         const cardProduct = getCardDisplayProduct(product);
-                        return <ProductShoppingCard key={product.id} product={product} cardProduct={cardProduct} variant="grid" hasSelectedVariation={Boolean(product.is_variable && cardProduct?.parent_id)} onOpenModal={() => openModal(product, cardProduct)} onAddToCart={() => openModal(product, cardProduct)} index={index} />;
+                        return <ProductShoppingCard key={product.id} product={product} cardProduct={cardProduct} variant={displayMode} hasSelectedVariation={Boolean(product.is_variable && cardProduct?.parent_id)} onOpenModal={() => openModal(product, cardProduct)} onAddToCart={() => openModal(product, cardProduct)} index={index} />;
                       })}
                     </div>
 

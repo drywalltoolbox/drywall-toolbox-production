@@ -3,7 +3,6 @@ import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { useCart } from '../../context/CartContext';
 import { useAuthContext } from '../../auth/AuthContext.js';
 import { ShoppingCart, Menu, X, ChevronDown, ChevronRight, User, LogIn, UserPlus, LogOut, Bell, Search } from 'lucide-react';
-import { motion as Motion } from 'framer-motion';
 import LogoWhite from '/logo-white.svg';
 import NotificationsBell from '../shell/NotificationsBell';
 import StorefrontSearchOverlay from './StorefrontSearchOverlay';
@@ -53,7 +52,7 @@ const DRAWER_NAV_ROWS = [
   { to: '/contact', label: 'Contact' },
 ];
 
-export default function Header({ onCartToggle, cartOpen = false, hasTopTicker = false }) {
+export default function Header({ onCartToggle, hasTopTicker = false }) {
   const location = useLocation();
   const navigate = useNavigate();
   const { getCartCount } = useCart();
@@ -86,8 +85,6 @@ export default function Header({ onCartToggle, cartOpen = false, hasTopTicker = 
 
   const isActive = (path) => location.pathname === path;
   const shopActive = location.pathname.startsWith('/products') || isActive('/parts') || isActive('/toolset-builder');
-  const isProductDetailRoute = /^\/products\/(?!brands(?:\/|$))/.test(location.pathname);
-  const hideMobileCartFab = mobileMenuOpen || searchOverlayOpen || cartOpen || accountHubOpen || isProductDetailRoute;
   const drawerBrands = useMemo(
     () => sortBrandsBy(Object.entries(BRAND_TO_SLUG).map(([name, slug]) => ({ name, slug }))),
     []
@@ -305,7 +302,20 @@ export default function Header({ onCartToggle, cartOpen = false, hasTopTicker = 
                 className="header-mobile-account-toggle header-icon"
                 aria-label={isAuthenticated ? 'Open account hub' : 'Sign in'}
               >
-                <User size={22} />
+                <User size={20} />
+              </button>
+              <button
+                type="button"
+                onClick={onCartToggle}
+                className="header-mobile-cart-toggle cart-toggle header-icon"
+                aria-label="Open cart"
+              >
+                <ShoppingCart size={20} />
+                {getCartCount() > 0 ? (
+                  <span className="cart-badge" aria-label={`${getCartCount()} items in cart`}>
+                    {getCartCount()}
+                  </span>
+                ) : null}
               </button>
             </div>
           </div>
@@ -442,11 +452,6 @@ export default function Header({ onCartToggle, cartOpen = false, hasTopTicker = 
           ))}
         </div>
       </StorefrontMobileDrawer>
-
-      <Motion.button className={`mobile-cart-fab${hideMobileCartFab ? ' mobile-cart-fab--hidden' : ''}`} onClick={onCartToggle} aria-label="Open cart" initial={{ scale: 0.7, opacity: 0 }} animate={{ scale: 1, opacity: hideMobileCartFab ? 0 : 1 }} transition={{ type: 'spring', stiffness: 340, damping: 24 }} whileTap={{ scale: 0.9 }}>
-        <ShoppingCart size={22} />
-        <span aria-live="polite" aria-atomic="true">{getCartCount() > 0 && <span className="mobile-cart-fab-badge" aria-label={`${getCartCount()} items in cart`}>{getCartCount()}</span>}</span>
-      </Motion.button>
 
       <StorefrontSearchOverlay
         isOpen={searchOverlayOpen}
