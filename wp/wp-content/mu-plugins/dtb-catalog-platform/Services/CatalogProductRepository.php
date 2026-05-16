@@ -7,6 +7,11 @@
  * Applies all supported filters in WP_Query before pagination so totals and
  * page counts remain correct for filtered catalog views.
  *
+ * Important catalog rule:
+ * - The canonical `/products` surface may include tools and parts.
+ * - Customer-facing tool display categories must not include replacement parts.
+ * - Replacement parts are exposed through the dedicated `parts` display bucket.
+ *
  * @package drywall-toolbox
  */
 
@@ -79,13 +84,33 @@ final class DTB_CatalogProductRepository {
 			];
 		}
 
-		$display_category = (string) ( $filters['display_category'] ?? '' );
+		$is_parts_constrained = false;
+		$display_category     = sanitize_title( (string) ( $filters['display_category'] ?? '' ) );
 		if ( '' !== $display_category ) {
-			$meta_query[] = [
-				'key'     => DTB_ProductMeta::DISPLAY_CATEGORY_KEY,
-				'value'   => $display_category,
-				'compare' => '=',
-			];
+			if ( self::is_parts_display_category( $display_category ) ) {
+				$meta_query[] = [
+					'key'     => DTB_ProductMeta::IS_PARTS,
+					'value'   => '1',
+					'compare' => '=',
+				];
+				$is_parts_constrained = true;
+			} else {
+				$meta_query[] = [
+					'key'     => DTB_ProductMeta::DISPLAY_CATEGORY_KEY,
+					'value'   => $display_category,
+					'compare' => '=',
+				];
+
+				// Tool/category filters must not leak schematic replacement parts.
+				if ( ! array_key_exists( 'is_parts', $filters ) || null === $filters['is_parts'] ) {
+					$meta_query[] = [
+						'key'     => DTB_ProductMeta::IS_PARTS,
+						'value'   => '0',
+						'compare' => '=',
+					];
+					$is_parts_constrained = true;
+				}
+			}
 		}
 
 		$tool_family = (string) ( $filters['tool_family'] ?? '' );
@@ -114,7 +139,7 @@ final class DTB_CatalogProductRepository {
 			];
 		}
 
-		if ( isset( $filters['is_parts'] ) && null !== $filters['is_parts'] ) {
+		if ( ! $is_parts_constrained && isset( $filters['is_parts'] ) && null !== $filters['is_parts'] ) {
 			$meta_query[] = [
 				'key'     => DTB_ProductMeta::IS_PARTS,
 				'value'   => (int) $filters['is_parts'] ? '1' : '0',
@@ -149,6 +174,14 @@ final class DTB_CatalogProductRepository {
 			'total'      => $total,
 			'totalPages' => $total_pages,
 		];
+	}
+
+	/**
+	 * True when a customer-facing display-category selection is the dedicated
+	 * replacement parts bucket.
+	 */
+	private static function is_parts_display_category( string $display_category ): bool {
+		return in_array( sanitize_title( $display_category ), [ 'parts', 'repair_parts', 'replacement_parts' ], true );
 	}
 
 	/**
