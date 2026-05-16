@@ -11,18 +11,27 @@ import { brandToSlug } from '../utils/catalogUrlState.js';
 
 const DEFAULT_PAGINATION = { page: 1, perPage: 24, total: 0, totalPages: 0 };
 
-export function useCatalogProducts(query = {}) {
+export function useCatalogProducts(query = {}, options = {}) {
+  const enabled = options.enabled !== false;
   const [items, setItems] = useState([]);
   const [pagination, setPagination] = useState(DEFAULT_PAGINATION);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(enabled);
   const [error, setError] = useState(null);
 
-  const queryKey = JSON.stringify(query);
+  const queryKey = JSON.stringify({ query, enabled });
   const prevKey = useRef(null);
 
   useEffect(() => {
     if (queryKey === prevKey.current) return;
     prevKey.current = queryKey;
+
+    if (!enabled) {
+      setItems([]);
+      setPagination(DEFAULT_PAGINATION);
+      setLoading(false);
+      setError(null);
+      return undefined;
+    }
 
     let cancelled = false;
 
