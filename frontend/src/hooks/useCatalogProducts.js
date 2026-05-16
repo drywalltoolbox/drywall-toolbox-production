@@ -22,14 +22,10 @@ export function useCatalogProducts(query = {}, options = {}) {
   const prevKey = useRef(null);
 
   useEffect(() => {
-    if (queryKey === prevKey.current) return;
+    if (queryKey === prevKey.current) return undefined;
     prevKey.current = queryKey;
 
     if (!enabled) {
-      setItems([]);
-      setPagination(DEFAULT_PAGINATION);
-      setLoading(false);
-      setError(null);
       return undefined;
     }
 
@@ -62,6 +58,15 @@ export function useCatalogProducts(query = {}, options = {}) {
       clearTimeout(timer);
     };
   }, [queryKey]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  if (!enabled) {
+    return {
+      items: [],
+      pagination: DEFAULT_PAGINATION,
+      loading: false,
+      error: null,
+    };
+  }
 
   return { items, pagination, loading, error };
 }
