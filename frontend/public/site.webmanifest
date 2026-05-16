@@ -56,10 +56,10 @@
   ],
   "shortcuts": [
     {
-      "name": "Shop All Products",
+      "name": "Shop Products",
       "short_name": "Shop",
-      "description": "Browse the full catalog of drywall tools and equipment.",
-      "url": "./all-products"
+      "description": "Browse the full catalog of drywall tools, equipment, accessories, and replacement parts.",
+      "url": "./products"
     },
     {
       "name": "Parts",
