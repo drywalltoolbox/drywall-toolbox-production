@@ -483,6 +483,10 @@ export default function ProductDetail({
                   clearAddToCartError();
                   setQuantity((prev) => prev + 1);
                 }}
+                onQuantityChange={(val) => {
+                  clearAddToCartError();
+                  setQuantity(val);
+                }}
                 onAddToCart={handleAddToCart}
                 canAddToCart={canAddToCart}
                 isOutOfStock={isOutOfStock}

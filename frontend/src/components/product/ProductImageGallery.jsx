@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { motion as Motion, AnimatePresence } from 'framer-motion';
-import { ChevronLeft, ChevronRight, X, ZoomIn } from 'lucide-react';
+import { ChevronLeft, ChevronRight, X } from 'lucide-react';
 import { PLACEHOLDER_IMAGE } from '../../constants/images.js';
 
 // Sits above the product modal (10002) and its backdrop (10001)
@@ -320,16 +320,6 @@ export default function ProductImageGallery({ product }) {
               }}
             />
           </AnimatePresence>
-
-          {/* Expand / zoom-in button — always visible on touch devices, hover-only on pointer devices */}
-          <button
-            className="absolute top-2.5 right-2.5 z-10 flex items-center justify-center w-8 h-8 rounded-full bg-white/90 shadow-sm opacity-60 sm:opacity-0 sm:group-hover:opacity-100 focus:opacity-100 transition-opacity duration-150"
-            onClick={(e) => { e.stopPropagation(); openLb(currentIndex); }}
-            aria-label="Expand image to fullscreen"
-            tabIndex={0}
-          >
-            <ZoomIn size={14} className="text-gray-600" />
-          </button>
 
           {/* Prev / Next arrows */}
           {hasMultiple && (

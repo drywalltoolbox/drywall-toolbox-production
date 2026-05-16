@@ -11,9 +11,16 @@
     --tension-highlight: var(--color-primary-400, #60a5fa);
     --machined-border: rgba(15, 23, 42, 0.08);
     --surface-glass: rgba(255, 255, 255, 0.7);
-    --font-main: 'Inter', sans-serif;
+    --font-main: 'Inter', system-ui, -apple-system, sans-serif;
+    --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
     --font-mono: 'JetBrains Mono', monospace;
     --ease-tension: cubic-bezier(0.16, 1, 0.3, 1);
+
+    /* ── Global shape tokens ──────────────────────────────────────────── */
+    --dtb-radius-sm:  6px;   /* badges, tags */
+    --dtb-radius:     10px;  /* buttons, inputs, qty, tabs */
+    --dtb-radius-lg:  14px;  /* cards, panels */
+    --dtb-radius-xl:  20px;  /* modals, sheets */
     /* Silver/white radial gradient — light theme background */
     --dtb-page-bg: radial-gradient(ellipse at 30% 42%, #ffffff 0%, #e8ecf4 28%, #d2d6e2 55%, #bfc4d0 80%, #b5bac7 100%);
     
@@ -46,6 +53,17 @@ html, body {
     max-width: 100%;
 }
 
+/* ── Mobile density scale ──────────────────────────────────────────────────
+   Stepping html font-size down from the browser default 16px → 15px on small
+   screens shrinks every rem-based value ~6% uniformly — typography, spacing,
+   button heights, gaps — without touching individual rules. This produces the
+   "zoomed-out / less cramped" density that matches CSR's mobile proportions. */
+@media (max-width: 768px) {
+    html {
+        font-size: 15px;
+    }
+}
+
 /* Defensive root overflow guard — clips any child overflow without creating
    a scroll container (clip ≠ hidden; does not affect scroll restoration). */
 #root {
@@ -59,6 +77,11 @@ body {
     background-attachment: fixed;
     color: #0f172a;
     font-family: var(--font-main);
+    font-optical-sizing: auto;
+    font-feature-settings: 'cv11', 'ss01';
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
     line-height: 1.5;
     margin: 0;
     padding: 0;
@@ -152,7 +175,7 @@ body {
     text-transform: uppercase;
     letter-spacing: 0.1em;
     font-size: 0.75rem;
-    border-radius: 12px;
+    border-radius: var(--dtb-radius, 10px);
     transition: transform 0.2s, box-shadow 0.2s;
     border: none;
     cursor: pointer;
@@ -168,12 +191,12 @@ body {
     font-size: 0.6rem;
 }
 
-/* --- QUANTITY CONTROL - modern, touch-friendly pill --- */
+/* --- QUANTITY CONTROL - modern, touch-friendly --- */
 .quantity-control {
     display: inline-flex;
     align-items: center;
     background: linear-gradient(180deg, #ffffff, #fbfdff);
-    border-radius: 999px;
+    border-radius: var(--dtb-radius, 10px);
     padding: 6px;
     box-shadow: 0 6px 20px rgba(2,6,23,0.06);
     border: 1px solid rgba(15,23,42,0.06);
@@ -198,8 +221,8 @@ body {
 
 .quantity-btn:hover { background: rgba(2,6,23,0.04); }
 
-.quantity-decrease { border-radius: 999px; }
-.quantity-increase { border-radius: 999px; background: linear-gradient(90deg, var(--primary-500), var(--primary-600)); color: #fff; }
+.quantity-decrease { border-radius: var(--dtb-radius, 10px); }
+.quantity-increase { border-radius: var(--dtb-radius, 10px); background: linear-gradient(90deg, var(--primary-500), var(--primary-600)); color: #fff; }
 
 .quantity-input {
     width: 64px;
@@ -679,8 +702,7 @@ aside input[type="range"],
     align-items: center;
     gap: 8px;
     padding: 6px 8px;
-    border-radius: 999px;
-    /* use subtle dark glass so it shows on white diagrams */
+    border-radius: var(--dtb-radius, 10px);
     background: rgba(2,6,23,0.06);
     backdrop-filter: blur(6px);
     border: 1px solid rgba(255,255,255,0.06);
@@ -706,7 +728,7 @@ aside input[type="range"],
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    border-radius: 999px;
+    border-radius: var(--dtb-radius, 10px);
     background: transparent;
     border: 1px solid transparent;
     color: var(--tension-accent);
@@ -730,7 +752,7 @@ aside input[type="range"],
     font-size: 0.85rem;
     color: rgba(15,23,42,0.9);
     padding: 4px 10px;
-    border-radius: 999px;
+    border-radius: var(--dtb-radius-sm, 6px);
     background: rgba(255,255,255,0.9);
     font-weight: 700;
     box-shadow: 0 6px 18px rgba(2,6,23,0.06);
@@ -750,7 +772,7 @@ aside input[type="range"],
     -moz-appearance: none;
     padding: 8px 14px;
     min-width: 140px;
-    border-radius: 999px;
+    border-radius: var(--dtb-radius, 10px);
     border: 1px solid rgba(15,23,42,0.06);
     background: linear-gradient(180deg, #ffffff, #fbfdff);
     color: var(--alloy-deep);

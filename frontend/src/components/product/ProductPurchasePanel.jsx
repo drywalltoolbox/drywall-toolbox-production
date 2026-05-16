@@ -5,6 +5,7 @@ export default function ProductPurchasePanel({
   quantity,
   onDecrease,
   onIncrease,
+  onQuantityChange,
   onAddToCart,
   canAddToCart,
   isOutOfStock,
@@ -15,16 +16,51 @@ export default function ProductPurchasePanel({
   partsUrl,
   reviewNode = null,
 }) {
+  const handleInputChange = (e) => {
+    const val = parseInt(e.target.value, 10);
+    if (Number.isFinite(val) && val >= 1 && val <= 99) {
+      onQuantityChange?.(val);
+    }
+  };
+
   return (
     <div className="product-detail-purchase-panel dtb-pdp-purchase-panel">
+
+      {/* CSR-style stock status line */}
+      <p className={`dtb-pdp-stock-status${isOutOfStock ? ' is-out' : ''}`}>
+        <span className="dtb-pdp-stock-status__dot" aria-hidden="true" />
+        {isOutOfStock ? 'Out of stock' : 'In stock'}
+      </p>
+
       <div className="dtb-pdp-purchase-row">
-        <div className="dtb-pdp-quantity-stepper">
-          <button type="button" onClick={onDecrease} className="dtb-pdp-quantity-stepper__button" aria-label="Decrease quantity">
-            <Minus size={16} />
+        {/* Flat qty stepper */}
+        <div className="dtb-pdp-qty-root" role="group" aria-label="Quantity">
+          <button
+            type="button"
+            onClick={onDecrease}
+            disabled={quantity <= 1}
+            className="dtb-pdp-qty-btn"
+            aria-label="Decrease quantity"
+          >
+            <Minus size={14} strokeWidth={2.5} />
           </button>
-          <span className="dtb-pdp-quantity-stepper__value">{quantity}</span>
-          <button type="button" onClick={onIncrease} className="dtb-pdp-quantity-stepper__button" aria-label="Increase quantity">
-            <Plus size={16} />
+          <input
+            type="number"
+            className="dtb-pdp-qty-input"
+            value={quantity}
+            min={1}
+            max={99}
+            onChange={handleInputChange}
+            aria-label="Quantity"
+          />
+          <button
+            type="button"
+            onClick={onIncrease}
+            disabled={quantity >= 99}
+            className="dtb-pdp-qty-btn"
+            aria-label="Increase quantity"
+          >
+            <Plus size={14} strokeWidth={2.5} />
           </button>
         </div>
 

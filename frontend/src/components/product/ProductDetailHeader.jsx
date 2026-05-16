@@ -1,13 +1,9 @@
-import { CheckCircle2, PackageCheck } from 'lucide-react';
 
 export default function ProductDetailHeader({
   product,
   effectiveName,
   effectiveSku,
-  isOutOfStock,
   brandLabel,
-  brandLogoSrc,
-  brandLogoClassName,
   displayPrice,
   pricePrefix,
   compareAt,
@@ -25,10 +21,8 @@ export default function ProductDetailHeader({
       </h2>
 
       <div className="dtb-pdp-header__meta">
-        {brandLabel && brandLogoSrc ? (
-          <img src={brandLogoSrc} alt={brandLabel} className={brandLogoClassName} />
-        ) : brandLabel ? (
-          <span className="dtb-pdp-header__brand-text">{brandLabel}</span>
+        {brandLabel ? (
+          <span className="dtb-pdp-header__meta-brand">{brandLabel}</span>
         ) : null}
         {effectiveSku ? (
           <span className="dtb-pdp-header__meta-item">
@@ -38,17 +32,10 @@ export default function ProductDetailHeader({
         ) : null}
         {product.upc ? (
           <span className="dtb-pdp-header__meta-item">
-            <span className="dtb-pdp-header__meta-label">UPC</span>
+            <span className="dtb-pdp-header__meta-label">Barcode</span>
             <span className="dtb-pdp-header__meta-value">{product.upc}</span>
           </span>
         ) : null}
-      </div>
-
-      <div className="product-detail-meta-row dtb-pdp-header__status-row">
-        <span className={`dtb-pdp-header__status ${isOutOfStock ? 'dtb-pdp-header__status--out' : 'dtb-pdp-header__status--in'}`}>
-          {isOutOfStock ? <PackageCheck size={13} aria-hidden="true" /> : <CheckCircle2 size={13} aria-hidden="true" />}
-          {isOutOfStock ? 'Out of Stock' : 'In Stock'}
-        </span>
       </div>
 
       <div className="dtb-pdp-header__price-block">
