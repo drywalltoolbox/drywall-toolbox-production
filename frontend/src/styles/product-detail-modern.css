@@ -67,7 +67,6 @@
   font-size: 0.75rem;
 }
 
-/* ── Inline stock dot — first item in meta row ── */
 .dtb-pdp-header__meta-stock {
   display: inline-flex;
   align-items: center;
@@ -89,7 +88,6 @@
   flex-shrink: 0;
 }
 
-/* Pipe divider: stock → brand */
 .dtb-pdp-header__meta-stock + .dtb-pdp-header__meta-brand::before {
   content: '|';
   margin: 0 0.55rem;
@@ -97,7 +95,6 @@
   font-weight: 400;
 }
 
-/* Brand | SKU | Barcode — pipe-separated inline row like CSR */
 .dtb-pdp-header__meta-brand,
 .dtb-pdp-header__meta-item {
   display: inline-flex;
@@ -111,7 +108,6 @@
   font-weight: 500;
 }
 
-/* Pipe divider between meta chunks */
 .dtb-pdp-header__meta-brand + .dtb-pdp-header__meta-item::before,
 .dtb-pdp-header__meta-item + .dtb-pdp-header__meta-item::before {
   content: '|';
@@ -382,7 +378,6 @@
   gap: 0.75rem;
 }
 
-/* CSR-style stock status line */
 .dtb-pdp-stock-status {
   display: flex;
   align-items: center;
@@ -412,7 +407,6 @@
   align-items: center;
 }
 
-/* ── Qty Stepper — clean silver/grey, press-only animation ───────────────── */
 .dtb-pdp-qty-root {
   display: inline-flex;
   flex-flow: row nowrap;
@@ -433,20 +427,17 @@
   background: #f8fafc;
   color: #475569;
   cursor: pointer;
-  /* No transition at rest — animation fires only on :active */
   transition: transform 80ms ease, background 80ms ease;
   box-sizing: border-box;
   box-shadow: 0 1px 2px rgba(15, 23, 42, 0.06);
 }
 
-/* Hover: border darkens slightly, no colour overlay */
 .dtb-pdp-qty-btn:hover:not(:disabled) {
   background: #f1f5f9;
   border-color: #9ca3af;
   color: #1e293b;
 }
 
-/* Press: quick scale-down punch — the only animation effect */
 .dtb-pdp-qty-btn:active:not(:disabled) {
   transform: scale(0.88);
   background: #e2e8f0;
@@ -461,7 +452,6 @@
   cursor: not-allowed;
 }
 
-/* Plain bold number — no box, no border */
 .dtb-pdp-qty-input {
   width: 2.4rem;
   text-align: center;
@@ -543,13 +533,11 @@
   display: none;
 }
 
-/* ─── Brand banner — shown above the tabs ───────────────────────────────── */
-
 .dtb-pdp-brand-banner {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 1.5rem 1.25rem;
+  padding: 1.1rem 1rem;
   border-top: 1px solid #f1f5f9;
   border-bottom: 1px solid #f1f5f9;
   background: #fafbfc;
@@ -557,12 +545,12 @@
 
 .dtb-pdp-brand-banner__logo {
   display: block;
-  max-height: 104px;
-  max-width: 440px;
+  max-height: 72px;
+  max-width: 300px;
   width: auto;
   object-fit: contain;
-  opacity: 0.88;
-  filter: grayscale(18%);
+  opacity: 0.86;
+  filter: grayscale(12%);
   transition: opacity 180ms ease, filter 180ms ease;
 }
 
@@ -578,7 +566,6 @@
   border-top: 1px solid #e5e7eb;
 }
 
-/* ── Tab pill-tray — matches NavbarTabsPreview pattern ── */
 .dtb-pdp-tabs {
   display: inline-flex;
   align-items: center;
@@ -589,7 +576,6 @@
   background: #f1f5f9;
   overflow-x: auto;
   scrollbar-width: none;
-  /* Contain the tray so it doesn't stretch full-width */
   width: fit-content;
   max-width: 100%;
 }
@@ -651,7 +637,6 @@
   background: rgba(255, 255, 255, 0.5);
 }
 
-/* Reference: bg-white shadow-sm ring-1 ring-zinc-900/5 — clean white lift, no coloured accent */
 .dtb-pdp-tabs__tab.is-active {
   background: #fff;
   color: #0f172a;
@@ -831,12 +816,22 @@
     line-height: 1.25;
   }
 
+  .dtb-pdp-brand-banner {
+    padding: 0.9rem 1rem;
+    margin-block: 0.15rem;
+  }
+
+  .dtb-pdp-brand-banner__logo {
+    max-height: 48px;
+    max-width: min(17rem, 72vw);
+    opacity: 0.84;
+  }
+
   .dtb-pdp-tabs__tab {
     padding: 0.4rem 0.35rem;
     font-size: 0.78rem;
   }
 
-  /* Mobile active tab: soft translucent grey overlay — glassy, not stark white */
   .dtb-pdp-tabs__tab.is-active {
     background: rgba(255, 255, 255, 0.78);
     backdrop-filter: blur(6px);
@@ -868,7 +863,6 @@
   }
 
   .dtb-pdp-tabs {
-    /* On mobile let the tray stretch to fill the column */
     width: 100%;
     gap: 2px;
     margin-inline: 0;
