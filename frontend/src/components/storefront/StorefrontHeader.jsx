@@ -124,7 +124,6 @@ export default function Header({ onCartToggle, hasTopTicker = false }) {
 
   useEffect(() => {
     if (mobileMenuOpen) return;
-    // Keep the Brands accordion reset between drawer sessions.
     setBrandsExpanded(false);
   }, [mobileMenuOpen]);
 
@@ -386,9 +385,7 @@ export default function Header({ onCartToggle, hasTopTicker = false }) {
               >
                 <X size={16} />
               </button>
-            ) : (
-              <span className="storefront-search-dock__kbd" aria-hidden="true">⌘K</span>
-            )}
+            ) : null}
           />
         </div>
 
@@ -475,7 +472,6 @@ export default function Header({ onCartToggle, hasTopTicker = false }) {
       />
 
       <style>{`
-        /* ── Mobile search dock ── */
         .header-mobile-search-dock {
           display: none;
           width: 100%;
@@ -490,7 +486,6 @@ export default function Header({ onCartToggle, hasTopTicker = false }) {
           }
         }
 
-        /* On tablet, also show the search dock */
         @media (min-width: 641px) and (max-width: 1024px) {
           .header-mobile-search-dock {
             display: block;
