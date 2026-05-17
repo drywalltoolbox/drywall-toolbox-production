@@ -1,6 +1,5 @@
 import { Link } from 'react-router-dom';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Eye } from 'lucide-react';
 import { brandToSlug } from '../../utils/catalogUrlState.js';
 import ProductCardImage from '../product/ProductCardImage.jsx';
 import ProductModal from '../product/ProductModal.jsx';
@@ -26,12 +25,10 @@ export default function StorefrontSearchOverlay({
 }) {
   const { addToCart } = useCart();
   const [quickViewProduct, setQuickViewProduct] = useState(null);
-  const [pressedProductId, setPressedProductId] = useState(null);
   const hasQuery = useMemo(() => query.trim().length > 0, [query]);
 
   const closeSearch = () => {
     setQuickViewProduct(null);
-    setPressedProductId(null);
     onClose?.();
   };
 
@@ -54,16 +51,11 @@ export default function StorefrontSearchOverlay({
 
   const openQuickView = useCallback((product) => {
     if (!product?.id) return;
-    setPressedProductId(product.id);
-    window.setTimeout(() => {
-      setQuickViewProduct(product);
-      window.setTimeout(() => setPressedProductId(null), 180);
-    }, 90);
+    setQuickViewProduct(product);
   }, []);
 
   const closeQuickView = () => {
     setQuickViewProduct(null);
-    setPressedProductId(null);
   };
 
   if (!isOpen) return null;
@@ -161,13 +153,12 @@ export default function StorefrontSearchOverlay({
                   <section className="storefront-search-overlay__results">
                     {suggestions.map((product) => {
                       const price = formatPrice(product.price);
-                      const isPressed = pressedProductId === product.id;
                       return (
                         <button
                           key={product.id}
                           type="button"
                           onClick={() => openQuickView(product)}
-                          className={`storefront-search-overlay__result${isPressed ? ' is-quick-viewing' : ''}`}
+                          className="storefront-search-overlay__result"
                           aria-label={`Quick view ${product.name}`}
                         >
                           <div className="storefront-search-overlay__result-thumb">
@@ -180,12 +171,6 @@ export default function StorefrontSearchOverlay({
                               height={144}
                               className="storefront-search-overlay__result-thumb-image"
                             />
-                            <div className="storefront-search-overlay__result-qv-layer" aria-hidden="true">
-                              <span className="storefront-search-overlay__result-qv-pill">
-                                <Eye size={14} strokeWidth={2.2} />
-                                <span>Quick View</span>
-                              </span>
-                            </div>
                           </div>
                           <div className="storefront-search-overlay__result-copy">
                             <span className="storefront-search-overlay__result-brand">{product.brand || 'Product'}</span>
