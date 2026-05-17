@@ -3063,7 +3063,6 @@ const ALLOWED_BRANDS = [
                 }}
               >
                 <SchematicHotspotCard
-                  variant="desktop"
                   part={activeHotspotPart}
                   product={hotspotProduct}
                   stockStatus={hotspotStockStatus}
@@ -3092,7 +3091,6 @@ const ALLOWED_BRANDS = [
             onClick={(e) => e.stopPropagation()}
           >
             <SchematicHotspotCard
-              variant="mobile"
               part={activeHotspotPart}
               product={hotspotProduct}
               stockStatus={hotspotStockStatus}

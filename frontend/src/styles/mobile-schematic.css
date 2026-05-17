@@ -185,58 +185,306 @@
    All rules are scoped to min-width:769px so mobile is never affected.
    ============================================= */
 @media (min-width: 769px) {
-  /* 2-column grid: [thumb] [content] */
+  /* Desktop detached modal — simple flex container for the card */
   .part-modal-detached {
-    display: grid;
-    grid-template-columns: 72px 1fr;
-    grid-template-rows: auto;
-    column-gap: 12px;
-    row-gap: 0;
-    width: 260px;
-    padding: 14px;
-    align-items: start;
-  }
-
-  /* Image button: fixed square, spans all rows in column 1 */
-  .part-modal-detached .hotspot-modal-image-btn {
-    grid-column: 1;
-    grid-row: 1 / -1;
-    width: 72px;
-    height: 72px;
-    border-radius: 8px;
-    overflow: hidden;
-    background: #f1f5f9;
     display: flex;
-    align-items: center;
-    justify-content: center;
-    align-self: start;
+    flex-direction: column;
+    align-items: stretch;
+    width: fit-content;
+    padding: 0;
+    background: none;
+    border: none;
+    box-shadow: none;
   }
 
-  /* Image fills the square, no bottom margin */
-  .part-modal-detached .hotspot-modal-image {
-    width: 100%;
-    height: 100%;
-    max-height: none;
-    object-fit: contain;
-    border-radius: 6px;
-    margin-bottom: 0;
-    background: transparent;
+  /* The card itself is the detached modal */
+  .part-modal-detached .schematic-hotspot-card {
+    width: clamp(280px, 90vw, 380px);
   }
 
-  /* Skeleton: same fixed square, spans column 1 / all rows */
+  /* Hide old grid-based image styling */
+  .part-modal-detached .hotspot-modal-image-btn {
+    display: none;
+  }
+
   .part-modal-detached .hotspot-modal-image-skeleton--desktop {
-    grid-column: 1;
-    grid-row: 1 / -1;
-    width: 72px;
-    height: 72px;
-    margin-bottom: 0;
-    align-self: start;
+    display: none;
   }
 
-  /* All other direct children (h4, .part-meta, price/button div) flow into column 2 */
-  .part-modal-detached > *:not(.hotspot-modal-image-btn):not(.hotspot-modal-image-skeleton--desktop) {
-    grid-column: 2;
-    min-width: 0;
+  /* Hide old direct children that are no longer needed */
+  .part-modal-detached > h4,
+  .part-modal-detached > .part-meta,
+  .part-modal-detached > div:last-child {
+    display: none;
+  }
+}
+
+@keyframes skeletonShimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* =============================================
+   SCHEMATIC HOTSPOT CARD — UNIFIED HORIZONTAL DESIGN
+   Clean, sleek card for schematic diagram hotspot popups.
+   Horizontal layout: thumbnail on left, info stack on right.
+   No footer separating price/CTA — flows naturally with content.
+   Works for both mobile overlay and desktop detached modal.
+   ============================================= */
+
+.schematic-hotspot-card {
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  gap: 0;
+  width: 100%;
+  max-width: 100%;
+  border-radius: clamp(12px, 3vw, 16px);
+  background: #ffffff;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  transition: box-shadow 0.2s ease;
+}
+
+.schematic-hotspot-card:hover {
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
+}
+
+/* Left column — thumbnail fills full height, flush to card edge */
+.schematic-hotspot-card__image {
+  flex: 0 0 40%;
+  position: relative;
+  align-self: stretch;
+  border-radius: 0;
+  overflow: hidden;
+  background: linear-gradient(135deg, #f0f4f8 0%, #e2e8f0 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.schematic-hotspot-card__image img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  padding: 10px;
+}
+
+/* Image button fills the full image column when inside the card */
+.schematic-hotspot-card__image .hotspot-modal-image-btn {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.schematic-hotspot-card__image .hotspot-modal-image-btn .hotspot-modal-image {
+  width: 100%;
+  height: 100%;
+  max-height: none;
+  object-fit: contain;
+  padding: 10px;
+  border-radius: 0;
+  margin-bottom: 0;
+}
+
+/* Right column — info stack */
+.schematic-hotspot-card__info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  padding: clamp(12px, 2vw, 16px) clamp(12px, 2vw, 16px);
+  position: relative;
+}
+
+/* Close button — positioned absolutely over info */
+.schematic-hotspot-card__close {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(15, 23, 42, 0.06);
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  color: #0f172a;
+  transition: all 0.15s ease;
+  padding: 0;
+  min-width: 28px;
+  min-height: 28px;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.schematic-hotspot-card__close:hover {
+  background: rgba(15, 23, 42, 0.12);
+  color: #1e293b;
+}
+
+.schematic-hotspot-card__close:active {
+  transform: scale(0.95);
+}
+
+.schematic-hotspot-card__close svg {
+  width: 14px;
+  height: 14px;
+  stroke: currentColor;
+  stroke-width: 2.5;
+}
+
+/* Title — upper info section */
+.schematic-hotspot-card__title {
+  font-weight: 700;
+  font-size: clamp(13px, 2.2vw, 16px);
+  line-height: 1.3;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #0f172a;
+  margin: 0;
+  margin-bottom: 4px;
+  padding-right: 28px; /* clear the close button */
+  word-break: break-word;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  line-clamp: 2;
+  -webkit-line-clamp: 2;
+}
+
+/* SKU + Quantity */
+.schematic-hotspot-card__sku {
+  font-size: clamp(11px, 2vw, 13px);
+  color: #64748b;
+  margin: 0;
+  margin-bottom: 3px;
+  line-height: 1.3;
+  word-break: break-word;
+}
+
+/* Stock status badge */
+.schematic-hotspot-card__stock {
+  font-size: clamp(11px, 2vw, 13px);
+  margin: 0;
+  margin-bottom: 6px;
+  line-height: 1.3;
+}
+
+/* Price + CTA row — no border, flows naturally below stock badge */
+.schematic-hotspot-card__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: clamp(8px, 2vw, 12px);
+  margin-top: 0;
+}
+
+.schematic-hotspot-card__price {
+  font-family: 'Courier New', monospace;
+  font-weight: 800;
+  font-size: clamp(14px, 3vw, 18px);
+  color: #2563eb;
+  white-space: nowrap;
+}
+
+.schematic-hotspot-card__cta {
+  flex-shrink: 0;
+  padding: clamp(8px, 1.5vw, 10px) clamp(12px, 2vw, 16px);
+  background: #2563eb;
+  color: #ffffff;
+  border: none;
+  border-radius: clamp(6px, 1.5vw, 8px);
+  font-weight: 700;
+  font-size: clamp(11px, 2vw, 13px);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.schematic-hotspot-card__cta:hover:not(:disabled) {
+  background: #1d4ed8;
+  box-shadow: 0 4px 8px rgba(37, 99, 235, 0.3);
+}
+
+.schematic-hotspot-card__cta:active:not(:disabled) {
+  transform: scale(0.95);
+}
+
+.schematic-hotspot-card__cta:disabled {
+  background: #cbd5e1;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .schematic-hotspot-card {
+    background: #1e293b;
+    border-color: rgba(255, 255, 255, 0.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  }
+
+  .schematic-hotspot-card:hover {
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5);
+  }
+
+  .schematic-hotspot-card__image {
+    background: linear-gradient(135deg, #334155 0%, #1e293b 100%);
+  }
+
+  .schematic-hotspot-card__title {
+    color: #f1f5f9;
+  }
+
+  .schematic-hotspot-card__sku {
+    color: #cbd5e1;
+  }
+
+  .schematic-hotspot-card__close {
+    background: rgba(255, 255, 255, 0.1);
+    color: #f1f5f9;
+  }
+
+  .schematic-hotspot-card__close:hover {
+    background: rgba(255, 255, 255, 0.15);
+  }
+
+  .schematic-hotspot-card__price {
+    color: #60a5fa;
+  }
+
+  .schematic-hotspot-card__cta:hover:not(:disabled) {
+    background: #1e40af;
+    box-shadow: 0 4px 8px rgba(59, 130, 246, 0.4);
+  }
+}
+
+/* Responsive adjustments for small screens */
+@media (max-width: 480px) {
+  .schematic-hotspot-card {
+    gap: 0;
+  }
+
+  .schematic-hotspot-card__info {
+    padding: 12px;
+  }
+
+  .schematic-hotspot-card__close {
+    top: 6px;
+    right: 6px;
+    width: 26px;
+    height: 26px;
   }
 }
 

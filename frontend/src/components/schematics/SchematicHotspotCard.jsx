@@ -64,7 +64,6 @@ export default function SchematicHotspotCard({
   onAddToCart,
   onClose,
   onLightboxOpen,
-  variant = 'mobile',
 }) {
   if (!part) return null;
 
@@ -75,9 +74,9 @@ export default function SchematicHotspotCard({
   const canAdd       = Boolean(product?.id) && stockStatus !== null;
   const isResolving  = Boolean(part.sku) && stockStatus === null;
 
-  const ctaLabel = isAdding    ? (variant === 'mobile' ? 'Adding…' : '…')
-    : isResolving ? (variant === 'mobile' ? 'Resolving…' : 'Resolving…')
-    : canAdd      ? (variant === 'mobile' ? 'Add to Cart' : 'Add')
+  const ctaLabel = isAdding    ? 'Adding…'
+    : isResolving ? 'Resolving…'
+    : canAdd      ? 'Add'
     : 'Unavailable';
 
   const titleNode = product?.slug ? (
@@ -91,13 +90,14 @@ export default function SchematicHotspotCard({
     </Link>
   ) : part.name;
 
-  // ── Desktop variant ────────────────────────────────────────────────────────
-  // Renders flat children that slot into the CSS-grid `.part-modal-detached`
-  // (col-1: image; col-2: title → sku → status → price/CTA).
-  if (variant === 'desktop') {
-    return (
-      <>
-        {/* Column 1 — image or skeleton */}
+  // ── Both variants: horizontal sleek card ────────────────────────────────────
+  // Layout: fixed-width image on left → flex info column on right
+  // No footer. Price and CTA flow naturally with the right column.
+  // CSS class 'schematic-hotspot-card' handles responsive sizing and dark mode.
+  return (
+    <div className="schematic-hotspot-card">
+      {/* Left column — thumbnail (fixed width, square) */}
+      <div className="schematic-hotspot-card__image">
         {product?.images?.[0] ? (
           <button
             className="hotspot-modal-image-btn"
@@ -112,167 +112,57 @@ export default function SchematicHotspotCard({
             />
           </button>
         ) : isResolving ? (
-          <div className="hotspot-modal-image-skeleton hotspot-modal-image-skeleton--desktop" aria-hidden="true" />
+          <div className="hotspot-modal-image-skeleton" aria-hidden="true" />
         ) : null}
+      </div>
 
-        {/* Column 2 — title */}
-        <h4 style={{
-          textTransform: 'uppercase',
-          fontSize: '0.75rem',
-          letterSpacing: '0.1em',
-          marginBottom: '4px',
-          lineHeight: '1.3',
-        }}>
+      {/* Right column — info stack (flex, grows to fill) */}
+      <div className="schematic-hotspot-card__info">
+        {/* Close button — positioned absolutely over info */}
+        {onClose && (
+          <button
+            className="schematic-hotspot-card__close"
+            onClick={onClose}
+            aria-label="Close"
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+              <path d="M18 6L6 18M6 6l12 12"/>
+            </svg>
+          </button>
+        )}
+
+        {/* Title */}
+        <h3 className="schematic-hotspot-card__title">
           {titleNode}
-        </h4>
+        </h3>
 
-        {/* Column 2 — SKU */}
+        {/* SKU + Quantity */}
         {displayCode ? (
-          <div style={{ fontSize: '0.68rem', color: '#64748b', marginBottom: '4px' }}>
+          <div className="schematic-hotspot-card__sku">
             {codeLabel}: {displayCode}
             {part.quantity > 1 && ` | Qty: ${part.quantity}`}
           </div>
         ) : null}
 
-        {/* Column 2 — stock status */}
-        <div className="part-meta" style={{ fontSize: '0.68rem', marginBottom: '8px' }}>
+        {/* Stock status */}
+        <div className="schematic-hotspot-card__stock">
           <StockBadge stockStatus={stockStatus} />
         </div>
 
-        {/* Column 2 — price + CTA */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <span style={{ fontFamily: 'var(--font-mono)', fontWeight: 800 }}>
+        {/* Price + CTA (horizontal row, right-aligned) */}
+        <div className="schematic-hotspot-card__footer">
+          <span className="schematic-hotspot-card__price">
             {priceLabel}
           </span>
           <button
-            className="alloy-button"
-            style={{ padding: '8px 16px', fontSize: '0.6rem' }}
+            className="schematic-hotspot-card__cta"
             disabled={!canAdd || isAdding}
             onClick={(e) => { e.stopPropagation(); onAddToCart?.(); }}
           >
             {ctaLabel}
           </button>
         </div>
-      </>
-    );
-  }
-
-  // ── Mobile variant (default) ───────────────────────────────────────────────
-  // Renders the full card body inside `.mobile-part-modal-overlay`.
-  return (
-    <>
-      {/* Close button */}
-      {onClose && (
-        <button
-          className="mobile-modal-close-btn"
-          onClick={onClose}
-          aria-label="Close"
-          style={{
-            position: 'absolute',
-            top: '12px',
-            right: '12px',
-            width: '34px',
-            height: '34px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            background: 'rgba(15,23,42,0.06)',
-            border: 'none',
-            borderRadius: '8px',
-            cursor: 'pointer',
-            color: '#0f172a',
-            WebkitTapHighlightColor: 'transparent',
-          }}
-        >
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
-            <path d="M18 6L6 18M6 6l12 12"/>
-          </svg>
-        </button>
-      )}
-
-      {/* Top row — thumbnail (left) + info stack (right) */}
-      <div className="mobile-modal-top-row">
-        <div className="mobile-modal-thumb">
-          {product?.images?.[0] ? (
-            <button
-              className="hotspot-modal-image-btn hotspot-modal-image-btn--mobile"
-              onClick={(e) => { e.stopPropagation(); onLightboxOpen?.(); }}
-              aria-label="View full-size image"
-              title="View full-size image"
-            >
-              <img
-                src={product.images[0]}
-                alt={part.name}
-                className="hotspot-modal-image hotspot-modal-image--mobile"
-              />
-            </button>
-          ) : isResolving ? (
-            <div className="hotspot-modal-image-skeleton" aria-hidden="true" />
-          ) : null}
-        </div>
-
-        <div className="mobile-modal-info">
-          {/* Product name */}
-          <h4 style={{
-            textTransform: 'uppercase',
-            fontSize: '0.8rem',
-            fontWeight: '700',
-            letterSpacing: '0.08em',
-            marginBottom: '6px',
-            lineHeight: '1.35',
-            wordBreak: 'break-word',
-            color: '#0f172a',
-          }}>
-            {titleNode}
-          </h4>
-
-          {/* SKU — own line, below name */}
-          {displayCode ? (
-            <div style={{ fontSize: '0.72rem', color: '#64748b', marginBottom: '4px' }}>
-              {codeLabel}: {displayCode}
-              {part.quantity > 1 && ` | Qty: ${part.quantity}`}
-            </div>
-          ) : null}
-
-          {/* Stock status — own line, below SKU */}
-          <div className="part-meta" style={{ fontSize: '0.72rem' }}>
-            <StockBadge stockStatus={stockStatus} />
-          </div>
-        </div>
       </div>
-
-      {/* Footer — price (left) + add-to-cart button (right) */}
-      <div style={{
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        paddingTop: '14px',
-        borderTop: '1px solid rgba(15,23,42,0.08)',
-        gap: '12px',
-      }}>
-        <span style={{
-          fontFamily: 'var(--font-mono)',
-          fontWeight: 800,
-          fontSize: '1.3rem',
-          color: 'var(--tension-accent)',
-        }}>
-          {priceLabel}
-        </span>
-        <button
-          className="alloy-button"
-          style={{
-            padding: '10px 20px',
-            fontSize: '0.75rem',
-            borderRadius: '8px',
-            clipPath: 'none',
-            fontWeight: '700',
-          }}
-          disabled={!canAdd || isAdding}
-          onClick={(e) => { e.stopPropagation(); onAddToCart?.(); }}
-        >
-          {ctaLabel}
-        </button>
-      </div>
-    </>
+    </div>
   );
 }
