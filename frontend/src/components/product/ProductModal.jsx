@@ -14,9 +14,9 @@ const desktopPanelVariants = {
 };
 
 const mobilePanelVariants = {
-  hidden:  { opacity: 0, y: 42, scale: 0.995 },
-  visible: { opacity: 1, y: 0,  scale: 1 },
-  exit:    { opacity: 0, y: 28, scale: 0.995 },
+  hidden:  { opacity: 0, y: '18%', scale: 0.985, filter: 'blur(2px)' },
+  visible: { opacity: 1, y: 0,     scale: 1,     filter: 'blur(0px)' },
+  exit:    { opacity: 0, y: '12%', scale: 0.99,  filter: 'blur(1px)' },
 };
 
 const reduceMotionPanelVariants = {
@@ -25,8 +25,9 @@ const reduceMotionPanelVariants = {
   exit:    { opacity: 0 },
 };
 
-const backdropTransition = { duration: 0.22, ease: [0.4, 0, 0.2, 1] };
-const panelTransition = { duration: 0.32, ease: [0.22, 1, 0.36, 1] };
+const backdropTransition = { duration: 0.24, ease: [0.32, 0.72, 0, 1] };
+const panelTransition = { duration: 0.36, ease: [0.16, 1, 0.3, 1] };
+const mobilePanelTransition = { type: 'spring', stiffness: 420, damping: 38, mass: 0.9 };
 const reducedTransition = { duration: 0.12, ease: 'linear' };
 
 function useIsMobileModal() {
@@ -47,17 +48,6 @@ function useIsMobileModal() {
   return isMobile;
 }
 
-/**
- * ProductModal — shared animated overlay for all product-detail modals.
- *
- * Features:
- *  • Framer-motion backdrop + panel/sheet animations
- *  • Mobile-first bottom sheet behavior with desktop centered dialog behavior
- *  • Keyboard Escape close
- *  • Focus restoration
- *  • Scroll containment for iOS
- *  • Portal rendering for stable z-index stacking
- */
 export default function ProductModal({ isOpen, product, onClose, children }) {
   const scrollRef   = useRef(null);
   const openerRef   = useRef(null);
@@ -147,10 +137,10 @@ export default function ProductModal({ isOpen, product, onClose, children }) {
   const panelVariants = reduceMotion
     ? reduceMotionPanelVariants
     : (isMobile ? mobilePanelVariants : desktopPanelVariants);
-  const transition = reduceMotion ? reducedTransition : panelTransition;
+  const transition = reduceMotion ? reducedTransition : (isMobile ? mobilePanelTransition : panelTransition);
 
   return createPortal(
-    <AnimatePresence mode="wait">
+    <AnimatePresence mode="wait" initial={false}>
       {isOpen && product && (
         <>
           <Motion.div
@@ -170,7 +160,7 @@ export default function ProductModal({ isOpen, product, onClose, children }) {
             key="product-modal-panel"
             ref={scrollRef}
             className={`product-modal-scroll-shell fixed left-0 right-0 bottom-0 overflow-y-auto overscroll-contain outline-none${isScrollActive ? ' product-modal-scroll-shell--active' : ''}`}
-            style={{ zIndex: 10002 }}
+            style={{ zIndex: 10002, willChange: 'transform, opacity' }}
             role="dialog"
             aria-modal="true"
             aria-label={product?.name || 'Product detail'}
@@ -194,7 +184,8 @@ export default function ProductModal({ isOpen, product, onClose, children }) {
             >
               <Motion.div
                 className="product-modal-card-shell w-full max-w-6xl"
-                layout
+                layout="position"
+                transition={transition}
                 onClick={(e) => e.stopPropagation()}
               >
                 {children}
@@ -205,12 +196,15 @@ export default function ProductModal({ isOpen, product, onClose, children }) {
             .product-modal-backdrop {
               -webkit-backdrop-filter: blur(14px) saturate(120%);
               backdrop-filter: blur(14px) saturate(120%);
+              transform: translateZ(0);
             }
             .product-modal-scroll-shell {
               top: 0;
               scrollbar-width: none;
               scrollbar-color: transparent transparent;
               -webkit-overflow-scrolling: touch;
+              transform: translateZ(0);
+              contain: layout paint;
             }
             .product-modal-scroll-shell::-webkit-scrollbar {
               width: 0;
