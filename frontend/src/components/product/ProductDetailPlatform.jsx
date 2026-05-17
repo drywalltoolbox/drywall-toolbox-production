@@ -9,12 +9,6 @@ import { getVariationSelectionMap } from '../../utils/variationSelection.js';
 
 const optimisticShellTransition = { duration: 0.22, ease: [0.22, 1, 0.36, 1] };
 
-function formatPrice(value) {
-  const numeric = Number(value || 0);
-  if (!Number.isFinite(numeric)) return '$0.00';
-  return `$${numeric.toFixed(2)}`;
-}
-
 function getOptimisticImage(product) {
   return (
     product?.image ||
@@ -26,22 +20,8 @@ function getOptimisticImage(product) {
   );
 }
 
-function getOptimisticPrice(product) {
-  return (
-    product?.price ??
-    product?.cardProduct?.price ??
-    product?.min_price ??
-    product?.price?.current ??
-    product?.price?.value ??
-    0
-  );
-}
-
 function ProductDetailOptimisticShell({ product }) {
   const image = getOptimisticImage(product);
-  const brand = product?.brand || product?.brandLabel || product?.brand?.label || '';
-  const sku = product?.sku || product?.cardProduct?.sku || '';
-  const price = getOptimisticPrice(product);
 
   return (
     <Motion.div
@@ -86,7 +66,6 @@ export default function ProductDetailPlatform({
     variations,
     computed,
     status,
-    error,
   } = useCatalogProductDetail(slug);
 
   const fallbackProduct = product ? toLegacyProductCardDTO(product) : null;
