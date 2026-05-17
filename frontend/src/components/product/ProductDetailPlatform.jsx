@@ -7,7 +7,7 @@ import {
 } from '../../utils/catalogDtoAdapters.js';
 import { getVariationSelectionMap } from '../../utils/variationSelection.js';
 
-const optimisticShellTransition = { duration: 0.22, ease: [0.22, 1, 0.36, 1] };
+const optimisticShellTransition = { duration: 0.24, ease: [0.16, 1, 0.3, 1] };
 
 function getOptimisticImage(product) {
   return (
@@ -25,28 +25,79 @@ function ProductDetailOptimisticShell({ product }) {
 
   return (
     <Motion.div
-      className="bg-white w-full max-w-6xl mx-auto overflow-hidden"
-      initial={{ opacity: 0, y: 8 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -6 }}
+      className="dtb-product-detail-loading-shell bg-white w-full max-w-6xl mx-auto overflow-hidden"
+      initial={{ opacity: 0.96 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
       transition={optimisticShellTransition}
     >
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-0">
-        <div className="p-5 sm:p-6 lg:p-8">
-          <div className="aspect-square rounded-2xl bg-gray-50 border border-gray-100 flex items-center justify-center overflow-hidden">
-            {image ? (
-              <img
-                src={image}
-                alt={product?.name || 'Product'}
-                className="w-full h-full object-contain p-4"
-                loading="eager"
-              />
-            ) : (
-              <div className="w-full h-full bg-gradient-to-br from-gray-50 to-gray-100 animate-pulse" />
-            )}
-          </div>
-        </div>
+      <div className="dtb-product-detail-loading-shell__media">
+        {image ? (
+          <img
+            src={image}
+            alt={product?.name || 'Product'}
+            className="dtb-product-detail-loading-shell__image"
+            loading="eager"
+            decoding="async"
+          />
+        ) : null}
       </div>
+      <div className="dtb-product-detail-loading-shell__body" aria-hidden="true">
+        <div className="dtb-product-detail-loading-shell__line dtb-product-detail-loading-shell__line--title" />
+        <div className="dtb-product-detail-loading-shell__line dtb-product-detail-loading-shell__line--meta" />
+        <div className="dtb-product-detail-loading-shell__line dtb-product-detail-loading-shell__line--price" />
+        <div className="dtb-product-detail-loading-shell__cta" />
+      </div>
+      <style>{`
+        .dtb-product-detail-loading-shell {
+          min-height: min(82dvh, 760px);
+          border-radius: 26px 26px 0 0;
+        }
+        .dtb-product-detail-loading-shell__media {
+          margin: 28px 28px 0;
+          aspect-ratio: 1 / 1;
+          max-height: 42dvh;
+          border-radius: 22px;
+          background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+          border: 1px solid rgba(226, 232, 240, 0.86);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          overflow: hidden;
+        }
+        .dtb-product-detail-loading-shell__image {
+          width: 100%;
+          height: 100%;
+          object-fit: contain;
+          padding: 16px;
+        }
+        .dtb-product-detail-loading-shell__body {
+          display: grid;
+          gap: 14px;
+          padding: 26px 28px 36px;
+        }
+        .dtb-product-detail-loading-shell__line,
+        .dtb-product-detail-loading-shell__cta {
+          border-radius: 999px;
+          background: linear-gradient(90deg, #f1f5f9, #e2e8f0, #f8fafc);
+          background-size: 180% 100%;
+          animation: dtbProductDetailShellPulse 1.1s ease-in-out infinite;
+        }
+        .dtb-product-detail-loading-shell__line--title { width: 82%; height: 26px; }
+        .dtb-product-detail-loading-shell__line--meta { width: 56%; height: 16px; }
+        .dtb-product-detail-loading-shell__line--price { width: 34%; height: 34px; margin-top: 4px; }
+        .dtb-product-detail-loading-shell__cta { width: 100%; height: 54px; border-radius: 16px; margin-top: 8px; }
+        @keyframes dtbProductDetailShellPulse {
+          0%, 100% { background-position: 0% 50%; opacity: 0.72; }
+          50% { background-position: 100% 50%; opacity: 1; }
+        }
+        @media (min-width: 769px) {
+          .dtb-product-detail-loading-shell {
+            min-height: 620px;
+            border-radius: 26px;
+          }
+        }
+      `}</style>
     </Motion.div>
   );
 }
@@ -90,32 +141,32 @@ export default function ProductDetailPlatform({
 
   const shouldShowOptimisticShell = status === 'loading' && resolvedVariations.length === 0;
 
-  if (shouldShowOptimisticShell) {
-    return (
-      <AnimatePresence mode="wait">
-        <ProductDetailOptimisticShell key={`optimistic-${product?.id || slug}`} product={fallbackProduct || product} />
-      </AnimatePresence>
-    );
-  }
-
   return (
-    <Motion.div
-      initial={{ opacity: 0, y: 6 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={optimisticShellTransition}
-    >
-      <ProductDetail
-        product={resolvedProduct}
-        onAddToCart={onAddToCart}
-        onClose={onClose}
-        onNavigateToProduct={onNavigateToProduct}
-        initialVariations={resolvedVariations}
-        initialResolvedVariation={resolvedDefaultVariation}
-        initialSelectedAttrs={resolvedSelectedAttrs}
-        initialComputedData={computed}
-        disableLegacyDetailFetch
-        autoSelectDefaultVariation
-      />
-    </Motion.div>
+    <AnimatePresence mode="wait" initial={false}>
+      {shouldShowOptimisticShell ? (
+        <ProductDetailOptimisticShell key={`optimistic-${product?.id || slug}`} product={fallbackProduct || product} />
+      ) : (
+        <Motion.div
+          key={`detail-${resolvedProduct?.id || slug}`}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={optimisticShellTransition}
+        >
+          <ProductDetail
+            product={resolvedProduct}
+            onAddToCart={onAddToCart}
+            onClose={onClose}
+            onNavigateToProduct={onNavigateToProduct}
+            initialVariations={resolvedVariations}
+            initialResolvedVariation={resolvedDefaultVariation}
+            initialSelectedAttrs={resolvedSelectedAttrs}
+            initialComputedData={computed}
+            disableLegacyDetailFetch
+            autoSelectDefaultVariation
+          />
+        </Motion.div>
+      )}
+    </AnimatePresence>
   );
 }
