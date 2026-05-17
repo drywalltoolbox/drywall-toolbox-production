@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { brandToSlug } from '../../utils/catalogUrlState.js';
 import ProductCardImage from '../product/ProductCardImage.jsx';
 import ProductModal from '../product/ProductModal.jsx';
@@ -25,9 +25,18 @@ export default function StorefrontSearchOverlay({
 }) {
   const { addToCart } = useCart();
   const [quickViewProduct, setQuickViewProduct] = useState(null);
+  const quickViewFrameRef = useRef(null);
   const hasQuery = useMemo(() => query.trim().length > 0, [query]);
 
+  const clearPendingQuickViewFrame = () => {
+    if (quickViewFrameRef.current) {
+      cancelAnimationFrame(quickViewFrameRef.current);
+      quickViewFrameRef.current = null;
+    }
+  };
+
   const closeSearch = () => {
+    clearPendingQuickViewFrame();
     setQuickViewProduct(null);
     onClose?.();
   };
@@ -44,6 +53,7 @@ export default function StorefrontSearchOverlay({
     };
     window.addEventListener('keydown', onKeyDown);
     return () => {
+      clearPendingQuickViewFrame();
       document.body.style.overflow = previousOverflow;
       window.removeEventListener('keydown', onKeyDown);
     };
@@ -51,10 +61,17 @@ export default function StorefrontSearchOverlay({
 
   const openQuickView = useCallback((product) => {
     if (!product?.id) return;
-    setQuickViewProduct(product);
+    clearPendingQuickViewFrame();
+    quickViewFrameRef.current = requestAnimationFrame(() => {
+      quickViewFrameRef.current = requestAnimationFrame(() => {
+        setQuickViewProduct(product);
+        quickViewFrameRef.current = null;
+      });
+    });
   }, []);
 
   const closeQuickView = () => {
+    clearPendingQuickViewFrame();
     setQuickViewProduct(null);
   };
 
