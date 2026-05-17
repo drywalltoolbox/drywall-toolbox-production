@@ -27,6 +27,11 @@ export default function StorefrontSearchOverlay({
   const [quickViewProduct, setQuickViewProduct] = useState(null);
   const hasQuery = useMemo(() => query.trim().length > 0, [query]);
 
+  const closeSearch = () => {
+    setQuickViewProduct(null);
+    onClose?.();
+  };
+
   useEffect(() => {
     if (!isOpen) return undefined;
     const previousOverflow = document.body.style.overflow;
@@ -44,10 +49,6 @@ export default function StorefrontSearchOverlay({
     };
   }, [isOpen, onClose, quickViewProduct]);
 
-  useEffect(() => {
-    if (!isOpen) setQuickViewProduct(null);
-  }, [isOpen]);
-
   const openQuickView = (product) => {
     if (!product?.id) return;
     setQuickViewProduct(product);
@@ -60,7 +61,7 @@ export default function StorefrontSearchOverlay({
   return (
     <>
       <div className="storefront-search-overlay" data-open={isOpen ? 'true' : 'false'} role="dialog" aria-modal="true" aria-label="Search products">
-        <button type="button" className="storefront-mobile-drawer__backdrop" onClick={onClose} aria-label="Close search" />
+        <button type="button" className="storefront-mobile-drawer__backdrop" onClick={closeSearch} aria-label="Close search" />
         <div className="storefront-search-overlay__sheet">
           <div className="storefront-search-overlay__panel">
             {hasQuery ? (
@@ -83,7 +84,7 @@ export default function StorefrontSearchOverlay({
                           <Link
                             key={category}
                             to={`/products?display_category=${encodeURIComponent(category.toLowerCase().replace(/[^\w]+/g, '_'))}`}
-                            onClick={onClose}
+                            onClick={closeSearch}
                             className="storefront-search-overlay__chip"
                           >
                             {category}
@@ -101,7 +102,7 @@ export default function StorefrontSearchOverlay({
                           <Link
                             key={brand}
                             to={`/products/brands/${brandToSlug(brand)}`}
-                            onClick={onClose}
+                            onClick={closeSearch}
                             className="storefront-search-overlay__chip"
                           >
                             {brand}
