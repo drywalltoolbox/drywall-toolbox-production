@@ -16,11 +16,6 @@ function getProductSku(product) {
   return product?.sku || product?.part_number || product?.mpn || product?.source_sku || '';
 }
 
-function getProductDescription(product) {
-  const raw = product?.short_description || product?.shortDescription || product?.description || '';
-  return String(raw).replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim();
-}
-
 function canAddProduct(product) {
   if (!product?.id) return false;
   if (product?.type === 'variable') return false;
@@ -198,7 +193,6 @@ export default function StorefrontSearchOverlay({
                   <section className="storefront-search-overlay__results">
                     {suggestions.map((product) => {
                       const sku = getProductSku(product);
-                      const description = getProductDescription(product);
                       const isAdding = addingProductId === product.id;
                       const addable = canAddProduct(product);
                       return (
@@ -230,7 +224,6 @@ export default function StorefrontSearchOverlay({
                               {product.name}
                             </button>
                             {sku ? <span className="storefront-search-overlay__result-sku">SKU: {sku}</span> : null}
-                            {description ? <span className="storefront-search-overlay__result-description">{description}</span> : null}
                             <div className="storefront-search-overlay__result-footer">
                               <span className="storefront-search-overlay__result-price">{formatPrice(product.price)}</span>
                               <button
