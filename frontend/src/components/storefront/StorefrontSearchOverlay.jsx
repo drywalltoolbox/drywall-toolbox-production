@@ -1,11 +1,28 @@
 import { Link } from 'react-router-dom';
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { ShoppingCart } from 'lucide-react';
 import { brandToSlug } from '../../utils/catalogUrlState.js';
+import { useCart } from '../../context/CartContext.jsx';
 import ProductCardImage from '../product/ProductCardImage.jsx';
 
 function formatPrice(value) {
   const numeric = Number(value || 0);
   return Number.isFinite(numeric) && numeric > 0 ? `$${numeric.toFixed(2)}` : 'View product';
+}
+
+function getProductSku(product) {
+  return product?.sku || product?.part_number || product?.mpn || product?.source_sku || '';
+}
+
+function getProductDescription(product) {
+  const raw = product?.short_description || product?.shortDescription || product?.description || '';
+  return String(raw).replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim();
+}
+
+function canAddProduct(product) {
+  if (!product?.id) return false;
+  if (product?.type === 'variable') return false;
+  return product?.stock_status !== 'outofstock';
 }
 
 export default function StorefrontSearchOverlay({
@@ -20,6 +37,8 @@ export default function StorefrontSearchOverlay({
   categories = [],
   suggestions = [],
 }) {
+  const { addToCart } = useCart();
+  const [addingProductId, setAddingProductId] = useState(null);
   const hasQuery = useMemo(() => query.trim().length > 0, [query]);
 
   useEffect(() => {
@@ -35,6 +54,25 @@ export default function StorefrontSearchOverlay({
       window.removeEventListener('keydown', onKeyDown);
     };
   }, [isOpen, onClose]);
+
+  useEffect(() => {
+    if (!isOpen) setAddingProductId(null);
+  }, [isOpen]);
+
+  const handleAddToCart = async (event, product) => {
+    event.preventDefault();
+    event.stopPropagation();
+    if (!canAddProduct(product) || addingProductId) return;
+
+    setAddingProductId(product.id);
+    try {
+      await addToCart(product, 1);
+    } catch (error) {
+      console.error('Search result add-to-cart error:', error);
+    } finally {
+      setAddingProductId(null);
+    }
+  };
 
   if (!isOpen) return null;
 
@@ -128,26 +166,46 @@ export default function StorefrontSearchOverlay({
                 </section>
               ) : suggestions.length > 0 ? (
                 <section className="storefront-search-overlay__results">
-                  {suggestions.map((product) => (
-                    <Link key={product.id} to={`/products/${product.slug || product.id}`} onClick={onClose} className="storefront-search-overlay__result">
-                      <div className="storefront-search-overlay__result-thumb">
-                        <ProductCardImage
-                          product={product}
-                          alt={product.name}
-                          padding="8px"
-                          fit="contain"
-                          width={144}
-                          height={144}
-                          className="storefront-search-overlay__result-thumb-image"
-                        />
-                      </div>
-                      <div className="storefront-search-overlay__result-copy">
-                        <span className="storefront-search-overlay__result-brand">{product.brand || 'Product'}</span>
-                        <strong className="storefront-search-overlay__result-name">{product.name}</strong>
-                        <span className="storefront-search-overlay__result-price">{formatPrice(product.price)}</span>
-                      </div>
-                    </Link>
-                  ))}
+                  {suggestions.map((product) => {
+                    const sku = getProductSku(product);
+                    const description = getProductDescription(product);
+                    const isAdding = addingProductId === product.id;
+                    const addable = canAddProduct(product);
+                    return (
+                      <Link key={product.id} to={`/products/${product.slug || product.id}`} onClick={onClose} className="storefront-search-overlay__result">
+                        <div className="storefront-search-overlay__result-thumb">
+                          <ProductCardImage
+                            product={product}
+                            alt={product.name}
+                            padding="8px"
+                            fit="contain"
+                            width={144}
+                            height={144}
+                            className="storefront-search-overlay__result-thumb-image"
+                          />
+                        </div>
+                        <div className="storefront-search-overlay__result-copy">
+                          <span className="storefront-search-overlay__result-brand">{product.brand || 'Product'}</span>
+                          <strong className="storefront-search-overlay__result-name">{product.name}</strong>
+                          {sku ? <span className="storefront-search-overlay__result-sku">SKU: {sku}</span> : null}
+                          {description ? <span className="storefront-search-overlay__result-description">{description}</span> : null}
+                          <div className="storefront-search-overlay__result-footer">
+                            <span className="storefront-search-overlay__result-price">{formatPrice(product.price)}</span>
+                            <button
+                              type="button"
+                              className="storefront-search-overlay__result-cart"
+                              disabled={!addable || isAdding}
+                              onClick={(event) => handleAddToCart(event, product)}
+                              aria-label={`Add ${product.name} to cart`}
+                            >
+                              <ShoppingCart size={15} aria-hidden="true" />
+                              <span>{isAdding ? 'Adding…' : addable ? 'Add' : 'View'}</span>
+                            </button>
+                          </div>
+                        </div>
+                      </Link>
+                    );
+                  })}
                   <button type="button" onClick={onViewAll} className="storefront-search-overlay__view-all">
                     View all results
                   </button>
