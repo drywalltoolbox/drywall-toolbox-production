@@ -17,12 +17,28 @@ import App from './App.jsx'
 import ErrorBoundary from './components/errors/ErrorBoundary.jsx'
 
 // ─── Pre-warm product catalog cache ──────────────────────────────────────────
-// Kick off the catalog fetch immediately — before React even renders.
-// On first visit:  begins the API fetch immediately so it's ready sooner.
-// On return visits: reads from IndexedDB instantly and optionally revalidates
-//                   in the background — product pages load with 0ms wait.
+// Product listing pages use the DTB catalog-platform endpoints, so prewarm
+// those first. The legacy all-products cache is useful for older schematic
+// lookups, but it is intentionally delayed so it cannot compete with the first
+// visible product grid render on a cold device.
 import { prewarmCatalog } from './services/catalog.js';
-prewarmCatalog();
+import { prewarmCatalogPlatformForCurrentRoute } from './services/catalogPlatformCache.js';
+
+prewarmCatalogPlatformForCurrentRoute();
+
+if (typeof window !== 'undefined') {
+  const pathname = window.location.pathname.replace(/^\/drywall-toolbox(?=\/|$)/, '') || '/';
+  const isCatalogRoute = pathname.startsWith('/products') || pathname.startsWith('/parts');
+
+  if (!isCatalogRoute) {
+    const scheduleLegacyCatalogPrewarm = () => prewarmCatalog();
+    if ('requestIdleCallback' in window) {
+      window.requestIdleCallback(scheduleLegacyCatalogPrewarm, { timeout: 8000 });
+    } else {
+      window.setTimeout(scheduleLegacyCatalogPrewarm, 8000);
+    }
+  }
+}
 
 // ===== Mobile Viewport Optimization =====
 // Prevent iOS Safari from auto-zooming on input focus.

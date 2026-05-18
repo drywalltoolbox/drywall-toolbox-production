@@ -5,6 +5,7 @@ import { useCart } from '../context/CartContext';
 import ProductDetail from '../components/product/ProductDetail';
 import ProductModal from '../components/product/ProductModal';
 import ProductShoppingCard from '../components/ui/ProductShoppingCard';
+import { ProductSkeletonGrid } from '../components/catalog/ProductShoppingCardSkeleton';
 import Toast from '../components/ui/Toast';
 import SEOHead from '../components/shared/SEOHead';
 import { buildBreadcrumbSchema } from '../utils/schema';
@@ -119,9 +120,12 @@ export default function CategoryPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 page-wrapper">
         <SEOHead noindex title="Loading category…" />
-        <div className="text-center text-gray-400">Loading category…</div>
+        <div className="container mx-auto px-4 py-12">
+          <div className="mb-8 h-10 w-56 rounded-xl bg-slate-200/70 animate-pulse" aria-hidden="true" />
+          <ProductSkeletonGrid count={24} />
+        </div>
       </div>
     );
   }
@@ -159,7 +163,7 @@ export default function CategoryPage() {
         {products.length === 0 ? (
           <p className="text-gray-500">No products found in this category.</p>
         ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-5 lg:gap-6">
+          <div className={`dtb-product-grid${products.length === 1 ? ' dtb-product-grid--single' : ''}`}>
             {products.map((product, index) => {
                 const cardProduct = getCardDisplayProduct(product);
                 return (

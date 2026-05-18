@@ -20,6 +20,10 @@
   min-width: 0;
 }
 
+.product-image-gallery__main {
+  min-height: clamp(19rem, 42vw, 34rem);
+}
+
 .dtb-pdp__info-column {
   display: grid;
   gap: 0.9rem;
@@ -791,9 +795,10 @@
     gap: 0.7rem;
   }
 
-  .dtb-pdp-gallery [style*="aspect-ratio: 1 / 1"] {
+  .dtb-pdp-gallery .product-image-gallery__main {
     border-radius: var(--dtb-radius-lg, 14px);
-    max-height: 58vw;
+    min-height: min(92vw, 28rem);
+    max-height: min(92vw, 28rem);
     overflow: hidden;
   }
 

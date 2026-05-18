@@ -267,7 +267,7 @@ export default function ProductImageGallery({ product }) {
         {/* Main image container */}
         <div
           ref={galleryRef}
-          className="relative w-full rounded-2xl overflow-hidden bg-white border border-gray-100 group cursor-zoom-in select-none"
+          className="product-image-gallery__main relative w-full rounded-2xl overflow-hidden bg-white border border-gray-100 group cursor-zoom-in select-none"
           style={{ aspectRatio: '1 / 1' }}
           onClick={onGalleryClick}
           onTouchStart={onTouchStart}

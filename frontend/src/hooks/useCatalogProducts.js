@@ -6,20 +6,21 @@
  */
 
 import { useState, useEffect, useRef } from 'react';
-import { apiClient } from '../api/client.js';
-import { brandToSlug } from '../utils/catalogUrlState.js';
+import { fetchCatalogProducts, getCachedCatalogProducts } from '../services/catalogPlatformCache.js';
 
 const DEFAULT_PAGINATION = { page: 1, perPage: 24, total: 0, totalPages: 0 };
 
 export function useCatalogProducts(query = {}, options = {}) {
   const enabled = options.enabled !== false;
-  const [items, setItems] = useState([]);
-  const [pagination, setPagination] = useState(DEFAULT_PAGINATION);
-  const [loading, setLoading] = useState(enabled);
+  const initialCached = enabled ? getCachedCatalogProducts(query) : null;
+  const [items, setItems] = useState(() => Array.isArray(initialCached?.items) ? initialCached.items : []);
+  const [pagination, setPagination] = useState(() => initialCached?.pagination ?? DEFAULT_PAGINATION);
+  const [loading, setLoading] = useState(() => enabled && !initialCached);
   const [error, setError] = useState(null);
 
   const queryKey = JSON.stringify({ query, enabled });
   const prevKey = useRef(null);
+  const hasLoadedOnce = useRef(Boolean(initialCached));
 
   useEffect(() => {
     if (queryKey === prevKey.current) return undefined;
@@ -31,31 +32,46 @@ export function useCatalogProducts(query = {}, options = {}) {
 
     let cancelled = false;
 
-    const timer = setTimeout(() => {
+    const cached = getCachedCatalogProducts(query);
+    if (cached) {
+      Promise.resolve().then(() => {
+        if (cancelled) return;
+        setItems(Array.isArray(cached?.items) ? cached.items : []);
+        setPagination(cached?.pagination ?? DEFAULT_PAGINATION);
+        setLoading(false);
+        setError(null);
+        hasLoadedOnce.current = true;
+      });
+      return () => { cancelled = true; };
+    }
+
+    const load = () => {
       setLoading(true);
       setError(null);
 
-      const params = buildParams(query);
-      const qs = new URLSearchParams(params).toString();
-      const url = `/wp-json/dtb/v1/catalog/products${qs ? `?${qs}` : ''}`;
-
-      apiClient(url)
+      fetchCatalogProducts(query)
         .then((data) => {
           if (cancelled) return;
           setItems(Array.isArray(data?.items) ? data.items : []);
           setPagination(data?.pagination ?? DEFAULT_PAGINATION);
           setLoading(false);
+          hasLoadedOnce.current = true;
         })
         .catch((err) => {
           if (cancelled) return;
           setError(err);
           setLoading(false);
+          hasLoadedOnce.current = true;
         });
-    }, 300);
+    };
+
+    const delay = hasLoadedOnce.current ? 300 : 0;
+    const timer = delay > 0 ? setTimeout(load, delay) : null;
+    if (!timer) load();
 
     return () => {
       cancelled = true;
-      clearTimeout(timer);
+      if (timer) clearTimeout(timer);
     };
   }, [queryKey]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -69,25 +85,6 @@ export function useCatalogProducts(query = {}, options = {}) {
   }
 
   return { items, pagination, loading, error };
-}
-
-function buildParams(query) {
-  const p = {};
-  if (query.brands && query.brands.length > 0) {
-    p.brand = brandToSlug(query.brands[0]);
-  }
-  if (query.category) p.category = query.category;
-  if (query.displayCategory) p.display_category = query.displayCategory;
-  if (query.toolFamily) p.tool_family = query.toolFamily;
-  if (query.productKind) p.product_kind = query.productKind;
-  if (query.builderSlot) p.builder_slot = query.builderSlot;
-  if (query.workflowScope) p.workflow_scope = query.workflowScope;
-  if (typeof query.isParts === 'number') p.is_parts = query.isParts;
-  if (query.search) p.search = query.search;
-  if (query.page && query.page > 1) p.page = query.page;
-  if (query.perPage) p.per_page = query.perPage;
-  if (query.sort && query.sort !== 'popular') p.sort = query.sort;
-  return p;
 }
 
 export default useCatalogProducts;
