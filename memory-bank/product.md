@@ -1,165 +1,111 @@
 # Product
 
-## What This Project Is
+## Product definition
 
-Drywall Toolbox is a headless ecommerce and service platform for professional drywall contractors. The public experience is a React single-page app in `frontend/`. WordPress and WooCommerce in `wp/` provide the backend system of record for products, customers, orders, media, and custom business workflows.
+Drywall Toolbox is a contractor-focused headless commerce platform for drywall tools, parts, and services.
 
-This repository is not just a storefront. It combines:
+It combines:
 
-- ecommerce catalog and checkout
-- replacement-parts and schematic lookup
-- repair-service intake
-- customer account, rewards, and membership experiences
-- catalog/media operations tooling for maintaining a large specialized product dataset
+- multi-brand ecommerce (WooCommerce-backed)
+- replacement-part discovery through schematics
+- repair intake and repair-order workflows
+- customer account/rewards experiences
+- catalog/media operations workflows inside the same repository
 
-## Primary Audience
+Public UX lives in `frontend/` (React SPA). WordPress/WooCommerce in `wp/` is the backend system of record.
 
-The current product is aimed primarily at:
+## Primary users
 
-- professional drywall finishers and contractors
-- customers buying production-grade tools, parts, and accessories
-- customers who need repair or rebuild services for drywall tools
-- internal operators maintaining catalog data, images, schematics, and WooCommerce content
+### External
 
-## Core Value Proposition
+- professional drywall contractors and crews
+- buyers ordering tools, parts, and accessories
+- customers submitting repair requests
 
-The repo currently supports a "one-stop shop" model for drywall professionals:
+### Internal
 
-- buy tools and parts from multiple brands in one place
-- find replacement parts through schematics and tool-specific diagrams
-- submit repair requests instead of replacing expensive tools outright
-- manage orders, account data, rewards, and membership benefits in one system
+- operators maintaining catalog taxonomy/metadata
+- operators managing images/schematics/media sync
+- admins managing backend integrations and platform health
 
-The product copy and route structure show that the experience is intentionally contractor-oriented rather than general-consumer lifestyle ecommerce.
+## Live capability map (confirmed in code)
 
-## Confirmed User-Facing Capabilities
+### Storefront and checkout
 
-### 1. Storefront and commerce
+- catalog browsing, search, category/brand filtering
+- product detail and variation selection
+- cart + checkout + order confirmation surfaces
+- routes in `frontend/src/App.jsx` include `/products`, `/products/:slug`, `/cart`, `/checkout`, `/order/:id`
 
-Confirmed in `frontend/src/App.jsx`, product APIs, and page/component structure:
+### Parts and schematics
 
-- browse product listings at `/products`, `/all-products`, and `/category/:slug`
-- view product detail pages at `/products/:slug` and `/product/:partNumber`
-- filter by brand/category and search the catalog
-- add products to cart and use cart/checkout flows
-- view order confirmation pages
+- schematics browser and part lookup flows (`/schematics`, `/parts`, `/product/:partNumber`)
+- runtime schematic media manifest endpoint from backend: `GET /wp-json/dtb/v1/schematics/media`
+- static/public fallback assets remain available in frontend public trees
 
-### 2. Parts and schematic lookup
+### Repairs
 
-Confirmed in `frontend/src/pages/Schematics.jsx`, `frontend/src/data/schematicMappings.js`, and the schematics API layer:
+- dedicated repair intake flow (`/repairs`)
+- backend handling in DTB mu-plugins (not frontend business logic)
+- integration pathway to WooCommerce/Veeqo-side processing
 
-- browse brand-specific schematics
-- navigate tool diagrams and associated replacement parts
-- use schematic media served from WordPress, with static asset fallbacks
-- support multiple brands including Columbia, TapeTech, Asgard, Platinum, Dura-Stilts, and Level5 in the current frontend assets/data
+### Account and auth
 
-This is a major differentiator of the product, not a side feature.
+- login/register/forgot/reset flows
+- protected pages: dashboard, orders, rewards, addresses, notifications, settings
+- in-memory token policy (`frontend/src/auth/tokenStore.js`)
+- auth expiry fan-out through `auth:expired` event on 401 responses
 
-### 3. Repair-service intake
+### Rewards and retention
 
-Confirmed in `frontend/src/pages/Repairs.jsx` and `wp/wp-content/mu-plugins/dtb-veeqo.php`:
+- rewards balance/history/redeem flows (frontend + mu-plugin APIs)
 
-- multi-step repair request form
-- structured capture of contact info, tool details, service tier, shipping, and issue notes
-- support for tool-brand and schematic-driven repair flows
-- repair submissions create WooCommerce-backed service orders
-- optional Veeqo sync and confirmation-email handling happen server-side
+### Estimation tools
 
-The repair flow is a full product surface, with pricing copy, membership-aware messaging, and shipping guidance already built into the frontend.
+- calculator hub and specialized calculators under `frontend/src/components/calculators/`
 
-### 4. Customer authentication and account area
+### Supporting public surfaces
 
-Confirmed in `frontend/src/auth/*`, protected routes in `frontend/src/App.jsx`, and dashboard components:
+- contact, FAQ, shipping policy, returns, policies, toolset builder
 
-- login, registration, forgot-password, and reset-password flows
-- protected customer pages such as dashboard, orders, rewards, saved addresses, notifications, and account settings
-- in-memory token storage rather than browser persistence
-- session-expiry handling via `auth:expired` events on 401s
+## Backend product responsibilities
 
-### 5. Rewards
+The WordPress layer is a product backend, not a public template renderer.
 
-Confirmed in `frontend/src/api/rewards.js`, dashboard tabs, and backend mu-plugins:
+Current responsibilities:
 
-- rewards balance/history/redemption flows
+- custom REST APIs (`dtb/v1`, `drywall/v1`, and related namespaces)
+- catalog read model + platform endpoints (`dtb-catalog-platform`)
+- auth/session policy and API security
+- rewards integration
+- image and schematic media APIs/admin tooling
+- repair request orchestration
+- external integration surfaces (Veeqo, QuickBooks)
+- backend ops diagnostics and health/admin tools
 
-### 6. Estimation/calculator tools
+## Operational product reality
 
-Confirmed in `frontend/src/pages/Calculators.jsx` and `frontend/src/components/calculators/`:
+This repository is both:
 
-- drywall sheet calculator
-- tape calculator
-- corner bead calculator
-- screw calculator
-- summary/export/share-oriented calculator hub behavior
+1. production application source, and
+2. operational workspace for catalog/media lifecycle.
 
-These calculators are part of the public product experience, not just internal tooling.
+That means `products/` and `scripts/` are part of core product operations, not auxiliary folders.
 
-### 7. Informational/support pages
+## Scope boundaries
 
-Confirmed route surfaces include:
+Intended boundaries reflected by current implementation:
 
-- contact page
-- FAQ
-- shipping policy
-- returns portal
-- toolset builder
+- React owns customer-facing rendering
+- WordPress themes are backend/headless support only
+- mu-plugins are the canonical home for backend business logic
+- controlled catalog taxonomy is enforced operationally before import
 
-## Backend Product Responsibilities
+Non-goals implied by current architecture:
 
-WordPress/WooCommerce are being used as an application backend, not the public rendering layer. The backend currently owns:
+- returning to classic WP theme-first storefront rendering
+- treating catalog/media maintenance as out-of-band to product development
 
-- product catalog and product metadata
-- customer and order records
-- WooCommerce Store API and custom REST endpoints
-- repair-order creation
-- rewards and membership data exposure
-- image/media registration and sync workflows
-- schematic media delivery
-- inventory/shipping/order integration with Veeqo
+## One-line truth statement
 
-## Operational and Internal Product Surfaces
-
-This repo also includes important operator-facing capabilities that support the business but are not end-user storefront features:
-
-- WooCommerce/WordPress admin extensions in `wp/wp-content/mu-plugins/`
-- image-sync and product-mapping tooling
-- schematics admin support
-- cache admin and API health monitoring
-- Python scripts for scraping, catalog normalization, image cleanup, migration, auditing, and WooCommerce import preparation
-- large local product and image datasets under `products/`
-
-These are part of the product's operating model and should be treated as first-class project concerns.
-
-## Current Product Architecture Assumptions
-
-The checked-in code consistently assumes:
-
-- React is the only public frontend
-- WordPress is a headless backend/API/admin layer
-- WooCommerce remains the commerce system of record
-- product/parts/schematic content is asset-heavy and operationally maintained
-- custom business logic belongs in mu-plugins rather than in the frontend
-
-## Scope Boundaries and Non-Goals
-
-Based on the current codebase, the product does not treat these as primary goals:
-
-- traditional WordPress theme rendering for the public site
-- generic CMS-first editorial publishing
-- lightweight, catalog-only ecommerce without services/repair workflows
-- purely static product content with no backend business logic
-
-## Important Current Realities
-
-- The repo is both runtime application and operations workspace.
-- Schematics and parts data are a core part of the product identity.
-- Repair services are deeply integrated, not an experimental page.
-- Rewards/membership/account experiences are real implemented surfaces.
-- The frontend still contains both newer `src/api/*` code and older compatibility code in `src/services/*`, so the product is functional but mid-transition in places.
-- The repository contains substantial media/catalog payloads, which materially affect maintenance and build behavior.
-
-## Best Short Description
-
-If we need one truthful summary sentence for the project, the most accurate current version is:
-
-Drywall Toolbox is a headless React + WordPress/WooCommerce platform for drywall professionals that combines ecommerce, replacement-parts schematics, repair-service intake, and contractor account/rewards workflows, plus the operational tooling required to maintain a specialized catalog and media library.
+Drywall Toolbox is a headless React + WordPress/WooCommerce contractor platform that unifies ecommerce, schematics-driven parts lookup, and repair workflows, with integrated catalog/media operations tooling.

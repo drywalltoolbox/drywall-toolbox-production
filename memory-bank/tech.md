@@ -1,133 +1,127 @@
 # Tech
 
-## Core stack
+## Runtime stack
 
-### Frontend
+### Frontend (`frontend/`)
 
 - React 19
 - React Router 7
-- Axios for HTTP clients
-- Framer Motion for transitions and animation
-- React Helmet Async for document head management
-- React Markdown with `remark-gfm` for markdown rendering
+- Axios + fetch wrappers for API calls
+- Framer Motion
+- React Helmet Async
+- React Markdown + `remark-gfm`
+- DOMPurify
+- Stripe client libs (`@stripe/react-stripe-js`, `@stripe/stripe-js`)
 
-### Build and tooling
+### Backend (`wp/`)
 
-- Webpack 5 as the active bundler
-- Babel for JSX and modern JavaScript transpilation
-- PostCSS with Tailwind CSS v4 and Autoprefixer
-- ESLint 9 with flat config
-- Webpack Dev Server for local development
-- Webpack Bundle Analyzer for optional build inspection
+- WordPress (headless usage)
+- WooCommerce
+- custom mu-plugin backend suite in `wp/wp-content/mu-plugins/`
+- headless support theme: `wp/wp-content/themes/headless-base/`
 
-### Backend
+### Operations / data
 
-- PHP on WordPress
-- WooCommerce for catalog, customer, order, and cart-adjacent commerce capabilities
-- Custom must-use plugins for application-specific behavior
-- Custom headless WordPress theme focused on REST enrichment instead of page rendering
+- Python scripts for catalog validation, image synchronization, and audits
+- PowerShell smoke test script for catalog-platform endpoints
+- production catalog policy JSON + CSV pipeline assets in `products/Production/`
 
-### Operations and utilities
+## Build and tooling
 
-- GitHub Actions for CI/CD
-- FTPS deployment target for HostGator shared hosting
-- Python utility scripts in `scripts/` for catalog and asset workflows
-- SQL reset helpers for local or operational maintenance
+- Webpack 5 (`frontend/webpack.config.cjs`)
+- Babel (`babel-loader`, `@babel/preset-env`, `@babel/preset-react`)
+- Tailwind v4 + PostCSS + Autoprefixer
+- ESLint 9 flat config (`frontend/eslint.config.js`)
+- Workbox (`GenerateSW`) for production service worker generation
+- optional bundle analysis through `ANALYZE=true`
 
-## Key frontend dependencies
+## Frontend package profile (from `frontend/package.json`)
 
-From `frontend/package.json`, the primary runtime dependencies are:
+### Runtime dependencies (high signal)
 
-- `react`, `react-dom`
-- `react-router-dom`
+- `react`, `react-dom`, `react-router-dom`
 - `axios`
 - `framer-motion`
 - `lucide-react`
 - `react-helmet-async`
-- `react-markdown`
-- `remark-gfm`
+- `react-markdown`, `remark-gfm`
 - `dompurify`
+- `@stripe/react-stripe-js`, `@stripe/stripe-js`
 
-The project also includes `express`, `cors`, `socket.io`, and `socket.io-client`, which are used for the local reviews server and related development support rather than the main production storefront runtime.
+### Local/dev support dependencies
 
-## Build behavior
+- `express`, `cors`, `socket.io`, `socket.io-client` (dev support pathways)
 
-The active build pipeline is defined in `frontend/webpack.config.cjs`.
+### Tooling/dev dependencies
 
-- Development runs on port `5173`
-- Production output is emitted to the repo-root `dist/`
-- Environment variables are injected with Webpack `DefinePlugin`
-- Static files from `frontend/public/` are copied into the build output
-- CSS is extracted in production and injected in development
-- Chunks are split for React vendor code, general vendor code, and shared modules
-- Hidden source maps are generated for production builds
+- webpack ecosystem (`webpack`, `webpack-cli`, `webpack-dev-server`, `html-webpack-plugin`, etc.)
+- css pipeline (`css-loader`, `style-loader`, `mini-css-extract-plugin`, `postcss-loader`)
+- optimization (`terser-webpack-plugin`, `css-minimizer-webpack-plugin`)
+- workbox (`workbox-webpack-plugin`)
+- linting (`eslint`, `@eslint/js`, `eslint-plugin-react-hooks`, `globals`)
 
-## Backend technical shape
+## Frontend runtime/compile contract
 
-### WordPress integration model
+`webpack.config.cjs` drives:
 
-- WordPress lives under `/wp/`
-- The active theme is `wp/wp-content/themes/headless-base/`
-- Public rendering is blocked at the theme layer so React owns the frontend
-- REST responses are enriched with menu data, settings, image variants, product metadata, pricing, and availability fields
+- compile-time env injection via `DefinePlugin` (`process.env.*` and `import.meta.env.*` shims)
+- dev/prod output path split (dev local output, prod to repo-root `dist/`)
+- hashed asset emission and generated `asset-manifest.json`
+- static public copy from `frontend/public/` with targeted exclusions
+- production service worker generation with runtime caching strategies
 
-### Custom API namespaces
+## Environment model
 
-The backend exposes and consumes multiple API families:
+### Frontend
 
-- `dtb/v1` for custom application routes
-- `drywall/v1` for WooCommerce proxy and site-management routes
-- `wc/store/v1` for cart and checkout flows
-- standard WordPress and WooCommerce REST endpoints where needed
+- template file: `frontend/.env.example`
+- staging file exists: `frontend/.env.staging`
+- variables use `REACT_APP_*`
+- intended behavior: secrets are injected by environment/CI, not committed as operational values
 
-### External and environment-backed integrations
+### WordPress
 
-The mu-plugin stack references environment or config constants for:
+`wp/wp-config-sample.php` defines the server-side contract for:
 
-- JWT signing and allowed origins
-- WooCommerce proxy credentials and webhook secrets
-- import/auth credentials
-- Veeqo API keys, webhook secrets, warehouse, and channel IDs
+- DB and WP core settings
+- hardening and cookie path settings for `/wp` install
+- DTB constants (JWT/origin/proxy credentials/import secrets)
+- integration constants (Veeqo, QuickBooks optional)
 
-## Coding standards and conventions
+## Backend API surface model
 
-These are the standards visible in the checked-in code and config.
+Primary namespaces currently in active use:
 
-### JavaScript and React
+- `dtb/v1` (custom DTB routes)
+- `drywall/v1` (proxy/application routes)
+- `headless/v1` (theme-level headless support routes)
+- WooCommerce Store API routes under `/wc/store/v1`
 
-- ES modules are standard across the frontend
-- JSX lives in `.jsx` files
-- Functional React components and hooks are the dominant pattern
-- Route-level code splitting is preferred for pages
-- Shared app state is composed through context providers
-- Existing code style is semicolon-terminated and import-first
+## Security posture (code-level)
 
-### Linting
+- in-memory token storage in frontend (`tokenStore.js`)
+- token cleared on 401 and `auth:expired` event dispatch for app-wide handling
+- centralized origin allowlist and origin checks in mu-plugin loader helpers
+- hardened headers/routing behavior in root `.htaccess`
 
-`frontend/eslint.config.js` enforces:
+## CI/CD and performance validation
 
-- ESLint recommended base rules
-- React Hooks recommended rules
-- `react-hooks/rules-of-hooks` as an error
-- `no-unused-vars` as an error, with uppercase identifiers ignored for intentional constants
+- active CI workflow: `.github/workflows/validate-and-deploy.yml`
+- stages: build, (currently disabled) lighthouse-ci job, deploy to GitHub Pages
+- Lighthouse rules configured in `lighthouserc.json`
 
-### Environment handling
+## Catalog technology constraints
 
-- Frontend runtime configuration is compile-time injected through `REACT_APP_*` variables
-- Secrets are intended to stay out of the repository and live in deployment environment settings
-- WordPress runtime secrets are expected in server-side config rather than tracked source
+Canonical policy file:
 
-### Documentation and markdown
+- `products/Production/catalogs/config/production_taxonomy_policy.json`
 
-- The repo includes a permissive `.markdownlint.json` with broad markdown rule suppression
-- Documentation quality is therefore convention-driven rather than tool-enforced
+This enforces controlled taxonomy fields, brand/category allowlists, and alias normalization rules for production catalog integrity.
 
-## Practical standards for future work
+## Engineering conventions to preserve
 
-To stay aligned with the current codebase, new work should follow these rules:
-
-- Keep React feature work inside `frontend/src/` and prefer the newer `api/`, `hooks/`, and provider patterns over adding more legacy service wrappers
-- Treat `wp/wp-content/mu-plugins/` as the authoritative backend extension layer
-- Preserve the headless assumption: do not introduce public WordPress template rendering as an application dependency
-- Keep secrets out of committed frontend env files and out of browser-accessible bundles
-- Be careful with asset-heavy changes because repository size and build output are strongly affected by media additions
+- keep backend business logic in mu-plugins, not in React
+- prefer `frontend/src/api/*` + hooks/providers over growing legacy service paths
+- maintain headless assumption (React public UI; WP backend API/admin)
+- keep environment secrets server/CI-side
+- treat data/media-heavy operations as first-class technical concerns during planning

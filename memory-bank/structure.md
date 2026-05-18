@@ -1,259 +1,158 @@
 # Structure
 
-## System Shape
+## High-level architecture
 
-Drywall Toolbox is organized around two runtime layers and two support layers:
+Drywall Toolbox is a headless system with four primary layers:
 
-1. `frontend/` is the public React SPA.
-2. `wp/` is the WordPress + WooCommerce backend and admin system.
-3. `scripts/` contains offline maintenance and migration utilities.
-4. `products/` contains large local catalog/image/source datasets used to build and maintain the commerce content.
+1. `frontend/` — public React SPA
+2. `wp/` — WordPress + WooCommerce backend and admin runtime
+3. `products/` — catalog/media/production data workspace
+4. `scripts/` — operational tooling for data/csv/image workflows
 
-The public site is not rendered by WordPress templates. The browser-facing app is React; WordPress is used as API, admin, media, and commerce infrastructure.
+`README.md` is intentionally brief; this file is the deeper internal structure map.
 
-## Top-Level Repository Layout
+## Repository map (current)
 
 ```text
 drywall-toolbox/
-├─ .github/        CI/CD workflows
-├─ .vscode/        editor settings
-├─ docs/           currently empty in the checked-in repo
-├─ frontend/       React storefront source and public assets
-├─ memory-bank/    project reference docs
-├─ products/       scraped catalogs, images, reports, production data
-├─ scripts/        Python/SQL operational tooling
-├─ wp/             WordPress installation and backend code
-├─ .htaccess       root routing/security/SPA fallback rules
-├─ coming-soon.html
-├─ index.php
-└─ README.md
+├─ .github/                     CI workflows
+│  └─ workflows/
+│     ├─ validate-and-deploy.yml
+│     ├─ deploy.yml.archived
+│     └─ performance.yml.archived
+├─ frontend/                    React SPA (public UI)
+├─ memory-bank/                 internal architecture docs
+├─ products/                    catalog/media/source data
+├─ scripts/                     operational scripts
+├─ wp/                          WordPress installation
+├─ .htaccess                    root routing/security/caching policy
+├─ coming-soon.html             root page variant/asset
+├─ index.php                    root passthrough note
+├─ lighthouserc.json            Lighthouse assertion config
+└─ README.md                    short internal workspace note
 ```
 
-## Runtime Request Flow
+## Request flow
 
 ```text
 Browser
-  -> React router in frontend/src/App.jsx
-  -> frontend/src/api/* and some legacy frontend/src/services/*
-  -> WordPress REST endpoints under /wp-json/*
-  -> WooCommerce Store API / WC REST API
-  -> custom DTB mu-plugin logic
+  -> React routes/components (frontend/src/App.jsx)
+  -> frontend/src/api/* (plus some legacy frontend/src/services/*)
+  -> /wp-json/* REST endpoints
+  -> WooCommerce + DTB mu-plugin business logic
 
-WordPress + WooCommerce
-  -> auth/session handling
-  -> product/customer/order operations
-  -> rewards + membership endpoints
-  -> schematic/media delivery
-  -> repair request handling
-  -> Veeqo integration
+WordPress runtime
+  -> custom namespaces (dtb/v1, drywall/v1, headless/v1)
+  -> auth/security/cache policy
+  -> catalog/rewards/repair/integration modules
 ```
 
-## Frontend Layout
+## Frontend structure (`frontend/`)
 
-`frontend/` is the canonical public application.
+### Core files
 
-### Important root files
+- `package.json` — scripts/dependencies
+- `webpack.config.cjs` — build/dev/prod/service-worker config
+- `eslint.config.js` — lint rules
+- `.env.example` — environment template
+- `.env.staging` — staging-specific env values
 
-- `frontend/package.json`: scripts and dependency manifest
-- `frontend/webpack.config.cjs`: build/dev-server config
-- `frontend/src/main.jsx`: app bootstrap
-- `frontend/src/App.jsx`: provider composition, route definitions, lazy page loading, layout shell
-- `frontend/src/index.css` and `frontend/src/App.css`: global styling entry points
-
-### `frontend/src/` folders
+### Source layout (`frontend/src/`)
 
 ```text
 frontend/src/
-├─ api/         current API clients and fetch wrappers
-├─ assets/      minimal bundled source assets
-├─ auth/        auth context, hook, and in-memory token store
-├─ components/  shared UI, dashboard modules, calculator modules
-├─ constants/   app constants such as shipping config
-├─ context/     cart and WooCommerce providers
-├─ data/        schematic mappings and product-related local datasets
-├─ hooks/       reusable data and UI hooks
-├─ pages/       route-level pages
-├─ services/    older compatibility/service modules
-├─ styles/      standalone CSS files
-├─ utils/       parsing, schema, variation, and helper utilities
-├─ App.css
-├─ App.jsx
-├─ index.css
-└─ main.jsx
+├─ api/           primary data access layer
+├─ auth/          auth context + in-memory token store
+├─ components/    shared UI + feature component trees
+├─ constants/     shared constants
+├─ context/       app-level providers (cart, WooCommerce)
+├─ data/          static mappings/datasets
+├─ hooks/         reusable hooks
+├─ pages/         route-level pages
+├─ services/      legacy compatibility service layer
+├─ styles/        css modules/files
+├─ utils/         utility helpers
+├─ App.jsx        route map + providers
+└─ main.jsx       bootstrap
 ```
 
-### Frontend composition details
+### Route surface
 
-- `auth/` is a real architectural layer, not just a helper folder.
-  - `AuthContext.js`
-  - `useAuth.js`
-  - `tokenStore.js`
-- `api/` is the newer browser data-access surface.
-  - auth, cart, coupons, customers, membership, orders, products, rewards, schematics, wordpress
-- `services/` still exists for older or compatibility-oriented flows.
-- `components/` is split between general shared UI and two meaningful feature subtrees:
-  - `components/calculators/`
-  - `components/dashboard/`
+Primary pages include:
 
-### Public route surfaces
-
-Confirmed in `frontend/src/App.jsx`:
-
-- storefront: `/`, `/products`, `/products/:slug`, `/all-products`, `/category/:slug`
+- commerce: `/products`, `/products/:slug`, `/cart`, `/checkout`, `/order/:id`
 - parts/schematics: `/parts`, `/schematics`, `/product/:partNumber`
-- commerce: `/cart`, `/checkout`, `/order/:id`
-- auth: `/login`, `/register`, `/forgot-password`, `/reset-password`
-- account: `/dashboard`, `/orders`, `/rewards`, `/account-settings`, `/addresses`, `/notifications`
-- additional features: `/repairs`, `/calculators`, `/faq`, `/shipping-policy`, `/returns`, `/toolset-builder`, `/contact`
-- admin-ish protected page: `/settings/woocommerce`
+- auth/account: `/login`, `/register`, `/forgot-password`, `/reset-password`, `/dashboard`, `/orders`, `/rewards`, `/addresses`
+- service/content: `/repairs`, `/calculators`, `/faq`, `/shipping-policy`, `/returns`, `/policies`, `/toolset-builder`, `/contact`
 
-### Feature-heavy frontend areas
+## Backend structure (`wp/`)
 
-- `pages/Repairs.jsx` is a large self-contained repair intake experience.
-- `pages/Schematics.jsx` is a very large schematic/parts browser with extensive static imports and fallback media handling.
-- `components/dashboard/AccountHub.jsx` centralizes account tab state and data loading.
-- `components/calculators/CalculatorHub.jsx` owns the calculator suite state and UX.
+### Theme model
 
-### Frontend assets and public content
+- Active theme: `wp/wp-content/themes/headless-base/`
+- Purpose: backend/headless support, REST enrichment, no public template UX ownership
 
-`frontend/public/` is not just favicon/static boilerplate. It contains major product content:
+### MU plugin model
 
-- `brands/` with brand logos, product images, and schematic JSON/image trees
-- `404.html`, logos, manifest, robots, favicons
+Composition root: `wp/wp-content/mu-plugins/00-dtb-loader.php`
 
-This means a meaningful amount of "content" is bundled directly with the frontend build rather than fetched dynamically.
+This file provides shared helpers and explicit load order for DTB modules.
 
-## Backend Layout
+Confirmed loader chain includes:
 
-`wp/` contains the WordPress runtime. The most important project-specific code lives in `wp/wp-content/`.
+- `dtb-utils.php`, `dtb-auth.php`, `dtb-cache.php`, `dtb-cache-admin.php`, `dtb-rest-api.php`
+- `dtb-catalog-platform/bootstrap.php`
+- `dtb-api-security.php`, `dtb-frontend-security.php`, `dtb-admin-security.php`
+- `dtb-rewards.php`, `dtb-image-sync.php`, `dtb-woocommerce.php`
+- `dtb-commerce/bootstrap.php`
+- `dtb-veeqo.php`, `dtb-ops-dashboard.php`, `dtb-catalog-health.php`, `dtb-quickbooks.php`
+- `dtb-schematics-api.php`, `dtb-coming-soon.php`, `dtb-seo.php`, `dtb-config-reference.php`
 
-### Core backend directories
+Also present in `mu-plugins/` are additional auto-loaded/support files (`dtb-api-health-monitor.php`, `dtb-product-mapping.php`, `dtb-schematics-admin.php`, host-provided plugins, etc.).
 
-```text
-wp/wp-content/
-├─ mu-plugins/   custom backend feature modules and admin tooling
-├─ plugins/      regular WP plugins placeholder/installed plugins
-├─ themes/
-│  ├─ drywall-toolbox/  legacy/reference theme
-│  └─ headless-base/    active headless-oriented theme
-└─ uploads/      media storage placeholder in repo
-```
+### Key backend module subtrees
 
-### Theme structure
+- `mu-plugins/dtb-catalog-platform/` (`Domain/`, `Rest/`, `Services/`, `Validation/`, `Admin/`)
+- `mu-plugins/dtb-commerce/` (`Cart/`, `Orders/`)
 
-- `themes/headless-base/` is the active headless theme and should be treated as the current public-theme baseline.
-- `themes/drywall-toolbox/` appears to be retained as an older or reference theme.
+## Data and operations structure
 
-Neither theme is the main application UI layer; React remains the real frontend.
+### `products/`
 
-## MU-Plugin Architecture
-
-`wp/wp-content/mu-plugins/00-dtb-loader.php` is the composition root for the custom backend stack. It defines shared origin helpers and then explicitly loads DTB modules in a controlled order.
-
-### Confirmed load order from `00-dtb-loader.php`
-
-- `dtb-utils.php`
-- `dtb-auth.php`
-- `dtb-cache.php`
-- `dtb-cache-admin.php`
-- `dtb-rest-api.php`
-- `dtb-rewards.php`
-- `dtb-image-sync.php`
-- `dtb-woocommerce.php`
-- `dtb-veeqo.php`
-- `dtb-schematics-api.php`
-- `dtb-coming-soon.php`
-- `dtb-seo.php`
-- `dtb-config-reference.php`
-
-### Other checked-in mu-plugin files not in that explicit load chain
-
-- `dtb-admin-performance.php`
-- `dtb-api-health-monitor.php`
-- `dtb-product-mapping.php`
-- `dtb-schematics-admin.php`
-- `endurance-page-cache.php`
-- `sso.php`
-
-Because this is WordPress mu-plugin territory, these files still matter structurally even when not listed in the loader's explicit `require_once` chain.
-
-### Backend responsibilities by module
-
-- `dtb-auth.php`: authentication, JWT/session-related flows, auth routes
-- `dtb-cache.php`: cache helpers/diagnostics
-- `dtb-cache-admin.php`: cache-related admin tools
-- `dtb-rest-api.php`: custom REST routes and backend application endpoints
-- `dtb-rewards.php`: rewards bridge/endpoints
-- `dtb-image-sync.php`: media/image sync workflows
-- `dtb-woocommerce.php`: WooCommerce-specific backend behavior
-- `dtb-veeqo.php`: Veeqo proxy, order/inventory sync, shipping, repair request backend
-- `dtb-schematics-api.php`: schematic media manifest API
-- `dtb-coming-soon.php`: subscriber capture/admin handling
-- `dtb-seo.php`: product SEO metadata exposure/management
-- `dtb-config-reference.php`: config documentation/reference
-
-### Structural takeaway
-
-The WordPress layer is doing much more than "just CORS and a proxy." It is a fairly broad custom application backend with both customer-facing APIs and internal admin/ops tooling.
-
-## Products and Data Workspace
-
-`products/` is an important support layer, not clutter to ignore.
-
-### Confirmed top-level subdirectories
+Primary folders:
 
 - `catalogs/`
-- `logos/`
 - `Production/`
 - `reports/`
 - `scraped_results/`
+- `logos/`
 
-### Notable `scraped_results/` contents
+Production catalog authority currently centers around:
 
-- `brands/`
-- `toolsets/`
-- `archive/`
-- `new_images/`
-- `wc-catalog.csv`
-- `seo-tags.csv`
+- `products/Production/catalogs/official/woocommerce_catalog_production_optimized.csv`
+- taxonomy policy: `products/Production/catalogs/config/production_taxonomy_policy.json`
 
-This is a strong signal that the repository doubles as a catalog-production workspace and image-processing workspace.
+### `scripts/`
 
-## Scripts Layer
+Operational scripts support:
 
-`scripts/` is heavily catalog- and media-oriented. The file inventory shows several script families:
+- catalog validation and auditing (`validate_catalog.py`, `sku_audit.py`)
+- image URL sync and media maintenance (`sync_catalog_image_urls.py`)
+- endpoint smoke checks (`smoke-dtb-catalog-api.ps1`)
+- environment/data cleanup utilities (`appdata_audit.py`, `appdata_cleanup.py`)
+- DB reset SQL (`scripts/production_catalog/phpmyadmin-production-full-reset.sql`)
 
-- scraping: `scrape_*`
-- extraction: `extract_*`
-- normalization: `normalize_*`
-- building catalogs: `build_*`
-- migration/fixup: `migrate_*`, `fix_*`, `reshape_*`, `convert_*`
-- image maintenance: `cleanup_*`, `dedupe_*`, `sync_*`, `cross_reference_*`
-- auditing/reporting: `audit_*`, `generate_*`
-- SQL helper: `phpmyadmin-reset.sql`
+## Infrastructure and routing anchors
 
-These scripts are part of the repo's working architecture for maintaining product truth, not just one-off experiments.
+- Root `.htaccess` controls HTTPS redirects, security headers, REST aliases, and SPA fallback behavior
+- Root `index.php` is intentionally minimal and delegates frontend serving to built output/routing policy
+- `lighthouserc.json` defines performance assertions used by CI validation workflow
 
-## Documentation and Reference Layer
+## Navigation model for engineers
 
-- `memory-bank/` contains the maintained project-reference docs.
-- `README.md` is a broad repo overview but is not fully authoritative for every current detail.
-- `docs/` is currently empty in the checked-in repository, so current source code is more trustworthy than any expectation that docs live there.
+When locating logic quickly:
 
-## Current Architectural Realities
-
-- The codebase is intentionally headless.
-- The frontend has a newer `api/` layer and an older `services/` layer, so data access is transitional.
-- Large schematic/product asset trees live both in `frontend/public/` and `products/`.
-- WordPress mu-plugins are the main backend extension mechanism.
-- The repo combines runtime code and operational data workflows in one place.
-
-## Best Mental Model
-
-Use this model when navigating the project:
-
-- `frontend/` is the customer experience.
-- `wp/wp-content/` is the backend application logic and admin tooling.
-- `products/` is the content/categorization/image workspace.
-- `scripts/` is the transformation and maintenance toolbox.
-- `memory-bank/` is the concise project truth layer we should keep current.
+- UI/UX bug: `frontend/src/pages/*` and `frontend/src/components/*`
+- frontend API behavior: `frontend/src/api/*` then `frontend/src/services/*`
+- backend business logic/API: `wp/wp-content/mu-plugins/*`
+- operational data rules: `products/Production/*` and `scripts/*`
