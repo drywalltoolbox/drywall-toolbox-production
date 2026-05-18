@@ -40,6 +40,66 @@ function money(value) {
   return Number.isFinite(parsed) ? parsed.toFixed(2) : '0.00';
 }
 
+function toFinitePrice(value) {
+  if (typeof value === 'number') return Number.isFinite(value) ? value : null;
+  if (typeof value === 'string') {
+    const parsed = parseFloat(value);
+    return Number.isFinite(parsed) ? parsed : null;
+  }
+  return null;
+}
+
+function pickFirstFinitePrice(...candidates) {
+  for (const candidate of candidates) {
+    const parsed = toFinitePrice(candidate);
+    if (parsed != null) return parsed;
+  }
+  return null;
+}
+
+function getCurrentDisplayPrice(source, { preferMin = false } = {}) {
+  if (!source) return 0;
+
+  const priceObject = source?.price && typeof source.price === 'object' ? source.price : null;
+  const priceValue = pickFirstFinitePrice(
+    source?.price,
+    source?.price_value,
+    priceObject?.value,
+  );
+  const saleValue = pickFirstFinitePrice(
+    source?.sale_price,
+    source?.salePrice,
+    priceObject?.sale,
+  );
+  const regularValue = pickFirstFinitePrice(
+    source?.regular_price,
+    source?.regularPrice,
+    priceObject?.regular,
+  );
+  const minValue = pickFirstFinitePrice(
+    source?.min_price,
+    source?.price_min,
+    source?.minPrice,
+    priceObject?.min,
+  );
+
+  if (preferMin) {
+    return pickFirstFinitePrice(minValue, priceValue, saleValue, regularValue, 0) ?? 0;
+  }
+
+  return pickFirstFinitePrice(priceValue, saleValue, regularValue, minValue, 0) ?? 0;
+}
+
+function getCompareAtPrice(source) {
+  if (!source) return null;
+  const priceObject = source?.price && typeof source.price === 'object' ? source.price : null;
+  return pickFirstFinitePrice(
+    source?.regular_price,
+    source?.regularPrice,
+    priceObject?.regular,
+  );
+}
+
 function getVariantStatus(variation) {
   if (!variation) return 'unavailable';
   return variation.stock_status === 'outofstock' ? 'sold-out' : 'available';
@@ -393,11 +453,11 @@ export default function ProductDetail({
   };
 
   const rawPrice = selectedVariation
-    ? (selectedVariation.price || 0)
-    : (product.is_variable && product.min_price != null ? product.min_price : (product.price || 0));
+    ? getCurrentDisplayPrice(selectedVariation)
+    : getCurrentDisplayPrice(product, { preferMin: Boolean(product.is_variable) });
   const displayPrice = money(rawPrice);
   const pricePrefix = product.is_variable && !selectedVariation ? 'From $' : '$';
-  const compareAt = selectedVariation?.regular_price || product.regular_price;
+  const compareAt = getCompareAtPrice(selectedVariation) ?? getCompareAtPrice(product);
   const productSpecifications = getProductSpecifications(product);
 
   const brandLogoClassName = [

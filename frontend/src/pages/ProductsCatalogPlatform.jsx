@@ -383,9 +383,11 @@ export default function ProductsCatalogPlatform({ forceProductGrid = false, titl
                       <span>Grid</span>
                     </button>
                   </div>
-                  <div className="dtb-listing-toolbar__count" aria-live="polite">
-                    {itemsLoading ? 'Loading…' : `${total.toLocaleString()} result${total === 1 ? '' : 's'}`}
-                  </div>
+                  {!itemsLoading && (
+                    <div className="dtb-listing-toolbar__count" aria-live="polite">
+                      {`${total.toLocaleString()} result${total === 1 ? '' : 's'}`}
+                    </div>
+                  )}
                 </div>
 
                 {itemsLoading ? <ProductSkeletonGrid count={24} /> : (

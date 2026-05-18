@@ -471,6 +471,17 @@
 }
 
 /* Responsive adjustments for small screens */
+@media (max-width: 768px) {
+  .mobile-part-modal-overlay .schematic-hotspot-card__image {
+    flex: 0 0 33%;
+  }
+
+  .mobile-part-modal-overlay .schematic-hotspot-card__image img,
+  .mobile-part-modal-overlay .schematic-hotspot-card__image .hotspot-modal-image-btn .hotspot-modal-image {
+    padding: 8px;
+  }
+}
+
 @media (max-width: 480px) {
   .schematic-hotspot-card {
     gap: 0;

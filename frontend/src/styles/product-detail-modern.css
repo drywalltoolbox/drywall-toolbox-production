@@ -47,6 +47,10 @@
   gap: 0.85rem;
 }
 
+.dtb-pdp-header__mobile-status-row {
+  display: none;
+}
+
 .dtb-pdp-header__title {
   margin: 0;
   font-size: clamp(1.25rem, 3.5vw, 2rem);
@@ -229,6 +233,10 @@
   height: 0.92rem;
   flex: 0 0 auto;
   color: #d1d5db;
+}
+
+.dtb-pdp-header__reviews--mobile {
+  margin-top: 0;
 }
 
 .product-detail-brand-logo {
@@ -779,6 +787,38 @@
     align-items: center;
     gap: 0.5rem 0.7rem;
     row-gap: 0.5rem;
+  }
+
+  .dtb-pdp-header__mobile-status-row {
+    display: flex;
+    align-items: center;
+    gap: clamp(0.45rem, 1.8vw, 0.7rem);
+    flex-wrap: nowrap;
+    width: fit-content;
+    max-width: 100%;
+  }
+
+  .dtb-pdp-header__meta-stock--desktop,
+  .dtb-pdp-header__desktop-reviews {
+    display: none;
+  }
+
+  .dtb-pdp-header__meta-stock--desktop + .dtb-pdp-header__meta-brand::before {
+    content: none;
+    margin: 0;
+  }
+
+  .dtb-pdp-header__reviews--mobile {
+    margin-left: 0;
+    padding-left: clamp(0.08rem, 1vw, 0.2rem);
+    min-width: 0;
+    font-size: 0.78rem;
+    white-space: nowrap;
+  }
+
+  .dtb-pdp-header__meta-stock--mobile {
+    flex-shrink: 0;
+    white-space: nowrap;
   }
 
   .dtb-pdp-mobile-relocate {

@@ -25,6 +25,11 @@ function money(value) {
   return Number.isFinite(numeric) ? numeric.toFixed(2) : '0.00';
 }
 
+function parsePrice(value) {
+  const numeric = typeof value === 'number' ? value : parseFloat(String(value ?? ''));
+  return Number.isFinite(numeric) ? numeric : null;
+}
+
 function stripHtml(html, maxLen = 72) {
   if (!html) return '';
 
@@ -55,6 +60,21 @@ export default function StorefrontProductTile({
   const priceStr = isVariable && product?.min_price != null
     ? `From $${money(product.min_price)}`
     : `$${money(resolved.price ?? product?.price ?? 0)}`;
+
+  // Keep card compare pricing aligned with PDP modal/header behavior:
+  // use regular price when present and render it as a struck-through value.
+  const compareAtValue = parsePrice(
+    resolved.regular_price
+    ?? product?.regular_price
+    ?? resolved.compare_at_price
+    ?? product?.compare_at_price
+    ?? resolved.min_regular_price
+    ?? product?.min_regular_price
+  );
+
+  const comparePriceStr = compareAtValue !== null && compareAtValue > 0
+    ? `$${money(compareAtValue)}`
+    : null;
 
   const onSale = !isVariable
     && resolved.sale_price
@@ -271,12 +291,15 @@ export default function StorefrontProductTile({
         <div className="dtb-product-card__divider" />
 
         <div className="dtb-product-card__footer">
-          <strong
-            className="dtb-product-card__price"
-            style={{ color: outOfStock ? 'var(--dtb-muted)' : 'var(--dtb-text)' }}
-          >
-            {priceStr}
-          </strong>
+          <div className="dtb-product-card__price-group">
+            <strong
+              className="dtb-product-card__price"
+              style={{ color: outOfStock ? 'var(--dtb-muted)' : 'var(--dtb-text)' }}
+            >
+              {priceStr}
+            </strong>
+            {comparePriceStr ? <span className="dtb-product-card__compare-price">{comparePriceStr}</span> : null}
+          </div>
 
           {!isVariable && (
             <button

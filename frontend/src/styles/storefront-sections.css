@@ -88,6 +88,12 @@
   grid-auto-columns: clamp(162px, 44vw, 188px);
 }
 
+@media (min-width: 768px) {
+  .storefront-rail--fixed-tiles {
+    grid-auto-columns: clamp(210px, 22vw, 248px);
+  }
+}
+
 .storefront-rail--category {
   grid-auto-columns: clamp(140px, 38vw, 200px);
 }
@@ -228,6 +234,7 @@
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
+  line-clamp: 2;
   overflow: hidden;
   text-overflow: ellipsis;
 }
@@ -593,8 +600,14 @@
 
 @media (min-width: 1024px) {
   .dtb-product-grid {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 20px;
+  }
+}
+
+@media (min-width: 1440px) {
+  .dtb-product-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 }
 
