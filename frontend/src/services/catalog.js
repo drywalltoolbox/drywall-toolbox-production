@@ -41,12 +41,23 @@ async function fetchFromApi() {
   let all   = [];
   let page  = 1;
   const PER = 100;
+  // Per-request timeout: abort a page fetch that takes longer than 15 s.
+  // Without this, a hanging fetch (slow API cold-start or poor mobile network)
+  // keeps loadCatalog() pending forever since apiClient's inflightGetRequests
+  // dedup causes all components to wait on the same stalled promise.
+  const PAGE_TIMEOUT_MS = 15000;
 
   let done = false;
   while (!done) {
+    const controller = new AbortController();
+    const timeoutId  = setTimeout(() => controller.abort(), PAGE_TIMEOUT_MS);
     let batch;
     try {
-      const result = await proxyFetchProducts({ per_page: PER, page, status: 'publish' });
+      const result = await proxyFetchProducts(
+        { per_page: PER, page, status: 'publish' },
+        { signal: controller.signal },
+      );
+      clearTimeout(timeoutId);
       batch = Array.isArray(result) ? result : result?.products || [];
       batch = batch
         .map(normalizeProduct)
@@ -57,8 +68,14 @@ async function fetchFromApi() {
         // alongside their parent variable product).
         .filter((p) => p.type !== 'variation');
     } catch (pageErr) {
+      clearTimeout(timeoutId);
+      // Treat an abort (timeout) as a distinct failure type so callers can
+      // distinguish it from a generic network error if needed.
+      const err = pageErr?.name === 'AbortError'
+        ? Object.assign(new Error('Catalog page fetch timed out after 15 s.'), { code: 'timeout' })
+        : pageErr;
       if (all.length > 0) break;
-      throw pageErr;
+      throw err;
     }
     all = all.concat(batch);
     if (batch.length < PER) { done = true; break; }
