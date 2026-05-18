@@ -42,7 +42,6 @@ const SHOP_CATEGORY_LINKS = [
 ];
 
 const DRAWER_NAV_ROWS = [
-  { to: '/products', label: 'All Products' },
   { to: '/products?sort=newest', label: 'New Arrivals' },
   { to: '/repairs', label: 'Repairs' },
   { to: '/calculators', label: 'Calculators' },
@@ -67,6 +66,7 @@ export default function Header({ onCartToggle, hasTopTicker = false }) {
   const { getCartCount } = useCart();
   const { user, isAuthenticated, isLoading, logout } = useAuthContext();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [productsExpanded, setProductsExpanded] = useState(false);
   const [brandsExpanded, setBrandsExpanded] = useState(false);
   const [partsExpanded, setPartsExpanded] = useState(false);
   const [schematicsExpanded, setSchematicsExpanded] = useState(false);
@@ -117,6 +117,7 @@ export default function Header({ onCartToggle, hasTopTicker = false }) {
   }, []);
 
   const resetDrawerExpansions = useCallback(() => {
+    setProductsExpanded(false);
     setBrandsExpanded(false);
     setPartsExpanded(false);
     setSchematicsExpanded(false);
@@ -279,41 +280,20 @@ export default function Header({ onCartToggle, hasTopTicker = false }) {
     setAccountHubOpen(true);
   };
 
-  const handleDrawerBrandNavigate = (slug) => {
+  const closeDrawerAndNavigate = (to) => {
     resetDrawerExpansions();
     setMobileMenuOpen(false);
-    navigate(`/products/brands/${slug}`);
+    navigate(to);
   };
 
-  const handleDrawerPartsBrandNavigate = (slug) => {
-    resetDrawerExpansions();
-    setMobileMenuOpen(false);
-    navigate(`/parts?brand=${encodeURIComponent(slug)}`);
-  };
-
-  const handleDrawerSchematicsBrandNavigate = (slug) => {
-    resetDrawerExpansions();
-    setMobileMenuOpen(false);
-    navigate(`/schematics?brand=${encodeURIComponent(slug)}`);
-  };
-
-  const handleDrawerBrandsLanding = () => {
-    resetDrawerExpansions();
-    setMobileMenuOpen(false);
-    navigate('/products/brands');
-  };
-
-  const handleDrawerPartsLanding = () => {
-    resetDrawerExpansions();
-    setMobileMenuOpen(false);
-    navigate('/parts');
-  };
-
-  const handleDrawerSchematicsLanding = () => {
-    resetDrawerExpansions();
-    setMobileMenuOpen(false);
-    navigate('/schematics');
-  };
+  const handleDrawerBrandNavigate = (slug) => closeDrawerAndNavigate(`/products/brands/${slug}`);
+  const handleDrawerPartsBrandNavigate = (slug) => closeDrawerAndNavigate(`/parts?brand=${encodeURIComponent(slug)}`);
+  const handleDrawerSchematicsBrandNavigate = (slug) => closeDrawerAndNavigate(`/schematics?brand=${encodeURIComponent(slug)}`);
+  const handleDrawerBrandsLanding = () => closeDrawerAndNavigate('/products/brands');
+  const handleDrawerPartsLanding = () => closeDrawerAndNavigate('/parts');
+  const handleDrawerSchematicsLanding = () => closeDrawerAndNavigate('/schematics');
+  const handleDrawerProductsLanding = () => closeDrawerAndNavigate('/products');
+  const handleDrawerProductCategoryNavigate = (to) => closeDrawerAndNavigate(to);
 
   const handleMobileViewAll = useCallback(() => {
     const q = mobileSearchQuery.trim();
@@ -321,7 +301,7 @@ export default function Header({ onCartToggle, hasTopTicker = false }) {
     closeSearchOverlay();
   }, [mobileSearchQuery, navigate, closeSearchOverlay]);
 
-  const renderDrawerBrandSection = ({ id, label, expanded, onToggle, onLanding, onBrandNavigate }) => (
+  const renderDrawerListSection = ({ id, label, expanded, onToggle, onLanding, items, onItemNavigate }) => (
     <div className="storefront-mobile-drawer__row-wrap" key={id}>
       <div className="storefront-mobile-drawer__row">
         <button type="button" className="storefront-mobile-drawer__row-label" onClick={onLanding}>
@@ -342,19 +322,29 @@ export default function Header({ onCartToggle, hasTopTicker = false }) {
         id={`storefront-mobile-drawer-${id}`}
         className={`storefront-mobile-drawer__brands${expanded ? ' is-expanded' : ''}`}
       >
-        {drawerBrands.map((brand) => (
+        {items.map((item) => (
           <button
-            key={`${id}-${brand.slug}`}
+            key={`${id}-${item.slug || item.to || item.name || item.label}`}
             type="button"
             className="storefront-mobile-drawer__brand-link"
-            onClick={() => onBrandNavigate(brand.slug)}
+            onClick={() => onItemNavigate(item)}
           >
-            {brand.name}
+            {item.name || item.label}
           </button>
         ))}
       </div>
     </div>
   );
+
+  const renderDrawerBrandSection = ({ id, label, expanded, onToggle, onLanding, onBrandNavigate }) => renderDrawerListSection({
+    id,
+    label,
+    expanded,
+    onToggle,
+    onLanding,
+    items: drawerBrands,
+    onItemNavigate: (brand) => onBrandNavigate(brand.slug),
+  });
 
   return (
     <>
@@ -469,6 +459,15 @@ export default function Header({ onCartToggle, hasTopTicker = false }) {
 
       <StorefrontMobileDrawer isOpen={mobileMenuOpen} onClose={closeMobileMenu}>
         <nav className="storefront-mobile-drawer__nav" aria-label="Mobile navigation">
+          {renderDrawerListSection({
+            id: 'products',
+            label: 'All Products',
+            expanded: productsExpanded,
+            onToggle: () => setProductsExpanded((open) => !open),
+            onLanding: handleDrawerProductsLanding,
+            items: SHOP_CATEGORY_LINKS,
+            onItemNavigate: (category) => handleDrawerProductCategoryNavigate(category.to),
+          })}
           {renderDrawerBrandSection({
             id: 'brands',
             label: 'Brands',
