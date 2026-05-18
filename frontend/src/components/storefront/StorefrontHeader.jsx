@@ -43,6 +43,7 @@ const SHOP_CATEGORY_LINKS = [
 
 const DRAWER_NAV_ROWS = [
   { to: '/products?sort=newest', label: 'New Arrivals' },
+  { to: '/toolset-builder', label: 'Toolset Builder' },
   { to: '/repairs', label: 'Repairs' },
   { to: '/calculators', label: 'Calculators' },
   { to: '/faq', label: 'FAQ' },
