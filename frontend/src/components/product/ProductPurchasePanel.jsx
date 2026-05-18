@@ -1,4 +1,4 @@
-import { Heart, Minus, Plus, ShoppingCart } from 'lucide-react';
+import { Minus, Plus, ShoppingCart } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 export default function ProductPurchasePanel({
@@ -11,10 +11,7 @@ export default function ProductPurchasePanel({
   isOutOfStock,
   needsVariation,
   hasCompleteSelection,
-  isWishlisted,
-  onToggleWishlist,
   partsUrl,
-  reviewNode = null,
 }) {
   const handleInputChange = (e) => {
     const val = parseInt(e.target.value, 10);
@@ -25,9 +22,7 @@ export default function ProductPurchasePanel({
 
   return (
     <div className="product-detail-purchase-panel dtb-pdp-purchase-panel">
-
       <div className="dtb-pdp-purchase-row">
-        {/* Flat qty stepper */}
         <div className="dtb-pdp-qty-root" role="group" aria-label="Quantity">
           <button
             type="button"
@@ -71,25 +66,13 @@ export default function ProductPurchasePanel({
         </button>
       </div>
 
-      <div className="dtb-pdp-purchase-panel__meta-row">
-        <button
-          type="button"
-          onClick={onToggleWishlist}
-          className={`dtb-pdp-save-button${isWishlisted ? ' is-active' : ''}`}
-          aria-pressed={isWishlisted}
-        >
-          <Heart size={16} />
-          <span>{isWishlisted ? 'Saved' : 'Save for later'}</span>
-        </button>
-
-        {reviewNode}
-
-        {partsUrl ? (
+      {partsUrl ? (
+        <div className="dtb-pdp-purchase-panel__meta-row">
           <Link to={partsUrl} className="dtb-pdp-parts-link dtb-pdp-parts-link--desktop">
             View compatible schematics and parts
           </Link>
-        ) : null}
-      </div>
+        </div>
+      ) : null}
     </div>
   );
 }
