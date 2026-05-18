@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ShoppingCart, Eye, Heart } from 'lucide-react';
 import ProductCardImage from '../product/ProductCardImage';
@@ -7,12 +7,16 @@ function useIsMobile() {
   const [isMobile, setIsMobile] = useState(
     () => typeof window !== 'undefined' && window.matchMedia('(max-width: 768px)').matches
   );
+
   useEffect(() => {
     const mq = window.matchMedia('(max-width: 768px)');
     const onChange = () => setIsMobile(mq.matches);
+
     mq.addEventListener('change', onChange);
+
     return () => mq.removeEventListener('change', onChange);
   }, []);
+
   return isMobile;
 }
 
@@ -23,8 +27,12 @@ function money(value) {
 
 function stripHtml(html, maxLen = 72) {
   if (!html) return '';
+
   const plain = html.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
-  return plain.length > maxLen ? plain.slice(0, maxLen).trimEnd() + '…' : plain;
+
+  return plain.length > maxLen
+    ? `${plain.slice(0, maxLen).trimEnd()}…`
+    : plain;
 }
 
 export default function StorefrontProductTile({
@@ -35,17 +43,22 @@ export default function StorefrontProductTile({
   index = 0,
   variant = 'grid',
 }) {
-  const resolved = cardProduct || product || {};
+  const resolved = useMemo(() => cardProduct || product || {}, [cardProduct, product]);
+
   const isVariable = Boolean(product?.is_variable);
   const stockStatus = resolved.stock_status || product?.stock_status || 'instock';
   const outOfStock = stockStatus === 'outofstock';
   const name = resolved.name || product?.name || resolved.part_number || 'Product';
   const sku = resolved.sku || product?.sku || '';
   const desc = stripHtml(resolved.short_description || resolved.description || '');
+
   const priceStr = isVariable && product?.min_price != null
     ? `From $${money(product.min_price)}`
     : `$${money(resolved.price ?? product?.price ?? 0)}`;
-  const onSale = !isVariable && resolved.sale_price && resolved.regular_price
+
+  const onSale = !isVariable
+    && resolved.sale_price
+    && resolved.regular_price
     && parseFloat(resolved.sale_price) < parseFloat(resolved.regular_price);
 
   const isMobile = useIsMobile();
@@ -58,12 +71,15 @@ export default function StorefrontProductTile({
 
   useEffect(() => {
     if (!overlayActive || !isMobile) return undefined;
+
     const handler = (e) => {
       if (cardRef.current && !cardRef.current.contains(e.target)) {
         setOverlayActive(false);
       }
     };
+
     document.addEventListener('pointerdown', handler);
+
     return () => document.removeEventListener('pointerdown', handler);
   }, [overlayActive, isMobile]);
 
@@ -72,17 +88,22 @@ export default function StorefrontProductTile({
       if (productUrl) navigate(productUrl);
       return;
     }
+
     if (overlayActive) {
       setOverlayActive(false);
+
       if (productUrl) navigate(productUrl);
+
       return;
     }
+
     setOverlayActive(true);
-  }, [isMobile, overlayActive, productUrl, navigate]);
+  }, [isMobile, navigate, overlayActive, productUrl]);
 
   const handleMouseEnter = useCallback(() => {
     if (!isMobile) setOverlayActive(true);
   }, [isMobile]);
+
   const handleMouseLeave = useCallback(() => {
     if (!isMobile) setOverlayActive(false);
   }, [isMobile]);
@@ -91,34 +112,35 @@ export default function StorefrontProductTile({
     if (isMobile && overlayActive) {
       e.stopPropagation();
       setOverlayActive(false);
+
       if (productUrl) navigate(productUrl);
+
       return;
     }
+
     fallback?.(e);
-  }, [isMobile, overlayActive, productUrl, navigate]);
+  }, [isMobile, navigate, overlayActive, productUrl]);
 
   const handleQuickView = useCallback((e) => {
     e.stopPropagation();
     setOverlayActive(false);
-    onOpenModal?.(product || resolved);
-  }, [onOpenModal, product, resolved]);
+    onOpenModal?.(resolved);
+  }, [onOpenModal, resolved]);
 
   const handleOverlayAddToCart = useCallback((e) => {
     e.stopPropagation();
     setOverlayActive(false);
-    onAddToCart?.(product || resolved);
-  }, [onAddToCart, product, resolved]);
+    onAddToCart?.(resolved);
+  }, [onAddToCart, resolved]);
 
   const badgePositionClass = variant === 'list'
     ? 'dtb-product-card__badge--left'
     : 'dtb-product-card__badge--right';
 
-  const cardClassName = `dtb-product-card dtb-product-card--${variant} storefront-motion-card`;
-
   return (
     <article
       ref={cardRef}
-      className={cardClassName}
+      className={`dtb-product-card dtb-product-card--${variant} storefront-motion-card`}
       style={{ '--dtb-card-delay': `${Math.min(index, 8) * 30}ms` }}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
@@ -134,11 +156,13 @@ export default function StorefrontProductTile({
             Out of Stock
           </span>
         )}
+
         {onSale && !outOfStock && (
           <span className={`dtb-product-card__badge dtb-product-card__badge--sale ${badgePositionClass}`}>
             Sale
           </span>
         )}
+
         <ProductCardImage
           product={resolved}
           src={resolved.image_thumbnail || resolved.image}
@@ -165,6 +189,7 @@ export default function StorefrontProductTile({
             onClick={(e) => {
               e.stopPropagation();
               setOverlayActive(false);
+
               if (productUrl) navigate(productUrl);
             }}
           >
@@ -196,13 +221,11 @@ export default function StorefrontProductTile({
                   disabled={outOfStock}
                   className={isMobile
                     ? `dtb-product-card__qv-btn dtb-product-card__qv-btn--icon-only${outOfStock ? ' dtb-product-card__qv-btn--disabled' : ''}`
-                    : 'dtb-product-card__qv-icon-btn'
-                  }
+                    : 'dtb-product-card__qv-icon-btn'}
                   onClick={outOfStock ? (e) => e.stopPropagation() : handleOverlayAddToCart}
                   aria-label={outOfStock ? `${name} is out of stock` : `Add ${name} to cart`}
                 >
-                  <ShoppingCart size={isMobile ? 15 : 15} strokeWidth={2.2} />
-                  {!isMobile && <span className="sr-only">Add to Cart</span>}
+                  <ShoppingCart size={15} strokeWidth={2.2} />
                 </button>
               )}
             </div>
@@ -222,7 +245,10 @@ export default function StorefrontProductTile({
           </button>
         )}
 
-        {resolved.brand ? <span className="dtb-product-card__brand">{resolved.brand}</span> : null}
+        {resolved.brand ? (
+          <span className="dtb-product-card__brand">{resolved.brand}</span>
+        ) : null}
+
         <button
           type="button"
           onClick={handleCardInteract(onOpenModal)}
@@ -240,8 +266,7 @@ export default function StorefrontProductTile({
               : null
           : sku
             ? <span className="dtb-product-card__sku">SKU: {sku}</span>
-            : null
-        }
+            : null}
 
         <div className="dtb-product-card__divider" />
 
@@ -252,6 +277,7 @@ export default function StorefrontProductTile({
           >
             {priceStr}
           </strong>
+
           {!isVariable && (
             <button
               type="button"
