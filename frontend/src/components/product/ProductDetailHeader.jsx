@@ -27,18 +27,6 @@ export default function ProductDetailHeader({
 
   return (
     <header className="dtb-pdp-header">
-      <h2 className="dtb-pdp-header__title">
-        {productUrl ? (
-          <Link
-            to={productUrl}
-            className="dtb-pdp-header__title-link"
-            onClick={onProductTitleClick}
-          >
-            {title}
-          </Link>
-        ) : title}
-      </h2>
-
       <div className="dtb-pdp-header__meta">
         <span className={`dtb-pdp-header__meta-stock${isOutOfStock ? ' is-out' : ''}`}>
           <span className="dtb-pdp-header__meta-stock-dot" aria-hidden="true" />
@@ -60,6 +48,18 @@ export default function ProductDetailHeader({
           </span>
         ) : null}
       </div>
+
+      <h2 className="dtb-pdp-header__title">
+        {productUrl ? (
+          <Link
+            to={productUrl}
+            className="dtb-pdp-header__title-link"
+            onClick={onProductTitleClick}
+          >
+            {title}
+          </Link>
+        ) : title}
+      </h2>
 
       <div className="dtb-pdp-header__price-block">
         <div className="dtb-pdp-header__price-row">
