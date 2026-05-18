@@ -21,7 +21,6 @@ function money(value) {
   return Number.isFinite(numeric) ? numeric.toFixed(2) : '0.00';
 }
 
-/** Strip HTML tags and return a plain-text excerpt for the list card description. */
 function stripHtml(html, maxLen = 72) {
   if (!html) return '';
   const plain = html.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
@@ -50,7 +49,6 @@ export default function StorefrontProductTile({
     && parseFloat(resolved.sale_price) < parseFloat(resolved.regular_price);
 
   const isMobile = useIsMobile();
-  // Unified overlay state — activated by tap (mobile) or hover (desktop)
   const [overlayActive, setOverlayActive] = useState(false);
   const cardRef = useRef(null);
   const navigate = useNavigate();
@@ -58,7 +56,6 @@ export default function StorefrontProductTile({
   const slug = resolved.slug || product?.slug;
   const productUrl = slug ? `/products/${slug}` : null;
 
-  // Dismiss when user taps/clicks outside the card
   useEffect(() => {
     if (!overlayActive || !isMobile) return undefined;
     const handler = (e) => {
@@ -72,12 +69,10 @@ export default function StorefrontProductTile({
 
   const handleImageClick = useCallback(() => {
     if (!isMobile) {
-      // Desktop: image click navigates directly; overlay is hover-driven
       if (productUrl) navigate(productUrl);
       return;
     }
     if (overlayActive) {
-      // Second tap on image (not an overlay button) → navigate
       setOverlayActive(false);
       if (productUrl) navigate(productUrl);
       return;
@@ -85,7 +80,6 @@ export default function StorefrontProductTile({
     setOverlayActive(true);
   }, [isMobile, overlayActive, productUrl, navigate]);
 
-  // Desktop hover handlers
   const handleMouseEnter = useCallback(() => {
     if (!isMobile) setOverlayActive(true);
   }, [isMobile]);
@@ -93,7 +87,6 @@ export default function StorefrontProductTile({
     if (!isMobile) setOverlayActive(false);
   }, [isMobile]);
 
-  // When overlay is active any card interaction outside overlay buttons → navigate
   const handleCardInteract = useCallback((fallback) => (e) => {
     if (isMobile && overlayActive) {
       e.stopPropagation();
@@ -107,16 +100,15 @@ export default function StorefrontProductTile({
   const handleQuickView = useCallback((e) => {
     e.stopPropagation();
     setOverlayActive(false);
-    onOpenModal?.();
-  }, [onOpenModal]);
+    onOpenModal?.(product || resolved);
+  }, [onOpenModal, product, resolved]);
 
   const handleOverlayAddToCart = useCallback((e) => {
     e.stopPropagation();
     setOverlayActive(false);
-    onAddToCart?.();
-  }, [onAddToCart]);
+    onAddToCart?.(product || resolved);
+  }, [onAddToCart, product, resolved]);
 
-  // Badge is top-right on grid/rail, top-left on list (image stripe is narrow)
   const badgePositionClass = variant === 'list'
     ? 'dtb-product-card__badge--left'
     : 'dtb-product-card__badge--right';
@@ -166,20 +158,17 @@ export default function StorefrontProductTile({
           eager={index < 4}
         />
 
-        {/* Quick-view / action overlay — always rendered, visibility driven by CSS transitions */}
         {variant !== 'list' && (
           <div
             aria-hidden={!overlayActive}
             className={`dtb-product-card__qv-overlay${overlayActive ? ' dtb-product-card__qv-overlay--active' : ''}`}
             onClick={(e) => {
-              // Tap on dim layer (not a button) → navigate
               e.stopPropagation();
               setOverlayActive(false);
               if (productUrl) navigate(productUrl);
             }}
           >
             <div className={`dtb-product-card__qv-actions${overlayActive ? ' dtb-product-card__qv-actions--active' : ''}`}>
-              {/* Heart / Save — desktop only */}
               {!isMobile && (
                 <button
                   type="button"
@@ -191,7 +180,6 @@ export default function StorefrontProductTile({
                 </button>
               )}
 
-              {/* Quick View pill */}
               <button
                 type="button"
                 className="dtb-product-card__qv-btn"
@@ -199,25 +187,22 @@ export default function StorefrontProductTile({
                 aria-label={`Quick view ${name}`}
               >
                 <Eye size={14} strokeWidth={2.2} />
-                <span>Quick View</span>
+                {!isMobile && <span>Quick View</span>}
               </button>
 
-              {/* Add to Cart — simple products only; variable opens via Quick View.
-                  Mobile: always visible, greyed + disabled when out of stock.
-                  Desktop: hidden when out of stock (icon-only pill). */}
               {!isVariable && (isMobile || !outOfStock) && (
                 <button
                   type="button"
                   disabled={outOfStock}
                   className={isMobile
-                    ? `dtb-product-card__qv-btn${outOfStock ? ' dtb-product-card__qv-btn--disabled' : ''}`
+                    ? `dtb-product-card__qv-btn dtb-product-card__qv-btn--icon-only${outOfStock ? ' dtb-product-card__qv-btn--disabled' : ''}`
                     : 'dtb-product-card__qv-icon-btn'
                   }
                   onClick={outOfStock ? (e) => e.stopPropagation() : handleOverlayAddToCart}
                   aria-label={outOfStock ? `${name} is out of stock` : `Add ${name} to cart`}
                 >
-                  <ShoppingCart size={isMobile ? 14 : 15} strokeWidth={2.2} />
-                  {isMobile && <span>{outOfStock ? 'Out of Stock' : 'Add to Cart'}</span>}
+                  <ShoppingCart size={isMobile ? 15 : 15} strokeWidth={2.2} />
+                  {!isMobile && <span className="sr-only">Add to Cart</span>}
                 </button>
               )}
             </div>
@@ -225,10 +210,7 @@ export default function StorefrontProductTile({
         )}
       </button>
 
-      {/* ── Meta area ─────────────────────────────────────────────── */}
       <div className="dtb-product-card__meta">
-
-        {/* List variant: heart button floated to top-right */}
         {variant === 'list' && (
           <button
             type="button"
@@ -250,7 +232,6 @@ export default function StorefrontProductTile({
           {name}
         </button>
 
-        {/* List variant: description snippet; others: SKU */}
         {variant === 'list'
           ? desc
             ? <p className="dtb-product-card__desc">{desc}</p>
@@ -288,6 +269,3 @@ export default function StorefrontProductTile({
     </article>
   );
 }
-
-
-
