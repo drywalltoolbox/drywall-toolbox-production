@@ -17,6 +17,7 @@ import { findMatchingVariation, getVariationSelectionMap } from '../../utils/var
 import { setCachedVariations } from '../../utils/variationCache';
 import { apiClient } from '../../api/client.js';
 import { getBrandLogo } from '../../utils/brandAssets.js';
+import { toProductDetailDTO } from '../../utils/catalogDtoAdapters.js';
 import { getSchematicIdForProduct, buildSchematicsUrl } from '../../data/schematicMappings';
 import DOMPurify from 'dompurify';
 
@@ -303,8 +304,9 @@ export default function ProductDetail({
           try {
             const data = await apiClient(`/wp-json/dtb/v1/catalog/products/${encodeURIComponent(product.slug)}/detail`);
             if (!mounted) return;
-            if (data?.computed) setComputedData(data.computed);
-            const detailVars = Array.isArray(data?.variations) && data.variations.length > 0 ? data.variations : null;
+            const detail = toProductDetailDTO(data);
+            if (detail?.computed) setComputedData(detail.computed);
+            const detailVars = Array.isArray(detail?.variations) && detail.variations.length > 0 ? detail.variations : null;
             if (detailVars) {
               setCachedVariations(product.id, detailVars);
               applyVariations(detailVars);

@@ -133,7 +133,7 @@ export default function ProductDetailPlatform({
   const initialDefaultVariation = initialResolvedVariation
     ? toLegacyVariationDTO(initialResolvedVariation, product || null)
     : null;
-  const resolvedDefaultVariation = endpointDefaultVariation || initialDefaultVariation || null;
+  const resolvedDefaultVariation = initialDefaultVariation || endpointDefaultVariation || null;
 
   const resolvedSelectedAttrs = Object.keys(initialSelectedAttrs || {}).length > 0
     ? initialSelectedAttrs

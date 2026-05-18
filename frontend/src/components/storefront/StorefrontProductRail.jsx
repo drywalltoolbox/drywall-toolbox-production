@@ -9,7 +9,7 @@ import StorefrontRail from './StorefrontRail';
 import StorefrontProductTile from './StorefrontProductTile';
 import StorefrontSkeletons from './StorefrontSkeletons';
 import { PLACEHOLDER_IMAGE } from '../../constants/images.js';
-import { fetchVariationsBatched } from '../../utils/variationSelection';
+import { fetchVariationsBatched, getVariationSelectionMap } from '../../utils/variationSelection';
 
 /**
  * A horizontal product rail that fetches products from the catalog API.
@@ -114,8 +114,15 @@ export default function StorefrontProductRail({
     setToast({ message: `${product.name} added to cart!`, type: 'cart' });
   };
 
-  const openModal = (product) => {
-    setModalProduct(product);
+  const openModal = (product, cardProduct = null) => {
+    const initialResolvedVariation = cardProduct?.parent_id ? cardProduct : null;
+    setModalProduct({
+      product,
+      initialResolvedVariation,
+      initialSelectedAttrs: initialResolvedVariation
+        ? getVariationSelectionMap(initialResolvedVariation)
+        : {},
+    });
     setIsModalOpen(true);
   };
 
@@ -130,13 +137,21 @@ export default function StorefrontProductRail({
       <StorefrontRail label={label} className="storefront-rail--fixed-tiles">
         {products.map((product, index) => {
           const variations = variationMap[product.id] || [];
-          const firstVarImg = variations.find(
-            (v) => v.image && v.image !== PLACEHOLDER_IMAGE
-          )?.image;
-          const cardProduct =
-            (product.image === PLACEHOLDER_IMAGE || !product.image) && firstVarImg
-              ? { ...product, image: firstVarImg, image_thumbnail: firstVarImg }
-              : product;
+          const bestVariation = variations.find((v) => v.stock_status !== 'outofstock') || variations[0] || null;
+          const cardProduct = bestVariation
+            ? {
+                ...bestVariation,
+                image: bestVariation.image && bestVariation.image !== PLACEHOLDER_IMAGE
+                  ? bestVariation.image
+                  : product.image,
+                images: bestVariation.image && bestVariation.image !== PLACEHOLDER_IMAGE
+                  ? bestVariation.images
+                  : product.images,
+                image_thumbnail: bestVariation.image_thumbnail || bestVariation.image || product.image_thumbnail,
+                image_srcset: bestVariation.image_srcset || product.image_srcset,
+                image_sizes: bestVariation.image_sizes || product.image_sizes,
+              }
+            : product;
 
           return (
             <StorefrontProductTile
@@ -144,8 +159,8 @@ export default function StorefrontProductRail({
               product={product}
               cardProduct={cardProduct}
               variant="rail"
-              onOpenModal={() => openModal(product)}
-              onAddToCart={() => handleAddToCart(product)}
+              onOpenModal={() => openModal(product, cardProduct)}
+              onAddToCart={() => handleAddToCart(cardProduct)}
               index={index}
             />
           );
@@ -154,13 +169,16 @@ export default function StorefrontProductRail({
 
       {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
 
-      <ProductModal isOpen={isModalOpen && !!modalProduct} product={modalProduct} onClose={closeModal}>
+      <ProductModal isOpen={isModalOpen && !!modalProduct} product={modalProduct?.product || modalProduct} onClose={closeModal}>
         {modalProduct && (
           <ProductDetail
-            product={modalProduct}
+            key={`${modalProduct.product?.id || modalProduct.id}:${modalProduct.initialResolvedVariation?.id || 'parent'}`}
+            product={modalProduct.product || modalProduct}
             onAddToCart={handleAddToCart}
             onClose={closeModal}
-            initialVariations={variationMap[modalProduct.id] || []}
+            initialVariations={variationMap[modalProduct.product?.id || modalProduct.id] || []}
+            initialResolvedVariation={modalProduct.initialResolvedVariation}
+            initialSelectedAttrs={modalProduct.initialSelectedAttrs}
           />
         )}
       </ProductModal>

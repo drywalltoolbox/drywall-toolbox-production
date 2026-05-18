@@ -89,8 +89,11 @@ export default function StorefrontProductTile({
   const overlayRef = useRef(null);
   const navigate = useNavigate();
 
-  const slug = resolved.slug || product?.slug;
-  const productUrl = slug ? `/products/${slug}` : null;
+  const selectedVariantId = resolved?.parent_id && resolved?.id ? resolved.id : null;
+  const slug = product?.slug || resolved.slug;
+  const productUrl = slug
+    ? `/products/${slug}${selectedVariantId ? `?variant=${encodeURIComponent(selectedVariantId)}` : ''}`
+    : null;
 
   const closeOverlay = useCallback(() => {
     const activeEl = document.activeElement;
