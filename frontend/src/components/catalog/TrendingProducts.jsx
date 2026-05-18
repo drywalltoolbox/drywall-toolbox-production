@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { getProducts } from '../../services/catalog';
 import { getProductVariations } from '../../services/api';
 import { useCart } from '../../context/CartContext';
@@ -20,7 +20,6 @@ export default function TrendingProducts() {
   const [modalProduct, setModalProduct] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { addToCart } = useCart();
-  const sectionRef = useRef(null);
 
   const showToast = (message, type = 'cart') => {
     setToast({ message, type });
@@ -137,29 +136,28 @@ export default function TrendingProducts() {
       eyebrow="Featured"
       title="Trending Products"
       viewAllHref="/products?sort=popular"
-      className="dtb-trending-section storefront-section--trending"
     >
-      <StorefrontRail label="Trending products" className="storefront-rail--products dtb-trending-scroll" ref={sectionRef}>
+      <StorefrontRail label="Trending products" className="storefront-rail--fixed-tiles">
         {products.map((product, index) => {
           const variations = variationMap[product.id] || [];
           const firstVarImg = variations.find(
             (variation) => variation.image && variation.image !== PLACEHOLDER_IMAGE
           )?.image;
+
           const cardProduct = (product.image === PLACEHOLDER_IMAGE || !product.image) && firstVarImg
             ? { ...product, image: firstVarImg, image_thumbnail: firstVarImg }
             : product;
 
           return (
-            <div key={product.sku || product.id} className="dtb-trending-card-wrap">
-              <StorefrontProductTile
-                product={product}
-                cardProduct={cardProduct}
-                variant="rail"
-                onOpenModal={() => openModal(product)}
-                onAddToCart={() => handleAddToCart(product)}
-                index={index}
-              />
-            </div>
+            <StorefrontProductTile
+              key={product.sku || product.id}
+              product={product}
+              cardProduct={cardProduct}
+              variant="rail"
+              onOpenModal={() => openModal(product)}
+              onAddToCart={() => handleAddToCart(product)}
+              index={index}
+            />
           );
         })}
       </StorefrontRail>
