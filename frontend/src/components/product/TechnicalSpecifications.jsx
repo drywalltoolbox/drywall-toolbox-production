@@ -92,17 +92,11 @@ function renderIncludesValue(spec, onItemClick) {
               className="ts-includes-list__link"
               title={`View ${item.name}`}
             >
-              <span className="ts-includes-list__index">{String(index + 1).padStart(2, '0')}</span>
-              <span className="ts-includes-list__copy">
-                <span className="ts-includes-list__name">{item.name}</span>
-                <span className="ts-includes-list__sku">{item.sku}</span>
-              </span>
+              <span className="ts-includes-list__name">{item.name}</span>
+              <span className="ts-includes-list__sku">SKU: {item.sku}</span>
             </Link>
           ) : (
-            <span className="ts-includes-list__plain">
-              <span className="ts-includes-list__index">{String(index + 1).padStart(2, '0')}</span>
-              <span className="ts-includes-list__name">{item.name}</span>
-            </span>
+            <span className="ts-includes-list__plain">{item.name}</span>
           )}
         </li>
       ))}

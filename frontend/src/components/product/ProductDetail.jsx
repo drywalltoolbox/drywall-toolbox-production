@@ -18,6 +18,7 @@ import { setCachedVariations } from '../../utils/variationCache';
 import { apiClient } from '../../api/client.js';
 import { getBrandLogo } from '../../utils/brandAssets.js';
 import { getSchematicIdForProduct, buildSchematicsUrl } from '../../data/schematicMappings';
+import DOMPurify from 'dompurify';
 
 function buildSeedVariations(initialVariations = [], initialResolvedVariation = null) {
   const seeded = [];
@@ -38,6 +39,19 @@ function buildSeedVariations(initialVariations = [], initialResolvedVariation = 
 function money(value) {
   const parsed = typeof value === 'number' ? value : parseFloat(value || 0);
   return Number.isFinite(parsed) ? parsed.toFixed(2) : '0.00';
+}
+
+function decodeEscapedHtml(value) {
+  if (typeof value !== 'string' || !value.includes('&lt;')) return value;
+  if (typeof document === 'undefined') return value;
+
+  const textarea = document.createElement('textarea');
+  textarea.innerHTML = value;
+  return textarea.value;
+}
+
+function hasHtmlMarkup(value) {
+  return typeof value === 'string' && /<\s*\/?\s*[a-z][^>]*>/i.test(value);
 }
 
 function toFinitePrice(value) {
@@ -465,11 +479,28 @@ export default function ProductDetail({
     brandLabel === 'Columbia Taping Tools' ? 'product-detail-brand-logo--columbia' : '',
   ].filter(Boolean).join(' ');
 
-  const descriptionNode = (
-    <ReactMarkdown remarkPlugins={[remarkGfm]}>
-      {stripSpecsFromHtml(effectiveProduct.description_full || effectiveProduct.description || effectiveProduct.short_description || 'No description available.')}
-    </ReactMarkdown>
+  const rawDescription = stripSpecsFromHtml(
+    effectiveProduct.description_full || effectiveProduct.description || effectiveProduct.short_description || ''
   );
+  const decodedDescription = decodeEscapedHtml(rawDescription);
+  const descriptionContent = hasHtmlMarkup(decodedDescription)
+    ? (
+      <div
+        className="dtb-pdp-description-content"
+        dangerouslySetInnerHTML={{
+          __html: DOMPurify.sanitize(decodedDescription, { USE_PROFILES: { html: true } }),
+        }}
+      />
+      )
+    : (
+      <div className="dtb-pdp-description-content">
+        <ReactMarkdown remarkPlugins={[remarkGfm]}>
+          {decodedDescription || 'No description available.'}
+        </ReactMarkdown>
+      </div>
+      );
+
+  const descriptionNode = descriptionContent;
 
   return (
     <div className="dtb-pdp bg-white rounded-2xl shadow-2xl overflow-hidden w-full max-w-6xl mx-auto flex flex-col relative">

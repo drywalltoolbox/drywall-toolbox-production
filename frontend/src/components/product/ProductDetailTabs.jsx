@@ -37,7 +37,7 @@ export default function ProductDetailTabs({ activeTab, setActiveTab, description
           role="tabpanel"
           id={`product-tabpanel-${activeTabConfig.key}`}
           aria-labelledby={`product-tab-${activeTabConfig.key}`}
-          className={`dtb-pdp-section__content ${activeTabConfig.key === 'description' ? 'prose max-w-none text-sm text-gray-700' : ''}`}
+          className={`dtb-pdp-section__content ${activeTabConfig.key === 'description' ? 'dtb-pdp-section__content--description' : ''}`}
         >
           {contentByTab[activeTabConfig.key]}
         </div>
