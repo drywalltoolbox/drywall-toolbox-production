@@ -43,14 +43,23 @@ const SHOP_CATEGORY_LINKS = [
 
 const DRAWER_NAV_ROWS = [
   { to: '/products', label: 'All Products' },
-  { to: '/parts', label: 'Parts' },
   { to: '/products?sort=newest', label: 'New Arrivals' },
-  { to: '/schematics', label: 'Schematics' },
   { to: '/repairs', label: 'Repairs' },
   { to: '/calculators', label: 'Calculators' },
   { to: '/faq', label: 'FAQ' },
   { to: '/contact', label: 'Contact' },
 ];
+
+function MobileDrawerChevron({ expanded = false, className = '' }) {
+  return (
+    <ChevronRight
+      size={18}
+      strokeWidth={2.35}
+      className={`storefront-mobile-drawer__chevron${expanded ? ' is-expanded' : ''}${className ? ` ${className}` : ''}`}
+      aria-hidden="true"
+    />
+  );
+}
 
 export default function Header({ onCartToggle, hasTopTicker = false }) {
   const location = useLocation();
@@ -59,6 +68,8 @@ export default function Header({ onCartToggle, hasTopTicker = false }) {
   const { user, isAuthenticated, isLoading, logout } = useAuthContext();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [brandsExpanded, setBrandsExpanded] = useState(false);
+  const [partsExpanded, setPartsExpanded] = useState(false);
+  const [schematicsExpanded, setSchematicsExpanded] = useState(false);
   const [shopDropdownOpen, setShopDropdownOpen] = useState(false);
   const [accountDropdownOpen, setAccountDropdownOpen] = useState(false);
   const [accountHubOpen, setAccountHubOpen] = useState(false);
@@ -105,6 +116,12 @@ export default function Header({ onCartToggle, hasTopTicker = false }) {
     setSearchSuggestions([]);
   }, []);
 
+  const resetDrawerExpansions = useCallback(() => {
+    setBrandsExpanded(false);
+    setPartsExpanded(false);
+    setSchematicsExpanded(false);
+  }, []);
+
   const handleDropdownMouseLeave = () => {
     if (dropdownCloseTimerRef.current) clearTimeout(dropdownCloseTimerRef.current);
     dropdownCloseTimerRef.current = setTimeout(() => setShopDropdownOpen(false), 50);
@@ -124,21 +141,21 @@ export default function Header({ onCartToggle, hasTopTicker = false }) {
 
   useEffect(() => {
     if (mobileMenuOpen) return;
-    setBrandsExpanded(false);
-  }, [mobileMenuOpen]);
+    resetDrawerExpansions();
+  }, [mobileMenuOpen, resetDrawerExpansions]);
 
   useEffect(() => {
     if (prevPathnameRef.current === location.pathname) return;
     prevPathnameRef.current = location.pathname;
-    const t = setTimeout(() => { closeMenus(); closeSearchOverlay(); }, 0);
+    const t = setTimeout(() => { closeMenus(); closeSearchOverlay(); resetDrawerExpansions(); }, 0);
     return () => clearTimeout(t);
-  }, [location.pathname, closeSearchOverlay]);
+  }, [location.pathname, closeSearchOverlay, resetDrawerExpansions]);
 
   useEffect(() => {
-    const handleKeyDown = (e) => { if (e.key === 'Escape') { closeMenus(); closeSearchOverlay(); } };
+    const handleKeyDown = (e) => { if (e.key === 'Escape') { closeMenus(); closeSearchOverlay(); resetDrawerExpansions(); } };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [closeSearchOverlay]);
+  }, [closeSearchOverlay, resetDrawerExpansions]);
 
   useEffect(() => {
     const mq = window.matchMedia('(min-width: 641px) and (max-width: 1024px)');
@@ -263,15 +280,39 @@ export default function Header({ onCartToggle, hasTopTicker = false }) {
   };
 
   const handleDrawerBrandNavigate = (slug) => {
-    setBrandsExpanded(false);
+    resetDrawerExpansions();
     setMobileMenuOpen(false);
     navigate(`/products/brands/${slug}`);
   };
 
+  const handleDrawerPartsBrandNavigate = (slug) => {
+    resetDrawerExpansions();
+    setMobileMenuOpen(false);
+    navigate(`/parts?brand=${encodeURIComponent(slug)}`);
+  };
+
+  const handleDrawerSchematicsBrandNavigate = (slug) => {
+    resetDrawerExpansions();
+    setMobileMenuOpen(false);
+    navigate(`/schematics?brand=${encodeURIComponent(slug)}`);
+  };
+
   const handleDrawerBrandsLanding = () => {
-    setBrandsExpanded(false);
+    resetDrawerExpansions();
     setMobileMenuOpen(false);
     navigate('/products/brands');
+  };
+
+  const handleDrawerPartsLanding = () => {
+    resetDrawerExpansions();
+    setMobileMenuOpen(false);
+    navigate('/parts');
+  };
+
+  const handleDrawerSchematicsLanding = () => {
+    resetDrawerExpansions();
+    setMobileMenuOpen(false);
+    navigate('/schematics');
   };
 
   const handleMobileViewAll = useCallback(() => {
@@ -279,6 +320,41 @@ export default function Header({ onCartToggle, hasTopTicker = false }) {
     navigate(`/products${q ? `?search=${encodeURIComponent(q)}` : ''}`);
     closeSearchOverlay();
   }, [mobileSearchQuery, navigate, closeSearchOverlay]);
+
+  const renderDrawerBrandSection = ({ id, label, expanded, onToggle, onLanding, onBrandNavigate }) => (
+    <div className="storefront-mobile-drawer__row-wrap" key={id}>
+      <div className="storefront-mobile-drawer__row">
+        <button type="button" className="storefront-mobile-drawer__row-label" onClick={onLanding}>
+          {label}
+        </button>
+        <button
+          type="button"
+          className="storefront-mobile-drawer__row-toggle"
+          onClick={onToggle}
+          aria-label={`${expanded ? 'Collapse' : 'Expand'} ${label.toLowerCase()}`}
+          aria-expanded={expanded}
+          aria-controls={`storefront-mobile-drawer-${id}`}
+        >
+          <MobileDrawerChevron expanded={expanded} />
+        </button>
+      </div>
+      <div
+        id={`storefront-mobile-drawer-${id}`}
+        className={`storefront-mobile-drawer__brands${expanded ? ' is-expanded' : ''}`}
+      >
+        {drawerBrands.map((brand) => (
+          <button
+            key={`${id}-${brand.slug}`}
+            type="button"
+            className="storefront-mobile-drawer__brand-link"
+            onClick={() => onBrandNavigate(brand.slug)}
+          >
+            {brand.name}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
 
   return (
     <>
@@ -393,38 +469,30 @@ export default function Header({ onCartToggle, hasTopTicker = false }) {
 
       <StorefrontMobileDrawer isOpen={mobileMenuOpen} onClose={closeMobileMenu}>
         <nav className="storefront-mobile-drawer__nav" aria-label="Mobile navigation">
-          <div className="storefront-mobile-drawer__row-wrap">
-            <div className="storefront-mobile-drawer__row">
-              <button type="button" className="storefront-mobile-drawer__row-label" onClick={handleDrawerBrandsLanding}>
-                Brands
-              </button>
-              <button
-                type="button"
-                className={`storefront-mobile-drawer__row-toggle${brandsExpanded ? ' is-expanded' : ''}`}
-                onClick={() => setBrandsExpanded((open) => !open)}
-                aria-label={`${brandsExpanded ? 'Collapse' : 'Expand'} brands`}
-                aria-expanded={brandsExpanded}
-                aria-controls="storefront-mobile-drawer-brands"
-              >
-                <ChevronDown size={18} />
-              </button>
-            </div>
-            <div
-              id="storefront-mobile-drawer-brands"
-              className={`storefront-mobile-drawer__brands${brandsExpanded ? ' is-expanded' : ''}`}
-            >
-              {drawerBrands.map((brand) => (
-                <button
-                  key={brand.slug}
-                  type="button"
-                  className="storefront-mobile-drawer__brand-link"
-                  onClick={() => handleDrawerBrandNavigate(brand.slug)}
-                >
-                  {brand.name}
-                </button>
-              ))}
-            </div>
-          </div>
+          {renderDrawerBrandSection({
+            id: 'brands',
+            label: 'Brands',
+            expanded: brandsExpanded,
+            onToggle: () => setBrandsExpanded((open) => !open),
+            onLanding: handleDrawerBrandsLanding,
+            onBrandNavigate: handleDrawerBrandNavigate,
+          })}
+          {renderDrawerBrandSection({
+            id: 'parts',
+            label: 'Parts',
+            expanded: partsExpanded,
+            onToggle: () => setPartsExpanded((open) => !open),
+            onLanding: handleDrawerPartsLanding,
+            onBrandNavigate: handleDrawerPartsBrandNavigate,
+          })}
+          {renderDrawerBrandSection({
+            id: 'schematics',
+            label: 'Schematics',
+            expanded: schematicsExpanded,
+            onToggle: () => setSchematicsExpanded((open) => !open),
+            onLanding: handleDrawerSchematicsLanding,
+            onBrandNavigate: handleDrawerSchematicsBrandNavigate,
+          })}
           {DRAWER_NAV_ROWS.map(({ to, label }) => (
             <Link
               key={to}
@@ -433,7 +501,7 @@ export default function Header({ onCartToggle, hasTopTicker = false }) {
               onClick={closeMobileMenu}
             >
               <span>{label}</span>
-              <ChevronRight size={16} aria-hidden="true" />
+              <MobileDrawerChevron />
             </Link>
           ))}
         </nav>
