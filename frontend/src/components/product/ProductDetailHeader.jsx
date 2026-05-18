@@ -1,3 +1,11 @@
+import { Link } from 'react-router-dom';
+
+function getProductUrl(product) {
+  const slug = product?.slug || product?.post_name || '';
+  if (slug) return `/products/${slug}`;
+  const id = product?.id || product?.part_number || product?.sku || '';
+  return id ? `/product/${encodeURIComponent(id)}` : '';
+}
 
 export default function ProductDetailHeader({
   product,
@@ -11,13 +19,24 @@ export default function ProductDetailHeader({
   onReviewsClick,
   money,
   reviewsClassName = '',
+  onProductTitleClick,
 }) {
   const reviewLabel = 'View reviews, 0 out of 5 stars, no reviews yet';
+  const productUrl = getProductUrl(product);
+  const title = effectiveName || product.sku || product.part_number;
 
   return (
     <header className="dtb-pdp-header">
       <h2 className="dtb-pdp-header__title">
-        {effectiveName || product.sku || product.part_number}
+        {productUrl ? (
+          <Link
+            to={productUrl}
+            className="dtb-pdp-header__title-link"
+            onClick={onProductTitleClick}
+          >
+            {title}
+          </Link>
+        ) : title}
       </h2>
 
       <div className="dtb-pdp-header__meta">
