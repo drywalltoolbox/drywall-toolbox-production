@@ -1,0 +1,3502 @@
+{
+  "brand": "Columbia",
+  "source_pdf": "products\\scraped_results\\brands\\Columbia\\customercatalogue2024-3.pdf-3.pdf",
+  "generated_at_utc": "2026-05-18T12:13:45+00:00",
+  "record_count": 144,
+  "price_policy": "No prices are populated because the supplied official catalog PDF is not a price list.",
+  "records": [
+    {
+      "brand": "Columbia",
+      "official_sku": "PC1H",
+      "normalized_sku": "PC1H",
+      "product_name": "Predator One Handle 4'",
+      "alternate_names": [],
+      "catalog_item_type": "tool",
+      "launch_candidate": true,
+      "source_pdf": "products\\scraped_results\\brands\\Columbia\\customercatalogue2024-3.pdf-3.pdf",
+      "price": null,
+      "price_source": null,
+      "notes": [],
+      "source_refs": [
+        {
+          "pdf_page": 3,
+          "catalog_page": 2,
+          "section": "Columbia Predator",
+          "source_item_no": "PC1H",
+          "source_line": "PC1HEXT Predator Extendable 3'-5'",
+          "extraction_method": "pdf_text",
+          "source_validation": "sku_found_in_pdf_text"
+        }
+      ]
+    },
+    {
+      "brand": "Columbia",
+      "official_sku": "PC1HEXT",
+      "normalized_sku": "PC1HEXT",
+      "product_name": "Predator Extendable 3'-5'",
+      "alternate_names": [],
+      "catalog_item_type": "tool",
+      "launch_candidate": true,
+      "source_pdf": "products\\scraped_results\\brands\\Columbia\\customercatalogue2024-3.pdf-3.pdf",
+      "price": null,
+      "price_source": null,
+      "notes": [],
+      "source_refs": [
+        {
+          "pdf_page": 3,
+          "catalog_page": 2,
+          "section": "Columbia Predator",
+          "source_item_no": "PC1HEXT",
+          "source_line": "PC1HEXT Predator Extendable 3'-5'",
+          "extraction_method": "pdf_text",
+          "source_validation": "sku_found_in_pdf_text"
+        }
+      ]
+    },
+    {
+      "brand": "Columbia",
+      "official_sku": "PCHXL",
+      "normalized_sku": "PCHXL",
+      "product_name": "Predator Long Extendable 4'-8'",
+      "alternate_names": [],
+      "catalog_item_type": "tool",
+      "launch_candidate": true,
+      "source_pdf": "products\\scraped_results\\brands\\Columbia\\customercatalogue2024-3.pdf-3.pdf",
+      "price": null,
+      "price_source": null,
+      "notes": [],
+      "source_refs": [
+        {
+          "pdf_page": 3,
+          "catalog_page": 2,
+          "section": "Columbia Predator",
+          "source_item_no": "PCHXL",
+          "source_line": "PCHXL Predator Long Extendable 4'-8' PMHL",
+          "extraction_method": "pdf_text",
+          "source_validation": "sku_found_in_pdf_text"
+        }
+      ]
+    },
+    {
+      "brand": "Columbia",
+      "official_sku": "PCLT42",
+      "normalized_sku": "PCLT42",
+      "product_name": "Predator Camlock Tube 42\"",
+      "alternate_names": [],
+      "catalog_item_type": "tool",
+      "launch_candidate": true,
+      "source_pdf": "products\\scraped_results\\brands\\Columbia\\customercatalogue2024-3.pdf-3.pdf",
+      "price": null,
+      "price_source": null,
+      "notes": [],
+      "source_refs": [
+        {
+          "pdf_page": 3,
+          "catalog_page": 2,
+          "section": "Columbia Predator",
+          "source_item_no": "PCLT42",
+          "source_line": "PCLT42 Predator Camlock Tube 42\"",
+          "extraction_method": "pdf_text",
+          "source_validation": "sku_found_in_pdf_text"
+        }
+      ]
+    },
+    {
+      "brand": "Columbia",
+      "official_sku": "PCMT42",
+      "normalized_sku": "PCMT42",
+      "product_name": "Predator Compound Tube 42\"",
+      "alternate_names": [],
+      "catalog_item_type": "tool",
+      "launch_candidate": true,
+      "source_pdf": "products\\scraped_results\\brands\\Columbia\\customercatalogue2024-3.pdf-3.pdf",
+      "price": null,
+      "price_source": null,
+      "notes": [],
+      "source_refs": [
+        {
+          "pdf_page": 3,
+          "catalog_page": 2,
+          "section": "Columbia Predator",
+          "source_item_no": "PCMT42",
+          "source_line": "PCMT42 Predator Compound Tube 42\"",
+          "extraction_method": "pdf_text",
+          "source_validation": "sku_found_in_pdf_text"
+        }
+      ]
+    },
+    {
+      "brand": "Columbia",
+      "official_sku": "PHMP",
+      "normalized_sku": "PHMP",
+      "product_name": "Predator Mud Pump",
+      "alternate_names": [],
+      "catalog_item_type": "tool",
+      "launch_candidate": true,
+      "source_pdf": "products\\scraped_results\\brands\\Columbia\\customercatalogue2024-3.pdf-3.pdf",
+      "price": null,
+      "price_source": null,
+      "notes": [],
+      "source_refs": [
+        {
+          "pdf_page": 3,
+          "catalog_page": 2,
+          "section": "Columbia Predator",
+          "source_item_no": "PHMP",
+          "source_line": "PHMP Predator Mud Pump",
+          "extraction_method": "pdf_text",
+          "source_validation": "sku_found_in_pdf_text"
+        }
+      ]
+    },
+    {
+      "brand": "Columbia",
+      "official_sku": "PMH",
+      "normalized_sku": "PMH",
+      "product_name": "Predator Matrix Handle 40\"-60\"",
+      "alternate_names": [],
+      "catalog_item_type": "tool",
+      "launch_candidate": true,
+      "source_pdf": "products\\scraped_results\\brands\\Columbia\\customercatalogue2024-3.pdf-3.pdf",
+      "price": null,
+      "price_source": null,
+      "notes": [],
+      "source_refs": [
+        {
+          "pdf_page": 3,
+          "catalog_page": 2,
+          "section": "Columbia Predator",
+          "source_item_no": "PMH",
+          "source_line": "PCLT42 PMHS",
+          "extraction_method": "pdf_text",
+          "source_validation": "sku_found_in_pdf_text"
+        }
+      ]
+    },
+    {
+      "brand": "Columbia",
+      "official_sku": "PMHL",
+      "normalized_sku": "PMHL",
+      "product_name": "Predator Matrix Handle Long 56\"-76\"",
+      "alternate_names": [],
+      "catalog_item_type": "tool",
+      "launch_candidate": true,
+      "source_pdf": "products\\scraped_results\\brands\\Columbia\\customercatalogue2024-3.pdf-3.pdf",
+      "price": null,
+      "price_source": null,
+      "notes": [],
+      "source_refs": [
+        {
+          "pdf_page": 3,
+          "catalog_page": 2,
+          "section": "Columbia Predator",
+          "source_item_no": "PMHL",
+          "source_line": "PCHXL Predator Long Extendable 4'-8' PMHL",
+          "extraction_method": "pdf_text",
+          "source_validation": "sku_found_in_pdf_text"
+        }
+      ]
+    },
+    {
+      "brand": "Columbia",
+      "official_sku": "PMHS",
+      "normalized_sku": "PMHS",
+      "product_name": "Predator Matrix Handle Short 29\"-39\"",
+      "alternate_names": [],
+      "catalog_item_type": "tool",
+      "launch_candidate": true,
+      "source_pdf": "products\\scraped_results\\brands\\Columbia\\customercatalogue2024-3.pdf-3.pdf",
+      "price": null,
+      "price_source": null,
+      "notes": [],
+      "source_refs": [
+        {
+          "pdf_page": 3,
+          "catalog_page": 2,
+          "section": "Columbia Predator",
+          "source_item_no": "PMHS",
+          "source_line": "PCLT42 PMHS",
+          "extraction_method": "pdf_text",
+          "source_validation": "sku_found_in_pdf_text"
+        }
+      ]
+    },
+    {
+      "brand": "Columbia",
+      "official_sku": "PTS",
+      "normalized_sku": "PTS",
+      "product_name": "Predator Tactical Set",
+      "alternate_names": [],
+      "catalog_item_type": "tool_set",
+      "launch_candidate": true,
+      "source_pdf": "products\\scraped_results\\brands\\Columbia\\customercatalogue2024-3.pdf-3.pdf",
+      "price": null,
+      "price_source": null,
+      "notes": [],
+      "source_refs": [
+        {
+          "pdf_page": 4,
+          "catalog_page": 3,
+          "section": "Columbia Family of Sets",
+          "source_item_no": "PTS",
+          "source_line": "need to completely finish a job. PTS Predator Tactical Set",
+          "extraction_method": "pdf_text",
+          "source_validation": "sku_found_in_pdf_text"
+        }
+      ]
+    },
+    {
+      "brand": "Columbia",
+      "official_sku": "SACS",
+      "normalized_sku": "SACS",
+      "product_name": "Commando Set",
+      "alternate_names": [],
+      "catalog_item_type": "tool_set",
+      "launch_candidate": true,
+      "source_pdf": "products\\scraped_results\\brands\\Columbia\\customercatalogue2024-3.pdf-3.pdf",
+      "price": null,
+      "price_source": null,
+      "notes": [],
+      "source_refs": [
+        {
+          "pdf_page": 4,
+          "catalog_page": 3,
+          "section": "Columbia Family of Sets",
+          "source_item_no": "SACS",
+          "source_line": "SACS Commando Set",
+          "extraction_method": "pdf_text",
+          "source_validation": "sku_found_in_pdf_text"
+        }
+      ]
+    },
+    {
+      "brand": "Columbia",
+      "official_sku": "TS",
+      "normalized_sku": "TS",
+      "product_name": "Tactical Set",
+      "alternate_names": [],
+      "catalog_item_type": "tool_set",
+      "launch_candidate": true,
+      "source_pdf": "products\\scraped_results\\brands\\Columbia\\customercatalogue2024-3.pdf-3.pdf",
+      "price": null,
+      "price_source": null,
+      "notes": [],
+      "source_refs": [
+        {
+          "pdf_page": 4,
+          "catalog_page": 3,
+          "section": "Columbia Family of Sets",
+          "source_item_no": "TS",
+          "source_line": "COLUMBIA FAMILY OF SETS",
+          "extraction_method": "pdf_text",
+          "source_validation": "sku_found_in_pdf_text"
+        }
+      ]
+    },
+    {
+      "brand": "Columbia",
+      "official_sku": "TWS",
+      "normalized_sku": "TWS",
+      "product_name": "Warrior Set",
+      "alternate_names": [],
+      "catalog_item_type": "tool_set",
+      "launch_candidate": true,
+      "source_pdf": "products\\scraped_results\\brands\\Columbia\\customercatalogue2024-3.pdf-3.pdf",
+      "price": null,
+      "price_source": null,
+      "notes": [],
+      "source_refs": [
+        {
+          "pdf_page": 4,
+          "catalog_page": 3,
+          "section": "Columbia Family of Sets",
+          "source_item_no": "TWS",
+          "source_line": "Each set comes complete with a Columbia case to protect TWS Warrior Set",
+          "extraction_method": "pdf_text",
+          "source_validation": "sku_found_in_pdf_text"
+        }
+      ]
+    },
+    {
+      "brand": "Columbia",
+      "official_sku": "PTAPER",
+      "normalized_sku": "PTAPER",
+      "product_name": "Columbia Predator (Carbon Fiber) (53 inch length)",
+      "alternate_names": [],
+      "catalog_item_type": "tool",
+      "launch_candidate": true,
+      "source_pdf": "products\\scraped_results\\brands\\Columbia\\customercatalogue2024-3.pdf-3.pdf",
+      "price": null,
+      "price_source": null,
+      "notes": [],
+      "source_refs": [
+        {
+          "pdf_page": 6,
+          "catalog_page": 5,
+          "section": "Automatic Taper",
+          "source_item_no": "PTAPER",
+          "source_line": "PTAPER Columbia Predator",
+          "extraction_method": "pdf_text",
+          "source_validation": "sku_found_in_pdf_text"
+        }
+      ]
+    },
+    {
+      "brand": "Columbia",
+      "official_sku": "SPTAPER",
+      "normalized_sku": "SPTAPER",
+      "product_name": "Columbia Predator Sawed Off (Carbon Fiber) (39 inch length)",
+      "alternate_names": [],
+      "catalog_item_type": "tool",
+      "launch_candidate": true,
+      "source_pdf": "products\\scraped_results\\brands\\Columbia\\customercatalogue2024-3.pdf-3.pdf",
+      "price": null,
+      "price_source": null,
+      "notes": [],
+      "source_refs": [
+        {
+          "pdf_page": 6,
+          "catalog_page": 5,
+          "section": "Automatic Taper",
+          "source_item_no": "SPTAPER",
+          "source_line": "SPTAPER Columbia Predator Sawed Off",
+          "extraction_method": "pdf_text",
+          "source_validation": "sku_found_in_pdf_text"
+        }
+      ]
+    },
+    {
+      "brand": "Columbia",
+      "official_sku": "STAPER",
+      "normalized_sku": "STAPER",
+      "product_name": "Columbia Sawed Off Taper (39 inch length)",
+      "alternate_names": [],
+      "catalog_item_type": "tool",
+      "launch_candidate": true,
+      "source_pdf": "products\\scraped_results\\brands\\Columbia\\customercatalogue2024-3.pdf-3.pdf",
+      "price": null,
+      "price_source": null,
+      "notes": [],
+      "source_refs": [
+        {
+          "pdf_page": 6,
+          "catalog_page": 5,
+          "section": "Automatic Taper",
+          "source_item_no": "STAPER",
+          "source_line": "STAPER Columbia Sawed Off Taper",
+          "extraction_method": "pdf_text",
+          "source_validation": "sku_found_in_pdf_text"
+        }
+      ]
+    },
+    {
+      "brand": "Columbia",
+      "official_sku": "TAPER",
+      "normalized_sku": "TAPER",
+      "product_name": "Columbia Automatic Taper (53 inch length)",
+      "alternate_names": [],
+      "catalog_item_type": "tool",
+      "launch_candidate": true,
+      "source_pdf": "products\\scraped_results\\brands\\Columbia\\customercatalogue2024-3.pdf-3.pdf",
+      "price": null,
+      "price_source": null,
+      "notes": [],
+      "source_refs": [
+        {
+          "pdf_page": 6,
+          "catalog_page": 5,
+          "section": "Automatic Taper",
+          "source_item_no": "TAPER",
+          "source_line": "AUTOMATIC TAPER",
+          "extraction_method": "pdf_text",
+          "source_validation": "sku_found_in_pdf_text"
+        }
+      ]
+    },
+    {
+      "brand": "Columbia",
+      "official_sku": "CC",
+      "normalized_sku": "CC",
+      "product_name": "Corner Cobra",
+      "alternate_names": [],
+      "catalog_item_type": "tool",
+      "launch_candidate": true,
+      "source_pdf": "products\\scraped_results\\brands\\Columbia\\customercatalogue2024-3.pdf-3.pdf",
+      "price": null,
+      "price_source": null,
+      "notes": [],
+      "source_refs": [
+        {
+          "pdf_page": 8,
+          "catalog_page": 7,
+          "section": "Corner Rollers",
+          "source_item_no": "CC",
+          "source_line": "CC Corner Cobra",
+          "extraction_method": "pdf_text",
+          "source_validation": "sku_found_in_pdf_text"
+        }
+      ]
+    },
+    {
+      "brand": "Columbia",
+      "official_sku": "CR",
+      "normalized_sku": "CR",
+      "product_name": "Corner Roller",
+      "alternate_names": [],
+      "catalog_item_type": "tool",
+      "launch_candidate": true,
+      "source_pdf": "products\\scraped_results\\brands\\Columbia\\customercatalogue2024-3.pdf-3.pdf",
+      "price": null,
+      "price_source": null,
+      "notes": [],
+      "source_refs": [
+        {
+          "pdf_page": 8,
+          "catalog_page": 7,
+          "section": "Corner Rollers",
+          "source_item_no": "CR",
+          "source_line": "Item No. Description",
+          "extraction_method": "pdf_text",
+          "source_validation": "sku_found_in_pdf_text"
+        }
+      ]
+    },
+    {
+      "brand": "Columbia",
+      "official_sku": "CBNCR",
+      "normalized_sku": "CBNCR",
+      "product_name": "Bullnose Outside Corner Roller",
+      "alternate_names": [],
+      "catalog_item_type": "tool",
+      "launch_candidate": true,
+      "source_pdf": "products\\scraped_results\\brands\\Columbia\\customercatalogue2024-3.pdf-3.pdf",
+      "price": null,
+      "price_source": null,
+      "notes": [],
+      "source_refs": [
+        {
+          "pdf_page": 9,
+          "catalog_page": 8,
+          "section": "Outside Corner Rollers",
+          "source_item_no": "CBNCR",
+          "source_line": "CBNCR Bullnose Outside Corner Roller",
+          "extraction_method": "pdf_text",
+          "source_validation": "sku_found_in_pdf_text"
+        }
+      ]
+    },
+    {
+      "brand": "Columbia",
+      "official_sku": "COBCR",
+      "normalized_sku": "COBCR",
+      "product_name": "Standard Outside Corner Roller",
+      "alternate_names": [],
+      "catalog_item_type": "tool",
+      "launch_candidate": true,
+      "source_pdf": "products\\scraped_results\\brands\\Columbia\\customercatalogue2024-3.pdf-3.pdf",
+      "price": null,
+      "price_source": null,
+      "notes": [],
+      "source_refs": [
+        {
+          "pdf_page": 9,
+          "catalog_page": 8,
+          "section": "Outside Corner Rollers",
+          "source_item_no": "COBCR",
+          "source_line": "COBCR Standard Outside Corner Roller",
+          "extraction_method": "pdf_text",
+          "source_validation": "sku_found_in_pdf_text"
+        }
+      ]
+    },
+    {
+      "brand": "Columbia",
+      "official_sku": "COBCRE",
+      "normalized_sku": "COBCRE",
+      "product_name": "European Outside Corner Roller",
+      "alternate_names": [],
+      "catalog_item_type": "tool",
+      "launch_candidate": true,
+      "source_pdf": "products\\scraped_results\\brands\\Columbia\\customercatalogue2024-3.pdf-3.pdf",
+      "price": null,
+      "price_source": null,
+      "notes": [],
+      "source_refs": [
+        {
+          "pdf_page": 9,
+          "catalog_page": 8,
+          "section": "Outside Corner Rollers",
+          "source_item_no": "COBCRE",
+          "source_line": "COBCRE European Outside Corner Roller",
+          "extraction_method": "pdf_text",
+          "source_validation": "sku_found_in_pdf_text"
+        }
+      ]
+    },
+    {
+      "brand": "Columbia",
+      "official_sku": "COBCRW",
+      "normalized_sku": "COBCRW",
+      "product_name": "Wide Outside Corner Roller",
+      "alternate_names": [],
+      "catalog_item_type": "tool",
+      "launch_candidate": true,
+      "source_pdf": "products\\scraped_results\\brands\\Columbia\\customercatalogue2024-3.pdf-3.pdf",
+      "price": null,
+      "price_source": null,
+      "notes": [],
+      "source_refs": [
+        {
+          "pdf_page": 9,
+          "catalog_page": 8,
+          "section": "Outside Corner Rollers",
+          "source_item_no": "COBCRW",
+          "source_line": "COBCRW Wide Outside Corner Roller",
+          "extraction_method": "pdf_text",
+          "source_validation": "sku_found_in_pdf_text"
+        }
+      ]
+    },
+    {
+      "brand": "Columbia",
+      "official_sku": "2.5AH",
+      "normalized_sku": "2.5AH",
+      "product_name": "2.5\" Angle Head",
+      "alternate_names": [],
+      "catalog_item_type": "tool",
+      "launch_candidate": true,
+      "source_pdf": "products\\scraped_results\\brands\\Columbia\\customercatalogue2024-3.pdf-3.pdf",
+      "price": null,
+      "price_source": null,
+      "notes": [],
+      "source_refs": [
+        {
+          "pdf_page": 10,
+          "catalog_page": 9,
+          "section": "Angle Heads",
+          "source_item_no": "2.5AH",
+          "source_line": "2.5AH 2.5” Angle Head",
+          "extraction_method": "pdf_text",
+          "source_validation": "sku_found_in_pdf_text"
+        }
+      ]
+    },
+    {
+      "brand": "Columbia",
+      "official_sku": "2AH",
+      "normalized_sku": "2AH",
+      "product_name": "2\" Angle Head",
+      "alternate_names": [],
+      "catalog_item_type": "tool",
+      "launch_candidate": true,
+      "source_pdf": "products\\scraped_results\\brands\\Columbia\\customercatalogue2024-3.pdf-3.pdf",
+      "price": null,
+      "price_source": null,
+      "notes": [],
+      "source_refs": [
+        {
+          "pdf_page": 10,
+          "catalog_page": 9,
+          "section": "Angle Heads",
+          "source_item_no": "2AH",
+          "source_line": "2AH 2” Angle Head",
+          "extraction_method": "pdf_text",
+          "source_validation": "sku_found_in_pdf_text"
+        }
+      ]
+    },
+    {
+      "brand": "Columbia",
+      "official_sku": "3.5AH",
+      "normalized_sku": "3.5AH",
+      "product_name": "3.5\" Angle Head",
+      "alternate_names": [],
+      "catalog_item_type": "tool",
+      "launch_candidate": true,
+      "source_pdf": "products\\scraped_results\\brands\\Columbia\\customercatalogue2024-3.pdf-3.pdf",
+      "price": null,
+      "price_source": null,
+      "notes": [],
+      "source_refs": [
+        {
+          "pdf_page": 10,
+          "catalog_page": 9,
+          "section": "Angle Heads",
+          "source_item_no": "3.5AH",
+          "source_line": "3.5AH 3.5” Angle Head",
+          "extraction_method": "pdf_text",
+          "source_validation": "sku_found_in_pdf_text"
+        }
+      ]
+    },
+    {
+      "brand": "Columbia",
+      "official_sku": "3AH",
+      "normalized_sku": "3AH",
+      "product_name": "3\" Angle Head",
+      "alternate_names": [],
+      "catalog_item_type": "tool",
+      "launch_candidate": true,
+      "source_pdf": "products\\scraped_results\\brands\\Columbia\\customercatalogue2024-3.pdf-3.pdf",
+      "price": null,
+      "price_source": null,
+      "notes": [],
+      "source_refs": [
+        {
+          "pdf_page": 10,
+          "catalog_page": 9,
+          "section": "Angle Heads",
+          "source_item_no": "3AH",
+          "source_line": "3AH 3” Angle Head",
+          "extraction_method": "pdf_text",
+          "source_validation": "sku_found_in_pdf_text"
+        }
+      ]
+    },
+    {
+      "brand": "Columbia",
+      "official_sku": "AHA",
+      "normalized_sku": "AHA",
+      "product_name": "Angle Head Adapter",
+      "alternate_names": [
+        "Anglehead Adapter"
+      ],
+      "catalog_item_type": "tool",
+      "launch_candidate": true,
+      "source_pdf": "products\\scraped_results\\brands\\Columbia\\customercatalogue2024-3.pdf-3.pdf",
+      "price": null,
+      "price_source": null,
+      "notes": [],
+      "source_refs": [
+        {
+          "pdf_page": 10,
+          "catalog_page": 9,
+          "section": "Angle Heads",
+          "source_item_no": "AHA",
+          "source_line": "AHA Angle Head Adapter",
+          "extraction_method": "pdf_text",
+          "source_validation": "sku_found_in_pdf_text"
+        },
+        {
+          "pdf_page": 17,
+          "catalog_page": 16,
+          "section": "Columbia One",
+          "source_item_no": "AHA",
+          "source_line": "AHA Anglehead Adapter",
+          "extraction_method": "pdf_text",
+          "source_validation": "sku_found_in_pdf_text"
+        }
+      ]
+    },
+    {
+      "brand": "Columbia",
+      "official_sku": "7CFB",
+      "normalized_sku": "7CFB",
+      "product_name": "7\" Corner Flusher Box",
+      "alternate_names": [],
+      "catalog_item_type": "tool",
+      "launch_candidate": true,
+      "source_pdf": "products\\scraped_results\\brands\\Columbia\\customercatalogue2024-3.pdf-3.pdf",
+      "price": null,
+      "price_source": null,
+      "notes": [],
+      "source_refs": [
+        {
+          "pdf_page": 11,
+          "catalog_page": 10,
+          "section": "Throttle Boxes",
+          "source_item_no": "7CFB",
+          "source_line": "quick clean. 7CFB 7” Corner Flusher Box",
+          "extraction_method": "pdf_text",
+          "source_validation": "sku_found_in_pdf_text"
+        }
+      ]
+    },
+    {
+      "brand": "Columbia",
+      "official_sku": "8CFB",
+      "normalized_sku": "8CFB",
+      "product_name": "8\" Corner Flusher Box",
+      "alternate_names": [],
+      "catalog_item_type": "tool",
+      "launch_candidate": true,
+      "source_pdf": "products\\scraped_results\\brands\\Columbia\\customercatalogue2024-3.pdf-3.pdf",
+      "price": null,
+      "price_source": null,
+      "notes": [],
+      "source_refs": [
+        {
+          "pdf_page": 11,
+          "catalog_page": 10,
+          "section": "Throttle Boxes",
+          "source_item_no": "8CFB",
+          "source_line": "8CFB 8” Corner Flusher Box",
+          "extraction_method": "pdf_text",
+          "source_validation": "sku_found_in_pdf_text"
+        }
+      ]
+    },
+    {
+      "brand": "Columbia",
+      "official_sku": "10FBB",
+      "normalized_sku": "10FBB",
+      "product_name": "10\" Fat Boy Flat Box",
+      "alternate_names": [],
+      "catalog_item_type": "tool",
+      "launch_candidate": true,
+      "source_pdf": "products\\scraped_results\\brands\\Columbia\\customercatalogue2024-3.pdf-3.pdf",
+      "price": null,
+      "price_source": null,
+      "notes": [],
+      "source_refs": [
+        {
+          "pdf_page": 12,
+          "catalog_page": 11,
+          "section": "Flat Finisher Box",
+          "source_item_no": "10FBB",
+          "source_line": "10FBB 10“ Fat Boy Flat Box",
+          "extraction_method": "pdf_text",
+          "source_validation": "sku_found_in_pdf_text"
+        }
+      ]
+    },
+    {
+      "brand": "Columbia",
+      "official_sku": "10FFB",
+      "normalized_sku": "10FFB",
+      "product_name": "10\" Flat Finisher Box",
+      "alternate_names": [],
+      "catalog_item_type": "tool",
+      "launch_candidate": true,
+      "source_pdf": "products\\scraped_results\\brands\\Columbia\\customercatalogue2024-3.pdf-3.pdf",
+      "price": null,
+      "price_source": null,
+      "notes": [],
+      "source_refs": [
+        {
+          "pdf_page": 12,
+          "catalog_page": 11,
+          "section": "Flat Finisher Box",
+          "source_item_no": "10FFB",
+          "source_line": "10FFB 10” Flat Finisher Box",
+          "extraction_method": "pdf_text",
+          "source_validation": "sku_found_in_pdf_text"
+        }
+      ]
+    },
+    {
+      "brand": "Columbia",
+      "official_sku": "12FBB",
+      "normalized_sku": "12FBB",
+      "product_name": "12\" Fat Boy Flat Box",
+      "alternate_names": [],
+      "catalog_item_type": "tool",
+      "launch_candidate": true,
+      "source_pdf": "products\\scraped_results\\brands\\Columbia\\customercatalogue2024-3.pdf-3.pdf",
+      "price": null,
+      "price_source": null,
+      "notes": [],
+      "source_refs": [
+        {
+          "pdf_page": 12,
+          "catalog_page": 11,
+          "section": "Flat Finisher Box",
+          "source_item_no": "12FBB",
+          "source_line": "12FBB 12” Fat Boy Flat Box",
+          "extraction_method": "pdf_text",
+          "source_validation": "sku_found_in_pdf_text"
+        }
+      ]
+    },
+    {
+      "brand": "Columbia",
+      "official_sku": "12FFB",
+      "normalized_sku": "12FFB",
+      "product_name": "12\" Flat Finisher Box",
+      "alternate_names": [],
+      "catalog_item_type": "tool",
+      "launch_candidate": true,
+      "source_pdf": "products\\scraped_results\\brands\\Columbia\\customercatalogue2024-3.pdf-3.pdf",
+      "price": null,
+      "price_source": null,
+      "notes": [],
+      "source_refs": [
+        {
+          "pdf_page": 12,
+          "catalog_page": 11,
+          "section": "Flat Finisher Box",
+          "source_item_no": "12FFB",
+          "source_line": "12FFB 12“ Flat Finisher Box",
+          "extraction_method": "pdf_text",
+          "source_validation": "sku_found_in_pdf_text"
+        }
+      ]
+    },
+    {
+      "brand": "Columbia",
+      "official_sku": "14 FFB",
+      "normalized_sku": "14FFB",
+      "product_name": "14\" Flat Finisher Box",
+      "alternate_names": [],
+      "catalog_item_type": "tool",
+      "launch_candidate": true,
+      "source_pdf": "products\\scraped_results\\brands\\Columbia\\customercatalogue2024-3.pdf-3.pdf",
+      "price": null,
+      "price_source": null,
+      "notes": [],
+      "source_refs": [
+        {
+          "pdf_page": 12,
+          "catalog_page": 11,
+          "section": "Flat Finisher Box",
+          "source_item_no": "14 FFB",
+          "source_line": "14 FFB 14” Flat Finisher Box",
+          "extraction_method": "pdf_text",
+          "source_validation": "sku_found_in_pdf_text"
+        }
+      ]
+    },
+    {
+      "brand": "Columbia",
+      "official_sku": "5.5FBB",
+      "normalized_sku": "5.5FBB",
+      "product_name": "5.5\" Fat Boy Flat Box",
+      "alternate_names": [],
+      "catalog_item_type": "tool",
+      "launch_candidate": true,
+      "source_pdf": "products\\scraped_results\\brands\\Columbia\\customercatalogue2024-3.pdf-3.pdf",
+      "price": null,
+      "price_source": null,
+      "notes": [],
+      "source_refs": [
+        {
+          "pdf_page": 12,
+          "catalog_page": 11,
+          "section": "Flat Finisher Box",
+          "source_item_no": "5.5FBB",
+          "source_line": "5.5FBB 5.5” Fat Boy Flat Box",
+          "extraction_method": "pdf_text",
+          "source_validation": "sku_found_in_pdf_text"
+        }
+      ]
+    },
+    {
+      "brand": "Columbia",
+      "official_sku": "5.5FFB",
+      "normalized_sku": "5.5FFB",
+      "product_name": "5.5\" Flat Finisher Box",
+      "alternate_names": [],
+      "catalog_item_type": "tool",
+      "launch_candidate": true,
+      "source_pdf": "products\\scraped_results\\brands\\Columbia\\customercatalogue2024-3.pdf-3.pdf",
+      "price": null,
+      "price_source": null,
+      "notes": [],
+      "source_refs": [
+        {
+          "pdf_page": 12,
+          "catalog_page": 11,
+          "section": "Flat Finisher Box",
+          "source_item_no": "5.5FFB",
+          "source_line": "5.5FFB 5.5” Flat Finisher Box at all times.",
+          "extraction_method": "pdf_text",
+          "source_validation": "sku_found_in_pdf_text"
+        }
+      ]
+    },
+    {
+      "brand": "Columbia",
+      "official_sku": "7FFB",
+      "normalized_sku": "7FFB",
+      "product_name": "7\" Flat Finisher Box",
+      "alternate_names": [],
+      "catalog_item_type": "tool",
+      "launch_candidate": true,
+      "source_pdf": "products\\scraped_results\\brands\\Columbia\\customercatalogue2024-3.pdf-3.pdf",
+      "price": null,
+      "price_source": null,
+      "notes": [],
+      "source_refs": [
+        {
+          "pdf_page": 12,
+          "catalog_page": 11,
+          "section": "Flat Finisher Box",
+          "source_item_no": "7FFB",
+          "source_line": "7FFB 7” Flat Finisher Box",
+          "extraction_method": "pdf_text",
+          "source_validation": "sku_found_in_pdf_text"
+        }
+      ]
+    },
+    {
+      "brand": "Columbia",
+      "official_sku": "8FBB",
+      "normalized_sku": "8FBB",
+      "product_name": "8\" Fat Boy Flat Box",
+      "alternate_names": [],
+      "catalog_item_type": "tool",
+      "launch_candidate": true,
+      "source_pdf": "products\\scraped_results\\brands\\Columbia\\customercatalogue2024-3.pdf-3.pdf",
+      "price": null,
+      "price_source": null,
+      "notes": [],
+      "source_refs": [
+        {
+          "pdf_page": 12,
+          "catalog_page": 11,
+          "section": "Flat Finisher Box",
+          "source_item_no": "8FBB",
+          "source_line": "8FBB 8” Fat Boy Flat Box",
+          "extraction_method": "pdf_text",
+          "source_validation": "sku_found_in_pdf_text"
+        }
+      ]
+    },
+    {
+      "brand": "Columbia",
+      "official_sku": "8FFB",
+      "normalized_sku": "8FFB",
+      "product_name": "8\" Flat Finisher Box",
+      "alternate_names": [],
+      "catalog_item_type": "tool",
+      "launch_candidate": true,
+      "source_pdf": "products\\scraped_results\\brands\\Columbia\\customercatalogue2024-3.pdf-3.pdf",
+      "price": null,
+      "price_source": null,
+      "notes": [],
+      "source_refs": [
+        {
+          "pdf_page": 12,
+          "catalog_page": 11,
+          "section": "Flat Finisher Box",
+          "source_item_no": "8FFB",
+          "source_line": "8FFB 8“ Flat Finisher Box",
+          "extraction_method": "pdf_text",
+          "source_validation": "sku_found_in_pdf_text"
+        }
+      ]
+    },
+    {
+      "brand": "Columbia",
+      "official_sku": "10FBBA",
+      "normalized_sku": "10FBBA",
+      "product_name": "10\" Automatic Fat Boy Box",
+      "alternate_names": [],
+      "catalog_item_type": "tool",
+      "launch_candidate": true,
+      "source_pdf": "products\\scraped_results\\brands\\Columbia\\customercatalogue2024-3.pdf-3.pdf",
+      "price": null,
+      "price_source": null,
+      "notes": [],
+      "source_refs": [
+        {
+          "pdf_page": 13,
+          "catalog_page": 12,
+          "section": "Automatic Flat Boxes",
+          "source_item_no": "10FBBA",
+          "source_line": "10FBBA 10” Automatic Fat Boy Box",
+          "extraction_method": "pdf_text",
+          "source_validation": "sku_found_in_pdf_text"
+        }
+      ]
+    },
+    {
+      "brand": "Columbia",
+      "official_sku": "10FFBA",
+      "normalized_sku": "10FFBA",
+      "product_name": "10\" Automatic Flat Box",
+      "alternate_names": [],
+      "catalog_item_type": "tool",
+      "launch_candidate": true,
+      "source_pdf": "products\\scraped_results\\brands\\Columbia\\customercatalogue2024-3.pdf-3.pdf",
+      "price": null,
+      "price_source": null,
+      "notes": [],
+      "source_refs": [
+        {
+          "pdf_page": 13,
+          "catalog_page": 12,
+          "section": "Automatic Flat Boxes",
+          "source_item_no": "10FFBA",
+          "source_line": "10FFBA 10” Automatic Flat Box",
+          "extraction_method": "pdf_text",
+          "source_validation": "sku_found_in_pdf_text"
+        }
+      ]
+    },
+    {
+      "brand": "Columbia",
+      "official_sku": "12FBBA",
+      "normalized_sku": "12FBBA",
+      "product_name": "12\" Automatic Fat Boy Box",
+      "alternate_names": [],
+      "catalog_item_type": "tool",
+      "launch_candidate": true,
+      "source_pdf": "products\\scraped_results\\brands\\Columbia\\customercatalogue2024-3.pdf-3.pdf",
+      "price": null,
+      "price_source": null,
+      "notes": [],
+      "source_refs": [
+        {
+          "pdf_page": 13,
+          "catalog_page": 12,
+          "section": "Automatic Flat Boxes",
+          "source_item_no": "12FBBA",
+          "source_line": "12FBBA 12” Automatic Fat Boy Box Inside",
+          "extraction_method": "pdf_text",
+          "source_validation": "sku_found_in_pdf_text"
+        }
+      ]
+    },
+    {
+      "brand": "Columbia",
+      "official_sku": "12FFBA",
+      "normalized_sku": "12FFBA",
+      "product_name": "12\" Automatic Flat Box",
+      "alternate_names": [],
+      "catalog_item_type": "tool",
+      "launch_candidate": true,
+      "source_pdf": "products\\scraped_results\\brands\\Columbia\\customercatalogue2024-3.pdf-3.pdf",
+      "price": null,
+      "price_source": null,
+      "notes": [],
+      "source_refs": [
+        {
+          "pdf_page": 13,
+          "catalog_page": 12,
+          "section": "Automatic Flat Boxes",
+          "source_item_no": "12FFBA",
+          "source_line": "12FFBA 12” Automatic Flat Box",
+          "extraction_method": "pdf_text",
+          "source_validation": "sku_found_in_pdf_text"
+        }
+      ]
+    },
+    {
+      "brand": "Columbia",
+      "official_sku": "14FFBA",
+      "normalized_sku": "14FFBA",
+      "product_name": "14\" Automatic Flat Box",
+      "alternate_names": [],
+      "catalog_item_type": "tool",
+      "launch_candidate": true,
+      "source_pdf": "products\\scraped_results\\brands\\Columbia\\customercatalogue2024-3.pdf-3.pdf",
+      "price": null,
+      "price_source": null,
+      "notes": [],
+      "source_refs": [
+        {
+          "pdf_page": 13,
+          "catalog_page": 12,
+          "section": "Automatic Flat Boxes",
+          "source_item_no": "14FFBA",
+          "source_line": "14FFBA 14” Automatic Flat Box",
+          "extraction_method": "pdf_text",
+          "source_validation": "sku_found_in_pdf_text"
+        }
+      ]
+    },
+    {
+      "brand": "Columbia",
+      "official_sku": "8FBBA",
+      "normalized_sku": "8FBBA",
+      "product_name": "8\" Automatic Fat Boy Box",
+      "alternate_names": [],
+      "catalog_item_type": "tool",
+      "launch_candidate": true,
+      "source_pdf": "products\\scraped_results\\brands\\Columbia\\customercatalogue2024-3.pdf-3.pdf",
+      "price": null,
+      "price_source": null,
+      "notes": [],
+      "source_refs": [
+        {
+          "pdf_page": 13,
+          "catalog_page": 12,
+          "section": "Automatic Flat Boxes",
+          "source_item_no": "8FBBA",
+          "source_line": "8FBBA 8” Automatic Fat Boy Box",
+          "extraction_method": "pdf_text",
+          "source_validation": "sku_found_in_pdf_text"
+        }
+      ]
+    },
+    {
+      "brand": "Columbia",
+      "official_sku": "8FFBA",
+      "normalized_sku": "8FFBA",
+      "product_name": "8\" Automatic Flat Box",
+      "alternate_names": [],
+      "catalog_item_type": "tool",
+      "launch_candidate": true,
+      "source_pdf": "products\\scraped_results\\brands\\Columbia\\customercatalogue2024-3.pdf-3.pdf",
+      "price": null,
+      "price_source": null,
+      "notes": [],
+      "source_refs": [
+        {
+          "pdf_page": 13,
+          "catalog_page": 12,
+          "section": "Automatic Flat Boxes",
+          "source_item_no": "8FFBA",
+          "source_line": "8FFBA 8” Automatic Flat Box",
+          "extraction_method": "pdf_text",
+          "source_validation": "sku_found_in_pdf_text"
+        }
+      ]
+    },
+    {
+      "brand": "Columbia",
+      "official_sku": "ITC-K",
+      "normalized_sku": "ITC-K",
+      "product_name": "Track Conversion Kit",
+      "alternate_names": [],
+      "catalog_item_type": "tool",
+      "launch_candidate": true,
+      "source_pdf": "products\\scraped_results\\brands\\Columbia\\customercatalogue2024-3.pdf-3.pdf",
+      "price": null,
+      "price_source": null,
+      "notes": [],
+      "source_refs": [
+        {
+          "pdf_page": 13,
+          "catalog_page": 12,
+          "section": "Automatic Flat Boxes",
+          "source_item_no": "ITC-K",
+          "source_line": "ITC-K Track Conversion Kit",
+          "extraction_method": "pdf_text",
+          "source_validation": "sku_found_in_pdf_text"
+        }
+      ]
+    },
+    {
+      "brand": "Columbia",
+      "official_sku": "2NS",
+      "normalized_sku": "2NS",
+      "product_name": "2\" Nail Spotter",
+      "alternate_names": [],
+      "catalog_item_type": "tool",
+      "launch_candidate": true,
+      "source_pdf": "products\\scraped_results\\brands\\Columbia\\customercatalogue2024-3.pdf-3.pdf",
+      "price": null,
+      "price_source": null,
+      "notes": [],
+      "source_refs": [
+        {
+          "pdf_page": 14,
+          "catalog_page": 13,
+          "section": "Nail Spotters",
+          "source_item_no": "2NS",
+          "source_line": "2NS 2” Nail Spotter",
+          "extraction_method": "pdf_text",
+          "source_validation": "sku_found_in_pdf_text"
+        }
+      ]
+    },
+    {
+      "brand": "Columbia",
+      "official_sku": "3NS",
+      "normalized_sku": "3NS",
+      "product_name": "3\" Nail Spotter",
+      "alternate_names": [],
+      "catalog_item_type": "tool",
+      "launch_candidate": true,
+      "source_pdf": "products\\scraped_results\\brands\\Columbia\\customercatalogue2024-3.pdf-3.pdf",
+      "price": null,
+      "price_source": null,
+      "notes": [],
+      "source_refs": [
+        {
+          "pdf_page": 14,
+          "catalog_page": 13,
+          "section": "Nail Spotters",
+          "source_item_no": "3NS",
+          "source_line": "3NS 3” Nail Spotter",
+          "extraction_method": "pdf_text",
+          "source_validation": "sku_found_in_pdf_text"
+        }
+      ]
+    },
+    {
+      "brand": "Columbia",
+      "official_sku": "HNSA-5-2",
+      "normalized_sku": "HNSA-5-2",
+      "product_name": "2\" Wheel Conversion Kit",
+      "alternate_names": [
+        "Nail Spotter Wheel Kit 2\""
+      ],
+      "catalog_item_type": "tool",
+      "launch_candidate": true,
+      "source_pdf": "products\\scraped_results\\brands\\Columbia\\customercatalogue2024-3.pdf-3.pdf",
+      "price": null,
+      "price_source": null,
+      "notes": [
+        "appears as both tool and maintenance_kit"
+      ],
+      "source_refs": [
+        {
+          "pdf_page": 14,
+          "catalog_page": 13,
+          "section": "Nail Spotters",
+          "source_item_no": "HNSA-5-2",
+          "source_line": "HNSA-5-2 2” Wheel Conversion Kit",
+          "extraction_method": "pdf_text",
+          "source_validation": "sku_found_in_pdf_text"
+        },
+        {
+          "pdf_page": 24,
+          "catalog_page": 23,
+          "section": "Maintenance Kits",
+          "source_item_no": "HNSA-5-2",
+          "source_line": "HNSA-5-2 Nail Spotter Wheel Kit 2\"",
+          "extraction_method": "pdf_visual_table",
+          "source_validation": "sku_verified_from_rendered_pdf_or_garbled_text"
+        }
+      ]
+    },
+    {
+      "brand": "Columbia",
+      "official_sku": "HNSA-5-3",
+      "normalized_sku": "HNSA-5-3",
+      "product_name": "3\" Wheel Conversion Kit",
+      "alternate_names": [
+        "Nail Spotter Wheel Kit 3\""
+      ],
+      "catalog_item_type": "tool",
+      "launch_candidate": true,
+      "source_pdf": "products\\scraped_results\\brands\\Columbia\\customercatalogue2024-3.pdf-3.pdf",
+      "price": null,
+      "price_source": null,
+      "notes": [
+        "appears as both tool and maintenance_kit"
+      ],
+      "source_refs": [
+        {
+          "pdf_page": 14,
+          "catalog_page": 13,
+          "section": "Nail Spotters",
+          "source_item_no": "HNSA-5-3",
+          "source_line": "HNSA-5-3 3” Wheel Conversion Kit",
+          "extraction_method": "pdf_text",
+          "source_validation": "sku_found_in_pdf_text"
+        },
+        {
+          "pdf_page": 24,
+          "catalog_page": 23,
+          "section": "Maintenance Kits",
+          "source_item_no": "HNSA-5-3",
+          "source_line": "HNSA-5-3 Nail Spotter Wheel Kit 3\"",
+          "extraction_method": "pdf_visual_table",
+          "source_validation": "sku_verified_from_rendered_pdf_or_garbled_text"
+        }
+      ]
+    },
+    {
+      "brand": "Columbia",
+      "official_sku": "BF",
+      "normalized_sku": "BF",
+      "product_name": "Box Filler",
+      "alternate_names": [],
+      "catalog_item_type": "tool",
+      "launch_candidate": true,
+      "source_pdf": "products\\scraped_results\\brands\\Columbia\\customercatalogue2024-3.pdf-3.pdf",
+      "price": null,
+      "price_source": null,
+      "notes": [],
+      "source_refs": [
+        {
+          "pdf_page": 15,
+          "catalog_page": 14,
+          "section": "Mud Pumps",
+          "source_item_no": "BF",
+          "source_line": "BF Box Filler",
+          "extraction_method": "pdf_text",
+          "source_validation": "sku_found_in_pdf_text"
+        }
+      ]
+    },
+    {
+      "brand": "Columbia",
+      "official_sku": "GN",
+      "normalized_sku": "GN",
+      "product_name": "Gooseneck",
+      "alternate_names": [],
+      "catalog_item_type": "tool",
+      "launch_candidate": true,
+      "source_pdf": "products\\scraped_results\\brands\\Columbia\\customercatalogue2024-3.pdf-3.pdf",
+      "price": null,
+      "price_source": null,
+      "notes": [],
+      "source_refs": [
+        {
+          "pdf_page": 15,
+          "catalog_page": 14,
+          "section": "Mud Pumps",
+          "source_item_no": "GN",
+          "source_line": "GN Gooseneck",
+          "extraction_method": "pdf_text",
+          "source_validation": "sku_found_in_pdf_text"
+        }
+      ]
+    },
+    {
+      "brand": "Columbia",
+      "official_sku": "HMP",
+      "normalized_sku": "HMP",
+      "product_name": "Hot Mud Pump",
+      "alternate_names": [],
+      "catalog_item_type": "tool",
+      "launch_candidate": true,
+      "source_pdf": "products\\scraped_results\\brands\\Columbia\\customercatalogue2024-3.pdf-3.pdf",
+      "price": null,
+      "price_source": null,
+      "notes": [],
+      "source_refs": [
+        {
+          "pdf_page": 15,
+          "catalog_page": 14,
+          "section": "Mud Pumps",
+          "source_item_no": "HMP",
+          "source_line": "HMP Hot Mud Pump",
+          "extraction_method": "pdf_text",
+          "source_validation": "sku_found_in_pdf_text"
+        }
+      ]
+    },
+    {
+      "brand": "Columbia",
+      "official_sku": "HMP-C",
+      "normalized_sku": "HMP-C",
+      "product_name": "Hot Mud Pump (CDN)",
+      "alternate_names": [],
+      "catalog_item_type": "tool",
+      "launch_candidate": true,
+      "source_pdf": "products\\scraped_results\\brands\\Columbia\\customercatalogue2024-3.pdf-3.pdf",
+      "price": null,
+      "price_source": null,
+      "notes": [],
+      "source_refs": [
+        {
+          "pdf_page": 15,
+          "catalog_page": 14,
+          "section": "Mud Pumps",
+          "source_item_no": "HMP-C",
+          "source_line": "HMP-C Hot Mud Pump (CDN)*",
+          "extraction_method": "pdf_text",
+          "source_validation": "sku_found_in_pdf_text"
+        }
+      ]
+    },
+    {
+      "brand": "Columbia",
+      "official_sku": "TBBF",
+      "normalized_sku": "TBBF",
+      "product_name": "Tall Boy Box Filler",
+      "alternate_names": [],
+      "catalog_item_type": "tool",
+      "launch_candidate": true,
+      "source_pdf": "products\\scraped_results\\brands\\Columbia\\customercatalogue2024-3.pdf-3.pdf",
+      "price": null,
+      "price_source": null,
+      "notes": [],
+      "source_refs": [
+        {
+          "pdf_page": 15,
+          "catalog_page": 14,
+          "section": "Mud Pumps",
+          "source_item_no": "TBBF",
+          "source_line": "TBBF Tall Boy Box Filler",
+          "extraction_method": "pdf_text",
+          "source_validation": "sku_found_in_pdf_text"
+        }
+      ]
+    },
+    {
+      "brand": "Columbia",
+      "official_sku": "TBGN",
+      "normalized_sku": "TBGN",
+      "product_name": "Tall Boy Gooseneck",
+      "alternate_names": [],
+      "catalog_item_type": "tool",
+      "launch_candidate": true,
+      "source_pdf": "products\\scraped_results\\brands\\Columbia\\customercatalogue2024-3.pdf-3.pdf",
+      "price": null,
+      "price_source": null,
+      "notes": [],
+      "source_refs": [
+        {
+          "pdf_page": 15,
+          "catalog_page": 14,
+          "section": "Mud Pumps",
+          "source_item_no": "TBGN",
+          "source_line": "TBGN Tall Boy Gooseneck",
+          "extraction_method": "pdf_text",
+          "source_validation": "sku_found_in_pdf_text"
+        }
+      ]
+    },
+    {
+      "brand": "Columbia",
+      "official_sku": "TBMP",
+      "normalized_sku": "TBMP",
+      "product_name": "Tall Boy Hot Mud Pump",
+      "alternate_names": [],
+      "catalog_item_type": "tool",
+      "launch_candidate": true,
+      "source_pdf": "products\\scraped_results\\brands\\Columbia\\customercatalogue2024-3.pdf-3.pdf",
+      "price": null,
+      "price_source": null,
+      "notes": [],
+      "source_refs": [
+        {
+          "pdf_page": 15,
+          "catalog_page": 14,
+          "section": "Mud Pumps",
+          "source_item_no": "TBMP",
+          "source_line": "TBMP Tall Boy Hot Mud Pump",
+          "extraction_method": "pdf_text",
+          "source_validation": "sku_found_in_pdf_text"
+        }
+      ]
+    },
+    {
+      "brand": "Columbia",
+      "official_sku": "CLTHA",
+      "normalized_sku": "CLTHA",
+      "product_name": "Tomalock Adapter",
+      "alternate_names": [],
+      "catalog_item_type": "smoothing_tool",
+      "launch_candidate": true,
+      "source_pdf": "products\\scraped_results\\brands\\Columbia\\customercatalogue2024-3.pdf-3.pdf",
+      "price": null,
+      "price_source": null,
+      "notes": [],
+      "source_refs": [
+        {
+          "pdf_page": 16,
+          "catalog_page": 15,
+          "section": "Smoothing Blades",
+          "source_item_no": "CLTHA",
+          "source_line": "The CLTHA",
+          "extraction_method": "pdf_text",
+          "source_validation": "sku_found_in_pdf_text"
+        }
+      ]
+    },
+    {
+      "brand": "Columbia",
+      "official_sku": "TSB-10",
+      "normalized_sku": "TSB-10",
+      "product_name": "10\" Tomahawk",
+      "alternate_names": [],
+      "catalog_item_type": "smoothing_tool",
+      "launch_candidate": true,
+      "source_pdf": "products\\scraped_results\\brands\\Columbia\\customercatalogue2024-3.pdf-3.pdf",
+      "price": null,
+      "price_source": null,
+      "notes": [],
+      "source_refs": [
+        {
+          "pdf_page": 16,
+          "catalog_page": 15,
+          "section": "Smoothing Blades",
+          "source_item_no": "TSB-10",
+          "source_line": "TSB-10 10” Tomahawk",
+          "extraction_method": "pdf_text",
+          "source_validation": "sku_found_in_pdf_text"
+        }
+      ]
+    },
+    {
+      "brand": "Columbia",
+      "official_sku": "TSB-12",
+      "normalized_sku": "TSB-12",
+      "product_name": "12\" Tomahawk",
+      "alternate_names": [],
+      "catalog_item_type": "smoothing_tool",
+      "launch_candidate": true,
+      "source_pdf": "products\\scraped_results\\brands\\Columbia\\customercatalogue2024-3.pdf-3.pdf",
+      "price": null,
+      "price_source": null,
+      "notes": [],
+      "source_refs": [
+        {
+          "pdf_page": 16,
+          "catalog_page": 15,
+          "section": "Smoothing Blades",
+          "source_item_no": "TSB-12",
+          "source_line": "TSB-12 12” Tomahawk",
+          "extraction_method": "pdf_text",
+          "source_validation": "sku_found_in_pdf_text"
+        }
+      ]
+    },
+    {
+      "brand": "Columbia",
+      "official_sku": "TSB-14",
+      "normalized_sku": "TSB-14",
+      "product_name": "14\" Tomahawk",
+      "alternate_names": [],
+      "catalog_item_type": "smoothing_tool",
+      "launch_candidate": true,
+      "source_pdf": "products\\scraped_results\\brands\\Columbia\\customercatalogue2024-3.pdf-3.pdf",
+      "price": null,
+      "price_source": null,
+      "notes": [],
+      "source_refs": [
+        {
+          "pdf_page": 16,
+          "catalog_page": 15,
+          "section": "Smoothing Blades",
+          "source_item_no": "TSB-14",
+          "source_line": "TSB-14 14” Tomahawk",
+          "extraction_method": "pdf_text",
+          "source_validation": "sku_found_in_pdf_text"
+        }
+      ]
+    },
+    {
+      "brand": "Columbia",
+      "official_sku": "TSB-18",
+      "normalized_sku": "TSB-18",
+      "product_name": "18\" Tomahawk",
+      "alternate_names": [],
+      "catalog_item_type": "smoothing_tool",
+      "launch_candidate": true,
+      "source_pdf": "products\\scraped_results\\brands\\Columbia\\customercatalogue2024-3.pdf-3.pdf",
+      "price": null,
+      "price_source": null,
+      "notes": [],
+      "source_refs": [
+        {
+          "pdf_page": 16,
+          "catalog_page": 15,
+          "section": "Smoothing Blades",
+          "source_item_no": "TSB-18",
+          "source_line": "TSB-18 18” Tomahawk",
+          "extraction_method": "pdf_text",
+          "source_validation": "sku_found_in_pdf_text"
+        }
+      ]
+    },
+    {
+      "brand": "Columbia",
+      "official_sku": "TSB-24",
+      "normalized_sku": "TSB-24",
+      "product_name": "24\" Tomahawk",
+      "alternate_names": [],
+      "catalog_item_type": "smoothing_tool",
+      "launch_candidate": true,
+      "source_pdf": "products\\scraped_results\\brands\\Columbia\\customercatalogue2024-3.pdf-3.pdf",
+      "price": null,
+      "price_source": null,
+      "notes": [],
+      "source_refs": [
+        {
+          "pdf_page": 16,
+          "catalog_page": 15,
+          "section": "Smoothing Blades",
+          "source_item_no": "TSB-24",
+          "source_line": "TSB-24 24” Tomahawk",
+          "extraction_method": "pdf_text",
+          "source_validation": "sku_found_in_pdf_text"
+        }
+      ]
+    },
+    {
+      "brand": "Columbia",
+      "official_sku": "TSB-32",
+      "normalized_sku": "TSB-32",
+      "product_name": "32\" Tomahawk",
+      "alternate_names": [],
+      "catalog_item_type": "smoothing_tool",
+      "launch_candidate": true,
+      "source_pdf": "products\\scraped_results\\brands\\Columbia\\customercatalogue2024-3.pdf-3.pdf",
+      "price": null,
+      "price_source": null,
+      "notes": [],
+      "source_refs": [
+        {
+          "pdf_page": 16,
+          "catalog_page": 15,
+          "section": "Smoothing Blades",
+          "source_item_no": "TSB-32",
+          "source_line": "TSB-32 32” Tomahawk",
+          "extraction_method": "pdf_text",
+          "source_validation": "sku_found_in_pdf_text"
+        }
+      ]
+    },
+    {
+      "brand": "Columbia",
+      "official_sku": "TSB-40",
+      "normalized_sku": "TSB-40",
+      "product_name": "40\" Tomahawk",
+      "alternate_names": [],
+      "catalog_item_type": "smoothing_tool",
+      "launch_candidate": true,
+      "source_pdf": "products\\scraped_results\\brands\\Columbia\\customercatalogue2024-3.pdf-3.pdf",
+      "price": null,
+      "price_source": null,
+      "notes": [],
+      "source_refs": [
+        {
+          "pdf_page": 16,
+          "catalog_page": 15,
+          "section": "Smoothing Blades",
+          "source_item_no": "TSB-40",
+          "source_line": "TSB-40 40” Tomahawk",
+          "extraction_method": "pdf_text",
+          "source_validation": "sku_found_in_pdf_text"
+        }
+      ]
+    },
+    {
+      "brand": "Columbia",
+      "official_sku": "TSB-48",
+      "normalized_sku": "TSB-48",
+      "product_name": "48\" Tomahawk",
+      "alternate_names": [],
+      "catalog_item_type": "smoothing_tool",
+      "launch_candidate": true,
+      "source_pdf": "products\\scraped_results\\brands\\Columbia\\customercatalogue2024-3.pdf-3.pdf",
+      "price": null,
+      "price_source": null,
+      "notes": [],
+      "source_refs": [
+        {
+          "pdf_page": 16,
+          "catalog_page": 15,
+          "section": "Smoothing Blades",
+          "source_item_no": "TSB-48",
+          "source_line": "TSB-48 48” Tomahawk",
+          "extraction_method": "pdf_text",
+          "source_validation": "sku_found_in_pdf_text"
+        }
+      ]
+    },
+    {
+      "brand": "Columbia",
+      "official_sku": "TSB-7",
+      "normalized_sku": "TSB-7",
+      "product_name": "7\" Tomahawk",
+      "alternate_names": [],
+      "catalog_item_type": "smoothing_tool",
+      "launch_candidate": true,
+      "source_pdf": "products\\scraped_results\\brands\\Columbia\\customercatalogue2024-3.pdf-3.pdf",
+      "price": null,
+      "price_source": null,
+      "notes": [],
+      "source_refs": [
+        {
+          "pdf_page": 16,
+          "catalog_page": 15,
+          "section": "Smoothing Blades",
+          "source_item_no": "TSB-7",
+          "source_line": "TSB-7 7” Tomahawk",
+          "extraction_method": "pdf_text",
+          "source_validation": "sku_found_in_pdf_text"
+        }
+      ]
+    },
+    {
+      "brand": "Columbia",
+      "official_sku": "C1H",
+      "normalized_sku": "C1H",
+      "product_name": "Columbia One Handle",
+      "alternate_names": [],
+      "catalog_item_type": "tool",
+      "launch_candidate": true,
+      "source_pdf": "products\\scraped_results\\brands\\Columbia\\customercatalogue2024-3.pdf-3.pdf",
+      "price": null,
+      "price_source": null,
+      "notes": [],
+      "source_refs": [
+        {
+          "pdf_page": 17,
+          "catalog_page": 16,
+          "section": "Columbia One",
+          "source_item_no": "C1H",
+          "source_line": "C1H Columbia One Handle",
+          "extraction_method": "pdf_text",
+          "source_validation": "sku_found_in_pdf_text"
+        }
+      ]
+    },
+    {
+      "brand": "Columbia",
+      "official_sku": "C1HEXT",
+      "normalized_sku": "C1HEXT",
+      "product_name": "Columbia One Extendible (3-5')",
+      "alternate_names": [],
+      "catalog_item_type": "tool",
+      "launch_candidate": true,
+      "source_pdf": "products\\scraped_results\\brands\\Columbia\\customercatalogue2024-3.pdf-3.pdf",
+      "price": null,
+      "price_source": null,
+      "notes": [],
+      "source_refs": [
+        {
+          "pdf_page": 17,
+          "catalog_page": 16,
+          "section": "Columbia One",
+          "source_item_no": "C1HEXT",
+          "source_line": "C1HEXT Columbia One Extendible (3-5’)",
+          "extraction_method": "pdf_text",
+          "source_validation": "sku_found_in_pdf_text"
+        }
+      ]
+    },
+    {
+      "brand": "Columbia",
+      "official_sku": "C1HS",
+      "normalized_sku": "C1HS",
+      "product_name": "Columbia One Handle Stubby",
+      "alternate_names": [],
+      "catalog_item_type": "tool",
+      "launch_candidate": true,
+      "source_pdf": "products\\scraped_results\\brands\\Columbia\\customercatalogue2024-3.pdf-3.pdf",
+      "price": null,
+      "price_source": null,
+      "notes": [],
+      "source_refs": [
+        {
+          "pdf_page": 17,
+          "catalog_page": 16,
+          "section": "Columbia One",
+          "source_item_no": "C1HS",
+          "source_line": "C1HS Columbia One Handle Stubby",
+          "extraction_method": "pdf_text",
+          "source_validation": "sku_found_in_pdf_text"
+        }
+      ]
+    },
+    {
+      "brand": "Columbia",
+      "official_sku": "CHXL",
+      "normalized_sku": "CHXL",
+      "product_name": "Columbia Long Extendible (4-8')",
+      "alternate_names": [],
+      "catalog_item_type": "tool",
+      "launch_candidate": true,
+      "source_pdf": "products\\scraped_results\\brands\\Columbia\\customercatalogue2024-3.pdf-3.pdf",
+      "price": null,
+      "price_source": null,
+      "notes": [],
+      "source_refs": [
+        {
+          "pdf_page": 17,
+          "catalog_page": 16,
+          "section": "Columbia One",
+          "source_item_no": "CHXL",
+          "source_line": "CHXL Columbia Long Extendible (4-8’)",
+          "extraction_method": "pdf_text",
+          "source_validation": "sku_found_in_pdf_text"
+        }
+      ]
+    },
+    {
+      "brand": "Columbia",
+      "official_sku": "3BH",
+      "normalized_sku": "3BH",
+      "product_name": "3' 180 Degree Grip Flat Box Handle",
+      "alternate_names": [],
+      "catalog_item_type": "tool",
+      "launch_candidate": true,
+      "source_pdf": "products\\scraped_results\\brands\\Columbia\\customercatalogue2024-3.pdf-3.pdf",
+      "price": null,
+      "price_source": null,
+      "notes": [],
+      "source_refs": [
+        {
+          "pdf_page": 18,
+          "catalog_page": 17,
+          "section": "Flat Box Handles",
+          "source_item_no": "3BH",
+          "source_line": "3BH 3’ 180° Grip Flat Box Handle",
+          "extraction_method": "pdf_text",
+          "source_validation": "sku_found_in_pdf_text"
+        }
+      ]
+    },
+    {
+      "brand": "Columbia",
+      "official_sku": "42BH",
+      "normalized_sku": "42BH",
+      "product_name": "42\" 180 Degree Grip Flat Box Handle",
+      "alternate_names": [],
+      "catalog_item_type": "tool",
+      "launch_candidate": true,
+      "source_pdf": "products\\scraped_results\\brands\\Columbia\\customercatalogue2024-3.pdf-3.pdf",
+      "price": null,
+      "price_source": null,
+      "notes": [],
+      "source_refs": [
+        {
+          "pdf_page": 18,
+          "catalog_page": 17,
+          "section": "Flat Box Handles",
+          "source_item_no": "42BH",
+          "source_line": "42BH 42” 180° Grip Flat Box Handle",
+          "extraction_method": "pdf_text",
+          "source_validation": "sku_found_in_pdf_text"
+        }
+      ]
+    },
+    {
+      "brand": "Columbia",
+      "official_sku": "4BH",
+      "normalized_sku": "4BH",
+      "product_name": "4' 180 Degree Grip Flat Box Handle",
+      "alternate_names": [],
+      "catalog_item_type": "tool",
+      "launch_candidate": true,
+      "source_pdf": "products\\scraped_results\\brands\\Columbia\\customercatalogue2024-3.pdf-3.pdf",
+      "price": null,
+      "price_source": null,
+      "notes": [],
+      "source_refs": [
+        {
+          "pdf_page": 18,
+          "catalog_page": 17,
+          "section": "Flat Box Handles",
+          "source_item_no": "4BH",
+          "source_line": "4BH 4’ 180° Grip Flat Box Handle",
+          "extraction_method": "pdf_text",
+          "source_validation": "sku_found_in_pdf_text"
+        }
+      ]
+    },
+    {
+      "brand": "Columbia",
+      "official_sku": "5BH",
+      "normalized_sku": "5BH",
+      "product_name": "5' 180 Degree Grip Flat Box Handle",
+      "alternate_names": [],
+      "catalog_item_type": "tool",
+      "launch_candidate": true,
+      "source_pdf": "products\\scraped_results\\brands\\Columbia\\customercatalogue2024-3.pdf-3.pdf",
+      "price": null,
+      "price_source": null,
+      "notes": [],
+      "source_refs": [
+        {
+          "pdf_page": 18,
+          "catalog_page": 17,
+          "section": "Flat Box Handles",
+          "source_item_no": "5BH",
+          "source_line": "5BH 5’ 180° Grip Flat Box Handle",
+          "extraction_method": "pdf_text",
+          "source_validation": "sku_found_in_pdf_text"
+        }
+      ]
+    },
+    {
+      "brand": "Columbia",
+      "official_sku": "6BH",
+      "normalized_sku": "6BH",
+      "product_name": "6' 180 Degree Grip Flat Box Handle",
+      "alternate_names": [],
+      "catalog_item_type": "tool",
+      "launch_candidate": true,
+      "source_pdf": "products\\scraped_results\\brands\\Columbia\\customercatalogue2024-3.pdf-3.pdf",
+      "price": null,
+      "price_source": null,
+      "notes": [],
+      "source_refs": [
+        {
+          "pdf_page": 18,
+          "catalog_page": 17,
+          "section": "Flat Box Handles",
+          "source_item_no": "6BH",
+          "source_line": "6BH 6’ 180° Grip Flat Box Handle",
+          "extraction_method": "pdf_text",
+          "source_validation": "sku_found_in_pdf_text"
+        }
+      ]
+    },
+    {
+      "brand": "Columbia",
+      "official_sku": "CMH",
+      "normalized_sku": "CMH",
+      "product_name": "Closet Monster Handle",
+      "alternate_names": [],
+      "catalog_item_type": "tool",
+      "launch_candidate": true,
+      "source_pdf": "products\\scraped_results\\brands\\Columbia\\customercatalogue2024-3.pdf-3.pdf",
+      "price": null,
+      "price_source": null,
+      "notes": [],
+      "source_refs": [
+        {
+          "pdf_page": 18,
+          "catalog_page": 17,
+          "section": "Flat Box Handles",
+          "source_item_no": "CMH",
+          "source_line": "CMH Closet Monster Handle",
+          "extraction_method": "pdf_text",
+          "source_validation": "sku_found_in_pdf_text"
+        }
+      ]
+    },
+    {
+      "brand": "Columbia",
+      "official_sku": "MH",
+      "normalized_sku": "MH",
+      "product_name": "Matrix Flat Box Handle 40-60\"",
+      "alternate_names": [],
+      "catalog_item_type": "tool",
+      "launch_candidate": true,
+      "source_pdf": "products\\scraped_results\\brands\\Columbia\\customercatalogue2024-3.pdf-3.pdf",
+      "price": null,
+      "price_source": null,
+      "notes": [],
+      "source_refs": [
+        {
+          "pdf_page": 18,
+          "catalog_page": 17,
+          "section": "Flat Box Handles",
+          "source_item_no": "MH",
+          "source_line": "CMH Closet Monster Handle",
+          "extraction_method": "pdf_text",
+          "source_validation": "sku_found_in_pdf_text"
+        }
+      ]
+    },
+    {
+      "brand": "Columbia",
+      "official_sku": "MHL",
+      "normalized_sku": "MHL",
+      "product_name": "Matrix Flat Box Handle 56-76\"",
+      "alternate_names": [],
+      "catalog_item_type": "tool",
+      "launch_candidate": true,
+      "source_pdf": "products\\scraped_results\\brands\\Columbia\\customercatalogue2024-3.pdf-3.pdf",
+      "price": null,
+      "price_source": null,
+      "notes": [],
+      "source_refs": [
+        {
+          "pdf_page": 18,
+          "catalog_page": 17,
+          "section": "Flat Box Handles",
+          "source_item_no": "MHL",
+          "source_line": "MHL Matrix Flat Box Handle 56-76”",
+          "extraction_method": "pdf_text",
+          "source_validation": "sku_found_in_pdf_text"
+        }
+      ]
+    },
+    {
+      "brand": "Columbia",
+      "official_sku": "MHS",
+      "normalized_sku": "MHS",
+      "product_name": "Matrix Flat Box Handle 29-39\"",
+      "alternate_names": [],
+      "catalog_item_type": "tool",
+      "launch_candidate": true,
+      "source_pdf": "products\\scraped_results\\brands\\Columbia\\customercatalogue2024-3.pdf-3.pdf",
+      "price": null,
+      "price_source": null,
+      "notes": [],
+      "source_refs": [
+        {
+          "pdf_page": 18,
+          "catalog_page": 17,
+          "section": "Flat Box Handles",
+          "source_item_no": "MHS",
+          "source_line": "MHS Matrix Flat Box Handle 29-39”",
+          "extraction_method": "pdf_text",
+          "source_validation": "sku_found_in_pdf_text"
+        }
+      ]
+    },
+    {
+      "brand": "Columbia",
+      "official_sku": "CLT24",
+      "normalized_sku": "CLT24",
+      "product_name": "24\" Cam Lock Tube",
+      "alternate_names": [],
+      "catalog_item_type": "tool",
+      "launch_candidate": true,
+      "source_pdf": "products\\scraped_results\\brands\\Columbia\\customercatalogue2024-3.pdf-3.pdf",
+      "price": null,
+      "price_source": null,
+      "notes": [],
+      "source_refs": [
+        {
+          "pdf_page": 19,
+          "catalog_page": 18,
+          "section": "Semi Automatic Taper / Compound Tubes",
+          "source_item_no": "CLT24",
+          "source_line": "CLT24 24” Cam Lock Tube",
+          "extraction_method": "pdf_text",
+          "source_validation": "sku_found_in_pdf_text"
+        }
+      ]
+    },
+    {
+      "brand": "Columbia",
+      "official_sku": "CLT32",
+      "normalized_sku": "CLT32",
+      "product_name": "32\" Cam Lock Tube",
+      "alternate_names": [],
+      "catalog_item_type": "tool",
+      "launch_candidate": true,
+      "source_pdf": "products\\scraped_results\\brands\\Columbia\\customercatalogue2024-3.pdf-3.pdf",
+      "price": null,
+      "price_source": null,
+      "notes": [],
+      "source_refs": [
+        {
+          "pdf_page": 19,
+          "catalog_page": 18,
+          "section": "Semi Automatic Taper / Compound Tubes",
+          "source_item_no": "CLT32",
+          "source_line": "CLT32 32” Cam Lock Tube",
+          "extraction_method": "pdf_text",
+          "source_validation": "sku_found_in_pdf_text"
+        }
+      ]
+    },
+    {
+      "brand": "Columbia",
+      "official_sku": "CLT42",
+      "normalized_sku": "CLT42",
+      "product_name": "42\" Cam Lock Tube",
+      "alternate_names": [],
+      "catalog_item_type": "tool",
+      "launch_candidate": true,
+      "source_pdf": "products\\scraped_results\\brands\\Columbia\\customercatalogue2024-3.pdf-3.pdf",
+      "price": null,
+      "price_source": null,
+      "notes": [],
+      "source_refs": [
+        {
+          "pdf_page": 19,
+          "catalog_page": 18,
+          "section": "Semi Automatic Taper / Compound Tubes",
+          "source_item_no": "CLT42",
+          "source_line": "CLT42 42” Cam Lock Tube",
+          "extraction_method": "pdf_text",
+          "source_validation": "sku_found_in_pdf_text"
+        }
+      ]
+    },
+    {
+      "brand": "Columbia",
+      "official_sku": "CLT55",
+      "normalized_sku": "CLT55",
+      "product_name": "55\" Cam Lock Tube",
+      "alternate_names": [],
+      "catalog_item_type": "tool",
+      "launch_candidate": true,
+      "source_pdf": "products\\scraped_results\\brands\\Columbia\\customercatalogue2024-3.pdf-3.pdf",
+      "price": null,
+      "price_source": null,
+      "notes": [],
+      "source_refs": [
+        {
+          "pdf_page": 19,
+          "catalog_page": 18,
+          "section": "Semi Automatic Taper / Compound Tubes",
+          "source_item_no": "CLT55",
+          "source_line": "CLT55 55” Cam Lock Tube",
+          "extraction_method": "pdf_text",
+          "source_validation": "sku_found_in_pdf_text"
+        }
+      ]
+    },
+    {
+      "brand": "Columbia",
+      "official_sku": "CMT24",
+      "normalized_sku": "CMT24",
+      "product_name": "24\" Compound Tube",
+      "alternate_names": [],
+      "catalog_item_type": "tool",
+      "launch_candidate": true,
+      "source_pdf": "products\\scraped_results\\brands\\Columbia\\customercatalogue2024-3.pdf-3.pdf",
+      "price": null,
+      "price_source": null,
+      "notes": [],
+      "source_refs": [
+        {
+          "pdf_page": 19,
+          "catalog_page": 18,
+          "section": "Semi Automatic Taper / Compound Tubes",
+          "source_item_no": "CMT24",
+          "source_line": "CMT24 24” Compound Tube Stainless steel ball",
+          "extraction_method": "pdf_text",
+          "source_validation": "sku_found_in_pdf_text"
+        }
+      ]
+    },
+    {
+      "brand": "Columbia",
+      "official_sku": "CMT32",
+      "normalized_sku": "CMT32",
+      "product_name": "32\" Compound Tube",
+      "alternate_names": [],
+      "catalog_item_type": "tool",
+      "launch_candidate": true,
+      "source_pdf": "products\\scraped_results\\brands\\Columbia\\customercatalogue2024-3.pdf-3.pdf",
+      "price": null,
+      "price_source": null,
+      "notes": [],
+      "source_refs": [
+        {
+          "pdf_page": 19,
+          "catalog_page": 18,
+          "section": "Semi Automatic Taper / Compound Tubes",
+          "source_item_no": "CMT32",
+          "source_line": "CMT32 32” Compound Tube",
+          "extraction_method": "pdf_text",
+          "source_validation": "sku_found_in_pdf_text"
+        }
+      ]
+    },
+    {
+      "brand": "Columbia",
+      "official_sku": "CMT42",
+      "normalized_sku": "CMT42",
+      "product_name": "42\" Compound Tube",
+      "alternate_names": [],
+      "catalog_item_type": "tool",
+      "launch_candidate": true,
+      "source_pdf": "products\\scraped_results\\brands\\Columbia\\customercatalogue2024-3.pdf-3.pdf",
+      "price": null,
+      "price_source": null,
+      "notes": [],
+      "source_refs": [
+        {
+          "pdf_page": 19,
+          "catalog_page": 18,
+          "section": "Semi Automatic Taper / Compound Tubes",
+          "source_item_no": "CMT42",
+          "source_line": "CMT42 42” Compound Tube",
+          "extraction_method": "pdf_text",
+          "source_validation": "sku_found_in_pdf_text"
+        }
+      ]
+    },
+    {
+      "brand": "Columbia",
+      "official_sku": "CMT55",
+      "normalized_sku": "CMT55",
+      "product_name": "55\" Compound Tube",
+      "alternate_names": [],
+      "catalog_item_type": "tool",
+      "launch_candidate": true,
+      "source_pdf": "products\\scraped_results\\brands\\Columbia\\customercatalogue2024-3.pdf-3.pdf",
+      "price": null,
+      "price_source": null,
+      "notes": [],
+      "source_refs": [
+        {
+          "pdf_page": 19,
+          "catalog_page": 18,
+          "section": "Semi Automatic Taper / Compound Tubes",
+          "source_item_no": "CMT55",
+          "source_line": "CMT55 55” Compound Tube",
+          "extraction_method": "pdf_text",
+          "source_validation": "sku_found_in_pdf_text"
+        }
+      ]
+    },
+    {
+      "brand": "Columbia",
+      "official_sku": "SAT",
+      "normalized_sku": "SAT",
+      "product_name": "Semi Automatic Taper",
+      "alternate_names": [],
+      "catalog_item_type": "tool",
+      "launch_candidate": true,
+      "source_pdf": "products\\scraped_results\\brands\\Columbia\\customercatalogue2024-3.pdf-3.pdf",
+      "price": null,
+      "price_source": null,
+      "notes": [],
+      "source_refs": [
+        {
+          "pdf_page": 19,
+          "catalog_page": 18,
+          "section": "Semi Automatic Taper / Compound Tubes",
+          "source_item_no": "SAT",
+          "source_line": "specific amount of compound to a large volume of tape. It has a tape",
+          "extraction_method": "pdf_text",
+          "source_validation": "sku_found_in_pdf_text"
+        }
+      ]
+    },
+    {
+      "brand": "Columbia",
+      "official_sku": "CEXT90",
+      "normalized_sku": "CEXT90",
+      "product_name": "External 90 Applicator",
+      "alternate_names": [],
+      "catalog_item_type": "tool",
+      "launch_candidate": true,
+      "source_pdf": "products\\scraped_results\\brands\\Columbia\\customercatalogue2024-3.pdf-3.pdf",
+      "price": null,
+      "price_source": null,
+      "notes": [],
+      "source_refs": [
+        {
+          "pdf_page": 20,
+          "catalog_page": 19,
+          "section": "Billet Mud Applicators / UHMW Mud Applicators",
+          "source_item_no": "CEXT90",
+          "source_line": "CEXT90 External 90 Applicator",
+          "extraction_method": "pdf_text",
+          "source_validation": "sku_found_in_pdf_text"
+        }
+      ]
+    },
+    {
+      "brand": "Columbia",
+      "official_sku": "CFLT",
+      "normalized_sku": "CFLT",
+      "product_name": "Flat Applicator",
+      "alternate_names": [],
+      "catalog_item_type": "tool",
+      "launch_candidate": true,
+      "source_pdf": "products\\scraped_results\\brands\\Columbia\\customercatalogue2024-3.pdf-3.pdf",
+      "price": null,
+      "price_source": null,
+      "notes": [],
+      "source_refs": [
+        {
+          "pdf_page": 20,
+          "catalog_page": 19,
+          "section": "Billet Mud Applicators / UHMW Mud Applicators",
+          "source_item_no": "CFLT",
+          "source_line": "CFLT Flat Applicator",
+          "extraction_method": "pdf_text",
+          "source_validation": "sku_found_in_pdf_text"
+        }
+      ]
+    },
+    {
+      "brand": "Columbia",
+      "official_sku": "FMH",
+      "normalized_sku": "FMH",
+      "product_name": "L-Trim Applicator (Plastic)",
+      "alternate_names": [],
+      "catalog_item_type": "tool",
+      "launch_candidate": true,
+      "source_pdf": "products\\scraped_results\\brands\\Columbia\\customercatalogue2024-3.pdf-3.pdf",
+      "price": null,
+      "price_source": null,
+      "notes": [],
+      "source_refs": [
+        {
+          "pdf_page": 20,
+          "catalog_page": 19,
+          "section": "Billet Mud Applicators / UHMW Mud Applicators",
+          "source_item_no": "FMH",
+          "source_line": "FMH L-Trim Applicator (Plastic)",
+          "extraction_method": "pdf_text",
+          "source_validation": "sku_found_in_pdf_text"
+        }
+      ]
+    },
+    {
+      "brand": "Columbia",
+      "official_sku": "IA90",
+      "normalized_sku": "IA90",
+      "product_name": "Inside 90 Degree Applicator (Plastic)",
+      "alternate_names": [],
+      "catalog_item_type": "tool",
+      "launch_candidate": true,
+      "source_pdf": "products\\scraped_results\\brands\\Columbia\\customercatalogue2024-3.pdf-3.pdf",
+      "price": null,
+      "price_source": null,
+      "notes": [],
+      "source_refs": [
+        {
+          "pdf_page": 20,
+          "catalog_page": 19,
+          "section": "Billet Mud Applicators / UHMW Mud Applicators",
+          "source_item_no": "IA90",
+          "source_line": "IA90 Inside 90° Applicator (Plastic)",
+          "extraction_method": "pdf_text",
+          "source_validation": "sku_found_in_pdf_text"
+        }
+      ]
+    },
+    {
+      "brand": "Columbia",
+      "official_sku": "ICA2-1",
+      "normalized_sku": "ICA2-1",
+      "product_name": "Inside Corner Applicator (2 Wheels) - 1\"",
+      "alternate_names": [],
+      "catalog_item_type": "tool",
+      "launch_candidate": true,
+      "source_pdf": "products\\scraped_results\\brands\\Columbia\\customercatalogue2024-3.pdf-3.pdf",
+      "price": null,
+      "price_source": null,
+      "notes": [],
+      "source_refs": [
+        {
+          "pdf_page": 20,
+          "catalog_page": 19,
+          "section": "Billet Mud Applicators / UHMW Mud Applicators",
+          "source_item_no": "ICA2-1",
+          "source_line": "ICA2-1 Inside Corner Applicator (2 Wheels) - 1”",
+          "extraction_method": "pdf_text",
+          "source_validation": "sku_found_in_pdf_text"
+        }
+      ]
+    },
+    {
+      "brand": "Columbia",
+      "official_sku": "ICA4-1",
+      "normalized_sku": "ICA4-1",
+      "product_name": "Inside Corner Applicator (4 Wheels) - 1\"",
+      "alternate_names": [],
+      "catalog_item_type": "tool",
+      "launch_candidate": true,
+      "source_pdf": "products\\scraped_results\\brands\\Columbia\\customercatalogue2024-3.pdf-3.pdf",
+      "price": null,
+      "price_source": null,
+      "notes": [],
+      "source_refs": [
+        {
+          "pdf_page": 20,
+          "catalog_page": 19,
+          "section": "Billet Mud Applicators / UHMW Mud Applicators",
+          "source_item_no": "ICA4-1",
+          "source_line": "ICA4-1 Inside Corner Applicator (4 Wheels) - 1”",
+          "extraction_method": "pdf_text",
+          "source_validation": "sku_found_in_pdf_text"
+        }
+      ]
+    },
+    {
+      "brand": "Columbia",
+      "official_sku": "ICATW",
+      "normalized_sku": "ICATW",
+      "product_name": "Two-Way Internal Corner Applicator (4 Wheels)",
+      "alternate_names": [],
+      "catalog_item_type": "tool",
+      "launch_candidate": true,
+      "source_pdf": "products\\scraped_results\\brands\\Columbia\\customercatalogue2024-3.pdf-3.pdf",
+      "price": null,
+      "price_source": null,
+      "notes": [],
+      "source_refs": [
+        {
+          "pdf_page": 20,
+          "catalog_page": 19,
+          "section": "Billet Mud Applicators / UHMW Mud Applicators",
+          "source_item_no": "ICATW",
+          "source_line": "ICATW Two-Way Internal Corner Applicator (4 Wheels)",
+          "extraction_method": "pdf_text",
+          "source_validation": "sku_found_in_pdf_text"
+        }
+      ]
+    },
+    {
+      "brand": "Columbia",
+      "official_sku": "OA90",
+      "normalized_sku": "OA90",
+      "product_name": "Outside 90 Degree Applicator (Plastic)",
+      "alternate_names": [],
+      "catalog_item_type": "tool",
+      "launch_candidate": true,
+      "source_pdf": "products\\scraped_results\\brands\\Columbia\\customercatalogue2024-3.pdf-3.pdf",
+      "price": null,
+      "price_source": null,
+      "notes": [],
+      "source_refs": [
+        {
+          "pdf_page": 20,
+          "catalog_page": 19,
+          "section": "Billet Mud Applicators / UHMW Mud Applicators",
+          "source_item_no": "OA90",
+          "source_line": "OA90 Outside 90° Applicator (Plastic)",
+          "extraction_method": "pdf_text",
+          "source_validation": "sku_found_in_pdf_text"
+        }
+      ]
+    },
+    {
+      "brand": "Columbia",
+      "official_sku": "OA90-325",
+      "normalized_sku": "OA90-325",
+      "product_name": "Outside 90 Degree 325 Applicator (Plastic)",
+      "alternate_names": [],
+      "catalog_item_type": "tool",
+      "launch_candidate": true,
+      "source_pdf": "products\\scraped_results\\brands\\Columbia\\customercatalogue2024-3.pdf-3.pdf",
+      "price": null,
+      "price_source": null,
+      "notes": [],
+      "source_refs": [
+        {
+          "pdf_page": 20,
+          "catalog_page": 19,
+          "section": "Billet Mud Applicators / UHMW Mud Applicators",
+          "source_item_no": "OA90-325",
+          "source_line": "OA90-325 Outside 90° 325 Applicator (Plastic)",
+          "extraction_method": "pdf_text",
+          "source_validation": "sku_found_in_pdf_text"
+        }
+      ]
+    },
+    {
+      "brand": "Columbia",
+      "official_sku": "2.5CSF",
+      "normalized_sku": "2.5CSF",
+      "product_name": "2.5\" Combo Flusher",
+      "alternate_names": [],
+      "catalog_item_type": "tool",
+      "launch_candidate": true,
+      "source_pdf": "products\\scraped_results\\brands\\Columbia\\customercatalogue2024-3.pdf-3.pdf",
+      "price": null,
+      "price_source": null,
+      "notes": [],
+      "source_refs": [
+        {
+          "pdf_page": 21,
+          "catalog_page": 20,
+          "section": "Corner Flushers",
+          "source_item_no": "2.5CSF",
+          "source_line": "2.5CSF 2.5” Combo Flusher",
+          "extraction_method": "pdf_text",
+          "source_validation": "sku_found_in_pdf_text"
+        }
+      ]
+    },
+    {
+      "brand": "Columbia",
+      "official_sku": "2.5DF",
+      "normalized_sku": "2.5DF",
+      "product_name": "2.5\" Direct Flusher",
+      "alternate_names": [],
+      "catalog_item_type": "tool",
+      "launch_candidate": true,
+      "source_pdf": "products\\scraped_results\\brands\\Columbia\\customercatalogue2024-3.pdf-3.pdf",
+      "price": null,
+      "price_source": null,
+      "notes": [],
+      "source_refs": [
+        {
+          "pdf_page": 21,
+          "catalog_page": 20,
+          "section": "Corner Flushers",
+          "source_item_no": "2.5DF",
+          "source_line": "2.5DF 2.5” Direct Flusher",
+          "extraction_method": "pdf_text",
+          "source_validation": "sku_found_in_pdf_text"
+        }
+      ]
+    },
+    {
+      "brand": "Columbia",
+      "official_sku": "2.5SF",
+      "normalized_sku": "2.5SF",
+      "product_name": "2.5\" Standard Flusher",
+      "alternate_names": [],
+      "catalog_item_type": "tool",
+      "launch_candidate": true,
+      "source_pdf": "products\\scraped_results\\brands\\Columbia\\customercatalogue2024-3.pdf-3.pdf",
+      "price": null,
+      "price_source": null,
+      "notes": [],
+      "source_refs": [
+        {
+          "pdf_page": 21,
+          "catalog_page": 20,
+          "section": "Corner Flushers",
+          "source_item_no": "2.5SF",
+          "source_line": "2.5SF 2.5” Standard Flusher",
+          "extraction_method": "pdf_text",
+          "source_validation": "sku_found_in_pdf_text"
+        }
+      ]
+    },
+    {
+      "brand": "Columbia",
+      "official_sku": "3.5CSF",
+      "normalized_sku": "3.5CSF",
+      "product_name": "3.5\" Combo Flusher",
+      "alternate_names": [],
+      "catalog_item_type": "tool",
+      "launch_candidate": true,
+      "source_pdf": "products\\scraped_results\\brands\\Columbia\\customercatalogue2024-3.pdf-3.pdf",
+      "price": null,
+      "price_source": null,
+      "notes": [],
+      "source_refs": [
+        {
+          "pdf_page": 21,
+          "catalog_page": 20,
+          "section": "Corner Flushers",
+          "source_item_no": "3.5CSF",
+          "source_line": "3.5CSF 3.5” Combo Flusher",
+          "extraction_method": "pdf_text",
+          "source_validation": "sku_found_in_pdf_text"
+        }
+      ]
+    },
+    {
+      "brand": "Columbia",
+      "official_sku": "3.5DF",
+      "normalized_sku": "3.5DF",
+      "product_name": "3.5\" Direct Flusher",
+      "alternate_names": [],
+      "catalog_item_type": "tool",
+      "launch_candidate": true,
+      "source_pdf": "products\\scraped_results\\brands\\Columbia\\customercatalogue2024-3.pdf-3.pdf",
+      "price": null,
+      "price_source": null,
+      "notes": [],
+      "source_refs": [
+        {
+          "pdf_page": 21,
+          "catalog_page": 20,
+          "section": "Corner Flushers",
+          "source_item_no": "3.5DF",
+          "source_line": "3.5DF 3.5” Direct Flusher",
+          "extraction_method": "pdf_text",
+          "source_validation": "sku_found_in_pdf_text"
+        }
+      ]
+    },
+    {
+      "brand": "Columbia",
+      "official_sku": "3.5SF",
+      "normalized_sku": "3.5SF",
+      "product_name": "3.5\" Standard Flusher",
+      "alternate_names": [],
+      "catalog_item_type": "tool",
+      "launch_candidate": true,
+      "source_pdf": "products\\scraped_results\\brands\\Columbia\\customercatalogue2024-3.pdf-3.pdf",
+      "price": null,
+      "price_source": null,
+      "notes": [],
+      "source_refs": [
+        {
+          "pdf_page": 21,
+          "catalog_page": 20,
+          "section": "Corner Flushers",
+          "source_item_no": "3.5SF",
+          "source_line": "3.5SF 3.5” Standard Flusher",
+          "extraction_method": "pdf_text",
+          "source_validation": "sku_found_in_pdf_text"
+        }
+      ]
+    },
+    {
+      "brand": "Columbia",
+      "official_sku": "3CSF",
+      "normalized_sku": "3CSF",
+      "product_name": "3\" Combo Flusher",
+      "alternate_names": [],
+      "catalog_item_type": "tool",
+      "launch_candidate": true,
+      "source_pdf": "products\\scraped_results\\brands\\Columbia\\customercatalogue2024-3.pdf-3.pdf",
+      "price": null,
+      "price_source": null,
+      "notes": [],
+      "source_refs": [
+        {
+          "pdf_page": 21,
+          "catalog_page": 20,
+          "section": "Corner Flushers",
+          "source_item_no": "3CSF",
+          "source_line": "3CSF 3” Combo Flusher",
+          "extraction_method": "pdf_text",
+          "source_validation": "sku_found_in_pdf_text"
+        }
+      ]
+    },
+    {
+      "brand": "Columbia",
+      "official_sku": "3DF",
+      "normalized_sku": "3DF",
+      "product_name": "3\" Direct Flusher",
+      "alternate_names": [],
+      "catalog_item_type": "tool",
+      "launch_candidate": true,
+      "source_pdf": "products\\scraped_results\\brands\\Columbia\\customercatalogue2024-3.pdf-3.pdf",
+      "price": null,
+      "price_source": null,
+      "notes": [],
+      "source_refs": [
+        {
+          "pdf_page": 21,
+          "catalog_page": 20,
+          "section": "Corner Flushers",
+          "source_item_no": "3DF",
+          "source_line": "3DF 3” Direct Flusher",
+          "extraction_method": "pdf_text",
+          "source_validation": "sku_found_in_pdf_text"
+        }
+      ]
+    },
+    {
+      "brand": "Columbia",
+      "official_sku": "3SF",
+      "normalized_sku": "3SF",
+      "product_name": "3\" Standard Flusher",
+      "alternate_names": [],
+      "catalog_item_type": "tool",
+      "launch_candidate": true,
+      "source_pdf": "products\\scraped_results\\brands\\Columbia\\customercatalogue2024-3.pdf-3.pdf",
+      "price": null,
+      "price_source": null,
+      "notes": [],
+      "source_refs": [
+        {
+          "pdf_page": 21,
+          "catalog_page": 20,
+          "section": "Corner Flushers",
+          "source_item_no": "3SF",
+          "source_line": "3SF 3” Standard Flusher",
+          "extraction_method": "pdf_text",
+          "source_validation": "sku_found_in_pdf_text"
+        }
+      ]
+    },
+    {
+      "brand": "Columbia",
+      "official_sku": "3WTCSF",
+      "normalized_sku": "3WTCSF",
+      "product_name": "3\" Widetrack Combo Flusher",
+      "alternate_names": [],
+      "catalog_item_type": "tool",
+      "launch_candidate": true,
+      "source_pdf": "products\\scraped_results\\brands\\Columbia\\customercatalogue2024-3.pdf-3.pdf",
+      "price": null,
+      "price_source": null,
+      "notes": [],
+      "source_refs": [
+        {
+          "pdf_page": 21,
+          "catalog_page": 20,
+          "section": "Corner Flushers",
+          "source_item_no": "3WTCSF",
+          "source_line": "3WTCSF 3” Widetrack Combo Flusher",
+          "extraction_method": "pdf_text",
+          "source_validation": "sku_found_in_pdf_text"
+        }
+      ]
+    },
+    {
+      "brand": "Columbia",
+      "official_sku": "3WTDF",
+      "normalized_sku": "3WTDF",
+      "product_name": "3\" Widetrack Direct Flusher",
+      "alternate_names": [],
+      "catalog_item_type": "tool",
+      "launch_candidate": true,
+      "source_pdf": "products\\scraped_results\\brands\\Columbia\\customercatalogue2024-3.pdf-3.pdf",
+      "price": null,
+      "price_source": null,
+      "notes": [],
+      "source_refs": [
+        {
+          "pdf_page": 21,
+          "catalog_page": 20,
+          "section": "Corner Flushers",
+          "source_item_no": "3WTDF",
+          "source_line": "3WTDF 3” Widetrack Direct Flusher",
+          "extraction_method": "pdf_text",
+          "source_validation": "sku_found_in_pdf_text"
+        }
+      ]
+    },
+    {
+      "brand": "Columbia",
+      "official_sku": "3WTSF",
+      "normalized_sku": "3WTSF",
+      "product_name": "3\" Widetrack Standard Flusher",
+      "alternate_names": [],
+      "catalog_item_type": "tool",
+      "launch_candidate": true,
+      "source_pdf": "products\\scraped_results\\brands\\Columbia\\customercatalogue2024-3.pdf-3.pdf",
+      "price": null,
+      "price_source": null,
+      "notes": [],
+      "source_refs": [
+        {
+          "pdf_page": 21,
+          "catalog_page": 20,
+          "section": "Corner Flushers",
+          "source_item_no": "3WTSF",
+          "source_line": "3WTSF 3” Widetrack Standard Flusher",
+          "extraction_method": "pdf_text",
+          "source_validation": "sku_found_in_pdf_text"
+        }
+      ]
+    },
+    {
+      "brand": "Columbia",
+      "official_sku": "4DF",
+      "normalized_sku": "4DF",
+      "product_name": "4\" Direct Flusher",
+      "alternate_names": [],
+      "catalog_item_type": "tool",
+      "launch_candidate": true,
+      "source_pdf": "products\\scraped_results\\brands\\Columbia\\customercatalogue2024-3.pdf-3.pdf",
+      "price": null,
+      "price_source": null,
+      "notes": [],
+      "source_refs": [
+        {
+          "pdf_page": 21,
+          "catalog_page": 20,
+          "section": "Corner Flushers",
+          "source_item_no": "4DF",
+          "source_line": "4DF 4” Direct Flusher",
+          "extraction_method": "pdf_text",
+          "source_validation": "sku_found_in_pdf_text"
+        }
+      ]
+    },
+    {
+      "brand": "Columbia",
+      "official_sku": "4SF",
+      "normalized_sku": "4SF",
+      "product_name": "4\" Standard Flusher",
+      "alternate_names": [],
+      "catalog_item_type": "tool",
+      "launch_candidate": true,
+      "source_pdf": "products\\scraped_results\\brands\\Columbia\\customercatalogue2024-3.pdf-3.pdf",
+      "price": null,
+      "price_source": null,
+      "notes": [],
+      "source_refs": [
+        {
+          "pdf_page": 21,
+          "catalog_page": 20,
+          "section": "Corner Flushers",
+          "source_item_no": "4SF",
+          "source_line": "4SF 4” Standard Flusher",
+          "extraction_method": "pdf_text",
+          "source_validation": "sku_found_in_pdf_text"
+        }
+      ]
+    },
+    {
+      "brand": "Columbia",
+      "official_sku": "CS",
+      "normalized_sku": "CS",
+      "product_name": "Columbia Sander Head",
+      "alternate_names": [],
+      "catalog_item_type": "tool",
+      "launch_candidate": true,
+      "source_pdf": "products\\scraped_results\\brands\\Columbia\\customercatalogue2024-3.pdf-3.pdf",
+      "price": null,
+      "price_source": null,
+      "notes": [],
+      "source_refs": [
+        {
+          "pdf_page": 22,
+          "catalog_page": 21,
+          "section": "Sanders",
+          "source_item_no": "CS",
+          "source_line": "CS Columbia Sander Head",
+          "extraction_method": "pdf_text",
+          "source_validation": "sku_found_in_pdf_text"
+        }
+      ]
+    },
+    {
+      "brand": "Columbia",
+      "official_sku": "CSH",
+      "normalized_sku": "CSH",
+      "product_name": "Columbia Sander Pole",
+      "alternate_names": [],
+      "catalog_item_type": "tool",
+      "launch_candidate": true,
+      "source_pdf": "products\\scraped_results\\brands\\Columbia\\customercatalogue2024-3.pdf-3.pdf",
+      "price": null,
+      "price_source": null,
+      "notes": [],
+      "source_refs": [
+        {
+          "pdf_page": 22,
+          "catalog_page": 21,
+          "section": "Sanders",
+          "source_item_no": "CSH",
+          "source_line": "CSH Columbia Sander Pole",
+          "extraction_method": "pdf_text",
+          "source_validation": "sku_found_in_pdf_text"
+        }
+      ]
+    },
+    {
+      "brand": "Columbia",
+      "official_sku": "PDDM",
+      "normalized_sku": "PDDM",
+      "product_name": "Phantom DDM Sander",
+      "alternate_names": [],
+      "catalog_item_type": "tool",
+      "launch_candidate": true,
+      "source_pdf": "products\\scraped_results\\brands\\Columbia\\customercatalogue2024-3.pdf-3.pdf",
+      "price": null,
+      "price_source": null,
+      "notes": [],
+      "source_refs": [
+        {
+          "pdf_page": 22,
+          "catalog_page": 21,
+          "section": "Sanders",
+          "source_item_no": "PDDM",
+          "source_line": "PDDM Phantom DDM Sander",
+          "extraction_method": "pdf_text",
+          "source_validation": "sku_found_in_pdf_text"
+        }
+      ]
+    },
+    {
+      "brand": "Columbia",
+      "official_sku": "TL-3-8",
+      "normalized_sku": "TL-3-8",
+      "product_name": "Twist Lock Handle w PHA",
+      "alternate_names": [],
+      "catalog_item_type": "tool",
+      "launch_candidate": true,
+      "source_pdf": "products\\scraped_results\\brands\\Columbia\\customercatalogue2024-3.pdf-3.pdf",
+      "price": null,
+      "price_source": null,
+      "notes": [],
+      "source_refs": [
+        {
+          "pdf_page": 22,
+          "catalog_page": 21,
+          "section": "Sanders",
+          "source_item_no": "TL-3-8",
+          "source_line": "TL-3-8 Twist Lock Handle w PHA",
+          "extraction_method": "pdf_text",
+          "source_validation": "sku_found_in_pdf_text"
+        }
+      ]
+    },
+    {
+      "brand": "Columbia",
+      "official_sku": "RC",
+      "normalized_sku": "RC",
+      "product_name": "Columbia Road Case",
+      "alternate_names": [],
+      "catalog_item_type": "case",
+      "launch_candidate": true,
+      "source_pdf": "products\\scraped_results\\brands\\Columbia\\customercatalogue2024-3.pdf-3.pdf",
+      "price": null,
+      "price_source": null,
+      "notes": [],
+      "source_refs": [
+        {
+          "pdf_page": 23,
+          "catalog_page": 22,
+          "section": "Tool Cases",
+          "source_item_no": "RC",
+          "source_line": "RC Columbia Road Case",
+          "extraction_method": "pdf_text",
+          "source_validation": "sku_found_in_pdf_text"
+        }
+      ]
+    },
+    {
+      "brand": "Columbia",
+      "official_sku": "TCS",
+      "normalized_sku": "TCS",
+      "product_name": "Columbia Gun Case",
+      "alternate_names": [],
+      "catalog_item_type": "case",
+      "launch_candidate": true,
+      "source_pdf": "products\\scraped_results\\brands\\Columbia\\customercatalogue2024-3.pdf-3.pdf",
+      "price": null,
+      "price_source": null,
+      "notes": [],
+      "source_refs": [
+        {
+          "pdf_page": 23,
+          "catalog_page": 22,
+          "section": "Tool Cases",
+          "source_item_no": "TCS",
+          "source_line": "TCS Columbia Gun Case",
+          "extraction_method": "pdf_text",
+          "source_validation": "sku_found_in_pdf_text"
+        }
+      ]
+    },
+    {
+      "brand": "Columbia",
+      "official_sku": "AHR-BK-2",
+      "normalized_sku": "AHR-BK-2",
+      "product_name": "Anglehead Blade Kit 2\"",
+      "alternate_names": [],
+      "catalog_item_type": "maintenance_kit",
+      "launch_candidate": false,
+      "source_pdf": "products\\scraped_results\\brands\\Columbia\\customercatalogue2024-3.pdf-3.pdf",
+      "price": null,
+      "price_source": null,
+      "notes": [],
+      "source_refs": [
+        {
+          "pdf_page": 24,
+          "catalog_page": 23,
+          "section": "Maintenance Kits",
+          "source_item_no": "AHR-BK-2",
+          "source_line": "AHR-BK-2 Anglehead Blade Kit 2”",
+          "extraction_method": "pdf_visual_table",
+          "source_validation": "sku_found_in_pdf_text"
+        }
+      ]
+    },
+    {
+      "brand": "Columbia",
+      "official_sku": "AHR-BK-2.5",
+      "normalized_sku": "AHR-BK-2.5",
+      "product_name": "Anglehead Blade Kit 2.5\"",
+      "alternate_names": [],
+      "catalog_item_type": "maintenance_kit",
+      "launch_candidate": false,
+      "source_pdf": "products\\scraped_results\\brands\\Columbia\\customercatalogue2024-3.pdf-3.pdf",
+      "price": null,
+      "price_source": null,
+      "notes": [],
+      "source_refs": [
+        {
+          "pdf_page": 24,
+          "catalog_page": 23,
+          "section": "Maintenance Kits",
+          "source_item_no": "AHR-BK-2.5",
+          "source_line": "AHR-BK-2.5 Anglehead Blade Kit 2.5”",
+          "extraction_method": "pdf_visual_table",
+          "source_validation": "sku_found_in_pdf_text"
+        }
+      ]
+    },
+    {
+      "brand": "Columbia",
+      "official_sku": "AHR-BK-3",
+      "normalized_sku": "AHR-BK-3",
+      "product_name": "Anglehead Blade Kit 3.5\"",
+      "alternate_names": [],
+      "catalog_item_type": "maintenance_kit",
+      "launch_candidate": false,
+      "source_pdf": "products\\scraped_results\\brands\\Columbia\\customercatalogue2024-3.pdf-3.pdf",
+      "price": null,
+      "price_source": null,
+      "notes": [],
+      "source_refs": [
+        {
+          "pdf_page": 24,
+          "catalog_page": 23,
+          "section": "Maintenance Kits",
+          "source_item_no": "AHR-BK-3",
+          "source_line": "AHR-BK-3 Anglehead Blade Kit 3.5”",
+          "extraction_method": "pdf_visual_table",
+          "source_validation": "sku_found_in_pdf_text"
+        }
+      ]
+    },
+    {
+      "brand": "Columbia",
+      "official_sku": "AHR-K",
+      "normalized_sku": "AHR-K",
+      "product_name": "Anglehead Maintenance Kit",
+      "alternate_names": [],
+      "catalog_item_type": "maintenance_kit",
+      "launch_candidate": false,
+      "source_pdf": "products\\scraped_results\\brands\\Columbia\\customercatalogue2024-3.pdf-3.pdf",
+      "price": null,
+      "price_source": null,
+      "notes": [],
+      "source_refs": [
+        {
+          "pdf_page": 24,
+          "catalog_page": 23,
+          "section": "Maintenance Kits",
+          "source_item_no": "AHR-K",
+          "source_line": "AHR-K Anglehead Maintenance Kit",
+          "extraction_method": "pdf_visual_table",
+          "source_validation": "sku_found_in_pdf_text"
+        }
+      ]
+    },
+    {
+      "brand": "Columbia",
+      "official_sku": "CC-RK",
+      "normalized_sku": "CC-RK",
+      "product_name": "Corner Cobra Maintenance Kit",
+      "alternate_names": [],
+      "catalog_item_type": "maintenance_kit",
+      "launch_candidate": false,
+      "source_pdf": "products\\scraped_results\\brands\\Columbia\\customercatalogue2024-3.pdf-3.pdf",
+      "price": null,
+      "price_source": null,
+      "notes": [],
+      "source_refs": [
+        {
+          "pdf_page": 24,
+          "catalog_page": 23,
+          "section": "Maintenance Kits",
+          "source_item_no": "CC-RK",
+          "source_line": "CC-RK Corner Cobra Maintenance Kit",
+          "extraction_method": "pdf_visual_table",
+          "source_validation": "sku_found_in_pdf_text"
+        }
+      ]
+    },
+    {
+      "brand": "Columbia",
+      "official_sku": "CRA-2",
+      "normalized_sku": "CRA-2",
+      "product_name": "Corner Roller Wheel Kit",
+      "alternate_names": [],
+      "catalog_item_type": "maintenance_kit",
+      "launch_candidate": false,
+      "source_pdf": "products\\scraped_results\\brands\\Columbia\\customercatalogue2024-3.pdf-3.pdf",
+      "price": null,
+      "price_source": null,
+      "notes": [],
+      "source_refs": [
+        {
+          "pdf_page": 24,
+          "catalog_page": 23,
+          "section": "Maintenance Kits",
+          "source_item_no": "CRA-2",
+          "source_line": "CRA-2 Corner Roller Wheel Kit",
+          "extraction_method": "pdf_visual_table",
+          "source_validation": "sku_found_in_pdf_text"
+        }
+      ]
+    },
+    {
+      "brand": "Columbia",
+      "official_sku": "CTA-41",
+      "normalized_sku": "CTA-41",
+      "product_name": "Cutter Block Assembly",
+      "alternate_names": [],
+      "catalog_item_type": "maintenance_kit",
+      "launch_candidate": false,
+      "source_pdf": "products\\scraped_results\\brands\\Columbia\\customercatalogue2024-3.pdf-3.pdf",
+      "price": null,
+      "price_source": null,
+      "notes": [],
+      "source_refs": [
+        {
+          "pdf_page": 24,
+          "catalog_page": 23,
+          "section": "Maintenance Kits",
+          "source_item_no": "CTA-41",
+          "source_line": "CTA-41 Cutter Block Assembly",
+          "extraction_method": "pdf_visual_table",
+          "source_validation": "sku_found_in_pdf_text"
+        }
+      ]
+    },
+    {
+      "brand": "Columbia",
+      "official_sku": "CTR-1",
+      "normalized_sku": "CTR-1",
+      "product_name": "Taper Maintenance Kit",
+      "alternate_names": [],
+      "catalog_item_type": "maintenance_kit",
+      "launch_candidate": false,
+      "source_pdf": "products\\scraped_results\\brands\\Columbia\\customercatalogue2024-3.pdf-3.pdf",
+      "price": null,
+      "price_source": null,
+      "notes": [],
+      "source_refs": [
+        {
+          "pdf_page": 24,
+          "catalog_page": 23,
+          "section": "Maintenance Kits",
+          "source_item_no": "CTR-1",
+          "source_line": "CTR-1 Taper Maintenance Kit",
+          "extraction_method": "pdf_visual_table",
+          "source_validation": "sku_found_in_pdf_text"
+        }
+      ]
+    },
+    {
+      "brand": "Columbia",
+      "official_sku": "CTR-2",
+      "normalized_sku": "CTR-2",
+      "product_name": "Taper Head Maintenance Kit",
+      "alternate_names": [],
+      "catalog_item_type": "maintenance_kit",
+      "launch_candidate": false,
+      "source_pdf": "products\\scraped_results\\brands\\Columbia\\customercatalogue2024-3.pdf-3.pdf",
+      "price": null,
+      "price_source": null,
+      "notes": [],
+      "source_refs": [
+        {
+          "pdf_page": 24,
+          "catalog_page": 23,
+          "section": "Maintenance Kits",
+          "source_item_no": "CTR-2",
+          "source_line": "CTR-2 Taper Head Maintenance Kit",
+          "extraction_method": "pdf_visual_table",
+          "source_validation": "sku_found_in_pdf_text"
+        }
+      ]
+    },
+    {
+      "brand": "Columbia",
+      "official_sku": "CTR-42A",
+      "normalized_sku": "CTR-42A",
+      "product_name": "Taper Blades Kit",
+      "alternate_names": [],
+      "catalog_item_type": "maintenance_kit",
+      "launch_candidate": false,
+      "source_pdf": "products\\scraped_results\\brands\\Columbia\\customercatalogue2024-3.pdf-3.pdf",
+      "price": null,
+      "price_source": null,
+      "notes": [],
+      "source_refs": [
+        {
+          "pdf_page": 24,
+          "catalog_page": 23,
+          "section": "Maintenance Kits",
+          "source_item_no": "CTR-42A",
+          "source_line": "CTR-42A Taper Blades Kit",
+          "extraction_method": "pdf_visual_table",
+          "source_validation": "sku_found_in_pdf_text"
+        }
+      ]
+    },
+    {
+      "brand": "Columbia",
+      "official_sku": "CTR-63",
+      "normalized_sku": "CTR-63",
+      "product_name": "Taper Needles Kit",
+      "alternate_names": [],
+      "catalog_item_type": "maintenance_kit",
+      "launch_candidate": false,
+      "source_pdf": "products\\scraped_results\\brands\\Columbia\\customercatalogue2024-3.pdf-3.pdf",
+      "price": null,
+      "price_source": null,
+      "notes": [],
+      "source_refs": [
+        {
+          "pdf_page": 24,
+          "catalog_page": 23,
+          "section": "Maintenance Kits",
+          "source_item_no": "CTR-63",
+          "source_line": "CTR-63 Taper Needles Kit",
+          "extraction_method": "pdf_visual_table",
+          "source_validation": "sku_found_in_pdf_text"
+        }
+      ]
+    },
+    {
+      "brand": "Columbia",
+      "official_sku": "CTR-72",
+      "normalized_sku": "CTR-72",
+      "product_name": "Taper Cables Kit",
+      "alternate_names": [],
+      "catalog_item_type": "maintenance_kit",
+      "launch_candidate": false,
+      "source_pdf": "products\\scraped_results\\brands\\Columbia\\customercatalogue2024-3.pdf-3.pdf",
+      "price": null,
+      "price_source": null,
+      "notes": [],
+      "source_refs": [
+        {
+          "pdf_page": 24,
+          "catalog_page": 23,
+          "section": "Maintenance Kits",
+          "source_item_no": "CTR-72",
+          "source_line": "CTR-72 Taper Cables Kit",
+          "extraction_method": "pdf_visual_table",
+          "source_validation": "sku_found_in_pdf_text"
+        }
+      ]
+    },
+    {
+      "brand": "Columbia",
+      "official_sku": "FFBA-36",
+      "normalized_sku": "FFBA-36",
+      "product_name": "Box Wheels Kit",
+      "alternate_names": [],
+      "catalog_item_type": "maintenance_kit",
+      "launch_candidate": false,
+      "source_pdf": "products\\scraped_results\\brands\\Columbia\\customercatalogue2024-3.pdf-3.pdf",
+      "price": null,
+      "price_source": null,
+      "notes": [],
+      "source_refs": [
+        {
+          "pdf_page": 24,
+          "catalog_page": 23,
+          "section": "Maintenance Kits",
+          "source_item_no": "FFBA-36",
+          "source_line": "FFBA-36 Box Wheels Kit",
+          "extraction_method": "pdf_visual_table",
+          "source_validation": "sku_found_in_pdf_text"
+        }
+      ]
+    },
+    {
+      "brand": "Columbia",
+      "official_sku": "FFBR-7-7A",
+      "normalized_sku": "FFBR-7-7A",
+      "product_name": "Box Shoes Kit",
+      "alternate_names": [],
+      "catalog_item_type": "maintenance_kit",
+      "launch_candidate": false,
+      "source_pdf": "products\\scraped_results\\brands\\Columbia\\customercatalogue2024-3.pdf-3.pdf",
+      "price": null,
+      "price_source": null,
+      "notes": [],
+      "source_refs": [
+        {
+          "pdf_page": 24,
+          "catalog_page": 23,
+          "section": "Maintenance Kits",
+          "source_item_no": "FFBR-7-7A",
+          "source_line": "FFBR-7-7A Box Shoes Kit",
+          "extraction_method": "pdf_visual_table",
+          "source_validation": "sku_found_in_pdf_text"
+        }
+      ]
+    },
+    {
+      "brand": "Columbia",
+      "official_sku": "FFBR-9-10",
+      "normalized_sku": "FFBR-9-10",
+      "product_name": "Box Blades Kit 10\"",
+      "alternate_names": [],
+      "catalog_item_type": "maintenance_kit",
+      "launch_candidate": false,
+      "source_pdf": "products\\scraped_results\\brands\\Columbia\\customercatalogue2024-3.pdf-3.pdf",
+      "price": null,
+      "price_source": null,
+      "notes": [],
+      "source_refs": [
+        {
+          "pdf_page": 24,
+          "catalog_page": 23,
+          "section": "Maintenance Kits",
+          "source_item_no": "FFBR-9-10",
+          "source_line": "FFBR-9-10 Box Blades Kit 10”",
+          "extraction_method": "pdf_visual_table",
+          "source_validation": "sku_found_in_pdf_text"
+        }
+      ]
+    },
+    {
+      "brand": "Columbia",
+      "official_sku": "FFBR-9-12",
+      "normalized_sku": "FFBR-9-12",
+      "product_name": "Box Blades Kit 12\"",
+      "alternate_names": [],
+      "catalog_item_type": "maintenance_kit",
+      "launch_candidate": false,
+      "source_pdf": "products\\scraped_results\\brands\\Columbia\\customercatalogue2024-3.pdf-3.pdf",
+      "price": null,
+      "price_source": null,
+      "notes": [],
+      "source_refs": [
+        {
+          "pdf_page": 24,
+          "catalog_page": 23,
+          "section": "Maintenance Kits",
+          "source_item_no": "FFBR-9-12",
+          "source_line": "FFBR-9-12 Box Blades Kit 12”",
+          "extraction_method": "pdf_visual_table",
+          "source_validation": "sku_found_in_pdf_text"
+        }
+      ]
+    },
+    {
+      "brand": "Columbia",
+      "official_sku": "FFBR-9-14",
+      "normalized_sku": "FFBR-9-14",
+      "product_name": "Box Blades Kit 14\"",
+      "alternate_names": [],
+      "catalog_item_type": "maintenance_kit",
+      "launch_candidate": false,
+      "source_pdf": "products\\scraped_results\\brands\\Columbia\\customercatalogue2024-3.pdf-3.pdf",
+      "price": null,
+      "price_source": null,
+      "notes": [],
+      "source_refs": [
+        {
+          "pdf_page": 24,
+          "catalog_page": 23,
+          "section": "Maintenance Kits",
+          "source_item_no": "FFBR-9-14",
+          "source_line": "FFBR-9-14 Box Blades Kit 14\"",
+          "extraction_method": "pdf_visual_table",
+          "source_validation": "sku_verified_from_rendered_pdf_or_garbled_text"
+        }
+      ]
+    },
+    {
+      "brand": "Columbia",
+      "official_sku": "FFBR-9-5.5",
+      "normalized_sku": "FFBR-9-5.5",
+      "product_name": "Box Blades Kit 5.5\"",
+      "alternate_names": [],
+      "catalog_item_type": "maintenance_kit",
+      "launch_candidate": false,
+      "source_pdf": "products\\scraped_results\\brands\\Columbia\\customercatalogue2024-3.pdf-3.pdf",
+      "price": null,
+      "price_source": null,
+      "notes": [],
+      "source_refs": [
+        {
+          "pdf_page": 24,
+          "catalog_page": 23,
+          "section": "Maintenance Kits",
+          "source_item_no": "FFBR-9-5.5",
+          "source_line": "FFBR-9-5.5 Box Blades Kit 5.5”",
+          "extraction_method": "pdf_visual_table",
+          "source_validation": "sku_found_in_pdf_text"
+        }
+      ]
+    },
+    {
+      "brand": "Columbia",
+      "official_sku": "FFBR-9-7",
+      "normalized_sku": "FFBR-9-7",
+      "product_name": "Box Blades Kit 7\"",
+      "alternate_names": [],
+      "catalog_item_type": "maintenance_kit",
+      "launch_candidate": false,
+      "source_pdf": "products\\scraped_results\\brands\\Columbia\\customercatalogue2024-3.pdf-3.pdf",
+      "price": null,
+      "price_source": null,
+      "notes": [],
+      "source_refs": [
+        {
+          "pdf_page": 24,
+          "catalog_page": 23,
+          "section": "Maintenance Kits",
+          "source_item_no": "FFBR-9-7",
+          "source_line": "FFBR-9-7 Box Blades Kit 7”",
+          "extraction_method": "pdf_visual_table",
+          "source_validation": "sku_found_in_pdf_text"
+        }
+      ]
+    },
+    {
+      "brand": "Columbia",
+      "official_sku": "FFBR-9-8",
+      "normalized_sku": "FFBR-9-8",
+      "product_name": "Box Blades Kit 8\"",
+      "alternate_names": [],
+      "catalog_item_type": "maintenance_kit",
+      "launch_candidate": false,
+      "source_pdf": "products\\scraped_results\\brands\\Columbia\\customercatalogue2024-3.pdf-3.pdf",
+      "price": null,
+      "price_source": null,
+      "notes": [],
+      "source_refs": [
+        {
+          "pdf_page": 24,
+          "catalog_page": 23,
+          "section": "Maintenance Kits",
+          "source_item_no": "FFBR-9-8",
+          "source_line": "FFBR-9-8 Box Blades Kit 8”",
+          "extraction_method": "pdf_visual_table",
+          "source_validation": "sku_found_in_pdf_text"
+        }
+      ]
+    },
+    {
+      "brand": "Columbia",
+      "official_sku": "HHR-1",
+      "normalized_sku": "HHR-1",
+      "product_name": "Hydra Handle Maintenance Kit",
+      "alternate_names": [],
+      "catalog_item_type": "maintenance_kit",
+      "launch_candidate": false,
+      "source_pdf": "products\\scraped_results\\brands\\Columbia\\customercatalogue2024-3.pdf-3.pdf",
+      "price": null,
+      "price_source": null,
+      "notes": [],
+      "source_refs": [
+        {
+          "pdf_page": 24,
+          "catalog_page": 23,
+          "section": "Maintenance Kits",
+          "source_item_no": "HHR-1",
+          "source_line": "HHR-1 Hydra Handle Maintenance Kit",
+          "extraction_method": "pdf_visual_table",
+          "source_validation": "sku_found_in_pdf_text"
+        }
+      ]
+    },
+    {
+      "brand": "Columbia",
+      "official_sku": "HNS7-2",
+      "normalized_sku": "HNS7-2",
+      "product_name": "Nail Spotter Blade 2\"",
+      "alternate_names": [],
+      "catalog_item_type": "maintenance_kit",
+      "launch_candidate": false,
+      "source_pdf": "products\\scraped_results\\brands\\Columbia\\customercatalogue2024-3.pdf-3.pdf",
+      "price": null,
+      "price_source": null,
+      "notes": [],
+      "source_refs": [
+        {
+          "pdf_page": 24,
+          "catalog_page": 23,
+          "section": "Maintenance Kits",
+          "source_item_no": "HNS7-2",
+          "source_line": "HNS7-2 Nail Spotter Blade 2\"",
+          "extraction_method": "pdf_visual_table",
+          "source_validation": "sku_verified_from_rendered_pdf_or_garbled_text"
+        }
+      ]
+    },
+    {
+      "brand": "Columbia",
+      "official_sku": "HNS7-3",
+      "normalized_sku": "HNS7-3",
+      "product_name": "Nail Spotter Blade 3\"",
+      "alternate_names": [],
+      "catalog_item_type": "maintenance_kit",
+      "launch_candidate": false,
+      "source_pdf": "products\\scraped_results\\brands\\Columbia\\customercatalogue2024-3.pdf-3.pdf",
+      "price": null,
+      "price_source": null,
+      "notes": [],
+      "source_refs": [
+        {
+          "pdf_page": 24,
+          "catalog_page": 23,
+          "section": "Maintenance Kits",
+          "source_item_no": "HNS7-3",
+          "source_line": "HNS7-3 Nail Spotter Blade 3\"",
+          "extraction_method": "pdf_visual_table",
+          "source_validation": "sku_verified_from_rendered_pdf_or_garbled_text"
+        }
+      ]
+    },
+    {
+      "brand": "Columbia",
+      "official_sku": "MPR-1",
+      "normalized_sku": "MPR-1",
+      "product_name": "Mud Pump Maintenance Kit",
+      "alternate_names": [],
+      "catalog_item_type": "maintenance_kit",
+      "launch_candidate": false,
+      "source_pdf": "products\\scraped_results\\brands\\Columbia\\customercatalogue2024-3.pdf-3.pdf",
+      "price": null,
+      "price_source": null,
+      "notes": [],
+      "source_refs": [
+        {
+          "pdf_page": 24,
+          "catalog_page": 23,
+          "section": "Maintenance Kits",
+          "source_item_no": "MPR-1",
+          "source_line": "MPR-1 Mud Pump Maintenance Kit",
+          "extraction_method": "pdf_visual_table",
+          "source_validation": "sku_found_in_pdf_text"
+        }
+      ]
+    }
+  ]
+}

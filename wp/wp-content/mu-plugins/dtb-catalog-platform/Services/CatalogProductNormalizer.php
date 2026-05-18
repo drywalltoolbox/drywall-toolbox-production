@@ -47,6 +47,9 @@ final class DTB_CatalogProductNormalizer {
 		$category    = self::extract_category( $wc_cats, $meta );
 		$display_cat = self::extract_display_category( $meta, $category );
 		$is_parts    = self::extract_is_parts( $meta, $wc_cats );
+		if ( $is_parts ) {
+			$display_cat = [ 'key' => 'parts', 'label' => 'Parts', 'slug' => 'parts' ];
+		}
 		$builder     = self::extract_builder( $meta );
 		$tool_family = DTB_ToolFamilyResolver::resolve(
 			(string) ( $meta[ DTB_ProductMeta::TOOL_FAMILY ] ?? '' ),

@@ -232,7 +232,7 @@ export default function ProductsCatalogPlatform({ forceProductGrid = false, titl
   const canonicalUrl = isPartsPage ? 'https://drywalltoolbox.com/parts' : 'https://drywalltoolbox.com/products';
   const seoDescription = isPartsPage
     ? 'Shop professional drywall replacement parts, service kits, and repair components from leading brands.'
-    : 'Shop professional drywall tools, parts, accessories, and replacement components from leading drywall brands.';
+    : 'Shop professional drywall tools and accessories from leading drywall brands.';
 
   const setQuery = useCallback((patch, options = {}) => {
     const next = { ...query, ...patch };

@@ -232,6 +232,7 @@ export default function ProductDetail({
   product,
   onAddToCart,
   onClose,
+  onVariationChange,
   initialSelectedAttrs = {},
   initialVariations = [],
   initialResolvedVariation = null,
@@ -354,6 +355,11 @@ export default function ProductDetail({
     [product?.is_variable, variations, selectedAttrs],
   );
 
+  useEffect(() => {
+    if (typeof onVariationChange !== 'function') return;
+    onVariationChange(selectedVariation || null);
+  }, [onVariationChange, selectedVariation]);
+
   const variationAttributes = useMemo(
     () => (Array.isArray(product?.variation_attributes)
       ? product.variation_attributes.filter((attr) =>
@@ -446,6 +452,9 @@ export default function ProductDetail({
   const effectiveSku = effectiveProduct.sku || product.sku || '';
   const effectiveStock = effectiveProduct.stock_status || product.stock_status || 'instock';
   const isOutOfStock = effectiveStock === 'outofstock';
+  const detailProductUrl = product?.slug
+    ? `/products/${product.slug}${selectedVariation?.id ? `/variations/${encodeURIComponent(selectedVariation.id)}` : ''}`
+    : '';
   const needsVariation = product.is_variable && variationAttributes.length > 0;
   const hasCompleteSelection = !needsVariation || variationAttributes.every((attr) => selectedAttrs?.[attr.name]);
   const canAddToCart = !isOutOfStock && (!needsVariation || Boolean(selectedVariation && hasCompleteSelection));
@@ -522,6 +531,7 @@ export default function ProductDetail({
             <div className="dtb-pdp__info-column flex flex-col">
               <ProductDetailHeader
                 product={product}
+                productUrl={detailProductUrl}
                 effectiveName={(effectiveProduct.name || product.name)}
                 effectiveSku={effectiveSku}
                 isOutOfStock={isOutOfStock}

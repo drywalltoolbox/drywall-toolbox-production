@@ -2,7 +2,6 @@ import { BrowserRouter as Router, Routes, Route, useLocation, Navigate } from 'r
 import { useState, useEffect, lazy, Suspense } from 'react';
 import PageTransition from './components/routing/PageTransition';
 import LoadingSpinner from './components/shared/LoadingSpinner';
-import ShippingTicker from './components/shell/ShippingTicker';
 import { CartProvider } from './context/CartContext';
 import { WooCommerceProvider } from './context/WooCommerceContext';
 import { AuthProvider } from './auth/AuthContext.js';
@@ -35,7 +34,7 @@ const FAQ = lazy(() => import('./pages/FAQ'));
 const ShippingPolicy = lazy(() => import('./pages/ShippingPolicy'));
 const ReturnPortal = lazy(() => import('./pages/ReturnPortal'));
 const StorePolicies = lazy(() => import('./pages/StorePolicies'));
-const ToolsetBuilder = lazy(() => import('./pages/ToolsetBuilder'));
+// const ToolsetBuilder = lazy(() => import('./pages/ToolsetBuilder')); // DISABLED: temporarily hide Toolset Builder
 const TechnicalSpecificationsPreview = lazy(() => import('./pages/TechnicalSpecificationsPreview'));
 
 function NotFound() {
@@ -65,16 +64,17 @@ function RedirectToProducts() {
 
 function AppRoutes() {
   const location = useLocation();
-  const productSelectorElement = <Products title="Products" isPartsFilter={null} />;
+  const productSelectorElement = <Products title="Products" isPartsFilter={0} />;
   return (
     <PageTransition locationKey={location.pathname}>
       <Suspense fallback={<PageLoader />}>
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/products" element={<Products forceProductGrid title="Products" isPartsFilter={null} />} />
+          <Route path="/products" element={<Products forceProductGrid title="Products" isPartsFilter={0} />} />
           <Route path="/products/brands" element={productSelectorElement} />
           <Route path="/products/brands/:brandSlug" element={productSelectorElement} />
           <Route path="/products/brands/:brandSlug/categories/:categorySlug" element={productSelectorElement} />
+          <Route path="/products/:slug/variations/:variationId" element={<ProductDetailPage />} />
           <Route path="/products/:slug" element={<ProductDetailPage />} />
           <Route path="/all-products" element={<RedirectToProducts />} />
           <Route path="/parts" element={<Parts />} />
@@ -87,7 +87,7 @@ function AppRoutes() {
           <Route path="/shipping-policy" element={<ShippingPolicy />} />
           <Route path="/returns" element={<ReturnPortal />} />
           <Route path="/policies" element={<StorePolicies />} />
-          <Route path="/toolset-builder" element={<ToolsetBuilder />} />
+          {/* <Route path="/toolset-builder" element={<ToolsetBuilder />} /> */}
           <Route path="/preview/technical-specifications" element={<TechnicalSpecificationsPreview />} />
           <Route path="/cart" element={<Cart />} />
           <Route path="/checkout" element={<Checkout />} />
@@ -133,20 +133,19 @@ function App() {
 }
 
 function AppShell({ cartOpen, toggleCart, closeCart }) {
-  const location = useLocation();
-  const isHomePage = location.pathname === '/';
-
   return (
     <>
       <ScrollToTop />
       <div className="machined-bg" />
       <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+        {/* Temporarily disabled top shipping ticker (kept for quick re-enable)
         {isHomePage && (
           <div className="site-top-ticker">
             <ShippingTicker items={[{ text: 'FREE SHIPPING ON ALL ORDERS $75+ (CONTIGUOUS USA ONLY)' }, { text: 'Expert Support - Real Pros' }, { text: 'Professional Repair Services' }]} duration={33} className="dtb-desktop-shipping-bar dtb-top-shipping-bar" />
           </div>
         )}
-        <Header onCartToggle={toggleCart} cartOpen={cartOpen} hasTopTicker={isHomePage} />
+        */}
+        <Header onCartToggle={toggleCart} cartOpen={cartOpen} hasTopTicker={false} />
         <main style={{ flexGrow: 1 }} className="main-content"><AppRoutes /></main>
         <Footer />
       </div>

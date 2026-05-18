@@ -43,8 +43,9 @@ export default function MobileSearch({ onClose = () => {} }) {
     return () => clearTimeout(timer);
   }, [searchQuery]);
 
-  const handleProductClick = (productId) => {
-    navigate(`/product/${productId}`);
+  const handleProductClick = (product) => {
+    const target = product?.slug ? `/products/${product.slug}` : `/product/${product.id}`;
+    navigate(target);
     setSearchQuery('');
     setResults([]);
     setIsOpen(false);
@@ -95,7 +96,7 @@ export default function MobileSearch({ onClose = () => {} }) {
                   {results.map((product) => (
                     <button
                       key={product.id}
-                      onClick={() => handleProductClick(product.id)}
+                      onClick={() => handleProductClick(product)}
                       className="mobile-search-result-item"
                     >
                       <div className="mobile-search-result-image">

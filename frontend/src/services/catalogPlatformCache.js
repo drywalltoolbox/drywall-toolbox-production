@@ -135,7 +135,7 @@ export function prewarmCatalogPlatformForCurrentRoute() {
   if (!pathname.startsWith('/products') && !pathname.startsWith('/parts')) return;
 
   const pathParts = pathname.split('/').filter(Boolean);
-  const isParts = pathname.startsWith('/parts') ? 1 : null;
+  const isParts = pathname.startsWith('/parts') ? 1 : 0;
   const pathParams = {};
 
   if (pathParts[0] === 'products' && pathParts[1] === 'brands' && pathParts[2]) {
@@ -146,10 +146,8 @@ export function prewarmCatalogPlatformForCurrentRoute() {
   }
 
   const query = parseCatalogQuery(new URLSearchParams(window.location.search), pathParams);
-  const productQuery = isParts === null ? query : { ...query, isParts };
-  const facetScope = isParts === null
-    ? { brand: query.brands?.[0] || '' }
-    : { isParts, brand: query.brands?.[0] || '' };
+  const productQuery = { ...query, isParts };
+  const facetScope = { isParts, brand: query.brands?.[0] || '' };
 
   fetchCatalogFacets(facetScope).catch(() => {});
   fetchCatalogProducts(productQuery).catch(() => {});

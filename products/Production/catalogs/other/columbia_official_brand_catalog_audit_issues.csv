@@ -1,0 +1,6 @@
+brand,sku,pdf_page,catalog_page,issue,source_line,notes
+Columbia,FFBR-9-14,24,23,SKU not present as a continuous text token in pdfplumber output,"FFBR-9-14 Box Blades Kit 14""",
+Columbia,HNSA-5-2,24,23,SKU not present as a continuous text token in pdfplumber output,"HNSA-5-2 Nail Spotter Wheel Kit 2""",
+Columbia,HNSA-5-3,24,23,SKU not present as a continuous text token in pdfplumber output,"HNSA-5-3 Nail Spotter Wheel Kit 3""",
+Columbia,HNS7-2,24,23,SKU not present as a continuous text token in pdfplumber output,"HNS7-2 Nail Spotter Blade 2""",
+Columbia,HNS7-3,24,23,SKU not present as a continuous text token in pdfplumber output,"HNS7-3 Nail Spotter Blade 3""",

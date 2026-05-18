@@ -5,19 +5,15 @@ import SEOHead from '../components/shared/SEOHead';
 import { buildOrganizationSchema, buildSiteLinksSearchBoxSchema } from '../utils/schema';
 import StorefrontSection from '../components/storefront/StorefrontSection';
 import StorefrontRail from '../components/storefront/StorefrontRail';
-import StorefrontCategoryTile from '../components/storefront/StorefrontCategoryTile';
 import StorefrontBrandTile from '../components/storefront/StorefrontBrandTile';
 import StorefrontProductRail from '../components/storefront/StorefrontProductRail';
 import { useCatalogFacets } from '../hooks/useCatalogFacets.js';
 import { getBrandLogo } from '../utils/brandAssets.js';
-import {
-  buildDisplayCategoryUrl,
-  mapCatalogBrands,
-  mergeCatalogDisplayCategories,
-} from '../utils/catalogFacets.js';
+import columbiaHeroLogo from '/brands/Columbia/columbia_logo_white.svg';
+import platinumHeroLogo from '/brands/Platinum/platinum_logo_white.svg';
+import { mapCatalogBrands } from '../utils/catalogFacets.js';
 
 const MAX_HOME_BRANDS = 8;
-const MAX_HOME_CATEGORIES = 8;
 
 export default function Home() {
   const { facets } = useCatalogFacets();
@@ -36,18 +32,11 @@ export default function Home() {
   }, [facets]);
   const heroBrands = useMemo(() => brands.map((brand) => ({
     name: brand.name,
-    src: brand.logo,
+    src: /columbia/i.test(brand.name)
+      ? columbiaHeroLogo
+      : (/platinum/i.test(brand.name) ? platinumHeroLogo : brand.logo),
     to: brand.to,
   })), [brands]);
-  const categories = useMemo(() => ([
-    ...mergeCatalogDisplayCategories(facets?.displayCategoriesByBrand || {})
-      .slice(0, MAX_HOME_CATEGORIES)
-      .map((category) => ({
-        title: category.label,
-        to: buildDisplayCategoryUrl(category.slug),
-      })),
-    { title: 'New Arrivals', to: '/products?sort=newest' },
-  ]), [facets]);
 
   return (
     <>
@@ -79,16 +68,6 @@ export default function Home() {
             <StorefrontProductRail sort="newest" maxItems={10} label="New arrivals" />
           </StorefrontSection>
 
-          {/* ── Replacement Parts ── */}
-          <StorefrontSection
-            eyebrow="Parts"
-            title="Replacement Parts"
-            viewAllHref="/parts"
-            viewAllLabel="Browse all parts"
-          >
-            <StorefrontProductRail category="parts" maxItems={10} label="Parts" />
-          </StorefrontSection>
-
           {/* ── Shop by Brand ── */}
           <StorefrontSection
             eyebrow="Brands"
@@ -99,20 +78,6 @@ export default function Home() {
             <StorefrontRail label="Brands" className="storefront-rail--brand">
               {brands.map((brand) => (
                 <StorefrontBrandTile key={brand.name} {...brand} />
-              ))}
-            </StorefrontRail>
-          </StorefrontSection>
-
-          {/* ── Popular Categories ── */}
-          <StorefrontSection
-            eyebrow="Shop"
-            title="Popular Categories"
-            viewAllHref="/products"
-            viewAllLabel="All categories"
-          >
-            <StorefrontRail label="Popular categories" className="storefront-rail--category">
-              {categories.map((category) => (
-                <StorefrontCategoryTile key={category.to} {...category} />
               ))}
             </StorefrontRail>
           </StorefrontSection>

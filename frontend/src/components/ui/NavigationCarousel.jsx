@@ -14,7 +14,7 @@ const NAV_CARDS = [
   { id: 'parts', label: 'Parts', sub: 'Replacement parts', to: '/parts' },
   { id: 'schematics', label: 'Schematics', sub: 'Tool diagrams', to: '/schematics' },
   { id: 'calculator', label: 'Calculator', sub: 'Estimate materials', to: '/calculators' },
-  { id: 'toolsets', label: 'Tool Sets', sub: 'Complete kits', to: '/toolset-builder' },
+  // { id: 'toolsets', label: 'Tool Sets', sub: 'Complete kits', to: '/toolset-builder' }, // DISABLED: temporarily hide Toolset Builder
   { id: 'repairs', label: 'Repairs', sub: 'Expert service', to: '/repairs' },
 ];
 

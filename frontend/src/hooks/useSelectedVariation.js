@@ -27,6 +27,8 @@ import { getVariationSelectionMap } from '../utils/variationSelection.js';
 /**
  * @param {Array}        variations  All child variations from the detail endpoint.
  * @param {Object|null}  computed    Computed state from the detail endpoint.
+ * @param {number|null}  preferredVariantId  Optional variant ID from route params.
+ * @param {{ syncSearchParam?: boolean }} options
  * @returns {{
  *   selectedVariation: Object|null,
  *   selectedAttrs: Object,
@@ -35,18 +37,21 @@ import { getVariationSelectionMap } from '../utils/variationSelection.js';
  *   variationState: string,
  * }}
  */
-export function useSelectedVariation(variations, computed) {
+export function useSelectedVariation(variations, computed, preferredVariantId = null, options = {}) {
+  const { syncSearchParam = true } = options;
   const [searchParams, setSearchParams] = useSearchParams();
 
   // Derive the initial selected variation from the URL + backend hints.
   // Re-derives on every navigation (back/forward/refresh) because useSearchParams
   // always reflects the current URL.
-  const variantParam = useMemo(() => {
+  const queryVariantParam = useMemo(() => {
     const raw = searchParams.get('variant');
     if (!raw) return null;
     const id = parseInt(raw, 10);
     return Number.isFinite(id) && id > 0 ? id : null;
   }, [searchParams]);
+
+  const variantParam = preferredVariantId ?? queryVariantParam;
 
   const [selectedVariation, setSelectedVariation] = useState(() =>
     resolveInitialVariation(variantParam, variations, computed)
@@ -58,19 +63,19 @@ export function useSelectedVariation(variations, computed) {
     setSelectedVariation(resolved);
 
     // If the URL had an invalid ?variant= param, clear it (replace so no back-entry).
-    if (variantParam != null && !resolved) {
+    if (syncSearchParam && queryVariantParam != null && !resolved) {
       setSearchParams(
         (prev) => { prev.delete('variant'); return prev; },
         { replace: true }
       );
-    } else if (resolved?.id && !variantParam) {
+    } else if (syncSearchParam && resolved?.id && !queryVariantParam && preferredVariantId == null) {
       // No URL param yet — write the resolved variation into the URL.
       setSearchParams(
         (prev) => { prev.set('variant', String(resolved.id)); return prev; },
         { replace: true }
       );
     }
-  }, [variations, computed, variantParam]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [variations, computed, variantParam, queryVariantParam, preferredVariantId, syncSearchParam]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Build the selected attribute map from the current variation.
   const selectedAttrs = useMemo(
@@ -84,6 +89,7 @@ export function useSelectedVariation(variations, computed) {
    */
   const selectVariation = useCallback((variation) => {
     setSelectedVariation(variation ?? null);
+    if (!syncSearchParam) return;
     setSearchParams(
       (prev) => {
         if (variation?.id) {
@@ -95,7 +101,7 @@ export function useSelectedVariation(variations, computed) {
       },
       { replace: false }
     );
-  }, [setSearchParams]);
+  }, [setSearchParams, syncSearchParam]);
 
   /**
    * Update the selectedAttrs map directly (partial chip-click update).

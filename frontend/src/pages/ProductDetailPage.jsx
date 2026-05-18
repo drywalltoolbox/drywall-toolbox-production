@@ -21,7 +21,7 @@
  * use back/forward, or deep-link to any specific variation.
  */
 
-import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useParams, Link, useLocation, useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import useProductDetail from '../hooks/useProductDetail';
 import { useSelectedVariation } from '../hooks/useSelectedVariation';
@@ -31,7 +31,7 @@ import ProductDetail from '../components/product/ProductDetail';
 import SEOHead from '../components/shared/SEOHead';
 import LoadingSpinner from '../components/shared/LoadingSpinner';
 import Toast from '../components/ui/Toast';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { addRecentlyViewed } from '../utils/recentlyViewed.js';
 
 function getVariationDisplayName(product, selectedVariation, effectiveVariationName) {
@@ -44,9 +44,11 @@ function getVariationDisplayName(product, selectedVariation, effectiveVariationN
 }
 
 export default function ProductDetailPage() {
-  const { slug } = useParams();
+  const { slug, variationId } = useParams();
+  const location = useLocation();
   const navigate  = useNavigate();
   const { addToCart } = useCart();
+  const preferredVariantId = Number.isFinite(parseInt(variationId || '', 10)) ? parseInt(variationId, 10) : null;
 
   const [toast, setToast] = useState(null);
 
@@ -54,7 +56,12 @@ export default function ProductDetailPage() {
   const { product, variations, computed, status, error } = useProductDetail(slug);
 
   // ── Variation state machine ────────────────────────────────────────────────
-  const { selectedVariation } = useSelectedVariation(variations, computed);
+  const { selectedVariation } = useSelectedVariation(
+    variations,
+    computed,
+    preferredVariantId,
+    { syncSearchParam: preferredVariantId == null }
+  );
 
   // ── Recently viewed tracking ───────────────────────────────────────────────
   useEffect( () => {
@@ -130,6 +137,17 @@ export default function ProductDetailPage() {
   const effectiveProductName = selectedVariation
     ? getVariationDisplayName(product, selectedVariation, effectiveVariationName)
     : product.name;
+  const productDetailPath = `/products/${product.slug || slug}${selectedVariation?.id ? `/variations/${encodeURIComponent(selectedVariation.id)}` : ''}`;
+
+  const handleVariationChange = useCallback((variation) => {
+    const baseSlug = product?.slug || slug;
+    if (!baseSlug) return;
+    const targetPath = variation?.id
+      ? `/products/${baseSlug}/variations/${encodeURIComponent(variation.id)}`
+      : `/products/${baseSlug}`;
+    if (location.pathname === targetPath) return;
+    navigate(targetPath, { replace: true });
+  }, [location.pathname, navigate, product?.slug, slug]);
 
   // ── SEO ────────────────────────────────────────────────────────────────────
   const metaMap = {};
@@ -153,7 +171,7 @@ export default function ProductDetailPage() {
   const breadcrumbSchema = buildBreadcrumbSchema([
     { label: 'Home',       path: '/' },
     { label: 'Products',   path: '/products' },
-    { label: effectiveProductName, path: `/products/${product.slug || slug}` },
+    { label: effectiveProductName, path: productDetailPath },
   ]);
 
   return (
@@ -181,6 +199,7 @@ export default function ProductDetailPage() {
         <ProductDetail
           product={product}
           onAddToCart={handleAddToCart}
+          onVariationChange={handleVariationChange}
           initialVariations={variations}
           initialResolvedVariation={selectedVariation}
           initialSelectedAttrs={selectedVariation ? getVariationSelectionMap(selectedVariation) : {}}

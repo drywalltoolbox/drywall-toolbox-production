@@ -9,6 +9,7 @@ function getProductUrl(product) {
 
 export default function ProductDetailHeader({
   product,
+  productUrl: productUrlOverride,
   effectiveName,
   effectiveSku,
   brandLabel,
@@ -22,7 +23,7 @@ export default function ProductDetailHeader({
   onProductTitleClick,
 }) {
   const reviewLabel = 'View reviews, 0 out of 5 stars, no reviews yet';
-  const productUrl = getProductUrl(product);
+  const productUrl = productUrlOverride || getProductUrl(product);
   const title = effectiveName || product.sku || product.part_number;
 
   const mobileReviewsButton = (

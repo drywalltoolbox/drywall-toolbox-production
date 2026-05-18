@@ -84,10 +84,11 @@ final class DTB_CatalogProductRepository {
 			];
 		}
 
-		$is_parts_constrained = false;
-		$display_category     = sanitize_title( (string) ( $filters['display_category'] ?? '' ) );
-		if ( '' !== $display_category ) {
-			if ( self::is_parts_display_category( $display_category ) ) {
+		$is_parts_constrained   = false;
+		$display_category_slug  = sanitize_title( (string) ( $filters['display_category'] ?? '' ) );
+		$display_category_key   = str_replace( '-', '_', $display_category_slug );
+		if ( '' !== $display_category_slug ) {
+			if ( self::is_parts_display_category( $display_category_slug ) ) {
 				$meta_query[] = [
 					'key'     => DTB_ProductMeta::IS_PARTS,
 					'value'   => '1',
@@ -97,8 +98,8 @@ final class DTB_CatalogProductRepository {
 			} else {
 				$meta_query[] = [
 					'key'     => DTB_ProductMeta::DISPLAY_CATEGORY_KEY,
-					'value'   => $display_category,
-					'compare' => '=',
+					'value'   => array_values( array_unique( array_filter( [ $display_category_key, $display_category_slug ] ) ) ),
+					'compare' => 'IN',
 				];
 
 				// Tool/category filters must not leak schematic replacement parts.
