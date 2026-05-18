@@ -388,11 +388,29 @@
   margin-top: 0;
 }
 
+.schematic-hotspot-card__price-group {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.38rem;
+  min-width: 0;
+}
+
 .schematic-hotspot-card__price {
   font-family: 'Courier New', monospace;
   font-weight: 800;
   font-size: clamp(14px, 3vw, 18px);
   color: #2563eb;
+  white-space: nowrap;
+}
+
+.schematic-hotspot-card__compare-price {
+  font-family: 'Courier New', monospace;
+  font-size: clamp(11px, 2.1vw, 13px);
+  font-weight: 600;
+  color: #94a3b8;
+  text-decoration: line-through;
+  text-decoration-color: rgba(148, 163, 184, 0.75);
+  text-decoration-thickness: 1.4px;
   white-space: nowrap;
 }
 
@@ -474,6 +492,15 @@
 @media (max-width: 768px) {
   .mobile-part-modal-overlay .schematic-hotspot-card__image {
     flex: 0 0 33%;
+  }
+
+  .mobile-part-modal-overlay .schematic-hotspot-card__stock {
+    order: -1;
+    margin-bottom: 4px;
+  }
+
+  .mobile-part-modal-overlay .schematic-hotspot-card__title {
+    margin-bottom: 3px;
   }
 
   .mobile-part-modal-overlay .schematic-hotspot-card__image img,

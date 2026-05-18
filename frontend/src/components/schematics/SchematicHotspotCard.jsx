@@ -12,11 +12,52 @@ function getCodeLabel(part) {
   return part?.sku ? 'SKU' : part?.source_sku ? 'Ref' : 'SKU';
 }
 
-function getPriceLabel(product, part, stockStatus) {
-  const livePrice = parseFloat(product?.price);
-  if (Number.isFinite(livePrice) && livePrice > 0) return `$${livePrice.toFixed(2)}`;
-  if (part?.sku && stockStatus === null) return '...';
-  return 'Unavailable';
+function parsePrice(value) {
+  if (typeof value === 'number') return Number.isFinite(value) ? value : null;
+  if (typeof value === 'string') {
+    const parsed = parseFloat(value);
+    return Number.isFinite(parsed) ? parsed : null;
+  }
+  return null;
+}
+
+function firstFinitePrice(...values) {
+  for (const value of values) {
+    const parsed = parsePrice(value);
+    if (parsed != null) return parsed;
+  }
+  return null;
+}
+
+function getPriceData(product, part, stockStatus) {
+  const priceObject = product?.price && typeof product.price === 'object' ? product.price : null;
+
+  const livePrice = firstFinitePrice(
+    product?.price,
+    product?.sale_price,
+    priceObject?.value,
+    priceObject?.sale,
+  );
+
+  const comparePrice = firstFinitePrice(
+    product?.regular_price,
+    priceObject?.regular,
+    product?.compare_at_price,
+  );
+
+  if (livePrice != null && livePrice > 0) {
+    const hasDiscount = comparePrice != null && comparePrice > livePrice;
+    return {
+      priceLabel: `$${livePrice.toFixed(2)}`,
+      comparePriceLabel: hasDiscount ? `$${comparePrice.toFixed(2)}` : null,
+    };
+  }
+
+  if (part?.sku && stockStatus === null) {
+    return { priceLabel: '...', comparePriceLabel: null };
+  }
+
+  return { priceLabel: 'Unavailable', comparePriceLabel: null };
 }
 
 function StockBadge({ stockStatus }) {
@@ -69,7 +110,7 @@ export default function SchematicHotspotCard({
 
   const displayCode  = getDisplayCode(part);
   const codeLabel    = getCodeLabel(part);
-  const priceLabel   = getPriceLabel(product, part, stockStatus);
+  const { priceLabel, comparePriceLabel } = getPriceData(product, part, stockStatus);
   const isAdding     = addingToCart === part.id;
   const canAdd       = Boolean(product?.id) && stockStatus !== null;
   const isResolving  = Boolean(part.sku) && stockStatus === null;
@@ -131,6 +172,11 @@ export default function SchematicHotspotCard({
           </button>
         )}
 
+        {/* Stock status */}
+        <div className="schematic-hotspot-card__stock">
+          <StockBadge stockStatus={stockStatus} />
+        </div>
+
         {/* Title */}
         <h3 className="schematic-hotspot-card__title">
           {titleNode}
@@ -144,15 +190,17 @@ export default function SchematicHotspotCard({
           </div>
         ) : null}
 
-        {/* Stock status */}
-        <div className="schematic-hotspot-card__stock">
-          <StockBadge stockStatus={stockStatus} />
-        </div>
-
         {/* Price + CTA (horizontal row, right-aligned) */}
         <div className="schematic-hotspot-card__footer">
-          <span className="schematic-hotspot-card__price">
-            {priceLabel}
+          <span className="schematic-hotspot-card__price-group">
+            <span className="schematic-hotspot-card__price">
+              {priceLabel}
+            </span>
+            {comparePriceLabel ? (
+              <span className="schematic-hotspot-card__compare-price">
+                {comparePriceLabel}
+              </span>
+            ) : null}
           </span>
           <button
             className="schematic-hotspot-card__cta"
