@@ -1,9 +1,9 @@
 import { Link } from 'react-router-dom';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { brandToSlug } from '../../utils/catalogUrlState.js';
 import ProductCardImage from '../product/ProductCardImage.jsx';
 import ProductModal from '../product/ProductModal.jsx';
-import ProductDetailPlatform from '../product/ProductDetailPlatform.jsx';
+import ProductDetail from '../product/ProductDetail.jsx';
 import { useCart } from '../../context/CartContext.jsx';
 
 function formatPrice(value) {
@@ -24,22 +24,19 @@ export default function StorefrontSearchOverlay({
   suggestions = [],
 }) {
   const { addToCart } = useCart();
-  const [quickViewProduct, setQuickViewProduct] = useState(null);
-  const quickViewFrameRef = useRef(null);
+  const [modalProduct, setModalProduct] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const hasQuery = useMemo(() => query.trim().length > 0, [query]);
 
-  const clearPendingQuickViewFrame = () => {
-    if (quickViewFrameRef.current) {
-      cancelAnimationFrame(quickViewFrameRef.current);
-      quickViewFrameRef.current = null;
-    }
-  };
+  const closeQuickView = useCallback(() => {
+    setIsModalOpen(false);
+    setModalProduct(null);
+  }, []);
 
-  const closeSearch = () => {
-    clearPendingQuickViewFrame();
-    setQuickViewProduct(null);
+  const closeSearch = useCallback(() => {
+    closeQuickView();
     onClose?.();
-  };
+  }, [closeQuickView, onClose]);
 
   useEffect(() => {
     if (!isOpen) return undefined;
@@ -47,33 +44,28 @@ export default function StorefrontSearchOverlay({
     document.body.style.overflow = 'hidden';
     const onKeyDown = (event) => {
       if (event.key === 'Escape') {
-        if (quickViewProduct) setQuickViewProduct(null);
+        if (isModalOpen) closeQuickView();
         else onClose?.();
       }
     };
     window.addEventListener('keydown', onKeyDown);
     return () => {
-      clearPendingQuickViewFrame();
       document.body.style.overflow = previousOverflow;
       window.removeEventListener('keydown', onKeyDown);
     };
-  }, [isOpen, onClose, quickViewProduct]);
+  }, [isOpen, onClose, isModalOpen, closeQuickView]);
 
-  const openQuickView = useCallback((product) => {
+  const openQuickView = useCallback((product, event) => {
+    event?.preventDefault?.();
+    event?.stopPropagation?.();
     if (!product?.id) return;
-    clearPendingQuickViewFrame();
-    quickViewFrameRef.current = requestAnimationFrame(() => {
-      quickViewFrameRef.current = requestAnimationFrame(() => {
-        setQuickViewProduct(product);
-        quickViewFrameRef.current = null;
-      });
-    });
+    setModalProduct(product);
+    setIsModalOpen(true);
   }, []);
 
-  const closeQuickView = () => {
-    clearPendingQuickViewFrame();
-    setQuickViewProduct(null);
-  };
+  const handleAddToCart = useCallback((product, quantity = 1) => {
+    addToCart(product, quantity);
+  }, [addToCart]);
 
   if (!isOpen) return null;
 
@@ -100,12 +92,7 @@ export default function StorefrontSearchOverlay({
                       <h3 className="storefront-search-overlay__section-title">Popular categories</h3>
                       <div className="storefront-search-overlay__chip-list">
                         {categories.map((category) => (
-                          <Link
-                            key={category}
-                            to={`/products?display_category=${encodeURIComponent(category.toLowerCase().replace(/[^\w]+/g, '_'))}`}
-                            onClick={closeSearch}
-                            className="storefront-search-overlay__chip"
-                          >
+                          <Link key={category} to={`/products?display_category=${encodeURIComponent(category.toLowerCase().replace(/[^\w]+/g, '_'))}`} onClick={closeSearch} className="storefront-search-overlay__chip">
                             {category}
                           </Link>
                         ))}
@@ -118,12 +105,7 @@ export default function StorefrontSearchOverlay({
                       <h3 className="storefront-search-overlay__section-title">Popular brands</h3>
                       <div className="storefront-search-overlay__chip-list">
                         {brands.map((brand) => (
-                          <Link
-                            key={brand}
-                            to={`/products/brands/${brandToSlug(brand)}`}
-                            onClick={closeSearch}
-                            className="storefront-search-overlay__chip"
-                          >
+                          <Link key={brand} to={`/products/brands/${brandToSlug(brand)}`} onClick={closeSearch} className="storefront-search-overlay__chip">
                             {brand}
                           </Link>
                         ))}
@@ -136,13 +118,7 @@ export default function StorefrontSearchOverlay({
                       <h3 className="storefront-search-overlay__section-title">Recent searches</h3>
                       <div className="storefront-search-overlay__chip-list">
                         {recent.map((item) => (
-                          <button
-                            key={item}
-                            type="button"
-                            onClick={() => setQuery(item)}
-                            className="storefront-search-overlay__chip"
-                            aria-label={`Search for ${item}`}
-                          >
+                          <button key={item} type="button" onClick={() => setQuery(item)} className="storefront-search-overlay__chip" aria-label={`Search for ${item}`}>
                             {item}
                           </button>
                         ))}
@@ -171,23 +147,9 @@ export default function StorefrontSearchOverlay({
                     {suggestions.map((product) => {
                       const price = formatPrice(product.price);
                       return (
-                        <button
-                          key={product.id}
-                          type="button"
-                          onClick={() => openQuickView(product)}
-                          className="storefront-search-overlay__result"
-                          aria-label={`Quick view ${product.name}`}
-                        >
+                        <button key={product.id} type="button" onClick={(event) => openQuickView(product, event)} className="storefront-search-overlay__result" aria-label={`Quick view ${product.name}`}>
                           <div className="storefront-search-overlay__result-thumb">
-                            <ProductCardImage
-                              product={product}
-                              alt={product.name}
-                              padding="8px"
-                              fit="contain"
-                              width={144}
-                              height={144}
-                              className="storefront-search-overlay__result-thumb-image"
-                            />
+                            <ProductCardImage product={product} alt={product.name} padding="8px" fit="contain" width={144} height={144} className="storefront-search-overlay__result-thumb-image" />
                           </div>
                           <div className="storefront-search-overlay__result-copy">
                             <span className="storefront-search-overlay__result-brand">{product.brand || 'Product'}</span>
@@ -217,13 +179,9 @@ export default function StorefrontSearchOverlay({
         </div>
       </div>
 
-      <ProductModal isOpen={Boolean(quickViewProduct)} product={quickViewProduct} onClose={closeQuickView}>
-        {quickViewProduct ? (
-          <ProductDetailPlatform
-            product={quickViewProduct}
-            onAddToCart={addToCart}
-            onClose={closeQuickView}
-          />
+      <ProductModal isOpen={isModalOpen && !!modalProduct} product={modalProduct} onClose={closeQuickView}>
+        {modalProduct ? (
+          <ProductDetail product={modalProduct} onAddToCart={handleAddToCart} onClose={closeQuickView} initialVariations={[]} />
         ) : null}
       </ProductModal>
     </>
