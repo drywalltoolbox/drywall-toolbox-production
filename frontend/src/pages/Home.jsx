@@ -1,13 +1,6 @@
 import TrendingProducts from '../components/catalog/TrendingProducts';
+import { useMemo } from 'react';
 import HeroSection from '../components/ui/HeroSection';
-import tapeTechLogo from '/brands/TapeTech/tapetech_logo.svg';
-import columbiaLogo from '/brands/Columbia/columbia_taping_tools_logo.svg';
-import columbiaLogoWhite from '/brands/Columbia/columbia_logo_white.svg';
-import surproLogo from '/brands/SurPro/surpro_logo.svg';
-import asgardLogo from '/brands/Asgard/asgard_logo.svg';
-import platinumLogo from '/brands/Platinum/platinum_logo.svg';
-import platinumLogoWhite from '/brands/Platinum/platinum_logo_white.svg';
-import level5Logo from '/brands/Level5/Level5.svg';
 import SEOHead from '../components/shared/SEOHead';
 import { buildOrganizationSchema, buildSiteLinksSearchBoxSchema } from '../utils/schema';
 import StorefrontSection from '../components/storefront/StorefrontSection';
@@ -15,35 +8,47 @@ import StorefrontRail from '../components/storefront/StorefrontRail';
 import StorefrontCategoryTile from '../components/storefront/StorefrontCategoryTile';
 import StorefrontBrandTile from '../components/storefront/StorefrontBrandTile';
 import StorefrontProductRail from '../components/storefront/StorefrontProductRail';
+import { useCatalogFacets } from '../hooks/useCatalogFacets.js';
+import { getBrandLogo } from '../utils/brandAssets.js';
+import {
+  buildDisplayCategoryUrl,
+  mapCatalogBrands,
+  mergeCatalogDisplayCategories,
+} from '../utils/catalogFacets.js';
 
-const categories = [
-  { title: 'Automatic Taping Tools', to: '/products?display_category=automatic_taping_tools' },
-  { title: 'Finishing Boxes', to: '/products?display_category=finishing_boxes' },
-  { title: 'Corner Tools', to: '/products?display_category=corner_tools' },
-  { title: 'Parts', to: '/products?display_category=parts' },
-  { title: 'Handles & Extensions', to: '/products?display_category=handles_and_extensions' },
-  { title: 'New Arrivals', to: '/products?sort=newest' },
-];
-
-const brands = [
-  { name: 'TapeTech', logo: tapeTechLogo, to: '/products/brands/tapetech' },
-  { name: 'Columbia Taping Tools', logo: columbiaLogo, to: '/products/brands/columbia-taping-tools' },
-  { name: 'Level 5', logo: level5Logo, to: '/products/brands/level-5' },
-  { name: 'Platinum Drywall Tools', logo: platinumLogo, to: '/products/brands/platinum-drywall-tools' },
-  { name: 'Asgard', logo: asgardLogo, to: '/products/brands/asgard' },
-  { name: 'SurPro', logo: surproLogo, to: '/products/brands/surpro' },
-];
-
-const heroBrands = [
-  { name: 'TapeTech', src: tapeTechLogo, to: '/products?brand=TapeTech' },
-  { name: 'Columbia', src: columbiaLogoWhite, to: '/products?brand=Columbia%20Taping%20Tools' },
-  { name: 'Level5', src: level5Logo, to: '/products?brand=Level5' },
-  { name: 'Platinum Drywall Tools', src: platinumLogoWhite, to: '/products?brand=Platinum%20Drywall%20Tools' },
-  { name: 'Asgard', src: asgardLogo, to: '/products?brand=Asgard' },
-  { name: 'SurPro', src: surproLogo, to: '/products?brand=SurPro' },
-];
+const MAX_HOME_BRANDS = 8;
+const MAX_HOME_CATEGORIES = 8;
 
 export default function Home() {
+  const { facets } = useCatalogFacets();
+  const brands = useMemo(() => {
+    const mapped = mapCatalogBrands(facets?.brands);
+    return mapped
+      .slice(0, MAX_HOME_BRANDS)
+      .map((brand) => {
+        const logo = getBrandLogo(brand.name);
+        return {
+          name: brand.name,
+          logo,
+          to: `/products/brands/${brand.slug}`,
+        };
+      });
+  }, [facets]);
+  const heroBrands = useMemo(() => brands.map((brand) => ({
+    name: brand.name,
+    src: brand.logo,
+    to: brand.to,
+  })), [brands]);
+  const categories = useMemo(() => ([
+    ...mergeCatalogDisplayCategories(facets?.displayCategoriesByBrand || {})
+      .slice(0, MAX_HOME_CATEGORIES)
+      .map((category) => ({
+        title: category.label,
+        to: buildDisplayCategoryUrl(category.slug),
+      })),
+    { title: 'New Arrivals', to: '/products?sort=newest' },
+  ]), [facets]);
+
   return (
     <>
       <SEOHead

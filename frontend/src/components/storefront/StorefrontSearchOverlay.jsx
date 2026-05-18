@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { brandToSlug } from '../../utils/catalogUrlState.js';
+import { buildDisplayCategoryUrl, normalizeCatalogCategoryEntry } from '../../utils/catalogFacets.js';
 import ProductCardImage from '../product/ProductCardImage.jsx';
 import ProductModal from '../product/ProductModal.jsx';
 import ProductDetail from '../product/ProductDetail.jsx';
@@ -27,6 +28,12 @@ export default function StorefrontSearchOverlay({
   const [modalProduct, setModalProduct] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const hasQuery = useMemo(() => query.trim().length > 0, [query]);
+  const normalizedCategories = useMemo(
+    () => categories
+      .map((category) => normalizeCatalogCategoryEntry(category))
+      .filter((category) => category.label && category.slug),
+    [categories]
+  );
 
   const closeQuickView = useCallback(() => {
     setIsModalOpen(false);
@@ -87,13 +94,13 @@ export default function StorefrontSearchOverlay({
             <div className={`storefront-search-overlay__body${hasQuery ? '' : ' is-browsing'}`}>
               {!hasQuery ? (
                 <section className="storefront-search-overlay__empty-state">
-                  {categories.length > 0 ? (
+                  {normalizedCategories.length > 0 ? (
                     <div className="storefront-search-overlay__section">
                       <h3 className="storefront-search-overlay__section-title">Popular categories</h3>
                       <div className="storefront-search-overlay__chip-list">
-                        {categories.map((category) => (
-                          <Link key={category} to={`/products?display_category=${encodeURIComponent(category.toLowerCase().replace(/[^\w]+/g, '_'))}`} onClick={closeSearch} className="storefront-search-overlay__chip">
-                            {category}
+                        {normalizedCategories.map((category) => (
+                          <Link key={category.slug} to={buildDisplayCategoryUrl(category.slug)} onClick={closeSearch} className="storefront-search-overlay__chip">
+                            {category.label}
                           </Link>
                         ))}
                       </div>
