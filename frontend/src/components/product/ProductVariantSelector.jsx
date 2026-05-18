@@ -2,8 +2,8 @@
  * frontend/src/components/product/ProductVariantSelector.jsx
  *
  * Chip-based variant option selector. Renders one radiogroup per variation
- * attribute with radio-like option chips. Out-of-stock options are shown with a
- * strikethrough and remain selectable so users can inspect real variant state.
+ * attribute with radio-like option chips. Unavailable options are disabled and
+ * visually muted.
  */
 
 import { useMemo } from 'react';
@@ -46,31 +46,39 @@ export default function ProductVariantSelector({
   if (!isVariable || variationAttributes.length === 0) return null;
   if (!Array.isArray(variations) || variations.length === 0) return null;
 
-  const handleOptionClick = (attrName, option) => {
+  const handleOptionClick = (attrName, option, disabled = false) => {
+    if (disabled) return;
     const newSelections = { ...currentSelections, [attrName]: option };
     const match = findMatchingVariation(variations, newSelections);
     onSelect(match ?? null);
   };
 
-  const handleOptionKeyDown = (event, attrName, options, currentIndex) => {
+  const handleOptionKeyDown = (event, attrName, optionStates, currentIndex) => {
     const key = event.key;
     if (!['ArrowRight', 'ArrowDown', 'ArrowLeft', 'ArrowUp', 'Home', 'End'].includes(key)) return;
 
     event.preventDefault();
     let nextIndex = currentIndex;
+    const direction = key === 'ArrowLeft' || key === 'ArrowUp' ? -1 : 1;
 
     if (key === 'ArrowRight' || key === 'ArrowDown') {
-      nextIndex = (currentIndex + 1) % options.length;
+      nextIndex = (currentIndex + 1) % optionStates.length;
     } else if (key === 'ArrowLeft' || key === 'ArrowUp') {
-      nextIndex = (currentIndex - 1 + options.length) % options.length;
+      nextIndex = (currentIndex - 1 + optionStates.length) % optionStates.length;
     } else if (key === 'Home') {
       nextIndex = 0;
     } else if (key === 'End') {
-      nextIndex = options.length - 1;
+      nextIndex = optionStates.length - 1;
     }
 
-    const nextOption = options[nextIndex];
-    if (nextOption) handleOptionClick(attrName, nextOption);
+    for (let attempts = 0; attempts < optionStates.length; attempts += 1) {
+      const nextOption = optionStates[nextIndex];
+      if (nextOption && !nextOption.disabled) {
+        handleOptionClick(attrName, nextOption.value);
+        return;
+      }
+      nextIndex = (nextIndex + direction + optionStates.length) % optionStates.length;
+    }
   };
 
   return (
@@ -81,6 +89,18 @@ export default function ProductVariantSelector({
         const selectedValue = currentSelections[attrName] ?? null;
         const attrMatrix    = optionMatrix[attrName] ?? {};
         const groupLabelId  = `variant-group-${attrName.replace(/[^a-z0-9_-]/gi, '-').toLowerCase()}`;
+        const optionStates = options.map((option) => {
+          const meta = attrMatrix[option];
+          const status = meta ? getOptionStatus(meta) : 'unavailable';
+          const isOos = status === 'outofstock';
+          const isUnavail = status === 'unavailable';
+          return {
+            value: option,
+            isOos,
+            isUnavail,
+            disabled: isOos || isUnavail,
+          };
+        });
 
         return (
           <div key={attrName} className="product-variant-group">
@@ -105,12 +125,12 @@ export default function ProductVariantSelector({
               aria-labelledby={groupLabelId}
               style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}
             >
-              {options.map((option, index) => {
-                const meta        = attrMatrix[option];
-                const status      = meta ? getOptionStatus(meta) : 'unavailable';
+              {optionStates.map((optionState, index) => {
+                const option      = optionState.value;
                 const isSelected  = selectedValue === option;
-                const isOos       = status === 'outofstock';
-                const isUnavail   = status === 'unavailable';
+                const isOos       = optionState.isOos;
+                const isUnavail   = optionState.isUnavail;
+                const disabled    = optionState.disabled;
 
                 return (
                   <button
@@ -119,28 +139,15 @@ export default function ProductVariantSelector({
                     role="radio"
                     aria-checked={isSelected}
                     aria-label={`${option}${isOos ? ', out of stock' : isUnavail ? ', unavailable' : ''}`}
-                    tabIndex={isSelected || (!selectedValue && index === 0) ? 0 : -1}
-                    onClick={() => handleOptionClick(attrName, option)}
-                    onKeyDown={(event) => handleOptionKeyDown(event, attrName, options, index)}
+                    aria-disabled={disabled}
+                    disabled={disabled}
+                    tabIndex={!disabled && (isSelected || (!selectedValue && index === 0)) ? 0 : -1}
+                    onClick={() => handleOptionClick(attrName, option, disabled)}
+                    onKeyDown={(event) => handleOptionKeyDown(event, attrName, optionStates, index)}
                     title={isOos ? `${option} — Out of Stock` : isUnavail ? `${option} — Unavailable` : option}
                     style={chipStyle(isSelected, isOos, isUnavail)}
                   >
-                    <span
-                      style={{
-                        textDecoration: isOos || isUnavail ? 'line-through' : 'none',
-                        textDecorationColor: '#94a3b8',
-                      }}
-                    >
-                      {option}
-                    </span>
-                    {isOos && (
-                      <span
-                        style={{ fontSize: '0.55rem', display: 'block', color: '#94a3b8', lineHeight: 1 }}
-                        aria-hidden="true"
-                      >
-                        OOS
-                      </span>
-                    )}
+                    <span>{option}</span>
                   </button>
                 );
               })}
@@ -168,7 +175,8 @@ function chipStyle(isSelected, isOos, isUnavail) {
       : isOos || isUnavail ? '#94a3b8' : '#0f172a',
     fontSize: '0.82rem',
     fontWeight: isSelected ? 700 : 500,
-    cursor: 'pointer',
+    cursor: isOos || isUnavail ? 'not-allowed' : 'pointer',
+    opacity: isOos || isUnavail ? 0.62 : 1,
     textAlign: 'center',
     lineHeight: 1.3,
     transition: 'border-color 0.15s, background 0.15s, color 0.15s',

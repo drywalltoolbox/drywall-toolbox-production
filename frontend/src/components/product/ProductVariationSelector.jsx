@@ -47,7 +47,7 @@ export default function ProductVariationSelector({
                 const selected = `${selectedValue}` === `${option.value}`;
                 const soldOut = option.status === 'sold-out';
                 const unavailable = option.status === 'unavailable';
-                const disabled = variationsLoading || unavailable;
+                const disabled = variationsLoading || soldOut || unavailable;
 
                 // Build aria-label and className independently for clarity.
                 let ariaLabel = option.value;
@@ -58,7 +58,6 @@ export default function ProductVariationSelector({
                 const pillClasses = ['dtb-variant-pill'];
                 if (selected) pillClasses.push('is-selected', 'dtb-variant-pill--selected');
                 if (!variationsLoading) {
-                  // soldOut implies unavailability — apply sold-out class only (no duplicate disabled)
                   if (soldOut) pillClasses.push('is-sold-out', 'dtb-variant-pill--disabled');
                   else if (unavailable) pillClasses.push('is-disabled', 'dtb-variant-pill--disabled');
                 } else {
@@ -92,9 +91,7 @@ export default function ProductVariationSelector({
                         </Motion.span>
                       </AnimatePresence>
                     ) : null}
-                    {!variationsLoading && soldOut ? (
-                      <span className="dtb-variant-pill__status">Sold out</span>
-                    ) : !variationsLoading && unavailable ? (
+                    {!variationsLoading && (soldOut || unavailable) ? (
                       <span className="sr-only">Unavailable</span>
                     ) : null}
                   </Motion.button>

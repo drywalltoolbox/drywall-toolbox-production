@@ -349,20 +349,17 @@
 .dtb-variant-pill.is-disabled,
 .dtb-variant-pill.is-sold-out,
 .dtb-variant-pill--disabled {
-  color: #94a3b8;
+  border-color: rgba(203, 213, 225, 0.78);
   background: #f8fafc;
+  cursor: not-allowed;
+  opacity: 0.62;
+  box-shadow: none;
 }
 
-.dtb-variant-pill.is-disabled::after,
-.dtb-variant-pill.is-sold-out::after,
-.dtb-variant-pill--disabled::after {
-  content: '';
-  position: absolute;
-  inset: 8px;
-  border-top: 2px solid rgba(148, 163, 184, 0.8);
-  transform: rotate(-14deg);
-  transform-origin: center;
-  pointer-events: none;
+.dtb-variant-pill.is-disabled .dtb-variant-pill__label,
+.dtb-variant-pill.is-sold-out .dtb-variant-pill__label,
+.dtb-variant-pill--disabled .dtb-variant-pill__label {
+  color: #94a3b8;
 }
 
 .dtb-variant-pill.is-loading {
