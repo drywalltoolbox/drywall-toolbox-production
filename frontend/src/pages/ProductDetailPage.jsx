@@ -86,6 +86,16 @@ export default function ProductDetailPage() {
     }
   };
 
+  const handleVariationChange = useCallback((variation) => {
+    const baseSlug = product?.slug || slug;
+    if (!baseSlug) return;
+    const targetPath = variation?.id
+      ? `/products/${baseSlug}/variations/${encodeURIComponent(variation.id)}`
+      : `/products/${baseSlug}`;
+    if (location.pathname === targetPath) return;
+    navigate(targetPath, { replace: true });
+  }, [location.pathname, navigate, product?.slug, slug]);
+
   // ── Loading state ──────────────────────────────────────────────────────────
   if (status === 'loading' || status === 'idle') {
     return (
@@ -138,16 +148,6 @@ export default function ProductDetailPage() {
     ? getVariationDisplayName(product, selectedVariation, effectiveVariationName)
     : product.name;
   const productDetailPath = `/products/${product.slug || slug}${selectedVariation?.id ? `/variations/${encodeURIComponent(selectedVariation.id)}` : ''}`;
-
-  const handleVariationChange = useCallback((variation) => {
-    const baseSlug = product?.slug || slug;
-    if (!baseSlug) return;
-    const targetPath = variation?.id
-      ? `/products/${baseSlug}/variations/${encodeURIComponent(variation.id)}`
-      : `/products/${baseSlug}`;
-    if (location.pathname === targetPath) return;
-    navigate(targetPath, { replace: true });
-  }, [location.pathname, navigate, product?.slug, slug]);
 
   // ── SEO ────────────────────────────────────────────────────────────────────
   const metaMap = {};
