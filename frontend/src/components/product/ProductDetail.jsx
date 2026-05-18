@@ -503,7 +503,7 @@ export default function ProductDetail({
   const descriptionNode = descriptionContent;
 
   return (
-    <div className="dtb-pdp bg-white rounded-2xl shadow-2xl overflow-hidden w-full max-w-6xl mx-auto flex flex-col relative">
+    <div className={`dtb-pdp${onClose ? ' dtb-pdp--modal' : ''} bg-white rounded-2xl shadow-2xl overflow-hidden w-full max-w-6xl mx-auto flex flex-col relative`}>
       {onClose ? (
         <button
           onClick={onClose}

@@ -786,6 +786,10 @@
     padding: 0.75rem 0.9rem 1.25rem;
   }
 
+  .dtb-pdp--modal .dtb-pdp__inner {
+    padding-top: 3.35rem;
+  }
+
   .dtb-pdp__hero {
     gap: 1rem;
     margin-bottom: 0;
@@ -797,8 +801,8 @@
 
   .dtb-pdp-gallery .product-image-gallery__main {
     border-radius: var(--dtb-radius-lg, 14px);
-    min-height: min(92vw, 28rem);
-    max-height: min(92vw, 28rem);
+    min-height: min(106vw, 32rem);
+    max-height: min(106vw, 32rem);
     overflow: hidden;
   }
 

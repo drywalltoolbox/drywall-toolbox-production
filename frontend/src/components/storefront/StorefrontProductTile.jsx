@@ -83,11 +83,22 @@ export default function StorefrontProductTile({
 
   const isMobile = useIsMobile();
   const [overlayActive, setOverlayActive] = useState(false);
+  const [overlayHasFocus, setOverlayHasFocus] = useState(false);
   const cardRef = useRef(null);
+  const imageButtonRef = useRef(null);
+  const overlayRef = useRef(null);
   const navigate = useNavigate();
 
   const slug = resolved.slug || product?.slug;
   const productUrl = slug ? `/products/${slug}` : null;
+
+  const closeOverlay = useCallback(() => {
+    const activeEl = document.activeElement;
+    if (overlayRef.current && activeEl instanceof HTMLElement && overlayRef.current.contains(activeEl)) {
+      imageButtonRef.current?.focus();
+    }
+    setOverlayActive(false);
+  }, []);
 
   useEffect(() => {
     if (!overlayActive || !isMobile) return undefined;
@@ -110,7 +121,7 @@ export default function StorefrontProductTile({
     }
 
     if (overlayActive) {
-      setOverlayActive(false);
+      closeOverlay();
 
       if (productUrl) navigate(productUrl);
 
@@ -118,20 +129,20 @@ export default function StorefrontProductTile({
     }
 
     setOverlayActive(true);
-  }, [isMobile, navigate, overlayActive, productUrl]);
+  }, [closeOverlay, isMobile, navigate, overlayActive, productUrl]);
 
   const handleMouseEnter = useCallback(() => {
     if (!isMobile) setOverlayActive(true);
   }, [isMobile]);
 
   const handleMouseLeave = useCallback(() => {
-    if (!isMobile) setOverlayActive(false);
-  }, [isMobile]);
+    if (!isMobile) closeOverlay();
+  }, [closeOverlay, isMobile]);
 
   const handleCardInteract = useCallback((fallback) => (e) => {
     if (isMobile && overlayActive) {
       e.stopPropagation();
-      setOverlayActive(false);
+      closeOverlay();
 
       if (productUrl) navigate(productUrl);
 
@@ -139,19 +150,19 @@ export default function StorefrontProductTile({
     }
 
     fallback?.(e);
-  }, [isMobile, navigate, overlayActive, productUrl]);
+  }, [closeOverlay, isMobile, navigate, overlayActive, productUrl]);
 
   const handleQuickView = useCallback((e) => {
     e.stopPropagation();
-    setOverlayActive(false);
+    closeOverlay();
     onOpenModal?.(resolved);
-  }, [onOpenModal, resolved]);
+  }, [closeOverlay, onOpenModal, resolved]);
 
   const handleOverlayAddToCart = useCallback((e) => {
     e.stopPropagation();
-    setOverlayActive(false);
+    closeOverlay();
     onAddToCart?.(resolved);
-  }, [onAddToCart, resolved]);
+  }, [closeOverlay, onAddToCart, resolved]);
 
   const badgePositionClass = variant === 'list'
     ? 'dtb-product-card__badge--left'
@@ -165,10 +176,19 @@ export default function StorefrontProductTile({
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
-      <button
-        type="button"
+      <div
+        ref={imageButtonRef}
+        role="button"
+        tabIndex={0}
         className="dtb-product-card__image"
         onClick={handleImageClick}
+        onKeyDown={(e) => {
+          if (e.target !== e.currentTarget) return;
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            handleImageClick();
+          }
+        }}
         aria-label={`View ${name}`}
       >
         {outOfStock && (
@@ -204,11 +224,18 @@ export default function StorefrontProductTile({
 
         {variant !== 'list' && (
           <div
-            aria-hidden={!overlayActive}
+            ref={overlayRef}
+            aria-hidden={!overlayActive && !overlayHasFocus}
             className={`dtb-product-card__qv-overlay${overlayActive ? ' dtb-product-card__qv-overlay--active' : ''}`}
+            onFocusCapture={() => setOverlayHasFocus(true)}
+            onBlurCapture={(e) => {
+              if (!e.currentTarget.contains(e.relatedTarget)) {
+                setOverlayHasFocus(false);
+              }
+            }}
             onClick={(e) => {
               e.stopPropagation();
-              setOverlayActive(false);
+              closeOverlay();
 
               if (productUrl) navigate(productUrl);
             }}
@@ -217,6 +244,7 @@ export default function StorefrontProductTile({
               {!isMobile && (
                 <button
                   type="button"
+                  tabIndex={overlayActive ? 0 : -1}
                   className="dtb-product-card__qv-icon-btn"
                   onClick={(e) => e.stopPropagation()}
                   aria-label={`Save ${name} for later`}
@@ -227,6 +255,7 @@ export default function StorefrontProductTile({
 
               <button
                 type="button"
+                tabIndex={overlayActive ? 0 : -1}
                 className="dtb-product-card__qv-btn"
                 onClick={handleQuickView}
                 aria-label={`Quick view ${name}`}
@@ -239,6 +268,7 @@ export default function StorefrontProductTile({
                 <button
                   type="button"
                   disabled={outOfStock}
+                  tabIndex={overlayActive ? 0 : -1}
                   className={isMobile
                     ? `dtb-product-card__qv-btn dtb-product-card__qv-btn--icon-only${outOfStock ? ' dtb-product-card__qv-btn--disabled' : ''}`
                     : 'dtb-product-card__qv-icon-btn'}
@@ -251,7 +281,7 @@ export default function StorefrontProductTile({
             </div>
           </div>
         )}
-      </button>
+      </div>
 
       <div className="dtb-product-card__meta">
         {variant === 'list' && (

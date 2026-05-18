@@ -307,7 +307,7 @@ export default function ProductImageGallery({ product }) {
               exit="exit"
               transition={slideTransition}
               loading={currentIndex === 0 ? 'eager' : 'lazy'}
-              fetchpriority={currentIndex === 0 ? 'high' : undefined}
+              fetchPriority={currentIndex === 0 ? 'high' : undefined}
               decoding="async"
               draggable={false}
               className="absolute inset-0 w-full h-full object-contain p-3 sm:p-4"
