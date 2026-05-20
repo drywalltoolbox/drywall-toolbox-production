@@ -1,6 +1,4 @@
-Save this as:
 
-docs/mu-plugins-code-migration.md
 
 ⸻
 
