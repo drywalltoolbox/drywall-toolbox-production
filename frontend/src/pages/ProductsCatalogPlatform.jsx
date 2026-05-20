@@ -240,9 +240,13 @@ export default function ProductsCatalogPlatform({ forceProductGrid = false, titl
     navigate(buildCatalogUrl(next, pathParams), { replace: options.replace ?? false });
   }, [navigate, pathParams, query]);
 
-  const handleAddToCart = (product, quantity = 1) => {
-    addToCart(product, quantity);
-    setToast({ message: `${product.name} added to cart!`, type: 'cart' });
+  const handleAddToCart = async (product, quantity = 1) => {
+    try {
+      await addToCart(product, quantity);
+      setToast({ message: `${product.name} added to cart!`, type: 'cart' });
+    } catch (err) {
+      setToast({ message: err?.message || 'Could not add item to cart. Please try again.', type: 'error' });
+    }
   };
 
   const openModal = (product, cardProduct = null) => {

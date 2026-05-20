@@ -25,9 +25,13 @@ export default function CategoryPage() {
 
   const showToast = (message, type = 'cart') => setToast({ message, type });
 
-  const handleAddToCart = (product, quantity = 1) => {
-    addToCart(product, quantity);
-    showToast(`${product.name} added to cart!`, 'cart');
+  const handleAddToCart = async (product, quantity = 1) => {
+    try {
+      await addToCart(product, quantity);
+      showToast(`${product.name} added to cart!`, 'cart');
+    } catch (err) {
+      showToast(err?.message || 'Could not add item to cart. Please try again.', 'error');
+    }
   };
 
   const openModal = (product, cardProduct = null) => {

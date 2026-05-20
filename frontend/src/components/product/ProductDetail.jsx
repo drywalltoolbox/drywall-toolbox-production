@@ -459,18 +459,21 @@ export default function ProductDetail({
   const hasCompleteSelection = !needsVariation || variationAttributes.every((attr) => selectedAttrs?.[attr.name]);
   const canAddToCart = !isOutOfStock && (!needsVariation || Boolean(selectedVariation && hasCompleteSelection));
 
-  const handleAddToCart = () => {
+  const handleAddToCart = async () => {
     if (!canAddToCart) return;
     const productToAdd = selectedVariation ? effectiveProduct : product;
     try {
       setAddToCartError('');
-      if (onAddToCart) onAddToCart(productToAdd, quantity);
-      else addToCart(productToAdd, quantity);
+      if (onAddToCart) await onAddToCart(productToAdd, quantity);
+      else await addToCart(productToAdd, quantity);
       if (typeof onClose === 'function') {
         setTimeout(() => onClose(), 220);
       }
-    } catch {
-      setAddToCartError('Unable to add this item to cart. Please check your selection and try again. If this continues, contact support.');
+    } catch (err) {
+      setAddToCartError(
+        err?.message ||
+        'Unable to add this item to cart. Please check your selection and try again. If this continues, contact support.'
+      );
     }
   };
   const clearAddToCartError = () => {
