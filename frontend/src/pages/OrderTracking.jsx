@@ -83,7 +83,7 @@ const TIMELINE_ICONS = {
 
 function TimelineIcon( { type } ) {
   const Icon = TIMELINE_ICONS[ type ] || Package;
-  return <Icon size={ 16 } className="flex-shrink-0" />;
+  return <Icon size={ 16 } className="shrink-0" />;
 }
 
 // ─── Skeleton UI ─────────────────────────────────────────────────────────────
@@ -96,7 +96,7 @@ function TrackingSkeleton() {
       <div className="bg-white rounded-lg shadow p-6 space-y-3">
         { [ 1, 2, 3 ].map( ( i ) => (
           <div key={ i } className="flex gap-3 items-center">
-            <div className="w-6 h-6 bg-gray-200 rounded-full flex-shrink-0" />
+            <div className="w-6 h-6 bg-gray-200 rounded-full shrink-0" />
             <div className="flex-1 space-y-1">
               <div className="h-4 bg-gray-200 rounded w-40" />
               <div className="h-3 bg-gray-200 rounded w-24" />

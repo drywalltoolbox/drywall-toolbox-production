@@ -425,7 +425,7 @@ export default function AllProducts() {
                       cardProduct={cardProduct}
                       hasSelectedVariation={false}
                       onOpenModal={() => openModal(product, cardProduct)}
-                      onAddToCart={() => openModal(product, cardProduct)}
+                      onAddToCart={() => handleAddToCart(cardProduct || product, 1)}
                       index={index}
                     />
                   );

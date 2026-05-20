@@ -21,11 +21,51 @@ import { getToken, clearToken } from '../auth/tokenStore.js';
 
 const inflightGetRequests = new Map();
 const getCooldowns = new Map();
+let authExpiryCheckPromise = null;
 
 // ─── Base URLs ────────────────────────────────────────────────────────────────
 
 export const API_BASE_URL =
   ( process.env.REACT_APP_API_BASE_URL || '' ).replace( /\/+$/, '' );
+
+const DTB_AUTH_VALIDATE_URL = API_BASE_URL
+  ? `${ API_BASE_URL }/wp-json/dtb/v1/auth/validate`
+  : '';
+
+async function shouldDispatchAuthExpired() {
+  const token = getToken();
+  if ( token ) return true;
+
+  // Without an API base we cannot reliably validate session state here.
+  // Avoid forcing logout on ambiguous 401s (prevents dashboard flash loops).
+  if ( ! DTB_AUTH_VALIDATE_URL ) return false;
+
+  if ( authExpiryCheckPromise ) {
+    return authExpiryCheckPromise;
+  }
+
+  authExpiryCheckPromise = ( async () => {
+    try {
+      const res = await fetch( DTB_AUTH_VALIDATE_URL, {
+        method:      'POST',
+        credentials: 'include',
+        headers:     { 'Content-Type': 'application/json' },
+      } );
+
+      if ( ! res.ok ) return true;
+
+      const data = await res.json().catch( () => ( {} ) );
+      return ! data?.user;
+    } catch {
+      // Network/transient failures should not hard-logout the UI.
+      return false;
+    } finally {
+      authExpiryCheckPromise = null;
+    }
+  } )();
+
+  return authExpiryCheckPromise;
+}
 
 // WordPress REST API root — e.g. https://drywalltoolbox.com/wp/wp-json
 // Built from REACT_APP_WP_BASE_URL (e.g. https://drywalltoolbox.com/wp).
@@ -87,10 +127,11 @@ wpClient.interceptors.request.use(
 
 wpClient.interceptors.response.use(
   ( response ) => response,
-  ( error ) => {
+  async ( error ) => {
     if ( error.response && error.response.status === 401 ) {
       clearToken();
-      if ( typeof window !== 'undefined' ) {
+      const shouldExpireSession = await shouldDispatchAuthExpired();
+      if ( shouldExpireSession && typeof window !== 'undefined' ) {
         window.dispatchEvent( new Event( 'auth:expired' ) );
       }
     }
@@ -175,7 +216,8 @@ export async function apiClient( endpoint, options = {} ) {
 
     if ( response.status === 401 ) {
       clearToken();
-      if ( typeof window !== 'undefined' ) {
+      const shouldExpireSession = await shouldDispatchAuthExpired();
+      if ( shouldExpireSession && typeof window !== 'undefined' ) {
         window.dispatchEvent( new Event( 'auth:expired' ) );
       }
       let envelope = {};

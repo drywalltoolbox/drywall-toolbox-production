@@ -77,9 +77,9 @@ export default function ProductDetailPage() {
   }, [ product?.id ] );
 
   // ── Add to cart ────────────────────────────────────────────────────────────
-  const handleAddToCart = (prod, qty = 1) => {
+  const handleAddToCart = async (prod, qty = 1) => {
     try {
-      addToCart(prod, qty);
+      await addToCart(prod, qty);
       setToast({ message: `${prod.name} added to cart!`, type: 'cart' });
     } catch (err) {
       setToast({ message: err.message || 'Failed to add to cart.', type: 'error' });
