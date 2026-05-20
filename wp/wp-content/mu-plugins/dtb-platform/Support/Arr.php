@@ -1,12 +1,11 @@
 <?php
+/**
+ * Arr — DTB Platform
+ *
+ * Array utility helpers. Configuration lookups live in Config/RuntimeConfig.php
+ * (dtb_get_config) and Config/Environment.php (dtb_resolve_catalog_csv_config).
+ *
+ * @package drywall-toolbox
+ */
+
 defined( 'ABSPATH' ) || exit;
-
-if ( function_exists( 'dtb_module_require' ) ) {
-	dtb_module_require( 'dtb-platform/Legacy/dtb-utils.php' );
-	return;
-}
-
-$legacy_path = dirname( __DIR__, 2 ) . '/dtb-platform/Legacy/dtb-utils.php';
-if ( file_exists( $legacy_path ) ) {
-	require_once $legacy_path;
-}
