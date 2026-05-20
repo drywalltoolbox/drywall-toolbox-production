@@ -9,20 +9,26 @@ defined( 'ABSPATH' ) || exit;
 
 /**
  * Allowed MIME types for repair media uploads.
+ * Primary definition lives in RepairPostType.php; guard here to avoid
+ * redeclaration when both files are loaded.
  */
-const DTB_REPAIR_ALLOWED_MIME_TYPES = [
-'image/jpeg',
-'image/png',
-'image/webp',
-'image/gif',
-'video/mp4',
-'video/quicktime',
-];
+if ( ! defined( 'DTB_REPAIR_ALLOWED_MIME_TYPES' ) ) {
+	define( 'DTB_REPAIR_ALLOWED_MIME_TYPES', [
+		'image/jpeg',
+		'image/png',
+		'image/webp',
+		'image/gif',
+		'video/mp4',
+		'video/quicktime',
+	] );
+}
 
 /**
  * Maximum file size in bytes (25 MB).
  */
-const DTB_REPAIR_MAX_UPLOAD_BYTES = 26214400;
+if ( ! defined( 'DTB_REPAIR_MAX_UPLOAD_BYTES' ) ) {
+	define( 'DTB_REPAIR_MAX_UPLOAD_BYTES', 26214400 );
+}
 
 /**
  * Validate a single repair media upload.

@@ -7,12 +7,11 @@
 
 defined( 'ABSPATH' ) || exit;
 
-if ( is_admin() ) {
-	add_action( 'admin_menu', function (): void {
-		if ( ! class_exists( 'WP_List_Table' ) ) {
-			require_once ABSPATH . 'wp-admin/includes/class-wp-list-table.php';
-		}
-	}, 1 );
+// WP_List_Table is only available after wp-admin/includes/ is loaded.
+// Load it eagerly so the class declaration below can extend it safely
+// regardless of which hook triggered this file's require_once.
+if ( ! class_exists( 'WP_List_Table' ) ) {
+	require_once ABSPATH . 'wp-admin/includes/class-wp-list-table.php';
 }
 
 /**
