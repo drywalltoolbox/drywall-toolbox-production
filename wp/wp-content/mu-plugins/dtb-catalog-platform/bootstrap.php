@@ -33,12 +33,17 @@ require_once $_dtb_cp . '/Services/ToolFamilyResolver.php';
 require_once $_dtb_cp . '/Services/CatalogProductNormalizer.php';
 require_once $_dtb_cp . '/Infrastructure/CatalogProductRepository.php';
 require_once $_dtb_cp . '/Infrastructure/CatalogHealthRepository.php';
+require_once $_dtb_cp . '/Infrastructure/ProductVariationRepository.php';
+require_once $_dtb_cp . '/Infrastructure/ProductRelationshipRepository.php';
 require_once $_dtb_cp . '/Services/VariationReadModelService.php';
 require_once $_dtb_cp . '/Services/DefaultVariationResolver.php';
 require_once $_dtb_cp . '/Services/CatalogFacetService.php';
 require_once $_dtb_cp . '/Services/CatalogHealthService.php';
 require_once $_dtb_cp . '/Services/ToolsetEligibilityService.php';
 require_once $_dtb_cp . '/Services/ToolsetValidationService.php';
+require_once $_dtb_cp . '/Services/ProductMappingService.php';
+require_once $_dtb_cp . '/Services/CompatiblePartsService.php';
+require_once $_dtb_cp . '/Services/ProductRelationshipService.php';
 
 // REST controllers.
 require_once $_dtb_cp . '/Rest/CatalogFacetsController.php';
@@ -57,12 +62,14 @@ require_once $_dtb_cp . '/Validation/ToolsetEligibilityValidator.php';
 require_once $_dtb_cp . '/Validation/PricingValidator.php';
 require_once $_dtb_cp . '/Validation/ImageValidator.php';
 require_once $_dtb_cp . '/Validation/SeoValidator.php';
+require_once $_dtb_cp . '/Validation/ProductMappingValidator.php';
 
 // Application hook wiring and use cases.
 require_once $_dtb_cp . '/Application/RegisterCatalogMeta.php';
 require_once $_dtb_cp . '/Application/RegisterCatalogRoutes.php';
 require_once $_dtb_cp . '/Application/RegisterCatalogHooks.php';
 require_once $_dtb_cp . '/Application/RunCatalogHealthScan.php';
+require_once $_dtb_cp . '/Application/RunProductMappingMutation.php';
 require_once $_dtb_cp . '/Application/ResolveCompatibleParts.php';
 
 // Admin / CLI tools.
@@ -71,6 +78,9 @@ if ( is_admin() || ( defined( 'WP_CLI' ) && WP_CLI ) ) {
 	require_once $_dtb_cp . '/Admin/CatalogHealthRenderer.php';
 	require_once $_dtb_cp . '/Admin/CatalogHealthActions.php';
 	require_once $_dtb_cp . '/Admin/CatalogHealthPage.php';
+	require_once $_dtb_cp . '/Admin/ProductMappingRenderer.php';
+	require_once $_dtb_cp . '/Admin/ProductMappingPage.php';
+	require_once $_dtb_cp . '/Admin/ProductMappingActions.php';
 }
 
 unset( $_dtb_cp );
