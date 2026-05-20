@@ -88,7 +88,6 @@ dtb_integrations_require_files( [
 	'dtb-integrations/Rewards/RewardsIssueJob.php',
 	'dtb-integrations/Rewards/RewardsAdjustmentController.php',
 	'dtb-integrations/Rewards/RewardsBalanceController.php',
-	'dtb-integrations/Rewards/ProCareEligibilityService.php',
 	'dtb-integrations/Rewards/RewardsHealthCheck.php',
 ] );
 
