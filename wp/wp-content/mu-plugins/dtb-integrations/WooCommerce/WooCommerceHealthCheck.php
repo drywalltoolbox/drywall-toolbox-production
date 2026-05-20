@@ -24,7 +24,7 @@ final class DTB_WooCommerceHealthCheck {
 	 *
 	 * @return array<string,mixed>
 	 */
-	public static function run(): array {
+	public static function run( bool $include_mutating_checks = false ): array {
 		$loaded = class_exists( 'WooCommerce' ) || function_exists( 'WC' );
 		$status = [
 			'ok'                 => $loaded,
@@ -32,9 +32,13 @@ final class DTB_WooCommerceHealthCheck {
 			'wc_version'         => defined( 'WC_VERSION' ) ? WC_VERSION : '',
 			'rest_url_rewrite'   => function_exists( 'dtb_wc_admin_rest_url' ),
 			'webhook_manager'    => function_exists( 'dtb_wc_ensure_webhooks' ),
+			'webhooks'           => [
+				'status' => 'not_checked',
+				'reason' => 'passive_snapshot',
+			],
 		];
 
-		if ( function_exists( 'dtb_wc_ensure_webhooks' ) ) {
+		if ( $include_mutating_checks && function_exists( 'dtb_wc_ensure_webhooks' ) ) {
 			$status['webhooks'] = dtb_wc_ensure_webhooks();
 		}
 
@@ -49,6 +53,6 @@ add_action( 'plugins_loaded', [ 'DTB_WooCommerceHealthCheck', 'register' ], 20 )
  *
  * @return array<string,mixed>
  */
-function dtb_integrations_woo_health(): array {
-	return DTB_WooCommerceHealthCheck::run();
+function dtb_integrations_woo_health( bool $include_mutating_checks = false ): array {
+	return DTB_WooCommerceHealthCheck::run( $include_mutating_checks );
 }

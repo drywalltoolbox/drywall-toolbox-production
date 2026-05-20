@@ -61,12 +61,7 @@ final class DTB_NotificationJob {
 	 * @return array{type:string,to:string,template:string,message:string,context:array}
 	 */
 	private static function sanitize_payload( array $payload ): array {
-		$context = [];
-		foreach ( (array) ( $payload['context'] ?? [] ) as $key => $value ) {
-			if ( is_scalar( $value ) || null === $value ) {
-				$context[ sanitize_key( (string) $key ) ] = sanitize_text_field( (string) $value );
-			}
-		}
+		$context = self::sanitize_context_recursive( (array) ( $payload['context'] ?? [] ) );
 
 		return [
 			'type'     => sanitize_key( (string) ( $payload['type'] ?? 'email' ) ),
@@ -75,6 +70,64 @@ final class DTB_NotificationJob {
 			'message'  => sanitize_textarea_field( (string) ( $payload['message'] ?? '' ) ),
 			'context'  => $context,
 		];
+	}
+
+	/**
+	 * Recursively sanitize template context while preserving nested structures.
+	 *
+	 * @param array<string|int,mixed> $value
+	 * @return array<string|int,mixed>
+	 */
+	private static function sanitize_context_recursive( array $value ): array {
+		$sanitized = [];
+
+		foreach ( $value as $key => $item ) {
+			$target_key = is_int( $key ) ? $key : self::sanitize_context_key( $key );
+			$sanitized[ $target_key ] = self::sanitize_context_value( $item, is_string( $target_key ) ? $target_key : '' );
+		}
+
+		return $sanitized;
+	}
+
+	/**
+	 * @param string $key Raw key.
+	 */
+	private static function sanitize_context_key( string $key ): string {
+		$key = trim( sanitize_text_field( $key ) );
+		if ( '' !== $key ) {
+			return $key;
+		}
+
+		return sanitize_key( $key );
+	}
+
+	/**
+	 * @param mixed  $value Raw value.
+	 * @param string $key   Sanitized key name.
+	 * @return mixed
+	 */
+	private static function sanitize_context_value( mixed $value, string $key ): mixed {
+		if ( null === $value || is_bool( $value ) || is_int( $value ) || is_float( $value ) ) {
+			return $value;
+		}
+
+		if ( is_string( $value ) ) {
+			if ( preg_match( '/(?:html|body|content|markup)/i', $key ) ) {
+				return wp_kses_post( $value );
+			}
+
+			return sanitize_text_field( $value );
+		}
+
+		if ( is_array( $value ) ) {
+			return self::sanitize_context_recursive( $value );
+		}
+
+		if ( is_object( $value ) ) {
+			return self::sanitize_context_recursive( get_object_vars( $value ) );
+		}
+
+		return null;
 	}
 }
 

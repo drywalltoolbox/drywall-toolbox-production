@@ -2,53 +2,104 @@
 /**
  * DTB Integrations bootstrap.
  *
- * Loads external-system bridge modules in dependency order. The legacy client
- * files remain the contract owners for this phase; surrounding module-layer
- * files provide typed facades, health snapshots, and bounded service entrypoints
- * without changing runtime hooks or REST routes.
+ * Composition root for external-system integrations.
+ *
+ * Loads module-layer files in explicit dependency order:
+ *   1. Base bridges/clients (contract owners)
+ *   2. Module config + services + controllers
+ *   3. Health-check adapters
+ *   4. Cross-integration notifications
  *
  * @package drywall-toolbox
  */
 
 defined( 'ABSPATH' ) || exit;
 
-// WooCommerce bridge first so all integration consumers hook against the configured WC runtime.
-dtb_module_require( 'dtb-integrations/WooCommerce/WooCommerceBridge.php' );
-dtb_module_require( 'dtb-integrations/WooCommerce/WooCommerceHealthCheck.php' );
-dtb_module_require( 'dtb-integrations/WooCommerce/ProductLookupService.php' );
-dtb_module_require( 'dtb-integrations/WooCommerce/WooWebhookManager.php' );
-dtb_module_require( 'dtb-integrations/WooCommerce/ProductWebhookHandler.php' );
-dtb_module_require( 'dtb-integrations/WooCommerce/RepairOrderService.php' );
+if ( ! function_exists( 'dtb_integrations_require_files' ) ) {
+	/**
+	 * Require a list of integration module files in-order.
+	 *
+	 * @param string[] $relative_paths Paths relative to wp-content/mu-plugins.
+	 */
+	function dtb_integrations_require_files( array $relative_paths ): void {
+		foreach ( $relative_paths as $path ) {
+			dtb_module_require( $path );
+		}
+	}
+}
 
-// Veeqo.
-dtb_module_require( 'dtb-integrations/Veeqo/VeeqoClient.php' );
-dtb_module_require( 'dtb-integrations/Veeqo/VeeqoConfig.php' );
-dtb_module_require( 'dtb-integrations/Veeqo/VeeqoHealthCheck.php' );
-dtb_module_require( 'dtb-integrations/Veeqo/VeeqoInventoryService.php' );
-dtb_module_require( 'dtb-integrations/Veeqo/VeeqoShippingService.php' );
-dtb_module_require( 'dtb-integrations/Veeqo/VeeqoSyncJob.php' );
-dtb_module_require( 'dtb-integrations/Veeqo/VeeqoWebhookController.php' );
+if ( ! function_exists( 'dtb_integrations_register_health_checks' ) ) {
+	/** Register all major integration health checks with DTB health registry. */
+	function dtb_integrations_register_health_checks(): void {
+		if ( class_exists( 'DTB_WooCommerceHealthCheck' ) ) {
+			DTB_WooCommerceHealthCheck::register();
+		}
+		if ( class_exists( 'DTB_VeeqoHealthCheck' ) ) {
+			DTB_VeeqoHealthCheck::register();
+		}
+		if ( class_exists( 'DTB_QuickBooksHealthCheck' ) ) {
+			DTB_QuickBooksHealthCheck::register();
+		}
+		if ( class_exists( 'DTB_RewardsHealthCheck' ) ) {
+			DTB_RewardsHealthCheck::register();
+		}
+	}
+}
 
-// QuickBooks.
-dtb_module_require( 'dtb-integrations/QuickBooks/QuickBooksClient.php' );
-dtb_module_require( 'dtb-integrations/QuickBooks/QuickBooksConfig.php' );
-dtb_module_require( 'dtb-integrations/QuickBooks/QuickBooksHealthCheck.php' );
-dtb_module_require( 'dtb-integrations/QuickBooks/QuickBooksCustomerMapper.php' );
-dtb_module_require( 'dtb-integrations/QuickBooks/QuickBooksInvoiceService.php' );
-dtb_module_require( 'dtb-integrations/QuickBooks/QuickBooksOAuthController.php' );
-dtb_module_require( 'dtb-integrations/QuickBooks/QuickBooksSyncJob.php' );
+// 1) Core bridges/clients first (runtime hooks/routes).
+dtb_integrations_require_files( [
+	'dtb-integrations/WooCommerce/WooCommerceBridge.php',
+	'dtb-integrations/Veeqo/VeeqoClient.php',
+	'dtb-integrations/QuickBooks/QuickBooksClient.php',
+	'dtb-integrations/Rewards/RewardsService.php',
+] );
 
-// Rewards / ProCare.
-dtb_module_require( 'dtb-integrations/Rewards/RewardsService.php' );
-dtb_module_require( 'dtb-integrations/Rewards/RewardsHealthCheck.php' );
-dtb_module_require( 'dtb-integrations/Rewards/RewardsIssueJob.php' );
-dtb_module_require( 'dtb-integrations/Rewards/RewardsAdjustmentController.php' );
-dtb_module_require( 'dtb-integrations/Rewards/RewardsBalanceController.php' );
-dtb_module_require( 'dtb-integrations/Rewards/ProCareEligibilityService.php' );
+// 2) WooCommerce module-layer files.
+dtb_integrations_require_files( [
+	'dtb-integrations/WooCommerce/ProductLookupService.php',
+	'dtb-integrations/WooCommerce/WooWebhookManager.php',
+	'dtb-integrations/WooCommerce/ProductWebhookHandler.php',
+	'dtb-integrations/WooCommerce/RepairOrderService.php',
+	'dtb-integrations/WooCommerce/WooCommerceHealthCheck.php',
+] );
 
-// Notifications are loaded last because they can be used by order/repair/integration hooks.
-dtb_module_require( 'dtb-integrations/Notifications/NotificationTemplateRepository.php' );
-dtb_module_require( 'dtb-integrations/Notifications/EmailTemplateRenderer.php' );
-dtb_module_require( 'dtb-integrations/Notifications/NotificationDispatcher.php' );
-dtb_module_require( 'dtb-integrations/Notifications/NotificationJob.php' );
-dtb_module_require( 'dtb-integrations/Notifications/SmsGateway.php' );
+// 3) Veeqo module-layer files.
+dtb_integrations_require_files( [
+	'dtb-integrations/Veeqo/VeeqoConfig.php',
+	'dtb-integrations/Veeqo/VeeqoInventoryService.php',
+	'dtb-integrations/Veeqo/VeeqoShippingService.php',
+	'dtb-integrations/Veeqo/VeeqoSyncJob.php',
+	'dtb-integrations/Veeqo/VeeqoWebhookController.php',
+	'dtb-integrations/Veeqo/VeeqoHealthCheck.php',
+] );
+
+// 4) QuickBooks module-layer files.
+dtb_integrations_require_files( [
+	'dtb-integrations/QuickBooks/QuickBooksConfig.php',
+	'dtb-integrations/QuickBooks/QuickBooksCustomerMapper.php',
+	'dtb-integrations/QuickBooks/QuickBooksInvoiceService.php',
+	'dtb-integrations/QuickBooks/QuickBooksOAuthController.php',
+	'dtb-integrations/QuickBooks/QuickBooksSyncJob.php',
+	'dtb-integrations/QuickBooks/QuickBooksHealthCheck.php',
+] );
+
+// 5) Rewards module-layer files.
+dtb_integrations_require_files( [
+	'dtb-integrations/Rewards/RewardsIssueJob.php',
+	'dtb-integrations/Rewards/RewardsAdjustmentController.php',
+	'dtb-integrations/Rewards/RewardsBalanceController.php',
+	'dtb-integrations/Rewards/ProCareEligibilityService.php',
+	'dtb-integrations/Rewards/RewardsHealthCheck.php',
+] );
+
+// 6) Notifications last (cross-integration consumers).
+dtb_integrations_require_files( [
+	'dtb-integrations/Notifications/NotificationTemplateRepository.php',
+	'dtb-integrations/Notifications/EmailTemplateRenderer.php',
+	'dtb-integrations/Notifications/NotificationDispatcher.php',
+	'dtb-integrations/Notifications/NotificationJob.php',
+	'dtb-integrations/Notifications/SmsGateway.php',
+] );
+
+// Register structured integration diagnostics with platform health registry.
+dtb_integrations_register_health_checks();
