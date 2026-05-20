@@ -265,7 +265,7 @@ export default function ProductsCatalogPlatform({ forceProductGrid = false, titl
   const toggleDisplayCategory = (displayCategory) => setQuery({ displayCategory: query.displayCategory === displayCategory ? '' : displayCategory, category: '' });
   const resetToBrandList = () => navigate('/products/brands');
   const resetToCategoryCards = () => navigate(`/products/brands/${brandToSlug(selectedBrand)}`);
-  const getCardDisplayProduct = useCallback((product) => product?.cardProduct || product, []);
+  const getCardDisplayProduct = useCallback((product) => product?.cardProduct || null, []);
 
   const showBrandLanding = !forceProductGrid && isBrandSelectorRoute && !query.search;
   const showCategoryLanding = !forceProductGrid && isBrandCategorySelectorRoute && !query.search;

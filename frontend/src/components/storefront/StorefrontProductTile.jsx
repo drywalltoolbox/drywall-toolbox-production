@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ShoppingCart, Eye, Heart } from 'lucide-react';
 import ProductCardImage from '../product/ProductCardImage';
@@ -48,28 +48,34 @@ export default function StorefrontProductTile({
   index = 0,
   variant = 'grid',
 }) {
-  const resolved = useMemo(() => cardProduct || product || {}, [cardProduct, product]);
-
+  // Parent product is always the canonical card identity.
+  // variationContext enriches commerce fields (price, image, stock) only.
   const isVariable = Boolean(product?.is_variable);
-  const stockStatus = resolved.stock_status || product?.stock_status || 'instock';
-  const outOfStock = stockStatus === 'outofstock';
-  const name = resolved.name || product?.name || resolved.part_number || 'Product';
-  const sku = resolved.sku || product?.sku || '';
-  const desc = stripHtml(resolved.short_description || resolved.description || '');
+  const variationContext = isVariable ? cardProduct : null;
+  const displayProduct = product || {};
+  const commerceProduct = variationContext || displayProduct;
 
-  const priceStr = isVariable && product?.min_price != null
-    ? `From $${money(product.min_price)}`
-    : `$${money(resolved.price ?? product?.price ?? 0)}`;
+  const stockStatus = commerceProduct.stock_status || displayProduct.stock_status || 'instock';
+  const outOfStock = stockStatus === 'outofstock';
+
+  // Parent identity must remain canonical on listing cards.
+  const name = displayProduct.name || commerceProduct.name || displayProduct.part_number || 'Product';
+  const sku = displayProduct.sku || commerceProduct.sku || '';
+  const desc = stripHtml(displayProduct.short_description || displayProduct.description || '');
+
+  const priceStr = isVariable && displayProduct.min_price != null
+    ? `From $${money(displayProduct.min_price)}`
+    : `$${money(commerceProduct.price ?? displayProduct.price ?? 0)}`;
 
   // Keep card compare pricing aligned with PDP modal/header behavior:
   // use regular price when present and render it as a struck-through value.
   const compareAtValue = parsePrice(
-    resolved.regular_price
-    ?? product?.regular_price
-    ?? resolved.compare_at_price
-    ?? product?.compare_at_price
-    ?? resolved.min_regular_price
-    ?? product?.min_regular_price
+    commerceProduct.regular_price
+    ?? displayProduct.regular_price
+    ?? commerceProduct.compare_at_price
+    ?? displayProduct.compare_at_price
+    ?? commerceProduct.min_regular_price
+    ?? displayProduct.min_regular_price
   );
 
   const comparePriceStr = compareAtValue !== null && compareAtValue > 0
@@ -77,9 +83,20 @@ export default function StorefrontProductTile({
     : null;
 
   const onSale = !isVariable
-    && resolved.sale_price
-    && resolved.regular_price
-    && parseFloat(resolved.sale_price) < parseFloat(resolved.regular_price);
+    && commerceProduct.sale_price
+    && commerceProduct.regular_price
+    && parseFloat(commerceProduct.sale_price) < parseFloat(commerceProduct.regular_price);
+
+  // Representative media may come from the resolved default variation.
+  const image = variationContext?.image_thumbnail
+    || variationContext?.image
+    || displayProduct.image_thumbnail
+    || displayProduct.image;
+  const imageSrcset = variationContext?.image_srcset || displayProduct.image_srcset;
+
+  // Canonical URL always routes to the parent slug.
+  const slug = displayProduct.slug || commerceProduct.slug;
+  const productUrl = slug ? `/products/${slug}` : null;
 
   const isMobile = useIsMobile();
   const [overlayActive, setOverlayActive] = useState(false);
@@ -88,12 +105,6 @@ export default function StorefrontProductTile({
   const imageButtonRef = useRef(null);
   const overlayRef = useRef(null);
   const navigate = useNavigate();
-
-  const selectedVariantId = resolved?.parent_id && resolved?.id ? resolved.id : null;
-  const slug = product?.slug || resolved.slug;
-  const productUrl = slug
-    ? `/products/${slug}${selectedVariantId ? `/variations/${encodeURIComponent(selectedVariantId)}` : ''}`
-    : null;
 
   const closeOverlay = useCallback(() => {
     const activeEl = document.activeElement;
@@ -158,14 +169,14 @@ export default function StorefrontProductTile({
   const handleQuickView = useCallback((e) => {
     e.stopPropagation();
     closeOverlay();
-    onOpenModal?.(resolved);
-  }, [closeOverlay, onOpenModal, resolved]);
+    onOpenModal?.();
+  }, [closeOverlay, onOpenModal]);
 
   const handleOverlayAddToCart = useCallback((e) => {
     e.stopPropagation();
     closeOverlay();
-    onAddToCart?.(resolved);
-  }, [closeOverlay, onAddToCart, resolved]);
+    onAddToCart?.();
+  }, [closeOverlay, onAddToCart]);
 
   const badgePositionClass = variant === 'list'
     ? 'dtb-product-card__badge--left'
@@ -207,9 +218,9 @@ export default function StorefrontProductTile({
         )}
 
         <ProductCardImage
-          product={resolved}
-          src={resolved.image_thumbnail || resolved.image}
-          srcSet={resolved.image_srcset}
+          product={displayProduct}
+          src={image}
+          srcSet={imageSrcset}
           sizes={
             variant === 'rail'
               ? '(max-width: 767px) 44vw, 188px'
@@ -298,8 +309,8 @@ export default function StorefrontProductTile({
           </button>
         )}
 
-        {resolved.brand ? (
-          <span className="dtb-product-card__brand">{resolved.brand}</span>
+        {displayProduct.brand ? (
+          <span className="dtb-product-card__brand">{displayProduct.brand}</span>
         ) : null}
 
         <button
