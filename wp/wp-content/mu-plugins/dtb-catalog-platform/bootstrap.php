@@ -78,6 +78,9 @@ if ( is_admin() || ( defined( 'WP_CLI' ) && WP_CLI ) ) {
 	require_once $_dtb_cp . '/Admin/MetaBackfillTool.php';
 }
 
+// Transitional legacy bridge for existing catalog health diagnostics.
+dtb_module_require( 'dtb-catalog-health.php' );
+
 unset( $_dtb_cp );
 
 // ── Seed toolset templates (idempotent) ───────────────────────────────────────
