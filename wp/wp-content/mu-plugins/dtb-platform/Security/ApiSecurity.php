@@ -109,6 +109,15 @@ function dtb_emit_cors_headers( ?string $raw_origin = null ): void {
 		? (string) wp_unslash( $_SERVER['HTTP_ORIGIN'] ) // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 		: '';
 
+	if ( class_exists( 'DTB_CorsPolicy' ) ) {
+		header_remove( 'Access-Control-Allow-Origin' );
+		header_remove( 'Access-Control-Allow-Credentials' );
+		header_remove( 'Access-Control-Allow-Methods' );
+		header_remove( 'Access-Control-Allow-Headers' );
+		DTB_CorsPolicy::emit( $raw_origin );
+		return;
+	}
+
 	header_remove( 'Access-Control-Allow-Origin' );
 	header_remove( 'Access-Control-Allow-Credentials' );
 	header_remove( 'Access-Control-Allow-Methods' );

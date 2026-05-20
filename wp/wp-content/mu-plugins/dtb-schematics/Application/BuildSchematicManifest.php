@@ -11,41 +11,26 @@ defined( 'ABSPATH' ) || exit;
  * @return WP_REST_Response
  */
 function dtb_get_schematic_media_manifest( WP_REST_Request $request ): WP_REST_Response {
-	$cached = get_transient( 'dtb_schematics_manifest' );
-	if ( false !== $cached && is_array( $cached ) ) {
+	unset( $request );
+
+	$cached = dtb_schematics_manifest_repo_get_cache();
+	if ( false !== $cached ) {
 		$response = new WP_REST_Response( $cached, 200 );
 		$response->header( 'Cache-Control', 'public, max-age=3600, stale-while-revalidate=86400' );
 		$response->header( 'Vary', 'Accept-Encoding' );
 		return $response;
 	}
 
-	$attachments = get_posts(
-		[
-			'post_type'      => 'attachment',
-			'post_status'    => 'inherit',
-			'posts_per_page' => -1,
-			'meta_query'     => [
-				[
-					'key'     => '_dtb_schematic_id',
-					'compare' => 'EXISTS',
-				],
-				[
-					'key'     => '_dtb_schematic_id',
-					'value'   => '',
-					'compare' => '!=',
-				],
-			],
-		]
-	);
+	$attachments = dtb_schematics_manifest_repo_get_attachments();
 
 	$manifest = [];
 
 	/** @var WP_Post[] $attachments */
 	foreach ( $attachments as $attachment ) {
 		/** @var WP_Post $attachment */
-		$id   = get_post_meta( $attachment->ID, '_dtb_schematic_id', true );
-		$page = get_post_meta( $attachment->ID, '_dtb_schematic_page', true );
-		$type = get_post_meta( $attachment->ID, '_dtb_schematic_type', true );
+		$id = dtb_schematic_manifest_normalize_id(
+			(string) get_post_meta( $attachment->ID, '_dtb_schematic_id', true )
+		);
 
 		if ( ! $id ) {
 			continue;
@@ -58,20 +43,25 @@ function dtb_get_schematic_media_manifest( WP_REST_Request $request ): WP_REST_R
 			];
 		}
 
-		$url  = wp_get_attachment_url( $attachment->ID );
+		$url = dtb_wp_media_get_attachment_url( $attachment->ID );
 		/** @var array|false $meta */
-		$meta = wp_get_attachment_metadata( $attachment->ID );
+		$meta = dtb_wp_media_get_attachment_metadata( $attachment->ID );
 
-		$entry = [
-			'url'    => $url,
-			'width'  => isset( $meta['width'] )  ? (int) $meta['width']  : null,
-			'height' => isset( $meta['height'] ) ? (int) $meta['height'] : null,
-		];
+		$entry = dtb_schematic_asset_make(
+			$url,
+			isset( $meta['width'] ) ? (int) $meta['width'] : null,
+			isset( $meta['height'] ) ? (int) $meta['height'] : null
+		);
 
+		$type = dtb_schematic_manifest_normalize_type(
+			(string) get_post_meta( $attachment->ID, '_dtb_schematic_type', true )
+		);
 		if ( 'preview' === $type ) {
 			$manifest[ $id ]['preview'] = $url;
 		} else {
-			$page_key = (string) ( $page ?: '1' );
+			$page_key = dtb_schematic_manifest_normalize_page(
+				get_post_meta( $attachment->ID, '_dtb_schematic_page', true )
+			);
 			$manifest[ $id ]['pages'][ $page_key ] = $entry;
 		}
 	}
@@ -88,7 +78,7 @@ function dtb_get_schematic_media_manifest( WP_REST_Request $request ): WP_REST_R
 	ksort( $manifest );
 
 	// Cache for 1 hour - invalidated on attachment save/delete.
-	set_transient( 'dtb_schematics_manifest', $manifest, HOUR_IN_SECONDS );
+	dtb_schematics_manifest_repo_set_cache( $manifest, HOUR_IN_SECONDS );
 
 	$response = new WP_REST_Response( $manifest, 200 );
 	$response->header( 'Cache-Control', 'public, max-age=3600, stale-while-revalidate=86400' );

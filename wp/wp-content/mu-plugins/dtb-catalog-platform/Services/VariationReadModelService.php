@@ -74,7 +74,7 @@ final class DTB_VariationReadModelService {
 				continue;
 			}
 			$raw['type'] = 'variation';
-			$variations[] = DTB_CatalogProductNormalizer::normalize( $raw, $parent_wc );
+			$variations[] = dtb_catalog_normalize_product( $raw, $parent_wc );
 		}
 
 		usort( $variations, static function ( array $a, array $b ): int {

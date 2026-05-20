@@ -22,7 +22,11 @@ $_dtb_cp = __DIR__;
 
 // Domain.
 require_once $_dtb_cp . '/Domain/ProductMeta.php';
+require_once $_dtb_cp . '/Domain/Brand.php';
 require_once $_dtb_cp . '/Domain/ToolFamilies.php';
+require_once $_dtb_cp . '/Domain/ToolFamily.php';
+require_once $_dtb_cp . '/Domain/CatalogProduct.php';
+require_once $_dtb_cp . '/Domain/ProductVariation.php';
 require_once $_dtb_cp . '/Domain/ToolsetData.php';
 require_once $_dtb_cp . '/Domain/CatalogHealthIssue.php';
 
@@ -31,13 +35,17 @@ require_once $_dtb_cp . '/Services/BrandNormalizer.php';
 require_once $_dtb_cp . '/Services/CategoryNormalizer.php';
 require_once $_dtb_cp . '/Services/ToolFamilyResolver.php';
 require_once $_dtb_cp . '/Services/CatalogProductNormalizer.php';
+require_once $_dtb_cp . '/Infrastructure/CatalogCache.php';
 require_once $_dtb_cp . '/Infrastructure/CatalogProductRepository.php';
 require_once $_dtb_cp . '/Infrastructure/CatalogHealthRepository.php';
+require_once $_dtb_cp . '/Infrastructure/WooProductRepository.php';
+require_once $_dtb_cp . '/Infrastructure/WordPressProductMetaStore.php';
 require_once $_dtb_cp . '/Infrastructure/ProductVariationRepository.php';
 require_once $_dtb_cp . '/Infrastructure/ProductRelationshipRepository.php';
 require_once $_dtb_cp . '/Services/VariationReadModelService.php';
 require_once $_dtb_cp . '/Services/DefaultVariationResolver.php';
 require_once $_dtb_cp . '/Services/CatalogFacetService.php';
+require_once $_dtb_cp . '/Services/ProductLookupService.php';
 require_once $_dtb_cp . '/Services/CatalogHealthService.php';
 require_once $_dtb_cp . '/Services/ToolsetEligibilityService.php';
 require_once $_dtb_cp . '/Services/ToolsetValidationService.php';
@@ -68,12 +76,19 @@ require_once $_dtb_cp . '/Validation/ProductMappingValidator.php';
 require_once $_dtb_cp . '/Application/RegisterCatalogMeta.php';
 require_once $_dtb_cp . '/Application/RegisterCatalogRoutes.php';
 require_once $_dtb_cp . '/Application/RegisterCatalogHooks.php';
+require_once $_dtb_cp . '/Application/NormalizeCatalogProduct.php';
+require_once $_dtb_cp . '/Application/ResolveDefaultVariation.php';
+require_once $_dtb_cp . '/Application/ValidateCatalogProduct.php';
+require_once $_dtb_cp . '/Application/BuildCatalogFacets.php';
 require_once $_dtb_cp . '/Application/RunCatalogHealthScan.php';
+require_once $_dtb_cp . '/Application/BackfillProductMeta.php';
 require_once $_dtb_cp . '/Application/RunProductMappingMutation.php';
 require_once $_dtb_cp . '/Application/ResolveCompatibleParts.php';
 
 // Admin / CLI tools.
 if ( is_admin() || ( defined( 'WP_CLI' ) && WP_CLI ) ) {
+	require_once $_dtb_cp . '/Admin/CatalogAdminMenu.php';
+	require_once $_dtb_cp . '/Admin/CatalogToolsPage.php';
 	require_once $_dtb_cp . '/Admin/MetaBackfillTool.php';
 	require_once $_dtb_cp . '/Admin/CatalogHealthRenderer.php';
 	require_once $_dtb_cp . '/Admin/CatalogHealthActions.php';

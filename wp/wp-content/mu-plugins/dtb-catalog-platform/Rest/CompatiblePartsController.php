@@ -291,7 +291,7 @@ final class DTB_CompatiblePartsController {
 			return null;
 		}
 
-		return DTB_CatalogProductNormalizer::normalize( $wc );
+		return dtb_catalog_normalize_product( $wc );
 	}
 
 	/**

@@ -61,15 +61,15 @@ final class DTB_ProductDetailController {
 			return new WP_REST_Response( dtb_error_envelope( 'not_found', 'Product not found.', 404 ), 404 );
 		}
 
-		$product    = DTB_CatalogProductNormalizer::normalize( $wc_product );
+		$product    = dtb_catalog_normalize_product( $wc_product );
 		$variations = [];
 
 		if ( 'variable' === $product['type'] && $product['id'] > 0 ) {
 			$variations = DTB_VariationReadModelService::get_normalized( $product['id'], $wc_product );
 		}
 
-		$default_var = DTB_DefaultVariationResolver::resolve( $product, $variations );
-		$product     = DTB_DefaultVariationResolver::apply_to_card( $product, $default_var );
+		$default_var = dtb_catalog_resolve_default_variation( $product, $variations );
+		$product     = dtb_catalog_apply_default_variation_to_card( $product, $default_var );
 
 		$in_stock_count = count( array_filter( $variations, static fn( $v ) =>
 			'outofstock' !== $v['inventory']['stockStatus']
@@ -87,7 +87,7 @@ final class DTB_ProductDetailController {
 				'hasInStockVariation'   => $in_stock_count > 0,
 				'variationCount'        => count( $variations ),
 				'inStockVariationCount' => $in_stock_count,
-				'variationMatrix'       => self::build_variation_matrix( $variations ),
+				'variationMatrix'       => dtb_catalog_build_variation_matrix( $variations ),
 				'variationDiagnostics'  => $variation_diagnostics,
 			],
 		], 200 );
@@ -124,49 +124,4 @@ final class DTB_ProductDetailController {
 		], 200 );
 	}
 
-	/**
-	 * Build a variation matrix from a normalized variations array.
-	 *
-	 * @param  array[] $variations  Normalized DTB variation DTOs.
-	 * @return array|null           Null when no variations exist.
-	 */
-	private static function build_variation_matrix( array $variations ): ?array {
-		if ( empty( $variations ) ) {
-			return null;
-		}
-
-		$axis = '';
-		foreach ( $variations as $v ) {
-			$candidate = (string) ( $v['variation']['axis'] ?? '' );
-			if ( '' !== $candidate ) {
-				$axis = $candidate;
-				break;
-			}
-		}
-
-		$options = [];
-		foreach ( $variations as $v ) {
-			$value = (string) ( $v['variation']['value'] ?? '' );
-			$label = (string) ( $v['variation']['label'] ?? $value );
-
-			if ( '' === $value ) {
-				continue;
-			}
-
-			$options[] = [
-				'value'       => $value,
-				'label'       => $label,
-				'variationId' => (int) ( $v['id'] ?? 0 ),
-				'sku'         => (string) ( $v['sku'] ?? '' ),
-				'price'       => isset( $v['price']['value'] ) ? (float) $v['price']['value'] : null,
-				'stockStatus' => (string) ( $v['inventory']['stockStatus'] ?? 'instock' ),
-				'purchasable' => (bool) ( $v['inventory']['purchasable'] ?? true ),
-			];
-		}
-
-		return [
-			'axis'    => $axis,
-			'options' => $options,
-		];
-	}
 }

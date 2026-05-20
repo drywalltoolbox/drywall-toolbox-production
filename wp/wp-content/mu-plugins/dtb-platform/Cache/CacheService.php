@@ -52,6 +52,11 @@ if ( ! dtb_is_admin_or_rest_request() ) {
 add_action( 'rest_api_init', 'dtb_register_cache_control_headers', 10 );
 
 function dtb_register_cache_control_headers(): void {
+	if ( class_exists( 'DTB_CacheHeaders' ) ) {
+		DTB_CacheHeaders::register();
+		return;
+	}
+
 	add_filter( 'rest_pre_send_headers', 'dtb_maybe_add_cache_control_headers' );
 }
 
@@ -62,6 +67,10 @@ function dtb_register_cache_control_headers(): void {
  * @return array Modified headers array (unchanged for excluded routes).
  */
 function dtb_maybe_add_cache_control_headers( array $headers ): array {
+	if ( class_exists( 'DTB_CacheHeaders' ) ) {
+		return DTB_CacheHeaders::filter_headers( $headers );
+	}
+
 	$uri = isset( $_SERVER['REQUEST_URI'] ) ? sanitize_text_field( wp_unslash( $_SERVER['REQUEST_URI'] ) ) : '';
 
 	// Never cache auth, mutation, or admin-sensitive routes.
@@ -125,8 +134,9 @@ function dtb_maybe_add_cache_control_headers( array $headers ): array {
  * @return mixed            Cached or freshly fetched value.
  */
 function dtb_cached_proxy( string $route, array $params, callable $fetcher ) {
-	ksort( $params );
-	$cache_key = 'drywall_cache_' . md5( $route . wp_json_encode( $params ) );
+	$cache_key = class_exists( 'DTB_CacheKeyBuilder' )
+		? DTB_CacheKeyBuilder::proxy_key( $route, $params )
+		: 'drywall_cache_' . md5( $route . wp_json_encode( $params ) );
 
 	$cached = get_transient( $cache_key );
 	if ( false !== $cached ) {
@@ -140,11 +150,9 @@ function dtb_cached_proxy( string $route, array $params, callable $fetcher ) {
 		return $result;
 	}
 
-	if ( false !== strpos( $route, 'categories' ) || false !== strpos( $route, 'attributes' ) ) {
-		$ttl = 900;
-	} else {
-		$ttl = 600;
-	}
+	$ttl = class_exists( 'DTB_CacheKeyBuilder' )
+		? DTB_CacheKeyBuilder::proxy_ttl( $route )
+		: ( ( false !== strpos( $route, 'categories' ) || false !== strpos( $route, 'attributes' ) ) ? 900 : 600 );
 
 	set_transient( $cache_key, $result, $ttl );
 	header( 'X-Cache: MISS' );
@@ -163,6 +171,11 @@ function dtb_cached_proxy( string $route, array $params, callable $fetcher ) {
  * Calls dtb_log_cache_event() with event 'cache_invalidated' after deletion.
  */
 function dtb_invalidate_product_cache(): void {
+	if ( class_exists( 'DTB_CacheInvalidationService' ) ) {
+		DTB_CacheInvalidationService::invalidate_product_cache();
+		return;
+	}
+
 	global $wpdb;
 
 	$wpdb->query(
@@ -229,7 +242,9 @@ function dtb_get_cache_log(): array {
  * @return mixed
  */
 function dtb_ops_cache_get( string $module, string $key, int $ttl, callable $callback ) {
-	$cache_key = 'dtb_ops_' . sanitize_key( $module ) . '_' . sanitize_key( $key );
+	$cache_key = class_exists( 'DTB_CacheKeyBuilder' )
+		? DTB_CacheKeyBuilder::ops_key( $module, $key )
+		: 'dtb_ops_' . sanitize_key( $module ) . '_' . sanitize_key( $key );
 	$cached    = get_transient( $cache_key );
 
 	if ( false !== $cached ) {
@@ -253,6 +268,11 @@ function dtb_ops_cache_get( string $module, string $key, int $ttl, callable $cal
  * @param string $module Module name (e.g. 'kpis', 'orders'). Empty string flushes all ops transients.
  */
 function dtb_ops_cache_flush( string $module = '' ): void {
+	if ( class_exists( 'DTB_CacheInvalidationService' ) ) {
+		DTB_CacheInvalidationService::flush_ops_cache( $module );
+		return;
+	}
+
 	global $wpdb;
 
 	$prefix = '' !== $module

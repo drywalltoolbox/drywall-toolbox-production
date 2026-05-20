@@ -288,6 +288,7 @@ function dtb_ajax_run_health_checks() {
 
 	wp_send_json_success( [
 		'results'    => $results,
+		'summary'    => class_exists( 'DTB_ApiHealthController' ) ? DTB_ApiHealthController::summary() : [],
 		'checked_at' => current_time( 'mysql' ),
 		'site_url'   => get_site_url(),
 		'rest_url'   => get_rest_url(),

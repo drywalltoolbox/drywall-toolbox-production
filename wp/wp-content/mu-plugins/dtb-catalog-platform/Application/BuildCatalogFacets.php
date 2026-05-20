@@ -1,4 +1,9 @@
 <?php
 defined( 'ABSPATH' ) || exit;
 
-// Architecture placeholder for bounded module extraction: dtb-catalog-platform/Application/BuildCatalogFacets.php.
+/**
+ * Application use case: build/get scoped facets.
+ */
+function dtb_catalog_build_facets( array $scope = [] ): array {
+	return DTB_CatalogFacetService::get( $scope );
+}

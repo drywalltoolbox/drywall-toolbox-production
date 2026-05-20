@@ -55,12 +55,7 @@ function dtb_catalog_inject_meta_rest( WP_REST_Response $response, object $produ
 
 	$data = $response->get_data();
 	if ( ! isset( $data['dtb_meta'] ) ) {
-		$data['dtb_meta'] = [];
-	}
-
-	foreach ( array_keys( DTB_ProductMeta::FIELDS ) as $key ) {
-		$raw = get_post_meta( $id, $key, true );
-		$data['dtb_meta'][ ltrim( $key, '_' ) ] = ( '' === $raw ) ? null : $raw;
+		$data['dtb_meta'] = dtb_catalog_meta_get_dtb_map( (int) $id );
 	}
 
 	$response->set_data( $data );

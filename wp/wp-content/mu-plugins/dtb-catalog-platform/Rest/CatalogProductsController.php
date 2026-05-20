@@ -81,23 +81,28 @@ final class DTB_CatalogProductsController {
 			], 200 );
 		}
 
-		$response = dtb_cached_wc_get( 'wc/v3/products', [
-			'include'  => implode( ',', $ids ),
-			'orderby'  => 'include',
-			'per_page' => count( $ids ),
-			'_fields'  => DTB_PRODUCT_DETAIL_FIELDS,
-		] );
-
-		if ( $response->get_status() !== 200 ) {
-			return $response;
-		}
-
-		$raw_products = $response->get_data();
-		if ( ! is_array( $raw_products ) ) {
+		$raw_response = dtb_catalog_wc_get_products_by_ids_response( $ids );
+		if ( ! is_object( $raw_response ) ) {
 			return new WP_REST_Response(
 				dtb_error_envelope( 'upstream_error', 'Unexpected response from product catalog.', 502 ),
 				502
 			);
+		}
+		if ( $raw_response->get_status() !== 200 ) {
+			return $raw_response;
+		}
+
+		$raw_products = $raw_response->get_data();
+		if ( ! is_array( $raw_products ) || empty( $raw_products ) ) {
+			return new WP_REST_Response( [
+				'items'      => [],
+				'pagination' => [
+					'page'       => $query['page'],
+					'perPage'    => $query['perPage'],
+					'total'      => $query['total'],
+					'totalPages' => $query['totalPages'],
+				],
+			], 200 );
 		}
 
 		$raw_by_id = [];
@@ -113,14 +118,14 @@ final class DTB_CatalogProductsController {
 				continue;
 			}
 
-			$dto = DTB_CatalogProductNormalizer::normalize( $raw_by_id[ $id ] );
+			$dto = dtb_catalog_normalize_product( $raw_by_id[ $id ] );
 
 			// Listing enrichment for variable products: resolve and apply the
 			// default variation directly into cardProduct for storefront cards.
 			if ( 'variable' === $dto['type'] ) {
 				$variations  = DTB_VariationReadModelService::get_normalized( $dto['id'], $raw_by_id[ $id ] );
-				$default_var = DTB_DefaultVariationResolver::resolve( $dto, $variations );
-				$dto         = DTB_DefaultVariationResolver::apply_to_card( $dto, $default_var );
+				$default_var = dtb_catalog_resolve_default_variation( $dto, $variations );
+				$dto         = dtb_catalog_apply_default_variation_to_card( $dto, $default_var );
 			}
 
 			$items[] = $dto;

@@ -44,6 +44,6 @@ final class DTB_CatalogFacetsController {
 			'is_parts'         => $request->get_param( 'is_parts' ),
 		];
 
-		return new WP_REST_Response( DTB_CatalogFacetService::get( $scope ), 200 );
+		return new WP_REST_Response( dtb_catalog_build_facets( $scope ), 200 );
 	}
 }

@@ -1,16 +1,6 @@
 <?php
 /**
- * Backward-compatible entrypoint shim.
- * Real implementation loads from dtb-media/bootstrap.php.
+ * Legacy shim. Real implementation moved to dtb-media/bootstrap.php.
+ * Remove after deployment verification window.
  */
 defined( 'ABSPATH' ) || exit;
-
-if ( function_exists( 'dtb_module_require' ) ) {
-	dtb_module_require( 'dtb-media/bootstrap.php' );
-	return;
-}
-
-$module_path = __DIR__ . '/dtb-media/bootstrap.php';
-if ( file_exists( $module_path ) ) {
-	require_once $module_path;
-}

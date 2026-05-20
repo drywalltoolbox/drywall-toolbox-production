@@ -15,8 +15,4 @@ function dtb_register_schematics_endpoint() {
 	);
 }
 
-// Invalidate schematics manifest cache when attachments are saved or deleted.
-add_action( 'save_post_attachment', 'dtb_schematics_invalidate_manifest_cache' );
-add_action( 'delete_attachment',    'dtb_schematics_invalidate_manifest_cache' );
-
 

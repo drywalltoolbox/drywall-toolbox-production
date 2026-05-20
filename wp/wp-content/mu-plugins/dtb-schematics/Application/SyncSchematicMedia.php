@@ -5,7 +5,7 @@ add_action( 'save_post_attachment', 'dtb_schematics_invalidate_manifest_cache' )
 add_action( 'delete_attachment',    'dtb_schematics_invalidate_manifest_cache' );
 
 function dtb_schematics_invalidate_manifest_cache(): void {
-	delete_transient( 'dtb_schematics_manifest' );
+	dtb_schematics_manifest_repo_delete_cache();
 }
 
 /**

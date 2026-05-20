@@ -17,6 +17,10 @@
 
 defined( 'ABSPATH' ) || exit;
 
+if ( class_exists( 'DTB_CatalogProductRepository' ) ) {
+	return;
+}
+
 final class DTB_CatalogProductRepository {
 
 	/**

@@ -12,7 +12,7 @@ add_action( 'init', static function (): void {
 }, 5 );
 
 add_action( 'dtb_product_cache_invalidated', static function (): void {
-	DTB_CatalogFacetService::invalidate();
+	dtb_catalog_cache_invalidate_facets();
 } );
 
 /**
@@ -21,9 +21,7 @@ add_action( 'dtb_product_cache_invalidated', static function (): void {
  * @param int|WC_Product|object $subject Post ID, WC product object, or source object.
  */
 function dtb_catalog_invalidate_all_caches( object|int $subject = 0 ): void {
-	DTB_CatalogFacetService::invalidate();
-	DTB_ToolsetEligibilityService::invalidate_slot_options_cache();
-	do_action( 'dtb_catalog_caches_invalidated', $subject );
+	dtb_catalog_cache_invalidate_all( $subject );
 }
 
 add_action( 'save_post_product', 'dtb_catalog_invalidate_all_caches', 20 );

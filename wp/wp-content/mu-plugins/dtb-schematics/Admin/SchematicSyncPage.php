@@ -25,7 +25,7 @@ function dtb_ajax_schematics_get() {
 	if ( ! current_user_can( 'manage_options' ) ) wp_send_json_error( [], 403 );
 
 	$id = absint( $_POST['id'] ?? 0 );
-	if ( ! $id || get_post_type( $id ) !== 'attachment' ) {
+	if ( ! dtb_validate_schematic_attachment_id( $id ) ) {
 		wp_send_json_error( [ 'message' => 'Invalid attachment ID.' ] );
 	}
 
@@ -40,17 +40,11 @@ function dtb_ajax_schematics_save() {
 	if ( ! current_user_can( 'manage_options' ) ) wp_send_json_error( [], 403 );
 
 	$id = absint( $_POST['attachment_id'] ?? 0 );
-	if ( ! $id || get_post_type( $id ) !== 'attachment' ) {
+	if ( ! dtb_validate_schematic_attachment_id( $id ) ) {
 		wp_send_json_error( [ 'message' => 'Invalid attachment ID.' ] );
 	}
 
-	$product_ids_raw = $_POST['product_ids'] ?? '';
-	$product_ids     = [];
-	if ( is_array( $product_ids_raw ) ) {
-		$product_ids = array_map( 'absint', $product_ids_raw );
-	} elseif ( is_string( $product_ids_raw ) && $product_ids_raw !== '' ) {
-		$product_ids = array_map( 'absint', explode( ',', $product_ids_raw ) );
-	}
+	$product_ids = dtb_schematic_normalize_product_ids( $_POST['product_ids'] ?? '' );
 
 	dtb_save_schematic_meta( $id, [
 		'brand'        => sanitize_text_field( $_POST['brand'] ?? '' ),
@@ -61,7 +55,7 @@ function dtb_ajax_schematics_save() {
 		'product_ids'  => $product_ids,
 	] );
 
-	delete_transient( DTB_MANIFEST_TRANSIENT );
+	dtb_schematics_manifest_repo_delete_cache();
 
 	wp_send_json_success( dtb_format_schematic( $id ) );
 }
@@ -76,14 +70,8 @@ function dtb_ajax_schematics_remove() {
 	$id = absint( $_POST['id'] ?? 0 );
 	if ( ! $id ) wp_send_json_error( [ 'message' => 'Invalid ID.' ] );
 
-	delete_post_meta( $id, '_dtb_is_schematic' );
-	delete_post_meta( $id, '_dtb_schematic_brand' );
-	delete_post_meta( $id, '_dtb_schematic_model_number' );
-	delete_post_meta( $id, '_dtb_schematic_model_name' );
-	delete_post_meta( $id, '_dtb_schematic_part_count' );
-	delete_post_meta( $id, '_dtb_schematic_notes' );
-	delete_post_meta( $id, '_dtb_schematic_product_ids' );
-	delete_transient( DTB_MANIFEST_TRANSIENT );
+	dtb_schematic_media_repo_remove_meta( $id );
+	dtb_schematics_manifest_repo_delete_cache();
 
 	wp_send_json_success( [ 'message' => 'Schematic removed.' ] );
 }
@@ -95,7 +83,7 @@ function dtb_ajax_schematics_purge() {
 	check_ajax_referer( 'dtb_schematics_nonce', 'nonce' );
 	if ( ! current_user_can( 'manage_options' ) ) wp_send_json_error( [], 403 );
 
-	$deleted = delete_transient( DTB_MANIFEST_TRANSIENT );
+	$deleted = dtb_schematics_manifest_repo_delete_cache();
 	wp_send_json_success( [ 'deleted' => $deleted, 'message' => $deleted ? 'Manifest cache purged.' : 'Cache was already empty.' ] );
 }
 
@@ -109,20 +97,7 @@ function dtb_ajax_schematics_search_products() {
 	$q = sanitize_text_field( $_POST['q'] ?? '' );
 	if ( strlen( $q ) < 1 ) wp_send_json_success( [] );
 
-	$products = wc_get_products( [
-		'limit'  => 20,
-		's'      => $q,
-		'status' => 'publish',
-		'type'   => [ 'simple', 'variable' ],
-		'return' => 'objects',
-	] );
-
-	$results = [];
-	foreach ( $products as $p ) {
-		$results[] = [ 'id' => $p->get_id(), 'name' => $p->get_name(), 'sku' => $p->get_sku() ];
-	}
-
-	wp_send_json_success( $results );
+	wp_send_json_success( dtb_schematic_media_repo_search_products( $q, 20 ) );
 }
 
 // ── Page Render ───────────────────────────────────────────────────────────────

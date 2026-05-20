@@ -1,4 +1,13 @@
 <?php
 defined( 'ABSPATH' ) || exit;
 
-// Architecture placeholder for bounded module extraction: dtb-schematics/Domain/SchematicAsset.php.
+/**
+ * Build a normalized manifest asset payload.
+ */
+function dtb_schematic_asset_make( string $url, ?int $width, ?int $height ): array {
+	return [
+		'url'    => $url,
+		'width'  => $width,
+		'height' => $height,
+	];
+}
