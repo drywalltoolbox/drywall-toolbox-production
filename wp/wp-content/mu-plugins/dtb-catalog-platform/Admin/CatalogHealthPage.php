@@ -1,4 +1,10 @@
 <?php
+/**
+ * Catalog Health admin page shell.
+ *
+ * @package drywall-toolbox
+ */
+
 defined( 'ABSPATH' ) || exit;
 
 /**
