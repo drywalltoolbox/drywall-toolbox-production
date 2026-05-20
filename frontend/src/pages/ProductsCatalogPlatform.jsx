@@ -18,6 +18,7 @@ import { SORT_OPTIONS } from '../constants/sortOptions';
 import { useCatalogFacets } from '../hooks/useCatalogFacets';
 import { useCatalogProducts } from '../hooks/useCatalogProducts';
 import { useCart } from '../context/CartContext';
+import { useWorkflowTransition } from '../context/WorkflowTransitionContext.jsx';
 import { buildSiteLinksSearchBoxSchema } from '../utils/schema';
 import { getVariationSelectionMap } from '../utils/variationSelection';
 import { getBrandLogo } from '../utils/brandAssets.js';
@@ -144,6 +145,7 @@ export default function ProductsCatalogPlatform({ forceProductGrid = false, titl
   const navigate = useNavigate();
   const { brandSlug, categorySlug } = useParams();
   const { addToCart } = useCart();
+  const { runWorkflow } = useWorkflowTransition();
 
   const [showFilters, setShowFilters] = useState(false);
   const [displayMode, setDisplayMode] = useState(() => {
@@ -242,7 +244,14 @@ export default function ProductsCatalogPlatform({ forceProductGrid = false, titl
 
   const handleAddToCart = async (product, quantity = 1) => {
     try {
-      await addToCart(product, quantity);
+      await runWorkflow(
+        {
+          label: 'Adding to cart…',
+          sublabel: product?.name || 'Updating your cart securely.',
+          blocking: false,
+        },
+        () => addToCart(product, quantity),
+      );
       setToast({ message: `${product.name} added to cart!`, type: 'cart' });
     } catch (err) {
       setToast({ message: err?.message || 'Could not add item to cart. Please try again.', type: 'error' });

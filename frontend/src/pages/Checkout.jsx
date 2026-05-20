@@ -24,6 +24,7 @@ import {
 import DOMPurify from 'dompurify';
 
 import { useCart } from '../context/CartContext';
+import { useWorkflowTransition } from '../context/WorkflowTransitionContext.jsx';
 import { syncAndPlace } from '../api/cart.js';
 import veeqoService from '../services/veeqo';
 import SEOHead from '../components/shared/SEOHead';
@@ -52,27 +53,6 @@ const cardVariants = {
     transition: { duration: 0.45, ease: [0.16, 1, 0.3, 1], delay: delay ?? 0 },
   }),
 };
-
-// ─── BreathingLoader ──────────────────────────────────────────────────────────
-// Four dots that breathe in/out with a staggered delay, used while the cart is
-// being synced to the WC Store API or the order is being placed.
-function BreathingLoader( { label = 'Processing…' } ) {
-  return (
-    <div className="flex flex-col items-center justify-center gap-4 py-12">
-      <div className="flex items-center gap-2">
-        { [0, 1, 2, 3].map( ( i ) => (
-          <Motion.span
-            key={ i }
-            className="block w-2.5 h-2.5 rounded-full bg-primary-500"
-            animate={ { scale: [1, 1.45, 1], opacity: [0.35, 1, 0.35] } }
-            transition={ { duration: 1.2, repeat: Infinity, delay: i * 0.22, ease: 'easeInOut' } }
-          />
-        ) ) }
-      </div>
-      <p className="text-sm text-gray-500 tracking-wide">{ label }</p>
-    </div>
-  );
-}
 
 // ─── StepCard ─────────────────────────────────────────────────────────────────
 // Animated section card that slides up on mount.
@@ -187,6 +167,7 @@ function OrderSummaryPanel( { cartItems, subtotal, shipping, tax, total, loading
 export default function Checkout() {
   const navigate = useNavigate();
   const { cartItems, getCartTotal, clearCart } = useCart();
+  const { showWorkflow, hideWorkflow } = useWorkflowTransition();
   const { user, isAuthenticated } = useAuthContext();
 
   const [formData, setFormData] = useState( {
@@ -475,6 +456,18 @@ export default function Checkout() {
     setStep( 'form' );
   }, [] );
 
+  useEffect(() => {
+    if (processing) {
+      showWorkflow({
+        label: step === 'syncing' ? 'Syncing your cart…' : 'Placing your order…',
+        sublabel: 'Securely processing your checkout details.',
+        blocking: true,
+      });
+      return;
+    }
+    hideWorkflow();
+  }, [hideWorkflow, processing, showWorkflow, step]);
+
   // ── Input / label class helpers ───────────────────────────────────────────
   const inputClass = ( field ) =>
     `w-full px-4 py-3.5 rounded-2xl border text-sm transition-all min-h-[48px]
@@ -583,17 +576,6 @@ export default function Checkout() {
           </div>
         </div>
       </Motion.div>
-    );
-  }
-
-  // ── Processing overlay ────────────────────────────────────────────────────
-  if ( processing ) {
-    return (
-      <div className="min-h-screen bg-gray-50/60 flex items-center justify-center">
-        <BreathingLoader
-          label={ step === 'syncing' ? 'Syncing your cart…' : 'Placing your order…' }
-        />
-      </div>
     );
   }
 

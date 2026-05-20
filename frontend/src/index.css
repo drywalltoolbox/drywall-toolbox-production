@@ -30,6 +30,80 @@
 @keyframes dtb-spin {
   to { transform: rotate(360deg); }
 }
+
+.dtb-workflow-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10050;
+  display: grid;
+  place-items: center;
+  padding: 1.25rem;
+  background:
+    radial-gradient(circle at center, rgba(37, 99, 235, 0.12), transparent 44%),
+    rgba(15, 23, 42, 0.48);
+  -webkit-backdrop-filter: blur(14px) saturate(120%);
+  backdrop-filter: blur(14px) saturate(120%);
+}
+
+.dtb-workflow-card {
+  width: min(92vw, 360px);
+  border-radius: 24px;
+  padding: 1.5rem;
+  text-align: center;
+  background: rgba(255, 255, 255, 0.94);
+  border: 1px solid rgba(226, 232, 240, 0.9);
+  box-shadow: 0 28px 90px rgba(15, 23, 42, 0.28);
+  color: #0f172a;
+  transform: translateZ(0);
+}
+
+.dtb-workflow-card strong {
+  display: block;
+  margin-top: 0.875rem;
+  font-size: 0.98rem;
+  font-weight: 800;
+}
+
+.dtb-workflow-card p {
+  margin: 0.35rem 0 0;
+  color: #64748b;
+  font-size: 0.875rem;
+}
+
+.dtb-workflow-spinner {
+  width: 42px;
+  height: 42px;
+  margin: 0 auto;
+  border-radius: 999px;
+  border: 3px solid rgba(37, 99, 235, 0.16);
+  border-top-color: #2563eb;
+  animation: dtb-spin 0.8s linear infinite;
+}
+
+@media (max-width: 768px) {
+  .dtb-workflow-overlay {
+    align-items: end;
+    padding: 0.875rem;
+  }
+
+  .dtb-workflow-card {
+    width: 100%;
+    border-radius: 24px 24px 18px 18px;
+    padding: 1.35rem 1.1rem calc(1.35rem + env(safe-area-inset-bottom));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dtb-workflow-overlay {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+
+  .dtb-workflow-spinner {
+    animation-duration: 1.4s;
+  }
+}
+
 @layer base {
   :root {
     --color-primary-50: #eff6ff;

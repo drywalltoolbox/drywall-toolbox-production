@@ -4,6 +4,7 @@ import PageTransition from './components/routing/PageTransition';
 import LoadingSpinner from './components/shared/LoadingSpinner';
 import { CartProvider } from './context/CartContext';
 import { WooCommerceProvider } from './context/WooCommerceContext';
+import { WorkflowTransitionProvider } from './context/WorkflowTransitionContext.jsx';
 import { AuthProvider } from './auth/AuthContext.js';
 import AppErrorBoundary from './components/system/AppErrorBoundary.jsx';
 import Header from './components/shell/Header';
@@ -126,9 +127,11 @@ function App() {
       <AuthProvider>
         <WooCommerceProvider>
           <CartProvider>
-            <Router basename={basename}>
-              <AppShell cartOpen={cartOpen} toggleCart={toggleCart} closeCart={closeCart} />
-            </Router>
+            <WorkflowTransitionProvider>
+              <Router basename={basename}>
+                <AppShell cartOpen={cartOpen} toggleCart={toggleCart} closeCart={closeCart} />
+              </Router>
+            </WorkflowTransitionProvider>
           </CartProvider>
         </WooCommerceProvider>
       </AuthProvider>

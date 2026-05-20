@@ -1,3 +1,6 @@
+import { motion as Motion, useReducedMotion } from 'framer-motion';
+import { dtbDuration, dtbEase } from '../../motion/dtbMotion.js';
+
 /**
  * LoadingSpinner
  *
@@ -9,6 +12,7 @@
  *              otherwise always centers in a flex row
  */
 export default function LoadingSpinner({ size = 'md', label = 'Loading', fullPage = false }) {
+  const reduceMotion = useReducedMotion();
   const dim = size === 'sm' ? 16 : size === 'lg' ? 40 : 28;
   const stroke = size === 'sm' ? 2 : size === 'lg' ? 2.8 : 2.5;
   const r = (dim / 2) - (stroke * 1.5);
@@ -20,7 +24,10 @@ export default function LoadingSpinner({ size = 'md', label = 'Loading', fullPag
       height={dim}
       viewBox={`0 0 ${dim} ${dim}`}
       fill="none"
-      style={{ animation: 'dtb-spin 0.8s linear infinite', display: 'block' }}
+      style={{
+        animation: `dtb-spin ${reduceMotion ? 1.4 : 0.8}s linear infinite`,
+        display: 'block',
+      }}
       aria-hidden="true"
     >
       {/* Track */}
@@ -48,9 +55,12 @@ export default function LoadingSpinner({ size = 'md', label = 'Loading', fullPag
   const minH = fullPage ? '60vh' : undefined;
 
   return (
-    <div
+    <Motion.div
       role="status"
       aria-label={label}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: reduceMotion ? dtbDuration.instant : dtbDuration.fast, ease: dtbEase.standard }}
       style={{
         minHeight: minH,
         display: 'flex',
@@ -61,6 +71,6 @@ export default function LoadingSpinner({ size = 'md', label = 'Loading', fullPag
     >
       {spinner}
       <span className="sr-only">{label}</span>
-    </div>
+    </Motion.div>
   );
 }

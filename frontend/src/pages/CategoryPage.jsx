@@ -2,6 +2,7 @@ import { useParams, Link } from 'react-router-dom';
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { getProductsByCategory } from '../services/catalog';
 import { useCart } from '../context/CartContext';
+import { useWorkflowTransition } from '../context/WorkflowTransitionContext.jsx';
 import ProductDetail from '../components/product/ProductDetail';
 import ProductModal from '../components/product/ProductModal';
 import ProductShoppingCard from '../components/ui/ProductShoppingCard';
@@ -16,6 +17,7 @@ import { PLACEHOLDER_IMAGE } from '../constants/images.js';
 export default function CategoryPage() {
   const { slug } = useParams();
   const { addToCart } = useCart();
+  const { runWorkflow } = useWorkflowTransition();
 
   // All fetch-derived state in one object — avoids synchronous multi-setState
   // inside useEffect (react-hooks/set-state-in-effect rule).
@@ -27,7 +29,14 @@ export default function CategoryPage() {
 
   const handleAddToCart = async (product, quantity = 1) => {
     try {
-      await addToCart(product, quantity);
+      await runWorkflow(
+        {
+          label: 'Adding to cart…',
+          sublabel: product?.name || 'Updating your cart securely.',
+          blocking: false,
+        },
+        () => addToCart(product, quantity),
+      );
       showToast(`${product.name} added to cart!`, 'cart');
     } catch (err) {
       showToast(err?.message || 'Could not add item to cart. Please try again.', 'error');

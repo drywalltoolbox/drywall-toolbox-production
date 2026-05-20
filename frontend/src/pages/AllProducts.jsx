@@ -14,6 +14,7 @@ import { ProductSkeletonGrid } from '../components/catalog/ProductShoppingCardSk
 import { getProducts } from '../services/catalog';
 import { getProductVariations } from '../services/api';
 import { useCart } from '../context/CartContext';
+import { useWorkflowTransition } from '../context/WorkflowTransitionContext.jsx';
 import {
   ShoppingCart,
   Filter,
@@ -90,6 +91,7 @@ export default function AllProducts() {
   const location = useLocation();
   const navigate = useNavigate();
   const { addToCart } = useCart();
+  const { runWorkflow } = useWorkflowTransition();
 
   // Initialize search query from URL param for deep-linking (e.g. from MobileSearch)
   const urlParams = new URLSearchParams(location.search);
@@ -119,7 +121,14 @@ export default function AllProducts() {
 
   const handleAddToCart = async (product, quantity = 1) => {
     try {
-      await addToCart(product, quantity);
+      await runWorkflow(
+        {
+          label: 'Adding to cart…',
+          sublabel: product?.name || 'Updating your cart securely.',
+          blocking: false,
+        },
+        () => addToCart(product, quantity),
+      );
       showToast(`${product.name} added to cart!`, 'cart');
     } catch (err) {
       showToast(err?.message || 'Could not add item to cart. Please try again.', 'error');

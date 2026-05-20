@@ -20,48 +20,27 @@
  * is skipped entirely — only a clean opacity cross-fade is applied to prevent
  * triggering motion sensitivity.
  */
-import { motion as Motion, AnimatePresence } from 'framer-motion';
-
-// Detect reduced-motion preference once at module load time.
-// Components that need reactivity should use the `useReducedMotion` hook
-// from Framer Motion, but for a module-level constant this is sufficient.
-const prefersReducedMotion =
-  typeof window !== 'undefined' &&
-  window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-// Enter: matches ProductModal's panelTransition easing for site-wide consistency.
-// Exit: slightly faster ease-in so it gets out of the way quickly.
-// Reduced-motion variant: opacity-only, no spatial movement.
-const VARIANTS = prefersReducedMotion
-  ? {
-      initial: { opacity: 0 },
-      animate: { opacity: 1, transition: { duration: 0.15 } },
-      exit:    { opacity: 0, transition: { duration: 0.1  } },
-    }
-  : {
-      initial: { opacity: 0, y: 12 },
-      animate: {
-        opacity: 1,
-        y: 0,
-        transition: { duration: 0.28, ease: [ 0.22, 1, 0.36, 1 ] },
-      },
-      exit: {
-        opacity: 0,
-        y: -8,
-        transition: { duration: 0.18, ease: [ 0.36, 0, 0.66, 0 ] },
-      },
-    };
+import { motion as Motion, AnimatePresence, useReducedMotion } from 'framer-motion';
+import { routeVariants, reducedRouteVariants } from '../../motion/dtbMotion.js';
 
 export default function PageTransition( { children, locationKey } ) {
+  const reduceMotion = useReducedMotion();
+  const variants = reduceMotion ? reducedRouteVariants : routeVariants;
+
   return (
     <AnimatePresence mode="wait" initial={ false }>
       <Motion.div
         key={ locationKey }
-        variants={ VARIANTS }
+        variants={ variants }
         initial="initial"
         animate="animate"
         exit="exit"
-        style={ { width: '100%' } }
+        style={{
+          width: '100%',
+          minHeight: '100%',
+          willChange: reduceMotion ? 'opacity' : 'transform, opacity, filter',
+          transform: 'translateZ(0)',
+        }}
       >
         { children }
       </Motion.div>

@@ -1,34 +1,15 @@
 import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { motion as Motion, AnimatePresence, useReducedMotion } from 'framer-motion';
-
-const backdropVariants = {
-  hidden:  { opacity: 0, backdropFilter: 'blur(0px)' },
-  visible: { opacity: 1, backdropFilter: 'blur(14px)' },
-};
-
-const desktopPanelVariants = {
-  hidden:  { opacity: 0, y: 18, scale: 0.985, filter: 'blur(5px)' },
-  visible: { opacity: 1, y: 0,  scale: 1,     filter: 'blur(0px)' },
-  exit:    { opacity: 0, y: 14, scale: 0.99,  filter: 'blur(3px)' },
-};
-
-const mobilePanelVariants = {
-  hidden:  { opacity: 0, y: '18%', scale: 0.985, filter: 'blur(2px)' },
-  visible: { opacity: 1, y: 0,     scale: 1,     filter: 'blur(0px)' },
-  exit:    { opacity: 0, y: '12%', scale: 0.99,  filter: 'blur(1px)' },
-};
-
-const reduceMotionPanelVariants = {
-  hidden:  { opacity: 0 },
-  visible: { opacity: 1 },
-  exit:    { opacity: 0 },
-};
-
-const backdropTransition = { duration: 0.24, ease: [0.32, 0.72, 0, 1] };
-const panelTransition = { duration: 0.36, ease: [0.16, 1, 0.3, 1] };
-const mobilePanelTransition = { type: 'spring', stiffness: 420, damping: 38, mass: 0.9 };
-const reducedTransition = { duration: 0.12, ease: 'linear' };
+import { motion as Motion, useReducedMotion } from 'framer-motion';
+import MotionBackdrop from '../motion/MotionBackdrop.jsx';
+import MotionDialog from '../motion/MotionDialog.jsx';
+import MotionDrawer from '../motion/MotionDrawer.jsx';
+import MotionPresence from '../motion/MotionPresence.jsx';
+import {
+  mobileSheetTransition,
+  panelTransition,
+  reducedTransition,
+} from '../../motion/dtbMotion.js';
 
 function useIsMobileModal() {
   const [isMobile, setIsMobile] = useState(() => {
@@ -134,29 +115,21 @@ export default function ProductModal({ isOpen, product, onClose, children }) {
 
   if (typeof document === 'undefined') return null;
 
-  const panelVariants = reduceMotion
-    ? reduceMotionPanelVariants
-    : (isMobile ? mobilePanelVariants : desktopPanelVariants);
-  const transition = reduceMotion ? reducedTransition : (isMobile ? mobilePanelTransition : panelTransition);
+  const transition = reduceMotion ? reducedTransition : (isMobile ? mobileSheetTransition : panelTransition);
+  const PanelComponent = isMobile ? MotionDrawer : MotionDialog;
 
   return createPortal(
-    <AnimatePresence mode="wait" initial={false}>
+    <MotionPresence mode="wait" initial={false}>
       {isOpen && product && (
         <>
-          <Motion.div
-            key="product-modal-backdrop"
+          <MotionBackdrop
             className="fixed inset-0 bg-slate-950/55 product-modal-backdrop"
             style={{ zIndex: 10001 }}
-            variants={backdropVariants}
-            initial="hidden"
-            animate="visible"
-            exit="hidden"
-            transition={reduceMotion ? reducedTransition : backdropTransition}
+            reduceMotion={reduceMotion}
             onClick={onClose}
-            aria-hidden="true"
           />
 
-          <Motion.div
+          <PanelComponent
             key="product-modal-panel"
             ref={scrollRef}
             className={`product-modal-scroll-shell fixed left-0 right-0 bottom-0 overflow-y-auto overscroll-contain outline-none${isScrollActive ? ' product-modal-scroll-shell--active' : ''}`}
@@ -165,10 +138,7 @@ export default function ProductModal({ isOpen, product, onClose, children }) {
             aria-modal="true"
             aria-label={product?.name || 'Product detail'}
             tabIndex={-1}
-            variants={panelVariants}
-            initial="hidden"
-            animate="visible"
-            exit="exit"
+            reduceMotion={reduceMotion}
             transition={transition}
             onScroll={() => {
               setIsScrollActive(true);
@@ -191,7 +161,7 @@ export default function ProductModal({ isOpen, product, onClose, children }) {
                 {children}
               </Motion.div>
             </div>
-          </Motion.div>
+          </PanelComponent>
           <style>{`
             .product-modal-backdrop {
               -webkit-backdrop-filter: blur(14px) saturate(120%);
@@ -250,7 +220,7 @@ export default function ProductModal({ isOpen, product, onClose, children }) {
           `}</style>
         </>
       )}
-    </AnimatePresence>,
+    </MotionPresence>,
     document.body
   );
 }
