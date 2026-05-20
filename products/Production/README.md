@@ -6,7 +6,7 @@ Scope:
 - Brands: Asgard, Columbia, Level 5, TapeTech
 - Product types: Automatic Taping Tools, Parts, Semi Automatic Taping Tools, Taping & Finishing Tools
 - `Parts` is included because the requested catalog scope includes tools and parts.
-- Catalog outputs intentionally omit source-store IDs, source URLs, product URLs, image URLs, source SKUs, handles, and timestamp metadata.
+- Catalog outputs intentionally omit source-store IDs, source URLs, product URLs, image URLs, source SKUs, handles, and timestamp metadata-.
 
 Counts:
 - Products scanned: 1913
