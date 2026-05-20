@@ -129,15 +129,6 @@ function dtb_build_image_sync_snapshot( string $relative_path ): array {
 	$products_waiting_on_media  = 0;
 
 	foreach ( $expected_by_sku as $sku_lower => $expected_filenames ) {
-		$product = $sku_map[ $sku_lower ] ?? null;
-		if ( ! $product ) {
-			$missing_wc_skus[] = $sku_lower;
-			continue;
-		}
-
-		++$wc_expected_skus;
-		$is_variation = 'product_variation' === $product['post_type'];
-
 		$expected_attachment_ids = [];
 		$missing_for_this_sku    = [];
 
@@ -170,6 +161,15 @@ function dtb_build_image_sync_snapshot( string $relative_path ): array {
 				'expected' => array_values( $missing_for_this_sku ),
 			];
 		}
+
+		$product = $sku_map[ $sku_lower ] ?? null;
+		if ( ! $product ) {
+			$missing_wc_skus[] = $sku_lower;
+			continue;
+		}
+
+		++$wc_expected_skus;
+		$is_variation = 'product_variation' === $product['post_type'];
 
 		if ( empty( $expected_attachment_ids ) ) {
 			++$products_waiting_on_media;

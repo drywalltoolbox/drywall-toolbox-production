@@ -30,6 +30,10 @@ final class DTB_CorsPolicy {
 	}
 
 	public static function emit( ?string $origin = null ): void {
+		if ( headers_sent() ) {
+			return;
+		}
+
 		foreach ( self::headers( $origin ) as $name => $value ) {
 			header( $name . ': ' . $value );
 		}

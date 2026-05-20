@@ -52,10 +52,8 @@ add_filter( 'http_request_args', function ( $args, $url ) {
 // Rewrites /wp/wp-json/ → /wp-json/ so the React SPA can call /wp-json/
 // from the domain root.
 //
-// In wp-admin, do the inverse when WordPress is installed in /wp/: force admin
-// REST URLs through site_url('/wp-json/...') so browser requests include the
-// WordPress auth cookies that may be scoped to /wp. Without this, Woo Admin can
-// repeatedly 403 on /wp-json/wp/v2/users/me, /wc-admin/*, and /wc-analytics/*.
+// In wp-admin we now keep the canonical /wp-json root by default because some
+// hosts return 404 for /wp/wp-json/* even when WordPress lives in /wp.
 //
 // The rest_url_prefix filter is intentionally absent. Changing the prefix
 // corrupts wpApiSettings.root — the base URL injected into @wordpress/api-fetch
@@ -72,21 +70,9 @@ add_filter( 'rest_url', function ( $url, $path, $blog_id, $scheme ) {
 }, 10, 4 );
 
 function dtb_wc_admin_rest_url( string $url ): string {
-	$home_path = wp_parse_url( home_url( '/' ), PHP_URL_PATH ) ?: '/';
-	$site_path = wp_parse_url( site_url( '/' ), PHP_URL_PATH ) ?: '/';
-
-	if ( untrailingslashit( $home_path ) === untrailingslashit( $site_path ) ) {
-		return $url;
-	}
-
-	$home_rest = trailingslashit( home_url( 'wp-json' ) );
-	$site_rest = trailingslashit( site_url( 'wp-json' ) );
-
-	if ( str_starts_with( $url, $home_rest ) ) {
-		return $site_rest . ltrim( substr( $url, strlen( $home_rest ) ), '/' );
-	}
-
-	return $url;
+	// Canonicalize first. This avoids wpApiSettings.root pointing to a 404 base
+	// such as /wp/wp-json/ on hosts where only /wp-json/ is routed.
+	return str_replace( '/wp/wp-json/', '/wp-json/', $url );
 }
 
 
@@ -255,6 +241,138 @@ add_filter( 'woocommerce_show_admin_notice', function ( $show, $notice ) {
 	$suppressed = [ 'install', 'update', 'no_shipping_methods' ];
 	return in_array( $notice, $suppressed, true ) ? false : $show;
 }, 10, 2 );
+
+/**
+ * Detect the WooCommerce product importer admin screen.
+ *
+ * We key off query vars because this runs in multiple hook timings.
+ */
+function dtb_is_wc_product_importer_admin_page(): bool {
+	if ( ! is_admin() ) {
+		return false;
+	}
+
+	$page = isset( $_GET['page'] )
+		? sanitize_text_field( wp_unslash( (string) $_GET['page'] ) ) // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		: '';
+
+	if ( 'product_importer' !== $page ) {
+		return false;
+	}
+
+	$post_type = isset( $_GET['post_type'] )
+		? sanitize_text_field( wp_unslash( (string) $_GET['post_type'] ) ) // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		: '';
+
+	return '' === $post_type || 'product' === $post_type;
+}
+
+/**
+ * Dequeue non-essential telemetry/dashboard scripts on the importer page.
+ */
+add_action(
+	'admin_enqueue_scripts',
+	static function (): void {
+		if ( ! dtb_is_wc_product_importer_admin_page() ) {
+			return;
+		}
+
+		$remove_handles = [
+			'wc-admin-app',
+			'wc-admin-homepage',
+			'wc-admin-layout',
+			'wc-admin-notes',
+			'wc-admin-navigation',
+			'wc-customer-effort-score-tracks',
+			'wp-preferences',
+			'wp-preferences-persistence',
+			'newfold-ctb',
+			'newfold-notifications',
+			'newfold-notifications-prime',
+			'newfold-prime-notices',
+		];
+
+		foreach ( $remove_handles as $handle ) {
+			if ( wp_script_is( $handle, 'enqueued' ) || wp_script_is( $handle, 'registered' ) ) {
+				wp_dequeue_script( $handle );
+				wp_deregister_script( $handle );
+			}
+		}
+
+		// Fallback: remove any remaining importer-irrelevant scripts by src
+		// fragment in case host/plugin updates changed the script handles.
+		global $wp_scripts;
+		if ( ! ( $wp_scripts instanceof WP_Scripts ) ) {
+			return;
+		}
+
+		$blocked_src_fragments = [
+			'/woocommerce/assets/client/admin/',
+			'/plugins/woocommerce/assets/client/admin/',
+			'ctb.js',
+			'newfold-notifications',
+			'prime-notices.js',
+		];
+
+		foreach ( $wp_scripts->registered as $handle => $script ) {
+			if ( ! ( $script instanceof _WP_Dependency ) ) {
+				continue;
+			}
+
+			$src = (string) ( $script->src ?? '' );
+			if ( '' === $src ) {
+				continue;
+			}
+
+			foreach ( $blocked_src_fragments as $fragment ) {
+				if ( false !== strpos( $src, $fragment ) ) {
+					wp_dequeue_script( $handle );
+					wp_deregister_script( $handle );
+					break;
+				}
+			}
+		}
+	},
+	100
+);
+
+/**
+ * Remove unused module preloads that trigger Chrome warnings on importer.
+ */
+add_filter(
+	'wp_preload_resources',
+	static function ( array $preloads ): array {
+		if ( ! dtb_is_wc_product_importer_admin_page() ) {
+			return $preloads;
+		}
+
+		$blocked_fragments = [
+			'/woocommerce/assets/client/admin/embed/index.js',
+			'/woocommerce/assets/client/admin/components/index.js',
+		];
+
+		return array_values(
+			array_filter(
+				$preloads,
+				static function ( $entry ) use ( $blocked_fragments ): bool {
+					if ( ! is_array( $entry ) || empty( $entry['href'] ) ) {
+						return true;
+					}
+
+					$href = (string) $entry['href'];
+					foreach ( $blocked_fragments as $fragment ) {
+						if ( false !== strpos( $href, $fragment ) ) {
+							return false;
+						}
+					}
+
+					return true;
+				}
+			)
+		);
+	},
+	20
+);
 
 
 // ============================================================================
@@ -759,8 +877,11 @@ add_action( 'init', function (): void {
 		return;
 	}
 
-	if ( class_exists( 'ActionScheduler' ) ) {
-		remove_action( 'action_scheduler_run_queue', [ ActionScheduler::runner(), 'run' ] );
+	// Keep importer requests isolated from shutdown-triggered queue processing
+	// without depending on Action Scheduler internal APIs that vary by version.
+	global $wp_filter;
+	if ( isset( $wp_filter['action_scheduler_run_queue'] ) ) {
+		unset( $wp_filter['action_scheduler_run_queue'] );
 	}
 }, 20 );
 
@@ -853,6 +974,32 @@ add_action( 'admin_notices', function (): void {
 	}
 
 	echo '<div class="notice notice-warning"><p><strong>DTB import safe mode is active.</strong> This WooCommerce CSV import will skip image sideloading to avoid shared-hosting timeouts. After the products import, run DTB image linking to attach the registered images by SKU.</p></div>';
+} );
+
+// Temporary importer diagnostics: show effective REST root on importer pages.
+// Enable with:
+//   define( 'DTB_DEBUG_IMPORTER_REST_ROOT_NOTICE', true );
+add_action( 'admin_notices', function (): void {
+	if ( ! dtb_feature_enabled( 'DTB_DEBUG_IMPORTER_REST_ROOT_NOTICE', false ) ) {
+		return;
+	}
+
+	if ( ! is_admin() || ! dtb_is_wc_product_import_request() ) {
+		return;
+	}
+
+	$rest_root = esc_url( trailingslashit( rest_url() ) );
+	$request_uri = isset( $_SERVER['REQUEST_URI'] )
+		? sanitize_text_field( wp_unslash( (string) $_SERVER['REQUEST_URI'] ) ) // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+		: '';
+	$page        = isset( $_GET['page'] )
+		? sanitize_text_field( wp_unslash( (string) $_GET['page'] ) ) // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		: '';
+	$action      = isset( $_REQUEST['action'] )
+		? sanitize_text_field( wp_unslash( (string) $_REQUEST['action'] ) ) // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		: '';
+
+	echo '<div class="notice notice-info"><p><strong>DTB importer REST root debug:</strong> <code>' . $rest_root . '</code><br><strong>Request URI:</strong> <code>' . esc_html( $request_uri ) . '</code><br><strong>$_GET[page]:</strong> <code>' . esc_html( $page ) . '</code><br><strong>$_REQUEST[action]:</strong> <code>' . esc_html( $action ) . '</code></p></div>';
 } );
 
 // =============================================================================

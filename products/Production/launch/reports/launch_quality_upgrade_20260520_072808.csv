@@ -1,0 +1,12 @@
+target,target_size,source,source_size,strategy,score,area_gain,applied
+columbia_2ah_01.webp,783x782,c:\Users\Elliott\drywall-toolbox\frontend\public\brands\Columbia\Products\2ah.webp,800x800,exact_key,1.0,1.05,False
+columbia_tools_25ah_02.webp,783x782,c:\Users\Elliott\drywall-toolbox\products\Production\Images\launch_images\columbia_tools_25ah_04.webp,826x826,exact_key,1.0,1.11,False
+columbia_tools_35ah_03.webp,783x782,c:\Users\Elliott\drywall-toolbox\products\Production\Images\launch_images\columbia_tools_35ah_01.webp,826x826,exact_key,1.0,1.11,False
+columbia_tools_3ah_02.webp,783x782,c:\Users\Elliott\drywall-toolbox\products\Production\Images\launch_images\columbia_tools_3ah_04.webp,826x826,exact_key,1.0,1.11,False
+columbia_tools_pchxl_01.webp,600x400,c:\Users\Elliott\drywall-toolbox\products\Production\Images\launch_images\columbia_tools_chxl_01.webp,800x800,fuzzy_key,0.9474,2.67,False
+tapetech_eabs127ttsm_01.webp,300x300,c:\Users\Elliott\drywall-toolbox\frontend\public\brands\TapeTech\Products\eabs127-ttsm.webp,1200x1200,exact_key,1.0,16.0,False
+tapetech_eexset590_01.webp,300x300,c:\Users\Elliott\drywall-toolbox\frontend\public\brands\TapeTech\Products\eexset590_01.webp,1200x1200,exact_key,1.0,16.0,False
+tapetech_efloat0512n_01.webp,300x300,c:\Users\Elliott\drywall-toolbox\frontend\public\brands\TapeTech\Products\efloat0512-n.webp,1200x1200,exact_key,1.0,16.0,False
+tapetech_einset590_01.webp,300x300,c:\Users\Elliott\drywall-toolbox\frontend\public\brands\TapeTech\Products\einset590_01.webp,1200x1200,exact_key,1.0,16.0,False
+tapetech_hwk001ps_01.webp,300x300,c:\Users\Elliott\drywall-toolbox\frontend\public\brands\TapeTech\Products\hwk001-ps.webp,1200x1200,exact_key,1.0,16.0,False
+tapetech_ttpss_04.webp,300x300,c:\Users\Elliott\drywall-toolbox\frontend\public\brands\TapeTech\Products\ttpss.webp,1200x1200,exact_key,1.0,16.0,False

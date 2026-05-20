@@ -92,7 +92,11 @@ if ( is_admin() || ( defined( 'WP_CLI' ) && WP_CLI ) ) {
 	require_once $_dtb_cp . '/Admin/MetaBackfillTool.php';
 	require_once $_dtb_cp . '/Admin/CatalogHealthRenderer.php';
 	require_once $_dtb_cp . '/Admin/CatalogHealthActions.php';
-	require_once $_dtb_cp . '/Admin/CatalogHealthPage.php';
+	// Page-shell file is only needed for normal wp-admin page loads.
+	// Exclude admin-ajax requests to avoid loading UI-only code there.
+	if ( ! ( function_exists( 'wp_doing_ajax' ) && wp_doing_ajax() ) ) {
+		require_once $_dtb_cp . '/Admin/CatalogHealthPage.php';
+	}
 	require_once $_dtb_cp . '/Admin/ProductMappingRenderer.php';
 	require_once $_dtb_cp . '/Admin/ProductMappingPage.php';
 	require_once $_dtb_cp . '/Admin/ProductMappingActions.php';

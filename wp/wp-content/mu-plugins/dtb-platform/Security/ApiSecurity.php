@@ -19,6 +19,8 @@ add_action( 'woocommerce_init', 'dtb_wc_cors_early', 1 );
 add_action( 'init', 'dtb_api_security_handle_options_preflight', 1 );
 add_filter( 'rest_endpoints', 'dtb_api_security_restrict_user_endpoints', 20 );
 add_filter( 'woocommerce_rest_check_permissions', 'dtb_api_security_wc_public_read', 10, 4 );
+add_filter( 'rest_authentication_errors', 'dtb_api_security_relax_admin_background_nonce_failures', 110 );
+add_filter( 'rest_request_after_callbacks', 'dtb_api_security_downgrade_newfold_notifications_403', 10, 3 );
 add_action( 'rest_api_init', 'dtb_api_security_register_nonce_route', 20 );
 
 add_action(
@@ -105,6 +107,10 @@ function dtb_is_rest_request(): bool {
 }
 
 function dtb_emit_cors_headers( ?string $raw_origin = null ): void {
+	if ( headers_sent() ) {
+		return;
+	}
+
 	$raw_origin ??= isset( $_SERVER['HTTP_ORIGIN'] )
 		? (string) wp_unslash( $_SERVER['HTTP_ORIGIN'] ) // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 		: '';
@@ -160,6 +166,27 @@ function dtb_api_security_restrict_user_endpoints( array $endpoints ): array {
 			}
 
 			$handler['permission_callback'] = static function () use ( $route ): bool {
+				// Preserve hardened user-list protections, but do not break
+				// authenticated self-profile reads used by wp-admin / Woo Admin.
+				if ( '/wp/v2/users/me' === $route ) {
+					// Some hardened/edge role setups can lack the nominal "read"
+					// capability while still representing a valid authenticated
+					// wp-admin session. For /users/me we only require auth.
+					$allowed = is_user_logged_in() && get_current_user_id() > 0;
+
+					if ( ! $allowed ) {
+						dtb_security_log(
+							'wp_users_endpoint_denied',
+							[
+								'route'        => $route,
+								'required_cap' => 'authenticated_user',
+							]
+						);
+					}
+
+					return $allowed;
+				}
+
 				$allowed = current_user_can( 'list_users' );
 
 				if ( ! $allowed ) {
@@ -179,6 +206,116 @@ function dtb_api_security_restrict_user_endpoints( array $endpoints ): array {
 	}
 
 	return $endpoints;
+}
+
+/**
+ * Relax cookie-nonce failures for low-risk wp-admin background GET requests.
+ *
+ * Some shared-hosting/proxy paths intermittently invalidate wp_rest nonces,
+ * which causes retry loops in wp-admin for benign read-only endpoints.
+ * Keep this narrowly scoped to authenticated same-host admin requests.
+ *
+ * @param WP_Error|mixed $result Authentication result from prior callbacks.
+ * @return WP_Error|mixed|null
+ */
+function dtb_api_security_relax_admin_background_nonce_failures( $result ) {
+	if ( ! is_wp_error( $result ) || 'rest_cookie_invalid_nonce' !== $result->get_error_code() ) {
+		return $result;
+	}
+
+	$method = isset( $_SERVER['REQUEST_METHOD'] )
+		? strtoupper( sanitize_text_field( (string) wp_unslash( $_SERVER['REQUEST_METHOD'] ) ) ) // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+		: '';
+
+	if ( 'GET' !== $method ) {
+		return $result;
+	}
+
+	$request_uri = isset( $_SERVER['REQUEST_URI'] )
+		? sanitize_text_field( (string) wp_unslash( $_SERVER['REQUEST_URI'] ) ) // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+		: '';
+
+	$allowed_uri_fragments = [
+		'/wp-json/wp/v2/users/me',
+		'/wp-json/newfold-notifications/v1/notifications',
+		'/wp-json/newfold-ctb/v2/ctb/url',
+	];
+
+	$route_allowed = false;
+	foreach ( $allowed_uri_fragments as $fragment ) {
+		if ( false !== strpos( $request_uri, $fragment ) ) {
+			$route_allowed = true;
+			break;
+		}
+	}
+
+	if ( ! $route_allowed || ! is_user_logged_in() || get_current_user_id() <= 0 ) {
+		return $result;
+	}
+
+	$referrer = wp_get_raw_referer();
+	$site_host = wp_parse_url( home_url(), PHP_URL_HOST );
+	$ref_host  = $referrer ? wp_parse_url( $referrer, PHP_URL_HOST ) : '';
+	$ref_path  = $referrer ? (string) wp_parse_url( $referrer, PHP_URL_PATH ) : '';
+
+	if ( ! $site_host || ! $ref_host || strtolower( $site_host ) !== strtolower( $ref_host ) || false === strpos( $ref_path, '/wp-admin/' ) ) {
+		return $result;
+	}
+
+	dtb_security_log(
+		'rest_cookie_invalid_nonce_relaxed',
+		[
+			'uri' => $request_uri,
+		]
+	);
+
+	return null;
+}
+
+/**
+ * Downgrade noisy Newfold admin-notification endpoint 401/403 responses.
+ *
+ * Keeps WooCommerce Admin enabled while preventing repeated failed polling
+ * from spamming browser console/network logs in wp-admin sessions.
+ *
+ * @param mixed           $response Result after callbacks (response or WP_Error).
+ * @param array           $handler  Endpoint handler.
+ * @param WP_REST_Request $request  REST request object.
+ * @return mixed
+ */
+function dtb_api_security_downgrade_newfold_notifications_403( $response, array $handler, WP_REST_Request $request ) {
+	if ( 'GET' !== $request->get_method() || '/newfold-notifications/v1/notifications' !== $request->get_route() ) {
+		return $response;
+	}
+
+	if ( ! is_user_logged_in() || get_current_user_id() <= 0 ) {
+		return $response;
+	}
+
+	$status = 0;
+	if ( is_wp_error( $response ) ) {
+		$error_data = $response->get_error_data();
+		$status     = is_array( $error_data ) ? (int) ( $error_data['status'] ?? 0 ) : 0;
+	} elseif ( $response instanceof WP_REST_Response ) {
+		$status = (int) $response->get_status();
+	}
+
+	if ( ! in_array( $status, [ 401, 403 ], true ) ) {
+		return $response;
+	}
+
+	dtb_security_log(
+		'newfold_notifications_403_downgraded',
+		[
+			'route'  => $request->get_route(),
+			'status' => $status,
+		]
+	);
+
+	$patched = new WP_REST_Response( [], 200 );
+	$patched->header( 'X-DTB-Patched', 'newfold-notifications' );
+
+	return $patched;
 }
 
 function dtb_api_security_wc_public_read( $permission, $context, $object_id, $post_type ) {

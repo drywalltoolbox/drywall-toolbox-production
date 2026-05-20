@@ -31,6 +31,52 @@
 defined( 'ABSPATH' ) || exit;
 
 /**
+ * Start a small safety output buffer early in MU bootstrap.
+ *
+ * Purpose:
+ * - Prevent "headers already sent" cascades if any included file accidentally
+ *   emits a UTF-8 BOM or stray whitespace before header() calls.
+ * - Strip a single leading UTF-8 BOM from the first buffered chunk.
+ *
+ * Scope is limited to admin / ajax / REST style requests where DTB emits
+ * security and CORS headers.
+ */
+function dtb_bootstrap_start_output_buffer(): void {
+	if ( headers_sent() ) {
+		return;
+	}
+
+	$request_uri = isset( $_SERVER['REQUEST_URI'] )
+		? (string) wp_unslash( $_SERVER['REQUEST_URI'] ) // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+		: '';
+
+	$is_header_sensitive_request = str_contains( $request_uri, '/wp-admin/' )
+		|| str_contains( $request_uri, '/wp-json/' )
+		|| str_contains( $request_uri, 'admin-ajax.php' );
+
+	if ( ! $is_header_sensitive_request ) {
+		return;
+	}
+
+	ob_start(
+		static function ( string $buffer ): string {
+			static $first_chunk = true;
+
+			if ( $first_chunk ) {
+				$first_chunk = false;
+				if ( str_starts_with( $buffer, "\xEF\xBB\xBF" ) ) {
+					$buffer = substr( $buffer, 3 );
+				}
+			}
+
+			return $buffer;
+		}
+	);
+}
+
+dtb_bootstrap_start_output_buffer();
+
+/**
  * Central feature-flag helper for production-safe hardening rollouts.
  *
  * Define a constant as true/false to override, or filter

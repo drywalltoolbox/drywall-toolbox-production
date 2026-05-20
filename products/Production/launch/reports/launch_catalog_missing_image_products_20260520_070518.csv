@@ -1,0 +1,75 @@
+sku,row_type,parent,name,missing_basenames
+COL-AUTOMATIC-FLAT-BOX,variable,,Columbia Automatic Flat Box,columbia_automatic_flat_boxes_01.webp
+8FFBA,variation,COL-AUTOMATIC-FLAT-BOX,"Columbia Automatic Flat Box - 8""",columbia_automatic_flat_boxes_01.webp
+10FFBA,variation,COL-AUTOMATIC-FLAT-BOX,"Columbia Automatic Flat Box - 10""",columbia_automatic_flat_boxes_01.webp
+12FFBA,variation,COL-AUTOMATIC-FLAT-BOX,"Columbia Automatic Flat Box - 12""",columbia_automatic_flat_boxes_01.webp
+14FFBA,variation,COL-AUTOMATIC-FLAT-BOX,"Columbia Automatic Flat Box - 14""",columbia_automatic_flat_boxes_01.webp
+COL-AUTOMATIC-FAT-BOY-BOX,variable,,Columbia Automatic Fat Boy Box,columbia_automatic_flat_boxes_01.webp
+10FBBA,variation,COL-AUTOMATIC-FAT-BOY-BOX,"Columbia Automatic Fat Boy Box - 10""",columbia_automatic_flat_boxes_01.webp
+12FBBA,variation,COL-AUTOMATIC-FAT-BOY-BOX,"Columbia Automatic Fat Boy Box - 12""",columbia_automatic_flat_boxes_01.webp
+COL-DIRECT-FLUSHER,variable,,Columbia Direct Flusher,columbia_3wtdf_01.webp
+3WTDF,variation,COL-DIRECT-FLUSHER,"Columbia Direct Flusher - 3"" Widetrack",columbia_3wtdf_01.webp
+COL-COMBO-FLUSHER,variable,,Columbia Combo Flusher,columbia_3wtdf_01.webp
+3WTCSF,variation,COL-COMBO-FLUSHER,"Columbia Combo Flusher - 3"" Widetrack",columbia_3wtdf_01.webp
+COL-180-GRIP-FLAT-BOX-HANDLE,variable,,Columbia 180° Grip Flat Box Handle,columbia_flat_box_handle_01.webp
+3BH,variation,COL-180-GRIP-FLAT-BOX-HANDLE,Columbia 180° Grip Flat Box Handle - 3',columbia_flat_box_handle_01.webp
+42BH,variation,COL-180-GRIP-FLAT-BOX-HANDLE,"Columbia 180° Grip Flat Box Handle - 42""",columbia_flat_box_handle_01.webp
+4BH,variation,COL-180-GRIP-FLAT-BOX-HANDLE,Columbia 180° Grip Flat Box Handle - 4',columbia_flat_box_handle_01.webp
+5BH,variation,COL-180-GRIP-FLAT-BOX-HANDLE,Columbia 180° Grip Flat Box Handle - 5',columbia_flat_box_handle_01.webp
+6BH,variation,COL-180-GRIP-FLAT-BOX-HANDLE,Columbia 180° Grip Flat Box Handle - 6',columbia_flat_box_handle_01.webp
+COL-BILLET-MUD-APPLICATOR,variable,,Columbia Billet Mud Applicator,columbia_cflt_01.webp
+CFLT,variation,COL-BILLET-MUD-APPLICATOR,Columbia Billet Mud Applicator - Flat,columbia_cflt_01.webp
+COL-PREDATOR-MATRIX-HANDLE,variable,,Columbia Predator Matrix Handle,columbia_col_predator_matrix_box_handle_01.webp
+PMH,variation,COL-PREDATOR-MATRIX-HANDLE,"Columbia Predator Matrix Handle - 40""-60""",columbia_col_predator_matrix_box_handle_01.webp
+PMHL,variation,COL-PREDATOR-MATRIX-HANDLE,"Columbia Predator Matrix Handle - Long 56""-76""",columbia_col_predator_matrix_box_handle_01.webp
+COL-AUTOMATIC-TAPER,variable,,Columbia Automatic Taper,columbia_staper_03.webp; columbia_taper_01.webp
+TAPER,variation,COL-AUTOMATIC-TAPER,"Columbia Automatic Taper - Standard 53""",columbia_taper_01.webp
+STAPER,variation,COL-AUTOMATIC-TAPER,"Columbia Automatic Taper - Sawed Off 39""",columbia_staper_03.webp
+COL-TOOL-SET,variable,,Columbia Tool Set,columbia_pts_01.webp
+PTS,variation,COL-TOOL-SET,Columbia Tool Set - Predator Tactical Set,columbia_pts_01.webp
+TT-EASYCLEAN-AUTOMATIC-TAPER,variable,,TapeTech EasyClean® Automatic Taper,tapetech_07tt_05.webp; tapetech_07tt_06.webp; tapetech_07tt_07.webp; tapetech_07tt_08.webp; tapetech_07tt_09.webp
+07TT,variation,TT-EASYCLEAN-AUTOMATIC-TAPER,TapeTech EasyClean® Automatic Taper - Standard,tapetech_07tt_05.webp; tapetech_07tt_06.webp; tapetech_07tt_07.webp; tapetech_07tt_08.webp; tapetech_07tt_09.webp
+TT-APPLICATOR-HEAD,variable,,TapeTech Applicator Head,tapetech_16tt_04.webp
+16TT,variation,TT-APPLICATOR-HEAD,TapeTech Applicator Head - Outside Corner,tapetech_16tt_04.webp
+TT-STANDARD-FULL-SET,variable,,TapeTech Standard Full Set,tapetech_ttsfs_01.webp
+TTSFS,variation,TT-STANDARD-FULL-SET,TapeTech Standard Full Set - Standard,tapetech_ttsfs_01.webp
+CMH,simple,,Columbia Closet Monster Handle,columbia_cmh_01.webp
+CLTHA,simple,,Columbia Tomalock Adapter,columbia_cltha_03.webp
+TTBBS,simple,,TapeTech Basic Box Set TTBBS,tapetech_ttbbs_01.webp; tapetech_ttbbs_02.webp
+TTBTS,simple,,TapeTech Basic Taping Set TTBTS,tapetech_ttbts_01.webp
+TTCFS,simple,,TapeTech Corner Finishing Set TTCFS,tapetech_ttcfs_01.webp
+TTPPS,simple,,TapeTech Pro Performance Set TTPPS,tapetech_ttpps_01.webp; tapetech_ttpps_02.webp; tapetech_ttpps_03.webp; tapetech_ttpps_04.webp; tapetech_ttpps_05.webp; tapetech_ttpps_06.webp; tapetech_ttpps_07.webp
+TTPSS,simple,,TapeTech Professional Starter Set TTPSS,tapetech_ttpss_01.webp; tapetech_ttpss_02.webp; tapetech_ttpss_04.webp
+TT-135-OUTSIDE-CORNER-EDGER,variable,,TapeTech 135° Outside Corner Edger,tapetech_eex125135_01.webp; tapetech_eex200135_01.webp; tapetech_eex275135_01.webp
+EEX125135,variation,TT-135-OUTSIDE-CORNER-EDGER,"TapeTech 135° Outside Corner Edger - 1.25""",tapetech_eex125135_01.webp
+EEX200135,variation,TT-135-OUTSIDE-CORNER-EDGER,"TapeTech 135° Outside Corner Edger - 2""",tapetech_eex200135_01.webp
+EEX275135,variation,TT-135-OUTSIDE-CORNER-EDGER,"TapeTech 135° Outside Corner Edger - 2.75""",tapetech_eex275135_01.webp
+TT-90-INSIDE-CORNER-EDGER,variable,,TapeTech 90° Inside Corner Edger,tapetech_ein10090_01.webp; tapetech_ein15090_01.webp; tapetech_ein20090_01.webp; tapetech_ein5090_01.webp; tapetech_ein7590_01.webp
+EIN5090,variation,TT-90-INSIDE-CORNER-EDGER,"TapeTech 90° Inside Corner Edger - 0.5""",tapetech_ein5090_01.webp
+EIN7590,variation,TT-90-INSIDE-CORNER-EDGER,"TapeTech 90° Inside Corner Edger - 0.75""",tapetech_ein7590_01.webp
+EIN10090,variation,TT-90-INSIDE-CORNER-EDGER,"TapeTech 90° Inside Corner Edger - 1""",tapetech_ein10090_01.webp
+EIN15090,variation,TT-90-INSIDE-CORNER-EDGER,"TapeTech 90° Inside Corner Edger - 1.5""",tapetech_ein15090_01.webp
+EIN20090,variation,TT-90-INSIDE-CORNER-EDGER,"TapeTech 90° Inside Corner Edger - 2""",tapetech_ein20090_01.webp
+TT-90-OUTSIDE-CORNER-EDGER,variable,,TapeTech 90° Outside Corner Edger,tapetech_eex10090_01.webp; tapetech_eex15090_01.webp; tapetech_eex20090_01.webp; tapetech_eex5090_01.webp; tapetech_eex7590_01.webp
+EEX5090,variation,TT-90-OUTSIDE-CORNER-EDGER,"TapeTech 90° Outside Corner Edger - 0.5""",tapetech_eex5090_01.webp
+EEX7590,variation,TT-90-OUTSIDE-CORNER-EDGER,"TapeTech 90° Outside Corner Edger - 0.75""",tapetech_eex7590_01.webp
+EEX10090,variation,TT-90-OUTSIDE-CORNER-EDGER,"TapeTech 90° Outside Corner Edger - 1""",tapetech_eex10090_01.webp
+EEX15090,variation,TT-90-OUTSIDE-CORNER-EDGER,"TapeTech 90° Outside Corner Edger - 1.5""",tapetech_eex15090_01.webp
+EEX20090,variation,TT-90-OUTSIDE-CORNER-EDGER,"TapeTech 90° Outside Corner Edger - 2""",tapetech_eex20090_01.webp
+TT-COMPOUND-TUBE,variable,,TapeTech Compound Tube,tapetech_ct24tt_01.webp; tapetech_ct36tt_01.webp; tapetech_ct42tt_01.webp
+CT24TT,variation,TT-COMPOUND-TUBE,"TapeTech Compound Tube - 24""",tapetech_ct24tt_01.webp
+CT36TT,variation,TT-COMPOUND-TUBE,"TapeTech Compound Tube - 36""",tapetech_ct36tt_01.webp
+CT42TT,variation,TT-COMPOUND-TUBE,"TapeTech Compound Tube - 42""",tapetech_ct42tt_01.webp
+TT-ITALIAN-ABS-FLOAT,variable,,TapeTech Italian ABS Float,tapetech_vabs050_01.webp; tapetech_vabs130_01.webp
+VABS050,variation,TT-ITALIAN-ABS-FLOAT,"TapeTech Italian ABS Float - 2""",tapetech_vabs050_01.webp
+VABS130,variation,TT-ITALIAN-ABS-FLOAT,"TapeTech Italian ABS Float - 5""",tapetech_vabs130_01.webp
+CTA01TT,simple,,TapeTech Compound Tube Filler Adapter,tapetech_cta01tt_01.webp; tapetech_cta01tt_02.webp; tapetech_cta01tt_03.webp; tapetech_cta01tt_04.webp
+804003F,simple,,Grip Assembly For Box Handle,tapetech_804003f_01.webp
+MP12TT,simple,,"TapeTech 12"" Stainless Steel Mud Pan",tapetech_mp12tt_01.webp; tapetech_mp12tt_02.webp; tapetech_mp12tt_03.webp
+EFLOAT0512N,simple,,TapeTech 12″ x 5″ x 1/4″ EVA Neo Float,tapetech_efloat0512n_01.webp
+HWK001PS,simple,,"TapeTech 13"" x 13"" Aluminum Hawk",tapetech_hwk001_ps_01.webp; tapetech_hwk001_ps_02.webp; tapetech_hwk001ps_01.webp
+HWK002BLK,simple,,"TapeTech 13"" x 13"" Premium Aluminum Hawk – Black",tapetech_hwk002_blk_01.webp; tapetech_hwk002_blk_02.webp
+MP14TT,simple,,"TapeTech 14"" Premium Stainless Steel Mud Pan",tapetech_mp14tt_01.webp
+EABS127TTSM,simple,,TapeTech Premium ABS Float – Smooth,tapetech_eabs127ttsm_01.webp
+EINSET590,simple,,TapeTech 5 Piece 90° Inside Corner Edger Set,tapetech_einset590_01.webp
+EEXSET590,simple,,TapeTech 5 Piece 90° Outside Corner Edger Set,tapetech_eexset590_01.webp

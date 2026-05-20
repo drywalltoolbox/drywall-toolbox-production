@@ -4,18 +4,18 @@ defined( 'ABSPATH' ) || exit;
 /**
  * Main sync route. Scans uploads/2026/media/ (or the upload_path param),
  * registers image files as WP attachments, and links each to its WooCommerce
- * product by SKU.
+ * product resolved by SKU.
  *
  * Image file naming convention: {Slug}-{SKU}-{Seq}.webp
  * Example: columbia-10-24-nyloc-nut-FA271-2.webp
  * CSV Images column uses the full URL, e.g.:
  *   https://drywalltoolbox.com/wp-content/uploads/2026/media/columbia-10-24-nyloc-nut-FA271-2.webp
  *
- * Sync strategy (exact-filename, SKU-first):
+ * Sync strategy (exact-filename, Images-first):
  *   1. Load all product SKUs from the DB in one indexed query.
  *   2. Build disk index: basename_lower => { path, url } from the scan dir.
  *   3. For each SKU, match exact image basenames from the active import CSV
- *      against the disk index — no fuzzy guessing, no stem scanning.
+ *      Images column against the disk index — no fuzzy guessing, no stem scanning.
  *   4. Register any unregistered files found on disk via dtb_register_image_attachment().
  *   5. Link thumbnail + gallery to each product via the WC_Product API.
  *   6. Flush WC product transients so REST responses reflect new images.
@@ -419,6 +419,7 @@ function dtb_route_sync_images( WP_REST_Request $request ): WP_REST_Response|WP_
 			? $offset + $limit
 			: null,
 		'file_based_sync' => ( 'file' === $batch_mode ),
+		'image_match_mode'=> 'csv_images_exact_basename',
 	] );
 
 	// Record the completed run if not a dry run and we finished this batch.

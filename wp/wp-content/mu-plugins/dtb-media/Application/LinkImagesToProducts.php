@@ -2,12 +2,14 @@
 defined( 'ABSPATH' ) || exit;
 
 /**
- * Link already-registered image attachments to WooCommerce products by SKU.
+ * Link already-registered image attachments to WooCommerce products.
  *
  * This mode does not register files. It is intended for the post-import step
  * after products from the active WooCommerce import CSV exist in WooCommerce
  * and image files were already registered in the Media Library.
- * already registered in the Media Library.
+ *
+ * Product targeting is by SKU, but image resolution is by exact basenames from
+ * the CSV Images column (no filename inference from SKU).
  */
 function dtb_route_link_registered_images( WP_REST_Request $request ): WP_REST_Response|WP_Error {
 	$relative_path = dtb_image_sync_resolve_relative_upload_path( $request );
@@ -206,6 +208,7 @@ function dtb_route_link_registered_images( WP_REST_Request $request ): WP_REST_R
 			? $offset + $limit
 			: null,
 		'link_only'           => true,
+		'image_match_mode'    => 'csv_images_exact_basename',
 	] );
 }
 

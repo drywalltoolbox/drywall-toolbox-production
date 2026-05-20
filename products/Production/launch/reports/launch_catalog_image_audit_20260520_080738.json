@@ -1,0 +1,60 @@
+{
+  "summary": {
+    "csv": "c:\\Users\\Elliott\\drywall-toolbox\\products\\Production\\launch\\dtb_woocommerce_official_catalog_optimized.csv",
+    "images_dir": "c:\\Users\\Elliott\\drywall-toolbox\\products\\Production\\launch\\launch_images",
+    "apply": false,
+    "parent_variable_rows": 65,
+    "parent_rows_updated": 0,
+    "rows_with_missing_images": 0,
+    "rows_with_empty_images": 7,
+    "missing_unique_basenames": 0
+  },
+  "backup_csv": null,
+  "parent_updates": [],
+  "missing_rows": [],
+  "empty_rows": [
+    {
+      "sku": "5.5FBB",
+      "row_type": "variation",
+      "parent": "COL-FAT-BOY-FLAT-BOX",
+      "name": "Columbia Fat Boy Flat Box - 5.5\""
+    },
+    {
+      "sku": "ICATW",
+      "row_type": "variation",
+      "parent": "COL-BILLET-MUD-APPLICATOR",
+      "name": "Columbia Billet Mud Applicator - Two-Way Internal Corner - 4 Wheels"
+    },
+    {
+      "sku": "TT-CARBON-FIBER-BOX-HANDLE",
+      "row_type": "variable",
+      "parent": "",
+      "name": "TapeTech Carbon Fiber Box Handle"
+    },
+    {
+      "sku": "FBH2642TT-CF",
+      "row_type": "variation",
+      "parent": "TT-CARBON-FIBER-BOX-HANDLE",
+      "name": "TapeTech Carbon Fiber Box Handle - 26\"-42\""
+    },
+    {
+      "sku": "FBH4272TT-CF",
+      "row_type": "variation",
+      "parent": "TT-CARBON-FIBER-BOX-HANDLE",
+      "name": "TapeTech Carbon Fiber Box Handle - 42\"-72\""
+    },
+    {
+      "sku": "HAWK002-PS",
+      "row_type": "variation",
+      "parent": "TT-FINISHING-HAWK",
+      "name": "TapeTech Finishing Hawk - 13\" x 13\" Premium Anodized"
+    },
+    {
+      "sku": "14TT",
+      "row_type": "simple",
+      "parent": "",
+      "name": "TapeTech MudRunner\u00ae"
+    }
+  ],
+  "missing_basenames": []
+}

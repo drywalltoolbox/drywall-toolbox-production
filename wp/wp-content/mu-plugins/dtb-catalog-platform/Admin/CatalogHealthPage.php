@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 /**
  * Catalog Health admin page shell.
  *

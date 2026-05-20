@@ -4,7 +4,8 @@ defined( 'ABSPATH' ) || exit;
 /**
  * Plugin Name: DTB Image Sync
  * Description: Registers pre-placed product images into the WordPress Media
- *              Library and links them to WooCommerce products by SKU.
+ *              Library and links them to WooCommerce products using exact
+ *              basenames from the active CSV Images column.
  *              Uses only public WP/WC APIs. Safe for HostGator shared hosting.
  * Version: 2.1.3
  * Author: Drywall Toolbox
@@ -40,9 +41,12 @@ defined( 'ABSPATH' ) || exit;
  *   Prevents concurrent sync runs which corrupt gallery meta on shared
  *   hosting where multiple PHP processes can be in flight simultaneously.
  *
- * SKU normalisation: lower-case + hyphen/underscore equivalence
- *   Checks sku, UPPER(sku), and a hyphen↔underscore swap variant to
- *   tolerate common filename→SKU mismatches (e.g. "tc-01_tt" vs "TC-01TT").
+ * Product resolution key: SKU
+ *   SKU is used only to identify the WooCommerce target product row.
+ *
+ * Image resolution key: CSV Images basenames
+ *   Image files are resolved from exact basenames listed in the active CSV
+ *   Images column; the sync does not infer image filenames from SKU.
  *
  * @package drywall-toolbox
  */
@@ -70,7 +74,9 @@ define( 'DTB_SYNC_LOCK_TTL', 600 );
  * you do not want the plugin to attempt renaming files on disk. To re-enable
  * the behavior, set this to false or remove the define and reload.
  */
-define( 'DTB_IMAGE_SYNC_DISABLE_RENAME', true );
+if ( ! defined( 'DTB_IMAGE_SYNC_DISABLE_RENAME' ) ) {
+	define( 'DTB_IMAGE_SYNC_DISABLE_RENAME', false );
+}
 
 /**
  * Relative uploads path to scan by default.
