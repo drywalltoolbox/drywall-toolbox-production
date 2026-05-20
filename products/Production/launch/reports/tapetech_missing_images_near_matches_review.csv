@@ -1,0 +1,2 @@
+ID,Type,SKU,Name,sku_norm,best_candidate,similarity,edit_distance,reason,candidate_file_count,candidate_sample
+,variation,CF40TT,"TapeTech Direct Corner Flusher - 4""",CF40TT,CFH40TT,0.9231,1,manual-review-needed,1,tapetech-CFH40TT-01.webp

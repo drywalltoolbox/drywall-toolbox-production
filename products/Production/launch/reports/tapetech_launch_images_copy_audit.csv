@@ -1,0 +1,14 @@
+tier,sku,slug,source_relative_path,dest_filename,status
+confident,HAWK001-PS,hawk001ps,tapetech-HWK001-PS-01.webp,tapetech_hawk001ps_01.webp,copied
+confident,HAWK001-PS,hawk001ps,tapetech-HWK001-PS-02.webp,tapetech_hawk001ps_02.webp,copied
+confident,TTSFS-2,ttsfs2,tapetech-TTSFS-2-01.webp,tapetech_ttsfs2_01.webp,copied
+confident,TTSFS-2,ttsfs2,tapetech-TTSFS-2-02.webp,tapetech_ttsfs2_02.webp,copied
+confident,TTSFS-2,ttsfs2,tapetech-TTSFS-2-03.webp,tapetech_ttsfs2_03.webp,copied
+confident,TTPFB,ttpfb,tapetech-TTPFB-01.webp,tapetech_ttpfb_01.webp,copied
+confident,TTPPS-EF,ttppsef,tapetech-TTPPS-EF-01.webp,tapetech_ttppsef_01.webp,copied
+confident,TTPPS-EF,ttppsef,tapetech-TTPPS-EF-02.webp,tapetech_ttppsef_02.webp,copied
+confident,TTPPS-EF,ttppsef,tapetech-TTPPS-EF-03.webp,tapetech_ttppsef_03.webp,copied
+confident,TTPPS-EF,ttppsef,tapetech-TTPPS-EF-04.webp,tapetech_ttppsef_04.webp,copied
+confident,TTPPS-EF,ttppsef,tapetech-TTPPS-EF-05.webp,tapetech_ttppsef_05.webp,copied
+confident,TTPPS-EF,ttppsef,tapetech-TTPPS-EF-06.webp,tapetech_ttppsef_06.webp,copied
+near,CF40TT,cf40tt,tapetech-CFH40TT-01.webp,tapetech_cf40tt_01.webp,copied

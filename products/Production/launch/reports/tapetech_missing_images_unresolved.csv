@@ -1,0 +1,50 @@
+ID,Type,SKU,Name,sku_norm,reason
+,variable,TT-CARBON-FIBER-BOX-HANDLE,TapeTech Carbon Fiber Box Handle,TTCARBONFIBERBOXHANDLE,no-safe-candidate
+,variation,FBH2642TT-CF,"TapeTech Carbon Fiber Box Handle - 26""-42""",FBH2642TTCF,no-safe-candidate
+,variation,FBH4272TT-CF,"TapeTech Carbon Fiber Box Handle - 42""-72""",FBH4272TTCF,no-safe-candidate
+,variable,TT-STAINLESS-STEEL-MUD-PAN,TapeTech Stainless Steel Mud Pan,TTSTAINLESSSTEELMUDPAN,no-safe-candidate
+,variation,MP12SSTT,"TapeTech Stainless Steel Mud Pan - 12""",MP12SSTT,no-safe-candidate
+,variation,MP14SSTT,"TapeTech Stainless Steel Mud Pan - 14""",MP14SSTT,no-safe-candidate
+,variable,TT-FINISHING-HAWK,TapeTech Finishing Hawk,TTFINISHINGHAWK,no-safe-candidate
+,variation,HAWK002-PS,"TapeTech Finishing Hawk - 13"" x 13"" Premium Anodized",HAWK002PS,no-safe-candidate
+,variable,TT-BASIC-FULL-SET,TapeTech Basic Full Set,TTBASICFULLSET,no-safe-candidate
+,variation,TTFULL7/10,"TapeTech Basic Full Set - 7"" and 10"" Boxes",TTFULL710,no-safe-candidate
+,variation,TTFULL10/12,"TapeTech Basic Full Set - 10"" and 12"" Boxes",TTFULL1012,no-safe-candidate
+,variable,TT-BASIC-JUMBO-SET,TapeTech Basic Jumbo Set,TTBASICJUMBOSET,no-safe-candidate
+,variation,TTJUMBO7/10,"TapeTech Basic Jumbo Set - 7"" and 10"" Boxes",TTJUMBO710,no-safe-candidate
+,variation,TTJUMBOO10/12,"TapeTech Basic Jumbo Set - 10"" and 12"" Boxes",TTJUMBOO1012,no-safe-candidate
+,simple,70171,TapeTech 2 Pump Set,70171,no-safe-candidate
+,simple,70173,"TapeTech 10"" and 12"" Full Set",70173,no-safe-candidate
+,simple,TTFBC,TapeTech Flat Box Combo TTFBC,TTFBC,no-safe-candidate
+,simple,TTFFS,TapeTech Value Drywall Finishing Set,TTFFS,no-safe-candidate
+,simple,TTFINISH7/10,TapeTech Taping Tools Drywall Finishing Set,TTFINISH710,no-safe-candidate
+,simple,TTFTFS,TapeTech Value Full Drywall Taping & Finishing Set,TTFTFS,no-safe-candidate
+,simple,TTFULL2SET,TapeTech Full Set X2 Contractors Pack,TTFULL2SET,no-safe-candidate
+,variable,TT-COMBO-CORNER-FLUSHER,TapeTech Combo Corner Flusher,TTCOMBOCORNERFLUSHER,no-safe-candidate
+,variation,CF25COMBO,"TapeTech Combo Corner Flusher - 2.5""",CF25COMBO,no-safe-candidate
+,variation,CF30COMBO,"TapeTech Combo Corner Flusher - 3""",CF30COMBO,no-safe-candidate
+,variation,CF35COMBO,"TapeTech Combo Corner Flusher - 3.5""",CF35COMBO,no-safe-candidate
+,variation,CF40COMBO,"TapeTech Combo Corner Flusher - 4""",CF40COMBO,no-safe-candidate
+,variable,TT-CORNER-APPLICATOR-WITH-FHTT-HANDLE,TapeTech Corner Applicator with FHTT Fiberglass Handle,TTCORNERAPPLICATORWITHFHTTHANDLE,no-safe-candidate
+,variation,CA07FHTT,"TapeTech Corner Applicator with FHTT Fiberglass Handle - 7""",CA07FHTT,no-safe-candidate
+,variation,CA08FHTT,"TapeTech Corner Applicator with FHTT Fiberglass Handle - 8""",CA08FHTT,no-safe-candidate
+,variable,TT-DIRECT-CORNER-FLUSHER,TapeTech Direct Corner Flusher,TTDIRECTCORNERFLUSHER,no-safe-candidate
+,variation,CF25TT,"TapeTech Direct Corner Flusher - 2.5""",CF25TT,no-safe-candidate
+,variation,CF30TT,"TapeTech Direct Corner Flusher - 3""",CF30TT,no-safe-candidate
+,variation,CF35TT,"TapeTech Direct Corner Flusher - 3.5""",CF35TT,no-safe-candidate
+,variable,TT-EASYCLEAN-NAIL-SPOTTER-WITH-FHTT-HANDLE,TapeTech EasyClean® Nail Spotter with FHTT Fiberglass Handle,TTEASYCLEANNAILSPOTTERWITHFHTTHANDLE,no-safe-candidate
+,variation,NS02FHTT,"TapeTech EasyClean® Nail Spotter with FHTT Fiberglass Handle - 2""",NS02FHTT,no-safe-candidate
+,variation,NS03FHTT,"TapeTech EasyClean® Nail Spotter with FHTT Fiberglass Handle - 3""",NS03FHTT,no-safe-candidate
+,variable,TT-COMPOUND-ROLLER-WITH-FRAME,TapeTech Premium Compound Roller with Frame,TTCOMPOUNDROLLERWITHFRAME,no-safe-candidate
+,variation,CROLL04CG,"TapeTech Premium Compound Roller with Frame - 4""",CROLL04CG,no-safe-candidate
+,variation,CROLL09CG,"TapeTech Premium Compound Roller with Frame - 9""",CROLL09CG,no-safe-candidate
+,variation,CROLL12CG,"TapeTech Premium Compound Roller with Frame - 12""",CROLL12CG,no-safe-candidate
+,simple,CA07XHTT,"TapeTech 7"" Angle Box with Extendable XHTT Handle",CA07XHTT,no-safe-candidate
+,simple,CA08TTXHTT,"TapeTech 8"" Angle Box with XHTT Extendable Handle",CA08TTXHTT,no-safe-candidate
+,simple,15TTEXHTT,TapeTech Corner Roller with Extendable XHTT Handle,15TTEXHTT,no-safe-candidate
+,simple,15TTEWHANDLE,TapeTech Corner Roller with Handle,15TTEWHANDLE,no-safe-candidate
+,simple,FHTTCAATT,TapeTech Fiberglass Angle Box Handle (FHTT/CAA),FHTTCAATT,no-safe-candidate
+,simple,FHTTCFA,TapeTech Fiberglass Angle Head Handle (FHTT/CFA),FHTTCFA,no-safe-candidate
+,simple,14TT,TapeTech MudRunner®,14TT,no-safe-candidate
+,simple,NS02WX1HDL,"TapeTech 2"" Nail Spotter with X1 Extension Handle",NS02WX1HDL,no-safe-candidate
+,simple,FHTTNSA,TapeTech Fiberglass Nail Spotter Handle (FHTT/NSA),FHTTNSA,no-safe-candidate

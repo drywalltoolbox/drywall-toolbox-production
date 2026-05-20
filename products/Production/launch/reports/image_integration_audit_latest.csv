@@ -1,0 +1,6 @@
+Type,SKU,Name,match_key,file_count,files
+variation,HAWK001-PS,"TapeTech Finishing Hawk - 13"" x 13"" Aluminum",HAWK001PS,2,tapetech_hawk001ps_01.webp | tapetech_hawk001ps_02.webp
+variation,TTSFS-2,TapeTech Standard Full Set - With 2 Pumps,TTSFS2,3,tapetech_ttsfs2_01.webp | tapetech_ttsfs2_02.webp | tapetech_ttsfs2_03.webp
+simple,TTPFB,TapeTech Paper Faced Bead Pro Set TTPFB,TTPFB,1,tapetech_ttpfb_01.webp
+simple,TTPPS-EF,TapeTech Pro Performance Easy Finish Set TTPPS-EF,TTPPSEF,6,tapetech_ttppsef_01.webp | tapetech_ttppsef_02.webp | tapetech_ttppsef_03.webp | tapetech_ttppsef_04.webp | tapetech_ttppsef_05.webp | tapetech_ttppsef_06.webp
+variation,CF40TT,"TapeTech Direct Corner Flusher - 4""",CF40TT,1,tapetech_cf40tt_01.webp

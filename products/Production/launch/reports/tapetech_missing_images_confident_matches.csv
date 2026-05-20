@@ -1,0 +1,13 @@
+ID,Type,SKU,Name,sku_norm,match_type,candidate,similarity,edit_distance,image_relative_path
+,variation,HAWK001-PS,"TapeTech Finishing Hawk - 13"" x 13"" Aluminum",HAWK001PS,fuzzy-safe-high,HWK001PS,0.9412,1,tapetech-HWK001-PS-01.webp
+,variation,HAWK001-PS,"TapeTech Finishing Hawk - 13"" x 13"" Aluminum",HAWK001PS,fuzzy-safe-high,HWK001PS,0.9412,1,tapetech-HWK001-PS-02.webp
+,variation,TTSFS-2,TapeTech Standard Full Set - With 2 Pumps,TTSFS2,exact-candidate,TTSFS2,1.0,0,tapetech-TTSFS-2-01.webp
+,variation,TTSFS-2,TapeTech Standard Full Set - With 2 Pumps,TTSFS2,exact-candidate,TTSFS2,1.0,0,tapetech-TTSFS-2-02.webp
+,variation,TTSFS-2,TapeTech Standard Full Set - With 2 Pumps,TTSFS2,exact-candidate,TTSFS2,1.0,0,tapetech-TTSFS-2-03.webp
+,simple,TTPFB,TapeTech Paper Faced Bead Pro Set TTPFB,TTPFB,exact-candidate,TTPFB,1.0,0,tapetech-TTPFB-01.webp
+,simple,TTPPS-EF,TapeTech Pro Performance Easy Finish Set TTPPS-EF,TTPPSEF,exact-candidate,TTPPSEF,1.0,0,tapetech-TTPPS-EF-01.webp
+,simple,TTPPS-EF,TapeTech Pro Performance Easy Finish Set TTPPS-EF,TTPPSEF,exact-candidate,TTPPSEF,1.0,0,tapetech-TTPPS-EF-02.webp
+,simple,TTPPS-EF,TapeTech Pro Performance Easy Finish Set TTPPS-EF,TTPPSEF,exact-candidate,TTPPSEF,1.0,0,tapetech-TTPPS-EF-03.webp
+,simple,TTPPS-EF,TapeTech Pro Performance Easy Finish Set TTPPS-EF,TTPPSEF,exact-candidate,TTPPSEF,1.0,0,tapetech-TTPPS-EF-04.webp
+,simple,TTPPS-EF,TapeTech Pro Performance Easy Finish Set TTPPS-EF,TTPPSEF,exact-candidate,TTPPSEF,1.0,0,tapetech-TTPPS-EF-05.webp
+,simple,TTPPS-EF,TapeTech Pro Performance Easy Finish Set TTPPS-EF,TTPPSEF,exact-candidate,TTPPSEF,1.0,0,tapetech-TTPPS-EF-06.webp

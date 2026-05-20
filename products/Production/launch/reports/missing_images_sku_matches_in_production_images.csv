@@ -1,0 +1,28 @@
+ID,Type,SKU,Name,sku_norm,match_type,image_file,image_relative_path
+,variation,5.5FBB,"Columbia Fat Boy Flat Box - 5.5""",55FBB,exact-candidate,columbia-5-5FBB-01.webp,columbia-5-5FBB-01.webp
+,variation,5.5FBB,"Columbia Fat Boy Flat Box - 5.5""",55FBB,exact-candidate,columbia-5-5FBB-01.webp,new_images/columbia-5-5FBB-01.webp
+,variation,2.5DF,"Columbia Direct Flusher - 2.5""",25DF,exact-candidate,columbia-2-5DF-01.webp,columbia-2-5DF-01.webp
+,variation,2.5DF,"Columbia Direct Flusher - 2.5""",25DF,exact-candidate,columbia-25DF-01.webp,columbia-25DF-01.webp
+,variation,2.5DF,"Columbia Direct Flusher - 2.5""",25DF,exact-candidate,columbia-2-5DF-01.webp,new_images/columbia-2-5DF-01.webp
+,variation,2.5CSF,"Columbia Combo Flusher - 2.5""",25CSF,exact-candidate,columbia-2-5CSF-01.webp,columbia-2-5CSF-01.webp
+,variation,2.5CSF,"Columbia Combo Flusher - 2.5""",25CSF,exact-candidate,columbia-2-5CSF-01.webp,new_images/columbia-2-5CSF-01.webp
+,variation,3.5CSF,"Columbia Combo Flusher - 3.5""",35CSF,exact-candidate,columbia-3-5CSF-01.webp,columbia-3-5CSF-01.webp
+,variation,3.5CSF,"Columbia Combo Flusher - 3.5""",35CSF,exact-candidate,columbia-3-5CSF-01.webp,new_images/columbia-3-5CSF-01.webp
+,variation,TTSFS-2,TapeTech Standard Full Set - With 2 Pumps,TTSFS2,exact-candidate,tapetech-TTSFS-2-01.webp,tapetech-TTSFS-2-01.webp
+,variation,TTSFS-2,TapeTech Standard Full Set - With 2 Pumps,TTSFS2,exact-candidate,tapetech-TTSFS-2-02.webp,tapetech-TTSFS-2-02.webp
+,variation,TTSFS-2,TapeTech Standard Full Set - With 2 Pumps,TTSFS2,exact-candidate,tapetech-TTSFS-2-03.webp,tapetech-TTSFS-2-03.webp
+,variation,TTSFS-2,TapeTech Standard Full Set - With 2 Pumps,TTSFS2,exact-candidate,tapetech-TTSFS-2-01.webp,new_images/tapetech-TTSFS-2-01.webp
+,variation,TTSFS-2,TapeTech Standard Full Set - With 2 Pumps,TTSFS2,exact-candidate,tapetech-TTSFS-2-02.webp,new_images/tapetech-TTSFS-2-02.webp
+,variation,TTSFS-2,TapeTech Standard Full Set - With 2 Pumps,TTSFS2,exact-candidate,tapetech-TTSFS-2-03.webp,new_images/tapetech-TTSFS-2-03.webp
+,simple,TTPPS-EF,TapeTech Pro Performance Easy Finish Set TTPPS-EF,TTPPSEF,exact-candidate,tapetech-TTPPS-EF-01.webp,tapetech-TTPPS-EF-01.webp
+,simple,TTPPS-EF,TapeTech Pro Performance Easy Finish Set TTPPS-EF,TTPPSEF,exact-candidate,tapetech-TTPPS-EF-02.webp,tapetech-TTPPS-EF-02.webp
+,simple,TTPPS-EF,TapeTech Pro Performance Easy Finish Set TTPPS-EF,TTPPSEF,exact-candidate,tapetech-TTPPS-EF-03.webp,tapetech-TTPPS-EF-03.webp
+,simple,TTPPS-EF,TapeTech Pro Performance Easy Finish Set TTPPS-EF,TTPPSEF,exact-candidate,tapetech-TTPPS-EF-04.webp,tapetech-TTPPS-EF-04.webp
+,simple,TTPPS-EF,TapeTech Pro Performance Easy Finish Set TTPPS-EF,TTPPSEF,exact-candidate,tapetech-TTPPS-EF-05.webp,tapetech-TTPPS-EF-05.webp
+,simple,TTPPS-EF,TapeTech Pro Performance Easy Finish Set TTPPS-EF,TTPPSEF,exact-candidate,tapetech-TTPPS-EF-06.webp,tapetech-TTPPS-EF-06.webp
+,simple,TTPPS-EF,TapeTech Pro Performance Easy Finish Set TTPPS-EF,TTPPSEF,exact-candidate,tapetech-TTPPS-EF-01.webp,new_images/tapetech-TTPPS-EF-01.webp
+,simple,TTPPS-EF,TapeTech Pro Performance Easy Finish Set TTPPS-EF,TTPPSEF,exact-candidate,tapetech-TTPPS-EF-02.webp,new_images/tapetech-TTPPS-EF-02.webp
+,simple,TTPPS-EF,TapeTech Pro Performance Easy Finish Set TTPPS-EF,TTPPSEF,exact-candidate,tapetech-TTPPS-EF-03.webp,new_images/tapetech-TTPPS-EF-03.webp
+,simple,TTPPS-EF,TapeTech Pro Performance Easy Finish Set TTPPS-EF,TTPPSEF,exact-candidate,tapetech-TTPPS-EF-04.webp,new_images/tapetech-TTPPS-EF-04.webp
+,simple,TTPPS-EF,TapeTech Pro Performance Easy Finish Set TTPPS-EF,TTPPSEF,exact-candidate,tapetech-TTPPS-EF-05.webp,new_images/tapetech-TTPPS-EF-05.webp
+,simple,TTPPS-EF,TapeTech Pro Performance Easy Finish Set TTPPS-EF,TTPPSEF,exact-candidate,tapetech-TTPPS-EF-06.webp,new_images/tapetech-TTPPS-EF-06.webp
