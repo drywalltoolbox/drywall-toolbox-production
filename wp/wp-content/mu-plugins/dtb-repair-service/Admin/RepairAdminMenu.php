@@ -384,13 +384,103 @@ function dtb_repair_admin_inline_styles(): void {
 	}
 	.dtb-repairs-wrap .tablenav .displaying-num { font-size: 12px; color: #9ca3af; }
 	.dtb-repairs-wrap .tablenav-pages .pagination-links .button { border-radius: 6px !important; }
-	.dtb-repairs-wrap .column-repair_id { width: 90px; }
-	.dtb-repairs-wrap .column-status    { width: 130px; }
+	.dtb-repairs-wrap .column-repair_id  { width: 90px; }
+	.dtb-repairs-wrap .column-status     { width: 140px; }
 	.dtb-repairs-wrap .column-age,
-	.dtb-repairs-wrap .column-sla       { width: 80px; }
+	.dtb-repairs-wrap .column-sla        { width: 72px; text-align: center; }
 	.dtb-repairs-wrap .column-wc_order,
 	.dtb-repairs-wrap .column-veeqo,
-	.dtb-repairs-wrap .column-quickbooks{ width: 80px; }
+	.dtb-repairs-wrap .column-quickbooks { width: 72px; text-align: center; }
+	.dtb-repairs-wrap .column-tech       { width: 110px; }
+	.dtb-repairs-wrap .column-last_event { min-width: 140px; }
+
+	/* ── Kill WP's striped alternating rows ──────────────────── */
+	.dtb-repairs-wrap .wp-list-table.striped > tbody > tr:nth-child(odd) {
+		background: transparent !important;
+	}
+	.dtb-repairs-wrap .wp-list-table.striped > tbody > tr:nth-child(odd):hover {
+		background: #f5f8ff !important;
+	}
+
+	/* ── Page header ──────────────────────────────────────────── */
+	.dtb-page-header {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		margin-bottom: 18px;
+	}
+	.dtb-page-header h1 {
+		margin: 0;
+		padding: 0;
+		font-size: 20px;
+		font-weight: 800;
+		color: var(--dtb-text);
+		line-height: 1.2;
+		border: none;
+	}
+	.dtb-page-header .dtb-page-subtitle {
+		display: block;
+		font-size: 12px;
+		font-weight: 400;
+		color: var(--dtb-muted);
+		margin-top: 3px;
+	}
+
+	/* ── Secondary cell text ──────────────────────────────────── */
+	.dtb-cell-sub {
+		display: block;
+		font-size: 11px;
+		color: var(--dtb-muted);
+		font-weight: 400;
+		margin-top: 2px;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		max-width: 180px;
+	}
+
+	/* ── Age / SLA coloring ───────────────────────────────────── */
+	.dtb-age-ok       { color: var(--dtb-muted); }
+	.dtb-age-warn     { color: #b45309; font-weight: 600; }
+	.dtb-age-critical { color: #dc2626; font-weight: 700; }
+
+	/* ── Repair ID link ───────────────────────────────────────── */
+	.dtb-repairs-wrap .column-repair_id strong a {
+		color: var(--dtb-blue);
+		font-size: 13px;
+		font-weight: 700;
+	}
+
+	/* ── Integration badges (list table) ─────────────────────── */
+	.dtb-repairs-wrap .column-veeqo,
+	.dtb-repairs-wrap .column-quickbooks,
+	.dtb-repairs-wrap .column-wc_order {
+		text-align: center;
+	}
+	.dtb-int-ok    { color: #16a34a; font-weight: 700; font-size: 14px; }
+	.dtb-int-err   { color: #dc2626; font-weight: 700; font-size: 14px; }
+	.dtb-int-dash  { color: #d1d5db; font-size: 14px; }
+
+	/* ── Last-event cell ──────────────────────────────────────── */
+	.dtb-last-event-type {
+		font-size: 12px;
+		font-weight: 600;
+		color: var(--dtb-text);
+		display: block;
+		font-family: 'SFMono-Regular', Consolas, monospace;
+	}
+	.dtb-last-event-time {
+		display: block;
+		font-size: 11px;
+		color: var(--dtb-muted);
+		margin-top: 2px;
+	}
+
+	/* ── Notice refinement ────────────────────────────────────── */
+	.dtb-repairs-wrap .notice {
+		border-radius: 8px;
+		margin-bottom: 14px;
+	}
 
 	<?php if ( $is_edit ) : ?>
 
@@ -982,41 +1072,181 @@ function dtb_repair_admin_footer_scripts(): void {
 // =============================================================================
 
 /**
- * Render the All Repairs admin page.
+ * Render the All Repairs admin page — modernized dashboard layout.
  */
 function dtb_repair_admin_list_page(): void {
 	if ( ! current_user_can( 'dtb_manage_repairs' ) ) {
 		wp_die( esc_html__( 'You do not have permission to view this page.', 'drywall-toolbox' ) );
 	}
 
-	// Load the list table class if it isn't already.
 	if ( ! class_exists( 'WP_List_Table' ) ) {
 		require_once ABSPATH . 'wp-admin/includes/class-wp-list-table.php';
 	}
 
 	$table = new DTB_Repair_List_Table();
 	$table->prepare_items();
+
+	// ── Status counts ────────────────────────────────────────────────────────
+	$counts      = dtb_repair_admin_get_status_counts();
+	$n_total     = (int) array_sum( $counts );
+	$n_active    = dtb_repair_admin_sum_counts( $counts, dtb_repair_admin_tab_statuses( 'active' ) );
+	$n_ready     = dtb_repair_admin_sum_counts( $counts, dtb_repair_admin_tab_statuses( 'ready' ) );
+	$n_completed = dtb_repair_admin_sum_counts( $counts, dtb_repair_admin_tab_statuses( 'completed' ) );
+	$n_cancelled = dtb_repair_admin_sum_counts( $counts, dtb_repair_admin_tab_statuses( 'cancelled' ) );
+
+	// ── Current tab & chip ───────────────────────────────────────────────────
+	// phpcs:disable WordPress.Security.NonceVerification.Recommended
+	$current_tab    = isset( $_GET['tab'] )           ? sanitize_text_field( wp_unslash( (string) $_GET['tab'] ) )           : 'all';
+	$current_status = isset( $_GET['repair_status'] ) ? sanitize_text_field( wp_unslash( (string) $_GET['repair_status'] ) ) : '';
+	// phpcs:enable WordPress.Security.NonceVerification.Recommended
+
+	// Normalise 'all' to a known slug
+	if ( ! in_array( $current_tab, [ 'all', 'active', 'ready', 'completed', 'cancelled' ], true ) ) {
+		$current_tab = 'all';
+	}
+
+	$base_url    = admin_url( 'admin.php?page=dtb-repairs' );
+	$tab_statuses = dtb_repair_admin_tab_statuses( $current_tab );
+
+	// ── Ordered list of all statuses for chip bar ────────────────────────────
+	$all_statuses_ordered = [
+		'submitted', 'reviewed', 'awaiting_customer', 'approved',
+		'quoted', 'quote_accepted', 'quote_declined',
+		'parts_allocated', 'in_progress',
+		'ready_to_ship', 'completed', 'closed', 'cancelled',
+	];
+	$chip_pool = ( 'all' === $current_tab ) ? $all_statuses_ordered : $tab_statuses;
+
+	// Filter chip pool to statuses that have at least 1 repair (on All tab)
+	if ( 'all' === $current_tab ) {
+		$chip_pool = array_filter( $chip_pool, static fn( $s ) => ( $counts[ $s ] ?? 0 ) > 0 );
+	}
 	?>
-	<div class="wrap">
-		<h1 class="wp-heading-inline"><?php esc_html_e( 'Repair Requests', 'drywall-toolbox' ); ?></h1>
-		<hr class="wp-header-end">
+	<div class="wrap dtb-repairs-wrap">
 
-		<?php
-		// Handle bulk action messages.
-		if ( ! empty( $_GET['dtb_bulk_msg'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-			$msg = sanitize_text_field( wp_unslash( (string) $_GET['dtb_bulk_msg'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-			echo '<div class="notice notice-success is-dismissible"><p>' . esc_html( $msg ) . '</p></div>';
-		}
-		?>
+		<?php if ( ! empty( $_GET['dtb_bulk_msg'] ) ) : // phpcs:ignore WordPress.Security.NonceVerification.Recommended ?>
+			<div class="notice notice-success is-dismissible">
+				<p><?php echo esc_html( sanitize_text_field( wp_unslash( (string) $_GET['dtb_bulk_msg'] ) ) ); ?></p>
+			</div>
+		<?php endif; ?>
 
-		<form method="get" action="">
-			<input type="hidden" name="page" value="dtb-repairs">
+		<!-- ── Page header ────────────────────────────────────────────────── -->
+		<div class="dtb-page-header">
+			<div>
+				<h1><?php esc_html_e( 'Repair Requests', 'drywall-toolbox' ); ?>
+					<span class="dtb-page-subtitle"><?php echo esc_html( date_i18n( 'F j, Y' ) ); ?></span>
+				</h1>
+			</div>
+		</div>
+		<div class="dtb-stats-row">
 			<?php
-			$table->search_box( __( 'Search Repairs', 'drywall-toolbox' ), 'dtb-repair-search' );
-			$table->display();
+			$stat_cards = [
+				[ 'cls' => 'dtb-sc-total',     'num' => $n_total,     'label' => __( 'Total Repairs',   'drywall-toolbox' ) ],
+				[ 'cls' => 'dtb-sc-active',    'num' => $n_active,    'label' => __( 'Active',           'drywall-toolbox' ) ],
+				[ 'cls' => 'dtb-sc-ready',     'num' => $n_ready,     'label' => __( 'Ready to Ship',    'drywall-toolbox' ) ],
+				[ 'cls' => 'dtb-sc-completed', 'num' => $n_completed, 'label' => __( 'Completed',        'drywall-toolbox' ) ],
+				[ 'cls' => 'dtb-sc-cancelled', 'num' => $n_cancelled, 'label' => __( 'Cancelled',        'drywall-toolbox' ) ],
+			];
+			foreach ( $stat_cards as $card ) :
 			?>
-		</form>
-	</div>
+				<div class="dtb-stat-card <?php echo esc_attr( $card['cls'] ); ?>">
+					<div class="dtb-stat-num"><?php echo esc_html( (string) $card['num'] ); ?></div>
+					<div class="dtb-stat-label"><?php echo esc_html( $card['label'] ); ?></div>
+				</div>
+			<?php endforeach; ?>
+		</div>
+
+		<!-- ── List shell ─────────────────────────────────────────────────── -->
+		<div class="dtb-list-shell">
+
+			<!-- ── Tab bar ──────────────────────────────────────────────── -->
+			<div class="dtb-tab-bar">
+				<nav class="dtb-tabs" role="tablist">
+					<?php
+					$tabs = [
+						'all'       => [ 'label' => __( 'All Repairs',    'drywall-toolbox' ), 'count' => $n_total     ],
+						'active'    => [ 'label' => __( 'Active',          'drywall-toolbox' ), 'count' => $n_active    ],
+						'ready'     => [ 'label' => __( 'Ready to Ship',   'drywall-toolbox' ), 'count' => $n_ready     ],
+						'completed' => [ 'label' => __( 'Completed',       'drywall-toolbox' ), 'count' => $n_completed ],
+						'cancelled' => [ 'label' => __( 'Cancelled',       'drywall-toolbox' ), 'count' => $n_cancelled ],
+					];
+					foreach ( $tabs as $slug => $tab_def ) :
+						$is_cur  = ( $slug === $current_tab );
+						$tab_url = ( 'all' === $slug )
+							? esc_url( $base_url )
+							: esc_url( add_query_arg( [ 'tab' => $slug ], $base_url ) );
+					?>
+						<a href="<?php echo $tab_url; // phpcs:ignore ?>"
+						   class="dtb-tab<?php echo $is_cur ? ' dtb-tab-current' : ''; ?>"
+						   role="tab"
+						   aria-selected="<?php echo $is_cur ? 'true' : 'false'; ?>"
+						>
+							<?php echo esc_html( $tab_def['label'] ); ?>
+							<span class="dtb-tab-badge"><?php echo esc_html( (string) $tab_def['count'] ); ?></span>
+						</a>
+					<?php endforeach; ?>
+				</nav>
+				<div class="dtb-tab-bar-right">
+					<a href="<?php echo esc_url( admin_url( 'post-new.php?post_type=dtb_repair_request' ) ); ?>"
+					   class="button button-primary">
+						+ <?php esc_html_e( 'New Repair', 'drywall-toolbox' ); ?>
+					</a>
+				</div>
+			</div><!-- .dtb-tab-bar -->
+
+			<!-- ── Status chip filter bar ───────────────────────────────── -->
+			<div class="dtb-chip-bar">
+				<?php
+				// "All Statuses" chip clears the status filter but keeps the tab.
+				$clear_url = ( 'all' === $current_tab )
+					? esc_url( $base_url )
+					: esc_url( add_query_arg( [ 'tab' => $current_tab ], $base_url ) );
+				?>
+				<a href="<?php echo $clear_url; // phpcs:ignore ?>"
+				   class="dtb-chip<?php echo '' === $current_status ? ' dtb-chip-active' : ''; ?>">
+					<?php esc_html_e( 'All Statuses', 'drywall-toolbox' ); ?>
+				</a>
+
+				<?php foreach ( $chip_pool as $st ) :
+					$cnt   = $counts[ $st ] ?? 0;
+					$label = function_exists( 'dtb_get_repair_status_label' )
+						? dtb_get_repair_status_label( $st )
+						: ucwords( str_replace( '_', ' ', $st ) );
+
+					$chip_args = [ 'repair_status' => $st ];
+					if ( 'all' !== $current_tab ) {
+						$chip_args['tab'] = $current_tab;
+					}
+					$chip_url = esc_url( add_query_arg( $chip_args, $base_url ) );
+				?>
+					<a href="<?php echo $chip_url; // phpcs:ignore ?>"
+					   class="dtb-chip<?php echo ( $current_status === $st ) ? ' dtb-chip-active' : ''; ?>">
+						<?php echo esc_html( $label ); ?>
+						<span class="dtb-chip-count"><?php echo esc_html( (string) $cnt ); ?></span>
+					</a>
+				<?php endforeach; ?>
+			</div><!-- .dtb-chip-bar -->
+
+			<!-- ── Table ────────────────────────────────────────────────── -->
+			<div class="dtb-table-wrap">
+				<form method="get" action="">
+					<input type="hidden" name="page" value="dtb-repairs">
+					<?php if ( 'all' !== $current_tab ) : ?>
+						<input type="hidden" name="tab" value="<?php echo esc_attr( $current_tab ); ?>">
+					<?php endif; ?>
+					<?php if ( '' !== $current_status ) : ?>
+						<input type="hidden" name="repair_status" value="<?php echo esc_attr( $current_status ); ?>">
+					<?php endif; ?>
+					<?php
+					$table->search_box( __( 'Search repairs…', 'drywall-toolbox' ), 'dtb-repair-search' );
+					$table->display();
+					?>
+				</form>
+			</div><!-- .dtb-table-wrap -->
+
+		</div><!-- .dtb-list-shell -->
+
+	</div><!-- .dtb-repairs-wrap -->
 	<?php
 }
 

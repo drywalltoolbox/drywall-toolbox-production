@@ -160,13 +160,28 @@ class DTB_Repair_List_Table extends WP_List_Table {
 			];
 		}
 
-		// Status filter.
-		if ( ! empty( $_GET['repair_status'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-			$filter_status = sanitize_text_field( wp_unslash( (string) $_GET['repair_status'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		// Status filter — supports tab group (IN) and individual chip (=).
+		// phpcs:disable WordPress.Security.NonceVerification.Recommended
+		$current_tab    = isset( $_GET['tab'] )           ? sanitize_key( wp_unslash( (string) $_GET['tab'] ) )           : 'all';
+		$chip_status    = isset( $_GET['repair_status'] ) ? sanitize_text_field( wp_unslash( (string) $_GET['repair_status'] ) ) : '';
+		// phpcs:enable WordPress.Security.NonceVerification.Recommended
+
+		if ( '' !== $chip_status ) {
+			// A specific chip is selected — single-status exact match.
 			$args['meta_query'][] = [
 				'key'   => '_repair_status',
-				'value' => $filter_status,
+				'value' => $chip_status,
 			];
+		} elseif ( 'all' !== $current_tab && function_exists( 'dtb_repair_admin_tab_statuses' ) ) {
+			// Tab group — filter to all statuses in that group.
+			$tab_statuses = dtb_repair_admin_tab_statuses( $current_tab );
+			if ( ! empty( $tab_statuses ) ) {
+				$args['meta_query'][] = [
+					'key'     => '_repair_status',
+					'value'   => $tab_statuses,
+					'compare' => 'IN',
+				];
+			}
 		}
 
 		$query             = new WP_Query( $args );
