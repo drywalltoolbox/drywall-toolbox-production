@@ -2019,6 +2019,225 @@ function dtb_repair_admin_footer_scripts(): void {
 			});
 		}
 
+		/* ── Live parts lookup (technician workspace) ── */
+		var partsLookupInput = document.getElementById('dtb_repair_parts_lookup');
+		var partsLookupMenu = document.getElementById('dtb-tech-parts-lookup-menu');
+		var partsLinksInput = document.getElementById('dtb_repair_parts_links_json');
+		var selectedPartsEl = document.getElementById('dtb-tech-selected-parts');
+		var primaryPartSkuEl = document.getElementById('dtb-tech-primary-part-sku');
+		var primaryPartNameEl = document.getElementById('dtb-tech-primary-part-name');
+		var primaryPartBrandEl = document.getElementById('dtb-tech-primary-part-brand');
+		var partsReq = null;
+		var partsTimer = null;
+		var selectedParts = [];
+
+		var hidePartsLookupMenu = function() {
+			if (!partsLookupMenu) return;
+			partsLookupMenu.hidden = true;
+			partsLookupMenu.innerHTML = '';
+		};
+
+		var renderPartsLookupMenu = function(items) {
+			if (!partsLookupMenu) return;
+			if (!items || !items.length) {
+				hidePartsLookupMenu();
+				return;
+			}
+			partsLookupMenu.innerHTML = items.map(function(item) {
+				var primary = (item.sku || 'No SKU') + ' — ' + (item.name || 'Part');
+				var secondary = [item.brand_label, item.manufacturer_sku ? ('MFG: ' + item.manufacturer_sku) : ''].filter(Boolean).join(' · ');
+				return (
+					'<button type="button" class="dtb-tech-lookup-option" ' +
+					'data-part-id="' + String(item.part_id || 0).replace(/"/g, '&quot;') + '" ' +
+					'data-sku="' + String(item.sku || '').replace(/"/g, '&quot;') + '" ' +
+					'data-name="' + String(item.name || '').replace(/"/g, '&quot;') + '" ' +
+					'data-brand="' + String(item.brand_label || '').replace(/"/g, '&quot;') + '" ' +
+					'data-manufacturer-sku="' + String(item.manufacturer_sku || '').replace(/"/g, '&quot;') + '">' +
+						'<span class="dtb-tech-lookup-primary">' + primary + '</span>' +
+						'<span class="dtb-tech-lookup-secondary">' + (secondary || 'Parts library item') + '</span>' +
+					'</button>'
+				);
+			}).join('');
+			partsLookupMenu.hidden = false;
+		};
+
+		var renderSelectedParts = function() {
+			if (!selectedPartsEl || !partsLinksInput) return;
+			if (!selectedParts.length) {
+				selectedPartsEl.innerHTML = '<div class="dtb-tech-selected-empty">No part selected yet.</div>';
+				partsLinksInput.value = '[]';
+				if (primaryPartSkuEl) primaryPartSkuEl.textContent = '';
+				if (primaryPartNameEl) primaryPartNameEl.textContent = '';
+				if (primaryPartBrandEl) primaryPartBrandEl.textContent = '';
+				return;
+			}
+			selectedPartsEl.innerHTML = selectedParts.map(function(item, idx) {
+				var subtitle = [item.brand_label, item.manufacturer_sku ? ('MFG: ' + item.manufacturer_sku) : ''].filter(Boolean).join(' · ');
+				var qty = parseInt(item.quantity || 1, 10);
+				if (!qty || qty < 1) qty = 1;
+				var lineNote = item.line_note || '';
+				return (
+					'<div class="dtb-tech-selected-item" draggable="true" data-index="' + idx + '">' +
+						'<div class="dtb-tech-selected-main">' +
+							'<div class="dtb-tech-selected-title">' + (item.sku || 'No SKU') + ' — ' + (item.name || 'Part') + '</div>' +
+							'<div class="dtb-tech-selected-sub">' + (subtitle || 'Parts library item') + '</div>' +
+							'<div class="dtb-tech-selected-fields" style="display:grid;grid-template-columns:120px 1fr;gap:8px;margin-top:8px;">' +
+								'<input type="number" min="1" step="1" class="dtb-tech-part-qty" data-index="' + idx + '" value="' + qty + '" placeholder="Qty" />' +
+								'<input type="text" class="dtb-tech-part-note" data-index="' + idx + '" value="' + String(lineNote).replace(/"/g, '&quot;') + '" placeholder="Line note (installed position, condition, torque, etc.)" />' +
+							'</div>' +
+						'</div>' +
+						'<div class="dtb-tech-selected-actions">' +
+							'<button type="button" class="dtb-tech-selected-remove" data-index="' + idx + '">Remove</button>' +
+						'</div>' +
+					'</div>'
+				);
+			}).join('');
+			partsLinksInput.value = JSON.stringify(selectedParts);
+			var primary = selectedParts[0] || {};
+			if (primaryPartSkuEl) primaryPartSkuEl.textContent = primary.sku || '';
+			if (primaryPartNameEl) primaryPartNameEl.textContent = primary.name || '';
+			if (primaryPartBrandEl) primaryPartBrandEl.textContent = primary.brand_label || '';
+		};
+
+		if (partsLookupInput && partsLookupMenu && partsLinksInput && selectedPartsEl && typeof ajaxurl === 'string') {
+			try {
+				selectedParts = JSON.parse(partsLinksInput.value || '[]');
+				if (!Array.isArray(selectedParts)) selectedParts = [];
+			} catch (e) {
+				selectedParts = [];
+			}
+			renderSelectedParts();
+
+			partsLookupInput.addEventListener('input', function() {
+				var term = partsLookupInput.value.trim();
+				if (partsTimer) window.clearTimeout(partsTimer);
+				if (term.length < 2) {
+					hidePartsLookupMenu();
+					return;
+				}
+				partsTimer = window.setTimeout(function() {
+					if (partsReq && typeof partsReq.abort === 'function') {
+						partsReq.abort();
+					}
+					var body = new URLSearchParams();
+					body.set('action', 'dtb_repair_parts_lookup');
+					body.set('term', term);
+					body.set('nonce', partsLookupInput.getAttribute('data-lookup-nonce') || '');
+
+					partsReq = fetch(ajaxurl, {
+						method: 'POST',
+						headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' },
+						body: body.toString(),
+						credentials: 'same-origin'
+					})
+					.then(function(resp) { return resp.json(); })
+					.then(function(payload) {
+						var items = payload && payload.success && payload.data ? payload.data.items : [];
+						renderPartsLookupMenu(items || []);
+					})
+					.catch(function() { hidePartsLookupMenu(); });
+				}, 180);
+			});
+
+			partsLookupMenu.addEventListener('click', function(e) {
+				var btn = e.target.closest('.dtb-tech-lookup-option');
+				if (!btn) return;
+				var partId = parseInt(btn.getAttribute('data-part-id') || '0', 10);
+				var sku = btn.getAttribute('data-sku') || '';
+				var existing = selectedParts.find(function(item) {
+					return (partId > 0 && parseInt(item.part_id || 0, 10) === partId) || (sku && item.sku === sku);
+				});
+				if (!existing) {
+					selectedParts.push({
+						part_id: partId,
+						sku: sku,
+						name: btn.getAttribute('data-name') || '',
+						brand_label: btn.getAttribute('data-brand') || '',
+						manufacturer_sku: btn.getAttribute('data-manufacturer-sku') || '',
+						quantity: 1,
+						line_note: ''
+					});
+				}
+				partsLookupInput.value = '';
+				renderSelectedParts();
+				hidePartsLookupMenu();
+			});
+
+			selectedPartsEl.addEventListener('click', function(e) {
+				var removeBtn = e.target.closest('.dtb-tech-selected-remove');
+				if (!removeBtn) return;
+				var index = parseInt(removeBtn.getAttribute('data-index') || '-1', 10);
+				if (index < 0 || index >= selectedParts.length) return;
+				selectedParts.splice(index, 1);
+				renderSelectedParts();
+			});
+
+			selectedPartsEl.addEventListener('input', function(e) {
+				var qtyEl = e.target.closest('.dtb-tech-part-qty');
+				if (qtyEl) {
+					var idx = parseInt(qtyEl.getAttribute('data-index') || '-1', 10);
+					if (idx >= 0 && idx < selectedParts.length) {
+						var qtyVal = parseInt(qtyEl.value || '1', 10);
+						if (!qtyVal || qtyVal < 1) qtyVal = 1;
+						selectedParts[idx].quantity = qtyVal;
+						partsLinksInput.value = JSON.stringify(selectedParts);
+					}
+					return;
+				}
+				var noteEl = e.target.closest('.dtb-tech-part-note');
+				if (noteEl) {
+					var nidx = parseInt(noteEl.getAttribute('data-index') || '-1', 10);
+					if (nidx >= 0 && nidx < selectedParts.length) {
+						selectedParts[nidx].line_note = noteEl.value || '';
+						partsLinksInput.value = JSON.stringify(selectedParts);
+					}
+				}
+			});
+
+			var dragPartFromIndex = -1;
+			selectedPartsEl.addEventListener('dragstart', function(e) {
+				var item = e.target.closest('.dtb-tech-selected-item');
+				if (!item) return;
+				dragPartFromIndex = parseInt(item.getAttribute('data-index') || '-1', 10);
+				item.classList.add('is-dragging');
+				if (e.dataTransfer) {
+					e.dataTransfer.effectAllowed = 'move';
+					e.dataTransfer.setData('text/plain', String(dragPartFromIndex));
+				}
+			});
+			selectedPartsEl.addEventListener('dragend', function() {
+				dragPartFromIndex = -1;
+				selectedPartsEl.querySelectorAll('.dtb-tech-selected-item').forEach(function(el) {
+					el.classList.remove('is-dragging', 'is-drop-target');
+				});
+			});
+			selectedPartsEl.addEventListener('dragover', function(e) {
+				var item = e.target.closest('.dtb-tech-selected-item');
+				if (!item) return;
+				e.preventDefault();
+				selectedPartsEl.querySelectorAll('.dtb-tech-selected-item').forEach(function(el) {
+					el.classList.remove('is-drop-target');
+				});
+				item.classList.add('is-drop-target');
+			});
+			selectedPartsEl.addEventListener('drop', function(e) {
+				var item = e.target.closest('.dtb-tech-selected-item');
+				if (!item) return;
+				e.preventDefault();
+				var toIndex = parseInt(item.getAttribute('data-index') || '-1', 10);
+				if (dragPartFromIndex < 0 || toIndex < 0 || dragPartFromIndex === toIndex) return;
+				var moved = selectedParts.splice(dragPartFromIndex, 1)[0];
+				selectedParts.splice(toIndex, 0, moved);
+				renderSelectedParts();
+			});
+
+			document.addEventListener('click', function(e) {
+				if (!partsLookupMenu.contains(e.target) && e.target !== partsLookupInput) {
+					hidePartsLookupMenu();
+				}
+			});
+		}
+
 	}());
 	</script>
 	<?php

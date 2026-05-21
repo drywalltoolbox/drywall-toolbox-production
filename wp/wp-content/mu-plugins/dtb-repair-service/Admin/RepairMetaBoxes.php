@@ -220,8 +220,9 @@ function dtb_repair_save_notes_meta( int $post_id ): void {
 function dtb_repair_metabox_technician( WP_Post $post ): void {
 	wp_nonce_field( 'dtb_repair_save_technician_' . $post->ID, 'dtb_repair_technician_nonce' );
 
-	$diag     = (string) get_post_meta( $post->ID, '_repair_diag_notes', true );
-	$parts    = (string) get_post_meta( $post->ID, '_repair_parts_worklog', true );
+	$diag      = (string) get_post_meta( $post->ID, '_repair_diag_notes', true );
+	$parts     = (string) get_post_meta( $post->ID, '_repair_parts_worklog', true );
+	$order_log = trim( $diag . ( '' !== trim( $parts ) ? "\n\n" . $parts : '' ) );
 	$qa_notes = (string) get_post_meta( $post->ID, '_repair_qa_notes', true );
 	$qa_ok    = (string) get_post_meta( $post->ID, '_repair_qa_passed', true );
 	$qa_by    = (string) get_post_meta( $post->ID, '_repair_qa_signed_by', true );
@@ -287,28 +288,21 @@ function dtb_repair_metabox_technician( WP_Post $post ): void {
 			],
 		]
 	);
+	$parts_list = get_post_meta( $post->ID, '_repair_parts_links', true );
+	$parts_list = is_array( $parts_list ) ? $parts_list : [];
 
 	?>
 	<div class="dtb-tech-workspace">
 		<div class="dtb-tech-grid">
 			<section class="dtb-tech-card">
-				<h3>Diagnostic Checklist & Notes</h3>
-				<p class="dtb-tech-help">Record observations, measured values, and validation steps.</p>
+				<h3>Repair Order Log & Notes</h3>
+				<p class="dtb-tech-help">Unified technician log for diagnostics, parts work, and labor notes.</p>
 				<textarea
 					name="dtb_repair_diag_notes"
 					class="dtb-tech-textarea"
-					placeholder="Example: Motor draws 4.2A at idle; vibration starts above 60% throttle..."
-				><?php echo esc_textarea( $diag ); ?></textarea>
-			</section>
-
-			<section class="dtb-tech-card">
-				<h3>Parts & Work Log</h3>
-				<p class="dtb-tech-help">Track part numbers, quantity, labor details, and key actions performed.</p>
-				<textarea
-					name="dtb_repair_parts_worklog"
-					class="dtb-tech-textarea"
-					placeholder="Example: PN-AX21 bearing x2, replaced spindle assembly, threadlocked fasteners..."
-				><?php echo esc_textarea( $parts ); ?></textarea>
+					placeholder="Example: Motor draws 4.2A at idle. Replaced PN-AX21 bearing x2. Threadlocked fasteners and validated runout."
+				><?php echo esc_textarea( $order_log ); ?></textarea>
+				<input type="hidden" name="dtb_repair_parts_worklog" value="">
 			</section>
 		</div>
 
@@ -355,6 +349,25 @@ function dtb_repair_metabox_technician( WP_Post $post ): void {
 			</section>
 
 			<section class="dtb-tech-card">
+				<h3>Parts Reference</h3>
+				<p class="dtb-tech-help">Synced to your Parts library for fast lookup and technician selection.</p>
+				<label class="dtb-tech-label" for="dtb_repair_parts_lookup">Parts Look up</label>
+				<input id="dtb_repair_parts_lookup" type="text" class="dtb-tech-input" value="" placeholder="Search by SKU, title, or brand..." autocomplete="off" data-lookup-nonce="<?php echo esc_attr( wp_create_nonce( 'dtb_repair_parts_lookup' ) ); ?>" />
+				<div id="dtb-tech-parts-lookup-menu" class="dtb-tech-lookup-menu" role="listbox" aria-label="Parts lookup results" hidden></div>
+				<input type="hidden" id="dtb_repair_parts_links_json" name="dtb_repair_parts_links_json" value="<?php echo esc_attr( wp_json_encode( $parts_list ) ); ?>" />
+				<div class="dtb-tech-selected-wrap">
+					<div class="dtb-tech-label">Selected Parts</div>
+					<div id="dtb-tech-selected-parts" class="dtb-tech-selected-list"></div>
+					<div class="dtb-tech-sync-meta" id="dtb-tech-primary-part-details">
+						<div><strong>Primary Part SKU:</strong> <span id="dtb-tech-primary-part-sku"><?php echo esc_html( (string) get_post_meta( $post->ID, '_repair_parts_primary_sku', true ) ); ?></span></div>
+						<div><strong>Primary Part Name:</strong> <span id="dtb-tech-primary-part-name"><?php echo esc_html( (string) get_post_meta( $post->ID, '_repair_parts_primary_name', true ) ); ?></span></div>
+						<div><strong>Primary Part Brand:</strong> <span id="dtb-tech-primary-part-brand"><?php echo esc_html( (string) get_post_meta( $post->ID, '_repair_parts_primary_brand', true ) ); ?></span></div>
+					</div>
+					<p class="dtb-tech-help" style="margin-top:8px;">Selected parts are saved with this repair and can be reordered to set the primary part at top.</p>
+				</div>
+			</section>
+
+			<section class="dtb-tech-card">
 				<h3>Final QA & Sign-off</h3>
 				<p class="dtb-tech-help">Complete final checks before ready-to-ship transition.</p>
 				<label class="dtb-tech-checkbox">
@@ -375,6 +388,7 @@ function dtb_repair_metabox_technician( WP_Post $post ): void {
 
 add_action( 'save_post_dtb_repair_request', 'dtb_repair_save_technician_meta' );
 add_action( 'wp_ajax_dtb_repair_schematic_lookup', 'dtb_repair_ajax_schematic_lookup' );
+add_action( 'wp_ajax_dtb_repair_parts_lookup', 'dtb_repair_ajax_parts_lookup' );
 
 function dtb_repair_save_technician_meta( int $post_id ): void {
 	if ( ! isset( $_POST['dtb_repair_technician_nonce'] ) ) {
@@ -397,6 +411,7 @@ function dtb_repair_save_technician_meta( int $post_id ): void {
 	$qa_by    = isset( $_POST['dtb_repair_qa_signed_by'] ) ? sanitize_text_field( wp_unslash( (string) $_POST['dtb_repair_qa_signed_by'] ) ) : '';
 	$qa_at    = isset( $_POST['dtb_repair_qa_signed_at'] ) ? sanitize_text_field( wp_unslash( (string) $_POST['dtb_repair_qa_signed_at'] ) ) : '';
 
+	$parts_json = isset( $_POST['dtb_repair_parts_links_json'] ) ? wp_unslash( (string) $_POST['dtb_repair_parts_links_json'] ) : '[]';
 	$sch_cat  = isset( $_POST['dtb_repair_schematic_catalog_id'] ) ? sanitize_text_field( wp_unslash( (string) $_POST['dtb_repair_schematic_catalog_id'] ) ) : '';
 	$sch_json = isset( $_POST['dtb_repair_schematic_links_json'] ) ? wp_unslash( (string) $_POST['dtb_repair_schematic_links_json'] ) : '[]';
 	$sch_raw  = json_decode( $sch_json, true );
@@ -424,6 +439,30 @@ function dtb_repair_save_technician_meta( int $post_id ): void {
 		}
 	}
 	$sch_list = array_slice( $sch_list, 0, 20 );
+	$parts_raw  = json_decode( $parts_json, true );
+	$parts_list = [];
+	if ( is_array( $parts_raw ) ) {
+		foreach ( $parts_raw as $row ) {
+			if ( ! is_array( $row ) ) {
+				continue;
+			}
+			$part_id = absint( $row['part_id'] ?? 0 );
+			$sku = sanitize_text_field( (string) ( $row['sku'] ?? '' ) );
+			if ( $part_id <= 0 && '' === $sku ) {
+				continue;
+			}
+			$parts_list[] = [
+				'part_id'           => $part_id,
+				'sku'               => $sku,
+				'name'              => sanitize_text_field( (string) ( $row['name'] ?? '' ) ),
+				'brand_label'       => sanitize_text_field( (string) ( $row['brand_label'] ?? '' ) ),
+				'manufacturer_sku'  => sanitize_text_field( (string) ( $row['manufacturer_sku'] ?? '' ) ),
+				'quantity'          => max( 1, absint( $row['quantity'] ?? 1 ) ),
+				'line_note'         => sanitize_textarea_field( (string) ( $row['line_note'] ?? '' ) ),
+			];
+		}
+	}
+	$parts_list = array_slice( $parts_list, 0, 40 );
 
 	$primary  = $sch_list[0] ?? [
 		'schematic_id' => $sch_cat,
@@ -441,7 +480,7 @@ function dtb_repair_save_technician_meta( int $post_id ): void {
 	}
 
 	update_post_meta( $post_id, '_repair_diag_notes', $diag );
-	update_post_meta( $post_id, '_repair_parts_worklog', $parts );
+	update_post_meta( $post_id, '_repair_parts_worklog', '' );
 	update_post_meta( $post_id, '_repair_qa_notes', $qa_notes );
 	update_post_meta( $post_id, '_repair_qa_passed', $qa_ok );
 	update_post_meta( $post_id, '_repair_qa_signed_by', $qa_by );
@@ -454,6 +493,11 @@ function dtb_repair_save_technician_meta( int $post_id ): void {
 	update_post_meta( $post_id, '_repair_schematic_tool_brand', $sch_brand );
 	update_post_meta( $post_id, '_repair_schematic_tool_model', $sch_model );
 	update_post_meta( $post_id, '_repair_schematic_tool_sku', $sch_sku );
+	update_post_meta( $post_id, '_repair_parts_links', $parts_list );
+	$primary_part = $parts_list[0] ?? [];
+	update_post_meta( $post_id, '_repair_parts_primary_sku', sanitize_text_field( (string) ( $primary_part['sku'] ?? '' ) ) );
+	update_post_meta( $post_id, '_repair_parts_primary_name', sanitize_text_field( (string) ( $primary_part['name'] ?? '' ) ) );
+	update_post_meta( $post_id, '_repair_parts_primary_brand', sanitize_text_field( (string) ( $primary_part['brand_label'] ?? '' ) ) );
 	if ( '' !== $sch_brand && '' === trim( (string) get_post_meta( $post_id, '_repair_tool_brand', true ) ) ) {
 		update_post_meta( $post_id, '_repair_tool_brand', $sch_brand );
 	}
@@ -578,6 +622,64 @@ function dtb_repair_ajax_schematic_lookup(): void {
 			'version'       => $version,
 			'sku'           => $product_sku,
 			'product_name'  => $product_name,
+		];
+	}
+
+	wp_send_json_success( [ 'items' => array_values( $items ) ] );
+}
+
+/**
+ * AJAX lookup for technician parts search.
+ */
+function dtb_repair_ajax_parts_lookup(): void {
+	if ( ! current_user_can( 'dtb_manage_repairs' ) ) {
+		wp_send_json_error( [ 'message' => 'Forbidden' ], 403 );
+	}
+	check_ajax_referer( 'dtb_repair_parts_lookup', 'nonce' );
+
+	$term = isset( $_POST['term'] ) ? sanitize_text_field( wp_unslash( (string) $_POST['term'] ) ) : '';
+	$term = trim( $term );
+	if ( strlen( $term ) < 2 ) {
+		wp_send_json_success( [ 'items' => [] ] );
+	}
+
+	$query = new WP_Query(
+		[
+			'post_type'      => 'product',
+			'post_status'    => [ 'publish', 'draft', 'private', 'pending' ],
+			'posts_per_page' => 20,
+			'fields'         => 'ids',
+			's'              => $term,
+			'meta_query'     => [
+				[
+					'key'     => '_dtb_is_parts',
+					'value'   => '1',
+					'compare' => '=',
+				],
+			],
+		]
+	);
+
+	$items = [];
+	foreach ( (array) $query->posts as $product_id ) {
+		$product_id = (int) $product_id;
+		$product    = function_exists( 'wc_get_product' ) ? wc_get_product( $product_id ) : null;
+		$sku        = $product ? (string) $product->get_sku() : (string) get_post_meta( $product_id, '_sku', true );
+		$name       = get_the_title( $product_id );
+		$brand      = (string) get_post_meta( $product_id, '_dtb_brand_label', true );
+		$manu_sku   = (string) get_post_meta( $product_id, '_dtb_manufacturer_sku', true );
+		$haystack   = strtolower( trim( $sku . ' ' . $name . ' ' . $brand . ' ' . $manu_sku ) );
+
+		if ( false === strpos( $haystack, strtolower( $term ) ) ) {
+			continue;
+		}
+
+		$items[] = [
+			'part_id'           => $product_id,
+			'sku'               => $sku,
+			'name'              => $name,
+			'brand_label'       => $brand,
+			'manufacturer_sku'  => $manu_sku,
 		];
 	}
 

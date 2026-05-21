@@ -263,6 +263,90 @@ function dtb_ajax_schematics_import_csv() {
 	);
 }
 
+// ── AJAX: Export schematics library (CSV/JSON) ─────────────────────────────
+
+add_action( 'wp_ajax_dtb_schematics_export', 'dtb_ajax_schematics_export' );
+function dtb_ajax_schematics_export() {
+	check_ajax_referer( 'dtb_schematics_nonce', 'nonce' );
+	if ( ! current_user_can( 'manage_options' ) ) {
+		wp_send_json_error( [], 403 );
+	}
+
+	$format = sanitize_key( $_POST['format'] ?? 'csv' );
+	if ( ! in_array( $format, [ 'csv', 'json' ], true ) ) {
+		$format = 'csv';
+	}
+
+	$ids = get_posts(
+		[
+			'post_type'      => 'attachment',
+			'post_status'    => 'inherit',
+			'posts_per_page' => -1,
+			'fields'         => 'ids',
+			'meta_query'     => [
+				[
+					'relation' => 'OR',
+					[
+						'key'     => '_dtb_is_schematic',
+						'value'   => '1',
+						'compare' => '=',
+					],
+					[
+						'key'     => '_dtb_schematic_id',
+						'value'   => '',
+						'compare' => '!=',
+					],
+				],
+			],
+		]
+	);
+
+	$rows = [];
+	foreach ( (array) $ids as $id ) {
+		$id      = (int) $id;
+		$rows[] = [
+			'attachment_id' => $id,
+			'schematic_id'  => (string) get_post_meta( $id, '_dtb_schematic_id', true ),
+			'brand'         => (string) get_post_meta( $id, '_dtb_schematic_brand', true ),
+			'model_number'  => (string) get_post_meta( $id, '_dtb_schematic_model_number', true ),
+			'model_name'    => (string) get_post_meta( $id, '_dtb_schematic_model_name', true ),
+			'part_count'    => (int) get_post_meta( $id, '_dtb_schematic_part_count', true ),
+			'notes'         => (string) get_post_meta( $id, '_dtb_schematic_notes', true ),
+			'product_ids'   => implode( ',', dtb_schematic_normalize_product_ids( get_post_meta( $id, '_dtb_schematic_product_ids', true ) ) ),
+			'file_url'      => (string) wp_get_attachment_url( $id ),
+		];
+	}
+
+	if ( 'json' === $format ) {
+		wp_send_json_success(
+			[
+				'filename' => 'dtb-schematics-export-' . gmdate( 'Ymd-His' ) . '.json',
+				'mime'     => 'application/json;charset=utf-8',
+				'content'  => wp_json_encode( $rows, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES ),
+			]
+		);
+	}
+
+	$headers = [ 'attachment_id', 'schematic_id', 'brand', 'model_number', 'model_name', 'part_count', 'notes', 'product_ids', 'file_url' ];
+	$csv     = implode( ',', $headers ) . "\n";
+	foreach ( $rows as $row ) {
+		$line = [];
+		foreach ( $headers as $h ) {
+			$val    = (string) ( $row[ $h ] ?? '' );
+			$line[] = '"' . str_replace( '"', '""', $val ) . '"';
+		}
+		$csv .= implode( ',', $line ) . "\n";
+	}
+
+	wp_send_json_success(
+		[
+			'filename' => 'dtb-schematics-export-' . gmdate( 'Ymd-His' ) . '.csv',
+			'mime'     => 'text/csv;charset=utf-8',
+			'content'  => $csv,
+		]
+	);
+}
+
 // ── Page Render ───────────────────────────────────────────────────────────────
 
 

@@ -14,8 +14,8 @@ if ( ! dtb_is_admin_or_ajax_request() ) {
 function dtb_register_parts_manager_submenu(): void {
 	add_submenu_page(
 		'dtb-toolbox',
-		__( 'Parts Manager', 'dtb' ),
-		__( 'Parts Manager', 'dtb' ),
+		__( 'Parts', 'dtb' ),
+		__( 'Parts', 'dtb' ),
 		'manage_woocommerce',
 		'dtb-parts-manager',
 		'dtb_parts_manager_render_page'
@@ -33,7 +33,7 @@ function dtb_parts_manager_render_page(): void {
 	$brands = defined( 'DTB_BRANDS' ) && is_array( DTB_BRANDS ) ? DTB_BRANDS : [];
 	?>
 	<div class="wrap dtb-parts-manager">
-		<h1 class="wp-heading-inline">Parts Manager</h1>
+		<h1 class="wp-heading-inline">Parts</h1>
 		<hr class="wp-header-end">
 
 		<style>
@@ -75,6 +75,8 @@ function dtb_parts_manager_render_page(): void {
 				</select>
 				<button id="dtb-pm-btn-search" class="dtb-pm-btn dtb-pm-btn-secondary">Search</button>
 				<button id="dtb-pm-btn-add" class="dtb-pm-btn dtb-pm-btn-primary">Add Part</button>
+				<button id="dtb-pm-export-csv" class="dtb-pm-btn dtb-pm-btn-secondary">Export CSV</button>
+				<button id="dtb-pm-export-json" class="dtb-pm-btn dtb-pm-btn-secondary">Export JSON</button>
 				<span id="dtb-pm-count" style="margin-left:auto;color:#787c82;"></span>
 			</div>
 			<div id="dtb-pm-loading" style="color:#787c82;">Loading parts...</div>
@@ -86,6 +88,18 @@ function dtb_parts_manager_render_page(): void {
 			</table>
 			<div id="dtb-pm-empty" style="display:none;color:#787c82;padding:10px 0;">No parts found.</div>
 			<div id="dtb-pm-pagination" style="display:flex;gap:8px;align-items:center;margin-top:12px;"></div>
+		</div>
+
+		<div class="dtb-pm-card">
+			<h2 style="margin-top:0;">Import Parts</h2>
+			<p style="margin-top:0;color:#787c82;">CSV required columns: <code>sku</code>, <code>title</code>. Optional: <code>id</code>, <code>brand_label</code>, <code>manufacturer_sku</code>, <code>price</code>, <code>status</code>, <code>description</code>.</p>
+			<input id="dtb-pm-import-file" type="file" accept=".csv,text/csv">
+			<div style="margin-top:10px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+				<button id="dtb-pm-import" class="dtb-pm-btn dtb-pm-btn-primary">Import CSV</button>
+				<span id="dtb-pm-import-spinner" style="display:none;"><span class="spinner is-active" style="float:none;margin:0;"></span></span>
+			</div>
+			<div id="dtb-pm-import-msg" style="margin-top:10px;font-size:13px;"></div>
+			<pre id="dtb-pm-import-errors" style="display:none;margin-top:10px;background:#fff8f8;border:1px solid #f0c0c1;padding:10px;border-radius:4px;white-space:pre-wrap;color:#8a2424;"></pre>
 		</div>
 	</div>
 
@@ -119,6 +133,17 @@ function dtb_parts_manager_render_page(): void {
 		var pages = 1;
 
 		function esc(v){ return $('<div>').text(v || '').html(); }
+		function downloadFile(content, mime, filename){
+			var blob = new Blob([content || ''], { type: mime || 'text/plain;charset=utf-8' });
+			var url = URL.createObjectURL(blob);
+			var a = document.createElement('a');
+			a.href = url;
+			a.download = filename || 'download.txt';
+			document.body.appendChild(a);
+			a.click();
+			document.body.removeChild(a);
+			URL.revokeObjectURL(url);
+		}
 
 		function loadParts(p){
 			page = p || 1;
@@ -250,6 +275,57 @@ function dtb_parts_manager_render_page(): void {
 				}
 				closeModal();
 				loadParts(1);
+			});
+		});
+
+		$('#dtb-pm-import').on('click', function(){
+			var fileInput = document.getElementById('dtb-pm-import-file');
+			if(!fileInput || !fileInput.files || !fileInput.files.length){
+				alert('Please select a CSV file first.');
+				return;
+			}
+			var fd = new FormData();
+			fd.append('action', 'dtb_parts_import_csv');
+			fd.append('nonce', nonce);
+			fd.append('file', fileInput.files[0]);
+			$('#dtb-pm-import-spinner').show();
+			$('#dtb-pm-import-msg').text('');
+			$('#dtb-pm-import-errors').hide().text('');
+			$.ajax({
+				url: ajaxurl,
+				type: 'POST',
+				data: fd,
+				processData: false,
+				contentType: false
+			}).done(function(res){
+				$('#dtb-pm-import-spinner').hide();
+				if(!res || !res.success){
+					$('#dtb-pm-import-msg').text('Import failed.').css('color','#d63638');
+					return;
+				}
+				var d = res.data || {};
+				$('#dtb-pm-import-msg').text('✓ ' + (d.message || 'Import completed.')).css('color','#1a7f37');
+				if(d.errors && d.errors.length){
+					$('#dtb-pm-import-errors').show().text(d.errors.join('\n'));
+				}
+				loadParts(1);
+			}).fail(function(){
+				$('#dtb-pm-import-spinner').hide();
+				$('#dtb-pm-import-msg').text('Import failed.').css('color','#d63638');
+			});
+		});
+
+		$('#dtb-pm-export-csv').on('click', function(){
+			$.post(ajaxurl, { action:'dtb_parts_export', nonce:nonce, format:'csv' }, function(res){
+				if(!res || !res.success){ alert('Export failed.'); return; }
+				downloadFile((res.data || {}).content, (res.data || {}).mime, (res.data || {}).filename);
+			});
+		});
+
+		$('#dtb-pm-export-json').on('click', function(){
+			$.post(ajaxurl, { action:'dtb_parts_export', nonce:nonce, format:'json' }, function(res){
+				if(!res || !res.success){ alert('Export failed.'); return; }
+				downloadFile((res.data || {}).content, (res.data || {}).mime, (res.data || {}).filename);
 			});
 		});
 

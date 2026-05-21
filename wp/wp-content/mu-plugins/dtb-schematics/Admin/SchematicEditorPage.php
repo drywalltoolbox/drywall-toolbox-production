@@ -203,6 +203,14 @@ function dtb_schematics_render_page() {
 					<span id="dtb-audit-spinner" style="display:none;"><span class="spinner is-active" style="float:none;margin:0;"></span></span>
 				</div>
 				<pre id="dtb-audit-output" style="display:none;margin-top:12px;background:#f6f7f7;border:1px solid #dcdcde;padding:10px;border-radius:4px;white-space:pre-wrap;"></pre>
+				<div style="margin-top:10px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+					<button id="dtb-export-csv" class="dtb-btn dtb-btn-secondary">
+						<span class="dashicons dashicons-download" style="font-size:15px;"></span> Export CSV
+					</button>
+					<button id="dtb-export-json" class="dtb-btn dtb-btn-secondary">
+						<span class="dashicons dashicons-download" style="font-size:15px;"></span> Export JSON
+					</button>
+				</div>
 			</div>
 
 			<div class="dtb-card" style="max-width:760px;">
@@ -280,6 +288,17 @@ function dtb_schematics_render_page() {
 		var nonce  = <?php echo wp_json_encode( $nonce ); ?>;
 		var paged  = 1;
 		var totalPages = 1;
+		function downloadFile(content, mime, filename) {
+			var blob = new Blob([content || ''], { type: mime || 'text/plain;charset=utf-8' });
+			var url = URL.createObjectURL(blob);
+			var a = document.createElement('a');
+			a.href = url;
+			a.download = filename || 'download.txt';
+			document.body.appendChild(a);
+			a.click();
+			document.body.removeChild(a);
+			URL.revokeObjectURL(url);
+		}
 
 		// ── Tabs ──────────────────────────────────────────────────────────────
 
@@ -624,6 +643,20 @@ function dtb_schematics_render_page() {
 				$btn.prop('disabled', false);
 				$('#dtb-import-spinner').hide();
 				$('#dtb-import-msg').text('Import failed.').css('color', '#d63638');
+			});
+		});
+
+		$('#dtb-export-csv').on('click', function(){
+			$.post(ajaxurl, { action: 'dtb_schematics_export', nonce: nonce, format: 'csv' }, function(res){
+				if (!res || !res.success) { alert('Export failed.'); return; }
+				downloadFile((res.data || {}).content, (res.data || {}).mime, (res.data || {}).filename);
+			});
+		});
+
+		$('#dtb-export-json').on('click', function(){
+			$.post(ajaxurl, { action: 'dtb_schematics_export', nonce: nonce, format: 'json' }, function(res){
+				if (!res || !res.success) { alert('Export failed.'); return; }
+				downloadFile((res.data || {}).content, (res.data || {}).mime, (res.data || {}).filename);
 			});
 		});
 
