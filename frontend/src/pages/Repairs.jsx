@@ -797,6 +797,13 @@ export default function Repairs() {
     setErrors((prev) => { const n = { ...prev }; delete n.serviceType; return n; });
   }
 
+  // Tool selection mode — track whether each level is in freetext (custom) mode.
+  // These are separate from formData so the actual string values in toolBrand /
+  // toolCategory / toolModel are always the clean submitted values.
+  const [brandIsCustom,    setBrandIsCustom]    = useState(false);
+  const [categoryIsCustom, setCategoryIsCustom] = useState(false);
+  const [modelIsCustom,    setModelIsCustom]    = useState(false);
+
   // Submission state
   const [submitting, setSubmitting]   = useState(false);
   const [submitError, setSubmitError] = useState('');
@@ -864,12 +871,13 @@ export default function Repairs() {
       if (!formData.phone.trim())                errs.phone       = 'Phone number is required.';
     }
     if (s === 2) {
-      if (!formData.toolBrand)                   errs.toolBrand    = 'Please select a brand.';
-      if (formData.toolBrand && formData.toolBrand !== 'Other') {
-        if (!formData.toolCategory)              errs.toolCategory = 'Please select a tool category.';
-        if (formData.toolCategory && !formData.toolModel)
-                                                 errs.toolModel    = 'Please select the tool model.';
-      }
+      if (!formData.toolBrand.trim())
+        errs.toolBrand = brandIsCustom ? 'Please enter the brand name.' : 'Please select a brand.';
+      if (formData.toolBrand.trim() && !formData.toolCategory.trim())
+        errs.toolCategory = (brandIsCustom || categoryIsCustom) ? 'Please enter the tool type / category.' : 'Please select a tool category.';
+      // Model required only when navigating fully through the catalog dropdowns
+      if (!brandIsCustom && !categoryIsCustom && !modelIsCustom && formData.toolCategory && !formData.toolModel)
+        errs.toolModel = 'Please select the tool model.';
     }
     if (s === 3) {
       if (!formData.serviceType)                 errs.serviceType  = 'Please select a service type.';
@@ -958,6 +966,9 @@ export default function Repairs() {
     setOrderResult(null);
     setSubmitError('');
     setRates([]);
+    setBrandIsCustom(false);
+    setCategoryIsCustom(false);
+    setModelIsCustom(false);
   }
 
   /* ── shared input style ── */
@@ -1336,95 +1347,205 @@ export default function Repairs() {
                       Identify the tool that needs service so we can prepare the right technician and parts.
                     </p>
 
-                    {/* Brand */}
+                    {/* ── Brand ── */}
                     <Field label="Brand" required>
-                      <select
-                        className={inputCls}
-                        style={{ cursor: 'pointer' }}
-                        value={formData.toolBrand}
-                        onChange={(e) => {
-                          setFormData((prev) => ({
-                            ...prev,
-                            toolBrand: e.target.value,
-                            toolCategory: '',
-                            toolModel: '',
-                          }));
-                          clearErr('toolBrand');
-                          clearErr('toolCategory');
-                          clearErr('toolModel');
-                        }}
-                      >
-                        <option value="" disabled>Select a brand…</option>
-                        {SUPPORTED_BRANDS.map((b) => (
-                          <option key={b} value={b}>{b}</option>
-                        ))}
-                        <option value="Other">Other / Not Listed</option>
-                      </select>
+                      {brandIsCustom ? (
+                        <>
+                          <input
+                            type="text"
+                            className={inputCls}
+                            placeholder="e.g. Renegade, Ames, Custom Brand…"
+                            value={formData.toolBrand}
+                            onChange={(e) => { set('toolBrand')(e); clearErr('toolBrand'); }}
+                            autoFocus
+                          />
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setBrandIsCustom(false);
+                              setCategoryIsCustom(false);
+                              setModelIsCustom(false);
+                              setFormData((prev) => ({ ...prev, toolBrand: '', toolCategory: '', toolModel: '' }));
+                              clearErr('toolBrand'); clearErr('toolCategory'); clearErr('toolModel');
+                            }}
+                            style={{ background: 'none', border: 'none', padding: '4px 0 0', cursor: 'pointer', fontSize: '0.78rem', color: 'var(--primary-600)', textDecoration: 'underline' }}
+                          >
+                            ← Back to brand list
+                          </button>
+                        </>
+                      ) : (
+                        <select
+                          className={inputCls}
+                          style={{ cursor: 'pointer' }}
+                          value={formData.toolBrand}
+                          onChange={(e) => {
+                            const val = e.target.value;
+                            if (val === '__other__') {
+                              setBrandIsCustom(true);
+                              setCategoryIsCustom(false);
+                              setModelIsCustom(false);
+                              setFormData((prev) => ({ ...prev, toolBrand: '', toolCategory: '', toolModel: '' }));
+                            } else {
+                              setBrandIsCustom(false);
+                              setCategoryIsCustom(false);
+                              setModelIsCustom(false);
+                              setFormData((prev) => ({ ...prev, toolBrand: val, toolCategory: '', toolModel: '' }));
+                            }
+                            clearErr('toolBrand'); clearErr('toolCategory'); clearErr('toolModel');
+                          }}
+                        >
+                          <option value="" disabled>Select a brand…</option>
+                          {SUPPORTED_BRANDS.map((b) => (
+                            <option key={b} value={b}>{b}</option>
+                          ))}
+                          <option value="__other__">Other / Not Listed</option>
+                        </select>
+                      )}
                       {errors.toolBrand && <p style={errStyle}>{errors.toolBrand}</p>}
                     </Field>
 
-                    {/* Structured category + model for known brands */}
-                    {formData.toolBrand && formData.toolBrand !== 'Other' && (
+                    {/* ── Category + Model — catalog path (known brand) ── */}
+                    {!brandIsCustom && formData.toolBrand && (
                       <>
+                        {/* Category */}
                         <Field label="Tool Category" required>
-                          <select
-                            className={inputCls}
-                            style={{ cursor: 'pointer' }}
-                            value={formData.toolCategory}
-                            onChange={(e) => {
-                              setFormData((prev) => ({
-                                ...prev,
-                                toolCategory: e.target.value,
-                                toolModel: '',
-                              }));
-                              clearErr('toolCategory');
-                              clearErr('toolModel');
-                            }}
-                          >
-                            <option value="" disabled>Select a tool category…</option>
-                            {getCategoriesForBrand(formData.toolBrand).map((cat) => (
-                              <option key={cat} value={cat}>{cat}</option>
-                            ))}
-                          </select>
+                          {categoryIsCustom ? (
+                            <>
+                              <input
+                                type="text"
+                                className={inputCls}
+                                placeholder="e.g. Flat Box, Auto Taper, Pump…"
+                                value={formData.toolCategory}
+                                onChange={(e) => { set('toolCategory')(e); clearErr('toolCategory'); }}
+                                autoFocus
+                              />
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setCategoryIsCustom(false);
+                                  setModelIsCustom(false);
+                                  setFormData((prev) => ({ ...prev, toolCategory: '', toolModel: '' }));
+                                  clearErr('toolCategory'); clearErr('toolModel');
+                                }}
+                                style={{ background: 'none', border: 'none', padding: '4px 0 0', cursor: 'pointer', fontSize: '0.78rem', color: 'var(--primary-600)', textDecoration: 'underline' }}
+                              >
+                                ← Back to category list
+                              </button>
+                            </>
+                          ) : (
+                            <select
+                              className={inputCls}
+                              style={{ cursor: 'pointer' }}
+                              value={formData.toolCategory}
+                              onChange={(e) => {
+                                const val = e.target.value;
+                                if (val === '__other__') {
+                                  setCategoryIsCustom(true);
+                                  setModelIsCustom(false);
+                                  setFormData((prev) => ({ ...prev, toolCategory: '', toolModel: '' }));
+                                } else {
+                                  setCategoryIsCustom(false);
+                                  setModelIsCustom(false);
+                                  setFormData((prev) => ({ ...prev, toolCategory: val, toolModel: '' }));
+                                }
+                                clearErr('toolCategory'); clearErr('toolModel');
+                              }}
+                            >
+                              <option value="" disabled>Select a tool category…</option>
+                              {getCategoriesForBrand(formData.toolBrand).map((cat) => (
+                                <option key={cat} value={cat}>{cat}</option>
+                              ))}
+                              <option value="__other__">Other / Not Listed</option>
+                            </select>
+                          )}
                           {errors.toolCategory && <p style={errStyle}>{errors.toolCategory}</p>}
                         </Field>
 
-                        <Field label="Tool Model" required>
-                          <select
-                            className={inputCls}
-                            style={{ cursor: 'pointer' }}
-                            value={formData.toolModel}
-                            disabled={!formData.toolCategory}
-                            onChange={(e) => { set('toolModel')(e); clearErr('toolModel'); }}
-                          >
-                            <option value="" disabled>
-                              {formData.toolCategory ? 'Select the specific model…' : 'Select a category first…'}
-                            </option>
-                            {getModelsForBrandCategory(formData.toolBrand, formData.toolCategory).map((model) => (
-                              <option key={model.value} value={model.value}>{model.label}</option>
-                            ))}
-                          </select>
-                          {errors.toolModel && <p style={errStyle}>{errors.toolModel}</p>}
-                        </Field>
+                        {/* Model — catalog dropdown when category is known */}
+                        {!categoryIsCustom && formData.toolCategory && (
+                          <Field label="Tool Model" required>
+                            {modelIsCustom ? (
+                              <>
+                                <input
+                                  type="text"
+                                  className={inputCls}
+                                  placeholder="e.g. model name, number, or description"
+                                  value={formData.toolModel}
+                                  onChange={(e) => { set('toolModel')(e); clearErr('toolModel'); }}
+                                  autoFocus
+                                />
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setModelIsCustom(false);
+                                    setFormData((prev) => ({ ...prev, toolModel: '' }));
+                                    clearErr('toolModel');
+                                  }}
+                                  style={{ background: 'none', border: 'none', padding: '4px 0 0', cursor: 'pointer', fontSize: '0.78rem', color: 'var(--primary-600)', textDecoration: 'underline' }}
+                                >
+                                  ← Back to model list
+                                </button>
+                              </>
+                            ) : (
+                              <select
+                                className={inputCls}
+                                style={{ cursor: 'pointer' }}
+                                value={formData.toolModel}
+                                onChange={(e) => {
+                                  const val = e.target.value;
+                                  if (val === '__other__') {
+                                    setModelIsCustom(true);
+                                    setFormData((prev) => ({ ...prev, toolModel: '' }));
+                                  } else {
+                                    setModelIsCustom(false);
+                                    setFormData((prev) => ({ ...prev, toolModel: val }));
+                                  }
+                                  clearErr('toolModel');
+                                }}
+                              >
+                                <option value="" disabled>Select the specific model…</option>
+                                {getModelsForBrandCategory(formData.toolBrand, formData.toolCategory).map((model) => (
+                                  <option key={model.value} value={model.value}>{model.label}</option>
+                                ))}
+                                <option value="__other__">Other / Not Listed</option>
+                              </select>
+                            )}
+                            {errors.toolModel && <p style={errStyle}>{errors.toolModel}</p>}
+                          </Field>
+                        )}
+
+                        {/* Model freetext when category is custom — shown inline below category input */}
+                        {categoryIsCustom && (
+                          <Field label="Tool Model / Name" hint="Optional — model number, size, or description">
+                            <input
+                              type="text"
+                              className={inputCls}
+                              placeholder="e.g. ProBox 10-inch, Model #XB-200"
+                              value={formData.toolModel}
+                              onChange={(e) => { set('toolModel')(e); clearErr('toolModel'); }}
+                            />
+                          </Field>
+                        )}
                       </>
                     )}
 
-                    {/* Freeform fields for "Other" brand */}
-                    {formData.toolBrand === 'Other' && (
+                    {/* ── Category + Model — freetext path (custom brand) ── */}
+                    {brandIsCustom && (
                       <div style={{
                         display: 'grid',
                         gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
                         gap: '0 20px',
                       }}>
-                        <Field label="Tool Type / Category" hint="e.g. Flat Box, Taper, Pump…">
+                        <Field label="Tool Type / Category" required hint="e.g. Flat Box, Taper, Pump…">
                           <input
                             type="text" className={inputCls}
                             placeholder="e.g. Finishing Box"
                             value={formData.toolCategory}
                             onChange={(e) => { set('toolCategory')(e); clearErr('toolCategory'); }}
                           />
+                          {errors.toolCategory && <p style={errStyle}>{errors.toolCategory}</p>}
                         </Field>
-                        <Field label="Tool Model / Name" hint="e.g. make, model number, or description">
+                        <Field label="Tool Model / Name" hint="Model number, size, or description">
                           <input
                             type="text" className={inputCls}
                             placeholder="e.g. ProBox 10-inch"
