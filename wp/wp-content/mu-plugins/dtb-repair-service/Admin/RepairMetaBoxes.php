@@ -15,8 +15,7 @@ add_action( 'add_meta_boxes', 'dtb_repair_admin_add_metaboxes' );
 function dtb_repair_admin_add_metaboxes(): void {
 	$boxes = [
 		'dtb-repair-command-center' => [ __( 'Repair Command Center', 'drywall-toolbox' ), 'dtb_repair_metabox_command_center', 'normal', 'high' ],
-		'dtb-repair-tool'           => [ __( 'Tool Details', 'drywall-toolbox' ), 'dtb_repair_metabox_tool', 'normal', 'high' ],
-		'dtb-repair-issue'          => [ __( 'Issue Description', 'drywall-toolbox' ), 'dtb_repair_metabox_issue', 'normal', 'high' ],
+		'dtb-repair-order-details'  => [ __( 'Repair Order Details', 'drywall-toolbox' ), 'dtb_repair_metabox_order_details', 'normal', 'high' ],
 		'dtb-repair-technician'     => [ __( 'Technician Workspace', 'drywall-toolbox' ), 'dtb_repair_metabox_technician', 'normal', 'high' ],
 		'dtb-repair-timeline'       => [ __( 'Repair Timeline', 'drywall-toolbox' ), 'dtb_repair_metabox_timeline', 'normal', 'default' ],
 		'dtb-repair-notes'          => [ __( 'Internal Notes', 'drywall-toolbox' ), 'dtb_repair_metabox_notes', 'normal', 'default' ],
@@ -94,6 +93,46 @@ function dtb_repair_metabox_issue( WP_Post $post ): void {
 		echo '</div>';
 	}
 	echo '</div>';
+}
+
+// ---- Metabox: Repair Order Details (Unified) -------------------------------
+
+function dtb_repair_metabox_order_details( WP_Post $post ): void {
+	$fields = [
+		'_repair_tool_brand'   => __( 'Brand', 'drywall-toolbox' ),
+		'_repair_model'        => __( 'Model', 'drywall-toolbox' ),
+		'_repair_serial'       => __( 'Serial Number', 'drywall-toolbox' ),
+		'_repair_service_tier' => __( 'Service Tier', 'drywall-toolbox' ),
+		'_repair_wc_order_id'  => __( 'Woo Order ID', 'drywall-toolbox' ),
+	];
+	$issue  = wp_kses_post( (string) get_post_meta( $post->ID, '_repair_issue', true ) );
+	$images = json_decode( (string) get_post_meta( $post->ID, '_repair_images', true ), true );
+
+	echo '<div class="dtb-repair-metabox"><table>';
+	foreach ( $fields as $key => $label ) {
+		$value = esc_html( (string) get_post_meta( $post->ID, $key, true ) );
+		echo '<tr><th>' . esc_html( $label ) . '</th><td>' . $value . '</td></tr>';
+	}
+	echo '</table>';
+
+	echo '<div style="margin-top:14px;border-top:1px solid #eef2f7;padding-top:12px;">';
+	echo '<div style="font-size:11px;font-weight:700;color:#64748b;letter-spacing:.45px;text-transform:uppercase;margin-bottom:6px;">'
+		. esc_html__( 'Issue Description', 'drywall-toolbox' ) . '</div>';
+	echo '<p style="margin:0 0 10px;color:#111827;font-size:13px;line-height:1.5;">' . wp_kses_post( $issue ) . '</p>';
+
+	if ( ! empty( $images ) && is_array( $images ) ) {
+		echo '<p style="margin:0 0 6px;"><strong>' . esc_html__( 'Attached Images:', 'drywall-toolbox' ) . '</strong></p><div style="display:flex;gap:8px;flex-wrap:wrap;">';
+		foreach ( $images as $att_id ) {
+			$att_id = absint( $att_id );
+			$thumb  = wp_get_attachment_image( $att_id, [ 80, 80 ] );
+			$url    = wp_get_attachment_url( $att_id );
+			if ( $thumb && $url ) {
+				echo '<a href="' . esc_url( $url ) . '" target="_blank" rel="noopener noreferrer">' . $thumb . '</a>';
+			}
+		}
+		echo '</div>';
+	}
+	echo '</div></div>';
 }
 
 // ---- Metabox: Timeline -------------------------------------------------------
@@ -188,11 +227,22 @@ function dtb_repair_metabox_technician( WP_Post $post ): void {
 	$qa_by    = (string) get_post_meta( $post->ID, '_repair_qa_signed_by', true );
 	$qa_at    = (string) get_post_meta( $post->ID, '_repair_qa_signed_at', true );
 
-	$sch_url  = (string) get_post_meta( $post->ID, '_repair_schematic_url', true );
-	$sch_rev  = (string) get_post_meta( $post->ID, '_repair_schematic_revision', true );
-	$sch_ref  = (string) get_post_meta( $post->ID, '_repair_schematic_ref', true );
 	$sch_cat  = (string) get_post_meta( $post->ID, '_repair_schematic_catalog_id', true );
 	$sch_meta = function_exists( 'dtb_repair_get_schematic_sync_snapshot' ) ? dtb_repair_get_schematic_sync_snapshot( $post->ID ) : [];
+	$sch_list = get_post_meta( $post->ID, '_repair_schematic_links', true );
+	$sch_list = is_array( $sch_list ) ? $sch_list : [];
+	if ( empty( $sch_list ) && '' !== trim( $sch_cat ) ) {
+		$fallback_url = (string) get_post_meta( $post->ID, '_repair_schematic_url', true );
+		$fallback_rev = (string) get_post_meta( $post->ID, '_repair_schematic_revision', true );
+		$sch_list[]   = [
+			'schematic_id' => $sch_cat,
+			'url'          => $fallback_url,
+			'version'      => $fallback_rev,
+			'brand'        => '',
+			'model_number' => '',
+			'model_name'   => '',
+		];
+	}
 
 	$model_hint = sanitize_text_field( (string) get_post_meta( $post->ID, '_repair_model', true ) );
 	$brand_hint = sanitize_text_field( (string) get_post_meta( $post->ID, '_repair_tool_brand', true ) );
@@ -258,8 +308,10 @@ function dtb_repair_metabox_technician( WP_Post $post ): void {
 			<section class="dtb-tech-card">
 				<h3>Schematic Reference</h3>
 				<p class="dtb-tech-help">Synced against the same schematics catalog powering your frontend Schematics workflow.</p>
-				<label class="dtb-tech-label" for="dtb_repair_schematic_catalog_id">Catalog Schematic ID</label>
-				<input id="dtb_repair_schematic_catalog_id" name="dtb_repair_schematic_catalog_id" type="text" class="dtb-tech-input" list="dtb_repair_schematic_catalog_list" value="<?php echo esc_attr( $sch_cat ); ?>" placeholder="ex: asgard-ez12a-main" />
+				<label class="dtb-tech-label" for="dtb_repair_schematic_catalog_id">Schematic Look up</label>
+				<input id="dtb_repair_schematic_catalog_id" name="dtb_repair_schematic_catalog_id" type="text" class="dtb-tech-input" value="" placeholder="Search by schematic ID, brand, or model..." autocomplete="off" data-lookup-nonce="<?php echo esc_attr( wp_create_nonce( 'dtb_repair_schematic_lookup' ) ); ?>" />
+				<div id="dtb-tech-schematic-lookup-menu" class="dtb-tech-lookup-menu" role="listbox" aria-label="Schematic lookup results" hidden></div>
+				<input type="hidden" id="dtb_repair_schematic_links_json" name="dtb_repair_schematic_links_json" value="<?php echo esc_attr( wp_json_encode( $sch_list ) ); ?>" />
 				<datalist id="dtb_repair_schematic_catalog_list">
 					<?php foreach ( (array) $catalog_seed as $att_id ) :
 						$sid = (string) get_post_meta( (int) $att_id, '_dtb_schematic_id', true );
@@ -272,25 +324,16 @@ function dtb_repair_metabox_technician( WP_Post $post ): void {
 						<option value="<?php echo esc_attr( $sid ); ?>"><?php echo esc_html( trim( $sbrand . ' ' . $smodel ) ); ?></option>
 					<?php endforeach; ?>
 				</datalist>
-				<label class="dtb-tech-label" for="dtb_repair_schematic_url">Official Schematic URL</label>
-				<input id="dtb_repair_schematic_url" name="dtb_repair_schematic_url" type="url" class="dtb-tech-input" value="<?php echo esc_attr( $sch_url ); ?>" placeholder="https://..." />
-
-				<div class="dtb-tech-row">
-					<div>
-						<label class="dtb-tech-label" for="dtb_repair_schematic_revision">Revision / Version</label>
-						<input id="dtb_repair_schematic_revision" name="dtb_repair_schematic_revision" type="text" class="dtb-tech-input" value="<?php echo esc_attr( $sch_rev ); ?>" placeholder="Rev B, 2026.05" />
+				<div class="dtb-tech-selected-wrap">
+					<div class="dtb-tech-label">Selected Schematics</div>
+					<div id="dtb-tech-selected-schematics" class="dtb-tech-selected-list"></div>
+					<div class="dtb-tech-sync-meta" id="dtb-tech-primary-details">
+						<div><strong>Synced Brand:</strong> <span id="dtb-tech-primary-brand"><?php echo esc_html( (string) get_post_meta( $post->ID, '_repair_schematic_tool_brand', true ) ); ?></span></div>
+						<div><strong>Synced Model:</strong> <span id="dtb-tech-primary-model"><?php echo esc_html( (string) get_post_meta( $post->ID, '_repair_schematic_tool_model', true ) ); ?></span></div>
+						<div><strong>Synced SKU:</strong> <span id="dtb-tech-primary-sku"><?php echo esc_html( (string) get_post_meta( $post->ID, '_repair_schematic_tool_sku', true ) ); ?></span></div>
 					</div>
-					<div>
-						<label class="dtb-tech-label" for="dtb_repair_schematic_ref">Reference ID</label>
-						<input id="dtb_repair_schematic_ref" name="dtb_repair_schematic_ref" type="text" class="dtb-tech-input" value="<?php echo esc_attr( $sch_ref ); ?>" placeholder="Doc-1234 / SKU diagram code" />
-					</div>
+					<p class="dtb-tech-help" style="margin-top:8px;">Selections are saved with this repair and used as technician reference.</p>
 				</div>
-
-				<?php if ( '' !== trim( $sch_url ) ) : ?>
-					<p style="margin-top:10px;">
-						<a class="button" href="<?php echo esc_url( $sch_url ); ?>" target="_blank" rel="noopener noreferrer">Open Schematic</a>
-					</p>
-				<?php endif; ?>
 
 				<?php if ( ! empty( $sch_meta ) ) : ?>
 					<div class="dtb-tech-sync-meta">
@@ -323,6 +366,7 @@ function dtb_repair_metabox_technician( WP_Post $post ): void {
 }
 
 add_action( 'save_post_dtb_repair_request', 'dtb_repair_save_technician_meta' );
+add_action( 'wp_ajax_dtb_repair_schematic_lookup', 'dtb_repair_ajax_schematic_lookup' );
 
 function dtb_repair_save_technician_meta( int $post_id ): void {
 	if ( ! isset( $_POST['dtb_repair_technician_nonce'] ) ) {
@@ -345,10 +389,48 @@ function dtb_repair_save_technician_meta( int $post_id ): void {
 	$qa_by    = isset( $_POST['dtb_repair_qa_signed_by'] ) ? sanitize_text_field( wp_unslash( (string) $_POST['dtb_repair_qa_signed_by'] ) ) : '';
 	$qa_at    = isset( $_POST['dtb_repair_qa_signed_at'] ) ? sanitize_text_field( wp_unslash( (string) $_POST['dtb_repair_qa_signed_at'] ) ) : '';
 
-	$sch_url  = isset( $_POST['dtb_repair_schematic_url'] ) ? esc_url_raw( wp_unslash( (string) $_POST['dtb_repair_schematic_url'] ) ) : '';
-	$sch_rev  = isset( $_POST['dtb_repair_schematic_revision'] ) ? sanitize_text_field( wp_unslash( (string) $_POST['dtb_repair_schematic_revision'] ) ) : '';
-	$sch_ref  = isset( $_POST['dtb_repair_schematic_ref'] ) ? sanitize_text_field( wp_unslash( (string) $_POST['dtb_repair_schematic_ref'] ) ) : '';
 	$sch_cat  = isset( $_POST['dtb_repair_schematic_catalog_id'] ) ? sanitize_text_field( wp_unslash( (string) $_POST['dtb_repair_schematic_catalog_id'] ) ) : '';
+	$sch_json = isset( $_POST['dtb_repair_schematic_links_json'] ) ? wp_unslash( (string) $_POST['dtb_repair_schematic_links_json'] ) : '[]';
+	$sch_raw  = json_decode( $sch_json, true );
+	$sch_list = [];
+	if ( is_array( $sch_raw ) ) {
+		foreach ( $sch_raw as $row ) {
+			if ( ! is_array( $row ) ) {
+				continue;
+			}
+			$sid = sanitize_text_field( (string) ( $row['schematic_id'] ?? '' ) );
+			$url = esc_url_raw( (string) ( $row['url'] ?? '' ) );
+			if ( '' === $sid && '' === $url ) {
+				continue;
+			}
+			$sch_list[] = [
+				'schematic_id' => $sid,
+				'url'          => $url,
+				'version'      => sanitize_text_field( (string) ( $row['version'] ?? '' ) ),
+				'brand'        => sanitize_text_field( (string) ( $row['brand'] ?? '' ) ),
+				'model_number' => sanitize_text_field( (string) ( $row['model_number'] ?? '' ) ),
+				'model_name'   => sanitize_text_field( (string) ( $row['model_name'] ?? '' ) ),
+				'sku'          => sanitize_text_field( (string) ( $row['sku'] ?? '' ) ),
+				'product_name' => sanitize_text_field( (string) ( $row['product_name'] ?? '' ) ),
+			];
+		}
+	}
+	$sch_list = array_slice( $sch_list, 0, 20 );
+
+	$primary  = $sch_list[0] ?? [
+		'schematic_id' => $sch_cat,
+		'url'          => '',
+		'version'      => '',
+	];
+	$sch_ref = sanitize_text_field( (string) ( $primary['schematic_id'] ?? '' ) );
+	$sch_url = esc_url_raw( (string) ( $primary['url'] ?? '' ) );
+	$sch_rev = sanitize_text_field( (string) ( $primary['version'] ?? '' ) );
+	$sch_brand = sanitize_text_field( (string) ( $primary['brand'] ?? '' ) );
+	$sch_model = sanitize_text_field( (string) ( $primary['model_number'] ?? $primary['model_name'] ?? '' ) );
+	$sch_sku   = sanitize_text_field( (string) ( $primary['sku'] ?? '' ) );
+	if ( '' === $sch_cat ) {
+		$sch_cat = $sch_ref;
+	}
 
 	update_post_meta( $post_id, '_repair_diag_notes', $diag );
 	update_post_meta( $post_id, '_repair_parts_worklog', $parts );
@@ -356,10 +438,20 @@ function dtb_repair_save_technician_meta( int $post_id ): void {
 	update_post_meta( $post_id, '_repair_qa_passed', $qa_ok );
 	update_post_meta( $post_id, '_repair_qa_signed_by', $qa_by );
 	update_post_meta( $post_id, '_repair_qa_signed_at', $qa_at );
+	update_post_meta( $post_id, '_repair_schematic_links', $sch_list );
 	update_post_meta( $post_id, '_repair_schematic_url', $sch_url );
 	update_post_meta( $post_id, '_repair_schematic_revision', $sch_rev );
 	update_post_meta( $post_id, '_repair_schematic_ref', $sch_ref );
 	update_post_meta( $post_id, '_repair_schematic_catalog_id', $sch_cat );
+	update_post_meta( $post_id, '_repair_schematic_tool_brand', $sch_brand );
+	update_post_meta( $post_id, '_repair_schematic_tool_model', $sch_model );
+	update_post_meta( $post_id, '_repair_schematic_tool_sku', $sch_sku );
+	if ( '' !== $sch_brand && '' === trim( (string) get_post_meta( $post_id, '_repair_tool_brand', true ) ) ) {
+		update_post_meta( $post_id, '_repair_tool_brand', $sch_brand );
+	}
+	if ( '' !== $sch_model && '' === trim( (string) get_post_meta( $post_id, '_repair_model', true ) ) ) {
+		update_post_meta( $post_id, '_repair_model', $sch_model );
+	}
 
 	if ( function_exists( 'dtb_repair_sync_schematic_metadata' ) ) {
 		$snapshot = dtb_repair_sync_schematic_metadata( $post_id, $sch_url, $sch_ref, $sch_rev, $sch_cat );
@@ -373,6 +465,106 @@ function dtb_repair_save_technician_meta( int $post_id ): void {
 			update_post_meta( $post_id, '_repair_schematic_revision', (string) $snapshot['catalog_version'] );
 		}
 	}
+}
+
+/**
+ * AJAX lookup for technician schematic search.
+ */
+function dtb_repair_ajax_schematic_lookup(): void {
+	if ( ! current_user_can( 'dtb_manage_repairs' ) ) {
+		wp_send_json_error( [ 'message' => 'Forbidden' ], 403 );
+	}
+	check_ajax_referer( 'dtb_repair_schematic_lookup', 'nonce' );
+
+	$term = isset( $_POST['term'] ) ? sanitize_text_field( wp_unslash( (string) $_POST['term'] ) ) : '';
+	$term = trim( $term );
+	if ( strlen( $term ) < 2 ) {
+		wp_send_json_success( [ 'items' => [] ] );
+	}
+
+	$query = new WP_Query(
+		[
+			'post_type'      => 'attachment',
+			'post_status'    => 'inherit',
+			'posts_per_page' => 15,
+			'fields'         => 'ids',
+			'meta_query'     => [
+				'relation' => 'AND',
+				[
+					'key'     => '_dtb_is_schematic',
+					'value'   => '1',
+					'compare' => '=',
+				],
+				[
+					'relation' => 'OR',
+					[
+						'key'     => '_dtb_schematic_id',
+						'value'   => $term,
+						'compare' => 'LIKE',
+					],
+					[
+						'key'     => '_dtb_schematic_brand',
+						'value'   => $term,
+						'compare' => 'LIKE',
+					],
+					[
+						'key'     => '_dtb_schematic_model_number',
+						'value'   => $term,
+						'compare' => 'LIKE',
+					],
+					[
+						'key'     => '_dtb_schematic_model_name',
+						'value'   => $term,
+						'compare' => 'LIKE',
+					],
+				],
+			],
+		]
+	);
+
+	$items = [];
+	foreach ( (array) $query->posts as $attachment_id ) {
+		$attachment_id = (int) $attachment_id;
+		$sid           = (string) get_post_meta( $attachment_id, '_dtb_schematic_id', true );
+		$brand         = (string) get_post_meta( $attachment_id, '_dtb_schematic_brand', true );
+		$model_number  = (string) get_post_meta( $attachment_id, '_dtb_schematic_model_number', true );
+		$model_name    = (string) get_post_meta( $attachment_id, '_dtb_schematic_model_name', true );
+		$url           = (string) wp_get_attachment_url( $attachment_id );
+		$version       = get_post_modified_time( 'Y-m-d\TH:i:s\Z', true, $attachment_id );
+		$product_ids   = get_post_meta( $attachment_id, '_dtb_schematic_product_ids', true );
+		if ( function_exists( 'dtb_schematic_normalize_product_ids' ) ) {
+			$product_ids = dtb_schematic_normalize_product_ids( $product_ids );
+		}
+		$product_ids = is_array( $product_ids ) ? array_map( 'intval', $product_ids ) : [];
+		$product_sku = '';
+		$product_name = '';
+		if ( ! empty( $product_ids ) && function_exists( 'wc_get_product' ) ) {
+			$product = wc_get_product( (int) $product_ids[0] );
+			if ( $product ) {
+				$product_sku  = (string) $product->get_sku();
+				$product_name = (string) $product->get_name();
+			}
+		}
+
+		$haystack = strtolower( trim( $sid . ' ' . $brand . ' ' . $model_number . ' ' . $model_name ) );
+		if ( false === strpos( $haystack, strtolower( $term ) ) ) {
+			continue;
+		}
+
+		$items[] = [
+			'attachment_id' => $attachment_id,
+			'schematic_id'  => $sid,
+			'brand'         => $brand,
+			'model_number'  => $model_number,
+			'model_name'    => $model_name,
+			'url'           => $url,
+			'version'       => $version,
+			'sku'           => $product_sku,
+			'product_name'  => $product_name,
+		];
+	}
+
+	wp_send_json_success( [ 'items' => array_values( $items ) ] );
 }
 
 // ---- Metabox: Repair Command Center (Status Transition) ----------------------

@@ -24,6 +24,15 @@ function dtb_repair_admin_add_capability(): void {
 // =============================================================================
 
 add_action( 'admin_menu', 'dtb_repair_admin_menu' );
+add_filter( 'get_user_option_screen_layout_dtb_repair_request', 'dtb_repair_force_two_column_layout' );
+
+/**
+ * Force 2-column edit layout for repair requests so side cards always render.
+ */
+function dtb_repair_force_two_column_layout( $value ): int {
+	unset( $value );
+	return 2;
+}
 
 /**
  * Register the top-level "Repairs" menu in WP-Admin.
@@ -753,6 +762,97 @@ function dtb_repair_admin_inline_styles(): void {
 		word-break: break-all;
 		font-family: SFMono-Regular, Consolas, Monaco, monospace;
 	}
+	.dtb-tech-lookup-menu {
+		position: relative;
+		margin-top: 6px;
+		border: 1px solid #d7dee9;
+		border-radius: 8px;
+		background: #fff;
+		box-shadow: 0 8px 24px rgba(0,0,0,.12);
+		max-height: 230px;
+		overflow: auto;
+		z-index: 18;
+	}
+	.dtb-tech-lookup-option {
+		display: block;
+		width: 100%;
+		border: 0;
+		border-bottom: 1px solid #eef2f7;
+		background: #fff;
+		text-align: left;
+		padding: 8px 10px;
+		cursor: pointer;
+	}
+	.dtb-tech-lookup-option:last-child { border-bottom: none; }
+	.dtb-tech-lookup-option:hover,
+	.dtb-tech-lookup-option:focus {
+		outline: none;
+		background: #eff6ff;
+	}
+	.dtb-tech-lookup-primary {
+		display: block;
+		font-size: 12px;
+		font-weight: 700;
+		color: #0f172a;
+	}
+	.dtb-tech-lookup-secondary {
+		display: block;
+		margin-top: 2px;
+		font-size: 11px;
+		color: #64748b;
+	}
+	.dtb-tech-selected-list {
+		display: grid;
+		gap: 8px;
+		margin-top: 6px;
+	}
+	.dtb-tech-selected-empty {
+		padding: 10px;
+		border: 1px dashed #cbd5e1;
+		border-radius: 8px;
+		font-size: 11px;
+		color: #64748b;
+		background: #f8fafc;
+	}
+	.dtb-tech-selected-item {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 10px;
+		padding: 8px 10px;
+		border: 1px solid #dbe7ff;
+		border-radius: 8px;
+		background: #f8fbff;
+	}
+	.dtb-tech-selected-item[draggable="true"] { cursor: grab; }
+	.dtb-tech-selected-item.is-dragging { opacity: .55; cursor: grabbing; }
+	.dtb-tech-selected-item.is-drop-target { border-color: #60a5fa; background: #eff6ff; }
+	.dtb-tech-selected-main { min-width: 0; }
+	.dtb-tech-selected-title {
+		font-size: 12px;
+		font-weight: 700;
+		color: #0f172a;
+	}
+	.dtb-tech-selected-sub {
+		font-size: 11px;
+		color: #64748b;
+		margin-top: 2px;
+	}
+	.dtb-tech-selected-actions {
+		display: inline-flex;
+		align-items: center;
+		gap: 8px;
+	}
+	.dtb-tech-selected-remove {
+		border: 0;
+		background: #fee2e2;
+		color: #991b1b;
+		font-size: 11px;
+		font-weight: 700;
+		border-radius: 999px;
+		padding: 4px 8px;
+		cursor: pointer;
+	}
 
 	/* ── Sticky action bar (appears on scroll) ──────────────────────────────── */
 	#dtb-sticky-bar {
@@ -798,6 +898,36 @@ function dtb_repair_admin_inline_styles(): void {
 	.postbox .inside { padding: 16px !important; }
 	.postbox.closed .inside { display: block !important; } /* keep all boxes open */
 	.postbox .handle-actions { display: none !important; } /* hide collapse toggle */
+
+	/* ── Main workspace grid ──────────────────────────────────────────────── */
+	#postbox-container-2 #normal-sortables {
+		display: grid;
+		grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+		gap: 16px;
+	}
+	#postbox-container-2 #normal-sortables > .postbox {
+		margin: 0 !important;
+		grid-column: 1 / -1; /* default full width */
+	}
+	#postbox-container-2 #dtb-repair-command-center,
+	#postbox-container-2 #dtb-repair-order-details {
+		grid-column: auto; /* top row side-by-side */
+	}
+	#postbox-container-2 #dtb-repair-command-center { order: 1; }
+	#postbox-container-2 #dtb-repair-order-details { order: 2; }
+	#postbox-container-2 #dtb-repair-technician    { order: 3; }
+	#postbox-container-2 #dtb-repair-timeline      { order: 4; }
+	#postbox-container-2 #dtb-repair-notes         { order: 5; }
+
+	@media (max-width: 1360px) {
+		#postbox-container-2 #normal-sortables {
+			grid-template-columns: 1fr;
+		}
+		#postbox-container-2 #dtb-repair-command-center,
+		#postbox-container-2 #dtb-repair-order-details {
+			grid-column: 1 / -1;
+		}
+	}
 
 	/* ── Customer / Tool detail tables ─────────────────────────────────────── */
 	.dtb-repair-metabox table { width: 100%; border-collapse: collapse; }
@@ -1558,6 +1688,17 @@ function dtb_repair_admin_footer_scripts(): void {
 			side.insertBefore( transBox, side.firstChild );
 		}
 
+		/* ── Force Custom Fields metabox into side column (user order safe) ── */
+		var postBody = document.getElementById('post-body');
+		if ( postBody ) {
+			postBody.classList.remove('columns-1');
+			postBody.classList.add('columns-2');
+		}
+		var customFieldsBox = document.getElementById('postcustom');
+		if ( side && customFieldsBox && customFieldsBox.parentElement !== side ) {
+			side.appendChild(customFieldsBox);
+		}
+
 		/* ── Restyle integration status rows ── */
 		document.querySelectorAll('.dtb-integration-row').forEach(function(row) {
 			var strong = row.querySelector('strong');
@@ -1588,14 +1729,12 @@ function dtb_repair_admin_footer_scripts(): void {
 			var groups = {
 				order_details: [
 					'dtb-repair-command-center',
-					'dtb-repair-tool',
-					'dtb-repair-issue'
+					'dtb-repair-order-details'
 				],
 				technician_details: [
 					'dtb-repair-command-center',
 					'dtb-repair-technician',
-					'dtb-repair-tool',
-					'dtb-repair-issue',
+					'dtb-repair-order-details',
 					'dtb-repair-notes',
 					'dtb-repair-queue'
 				],
@@ -1609,8 +1748,7 @@ function dtb_repair_admin_footer_scripts(): void {
 			var allKnownIds = [
 				'dtb-repair-command-center',
 				'dtb-repair-technician',
-				'dtb-repair-tool',
-				'dtb-repair-issue',
+				'dtb-repair-order-details',
 				'dtb-repair-timeline',
 				'dtb-repair-notes',
 				'dtb-repair-queue'
@@ -1647,6 +1785,202 @@ function dtb_repair_admin_footer_scripts(): void {
 			});
 
 			setActiveTab('order_details');
+		}
+
+		/* ── Live schematic lookup (technician workspace) ── */
+		var lookupInput = document.getElementById('dtb_repair_schematic_catalog_id');
+		var lookupMenu = document.getElementById('dtb-tech-schematic-lookup-menu');
+		var linksInput = document.getElementById('dtb_repair_schematic_links_json');
+		var selectedListEl = document.getElementById('dtb-tech-selected-schematics');
+		var primaryBrandEl = document.getElementById('dtb-tech-primary-brand');
+		var primaryModelEl = document.getElementById('dtb-tech-primary-model');
+		var primarySkuEl = document.getElementById('dtb-tech-primary-sku');
+		var lookupReq = null;
+		var lookupTimer = null;
+		var selectedSchematics = [];
+
+		var hideLookupMenu = function() {
+			if (!lookupMenu) return;
+			lookupMenu.hidden = true;
+			lookupMenu.innerHTML = '';
+		};
+
+		var renderLookupMenu = function(items) {
+			if (!lookupMenu) return;
+			if (!items || !items.length) {
+				hideLookupMenu();
+				return;
+			}
+			lookupMenu.innerHTML = items.map(function(item) {
+				var primary = (item.schematic_id || 'Unknown ID');
+				var secondary = [item.brand, item.model_number, item.model_name].filter(Boolean).join(' · ');
+				return (
+					'<button type="button" class="dtb-tech-lookup-option" ' +
+					'data-id="' + String(item.schematic_id || '').replace(/"/g, '&quot;') + '" ' +
+					'data-url="' + String(item.url || '').replace(/"/g, '&quot;') + '" ' +
+					'data-brand="' + String(item.brand || '').replace(/"/g, '&quot;') + '" ' +
+					'data-model="' + String(item.model_number || '').replace(/"/g, '&quot;') + '" ' +
+					'data-model-name="' + String(item.model_name || '').replace(/"/g, '&quot;') + '" ' +
+					'data-sku="' + String(item.sku || '').replace(/"/g, '&quot;') + '" ' +
+					'data-product-name="' + String(item.product_name || '').replace(/"/g, '&quot;') + '" ' +
+					'data-version="' + String(item.version || '').replace(/"/g, '&quot;') + '">' +
+						'<span class="dtb-tech-lookup-primary">' + primary + '</span>' +
+						'<span class="dtb-tech-lookup-secondary">' + (secondary || 'Catalog schematic') + '</span>' +
+					'</button>'
+				);
+			}).join('');
+			lookupMenu.hidden = false;
+		};
+
+		var renderSelectedSchematics = function() {
+			if (!selectedListEl || !linksInput) return;
+			if (!selectedSchematics.length) {
+				selectedListEl.innerHTML = '<div class="dtb-tech-selected-empty">No schematic selected yet.</div>';
+				linksInput.value = '[]';
+				if (primaryBrandEl) primaryBrandEl.textContent = '';
+				if (primaryModelEl) primaryModelEl.textContent = '';
+				if (primarySkuEl) primarySkuEl.textContent = '';
+				return;
+			}
+			selectedListEl.innerHTML = selectedSchematics.map(function(item, idx) {
+				var title = item.schematic_id || 'Unknown schematic';
+				var subtitle = [item.brand, item.model_number, item.model_name, item.sku ? ('SKU: ' + item.sku) : ''].filter(Boolean).join(' · ');
+				var link = item.url ? '<a href="' + item.url + '" target="_blank" rel="noopener noreferrer">Open</a>' : '';
+				return (
+					'<div class="dtb-tech-selected-item" draggable="true" data-index="' + idx + '">' +
+						'<div class="dtb-tech-selected-main">' +
+							'<div class="dtb-tech-selected-title">' + title + '</div>' +
+							'<div class="dtb-tech-selected-sub">' + (subtitle || 'Catalog schematic') + '</div>' +
+						'</div>' +
+						'<div class="dtb-tech-selected-actions">' +
+							link +
+							'<button type="button" class="dtb-tech-selected-remove" data-index="' + idx + '">Remove</button>' +
+						'</div>' +
+					'</div>'
+				);
+			}).join('');
+			linksInput.value = JSON.stringify(selectedSchematics);
+			var primary = selectedSchematics[0] || {};
+			if (primaryBrandEl) primaryBrandEl.textContent = primary.brand || '';
+			if (primaryModelEl) primaryModelEl.textContent = primary.model_number || primary.model_name || '';
+			if (primarySkuEl) primarySkuEl.textContent = primary.sku || '';
+		};
+
+		if (lookupInput && lookupMenu && linksInput && selectedListEl && typeof ajaxurl === 'string') {
+			try {
+				selectedSchematics = JSON.parse(linksInput.value || '[]');
+				if (!Array.isArray(selectedSchematics)) selectedSchematics = [];
+			} catch (e) {
+				selectedSchematics = [];
+			}
+			renderSelectedSchematics();
+
+			lookupInput.addEventListener('input', function() {
+				var term = lookupInput.value.trim();
+				if (lookupTimer) window.clearTimeout(lookupTimer);
+				if (term.length < 2) {
+					hideLookupMenu();
+					return;
+				}
+				lookupTimer = window.setTimeout(function() {
+					if (lookupReq && typeof lookupReq.abort === 'function') {
+						lookupReq.abort();
+					}
+					var body = new URLSearchParams();
+					body.set('action', 'dtb_repair_schematic_lookup');
+					body.set('term', term);
+					body.set('nonce', lookupInput.getAttribute('data-lookup-nonce') || '');
+
+					lookupReq = fetch(ajaxurl, {
+						method: 'POST',
+						headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' },
+						body: body.toString(),
+						credentials: 'same-origin'
+					})
+					.then(function(resp) { return resp.json(); })
+					.then(function(payload) {
+						var items = payload && payload.success && payload.data ? payload.data.items : [];
+						renderLookupMenu(items || []);
+					})
+					.catch(function() { hideLookupMenu(); });
+				}, 180);
+			});
+
+			lookupMenu.addEventListener('click', function(e) {
+				var btn = e.target.closest('.dtb-tech-lookup-option');
+				if (!btn) return;
+				var sid = btn.getAttribute('data-id') || '';
+				var surl = btn.getAttribute('data-url') || '';
+				var sver = btn.getAttribute('data-version') || '';
+				var existing = selectedSchematics.find(function(item) { return item.schematic_id === sid; });
+				if (!existing) {
+					selectedSchematics.push({
+						schematic_id: sid,
+						url: surl,
+						version: sver,
+						brand: btn.getAttribute('data-brand') || '',
+						model_number: btn.getAttribute('data-model') || '',
+						model_name: btn.getAttribute('data-model-name') || '',
+						sku: btn.getAttribute('data-sku') || '',
+						product_name: btn.getAttribute('data-product-name') || ''
+					});
+				}
+				lookupInput.value = '';
+				renderSelectedSchematics();
+				hideLookupMenu();
+			});
+
+			selectedListEl.addEventListener('click', function(e) {
+				var removeBtn = e.target.closest('.dtb-tech-selected-remove');
+				if (!removeBtn) return;
+				var index = parseInt(removeBtn.getAttribute('data-index') || '-1', 10);
+				if (index < 0 || index >= selectedSchematics.length) return;
+				selectedSchematics.splice(index, 1);
+				renderSelectedSchematics();
+			});
+
+			var dragFromIndex = -1;
+			selectedListEl.addEventListener('dragstart', function(e) {
+				var item = e.target.closest('.dtb-tech-selected-item');
+				if (!item) return;
+				dragFromIndex = parseInt(item.getAttribute('data-index') || '-1', 10);
+				item.classList.add('is-dragging');
+				if (e.dataTransfer) {
+					e.dataTransfer.effectAllowed = 'move';
+					e.dataTransfer.setData('text/plain', String(dragFromIndex));
+				}
+			});
+			selectedListEl.addEventListener('dragend', function() {
+				dragFromIndex = -1;
+				selectedListEl.querySelectorAll('.dtb-tech-selected-item').forEach(function(el) {
+					el.classList.remove('is-dragging', 'is-drop-target');
+				});
+			});
+			selectedListEl.addEventListener('dragover', function(e) {
+				var item = e.target.closest('.dtb-tech-selected-item');
+				if (!item) return;
+				e.preventDefault();
+				selectedListEl.querySelectorAll('.dtb-tech-selected-item').forEach(function(el) {
+					el.classList.remove('is-drop-target');
+				});
+				item.classList.add('is-drop-target');
+			});
+			selectedListEl.addEventListener('drop', function(e) {
+				var item = e.target.closest('.dtb-tech-selected-item');
+				if (!item) return;
+				e.preventDefault();
+				var toIndex = parseInt(item.getAttribute('data-index') || '-1', 10);
+				if (dragFromIndex < 0 || toIndex < 0 || dragFromIndex === toIndex) return;
+				var moved = selectedSchematics.splice(dragFromIndex, 1)[0];
+				selectedSchematics.splice(toIndex, 0, moved);
+				renderSelectedSchematics();
+			});
+
+			document.addEventListener('click', function(e) {
+				if (!lookupMenu.contains(e.target) && e.target !== lookupInput) {
+					hideLookupMenu();
+				}
+			});
 		}
 
 	}());
