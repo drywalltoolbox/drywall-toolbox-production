@@ -14,14 +14,13 @@ add_action( 'add_meta_boxes', 'dtb_repair_admin_add_metaboxes' );
  */
 function dtb_repair_admin_add_metaboxes(): void {
 	$boxes = [
-		'dtb-repair-customer'    => [ __( 'Customer Details', 'drywall-toolbox' ), 'dtb_repair_metabox_customer', 'side', 'high' ],
-		'dtb-repair-tool'        => [ __( 'Tool Details', 'drywall-toolbox' ), 'dtb_repair_metabox_tool', 'normal', 'high' ],
-		'dtb-repair-issue'       => [ __( 'Issue Description', 'drywall-toolbox' ), 'dtb_repair_metabox_issue', 'normal', 'high' ],
-		'dtb-repair-timeline'    => [ __( 'Repair Timeline', 'drywall-toolbox' ), 'dtb_repair_metabox_timeline', 'normal', 'default' ],
-		'dtb-repair-notes'       => [ __( 'Internal Notes', 'drywall-toolbox' ), 'dtb_repair_metabox_notes', 'normal', 'default' ],
-		'dtb-repair-integration' => [ __( 'Integration Status', 'drywall-toolbox' ), 'dtb_repair_metabox_integration', 'side', 'default' ],
-		'dtb-repair-transition'  => [ __( 'Status Transition', 'drywall-toolbox' ), 'dtb_repair_metabox_transition', 'side', 'high' ],
-		'dtb-repair-queue'       => [ __( 'Queue Jobs', 'drywall-toolbox' ), 'dtb_repair_metabox_queue', 'side', 'low' ],
+		'dtb-repair-command-center' => [ __( 'Repair Command Center', 'drywall-toolbox' ), 'dtb_repair_metabox_command_center', 'normal', 'high' ],
+		'dtb-repair-tool'           => [ __( 'Tool Details', 'drywall-toolbox' ), 'dtb_repair_metabox_tool', 'normal', 'high' ],
+		'dtb-repair-issue'          => [ __( 'Issue Description', 'drywall-toolbox' ), 'dtb_repair_metabox_issue', 'normal', 'high' ],
+		'dtb-repair-timeline'       => [ __( 'Repair Timeline', 'drywall-toolbox' ), 'dtb_repair_metabox_timeline', 'normal', 'default' ],
+		'dtb-repair-notes'          => [ __( 'Internal Notes', 'drywall-toolbox' ), 'dtb_repair_metabox_notes', 'normal', 'default' ],
+		'dtb-repair-customer'       => [ __( 'Customer Details', 'drywall-toolbox' ), 'dtb_repair_metabox_customer', 'side', 'high' ],
+		'dtb-repair-queue'          => [ __( 'Queue Jobs', 'drywall-toolbox' ), 'dtb_repair_metabox_queue', 'side', 'low' ],
 	];
 
 	foreach ( $boxes as $id => $args ) {
@@ -34,6 +33,10 @@ function dtb_repair_admin_add_metaboxes(): void {
 			$args[3]
 		);
 	}
+
+	// Move WP's native Custom Fields box to the side column.
+	remove_meta_box( 'postcustom', 'dtb_repair_request', 'normal' );
+	add_meta_box( 'postcustom', __( 'Custom Fields', 'drywall-toolbox' ), 'post_custom_meta_box', 'dtb_repair_request', 'side', 'low' );
 }
 
 // ---- Metabox: Customer Details -----------------------------------------------
@@ -173,101 +176,144 @@ function dtb_repair_save_notes_meta( int $post_id ): void {
 	}
 }
 
-// ---- Metabox: Integration Status --------------------------------------------
+// ---- Metabox: Repair Command Center (Status Transition + Integration) -------
 
-function dtb_repair_metabox_integration( WP_Post $post ): void {
-	$raw   = (string) get_post_meta( $post->ID, '_repair_integration_state', true );
-	$state = ( '' !== $raw ) ? json_decode( $raw, true ) : [];
-
-	echo '<div class="dtb-repair-metabox">';
-
-	// WooCommerce.
-	$wc_order_id = (int) get_post_meta( $post->ID, '_repair_wc_order_id', true );
-	$wc_state    = esc_html( $state['woocommerce']['state'] ?? 'pending' );
-	echo '<div class="dtb-integration-row">';
-	echo '<span class="dtb-int-label">WooCommerce</span>';
-	echo '<span class="dtb-int-value">';
-	if ( $wc_order_id ) {
-		$wc_url = admin_url( 'post.php?post=' . $wc_order_id . '&action=edit' );
-		echo '<span class="dtb-int-pill dtb-int-synced">synced</span>';
-		echo '<a href="' . esc_url( $wc_url ) . '">Order #' . $wc_order_id . ' →</a>';
-	} else {
-		echo '<span class="dtb-int-pill dtb-int-' . esc_attr( $wc_state ) . '">' . esc_html( $wc_state ) . '</span>';
-	}
-	echo '</span></div>';
-
-	// Veeqo.
-	$veeqo_state = $state['veeqo']['state'] ?? 'pending';
-	$veeqo_track = esc_html( $state['veeqo']['tracking_number'] ?? '' );
-	echo '<div class="dtb-integration-row">';
-	echo '<span class="dtb-int-label">Veeqo</span>';
-	echo '<span class="dtb-int-value">';
-	echo '<span class="dtb-int-pill dtb-int-' . esc_attr( $veeqo_state ) . '">' . esc_html( $veeqo_state ) . '</span>';
-	if ( $veeqo_track ) echo '<span style="font-size:12px;color:#374151;">' . $veeqo_track . '</span>';
-	echo '</span></div>';
-
-	// QuickBooks.
-	$qb_state   = $state['quickbooks']['state'] ?? 'pending';
-	$qb_invoice = esc_html( $state['quickbooks']['invoice_id'] ?? '' );
-	echo '<div class="dtb-integration-row">';
-	echo '<span class="dtb-int-label">QuickBooks</span>';
-	echo '<span class="dtb-int-value">';
-	echo '<span class="dtb-int-pill dtb-int-' . esc_attr( $qb_state ) . '">' . esc_html( $qb_state ) . '</span>';
-	if ( $qb_invoice ) echo '<span style="font-size:12px;color:#374151;">#' . $qb_invoice . '</span>';
-	echo '</span></div>';
-
-	// Rewards.
-	$rewards_state  = $state['rewards']['state'] ?? 'not_eligible';
-	$rewards_issued = ! empty( $state['rewards']['issued'] );
-	echo '<div class="dtb-integration-row">';
-	echo '<span class="dtb-int-label">Rewards</span>';
-	echo '<span class="dtb-int-value">';
-	echo '<span class="dtb-int-pill dtb-int-' . esc_attr( $rewards_state ) . '">' . esc_html( $rewards_state ) . '</span>';
-	if ( $rewards_issued ) echo '<span style="font-size:11px;color:#16a34a;">✓ Issued</span>';
-	echo '</span></div>';
-
-	echo '</div>';
-}
-
-// ---- Metabox: Status Transition ---------------------------------------------
-
-function dtb_repair_metabox_transition( WP_Post $post ): void {
+/**
+ * Unified command center — left panel: status transition form, right panel: integration status.
+ */
+function dtb_repair_metabox_command_center( WP_Post $post ): void {
 	if ( ! function_exists( 'dtb_get_repair_status' ) || ! function_exists( 'dtb_get_allowed_transitions' ) ) {
-		echo '<p>' . esc_html__( 'Workflow module unavailable.', 'drywall-toolbox' ) . '</p>';
+		echo '<p style="padding:16px;color:#9ca3af;">' . esc_html__( 'Workflow module unavailable.', 'drywall-toolbox' ) . '</p>';
 		return;
 	}
 
+	// ── Status data ──────────────────────────────────────────────────────────
 	$current     = dtb_get_repair_status( $post->ID );
+	$current_lbl = dtb_get_repair_status_label( $current );
 	$transitions = dtb_get_allowed_transitions();
 	$allowed     = $transitions[ $current ] ?? [];
 
-	echo '<div class="dtb-repair-metabox">';
-	echo '<p><strong>' . esc_html__( 'Current Status:', 'drywall-toolbox' ) . '</strong> '
-		. '<span class="dtb-status-badge dtb-status-' . esc_attr( $current ) . '">' . esc_html( dtb_get_repair_status_label( $current ) ) . '</span></p>';
+	// ── Integration data ─────────────────────────────────────────────────────
+	$raw_int   = (string) get_post_meta( $post->ID, '_repair_integration_state', true );
+	$int_state = ( '' !== $raw_int ) ? json_decode( $raw_int, true ) : [];
 
-	if ( empty( $allowed ) ) {
-		echo '<p><em>' . esc_html__( 'No transitions available (terminal state).', 'drywall-toolbox' ) . '</em></p>';
-		echo '</div>';
-		return;
-	}
-
-	echo '<select id="dtb-repair-to-status" style="width:100%;margin-bottom:8px;">';
-	echo '<option value="">' . esc_html__( '— Select new status —', 'drywall-toolbox' ) . '</option>';
-	foreach ( $allowed as $ts ) {
-		echo '<option value="' . esc_attr( $ts ) . '">' . esc_html( dtb_get_repair_status_label( $ts ) ) . '</option>';
-	}
-	echo '</select>';
-	echo '<input type="text" id="dtb-repair-transition-note" placeholder="' . esc_attr__( 'Optional note…', 'drywall-toolbox' ) . '" style="width:100%;margin-bottom:8px;">';
-
-	wp_nonce_field( 'dtb_repair_transition_' . $post->ID, 'dtb_repair_transition_nonce' );
-
-	echo '<button type="button" id="dtb-repair-transition-btn" class="button button-primary" data-repair-id="' . esc_attr( (string) $post->ID ) . '">'
-		. esc_html__( 'Transition', 'drywall-toolbox' )
-		. '</button>';
-	echo '<span id="dtb-repair-transition-msg" style="margin-left:8px;"></span>';
-
-	// Inline JS for the AJAX transition button.
+	$wc_order_id    = (int) get_post_meta( $post->ID, '_repair_wc_order_id', true );
+	$wc_s           = $wc_order_id ? 'synced' : ( $int_state['woocommerce']['state'] ?? 'pending' );
+	$veeqo_s        = $int_state['veeqo']['state']        ?? 'pending';
+	$veeqo_track    = esc_html( $int_state['veeqo']['tracking_number'] ?? '' );
+	$qb_s           = $int_state['quickbooks']['state']    ?? 'pending';
+	$qb_inv         = esc_html( $int_state['quickbooks']['invoice_id'] ?? '' );
+	$rewards_s      = $int_state['rewards']['state']       ?? 'not_eligible';
+	$rewards_issued = ! empty( $int_state['rewards']['issued'] );
 	?>
+	<div class="dtb-command-center">
+
+		<!-- ── LEFT: Status Transition ─────────────────────────────────── -->
+		<div class="dtb-cc-panel">
+			<div class="dtb-cc-section-title">Status Transition</div>
+
+			<div class="dtb-cc-current-status">
+				<span class="dtb-cc-current-label">Current</span>
+				<span class="dtb-status-badge dtb-status-<?php echo esc_attr( $current ); ?>">
+					<?php echo esc_html( $current_lbl ); ?>
+				</span>
+			</div>
+
+			<?php if ( empty( $allowed ) ) : ?>
+				<p class="dtb-cc-terminal">Terminal state — no transitions available.</p>
+			<?php else : ?>
+				<?php wp_nonce_field( 'dtb_repair_transition_' . $post->ID, 'dtb_repair_transition_nonce' ); ?>
+
+				<select id="dtb-repair-to-status" class="dtb-cc-select">
+					<option value="">— Select new status —</option>
+					<?php foreach ( $allowed as $ts ) : ?>
+						<option value="<?php echo esc_attr( $ts ); ?>"><?php echo esc_html( dtb_get_repair_status_label( $ts ) ); ?></option>
+					<?php endforeach; ?>
+				</select>
+
+				<input type="text"
+				       id="dtb-repair-transition-note"
+				       class="dtb-cc-note"
+				       placeholder="<?php esc_attr_e( 'Optional note…', 'drywall-toolbox' ); ?>">
+
+				<button type="button"
+				        id="dtb-repair-transition-btn"
+				        class="dtb-cc-btn"
+				        data-repair-id="<?php echo esc_attr( (string) $post->ID ); ?>">
+					<span class="dashicons dashicons-update" style="font-size:14px;width:14px;height:14px;line-height:1.4;"></span>
+					<?php esc_html_e( 'Transition', 'drywall-toolbox' ); ?>
+				</button>
+				<span id="dtb-repair-transition-msg" class="dtb-cc-msg"></span>
+			<?php endif; ?>
+		</div><!-- .dtb-cc-panel -->
+
+		<!-- ── RIGHT: Integration Status ──────────────────────────────── -->
+		<div class="dtb-cc-panel">
+			<div class="dtb-cc-section-title">Integration Status</div>
+
+			<!-- WooCommerce -->
+			<div class="dtb-cc-int-row">
+				<span class="dtb-cc-int-name">
+					<span class="dashicons dashicons-cart" style="font-size:14px;width:14px;height:14px;color:#7c3aed;flex-shrink:0;"></span>
+					WooCommerce
+				</span>
+				<span class="dtb-cc-int-right">
+					<?php echo dtb_repair_admin_integration_badge( $wc_s ); // phpcs:ignore ?>
+					<?php if ( $wc_order_id ) : ?>
+						<a class="dtb-cc-int-link"
+						   href="<?php echo esc_url( admin_url( 'post.php?post=' . $wc_order_id . '&action=edit' ) ); ?>">
+							Order #<?php echo esc_html( (string) $wc_order_id ); ?> →
+						</a>
+					<?php endif; ?>
+				</span>
+			</div>
+
+			<!-- Veeqo -->
+			<div class="dtb-cc-int-row">
+				<span class="dtb-cc-int-name">
+					<span class="dashicons dashicons-airplane" style="font-size:14px;width:14px;height:14px;color:#0891b2;flex-shrink:0;"></span>
+					Veeqo
+				</span>
+				<span class="dtb-cc-int-right">
+					<?php echo dtb_repair_admin_integration_badge( $veeqo_s ); // phpcs:ignore ?>
+					<?php if ( $veeqo_track ) : ?>
+						<span class="dtb-cc-int-meta"><?php echo esc_html( $veeqo_track ); ?></span>
+					<?php endif; ?>
+				</span>
+			</div>
+
+			<!-- QuickBooks -->
+			<div class="dtb-cc-int-row">
+				<span class="dtb-cc-int-name">
+					<span class="dashicons dashicons-money-alt" style="font-size:14px;width:14px;height:14px;color:#16a34a;flex-shrink:0;"></span>
+					QuickBooks
+				</span>
+				<span class="dtb-cc-int-right">
+					<?php echo dtb_repair_admin_integration_badge( $qb_s ); // phpcs:ignore ?>
+					<?php if ( $qb_inv ) : ?>
+						<span class="dtb-cc-int-meta">#<?php echo esc_html( $qb_inv ); ?></span>
+					<?php endif; ?>
+				</span>
+			</div>
+
+			<!-- Rewards -->
+			<div class="dtb-cc-int-row">
+				<span class="dtb-cc-int-name">
+					<span class="dashicons dashicons-star-filled" style="font-size:14px;width:14px;height:14px;color:#f59e0b;flex-shrink:0;"></span>
+					Rewards
+				</span>
+				<span class="dtb-cc-int-right">
+					<?php echo dtb_repair_admin_integration_badge( $rewards_s ); // phpcs:ignore ?>
+					<?php if ( $rewards_issued ) : ?>
+						<span class="dtb-cc-int-meta" style="color:#16a34a;">✓ Issued</span>
+					<?php endif; ?>
+				</span>
+			</div>
+
+		</div><!-- .dtb-cc-panel -->
+
+	</div><!-- .dtb-command-center -->
+
 	<script>
 	(function($) {
 		$('#dtb-repair-transition-btn').on('click', function() {
@@ -275,14 +321,16 @@ function dtb_repair_metabox_transition( WP_Post $post ): void {
 			var toStatus = $('#dtb-repair-to-status').val();
 			var note     = $('#dtb-repair-transition-note').val();
 			var nonce    = $('input[name="dtb_repair_transition_nonce"]').val();
+			var $msg     = $('#dtb-repair-transition-msg');
+			var $btn     = $(this);
 
-			if (!toStatus) {
-				$('#dtb-repair-transition-msg').text('<?php echo esc_js( __( 'Please select a status.', 'drywall-toolbox' ) ); ?>');
+			if ( ! toStatus ) {
+				$msg.text('Please select a target status.').attr('class', 'dtb-cc-msg dtb-cc-msg-err');
 				return;
 			}
 
-			$('#dtb-repair-transition-btn').prop('disabled', true);
-			$('#dtb-repair-transition-msg').text('<?php echo esc_js( __( 'Transitioning…', 'drywall-toolbox' ) ); ?>');
+			$btn.prop('disabled', true);
+			$msg.text('Transitioning…').attr('class', 'dtb-cc-msg');
 
 			$.post(ajaxurl, {
 				action:    'dtb_repair_transition',
@@ -292,18 +340,17 @@ function dtb_repair_metabox_transition( WP_Post $post ): void {
 				nonce:     nonce
 			}, function(response) {
 				if (response.success) {
-					$('#dtb-repair-transition-msg').text(response.data.message);
-					setTimeout(function() { location.reload(); }, 800);
+					$msg.text(response.data.message).attr('class', 'dtb-cc-msg dtb-cc-msg-ok');
+					setTimeout(function() { location.reload(); }, 900);
 				} else {
-					$('#dtb-repair-transition-msg').text(response.data.message || '<?php echo esc_js( __( 'Error.', 'drywall-toolbox' ) ); ?>');
-					$('#dtb-repair-transition-btn').prop('disabled', false);
+					$msg.text(response.data.message || 'Error.').attr('class', 'dtb-cc-msg dtb-cc-msg-err');
+					$btn.prop('disabled', false);
 				}
 			});
 		});
 	}(jQuery));
 	</script>
 	<?php
-	echo '</div>';
 }
 
 // ---- Metabox: Queue Jobs ----------------------------------------------------

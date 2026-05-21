@@ -22,17 +22,24 @@ $events    = dtb_repair_get_events( $repair_id );
 $timeline  = [];
 
 foreach ( $events as $event ) {
-$payload = is_string( $event->payload ) ? json_decode( $event->payload, true ) : (array) $event->payload;
+$payload = is_string( $event->payload_json ?? null ) ? json_decode( (string) $event->payload_json, true ) : [];
 
-if ( ! in_array( (string) ( $payload['visibility'] ?? 'customer' ), [ 'customer', 'public' ], true ) ) {
+$visibility = sanitize_text_field( (string) ( $event->visibility ?? '' ) );
+if ( ! in_array( $visibility, [ 'customer', 'public' ], true ) ) {
 continue;
 }
 
-$timeline[] = [
+$row = [
 'event_type' => $event->event_type,
 'created_at' => $event->created_at,
 'label'      => dtb_repair_event_label( $event->event_type ),
 ];
+
+if ( 'repair.note_added' === (string) $event->event_type && ! empty( $payload['note'] ) ) {
+	$row['message'] = wp_strip_all_tags( (string) $payload['note'] );
+}
+
+$timeline[] = $row;
 }
 
 return $timeline;
@@ -58,6 +65,7 @@ $map = [
 'repair.completed'       => __( 'Repair completed', 'drywall-toolbox' ),
 'repair.closed'          => __( 'Closed', 'drywall-toolbox' ),
 'repair.cancelled'       => __( 'Cancelled', 'drywall-toolbox' ),
+'repair.note_added'      => __( 'Customer note added', 'drywall-toolbox' ),
 ];
 
 return $map[ $event_type ] ?? ucwords( str_replace( [ 'repair.', '_' ], [ '', ' ' ], $event_type ) );

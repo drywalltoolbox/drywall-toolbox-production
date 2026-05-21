@@ -6,21 +6,21 @@
  * - Uses :id from URL params + ?token=xxx from search params
  * - No auth required; token is the public repair token issued at submission
  * - If no token is present and user is not authenticated, shows a token entry form
- * - Live updates via SSE (with polling fallback) through useRepairEventStream
+ * - Customer-safe timeline only (no backend/system event stream rendering)
  */
 
 import { useState } from 'react';
 import { useParams, useSearchParams, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, AlertTriangle, SearchX, RefreshCw, Radio } from 'lucide-react';
+import { Search, AlertTriangle, SearchX, RefreshCw } from 'lucide-react';
 import SEOHead from '../components/shared/SEOHead.jsx';
 import useRepairStatus       from '../hooks/useRepairStatus.js';
-import useRepairEventStream  from '../hooks/useRepairEventStream.js';
 import RepairStatusTracker   from '../components/repairs/RepairStatusTracker.jsx';
 import RepairTimeline        from '../components/repairs/RepairTimeline.jsx';
 import RepairQuoteReview     from '../components/repairs/RepairQuoteReview.jsx';
 import RepairIntegrationNotice from '../components/repairs/RepairIntegrationNotice.jsx';
 import RepairMediaUploader   from '../components/repairs/RepairMediaUploader.jsx';
+import RepairCommentBox      from '../components/repairs/RepairCommentBox.jsx';
 import { REPAIR_STATUS_LABELS } from '../api/repairs.js';
 
 // ─── Token entry form (shown when no token in URL) ────────────────────────────
@@ -229,13 +229,7 @@ export default function RepairStatus() {
     needsTokenEntry ? null : resolvedToken
   );
 
-  const { events } = useRepairEventStream(
-    needsTokenEntry ? null : resolvedId,
-    needsTokenEntry ? null : resolvedToken
-  );
-
-  // Merge streamed events with the timeline from the polling snapshot
-  const mergedEvents = mergeTimelines( data?.timeline, events );
+  const customerTimeline = toCustomerTimeline( data?.timeline );
 
   const handleTokenFormSubmit = ( repairId, token ) => {
     setResolvedId( repairId );
@@ -267,7 +261,6 @@ export default function RepairStatus() {
 
   const status = data?.status;
   const label  = data?.label || REPAIR_STATUS_LABELS[ status ] || status;
-  const hasLiveEvents = events.length > 0;
 
   return (
     <>
@@ -292,24 +285,6 @@ export default function RepairStatus() {
             <div className="text-[10px] text-neutral-400 uppercase tracking-widest font-semibold">Repair ID</div>
             <div className="flex items-center gap-2 mt-0.5">
               <h1 className="text-xl font-bold text-neutral-900">DTB-{ resolvedId }</h1>
-              {/* Live indicator — only shown when SSE events are flowing */}
-              <AnimatePresence>
-                { hasLiveEvents && (
-                  <motion.div
-                    initial={{ opacity: 0, scale: 0.6 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.6 }}
-                    className="flex items-center gap-1 bg-green-50 border border-green-200 rounded-full px-2 py-0.5"
-                    title="Live updates active"
-                  >
-                    <span className="relative flex h-1.5 w-1.5">
-                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75" />
-                      <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-green-500" />
-                    </span>
-                    <span className="text-[9px] font-bold text-green-600 uppercase tracking-wider">Live</span>
-                  </motion.div>
-                ) }
-              </AnimatePresence>
             </div>
           </div>
           <button
@@ -373,6 +348,15 @@ export default function RepairStatus() {
           </motion.div>
         ) }
 
+        {/* ── Customer note box ─────────────────────────────────────── */}
+        { data && ! [ 'completed', 'closed', 'cancelled', 'quote_declined' ].includes( status ) && (
+          <RepairCommentBox
+            repairId={ resolvedId }
+            token={ resolvedToken }
+            onSubmitted={ () => refresh() }
+          />
+        ) }
+
         {/* ── Timeline ──────────────────────────────────────────────── */}
         { ( loading && ! data ) ? (
           <div className="bg-white rounded-2xl border border-neutral-200 shadow-sm p-6 space-y-3">
@@ -388,7 +372,7 @@ export default function RepairStatus() {
             ) ) }
           </div>
         ) : (
-          <RepairTimeline events={ mergedEvents } />
+          <RepairTimeline events={ customerTimeline } />
         ) }
 
         {/* ── Stale-data error banner ────────────────────────────────── */}
@@ -420,14 +404,38 @@ export default function RepairStatus() {
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
-function mergeTimelines( polledTimeline, streamedEvents ) {
-  const base   = Array.isArray( polledTimeline ) ? polledTimeline : [];
-  const stream = Array.isArray( streamedEvents  ) ? streamedEvents  : [];
-  if ( stream.length === 0 ) return base;
+function toCustomerTimeline( timeline ) {
+  if ( ! Array.isArray( timeline ) ) return [];
 
-  const seen = new Set( base.map( ( e ) => `${ e.type }|${ e.occurred_at }` ) );
-  const extras = stream.filter( ( e ) => ! seen.has( `${ e.type }|${ e.occurred_at }` ) );
-  return [ ...base, ...extras ].sort(
-    ( a, b ) => new Date( a.occurred_at ) - new Date( b.occurred_at )
-  );
+  const labelByType = {
+    'repair.submitted': 'Request submitted',
+    'repair.reviewed': 'Under review',
+    'repair.awaiting_customer': 'Waiting on customer details',
+    'repair.approved': 'Repair approved',
+    'repair.quoted': 'Quote issued',
+    'repair.quote_accepted': 'Quote accepted',
+    'repair.quote_declined': 'Quote declined',
+    'repair.parts_allocated': 'Parts prepared',
+    'repair.in_progress': 'Repair in progress',
+    'repair.ready_to_ship': 'Ready to ship',
+    'repair.completed': 'Repair completed',
+    'repair.closed': 'Repair closed',
+    'repair.cancelled': 'Repair cancelled',
+    'repair.note_added': 'Repair updated',
+    'repair.media_uploaded': 'Photos received',
+  };
+
+  return timeline
+    .map( ( event ) => {
+      const type = typeof event?.type === 'string' ? event.type : event?.event_type;
+      const occurredAt = event?.occurred_at || event?.created_at;
+      if ( typeof type !== 'string' || ! type.startsWith( 'repair.' ) ) return null;
+      return { ...event, type, occurred_at: occurredAt };
+    } )
+    .filter( Boolean )
+    .map( ( event ) => ( {
+      ...event,
+      label: labelByType[ event.type ] || event.label || 'Repair updated',
+    } ) )
+    .sort( ( a, b ) => new Date( a.occurred_at ) - new Date( b.occurred_at ) );
 }

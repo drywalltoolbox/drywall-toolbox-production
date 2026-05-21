@@ -183,6 +183,11 @@ export default function RepairTimeline( { events = [] } ) {
                   <p className={ `text-sm font-semibold ${ colors.text }` }>
                     { event.label || event.type }
                   </p>
+                  { event.message && (
+                    <p className="text-xs text-neutral-600 mt-1 leading-relaxed">
+                      { event.message }
+                    </p>
+                  ) }
                   <p
                     className="text-xs text-neutral-400 mt-0.5"
                     title={ fmtAbsolute( event.occurred_at ) }

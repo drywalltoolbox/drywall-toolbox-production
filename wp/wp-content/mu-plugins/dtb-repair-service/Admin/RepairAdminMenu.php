@@ -784,6 +784,158 @@ function dtb_repair_admin_inline_styles(): void {
 	#dtb-repair-transition-btn.button-primary:hover { opacity: .85; }
 	#dtb-repair-transition-msg { font-size: 12px; color: var(--dtb-muted); margin-left: 0 !important; display: block; margin-top: 8px; }
 
+	/* ── Command Center metabox ─────────────────────────────────────────────── */
+	#dtb-repair-command-center .inside { padding: 0 !important; }
+	#dtb-repair-command-center { overflow: hidden; }
+
+	.dtb-command-center {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		min-height: 220px;
+	}
+	.dtb-cc-panel {
+		padding: 18px 20px;
+	}
+	.dtb-cc-panel + .dtb-cc-panel {
+		border-left: 1px solid var(--dtb-border);
+	}
+	.dtb-cc-section-title {
+		font-size: 10px;
+		font-weight: 700;
+		text-transform: uppercase;
+		letter-spacing: .7px;
+		color: var(--dtb-muted);
+		margin: 0 0 14px;
+		display: flex;
+		align-items: center;
+		gap: 8px;
+	}
+	.dtb-cc-section-title::after {
+		content: '';
+		flex: 1;
+		height: 1px;
+		background: var(--dtb-border);
+	}
+	.dtb-cc-current-status {
+		display: flex;
+		align-items: center;
+		gap: 10px;
+		margin-bottom: 14px;
+		padding: 10px 13px;
+		background: #f9fafb;
+		border-radius: 8px;
+		border: 1px solid var(--dtb-border);
+	}
+	.dtb-cc-current-label {
+		font-size: 10px;
+		font-weight: 700;
+		text-transform: uppercase;
+		letter-spacing: .5px;
+		color: var(--dtb-muted);
+		white-space: nowrap;
+	}
+	.dtb-cc-select {
+		width: 100% !important;
+		margin-bottom: 8px !important;
+		border: 1px solid var(--dtb-border) !important;
+		border-radius: 7px !important;
+		padding: 8px 10px !important;
+		font-size: 13px !important;
+		color: var(--dtb-text) !important;
+		background: #fff !important;
+		box-sizing: border-box;
+		display: block;
+	}
+	.dtb-cc-note {
+		width: 100% !important;
+		margin-bottom: 10px !important;
+		border: 1px solid var(--dtb-border) !important;
+		border-radius: 7px !important;
+		padding: 8px 10px !important;
+		font-size: 13px !important;
+		color: var(--dtb-text) !important;
+		box-sizing: border-box !important;
+		display: block;
+	}
+	.dtb-cc-note:focus,
+	.dtb-cc-select:focus {
+		outline: none !important;
+		border-color: var(--dtb-blue) !important;
+		box-shadow: 0 0 0 3px rgba(29,78,216,.1) !important;
+	}
+	.dtb-cc-btn {
+		display: inline-flex;
+		align-items: center;
+		gap: 6px;
+		padding: 8px 20px;
+		background: var(--dtb-blue);
+		border: none;
+		border-radius: 7px;
+		color: #fff;
+		font-size: 13px;
+		font-weight: 600;
+		cursor: pointer;
+		transition: opacity .15s;
+		line-height: 1.4;
+	}
+	.dtb-cc-btn:hover { opacity: .85; }
+	.dtb-cc-btn:disabled { opacity: .45; cursor: not-allowed; }
+	.dtb-cc-msg {
+		display: block;
+		font-size: 12px;
+		color: var(--dtb-muted);
+		margin-top: 9px;
+		min-height: 16px;
+	}
+	.dtb-cc-msg-ok  { color: #16a34a !important; font-weight: 600; }
+	.dtb-cc-msg-err { color: #dc2626 !important; font-weight: 600; }
+	.dtb-cc-terminal {
+		font-size: 13px;
+		color: var(--dtb-muted);
+		font-style: italic;
+		padding: 8px 0;
+	}
+
+	/* Integration rows in command center */
+	.dtb-cc-int-row {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		padding: 9px 0;
+		border-bottom: 1px solid #f3f4f6;
+		gap: 8px;
+	}
+	.dtb-cc-int-row:last-child { border-bottom: none; }
+	.dtb-cc-int-name {
+		font-size: 12px;
+		font-weight: 700;
+		color: var(--dtb-text);
+		display: flex;
+		align-items: center;
+		gap: 5px;
+		min-width: 100px;
+		flex-shrink: 0;
+	}
+	.dtb-cc-int-right {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+		flex-wrap: wrap;
+		justify-content: flex-end;
+	}
+	.dtb-cc-int-link {
+		font-size: 11px;
+		color: var(--dtb-blue);
+		text-decoration: none;
+		font-weight: 600;
+	}
+	.dtb-cc-int-link:hover { text-decoration: underline; }
+	.dtb-cc-int-meta {
+		font-size: 11px;
+		color: var(--dtb-muted);
+		font-family: 'SFMono-Regular', Consolas, monospace;
+	}
+
 	/* ── Internal notes textarea ────────────────────────────────────────────── */
 	textarea[name="dtb_repair_internal_notes"] {
 		width: 100% !important;

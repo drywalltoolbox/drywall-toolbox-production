@@ -250,3 +250,18 @@ export async function acceptRepairQuote( repairId, token ) {
 export async function declineRepairQuote( repairId, token ) {
   return respondToRepairQuote( repairId, 'decline', token );
 }
+
+/**
+ * Submit a lightweight customer comment/update for an active repair.
+ *
+ * @param {number|string} repairId
+ * @param {string}        token
+ * @param {string}        comment
+ * @returns {Promise<{ success: boolean, message: string, data?: { comment: string } }>}
+ */
+export async function submitRepairComment( repairId, token, comment ) {
+  return apiClient( `/wp-json/dtb/v1/repairs/${ encodeURIComponent( repairId ) }/comment`, {
+    method: 'POST',
+    body: JSON.stringify( { token, comment } ),
+  } );
+}
