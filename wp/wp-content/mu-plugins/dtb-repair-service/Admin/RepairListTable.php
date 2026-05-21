@@ -36,26 +36,22 @@ class DTB_Repair_List_Table extends WP_List_Table {
 
 	public function get_columns(): array {
 		return [
-			'cb'          => '<input type="checkbox">',
-			'repair_id'   => __( 'Repair ID', 'drywall-toolbox' ),
-			'customer'    => __( 'Customer', 'drywall-toolbox' ),
-			'tool'        => __( 'Brand / Model', 'drywall-toolbox' ),
-			'status'      => __( 'Status', 'drywall-toolbox' ),
-			'age'         => __( 'Age', 'drywall-toolbox' ),
-			'sla'         => __( 'SLA', 'drywall-toolbox' ),
-			'wc_order'    => __( 'WC Order', 'drywall-toolbox' ),
-			'veeqo'       => __( 'Veeqo', 'drywall-toolbox' ),
-			'quickbooks'  => __( 'QuickBooks', 'drywall-toolbox' ),
-			'tech'        => __( 'Tech', 'drywall-toolbox' ),
-			'last_event'  => __( 'Last Event', 'drywall-toolbox' ),
+			'cb'           => '<input type="checkbox">',
+			'repair_id'    => __( 'Repair ID', 'drywall-toolbox' ),
+			'customer'     => __( 'Customer', 'drywall-toolbox' ),
+			'tool'         => __( 'Brand / Model', 'drywall-toolbox' ),
+			'status'       => __( 'Status', 'drywall-toolbox' ),
+			'wc_order'     => __( 'WC Order', 'drywall-toolbox' ),
+			'last_event'   => __( 'Last Update', 'drywall-toolbox' ),
+			'date_created' => __( 'Date Created', 'drywall-toolbox' ),
 		];
 	}
 
 	public function get_sortable_columns(): array {
 		return [
-			'repair_id' => [ 'ID', false ],
-			'status'    => [ 'status', false ],
-			'age'       => [ 'date', true ],
+			'repair_id'    => [ 'ID', false ],
+			'status'       => [ 'status', false ],
+			'date_created' => [ 'date', true ],
 		];
 	}
 
@@ -251,70 +247,17 @@ class DTB_Repair_List_Table extends WP_List_Table {
 		);
 	}
 
-	protected function column_age( $item ): string {
-		$submitted = (string) get_post_meta( $item->ID, '_repair_submitted_at', true );
-		if ( '' === $submitted ) {
-			return '<span class="dtb-age-ok">—</span>';
-		}
-		$ts   = strtotime( $submitted );
-		$days = (int) floor( ( time() - $ts ) / DAY_IN_SECONDS );
-
-		if ( $days >= 14 ) {
-			$cls = 'dtb-age-critical';
-		} elseif ( $days >= 7 ) {
-			$cls = 'dtb-age-warn';
-		} else {
-			$cls = 'dtb-age-ok';
-		}
-
-		$label = $days === 1 ? '1 day' : $days . 'd';
-		return '<span class="' . esc_attr( $cls ) . '">' . esc_html( $label ) . '</span>';
-	}
-
-	protected function column_sla( $item ): string {
-		$breached   = (string) get_post_meta( $item->ID, '_repair_sla_breached', true );
-		$age_days   = (string) get_post_meta( $item->ID, '_repair_sla_age_days', true );
-		$sla_days   = (string) get_post_meta( $item->ID, '_repair_sla_threshold_days', true );
-
-		if ( '' === $age_days ) {
-			return '<span class="dtb-sla-ok">—</span>';
-		}
-
-		$class = $breached ? 'dtb-sla-breached' : 'dtb-sla-ok';
-		return sprintf(
-			'<span class="%s">%s/%s d</span>',
-			esc_attr( $class ),
-			esc_html( $age_days ),
-			esc_html( $sla_days )
-		);
-	}
-
 	protected function column_wc_order( $item ): string {
 		$order_id = (int) get_post_meta( $item->ID, '_repair_wc_order_id', true );
 		if ( ! $order_id ) {
-			return '—';
+			return '<span style="color:#d1d5db;">—</span>';
 		}
 		$order_url = admin_url( 'post.php?post=' . $order_id . '&action=edit' );
-		return sprintf( '<a href="%s">#%d</a>', esc_url( $order_url ), $order_id );
-	}
-
-	protected function column_veeqo( $item ): string {
-		$state = dtb_repair_admin_get_integration_state_value( $item->ID, 'veeqo', 'state' );
-		return dtb_repair_admin_integration_badge( $state );
-	}
-
-	protected function column_quickbooks( $item ): string {
-		$state = dtb_repair_admin_get_integration_state_value( $item->ID, 'quickbooks', 'state' );
-		return dtb_repair_admin_integration_badge( $state );
-	}
-
-	protected function column_tech( $item ): string {
-		$tech_id = (int) get_post_meta( $item->ID, '_repair_assigned_tech_id', true );
-		if ( ! $tech_id ) {
-			return '—';
-		}
-		$user = get_userdata( $tech_id );
-		return $user ? esc_html( $user->display_name ) : esc_html( '#' . $tech_id );
+		return sprintf(
+			'<a href="%s" style="font-weight:600;">#%d</a>',
+			esc_url( $order_url ),
+			$order_id
+		);
 	}
 
 	protected function column_last_event( $item ): string {
@@ -332,6 +275,34 @@ class DTB_Repair_List_Table extends WP_List_Table {
 
 		return '<span class="dtb-last-event-type">' . $type_label . '</span>'
 			. '<span class="dtb-last-event-time">' . esc_html( $ago ) . '</span>';
+	}
+
+	protected function column_date_created( $item ): string {
+		$submitted = (string) get_post_meta( $item->ID, '_repair_submitted_at', true );
+		$ts        = $submitted ? strtotime( $submitted ) : strtotime( $item->post_date );
+
+		if ( ! $ts ) {
+			return '—';
+		}
+
+		$date = date_i18n( 'M j, Y', $ts );
+		$time = date_i18n( 'g:i a', $ts );
+
+		// Age coloring: warn ≥7 days, critical ≥14 days.
+		$days = (int) floor( ( time() - $ts ) / DAY_IN_SECONDS );
+		if ( $days >= 14 ) {
+			$age_cls = 'dtb-age-critical';
+		} elseif ( $days >= 7 ) {
+			$age_cls = 'dtb-age-warn';
+		} else {
+			$age_cls = 'dtb-age-ok';
+		}
+
+		$age_label = $days === 0 ? 'Today' : ( $days === 1 ? '1 day ago' : $days . 'd ago' );
+
+		return '<span style="font-size:12px;font-weight:500;">' . esc_html( $date ) . '</span>'
+			. '<span class="dtb-cell-sub">' . esc_html( $time ) . '</span>'
+			. '<span class="dtb-cell-sub ' . esc_attr( $age_cls ) . '">' . esc_html( $age_label ) . '</span>';
 	}
 }
 

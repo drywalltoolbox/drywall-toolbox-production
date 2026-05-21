@@ -384,15 +384,13 @@ function dtb_repair_admin_inline_styles(): void {
 	}
 	.dtb-repairs-wrap .tablenav .displaying-num { font-size: 12px; color: #9ca3af; }
 	.dtb-repairs-wrap .tablenav-pages .pagination-links .button { border-radius: 6px !important; }
-	.dtb-repairs-wrap .column-repair_id  { width: 90px; }
-	.dtb-repairs-wrap .column-status     { width: 140px; }
-	.dtb-repairs-wrap .column-age,
-	.dtb-repairs-wrap .column-sla        { width: 72px; text-align: center; }
-	.dtb-repairs-wrap .column-wc_order,
-	.dtb-repairs-wrap .column-veeqo,
-	.dtb-repairs-wrap .column-quickbooks { width: 72px; text-align: center; }
-	.dtb-repairs-wrap .column-tech       { width: 110px; }
-	.dtb-repairs-wrap .column-last_event { min-width: 140px; }
+	.dtb-repairs-wrap .column-repair_id    { width: 90px; }
+	.dtb-repairs-wrap .column-customer     { min-width: 160px; }
+	.dtb-repairs-wrap .column-tool         { min-width: 160px; }
+	.dtb-repairs-wrap .column-status       { width: 145px; }
+	.dtb-repairs-wrap .column-wc_order     { width: 90px; text-align: center; }
+	.dtb-repairs-wrap .column-last_event   { min-width: 150px; }
+	.dtb-repairs-wrap .column-date_created { width: 130px; }
 
 	/* ── Kill WP's striped alternating rows ──────────────────── */
 	.dtb-repairs-wrap .wp-list-table.striped > tbody > tr:nth-child(odd) {
