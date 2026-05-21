@@ -905,6 +905,15 @@ function dtb_repair_admin_inline_styles(): void {
 		grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
 		gap: 16px;
 	}
+	#postbox-container-2 #normal-sortables .dtb-top-grid {
+		grid-column: 1 / -1;
+		display: grid;
+		grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+		gap: 16px;
+	}
+	#postbox-container-2 #normal-sortables .dtb-top-grid > .postbox {
+		margin: 0 !important;
+	}
 	#postbox-container-2 #normal-sortables > .postbox {
 		margin: 0 !important;
 		grid-column: 1 / -1; /* default full width */
@@ -921,6 +930,9 @@ function dtb_repair_admin_inline_styles(): void {
 
 	@media (max-width: 1360px) {
 		#postbox-container-2 #normal-sortables {
+			grid-template-columns: 1fr;
+		}
+		#postbox-container-2 #normal-sortables .dtb-top-grid {
 			grid-template-columns: 1fr;
 		}
 		#postbox-container-2 #dtb-repair-command-center,
@@ -1724,6 +1736,28 @@ function dtb_repair_admin_footer_scripts(): void {
 
 		/* ── Workspace tabs: show/hide section groups ── */
 		var tabButtons = Array.from(document.querySelectorAll('.dtb-workspace-tab'));
+		var mountTopGrid = function() {
+			var normal = document.getElementById('normal-sortables');
+			var command = document.getElementById('dtb-repair-command-center');
+			var orderDetails = document.getElementById('dtb-repair-order-details');
+			if (!normal || !command || !orderDetails) return;
+
+			var topGrid = normal.querySelector('.dtb-top-grid');
+			if (!topGrid) {
+				topGrid = document.createElement('div');
+				topGrid.className = 'dtb-top-grid';
+				normal.insertBefore(topGrid, normal.firstChild);
+			}
+
+			if (command.parentElement !== topGrid) {
+				topGrid.appendChild(command);
+			}
+			if (orderDetails.parentElement !== topGrid) {
+				topGrid.appendChild(orderDetails);
+			}
+		};
+
+		mountTopGrid();
 		if ( tabButtons.length ) {
 			var byId = function(id) { return document.getElementById(id); };
 			var groups = {
@@ -1781,10 +1815,12 @@ function dtb_repair_admin_footer_scripts(): void {
 				btn.addEventListener('click', function() {
 					var tabKey = btn.getAttribute('data-dtb-tab') || 'order_details';
 					setActiveTab(tabKey);
+					mountTopGrid();
 				});
 			});
 
 			setActiveTab('order_details');
+			mountTopGrid();
 		}
 
 		/* ── Live schematic lookup (technician workspace) ── */

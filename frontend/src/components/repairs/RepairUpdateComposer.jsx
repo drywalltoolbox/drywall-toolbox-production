@@ -4,7 +4,7 @@
  * Unified customer update composer:
  * - short note/comment
  * - optional photos
- * - mobile-first attachment action menu (photo library / camera)
+ * - anchored attachment dropdown (photo library / camera)
  */
 
 import { useEffect, useMemo, useRef, useState } from 'react';
@@ -26,7 +26,8 @@ export default function RepairUpdateComposer( { repairId, token, onSubmitted } )
   const [ error, setError ] = useState( null );
   const [ success, setSuccess ] = useState( null );
 
-  const sheetRef = useRef( null );
+  const menuRef = useRef( null );
+  const attachButtonRef = useRef( null );
   const libraryInputRef = useRef( null );
   const cameraInputRef = useRef( null );
 
@@ -37,7 +38,9 @@ export default function RepairUpdateComposer( { repairId, token, onSubmitted } )
   useEffect( () => {
     if ( ! menuOpen ) return undefined;
     const onPointerDown = ( e ) => {
-      if ( ! sheetRef.current?.contains( e.target ) ) setMenuOpen( false );
+      const clickInsideMenu = menuRef.current?.contains( e.target );
+      const clickToggle = attachButtonRef.current?.contains( e.target );
+      if ( ! clickInsideMenu && ! clickToggle ) setMenuOpen( false );
     };
     document.addEventListener( 'pointerdown', onPointerDown );
     return () => document.removeEventListener( 'pointerdown', onPointerDown );
@@ -160,14 +163,58 @@ export default function RepairUpdateComposer( { repairId, token, onSubmitted } )
             { remaining } characters remaining
           </span>
           <div className="flex items-center gap-2">
+            <div className="relative">
             <button
+              ref={ attachButtonRef }
               type="button"
-              onClick={ () => setMenuOpen( true ) }
+              onClick={ () => setMenuOpen( ( prev ) => ! prev ) }
               className="h-10 w-10 rounded-xl border border-neutral-300 text-neutral-600 hover:text-blue-600 hover:border-blue-300 bg-white transition-colors flex items-center justify-center"
               aria-label="Attach photo"
+              aria-expanded={ menuOpen }
+              aria-haspopup="menu"
             >
               <ImagePlus size={ 18 } />
             </button>
+            <AnimatePresence>
+              { menuOpen && (
+                <motion.div
+                  ref={ menuRef }
+                  initial={{ opacity: 0, y: -6, scale: 0.98 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: -4, scale: 0.98 }}
+                  transition={{ duration: 0.16, ease: 'easeOut' }}
+                  className="absolute right-0 top-full mt-2 z-40 w-48 rounded-xl border border-neutral-200 bg-white shadow-xl overflow-hidden"
+                  role="menu"
+                  aria-label="Photo options"
+                >
+                  <button
+                    type="button"
+                    onClick={ () => {
+                      setMenuOpen( false );
+                      libraryInputRef.current?.click();
+                    } }
+                    className="w-full px-3.5 py-2.5 text-left text-sm font-medium text-neutral-700 hover:bg-neutral-50 flex items-center gap-2"
+                    role="menuitem"
+                  >
+                    <ImagePlus size={ 16 } className="text-blue-600" />
+                    Photo Library
+                  </button>
+                  <button
+                    type="button"
+                    onClick={ () => {
+                      setMenuOpen( false );
+                      cameraInputRef.current?.click();
+                    } }
+                    className="w-full px-3.5 py-2.5 text-left text-sm font-medium text-neutral-700 hover:bg-neutral-50 border-t border-neutral-100 flex items-center gap-2"
+                    role="menuitem"
+                  >
+                    <Camera size={ 16 } className="text-blue-600" />
+                    Take Picture
+                  </button>
+                </motion.div>
+              ) }
+            </AnimatePresence>
+            </div>
             <button
               type="submit"
               disabled={ ! canSend }
@@ -200,60 +247,6 @@ export default function RepairUpdateComposer( { repairId, token, onSubmitted } )
         onChange={ onSelectFiles }
       />
 
-      <AnimatePresence>
-        { menuOpen && (
-          <>
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-black/30 z-40"
-            />
-            <motion.div
-              ref={ sheetRef }
-              initial={{ y: 40, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              exit={{ y: 24, opacity: 0 }}
-              transition={{ duration: 0.22, ease: 'easeOut' }}
-              className="fixed inset-x-0 bottom-0 z-50 max-w-2xl mx-auto px-4 pb-4"
-            >
-              <div className="rounded-2xl border border-neutral-200 bg-white shadow-xl overflow-hidden">
-                <div className="h-1.5 w-10 bg-neutral-300 rounded-full mx-auto mt-2 mb-1" />
-                <button
-                  type="button"
-                  onClick={ () => {
-                    setMenuOpen( false );
-                    libraryInputRef.current?.click();
-                  } }
-                  className="w-full px-4 py-3.5 text-left text-sm font-medium text-neutral-700 hover:bg-neutral-50 flex items-center gap-2"
-                >
-                  <ImagePlus size={ 16 } className="text-blue-600" />
-                  Photo Library
-                </button>
-                <button
-                  type="button"
-                  onClick={ () => {
-                    setMenuOpen( false );
-                    cameraInputRef.current?.click();
-                  } }
-                  className="w-full px-4 py-3.5 text-left text-sm font-medium text-neutral-700 hover:bg-neutral-50 border-t border-neutral-100 flex items-center gap-2"
-                >
-                  <Camera size={ 16 } className="text-blue-600" />
-                  Take Picture
-                </button>
-                <button
-                  type="button"
-                  onClick={ () => setMenuOpen( false ) }
-                  className="w-full px-4 py-3.5 text-sm font-semibold text-neutral-500 border-t border-neutral-100 hover:bg-neutral-50"
-                >
-                  Cancel
-                </button>
-              </div>
-            </motion.div>
-          </>
-        ) }
-      </AnimatePresence>
     </div>
   );
 }
-
