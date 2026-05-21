@@ -61,9 +61,17 @@ function dtb_repair_resolve_schematic_catalog_match( int $repair_id, string $sch
 	foreach ( $candidates as $meta_clause ) {
 		$meta_query = [
 			[
-				'key'     => '_dtb_is_schematic',
-				'value'   => '1',
-				'compare' => '=',
+				'relation' => 'OR',
+				[
+					'key'     => '_dtb_is_schematic',
+					'value'   => '1',
+					'compare' => '=',
+				],
+				[
+					'key'     => '_dtb_schematic_id',
+					'value'   => '',
+					'compare' => '!=',
+				],
 			],
 			$meta_clause,
 		];
@@ -98,9 +106,17 @@ function dtb_repair_resolve_schematic_catalog_match( int $repair_id, string $sch
 				'fields'         => 'ids',
 				'meta_query'     => [
 					[
-						'key'     => '_dtb_is_schematic',
-						'value'   => '1',
-						'compare' => '=',
+						'relation' => 'OR',
+						[
+							'key'     => '_dtb_is_schematic',
+							'value'   => '1',
+							'compare' => '=',
+						],
+						[
+							'key'     => '_dtb_schematic_id',
+							'value'   => '',
+							'compare' => '!=',
+						],
 					],
 				],
 			]
@@ -216,4 +232,3 @@ function dtb_repair_get_schematic_sync_snapshot( int $repair_id ): array {
 	$decoded = json_decode( $raw, true );
 	return is_array( $decoded ) ? $decoded : [];
 }
-

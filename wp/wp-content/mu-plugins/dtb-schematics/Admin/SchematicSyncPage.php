@@ -100,6 +100,169 @@ function dtb_ajax_schematics_search_products() {
 	wp_send_json_success( dtb_schematic_media_repo_search_products( $q, 20 ) );
 }
 
+// ── AJAX: Audit schematic library coverage ──────────────────────────────────
+
+add_action( 'wp_ajax_dtb_schematics_audit', 'dtb_ajax_schematics_audit' );
+function dtb_ajax_schematics_audit() {
+	check_ajax_referer( 'dtb_schematics_nonce', 'nonce' );
+	if ( ! current_user_can( 'manage_options' ) ) {
+		wp_send_json_error( [], 403 );
+	}
+
+	$ids = get_posts(
+		[
+			'post_type'      => 'attachment',
+			'post_status'    => 'inherit',
+			'posts_per_page' => -1,
+			'fields'         => 'ids',
+			'meta_query'     => [
+				[
+					'relation' => 'OR',
+					[
+						'key'     => '_dtb_is_schematic',
+						'value'   => '1',
+						'compare' => '=',
+					],
+					[
+						'key'     => '_dtb_schematic_id',
+						'value'   => '',
+						'compare' => '!=',
+					],
+				],
+			],
+		]
+	);
+
+	$stats = [
+		'total'              => 0,
+		'with_id'            => 0,
+		'with_flag'          => 0,
+		'with_brand'         => 0,
+		'with_model_number'  => 0,
+		'complete_records'   => 0,
+		'missing_product_map'=> 0,
+	];
+
+	foreach ( (array) $ids as $id ) {
+		$id = (int) $id;
+		$stats['total']++;
+		$sid    = trim( (string) get_post_meta( $id, '_dtb_schematic_id', true ) );
+		$flag   = (string) get_post_meta( $id, '_dtb_is_schematic', true );
+		$brand  = trim( (string) get_post_meta( $id, '_dtb_schematic_brand', true ) );
+		$model  = trim( (string) get_post_meta( $id, '_dtb_schematic_model_number', true ) );
+		$pids   = dtb_schematic_normalize_product_ids( get_post_meta( $id, '_dtb_schematic_product_ids', true ) );
+
+		if ( '' !== $sid ) {
+			$stats['with_id']++;
+		}
+		if ( '1' === $flag ) {
+			$stats['with_flag']++;
+		}
+		if ( '' !== $brand ) {
+			$stats['with_brand']++;
+		}
+		if ( '' !== $model ) {
+			$stats['with_model_number']++;
+		}
+		if ( '' !== $sid && '' !== $brand && '' !== $model ) {
+			$stats['complete_records']++;
+		}
+		if ( empty( $pids ) ) {
+			$stats['missing_product_map']++;
+		}
+	}
+
+	wp_send_json_success( $stats );
+}
+
+// ── AJAX: CSV importer for schematic metadata ───────────────────────────────
+
+add_action( 'wp_ajax_dtb_schematics_import_csv', 'dtb_ajax_schematics_import_csv' );
+function dtb_ajax_schematics_import_csv() {
+	check_ajax_referer( 'dtb_schematics_nonce', 'nonce' );
+	if ( ! current_user_can( 'manage_options' ) ) {
+		wp_send_json_error( [], 403 );
+	}
+	if ( empty( $_FILES['file']['tmp_name'] ) || ! is_uploaded_file( $_FILES['file']['tmp_name'] ) ) {
+		wp_send_json_error( [ 'message' => 'CSV file is required.' ], 400 );
+	}
+
+	$fp = fopen( $_FILES['file']['tmp_name'], 'r' );
+	if ( false === $fp ) {
+		wp_send_json_error( [ 'message' => 'Unable to read uploaded CSV.' ], 400 );
+	}
+
+	$header = fgetcsv( $fp );
+	if ( ! is_array( $header ) ) {
+		fclose( $fp );
+		wp_send_json_error( [ 'message' => 'CSV header row is missing.' ], 400 );
+	}
+	$header = array_map( static fn( $h ) => strtolower( trim( (string) $h ) ), $header );
+	$map    = array_flip( $header );
+
+	$required = [ 'attachment_id', 'schematic_id', 'brand', 'model_number' ];
+	foreach ( $required as $col ) {
+		if ( ! isset( $map[ $col ] ) ) {
+			fclose( $fp );
+			wp_send_json_error( [ 'message' => sprintf( 'Missing required column: %s', $col ) ], 400 );
+		}
+	}
+
+	$row_num = 1;
+	$imported = 0;
+	$errors = [];
+
+	while ( ( $row = fgetcsv( $fp ) ) !== false ) {
+		$row_num++;
+		if ( empty( array_filter( $row, static fn( $v ) => '' !== trim( (string) $v ) ) ) ) {
+			continue;
+		}
+
+		$attachment_id = absint( $row[ $map['attachment_id'] ] ?? 0 );
+		$schematic_id  = sanitize_text_field( (string) ( $row[ $map['schematic_id'] ] ?? '' ) );
+		$brand         = sanitize_text_field( (string) ( $row[ $map['brand'] ] ?? '' ) );
+		$model_number  = sanitize_text_field( (string) ( $row[ $map['model_number'] ] ?? '' ) );
+		$model_name    = isset( $map['model_name'] ) ? sanitize_text_field( (string) ( $row[ $map['model_name'] ] ?? '' ) ) : '';
+		$part_count    = isset( $map['part_count'] ) ? absint( $row[ $map['part_count'] ] ?? 0 ) : 0;
+		$notes         = isset( $map['notes'] ) ? sanitize_textarea_field( (string) ( $row[ $map['notes'] ] ?? '' ) ) : '';
+		$product_ids   = isset( $map['product_ids'] ) ? dtb_schematic_normalize_product_ids( (string) ( $row[ $map['product_ids'] ] ?? '' ) ) : [];
+
+		if ( ! dtb_validate_schematic_attachment_id( $attachment_id ) ) {
+			$errors[] = "Row {$row_num}: invalid attachment_id {$attachment_id}.";
+			continue;
+		}
+		if ( '' === $schematic_id || '' === $brand || '' === $model_number ) {
+			$errors[] = "Row {$row_num}: schematic_id, brand, and model_number are required.";
+			continue;
+		}
+
+		update_post_meta( $attachment_id, '_dtb_schematic_id', $schematic_id );
+		dtb_save_schematic_meta(
+			$attachment_id,
+			[
+				'brand'        => $brand,
+				'model_number' => $model_number,
+				'model_name'   => $model_name,
+				'part_count'   => $part_count,
+				'notes'        => $notes,
+				'product_ids'  => $product_ids,
+			]
+		);
+		$imported++;
+	}
+	fclose( $fp );
+
+	dtb_schematics_manifest_repo_delete_cache();
+
+	wp_send_json_success(
+		[
+			'imported' => $imported,
+			'errors'   => $errors,
+			'message'  => sprintf( 'Imported %d schematic rows.', $imported ),
+		]
+	);
+}
+
 // ── Page Render ───────────────────────────────────────────────────────────────
 
 

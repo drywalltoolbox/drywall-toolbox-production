@@ -254,9 +254,17 @@ function dtb_repair_metabox_technician( WP_Post $post ): void {
 			'fields'         => 'ids',
 			'meta_query'     => [
 				[
-					'key'     => '_dtb_is_schematic',
-					'value'   => '1',
-					'compare' => '=',
+					'relation' => 'OR',
+					[
+						'key'     => '_dtb_is_schematic',
+						'value'   => '1',
+						'compare' => '=',
+					],
+					[
+						'key'     => '_dtb_schematic_id',
+						'value'   => '',
+						'compare' => '!=',
+					],
 				],
 				[
 					'relation' => 'OR',
@@ -488,12 +496,21 @@ function dtb_repair_ajax_schematic_lookup(): void {
 			'post_status'    => 'inherit',
 			'posts_per_page' => 15,
 			'fields'         => 'ids',
+			's'              => $term,
 			'meta_query'     => [
 				'relation' => 'AND',
 				[
-					'key'     => '_dtb_is_schematic',
-					'value'   => '1',
-					'compare' => '=',
+					'relation' => 'OR',
+					[
+						'key'     => '_dtb_is_schematic',
+						'value'   => '1',
+						'compare' => '=',
+					],
+					[
+						'key'     => '_dtb_schematic_id',
+						'value'   => '',
+						'compare' => '!=',
+					],
 				],
 				[
 					'relation' => 'OR',

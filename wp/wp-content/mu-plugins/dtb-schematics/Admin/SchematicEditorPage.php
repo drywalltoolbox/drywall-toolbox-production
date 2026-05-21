@@ -73,6 +73,7 @@ function dtb_schematics_render_page() {
 			<button class="dtb-tab active" data-tab="list">All Schematics</button>
 			<button class="dtb-tab" data-tab="add">Add Schematic</button>
 			<button class="dtb-tab" data-tab="manifest">Manifest</button>
+			<button class="dtb-tab" data-tab="import">Import & Audit</button>
 		</div>
 
 		<!-- Tab: List -->
@@ -187,6 +188,35 @@ function dtb_schematics_render_page() {
 				</button>
 				<span id="dtb-purge-spinner" style="display:none;margin-left:8px;"><span class="spinner is-active" style="float:none;margin:0;"></span></span>
 				<div id="dtb-purge-msg" style="margin-top:10px;font-size:13px;"></div>
+			</div>
+		</div>
+
+		<!-- Tab: Import & Audit -->
+		<div id="dtb-tab-import" class="dtb-tab-panel">
+			<div class="dtb-card" style="max-width:760px;">
+				<h3 style="margin-top:0;">Schematic Library Audit</h3>
+				<p style="font-size:13px;color:#787c82;margin-top:0;">Check how complete your schematics metadata is before frontend/admin lookups depend on it.</p>
+				<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+					<button id="dtb-btn-audit" class="dtb-btn dtb-btn-secondary">
+						<span class="dashicons dashicons-search" style="font-size:15px;"></span> Run Audit
+					</button>
+					<span id="dtb-audit-spinner" style="display:none;"><span class="spinner is-active" style="float:none;margin:0;"></span></span>
+				</div>
+				<pre id="dtb-audit-output" style="display:none;margin-top:12px;background:#f6f7f7;border:1px solid #dcdcde;padding:10px;border-radius:4px;white-space:pre-wrap;"></pre>
+			</div>
+
+			<div class="dtb-card" style="max-width:760px;">
+				<h3 style="margin-top:0;">Bulk Import (CSV)</h3>
+				<p style="font-size:13px;color:#787c82;margin-top:0;">Required columns: <code>attachment_id</code>, <code>schematic_id</code>, <code>brand</code>, <code>model_number</code>. Optional: <code>model_name</code>, <code>part_count</code>, <code>notes</code>, <code>product_ids</code>.</p>
+				<input type="file" id="dtb-import-file" accept=".csv,text/csv">
+				<div style="margin-top:10px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+					<button id="dtb-btn-import" class="dtb-btn dtb-btn-primary">
+						<span class="dashicons dashicons-upload" style="font-size:15px;"></span> Import CSV
+					</button>
+					<span id="dtb-import-spinner" style="display:none;"><span class="spinner is-active" style="float:none;margin:0;"></span></span>
+				</div>
+				<div id="dtb-import-msg" style="margin-top:10px;font-size:13px;"></div>
+				<pre id="dtb-import-errors" style="display:none;margin-top:10px;background:#fff8f8;border:1px solid #f0c0c1;padding:10px;border-radius:4px;white-space:pre-wrap;color:#8a2424;"></pre>
 			</div>
 		</div>
 
@@ -523,6 +553,77 @@ function dtb_schematics_render_page() {
 				} else {
 					$('#dtb-purge-msg').text('✗ Purge failed.').css('color','#d63638');
 				}
+			});
+		});
+
+		// ── Import & Audit Tab ───────────────────────────────────────────────
+
+		$('#dtb-btn-audit').on('click', function(){
+			var $btn = $(this);
+			$btn.prop('disabled', true);
+			$('#dtb-audit-spinner').show();
+			$('#dtb-audit-output').hide().text('');
+			$.post(ajaxurl, { action: 'dtb_schematics_audit', nonce: nonce }, function(res){
+				$btn.prop('disabled', false);
+				$('#dtb-audit-spinner').hide();
+				if (!res.success) {
+					$('#dtb-audit-output').show().text('Audit failed.');
+					return;
+				}
+				var d = res.data || {};
+				var lines = [
+					'Total schematic attachments: ' + (d.total || 0),
+					'With schematic ID: ' + (d.with_id || 0),
+					'With schematic flag: ' + (d.with_flag || 0),
+					'With brand: ' + (d.with_brand || 0),
+					'With model number: ' + (d.with_model_number || 0),
+					'Complete records (ID + brand + model): ' + (d.complete_records || 0),
+					'Missing product map: ' + (d.missing_product_map || 0)
+				];
+				$('#dtb-audit-output').show().text(lines.join('\n'));
+			});
+		});
+
+		$('#dtb-btn-import').on('click', function(){
+			var fileInput = document.getElementById('dtb-import-file');
+			if (!fileInput || !fileInput.files || !fileInput.files.length) {
+				alert('Please select a CSV file first.');
+				return;
+			}
+			var formData = new FormData();
+			formData.append('action', 'dtb_schematics_import_csv');
+			formData.append('nonce', nonce);
+			formData.append('file', fileInput.files[0]);
+
+			var $btn = $(this);
+			$btn.prop('disabled', true);
+			$('#dtb-import-spinner').show();
+			$('#dtb-import-msg').text('');
+			$('#dtb-import-errors').hide().text('');
+
+			$.ajax({
+				url: ajaxurl,
+				type: 'POST',
+				data: formData,
+				processData: false,
+				contentType: false
+			}).done(function(res){
+				$btn.prop('disabled', false);
+				$('#dtb-import-spinner').hide();
+				if (!res || !res.success) {
+					$('#dtb-import-msg').text('Import failed.').css('color', '#d63638');
+					return;
+				}
+				var d = res.data || {};
+				$('#dtb-import-msg').text('✓ ' + (d.message || 'Import complete.')).css('color', '#1a7f37');
+				if (d.errors && d.errors.length) {
+					$('#dtb-import-errors').show().text(d.errors.join('\n'));
+				}
+				loadList(1);
+			}).fail(function(){
+				$btn.prop('disabled', false);
+				$('#dtb-import-spinner').hide();
+				$('#dtb-import-msg').text('Import failed.').css('color', '#d63638');
 			});
 		});
 

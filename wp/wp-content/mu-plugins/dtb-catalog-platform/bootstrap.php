@@ -100,6 +100,9 @@ if ( is_admin() || ( defined( 'WP_CLI' ) && WP_CLI ) ) {
 	require_once $_dtb_cp . '/Admin/ProductMappingRenderer.php';
 	require_once $_dtb_cp . '/Admin/ProductMappingPage.php';
 	require_once $_dtb_cp . '/Admin/ProductMappingActions.php';
+	require_once $_dtb_cp . '/Admin/PartsManagerPage.php';
+	require_once $_dtb_cp . '/Admin/PartsManagerActions.php';
 }
 
 unset( $_dtb_cp );
+
