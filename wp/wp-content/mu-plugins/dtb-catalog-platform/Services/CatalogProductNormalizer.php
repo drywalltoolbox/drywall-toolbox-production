@@ -108,6 +108,7 @@ final class DTB_CatalogProductNormalizer {
 			],
 			'variation'        => $variation,
 			'attributes'       => $wc['attributes'] ?? [],
+			'metaData'         => self::extract_specs_meta_data( $wc['meta_data'] ?? [] ),
 		];
 
 		// Attach the card product DTO (self or resolved default variation placeholder).
@@ -127,6 +128,41 @@ final class DTB_CatalogProductNormalizer {
 			}
 		}
 		return $map;
+	}
+
+	/**
+	 * Extract only specification-related metadata for frontend product detail.
+	 *
+	 * Keeps payloads lean while preserving compatibility with both the new
+	 * canonical specs JSON workflow and legacy _specs/_includes keys.
+	 *
+	 * @param  array<int,array<string,mixed>> $meta_data
+	 * @return array<int,array<string,mixed>>
+	 */
+	private static function extract_specs_meta_data( array $meta_data ): array {
+		$filtered = [];
+
+		foreach ( $meta_data as $entry ) {
+			$key = isset( $entry['key'] ) ? (string) $entry['key'] : '';
+			if ( '' === $key ) {
+				continue;
+			}
+
+			$include = '_dtb_specs_json' === $key
+				|| preg_match( '/^_specs_\d+_(label|value)$/', $key )
+				|| preg_match( '/^_includes_\d+_(name|sku)$/', $key );
+
+			if ( ! $include ) {
+				continue;
+			}
+
+			$filtered[] = [
+				'key'   => $key,
+				'value' => $entry['value'] ?? '',
+			];
+		}
+
+		return $filtered;
 	}
 
 	/** Extract brand identity, trying meta → parent meta → WC attribute → WC category. */

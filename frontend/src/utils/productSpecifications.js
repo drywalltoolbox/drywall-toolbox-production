@@ -53,6 +53,67 @@ export function extractSpecifications(product) {
     .filter(spec => spec.label && spec.value);
 }
 
+const INTERNAL_SPEC_LABELS = new Set([
+  'parent sku',
+  'product type',
+  'commerce mode',
+  'category key',
+  'display category key',
+  'variation axis',
+  'variation value',
+  'variation label',
+]);
+
+function isCustomerFacingSpec(spec) {
+  const label = `${spec?.label || ''}`.trim().toLowerCase();
+  return Boolean(label) && !INTERNAL_SPEC_LABELS.has(label);
+}
+
+function extractSpecificationsFromCanonicalMeta(meta_data) {
+  if (!Array.isArray(meta_data) || meta_data.length === 0) {
+    return [];
+  }
+
+  const canonicalEntry = meta_data.find((entry) => {
+    const key = `${entry?.key || ''}`.trim();
+    return key === '_dtb_specs_json' || key === 'dtb_specs_json';
+  });
+
+  if (!canonicalEntry || typeof canonicalEntry.value !== 'string') {
+    return [];
+  }
+
+  try {
+    const parsed = JSON.parse(canonicalEntry.value);
+    if (!Array.isArray(parsed)) return [];
+
+    return parsed
+      .map((item) => {
+        const label = `${item?.label || ''}`.trim();
+        const value = item?.value == null ? '' : `${item.value}`.trim();
+        const items = Array.isArray(item?.items)
+          ? item.items
+              .map((included) => {
+                const name = `${included?.name || ''}`.trim();
+                const sku = `${included?.sku || ''}`.trim();
+                if (!name) return null;
+                return sku ? { name, sku } : { name };
+              })
+              .filter(Boolean)
+          : undefined;
+
+        if (!label || (!value && (!Array.isArray(items) || items.length === 0))) {
+          return null;
+        }
+
+        return items && items.length > 0 ? { label, value, items } : { label, value };
+      })
+      .filter(Boolean);
+  } catch {
+    return [];
+  }
+}
+
 /**
  * parseSpecificationsFromDescription — Extract specs from HTML description
  * 
@@ -306,10 +367,16 @@ function enrichIncludesSpec(specs, meta_data) {
 export function getProductSpecifications(product) {
   const meta_data = Array.isArray(product?.meta_data) ? product.meta_data : [];
 
+  // Canonical launch workflow format (single JSON meta field from CSV).
+  const canonicalSpecs = extractSpecificationsFromCanonicalMeta(meta_data);
+  if (canonicalSpecs.length > 0) {
+    return enrichIncludesSpec(canonicalSpecs, meta_data).filter(isCustomerFacingSpec);
+  }
+
   // Try meta_data first (new standard format)
   const metaSpecs = extractSpecifications(product);
   if (metaSpecs.length > 0) {
-    return enrichIncludesSpec(metaSpecs, meta_data);
+    return enrichIncludesSpec(metaSpecs, meta_data).filter(isCustomerFacingSpec);
   }
 
   // Fall back to parsing HTML description
@@ -317,7 +384,7 @@ export function getProductSpecifications(product) {
     product.description_full || product.description
   );
   if (descSpecs.length > 0) {
-    return enrichIncludesSpec(descSpecs, meta_data);
+    return enrichIncludesSpec(descSpecs, meta_data).filter(isCustomerFacingSpec);
   }
 
   return [];

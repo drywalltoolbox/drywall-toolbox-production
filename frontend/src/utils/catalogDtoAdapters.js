@@ -3,6 +3,21 @@ function toNumber(value, fallback = 0) {
   return Number.isFinite(parsed) ? parsed : fallback;
 }
 
+function toLegacyMetaData(metaData = []) {
+  if (!Array.isArray(metaData)) return [];
+
+  return metaData
+    .map((entry) => {
+      const key = `${entry?.key || ''}`.trim();
+      if (!key) return null;
+      return {
+        key,
+        value: entry?.value ?? '',
+      };
+    })
+    .filter(Boolean);
+}
+
 function toLegacyVariationAttributeValues(attributes = []) {
   if (!Array.isArray(attributes)) return [];
   return attributes
@@ -272,6 +287,7 @@ export function toLegacyVariationDTO(variationDto = {}, parentDto = null) {
         : (Array.isArray(parentDto?.media?.images) ? parentDto.media.images : [])),
     attributes,
     variation: variationDto?.variation || {},
+    meta_data: toLegacyMetaData(variationDto?.metaData),
     variation_attribute_values: toLegacyVariationAttributeValues(attributes),
   };
 }
@@ -312,6 +328,7 @@ export function toLegacyProductCardDTO(dto = {}, computed = null) {
     purchasable: inventory?.purchasable ?? true,
     image: media?.image || cardProduct.image || '',
     images: Array.isArray(media?.images) ? media.images : [],
+  meta_data: toLegacyMetaData(dto?.metaData),
     attributes: variationAttributes,
     variation_attributes: variationAttributes,
     variation_attribute_values: toLegacyVariationAttributeValues(variationAttributes),

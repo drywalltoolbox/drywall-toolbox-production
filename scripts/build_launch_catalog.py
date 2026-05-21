@@ -104,6 +104,7 @@ IMAGE_URL_RE = re.compile(r"^https?://", re.I)
 IMAGE_SPLIT_RE = re.compile(r"\s*(?:,|\|)\s*")
 KEY_COLUMN_NAMES = {"sku", "mpn", "model", "part"}
 PRICE_COLUMN_NAMES = {"regularprice", "price", "pricedisplay", "gold", "listpriceusd", "listprice"}
+SPECS_META_JSON_COL = "Meta: _dtb_specs_json"
 
 
 def read_csv(path: Path) -> tuple[list[str], list[dict[str, str]]]:
@@ -460,6 +461,121 @@ def add_issue(
     )
 
 
+def append_spec(specs: list[dict[str, str]], seen_labels: set[str], label: str, value: str) -> None:
+    clean_label = clean_space(label)
+    clean_value = clean_space(value)
+    if not clean_label or not clean_value:
+        return
+    key = clean_label.lower()
+    if key in seen_labels:
+        return
+    seen_labels.add(key)
+    specs.append({"label": clean_label, "value": clean_value})
+
+
+def customer_label_for(attribute_label: str) -> str:
+    label = clean_space(attribute_label)
+    low = label.lower()
+    overrides = {
+        "box configuration": "Configuration",
+        "size / model": "Size",
+    }
+    return overrides.get(low, label)
+
+
+def format_with_unit(value: str, unit: str) -> str:
+    clean_value = clean_space(value)
+    if not clean_value:
+        return ""
+    return f"{clean_value} {unit}".strip()
+
+
+def extract_kit_includes(html_str: str) -> list[dict[str, str]]:
+    """
+    Parse <table class="...dtb-kit-contents..."> rows from a product description.
+
+    Returns a list of {"name": "2× EasyClean Automatic Tapers", "sku": "07TT"} dicts.
+    """
+    if not html_str:
+        return []
+
+    table_m = re.search(
+        r"<table[^>]*dtb-kit-contents[^>]*>(.*?)</table>",
+        html_str, re.DOTALL | re.IGNORECASE,
+    )
+    if not table_m:
+        return []
+
+    table_html = table_m.group(1)
+    table_html = re.sub(r"<thead>.*?</thead>", "", table_html, flags=re.DOTALL | re.IGNORECASE)
+
+    items: list[dict[str, str]] = []
+    for tr_m in re.finditer(r"<tr[^>]*>(.*?)</tr>", table_html, re.DOTALL | re.IGNORECASE):
+        cells = re.findall(r"<td[^>]*>(.*?)</td>", tr_m.group(1), re.DOTALL | re.IGNORECASE)
+        if len(cells) < 2:
+            continue
+        qty  = re.sub(r"<[^>]+>", "", cells[0]).strip()
+        name = re.sub(r"<[^>]+>", "", cells[1]).strip()
+        mpn  = re.sub(r"<[^>]+>", "", cells[2]).strip() if len(cells) >= 3 else ""
+        if not name:
+            continue
+        display_name = f"{qty}\u00d7 {name}" if qty and re.match(r"^\d+$", qty) else name
+        items.append({"name": clean_space(display_name), "sku": clean_space(mpn)})
+
+    return items
+
+
+def build_canonical_specs_json(row: dict[str, str]) -> str:
+    specs: list[dict[str, str]] = []
+    seen_labels: set[str] = set()
+
+    # ── Identity ────────────────────────────────────────────────────────────
+    append_spec(specs, seen_labels, "Brand", row.get("Brands", ""))
+    append_spec(specs, seen_labels, "Part Number", row.get("SKU", ""))
+    append_spec(specs, seen_labels, "Model", row.get("Meta: schema_mpn", ""))
+
+    # ── Physical dimensions ──────────────────────────────────────────────────
+    append_spec(specs, seen_labels, "Weight", format_with_unit(row.get("Weight (lbs)", ""), "lbs"))
+
+    length = clean_space(row.get("Length (in)", ""))
+    width  = clean_space(row.get("Width (in)", ""))
+    height = clean_space(row.get("Height (in)", ""))
+    if length and width and height:
+        append_spec(specs, seen_labels, "Dimensions", f"{length} in × {width} in × {height} in")
+    elif length:
+        append_spec(specs, seen_labels, "Length", f"{length} in")
+
+    # ── Product attributes ───────────────────────────────────────────────────
+    attribute_keys: list[tuple[int, str, str]] = []
+    for key in row.keys():
+        match = re.match(r"^Attribute\s+(\d+)\s+name$", key)
+        if not match:
+            continue
+        index = int(match.group(1))
+        value_key = f"Attribute {index} value(s)"
+        attribute_keys.append((index, key, value_key))
+
+    for _, name_key, value_key in sorted(attribute_keys, key=lambda item: item[0]):
+        attr_name = clean_space(row.get(name_key, ""))
+        attr_value = clean_space(row.get(value_key, ""))
+        if not attr_name or not attr_value:
+            continue
+        if attr_name.lower() == "brand":
+            continue
+        append_spec(specs, seen_labels, customer_label_for(attr_name), attr_value)
+
+    # ── Set Includes (toolsets) ──────────────────────────────────────────────
+    kit_items = extract_kit_includes(row.get("Description", ""))
+    if kit_items:
+        value_str = ", ".join(item["name"] for item in kit_items)
+        append_spec(specs, seen_labels, "Set Includes", value_str)
+
+    if not specs:
+        return "[]"
+
+    return json.dumps(specs, ensure_ascii=False, separators=(",", ":"))
+
+
 def build_unique_slugs(rows: list[dict[str, str]]) -> dict[str, str]:
     base_counts = Counter(slugify(row.get("Name")) for row in rows)
     used: set[str] = set()
@@ -516,6 +632,8 @@ def regenerate_seo(row: dict[str, str], slug: str) -> None:
 
 def process_catalog(input_path: Path, output_path: Path, policy_path: Path) -> tuple[list[dict[str, str]], dict[str, int]]:
     fieldnames, source_rows = read_csv(input_path)
+    if SPECS_META_JSON_COL not in fieldnames:
+        fieldnames.append(SPECS_META_JSON_COL)
     aliases = load_policy_aliases(policy_path)
     image_lookup = build_image_lookup(IMAGE_LOOKUP_CSVS)
     price_lookup = build_price_lookup(PRICE_LOOKUP_CSVS)
@@ -655,9 +773,28 @@ def process_catalog(input_path: Path, output_path: Path, policy_path: Path) -> t
     for row in kept_rows:
         regenerate_seo(row, slugs.get(clean_space(row.get("SKU")), slugify(row.get("Name"))))
 
-    # Remove private helper column before writing.
+    # Build specs JSON and kit includes for every row.
     for row in kept_rows:
+        row[SPECS_META_JSON_COL] = build_canonical_specs_json(row)
         row.pop("__source_line", None)
+
+    # Write _includes_N_name / _includes_N_sku columns for toolset rows.
+    rows_includes = [extract_kit_includes(row.get("Description", "")) for row in kept_rows]
+    max_includes = max((len(items) for items in rows_includes), default=0)
+    for i in range(max_includes):
+        name_col = f"Meta: _includes_{i}_name"
+        sku_col  = f"Meta: _includes_{i}_sku"
+        if name_col not in fieldnames:
+            fieldnames.append(name_col)
+        if sku_col not in fieldnames:
+            fieldnames.append(sku_col)
+    for row, kit_items in zip(kept_rows, rows_includes):
+        for key in list(row.keys()):
+            if re.match(r"^Meta: _includes_\d+_(name|sku)$", key):
+                row[key] = ""
+        for i, item in enumerate(kit_items):
+            row[f"Meta: _includes_{i}_name"] = item["name"]
+            row[f"Meta: _includes_{i}_sku"]  = item["sku"]
 
     write_csv(output_path, fieldnames, kept_rows)
 
