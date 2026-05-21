@@ -117,6 +117,281 @@ function dtb_repair_admin_inline_styles(): void {
 	.dtb-sla-breached { color: #dc2626; font-weight: 600; }
 	.dtb-sla-ok       { color: #16a34a; }
 
+	/* ============================================================
+	   LIST PAGE — modern e-commerce admin dashboard styles
+	   ============================================================ */
+
+	/* ── Page wrapper ─────────────────────────────────────────── */
+	.dtb-repairs-wrap { padding: 12px 0 0; }
+
+	/* ── Stats row ────────────────────────────────────────────── */
+	.dtb-stats-row {
+		display: grid;
+		grid-template-columns: repeat(5,1fr);
+		gap: 12px;
+		margin-bottom: 20px;
+	}
+	.dtb-stat-card {
+		background: #fff;
+		border: 1px solid var(--dtb-border);
+		border-radius: var(--dtb-radius);
+		padding: 16px 18px 14px;
+		position: relative;
+		overflow: hidden;
+		box-shadow: var(--dtb-shadow);
+	}
+	.dtb-stat-card::before {
+		content: '';
+		position: absolute;
+		left: 0; top: 0; bottom: 0;
+		width: 3px;
+		border-radius: var(--dtb-radius) 0 0 var(--dtb-radius);
+	}
+	.dtb-sc-total::before    { background: #6366f1; }
+	.dtb-sc-active::before   { background: #3b82f6; }
+	.dtb-sc-ready::before    { background: #10b981; }
+	.dtb-sc-completed::before{ background: #22c55e; }
+	.dtb-sc-cancelled::before{ background: #ef4444; }
+	.dtb-stat-num {
+		font-size: 30px;
+		font-weight: 800;
+		color: var(--dtb-text);
+		line-height: 1;
+		margin-bottom: 5px;
+		letter-spacing: -.5px;
+	}
+	.dtb-stat-label {
+		font-size: 11px;
+		font-weight: 700;
+		color: var(--dtb-muted);
+		text-transform: uppercase;
+		letter-spacing: .6px;
+	}
+
+	/* ── List shell (white card — tabs + table) ───────────────── */
+	.dtb-list-shell {
+		background: #fff;
+		border: 1px solid var(--dtb-border);
+		border-radius: 12px;
+		overflow: hidden;
+		box-shadow: var(--dtb-shadow);
+	}
+
+	/* ── Tab bar ──────────────────────────────────────────────── */
+	.dtb-tab-bar {
+		display: flex;
+		align-items: stretch;
+		justify-content: space-between;
+		border-bottom: 1px solid var(--dtb-border);
+		padding: 0 20px;
+		background: #fff;
+		min-height: 48px;
+	}
+	.dtb-tabs { display: flex; gap: 0; align-items: stretch; }
+	.dtb-tab {
+		display: inline-flex;
+		align-items: center;
+		gap: 6px;
+		padding: 0 16px;
+		font-size: 13px;
+		font-weight: 600;
+		color: var(--dtb-muted);
+		text-decoration: none;
+		border-bottom: 2px solid transparent;
+		margin-bottom: -1px;
+		transition: color .15s, border-color .15s;
+		white-space: nowrap;
+		cursor: pointer;
+	}
+	.dtb-tab:hover { color: var(--dtb-blue); text-decoration: none; }
+	.dtb-tab.dtb-tab-current {
+		color: var(--dtb-blue);
+		border-bottom-color: var(--dtb-blue);
+	}
+	.dtb-tab-badge {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		min-width: 20px;
+		height: 18px;
+		padding: 0 6px;
+		border-radius: 9px;
+		font-size: 10px;
+		font-weight: 700;
+		background: #f3f4f6;
+		color: var(--dtb-muted);
+		transition: background .15s, color .15s;
+	}
+	.dtb-tab.dtb-tab-current .dtb-tab-badge { background: #dbeafe; color: var(--dtb-blue); }
+	.dtb-tab-bar-right {
+		display: flex;
+		align-items: center;
+		gap: 10px;
+		padding: 8px 0;
+		flex-shrink: 0;
+	}
+	.dtb-tab-bar-right .button-primary {
+		border-radius: 8px !important;
+		font-weight: 700 !important;
+		font-size: 12px !important;
+		padding: 5px 14px !important;
+		height: auto !important;
+	}
+
+	/* ── Status chip filter bar ───────────────────────────────── */
+	.dtb-chip-bar {
+		display: flex;
+		gap: 6px;
+		padding: 10px 20px;
+		border-bottom: 1px solid #f3f4f6;
+		flex-wrap: wrap;
+		background: #fafafa;
+		align-items: center;
+	}
+	.dtb-chip {
+		display: inline-flex;
+		align-items: center;
+		gap: 5px;
+		padding: 4px 11px;
+		border-radius: 20px;
+		font-size: 12px;
+		font-weight: 600;
+		color: var(--dtb-muted);
+		background: #f3f4f6;
+		text-decoration: none;
+		border: 1.5px solid transparent;
+		transition: all .15s;
+		white-space: nowrap;
+		line-height: 1.4;
+	}
+	.dtb-chip:hover { background: #e5e7eb; color: #374151; text-decoration: none; }
+	.dtb-chip.dtb-chip-active {
+		background: var(--dtb-blue-light);
+		color: var(--dtb-blue);
+		border-color: #bfdbfe;
+	}
+	.dtb-chip-count {
+		font-size: 10px;
+		background: rgba(0,0,0,.08);
+		border-radius: 8px;
+		padding: 0 5px;
+		min-width: 16px;
+		text-align: center;
+	}
+	.dtb-chip-active .dtb-chip-count { background: rgba(29,78,216,.12); }
+
+	/* ── Table wrapper ────────────────────────────────────────── */
+	.dtb-table-wrap { padding: 0; }
+
+	.dtb-table-wrap .search-box {
+		padding: 12px 20px;
+		border-bottom: 1px solid #f3f4f6;
+		display: flex;
+		gap: 8px;
+		align-items: center;
+		background: #fff;
+	}
+	.dtb-table-wrap .search-box #dtb-repair-search-input,
+	.dtb-table-wrap .search-box input[type="search"] {
+		border: 1px solid #e5e7eb !important;
+		border-radius: 8px !important;
+		padding: 6px 12px !important;
+		font-size: 13px !important;
+		min-width: 220px;
+		background: #f9fafb !important;
+		transition: border-color .15s, background .15s;
+	}
+	.dtb-table-wrap .search-box input[type="search"]:focus {
+		border-color: var(--dtb-blue) !important;
+		background: #fff !important;
+		outline: none !important;
+		box-shadow: 0 0 0 3px rgba(29,78,216,.1) !important;
+	}
+	.dtb-table-wrap .search-box .button {
+		border-radius: 8px !important;
+		font-size: 12px !important;
+		font-weight: 600 !important;
+		height: auto !important;
+		padding: 6px 14px !important;
+	}
+
+	/* ── WP_List_Table overrides ─────────────────────────────── */
+	.dtb-repairs-wrap .wp-list-table {
+		border: none !important;
+		box-shadow: none !important;
+		background: transparent !important;
+		margin: 0 !important;
+	}
+	.dtb-repairs-wrap .wp-list-table thead th,
+	.dtb-repairs-wrap .wp-list-table thead td {
+		background: #f9fafb !important;
+		border-bottom: 1px solid #e9ebee !important;
+		border-top: none !important;
+		color: var(--dtb-muted) !important;
+		font-size: 11px !important;
+		font-weight: 700 !important;
+		text-transform: uppercase !important;
+		letter-spacing: .55px !important;
+		padding: 10px 12px !important;
+	}
+	.dtb-repairs-wrap .wp-list-table th a { color: var(--dtb-muted) !important; }
+	.dtb-repairs-wrap .wp-list-table th a:hover { color: var(--dtb-blue) !important; }
+	.dtb-repairs-wrap .wp-list-table tbody tr {
+		border-bottom: 1px solid #f3f4f6;
+		transition: background .1s;
+	}
+	.dtb-repairs-wrap .wp-list-table tbody tr:hover { background: #f5f8ff !important; }
+	.dtb-repairs-wrap .wp-list-table tbody tr:last-child { border-bottom: none; }
+	.dtb-repairs-wrap .wp-list-table td,
+	.dtb-repairs-wrap .wp-list-table th {
+		padding: 12px !important;
+		vertical-align: middle !important;
+		border-top: none !important;
+		box-shadow: none !important;
+	}
+	.dtb-repairs-wrap .wp-list-table td.check-column,
+	.dtb-repairs-wrap .wp-list-table th.check-column {
+		width: 36px !important;
+		padding: 12px 8px !important;
+	}
+	.dtb-repairs-wrap .wp-list-table a { color: var(--dtb-text); font-weight: 600; text-decoration: none; }
+	.dtb-repairs-wrap .wp-list-table a:hover { color: var(--dtb-blue); }
+	.dtb-repairs-wrap .wp-list-table .row-actions { color: var(--dtb-muted); font-size: 11px; }
+	.dtb-repairs-wrap .wp-list-table .row-actions a { font-weight: 400; color: var(--dtb-blue); }
+	.dtb-repairs-wrap .widefat { border-radius: 0 !important; border: none !important; }
+
+	/* ── Tablenav (bulk actions + pagination) ─────────────────── */
+	.dtb-repairs-wrap .tablenav {
+		padding: 10px 20px;
+		background: #fff;
+		border-top: 1px solid #f3f4f6;
+		display: flex;
+		align-items: center;
+		flex-wrap: wrap;
+		gap: 8px;
+		margin: 0 !important;
+	}
+	.dtb-repairs-wrap .tablenav.top { border-top: none; border-bottom: 1px solid #f3f4f6; }
+	.dtb-repairs-wrap .tablenav .tablenav-pages { margin: 0; }
+	.dtb-repairs-wrap .tablenav .bulkactions { display: flex; gap: 8px; align-items: center; }
+	.dtb-repairs-wrap .tablenav .bulkactions select {
+		border-radius: 7px !important; font-size: 12px !important;
+		border-color: var(--dtb-border) !important; height: auto !important; padding: 5px 8px !important;
+	}
+	.dtb-repairs-wrap .tablenav .bulkactions input[type="submit"] {
+		border-radius: 7px !important; font-size: 12px !important;
+		font-weight: 600 !important; height: auto !important; padding: 5px 12px !important;
+	}
+	.dtb-repairs-wrap .tablenav .displaying-num { font-size: 12px; color: #9ca3af; }
+	.dtb-repairs-wrap .tablenav-pages .pagination-links .button { border-radius: 6px !important; }
+	.dtb-repairs-wrap .column-repair_id { width: 90px; }
+	.dtb-repairs-wrap .column-status    { width: 130px; }
+	.dtb-repairs-wrap .column-age,
+	.dtb-repairs-wrap .column-sla       { width: 80px; }
+	.dtb-repairs-wrap .column-wc_order,
+	.dtb-repairs-wrap .column-veeqo,
+	.dtb-repairs-wrap .column-quickbooks{ width: 80px; }
+
 	<?php if ( $is_edit ) : ?>
 
 	/* ── Hide default WP chrome we don't want on the repair edit screen ─────── */
@@ -436,6 +711,70 @@ function dtb_repair_admin_inline_styles(): void {
 	<?php endif; ?>
 	</style>
 	<?php
+}
+
+// =============================================================================
+// SECTION 3d — LIST PAGE HELPERS (counts, tab groups)
+// =============================================================================
+
+/**
+ * Return status keys grouped by tab slug.
+ * An empty array means "all statuses" (no filter).
+ *
+ * @param string $tab  Tab slug: all | active | ready | completed | cancelled
+ * @return array<string>
+ */
+function dtb_repair_admin_tab_statuses( string $tab ): array {
+	$groups = [
+		'active'    => [ 'submitted', 'reviewed', 'awaiting_customer', 'approved', 'quoted', 'quote_accepted', 'parts_allocated', 'in_progress' ],
+		'ready'     => [ 'ready_to_ship' ],
+		'completed' => [ 'completed', 'closed' ],
+		'cancelled' => [ 'cancelled', 'quote_declined' ],
+	];
+	return $groups[ $tab ] ?? [];
+}
+
+/**
+ * Count all repair CPT posts grouped by `_repair_status` meta.
+ *
+ * @return array<string,int>  key → count
+ */
+function dtb_repair_admin_get_status_counts(): array {
+	global $wpdb;
+	// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
+	$rows = $wpdb->get_results(
+		$wpdb->prepare(
+			"SELECT pm.meta_value AS status, COUNT(*) AS cnt
+			 FROM {$wpdb->postmeta} pm
+			 INNER JOIN {$wpdb->posts} p ON p.ID = pm.post_id
+			 WHERE pm.meta_key = %s
+			   AND p.post_type   = %s
+			   AND p.post_status = 'publish'
+			 GROUP BY pm.meta_value",
+			'_repair_status',
+			'dtb_repair_request'
+		)
+	);
+	// phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
+	$out = [];
+	foreach ( (array) $rows as $row ) {
+		$out[ $row->status ] = (int) $row->cnt;
+	}
+	return $out;
+}
+
+/**
+ * Sum counts for a slice of statuses.
+ *
+ * @param array<string,int> $counts    Full counts map.
+ * @param array<string>     $statuses  Keys to sum.
+ * @return int
+ */
+function dtb_repair_admin_sum_counts( array $counts, array $statuses ): int {
+	if ( empty( $statuses ) ) {
+		return (int) array_sum( $counts );
+	}
+	return (int) array_sum( array_intersect_key( $counts, array_flip( $statuses ) ) );
 }
 
 // =============================================================================
