@@ -19,8 +19,7 @@ import RepairStatusTracker   from '../components/repairs/RepairStatusTracker.jsx
 import RepairTimeline        from '../components/repairs/RepairTimeline.jsx';
 import RepairQuoteReview     from '../components/repairs/RepairQuoteReview.jsx';
 import RepairIntegrationNotice from '../components/repairs/RepairIntegrationNotice.jsx';
-import RepairMediaUploader   from '../components/repairs/RepairMediaUploader.jsx';
-import RepairCommentBox      from '../components/repairs/RepairCommentBox.jsx';
+import RepairUpdateComposer  from '../components/repairs/RepairUpdateComposer.jsx';
 import { REPAIR_STATUS_LABELS } from '../api/repairs.js';
 
 // ─── Token entry form (shown when no token in URL) ────────────────────────────
@@ -328,29 +327,9 @@ export default function RepairStatus() {
           />
         ) }
 
-        {/* ── Media upload ──────────────────────────────────────────── */}
+        {/* ── Unified customer update composer ─────────────────────── */}
         { data && ! [ 'completed', 'closed', 'cancelled', 'quote_declined' ].includes( status ) && (
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.35, delay: 0.2 }}
-            className="bg-white rounded-2xl border border-neutral-200 shadow-sm p-6"
-          >
-            <h3 className="text-sm font-semibold text-neutral-700 mb-3">Add Photos</h3>
-            <RepairMediaUploader
-              mode="upload"
-              repairId={ resolvedId }
-              token={ resolvedToken }
-              onUploaded={ () => refresh() }
-              maxFiles={ 5 }
-              maxSizeMB={ 5 }
-            />
-          </motion.div>
-        ) }
-
-        {/* ── Customer note box ─────────────────────────────────────── */}
-        { data && ! [ 'completed', 'closed', 'cancelled', 'quote_declined' ].includes( status ) && (
-          <RepairCommentBox
+          <RepairUpdateComposer
             repairId={ resolvedId }
             token={ resolvedToken }
             onSubmitted={ () => refresh() }
