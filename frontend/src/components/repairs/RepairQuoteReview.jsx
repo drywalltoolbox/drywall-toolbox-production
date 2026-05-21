@@ -12,6 +12,7 @@
  */
 
 import { useState } from 'react';
+import { Handshake, ClipboardList, FileText, Check, X } from 'lucide-react';
 import { acceptRepairQuote, declineRepairQuote } from '../../api/repairs.js';
 
 export default function RepairQuoteReview( { repairId, token, onAccepted, onDeclined } ) {
@@ -49,34 +50,63 @@ export default function RepairQuoteReview( { repairId, token, onAccepted, onDecl
 
   if ( confirmed === 'accepted' ) {
     return (
-      <div className="bg-green-50 border border-green-200 rounded-2xl p-6 text-center">
-        <div className="text-3xl mb-2">🤝</div>
+      <motion.div
+        initial={{ opacity: 0, scale: 0.96 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.35, ease: 'easeOut' }}
+        className="bg-green-50 border border-green-200 rounded-2xl p-6 text-center"
+      >
+        <motion.div
+          initial={{ scale: 0.5, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ type: 'spring', stiffness: 280, damping: 20, delay: 0.1 }}
+          className="w-12 h-12 rounded-xl bg-green-100 flex items-center justify-center mx-auto mb-3"
+        >
+          <Handshake size={ 24 } className="text-green-600" strokeWidth={ 1.75 } />
+        </motion.div>
         <h3 className="text-base font-semibold text-green-800 mb-1">Quote Accepted</h3>
         <p className="text-sm text-green-700">
           We'll begin work on your repair shortly. You'll receive an update when work starts.
         </p>
-      </div>
+      </motion.div>
     );
   }
 
   if ( confirmed === 'declined' ) {
     return (
-      <div className="bg-neutral-50 border border-neutral-200 rounded-2xl p-6 text-center">
-        <div className="text-3xl mb-2">📋</div>
+      <motion.div
+        initial={{ opacity: 0, scale: 0.96 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.35, ease: 'easeOut' }}
+        className="bg-neutral-50 border border-neutral-200 rounded-2xl p-6 text-center"
+      >
+        <motion.div
+          initial={{ scale: 0.5, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ type: 'spring', stiffness: 280, damping: 20, delay: 0.1 }}
+          className="w-12 h-12 rounded-xl bg-neutral-100 flex items-center justify-center mx-auto mb-3"
+        >
+          <ClipboardList size={ 24 } className="text-neutral-500" strokeWidth={ 1.75 } />
+        </motion.div>
         <h3 className="text-base font-semibold text-neutral-800 mb-1">Quote Declined</h3>
         <p className="text-sm text-neutral-600">
           Your repair request has been updated. If you change your mind or have questions,
           please contact us directly.
         </p>
-      </div>
+      </motion.div>
     );
   }
 
   return (
-    <div className="bg-yellow-50 border border-yellow-200 rounded-2xl p-6 space-y-4">
+    <motion.div
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4, ease: 'easeOut' }}
+      className="bg-yellow-50 border border-yellow-200 rounded-2xl p-6 space-y-4"
+    >
       <div className="flex items-center gap-3">
-        <div className="w-10 h-10 rounded-xl bg-yellow-100 flex items-center justify-center text-xl">
-          💰
+        <div className="w-10 h-10 rounded-xl bg-yellow-100 flex items-center justify-center">
+          <FileText size={ 20 } className="text-yellow-600" strokeWidth={ 1.75 } />
         </div>
         <div>
           <h3 className="text-base font-semibold text-yellow-900">Quote Sent</h3>
@@ -101,9 +131,16 @@ export default function RepairQuoteReview( { repairId, token, onAccepted, onDecl
       </p>
 
       { error && (
-        <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-xs" role="alert">
-          { error }
-        </div>
+        <motion.div
+          initial={{ opacity: 0, height: 0 }}
+          animate={{ opacity: 1, height: 'auto' }}
+          className="overflow-hidden"
+          role="alert"
+        >
+          <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-xs">
+            { error }
+          </div>
+        </motion.div>
       ) }
 
       <div className="flex gap-3 pt-1">
@@ -111,9 +148,9 @@ export default function RepairQuoteReview( { repairId, token, onAccepted, onDecl
           type="button"
           onClick={ handleAccept }
           disabled={ acting !== null }
-          className="flex-1 px-4 py-2.5 bg-green-600 hover:bg-green-700 disabled:bg-green-400 text-white text-sm font-semibold rounded-xl transition-colors"
+          className="flex-1 px-4 py-2.5 bg-green-600 hover:bg-green-700 active:scale-[0.97] disabled:bg-green-400 text-white text-sm font-semibold rounded-xl transition-all"
         >
-          { acting === 'accept' ? 'Accepting…' : '✓ Accept Quote' }
+        { acting === 'accept' ? 'Accepting…' : <><Check size={ 14 } className="inline mr-1" />Accept Quote</> }
         </button>
         <button
           type="button"
@@ -121,9 +158,9 @@ export default function RepairQuoteReview( { repairId, token, onAccepted, onDecl
           disabled={ acting !== null }
           className="flex-1 px-4 py-2.5 border border-red-300 hover:bg-red-50 disabled:opacity-50 text-red-700 text-sm font-semibold rounded-xl transition-colors"
         >
-          { acting === 'decline' ? 'Declining…' : '✕ Decline Quote' }
+          { acting === 'decline' ? 'Declining…' : <><X size={ 14 } className="inline mr-1" />Decline Quote</> }
         </button>
       </div>
-    </div>
+    </motion.div>
   );
 }

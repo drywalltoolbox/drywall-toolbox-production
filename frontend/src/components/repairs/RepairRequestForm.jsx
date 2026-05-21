@@ -17,6 +17,7 @@
  */
 
 import { useState, useRef, useEffect, useCallback } from 'react';
+import { Check, CheckCircle } from 'lucide-react';
 import { submitRepair } from '../../api/repairs.js';
 import RepairMediaUploader from './RepairMediaUploader.jsx';
 
@@ -520,7 +521,7 @@ function StepIndicator( { current, steps } ) {
               ].join( ' ' ) }
               aria-current={ active ? 'step' : undefined }
             >
-              { done ? '✓' : s.id }
+              { done ? <Check size={ 12 } strokeWidth={ 2.5 } /> : s.id }
             </div>
             <span
               className={ [
@@ -545,7 +546,9 @@ function StepIndicator( { current, steps } ) {
 function SuccessScreen( { result, mediaFiles } ) {
   return (
     <div className="w-full max-w-2xl mx-auto text-center py-10 px-4">
-      <div className="text-5xl mb-4">✅</div>
+      <div className="w-16 h-16 rounded-2xl bg-green-50 flex items-center justify-center mx-auto mb-4">
+        <CheckCircle size={ 32 } className="text-green-500" strokeWidth={ 1.5 } />
+      </div>
       <h2 className="text-2xl font-bold text-neutral-900 mb-2">Repair Request Submitted!</h2>
       <p className="text-neutral-600 mb-6">
         { result.message || "We've received your request and will be in touch soon." }

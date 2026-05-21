@@ -11,6 +11,8 @@
 
 import { useState } from 'react';
 import { useParams, useSearchParams, Link } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Search, AlertTriangle, SearchX, RefreshCw, Radio } from 'lucide-react';
 import SEOHead from '../components/shared/SEOHead.jsx';
 import useRepairStatus       from '../hooks/useRepairStatus.js';
 import useRepairEventStream  from '../hooks/useRepairEventStream.js';
@@ -40,9 +42,21 @@ function TokenEntryForm( { onSubmit } ) {
 
   return (
     <div className="min-h-[60vh] flex items-center justify-center px-4">
-      <div className="w-full max-w-md">
+      <motion.div
+        initial={{ opacity: 0, y: 24 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, ease: [ 0.25, 0.46, 0.45, 0.94 ] }}
+        className="w-full max-w-md"
+      >
         <div className="text-center mb-8">
-          <div className="text-4xl mb-3">🔍</div>
+          <motion.div
+            initial={{ scale: 0.7, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ type: 'spring', stiffness: 280, damping: 22, delay: 0.1 }}
+            className="w-14 h-14 rounded-2xl bg-blue-50 flex items-center justify-center mx-auto mb-4 shadow-sm"
+          >
+            <Search size={ 26 } className="text-blue-500" strokeWidth={ 1.75 } />
+          </motion.div>
           <h1 className="text-2xl font-bold text-neutral-900">Track Your Repair</h1>
           <p className="text-sm text-neutral-500 mt-2">
             Enter your repair ID and the tracking token from your confirmation email.
@@ -51,7 +65,7 @@ function TokenEntryForm( { onSubmit } ) {
 
         <form onSubmit={ handleSubmit } className="bg-white rounded-2xl border border-neutral-200 shadow-sm p-6 space-y-4">
           <div>
-            <label htmlFor="repair-id" className="block text-sm font-medium text-neutral-700 mb-1">
+            <label htmlFor="repair-id" className="block text-xs font-semibold text-neutral-500 uppercase tracking-wider mb-1.5">
               Repair ID
             </label>
             <input
@@ -60,12 +74,12 @@ function TokenEntryForm( { onSubmit } ) {
               value={ repairId }
               onChange={ ( e ) => setRepairId( e.target.value ) }
               placeholder="e.g. 1042"
-              className="w-full px-3 py-2 text-sm border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3.5 py-2.5 text-sm border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all bg-neutral-50 focus:bg-white"
               autoComplete="off"
             />
           </div>
           <div>
-            <label htmlFor="repair-token" className="block text-sm font-medium text-neutral-700 mb-1">
+            <label htmlFor="repair-token" className="block text-xs font-semibold text-neutral-500 uppercase tracking-wider mb-1.5">
               Tracking Token
             </label>
             <input
@@ -74,18 +88,28 @@ function TokenEntryForm( { onSubmit } ) {
               value={ token }
               onChange={ ( e ) => setToken( e.target.value ) }
               placeholder="From your confirmation email"
-              className="w-full px-3 py-2 text-sm border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3.5 py-2.5 text-sm border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all bg-neutral-50 focus:bg-white"
               autoComplete="off"
             />
           </div>
 
-          { error && (
-            <p className="text-xs text-red-600" role="alert">{ error }</p>
-          ) }
+          <AnimatePresence>
+            { error && (
+              <motion.p
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                className="text-xs text-red-600 overflow-hidden"
+                role="alert"
+              >
+                { error }
+              </motion.p>
+            ) }
+          </AnimatePresence>
 
           <button
             type="submit"
-            className="w-full px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-xl transition-colors"
+            className="w-full px-4 py-2.5 bg-blue-600 hover:bg-blue-700 active:scale-[0.98] text-white text-sm font-semibold rounded-xl transition-all"
           >
             Look Up Repair →
           </button>
@@ -95,7 +119,7 @@ function TokenEntryForm( { onSubmit } ) {
           Need help?{' '}
           <Link to="/contact" className="text-blue-600 hover:underline">Contact us</Link>
         </p>
-      </div>
+      </motion.div>
     </div>
   );
 }
@@ -139,8 +163,23 @@ function ErrorDisplay( { message, onRetry } ) {
 
   return (
     <div className="min-h-[60vh] flex items-center justify-center px-4">
-      <div className="text-center max-w-sm">
-        <div className="text-4xl mb-3">{ isNotFound ? '🔍' : '⚠️' }</div>
+      <motion.div
+        initial={{ opacity: 0, scale: 0.96, y: 12 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        transition={{ duration: 0.4, ease: 'easeOut' }}
+        className="text-center max-w-sm"
+      >
+        <motion.div
+          initial={{ scale: 0.6, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ type: 'spring', stiffness: 260, damping: 20, delay: 0.1 }}
+          className={ `w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-4 ${ isNotFound ? 'bg-neutral-100' : 'bg-yellow-50' }` }
+        >
+          { isNotFound
+            ? <SearchX size={ 28 } className="text-neutral-400" strokeWidth={ 1.5 } />
+            : <AlertTriangle size={ 28 } className="text-yellow-500" strokeWidth={ 1.5 } />
+          }
+        </motion.div>
         <h2 className="text-lg font-semibold text-neutral-800 mb-2">
           { isNotFound ? 'Repair Not Found' : isUnauth ? 'Access Denied' : 'Something Went Wrong' }
         </h2>
@@ -155,7 +194,7 @@ function ErrorDisplay( { message, onRetry } ) {
           { onRetry && (
             <button
               onClick={ onRetry }
-              className="px-4 py-2 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700 transition-colors"
+              className="px-4 py-2 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700 active:scale-[0.97] transition-all"
             >
               Retry
             </button>
@@ -167,7 +206,7 @@ function ErrorDisplay( { message, onRetry } ) {
             Submit a Repair
           </Link>
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 }
@@ -228,6 +267,7 @@ export default function RepairStatus() {
 
   const status = data?.status;
   const label  = data?.label || REPAIR_STATUS_LABELS[ status ] || status;
+  const hasLiveEvents = events.length > 0;
 
   return (
     <>
@@ -235,28 +275,57 @@ export default function RepairStatus() {
         title={ data ? `Repair DTB-${ resolvedId } — ${ label } | Drywall Toolbox` : 'Repair Status | Drywall Toolbox' }
       />
 
-      <div className="max-w-2xl mx-auto px-4 py-8 space-y-4">
-        {/* Page header */}
-        <div className="flex items-center justify-between">
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.3 }}
+        className="max-w-2xl mx-auto px-4 py-8 space-y-4"
+      >
+        {/* ── Page header ───────────────────────────────────────────── */}
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4 }}
+          className="flex items-center justify-between"
+        >
           <div>
-            <div className="text-xs text-neutral-400 uppercase tracking-wider">Repair ID</div>
-            <h1 className="text-xl font-bold text-neutral-900">DTB-{ resolvedId }</h1>
+            <div className="text-[10px] text-neutral-400 uppercase tracking-widest font-semibold">Repair ID</div>
+            <div className="flex items-center gap-2 mt-0.5">
+              <h1 className="text-xl font-bold text-neutral-900">DTB-{ resolvedId }</h1>
+              {/* Live indicator — only shown when SSE events are flowing */}
+              <AnimatePresence>
+                { hasLiveEvents && (
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.6 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.6 }}
+                    className="flex items-center gap-1 bg-green-50 border border-green-200 rounded-full px-2 py-0.5"
+                    title="Live updates active"
+                  >
+                    <span className="relative flex h-1.5 w-1.5">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75" />
+                      <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-green-500" />
+                    </span>
+                    <span className="text-[9px] font-bold text-green-600 uppercase tracking-wider">Live</span>
+                  </motion.div>
+                ) }
+              </AnimatePresence>
+            </div>
           </div>
           <button
             onClick={ refresh }
             disabled={ loading }
             aria-label="Refresh status"
-            className="p-2 text-neutral-400 hover:text-blue-600 disabled:opacity-40 transition-colors"
+            className="p-2 text-neutral-400 hover:text-blue-600 disabled:opacity-40 transition-colors rounded-xl hover:bg-blue-50"
           >
-            { loading ? (
-              <span className="inline-block animate-spin text-lg">⟳</span>
-            ) : (
-              <span className="text-lg">⟳</span>
-            ) }
+            <RefreshCw
+              size={ 17 }
+              className={ loading ? 'animate-spin' : '' }
+            />
           </button>
-        </div>
+        </motion.div>
 
-        {/* Status tracker */}
+        {/* ── Status tracker ────────────────────────────────────────── */}
         { loading && ! data ? (
           <StatusSkeleton />
         ) : data ? (
@@ -269,12 +338,12 @@ export default function RepairStatus() {
           />
         ) : null }
 
-        {/* Integration notice — shown for processing states */}
+        {/* ── Integration notice ─────────────────────────────────────── */}
         { status && (
           <RepairIntegrationNotice status={ status } />
         ) }
 
-        {/* Quote review — only when status is 'quoted' */}
+        {/* ── Quote review ──────────────────────────────────────────── */}
         { status === 'quoted' && (
           <RepairQuoteReview
             repairId={ resolvedId }
@@ -284,9 +353,14 @@ export default function RepairStatus() {
           />
         ) }
 
-        {/* Media upload — shown for active (non-terminal) repairs */}
+        {/* ── Media upload ──────────────────────────────────────────── */}
         { data && ! [ 'completed', 'closed', 'cancelled', 'quote_declined' ].includes( status ) && (
-          <div className="bg-white rounded-2xl border border-neutral-200 shadow-sm p-6">
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.35, delay: 0.2 }}
+            className="bg-white rounded-2xl border border-neutral-200 shadow-sm p-6"
+          >
             <h3 className="text-sm font-semibold text-neutral-700 mb-3">Add Photos</h3>
             <RepairMediaUploader
               mode="upload"
@@ -296,10 +370,10 @@ export default function RepairStatus() {
               maxFiles={ 5 }
               maxSizeMB={ 5 }
             />
-          </div>
+          </motion.div>
         ) }
 
-        {/* Timeline */}
+        {/* ── Timeline ──────────────────────────────────────────────── */}
         { ( loading && ! data ) ? (
           <div className="bg-white rounded-2xl border border-neutral-200 shadow-sm p-6 space-y-3">
             <Skeleton className="h-4 w-24" />
@@ -317,19 +391,29 @@ export default function RepairStatus() {
           <RepairTimeline events={ mergedEvents } />
         ) }
 
-        {/* Persistent error banner (when we have stale data + a new error) */}
-        { error && data && (
-          <div className="p-3 bg-yellow-50 border border-yellow-200 rounded-xl text-yellow-800 text-xs" role="alert">
-            Could not refresh status — showing last known data.
-          </div>
-        ) }
+        {/* ── Stale-data error banner ────────────────────────────────── */}
+        <AnimatePresence>
+          { error && data && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              transition={{ duration: 0.3 }}
+              className="overflow-hidden"
+            >
+              <div className="p-3 bg-yellow-50 border border-yellow-200 rounded-xl text-yellow-800 text-xs" role="alert">
+                Could not refresh status — showing last known data.
+              </div>
+            </motion.div>
+          ) }
+        </AnimatePresence>
 
-        <div className="text-center pt-4">
-          <Link to="/contact" className="text-xs text-neutral-400 hover:text-blue-600 underline">
+        <div className="text-center pt-2 pb-4">
+          <Link to="/contact" className="text-xs text-neutral-400 hover:text-blue-600 underline transition-colors">
             Need help with your repair?
           </Link>
         </div>
-      </div>
+      </motion.div>
     </>
   );
 }

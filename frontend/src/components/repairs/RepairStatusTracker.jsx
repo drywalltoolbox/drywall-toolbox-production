@@ -1,7 +1,8 @@
 /**
  * frontend/src/components/repairs/RepairStatusTracker.jsx
  *
- * Visual status tracker showing the repair's current position in the workflow.
+ * Visual status tracker — animated progress bar, staggered milestone dots,
+ * spring-driven icon entrance, AnimatePresence for dynamic sections.
  *
  * Props:
  *   status         string       — machine status key
@@ -11,6 +12,11 @@
  *   trackingNumber string|null  — shown when status is ready_to_ship or completed
  */
 
+import { motion, AnimatePresence } from 'framer-motion';
+import {
+  Mail, Search, Clock, CheckCircle, FileText, Handshake,
+  XCircle, Package, Wrench, Truck, BadgeCheck, Archive, Ban,
+} from 'lucide-react';
 import { REPAIR_STATUS_PROGRESS } from '../../api/repairs.js';
 
 // Ordered milestones shown in the step track (a simplified customer-facing flow)
@@ -64,125 +70,211 @@ export default function RepairStatusTracker( {
   const isNegative     = TERMINAL_NEGATIVE.includes( status );
   const isCompleted    = status === 'completed' || status === 'closed';
 
+  const accentColor = isNegative ? 'bg-red-400' : isCompleted ? 'bg-green-400' : 'bg-blue-500';
+  const labelColor  = isNegative ? 'text-red-600' : isCompleted ? 'text-green-600' : 'text-blue-700';
+
   return (
-    <div className="bg-white rounded-2xl border border-neutral-200 shadow-sm p-6 space-y-5">
-      {/* Current status badge */}
-      <div className="flex items-center gap-3">
-        <StatusIcon status={ status } />
-        <div>
-          <div className="text-xs text-neutral-400 uppercase tracking-wider">Current Status</div>
-          <div className={ [
-            'text-lg font-bold',
-            isNegative  ? 'text-red-600'   : '',
-            isCompleted ? 'text-green-600' : '',
-            ! isNegative && ! isCompleted ? 'text-blue-700' : '',
-          ].join( ' ' ) }>
-            { label || status }
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.45, ease: [ 0.25, 0.46, 0.45, 0.94 ] }}
+      className="bg-white rounded-2xl border border-neutral-200 shadow-sm overflow-hidden"
+    >
+      {/* Accent bar — color indicates state */}
+      <motion.div
+        className={ `h-1 ${ accentColor }` }
+        initial={{ scaleX: 0, originX: 0 }}
+        animate={{ scaleX: 1 }}
+        transition={{ duration: 0.6, delay: 0.15, ease: 'easeOut' }}
+      />
+
+      <div className="p-6 space-y-5">
+
+        {/* ── Status header ─────────────────────────────────────────── */}
+        <div className="flex items-center gap-4">
+          <StatusIcon status={ status } />
+          <div className="min-w-0">
+            <div className="text-[10px] text-neutral-400 uppercase tracking-widest font-semibold mb-0.5">
+              Current Status
+            </div>
+            <motion.div
+              key={ status }
+              initial={{ opacity: 0, x: -8 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.3, delay: 0.1 }}
+              className={ `text-xl font-bold leading-tight ${ labelColor }` }
+            >
+              { label || status }
+            </motion.div>
           </div>
         </div>
+
+        {/* ── Terminal negative banner ───────────────────────────────── */}
+        <AnimatePresence>
+          { isNegative && (
+            <motion.div
+              initial={{ opacity: 0, height: 0, marginTop: 0 }}
+              animate={{ opacity: 1, height: 'auto', marginTop: 8 }}
+              exit={{ opacity: 0, height: 0, marginTop: 0 }}
+              transition={{ duration: 0.3 }}
+              className="overflow-hidden"
+            >
+              <div className="p-3.5 bg-red-50 border border-red-100 rounded-xl text-sm text-red-700 leading-relaxed">
+                { status === 'cancelled'
+                  ? 'This repair request has been cancelled. Please contact us if you have questions.'
+                  : "The repair quote was declined. Contact us if you'd like to revisit your options." }
+              </div>
+            </motion.div>
+          ) }
+        </AnimatePresence>
+
+        {/* ── Progress bar + milestone steps ────────────────────────── */}
+        { ! isNegative && (
+          <div>
+            {/* Track */}
+            <div className="h-1.5 bg-neutral-100 rounded-full overflow-hidden">
+              <motion.div
+                className={ `h-full rounded-full ${ isCompleted ? 'bg-green-500' : 'bg-blue-500' }` }
+                initial={{ width: 0 }}
+                animate={{ width: `${ progress }%` }}
+                transition={{ duration: 1.0, delay: 0.2, ease: [ 0.25, 0.46, 0.45, 0.94 ] }}
+                role="progressbar"
+                aria-valuenow={ progress }
+                aria-valuemin={ 0 }
+                aria-valuemax={ 100 }
+                aria-label={ `Repair progress: ${ progress }%` }
+              />
+            </div>
+
+            {/* Milestone dots */}
+            <div className="flex justify-between mt-3.5">
+              { MILESTONES.map( ( m, i ) => {
+                const done   = milestoneIndex > i;
+                const active = milestoneIndex === i && ! isCompleted;
+                const future = ! done && ! active;
+
+                return (
+                  <div key={ m.key } className="flex flex-col items-center gap-1.5 flex-1">
+                    {/* Dot with optional ping ring */}
+                    <div className="relative flex items-center justify-center w-5 h-5">
+                      { active && (
+                        <span
+                          aria-hidden="true"
+                          className="absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-50 animate-ping"
+                        />
+                      ) }
+                      <motion.div
+                        initial={{ scale: 0.4, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        transition={{ delay: 0.3 + i * 0.07, duration: 0.3, ease: 'backOut' }}
+                        className={ [
+                          'w-3.5 h-3.5 rounded-full border-2 z-10 transition-colors duration-500',
+                          done   ? 'bg-blue-500 border-blue-500'          : '',
+                          active ? 'bg-white border-blue-500 shadow-md'   : '',
+                          future ? 'bg-white border-neutral-300'          : '',
+                        ].join( ' ' ) }
+                      />
+                    </div>
+                    {/* Label */}
+                    <span className={ [
+                      'text-[10px] text-center leading-tight font-medium',
+                      active ? 'text-blue-700'   : '',
+                      done   ? 'text-blue-400'   : '',
+                      future ? 'text-neutral-400' : '',
+                    ].join( ' ' ) }>
+                      { m.label }
+                    </span>
+                  </div>
+                );
+              } ) }
+            </div>
+          </div>
+        ) }
+
+        {/* ── Date tiles ────────────────────────────────────────────── */}
+        <div className="grid grid-cols-2 gap-2.5">
+          { [
+            { label: 'Submitted',    value: fmt( submittedAt )    },
+            { label: 'Last Updated', value: fmt( lastUpdatedAt )  },
+          ].map( ( { label: dtLabel, value }, i ) => (
+            <motion.div
+              key={ dtLabel }
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.35 + i * 0.06, duration: 0.3 }}
+              className="bg-neutral-50 rounded-xl px-3.5 py-2.5 border border-neutral-100"
+            >
+              <div className="text-[10px] text-neutral-400 uppercase tracking-wider font-semibold mb-0.5">
+                { dtLabel }
+              </div>
+              <div className="text-xs text-neutral-700 font-semibold leading-snug">
+                { value }
+              </div>
+            </motion.div>
+          ) ) }
+        </div>
+
+        {/* ── Tracking number callout ────────────────────────────────── */}
+        <AnimatePresence>
+          { trackingNumber && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 10 }}
+              transition={{ duration: 0.35 }}
+              className="rounded-xl bg-linear-to-br from-green-50 to-emerald-50 border border-green-200 p-4"
+            >
+              <div className="flex items-center gap-1.5 mb-1.5">
+                <Truck size={ 13 } className="text-green-600" strokeWidth={ 2 } />
+                <span className="text-[10px] text-green-600 font-bold uppercase tracking-widest">
+                  Shipping Tracking
+                </span>
+              </div>
+              <div className="text-base font-mono font-bold text-green-800 tracking-wider leading-none">
+                { trackingNumber }
+              </div>
+              <p className="text-xs text-green-600 mt-1.5">
+                Use this number to track your shipment with your carrier.
+              </p>
+            </motion.div>
+          ) }
+        </AnimatePresence>
+
       </div>
-
-      {/* Terminal negative message */}
-      { isNegative && (
-        <div className="p-3 bg-red-50 border border-red-100 rounded-xl text-sm text-red-700">
-          { status === 'cancelled'
-            ? 'This repair request has been cancelled. Please contact us if you have questions.'
-            : "The repair quote was declined. Contact us if you'd like to revisit your options." }
-        </div>
-      ) }
-
-      {/* Progress bar */}
-      { ! isNegative && (
-        <div>
-          <div className="h-2 bg-neutral-100 rounded-full overflow-hidden">
-            <div
-              className={ [
-                'h-full rounded-full transition-all duration-700',
-                isCompleted ? 'bg-green-500' : 'bg-blue-500',
-              ].join( ' ' ) }
-              style={ { width: `${ progress }%` } }
-              role="progressbar"
-              aria-valuenow={ progress }
-              aria-valuemin={ 0 }
-              aria-valuemax={ 100 }
-              aria-label={ `Repair progress: ${ progress }%` }
-            />
-          </div>
-
-          {/* Milestone steps */}
-          <div className="flex justify-between mt-2">
-            { MILESTONES.map( ( m, i ) => {
-              const done   = milestoneIndex > i;
-              const active = milestoneIndex === i;
-              return (
-                <div key={ m.key } className="flex flex-col items-center gap-1 flex-1">
-                  <div className={ [
-                    'w-3 h-3 rounded-full border-2',
-                    done    ? 'bg-blue-500 border-blue-500'        : '',
-                    active  ? 'bg-white border-blue-500 shadow-sm' : '',
-                    ! done && ! active ? 'bg-white border-neutral-300' : '',
-                  ].join( ' ' ) } />
-                  <span className={ [
-                    'text-xs text-center leading-tight',
-                    active ? 'text-blue-700 font-medium' : 'text-neutral-400',
-                  ].join( ' ' ) }>
-                    { m.label }
-                  </span>
-                </div>
-              );
-            } ) }
-          </div>
-        </div>
-      ) }
-
-      {/* Dates */}
-      <dl className="grid grid-cols-2 gap-3 text-sm">
-        <div>
-          <dt className="text-xs text-neutral-400">Submitted</dt>
-          <dd className="text-neutral-700 font-medium">{ fmt( submittedAt ) }</dd>
-        </div>
-        <div>
-          <dt className="text-xs text-neutral-400">Last Updated</dt>
-          <dd className="text-neutral-700 font-medium">{ fmt( lastUpdatedAt ) }</dd>
-        </div>
-      </dl>
-
-      {/* Tracking number */}
-      { trackingNumber && (
-        <div className="p-3 bg-green-50 border border-green-100 rounded-xl">
-          <div className="text-xs text-green-600 font-medium mb-1">Shipping Tracking</div>
-          <div className="text-sm font-mono font-bold text-green-800">{ trackingNumber }</div>
-          <p className="text-xs text-green-600 mt-1">
-            Use this number to track your shipment with your carrier.
-          </p>
-        </div>
-      ) }
-    </div>
+    </motion.div>
   );
 }
 
 // ─── Status icon ──────────────────────────────────────────────────────────────
 
+const STATUS_ICON_MAP = {
+  submitted:         { Icon: Mail,        bg: 'bg-blue-50',    icon: 'text-blue-500'    },
+  reviewed:          { Icon: Search,      bg: 'bg-blue-50',    icon: 'text-blue-500'    },
+  awaiting_customer: { Icon: Clock,       bg: 'bg-yellow-50',  icon: 'text-yellow-500'  },
+  approved:          { Icon: CheckCircle, bg: 'bg-green-50',   icon: 'text-green-500'   },
+  quoted:            { Icon: FileText,    bg: 'bg-yellow-50',  icon: 'text-yellow-500'  },
+  quote_accepted:    { Icon: Handshake,   bg: 'bg-green-50',   icon: 'text-green-500'   },
+  quote_declined:    { Icon: XCircle,     bg: 'bg-red-50',     icon: 'text-red-500'     },
+  parts_allocated:   { Icon: Package,     bg: 'bg-blue-50',    icon: 'text-blue-500'    },
+  in_progress:       { Icon: Wrench,      bg: 'bg-yellow-50',  icon: 'text-yellow-500'  },
+  ready_to_ship:     { Icon: Truck,       bg: 'bg-green-50',   icon: 'text-green-500'   },
+  completed:         { Icon: BadgeCheck,  bg: 'bg-green-50',   icon: 'text-green-500'   },
+  closed:            { Icon: Archive,     bg: 'bg-neutral-50', icon: 'text-neutral-400' },
+  cancelled:         { Icon: Ban,         bg: 'bg-red-50',     icon: 'text-red-500'     },
+};
+
 function StatusIcon( { status } ) {
-  const icons = {
-    submitted:         { emoji: '📬', bg: 'bg-blue-50'   },
-    reviewed:          { emoji: '🔍', bg: 'bg-blue-50'   },
-    awaiting_customer: { emoji: '⏳', bg: 'bg-yellow-50' },
-    approved:          { emoji: '✅', bg: 'bg-green-50'  },
-    quoted:            { emoji: '💰', bg: 'bg-yellow-50' },
-    quote_accepted:    { emoji: '🤝', bg: 'bg-green-50'  },
-    quote_declined:    { emoji: '❌', bg: 'bg-red-50'    },
-    parts_allocated:   { emoji: '📦', bg: 'bg-blue-50'   },
-    in_progress:       { emoji: '🔧', bg: 'bg-yellow-50' },
-    ready_to_ship:     { emoji: '🚚', bg: 'bg-green-50'  },
-    completed:         { emoji: '🎉', bg: 'bg-green-50'  },
-    closed:            { emoji: '🗂️', bg: 'bg-neutral-50' },
-    cancelled:         { emoji: '🚫', bg: 'bg-red-50'    },
-  };
-  const { emoji, bg } = icons[ status ] || { emoji: '🔧', bg: 'bg-neutral-50' };
+  const { Icon, bg, icon } = STATUS_ICON_MAP[ status ] || { Icon: Wrench, bg: 'bg-neutral-50', icon: 'text-neutral-400' };
   return (
-    <div className={ `w-12 h-12 rounded-xl ${ bg } flex items-center justify-center text-2xl` }>
-      { emoji }
-    </div>
+    <motion.div
+      key={ status }
+      initial={{ scale: 0.6, opacity: 0 }}
+      animate={{ scale: 1, opacity: 1 }}
+      transition={{ type: 'spring', stiffness: 320, damping: 22, delay: 0.05 }}
+      className={ `w-13 h-13 rounded-xl ${ bg } flex items-center justify-center shrink-0 shadow-sm` }
+      style={{ width: 52, height: 52 }}
+    >
+      <Icon size={ 23 } className={ icon } strokeWidth={ 1.75 } />
+    </motion.div>
   );
 }

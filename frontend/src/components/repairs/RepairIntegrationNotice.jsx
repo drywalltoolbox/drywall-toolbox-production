@@ -10,41 +10,44 @@
  *                                (content is always sanitised — never raw errors)
  */
 
+import { motion } from 'framer-motion';
+import { Info, Mail, CheckCircle, Package, Wrench, Truck } from 'lucide-react';
+
 // ─── Per-status customer messaging ───────────────────────────────────────────
 
 const STATUS_MESSAGES = {
   reviewed: {
-    icon:  'ℹ️',
+    Icon:  Info,
     title: 'Under Review',
     body:  "Our technicians are reviewing your repair request. We'll be in touch soon.",
     color: 'blue',
   },
   awaiting_customer: {
-    icon:  '📬',
+    Icon:  Mail,
     title: 'Your Input Needed',
     body:  'We need a bit more information from you. Please check your email for details.',
     color: 'yellow',
   },
   approved: {
-    icon:  '✅',
+    Icon:  CheckCircle,
     title: 'Repair Approved',
     body:  'Your repair has been approved and is being scheduled.',
     color: 'green',
   },
   parts_allocated: {
-    icon:  '📦',
+    Icon:  Package,
     title: 'Parts Being Prepared',
     body:  'Parts allocation is being processed. Your repair will begin shortly.',
     color: 'blue',
   },
   in_progress: {
-    icon:  '🔧',
+    Icon:  Wrench,
     title: 'Repair In Progress',
     body:  "Our technicians are actively working on your tool. We'll notify you when it's ready.",
     color: 'yellow',
   },
   ready_to_ship: {
-    icon:  '🚚',
+    Icon:  Truck,
     title: 'Ready to Ship',
     body:  'Your repaired tool is packaged and ready. Shipping details will be sent to your email.',
     color: 'green',
@@ -64,25 +67,32 @@ export default function RepairIntegrationNotice( { status, integrationState } ) 
   // Only render when there's something customer-relevant to show
   if ( ! msg && ! integrationState ) return null;
 
-  // If we have no message for this status but have an integrationState, show a neutral notice
   const display = msg || {
-    icon:  'ℹ️',
+    Icon:  Info,
     title: 'Processing',
     body:  "Your repair request is being processed. We'll update you as soon as there's news.",
     color: 'neutral',
   };
 
   const colors = COLOR_CLASSES[ display.color ] || COLOR_CLASSES.neutral;
+  const { Icon } = display;
 
   return (
-    <div className={ `rounded-xl border px-4 py-3 ${ colors.wrapper }` } role="status" aria-live="polite">
+    <motion.div
+      initial={{ opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.35, ease: 'easeOut' }}
+      className={ `rounded-xl border px-4 py-3 ${ colors.wrapper }` }
+      role="status"
+      aria-live="polite"
+    >
       <div className="flex items-start gap-2">
-        <span className="text-base mt-0.5" aria-hidden="true">{ display.icon }</span>
+        <Icon size={ 16 } strokeWidth={ 2 } className={ `mt-0.5 shrink-0 ${ colors.title }` } aria-hidden="true" />
         <div>
           <p className={ `text-sm font-semibold ${ colors.title }` }>{ display.title }</p>
           <p className={ `text-sm mt-0.5 ${ colors.body }` }>{ display.body }</p>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 }

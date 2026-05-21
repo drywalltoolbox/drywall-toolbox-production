@@ -20,6 +20,7 @@
  */
 
 import { useState, useRef, useCallback } from 'react';
+import { Paperclip } from 'lucide-react';
 import { uploadRepairMedia } from '../../api/repairs.js';
 
 const ACCEPTED_TYPES = [ 'image/jpeg', 'image/png', 'image/gif', 'image/webp' ];
@@ -142,7 +143,9 @@ export default function RepairMediaUploader( {
               : 'border-neutral-300 hover:border-neutral-400 bg-neutral-50',
           ].join( ' ' ) }
         >
-          <div className="text-2xl mb-1">📎</div>
+          <div className="flex justify-center mb-2">
+            <Paperclip size={ 24 } className="text-neutral-400" strokeWidth={ 1.75 } />
+          </div>
           <p className="text-sm text-neutral-600 font-medium">
             Drag &amp; drop photos here, or click to browse
           </p>

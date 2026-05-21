@@ -103,16 +103,21 @@ function dtb_repair_metabox_timeline( WP_Post $post ): void {
 
 	$events = dtb_repair_get_events( $post->ID, null, 50 );
 	if ( empty( $events ) ) {
-		echo '<p>' . esc_html__( 'No events recorded yet.', 'drywall-toolbox' ) . '</p>';
+		echo '<p style="color:#9ca3af;font-size:13px;">' . esc_html__( 'No events recorded yet.', 'drywall-toolbox' ) . '</p>';
 		return;
 	}
 
 	echo '<ul class="dtb-repair-timeline">';
 	foreach ( array_reverse( $events ) as $ev ) {
-		echo '<li>'
-			. '<span class="dtb-status-badge dtb-status-' . esc_attr( $ev->visibility ) . '">' . esc_html( $ev->visibility ) . '</span> '
-			. esc_html( $ev->event_type )
-			. '<span class="dtb-timeline-time">' . esc_html( $ev->created_at ) . '</span>'
+		$vis       = esc_attr( (string) $ev->visibility );
+		$type_raw  = esc_html( (string) $ev->event_type );
+		$time_fmt  = $ev->created_at ? date_i18n( 'M j, Y g:i a', strtotime( (string) $ev->created_at ) ) : '';
+		echo '<li class="dtb-ev-' . $vis . '">'
+			. '<div class="dtb-tl-body">'
+			. '<span class="dtb-tl-type">' . $type_raw . '</span>'
+			. '<span class="dtb-tl-vis dtb-tl-vis-' . $vis . '">' . esc_html( (string) $ev->visibility ) . '</span>'
+			. '<span class="dtb-timeline-time">' . esc_html( $time_fmt ) . '</span>'
+			. '</div>'
 			. '</li>';
 	}
 	echo '</ul>';
@@ -179,39 +184,47 @@ function dtb_repair_metabox_integration( WP_Post $post ): void {
 	// WooCommerce.
 	$wc_order_id = (int) get_post_meta( $post->ID, '_repair_wc_order_id', true );
 	$wc_state    = esc_html( $state['woocommerce']['state'] ?? 'pending' );
-	echo '<div class="dtb-integration-row"><strong>WooCommerce:</strong> ';
+	echo '<div class="dtb-integration-row">';
+	echo '<span class="dtb-int-label">WooCommerce</span>';
+	echo '<span class="dtb-int-value">';
 	if ( $wc_order_id ) {
 		$wc_url = admin_url( 'post.php?post=' . $wc_order_id . '&action=edit' );
-		echo '<a href="' . esc_url( $wc_url ) . '">' . esc_html__( 'Order #', 'drywall-toolbox' ) . $wc_order_id . '</a>';
+		echo '<span class="dtb-int-pill dtb-int-synced">synced</span>';
+		echo '<a href="' . esc_url( $wc_url ) . '">Order #' . $wc_order_id . ' →</a>';
 	} else {
-		echo esc_html( $wc_state );
+		echo '<span class="dtb-int-pill dtb-int-' . esc_attr( $wc_state ) . '">' . esc_html( $wc_state ) . '</span>';
 	}
-	echo '</div>';
+	echo '</span></div>';
 
 	// Veeqo.
-	$veeqo_state = esc_html( $state['veeqo']['state'] ?? 'pending' );
+	$veeqo_state = $state['veeqo']['state'] ?? 'pending';
 	$veeqo_track = esc_html( $state['veeqo']['tracking_number'] ?? '' );
-	echo '<div class="dtb-integration-row"><strong>Veeqo:</strong> '
-		. $veeqo_state
-		. ( $veeqo_track ? ' &mdash; ' . $veeqo_track : '' )
-		. '</div>';
+	echo '<div class="dtb-integration-row">';
+	echo '<span class="dtb-int-label">Veeqo</span>';
+	echo '<span class="dtb-int-value">';
+	echo '<span class="dtb-int-pill dtb-int-' . esc_attr( $veeqo_state ) . '">' . esc_html( $veeqo_state ) . '</span>';
+	if ( $veeqo_track ) echo '<span style="font-size:12px;color:#374151;">' . $veeqo_track . '</span>';
+	echo '</span></div>';
 
 	// QuickBooks.
-	$qb_state   = esc_html( $state['quickbooks']['state'] ?? 'pending' );
+	$qb_state   = $state['quickbooks']['state'] ?? 'pending';
 	$qb_invoice = esc_html( $state['quickbooks']['invoice_id'] ?? '' );
-	echo '<div class="dtb-integration-row"><strong>QuickBooks:</strong> '
-		. $qb_state
-		. ( $qb_invoice ? ' &mdash; ' . $qb_invoice : '' )
-		. '</div>';
+	echo '<div class="dtb-integration-row">';
+	echo '<span class="dtb-int-label">QuickBooks</span>';
+	echo '<span class="dtb-int-value">';
+	echo '<span class="dtb-int-pill dtb-int-' . esc_attr( $qb_state ) . '">' . esc_html( $qb_state ) . '</span>';
+	if ( $qb_invoice ) echo '<span style="font-size:12px;color:#374151;">#' . $qb_invoice . '</span>';
+	echo '</span></div>';
 
 	// Rewards.
-	$rewards_state  = esc_html( $state['rewards']['state'] ?? 'not_eligible' );
-	$rewards_issued = ! empty( $state['rewards']['issued'] ) ? __( 'Yes', 'drywall-toolbox' ) : __( 'No', 'drywall-toolbox' );
-	echo '<div class="dtb-integration-row"><strong>'
-		. esc_html__( 'Rewards:', 'drywall-toolbox' )
-		. '</strong> '
-		. $rewards_state
-		. ' (' . esc_html( $rewards_issued ) . ')</div>';
+	$rewards_state  = $state['rewards']['state'] ?? 'not_eligible';
+	$rewards_issued = ! empty( $state['rewards']['issued'] );
+	echo '<div class="dtb-integration-row">';
+	echo '<span class="dtb-int-label">Rewards</span>';
+	echo '<span class="dtb-int-value">';
+	echo '<span class="dtb-int-pill dtb-int-' . esc_attr( $rewards_state ) . '">' . esc_html( $rewards_state ) . '</span>';
+	if ( $rewards_issued ) echo '<span style="font-size:11px;color:#16a34a;">✓ Issued</span>';
+	echo '</span></div>';
 
 	echo '</div>';
 }
