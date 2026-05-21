@@ -522,6 +522,31 @@ function dtb_repair_admin_inline_styles(): void {
 		transition: opacity .15s;
 	}
 	#submitdiv #publish:hover { opacity: .88; }
+	#postbox-container-1 .meta-box-sortables {
+		display: flex;
+		flex-direction: column;
+		gap: 0;
+	}
+	#postbox-container-1 #postcustom { order: 60; }
+	#postbox-container-1 #submitdiv { order: 999; }
+	#postbox-container-1 #submitdiv.postbox {
+		margin-top: 8px !important;
+	}
+	#postcustom .inside {
+		padding: 12px !important;
+	}
+	#postcustom table,
+	#postcustom .inside > div {
+		width: 100% !important;
+		box-sizing: border-box;
+	}
+	#postcustom input[type="text"],
+	#postcustom textarea,
+	#postcustom select {
+		width: 100% !important;
+		max-width: 100% !important;
+		box-sizing: border-box;
+	}
 
 	/* ── Page layout ────────────────────────────────────────────────────────── */
 	#poststuff { padding-top: 0 !important; margin-top: 0 !important; }
@@ -543,6 +568,13 @@ function dtb_repair_admin_inline_styles(): void {
 		box-shadow: var(--dtb-shadow-md);
 	}
 	#dtb-repair-hero .dtb-hero-left { flex: 1; min-width: 0; }
+	#dtb-repair-hero .dtb-hero-top {
+		display: flex;
+		align-items: flex-start;
+		justify-content: space-between;
+		gap: 20px;
+	}
+	#dtb-repair-hero .dtb-hero-identity { min-width: 0; }
 	#dtb-repair-hero .dtb-hero-id {
 		font-size: 11px;
 		font-weight: 700;
@@ -558,6 +590,7 @@ function dtb_repair_admin_inline_styles(): void {
 		margin: 0 0 10px;
 		line-height: 1.2;
 	}
+	#dtb-repair-hero .dtb-hero-status-inline { margin: 0 0 10px; }
 	#dtb-repair-hero .dtb-hero-meta {
 		display: flex;
 		flex-wrap: wrap;
@@ -567,13 +600,7 @@ function dtb_repair_admin_inline_styles(): void {
 		align-items: center;
 	}
 	#dtb-repair-hero .dtb-hero-meta span { display: flex; align-items: center; gap: 4px; }
-	#dtb-repair-hero .dtb-hero-right {
-		display: flex;
-		flex-direction: column;
-		align-items: flex-end;
-		gap: 10px;
-		flex-shrink: 0;
-	}
+	#dtb-repair-hero .dtb-hero-right { display: none; }
 	#dtb-repair-hero .dtb-hero-wc a {
 		font-size: 12px;
 		color: rgba(255,255,255,.75);
@@ -584,6 +611,148 @@ function dtb_repair_admin_inline_styles(): void {
 		transition: background .15s;
 	}
 	#dtb-repair-hero .dtb-hero-wc a:hover { background: rgba(255,255,255,.1); }
+	#dtb-repair-hero .dtb-hero-integrations {
+		min-width: 420px;
+		max-width: 560px;
+		display: grid;
+		grid-template-columns: repeat(4, minmax(88px, 1fr));
+		gap: 8px;
+	}
+	#dtb-repair-hero .dtb-hero-int-item {
+		display: flex;
+		flex-direction: column;
+		gap: 4px;
+		padding: 8px 10px;
+		background: rgba(255,255,255,.06);
+		border: 1px solid rgba(255,255,255,.15);
+		border-radius: 8px;
+	}
+	#dtb-repair-hero .dtb-hero-int-name {
+		font-size: 10px;
+		font-weight: 700;
+		text-transform: uppercase;
+		letter-spacing: .45px;
+		color: rgba(255,255,255,.62);
+	}
+	#dtb-repair-hero .dtb-hero-int-meta {
+		font-size: 11px;
+		font-weight: 600;
+		color: rgba(255,255,255,.82);
+		text-decoration: none;
+	}
+	#dtb-repair-hero .dtb-hero-int-meta:hover { text-decoration: underline; }
+	#dtb-repair-hero .dtb-hero-int-item .dtb-int-pill { font-size: 10px; }
+	#dtb-repair-hero .dtb-hero-int-item .dtb-int-synced   { background: #bbf7d0; color: #14532d; }
+	#dtb-repair-hero .dtb-hero-int-item .dtb-int-pending  { background: #fde68a; color: #78350f; }
+	#dtb-repair-hero .dtb-hero-int-item .dtb-int-error    { background: #fecaca; color: #7f1d1d; }
+	#dtb-repair-hero .dtb-hero-int-item .dtb-int-not_configured,
+	#dtb-repair-hero .dtb-hero-int-item .dtb-int-not_eligible { background: #e5e7eb; color: #6b7280; }
+	#dtb-repair-workspace-tabs {
+		margin: -6px 0 16px;
+		background: #fff;
+		border: 1px solid var(--dtb-border);
+		border-radius: 10px;
+		padding: 8px;
+		display: flex;
+		gap: 8px;
+		flex-wrap: wrap;
+		box-shadow: var(--dtb-shadow);
+	}
+	.dtb-workspace-tab {
+		border: 1px solid #dbe1ea;
+		background: #f8fafc;
+		color: #475569;
+		border-radius: 8px;
+		padding: 7px 12px;
+		font-size: 12px;
+		font-weight: 700;
+		letter-spacing: .2px;
+		cursor: pointer;
+	}
+	.dtb-workspace-tab:hover { border-color: #bfdbfe; color: #1e40af; }
+	.dtb-workspace-tab.is-active {
+		background: #eff6ff;
+		border-color: #93c5fd;
+		color: #1d4ed8;
+	}
+	.dtb-workspace-hidden { display: none !important; }
+	.dtb-tech-workspace { display: grid; gap: 14px; }
+	.dtb-tech-grid {
+		display: grid;
+		grid-template-columns: repeat(2, minmax(0,1fr));
+		gap: 12px;
+	}
+	.dtb-tech-card {
+		border: 1px solid var(--dtb-border);
+		background: #f9fafb;
+		border-radius: 10px;
+		padding: 12px;
+	}
+	.dtb-tech-card h3 {
+		margin: 0 0 6px;
+		font-size: 13px;
+		font-weight: 700;
+		color: #0f172a;
+	}
+	.dtb-tech-help {
+		margin: 0 0 8px;
+		font-size: 11px;
+		color: #64748b;
+	}
+	.dtb-tech-label {
+		display: block;
+		font-size: 11px;
+		font-weight: 700;
+		color: #475569;
+		margin: 8px 0 4px;
+	}
+	.dtb-tech-input,
+	.dtb-tech-textarea {
+		width: 100%;
+		border: 1px solid #d7dee9;
+		border-radius: 8px;
+		background: #fff;
+		padding: 8px 10px;
+		font-size: 12px;
+		color: #111827;
+		box-sizing: border-box;
+	}
+	.dtb-tech-textarea { min-height: 124px; resize: vertical; }
+	.dtb-tech-textarea-sm { min-height: 82px; }
+	.dtb-tech-input:focus,
+	.dtb-tech-textarea:focus {
+		outline: none;
+		border-color: var(--dtb-blue);
+		box-shadow: 0 0 0 3px rgba(29,78,216,.14);
+	}
+	.dtb-tech-row {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: 8px;
+	}
+	.dtb-tech-checkbox {
+		display: inline-flex;
+		align-items: center;
+		gap: 7px;
+		font-size: 12px;
+		font-weight: 600;
+		color: #1f2937;
+	}
+	.dtb-tech-sync-meta {
+		margin-top: 10px;
+		padding: 10px;
+		border: 1px solid #dbe7ff;
+		background: #f8fbff;
+		border-radius: 8px;
+		font-size: 11px;
+		color: #334155;
+		display: grid;
+		gap: 4px;
+	}
+	.dtb-tech-sync-checksum {
+		word-break: break-all;
+		font-family: SFMono-Regular, Consolas, Monaco, monospace;
+	}
 
 	/* ── Sticky action bar (appears on scroll) ──────────────────────────────── */
 	#dtb-sticky-bar {
@@ -786,10 +955,110 @@ function dtb_repair_admin_inline_styles(): void {
 	#dtb-repair-command-center .inside { padding: 0 !important; }
 	#dtb-repair-command-center { overflow: hidden; }
 
-	.dtb-command-center {
-		display: grid;
-		grid-template-columns: 1fr 1fr;
-		min-height: 220px;
+	.dtb-command-center { display: block; min-height: 0; }
+	.dtb-cc-progress-wrap {
+		padding: 16px 20px 8px;
+		border-bottom: 1px solid var(--dtb-border);
+		background: #fff;
+	}
+	.dtb-cc-progress-head {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 10px;
+		margin-bottom: 10px;
+	}
+	.dtb-cc-progress-kicker {
+		font-size: 10px;
+		font-weight: 700;
+		color: var(--dtb-muted);
+		text-transform: uppercase;
+		letter-spacing: .6px;
+	}
+	.dtb-cc-progress-track {
+		height: 6px;
+		border-radius: 999px;
+		background: #e5e7eb;
+		overflow: hidden;
+	}
+	.dtb-cc-progress-fill {
+		height: 100%;
+		background: #2563eb;
+		border-radius: 999px;
+		transition: width .25s ease-out;
+	}
+	.dtb-cc-progress-fill-complete { background: #16a34a; }
+	.dtb-cc-milestones {
+		display: flex;
+		justify-content: space-between;
+		gap: 10px;
+		margin-top: 10px;
+	}
+	.dtb-cc-ms-item {
+		flex: 1;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 5px;
+	}
+	.dtb-cc-ms-dot-btn {
+		border: 0;
+		background: transparent;
+		padding: 0;
+		cursor: default;
+		line-height: 1;
+		width: 24px;
+		height: 24px;
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		border-radius: 999px;
+		position: relative;
+	}
+	.dtb-cc-ms-dot-btn.is-clickable { cursor: pointer; }
+	.dtb-cc-ms-dot-btn.is-clickable:focus { outline: none; }
+	.dtb-cc-ms-dot-btn.is-clickable:focus .dtb-cc-ms-dot {
+		box-shadow: 0 0 0 3px rgba(37,99,235,.20);
+	}
+	.dtb-cc-ms-dot-btn.is-clickable:hover {
+		background: rgba(37,99,235,.08);
+	}
+	.dtb-cc-ms-dot-btn.is-disabled { opacity: .8; }
+	.dtb-cc-ms-dot {
+		display: block;
+		width: 12px;
+		height: 12px;
+		border-radius: 50%;
+		border: 2px solid #cbd5e1;
+		background: #fff;
+		transition: border-color .15s, background-color .15s, transform .15s;
+	}
+	.dtb-cc-ms-dot-btn.is-clickable:hover .dtb-cc-ms-dot.dtb-ms-future {
+		border-color: #2563eb;
+	}
+	.dtb-cc-ms-dot.dtb-ms-done { border-color: #2563eb; background: #2563eb; transform: scale(1.02); }
+	.dtb-cc-ms-dot.dtb-ms-active { border-color: #2563eb; background: #fff; box-shadow: 0 0 0 3px rgba(37,99,235,.18); transform: scale(1.08); }
+	.dtb-cc-ms-label {
+		font-size: 10px;
+		font-weight: 600;
+		color: #9ca3af;
+		text-align: center;
+		line-height: 1.2;
+	}
+	.dtb-cc-ms-label.dtb-ms-done,
+	.dtb-cc-ms-label.dtb-ms-active { color: #1f2937; }
+	.dtb-cc-terminal-msg {
+		margin-top: 8px;
+		display: inline-flex;
+		align-items: center;
+		padding: 2px 8px;
+		border-radius: 999px;
+		font-size: 10px;
+		font-weight: 700;
+		text-transform: uppercase;
+		letter-spacing: .45px;
+		background: #f3f4f6;
+		color: #6b7280;
 	}
 	.dtb-cc-panel {
 		padding: 18px 20px;
@@ -843,6 +1112,63 @@ function dtb_repair_admin_inline_styles(): void {
 		background: #fff !important;
 		box-sizing: border-box;
 		display: block;
+	}
+	.dtb-cc-action-picker {
+		position: relative;
+		margin-bottom: 10px;
+	}
+	.dtb-cc-action-toggle {
+		width: 100%;
+		border: 1px solid var(--dtb-border);
+		border-radius: 8px;
+		background: #fff;
+		color: var(--dtb-text);
+		font-size: 13px;
+		font-weight: 600;
+		padding: 9px 11px;
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		cursor: pointer;
+		text-align: left;
+	}
+	.dtb-cc-action-toggle:hover { border-color: #cbd5e1; }
+	.dtb-cc-action-toggle:focus {
+		outline: none;
+		border-color: var(--dtb-blue);
+		box-shadow: 0 0 0 3px rgba(29,78,216,.14);
+	}
+	.dtb-cc-action-menu {
+		position: absolute;
+		left: 0;
+		right: 0;
+		top: calc(100% + 6px);
+		z-index: 12;
+		background: #fff;
+		border: 1px solid var(--dtb-border);
+		border-radius: 10px;
+		box-shadow: 0 10px 24px rgba(0,0,0,.12);
+		overflow: hidden;
+	}
+	.dtb-cc-action-option {
+		display: block;
+		width: 100%;
+		border: 0;
+		border-bottom: 1px solid #f3f4f6;
+		background: #fff;
+		color: #111827;
+		text-align: left;
+		padding: 10px 12px;
+		font-size: 13px;
+		font-weight: 600;
+		cursor: pointer;
+	}
+	.dtb-cc-action-option:last-child { border-bottom: none; }
+	.dtb-cc-action-option:hover { background: #f8fafc; }
+	.dtb-cc-action-option:focus {
+		outline: none;
+		background: #eff6ff;
+		color: #1d4ed8;
 	}
 	.dtb-cc-note {
 		width: 100% !important;
@@ -1045,14 +1371,52 @@ function dtb_repair_admin_hero_banner( WP_Post $post ): void {
 	$tier        = esc_html( (string) get_post_meta( $repair_id, '_repair_service_tier', true ) );
 	$submitted   = esc_html( (string) get_post_meta( $repair_id, '_repair_submitted_at', true ) );
 	$wc_id       = (int) get_post_meta( $repair_id, '_repair_wc_order_id', true );
+	$int_raw     = (string) get_post_meta( $repair_id, '_repair_integration_state', true );
+	$int_state   = ( '' !== $int_raw ) ? json_decode( $int_raw, true ) : [];
+	$wc_state    = $wc_id ? 'synced' : ( $int_state['woocommerce']['state'] ?? 'pending' );
+	$veeqo_state = $int_state['veeqo']['state'] ?? 'pending';
+	$qb_state    = $int_state['quickbooks']['state'] ?? 'pending';
+	$rw_state    = $int_state['rewards']['state'] ?? 'not_eligible';
 
 	$tool_desc   = trim( implode( ' — ', array_filter( [ $brand, $model ?: $category ] ) ) );
 	$submitted_fmt = $submitted ? date_i18n( 'M j, Y g:i a', strtotime( $submitted ) ) : '';
 	?>
 	<div id="dtb-repair-hero">
 		<div class="dtb-hero-left">
-			<div class="dtb-hero-id">Repair #<?php echo esc_html( (string) $repair_id ); ?></div>
-			<div class="dtb-hero-title"><?php echo $customer ? esc_html( $customer ) : esc_html__( '(No customer name)', 'drywall-toolbox' ); ?></div>
+			<div class="dtb-hero-top">
+				<div class="dtb-hero-identity">
+					<div class="dtb-hero-id">Repair #<?php echo esc_html( (string) $repair_id ); ?></div>
+					<div class="dtb-hero-title"><?php echo $customer ? esc_html( $customer ) : esc_html__( '(No customer name)', 'drywall-toolbox' ); ?></div>
+					<div class="dtb-hero-status-inline">
+						<span class="dtb-status-badge dtb-status-<?php echo esc_attr( $status ); ?>"><?php echo esc_html( $status_lbl ); ?></span>
+					</div>
+				</div>
+
+				<div class="dtb-hero-integrations">
+					<div class="dtb-hero-int-item">
+						<span class="dtb-hero-int-name">WooCommerce</span>
+						<?php echo dtb_repair_admin_integration_badge( $wc_state ); // phpcs:ignore ?>
+						<?php if ( $wc_id ) : ?>
+							<a class="dtb-hero-int-meta" href="<?php echo esc_url( admin_url( 'post.php?post=' . $wc_id . '&action=edit' ) ); ?>">
+								Order #<?php echo esc_html( (string) $wc_id ); ?> →
+							</a>
+						<?php endif; ?>
+					</div>
+					<div class="dtb-hero-int-item">
+						<span class="dtb-hero-int-name">Veeqo</span>
+						<?php echo dtb_repair_admin_integration_badge( $veeqo_state ); // phpcs:ignore ?>
+					</div>
+					<div class="dtb-hero-int-item">
+						<span class="dtb-hero-int-name">QuickBooks</span>
+						<?php echo dtb_repair_admin_integration_badge( $qb_state ); // phpcs:ignore ?>
+					</div>
+					<div class="dtb-hero-int-item">
+						<span class="dtb-hero-int-name">Rewards</span>
+						<?php echo dtb_repair_admin_integration_badge( $rw_state ); // phpcs:ignore ?>
+					</div>
+				</div>
+			</div>
+
 			<div class="dtb-hero-meta">
 				<?php if ( $email ) : ?>
 					<span><span class="dashicons dashicons-email-alt" style="font-size:13px;width:13px;height:13px;vertical-align:middle;margin-right:3px;opacity:.7;"></span><?php echo esc_html( $email ); ?></span>
@@ -1071,16 +1435,6 @@ function dtb_repair_admin_hero_banner( WP_Post $post ): void {
 				<?php endif; ?>
 			</div>
 		</div>
-		<div class="dtb-hero-right">
-			<span class="dtb-status-badge dtb-status-<?php echo esc_attr( $status ); ?>"><?php echo esc_html( $status_lbl ); ?></span>
-			<?php if ( $wc_id ) : ?>
-				<div class="dtb-hero-wc">
-					<a href="<?php echo esc_url( admin_url( 'post.php?post=' . $wc_id . '&action=edit' ) ); ?>">
-						WC Order #<?php echo esc_html( (string) $wc_id ); ?> →
-					</a>
-				</div>
-			<?php endif; ?>
-		</div>
 	</div>
 
 	<div id="dtb-sticky-bar">
@@ -1094,6 +1448,21 @@ function dtb_repair_admin_hero_banner( WP_Post $post ): void {
 				<span class="dashicons dashicons-saved" style="vertical-align:middle;margin-right:4px;font-size:14px;width:14px;height:14px;line-height:1.4;"></span>Save Notes
 			</button>
 		</div>
+	</div>
+
+	<div id="dtb-repair-workspace-tabs" role="tablist" aria-label="Repair Workspace Tabs">
+		<button type="button" class="dtb-workspace-tab is-active" data-dtb-tab="order_details" role="tab" aria-selected="true">
+			Order Details
+		</button>
+		<button type="button" class="dtb-workspace-tab" data-dtb-tab="technician_details" role="tab" aria-selected="false">
+			Technician Details
+		</button>
+		<button type="button" class="dtb-workspace-tab" data-dtb-tab="timeline" role="tab" aria-selected="false">
+			Timeline
+		</button>
+		<button type="button" class="dtb-workspace-tab" data-dtb-tab="all" role="tab" aria-selected="false">
+			All Sections
+		</button>
 	</div>
 	<?php
 }
@@ -1211,6 +1580,74 @@ function dtb_repair_admin_footer_scripts(): void {
 				}
 			});
 		});
+
+		/* ── Workspace tabs: show/hide section groups ── */
+		var tabButtons = Array.from(document.querySelectorAll('.dtb-workspace-tab'));
+		if ( tabButtons.length ) {
+			var byId = function(id) { return document.getElementById(id); };
+			var groups = {
+				order_details: [
+					'dtb-repair-command-center',
+					'dtb-repair-tool',
+					'dtb-repair-issue'
+				],
+				technician_details: [
+					'dtb-repair-command-center',
+					'dtb-repair-technician',
+					'dtb-repair-tool',
+					'dtb-repair-issue',
+					'dtb-repair-notes',
+					'dtb-repair-queue'
+				],
+				timeline: [
+					'dtb-repair-command-center',
+					'dtb-repair-timeline'
+				],
+				all: []
+			};
+
+			var allKnownIds = [
+				'dtb-repair-command-center',
+				'dtb-repair-technician',
+				'dtb-repair-tool',
+				'dtb-repair-issue',
+				'dtb-repair-timeline',
+				'dtb-repair-notes',
+				'dtb-repair-queue'
+			];
+
+			var setActiveTab = function(tabKey) {
+				tabButtons.forEach(function(btn) {
+					var isActive = btn.getAttribute('data-dtb-tab') === tabKey;
+					btn.classList.toggle('is-active', isActive);
+					btn.setAttribute('aria-selected', isActive ? 'true' : 'false');
+				});
+
+				if ( tabKey === 'all' ) {
+					allKnownIds.forEach(function(id) {
+						var el = byId(id);
+						if ( el ) el.classList.remove('dtb-workspace-hidden');
+					});
+					return;
+				}
+
+				var visibleSet = new Set(groups[tabKey] || groups.order_details);
+				allKnownIds.forEach(function(id) {
+					var el = byId(id);
+					if ( ! el ) return;
+					el.classList.toggle('dtb-workspace-hidden', ! visibleSet.has(id));
+				});
+			};
+
+			tabButtons.forEach(function(btn) {
+				btn.addEventListener('click', function() {
+					var tabKey = btn.getAttribute('data-dtb-tab') || 'order_details';
+					setActiveTab(tabKey);
+				});
+			});
+
+			setActiveTab('order_details');
+		}
 
 	}());
 	</script>

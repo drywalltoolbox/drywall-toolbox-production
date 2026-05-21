@@ -31,6 +31,7 @@ require_once __DIR__ . '/Services/RepairSlaService.php';
 require_once __DIR__ . '/Services/RepairOpsQueryService.php';
 require_once __DIR__ . '/Services/RepairOpsProjectionService.php';
 require_once __DIR__ . '/Services/RepairWorkflowService.php';
+require_once __DIR__ . '/Services/RepairSchematicResolver.php';
 
 // Infrastructure — queue and notifications (depend on Services)
 require_once __DIR__ . '/Infrastructure/RepairQueue.php';

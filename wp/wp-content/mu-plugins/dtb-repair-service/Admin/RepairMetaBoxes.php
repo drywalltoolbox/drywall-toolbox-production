@@ -17,9 +17,9 @@ function dtb_repair_admin_add_metaboxes(): void {
 		'dtb-repair-command-center' => [ __( 'Repair Command Center', 'drywall-toolbox' ), 'dtb_repair_metabox_command_center', 'normal', 'high' ],
 		'dtb-repair-tool'           => [ __( 'Tool Details', 'drywall-toolbox' ), 'dtb_repair_metabox_tool', 'normal', 'high' ],
 		'dtb-repair-issue'          => [ __( 'Issue Description', 'drywall-toolbox' ), 'dtb_repair_metabox_issue', 'normal', 'high' ],
+		'dtb-repair-technician'     => [ __( 'Technician Workspace', 'drywall-toolbox' ), 'dtb_repair_metabox_technician', 'normal', 'high' ],
 		'dtb-repair-timeline'       => [ __( 'Repair Timeline', 'drywall-toolbox' ), 'dtb_repair_metabox_timeline', 'normal', 'default' ],
 		'dtb-repair-notes'          => [ __( 'Internal Notes', 'drywall-toolbox' ), 'dtb_repair_metabox_notes', 'normal', 'default' ],
-		'dtb-repair-customer'       => [ __( 'Customer Details', 'drywall-toolbox' ), 'dtb_repair_metabox_customer', 'side', 'high' ],
 		'dtb-repair-queue'          => [ __( 'Queue Jobs', 'drywall-toolbox' ), 'dtb_repair_metabox_queue', 'side', 'low' ],
 	];
 
@@ -176,10 +176,209 @@ function dtb_repair_save_notes_meta( int $post_id ): void {
 	}
 }
 
-// ---- Metabox: Repair Command Center (Status Transition + Integration) -------
+// ---- Metabox: Technician Workspace ------------------------------------------
+
+function dtb_repair_metabox_technician( WP_Post $post ): void {
+	wp_nonce_field( 'dtb_repair_save_technician_' . $post->ID, 'dtb_repair_technician_nonce' );
+
+	$diag     = (string) get_post_meta( $post->ID, '_repair_diag_notes', true );
+	$parts    = (string) get_post_meta( $post->ID, '_repair_parts_worklog', true );
+	$qa_notes = (string) get_post_meta( $post->ID, '_repair_qa_notes', true );
+	$qa_ok    = (string) get_post_meta( $post->ID, '_repair_qa_passed', true );
+	$qa_by    = (string) get_post_meta( $post->ID, '_repair_qa_signed_by', true );
+	$qa_at    = (string) get_post_meta( $post->ID, '_repair_qa_signed_at', true );
+
+	$sch_url  = (string) get_post_meta( $post->ID, '_repair_schematic_url', true );
+	$sch_rev  = (string) get_post_meta( $post->ID, '_repair_schematic_revision', true );
+	$sch_ref  = (string) get_post_meta( $post->ID, '_repair_schematic_ref', true );
+	$sch_cat  = (string) get_post_meta( $post->ID, '_repair_schematic_catalog_id', true );
+	$sch_meta = function_exists( 'dtb_repair_get_schematic_sync_snapshot' ) ? dtb_repair_get_schematic_sync_snapshot( $post->ID ) : [];
+
+	$model_hint = sanitize_text_field( (string) get_post_meta( $post->ID, '_repair_model', true ) );
+	$brand_hint = sanitize_text_field( (string) get_post_meta( $post->ID, '_repair_tool_brand', true ) );
+	$catalog_seed = get_posts(
+		[
+			'post_type'      => 'attachment',
+			'post_status'    => 'inherit',
+			'posts_per_page' => 40,
+			'fields'         => 'ids',
+			'meta_query'     => [
+				[
+					'key'     => '_dtb_is_schematic',
+					'value'   => '1',
+					'compare' => '=',
+				],
+				[
+					'relation' => 'OR',
+					[
+						'key'     => '_dtb_schematic_model_number',
+						'value'   => $model_hint,
+						'compare' => '=',
+					],
+					[
+						'key'     => '_dtb_schematic_brand',
+						'value'   => $brand_hint,
+						'compare' => '=',
+					],
+					[
+						'key'     => '_dtb_schematic_id',
+						'value'   => '',
+						'compare' => '!=',
+					],
+				],
+			],
+		]
+	);
+
+	?>
+	<div class="dtb-tech-workspace">
+		<div class="dtb-tech-grid">
+			<section class="dtb-tech-card">
+				<h3>Diagnostic Checklist & Notes</h3>
+				<p class="dtb-tech-help">Record observations, measured values, and validation steps.</p>
+				<textarea
+					name="dtb_repair_diag_notes"
+					class="dtb-tech-textarea"
+					placeholder="Example: Motor draws 4.2A at idle; vibration starts above 60% throttle..."
+				><?php echo esc_textarea( $diag ); ?></textarea>
+			</section>
+
+			<section class="dtb-tech-card">
+				<h3>Parts & Work Log</h3>
+				<p class="dtb-tech-help">Track part numbers, quantity, labor details, and key actions performed.</p>
+				<textarea
+					name="dtb_repair_parts_worklog"
+					class="dtb-tech-textarea"
+					placeholder="Example: PN-AX21 bearing x2, replaced spindle assembly, threadlocked fasteners..."
+				><?php echo esc_textarea( $parts ); ?></textarea>
+			</section>
+		</div>
+
+		<div class="dtb-tech-grid">
+			<section class="dtb-tech-card">
+				<h3>Schematic Reference</h3>
+				<p class="dtb-tech-help">Synced against the same schematics catalog powering your frontend Schematics workflow.</p>
+				<label class="dtb-tech-label" for="dtb_repair_schematic_catalog_id">Catalog Schematic ID</label>
+				<input id="dtb_repair_schematic_catalog_id" name="dtb_repair_schematic_catalog_id" type="text" class="dtb-tech-input" list="dtb_repair_schematic_catalog_list" value="<?php echo esc_attr( $sch_cat ); ?>" placeholder="ex: asgard-ez12a-main" />
+				<datalist id="dtb_repair_schematic_catalog_list">
+					<?php foreach ( (array) $catalog_seed as $att_id ) :
+						$sid = (string) get_post_meta( (int) $att_id, '_dtb_schematic_id', true );
+						if ( '' === trim( $sid ) ) {
+							continue;
+						}
+						$sbrand = (string) get_post_meta( (int) $att_id, '_dtb_schematic_brand', true );
+						$smodel = (string) get_post_meta( (int) $att_id, '_dtb_schematic_model_number', true );
+					?>
+						<option value="<?php echo esc_attr( $sid ); ?>"><?php echo esc_html( trim( $sbrand . ' ' . $smodel ) ); ?></option>
+					<?php endforeach; ?>
+				</datalist>
+				<label class="dtb-tech-label" for="dtb_repair_schematic_url">Official Schematic URL</label>
+				<input id="dtb_repair_schematic_url" name="dtb_repair_schematic_url" type="url" class="dtb-tech-input" value="<?php echo esc_attr( $sch_url ); ?>" placeholder="https://..." />
+
+				<div class="dtb-tech-row">
+					<div>
+						<label class="dtb-tech-label" for="dtb_repair_schematic_revision">Revision / Version</label>
+						<input id="dtb_repair_schematic_revision" name="dtb_repair_schematic_revision" type="text" class="dtb-tech-input" value="<?php echo esc_attr( $sch_rev ); ?>" placeholder="Rev B, 2026.05" />
+					</div>
+					<div>
+						<label class="dtb-tech-label" for="dtb_repair_schematic_ref">Reference ID</label>
+						<input id="dtb_repair_schematic_ref" name="dtb_repair_schematic_ref" type="text" class="dtb-tech-input" value="<?php echo esc_attr( $sch_ref ); ?>" placeholder="Doc-1234 / SKU diagram code" />
+					</div>
+				</div>
+
+				<?php if ( '' !== trim( $sch_url ) ) : ?>
+					<p style="margin-top:10px;">
+						<a class="button" href="<?php echo esc_url( $sch_url ); ?>" target="_blank" rel="noopener noreferrer">Open Schematic</a>
+					</p>
+				<?php endif; ?>
+
+				<?php if ( ! empty( $sch_meta ) ) : ?>
+					<div class="dtb-tech-sync-meta">
+						<div><strong>Catalog Match:</strong> <?php echo esc_html( (string) ( $sch_meta['catalog_id'] ?? 'Unresolved' ) ); ?></div>
+						<div><strong>Source Host:</strong> <?php echo esc_html( (string) ( $sch_meta['source_host'] ?? 'n/a' ) ); ?></div>
+						<div><strong>Synced:</strong> <?php echo esc_html( (string) ( $sch_meta['synced_at_gmt'] ?? '' ) ); ?> UTC</div>
+						<div><strong>Version:</strong> <?php echo esc_html( (string) ( $sch_meta['catalog_version'] ?? 'n/a' ) ); ?></div>
+						<div class="dtb-tech-sync-checksum"><strong>Checksum:</strong> <?php echo esc_html( (string) ( $sch_meta['catalog_checksum'] ?? 'n/a' ) ); ?></div>
+					</div>
+				<?php endif; ?>
+			</section>
+
+			<section class="dtb-tech-card">
+				<h3>Final QA & Sign-off</h3>
+				<p class="dtb-tech-help">Complete final checks before ready-to-ship transition.</p>
+				<label class="dtb-tech-checkbox">
+					<input type="checkbox" name="dtb_repair_qa_passed" value="1" <?php checked( $qa_ok, '1' ); ?> />
+					<span>QA Passed</span>
+				</label>
+				<label class="dtb-tech-label" for="dtb_repair_qa_signed_by">Signed By</label>
+				<input id="dtb_repair_qa_signed_by" name="dtb_repair_qa_signed_by" type="text" class="dtb-tech-input" value="<?php echo esc_attr( $qa_by ); ?>" placeholder="Technician name" />
+				<label class="dtb-tech-label" for="dtb_repair_qa_signed_at">Signed At</label>
+				<input id="dtb_repair_qa_signed_at" name="dtb_repair_qa_signed_at" type="datetime-local" class="dtb-tech-input" value="<?php echo esc_attr( $qa_at ); ?>" />
+				<label class="dtb-tech-label" for="dtb_repair_qa_notes">QA Notes</label>
+				<textarea id="dtb_repair_qa_notes" name="dtb_repair_qa_notes" class="dtb-tech-textarea dtb-tech-textarea-sm" placeholder="Final validation summary..."><?php echo esc_textarea( $qa_notes ); ?></textarea>
+			</section>
+		</div>
+	</div>
+	<?php
+}
+
+add_action( 'save_post_dtb_repair_request', 'dtb_repair_save_technician_meta' );
+
+function dtb_repair_save_technician_meta( int $post_id ): void {
+	if ( ! isset( $_POST['dtb_repair_technician_nonce'] ) ) {
+		return;
+	}
+	if ( ! wp_verify_nonce( sanitize_text_field( wp_unslash( (string) $_POST['dtb_repair_technician_nonce'] ) ), 'dtb_repair_save_technician_' . $post_id ) ) {
+		return;
+	}
+	if ( ! current_user_can( 'dtb_manage_repairs' ) ) {
+		return;
+	}
+	if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
+		return;
+	}
+
+	$diag     = isset( $_POST['dtb_repair_diag_notes'] ) ? wp_kses_post( wp_unslash( (string) $_POST['dtb_repair_diag_notes'] ) ) : '';
+	$parts    = isset( $_POST['dtb_repair_parts_worklog'] ) ? wp_kses_post( wp_unslash( (string) $_POST['dtb_repair_parts_worklog'] ) ) : '';
+	$qa_notes = isset( $_POST['dtb_repair_qa_notes'] ) ? wp_kses_post( wp_unslash( (string) $_POST['dtb_repair_qa_notes'] ) ) : '';
+	$qa_ok    = isset( $_POST['dtb_repair_qa_passed'] ) ? '1' : '0';
+	$qa_by    = isset( $_POST['dtb_repair_qa_signed_by'] ) ? sanitize_text_field( wp_unslash( (string) $_POST['dtb_repair_qa_signed_by'] ) ) : '';
+	$qa_at    = isset( $_POST['dtb_repair_qa_signed_at'] ) ? sanitize_text_field( wp_unslash( (string) $_POST['dtb_repair_qa_signed_at'] ) ) : '';
+
+	$sch_url  = isset( $_POST['dtb_repair_schematic_url'] ) ? esc_url_raw( wp_unslash( (string) $_POST['dtb_repair_schematic_url'] ) ) : '';
+	$sch_rev  = isset( $_POST['dtb_repair_schematic_revision'] ) ? sanitize_text_field( wp_unslash( (string) $_POST['dtb_repair_schematic_revision'] ) ) : '';
+	$sch_ref  = isset( $_POST['dtb_repair_schematic_ref'] ) ? sanitize_text_field( wp_unslash( (string) $_POST['dtb_repair_schematic_ref'] ) ) : '';
+	$sch_cat  = isset( $_POST['dtb_repair_schematic_catalog_id'] ) ? sanitize_text_field( wp_unslash( (string) $_POST['dtb_repair_schematic_catalog_id'] ) ) : '';
+
+	update_post_meta( $post_id, '_repair_diag_notes', $diag );
+	update_post_meta( $post_id, '_repair_parts_worklog', $parts );
+	update_post_meta( $post_id, '_repair_qa_notes', $qa_notes );
+	update_post_meta( $post_id, '_repair_qa_passed', $qa_ok );
+	update_post_meta( $post_id, '_repair_qa_signed_by', $qa_by );
+	update_post_meta( $post_id, '_repair_qa_signed_at', $qa_at );
+	update_post_meta( $post_id, '_repair_schematic_url', $sch_url );
+	update_post_meta( $post_id, '_repair_schematic_revision', $sch_rev );
+	update_post_meta( $post_id, '_repair_schematic_ref', $sch_ref );
+	update_post_meta( $post_id, '_repair_schematic_catalog_id', $sch_cat );
+
+	if ( function_exists( 'dtb_repair_sync_schematic_metadata' ) ) {
+		$snapshot = dtb_repair_sync_schematic_metadata( $post_id, $sch_url, $sch_ref, $sch_rev, $sch_cat );
+		if ( ! empty( $snapshot['catalog_url'] ) ) {
+			update_post_meta( $post_id, '_repair_schematic_url', (string) $snapshot['catalog_url'] );
+		}
+		if ( ! empty( $snapshot['catalog_id'] ) ) {
+			update_post_meta( $post_id, '_repair_schematic_ref', (string) $snapshot['catalog_id'] );
+		}
+		if ( ! empty( $snapshot['catalog_version'] ) && '' === trim( $sch_rev ) ) {
+			update_post_meta( $post_id, '_repair_schematic_revision', (string) $snapshot['catalog_version'] );
+		}
+	}
+}
+
+// ---- Metabox: Repair Command Center (Status Transition) ----------------------
 
 /**
- * Unified command center — left panel: status transition form, right panel: integration status.
+ * Unified command center — status transition controls.
  */
 function dtb_repair_metabox_command_center( WP_Post $post ): void {
 	if ( ! function_exists( 'dtb_get_repair_status' ) || ! function_exists( 'dtb_get_allowed_transitions' ) ) {
@@ -192,44 +391,132 @@ function dtb_repair_metabox_command_center( WP_Post $post ): void {
 	$current_lbl = dtb_get_repair_status_label( $current );
 	$transitions = dtb_get_allowed_transitions();
 	$allowed     = $transitions[ $current ] ?? [];
+	$milestones  = [
+		[ 'key' => 'submitted',     'label' => __( 'Submitted', 'drywall-toolbox' ) ],
+		[ 'key' => 'in_progress',   'label' => __( 'In Progress', 'drywall-toolbox' ) ],
+		[ 'key' => 'ready_to_ship', 'label' => __( 'Ready to Ship', 'drywall-toolbox' ) ],
+		[ 'key' => 'completed',     'label' => __( 'Completed', 'drywall-toolbox' ) ],
+	];
+	$milestone_targets = [
+		'submitted'     => [ 'submitted', 'reviewed' ],
+		'in_progress'   => [ 'approved', 'quoted', 'quote_accepted', 'parts_allocated', 'in_progress' ],
+		'ready_to_ship' => [ 'ready_to_ship' ],
+		'completed'     => [ 'completed', 'closed' ],
+	];
+	$milestone_order = [
+		'submitted'         => 0,
+		'reviewed'          => 0,
+		'awaiting_customer' => 0,
+		'approved'          => 1,
+		'quoted'            => 1,
+		'quote_accepted'    => 1,
+		'parts_allocated'   => 1,
+		'in_progress'       => 1,
+		'ready_to_ship'     => 2,
+		'completed'         => 3,
+		'closed'            => 3,
+		'cancelled'         => -1,
+		'quote_declined'    => -1,
+	];
+	$progress_pct = [
+		'submitted'         => 8,
+		'reviewed'          => 16,
+		'awaiting_customer' => 20,
+		'approved'          => 28,
+		'quoted'            => 35,
+		'quote_accepted'    => 42,
+		'quote_declined'    => 100,
+		'parts_allocated'   => 55,
+		'in_progress'       => 70,
+		'ready_to_ship'     => 88,
+		'completed'         => 100,
+		'closed'            => 100,
+		'cancelled'         => 100,
+	];
+	$milestone_idx = $milestone_order[ $current ] ?? 0;
+	$is_negative   = in_array( $current, [ 'cancelled', 'quote_declined' ], true );
+	$is_complete   = in_array( $current, [ 'completed', 'closed' ], true );
+	$progress      = $progress_pct[ $current ] ?? 0;
 
-	// ── Integration data ─────────────────────────────────────────────────────
-	$raw_int   = (string) get_post_meta( $post->ID, '_repair_integration_state', true );
-	$int_state = ( '' !== $raw_int ) ? json_decode( $raw_int, true ) : [];
-
-	$wc_order_id    = (int) get_post_meta( $post->ID, '_repair_wc_order_id', true );
-	$wc_s           = $wc_order_id ? 'synced' : ( $int_state['woocommerce']['state'] ?? 'pending' );
-	$veeqo_s        = $int_state['veeqo']['state']        ?? 'pending';
-	$veeqo_track    = esc_html( $int_state['veeqo']['tracking_number'] ?? '' );
-	$qb_s           = $int_state['quickbooks']['state']    ?? 'pending';
-	$qb_inv         = esc_html( $int_state['quickbooks']['invoice_id'] ?? '' );
-	$rewards_s      = $int_state['rewards']['state']       ?? 'not_eligible';
-	$rewards_issued = ! empty( $int_state['rewards']['issued'] );
 	?>
 	<div class="dtb-command-center">
-
-		<!-- ── LEFT: Status Transition ─────────────────────────────────── -->
-		<div class="dtb-cc-panel">
-			<div class="dtb-cc-section-title">Status Transition</div>
-
-			<div class="dtb-cc-current-status">
-				<span class="dtb-cc-current-label">Current</span>
+		<div class="dtb-cc-progress-wrap">
+			<div class="dtb-cc-progress-head">
+				<span class="dtb-cc-progress-kicker"><?php esc_html_e( 'Current Status', 'drywall-toolbox' ); ?></span>
 				<span class="dtb-status-badge dtb-status-<?php echo esc_attr( $current ); ?>">
 					<?php echo esc_html( $current_lbl ); ?>
 				</span>
 			</div>
+
+			<?php if ( ! $is_negative ) : ?>
+				<div class="dtb-cc-progress-track">
+					<div class="dtb-cc-progress-fill <?php echo $is_complete ? 'dtb-cc-progress-fill-complete' : ''; ?>" style="width:<?php echo esc_attr( (string) $progress ); ?>%;"></div>
+				</div>
+				<div class="dtb-cc-milestones">
+					<?php foreach ( $milestones as $i => $m ) :
+						$done   = $milestone_idx > $i || $is_complete;
+						$active = ! $is_complete && $milestone_idx === $i;
+						$cls    = $done ? 'dtb-ms-done' : ( $active ? 'dtb-ms-active' : 'dtb-ms-future' );
+						$dot_target = '';
+						foreach ( ( $milestone_targets[ $m['key'] ] ?? [] ) as $candidate ) {
+							if ( in_array( $candidate, $allowed, true ) ) {
+								$dot_target = $candidate;
+								break;
+							}
+						}
+						$is_clickable = '' !== $dot_target;
+						$target_label = $is_clickable ? dtb_get_repair_status_label( $dot_target ) : '';
+					?>
+						<div class="dtb-cc-ms-item">
+							<button
+								type="button"
+								class="dtb-cc-ms-dot-btn <?php echo $is_clickable ? 'is-clickable' : 'is-disabled'; ?>"
+								<?php if ( ! $is_clickable ) : ?>disabled<?php endif; ?>
+								<?php if ( $is_clickable ) : ?>
+									data-status="<?php echo esc_attr( $dot_target ); ?>"
+									data-label="<?php echo esc_attr( $target_label ); ?>"
+									title="<?php echo esc_attr( sprintf( __( 'Transition to %s', 'drywall-toolbox' ), $target_label ) ); ?>"
+								<?php else : ?>
+									title="<?php esc_attr_e( 'No valid transition to this stage right now', 'drywall-toolbox' ); ?>"
+								<?php endif; ?>
+							>
+								<span class="dtb-cc-ms-dot <?php echo esc_attr( $cls ); ?>"></span>
+							</button>
+							<span class="dtb-cc-ms-label <?php echo esc_attr( $cls ); ?>"><?php echo esc_html( $m['label'] ); ?></span>
+						</div>
+					<?php endforeach; ?>
+				</div>
+			<?php else : ?>
+				<div class="dtb-cc-terminal-msg"><?php esc_html_e( 'Terminal state', 'drywall-toolbox' ); ?></div>
+			<?php endif; ?>
+		</div>
+
+		<div class="dtb-cc-panel">
+			<div class="dtb-cc-section-title">Status Transition</div>
 
 			<?php if ( empty( $allowed ) ) : ?>
 				<p class="dtb-cc-terminal">Terminal state — no transitions available.</p>
 			<?php else : ?>
 				<?php wp_nonce_field( 'dtb_repair_transition_' . $post->ID, 'dtb_repair_transition_nonce' ); ?>
 
-				<select id="dtb-repair-to-status" class="dtb-cc-select">
-					<option value="">— Select new status —</option>
-					<?php foreach ( $allowed as $ts ) : ?>
-						<option value="<?php echo esc_attr( $ts ); ?>"><?php echo esc_html( dtb_get_repair_status_label( $ts ) ); ?></option>
-					<?php endforeach; ?>
-				</select>
+				<div class="dtb-cc-action-picker" id="dtb-cc-action-picker">
+					<input type="hidden" id="dtb-repair-to-status" value="">
+					<button type="button" id="dtb-cc-action-toggle" class="dtb-cc-action-toggle" aria-expanded="false" aria-controls="dtb-cc-action-menu">
+						<span class="dtb-cc-action-toggle-label">Select transition action</span>
+						<span class="dashicons dashicons-arrow-down-alt2" style="font-size:14px;width:14px;height:14px;"></span>
+					</button>
+					<div id="dtb-cc-action-menu" class="dtb-cc-action-menu" hidden>
+						<?php foreach ( $allowed as $ts ) : ?>
+							<button
+								type="button"
+								class="dtb-cc-action-option"
+								data-status="<?php echo esc_attr( $ts ); ?>"
+							>
+								<?php echo esc_html( dtb_get_repair_status_label( $ts ) ); ?>
+							</button>
+						<?php endforeach; ?>
+					</div>
+				</div>
 
 				<input type="text"
 				       id="dtb-repair-transition-note"
@@ -246,83 +533,44 @@ function dtb_repair_metabox_command_center( WP_Post $post ): void {
 				<span id="dtb-repair-transition-msg" class="dtb-cc-msg"></span>
 			<?php endif; ?>
 		</div><!-- .dtb-cc-panel -->
-
-		<!-- ── RIGHT: Integration Status ──────────────────────────────── -->
-		<div class="dtb-cc-panel">
-			<div class="dtb-cc-section-title">Integration Status</div>
-
-			<!-- WooCommerce -->
-			<div class="dtb-cc-int-row">
-				<span class="dtb-cc-int-name">
-					<span class="dashicons dashicons-cart" style="font-size:14px;width:14px;height:14px;color:#7c3aed;flex-shrink:0;"></span>
-					WooCommerce
-				</span>
-				<span class="dtb-cc-int-right">
-					<?php echo dtb_repair_admin_integration_badge( $wc_s ); // phpcs:ignore ?>
-					<?php if ( $wc_order_id ) : ?>
-						<a class="dtb-cc-int-link"
-						   href="<?php echo esc_url( admin_url( 'post.php?post=' . $wc_order_id . '&action=edit' ) ); ?>">
-							Order #<?php echo esc_html( (string) $wc_order_id ); ?> →
-						</a>
-					<?php endif; ?>
-				</span>
-			</div>
-
-			<!-- Veeqo -->
-			<div class="dtb-cc-int-row">
-				<span class="dtb-cc-int-name">
-					<span class="dashicons dashicons-airplane" style="font-size:14px;width:14px;height:14px;color:#0891b2;flex-shrink:0;"></span>
-					Veeqo
-				</span>
-				<span class="dtb-cc-int-right">
-					<?php echo dtb_repair_admin_integration_badge( $veeqo_s ); // phpcs:ignore ?>
-					<?php if ( $veeqo_track ) : ?>
-						<span class="dtb-cc-int-meta"><?php echo esc_html( $veeqo_track ); ?></span>
-					<?php endif; ?>
-				</span>
-			</div>
-
-			<!-- QuickBooks -->
-			<div class="dtb-cc-int-row">
-				<span class="dtb-cc-int-name">
-					<span class="dashicons dashicons-money-alt" style="font-size:14px;width:14px;height:14px;color:#16a34a;flex-shrink:0;"></span>
-					QuickBooks
-				</span>
-				<span class="dtb-cc-int-right">
-					<?php echo dtb_repair_admin_integration_badge( $qb_s ); // phpcs:ignore ?>
-					<?php if ( $qb_inv ) : ?>
-						<span class="dtb-cc-int-meta">#<?php echo esc_html( $qb_inv ); ?></span>
-					<?php endif; ?>
-				</span>
-			</div>
-
-			<!-- Rewards -->
-			<div class="dtb-cc-int-row">
-				<span class="dtb-cc-int-name">
-					<span class="dashicons dashicons-star-filled" style="font-size:14px;width:14px;height:14px;color:#f59e0b;flex-shrink:0;"></span>
-					Rewards
-				</span>
-				<span class="dtb-cc-int-right">
-					<?php echo dtb_repair_admin_integration_badge( $rewards_s ); // phpcs:ignore ?>
-					<?php if ( $rewards_issued ) : ?>
-						<span class="dtb-cc-int-meta" style="color:#16a34a;">✓ Issued</span>
-					<?php endif; ?>
-				</span>
-			</div>
-
-		</div><!-- .dtb-cc-panel -->
-
 	</div><!-- .dtb-command-center -->
 
 	<script>
 	(function($) {
-		$('#dtb-repair-transition-btn').on('click', function() {
-			var repairId = $(this).data('repair-id');
-			var toStatus = $('#dtb-repair-to-status').val();
+		var $picker = $('#dtb-cc-action-picker');
+		var $toggle = $('#dtb-cc-action-toggle');
+		var $menu   = $('#dtb-cc-action-menu');
+		var $target = $('#dtb-repair-to-status');
+		var $label  = $('.dtb-cc-action-toggle-label');
+
+		$toggle.on('click', function() {
+			var open = ! $menu.prop('hidden');
+			$menu.prop('hidden', open);
+			$toggle.attr('aria-expanded', open ? 'false' : 'true');
+		});
+
+		$menu.on('click', '.dtb-cc-action-option', function() {
+			var status = $(this).data('status');
+			var text   = $(this).text().trim();
+			$target.val(status);
+			$label.text(text);
+			$menu.prop('hidden', true);
+			$toggle.attr('aria-expanded', 'false');
+		});
+
+		$(document).on('click', function(e) {
+			if ( ! $picker.length ) return;
+			if ( $(e.target).closest('#dtb-cc-action-picker').length ) return;
+			$menu.prop('hidden', true);
+			$toggle.attr('aria-expanded', 'false');
+		});
+
+		var runTransition = function(toStatus) {
+			var repairId = $('#dtb-repair-transition-btn').data('repair-id');
 			var note     = $('#dtb-repair-transition-note').val();
 			var nonce    = $('input[name="dtb_repair_transition_nonce"]').val();
 			var $msg     = $('#dtb-repair-transition-msg');
-			var $btn     = $(this);
+			var $btn     = $('#dtb-repair-transition-btn');
 
 			if ( ! toStatus ) {
 				$msg.text('Please select a target status.').attr('class', 'dtb-cc-msg dtb-cc-msg-err');
@@ -347,6 +595,21 @@ function dtb_repair_metabox_command_center( WP_Post $post ): void {
 					$btn.prop('disabled', false);
 				}
 			});
+		};
+
+		$('.dtb-cc-milestones').on('click', '.dtb-cc-ms-dot-btn.is-clickable', function() {
+			var toStatus = $(this).data('status');
+			var labelTxt = $(this).data('label');
+			$('#dtb-repair-to-status').val(toStatus);
+			if ( labelTxt ) {
+				$('.dtb-cc-action-toggle-label').text(labelTxt);
+			}
+			runTransition(toStatus);
+		});
+
+		$('#dtb-repair-transition-btn').on('click', function() {
+			var toStatus = $('#dtb-repair-to-status').val();
+			runTransition(toStatus);
 		});
 	}(jQuery));
 	</script>
