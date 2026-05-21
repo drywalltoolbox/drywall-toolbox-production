@@ -905,19 +905,19 @@ function dtb_repair_admin_hero_banner( WP_Post $post ): void {
 			<div class="dtb-hero-title"><?php echo $customer ? esc_html( $customer ) : esc_html__( '(No customer name)', 'drywall-toolbox' ); ?></div>
 			<div class="dtb-hero-meta">
 				<?php if ( $email ) : ?>
-					<span>✉&nbsp;<?php echo esc_html( $email ); ?></span>
+					<span><span class="dashicons dashicons-email-alt" style="font-size:13px;width:13px;height:13px;vertical-align:middle;margin-right:3px;opacity:.7;"></span><?php echo esc_html( $email ); ?></span>
 				<?php endif; ?>
 				<?php if ( $phone ) : ?>
-					<span>📞&nbsp;<?php echo esc_html( $phone ); ?></span>
+					<span><span class="dashicons dashicons-phone" style="font-size:13px;width:13px;height:13px;vertical-align:middle;margin-right:3px;opacity:.7;"></span><?php echo esc_html( $phone ); ?></span>
 				<?php endif; ?>
 				<?php if ( $tool_desc ) : ?>
-					<span>🔧&nbsp;<?php echo esc_html( $tool_desc ); ?></span>
+					<span><span class="dashicons dashicons-hammer" style="font-size:13px;width:13px;height:13px;vertical-align:middle;margin-right:3px;opacity:.7;"></span><?php echo esc_html( $tool_desc ); ?></span>
 				<?php endif; ?>
 				<?php if ( $tier ) : ?>
-					<span>⭐&nbsp;<?php echo esc_html( ucfirst( $tier ) ); ?></span>
+					<span><span class="dashicons dashicons-star-filled" style="font-size:13px;width:13px;height:13px;vertical-align:middle;margin-right:3px;opacity:.7;"></span><?php echo esc_html( ucfirst( $tier ) ); ?></span>
 				<?php endif; ?>
 				<?php if ( $submitted_fmt ) : ?>
-					<span>📅&nbsp;Submitted <?php echo esc_html( $submitted_fmt ); ?></span>
+					<span><span class="dashicons dashicons-calendar-alt" style="font-size:13px;width:13px;height:13px;vertical-align:middle;margin-right:3px;opacity:.7;"></span>Submitted <?php echo esc_html( $submitted_fmt ); ?></span>
 				<?php endif; ?>
 			</div>
 		</div>
@@ -941,7 +941,7 @@ function dtb_repair_admin_hero_banner( WP_Post $post ): void {
 		</span>
 		<div class="dtb-sb-actions">
 			<button type="button" class="button" onclick="document.getElementById('publish').click();" style="border-radius:7px;font-weight:600;">
-				💾 Save Notes
+				<span class="dashicons dashicons-saved" style="vertical-align:middle;margin-right:4px;font-size:14px;width:14px;height:14px;line-height:1.4;"></span>Save Notes
 			</button>
 		</div>
 	</div>

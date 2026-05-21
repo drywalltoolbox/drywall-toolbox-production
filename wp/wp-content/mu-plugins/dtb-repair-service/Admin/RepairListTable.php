@@ -226,14 +226,15 @@ class DTB_Repair_List_Table extends WP_List_Table {
 	protected function column_customer( $item ): string {
 		$name  = esc_html( (string) get_post_meta( $item->ID, '_repair_customer_name', true ) );
 		$email = esc_html( (string) get_post_meta( $item->ID, '_repair_customer_email', true ) );
-		return $name . ( $email ? '<br><small>' . $email . '</small>' : '' );
+		return $name . ( $email ? '<span class="dtb-cell-sub">' . $email . '</span>' : '' );
 	}
 
 	protected function column_tool( $item ): string {
 		$brand  = esc_html( (string) get_post_meta( $item->ID, '_repair_tool_brand', true ) );
 		$model  = esc_html( (string) get_post_meta( $item->ID, '_repair_model', true ) );
 		$serial = esc_html( (string) get_post_meta( $item->ID, '_repair_serial', true ) );
-		return $brand . ' ' . $model . ( $serial ? '<br><small>S/N: ' . $serial . '</small>' : '' );
+		$main   = trim( $brand . ' ' . $model );
+		return $main . ( $serial ? '<span class="dtb-cell-sub">S/N: ' . $serial . '</span>' : '' );
 	}
 
 	protected function column_status( $item ): string {
@@ -253,11 +254,21 @@ class DTB_Repair_List_Table extends WP_List_Table {
 	protected function column_age( $item ): string {
 		$submitted = (string) get_post_meta( $item->ID, '_repair_submitted_at', true );
 		if ( '' === $submitted ) {
-			return '—';
+			return '<span class="dtb-age-ok">—</span>';
 		}
 		$ts   = strtotime( $submitted );
 		$days = (int) floor( ( time() - $ts ) / DAY_IN_SECONDS );
-		return esc_html( sprintf( _n( '%d day', '%d days', $days, 'drywall-toolbox' ), $days ) );
+
+		if ( $days >= 14 ) {
+			$cls = 'dtb-age-critical';
+		} elseif ( $days >= 7 ) {
+			$cls = 'dtb-age-warn';
+		} else {
+			$cls = 'dtb-age-ok';
+		}
+
+		$label = $days === 1 ? '1 day' : $days . 'd';
+		return '<span class="' . esc_attr( $cls ) . '">' . esc_html( $label ) . '</span>';
 	}
 
 	protected function column_sla( $item ): string {
@@ -314,7 +325,13 @@ class DTB_Repair_List_Table extends WP_List_Table {
 		if ( ! $ev ) {
 			return '—';
 		}
-		return esc_html( $ev->event_type ) . '<br><small class="dtb-timeline-time">' . esc_html( $ev->created_at ) . '</small>';
+
+		$type_label = ucwords( str_replace( '_', ' ', esc_html( $ev->event_type ) ) );
+		$ts         = strtotime( $ev->created_at );
+		$ago        = $ts ? human_time_diff( $ts, time() ) . ' ago' : esc_html( $ev->created_at );
+
+		return '<span class="dtb-last-event-type">' . $type_label . '</span>'
+			. '<span class="dtb-last-event-time">' . esc_html( $ago ) . '</span>';
 	}
 }
 
