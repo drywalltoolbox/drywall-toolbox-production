@@ -1,0 +1,139 @@
+{
+  "summary": {
+    "scanned": 94,
+    "copied_entries": 76,
+    "copied_files": 89.0,
+    "missing_image": 18,
+    "missing_title": 0,
+    "invalid_json": 0,
+    "destination": "d:\\AMD\\projects\\drywall-toolbox\\frontend\\public\\brands\\wp_schematics"
+  },
+  "missing": [
+    {
+      "json": "D:\\AMD\\projects\\drywall-toolbox\\frontend\\public\\brands\\Level5\\Schematics\\FinishingBoxes\\14-inch-Flat-Box\\schematic_data.json",
+      "title": "4-770_SCH",
+      "status": "missing_image",
+      "copied_count": 0,
+      "detail": "No image matched normalized title in schematic folder tree"
+    },
+    {
+      "json": "D:\\AMD\\projects\\drywall-toolbox\\frontend\\public\\brands\\Platinum\\Schematics\\CompoundPump\\schematic_data.json",
+      "title": "PT-Compound-Pump_SCH",
+      "status": "missing_image",
+      "copied_count": 0,
+      "detail": "No image matched normalized title in schematic folder tree"
+    },
+    {
+      "json": "D:\\AMD\\projects\\drywall-toolbox\\frontend\\public\\brands\\Platinum\\Schematics\\FlatBox\\schematic_data.json",
+      "title": "Platinum_Flat_Box_SCH",
+      "status": "missing_image",
+      "copied_count": 0,
+      "detail": "No image matched normalized title in schematic folder tree"
+    },
+    {
+      "json": "D:\\AMD\\projects\\drywall-toolbox\\frontend\\public\\brands\\Platinum\\Schematics\\OutsideCornerRoller\\schematic_data.json",
+      "title": "platinum_outside_cornerroller_SCH",
+      "status": "missing_image",
+      "copied_count": 0,
+      "detail": "No image matched normalized title in schematic folder tree"
+    },
+    {
+      "json": "D:\\AMD\\projects\\drywall-toolbox\\frontend\\public\\brands\\TapeTech\\Schematics\\07TT\\schematic_data.json",
+      "title": "07TT_SCH_v11",
+      "status": "missing_image",
+      "copied_count": 0,
+      "detail": "No image matched normalized title in schematic folder tree"
+    },
+    {
+      "json": "D:\\AMD\\projects\\drywall-toolbox\\frontend\\public\\brands\\TapeTech\\Schematics\\17TT\\schematic_data.json",
+      "title": "17TT_SCH",
+      "status": "missing_image",
+      "copied_count": 0,
+      "detail": "No image matched normalized title in schematic folder tree"
+    },
+    {
+      "json": "D:\\AMD\\projects\\drywall-toolbox\\frontend\\public\\brands\\TapeTech\\Schematics\\20TTX\\schematic_data.json",
+      "title": "20TTX_SCH",
+      "status": "missing_image",
+      "copied_count": 0,
+      "detail": "No image matched normalized title in schematic folder tree"
+    },
+    {
+      "json": "D:\\AMD\\projects\\drywall-toolbox\\frontend\\public\\brands\\TapeTech\\Schematics\\25TTX\\schematic_data.json",
+      "title": "25TTX_SCH",
+      "status": "missing_image",
+      "copied_count": 0,
+      "detail": "No image matched normalized title in schematic folder tree"
+    },
+    {
+      "json": "D:\\AMD\\projects\\drywall-toolbox\\frontend\\public\\brands\\TapeTech\\Schematics\\30TTX\\schematic_data.json",
+      "title": "30TTX_SCH",
+      "status": "missing_image",
+      "copied_count": 0,
+      "detail": "No image matched normalized title in schematic folder tree"
+    },
+    {
+      "json": "D:\\AMD\\projects\\drywall-toolbox\\frontend\\public\\brands\\TapeTech\\Schematics\\35TT\\schematic_data.json",
+      "title": "35TT_SCH",
+      "status": "missing_image",
+      "copied_count": 0,
+      "detail": "No image matched normalized title in schematic folder tree"
+    },
+    {
+      "json": "D:\\AMD\\projects\\drywall-toolbox\\frontend\\public\\brands\\TapeTech\\Schematics\\40TT\\schematic_data.json",
+      "title": "40TT_SCH",
+      "status": "missing_image",
+      "copied_count": 0,
+      "detail": "No image matched normalized title in schematic folder tree"
+    },
+    {
+      "json": "D:\\AMD\\projects\\drywall-toolbox\\frontend\\public\\brands\\TapeTech\\Schematics\\42TT\\schematic_data.json",
+      "title": "42TT_SCH",
+      "status": "missing_image",
+      "copied_count": 0,
+      "detail": "No image matched normalized title in schematic folder tree"
+    },
+    {
+      "json": "D:\\AMD\\projects\\drywall-toolbox\\frontend\\public\\brands\\TapeTech\\Schematics\\45TT\\schematic_data.json",
+      "title": "45TT_SCH",
+      "status": "missing_image",
+      "copied_count": 0,
+      "detail": "No image matched normalized title in schematic folder tree"
+    },
+    {
+      "json": "D:\\AMD\\projects\\drywall-toolbox\\frontend\\public\\brands\\TapeTech\\Schematics\\48TT\\schematic_data.json",
+      "title": "48TT_SCH",
+      "status": "missing_image",
+      "copied_count": 0,
+      "detail": "No image matched normalized title in schematic folder tree"
+    },
+    {
+      "json": "D:\\AMD\\projects\\drywall-toolbox\\frontend\\public\\brands\\TapeTech\\Schematics\\50TT\\schematic_data.json",
+      "title": "50TT_SCH",
+      "status": "missing_image",
+      "copied_count": 0,
+      "detail": "No image matched normalized title in schematic folder tree"
+    },
+    {
+      "json": "D:\\AMD\\projects\\drywall-toolbox\\frontend\\public\\brands\\TapeTech\\Schematics\\63TT\\schematic_data.json",
+      "title": "63TT_SCH",
+      "status": "missing_image",
+      "copied_count": 0,
+      "detail": "No image matched normalized title in schematic folder tree"
+    },
+    {
+      "json": "D:\\AMD\\projects\\drywall-toolbox\\frontend\\public\\brands\\TapeTech\\Schematics\\68TT\\schematic_data.json",
+      "title": "68TT_SCH",
+      "status": "missing_image",
+      "copied_count": 0,
+      "detail": "No image matched normalized title in schematic folder tree"
+    },
+    {
+      "json": "D:\\AMD\\projects\\drywall-toolbox\\frontend\\public\\brands\\TapeTech\\Schematics\\8054TT\\schematic_data.json",
+      "title": "8054TT_SCH",
+      "status": "missing_image",
+      "copied_count": 0,
+      "detail": "No image matched normalized title in schematic folder tree"
+    }
+  ]
+}
