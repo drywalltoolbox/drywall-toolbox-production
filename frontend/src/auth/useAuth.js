@@ -27,8 +27,11 @@ import { useState, useEffect, useCallback } from 'react';
 
 // ─── DTB auth endpoint base ───────────────────────────────────────────────────
 
-const _base = ( process.env.REACT_APP_API_BASE_URL || '' ).replace( /\/+$/, '' );
-const DTB_AUTH_BASE = _base + '/wp-json/dtb/v1/auth';
+const runtimeHost = typeof window !== 'undefined' ? window.location.hostname : '';
+const runtimeOrigin = typeof window !== 'undefined' ? window.location.origin : '';
+const envApiBase = ( process.env.REACT_APP_API_BASE_URL || '' ).replace( /\/+$/, '' );
+const _base = envApiBase || ( /github\.io$/i.test( runtimeHost ) ? 'https://drywalltoolbox.com' : runtimeOrigin );
+const DTB_AUTH_BASE = `${ _base }/wp-json/dtb/v1/auth`;
 
 // ─── Hook ─────────────────────────────────────────────────────────────────────
 
@@ -44,12 +47,6 @@ export function useAuth() {
     let cancelled = false;
 
     async function validateSession() {
-      // Skip the validate call entirely when no API base URL is configured
-      // (e.g. GitHub Pages static build) — avoids 405/404 against wrong origin.
-      if ( ! _base ) {
-        if ( ! cancelled ) setIsLoading( false );
-        return;
-      }
       setIsLoading( true );
       try {
         const res = await fetch( `${ DTB_AUTH_BASE }/validate`, {

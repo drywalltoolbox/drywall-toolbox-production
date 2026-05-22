@@ -87,7 +87,8 @@ function buildStoreApiExtensions(product) {
 function readSnapshot() {
   try {
     const saved = localStorage.getItem(CART_SNAPSHOT_KEY);
-    return saved ? JSON.parse(saved) : [];
+    const parsed = saved ? JSON.parse(saved) : [];
+    return Array.isArray(parsed) ? parsed : [];
   } catch {
     return [];
   }

@@ -15,8 +15,12 @@
 import { submitRepair } from '../api/repairs.js';
 
 // Server-side proxy base (Veeqo API key kept on the WordPress server).
-const DTB_PROXY_BASE =
-  ( process.env.REACT_APP_API_BASE_URL || '' ).replace( /\/+$/, '' ) + '/wp-json/dtb/v1';
+const runtimeHost = typeof window !== 'undefined' ? window.location.hostname : '';
+const runtimeOrigin = typeof window !== 'undefined' ? window.location.origin : '';
+const envApiBase = ( process.env.REACT_APP_API_BASE_URL || '' ).replace( /\/+$/, '' );
+const resolvedApiBase = envApiBase || ( /github\.io$/i.test( runtimeHost ) ? 'https://drywalltoolbox.com' : runtimeOrigin );
+
+const DTB_PROXY_BASE = `${ resolvedApiBase.replace( /\/+$/, '' ) }/wp-json/dtb/v1`;
 
 class VeeqoService {
   /**

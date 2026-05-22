@@ -25,8 +25,14 @@ let authExpiryCheckPromise = null;
 
 // ─── Base URLs ────────────────────────────────────────────────────────────────
 
+const runtimeHost = typeof window !== 'undefined' ? window.location.hostname : '';
+const runtimeOrigin = typeof window !== 'undefined' ? window.location.origin : '';
+const envApiBase = ( process.env.REACT_APP_API_BASE_URL || '' ).replace( /\/+$/, '' );
+
+// Keep API calls pinned to the production WP host when running the static
+// storefront from GitHub Pages and no explicit API base is injected.
 export const API_BASE_URL =
-  ( process.env.REACT_APP_API_BASE_URL || '' ).replace( /\/+$/, '' );
+  envApiBase || ( /github\.io$/i.test( runtimeHost ) ? 'https://drywalltoolbox.com' : runtimeOrigin );
 
 const DTB_AUTH_VALIDATE_URL = API_BASE_URL
   ? `${ API_BASE_URL }/wp-json/dtb/v1/auth/validate`
