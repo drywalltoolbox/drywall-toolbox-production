@@ -26,6 +26,14 @@ const PRIMARY_NAV_LINKS = [
   { to: '/contact', label: 'Contact' },
 ];
 
+const SHOP_FEATURE_LINKS = [
+  { to: '/products', label: 'All Products', sub: 'Full drywall catalog' },
+  { to: '/products/brands', label: 'Shop by Brand', sub: 'TapeTech, Columbia, Level 5, and more' },
+  { to: '/parts', label: 'Replacement Parts', sub: 'Parts, kits, and schematics' },
+];
+
+const MAX_DRAWER_CATEGORIES = 12;
+
 const DRAWER_NAV_ROWS = [
   { to: '/products?sort=newest', label: 'New Arrivals' },
   // { to: '/toolset-builder', label: 'Toolset Builder' }, // DISABLED: temporarily hide Toolset Builder
@@ -60,7 +68,7 @@ export default function Header({ onCartToggle, hasTopTicker = false }) {
   const [brandsExpanded, setBrandsExpanded] = useState(false);
   const [partsExpanded, setPartsExpanded] = useState(false);
   const [schematicsExpanded, setSchematicsExpanded] = useState(false);
-  const [desktopMenuOpen, setDesktopMenuOpen] = useState(null);
+  const [shopDropdownOpen, setShopDropdownOpen] = useState(false);
   const [accountDropdownOpen, setAccountDropdownOpen] = useState(false);
   const [accountHubOpen, setAccountHubOpen] = useState(false);
   const [desktopSearchOpen, setDesktopSearchOpen] = useState(false);
@@ -86,10 +94,7 @@ export default function Header({ onCartToggle, hasTopTicker = false }) {
   });
 
   const isActive = (path) => location.pathname === path;
-  const shopActive = location.pathname.startsWith('/products') || isActive('/parts') /* || isActive('/toolset-builder') */;
-  const brandsActive = location.pathname.startsWith('/products/brands');
-  const partsActive = isActive('/parts');
-  const servicesActive = PRIMARY_NAV_LINKS.some(({ to }) => isActive(to));
+  const shopActive = location.pathname.startsWith('/products') || isActive('/parts');
   const drawerBrands = useMemo(() => mapCatalogBrands(facets?.brands), [facets]);
   const drawerCategoryLinks = useMemo(() => {
     const displayCategories = mergeCatalogDisplayCategories(facets?.displayCategoriesByBrand || {})
@@ -118,30 +123,15 @@ export default function Header({ onCartToggle, hasTopTicker = false }) {
       .filter((category) => category.slug && category.label && category.count > 0)
       .sort((a, b) => String(a.label).localeCompare(String(b.label)));
   }, [facets]);
-  const desktopAllProductsItems = useMemo(
-    () => drawerCategoryLinks.map(({ slug, to, label }) => ({ key: slug, to, label })),
+  const desktopCategoryLinks = useMemo(
+    () => drawerCategoryLinks.slice(0, MAX_DRAWER_CATEGORIES),
     [drawerCategoryLinks]
-  );
-  const desktopBrandsItems = useMemo(
-    () => drawerBrands.map(({ slug, name }) => ({ key: `brand-${slug}`, to: buildProductsBrandRoute(slug), label: name })),
-    [drawerBrands]
-  );
-  const desktopPartsItems = useMemo(
-    () => drawerBrands.map(({ slug, name }) => ({ key: `parts-${slug}`, to: buildPartsBrandRoute(slug), label: `${name} Parts` })),
-    [drawerBrands]
-  );
-  const desktopServicesItems = useMemo(
-    () => [
-      ...PRIMARY_NAV_LINKS.map(({ to, label }) => ({ key: `service-${to}`, to, label })),
-      ...drawerBrands.slice(0, 12).map(({ slug, name }) => ({ key: `schematics-${slug}`, to: buildSchematicsBrandRoute(slug), label: `${name} Schematics` })),
-    ],
-    [drawerBrands]
   );
 
   const toggleMobileMenu = () => setMobileMenuOpen((open) => !open);
   const closeMobileMenu = () => setMobileMenuOpen(false);
   const closeMenus = () => {
-    setDesktopMenuOpen(null);
+    setShopDropdownOpen(false);
     setMobileMenuOpen(false);
     setAccountDropdownOpen(false);
     setDesktopSearchOpen(false);
@@ -160,22 +150,18 @@ export default function Header({ onCartToggle, hasTopTicker = false }) {
     setSchematicsExpanded(false);
   }, []);
 
-  const handleDropdownMouseLeave = useCallback(() => {
+  const handleDropdownMouseLeave = () => {
     if (dropdownCloseTimerRef.current) clearTimeout(dropdownCloseTimerRef.current);
-    dropdownCloseTimerRef.current = setTimeout(() => setDesktopMenuOpen(null), 70);
-  }, []);
+    dropdownCloseTimerRef.current = setTimeout(() => setShopDropdownOpen(false), 50);
+  };
 
-  const handleDropdownMouseEnter = (menuId) => {
+  const handleDropdownMouseEnter = () => {
     if (dropdownCloseTimerRef.current) {
       clearTimeout(dropdownCloseTimerRef.current);
       dropdownCloseTimerRef.current = null;
     }
-    setDesktopMenuOpen(menuId);
+    setShopDropdownOpen(true);
   };
-
-  const handleDropdownBlurCapture = useCallback((event) => {
-    if (!event.currentTarget.contains(event.relatedTarget)) handleDropdownMouseLeave();
-  }, [handleDropdownMouseLeave]);
 
   useEffect(() => () => {
     if (dropdownCloseTimerRef.current) clearTimeout(dropdownCloseTimerRef.current);
@@ -214,7 +200,7 @@ export default function Header({ onCartToggle, hasTopTicker = false }) {
     const handleClickOutside = (e) => {
       const header = document.querySelector('.site-header');
       if (header && !header.contains(e.target)) {
-        setDesktopMenuOpen(null);
+        setShopDropdownOpen(false);
         setDesktopSearchOpen(false);
       }
       if (accountDropdownRef.current && !accountDropdownRef.current.contains(e.target)) setAccountDropdownOpen(false);
@@ -324,7 +310,7 @@ export default function Header({ onCartToggle, hasTopTicker = false }) {
 
   const navigateShopDestination = useCallback((to, { closeMobile = false } = {}) => {
     resetDrawerExpansions();
-    setDesktopMenuOpen(null);
+    setShopDropdownOpen(false);
     if (closeMobile) setMobileMenuOpen(false);
     navigate(to);
   }, [navigate, resetDrawerExpansions]);
@@ -432,152 +418,35 @@ export default function Header({ onCartToggle, hasTopTicker = false }) {
 
           <div className="header-desktop-layout" style={{ display: isTablet ? 'none' : undefined }}>
             <div className="header-left"><Link to="/" className="header-logo-link" aria-label="Drywall Toolbox home"><img src={LogoWhite} alt="Drywall Toolbox Logo" className="logo-image" /></Link></div>
-            <div className="header-center header-center--desktop-search">
-              <div ref={desktopSearchRef} className="dtb-desktop-search dtb-desktop-search--header">
-                <div className="dtb-desktop-search-pill"><input ref={desktopSearchInputRef} type="text" value={desktopSearchQuery} onChange={(e) => setDesktopSearchQuery(e.target.value)} onFocus={() => setDesktopSearchOpen(true)} onKeyDown={(e) => { if (e.key === 'Enter') handleDesktopViewAll(); }} placeholder="Search products, brands, SKUs..." className="dtb-desktop-search-input" aria-label="Search products" autoComplete="off" /></div>
+            <div className="header-center">
+              <nav className="nav-links header-desktop-nav" aria-label="Primary">
+                <div className={`header-mega${shopDropdownOpen ? ' is-open' : ''}`} onMouseEnter={handleDropdownMouseEnter} onMouseLeave={handleDropdownMouseLeave}>
+                  <button className={`nav-link header-nav-trigger ${shopActive ? 'active' : ''}`} type="button" aria-expanded={shopDropdownOpen}><span>Shop</span><ChevronDown size={14} className="header-nav-trigger__chevron" /></button>
+                  <div className={`shop-dropdown-menu header-mega-panel${shopDropdownOpen ? ' is-open' : ''}`}>
+                    <div className="header-mega-accent" />
+                    <div className="header-mega-grid">
+                      <div className="header-mega-section"><p className="header-mega-section-title">Shop Navigation</p><div className="header-mega-links">{SHOP_FEATURE_LINKS.map(({ to, label, sub }) => <Link key={to} to={to} onClick={() => setShopDropdownOpen(false)} className="header-mega-link"><span className="header-mega-link-copy"><span className="header-mega-link-title">{label}</span><span className="header-mega-link-sub">{sub}</span></span></Link>)}</div></div>
+                      <div className="header-mega-section"><p className="header-mega-section-title">Drywall Industry Categories</p><div className="header-mega-category-grid">{desktopCategoryLinks.map(({ slug, to, label }) => <Link key={slug} to={to} onClick={() => setShopDropdownOpen(false)} className="header-mega-category-link">{label}</Link>)}</div></div>
+                    </div>
+                    <div className="header-mega-footer"><div className="header-mega-footer-actions"><Link to="/products" onClick={() => setShopDropdownOpen(false)} className="header-mega-footer-link">View All Products</Link><Link to="/products/brands" onClick={() => setShopDropdownOpen(false)} className="header-mega-footer-link header-mega-footer-link--secondary">Shop by Brand</Link></div></div>
+                  </div>
+                </div>
+                {PRIMARY_NAV_LINKS.map(({ to, label }) => <Link key={to} to={to} className={`nav-link ${isActive(to) ? 'active' : ''}`}>{label}</Link>)}
+              </nav>
+            </div>
+            <div className="header-right header-desktop-actions">
+              <div ref={desktopSearchRef} className="dtb-desktop-search">
+                <div className="dtb-desktop-search-pill"><input ref={desktopSearchInputRef} type="text" value={desktopSearchQuery} onChange={(e) => setDesktopSearchQuery(e.target.value)} onFocus={() => setDesktopSearchOpen(true)} onKeyDown={(e) => { if (e.key === 'Enter') handleDesktopViewAll(); }} placeholder="Search products..." className="dtb-desktop-search-input" aria-label="Search products" autoComplete="off" /></div>
                 {desktopSearchOpen && (desktopSearchLoading || desktopSearchResults.length > 0 || desktopSearchQuery.trim()) && (
                   <div className="dtb-desktop-search-dropdown">
                     {desktopSearchLoading ? <div className="dtb-desktop-search-state">Loading...</div> : desktopSearchResults.length > 0 ? <><div className="dtb-desktop-search-results">{desktopSearchResults.map((product) => <button key={product.id} className="dtb-desktop-search-item" onClick={() => handleDesktopResultClick(product)}><div className="dtb-desktop-search-thumb">{product.image ? <img src={product.image} alt={product.name} /> : null}</div><div className="dtb-desktop-search-meta"><span className="dtb-desktop-search-name">{product.name}</span><span className="dtb-desktop-search-price">{typeof product.price === 'number' ? `$${product.price.toFixed(2)}` : 'View product'}</span></div></button>)}</div><button className="dtb-desktop-search-view-all" onClick={handleDesktopViewAll}>View All Results</button></> : desktopSearchQuery.trim() ? <div className="dtb-desktop-search-state">No products found</div> : null}
                   </div>
                 )}
               </div>
-            </div>
-            <div className="header-right header-desktop-actions">
               {!isLoading && <div ref={accountDropdownRef} className="header-account"><button onClick={() => { if (isAuthenticated) { setAccountHubOpen(true); } else { setAccountDropdownOpen((o) => !o); } }} aria-label={isAuthenticated ? 'Open account hub' : 'Account menu'} aria-expanded={!isAuthenticated && accountDropdownOpen} className="header-account-toggle header-icon"><User size={20} /></button>{!isAuthenticated && <div className={`header-account-panel${accountDropdownOpen ? ' is-open' : ''}`}><div className="header-account-guest-header"><p className="header-account-guest-title">My Account</p></div><Link to="/login" onClick={() => setAccountDropdownOpen(false)} className="header-account-link header-account-link--strong"><LogIn size={14} />Sign In</Link><div className="header-account-divider header-account-divider--inset" /><div className="header-account-guest-body"><Link to="/register" onClick={() => setAccountDropdownOpen(false)} className="header-account-cta"><UserPlus size={13} />Create Account</Link><p className="header-account-note">No account needed to browse or checkout.</p></div></div>}</div>}
               {!isLoading && isAuthenticated && <NotificationsBell />}
               <div className="cart-area"><button onClick={onCartToggle} className="cart-toggle header-icon" aria-label="Toggle cart"><ShoppingCart size={20} />{getCartCount() > 0 && <span className="cart-badge">{getCartCount()}</span>}</button></div>
             </div>
-          </div>
-
-          <div className="header-desktop-nav-row" style={{ display: isTablet ? 'none' : undefined }}>
-            <nav className="nav-links header-desktop-nav" aria-label="Primary">
-              <div
-                className={`header-mega${desktopMenuOpen === 'brands' ? ' is-open' : ''}`}
-                onMouseEnter={() => handleDropdownMouseEnter('brands')}
-                onMouseLeave={handleDropdownMouseLeave}
-                onFocusCapture={() => handleDropdownMouseEnter('brands')}
-                onBlurCapture={handleDropdownBlurCapture}
-              >
-                <button className={`nav-link header-nav-trigger ${brandsActive ? 'active' : ''}`} type="button" onClick={() => setDesktopMenuOpen((open) => (open === 'brands' ? null : 'brands'))} aria-expanded={desktopMenuOpen === 'brands'} aria-haspopup="true">
-                  <span>Brands</span>
-                  <ChevronDown size={14} className="header-nav-trigger__chevron" />
-                </button>
-                <div className={`shop-dropdown-menu header-mega-panel${desktopMenuOpen === 'brands' ? ' is-open' : ''}`}>
-                  <div className="header-mega-accent" />
-                  <div className="header-mega-links" style={{ marginBottom: 10 }}>
-                    <button type="button" className="header-mega-link header-mega-link--cta" onClick={() => navigateShopDestination('/products/brands')}>
-                      <span className="header-mega-link-copy">
-                        <span className="header-mega-link-title">Shop all brands</span>
-                        <span className="header-mega-link-sub">Browse full brand directory</span>
-                      </span>
-                    </button>
-                  </div>
-                  <div className="header-mega-category-grid" style={{ gridTemplateColumns: 'repeat(3, minmax(0, 1fr))' }}>
-                    {desktopBrandsItems.map(({ key, to, label }) => (
-                      <button key={key} type="button" onClick={() => navigateShopDestination(to)} className="header-mega-category-link">{label}</button>
-                    ))}
-                  </div>
-                </div>
-              </div>
-                <div
-                  className={`header-mega${desktopMenuOpen === 'all-products' ? ' is-open' : ''}`}
-                  onMouseEnter={() => handleDropdownMouseEnter('all-products')}
-                  onMouseLeave={handleDropdownMouseLeave}
-                  onFocusCapture={() => handleDropdownMouseEnter('all-products')}
-                  onBlurCapture={handleDropdownBlurCapture}
-                >
-                  <button
-                    className={`nav-link header-nav-trigger ${shopActive ? 'active' : ''}`}
-                    type="button"
-                    onClick={() => setDesktopMenuOpen((open) => (open === 'all-products' ? null : 'all-products'))}
-                    onKeyDown={(event) => {
-                      if (event.key === 'Escape') {
-                        event.preventDefault();
-                        setDesktopMenuOpen(null);
-                      }
-                      if (event.key === 'ArrowDown') {
-                        event.preventDefault();
-                        setDesktopMenuOpen('all-products');
-                      }
-                    }}
-                    aria-expanded={desktopMenuOpen === 'all-products'}
-                    aria-haspopup="true"
-                  >
-                    <span>All Products</span>
-                    <ChevronDown size={14} className="header-nav-trigger__chevron" />
-                  </button>
-                  <div className={`shop-dropdown-menu header-mega-panel${desktopMenuOpen === 'all-products' ? ' is-open' : ''}`}>
-                    <div className="header-mega-accent" />
-                    <div className="header-mega-links" style={{ marginBottom: 10 }}>
-                      <button type="button" className="header-mega-link header-mega-link--cta" onClick={() => navigateShopDestination('/products')}>
-                        <span className="header-mega-link-copy">
-                          <span className="header-mega-link-title">View all products</span>
-                          <span className="header-mega-link-sub">Browse by category</span>
-                        </span>
-                      </button>
-                    </div>
-                    <div className="header-mega-category-grid" style={{ gridTemplateColumns: 'repeat(3, minmax(0, 1fr))' }}>
-                      {desktopAllProductsItems.map(({ key, to, label }) => (
-                        <button key={key} type="button" onClick={() => navigateShopDestination(to)} className="header-mega-category-link">
-                          {label}
-                        </button>
-                      ))}
-                    </div>
-                    <div className="header-mega-footer"><div className="header-mega-footer-actions">{DRAWER_NAV_ROWS.map(({ to, label }) => <button key={to} type="button" onClick={() => navigateShopDestination(to)} className="header-mega-footer-link header-mega-footer-link--secondary">{label}</button>)}</div></div>
-                  </div>
-                </div>
-              <div
-                className={`header-mega${desktopMenuOpen === 'parts' ? ' is-open' : ''}`}
-                onMouseEnter={() => handleDropdownMouseEnter('parts')}
-                onMouseLeave={handleDropdownMouseLeave}
-                onFocusCapture={() => handleDropdownMouseEnter('parts')}
-                onBlurCapture={handleDropdownBlurCapture}
-              >
-                <button className={`nav-link header-nav-trigger ${partsActive ? 'active' : ''}`} type="button" onClick={() => setDesktopMenuOpen((open) => (open === 'parts' ? null : 'parts'))} aria-expanded={desktopMenuOpen === 'parts'} aria-haspopup="true">
-                  <span>Parts</span>
-                  <ChevronDown size={14} className="header-nav-trigger__chevron" />
-                </button>
-                <div className={`shop-dropdown-menu header-mega-panel${desktopMenuOpen === 'parts' ? ' is-open' : ''}`}>
-                  <div className="header-mega-accent" />
-                  <div className="header-mega-links" style={{ marginBottom: 10 }}>
-                    <button type="button" className="header-mega-link header-mega-link--cta" onClick={() => navigateShopDestination('/parts')}>
-                      <span className="header-mega-link-copy">
-                        <span className="header-mega-link-title">Browse all parts</span>
-                        <span className="header-mega-link-sub">Replacement parts by brand</span>
-                      </span>
-                    </button>
-                  </div>
-                  <div className="header-mega-category-grid" style={{ gridTemplateColumns: 'repeat(3, minmax(0, 1fr))' }}>
-                    {desktopPartsItems.map(({ key, to, label }) => (
-                      <button key={key} type="button" onClick={() => navigateShopDestination(to)} className="header-mega-category-link">{label}</button>
-                    ))}
-                  </div>
-                </div>
-              </div>
-
-              <Link to="/products?sort=newest" className={`nav-link ${isActive('/products?sort=newest') ? 'active' : ''}`}>New Arrivals</Link>
-
-              <div
-                className={`header-mega${desktopMenuOpen === 'services' ? ' is-open' : ''}`}
-                onMouseEnter={() => handleDropdownMouseEnter('services')}
-                onMouseLeave={handleDropdownMouseLeave}
-                onFocusCapture={() => handleDropdownMouseEnter('services')}
-                onBlurCapture={handleDropdownBlurCapture}
-              >
-                <button className={`nav-link header-nav-trigger ${servicesActive ? 'active' : ''}`} type="button" onClick={() => setDesktopMenuOpen((open) => (open === 'services' ? null : 'services'))} aria-expanded={desktopMenuOpen === 'services'} aria-haspopup="true">
-                  <span>Services</span>
-                  <ChevronDown size={14} className="header-nav-trigger__chevron" />
-                </button>
-                <div className={`shop-dropdown-menu header-mega-panel${desktopMenuOpen === 'services' ? ' is-open' : ''}`}>
-                  <div className="header-mega-accent" />
-                  <div className="header-mega-category-grid" style={{ gridTemplateColumns: 'repeat(2, minmax(0, 1fr))' }}>
-                    {desktopServicesItems.map(({ key, to, label }) => (
-                      <button key={key} type="button" onClick={() => navigateShopDestination(to)} className="header-mega-category-link">{label}</button>
-                    ))}
-                  </div>
-                </div>
-              </div>
-              </nav>
           </div>
         </div>
 
