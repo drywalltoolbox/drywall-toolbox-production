@@ -229,6 +229,7 @@ export default function RepairStatus() {
   );
 
   const customerTimeline = toCustomerTimeline( data?.timeline );
+  const requestDetails = toDisplayRequestDetails( data?.request_details );
 
   const handleTokenFormSubmit = ( repairId, token ) => {
     setResolvedId( repairId );
@@ -327,6 +328,11 @@ export default function RepairStatus() {
           />
         ) }
 
+        {/* ── Submitted request details ───────────────────────────── */}
+        { requestDetails.length > 0 && (
+          <SubmittedRequestDetails details={ requestDetails } />
+        ) }
+
         {/* ── Unified customer update composer ─────────────────────── */}
         { data && ! [ 'completed', 'closed', 'cancelled', 'quote_declined' ].includes( status ) && (
           <RepairUpdateComposer
@@ -417,4 +423,85 @@ function toCustomerTimeline( timeline ) {
       label: labelByType[ event.type ] || event.label || 'Repair updated',
     } ) )
     .sort( ( a, b ) => new Date( a.occurred_at ) - new Date( b.occurred_at ) );
+}
+
+function SubmittedRequestDetails( { details } ) {
+  if ( ! Array.isArray( details ) || details.length === 0 ) return null;
+
+  return (
+    <div className="bg-white rounded-2xl border border-neutral-200 shadow-sm p-5">
+      <h3 className="text-sm font-semibold text-neutral-800 mb-1">Submitted Request Details</h3>
+      <p className="text-xs text-neutral-500 mb-3">
+        Snapshot of the information you originally submitted with this repair request.
+      </p>
+
+      <dl className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2.5">
+        { details.map( ( item ) => (
+          <div key={ item.label } className={ item.fullWidth ? 'sm:col-span-2' : '' }>
+            <dt className="text-[10px] text-neutral-400 uppercase tracking-wider font-semibold mb-0.5">
+              { item.label }
+            </dt>
+            <dd className="text-sm text-neutral-800 leading-snug whitespace-pre-line wrap-break-word">
+              { item.value }
+            </dd>
+          </div>
+        ) ) }
+      </dl>
+    </div>
+  );
+}
+
+function toDisplayRequestDetails( details ) {
+  if ( ! details || typeof details !== 'object' ) return [];
+
+  const shipping = ( typeof details.shipping_rate_price === 'number' && Number.isFinite( details.shipping_rate_price ) )
+    ? `${ details.shipping_rate_name || 'Shipping' } (${ formatCurrency( details.shipping_rate_price ) })`
+    : details.shipping_rate_name;
+
+  const returnAddress = [ details.address_1, details.city, details.state, details.postcode, details.country ]
+    .map( ( part ) => normalizeField( part ) )
+    .filter( Boolean )
+    .join( ', ' );
+
+  return [
+    { label: 'Tool Brand', value: normalizeField( details.tool_brand ) },
+    { label: 'Tool Category', value: normalizeField( details.tool_category ) },
+    { label: 'Model', value: normalizeField( details.tool_model ) },
+    { label: 'Serial Number', value: normalizeField( details.serial_number ) },
+    { label: 'Service Tier', value: formatSlugLabel( details.service_tier ) },
+    { label: 'Priority', value: formatSlugLabel( details.priority ) },
+    { label: 'Contact Preference', value: formatSlugLabel( details.contact_preference ) },
+    { label: 'Issue Started', value: formatSlugLabel( details.issue_start ) },
+    { label: 'Customer Name', value: normalizeField( details.customer_name ) },
+    { label: 'Customer Email', value: normalizeField( details.customer_email ) },
+    { label: 'Customer Phone', value: normalizeField( details.customer_phone ) },
+    { label: 'Company', value: normalizeField( details.company ) },
+    { label: 'Return Address', value: returnAddress || null, fullWidth: true },
+    { label: 'Shipping Service', value: normalizeField( shipping ) },
+    { label: 'Tool Age', value: normalizeField( details.tool_age ) },
+    { label: 'Issue Description', value: normalizeField( details.issue_description ), fullWidth: true },
+  ].filter( ( item ) => Boolean( item.value ) );
+}
+
+function normalizeField( value ) {
+  if ( value === null || value === undefined ) return null;
+  const normalized = String( value ).trim();
+  return normalized ? normalized : null;
+}
+
+function formatSlugLabel( value ) {
+  const normalized = normalizeField( value );
+  if ( ! normalized ) return null;
+  return normalized
+    .replaceAll( '_', ' ' )
+    .replace( /\s+/g, ' ' )
+    .replace( /\b\w/g, ( char ) => char.toUpperCase() );
+}
+
+function formatCurrency( value ) {
+  try {
+    return new Intl.NumberFormat( undefined, { style: 'currency', currency: 'USD' } ).format( value );
+  } catch {
+    return `$${ value }`;
+  }
 }
