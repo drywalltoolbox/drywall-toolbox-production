@@ -68,8 +68,9 @@ function dtb_repair_rest_comment( WP_REST_Request $request ): WP_REST_Response|W
 		return new WP_Error( 'dtb_repair_comment_too_long', __( 'Comment is too long.', 'drywall-toolbox' ), [ 'status' => 422 ] );
 	}
 
+	$event_id = false;
 	if ( function_exists( 'dtb_repair_append_event' ) ) {
-		dtb_repair_append_event(
+		$event_id = dtb_repair_append_event(
 			$repair_id,
 			'repair.note_added',
 			[
@@ -81,6 +82,24 @@ function dtb_repair_rest_comment( WP_REST_Request $request ): WP_REST_Response|W
 			]
 		);
 	}
+
+	/**
+	 * Fire a server-side alert hook when a customer posts a new repair message.
+	 *
+	 * Integrations can listen here to send proactive notifications (email/SMS/etc).
+	 */
+	do_action(
+		'dtb_repair_customer_message_posted',
+		$repair_id,
+		$comment,
+		[
+			'event_id'   => is_numeric( $event_id ) ? (int) $event_id : 0,
+			'event_type' => 'repair.note_added',
+			'actor_type' => 'customer',
+			'source'     => 'customer_status_page',
+			'visibility' => 'customer',
+		]
+	);
 
 	return new WP_REST_Response(
 		[

@@ -105,6 +105,22 @@ $tier, $issue, $aurl
 ),
 ];
 
+// ---- Admin: customer posted new message --------------------------------
+case 'repair-customer-message-admin':
+return [
+'subject' => sprintf( __( '[%1$s] New customer message on repair #%2$d', 'drywall-toolbox' ), $site, $rid ),
+'body'    => sprintf(
+__( "A customer posted a new message on repair #%1\$d.\n\nCustomer: %2\$s\nTool: %3\$s %4\$s\n\nMessage:\n%5\$s\n\nOpen in WP-Admin:\n%6\$s\n\nCustomer status page:\n%7\$s", 'drywall-toolbox' ),
+$rid,
+$name,
+$brand,
+$model,
+esc_html( wp_strip_all_tags( (string) ( $ctx['customer_message'] ?? '' ) ) ),
+$aurl,
+$turl
+),
+];
+
 // ---- Customer: information requested ------------------------------------
 case 'repair-info-requested':
 return [
@@ -306,7 +322,7 @@ $extra_context
 );
 
 // Determine recipient: admin templates go to the admin address.
-$admin_templates = [ 'repair-submitted-admin' ];
+$admin_templates = [ 'repair-submitted-admin', 'repair-customer-message-admin' ];
 if ( in_array( $template, $admin_templates, true ) ) {
 $to = dtb_repair_admin_email();
 } else {
@@ -343,6 +359,55 @@ dtb_repair_append_event( $repair_id, $event_type, [
 // =============================================================================
 
 add_action( 'dtb_repair_status_changed', 'dtb_repair_notifications_on_status_changed', 10, 4 );
+
+/**
+ * Handle proactive alerts when a customer posts a message from status page.
+ *
+ * Default behavior:
+ * - Sends an admin email alert (queued when Action Scheduler/job queue is available).
+ * - Fires an SMS integration hook for optional provider wiring.
+ *
+ * @param int    $repair_id
+ * @param string $message
+ * @param array  $context
+ */
+function dtb_repair_notifications_on_customer_message( int $repair_id, string $message, array $context = [] ): void {
+$message = trim( wp_strip_all_tags( $message ) );
+if ( $repair_id <= 0 || '' === $message ) {
+return;
+}
+
+$notification_context = array_merge(
+[
+'customer_message' => $message,
+'message_source'   => sanitize_text_field( (string) ( $context['source'] ?? 'customer_status_page' ) ),
+'event_id'         => (int) ( $context['event_id'] ?? 0 ),
+],
+$context
+);
+
+if ( function_exists( 'dtb_repair_enqueue_job' ) ) {
+dtb_repair_enqueue_job(
+'dtb_repair_send_notification',
+$repair_id,
+[
+'template' => 'repair-customer-message-admin',
+'context'  => $notification_context,
+]
+);
+} else {
+dtb_repair_dispatch_notification( $repair_id, 'repair-customer-message-admin', $notification_context );
+}
+
+/**
+ * Allow external SMS integrations to send operator alerts for customer messages.
+ *
+ * Hook this action in a site-specific mu-plugin to call Twilio/other providers.
+ */
+do_action( 'dtb_repair_customer_message_sms_alert', $repair_id, $message, $notification_context );
+}
+
+add_action( 'dtb_repair_customer_message_posted', 'dtb_repair_notifications_on_customer_message', 10, 3 );
 
 /**
  * Dispatch the appropriate notification when a repair status changes.
