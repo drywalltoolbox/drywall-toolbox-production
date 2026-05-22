@@ -426,27 +426,63 @@ function toCustomerTimeline( timeline ) {
 }
 
 function SubmittedRequestDetails( { details } ) {
+  const [ isOpen, setIsOpen ] = useState( false );
+  const panelId = 'submitted-request-details-panel';
+
   if ( ! Array.isArray( details ) || details.length === 0 ) return null;
 
   return (
-    <div className="bg-white rounded-2xl border border-neutral-200 shadow-sm p-5">
-      <h3 className="text-sm font-semibold text-neutral-800 mb-1">Submitted Request Details</h3>
-      <p className="text-xs text-neutral-500 mb-3">
-        Snapshot of the information you originally submitted with this repair request.
-      </p>
-
-      <dl className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2.5">
-        { details.map( ( item ) => (
-          <div key={ item.label } className={ item.fullWidth ? 'sm:col-span-2' : '' }>
-            <dt className="text-[10px] text-neutral-400 uppercase tracking-wider font-semibold mb-0.5">
-              { item.label }
-            </dt>
-            <dd className="text-sm text-neutral-800 leading-snug whitespace-pre-line wrap-break-word">
-              { item.value }
-            </dd>
+    <div className="bg-white rounded-2xl border border-neutral-200 shadow-sm overflow-hidden">
+      <button
+        type="button"
+        onClick={ () => setIsOpen( ( prev ) => ! prev ) }
+        className="w-full text-left px-5 py-4 hover:bg-neutral-50 transition-colors"
+        aria-expanded={ isOpen }
+        aria-controls={ panelId }
+      >
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <h3 className="text-sm font-semibold text-neutral-800">Submitted Request Details</h3>
+            <p className="text-xs text-neutral-500 mt-1">
+              { isOpen
+                ? 'Click to close your submitted request details.'
+                : 'Click to view the information you originally submitted.' }
+            </p>
           </div>
-        ) ) }
-      </dl>
+          <span
+            className={ `text-neutral-400 text-base leading-none mt-0.5 transition-transform duration-200 ${ isOpen ? 'rotate-180' : '' }` }
+            aria-hidden="true"
+          >
+            ▾
+          </span>
+        </div>
+      </button>
+
+      <AnimatePresence initial={ false }>
+        { isOpen && (
+          <motion.div
+            id={ panelId }
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.24, ease: 'easeOut' }}
+            className="overflow-hidden border-t border-neutral-100"
+          >
+            <dl className="p-5 grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2.5">
+              { details.map( ( item ) => (
+                <div key={ item.label } className={ item.fullWidth ? 'sm:col-span-2' : '' }>
+                  <dt className="text-[10px] text-neutral-400 uppercase tracking-wider font-semibold mb-0.5">
+                    { item.label }
+                  </dt>
+                  <dd className="text-sm text-neutral-800 leading-snug whitespace-pre-line wrap-break-word">
+                    { item.value }
+                  </dd>
+                </div>
+              ) ) }
+            </dl>
+          </motion.div>
+        ) }
+      </AnimatePresence>
     </div>
   );
 }
