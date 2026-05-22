@@ -65,11 +65,10 @@ function dtb_frontend_security_headers(): void {
 	// Content-Security-Policy: opt-in via DTB_ENABLE_CSP constant (default off).
 	if ( ! is_admin() && dtb_feature_enabled( 'DTB_ENABLE_CSP', false ) ) {
 		$csp = "default-src 'self'; "
-			. "script-src 'self' 'unsafe-inline' https://js.stripe.com; "
+			. "script-src 'self' 'unsafe-inline'; "
 			. "style-src 'self' 'unsafe-inline'; "
 			. "img-src 'self' data: https:; "
-			. "connect-src 'self' https://api.stripe.com https://drywalltoolbox.com https://www.drywalltoolbox.com; "
-			. "frame-src https://js.stripe.com;";
+			. "connect-src 'self' https://drywalltoolbox.com https://www.drywalltoolbox.com;";
 		header( 'Content-Security-Policy: ' . $csp );
 	}
 

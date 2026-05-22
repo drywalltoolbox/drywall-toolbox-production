@@ -35,6 +35,24 @@ defined( 'ABSPATH' ) || exit;
 
 defined( 'ABSPATH' ) || exit;
 
+if ( ! defined( 'DTB_REWARDS_ENABLED' ) ) {
+	define( 'DTB_REWARDS_ENABLED', false );
+}
+
+function dtb_rewards_is_enabled(): bool {
+	return (bool) apply_filters( 'dtb_rewards_enabled', (bool) DTB_REWARDS_ENABLED );
+}
+
+function dtb_rewards_disabled_error(): WP_Error {
+	return new WP_Error( 'rewards_disabled', 'Rewards are temporarily unavailable.', [ 'status' => 503 ] );
+}
+
+if ( ! function_exists( 'dtb_rest_validate_numeric' ) ) {
+	function dtb_rest_validate_numeric( $value, $request = null, $param = null ): bool {
+		return is_numeric( $value );
+	}
+}
+
 /** Points earned per US dollar spent (100 pts = $5.00 → 20 pts/$1.00). */
 if ( ! defined( 'DTB_REWARDS_POINTS_PER_DOLLAR' ) ) {
 	define( 'DTB_REWARDS_POINTS_PER_DOLLAR', 20 );
@@ -52,7 +70,9 @@ if ( ! defined( 'DTB_REWARDS_POINTS_PER_DOLLAR' ) ) {
 // SOURCE:    DTB_Strategy_Overview.md §Loyalty Points
 // =============================================================================
 
-add_action( 'woocommerce_order_status_completed', 'dtb_rewards_award_order_points', 20 );
+if ( dtb_rewards_is_enabled() ) {
+	add_action( 'woocommerce_order_status_completed', 'dtb_rewards_award_order_points', 20 );
+}
 
 /**
  * Award points when an order is marked complete.
@@ -131,8 +151,10 @@ function dtb_rewards_award_order_points( int $order_id ): void {
  *
  * @param int $order_id
  */
-add_action( 'woocommerce_order_status_refunded', 'dtb_rewards_reverse_points', 10 );
-add_action( 'woocommerce_order_status_cancelled', 'dtb_rewards_reverse_points', 10 );
+if ( dtb_rewards_is_enabled() ) {
+	add_action( 'woocommerce_order_status_refunded', 'dtb_rewards_reverse_points', 10 );
+	add_action( 'woocommerce_order_status_cancelled', 'dtb_rewards_reverse_points', 10 );
+}
 function dtb_rewards_reverse_points( int $order_id ): void {
 	if ( ! class_exists( 'WLR\Plugin\Helpers\App' ) ) {
 		return;
@@ -188,7 +210,7 @@ function dtb_rewards_register_routes(): void {
 		'callback'            => 'dtb_rewards_get_balance',
 		'permission_callback' => 'dtb_jwt_permission',
 		'args'                => [
-			'id' => [ 'validate_callback' => 'is_numeric' ],
+			'id' => [ 'validate_callback' => 'dtb_rest_validate_numeric' ],
 		],
 	] );
 
@@ -198,9 +220,9 @@ function dtb_rewards_register_routes(): void {
 		'callback'            => 'dtb_rewards_get_history',
 		'permission_callback' => 'dtb_jwt_permission',
 		'args'                => [
-			'id'     => [ 'validate_callback' => 'is_numeric' ],
-			'limit'  => [ 'default' => 20, 'validate_callback' => 'is_numeric' ],
-			'offset' => [ 'default' => 0,  'validate_callback' => 'is_numeric' ],
+			'id'     => [ 'validate_callback' => 'dtb_rest_validate_numeric' ],
+			'limit'  => [ 'default' => 20, 'validate_callback' => 'dtb_rest_validate_numeric' ],
+			'offset' => [ 'default' => 0,  'validate_callback' => 'dtb_rest_validate_numeric' ],
 		],
 	] );
 
@@ -274,6 +296,10 @@ function dtb_rewards_admin_permission( WP_REST_Request $request ) {
  * @return WP_REST_Response|WP_Error
  */
 function dtb_rewards_get_balance( WP_REST_Request $request ) {
+	if ( ! dtb_rewards_is_enabled() ) {
+		return dtb_rewards_disabled_error();
+	}
+
 	$user_id = (int) $request['id'];
 
 	// WPLoyalty not yet installed — return a zero-balance stub so the
@@ -313,6 +339,10 @@ function dtb_rewards_get_balance( WP_REST_Request $request ) {
  * @return WP_REST_Response|WP_Error
  */
 function dtb_rewards_get_history( WP_REST_Request $request ) {
+	if ( ! dtb_rewards_is_enabled() ) {
+		return dtb_rewards_disabled_error();
+	}
+
 	$user_id = (int) $request['id'];
 	$limit   = max( 1, min( 100, (int) $request['limit'] ) );
 	$offset  = max( 0, (int) $request['offset'] );
@@ -347,6 +377,10 @@ function dtb_rewards_get_history( WP_REST_Request $request ) {
  * @return WP_REST_Response|WP_Error
  */
 function dtb_rewards_redeem( WP_REST_Request $request ) {
+	if ( ! dtb_rewards_is_enabled() ) {
+		return dtb_rewards_disabled_error();
+	}
+
 	if ( ! class_exists( 'WLR\Plugin\Helpers\App' ) ) {
 		return new WP_Error( 'not_configured', 'Rewards program not yet configured.', [ 'status' => 503 ] );
 	}
@@ -402,6 +436,10 @@ function dtb_rewards_redeem( WP_REST_Request $request ) {
  * @return WP_REST_Response|WP_Error
  */
 function dtb_rewards_admin_adjust( WP_REST_Request $request ) {
+	if ( ! dtb_rewards_is_enabled() ) {
+		return dtb_rewards_disabled_error();
+	}
+
 	if ( ! class_exists( 'WLR\Plugin\Helpers\App' ) ) {
 		return new WP_Error( 'not_configured', 'Rewards program not yet configured.', [ 'status' => 503 ] );
 	}

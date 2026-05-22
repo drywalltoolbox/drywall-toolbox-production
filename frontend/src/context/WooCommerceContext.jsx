@@ -112,7 +112,7 @@ export function WooCommerceProvider({ children }) {
     }
   }, [isEnabled]);
 
-  const createOrder = useCallback(async (cartItems, customerInfo, paymentMethod = 'stripe') => {
+  const createOrder = useCallback(async (cartItems, customerInfo, paymentMethod = 'cod') => {
     if (!isEnabled) {
       return null;
     }

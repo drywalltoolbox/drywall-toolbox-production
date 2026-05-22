@@ -1,12 +1,10 @@
 /**
  * frontend/src/pages/Checkout.jsx
  *
- * Production-ready headless WooCommerce checkout with Stripe SDK integration.
- *   - Stripe PaymentElement + ExpressCheckoutElement via StripePaymentBlock
+ * Production-ready headless WooCommerce checkout.
  *   - Responsive two-column layout with mobile summary + sticky CTA
  *   - Framer Motion step-enter animations + AnimatePresence
  *   - Existing business logic preserved: syncAndPlace(), DOMPurify, Veeqo
- *   - PaymentIntent architecture ready for Stripe account activation
  */
 
 import { useState, useMemo, useCallback, useEffect, useRef } from 'react';
@@ -26,6 +24,7 @@ import DOMPurify from 'dompurify';
 import { useCart } from '../context/CartContext';
 import { useWorkflowTransition } from '../context/WorkflowTransitionContext.jsx';
 import { syncAndPlace } from '../api/cart.js';
+import { getCheckoutCapabilities } from '../api/checkout.js';
 import veeqoService from '../services/veeqo';
 import SEOHead from '../components/shared/SEOHead';
 import { useAuthContext } from '../auth/AuthContext.js';
@@ -38,7 +37,7 @@ import {
   POINTS_MAX_REDEEM,
   POINTS_REDEEM_STEP,
 } from '../api/rewards.js';
-import StripePaymentBlock from '../components/checkout/StripePaymentBlock.jsx';
+import { isRewardsEnabled } from '../utils/featureFlags.js';
 
 // ─── Framer Motion shared variants ────────────────────────────────────────────
 // will-change is set on the hidden/initial state (before animation starts) and
@@ -170,6 +169,7 @@ function OrderSummaryPanel( { cartItems, subtotal, shipping, tax, total, loading
 
 // ─── Main Checkout component ──────────────────────────────────────────────────
 export default function Checkout() {
+  const rewardsEnabled = isRewardsEnabled();
   const toMoney = useCallback( ( value ) => {
     const n = Number( value );
     return Number.isFinite( n ) ? n : 0;
@@ -204,20 +204,9 @@ export default function Checkout() {
   const [orderComplete, setOrderComplete] = useState( false );
   const [orderDetails,  setOrderDetails ] = useState( null );
   const [step,          setStep         ] = useState( 'form' ); // 'form' | 'syncing' | 'placing'
-
-  // ── Stripe PaymentIntent client_secret ────────────────────────────────────
-  // Set when the PaymentIntent is created on checkout entry.
-  // TODO: Activate this effect once the Stripe account and server endpoint are ready.
-  // The WP endpoint should POST to Stripe's PaymentIntents API and return { client_secret }.
-  const [clientSecret, setClientSecret] = useState( null );
-
-  // Silence the unused-setter warning until the backend endpoint is wired.
-  // Remove this line and uncomment the useEffect below when Stripe is live.
-  void setClientSecret;
-
-  // Ref to capture the WC order created during the Stripe onCreateSession callback
-  // so it is available in handlePaymentSuccess without needing a state round-trip.
-  const wcOrderRef = useRef( null );
+  const [paymentGateway, setPaymentGateway] = useState( 'woo_native' );
+  const [paymentMethod, setPaymentMethod] = useState( 'cod' );
+  const [paymentMethods, setPaymentMethods] = useState( [] );
 
   // ── Points redemption ─────────────────────────────────────────────────────
   const [pointsBalance,   setPointsBalance  ] = useState( null );   // raw balance from API
@@ -228,6 +217,7 @@ export default function Checkout() {
 
   // Fetch points balance once we have an authenticated user.
   useEffect( () => {
+    if ( ! rewardsEnabled ) return;
     if ( isAuthenticated && user?.id ) {
       getUserPoints( user.id )
         .then( ( data ) => {
@@ -243,7 +233,27 @@ export default function Checkout() {
         } )
         .catch( () => {} );
     }
-  }, [ isAuthenticated, user?.id ] );
+  }, [ isAuthenticated, rewardsEnabled, user?.id ] );
+
+  useEffect( () => {
+    let mounted = true;
+    getCheckoutCapabilities()
+      .then( (caps) => {
+        if ( !mounted ) return;
+        const defaultGateway = caps?.default_gateway || 'woo_native';
+        const gateway = Array.isArray( caps?.gateways )
+          ? caps.gateways.find( (g) => g.id === defaultGateway ) || caps.gateways[0]
+          : null;
+        const methods = Array.isArray( gateway?.payment_methods ) ? gateway.payment_methods : [];
+        setPaymentGateway( gateway?.id || defaultGateway );
+        setPaymentMethods( methods );
+        if ( methods[0]?.id ) {
+          setPaymentMethod( methods[0].id );
+        }
+      } )
+      .catch( () => {} );
+    return () => { mounted = false; };
+  }, [] );
 
   const pointsUsd         = pointsToUsd( pointsToRedeem );
   const availablePts      = pointsBalance?.points ?? 0;
@@ -396,21 +406,9 @@ export default function Checkout() {
     return Object.keys( e ).length === 0;
   };
 
-  /**
-   * Called by StripePaymentBlock before the Stripe SDK confirms payment.
-   * Validates the form and syncs the cart + billing info to WooCommerce.
-   * The resulting WC order is captured in wcOrderRef for use after payment success.
-   *
-   * Dependency note: validateForm reads formData from closure; since formData is
-   * already in the dep array, recreating handleCreateSession when formData changes
-   * is correct and sufficient. useState setters (setProcessing, setCheckoutError,
-   * setStep) are stable references and do not need to be listed.
-   */
-  const handleCreateSession = useCallback( async () => {
+  const handlePlaceOrder = useCallback( async () => {
     if ( ! validateForm() ) {
-      // Field-level errors are already surfaced by validateForm() via setErrors().
-      // Throw a sentinel so the Stripe flow aborts without showing a duplicate banner.
-      throw Object.assign( new Error( 'Form validation failed.' ), { isValidation: true } );
+      return;
     }
 
     setProcessing( true );
@@ -433,44 +431,30 @@ export default function Checkout() {
     // Map the selected Veeqo rate to the WC shipping method rate ID.
     const wcRateId = selectedRate ? `dtb_veeqo_rates:${ selectedRate.id }` : '';
 
-    const wcOrder = await syncAndPlace(
-      safeCartItems,
-      billingAddress,
-      billingAddress,   // billing used as shipping; customer may update in WP account
-      'stripe',
-      [],               // payment_data is provided by Stripe SDK after this callback
-      formData.customerNote,
-      wcRateId,
-      appliedCoupon ? [ appliedCoupon.code ] : [],
-    );
+    try {
+      const wcOrder = await syncAndPlace(
+        safeCartItems,
+        billingAddress,
+        billingAddress,
+        paymentMethod || 'cod',
+        [],
+        formData.customerNote,
+        wcRateId,
+        selectedRate ? selectedRate.price : '',
+        appliedCoupon ? [ appliedCoupon.code ] : [],
+      );
 
-    wcOrderRef.current = wcOrder;
-    setStep( 'placing' );
-  }, [ formData, safeCartItems, selectedRate, appliedCoupon ] ); // eslint-disable-line react-hooks/exhaustive-deps
-
-  /**
-   * Called by StripePaymentBlock after the Stripe SDK confirms payment successfully.
-   */
-  const handlePaymentSuccess = useCallback( async () => {
-    setOrderDetails( { wooCommerce: wcOrderRef.current } );
-    setOrderComplete( true );
-    clearCart();
-    setProcessing( false );
-    setStep( 'form' );
-  }, [ clearCart ] );
-
-  /**
-   * Called by StripePaymentBlock when payment confirmation fails.
-   * Validation errors (isValidation=true) are shown as field errors only —
-   * no duplicate banner is rendered for them.
-   */
-  const handlePaymentError = useCallback( ( error ) => {
-    if ( ! error?.isValidation ) {
-      setCheckoutError( error.message || 'Payment failed. Please try again.' );
+      setStep( 'placing' );
+      setOrderDetails( { wooCommerce: wcOrder?.finalize || wcOrder } );
+      setOrderComplete( true );
+      clearCart();
+    } catch ( error ) {
+      setCheckoutError( error?.message || 'Checkout failed. Please try again.' );
+    } finally {
+      setProcessing( false );
+      setStep( 'form' );
     }
-    setProcessing( false );
-    setStep( 'form' );
-  }, [] );
+  }, [ appliedCoupon, clearCart, formData, paymentMethod, safeCartItems, selectedRate ] );
 
   useEffect(() => {
     if (processing) {
@@ -804,7 +788,7 @@ export default function Checkout() {
             </StepCard>
 
             {/* ── Points redemption panel (authenticated users only) ── */}
-            { isAuthenticated && pointsBalance && pointsBalance.points >= POINTS_MIN_REDEEM && (
+            { rewardsEnabled && isAuthenticated && pointsBalance && pointsBalance.points >= POINTS_MIN_REDEEM && (
               <StepCard delay={ 0.15 } className="p-5">
                 <div className="flex items-center justify-between mb-3">
                   <h3 className="text-sm font-bold text-gray-900 flex items-center gap-2">
@@ -882,19 +866,41 @@ export default function Checkout() {
               />
             </StepCard>
 
-            {/* ── Stripe payment section ──────────────────────────────────── */}
+            {/* ── Payment section (WooCommerce-native) ───────────────────── */}
             <StepCard delay={ 0.2 } className="p-6" id="payment-section">
               <p className="mb-4 text-xs font-bold uppercase tracking-[0.18em] text-slate-400">
                 Payment
               </p>
-              <StripePaymentBlock
-                clientSecret={ clientSecret }
-                email={ formData.email }
-                disabled={ processing }
-                onCreateSession={ handleCreateSession }
-                onPaymentSuccess={ handlePaymentSuccess }
-                onPaymentError={ handlePaymentError }
-              />
+              <p className="text-sm text-slate-600 mb-4">
+                { `Payment is processed through ${ paymentGateway } using gateways enabled in WooCommerce.` }
+              </p>
+              { paymentMethods.length > 0 && (
+                <div className="mb-4">
+                  <label className="block text-xs font-semibold uppercase tracking-[0.12em] text-slate-500 mb-2">
+                    Payment Method
+                  </label>
+                  <select
+                    value={ paymentMethod }
+                    onChange={ (e) => setPaymentMethod( e.target.value ) }
+                    className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/30 focus:border-primary-500"
+                  >
+                    { paymentMethods.map( (method) => (
+                      <option key={ method.id } value={ method.id }>
+                        { method.title || method.id }
+                      </option>
+                    ) ) }
+                  </select>
+                </div>
+              ) }
+              <button
+                type="button"
+                onClick={ handlePlaceOrder }
+                disabled={ processing || ! isFormComplete || safeCartItems.length === 0 }
+                className="w-full inline-flex items-center justify-center gap-2 bg-primary-600 hover:bg-primary-700 text-white py-3.5 rounded-xl font-bold text-sm tracking-wide transition-all shadow-md active:scale-[0.99] min-h-12 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <Lock size={ 16 } />
+                { processing ? 'Processing…' : 'Place Order' }
+              </button>
             </StepCard>
 
             {/* Checkout error */}
@@ -952,7 +958,7 @@ export default function Checkout() {
                      active:scale-[0.99] min-h-12"
         >
           <Lock size={ 16 } />
-          { isFormComplete ? 'Continue to Payment' : 'Fill in required fields' }
+          { isFormComplete ? 'Review Payment Section' : 'Fill in required fields' }
         </a>
       </div>
     </div>

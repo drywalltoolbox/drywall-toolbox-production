@@ -117,7 +117,7 @@ module.exports = (envFlags, argv) => {
     'process.env.REACT_APP_STORE_API_BASE':             JSON.stringify(env('REACT_APP_STORE_API_BASE')),
     'process.env.REACT_APP_JWT_AUTH_ENDPOINT':          JSON.stringify(env('REACT_APP_JWT_AUTH_ENDPOINT')),
     'process.env.REACT_APP_ENV':                        JSON.stringify(env('REACT_APP_ENV')),
-    'process.env.REACT_APP_STRIPE_PUBLISHABLE_KEY':     JSON.stringify(env('REACT_APP_STRIPE_PUBLISHABLE_KEY')),
+    'process.env.REACT_APP_REWARDS_ENABLED':            JSON.stringify(env('REACT_APP_REWARDS_ENABLED')),
 
     // Build timestamp — set once at config evaluation time (not per-module).
     'process.env.BUILD_TIMESTAMP':                      JSON.stringify(new Date().toISOString()),

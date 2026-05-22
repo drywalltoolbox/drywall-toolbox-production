@@ -1,16 +1,21 @@
-import apiClient from './client.js';
+import { apiClient } from './client.js';
 
 /**
  * frontend/src/api/checkout.js
  *
- * Production-grade checkout orchestration client.
- *
- * These endpoints are expected to be implemented server-side behind
- * authenticated WooCommerce/Stripe proxy routes.
+ * Gateway-agnostic checkout orchestration client.
+ * Frontend talks only to DTB backend checkout routes.
  */
 
-export async function createPaymentIntent(payload = {}) {
-  return apiClient('/wp-json/dtb/v1/checkout/payment-intent', {
+export async function createCheckoutSession(payload = {}) {
+  return apiClient('/wp-json/dtb/v1/checkout/session', {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  });
+}
+
+export async function confirmCheckout(payload = {}) {
+  return apiClient('/wp-json/dtb/v1/checkout/confirm', {
     method: 'POST',
     body: JSON.stringify(payload),
   });
@@ -21,4 +26,8 @@ export async function finalizeCheckout(payload = {}) {
     method: 'POST',
     body: JSON.stringify(payload),
   });
+}
+
+export async function getCheckoutCapabilities() {
+  return apiClient('/wp-json/dtb/v1/checkout/capabilities');
 }

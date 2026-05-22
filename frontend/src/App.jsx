@@ -11,6 +11,7 @@ import Header from './components/shell/Header';
 import Footer from './components/shell/Footer';
 import CartSidebar from './components/shell/CartSidebar';
 import ProtectedRoute from './components/routing/ProtectedRoute';
+import { isRewardsEnabled } from './utils/featureFlags.js';
 
 const APP_BASE = (process.env.PUBLIC_URL || '').replace(/\/+$/, '');
 
@@ -99,6 +100,7 @@ function RedirectToProducts() {
 
 function AppRoutes() {
   const location = useLocation();
+  const rewardsEnabled = isRewardsEnabled();
   const productSelectorElement = <Products title="Products" isPartsFilter={0} />;
   return (
     <PageTransition locationKey={location.pathname}>
@@ -137,7 +139,7 @@ function AppRoutes() {
           <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
           <Route path="/orders" element={<Navigate to="/dashboard?tab=orders" replace />} />
-          <Route path="/rewards" element={<Navigate to="/dashboard?tab=rewards" replace />} />
+          <Route path="/rewards" element={<Navigate to={rewardsEnabled ? "/dashboard?tab=rewards" : "/dashboard"} replace />} />
           <Route path="/account-settings" element={<Navigate to="/dashboard?tab=settings" replace />} />
           <Route path="/addresses" element={<Navigate to="/dashboard?tab=addresses" replace />} />
           <Route path="/notifications" element={<Navigate to="/dashboard?tab=settings" replace />} />

@@ -63,3 +63,7 @@ export function getFeatureFlag( key, defaultValue = false ) {
 export function isCatalogPlatformEnabled() {
   return getFeatureFlag( 'dtb_catalog_platform', false );
 }
+
+export function isRewardsEnabled() {
+  return getFeatureFlag( 'rewards_enabled', false );
+}

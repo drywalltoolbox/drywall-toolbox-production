@@ -4,7 +4,7 @@ defined( 'ABSPATH' ) || exit;
 /**
  * Plugin Name: DTB WooCommerce Configuration
  * Description: WooCommerce loopback, REST URL rewriting, wizard suppression,
- *              checkout customisation, Stripe/PayPal appearance, webhook
+ *              checkout customisation, PayPal appearance, webhook
  *              auto-registration, and server-side validation.
  * Version: 8.0.0
  * Author: Drywall Toolbox
@@ -600,53 +600,6 @@ add_filter( 'woocommerce_checkout_fields', function ( $fields ) {
 
 	return $fields;
 } );
-
-
-// ============================================================================
-// SECTION 9 — STRIPE UPE APPEARANCE
-//
-// Passes a custom appearance object to Stripe Elements so the card UI matches
-// the storefront: Inter font, 12 px border radius, primary blue #2563eb.
-// Requires WooCommerce Stripe Gateway ≥ 7.x (UPE mode).
-// Guard: only registers if the Stripe plugin class exists.
-// ============================================================================
-if ( class_exists( 'WC_Stripe' ) ) {
-	add_filter( 'wc_stripe_upe_params', function ( $params ) {
-		$params['appearance'] = [
-			'theme'     => 'flat',
-			'variables' => [
-				'fontFamily'      => "'Inter', system-ui, sans-serif",
-				'fontSizeBase'    => '16px',
-				'borderRadius'    => '12px',
-				'colorPrimary'    => '#2563eb',
-				'colorBackground' => '#ffffff',
-				'colorText'       => '#111827',
-				'colorDanger'     => '#dc2626',
-				'spacingUnit'     => '4px',
-			],
-			'rules' => [
-				'.Input' => [
-					'border'    => '1px solid #e5e7eb',
-					'boxShadow' => 'none',
-					'padding'   => '12px 16px',
-					'fontSize'  => '16px',
-				],
-				'.Input:focus' => [
-					'border'    => '2px solid #2563eb',
-					'boxShadow' => '0 0 0 3px rgba(37,99,235,0.12)',
-				],
-				'.Label' => [
-					'color'         => '#6b7280',
-					'fontSize'      => '12px',
-					'fontWeight'    => '600',
-					'letterSpacing' => '0.05em',
-					'textTransform' => 'uppercase',
-				],
-			],
-		];
-		return $params;
-	} );
-}
 
 
 // ============================================================================

@@ -33,10 +33,11 @@ import RewardsTab    from './RewardsTab.jsx';
 import AddressesTab  from './AddressesTab.jsx';
 import SettingsTab   from './SettingsTab.jsx';
 import NavbarTabs    from '../ui/NavbarTabs.jsx';
+import { isRewardsEnabled } from '../../utils/featureFlags.js';
 
 // ─── Tab definitions ──────────────────────────────────────────────────────────
 
-const TABS = [
+const BASE_TABS = [
   { id: 'overview',   label: 'Overview',   shortLabel: 'Overview',  icon: LayoutDashboard },
   { id: 'orders',     label: 'Orders',     shortLabel: 'Orders',    icon: Package         },
   { id: 'rewards',    label: 'Rewards',    shortLabel: 'Rewards',   icon: Star            },
@@ -64,6 +65,8 @@ const DOT_GRID = {
 // ─── Hub component ────────────────────────────────────────────────────────────
 
 export default function AccountHub() {
+  const rewardsEnabled = isRewardsEnabled();
+  const TABS = rewardsEnabled ? BASE_TABS : BASE_TABS.filter( (tab) => tab.id !== 'rewards' );
   const navigate                                      = useNavigate();
   const { user, isAuthenticated, isLoading, logout }  = useAuthContext();
 
@@ -118,7 +121,9 @@ export default function AccountHub() {
     if ( ! user?.id ) return;
     let cancelled = false;
 
-    getUserPoints( user.id ).then( ( d ) => { if ( ! cancelled ) setPointsData( d ); } ).catch( () => {} );
+    if ( rewardsEnabled ) {
+      getUserPoints( user.id ).then( ( d ) => { if ( ! cancelled ) setPointsData( d ); } ).catch( () => {} );
+    }
     getCustomerOrders( user.id, 1, 5 )
       .then( ( data ) => {
         if ( cancelled ) return;
@@ -128,7 +133,7 @@ export default function AccountHub() {
       .catch( () => { if ( ! cancelled ) setOrdersLoading( false ); } );
 
     return () => { cancelled = true; };
-  }, [ user?.id ] );
+  }, [ rewardsEnabled, user?.id ] );
 
   function changeTab( idx ) {
     if ( idx === activeTab ) return;
@@ -268,13 +273,17 @@ export default function AccountHub() {
                 </span>
                 <span className="dash-hero-stat-lbl">Plan</span>
               </div>
-              <div className="dash-hero-stat-divider" />
-              <div className="dash-hero-stat">
-                <span className="dash-hero-stat-val">
-                  { pointsData?.points ?? '—' }
-                </span>
-                <span className="dash-hero-stat-lbl">Points</span>
-              </div>
+              { rewardsEnabled && (
+                <>
+                  <div className="dash-hero-stat-divider" />
+                  <div className="dash-hero-stat">
+                    <span className="dash-hero-stat-val">
+                      { pointsData?.points ?? '—' }
+                    </span>
+                    <span className="dash-hero-stat-lbl">Points</span>
+                  </div>
+                </>
+              ) }
             </div>
 
           </Motion.div>
@@ -314,7 +323,7 @@ export default function AccountHub() {
               {/* Thin accent rule */}
               <div style={ { height: '3px', width: '32px', borderRadius: '999px', background: '#1d4ed8', marginBottom: '18px', opacity: 0.7 } } />
 
-              { activeTab === 0 && (
+              { TABS[ activeTab ]?.id === 'overview' && (
                 <OverviewTab
                   user={ user }
                   pointsData={ pointsData }
@@ -323,10 +332,10 @@ export default function AccountHub() {
                   onTabChange={ changeTab }
                 />
               ) }
-              { activeTab === 1 && <OrdersTab userId={ user.id } /> }
-              { activeTab === 2 && <RewardsTab userId={ user.id } /> }
-              { activeTab === 3 && <AddressesTab user={ user } /> }
-              { activeTab === 4 && <SettingsTab /> }
+              { TABS[ activeTab ]?.id === 'orders' && <OrdersTab userId={ user.id } /> }
+              { rewardsEnabled && TABS[ activeTab ]?.id === 'rewards' && <RewardsTab userId={ user.id } /> }
+              { TABS[ activeTab ]?.id === 'addresses' && <AddressesTab user={ user } /> }
+              { TABS[ activeTab ]?.id === 'settings' && <SettingsTab /> }
             </Motion.div>
           </AnimatePresence>
         </div>

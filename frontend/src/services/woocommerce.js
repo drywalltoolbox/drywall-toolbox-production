@@ -272,7 +272,7 @@ class WooCommerceService {
   /**
    * Sync cart to WooCommerce order
    */
-  async syncCartToOrder(cartItems, customerInfo, paymentMethod = 'stripe') {
+  async syncCartToOrder(cartItems, customerInfo, paymentMethod = 'cod') {
     if (!this.isEnabled()) {
       console.log('WooCommerce integration not enabled, skipping order sync');
       return null;
@@ -341,7 +341,6 @@ class WooCommerceService {
    */
   getPaymentMethodTitle(method) {
     const methods = {
-      stripe: 'Credit Card (Stripe)',
       paypal: 'PayPal',
       cod: 'Cash on Delivery',
       bacs: 'Direct Bank Transfer'

@@ -18,7 +18,21 @@ function dtb_payment_webhook_register_routes(): void {
 			'gateway' => [
 				'type'     => 'string',
 				'required' => true,
-				'enum'     => apply_filters( 'dtb_webhook_gateway_ids', [ 'stripe', 'paypal' ] ),
+				'enum'     => apply_filters( 'dtb_webhook_gateway_ids', [ 'paypal' ] ),
+			],
+		],
+	] );
+
+	// Alias path to match pluralized contract: /webhooks/payments/{gateway}.
+	register_rest_route( 'dtb/v1', '/webhooks/payments/(?P<gateway>[a-z0-9_\-]+)', [
+		'methods'             => WP_REST_Server::CREATABLE,
+		'callback'            => 'dtb_payment_webhook_handle',
+		'permission_callback' => '__return_true',
+		'args'                => [
+			'gateway' => [
+				'type'     => 'string',
+				'required' => true,
+				'enum'     => apply_filters( 'dtb_webhook_gateway_ids', [ 'paypal' ] ),
 			],
 		],
 	] );

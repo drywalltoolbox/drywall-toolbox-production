@@ -12,6 +12,7 @@
  *
  * Docs: https://github.com/woocommerce/woocommerce/tree/trunk/plugins/woocommerce/src/StoreApi
  */
+import { createCheckoutSession, confirmCheckout, finalizeCheckout } from './checkout.js';
 
 const runtimeHost = typeof window !== 'undefined' ? window.location.hostname : '';
 const runtimeOrigin = typeof window !== 'undefined' ? window.location.origin : '';
@@ -273,9 +274,9 @@ export async function clearStoreCart() {
  * returns the order ID + order key used for the confirmation page.
  *
  * Payment method must match a gateway enabled in WP Admin
- * (WooCommerce → Settings → Payments).  Default: 'cod' (Cash on Delivery /
- * Check / Invoice).  For Stripe/PayPal use their respective gateway IDs and
- * pass payment_data from the gateway JS SDK.
+ * (WooCommerce → Settings → Payments). Default: 'cod' (Cash on Delivery /
+ * Check / Invoice). For card wallets or third-party gateways, pass the
+ * gateway ID and any required payment_data from that provider's SDK.
  *
  * @param {Object} billingAddress   WC billing address object
  * @param {Object} shippingAddress  WC shipping address object (optional, defaults to billing)
@@ -345,51 +346,70 @@ export async function syncAndPlace(
   paymentData = [],
   customerNote = '',
   shippingRateId = '',
+  shippingRateTotal = '',
   couponCodes = [],
 ) {
-  // Initialise session + capture nonce.
-  await initCart();
-
-  // Clear any lingering server-side items.
-  await clearStoreCart();
-
-  // Sync the local cart to the server.  Sequential to avoid race conditions on
-  // the nonce — each response carries the updated nonce in the header.
-  for ( const item of cartItems ) {
-    if ( item.parent_id && !item.variation_attribute_values?.length ) {
-      throw new Error( `Variation item ${ item.sku || item.id } is missing selected attributes.` );
-    }
-
-    const variation = buildStoreApiVariation( item.variation_attribute_values );
-    await addToCart( item.id, item.quantity, variation, item.extensions || {} );
+  const safeItems = Array.isArray( cartItems ) ? cartItems : [];
+  if ( safeItems.length === 0 ) {
+    throw new Error( 'Cart is empty.' );
   }
 
-  // Apply any coupon codes (e.g. loyalty redemption coupons).
-  for ( const code of couponCodes ) {
-    try {
-      await storeFetch( '/cart/coupons', {
-        method: 'POST',
-        body: JSON.stringify( { code } ),
-      } );
-    } catch ( err ) {
-      console.warn( `[DTB Checkout] Coupon "${ code }" could not be applied (non-fatal):`, err.message );
+  const line_items = safeItems.map( ( item ) => {
+    const productId = Number( item?.parent_id || item?.product_id || item?.id || 0 );
+    const variationId = Number( item?.parent_id ? item.id : ( item?.variation_id || 0 ) );
+    const quantity = Number( item?.quantity || 1 );
+    if ( productId <= 0 || quantity <= 0 ) {
+      throw new Error( `Invalid cart line item: ${ item?.sku || item?.id || 'unknown' }` );
     }
+    return {
+      product_id: productId,
+      variation_id: variationId > 0 ? variationId : 0,
+      quantity,
+    };
+  } );
+
+  const shippingLineTotal = Number.isFinite( Number( shippingRateTotal ) )
+    ? String( Number( shippingRateTotal ) )
+    : '0';
+  const shippingLines = shippingRateId
+    ? [ { method_id: shippingRateId.split( ':' )[0] || 'flat_rate', method_title: shippingRateId, total: shippingLineTotal } ]
+    : [];
+
+  const idempotencyKey = `dtb-${ Date.now() }-${ Math.random().toString( 36 ).slice( 2, 10 ) }`;
+  const gateway = 'woo_native';
+
+  const session = await createCheckoutSession( {
+    gateway,
+    payment_method: paymentMethod,
+    line_items,
+  } );
+
+  const sessionToken = session?.session?.session_token;
+  if ( !sessionToken ) {
+    throw new Error( 'Checkout session was not created.' );
   }
 
-  // Set the shipping address on the WC cart so the correct shipping zone is
-  // resolved, then select the rate the customer chose in the React UI.
-  // Failure is non-fatal: WC will fall back to the first available rate.
-  if ( shippingRateId ) {
-    try {
-      await updateCartCustomer( {
-        shipping_address: shippingAddress || billingAddress,
-      } );
-      await selectShippingRate( shippingRateId );
-    } catch ( err ) {
-      console.warn( 'Shipping rate selection failed (non-fatal):', err.message );
-    }
+  const confirmed = await confirmCheckout( {
+    gateway,
+    session_token: sessionToken,
+    payment_ref: paymentData?.[0]?.value || '',
+  } );
+  if ( !confirmed?.confirm?.confirmed ) {
+    throw new Error( 'Checkout confirmation failed.' );
   }
 
-  // Submit the checkout.
-  return placeOrder( billingAddress, shippingAddress, paymentMethod, paymentData, customerNote );
+  return finalizeCheckout( {
+    gateway,
+    session_token: sessionToken,
+    idempotency_key: idempotencyKey,
+    payment_method: paymentMethod,
+    payment_ref: paymentData?.[0]?.value || '',
+    customer_note: customerNote || '',
+    billing: billingAddress,
+    shipping: shippingAddress || billingAddress,
+    line_items,
+    shipping_lines: shippingLines,
+    coupon_codes: Array.isArray( couponCodes ) ? couponCodes : [],
+    set_paid: false,
+  } );
 }

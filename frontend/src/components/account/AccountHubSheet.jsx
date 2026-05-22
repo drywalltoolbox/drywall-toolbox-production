@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Home, Package, LifeBuoy, User, X, ShoppingBag, Heart, Sparkles, ChevronRight, Clock, CheckCircle, AlertCircle, Truck, Loader } from 'lucide-react';
 import { getCustomerOrders } from '../../api/orders.js';
 import { getRecentlyViewed } from '../../utils/recentlyViewed.js';
+import { isRewardsEnabled } from '../../utils/featureFlags.js';
 
 const TABS = [
   { id: 'home',    label: 'Home',    Icon: Home },
@@ -96,6 +97,7 @@ function RecentlyViewedTile( { product, onClose } ) {
 }
 
 export default function AccountHubSheet({ isOpen, onClose, user, onLogout }) {
+  const rewardsEnabled = isRewardsEnabled();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('home');
   const [recentlyViewed, setRecentlyViewed] = useState([]);
@@ -194,10 +196,12 @@ export default function AccountHubSheet({ isOpen, onClose, user, onLogout }) {
               <h2 className="account-hub__headline">
                 Earn rewards, track orders, and save your tools
               </h2>
-              <div className="account-hub__rewards-badge">
-                <Sparkles size={14} strokeWidth={2} />
-                <span>Rewards available</span>
-              </div>
+              { rewardsEnabled && (
+                <div className="account-hub__rewards-badge">
+                  <Sparkles size={14} strokeWidth={2} />
+                  <span>Rewards available</span>
+                </div>
+              ) }
               <button
                 type="button"
                 className="account-hub__signin-cta"
@@ -424,7 +428,7 @@ export default function AccountHubSheet({ isOpen, onClose, user, onLogout }) {
                   {[
                     { to: '/dashboard',                label: 'My Dashboard'      },
                     { to: '/dashboard?tab=orders',     label: 'Order History'     },
-                    { to: '/dashboard?tab=rewards',    label: 'Rewards'           },
+                    ...( rewardsEnabled ? [ { to: '/dashboard?tab=rewards', label: 'Rewards' } ] : [] ),
                     { to: '/dashboard?tab=addresses',  label: 'Saved Addresses'   },
                     { to: '/dashboard?tab=settings',   label: 'Account Settings'  },
                   ].map(({ to, label }) => (

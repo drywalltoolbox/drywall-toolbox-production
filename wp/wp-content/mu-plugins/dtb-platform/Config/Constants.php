@@ -237,8 +237,7 @@ defined( 'ABSPATH' ) || exit;
  *                  scripts on initial deployment).
  *   Override     : Set to true in wp-config.php once you have verified that your
  *                  theme and all active plugins comply with the policy:
- *                    default-src 'self'; script-src 'self' 'unsafe-inline'
- *                    https://js.stripe.com; ...
+ *                    default-src 'self'; script-src 'self' 'unsafe-inline'; ...
  *                  Test in CSP Report-Only mode first if possible.
  *
  * =============================================================================
