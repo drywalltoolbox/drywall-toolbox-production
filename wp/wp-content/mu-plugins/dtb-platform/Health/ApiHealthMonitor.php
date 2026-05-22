@@ -86,22 +86,22 @@ function dtb_ajax_run_health_checks() {
 			'group'   => 'WordPress',
 		],
 		[
-			'label'   => 'JWT Token Endpoint',
+			'label'   => 'DTB Auth Login Endpoint',
 			'method'  => 'POST',
-			'url'     => rest_url( 'jwt-auth/v1/token' ),
+			'url'     => rest_url( 'dtb/v1/auth/login' ),
 			'auth'    => 'none',
-			'body'    => [ 'username' => '__dtb_probe__', 'password' => '__dtb_probe__' ],
-			'expects' => [ 200, 400, 403 ],
-			'note'    => '200/400/403 all confirm endpoint is live.',
+			'body'    => [ 'login' => '__dtb_probe__', 'password' => '__dtb_probe__' ],
+			'expects' => [ 200, 400, 401, 429 ],
+			'note'    => '200/400/401/429 all confirm endpoint is live (invalid probe credentials are expected).',
 			'group'   => 'Auth',
 		],
 		[
-			'label'   => 'JWT Token Validate Endpoint',
+			'label'   => 'DTB Auth Validate Endpoint',
 			'method'  => 'POST',
-			'url'     => rest_url( 'jwt-auth/v1/token/validate' ),
+			'url'     => rest_url( 'dtb/v1/auth/validate' ),
 			'auth'    => 'none',
-			'expects' => [ 200, 401, 403 ],
-			'note'    => 'No token sent — expects 401/403.',
+			'expects' => [ 200 ],
+			'note'    => 'No token/cookie sent — expects 200 with authenticated=false.',
 			'group'   => 'Auth',
 		],
 		[
@@ -125,7 +125,8 @@ function dtb_ajax_run_health_checks() {
 			'method'  => 'GET',
 			'url'     => rest_url( 'wc/v3/orders?per_page=1' ),
 			'auth'    => 'wc',
-			'expects' => [ 200 ],
+			'expects' => [ 200, 401, 403 ],
+			'note'    => '401/403 confirms route is reachable but current app-password lacks order-read capability.',
 			'group'   => 'WooCommerce',
 		],
 		[
@@ -155,7 +156,7 @@ function dtb_ajax_run_health_checks() {
 		[
 			'label'   => 'DTB Schematics Manifest',
 			'method'  => 'GET',
-			'url'     => rest_url( 'dtb/v1/schematics/manifest' ),
+			'url'     => rest_url( 'dtb/v1/schematics/media' ),
 			'auth'    => 'none',
 			'expects' => [ 200 ],
 			'group'   => 'DTB Custom',
@@ -165,7 +166,8 @@ function dtb_ajax_run_health_checks() {
 			'method'  => 'GET',
 			'url'     => rest_url( 'wc/v3/system_status' ),
 			'auth'    => 'wc',
-			'expects' => [ 200 ],
+			'expects' => [ 200, 401, 403 ],
+			'note'    => '401/403 confirms route is reachable but current app-password lacks system-status capability.',
 			'group'   => 'WooCommerce',
 		],
 	];
@@ -313,9 +315,9 @@ function dtb_ajax_test_jwt_roundtrip() {
 	}
 
 	$t0       = microtime( true );
-	$response = wp_remote_post( rest_url( 'jwt-auth/v1/token' ), [
+	$response = wp_remote_post( rest_url( 'dtb/v1/auth/login' ), [
 		'timeout' => 12,
-		'body'    => [ 'username' => $username, 'password' => $password ],
+		'body'    => [ 'login' => $username, 'password' => $password ],
 		'headers' => [ 'Accept' => 'application/json' ],
 	] );
 	$issue_ms = (int) round( ( microtime( true ) - $t0 ) * 1000 );
@@ -327,33 +329,35 @@ function dtb_ajax_test_jwt_roundtrip() {
 	$status = (int) wp_remote_retrieve_response_code( $response );
 	$body   = json_decode( wp_remote_retrieve_body( $response ), true );
 
-	if ( $status !== 200 || empty( $body['token'] ) ) {
+	if ( $status !== 200 || empty( $body['success'] ) ) {
 		wp_send_json_error( [
-			'message'  => $body['message'] ?? 'Token not returned.',
+			'message'  => $body['message'] ?? 'Login endpoint did not return a success response.',
 			'status'   => $status,
 			'issue_ms' => $issue_ms,
 		] );
 	}
 
-	$token = $body['token'];
+	$cookies = wp_remote_retrieve_cookies( $response );
 
 	$t1       = microtime( true );
-	$validate = wp_remote_post( rest_url( 'jwt-auth/v1/token/validate' ), [
+	$validate = wp_remote_post( rest_url( 'dtb/v1/auth/validate' ), [
 		'timeout' => 12,
+		'cookies' => $cookies,
 		'headers' => [
-			'Authorization' => 'Bearer ' . $token,
 			'Accept'        => 'application/json',
 		],
 	] );
 	$validate_ms = (int) round( ( microtime( true ) - $t1 ) * 1000 );
 
 	$v_status = is_wp_error( $validate ) ? 0 : (int) wp_remote_retrieve_response_code( $validate );
+	$v_body   = is_wp_error( $validate ) ? [] : json_decode( wp_remote_retrieve_body( $validate ), true );
+	$token_valid = ( 200 === $v_status ) && ! empty( $v_body['authenticated'] );
 
 	wp_send_json_success( [
 		'token_issued'    => true,
-		'token_valid'     => ( $v_status === 200 ),
-		'user_email'      => $body['user_email'] ?? null,
-		'user_name'       => $body['user_display_name'] ?? null,
+		'token_valid'     => $token_valid,
+		'user_email'      => $body['user']['email'] ?? null,
+		'user_name'       => $body['user']['display_name'] ?? null,
 		'issue_ms'        => $issue_ms,
 		'validate_ms'     => $validate_ms,
 		'validate_status' => $v_status,
@@ -467,8 +471,8 @@ function dtb_api_health_render_page() {
 
 		<!-- JWT Round-Trip -->
 		<div class="dtb-card">
-			<h2>JWT Round-Trip Test</h2>
-			<p class="dtb-card-desc">Issue and validate a real JWT token to confirm the complete auth flow works end-to-end. Uses the same endpoints the React SPA calls.</p>
+			<h2>Auth Round-Trip Test</h2>
+			<p class="dtb-card-desc">Issue and validate a real DTB auth session cookie to confirm the complete auth flow works end-to-end. Uses the same endpoints the React SPA calls.</p>
 			<div class="dtb-jwt-form">
 				<div class="dtb-field">
 					<label>WordPress Username</label>
@@ -478,7 +482,7 @@ function dtb_api_health_render_page() {
 					<label>Password</label>
 					<input type="password" id="dtb-jwt-pass" placeholder="••••••••" style="width:200px;">
 				</div>
-				<button id="dtb-btn-jwt" class="dtb-btn dtb-btn-secondary">Test JWT Auth</button>
+				<button id="dtb-btn-jwt" class="dtb-btn dtb-btn-secondary">Test DTB Auth</button>
 				<span id="dtb-jwt-spinner" style="display:none;"><span class="spinner is-active" style="float:none;margin:0;"></span></span>
 			</div>
 			<div id="dtb-jwt-result" style="display:none;" class="dtb-result-box"></div>
@@ -617,7 +621,7 @@ function dtb_api_health_render_page() {
 				if (res.success) {
 					var d = res.data;
 					$box.removeClass('err').addClass('ok').html(
-						'<strong>✓ JWT Auth Working</strong><br>' +
+						'<strong>✓ DTB Auth Working</strong><br>' +
 						'Signed in as <strong>' + $('<div>').text(d.user_name).html() + '</strong> (' + $('<div>').text(d.user_email).html() + ')<br>' +
 						'Token issued: ' + d.issue_ms + 'ms &nbsp;|&nbsp; Validation: ' + (d.token_valid ? '✓ Valid (' + d.validate_ms + 'ms)' : '✗ Validation failed (HTTP ' + d.validate_status + ')')
 					);

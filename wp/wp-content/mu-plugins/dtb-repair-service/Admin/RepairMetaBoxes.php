@@ -107,6 +107,8 @@ function dtb_repair_metabox_order_details( WP_Post $post ): void {
 	];
 	$issue  = wp_kses_post( (string) get_post_meta( $post->ID, '_repair_issue', true ) );
 	$images = json_decode( (string) get_post_meta( $post->ID, '_repair_images', true ), true );
+	$thread_events = dtb_repair_get_customer_message_thread( $post->ID, 120 );
+	$thread_alert  = dtb_repair_get_customer_message_alert_state( $post->ID, $thread_events );
 
 	echo '<div class="dtb-repair-metabox"><table>';
 	foreach ( $fields as $key => $label ) {
@@ -132,7 +134,253 @@ function dtb_repair_metabox_order_details( WP_Post $post ): void {
 		}
 		echo '</div>';
 	}
-	echo '</div></div>';
+	echo '</div>';
+
+	wp_nonce_field( 'dtb_repair_thread_' . $post->ID, 'dtb_repair_thread_nonce' );
+
+	echo '<div class="dtb-repair-chat-card">';
+	echo '<div class="dtb-repair-chat-head">';
+	echo '<div>';
+	echo '<div class="dtb-repair-chat-title">' . esc_html__( 'Customer Conversation', 'drywall-toolbox' ) . '</div>';
+	echo '<div class="dtb-repair-chat-subtitle">' . esc_html__( 'Two-way updates shared with the customer status page.', 'drywall-toolbox' ) . '</div>';
+	echo '</div>';
+	if ( (int) $thread_alert['unread_count'] > 0 ) {
+		echo '<span class="dtb-repair-chat-unread-badge">' . esc_html( (string) $thread_alert['unread_count'] ) . ' ' . esc_html__( 'new', 'drywall-toolbox' ) . '</span>';
+	}
+	echo '</div>';
+
+	if ( (int) $thread_alert['unread_count'] > 0 ) {
+		echo '<div class="dtb-repair-chat-alert">'
+			. esc_html__( 'Customer sent new message(s). Review and mark as read when handled.', 'drywall-toolbox' )
+			. '</div>';
+	}
+
+	echo '<div class="dtb-repair-chat-thread" data-repair-id="' . esc_attr( (string) $post->ID ) . '">';
+	echo '<div id="dtb-repair-chat-list" class="dtb-repair-chat-list">';
+	if ( empty( $thread_events ) ) {
+		echo '<p class="dtb-repair-chat-empty">' . esc_html__( 'No customer-facing messages yet.', 'drywall-toolbox' ) . '</p>';
+	} else {
+		foreach ( $thread_events as $event ) {
+			echo dtb_repair_render_customer_message_item( $event, (int) $thread_alert['last_seen_customer_note_id'] ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		}
+	}
+	echo '</div>';
+
+	echo '<div class="dtb-repair-chat-compose">';
+	echo '<textarea id="dtb-repair-chat-input" class="dtb-repair-chat-input" maxlength="600" placeholder="'
+		. esc_attr__( 'Send an update to the customer…', 'drywall-toolbox' )
+		. '"></textarea>';
+	echo '<div class="dtb-repair-chat-actions">';
+	echo '<span id="dtb-repair-chat-msg" class="dtb-repair-chat-msg"></span>';
+	if ( (int) $thread_alert['unread_count'] > 0 ) {
+		echo '<button type="button" id="dtb-repair-chat-mark-read" class="button">'
+			. esc_html__( 'Mark customer messages read', 'drywall-toolbox' )
+			. '</button>';
+	}
+	echo '<button type="button" id="dtb-repair-chat-send" class="button button-primary">'
+		. esc_html__( 'Send Update', 'drywall-toolbox' )
+		. '</button>';
+	echo '</div>';
+	echo '</div>';
+	echo '</div>';
+	echo '</div>';
+
+	?>
+	<script>
+	(function($){
+		var $root = $('#dtb-repair-chat-list').closest('.dtb-repair-chat-thread');
+		if (!$root.length) return;
+
+		var repairId = Number($root.data('repair-id') || 0);
+		var nonce = $('input[name="dtb_repair_thread_nonce"]').val();
+		var $list = $('#dtb-repair-chat-list');
+		var $input = $('#dtb-repair-chat-input');
+		var $msg = $('#dtb-repair-chat-msg');
+		var $send = $('#dtb-repair-chat-send');
+		var $markRead = $('#dtb-repair-chat-mark-read');
+
+		var esc = function(str){
+			return $('<div>').text(String(str || '')).html();
+		};
+
+		var setMsg = function(text, cls){
+			$msg.removeClass('is-ok is-err').addClass(cls || '').text(text || '');
+		};
+
+		$send.on('click', function(){
+			var comment = ($input.val() || '').trim();
+			if (!comment) {
+				setMsg('Please enter a message.', 'is-err');
+				return;
+			}
+			$send.prop('disabled', true);
+			setMsg('Sending…', '');
+
+			$.post(ajaxurl, {
+				action: 'dtb_repair_send_customer_update',
+				repair_id: repairId,
+				comment: comment,
+				nonce: nonce
+			}, function(res){
+				$send.prop('disabled', false);
+				if (!res || !res.success) {
+					setMsg((res && res.data && res.data.message) ? res.data.message : 'Could not send message.', 'is-err');
+					return;
+				}
+
+				var html = res.data && res.data.html ? String(res.data.html) : '';
+				if (html) {
+					$list.find('.dtb-repair-chat-empty').remove();
+					$list.append(html);
+					$list.scrollTop($list.prop('scrollHeight'));
+				}
+
+				$input.val('');
+				setMsg((res.data && res.data.message) ? res.data.message : 'Update sent.', 'is-ok');
+			});
+		});
+
+		$markRead.on('click', function(){
+			$markRead.prop('disabled', true);
+			$.post(ajaxurl, {
+				action: 'dtb_repair_mark_customer_messages_read',
+				repair_id: repairId,
+				nonce: nonce
+			}, function(res){
+				if (res && res.success) {
+					$list.find('.dtb-repair-chat-item.is-unread').removeClass('is-unread');
+					$('.dtb-repair-chat-unread-badge').remove();
+					$('.dtb-repair-chat-alert').remove();
+					$markRead.remove();
+					setMsg('Marked as read.', 'is-ok');
+				} else {
+					$markRead.prop('disabled', false);
+					setMsg((res && res.data && res.data.message) ? res.data.message : 'Unable to mark read.', 'is-err');
+				}
+			});
+		});
+	})(jQuery);
+	</script>
+	<?php
+
+	echo '</div>';
+}
+
+/**
+ * Return customer-visible message-thread events for admin conversation UI.
+ *
+ * @param int $repair_id
+ * @param int $limit
+ * @return array<int, object>
+ */
+function dtb_repair_get_customer_message_thread( int $repair_id, int $limit = 120 ): array {
+	if ( ! function_exists( 'dtb_repair_get_events' ) ) {
+		return [];
+	}
+
+	$events = dtb_repair_get_events( $repair_id, null, $limit );
+	$thread = [];
+
+	foreach ( $events as $event ) {
+		$event_type = (string) ( $event->event_type ?? '' );
+		$visibility = (string) ( $event->visibility ?? '' );
+		if ( 'repair.note_added' !== $event_type ) {
+			continue;
+		}
+		if ( ! in_array( $visibility, [ 'customer', 'public' ], true ) ) {
+			continue;
+		}
+
+		$payload = is_string( $event->payload_json ?? null )
+			? json_decode( (string) $event->payload_json, true )
+			: [];
+		$message = trim( wp_strip_all_tags( (string) ( $payload['note'] ?? '' ) ) );
+		if ( '' === $message ) {
+			continue;
+		}
+
+		$thread[] = $event;
+	}
+
+	return $thread;
+}
+
+/**
+ * Build unread-state metadata for customer messages in the admin thread.
+ *
+ * @param int               $repair_id
+ * @param array<int,object> $thread_events
+ * @return array{unread_count:int,last_seen_customer_note_id:int,last_customer_note_id:int}
+ */
+function dtb_repair_get_customer_message_alert_state( int $repair_id, array $thread_events ): array {
+	$last_seen = (int) get_post_meta( $repair_id, '_repair_admin_last_seen_customer_note_id', true );
+	$latest_customer_note_id = 0;
+	$unread_count = 0;
+
+	foreach ( $thread_events as $event ) {
+		$event_id = (int) ( $event->id ?? 0 );
+		$actor_type = (string) ( $event->actor_type ?? '' );
+		if ( 'customer' !== $actor_type ) {
+			continue;
+		}
+		$latest_customer_note_id = max( $latest_customer_note_id, $event_id );
+		if ( $event_id > $last_seen ) {
+			$unread_count++;
+		}
+	}
+
+	return [
+		'unread_count'                => $unread_count,
+		'last_seen_customer_note_id'  => $last_seen,
+		'last_customer_note_id'       => $latest_customer_note_id,
+	];
+}
+
+/**
+ * Render a single message row for the customer conversation thread.
+ *
+ * @param object $event
+ * @param int    $last_seen_customer_note_id
+ * @return string
+ */
+function dtb_repair_render_customer_message_item( object $event, int $last_seen_customer_note_id = 0 ): string {
+	$payload = is_string( $event->payload_json ?? null )
+		? json_decode( (string) $event->payload_json, true )
+		: [];
+	$message = trim( wp_strip_all_tags( (string) ( $payload['note'] ?? '' ) ) );
+	if ( '' === $message ) {
+		return '';
+	}
+
+	$event_id = (int) ( $event->id ?? 0 );
+	$actor_type = (string) ( $event->actor_type ?? 'system' );
+	$is_customer = 'customer' === $actor_type;
+	$is_unread = $is_customer && $event_id > $last_seen_customer_note_id;
+	$author = $is_customer ? __( 'Customer', 'drywall-toolbox' ) : __( 'DTB Team', 'drywall-toolbox' );
+	$created_at = (string) ( $event->created_at ?? '' );
+	$time_fmt = $created_at ? date_i18n( 'M j, Y g:i a', strtotime( $created_at ) ) : '';
+
+	$classes = [ 'dtb-repair-chat-item', $is_customer ? 'from-customer' : 'from-admin' ];
+	if ( $is_unread ) {
+		$classes[] = 'is-unread';
+	}
+
+	$html  = '<div class="' . esc_attr( implode( ' ', $classes ) ) . '" data-event-id="' . esc_attr( (string) $event_id ) . '">';
+	$html .= '<div class="dtb-repair-chat-bubble">';
+	$html .= '<div class="dtb-repair-chat-meta">';
+	$html .= '<span class="dtb-repair-chat-author">' . esc_html( $author ) . '</span>';
+	if ( $is_unread ) {
+		$html .= '<span class="dtb-repair-chat-pill">' . esc_html__( 'new', 'drywall-toolbox' ) . '</span>';
+	}
+	if ( '' !== $time_fmt ) {
+		$html .= '<span class="dtb-repair-chat-time">' . esc_html( $time_fmt ) . '</span>';
+	}
+	$html .= '</div>';
+	$html .= '<div class="dtb-repair-chat-text">' . esc_html( $message ) . '</div>';
+	$html .= '</div>';
+	$html .= '</div>';
+
+	return $html;
 }
 
 // ---- Metabox: Timeline -------------------------------------------------------
@@ -389,6 +637,92 @@ function dtb_repair_metabox_technician( WP_Post $post ): void {
 add_action( 'save_post_dtb_repair_request', 'dtb_repair_save_technician_meta' );
 add_action( 'wp_ajax_dtb_repair_schematic_lookup', 'dtb_repair_ajax_schematic_lookup' );
 add_action( 'wp_ajax_dtb_repair_parts_lookup', 'dtb_repair_ajax_parts_lookup' );
+add_action( 'wp_ajax_dtb_repair_send_customer_update', 'dtb_repair_ajax_send_customer_update' );
+add_action( 'wp_ajax_dtb_repair_mark_customer_messages_read', 'dtb_repair_ajax_mark_customer_messages_read' );
+
+/**
+ * Send a customer-visible admin update from the Order Details conversation card.
+ */
+function dtb_repair_ajax_send_customer_update(): void {
+	$repair_id = (int) ( $_POST['repair_id'] ?? 0 );
+	$nonce = sanitize_text_field( wp_unslash( (string) ( $_POST['nonce'] ?? '' ) ) );
+	$comment = trim( wp_strip_all_tags( (string) wp_unslash( $_POST['comment'] ?? '' ) ) );
+
+	if ( ! $repair_id || ! wp_verify_nonce( $nonce, 'dtb_repair_thread_' . $repair_id ) ) {
+		wp_send_json_error( [ 'message' => __( 'Security check failed.', 'drywall-toolbox' ) ], 403 );
+	}
+
+	if ( ! current_user_can( 'dtb_manage_repairs' ) ) {
+		wp_send_json_error( [ 'message' => __( 'Insufficient permissions.', 'drywall-toolbox' ) ], 403 );
+	}
+
+	if ( '' === $comment ) {
+		wp_send_json_error( [ 'message' => __( 'Please enter a message.', 'drywall-toolbox' ) ], 422 );
+	}
+
+	if ( strlen( $comment ) > 600 ) {
+		wp_send_json_error( [ 'message' => __( 'Message is too long.', 'drywall-toolbox' ) ], 422 );
+	}
+
+	$status = (string) get_post_meta( $repair_id, '_repair_status', true );
+	if ( in_array( $status, [ 'closed', 'completed', 'cancelled', 'quote_declined' ], true ) ) {
+		wp_send_json_error( [ 'message' => __( 'Messaging is disabled for this repair status.', 'drywall-toolbox' ) ], 409 );
+	}
+
+	if ( ! function_exists( 'dtb_repair_append_event' ) ) {
+		wp_send_json_error( [ 'message' => __( 'Event service unavailable.', 'drywall-toolbox' ) ], 500 );
+	}
+
+	$event_id = dtb_repair_append_event(
+		$repair_id,
+		'repair.note_added',
+		[
+			'actor_type' => 'admin',
+			'actor_id'   => get_current_user_id(),
+			'source'     => 'admin_order_details',
+			'visibility' => 'customer',
+			'payload'    => [ 'note' => $comment ],
+		]
+	);
+
+	if ( false === $event_id ) {
+		wp_send_json_error( [ 'message' => __( 'Could not store message.', 'drywall-toolbox' ) ], 500 );
+	}
+
+	$event = null;
+	if ( function_exists( 'dtb_repair_get_events' ) ) {
+		$rows = dtb_repair_get_events( $repair_id, null, 1, max( 0, (int) $event_id - 1 ) );
+		$event = ! empty( $rows ) ? $rows[0] : null;
+	}
+
+	wp_send_json_success( [
+		'message' => __( 'Update sent to customer timeline.', 'drywall-toolbox' ),
+		'html'    => $event ? dtb_repair_render_customer_message_item( $event ) : '',
+	] );
+}
+
+/**
+ * Mark customer messages as read for this repair's admin conversation card.
+ */
+function dtb_repair_ajax_mark_customer_messages_read(): void {
+	$repair_id = (int) ( $_POST['repair_id'] ?? 0 );
+	$nonce = sanitize_text_field( wp_unslash( (string) ( $_POST['nonce'] ?? '' ) ) );
+
+	if ( ! $repair_id || ! wp_verify_nonce( $nonce, 'dtb_repair_thread_' . $repair_id ) ) {
+		wp_send_json_error( [ 'message' => __( 'Security check failed.', 'drywall-toolbox' ) ], 403 );
+	}
+
+	if ( ! current_user_can( 'dtb_manage_repairs' ) ) {
+		wp_send_json_error( [ 'message' => __( 'Insufficient permissions.', 'drywall-toolbox' ) ], 403 );
+	}
+
+	$thread = dtb_repair_get_customer_message_thread( $repair_id, 200 );
+	$alert  = dtb_repair_get_customer_message_alert_state( $repair_id, $thread );
+
+	update_post_meta( $repair_id, '_repair_admin_last_seen_customer_note_id', (int) $alert['last_customer_note_id'] );
+
+	wp_send_json_success( [ 'message' => __( 'Customer messages marked read.', 'drywall-toolbox' ) ] );
+}
 
 function dtb_repair_save_technician_meta( int $post_id ): void {
 	if ( ! isset( $_POST['dtb_repair_technician_nonce'] ) ) {

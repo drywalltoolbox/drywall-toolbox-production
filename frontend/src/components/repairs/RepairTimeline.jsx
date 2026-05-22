@@ -159,7 +159,7 @@ export default function RepairTimeline( { events = [] } ) {
                     initial={{ scaleY: 0, originY: 0 }}
                     animate={{ scaleY: 1 }}
                     transition={{ duration: 0.4, delay: 0.15 + idx * 0.07, ease: 'easeOut' }}
-                    className={ `absolute left-[15px] top-8 bottom-0 w-0.5 ${ colors.line }` }
+                    className={ `absolute left-3.75 top-8 bottom-0 w-0.5 ${ colors.line }` }
                   />
                 ) }
 
@@ -184,9 +184,16 @@ export default function RepairTimeline( { events = [] } ) {
                     { event.label || event.type }
                   </p>
                   { event.message && (
-                    <p className="text-xs text-neutral-600 mt-1 leading-relaxed">
-                      { event.message }
-                    </p>
+                    <div className="mt-1 leading-relaxed">
+                      { event.actor_label && (
+                        <p className="text-[10px] uppercase tracking-wider font-semibold text-neutral-400 mb-0.5">
+                          { event.actor_label }
+                        </p>
+                      ) }
+                      <p className="text-xs text-neutral-600">
+                        { event.message }
+                      </p>
+                    </div>
                   ) }
                   <p
                     className="text-xs text-neutral-400 mt-0.5"

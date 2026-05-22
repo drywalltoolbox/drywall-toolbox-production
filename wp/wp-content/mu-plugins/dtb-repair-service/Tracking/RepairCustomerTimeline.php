@@ -36,7 +36,15 @@ $row = [
 ];
 
 if ( 'repair.note_added' === (string) $event->event_type && ! empty( $payload['note'] ) ) {
+	$actor_type = sanitize_text_field( (string) ( $event->actor_type ?? '' ) );
 	$row['message'] = wp_strip_all_tags( (string) $payload['note'] );
+	$row['actor_type'] = $actor_type;
+	$row['actor_label'] = ( 'customer' === $actor_type )
+		? __( 'You', 'drywall-toolbox' )
+		: __( 'DTB Team', 'drywall-toolbox' );
+	$row['label'] = ( 'customer' === $actor_type )
+		? __( 'Message sent', 'drywall-toolbox' )
+		: __( 'New message from DTB Team', 'drywall-toolbox' );
 }
 
 $timeline[] = $row;

@@ -684,6 +684,21 @@ function dtb_repair_admin_inline_styles(): void {
 		border-color: #93c5fd;
 		color: #1d4ed8;
 	}
+	.dtb-workspace-tab-badge {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		min-width: 18px;
+		height: 18px;
+		padding: 0 6px;
+		margin-left: 6px;
+		font-size: 10px;
+		font-weight: 700;
+		line-height: 1;
+		color: #fff;
+		background: #dc2626;
+		border-radius: 999px;
+	}
 	.dtb-workspace-hidden { display: none !important; }
 	.dtb-tech-workspace { display: grid; gap: 14px; }
 	.dtb-tech-grid {
@@ -1025,6 +1040,160 @@ function dtb_repair_admin_inline_styles(): void {
 	.dtb-tl-vis-customer { background: #f3e8ff; color: #7c3aed; }
 	.dtb-tl-vis-operator { background: #e0f2fe; color: #0369a1; }
 	.dtb-tl-vis-internal { background: #f3f4f6; color: #6b7280; }
+
+	/* ── Customer conversation card ────────────────────────────────────────── */
+	.dtb-repair-chat-card {
+		margin-top: 14px;
+		border: 1px solid var(--dtb-border);
+		border-radius: 10px;
+		background: #f8fafc;
+		padding: 12px;
+	}
+	.dtb-repair-chat-head {
+		display: flex;
+		align-items: flex-start;
+		justify-content: space-between;
+		gap: 10px;
+		margin-bottom: 10px;
+	}
+	.dtb-repair-chat-title {
+		font-size: 12px;
+		font-weight: 800;
+		color: #0f172a;
+		text-transform: uppercase;
+		letter-spacing: .4px;
+	}
+	.dtb-repair-chat-subtitle {
+		font-size: 11px;
+		color: #64748b;
+		margin-top: 2px;
+	}
+	.dtb-repair-chat-unread-badge {
+		display: inline-flex;
+		align-items: center;
+		padding: 2px 8px;
+		border-radius: 999px;
+		background: #dc2626;
+		color: #fff;
+		font-size: 10px;
+		font-weight: 700;
+		text-transform: uppercase;
+		letter-spacing: .3px;
+	}
+	.dtb-repair-chat-alert {
+		margin-bottom: 10px;
+		padding: 8px 10px;
+		font-size: 12px;
+		border-radius: 8px;
+		background: #fef3c7;
+		color: #92400e;
+		border: 1px solid #fcd34d;
+	}
+	.dtb-repair-chat-list {
+		display: flex;
+		flex-direction: column;
+		gap: 8px;
+		max-height: 310px;
+		overflow: auto;
+		padding-right: 2px;
+		margin-bottom: 10px;
+	}
+	.dtb-repair-chat-empty {
+		margin: 0;
+		font-size: 12px;
+		color: #94a3b8;
+	}
+	.dtb-repair-chat-item {
+		display: flex;
+	}
+	.dtb-repair-chat-item.from-customer { justify-content: flex-start; }
+	.dtb-repair-chat-item.from-admin { justify-content: flex-end; }
+	.dtb-repair-chat-bubble {
+		max-width: min(100%, 86%);
+		padding: 8px 10px;
+		border-radius: 10px;
+		border: 1px solid transparent;
+		box-shadow: 0 1px 1px rgba(15,23,42,.03);
+	}
+	.dtb-repair-chat-item.from-customer .dtb-repair-chat-bubble {
+		background: #ffffff;
+		border-color: #ddd6fe;
+	}
+	.dtb-repair-chat-item.from-admin .dtb-repair-chat-bubble {
+		background: #dbeafe;
+		border-color: #bfdbfe;
+	}
+	.dtb-repair-chat-item.is-unread .dtb-repair-chat-bubble {
+		border-color: #c026d3;
+		box-shadow: 0 0 0 1px rgba(192,38,211,.2);
+	}
+	.dtb-repair-chat-meta {
+		display: flex;
+		align-items: center;
+		gap: 6px;
+		margin-bottom: 4px;
+	}
+	.dtb-repair-chat-author {
+		font-size: 11px;
+		font-weight: 700;
+		color: #334155;
+	}
+	.dtb-repair-chat-time {
+		font-size: 10px;
+		color: #64748b;
+	}
+	.dtb-repair-chat-pill {
+		display: inline-flex;
+		align-items: center;
+		height: 15px;
+		padding: 0 5px;
+		font-size: 9px;
+		font-weight: 700;
+		text-transform: uppercase;
+		letter-spacing: .3px;
+		border-radius: 999px;
+		background: #f3e8ff;
+		color: #86198f;
+	}
+	.dtb-repair-chat-text {
+		font-size: 12px;
+		line-height: 1.45;
+		color: #0f172a;
+		white-space: pre-wrap;
+	}
+	.dtb-repair-chat-compose {
+		display: grid;
+		gap: 8px;
+	}
+	.dtb-repair-chat-input {
+		width: 100%;
+		min-height: 78px;
+		padding: 8px 10px;
+		border: 1px solid #cbd5e1;
+		border-radius: 8px;
+		font-size: 13px;
+		line-height: 1.4;
+		resize: vertical;
+		box-sizing: border-box;
+	}
+	.dtb-repair-chat-input:focus {
+		outline: none;
+		border-color: #93c5fd;
+		box-shadow: 0 0 0 2px rgba(59,130,246,.15);
+	}
+	.dtb-repair-chat-actions {
+		display: flex;
+		align-items: center;
+		justify-content: flex-end;
+		gap: 8px;
+	}
+	.dtb-repair-chat-msg {
+		margin-right: auto;
+		font-size: 12px;
+		color: #64748b;
+	}
+	.dtb-repair-chat-msg.is-ok { color: #166534; }
+	.dtb-repair-chat-msg.is-err { color: #b91c1c; }
 
 	/* ── Integration status pills ───────────────────────────────────────────── */
 	.dtb-integration-row {
@@ -1519,6 +1688,10 @@ function dtb_repair_admin_hero_banner( WP_Post $post ): void {
 	$veeqo_state = $int_state['veeqo']['state'] ?? 'pending';
 	$qb_state    = $int_state['quickbooks']['state'] ?? 'pending';
 	$rw_state    = $int_state['rewards']['state'] ?? 'not_eligible';
+	$thread_alert_state = function_exists( 'dtb_repair_get_customer_message_alert_state' )
+		? dtb_repair_get_customer_message_alert_state( $repair_id, dtb_repair_get_customer_message_thread( $repair_id, 120 ) )
+		: [ 'unread_count' => 0 ];
+	$unread_customer_messages = (int) ( $thread_alert_state['unread_count'] ?? 0 );
 
 	$tool_desc   = trim( implode( ' — ', array_filter( [ $brand, $model ?: $category ] ) ) );
 	$submitted_fmt = $submitted ? date_i18n( 'M j, Y g:i a', strtotime( $submitted ) ) : '';
@@ -1595,6 +1768,9 @@ function dtb_repair_admin_hero_banner( WP_Post $post ): void {
 	<div id="dtb-repair-workspace-tabs" role="tablist" aria-label="Repair Workspace Tabs">
 		<button type="button" class="dtb-workspace-tab is-active" data-dtb-tab="order_details" role="tab" aria-selected="true">
 			Order Details
+			<?php if ( $unread_customer_messages > 0 ) : ?>
+				<span class="dtb-workspace-tab-badge"><?php echo esc_html( (string) $unread_customer_messages ); ?></span>
+			<?php endif; ?>
 		</button>
 		<button type="button" class="dtb-workspace-tab" data-dtb-tab="technician_details" role="tab" aria-selected="false">
 			Technician Details

@@ -651,9 +651,7 @@ add_action( 'dtb_ops_audit_purge', 'dtb_ops_purge_old_audit_entries' );
 // SECTION 10 — REST: dtb/v1/health
 // =============================================================================
 
-if ( dtb_is_rest_api_request() ) {
-	add_action( 'rest_api_init', 'dtb_ops_register_health_route' );
-}
+add_action( 'rest_api_init', 'dtb_ops_register_health_route' );
 
 /**
  * Register the public health-check REST endpoint.
