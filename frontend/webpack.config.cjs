@@ -162,8 +162,11 @@ module.exports = (envFlags, argv) => {
     output: {
       path:      outputPath,
       publicPath,
-      filename:  isDev ? 'assets/js/[name].js'         : 'assets/js/[name].[contenthash:8].js',
-      chunkFilename: isDev ? 'assets/js/[name].chunk.js' : 'assets/js/[name].[contenthash:8].chunk.js',
+      // Use stable JS entry/chunk names in production to avoid transient
+      // GitHub Pages 404s when a stale HTML shell references a previous
+      // content-hashed filename during edge/browser cache propagation.
+      filename:  'assets/js/[name].js',
+      chunkFilename: 'assets/js/[name].chunk.js',
       assetModuleFilename: 'assets/media/[name].[hash:8][ext]',
       clean: true,
     },
@@ -289,8 +292,9 @@ module.exports = (envFlags, argv) => {
 
       ...(!isDev ? [
         new MiniCssExtractPlugin({
-          filename:      'assets/css/[name].[contenthash:8].css',
-          chunkFilename: 'assets/css/[name].[contenthash:8].chunk.css',
+          // Keep CSS entry/chunk names stable for the same reason as JS.
+          filename:      'assets/css/[name].css',
+          chunkFilename: 'assets/css/[name].chunk.css',
         }),
 
         // ── Service Worker (Workbox GenerateSW) ─────────────────────────────

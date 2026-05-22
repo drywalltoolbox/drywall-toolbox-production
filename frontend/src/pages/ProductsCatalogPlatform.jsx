@@ -28,6 +28,7 @@ import {
   canonicalBrandLabel,
   parseCatalogQuery,
 } from '../utils/catalogUrlState.js';
+import { normalizeDisplayCategorySlug } from '../utils/catalogFacets.js';
 
 function toCardProduct(dto) {
   const card = dto?.cardProduct || null;
@@ -70,28 +71,40 @@ function toCardProduct(dto) {
   return mapped;
 }
 
-function mergeDisplayCategories(displayCategoriesByBrand = {}) {
+function canonicalCategoryKey(category = {}) {
+  const raw = category?.slug || category?.key || category?.label || category?.name || '';
+  return normalizeDisplayCategorySlug(raw);
+}
+
+function mergeCategoryEntries(items = []) {
   const merged = new Map();
-  Object.values(displayCategoriesByBrand || {}).forEach((items) => {
-    if (!Array.isArray(items)) return;
-    items.forEach((cat) => {
-      const id = cat?.slug || cat?.key;
-      if (!id) return;
-      const existing = merged.get(id);
-      merged.set(id, {
-        id,
-        key: cat.key || id,
-        slug: id,
-        name: cat.label || cat.key || id,
-        count: (existing?.count || 0) + (cat.productCount || 0),
-        image: existing?.image || cat.image || '',
-      });
+
+  (Array.isArray(items) ? items : []).forEach((cat) => {
+    const id = canonicalCategoryKey(cat);
+    if (!id) return;
+
+    const existing = merged.get(id);
+    merged.set(id, {
+      id,
+      key: cat?.key || existing?.key || id,
+      slug: cat?.slug || existing?.slug || id,
+      name: cat?.label || cat?.name || existing?.name || formatCategoryLabel(id),
+      count: (existing?.count || 0) + Number(cat?.productCount || cat?.count || 0),
+      image: existing?.image || cat?.image || '',
     });
   });
 
   return Array.from(merged.values())
     .filter((cat) => cat.count > 0)
     .sort((a, b) => a.name.localeCompare(b.name));
+}
+
+function mergeDisplayCategories(displayCategoriesByBrand = {}) {
+  const allCategories = [];
+  Object.values(displayCategoriesByBrand || {}).forEach((items) => {
+    if (Array.isArray(items)) allCategories.push(...items);
+  });
+  return mergeCategoryEntries(allCategories);
 }
 
 function toBrandFacet(rawBrand = {}) {
@@ -192,10 +205,7 @@ export default function ProductsCatalogPlatform({ forceProductGrid = false, titl
     if (selectedBrandFacet?.key) {
       const byBrand = facets.displayCategoriesByBrand?.[selectedBrandFacet.key] || facets.displayCategoriesByBrand?.[selectedBrandFacet.slug];
       if (!Array.isArray(byBrand)) return [];
-      return byBrand
-        .filter((cat) => (cat.productCount || 0) > 0)
-        .map((cat) => ({ id: cat.slug || cat.key, key: cat.key, slug: cat.slug || cat.key, name: cat.label || cat.key, count: cat.productCount || 0, image: cat.image || '' }))
-        .sort((a, b) => a.name.localeCompare(b.name));
+      return mergeCategoryEntries(byBrand);
     }
     return mergeDisplayCategories(facets.displayCategoriesByBrand);
   }, [facets, selectedBrandFacet]);
@@ -204,10 +214,7 @@ export default function ProductsCatalogPlatform({ forceProductGrid = false, titl
     if (!selectedBrandFacet?.key) return [];
     const byBrand = facets?.displayCategoriesByBrand?.[selectedBrandFacet.key] || facets?.displayCategoriesByBrand?.[selectedBrandFacet.slug];
     if (!Array.isArray(byBrand)) return [];
-    return [...byBrand]
-      .filter((cat) => (cat.productCount || 0) > 0)
-      .map((cat) => ({ key: cat.key, slug: cat.slug || cat.key, name: cat.label || cat.key, count: cat.productCount || 0, image: cat.image || '' }))
-      .sort((a, b) => a.name.localeCompare(b.name));
+    return mergeCategoryEntries(byBrand);
   }, [facets, selectedBrandFacet]);
 
   const selectedCategoryLabel = useMemo(() => {

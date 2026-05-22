@@ -128,15 +128,25 @@ createRoot(document.getElementById('root')).render(
 
 // ─── Service Worker registration (production only) ────────────────────────────
 // Deferred until after the 'load' event so the SW fetch does not compete with
-// critical resource loading or React hydration.  Only registered in production
-// builds because the GenerateSW plugin only emits service-worker.js then.
+// critical resource loading or React hydration.  On GitHub Pages we explicitly
+// unregister SWs to avoid stale cached shells referencing deleted hashed assets.
 if (process.env.NODE_ENV === 'production' && 'serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    const swUrl = process.env.PUBLIC_URL + '/service-worker.js';
-    navigator.serviceWorker
-      .register(swUrl)
-      .catch(() => {
-        // SW registration failures are non-fatal; log silently.
+  const isGithubPagesHost = typeof window !== 'undefined' && /\.github\.io$/i.test(window.location.hostname);
+
+  if (isGithubPagesHost) {
+    navigator.serviceWorker.getRegistrations().then((regs) => {
+      regs.forEach((reg) => {
+        reg.unregister();
       });
-  });
+    }).catch(() => {});
+  } else {
+    window.addEventListener('load', () => {
+      const swUrl = process.env.PUBLIC_URL + '/service-worker.js';
+      navigator.serviceWorker
+        .register(swUrl)
+        .catch(() => {
+          // SW registration failures are non-fatal; log silently.
+        });
+    });
+  }
 }
