@@ -13,8 +13,13 @@
  * Docs: https://github.com/woocommerce/woocommerce/tree/trunk/plugins/woocommerce/src/StoreApi
  */
 
+const runtimeHost = typeof window !== 'undefined' ? window.location.hostname : '';
+const runtimeOrigin = typeof window !== 'undefined' ? window.location.origin : '';
+const envApiBase = ( process.env.REACT_APP_API_BASE_URL || '' ).replace( /\/+$/, '' );
+const resolvedApiBase = envApiBase || ( /github\.io$/i.test( runtimeHost ) ? 'https://drywalltoolbox.com' : runtimeOrigin );
+
 const STORE_BASE =
-  ( process.env.REACT_APP_API_BASE_URL || '' ).replace( /\/+$/, '' ) +
+  resolvedApiBase.replace( /\/+$/, '' ) +
   ( process.env.REACT_APP_STORE_API_BASE || '/wp-json/wc/store/v1' );
 
 // Nonce stored at module scope — refreshed by initCart().

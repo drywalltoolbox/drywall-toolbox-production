@@ -8,8 +8,13 @@
  * idempotency must never live in the browser.
  */
 
+const runtimeHost = typeof window !== 'undefined' ? window.location.hostname : '';
+const runtimeOrigin = typeof window !== 'undefined' ? window.location.origin : '';
+const envApiBase = ( process.env.REACT_APP_API_BASE_URL || '' ).replace( /\/+$/, '' );
+const resolvedApiBase = envApiBase || ( /github\.io$/i.test( runtimeHost ) ? 'https://drywalltoolbox.com' : runtimeOrigin );
+
 const DTB_API_BASE =
-  ( process.env.REACT_APP_API_BASE_URL || '' ).replace( /\/+$/, '' ) +
+  resolvedApiBase.replace( /\/+$/, '' ) +
   ( process.env.REACT_APP_DTB_API_BASE || '/wp-json/dtb/v1' );
 
 async function dtbFetch( path, options = {} ) {
