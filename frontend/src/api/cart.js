@@ -367,7 +367,7 @@ export async function syncAndPlace(
   // Apply any coupon codes (e.g. loyalty redemption coupons).
   for ( const code of couponCodes ) {
     try {
-      await storeFetch( '/cart/apply-coupon', {
+      await storeFetch( '/cart/coupons', {
         method: 'POST',
         body: JSON.stringify( { code } ),
       } );

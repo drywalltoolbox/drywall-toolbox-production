@@ -116,12 +116,14 @@ export default function TrendingProducts() {
     if (variableIds.length === 0) return undefined;
 
     let mounted = true;
-    fetchVariationsBatched(variableIds, getProductVariations).then((pairs) => {
-      if (!mounted) return;
-      const next = {};
-      pairs.forEach(([id, vars]) => { next[id] = vars; });
-      setVariationMap((prev) => ({ ...prev, ...next }));
-    });
+    fetchVariationsBatched(variableIds, getProductVariations)
+      .then((pairs) => {
+        if (!mounted) return;
+        const next = {};
+        pairs.forEach(([id, vars]) => { next[id] = vars; });
+        setVariationMap((prev) => ({ ...prev, ...next }));
+      })
+      .catch(() => {});
 
     return () => { mounted = false; };
   }, [trendingVariableIdsKey]); // eslint-disable-line react-hooks/exhaustive-deps

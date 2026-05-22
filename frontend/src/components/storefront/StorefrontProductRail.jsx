@@ -99,12 +99,14 @@ export default function StorefrontProductRail({
     if (ids.length === 0) return;
 
     let mounted = true;
-    fetchVariationsBatched(ids, getProductVariations).then((pairs) => {
-      if (!mounted) return;
-      const next = {};
-      pairs.forEach(([id, vars]) => { next[id] = vars; });
-      setVariationMap((prev) => ({ ...prev, ...next }));
-    });
+    fetchVariationsBatched(ids, getProductVariations)
+      .then((pairs) => {
+        if (!mounted) return;
+        const next = {};
+        pairs.forEach(([id, vars]) => { next[id] = vars; });
+        setVariationMap((prev) => ({ ...prev, ...next }));
+      })
+      .catch(() => {});
 
     return () => { mounted = false; };
   }, [variableIdsKey]); // eslint-disable-line react-hooks/exhaustive-deps

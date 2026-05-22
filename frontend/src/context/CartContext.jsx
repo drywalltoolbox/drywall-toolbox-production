@@ -61,6 +61,10 @@ function normalizeStoreCart(cart) {
   return Array.isArray(cart?.items) ? cart.items.map(normalizeStoreCartItem) : [];
 }
 
+function asCartItems(value) {
+  return Array.isArray(value) ? value : [];
+}
+
 function buildStoreApiVariation(variationAttributeValues) {
   if (!Array.isArray(variationAttributeValues)) return {};
   return Object.fromEntries(
@@ -246,13 +250,14 @@ export function CartProvider({ children }) {
   }, [applyServerCart, cartItems]);
 
   const getCartTotal = useCallback(() => {
+    const safeItems = asCartItems(cartItems);
     const totalPrice = cart?.totals?.total_price;
     if (totalPrice != null) return parsePriceFromStoreApi(totalPrice);
-    return cartItems.reduce((total, item) => total + (item.price * item.quantity), 0);
+    return safeItems.reduce((total, item) => total + (item.price * item.quantity), 0);
   }, [cart, cartItems]);
 
   const getCartCount = useCallback(
-    () => cartItems.reduce((count, item) => count + item.quantity, 0),
+    () => asCartItems(cartItems).reduce((count, item) => count + item.quantity, 0),
     [cartItems]
   );
 

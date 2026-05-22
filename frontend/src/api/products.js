@@ -135,7 +135,7 @@ export async function getProductCategories( params = {} ) {
  * @returns {Promise<any>}
  */
 export async function fetchProductVariations( parentId, params = {} ) {
-  const qs = new URLSearchParams( { per_page: 100, ...params } ).toString();
+  const qs = new URLSearchParams( { per_page: 24, ...params } ).toString();
   return apiClient( `/wp-json/drywall/v1/products/${ encodeURIComponent( parentId ) }/variations?${ qs }` );
 }
 

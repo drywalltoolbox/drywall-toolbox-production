@@ -584,7 +584,7 @@ export const searchProducts = (searchTerm) =>
  * @returns {Promise<Array>}        Array of normalised variation objects
  */
 export const getProductVariations = (parentId) =>
-  apiClient(`/wp-json/drywall/v1/products/${encodeURIComponent(parentId)}/variations?${new URLSearchParams({ per_page: 100 }).toString()}`)
+  apiClient(`/wp-json/drywall/v1/products/${encodeURIComponent(parentId)}/variations?${new URLSearchParams({ per_page: 24 }).toString()}`)
     .then((list) => Array.isArray(list) ? list.map(normalizeProduct) : [])
     .catch(async (err) => {
       const status = Number(err?.status || 0);

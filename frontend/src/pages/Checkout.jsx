@@ -177,6 +177,7 @@ export default function Checkout() {
 
   const navigate = useNavigate();
   const { cartItems, getCartTotal, clearCart } = useCart();
+  const safeCartItems = Array.isArray( cartItems ) ? cartItems : [];
   const { showWorkflow, hideWorkflow } = useWorkflowTransition();
   const { user, isAuthenticated } = useAuthContext();
 
@@ -357,9 +358,9 @@ export default function Checkout() {
   // Re-fetch rates whenever the shipping address or cart contents change.
   useEffect( () => {
     if ( isAddressComplete ) {
-      fetchShippingRates( formData, cartItems );
+      fetchShippingRates( formData, safeCartItems );
     }
-  }, [ formData.address, formData.city, formData.state, formData.zip, formData.country, fetchShippingRates, cartItems ] ); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [ formData.address, formData.city, formData.state, formData.zip, formData.country, fetchShippingRates, safeCartItems ] ); // eslint-disable-line react-hooks/exhaustive-deps
   // ↑ formData is destructured so only address fields trigger (not every keystroke).
   //   cartItems identity changes on quantity updates which is intentional — different
   //   weights need fresh rates.
@@ -428,7 +429,7 @@ export default function Checkout() {
     const wcRateId = selectedRate ? `dtb_veeqo_rates:${ selectedRate.id }` : '';
 
     const wcOrder = await syncAndPlace(
-      cartItems,
+      safeCartItems,
       billingAddress,
       billingAddress,   // billing used as shipping; customer may update in WP account
       'stripe',
@@ -440,7 +441,7 @@ export default function Checkout() {
 
     wcOrderRef.current = wcOrder;
     setStep( 'placing' );
-  }, [ formData, cartItems, selectedRate, appliedCoupon ] ); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [ formData, safeCartItems, selectedRate, appliedCoupon ] ); // eslint-disable-line react-hooks/exhaustive-deps
 
   /**
    * Called by StripePaymentBlock after the Stripe SDK confirms payment successfully.
@@ -489,7 +490,7 @@ export default function Checkout() {
   const requiredMark = <span className="text-red-500 ml-0.5" aria-hidden="true">*</span>;
 
   // ── Empty cart guard ──────────────────────────────────────────────────────
-  if ( cartItems.length === 0 && ! orderComplete ) {
+  if ( safeCartItems.length === 0 && ! orderComplete ) {
     return (
       <Motion.div
         initial={ { opacity: 0, y: 20 } }
@@ -621,7 +622,7 @@ export default function Checkout() {
 
         <div className="lg:hidden mb-5">
           <OrderSummaryPanel
-            cartItems={ cartItems }
+            cartItems={ safeCartItems }
             subtotal={ subtotal }
             shipping={ shipping }
             tax={ tax }
@@ -913,7 +914,7 @@ export default function Checkout() {
           {/* ── Right column: sticky order summary ─────────────────────── */}
           <div className="hidden lg:block">
             <OrderSummaryPanel
-              cartItems={ cartItems }
+              cartItems={ safeCartItems }
               subtotal={ subtotal }
               shipping={ shipping }
               tax={ tax }
@@ -933,7 +934,7 @@ export default function Checkout() {
                    bg-white/95 backdrop-blur-sm border-t border-gray-100 px-4 py-3 shadow-xl"
       >
         <div className="flex justify-between items-center text-xs text-gray-500 mb-2.5 px-0.5">
-          <span>{ cartItems.length } item{ cartItems.length !== 1 ? 's' : '' }</span>
+          <span>{ safeCartItems.length } item{ safeCartItems.length !== 1 ? 's' : '' }</span>
           <span className="font-bold text-gray-900 tabular-nums text-sm">
             ${ total.toFixed( 2 ) }
           </span>
