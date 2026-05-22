@@ -18,9 +18,22 @@ const runtimeOrigin = typeof window !== 'undefined' ? window.location.origin : '
 const envApiBase = ( process.env.REACT_APP_API_BASE_URL || '' ).replace( /\/+$/, '' );
 const resolvedApiBase = envApiBase || ( /github\.io$/i.test( runtimeHost ) ? 'https://drywalltoolbox.com' : runtimeOrigin );
 
-const STORE_BASE =
-  resolvedApiBase.replace( /\/+$/, '' ) +
-  ( process.env.REACT_APP_STORE_API_BASE || '/wp-json/wc/store/v1' );
+const configuredStorePath = ( process.env.REACT_APP_STORE_API_BASE || '/wp-json/wc/store/v1' ).replace( /\/+$/, '' );
+
+function uniqueValues(values = []) {
+  return Array.from( new Set( values.filter( Boolean ) ) );
+}
+
+const STORE_BASE_CANDIDATES = uniqueValues( [
+  `${ resolvedApiBase.replace( /\/+$/, '' ) }${ configuredStorePath }`,
+  `${ resolvedApiBase.replace( /\/+$/, '' ) }/wp/wp-json/wc/store/v1`,
+] );
+
+let _activeStoreBaseIndex = 0;
+
+function currentStoreBase() {
+  return STORE_BASE_CANDIDATES[ _activeStoreBaseIndex ] || STORE_BASE_CANDIDATES[0] || '';
+}
 
 // Nonce stored at module scope — refreshed by initCart().
 let _storeNonce = '';
@@ -41,7 +54,7 @@ function updateStoreSessionHeaders( res ) {
 // ─── Fetch helper ─────────────────────────────────────────────────────────────
 
 async function storeFetch( path, options = {}, isRetry = false ) {
-  const url = `${ STORE_BASE }${ path }`;
+  const url = `${ currentStoreBase() }${ path }`;
   const headers = {
     'Content-Type': 'application/json',
     ...( _storeNonce ? { 'X-WC-Store-API-Nonce': _storeNonce } : {} ),
@@ -59,6 +72,13 @@ async function storeFetch( path, options = {}, isRetry = false ) {
   // 'X-WC-Store-API-Nonce'.  Capture it from every response so the
   // in-memory nonce stays fresh for subsequent mutations.
   updateStoreSessionHeaders( res );
+
+  // Some production hosts expose Store API under /wp/wp-json only.
+  // On first 404, flip base once and retry this exact request.
+  if ( res.status === 404 && ! isRetry && _activeStoreBaseIndex < STORE_BASE_CANDIDATES.length - 1 ) {
+    _activeStoreBaseIndex += 1;
+    return storeFetch( path, options, true );
+  }
 
   // 401 — refresh nonce via initCart() and retry once.
   if ( res.status === 401 ) {
@@ -96,13 +116,18 @@ async function storeFetch( path, options = {}, isRetry = false ) {
  * @returns {Promise<Object>}  WooCommerce cart object
  */
 export async function initCart() {
-  const url = `${ STORE_BASE }/cart`;
+  const url = `${ currentStoreBase() }/cart`;
   const res = await fetch( url, {
     credentials: 'include',
     headers: { 'Content-Type': 'application/json' },
   } );
 
   updateStoreSessionHeaders( res );
+
+  if ( res.status === 404 && _activeStoreBaseIndex < STORE_BASE_CANDIDATES.length - 1 ) {
+    _activeStoreBaseIndex += 1;
+    return initCart();
+  }
 
   if ( ! res.ok ) {
     throw new Error( `Store API error ${ res.status }: ${ url }` );
