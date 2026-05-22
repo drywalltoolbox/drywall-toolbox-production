@@ -113,9 +113,11 @@ module.exports = (envFlags, argv) => {
     // ─── Headless WooCommerce proxy (drywall/v1) ──────────────────────────────
     // Read from the environment-specific .env file loaded above.
     'process.env.REACT_APP_API_BASE_URL':               JSON.stringify(env('REACT_APP_API_BASE_URL')),
+    'process.env.REACT_APP_DTB_API_BASE':               JSON.stringify(env('REACT_APP_DTB_API_BASE')),
     'process.env.REACT_APP_STORE_API_BASE':             JSON.stringify(env('REACT_APP_STORE_API_BASE')),
     'process.env.REACT_APP_JWT_AUTH_ENDPOINT':          JSON.stringify(env('REACT_APP_JWT_AUTH_ENDPOINT')),
     'process.env.REACT_APP_ENV':                        JSON.stringify(env('REACT_APP_ENV')),
+    'process.env.REACT_APP_STRIPE_PUBLISHABLE_KEY':     JSON.stringify(env('REACT_APP_STRIPE_PUBLISHABLE_KEY')),
 
     // Build timestamp — set once at config evaluation time (not per-module).
     'process.env.BUILD_TIMESTAMP':                      JSON.stringify(new Date().toISOString()),
