@@ -87,6 +87,11 @@ function SkeletonRow() {
 // Sticky right-column panel that shows cart items, pricing totals, and a
 // skeleton loading state while the order is being processed.
 function OrderSummaryPanel( { cartItems, subtotal, shipping, tax, total, loading, className = '' } ) {
+  const toMoney = ( value ) => {
+    const n = Number( value );
+    return Number.isFinite( n ) ? n : 0;
+  };
+
   return (
     <StepCard delay={ 0.15 } className={ `overflow-hidden ${ className }` }>
       <div className="bg-slate-950 px-5 py-4 text-white">
@@ -120,7 +125,7 @@ function OrderSummaryPanel( { cartItems, subtotal, shipping, tax, total, loading
                     <p className="text-slate-400 text-xs mt-0.5">Qty { item.quantity }</p>
                   </div>
                   <p className="font-bold text-slate-950 shrink-0 tabular-nums">
-                    ${ ( item.price * item.quantity ).toFixed( 2 ) }
+                    ${ ( toMoney( item.price ) * toMoney( item.quantity ) ).toFixed( 2 ) }
                   </p>
                 </Motion.div>
               ) )
@@ -165,6 +170,11 @@ function OrderSummaryPanel( { cartItems, subtotal, shipping, tax, total, loading
 
 // ─── Main Checkout component ──────────────────────────────────────────────────
 export default function Checkout() {
+  const toMoney = useCallback( ( value ) => {
+    const n = Number( value );
+    return Number.isFinite( n ) ? n : 0;
+  }, [] );
+
   const navigate = useNavigate();
   const { cartItems, getCartTotal, clearCart } = useCart();
   const { showWorkflow, hideWorkflow } = useWorkflowTransition();
@@ -269,14 +279,14 @@ export default function Checkout() {
   const selectedRateRef = useRef( selectedRate );
   selectedRateRef.current = selectedRate;
 
-  const subtotal = getCartTotal();
+  const subtotal = toMoney( getCartTotal() );
   // Show shipping from the selected rate when available, otherwise fall back
   // to a provisional estimate matching the server-side tiered logic.
   const shipping = selectedRate
-    ? selectedRate.price
+    ? toMoney( selectedRate.price )
     : ( subtotal >= FREE_SHIP_THRESHOLD ? 0 : ESTIMATED_SHIP_RATE );
-  const tax   = subtotal * 0.08;
-  const total = subtotal + shipping + tax;
+  const tax   = toMoney( subtotal * 0.08 );
+  const total = toMoney( subtotal + shipping + tax );
 
   // True when all required fields have a non-empty value (used to activate
   // the mobile sticky CTA before full form validation runs on submit).
@@ -779,7 +789,7 @@ export default function Checkout() {
                         </div>
                       </div>
                       <span className="text-sm font-semibold text-gray-900 shrink-0">
-                        { rate.price === 0 ? 'Free' : `$${ rate.price.toFixed( 2 ) }` }
+                        { toMoney( rate.price ) === 0 ? 'Free' : `$${ toMoney( rate.price ).toFixed( 2 ) }` }
                       </span>
                     </label>
                   ) ) }
