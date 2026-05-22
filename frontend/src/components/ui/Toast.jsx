@@ -17,6 +17,7 @@
 import { useEffect, useCallback, useState } from 'react';
 import { motion as Motion, AnimatePresence } from 'framer-motion';
 import { X, CheckCircle, AlertCircle, Info, ShoppingCart, AlertTriangle } from 'lucide-react';
+import { createPortal } from 'react-dom';
 
 const CONFIG = {
   success: {
@@ -82,7 +83,7 @@ export default function Toast({ message, type = 'success', onClose, duration = 3
     return () => clearInterval(id);
   }, [duration]);
 
-  return (
+  const toastNode = (
     <Motion.div
       role="alert"
       aria-live="polite"
@@ -93,11 +94,10 @@ export default function Toast({ message, type = 'success', onClose, duration = 3
       transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
       style={{
         position: 'fixed',
-        top: '80px',
+        top: 'calc(var(--header-height, 70px) + 10px)',
         right: '16px',
         zIndex: 99999,
-        minWidth: '300px',
-        maxWidth: '420px',
+        width: 'min(420px, calc(100vw - 24px))',
         background: cfg.bg,
         borderRadius: '12px',
         boxShadow: '0 8px 30px rgba(15,23,42,0.14), 0 2px 8px rgba(15,23,42,0.06)',
@@ -179,4 +179,10 @@ export default function Toast({ message, type = 'success', onClose, duration = 3
       </div>
     </Motion.div>
   );
+
+  if (typeof document === 'undefined') {
+    return toastNode;
+  }
+
+  return createPortal(toastNode, document.body);
 }
