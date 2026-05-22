@@ -1,0 +1,80 @@
+﻿status,brand,schematic_id,model_number,model_name,catalog_sku,catalog_name,catalog_source
+catalog_exact_sku,Asgard,asgard-ah25-ad-sch,AH25AD,"Asgard Angle Head - 2.5""",AH25AD,"Asgard Angle Head - 2.5""",wc-product-export-current.csv
+catalog_exact_sku,Asgard,asgard-ah30-ad-sch,AH30AD,"Asgard Angle Head - 3""",AH30AD,"Asgard Angle Head - 3""",wc-product-export-current.csv
+catalog_exact_sku,Asgard,asgard-ah35-ad-sch,AH35AD,"Asgard Angle Head - 3.5""",AH35AD,"Asgard Angle Head - 3.5""",wc-product-export-current.csv
+catalog_exact_sku,Asgard,asgard-at01-ad-sch,AT01AD,Asgard The HAMMER™ Automatic Taper,AT01AD,Asgard The HAMMER™ Automatic Taper,wc-product-export-current.csv
+catalog_exact_sku,Asgard,asgard-bbh-ad-sch,BBHAD,"Asgard Brakeless Box Handle (Fixed Length) - 34""",BBHAD,"Asgard Brakeless Box Handle (Fixed Length) - 34""",wc-product-export-current.csv
+catalog_exact_sku,Asgard,asgard-bbhe-ad-sch,BBHEAD,Asgard Brakeless Box Extendable Handle - 38” - 60”,BBHEAD,Asgard Brakeless Box Extendable Handle - 38” - 60”,wc-product-export-current.csv
+catalog_exact_sku,Asgard,asgard-ca08-ad-sch,CA08AD,Asgard Applicator Box – Head Only,CA08AD,Asgard Applicator Box – Head Only,wc-product-export-current.csv
+catalog_exact_sku,Asgard,asgard-cfa-ad-sch,CFAAD,Asgard Angle Head Adapter,CFAAD,Asgard Angle Head Adapter,wc-product-export-current.csv
+catalog_exact_sku,Asgard,asgard-cr01-ad-sch,CR01AD,Asgard Inside Corner Roller – Head Only,CR01AD,Asgard Inside Corner Roller – Head Only,wc-product-export-current.csv
+catalog_exact_sku,Asgard,asgard-ehc07-ad-sch,EHC07AD,"Asgard MAXXBOX Finishing Box - 7""",EHC07AD,"Asgard MAXXBOX Finishing Box - 7""",wc-product-export-current.csv
+catalog_exact_sku,Asgard,asgard-ehc10-ad-sch,EHC10AD,"Asgard MAXXBOX Finishing Box - 10""",EHC10AD,"Asgard MAXXBOX Finishing Box - 10""",wc-product-export-current.csv
+catalog_exact_sku,Asgard,asgard-ehc12-ad-sch,EHC12AD,"Asgard MAXXBOX Finishing Box - 12""",EHC12AD,"Asgard MAXXBOX Finishing Box - 12""",wc-product-export-current.csv
+catalog_exact_sku,Asgard,asgard-ez07-ad-sch,EZ07AD,"Asgard Finishing Box - 7""",EZ07AD,"Asgard Finishing Box - 7""",wc-product-export-current.csv
+catalog_exact_sku,Asgard,asgard-ez10-ad-sch,EZ10AD,"Asgard Finishing Box - 10""",EZ10AD,"Asgard Finishing Box - 10""",wc-product-export-current.csv
+catalog_exact_sku,Asgard,asgard-ez12-ad-sch,EZ12AD,"Asgard Finishing Box - 12""",EZ12AD,"Asgard Finishing Box - 12""",wc-product-export-current.csv
+unmatched,Asgard,asgard-fa01-ad-sch,FA01-AD,Filler Adapter,,,
+catalog_exact_sku,Asgard,asgard-fbhe-ad-sch,FBHEAD,"Asgard Extendable Finishing Box Handle - 41"" - 63""",FBHEAD,"Asgard Extendable Finishing Box Handle - 41"" - 63""",wc-product-export-current.csv
+catalog_exact_sku,Asgard,asgard-fh-ad-sch,FHAD,"Asgard Fiberglass Handle - 43""",FHAD,"Asgard Fiberglass Handle - 43""",wc-product-export-current.csv
+catalog_exact_sku,Asgard,asgard-gn01-ad-sch,GN01AD,Asgard Gooseneck Adapter,GN01AD,Asgard Gooseneck Adapter,wc-product-export-current.csv
+catalog_exact_sku,Asgard,asgard-lp01-ad-sch,LP01AD,Asgard Loading Pump,LP01AD,Asgard Loading Pump,wc-product-export-current.csv
+catalog_exact_sku,Asgard,asgard-ns03-ad-sch,NS03AD,Asgard Nail Spotter – Head Only,NS03AD,Asgard Nail Spotter – Head Only,wc-product-export-current.csv
+catalog_exact_sku,Asgard,asgard-pa07-ad-sch,PA07AD,"Asgard Power Assist MAXXBOX Finishing Box - 7""",PA07AD,"Asgard Power Assist MAXXBOX Finishing Box - 7""",wc-product-export-current.csv
+catalog_exact_sku,Asgard,asgard-pa10-ad-sch,PA10AD,"Asgard Power Assist MAXXBOX Finishing Box - 10""",PA10AD,"Asgard Power Assist MAXXBOX Finishing Box - 10""",wc-product-export-current.csv
+catalog_exact_sku,Asgard,asgard-pa12-ad-sch,PA12AD,"Asgard Power Assist MAXXBOX Finishing Box - 12""",PA12AD,"Asgard Power Assist MAXXBOX Finishing Box - 12""",wc-product-export-current.csv
+catalog_exact_sku,Asgard,asgard-xh-ad-sch,XHAD,Asgard Extension Support Handle - 43” to 76”,XHAD,Asgard Extension Support Handle - 43” to 76”,wc-product-export-current.csv
+unmatched,Columbia Tools,columbia-180gripboxhandle-2014,180GripBoxHandle-2014,180GripBoxHandle 2014,,,
+unmatched,Columbia Tools,columbia-2-way-internal-corner-applicator-1,2-WAY-INTERNAL-CORNER-APPLICATOR-1,2 WAY INTERNAL CORNER APPLICATOR 1,,,
+unmatched,Columbia Tools,columbia-3-5inch-corner-flusher-schematic-2015,3.5INCH-CORNER-FLUSHER-SCHEMATIC-2015,3.5INCH CORNER FLUSHER SCHEMATIC 2015,,,
+unmatched,Columbia Tools,columbia-8-wheel-external-corner-applicator-1,8-WHEEL-EXTERNAL-CORNER-APPLICATOR-1,8 WHEEL EXTERNAL CORNER APPLICATOR 1,,,
+unmatched,Columbia Tools,columbia-anglehead-2014-3,AngleHead-2014-3,AngleHead 2014 3,,,
+unmatched,Columbia Tools,columbia-auto-box-schematic-2022,AUTO-BOX-SCHEMATIC-2022,AUTO BOX SCHEMATIC 2022,,,
+unmatched,Columbia Tools,columbia-box-filler,BOX-FILLER,BOX FILLER,,,
+unmatched,Columbia Tools,columbia-cam-lock-tube-2019,CAM-LOCK-TUBE-2019,CAM LOCK TUBE 2019,,,
+unmatched,Columbia Tools,columbia-classic-combo-flusher-1,CLASSIC-COMBO-FLUSHER-1,CLASSIC COMBO FLUSHER 1,,,
+unmatched,Columbia Tools,columbia-closetmonster-2015,ClosetMonster-2015,ClosetMonster 2015,,,
+unmatched,Columbia Tools,columbia-columbia-one,COLUMBIA-ONE,COLUMBIA ONE,,,
+unmatched,Columbia Tools,columbia-compound-tube-schematic-2022,COMPOUND-TUBE-SCHEMATIC-2022,COMPOUND TUBE SCHEMATIC 2022,,,
+unmatched,Columbia Tools,columbia-corner-box-schematic,CORNER-BOX-SCHEMATIC,CORNER BOX,,,
+unmatched,Columbia Tools,columbia-corner-cobra,CORNER-COBRA,CORNER COBRA,,,
+unmatched,Columbia Tools,columbia-directstandardflusher-2015,DirectStandardFlusher-2015,DirectStandardFlusher 2015,,,
+unmatched,Columbia Tools,columbia-extendable-handle,extendable-handle,extendable handle,,,
+unmatched,Columbia Tools,columbia-extension-housing-schematic-1,EXTENSION-HOUSING-SCHEMATIC-1,EXTENSION HOUSING SCHEMATIC 1,,,
+unmatched,Columbia Tools,columbia-fat-boy-box,FAT-BOY-BOX,FAT BOY BOX,,,
+unmatched,Columbia Tools,columbia-flat-box-hinged-schematic-2022,FLAT-BOX-HINGED-SCHEMATIC-2022,FLAT BOX HINGED SCHEMATIC 2022,,,
+unmatched,Columbia Tools,columbia-gooseneck-1-1,Gooseneck-1-1,Gooseneck 1 1,,,
+unmatched,Columbia Tools,columbia-ica1-2-2015,ICA1-2-2015,ICA1 2 2015,,,
+unmatched,Columbia Tools,columbia-ica1-4-2015,ICA1-4-2015,ICA1 4 2015,,,
+unmatched,Columbia Tools,columbia-insidecornerroller-2014-1-squared,INSIDECORNERROLLER-2014-1-SQUARED,INSIDECORNERROLLER 2014 1 SQUARED,,,
+unmatched,Columbia Tools,columbia-matrix-handle,MATRIX-HANDLE,MATRIX HANDLE,,,
+unmatched,Columbia Tools,columbia-matrix-head,MATRIX-HEAD,MATRIX HEAD,,,
+unmatched,Columbia Tools,columbia-matrix-lever-1,MATRIX-LEVER-1,MATRIX LEVER 1,,,
+unmatched,Columbia Tools,columbia-matrix-pinchbox-1,MATRIX-PINCHBOX-1,MATRIX PINCHBOX 1,,,
+unmatched,Columbia Tools,columbia-mud-pump-schematic-2022,MUD-PUMP-SCHEMATIC-2022,MUD PUMP SCHEMATIC 2022,,,
+unmatched,Columbia Tools,columbia-nail-spotter-schematic-2022,NAIL-SPOTTER-SCHEMATIC-2022,NAIL SPOTTER SCHEMATIC 2022,,,
+unmatched,Columbia Tools,columbia-outsidecornerrollers-2016-1,OutsideCornerRollers-2016-1,OutsideCornerRollers 2016 1,,,
+unmatched,Columbia Tools,columbia-predator-taper-body,PREDATOR-TAPER-BODY,PREDATOR TAPER BODY,,,
+unmatched,Columbia Tools,columbia-predator-taper-head,PREDATOR-TAPER-HEAD,PREDATOR TAPER HEAD,,,
+unmatched,Columbia Tools,columbia-sander-head-schematic,SANDER-HEAD-SCHEMATIC,SANDER HEAD,,,
+unmatched,Columbia Tools,columbia-semi-automatic-taper-schematic-2022,SEMI-AUTOMATIC-TAPER-SCHEMATIC-2022,SEMI AUTOMATIC TAPER SCHEMATIC 2022,,,
+unmatched,Columbia Tools,columbia-tall-boy-mud-pump-schematic-2022,TALL-BOY-MUD-PUMP-SCHEMATIC-2022,TALL BOY MUD PUMP SCHEMATIC 2022,,,
+unmatched,Columbia Tools,columbia-tomahawk-schematic-2022,TOMAHAWK-SCHEMATIC-2022,TOMAHAWK SCHEMATIC 2022,,,
+unmatched,Platinum Drywall Tools,platinum-platinum-corner-roller-handle-page-001,PLATINUM-CORNER-ROLLER-HANDLE-PAGE-001,PLATINUM CORNER ROLLER HANDLE PAGE 001,,,
+unmatched,Platinum Drywall Tools,platinum-flat-box,PLATINUM-FLAT-BOX-SCH,Flat Box,,,
+unmatched,Platinum Drywall Tools,platinum-outside-corner-roller,PLATINUM-OUTSIDE-CORNERROLLER-SCH,Outside Corner Roller,,,
+unmatched,Platinum Drywall Tools,platinum-compound-pump,PT-COMPOUND-PUMP-SCH,Compound Pump,,,
+unmatched,TapeTech,tapetech-07tt-sch-v11,07TT-SCH-V11,07TT SCH V11,,,
+unmatched,TapeTech,tapetech-17tt-sch,17TT-SCH,17TT SCH,,,
+unmatched,TapeTech,tapetech-20ttx-sch,20TTX-SCH,20TTX SCH,,,
+unmatched,TapeTech,tapetech-25ttx-sch,25TTX-SCH,25TTX SCH,,,
+unmatched,TapeTech,tapetech-30ttx-sch,30TTX-SCH,30TTX SCH,,,
+unmatched,TapeTech,tapetech-35tt-sch,35TT-SCH,35TT SCH,,,
+unmatched,TapeTech,tapetech-40tt-sch,40TT-SCH,40TT SCH,,,
+unmatched,TapeTech,tapetech-42tt-sch,42TT-SCH,42TT SCH,,,
+unmatched,TapeTech,tapetech-45tt-sch,45TT-SCH,45TT SCH,,,
+unmatched,TapeTech,tapetech-48tt-sch,48TT-SCH,48TT SCH,,,
+unmatched,TapeTech,tapetech-50tt-sch,50TT-SCH,50TT SCH,,,
+unmatched,TapeTech,tapetech-63tt-sch,63TT-SCH,63TT SCH,,,
+unmatched,TapeTech,tapetech-68tt-sch,68TT-SCH,68TT SCH,,,
+unmatched,TapeTech,tapetech-8054tt-sch,8054TT-SCH,8054TT SCH,,,

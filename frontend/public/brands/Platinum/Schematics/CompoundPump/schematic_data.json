@@ -1,15 +1,15 @@
 {
-  "id": "platinum-compound-pump",
-  "title": "PT-Compound-Pump_SCH",
-  "product_name": "Compound Pump",
-  "sku": "",
-  "diagramPages": [
-    1
-  ],
-  "legendPages": [],
-  "parts": [],
-  "coordinates": {},
-  "schema_version": "1.0",
-  "image_natural_width": 1200,
-  "image_natural_height": 896
+    "id": "platinum-drywall-pump-w-filler-sch",
+    "title": "PT-COMPOUND-PUMP-SCH",
+    "product_name": "Platinum Drywall Pump w/Filler",
+    "sku": "PTCP",
+    "diagramPages": [
+        1
+    ],
+    "legendPages": [],
+    "parts": [],
+    "coordinates": {},
+    "schema_version": "1.0",
+    "image_natural_width": 1200,
+    "image_natural_height": 896
 }

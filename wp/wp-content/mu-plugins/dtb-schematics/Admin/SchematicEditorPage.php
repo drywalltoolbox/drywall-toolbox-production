@@ -214,9 +214,32 @@ function dtb_schematics_render_page() {
 			</div>
 
 			<div class="dtb-card" style="max-width:760px;">
+				<h3 style="margin-top:0;">Import Preflight</h3>
+				<p style="font-size:13px;color:#787c82;margin-top:0;">Validate staged-folder readiness and estimate CSV token match coverage before running import.</p>
+				<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+					<button id="dtb-btn-preflight" class="dtb-btn dtb-btn-secondary">
+						<span class="dashicons dashicons-yes-alt" style="font-size:15px;"></span> Run Preflight
+					</button>
+					<span id="dtb-preflight-spinner" style="display:none;"><span class="spinner is-active" style="float:none;margin:0;"></span></span>
+				</div>
+				<pre id="dtb-preflight-output" style="display:none;margin-top:12px;background:#f6f7f7;border:1px solid #dcdcde;padding:10px;border-radius:4px;white-space:pre-wrap;"></pre>
+			</div>
+
+			<div class="dtb-card" style="max-width:760px;">
 				<h3 style="margin-top:0;">Bulk Import (CSV)</h3>
-				<p style="font-size:13px;color:#787c82;margin-top:0;">Required columns: <code>schematic_id</code>, <code>brand</code>, <code>model_number</code>. Optional: <code>attachment_id</code>, <code>model_name</code>, <code>part_count</code>, <code>notes</code>, <code>product_ids</code>. If <code>attachment_id</code> is missing/blank, upload an optional ZIP and importer will auto-match and create Media Library attachments.</p>
+				<p style="font-size:13px;color:#787c82;margin-top:0;">Required columns: <code>schematic_id</code>, <code>brand</code>, <code>model_number</code>. Optional: <code>attachment_id</code>, <code>model_name</code>, <code>part_count</code>, <code>notes</code>, <code>product_ids</code>. If <code>attachment_id</code> is missing/blank, use staged uploads folder matching (recommended) or upload a ZIP.</p>
 				<input type="file" id="dtb-import-file" accept=".csv,text/csv">
+				<div style="margin-top:10px;">
+					<label for="dtb-import-staged-folder" style="display:block;font-size:12px;font-weight:600;margin-bottom:4px;color:#3c434a;">Staged Uploads Folder (recommended)</label>
+					<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+						<input type="text" id="dtb-import-staged-folder" class="dtb-input" value="2026/schematics" style="min-width:260px;" />
+						<button id="dtb-register-staged-images" class="dtb-btn dtb-btn-secondary">
+							<span class="dashicons dashicons-images-alt2" style="font-size:15px;"></span> Register staged images
+						</button>
+						<span id="dtb-register-staged-spinner" style="display:none;"><span class="spinner is-active" style="float:none;margin:0;"></span></span>
+					</div>
+					<div id="dtb-register-staged-msg" style="margin-top:6px;font-size:12px;color:#787c82;">Registers files from <code>wp-content/uploads/&lt;folder&gt;</code> into Media Library for fast CSV matching.</div>
+				</div>
 				<div style="margin-top:10px;">
 					<label for="dtb-import-images-zip" style="display:block;font-size:12px;font-weight:600;margin-bottom:4px;color:#3c434a;">Optional Schematics Images ZIP</label>
 					<input type="file" id="dtb-import-images-zip" accept=".zip,application/zip,application/x-zip-compressed">
@@ -607,9 +630,124 @@ function dtb_schematics_render_page() {
 			});
 		});
 
+		function registerStagedImages(folderRel, done) {
+			var offset = 0;
+			var batchSize = 25;
+			$('#dtb-register-staged-spinner').show();
+			$('#dtb-register-staged-msg').text('Registering staged images…').css('color', '#1d6fa4');
+
+			function tick() {
+				$.post(ajaxurl, {
+					action: 'dtb_schematics_register_staged_images',
+					nonce: nonce,
+					staged_folder: folderRel,
+					offset: offset,
+					batch_size: batchSize
+				}, function(res){
+					if (!res || !res.success) {
+						$('#dtb-register-staged-spinner').hide();
+						var msg = (res && res.data && res.data.message) ? res.data.message : 'Register staged images failed.';
+						$('#dtb-register-staged-msg').text('✗ ' + msg).css('color', '#d63638');
+						if (done) done(false);
+						return;
+					}
+
+					var d = res.data || {};
+					offset = parseInt(d.next_offset || 0, 10);
+					$('#dtb-register-staged-msg').text(d.message || ('Registered ' + (d.processed || 0) + '/' + (d.total || 0))).css('color', '#1d6fa4');
+					if (!d.done) {
+						tick();
+						return;
+					}
+
+					$('#dtb-register-staged-spinner').hide();
+					$('#dtb-register-staged-msg').text('✓ ' + (d.message || 'Staged images registered.')).css('color', '#1a7f37');
+					if (done) done(true);
+				}).fail(function(){
+					$('#dtb-register-staged-spinner').hide();
+					$('#dtb-register-staged-msg').text('✗ Register staged images request failed.').css('color', '#d63638');
+					if (done) done(false);
+				});
+			}
+
+			tick();
+		}
+
+		$('#dtb-register-staged-images').on('click', function(){
+			var folderRel = ($('#dtb-import-staged-folder').val() || '2026/schematics').trim();
+			registerStagedImages(folderRel);
+		});
+
+		$('#dtb-btn-preflight').on('click', function(){
+			var fileInput = document.getElementById('dtb-import-file');
+			if (!fileInput || !fileInput.files || !fileInput.files.length) {
+				alert('Select a CSV file first for preflight.');
+				return;
+			}
+			var stagedFolder = ($('#dtb-import-staged-folder').val() || '2026/schematics').trim();
+			var $btn = $(this);
+			$btn.prop('disabled', true);
+			$('#dtb-preflight-spinner').show();
+			$('#dtb-preflight-output').hide().text('');
+
+			var formData = new FormData();
+			formData.append('action', 'dtb_schematics_import_preflight');
+			formData.append('nonce', nonce);
+			formData.append('staged_folder', stagedFolder);
+			formData.append('file', fileInput.files[0]);
+
+			$.ajax({
+				url: ajaxurl,
+				type: 'POST',
+				data: formData,
+				processData: false,
+				contentType: false,
+				timeout: 120000
+			}).done(function(res){
+				$btn.prop('disabled', false);
+				$('#dtb-preflight-spinner').hide();
+				if (!res || !res.success) {
+					var msg = (res && res.data && res.data.message) ? res.data.message : 'Preflight failed.';
+					$('#dtb-preflight-output').show().text(msg);
+					return;
+				}
+				var d = res.data || {};
+				var lines = [
+					'Staged folder: ' + (d.staged_folder || stagedFolder),
+					'Files found in staged folder: ' + (d.files_found || 0),
+					'Attachments registered: ' + (d.attachments_registered || 0),
+					'CSV rows: ' + (d.csv_total_rows || 0),
+					'Token-matched rows: ' + (d.matched_rows || 0),
+					'Unmatched rows: ' + (d.unmatched_rows || 0),
+					'Coverage: ' + (d.coverage_pct || 0) + '%',
+					'',
+					(d.message || 'Preflight complete.')
+				];
+				var examples = d.unmatched_examples || [];
+				if (examples.length) {
+					lines.push('');
+					lines.push('Unmatched examples (first ' + examples.length + '):');
+					examples.forEach(function(ex){
+						lines.push(
+							'Line ' + ex.csv_line +
+							' | sid=' + (ex.schematic_id || '') +
+							' | model=' + (ex.model_number || '') +
+							' | name=' + (ex.model_name || '')
+						);
+					});
+				}
+				$('#dtb-preflight-output').show().text(lines.join('\n'));
+			}).fail(function(xhr, textStatus){
+				$btn.prop('disabled', false);
+				$('#dtb-preflight-spinner').hide();
+				$('#dtb-preflight-output').show().text('Preflight request failed (' + (xhr.status || textStatus || 'network') + ').');
+			});
+		});
+
 		$('#dtb-btn-import').on('click', function(){
 			var fileInput = document.getElementById('dtb-import-file');
 			var zipInput = document.getElementById('dtb-import-images-zip');
+			var stagedFolder = ($('#dtb-import-staged-folder').val() || '2026/schematics').trim();
 			if (!fileInput || !fileInput.files || !fileInput.files.length) {
 				alert('Please select a CSV file first.');
 				return;
@@ -626,11 +764,15 @@ function dtb_schematics_render_page() {
 			formData.append('nonce', nonce);
 			formData.append('file', fileInput.files[0]);
 			if (zipInput && zipInput.files && zipInput.files.length) {
+				formData.append('image_source', 'zip');
 				formData.append('images_zip', zipInput.files[0]);
+			} else {
+				formData.append('image_source', 'staged');
+				formData.append('staged_folder', stagedFolder);
 			}
 
-			var initialBatchSize = 50;
-			var batchSizeTiers = [50, 35, 25];
+			var initialBatchSize = 10;
+			var batchSizeTiers = [10, 6, 3];
 			var maxTimeoutRetriesPerBatch = 3;
 
 			function nextBatchSizeFromTimeout(currentSize) {

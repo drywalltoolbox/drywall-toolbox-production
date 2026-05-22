@@ -1,481 +1,481 @@
 {
-    "id":  "tapetech-45tt-sch",
-    "title":  "45TT_SCH",
-    "diagramPages":  [
-                         1
-                     ],
-    "legendPages":  [
-
-                    ],
-    "parts":  [
-                  {
-                      "id":  "10",
-                      "name":  "6-32 X 1/2 FILLISTER HEAD SCREW SST",
-                      "quantity":  1,
-                      "sku":  "",
-                      "source_sku":  "059091"
-                  },
-                  {
-                      "id":  "6",
-                      "name":  "SPRING RETAINER",
-                      "quantity":  1,
-                      "sku":  "",
-                      "source_sku":  "402002F"
-                  },
-                  {
-                      "id":  "11",
-                      "name":  "RETAINER SPRING",
-                      "quantity":  1,
-                      "sku":  "",
-                      "source_sku":  "409010"
-                  },
-                  {
-                      "id":  "9",
-                      "name":  "9",
-                      "quantity":  1,
-                      "sku":  "",
-                      "source_sku":  "9"
-                  },
-                  {
-                      "id":  "12",
-                      "name":  "CENTER CLIP",
-                      "quantity":  1,
-                      "sku":  "",
-                      "source_sku":  "402017F"
-                  },
-                  {
-                      "id":  "13",
-                      "name":  "8-32 X 1/4 SETSCREW 1/2 DOG SST",
-                      "quantity":  2,
-                      "sku":  "",
-                      "source_sku":  "059084"
-                  },
-                  {
-                      "id":  "7",
-                      "name":  "3\" HEAD",
-                      "quantity":  1,
-                      "sku":  "",
-                      "source_sku":  "456001"
-                  },
-                  {
-                      "id":  "5",
-                      "name":  "BLADE TENSION SPR.",
-                      "quantity":  1,
-                      "sku":  "",
-                      "source_sku":  "450005"
-                  },
-                  {
-                      "id":  "4",
-                      "name":  "BLADE TENSION SPRG",
-                      "quantity":  1,
-                      "sku":  "",
-                      "source_sku":  "450021"
-                  },
-                  {
-                      "id":  "3",
-                      "name":  "FRAME, LEFT",
-                      "quantity":  1,
-                      "sku":  "",
-                      "source_sku":  "454015"
-                  },
-                  {
-                      "id":  "2",
-                      "name":  "4-40X1/8 SET SCREW",
-                      "quantity":  12,
-                      "sku":  "",
-                      "source_sku":  "409013"
-                  },
-                  {
-                      "id":  "19",
-                      "name":  "BLADE HOLDER STOP",
-                      "quantity":  2,
-                      "sku":  "",
-                      "source_sku":  "402019"
-                  },
-                  {
-                      "id":  "14",
-                      "name":  "CENTER CLIP ASSY",
-                      "quantity":  1,
-                      "sku":  "",
-                      "source_sku":  "404014F"
-                  },
-                  {
-                      "id":  "2",
-                      "name":  "4-40X1/8 SET SCREW",
-                      "quantity":  12,
-                      "sku":  "",
-                      "source_sku":  "409013"
-                  },
-                  {
-                      "id":  "20",
-                      "name":  "INSERT SOCKET",
-                      "quantity":  1,
-                      "sku":  "",
-                      "source_sku":  "402006"
-                  },
-                  {
-                      "id":  "8",
-                      "name":  "6-32 X 1/4 BIND HEAD SCREW SST",
-                      "quantity":  2,
-                      "sku":  "",
-                      "source_sku":  "359005"
-                  },
-                  {
-                      "id":  "18",
-                      "name":  "4-40 X 3/16 BIND HEAD SCREW SST",
-                      "quantity":  4,
-                      "sku":  "",
-                      "source_sku":  "059057"
-                  },
-                  {
-                      "id":  "15",
-                      "name":  "BLADE, CARBIDE",
-                      "quantity":  2,
-                      "sku":  "",
-                      "source_sku":  "450009F"
-                  },
-                  {
-                      "id":  "16",
-                      "name":  "SKID",
-                      "quantity":  2,
-                      "sku":  "",
-                      "source_sku":  "409011"
-                  },
-                  {
-                      "id":  "17",
-                      "name":  "FRAME, RIGHT",
-                      "quantity":  1,
-                      "sku":  "",
-                      "source_sku":  "454016"
-                  }
-              ],
-    "coordinates":  {
-                        "359005":  {
-                                       "id":  "359005",
-                                       "x_px":  null,
-                                       "y_px":  null,
-                                       "x_pct":  69.59596,
-                                       "y_pct":  48.99695,
-                                       "shape":  "rectangle",
-                                       "pageNumber":  1,
-                                       "rotation":  0,
-                                       "widthPx":  100,
-                                       "heightPx":  40
-                                   },
-                        "402006":  {
-                                       "id":  "402006",
-                                       "x_px":  null,
-                                       "y_px":  null,
-                                       "x_pct":  66.464646,
-                                       "y_pct":  43.628758,
-                                       "shape":  "rectangle",
-                                       "pageNumber":  1,
-                                       "rotation":  0,
-                                       "widthPx":  100,
-                                       "heightPx":  40
-                                   },
-                        "402012":  {
-                                       "id":  "402012",
-                                       "x_px":  null,
-                                       "y_px":  null,
-                                       "x_pct":  37.828283,
-                                       "y_pct":  23.620044,
-                                       "shape":  "rectangle",
-                                       "pageNumber":  1,
-                                       "rotation":  0,
-                                       "widthPx":  100,
-                                       "heightPx":  40
-                                   },
-                        "409010":  {
-                                       "id":  "409010",
-                                       "x_px":  null,
-                                       "y_px":  null,
-                                       "x_pct":  37.272727,
-                                       "y_pct":  17.37342,
-                                       "shape":  "rectangle",
-                                       "pageNumber":  1,
-                                       "rotation":  0,
-                                       "widthPx":  100,
-                                       "heightPx":  40
-                                   },
-                        "409011":  {
-                                       "id":  "409011",
-                                       "x_px":  null,
-                                       "y_px":  null,
-                                       "x_pct":  40.808081,
-                                       "y_pct":  71.445752,
-                                       "shape":  "rectangle",
-                                       "pageNumber":  1,
-                                       "rotation":  0,
-                                       "widthPx":  100,
-                                       "heightPx":  40
-                                   },
-                        "480005":  {
-                                       "id":  "480005",
-                                       "x_px":  null,
-                                       "y_px":  null,
-                                       "x_pct":  56.616162,
-                                       "y_pct":  33.33159,
-                                       "shape":  "rectangle",
-                                       "pageNumber":  1,
-                                       "rotation":  0,
-                                       "widthPx":  100,
-                                       "heightPx":  40
-                                   },
-                        "480021":  {
-                                       "id":  "480021",
-                                       "x_px":  null,
-                                       "y_px":  null,
-                                       "x_pct":  50.252525,
-                                       "y_pct":  32.160349,
-                                       "shape":  "rectangle",
-                                       "pageNumber":  1,
-                                       "rotation":  0,
-                                       "widthPx":  100,
-                                       "heightPx":  40
-                                   },
-                        "480026":  {
-                                       "id":  "480026",
-                                       "x_px":  null,
-                                       "y_px":  null,
-                                       "x_pct":  17.474747,
-                                       "y_pct":  71.738562,
-                                       "shape":  "rectangle",
-                                       "pageNumber":  1,
-                                       "rotation":  0,
-                                       "widthPx":  100,
-                                       "heightPx":  40
-                                   },
-                        "480027":  {
-                                       "id":  "480027",
-                                       "x_px":  null,
-                                       "y_px":  null,
-                                       "x_pct":  31.363636,
-                                       "y_pct":  70.469717,
-                                       "shape":  "rectangle",
-                                       "pageNumber":  1,
-                                       "rotation":  0,
-                                       "widthPx":  100,
-                                       "heightPx":  40
-                                   },
-                        "489013":  {
-                                       "id":  "489013",
-                                       "x_px":  null,
-                                       "y_px":  null,
-                                       "x_pct":  64.494949,
-                                       "y_pct":  38.894989,
-                                       "shape":  "rectangle",
-                                       "pageNumber":  1,
-                                       "rotation":  0,
-                                       "widthPx":  100,
-                                       "heightPx":  40
-                                   },
-                        "489020":  {
-                                       "id":  "489020",
-                                       "x_px":  null,
-                                       "y_px":  null,
-                                       "x_pct":  54.89899,
-                                       "y_pct":  57.878867,
-                                       "shape":  "rectangle",
-                                       "pageNumber":  1,
-                                       "rotation":  0,
-                                       "widthPx":  100,
-                                       "heightPx":  40
-                                   },
-                        "489022":  {
-                                       "id":  "489022",
-                                       "x_px":  null,
-                                       "y_px":  null,
-                                       "x_pct":  43.787879,
-                                       "y_pct":  36.064488,
-                                       "shape":  "rectangle",
-                                       "pageNumber":  1,
-                                       "rotation":  0,
-                                       "widthPx":  100,
-                                       "heightPx":  40
-                                   },
-                        "489023":  {
-                                       "id":  "489023",
-                                       "x_px":  null,
-                                       "y_px":  null,
-                                       "x_pct":  14.191919,
-                                       "y_pct":  63.051852,
-                                       "shape":  "rectangle",
-                                       "pageNumber":  1,
-                                       "rotation":  0,
-                                       "widthPx":  100,
-                                       "heightPx":  40
-                                   },
-                        "489029":  {
-                                       "id":  "489029",
-                                       "x_px":  null,
-                                       "y_px":  null,
-                                       "x_pct":  40.252525,
-                                       "y_pct":  77.497168,
-                                       "shape":  "rectangle",
-                                       "pageNumber":  1,
-                                       "rotation":  0,
-                                       "widthPx":  100,
-                                       "heightPx":  40
-                                   },
-                        "059091":  {
-                                       "id":  "059091",
-                                       "x_px":  null,
-                                       "y_px":  null,
-                                       "x_pct":  22.727273,
-                                       "y_pct":  15.226144,
-                                       "shape":  "rectangle",
-                                       "pageNumber":  1,
-                                       "rotation":  0,
-                                       "widthPx":  100,
-                                       "heightPx":  40
-                                   },
-                        "402002F":  {
-                                        "id":  "402002F",
-                                        "x_px":  null,
-                                        "y_px":  null,
-                                        "x_pct":  22.979798,
-                                        "y_pct":  21.521569,
-                                        "shape":  "rectangle",
-                                        "pageNumber":  1,
-                                        "rotation":  0,
-                                        "widthPx":  100,
-                                        "heightPx":  40
-                                    },
-                        "480002F":  {
-                                        "id":  "480002F",
-                                        "x_px":  null,
-                                        "y_px":  null,
-                                        "x_pct":  38.839496,
-                                        "y_pct":  28.56854,
-                                        "shape":  "rectangle",
-                                        "pageNumber":  1,
-                                        "rotation":  0,
-                                        "widthPx":  100,
-                                        "heightPx":  40
-                                    },
-                        "480008F":  {
-                                        "id":  "480008F",
-                                        "x_px":  null,
-                                        "y_px":  null,
-                                        "x_pct":  40.454545,
-                                        "y_pct":  31.086723,
-                                        "shape":  "rectangle",
-                                        "pageNumber":  1,
-                                        "rotation":  0,
-                                        "widthPx":  100,
-                                        "heightPx":  40
-                                    },
-                        "480017E":  {
-                                        "id":  "480017E",
-                                        "x_px":  null,
-                                        "y_px":  null,
-                                        "x_pct":  20.30303,
-                                        "y_pct":  36.845316,
-                                        "shape":  "rectangle",
-                                        "pageNumber":  1,
-                                        "rotation":  0,
-                                        "widthPx":  100,
-                                        "heightPx":  40
-                                    },
-                        "059084":  {
-                                       "id":  "059084",
-                                       "x_px":  null,
-                                       "y_px":  null,
-                                       "x_pct":  15.707071,
-                                       "y_pct":  42.652723,
-                                       "shape":  "rectangle",
-                                       "pageNumber":  1,
-                                       "rotation":  0,
-                                       "widthPx":  100,
-                                       "heightPx":  40
-                                   },
-                        "480001F":  {
-                                        "id":  "480001F",
-                                        "x_px":  null,
-                                        "y_px":  null,
-                                        "x_pct":  43.939394,
-                                        "y_pct":  33.233987,
-                                        "shape":  "rectangle",
-                                        "pageNumber":  1,
-                                        "rotation":  0,
-                                        "widthPx":  100,
-                                        "heightPx":  40
-                                    },
-                        "480015F":  {
-                                        "id":  "480015F",
-                                        "x_px":  null,
-                                        "y_px":  null,
-                                        "x_pct":  61.515152,
-                                        "y_pct":  35.430065,
-                                        "shape":  "rectangle",
-                                        "pageNumber":  1,
-                                        "rotation":  0,
-                                        "widthPx":  100,
-                                        "heightPx":  40
-                                    },
-                        "480007F":  {
-                                        "id":  "480007F",
-                                        "x_px":  null,
-                                        "y_px":  null,
-                                        "x_pct":  41.313131,
-                                        "y_pct":  58.854902,
-                                        "shape":  "rectangle",
-                                        "pageNumber":  1,
-                                        "rotation":  0,
-                                        "widthPx":  100,
-                                        "heightPx":  40
-                                    },
-                        "059037":  {
-                                       "id":  "059037",
-                                       "x_px":  null,
-                                       "y_px":  null,
-                                       "x_pct":  42.020202,
-                                       "y_pct":  65.638344,
-                                       "shape":  "rectangle",
-                                       "pageNumber":  1,
-                                       "rotation":  0,
-                                       "widthPx":  100,
-                                       "heightPx":  40
-                                   },
-                        "450009F":  {
-                                        "id":  "450009F",
-                                        "x_px":  null,
-                                        "y_px":  null,
-                                        "x_pct":  48.282828,
-                                        "y_pct":  69.44488,
-                                        "shape":  "rectangle",
-                                        "pageNumber":  1,
-                                        "rotation":  0,
-                                        "widthPx":  100,
-                                        "heightPx":  40
-                                    },
-                        "480016F":  {
-                                        "id":  "480016F",
-                                        "x_px":  null,
-                                        "y_px":  null,
-                                        "x_pct":  48.232323,
-                                        "y_pct":  79.302832,
-                                        "shape":  "rectangle",
-                                        "pageNumber":  1,
-                                        "rotation":  0,
-                                        "widthPx":  100,
-                                        "heightPx":  40
-                                    },
-                        "484014F":  {
-                                        "id":  "484014F",
-                                        "x_px":  null,
-                                        "y_px":  null,
-                                        "x_pct":  20.959596,
-                                        "y_pct":  75.740305,
-                                        "shape":  "rectangle",
-                                        "pageNumber":  1,
-                                        "rotation":  0,
-                                        "widthPx":  100,
-                                        "heightPx":  40
-                                    }
-                    },
-    "schema_version":  "1.0",
-    "image_natural_width":  2400,
-    "image_natural_height":  1792
+    "id": "tapetech-90-inside-corner-edger-tapetech-45tt-sch",
+    "title": "45TT-SCH",
+    "diagramPages": [
+        1
+    ],
+    "legendPages": [],
+    "parts": [
+        {
+            "id": "10",
+            "name": "6-32 X 1/2 FILLISTER HEAD SCREW SST",
+            "quantity": 1,
+            "sku": "",
+            "source_sku": "059091"
+        },
+        {
+            "id": "6",
+            "name": "SPRING RETAINER",
+            "quantity": 1,
+            "sku": "",
+            "source_sku": "402002F"
+        },
+        {
+            "id": "11",
+            "name": "RETAINER SPRING",
+            "quantity": 1,
+            "sku": "",
+            "source_sku": "409010"
+        },
+        {
+            "id": "9",
+            "name": "9",
+            "quantity": 1,
+            "sku": "",
+            "source_sku": "9"
+        },
+        {
+            "id": "12",
+            "name": "CENTER CLIP",
+            "quantity": 1,
+            "sku": "",
+            "source_sku": "402017F"
+        },
+        {
+            "id": "13",
+            "name": "8-32 X 1/4 SETSCREW 1/2 DOG SST",
+            "quantity": 2,
+            "sku": "",
+            "source_sku": "059084"
+        },
+        {
+            "id": "7",
+            "name": "3\" HEAD",
+            "quantity": 1,
+            "sku": "",
+            "source_sku": "456001"
+        },
+        {
+            "id": "5",
+            "name": "BLADE TENSION SPR.",
+            "quantity": 1,
+            "sku": "",
+            "source_sku": "450005"
+        },
+        {
+            "id": "4",
+            "name": "BLADE TENSION SPRG",
+            "quantity": 1,
+            "sku": "",
+            "source_sku": "450021"
+        },
+        {
+            "id": "3",
+            "name": "FRAME, LEFT",
+            "quantity": 1,
+            "sku": "",
+            "source_sku": "454015"
+        },
+        {
+            "id": "2",
+            "name": "4-40X1/8 SET SCREW",
+            "quantity": 12,
+            "sku": "",
+            "source_sku": "409013"
+        },
+        {
+            "id": "19",
+            "name": "BLADE HOLDER STOP",
+            "quantity": 2,
+            "sku": "",
+            "source_sku": "402019"
+        },
+        {
+            "id": "14",
+            "name": "CENTER CLIP ASSY",
+            "quantity": 1,
+            "sku": "",
+            "source_sku": "404014F"
+        },
+        {
+            "id": "2",
+            "name": "4-40X1/8 SET SCREW",
+            "quantity": 12,
+            "sku": "",
+            "source_sku": "409013"
+        },
+        {
+            "id": "20",
+            "name": "INSERT SOCKET",
+            "quantity": 1,
+            "sku": "",
+            "source_sku": "402006"
+        },
+        {
+            "id": "8",
+            "name": "6-32 X 1/4 BIND HEAD SCREW SST",
+            "quantity": 2,
+            "sku": "",
+            "source_sku": "359005"
+        },
+        {
+            "id": "18",
+            "name": "4-40 X 3/16 BIND HEAD SCREW SST",
+            "quantity": 4,
+            "sku": "",
+            "source_sku": "059057"
+        },
+        {
+            "id": "15",
+            "name": "BLADE, CARBIDE",
+            "quantity": 2,
+            "sku": "",
+            "source_sku": "450009F"
+        },
+        {
+            "id": "16",
+            "name": "SKID",
+            "quantity": 2,
+            "sku": "",
+            "source_sku": "409011"
+        },
+        {
+            "id": "17",
+            "name": "FRAME, RIGHT",
+            "quantity": 1,
+            "sku": "",
+            "source_sku": "454016"
+        }
+    ],
+    "coordinates": {
+        "359005": {
+            "id": "359005",
+            "x_px": null,
+            "y_px": null,
+            "x_pct": 69.59596,
+            "y_pct": 48.99695,
+            "shape": "rectangle",
+            "pageNumber": 1,
+            "rotation": 0,
+            "widthPx": 100,
+            "heightPx": 40
+        },
+        "402006": {
+            "id": "402006",
+            "x_px": null,
+            "y_px": null,
+            "x_pct": 66.464646,
+            "y_pct": 43.628758,
+            "shape": "rectangle",
+            "pageNumber": 1,
+            "rotation": 0,
+            "widthPx": 100,
+            "heightPx": 40
+        },
+        "402012": {
+            "id": "402012",
+            "x_px": null,
+            "y_px": null,
+            "x_pct": 37.828283,
+            "y_pct": 23.620044,
+            "shape": "rectangle",
+            "pageNumber": 1,
+            "rotation": 0,
+            "widthPx": 100,
+            "heightPx": 40
+        },
+        "409010": {
+            "id": "409010",
+            "x_px": null,
+            "y_px": null,
+            "x_pct": 37.272727,
+            "y_pct": 17.37342,
+            "shape": "rectangle",
+            "pageNumber": 1,
+            "rotation": 0,
+            "widthPx": 100,
+            "heightPx": 40
+        },
+        "409011": {
+            "id": "409011",
+            "x_px": null,
+            "y_px": null,
+            "x_pct": 40.808081,
+            "y_pct": 71.445752,
+            "shape": "rectangle",
+            "pageNumber": 1,
+            "rotation": 0,
+            "widthPx": 100,
+            "heightPx": 40
+        },
+        "480005": {
+            "id": "480005",
+            "x_px": null,
+            "y_px": null,
+            "x_pct": 56.616162,
+            "y_pct": 33.33159,
+            "shape": "rectangle",
+            "pageNumber": 1,
+            "rotation": 0,
+            "widthPx": 100,
+            "heightPx": 40
+        },
+        "480021": {
+            "id": "480021",
+            "x_px": null,
+            "y_px": null,
+            "x_pct": 50.252525,
+            "y_pct": 32.160349,
+            "shape": "rectangle",
+            "pageNumber": 1,
+            "rotation": 0,
+            "widthPx": 100,
+            "heightPx": 40
+        },
+        "480026": {
+            "id": "480026",
+            "x_px": null,
+            "y_px": null,
+            "x_pct": 17.474747,
+            "y_pct": 71.738562,
+            "shape": "rectangle",
+            "pageNumber": 1,
+            "rotation": 0,
+            "widthPx": 100,
+            "heightPx": 40
+        },
+        "480027": {
+            "id": "480027",
+            "x_px": null,
+            "y_px": null,
+            "x_pct": 31.363636,
+            "y_pct": 70.469717,
+            "shape": "rectangle",
+            "pageNumber": 1,
+            "rotation": 0,
+            "widthPx": 100,
+            "heightPx": 40
+        },
+        "489013": {
+            "id": "489013",
+            "x_px": null,
+            "y_px": null,
+            "x_pct": 64.494949,
+            "y_pct": 38.894989,
+            "shape": "rectangle",
+            "pageNumber": 1,
+            "rotation": 0,
+            "widthPx": 100,
+            "heightPx": 40
+        },
+        "489020": {
+            "id": "489020",
+            "x_px": null,
+            "y_px": null,
+            "x_pct": 54.89899,
+            "y_pct": 57.878867,
+            "shape": "rectangle",
+            "pageNumber": 1,
+            "rotation": 0,
+            "widthPx": 100,
+            "heightPx": 40
+        },
+        "489022": {
+            "id": "489022",
+            "x_px": null,
+            "y_px": null,
+            "x_pct": 43.787879,
+            "y_pct": 36.064488,
+            "shape": "rectangle",
+            "pageNumber": 1,
+            "rotation": 0,
+            "widthPx": 100,
+            "heightPx": 40
+        },
+        "489023": {
+            "id": "489023",
+            "x_px": null,
+            "y_px": null,
+            "x_pct": 14.191919,
+            "y_pct": 63.051852,
+            "shape": "rectangle",
+            "pageNumber": 1,
+            "rotation": 0,
+            "widthPx": 100,
+            "heightPx": 40
+        },
+        "489029": {
+            "id": "489029",
+            "x_px": null,
+            "y_px": null,
+            "x_pct": 40.252525,
+            "y_pct": 77.497168,
+            "shape": "rectangle",
+            "pageNumber": 1,
+            "rotation": 0,
+            "widthPx": 100,
+            "heightPx": 40
+        },
+        "059091": {
+            "id": "059091",
+            "x_px": null,
+            "y_px": null,
+            "x_pct": 22.727273,
+            "y_pct": 15.226144,
+            "shape": "rectangle",
+            "pageNumber": 1,
+            "rotation": 0,
+            "widthPx": 100,
+            "heightPx": 40
+        },
+        "402002F": {
+            "id": "402002F",
+            "x_px": null,
+            "y_px": null,
+            "x_pct": 22.979798,
+            "y_pct": 21.521569,
+            "shape": "rectangle",
+            "pageNumber": 1,
+            "rotation": 0,
+            "widthPx": 100,
+            "heightPx": 40
+        },
+        "480002F": {
+            "id": "480002F",
+            "x_px": null,
+            "y_px": null,
+            "x_pct": 38.839496,
+            "y_pct": 28.56854,
+            "shape": "rectangle",
+            "pageNumber": 1,
+            "rotation": 0,
+            "widthPx": 100,
+            "heightPx": 40
+        },
+        "480008F": {
+            "id": "480008F",
+            "x_px": null,
+            "y_px": null,
+            "x_pct": 40.454545,
+            "y_pct": 31.086723,
+            "shape": "rectangle",
+            "pageNumber": 1,
+            "rotation": 0,
+            "widthPx": 100,
+            "heightPx": 40
+        },
+        "480017E": {
+            "id": "480017E",
+            "x_px": null,
+            "y_px": null,
+            "x_pct": 20.30303,
+            "y_pct": 36.845316,
+            "shape": "rectangle",
+            "pageNumber": 1,
+            "rotation": 0,
+            "widthPx": 100,
+            "heightPx": 40
+        },
+        "059084": {
+            "id": "059084",
+            "x_px": null,
+            "y_px": null,
+            "x_pct": 15.707071,
+            "y_pct": 42.652723,
+            "shape": "rectangle",
+            "pageNumber": 1,
+            "rotation": 0,
+            "widthPx": 100,
+            "heightPx": 40
+        },
+        "480001F": {
+            "id": "480001F",
+            "x_px": null,
+            "y_px": null,
+            "x_pct": 43.939394,
+            "y_pct": 33.233987,
+            "shape": "rectangle",
+            "pageNumber": 1,
+            "rotation": 0,
+            "widthPx": 100,
+            "heightPx": 40
+        },
+        "480015F": {
+            "id": "480015F",
+            "x_px": null,
+            "y_px": null,
+            "x_pct": 61.515152,
+            "y_pct": 35.430065,
+            "shape": "rectangle",
+            "pageNumber": 1,
+            "rotation": 0,
+            "widthPx": 100,
+            "heightPx": 40
+        },
+        "480007F": {
+            "id": "480007F",
+            "x_px": null,
+            "y_px": null,
+            "x_pct": 41.313131,
+            "y_pct": 58.854902,
+            "shape": "rectangle",
+            "pageNumber": 1,
+            "rotation": 0,
+            "widthPx": 100,
+            "heightPx": 40
+        },
+        "059037": {
+            "id": "059037",
+            "x_px": null,
+            "y_px": null,
+            "x_pct": 42.020202,
+            "y_pct": 65.638344,
+            "shape": "rectangle",
+            "pageNumber": 1,
+            "rotation": 0,
+            "widthPx": 100,
+            "heightPx": 40
+        },
+        "450009F": {
+            "id": "450009F",
+            "x_px": null,
+            "y_px": null,
+            "x_pct": 48.282828,
+            "y_pct": 69.44488,
+            "shape": "rectangle",
+            "pageNumber": 1,
+            "rotation": 0,
+            "widthPx": 100,
+            "heightPx": 40
+        },
+        "480016F": {
+            "id": "480016F",
+            "x_px": null,
+            "y_px": null,
+            "x_pct": 48.232323,
+            "y_pct": 79.302832,
+            "shape": "rectangle",
+            "pageNumber": 1,
+            "rotation": 0,
+            "widthPx": 100,
+            "heightPx": 40
+        },
+        "484014F": {
+            "id": "484014F",
+            "x_px": null,
+            "y_px": null,
+            "x_pct": 20.959596,
+            "y_pct": 75.740305,
+            "shape": "rectangle",
+            "pageNumber": 1,
+            "rotation": 0,
+            "widthPx": 100,
+            "heightPx": 40
+        }
+    },
+    "schema_version": "1.0",
+    "image_natural_width": 2400,
+    "image_natural_height": 1792,
+    "sku": "TTSIDECORNEREDGER",
+    "product_name": "TapeTech 90° Inside Corner Edger"
 }

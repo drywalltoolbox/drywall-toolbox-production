@@ -1,988 +1,988 @@
 {
-    "id":  "tapetech-20ttx-sch",
-    "title":  "20TTX_SCH",
-    "diagramPages":  [
-                         1
-                     ],
-    "legendPages":  [
-
-                    ],
-    "parts":  [
-                  {
-                      "id":  "202021",
-                      "name":  "Nut, Special",
-                      "quantity":  1,
-                      "sku":  "",
-                      "source_sku":  "202021"
-                  },
-                  {
-                      "id":  "206003",
-                      "name":  "Dial Assembly",
-                      "quantity":  1,
-                      "sku":  "",
-                      "source_sku":  "206003"
-                  },
-                  {
-                      "id":  "202007",
-                      "name":  "Push Rod, Crown Adjust",
-                      "quantity":  2,
-                      "sku":  "",
-                      "source_sku":  "202007"
-                  },
-                  {
-                      "id":  "203010",
-                      "name":  "7\"/10\" Crown Spring",
-                      "quantity":  1,
-                      "sku":  "",
-                      "source_sku":  "203010"
-                  },
-                  {
-                      "id":  "200001",
-                      "name":  "7\" Blade",
-                      "quantity":  2,
-                      "sku":  "",
-                      "source_sku":  "200001"
-                  },
-                  {
-                      "id":  "059018",
-                      "name":  "#6-32 Thin Pattern Stopnut",
-                      "quantity":  2,
-                      "sku":  "",
-                      "source_sku":  "059018"
-                  },
-                  {
-                      "id":  "200026F",
-                      "name":  "7\" Wiper",
-                      "quantity":  1,
-                      "sku":  "",
-                      "source_sku":  "200026F"
-                  },
-                  {
-                      "id":  "489023",
-                      "name":  "#6 Flat Washer",
-                      "quantity":  2,
-                      "sku":  "",
-                      "source_sku":  "489023"
-                  },
-                  {
-                      "id":  "219064",
-                      "name":  "Spring Washer",
-                      "quantity":  2,
-                      "sku":  "",
-                      "source_sku":  "219064"
-                  },
-                  {
-                      "id":  "202033G",
-                      "name":  "7\" Base Plate (Extruded) Gold",
-                      "quantity":  1,
-                      "sku":  "",
-                      "source_sku":  "202033G"
-                  },
-                  {
-                      "id":  "210059",
-                      "name":  "Shoulder Screw",
-                      "quantity":  2,
-                      "sku":  "",
-                      "source_sku":  "210059"
-                  },
-                  {
-                      "id":  "609012",
-                      "name":  "#4-40 Stopnut",
-                      "quantity":  2,
-                      "sku":  "",
-                      "source_sku":  "609012"
-                  },
-                  {
-                      "id":  "210058F",
-                      "name":  "Latch",
-                      "quantity":  2,
-                      "sku":  "",
-                      "source_sku":  "210058F"
-                  },
-                  {
-                      "id":  "202022",
-                      "name":  "Repair Clip",
-                      "quantity":  2,
-                      "sku":  "",
-                      "source_sku":  "202022"
-                  },
-                  {
-                      "id":  "209039",
-                      "name":  "Skid Cover",
-                      "quantity":  2,
-                      "sku":  "",
-                      "source_sku":  "209039"
-                  },
-                  {
-                      "id":  "059015",
-                      "name":  "#6-32 x 1/4 Fillister Head Screw",
-                      "quantity":  4,
-                      "sku":  "",
-                      "source_sku":  "059015"
-                  },
-                  {
-                      "id":  "251025G",
-                      "name":  "Right Side Plate (Gold)",
-                      "quantity":  1,
-                      "sku":  "",
-                      "source_sku":  "251025G"
-                  },
-                  {
-                      "id":  "609048\nASSEMBLE WITH LOCTITE 242\nTORQUE 12-14 IN-LB",
-                      "name":  "609048\nASSEMBLE WITH LOCTITE 242\nTORQUE 12-14 IN-LB",
-                      "quantity":  8,
-                      "sku":  "",
-                      "source_sku":  "609048\nASSEMBLE WITH LOCTITE 242\nTORQUE 12-14 IN-LB"
-                  },
-                  {
-                      "id":  "059018",
-                      "name":  "#6-32 Thin Pattern Stopnut",
-                      "quantity":  2,
-                      "sku":  "",
-                      "source_sku":  "059018"
-                  },
-                  {
-                      "id":  "209041",
-                      "name":  "Spring Clip",
-                      "quantity":  2,
-                      "sku":  "",
-                      "source_sku":  "209041"
-                  },
-                  {
-                      "id":  "209049",
-                      "name":  "#6-32 x 5/16 Binding Head Screw",
-                      "quantity":  2,
-                      "sku":  "",
-                      "source_sku":  "209049"
-                  },
-                  {
-                      "id":  "20052F",
-                      "name":  "20052F",
-                      "quantity":  2,
-                      "sku":  "",
-                      "source_sku":  "20052F"
-                  },
-                  {
-                      "id":  "209148",
-                      "name":  "Bearing Nyliner",
-                      "quantity":  2,
-                      "sku":  "",
-                      "source_sku":  "209148"
-                  },
-                  {
-                      "id":  "310051F",
-                      "name":  "Wheel",
-                      "quantity":  2,
-                      "sku":  "",
-                      "source_sku":  "310051F"
-                  },
-                  {
-                      "id":  "219067",
-                      "name":  "#310 Buna \"O\" Ring",
-                      "quantity":  2,
-                      "sku":  "",
-                      "source_sku":  "219067"
-                  },
-                  {
-                      "id":  "209042",
-                      "name":  "#10 Brass Washer",
-                      "quantity":  2,
-                      "sku":  "",
-                      "source_sku":  "209042"
-                  },
-                  {
-                      "id":  "809006",
-                      "name":  "#14 Brass Washer",
-                      "quantity":  1,
-                      "sku":  "",
-                      "source_sku":  "809006"
-                  },
-                  {
-                      "id":  "200045G",
-                      "name":  "7\" Axle",
-                      "quantity":  1,
-                      "sku":  "",
-                      "source_sku":  "200045G"
-                  },
-                  {
-                      "id":  "202036",
-                      "name":  "Shoulder Screw",
-                      "quantity":  1,
-                      "sku":  "",
-                      "source_sku":  "202036"
-                  },
-                  {
-                      "id":  "059225",
-                      "name":  "#10-32 Locknut",
-                      "quantity":  1,
-                      "sku":  "",
-                      "source_sku":  "059225"
-                  },
-                  {
-                      "id":  "209042",
-                      "name":  "#10 Brass Washer",
-                      "quantity":  3,
-                      "sku":  "",
-                      "source_sku":  "209042"
-                  },
-                  {
-                      "id":  "209047",
-                      "name":  "Bearing Nyliner",
-                      "quantity":  1,
-                      "sku":  "",
-                      "source_sku":  "209047"
-                  },
-                  {
-                      "id":  "206027G",
-                      "name":  "7\" Pressure Plate",
-                      "quantity":  1,
-                      "sku":  "",
-                      "source_sku":  "206027G"
-                  },
-                  {
-                      "id":  "200009",
-                      "name":  "Shim",
-                      "quantity":  1,
-                      "sku":  "",
-                      "source_sku":  "200009"
-                  },
-                  {
-                      "id":  "209048",
-                      "name":  "#4-40 x 1/8 Binding Head Screw",
-                      "quantity":  1,
-                      "sku":  "",
-                      "source_sku":  "209048"
-                  },
-                  {
-                      "id":  "202044F",
-                      "name":  "Spring",
-                      "quantity":  2,
-                      "sku":  "",
-                      "source_sku":  "202044F"
-                  },
-                  {
-                      "id":  "339073",
-                      "name":  "#10-24 X 1-1/4 Fillister Head Screw",
-                      "quantity":  2,
-                      "sku":  "",
-                      "source_sku":  "339073"
-                  },
-                  {
-                      "id":  "202020",
-                      "name":  "Spring Anchor",
-                      "quantity":  2,
-                      "sku":  "",
-                      "source_sku":  "202020"
-                  },
-                  {
-                      "id":  "209030",
-                      "name":  "#10-24 Wingnut",
-                      "quantity":  2,
-                      "sku":  "",
-                      "source_sku":  "209030"
-                  },
-                  {
-                      "id":  "202028",
-                      "name":  "Threaded Washer",
-                      "quantity":  2,
-                      "sku":  "",
-                      "source_sku":  "202028"
-                  },
-                  {
-                      "id":  "251023G",
-                      "name":  "Left Side Plate (Gold)",
-                      "quantity":  1,
-                      "sku":  "",
-                      "source_sku":  "251023G"
-                  },
-                  {
-                      "id":  "209046",
-                      "name":  "Washer",
-                      "quantity":  2,
-                      "sku":  "",
-                      "source_sku":  "209046"
-                  },
-                  {
-                      "id":  "209017",
-                      "name":  "#10-24 Locknut",
-                      "quantity":  2,
-                      "sku":  "",
-                      "source_sku":  "209017"
-                  },
-                  {
-                      "id":  "209006",
-                      "name":  "Skid Cover",
-                      "quantity":  2,
-                      "sku":  "",
-                      "source_sku":  "209006"
-                  },
-                  {
-                      "id":  "059012",
-                      "name":  "#6-32 x 3/8 Fillister Head Screw",
-                      "quantity":  2,
-                      "sku":  "",
-                      "source_sku":  "059012"
-                  },
-                  {
-                      "id":  "201032G",
-                      "name":  "7\" Radius Plate (Extruded) Gold",
-                      "quantity":  1,
-                      "sku":  "",
-                      "source_sku":  "201032G"
-                  },
-                  {
-                      "id":  "200040F",
-                      "name":  "7\" Tie Rod",
-                      "quantity":  1,
-                      "sku":  "",
-                      "source_sku":  "200040F"
-                  },
-                  {
-                      "id":  "209012",
-                      "name":  "#4-40 x 1/4 Fillister Head Screw",
-                      "quantity":  2,
-                      "sku":  "",
-                      "source_sku":  "209012"
-                  },
-                  {
-                      "id":  "204002",
-                      "name":  "Blade Holder Assembly",
-                      "quantity":  1,
-                      "sku":  "",
-                      "source_sku":  "204002"
-                  },
-                  {
-                      "id":  "204005",
-                      "name":  "Clamp Assembly",
-                      "quantity":  1,
-                      "sku":  "",
-                      "source_sku":  "204005"
-                  },
-                  {
-                      "id":  "209016",
-                      "name":  "#4-40 x 7/32 Binding Head Screw",
-                      "quantity":  6,
-                      "sku":  "",
-                      "source_sku":  "209016"
-                  },
-                  {
-                      "id":  "209058",
-                      "name":  "#6-32 Brass Nut",
-                      "quantity":  2,
-                      "sku":  "",
-                      "source_sku":  "209058"
-                  },
-                  {
-                      "id":  "059018",
-                      "name":  "#6-32 Thin Pattern Stopnut",
-                      "quantity":  5,
-                      "sku":  "",
-                      "source_sku":  "059018"
-                  }
-              ],
-    "coordinates":  {
-                        "200001":  {
-                                       "id":  "200001",
-                                       "x_px":  null,
-                                       "y_px":  null,
-                                       "x_pct":  0,
-                                       "y_pct":  0,
-                                       "shape":  "rectangle",
-                                       "pageNumber":  1,
-                                       "rotation":  0,
-                                       "widthPx":  100,
-                                       "heightPx":  40
-                                   },
-                        "200009":  {
-                                       "id":  "200009",
-                                       "x_px":  null,
-                                       "y_px":  null,
-                                       "x_pct":  0,
-                                       "y_pct":  0,
-                                       "shape":  "rectangle",
-                                       "pageNumber":  1,
-                                       "rotation":  0,
-                                       "widthPx":  100,
-                                       "heightPx":  40
-                                   },
-                        "202007":  {
-                                       "id":  "202007",
-                                       "x_px":  null,
-                                       "y_px":  null,
-                                       "x_pct":  0,
-                                       "y_pct":  0,
-                                       "shape":  "rectangle",
-                                       "pageNumber":  1,
-                                       "rotation":  0,
-                                       "widthPx":  100,
-                                       "heightPx":  40
-                                   },
-                        "202020":  {
-                                       "id":  "202020",
-                                       "x_px":  null,
-                                       "y_px":  null,
-                                       "x_pct":  0,
-                                       "y_pct":  0,
-                                       "shape":  "rectangle",
-                                       "pageNumber":  1,
-                                       "rotation":  0,
-                                       "widthPx":  100,
-                                       "heightPx":  40
-                                   },
-                        "202021":  {
-                                       "id":  "202021",
-                                       "x_px":  null,
-                                       "y_px":  null,
-                                       "x_pct":  0,
-                                       "y_pct":  0,
-                                       "shape":  "rectangle",
-                                       "pageNumber":  1,
-                                       "rotation":  0,
-                                       "widthPx":  100,
-                                       "heightPx":  40
-                                   },
-                        "202022":  {
-                                       "id":  "202022",
-                                       "x_px":  null,
-                                       "y_px":  null,
-                                       "x_pct":  0,
-                                       "y_pct":  0,
-                                       "shape":  "rectangle",
-                                       "pageNumber":  1,
-                                       "rotation":  0,
-                                       "widthPx":  100,
-                                       "heightPx":  40
-                                   },
-                        "202028":  {
-                                       "id":  "202028",
-                                       "x_px":  null,
-                                       "y_px":  null,
-                                       "x_pct":  0,
-                                       "y_pct":  0,
-                                       "shape":  "rectangle",
-                                       "pageNumber":  1,
-                                       "rotation":  0,
-                                       "widthPx":  100,
-                                       "heightPx":  40
-                                   },
-                        "202036":  {
-                                       "id":  "202036",
-                                       "x_px":  null,
-                                       "y_px":  null,
-                                       "x_pct":  0,
-                                       "y_pct":  0,
-                                       "shape":  "rectangle",
-                                       "pageNumber":  1,
-                                       "rotation":  0,
-                                       "widthPx":  100,
-                                       "heightPx":  40
-                                   },
-                        "203010":  {
-                                       "id":  "203010",
-                                       "x_px":  null,
-                                       "y_px":  null,
-                                       "x_pct":  0,
-                                       "y_pct":  0,
-                                       "shape":  "rectangle",
-                                       "pageNumber":  1,
-                                       "rotation":  0,
-                                       "widthPx":  100,
-                                       "heightPx":  40
-                                   },
-                        "204002":  {
-                                       "id":  "204002",
-                                       "x_px":  null,
-                                       "y_px":  null,
-                                       "x_pct":  0,
-                                       "y_pct":  0,
-                                       "shape":  "rectangle",
-                                       "pageNumber":  1,
-                                       "rotation":  0,
-                                       "widthPx":  100,
-                                       "heightPx":  40
-                                   },
-                        "204005":  {
-                                       "id":  "204005",
-                                       "x_px":  null,
-                                       "y_px":  null,
-                                       "x_pct":  0,
-                                       "y_pct":  0,
-                                       "shape":  "rectangle",
-                                       "pageNumber":  1,
-                                       "rotation":  0,
-                                       "widthPx":  100,
-                                       "heightPx":  40
-                                   },
-                        "206003":  {
-                                       "id":  "206003",
-                                       "x_px":  null,
-                                       "y_px":  null,
-                                       "x_pct":  0,
-                                       "y_pct":  0,
-                                       "shape":  "rectangle",
-                                       "pageNumber":  1,
-                                       "rotation":  0,
-                                       "widthPx":  100,
-                                       "heightPx":  40
-                                   },
-                        "209006":  {
-                                       "id":  "209006",
-                                       "x_px":  null,
-                                       "y_px":  null,
-                                       "x_pct":  0,
-                                       "y_pct":  0,
-                                       "shape":  "rectangle",
-                                       "pageNumber":  1,
-                                       "rotation":  0,
-                                       "widthPx":  100,
-                                       "heightPx":  40
-                                   },
-                        "209012":  {
-                                       "id":  "209012",
-                                       "x_px":  null,
-                                       "y_px":  null,
-                                       "x_pct":  0,
-                                       "y_pct":  0,
-                                       "shape":  "rectangle",
-                                       "pageNumber":  1,
-                                       "rotation":  0,
-                                       "widthPx":  100,
-                                       "heightPx":  40
-                                   },
-                        "209016":  {
-                                       "id":  "209016",
-                                       "x_px":  null,
-                                       "y_px":  null,
-                                       "x_pct":  0,
-                                       "y_pct":  0,
-                                       "shape":  "rectangle",
-                                       "pageNumber":  1,
-                                       "rotation":  0,
-                                       "widthPx":  100,
-                                       "heightPx":  40
-                                   },
-                        "209017":  {
-                                       "id":  "209017",
-                                       "x_px":  null,
-                                       "y_px":  null,
-                                       "x_pct":  0,
-                                       "y_pct":  0,
-                                       "shape":  "rectangle",
-                                       "pageNumber":  1,
-                                       "rotation":  0,
-                                       "widthPx":  100,
-                                       "heightPx":  40
-                                   },
-                        "209030":  {
-                                       "id":  "209030",
-                                       "x_px":  null,
-                                       "y_px":  null,
-                                       "x_pct":  0,
-                                       "y_pct":  0,
-                                       "shape":  "rectangle",
-                                       "pageNumber":  1,
-                                       "rotation":  0,
-                                       "widthPx":  100,
-                                       "heightPx":  40
-                                   },
-                        "209039":  {
-                                       "id":  "209039",
-                                       "x_px":  null,
-                                       "y_px":  null,
-                                       "x_pct":  0,
-                                       "y_pct":  0,
-                                       "shape":  "rectangle",
-                                       "pageNumber":  1,
-                                       "rotation":  0,
-                                       "widthPx":  100,
-                                       "heightPx":  40
-                                   },
-                        "209041":  {
-                                       "id":  "209041",
-                                       "x_px":  null,
-                                       "y_px":  null,
-                                       "x_pct":  0,
-                                       "y_pct":  0,
-                                       "shape":  "rectangle",
-                                       "pageNumber":  1,
-                                       "rotation":  0,
-                                       "widthPx":  100,
-                                       "heightPx":  40
-                                   },
-                        "209042":  {
-                                       "id":  "209042",
-                                       "x_px":  null,
-                                       "y_px":  null,
-                                       "x_pct":  0,
-                                       "y_pct":  0,
-                                       "shape":  "rectangle",
-                                       "pageNumber":  1,
-                                       "rotation":  0,
-                                       "widthPx":  100,
-                                       "heightPx":  40
-                                   },
-                        "209046":  {
-                                       "id":  "209046",
-                                       "x_px":  null,
-                                       "y_px":  null,
-                                       "x_pct":  0,
-                                       "y_pct":  0,
-                                       "shape":  "rectangle",
-                                       "pageNumber":  1,
-                                       "rotation":  0,
-                                       "widthPx":  100,
-                                       "heightPx":  40
-                                   },
-                        "209047":  {
-                                       "id":  "209047",
-                                       "x_px":  null,
-                                       "y_px":  null,
-                                       "x_pct":  0,
-                                       "y_pct":  0,
-                                       "shape":  "rectangle",
-                                       "pageNumber":  1,
-                                       "rotation":  0,
-                                       "widthPx":  100,
-                                       "heightPx":  40
-                                   },
-                        "209048":  {
-                                       "id":  "209048",
-                                       "x_px":  null,
-                                       "y_px":  null,
-                                       "x_pct":  0,
-                                       "y_pct":  0,
-                                       "shape":  "rectangle",
-                                       "pageNumber":  1,
-                                       "rotation":  0,
-                                       "widthPx":  100,
-                                       "heightPx":  40
-                                   },
-                        "209049":  {
-                                       "id":  "209049",
-                                       "x_px":  null,
-                                       "y_px":  null,
-                                       "x_pct":  0,
-                                       "y_pct":  0,
-                                       "shape":  "rectangle",
-                                       "pageNumber":  1,
-                                       "rotation":  0,
-                                       "widthPx":  100,
-                                       "heightPx":  40
-                                   },
-                        "209058":  {
-                                       "id":  "209058",
-                                       "x_px":  null,
-                                       "y_px":  null,
-                                       "x_pct":  0,
-                                       "y_pct":  0,
-                                       "shape":  "rectangle",
-                                       "pageNumber":  1,
-                                       "rotation":  0,
-                                       "widthPx":  100,
-                                       "heightPx":  40
-                                   },
-                        "209148":  {
-                                       "id":  "209148",
-                                       "x_px":  null,
-                                       "y_px":  null,
-                                       "x_pct":  0,
-                                       "y_pct":  0,
-                                       "shape":  "rectangle",
-                                       "pageNumber":  1,
-                                       "rotation":  0,
-                                       "widthPx":  100,
-                                       "heightPx":  40
-                                   },
-                        "210059":  {
-                                       "id":  "210059",
-                                       "x_px":  null,
-                                       "y_px":  null,
-                                       "x_pct":  0,
-                                       "y_pct":  0,
-                                       "shape":  "rectangle",
-                                       "pageNumber":  1,
-                                       "rotation":  0,
-                                       "widthPx":  100,
-                                       "heightPx":  40
-                                   },
-                        "219064":  {
-                                       "id":  "219064",
-                                       "x_px":  null,
-                                       "y_px":  null,
-                                       "x_pct":  0,
-                                       "y_pct":  0,
-                                       "shape":  "rectangle",
-                                       "pageNumber":  1,
-                                       "rotation":  0,
-                                       "widthPx":  100,
-                                       "heightPx":  40
-                                   },
-                        "219067":  {
-                                       "id":  "219067",
-                                       "x_px":  null,
-                                       "y_px":  null,
-                                       "x_pct":  0,
-                                       "y_pct":  0,
-                                       "shape":  "rectangle",
-                                       "pageNumber":  1,
-                                       "rotation":  0,
-                                       "widthPx":  100,
-                                       "heightPx":  40
-                                   },
-                        "339073":  {
-                                       "id":  "339073",
-                                       "x_px":  null,
-                                       "y_px":  null,
-                                       "x_pct":  0,
-                                       "y_pct":  0,
-                                       "shape":  "rectangle",
-                                       "pageNumber":  1,
-                                       "rotation":  0,
-                                       "widthPx":  100,
-                                       "heightPx":  40
-                                   },
-                        "489023":  {
-                                       "id":  "489023",
-                                       "x_px":  null,
-                                       "y_px":  null,
-                                       "x_pct":  0,
-                                       "y_pct":  0,
-                                       "shape":  "rectangle",
-                                       "pageNumber":  1,
-                                       "rotation":  0,
-                                       "widthPx":  100,
-                                       "heightPx":  40
-                                   },
-                        "609012":  {
-                                       "id":  "609012",
-                                       "x_px":  null,
-                                       "y_px":  null,
-                                       "x_pct":  0,
-                                       "y_pct":  0,
-                                       "shape":  "rectangle",
-                                       "pageNumber":  1,
-                                       "rotation":  0,
-                                       "widthPx":  100,
-                                       "heightPx":  40
-                                   },
-                        "809006":  {
-                                       "id":  "809006",
-                                       "x_px":  null,
-                                       "y_px":  null,
-                                       "x_pct":  0,
-                                       "y_pct":  0,
-                                       "shape":  "rectangle",
-                                       "pageNumber":  1,
-                                       "rotation":  0,
-                                       "widthPx":  100,
-                                       "heightPx":  40
-                                   },
-                        "059018":  {
-                                       "id":  "059018",
-                                       "x_px":  null,
-                                       "y_px":  null,
-                                       "x_pct":  0,
-                                       "y_pct":  0,
-                                       "shape":  "rectangle",
-                                       "pageNumber":  1,
-                                       "rotation":  0,
-                                       "widthPx":  100,
-                                       "heightPx":  40
-                                   },
-                        "200026F":  {
-                                        "id":  "200026F",
-                                        "x_px":  null,
-                                        "y_px":  null,
-                                        "x_pct":  0,
-                                        "y_pct":  0,
-                                        "shape":  "rectangle",
-                                        "pageNumber":  1,
-                                        "rotation":  0,
-                                        "widthPx":  100,
-                                        "heightPx":  40
-                                    },
-                        "202033G":  {
-                                        "id":  "202033G",
-                                        "x_px":  null,
-                                        "y_px":  null,
-                                        "x_pct":  0,
-                                        "y_pct":  0,
-                                        "shape":  "rectangle",
-                                        "pageNumber":  1,
-                                        "rotation":  0,
-                                        "widthPx":  100,
-                                        "heightPx":  40
-                                    },
-                        "210058F":  {
-                                        "id":  "210058F",
-                                        "x_px":  null,
-                                        "y_px":  null,
-                                        "x_pct":  0,
-                                        "y_pct":  0,
-                                        "shape":  "rectangle",
-                                        "pageNumber":  1,
-                                        "rotation":  0,
-                                        "widthPx":  100,
-                                        "heightPx":  40
-                                    },
-                        "059015":  {
-                                       "id":  "059015",
-                                       "x_px":  null,
-                                       "y_px":  null,
-                                       "x_pct":  0,
-                                       "y_pct":  0,
-                                       "shape":  "rectangle",
-                                       "pageNumber":  1,
-                                       "rotation":  0,
-                                       "widthPx":  100,
-                                       "heightPx":  40
-                                   },
-                        "251025G":  {
-                                        "id":  "251025G",
-                                        "x_px":  null,
-                                        "y_px":  null,
-                                        "x_pct":  0,
-                                        "y_pct":  0,
-                                        "shape":  "rectangle",
-                                        "pageNumber":  1,
-                                        "rotation":  0,
-                                        "widthPx":  100,
-                                        "heightPx":  40
-                                    },
-                        "609048\nASSEMBLE WITH LOCTITE 242\nTORQUE 12-14 IN-LB":  {
-                                                                                      "id":  "609048\nASSEMBLE WITH LOCTITE 242\nTORQUE 12-14 IN-LB",
-                                                                                      "x_px":  null,
-                                                                                      "y_px":  null,
-                                                                                      "x_pct":  0,
-                                                                                      "y_pct":  0,
-                                                                                      "shape":  "rectangle",
-                                                                                      "pageNumber":  1,
-                                                                                      "rotation":  0,
-                                                                                      "widthPx":  100,
-                                                                                      "heightPx":  40
-                                                                                  },
-                        "20052F":  {
-                                       "id":  "20052F",
-                                       "x_px":  null,
-                                       "y_px":  null,
-                                       "x_pct":  0,
-                                       "y_pct":  0,
-                                       "shape":  "rectangle",
-                                       "pageNumber":  1,
-                                       "rotation":  0,
-                                       "widthPx":  100,
-                                       "heightPx":  40
-                                   },
-                        "310051F":  {
-                                        "id":  "310051F",
-                                        "x_px":  null,
-                                        "y_px":  null,
-                                        "x_pct":  0,
-                                        "y_pct":  0,
-                                        "shape":  "rectangle",
-                                        "pageNumber":  1,
-                                        "rotation":  0,
-                                        "widthPx":  100,
-                                        "heightPx":  40
-                                    },
-                        "200045G":  {
-                                        "id":  "200045G",
-                                        "x_px":  null,
-                                        "y_px":  null,
-                                        "x_pct":  0,
-                                        "y_pct":  0,
-                                        "shape":  "rectangle",
-                                        "pageNumber":  1,
-                                        "rotation":  0,
-                                        "widthPx":  100,
-                                        "heightPx":  40
-                                    },
-                        "059225":  {
-                                       "id":  "059225",
-                                       "x_px":  null,
-                                       "y_px":  null,
-                                       "x_pct":  0,
-                                       "y_pct":  0,
-                                       "shape":  "rectangle",
-                                       "pageNumber":  1,
-                                       "rotation":  0,
-                                       "widthPx":  100,
-                                       "heightPx":  40
-                                   },
-                        "206027G":  {
-                                        "id":  "206027G",
-                                        "x_px":  null,
-                                        "y_px":  null,
-                                        "x_pct":  0,
-                                        "y_pct":  0,
-                                        "shape":  "rectangle",
-                                        "pageNumber":  1,
-                                        "rotation":  0,
-                                        "widthPx":  100,
-                                        "heightPx":  40
-                                    },
-                        "202044F":  {
-                                        "id":  "202044F",
-                                        "x_px":  null,
-                                        "y_px":  null,
-                                        "x_pct":  0,
-                                        "y_pct":  0,
-                                        "shape":  "rectangle",
-                                        "pageNumber":  1,
-                                        "rotation":  0,
-                                        "widthPx":  100,
-                                        "heightPx":  40
-                                    },
-                        "251023G":  {
-                                        "id":  "251023G",
-                                        "x_px":  null,
-                                        "y_px":  null,
-                                        "x_pct":  0,
-                                        "y_pct":  0,
-                                        "shape":  "rectangle",
-                                        "pageNumber":  1,
-                                        "rotation":  0,
-                                        "widthPx":  100,
-                                        "heightPx":  40
-                                    },
-                        "059012":  {
-                                       "id":  "059012",
-                                       "x_px":  null,
-                                       "y_px":  null,
-                                       "x_pct":  0,
-                                       "y_pct":  0,
-                                       "shape":  "rectangle",
-                                       "pageNumber":  1,
-                                       "rotation":  0,
-                                       "widthPx":  100,
-                                       "heightPx":  40
-                                   },
-                        "201032G":  {
-                                        "id":  "201032G",
-                                        "x_px":  null,
-                                        "y_px":  null,
-                                        "x_pct":  0,
-                                        "y_pct":  0,
-                                        "shape":  "rectangle",
-                                        "pageNumber":  1,
-                                        "rotation":  0,
-                                        "widthPx":  100,
-                                        "heightPx":  40
-                                    },
-                        "200040F":  {
-                                        "id":  "200040F",
-                                        "x_px":  null,
-                                        "y_px":  null,
-                                        "x_pct":  0,
-                                        "y_pct":  0,
-                                        "shape":  "rectangle",
-                                        "pageNumber":  1,
-                                        "rotation":  0,
-                                        "widthPx":  100,
-                                        "heightPx":  40
-                                    }
-                    },
-    "schema_version":  "1.0",
-    "image_natural_width":  3672,
-    "image_natural_height":  2376
+    "id": "tapetech-90-inside-corner-edger-tapetech-20ttx-sch",
+    "title": "20TTX-SCH",
+    "diagramPages": [
+        1
+    ],
+    "legendPages": [],
+    "parts": [
+        {
+            "id": "202021",
+            "name": "Nut, Special",
+            "quantity": 1,
+            "sku": "",
+            "source_sku": "202021"
+        },
+        {
+            "id": "206003",
+            "name": "Dial Assembly",
+            "quantity": 1,
+            "sku": "",
+            "source_sku": "206003"
+        },
+        {
+            "id": "202007",
+            "name": "Push Rod, Crown Adjust",
+            "quantity": 2,
+            "sku": "",
+            "source_sku": "202007"
+        },
+        {
+            "id": "203010",
+            "name": "7\"/10\" Crown Spring",
+            "quantity": 1,
+            "sku": "",
+            "source_sku": "203010"
+        },
+        {
+            "id": "200001",
+            "name": "7\" Blade",
+            "quantity": 2,
+            "sku": "",
+            "source_sku": "200001"
+        },
+        {
+            "id": "059018",
+            "name": "#6-32 Thin Pattern Stopnut",
+            "quantity": 2,
+            "sku": "",
+            "source_sku": "059018"
+        },
+        {
+            "id": "200026F",
+            "name": "7\" Wiper",
+            "quantity": 1,
+            "sku": "",
+            "source_sku": "200026F"
+        },
+        {
+            "id": "489023",
+            "name": "#6 Flat Washer",
+            "quantity": 2,
+            "sku": "",
+            "source_sku": "489023"
+        },
+        {
+            "id": "219064",
+            "name": "Spring Washer",
+            "quantity": 2,
+            "sku": "",
+            "source_sku": "219064"
+        },
+        {
+            "id": "202033G",
+            "name": "7\" Base Plate (Extruded) Gold",
+            "quantity": 1,
+            "sku": "",
+            "source_sku": "202033G"
+        },
+        {
+            "id": "210059",
+            "name": "Shoulder Screw",
+            "quantity": 2,
+            "sku": "",
+            "source_sku": "210059"
+        },
+        {
+            "id": "609012",
+            "name": "#4-40 Stopnut",
+            "quantity": 2,
+            "sku": "",
+            "source_sku": "609012"
+        },
+        {
+            "id": "210058F",
+            "name": "Latch",
+            "quantity": 2,
+            "sku": "",
+            "source_sku": "210058F"
+        },
+        {
+            "id": "202022",
+            "name": "Repair Clip",
+            "quantity": 2,
+            "sku": "",
+            "source_sku": "202022"
+        },
+        {
+            "id": "209039",
+            "name": "Skid Cover",
+            "quantity": 2,
+            "sku": "",
+            "source_sku": "209039"
+        },
+        {
+            "id": "059015",
+            "name": "#6-32 x 1/4 Fillister Head Screw",
+            "quantity": 4,
+            "sku": "",
+            "source_sku": "059015"
+        },
+        {
+            "id": "251025G",
+            "name": "Right Side Plate (Gold)",
+            "quantity": 1,
+            "sku": "",
+            "source_sku": "251025G"
+        },
+        {
+            "id": "609048\nASSEMBLE WITH LOCTITE 242\nTORQUE 12-14 IN-LB",
+            "name": "609048\nASSEMBLE WITH LOCTITE 242\nTORQUE 12-14 IN-LB",
+            "quantity": 8,
+            "sku": "",
+            "source_sku": "609048\nASSEMBLE WITH LOCTITE 242\nTORQUE 12-14 IN-LB"
+        },
+        {
+            "id": "059018",
+            "name": "#6-32 Thin Pattern Stopnut",
+            "quantity": 2,
+            "sku": "",
+            "source_sku": "059018"
+        },
+        {
+            "id": "209041",
+            "name": "Spring Clip",
+            "quantity": 2,
+            "sku": "",
+            "source_sku": "209041"
+        },
+        {
+            "id": "209049",
+            "name": "#6-32 x 5/16 Binding Head Screw",
+            "quantity": 2,
+            "sku": "",
+            "source_sku": "209049"
+        },
+        {
+            "id": "20052F",
+            "name": "20052F",
+            "quantity": 2,
+            "sku": "",
+            "source_sku": "20052F"
+        },
+        {
+            "id": "209148",
+            "name": "Bearing Nyliner",
+            "quantity": 2,
+            "sku": "",
+            "source_sku": "209148"
+        },
+        {
+            "id": "310051F",
+            "name": "Wheel",
+            "quantity": 2,
+            "sku": "",
+            "source_sku": "310051F"
+        },
+        {
+            "id": "219067",
+            "name": "#310 Buna \"O\" Ring",
+            "quantity": 2,
+            "sku": "",
+            "source_sku": "219067"
+        },
+        {
+            "id": "209042",
+            "name": "#10 Brass Washer",
+            "quantity": 2,
+            "sku": "",
+            "source_sku": "209042"
+        },
+        {
+            "id": "809006",
+            "name": "#14 Brass Washer",
+            "quantity": 1,
+            "sku": "",
+            "source_sku": "809006"
+        },
+        {
+            "id": "200045G",
+            "name": "7\" Axle",
+            "quantity": 1,
+            "sku": "",
+            "source_sku": "200045G"
+        },
+        {
+            "id": "202036",
+            "name": "Shoulder Screw",
+            "quantity": 1,
+            "sku": "",
+            "source_sku": "202036"
+        },
+        {
+            "id": "059225",
+            "name": "#10-32 Locknut",
+            "quantity": 1,
+            "sku": "",
+            "source_sku": "059225"
+        },
+        {
+            "id": "209042",
+            "name": "#10 Brass Washer",
+            "quantity": 3,
+            "sku": "",
+            "source_sku": "209042"
+        },
+        {
+            "id": "209047",
+            "name": "Bearing Nyliner",
+            "quantity": 1,
+            "sku": "",
+            "source_sku": "209047"
+        },
+        {
+            "id": "206027G",
+            "name": "7\" Pressure Plate",
+            "quantity": 1,
+            "sku": "",
+            "source_sku": "206027G"
+        },
+        {
+            "id": "200009",
+            "name": "Shim",
+            "quantity": 1,
+            "sku": "",
+            "source_sku": "200009"
+        },
+        {
+            "id": "209048",
+            "name": "#4-40 x 1/8 Binding Head Screw",
+            "quantity": 1,
+            "sku": "",
+            "source_sku": "209048"
+        },
+        {
+            "id": "202044F",
+            "name": "Spring",
+            "quantity": 2,
+            "sku": "",
+            "source_sku": "202044F"
+        },
+        {
+            "id": "339073",
+            "name": "#10-24 X 1-1/4 Fillister Head Screw",
+            "quantity": 2,
+            "sku": "",
+            "source_sku": "339073"
+        },
+        {
+            "id": "202020",
+            "name": "Spring Anchor",
+            "quantity": 2,
+            "sku": "",
+            "source_sku": "202020"
+        },
+        {
+            "id": "209030",
+            "name": "#10-24 Wingnut",
+            "quantity": 2,
+            "sku": "",
+            "source_sku": "209030"
+        },
+        {
+            "id": "202028",
+            "name": "Threaded Washer",
+            "quantity": 2,
+            "sku": "",
+            "source_sku": "202028"
+        },
+        {
+            "id": "251023G",
+            "name": "Left Side Plate (Gold)",
+            "quantity": 1,
+            "sku": "",
+            "source_sku": "251023G"
+        },
+        {
+            "id": "209046",
+            "name": "Washer",
+            "quantity": 2,
+            "sku": "",
+            "source_sku": "209046"
+        },
+        {
+            "id": "209017",
+            "name": "#10-24 Locknut",
+            "quantity": 2,
+            "sku": "",
+            "source_sku": "209017"
+        },
+        {
+            "id": "209006",
+            "name": "Skid Cover",
+            "quantity": 2,
+            "sku": "",
+            "source_sku": "209006"
+        },
+        {
+            "id": "059012",
+            "name": "#6-32 x 3/8 Fillister Head Screw",
+            "quantity": 2,
+            "sku": "",
+            "source_sku": "059012"
+        },
+        {
+            "id": "201032G",
+            "name": "7\" Radius Plate (Extruded) Gold",
+            "quantity": 1,
+            "sku": "",
+            "source_sku": "201032G"
+        },
+        {
+            "id": "200040F",
+            "name": "7\" Tie Rod",
+            "quantity": 1,
+            "sku": "",
+            "source_sku": "200040F"
+        },
+        {
+            "id": "209012",
+            "name": "#4-40 x 1/4 Fillister Head Screw",
+            "quantity": 2,
+            "sku": "",
+            "source_sku": "209012"
+        },
+        {
+            "id": "204002",
+            "name": "Blade Holder Assembly",
+            "quantity": 1,
+            "sku": "",
+            "source_sku": "204002"
+        },
+        {
+            "id": "204005",
+            "name": "Clamp Assembly",
+            "quantity": 1,
+            "sku": "",
+            "source_sku": "204005"
+        },
+        {
+            "id": "209016",
+            "name": "#4-40 x 7/32 Binding Head Screw",
+            "quantity": 6,
+            "sku": "",
+            "source_sku": "209016"
+        },
+        {
+            "id": "209058",
+            "name": "#6-32 Brass Nut",
+            "quantity": 2,
+            "sku": "",
+            "source_sku": "209058"
+        },
+        {
+            "id": "059018",
+            "name": "#6-32 Thin Pattern Stopnut",
+            "quantity": 5,
+            "sku": "",
+            "source_sku": "059018"
+        }
+    ],
+    "coordinates": {
+        "200001": {
+            "id": "200001",
+            "x_px": null,
+            "y_px": null,
+            "x_pct": 0,
+            "y_pct": 0,
+            "shape": "rectangle",
+            "pageNumber": 1,
+            "rotation": 0,
+            "widthPx": 100,
+            "heightPx": 40
+        },
+        "200009": {
+            "id": "200009",
+            "x_px": null,
+            "y_px": null,
+            "x_pct": 0,
+            "y_pct": 0,
+            "shape": "rectangle",
+            "pageNumber": 1,
+            "rotation": 0,
+            "widthPx": 100,
+            "heightPx": 40
+        },
+        "202007": {
+            "id": "202007",
+            "x_px": null,
+            "y_px": null,
+            "x_pct": 0,
+            "y_pct": 0,
+            "shape": "rectangle",
+            "pageNumber": 1,
+            "rotation": 0,
+            "widthPx": 100,
+            "heightPx": 40
+        },
+        "202020": {
+            "id": "202020",
+            "x_px": null,
+            "y_px": null,
+            "x_pct": 0,
+            "y_pct": 0,
+            "shape": "rectangle",
+            "pageNumber": 1,
+            "rotation": 0,
+            "widthPx": 100,
+            "heightPx": 40
+        },
+        "202021": {
+            "id": "202021",
+            "x_px": null,
+            "y_px": null,
+            "x_pct": 0,
+            "y_pct": 0,
+            "shape": "rectangle",
+            "pageNumber": 1,
+            "rotation": 0,
+            "widthPx": 100,
+            "heightPx": 40
+        },
+        "202022": {
+            "id": "202022",
+            "x_px": null,
+            "y_px": null,
+            "x_pct": 0,
+            "y_pct": 0,
+            "shape": "rectangle",
+            "pageNumber": 1,
+            "rotation": 0,
+            "widthPx": 100,
+            "heightPx": 40
+        },
+        "202028": {
+            "id": "202028",
+            "x_px": null,
+            "y_px": null,
+            "x_pct": 0,
+            "y_pct": 0,
+            "shape": "rectangle",
+            "pageNumber": 1,
+            "rotation": 0,
+            "widthPx": 100,
+            "heightPx": 40
+        },
+        "202036": {
+            "id": "202036",
+            "x_px": null,
+            "y_px": null,
+            "x_pct": 0,
+            "y_pct": 0,
+            "shape": "rectangle",
+            "pageNumber": 1,
+            "rotation": 0,
+            "widthPx": 100,
+            "heightPx": 40
+        },
+        "203010": {
+            "id": "203010",
+            "x_px": null,
+            "y_px": null,
+            "x_pct": 0,
+            "y_pct": 0,
+            "shape": "rectangle",
+            "pageNumber": 1,
+            "rotation": 0,
+            "widthPx": 100,
+            "heightPx": 40
+        },
+        "204002": {
+            "id": "204002",
+            "x_px": null,
+            "y_px": null,
+            "x_pct": 0,
+            "y_pct": 0,
+            "shape": "rectangle",
+            "pageNumber": 1,
+            "rotation": 0,
+            "widthPx": 100,
+            "heightPx": 40
+        },
+        "204005": {
+            "id": "204005",
+            "x_px": null,
+            "y_px": null,
+            "x_pct": 0,
+            "y_pct": 0,
+            "shape": "rectangle",
+            "pageNumber": 1,
+            "rotation": 0,
+            "widthPx": 100,
+            "heightPx": 40
+        },
+        "206003": {
+            "id": "206003",
+            "x_px": null,
+            "y_px": null,
+            "x_pct": 0,
+            "y_pct": 0,
+            "shape": "rectangle",
+            "pageNumber": 1,
+            "rotation": 0,
+            "widthPx": 100,
+            "heightPx": 40
+        },
+        "209006": {
+            "id": "209006",
+            "x_px": null,
+            "y_px": null,
+            "x_pct": 0,
+            "y_pct": 0,
+            "shape": "rectangle",
+            "pageNumber": 1,
+            "rotation": 0,
+            "widthPx": 100,
+            "heightPx": 40
+        },
+        "209012": {
+            "id": "209012",
+            "x_px": null,
+            "y_px": null,
+            "x_pct": 0,
+            "y_pct": 0,
+            "shape": "rectangle",
+            "pageNumber": 1,
+            "rotation": 0,
+            "widthPx": 100,
+            "heightPx": 40
+        },
+        "209016": {
+            "id": "209016",
+            "x_px": null,
+            "y_px": null,
+            "x_pct": 0,
+            "y_pct": 0,
+            "shape": "rectangle",
+            "pageNumber": 1,
+            "rotation": 0,
+            "widthPx": 100,
+            "heightPx": 40
+        },
+        "209017": {
+            "id": "209017",
+            "x_px": null,
+            "y_px": null,
+            "x_pct": 0,
+            "y_pct": 0,
+            "shape": "rectangle",
+            "pageNumber": 1,
+            "rotation": 0,
+            "widthPx": 100,
+            "heightPx": 40
+        },
+        "209030": {
+            "id": "209030",
+            "x_px": null,
+            "y_px": null,
+            "x_pct": 0,
+            "y_pct": 0,
+            "shape": "rectangle",
+            "pageNumber": 1,
+            "rotation": 0,
+            "widthPx": 100,
+            "heightPx": 40
+        },
+        "209039": {
+            "id": "209039",
+            "x_px": null,
+            "y_px": null,
+            "x_pct": 0,
+            "y_pct": 0,
+            "shape": "rectangle",
+            "pageNumber": 1,
+            "rotation": 0,
+            "widthPx": 100,
+            "heightPx": 40
+        },
+        "209041": {
+            "id": "209041",
+            "x_px": null,
+            "y_px": null,
+            "x_pct": 0,
+            "y_pct": 0,
+            "shape": "rectangle",
+            "pageNumber": 1,
+            "rotation": 0,
+            "widthPx": 100,
+            "heightPx": 40
+        },
+        "209042": {
+            "id": "209042",
+            "x_px": null,
+            "y_px": null,
+            "x_pct": 0,
+            "y_pct": 0,
+            "shape": "rectangle",
+            "pageNumber": 1,
+            "rotation": 0,
+            "widthPx": 100,
+            "heightPx": 40
+        },
+        "209046": {
+            "id": "209046",
+            "x_px": null,
+            "y_px": null,
+            "x_pct": 0,
+            "y_pct": 0,
+            "shape": "rectangle",
+            "pageNumber": 1,
+            "rotation": 0,
+            "widthPx": 100,
+            "heightPx": 40
+        },
+        "209047": {
+            "id": "209047",
+            "x_px": null,
+            "y_px": null,
+            "x_pct": 0,
+            "y_pct": 0,
+            "shape": "rectangle",
+            "pageNumber": 1,
+            "rotation": 0,
+            "widthPx": 100,
+            "heightPx": 40
+        },
+        "209048": {
+            "id": "209048",
+            "x_px": null,
+            "y_px": null,
+            "x_pct": 0,
+            "y_pct": 0,
+            "shape": "rectangle",
+            "pageNumber": 1,
+            "rotation": 0,
+            "widthPx": 100,
+            "heightPx": 40
+        },
+        "209049": {
+            "id": "209049",
+            "x_px": null,
+            "y_px": null,
+            "x_pct": 0,
+            "y_pct": 0,
+            "shape": "rectangle",
+            "pageNumber": 1,
+            "rotation": 0,
+            "widthPx": 100,
+            "heightPx": 40
+        },
+        "209058": {
+            "id": "209058",
+            "x_px": null,
+            "y_px": null,
+            "x_pct": 0,
+            "y_pct": 0,
+            "shape": "rectangle",
+            "pageNumber": 1,
+            "rotation": 0,
+            "widthPx": 100,
+            "heightPx": 40
+        },
+        "209148": {
+            "id": "209148",
+            "x_px": null,
+            "y_px": null,
+            "x_pct": 0,
+            "y_pct": 0,
+            "shape": "rectangle",
+            "pageNumber": 1,
+            "rotation": 0,
+            "widthPx": 100,
+            "heightPx": 40
+        },
+        "210059": {
+            "id": "210059",
+            "x_px": null,
+            "y_px": null,
+            "x_pct": 0,
+            "y_pct": 0,
+            "shape": "rectangle",
+            "pageNumber": 1,
+            "rotation": 0,
+            "widthPx": 100,
+            "heightPx": 40
+        },
+        "219064": {
+            "id": "219064",
+            "x_px": null,
+            "y_px": null,
+            "x_pct": 0,
+            "y_pct": 0,
+            "shape": "rectangle",
+            "pageNumber": 1,
+            "rotation": 0,
+            "widthPx": 100,
+            "heightPx": 40
+        },
+        "219067": {
+            "id": "219067",
+            "x_px": null,
+            "y_px": null,
+            "x_pct": 0,
+            "y_pct": 0,
+            "shape": "rectangle",
+            "pageNumber": 1,
+            "rotation": 0,
+            "widthPx": 100,
+            "heightPx": 40
+        },
+        "339073": {
+            "id": "339073",
+            "x_px": null,
+            "y_px": null,
+            "x_pct": 0,
+            "y_pct": 0,
+            "shape": "rectangle",
+            "pageNumber": 1,
+            "rotation": 0,
+            "widthPx": 100,
+            "heightPx": 40
+        },
+        "489023": {
+            "id": "489023",
+            "x_px": null,
+            "y_px": null,
+            "x_pct": 0,
+            "y_pct": 0,
+            "shape": "rectangle",
+            "pageNumber": 1,
+            "rotation": 0,
+            "widthPx": 100,
+            "heightPx": 40
+        },
+        "609012": {
+            "id": "609012",
+            "x_px": null,
+            "y_px": null,
+            "x_pct": 0,
+            "y_pct": 0,
+            "shape": "rectangle",
+            "pageNumber": 1,
+            "rotation": 0,
+            "widthPx": 100,
+            "heightPx": 40
+        },
+        "809006": {
+            "id": "809006",
+            "x_px": null,
+            "y_px": null,
+            "x_pct": 0,
+            "y_pct": 0,
+            "shape": "rectangle",
+            "pageNumber": 1,
+            "rotation": 0,
+            "widthPx": 100,
+            "heightPx": 40
+        },
+        "059018": {
+            "id": "059018",
+            "x_px": null,
+            "y_px": null,
+            "x_pct": 0,
+            "y_pct": 0,
+            "shape": "rectangle",
+            "pageNumber": 1,
+            "rotation": 0,
+            "widthPx": 100,
+            "heightPx": 40
+        },
+        "200026F": {
+            "id": "200026F",
+            "x_px": null,
+            "y_px": null,
+            "x_pct": 0,
+            "y_pct": 0,
+            "shape": "rectangle",
+            "pageNumber": 1,
+            "rotation": 0,
+            "widthPx": 100,
+            "heightPx": 40
+        },
+        "202033G": {
+            "id": "202033G",
+            "x_px": null,
+            "y_px": null,
+            "x_pct": 0,
+            "y_pct": 0,
+            "shape": "rectangle",
+            "pageNumber": 1,
+            "rotation": 0,
+            "widthPx": 100,
+            "heightPx": 40
+        },
+        "210058F": {
+            "id": "210058F",
+            "x_px": null,
+            "y_px": null,
+            "x_pct": 0,
+            "y_pct": 0,
+            "shape": "rectangle",
+            "pageNumber": 1,
+            "rotation": 0,
+            "widthPx": 100,
+            "heightPx": 40
+        },
+        "059015": {
+            "id": "059015",
+            "x_px": null,
+            "y_px": null,
+            "x_pct": 0,
+            "y_pct": 0,
+            "shape": "rectangle",
+            "pageNumber": 1,
+            "rotation": 0,
+            "widthPx": 100,
+            "heightPx": 40
+        },
+        "251025G": {
+            "id": "251025G",
+            "x_px": null,
+            "y_px": null,
+            "x_pct": 0,
+            "y_pct": 0,
+            "shape": "rectangle",
+            "pageNumber": 1,
+            "rotation": 0,
+            "widthPx": 100,
+            "heightPx": 40
+        },
+        "609048\nASSEMBLE WITH LOCTITE 242\nTORQUE 12-14 IN-LB": {
+            "id": "609048\nASSEMBLE WITH LOCTITE 242\nTORQUE 12-14 IN-LB",
+            "x_px": null,
+            "y_px": null,
+            "x_pct": 0,
+            "y_pct": 0,
+            "shape": "rectangle",
+            "pageNumber": 1,
+            "rotation": 0,
+            "widthPx": 100,
+            "heightPx": 40
+        },
+        "20052F": {
+            "id": "20052F",
+            "x_px": null,
+            "y_px": null,
+            "x_pct": 0,
+            "y_pct": 0,
+            "shape": "rectangle",
+            "pageNumber": 1,
+            "rotation": 0,
+            "widthPx": 100,
+            "heightPx": 40
+        },
+        "310051F": {
+            "id": "310051F",
+            "x_px": null,
+            "y_px": null,
+            "x_pct": 0,
+            "y_pct": 0,
+            "shape": "rectangle",
+            "pageNumber": 1,
+            "rotation": 0,
+            "widthPx": 100,
+            "heightPx": 40
+        },
+        "200045G": {
+            "id": "200045G",
+            "x_px": null,
+            "y_px": null,
+            "x_pct": 0,
+            "y_pct": 0,
+            "shape": "rectangle",
+            "pageNumber": 1,
+            "rotation": 0,
+            "widthPx": 100,
+            "heightPx": 40
+        },
+        "059225": {
+            "id": "059225",
+            "x_px": null,
+            "y_px": null,
+            "x_pct": 0,
+            "y_pct": 0,
+            "shape": "rectangle",
+            "pageNumber": 1,
+            "rotation": 0,
+            "widthPx": 100,
+            "heightPx": 40
+        },
+        "206027G": {
+            "id": "206027G",
+            "x_px": null,
+            "y_px": null,
+            "x_pct": 0,
+            "y_pct": 0,
+            "shape": "rectangle",
+            "pageNumber": 1,
+            "rotation": 0,
+            "widthPx": 100,
+            "heightPx": 40
+        },
+        "202044F": {
+            "id": "202044F",
+            "x_px": null,
+            "y_px": null,
+            "x_pct": 0,
+            "y_pct": 0,
+            "shape": "rectangle",
+            "pageNumber": 1,
+            "rotation": 0,
+            "widthPx": 100,
+            "heightPx": 40
+        },
+        "251023G": {
+            "id": "251023G",
+            "x_px": null,
+            "y_px": null,
+            "x_pct": 0,
+            "y_pct": 0,
+            "shape": "rectangle",
+            "pageNumber": 1,
+            "rotation": 0,
+            "widthPx": 100,
+            "heightPx": 40
+        },
+        "059012": {
+            "id": "059012",
+            "x_px": null,
+            "y_px": null,
+            "x_pct": 0,
+            "y_pct": 0,
+            "shape": "rectangle",
+            "pageNumber": 1,
+            "rotation": 0,
+            "widthPx": 100,
+            "heightPx": 40
+        },
+        "201032G": {
+            "id": "201032G",
+            "x_px": null,
+            "y_px": null,
+            "x_pct": 0,
+            "y_pct": 0,
+            "shape": "rectangle",
+            "pageNumber": 1,
+            "rotation": 0,
+            "widthPx": 100,
+            "heightPx": 40
+        },
+        "200040F": {
+            "id": "200040F",
+            "x_px": null,
+            "y_px": null,
+            "x_pct": 0,
+            "y_pct": 0,
+            "shape": "rectangle",
+            "pageNumber": 1,
+            "rotation": 0,
+            "widthPx": 100,
+            "heightPx": 40
+        }
+    },
+    "schema_version": "1.0",
+    "image_natural_width": 3672,
+    "image_natural_height": 2376,
+    "sku": "TTSIDECORNEREDGER",
+    "product_name": "TapeTech 90° Inside Corner Edger"
 }
