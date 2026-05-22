@@ -80,19 +80,17 @@ function dtb_oo_enqueue_assets( string $hook ): void {
 		return;
 	}
 
-	$settings = function_exists( 'dtb_oo_get_settings' ) ? dtb_oo_get_settings() : [];
+    $settings = function_exists( 'dtb_oo_get_settings' ) ? dtb_oo_get_settings() : [];
 
-	// wp_enqueue_style/script with false source registers a handle-only placeholder so
-	// wp_add_inline_style / wp_add_inline_script can attach content without an external file.
-	// The WordPress version string is still passed to bust any edge-case caches.
-	wp_enqueue_style( 'dtb-oo-dashboard', false, [], '1.0.0' ); // phpcs:ignore WordPress.WP.EnqueuedResourceParameters
-	wp_add_inline_style( 'dtb-oo-dashboard', dtb_oo_inline_css() );
+    // Attach dashboard CSS to a guaranteed admin style handle.
+    wp_enqueue_style( 'wp-admin' );
+    wp_add_inline_style( 'wp-admin', dtb_oo_inline_css() );
 
-	wp_enqueue_script( 'dtb-oo-dashboard', false, [ 'jquery' ], '1.0.0', true ); // phpcs:ignore WordPress.WP.EnqueuedResourceParameters
-	wp_add_inline_script( 'dtb-oo-dashboard', dtb_oo_inline_js(), 'after' );
+    // Attach dashboard JS to a guaranteed admin script handle.
+    wp_enqueue_script( 'jquery' );
 
-	// Bootstrap data for JS.
-	wp_localize_script( 'dtb-oo-dashboard', 'dtbOpsOrd', [
+    // Bootstrap data for JS.
+    $bootstrap = [
 		'ajaxUrl'         => admin_url( 'admin-ajax.php' ),
 		'nonce'           => wp_create_nonce( DTB_OO_NONCE_ACTION ),
 		'pollInterval'    => ( (int) ( $settings['poll_interval'] ?? 30 ) ) * 1000,
@@ -106,8 +104,16 @@ function dtb_oo_enqueue_assets( string $hook ): void {
 			'loading'         => __( 'Loading…', 'dtb' ),
 			'no_results'      => __( 'No results found.', 'dtb' ),
 			'error_generic'   => __( 'An error occurred. Please try again.', 'dtb' ),
-		],
-	] );
+        ],
+    ];
+
+    wp_add_inline_script(
+        'jquery',
+        'window.dtbOpsOrd = ' . wp_json_encode( $bootstrap ) . ';',
+        'before'
+    );
+
+    wp_add_inline_script( 'jquery', dtb_oo_inline_js(), 'after' );
 }
 
 // =============================================================================
@@ -553,7 +559,7 @@ function dtb_oo_inline_js(): string {
     // State
     // -------------------------------------------------------------------------
     var cfg = window.dtbOpsOrd || {};
-    var ajaxUrl      = cfg.ajaxUrl    || '';
+    var ajaxUrl      = cfg.ajaxUrl    || window.ajaxurl || '';
     var nonce        = cfg.nonce      || '';
     var pollInterval = cfg.pollInterval || 30000;
     var strings      = cfg.strings    || {};
@@ -693,13 +699,18 @@ function dtb_oo_inline_js(): string {
 
     function loadOverview() {
         var $grid = $('#dtb-oo-overview-kpis');
+        if (!ajaxUrl || !nonce) {
+            $grid.removeClass('dtb-oo-loading');
+            $grid.html('<p class="dtb-oo-error">Order Operations bootstrap is missing (ajax/nonce).</p>');
+            return;
+        }
         $grid.addClass('dtb-oo-loading');
         ajaxPost('dtb_ops_order_overview', {}, function (data) {
             $grid.removeClass('dtb-oo-loading');
             renderKpis(data.kpis || {});
-        }, function () {
+        }, function (msg) {
             $grid.removeClass('dtb-oo-loading');
-            $grid.html('<p class="dtb-oo-error">Could not load KPIs.</p>');
+            $grid.html('<p class="dtb-oo-error">' + esc(msg || 'Could not load KPIs.') + '</p>');
         });
     }
 
@@ -1374,7 +1385,10 @@ function dtb_oo_inline_js(): string {
     // -------------------------------------------------------------------------
 
     $(document).ready(function () {
-        if (typeof dtbOpsOrd === 'undefined') return;
+        if (typeof dtbOpsOrd === 'undefined') {
+            $('#dtb-oo-overview-kpis').html('<p class="dtb-oo-error">Order Operations bootstrap config is unavailable.</p>');
+            return;
+        }
         // Restore tab from hash.
         var hash = window.location.hash.replace('#', '');
         var validTabs = ['overview', 'product_orders', 'repair_orders', 'queue', 'audit_log', 'settings'];

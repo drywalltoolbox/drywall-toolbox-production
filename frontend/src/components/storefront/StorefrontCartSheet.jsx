@@ -1,12 +1,40 @@
 import { Link } from 'react-router-dom';
 import { ShoppingCart, Trash2, X, Package } from 'lucide-react';
-import { useEffect } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 
 export default function StorefrontCartSheet({ isOpen, onClose, cartItems = [], removeFromCart, getCartTotal }) {
+  const overlayRef = useRef(null);
+  const closeButtonRef = useRef(null);
+  const previouslyFocusedRef = useRef(null);
+
+  const handleClose = useCallback(() => {
+    if (overlayRef.current?.contains(document.activeElement)) {
+      document.activeElement?.blur?.();
+    }
+    onClose?.();
+  }, [onClose]);
+
+  const handleNavAndClose = useCallback((event) => {
+    event.currentTarget?.blur?.();
+    handleClose();
+  }, [handleClose]);
+
+  useEffect(() => {
+    if (isOpen) {
+      previouslyFocusedRef.current = document.activeElement;
+      closeButtonRef.current?.focus?.();
+      return;
+    }
+
+    if (previouslyFocusedRef.current?.focus) {
+      previouslyFocusedRef.current.focus();
+    }
+  }, [isOpen]);
+
   useEffect(() => {
     if (!isOpen) return undefined;
     const onKeyDown = (event) => {
-      if (event.key === 'Escape') onClose?.();
+      if (event.key === 'Escape') handleClose();
     };
     const prev = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
@@ -15,19 +43,21 @@ export default function StorefrontCartSheet({ isOpen, onClose, cartItems = [], r
       document.body.style.overflow = prev;
       window.removeEventListener('keydown', onKeyDown);
     };
-  }, [isOpen, onClose]);
+  }, [isOpen, handleClose]);
 
   return (
     <div
+      ref={overlayRef}
       className={`cart-overlay${isOpen ? ' active' : ''}`}
-      onClick={onClose}
+      onClick={handleClose}
       aria-hidden={!isOpen}
+      inert={!isOpen ? '' : undefined}
     >
       <aside
         className="cart-panel storefront-cart-sheet"
         onClick={(event) => event.stopPropagation()}
         role="dialog"
-        aria-modal="true"
+        aria-modal={isOpen ? 'true' : 'false'}
         aria-label="Shopping cart"
       >
         {/* ── Header ── */}
@@ -41,7 +71,7 @@ export default function StorefrontCartSheet({ isOpen, onClose, cartItems = [], r
               <span className="scs-count">{cartItems.length}</span>
             )}
           </div>
-          <button type="button" onClick={onClose} aria-label="Close cart" className="scs-close">
+          <button ref={closeButtonRef} type="button" onClick={handleClose} aria-label="Close cart" className="scs-close">
             <X size={18} strokeWidth={2.5} />
           </button>
         </header>
@@ -55,7 +85,7 @@ export default function StorefrontCartSheet({ isOpen, onClose, cartItems = [], r
               </div>
               <strong className="scs-empty-title">Your cart is empty</strong>
               <p className="scs-empty-body">Add products to get started.</p>
-              <Link to="/products" onClick={onClose} className="scs-browse-btn">
+              <Link to="/products" onClick={handleNavAndClose} className="scs-browse-btn">
                 Browse Products
               </Link>
             </div>
@@ -107,14 +137,14 @@ export default function StorefrontCartSheet({ isOpen, onClose, cartItems = [], r
             </div>
             <Link
               to="/checkout"
-              onClick={onClose}
+              onClick={handleNavAndClose}
               className="scs-checkout-btn"
             >
               Proceed to Checkout
             </Link>
             <Link
               to="/cart"
-              onClick={onClose}
+              onClick={handleNavAndClose}
               className="scs-view-cart-btn"
             >
               View cart
