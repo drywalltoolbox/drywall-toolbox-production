@@ -16,7 +16,7 @@
  *   - Shared data (points, recent orders) fetched once and passed to tabs
  */
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion as Motion, AnimatePresence } from 'framer-motion';
 import {
@@ -66,7 +66,10 @@ const DOT_GRID = {
 
 export default function AccountHub() {
   const rewardsEnabled = isRewardsEnabled();
-  const TABS = rewardsEnabled ? BASE_TABS : BASE_TABS.filter( (tab) => tab.id !== 'rewards' );
+  const TABS = useMemo(
+    () => ( rewardsEnabled ? BASE_TABS : BASE_TABS.filter( (tab) => tab.id !== 'rewards' ) ),
+    [ rewardsEnabled ],
+  );
   const navigate                                      = useNavigate();
   const { user, isAuthenticated, isLoading, logout }  = useAuthContext();
 
@@ -114,7 +117,7 @@ export default function AccountHub() {
       window.history.replaceState( null, '', url.toString() );
       localStorage.setItem( 'dtb_dashboard_tab', JSON.stringify( activeTab ) );
     } catch { /* noop */ }
-  }, [ activeTab ] );
+  }, [ TABS, activeTab ] );
 
   // Fetch shared data once when user changes
   useEffect( () => {

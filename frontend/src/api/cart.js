@@ -305,16 +305,6 @@ export async function placeOrder(
   } );
 }
 
-function buildStoreApiVariation(variationAttributeValues) {
-  if ( !Array.isArray( variationAttributeValues ) ) return {};
-
-  return Object.fromEntries(
-    variationAttributeValues
-      .filter( ( attr ) => attr?.name && attr?.option )
-      .map( ( attr ) => [ attr.name, attr.option ] ),
-  );
-}
-
 /**
  * Synchronise the React CartContext items into the WC server-side cart and
  * submit the Store API checkout in one atomic operation.

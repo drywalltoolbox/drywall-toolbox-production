@@ -181,7 +181,10 @@ export default function Checkout() {
 
   const navigate = useNavigate();
   const { cartItems, getCartTotal, clearCart } = useCart();
-  const safeCartItems = Array.isArray( cartItems ) ? cartItems : [];
+  const safeCartItems = useMemo(
+    () => ( Array.isArray( cartItems ) ? cartItems : [] ),
+    [ cartItems ],
+  );
   const { showWorkflow, hideWorkflow } = useWorkflowTransition();
   const { user, isAuthenticated } = useAuthContext();
 
@@ -388,7 +391,7 @@ export default function Checkout() {
     if ( errors[name] ) setErrors( ( prev ) => ( { ...prev, [name]: '' } ) );
   };
 
-  const validateForm = () => {
+  const validateForm = useCallback( () => {
     const e = {};
     if ( ! formData.firstName.trim() ) e.firstName = 'Required';
     if ( ! formData.lastName.trim()  ) e.lastName  = 'Required';
@@ -404,7 +407,7 @@ export default function Checkout() {
     if ( ! formData.zip.trim()     ) e.zip     = 'Required';
     setErrors( e );
     return Object.keys( e ).length === 0;
-  };
+  }, [ formData ] );
 
   const handlePlaceOrder = useCallback( async () => {
     if ( ! validateForm() ) {
@@ -454,7 +457,7 @@ export default function Checkout() {
       setProcessing( false );
       setStep( 'form' );
     }
-  }, [ appliedCoupon, clearCart, formData, paymentMethod, safeCartItems, selectedRate ] );
+  }, [ appliedCoupon, clearCart, formData, paymentMethod, safeCartItems, selectedRate, validateForm ] );
 
   useEffect(() => {
     if (processing) {
