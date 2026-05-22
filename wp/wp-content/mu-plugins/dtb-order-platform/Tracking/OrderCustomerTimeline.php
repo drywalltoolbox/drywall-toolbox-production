@@ -23,9 +23,13 @@ function dtb_order_get_customer_timeline( int $order_id ): array {
 
 function dtb_order_format_summary( WC_Order $order ): array {
 	$status_proj = dtb_order_build_status_projection( (int) $order->get_id() );
+	$order_type  = function_exists( 'dtb_order_resolve_type' )
+		? dtb_order_resolve_type( $order )
+		: 'product';
 
 	return [
 		'id'                 => (int) $order->get_id(),
+		'order_type'         => $order_type,
 		'status'             => $status_proj['status'],
 		'status_label'       => $status_proj['label'],
 		'total'              => $order->get_total(),

@@ -21,6 +21,7 @@ require_once $_dtb_order . '/Infrastructure/WooOrderStatusStore.php';
 require_once $_dtb_order . '/Infrastructure/OrderIntegrationStateStore.php';
 require_once $_dtb_order . '/Infrastructure/OrderQueue.php';
 require_once $_dtb_order . '/Services/OrderTrackingUrlService.php';
+require_once $_dtb_order . '/Services/OrderTypeService.php';
 require_once $_dtb_order . '/Services/OrderProjectionService.php';
 require_once $_dtb_order . '/Services/OrderOpsQueryService.php';
 require_once $_dtb_order . '/Services/OrderOpsProjectionService.php';

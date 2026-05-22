@@ -12,8 +12,8 @@ final class DTB_CorsPolicy {
 	public static function headers( ?string $origin = null ): array {
 		$headers = [
 			'Access-Control-Allow-Methods' => 'GET, POST, PUT, PATCH, DELETE, OPTIONS',
-			'Access-Control-Allow-Headers' => 'Authorization, Content-Type, X-WP-Nonce, X-Requested-With, X-WC-Store-API-Nonce',
-			'Access-Control-Expose-Headers' => 'X-WC-Store-API-Nonce, Nonce',
+			'Access-Control-Allow-Headers' => 'Authorization, Content-Type, X-WP-Nonce, X-Requested-With, X-WC-Store-API-Nonce, Cart-Token',
+			'Access-Control-Expose-Headers' => 'X-WC-Store-API-Nonce, Nonce, Cart-Token',
 			'Access-Control-Max-Age' => '86400',
 		];
 

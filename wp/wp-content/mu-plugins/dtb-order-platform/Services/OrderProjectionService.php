@@ -49,6 +49,9 @@ function dtb_order_build_tracking_projection( int $order_id ): ?array {
 	$status_proj = dtb_order_build_status_projection( $order_id );
 	$timeline    = dtb_order_get_customer_timeline( $order_id );
 	$int_state   = dtb_order_get_integration_state( $order_id );
+	$order_type  = function_exists( 'dtb_order_resolve_type' )
+		? dtb_order_resolve_type( $order )
+		: 'product';
 
 	$veeqo = $int_state['veeqo'] ?? [];
 	$tracking_number   = ( ! empty( $veeqo['tracking'] ) && is_string( $veeqo['tracking'] ) )
@@ -74,6 +77,7 @@ function dtb_order_build_tracking_projection( int $order_id ): ?array {
 
 	return [
 		'order_id'           => $order_id,
+		'order_type'         => $order_type,
 		'status'             => $status_proj['status'],
 		'label'              => $status_proj['label'],
 		'placed_at'          => $order->get_date_created() ? $order->get_date_created()->format( 'c' ) : null,

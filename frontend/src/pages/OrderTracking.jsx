@@ -121,6 +121,11 @@ function StatusBadge( { status, label } ) {
   );
 }
 
+function formatOrderType( type ) {
+  if ( type === 'repair_service' ) return 'Repair Service Order';
+  return 'Product Order';
+}
+
 // ─── Timeline ────────────────────────────────────────────────────────────────
 
 function OrderTimeline( { timeline } ) {
@@ -286,7 +291,12 @@ export default function OrderTracking() {
             ) }
           </div>
           { data && (
-            <StatusBadge status={ data.status } label={ data.label } />
+            <div className="flex flex-col gap-1.5">
+              <StatusBadge status={ data.status } label={ data.label } />
+              <p className="text-xs font-medium text-gray-500">
+                { formatOrderType( data.order_type ) }
+              </p>
+            </div>
           ) }
         </div>
 

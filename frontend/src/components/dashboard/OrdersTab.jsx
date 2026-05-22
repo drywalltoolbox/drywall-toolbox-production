@@ -29,6 +29,36 @@ const STATUS_CFG = {
   failed:     { label: 'Failed',     color: '#dc2626', bg: '#fef2f2', Icon: AlertCircle },
 };
 
+const ORDER_TYPE_CFG = {
+  product: { label: 'Product', color: '#334155', bg: '#f8fafc', border: '#e2e8f0' },
+  repair_service: { label: 'Repair Service', color: '#1d4ed8', bg: '#eff6ff', border: '#bfdbfe' },
+};
+
+function resolveOrderType( order ) {
+  const rawType = typeof order?.order_type === 'string' ? order.order_type.trim().toLowerCase() : '';
+  if ( rawType === 'repair_service' || rawType === 'product' ) return rawType;
+  return 'product';
+}
+
+function OrderTypeBadge( { order } ) {
+  const type = resolveOrderType( order );
+  const cfg = ORDER_TYPE_CFG[ type ] || ORDER_TYPE_CFG.product;
+
+  return (
+    <span
+      style={ {
+        display: 'inline-flex', alignItems: 'center',
+        padding: '2px 8px', borderRadius: '999px',
+        border: `1px solid ${ cfg.border }`,
+        background: cfg.bg, color: cfg.color,
+        fontSize: '0.66rem', fontWeight: 700, lineHeight: 1.2,
+      } }
+    >
+      { cfg.label }
+    </span>
+  );
+}
+
 function StatusBadge( { status } ) {
   const cfg = STATUS_CFG[ status ] || { label: status, color: '#64748b', bg: '#f8fafc', Icon: Package };
   return (
@@ -123,6 +153,7 @@ export default function OrdersTab( { userId } ) {
                     <div>
                       <div style={ { display: 'flex', alignItems: 'center', gap: '7px', marginBottom: '3px' } }>
                         <span style={ { fontWeight: 700, color: '#0f172a', fontSize: '0.9rem' } }>Order #{ order.id }</span>
+                        <OrderTypeBadge order={ order } />
                         <StatusBadge status={ order.status } />
                       </div>
                       <p style={ { margin: 0, fontSize: '0.73rem', color: 'rgba(15,23,42,0.4)' } }>

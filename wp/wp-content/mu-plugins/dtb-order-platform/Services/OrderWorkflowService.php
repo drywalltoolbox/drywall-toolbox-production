@@ -14,6 +14,18 @@ add_action( 'woocommerce_new_order', 'dtb_order_on_created', 10, 2 );
 add_action( 'woocommerce_order_refunded', 'dtb_order_on_refunded', 10, 2 );
 
 function dtb_order_on_created( int $order_id, $order ): void {
+	if ( $order instanceof WC_Abstract_Order ) {
+		$current_type = sanitize_key( (string) $order->get_meta( '_dtb_order_type', true ) );
+		if ( '' === $current_type ) {
+			$resolved_type = function_exists( 'dtb_order_resolve_type' )
+				? dtb_order_resolve_type( $order )
+				: 'product';
+
+			$order->update_meta_data( '_dtb_order_type', $resolved_type );
+			$order->save_meta_data();
+		}
+	}
+
 	dtb_order_append_event( $order_id, 'order.created', [
 		'source'      => 'checkout',
 		'actor_type'  => 'customer',

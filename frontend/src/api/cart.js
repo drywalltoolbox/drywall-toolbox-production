@@ -19,6 +19,19 @@ const STORE_BASE =
 
 // Nonce stored at module scope — refreshed by initCart().
 let _storeNonce = '';
+let _cartToken = '';
+
+function updateStoreSessionHeaders( res ) {
+  const updatedNonce = res.headers.get( 'Nonce' ) || res.headers.get( 'X-WC-Store-API-Nonce' );
+  if ( updatedNonce ) {
+    _storeNonce = updatedNonce;
+  }
+
+  const updatedCartToken = res.headers.get( 'Cart-Token' );
+  if ( updatedCartToken ) {
+    _cartToken = updatedCartToken;
+  }
+}
 
 // ─── Fetch helper ─────────────────────────────────────────────────────────────
 
@@ -27,6 +40,7 @@ async function storeFetch( path, options = {}, isRetry = false ) {
   const headers = {
     'Content-Type': 'application/json',
     ...( _storeNonce ? { 'X-WC-Store-API-Nonce': _storeNonce } : {} ),
+    ...( _cartToken ? { 'Cart-Token': _cartToken } : {} ),
     ...( options.headers || {} ),
   };
 
@@ -39,10 +53,7 @@ async function storeFetch( path, options = {}, isRetry = false ) {
   // WooCommerce 8+ returns the nonce as 'Nonce'; older versions use
   // 'X-WC-Store-API-Nonce'.  Capture it from every response so the
   // in-memory nonce stays fresh for subsequent mutations.
-  const updatedNonce = res.headers.get( 'Nonce' ) || res.headers.get( 'X-WC-Store-API-Nonce' );
-  if ( updatedNonce ) {
-    _storeNonce = updatedNonce;
-  }
+  updateStoreSessionHeaders( res );
 
   // 401 — refresh nonce via initCart() and retry once.
   if ( res.status === 401 ) {
@@ -86,10 +97,7 @@ export async function initCart() {
     headers: { 'Content-Type': 'application/json' },
   } );
 
-  const nonce = res.headers.get( 'Nonce' ) || res.headers.get( 'X-WC-Store-API-Nonce' );
-  if ( nonce ) {
-    _storeNonce = nonce;
-  }
+  updateStoreSessionHeaders( res );
 
   if ( ! res.ok ) {
     throw new Error( `Store API error ${ res.status }: ${ url }` );
