@@ -1245,6 +1245,22 @@ function dtb_ajax_schematics_import_csv() {
 		$batch_result = dtb_schematics_import_run_batch( $state, $image_index, $batch_size );
 		$done         = ! empty( $batch_result['done'] );
 
+		// Defensive normalization: if import completed with no row-level errors,
+		// do not surface stale/false failure counters in UI summary.
+		if ( $done ) {
+			$errors = is_array( $state['errors'] ?? null ) ? (array) $state['errors'] : [];
+			$has_row_errors = false;
+			foreach ( $errors as $err ) {
+				if ( is_string( $err ) && str_starts_with( $err, 'Row ' ) ) {
+					$has_row_errors = true;
+					break;
+				}
+			}
+			if ( ! $has_row_errors ) {
+				$state['reason_counts'] = dtb_schematics_import_default_reason_counts();
+			}
+		}
+
 		if ( $done ) {
 			dtb_schematics_manifest_repo_delete_cache();
 			delete_transient( $key );
