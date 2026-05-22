@@ -1,8 +1,8 @@
 {
     "id": "asgard-loading-pump-lp01-ad-sch",
-    "title": "asgard-loading-pump-lp01-ad-sch-schematic-page-01.webp",
-    "product_name": "Asgard Loading Pump",
-    "sku": "LP01AD",
+    "title": "LP01-AD_SCH",
+    "product_name": "Compound Loading Pump",
+    "sku": "LP01-AD",
     "diagramPages": [
         1
     ],

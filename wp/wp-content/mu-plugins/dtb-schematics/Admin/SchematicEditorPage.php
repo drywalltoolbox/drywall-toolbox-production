@@ -3,7 +3,7 @@ defined( 'ABSPATH' ) || exit;
 
 function dtb_schematics_render_page() {
 	$nonce        = wp_create_nonce( 'dtb_schematics_nonce' );
-	$brands       = DTB_BRANDS;
+	$brands       = dtb_schematics_get_brand_options();
 	$manifest_age = '';
 	$transient    = get_option( '_transient_timeout_' . DTB_MANIFEST_TRANSIENT );
 	if ( $transient ) {

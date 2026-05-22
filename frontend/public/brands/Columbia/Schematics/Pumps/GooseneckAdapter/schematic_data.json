@@ -75,7 +75,5 @@
     },
     "schema_version": "1.0",
     "image_natural_width": 1792,
-    "image_natural_height": 2400,
-    "sku": "COL-GOOSENECK",
-    "product_name": "Columbia Gooseneck"
+    "image_natural_height": 2400
 }

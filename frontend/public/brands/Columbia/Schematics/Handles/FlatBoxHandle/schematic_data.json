@@ -353,7 +353,5 @@
     },
     "schema_version": "1.0",
     "image_natural_width": 1024,
-    "image_natural_height": 1024,
-    "sku": "COL180GRIPFLATBOXHANDLEFIXEDLENGTH",
-    "product_name": "Columbia 180 Grip Flat Box Handle"
+    "image_natural_height": 1024
 }

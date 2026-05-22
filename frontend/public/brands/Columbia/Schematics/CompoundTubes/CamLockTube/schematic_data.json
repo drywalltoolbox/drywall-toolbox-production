@@ -423,7 +423,5 @@
     },
     "schema_version": "1.0",
     "image_natural_width": 1792,
-    "image_natural_height": 2400,
-    "sku": "COL-CAM-LOCK-TUBE",
-    "product_name": "Columbia Cam Lock Tube"
+    "image_natural_height": 2400
 }

@@ -1045,7 +1045,5 @@
     },
     "schema_version": "1.0",
     "image_natural_width": 1200,
-    "image_natural_height": 896,
-    "sku": "COL-AUTOMATIC-FLAT-BOX",
-    "product_name": "Columbia Automatic Flat Box"
+    "image_natural_height": 896
 }

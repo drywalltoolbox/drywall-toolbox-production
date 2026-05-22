@@ -837,7 +837,5 @@
     },
     "schema_version": "1.0",
     "image_natural_width": 896,
-    "image_natural_height": 1200,
-    "sku": "COLMUDPUMP",
-    "product_name": "Columbia Mud Pump"
+    "image_natural_height": 1200
 }

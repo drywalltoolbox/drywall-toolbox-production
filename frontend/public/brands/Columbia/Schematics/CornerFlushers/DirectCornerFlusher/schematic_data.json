@@ -461,7 +461,5 @@
     },
     "schema_version": "1.0",
     "image_natural_width": 768,
-    "image_natural_height": 1376,
-    "sku": "COL-DIRECT-FLUSHER",
-    "product_name": "Columbia Direct Flusher"
+    "image_natural_height": 1376
 }

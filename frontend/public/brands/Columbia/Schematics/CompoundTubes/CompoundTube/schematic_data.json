@@ -371,7 +371,5 @@
     },
     "schema_version": "1.0",
     "image_natural_width": 1792,
-    "image_natural_height": 2400,
-    "sku": "COL-COMPOUND-TUBE",
-    "product_name": "Columbia Compound Tube"
+    "image_natural_height": 2400
 }

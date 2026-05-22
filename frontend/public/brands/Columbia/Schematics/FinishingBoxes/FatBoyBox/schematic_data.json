@@ -755,7 +755,5 @@
     },
     "schema_version": "1.0",
     "image_natural_width": 1200,
-    "image_natural_height": 896,
-    "sku": "COLFATBOYBOX",
-    "product_name": "Columbia Fat Boy Finishing Box"
+    "image_natural_height": 896
 }

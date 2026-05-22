@@ -107,7 +107,5 @@
     },
     "schema_version": "1.0",
     "image_natural_width": 1792,
-    "image_natural_height": 2400,
-    "sku": "COL-BOX-FILLER",
-    "product_name": "Columbia Box Filler"
+    "image_natural_height": 2400
 }

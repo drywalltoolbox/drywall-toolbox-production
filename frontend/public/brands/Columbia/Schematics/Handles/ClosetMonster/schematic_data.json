@@ -219,7 +219,5 @@
     },
     "schema_version": "1.0",
     "image_natural_width": 1200,
-    "image_natural_height": 896,
-    "sku": "CMH",
-    "product_name": "Columbia Closet Monster Handle"
+    "image_natural_height": 896
 }

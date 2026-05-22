@@ -235,7 +235,5 @@
     },
     "schema_version": "1.0",
     "image_natural_width": 2400,
-    "image_natural_height": 1792,
-    "sku": "COLSTANDARDFLUSHERS",
-    "product_name": "Columbia Standard Flusher"
+    "image_natural_height": 1792
 }

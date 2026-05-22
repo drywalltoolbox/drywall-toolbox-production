@@ -69,9 +69,49 @@ add_action( 'admin_enqueue_scripts', function ( $hook ) {
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 
-define( 'DTB_BRANDS', [ 'Asgard', 'Columbia Taping Tools', 'Platinum Drywall Tools', 'SurPro', 'TapeTech' ] );
 define( 'DTB_MANIFEST_TRANSIENT', 'dtb_schematics_manifest' );
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
+
+if ( ! function_exists( 'dtb_schematics_get_brand_options' ) ) {
+	/**
+	 * Return brand labels from live Woo product_brand taxonomy.
+	 * Falls back to canonical defaults if taxonomy/terms are unavailable.
+	 *
+	 * @return string[]
+	 */
+	function dtb_schematics_get_brand_options() {
+		$fallback = [ 'Asgard', 'Columbia Tools', 'Level5', 'Platinum Drywall Tools', 'TapeTech' ];
+
+		if ( ! taxonomy_exists( 'product_brand' ) ) {
+			return $fallback;
+		}
+
+		$terms = get_terms(
+			[
+				'taxonomy'   => 'product_brand',
+				'hide_empty' => false,
+				'orderby'    => 'name',
+				'order'      => 'ASC',
+				'fields'     => 'names',
+			]
+		);
+
+		if ( is_wp_error( $terms ) || empty( $terms ) ) {
+			return $fallback;
+		}
+
+		$brands = [];
+		foreach ( $terms as $name ) {
+			$name = trim( (string) $name );
+			if ( '' !== $name ) {
+				$brands[] = $name;
+			}
+		}
+
+		$brands = array_values( array_unique( $brands ) );
+		return ! empty( $brands ) ? $brands : $fallback;
+	}
+}
 
 

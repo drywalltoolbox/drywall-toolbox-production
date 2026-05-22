@@ -1,6 +1,6 @@
 {
     "id": "tapetech-corner-applicator-sch",
-    "title": "35TT-SCH",
+    "title": "tapetech-corner-applicator-sch-schematic-page-01.png",
     "diagramPages": [
         1
     ],
@@ -661,7 +661,5 @@
     },
     "schema_version": "1.0",
     "image_natural_width": 1376,
-    "image_natural_height": 768,
-    "sku": "TT-CORNER-APPLICATOR",
-    "product_name": "TapeTech Corner Applicator"
+    "image_natural_height": 768
 }

@@ -1,6 +1,6 @@
 {
     "id": "tapetech-tapetech-lock-block-for-07tt-050212f-sch",
-    "title": "07TT-SCH-V11",
+    "title": "tapetech-tapetech-lock-block-for-07tt-050212f-sch-schematic-page-01.png",
     "diagramPages": [
         1,
         2,
@@ -3816,7 +3816,5 @@
     },
     "schema_version": "1.0",
     "image_natural_width": 792,
-    "image_natural_height": 612,
-    "sku": "050212F",
-    "product_name": "Lock Block for 07TT"
+    "image_natural_height": 612
 }

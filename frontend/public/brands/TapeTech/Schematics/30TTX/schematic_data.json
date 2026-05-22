@@ -1,6 +1,6 @@
 {
     "id": "tapetech-90-inside-corner-edger-tapetech-30ttx-sch",
-    "title": "30TTX-SCH",
+    "title": "tapetech-90-inside-corner-edger-tapetech-30ttx-sch-schematic-page-01.png",
     "diagramPages": [
         1
     ],
@@ -963,7 +963,5 @@
     },
     "schema_version": "1.0",
     "image_natural_width": 2752,
-    "image_natural_height": 1536,
-    "sku": "TTSIDECORNEREDGER",
-    "product_name": "TapeTech 90° Inside Corner Edger"
+    "image_natural_height": 1536
 }

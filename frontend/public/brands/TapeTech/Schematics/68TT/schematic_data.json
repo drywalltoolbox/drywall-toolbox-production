@@ -1,6 +1,6 @@
 {
     "id": "tapetech-easyclean-nail-spotter-sch-2",
-    "title": "68TT-SCH",
+    "title": "tapetech-easyclean-nail-spotter-sch-2-schematic-page-01.png",
     "diagramPages": [
         1
     ],
@@ -823,7 +823,5 @@
     },
     "schema_version": "1.0",
     "image_natural_width": 2527,
-    "image_natural_height": 1836,
-    "sku": "TTEASYCLEANNAILSPOTTER",
-    "product_name": "TapeTech EasyClean® Nail Spotter"
+    "image_natural_height": 1836
 }

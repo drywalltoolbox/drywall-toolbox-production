@@ -231,6 +231,8 @@ function dtb_schematics_rmdir_recursive( string $dir ): void {
 function dtb_schematics_normalize_token( string $value ): string {
 	$value = strtolower( trim( $value ) );
 	$value = preg_replace( '/[^a-z0-9]+/', '', $value );
+	// Normalize page number padding so page-001 and page-01 resolve to the same token.
+	$value = preg_replace( '/page0+([0-9]+)/', 'page$1', (string) $value );
 	return is_string( $value ) ? $value : '';
 }
 
@@ -741,7 +743,7 @@ function dtb_ajax_schematics_register_staged_images(): void {
 	for ( $i = $offset; $i < $total && $processed < $batch_size; $i++ ) {
 		$file = (string) $files[ $i ];
 		$title = (string) pathinfo( wp_basename( $file ), PATHINFO_FILENAME );
-		$id = dtb_schematics_register_existing_upload_file_as_attachment( $file, $title, 0, false );
+		$id = dtb_schematics_register_existing_upload_file_as_attachment( $file, $title, 0, true );
 		if ( $id > 0 ) {
 			$registered++;
 		} else {
@@ -1052,8 +1054,10 @@ function dtb_schematics_import_run_batch( array &$state, array $image_index, int
 						$attachment_id = dtb_schematics_import_image_as_attachment( $matched_value, $model_name ?: $schematic_id, $parent_post_id, $generate_metadata );
 					}
 
-					if ( $attachment_id > 0 && 'attachment_id' !== $image_index_mode ) {
-						$image_imported++;
+					if ( $attachment_id > 0 ) {
+						if ( 'attachment_id' !== $image_index_mode ) {
+							$image_imported++;
+						}
 					} elseif ( 'zip_entry' === $image_index_mode && 'zip_entry_not_found' === $zip_import_failure_reason ) {
 						dtb_schematics_import_increment_reason( $reason_counts, 'zip_missing_entry' );
 					} else {

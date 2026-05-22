@@ -1,6 +1,6 @@
 {
     "id": "tapetech-flat-box-handle-sch",
-    "title": "8054TT-SCH",
+    "title": "tapetech-flat-box-handle-sch-schematic-page-01.png",
     "diagramPages": [
         1
     ],
@@ -412,7 +412,5 @@
     },
     "schema_version": "1.0",
     "image_natural_width": 2400,
-    "image_natural_height": 1792,
-    "sku": "TT-FLAT-BOX-HANDLE",
-    "product_name": "TapeTech Flat Box Handle"
+    "image_natural_height": 1792
 }

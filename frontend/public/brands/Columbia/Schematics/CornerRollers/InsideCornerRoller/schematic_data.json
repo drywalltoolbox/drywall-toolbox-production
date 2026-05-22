@@ -187,7 +187,5 @@
     },
     "schema_version": "1.0",
     "image_natural_width": 1200,
-    "image_natural_height": 896,
-    "sku": "CR",
-    "product_name": "Columbia Corner Roller"
+    "image_natural_height": 896
 }

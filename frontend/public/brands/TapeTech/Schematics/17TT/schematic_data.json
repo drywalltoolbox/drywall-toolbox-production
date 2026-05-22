@@ -1,385 +1,383 @@
 {
-    "id": "tapetech-90-inside-corner-edger-tapetech-17tt-sch",
-    "title": "17TT-SCH",
-    "diagramPages": [
-        1
-    ],
-    "legendPages": [],
-    "parts": [
-        {
-            "id": "170002",
-            "name": "Block",
-            "quantity": 1,
-            "sku": "",
-            "source_sku": "170002"
-        },
-        {
-            "id": "150004F",
-            "name": "Pin, Swivel Coupling",
-            "quantity": 1,
-            "sku": "",
-            "source_sku": "150004F"
-        },
-        {
-            "id": "179004",
-            "name": "6-32 X 3/16 Hex Soc Setscrew Cup Pt 18-8",
-            "quantity": 1,
-            "sku": "",
-            "source_sku": "179004"
-        },
-        {
-            "id": "059143",
-            "name": "Cotter Pin 1/16 X 1/2 SST.",
-            "quantity": 1,
-            "sku": "",
-            "source_sku": "059143"
-        },
-        {
-            "id": "150009",
-            "name": "Swivel Axle",
-            "quantity": 1,
-            "sku": "",
-            "source_sku": "150009"
-        },
-        {
-            "id": "359005",
-            "name": "Screw: 6-32 X 1/4 Bind Hd.",
-            "quantity": 1,
-            "sku": "",
-            "source_sku": "359005"
-        },
-        {
-            "id": "176001",
-            "name": "Bracket, No Logo, Serialized",
-            "quantity": 1,
-            "sku": "",
-            "source_sku": "176001"
-        },
-        {
-            "id": "150003F",
-            "name": "Coupling",
-            "quantity": 1,
-            "sku": "",
-            "source_sku": "150003F"
-        },
-        {
-            "id": "154007",
-            "name": "Swivel Ass'Y",
-            "quantity": 1,
-            "sku": "",
-            "source_sku": "154007"
-        },
-        {
-            "id": "171005",
-            "name": "Universal Roller",
-            "quantity": 1,
-            "sku": "",
-            "source_sku": "171005"
-        },
-        {
-            "id": "170003",
-            "name": "Axle",
-            "quantity": 1,
-            "sku": "",
-            "source_sku": "170003"
-        },
-        {
-            "id": "359046",
-            "name": "Nut, Hex 10-32",
-            "quantity": 1,
-            "sku": "",
-            "source_sku": "359046"
-        },
-        {
-            "id": "179006",
-            "name": "#10 Medium Lockwasher 18-8 S.S.",
-            "quantity": 1,
-            "sku": "",
-            "source_sku": "179006"
-        },
-        {
-            "id": "179007",
-            "name": "#10 Flat Washer, 18-8 S.S.",
-            "quantity": 1,
-            "sku": "",
-            "source_sku": "179007"
-        },
-        {
-            "id": "179010",
-            "name": ".312 Ext. Retainer \"E\" Ring, 18-8 S.S.",
-            "quantity": 1,
-            "sku": "",
-            "source_sku": "179010"
-        },
-        {
-            "id": "059025",
-            "name": "Cotter Pin. 5/64 X 1/2 S.S",
-            "quantity": 1,
-            "sku": "",
-            "source_sku": "059025"
-        },
-        {
-            "id": "164348",
-            "name": "Corner Roller Handle Assembly, Sold",
-            "quantity": 1,
-            "sku": "",
-            "source_sku": "164348"
-        },
-        {
-            "id": "179009",
-            "name": "5L10-Fk Type 6 Nyliner",
-            "quantity": 1,
-            "sku": "",
-            "source_sku": "179009"
-        },
-        {
-            "id": "179008",
-            "name": "5/16 Flat Washer",
-            "quantity": 1,
-            "sku": "",
-            "source_sku": "179008"
-        },
-        {
-            "id": "164348",
-            "name": "Corner Roller Handle Assembly, Sold",
-            "quantity": 1,
-            "sku": "",
-            "source_sku": "164348"
-        }
-    ],
-    "coordinates": {
-        "150009": {
-            "id": "150009",
-            "x_px": null,
-            "y_px": null,
-            "x_pct": 24.343434,
-            "y_pct": 36.259695,
-            "shape": "rectangle",
-            "pageNumber": 1,
-            "rotation": 0,
-            "widthPx": 100,
-            "heightPx": 40
-        },
-        "154007": {
-            "id": "154007",
-            "x_px": null,
-            "y_px": null,
-            "x_pct": 37.222222,
-            "y_pct": 48.801743,
-            "shape": "rectangle",
-            "pageNumber": 1,
-            "rotation": 0,
-            "widthPx": 100,
-            "heightPx": 40
-        },
-        "164348": {
-            "id": "164348",
-            "x_px": null,
-            "y_px": null,
-            "x_pct": 46.961257,
-            "y_pct": 77.527203,
-            "shape": "rectangle",
-            "pageNumber": 1,
-            "rotation": 0,
-            "widthPx": 100,
-            "heightPx": 40
-        },
-        "170002": {
-            "id": "170002",
-            "x_px": null,
-            "y_px": null,
-            "x_pct": 38.484848,
-            "y_pct": 25.620915,
-            "shape": "rectangle",
-            "pageNumber": 1,
-            "rotation": 0,
-            "widthPx": 100,
-            "heightPx": 40
-        },
-        "170003": {
-            "id": "170003",
-            "x_px": null,
-            "y_px": null,
-            "x_pct": 0.0,
-            "y_pct": 0.0,
-            "shape": "rectangle",
-            "pageNumber": 1,
-            "rotation": 0,
-            "widthPx": 100,
-            "heightPx": 40
-        },
-        "171005": {
-            "id": "171005",
-            "x_px": null,
-            "y_px": null,
-            "x_pct": 69.444444,
-            "y_pct": 45.62963,
-            "shape": "rectangle",
-            "pageNumber": 1,
-            "rotation": 0,
-            "widthPx": 100,
-            "heightPx": 40
-        },
-        "176001": {
-            "id": "176001",
-            "x_px": null,
-            "y_px": null,
-            "x_pct": 56.212121,
-            "y_pct": 43.433551,
-            "shape": "rectangle",
-            "pageNumber": 1,
-            "rotation": 0,
-            "widthPx": 100,
-            "heightPx": 40
-        },
-        "179004": {
-            "id": "179004",
-            "x_px": null,
-            "y_px": null,
-            "x_pct": 34.040404,
-            "y_pct": 28.500218,
-            "shape": "rectangle",
-            "pageNumber": 1,
-            "rotation": 0,
-            "widthPx": 100,
-            "heightPx": 40
-        },
-        "179006": {
-            "id": "179006",
-            "x_px": null,
-            "y_px": null,
-            "x_pct": 36.868687,
-            "y_pct": 56.122004,
-            "shape": "rectangle",
-            "pageNumber": 1,
-            "rotation": 0,
-            "widthPx": 100,
-            "heightPx": 40
-        },
-        "179007": {
-            "id": "179007",
-            "x_px": null,
-            "y_px": null,
-            "x_pct": 38.737374,
-            "y_pct": 58.8061,
-            "shape": "rectangle",
-            "pageNumber": 1,
-            "rotation": 0,
-            "widthPx": 100,
-            "heightPx": 40
-        },
-        "179008": {
-            "id": "179008",
-            "x_px": null,
-            "y_px": null,
-            "x_pct": 55.434889,
-            "y_pct": 63.198257,
-            "shape": "rectangle",
-            "pageNumber": 1,
-            "rotation": 0,
-            "widthPx": 100,
-            "heightPx": 40
-        },
-        "179009": {
-            "id": "179009",
-            "x_px": null,
-            "y_px": null,
-            "x_pct": 63.838384,
-            "y_pct": 61.490196,
-            "shape": "rectangle",
-            "pageNumber": 1,
-            "rotation": 0,
-            "widthPx": 100,
-            "heightPx": 40
-        },
-        "179010": {
-            "id": "179010",
-            "x_px": null,
-            "y_px": null,
-            "x_pct": 81.969697,
-            "y_pct": 52.705882,
-            "shape": "rectangle",
-            "pageNumber": 1,
-            "rotation": 0,
-            "widthPx": 100,
-            "heightPx": 40
-        },
-        "359005": {
-            "id": "359005",
-            "x_px": null,
-            "y_px": null,
-            "x_pct": 63.383838,
-            "y_pct": 39.041394,
-            "shape": "rectangle",
-            "pageNumber": 1,
-            "rotation": 0,
-            "widthPx": 100,
-            "heightPx": 40
-        },
-        "359046": {
-            "id": "359046",
-            "x_px": null,
-            "y_px": null,
-            "x_pct": 34.89899,
-            "y_pct": 53.1939,
-            "shape": "rectangle",
-            "pageNumber": 1,
-            "rotation": 0,
-            "widthPx": 100,
-            "heightPx": 40
-        },
-        "150004F": {
-            "id": "150004F",
-            "x_px": null,
-            "y_px": null,
-            "x_pct": 0.0,
-            "y_pct": 0.0,
-            "shape": "rectangle",
-            "pageNumber": 1,
-            "rotation": 0,
-            "widthPx": 100,
-            "heightPx": 40
-        },
-        "059143": {
-            "id": "059143",
-            "x_px": null,
-            "y_px": null,
-            "x_pct": 29.141414,
-            "y_pct": 31.477124,
-            "shape": "rectangle",
-            "pageNumber": 1,
-            "rotation": 0,
-            "widthPx": 100,
-            "heightPx": 40
-        },
-        "150003F": {
-            "id": "150003F",
-            "x_px": null,
-            "y_px": null,
-            "x_pct": 26.565657,
-            "y_pct": 50.021786,
-            "shape": "rectangle",
-            "pageNumber": 1,
-            "rotation": 0,
-            "widthPx": 100,
-            "heightPx": 40
-        },
-        "059025": {
-            "id": "059025",
-            "x_px": null,
-            "y_px": null,
-            "x_pct": 47.718287,
-            "y_pct": 60.465359,
-            "shape": "rectangle",
-            "pageNumber": 1,
-            "rotation": 0,
-            "widthPx": 100,
-            "heightPx": 40
-        }
+  "id": "1776147101640",
+  "title": "17TT_SCH",
+  "diagramPages": [
+    1
+  ],
+  "legendPages": [],
+  "parts": [
+    {
+      "id": "170002",
+      "name": "Block",
+      "quantity": 1,
+      "sku": "",
+      "source_sku": "170002"
     },
-    "schema_version": "1.0",
-    "image_natural_width": 2400,
-    "image_natural_height": 1792,
-    "sku": "TTSIDECORNEREDGER",
-    "product_name": "TapeTech 90° Inside Corner Edger"
+    {
+      "id": "150004F",
+      "name": "Pin, Swivel Coupling",
+      "quantity": 1,
+      "sku": "",
+      "source_sku": "150004F"
+    },
+    {
+      "id": "179004",
+      "name": "6-32 X 3/16 Hex Soc Setscrew Cup Pt 18-8",
+      "quantity": 1,
+      "sku": "",
+      "source_sku": "179004"
+    },
+    {
+      "id": "059143",
+      "name": "Cotter Pin 1/16 X 1/2 SST.",
+      "quantity": 1,
+      "sku": "",
+      "source_sku": "059143"
+    },
+    {
+      "id": "150009",
+      "name": "Swivel Axle",
+      "quantity": 1,
+      "sku": "",
+      "source_sku": "150009"
+    },
+    {
+      "id": "359005",
+      "name": "Screw: 6-32 X 1/4 Bind Hd.",
+      "quantity": 1,
+      "sku": "",
+      "source_sku": "359005"
+    },
+    {
+      "id": "176001",
+      "name": "Bracket, No Logo, Serialized",
+      "quantity": 1,
+      "sku": "",
+      "source_sku": "176001"
+    },
+    {
+      "id": "150003F",
+      "name": "Coupling",
+      "quantity": 1,
+      "sku": "",
+      "source_sku": "150003F"
+    },
+    {
+      "id": "154007",
+      "name": "Swivel Ass'Y",
+      "quantity": 1,
+      "sku": "",
+      "source_sku": "154007"
+    },
+    {
+      "id": "171005",
+      "name": "Universal Roller",
+      "quantity": 1,
+      "sku": "",
+      "source_sku": "171005"
+    },
+    {
+      "id": "170003",
+      "name": "Axle",
+      "quantity": 1,
+      "sku": "",
+      "source_sku": "170003"
+    },
+    {
+      "id": "359046",
+      "name": "Nut, Hex 10-32",
+      "quantity": 1,
+      "sku": "",
+      "source_sku": "359046"
+    },
+    {
+      "id": "179006",
+      "name": "#10 Medium Lockwasher 18-8 S.S.",
+      "quantity": 1,
+      "sku": "",
+      "source_sku": "179006"
+    },
+    {
+      "id": "179007",
+      "name": "#10 Flat Washer, 18-8 S.S.",
+      "quantity": 1,
+      "sku": "",
+      "source_sku": "179007"
+    },
+    {
+      "id": "179010",
+      "name": ".312 Ext. Retainer \"E\" Ring, 18-8 S.S.",
+      "quantity": 1,
+      "sku": "",
+      "source_sku": "179010"
+    },
+    {
+      "id": "059025",
+      "name": "Cotter Pin. 5/64 X 1/2 S.S",
+      "quantity": 1,
+      "sku": "",
+      "source_sku": "059025"
+    },
+    {
+      "id": "164348",
+      "name": "Corner Roller Handle Assembly, Sold",
+      "quantity": 1,
+      "sku": "",
+      "source_sku": "164348"
+    },
+    {
+      "id": "179009",
+      "name": "5L10-Fk Type 6 Nyliner",
+      "quantity": 1,
+      "sku": "",
+      "source_sku": "179009"
+    },
+    {
+      "id": "179008",
+      "name": "5/16 Flat Washer",
+      "quantity": 1,
+      "sku": "",
+      "source_sku": "179008"
+    },
+    {
+      "id": "164348",
+      "name": "Corner Roller Handle Assembly, Sold",
+      "quantity": 1,
+      "sku": "",
+      "source_sku": "164348"
+    }
+  ],
+  "coordinates": {
+    "150009": {
+      "id": "150009",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 24.343434,
+      "y_pct": 36.259695,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0,
+      "widthPx": 100,
+      "heightPx": 40
+    },
+    "154007": {
+      "id": "154007",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 37.222222,
+      "y_pct": 48.801743,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0,
+      "widthPx": 100,
+      "heightPx": 40
+    },
+    "164348": {
+      "id": "164348",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 46.961257,
+      "y_pct": 77.527203,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0,
+      "widthPx": 100,
+      "heightPx": 40
+    },
+    "170002": {
+      "id": "170002",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 38.484848,
+      "y_pct": 25.620915,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0,
+      "widthPx": 100,
+      "heightPx": 40
+    },
+    "170003": {
+      "id": "170003",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 0.0,
+      "y_pct": 0.0,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0,
+      "widthPx": 100,
+      "heightPx": 40
+    },
+    "171005": {
+      "id": "171005",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 69.444444,
+      "y_pct": 45.62963,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0,
+      "widthPx": 100,
+      "heightPx": 40
+    },
+    "176001": {
+      "id": "176001",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 56.212121,
+      "y_pct": 43.433551,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0,
+      "widthPx": 100,
+      "heightPx": 40
+    },
+    "179004": {
+      "id": "179004",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 34.040404,
+      "y_pct": 28.500218,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0,
+      "widthPx": 100,
+      "heightPx": 40
+    },
+    "179006": {
+      "id": "179006",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 36.868687,
+      "y_pct": 56.122004,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0,
+      "widthPx": 100,
+      "heightPx": 40
+    },
+    "179007": {
+      "id": "179007",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 38.737374,
+      "y_pct": 58.8061,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0,
+      "widthPx": 100,
+      "heightPx": 40
+    },
+    "179008": {
+      "id": "179008",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 55.434889,
+      "y_pct": 63.198257,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0,
+      "widthPx": 100,
+      "heightPx": 40
+    },
+    "179009": {
+      "id": "179009",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 63.838384,
+      "y_pct": 61.490196,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0,
+      "widthPx": 100,
+      "heightPx": 40
+    },
+    "179010": {
+      "id": "179010",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 81.969697,
+      "y_pct": 52.705882,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0,
+      "widthPx": 100,
+      "heightPx": 40
+    },
+    "359005": {
+      "id": "359005",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 63.383838,
+      "y_pct": 39.041394,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0,
+      "widthPx": 100,
+      "heightPx": 40
+    },
+    "359046": {
+      "id": "359046",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 34.89899,
+      "y_pct": 53.1939,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0,
+      "widthPx": 100,
+      "heightPx": 40
+    },
+    "150004F": {
+      "id": "150004F",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 0.0,
+      "y_pct": 0.0,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0,
+      "widthPx": 100,
+      "heightPx": 40
+    },
+    "059143": {
+      "id": "059143",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 29.141414,
+      "y_pct": 31.477124,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0,
+      "widthPx": 100,
+      "heightPx": 40
+    },
+    "150003F": {
+      "id": "150003F",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 26.565657,
+      "y_pct": 50.021786,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0,
+      "widthPx": 100,
+      "heightPx": 40
+    },
+    "059025": {
+      "id": "059025",
+      "x_px": null,
+      "y_px": null,
+      "x_pct": 47.718287,
+      "y_pct": 60.465359,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0,
+      "widthPx": 100,
+      "heightPx": 40
+    }
+  },
+  "schema_version": "1.0",
+  "image_natural_width": 2400,
+  "image_natural_height": 1792
 }
