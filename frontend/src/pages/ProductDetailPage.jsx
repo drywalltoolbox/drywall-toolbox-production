@@ -23,7 +23,7 @@
 
 import { useParams, Link, useLocation, useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
-import useProductDetail from '../hooks/useProductDetail';
+import useCatalogProductDetail from '../hooks/useCatalogProductDetail.js';
 import { useSelectedVariation } from '../hooks/useSelectedVariation';
 import { getVariationSelectionMap } from '../utils/variationSelection';
 import { buildBreadcrumbSchema, buildProductSchema, stripHtml } from '../utils/schema';
@@ -48,20 +48,37 @@ export default function ProductDetailPage() {
   const location = useLocation();
   const navigate  = useNavigate();
   const { addToCart } = useCart();
-  const preferredVariantId = Number.isFinite(parseInt(variationId || '', 10)) ? parseInt(variationId, 10) : null;
+  const legacyPathVariantId = Number.isFinite(parseInt(variationId || '', 10)) ? parseInt(variationId, 10) : null;
 
   const [toast, setToast] = useState(null);
 
   // ── Data fetching ──────────────────────────────────────────────────────────
-  const { product, variations, computed, status, error } = useProductDetail(slug);
+  const { product, variations, computed, status, error } = useCatalogProductDetail(slug);
 
   // ── Variation state machine ────────────────────────────────────────────────
   const { selectedVariation } = useSelectedVariation(
     variations,
     computed,
-    preferredVariantId,
-    { syncSearchParam: preferredVariantId == null }
+    null,
+    { syncSearchParam: true }
   );
+
+  // Normalize legacy /products/:slug/variations/:id routes to the canonical
+  // /products/:slug?variant=:id contract used by quick view and selectors.
+  useEffect(() => {
+    if (!slug || !variationId) return;
+    const targetSlug = product?.slug || slug;
+    const params = new URLSearchParams(location.search);
+    if (legacyPathVariantId) {
+      params.set('variant', String(legacyPathVariantId));
+    }
+    const qs = params.toString();
+    const target = `/products/${encodeURIComponent(targetSlug)}${qs ? `?${qs}` : ''}`;
+    const current = `${location.pathname}${location.search}`;
+    if (current !== target) {
+      navigate(target, { replace: true });
+    }
+  }, [legacyPathVariantId, location.pathname, location.search, navigate, product?.slug, slug, variationId]);
 
   // ── Recently viewed tracking ───────────────────────────────────────────────
   useEffect( () => {
@@ -89,12 +106,18 @@ export default function ProductDetailPage() {
   const handleVariationChange = useCallback((variation) => {
     const baseSlug = product?.slug || slug;
     if (!baseSlug) return;
-    const targetPath = variation?.id
-      ? `/products/${baseSlug}/variations/${encodeURIComponent(variation.id)}`
-      : `/products/${baseSlug}`;
-    if (location.pathname === targetPath) return;
-    navigate(targetPath, { replace: true });
-  }, [location.pathname, navigate, product?.slug, slug]);
+    const params = new URLSearchParams(location.search);
+    if (variation?.id) {
+      params.set('variant', String(variation.id));
+    } else {
+      params.delete('variant');
+    }
+    const qs = params.toString();
+    const target = `/products/${encodeURIComponent(baseSlug)}${qs ? `?${qs}` : ''}`;
+    const current = `${location.pathname}${location.search}`;
+    if (current === target) return;
+    navigate(target, { replace: true });
+  }, [location.pathname, location.search, navigate, product?.slug, slug]);
 
   // ── Loading state ──────────────────────────────────────────────────────────
   if (status === 'loading' || status === 'idle') {
@@ -147,7 +170,7 @@ export default function ProductDetailPage() {
   const effectiveProductName = selectedVariation
     ? getVariationDisplayName(product, selectedVariation, effectiveVariationName)
     : product.name;
-  const productDetailPath = `/products/${product.slug || slug}${selectedVariation?.id ? `/variations/${encodeURIComponent(selectedVariation.id)}` : ''}`;
+  const productDetailPath = `/products/${product.slug || slug}${selectedVariation?.id ? `?variant=${encodeURIComponent(selectedVariation.id)}` : ''}`;
 
   // ── SEO ────────────────────────────────────────────────────────────────────
   const metaMap = {};
