@@ -16,6 +16,8 @@
  *   location.reload();
  */
 
+const SAFE_ENV = ( typeof process !== 'undefined' && process?.env ) ? process.env : {};
+
 /**
  * Read a feature flag value.
  *
@@ -30,16 +32,20 @@
  */
 export function getFeatureFlag( key, defaultValue = false ) {
   // localStorage override (non-production only).
-  if ( process.env.REACT_APP_ENV !== 'production' ) {
-    const stored = localStorage.getItem( `dtb_flag_${ key }` );
-    if ( stored !== null ) {
-      return stored === '1' || stored === 'true';
+  if ( SAFE_ENV.REACT_APP_ENV !== 'production' && typeof window !== 'undefined' ) {
+    try {
+      const stored = window.localStorage.getItem( `dtb_flag_${ key }` );
+      if ( stored !== null ) {
+        return stored === '1' || stored === 'true';
+      }
+    } catch {
+      // Ignore storage access errors (privacy mode, blocked storage, etc.)
     }
   }
 
   // Build-time env var.
   const envKey = `REACT_APP_${ key.toUpperCase() }`;
-  const envVal = process.env[ envKey ];
+  const envVal = SAFE_ENV[ envKey ];
   if ( envVal !== undefined ) {
     return envVal === '1' || envVal === 'true';
   }
