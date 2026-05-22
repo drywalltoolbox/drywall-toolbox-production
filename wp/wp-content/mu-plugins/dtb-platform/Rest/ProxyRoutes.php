@@ -582,7 +582,7 @@ const DTB_PRODUCT_DETAIL_FIELDS = 'id,name,slug,permalink,type,status,featured,c
  * Without _fields, WC fully hydrates variations including all meta,
  * shipping classes, and downloadable data — expensive / OOM on shared hosting.
  */
-const DTB_VARIATION_FIELDS = 'id,sku,slug,name,type,status,price,regular_price,sale_price,on_sale,purchasable,stock_status,manage_stock,stock_quantity,backorders_allowed,backordered,images,attributes,meta_data,parent_id,description,short_description';
+const DTB_VARIATION_FIELDS = 'id,sku,slug,name,type,status,price,regular_price,sale_price,on_sale,purchasable,stock_status,manage_stock,stock_quantity,backorders_allowed,backordered,images,attributes,parent_id';
 
 /** GET /drywall/v1/products */
 function dtb_proxy_products( WP_REST_Request $request ): WP_REST_Response {
@@ -636,26 +636,152 @@ function dtb_proxy_product_variations( WP_REST_Request $request ): WP_REST_Respo
 		);
 	}
 
-	$params = [ '_fields' => DTB_VARIATION_FIELDS ];
-
-	$page     = $request->get_param( 'page' );
-	$per_page = $request->get_param( 'per_page' );
-	if ( null !== $page )     $params['page']     = absint( $page );
-	if ( null !== $per_page ) $params['per_page'] = absint( $per_page );
-
-	$response = dtb_cached_wc_get( 'wc/v3/products/' . $parent_id . '/variations', $params );
-
-	// If WC returns a 5xx (e.g. corrupted variation data), return an empty
-	// array so the SPA degrades gracefully instead of crashing with a 500.
-	if ( $response->get_status() >= 500 ) {
-		dtb_log_cache_event( 'variations_upstream_error', [
-			'parent_id' => $parent_id,
-			'status'    => $response->get_status(),
-		] );
-		return new WP_REST_Response( [], 200 );
+	if ( ! dtb_check_origin() ) {
+		return new WP_REST_Response( dtb_error_envelope( 'forbidden_origin', 'Origin not allowed.', 403 ), 403 );
 	}
 
-	return $response;
+	$rl = dtb_rate_limit_get( 'wc/v3/products/' . $parent_id . '/variations' );
+	if ( $rl ) {
+		return $rl;
+	}
+
+	$page_param     = absint( (string) ( $request->get_param( 'page' ) ?? 1 ) );
+	$per_page_param = absint( (string) ( $request->get_param( 'per_page' ) ?? 100 ) );
+	$page           = max( 1, $page_param );
+	$per_page       = max( 1, min( 200, $per_page_param ) );
+	$offset         = ( $page - 1 ) * $per_page;
+
+	try {
+		$variation_ids = get_posts( [
+			'post_type'              => 'product_variation',
+			'post_parent'            => $parent_id,
+			'post_status'            => [ 'publish', 'private' ],
+			'orderby'                => [ 'menu_order' => 'ASC', 'ID' => 'ASC' ],
+			'numberposts'            => $per_page,
+			'offset'                 => $offset,
+			'fields'                 => 'ids',
+			'no_found_rows'          => true,
+			'ignore_sticky_posts'    => true,
+			'suppress_filters'       => true,
+		] );
+
+		if ( is_wp_error( $variation_ids ) ) {
+			if ( function_exists( 'dtb_log_cache_event' ) ) {
+				dtb_log_cache_event( 'variations_query_wp_error', [
+					'parent_id' => $parent_id,
+					'code'      => $variation_ids->get_error_code(),
+					'message'   => $variation_ids->get_error_message(),
+				] );
+			}
+			return new WP_REST_Response( [], 200 );
+		}
+
+		$data = [];
+		foreach ( $variation_ids as $variation_id ) {
+			$data[] = dtb_proxy_build_safe_variation_payload( (int) $variation_id, $parent_id );
+		}
+
+		return new WP_REST_Response( $data, 200 );
+	} catch ( Throwable $e ) {
+		if ( function_exists( 'dtb_log_cache_event' ) ) {
+			dtb_log_cache_event( 'variations_proxy_exception', [
+				'parent_id' => $parent_id,
+				'message'   => $e->getMessage(),
+			] );
+		}
+		return new WP_REST_Response( [], 200 );
+	}
+}
+
+/**
+ * Build a minimal, safe variation payload for the storefront.
+ *
+ * This avoids Woo REST variation hydration (which can fatally fail on
+ * malformed records) and only reads core post/meta fields needed by DTB UI.
+ */
+function dtb_proxy_build_safe_variation_payload( int $variation_id, int $parent_id ): array {
+	$sku           = (string) get_post_meta( $variation_id, '_sku', true );
+	$price         = (string) get_post_meta( $variation_id, '_price', true );
+	$regular_price = (string) get_post_meta( $variation_id, '_regular_price', true );
+	$sale_price    = (string) get_post_meta( $variation_id, '_sale_price', true );
+	$stock_status  = (string) get_post_meta( $variation_id, '_stock_status', true );
+	$manage_stock  = 'yes' === (string) get_post_meta( $variation_id, '_manage_stock', true );
+	$stock_raw     = get_post_meta( $variation_id, '_stock', true );
+	$stock_qty     = ( is_numeric( $stock_raw ) ) ? (float) $stock_raw : null;
+	$backorders    = (string) get_post_meta( $variation_id, '_backorders', true );
+	$attributes    = [];
+
+	$meta = get_post_meta( $variation_id );
+	if ( is_array( $meta ) ) {
+		foreach ( $meta as $key => $values ) {
+			if ( 0 !== strpos( (string) $key, 'attribute_' ) ) {
+				continue;
+			}
+
+			$raw_option = is_array( $values ) ? (string) ( $values[0] ?? '' ) : (string) $values;
+			if ( '' === trim( $raw_option ) ) {
+				continue;
+			}
+
+			$raw_name = preg_replace( '/^attribute_/', '', (string) $key );
+			$raw_name = preg_replace( '/^pa_/', '', (string) $raw_name );
+
+			$attributes[] = [
+				'id'       => 0,
+				'name'     => wc_attribute_label( (string) $raw_name ),
+				'slug'     => sanitize_title( (string) $raw_name ),
+				'option'   => $raw_option,
+				'position' => 0,
+				'visible'  => true,
+				'variation'=> true,
+			];
+		}
+	}
+
+	$image_id = (int) get_post_meta( $variation_id, '_thumbnail_id', true );
+	$images   = [];
+	if ( $image_id > 0 ) {
+		$src = wp_get_attachment_image_url( $image_id, 'full' );
+		if ( is_string( $src ) && '' !== $src ) {
+			$images[] = [
+				'id'   => $image_id,
+				'src'  => $src,
+				'name' => basename( (string) wp_parse_url( $src, PHP_URL_PATH ) ),
+				'alt'  => (string) get_post_meta( $image_id, '_wp_attachment_image_alt', true ),
+			];
+		}
+	}
+
+	if ( '' === $stock_status ) {
+		$stock_status = 'instock';
+	}
+
+	$status = (string) get_post_status( $variation_id );
+	if ( '' === $status ) {
+		$status = 'publish';
+	}
+
+	return [
+		'id'                 => $variation_id,
+		'parent_id'          => $parent_id,
+		'name'               => (string) get_the_title( $variation_id ),
+		'slug'               => (string) get_post_field( 'post_name', $variation_id ),
+		'type'               => 'variation',
+		'status'             => $status,
+		'sku'                => $sku,
+		'price'              => $price,
+		'regular_price'      => $regular_price,
+		'sale_price'         => $sale_price,
+		'on_sale'            => ( '' !== $sale_price && $sale_price !== $regular_price ),
+		'purchasable'        => 'publish' === $status,
+		'stock_status'       => $stock_status,
+		'manage_stock'       => $manage_stock,
+		'stock_quantity'     => $stock_qty,
+		'backorders_allowed' => in_array( $backorders, [ 'yes', 'notify' ], true ),
+		'backordered'        => 'notify' === $backorders,
+		'images'             => $images,
+		'attributes'         => $attributes,
+	];
 }
 
 /** GET /drywall/v1/categories */
@@ -1366,13 +1492,17 @@ function dtb_proxy_product_detail( WP_REST_Request $request ): WP_REST_Response 
 				'timeout' => 15,
 			] );
 			if ( is_wp_error( $raw ) ) {
-				dtb_log_cache_event( 'detail_variations_upstream_error', [ 'product_id' => $product_id ] );
+				if ( function_exists( 'dtb_log_cache_event' ) ) {
+					dtb_log_cache_event( 'detail_variations_upstream_error', [ 'product_id' => $product_id ] );
+				}
 				return [];
 			}
 			$code = wp_remote_retrieve_response_code( $raw );
 			$body = json_decode( wp_remote_retrieve_body( $raw ), true );
 			if ( $code >= 500 ) {
-				dtb_log_cache_event( 'detail_variations_upstream_error', [ 'product_id' => $product_id, 'status' => $code ] );
+				if ( function_exists( 'dtb_log_cache_event' ) ) {
+					dtb_log_cache_event( 'detail_variations_upstream_error', [ 'product_id' => $product_id, 'status' => $code ] );
+				}
 				return [];
 			}
 			return is_array( $body ) ? $body : [];

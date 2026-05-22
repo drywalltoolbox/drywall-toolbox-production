@@ -151,35 +151,29 @@ function dtb_ops_enqueue_assets( string $hook ): void {
 		return;
 	}
 
-	wp_enqueue_style(
-		'dtb-ops-dashboard',
-		false, // Inline style below
-		[],
-		DTB_OPS_VERSION
-	);
+	wp_enqueue_style( 'wp-admin' );
+	wp_add_inline_style( 'wp-admin', dtb_ops_inline_css() );
 
-	wp_add_inline_style( 'dtb-ops-dashboard', dtb_ops_inline_css() );
+	wp_enqueue_script( 'jquery' );
 
-	wp_enqueue_script(
-		'dtb-ops-dashboard',
-		false, // Inline script below
-		[ 'jquery' ],
-		DTB_OPS_VERSION,
-		true
-	);
-
-	wp_add_inline_script(
-		'dtb-ops-dashboard',
-		dtb_ops_inline_js(),
-		'after'
-	);
-
-	wp_localize_script( 'dtb-ops-dashboard', 'dtbOps', [
+	$bootstrap = [
 		'ajaxUrl'     => admin_url( 'admin-ajax.php' ),
 		'nonce'       => wp_create_nonce( 'dtb_ops_nonce' ),
 		'pollInterval'=> 30000,
 		'version'     => DTB_OPS_VERSION,
-	] );
+	];
+
+	wp_add_inline_script(
+		'jquery',
+		'window.dtbOps = ' . wp_json_encode( $bootstrap ) . ';',
+		'before'
+	);
+
+	wp_add_inline_script(
+		'jquery',
+		dtb_ops_inline_js(),
+		'after'
+	);
 }
 
 /**
@@ -445,16 +439,6 @@ function dtb_ops_render_dashboard(): void {
 	if ( ! current_user_can( 'manage_options' ) ) {
 		wp_die( esc_html__( 'Insufficient permissions.', 'dtb' ) );
 	}
-
-	global $wpdb;
-	$db_ok    = ( 1 === (int) $wpdb->get_var( 'SELECT 1' ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
-	$db_label = $db_ok ? 'Connected' : 'Error';
-	$db_state = $db_ok ? 'ok' : 'warn';
-
-	$next_cron = wp_next_scheduled( 'dtb_ops_refresh_kpis' );
-	$next_cron_label = $next_cron
-		? human_time_diff( time(), $next_cron ) . ' from now'
-		: 'Not scheduled';
 	?>
 	<div class="wrap" style="padding:0;margin:0">
 	<div class="dtb-ops-wrap">
@@ -483,62 +467,33 @@ function dtb_ops_render_dashboard(): void {
 			</div>
 		</div>
 
-		<!-- ── System Status ────────────────────────────────────── -->
-		<div class="dtb-status-grid">
-			<div class="dtb-status-card">
-				<div class="dtb-status-icon dtb-status-icon--info">
-					<span class="dashicons dashicons-code-standards"></span>
-				</div>
-				<div>
-					<div class="dtb-status-label"><?php esc_html_e( 'PHP Version', 'dtb' ); ?></div>
-					<div class="dtb-status-value"><?php echo esc_html( PHP_MAJOR_VERSION . '.' . PHP_MINOR_VERSION . '.' . PHP_RELEASE_VERSION ); ?></div>
-				</div>
-			</div>
-			<div class="dtb-status-card">
-				<div class="dtb-status-icon dtb-status-icon--info">
-					<span class="dashicons dashicons-wordpress-alt"></span>
-				</div>
-				<div>
-					<div class="dtb-status-label"><?php esc_html_e( 'WordPress', 'dtb' ); ?></div>
-					<div class="dtb-status-value"><?php echo esc_html( get_bloginfo( 'version' ) ); ?></div>
-				</div>
-			</div>
-			<div class="dtb-status-card">
-				<div class="dtb-status-icon dtb-status-icon--<?php echo esc_attr( $db_state ); ?>">
-					<span class="dashicons dashicons-database"></span>
-				</div>
-				<div>
-					<div class="dtb-status-label"><?php esc_html_e( 'Database', 'dtb' ); ?></div>
-					<div class="dtb-status-value"><?php echo esc_html( $db_label ); ?></div>
-				</div>
-			</div>
-			<div class="dtb-status-card">
-				<div class="dtb-status-icon dtb-status-icon--ok">
-					<span class="dashicons dashicons-clock"></span>
-				</div>
-				<div>
-					<div class="dtb-status-label"><?php esc_html_e( 'Next KPI Refresh', 'dtb' ); ?></div>
-					<div class="dtb-status-value"><?php echo esc_html( $next_cron_label ); ?></div>
-				</div>
+		<!-- ── Order Operations Overview Cards (Top Row) ───────── -->
+		<div class="dtb-oo-wrap dtb-oo-wrap--embedded dtb-oo-wrap--top-overview">
+			<div id="dtb-oo-overview-kpis-top" class="dtb-oo-kpi-grid">
+				<p class="dtb-oo-loading"><?php esc_html_e( 'Loading KPIs…', 'dtb' ); ?></p>
 			</div>
 		</div>
 
-		<!-- ── KPI Grid ─────────────────────────────────────────── -->
-		<div id="dtb-ops-kpis" class="dtb-kpi-grid">
-			<?php foreach ( dtb_ops_kpi_definitions() as $key => $def ) : ?>
-			<div class="dtb-kpi-card dtb-kpi-card--<?php echo esc_attr( $def['color'] ); ?>" id="dtb-kpi-<?php echo esc_attr( $key ); ?>">
-				<div class="dtb-kpi-card-top">
-					<div class="dtb-kpi-icon">
-						<span class="dashicons dashicons-<?php echo esc_attr( $def['icon'] ); ?>"></span>
-					</div>
-					<span class="dtb-kpi-badge dtb-kpi-badge--info">&hellip;</span>
-				</div>
-				<div>
-					<div class="dtb-kpi-value">—</div>
-					<div class="dtb-kpi-label"><?php echo esc_html( $def['label'] ); ?></div>
-				</div>
+		<!-- ── Order Operations (Unified) ─────────────────────── -->
+		<div class="dtb-section" id="dtb-order-operations-section">
+			<div class="dtb-section-header">
+				<h2 class="dtb-section-title">
+					<span class="dashicons dashicons-hammer"></span>
+					<?php esc_html_e( 'Order Operations', 'dtb' ); ?>
+				</h2>
+				<a href="<?php echo esc_url( admin_url( 'admin.php?page=dtb-ops-order-operations' ) ); ?>" class="dtb-btn-sm">
+					<?php esc_html_e( 'Open Fullscreen →', 'dtb' ); ?>
+				</a>
 			</div>
-			<?php endforeach; ?>
+			<div class="dtb-section-body">
+				<?php
+				if ( function_exists( 'dtb_oo_render_embedded_section' ) ) {
+					dtb_oo_render_embedded_section();
+				} else {
+					echo '<p class="dtb-text-muted">' . esc_html__( 'Order Operations module is unavailable.', 'dtb' ) . '</p>';
+				}
+				?>
+			</div>
 		</div>
 
 		<!-- ── Recent Audit Events ──────────────────────────────── -->

@@ -76,7 +76,10 @@ add_action( 'admin_enqueue_scripts', 'dtb_oo_enqueue_assets' );
  * @param string $hook Current admin page hook suffix.
  */
 function dtb_oo_enqueue_assets( string $hook ): void {
-	if ( false === strpos( $hook, 'dtb-ops-order-operations' ) ) {
+    $on_order_ops_page = false !== strpos( $hook, 'dtb-ops-order-operations' );
+    $on_dtb_ops_page   = false !== strpos( $hook, 'dtb-ops' );
+
+    if ( ! $on_order_ops_page && ! $on_dtb_ops_page ) {
 		return;
 	}
 
@@ -127,8 +130,54 @@ function dtb_oo_render_page(): void {
 	if ( ! dtb_oo_can_view() ) {
 		wp_die( esc_html__( 'You do not have permission to view this page.', 'dtb' ) );
 	}
+
+    if ( function_exists( 'dtb_ops_render_dashboard' ) ) {
+        dtb_ops_render_dashboard();
+        return;
+    }
+
+    dtb_oo_render_dashboard_shell( false );
+}
+
+/**
+ * Render Order Operations inside the DTB Ops dashboard section.
+ */
+function dtb_oo_render_embedded_section(): void {
+    if ( ! dtb_oo_can_view() ) {
+        echo '<p class="dtb-oo-error">' . esc_html__( 'You do not have permission to view Order Operations.', 'dtb' ) . '</p>';
+        return;
+    }
+
+    echo '<div id="dtb-order-operations" class="dtb-oo-embedded">';
+    dtb_oo_render_dashboard_shell( true );
+    echo '</div>';
+}
+
+/**
+ * Render the shared Order Operations shell.
+ *
+ * @param bool $embedded Whether rendering inside DTB Ops.
+ */
+function dtb_oo_render_dashboard_shell( bool $embedded = false ): void {
+    $container_classes = $embedded
+        ? 'dtb-oo-wrap dtb-oo-wrap--embedded'
+        : 'wrap dtb-oo-wrap';
 	?>
-	<div class="wrap dtb-oo-wrap">
+    <div class="<?php echo esc_attr( $container_classes ); ?>">
+        <?php if ( $embedded ) : ?>
+        <div class="dtb-oo-topbar">
+            <div>
+                <h3 class="dtb-oo-embedded-title"><?php esc_html_e( 'Order Operations', 'dtb' ); ?></h3>
+                <p class="dtb-oo-embedded-subtitle"><?php esc_html_e( 'Live queue, SLA health, and fulfillment actions.', 'dtb' ); ?></p>
+            </div>
+            <div class="dtb-oo-topbar-actions">
+                <button type="button" id="dtb-oo-refresh-btn" class="button button-primary">
+                    <?php esc_html_e( '↺ Refresh', 'dtb' ); ?>
+                </button>
+                <span id="dtb-oo-poll-indicator" class="dtb-oo-poll-indicator" aria-live="polite"></span>
+            </div>
+        </div>
+        <?php else : ?>
 		<h1 class="wp-heading-inline">
 			<?php esc_html_e( 'Order Operations', 'dtb' ); ?>
 		</h1>
@@ -136,13 +185,16 @@ function dtb_oo_render_page(): void {
 			<?php esc_html_e( '↺ Refresh', 'dtb' ); ?>
 		</button>
 		<span id="dtb-oo-poll-indicator" class="dtb-oo-poll-indicator" aria-live="polite"></span>
+        <?php endif; ?>
 
 		<?php /* Tab Navigation */ ?>
 		<nav class="dtb-oo-tabs" role="tablist" aria-label="<?php esc_attr_e( 'Order Operations Tabs', 'dtb' ); ?>">
+            <?php if ( ! $embedded ) : ?>
 			<a href="#" class="dtb-oo-tab nav-tab nav-tab-active" data-tab="overview" role="tab" aria-selected="true" aria-controls="dtb-oo-tab-overview">
 				<?php esc_html_e( 'Overview', 'dtb' ); ?>
 			</a>
-			<a href="#" class="dtb-oo-tab nav-tab" data-tab="product_orders" role="tab" aria-selected="false" aria-controls="dtb-oo-tab-product_orders">
+            <?php endif; ?>
+            <a href="#" class="dtb-oo-tab nav-tab<?php echo $embedded ? ' nav-tab-active' : ''; ?>" data-tab="product_orders" role="tab" aria-selected="<?php echo $embedded ? 'true' : 'false'; ?>" aria-controls="dtb-oo-tab-product_orders">
 				<?php esc_html_e( 'Product Orders', 'dtb' ); ?>
 			</a>
 			<a href="#" class="dtb-oo-tab nav-tab" data-tab="repair_orders" role="tab" aria-selected="false" aria-controls="dtb-oo-tab-repair_orders">
@@ -163,12 +215,14 @@ function dtb_oo_render_page(): void {
 
 		<?php /* Tab Panels */ ?>
 
-		<?php /* Overview Tab */ ?>
-		<div id="dtb-oo-tab-overview" class="dtb-oo-tab-panel" role="tabpanel" data-tab="overview">
-			<div id="dtb-oo-overview-kpis" class="dtb-oo-kpi-grid">
-				<p class="dtb-oo-loading"><?php esc_html_e( 'Loading KPIs…', 'dtb' ); ?></p>
-			</div>
-		</div>
+        <?php if ( ! $embedded ) : ?>
+        <?php /* Overview Tab */ ?>
+        <div id="dtb-oo-tab-overview" class="dtb-oo-tab-panel" role="tabpanel" data-tab="overview">
+            <div id="dtb-oo-overview-kpis" class="dtb-oo-kpi-grid">
+                <p class="dtb-oo-loading"><?php esc_html_e( 'Loading KPIs…', 'dtb' ); ?></p>
+            </div>
+        </div>
+        <?php endif; ?>
 
 		<?php /* Product Orders Tab */ ?>
 		<div id="dtb-oo-tab-product_orders" class="dtb-oo-tab-panel" role="tabpanel" data-tab="product_orders" hidden>
@@ -441,11 +495,40 @@ function dtb_oo_inline_css(): string {
 	return '
 /* ---- Layout ---- */
 .dtb-oo-wrap { max-width: 1600px; }
+.dtb-oo-wrap--embedded { max-width: none; }
+.dtb-oo-topbar { display: flex; justify-content: space-between; gap: 16px; align-items: center; margin: 0 0 10px; }
+.dtb-oo-topbar-actions { display: flex; align-items: center; gap: 10px; }
+.dtb-oo-embedded-title { margin: 0; font-size: 17px; font-weight: 700; color: #1e293b; }
+.dtb-oo-embedded-subtitle { margin: 4px 0 0; font-size: 12px; color: #64748b; }
 .dtb-oo-tabs { margin: 16px 0 0; border-bottom: 1px solid #ccc; }
 .dtb-oo-tab { text-decoration: none; }
 .dtb-oo-tab-panel { padding: 16px 0; }
 .dtb-oo-section { background: #fff; border: 1px solid #e0e0e0; border-radius: 4px; padding: 20px; margin: 0 0 20px; }
 .dtb-oo-section h2 { margin-top: 0; font-size: 15px; border-bottom: 1px solid #f0f0f0; padding-bottom: 10px; }
+.dtb-oo-wrap--embedded .dtb-oo-tabs { margin-top: 14px; border-bottom-color: #e2e8f0; }
+.dtb-oo-wrap--embedded .dtb-oo-tab { color: #475569; border-color: transparent; border-top-left-radius: 8px; border-top-right-radius: 8px; }
+.dtb-oo-wrap--embedded .dtb-oo-tab.nav-tab-active { color: #1d4ed8; border-color: #c7d2fe #c7d2fe #fff; background: #fff; }
+.dtb-oo-wrap--embedded .dtb-oo-kpi-grid { gap: 16px; margin-bottom: 18px; }
+.dtb-oo-wrap--embedded .dtb-oo-kpi { position: relative; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; box-shadow: 0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.05); overflow: hidden; transition: box-shadow .2s ease, transform .2s ease; }
+.dtb-oo-wrap--embedded .dtb-oo-kpi:hover { box-shadow: 0 4px 16px rgba(0,0,0,.1); transform: translateY(-2px); }
+.dtb-oo-wrap--embedded .dtb-oo-kpi::before { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 3px; }
+.dtb-oo-wrap--embedded .dtb-oo-kpi--green::before { background: linear-gradient(90deg,#10b981,#34d399); }
+.dtb-oo-wrap--embedded .dtb-oo-kpi--blue::before { background: linear-gradient(90deg,#0ea5e9,#38bdf8); }
+.dtb-oo-wrap--embedded .dtb-oo-kpi--yellow::before { background: linear-gradient(90deg,#f59e0b,#fbbf24); }
+.dtb-oo-wrap--embedded .dtb-oo-kpi--red::before { background: linear-gradient(90deg,#ef4444,#f87171); }
+.dtb-oo-wrap--embedded .dtb-oo-kpi--gray::before { background: linear-gradient(90deg,#94a3b8,#cbd5e1); }
+.dtb-oo-wrap--embedded .dtb-oo-kpi__top { display: flex; justify-content: flex-end; margin-bottom: 12px; }
+.dtb-oo-wrap--embedded .dtb-oo-kpi__state { font-size: 10px; font-weight: 800; letter-spacing: .07em; text-transform: uppercase; padding: 3px 9px; border-radius: 20px; }
+.dtb-oo-wrap--embedded .dtb-oo-kpi--green .dtb-oo-kpi__state { background:#ecfdf5; color:#059669; }
+.dtb-oo-wrap--embedded .dtb-oo-kpi--blue .dtb-oo-kpi__state { background:#f0f9ff; color:#0284c7; }
+.dtb-oo-wrap--embedded .dtb-oo-kpi--yellow .dtb-oo-kpi__state { background:#fffbeb; color:#d97706; }
+.dtb-oo-wrap--embedded .dtb-oo-kpi--red .dtb-oo-kpi__state { background:#fef2f2; color:#dc2626; }
+.dtb-oo-wrap--embedded .dtb-oo-kpi--gray .dtb-oo-kpi__state { background:#f1f5f9; color:#475569; }
+.dtb-oo-wrap--embedded .dtb-oo-kpi__value { font-size: 32px; font-weight: 900; line-height: 1; letter-spacing: -.03em; color: #1e293b; }
+.dtb-oo-wrap--embedded .dtb-oo-kpi__label { margin-top: 8px; font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: .06em; }
+.dtb-oo-wrap--embedded .dtb-oo-filter-bar { border-color: #e2e8f0; border-radius: 8px; background: #f8fafc; }
+.dtb-oo-wrap--embedded .dtb-oo-table th { background: #f8fafc; border-bottom-color: #e2e8f0; }
+.dtb-oo-wrap--top-overview { margin-bottom: 18px; }
 
 /* ---- KPI Grid ---- */
 .dtb-oo-kpi-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 14px; margin: 16px 0 24px; }
@@ -698,33 +781,60 @@ function dtb_oo_inline_js(): string {
     // -------------------------------------------------------------------------
 
     function loadOverview() {
-        var $grid = $('#dtb-oo-overview-kpis');
-        if (!ajaxUrl || !nonce) {
-            $grid.removeClass('dtb-oo-loading');
-            $grid.html('<p class="dtb-oo-error">Order Operations bootstrap is missing (ajax/nonce).</p>');
+        var $grids = $('#dtb-oo-overview-kpis, #dtb-oo-overview-kpis-top');
+        if (!$grids.length) {
             return;
         }
-        $grid.addClass('dtb-oo-loading');
+        if (!ajaxUrl || !nonce) {
+            $grids.removeClass('dtb-oo-loading');
+            $grids.html('<p class="dtb-oo-error">Order Operations bootstrap is missing (ajax/nonce).</p>');
+            return;
+        }
+        $grids.addClass('dtb-oo-loading');
         ajaxPost('dtb_ops_order_overview', {}, function (data) {
-            $grid.removeClass('dtb-oo-loading');
+            $grids.removeClass('dtb-oo-loading');
             renderKpis(data.kpis || {});
         }, function (msg) {
-            $grid.removeClass('dtb-oo-loading');
-            $grid.html('<p class="dtb-oo-error">' + esc(msg || 'Could not load KPIs.') + '</p>');
+            $grids.removeClass('dtb-oo-loading');
+            $grids.html('<p class="dtb-oo-error">' + esc(msg || 'Could not load KPIs.') + '</p>');
         });
     }
 
     function renderKpis(kpis) {
-        var $grid = $('#dtb-oo-overview-kpis');
-        $grid.empty();
+        var $grids = $('#dtb-oo-overview-kpis, #dtb-oo-overview-kpis-top');
+        if (!$grids.length) {
+            return;
+        }
+
+        var excludedLabels = ['sla warnings', 'sla breached', 'failed local actions'];
+        var excludedKeys = ['sla_warnings', 'sla_breached', 'failed_local_actions'];
+
+        $grids.empty();
         $.each(kpis, function (key, kpi) {
-            var cls = kpi.badge || (kpi.warn ? 'red' : 'green');
-            $grid.append(
+            var keyNorm = String(key || '').toLowerCase();
+            var labelNorm = String((kpi && kpi.label) || '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+            if (excludedKeys.indexOf(keyNorm) !== -1 || excludedLabels.indexOf(labelNorm) !== -1) {
+                return;
+            }
+
+            var cls = String(kpi.badge || (kpi.warn ? 'red' : 'green')).toLowerCase();
+            if (cls === 'warn' || cls === 'warning') cls = 'yellow';
+            if (cls === 'danger' || cls === 'critical') cls = 'red';
+            if (cls === 'ok' || cls === 'success') cls = 'green';
+            if (['green', 'blue', 'yellow', 'red', 'gray'].indexOf(cls) === -1) cls = 'gray';
+
+            var stateLabel = 'Live';
+            if (cls === 'yellow') stateLabel = 'Watch';
+            if (cls === 'red') stateLabel = 'Alert';
+
+            var cardHtml =
                 '<div class="dtb-oo-kpi dtb-oo-kpi--' + esc(cls) + '" id="dtb-oo-kpi-' + esc(key) + '">' +
+                '<div class="dtb-oo-kpi__top"><span class="dtb-oo-kpi__state">' + esc(stateLabel) + '</span></div>' +
                 '<div class="dtb-oo-kpi__label">' + esc(kpi.label) + '</div>' +
                 '<div class="dtb-oo-kpi__value">' + esc(String(kpi.value)) + '</div>' +
-                '</div>'
-            );
+                '</div>';
+
+            $grids.append(cardHtml);
         });
     }
 
@@ -1331,7 +1441,8 @@ function dtb_oo_inline_js(): string {
     function startPolling() {
         loadOverview();
         state.pollTimer = setInterval(function () {
-            if (!state.paused && state.tab === 'overview') {
+            var hasTopOverview = $('#dtb-oo-overview-kpis-top').length > 0;
+            if (!state.paused && (state.tab === 'overview' || hasTopOverview)) {
                 loadOverview();
             }
         }, pollInterval);
@@ -1352,7 +1463,7 @@ function dtb_oo_inline_js(): string {
             $indicator.text('Polling paused').addClass('paused');
         } else {
             $indicator.text('').removeClass('paused');
-            if (state.tab === 'overview') loadOverview();
+            if (state.tab === 'overview' || $('#dtb-oo-overview-kpis-top').length) loadOverview();
         }
     });
 
@@ -1360,6 +1471,9 @@ function dtb_oo_inline_js(): string {
     $('#dtb-oo-refresh-btn').on('click', function (e) {
         e.preventDefault();
         loadTab(state.tab);
+        if ($('#dtb-oo-overview-kpis-top').length) {
+            loadOverview();
+        }
     });
 
     // -------------------------------------------------------------------------
@@ -1386,16 +1500,20 @@ function dtb_oo_inline_js(): string {
 
     $(document).ready(function () {
         if (typeof dtbOpsOrd === 'undefined') {
-            $('#dtb-oo-overview-kpis').html('<p class="dtb-oo-error">Order Operations bootstrap config is unavailable.</p>');
+            $('#dtb-oo-overview-kpis, #dtb-oo-overview-kpis-top').html('<p class="dtb-oo-error">Order Operations bootstrap config is unavailable.</p>');
             return;
         }
         // Restore tab from hash.
+        var hasOverviewTab = $('.dtb-oo-tab[data-tab="overview"]').length > 0;
         var hash = window.location.hash.replace('#', '');
-        var validTabs = ['overview', 'product_orders', 'repair_orders', 'queue', 'audit_log', 'settings'];
+        var validTabs = hasOverviewTab
+            ? ['overview', 'product_orders', 'repair_orders', 'queue', 'audit_log', 'settings']
+            : ['product_orders', 'repair_orders', 'queue', 'audit_log', 'settings'];
+        var defaultTab = hasOverviewTab ? 'overview' : 'product_orders';
         if (hash && validTabs.indexOf(hash) !== -1) {
             switchTab(hash);
         } else {
-            switchTab('overview');
+            switchTab(defaultTab);
         }
         startPolling();
     });

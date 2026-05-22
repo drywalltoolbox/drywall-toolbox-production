@@ -588,10 +588,11 @@ export const getProductVariations = (parentId) =>
     .then((list) => Array.isArray(list) ? list.map(normalizeProduct) : [])
     .catch(async (err) => {
       const status = Number(err?.status || 0);
-      // 5xx / auth / rate-limit — server can't serve this right now; bail early
-      // so we don't pile on with secondary requests.
+      // Variations are a non-critical enhancement on listing pages. If the
+      // upstream proxy is currently failing (5xx/404/429), degrade to an empty
+      // list so product grids and checkout flows remain available.
       if (status >= 400) {
-        throw err;
+        return [];
       }
       // Network-level failure (status 0) or unexpected client error:
       // fall back to fetching each variation ID individually via the parent's
