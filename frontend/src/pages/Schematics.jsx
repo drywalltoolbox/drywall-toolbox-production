@@ -165,148 +165,148 @@ import level5CompoundPumpData from '/brands/Level5/Schematics/Pumps/Compound-Pum
 //            scripts/upload_schematics_to_wp.py to populate WP Media Library.
 //            Once confirmed, originals in public/brands/*/Schematics/ can be deleted.
 // ---------------------------------------------------------------------------
-const _BASE = process.env.PUBLIC_URL;
+const _BASE = `${ ( process.env.PUBLIC_URL || '' ).replace( /\/+$/, '' ) }/`;
 
 // Static fallback image paths — all converted to WebP.
 // These are served from public/brands/ and copied verbatim into dist/ by webpack.
 const _fallbacks = {
   'columbia-matrix': {
     pages: {
-      1: `${_BASE}brands/Columbia/Schematics/Handles/MatrixBoxHandle/BoxHandle/Matrix_Handle-enhanced.webp`,
-      2: `${_BASE}brands/Columbia/Schematics/Handles/MatrixBoxHandle/Head/Matrix_Head-enhanced-enhanced.webp`,
-      3: `${_BASE}brands/Columbia/Schematics/Handles/MatrixBoxHandle/Lever/Matrix_Lever-1-enhanced.webp`,
-      4: `${_BASE}brands/Columbia/Schematics/Handles/MatrixBoxHandle/Pinchbox/Matrix_Pinchbox-1-enhanced.webp`,
-      5: `${_BASE}brands/Columbia/Schematics/Handles/MatrixBoxHandle/ExtensionHousing/Extension_Housing_Schematic-1-enhanced.webp`,
+      1: `${_BASE}brands/Columbia/Schematics/Handles/MatrixBoxHandle/BoxHandle/columbia-matrix-box-handle-matrixboxhandle-boxhandle-sch-schematic-page-01.webp`,
+      2: `${_BASE}brands/Columbia/Schematics/Handles/MatrixBoxHandle/Head/columbia-matrix-box-handle-matrixboxhandle-head-sch-schematic-page-01.webp`,
+      3: `${_BASE}brands/Columbia/Schematics/Handles/MatrixBoxHandle/Lever/columbia-matrix-box-handle-matrixboxhandle-lever-sch-schematic-page-01.webp`,
+      4: `${_BASE}brands/Columbia/Schematics/Handles/MatrixBoxHandle/Pinchbox/columbia-matrix-box-handle-matrixboxhandle-pinchbox-sch-schematic-page-01.webp`,
+      5: `${_BASE}brands/Columbia/Schematics/Handles/MatrixBoxHandle/ExtensionHousing/columbia-matrix-box-handle-matrixboxhandle-extensionhousing-sch-schematic-page-01.webp`,
     },
     preview: `${_BASE}brands/Columbia/Schematics/Handles/MatrixBoxHandle/BoxHandle/columbia_matrix_box_handle.webp`,
   },
   'columbia-predator-taper': {
     pages: {
-      1: `${_BASE}brands/Columbia/Schematics/AutomaticTapers/PredatorTaper/Body/predator_taper_body.webp`,
-      2: `${_BASE}brands/Columbia/Schematics/AutomaticTapers/PredatorTaper/Head/predator_taper_head.webp`,
+      1: `${_BASE}brands/Columbia/Schematics/AutomaticTapers/PredatorTaper/Body/columbia-automatic-taper-predator-carbon-fiber-53-ptaper-predatortaper-body-sch-schematic-page-01.webp`,
+      2: `${_BASE}brands/Columbia/Schematics/AutomaticTapers/PredatorTaper/Head/columbia-automatic-taper-predator-carbon-fiber-53-ptaper-predatortaper-head-sch-schematic-page-01.webp`,
     },
     preview: `${_BASE}brands/Columbia/Schematics/AutomaticTapers/PredatorTaper/predator_taper.webp`,
   },
   'columbia-2-way-internal-corner': {
-    pages: { 1: `${_BASE}brands/Columbia/Schematics/Applicators/TwoWayInternalCorner/2_Way_Internal_Corner_Applicator-1-enhanced.webp` },
+    pages: { 1: `${_BASE}brands/Columbia/Schematics/Applicators/TwoWayInternalCorner/columbia-billet-mud-applicator-two-way-internal-corner-4-wheels-icatw-sch-schematic-page-01.webp` },
     preview: `${_BASE}brands/Columbia/Schematics/Applicators/TwoWayInternalCorner/Two-Way_Internal_Corner_Applicator.webp`,
   },
   'columbia-external-corner-applicator': {
-    pages: { 1: `${_BASE}brands/Columbia/Schematics/Applicators/ExternalCorner/8_Wheel_External_Corner_Applicator-1-enhanced.webp` },
+    pages: { 1: `${_BASE}brands/Columbia/Schematics/Applicators/ExternalCorner/columbia-billet-mud-applicator-external-90-cext90-sch-schematic-page-01.webp` },
     preview: `${_BASE}brands/Columbia/Schematics/Applicators/ExternalCorner/External_90_Aplicator_CEXT90_-_FRONT.webp`,
   },
   'columbia-inside-corner-applicator': {
     pages: {
-      1: `${_BASE}brands/Columbia/Schematics/Applicators/InsideCornerApplicator/2Wheel/ICA1-2-2015.webp`,
-      2: `${_BASE}brands/Columbia/Schematics/Applicators/InsideCornerApplicator/4Wheel/ICA1-4-2015.webp`,
+      1: `${_BASE}brands/Columbia/Schematics/Applicators/InsideCornerApplicator/2Wheel/columbia-billet-mud-applicator-inside-corner-2-wheels-1-ica2-1-sch-schematic-page-01.webp`,
+      2: `${_BASE}brands/Columbia/Schematics/Applicators/InsideCornerApplicator/4Wheel/columbia-billet-mud-applicator-inside-corner-4-wheels-1-ica4-1-sch-schematic-page-01.webp`,
     },
     preview: `${_BASE}brands/Columbia/Schematics/Applicators/InsideCornerApplicator/Inside_Corner_Applicator_4_Wheels_ICA1-4_-_BACK.webp`,
   },
   // (Inside Corner Roller images/data intentionally removed from parts schematics)
   'columbia-standard-outside-corner-roller': {
-    pages: { 1: `${_BASE}brands/Columbia/Schematics/CornerRollers/StandardOutsideCornerRoller/OutsideCornerRollers-2016-1-enhanced.webp` },
+    pages: { 1: `${_BASE}brands/Columbia/Schematics/CornerRollers/StandardOutsideCornerRoller/columbia-outside-corner-roller-sch-schematic-page-01.webp` },
     preview: `${_BASE}brands/Columbia/Schematics/CornerRollers/StandardOutsideCornerRoller/External_90_Aplicator.webp`,
   },
   'columbia-inside-corner-roller': {
-    pages: { 1: `${_BASE}brands/Columbia/Schematics/CornerRollers/InsideCornerRoller/InsideCornerRoller-2014_1_-enhanced-squared.webp` },
-    preview: `${_BASE}brands/Columbia/Schematics/CornerRollers/InsideCornerRoller/cornerroller.webp`,
+    pages: { 1: `${_BASE}brands/Columbia/Schematics/CornerRollers/InsideCornerRoller/columbia-corner-roller-sch-schematic-page-01.webp` },
+    preview: `${_BASE}brands/Columbia/Schematics/CornerRollers/InsideCornerRoller/columbia-corner-roller-sch-schematic-page-01.webp`,
   },
   'columbia-throttle-box': {
-    pages: { 1: `${_BASE}brands/Columbia/Schematics/CornerBoxes/ThrottleBox/CORNER-BOX-SCHEMATIC-enhanced.webp` },
+    pages: { 1: `${_BASE}brands/Columbia/Schematics/CornerBoxes/ThrottleBox/columbia-throttle-box-sch-schematic-page-01.webp` },
     preview: `${_BASE}brands/Columbia/Schematics/CornerBoxes/ThrottleBox/throttlebox8small.webp`,
   },
   'columbia-automatic-flat-box': {
-    pages: { 1: `${_BASE}brands/Columbia/Schematics/FinishingBoxes/AutomaticFlatBox/AUTO-BOX-SCHEMATIC-2022-enhanced.webp` },
+    pages: { 1: `${_BASE}brands/Columbia/Schematics/FinishingBoxes/AutomaticFlatBox/columbia-automatic-flat-finishing-box-sch-schematic-page-01.webp` },
     preview: `${_BASE}brands/Columbia/Schematics/FinishingBoxes/AutomaticFlatBox/automaticbox-1.webp`,
   },
   'columbia-flat-box': {
-    pages: { 1: `${_BASE}brands/Columbia/Schematics/FinishingBoxes/FlatBox/FLAT-BOX-HINGED-SCHEMATIC-2022-enhanced.webp` },
+    pages: { 1: `${_BASE}brands/Columbia/Schematics/FinishingBoxes/FlatBox/columbia-flat-finishing-box-sch-schematic-page-01.webp` },
     preview: `${_BASE}brands/Columbia/Schematics/FinishingBoxes/FlatBox/2023flatbox.webp`,
   },
   'columbia-fat-boy-box': {
-    pages: { 1: `${_BASE}brands/Columbia/Schematics/FinishingBoxes/FatBoyBox/fat_boy_box.webp` },
+    pages: { 1: `${_BASE}brands/Columbia/Schematics/FinishingBoxes/FatBoyBox/columbia-fat-boy-finishing-box-sch-schematic-page-01.webp` },
     preview: `${_BASE}brands/Columbia/Schematics/FinishingBoxes/FatBoyBox/InsideTrackBoxFrontSmall.webp`,
   },
   'columbia-angle-head': {
-    pages: { 1: `${_BASE}brands/Columbia/Schematics/Angleheads/AngleHead/AngleHead-2014-3-enhanced.webp` },
+    pages: { 1: `${_BASE}brands/Columbia/Schematics/Angleheads/AngleHead/columbia-angle-head-sch-schematic-page-01.webp` },
     preview: `${_BASE}brands/Columbia/Schematics/Angleheads/AngleHead/angleheadbacksquare.webp`,
   },
   'columbia-gooseneck-adapter': {
-    pages: { 1: `${_BASE}brands/Columbia/Schematics/Pumps/GooseneckAdapter/Gooseneck-1-1-enhanced.webp` },
+    pages: { 1: `${_BASE}brands/Columbia/Schematics/Pumps/GooseneckAdapter/columbia-gooseneck-sch-schematic-page-01.webp` },
     preview: `${_BASE}brands/Columbia/Schematics/Pumps/GooseneckAdapter/goosenecksquare.webp`,
   },
   'columbia-mud-pump': {
     pages: {
       1: `${_BASE}brands/Columbia/Schematics/Pumps/MudPump/MUD-PUMP-SUB-ASSEMBLIES-2022-enhanced.webp`,
-      2: `${_BASE}brands/Columbia/Schematics/Pumps/MudPump/MUD-PUMP-SCHEMATIC-2022-enhanced.webp`,
+  2: `${_BASE}brands/Columbia/Schematics/Pumps/MudPump/columbia-mud-pump-sch-schematic-page-01.webp`,
     },
     preview: `${_BASE}brands/Columbia/Schematics/Pumps/MudPump/TallBoyMudpumps.webp`,
   },
   'columbia-tall-boy-mud-pump': {
     pages: {
       1: `${_BASE}brands/Columbia/Schematics/Pumps/TallBoyMudPump/TALL-BOY-MUD-PUMP-SUB-ASSEMBLIES-2022-enhanced.webp`,
-      2: `${_BASE}brands/Columbia/Schematics/Pumps/TallBoyMudPump/TALL-BOY-MUD-PUMP-SCHEMATIC-2022-enhanced.webp`,
+  2: `${_BASE}brands/Columbia/Schematics/Pumps/TallBoyMudPump/columbia-mud-pump-sch-2-schematic-page-01.webp`,
     },
     preview: `${_BASE}brands/Columbia/Schematics/Pumps/TallBoyMudPump/TallBoyPump.webp`,
   },
   'columbia-nailspotter': {
-    pages: { 1: `${_BASE}brands/Columbia/Schematics/Nailspotters/Nailspotter/NAIL-SPOTTER-SCHEMATIC-2022-enhanced.webp` },
+    pages: { 1: `${_BASE}brands/Columbia/Schematics/Nailspotters/Nailspotter/columbia-nail-spotter-sch-schematic-page-01.webp` },
     preview: `${_BASE}brands/Columbia/Schematics/Nailspotters/Nailspotter/2023Nailspotter3inch.webp`,
   },
   'columbia-tomahawk-smoothing-blades': {
-    pages: { 1: `${_BASE}brands/Columbia/Schematics/SmoothingBlades/TomahawkSmoothingBlades/TOMAHAWK-SCHEMATIC-2022-enhanced.webp` },
+    pages: { 1: `${_BASE}brands/Columbia/Schematics/SmoothingBlades/TomahawkSmoothingBlades/columbia-tomahawk-smoothing-blade-sch-schematic-page-01.webp` },
     preview: `${_BASE}brands/Columbia/Schematics/SmoothingBlades/TomahawkSmoothingBlades/Tomahawksmoothingblade.webp`,
   },
   'columbia-standard-corner-flusher': {
-    pages: { 1: `${_BASE}brands/Columbia/Schematics/CornerFlushers/StandardCornerFlusher/3.5INCH-CORNER-FLUSHER-SCHEMATIC-2015-enhanced.webp` },
+    pages: { 1: `${_BASE}brands/Columbia/Schematics/CornerFlushers/StandardCornerFlusher/columbia-standard-flusher-sch-schematic-page-01.webp` },
     preview: `${_BASE}brands/Columbia/Schematics/CornerFlushers/StandardCornerFlusher/3inchflusher.webp`,
   },
   'columbia-direct-corner-flusher': {
-    pages: { 1: `${_BASE}brands/Columbia/Schematics/CornerFlushers/DirectCornerFlusher/DirectStandardFlusher-2015-enhanced.webp` },
+    pages: { 1: `${_BASE}brands/Columbia/Schematics/CornerFlushers/DirectCornerFlusher/columbia-direct-flusher-sch-schematic-page-01.webp` },
     preview: `${_BASE}brands/Columbia/Schematics/CornerFlushers/DirectCornerFlusher/2.5_Direct_Flusher_2.5DF.webp`,
   },
   'columbia-combo-flusher': {
-    pages: { 1: `${_BASE}brands/Columbia/Schematics/CornerFlushers/ComboFlusher/Classic_Combo_Flusher-1-enhanced.webp` },
+    pages: { 1: `${_BASE}brands/Columbia/Schematics/CornerFlushers/ComboFlusher/columbia-combo-flusher-sch-schematic-page-01.webp` },
     preview: `${_BASE}brands/Columbia/Schematics/CornerFlushers/ComboFlusher/combo_flusher.webp`,
   },
   'columbia-sander-head': {
-    pages: { 1: `${_BASE}brands/Columbia/Schematics/Sanders/SanderHead/SANDER-HEAD-SCHEMATIC-enhanced.webp` },
+    pages: { 1: `${_BASE}brands/Columbia/Schematics/Sanders/SanderHead/columbia-combo-flusher-3-3csf-sch-schematic-page-01.webp` },
     preview: `${_BASE}brands/Columbia/Schematics/Sanders/SanderHead/sanderwhandlesquaresmall.webp`,
   },
   'columbia-compound-tube': {
-    pages: { 1: `${_BASE}brands/Columbia/Schematics/CompoundTubes/CompoundTube/COMPOUND-TUBE-SCHEMATIC-2022-enhanced.webp` },
+    pages: { 1: `${_BASE}brands/Columbia/Schematics/CompoundTubes/CompoundTube/columbia-compound-tube-sch-schematic-page-01.webp` },
     preview: `${_BASE}brands/Columbia/Schematics/CompoundTubes/CompoundTube/compoundtubesquare.webp`,
   },
   'columbia-cam-lock-tube': {
-    pages: { 1: `${_BASE}brands/Columbia/Schematics/CompoundTubes/CamLockTube/Cam_Lock_Tube_2019-enhanced.webp` },
+    pages: { 1: `${_BASE}brands/Columbia/Schematics/CompoundTubes/CamLockTube/columbia-cam-lock-tube-sch-schematic-page-01.webp` },
     preview: `${_BASE}brands/Columbia/Schematics/CompoundTubes/CamLockTube/camlocktubesquare.webp`,
   },
   'columbia-semi-automatic-taper': {
-    pages: { 1: `${_BASE}brands/Columbia/Schematics/SemiAutomaticTapers/SemiAutomaticTaper/SEMI-AUTOMATIC-TAPER-SCHEMATIC-2022-enhanced.webp` },
+    pages: { 1: `${_BASE}brands/Columbia/Schematics/SemiAutomaticTapers/SemiAutomaticTaper/columbia-semi-automatic-taper-sat-sch-schematic-page-01.webp` },
     preview: `${_BASE}brands/Columbia/Schematics/SemiAutomaticTapers/SemiAutomaticTaper/semiautotapersquare.webp`,
   },
   'columbia-one': {
-    pages: { 1: `${_BASE}brands/Columbia/Schematics/Handles/ColumbiaOne/Columbia_One-enhanced.webp` },
+    pages: { 1: `${_BASE}brands/Columbia/Schematics/Handles/ColumbiaOne/columbia-one-handle-sch-schematic-page-01.webp` },
     preview: `${_BASE}brands/Columbia/Schematics/Handles/ColumbiaOne/columbiaonesquare.webp`,
   },
   'columbia-long-extendable-handle': {
-    pages: { 1: `${_BASE}brands/Columbia/Schematics/Handles/LongExtendableHandle/extendable-handle-enhanced.webp` },
+    pages: { 1: `${_BASE}brands/Columbia/Schematics/Handles/LongExtendableHandle/columbia-one-handle-4-8-long-extendible-chxl-sch-schematic-page-01.webp` },
     preview: `${_BASE}brands/Columbia/Schematics/Handles/LongExtendableHandle/corner_roller_handle_extendible.webp`,
   },
   'columbia-flat-box-handle': {
-    pages: { 1: `${_BASE}brands/Columbia/Schematics/Handles/FlatBoxHandle/180GripBoxHandle-2014-enhanced.webp` },
+    pages: { 1: `${_BASE}brands/Columbia/Schematics/Handles/FlatBoxHandle/columbia-180-grip-flat-box-handle-sch-schematic-page-01.webp` },
     preview: `${_BASE}brands/Columbia/Schematics/Handles/FlatBoxHandle/boxhandle.webp`,
   },
   'columbia-closet-monster-flat-box-handle': {
-    pages: { 1: `${_BASE}brands/Columbia/Schematics/Handles/ClosetMonster/ClosetMonster-2015-enhanced.webp` },
+    pages: { 1: `${_BASE}brands/Columbia/Schematics/Handles/ClosetMonster/columbia-closet-monster-handle-sch-schematic-page-01.webp` },
     preview: `${_BASE}brands/Columbia/Schematics/Handles/ClosetMonster/closet_monster_copy.webp`,
   },
   'columbia-box-filler': {
-    pages: { 1: `${_BASE}brands/Columbia/Schematics/Pumps/BoxFiller/Box_Filler.webp` },
+    pages: { 1: `${_BASE}brands/Columbia/Schematics/Pumps/BoxFiller/columbia-box-filler-sch-schematic-page-01.webp` },
     preview: `${_BASE}brands/Columbia/Schematics/Pumps/BoxFiller/boxfiller.webp`,
   },
   'columbia-corner-cobra': {
-    pages: { 1: `${_BASE}brands/Columbia/Schematics/CornerRollers/CornerCobra/CORNER-COBRA-SCHEMATIC.2024-enhanced.webp` },
+    pages: { 1: `${_BASE}brands/Columbia/Schematics/CornerRollers/CornerCobra/columbia-corner-cobra-sch-schematic-page-01.webp` },
     preview: `${_BASE}brands/Columbia/Schematics/CornerRollers/CornerCobra/NEWCORNERCOBRA-scaled.webp`,
   },
 
@@ -435,15 +435,15 @@ const _fallbacks = {
 
   // ── Platinum ──────────────────────────────────────────────────────────────
   'platinum-compound-pump': {
-    pages:   { 1: `${_BASE}brands/Platinum/Schematics/CompoundPump/PT-Compound-Pump-page-001.webp` },
+    pages:   { 1: `${_BASE}brands/Platinum/Schematics/CompoundPump/PT-Compound-Pump-page-01.webp` },
     preview: `${_BASE}brands/Platinum/Schematics/CompoundPump/PT-Compound-Pump-preview.webp`,
   },
   'platinum-flat-box': {
-    pages:   { 1: `${_BASE}brands/Platinum/Schematics/FlatBox/Platinum_Flat_Box-page-001.webp` },
+    pages:   { 1: `${_BASE}brands/Platinum/Schematics/FlatBox/Platinum_Flat_Box-page-01.webp` },
     preview: `${_BASE}brands/Platinum/Schematics/FlatBox/Platinum_Flat_Box-preview.webp`,
   },
   'platinum-outside-corner-roller': {
-    pages:   { 1: `${_BASE}brands/Platinum/Schematics/OutsideCornerRoller/platinum_outside_cornerroller-page-001.webp` },
+    pages:   { 1: `${_BASE}brands/Platinum/Schematics/OutsideCornerRoller/platinum_outside_cornerroller-page-01.webp` },
     preview: `${_BASE}brands/Platinum/Schematics/OutsideCornerRoller/platinum_outside_cornerroller_preview.webp`,
   },
 
