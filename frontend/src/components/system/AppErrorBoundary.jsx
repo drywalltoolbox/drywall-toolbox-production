@@ -7,6 +7,13 @@ function toAppHref(path = '/') {
   return `${ APP_BASE }${ normalized }` || '/';
 }
 
+function isFrontendDebugEnabled() {
+  if (typeof window === 'undefined') return false;
+  const params = new URLSearchParams(window.location.search || '');
+  const flag = String(params.get('dtb_frontend_debug') || '').toLowerCase();
+  return flag === '1' || flag === 'true' || flag === 'yes' || flag === 'on';
+}
+
 /**
  * frontend/src/components/system/AppErrorBoundary.jsx
  *
@@ -82,6 +89,23 @@ export default class AppErrorBoundary extends React.Component {
             The storefront encountered an unexpected error while rendering this page.
             You can safely retry or return to the products catalog.
           </p>
+
+          { isFrontendDebugEnabled() && (
+            <div className="mb-6 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-left">
+              <p className="mb-2 text-xs font-bold uppercase tracking-wide text-amber-800">
+                Debug Details
+              </p>
+              <pre className="max-h-64 overflow-auto whitespace-pre-wrap break-words text-xs text-amber-900">
+                { JSON.stringify( {
+                  message: this.state.error?.message || null,
+                  stack: this.state.error?.stack || null,
+                  componentStack: this.state.errorInfo?.componentStack || null,
+                  path: typeof window !== 'undefined' ? window.location.pathname : null,
+                  href: typeof window !== 'undefined' ? window.location.href : null,
+                }, null, 2 ) }
+              </pre>
+            </div>
+          ) }
 
           <div className="flex flex-wrap gap-3 justify-center">
             <button

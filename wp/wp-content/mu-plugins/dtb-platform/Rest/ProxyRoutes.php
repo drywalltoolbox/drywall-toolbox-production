@@ -37,10 +37,21 @@ defined( 'ABSPATH' ) || exit;
 // =============================================================================
 
 add_action( 'rest_api_init', 'dtb_register_all_routes', 10 );
+add_filter( 'dtb_variations_diagnostics_enabled', '__return_true' );
 
 function dtb_register_all_routes(): void {
 	dtb_register_proxy_routes();
 	dtb_register_config_routes();
+}
+
+/**
+ * WP REST-safe numeric validator callback.
+ *
+ * WP passes ( $value, $request, $param ) to validate callbacks, so built-ins
+ * like is_numeric() cannot be used directly as callback strings.
+ */
+function dtb_rest_validate_numeric( $value, $request = null, $param = null ): bool {
+	return is_numeric( $value );
 }
 
 // =============================================================================
@@ -82,14 +93,14 @@ function dtb_register_proxy_routes(): void {
 		'methods'             => 'GET',
 		'callback'            => 'dtb_proxy_product_by_id',
 		'permission_callback' => '__return_true',
-		'args'                => [ 'id' => [ 'validate_callback' => 'is_numeric' ] ],
+		'args'                => [ 'id' => [ 'validate_callback' => 'dtb_rest_validate_numeric' ] ],
 	] );
 
 	register_rest_route( $ns, '/products/(?P<id>\d+)/variations', [
 		'methods'             => 'GET',
 		'callback'            => 'dtb_proxy_product_variations',
 		'permission_callback' => '__return_true',
-		'args'                => [ 'id' => [ 'validate_callback' => 'is_numeric' ] ],
+		'args'                => [ 'id' => [ 'validate_callback' => 'dtb_rest_validate_numeric' ] ],
 	] );
 
 	register_rest_route( $ns, '/products/(?P<parent_id>\d+)/variations/(?P<id>\d+)', [
@@ -97,8 +108,8 @@ function dtb_register_proxy_routes(): void {
 		'callback'            => 'dtb_proxy_product_variation_by_id',
 		'permission_callback' => '__return_true',
 		'args'                => [
-			'parent_id' => [ 'validate_callback' => 'is_numeric' ],
-			'id'        => [ 'validate_callback' => 'is_numeric' ],
+			'parent_id' => [ 'validate_callback' => 'dtb_rest_validate_numeric' ],
+			'id'        => [ 'validate_callback' => 'dtb_rest_validate_numeric' ],
 		],
 	] );
 
@@ -132,7 +143,7 @@ function dtb_register_proxy_routes(): void {
 		'methods'             => 'GET',
 		'callback'            => 'dtb_proxy_get_order',
 		'permission_callback' => 'dtb_jwt_permission',
-		'args'                => [ 'id' => [ 'validate_callback' => 'is_numeric' ] ],
+		'args'                => [ 'id' => [ 'validate_callback' => 'dtb_rest_validate_numeric' ] ],
 	] );
 
 	// ── GET /drywall/v1/orders — customer's own order list (JWT-gated) ────────
@@ -162,7 +173,7 @@ function dtb_register_proxy_routes(): void {
 		'methods'             => 'GET',
 		'callback'            => 'dtb_proxy_get_customer',
 		'permission_callback' => 'dtb_jwt_permission',
-		'args'                => [ 'id' => [ 'validate_callback' => 'is_numeric' ] ],
+		'args'                => [ 'id' => [ 'validate_callback' => 'dtb_rest_validate_numeric' ] ],
 	] );
 
 	// ── Cache-invalidation webhook receiver ───────────────────────────────────
@@ -630,10 +641,7 @@ function dtb_proxy_product_variation_by_id( WP_REST_Request $request ): WP_REST_
 function dtb_proxy_product_variations( WP_REST_Request $request ): WP_REST_Response {
 	$parent_id = absint( $request->get_param( 'id' ) );
 	if ( 0 === $parent_id ) {
-		return new WP_REST_Response(
-			dtb_error_envelope( 'invalid_id', 'Invalid product ID.', 400 ),
-			400
-		);
+		return new WP_REST_Response( dtb_error_envelope( 'invalid_id', 'Invalid product ID.', 400 ), 400 );
 	}
 
 	if ( ! dtb_check_origin() ) {
@@ -649,138 +657,240 @@ function dtb_proxy_product_variations( WP_REST_Request $request ): WP_REST_Respo
 	$per_page_param = absint( (string) ( $request->get_param( 'per_page' ) ?? 100 ) );
 	$page           = max( 1, $page_param );
 	$per_page       = max( 1, min( 200, $per_page_param ) );
-	$offset         = ( $page - 1 ) * $per_page;
-
-	try {
-		$variation_ids = get_posts( [
-			'post_type'              => 'product_variation',
-			'post_parent'            => $parent_id,
-			'post_status'            => [ 'publish', 'private' ],
-			'orderby'                => [ 'menu_order' => 'ASC', 'ID' => 'ASC' ],
-			'numberposts'            => $per_page,
-			'offset'                 => $offset,
-			'fields'                 => 'ids',
-			'no_found_rows'          => true,
-			'ignore_sticky_posts'    => true,
-			'suppress_filters'       => true,
-		] );
-
-		if ( is_wp_error( $variation_ids ) ) {
-			if ( function_exists( 'dtb_log_cache_event' ) ) {
-				dtb_log_cache_event( 'variations_query_wp_error', [
-					'parent_id' => $parent_id,
-					'code'      => $variation_ids->get_error_code(),
-					'message'   => $variation_ids->get_error_message(),
-				] );
-			}
-			return new WP_REST_Response( [], 200 );
-		}
-
-		$data = [];
-		foreach ( $variation_ids as $variation_id ) {
-			$data[] = dtb_proxy_build_safe_variation_payload( (int) $variation_id, $parent_id );
-		}
-
-		return new WP_REST_Response( $data, 200 );
-	} catch ( Throwable $e ) {
-		if ( function_exists( 'dtb_log_cache_event' ) ) {
-			dtb_log_cache_event( 'variations_proxy_exception', [
-				'parent_id' => $parent_id,
-				'message'   => $e->getMessage(),
-			] );
-		}
-		return new WP_REST_Response( [], 200 );
+	$result = dtb_variation_repository_fetch( $parent_id, [
+		'page'     => $page,
+		'per_page' => $per_page,
+	] );
+	if ( is_wp_error( $result ) ) {
+		$status = (int) ( $result->get_error_data()['status'] ?? 500 );
+		return new WP_REST_Response(
+			dtb_error_envelope( $result->get_error_code(), $result->get_error_message(), $status ),
+			$status
+		);
 	}
+
+	return new WP_REST_Response( $result['items'], 200 );
 }
 
 /**
- * Build a minimal, safe variation payload for the storefront.
- *
- * This avoids Woo REST variation hydration (which can fatally fail on
- * malformed records) and only reads core post/meta fields needed by DTB UI.
+ * Production diagnostics toggle for variation repository logging.
  */
-function dtb_proxy_build_safe_variation_payload( int $variation_id, int $parent_id ): array {
-	$sku           = (string) get_post_meta( $variation_id, '_sku', true );
-	$price         = (string) get_post_meta( $variation_id, '_price', true );
-	$regular_price = (string) get_post_meta( $variation_id, '_regular_price', true );
-	$sale_price    = (string) get_post_meta( $variation_id, '_sale_price', true );
-	$stock_status  = (string) get_post_meta( $variation_id, '_stock_status', true );
-	$manage_stock  = 'yes' === (string) get_post_meta( $variation_id, '_manage_stock', true );
-	$stock_raw     = get_post_meta( $variation_id, '_stock', true );
-	$stock_qty     = ( is_numeric( $stock_raw ) ) ? (float) $stock_raw : null;
-	$backorders    = (string) get_post_meta( $variation_id, '_backorders', true );
-	$attributes    = [];
+function dtb_variations_diagnostics_enabled(): bool {
+	return (bool) apply_filters( 'dtb_variations_diagnostics_enabled', defined( 'WP_DEBUG_LOG' ) && WP_DEBUG_LOG );
+}
 
-	$meta = get_post_meta( $variation_id );
-	if ( is_array( $meta ) ) {
-		foreach ( $meta as $key => $values ) {
-			if ( 0 !== strpos( (string) $key, 'attribute_' ) ) {
-				continue;
-			}
-
-			$raw_option = is_array( $values ) ? (string) ( $values[0] ?? '' ) : (string) $values;
-			if ( '' === trim( $raw_option ) ) {
-				continue;
-			}
-
-			$raw_name = preg_replace( '/^attribute_/', '', (string) $key );
-			$raw_name = preg_replace( '/^pa_/', '', (string) $raw_name );
-
-			$attributes[] = [
-				'id'       => 0,
-				'name'     => wc_attribute_label( (string) $raw_name ),
-				'slug'     => sanitize_title( (string) $raw_name ),
-				'option'   => $raw_option,
-				'position' => 0,
-				'visible'  => true,
-				'variation'=> true,
-			];
-		}
+/**
+ * Diagnostic logging for variation repository behavior.
+ */
+function dtb_variations_diagnostic_log( string $event, array $context = [] ): void {
+	if ( ! dtb_variations_diagnostics_enabled() ) {
+		return;
 	}
 
-	$image_id = (int) get_post_meta( $variation_id, '_thumbnail_id', true );
-	$images   = [];
-	if ( $image_id > 0 ) {
-		$src = wp_get_attachment_image_url( $image_id, 'full' );
-		if ( is_string( $src ) && '' !== $src ) {
-			$images[] = [
-				'id'   => $image_id,
-				'src'  => $src,
-				'name' => basename( (string) wp_parse_url( $src, PHP_URL_PATH ) ),
-				'alt'  => (string) get_post_meta( $image_id, '_wp_attachment_image_alt', true ),
-			];
-		}
+	if ( function_exists( 'dtb_log_cache_event' ) ) {
+		dtb_log_cache_event( 'variation_repository_' . $event, $context );
+		return;
 	}
 
-	if ( '' === $stock_status ) {
-		$stock_status = 'instock';
+	error_log( '[DTB Variations] ' . $event . ' ' . wp_json_encode( $context ) );
+}
+
+/**
+ * Variation repository: single-query fetch + normalization.
+ */
+function dtb_variation_repository_fetch( int $parent_id, array $args = [] ) {
+	global $wpdb;
+
+	$page     = max( 1, absint( $args['page'] ?? 1 ) );
+	$per_page = max( 1, min( 200, absint( $args['per_page'] ?? 100 ) ) );
+	$offset   = ( $page - 1 ) * $per_page;
+	$started  = microtime( true );
+	$like_attr = $wpdb->esc_like( 'attribute_' ) . '%';
+
+	try {
+		$rows = $wpdb->get_results(
+			$wpdb->prepare(
+				"SELECT v.ID, v.post_parent, v.post_name, v.post_title, v.post_status, pm.meta_key, pm.meta_value
+				 FROM (
+				 	SELECT ID, post_parent, post_name, post_title, post_status, menu_order
+				 	FROM {$wpdb->posts}
+				 	WHERE post_parent = %d
+				 	  AND post_type = %s
+				 	  AND post_status IN ('publish','private')
+				 	ORDER BY menu_order ASC, ID ASC
+				 	LIMIT %d OFFSET %d
+				 ) v
+				 LEFT JOIN {$wpdb->postmeta} pm
+				   ON pm.post_id = v.ID
+				  AND (
+				  	pm.meta_key IN ('_sku','_price','_regular_price','_sale_price','_stock_status','_manage_stock','_stock','_backorders','_thumbnail_id')
+				  	OR pm.meta_key LIKE %s
+				  )
+				 ORDER BY v.menu_order ASC, v.ID ASC",
+				$parent_id,
+				'product_variation',
+				$per_page,
+				$offset,
+				$like_attr
+			),
+			ARRAY_A
+		);
+	} catch ( Throwable $e ) {
+		dtb_variations_diagnostic_log( 'query_exception', [
+			'parent_id' => $parent_id,
+			'page'      => $page,
+			'per_page'  => $per_page,
+			'message'   => $e->getMessage(),
+		] );
+		return new WP_Error( 'variation_query_failed', 'Unable to load product variations.', [ 'status' => 500 ] );
 	}
 
-	$status = (string) get_post_status( $variation_id );
-	if ( '' === $status ) {
-		$status = 'publish';
-	}
+	$items = dtb_variation_repository_normalize_rows( $parent_id, is_array( $rows ) ? $rows : [] );
+	dtb_variations_diagnostic_log( 'fetch', [
+		'parent_id'      => $parent_id,
+		'page'           => $page,
+		'per_page'       => $per_page,
+		'rows'           => is_array( $rows ) ? count( $rows ) : 0,
+		'items'          => count( $items ),
+		'duration_ms'    => (int) round( ( microtime( true ) - $started ) * 1000 ),
+		'memory_peak_mb' => round( memory_get_peak_usage( true ) / 1048576, 2 ),
+	] );
 
 	return [
-		'id'                 => $variation_id,
-		'parent_id'          => $parent_id,
-		'name'               => (string) get_the_title( $variation_id ),
-		'slug'               => (string) get_post_field( 'post_name', $variation_id ),
-		'type'               => 'variation',
-		'status'             => $status,
-		'sku'                => $sku,
-		'price'              => $price,
-		'regular_price'      => $regular_price,
-		'sale_price'         => $sale_price,
-		'on_sale'            => ( '' !== $sale_price && $sale_price !== $regular_price ),
-		'purchasable'        => 'publish' === $status,
-		'stock_status'       => $stock_status,
-		'manage_stock'       => $manage_stock,
-		'stock_quantity'     => $stock_qty,
-		'backorders_allowed' => in_array( $backorders, [ 'yes', 'notify' ], true ),
-		'backordered'        => 'notify' === $backorders,
-		'images'             => $images,
-		'attributes'         => $attributes,
+		'items'    => $items,
+		'page'     => $page,
+		'per_page' => $per_page,
+	];
+}
+
+/**
+ * Return a stable label for an attribute key without letting taxonomy/plugin
+ * errors abort the entire variation response.
+ */
+function dtb_proxy_safe_attribute_label( string $raw_name ): string {
+	try {
+		$label = wc_attribute_label( $raw_name );
+	} catch ( Throwable $e ) {
+		$label = '';
+	}
+
+	if ( ! is_string( $label ) || '' === trim( $label ) ) {
+		$label = ucwords( str_replace( [ '-', '_' ], ' ', $raw_name ) );
+	}
+
+	return (string) $label;
+}
+
+/**
+ * Load only variation attribute meta keys (attribute_*) instead of loading the
+ * full postmeta payload, which can be extremely large on malformed records.
+ */
+function dtb_variation_repository_normalize_rows( int $parent_id, array $rows ): array {
+	$bucket = [];
+
+	foreach ( $rows as $row ) {
+		$variation_id = absint( $row['ID'] ?? 0 );
+		if ( $variation_id <= 0 ) {
+			continue;
+		}
+		if ( ! isset( $bucket[ $variation_id ] ) ) {
+			$bucket[ $variation_id ] = [
+				'id'         => $variation_id,
+				'parent_id'  => $parent_id,
+				'name'       => (string) ( $row['post_title'] ?? '' ),
+				'slug'       => (string) ( $row['post_name'] ?? '' ),
+				'type'       => 'variation',
+				'status'     => (string) ( $row['post_status'] ?? 'publish' ),
+				'meta'       => [],
+				'attributes' => [],
+			];
+		}
+
+		$meta_key = (string) ( $row['meta_key'] ?? '' );
+		if ( '' === $meta_key ) {
+			continue;
+		}
+
+		$meta_value = (string) ( $row['meta_value'] ?? '' );
+		if ( 0 === strpos( $meta_key, 'attribute_' ) ) {
+			if ( '' !== trim( $meta_value ) ) {
+				$bucket[ $variation_id ]['attributes'][] = dtb_proxy_format_variation_attribute_meta( $meta_key, $meta_value );
+			}
+			continue;
+		}
+
+		$bucket[ $variation_id ]['meta'][ $meta_key ] = $meta_value;
+	}
+
+	$items = [];
+	foreach ( $bucket as $variation ) {
+		$meta         = $variation['meta'];
+		$sale_price   = (string) ( $meta['_sale_price'] ?? '' );
+		$regular      = (string) ( $meta['_regular_price'] ?? '' );
+		$stock_status = (string) ( $meta['_stock_status'] ?? 'instock' );
+		$stock_raw    = $meta['_stock'] ?? '';
+		$stock_qty    = is_numeric( $stock_raw ) ? (float) $stock_raw : null;
+		$backorders   = (string) ( $meta['_backorders'] ?? '' );
+		$image_id     = absint( $meta['_thumbnail_id'] ?? 0 );
+		$images       = [];
+		$image        = null;
+
+		if ( $image_id > 0 ) {
+			$src = wp_get_attachment_image_url( $image_id, 'full' );
+			if ( is_string( $src ) && '' !== $src ) {
+				$image = [
+					'id'   => $image_id,
+					'src'  => $src,
+					'name' => basename( (string) wp_parse_url( $src, PHP_URL_PATH ) ),
+					'alt'  => (string) get_post_meta( $image_id, '_wp_attachment_image_alt', true ),
+				];
+				$images[] = $image;
+			}
+		}
+
+		$status = (string) ( $variation['status'] ?? 'publish' );
+		$items[] = [
+			'id'                 => (int) $variation['id'],
+			'parent_id'          => (int) $variation['parent_id'],
+			'name'               => (string) $variation['name'],
+			'slug'               => (string) $variation['slug'],
+			'type'               => 'variation',
+			'status'             => $status,
+			'sku'                => (string) ( $meta['_sku'] ?? '' ),
+			'price'              => (string) ( $meta['_price'] ?? '' ),
+			'regular_price'      => $regular,
+			'sale_price'         => $sale_price,
+			'on_sale'            => ( '' !== $sale_price && $sale_price !== $regular ),
+			'purchasable'        => 'publish' === $status,
+			'stock_status'       => '' !== $stock_status ? $stock_status : 'instock',
+			'manage_stock'       => 'yes' === (string) ( $meta['_manage_stock'] ?? '' ),
+			'stock_quantity'     => $stock_qty,
+			'backorders_allowed' => in_array( $backorders, [ 'yes', 'notify' ], true ),
+			'backordered'        => 'notify' === $backorders,
+			'images'             => $images,
+			'image'              => $image,
+			'attributes'         => $variation['attributes'],
+		];
+	}
+
+	return array_values( $items );
+}
+
+/**
+ * Convert a raw variation attribute meta key/value pair to the storefront shape.
+ */
+function dtb_proxy_format_variation_attribute_meta( string $meta_key, string $raw_option ): array {
+	$raw_name = preg_replace( '/^attribute_/', '', $meta_key );
+	$raw_name = preg_replace( '/^pa_/', '', (string) $raw_name );
+
+	return [
+		'id'        => 0,
+		'name'      => dtb_proxy_safe_attribute_label( (string) $raw_name ),
+		'slug'      => sanitize_title( (string) $raw_name ),
+		'option'    => $raw_option,
+		'position'  => 0,
+		'visible'   => true,
+		'variation' => true,
 	];
 }
 
@@ -1480,32 +1590,18 @@ function dtb_proxy_product_detail( WP_REST_Request $request ): WP_REST_Response 
 	$variations = [];
 
 	if ( 'variable' === $product_type && $product_id > 0 ) {
-		$var_cache_key = 'wc/v3/products/' . $product_id . '/variations';
-
-		$variations_raw = dtb_cached_proxy( $var_cache_key, [ '_fields' => DTB_VARIATION_FIELDS, 'per_page' => 100 ], function () use ( $product_id ) {
-			$wc_url = add_query_arg(
-				[ '_fields' => DTB_VARIATION_FIELDS, 'per_page' => 100 ],
-				dtb_wc_url( 'wc/v3/products/' . $product_id . '/variations' )
-			);
-			$raw = wp_remote_get( $wc_url, [
-				'headers' => [ 'Authorization' => dtb_wc_auth_header() ],
-				'timeout' => 15,
-			] );
-			if ( is_wp_error( $raw ) ) {
-				if ( function_exists( 'dtb_log_cache_event' ) ) {
-					dtb_log_cache_event( 'detail_variations_upstream_error', [ 'product_id' => $product_id ] );
-				}
+		$var_cache_key = 'variation_repository_product_' . $product_id;
+		$variations_raw = dtb_cached_proxy( $var_cache_key, [ 'page' => 1, 'per_page' => 200 ], function () use ( $product_id ) {
+			$result = dtb_variation_repository_fetch( $product_id, [ 'page' => 1, 'per_page' => 200 ] );
+			if ( is_wp_error( $result ) ) {
+				dtb_variations_diagnostic_log( 'detail_repository_error', [
+					'product_id' => $product_id,
+					'code'       => $result->get_error_code(),
+					'message'    => $result->get_error_message(),
+				] );
 				return [];
 			}
-			$code = wp_remote_retrieve_response_code( $raw );
-			$body = json_decode( wp_remote_retrieve_body( $raw ), true );
-			if ( $code >= 500 ) {
-				if ( function_exists( 'dtb_log_cache_event' ) ) {
-					dtb_log_cache_event( 'detail_variations_upstream_error', [ 'product_id' => $product_id, 'status' => $code ] );
-				}
-				return [];
-			}
-			return is_array( $body ) ? $body : [];
+			return (array) ( $result['items'] ?? [] );
 		} );
 
 		$variations = is_array( $variations_raw ) ? array_values( $variations_raw ) : [];

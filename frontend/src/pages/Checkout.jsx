@@ -174,6 +174,10 @@ export default function Checkout() {
     const n = Number( value );
     return Number.isFinite( n ) ? n : 0;
   }, [] );
+  const toNumber = useCallback( ( value, fallback = 0 ) => {
+    const n = Number( value );
+    return Number.isFinite( n ) ? n : fallback;
+  }, [] );
 
   const navigate = useNavigate();
   const { cartItems, getCartTotal, clearCart } = useCart();
@@ -341,11 +345,12 @@ export default function Checkout() {
       } ) );
 
       const rates = await veeqoService.getShippingRates( destination, lineItems );
-      setShippingRates( rates );
+      const normalizedRates = Array.isArray( rates ) ? rates : [];
+      setShippingRates( normalizedRates );
 
       // Auto-select the first (cheapest) rate when none has been chosen yet.
-      if ( rates.length > 0 && ! selectedRateRef.current ) {
-        setSelectedRate( rates[0] );
+      if ( normalizedRates.length > 0 && ! selectedRateRef.current ) {
+        setSelectedRate( normalizedRates[0] );
       }
     } catch ( err ) {
       setRatesError( 'Could not load shipping options. Rates will be calculated at checkout.' );
@@ -806,7 +811,7 @@ export default function Checkout() {
                     <span>⭐</span> Redeem Points
                   </h3>
                   <span className="text-xs text-gray-500">
-                    Balance: { pointsBalance.points } pts (${pointsToUsd(pointsBalance.points).toFixed(2)})
+                    Balance: { toNumber( pointsBalance.points, 0 ) } pts (${ toNumber( pointsToUsd( pointsBalance.points ), 0 ).toFixed( 2 ) })
                   </span>
                 </div>
 
@@ -814,7 +819,7 @@ export default function Checkout() {
                   <div className="flex items-center justify-between bg-green-50 border border-green-200 rounded-lg px-4 py-3">
                     <div>
                       <p className="text-sm font-semibold text-green-800">
-                        ✓ ${ appliedCoupon.discount_amount.toFixed( 2 ) } discount applied
+                        ✓ ${ toNumber( appliedCoupon.discount_amount, 0 ).toFixed( 2 ) } discount applied
                       </p>
                       <code className="text-xs text-green-700 font-mono">{ appliedCoupon.code }</code>
                     </div>
