@@ -15,7 +15,7 @@ ROOT = Path(__file__).resolve().parents[3]
 DEFAULT_SEED = ROOT / "products/Production/launch/dtb_schematics_bulk_import_seed.csv"
 DEFAULT_CROSSWALK = ROOT / "products/Production/refs/schematic_tool_crosswalk.csv"
 DEFAULT_REPORTS_DIR = ROOT / "products/Production/launch/reports"
-DEFAULT_SCHEMATICS_ROOT = ROOT / "frontend/public/brands"
+DEFAULT_SCHEMATICS_ROOT = ROOT / "frontend/public/brands/wp_schematics_unified"
 DEFAULT_SEED_OUT = ROOT / "products/Production/launch/dtb_schematics_bulk_import_seed.csv"
 
 DEFAULT_CATALOGS = [
@@ -337,4 +337,3 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-

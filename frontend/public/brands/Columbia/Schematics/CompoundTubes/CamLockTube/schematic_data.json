@@ -1,6 +1,6 @@
 {
     "id": "columbia-cam-lock-tube-sch",
-    "title": "CAM-LOCK-TUBE-2019",
+    "title": "columbia-cam-lock-tube-sch-schematic-page-01.webp",
     "diagramPages": [
         1
     ],
@@ -424,6 +424,6 @@
     "schema_version": "1.0",
     "image_natural_width": 1792,
     "image_natural_height": 2400,
-    "sku": "COLCAMLOCKTUBE",
+    "sku": "COL-CAM-LOCK-TUBE",
     "product_name": "Columbia Cam Lock Tube"
 }

@@ -1,6 +1,6 @@
 {
     "id": "columbia-compound-tube-sch",
-    "title": "COMPOUND-TUBE-SCHEMATIC-2022",
+    "title": "columbia-compound-tube-sch-schematic-page-01.webp",
     "diagramPages": [
         1
     ],
@@ -372,6 +372,6 @@
     "schema_version": "1.0",
     "image_natural_width": 1792,
     "image_natural_height": 2400,
-    "sku": "COLCOMPOUNDTUBE",
+    "sku": "COL-COMPOUND-TUBE",
     "product_name": "Columbia Compound Tube"
 }

@@ -1,6 +1,6 @@
 {
     "id": "columbia-nail-spotter-sch",
-    "title": "NAIL-SPOTTER-SCHEMATIC-2022",
+    "title": "columbia-nail-spotter-sch-schematic-page-01.webp",
     "diagramPages": [
         1
     ],
@@ -698,6 +698,6 @@
     "schema_version": "1.0",
     "image_natural_width": 2400,
     "image_natural_height": 1792,
-    "sku": "COLNAILSPOTTER",
+    "sku": "COL-NAIL-SPOTTER",
     "product_name": "Columbia Nail Spotter"
 }

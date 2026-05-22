@@ -1,5 +1,7 @@
 ﻿brand,old_schematic_id,new_schematic_id,sku,slug
+Columbia Tools,columbia-180-grip-flat-box-handle-sch,columbia-180-grip-flat-box-handle-sch,COL180GRIPFLATBOXHANDLEFIXEDLENGTH,columbia-180-grip-flat-box-handle
 Columbia Tools,columbia-billet-mud-applicator-two-way-internal-corner-4-wheels-icatw-sch,columbia-billet-mud-applicator-two-way-internal-corner-4-wheels-icatw-sch,ICATW,columbia-billet-mud-applicator-two-way-internal-corner-4-wheels-icatw
+Columbia Tools,columbia-standard-flusher-sch,columbia-standard-flusher-sch,COLSTANDARDFLUSHERS,columbia-standard-flusher
 Columbia Tools,columbia-billet-mud-applicator-external-90-cext90-sch,columbia-billet-mud-applicator-external-90-cext90-sch,CEXT90,columbia-billet-mud-applicator-external-90-cext90
 Columbia Tools,columbia-angle-head-sch,columbia-angle-head-sch,COLANGLEHEAD,columbia-angle-head
 Columbia Tools,columbia-automatic-flat-finishing-box-sch,columbia-automatic-flat-finishing-box-sch,COLAUTOMATICFLATBOX,columbia-automatic-flat-finishing-box
@@ -9,23 +11,35 @@ Columbia Tools,columbia-combo-flusher-sch,columbia-combo-flusher-sch,COLCOMBOFLU
 Columbia Tools,columbia-closet-monster-handle-sch,columbia-closet-monster-handle-sch,CMH,columbia-closet-monster-handle
 Columbia Tools,columbia-one-handle-sch,columbia-one-handle-sch,COLONEHANDLE,columbia-one-handle
 Columbia Tools,columbia-compound-tube-sch,columbia-compound-tube-sch,COLCOMPOUNDTUBE,columbia-compound-tube
+Columbia Tools,columbia-throttle-box-sch,columbia-throttle-box-sch,COLTHROTTLEBOX,columbia-throttle-box
 Columbia Tools,columbia-corner-cobra-sch,columbia-corner-cobra-sch,CC,columbia-corner-cobra
 Columbia Tools,columbia-direct-flusher-sch,columbia-direct-flusher-sch,COLDIRECTFLUSHER,columbia-direct-flusher
 Columbia Tools,columbia-one-handle-4-8-long-extendible-chxl-sch,columbia-one-handle-4-8-long-extendible-chxl-sch,CHXL,columbia-one-handle-4-8-long-extendible-chxl
+Columbia Tools,columbia-matrix-box-handle-matrixboxhandle-extensionhousing-sch,columbia-matrix-box-handle-matrixboxhandle-extensionhousing-sch,COLMATRIXBOXHANDLE,columbia-matrix-box-handle
+Columbia Tools,columbia-fat-boy-finishing-box-sch,columbia-fat-boy-finishing-box-sch,COLFATBOYBOX,columbia-fat-boy-finishing-box
+Columbia Tools,columbia-flat-finishing-box-sch,columbia-flat-finishing-box-sch,COLFLATFINISHINGBOXES,columbia-flat-finishing-box
 Columbia Tools,columbia-gooseneck-sch,columbia-gooseneck-sch,COLGOOSENECK,columbia-gooseneck
 Columbia Tools,columbia-billet-mud-applicator-inside-corner-2-wheels-1-ica2-1-sch,columbia-billet-mud-applicator-inside-corner-2-wheels-1-ica2-1-sch,ICA21,columbia-billet-mud-applicator-inside-corner-2-wheels-1-ica2-1
 Columbia Tools,columbia-billet-mud-applicator-inside-corner-4-wheels-1-ica4-1-sch,columbia-billet-mud-applicator-inside-corner-4-wheels-1-ica4-1-sch,ICA41,columbia-billet-mud-applicator-inside-corner-4-wheels-1-ica4-1
 Columbia Tools,columbia-corner-roller-sch,columbia-corner-roller-sch,CR,columbia-corner-roller
+Columbia Tools,columbia-matrix-box-handle-matrixboxhandle-boxhandle-sch,columbia-matrix-box-handle-matrixboxhandle-boxhandle-sch,COLMATRIXBOXHANDLE,columbia-matrix-box-handle
+Columbia Tools,columbia-ah1-3-5-head-casting-3-5in-sch,columbia-matrix-box-handle-matrixboxhandle-head-sch,COLMATRIXBOXHANDLE,columbia-matrix-box-handle
+Columbia Tools,columbia-180-grip-lower-brake-lever-bh4-sch,columbia-matrix-box-handle-matrixboxhandle-lever-sch,COLMATRIXBOXHANDLE,columbia-matrix-box-handle
+Columbia Tools,columbia-matrix-box-handle-matrixboxhandle-pinchbox-sch,columbia-matrix-box-handle-matrixboxhandle-pinchbox-sch,COLMATRIXBOXHANDLE,columbia-matrix-box-handle
+Columbia Tools,columbia-mud-pump-pumps-mudpump-sch,columbia-mud-pump-sch,COLMUDPUMP,columbia-mud-pump
 Columbia Tools,columbia-nail-spotter-sch,columbia-nail-spotter-sch,COLNAILSPOTTER,columbia-nail-spotter
 Columbia Tools,columbia-outside-corner-roller-sch,columbia-outside-corner-roller-sch,COLOUTSIDECORNERROLLER,columbia-outside-corner-roller
 Columbia Tools,columbia-automatic-taper-predator-carbon-fiber-53-ptaper-predatortaper-body-sch,columbia-automatic-taper-predator-carbon-fiber-53-ptaper-predatortaper-body-sch,PTAPER,columbia-automatic-taper-predator-carbon-fiber-53-ptaper
 Columbia Tools,columbia-automatic-taper-predator-carbon-fiber-53-ptaper-predatortaper-head-sch,columbia-automatic-taper-predator-carbon-fiber-53-ptaper-predatortaper-head-sch,PTAPER,columbia-automatic-taper-predator-carbon-fiber-53-ptaper
 Columbia Tools,columbia-semi-automatic-taper-sat-sch,columbia-semi-automatic-taper-sat-sch,SAT,columbia-semi-automatic-taper-sat
+Columbia Tools,columbia-mud-pump-pumps-tallboymudpump-sch,columbia-mud-pump-sch-2,COLMUDPUMP,columbia-mud-pump
 Columbia Tools,columbia-tomahawk-smoothing-blade-sch,columbia-tomahawk-smoothing-blade-sch,COLTOMAHAWKSMOOTHINGBLADE,columbia-tomahawk-smoothing-blade
 Platinum Drywall Tools,platinum-50-corner-roller-handle-sch,platinum-50-corner-roller-handle-sch,PTCRH50,platinum-50-corner-roller-handle
 Platinum Drywall Tools,platinum-flat-finishing-box-sch,platinum-flat-finishing-box-sch,PTFB,platinum-flat-finishing-box
 Platinum Drywall Tools,platinum-outside-90-degree-corner-roller-sch,platinum-outside-90-degree-corner-roller-sch,PTOCR,platinum-outside-90-degree-corner-roller
 Platinum Drywall Tools,platinum-drywall-pump-w-filler-sch,platinum-drywall-pump-w-filler-sch,PTCP,platinum-drywall-pump-w-filler
 TapeTech,tapetech-corner-applicator-sch,tapetech-corner-applicator-sch,TTCORNERAPPLICATOR,tapetech-corner-applicator
-TapeTech,tapetech-corner-applicator-sch-2,tapetech-corner-applicator-sch-3,TTCORNERAPPLICATOR,tapetech-corner-applicator
+TapeTech,tapetech-corner-applicator-sch-3,tapetech-corner-applicator-sch-2,TTCORNERAPPLICATOR,tapetech-corner-applicator
+TapeTech,tapetech-easyclean-nail-spotter-tapetech-63tt-sch,tapetech-easyclean-nail-spotter-sch,TTEASYCLEANNAILSPOTTER,tapetech-easyclean-nail-spotter
+TapeTech,tapetech-easyclean-nail-spotter-tapetech-68tt-sch,tapetech-easyclean-nail-spotter-sch-2,TTEASYCLEANNAILSPOTTER,tapetech-easyclean-nail-spotter
 TapeTech,tapetech-flat-box-handle-sch,tapetech-flat-box-handle-sch,TTFLATBOXHANDLE,tapetech-flat-box-handle

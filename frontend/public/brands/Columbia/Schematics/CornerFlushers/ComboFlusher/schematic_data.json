@@ -1,6 +1,6 @@
 {
     "id": "columbia-combo-flusher-sch",
-    "title": "CLASSIC-COMBO-FLUSHER-1",
+    "title": "columbia-combo-flusher-sch-schematic-page-01.webp",
     "diagramPages": [
         1
     ],
@@ -324,6 +324,6 @@
     "schema_version": "1.0",
     "image_natural_width": 2400,
     "image_natural_height": 1792,
-    "sku": "COLCOMBOFLUSHER",
+    "sku": "COL-COMBO-FLUSHER",
     "product_name": "Columbia Combo Flusher"
 }

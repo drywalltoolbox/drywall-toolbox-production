@@ -1,6 +1,6 @@
 {
     "id": "columbia-direct-flusher-sch",
-    "title": "DirectStandardFlusher-2015",
+    "title": "columbia-direct-flusher-sch-schematic-page-01.webp",
     "diagramPages": [
         1
     ],
@@ -462,6 +462,6 @@
     "schema_version": "1.0",
     "image_natural_width": 768,
     "image_natural_height": 1376,
-    "sku": "COLDIRECTFLUSHER",
+    "sku": "COL-DIRECT-FLUSHER",
     "product_name": "Columbia Direct Flusher"
 }

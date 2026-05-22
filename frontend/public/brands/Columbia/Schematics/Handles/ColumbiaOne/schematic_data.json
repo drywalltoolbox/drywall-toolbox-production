@@ -1,6 +1,6 @@
 {
     "id": "columbia-one-handle-sch",
-    "title": "COLUMBIA-ONE",
+    "title": "columbia-one-handle-sch-schematic-page-01.webp",
     "diagramPages": [
         1
     ],
@@ -76,6 +76,6 @@
     "schema_version": "1.0",
     "image_natural_width": 2400,
     "image_natural_height": 1792,
-    "sku": "COLONEHANDLE",
+    "sku": "COL-ONE-HANDLE",
     "product_name": "Columbia One Handle"
 }

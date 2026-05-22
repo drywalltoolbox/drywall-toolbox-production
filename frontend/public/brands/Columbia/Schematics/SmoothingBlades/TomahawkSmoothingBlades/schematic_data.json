@@ -1,6 +1,6 @@
 {
     "id": "columbia-tomahawk-smoothing-blade-sch",
-    "title": "TOMAHAWK-SCHEMATIC-2022",
+    "title": "columbia-tomahawk-smoothing-blade-sch-schematic-page-01.webp",
     "diagramPages": [
         1
     ],
@@ -156,6 +156,6 @@
     "schema_version": "1.0",
     "image_natural_width": 2400,
     "image_natural_height": 1792,
-    "sku": "COLTOMAHAWKSMOOTHINGBLADE",
+    "sku": "COL-TOMAHAWK-SMOOTHING-BLADE",
     "product_name": "Columbia Tomahawk Smoothing Blade"
 }

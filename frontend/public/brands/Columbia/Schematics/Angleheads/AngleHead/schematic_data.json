@@ -1,6 +1,6 @@
 {
     "id": "columbia-angle-head-sch",
-    "title": "AngleHead-2014-3",
+    "title": "columbia-angle-head-sch-schematic-page-01.webp",
     "diagramPages": [
         1
     ],
@@ -496,6 +496,6 @@
     "schema_version": "1.0",
     "image_natural_width": 2400,
     "image_natural_height": 1792,
-    "sku": "COLANGLEHEAD",
+    "sku": "COL-ANGLE-HEAD",
     "product_name": "Columbia Angle Head"
 }

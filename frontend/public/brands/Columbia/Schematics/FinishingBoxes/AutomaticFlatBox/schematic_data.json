@@ -1,6 +1,6 @@
 {
     "id": "columbia-automatic-flat-finishing-box-sch",
-    "title": "AUTO-BOX-SCHEMATIC-2022",
+    "title": "columbia-automatic-flat-finishing-box-sch-schematic-page-01.webp",
     "diagramPages": [
         1
     ],
@@ -1046,6 +1046,6 @@
     "schema_version": "1.0",
     "image_natural_width": 1200,
     "image_natural_height": 896,
-    "sku": "COLAUTOMATICFLATBOX",
-    "product_name": "Columbia Automatic Flat Finishing Box"
+    "sku": "COL-AUTOMATIC-FLAT-BOX",
+    "product_name": "Columbia Automatic Flat Box"
 }

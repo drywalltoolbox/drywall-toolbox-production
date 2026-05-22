@@ -1,6 +1,6 @@
 {
-    "id": "columbia-ah1-3-5-head-casting-3-5in-sch",
-    "title": "MATRIX-HEAD",
+    "id": "columbia-matrix-box-handle-matrixboxhandle-head-sch",
+    "title": "columbia-matrix-box-handle-matrixboxhandle-head-sch-schematic-page-01.webp",
     "diagramPages": [
         2
     ],
@@ -189,6 +189,6 @@
     "schema_version": "1.0",
     "image_natural_width": 1200,
     "image_natural_height": 896,
-    "sku": "AH135IN",
-    "product_name": "AH1 - 3.5 - Head Casting - 3.5\""
+    "sku": "COLMATRIXBOXHANDLE",
+    "product_name": "Columbia Matrix Box Handle"
 }
