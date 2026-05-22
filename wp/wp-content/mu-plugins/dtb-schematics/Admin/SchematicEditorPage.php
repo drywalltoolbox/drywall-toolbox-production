@@ -215,7 +215,7 @@ function dtb_schematics_render_page() {
 
 			<div class="dtb-card" style="max-width:760px;">
 				<h3 style="margin-top:0;">Bulk Import (CSV)</h3>
-				<p style="font-size:13px;color:#787c82;margin-top:0;">Required columns: <code>attachment_id</code>, <code>schematic_id</code>, <code>brand</code>, <code>model_number</code>. Optional: <code>model_name</code>, <code>part_count</code>, <code>notes</code>, <code>product_ids</code>. If <code>attachment_id</code> is blank, upload an optional ZIP and importer will auto-match and create Media Library attachments.</p>
+				<p style="font-size:13px;color:#787c82;margin-top:0;">Required columns: <code>schematic_id</code>, <code>brand</code>, <code>model_number</code>. Optional: <code>attachment_id</code>, <code>model_name</code>, <code>part_count</code>, <code>notes</code>, <code>product_ids</code>. If <code>attachment_id</code> is missing/blank, upload an optional ZIP and importer will auto-match and create Media Library attachments.</p>
 				<input type="file" id="dtb-import-file" accept=".csv,text/csv">
 				<div style="margin-top:10px;">
 					<label for="dtb-import-images-zip" style="display:block;font-size:12px;font-weight:600;margin-bottom:4px;color:#3c434a;">Optional Schematics Images ZIP</label>
@@ -614,47 +614,225 @@ function dtb_schematics_render_page() {
 				alert('Please select a CSV file first.');
 				return;
 			}
+			var $btn = $(this);
+			$btn.prop('disabled', true);
+			$('#dtb-import-spinner').show();
+			$('#dtb-import-msg').text('Initializing import…').css('color', '#1d6fa4');
+			$('#dtb-import-errors').hide().text('');
+
 			var formData = new FormData();
 			formData.append('action', 'dtb_schematics_import_csv');
+			formData.append('mode', 'init');
 			formData.append('nonce', nonce);
 			formData.append('file', fileInput.files[0]);
 			if (zipInput && zipInput.files && zipInput.files.length) {
 				formData.append('images_zip', zipInput.files[0]);
 			}
 
-			var $btn = $(this);
-			$btn.prop('disabled', true);
-			$('#dtb-import-spinner').show();
-			$('#dtb-import-msg').text('');
-			$('#dtb-import-errors').hide().text('');
+			var initialBatchSize = 50;
+			var batchSizeTiers = [50, 35, 25];
+			var maxTimeoutRetriesPerBatch = 3;
+
+			function nextBatchSizeFromTimeout(currentSize) {
+				for (var i = 0; i < batchSizeTiers.length; i++) {
+					if (currentSize > batchSizeTiers[i]) {
+						return batchSizeTiers[i];
+					}
+					if (currentSize === batchSizeTiers[i] && i < batchSizeTiers.length - 1) {
+						return batchSizeTiers[i + 1];
+					}
+				}
+
+				return batchSizeTiers[batchSizeTiers.length - 1];
+			}
+
+			function finishFailure(errorMsg, details) {
+				$btn.prop('disabled', false);
+				$('#dtb-import-spinner').hide();
+				$('#dtb-import-msg').text(errorMsg).css('color', '#d63638');
+				if (details) {
+					$('#dtb-import-errors').show().text(details);
+				}
+			}
+
+			function buildReasonSummary(reasonCounts) {
+				if (!reasonCounts) {
+					return '';
+				}
+
+				var labelMap = {
+					missing_required_fields: 'Missing required fields',
+					invalid_product_parent: 'Invalid product parent',
+					no_token_match: 'No token match',
+					zip_missing_entry: 'ZIP missing entry',
+					attachment_import_failed: 'Attachment import failed'
+				};
+
+				var lines = [];
+				Object.keys(labelMap).forEach(function(key){
+					var count = parseInt(reasonCounts[key] || 0, 10);
+					if (count > 0) {
+						lines.push(labelMap[key] + ': ' + count);
+					}
+				});
+
+				if (!lines.length) {
+					return '';
+				}
+
+				return 'Post-run summary:\n' + lines.join('\n');
+			}
+
+			function renderImportDiagnostics(data) {
+				if (!data) {
+					return;
+				}
+
+				var reasonSummary = buildReasonSummary(data.reason_counts || null);
+				var errs = (data.errors && data.errors.length) ? data.errors.join('\n') : '';
+				var out = reasonSummary;
+				if (errs) {
+					out = out ? (out + '\n\n' + errs) : errs;
+				}
+
+				if (out) {
+					$('#dtb-import-errors').show().text(out);
+				}
+			}
+
+			function runBatch(sessionId, totalRows, batchSize, timeoutRetryCount) {
+				if (!sessionId) {
+					finishFailure('Import failed: missing staged session ID.', 'The staged import session was not returned by the server.');
+					return;
+				}
+
+				$.ajax({
+					url: ajaxurl,
+					type: 'POST',
+					data: {
+						action: 'dtb_schematics_import_csv',
+						mode: 'batch',
+						nonce: nonce,
+						session_id: sessionId,
+						batch_size: batchSize
+					},
+					timeout: 120000
+				}).done(function(res){
+					if (!res || !res.success) {
+						var msg = 'Import failed during batch processing.';
+						if (res && res.data && res.data.message) {
+							msg = 'Import failed: ' + res.data.message;
+						}
+						var errs = (res && res.data && res.data.errors && res.data.errors.length)
+							? res.data.errors.join('\n')
+							: '';
+						finishFailure(msg, errs);
+						renderImportDiagnostics((res && res.data) ? res.data : null);
+						return;
+					}
+
+					var d = res.data || {};
+					var processed = d.processed_rows || 0;
+					var total = d.total_rows || totalRows || 0;
+					$('#dtb-import-msg').text('Processing rows ' + processed + ' / ' + total + '… (batch size ' + batchSize + ')').css('color', '#1d6fa4');
+
+					if (!d.done) {
+						runBatch(sessionId, total, batchSize, 0);
+						return;
+					}
+
+					$btn.prop('disabled', false);
+					$('#dtb-import-spinner').hide();
+
+					var msg = d.message || 'Import complete.';
+					$('#dtb-import-msg').text('✓ ' + msg).css('color', '#1a7f37');
+					renderImportDiagnostics(d);
+					loadList(1);
+				}).fail(function(xhr, textStatus){
+					var httpStatus = xhr && typeof xhr.status !== 'undefined' ? xhr.status : 0;
+					var responseText = xhr && xhr.responseText ? xhr.responseText : '';
+					var timedOut = ('timeout' === textStatus) || (524 === httpStatus);
+
+					if (timedOut && timeoutRetryCount < maxTimeoutRetriesPerBatch) {
+						var nextBatchSize = nextBatchSizeFromTimeout(batchSize);
+						var nextRetry = timeoutRetryCount + 1;
+
+						$('#dtb-import-msg')
+							.text('Batch timed out. Retrying with smaller batch size (' + nextBatchSize + '), attempt ' + nextRetry + '/' + maxTimeoutRetriesPerBatch + '…')
+							.css('color', '#1d6fa4');
+
+						setTimeout(function(){
+							runBatch(sessionId, totalRows, nextBatchSize, nextRetry);
+						}, 1200);
+						return;
+					}
+
+					var errorMsg = 'Import request failed (' + (httpStatus || textStatus || 'network') + ').';
+					if (timedOut) {
+						errorMsg = 'Import batch timed out after retries. The session remains staged; click Import CSV to retry.';
+					}
+					finishFailure(errorMsg, responseText ? responseText.slice(0, 5000) : '');
+
+					if (window.console && console.error) {
+						console.error('DTB schematics import batch AJAX failure', {
+							status: httpStatus,
+							textStatus: textStatus,
+							responseText: responseText,
+							ajaxurl: ajaxurl,
+							sessionId: sessionId
+						});
+					}
+				});
+			}
 
 			$.ajax({
 				url: ajaxurl,
 				type: 'POST',
 				data: formData,
 				processData: false,
-				contentType: false
+				contentType: false,
+				timeout: 180000
 			}).done(function(res){
-				$btn.prop('disabled', false);
-				$('#dtb-import-spinner').hide();
 				if (!res || !res.success) {
-					$('#dtb-import-msg').text('Import failed.').css('color', '#d63638');
+					var msg = 'Import failed.';
+					if (res && res.data && res.data.message) {
+						msg = 'Import failed: ' + res.data.message;
+					}
+					var errs = (res && res.data && res.data.errors && res.data.errors.length)
+						? res.data.errors.join('\n')
+						: '';
+					finishFailure(msg, errs);
+					renderImportDiagnostics((res && res.data) ? res.data : null);
 					return;
 				}
 				var d = res.data || {};
-				var msg = d.message || 'Import complete.';
-				if (typeof d.images_imported !== 'undefined') {
-					msg += ' (images imported: ' + d.images_imported + ')';
+				renderImportDiagnostics(d);
+				if (d.done) {
+					$btn.prop('disabled', false);
+					$('#dtb-import-spinner').hide();
+					$('#dtb-import-msg').text(d.message || 'Import complete.').css('color', '#1a7f37');
+					loadList(1);
+					return;
 				}
-				$('#dtb-import-msg').text('✓ ' + msg).css('color', '#1a7f37');
-				if (d.errors && d.errors.length) {
-					$('#dtb-import-errors').show().text(d.errors.join('\n'));
+
+				runBatch(d.session_id || '', d.total_rows || 0, initialBatchSize, 0);
+			}).fail(function(xhr, textStatus){
+				var httpStatus = xhr && typeof xhr.status !== 'undefined' ? xhr.status : 0;
+				var responseText = xhr && xhr.responseText ? xhr.responseText : '';
+				var errorMsg = 'Import request failed (' + (httpStatus || textStatus || 'network') + ').';
+				if ('timeout' === textStatus) {
+					errorMsg = 'Import initialization timed out. Try a smaller ZIP or rerun.';
 				}
-				loadList(1);
-			}).fail(function(){
-				$btn.prop('disabled', false);
-				$('#dtb-import-spinner').hide();
-				$('#dtb-import-msg').text('Import failed.').css('color', '#d63638');
+				finishFailure(errorMsg, responseText ? responseText.slice(0, 5000) : '');
+
+				if (window.console && console.error) {
+					console.error('DTB schematics import AJAX failure', {
+						status: httpStatus,
+						textStatus: textStatus,
+						responseText: responseText,
+						ajaxurl: ajaxurl
+					});
+				}
 			});
 		});
 

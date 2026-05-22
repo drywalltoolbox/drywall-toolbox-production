@@ -25,6 +25,7 @@ dtb_module_require( 'dtb-schematics/Validation/SchematicMediaValidator.php' );
 dtb_module_require( 'dtb-schematics/Services/SchematicMediaService.php' );
 dtb_module_require( 'dtb-schematics/Services/SchematicFallbackResolver.php' );
 dtb_module_require( 'dtb-schematics/Services/SchematicPartResolver.php' );
+dtb_module_require( 'dtb-schematics/Services/SchematicAttachmentProcessor.php' );
 
 // Application.
 dtb_module_require( 'dtb-schematics/Application/SyncSchematicMedia.php' );

@@ -8,6 +8,10 @@ function dtb_ajax_schematics_list() {
 	check_ajax_referer( 'dtb_schematics_nonce', 'nonce' );
 	if ( ! current_user_can( 'manage_options' ) ) wp_send_json_error( [], 403 );
 
+	if ( ! function_exists( 'dtb_get_schematics' ) ) {
+		wp_send_json_error( [ 'message' => 'Schematics module not loaded.' ], 503 );
+	}
+
 	$result = dtb_get_schematics(
 		sanitize_text_field( $_POST['brand'] ?? '' ),
 		sanitize_text_field( $_POST['search'] ?? '' ),
@@ -179,6 +183,46 @@ function dtb_ajax_schematics_audit() {
 
 add_action( 'wp_ajax_dtb_schematics_import_csv', 'dtb_ajax_schematics_import_csv' );
 
+// ── Orphan temp-dir cleanup (runs on every wp-admin page load) ───────────────
+add_action( 'admin_init', 'dtb_schematics_cleanup_orphan_temp_dirs' );
+function dtb_schematics_cleanup_orphan_temp_dirs(): void {
+	$uploads  = wp_upload_dir();
+	$base     = trailingslashit( $uploads['basedir'] );
+	$pattern  = $base . 'dtb-schematics-import-*';
+	$dirs     = glob( $pattern, GLOB_ONLYDIR );
+	if ( ! is_array( $dirs ) ) {
+		return;
+	}
+	$cutoff = time() - HOUR_IN_SECONDS;
+	foreach ( $dirs as $dir ) {
+		// Only remove dirs that are at least 1 hour old to avoid nuking an in-flight import.
+		if ( is_dir( $dir ) && filemtime( $dir ) < $cutoff ) {
+			dtb_schematics_rmdir_recursive( $dir );
+		}
+	}
+}
+
+/**
+ * Recursively delete a directory and all its contents.
+ */
+function dtb_schematics_rmdir_recursive( string $dir ): void {
+	if ( ! is_dir( $dir ) ) {
+		return;
+	}
+	$items = new RecursiveIteratorIterator(
+		new RecursiveDirectoryIterator( $dir, RecursiveDirectoryIterator::SKIP_DOTS ),
+		RecursiveIteratorIterator::CHILD_FIRST
+	);
+	foreach ( $items as $item ) {
+		if ( $item->isDir() ) {
+			@rmdir( $item->getRealPath() ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+		} else {
+			@unlink( $item->getRealPath() ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+		}
+	}
+	@rmdir( $dir ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+}
+
 /**
  * Normalize free-text tokens for file-matching.
  */
@@ -189,15 +233,14 @@ function dtb_schematics_normalize_token( string $value ): string {
 }
 
 /**
- * Build an index of image files from uploaded ZIP archive.
+ * Build a lazy token index from a ZIP archive (no extraction at init).
  *
- * @return array{index: array<string, string>, temp_dir: string, errors: string[]}
+ * @return array{index: array<string, string>, errors: string[]}
  */
-function dtb_schematics_build_image_index_from_zip( string $zip_tmp_path ): array {
+function dtb_schematics_build_image_index_from_zip( string $zip_path ): array {
 	$result = [
-		'index'    => [],
-		'temp_dir' => '',
-		'errors'   => [],
+		'index'  => [],
+		'errors' => [],
 	];
 
 	if ( ! class_exists( 'ZipArchive' ) ) {
@@ -206,15 +249,10 @@ function dtb_schematics_build_image_index_from_zip( string $zip_tmp_path ): arra
 	}
 
 	$zip = new ZipArchive();
-	if ( true !== $zip->open( $zip_tmp_path ) ) {
+	if ( true !== $zip->open( $zip_path ) ) {
 		$result['errors'][] = 'Unable to open image ZIP archive.';
 		return $result;
 	}
-
-	$uploads = wp_upload_dir();
-	$temp_dir = trailingslashit( $uploads['basedir'] ) . 'dtb-schematics-import-' . wp_generate_password( 8, false, false );
-	wp_mkdir_p( $temp_dir );
-	$result['temp_dir'] = $temp_dir;
 
 	for ( $i = 0; $i < $zip->numFiles; $i++ ) {
 		$entry = $zip->getNameIndex( $i );
@@ -226,12 +264,6 @@ function dtb_schematics_build_image_index_from_zip( string $zip_tmp_path ): arra
 			continue;
 		}
 		$base_name = wp_basename( $entry );
-		$dest_path = trailingslashit( $temp_dir ) . $base_name;
-		$content   = $zip->getFromIndex( $i );
-		if ( false === $content ) {
-			continue;
-		}
-		file_put_contents( $dest_path, $content );
 
 		$name_no_ext = pathinfo( $base_name, PATHINFO_FILENAME );
 		$tokens = [
@@ -240,7 +272,7 @@ function dtb_schematics_build_image_index_from_zip( string $zip_tmp_path ): arra
 		];
 		foreach ( $tokens as $token ) {
 			if ( '' !== $token ) {
-				$result['index'][ $token ] = $dest_path;
+				$result['index'][ $token ] = $entry;
 			}
 		}
 	}
@@ -252,37 +284,91 @@ function dtb_schematics_build_image_index_from_zip( string $zip_tmp_path ): arra
 /**
  * Insert extracted image file into Media Library and return attachment ID.
  */
-function dtb_schematics_import_image_as_attachment( string $file_path, string $title = '' ): int {
+function dtb_schematics_import_image_as_attachment( string $file_path, string $title = '', int $parent_post_id = 0 ): int {
 	if ( ! file_exists( $file_path ) ) {
 		return 0;
 	}
 
-	$file_bits = file_get_contents( $file_path );
-	if ( false === $file_bits ) {
-		return 0;
-	}
-
 	$filename = wp_basename( $file_path );
-	$upload   = wp_upload_bits( $filename, null, $file_bits );
+	require_once ABSPATH . 'wp-admin/includes/file.php';
+
+	$filetype = wp_check_filetype( $filename, null );
+	$sideload = [
+		'name'     => $filename,
+		'tmp_name' => $file_path,
+		'error'    => 0,
+		'size'     => (int) filesize( $file_path ),
+		'type'     => $filetype['type'] ?? '',
+	];
+
+	$upload = wp_handle_sideload(
+		$sideload,
+		[
+			'test_form' => false,
+		]
+	);
 	if ( ! empty( $upload['error'] ) || empty( $upload['file'] ) ) {
 		return 0;
 	}
 
-	$filetype   = wp_check_filetype( $upload['file'], null );
+	$uploaded_file = (string) ( $upload['file'] ?? '' );
+	$uploaded_url  = (string) ( $upload['url'] ?? '' );
+	$parent_post_id = max( 0, $parent_post_id );
+
+	if ( '' !== $uploaded_url && function_exists( 'attachment_url_to_postid' ) ) {
+		$existing_id = (int) attachment_url_to_postid( $uploaded_url );
+		if ( $existing_id > 0 ) {
+			if ( '' !== $title ) {
+				wp_update_post(
+					[
+						'ID'         => $existing_id,
+						'post_title' => $title,
+					]
+				);
+			}
+			if ( $parent_post_id > 0 ) {
+				wp_update_post(
+					[
+						'ID'          => $existing_id,
+						'post_parent' => $parent_post_id,
+					]
+				);
+			}
+			return $existing_id;
+		}
+	}
+
+	if ( function_exists( 'dtb_register_image_attachment' ) && '' !== $uploaded_file && '' !== $uploaded_url ) {
+		$registered_id = dtb_register_image_attachment( $uploaded_file, $uploaded_url, $parent_post_id );
+		if ( ! is_wp_error( $registered_id ) && (int) $registered_id > 0 ) {
+			if ( '' !== $title ) {
+				wp_update_post(
+					[
+						'ID'         => (int) $registered_id,
+						'post_title' => $title,
+					]
+				);
+			}
+			return (int) $registered_id;
+		}
+	}
+
+	$filetype   = wp_check_filetype( $uploaded_file, null );
 	$attachment = [
 		'post_mime_type' => $filetype['type'] ?? 'application/octet-stream',
 		'post_title'     => '' !== $title ? $title : preg_replace( '/\.[^.]+$/', '', $filename ),
 		'post_content'   => '',
 		'post_status'    => 'inherit',
+		'post_parent'    => $parent_post_id,
 	];
 
-	$attachment_id = wp_insert_attachment( $attachment, $upload['file'] );
+	$attachment_id = wp_insert_attachment( $attachment, $uploaded_file, $parent_post_id );
 	if ( ! $attachment_id || is_wp_error( $attachment_id ) ) {
 		return 0;
 	}
 
 	require_once ABSPATH . 'wp-admin/includes/image.php';
-	$metadata = wp_generate_attachment_metadata( $attachment_id, $upload['file'] );
+	$metadata = wp_generate_attachment_metadata( $attachment_id, $uploaded_file );
 	if ( is_array( $metadata ) ) {
 		wp_update_attachment_metadata( $attachment_id, $metadata );
 	}
@@ -290,59 +376,302 @@ function dtb_schematics_import_image_as_attachment( string $file_path, string $t
 	return (int) $attachment_id;
 }
 
-function dtb_ajax_schematics_import_csv() {
-	check_ajax_referer( 'dtb_schematics_nonce', 'nonce' );
-	if ( ! current_user_can( 'manage_options' ) ) {
-		wp_send_json_error( [], 403 );
-	}
-	if ( empty( $_FILES['file']['tmp_name'] ) || ! is_uploaded_file( $_FILES['file']['tmp_name'] ) ) {
-		wp_send_json_error( [ 'message' => 'CSV file is required.' ], 400 );
+/**
+ * Import a single ZIP entry as an attachment (lazy extraction).
+ */
+function dtb_schematics_import_zip_entry_as_attachment( string $zip_path, string $entry, string $title = '', int $parent_post_id = 0, ?string &$failure_reason = null ): int {
+	$failure_reason = null;
+
+	if ( ! class_exists( 'ZipArchive' ) || '' === $zip_path || '' === $entry || ! file_exists( $zip_path ) ) {
+		$failure_reason = 'zip_open_failed';
+		return 0;
 	}
 
-	$image_index = [];
-	$temp_extract_dir = '';
-	$image_imported = 0;
-	$errors = [];
-	if ( ! empty( $_FILES['images_zip']['tmp_name'] ) && is_uploaded_file( $_FILES['images_zip']['tmp_name'] ) ) {
-		$zip_result = dtb_schematics_build_image_index_from_zip( $_FILES['images_zip']['tmp_name'] );
-		$image_index = is_array( $zip_result['index'] ?? null ) ? $zip_result['index'] : [];
-		$temp_extract_dir = (string) ( $zip_result['temp_dir'] ?? '' );
-		if ( ! empty( $zip_result['errors'] ) ) {
-			$errors = array_merge( $errors, (array) $zip_result['errors'] );
+	require_once ABSPATH . 'wp-admin/includes/file.php';
+
+	$zip = new ZipArchive();
+	if ( true !== $zip->open( $zip_path ) ) {
+		$failure_reason = 'zip_open_failed';
+		return 0;
+	}
+
+	$stream = $zip->getStream( $entry );
+	if ( false === $stream ) {
+		$zip->close();
+		$failure_reason = 'zip_entry_not_found';
+		return 0;
+	}
+
+	$tmp = wp_tempnam( wp_basename( $entry ) );
+	if ( ! is_string( $tmp ) || '' === $tmp ) {
+		fclose( $stream );
+		$zip->close();
+		$failure_reason = 'temp_file_failed';
+		return 0;
+	}
+
+	$out = fopen( $tmp, 'wb' );
+	if ( false === $out ) {
+		fclose( $stream );
+		$zip->close();
+		@unlink( $tmp ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+		$failure_reason = 'temp_file_failed';
+		return 0;
+	}
+
+	stream_copy_to_stream( $stream, $out );
+	fclose( $stream );
+	fclose( $out );
+	$zip->close();
+
+	$ext = pathinfo( $entry, PATHINFO_EXTENSION );
+	if ( '' !== $ext && ! str_ends_with( strtolower( $tmp ), '.' . strtolower( $ext ) ) ) {
+		$tmp_with_ext = $tmp . '.' . strtolower( $ext );
+		if ( @rename( $tmp, $tmp_with_ext ) ) { // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+			$tmp = $tmp_with_ext;
 		}
 	}
 
-	$fp = fopen( $_FILES['file']['tmp_name'], 'r' );
+	$id = dtb_schematics_import_image_as_attachment( $tmp, $title, $parent_post_id );
+	@unlink( $tmp ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+	if ( $id <= 0 ) {
+		$failure_reason = 'attachment_import_failed';
+	}
+
+	return $id;
+}
+
+function dtb_schematics_import_state_key( string $session_id ): string {
+	$session_id = preg_replace( '/[^a-zA-Z0-9_-]+/', '', $session_id );
+	$session_id = is_string( $session_id ) ? $session_id : '';
+	return 'dtb_schematics_import_' . $session_id;
+}
+
+function dtb_schematics_import_limit_errors( array $errors ): array {
+	$max = 200;
+	if ( count( $errors ) <= $max ) {
+		return $errors;
+	}
+
+	return array_slice( $errors, -1 * $max );
+}
+
+/**
+ * Default reason counters for import diagnostics.
+ *
+ * @return array<string,int>
+ */
+function dtb_schematics_import_default_reason_counts(): array {
+	return [
+		'missing_required_fields' => 0,
+		'invalid_product_parent'  => 0,
+		'no_token_match'          => 0,
+		'zip_missing_entry'       => 0,
+		'attachment_import_failed' => 0,
+	];
+}
+
+/**
+ * Merge persisted counters with defaults.
+ *
+ * @param mixed $input
+ * @return array<string,int>
+ */
+function dtb_schematics_import_normalize_reason_counts( $input ): array {
+	$counts = dtb_schematics_import_default_reason_counts();
+	if ( ! is_array( $input ) ) {
+		return $counts;
+	}
+
+	foreach ( $counts as $key => $value ) {
+		$counts[ $key ] = max( 0, (int) ( $input[ $key ] ?? $value ) );
+	}
+
+	return $counts;
+}
+
+function dtb_schematics_import_increment_reason( array &$reason_counts, string $reason ): void {
+	if ( ! isset( $reason_counts[ $reason ] ) ) {
+		$reason_counts[ $reason ] = 0;
+	}
+
+	$reason_counts[ $reason ] = max( 0, (int) $reason_counts[ $reason ] ) + 1;
+}
+
+/**
+ * Parse notes field and derive normalized image filename tokens from
+ * `images=foo.webp|bar.webp` hint blocks.
+ *
+ * @return string[]
+ */
+function dtb_schematics_extract_note_image_tokens( string $notes ): array {
+	$notes = trim( $notes );
+	if ( '' === $notes ) {
+		return [];
+	}
+
+	$pos = stripos( $notes, 'images=' );
+	if ( false === $pos ) {
+		return [];
+	}
+
+	$images_part = trim( substr( $notes, $pos + 7 ) );
+	if ( '' === $images_part ) {
+		return [];
+	}
+
+	$tokens = [];
+	$items  = explode( '|', $images_part );
+	foreach ( $items as $raw_item ) {
+		$item = trim( (string) $raw_item );
+		if ( '' === $item ) {
+			continue;
+		}
+
+		// Strip trailing delimiters if any extra metadata is appended.
+		$item = preg_split( '/[;,\s]+/', $item )[0] ?? '';
+		$item = trim( (string) $item, " \t\n\r\0\x0B\"'" );
+		if ( '' === $item ) {
+			continue;
+		}
+
+		$base_name = wp_basename( $item );
+		$stem      = pathinfo( $base_name, PATHINFO_FILENAME );
+
+		foreach ( [ $base_name, (string) $stem ] as $candidate ) {
+			$token = dtb_schematics_normalize_token( $candidate );
+			if ( '' !== $token ) {
+				$tokens[] = $token;
+			}
+		}
+	}
+
+	return array_values( array_unique( $tokens ) );
+}
+
+function dtb_schematics_import_cleanup_state( array $state ): void {
+	$session_dir      = (string) ( $state['session_dir'] ?? '' );
+	$temp_extract_dir = (string) ( $state['temp_extract_dir'] ?? '' );
+
+	if ( '' !== $session_dir && is_dir( $session_dir ) ) {
+		dtb_schematics_rmdir_recursive( $session_dir );
+	}
+
+	if ( '' !== $temp_extract_dir && is_dir( $temp_extract_dir ) ) {
+		dtb_schematics_rmdir_recursive( $temp_extract_dir );
+	}
+}
+
+/**
+ * Validate CSV header and count non-empty data rows.
+ *
+ * @return array{ok: bool, message: string, map: array<string, int>, total_rows: int}
+ */
+function dtb_schematics_import_validate_csv( string $csv_path ): array {
+	$fp = fopen( $csv_path, 'r' );
 	if ( false === $fp ) {
-		wp_send_json_error( [ 'message' => 'Unable to read uploaded CSV.' ], 400 );
+		return [
+			'ok'        => false,
+			'message'   => 'Unable to read uploaded CSV.',
+			'map'       => [],
+			'total_rows' => 0,
+		];
 	}
 
 	$header = fgetcsv( $fp );
 	if ( ! is_array( $header ) ) {
 		fclose( $fp );
-		wp_send_json_error( [ 'message' => 'CSV header row is missing.' ], 400 );
+		return [
+			'ok'        => false,
+			'message'   => 'CSV header row is missing.',
+			'map'       => [],
+			'total_rows' => 0,
+		];
 	}
+
 	$header = array_map( static fn( $h ) => strtolower( trim( (string) $h ) ), $header );
 	$map    = array_flip( $header );
 
-	$required = [ 'attachment_id', 'schematic_id', 'brand', 'model_number' ];
-	foreach ( $required as $col ) {
-		if ( ! isset( $map[ $col ] ) ) {
+	foreach ( [ 'schematic_id', 'brand', 'model_number' ] as $required ) {
+		if ( ! isset( $map[ $required ] ) ) {
 			fclose( $fp );
-			wp_send_json_error( [ 'message' => sprintf( 'Missing required column: %s', $col ) ], 400 );
+			return [
+				'ok'        => false,
+				'message'   => sprintf( 'Missing required column: %s', $required ),
+				'map'       => [],
+				'total_rows' => 0,
+			];
 		}
 	}
 
-	$row_num = 1;
-	$imported = 0;
+	$total_rows = 0;
+	while ( ( $row = fgetcsv( $fp ) ) !== false ) {
+		if ( empty( array_filter( $row, static fn( $v ) => '' !== trim( (string) $v ) ) ) ) {
+			continue;
+		}
+		$total_rows++;
+	}
+
+	fclose( $fp );
+
+	return [
+		'ok'        => true,
+		'message'   => '',
+		'map'       => $map,
+		'total_rows' => $total_rows,
+	];
+}
+
+/**
+ * Process one batch of non-empty CSV rows for a session.
+ *
+ * @return array{processed: int, done: bool}
+ */
+function dtb_schematics_import_run_batch( array &$state, array $image_index, int $batch_size ): array {
+	$csv_path = (string) ( $state['csv_path'] ?? '' );
+	$image_index_mode = (string) ( $state['image_index_mode'] ?? 'file_path' );
+	$zip_path         = (string) ( $state['zip_path'] ?? '' );
+	$fp = fopen( $csv_path, 'r' );
+	if ( false === $fp ) {
+		$errors    = (array) ( $state['errors'] ?? [] );
+		$errors[]  = 'Unable to re-open staged CSV file.';
+		$state['errors'] = dtb_schematics_import_limit_errors( $errors );
+		return [ 'processed' => 0, 'done' => true ];
+	}
+
+	$header = fgetcsv( $fp );
+	if ( ! is_array( $header ) ) {
+		fclose( $fp );
+		$errors    = (array) ( $state['errors'] ?? [] );
+		$errors[]  = 'CSV header row is missing.';
+		$state['errors'] = dtb_schematics_import_limit_errors( $errors );
+		return [ 'processed' => 0, 'done' => true ];
+	}
+
+	$map            = is_array( $state['map'] ?? null ) ? $state['map'] : [];
+	$offset         = max( 0, (int) ( $state['offset'] ?? 0 ) );
+	$imported       = max( 0, (int) ( $state['imported'] ?? 0 ) );
+	$image_imported = max( 0, (int) ( $state['images_imported'] ?? 0 ) );
+	$errors         = is_array( $state['errors'] ?? null ) ? (array) $state['errors'] : [];
+	$reason_counts  = dtb_schematics_import_normalize_reason_counts( $state['reason_counts'] ?? [] );
+
+	$line_num          = 1;
+	$data_index        = 0;
+	$processed_in_call = 0;
 
 	while ( ( $row = fgetcsv( $fp ) ) !== false ) {
-		$row_num++;
+		$line_num++;
+
 		if ( empty( array_filter( $row, static fn( $v ) => '' !== trim( (string) $v ) ) ) ) {
 			continue;
 		}
 
-		$attachment_id = absint( $row[ $map['attachment_id'] ] ?? 0 );
+		if ( $data_index < $offset ) {
+			$data_index++;
+			continue;
+		}
+
+		$attachment_id = isset( $map['attachment_id'] ) ? absint( $row[ $map['attachment_id'] ] ?? 0 ) : 0;
 		$schematic_id  = sanitize_text_field( (string) ( $row[ $map['schematic_id'] ] ?? '' ) );
 		$brand         = sanitize_text_field( (string) ( $row[ $map['brand'] ] ?? '' ) );
 		$model_number  = sanitize_text_field( (string) ( $row[ $map['model_number'] ] ?? '' ) );
@@ -352,74 +681,238 @@ function dtb_ajax_schematics_import_csv() {
 		$product_ids   = isset( $map['product_ids'] ) ? dtb_schematic_normalize_product_ids( (string) ( $row[ $map['product_ids'] ] ?? '' ) ) : [];
 
 		if ( '' === $schematic_id || '' === $brand || '' === $model_number ) {
-			$errors[] = "Row {$row_num}: schematic_id, brand, and model_number are required.";
-			continue;
-		}
+			dtb_schematics_import_increment_reason( $reason_counts, 'missing_required_fields' );
+			$errors[] = "Row {$line_num}: schematic_id, brand, and model_number are required.";
+		} else {
+			$parent_post_id = function_exists( 'dtb_schematics_resolve_parent_product_id' )
+				? dtb_schematics_resolve_parent_product_id( $product_ids )
+				: ( ! empty( $product_ids ) ? (int) $product_ids[0] : 0 );
 
-		if ( ! dtb_validate_schematic_attachment_id( $attachment_id ) ) {
-			$matched_path = '';
-			$tokens = [
-				dtb_schematics_normalize_token( $schematic_id ),
-				dtb_schematics_normalize_token( $model_number ),
-				dtb_schematics_normalize_token( $model_name ),
-			];
-			foreach ( $tokens as $token ) {
-				if ( '' !== $token && isset( $image_index[ $token ] ) ) {
-					$matched_path = (string) $image_index[ $token ];
-					break;
+			if ( ! empty( $product_ids ) && $parent_post_id <= 0 ) {
+				dtb_schematics_import_increment_reason( $reason_counts, 'invalid_product_parent' );
+			}
+
+			if ( ! dtb_validate_schematic_attachment_id( $attachment_id ) ) {
+				$matched_value = '';
+				$tokens = array_merge(
+					[
+					dtb_schematics_normalize_token( $schematic_id ),
+					dtb_schematics_normalize_token( $model_number ),
+					dtb_schematics_normalize_token( $model_name ),
+					],
+					dtb_schematics_extract_note_image_tokens( $notes )
+				);
+				foreach ( $tokens as $token ) {
+					if ( '' !== $token && isset( $image_index[ $token ] ) ) {
+						$matched_value = (string) $image_index[ $token ];
+						break;
+					}
+				}
+
+				if ( '' !== $matched_value ) {
+					$zip_import_failure_reason = null;
+					if ( 'zip_entry' === $image_index_mode ) {
+						$attachment_id = dtb_schematics_import_zip_entry_as_attachment( $zip_path, $matched_value, $model_name ?: $schematic_id, $parent_post_id, $zip_import_failure_reason );
+					} else {
+						$attachment_id = dtb_schematics_import_image_as_attachment( $matched_value, $model_name ?: $schematic_id, $parent_post_id );
+					}
+
+					if ( $attachment_id > 0 ) {
+						$image_imported++;
+					} elseif ( 'zip_entry' === $image_index_mode && 'zip_entry_not_found' === $zip_import_failure_reason ) {
+						dtb_schematics_import_increment_reason( $reason_counts, 'zip_missing_entry' );
+					} else {
+						dtb_schematics_import_increment_reason( $reason_counts, 'attachment_import_failed' );
+					}
+				} else {
+					dtb_schematics_import_increment_reason( $reason_counts, 'no_token_match' );
 				}
 			}
 
-			if ( '' !== $matched_path ) {
-				$attachment_id = dtb_schematics_import_image_as_attachment( $matched_path, $model_name ?: $schematic_id );
-				if ( $attachment_id > 0 ) {
-					$image_imported++;
-				}
+			if ( ! dtb_validate_schematic_attachment_id( $attachment_id ) ) {
+				$errors[] = "Row {$line_num}: no valid attachment_id and no matching image found in ZIP.";
+			} else {
+				update_post_meta( $attachment_id, '_dtb_schematic_id', $schematic_id );
+				dtb_save_schematic_meta(
+					$attachment_id,
+					[
+						'brand'        => $brand,
+						'model_number' => $model_number,
+						'model_name'   => $model_name,
+						'part_count'   => $part_count,
+						'notes'        => $notes,
+						'product_ids'  => $product_ids,
+					]
+				);
+				$imported++;
 			}
 		}
 
-		if ( ! dtb_validate_schematic_attachment_id( $attachment_id ) ) {
-			$errors[] = "Row {$row_num}: no valid attachment_id and no matching image found in ZIP.";
-			continue;
+		$data_index++;
+		$processed_in_call++;
+
+		if ( $processed_in_call >= $batch_size ) {
+			break;
+		}
+	}
+
+	$done = feof( $fp );
+	fclose( $fp );
+
+	$state['offset']          = $data_index;
+	$state['imported']        = $imported;
+	$state['images_imported'] = $image_imported;
+	$state['errors']          = dtb_schematics_import_limit_errors( $errors );
+	$state['reason_counts']   = dtb_schematics_import_normalize_reason_counts( $reason_counts );
+
+	return [
+		'processed' => $processed_in_call,
+		'done'      => $done,
+	];
+}
+
+function dtb_ajax_schematics_import_csv() {
+	check_ajax_referer( 'dtb_schematics_nonce', 'nonce' );
+	if ( ! current_user_can( 'manage_options' ) ) {
+		wp_send_json_error( [], 403 );
+	}
+
+	$mode = sanitize_key( $_POST['mode'] ?? 'init' );
+
+	if ( 'init' === $mode ) {
+		if ( empty( $_FILES['file']['tmp_name'] ) || ! is_uploaded_file( $_FILES['file']['tmp_name'] ) ) {
+			wp_send_json_error( [ 'message' => 'CSV file is required.' ], 400 );
 		}
 
-		update_post_meta( $attachment_id, '_dtb_schematic_id', $schematic_id );
-		dtb_save_schematic_meta(
-			$attachment_id,
+		$uploads     = wp_upload_dir();
+		$session_id  = wp_generate_password( 12, false, false );
+		$session_dir = trailingslashit( $uploads['basedir'] ) . 'dtb-schematics-import-session-' . $session_id;
+		wp_mkdir_p( $session_dir );
+
+		$csv_path = trailingslashit( $session_dir ) . 'import.csv';
+		if ( ! move_uploaded_file( $_FILES['file']['tmp_name'], $csv_path ) ) {
+			dtb_schematics_rmdir_recursive( $session_dir );
+			wp_send_json_error( [ 'message' => 'Unable to stage uploaded CSV file.' ], 500 );
+		}
+
+		$csv_check = dtb_schematics_import_validate_csv( $csv_path );
+		if ( empty( $csv_check['ok'] ) ) {
+			dtb_schematics_rmdir_recursive( $session_dir );
+			wp_send_json_error( [ 'message' => (string) ( $csv_check['message'] ?? 'Invalid CSV file.' ) ], 400 );
+		}
+
+		$image_index      = [];
+		$temp_extract_dir = '';
+		$zip_path         = '';
+		$image_index_mode = 'file_path';
+		$errors           = [];
+		if ( ! empty( $_FILES['images_zip']['tmp_name'] ) && is_uploaded_file( $_FILES['images_zip']['tmp_name'] ) ) {
+			$zip_path = trailingslashit( $session_dir ) . 'images.zip';
+			if ( ! move_uploaded_file( $_FILES['images_zip']['tmp_name'], $zip_path ) ) {
+				dtb_schematics_rmdir_recursive( $session_dir );
+				wp_send_json_error( [ 'message' => 'Unable to stage uploaded ZIP file.' ], 500 );
+			}
+
+			$zip_result       = dtb_schematics_build_image_index_from_zip( $zip_path );
+			$image_index      = is_array( $zip_result['index'] ?? null ) ? $zip_result['index'] : [];
+			$image_index_mode = 'zip_entry';
+			if ( ! empty( $zip_result['errors'] ) ) {
+				$errors = array_merge( $errors, (array) $zip_result['errors'] );
+			}
+		}
+
+		$image_index_file = trailingslashit( $session_dir ) . 'image-index.json';
+		file_put_contents( $image_index_file, wp_json_encode( $image_index ) );
+
+		$state = [
+			'session_id'       => $session_id,
+			'session_dir'      => $session_dir,
+			'csv_path'         => $csv_path,
+			'zip_path'         => $zip_path,
+			'image_index_file' => $image_index_file,
+			'image_index_mode' => $image_index_mode,
+			'temp_extract_dir' => $temp_extract_dir,
+			'map'              => (array) ( $csv_check['map'] ?? [] ),
+			'total_rows'       => (int) ( $csv_check['total_rows'] ?? 0 ),
+			'offset'           => 0,
+			'imported'         => 0,
+			'images_imported'  => 0,
+			'reason_counts'    => dtb_schematics_import_default_reason_counts(),
+			'errors'           => dtb_schematics_import_limit_errors( $errors ),
+		];
+
+		set_transient( dtb_schematics_import_state_key( $session_id ), $state, 2 * HOUR_IN_SECONDS );
+
+		wp_send_json_success(
 			[
-				'brand'        => $brand,
-				'model_number' => $model_number,
-				'model_name'   => $model_name,
-				'part_count'   => $part_count,
-				'notes'        => $notes,
-				'product_ids'  => $product_ids,
+				'session_id'      => $session_id,
+				'processed_rows'  => 0,
+				'total_rows'      => $state['total_rows'],
+				'imported'        => 0,
+				'images_imported' => 0,
+				'reason_counts'   => dtb_schematics_import_normalize_reason_counts( $state['reason_counts'] ?? [] ),
+				'errors'          => $state['errors'],
+				'done'            => 0 === (int) $state['total_rows'],
+				'message'         => 0 === (int) $state['total_rows'] ? 'CSV contains no data rows to import.' : 'Import initialized. Processing will continue in batches.',
 			]
 		);
-		$imported++;
 	}
-	fclose( $fp );
-	if ( '' !== $temp_extract_dir && is_dir( $temp_extract_dir ) ) {
-		$files = glob( trailingslashit( $temp_extract_dir ) . '*' );
-		if ( is_array( $files ) ) {
-			foreach ( $files as $file ) {
-				if ( is_file( $file ) ) {
-					@unlink( $file ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+
+	if ( 'batch' === $mode ) {
+		$session_id = sanitize_key( $_POST['session_id'] ?? '' );
+		if ( '' === $session_id ) {
+			wp_send_json_error( [ 'message' => 'Missing import session ID.' ], 400 );
+		}
+
+		$key   = dtb_schematics_import_state_key( $session_id );
+		$state = get_transient( $key );
+		if ( ! is_array( $state ) ) {
+			wp_send_json_error( [ 'message' => 'Import session expired. Please restart the import.' ], 410 );
+		}
+
+		$batch_size = max( 1, min( 200, absint( $_POST['batch_size'] ?? 50 ) ) );
+
+		$image_index = [];
+		$image_index_file = (string) ( $state['image_index_file'] ?? '' );
+		if ( '' !== $image_index_file && file_exists( $image_index_file ) ) {
+			$json = file_get_contents( $image_index_file );
+			if ( false !== $json ) {
+				$decoded = json_decode( $json, true );
+				if ( is_array( $decoded ) ) {
+					$image_index = $decoded;
 				}
 			}
 		}
-		@rmdir( $temp_extract_dir ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+
+		$batch_result = dtb_schematics_import_run_batch( $state, $image_index, $batch_size );
+		$done         = ! empty( $batch_result['done'] );
+
+		if ( $done ) {
+			dtb_schematics_manifest_repo_delete_cache();
+			delete_transient( $key );
+			dtb_schematics_import_cleanup_state( $state );
+		} else {
+			set_transient( $key, $state, 2 * HOUR_IN_SECONDS );
+		}
+
+		wp_send_json_success(
+			[
+				'session_id'      => $session_id,
+				'processed_rows'  => (int) ( $state['offset'] ?? 0 ),
+				'total_rows'      => (int) ( $state['total_rows'] ?? 0 ),
+				'imported'        => (int) ( $state['imported'] ?? 0 ),
+				'images_imported' => (int) ( $state['images_imported'] ?? 0 ),
+				'reason_counts'   => dtb_schematics_import_normalize_reason_counts( $state['reason_counts'] ?? [] ),
+				'errors'          => (array) ( $state['errors'] ?? [] ),
+				'done'            => $done,
+				'message'         => $done
+					? sprintf( 'Imported %d schematic rows. Imported %d images from ZIP.', (int) ( $state['imported'] ?? 0 ), (int) ( $state['images_imported'] ?? 0 ) )
+					: sprintf( 'Processed %d/%d rows…', (int) ( $state['offset'] ?? 0 ), (int) ( $state['total_rows'] ?? 0 ) ),
+			]
+		);
 	}
 
-	dtb_schematics_manifest_repo_delete_cache();
-
-	wp_send_json_success(
-		[
-			'imported' => $imported,
-			'images_imported' => $image_imported,
-			'errors'   => $errors,
-			'message'  => sprintf( 'Imported %d schematic rows. Imported %d images from ZIP.', $imported, $image_imported ),
-		]
-	);
+	wp_send_json_error( [ 'message' => 'Invalid import mode.' ], 400 );
 }
 
 // ── AJAX: Export schematics library (CSV/JSON) ─────────────────────────────

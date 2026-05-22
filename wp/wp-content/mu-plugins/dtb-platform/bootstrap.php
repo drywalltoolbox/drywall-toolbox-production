@@ -56,6 +56,7 @@ require_once $_dtb_platform . '/Security/NonceController.php';
 require_once $_dtb_platform . '/Security/NonceGuard.php';
 require_once $_dtb_platform . '/Security/PermissionGuard.php';
 require_once $_dtb_platform . '/Security/RequestFingerprint.php';
+require_once $_dtb_platform . '/Security/HostingPluginSuppression.php';
 
 // =============================================================================
 // 4. AUTH
