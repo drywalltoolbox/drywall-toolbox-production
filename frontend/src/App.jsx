@@ -12,40 +12,72 @@ import Footer from './components/shell/Footer';
 import CartSidebar from './components/shell/CartSidebar';
 import ProtectedRoute from './components/routing/ProtectedRoute';
 
-const Home = lazy(() => import('./pages/Home'));
-const Products = lazy(() => import('./pages/Products'));
-const Parts = lazy(() => import('./pages/Parts'));
-const Product = lazy(() => import('./pages/Product'));
-const ProductDetailPage = lazy(() => import('./pages/ProductDetailPage'));
-const CategoryPage = lazy(() => import('./pages/CategoryPage'));
-const Schematics = lazy(() => import('./pages/Schematics'));
-const Repairs = lazy(() => import('./pages/Repairs'));
-const RepairStatus = lazy(() => import('./pages/RepairStatus'));
-const Cart = lazy(() => import('./pages/Cart'));
-const Checkout = lazy(() => import('./pages/Checkout'));
-const OrderConfirmation = lazy(() => import('./pages/OrderConfirmation'));
-const OrderTracking = lazy(() => import('./pages/OrderTracking'));
-const Contact = lazy(() => import('./pages/Contact'));
-const WooCommerceSettings = lazy(() => import('./pages/WooCommerceSettings'));
-const Login = lazy(() => import('./pages/Login'));
-const Register = lazy(() => import('./pages/Register'));
-const ForgotPassword = lazy(() => import('./pages/ForgotPassword'));
-const ResetPassword = lazy(() => import('./pages/ResetPassword'));
-const Dashboard = lazy(() => import('./pages/Dashboard'));
-const Calculators = lazy(() => import('./pages/Calculators'));
-const FAQ = lazy(() => import('./pages/FAQ'));
-const ShippingPolicy = lazy(() => import('./pages/ShippingPolicy'));
-const ReturnPortal = lazy(() => import('./pages/ReturnPortal'));
-const StorePolicies = lazy(() => import('./pages/StorePolicies'));
+const APP_BASE = (process.env.PUBLIC_URL || '').replace(/\/+$/, '');
+
+function toAppHref(path = '/') {
+  const normalized = path.startsWith('/') ? path : `/${ path }`;
+  return `${ APP_BASE }${ normalized }` || '/';
+}
+
+function lazyWithReload(importer) {
+  return lazy(() => importer().catch((error) => {
+    const message = String(error?.message || '');
+    const isChunkLoadFailure =
+      /ChunkLoadError/i.test(message) ||
+      /Loading chunk [\w-]+ failed/i.test(message) ||
+      /Failed to fetch dynamically imported module/i.test(message);
+
+    if (isChunkLoadFailure && typeof window !== 'undefined') {
+      const retryKey = `dtb:lazy-retry:${ window.location.pathname }`;
+      const hasRetried = window.sessionStorage.getItem(retryKey) === '1';
+
+      if (!hasRetried) {
+        window.sessionStorage.setItem(retryKey, '1');
+        window.location.reload();
+        return new Promise(() => {});
+      }
+
+      window.sessionStorage.removeItem(retryKey);
+    }
+
+    throw error;
+  }));
+}
+
+const Home = lazyWithReload(() => import('./pages/Home'));
+const Products = lazyWithReload(() => import('./pages/Products'));
+const Parts = lazyWithReload(() => import('./pages/Parts'));
+const Product = lazyWithReload(() => import('./pages/Product'));
+const ProductDetailPage = lazyWithReload(() => import('./pages/ProductDetailPage'));
+const CategoryPage = lazyWithReload(() => import('./pages/CategoryPage'));
+const Schematics = lazyWithReload(() => import('./pages/Schematics'));
+const Repairs = lazyWithReload(() => import('./pages/Repairs'));
+const RepairStatus = lazyWithReload(() => import('./pages/RepairStatus'));
+const Cart = lazyWithReload(() => import('./pages/Cart'));
+const Checkout = lazyWithReload(() => import('./pages/Checkout'));
+const OrderConfirmation = lazyWithReload(() => import('./pages/OrderConfirmation'));
+const OrderTracking = lazyWithReload(() => import('./pages/OrderTracking'));
+const Contact = lazyWithReload(() => import('./pages/Contact'));
+const WooCommerceSettings = lazyWithReload(() => import('./pages/WooCommerceSettings'));
+const Login = lazyWithReload(() => import('./pages/Login'));
+const Register = lazyWithReload(() => import('./pages/Register'));
+const ForgotPassword = lazyWithReload(() => import('./pages/ForgotPassword'));
+const ResetPassword = lazyWithReload(() => import('./pages/ResetPassword'));
+const Dashboard = lazyWithReload(() => import('./pages/Dashboard'));
+const Calculators = lazyWithReload(() => import('./pages/Calculators'));
+const FAQ = lazyWithReload(() => import('./pages/FAQ'));
+const ShippingPolicy = lazyWithReload(() => import('./pages/ShippingPolicy'));
+const ReturnPortal = lazyWithReload(() => import('./pages/ReturnPortal'));
+const StorePolicies = lazyWithReload(() => import('./pages/StorePolicies'));
 // const ToolsetBuilder = lazy(() => import('./pages/ToolsetBuilder')); // DISABLED: temporarily hide Toolset Builder
-const TechnicalSpecificationsPreview = lazy(() => import('./pages/TechnicalSpecificationsPreview'));
+const TechnicalSpecificationsPreview = lazyWithReload(() => import('./pages/TechnicalSpecificationsPreview'));
 
 function NotFound() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '60vh', textAlign: 'center', padding: '2rem', color: '#888' }}>
       <h1 style={{ fontSize: '4rem', fontWeight: 700, margin: 0 }}>404</h1>
       <p style={{ fontSize: '1.1rem', margin: '0.75rem 0 1.5rem' }}>Page not found</p>
-      <a href="/" style={{ color: '#3b82f6', textDecoration: 'underline' }}>Return to home</a>
+      <a href={toAppHref('/')} style={{ color: '#3b82f6', textDecoration: 'underline' }}>Return to home</a>
     </div>
   );
 }

@@ -1,5 +1,12 @@
 import React from 'react';
 
+const APP_BASE = (process.env.PUBLIC_URL || '').replace(/\/+$/, '');
+
+function toAppHref(path = '/') {
+  const normalized = path.startsWith('/') ? path : `/${ path }`;
+  return `${ APP_BASE }${ normalized }` || '/';
+}
+
 /**
  * frontend/src/components/system/AppErrorBoundary.jsx
  *
@@ -86,7 +93,7 @@ export default class AppErrorBoundary extends React.Component {
             </button>
 
             <a
-              href="/products/brands"
+              href={toAppHref('/products/brands')}
               className="px-5 py-3 rounded-2xl border border-slate-200 hover:bg-slate-50 text-slate-700 font-semibold transition-colors"
             >
               Browse Products
