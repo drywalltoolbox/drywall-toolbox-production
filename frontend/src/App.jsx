@@ -12,8 +12,11 @@ import Footer from './components/shell/Footer';
 import CartSidebar from './components/shell/CartSidebar';
 import ProtectedRoute from './components/routing/ProtectedRoute';
 import { isRewardsEnabled } from './utils/featureFlags.js';
+import { initializeWebpackPublicPath } from './setWebpackPublicPath.js';
 
 const APP_BASE = (process.env.PUBLIC_URL || '').replace(/\/+$/, '');
+
+initializeWebpackPublicPath();
 
 function toAppHref(path = '/') {
   const normalized = path.startsWith('/') ? path : `/${ path }`;
