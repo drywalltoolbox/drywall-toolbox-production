@@ -8,7 +8,11 @@
 defined( 'ABSPATH' ) || exit;
 
 function dtb_order_rest_list_orders( WP_REST_Request $request ): WP_REST_Response|WP_Error {
-	$user_id  = get_current_user_id();
+	$user_id  = dtb_order_rest_resolve_request_user_id( $request );
+	if ( is_wp_error( $user_id ) ) {
+		return $user_id;
+	}
+	$user_id  = (int) $user_id;
 	$page     = (int) $request->get_param( 'page' );
 	$per_page = (int) $request->get_param( 'per_page' );
 

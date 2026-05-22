@@ -579,22 +579,63 @@ function dtb_checkout_finalize_route( WP_REST_Request $request ): WP_REST_Respon
 	], 200 );
 }
 
-function dtb_checkout_woo_native_capabilities(): array {
-	$enabled = [];
-	if ( function_exists( 'WC' ) && WC()->payment_gateways() ) {
-		$gateways = WC()->payment_gateways()->get_available_payment_gateways();
-		foreach ( (array) $gateways as $gateway ) {
-			if ( ! is_object( $gateway ) ) {
-				continue;
-			}
-			$enabled[] = [
-				'id'          => (string) ( $gateway->id ?? '' ),
-				'title'       => (string) ( $gateway->title ?? '' ),
-				'description' => (string) ( $gateway->description ?? '' ),
-				'enabled'     => true,
-			];
-		}
+function dtb_checkout_offline_payment_method_ids(): array {
+	return (array) apply_filters( 'dtb_checkout_offline_payment_method_ids', [ 'cod', 'bacs', 'cheque' ] );
+}
+
+function dtb_checkout_is_manual_payment_method( string $payment_method ): bool {
+	$method = sanitize_key( $payment_method );
+	if ( '' === $method ) {
+		return false;
 	}
+	return in_array( $method, dtb_checkout_offline_payment_method_ids(), true );
+}
+
+function dtb_checkout_woo_native_payment_methods(): array {
+	$enabled = [];
+	if ( ! function_exists( 'WC' ) || ! WC()->payment_gateways() ) {
+		return $enabled;
+	}
+
+	$gateways = WC()->payment_gateways()->get_available_payment_gateways();
+	foreach ( (array) $gateways as $gateway ) {
+		if ( ! is_object( $gateway ) ) {
+			continue;
+		}
+
+		$id = sanitize_key( (string) ( $gateway->id ?? '' ) );
+		if ( '' === $id ) {
+			continue;
+		}
+
+		$supports = [];
+		if ( isset( $gateway->supports ) && is_array( $gateway->supports ) ) {
+			foreach ( $gateway->supports as $feature ) {
+				$feature = sanitize_key( (string) $feature );
+				if ( '' !== $feature ) {
+					$supports[] = $feature;
+				}
+			}
+		}
+
+		$is_manual = dtb_checkout_is_manual_payment_method( $id );
+		$enabled[] = [
+			'id'                   => $id,
+			'title'                => sanitize_text_field( (string) ( $gateway->title ?? '' ) ),
+			'description'          => sanitize_text_field( (string) ( $gateway->description ?? '' ) ),
+			'enabled'              => true,
+			'is_manual'            => $is_manual,
+			'requires_payment_ref' => ! $is_manual,
+			'has_fields'           => ! empty( $gateway->has_fields ),
+			'supports'             => array_values( array_unique( $supports ) ),
+		];
+	}
+
+	return $enabled;
+}
+
+function dtb_checkout_woo_native_capabilities(): array {
+	$enabled = dtb_checkout_woo_native_payment_methods();
 
 	return [
 		'label'             => 'Woo Native',
@@ -612,7 +653,28 @@ function dtb_checkout_woo_native_create_session( array $context, WP_REST_Request
 		return new WP_Error( 'dtb_checkout_missing_items', 'line_items is required.', [ 'status' => 400 ] );
 	}
 
-	$gateway = sanitize_key( (string) ( $context['payment_method'] ?? 'cod' ) );
+	$available_methods = dtb_checkout_woo_native_payment_methods();
+	if ( empty( $available_methods ) ) {
+		return new WP_Error( 'dtb_checkout_no_payment_methods', 'No payment methods are currently available.', [ 'status' => 422 ] );
+	}
+
+	$gateway = sanitize_key( (string) ( $context['payment_method'] ?? '' ) );
+	if ( '' === $gateway ) {
+		$gateway = sanitize_key( (string) ( $available_methods[0]['id'] ?? '' ) );
+	}
+
+	$selected_method = null;
+	foreach ( $available_methods as $method ) {
+		if ( $gateway === (string) ( $method['id'] ?? '' ) ) {
+			$selected_method = $method;
+			break;
+		}
+	}
+
+	if ( ! is_array( $selected_method ) ) {
+		return new WP_Error( 'dtb_checkout_invalid_payment_method', 'Selected payment method is not available.', [ 'status' => 422 ] );
+	}
+
 	$token_payload = [
 		'sid'        => wp_generate_uuid4(),
 		'gateway'    => 'woo_native',
@@ -643,6 +705,7 @@ function dtb_checkout_woo_native_create_session( array $context, WP_REST_Request
 		'expires_at'    => gmdate( 'c', (int) $token_payload['expires_at'] ),
 		'status'        => 'created',
 		'payment_method'=> $gateway,
+		'is_manual'     => ! empty( $selected_method['is_manual'] ),
 	];
 }
 
@@ -714,20 +777,29 @@ function dtb_checkout_woo_native_finalize( array $context, WP_REST_Request $requ
 	$customer_note  = sanitize_textarea_field( (string) ( $context['customer_note'] ?? '' ) );
 	$shipping_lines = is_array( $context['shipping_lines'] ?? null ) ? $context['shipping_lines'] : [];
 	$coupon_codes   = is_array( $context['coupon_codes'] ?? null ) ? $context['coupon_codes'] : [];
+	$set_paid = ! empty( $context['set_paid'] );
 	$idempotency_key = dtb_checkout_build_idempotency_key( $context );
 	$existing_order_id = absint( (string) get_transient( 'dtb_checkout_idem_' . md5( $idempotency_key ) ) );
 	if ( $existing_order_id > 0 ) {
 		$existing_order = wc_get_order( $existing_order_id );
 		if ( $existing_order ) {
+			$existing_status = (string) $existing_order->get_status();
+			$existing_payment_required = in_array( $existing_status, [ 'pending', 'on-hold', 'failed' ], true );
+			$existing_payment_url = $existing_payment_required && method_exists( $existing_order, 'get_checkout_payment_url' )
+				? (string) $existing_order->get_checkout_payment_url()
+				: '';
+
 			return [
 				'order_id'       => (int) $existing_order->get_id(),
 				'order_key'      => (string) $existing_order->get_order_key(),
-				'status'         => (string) $existing_order->get_status(),
+				'status'         => $existing_status,
 				'payment_method' => (string) $existing_order->get_payment_method(),
 				'payment_ref'    => (string) $existing_order->get_meta( '_dtb_payment_ref', true ),
 				'total'          => (string) $existing_order->get_total(),
 				'currency'       => (string) $existing_order->get_currency(),
 				'idempotent'     => true,
+				'payment_required' => $existing_payment_required,
+				'payment_url'      => $existing_payment_url,
 			];
 		}
 	}
@@ -819,10 +891,15 @@ function dtb_checkout_woo_native_finalize( array $context, WP_REST_Request $requ
 	delete_transient( 'dtb_checkout_session_' . md5( $sid ) );
 
 	$final_status = 'pending';
-	if ( ! empty( $context['set_paid'] ) ) {
+	if ( $set_paid ) {
 		$order->payment_complete( $payment_ref );
 		$final_status = (string) $order->get_status();
 	}
+
+	$payment_required = ! $set_paid;
+	$payment_url = $payment_required && method_exists( $order, 'get_checkout_payment_url' )
+		? (string) $order->get_checkout_payment_url()
+		: '';
 
 	return [
 		'order_id'        => (int) $order->get_id(),
@@ -832,6 +909,8 @@ function dtb_checkout_woo_native_finalize( array $context, WP_REST_Request $requ
 		'payment_ref'     => $payment_ref,
 		'total'           => (string) $order->get_total(),
 		'currency'        => (string) $order->get_currency(),
+		'payment_required' => $payment_required,
+		'payment_url'      => $payment_url,
 	];
 }
 

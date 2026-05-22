@@ -53,6 +53,20 @@ const cardVariants = {
   }),
 };
 
+const MANUAL_PAYMENT_METHOD_IDS = new Set( [ 'cod', 'bacs', 'cheque' ] );
+
+function isManualPaymentMethod( method ) {
+  const methodId = typeof method === 'string' ? method : method?.id;
+  if ( ! methodId ) return false;
+  return Boolean( method?.is_manual ) || MANUAL_PAYMENT_METHOD_IDS.has( String( methodId ).toLowerCase() );
+}
+
+function resolvePreferredPaymentMethod( methods = [] ) {
+  if ( ! Array.isArray( methods ) || methods.length === 0 ) return '';
+  const online = methods.find( ( method ) => ! isManualPaymentMethod( method ) );
+  return ( online?.id || methods[0]?.id || '' );
+}
+
 // ─── StepCard ─────────────────────────────────────────────────────────────────
 // Animated section card that slides up on mount.
 function StepCard( { children, delay = 0, className = '' } ) {
@@ -208,7 +222,7 @@ export default function Checkout() {
   const [orderDetails,  setOrderDetails ] = useState( null );
   const [step,          setStep         ] = useState( 'form' ); // 'form' | 'syncing' | 'placing'
   const [paymentGateway, setPaymentGateway] = useState( 'woo_native' );
-  const [paymentMethod, setPaymentMethod] = useState( 'cod' );
+  const [paymentMethod, setPaymentMethod] = useState( '' );
   const [paymentMethods, setPaymentMethods] = useState( [] );
 
   // ── Points redemption ─────────────────────────────────────────────────────
@@ -250,13 +264,24 @@ export default function Checkout() {
         const methods = Array.isArray( gateway?.payment_methods ) ? gateway.payment_methods : [];
         setPaymentGateway( gateway?.id || defaultGateway );
         setPaymentMethods( methods );
-        if ( methods[0]?.id ) {
-          setPaymentMethod( methods[0].id );
+        const preferredMethod = resolvePreferredPaymentMethod( methods );
+        if ( preferredMethod ) {
+          setPaymentMethod( preferredMethod );
         }
       } )
       .catch( () => {} );
     return () => { mounted = false; };
   }, [] );
+
+  const selectedPaymentMethod = useMemo(
+    () => paymentMethods.find( ( method ) => method.id === paymentMethod ) || null,
+    [ paymentMethod, paymentMethods ],
+  );
+
+  const manualPaymentSelected = useMemo(
+    () => isManualPaymentMethod( selectedPaymentMethod || paymentMethod ),
+    [ paymentMethod, selectedPaymentMethod ],
+  );
 
   const pointsUsd         = pointsToUsd( pointsToRedeem );
   const availablePts      = pointsBalance?.points ?? 0;
@@ -318,6 +343,17 @@ export default function Checkout() {
     formData.state.trim()     !== '' &&
     formData.zip.trim()       !== ''
   ), [formData] );
+
+  const canSubmitCheckout = useMemo(
+    () => (
+      !processing
+      && isFormComplete
+      && safeCartItems.length > 0
+      && Boolean( paymentMethod )
+      && !manualPaymentSelected
+    ),
+    [ isFormComplete, manualPaymentSelected, paymentMethod, processing, safeCartItems.length ],
+  );
 
   // True when the address fields needed for rate calculation are all filled.
   const isAddressComplete = useMemo( () => (
@@ -414,6 +450,16 @@ export default function Checkout() {
       return;
     }
 
+    if ( ! paymentMethod ) {
+      setCheckoutError( 'No payment method is currently available. Please contact support.' );
+      return;
+    }
+
+    if ( manualPaymentSelected ) {
+      setCheckoutError( 'This method requires offline/manual payment. Please select an online payment option to complete checkout.' );
+      return;
+    }
+
     setProcessing( true );
     setCheckoutError( null );
     setStep( 'syncing' );
@@ -439,7 +485,7 @@ export default function Checkout() {
         safeCartItems,
         billingAddress,
         billingAddress,
-        paymentMethod || 'cod',
+        paymentMethod,
         [],
         formData.customerNote,
         wcRateId,
@@ -457,7 +503,7 @@ export default function Checkout() {
       setProcessing( false );
       setStep( 'form' );
     }
-  }, [ appliedCoupon, clearCart, formData, paymentMethod, safeCartItems, selectedRate, validateForm ] );
+  }, [ appliedCoupon, clearCart, formData, manualPaymentSelected, paymentMethod, safeCartItems, selectedRate, validateForm ] );
 
   useEffect(() => {
     if (processing) {
@@ -510,6 +556,8 @@ export default function Checkout() {
   // ── Order confirmation ────────────────────────────────────────────────────
   if ( orderComplete && orderDetails ) {
     const wcOrder = orderDetails.wooCommerce;
+    const paymentRequired = Boolean( wcOrder?.payment_required );
+    const paymentUrl = typeof wcOrder?.payment_url === 'string' ? wcOrder.payment_url : '';
     return (
       <Motion.div
         initial={ { opacity: 0, scale: 0.97 } }
@@ -524,13 +572,21 @@ export default function Checkout() {
             animate={ { scale: 1 } }
             transition={ { type: 'spring', stiffness: 260, damping: 20, delay: 0.1 } }
           >
-            <CheckCircle className="h-20 w-20 mx-auto mb-6 text-emerald-500" strokeWidth={ 1.5 } />
+            <CheckCircle className={ `h-20 w-20 mx-auto mb-6 ${ paymentRequired ? 'text-amber-500' : 'text-emerald-500' }` } strokeWidth={ 1.5 } />
           </Motion.div>
-          <h2 className="text-2xl font-bold text-gray-900 mb-3">Order Placed!</h2>
+          <h2 className="text-2xl font-bold text-gray-900 mb-3">
+            { paymentRequired ? 'Order Created - Payment Required' : 'Order Placed!' }
+          </h2>
           <p className="text-gray-500 mb-8 text-sm">
             Thank you! A confirmation email will be sent to{ ' ' }
             <strong className="text-gray-800">{ formData.email }</strong>.
           </p>
+
+          { paymentRequired && (
+            <div className="mb-6 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-left text-xs text-amber-800">
+              Your order has been created but is not paid yet. Complete payment now to avoid cancellation.
+            </div>
+          ) }
 
           { wcOrder && (
             <div className="bg-gray-50 rounded-xl p-5 mb-8 text-left space-y-2 text-sm">
@@ -558,6 +614,16 @@ export default function Checkout() {
           ) }
 
           <div className="flex gap-3 justify-center flex-wrap">
+            { paymentRequired && paymentUrl && (
+              <a
+                href={ paymentUrl }
+                className="inline-flex items-center gap-2 bg-amber-500 hover:bg-amber-600
+                           active:scale-95 text-white px-6 py-3 rounded-xl font-semibold
+                           text-sm transition-all min-h-12"
+              >
+                Complete Payment
+              </a>
+            ) }
             { wcOrder?.order_id && (
               <Link
                 to={ `/order/${ wcOrder.order_id }` }
@@ -875,34 +941,73 @@ export default function Checkout() {
                 Payment
               </p>
               <p className="text-sm text-slate-600 mb-4">
-                { `Payment is processed through ${ paymentGateway } using gateways enabled in WooCommerce.` }
+                { `Choose how to pay. Checkout is powered by ${ paymentGateway } and will continue to a secure payment screen.` }
               </p>
-              { paymentMethods.length > 0 && (
-                <div className="mb-4">
-                  <label className="block text-xs font-semibold uppercase tracking-[0.12em] text-slate-500 mb-2">
-                    Payment Method
-                  </label>
-                  <select
-                    value={ paymentMethod }
-                    onChange={ (e) => setPaymentMethod( e.target.value ) }
-                    className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/30 focus:border-primary-500"
-                  >
-                    { paymentMethods.map( (method) => (
-                      <option key={ method.id } value={ method.id }>
-                        { method.title || method.id }
-                      </option>
-                    ) ) }
-                  </select>
+
+              { paymentMethods.length === 0 && (
+                <div className="mb-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-xs text-red-700">
+                  No payment methods are available. Please configure WooCommerce payments before taking orders.
                 </div>
               ) }
+
+              { paymentMethods.length > 0 && (
+                <div className="mb-4 space-y-2.5" role="radiogroup" aria-label="Payment Method">
+                  { paymentMethods.map( ( method ) => {
+                    const isSelected = paymentMethod === method.id;
+                    const isManual = isManualPaymentMethod( method );
+                    return (
+                      <label
+                        key={ method.id }
+                        className={ `flex items-start justify-between gap-3 rounded-xl border px-4 py-3 cursor-pointer transition-all
+                                     ${ isSelected
+                                        ? 'border-primary-500 bg-primary-50/60 ring-1 ring-primary-500/30'
+                                        : 'border-gray-200 hover:border-gray-300 bg-white' }` }
+                      >
+                        <div className="flex items-start gap-3">
+                          <input
+                            type="radio"
+                            name="paymentMethod"
+                            value={ method.id }
+                            checked={ isSelected }
+                            onChange={ () => setPaymentMethod( method.id ) }
+                            className="mt-0.5 accent-primary-600"
+                          />
+                          <div>
+                            <p className="text-sm font-semibold text-gray-900">{ method.title || method.id }</p>
+                            { method.description && (
+                              <p className="text-xs text-gray-500 mt-0.5">{ method.description }</p>
+                            ) }
+                          </div>
+                        </div>
+                        <span className={ `shrink-0 rounded-full px-2 py-1 text-[10px] font-bold uppercase tracking-[0.08em]
+                                          ${ isManual ? 'bg-amber-100 text-amber-800' : 'bg-emerald-100 text-emerald-700' }` }>
+                          { isManual ? 'Manual' : 'Online' }
+                        </span>
+                      </label>
+                    );
+                  } ) }
+                </div>
+              ) }
+
+              { selectedPaymentMethod && (
+                <p className={ `mb-4 rounded-xl border px-3.5 py-2.5 text-xs
+                                ${ manualPaymentSelected
+                                  ? 'border-amber-200 bg-amber-50 text-amber-700'
+                                  : 'border-emerald-200 bg-emerald-50 text-emerald-700' }` }>
+                  { manualPaymentSelected
+                    ? 'Manual payment methods are disabled for this headless checkout. Select an online method to continue.'
+                    : 'Your order will be created first, then you will complete payment on a secure payment page.' }
+                </p>
+              ) }
+
               <button
                 type="button"
                 onClick={ handlePlaceOrder }
-                disabled={ processing || ! isFormComplete || safeCartItems.length === 0 }
+                disabled={ ! canSubmitCheckout }
                 className="w-full inline-flex items-center justify-center gap-2 bg-primary-600 hover:bg-primary-700 text-white py-3.5 rounded-xl font-bold text-sm tracking-wide transition-all shadow-md active:scale-[0.99] min-h-12 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <Lock size={ 16 } />
-                { processing ? 'Processing…' : 'Place Order' }
+                { processing ? 'Processing…' : 'Create Order & Continue to Payment' }
               </button>
             </StepCard>
 

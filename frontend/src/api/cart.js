@@ -361,6 +361,8 @@ export async function syncAndPlace(
   const shippingLineTotal = Number.isFinite( Number( shippingRateTotal ) )
     ? String( Number( shippingRateTotal ) )
     : '0';
+  const paymentRef = paymentData?.[0]?.value || '';
+  const markPaid = paymentRef !== '';
   const shippingLines = shippingRateId
     ? [ { method_id: shippingRateId.split( ':' )[0] || 'flat_rate', method_title: shippingRateId, total: shippingLineTotal } ]
     : [];
@@ -382,7 +384,7 @@ export async function syncAndPlace(
   const confirmed = await confirmCheckout( {
     gateway,
     session_token: sessionToken,
-    payment_ref: paymentData?.[0]?.value || '',
+    payment_ref: paymentRef,
   } );
   if ( !confirmed?.confirm?.confirmed ) {
     throw new Error( 'Checkout confirmation failed.' );
@@ -393,13 +395,13 @@ export async function syncAndPlace(
     session_token: sessionToken,
     idempotency_key: idempotencyKey,
     payment_method: paymentMethod,
-    payment_ref: paymentData?.[0]?.value || '',
+    payment_ref: paymentRef,
     customer_note: customerNote || '',
     billing: billingAddress,
     shipping: shippingAddress || billingAddress,
     line_items,
     shipping_lines: shippingLines,
     coupon_codes: Array.isArray( couponCodes ) ? couponCodes : [],
-    set_paid: false,
+    set_paid: markPaid,
   } );
 }

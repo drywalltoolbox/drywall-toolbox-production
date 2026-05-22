@@ -9,7 +9,11 @@ defined( 'ABSPATH' ) || exit;
 
 function dtb_order_rest_get_order( WP_REST_Request $request ): WP_REST_Response|WP_Error {
 	$order_id = (int) $request->get_param( 'id' );
-	$user_id  = get_current_user_id();
+	$user_id  = dtb_order_rest_resolve_request_user_id( $request );
+	if ( is_wp_error( $user_id ) ) {
+		return $user_id;
+	}
+	$user_id  = (int) $user_id;
 	$order    = wc_get_order( $order_id );
 
 	if ( ! $order ) {
