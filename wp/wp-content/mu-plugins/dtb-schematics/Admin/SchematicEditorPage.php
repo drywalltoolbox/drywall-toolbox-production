@@ -215,8 +215,12 @@ function dtb_schematics_render_page() {
 
 			<div class="dtb-card" style="max-width:760px;">
 				<h3 style="margin-top:0;">Bulk Import (CSV)</h3>
-				<p style="font-size:13px;color:#787c82;margin-top:0;">Required columns: <code>attachment_id</code>, <code>schematic_id</code>, <code>brand</code>, <code>model_number</code>. Optional: <code>model_name</code>, <code>part_count</code>, <code>notes</code>, <code>product_ids</code>.</p>
+				<p style="font-size:13px;color:#787c82;margin-top:0;">Required columns: <code>attachment_id</code>, <code>schematic_id</code>, <code>brand</code>, <code>model_number</code>. Optional: <code>model_name</code>, <code>part_count</code>, <code>notes</code>, <code>product_ids</code>. If <code>attachment_id</code> is blank, upload an optional ZIP and importer will auto-match and create Media Library attachments.</p>
 				<input type="file" id="dtb-import-file" accept=".csv,text/csv">
+				<div style="margin-top:10px;">
+					<label for="dtb-import-images-zip" style="display:block;font-size:12px;font-weight:600;margin-bottom:4px;color:#3c434a;">Optional Schematics Images ZIP</label>
+					<input type="file" id="dtb-import-images-zip" accept=".zip,application/zip,application/x-zip-compressed">
+				</div>
 				<div style="margin-top:10px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
 					<button id="dtb-btn-import" class="dtb-btn dtb-btn-primary">
 						<span class="dashicons dashicons-upload" style="font-size:15px;"></span> Import CSV
@@ -605,6 +609,7 @@ function dtb_schematics_render_page() {
 
 		$('#dtb-btn-import').on('click', function(){
 			var fileInput = document.getElementById('dtb-import-file');
+			var zipInput = document.getElementById('dtb-import-images-zip');
 			if (!fileInput || !fileInput.files || !fileInput.files.length) {
 				alert('Please select a CSV file first.');
 				return;
@@ -613,6 +618,9 @@ function dtb_schematics_render_page() {
 			formData.append('action', 'dtb_schematics_import_csv');
 			formData.append('nonce', nonce);
 			formData.append('file', fileInput.files[0]);
+			if (zipInput && zipInput.files && zipInput.files.length) {
+				formData.append('images_zip', zipInput.files[0]);
+			}
 
 			var $btn = $(this);
 			$btn.prop('disabled', true);
@@ -634,7 +642,11 @@ function dtb_schematics_render_page() {
 					return;
 				}
 				var d = res.data || {};
-				$('#dtb-import-msg').text('✓ ' + (d.message || 'Import complete.')).css('color', '#1a7f37');
+				var msg = d.message || 'Import complete.';
+				if (typeof d.images_imported !== 'undefined') {
+					msg += ' (images imported: ' + d.images_imported + ')';
+				}
+				$('#dtb-import-msg').text('✓ ' + msg).css('color', '#1a7f37');
 				if (d.errors && d.errors.length) {
 					$('#dtb-import-errors').show().text(d.errors.join('\n'));
 				}

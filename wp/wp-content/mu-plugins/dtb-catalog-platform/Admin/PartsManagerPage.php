@@ -101,6 +101,18 @@ function dtb_parts_manager_render_page(): void {
 			<div id="dtb-pm-import-msg" style="margin-top:10px;font-size:13px;"></div>
 			<pre id="dtb-pm-import-errors" style="display:none;margin-top:10px;background:#fff8f8;border:1px solid #f0c0c1;padding:10px;border-radius:4px;white-space:pre-wrap;color:#8a2424;"></pre>
 		</div>
+
+		<div class="dtb-pm-card">
+			<h2 style="margin-top:0;">Import Schematic Parts Map</h2>
+			<p style="margin-top:0;color:#787c82;">Upload flattened schematic parts CSV for technician cross-mapping. Required columns: <code>schematic_id</code>, <code>part_id</code>, <code>part_name</code>, <code>qty</code>, <code>source_sku</code>.</p>
+			<input id="dtb-pm-map-import-file" type="file" accept=".csv,text/csv">
+			<div style="margin-top:10px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+				<button id="dtb-pm-map-import" class="dtb-pm-btn dtb-pm-btn-primary">Import Schematic Map</button>
+				<span id="dtb-pm-map-import-spinner" style="display:none;"><span class="spinner is-active" style="float:none;margin:0;"></span></span>
+			</div>
+			<div id="dtb-pm-map-import-msg" style="margin-top:10px;font-size:13px;"></div>
+			<pre id="dtb-pm-map-import-errors" style="display:none;margin-top:10px;background:#fff8f8;border:1px solid #f0c0c1;padding:10px;border-radius:4px;white-space:pre-wrap;color:#8a2424;"></pre>
+		</div>
 	</div>
 
 	<div class="dtb-pm-modal-overlay" id="dtb-pm-modal-wrap">
@@ -326,6 +338,43 @@ function dtb_parts_manager_render_page(): void {
 			$.post(ajaxurl, { action:'dtb_parts_export', nonce:nonce, format:'json' }, function(res){
 				if(!res || !res.success){ alert('Export failed.'); return; }
 				downloadFile((res.data || {}).content, (res.data || {}).mime, (res.data || {}).filename);
+			});
+		});
+
+		$('#dtb-pm-map-import').on('click', function(){
+			var fileInput = document.getElementById('dtb-pm-map-import-file');
+			if(!fileInput || !fileInput.files || !fileInput.files.length){
+				alert('Please select a schematic map CSV first.');
+				return;
+			}
+			var fd = new FormData();
+			fd.append('action', 'dtb_parts_import_schematic_map');
+			fd.append('nonce', nonce);
+			fd.append('file', fileInput.files[0]);
+			$('#dtb-pm-map-import-spinner').show();
+			$('#dtb-pm-map-import-msg').text('');
+			$('#dtb-pm-map-import-errors').hide().text('');
+			$.ajax({
+				url: ajaxurl,
+				type: 'POST',
+				data: fd,
+				processData: false,
+				contentType: false
+			}).done(function(res){
+				$('#dtb-pm-map-import-spinner').hide();
+				if(!res || !res.success){
+					$('#dtb-pm-map-import-msg').text('Schematic map import failed.').css('color','#d63638');
+					return;
+				}
+				var d = res.data || {};
+				$('#dtb-pm-map-import-msg').text('✓ ' + (d.message || 'Schematic map import completed.')).css('color','#1a7f37');
+				if(d.errors && d.errors.length){
+					$('#dtb-pm-map-import-errors').show().text(d.errors.join('\n'));
+				}
+				loadParts(page);
+			}).fail(function(){
+				$('#dtb-pm-map-import-spinner').hide();
+				$('#dtb-pm-map-import-msg').text('Schematic map import failed.').css('color','#d63638');
 			});
 		});
 

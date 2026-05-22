@@ -16,6 +16,7 @@ add_action( 'wp_ajax_dtb_parts_get', 'dtb_ajax_parts_get' );
 add_action( 'wp_ajax_dtb_parts_save', 'dtb_ajax_parts_save' );
 add_action( 'wp_ajax_dtb_parts_delete', 'dtb_ajax_parts_delete' );
 add_action( 'wp_ajax_dtb_parts_import_csv', 'dtb_ajax_parts_import_csv' );
+add_action( 'wp_ajax_dtb_parts_import_schematic_map', 'dtb_ajax_parts_import_schematic_map' );
 add_action( 'wp_ajax_dtb_parts_export', 'dtb_ajax_parts_export' );
 
 function dtb_parts_validate_ajax_request(): void {
@@ -203,6 +204,61 @@ function dtb_find_part_id_by_sku( string $sku ): int {
 	return ! empty( $ids ) ? (int) $ids[0] : 0;
 }
 
+function dtb_find_part_id_by_manufacturer_sku( string $manufacturer_sku ): int {
+	if ( '' === $manufacturer_sku ) {
+		return 0;
+	}
+	$ids = get_posts(
+		[
+			'post_type'      => 'product',
+			'post_status'    => 'any',
+			'posts_per_page' => 1,
+			'fields'         => 'ids',
+			'meta_query'     => [
+				[
+					'key'   => DTB_ProductMeta::MANUFACTURER_SKU,
+					'value' => $manufacturer_sku,
+				],
+			],
+		]
+	);
+	return ! empty( $ids ) ? (int) $ids[0] : 0;
+}
+
+function dtb_append_schematic_map_to_part( int $part_id, array $entry ): bool {
+	$current = get_post_meta( $part_id, '_dtb_schematic_part_map', true );
+	if ( ! is_array( $current ) ) {
+		$current = [];
+	}
+
+	$fingerprint = implode(
+		'|',
+		[
+			(string) ( $entry['schematic_id'] ?? '' ),
+			(string) ( $entry['part_id'] ?? '' ),
+			(string) ( $entry['source_sku'] ?? '' ),
+		]
+	);
+
+	foreach ( $current as $row ) {
+		$existing_fingerprint = implode(
+			'|',
+			[
+				(string) ( $row['schematic_id'] ?? '' ),
+				(string) ( $row['part_id'] ?? '' ),
+				(string) ( $row['source_sku'] ?? '' ),
+			]
+		);
+		if ( $existing_fingerprint === $fingerprint ) {
+			return false;
+		}
+	}
+
+	$current[] = $entry;
+	update_post_meta( $part_id, '_dtb_schematic_part_map', $current );
+	return true;
+}
+
 function dtb_ajax_parts_import_csv(): void {
 	dtb_parts_validate_ajax_request();
 	if ( empty( $_FILES['file']['tmp_name'] ) || ! is_uploaded_file( $_FILES['file']['tmp_name'] ) ) {
@@ -295,6 +351,100 @@ function dtb_ajax_parts_import_csv(): void {
 			'imported' => $imported,
 			'errors'   => $errors,
 			'message'  => sprintf( 'Imported %d parts rows.', $imported ),
+		]
+	);
+}
+
+function dtb_ajax_parts_import_schematic_map(): void {
+	dtb_parts_validate_ajax_request();
+	if ( empty( $_FILES['file']['tmp_name'] ) || ! is_uploaded_file( $_FILES['file']['tmp_name'] ) ) {
+		wp_send_json_error( [ 'message' => 'CSV file is required.' ], 400 );
+	}
+
+	$fp = fopen( $_FILES['file']['tmp_name'], 'r' );
+	if ( false === $fp ) {
+		wp_send_json_error( [ 'message' => 'Unable to read uploaded CSV.' ], 400 );
+	}
+
+	$header = fgetcsv( $fp );
+	if ( ! is_array( $header ) ) {
+		fclose( $fp );
+		wp_send_json_error( [ 'message' => 'CSV header row is missing.' ], 400 );
+	}
+
+	$header = array_map( static fn( $h ) => strtolower( trim( (string) $h ) ), $header );
+	$map    = array_flip( $header );
+	foreach ( [ 'schematic_id', 'part_id', 'part_name', 'qty', 'source_sku' ] as $required ) {
+		if ( ! isset( $map[ $required ] ) ) {
+			fclose( $fp );
+			wp_send_json_error( [ 'message' => sprintf( 'Missing required column: %s', $required ) ], 400 );
+		}
+	}
+
+	$row_num   = 1;
+	$linked    = 0;
+	$matched   = 0;
+	$unmatched = 0;
+	$errors    = [];
+
+	while ( ( $row = fgetcsv( $fp ) ) !== false ) {
+		$row_num++;
+		if ( empty( array_filter( $row, static fn( $v ) => '' !== trim( (string) $v ) ) ) ) {
+			continue;
+		}
+
+		$schematic_id = sanitize_text_field( (string) ( $row[ $map['schematic_id'] ] ?? '' ) );
+		$part_id      = sanitize_text_field( (string) ( $row[ $map['part_id'] ] ?? '' ) );
+		$part_name    = sanitize_text_field( (string) ( $row[ $map['part_name'] ] ?? '' ) );
+		$qty          = sanitize_text_field( (string) ( $row[ $map['qty'] ] ?? '' ) );
+		$source_sku   = sanitize_text_field( (string) ( $row[ $map['source_sku'] ] ?? '' ) );
+
+		if ( '' === $schematic_id && '' === $part_id && '' === $part_name && '' === $source_sku ) {
+			continue;
+		}
+
+		$target_part_id = dtb_find_part_id_by_sku( $source_sku );
+		if ( $target_part_id <= 0 ) {
+			$target_part_id = dtb_find_part_id_by_manufacturer_sku( $source_sku );
+		}
+
+		if ( $target_part_id <= 0 ) {
+			$unmatched++;
+			$errors[] = sprintf( 'Row %d: no part match for source_sku "%s".', $row_num, $source_sku );
+			continue;
+		}
+		$matched++;
+
+		$did_add = dtb_append_schematic_map_to_part(
+			$target_part_id,
+			[
+				'schematic_id' => $schematic_id,
+				'part_id'      => $part_id,
+				'part_name'    => $part_name,
+				'qty'          => $qty,
+				'source_sku'   => $source_sku,
+				'imported_at'  => gmdate( 'c' ),
+			]
+		);
+
+		if ( $did_add ) {
+			$linked++;
+		}
+	}
+	fclose( $fp );
+
+	wp_send_json_success(
+		[
+			'linked'    => $linked,
+			'matched'   => $matched,
+			'unmatched' => $unmatched,
+			'errors'    => $errors,
+			'message'   => sprintf(
+				'Processed schematic-parts map. %d linked, %d matched, %d unmatched.',
+				$linked,
+				$matched,
+				$unmatched
+			),
 		]
 	);
 }

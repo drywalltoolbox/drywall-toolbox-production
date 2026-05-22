@@ -178,6 +178,118 @@ function dtb_ajax_schematics_audit() {
 // ── AJAX: CSV importer for schematic metadata ───────────────────────────────
 
 add_action( 'wp_ajax_dtb_schematics_import_csv', 'dtb_ajax_schematics_import_csv' );
+
+/**
+ * Normalize free-text tokens for file-matching.
+ */
+function dtb_schematics_normalize_token( string $value ): string {
+	$value = strtolower( trim( $value ) );
+	$value = preg_replace( '/[^a-z0-9]+/', '', $value );
+	return is_string( $value ) ? $value : '';
+}
+
+/**
+ * Build an index of image files from uploaded ZIP archive.
+ *
+ * @return array{index: array<string, string>, temp_dir: string, errors: string[]}
+ */
+function dtb_schematics_build_image_index_from_zip( string $zip_tmp_path ): array {
+	$result = [
+		'index'    => [],
+		'temp_dir' => '',
+		'errors'   => [],
+	];
+
+	if ( ! class_exists( 'ZipArchive' ) ) {
+		$result['errors'][] = 'ZipArchive PHP extension is not available on this server.';
+		return $result;
+	}
+
+	$zip = new ZipArchive();
+	if ( true !== $zip->open( $zip_tmp_path ) ) {
+		$result['errors'][] = 'Unable to open image ZIP archive.';
+		return $result;
+	}
+
+	$uploads = wp_upload_dir();
+	$temp_dir = trailingslashit( $uploads['basedir'] ) . 'dtb-schematics-import-' . wp_generate_password( 8, false, false );
+	wp_mkdir_p( $temp_dir );
+	$result['temp_dir'] = $temp_dir;
+
+	for ( $i = 0; $i < $zip->numFiles; $i++ ) {
+		$entry = $zip->getNameIndex( $i );
+		if ( ! is_string( $entry ) || '' === $entry || str_ends_with( $entry, '/' ) ) {
+			continue;
+		}
+		$ext = strtolower( pathinfo( $entry, PATHINFO_EXTENSION ) );
+		if ( ! in_array( $ext, [ 'jpg', 'jpeg', 'png', 'webp', 'gif', 'svg' ], true ) ) {
+			continue;
+		}
+		$base_name = wp_basename( $entry );
+		$dest_path = trailingslashit( $temp_dir ) . $base_name;
+		$content   = $zip->getFromIndex( $i );
+		if ( false === $content ) {
+			continue;
+		}
+		file_put_contents( $dest_path, $content );
+
+		$name_no_ext = pathinfo( $base_name, PATHINFO_FILENAME );
+		$tokens = [
+			dtb_schematics_normalize_token( $base_name ),
+			dtb_schematics_normalize_token( $name_no_ext ),
+		];
+		foreach ( $tokens as $token ) {
+			if ( '' !== $token ) {
+				$result['index'][ $token ] = $dest_path;
+			}
+		}
+	}
+
+	$zip->close();
+	return $result;
+}
+
+/**
+ * Insert extracted image file into Media Library and return attachment ID.
+ */
+function dtb_schematics_import_image_as_attachment( string $file_path, string $title = '' ): int {
+	if ( ! file_exists( $file_path ) ) {
+		return 0;
+	}
+
+	$file_bits = file_get_contents( $file_path );
+	if ( false === $file_bits ) {
+		return 0;
+	}
+
+	$filename = wp_basename( $file_path );
+	$upload   = wp_upload_bits( $filename, null, $file_bits );
+	if ( ! empty( $upload['error'] ) || empty( $upload['file'] ) ) {
+		return 0;
+	}
+
+	$filetype   = wp_check_filetype( $upload['file'], null );
+	$attachment = [
+		'post_mime_type' => $filetype['type'] ?? 'application/octet-stream',
+		'post_title'     => '' !== $title ? $title : preg_replace( '/\.[^.]+$/', '', $filename ),
+		'post_content'   => '',
+		'post_status'    => 'inherit',
+	];
+
+	$attachment_id = wp_insert_attachment( $attachment, $upload['file'] );
+	if ( ! $attachment_id || is_wp_error( $attachment_id ) ) {
+		return 0;
+	}
+
+	require_once ABSPATH . 'wp-admin/includes/image.php';
+	$metadata = wp_generate_attachment_metadata( $attachment_id, $upload['file'] );
+	if ( is_array( $metadata ) ) {
+		wp_update_attachment_metadata( $attachment_id, $metadata );
+	}
+
+	return (int) $attachment_id;
+}
+
 function dtb_ajax_schematics_import_csv() {
 	check_ajax_referer( 'dtb_schematics_nonce', 'nonce' );
 	if ( ! current_user_can( 'manage_options' ) ) {
@@ -185,6 +297,19 @@ function dtb_ajax_schematics_import_csv() {
 	}
 	if ( empty( $_FILES['file']['tmp_name'] ) || ! is_uploaded_file( $_FILES['file']['tmp_name'] ) ) {
 		wp_send_json_error( [ 'message' => 'CSV file is required.' ], 400 );
+	}
+
+	$image_index = [];
+	$temp_extract_dir = '';
+	$image_imported = 0;
+	$errors = [];
+	if ( ! empty( $_FILES['images_zip']['tmp_name'] ) && is_uploaded_file( $_FILES['images_zip']['tmp_name'] ) ) {
+		$zip_result = dtb_schematics_build_image_index_from_zip( $_FILES['images_zip']['tmp_name'] );
+		$image_index = is_array( $zip_result['index'] ?? null ) ? $zip_result['index'] : [];
+		$temp_extract_dir = (string) ( $zip_result['temp_dir'] ?? '' );
+		if ( ! empty( $zip_result['errors'] ) ) {
+			$errors = array_merge( $errors, (array) $zip_result['errors'] );
+		}
 	}
 
 	$fp = fopen( $_FILES['file']['tmp_name'], 'r' );
@@ -210,7 +335,6 @@ function dtb_ajax_schematics_import_csv() {
 
 	$row_num = 1;
 	$imported = 0;
-	$errors = [];
 
 	while ( ( $row = fgetcsv( $fp ) ) !== false ) {
 		$row_num++;
@@ -227,12 +351,35 @@ function dtb_ajax_schematics_import_csv() {
 		$notes         = isset( $map['notes'] ) ? sanitize_textarea_field( (string) ( $row[ $map['notes'] ] ?? '' ) ) : '';
 		$product_ids   = isset( $map['product_ids'] ) ? dtb_schematic_normalize_product_ids( (string) ( $row[ $map['product_ids'] ] ?? '' ) ) : [];
 
-		if ( ! dtb_validate_schematic_attachment_id( $attachment_id ) ) {
-			$errors[] = "Row {$row_num}: invalid attachment_id {$attachment_id}.";
-			continue;
-		}
 		if ( '' === $schematic_id || '' === $brand || '' === $model_number ) {
 			$errors[] = "Row {$row_num}: schematic_id, brand, and model_number are required.";
+			continue;
+		}
+
+		if ( ! dtb_validate_schematic_attachment_id( $attachment_id ) ) {
+			$matched_path = '';
+			$tokens = [
+				dtb_schematics_normalize_token( $schematic_id ),
+				dtb_schematics_normalize_token( $model_number ),
+				dtb_schematics_normalize_token( $model_name ),
+			];
+			foreach ( $tokens as $token ) {
+				if ( '' !== $token && isset( $image_index[ $token ] ) ) {
+					$matched_path = (string) $image_index[ $token ];
+					break;
+				}
+			}
+
+			if ( '' !== $matched_path ) {
+				$attachment_id = dtb_schematics_import_image_as_attachment( $matched_path, $model_name ?: $schematic_id );
+				if ( $attachment_id > 0 ) {
+					$image_imported++;
+				}
+			}
+		}
+
+		if ( ! dtb_validate_schematic_attachment_id( $attachment_id ) ) {
+			$errors[] = "Row {$row_num}: no valid attachment_id and no matching image found in ZIP.";
 			continue;
 		}
 
@@ -251,14 +398,26 @@ function dtb_ajax_schematics_import_csv() {
 		$imported++;
 	}
 	fclose( $fp );
+	if ( '' !== $temp_extract_dir && is_dir( $temp_extract_dir ) ) {
+		$files = glob( trailingslashit( $temp_extract_dir ) . '*' );
+		if ( is_array( $files ) ) {
+			foreach ( $files as $file ) {
+				if ( is_file( $file ) ) {
+					@unlink( $file ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+				}
+			}
+		}
+		@rmdir( $temp_extract_dir ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+	}
 
 	dtb_schematics_manifest_repo_delete_cache();
 
 	wp_send_json_success(
 		[
 			'imported' => $imported,
+			'images_imported' => $image_imported,
 			'errors'   => $errors,
-			'message'  => sprintf( 'Imported %d schematic rows.', $imported ),
+			'message'  => sprintf( 'Imported %d schematic rows. Imported %d images from ZIP.', $imported, $image_imported ),
 		]
 	);
 }

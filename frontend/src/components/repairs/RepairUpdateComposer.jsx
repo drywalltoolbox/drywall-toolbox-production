@@ -162,8 +162,8 @@ export default function RepairUpdateComposer( { repairId, token, onSubmitted } )
           <span className={ `text-xs ${ remaining < 80 ? 'text-amber-600' : 'text-neutral-400' }` }>
             { remaining } characters remaining
           </span>
-          <div className="flex items-center gap-2">
-            <div className="relative">
+          <div className="relative flex items-center gap-2 overflow-visible">
+            <div className="relative overflow-visible">
             <button
               ref={ attachButtonRef }
               type="button"
@@ -183,7 +183,7 @@ export default function RepairUpdateComposer( { repairId, token, onSubmitted } )
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   exit={{ opacity: 0, y: -4, scale: 0.98 }}
                   transition={{ duration: 0.16, ease: 'easeOut' }}
-                  className="absolute right-0 top-full mt-2 z-40 w-48 rounded-xl border border-neutral-200 bg-white shadow-xl overflow-hidden"
+                  className="absolute right-0 top-full mt-2 z-40 w-52 origin-top-right rounded-xl border border-neutral-200 bg-white shadow-xl overflow-hidden"
                   role="menu"
                   aria-label="Photo options"
                 >
@@ -233,7 +233,7 @@ export default function RepairUpdateComposer( { repairId, token, onSubmitted } )
       <input
         ref={ libraryInputRef }
         type="file"
-        accept={ ACCEPTED_TYPES.join( ',' ) }
+        accept=".jpg,.jpeg,.png,.gif,.webp"
         multiple
         className="hidden"
         onChange={ onSelectFiles }
