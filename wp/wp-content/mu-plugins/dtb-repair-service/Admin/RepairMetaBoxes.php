@@ -973,29 +973,67 @@ function dtb_repair_ajax_parts_lookup(): void {
 
 	$term = isset( $_POST['term'] ) ? sanitize_text_field( wp_unslash( (string) $_POST['term'] ) ) : '';
 	$term = trim( $term );
-	if ( strlen( $term ) < 2 ) {
+	if ( '' === $term ) {
 		wp_send_json_success( [ 'items' => [] ] );
 	}
 
-	$query = new WP_Query(
+	// First, do an exact SKU/manufacturer SKU lookup so exact part-code searches
+	// are not blocked by WP text search behavior (which does not search _sku meta).
+	$exact_ids = get_posts(
 		[
 			'post_type'      => 'product',
 			'post_status'    => [ 'publish', 'draft', 'private', 'pending' ],
 			'posts_per_page' => 20,
 			'fields'         => 'ids',
-			's'              => $term,
 			'meta_query'     => [
+				'relation' => 'AND',
 				[
 					'key'     => '_dtb_is_parts',
 					'value'   => '1',
 					'compare' => '=',
 				],
+				[
+					'relation' => 'OR',
+					[
+						'key'     => '_sku',
+						'value'   => $term,
+						'compare' => '=',
+					],
+					[
+						'key'     => '_dtb_manufacturer_sku',
+						'value'   => $term,
+						'compare' => '=',
+					],
+				],
 			],
 		]
 	);
 
+	$search_ids = [];
+	if ( strlen( $term ) >= 2 ) {
+		$query = new WP_Query(
+			[
+				'post_type'      => 'product',
+				'post_status'    => [ 'publish', 'draft', 'private', 'pending' ],
+				'posts_per_page' => 20,
+				'fields'         => 'ids',
+				's'              => $term,
+				'meta_query'     => [
+					[
+						'key'     => '_dtb_is_parts',
+						'value'   => '1',
+						'compare' => '=',
+					],
+				],
+			]
+		);
+		$search_ids = (array) $query->posts;
+	}
+
+	$product_ids = array_values( array_unique( array_map( 'intval', array_merge( (array) $exact_ids, (array) $search_ids ) ) ) );
+
 	$items = [];
-	foreach ( (array) $query->posts as $product_id ) {
+	foreach ( $product_ids as $product_id ) {
 		$product_id = (int) $product_id;
 		$product    = function_exists( 'wc_get_product' ) ? wc_get_product( $product_id ) : null;
 		$sku        = $product ? (string) $product->get_sku() : (string) get_post_meta( $product_id, '_sku', true );

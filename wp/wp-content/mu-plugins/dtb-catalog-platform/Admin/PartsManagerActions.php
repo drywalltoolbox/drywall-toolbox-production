@@ -225,6 +225,102 @@ function dtb_find_part_id_by_manufacturer_sku( string $manufacturer_sku ): int {
 	return ! empty( $ids ) ? (int) $ids[0] : 0;
 }
 
+function dtb_parts_detect_brand_taxonomy(): string {
+	foreach ( [ 'product_brand', 'wc_product_brands', 'pwb-brand' ] as $taxonomy ) {
+		if ( taxonomy_exists( $taxonomy ) ) {
+			return $taxonomy;
+		}
+	}
+	return '';
+}
+
+function dtb_parts_parse_list_field( string $raw ): array {
+	if ( '' === trim( $raw ) ) {
+		return [];
+	}
+	$items = preg_split( '/\s*,\s*/', $raw );
+	$items = array_map( static fn( $v ) => trim( (string) $v ), is_array( $items ) ? $items : [] );
+	$items = array_values( array_filter( array_unique( $items ), static fn( $v ) => '' !== $v ) );
+	return $items;
+}
+
+function dtb_parts_apply_brand_terms( int $post_id, string $brands_csv, string $brand_label ): void {
+	$taxonomy = dtb_parts_detect_brand_taxonomy();
+	if ( '' === $taxonomy ) {
+		return;
+	}
+
+	$terms = dtb_parts_parse_list_field( $brands_csv );
+	if ( empty( $terms ) && '' !== trim( $brand_label ) ) {
+		$terms = [ trim( $brand_label ) ];
+	}
+	if ( empty( $terms ) ) {
+		return;
+	}
+
+	wp_set_object_terms( $post_id, $terms, $taxonomy, false );
+}
+
+function dtb_parts_ensure_category_path( string $path ): ?int {
+	$segments = preg_split( '/\s*>\s*/', $path );
+	$segments = array_map( static fn( $v ) => trim( (string) $v ), is_array( $segments ) ? $segments : [] );
+	$segments = array_values( array_filter( $segments, static fn( $v ) => '' !== $v ) );
+	if ( empty( $segments ) ) {
+		return null;
+	}
+
+	$parent_id = 0;
+	$last_id   = 0;
+	foreach ( $segments as $segment ) {
+		$existing = term_exists( $segment, 'product_cat', $parent_id );
+		if ( is_array( $existing ) && ! empty( $existing['term_id'] ) ) {
+			$last_id   = (int) $existing['term_id'];
+			$parent_id = $last_id;
+			continue;
+		}
+
+		$created = wp_insert_term(
+			$segment,
+			'product_cat',
+			[
+				'parent' => $parent_id,
+			]
+		);
+		if ( is_wp_error( $created ) || empty( $created['term_id'] ) ) {
+			return null;
+		}
+
+		$last_id   = (int) $created['term_id'];
+		$parent_id = $last_id;
+	}
+
+	return $last_id > 0 ? $last_id : null;
+}
+
+function dtb_parts_apply_category_terms( int $post_id, string $categories_csv ): void {
+	if ( ! taxonomy_exists( 'product_cat' ) ) {
+		return;
+	}
+
+	$paths = dtb_parts_parse_list_field( $categories_csv );
+	if ( empty( $paths ) ) {
+		return;
+	}
+
+	$term_ids = [];
+	foreach ( $paths as $path ) {
+		$term_id = dtb_parts_ensure_category_path( $path );
+		if ( null !== $term_id ) {
+			$term_ids[] = $term_id;
+		}
+	}
+
+	$term_ids = array_values( array_unique( array_filter( $term_ids ) ) );
+	if ( ! empty( $term_ids ) ) {
+		wp_set_object_terms( $post_id, $term_ids, 'product_cat', false );
+	}
+}
+
 function dtb_append_schematic_map_to_part( int $part_id, array $entry ): bool {
 	$current = get_post_meta( $part_id, '_dtb_schematic_part_map', true );
 	if ( ! is_array( $current ) ) {
@@ -300,6 +396,11 @@ function dtb_ajax_parts_import_csv(): void {
 		$brand_label      = isset( $map['brand_label'] ) ? sanitize_text_field( (string) ( $row[ $map['brand_label'] ] ?? '' ) ) : '';
 		$manufacturer_sku = isset( $map['manufacturer_sku'] ) ? sanitize_text_field( (string) ( $row[ $map['manufacturer_sku'] ] ?? '' ) ) : '';
 		$price            = isset( $map['price'] ) ? wc_format_decimal( (string) ( $row[ $map['price'] ] ?? '' ) ) : '';
+		$brands_csv       = isset( $map['brands'] ) ? sanitize_text_field( (string) ( $row[ $map['brands'] ] ?? '' ) ) : '';
+		$categories_csv   = isset( $map['categories'] ) ? sanitize_text_field( (string) ( $row[ $map['categories'] ] ?? '' ) ) : '';
+		if ( '' === trim( $categories_csv ) ) {
+			$categories_csv = 'Parts';
+		}
 		$status           = isset( $map['status'] ) ? sanitize_key( (string) ( $row[ $map['status'] ] ?? 'draft' ) ) : 'draft';
 		$description      = isset( $map['description'] ) ? wp_kses_post( (string) ( $row[ $map['description'] ] ?? '' ) ) : '';
 
@@ -342,6 +443,8 @@ function dtb_ajax_parts_import_csv(): void {
 		update_post_meta( $id, DTB_ProductMeta::PRODUCT_KIND, 'part' );
 		update_post_meta( $id, DTB_ProductMeta::BRAND_LABEL, $brand_label );
 		update_post_meta( $id, DTB_ProductMeta::MANUFACTURER_SKU, $manufacturer_sku );
+		dtb_parts_apply_brand_terms( $id, $brands_csv, $brand_label );
+		dtb_parts_apply_category_terms( $id, $categories_csv );
 		$imported++;
 	}
 	fclose( $fp );
