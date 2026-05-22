@@ -13,10 +13,6 @@
  */
 
 import { motion, AnimatePresence } from 'framer-motion';
-import {
-  Mail, Search, Clock, CheckCircle, FileText, Handshake,
-  XCircle, Package, Wrench, Truck, BadgeCheck, Archive, Ban,
-} from 'lucide-react';
 import { REPAIR_STATUS_PROGRESS } from '../../api/repairs.js';
 
 // Ordered milestones shown in the step track (a simplified customer-facing flow)
@@ -72,6 +68,7 @@ export default function RepairStatusTracker( {
 
   const accentColor = isNegative ? 'bg-red-400' : isCompleted ? 'bg-green-400' : 'bg-blue-500';
   const labelColor  = isNegative ? 'text-red-600' : isCompleted ? 'text-green-600' : 'text-blue-700';
+  const indicatorColor = isNegative ? 'bg-red-500' : isCompleted ? 'bg-green-500' : 'bg-blue-500';
 
   return (
     <motion.div
@@ -91,8 +88,7 @@ export default function RepairStatusTracker( {
       <div className="p-6 space-y-5">
 
         {/* ── Status header ─────────────────────────────────────────── */}
-        <div className="flex items-center gap-4">
-          <StatusIcon status={ status } />
+        <div className="flex items-start justify-between gap-4">
           <div className="min-w-0">
             <div className="text-[10px] text-neutral-400 uppercase tracking-widest font-semibold mb-0.5">
               Current Status
@@ -107,6 +103,10 @@ export default function RepairStatusTracker( {
               { label || status }
             </motion.div>
           </div>
+          <span
+            className={ `mt-1 inline-flex h-2.5 w-2.5 rounded-full ${ indicatorColor }` }
+            aria-hidden="true"
+          />
         </div>
 
         {/* ── Terminal negative banner ───────────────────────────────── */}
@@ -224,11 +224,8 @@ export default function RepairStatusTracker( {
               transition={{ duration: 0.35 }}
               className="rounded-xl bg-linear-to-br from-green-50 to-emerald-50 border border-green-200 p-4"
             >
-              <div className="flex items-center gap-1.5 mb-1.5">
-                <Truck size={ 13 } className="text-green-600" strokeWidth={ 2 } />
-                <span className="text-[10px] text-green-600 font-bold uppercase tracking-widest">
-                  Shipping Tracking
-                </span>
+              <div className="text-[10px] text-green-600 font-bold uppercase tracking-widest mb-1.5">
+                Shipping Tracking
               </div>
               <div className="text-base font-mono font-bold text-green-800 tracking-wider leading-none">
                 { trackingNumber }
@@ -241,40 +238,6 @@ export default function RepairStatusTracker( {
         </AnimatePresence>
 
       </div>
-    </motion.div>
-  );
-}
-
-// ─── Status icon ──────────────────────────────────────────────────────────────
-
-const STATUS_ICON_MAP = {
-  submitted:         { Icon: Mail,        bg: 'bg-blue-50',    icon: 'text-blue-500'    },
-  reviewed:          { Icon: Search,      bg: 'bg-blue-50',    icon: 'text-blue-500'    },
-  awaiting_customer: { Icon: Clock,       bg: 'bg-yellow-50',  icon: 'text-yellow-500'  },
-  approved:          { Icon: CheckCircle, bg: 'bg-green-50',   icon: 'text-green-500'   },
-  quoted:            { Icon: FileText,    bg: 'bg-yellow-50',  icon: 'text-yellow-500'  },
-  quote_accepted:    { Icon: Handshake,   bg: 'bg-green-50',   icon: 'text-green-500'   },
-  quote_declined:    { Icon: XCircle,     bg: 'bg-red-50',     icon: 'text-red-500'     },
-  parts_allocated:   { Icon: Package,     bg: 'bg-blue-50',    icon: 'text-blue-500'    },
-  in_progress:       { Icon: Wrench,      bg: 'bg-yellow-50',  icon: 'text-yellow-500'  },
-  ready_to_ship:     { Icon: Truck,       bg: 'bg-green-50',   icon: 'text-green-500'   },
-  completed:         { Icon: BadgeCheck,  bg: 'bg-green-50',   icon: 'text-green-500'   },
-  closed:            { Icon: Archive,     bg: 'bg-neutral-50', icon: 'text-neutral-400' },
-  cancelled:         { Icon: Ban,         bg: 'bg-red-50',     icon: 'text-red-500'     },
-};
-
-function StatusIcon( { status } ) {
-  const { Icon, bg, icon } = STATUS_ICON_MAP[ status ] || { Icon: Wrench, bg: 'bg-neutral-50', icon: 'text-neutral-400' };
-  return (
-    <motion.div
-      key={ status }
-      initial={{ scale: 0.6, opacity: 0 }}
-      animate={{ scale: 1, opacity: 1 }}
-      transition={{ type: 'spring', stiffness: 320, damping: 22, delay: 0.05 }}
-      className={ `w-13 h-13 rounded-xl ${ bg } flex items-center justify-center shrink-0 shadow-sm` }
-      style={{ width: 52, height: 52 }}
-    >
-      <Icon size={ 23 } className={ icon } strokeWidth={ 1.75 } />
     </motion.div>
   );
 }

@@ -11,43 +11,36 @@
  */
 
 import { motion } from 'framer-motion';
-import { Info, Mail, CheckCircle, Package, Wrench, Truck } from 'lucide-react';
 
 // ─── Per-status customer messaging ───────────────────────────────────────────
 
 const STATUS_MESSAGES = {
   reviewed: {
-    Icon:  Info,
     title: 'Under Review',
     body:  "Our technicians are reviewing your repair request. We'll be in touch soon.",
     color: 'blue',
   },
   awaiting_customer: {
-    Icon:  Mail,
     title: 'Your Input Needed',
     body:  'We need a bit more information from you. Please check your email for details.',
     color: 'yellow',
   },
   approved: {
-    Icon:  CheckCircle,
     title: 'Repair Approved',
     body:  'Your repair has been approved and is being scheduled.',
     color: 'green',
   },
   parts_allocated: {
-    Icon:  Package,
     title: 'Parts Being Prepared',
     body:  'Parts allocation is being processed. Your repair will begin shortly.',
     color: 'blue',
   },
   in_progress: {
-    Icon:  Wrench,
     title: 'Repair In Progress',
     body:  "Our technicians are actively working on your tool. We'll notify you when it's ready.",
     color: 'yellow',
   },
   ready_to_ship: {
-    Icon:  Truck,
     title: 'Ready to Ship',
     body:  'Your repaired tool is packaged and ready. Shipping details will be sent to your email.',
     color: 'green',
@@ -68,14 +61,12 @@ export default function RepairIntegrationNotice( { status, integrationState } ) 
   if ( ! msg && ! integrationState ) return null;
 
   const display = msg || {
-    Icon:  Info,
     title: 'Processing',
     body:  "Your repair request is being processed. We'll update you as soon as there's news.",
     color: 'neutral',
   };
 
   const colors = COLOR_CLASSES[ display.color ] || COLOR_CLASSES.neutral;
-  const { Icon } = display;
 
   return (
     <motion.div
@@ -86,12 +77,9 @@ export default function RepairIntegrationNotice( { status, integrationState } ) 
       role="status"
       aria-live="polite"
     >
-      <div className="flex items-start gap-2">
-        <Icon size={ 16 } strokeWidth={ 2 } className={ `mt-0.5 shrink-0 ${ colors.title }` } aria-hidden="true" />
-        <div>
-          <p className={ `text-sm font-semibold ${ colors.title }` }>{ display.title }</p>
-          <p className={ `text-sm mt-0.5 ${ colors.body }` }>{ display.body }</p>
-        </div>
+      <div className="border-l-2 border-current/35 pl-3" style={{ color: 'inherit' }}>
+        <p className={ `text-sm font-semibold ${ colors.title }` }>{ display.title }</p>
+        <p className={ `text-sm mt-0.5 ${ colors.body }` }>{ display.body }</p>
       </div>
     </motion.div>
   );

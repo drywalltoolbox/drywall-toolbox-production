@@ -9,30 +9,25 @@
  */
 
 import { motion, AnimatePresence } from 'framer-motion';
-import {
-  Mail, Search, Clock, CheckCircle, FileText, Handshake,
-  XCircle, Package, Wrench, Truck, BadgeCheck, Archive, Ban,
-  MessageSquare, Camera, ClipboardList,
-} from 'lucide-react';
 
 // ─── Event type metadata ──────────────────────────────────────────────────────
 
 const EVENT_META = {
-  'repair.submitted':         { Icon: Mail,          color: 'blue'    },
-  'repair.reviewed':          { Icon: Search,        color: 'blue'    },
-  'repair.awaiting_customer': { Icon: Clock,         color: 'yellow'  },
-  'repair.approved':          { Icon: CheckCircle,   color: 'green'   },
-  'repair.quoted':            { Icon: FileText,      color: 'yellow'  },
-  'repair.quote_accepted':    { Icon: Handshake,     color: 'green'   },
-  'repair.quote_declined':    { Icon: XCircle,       color: 'red'     },
-  'repair.parts_allocated':   { Icon: Package,       color: 'blue'    },
-  'repair.in_progress':       { Icon: Wrench,        color: 'yellow'  },
-  'repair.ready_to_ship':     { Icon: Truck,         color: 'green'   },
-  'repair.completed':         { Icon: BadgeCheck,    color: 'green'   },
-  'repair.closed':            { Icon: Archive,       color: 'neutral' },
-  'repair.cancelled':         { Icon: Ban,           color: 'red'     },
-  'repair.note_added':        { Icon: MessageSquare, color: 'blue'    },
-  'repair.media_uploaded':    { Icon: Camera,        color: 'blue'    },
+  'repair.submitted':         { color: 'blue'    },
+  'repair.reviewed':          { color: 'blue'    },
+  'repair.awaiting_customer': { color: 'yellow'  },
+  'repair.approved':          { color: 'green'   },
+  'repair.quoted':            { color: 'yellow'  },
+  'repair.quote_accepted':    { color: 'green'   },
+  'repair.quote_declined':    { color: 'red'     },
+  'repair.parts_allocated':   { color: 'blue'    },
+  'repair.in_progress':       { color: 'yellow'  },
+  'repair.ready_to_ship':     { color: 'green'   },
+  'repair.completed':         { color: 'green'   },
+  'repair.closed':            { color: 'neutral' },
+  'repair.cancelled':         { color: 'red'     },
+  'repair.note_added':        { color: 'blue'    },
+  'repair.media_uploaded':    { color: 'blue'    },
 };
 
 const COLOR_CLASSES = {
@@ -45,10 +40,10 @@ const COLOR_CLASSES = {
 
 function getEventMeta( type ) {
   if ( EVENT_META[ type ] ) return EVENT_META[ type ];
-  if ( type?.includes( 'cancel' ) )                              return { Icon: Ban,        color: 'red'     };
-  if ( type?.includes( 'complete' ) || type?.includes( 'ship' ) ) return { Icon: BadgeCheck, color: 'green'   };
-  if ( type?.includes( 'progress' ) )                            return { Icon: Wrench,     color: 'yellow'  };
-  return { Icon: ClipboardList, color: 'neutral' };
+  if ( type?.includes( 'cancel' ) )                              return { color: 'red' };
+  if ( type?.includes( 'complete' ) || type?.includes( 'ship' ) ) return { color: 'green' };
+  if ( type?.includes( 'progress' ) )                            return { color: 'yellow' };
+  return { color: 'neutral' };
 }
 
 // ─── Timestamp formatter ──────────────────────────────────────────────────────
@@ -110,9 +105,8 @@ export default function RepairTimeline( { events = [] } ) {
         className="bg-white rounded-2xl border border-neutral-200 shadow-sm p-6"
       >
         <h3 className="text-sm font-semibold text-neutral-700 mb-3">Timeline</h3>
-        <div className="flex flex-col items-center justify-center py-8 text-neutral-300">
-          <ClipboardList size={ 32 } strokeWidth={ 1.5 } className="mb-2" />
-          <p className="text-sm">No events yet</p>
+        <div className="flex flex-col items-center justify-center py-8 text-neutral-400">
+          <p className="text-sm">No timeline events yet</p>
         </div>
       </motion.div>
     );
@@ -141,7 +135,7 @@ export default function RepairTimeline( { events = [] } ) {
           aria-label="Repair event timeline"
         >
           { sorted.map( ( event, idx ) => {
-            const { Icon, color } = getEventMeta( event.type );
+            const { color }       = getEventMeta( event.type );
             const colors          = COLOR_CLASSES[ color ] || COLOR_CLASSES.neutral;
             const isLast          = idx === sorted.length - 1;
             const isFirst         = idx === 0;
@@ -170,7 +164,7 @@ export default function RepairTimeline( { events = [] } ) {
                   transition={{ type: 'spring', stiffness: 300, damping: 20, delay: 0.1 + idx * 0.07 }}
                   className={ `w-8 h-8 rounded-full ${ colors.dot } flex items-center justify-center shrink-0 z-10 shadow-sm` }
                 >
-                  <Icon size={ 14 } strokeWidth={ 2 } className="text-white" />
+                  <span className="w-2 h-2 rounded-full bg-white/90" aria-hidden="true" />
                 </motion.div>
 
                 {/* Content */}
