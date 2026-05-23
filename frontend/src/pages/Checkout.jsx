@@ -229,7 +229,7 @@ function DesktopSummaryPanel( { cartItems, subtotal, shipping, total, couponInpu
   const firstImage = resolveCartItemImage( first );
   const qty = cartItems.reduce( ( sum, item ) => sum + Number( item.quantity || 0 ), 0 );
   return (
-    <aside className="fixed right-0 top-0 hidden h-screen w-[390px] overflow-y-auto border-l border-slate-200 bg-slate-50 px-7 py-10 lg:block">
+    <aside className="fixed right-0 top-0 hidden h-screen w-96 overflow-y-auto border-l border-slate-200 bg-slate-50 px-7 py-10 lg:block">
       <div className="max-w-sm pb-16">
         { first && (
           <div className="mb-5 flex items-start gap-3">
@@ -787,10 +787,10 @@ export default function Checkout() {
 
   // ── Checkout form ─────────────────────────────────────────────────────────
   return (
-    <div className="dtb-checkout min-h-screen bg-gradient-to-b from-slate-50 via-white to-slate-100/70 pb-28 md:bg-white md:pb-14 page-wrapper">
+    <div className="dtb-checkout min-h-screen bg-linear-to-b from-slate-50 via-white to-slate-100/70 pb-28 md:bg-white md:pb-14 page-wrapper">
       <SEOHead noindex title="Checkout" />
-      <div className="mx-auto max-w-[1400px]">
-        <div className="px-3.5 py-5 sm:px-6 md:py-10 lg:pr-[405px] lg:pl-10">
+      <div className="mx-auto max-w-350">
+        <div className="px-3.5 py-5 sm:px-6 md:py-10 lg:pr-101.25 lg:pl-10">
 
         {/* Page heading */}
         <Motion.div
