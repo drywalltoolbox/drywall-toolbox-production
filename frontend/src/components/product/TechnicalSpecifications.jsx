@@ -141,13 +141,13 @@ export default function TechnicalSpecifications({
           <span role="columnheader">Specification</span>
           <span role="columnheader">Value</span>
         </div>
-        {visibleSpecs.map((spec) => {
+        {visibleSpecs.map((spec, index) => {
           const normalized = normalizeLabel(spec.label);
           const isMono = MONO_LABELS.has(normalized);
           const rowType = isIncludesLabel(spec.label) ? 'includes' : getRowType(spec.label);
 
           return (
-            <div key={spec.label} className={`ts-row ts-row--${rowType}`} role="row">
+            <div key={`${spec.label}-${index}`} className={`ts-row ts-row--${rowType}`} role="row">
               <span className="ts-row__label" role="rowheader">
                 {spec.label}
               </span>

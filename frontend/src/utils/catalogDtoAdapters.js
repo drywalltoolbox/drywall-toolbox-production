@@ -1,3 +1,10 @@
+import {
+  buildSpecificationsFromApiProduct,
+  buildSpecsMetaFromRows,
+  mergeSpecMeta,
+} from './csvSpecificationMapping.js';
+import { buildIncludesMetaFromContent } from './includesExtraction.js';
+
 function toNumber(value, fallback = 0) {
   const parsed = typeof value === 'number' ? value : parseFloat(String(value ?? ''));
   return Number.isFinite(parsed) ? parsed : fallback;
@@ -16,6 +23,43 @@ function toLegacyMetaData(metaData = []) {
       };
     })
     .filter(Boolean);
+}
+
+function hasStructuredIncludesMeta(metaData = []) {
+  return metaData.some(({ key }) => /^_includes_\d+_(name|sku)$/.test(String(key || '')));
+}
+
+function synthesizeSpecMetaData(productLike = {}, legacyMeta = [], brand = '') {
+  const baseMeta = Array.isArray(legacyMeta) ? legacyMeta : [];
+  const apiSpecRows = buildSpecificationsFromApiProduct(
+    {
+      sku: productLike?.sku || '',
+      type: productLike?.type || 'simple',
+      weight: productLike?.weight || '',
+      dimensions: productLike?.dimensions || {},
+      attributes: Array.isArray(productLike?.attributes) ? productLike.attributes : [],
+      meta_data: baseMeta,
+      description: productLike?.description || '',
+    },
+    { brand }
+  );
+  const apiSpecsMeta = buildSpecsMetaFromRows(apiSpecRows);
+  const inferredIncludes = buildIncludesMetaFromContent(productLike?.description || '', {
+    sku: productLike?.sku || '',
+  });
+  const mergedSpecMeta = mergeSpecMeta(
+    mergeSpecMeta(baseMeta, apiSpecsMeta),
+    inferredIncludes.specsMeta
+  );
+  const nonSpecMeta = baseMeta.filter(({ key }) => {
+    const normalizedKey = String(key || '');
+    return !/^_specs_\d+_(label|value)$/.test(normalizedKey)
+      && !/^_includes_\d+_(name|sku)$/.test(normalizedKey);
+  });
+  const includeMeta = hasStructuredIncludesMeta(baseMeta)
+    ? baseMeta.filter(({ key }) => /^_includes_\d+_(name|sku)$/.test(String(key || '')))
+    : inferredIncludes.includesMeta;
+  return [...nonSpecMeta, ...mergedSpecMeta, ...includeMeta];
 }
 
 function toLegacyVariationAttributeValues(attributes = []) {
@@ -266,6 +310,19 @@ export function toLegacyVariationDTO(variationDto = {}, parentDto = null) {
   const rawName = variationDto?.name || '';
   const displayName = composeVariationName(rawName, parentName, variationLabel);
 
+  const legacyMeta = toLegacyMetaData(variationDto?.metaData);
+  const mergedMeta = synthesizeSpecMetaData(
+    {
+      sku: variationDto?.sku || parentDto?.sku || '',
+      type: 'variation',
+      description: variationDto?.description || parentDto?.description || '',
+      attributes,
+      meta_data: legacyMeta,
+    },
+    legacyMeta,
+    parentDto?.brand?.label || ''
+  );
+
   return {
     id: variationDto?.id ?? 0,
     parent_id: variationDto?.parentId ?? variationDto?.parent_id ?? parentDto?.id ?? null,
@@ -287,7 +344,7 @@ export function toLegacyVariationDTO(variationDto = {}, parentDto = null) {
         : (Array.isArray(parentDto?.media?.images) ? parentDto.media.images : [])),
     attributes,
     variation: variationDto?.variation || {},
-    meta_data: toLegacyMetaData(variationDto?.metaData),
+    meta_data: mergedMeta,
     variation_attribute_values: toLegacyVariationAttributeValues(attributes),
   };
 }
@@ -300,6 +357,21 @@ export function toLegacyProductCardDTO(dto = {}, computed = null) {
   const media = dto?.media || {};
   const cardProduct = toCatalogProductCardDTO(dto);
   const variationAttributes = buildVariationAttributes(dto, computed);
+
+  const legacyMeta = toLegacyMetaData(dto?.metaData);
+  const mergedMeta = synthesizeSpecMetaData(
+    {
+      sku: dto?.sku || '',
+      type: dto?.type || 'simple',
+      description: dto?.description || dto?.description_full || '',
+      attributes: variationAttributes,
+      dimensions: dto?.dimensions || {},
+      weight: dto?.weight || '',
+      meta_data: legacyMeta,
+    },
+    legacyMeta,
+    dto?.brand?.label || ''
+  );
 
   return {
     id: dto?.id ?? 0,
@@ -328,7 +400,7 @@ export function toLegacyProductCardDTO(dto = {}, computed = null) {
     purchasable: inventory?.purchasable ?? true,
     image: media?.image || cardProduct.image || '',
     images: Array.isArray(media?.images) ? media.images : [],
-  meta_data: toLegacyMetaData(dto?.metaData),
+    meta_data: mergedMeta,
     attributes: variationAttributes,
     variation_attributes: variationAttributes,
     variation_attribute_values: toLegacyVariationAttributeValues(variationAttributes),

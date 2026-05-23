@@ -1,0 +1,138 @@
+@import url("https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Roboto+Mono:wght@500;600;700&display=swap");
+
+.dtb-checkout {
+  --checkout-font: "Manrope", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --checkout-mono: "Roboto Mono", "SF Mono", "Cascadia Code", ui-monospace, Menlo, Consolas, monospace;
+  --checkout-ink: #0b1220;
+  --checkout-muted: #5f6f86;
+
+  color: var(--checkout-ink);
+  font-family: var(--checkout-font);
+  font-synthesis-weight: none;
+  letter-spacing: 0;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.dtb-checkout *,
+.dtb-checkout *::before,
+.dtb-checkout *::after {
+  letter-spacing: 0 !important;
+}
+
+.dtb-checkout h1,
+.dtb-checkout h2,
+.dtb-checkout h3,
+.dtb-checkout p,
+.dtb-checkout label,
+.dtb-checkout button,
+.dtb-checkout input,
+.dtb-checkout textarea,
+.dtb-checkout a,
+.dtb-checkout span {
+  font-family: inherit;
+}
+
+.dtb-checkout h1 {
+  color: var(--checkout-ink);
+  font-size: clamp(2rem, 1.7rem + 0.9vw, 2.85rem);
+  font-weight: 800;
+  line-height: 1.02;
+}
+
+.dtb-checkout h2,
+.dtb-checkout h3 {
+  color: var(--checkout-ink);
+  font-weight: 750;
+  line-height: 1.12;
+}
+
+.dtb-checkout p {
+  line-height: 1.5;
+}
+
+.dtb-checkout label {
+  color: #52627a;
+  font-size: 0.76rem;
+  font-weight: 700;
+  line-height: 1.2;
+  text-transform: none;
+}
+
+.dtb-checkout input,
+.dtb-checkout textarea,
+.dtb-checkout select {
+  color: var(--checkout-ink);
+  font-size: 1rem !important;
+  font-weight: 500;
+  line-height: 1.35;
+}
+
+.dtb-checkout input::placeholder,
+.dtb-checkout textarea::placeholder {
+  color: #9aa7b8;
+  font-weight: 500;
+}
+
+.dtb-checkout button,
+.dtb-checkout a[href="#payment-section"] {
+  font-weight: 750;
+  line-height: 1;
+}
+
+.dtb-checkout .tabular-nums,
+.dtb-checkout code {
+  font-family: var(--checkout-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+.dtb-checkout .text-xs {
+  line-height: 1.35;
+}
+
+.dtb-checkout .text-sm {
+  line-height: 1.42;
+}
+
+.dtb-checkout .text-slate-500,
+.dtb-checkout .text-gray-500,
+.dtb-checkout .text-slate-600,
+.dtb-checkout .text-gray-600 {
+  color: var(--checkout-muted);
+}
+
+.dtb-checkout .bg-slate-950 h2,
+.dtb-checkout .bg-slate-950 p,
+.dtb-checkout .bg-slate-950 span {
+  color: inherit;
+}
+
+.dtb-checkout .bg-slate-950 h2 {
+  font-weight: 800;
+}
+
+.dtb-checkout .bg-slate-950 p {
+  color: #bfdbfe;
+  font-size: 0.69rem;
+  font-weight: 750;
+}
+
+.dtb-checkout .font-black {
+  font-weight: 800;
+}
+
+.dtb-checkout .font-bold {
+  font-weight: 750;
+}
+
+.dtb-checkout .font-semibold {
+  font-weight: 650;
+}
+
+@media (max-width: 640px) {
+  .dtb-checkout h1 {
+    font-size: 2rem;
+    line-height: 1.04;
+  }
+}

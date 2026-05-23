@@ -1,5 +1,5 @@
-import { useState, useEffect, useRef } from 'react';
-import { X, ChevronDown, Sliders, RefreshCw } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { X, ChevronDown, Sliders, RefreshCw, Check } from 'lucide-react';
 import '../../styles/filter-panel.css';
 
 export default function FilterPanel({
@@ -22,7 +22,6 @@ export default function FilterPanel({
     brands: true,
     price: true,
   });
-  const panelRef = useRef(null);
 
   // Close on escape key
   useEffect(() => {
@@ -37,21 +36,14 @@ export default function FilterPanel({
     }
   }, [isOpen, onClose]);
 
-  // Close on outside click
   useEffect(() => {
-    const handleClickOutside = (e) => {
-      if (panelRef.current && !panelRef.current.contains(e.target)) {
-        // Only close if clicking on the overlay
-        if (e.target.className.includes('filter-panel-overlay')) {
-          onClose();
-        }
-      }
+    if (!isOpen) return undefined;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = prev;
     };
-    if (isOpen) {
-      document.addEventListener('mousedown', handleClickOutside);
-      return () => document.removeEventListener('mousedown', handleClickOutside);
-    }
-  }, [isOpen, onClose]);
+  }, [isOpen]);
 
   const toggleSection = (section) => {
     setExpandedSections(prev => ({
@@ -68,17 +60,8 @@ export default function FilterPanel({
 
   return (
     <>
-      {/* Overlay - positioned below the fixed site header */}
-      {isOpen && (
-        <div
-          className="filter-panel-overlay fixed left-0 right-0 bottom-0 bg-black/30 z-40 backdrop-blur-sm"
-          style={{ top: 'var(--header-height)' }}
-          onClick={onClose}
-        />
-      )}
-
       {/* Desktop Sidebar - Always Visible */}
-      <aside className="hidden lg:block lg:w-72 shrink-0">
+      <aside className="hidden lg:block lg:w-80 shrink-0">
         <div className="lg:sticky lg:top-24 h-full">
           <FilterContent
             categories={categories}
@@ -101,14 +84,9 @@ export default function FilterPanel({
 
       {/* Mobile Sidebar - Slide In */}
       {isOpen && (
-        <div
-          ref={panelRef}
-          className="fixed inset-0 z-50 pointer-events-none lg:hidden"
-          style={{ top: 'var(--header-height)' }}
-        >
-          {/* Tap outside to close indicator */}
+        <div className="fixed inset-0 z-50 lg:hidden" style={{ top: 'var(--header-height)' }}>
           <div 
-            className="pointer-events-auto absolute inset-0"
+            className="absolute inset-0 bg-black/35 backdrop-blur-[1px] filter-mobile-overlay-enter"
             onClick={(e) => {
               if (e.target === e.currentTarget) {
                 onClose();
@@ -116,24 +94,30 @@ export default function FilterPanel({
             }}
           />
           
-          <div className="pointer-events-auto">
-            <div className="fixed left-0 bottom-0 w-full max-w-sm bg-white shadow-2xl overflow-y-auto flex flex-col" style={{ top: 'var(--header-height)' }}>
-              <div className="sticky top-0 bg-white border-b border-gray-200 px-3 py-3 flex items-center justify-between shrink-0">
-                <h2 className="text-base font-bold text-gray-900 flex items-center gap-2">
+          <div className="absolute inset-x-0 top-0">
+            <div
+              className="w-full bg-white shadow-2xl overflow-hidden flex flex-col rounded-b-2xl filter-mobile-sheet-enter"
+              style={{
+                maxHeight: 'min(78dvh, calc(100dvh - var(--header-height) - 0.5rem))',
+                paddingBottom: 'env(safe-area-inset-bottom)',
+              }}
+            >
+              <div className="sticky top-0 bg-white border-b border-slate-200 px-4 py-4 flex items-center justify-between shrink-0">
+                <h2 className="text-base font-semibold text-slate-900 flex items-center gap-2">
                   <Sliders size={18} />
-                  Filters
+                  Advanced Filters
                 </h2>
                 <button
                   onClick={onClose}
-                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors touch-target"
+                  className="p-2 hover:bg-slate-100 rounded-xl transition-colors touch-target"
                   aria-label="Close filters"
                   title="Close filters (ESC)"
                 >
-                  <X size={22} className="text-gray-600" />
+                  <X size={22} className="text-slate-600" />
                 </button>
               </div>
 
-              <div className="flex-1 overflow-y-auto px-3 py-3">
+              <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain px-3 py-3">
                 <FilterContent
                   categories={categories}
                   brands={brands}
@@ -153,14 +137,21 @@ export default function FilterPanel({
                 />
               </div>
 
-              {/* Mobile Footer - Done Button */}
-              <div className="sticky bottom-0 bg-white border-t border-gray-200 px-3 py-3 shrink-0">
-                <button
-                  onClick={onClose}
-                  className="w-full bg-primary-600 hover:bg-primary-700 text-white font-semibold py-3 px-4 rounded-lg transition-colors touch-target"
-                >
-                  Done
-                </button>
+              <div className="sticky bottom-0 bg-white border-t border-slate-200 px-4 py-3 shrink-0">
+                <div className="flex gap-3">
+                  <button
+                    onClick={onClearFilters}
+                    className="flex-1 border border-slate-300 text-slate-700 font-medium py-2.5 px-4 rounded-xl hover:bg-slate-50 transition-colors"
+                  >
+                    Clear All
+                  </button>
+                  <button
+                    onClick={onClose}
+                    className="flex-1 bg-primary-600 hover:bg-primary-700 text-white font-semibold py-2.5 px-4 rounded-xl transition-colors"
+                  >
+                    Apply
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -187,19 +178,35 @@ function FilterContent({
   resultsCount,
   isMobile,
 }) {
-  return (
-    <div className={`bg-white rounded-xl shadow-md overflow-hidden ${isMobile ? 'shadow-none rounded-none -mx-3' : ''}`}>
-      {/* Results Count */}
-      {resultsCount !== undefined && (
-        <div className={`py-2.5 bg-linear-to-r from-blue-50 to-indigo-50 border-b border-blue-100 ${isMobile ? 'px-2 mx-3 rounded' : 'px-4'}`}>
-          <p className="text-xs font-medium text-gray-700">
-            <span className="text-primary-600 font-bold">{resultsCount}</span> products found
-          </p>
-        </div>
-      )}
+  const totalApplied =
+    selectedBrands.length +
+    selectedCategories.length +
+    (priceRange[0] !== 0 || priceRange[1] !== maxPrice ? 1 : 0);
 
-      {/* Filter Sections */}
-      <div className="divide-y divide-gray-200">
+  return (
+    <div
+      className={`overflow-hidden border border-slate-200 bg-gradient-to-b from-slate-50 to-white ${
+        isMobile ? 'rounded-2xl' : 'rounded-2xl shadow-sm'
+      }`}
+    >
+      <div className="border-b border-slate-200 px-4 py-4">
+        <div className="flex items-center gap-3">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary-600 text-white">
+            <Sliders size={18} />
+          </div>
+          <div>
+            <h3 className="text-sm font-semibold text-slate-900">Advanced Filters</h3>
+            <p className="text-xs text-slate-500">Refine your search</p>
+          </div>
+        </div>
+        {resultsCount !== undefined && (
+          <p className="mt-3 text-xs text-slate-600">
+            <span className="font-semibold text-primary-700">{resultsCount}</span> products found
+          </p>
+        )}
+      </div>
+
+      <div className="space-y-2 px-3 py-3">
         {/* Categories Section - only shown when categories are provided */}
         {categories && categories.length > 0 && (
         <FilterSection
@@ -213,29 +220,22 @@ function FilterContent({
             {categories.map(category => {
               const isSelected = selectedCategories.includes(category.id);
               return (
-                <label
+                <button
                   key={category.id}
-                  className={`flex items-center gap-3 cursor-pointer group p-2 rounded-lg transition-all ${
-                    isSelected ? 'bg-primary-50 border border-primary-200' : 'hover:bg-gray-50'
+                  type="button"
+                  onClick={() => onCategoryChange(category.id)}
+                  aria-pressed={isSelected}
+                  className={`w-full flex items-center justify-between gap-3 p-3 rounded-lg text-left border transition-all ${
+                    isSelected
+                      ? 'bg-primary-600 text-white border-primary-600 shadow-sm'
+                      : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
                   }`}
                 >
-                  <input
-                    type="checkbox"
-                    checked={isSelected}
-                    onChange={() => onCategoryChange(category.id)}
-                    className="w-4 h-4 text-primary-600 bg-white border-gray-300 rounded focus:ring-2 focus:ring-primary-500 transition-all cursor-pointer accent-primary-600 shrink-0"
-                  />
-                  <span className={`text-sm transition-colors ${
-                    isSelected ? 'text-primary-700 font-medium' : 'text-gray-700 group-hover:text-gray-900'
-                  }`}>
-                    {category.name}
-                  </span>
+                  <span className="text-sm font-medium">{category.name}</span>
                   {isSelected && (
-                    <span className="ml-auto inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-primary-100 text-primary-700">
-                      ✓
-                    </span>
+                    <Check size={16} />
                   )}
-                </label>
+                </button>
               );
             })}
           </div>
@@ -250,33 +250,26 @@ function FilterContent({
           itemCount={selectedBrands.length}
           isMobile={isMobile}
         >
-          <div className={`space-y-2 ${isMobile ? 'max-h-48' : 'max-h-56'} overflow-y-auto pr-2 custom-scrollbar`}>
+          <div className={`space-y-2 ${isMobile ? 'max-h-48' : 'max-h-56'} overflow-y-auto pr-1 custom-scrollbar`}>
             {brands.map(brand => {
               const isSelected = selectedBrands.includes(brand);
               return (
-                <label
+                <button
                   key={brand}
-                  className={`flex items-center gap-3 cursor-pointer group p-2 rounded-lg transition-all ${
-                    isSelected ? 'bg-primary-50 border border-primary-200' : 'hover:bg-gray-50'
+                  type="button"
+                  onClick={() => onBrandChange(brand)}
+                  aria-pressed={isSelected}
+                  className={`w-full flex items-center justify-between gap-3 p-3 rounded-lg text-left border transition-all ${
+                    isSelected
+                      ? 'bg-primary-600 text-white border-primary-600 shadow-sm'
+                      : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
                   }`}
                 >
-                  <input
-                    type="checkbox"
-                    checked={isSelected}
-                    onChange={() => onBrandChange(brand)}
-                    className="w-4 h-4 text-primary-600 bg-white border-gray-300 rounded focus:ring-2 focus:ring-primary-500 transition-all cursor-pointer accent-primary-600 shrink-0"
-                  />
-                  <span className={`text-sm transition-colors ${
-                    isSelected ? 'text-primary-700 font-medium' : 'text-gray-700 group-hover:text-gray-900'
-                  }`}>
-                    {brand}
-                  </span>
+                  <span className="text-sm font-medium">{brand}</span>
                   {isSelected && (
-                    <span className="ml-auto inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-primary-100 text-primary-700">
-                      ✓
-                    </span>
+                    <Check size={16} />
                   )}
-                </label>
+                </button>
               );
             })}
           </div>
@@ -290,7 +283,7 @@ function FilterContent({
           onToggle={() => toggleSection('price')}
           isMobile={isMobile}
         >
-          <div className="space-y-3 p-2">
+          <div className="space-y-3 p-1">
             {/* Price Display */}
             <div className="flex items-center justify-between bg-primary-50 px-3 py-2 rounded-lg border border-primary-200">
               <div className="flex items-baseline gap-1">
@@ -308,7 +301,7 @@ function FilterContent({
             <div className="space-y-3">
               {/* Min Price Input */}
               <div>
-                <label className="text-xs font-semibold text-gray-600 block mb-2">
+                <label className="text-xs font-semibold text-slate-600 block mb-2">
                   Min Price
                 </label>
                 <input
@@ -323,9 +316,9 @@ function FilterContent({
                       onPriceChange([newMin, priceRange[1]]);
                     }
                   }}
-                  className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider-thumb"
+                  className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer slider-thumb"
                 />
-                <div className="flex justify-between text-xs text-gray-500 mt-1">
+                <div className="flex justify-between text-xs text-slate-500 mt-1">
                   <span>$0</span>
                   <span>${maxPrice}</span>
                 </div>
@@ -333,7 +326,7 @@ function FilterContent({
 
               {/* Max Price Input */}
               <div>
-                <label className="text-xs font-semibold text-gray-600 block mb-2">
+                <label className="text-xs font-semibold text-slate-600 block mb-2">
                   Max Price
                 </label>
                 <input
@@ -348,7 +341,7 @@ function FilterContent({
                       onPriceChange([priceRange[0], newMax]);
                     }
                   }}
-                  className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider-thumb"
+                  className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer slider-thumb"
                 />
               </div>
             </div>
@@ -358,27 +351,31 @@ function FilterContent({
       </div>
 
       {/* Clear Filters Button */}
-      {hasActiveFilters && (
-        <div className={`border-t border-gray-200 bg-gray-50 ${isMobile ? 'px-2 py-2 m-3 rounded' : 'px-4 py-4'}`}>
-          <button
-            onClick={onClearFilters}
-            className="w-full flex items-center justify-center gap-2 px-3 py-2.5 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 text-gray-900 font-medium text-sm transition-colors"
-          >
-            <RefreshCw size={16} />
-            Clear All Filters
-          </button>
+      {hasActiveFilters && !isMobile && (
+        <div className="border-t border-slate-200 px-4 py-4">
+          <div className="flex gap-3">
+            <button
+              onClick={onClearFilters}
+              className="flex-1 flex items-center justify-center gap-2 px-3 py-2.5 border border-slate-300 rounded-xl hover:bg-slate-50 text-slate-700 font-medium text-sm transition-colors"
+            >
+              <RefreshCw size={16} />
+              Clear All
+            </button>
+            <button
+              className="flex-1 px-3 py-2.5 bg-primary-600 rounded-xl hover:bg-primary-700 text-white font-semibold text-sm transition-colors"
+            >
+              Apply
+            </button>
+          </div>
         </div>
       )}
 
-      {/* Footer Stats */}
-      <div className={`border-t border-gray-200 text-xs text-gray-600 ${isMobile ? 'px-2 py-2 m-3 rounded bg-gray-50' : 'px-4 py-3 bg-gray-50'}`}>
-        <div className="flex items-center justify-between">
-          <span>{hasActiveFilters ? 'Filters Active' : 'No filters'}</span>
-          {hasActiveFilters && (
-            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-primary-100 text-primary-800">
-              {(selectedBrands.length + selectedCategories.length + (priceRange[0] !== 0 || priceRange[1] !== maxPrice ? 1 : 0))}
-            </span>
-          )}
+      <div className="border-t border-slate-200 px-4 py-3 bg-slate-50">
+        <div className="flex items-center justify-between text-xs text-slate-600">
+          <span>{hasActiveFilters ? 'Filters active' : 'No filters'}</span>
+          <span className="inline-flex items-center rounded-full bg-primary-100 px-2 py-0.5 font-semibold text-primary-800">
+            {totalApplied}
+          </span>
         </div>
       </div>
     </div>
@@ -394,31 +391,31 @@ function FilterSection({
   isMobile,
 }) {
   return (
-    <div>
+    <div className="overflow-hidden rounded-xl border border-slate-200 bg-white">
       <button
         onClick={onToggle}
-        className={`w-full flex items-center justify-between gap-2 hover:bg-gray-50 transition-colors ${
-          isMobile ? 'px-2 py-3' : 'px-4 py-3.5'
+        className={`w-full flex items-center justify-between gap-2 transition-colors hover:bg-slate-50 ${
+          isMobile ? 'px-3 py-3' : 'px-4 py-3.5'
         }`}
       >
         <span className="flex items-center gap-2">
-          <span className="font-semibold text-gray-900 text-sm">{title}</span>
+          <span className="text-sm font-semibold text-slate-900">{title}</span>
           {itemCount > 0 && (
-            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-primary-100 text-primary-700">
+            <span className="inline-flex items-center rounded-full bg-primary-100 px-2 py-0.5 text-xs font-semibold text-primary-700">
               {itemCount}
             </span>
           )}
         </span>
         <ChevronDown
           size={18}
-          className={`text-gray-600 transition-transform duration-200 shrink-0 ${
+          className={`text-slate-500 transition-transform duration-200 shrink-0 ${
             isExpanded ? 'rotate-180' : ''
           }`}
         />
       </button>
 
       {isExpanded && (
-        <div className={`space-y-1 bg-gray-50 ${isMobile ? 'px-2 pb-2' : 'px-4 pb-3.5'}`}>
+        <div className={`${isMobile ? 'px-3 pb-3' : 'px-4 pb-4'} border-t border-slate-100 bg-slate-50/60`}>
           {children}
         </div>
       )}

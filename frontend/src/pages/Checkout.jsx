@@ -18,6 +18,10 @@ import {
   AlertTriangle,
   ShoppingCart,
   User,
+  CreditCard,
+  PackageCheck,
+  ClipboardCheck,
+  ShoppingBag,
 } from 'lucide-react';
 import DOMPurify from 'dompurify';
 
@@ -65,6 +69,29 @@ function resolvePreferredPaymentMethod( methods = [] ) {
   if ( ! Array.isArray( methods ) || methods.length === 0 ) return '';
   const online = methods.find( ( method ) => ! isManualPaymentMethod( method ) );
   return ( online?.id || methods[0]?.id || '' );
+}
+
+function paymentTabForMethod( methodId = '' ) {
+  const m = String( methodId ).toLowerCase();
+  if ( m.includes( 'paypal' ) ) return 'paypal';
+  if ( m.includes( 'stripe' ) || m.includes( 'square' ) || m.includes( 'card' ) || m.includes( 'credit' ) ) return 'card';
+  return 'other';
+}
+
+function resolveCartItemImage( item ) {
+  if ( !item || typeof item !== 'object' ) return '';
+  return (
+    item.image
+    || item.image_src
+    || item.thumbnail
+    || item.image_url
+    || item.product?.image
+    || item.product?.image_src
+    || item.product?.thumbnail
+    || item.images?.[0]?.src
+    || item.images?.[0]
+    || ''
+  );
 }
 
 // ─── StepCard ─────────────────────────────────────────────────────────────────
@@ -131,11 +158,27 @@ function OrderSummaryPanel( { cartItems, subtotal, shipping, tax, total, loading
                   initial={ { opacity: 0 } }
                   animate={ { opacity: 1 } }
                   exit={ { opacity: 0 } }
-                  className="flex justify-between gap-4 text-sm"
+                  className="flex items-start justify-between gap-3 text-sm"
                 >
-                  <div className="grow mr-3 min-w-0">
-                    <p className="font-semibold text-slate-950 truncate leading-snug">{ item.name }</p>
-                    <p className="text-slate-400 text-xs mt-0.5">Qty { item.quantity }</p>
+                  <div className="flex min-w-0 grow items-start gap-2.5">
+                    <div className="h-11 w-11 shrink-0 overflow-hidden rounded-lg border border-slate-200 bg-white">
+                      { resolveCartItemImage( item ) ? (
+                        <img
+                          src={ resolveCartItemImage( item ) }
+                          alt={ item.name || 'Product image' }
+                          className="h-full w-full object-cover"
+                          loading="lazy"
+                        />
+                      ) : (
+                        <div className="flex h-full w-full items-center justify-center text-slate-300">
+                          <ShoppingBag size={ 14 } />
+                        </div>
+                      ) }
+                    </div>
+                    <div className="min-w-0">
+                      <p className="truncate font-semibold leading-snug text-slate-950">{ item.name }</p>
+                      <p className="mt-0.5 text-xs text-slate-400">Qty { item.quantity }</p>
+                    </div>
                   </div>
                   <p className="font-bold text-slate-950 shrink-0 tabular-nums">
                     ${ ( toMoney( item.price ) * toMoney( item.quantity ) ).toFixed( 2 ) }
@@ -178,6 +221,73 @@ function OrderSummaryPanel( { cartItems, subtotal, shipping, tax, total, loading
         ) }
       </div>
     </StepCard>
+  );
+}
+
+function DesktopSummaryPanel( { cartItems, subtotal, shipping, total, couponInput, setCouponInput, addManualCoupon } ) {
+  const first = cartItems[0];
+  const firstImage = resolveCartItemImage( first );
+  const qty = cartItems.reduce( ( sum, item ) => sum + Number( item.quantity || 0 ), 0 );
+  return (
+    <aside className="fixed right-0 top-0 hidden h-screen w-[390px] overflow-y-auto border-l border-slate-200 bg-slate-50 px-7 py-10 lg:block">
+      <div className="max-w-sm pb-16">
+        { first && (
+          <div className="mb-5 flex items-start gap-3">
+            <div className="relative h-16 w-16 rounded-xl border border-slate-200 bg-white p-1">
+              { firstImage ? (
+                <img src={ firstImage } alt={ first.name } className="h-full w-full object-contain" />
+              ) : (
+                <div className="flex h-full w-full items-center justify-center text-slate-300">
+                  <ShoppingBag size={ 18 } />
+                </div>
+              ) }
+              <span className="absolute -right-2 -top-2 rounded-full bg-black px-1.5 py-0.5 text-[10px] font-bold text-white">
+                { qty }
+              </span>
+            </div>
+            <div className="flex-1">
+              <p className="text-sm font-semibold text-slate-900">{ first.name }</p>
+              <p className="text-xs text-slate-500">{ cartItems.length } line item{ cartItems.length !== 1 ? 's' : '' }</p>
+            </div>
+            <p className="text-sm font-semibold text-slate-900">${ subtotal.toFixed( 2 ) }</p>
+          </div>
+        ) }
+
+        <div className="mb-6 rounded-xl border border-slate-200 bg-white p-4">
+          <p className="text-sm text-slate-600">Discount code or gift card</p>
+          <div className="mt-2 flex gap-2">
+            <input
+              value={ couponInput }
+              onChange={ ( e ) => setCouponInput( e.target.value.toUpperCase() ) }
+              className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
+              placeholder="Enter code"
+            />
+            <button
+              type="button"
+              onClick={ addManualCoupon }
+              className="rounded-lg bg-slate-200 px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-300"
+            >
+              Apply
+            </button>
+          </div>
+        </div>
+
+        <div className="space-y-2 text-sm">
+          <div className="flex items-center justify-between text-slate-700">
+            <span>Subtotal</span>
+            <span>${ subtotal.toFixed( 2 ) }</span>
+          </div>
+          <div className="flex items-center justify-between text-slate-700">
+            <span>Shipping</span>
+            <span>{ shipping === 0 ? 'Free' : `$${ shipping.toFixed( 2 ) }` }</span>
+          </div>
+          <div className="mt-3 flex items-center justify-between border-t border-slate-200 pt-3">
+            <span className="text-xl font-semibold text-slate-900">Total</span>
+            <span className="text-3xl font-bold text-slate-900">${ total.toFixed( 2 ) }</span>
+          </div>
+        </div>
+      </div>
+    </aside>
   );
 }
 
@@ -224,6 +334,9 @@ export default function Checkout() {
   const [paymentGateway, setPaymentGateway] = useState( 'woo_native' );
   const [paymentMethod, setPaymentMethod] = useState( '' );
   const [paymentMethods, setPaymentMethods] = useState( [] );
+  const [paymentTab, setPaymentTab] = useState( 'card' );
+  const [couponInput, setCouponInput] = useState( '' );
+  const [manualCoupons, setManualCoupons] = useState( [] );
 
   // ── Points redemption ─────────────────────────────────────────────────────
   const [pointsBalance,   setPointsBalance  ] = useState( null );   // raw balance from API
@@ -267,6 +380,7 @@ export default function Checkout() {
         const preferredMethod = resolvePreferredPaymentMethod( methods );
         if ( preferredMethod ) {
           setPaymentMethod( preferredMethod );
+          setPaymentTab( paymentTabForMethod( preferredMethod ) );
         }
       } )
       .catch( () => {} );
@@ -277,6 +391,18 @@ export default function Checkout() {
     () => paymentMethods.find( ( method ) => method.id === paymentMethod ) || null,
     [ paymentMethod, paymentMethods ],
   );
+  const filteredPaymentMethods = useMemo(
+    () => paymentMethods.filter( ( method ) => paymentTabForMethod( method.id ) === paymentTab ),
+    [ paymentMethods, paymentTab ],
+  );
+
+  useEffect( () => {
+    if ( filteredPaymentMethods.length === 0 ) return;
+    const existsInTab = filteredPaymentMethods.some( ( method ) => method.id === paymentMethod );
+    if ( !existsInTab ) {
+      setPaymentMethod( filteredPaymentMethods[0].id );
+    }
+  }, [ filteredPaymentMethods, paymentMethod ] );
 
   const manualPaymentSelected = useMemo(
     () => isManualPaymentMethod( selectedPaymentMethod || paymentMethod ),
@@ -308,6 +434,17 @@ export default function Checkout() {
   function handleRemovePoints() {
     setAppliedCoupon( null );
     setPointsError( '' );
+  }
+
+  function addManualCoupon() {
+    const normalized = couponInput.trim().toUpperCase();
+    if ( !normalized ) return;
+    setManualCoupons( ( prev ) => ( prev.includes( normalized ) ? prev : [ ...prev, normalized ] ) );
+    setCouponInput( '' );
+  }
+
+  function removeManualCoupon( code ) {
+    setManualCoupons( ( prev ) => prev.filter( ( c ) => c !== code ) );
   }
 
   // ── Shipping rates ─────────────────────────────────────────────────────────
@@ -490,7 +627,7 @@ export default function Checkout() {
         formData.customerNote,
         wcRateId,
         selectedRate ? selectedRate.price : '',
-        appliedCoupon ? [ appliedCoupon.code ] : [],
+        [ ...( appliedCoupon ? [ appliedCoupon.code ] : [] ), ...manualCoupons ],
       );
 
       setStep( 'placing' );
@@ -503,7 +640,7 @@ export default function Checkout() {
       setProcessing( false );
       setStep( 'form' );
     }
-  }, [ appliedCoupon, clearCart, formData, manualPaymentSelected, paymentMethod, safeCartItems, selectedRate, validateForm ] );
+  }, [ appliedCoupon, clearCart, formData, manualCoupons, manualPaymentSelected, paymentMethod, safeCartItems, selectedRate, validateForm ] );
 
   useEffect(() => {
     if (processing) {
@@ -534,7 +671,7 @@ export default function Checkout() {
         initial={ { opacity: 0, y: 20 } }
         animate={ { opacity: 1, y: 0 } }
         transition={ { duration: 0.4 } }
-        className="min-h-screen bg-gray-50/60 flex items-center justify-center py-16"
+        className="dtb-checkout min-h-screen bg-gray-50/60 flex items-center justify-center py-16"
       >
         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-12 text-center max-w-lg mx-4">
           <ShoppingCart className="h-20 w-20 mx-auto mb-6 text-gray-200" strokeWidth={ 1.5 } />
@@ -563,7 +700,7 @@ export default function Checkout() {
         initial={ { opacity: 0, scale: 0.97 } }
         animate={ { opacity: 1, scale: 1 } }
         transition={ { duration: 0.45 } }
-        className="min-h-screen bg-gray-50/60 flex items-center justify-center py-16"
+        className="dtb-checkout min-h-screen bg-gray-50/60 flex items-center justify-center py-16"
       >
         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-10
                         text-center max-w-lg mx-4 w-full">
@@ -650,35 +787,30 @@ export default function Checkout() {
 
   // ── Checkout form ─────────────────────────────────────────────────────────
   return (
-    <div className="relative min-h-screen overflow-hidden bg-slate-100 pb-28 md:pb-14 page-wrapper">
+    <div className="dtb-checkout min-h-screen bg-gradient-to-b from-slate-50 via-white to-slate-100/70 pb-28 md:bg-white md:pb-14 page-wrapper">
       <SEOHead noindex title="Checkout" />
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-96 bg-slate-950" />
-      <div
-        className="pointer-events-none absolute inset-x-0 top-0 h-96 opacity-90"
-        style={ {
-          background:
-            'radial-gradient(circle at 18% 15%, rgba(59,130,246,0.42), transparent 28%), radial-gradient(circle at 72% 10%, rgba(20,184,166,0.24), transparent 24%), linear-gradient(135deg, #020617 0%, #0f2658 48%, #020617 100%)',
-        } }
-      />
-      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 py-8 md:py-12">
+      <div className="mx-auto max-w-[1400px]">
+        <div className="px-3.5 py-5 sm:px-6 md:py-10 lg:pr-[405px] lg:pl-10">
 
         {/* Page heading */}
         <Motion.div
           initial={ { opacity: 0, y: -12 } }
           animate={ { opacity: 1, y: 0 } }
           transition={ { duration: 0.4 } }
-          className="mb-6 md:mb-8 text-white"
+          className="mb-4 text-slate-900 md:mb-7 md:text-left text-center"
         >
-          <p className="mb-2 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-1 text-xs font-bold uppercase tracking-[0.18em] text-sky-100">
+          <p className="mb-2 inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-3 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-slate-600 shadow-sm md:text-xs">
             <Lock size={ 13 } />
             Secure checkout
           </p>
-          <h1 className="text-2xl md:text-3xl font-black tracking-tight">
+          <h1 className="text-[2rem] leading-[1.05] md:text-3xl font-black tracking-tight">
             Complete your order
           </h1>
+          <p className="mt-1.5 text-sm text-slate-500 md:hidden">
+            Complete your order in seconds
+          </p>
         </Motion.div>
-
-        <div className="lg:hidden mb-5">
+        <div className="lg:hidden mb-4">
           <OrderSummaryPanel
             cartItems={ safeCartItems }
             subtotal={ subtotal }
@@ -689,18 +821,21 @@ export default function Checkout() {
           />
         </div>
 
-        <div className="grid lg:grid-cols-[minmax(0,1fr)_410px] gap-6 xl:gap-8">
+        <div className="grid gap-6">
 
           {/* ── Left column: form steps ─────────────────────────────────── */}
           <div className="space-y-5">
 
             {/* Contact Information */}
-            <StepCard delay={ 0 } className="p-6">
-              <h2 className="flex items-center gap-2 text-base font-bold text-gray-900 mb-5">
-                <User size={ 17 } className="text-primary-500" />
-                Contact Information
-              </h2>
-              <div className="grid sm:grid-cols-2 gap-4">
+            <StepCard delay={ 0 } className="p-4 md:p-6">
+              <div className="mb-4 flex items-center justify-between">
+                <h2 className="flex items-center gap-2 text-base font-bold text-gray-900">
+                  <User size={ 17 } className="text-primary-500" />
+                  Contact
+                </h2>
+                <Link to="/login" className="text-sm font-semibold text-slate-700 underline">Sign in</Link>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 md:gap-4">
                 { [
                   { name: 'firstName', label: 'First Name',    type: 'text',  autoComplete: 'given-name'  },
                   { name: 'lastName',  label: 'Last Name',     type: 'text',  autoComplete: 'family-name' },
@@ -734,8 +869,8 @@ export default function Checkout() {
             </StepCard>
 
             {/* Shipping Address */}
-            <StepCard delay={ 0.05 } className="p-6">
-              <h2 className="flex items-center gap-2 text-base font-bold text-gray-900 mb-5">
+            <StepCard delay={ 0.05 } className="p-4 md:p-6">
+              <h2 className="flex items-center gap-2 text-base font-bold text-gray-900 mb-4 lg:mb-4 lg:text-[31px] lg:font-semibold lg:tracking-[-0.01em]">
                 <Truck size={ 17 } className="text-primary-500" />
                 Shipping Address
               </h2>
@@ -759,7 +894,7 @@ export default function Checkout() {
                   ) }
                 </div>
 
-                <div className="grid sm:grid-cols-3 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                   { [
                     { name: 'city',  label: 'City',     autoComplete: 'address-level2' },
                     { name: 'state', label: 'State',    autoComplete: 'address-level1' },
@@ -797,8 +932,8 @@ export default function Checkout() {
             </StepCard>
 
             {/* Shipping Method */}
-            <StepCard delay={ 0.1 } className="p-6">
-              <h2 className="flex items-center gap-2 text-base font-bold text-gray-900 mb-5">
+            <StepCard delay={ 0.1 } className="p-4 md:p-6">
+              <h2 className="flex items-center gap-2 text-base font-bold text-gray-900 mb-4 lg:mb-4 lg:text-[31px] lg:font-semibold lg:tracking-[-0.01em]">
                 <Truck size={ 17 } className="text-primary-500" />
                 Shipping Method
               </h2>
@@ -935,11 +1070,72 @@ export default function Checkout() {
               />
             </StepCard>
 
+            <StepCard delay={ 0.19 } className="p-5">
+              <label htmlFor="coupon-code" className={ labelClass }>Coupon Code</label>
+              <div className="flex gap-2">
+                <input
+                  id="coupon-code"
+                  type="text"
+                  value={ couponInput }
+                  onChange={ ( e ) => setCouponInput( e.target.value.toUpperCase() ) }
+                  placeholder="ENTER CODE"
+                  className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/30 focus:border-primary-500"
+                />
+                <button
+                  type="button"
+                  onClick={ addManualCoupon }
+                  className="px-4 py-3 rounded-xl bg-teal-700 hover:bg-teal-800 text-white text-sm font-semibold"
+                >
+                  Apply
+                </button>
+              </div>
+              { manualCoupons.length > 0 && (
+                <div className="mt-3 flex flex-wrap gap-2">
+                  { manualCoupons.map( ( code ) => (
+                    <button
+                      key={ code }
+                      type="button"
+                      onClick={ () => removeManualCoupon( code ) }
+                      className="rounded-full border border-teal-200 bg-teal-50 px-3 py-1 text-xs font-semibold text-teal-700"
+                    >
+                      { code } ×
+                    </button>
+                  ) ) }
+                </div>
+              ) }
+            </StepCard>
+
             {/* ── Payment section (WooCommerce-native) ───────────────────── */}
-            <StepCard delay={ 0.2 } className="p-6" id="payment-section">
-              <p className="mb-4 text-xs font-bold uppercase tracking-[0.18em] text-slate-400">
-                Payment
-              </p>
+            <StepCard delay={ 0.2 } className="p-4 md:p-6" id="payment-section">
+              <div className="mb-3 flex items-center justify-between">
+                <p className="text-base font-bold text-gray-900 lg:text-[31px] lg:font-semibold lg:tracking-[-0.01em]">
+                  Payment
+                </p>
+                <div className="hidden lg:flex items-center gap-1">
+                  <span className="rounded border border-slate-200 bg-white px-2 py-1 text-[11px] font-bold text-[#1A1F71]">VISA</span>
+                  <span className="rounded border border-slate-200 bg-white px-2 py-1 text-[11px] font-bold text-[#EB001B]">MC</span>
+                  <span className="rounded border border-slate-200 bg-white px-2 py-1 text-[11px] font-bold text-[#006FCF]">AMEX</span>
+                </div>
+              </div>
+              <div className="mb-4 flex gap-2 overflow-x-auto border-b border-slate-200 pb-3">
+                { [
+                  { id: 'card', label: 'Credit Card' },
+                  { id: 'paypal', label: 'PayPal' },
+                  { id: 'other', label: 'Other' },
+                ].map( ( tab ) => (
+                  <button
+                    key={ tab.id }
+                    type="button"
+                    onClick={ () => setPaymentTab( tab.id ) }
+                    className={ `shrink-0 rounded-lg px-3 py-2 text-xs font-semibold transition-colors
+                                 ${ paymentTab === tab.id
+                                   ? 'bg-primary-100 text-primary-700'
+                                   : 'bg-slate-100 text-slate-600 hover:bg-slate-200' }` }
+                  >
+                    { tab.label }
+                  </button>
+                ) ) }
+              </div>
               <p className="text-sm text-slate-600 mb-4">
                 { `Choose how to pay. Checkout is powered by ${ paymentGateway } and will continue to a secure payment screen.` }
               </p>
@@ -952,7 +1148,7 @@ export default function Checkout() {
 
               { paymentMethods.length > 0 && (
                 <div className="mb-4 space-y-2.5" role="radiogroup" aria-label="Payment Method">
-                  { paymentMethods.map( ( method ) => {
+                  { filteredPaymentMethods.map( ( method ) => {
                     const isSelected = paymentMethod === method.id;
                     const isManual = isManualPaymentMethod( method );
                     return (
@@ -986,6 +1182,11 @@ export default function Checkout() {
                       </label>
                     );
                   } ) }
+                  { filteredPaymentMethods.length === 0 && (
+                    <div className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-xs text-slate-600">
+                      No methods available in this payment type.
+                    </div>
+                  ) }
                 </div>
               ) }
 
@@ -1032,38 +1233,35 @@ export default function Checkout() {
 
           {/* ── Right column: sticky order summary ─────────────────────── */}
           <div className="hidden lg:block">
-            <OrderSummaryPanel
+            <DesktopSummaryPanel
               cartItems={ safeCartItems }
               subtotal={ subtotal }
               shipping={ shipping }
-              tax={ tax }
               total={ total }
-              loading={ processing }
-              className="sticky top-24"
+              couponInput={ couponInput }
+              setCouponInput={ setCouponInput }
+              addManualCoupon={ addManualCoupon }
             />
           </div>
         </div>
+      </div>
       </div>
 
       {/* ── Mobile sticky summary bar ─────────────────────────────────────────
           Visible only on mobile (< md breakpoint), docked to the viewport
           bottom. Shows cart total and scrolls to the payment section.         */}
       <div
-        className="md:hidden fixed bottom-0 left-0 right-0 z-40
-                   bg-white/95 backdrop-blur-sm border-t border-gray-100 px-4 py-3 shadow-xl"
+        className="md:hidden fixed bottom-0 left-0 right-0 z-40 border-t border-slate-200/80 bg-white/96 px-3.5 pb-[calc(0.75rem+env(safe-area-inset-bottom))] pt-2.5 shadow-[0_-12px_30px_rgba(15,23,42,0.12)] backdrop-blur"
       >
-        <div className="flex justify-between items-center text-xs text-gray-500 mb-2.5 px-0.5">
+        <div className="mb-2.5 flex items-center justify-between rounded-lg bg-slate-50 px-3 py-2 text-xs text-slate-600">
           <span>{ safeCartItems.length } item{ safeCartItems.length !== 1 ? 's' : '' }</span>
-          <span className="font-bold text-gray-900 tabular-nums text-sm">
+          <span className="text-sm font-bold text-slate-900 tabular-nums">
             ${ total.toFixed( 2 ) }
           </span>
         </div>
         <a
           href="#payment-section"
-          className="w-full inline-flex items-center justify-center gap-2
-                     bg-primary-600 hover:bg-primary-700 text-white py-3.5 rounded-xl
-                     font-bold text-sm tracking-wide transition-all shadow-md
-                     active:scale-[0.99] min-h-12"
+          className="w-full inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-slate-900 py-3.5 text-sm font-bold tracking-wide text-white shadow-md transition-all active:scale-[0.99] hover:bg-slate-800"
         >
           <Lock size={ 16 } />
           { isFormComplete ? 'Review Payment Section' : 'Fill in required fields' }
