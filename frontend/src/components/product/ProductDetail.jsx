@@ -1,6 +1,4 @@
 import { useMemo, useState, useEffect } from 'react';
-import ReactMarkdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
 import { X } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import Reviews from './Reviews';
@@ -53,6 +51,121 @@ function decodeEscapedHtml(value) {
 
 function hasHtmlMarkup(value) {
   return typeof value === 'string' && /<\s*\/?\s*[a-z][^>]*>/i.test(value);
+}
+
+function htmlToPlainText(html) {
+  if (typeof html !== 'string') return '';
+  if (typeof document === 'undefined') {
+    return html.replace(/<[^>]*>/g, ' ');
+  }
+  const container = document.createElement('div');
+  container.innerHTML = DOMPurify.sanitize(html, { USE_PROFILES: { html: true } });
+  return container.textContent || container.innerText || '';
+}
+
+function normalizeDescriptionText(value = '') {
+  return String(value)
+    .replace(/\u00a0/g, ' ')
+    .replace(/[ \t\r\n]+/g, ' ')
+    .trim();
+}
+
+const DESCRIPTION_SECTION_HEADINGS = [
+  'Specifications',
+  'Increased Reach',
+  'Easy Connection',
+  'Independent Controls',
+  'Improve Your Work Quality',
+  'Explore More',
+  'Conclusion',
+  'Note',
+];
+
+function splitSentences(text) {
+  return normalizeDescriptionText(text)
+    .match(/[^.!?]+[.!?]+(?:\s|$)|[^.!?]+$/g)
+    ?.map((sentence) => sentence.trim())
+    .filter(Boolean) || [];
+}
+
+function splitDescriptionSections(text) {
+  let normalized = normalizeDescriptionText(text);
+  DESCRIPTION_SECTION_HEADINGS.forEach((heading) => {
+    const pattern = new RegExp(`\\s+(${heading})\\s*[-:–]\\s*`, 'gi');
+    normalized = normalized.replace(pattern, `\n\n$1\n`);
+  });
+
+  const chunks = normalized
+    .split(/\n{2,}/)
+    .map((chunk) => chunk.trim())
+    .filter(Boolean);
+
+  if (chunks.length > 1) return chunks;
+
+  const sentences = splitSentences(normalized);
+  if (sentences.length <= 3) return [normalized].filter(Boolean);
+
+  const groups = [sentences.slice(0, 2).join(' ')];
+  for (let i = 2; i < sentences.length; i += 2) {
+    groups.push(sentences.slice(i, i + 2).join(' '));
+  }
+  return groups.filter(Boolean);
+}
+
+function ProductDescriptionContent({ html, text }) {
+  const sourceText = normalizeDescriptionText(text || '');
+  const plainHtmlText = hasHtmlMarkup(html) ? normalizeDescriptionText(htmlToPlainText(html)) : '';
+  const shouldFormatPlainText = !hasHtmlMarkup(html) || (
+    plainHtmlText
+    && plainHtmlText.length > 260
+    && !/<\s*(ul|ol|li|table|h[1-6]|blockquote)\b/i.test(html)
+  );
+  const content = shouldFormatPlainText ? (plainHtmlText || sourceText) : '';
+  const sections = shouldFormatPlainText ? splitDescriptionSections(content) : [];
+
+  if (!shouldFormatPlainText && hasHtmlMarkup(html)) {
+    return (
+      <div className="dtb-pdp-description-content dtb-pdp-description-content--rich">
+        <div
+          className="dtb-pdp-description-card"
+          dangerouslySetInnerHTML={{
+            __html: DOMPurify.sanitize(html, { USE_PROFILES: { html: true } }),
+          }}
+        />
+      </div>
+    );
+  }
+
+  if (sections.length === 0) {
+    return (
+      <div className="dtb-pdp-description-content dtb-pdp-description-content--empty">
+        <p>No description available.</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="dtb-pdp-description-content dtb-pdp-description-content--formatted">
+      <p className="dtb-pdp-description-kicker">Product Overview</p>
+      {sections.map((section, index) => {
+        const heading = DESCRIPTION_SECTION_HEADINGS.find((candidate) => (
+          new RegExp(`^${candidate}\\b`, 'i').test(section)
+        ));
+        const body = heading
+          ? section.replace(new RegExp(`^${heading}\\b\\s*`, 'i'), '').trim()
+          : section;
+
+        return (
+          <section key={`${heading || 'section'}-${index}`} className="dtb-pdp-description-card">
+            {heading ? <h3>{heading}</h3> : null}
+            <p className={index === 0 && !heading ? 'dtb-pdp-description-lead' : ''}>
+              {body}
+            </p>
+          </section>
+        );
+      })}
+    </div>
+  );
 }
 
 function toFinitePrice(value) {
@@ -493,20 +606,11 @@ export default function ProductDetail({
   );
   const decodedDescription = decodeEscapedHtml(rawDescription);
   const descriptionContent = hasHtmlMarkup(decodedDescription)
-    ? (
-      <div
-        className="dtb-pdp-description-content"
-        dangerouslySetInnerHTML={{
-          __html: DOMPurify.sanitize(decodedDescription, { USE_PROFILES: { html: true } }),
-        }}
-      />
-      )
+    ? <ProductDescriptionContent html={decodedDescription} />
     : (
-      <div className="dtb-pdp-description-content">
-        <ReactMarkdown remarkPlugins={[remarkGfm]}>
-          {decodedDescription || 'No description available.'}
-        </ReactMarkdown>
-      </div>
+      <ProductDescriptionContent
+        text={decodedDescription || 'No description available.'}
+      />
       );
 
   const descriptionNode = descriptionContent;
