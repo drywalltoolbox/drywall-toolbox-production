@@ -15,7 +15,7 @@ import { findMatchingVariation, getVariationSelectionMap } from '../../utils/var
 import { setCachedVariations } from '../../utils/variationCache';
 import { apiClient } from '../../api/client.js';
 import { getBrandLogo } from '../../utils/brandAssets.js';
-import { toProductDetailDTO } from '../../utils/catalogDtoAdapters.js';
+import { toLegacyProductCardDTO, toProductDetailDTO } from '../../utils/catalogDtoAdapters.js';
 import { getSchematicIdForProduct, buildSchematicsUrl } from '../../data/schematicMappings';
 import DOMPurify from 'dompurify';
 
@@ -49,55 +49,6 @@ function resolvePrimaryImageSrc(item) {
     if (typeof firstImage.url === 'string' && firstImage.url) return firstImage.url;
   }
   return item.image || item.image_src || item.thumbnail || '';
-}
-
-function normalizeSpecLabel(label = '') {
-  return String(label).trim().toLowerCase();
-}
-
-function pickQuickFacts(specs = [], limit = 4) {
-  if (!Array.isArray(specs) || specs.length === 0) return [];
-
-  const excluded = new Set(['set includes', 'includes', 'model numbers', 'description']);
-  const priority = [
-    'brand',
-    'model',
-    'sku',
-    'mpn',
-    'part number',
-    'length',
-    'size',
-    'width',
-    'weight',
-    'material',
-  ];
-
-  const normalizedSpecs = specs
-    .filter((spec) => spec?.label && `${spec?.value || ''}`.trim() !== '')
-    .filter((spec) => !excluded.has(normalizeSpecLabel(spec.label)))
-    .map((spec) => {
-      const label = `${spec.label}`.trim();
-      const value = `${spec.value}`.trim();
-      const normalizedLabel = normalizeSpecLabel(label);
-      const rank = priority.findIndex((key) => normalizedLabel.includes(key));
-      return {
-        label,
-        value,
-        rank: rank >= 0 ? rank : 999,
-      };
-    });
-
-  const deduped = [];
-  const seen = new Set();
-  for (const spec of normalizedSpecs.sort((a, b) => a.rank - b.rank)) {
-    const key = normalizeSpecLabel(spec.label);
-    if (seen.has(key)) continue;
-    seen.add(key);
-    deduped.push(spec);
-    if (deduped.length >= limit) break;
-  }
-
-  return deduped;
 }
 
 function decodeEscapedHtml(value) {
@@ -418,6 +369,11 @@ export default function ProductDetail({
   const [isWishlisted, setIsWishlisted] = useState(false);
   const [activeTab, setActiveTab] = useState('description');
   const [addToCartError, setAddToCartError] = useState('');
+  const [fbtAccessoryProduct, setFbtAccessoryProduct] = useState(null);
+  const [fbtLoading, setFbtLoading] = useState(false);
+  const [fbtIncludePrimary, setFbtIncludePrimary] = useState(true);
+  const [fbtIncludeAccessory, setFbtIncludeAccessory] = useState(false);
+  const [fbtAdding, setFbtAdding] = useState(false);
 
   const seededVariations = buildSeedVariations(initialVariations, initialResolvedVariation);
   const initialVariationSelection = buildInitialVariationSelection({
@@ -604,6 +560,52 @@ export default function ProductDetail({
     };
   }, [product, onClose]);
 
+  useEffect(() => {
+    setFbtIncludePrimary(true);
+  }, [product?.id, selectedVariation?.id]);
+
+  useEffect(() => {
+    const lookupSku = String(selectedVariation?.sku || product?.sku || '')
+      .trim()
+      .toUpperCase();
+
+    if (!lookupSku) {
+      setFbtAccessoryProduct(null);
+      setFbtIncludeAccessory(false);
+      setFbtLoading(false);
+      return;
+    }
+
+    let mounted = true;
+    setFbtLoading(true);
+    setFbtAccessoryProduct(null);
+    setFbtIncludeAccessory(false);
+
+    apiClient(`/wp-json/dtb/v1/products/${encodeURIComponent(lookupSku)}/compatible-parts`)
+      .then((payload) => {
+        if (!mounted) return;
+        const parts = Array.isArray(payload?.products) ? payload.products : [];
+        const firstPart = parts.find((item) => Number.isFinite(Number(item?.id)));
+        if (!firstPart) return;
+        const normalized = toLegacyProductCardDTO(firstPart);
+        if (!normalized?.id) return;
+        setFbtAccessoryProduct(normalized);
+        setFbtIncludeAccessory(true);
+      })
+      .catch(() => {
+        if (!mounted) return;
+        setFbtAccessoryProduct(null);
+        setFbtIncludeAccessory(false);
+      })
+      .finally(() => {
+        if (mounted) setFbtLoading(false);
+      });
+
+    return () => {
+      mounted = false;
+    };
+  }, [product?.sku, selectedVariation?.sku]);
+
   if (!product) return null;
 
   const stripSpecsFromHtml = (html) => {
@@ -660,7 +662,6 @@ export default function ProductDetail({
   const pricePrefix = product.is_variable && !selectedVariation ? 'From $' : '$';
   const compareAt = getCompareAtPrice(selectedVariation) ?? getCompareAtPrice(product);
   const productSpecifications = getProductSpecifications(product);
-  const quickFacts = pickQuickFacts(productSpecifications, 4);
   const stockQuantityRaw = selectedVariation?.stock_quantity ?? effectiveProduct?.stock_quantity ?? product?.stock_quantity;
   const stockQuantity = Number.isFinite(Number(stockQuantityRaw)) ? Number(stockQuantityRaw) : null;
   const stockProgress = isOutOfStock
@@ -678,7 +679,42 @@ export default function ProductDetail({
           : `${stockQuantity} in stock`
       : 'In stock and ready to ship';
   const fbtPrimaryImage = resolvePrimaryImageSrc(effectiveProduct) || resolvePrimaryImageSrc(product);
-  const fbtAccessoryImage = getBrandLogo(brandLabel);
+  const fbtAccessoryImage = resolvePrimaryImageSrc(fbtAccessoryProduct);
+  const fbtPrimaryPrice = toFinitePrice(rawPrice) ?? 0;
+  const fbtAccessoryPrice = toFinitePrice(fbtAccessoryProduct?.price) ?? 0;
+  const fbtTotal = (fbtIncludePrimary ? (fbtPrimaryPrice * quantity) : 0) + (fbtIncludeAccessory ? fbtAccessoryPrice : 0);
+  const fbtCanAddAny = (fbtIncludePrimary && canAddToCart) || (fbtIncludeAccessory && Boolean(fbtAccessoryProduct?.id));
+
+  const handleAddSelectedBundle = async () => {
+    if (!fbtCanAddAny || fbtAdding) return;
+
+    if (fbtIncludePrimary && !canAddToCart) {
+      setAddToCartError('Select required options before adding this bundle.');
+      return;
+    }
+
+    const baseProduct = selectedVariation ? effectiveProduct : product;
+
+    try {
+      setAddToCartError('');
+      setFbtAdding(true);
+
+      if (fbtIncludePrimary) {
+        await addToCart(baseProduct, quantity);
+      }
+
+      if (fbtIncludeAccessory && fbtAccessoryProduct?.id) {
+        await addToCart(fbtAccessoryProduct, 1);
+      }
+    } catch (err) {
+      setAddToCartError(
+        err?.message ||
+        'Unable to add selected bundle items to cart. Please try again.'
+      );
+    } finally {
+      setFbtAdding(false);
+    }
+  };
 
   const rawDescription = stripSpecsFromHtml(
     effectiveProduct.description_full || effectiveProduct.description || effectiveProduct.short_description || ''
@@ -794,46 +830,74 @@ export default function ProductDetail({
                   </div>
                 </div>
 
-                {quickFacts.length > 0 ? (
-                  <div className="dtb-pdp-quick-facts">
-                    <p className="dtb-pdp-quick-facts__title">Quick Facts</p>
-                    <div className="dtb-pdp-quick-facts__grid">
-                      {quickFacts.map((spec) => (
-                        <div key={spec.label} className="dtb-pdp-quick-facts__item">
-                          <span className="dtb-pdp-quick-facts__key">{spec.label}</span>
-                          <span className="dtb-pdp-quick-facts__value">{spec.value}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                ) : null}
-
                 <div className="dtb-pdp-fbt">
                   <p className="dtb-pdp-fbt__title">Frequently Bought Together</p>
-                  <div className="dtb-pdp-fbt__media-row">
-                    <div className="dtb-pdp-fbt__media-card">
+                  <div className="dtb-pdp-fbt__media-row dtb-pdp-fbt__media-row--toggle">
+                    <button
+                      type="button"
+                      className={`dtb-pdp-fbt__media-card dtb-pdp-fbt__media-card--toggle ${fbtIncludePrimary ? 'is-selected' : ''}`}
+                      onClick={() => setFbtIncludePrimary((prev) => !prev)}
+                      aria-pressed={fbtIncludePrimary}
+                    >
+                      <span className="dtb-pdp-fbt__toggle-check" aria-hidden="true">{fbtIncludePrimary ? '✓' : ''}</span>
                       {fbtPrimaryImage ? (
                         <img src={fbtPrimaryImage} alt={effectiveProduct.name || product.name} className="dtb-pdp-fbt__media-image" loading="lazy" />
                       ) : (
                         <span className="dtb-pdp-fbt__media-fallback">{(effectiveProduct.name || product.name || 'P').slice(0, 1).toUpperCase()}</span>
                       )}
-                    </div>
+                    </button>
                     <span className="dtb-pdp-fbt__plus" aria-hidden="true">+</span>
-                    <div className="dtb-pdp-fbt__media-card">
-                      {fbtAccessoryImage ? (
-                        <img src={fbtAccessoryImage} alt={`${brandLabel || 'Compatible'} accessories`} className="dtb-pdp-fbt__media-image dtb-pdp-fbt__media-image--brand" loading="lazy" />
-                      ) : (
+                    {fbtAccessoryProduct ? (
+                      <button
+                        type="button"
+                        className={`dtb-pdp-fbt__media-card dtb-pdp-fbt__media-card--toggle ${fbtIncludeAccessory ? 'is-selected' : ''}`}
+                        onClick={() => setFbtIncludeAccessory((prev) => !prev)}
+                        aria-pressed={fbtIncludeAccessory}
+                      >
+                        <span className="dtb-pdp-fbt__toggle-check" aria-hidden="true">{fbtIncludeAccessory ? '✓' : ''}</span>
+                        {fbtAccessoryImage ? (
+                          <img
+                            src={fbtAccessoryImage}
+                            alt={fbtAccessoryProduct.name || 'Compatible part'}
+                            className="dtb-pdp-fbt__media-image"
+                            loading="lazy"
+                          />
+                        ) : (
+                          <span className="dtb-pdp-fbt__media-fallback">{(fbtAccessoryProduct.name || 'A').slice(0, 1).toUpperCase()}</span>
+                        )}
+                      </button>
+                    ) : (
+                      <Link to={partsUrl || '/parts'} className="dtb-pdp-fbt__media-card dtb-pdp-fbt__media-card--placeholder">
                         <span className="dtb-pdp-fbt__media-fallback">+</span>
-                      )}
-                    </div>
+                      </Link>
+                    )}
                   </div>
                   <div className="dtb-pdp-fbt__items">
-                    <span className="dtb-pdp-fbt__item">{effectiveProduct.name || product.name}</span>
-                    <span className="dtb-pdp-fbt__item">Compatible parts & accessories</span>
+                    <span className={`dtb-pdp-fbt__item ${fbtIncludePrimary ? 'is-selected' : ''}`}>
+                      {effectiveProduct.name || product.name} · ${money(fbtPrimaryPrice * quantity)}
+                    </span>
+                    <span className={`dtb-pdp-fbt__item ${fbtIncludeAccessory ? 'is-selected' : ''}`}>
+                      {fbtAccessoryProduct?.name || (fbtLoading ? 'Loading compatible item…' : 'Compatible parts & accessories')}
+                      {fbtAccessoryProduct?.price ? ` · $${money(fbtAccessoryPrice)}` : ''}
+                    </span>
                   </div>
-                  <Link to={partsUrl || '/parts'} className="dtb-pdp-fbt__cta">
-                    View compatible bundle options
-                  </Link>
+                  <p className="dtb-pdp-fbt__total">
+                    Total price: <strong>${money(fbtTotal)}</strong>
+                  </p>
+                  <button
+                    type="button"
+                    className="dtb-pdp-fbt__cta dtb-pdp-fbt__cta--bundle"
+                    onClick={handleAddSelectedBundle}
+                    disabled={!fbtCanAddAny || fbtAdding}
+                  >
+                    {fbtAdding ? 'Adding selected…' : 'Add selected to cart'}
+                  </button>
+                  <div className="dtb-pdp-fbt__helper-row">
+                    <span>Click image cards to toggle include/exclude.</span>
+                    <Link to={partsUrl || '/parts'} className="dtb-pdp-fbt__link">
+                      Browse all compatible parts
+                    </Link>
+                  </div>
                 </div>
               </div>
             </div>
