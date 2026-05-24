@@ -85,7 +85,7 @@
   flex-direction: column;
   gap: 0.18rem;
   padding: 9px 11px 11px;
-  position: relative; /* anchor for heart button */
+  position: relative;
 }
 
 /* Description snippet — list variant only */
@@ -99,30 +99,6 @@
   line-clamp: 1;
   -webkit-box-orient: vertical;
   overflow: hidden;
-}
-
-/* Heart / save button — list variant, floated top-right of meta */
-.dtb-product-card__heart-btn {
-  position: absolute;
-  top: 9px;
-  right: 10px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 28px;
-  height: 28px;
-  border: 0;
-  border-radius: var(--dtb-radius-sm, 6px);
-  background: none;
-  color: #94a3b8;
-  cursor: pointer;
-  padding: 0;
-  transition: color 150ms ease, background 150ms ease;
-}
-
-.dtb-product-card__heart-btn:hover {
-  color: #dc2626;
-  background: rgba(220, 38, 38, 0.08);
 }
 
 .dtb-product-card__brand {
@@ -389,7 +365,7 @@
   pointer-events: auto;
 }
 
-/* Three-button row: Heart · Quick View pill · Cart */
+/* Hover actions row */
 .dtb-product-card__qv-actions {
   display: flex;
   align-items: center;
@@ -404,7 +380,7 @@
   transform: scale(1) translateY(0);
 }
 
-/* Circle icon buttons (Heart, Cart) */
+/* Circle icon buttons */
 .dtb-product-card__qv-icon-btn {
   display: inline-flex;
   align-items: center;

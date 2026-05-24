@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ShoppingCart, Eye, Heart } from 'lucide-react';
+import { ShoppingCart, Eye } from 'lucide-react';
 import ProductCardImage from '../product/ProductCardImage';
 
 function useIsMobile() {
@@ -255,18 +255,6 @@ export default function StorefrontProductTile({
             }}
           >
             <div className={`dtb-product-card__qv-actions${overlayActive ? ' dtb-product-card__qv-actions--active' : ''}`}>
-              {!isMobile && (
-                <button
-                  type="button"
-                  tabIndex={overlayActive ? 0 : -1}
-                  className="dtb-product-card__qv-icon-btn"
-                  onClick={(e) => e.stopPropagation()}
-                  aria-label={`Save ${name} for later`}
-                >
-                  <Heart size={15} strokeWidth={2.2} />
-                </button>
-              )}
-
               <button
                 type="button"
                 tabIndex={overlayActive ? 0 : -1}
@@ -278,14 +266,12 @@ export default function StorefrontProductTile({
                 {!isMobile && <span>Quick View</span>}
               </button>
 
-              {!isVariable && (isMobile || !outOfStock) && (
+              {!isVariable && isMobile && (
                 <button
                   type="button"
                   disabled={outOfStock}
                   tabIndex={overlayActive ? 0 : -1}
-                  className={isMobile
-                    ? `dtb-product-card__qv-btn dtb-product-card__qv-btn--icon-only${outOfStock ? ' dtb-product-card__qv-btn--disabled' : ''}`
-                    : 'dtb-product-card__qv-icon-btn'}
+                  className={`dtb-product-card__qv-btn dtb-product-card__qv-btn--icon-only${outOfStock ? ' dtb-product-card__qv-btn--disabled' : ''}`}
                   onClick={outOfStock ? (e) => e.stopPropagation() : handleOverlayAddToCart}
                   aria-label={outOfStock ? `${name} is out of stock` : `Add ${name} to cart`}
                 >
@@ -298,17 +284,6 @@ export default function StorefrontProductTile({
       </div>
 
       <div className="dtb-product-card__meta">
-        {variant === 'list' && (
-          <button
-            type="button"
-            className="dtb-product-card__heart-btn"
-            onClick={(e) => e.stopPropagation()}
-            aria-label={`Save ${name} for later`}
-          >
-            <Heart size={14} strokeWidth={2} />
-          </button>
-        )}
-
         {displayProduct.brand ? (
           <span className="dtb-product-card__brand">{displayProduct.brand}</span>
         ) : null}
