@@ -102,10 +102,30 @@
 }
 
 /* Dark summary panel text overrides */
+.dtb-checkout .dtb-summary-panel {
+  color: #e5ecf8;
+}
+
+.dtb-checkout .dtb-summary-panel h1,
 .dtb-checkout .dtb-summary-panel h2,
+.dtb-checkout .dtb-summary-panel h3,
 .dtb-checkout .dtb-summary-panel p,
-.dtb-checkout .dtb-summary-panel span {
+.dtb-checkout .dtb-summary-panel span,
+.dtb-checkout .dtb-summary-panel label,
+.dtb-checkout .dtb-summary-panel a,
+.dtb-checkout .dtb-summary-panel button {
   color: inherit;
+}
+
+.dtb-checkout .dtb-summary-panel input,
+.dtb-checkout .dtb-summary-panel textarea,
+.dtb-checkout .dtb-summary-panel select {
+  color: #f8fafc;
+}
+
+.dtb-checkout .dtb-summary-panel input::placeholder,
+.dtb-checkout .dtb-summary-panel textarea::placeholder {
+  color: #94a3b8;
 }
 
 .dtb-checkout .font-black {

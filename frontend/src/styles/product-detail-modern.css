@@ -515,6 +515,200 @@
   gap: 0.8rem 1rem;
 }
 
+.dtb-pdp-side-stack {
+  display: grid;
+  gap: 0.7rem;
+  margin-top: 0.45rem;
+}
+
+.dtb-pdp-shipping-note {
+  margin: 0;
+  font-size: 0.9rem;
+  color: #475569;
+}
+
+.dtb-pdp-stock-meter {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.dtb-pdp-stock-meter__label {
+  margin: 0;
+  font-size: 0.94rem;
+  font-weight: 700;
+  color: #d97706;
+}
+
+.dtb-pdp-stock-meter.is-out .dtb-pdp-stock-meter__label {
+  color: #dc2626;
+}
+
+.dtb-pdp-stock-meter__track {
+  width: 100%;
+  height: 5px;
+  border-radius: 999px;
+  background: #e2e8f0;
+  overflow: hidden;
+}
+
+.dtb-pdp-stock-meter__fill {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #d97706, #f59e0b);
+  transition: width 220ms ease;
+}
+
+.dtb-pdp-stock-meter.is-out .dtb-pdp-stock-meter__fill {
+  background: linear-gradient(90deg, #ef4444, #b91c1c);
+}
+
+.dtb-pdp-quick-facts {
+  display: grid;
+  gap: 0.5rem;
+  padding: 0.72rem 0.85rem;
+  border: 1px solid rgba(226, 232, 240, 0.95);
+  border-radius: 12px;
+  background: #ffffff;
+}
+
+.dtb-pdp-quick-facts__title {
+  margin: 0;
+  font-size: 0.84rem;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.dtb-pdp-quick-facts__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.5rem;
+}
+
+.dtb-pdp-quick-facts__item {
+  display: grid;
+  gap: 0.16rem;
+  min-width: 0;
+  padding: 0.4rem 0.45rem;
+  border-radius: 8px;
+  background: #f8fafc;
+  border: 1px solid rgba(226, 232, 240, 0.9);
+}
+
+.dtb-pdp-quick-facts__key {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: #64748b;
+}
+
+.dtb-pdp-quick-facts__value {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #0f172a;
+  line-height: 1.25;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.dtb-pdp-fbt {
+  display: grid;
+  gap: 0.55rem;
+  padding: 0.8rem 0.85rem;
+  border: 1px solid rgba(226, 232, 240, 0.95);
+  border-radius: 12px;
+  background: #f8fafc;
+}
+
+.dtb-pdp-fbt__title {
+  margin: 0;
+  font-size: 0.84rem;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.dtb-pdp-fbt__media-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.dtb-pdp-fbt__media-card {
+  width: 58px;
+  height: 58px;
+  border-radius: 10px;
+  border: 1px solid rgba(203, 213, 225, 0.9);
+  background: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.dtb-pdp-fbt__media-image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.dtb-pdp-fbt__media-image--brand {
+  width: 82%;
+  height: 82%;
+}
+
+.dtb-pdp-fbt__media-fallback {
+  font-size: 1rem;
+  font-weight: 800;
+  color: #64748b;
+}
+
+.dtb-pdp-fbt__items {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.dtb-pdp-fbt__item {
+  display: inline-block;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  padding: 0.28rem 0.45rem;
+  border-radius: 8px;
+  background: #fff;
+  border: 1px solid rgba(203, 213, 225, 0.75);
+  font-size: 0.73rem;
+  font-weight: 600;
+  color: #334155;
+}
+
+.dtb-pdp-fbt__plus {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #64748b;
+}
+
+.dtb-pdp-fbt__cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: fit-content;
+  min-height: 34px;
+  padding: 0.35rem 0.7rem;
+  border-radius: 999px;
+  background: #0f172a;
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.dtb-pdp-fbt__cta:hover {
+  background: #1e293b;
+}
+
 .dtb-pdp-save-button {
   display: inline-flex;
   align-items: center;
@@ -981,6 +1175,47 @@
     align-items: center;
     gap: 0.5rem 0.7rem;
     row-gap: 0.5rem;
+  }
+
+  .dtb-pdp-side-stack {
+    display: grid;
+    gap: 0.75rem;
+    margin-top: 0.2rem;
+  }
+
+  .dtb-pdp-shipping-note {
+    font-size: 0.95rem;
+    color: #1f2937;
+  }
+
+  .dtb-pdp-stock-meter__label {
+    font-size: 0.97rem;
+  }
+
+  .dtb-pdp-quick-facts {
+    padding: 0.68rem 0.72rem;
+  }
+
+  .dtb-pdp-quick-facts__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .dtb-pdp-fbt {
+    gap: 0.65rem;
+    padding: 0.75rem;
+  }
+
+  .dtb-pdp-fbt__title {
+    font-size: 0.95rem;
+  }
+
+  .dtb-pdp-fbt__media-card {
+    width: 64px;
+    height: 64px;
+  }
+
+  .dtb-pdp-fbt__item {
+    font-size: 0.76rem;
   }
 
   .dtb-pdp-header__mobile-status-row {

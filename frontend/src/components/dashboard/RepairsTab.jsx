@@ -1,0 +1,157 @@
+/**
+ * frontend/src/components/dashboard/RepairsTab.jsx
+ *
+ * Dashboard Repairs tab — quick access + repair-service order history.
+ */
+
+import { useState, useEffect, useMemo } from 'react';
+import { Link } from 'react-router-dom';
+import { motion as Motion } from 'framer-motion';
+import { Wrench, Clock3, CheckCircle2, Loader, ArrowRight, Package } from 'lucide-react';
+import { getOrders } from '../../api/orders.js';
+
+const CARD = {
+  background:   'white',
+  border:       '1px solid rgba(15,23,42,0.08)',
+  borderRadius: '12px',
+  boxShadow:    '0 2px 12px rgba(15,23,42,0.05)',
+};
+
+const fadeUp = {
+  hidden:  { opacity: 0, y: 12 },
+  visible: ( d ) => ( {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.34, ease: [ 0.16, 1, 0.3, 1 ], delay: d ?? 0 },
+  } ),
+};
+
+function isRepairOrder( order ) {
+  const type = typeof order?.order_type === 'string' ? order.order_type.trim().toLowerCase() : '';
+  return type === 'repair_service';
+}
+
+function StatTile( { icon: Icon, label, value, color, bg, delay = 0 } ) {
+  return (
+    <Motion.div custom={ delay } variants={ fadeUp } initial="hidden" animate="visible"
+      style={ { ...CARD, padding: '16px 18px', display: 'flex', alignItems: 'center', gap: '12px' } }
+    >
+      <div style={ { width: '40px', height: '40px', borderRadius: '10px', background: bg, display: 'flex', alignItems: 'center', justifyContent: 'center' } }>
+        <Icon size={ 18 } style={ { color } } />
+      </div>
+      <div>
+        <p style={ { margin: 0, fontSize: '0.65rem', textTransform: 'uppercase', letterSpacing: '0.09em', color: 'rgba(15,23,42,0.42)', fontWeight: 700 } }>
+          { label }
+        </p>
+        <p style={ { margin: '2px 0 0', fontSize: '1.35rem', fontWeight: 800, color: '#0f172a', lineHeight: 1 } }>
+          { value }
+        </p>
+      </div>
+    </Motion.div>
+  );
+}
+
+export default function RepairsTab( { userId } ) {
+  const [ orders, setOrders ] = useState( [] );
+  const [ loading, setLoading ] = useState( true );
+  const [ error, setError ] = useState( null );
+
+  useEffect( () => {
+    if ( ! userId ) return;
+    let cancelled = false;
+
+    ( async () => {
+      setLoading( true );
+      setError( null );
+      try {
+        const data = await getOrders( 1, 50 );
+        const allOrders = Array.isArray( data ) ? data : ( data?.orders ?? [] );
+        if ( ! cancelled ) setOrders( allOrders.filter( isRepairOrder ) );
+      } catch ( err ) {
+        if ( ! cancelled ) setError( err?.message || 'Unable to load repairs.' );
+      } finally {
+        if ( ! cancelled ) setLoading( false );
+      }
+    } )();
+
+    return () => { cancelled = true; };
+  }, [ userId ] );
+
+  const activeCount = useMemo(
+    () => orders.filter( ( o ) => ! [ 'completed', 'cancelled', 'refunded', 'failed' ].includes( o.status ) ).length,
+    [ orders ],
+  );
+  const completedCount = useMemo(
+    () => orders.filter( ( o ) => o.status === 'completed' ).length,
+    [ orders ],
+  );
+
+  return (
+    <div style={ { display: 'flex', flexDirection: 'column', gap: '14px' } }>
+      <div style={ { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '12px' } }>
+        <StatTile icon={ Wrench } label="Repairs" value={ loading ? '…' : String( orders.length ) } color="#0ea5e9" bg="#ecfeff" delay={ 0 } />
+        <StatTile icon={ Clock3 } label="Active" value={ loading ? '…' : String( activeCount ) } color="#d97706" bg="#fffbeb" delay={ 0.04 } />
+        <StatTile icon={ CheckCircle2 } label="Completed" value={ loading ? '…' : String( completedCount ) } color="#16a34a" bg="#f0fdf4" delay={ 0.08 } />
+      </div>
+
+      <Motion.div custom={ 0.15 } variants={ fadeUp } initial="hidden" animate="visible" style={ { ...CARD, padding: '18px 20px' } }>
+        <div style={ { display: 'flex', flexWrap: 'wrap', gap: '10px', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' } }>
+          <div style={ { display: 'flex', alignItems: 'center', gap: '10px' } }>
+            <div style={ { width: '34px', height: '34px', borderRadius: '8px', background: '#ecfeff', display: 'flex', alignItems: 'center', justifyContent: 'center' } }>
+              <Wrench size={ 16 } style={ { color: '#0284c7' } } />
+            </div>
+            <span style={ { fontSize: '0.92rem', fontWeight: 700, color: '#0f172a' } }>Repair Center</span>
+          </div>
+          <Link to="/repairs" style={ { display: 'inline-flex', alignItems: 'center', gap: '6px', textDecoration: 'none', fontSize: '0.78rem', fontWeight: 700, color: '#0284c7' } }>
+            New repair request <ArrowRight size={ 12 } />
+          </Link>
+        </div>
+
+        { loading && (
+          <div style={ { display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 0' } }>
+            <Loader size={ 15 } className="animate-spin" style={ { color: '#0284c7' } } />
+            <span style={ { fontSize: '0.82rem', color: 'rgba(15,23,42,0.45)' } }>Loading repairs…</span>
+          </div>
+        ) }
+
+        { ! loading && error && (
+          <div style={ { fontSize: '0.82rem', color: '#dc2626', background: '#fef2f2', border: '1px solid #fecaca', borderRadius: '8px', padding: '10px 12px' } }>
+            { error }
+          </div>
+        ) }
+
+        { ! loading && ! error && orders.length === 0 && (
+          <div style={ { textAlign: 'center', padding: '20px 14px', borderRadius: '10px', background: '#f8fafc' } }>
+            <Package size={ 24 } style={ { color: 'rgba(15,23,42,0.2)', display: 'block', margin: '0 auto 8px' } } />
+            <p style={ { margin: '0 0 12px', fontSize: '0.82rem', color: 'rgba(15,23,42,0.45)' } }>
+              No repair orders yet.
+            </p>
+            <Link to="/repairs" style={ { textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '6px', fontSize: '0.78rem', fontWeight: 700, color: '#0284c7', background: '#ecfeff', padding: '7px 12px', borderRadius: '7px' } }>
+              <Wrench size={ 12 } /> Start a repair
+            </Link>
+          </div>
+        ) }
+
+        { ! loading && ! error && orders.length > 0 && (
+          <div style={ { display: 'flex', flexDirection: 'column', gap: '8px' } }>
+            { orders.slice( 0, 5 ).map( ( order ) => (
+              <Link key={ order.id } to={ `/order/${ order.id }` } style={ { textDecoration: 'none' } }>
+                <div style={ { border: '1px solid rgba(15,23,42,0.08)', borderRadius: '9px', padding: '10px 12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '10px' } }>
+                  <div>
+                    <p style={ { margin: 0, fontSize: '0.82rem', fontWeight: 700, color: '#0f172a' } }>Repair Order #{ order.id }</p>
+                    <p style={ { margin: '2px 0 0', fontSize: '0.72rem', color: 'rgba(15,23,42,0.45)' } }>
+                      { order.date_created ? new Date( order.date_created ).toLocaleDateString( 'en-US', { month: 'short', day: 'numeric', year: 'numeric' } ) : '' }
+                    </p>
+                  </div>
+                  <span style={ { fontSize: '0.72rem', fontWeight: 700, color: '#0284c7', background: '#ecfeff', borderRadius: '999px', padding: '3px 8px', textTransform: 'capitalize' } }>
+                    { String( order.status || 'submitted' ).replace( /-/g, ' ' ) }
+                  </span>
+                </div>
+              </Link>
+            ) ) }
+          </div>
+        ) }
+      </Motion.div>
+    </div>
+  );
+}

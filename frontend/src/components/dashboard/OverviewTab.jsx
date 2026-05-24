@@ -7,10 +7,9 @@
 import { Link } from 'react-router-dom';
 import { motion as Motion } from 'framer-motion';
 import {
-  Package, Clock, CheckCircle, Star, ShoppingCart,
-  ChevronRight, Loader, CreditCard, Wrench,
+  Package, Clock, CheckCircle, Wrench, ShoppingCart,
+  ChevronRight, Loader, CreditCard,
 } from 'lucide-react';
-import { pointsToUsd } from '../../api/rewards.js';
 
 const fadeUp = {
   hidden:  { opacity: 0, y: 14 },
@@ -79,11 +78,17 @@ function StatCard( { icon, label, value, color, bg, delay } ) {
   );
 }
 
-export default function OverviewTab( { user, pointsData, orders, ordersLoading, onTabChange } ) {
+function isRepairOrder( order ) {
+  const type = typeof order?.order_type === 'string' ? order.order_type.trim().toLowerCase() : '';
+  return type === 'repair_service';
+}
+
+export default function OverviewTab( { user, orders, ordersLoading, onTabChange } ) {
   const displayName = [ user.first_name, user.last_name ].filter( Boolean ).join( ' ' ) || user.email;
 
   const pendingCount   = orders.filter( ( o ) => [ 'pending', 'processing', 'on-hold' ].includes( o.status ) ).length;
   const completedCount = orders.filter( ( o ) => o.status === 'completed' ).length;
+  const repairsCount   = orders.filter( isRepairOrder ).length;
 
   return (
     <div style={ { display: 'flex', flexDirection: 'column', gap: '18px' } }>
@@ -93,7 +98,7 @@ export default function OverviewTab( { user, pointsData, orders, ordersLoading, 
         <StatCard icon={ Package }     label="Orders"    value={ ordersLoading ? '…' : String( orders.length ) }                                                               color="#2563eb" bg="#eff6ff" delay={ 0 } />
         <StatCard icon={ Clock }       label="Active"    value={ ordersLoading ? '…' : String( pendingCount ) }                                                                color="#d97706" bg="#fffbeb" delay={ 0.05 } />
         <StatCard icon={ CheckCircle } label="Completed" value={ ordersLoading ? '…' : String( completedCount ) }                                                              color="#16a34a" bg="#f0fdf4" delay={ 0.1 } />
-        <StatCard icon={ Star }        label="Rewards"   value={ pointsData ? `$${ pointsToUsd( pointsData.points ).toFixed( 2 ) }` : '—' } color="#d97706" bg="#fffbeb" delay={ 0.15 } />
+        <StatCard icon={ Wrench }      label="Repairs"   value={ ordersLoading ? '…' : String( repairsCount ) }                                                                color="#0ea5e9" bg="#ecfeff" delay={ 0.15 } />
       </div>
 
       {/* Recent orders */}

@@ -6,41 +6,39 @@
  * Layout:
  *   Gradient hero strip  →  floating pill tab nav  →  animated tab panel
  *
- * Tabs: Overview · Orders · Rewards · Addresses · Settings
+ * Tabs: Overview · Orders · Repairs · Addresses · Settings
  *
  * Features:
- *   - Deep-linkable via ?tab= query param (overview | orders | rewards | addresses | settings)
+ *   - Deep-linkable via ?tab= query param (overview | orders | repairs | addresses | settings)
  *   - Tab persisted to localStorage
  *   - AnimatePresence tab transitions (opacity + scale, 0.22 s)
  *   - Touch swipe support for mobile
- *   - Shared data (points, recent orders) fetched once and passed to tabs
+ *   - Shared data (recent orders) fetched once and passed to tabs
  */
 
 import { useState, useEffect, useRef, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion as Motion, AnimatePresence } from 'framer-motion';
 import {
-  LayoutDashboard, Package, Star, MapPin, Settings, LogOut, User,
+  LayoutDashboard, Package, Wrench, MapPin, Settings, LogOut, User,
 } from 'lucide-react';
 
 import { useAuthContext }             from '../../auth/AuthContext.js';
-import { getUserPoints }              from '../../api/rewards.js';
 import { getCustomerOrders }          from '../../api/orders.js';
 
 import OverviewTab   from './OverviewTab.jsx';
 import OrdersTab     from './OrdersTab.jsx';
-import RewardsTab    from './RewardsTab.jsx';
+import RepairsTab    from './RepairsTab.jsx';
 import AddressesTab  from './AddressesTab.jsx';
 import SettingsTab   from './SettingsTab.jsx';
 import NavbarTabs    from '../ui/NavbarTabs.jsx';
-import { isRewardsEnabled } from '../../utils/featureFlags.js';
 
 // ─── Tab definitions ──────────────────────────────────────────────────────────
 
 const BASE_TABS = [
   { id: 'overview',   label: 'Overview',   shortLabel: 'Overview',  icon: LayoutDashboard },
   { id: 'orders',     label: 'Orders',     shortLabel: 'Orders',    icon: Package         },
-  { id: 'rewards',    label: 'Rewards',    shortLabel: 'Rewards',   icon: Star            },
+  { id: 'repairs',    label: 'Repairs',    shortLabel: 'Repairs',   icon: Wrench          },
   { id: 'addresses',  label: 'Addresses',  shortLabel: 'Addresses', icon: MapPin          },
   { id: 'settings',   label: 'Settings',   shortLabel: 'Settings',  icon: Settings        },
 ];
@@ -65,11 +63,7 @@ const DOT_GRID = {
 // ─── Hub component ────────────────────────────────────────────────────────────
 
 export default function AccountHub() {
-  const rewardsEnabled = isRewardsEnabled();
-  const TABS = useMemo(
-    () => ( rewardsEnabled ? BASE_TABS : BASE_TABS.filter( (tab) => tab.id !== 'rewards' ) ),
-    [ rewardsEnabled ],
-  );
+  const TABS = useMemo( () => BASE_TABS, [] );
   const navigate                                      = useNavigate();
   const { user, isAuthenticated, isLoading, logout }  = useAuthContext();
 
@@ -88,7 +82,6 @@ export default function AccountHub() {
   };
 
   const [ activeTab,      setActiveTab      ] = useState( resolveInitialTab );
-  const [ pointsData,     setPointsData     ] = useState( null );
   const [ recentOrders,   setRecentOrders   ] = useState( [] );
   const [ ordersLoading,  setOrdersLoading  ] = useState( true );
 
@@ -124,9 +117,6 @@ export default function AccountHub() {
     if ( ! user?.id ) return;
     let cancelled = false;
 
-    if ( rewardsEnabled ) {
-      getUserPoints( user.id ).then( ( d ) => { if ( ! cancelled ) setPointsData( d ); } ).catch( () => {} );
-    }
     getCustomerOrders( user.id, 1, 5 )
       .then( ( data ) => {
         if ( cancelled ) return;
@@ -136,7 +126,7 @@ export default function AccountHub() {
       .catch( () => { if ( ! cancelled ) setOrdersLoading( false ); } );
 
     return () => { cancelled = true; };
-  }, [ rewardsEnabled, user?.id ] );
+  }, [ user?.id ] );
 
   function changeTab( idx ) {
     if ( idx === activeTab ) return;
@@ -263,32 +253,6 @@ export default function AccountHub() {
               </div>
             </div>
 
-            {/* ── Stat strip ── */}
-            <div className="dash-hero-stats">
-              <div className="dash-hero-stat">
-                <span className="dash-hero-stat-val">{ recentOrders.length }</span>
-                <span className="dash-hero-stat-lbl">Orders</span>
-              </div>
-              <div className="dash-hero-stat-divider" />
-              <div className="dash-hero-stat">
-                <span className="dash-hero-stat-val">
-                  { user.role || 'Customer' }
-                </span>
-                <span className="dash-hero-stat-lbl">Plan</span>
-              </div>
-              { rewardsEnabled && (
-                <>
-                  <div className="dash-hero-stat-divider" />
-                  <div className="dash-hero-stat">
-                    <span className="dash-hero-stat-val">
-                      { pointsData?.points ?? '—' }
-                    </span>
-                    <span className="dash-hero-stat-lbl">Points</span>
-                  </div>
-                </>
-              ) }
-            </div>
-
           </Motion.div>
         </div>
       </div>
@@ -329,14 +293,13 @@ export default function AccountHub() {
               { TABS[ activeTab ]?.id === 'overview' && (
                 <OverviewTab
                   user={ user }
-                  pointsData={ pointsData }
                   orders={ recentOrders }
                   ordersLoading={ ordersLoading }
                   onTabChange={ changeTab }
                 />
               ) }
               { TABS[ activeTab ]?.id === 'orders' && <OrdersTab userId={ user.id } /> }
-              { rewardsEnabled && TABS[ activeTab ]?.id === 'rewards' && <RewardsTab userId={ user.id } /> }
+              { TABS[ activeTab ]?.id === 'repairs' && <RepairsTab userId={ user.id } /> }
               { TABS[ activeTab ]?.id === 'addresses' && <AddressesTab user={ user } /> }
               { TABS[ activeTab ]?.id === 'settings' && <SettingsTab /> }
             </Motion.div>
@@ -409,49 +372,6 @@ export default function AccountHub() {
         /* line break only on mobile */
         .dash-hero-br { display: none; }
 
-        /* ── Stat strip ── */
-        .dash-hero-stats {
-          display:          flex;
-          align-items:      center;
-          gap:              0;
-          background:       rgba(255,255,255,0.06);
-          border:           1px solid rgba(255,255,255,0.1);
-          border-radius:    12px;
-          padding:          12px 0;
-          margin-top:       4px;
-        }
-
-        .dash-hero-stat {
-          flex:             1;
-          display:          flex;
-          flex-direction:   column;
-          align-items:      center;
-          gap:              3px;
-        }
-
-        .dash-hero-stat-val {
-          font-size:     1.1rem;
-          font-weight:   800;
-          color:         white;
-          letter-spacing: -0.02em;
-          line-height:   1;
-        }
-
-        .dash-hero-stat-lbl {
-          font-size:     0.65rem;
-          font-weight:   600;
-          color:         rgba(255,255,255,0.45);
-          text-transform: uppercase;
-          letter-spacing: 0.08em;
-        }
-
-        .dash-hero-stat-divider {
-          width:            1px;
-          height:           32px;
-          background:       rgba(255,255,255,0.12);
-          flex-shrink:      0;
-        }
-
         /* ── Mobile overrides (≤ 639px) ── */
         @media (max-width: 639px) {
           .dash-hero-inner {
@@ -475,12 +395,7 @@ export default function AccountHub() {
 
           .dash-hero-br { display: inline; }
 
-          .dash-hero-stats {
-            border-radius: 14px;
-            padding:       14px 0;
-          }
-
-          .dash-hero-stat-val { font-size: 1.2rem; }
+          .dash-hero-inner { margin-bottom: 0; }
         }
 
         /* ── Show shorter tab labels on very small screens ── */

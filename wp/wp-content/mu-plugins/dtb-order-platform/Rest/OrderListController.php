@@ -44,7 +44,11 @@ function dtb_order_rest_list_orders( WP_REST_Request $request ): WP_REST_Respons
 	$results = [];
 
 	foreach ( $orders as $order ) {
-		$results[] = dtb_order_format_summary( $order );
+		$wc_order = $order instanceof WC_Order ? $order : wc_get_order( $order );
+		if ( ! ( $wc_order instanceof WC_Order ) ) {
+			continue;
+		}
+		$results[] = dtb_order_format_summary( $wc_order );
 	}
 
 	if ( $total_pages <= 0 ) {

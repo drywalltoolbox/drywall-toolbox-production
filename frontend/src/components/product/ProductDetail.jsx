@@ -40,6 +40,66 @@ function money(value) {
   return Number.isFinite(parsed) ? parsed.toFixed(2) : '0.00';
 }
 
+function resolvePrimaryImageSrc(item) {
+  if (!item || typeof item !== 'object') return '';
+  const firstImage = Array.isArray(item.images) && item.images.length > 0 ? item.images[0] : null;
+  if (typeof firstImage === 'string') return firstImage;
+  if (firstImage && typeof firstImage === 'object') {
+    if (typeof firstImage.src === 'string' && firstImage.src) return firstImage.src;
+    if (typeof firstImage.url === 'string' && firstImage.url) return firstImage.url;
+  }
+  return item.image || item.image_src || item.thumbnail || '';
+}
+
+function normalizeSpecLabel(label = '') {
+  return String(label).trim().toLowerCase();
+}
+
+function pickQuickFacts(specs = [], limit = 4) {
+  if (!Array.isArray(specs) || specs.length === 0) return [];
+
+  const excluded = new Set(['set includes', 'includes', 'model numbers', 'description']);
+  const priority = [
+    'brand',
+    'model',
+    'sku',
+    'mpn',
+    'part number',
+    'length',
+    'size',
+    'width',
+    'weight',
+    'material',
+  ];
+
+  const normalizedSpecs = specs
+    .filter((spec) => spec?.label && `${spec?.value || ''}`.trim() !== '')
+    .filter((spec) => !excluded.has(normalizeSpecLabel(spec.label)))
+    .map((spec) => {
+      const label = `${spec.label}`.trim();
+      const value = `${spec.value}`.trim();
+      const normalizedLabel = normalizeSpecLabel(label);
+      const rank = priority.findIndex((key) => normalizedLabel.includes(key));
+      return {
+        label,
+        value,
+        rank: rank >= 0 ? rank : 999,
+      };
+    });
+
+  const deduped = [];
+  const seen = new Set();
+  for (const spec of normalizedSpecs.sort((a, b) => a.rank - b.rank)) {
+    const key = normalizeSpecLabel(spec.label);
+    if (seen.has(key)) continue;
+    seen.add(key);
+    deduped.push(spec);
+    if (deduped.length >= limit) break;
+  }
+
+  return deduped;
+}
+
 function decodeEscapedHtml(value) {
   if (typeof value !== 'string' || !value.includes('&lt;')) return value;
   if (typeof document === 'undefined') return value;
@@ -600,6 +660,25 @@ export default function ProductDetail({
   const pricePrefix = product.is_variable && !selectedVariation ? 'From $' : '$';
   const compareAt = getCompareAtPrice(selectedVariation) ?? getCompareAtPrice(product);
   const productSpecifications = getProductSpecifications(product);
+  const quickFacts = useMemo(() => pickQuickFacts(productSpecifications, 4), [productSpecifications]);
+  const stockQuantityRaw = selectedVariation?.stock_quantity ?? effectiveProduct?.stock_quantity ?? product?.stock_quantity;
+  const stockQuantity = Number.isFinite(Number(stockQuantityRaw)) ? Number(stockQuantityRaw) : null;
+  const stockProgress = isOutOfStock
+    ? 0
+    : stockQuantity && stockQuantity > 0
+      ? Math.max(18, Math.min(100, Math.round((Math.min(stockQuantity, 36) / 36) * 100)))
+      : 72;
+  const stockHint = isOutOfStock
+    ? 'Temporarily out of stock'
+    : stockQuantity && stockQuantity > 0
+      ? stockQuantity <= 6
+        ? `Only ${stockQuantity} left - hurry while stock lasts`
+        : stockQuantity <= 24
+          ? `${stockQuantity} in stock - Hurry while stocks last!`
+          : `${stockQuantity} in stock`
+      : 'In stock and ready to ship';
+  const fbtPrimaryImage = resolvePrimaryImageSrc(effectiveProduct) || resolvePrimaryImageSrc(product);
+  const fbtAccessoryImage = getBrandLogo(brandLabel);
 
   const rawDescription = stripSpecsFromHtml(
     effectiveProduct.description_full || effectiveProduct.description || effectiveProduct.short_description || ''
@@ -704,6 +783,59 @@ export default function ProductDetail({
               {addToCartError ? (
                 <p className="text-sm text-red-600 mt-2" role="alert" aria-live="assertive">{addToCartError}</p>
               ) : null}
+
+              <div className="dtb-pdp-side-stack">
+                <p className="dtb-pdp-shipping-note">Shipping calculated at checkout.</p>
+
+                <div className={`dtb-pdp-stock-meter ${isOutOfStock ? 'is-out' : ''}`}>
+                  <p className="dtb-pdp-stock-meter__label">{stockHint}</p>
+                  <div className="dtb-pdp-stock-meter__track" aria-hidden="true">
+                    <span className="dtb-pdp-stock-meter__fill" style={{ width: `${stockProgress}%` }} />
+                  </div>
+                </div>
+
+                {quickFacts.length > 0 ? (
+                  <div className="dtb-pdp-quick-facts">
+                    <p className="dtb-pdp-quick-facts__title">Quick Facts</p>
+                    <div className="dtb-pdp-quick-facts__grid">
+                      {quickFacts.map((spec) => (
+                        <div key={spec.label} className="dtb-pdp-quick-facts__item">
+                          <span className="dtb-pdp-quick-facts__key">{spec.label}</span>
+                          <span className="dtb-pdp-quick-facts__value">{spec.value}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ) : null}
+
+                <div className="dtb-pdp-fbt">
+                  <p className="dtb-pdp-fbt__title">Frequently Bought Together</p>
+                  <div className="dtb-pdp-fbt__media-row">
+                    <div className="dtb-pdp-fbt__media-card">
+                      {fbtPrimaryImage ? (
+                        <img src={fbtPrimaryImage} alt={effectiveProduct.name || product.name} className="dtb-pdp-fbt__media-image" loading="lazy" />
+                      ) : (
+                        <span className="dtb-pdp-fbt__media-fallback">{(effectiveProduct.name || product.name || 'P').slice(0, 1).toUpperCase()}</span>
+                      )}
+                    </div>
+                    <span className="dtb-pdp-fbt__plus" aria-hidden="true">+</span>
+                    <div className="dtb-pdp-fbt__media-card">
+                      {fbtAccessoryImage ? (
+                        <img src={fbtAccessoryImage} alt={`${brandLabel || 'Compatible'} accessories`} className="dtb-pdp-fbt__media-image dtb-pdp-fbt__media-image--brand" loading="lazy" />
+                      ) : (
+                        <span className="dtb-pdp-fbt__media-fallback">+</span>
+                      )}
+                    </div>
+                  </div>
+                  <div className="dtb-pdp-fbt__items">
+                    <span className="dtb-pdp-fbt__item">{effectiveProduct.name || product.name}</span>
+                    <span className="dtb-pdp-fbt__item">Compatible parts & accessories</span>
+                  </div>
+                  <Link to={partsUrl || '/parts'} className="dtb-pdp-fbt__cta">
+                    View compatible bundle options
+                  </Link>
+                </div>
+              </div>
             </div>
           </div>
 
