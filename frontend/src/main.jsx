@@ -31,13 +31,20 @@ prewarmCatalogPlatformForCurrentRoute();
 if (typeof window !== 'undefined') {
   const pathname = window.location.pathname.replace(/^\/drywall-toolbox(?=\/|$)/, '') || '/';
   const isCatalogRoute = pathname.startsWith('/products') || pathname.startsWith('/parts');
+  const isHomePage = pathname === '/';
+  // Max delay for background catalog prewarm on non-home, non-catalog routes.
+  const CATALOG_PREWARM_TIMEOUT_MS = 5000;
 
   if (!isCatalogRoute) {
     const scheduleLegacyCatalogPrewarm = () => prewarmCatalog();
-    if ('requestIdleCallback' in window) {
-      window.requestIdleCallback(scheduleLegacyCatalogPrewarm, { timeout: 8000 });
+    // On the home page TrendingProducts depends on the legacy catalog immediately,
+    // so kick it off right away instead of waiting for an idle callback.
+    if (isHomePage) {
+      scheduleLegacyCatalogPrewarm();
+    } else if ('requestIdleCallback' in window) {
+      window.requestIdleCallback(scheduleLegacyCatalogPrewarm, { timeout: CATALOG_PREWARM_TIMEOUT_MS });
     } else {
-      window.setTimeout(scheduleLegacyCatalogPrewarm, 8000);
+      window.setTimeout(scheduleLegacyCatalogPrewarm, CATALOG_PREWARM_TIMEOUT_MS);
     }
   }
 }
