@@ -263,23 +263,23 @@ function DesktopSummaryPanel( {
 
   return (
     <aside
-      className="dtb-summary-panel hidden lg:flex flex-col sticky top-0 h-screen overflow-hidden"
+      className="dtb-summary-panel hidden lg:flex flex-col sticky top-0 h-screen overflow-hidden text-slate-100"
       style={ { background: 'linear-gradient(170deg, #0d1829 0%, #0a1020 80%)' } }
     >
       {/* Top brand accent stripe */}
       <div className="h-[3px] shrink-0 bg-gradient-to-r from-primary-700 via-primary-500 to-primary-600" />
 
       {/* Header */}
-      <div className="px-7 pt-7 pb-5 border-b border-white/8 shrink-0">
+      <div className="px-7 pt-7 pb-5 border-b border-white/12 shrink-0">
         <div className="flex items-center gap-1.5 mb-4">
-          <Lock size={ 9 } className="text-primary-400/80" />
-          <span className="text-[9px] font-bold uppercase tracking-[0.22em] text-primary-400/80">
+          <Lock size={ 9 } className="text-primary-300" />
+          <span className="text-[9px] font-bold uppercase tracking-[0.22em] text-primary-200">
             Secure Checkout
           </span>
         </div>
         <div className="flex items-start justify-between">
           <div>
-            <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-slate-500 mb-0.5">
+            <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-slate-300 mb-0.5">
               Order Summary
             </p>
             <h2 className="text-xl font-bold text-white leading-tight">
@@ -287,7 +287,7 @@ function DesktopSummaryPanel( {
             </h2>
           </div>
           <div className="text-right">
-            <p className="text-[10px] text-slate-500 mb-0.5">Total</p>
+            <p className="text-[10px] text-slate-300 mb-0.5">Total</p>
             <span className="text-2xl font-black text-white tabular-nums">${ total.toFixed( 2 ) }</span>
           </div>
         </div>
@@ -304,9 +304,9 @@ function DesktopSummaryPanel( {
                   initial={ { opacity: 0, x: 10 } }
                   animate={ { opacity: 1, x: 0 } }
                   exit={ { opacity: 0 } }
-                  className="flex items-center gap-3 p-3 rounded-2xl bg-white/[0.04] border border-white/[0.06] hover:bg-white/[0.07] transition-colors"
+                  className="flex items-center gap-3 p-3 rounded-2xl bg-white/[0.07] border border-white/[0.14] hover:bg-white/[0.11] transition-colors"
                 >
-                  <div className="relative h-14 w-14 shrink-0 rounded-xl overflow-hidden border border-white/10 bg-white/[0.06]">
+                  <div className="relative h-14 w-14 shrink-0 rounded-xl overflow-hidden border border-white/20 bg-white/[0.10]">
                     { resolveCartItemImage( item ) ? (
                       <img
                         src={ resolveCartItemImage( item ) }
@@ -315,7 +315,7 @@ function DesktopSummaryPanel( {
                         loading="lazy"
                       />
                     ) : (
-                      <div className="flex h-full w-full items-center justify-center text-white/20">
+                      <div className="flex h-full w-full items-center justify-center text-white/45">
                         <ShoppingBag size={ 16 } />
                       </div>
                     ) }
@@ -325,9 +325,9 @@ function DesktopSummaryPanel( {
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-[13px] font-semibold text-white truncate leading-snug">{ item.name }</p>
-                    <p className="text-xs text-slate-500 mt-0.5">Qty { item.quantity }</p>
+                    <p className="text-xs text-slate-300 mt-0.5">Qty { item.quantity }</p>
                   </div>
-                  <p className="text-sm font-bold text-slate-200 shrink-0 tabular-nums">
+                  <p className="text-sm font-bold text-white shrink-0 tabular-nums">
                     ${ ( toMoneyValue( item.price ) * toMoneyValue( item.quantity ) ).toFixed( 2 ) }
                   </p>
                 </Motion.div>
@@ -337,8 +337,8 @@ function DesktopSummaryPanel( {
       </div>
 
       {/* Coupon */}
-      <div className="px-6 py-4 border-t border-white/8 shrink-0">
-        <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-slate-500 mb-2">
+      <div className="px-6 py-4 border-t border-white/12 shrink-0">
+        <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-slate-300 mb-2">
           Discount Code
         </p>
         <div className="flex gap-2">
@@ -346,12 +346,12 @@ function DesktopSummaryPanel( {
             value={ couponInput }
             onChange={ ( e ) => setCouponInput( e.target.value.toUpperCase() ) }
             placeholder="Enter code"
-            className="flex-1 rounded-xl border border-white/10 bg-white/[0.06] px-3.5 py-2.5 text-sm text-white placeholder:text-slate-600 focus:border-primary-500/60 focus:outline-none focus:ring-2 focus:ring-primary-500/20 transition-all"
+            className="flex-1 rounded-xl border border-white/20 bg-white/[0.10] px-3.5 py-2.5 text-sm text-white placeholder:text-slate-300 focus:border-primary-400 focus:outline-none focus:ring-2 focus:ring-primary-400/30 transition-all"
           />
           <button
             type="button"
             onClick={ addManualCoupon }
-            className="rounded-xl bg-primary-600/20 hover:bg-primary-600/30 border border-primary-500/30 px-4 py-2.5 text-sm font-bold text-primary-300 transition-colors"
+            className="rounded-xl bg-primary-600 hover:bg-primary-500 border border-primary-400 px-4 py-2.5 text-sm font-bold text-white transition-colors"
           >
             Apply
           </button>
@@ -363,7 +363,7 @@ function DesktopSummaryPanel( {
                 key={ code }
                 type="button"
                 onClick={ () => removeManualCoupon( code ) }
-                className="flex items-center gap-1 rounded-full border border-primary-500/30 bg-primary-500/10 px-2.5 py-1 text-[11px] font-semibold text-primary-300"
+                className="flex items-center gap-1 rounded-full border border-primary-300/60 bg-primary-500/25 px-2.5 py-1 text-[11px] font-semibold text-primary-100"
               >
                 <Tag size={ 9 } /> { code } ×
               </button>
@@ -373,20 +373,20 @@ function DesktopSummaryPanel( {
       </div>
 
       {/* Totals */}
-      <div className="px-6 pt-4 pb-1 border-t border-white/8 shrink-0 space-y-2.5">
+      <div className="px-6 pt-4 pb-1 border-t border-white/12 shrink-0 space-y-2.5">
         { [
           { label: 'Subtotal', value: `$${ subtotal.toFixed( 2 ) }` },
           { label: 'Shipping', value: shipping === 0 ? 'Free' : `$${ shipping.toFixed( 2 ) }` },
           { label: 'Tax (8%)', value: `$${ tax.toFixed( 2 ) }` },
         ].map( ( { label, value } ) => (
           <div key={ label } className="flex justify-between text-sm">
-            <span className="text-slate-500">{ label }</span>
-            <span className={ `font-medium tabular-nums ${ label === 'Shipping' && shipping === 0 ? 'text-emerald-400' : 'text-slate-300' }` }>
+            <span className="text-slate-300">{ label }</span>
+            <span className={ `font-medium tabular-nums ${ label === 'Shipping' && shipping === 0 ? 'text-emerald-300' : 'text-slate-100' }` }>
               { value }
             </span>
           </div>
         ) ) }
-        <div className="flex justify-between items-baseline pt-3 pb-1 border-t border-white/8">
+        <div className="flex justify-between items-baseline pt-3 pb-1 border-t border-white/12">
           <span className="text-base font-bold text-white">Total</span>
           <span className="text-2xl font-black text-white tabular-nums">${ total.toFixed( 2 ) }</span>
         </div>
@@ -397,14 +397,14 @@ function DesktopSummaryPanel( {
         {/* Payment icons */}
         <div className="flex items-center justify-center gap-1.5 mb-4 flex-wrap">
           { [ ['VISA', '#a0b4f5'], ['MC', '#f87171'], ['AMEX', '#60a5fa'] ].map( ( [ label, color ] ) => (
-            <span key={ label } style={ { color } } className="rounded border border-white/10 bg-white/[0.04] px-1.5 py-0.5 text-[9px] font-black">
+            <span key={ label } style={ { color } } className="rounded border border-white/20 bg-white/[0.08] px-1.5 py-0.5 text-[9px] font-black">
               { label }
             </span>
           ) ) }
-          <span className="rounded border border-white/10 bg-white/[0.06] text-slate-300 px-1.5 py-0.5 text-[9px] font-semibold">
+          <span className="rounded border border-white/20 bg-white/[0.10] text-white px-1.5 py-0.5 text-[9px] font-semibold">
             Apple Pay
           </span>
-          <span className="rounded border border-white/10 bg-white/[0.06] text-slate-300 px-1.5 py-0.5 text-[9px] font-semibold">
+          <span className="rounded border border-white/20 bg-white/[0.10] text-white px-1.5 py-0.5 text-[9px] font-semibold">
             G Pay
           </span>
         </div>
@@ -417,7 +417,7 @@ function DesktopSummaryPanel( {
           <Lock size={ 14 } strokeWidth={ 2.5 } />
           { processing ? 'Processing…' : 'Place Order & Pay' }
         </button>
-        <div className="mt-3 flex items-center justify-center gap-1.5 text-[10px] text-slate-600">
+        <div className="mt-3 flex items-center justify-center gap-1.5 text-[10px] text-slate-300">
           <Lock size={ 10 } />
           <span>256-bit SSL encrypted</span>
         </div>

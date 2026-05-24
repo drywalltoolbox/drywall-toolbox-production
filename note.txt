@@ -1,8 +1,0 @@
-also i need you to revise and refine all of our brands schematic diagram image file names to be normailized for easier manageability.
-
-they should should all use this type of format for example:
-3.5INCH-CORNER-FLUSHER-SCHEMATIC.webp
-
-after fully normalizing safely and properly all image names and schematic_data.json files data.
-
-then you need to regenerate official final bulk import seed and parts flattened csv files

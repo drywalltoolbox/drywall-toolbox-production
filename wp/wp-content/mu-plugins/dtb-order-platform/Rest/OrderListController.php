@@ -15,27 +15,47 @@ function dtb_order_rest_list_orders( WP_REST_Request $request ): WP_REST_Respons
 	$user_id  = (int) $user_id;
 	$page     = (int) $request->get_param( 'page' );
 	$per_page = (int) $request->get_param( 'per_page' );
-
-	$query = new WC_Order_Query( [
+	$args = [
 		'customer_id' => $user_id,
 		'limit'       => $per_page,
 		'paged'       => $page,
 		'orderby'     => 'date',
 		'order'       => 'DESC',
 		'return'      => 'objects',
-	] );
+		'paginate'    => true,
+	];
 
-	$orders  = $query->get_orders();
+	$query_result = wc_get_orders( $args );
+	$orders       = [];
+	$total        = 0;
+	$total_pages  = 0;
+
+	if ( is_object( $query_result ) && isset( $query_result->orders ) ) {
+		$orders      = is_array( $query_result->orders ) ? $query_result->orders : [];
+		$total       = (int) ( $query_result->total ?? 0 );
+		$total_pages = (int) ( $query_result->max_num_pages ?? 0 );
+	} elseif ( is_array( $query_result ) ) {
+		// Defensive fallback for environments where wc_get_orders does not return
+		// the paginated result object.
+		$orders = $query_result;
+		$total  = count( $orders );
+	}
+
 	$results = [];
 
 	foreach ( $orders as $order ) {
 		$results[] = dtb_order_format_summary( $order );
 	}
 
-	$total = (int) $query->get_total();
+	if ( $total_pages <= 0 ) {
+		$total_pages = $per_page > 0 ? (int) ceil( $total / $per_page ) : 1;
+	}
+	if ( $total_pages <= 0 ) {
+		$total_pages = 1;
+	}
 
 	$response = new WP_REST_Response( $results, 200 );
 	$response->header( 'X-WP-Total',      (string) $total );
-	$response->header( 'X-WP-TotalPages', (string) ceil( $total / $per_page ) );
+	$response->header( 'X-WP-TotalPages', (string) $total_pages );
 	return $response;
 }
