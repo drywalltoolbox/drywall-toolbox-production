@@ -660,7 +660,7 @@ export default function ProductDetail({
   const pricePrefix = product.is_variable && !selectedVariation ? 'From $' : '$';
   const compareAt = getCompareAtPrice(selectedVariation) ?? getCompareAtPrice(product);
   const productSpecifications = getProductSpecifications(product);
-  const quickFacts = useMemo(() => pickQuickFacts(productSpecifications, 4), [productSpecifications]);
+  const quickFacts = pickQuickFacts(productSpecifications, 4);
   const stockQuantityRaw = selectedVariation?.stock_quantity ?? effectiveProduct?.stock_quantity ?? product?.stock_quantity;
   const stockQuantity = Number.isFinite(Number(stockQuantityRaw)) ? Number(stockQuantityRaw) : null;
   const stockProgress = isOutOfStock
