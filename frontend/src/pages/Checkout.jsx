@@ -267,7 +267,7 @@ function DesktopSummaryPanel( {
       style={ { background: 'linear-gradient(170deg, #0d1829 0%, #0a1020 80%)' } }
     >
       {/* Top brand accent stripe */}
-      <div className="h-[3px] shrink-0 bg-gradient-to-r from-primary-700 via-primary-500 to-primary-600" />
+  <div className="h-0.75 shrink-0 bg-linear-to-r from-primary-700 via-primary-500 to-primary-600" />
 
       {/* Header */}
       <div className="px-7 pt-7 pb-5 border-b border-white/12 shrink-0">
@@ -304,9 +304,9 @@ function DesktopSummaryPanel( {
                   initial={ { opacity: 0, x: 10 } }
                   animate={ { opacity: 1, x: 0 } }
                   exit={ { opacity: 0 } }
-                  className="flex items-center gap-3 p-3 rounded-2xl bg-white/[0.07] border border-white/[0.14] hover:bg-white/[0.11] transition-colors"
+                  className="flex items-center gap-3 p-3 rounded-2xl bg-white/[0.07] border border-white/[0.14] hover:bg-white/11 transition-colors"
                 >
-                  <div className="relative h-14 w-14 shrink-0 rounded-xl overflow-hidden border border-white/20 bg-white/[0.10]">
+                  <div className="relative h-14 w-14 shrink-0 rounded-xl overflow-hidden border border-white/20 bg-white/10">
                     { resolveCartItemImage( item ) ? (
                       <img
                         src={ resolveCartItemImage( item ) }
@@ -346,7 +346,7 @@ function DesktopSummaryPanel( {
             value={ couponInput }
             onChange={ ( e ) => setCouponInput( e.target.value.toUpperCase() ) }
             placeholder="Enter code"
-            className="flex-1 rounded-xl border border-white/20 bg-white/[0.10] px-3.5 py-2.5 text-sm text-white placeholder:text-slate-300 focus:border-primary-400 focus:outline-none focus:ring-2 focus:ring-primary-400/30 transition-all"
+            className="flex-1 rounded-xl border border-white/20 bg-white/10 px-3.5 py-2.5 text-sm text-white placeholder:text-slate-300 focus:border-primary-400 focus:outline-none focus:ring-2 focus:ring-primary-400/30 transition-all"
           />
           <button
             type="button"
@@ -397,14 +397,14 @@ function DesktopSummaryPanel( {
         {/* Payment icons */}
         <div className="flex items-center justify-center gap-1.5 mb-4 flex-wrap">
           { [ ['VISA', '#a0b4f5'], ['MC', '#f87171'], ['AMEX', '#60a5fa'] ].map( ( [ label, color ] ) => (
-            <span key={ label } style={ { color } } className="rounded border border-white/20 bg-white/[0.08] px-1.5 py-0.5 text-[9px] font-black">
+            <span key={ label } style={ { color } } className="rounded border border-white/20 bg-white/8 px-1.5 py-0.5 text-[9px] font-black">
               { label }
             </span>
           ) ) }
-          <span className="rounded border border-white/20 bg-white/[0.10] text-white px-1.5 py-0.5 text-[9px] font-semibold">
+          <span className="rounded border border-white/20 bg-white/10 text-white px-1.5 py-0.5 text-[9px] font-semibold">
             Apple Pay
           </span>
-          <span className="rounded border border-white/20 bg-white/[0.10] text-white px-1.5 py-0.5 text-[9px] font-semibold">
+          <span className="rounded border border-white/20 bg-white/10 text-white px-1.5 py-0.5 text-[9px] font-semibold">
             G Pay
           </span>
         </div>
@@ -412,7 +412,7 @@ function DesktopSummaryPanel( {
           type="button"
           onClick={ onPlaceOrder }
           disabled={ ! canSubmit }
-          className="w-full inline-flex items-center justify-center gap-2.5 rounded-2xl bg-primary-600 hover:bg-primary-500 active:scale-[0.99] text-white py-4 text-sm font-bold tracking-wide shadow-[0_4px_20px_rgba(37,99,235,0.30)] transition-all disabled:opacity-40 disabled:cursor-not-allowed min-h-[52px]"
+          className="w-full inline-flex items-center justify-center gap-2.5 rounded-2xl bg-primary-600 hover:bg-primary-500 active:scale-[0.99] text-white py-4 text-sm font-bold tracking-wide shadow-[0_4px_20px_rgba(37,99,235,0.30)] transition-all disabled:opacity-40 disabled:cursor-not-allowed min-h-13"
         >
           <Lock size={ 14 } strokeWidth={ 2.5 } />
           { processing ? 'Processing…' : 'Place Order & Pay' }
@@ -1341,7 +1341,7 @@ export default function Checkout() {
                     </span>
                     <h2 className="text-[0.95rem] font-bold text-slate-900 tracking-tight">Payment</h2>
                   </div>
-                  <div className="flex items-center gap-1 flex-wrap justify-end max-w-[200px]">
+                  <div className="flex items-center gap-1 flex-wrap justify-end max-w-50">
                     { [ ['VISA', '#1A1F71'], ['MC', '#EB001B'], ['AMEX', '#006FCF'] ].map( ( [ label, color ] ) => (
                       <span key={ label } style={ { color } } className="rounded border border-slate-200 bg-white px-1.5 py-0.5 text-[9px] font-black">
                         { label }

@@ -34,7 +34,10 @@ function toCardProduct(dto) {
   const card = dto?.cardProduct || null;
   const categoryKey = dto?.category?.key || '';
   const displayCategoryKey = dto?.displayCategory?.slug || dto?.displayCategory?.key || '';
-  const price = dto?.price?.current ?? dto?.price?.value ?? dto?.price?.min ?? card?.price ?? 0;
+  const effectivePrice = dto?.price?.effective ?? dto?.price?.current ?? dto?.price?.value;
+  const regularPrice = dto?.price?.regular ?? card?.regularPrice ?? card?.regular_price ?? null;
+  const salePrice = dto?.price?.sale ?? card?.salePrice ?? card?.sale_price ?? null;
+  const price = effectivePrice ?? dto?.price?.min ?? card?.price ?? 0;
 
   const mapped = {
     ...dto,
@@ -45,10 +48,14 @@ function toCardProduct(dto) {
     image: dto?.media?.image || card?.image || '',
     images: dto?.media?.images || [],
     price: typeof price === 'number' ? price : parseFloat(String(price || 0)),
+    regular_price: regularPrice,
+    sale_price: salePrice,
+    compare_at_price: regularPrice,
     stock_status: dto?.inventory?.stockStatus || card?.stockStatus || 'instock',
     is_variable: dto?.type === 'variable',
     is_parts: Boolean(dto?.isParts),
     min_price: dto?.price?.min ?? null,
+    min_regular_price: dto?.price?.minRegular ?? dto?.price?.min_regular ?? null,
     variation_attributes: dto?.variationAttributes || dto?.attributes || [],
   };
 
@@ -62,6 +69,9 @@ function toCardProduct(dto) {
         image_thumbnail: card?.imageThumbnail || card?.image_thumbnail || mapped.image_thumbnail,
         image_srcset: card?.imageSrcset || card?.image_srcset || mapped.image_srcset,
         price: card?.price ?? mapped.price,
+        regular_price: card?.regularPrice ?? card?.regular_price ?? mapped.regular_price,
+        sale_price: card?.salePrice ?? card?.sale_price ?? mapped.sale_price,
+        compare_at_price: card?.regularPrice ?? card?.regular_price ?? mapped.compare_at_price,
         brand: mapped.brand,
         parentName: mapped.name,
         variation_label: card?.variationLabel || card?.variation_label || '',
