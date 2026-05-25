@@ -15,7 +15,7 @@ import { findMatchingVariation, getVariationSelectionMap } from '../../utils/var
 import { setCachedVariations } from '../../utils/variationCache';
 import { apiClient } from '../../api/client.js';
 import { getBrandLogo } from '../../utils/brandAssets.js';
-import { toLegacyProductCardDTO, toProductDetailDTO } from '../../utils/catalogDtoAdapters.js';
+import { toProductDetailDTO } from '../../utils/catalogDtoAdapters.js';
 import { BRAND_TO_SLUG, BRAND_ALIASES } from '../../utils/catalogUrlState.js';
 import { getSchematicIdForProduct, buildSchematicsUrl } from '../../data/schematicMappings';
 import DOMPurify from 'dompurify';
@@ -39,17 +39,6 @@ function buildSeedVariations(initialVariations = [], initialResolvedVariation = 
 function money(value) {
   const parsed = typeof value === 'number' ? value : parseFloat(value || 0);
   return Number.isFinite(parsed) ? parsed.toFixed(2) : '0.00';
-}
-
-function resolvePrimaryImageSrc(item) {
-  if (!item || typeof item !== 'object') return '';
-  const firstImage = Array.isArray(item.images) && item.images.length > 0 ? item.images[0] : null;
-  if (typeof firstImage === 'string') return firstImage;
-  if (firstImage && typeof firstImage === 'object') {
-    if (typeof firstImage.src === 'string' && firstImage.src) return firstImage.src;
-    if (typeof firstImage.url === 'string' && firstImage.url) return firstImage.url;
-  }
-  return item.image || item.image_src || item.thumbnail || '';
 }
 
 function decodeEscapedHtml(value) {

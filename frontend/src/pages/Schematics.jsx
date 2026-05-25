@@ -2893,6 +2893,38 @@ const ALLOWED_BRANDS = [
                   // that appear twice on a schematic) each get an independent active
                   // state — only the clicked instance highlights, not all copies.
                   const hotspotKey = `${part.id}::${index}`;
+                  const activateHotspot = (element) => {
+                    // Check if this is a navigation hotspot
+                    if (part.name === 'SEE HEAD DETAIL') {
+                      setCurrentPage(2);
+                      closeModal();
+                    } else if (part.name === 'SEE LEVER DETAIL') {
+                      setCurrentPage(3);
+                      closeModal();
+                    } else if (part.name === 'SEE PINCHBOX DETAIL') {
+                      setCurrentPage(4);
+                      closeModal();
+                    } else if (part.name === 'SEE EXTENSION HOUSING DETAIL') {
+                      setCurrentPage(5);
+                      closeModal();
+                    } else if (activeHotspot === hotspotKey) {
+                      closeModal();
+                    } else {
+                      // Snapshot the hotspot's bounding rect before React re-renders
+                      // so calculateAndSetModalPosition can use it both immediately
+                      // and in the post-render useEffect.
+                      const r = element.getBoundingClientRect();
+                      lastHotspotRectRef.current = {
+                        top: r.top, left: r.left, bottom: r.bottom,
+                        right: r.right, width: r.width, height: r.height,
+                      };
+                      window.setTimeout(() => {
+                        calculateAndSetModalPosition(lastHotspotRectRef.current);
+                        setActiveHotspot(hotspotKey);
+                        setActiveHotspotPart(part);
+                      }, 0);
+                    }
+                  };
                   // Determine if this hotspot has precise pixel-derived dimensions.
                   // When true, a CSS class prevents any min-width/min-height override
                   // from expanding it beyond its exact schematic footprint.
@@ -2904,6 +2936,9 @@ const ALLOWED_BRANDS = [
                   <div
                     key={`${part.id}-${part.position.top}-${part.position.left}-${index}`}
                     className={`hotspot hotspot-${part.shape || 'circle'} ${activeHotspot === hotspotKey ? 'active' : ''} ${hasPreciseSize ? 'hotspot-precise' : ''}`}
+                    role="button"
+                    tabIndex={0}
+                    aria-label={`Hotspot: ${part.name}${part.sku ? ` (${part.sku})` : ''}`}
                     style={{
                       position: 'absolute',
                       top: part.position.top,
@@ -2941,17 +2976,27 @@ const ALLOWED_BRANDS = [
                       // Only handle primary pointer (finger 0 or left-click).
                       if (!e.isPrimary) return;
                       e.stopPropagation();
-                      e.preventDefault();
+                      // Prevent browser gesture/click synthesis for touch/pen only.
+                      // Mouse on desktop falls back to onClick for reliability.
+                      if (e.pointerType !== 'mouse') {
+                        e.preventDefault();
+                      }
                       // Record where the press began so we can measure drift.
                       e.currentTarget.dataset.pdX = e.clientX;
                       e.currentTarget.dataset.pdY = e.clientY;
                       // Capture so pointerup fires on this element even if the
                       // finger drifts slightly off the edge of the hotspot.
-                      e.currentTarget.setPointerCapture(e.pointerId);
+                      try {
+                        e.currentTarget.setPointerCapture(e.pointerId);
+                      } catch {
+                        // Some desktop/browser combinations can throw InvalidPointerId.
+                      }
                     }}
                     onPointerUp={(e) => {
                       if (!e.isPrimary) return;
                       e.stopPropagation();
+                      // Desktop mouse uses onClick fallback; pointerup path is for touch/pen.
+                      if (e.pointerType === 'mouse') return;
                       e.preventDefault();
                       // Measure how far the pointer drifted from the down position.
                       const downX = parseFloat(e.currentTarget.dataset.pdX ?? e.clientX);
@@ -2959,40 +3004,20 @@ const ALLOWED_BRANDS = [
                       const drift = Math.hypot(e.clientX - downX, e.clientY - downY);
                       // 8 px threshold: anything larger is a pan/scroll, not a tap.
                       if (drift > 8) return;
-                      // Check if this is a navigation hotspot
-                      if (part.name === 'SEE HEAD DETAIL') {
-                        setCurrentPage(2);
-                        closeModal();
-                      } else if (part.name === 'SEE LEVER DETAIL') {
-                        setCurrentPage(3);
-                        closeModal();
-                      } else if (part.name === 'SEE PINCHBOX DETAIL') {
-                        setCurrentPage(4);
-                        closeModal();
-                      } else if (part.name === 'SEE EXTENSION HOUSING DETAIL') {
-                        setCurrentPage(5);
-                        closeModal();
-                      } else if (activeHotspot === hotspotKey) {
-                        closeModal();
-                      } else {
-                        // Snapshot the hotspot's bounding rect before React re-renders
-                        // so calculateAndSetModalPosition can use it both immediately
-                        // and in the post-render useEffect.
-                        const r = e.currentTarget.getBoundingClientRect();
-                        lastHotspotRectRef.current = {
-                          top: r.top, left: r.left, bottom: r.bottom,
-                          right: r.right, width: r.width, height: r.height,
-                        };
-                        window.setTimeout(() => {
-                          calculateAndSetModalPosition(lastHotspotRectRef.current);
-                          setActiveHotspot(hotspotKey);
-                          setActiveHotspotPart(part);
-                        }, 0);
-                      }
+                      activateHotspot(e.currentTarget);
                     }}
-                    // Suppress the synthesized click that follows touch so it
-                    // doesn't double-fire the action or bubble to the container.
-                    onClick={(e) => e.stopPropagation()}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      // Mobile uses pointerup drift-guard path to avoid accidental opens.
+                      if (isMobile) return;
+                      activateHotspot(e.currentTarget);
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key !== 'Enter' && e.key !== ' ') return;
+                      e.preventDefault();
+                      e.stopPropagation();
+                      activateHotspot(e.currentTarget);
+                    }}
                     title={`${part.name} (${part.sku})`}
                   >
                   </div>
