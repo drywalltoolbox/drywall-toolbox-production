@@ -263,7 +263,7 @@ function DesktopSummaryPanel( {
 
   return (
     <aside
-      className="dtb-summary-panel hidden lg:flex flex-col sticky top-0 h-screen overflow-hidden text-slate-100"
+      className="dtb-summary-panel hidden lg:flex flex-col lg:sticky lg:top-6 lg:self-start overflow-hidden rounded-2xl text-slate-100"
       style={ { background: 'linear-gradient(170deg, #0d1829 0%, #0a1020 80%)' } }
     >
       {/* Top brand accent stripe */}
@@ -294,7 +294,7 @@ function DesktopSummaryPanel( {
       </div>
 
       {/* Item list */}
-      <div className="flex-1 overflow-y-auto px-6 py-5 space-y-3">
+      <div className="px-6 py-5 space-y-3">
         <AnimatePresence>
           { processing
             ? [0, 1, 2].map( ( i ) => <SkeletonRow key={ i } /> )
@@ -1010,11 +1010,11 @@ export default function Checkout() {
     <div className="dtb-checkout min-h-screen bg-slate-50 page-wrapper">
       <SEOHead noindex title="Checkout" />
 
-      {/* ── Two-column grid: form (left) + dark summary (right, desktop only) ── */}
-      <div className="lg:grid lg:grid-cols-[1fr_500px] min-h-screen">
+      {/* ── Two-column desktop layout with unified page scroll (no pane scrollbars) ── */}
+      <div className="lg:grid lg:grid-cols-[1fr_500px] lg:gap-8 lg:items-start min-h-screen">
 
         {/* ── Left column: form ───────────────────────────────────────────── */}
-        <div className="px-4 py-8 sm:px-8 md:px-10 lg:px-12 xl:px-16 pb-32 lg:pb-16 lg:overflow-y-auto lg:max-h-screen">
+        <div className="px-4 py-8 sm:px-8 md:px-10 lg:px-12 xl:px-16 pb-32 lg:pb-16">
           <div className="max-w-xl mx-auto lg:mx-0">
 
             {/* Page heading */}
