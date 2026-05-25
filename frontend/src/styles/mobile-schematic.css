@@ -211,10 +211,10 @@
     display: none;
   }
 
-  /* Hide old direct children that are no longer needed */
+  /* Hide legacy detached-modal children from the pre-card layout only. */
   .part-modal-detached > h4,
   .part-modal-detached > .part-meta,
-  .part-modal-detached > div:last-child {
+  .part-modal-detached > .part-modal-actions {
     display: none;
   }
 }
@@ -989,26 +989,6 @@
   .hotspot.hotspot-precise.hotspot-rectangle {
     width: unset !important;
     height: unset !important;
-  }
-}
-
-/* Desktop discoverability: keep hotspots subtly visible even before hover so
-   users can find clickable part anchors on large schematics. */
-@media (min-width: 769px) {
-  .hotspot {
-    background: rgba(37, 99, 235, 0.06);
-    box-shadow:
-      inset 0 0 0 1px rgba(37, 99, 235, 0.38),
-      0 0 0 1px rgba(255, 255, 255, 0.55);
-  }
-
-  .hotspot:hover,
-  .hotspot:focus-visible,
-  .hotspot.active {
-    background: rgba(37, 99, 235, 0.14);
-    box-shadow:
-      inset 0 0 0 1px rgba(37, 99, 235, 0.78),
-      0 6px 14px rgba(37, 99, 235, 0.18);
   }
 }
 
