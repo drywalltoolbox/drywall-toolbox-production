@@ -992,6 +992,26 @@
   }
 }
 
+/* Desktop discoverability: keep hotspots subtly visible even before hover so
+   users can find clickable part anchors on large schematics. */
+@media (min-width: 769px) {
+  .hotspot {
+    background: rgba(37, 99, 235, 0.06);
+    box-shadow:
+      inset 0 0 0 1px rgba(37, 99, 235, 0.38),
+      0 0 0 1px rgba(255, 255, 255, 0.55);
+  }
+
+  .hotspot:hover,
+  .hotspot:focus-visible,
+  .hotspot.active {
+    background: rgba(37, 99, 235, 0.14);
+    box-shadow:
+      inset 0 0 0 1px rgba(37, 99, 235, 0.78),
+      0 6px 14px rgba(37, 99, 235, 0.18);
+  }
+}
+
 /* Tablet portrait & large phones (481px - 768px): Touch-friendly hotspots */
 @media (min-width: 481px) and (max-width: 768px) {
   .hotspot {

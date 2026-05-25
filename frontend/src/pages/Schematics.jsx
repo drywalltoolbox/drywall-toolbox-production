@@ -3009,11 +3009,26 @@ const ALLOWED_BRANDS = [
                       // Drift threshold: reject pan/drag gestures.
                       const maxTapDrift = e.pointerType === 'mouse' ? 6 : 8;
                       if (drift > maxTapDrift) return;
+                      // Mark mouse pointer activation so the subsequent click can be
+                      // ignored (prevents duplicate open/close toggles on desktop).
+                      if (e.pointerType === 'mouse') {
+                        e.currentTarget.dataset.pointerActivated = '1';
+                      }
                       activateHotspot(e.currentTarget);
                     }}
                     onClick={(e) => {
                       e.stopPropagation();
-                      // Activation is handled in onPointerUp for all pointer types.
+                      // Mobile uses pointerup drift-guard path to avoid accidental opens.
+                      if (isMobile) return;
+                      // Desktop fallback: if pointerup already activated this hotspot,
+                      // consume this click to avoid toggling it closed immediately.
+                      if (e.currentTarget.dataset.pointerActivated === '1') {
+                        e.currentTarget.dataset.pointerActivated = '0';
+                        return;
+                      }
+                      // Fallback activation for browsers/environments where pointerup
+                      // does not fire reliably for mouse.
+                      activateHotspot(e.currentTarget);
                     }}
                     onKeyDown={(e) => {
                       if (e.key !== 'Enter' && e.key !== ' ') return;
