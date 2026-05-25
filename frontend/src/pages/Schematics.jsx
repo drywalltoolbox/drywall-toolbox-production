@@ -2976,14 +2976,11 @@ const ALLOWED_BRANDS = [
                     // activating hotspots.  The displacement guard (8 px) means
                     // a finger that slid even slightly during the press is ignored.
                     onPointerDown={(e) => {
-                      // Only handle primary pointer (finger 0 or left-click).
+                      // Mobile/tablet touch path only; desktop mouse uses onClick.
                       if (!e.isPrimary) return;
+                      if (e.pointerType === 'mouse') return;
                       e.stopPropagation();
-                      // Prevent browser gesture/click synthesis for touch/pen only.
-                      // Mouse on desktop falls back to onClick for reliability.
-                      if (e.pointerType !== 'mouse') {
-                        e.preventDefault();
-                      }
+                      e.preventDefault();
                       // Record where the press began so we can measure drift.
                       e.currentTarget.dataset.pdX = e.clientX;
                       e.currentTarget.dataset.pdY = e.clientY;
@@ -2997,37 +2994,22 @@ const ALLOWED_BRANDS = [
                     }}
                     onPointerUp={(e) => {
                       if (!e.isPrimary) return;
+                      if (e.pointerType === 'mouse') return;
                       e.stopPropagation();
-                      // Prevent browser gesture/click synthesis for touch/pen.
-                      if (e.pointerType !== 'mouse') {
-                        e.preventDefault();
-                      }
+                      e.preventDefault();
                       // Measure how far the pointer drifted from the down position.
                       const downX = parseFloat(e.currentTarget.dataset.pdX ?? e.clientX);
                       const downY = parseFloat(e.currentTarget.dataset.pdY ?? e.clientY);
                       const drift = Math.hypot(e.clientX - downX, e.clientY - downY);
-                      // Drift threshold: reject pan/drag gestures.
-                      const maxTapDrift = e.pointerType === 'mouse' ? 6 : 8;
-                      if (drift > maxTapDrift) return;
-                      // Mark mouse pointer activation so the subsequent click can be
-                      // ignored (prevents duplicate open/close toggles on desktop).
-                      if (e.pointerType === 'mouse') {
-                        e.currentTarget.dataset.pointerActivated = '1';
-                      }
+                      // 8 px threshold: anything larger is a pan/scroll, not a tap.
+                      if (drift > 8) return;
                       activateHotspot(e.currentTarget);
                     }}
                     onClick={(e) => {
                       e.stopPropagation();
                       // Mobile uses pointerup drift-guard path to avoid accidental opens.
                       if (isMobile) return;
-                      // Desktop fallback: if pointerup already activated this hotspot,
-                      // consume this click to avoid toggling it closed immediately.
-                      if (e.currentTarget.dataset.pointerActivated === '1') {
-                        e.currentTarget.dataset.pointerActivated = '0';
-                        return;
-                      }
-                      // Fallback activation for browsers/environments where pointerup
-                      // does not fire reliably for mouse.
+                      // Desktop mouse activation path.
                       activateHotspot(e.currentTarget);
                     }}
                     onKeyDown={(e) => {
