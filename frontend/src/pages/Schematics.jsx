@@ -2571,7 +2571,10 @@ const ALLOWED_BRANDS = [
         backgroundColor: '#f9fafb'
       }}
       className={`page-wrapper ${selectedSchematic ? 'viewer-active' : ''} ${isFullscreen ? 'fullscreen-mode' : ''}`}
-      onClick={closeModal}
+      onClick={(e) => {
+        // Only close when clicking the section backdrop itself, not any child.
+        if (e.target === e.currentTarget) closeModal();
+      }}
     >
       <SEOHead
         title="Tool Schematics & Diagrams"
@@ -2995,22 +2998,22 @@ const ALLOWED_BRANDS = [
                     onPointerUp={(e) => {
                       if (!e.isPrimary) return;
                       e.stopPropagation();
-                      // Desktop mouse uses onClick fallback; pointerup path is for touch/pen.
-                      if (e.pointerType === 'mouse') return;
-                      e.preventDefault();
+                      // Prevent browser gesture/click synthesis for touch/pen.
+                      if (e.pointerType !== 'mouse') {
+                        e.preventDefault();
+                      }
                       // Measure how far the pointer drifted from the down position.
                       const downX = parseFloat(e.currentTarget.dataset.pdX ?? e.clientX);
                       const downY = parseFloat(e.currentTarget.dataset.pdY ?? e.clientY);
                       const drift = Math.hypot(e.clientX - downX, e.clientY - downY);
-                      // 8 px threshold: anything larger is a pan/scroll, not a tap.
-                      if (drift > 8) return;
+                      // Drift threshold: reject pan/drag gestures.
+                      const maxTapDrift = e.pointerType === 'mouse' ? 6 : 8;
+                      if (drift > maxTapDrift) return;
                       activateHotspot(e.currentTarget);
                     }}
                     onClick={(e) => {
                       e.stopPropagation();
-                      // Mobile uses pointerup drift-guard path to avoid accidental opens.
-                      if (isMobile) return;
-                      activateHotspot(e.currentTarget);
+                      // Activation is handled in onPointerUp for all pointer types.
                     }}
                     onKeyDown={(e) => {
                       if (e.key !== 'Enter' && e.key !== ' ') return;
