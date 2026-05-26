@@ -1795,7 +1795,7 @@ const ALLOWED_BRANDS = [
     },
     {
       id: 'tapetech-48tt',
-      title: 'Corner Finisher - 3\" EasyRoll Adjustable (48TT)',
+      title: 'Corner Finisher - 3" EasyRoll Adjustable (48TT)',
       description: 'TapeTech 48TT schematic diagram with replacement parts',
       brand: 'TapeTech',
       category: 'Corner Finishers',

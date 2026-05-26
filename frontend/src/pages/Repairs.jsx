@@ -22,7 +22,7 @@ import veeqoService from '../services/veeqo';
    ───────────────────────────────────────────────────────────────────────── */
 const SUPPORTED_BRANDS = Object.keys(SCHEMATIC_DEFINITIONS).sort((a, b) => a.localeCompare(b)); // alphabetical
 
-function normalizeCategoryForBrand(category, brand) {
+function normalizeCategoryForBrand(category, _brand) {
   return normalizeRepairCategory(category);
 }
 
