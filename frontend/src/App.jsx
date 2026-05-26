@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route, useLocation, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useLocation, Navigate, useNavigate } from 'react-router-dom';
 import { useState, useEffect, lazy, Suspense, useCallback } from 'react';
 import PageTransition from './components/routing/PageTransition';
 import LoadingSpinner from './components/shared/LoadingSpinner';
@@ -11,14 +11,14 @@ import Header from './components/shell/Header';
 import Footer from './components/shell/Footer';
 import CartSidebar from './components/shell/CartSidebar';
 import ProtectedRoute from './components/routing/ProtectedRoute';
-import AccountHubSheet from './components/account/AccountHubSheet.jsx';
+import HomepageSignupCTA from './components/cta/HomepageSignupCTA.jsx';
 import MobileInstallNudge from './components/pwa/MobileInstallNudge.jsx';
 import { isRewardsEnabled } from './utils/featureFlags.js';
 import { initializeWebpackPublicPath } from './setWebpackPublicPath.js';
 
 const APP_BASE = (process.env.PUBLIC_URL || '').replace(/\/+$/, '');
-const HOMEPAGE_ACCOUNT_CTA_SEEN_KEY = 'dtb:homepage-account-cta-seen:v1';
-const HOMEPAGE_ACCOUNT_CTA_DELAY_MS = 900;
+const HOMEPAGE_SIGNUP_CTA_SEEN_KEY = 'dtb:homepage-signup-cta-seen:v1';
+const HOMEPAGE_SIGNUP_CTA_DELAY_MS = 900;
 
 initializeWebpackPublicPath();
 
@@ -202,36 +202,42 @@ function App() {
 
 function AppShell({ cartOpen, toggleCart, closeCart }) {
   const location = useLocation();
-  const { user, isAuthenticated, isLoading, logout } = useAuthContext();
-  const [homepageAccountCtaOpen, setHomepageAccountCtaOpen] = useState(false);
+  const navigate = useNavigate();
+  const { isAuthenticated, isLoading } = useAuthContext();
+  const [homepageSignupCtaOpen, setHomepageSignupCtaOpen] = useState(false);
   const isHomePage = location.pathname === '/';
 
-  const closeHomepageAccountCta = useCallback(() => {
-    setHomepageAccountCtaOpen(false);
+  const closeHomepageSignupCta = useCallback(() => {
+    setHomepageSignupCtaOpen(false);
   }, []);
 
+  const handleHomepageSignup = useCallback(() => {
+    setHomepageSignupCtaOpen(false);
+    navigate('/register');
+  }, [navigate]);
+
   useEffect(() => {
-    if (!isHomePage || isLoading || isAuthenticated || homepageAccountCtaOpen) return undefined;
-    if (getLocalStorageFlag(HOMEPAGE_ACCOUNT_CTA_SEEN_KEY)) return undefined;
+    if (!isHomePage || isLoading || isAuthenticated || homepageSignupCtaOpen) return undefined;
+    if (getLocalStorageFlag(HOMEPAGE_SIGNUP_CTA_SEEN_KEY)) return undefined;
 
     const timer = window.setTimeout(() => {
-      if (getLocalStorageFlag(HOMEPAGE_ACCOUNT_CTA_SEEN_KEY)) return;
-      setLocalStorageFlag(HOMEPAGE_ACCOUNT_CTA_SEEN_KEY);
-      setHomepageAccountCtaOpen(true);
-    }, HOMEPAGE_ACCOUNT_CTA_DELAY_MS);
+      if (getLocalStorageFlag(HOMEPAGE_SIGNUP_CTA_SEEN_KEY)) return;
+      setLocalStorageFlag(HOMEPAGE_SIGNUP_CTA_SEEN_KEY);
+      setHomepageSignupCtaOpen(true);
+    }, HOMEPAGE_SIGNUP_CTA_DELAY_MS);
 
     return () => window.clearTimeout(timer);
-  }, [homepageAccountCtaOpen, isAuthenticated, isHomePage, isLoading]);
+  }, [homepageSignupCtaOpen, isAuthenticated, isHomePage, isLoading]);
 
   useEffect(() => {
-    if (isHomePage || !homepageAccountCtaOpen) return undefined;
+    if (isHomePage || !homepageSignupCtaOpen) return undefined;
 
     const timer = window.setTimeout(() => {
-      setHomepageAccountCtaOpen(false);
+      setHomepageSignupCtaOpen(false);
     }, 0);
 
     return () => window.clearTimeout(timer);
-  }, [homepageAccountCtaOpen, isHomePage]);
+  }, [homepageSignupCtaOpen, isHomePage]);
 
   return (
     <>
@@ -250,13 +256,12 @@ function AppShell({ cartOpen, toggleCart, closeCart }) {
         <Footer />
       </div>
       <CartSidebar isOpen={cartOpen} onClose={closeCart} />
-      <AccountHubSheet
-        isOpen={homepageAccountCtaOpen}
-        onClose={closeHomepageAccountCta}
-        user={user}
-        onLogout={logout}
+      <HomepageSignupCTA
+        isOpen={homepageSignupCtaOpen}
+        onClose={closeHomepageSignupCta}
+        onSignup={handleHomepageSignup}
       />
-      <MobileInstallNudge suppressed={homepageAccountCtaOpen || cartOpen} />
+      <MobileInstallNudge suppressed={homepageSignupCtaOpen || cartOpen} />
     </>
   );
 }
