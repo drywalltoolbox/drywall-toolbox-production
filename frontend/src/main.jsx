@@ -13,6 +13,7 @@ import './styles/storefront-sections.css'
 import './styles/storefront-product-card.css'
 import './styles/storefront-drawer.css'
 import './styles/account-hub.css'
+import './styles/account-hub-cta.css'
 import './styles/checkout-typography.css'
 import App from './App.jsx'
 import ErrorBoundary from './components/errors/ErrorBoundary.jsx'
@@ -73,7 +74,7 @@ if (typeof window !== 'undefined') {
       });
       
       input.addEventListener('blur', () => {
-        // Restore full zoom capability after the keyboard closes.
+        // Restore full zoom capability after the keyboard closes
         const viewport = document.querySelector('meta[name="viewport"]');
         if (viewport) {
           viewport.setAttribute('content', 'width=device-width, initial-scale=1.0, viewport-fit=cover');
