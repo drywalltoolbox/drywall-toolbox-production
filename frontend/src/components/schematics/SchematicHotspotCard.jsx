@@ -57,7 +57,7 @@ function getPriceData(product, part, stockStatus) {
     return { priceLabel: '...', comparePriceLabel: null };
   }
 
-  return { priceLabel: 'Unavailable', comparePriceLabel: null };
+  return { priceLabel: null, comparePriceLabel: null };
 }
 
 function StockBadge({ stockStatus }) {
@@ -114,11 +114,12 @@ export default function SchematicHotspotCard({
   const isAdding     = addingToCart === part.id;
   const canAdd       = Boolean(product?.id) && stockStatus !== null;
   const isResolving  = Boolean(part.sku) && stockStatus === null;
+  const isUnavailable = !canAdd && !isResolving;
 
   const ctaLabel = isAdding    ? 'Adding…'
     : isResolving ? 'Resolving…'
     : canAdd      ? 'Add'
-    : 'Unavailable';
+    : '';
 
   const titleNode = product?.slug ? (
     <Link
@@ -192,23 +193,31 @@ export default function SchematicHotspotCard({
 
         {/* Price + CTA (horizontal row, right-aligned) */}
         <div className="schematic-hotspot-card__footer">
-          <span className="schematic-hotspot-card__price-group">
-            <span className="schematic-hotspot-card__price">
-              {priceLabel}
-            </span>
-            {comparePriceLabel ? (
-              <span className="schematic-hotspot-card__compare-price">
-                {comparePriceLabel}
+          {!isUnavailable ? (
+            <>
+              <span className="schematic-hotspot-card__price-group">
+                <span className="schematic-hotspot-card__price">
+                  {priceLabel}
+                </span>
+                {comparePriceLabel ? (
+                  <span className="schematic-hotspot-card__compare-price">
+                    {comparePriceLabel}
+                  </span>
+                ) : null}
               </span>
-            ) : null}
-          </span>
-          <button
-            className="schematic-hotspot-card__cta"
-            disabled={!canAdd || isAdding}
-            onClick={(e) => { e.stopPropagation(); onAddToCart?.(); }}
-          >
-            {ctaLabel}
-          </button>
+              <button
+                className="schematic-hotspot-card__cta"
+                disabled={!canAdd || isAdding}
+                onClick={(e) => { e.stopPropagation(); onAddToCart?.(); }}
+              >
+                {ctaLabel}
+              </button>
+            </>
+          ) : (
+            <span className="schematic-hotspot-card__price schematic-hotspot-card__price--unavailable">
+              Unavailable
+            </span>
+          )}
         </div>
       </div>
     </div>

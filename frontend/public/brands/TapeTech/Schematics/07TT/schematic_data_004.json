@@ -1,0 +1,773 @@
+{
+  "id": "1779789653455",
+  "title": "tapetech-tapetech-lock-block-for-07tt-050212f-sch-schematic-page-004",
+  "diagramPages": [
+    1
+  ],
+  "legendPages": [],
+  "parts": [
+    {
+      "id": "052409",
+      "name": "052409",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "052407B",
+      "name": "052407B",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "209058",
+      "name": "209058",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "050244",
+      "name": "050244",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "709034",
+      "name": "709034",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "052404B",
+      "name": "052404B",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "050403B",
+      "name": "050403B",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "05240B",
+      "name": "05240B",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "Details",
+      "name": "Details",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "051252",
+      "name": "051252",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "051415",
+      "name": "051415",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "050249",
+      "name": "050249",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "059331 x 2",
+      "name": "059331 x 2",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "050229",
+      "name": "050229",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "050212F",
+      "name": "050212F",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "059230",
+      "name": "059230",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "059225 x 2",
+      "name": "059225 x 2",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "059226",
+      "name": "059226",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "051251",
+      "name": "051251",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "059015",
+      "name": "059015",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "059164",
+      "name": "059164",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "050145",
+      "name": "050145",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "056100F",
+      "name": "056100F",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "054219",
+      "name": "054219",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "051248",
+      "name": "051248",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "051250",
+      "name": "051250",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "059330 x 2",
+      "name": "059330 x 2",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "059330 x 2",
+      "name": "059330 x 2",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "059143",
+      "name": "059143",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "052221",
+      "name": "052221",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "059057 x 4",
+      "name": "059057 x 4",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "052214 x 4",
+      "name": "052214 x 4",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "059436 x 2",
+      "name": "059436 x 2",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "050412 x 4",
+      "name": "050412 x 4",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "050410B x 2",
+      "name": "050410B x 2",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "050413 x 8",
+      "name": "050413 x 8",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "050418 x 8",
+      "name": "050418 x 8",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "059323 x 2",
+      "name": "059323 x 2",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "05402FF",
+      "name": "05402FF",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "054002B x 8",
+      "name": "054002B x 8",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "059238 x 2",
+      "name": "059238 x 2",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "052400B",
+      "name": "052400B",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "889009 x 2",
+      "name": "889009 x 2",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "709043",
+      "name": "709043",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "Details",
+      "name": "Details",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "809006",
+      "name": "809006",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "051243",
+      "name": "051243",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "059143",
+      "name": "059143",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "059206",
+      "name": "059206",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "059201",
+      "name": "059201",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "050204",
+      "name": "050204",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "050205",
+      "name": "050205",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "050205",
+      "name": "050205",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "050203",
+      "name": "050203",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "Details",
+      "name": "Details",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "052403",
+      "name": "052403",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "052401B",
+      "name": "052401B",
+      "quantity": 1,
+      "sku": ""
+    }
+  ],
+  "coordinates": {
+    "209058": {
+      "id": "209058",
+      "x_pct": 49.42,
+      "y_pct": 23.59007765781313,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "709034": {
+      "id": "709034",
+      "x_pct": 45.280884940418076,
+      "y_pct": 30.38014730760222,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "709043": {
+      "id": "709043",
+      "x_pct": 28.7,
+      "y_pct": 52.400000000000006,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "809006": {
+      "id": "809006",
+      "x_pct": 16.299999999999997,
+      "y_pct": 48.7,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "052409": {
+      "id": "052409",
+      "x_pct": 37.45,
+      "y_pct": 10.600000000000001,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "052407B": {
+      "id": "052407B",
+      "x_pct": 50.034796275731345,
+      "y_pct": 17.490073653801108,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "050244": {
+      "id": "050244",
+      "x_pct": 47.849999999999994,
+      "y_pct": 24.890073653801107,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "052404B": {
+      "id": "052404B",
+      "x_pct": 26.268029811082197,
+      "y_pct": 30.29007765781313,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "050403B": {
+      "id": "050403B",
+      "x_pct": 29.627581361723767,
+      "y_pct": 34.47022496541534,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "05240B": {
+      "id": "05240B",
+      "x_pct": 35.73652515574638,
+      "y_pct": 36.589930350210906,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "Details": {
+      "id": "Details",
+      "x_pct": 34.46176470588235,
+      "y_pct": 87.75,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "051252": {
+      "id": "051252",
+      "x_pct": 51.24389425108971,
+      "y_pct": 33.87021695739131,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "051415": {
+      "id": "051415",
+      "x_pct": 57.37977577532078,
+      "y_pct": 31.5,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "050249": {
+      "id": "050249",
+      "x_pct": 65.2,
+      "y_pct": 36.4,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "059331 x 2": {
+      "id": "059331 x 2",
+      "x_pct": 65.93260186213433,
+      "y_pct": 33.880147307602215,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "050229": {
+      "id": "050229",
+      "x_pct": 68.9465131974476,
+      "y_pct": 31.52,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "050212F": {
+      "id": "050212F",
+      "x_pct": 70.67867856852227,
+      "y_pct": 26.59007365380111,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "059230": {
+      "id": "059230",
+      "x_pct": 70.69215341277591,
+      "y_pct": 28.980147307602216,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "059225 x 2": {
+      "id": "059225 x 2",
+      "x_pct": 74.61910310128314,
+      "y_pct": 20.480147307602216,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "059226": {
+      "id": "059226",
+      "x_pct": 73.22325061957442,
+      "y_pct": 23.290294615204434,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "051251": {
+      "id": "051251",
+      "x_pct": 79.28150465533582,
+      "y_pct": 14.3,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "059015": {
+      "id": "059015",
+      "x_pct": 89.61067267403764,
+      "y_pct": 11.3,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "059164": {
+      "id": "059164",
+      "x_pct": 90.08022422467921,
+      "y_pct": 14.809999999999999,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "050145": {
+      "id": "050145",
+      "x_pct": 90.45064875744009,
+      "y_pct": 16.6,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "056100F": {
+      "id": "056100F",
+      "x_pct": 97.5,
+      "y_pct": 25.70992634619889,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "054219": {
+      "id": "054219",
+      "x_pct": 95.5,
+      "y_pct": 31.200000000000003,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "051248": {
+      "id": "051248",
+      "x_pct": 92.32132143147773,
+      "y_pct": 34.190077657813134,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "051250": {
+      "id": "051250",
+      "x_pct": 90.03479627573135,
+      "y_pct": 36.909922342186874,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "059330 x 2": {
+      "id": "059330 x 2",
+      "x_pct": 84,
+      "y_pct": 42.7,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "059143": {
+      "id": "059143",
+      "x_pct": 19.4,
+      "y_pct": 61.599999999999994,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "052221": {
+      "id": "052221",
+      "x_pct": 81.9,
+      "y_pct": 45.900000000000006,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "059057 x 4": {
+      "id": "059057 x 4",
+      "x_pct": 78.65955155064157,
+      "y_pct": 51.2,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "052214 x 4": {
+      "id": "052214 x 4",
+      "x_pct": 77.56237763745511,
+      "y_pct": 56.599999999999994,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "059436 x 2": {
+      "id": "059436 x 2",
+      "x_pct": 70,
+      "y_pct": 58.89999999999999,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "050412 x 4": {
+      "id": "050412 x 4",
+      "x_pct": 68.9,
+      "y_pct": 61.4,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "050410B x 2": {
+      "id": "050410B x 2",
+      "x_pct": 67.5,
+      "y_pct": 63.7,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "050413 x 8": {
+      "id": "050413 x 8",
+      "x_pct": 66.3,
+      "y_pct": 66.30000000000001,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "050418 x 8": {
+      "id": "050418 x 8",
+      "x_pct": 64.80000000000001,
+      "y_pct": 70.5,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "059323 x 2": {
+      "id": "059323 x 2",
+      "x_pct": 49.57326257787319,
+      "y_pct": 65.79993035021091,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "05402FF": {
+      "id": "05402FF",
+      "x_pct": 44.446088664686734,
+      "y_pct": 66.80993035021092,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "054002B x 8": {
+      "id": "054002B x 8",
+      "x_pct": 46.7,
+      "y_pct": 71,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "059238 x 2": {
+      "id": "059238 x 2",
+      "x_pct": 38.9,
+      "y_pct": 76.9,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "052400B": {
+      "id": "052400B",
+      "x_pct": 29.12326257787319,
+      "y_pct": 61.759852692397786,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "889009 x 2": {
+      "id": "889009 x 2",
+      "x_pct": 30.962377637455113,
+      "y_pct": 57.599999999999994,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "051243": {
+      "id": "051243",
+      "x_pct": 19.7,
+      "y_pct": 59.3,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "059206": {
+      "id": "059206",
+      "x_pct": 18.9,
+      "y_pct": 64.1,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "059201": {
+      "id": "059201",
+      "x_pct": 18.5,
+      "y_pct": 66.4,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "050204": {
+      "id": "050204",
+      "x_pct": 18,
+      "y_pct": 68.69999999999999,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "050205": {
+      "id": "050205",
+      "x_pct": 10.100000000000001,
+      "y_pct": 80.30000000000001,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "050203": {
+      "id": "050203",
+      "x_pct": 26.299999999999997,
+      "y_pct": 89,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "052403": {
+      "id": "052403",
+      "x_pct": 37.5,
+      "y_pct": 81.9,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "052401B": {
+      "id": "052401B",
+      "x_pct": 7,
+      "y_pct": 91.5,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    }
+  },
+  "schema_version": "1.0",
+  "image_natural_width": 2400,
+  "image_natural_height": 1792
+}

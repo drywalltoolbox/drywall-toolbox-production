@@ -115,19 +115,11 @@ import platinumOutsideCornerRollerData from '/brands/Platinum/Schematics/Outside
 // ---------------------------------------------------------------------------
 // TapeTech schematic JSON data imports
 // ---------------------------------------------------------------------------
-import tapeTech8054TTData from '/brands/TapeTech/Schematics/8054TT/schematic_data.json';
+import tapeTech8054TTData from '/brands/TapeTech/Schematics/80XXTT/schematic_data.json';
+import tapeTech07TTData  from '/brands/TapeTech/Schematics/07TT/schematic_data.json';
 import tapeTech17TTData  from '/brands/TapeTech/Schematics/17TT/schematic_data.json';
-import tapeTech20TTXData from '/brands/TapeTech/Schematics/20TTX/schematic_data.json';
-import tapeTech25TTXData from '/brands/TapeTech/Schematics/25TTX/schematic_data.json';
-import tapeTech30TTXData from '/brands/TapeTech/Schematics/30TTX/schematic_data.json';
-import tapeTech35TTData  from '/brands/TapeTech/Schematics/35TT/schematic_data.json';
-import tapeTech40TTData  from '/brands/TapeTech/Schematics/40TT/schematic_data.json';
 import tapeTech42TTData  from '/brands/TapeTech/Schematics/42TT/schematic_data.json';
-import tapeTech45TTData  from '/brands/TapeTech/Schematics/45TT/schematic_data.json';
 import tapeTech48TTData  from '/brands/TapeTech/Schematics/48TT/schematic_data.json';
-import tapeTech50TTData  from '/brands/TapeTech/Schematics/50TT/schematic_data.json';
-import tapeTech63TTData  from '/brands/TapeTech/Schematics/63TT/schematic_data.json';
-import tapeTech68TTData  from '/brands/TapeTech/Schematics/68TT/schematic_data.json';
 
 // ---------------------------------------------------------------------------
 // Dura-Stilts schematic JSON data imports
@@ -448,57 +440,102 @@ const _fallbacks = {
   },
 
   // ── TapeTech ────────────────────────────────────────────────────────────
-  'tapetech-8054tt': {
-    pages:   { 1: `${_BASE}brands/TapeTech/Schematics/8054TT/schematic_page_1.png` },
-    preview: `${_BASE}brands/TapeTech/Schematics/8054TT/8054tt.png`,
+  'tapetech-80xxtt': {
+    pages:   { 1: `${_BASE}brands/TapeTech/Schematics/80XXTT/8034TT_SCH_page_1-enhanced.png` },
+    preview: `${_BASE}brands/TapeTech/Schematics/80XXTT/reference_images/8034tt_01.webp`,
+  },
+  'tapetech-07tt': {
+    pages: {
+      1: `${_BASE}brands/TapeTech/Schematics/07TT/tapetech-tapetech-lock-block-for-07tt-050212f-sch-schematic-page-001.png`,
+      2: `${_BASE}brands/TapeTech/Schematics/07TT/tapetech-tapetech-lock-block-for-07tt-050212f-sch-schematic-page-002.png`,
+      3: `${_BASE}brands/TapeTech/Schematics/07TT/tapetech-tapetech-lock-block-for-07tt-050212f-sch-schematic-page-003.png`,
+      4: `${_BASE}brands/TapeTech/Schematics/07TT/tapetech-tapetech-lock-block-for-07tt-050212f-sch-schematic-page-004.png`,
+    },
+    preview: `${_BASE}brands/TapeTech/Schematics/07TT/07TT_Full_Full__37672.png`,
   },
   'tapetech-17tt': {
     pages:   { 1: `${_BASE}brands/TapeTech/Schematics/17TT/schematic_page_1.png` },
-    preview: `${_BASE}brands/TapeTech/Schematics/17TT/17tt.png`,
-  },
-  'tapetech-20ttx': {
-    pages:   { 1: `${_BASE}brands/TapeTech/Schematics/20TTX/schematic_page_1.png` },
-    preview: `${_BASE}brands/TapeTech/Schematics/20TTX/20ttx.png`,
-  },
-  'tapetech-25ttx': {
-    pages:   { 1: `${_BASE}brands/TapeTech/Schematics/25TTX/schematic_page_1-.png` },
-    preview: `${_BASE}brands/TapeTech/Schematics/25TTX/25ttx.png`,
-  },
-  'tapetech-30ttx': {
-    pages:   { 1: `${_BASE}brands/TapeTech/Schematics/30TTX/schematic_page_1.png` },
-    preview: `${_BASE}brands/TapeTech/Schematics/30TTX/30ttx.png`,
-  },
-  'tapetech-35tt': {
-    pages:   { 1: `${_BASE}brands/TapeTech/Schematics/35TT/schematic_page_1.png` },
-    preview: `${_BASE}brands/TapeTech/Schematics/35TT/35tt.png`,
-  },
-  'tapetech-40tt': {
-    pages:   { 1: `${_BASE}brands/TapeTech/Schematics/40TT/schematic_page_1.png` },
-    preview: `${_BASE}brands/TapeTech/Schematics/40TT/40tt.png`,
+    preview: `${_BASE}brands/TapeTech/Schematics/17TT/tapetech_17tta__59147.png`,
   },
   'tapetech-42tt': {
-    pages:   { 1: `${_BASE}brands/TapeTech/Schematics/42TT/schematic_page_1.png` },
+    pages:   { 1: `${_BASE}brands/TapeTech/Schematics/42TT/tapetech-90-inside-corner-edger-tapetech-42tt-sch-schematic-page-001.png` },
     preview: `${_BASE}brands/TapeTech/Schematics/42TT/42tt.png`,
   },
-  'tapetech-45tt': {
-    pages:   { 1: `${_BASE}brands/TapeTech/Schematics/45TT/schematic_page_1.png` },
-    preview: `${_BASE}brands/TapeTech/Schematics/45TT/45tt.png`,
-  },
   'tapetech-48tt': {
-    pages:   { 1: `${_BASE}brands/TapeTech/Schematics/48TT/schematic_page_1.png` },
-    preview: `${_BASE}brands/TapeTech/Schematics/48TT/48tt.png`,
+    pages:   { 1: `${_BASE}brands/TapeTech/Schematics/48TT/tapetech-90-inside-corner-edger-tapetech-48tt-sch-schematic-page-001.png` },
+    preview: `${_BASE}brands/TapeTech/Schematics/48TT/tapetech-90-inside-corner-edger-tapetech-48tt-sch-schematic-page-001.png`,
   },
-  'tapetech-50tt': {
-    pages:   { 1: `${_BASE}brands/TapeTech/Schematics/50TT/schematic_page_1.png` },
-    preview: `${_BASE}brands/TapeTech/Schematics/50TT/50tt.png`,
+  'tapetech-76tt': {
+    pages:   { 1: `${_BASE}brands/TapeTech/Schematics/76TT/76TT-page_1.png` },
+    preview: `${_BASE}brands/TapeTech/Schematics/76TT/reference_images/76tt_01.webp`,
   },
-  'tapetech-63tt': {
-    pages:   { 1: `${_BASE}brands/TapeTech/Schematics/63TT/schematic_page_1.png` },
-    preview: `${_BASE}brands/TapeTech/Schematics/63TT/63tt.png`,
+  'tapetech-81xxtt': {
+    pages:   { 1: `${_BASE}brands/TapeTech/Schematics/81XXTT/8154TT_SCH_page_1.png` },
+    preview: `${_BASE}brands/TapeTech/Schematics/81XXTT/reference_images/8154tt_01.webp`,
   },
-  'tapetech-68tt': {
-    pages:   { 1: `${_BASE}brands/TapeTech/Schematics/68TT/schematic_page_1.png` },
-    preview: `${_BASE}brands/TapeTech/Schematics/68TT/68tt.png`,
+  'tapetech-85t': {
+    pages:   { 1: `${_BASE}brands/TapeTech/Schematics/85T/85T_SCH_page_1.png` },
+    preview: `${_BASE}brands/TapeTech/Schematics/85T/reference_images/85t_01.webp`,
+  },
+  'tapetech-88tte': {
+    pages:   { 1: `${_BASE}brands/TapeTech/Schematics/88TTE/88TTE_SCH_page_1.png` },
+    preview: `${_BASE}brands/TapeTech/Schematics/88TTE/reference_images/88tte_01.webp`,
+  },
+  'tapetech-90t': {
+    pages:   { 1: `${_BASE}brands/TapeTech/Schematics/90T/90T_SCH_page_1.png` },
+    preview: `${_BASE}brands/TapeTech/Schematics/90T/reference_images/90t_01.webp`,
+  },
+  'tapetech-ehc07': {
+    pages:   { 1: `${_BASE}brands/TapeTech/Schematics/EHC07/EHC07_SCH_page_1-enhanced.png` },
+    preview: `${_BASE}brands/TapeTech/Schematics/EHC07/reference_images/ehc07_01.webp`,
+  },
+  'tapetech-ehc10': {
+    pages:   { 1: `${_BASE}brands/TapeTech/Schematics/EHC10/EHC10_SCH_page_1.png` },
+    preview: `${_BASE}brands/TapeTech/Schematics/EHC10/reference_images/ehc10_01.webp`,
+  },
+  'tapetech-ehc12': {
+    pages:   { 1: `${_BASE}brands/TapeTech/Schematics/EHC12/EHC12_SCH_page_1.png` },
+    preview: `${_BASE}brands/TapeTech/Schematics/EHC12/reference_images/ehc12_01.webp`,
+  },
+  'tapetech-ez07tt': {
+    pages:   { 1: `${_BASE}brands/TapeTech/Schematics/EZ07TT/EZ07TT_SCH_page_1.png` },
+    preview: `${_BASE}brands/TapeTech/Schematics/EZ07TT/reference_images/ez07tt_01.webp`,
+  },
+  'tapetech-ez10tt': {
+    pages:   { 1: `${_BASE}brands/TapeTech/Schematics/EZ10TT/EZ10TT_SCH_page_1.png` },
+    preview: `${_BASE}brands/TapeTech/Schematics/EZ10TT/reference_images/ez10tt_01.webp`,
+  },
+  'tapetech-ez12tt': {
+    pages:   { 1: `${_BASE}brands/TapeTech/Schematics/EZ12TT/EZ12TT_SCH_page_1.png` },
+    preview: `${_BASE}brands/TapeTech/Schematics/EZ12TT/reference_images/ez12tt_01.webp`,
+  },
+  'tapetech-ez15tt': {
+    pages:   { 1: `${_BASE}brands/TapeTech/Schematics/EZ15TT/EZ15TT_SCH_page_1.png` },
+    preview: `${_BASE}brands/TapeTech/Schematics/EZ15TT/reference_images/ez15tt_01.webp`,
+  },
+  'tapetech-pahc07': {
+    pages:   { 1: `${_BASE}brands/TapeTech/Schematics/PAHC07/PAHC07_SCH_page_1.png` },
+    preview: `${_BASE}brands/TapeTech/Schematics/PAHC07/reference_images/pahc07_01.webp`,
+  },
+  'tapetech-pahc10': {
+    pages:   { 1: `${_BASE}brands/TapeTech/Schematics/PAHC10/PAHC10_SCH_v2_page_1.png` },
+    preview: `${_BASE}brands/TapeTech/Schematics/PAHC10/reference_images/pahc10_01.webp`,
+  },
+  'tapetech-pahc12': {
+    pages:   { 1: `${_BASE}brands/TapeTech/Schematics/PAHC12/PAHC12_SCH_page_1.png` },
+    preview: `${_BASE}brands/TapeTech/Schematics/PAHC12/reference_images/pahc12_01.webp`,
+  },
+  'tapetech-qb06-qsx': {
+    pages:   { 1: `${_BASE}brands/TapeTech/Schematics/QB06-QSX/QB06-QSX_SCH_page_1.png` },
+    preview: `${_BASE}brands/TapeTech/Schematics/QB06-QSX/reference_images/qb06-qsx_01.webp`,
+  },
+  'tapetech-qb08-qsx': {
+    pages:   { 1: `${_BASE}brands/TapeTech/Schematics/QB08-QSX/QB08-QSX_SCH_page_1.png` },
+    preview: `${_BASE}brands/TapeTech/Schematics/QB08-QSX/reference_images/qb08-qsx_01.webp`,
+  },
+  'tapetech-xhtt': {
+    pages:   { 1: `${_BASE}brands/TapeTech/Schematics/XHTT/XHTT_SCH_page_1-enhanced.png` },
+    preview: `${_BASE}brands/TapeTech/Schematics/XHTT/reference_images/xhtt_01.webp`,
   },
 
   // ── Level5 ───────────────────────────────────────────────────────────────
@@ -653,6 +690,7 @@ const ALLOWED_BRANDS = [
   // Position of the detached desktop modal within schematic-container (px from top-left)
   const [modalPosition, setModalPosition] = useState({ top: 0, left: 0 });
   const [toast, setToast] = useState(null);
+  const [imageNaturalSizeBySrc, setImageNaturalSizeBySrc] = useState({});
   const [brands, setBrands] = useState([]);
   // Tracks whether the main schematic diagram image has finished loading.
   // Drives the skeleton placeholder and fade-in transition on the <img>.
@@ -900,18 +938,10 @@ const ALLOWED_BRANDS = [
 
   // TapeTech parts arrays
   const tapeTech8054TTParts = buildPartsFromData(tapeTech8054TTData);
+  const tapeTech07TTParts  = buildPartsFromData(tapeTech07TTData);
   const tapeTech17TTParts  = buildPartsFromData(tapeTech17TTData);
-  const tapeTech20TTXParts = buildPartsFromData(tapeTech20TTXData);
-  const tapeTech25TTXParts = buildPartsFromData(tapeTech25TTXData);
-  const tapeTech30TTXParts = buildPartsFromData(tapeTech30TTXData);
-  const tapeTech35TTParts  = buildPartsFromData(tapeTech35TTData);
-  const tapeTech40TTParts  = buildPartsFromData(tapeTech40TTData);
   const tapeTech42TTParts  = buildPartsFromData(tapeTech42TTData);
-  const tapeTech45TTParts  = buildPartsFromData(tapeTech45TTData);
   const tapeTech48TTParts  = buildPartsFromData(tapeTech48TTData);
-  const tapeTech50TTParts  = buildPartsFromData(tapeTech50TTData);
-  const tapeTech63TTParts  = buildPartsFromData(tapeTech63TTData);
-  const tapeTech68TTParts  = buildPartsFromData(tapeTech68TTData);
 
   // Level5 parts arrays
   const level5CoverPlateAssemblyParts = buildPartsFromData(level5CoverPlateAssemblyData);
@@ -1679,147 +1709,262 @@ const ALLOWED_BRANDS = [
 
     // ── TapeTech ────────────────────────────────────────────────────────────
     {
-      id: 'tapetech-8054tt',
-      title: '8054TT',
-      description: 'TapeTech 8054TT schematic diagram with replacement parts',
+      id: 'tapetech-07tt',
+      title: 'TapeTech EasyClean® Automatic Taper',
+      description: 'TapeTech EasyClean automatic taper (07TT) schematic diagram with replacement parts',
       brand: 'TapeTech',
-      category: 'Tools',
+      category: 'Automatic Tapers',
+      diagramPages: [1, 2, 3, 4],
+      imagePages: {
+        1: schImg('tapetech-07tt', 1),
+        2: schImg('tapetech-07tt', 2),
+        3: schImg('tapetech-07tt', 3),
+        4: schImg('tapetech-07tt', 4),
+      },
+      previewImage: schPrev('tapetech-07tt'),
+      parts: tapeTech07TTParts,
+    },
+    {
+      id: 'tapetech-80xxtt',
+      title: 'TapeTech Finishing Box Handle Assemblies (80XXTT)',
+      description: 'TapeTech finishing box handle assembly schematic covering 8034TT, 8042TT, 8054TT, and 8072TT replacement parts',
+      brand: 'TapeTech',
+      category: 'Handles',
       diagramPages: [1],
-      imagePages: { 1: schImg('tapetech-8054tt', 1) },
-      previewImage: schPrev('tapetech-8054tt'),
+      imagePages: { 1: schImg('tapetech-80xxtt', 1) },
+      previewImage: schPrev('tapetech-80xxtt'),
       parts: tapeTech8054TTParts,
     },
     {
       id: 'tapetech-17tt',
-      title: '17TT',
+      title: 'Corner Roller - Outside Corner (17TT)',
       description: 'TapeTech 17TT schematic diagram with replacement parts',
       brand: 'TapeTech',
-      category: 'Tools',
+      category: 'Corner Rollers',
       diagramPages: [1],
       imagePages: { 1: schImg('tapetech-17tt', 1) },
       previewImage: schPrev('tapetech-17tt'),
       parts: tapeTech17TTParts,
     },
     {
-      id: 'tapetech-20ttx',
-      title: '20TTX',
-      description: 'TapeTech 20TTX schematic diagram with replacement parts',
-      brand: 'TapeTech',
-      category: 'Tools',
-      diagramPages: [1],
-      imagePages: { 1: schImg('tapetech-20ttx', 1) },
-      previewImage: schPrev('tapetech-20ttx'),
-      parts: tapeTech20TTXParts,
-    },
-    {
-      id: 'tapetech-25ttx',
-      title: '25TTX',
-      description: 'TapeTech 25TTX schematic diagram with replacement parts',
-      brand: 'TapeTech',
-      category: 'Tools',
-      diagramPages: [1],
-      imagePages: { 1: schImg('tapetech-25ttx', 1) },
-      previewImage: schPrev('tapetech-25ttx'),
-      parts: tapeTech25TTXParts,
-    },
-    {
-      id: 'tapetech-30ttx',
-      title: '30TTX',
-      description: 'TapeTech 30TTX schematic diagram with replacement parts',
-      brand: 'TapeTech',
-      category: 'Tools',
-      diagramPages: [1],
-      imagePages: { 1: schImg('tapetech-30ttx', 1) },
-      previewImage: schPrev('tapetech-30ttx'),
-      parts: tapeTech30TTXParts,
-    },
-    {
-      id: 'tapetech-35tt',
-      title: '35TT',
-      description: 'TapeTech 35TT schematic diagram with replacement parts',
-      brand: 'TapeTech',
-      category: 'Tools',
-      diagramPages: [1],
-      imagePages: { 1: schImg('tapetech-35tt', 1) },
-      previewImage: schPrev('tapetech-35tt'),
-      parts: tapeTech35TTParts,
-    },
-    {
-      id: 'tapetech-40tt',
-      title: '40TT',
-      description: 'TapeTech 40TT schematic diagram with replacement parts',
-      brand: 'TapeTech',
-      category: 'Tools',
-      diagramPages: [1],
-      imagePages: { 1: schImg('tapetech-40tt', 1) },
-      previewImage: schPrev('tapetech-40tt'),
-      parts: tapeTech40TTParts,
-    },
-    {
       id: 'tapetech-42tt',
-      title: '42TT',
+      title: 'Corner Finisher - 2.5" (42TT)',
       description: 'TapeTech 42TT schematic diagram with replacement parts',
       brand: 'TapeTech',
-      category: 'Tools',
+      category: 'Corner Finishers',
       diagramPages: [1],
       imagePages: { 1: schImg('tapetech-42tt', 1) },
       previewImage: schPrev('tapetech-42tt'),
       parts: tapeTech42TTParts,
     },
     {
-      id: 'tapetech-45tt',
-      title: '45TT',
-      description: 'TapeTech 45TT schematic diagram with replacement parts',
-      brand: 'TapeTech',
-      category: 'Tools',
-      diagramPages: [1],
-      imagePages: { 1: schImg('tapetech-45tt', 1) },
-      previewImage: schPrev('tapetech-45tt'),
-      parts: tapeTech45TTParts,
-    },
-    {
       id: 'tapetech-48tt',
-      title: '48TT',
+      title: 'Corner Finisher - 3\" EasyRoll Adjustable (48TT)',
       description: 'TapeTech 48TT schematic diagram with replacement parts',
       brand: 'TapeTech',
-      category: 'Tools',
+      category: 'Corner Finishers',
       diagramPages: [1],
       imagePages: { 1: schImg('tapetech-48tt', 1) },
       previewImage: schPrev('tapetech-48tt'),
       parts: tapeTech48TTParts,
     },
     {
-      id: 'tapetech-50tt',
-      title: '50TT',
-      description: 'TapeTech 50TT schematic diagram with replacement parts',
+      id: 'tapetech-76tt',
+      title: 'TapeTech EasyClean® Pump - Standard',
+      description: 'TapeTech EasyClean pump schematic diagram with replacement parts',
       brand: 'TapeTech',
-      category: 'Tools',
+      category: 'Pumps',
       diagramPages: [1],
-      imagePages: { 1: schImg('tapetech-50tt', 1) },
-      previewImage: schPrev('tapetech-50tt'),
-      parts: tapeTech50TTParts,
+      imagePages: { 1: schImg('tapetech-76tt', 1) },
+      previewImage: schPrev('tapetech-76tt'),
+      parts: [],
     },
     {
-      id: 'tapetech-63tt',
-      title: '63TT',
-      description: 'TapeTech 63TT schematic diagram with replacement parts',
+      id: 'tapetech-85t',
+      title: 'TapeTech Gooseneck - Standard',
+      description: 'TapeTech gooseneck schematic diagram with replacement parts',
       brand: 'TapeTech',
-      category: 'Tools',
+      category: 'Pumps',
       diagramPages: [1],
-      imagePages: { 1: schImg('tapetech-63tt', 1) },
-      previewImage: schPrev('tapetech-63tt'),
-      parts: tapeTech63TTParts,
+      imagePages: { 1: schImg('tapetech-85t', 1) },
+      previewImage: schPrev('tapetech-85t'),
+      parts: [],
     },
     {
-      id: 'tapetech-68tt',
-      title: '68TT',
-      description: 'TapeTech 68TT schematic diagram with replacement parts',
+      id: 'tapetech-90t',
+      title: 'TapeTech Filler Adapter',
+      description: 'TapeTech filler adapter schematic diagram with replacement parts',
       brand: 'TapeTech',
-      category: 'Tools',
+      category: 'Pumps',
       diagramPages: [1],
-      imagePages: { 1: schImg('tapetech-68tt', 1) },
-      previewImage: schPrev('tapetech-68tt'),
-      parts: tapeTech68TTParts,
+      imagePages: { 1: schImg('tapetech-90t', 1) },
+      previewImage: schPrev('tapetech-90t'),
+      parts: [],
+    },
+    {
+      id: 'tapetech-81xxtt',
+      title: 'TapeTech EasyFinish™ Box Handle Assemblies (81XXTT)',
+      description: 'TapeTech EasyFinish box handle assembly schematic covering 8134TT, 8142TT, 8154TT, and 8172TT replacement parts',
+      brand: 'TapeTech',
+      category: 'Handles',
+      diagramPages: [1],
+      imagePages: { 1: schImg('tapetech-81xxtt', 1) },
+      previewImage: schPrev('tapetech-81xxtt'),
+      parts: [],
+    },
+    {
+      id: 'tapetech-88tte',
+      title: 'TapeTech Box XTender Handle',
+      description: 'TapeTech Box XTender handle schematic diagram with replacement parts',
+      brand: 'TapeTech',
+      category: 'Handles',
+      diagramPages: [1],
+      imagePages: { 1: schImg('tapetech-88tte', 1) },
+      previewImage: schPrev('tapetech-88tte'),
+      parts: [],
+    },
+    {
+      id: 'tapetech-xhtt',
+      title: 'TapeTech Support Handle - Extension',
+      description: 'TapeTech support handle extension schematic diagram with replacement parts',
+      brand: 'TapeTech',
+      category: 'Handles',
+      diagramPages: [1],
+      imagePages: { 1: schImg('tapetech-xhtt', 1) },
+      previewImage: schPrev('tapetech-xhtt'),
+      parts: [],
+    },
+    {
+      id: 'tapetech-ehc07',
+      title: 'TapeTech MaxxBox® High Capacity Finishing Box - 7"',
+      description: 'TapeTech MaxxBox high capacity finishing box schematic diagram with replacement parts',
+      brand: 'TapeTech',
+      category: 'Finishing Boxes',
+      diagramPages: [1],
+      imagePages: { 1: schImg('tapetech-ehc07', 1) },
+      previewImage: schPrev('tapetech-ehc07'),
+      parts: [],
+    },
+    {
+      id: 'tapetech-ehc10',
+      title: 'TapeTech MaxxBox® High Capacity Finishing Box - 10"',
+      description: 'TapeTech MaxxBox high capacity finishing box schematic diagram with replacement parts',
+      brand: 'TapeTech',
+      category: 'Finishing Boxes',
+      diagramPages: [1],
+      imagePages: { 1: schImg('tapetech-ehc10', 1) },
+      previewImage: schPrev('tapetech-ehc10'),
+      parts: [],
+    },
+    {
+      id: 'tapetech-ehc12',
+      title: 'TapeTech MaxxBox® High Capacity Finishing Box - 12"',
+      description: 'TapeTech MaxxBox high capacity finishing box schematic diagram with replacement parts',
+      brand: 'TapeTech',
+      category: 'Finishing Boxes',
+      diagramPages: [1],
+      imagePages: { 1: schImg('tapetech-ehc12', 1) },
+      previewImage: schPrev('tapetech-ehc12'),
+      parts: [],
+    },
+    {
+      id: 'tapetech-ez07tt',
+      title: 'TapeTech EasyClean® Finishing Box - 7"',
+      description: 'TapeTech EasyClean finishing box schematic diagram with replacement parts',
+      brand: 'TapeTech',
+      category: 'Finishing Boxes',
+      diagramPages: [1],
+      imagePages: { 1: schImg('tapetech-ez07tt', 1) },
+      previewImage: schPrev('tapetech-ez07tt'),
+      parts: [],
+    },
+    {
+      id: 'tapetech-ez10tt',
+      title: 'TapeTech EasyClean® Finishing Box - 10"',
+      description: 'TapeTech EasyClean finishing box schematic diagram with replacement parts',
+      brand: 'TapeTech',
+      category: 'Finishing Boxes',
+      diagramPages: [1],
+      imagePages: { 1: schImg('tapetech-ez10tt', 1) },
+      previewImage: schPrev('tapetech-ez10tt'),
+      parts: [],
+    },
+    {
+      id: 'tapetech-ez12tt',
+      title: 'TapeTech EasyClean® Finishing Box - 12"',
+      description: 'TapeTech EasyClean finishing box schematic diagram with replacement parts',
+      brand: 'TapeTech',
+      category: 'Finishing Boxes',
+      diagramPages: [1],
+      imagePages: { 1: schImg('tapetech-ez12tt', 1) },
+      previewImage: schPrev('tapetech-ez12tt'),
+      parts: [],
+    },
+    {
+      id: 'tapetech-ez15tt',
+      title: 'TapeTech EasyClean® Finishing Box - 15"',
+      description: 'TapeTech EasyClean finishing box schematic diagram with replacement parts',
+      brand: 'TapeTech',
+      category: 'Finishing Boxes',
+      diagramPages: [1],
+      imagePages: { 1: schImg('tapetech-ez15tt', 1) },
+      previewImage: schPrev('tapetech-ez15tt'),
+      parts: [],
+    },
+    {
+      id: 'tapetech-pahc07',
+      title: 'TapeTech Power Assist® MaxxBox® Finishing Box - 7"',
+      description: 'TapeTech Power Assist MaxxBox finishing box schematic diagram with replacement parts',
+      brand: 'TapeTech',
+      category: 'Finishing Boxes',
+      diagramPages: [1],
+      imagePages: { 1: schImg('tapetech-pahc07', 1) },
+      previewImage: schPrev('tapetech-pahc07'),
+      parts: [],
+    },
+    {
+      id: 'tapetech-pahc10',
+      title: 'TapeTech Power Assist® MaxxBox® Finishing Box - 10"',
+      description: 'TapeTech Power Assist MaxxBox finishing box schematic diagram with replacement parts',
+      brand: 'TapeTech',
+      category: 'Finishing Boxes',
+      diagramPages: [1],
+      imagePages: { 1: schImg('tapetech-pahc10', 1) },
+      previewImage: schPrev('tapetech-pahc10'),
+      parts: [],
+    },
+    {
+      id: 'tapetech-pahc12',
+      title: 'TapeTech Power Assist® MaxxBox® Finishing Box - 12"',
+      description: 'TapeTech Power Assist MaxxBox finishing box schematic diagram with replacement parts',
+      brand: 'TapeTech',
+      category: 'Finishing Boxes',
+      diagramPages: [1],
+      imagePages: { 1: schImg('tapetech-pahc12', 1) },
+      previewImage: schPrev('tapetech-pahc12'),
+      parts: [],
+    },
+    {
+      id: 'tapetech-qb06-qsx',
+      title: 'TapeTech QuickBox® QSX Finishing Box - 6.5"',
+      description: 'TapeTech QuickBox QSX finishing box schematic diagram with replacement parts',
+      brand: 'TapeTech',
+      category: 'Finishing Boxes',
+      diagramPages: [1],
+      imagePages: { 1: schImg('tapetech-qb06-qsx', 1) },
+      previewImage: schPrev('tapetech-qb06-qsx'),
+      parts: [],
+    },
+    {
+      id: 'tapetech-qb08-qsx',
+      title: 'TapeTech QuickBox® QSX Finishing Box - 8.5"',
+      description: 'TapeTech QuickBox QSX finishing box schematic diagram with replacement parts',
+      brand: 'TapeTech',
+      category: 'Finishing Boxes',
+      diagramPages: [1],
+      imagePages: { 1: schImg('tapetech-qb08-qsx', 1) },
+      previewImage: schPrev('tapetech-qb08-qsx'),
+      parts: [],
     },
 
     // ── Level5 ──────────────────────────────────────────────────────────────
@@ -2048,7 +2193,11 @@ const ALLOWED_BRANDS = [
   const currentPageAspectRatio =
     currentPageFirstPart?.imageNaturalWidth && currentPageFirstPart?.imageNaturalHeight
       ? `${currentPageFirstPart.imageNaturalWidth} / ${currentPageFirstPart.imageNaturalHeight}`
-      : undefined;
+      : (schematicImageSrc &&
+        imageNaturalSizeBySrc[schematicImageSrc]?.width &&
+        imageNaturalSizeBySrc[schematicImageSrc]?.height)
+        ? `${imageNaturalSizeBySrc[schematicImageSrc].width} / ${imageNaturalSizeBySrc[schematicImageSrc].height}`
+        : undefined;
 
   const [addingToCart, setAddingToCart] = useState(null); // part.id being added
 
@@ -2883,7 +3032,27 @@ const ALLOWED_BRANDS = [
                       }}
                       loading="eager"
                       decoding="async"
-                      onLoad={() => setDiagramImageLoaded(true)}
+                      onLoad={(e) => {
+                        const img = e.currentTarget;
+                        if (img?.naturalWidth && img?.naturalHeight && schematicImageSrc) {
+                          setImageNaturalSizeBySrc(prev => {
+                            if (
+                              prev[schematicImageSrc]?.width === img.naturalWidth &&
+                              prev[schematicImageSrc]?.height === img.naturalHeight
+                            ) {
+                              return prev;
+                            }
+                            return {
+                              ...prev,
+                              [schematicImageSrc]: {
+                                width: img.naturalWidth,
+                                height: img.naturalHeight,
+                              },
+                            };
+                          });
+                        }
+                        setDiagramImageLoaded(true);
+                      }}
                     />
                   </>
                 ) : (

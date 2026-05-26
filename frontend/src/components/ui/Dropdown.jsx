@@ -25,6 +25,7 @@ export default function Dropdown({
   placeholder = 'Select…',
   label,
   disabled = false,
+  fullWidth = false,
   className = '',
   style = {},
 }) {
@@ -59,7 +60,12 @@ export default function Dropdown({
     <div
       ref={containerRef}
       className={`dtb-ui-dropdown${className ? ` ${className}` : ''}`}
-      style={{ position: 'relative', display: 'inline-block', ...style }}
+      style={{
+        position: 'relative',
+        display: fullWidth ? 'block' : 'inline-block',
+        width: fullWidth ? '100%' : undefined,
+        ...style,
+      }}
     >
       {label && (
         <p style={{
@@ -85,6 +91,7 @@ export default function Dropdown({
           display: 'flex',
           alignItems: 'center',
           gap: '8px',
+          width: fullWidth ? '100%' : undefined,
           padding: '9px 14px',
           background: 'white',
           border: `1.5px solid ${isOpen ? 'var(--primary-600)' : 'rgba(15,23,42,0.12)'}`,

@@ -1,0 +1,50 @@
+{
+  "id": "1777933053473",
+  "title": "90T",
+  "diagramPages": [
+    1
+  ],
+  "legendPages": [],
+  "parts": [
+    {
+      "id": "709034",
+      "name": "O'Ring 568-210 Buna",
+      "quantity": 1,
+      "sku": "709034"
+    },
+    {
+      "id": "722039",
+      "name": "Discharge Tube",
+      "quantity": 1,
+      "sku": "722039"
+    },
+    {
+      "id": "709043",
+      "name": "#63 \"S\" Hook 18-8 S.S.",
+      "quantity": 2,
+      "sku": "709043"
+    },
+    {
+      "id": "700042",
+      "name": "Lanyard",
+      "quantity": 1,
+      "sku": "700042"
+    },
+    {
+      "id": "704040",
+      "name": "Filler Tube, Assy.",
+      "quantity": 1,
+      "sku": "704040"
+    },
+    {
+      "id": "709043",
+      "name": "#63 \"S\" Hook 18-8 S.S.",
+      "quantity": 2,
+      "sku": "709043"
+    }
+  ],
+  "coordinates": {},
+  "schema_version": "1.0",
+  "image_natural_width": 1224,
+  "image_natural_height": 792
+}

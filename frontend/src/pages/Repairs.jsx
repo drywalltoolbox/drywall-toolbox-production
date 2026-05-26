@@ -2,7 +2,18 @@ import { useState, useRef, useCallback, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { motion as Motion, AnimatePresence } from 'framer-motion';
 import SEOHead from '../components/shared/SEOHead';
+import Dropdown from '../components/ui/Dropdown';
+import { useCatalogFacets } from '../hooks/useCatalogFacets.js';
+import { useCatalogProducts } from '../hooks/useCatalogProducts.js';
+import { canonicalBrandLabel } from '../utils/catalogUrlState.js';
+import { normalizeDisplayCategorySlug } from '../utils/catalogFacets.js';
 import { SCHEMATIC_DEFINITIONS } from '../data/schematicMappings';
+import {
+  normalizeRepairCategory,
+  getOfficialRepairBrands,
+  getOfficialRepairCategoriesForBrand,
+  getOfficialRepairModelsForBrandCategory,
+} from '../data/repairCatalogMap.js';
 import veeqoService from '../services/veeqo';
 
 /* ─────────────────────────────────────────────────────────────────────────────
@@ -11,6 +22,10 @@ import veeqoService from '../services/veeqo';
    ───────────────────────────────────────────────────────────────────────── */
 const SUPPORTED_BRANDS = Object.keys(SCHEMATIC_DEFINITIONS).sort((a, b) => a.localeCompare(b)); // alphabetical
 
+function normalizeCategoryForBrand(category, brand) {
+  return normalizeRepairCategory(category);
+}
+
 /**
  * Returns the sorted list of unique categories for a given brand.
  * Falls back to [] for unknown brands or "Other".
@@ -18,7 +33,7 @@ const SUPPORTED_BRANDS = Object.keys(SCHEMATIC_DEFINITIONS).sort((a, b) => a.loc
 function getCategoriesForBrand(brand) {
   const entries = SCHEMATIC_DEFINITIONS[brand];
   if (!entries) return [];
-  return [...new Set(entries.map((t) => t.category))].sort();
+  return [...new Set(entries.map((t) => normalizeCategoryForBrand(t.category, brand)))].sort();
 }
 
 /**
@@ -30,12 +45,44 @@ function getModelsForBrandCategory(brand, category) {
   const entries = SCHEMATIC_DEFINITIONS[brand];
   if (!entries || !category) return [];
   return entries
-    .filter((t) => t.category === category)
+    .filter((t) => normalizeCategoryForBrand(t.category, brand) === category)
     .map((t) => {
       const label = t.mpn ? `${t.title} — ${t.mpn}` : t.title;
       return { value: label, label };
     })
     .sort((a, b) => a.label.localeCompare(b.label));
+}
+
+function getLiveBrandsFromFacets(facets) {
+  if (!Array.isArray(facets?.brands)) return [];
+  return facets.brands
+    .map((b) => canonicalBrandLabel(b?.label || b?.name || b?.key || b?.slug || ''))
+    .filter(Boolean)
+    .filter((v, i, a) => a.indexOf(v) === i)
+    .sort((a, b) => a.localeCompare(b));
+}
+
+function getLiveCategoriesForBrand(facets, brand) {
+  if (!brand || !facets?.displayCategoriesByBrand || !Array.isArray(facets?.brands)) return [];
+  const brandFacet = facets.brands.find((b) => {
+    const label = canonicalBrandLabel(b?.label || b?.name || b?.key || b?.slug || '');
+    return label === brand;
+  });
+  if (!brandFacet) return [];
+
+  const byBrand =
+    facets.displayCategoriesByBrand[brandFacet.key] ||
+    facets.displayCategoriesByBrand[brandFacet.slug] ||
+    [];
+
+  if (!Array.isArray(byBrand)) return [];
+
+  return byBrand
+    .map((c) => c?.label || c?.name || c?.slug || c?.key || '')
+    .filter(Boolean)
+    .map((cat) => normalizeCategoryForBrand(cat, brand))
+    .filter((v, i, a) => a.indexOf(v) === i)
+    .sort((a, b) => a.localeCompare(b));
 }
 
 /**
@@ -78,47 +125,46 @@ const STEPS = [
 export const REPAIR_PRICING = {
   autoTaper: {
     label: 'Auto Taper',
-    anchor: { newPrice: 1899, rebuildPrice: 299, savePct: 84 },
     tiers: [
-      { id: 'qt',  name: 'Quick Fix',         price: 75,  desc: 'Adjustments, cable & blade swap, minor fixes',        badge: null },
-      { id: 'sr',  name: 'Standard Rebuild',  price: 299, desc: 'Full head rebuild — covers most worn-out tapers',     badge: 'Best Value' },
-      { id: 'po',  name: 'Premium Overhaul',  price: 499, desc: 'Complete overhaul including wear kit + all seals',    badge: null },
-      { id: 'ftu', name: 'Factory Tune-Up',   price: 179, desc: 'Deep clean, lube, calibrate — no parts replacement',  badge: null },
+      { id: 'qt',  name: 'Quick Fix',         desc: 'Minor issues, adjustments, and basic wear-part service',         badge: null },
+      { id: 'sr',  name: 'Standard Rebuild',  desc: 'Most common full rebuild path for worn-out tapers',             badge: null },
+      { id: 'po',  name: 'Premium Overhaul',  desc: 'Comprehensive teardown and high-mileage restoration',           badge: null },
+      { id: 'ftu', name: 'Factory Tune-Up',   desc: 'Preventive maintenance, cleaning, lubrication, and calibration', badge: null },
     ],
   },
   flatBoxes: {
     label: 'Flat & Angle Boxes',
     tiers: [
-      { id: 'fr',  name: 'Refresh',           price: 49,  desc: 'Clean, adjust, test — blade & gate check',           badge: null },
-      { id: 'rb',  name: 'Rebuild',           price: 89,  desc: 'Full disassembly, worn parts replaced',              badge: 'Best Value' },
-      { id: 'pp',  name: 'Pro Package',       price: 149, desc: 'Three boxes rebuilt — best rate per unit',           badge: '3-Box Bundle' },
-      { id: 'tub', name: 'Tune-Up',           price: 59,  perUnit: true, desc: 'Per-box deep clean + lube service',   badge: null },
+      { id: 'fr',  name: 'Refresh',           desc: 'Cleaning, adjustment, and performance check',                    badge: null },
+      { id: 'rb',  name: 'Rebuild',           desc: 'Full disassembly with worn-part replacement as needed',          badge: null },
+      { id: 'pp',  name: 'Multi-Tool Service', desc: 'Coordinated service for multiple boxes in one request',         badge: null },
+      { id: 'tub', name: 'Tune-Up',           desc: 'Preventive cleaning and lubrication service',                    badge: null },
     ],
   },
   mudPumps: {
     label: 'Mud Pumps',
     tiers: [
-      { id: 'ss',  name: 'Seal & Screen',     price: 59,  desc: 'Seal replacement + screen clean — most common fix',  badge: null },
-      { id: 'fr2', name: 'Full Rebuild',      price: 119, desc: 'Complete pump teardown, all wear parts replaced',    badge: 'Best Value' },
-      { id: 'ph',  name: 'Pump + Hose',       price: 159, desc: 'Full rebuild including hose replacement',            badge: null },
-      { id: 'ps',  name: 'Preventive',        price: 79,  desc: 'Pre-season service — seals, screen, lubrication',   badge: null },
+      { id: 'ss',  name: 'Seal & Screen',     desc: 'Targeted service for common flow and seal issues',              badge: null },
+      { id: 'fr2', name: 'Full Rebuild',      desc: 'Complete pump teardown and component restoration',              badge: null },
+      { id: 'ph',  name: 'Pump + Hose',       desc: 'Full pump service including hose-system inspection',            badge: null },
+      { id: 'ps',  name: 'Preventive',        desc: 'Preventive maintenance to reduce in-field downtime',            badge: null },
     ],
   },
   handles: {
     label: 'Handles & Accessories',
     tiers: [
-      { id: 'hr',  name: 'Handle Rebuild',    price: 49,  desc: 'Standard handle rebuild with new hardware',          badge: null },
-      { id: 'gn',  name: 'Gooseneck',         price: 39,  desc: 'Gooseneck corner tool rebuild',                      badge: null },
-      { id: 'cf',  name: 'Corner Flusher',    price: 69,  desc: 'Corner flusher full service',                        badge: null },
-      { id: 'ns',  name: 'Nail Spotter',      price: 45,  desc: 'Nail spotter rebuild',                               badge: null },
-      { id: 'bu',  name: 'Tool Bundle',       price: 99,  desc: 'Any three handles serviced together',                badge: 'Bundle Savings' },
+      { id: 'hr',  name: 'Handle Rebuild',    desc: 'Standard handle service and hardware refresh',                  badge: null },
+      { id: 'gn',  name: 'Gooseneck',         desc: 'Gooseneck service and functional adjustment',                   badge: null },
+      { id: 'cf',  name: 'Corner Flusher',    desc: 'Corner flusher full-service restoration',                       badge: null },
+      { id: 'ns',  name: 'Nail Spotter',      desc: 'Nail spotter inspection and service',                           badge: null },
+      { id: 'bu',  name: 'Accessory Group Service', desc: 'Single request covering multiple accessories',             badge: null },
     ],
   },
   diagnostic: {
     label: 'Diagnostic',
     tiers: [
-      { id: 'dx', name: 'Diagnostic / Bench Fee', priceMin: 50, priceMax: 75,
-        desc: 'Full inspection and written quote. Fee credited toward repair cost if you approve.', badge: null },
+      { id: 'dx', name: 'Diagnostic Inspection',
+        desc: 'Full inspection and written quote before any repair work begins.', badge: null },
     ],
   },
 };
@@ -303,13 +349,28 @@ const MAINTENANCE_SCHEDULE = [
 /* ─────────────────────────────────────────────────────────────────────────────
    Reusable labelled field wrapper
    ───────────────────────────────────────────────────────────────────────── */
-function Field({ label, required, children, hint }) {
+function Field({ label, required, optional, children, hint }) {
   return (
-    <div className="form-group" style={{ marginBottom: '20px' }}>
-      <label className="machined-label" style={{ color: 'var(--primary-600)', marginBottom: 6 }}>
-        {label}{required && <span style={{ color: '#ef4444', marginLeft: 3 }}>*</span>}
+    <div className="form-group" style={{ marginBottom: '14px' }}>
+      <label className="machined-label" style={{ color: 'var(--primary-600)', marginBottom: 4, display: 'inline-flex', alignItems: 'baseline', gap: '6px' }}>
+        <span>
+          {label}{required && <span style={{ color: '#ef4444', marginLeft: 3 }}>*</span>}
+        </span>
+        {optional && (
+          <span style={{ fontSize: '0.7rem', color: 'rgba(15,23,42,0.5)', lineHeight: 1 }}>
+            Optional
+          </span>
+        )}
       </label>
-      {hint && <p style={{ fontSize: '0.72rem', color: 'rgba(15,23,42,0.45)', margin: '0 0 6px 0' }}>{hint}</p>}
+      {hint && (
+        <p style={{
+          fontSize: '0.7rem',
+          color: 'rgba(15,23,42,0.45)',
+          margin: '0 0 4px 0',
+        }}>
+          {hint}
+        </p>
+      )}
       {children}
     </div>
   );
@@ -318,7 +379,7 @@ function Field({ label, required, children, hint }) {
 /* ─────────────────────────────────────────────────────────────────────────────
    Step progress bar
    ───────────────────────────────────────────────────────────────────────── */
-function ProgressBar({ step, total }) {
+function ProgressBar({ step, total, onStepSelect }) {
   const pct = ((step - 1) / (total - 1)) * 100;
   return (
     <div style={{ marginBottom: '32px' }}>
@@ -330,12 +391,20 @@ function ProgressBar({ step, total }) {
         gap: '4px',
       }}>
         {STEPS.map((s) => (
-          <div key={s.id} style={{
+          <button
+            type="button"
+            key={s.id}
+            onClick={() => onStepSelect?.(s.id)}
+            style={{
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
             flex: 1,
             gap: '6px',
+            border: 'none',
+            background: 'transparent',
+            padding: 0,
+            cursor: 'pointer',
           }}>
             <div style={{
               width: '30px',
@@ -365,7 +434,7 @@ function ProgressBar({ step, total }) {
             }}>
               {s.short}
             </span>
-          </div>
+          </button>
         ))}
       </div>
       {/* Progress track */}
@@ -784,14 +853,11 @@ export default function Repairs() {
     return 'diagnostic';
   }, [formData.toolCategory]);
 
-  // Pricing tier selection helper
+  // Service type selection helper
   function selectTier(tier) {
-    const priceDisplay = tier.priceMin
-      ? `$${tier.priceMin}–$${tier.priceMax}`
-      : `$${tier.price}${tier.perUnit ? '/box' : ''}`;
     setFormData((prev) => ({
       ...prev,
-      serviceType:    `${tier.name} (${priceDisplay})`,
+      serviceType:    tier.name,
       pricingTierId:  tier.id,
     }));
     setErrors((prev) => { const n = { ...prev }; delete n.serviceType; return n; });
@@ -813,6 +879,101 @@ export default function Repairs() {
   const [rates, setRates]           = useState([]);
   const [ratesLoading, setRatesLoading] = useState(false);
   const [ratesError, setRatesError] = useState('');
+
+  // Live catalog facets (official catalog source) for brands/categories.
+  const { facets: catalogFacets } = useCatalogFacets({});
+
+  const liveBrands = useMemo(
+    () => getLiveBrandsFromFacets(catalogFacets),
+    [catalogFacets],
+  );
+
+  const officialBrands = useMemo(() => getOfficialRepairBrands(), []);
+
+  const availableBrands = useMemo(() => {
+    const merged = new Set([...officialBrands, ...liveBrands, ...SUPPORTED_BRANDS]);
+    return [...merged].sort((a, b) => a.localeCompare(b));
+  }, [officialBrands, liveBrands]);
+
+  const liveCategories = useMemo(
+    () => getLiveCategoriesForBrand(catalogFacets, formData.toolBrand),
+    [catalogFacets, formData.toolBrand],
+  );
+
+  const fallbackCategories = useMemo(
+    () => getCategoriesForBrand(formData.toolBrand),
+    [formData.toolBrand],
+  );
+
+  const officialCategories = useMemo(
+    () => getOfficialRepairCategoriesForBrand(formData.toolBrand),
+    [formData.toolBrand],
+  );
+
+  const availableCategories = useMemo(() => {
+    if (officialCategories.length) return officialCategories;
+    if (liveCategories.length) return liveCategories;
+    return fallbackCategories;
+  }, [officialCategories, liveCategories, fallbackCategories]);
+
+  const selectedDisplayCategorySlug = useMemo(
+    () => normalizeDisplayCategorySlug(formData.toolCategory || ''),
+    [formData.toolCategory],
+  );
+
+  // Live catalog products for model options scoped by selected brand/category.
+  const { items: liveModelProducts } = useCatalogProducts(
+    {
+      brands: formData.toolBrand ? [formData.toolBrand] : [],
+      displayCategory: selectedDisplayCategorySlug,
+      perPage: 250,
+      sort: 'popular',
+    },
+    {
+      enabled: Boolean(formData.toolBrand && formData.toolCategory && !brandIsCustom && !categoryIsCustom),
+    },
+  );
+
+  const liveModelOptions = useMemo(() => {
+    if (!Array.isArray(liveModelProducts) || liveModelProducts.length === 0) return [];
+    const byIdentity = new Map();
+
+    liveModelProducts.forEach((p) => {
+      const sku = String(p?.sku || p?.part_number || '').trim();
+      const name = String(p?.name || '').trim();
+      if (!name) return;
+
+      // Canonical identity:
+      // 1) SKU (most authoritative)
+      // 2) normalized model name when SKU is missing
+      const identity = sku
+        ? `sku:${sku.toLowerCase()}`
+        : `name:${name.toLowerCase().replace(/\s+/g, ' ').trim()}`;
+
+      // Keep the first stable instance for each identity.
+      if (!byIdentity.has(identity)) {
+        const label = sku ? `${name} — ${sku}` : name;
+        byIdentity.set(identity, { value: label, label });
+      }
+    });
+
+    return [...byIdentity.values()].sort((a, b) => a.label.localeCompare(b.label));
+  }, [liveModelProducts]);
+
+  const fallbackModelOptions = useMemo(
+    () => getModelsForBrandCategory(formData.toolBrand, formData.toolCategory),
+    [formData.toolBrand, formData.toolCategory],
+  );
+
+  const officialModelOptions = useMemo(
+    () => getOfficialRepairModelsForBrandCategory(formData.toolBrand, formData.toolCategory),
+    [formData.toolBrand, formData.toolCategory],
+  );
+
+  const availableModelOptions = useMemo(
+    () => (officialModelOptions.length ? officialModelOptions : (liveModelOptions.length ? liveModelOptions : fallbackModelOptions)),
+    [officialModelOptions, liveModelOptions, fallbackModelOptions],
+  );
 
   /* ── field helpers ── */
   const set = (field) => (e) =>
@@ -912,6 +1073,39 @@ export default function Repairs() {
   function back() {
     setErrors({});
     setStep((s) => s - 1);
+    formRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  function goToStep(targetStep) {
+    if (targetStep === step) return;
+
+    // Always allow navigating backwards.
+    if (targetStep < step) {
+      setErrors({});
+      setStep(targetStep);
+      formRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      return;
+    }
+
+    // Guard forward navigation: each intermediate step must validate.
+    for (let s = step; s < targetStep; s += 1) {
+      const errs = validate(s);
+      if (Object.keys(errs).length) {
+        setErrors(errs);
+        setStep(s);
+        formRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        return;
+      }
+    }
+
+    setErrors({});
+    setStep(targetStep);
+
+    // When entering Step 4 (Shipping), auto-fetch rates if address already present.
+    if (targetStep === 4) {
+      fetchShippingRates(formData);
+    }
+
     formRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
@@ -1051,64 +1245,10 @@ export default function Repairs() {
                 maxWidth: '480px',
               }}>
                 Professional drywall tool repair for automatic tapers, flat boxes, mud pumps, and accessories.
-                Transparent pricing, 90-day warranty, no charges until you approve.
+                Every repair is unique and quoted after inspection. No work begins until you approve.
               </p>
-              <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
-                <button
-                  type="button"
-                  className="alloy-button"
-                  style={{ background: 'white', color: '#1e3a8a', border: 'none', cursor: 'pointer', fontWeight: 800, flex: '1 1 0', minWidth: 0 }}
-                  onClick={() => formRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
-                >
-                  Request Repair
-                </button>
-                <button
-                  type="button"
-                  className="alloy-button"
-                  style={{ background: 'white', color: '#1e3a8a', border: 'none', cursor: 'pointer', fontWeight: 800, flex: '1 1 0', minWidth: 0 }}
-                  onClick={() => {
-                    document.getElementById('pricing-tabs-section')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                  }}
-                >
-                  Pricing
-                </button>
-              </div>
             </div>
           </div>
-        </div>
-      </section>
-
-      {/* ── Pricing Tabs ────────────────────────────────────────────────── */}
-      <section
-        id="pricing-tabs-section"
-        style={{
-          background: 'var(--alloy-base)',
-          borderTop: '1px solid var(--machined-border)',
-          padding: 'clamp(3rem, 6vw, 5rem) clamp(1.5rem, 5vw, 3rem)',
-        }}
-      >
-        <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
-          <div style={{ textAlign: 'center', marginBottom: 'clamp(2rem, 4vw, 3rem)' }}>
-            <div style={{
-              display: 'inline-block',
-              background: 'rgba(37,99,235,0.08)',
-              border: '1px solid rgba(37,99,235,0.2)',
-              borderRadius: '99px', padding: '5px 16px',
-              fontSize: '0.68rem', fontWeight: 700,
-              letterSpacing: '0.12em', textTransform: 'uppercase',
-              color: 'var(--primary-600)', marginBottom: '14px',
-            }}>
-              Industry Pricing Reference
-            </div>
-            <h2 style={{
-              fontSize: 'clamp(1.75rem, 4vw, 2.5rem)',
-              fontWeight: 900, color: '#0f172a',
-              margin: '0 0 12px 0', letterSpacing: '-0.025em',
-            }}>
-              Repair Pricing
-            </h2>
-          </div>
-          <PricingTabs />
         </div>
       </section>
 
@@ -1142,8 +1282,8 @@ export default function Repairs() {
               Submit a Repair Inquiry
             </h2>
             <p style={{ fontSize: 'clamp(0.875rem, 2vw, 1rem)', color: 'rgba(15,23,42,0.55)', margin: 0, lineHeight: 1.6 }}>
-              Fill out the form below and our service team will follow up within one business day
-              with a quote and estimated turnaround time.
+              Fill out the form below. We will send your quote and estimated turnaround
+              within 24 hours after your tool is delivered and checked in at our shop.
             </p>
           </div>
 
@@ -1190,8 +1330,8 @@ export default function Repairs() {
                   <strong>{getToolDisplayName(formData)}</strong>.
                 </p>
                 <p style={{ fontSize: '0.875rem', color: 'rgba(15,23,42,0.5)', margin: '0 0 32px 0', lineHeight: 1.6 }}>
-                  Our service team will contact you at <strong>{formData.email}</strong> within one business day
-                  with a quote and estimated turnaround time.
+                  Our service team will contact you at <strong>{formData.email}</strong> with your quote and
+                  estimated turnaround within 24 hours after your tool is delivered and checked in at our shop.
                 </p>
                 {orderResult?.public_token && (
                   <p style={{ fontSize: '0.875rem', color: 'rgba(15,23,42,0.6)', margin: '0 0 24px 0', lineHeight: 1.6 }}>
@@ -1265,7 +1405,7 @@ export default function Repairs() {
               </div>
             ) : (
               <form onSubmit={handleSubmit} noValidate>
-                <ProgressBar step={step} total={STEPS.length} />
+                <ProgressBar step={step} total={STEPS.length} onStepSelect={goToStep} />
 
                 {/* ── STEP 1: Contact Info ── */}
                 {step === 1 && (
@@ -1294,7 +1434,7 @@ export default function Repairs() {
                         {errors.fullName && <p style={errStyle}>{errors.fullName}</p>}
                       </Field>
 
-                      <Field label="Company / Business" hint="Optional">
+                      <Field label="Company / Business" optional>
                         <input
                           type="text" className={inputCls}
                           placeholder="Acme Drywall Co."
@@ -1374,12 +1514,15 @@ export default function Repairs() {
                           </button>
                         </>
                       ) : (
-                        <select
-                          className={inputCls}
-                          style={{ cursor: 'pointer' }}
+                        <Dropdown
                           value={formData.toolBrand}
-                          onChange={(e) => {
-                            const val = e.target.value;
+                          placeholder="Select a brand..."
+                          options={[
+                            ...availableBrands.map((b) => ({ value: b, label: b })),
+                            { value: '__other__', label: 'Other / Not Listed' },
+                          ]}
+                          fullWidth
+                          onChange={(val) => {
                             if (val === '__other__') {
                               setBrandIsCustom(true);
                               setCategoryIsCustom(false);
@@ -1393,13 +1536,7 @@ export default function Repairs() {
                             }
                             clearErr('toolBrand'); clearErr('toolCategory'); clearErr('toolModel');
                           }}
-                        >
-                          <option value="" disabled>Select a brand…</option>
-                          {SUPPORTED_BRANDS.map((b) => (
-                            <option key={b} value={b}>{b}</option>
-                          ))}
-                          <option value="__other__">Other / Not Listed</option>
-                        </select>
+                        />
                       )}
                       {errors.toolBrand && <p style={errStyle}>{errors.toolBrand}</p>}
                     </Field>
@@ -1433,12 +1570,15 @@ export default function Repairs() {
                               </button>
                             </>
                           ) : (
-                            <select
-                              className={inputCls}
-                              style={{ cursor: 'pointer' }}
+                            <Dropdown
                               value={formData.toolCategory}
-                              onChange={(e) => {
-                                const val = e.target.value;
+                              placeholder="Select a tool category..."
+                              options={[
+                                ...availableCategories.map((cat) => ({ value: cat, label: cat })),
+                                { value: '__other__', label: 'Other / Not Listed' },
+                              ]}
+                              fullWidth
+                              onChange={(val) => {
                                 if (val === '__other__') {
                                   setCategoryIsCustom(true);
                                   setModelIsCustom(false);
@@ -1450,13 +1590,7 @@ export default function Repairs() {
                                 }
                                 clearErr('toolCategory'); clearErr('toolModel');
                               }}
-                            >
-                              <option value="" disabled>Select a tool category…</option>
-                              {getCategoriesForBrand(formData.toolBrand).map((cat) => (
-                                <option key={cat} value={cat}>{cat}</option>
-                              ))}
-                              <option value="__other__">Other / Not Listed</option>
-                            </select>
+                            />
                           )}
                           {errors.toolCategory && <p style={errStyle}>{errors.toolCategory}</p>}
                         </Field>
@@ -1487,12 +1621,15 @@ export default function Repairs() {
                                 </button>
                               </>
                             ) : (
-                              <select
-                                className={inputCls}
-                                style={{ cursor: 'pointer' }}
+                              <Dropdown
                                 value={formData.toolModel}
-                                onChange={(e) => {
-                                  const val = e.target.value;
+                                placeholder="Select the specific model..."
+                                options={[
+                                  ...availableModelOptions.map((model) => ({ value: model.value, label: model.label })),
+                                  { value: '__other__', label: 'Other / Not Listed' },
+                                ]}
+                                fullWidth
+                                onChange={(val) => {
                                   if (val === '__other__') {
                                     setModelIsCustom(true);
                                     setFormData((prev) => ({ ...prev, toolModel: '' }));
@@ -1502,13 +1639,7 @@ export default function Repairs() {
                                   }
                                   clearErr('toolModel');
                                 }}
-                              >
-                                <option value="" disabled>Select the specific model…</option>
-                                {getModelsForBrandCategory(formData.toolBrand, formData.toolCategory).map((model) => (
-                                  <option key={model.value} value={model.value}>{model.label}</option>
-                                ))}
-                                <option value="__other__">Other / Not Listed</option>
-                              </select>
+                              />
                             )}
                             {errors.toolModel && <p style={errStyle}>{errors.toolModel}</p>}
                           </Field>
@@ -1516,7 +1647,7 @@ export default function Repairs() {
 
                         {/* Model freetext when category is custom — shown inline below category input */}
                         {categoryIsCustom && (
-                          <Field label="Tool Model / Name" hint="Optional — model number, size, or description">
+                          <Field label="Tool Model / Name" optional>
                             <input
                               type="text"
                               className={inputCls}
@@ -1561,7 +1692,7 @@ export default function Repairs() {
                       gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
                       gap: '0 20px',
                     }}>
-                      <Field label="Serial Number" hint="Optional — found on the tool body or original packaging">
+                      <Field label="Serial Number" optional>
                         <input
                           type="text" className={inputCls}
                           placeholder="e.g. COL-2024-XXXXX"
@@ -1571,19 +1702,19 @@ export default function Repairs() {
                       </Field>
 
                       <Field label="Approximate Tool Age">
-                        <select
-                          className={inputCls}
-                          style={{ cursor: 'pointer' }}
+                        <Dropdown
                           value={formData.toolAge}
-                          onChange={set('toolAge')}
-                        >
-                          <option value="">Unknown / Not sure</option>
-                          <option value="Under 1 year">Under 1 year</option>
-                          <option value="1–3 years">1–3 years</option>
-                          <option value="3–5 years">3–5 years</option>
-                          <option value="5–10 years">5–10 years</option>
-                          <option value="10+ years">10+ years</option>
-                        </select>
+                          placeholder="Unknown / Not sure"
+                          options={[
+                            { value: 'Under 1 year', label: 'Under 1 year' },
+                            { value: '1–3 years', label: '1–3 years' },
+                            { value: '3–5 years', label: '3–5 years' },
+                            { value: '5–10 years', label: '5–10 years' },
+                            { value: '10+ years', label: '10+ years' },
+                          ]}
+                          fullWidth
+                          onChange={(value) => setFormData((prev) => ({ ...prev, toolAge: value }))}
+                        />
                       </Field>
                     </div>
                   </div>
@@ -1640,9 +1771,6 @@ export default function Repairs() {
                               )}
                               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                                 <span style={{ fontWeight: 700, color: '#0f172a', fontSize: '0.9rem' }}>{tier.name}</span>
-                                <span style={{ fontWeight: 800, color: 'var(--primary-600)', fontSize: '1.05rem', marginLeft: '8px', whiteSpace: 'nowrap' }}>
-                                  {tier.priceMin ? `$${tier.priceMin}–$${tier.priceMax}` : `$${tier.price}${tier.perUnit ? '/box' : ''}`}
-                                </span>
                               </div>
                               <p style={{ margin: '6px 0 0', fontSize: '0.78rem', color: 'rgba(15,23,42,0.55)' }}>
                                 {tier.desc}
@@ -1676,35 +1804,38 @@ export default function Repairs() {
                       gap: '0 20px',
                     }}>
                       <Field label="Priority Level" required>
-                        <select
-                          className={inputCls}
-                          style={{ cursor: 'pointer' }}
+                        <Dropdown
                           value={formData.priority}
-                          onChange={(e) => { set('priority')(e); clearErr('priority'); }}
-                        >
-                          <option value="" disabled>Select priority…</option>
-                          <option value="Standard (5–7 business days)">Standard — 5–7 business days</option>
-                          <option value="Expedited (2–3 business days)">Expedited — 2–3 business days</option>
-                          <option value="Emergency (same/next day)">Emergency — same / next day</option>
-                        </select>
+                          placeholder="Select priority..."
+                          options={[
+                            { value: 'Standard (5–7 business days)', label: 'Standard — 5–7 business days' },
+                            { value: 'Expedited (2–3 business days)', label: 'Expedited — 2–3 business days' },
+                            { value: 'Emergency (same/next day)', label: 'Emergency — same / next day' },
+                          ]}
+                          fullWidth
+                          onChange={(value) => {
+                            setFormData((prev) => ({ ...prev, priority: value }));
+                            clearErr('priority');
+                          }}
+                        />
                         {errors.priority && <p style={errStyle}>{errors.priority}</p>}
                       </Field>
                     </div>
 
                     <Field label="When Did the Issue Start?">
-                      <select
-                        className={inputCls}
-                        style={{ cursor: 'pointer' }}
+                      <Dropdown
                         value={formData.issueStart}
-                        onChange={set('issueStart')}
-                      >
-                        <option value="">Not sure / N/A</option>
-                        <option value="Today">Today</option>
-                        <option value="This week">This week</option>
-                        <option value="This month">This month</option>
-                        <option value="1–3 months ago">1–3 months ago</option>
-                        <option value="More than 3 months ago">More than 3 months ago</option>
-                      </select>
+                        placeholder="Not sure / N/A"
+                        options={[
+                          { value: 'Today', label: 'Today' },
+                          { value: 'This week', label: 'This week' },
+                          { value: 'This month', label: 'This month' },
+                          { value: '1–3 months ago', label: '1–3 months ago' },
+                          { value: 'More than 3 months ago', label: 'More than 3 months ago' },
+                        ]}
+                        fullWidth
+                        onChange={(value) => setFormData((prev) => ({ ...prev, issueStart: value }))}
+                      />
                     </Field>
 
                     <Field label="Preferred Contact Method" hint="How should we reach you when your repair is ready?">
@@ -1921,24 +2052,22 @@ export default function Repairs() {
                       </Field>
 
                       <Field label="Country">
-                        <select
-                          className={inputCls}
-                          style={{ cursor: 'pointer' }}
+                        <Dropdown
                           value={formData.country}
-                          onChange={(e) => {
-                            set('country')(e);
-                            // Reset rate when country changes.
-                            setFormData((prev) => ({ ...prev, country: e.target.value, shippingRateId: '', shippingRateName: '', shippingRatePrice: null }));
+                          options={[
+                            { value: 'US', label: 'United States' },
+                            { value: 'CA', label: 'Canada' },
+                            { value: 'MX', label: 'Mexico' },
+                            { value: 'GB', label: 'United Kingdom' },
+                            { value: 'AU', label: 'Australia' },
+                            { value: 'OTHER', label: 'Other' },
+                          ]}
+                          fullWidth
+                          onChange={(value) => {
+                            setFormData((prev) => ({ ...prev, country: value, shippingRateId: '', shippingRateName: '', shippingRatePrice: null }));
                             setRates([]);
                           }}
-                        >
-                          <option value="US">United States</option>
-                          <option value="CA">Canada</option>
-                          <option value="MX">Mexico</option>
-                          <option value="GB">United Kingdom</option>
-                          <option value="AU">Australia</option>
-                          <option value="OTHER">Other</option>
-                        </select>
+                        />
                       </Field>
                     </div>
 
