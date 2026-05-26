@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import { ShoppingCart, X, Package, Minus, Plus, ArrowRight, Trash2 } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
-export default function StorefrontCartSheet({ isOpen, onClose, cartItems = [], removeFromCart, updateQuantity, getCartTotal, isMutating }) {
+export default function StorefrontCartSheet({ isOpen, onClose, cartItems = [], removeFromCart, updateQuantity, getCartTotal, _isMutating }) {
   const overlayRef = useRef(null);
   const closeButtonRef = useRef(null);
   const previouslyFocusedRef = useRef(null);
