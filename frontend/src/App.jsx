@@ -1,26 +1,50 @@
 import { BrowserRouter as Router, Routes, Route, useLocation, Navigate } from 'react-router-dom';
-import { useState, useEffect, lazy, Suspense } from 'react';
+import { useState, useEffect, lazy, Suspense, useCallback } from 'react';
 import PageTransition from './components/routing/PageTransition';
 import LoadingSpinner from './components/shared/LoadingSpinner';
 import { CartProvider } from './context/CartContext';
 import { WooCommerceProvider } from './context/WooCommerceContext';
 import { WorkflowTransitionProvider } from './context/WorkflowTransitionContext.jsx';
-import { AuthProvider } from './auth/AuthContext.js';
+import { AuthProvider, useAuthContext } from './auth/AuthContext.js';
 import AppErrorBoundary from './components/system/AppErrorBoundary.jsx';
 import Header from './components/shell/Header';
 import Footer from './components/shell/Footer';
 import CartSidebar from './components/shell/CartSidebar';
 import ProtectedRoute from './components/routing/ProtectedRoute';
+import AccountHubSheet from './components/account/AccountHubSheet.jsx';
+import MobileInstallNudge from './components/pwa/MobileInstallNudge.jsx';
 import { isRewardsEnabled } from './utils/featureFlags.js';
 import { initializeWebpackPublicPath } from './setWebpackPublicPath.js';
 
 const APP_BASE = (process.env.PUBLIC_URL || '').replace(/\/+$/, '');
+const HOMEPAGE_ACCOUNT_CTA_SEEN_KEY = 'dtb:homepage-account-cta-seen:v1';
+const HOMEPAGE_ACCOUNT_CTA_DELAY_MS = 900;
 
 initializeWebpackPublicPath();
 
 function toAppHref(path = '/') {
   const normalized = path.startsWith('/') ? path : `/${ path }`;
   return `${ APP_BASE }${ normalized }` || '/';
+}
+
+function getLocalStorageFlag(key) {
+  if (typeof window === 'undefined') return false;
+
+  try {
+    return window.localStorage.getItem(key) === '1';
+  } catch {
+    return false;
+  }
+}
+
+function setLocalStorageFlag(key) {
+  if (typeof window === 'undefined') return;
+
+  try {
+    window.localStorage.setItem(key, '1');
+  } catch {
+    // Local storage can be unavailable in private browsing or strict modes.
+  }
 }
 
 function lazyWithReload(importer) {
@@ -177,6 +201,32 @@ function App() {
 }
 
 function AppShell({ cartOpen, toggleCart, closeCart }) {
+  const location = useLocation();
+  const { user, isAuthenticated, isLoading, logout } = useAuthContext();
+  const [homepageAccountCtaOpen, setHomepageAccountCtaOpen] = useState(false);
+  const isHomePage = location.pathname === '/';
+
+  const closeHomepageAccountCta = useCallback(() => {
+    setHomepageAccountCtaOpen(false);
+  }, []);
+
+  useEffect(() => {
+    if (!isHomePage || isLoading || isAuthenticated || homepageAccountCtaOpen) return undefined;
+    if (getLocalStorageFlag(HOMEPAGE_ACCOUNT_CTA_SEEN_KEY)) return undefined;
+
+    const timer = window.setTimeout(() => {
+      if (getLocalStorageFlag(HOMEPAGE_ACCOUNT_CTA_SEEN_KEY)) return;
+      setLocalStorageFlag(HOMEPAGE_ACCOUNT_CTA_SEEN_KEY);
+      setHomepageAccountCtaOpen(true);
+    }, HOMEPAGE_ACCOUNT_CTA_DELAY_MS);
+
+    return () => window.clearTimeout(timer);
+  }, [homepageAccountCtaOpen, isAuthenticated, isHomePage, isLoading]);
+
+  useEffect(() => {
+    if (!isHomePage && homepageAccountCtaOpen) setHomepageAccountCtaOpen(false);
+  }, [homepageAccountCtaOpen, isHomePage]);
+
   return (
     <>
       <ScrollToTop />
@@ -194,6 +244,13 @@ function AppShell({ cartOpen, toggleCart, closeCart }) {
         <Footer />
       </div>
       <CartSidebar isOpen={cartOpen} onClose={closeCart} />
+      <AccountHubSheet
+        isOpen={homepageAccountCtaOpen}
+        onClose={closeHomepageAccountCta}
+        user={user}
+        onLogout={logout}
+      />
+      <MobileInstallNudge suppressed={homepageAccountCtaOpen || cartOpen} />
     </>
   );
 }
