@@ -4,9 +4,6 @@ name: Build, Validate & Deploy
 # This workflow combines build, Lighthouse CI validation, and GitHub Pages deployment
 # into a single controlled pipeline with quality gates and artifact reuse.
 on:
-  push:
-    branches:
-      - main
   workflow_dispatch:
 
 concurrency:
