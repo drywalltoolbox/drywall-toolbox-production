@@ -150,231 +150,155 @@
   "coordinates": {
     "150009": {
       "id": "150009",
-      "x_px": null,
-      "y_px": null,
-      "x_pct": 24.343434,
-      "y_pct": 36.259695,
+      "x_pct": 23.95,
+      "y_pct": 37.05,
       "shape": "rectangle",
       "pageNumber": 1,
-      "rotation": 0,
-      "widthPx": 100,
-      "heightPx": 40
+      "rotation": 0
     },
     "154007": {
       "id": "154007",
-      "x_px": null,
-      "y_px": null,
-      "x_pct": 37.222222,
-      "y_pct": 48.801743,
+      "x_pct": 36.75,
+      "y_pct": 49.75,
       "shape": "rectangle",
       "pageNumber": 1,
-      "rotation": 0,
-      "widthPx": 100,
-      "heightPx": 40
+      "rotation": 0
     },
     "164348": {
       "id": "164348",
-      "x_px": null,
-      "y_px": null,
-      "x_pct": 46.961257,
-      "y_pct": 77.527203,
+      "x_pct": 46.15,
+      "y_pct": 79.55000000000001,
       "shape": "rectangle",
       "pageNumber": 1,
-      "rotation": 0,
-      "widthPx": 100,
-      "heightPx": 40
+      "rotation": 0
     },
     "170002": {
       "id": "170002",
-      "x_px": null,
-      "y_px": null,
-      "x_pct": 38.484848,
-      "y_pct": 25.620915,
+      "x_pct": 38.15,
+      "y_pct": 26.150000000000002,
       "shape": "rectangle",
       "pageNumber": 1,
-      "rotation": 0,
-      "widthPx": 100,
-      "heightPx": 40
+      "rotation": 0
     },
     "170003": {
       "id": "170003",
-      "x_px": null,
-      "y_px": null,
-      "x_pct": 0.0,
-      "y_pct": 0.0,
+      "x_pct": 60.55,
+      "y_pct": 48.55,
       "shape": "rectangle",
       "pageNumber": 1,
-      "rotation": 0,
-      "widthPx": 100,
-      "heightPx": 40
+      "rotation": 0
     },
     "171005": {
       "id": "171005",
-      "x_px": null,
-      "y_px": null,
-      "x_pct": 69.444444,
-      "y_pct": 45.62963,
+      "x_pct": 69.15,
+      "y_pct": 46.75,
       "shape": "rectangle",
       "pageNumber": 1,
-      "rotation": 0,
-      "widthPx": 100,
-      "heightPx": 40
+      "rotation": 0
     },
     "176001": {
       "id": "176001",
-      "x_px": null,
-      "y_px": null,
-      "x_pct": 56.212121,
-      "y_pct": 43.433551,
+      "x_pct": 55.95,
+      "y_pct": 44.55,
       "shape": "rectangle",
       "pageNumber": 1,
-      "rotation": 0,
-      "widthPx": 100,
-      "heightPx": 40
+      "rotation": 0
     },
     "179004": {
       "id": "179004",
-      "x_px": null,
-      "y_px": null,
-      "x_pct": 34.040404,
-      "y_pct": 28.500218,
+      "x_pct": 33.55,
+      "y_pct": 29.25,
       "shape": "rectangle",
       "pageNumber": 1,
-      "rotation": 0,
-      "widthPx": 100,
-      "heightPx": 40
+      "rotation": 0
     },
     "179006": {
       "id": "179006",
-      "x_px": null,
-      "y_px": null,
-      "x_pct": 36.868687,
-      "y_pct": 56.122004,
+      "x_pct": 36.550000000000004,
+      "y_pct": 57.74999999999999,
       "shape": "rectangle",
       "pageNumber": 1,
-      "rotation": 0,
-      "widthPx": 100,
-      "heightPx": 40
+      "rotation": 0
     },
     "179007": {
       "id": "179007",
-      "x_px": null,
-      "y_px": null,
-      "x_pct": 38.737374,
-      "y_pct": 58.8061,
+      "x_pct": 38.25,
+      "y_pct": 60.65,
       "shape": "rectangle",
       "pageNumber": 1,
-      "rotation": 0,
-      "widthPx": 100,
-      "heightPx": 40
+      "rotation": 0
     },
     "179008": {
       "id": "179008",
-      "x_px": null,
-      "y_px": null,
-      "x_pct": 55.434889,
-      "y_pct": 63.198257,
+      "x_pct": 54.95,
+      "y_pct": 64.95,
       "shape": "rectangle",
       "pageNumber": 1,
-      "rotation": 0,
-      "widthPx": 100,
-      "heightPx": 40
+      "rotation": 0
     },
     "179009": {
       "id": "179009",
-      "x_px": null,
-      "y_px": null,
-      "x_pct": 63.838384,
-      "y_pct": 61.490196,
+      "x_pct": 63.449999999999996,
+      "y_pct": 63.15,
       "shape": "rectangle",
       "pageNumber": 1,
-      "rotation": 0,
-      "widthPx": 100,
-      "heightPx": 40
+      "rotation": 0
     },
     "179010": {
       "id": "179010",
-      "x_px": null,
-      "y_px": null,
-      "x_pct": 81.969697,
-      "y_pct": 52.705882,
+      "x_pct": 81.55,
+      "y_pct": 54.050000000000004,
       "shape": "rectangle",
       "pageNumber": 1,
-      "rotation": 0,
-      "widthPx": 100,
-      "heightPx": 40
+      "rotation": 0
     },
     "359005": {
       "id": "359005",
-      "x_px": null,
-      "y_px": null,
-      "x_pct": 63.383838,
-      "y_pct": 39.041394,
+      "x_pct": 62.75,
+      "y_pct": 39.95,
       "shape": "rectangle",
       "pageNumber": 1,
-      "rotation": 0,
-      "widthPx": 100,
-      "heightPx": 40
+      "rotation": 0
     },
     "359046": {
       "id": "359046",
-      "x_px": null,
-      "y_px": null,
-      "x_pct": 34.89899,
-      "y_pct": 53.1939,
+      "x_pct": 34.45,
+      "y_pct": 54.75000000000001,
       "shape": "rectangle",
       "pageNumber": 1,
-      "rotation": 0,
-      "widthPx": 100,
-      "heightPx": 40
+      "rotation": 0
     },
     "150004F": {
       "id": "150004F",
-      "x_px": null,
-      "y_px": null,
-      "x_pct": 0.0,
-      "y_pct": 0.0,
+      "x_pct": 49.85,
+      "y_pct": 22.65,
       "shape": "rectangle",
       "pageNumber": 1,
-      "rotation": 0,
-      "widthPx": 100,
-      "heightPx": 40
+      "rotation": 0
     },
     "059143": {
       "id": "059143",
-      "x_px": null,
-      "y_px": null,
-      "x_pct": 29.141414,
-      "y_pct": 31.477124,
+      "x_pct": 28.65,
+      "y_pct": 32.35,
       "shape": "rectangle",
       "pageNumber": 1,
-      "rotation": 0,
-      "widthPx": 100,
-      "heightPx": 40
+      "rotation": 0
     },
     "150003F": {
       "id": "150003F",
-      "x_px": null,
-      "y_px": null,
-      "x_pct": 26.565657,
-      "y_pct": 50.021786,
+      "x_pct": 26.25,
+      "y_pct": 51.25,
       "shape": "rectangle",
       "pageNumber": 1,
-      "rotation": 0,
-      "widthPx": 100,
-      "heightPx": 40
+      "rotation": 0
     },
     "059025": {
       "id": "059025",
-      "x_px": null,
-      "y_px": null,
-      "x_pct": 47.718287,
-      "y_pct": 60.465359,
+      "x_pct": 47.05,
+      "y_pct": 62.05,
       "shape": "rectangle",
       "pageNumber": 1,
-      "rotation": 0,
-      "widthPx": 100,
-      "heightPx": 40
+      "rotation": 0
     }
   },
   "schema_version": "1.0",

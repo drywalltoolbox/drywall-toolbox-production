@@ -818,6 +818,11 @@ const ALLOWED_BRANDS = [
     const coords = data.coordinates || {};
     const imgW = data.image_natural_width  ?? null;
     const imgH = data.image_natural_height ?? null;
+    const clampPercent = (value) => {
+      const n = Number(value);
+      if (!Number.isFinite(n)) return 50;
+      return Math.min(100, Math.max(0, n));
+    };
     return data.parts.map((p) => {
       // Look up coordinate entry by part id first; fall back to part sku so that
       // schematics where the coordinates dict is keyed by part number (sku) rather
@@ -847,8 +852,8 @@ const ALLOWED_BRANDS = [
                 ? (c.y_px / imgH) * 100
                 : (c.top !== undefined ? c.top : 50)))
         : 50;
-      const top  = `${topVal}%`;
-      const left = `${leftVal}%`;
+      const top  = `${clampPercent(topVal)}%`;
+      const left = `${clampPercent(leftVal)}%`;
       const pageNumber = c && c.pageNumber
         ? c.pageNumber
         : (data.diagramPages && data.diagramPages[0]) || 1;
@@ -3185,35 +3190,37 @@ const ALLOWED_BRANDS = [
                       if (!e.isPrimary) return;
                       if (e.pointerType === 'mouse') return;
                       e.stopPropagation();
-                      e.preventDefault();
                       // Record where the press began so we can measure drift.
                       e.currentTarget.dataset.pdX = e.clientX;
                       e.currentTarget.dataset.pdY = e.clientY;
-                      // Capture so pointerup fires on this element even if the
-                      // finger drifts slightly off the edge of the hotspot.
-                      try {
-                        e.currentTarget.setPointerCapture(e.pointerId);
-                      } catch {
-                        // Some desktop/browser combinations can throw InvalidPointerId.
-                      }
                     }}
                     onPointerUp={(e) => {
                       if (!e.isPrimary) return;
                       if (e.pointerType === 'mouse') return;
                       e.stopPropagation();
-                      e.preventDefault();
                       // Measure how far the pointer drifted from the down position.
                       const downX = parseFloat(e.currentTarget.dataset.pdX ?? e.clientX);
                       const downY = parseFloat(e.currentTarget.dataset.pdY ?? e.clientY);
                       const drift = Math.hypot(e.clientX - downX, e.clientY - downY);
-                      // 8 px threshold: anything larger is a pan/scroll, not a tap.
-                      if (drift > 8) return;
+                      // Mobile taps while zoomed can jitter more; use a slightly
+                      // larger threshold to avoid false negatives.
+                      if (drift > 14) return;
                       activateHotspot(e.currentTarget);
+                    }}
+                    onPointerCancel={(e) => {
+                      if (e.pointerType === 'mouse') return;
+                      delete e.currentTarget.dataset.pdX;
+                      delete e.currentTarget.dataset.pdY;
                     }}
                     onClick={(e) => {
                       e.stopPropagation();
-                      // Mobile uses pointerup drift-guard path to avoid accidental opens.
-                      if (isMobile) return;
+                      // Mobile fallback: some browsers can drop pointerup while zoomed.
+                      // Allow click fallback when no active gesture is in progress.
+                      if (isMobile) {
+                        if (gestureActiveRef.current) return;
+                        activateHotspot(e.currentTarget);
+                        return;
+                      }
                       // Desktop mouse activation path.
                       activateHotspot(e.currentTarget);
                     }}
