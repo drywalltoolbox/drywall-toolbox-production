@@ -2222,23 +2222,28 @@ const ALLOWED_BRANDS = [
     ? (currentSchematic.imagePages && currentSchematic.imagePages[currentPage]) || currentSchematic.image || null
     : null;
 
-  // Derive the intrinsic aspect-ratio for the current page from the first
-  // matching part's imageNaturalWidth/Height (all parts on the same page share
-  // the same source-image dimensions).  Applied to the image-wrapper div so
-  // the layout reserves the correct proportional height *before* the image
-  // finishes loading, preventing a jump that would transiently misalign
-  // hotspot percentage positions on slow mobile connections.
+  // Derive a stable aspect-ratio for the current page to reserve diagram space
+  // before the image finishes loading (prevents jump/snap on slower devices).
+  // Priority:
+  //   1) measured natural size from a previously loaded src
+  //   2) metadata size from part records
+  //   3) conservative visual fallback ratio
   const currentPageFirstPart = currentSchematic
     ? currentSchematic.parts.find(p => !p.pageNumber || p.pageNumber === currentPage)
     : null;
-  const currentPageAspectRatio =
+  const measuredPageAspectRatio =
+    schematicImageSrc &&
+    imageNaturalSizeBySrc[schematicImageSrc]?.width &&
+    imageNaturalSizeBySrc[schematicImageSrc]?.height
+      ? `${imageNaturalSizeBySrc[schematicImageSrc].width} / ${imageNaturalSizeBySrc[schematicImageSrc].height}`
+      : undefined;
+  const metadataPageAspectRatio =
     currentPageFirstPart?.imageNaturalWidth && currentPageFirstPart?.imageNaturalHeight
       ? `${currentPageFirstPart.imageNaturalWidth} / ${currentPageFirstPart.imageNaturalHeight}`
-      : (schematicImageSrc &&
-        imageNaturalSizeBySrc[schematicImageSrc]?.width &&
-        imageNaturalSizeBySrc[schematicImageSrc]?.height)
-        ? `${imageNaturalSizeBySrc[schematicImageSrc].width} / ${imageNaturalSizeBySrc[schematicImageSrc].height}`
-        : undefined;
+      : undefined;
+  const currentPageAspectRatio =
+    measuredPageAspectRatio || metadataPageAspectRatio || '16 / 10';
+  const isDiagramLoading = Boolean(schematicImageSrc) && !diagramImageLoaded;
 
   const [addingToCart, setAddingToCart] = useState(null); // part.id being added
 
@@ -3010,7 +3015,7 @@ const ALLOWED_BRANDS = [
                   percentages is always that div, not the full-width wrapper. */}
               <div
                 ref={schematicImageRef}
-                className="schematic-image-wrapper"
+                className={`schematic-image-wrapper${isDiagramLoading ? ' schematic-image-wrapper--loading' : ''}`}
                 style={{
                   position: 'relative',
                   transform: `scale(${scale}) translate(${position.x / scale}px, ${position.y / scale}px)`,
@@ -3036,7 +3041,7 @@ const ALLOWED_BRANDS = [
                     Mobile: width:100%, height follows the img (height:auto from CSS).
                     ─────────────────────────────────────────────────────────────────── */}
                 <div
-                  className="schematic-image-bounds"
+                  className={`schematic-image-bounds${isDiagramLoading ? ' schematic-image-bounds--loading' : ''}`}
                   style={currentPageAspectRatio ? {
                     position: 'relative',
                     aspectRatio: currentPageAspectRatio,
@@ -3069,7 +3074,9 @@ const ALLOWED_BRANDS = [
                         WebkitUserSelect: 'none',
                         userSelect: 'none',
                         opacity: diagramImageLoaded ? 1 : 0,
-                        transition: 'opacity 0.35s ease',
+                        transform: diagramImageLoaded ? 'scale(1)' : 'scale(1.012)',
+                        filter: diagramImageLoaded ? 'none' : 'blur(0.8px)',
+                        transition: 'opacity 0.34s ease, transform 0.46s cubic-bezier(0.2, 0.72, 0, 1), filter 0.42s ease',
                       }}
                       loading="eager"
                       decoding="async"
@@ -3092,6 +3099,11 @@ const ALLOWED_BRANDS = [
                             };
                           });
                         }
+                        setDiagramImageLoaded(true);
+                      }}
+                      onError={() => {
+                        // Ensure we always leave the loading state even if an image fails
+                        // to decode/load, so the viewer never gets stuck in skeleton mode.
                         setDiagramImageLoaded(true);
                       }}
                     />

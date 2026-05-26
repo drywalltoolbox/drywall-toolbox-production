@@ -1,4 +1,5 @@
 import { ChevronRight } from 'lucide-react';
+import BackButton from '../shared/BackButton';
 import './products-selector.css';
 
 export default function ProductsCategorySelector({
@@ -11,10 +12,7 @@ export default function ProductsCategorySelector({
   return (
     <div className="product-selector">
       <div className="product-selector-header">
-        <button type="button" onClick={onBack} className="back-button">
-          <span aria-hidden="true">←</span>
-          <span>Brands</span>
-        </button>
+        <BackButton onClick={onBack} label="Brands" />
         <div className="product-selector-header-content">
           {brandLogo && (
             <img

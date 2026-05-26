@@ -333,15 +333,28 @@
     display: inline-flex;
     width: fit-content;
     align-items: center;
-    gap: 0.35rem;
-    padding: 0.45rem 0.8rem;
-    border: 1px solid rgba(148, 163, 184, 0.45);
-    border-radius: 999px;
-    background: var(--dtb-surface);
+    gap: 0.34rem;
+    padding: 0.4rem 0.72rem 0.4rem 0.62rem;
+    border: 1px solid rgba(148, 163, 184, 0.36);
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.92);
     color: var(--dtb-text);
-    font-size: 0.8rem;
+    font-size: 0.78rem;
     font-weight: 700;
-    box-shadow: 0 8px 18px rgba(15, 23, 42, 0.06);
+    box-shadow: 0 4px 10px rgba(15, 23, 42, 0.05);
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+    transition: background 120ms ease, border-color 120ms ease, opacity 120ms ease;
+  }
+
+  .dtb-listing-heading__back-pill:hover {
+    background: rgba(248, 250, 252, 0.95);
+    border-color: rgba(148, 163, 184, 0.45);
+  }
+
+  .dtb-listing-heading__back-pill:active {
+    background: rgba(241, 245, 249, 0.98);
+    opacity: 0.78;
   }
 
   .dtb-listing-heading__eyebrow {
@@ -585,6 +598,18 @@
 
   .dtb-product-grid--list {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (hover: none) and (pointer: coarse) {
+  .dtb-listing-heading__back-pill:hover {
+    background: rgba(255, 255, 255, 0.92);
+    border-color: rgba(148, 163, 184, 0.36);
+  }
+
+  .dtb-listing-heading__back-pill:active {
+    background: rgba(241, 245, 249, 0.98);
+    opacity: 0.72;
   }
 }
 

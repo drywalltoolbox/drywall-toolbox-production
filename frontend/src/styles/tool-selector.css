@@ -29,45 +29,49 @@
   gap: clamp(4px, 0.8vw, 8px);
 }
 
-.back-button {
+.tool-selector .back-button {
   align-self: flex-start;
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 7px 14px 7px 10px;
-  border-radius: 8px;
-  background: rgba(15, 23, 42, 0.07);
-  border: 1px solid rgba(15, 23, 42, 0.10);
+  gap: 5px;
+  min-height: 34px;
+  padding: 6px 12px 6px 10px;
+  border-radius: 10px;
+  background: rgba(248, 250, 252, 0.9);
+  border: 1px solid rgba(15, 23, 42, 0.1);
   color: var(--text-primary, #0f172a);
   cursor: pointer;
-  font-size: 0.875rem;
-  font-weight: 600;
+  font-size: 0.82rem;
+  font-weight: 650;
   letter-spacing: -0.01em;
   white-space: nowrap;
-  transition: background 150ms ease, border-color 150ms ease;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  transition: background 120ms ease, border-color 120ms ease, opacity 120ms ease;
   position: relative;
 }
 
-.back-button:hover {
-  background: rgba(15, 23, 42, 0.11);
+.tool-selector .back-button:hover {
+  background: rgba(241, 245, 249, 0.95);
   border-color: rgba(15, 23, 42, 0.16);
   color: var(--text-primary, #0f172a);
   transform: none;
 }
 
-.back-button:active {
-  background: rgba(15, 23, 42, 0.16);
+.tool-selector .back-button:active {
+  background: rgba(248, 250, 252, 0.9);
+  opacity: 0.74;
 }
 
-.back-button::before {
+.tool-selector .back-button::before {
   display: none;
 }
 
-.back-button:hover::before {
+.tool-selector .back-button:hover::before {
   display: none;
 }
 
-.back-button svg {
+.tool-selector .back-button svg {
   width: 16px;
   height: 16px;
   flex-shrink: 0;
@@ -413,14 +417,23 @@
   }
 
   /* Disable hover-only transitions on touch */
-  .back-button {
-    transition: none;
+  .tool-selector .back-button {
+    min-height: 34px;
+    padding: 6px 10px 6px 9px;
+    border-radius: 10px;
+    font-size: 0.8rem;
+    transition: opacity 120ms ease;
   }
 
-  .back-button:hover {
-    background: rgba(15, 23, 42, 0.07);
-    border-color: rgba(15, 23, 42, 0.10);
+  .tool-selector .back-button:hover {
+    background: rgba(241, 245, 249, 0.95);
+    border-color: rgba(15, 23, 42, 0.16);
     transform: none;
+  }
+
+  .tool-selector .back-button svg {
+    width: 15px;
+    height: 15px;
   }
 
   .header-content h2 {
@@ -499,5 +512,19 @@
 
   .tool-card:hover .tool-card-image-bg img {
     transform: none;
+  }
+}
+
+@media (hover: none) and (pointer: coarse) {
+  .tool-selector .back-button:hover {
+    background: rgba(248, 250, 252, 0.9);
+    border-color: rgba(15, 23, 42, 0.1);
+    color: var(--text-primary, #0f172a);
+    opacity: 1;
+  }
+
+  .tool-selector .back-button:active {
+    background: rgba(248, 250, 252, 0.9);
+    opacity: 0.72;
   }
 }

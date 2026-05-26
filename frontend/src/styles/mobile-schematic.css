@@ -559,6 +559,8 @@
   );
   background-size: 200% 100%;
   animation: skeletonShimmer 1.6s ease-in-out infinite;
+  opacity: 1;
+  transition: opacity 200ms ease;
   z-index: 1;
   pointer-events: none;
 }
@@ -727,6 +729,12 @@
   flex: 0 0 auto;
   display: block;
   width: 100%;
+  opacity: 1;
+  transition: opacity 220ms ease;
+}
+
+.schematic-image-wrapper--loading {
+  opacity: 0.985;
 }
 
 /* Desktop (769px+): wrapper fills all remaining container height and centers
@@ -768,6 +776,17 @@
   /* Mobile base: full width, height driven by children */
   width: 100%;
   display: block;
+  max-width: 100%;
+  margin-inline: auto;
+  contain: layout paint;
+  transition: width 260ms cubic-bezier(0.22, 0.78, 0, 1),
+              max-width 260ms cubic-bezier(0.22, 0.78, 0, 1);
+}
+
+/* Guard against transient narrow first-paint while responsive state settles. */
+.schematic-image-bounds--loading {
+  width: 100% !important;
+  max-width: 100% !important;
 }
 
 /* Mobile base: img fills full width, height proportional */
@@ -1530,8 +1549,8 @@
 /* Mobile: tighter padding, larger title for legibility */
 @media (max-width: 480px) {
   .viewer-top-bar {
-    padding: 8px 10px;
-    min-height: 68px;
+    padding: 7px 10px;
+    min-height: 60px;
     gap: 6px;
   }
 
@@ -1563,6 +1582,56 @@
 /* Mobile: pager is replaced by the page-tab strip below the bar,
    so the top bar stays a single row and the title can use most of the width. */
 @media (max-width: 768px) {
+  .viewer-top-bar {
+    position: relative;
+    padding-left: 42px;
+    min-height: 58px;
+  }
+
+  .viewer-top-bar .back-button {
+    position: absolute;
+    left: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 24px;
+    height: 24px;
+    min-height: 24px;
+    padding: 0;
+    border: none;
+    border-radius: 999px;
+    background: transparent;
+    color: var(--text-primary, #0f172a);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    box-shadow: none;
+    opacity: 0.92;
+    transition: opacity 120ms ease;
+  }
+
+  .viewer-top-bar .back-button:hover {
+    transform: translateY(-50%);
+    background: transparent;
+    border-color: transparent;
+    opacity: 1;
+  }
+
+  .viewer-top-bar .back-button:active {
+    transform: translateY(-50%);
+    background: transparent;
+    opacity: 0.7;
+  }
+
+  .viewer-top-bar .back-button svg {
+    width: 17px;
+    height: 17px;
+  }
+
+  .viewer-top-bar .back-button span {
+    display: none;
+  }
+
   /* Inline pager hidden on mobile — page-tab strip takes its place */
   .viewer-pager {
     display: none;
@@ -1644,20 +1713,46 @@
 
 @media (max-width: 480px) {
   .viewer-top-bar .back-button {
-    padding: 5px 8px;
-    min-height: 38px;
-    font-size: 0.82rem;
-    gap: 4px;
-    max-width: 80px;
+    left: 7px;
+    width: 23px;
+    height: 23px;
+    min-height: 23px;
+    font-size: 0;
+    max-width: 23px;
   }
 
   .viewer-top-bar .back-button svg {
-    width: 14px;
-    height: 14px;
+    width: 16px;
+    height: 16px;
   }
 
   .viewer-top-bar .back-button span {
     display: none;
+  }
+}
+
+@media (hover: none) and (pointer: coarse) {
+  .viewer-top-bar .back-button:hover {
+    transform: translateY(-50%);
+    background: transparent;
+    opacity: 0.92;
+  }
+
+  .viewer-top-bar .back-button:active {
+    transform: translateY(-50%);
+    background: transparent;
+    opacity: 0.66;
+  }
+
+  .back-button:hover {
+    transform: none;
+    background: rgba(15, 23, 42, 0.07);
+    border-color: rgba(15, 23, 42, 0.10);
+  }
+
+  .back-button:active {
+    background: rgba(15, 23, 42, 0.07);
+    opacity: 0.72;
   }
 }
 
