@@ -1,170 +1,343 @@
 {
-  "id": "1777936233846",
-  "title": "QB08-QSX",
+  "id": "1779793141529",
+  "title": "QB08-QSX_SCH_page_1",
   "diagramPages": [
-    16
+    1
   ],
   "legendPages": [],
   "parts": [
     {
       "id": "339073",
-      "name": "Unknown Part",
+      "name": "339073",
       "quantity": 1,
       "sku": ""
     },
     {
       "id": "209030",
-      "name": "Unknown Part",
-      "quantity": 2,
+      "name": "209030",
+      "quantity": 1,
       "sku": ""
     },
     {
       "id": "202028",
-      "name": "Unknown Part",
+      "name": "202028",
       "quantity": 1,
       "sku": ""
     },
     {
       "id": "QB8002",
-      "name": "Unknown Part",
+      "name": "QB8002",
       "quantity": 1,
       "sku": ""
     },
     {
       "id": "499023",
-      "name": "Unknown Part",
+      "name": "499023",
       "quantity": 1,
       "sku": ""
     },
     {
       "id": "QB8015",
-      "name": "Unknown Part",
+      "name": "QB8015",
       "quantity": 1,
       "sku": ""
     },
     {
-      "id": "QB8111",
-      "name": "Unknown Part",
-      "quantity": 1,
-      "sku": ""
-    },
-    {
-      "id": "QB8010",
-      "name": "Unknown Part",
+      "id": "QB8111 INSTALL W RTV",
+      "name": "QB8111 INSTALL W RTV",
       "quantity": 1,
       "sku": ""
     },
     {
       "id": "209046",
-      "name": "Unknown Part",
+      "name": "209046",
       "quantity": 1,
       "sku": ""
     },
     {
       "id": "209017",
-      "name": "Unknown Part",
+      "name": "209017",
       "quantity": 1,
       "sku": ""
     },
     {
-      "id": "210059",
-      "name": "Unknown Part",
+      "id": "QB8010",
+      "name": "QB8010",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "Details",
+      "name": "Details",
       "quantity": 1,
       "sku": ""
     },
     {
       "id": "219064",
-      "name": "Unknown Part",
+      "name": "219064",
       "quantity": 1,
       "sku": ""
     },
     {
       "id": "210058F",
-      "name": "Unknown Part",
+      "name": "210058F",
       "quantity": 1,
       "sku": ""
     },
     {
       "id": "489023",
-      "name": "Unknown Part",
+      "name": "489023",
       "quantity": 1,
       "sku": ""
     },
     {
-      "id": "QB0016",
-      "name": "Unknown Part",
+      "id": "QB8016",
+      "name": "QB8016",
       "quantity": 1,
       "sku": ""
     },
     {
       "id": "QB8012",
-      "name": "Unknown Part",
+      "name": "QB8012",
       "quantity": 1,
       "sku": ""
     },
     {
-      "id": "QB0005",
-      "name": "Unknown Part",
-      "quantity": 2,
+      "id": "QB8005 TYP",
+      "name": "QB8005 TYP",
+      "quantity": 1,
       "sku": ""
     },
     {
       "id": "QB0013",
-      "name": "Unknown Part",
-      "quantity": 4,
-      "sku": ""
-    },
-    {
-      "id": "QB8001",
-      "name": "Unknown Part",
+      "name": "QB0013",
       "quantity": 1,
       "sku": ""
     },
     {
       "id": "QB8004",
-      "name": "Unknown Part",
+      "name": "QB8004",
       "quantity": 1,
       "sku": ""
     },
     {
-      "id": "QB8003-5",
-      "name": "Unknown Part",
+      "id": "Details",
+      "name": "Details",
       "quantity": 1,
       "sku": ""
     },
     {
-      "id": "QB8023-5",
-      "name": "Unknown Part",
+      "id": "QB8001",
+      "name": "QB8001",
       "quantity": 1,
-      "sku": ""
-    },
-    {
-      "id": "QB8043-5",
-      "name": "Unknown Part",
-      "quantity": 1,
-      "sku": ""
-    },
-    {
-      "id": "149029",
-      "name": "Unknown Part",
-      "quantity": 2,
       "sku": ""
     },
     {
       "id": "QB0008",
-      "name": "Unknown Part",
-      "quantity": 2,
+      "name": "QB0008",
+      "quantity": 1,
+      "sku": ""
+    },
+    {
+      "id": "149029 TYP",
+      "name": "149029 TYP",
+      "quantity": 1,
       "sku": ""
     },
     {
       "id": "QB0006",
-      "name": "Unknown Part",
+      "name": "QB0006",
       "quantity": 1,
       "sku": ""
     }
   ],
-  "coordinates": {},
+  "coordinates": {
+    "202028": {
+      "id": "202028",
+      "x_pct": 16.111764705882354,
+      "y_pct": 33.099999999999994,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "209017": {
+      "id": "209017",
+      "x_pct": 47.25,
+      "y_pct": 42.28260719707849,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "209030": {
+      "id": "209030",
+      "x_pct": 28.85,
+      "y_pct": 12.45,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "209046": {
+      "id": "209046",
+      "x_pct": 45.75,
+      "y_pct": 38.9326071970785,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "219064": {
+      "id": "219064",
+      "x_pct": 61.85,
+      "y_pct": 30.25,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "339073": {
+      "id": "339073",
+      "x_pct": 12.65,
+      "y_pct": 16.15,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "489023": {
+      "id": "489023",
+      "x_pct": 63.95,
+      "y_pct": 37.25,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "499023": {
+      "id": "499023",
+      "x_pct": 21.5,
+      "y_pct": 57.8,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "QB8002": {
+      "id": "QB8002",
+      "x_pct": 16.5,
+      "y_pct": 49.83478560584301,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "QB8015": {
+      "id": "QB8015",
+      "x_pct": 26.5,
+      "y_pct": 64.65,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "QB8111 INSTALL W RTV": {
+      "id": "QB8111 INSTALL W RTV",
+      "x_pct": 32.75,
+      "y_pct": 75.80000000000001,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "QB8010": {
+      "id": "QB8010",
+      "x_pct": 57.24607843137255,
+      "y_pct": 14.137392802921505,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "Details": {
+      "id": "Details",
+      "x_pct": 81.25,
+      "y_pct": 82.6,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "210058F": {
+      "id": "210058F",
+      "x_pct": 59.25,
+      "y_pct": 36.15,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "QB8016": {
+      "id": "QB8016",
+      "x_pct": 68.41078431372549,
+      "y_pct": 42.212178408764515,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "QB8012": {
+      "id": "QB8012",
+      "x_pct": 79.53,
+      "y_pct": 41.2026071970785,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "QB8005 TYP": {
+      "id": "QB8005 TYP",
+      "x_pct": 81.0078431372549,
+      "y_pct": 50.212178408764515,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "QB0013": {
+      "id": "QB0013",
+      "x_pct": 83.45,
+      "y_pct": 60.25,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "QB8004": {
+      "id": "QB8004",
+      "x_pct": 82.95,
+      "y_pct": 77.45,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "QB8001": {
+      "id": "QB8001",
+      "x_pct": 63.150000000000006,
+      "y_pct": 79.2,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "QB0008": {
+      "id": "QB0008",
+      "x_pct": 43.75,
+      "y_pct": 90.9,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "149029 TYP": {
+      "id": "149029 TYP",
+      "x_pct": 61.06392156862745,
+      "y_pct": 83.97,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "QB0006": {
+      "id": "QB0006",
+      "x_pct": 48.24019607843138,
+      "y_pct": 94.60000000000001,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    }
+  },
   "schema_version": "1.0",
-  "image_natural_width": 1000,
-  "image_natural_height": 1000
+  "image_natural_width": 2400,
+  "image_natural_height": 1792
 }
