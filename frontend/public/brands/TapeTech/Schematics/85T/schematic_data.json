@@ -1,38 +1,71 @@
 {
-  "id": "1777933053470",
-  "title": "85T",
+  "id": "1779792061029",
+  "title": "85T_SCH-1",
   "diagramPages": [
     1
   ],
   "legendPages": [],
   "parts": [
     {
-      "id": "859016",
-      "name": "Unknown Part",
-      "quantity": 2,
+      "id": "859016 X 2",
+      "name": "859016 X 2",
+      "quantity": 1,
       "sku": ""
     },
     {
       "id": "709034",
-      "name": "Unknown Part",
+      "name": "709034",
       "quantity": 1,
       "sku": ""
     },
     {
       "id": "861014",
-      "name": "Unknown Part",
+      "name": "861014",
       "quantity": 1,
       "sku": ""
     },
     {
       "id": "856003F",
-      "name": "Unknown Part",
+      "name": "856003F",
       "quantity": 1,
       "sku": ""
     }
   ],
-  "coordinates": {},
+  "coordinates": {
+    "709034": {
+      "id": "709034",
+      "x_pct": 61.15784313725491,
+      "y_pct": 36.612607197078496,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "861014": {
+      "id": "861014",
+      "x_pct": 61.900000000000006,
+      "y_pct": 47.35,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "859016 X 2": {
+      "id": "859016 X 2",
+      "x_pct": 70.5421568627451,
+      "y_pct": 24.042607197078496,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    },
+    "856003F": {
+      "id": "856003F",
+      "x_pct": 19.7,
+      "y_pct": 53.5,
+      "shape": "rectangle",
+      "pageNumber": 1,
+      "rotation": 0
+    }
+  },
   "schema_version": "1.0",
-  "image_natural_width": 1224,
-  "image_natural_height": 792
+  "image_natural_width": 2400,
+  "image_natural_height": 1792
 }

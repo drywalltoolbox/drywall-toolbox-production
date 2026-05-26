@@ -120,6 +120,24 @@ import tapeTech07TTData  from '/brands/TapeTech/Schematics/07TT/schematic_data.j
 import tapeTech17TTData  from '/brands/TapeTech/Schematics/17TT/schematic_data.json';
 import tapeTech42TTData  from '/brands/TapeTech/Schematics/42TT/schematic_data.json';
 import tapeTech48TTData  from '/brands/TapeTech/Schematics/48TT/schematic_data.json';
+import tapeTech76TTData  from '/brands/TapeTech/Schematics/76TT/schematic_data.json';
+import tapeTech81XXTTData from '/brands/TapeTech/Schematics/81XXTT/schematic_data.json';
+import tapeTech85TData  from '/brands/TapeTech/Schematics/85T/schematic_data.json';
+import tapeTech88TTEData from '/brands/TapeTech/Schematics/88TTE/schematic_data.json';
+import tapeTech90TData  from '/brands/TapeTech/Schematics/90T/schematic_data.json';
+import tapeTechEHC07Data from '/brands/TapeTech/Schematics/EHC07/schematic_data.json';
+import tapeTechEHC10Data from '/brands/TapeTech/Schematics/EHC10/schematic_data.json';
+import tapeTechEHC12Data from '/brands/TapeTech/Schematics/EHC12/schematic_data.json';
+import tapeTechEZ07TTData from '/brands/TapeTech/Schematics/EZ07TT/schematic_data.json';
+import tapeTechEZ10TTData from '/brands/TapeTech/Schematics/EZ10TT/schematic_data.json';
+import tapeTechEZ12TTData from '/brands/TapeTech/Schematics/EZ12TT/schematic_data.json';
+import tapeTechEZ15TTData from '/brands/TapeTech/Schematics/EZ15TT/schematic_data.json';
+import tapeTechPAHC07Data from '/brands/TapeTech/Schematics/PAHC07/schematic_data.json';
+import tapeTechPAHC10Data from '/brands/TapeTech/Schematics/PAHC10/schematic_data.json';
+import tapeTechPAHC12Data from '/brands/TapeTech/Schematics/PAHC12/schematic_data.json';
+import tapeTechQB06QSXData from '/brands/TapeTech/Schematics/QB06-QSX/schematic_data.json';
+import tapeTechQB08QSXData from '/brands/TapeTech/Schematics/QB08-QSX/schematic_data.json';
+import tapeTechXHTTData from '/brands/TapeTech/Schematics/XHTT/schematic_data.json';
 
 // ---------------------------------------------------------------------------
 // Dura-Stilts schematic JSON data imports
@@ -942,6 +960,24 @@ const ALLOWED_BRANDS = [
   const tapeTech17TTParts  = buildPartsFromData(tapeTech17TTData);
   const tapeTech42TTParts  = buildPartsFromData(tapeTech42TTData);
   const tapeTech48TTParts  = buildPartsFromData(tapeTech48TTData);
+  const tapeTech76TTParts  = buildPartsFromData(tapeTech76TTData);
+  const tapeTech81XXTTParts = buildPartsFromData(tapeTech81XXTTData);
+  const tapeTech85TParts  = buildPartsFromData(tapeTech85TData);
+  const tapeTech88TTEParts = buildPartsFromData(tapeTech88TTEData);
+  const tapeTech90TParts  = buildPartsFromData(tapeTech90TData);
+  const tapeTechEHC07Parts = buildPartsFromData(tapeTechEHC07Data);
+  const tapeTechEHC10Parts = buildPartsFromData(tapeTechEHC10Data);
+  const tapeTechEHC12Parts = buildPartsFromData(tapeTechEHC12Data);
+  const tapeTechEZ07TTParts = buildPartsFromData(tapeTechEZ07TTData);
+  const tapeTechEZ10TTParts = buildPartsFromData(tapeTechEZ10TTData);
+  const tapeTechEZ12TTParts = buildPartsFromData(tapeTechEZ12TTData);
+  const tapeTechEZ15TTParts = buildPartsFromData(tapeTechEZ15TTData);
+  const tapeTechPAHC07Parts = buildPartsFromData(tapeTechPAHC07Data);
+  const tapeTechPAHC10Parts = buildPartsFromData(tapeTechPAHC10Data);
+  const tapeTechPAHC12Parts = buildPartsFromData(tapeTechPAHC12Data);
+  const tapeTechQB06QSXParts = buildPartsFromData(tapeTechQB06QSXData);
+  const tapeTechQB08QSXParts = buildPartsFromData(tapeTechQB08QSXData);
+  const tapeTechXHTTParts = buildPartsFromData(tapeTechXHTTData);
 
   // Level5 parts arrays
   const level5CoverPlateAssemblyParts = buildPartsFromData(level5CoverPlateAssemblyData);
@@ -1777,7 +1813,7 @@ const ALLOWED_BRANDS = [
       diagramPages: [1],
       imagePages: { 1: schImg('tapetech-76tt', 1) },
       previewImage: schPrev('tapetech-76tt'),
-      parts: [],
+      parts: tapeTech76TTParts,
     },
     {
       id: 'tapetech-85t',
@@ -1788,7 +1824,7 @@ const ALLOWED_BRANDS = [
       diagramPages: [1],
       imagePages: { 1: schImg('tapetech-85t', 1) },
       previewImage: schPrev('tapetech-85t'),
-      parts: [],
+      parts: tapeTech85TParts,
     },
     {
       id: 'tapetech-90t',
@@ -1799,7 +1835,7 @@ const ALLOWED_BRANDS = [
       diagramPages: [1],
       imagePages: { 1: schImg('tapetech-90t', 1) },
       previewImage: schPrev('tapetech-90t'),
-      parts: [],
+      parts: tapeTech90TParts,
     },
     {
       id: 'tapetech-81xxtt',
@@ -1810,7 +1846,7 @@ const ALLOWED_BRANDS = [
       diagramPages: [1],
       imagePages: { 1: schImg('tapetech-81xxtt', 1) },
       previewImage: schPrev('tapetech-81xxtt'),
-      parts: [],
+      parts: tapeTech81XXTTParts,
     },
     {
       id: 'tapetech-88tte',
@@ -1821,7 +1857,7 @@ const ALLOWED_BRANDS = [
       diagramPages: [1],
       imagePages: { 1: schImg('tapetech-88tte', 1) },
       previewImage: schPrev('tapetech-88tte'),
-      parts: [],
+      parts: tapeTech88TTEParts,
     },
     {
       id: 'tapetech-xhtt',
@@ -1832,7 +1868,7 @@ const ALLOWED_BRANDS = [
       diagramPages: [1],
       imagePages: { 1: schImg('tapetech-xhtt', 1) },
       previewImage: schPrev('tapetech-xhtt'),
-      parts: [],
+      parts: tapeTechXHTTParts,
     },
     {
       id: 'tapetech-ehc07',
@@ -1843,7 +1879,7 @@ const ALLOWED_BRANDS = [
       diagramPages: [1],
       imagePages: { 1: schImg('tapetech-ehc07', 1) },
       previewImage: schPrev('tapetech-ehc07'),
-      parts: [],
+      parts: tapeTechEHC07Parts,
     },
     {
       id: 'tapetech-ehc10',
@@ -1854,7 +1890,7 @@ const ALLOWED_BRANDS = [
       diagramPages: [1],
       imagePages: { 1: schImg('tapetech-ehc10', 1) },
       previewImage: schPrev('tapetech-ehc10'),
-      parts: [],
+      parts: tapeTechEHC10Parts,
     },
     {
       id: 'tapetech-ehc12',
@@ -1865,7 +1901,7 @@ const ALLOWED_BRANDS = [
       diagramPages: [1],
       imagePages: { 1: schImg('tapetech-ehc12', 1) },
       previewImage: schPrev('tapetech-ehc12'),
-      parts: [],
+      parts: tapeTechEHC12Parts,
     },
     {
       id: 'tapetech-ez07tt',
@@ -1876,7 +1912,7 @@ const ALLOWED_BRANDS = [
       diagramPages: [1],
       imagePages: { 1: schImg('tapetech-ez07tt', 1) },
       previewImage: schPrev('tapetech-ez07tt'),
-      parts: [],
+      parts: tapeTechEZ07TTParts,
     },
     {
       id: 'tapetech-ez10tt',
@@ -1887,7 +1923,7 @@ const ALLOWED_BRANDS = [
       diagramPages: [1],
       imagePages: { 1: schImg('tapetech-ez10tt', 1) },
       previewImage: schPrev('tapetech-ez10tt'),
-      parts: [],
+      parts: tapeTechEZ10TTParts,
     },
     {
       id: 'tapetech-ez12tt',
@@ -1898,7 +1934,7 @@ const ALLOWED_BRANDS = [
       diagramPages: [1],
       imagePages: { 1: schImg('tapetech-ez12tt', 1) },
       previewImage: schPrev('tapetech-ez12tt'),
-      parts: [],
+      parts: tapeTechEZ12TTParts,
     },
     {
       id: 'tapetech-ez15tt',
@@ -1909,7 +1945,7 @@ const ALLOWED_BRANDS = [
       diagramPages: [1],
       imagePages: { 1: schImg('tapetech-ez15tt', 1) },
       previewImage: schPrev('tapetech-ez15tt'),
-      parts: [],
+      parts: tapeTechEZ15TTParts,
     },
     {
       id: 'tapetech-pahc07',
@@ -1920,7 +1956,7 @@ const ALLOWED_BRANDS = [
       diagramPages: [1],
       imagePages: { 1: schImg('tapetech-pahc07', 1) },
       previewImage: schPrev('tapetech-pahc07'),
-      parts: [],
+      parts: tapeTechPAHC07Parts,
     },
     {
       id: 'tapetech-pahc10',
@@ -1931,7 +1967,7 @@ const ALLOWED_BRANDS = [
       diagramPages: [1],
       imagePages: { 1: schImg('tapetech-pahc10', 1) },
       previewImage: schPrev('tapetech-pahc10'),
-      parts: [],
+      parts: tapeTechPAHC10Parts,
     },
     {
       id: 'tapetech-pahc12',
@@ -1942,7 +1978,7 @@ const ALLOWED_BRANDS = [
       diagramPages: [1],
       imagePages: { 1: schImg('tapetech-pahc12', 1) },
       previewImage: schPrev('tapetech-pahc12'),
-      parts: [],
+      parts: tapeTechPAHC12Parts,
     },
     {
       id: 'tapetech-qb06-qsx',
@@ -1953,7 +1989,7 @@ const ALLOWED_BRANDS = [
       diagramPages: [1],
       imagePages: { 1: schImg('tapetech-qb06-qsx', 1) },
       previewImage: schPrev('tapetech-qb06-qsx'),
-      parts: [],
+      parts: tapeTechQB06QSXParts,
     },
     {
       id: 'tapetech-qb08-qsx',
@@ -1964,7 +2000,7 @@ const ALLOWED_BRANDS = [
       diagramPages: [1],
       imagePages: { 1: schImg('tapetech-qb08-qsx', 1) },
       previewImage: schPrev('tapetech-qb08-qsx'),
-      parts: [],
+      parts: tapeTechQB08QSXParts,
     },
 
     // ── Level5 ──────────────────────────────────────────────────────────────
