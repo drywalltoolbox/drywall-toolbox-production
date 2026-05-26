@@ -1,0 +1,126 @@
+/* ─────────────────────────────────────────────
+   Mobile install nudge
+   First-visit transparent prompt for iOS/PWA install behavior.
+───────────────────────────────────────────── */
+
+.mobile-install-nudge {
+  position: fixed;
+  left: 12px;
+  right: 12px;
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 88px);
+  z-index: 10010;
+  display: flex;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.mobile-install-nudge__card {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  width: min(100%, 420px);
+  padding: 10px 10px 10px 12px;
+  border: 1px solid rgba(147, 197, 253, 0.24);
+  border-radius: 18px;
+  background: rgba(7, 19, 41, 0.64);
+  color: #ffffff;
+  box-shadow:
+    0 16px 40px rgba(2, 6, 23, 0.24),
+    0 0 0 1px rgba(255, 255, 255, 0.08) inset;
+  backdrop-filter: blur(18px) saturate(1.4);
+  -webkit-backdrop-filter: blur(18px) saturate(1.4);
+  pointer-events: auto;
+}
+
+.mobile-install-nudge__card::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: -8px;
+  width: 16px;
+  height: 16px;
+  transform: translateX(-50%) rotate(45deg);
+  border-right: 1px solid rgba(147, 197, 253, 0.24);
+  border-bottom: 1px solid rgba(147, 197, 253, 0.24);
+  background: rgba(7, 19, 41, 0.58);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+
+.mobile-install-nudge__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  background: rgba(37, 99, 235, 0.28);
+  color: #bfdbfe;
+  box-shadow: 0 0 0 1px rgba(147, 197, 253, 0.14) inset;
+}
+
+.mobile-install-nudge__content {
+  min-width: 0;
+}
+
+.mobile-install-nudge__label {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: #bfdbfe;
+  font-size: 0.68rem;
+  font-weight: 850;
+  letter-spacing: 0.08em;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.mobile-install-nudge__content p {
+  margin: 3px 0 0;
+  color: rgba(255, 255, 255, 0.88);
+  font-size: 0.82rem;
+  font-weight: 700;
+  line-height: 1.28;
+  letter-spacing: -0.015em;
+}
+
+.mobile-install-nudge__close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.12);
+  color: rgba(255, 255, 255, 0.9);
+  cursor: pointer;
+  transition: background 140ms ease, transform 140ms ease;
+}
+
+.mobile-install-nudge__close:hover {
+  background: rgba(255, 255, 255, 0.18);
+}
+
+.mobile-install-nudge__close:active {
+  transform: scale(0.94);
+}
+
+.mobile-install-nudge__close:focus-visible {
+  outline: 2px solid rgba(147, 197, 253, 0.9);
+  outline-offset: 2px;
+}
+
+@media (min-width: 768px) {
+  .mobile-install-nudge {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mobile-install-nudge__close {
+    transition: none;
+  }
+}
