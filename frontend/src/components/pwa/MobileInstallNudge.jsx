@@ -1,8 +1,9 @@
 import { useCallback, useEffect, useState } from 'react';
-import { Share, Smartphone, X } from 'lucide-react';
+import { Share, Smartphone } from 'lucide-react';
 import './MobileInstallNudge.css';
 
-const MOBILE_INSTALL_NUDGE_SEEN_KEY = 'dtb:mobile-install-nudge-seen:v1';
+const MOBILE_INSTALL_NUDGE_DISMISSED_KEY = 'dtb:a2hs-install-nudge-dismissed:v1';
+const MOBILE_INSTALL_NUDGE_SHOWN_KEY = 'dtb:a2hs-install-nudge-shown:v1';
 const MOBILE_MEDIA_QUERY = '(max-width: 767px)';
 const DISPLAY_DELAY_MS = 1800;
 
@@ -26,6 +27,16 @@ function setStorageFlag(key) {
   }
 }
 
+function isIOSSafari() {
+  if (typeof window === 'undefined') return false;
+
+  const userAgent = window.navigator.userAgent ?? '';
+  const isIOS = /iphone|ipad|ipod/i.test(userAgent);
+  if (!isIOS) return false;
+
+  return /safari/i.test(userAgent) && !/crios|fxios|edgios|opios/i.test(userAgent);
+}
+
 function isStandaloneApp() {
   if (typeof window === 'undefined') return false;
 
@@ -45,24 +56,36 @@ export default function MobileInstallNudge({ suppressed = false }) {
   const [visible, setVisible] = useState(false);
 
   const dismiss = useCallback(() => {
-    setStorageFlag(MOBILE_INSTALL_NUDGE_SEEN_KEY);
+    setStorageFlag(MOBILE_INSTALL_NUDGE_DISMISSED_KEY);
     setVisible(false);
   }, []);
 
   useEffect(() => {
     if (suppressed || visible) return undefined;
-    if (getStorageFlag(MOBILE_INSTALL_NUDGE_SEEN_KEY)) return undefined;
-    if (isStandaloneApp() || !isMobileViewport()) return undefined;
+    if (getStorageFlag(MOBILE_INSTALL_NUDGE_DISMISSED_KEY)) return undefined;
+    if (getStorageFlag(MOBILE_INSTALL_NUDGE_SHOWN_KEY)) return undefined;
+    if (isStandaloneApp() || !isMobileViewport() || !isIOSSafari()) return undefined;
 
     const timer = window.setTimeout(() => {
-      if (getStorageFlag(MOBILE_INSTALL_NUDGE_SEEN_KEY)) return;
-      if (isStandaloneApp() || !isMobileViewport()) return;
-      setStorageFlag(MOBILE_INSTALL_NUDGE_SEEN_KEY);
+      if (getStorageFlag(MOBILE_INSTALL_NUDGE_DISMISSED_KEY)) return;
+      if (getStorageFlag(MOBILE_INSTALL_NUDGE_SHOWN_KEY)) return;
+      if (isStandaloneApp() || !isMobileViewport() || !isIOSSafari()) return;
+      setStorageFlag(MOBILE_INSTALL_NUDGE_SHOWN_KEY);
       setVisible(true);
     }, DISPLAY_DELAY_MS);
 
     return () => window.clearTimeout(timer);
   }, [suppressed, visible]);
+
+  useEffect(() => {
+    const onInstalled = () => {
+      setVisible(false);
+      setStorageFlag(MOBILE_INSTALL_NUDGE_DISMISSED_KEY);
+    };
+
+    window.addEventListener('appinstalled', onInstalled);
+    return () => window.removeEventListener('appinstalled', onInstalled);
+  }, []);
 
   useEffect(() => {
     if (!visible) return undefined;
@@ -94,17 +117,19 @@ export default function MobileInstallNudge({ suppressed = false }) {
         <div className="mobile-install-nudge__content">
           <span className="mobile-install-nudge__label">
             <Share size={ 14 } strokeWidth={ 2.4 } aria-hidden="true" />
-            iOS Share
+            Add to Home Screen
           </span>
-          <p>Add to your home screen for our full app experience.</p>
+          <p>
+            On iPhone/iPad, tap <strong>Share</strong>, then <strong>Add to Home Screen</strong> to install Drywall Toolbox.
+          </p>
         </div>
         <button
           type="button"
-          className="mobile-install-nudge__close"
+          className="mobile-install-nudge__dismiss"
           onClick={ dismiss }
           aria-label="Dismiss add to home screen prompt"
         >
-          <X size={ 15 } strokeWidth={ 2.5 } />
+          Got it
         </button>
       </div>
     </aside>

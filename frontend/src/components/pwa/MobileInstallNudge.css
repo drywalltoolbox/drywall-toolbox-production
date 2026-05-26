@@ -70,45 +70,54 @@
   align-items: center;
   gap: 5px;
   color: #bfdbfe;
-  font-size: 0.68rem;
+  font-size: 0.74rem;
   font-weight: 850;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.03em;
   line-height: 1;
-  text-transform: uppercase;
 }
 
 .mobile-install-nudge__content p {
-  margin: 3px 0 0;
+  margin: 6px 0 0;
   color: rgba(255, 255, 255, 0.88);
-  font-size: 0.82rem;
-  font-weight: 700;
-  line-height: 1.28;
+  font-size: 0.79rem;
+  font-weight: 600;
+  line-height: 1.35;
   letter-spacing: -0.015em;
 }
 
-.mobile-install-nudge__close {
+.mobile-install-nudge__content strong {
+  color: #dbeafe;
+  font-weight: 800;
+}
+
+.mobile-install-nudge__dismiss {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 30px;
+  min-width: 64px;
   height: 30px;
-  border: 0;
+  padding: 0 10px;
+  border: 1px solid rgba(191, 219, 254, 0.55);
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.12);
-  color: rgba(255, 255, 255, 0.9);
+  background: rgba(30, 64, 175, 0.26);
+  color: #eff6ff;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.01em;
   cursor: pointer;
-  transition: background 140ms ease, transform 140ms ease;
+  transition: background 140ms ease, border-color 140ms ease, transform 140ms ease;
 }
 
-.mobile-install-nudge__close:hover {
-  background: rgba(255, 255, 255, 0.18);
+.mobile-install-nudge__dismiss:hover {
+  background: rgba(30, 64, 175, 0.38);
+  border-color: rgba(191, 219, 254, 0.78);
 }
 
-.mobile-install-nudge__close:active {
+.mobile-install-nudge__dismiss:active {
   transform: scale(0.94);
 }
 
-.mobile-install-nudge__close:focus-visible {
+.mobile-install-nudge__dismiss:focus-visible {
   outline: 2px solid rgba(147, 197, 253, 0.9);
   outline-offset: 2px;
 }
@@ -120,7 +129,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .mobile-install-nudge__close {
+  .mobile-install-nudge__dismiss {
     transition: none;
   }
 }
