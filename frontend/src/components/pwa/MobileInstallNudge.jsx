@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { Share, Smartphone } from 'lucide-react';
+import { Share, X } from 'lucide-react';
 import './MobileInstallNudge.css';
 
 const MOBILE_INSTALL_NUDGE_DISMISSED_KEY = 'dtb:a2hs-install-nudge-dismissed:v1';
@@ -111,25 +111,19 @@ export default function MobileInstallNudge({ suppressed = false }) {
   return (
     <aside className="mobile-install-nudge" aria-label="Install app prompt">
       <div className="mobile-install-nudge__card">
-        <div className="mobile-install-nudge__icon" aria-hidden="true">
-          <Smartphone size={ 16 } strokeWidth={ 2.2 } />
-        </div>
         <div className="mobile-install-nudge__content">
-          <span className="mobile-install-nudge__label">
-            <Share size={ 14 } strokeWidth={ 2.4 } aria-hidden="true" />
-            Add to Home Screen
-          </span>
           <p>
-            On iPhone/iPad, tap <strong>Share</strong>, then <strong>Add to Home Screen</strong> to install Drywall Toolbox.
+            On iPhone/iPad, tap <Share size={ 12 } strokeWidth={ 2.4 } aria-hidden="true" className="mobile-install-nudge__share-icon" /> then
+            <strong> Add to Home Screen</strong>.
           </p>
         </div>
         <button
           type="button"
-          className="mobile-install-nudge__dismiss"
+          className="mobile-install-nudge__close"
           onClick={ dismiss }
           aria-label="Dismiss add to home screen prompt"
         >
-          Got it
+          <X size={ 14 } strokeWidth={ 2.6 } aria-hidden="true" />
         </button>
       </div>
     </aside>
