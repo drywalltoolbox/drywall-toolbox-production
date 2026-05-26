@@ -96,6 +96,41 @@ function RecentlyViewedTile( { product, onClose } ) {
   );
 }
 
+// ─── Branded unauthenticated account CTA ──────────────────────────────────────
+
+function AccountHubSignInCTA( { rewardsEnabled, onSignIn } ) {
+  return (
+    <section className="account-hub-cta" aria-labelledby="account-hub-cta-title">
+      <div className="account-hub-cta__glow" aria-hidden="true" />
+      <div className="account-hub-cta__inner">
+        { rewardsEnabled && (
+          <div className="account-hub-cta__eyebrow">
+            <Sparkles size={ 14 } strokeWidth={ 2 } />
+            <span>Rewards available</span>
+          </div>
+        ) }
+        <h2 id="account-hub-cta-title" className="account-hub-cta__headline">
+          Earn rewards, track orders, and save your tools
+        </h2>
+        <p className="account-hub-cta__body">
+          Sign in for order tracking, rewards, saved products, and contractor account tools.
+        </p>
+        <button
+          type="button"
+          className="account-hub-cta__button"
+          onClick={ onSignIn }
+        >
+          <span className="account-hub-cta__button-glow" aria-hidden="true" />
+          <span className="account-hub-cta__button-content">
+            Sign in
+            <ChevronRight size={ 18 } strokeWidth={ 2.4 } />
+          </span>
+        </button>
+      </div>
+    </section>
+  );
+}
+
 export default function AccountHubSheet({ isOpen, onClose, user, onLogout }) {
   const rewardsEnabled = isRewardsEnabled();
   const navigate = useNavigate();
@@ -192,23 +227,11 @@ export default function AccountHubSheet({ isOpen, onClose, user, onLogout }) {
 
           {/* ── UNAUTHENTICATED ── */}
           {!user && (
-            <div className="account-hub__panel">
-              <h2 className="account-hub__headline">
-                Earn rewards, track orders, and save your tools
-              </h2>
-              { rewardsEnabled && (
-                <div className="account-hub__rewards-badge">
-                  <Sparkles size={14} strokeWidth={2} />
-                  <span>Rewards available</span>
-                </div>
-              ) }
-              <button
-                type="button"
-                className="account-hub__signin-cta"
-                onClick={() => { closeSheet(); navigate('/login'); }}
-              >
-                Sign in
-              </button>
+            <div className="account-hub__panel account-hub__panel--guest">
+              <AccountHubSignInCTA
+                rewardsEnabled={rewardsEnabled}
+                onSignIn={() => { closeSheet(); navigate('/login'); }}
+              />
 
               <div className="account-hub__divider" />
 
