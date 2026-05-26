@@ -224,7 +224,13 @@ function AppShell({ cartOpen, toggleCart, closeCart }) {
   }, [homepageAccountCtaOpen, isAuthenticated, isHomePage, isLoading]);
 
   useEffect(() => {
-    if (!isHomePage && homepageAccountCtaOpen) setHomepageAccountCtaOpen(false);
+    if (isHomePage || !homepageAccountCtaOpen) return undefined;
+
+    const timer = window.setTimeout(() => {
+      setHomepageAccountCtaOpen(false);
+    }, 0);
+
+    return () => window.clearTimeout(timer);
   }, [homepageAccountCtaOpen, isHomePage]);
 
   return (
