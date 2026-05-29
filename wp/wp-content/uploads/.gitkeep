@@ -1,3 +1,0 @@
-# This file ensures the uploads directory is tracked by git
-# Media files are uploaded here by WordPress on the server
-# This directory is NOT deployed via GitHub Actions (large binary files)
