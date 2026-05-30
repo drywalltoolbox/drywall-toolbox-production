@@ -9,7 +9,7 @@
  */
 
 import { Link } from 'react-router-dom';
-import { Truck, Clock, Package, Globe, CheckCircle, AlertCircle, ArrowRight } from 'lucide-react';
+import { Clock, Globe, CheckCircle, AlertCircle, ArrowRight } from 'lucide-react';
 import SEOHead from '../components/shared/SEOHead';
 
 /* ─── Shipping rate table data ───────────────────────────────────────────────── */
@@ -62,38 +62,6 @@ const SHIPPING_RATES = [
     transit:    '2–21 days (by method)',
     price:      'Calculated at checkout',
     highlight:  false,
-  },
-];
-
-/* ─── Policy highlight cards ─────────────────────────────────────────────────── */
-const HIGHLIGHTS = [
-  {
-    Icon:  Truck,
-    color: '#2563eb',
-    bg:    'linear-gradient(135deg, #eff6ff, #dbeafe)',
-    title: 'Free Shipping ≥ $75',
-    body:  'All orders over $75 ship free via Standard Ground to the contiguous 48 states. AK, HI, and Canada are calculated at carrier rate.',
-  },
-  {
-    Icon:  Clock,
-    color: '#16a34a',
-    bg:    'linear-gradient(135deg, #f0fdf4, #dcfce7)',
-    title: 'Same-Day Processing',
-    body:  'In-stock orders placed before 12:00 PM CST on business days are processed and shipped the same day — later than most competitors.',
-  },
-  {
-    Icon:  Package,
-    color: '#d97706',
-    bg:    'linear-gradient(135deg, #fffbeb, #fef3c7)',
-    title: 'Insured & Photographed',
-    body:  'Every outbound shipment is photographed before sealing and fully insured at declared value. Large tools are double-boxed with foam inserts.',
-  },
-  {
-    Icon:  Globe,
-    color: '#7c3aed',
-    bg:    'linear-gradient(135deg, #f5f3ff, #ede9fe)',
-    title: 'US, Canada & Worldwide',
-    body:  'We ship to all 50 US states, Canada (Canada Post & FedEx Air), and worldwide via FedEx International Priority or Economy.',
   },
 ];
 
@@ -201,81 +169,6 @@ export default function ShippingPolicy() {
         maxWidth:  '1400px',
         margin:    '0 auto',
       }}>
-
-        {/* Free-shipping banner */}
-        <div style={{
-          background:   'linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%)',
-          border:       '1px solid #bfdbfe',
-          borderRadius: '4px',
-          padding:      '20px 28px',
-          display:      'flex',
-          alignItems:   'center',
-          gap:          '16px',
-          marginBottom: 'clamp(2rem, 4vw, 3rem)',
-          flexWrap:     'wrap',
-        }}>
-          <div style={{
-            width:          '44px',
-            height:         '44px',
-            background:     'white',
-            borderRadius:   '10px',
-            display:        'flex',
-            alignItems:     'center',
-            justifyContent: 'center',
-            color:          '#2563eb',
-            flexShrink:     0,
-            boxShadow:      '0 2px 8px rgba(37,99,235,0.15)',
-          }}>
-            <Truck size={22} />
-          </div>
-          <div>
-            <div style={{ fontWeight: 800, fontSize: '1rem', color: '#1e3a8a', marginBottom: '2px' }}>
-              Free Standard Ground Shipping on Orders Over $75
-            </div>
-            <div style={{ fontSize: '0.85rem', color: 'rgba(30,58,138,0.7)' }}>
-              Applies to orders shipping within the contiguous 48 states. Alaska, Hawaii, and Canada
-              are calculated at actual carrier rate. Same-day shipping on in-stock orders placed
-              before 12:00 PM CST.
-            </div>
-          </div>
-        </div>
-
-        {/* Highlight cards */}
-        <div style={{
-          display:             'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
-          gap:                 '16px',
-          marginBottom:        'clamp(2.5rem, 5vw, 4rem)',
-        }}>
-          {HIGHLIGHTS.map(({ Icon, color, bg, title, body }) => (
-            <div key={title} style={{
-              background:   'white',
-              border:       '1px solid var(--machined-border)',
-              borderRadius: '4px',
-              padding:      '20px 20px 22px',
-            }}>
-              <div style={{
-                width:          '44px',
-                height:         '44px',
-                background:     bg,
-                borderRadius:   '10px',
-                display:        'flex',
-                alignItems:     'center',
-                justifyContent: 'center',
-                color,
-                marginBottom:   '14px',
-              }}>
-                <Icon size={22} />
-              </div>
-              <div style={{ fontWeight: 700, fontSize: '0.9rem', color: '#0f172a', marginBottom: '6px' }}>
-                {title}
-              </div>
-              <div style={{ fontSize: '0.825rem', color: 'rgba(15,23,42,0.6)', lineHeight: 1.6 }}>
-                {body}
-              </div>
-            </div>
-          ))}
-        </div>
 
         {/* ── Service levels table ──────────────────────────────────────── */}
         <div style={{ marginBottom: 'clamp(2.5rem, 5vw, 4rem)' }}>

@@ -113,6 +113,26 @@ function splitDescriptionSections(text) {
   return groups.filter(Boolean);
 }
 
+function isIncludesLabel(label) {
+  return /^(set\s+)?includes?$/i.test(String(label || '').trim());
+}
+
+function stripSetIncludesFromDescription(content) {
+  if (!content || typeof content !== 'string') return content;
+
+  return content
+    // Remove dedicated HTML blocks that are only a Set/Kit Includes section.
+    .replace(
+      /<(?:p|li)[^>]*>\s*(?:<[^>]+>\s*)*(?:set|kit)\s+includes?\s*:?\s*[\s\S]*?<\/(?:p|li)>\s*/gi,
+      ''
+    )
+    // Remove plain text Set/Kit Includes lines for markdown/plain descriptions.
+    .replace(/(?:^|\n)\s*(?:set|kit)\s+includes?\s*:\s*[^\n]*(?=\n|$)/gi, '\n')
+    // Remove inline trailing Set Includes tails that occasionally append to prose.
+    .replace(/\s+(?:set|kit)\s+includes?\s*:\s*[\s\S]*$/i, '')
+    .trim();
+}
+
 function ProductDescriptionContent({ html, text }) {
   const sourceText = normalizeDescriptionText(text || '');
   const plainHtmlText = hasHtmlMarkup(html) ? normalizeDescriptionText(htmlToPlainText(html)) : '';
@@ -623,9 +643,13 @@ export default function ProductDetail({
           ? `${stockQuantity} in stock - Hurry while stocks last!`
           : `${stockQuantity} in stock`
       : 'In stock and ready to ship';
-  const rawDescription = stripSpecsFromHtml(
+  const hasIncludesSpec = productSpecifications.some((spec) => isIncludesLabel(spec?.label));
+  const rawDescriptionBase = stripSpecsFromHtml(
     effectiveProduct.description_full || effectiveProduct.description || effectiveProduct.short_description || ''
   );
+  const rawDescription = hasIncludesSpec
+    ? stripSetIncludesFromDescription(rawDescriptionBase)
+    : rawDescriptionBase;
   const decodedDescription = decodeEscapedHtml(rawDescription);
   const descriptionContent = hasHtmlMarkup(decodedDescription)
     ? <ProductDescriptionContent html={decodedDescription} />
@@ -676,7 +700,12 @@ export default function ProductDetail({
                 reviewsClassName="dtb-pdp-mobile-relocate"
               />
 
-              <p className="dtb-pdp-shipping-note">Shipping calculated at checkout.</p>
+              <p className="dtb-pdp-shipping-note">
+                <Link to="/shipping-policy" className="dtb-pdp-shipping-note__link">
+                  Shipping
+                </Link>{' '}
+                calculated at checkout.
+              </p>
 
               {needsVariation ? (
                 <ProductVariationRail

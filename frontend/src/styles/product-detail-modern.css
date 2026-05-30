@@ -637,9 +637,21 @@
 }
 
 .dtb-pdp-shipping-note {
-  margin: 0.35rem 0 0.1rem;
+  margin: -0.45rem 0 0.05rem;
   font-size: 0.9rem;
+  line-height: 1.25;
   color: #475569;
+}
+
+.dtb-pdp-shipping-note__link {
+  color: #1d4ed8;
+  text-decoration: underline;
+  text-underline-offset: 0.12em;
+  font-weight: 600;
+}
+
+.dtb-pdp-shipping-note__link:hover {
+  color: #1e40af;
 }
 
 /* ── Stock meter ─────────────────────────────────────────────────────────── */
@@ -1213,6 +1225,7 @@
   }
 
   .dtb-pdp-shipping-note {
+    margin: -0.4rem 0 0.05rem;
     font-size: 0.95rem;
     color: #1f2937;
   }
