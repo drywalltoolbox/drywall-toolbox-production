@@ -1,28 +1,13 @@
-# ─── WordPress /wp/ subdirectory — internal mod_rewrite rules ─────────────────
-# These rules live inside the /wp/ directory itself and tell WordPress how to
-# route its own internal requests.  The domain-root .htaccess handles routing
-# from the public URL space (e.g. /wp-admin/ → /wp/wp-admin/).
-#
-# This configuration supports:
-#   1. WordPress permalink structures (custom, post name, date-based, etc.)
-#   2. Standard WordPress subdirectory installation pattern
-#   3. WooCommerce product/shop URLs
-#
-# RewriteBase must match the subdirectory WordPress is installed in (/wp/).
+# wp-content should never run permalink rewrites.
+# Permalink routing belongs in /wp/.htaccess.
 
-# BEGIN WordPress
-<IfModule mod_rewrite.c>
-    RewriteEngine On
-    RewriteBase /wp/
-    
-    # Don't rewrite index.php itself
-    RewriteRule ^index\.php$ - [L]
-    
-    # Don't rewrite existing files
-    RewriteCond %{REQUEST_FILENAME} !-f
-    RewriteCond %{REQUEST_FILENAME} !-d
-    
-    # Rewrite all other requests to index.php (this enables custom permalink structures)
-    RewriteRule . index.php [L]
+Options -Indexes
+
+<Files ".ht*">
+<IfModule mod_authz_core.c>
+Require all denied
 </IfModule>
-# END WordPress
+<IfModule !mod_authz_core.c>
+Deny from all
+</IfModule>
+</Files>

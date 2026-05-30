@@ -1,62 +1,59 @@
-# BEGIN NFD EPC
-<IfModule mod_expires.c>
-	ExpiresActive On
-	ExpiresByType image/jpg "access plus 1 year"
-	ExpiresByType image/jpeg "access plus 1 year"
-	ExpiresByType image/gif "access plus 1 year"
-	ExpiresByType image/png "access plus 1 year"
-	ExpiresByType text/css "access plus 1 month"
-	ExpiresByType application/pdf "access plus 1 month"
-	ExpiresByType text/javascript "access plus 1 month"
-	ExpiresByType text/html "access plus 2 hours"
-	ExpiresByType image/x-icon "access plus 1 year"
-	ExpiresDefault "access plus 6 hours"
-</IfModule>
-# END NFD EPC
-# BEGIN WordPress
-# The directives (lines) between "BEGIN WordPress" and "END WordPress" are
-# dynamically generated, and should only be modified via WordPress filters.
-# Any changes to the directives between these markers will be overwritten.
+# Drywall Toolbox root routing
+# Document root: /public_html/drywalltoolbox/
+# WordPress core: /public_html/drywalltoolbox/wp/
 
-# END WordPress
-# BEGIN NFD Htaccess
-# Managed by Newfold Htaccess Manager v1.0.0 (drywalltoolbox.com)
-# STATE sha256: 82878a3d822855afc505a3527de748901e7890a62219c6c8cff11a6af3cbfd04 applied: 2026-05-29T09:49:03Z
+DirectoryIndex index.html index.php
+Options -Indexes
+Options +FollowSymLinks
 
-# BEGIN Newfold Browser Cache
-<IfModule mod_expires.c>
-	ExpiresActive On
-	ExpiresDefault "access plus 24 hours"
-	ExpiresByType text/html "access plus 2 hours"
-	ExpiresByType image/jpg "access plus 24 hours"
-	ExpiresByType image/jpeg "access plus 24 hours"
-	ExpiresByType image/gif "access plus 24 hours"
-	ExpiresByType image/png "access plus 24 hours"
-	ExpiresByType image/webp "access plus 24 hours"
-	ExpiresByType text/css "access plus 24 hours"
-	ExpiresByType text/javascript "access plus 24 hours"
-	ExpiresByType application/pdf "access plus 1 week"
-	ExpiresByType image/x-icon "access plus 1 year"
-</IfModule>
 <IfModule mod_rewrite.c>
 RewriteEngine On
-RewriteCond %{REQUEST_URI} ^/(cart|checkout|wp-admin|wp-json) [NC]
-<IfModule mod_headers.c>
-Header set Cache-Control "no-cache, no-store, must-revalidate"
-Header set Pragma "no-cache"
-Header set Expires 0
-</IfModule>
-</IfModule>
-# END Newfold Browser Cache
+RewriteBase /
 
-# BEGIN Newfold Skip 404 Handling for Static Files
-<IfModule mod_rewrite.c>
-	RewriteEngine On
-	RewriteCond %{REQUEST_FILENAME} !-f
-	RewriteCond %{REQUEST_FILENAME} !-d
-	RewriteCond %{REQUEST_URI} !(robots\.txt|ads\.txt|[a-z0-9_\-]*sitemap[a-z0-9_\.\-]*\.(xml|xsl|html)(\.gz)?)
-	RewriteCond %{REQUEST_URI} \.(css|htc|less|js|js2|js3|js4|html|htm|rtf|rtx|txt|xsd|xsl|xml|asf|asx|wax|wmv|wmx|avi|avif|avifs|bmp|class|divx|doc|docx|eot|exe|gif|gz|gzip|ico|jpg|jpeg|jpe|webp|json|mdb|mid|midi|mov|qt|mp3|m4a|mp4|m4v|mpeg|mpg|mpe|webm|mpp|otf|_otf|odb|odc|odf|odg|odp|ods|odt|ogg|ogv|pdf|png|pot|pps|ppt|pptx|ra|ram|svg|svgz|swf|tar|tif|tiff|ttf|ttc|_ttf|wav|wma|wri|woff|woff2|xla|xls|xlsx|xlt|xlw|zip)$ [NC]
-	RewriteRule .* - [L]
+# Preserve Authorization headers for PHP/WordPress auth handlers.
+RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+
+# Force HTTPS in production.
+RewriteCond %{HTTPS} off
+RewriteCond %{HTTP_HOST} !^localhost$ [NC]
+RewriteCond %{HTTP_HOST} !^127\.0\.0\.1$ [NC]
+RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
+
+# WordPress admin/login aliases from root URL space.
+RewriteRule ^wp-admin/?$ wp/wp-admin/ [L]
+RewriteRule ^wp-admin/(.*)$ wp/wp-admin/$1 [L]
+RewriteRule ^wp-login\.php$ wp/wp-login.php [L]
+
+# Expose core asset paths at root for compatibility.
+RewriteRule ^wp-content/(.*)$ wp/wp-content/$1 [L]
+RewriteRule ^wp-includes/(.*)$ wp/wp-includes/$1 [L]
+RewriteRule ^wp-cron\.php$ wp/wp-cron.php [L]
+RewriteRule ^xmlrpc\.php$ wp/xmlrpc.php [L]
+
+# Root REST aliases -> WordPress in /wp.
+RewriteRule ^wp-json/?$ wp/index.php?rest_route=/ [QSA,L]
+RewriteRule ^wp-json/(.*)$ wp/index.php?rest_route=/$1 [QSA,L]
+RewriteRule ^dtb/(.*)$ wp/index.php?rest_route=/dtb/$1 [QSA,L]
+
+# Route direct rest_route=index.php calls into /wp/index.php.
+RewriteCond %{QUERY_STRING} (^|&)rest_route= [NC]
+RewriteRule ^index\.php$ wp/index.php [QSA,L]
+
+# Staging SPA deep-link fallback.
+RewriteCond %{REQUEST_URI} ^/staging/2972/ [NC]
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^staging/2972/ /staging/2972/index.html [QSA,L]
+
+# Serve existing files/directories directly.
+RewriteCond %{REQUEST_FILENAME} -f [OR]
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^ - [L]
+
+# Keep direct /wp/* requests in WordPress' own rewrite scope.
+RewriteCond %{REQUEST_URI} ^/wp/ [NC]
+RewriteRule ^ - [L]
+
+# Root SPA catch-all.
+RewriteRule ^ index.html [QSA,L]
 </IfModule>
-# END Newfold Skip 404 Handling for Static Files
-# END NFD Htaccess

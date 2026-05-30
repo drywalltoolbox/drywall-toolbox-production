@@ -1,0 +1,12 @@
+# WordPress core rewrite rules for /wp subdirectory install.
+# Public aliases (/wp-admin, /wp-login.php, /wp-json) are handled in root .htaccess.
+
+<IfModule mod_rewrite.c>
+RewriteEngine On
+RewriteBase /wp/
+RewriteRule ^index\.php$ - [L]
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule . /wp/index.php [L]
+</IfModule>
+
