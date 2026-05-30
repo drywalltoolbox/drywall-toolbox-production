@@ -177,15 +177,15 @@ export async function updateCartItem( key, qty ) {
   let payload = null;
 
   try {
-    payload = await storeFetch( `/cart/items/${ encodedKey }`, {
-      method: 'PUT',
-      body: JSON.stringify( { quantity: normalizedQty } ),
-    } );
-  } catch ( err ) {
-    // Compatibility fallback for environments exposing update-item only.
     payload = await storeFetch( '/cart/update-item', {
       method: 'POST',
       body: JSON.stringify( { key, quantity: normalizedQty } ),
+    } );
+  } catch ( err ) {
+    // Compatibility fallback for environments exposing cart item routes only.
+    payload = await storeFetch( `/cart/items/${ encodedKey }`, {
+      method: 'PUT',
+      body: JSON.stringify( { quantity: normalizedQty } ),
     } );
   }
 

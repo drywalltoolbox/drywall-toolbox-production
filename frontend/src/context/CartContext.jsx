@@ -136,6 +136,9 @@ export function CartProvider({ children }) {
     if (Number.isFinite(mutationId) && mutationId !== lastMutationIdRef.current) {
       return null;
     }
+    if (!Array.isArray(nextCart?.items)) {
+      return null;
+    }
     const normalizedItems = normalizeStoreCart(nextCart);
     setCart(nextCart || null);
     setCartItems(normalizedItems);
@@ -144,6 +147,14 @@ export function CartProvider({ children }) {
     writeSnapshot(normalizedItems);
     return normalizedItems;
   }, []);
+
+  const applyOrRefreshServerCart = useCallback(async (nextCart, mutationId) => {
+    const appliedItems = applyServerCart(nextCart, { mutationId });
+    if (appliedItems) return appliedItems;
+
+    const refreshedCart = await getCart();
+    return applyServerCart(refreshedCart, { mutationId }) || [];
+  }, [applyServerCart]);
 
   const refreshCart = useCallback(async () => {
     setIsLoading(true);
@@ -195,7 +206,7 @@ export function CartProvider({ children }) {
       const variation = buildStoreApiVariation(product.variation_attribute_values);
       const extensions = buildStoreApiExtensions(product);
       const nextCart = await storeAddToCart(product.id, quantity, variation, extensions);
-      const normalizedItems = applyServerCart(nextCart, { mutationId }) || [];
+      const normalizedItems = await applyOrRefreshServerCart(nextCart, mutationId);
       const addedItem = normalizedItems.find((item) => String(item.id) === String(product.id)) || { ...product, quantity };
       trackAddToCart({ ...addedItem, quantity });
       return nextCart;
@@ -210,7 +221,7 @@ export function CartProvider({ children }) {
     } finally {
       if (isLatestMutation(mutationId)) setIsMutating(false);
     }
-  }, [applyServerCart, beginMutation, isLatestMutation]);
+  }, [applyOrRefreshServerCart, beginMutation, isLatestMutation]);
 
   const removeFromCart = useCallback(async (productIdOrKey) => {
     const key = String(productIdOrKey || '');
@@ -229,7 +240,7 @@ export function CartProvider({ children }) {
     writeSnapshot(optimisticItems);
     try {
       const nextCart = await removeCartItem(target.cartKey || target.key);
-      applyServerCart(nextCart, { mutationId });
+      await applyOrRefreshServerCart(nextCart, mutationId);
       trackRemoveFromCart(target);
       return nextCart;
     } catch (err) {
@@ -243,7 +254,7 @@ export function CartProvider({ children }) {
     } finally {
       if (isLatestMutation(mutationId)) setIsMutating(false);
     }
-  }, [applyServerCart, beginMutation, isLatestMutation]);
+  }, [applyOrRefreshServerCart, beginMutation, isLatestMutation]);
 
   const updateQuantity = useCallback(async (productIdOrKey, newQuantity) => {
     const normalizedQuantity = Number(newQuantity);
@@ -271,7 +282,10 @@ export function CartProvider({ children }) {
     writeSnapshot(optimisticItems);
     try {
       const nextCart = await updateCartItem(target.cartKey || target.key, normalizedQuantity);
-      applyServerCart(nextCart, { mutationId });
+      const normalizedItems = await applyOrRefreshServerCart(nextCart, mutationId);
+      if (previousItems.length > 0 && normalizedItems.length === 0) {
+        throw new Error('Cart sync returned an empty cart unexpectedly.');
+      }
       return nextCart;
     } catch (err) {
       if (isLatestMutation(mutationId)) {
@@ -284,7 +298,7 @@ export function CartProvider({ children }) {
     } finally {
       if (isLatestMutation(mutationId)) setIsMutating(false);
     }
-  }, [applyServerCart, beginMutation, isLatestMutation, removeFromCart]);
+  }, [applyOrRefreshServerCart, beginMutation, isLatestMutation, removeFromCart]);
 
   const clearCart = useCallback(async () => {
     const mutationId = beginMutation();
@@ -296,7 +310,7 @@ export function CartProvider({ children }) {
     writeSnapshot([]);
     try {
       const nextCart = await clearStoreCart();
-      applyServerCart(nextCart, { mutationId });
+      await applyOrRefreshServerCart(nextCart, mutationId);
       return nextCart;
     } catch (err) {
       if (isLatestMutation(mutationId)) {
@@ -309,7 +323,7 @@ export function CartProvider({ children }) {
     } finally {
       if (isLatestMutation(mutationId)) setIsMutating(false);
     }
-  }, [applyServerCart, beginMutation, isLatestMutation]);
+  }, [applyOrRefreshServerCart, beginMutation, isLatestMutation]);
 
   const getCartTotal = useCallback(() => {
     const safeItems = asCartItems(cartItems);
