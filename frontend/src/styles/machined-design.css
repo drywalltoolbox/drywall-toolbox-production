@@ -21,8 +21,11 @@
     --dtb-radius:     10px;  /* buttons, inputs, qty, tabs */
     --dtb-radius-lg:  14px;  /* cards, panels */
     --dtb-radius-xl:  20px;  /* modals, sheets */
-    /* Silver/white radial gradient — light theme background */
-    --dtb-page-bg: radial-gradient(ellipse at 30% 42%, #ffffff 0%, #e8ecf4 28%, #d2d6e2 55%, #bfc4d0 80%, #b5bac7 100%);
+    /* Balanced neutral backdrop with no center hotspot */
+    --dtb-page-bg:
+        radial-gradient(120% 120% at 10% -12%, rgba(236, 241, 249, 0.56) 0%, rgba(236, 241, 249, 0) 46%),
+        radial-gradient(120% 120% at 90% -16%, rgba(231, 237, 247, 0.5) 0%, rgba(231, 237, 247, 0) 44%),
+        linear-gradient(180deg, #dfe5ef 0%, #d5dce8 52%, #cfd7e3 100%);
     
     /* Legacy primary tokens kept as fallbacks but centralized variables are preferred */
     --primary-600: var(--color-primary-600, #2563eb);
@@ -74,7 +77,7 @@ html, body {
 body {
     /* Silver/white radial gradient — light theme page background */
     background: var(--dtb-page-bg);
-    background-attachment: fixed;
+    background-attachment: scroll;
     color: #0f172a;
     font-family: var(--font-main);
     font-optical-sizing: auto;

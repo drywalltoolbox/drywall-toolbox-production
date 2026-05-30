@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
+import { createContext, useContext, useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import {
   initCart,
   getCart,
@@ -114,11 +114,32 @@ export function CartProvider({ children }) {
   const [isMutating, setIsMutating] = useState(false);
   const [error, setError] = useState(null);
   const [lastSyncedAt, setLastSyncedAt] = useState(null);
+  const cartItemsRef = useRef(cartItems);
+  const lastMutationIdRef = useRef(0);
 
-  const applyServerCart = useCallback((nextCart) => {
+  useEffect(() => {
+    cartItemsRef.current = cartItems;
+  }, [cartItems]);
+
+  const beginMutation = useCallback(() => {
+    lastMutationIdRef.current += 1;
+    return lastMutationIdRef.current;
+  }, []);
+
+  const isLatestMutation = useCallback(
+    (mutationId) => mutationId === lastMutationIdRef.current,
+    []
+  );
+
+  const applyServerCart = useCallback((nextCart, options = {}) => {
+    const mutationId = options?.mutationId;
+    if (Number.isFinite(mutationId) && mutationId !== lastMutationIdRef.current) {
+      return null;
+    }
     const normalizedItems = normalizeStoreCart(nextCart);
     setCart(nextCart || null);
     setCartItems(normalizedItems);
+    cartItemsRef.current = normalizedItems;
     setLastSyncedAt(Date.now());
     writeSnapshot(normalizedItems);
     return normalizedItems;
@@ -166,89 +187,129 @@ export function CartProvider({ children }) {
 
   const addToCart = useCallback(async (product, quantity = 1) => {
     if (!product?.id) return null;
+    const mutationId = beginMutation();
     setIsMutating(true);
     setError(null);
-    const previousItems = cartItems;
+    const previousItems = cartItemsRef.current;
     try {
       const variation = buildStoreApiVariation(product.variation_attribute_values);
       const extensions = buildStoreApiExtensions(product);
       const nextCart = await storeAddToCart(product.id, quantity, variation, extensions);
-      const normalizedItems = applyServerCart(nextCart);
+      const normalizedItems = applyServerCart(nextCart, { mutationId }) || [];
       const addedItem = normalizedItems.find((item) => String(item.id) === String(product.id)) || { ...product, quantity };
       trackAddToCart({ ...addedItem, quantity });
       return nextCart;
     } catch (err) {
-      setCartItems(previousItems);
-      setError(err?.message || 'Could not add item to cart.');
+      if (isLatestMutation(mutationId)) {
+        setCartItems(previousItems);
+        cartItemsRef.current = previousItems;
+        writeSnapshot(previousItems);
+        setError(err?.message || 'Could not add item to cart.');
+      }
       throw err;
     } finally {
-      setIsMutating(false);
+      if (isLatestMutation(mutationId)) setIsMutating(false);
     }
-  }, [applyServerCart, cartItems]);
+  }, [applyServerCart, beginMutation, isLatestMutation]);
 
   const removeFromCart = useCallback(async (productIdOrKey) => {
     const key = String(productIdOrKey || '');
     if (!key) return null;
-    const target = cartItems.find((item) => String(item.cartKey || item.key || item.id) === key || String(item.id) === key);
+    const target = cartItemsRef.current.find((item) => String(item.cartKey || item.key || item.id) === key || String(item.id) === key);
     if (!target?.cartKey && !target?.key) return null;
+    const mutationId = beginMutation();
     setIsMutating(true);
     setError(null);
-    const previousItems = cartItems;
+    const previousItems = cartItemsRef.current;
+    const optimisticItems = previousItems.filter(
+      (item) => String(item.cartKey || item.key || item.id) !== key && String(item.id) !== key
+    );
+    setCartItems(optimisticItems);
+    cartItemsRef.current = optimisticItems;
+    writeSnapshot(optimisticItems);
     try {
       const nextCart = await removeCartItem(target.cartKey || target.key);
-      applyServerCart(nextCart);
+      applyServerCart(nextCart, { mutationId });
       trackRemoveFromCart(target);
       return nextCart;
     } catch (err) {
-      setCartItems(previousItems);
-      setError(err?.message || 'Could not remove item from cart.');
+      if (isLatestMutation(mutationId)) {
+        setCartItems(previousItems);
+        cartItemsRef.current = previousItems;
+        writeSnapshot(previousItems);
+        setError(err?.message || 'Could not remove item from cart.');
+      }
       throw err;
     } finally {
-      setIsMutating(false);
+      if (isLatestMutation(mutationId)) setIsMutating(false);
     }
-  }, [applyServerCart, cartItems]);
+  }, [applyServerCart, beginMutation, isLatestMutation]);
 
   const updateQuantity = useCallback(async (productIdOrKey, newQuantity) => {
-    if (newQuantity < 1) {
+    const normalizedQuantity = Number(newQuantity);
+    if (!Number.isFinite(normalizedQuantity)) return null;
+    if (normalizedQuantity < 1) {
       return removeFromCart(productIdOrKey);
     }
 
     const key = String(productIdOrKey || '');
-    const target = cartItems.find((item) => String(item.cartKey || item.key || item.id) === key || String(item.id) === key);
+    const target = cartItemsRef.current.find((item) => String(item.cartKey || item.key || item.id) === key || String(item.id) === key);
     if (!target?.cartKey && !target?.key) return null;
 
+    const mutationId = beginMutation();
     setIsMutating(true);
     setError(null);
-    const previousItems = cartItems;
+    const previousItems = cartItemsRef.current;
+    const optimisticItems = previousItems.map((item) => {
+      const itemKey = String(item.cartKey || item.key || item.id);
+      return itemKey === key || String(item.id) === key
+        ? { ...item, quantity: normalizedQuantity }
+        : item;
+    });
+    setCartItems(optimisticItems);
+    cartItemsRef.current = optimisticItems;
+    writeSnapshot(optimisticItems);
     try {
-      const nextCart = await updateCartItem(target.cartKey || target.key, newQuantity);
-      applyServerCart(nextCart);
+      const nextCart = await updateCartItem(target.cartKey || target.key, normalizedQuantity);
+      applyServerCart(nextCart, { mutationId });
       return nextCart;
     } catch (err) {
-      setCartItems(previousItems);
-      setError(err?.message || 'Could not update cart quantity.');
+      if (isLatestMutation(mutationId)) {
+        setCartItems(previousItems);
+        cartItemsRef.current = previousItems;
+        writeSnapshot(previousItems);
+        setError(err?.message || 'Could not update cart quantity.');
+      }
       throw err;
     } finally {
-      setIsMutating(false);
+      if (isLatestMutation(mutationId)) setIsMutating(false);
     }
-  }, [applyServerCart, cartItems, removeFromCart]);
+  }, [applyServerCart, beginMutation, isLatestMutation, removeFromCart]);
 
   const clearCart = useCallback(async () => {
+    const mutationId = beginMutation();
     setIsMutating(true);
     setError(null);
-    const previousItems = cartItems;
+    const previousItems = cartItemsRef.current;
+    setCartItems([]);
+    cartItemsRef.current = [];
+    writeSnapshot([]);
     try {
       const nextCart = await clearStoreCart();
-      applyServerCart(nextCart);
+      applyServerCart(nextCart, { mutationId });
       return nextCart;
     } catch (err) {
-      setCartItems(previousItems);
-      setError(err?.message || 'Could not clear cart.');
+      if (isLatestMutation(mutationId)) {
+        setCartItems(previousItems);
+        cartItemsRef.current = previousItems;
+        writeSnapshot(previousItems);
+        setError(err?.message || 'Could not clear cart.');
+      }
       throw err;
     } finally {
-      setIsMutating(false);
+      if (isLatestMutation(mutationId)) setIsMutating(false);
     }
-  }, [applyServerCart, cartItems]);
+  }, [applyServerCart, beginMutation, isLatestMutation]);
 
   const getCartTotal = useCallback(() => {
     const safeItems = asCartItems(cartItems);

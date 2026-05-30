@@ -250,19 +250,6 @@ export default function Cart() {
                   </div>
                 ) }
 
-                { subtotal >= FREE_SHIP_THRESHOLD && (
-                  <Motion.div
-                    initial={ { opacity: 0, scale: 0.97 } }
-                    animate={ { opacity: 1, scale: 1 } }
-                    className="mb-5 p-3.5 rounded-xl bg-emerald-50 border border-emerald-100 flex items-center gap-2"
-                  >
-                    <Truck size={ 13 } className="text-emerald-600 shrink-0" />
-                    <p className="text-xs font-semibold text-emerald-700">
-                      🎉 Free shipping unlocked!
-                    </p>
-                  </Motion.div>
-                ) }
-
                 {/* Line items */}
                 <div className="space-y-2.5 mb-4">
                   <div className="flex justify-between text-sm">

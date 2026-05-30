@@ -1011,11 +1011,11 @@ export default function Checkout() {
       <SEOHead noindex title="Checkout" />
 
       {/* ── Two-column desktop layout with unified page scroll (no pane scrollbars) ── */}
-      <div className="lg:grid lg:grid-cols-[1fr_500px] lg:gap-8 lg:items-start min-h-screen">
+      <div className="mx-auto w-full max-w-[1380px] lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(420px,460px)] lg:gap-6 xl:gap-7 lg:items-start min-h-screen">
 
         {/* ── Left column: form ───────────────────────────────────────────── */}
-        <div className="px-4 py-8 sm:px-8 md:px-10 lg:px-12 xl:px-16 pb-32 lg:pb-16">
-          <div className="max-w-xl mx-auto lg:mx-0">
+        <div className="px-4 py-8 sm:px-7 md:px-8 lg:px-8 xl:px-10 pb-32 lg:pb-16">
+          <div className="max-w-2xl mx-auto lg:mx-0 lg:max-w-[780px]">
 
             {/* Page heading */}
             <Motion.div

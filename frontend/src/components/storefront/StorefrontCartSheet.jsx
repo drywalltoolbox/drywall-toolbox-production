@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import { ShoppingCart, X, Package, Minus, Plus, ArrowRight, Trash2 } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
-export default function StorefrontCartSheet({ isOpen, onClose, cartItems = [], removeFromCart, updateQuantity, getCartTotal, _isMutating }) {
+export default function StorefrontCartSheet({ isOpen, onClose, cartItems = [], removeFromCart, updateQuantity, getCartTotal }) {
   const overlayRef = useRef(null);
   const closeButtonRef = useRef(null);
   const previouslyFocusedRef = useRef(null);
@@ -30,11 +30,13 @@ export default function StorefrontCartSheet({ isOpen, onClose, cartItems = [], r
   }, [removeFromCart]);
 
   const handleQtyChange = useCallback(async (key, delta, currentQty) => {
-    const next = currentQty + delta;
+    const baseQty = Number(currentQty);
+    const next = (Number.isFinite(baseQty) ? baseQty : 0) + Number(delta || 0);
     if (next < 1) {
       await handleRemove(key);
       return;
     }
+    if (next > 99) return;
     setPendingKey(key);
     try {
       await updateQuantity?.(key, next);

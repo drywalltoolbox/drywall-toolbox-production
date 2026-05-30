@@ -141,7 +141,7 @@
     padding: 0;
     /* Silver/white radial gradient — light theme page background */
     background: var(--dtb-page-bg);
-    background-attachment: fixed;
+    background-attachment: scroll;
   }
 
   main {

@@ -1,7 +1,10 @@
 -- =============================================================================
 -- DTB WooCommerce — PRODUCTION FULL RESET
 -- Database:  benconkl_WPkgq
--- Prefix:    wp_
+-- Prefix:    kf5_
+-- Note: This script is configured for a WordPress install using the kf5_ table prefix.
+--       If your database uses a different prefix, replace kf5_ with your prefix
+--       before executing the script in phpMyAdmin.
 -- Generated: 2026-05-15
 -- Author:    Drywall Toolbox / DTB Engineering
 --
@@ -18,26 +21,26 @@
 --   ✓ Product postmeta (SKU, price, stock, thumbnail, gallery, all meta)
 --   ✓ Product comments/reviews + comment meta
 --   ✓ Downloadable product permissions + download logs
---   ✓ WC product meta lookup   (wp_wc_product_meta_lookup)
---   ✓ WC attribute lookup      (wp_wc_product_attributes_lookup)
---   ✓ WC category lookup       (wp_wc_category_lookup)
+--   ✓ WC product meta lookup   (kf5_wc_product_meta_lookup)
+--   ✓ WC attribute lookup      (kf5_wc_product_attributes_lookup)
+--   ✓ WC category lookup       (kf5_wc_category_lookup)
 --   ✓ ALL registered media attachments + their postmeta + term relationships
 --   ✓ Product categories       (product_cat terms, term_taxonomy, termmeta)
 --   ✓ Product tags             (product_tag)
 --   ✓ Brand terms              (pa_brand, product_brand, pwb-brand, yith_product_brand)
 --   ✓ All product attribute terms (pa_* taxonomies)
 --   ✓ Product shipping classes (product_shipping_class)
---   ✓ Orphaned wp_terms rows after taxonomy removal
+--   ✓ Orphaned kf5_terms rows after taxonomy removal
 --   ✓ WC + WP transient / object-cache option rows
---   ✓ AUTO_INCREMENT reset on wp_posts, wp_postmeta, wp_terms,
---     wp_term_taxonomy, wp_termmeta, wp_comments, wp_commentmeta
+--   ✓ AUTO_INCREMENT reset on kf5_posts, kf5_postmeta, kf5_terms,
+--     kf5_term_taxonomy, kf5_termmeta, kf5_comments, kf5_commentmeta
 --
 -- WHAT THIS SCRIPT PRESERVES
 --   ✓ Orders, order items, order meta
 --   ✓ Customers / users
 --   ✓ Coupons
 --   ✓ Tax rates, shipping zones, payment gateway settings
---   ✓ WooCommerce global attribute definitions (wp_woocommerce_attribute_taxonomies)
+--   ✓ WooCommerce global attribute definitions (kf5_woocommerce_attribute_taxonomies)
 --   ✓ WooCommerce system taxonomy terms: product_type, product_visibility
 --   ✓ Pages, posts, menus, WP settings, theme options
 --   ✓ Physical files on disk (SQL does not touch the filesystem)
@@ -66,6 +69,21 @@
 
 SELECT DATABASE() AS current_database;
 
+-- =============================================================================
+-- STEP 0.5 — CONFIRM TABLE PREFIX
+-- Use this to verify the active WordPress table prefix before running the reset.
+-- If the detected prefix is not kf5_, update this script's table names accordingly.
+-- =============================================================================
+
+SELECT DISTINCT
+             SUBSTRING_INDEX(table_name, '_posts', 1) AS detected_prefix,
+             COUNT(*) AS matching_tables
+FROM information_schema.tables
+WHERE table_schema = DATABASE()
+    AND table_name LIKE '%_posts'
+GROUP BY detected_prefix
+ORDER BY matching_tables DESC, detected_prefix;
+
 
 -- =============================================================================
 -- STEP 1 — SESSION SETTINGS + DROP OLD HELPER TABLES (safe re-run guard)
@@ -87,60 +105,60 @@ DROP TABLE IF EXISTS _dtb_reset_term_taxonomy_ids;
 
 SELECT
     (SELECT COUNT(*)
-     FROM wp_posts
+     FROM kf5_posts
      WHERE post_type = 'product'
     ) AS products,
 
     (SELECT COUNT(*)
-     FROM wp_posts
+     FROM kf5_posts
      WHERE post_type = 'product_variation'
     ) AS product_variations,
 
     (SELECT COUNT(*)
-     FROM wp_posts
+     FROM kf5_posts
      WHERE post_type = 'attachment'
     ) AS registered_media_attachments,
 
     (SELECT COUNT(*)
-     FROM wp_comments c
-     INNER JOIN wp_posts p ON p.ID = c.comment_post_ID
+     FROM kf5_comments c
+     INNER JOIN kf5_posts p ON p.ID = c.comment_post_ID
      WHERE p.post_type = 'product'
     ) AS product_reviews_and_comments,
 
     (SELECT COUNT(*)
-     FROM wp_wc_product_meta_lookup
+     FROM kf5_wc_product_meta_lookup
     ) AS wc_product_meta_lookup_rows,
 
     (SELECT COUNT(*)
-     FROM wp_wc_product_attributes_lookup
+     FROM kf5_wc_product_attributes_lookup
     ) AS wc_attribute_lookup_rows,
 
     (SELECT COUNT(*)
-     FROM wp_wc_category_lookup
+     FROM kf5_wc_category_lookup
     ) AS wc_category_lookup_rows,
 
     (SELECT COUNT(*)
-     FROM wp_term_taxonomy
+     FROM kf5_term_taxonomy
      WHERE taxonomy = 'product_cat'
     ) AS product_categories,
 
     (SELECT COUNT(*)
-     FROM wp_term_taxonomy
+     FROM kf5_term_taxonomy
      WHERE taxonomy = 'product_tag'
     ) AS product_tags,
 
     (SELECT COUNT(*)
-     FROM wp_term_taxonomy
+     FROM kf5_term_taxonomy
      WHERE taxonomy IN ('pa_brand', 'product_brand', 'pwb-brand', 'yith_product_brand')
     ) AS brand_terms,
 
     (SELECT COUNT(*)
-     FROM wp_term_taxonomy
+     FROM kf5_term_taxonomy
      WHERE taxonomy LIKE 'pa\_%'
     ) AS product_attribute_terms,
 
     (SELECT COUNT(*)
-     FROM wp_woocommerce_attribute_taxonomies
+     FROM kf5_woocommerce_attribute_taxonomies
     ) AS preserved_global_attribute_definitions;
 
 
@@ -154,7 +172,7 @@ CREATE TABLE _dtb_reset_product_ids (
 
 INSERT INTO _dtb_reset_product_ids (ID)
 SELECT ID
-FROM wp_posts
+FROM kf5_posts
 WHERE post_type IN ('product', 'product_variation');
 
 SELECT COUNT(*) AS staged_products_and_variations
@@ -171,7 +189,7 @@ CREATE TABLE _dtb_reset_attachment_ids (
 
 INSERT INTO _dtb_reset_attachment_ids (ID)
 SELECT ID
-FROM wp_posts
+FROM kf5_posts
 WHERE post_type = 'attachment';
 
 SELECT COUNT(*) AS staged_registered_attachments
@@ -188,7 +206,7 @@ CREATE TABLE _dtb_reset_comment_ids (
 
 INSERT INTO _dtb_reset_comment_ids (comment_ID)
 SELECT c.comment_ID
-FROM wp_comments c
+FROM kf5_comments c
 INNER JOIN _dtb_reset_product_ids pid
     ON pid.ID = c.comment_post_ID;
 
@@ -206,7 +224,7 @@ CREATE TABLE _dtb_reset_download_permission_ids (
 
 INSERT INTO _dtb_reset_download_permission_ids (permission_id)
 SELECT dp.permission_id
-FROM wp_woocommerce_downloadable_product_permissions dp
+FROM kf5_woocommerce_downloadable_product_permissions dp
 INNER JOIN _dtb_reset_product_ids pid
     ON pid.ID = dp.product_id;
 
@@ -248,7 +266,7 @@ SELECT
     term_taxonomy_id,
     term_id,
     taxonomy
-FROM wp_term_taxonomy
+FROM kf5_term_taxonomy
 WHERE taxonomy IN (
         'product_cat',
         'product_tag',
@@ -273,12 +291,12 @@ ORDER BY taxonomy;
 -- =============================================================================
 
 DELETE cm
-FROM wp_commentmeta cm
+FROM kf5_commentmeta cm
 INNER JOIN _dtb_reset_comment_ids cid
     ON cid.comment_ID = cm.comment_id;
 
 SELECT COUNT(*) AS remaining_product_comment_meta
-FROM wp_commentmeta cm
+FROM kf5_commentmeta cm
 INNER JOIN _dtb_reset_comment_ids cid
     ON cid.comment_ID = cm.comment_id;
 
@@ -288,12 +306,12 @@ INNER JOIN _dtb_reset_comment_ids cid
 -- =============================================================================
 
 DELETE c
-FROM wp_comments c
+FROM kf5_comments c
 INNER JOIN _dtb_reset_comment_ids cid
     ON cid.comment_ID = c.comment_ID;
 
 SELECT COUNT(*) AS remaining_product_comments_reviews
-FROM wp_comments c
+FROM kf5_comments c
 INNER JOIN _dtb_reset_product_ids pid
     ON pid.ID = c.comment_post_ID;
 
@@ -304,12 +322,12 @@ INNER JOIN _dtb_reset_product_ids pid
 -- =============================================================================
 
 DELETE pm
-FROM wp_postmeta pm
+FROM kf5_postmeta pm
 INNER JOIN _dtb_reset_product_ids pid
     ON pid.ID = pm.post_id;
 
 SELECT COUNT(*) AS remaining_product_postmeta
-FROM wp_postmeta pm
+FROM kf5_postmeta pm
 INNER JOIN _dtb_reset_product_ids pid
     ON pid.ID = pm.post_id;
 
@@ -320,12 +338,12 @@ INNER JOIN _dtb_reset_product_ids pid
 -- =============================================================================
 
 DELETE tr
-FROM wp_term_relationships tr
+FROM kf5_term_relationships tr
 INNER JOIN _dtb_reset_product_ids pid
     ON pid.ID = tr.object_id;
 
 SELECT COUNT(*) AS remaining_product_term_relationships
-FROM wp_term_relationships tr
+FROM kf5_term_relationships tr
 INNER JOIN _dtb_reset_product_ids pid
     ON pid.ID = tr.object_id;
 
@@ -336,33 +354,33 @@ INNER JOIN _dtb_reset_product_ids pid
 
 -- 12a. Product meta lookup
 DELETE pl
-FROM wp_wc_product_meta_lookup pl
+FROM kf5_wc_product_meta_lookup pl
 INNER JOIN _dtb_reset_product_ids pid
     ON pid.ID = pl.product_id;
 
 -- 12b. Product attributes lookup (both product_id and product_or_parent_id)
 DELETE al
-FROM wp_wc_product_attributes_lookup al
+FROM kf5_wc_product_attributes_lookup al
 INNER JOIN _dtb_reset_product_ids pid
     ON pid.ID = al.product_id
     OR pid.ID = al.product_or_parent_id;
 
 -- 12c. WC category lookup — fully derived, safe to clear entirely
-DELETE FROM wp_wc_category_lookup;
+DELETE FROM kf5_wc_category_lookup;
 
 SELECT
     (SELECT COUNT(*)
-     FROM wp_wc_product_meta_lookup pl
+     FROM kf5_wc_product_meta_lookup pl
      INNER JOIN _dtb_reset_product_ids pid ON pid.ID = pl.product_id
     ) AS remaining_product_meta_lookup,
 
     (SELECT COUNT(*)
-     FROM wp_wc_product_attributes_lookup al
+     FROM kf5_wc_product_attributes_lookup al
      INNER JOIN _dtb_reset_product_ids pid
         ON pid.ID = al.product_id OR pid.ID = al.product_or_parent_id
     ) AS remaining_attribute_lookup,
 
-    (SELECT COUNT(*) FROM wp_wc_category_lookup) AS remaining_category_lookup;
+    (SELECT COUNT(*) FROM kf5_wc_category_lookup) AS remaining_category_lookup;
 
 
 -- =============================================================================
@@ -370,17 +388,17 @@ SELECT
 -- =============================================================================
 
 DELETE dl
-FROM wp_wc_download_log dl
+FROM kf5_wc_download_log dl
 INNER JOIN _dtb_reset_download_permission_ids dpid
     ON dpid.permission_id = dl.permission_id;
 
 DELETE dp
-FROM wp_woocommerce_downloadable_product_permissions dp
+FROM kf5_woocommerce_downloadable_product_permissions dp
 INNER JOIN _dtb_reset_download_permission_ids dpid
     ON dpid.permission_id = dp.permission_id;
 
 SELECT COUNT(*) AS remaining_downloadable_permissions
-FROM wp_woocommerce_downloadable_product_permissions dp
+FROM kf5_woocommerce_downloadable_product_permissions dp
 INNER JOIN _dtb_reset_product_ids pid
     ON pid.ID = dp.product_id;
 
@@ -390,38 +408,38 @@ INNER JOIN _dtb_reset_product_ids pid
 -- =============================================================================
 
 DELETE p
-FROM wp_posts p
+FROM kf5_posts p
 INNER JOIN _dtb_reset_product_ids pid
     ON pid.ID = p.ID;
 
 SELECT COUNT(*) AS remaining_products_and_variations
-FROM wp_posts
+FROM kf5_posts
 WHERE post_type IN ('product', 'product_variation');
 
 
 -- =============================================================================
 -- STEP 15 — DELETE ATTACHMENT POSTMETA + ATTACHMENT TERM RELATIONSHIPS
--- (_wp_attached_file, _wp_attachment_metadata, alt text, etc.)
+ -- (_wp_attached_file, _wp_attachment_metadata, alt text, etc.)
 -- =============================================================================
 
 DELETE pm
-FROM wp_postmeta pm
+FROM kf5_postmeta pm
 INNER JOIN _dtb_reset_attachment_ids aid
     ON aid.ID = pm.post_id;
 
 DELETE tr
-FROM wp_term_relationships tr
+FROM kf5_term_relationships tr
 INNER JOIN _dtb_reset_attachment_ids aid
     ON aid.ID = tr.object_id;
 
 SELECT
     (SELECT COUNT(*)
-     FROM wp_postmeta pm
+     FROM kf5_postmeta pm
      INNER JOIN _dtb_reset_attachment_ids aid ON aid.ID = pm.post_id
     ) AS remaining_attachment_postmeta,
 
     (SELECT COUNT(*)
-     FROM wp_term_relationships tr
+     FROM kf5_term_relationships tr
      INNER JOIN _dtb_reset_attachment_ids aid ON aid.ID = tr.object_id
     ) AS remaining_attachment_term_relationships;
 
@@ -433,12 +451,12 @@ SELECT
 -- =============================================================================
 
 DELETE p
-FROM wp_posts p
+FROM kf5_posts p
 INNER JOIN _dtb_reset_attachment_ids aid
     ON aid.ID = p.ID;
 
 SELECT COUNT(*) AS remaining_registered_attachments
-FROM wp_posts
+FROM kf5_posts
 WHERE post_type = 'attachment';
 
 
@@ -448,12 +466,12 @@ WHERE post_type = 'attachment';
 -- =============================================================================
 
 DELETE tr
-FROM wp_term_relationships tr
+FROM kf5_term_relationships tr
 INNER JOIN _dtb_reset_term_taxonomy_ids ttx
     ON ttx.term_taxonomy_id = tr.term_taxonomy_id;
 
 SELECT COUNT(*) AS remaining_relationships_for_staged_taxonomies
-FROM wp_term_relationships tr
+FROM kf5_term_relationships tr
 INNER JOIN _dtb_reset_term_taxonomy_ids ttx
     ON ttx.term_taxonomy_id = tr.term_taxonomy_id;
 
@@ -464,51 +482,51 @@ INNER JOIN _dtb_reset_term_taxonomy_ids ttx
 -- =============================================================================
 
 DELETE tm
-FROM wp_termmeta tm
+FROM kf5_termmeta tm
 INNER JOIN _dtb_reset_term_taxonomy_ids ttx
     ON ttx.term_id = tm.term_id;
 
 SELECT COUNT(*) AS remaining_termmeta_for_staged_terms
-FROM wp_termmeta tm
+FROM kf5_termmeta tm
 INNER JOIN _dtb_reset_term_taxonomy_ids ttx
     ON ttx.term_id = tm.term_id;
 
 
 -- =============================================================================
 -- STEP 19 — DELETE CSV-OWNED TERM TAXONOMY ROWS
--- (removes product_cat, product_tag, pa_* entries from wp_term_taxonomy)
+-- (removes product_cat, product_tag, pa_* entries from kf5_term_taxonomy)
 -- =============================================================================
 
 DELETE tt
-FROM wp_term_taxonomy tt
+FROM kf5_term_taxonomy tt
 INNER JOIN _dtb_reset_term_taxonomy_ids ttx
     ON ttx.term_taxonomy_id = tt.term_taxonomy_id;
 
 SELECT COUNT(*) AS remaining_staged_term_taxonomy_rows
-FROM wp_term_taxonomy tt
+FROM kf5_term_taxonomy tt
 INNER JOIN _dtb_reset_term_taxonomy_ids ttx
     ON ttx.term_taxonomy_id = tt.term_taxonomy_id;
 
 
 -- =============================================================================
--- STEP 20 — DELETE ORPHANED wp_terms ROWS
+-- STEP 20 — DELETE ORPHANED kf5_terms ROWS
 -- Only removes terms that no longer have ANY taxonomy registration.
 -- Shared terms (used by non-product taxonomies) are safely kept.
 -- =============================================================================
 
 DELETE t
-FROM wp_terms t
+FROM kf5_terms t
 INNER JOIN _dtb_reset_term_taxonomy_ids ttx
     ON ttx.term_id = t.term_id
-LEFT JOIN wp_term_taxonomy tt
+LEFT JOIN kf5_term_taxonomy tt
     ON tt.term_id = t.term_id
 WHERE tt.term_id IS NULL;
 
 SELECT COUNT(*) AS remaining_orphaned_staged_terms
-FROM wp_terms t
+FROM kf5_terms t
 INNER JOIN _dtb_reset_term_taxonomy_ids ttx
     ON ttx.term_id = t.term_id
-LEFT JOIN wp_term_taxonomy tt
+LEFT JOIN kf5_term_taxonomy tt
     ON tt.term_id = t.term_id
 WHERE tt.term_id IS NULL;
 
@@ -516,7 +534,7 @@ WHERE tt.term_id IS NULL;
 -- =============================================================================
 -- STEP 21 — PRESERVE GLOBAL ATTRIBUTE DEFINITIONS (read-only verification)
 --
--- wp_woocommerce_attribute_taxonomies is intentionally NOT deleted.
+-- kf5_woocommerce_attribute_taxonomies is intentionally NOT deleted.
 -- WooCommerce global attribute definitions (pa_brand, pa_size, etc.) are
 -- schema-level config — deleting them would require WC reinstall steps.
 -- The CSV import will reuse these definitions to recreate all terms.
@@ -529,7 +547,7 @@ SELECT
     attribute_type,
     attribute_orderby,
     attribute_public
-FROM wp_woocommerce_attribute_taxonomies
+FROM kf5_woocommerce_attribute_taxonomies
 ORDER BY attribute_id;
 
 -- These rows should be present. If this table is empty, run:
@@ -543,7 +561,7 @@ ORDER BY attribute_id;
 -- product counts must be zeroed since all products are now deleted.
 -- =============================================================================
 
-UPDATE wp_term_taxonomy
+UPDATE kf5_term_taxonomy
 SET count = 0
 WHERE taxonomy IN ('product_type', 'product_visibility');
 
@@ -551,8 +569,8 @@ SELECT
     taxonomy,
     t.name,
     tt.count
-FROM wp_term_taxonomy tt
-INNER JOIN wp_terms t ON t.term_id = tt.term_id
+FROM kf5_term_taxonomy tt
+INNER JOIN kf5_terms t ON t.term_id = tt.term_id
 WHERE tt.taxonomy IN ('product_type', 'product_visibility')
 ORDER BY tt.taxonomy, t.name;
 
@@ -563,17 +581,17 @@ ORDER BY tt.taxonomy, t.name;
 -- attributes, and media so the next page load reads from a clean state.
 -- =============================================================================
 
-DELETE FROM wp_options
+DELETE FROM kf5_options
 WHERE option_name LIKE '_transient_wc_%'
    OR option_name LIKE '_transient_timeout_wc_%'
    OR option_name LIKE '_transient_woocommerce_%'
    OR option_name LIKE '_transient_timeout_woocommerce_%'
    OR option_name LIKE '_site_transient_wc_%'
    OR option_name LIKE '_site_transient_timeout_wc_%'
-   OR option_name LIKE '_transient_wp_product%'
-   OR option_name LIKE '_transient_timeout_wp_product%'
-   OR option_name LIKE '_transient_wp_get_attachment%'
-   OR option_name LIKE '_transient_timeout_wp_get_attachment%'
+    OR option_name LIKE '_transient_wp_product%'
+    OR option_name LIKE '_transient_timeout_wp_product%'
+    OR option_name LIKE '_transient_wp_get_attachment%'
+    OR option_name LIKE '_transient_timeout_wp_get_attachment%'
    OR option_name LIKE '_transient_wc_product_image%'
    OR option_name LIKE '_transient_timeout_wc_product_image%'
    OR option_name = 'wc_attribute_taxonomies'
@@ -595,42 +613,59 @@ SELECT ROW_COUNT() AS options_cache_rows_deleted;
 -- remaining steps will still work; IDs will just continue from current value.
 -- =============================================================================
 
--- wp_posts
-SET @ai_posts = (SELECT IFNULL(MAX(ID), 0) + 1 FROM wp_posts);
-SET @sql = CONCAT('ALTER TABLE wp_posts AUTO_INCREMENT = ', @ai_posts);
+-- Workaround for strict SQL modes on older MySQL / phpMyAdmin installs.
+-- ALTER TABLE may recreate a table and fail if legacy DATE/TIME defaults
+-- like '0000-00-00 00:00:00' exist. This temporarily removes strict/zero
+-- date rules for the session before resetting AUTO_INCREMENT values.
+SET @old_sql_mode = @@SESSION.sql_mode;
+SET @safe_sql_mode = CONCAT(',', @old_sql_mode, ',');
+SET @safe_sql_mode = REPLACE(@safe_sql_mode, ',NO_ZERO_DATE,', ',');
+SET @safe_sql_mode = REPLACE(@safe_sql_mode, ',NO_ZERO_IN_DATE,', ',');
+SET @safe_sql_mode = REPLACE(@safe_sql_mode, ',STRICT_TRANS_TABLES,', ',');
+SET @safe_sql_mode = REPLACE(@safe_sql_mode, ',STRICT_ALL_TABLES,', ',');
+SET @safe_sql_mode = REPLACE(@safe_sql_mode, ',,', ',');
+SET @safe_sql_mode = IF(LEFT(@safe_sql_mode, 1) = ',', SUBSTRING(@safe_sql_mode, 2), @safe_sql_mode);
+SET @safe_sql_mode = IF(RIGHT(@safe_sql_mode, 1) = ',', LEFT(@safe_sql_mode, LENGTH(@safe_sql_mode) - 1), @safe_sql_mode);
+SET SESSION sql_mode = @safe_sql_mode;
+
+-- kf5_posts
+SET @ai_posts = (SELECT IFNULL(MAX(ID), 0) + 1 FROM kf5_posts);
+SET @sql = CONCAT('ALTER TABLE kf5_posts AUTO_INCREMENT = ', @ai_posts);
 PREPARE stmt FROM @sql; EXECUTE stmt; DEALLOCATE PREPARE stmt;
 
--- wp_postmeta
-SET @ai_postmeta = (SELECT IFNULL(MAX(meta_id), 0) + 1 FROM wp_postmeta);
-SET @sql = CONCAT('ALTER TABLE wp_postmeta AUTO_INCREMENT = ', @ai_postmeta);
+-- kf5_postmeta
+SET @ai_postmeta = (SELECT IFNULL(MAX(meta_id), 0) + 1 FROM kf5_postmeta);
+SET @sql = CONCAT('ALTER TABLE kf5_postmeta AUTO_INCREMENT = ', @ai_postmeta);
 PREPARE stmt FROM @sql; EXECUTE stmt; DEALLOCATE PREPARE stmt;
 
--- wp_terms
-SET @ai_terms = (SELECT IFNULL(MAX(term_id), 0) + 1 FROM wp_terms);
-SET @sql = CONCAT('ALTER TABLE wp_terms AUTO_INCREMENT = ', @ai_terms);
+-- kf5_terms
+SET @ai_terms = (SELECT IFNULL(MAX(term_id), 0) + 1 FROM kf5_terms);
+SET @sql = CONCAT('ALTER TABLE kf5_terms AUTO_INCREMENT = ', @ai_terms);
 PREPARE stmt FROM @sql; EXECUTE stmt; DEALLOCATE PREPARE stmt;
 
--- wp_term_taxonomy
-SET @ai_tt = (SELECT IFNULL(MAX(term_taxonomy_id), 0) + 1 FROM wp_term_taxonomy);
-SET @sql = CONCAT('ALTER TABLE wp_term_taxonomy AUTO_INCREMENT = ', @ai_tt);
+-- kf5_term_taxonomy
+SET @ai_tt = (SELECT IFNULL(MAX(term_taxonomy_id), 0) + 1 FROM kf5_term_taxonomy);
+SET @sql = CONCAT('ALTER TABLE kf5_term_taxonomy AUTO_INCREMENT = ', @ai_tt);
 PREPARE stmt FROM @sql; EXECUTE stmt; DEALLOCATE PREPARE stmt;
 
--- wp_termmeta
-SET @ai_tm = (SELECT IFNULL(MAX(meta_id), 0) + 1 FROM wp_termmeta);
-SET @sql = CONCAT('ALTER TABLE wp_termmeta AUTO_INCREMENT = ', @ai_tm);
+-- kf5_termmeta
+SET @ai_tm = (SELECT IFNULL(MAX(meta_id), 0) + 1 FROM kf5_termmeta);
+SET @sql = CONCAT('ALTER TABLE kf5_termmeta AUTO_INCREMENT = ', @ai_tm);
 PREPARE stmt FROM @sql; EXECUTE stmt; DEALLOCATE PREPARE stmt;
 
--- wp_comments
-SET @ai_c = (SELECT IFNULL(MAX(comment_ID), 0) + 1 FROM wp_comments);
-SET @sql = CONCAT('ALTER TABLE wp_comments AUTO_INCREMENT = ', @ai_c);
+-- kf5_comments
+SET @ai_c = (SELECT IFNULL(MAX(comment_ID), 0) + 1 FROM kf5_comments);
+SET @sql = CONCAT('ALTER TABLE kf5_comments AUTO_INCREMENT = ', @ai_c);
 PREPARE stmt FROM @sql; EXECUTE stmt; DEALLOCATE PREPARE stmt;
 
--- wp_commentmeta
-SET @ai_cm = (SELECT IFNULL(MAX(meta_id), 0) + 1 FROM wp_commentmeta);
-SET @sql = CONCAT('ALTER TABLE wp_commentmeta AUTO_INCREMENT = ', @ai_cm);
+-- kf5_commentmeta
+SET @ai_cm = (SELECT IFNULL(MAX(meta_id), 0) + 1 FROM kf5_commentmeta);
+SET @sql = CONCAT('ALTER TABLE kf5_commentmeta AUTO_INCREMENT = ', @ai_cm);
 PREPARE stmt FROM @sql; EXECUTE stmt; DEALLOCATE PREPARE stmt;
 
 SELECT 'AUTO_INCREMENT reset complete' AS status;
+
+SET SESSION sql_mode = @old_sql_mode;
 
 
 -- =============================================================================
@@ -641,75 +676,75 @@ SELECT 'AUTO_INCREMENT reset complete' AS status;
 
 SELECT
     (SELECT COUNT(*)
-     FROM wp_posts
+     FROM kf5_posts
      WHERE post_type = 'product'
     ) AS remaining_products,
 
     (SELECT COUNT(*)
-     FROM wp_posts
+     FROM kf5_posts
      WHERE post_type = 'product_variation'
     ) AS remaining_product_variations,
 
     (SELECT COUNT(*)
-     FROM wp_posts
+     FROM kf5_posts
      WHERE post_type = 'attachment'
     ) AS remaining_registered_attachments,
 
     (SELECT COUNT(*)
-     FROM wp_comments c
-     INNER JOIN wp_posts p ON p.ID = c.comment_post_ID
+     FROM kf5_comments c
+     INNER JOIN kf5_posts p ON p.ID = c.comment_post_ID
      WHERE p.post_type = 'product'
     ) AS remaining_product_reviews,
 
     (SELECT COUNT(*)
-     FROM wp_wc_product_meta_lookup
+     FROM kf5_wc_product_meta_lookup
     ) AS remaining_wc_product_meta_lookup,
 
     (SELECT COUNT(*)
-     FROM wp_wc_product_attributes_lookup
+     FROM kf5_wc_product_attributes_lookup
     ) AS remaining_wc_attribute_lookup,
 
     (SELECT COUNT(*)
-     FROM wp_wc_category_lookup
+     FROM kf5_wc_category_lookup
     ) AS remaining_wc_category_lookup,
 
     (SELECT COUNT(*)
-     FROM wp_term_taxonomy
+     FROM kf5_term_taxonomy
      WHERE taxonomy = 'product_cat'
     ) AS remaining_product_categories,
 
     (SELECT COUNT(*)
-     FROM wp_term_taxonomy
+     FROM kf5_term_taxonomy
      WHERE taxonomy = 'product_tag'
     ) AS remaining_product_tags,
 
     (SELECT COUNT(*)
-     FROM wp_term_taxonomy
+     FROM kf5_term_taxonomy
      WHERE taxonomy IN ('pa_brand', 'product_brand', 'pwb-brand', 'yith_product_brand')
     ) AS remaining_brand_terms,
 
     (SELECT COUNT(*)
-     FROM wp_term_taxonomy
+     FROM kf5_term_taxonomy
      WHERE taxonomy LIKE 'pa\_%'
     ) AS remaining_attribute_terms,
 
     (SELECT COUNT(*)
-     FROM wp_woocommerce_attribute_taxonomies
+     FROM kf5_woocommerce_attribute_taxonomies
     ) AS preserved_global_attribute_definitions,
 
     (SELECT COUNT(*)
-     FROM wp_term_taxonomy
+     FROM kf5_term_taxonomy
      WHERE taxonomy IN ('product_type', 'product_visibility')
     ) AS preserved_system_terms,
 
     (SELECT COUNT(*)
-     FROM wp_postmeta
+     FROM kf5_postmeta
      WHERE meta_key = '_thumbnail_id'
     ) AS remaining_thumbnail_meta,
 
     (SELECT COUNT(*)
-     FROM wp_postmeta
-     WHERE meta_key = '_wp_attached_file'
+     FROM kf5_postmeta
+    WHERE meta_key = '_wp_attached_file'
     ) AS remaining_attached_file_meta;
 
 -- Expected clean state:
@@ -750,7 +785,7 @@ SELECT 'Helper tables dropped. Reset complete.' AS status;
 -- 1. MEDIA SYNC
 --    Run: scripts\image-sync.ps1
 --    This re-registers all images from wp-content/uploads/2026/media/ as
---    fresh wp_posts attachment records with correct postmeta.
+--    fresh kf5_posts attachment records with correct postmeta.
 --
 -- 2. CATALOG IMPORT
 --    WooCommerce → Products → Import
@@ -760,8 +795,8 @@ SELECT 'Helper tables dropped. Reset complete.' AS status;
 --
 -- 3. POST-IMPORT: REBUILD LOOKUP TABLES
 --    WooCommerce → Status → Tools → "Update database"
---    This regenerates wp_wc_product_meta_lookup,
---    wp_wc_product_attributes_lookup, and wp_wc_category_lookup.
+--    This regenerates kf5_wc_product_meta_lookup,
+--    kf5_wc_product_attributes_lookup, and kf5_wc_category_lookup.
 --
 -- 4. BUST FRONTEND CACHE
 --    In browser console on the live site:
@@ -770,3 +805,4 @@ SELECT 'Helper tables dropped. Reset complete.' AS status;
 --    to auto-bust the IDB cache on next load.
 --
 -- =============================================================================
+
