@@ -585,22 +585,38 @@ aside input[type="range"],
     }
 
     .site-footer .footer-col--shop {
-        grid-column: 2;
-        grid-row: 1;
+        grid-column: 1;
+        grid-row: 3;
         justify-content: flex-start;
         min-height: 0;
     }
 
     .site-footer .footer-col--support {
         grid-column: 2;
-        grid-row: 2;
+        grid-row: 3;
         justify-content: flex-start;
         min-height: 0;
     }
 
-    /* Hide contact column on mobile */
-    .site-footer .footer-grid > div:nth-child(4) {
-        display: none !important;
+    /* Show and elevate Contact & Support on mobile where nav headers used to be */
+    .site-footer .dtb-footer-contact-col {
+        display: flex !important;
+        grid-column: 2;
+        grid-row: 1 / span 2;
+        align-items: center !important;
+        text-align: center !important;
+        justify-content: flex-start;
+        gap: 8px !important;
+    }
+
+    .site-footer .dtb-footer-contact-col h5 {
+        display: block !important;
+        margin: 0 0 4px 0 !important;
+    }
+
+    .site-footer .dtb-footer-contact-col a,
+    .site-footer .dtb-footer-contact-col div {
+        justify-content: center;
     }
 
     /* Mobile footer header buttons - clickable sections */
@@ -3543,7 +3559,12 @@ button.header-mega-category-link {
    Adds a "Contact & Support" 4th column visible only on
    desktop. All columns left-align for a professional look.
    ─────────────────────────────────────────────────────── */
-.dtb-footer-contact-col { display: none; }
+.dtb-footer-contact-col {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+}
 
 @media (min-width: 1025px) {
     .dtb-footer-contact-col {

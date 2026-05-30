@@ -24,6 +24,7 @@
  *   7. dtb-marketing/bootstrap.php
  *   8. dtb-repair-service/bootstrap.php
  *   9. dtb-integrations/bootstrap.php
+ *  10. dtb-support/bootstrap.php
  *
  * @package drywall-toolbox
  */
@@ -263,6 +264,7 @@ _dtb_require( $_dtb_dir . '/dtb-media/bootstrap.php' );
 _dtb_require( $_dtb_dir . '/dtb-marketing/bootstrap.php' );
 _dtb_require( $_dtb_dir . '/dtb-repair-service/bootstrap.php' );
 _dtb_require( $_dtb_dir . '/dtb-integrations/bootstrap.php' );
+_dtb_require( $_dtb_dir . '/dtb-support/bootstrap.php' );
 
 // Order Operations Dashboard — migrated to dtb-platform module (Observability/).
 // _dtb_require( $_dtb_dir . '/dtb-order-operations-read-models.php' );

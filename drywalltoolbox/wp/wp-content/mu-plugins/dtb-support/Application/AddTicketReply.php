@@ -1,0 +1,87 @@
+<?php
+/**
+ * Application — AddTicketReply: handles customer and staff reply submission.
+ *
+ * @package drywall-toolbox
+ */
+
+defined( 'ABSPATH' ) || exit;
+
+/**
+ * Add a reply to an existing support ticket.
+ *
+ * Handles:
+ *  - Sanitisation of body content.
+ *  - Appending the reply event to the event stream.
+ *  - Auto-reopening closed/resolved tickets on customer reply.
+ *  - Dispatching notifications to the appropriate party.
+ *
+ * @param int    $ticket_id
+ * @param string $body        Raw reply message text.
+ * @param string $actor_type  'customer' | 'staff'.
+ * @param int    $actor_id    WP user ID (0 for unauthenticated customer).
+ * @param bool   $is_internal Mark as internal note (staff only; not visible to customer).
+ * @return int|WP_Error  Event row ID on success.
+ */
+function dtb_support_add_reply(
+	int $ticket_id,
+	string $body,
+	string $actor_type = 'customer',
+	int $actor_id = 0,
+	bool $is_internal = false
+): int|WP_Error {
+	$ticket = dtb_support_get_ticket( $ticket_id );
+	if ( ! $ticket ) {
+		return new WP_Error( 'dtb_support_not_found', __( 'Ticket not found.', 'drywall-toolbox' ) );
+	}
+
+	$sanitised_body = wp_kses_post( trim( $body ) );
+	if ( '' === $sanitised_body ) {
+		return new WP_Error( 'dtb_support_empty_reply', __( 'Reply body cannot be empty.', 'drywall-toolbox' ) );
+	}
+
+	// Visibility: internal notes are operator-only; customer replies are public.
+	$visibility = 'customer' === $actor_type ? 'all' : ( $is_internal ? 'operator' : 'all' );
+
+	$event_type = 'customer' === $actor_type ? 'reply.customer' : ( $is_internal ? 'note.added' : 'reply.staff' );
+
+	$event = dtb_support_build_event( $ticket_id, $event_type, [
+		'actor_type' => $actor_type,
+		'actor_id'   => $actor_id ?: null,
+		'source'     => 'web',
+		'visibility' => $visibility,
+		'body'       => $sanitised_body,
+	] );
+
+	$event_id = dtb_support_append_event( $event );
+
+	// Auto-reopen if a customer replies to a resolved/closed ticket.
+	if ( 'customer' === $actor_type ) {
+		dtb_support_maybe_reopen_on_customer_reply( $ticket_id, $ticket['status'] );
+		// Refresh ticket after possible status change.
+		$ticket = dtb_support_get_ticket( $ticket_id );
+	}
+
+	// Dispatch notifications (skip internal notes — those never go to customer).
+	if ( ! $is_internal ) {
+		if ( 'customer' === $actor_type ) {
+			// Notify assigned staff.
+			dtb_support_notify_customer_reply( $ticket, $sanitised_body );
+		} else {
+			// Notify the customer.
+			dtb_support_notify_staff_reply( $ticket, $sanitised_body );
+		}
+	}
+
+	/**
+	 * Fires after a reply is successfully added to a ticket.
+	 *
+	 * @param int    $ticket_id
+	 * @param int    $event_id
+	 * @param string $actor_type
+	 * @param string $event_type
+	 */
+	do_action( 'dtb_support_reply_added', $ticket_id, $event_id, $actor_type, $event_type );
+
+	return $event_id;
+}

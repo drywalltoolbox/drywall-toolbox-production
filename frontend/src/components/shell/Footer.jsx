@@ -7,7 +7,7 @@
 
 import { Link } from 'react-router-dom';
 import { useState } from 'react';
-import { Instagram, Facebook, Twitter, ChevronDown, Mail, Phone, MapPin, Clock } from 'lucide-react';
+import { Instagram, Facebook, Twitter, ChevronDown, Mail, Phone, MapPin } from 'lucide-react';
 import { motion as Motion } from 'framer-motion';
 import LogoWhite from '/logo-white.svg';
 
@@ -168,8 +168,7 @@ export default function Footer() {
           </h5>
           {[
             { Icon: Mail, href: 'mailto:support@drywalltoolbox.com', text: 'support@drywalltoolbox.com' },
-            { Icon: Phone, to: '/contact', text: 'Contact Us Online' },
-            { Icon: Clock, text: 'Mon – Fri · 8AM – 5PM CST' },
+            { Icon: Phone, href: 'tel:+16098665269', text: '(609) 866-5269' },
             { Icon: MapPin, to: '/repairs', text: 'Tool Repair Services' },
           ].map(({ Icon, href, to, text }) => {
             const inner = (
