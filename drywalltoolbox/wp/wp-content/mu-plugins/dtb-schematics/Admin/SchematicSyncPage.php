@@ -595,6 +595,10 @@ function dtb_schematics_resolve_staged_folder( string $folder_rel ): array {
 	];
 }
 
+if ( ! defined( 'DTB_SCHEMATICS_REGISTER_GENERATE_METADATA' ) ) {
+	define( 'DTB_SCHEMATICS_REGISTER_GENERATE_METADATA', false );
+}
+
 function dtb_schematics_register_existing_upload_file_as_attachment( string $absolute_file_path, string $title = '', int $parent_post_id = 0, bool $generate_metadata = false ): int {
 	if ( ! file_exists( $absolute_file_path ) ) {
 		return 0;
@@ -709,10 +713,19 @@ function dtb_ajax_schematics_register_staged_images(): void {
 	if ( ! current_user_can( 'manage_options' ) ) {
 		wp_send_json_error( [], 403 );
 	}
+	if ( function_exists( 'set_time_limit' ) ) {
+		@set_time_limit( 120 ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+	}
+	if ( function_exists( 'ini_set' ) ) {
+		@ini_set( 'memory_limit', '512M' ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+	}
 
 	$folder_rel = sanitize_text_field( (string) ( $_POST['staged_folder'] ?? '2026/schematics' ) );
 	$offset     = max( 0, absint( $_POST['offset'] ?? 0 ) );
 	$batch_size = max( 1, min( 100, absint( $_POST['batch_size'] ?? 20 ) ) );
+	$generate_metadata = defined( 'DTB_SCHEMATICS_REGISTER_GENERATE_METADATA' )
+		? (bool) DTB_SCHEMATICS_REGISTER_GENERATE_METADATA
+		: false;
 
 	$resolved = dtb_schematics_resolve_staged_folder( $folder_rel );
 	if ( empty( $resolved['ok'] ) ) {
@@ -743,7 +756,7 @@ function dtb_ajax_schematics_register_staged_images(): void {
 	for ( $i = $offset; $i < $total && $processed < $batch_size; $i++ ) {
 		$file = (string) $files[ $i ];
 		$title = (string) pathinfo( wp_basename( $file ), PATHINFO_FILENAME );
-		$id = dtb_schematics_register_existing_upload_file_as_attachment( $file, $title, 0, true );
+		$id = dtb_schematics_register_existing_upload_file_as_attachment( $file, $title, 0, $generate_metadata );
 		if ( $id > 0 ) {
 			$registered++;
 		} else {
@@ -763,6 +776,7 @@ function dtb_ajax_schematics_register_staged_images(): void {
 			'done'          => $done,
 			'next_offset'   => $next_offset,
 			'staged_folder' => (string) $resolved['rel'],
+			'generate_metadata' => $generate_metadata,
 			'errors'        => dtb_schematics_import_limit_errors( $errors ),
 			'message'       => $done
 				? sprintf( 'Registered staged images complete (%d/%d).', $next_offset, $total )

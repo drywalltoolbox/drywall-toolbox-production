@@ -632,11 +632,23 @@ function dtb_schematics_render_page() {
 
 		function registerStagedImages(folderRel, done) {
 			var offset = 0;
-			var batchSize = 25;
+			var batchSize = 10;
+			var maxRetriesPerBatch = 4;
 			$('#dtb-register-staged-spinner').show();
 			$('#dtb-register-staged-msg').text('Registering staged images…').css('color', '#1d6fa4');
 
-			function tick() {
+			function isTransientHttpStatus(status) {
+				return status === 0 || status === 429 || status === 502 || status === 503 || status === 504;
+			}
+
+			function backoffDelayMs(attempt) {
+				var base = 700;
+				var cappedAttempt = Math.min(6, Math.max(1, attempt));
+				return (base * Math.pow(2, cappedAttempt - 1)) + Math.floor(Math.random() * 300);
+			}
+
+			function tick(retryAttempt) {
+				retryAttempt = retryAttempt || 0;
 				$.post(ajaxurl, {
 					action: 'dtb_schematics_register_staged_images',
 					nonce: nonce,
@@ -654,23 +666,35 @@ function dtb_schematics_render_page() {
 
 					var d = res.data || {};
 					offset = parseInt(d.next_offset || 0, 10);
-					$('#dtb-register-staged-msg').text(d.message || ('Registered ' + (d.processed || 0) + '/' + (d.total || 0))).css('color', '#1d6fa4');
+					var modeMsg = ('generate_metadata' in d) ? (' · metadata ' + (d.generate_metadata ? 'on' : 'off')) : '';
+					$('#dtb-register-staged-msg').text((d.message || ('Registered ' + (d.processed || 0) + '/' + (d.total || 0))) + modeMsg).css('color', '#1d6fa4');
 					if (!d.done) {
-						tick();
+						tick(0);
 						return;
 					}
 
 					$('#dtb-register-staged-spinner').hide();
 					$('#dtb-register-staged-msg').text('✓ ' + (d.message || 'Staged images registered.')).css('color', '#1a7f37');
 					if (done) done(true);
-				}).fail(function(){
+				}).fail(function(xhr, textStatus){
+					var status = (xhr && typeof xhr.status === 'number') ? xhr.status : 0;
+					if (retryAttempt < maxRetriesPerBatch && isTransientHttpStatus(status)) {
+						var nextAttempt = retryAttempt + 1;
+						var delay = backoffDelayMs(nextAttempt);
+						$('#dtb-register-staged-msg').text(
+							'Transient error (' + (status || textStatus || 'network') + ') at offset ' + offset +
+							'. Retrying ' + nextAttempt + '/' + maxRetriesPerBatch + '…'
+						).css('color', '#b26200');
+						setTimeout(function(){ tick(nextAttempt); }, delay);
+						return;
+					}
 					$('#dtb-register-staged-spinner').hide();
-					$('#dtb-register-staged-msg').text('✗ Register staged images request failed.').css('color', '#d63638');
+					$('#dtb-register-staged-msg').text('✗ Register staged images request failed (' + (status || textStatus || 'network') + ').').css('color', '#d63638');
 					if (done) done(false);
 				});
 			}
 
-			tick();
+			tick(0);
 		}
 
 		$('#dtb-register-staged-images').on('click', function(){
