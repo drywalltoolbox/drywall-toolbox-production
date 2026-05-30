@@ -15,6 +15,18 @@ on:
         description: "Type DEPLOY for deploy, or RESTORE for restore"
         required: true
         type: string
+      deploy_scope:
+        description: "Deploy mode (deploy action only)"
+        required: false
+        type: choice
+        options:
+          - full_payload
+          - selective
+        default: full_payload
+      deploy_items:
+        description: "Deploy action + selective scope only: comma or newline-separated paths from deploy-root (for example: index.html, assets/js/main.js, wp/wp-content/themes)"
+        required: false
+        type: string
       backup_run_id:
         description: "Restore only: workflow run ID that contains the backup artifact"
         required: false
@@ -221,10 +233,64 @@ jobs:
           name: deploy-payload-${{ github.run_id }}
           path: deploy-root
 
+      - name: Validate selective deployment inputs
+        if: ${{ inputs.deploy_scope == 'selective' }}
+        shell: bash
+        env:
+          DEPLOY_ITEMS: ${{ inputs.deploy_items }}
+        run: |
+          set -euo pipefail
+
+          RAW_INPUT="${DEPLOY_ITEMS:-}"
+          if [ -z "${RAW_INPUT//[[:space:]]/}" ]; then
+            echo "deploy_items is required when deploy_scope=selective." >&2
+            exit 1
+          fi
+
+          ROOT="$(realpath -m deploy-root)"
+          TMP_ITEMS="$(mktemp)"
+
+          printf '%s\n' "$RAW_INPUT" \
+            | tr ',' '\n' \
+            | sed 's/^[[:space:]]*//; s/[[:space:]]*$//' \
+            | sed '/^$/d' \
+            > "$TMP_ITEMS"
+
+          if [ ! -s "$TMP_ITEMS" ]; then
+            echo "No valid deploy_items were provided." >&2
+            exit 1
+          fi
+
+          echo "Selective deploy manifest:"
+          while IFS= read -r rel; do
+            rel="${rel#./}"
+            abs="$(realpath -m "deploy-root/$rel")"
+
+            if [[ "$abs" != "$ROOT"* ]]; then
+              echo "Path escapes deploy-root: $rel" >&2
+              exit 1
+            fi
+
+            if [ ! -e "$abs" ]; then
+              echo "Path not found in deploy payload: $rel" >&2
+              exit 1
+            fi
+
+            case "$rel" in
+              wp-config.php|wp/wp-config.php|wp-content/uploads/*|wp/wp-content/uploads/*|wp-content/cache/*|wp/wp-content/cache/*)
+                echo "Forbidden deploy path: $rel" >&2
+                exit 1
+                ;;
+            esac
+
+            echo "  - $rel"
+          done < "$TMP_ITEMS"
+
       - name: Install lftp
         run: sudo apt-get update && sudo apt-get install -y lftp
 
-      - name: Deploy to HostGator via FTPS
+      - name: Deploy full payload to HostGator via FTPS
+        if: ${{ inputs.deploy_scope != 'selective' }}
         shell: bash
         env:
           FTP_HOST: ${{ secrets.HOSTGATOR_FTP_HOST }}
@@ -257,6 +323,66 @@ jobs:
             --exclude-glob wp/wp-content/upgrade/**
           bye
           EOF
+
+      - name: Deploy selected files/directories to HostGator via FTPS
+        if: ${{ inputs.deploy_scope == 'selective' }}
+        shell: bash
+        env:
+          DEPLOY_ITEMS: ${{ inputs.deploy_items }}
+          FTP_HOST: ${{ secrets.HOSTGATOR_FTP_HOST }}
+          FTP_USERNAME: ${{ secrets.HOSTGATOR_FTP_USERNAME }}
+          FTP_PASSWORD: ${{ secrets.HOSTGATOR_FTP_PASSWORD }}
+          FTP_REMOTE_DIR: ${{ secrets.HOSTGATOR_FTP_REMOTE_DIR }}
+        run: |
+          set -euo pipefail
+
+          : "${FTP_HOST:?Missing HOSTGATOR_FTP_HOST secret}"
+          : "${FTP_USERNAME:?Missing HOSTGATOR_FTP_USERNAME secret}"
+          : "${FTP_PASSWORD:?Missing HOSTGATOR_FTP_PASSWORD secret}"
+
+          REMOTE_DIR="${FTP_REMOTE_DIR:-/public_html/drywalltoolbox}"
+          ROOT="$(realpath -m deploy-root)"
+          ITEMS_FILE="$(mktemp)"
+          CMDS_FILE="$(mktemp)"
+
+          printf '%s\n' "${DEPLOY_ITEMS:-}" \
+            | tr ',' '\n' \
+            | sed 's/^[[:space:]]*//; s/[[:space:]]*$//' \
+            | sed '/^$/d' \
+            > "$ITEMS_FILE"
+
+          {
+            echo "set ftp:ssl-force true"
+            echo "set ftp:ssl-protect-data true"
+            echo "set ssl:verify-certificate false"
+            echo "set net:max-retries 3"
+            echo "set net:timeout 30"
+            echo "set xfer:clobber true"
+          } > "$CMDS_FILE"
+
+          while IFS= read -r rel; do
+            rel="${rel#./}"
+            abs="$(realpath -m "deploy-root/$rel")"
+
+            if [[ "$abs" != "$ROOT"* ]]; then
+              echo "Path escapes deploy-root: $rel" >&2
+              exit 1
+            fi
+
+            if [ -d "$abs" ]; then
+              echo "mirror --reverse --verbose --parallel=2 --only-newer \"$abs\" \"$REMOTE_DIR/$rel\"" >> "$CMDS_FILE"
+            else
+              parent="$(dirname "$rel")"
+              if [ "$parent" = "." ]; then
+                parent=""
+              fi
+              echo "mkdir -p \"$REMOTE_DIR/$parent\"" >> "$CMDS_FILE"
+              echo "put -O \"$REMOTE_DIR/$parent\" \"$abs\"" >> "$CMDS_FILE"
+            fi
+          done < "$ITEMS_FILE"
+
+          echo "bye" >> "$CMDS_FILE"
+          lftp -u "$FTP_USERNAME","$FTP_PASSWORD" "$FTP_HOST" -f "$CMDS_FILE"
 
   smoke-check:
     name: Smoke-check production endpoints

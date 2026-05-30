@@ -17,6 +17,9 @@ Workflows:
 
 - `push` to `main`: runs CI build validation only, no production deploy.
 - Manual deploy: run workflow with `action=deploy` and `confirm=DEPLOY`.
+  - `deploy_scope=full_payload` (default): deploy full curated payload.
+  - `deploy_scope=selective`: deploy only paths listed in `deploy_items`.
+  - `deploy_items` accepts comma or newline separated paths relative to `deploy-root` (examples: `index.html`, `assets/js/main.js`, `wp/wp-content/themes`).
 - Manual restore: run workflow with `action=restore` and `confirm=RESTORE`, plus:
   - `backup_run_id`: workflow run ID that contains the backup artifact.
   - `backup_artifact_name`: artifact name from that run (`hostgator-backup-*`).

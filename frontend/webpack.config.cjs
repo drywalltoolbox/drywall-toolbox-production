@@ -29,16 +29,16 @@ const TerserPlugin          = require('terser-webpack-plugin');
 const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
 const { GenerateSW }            = require('workbox-webpack-plugin');
 // ─── Load environment-specific .env files ──────────────────────────────────
-// This MUST happen inside the module.exports function so we can access argv.mode
-// from webpack. If we do this at the top level, webpack hasn't passed argv yet.
+// This MUST happen inside module.exports so we can read argv/env flags passed
+// by webpack CLI (for example: --env appEnv=staging).
 //
-// Priority order (first found wins):
-//   1. NODE_ENV already set in shell (GitHub Actions, CI/CD)
-//   2. argv.mode from webpack (--mode flag)
-//   3. .env.development or .env.production (based on detected mode)
-//   4. .env (legacy fallback)
+// Resolution order:
+//   1. CLI --env appEnv=... (explicit build target)
+//   2. APP_ENV / REACT_APP_APP_ENV / REACT_APP_ENV from shell/CI
+//   3. Fallback from webpack mode (production/development)
 //
-// dotenv.config() is a no-op if variables are already set, so it's always safe.
+// dotenv.config() does not override pre-set env vars by default, so CI secrets
+// and workflow-level env still win over file values.
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -51,15 +51,40 @@ module.exports = (envFlags, argv) => {
   // Determine build mode from webpack argv FIRST
   const mode   = (argv && argv.mode) ? argv.mode : (process.env.NODE_ENV || 'development');
 
-  // NOW load the appropriate .env file based on the actual build mode
-  const envFile = mode === 'production' ? '.env.production' : '.env.development';
-  
-  // Load environment-specific .env file
-  require('dotenv').config({ path: envFile });
+  // Resolve application environment (production/staging/development).
+  const cliAppEnv = (envFlags && envFlags.appEnv) ? String(envFlags.appEnv).trim() : '';
+  const inferredAppEnv = mode === 'production' ? 'production' : 'development';
+  const appEnv = (
+    cliAppEnv ||
+    process.env.APP_ENV ||
+    process.env.REACT_APP_APP_ENV ||
+    process.env.REACT_APP_ENV ||
+    inferredAppEnv
+  ).trim().toLowerCase();
 
-  // Fallback to .env if the environment-specific file doesn't exist
-  if (!require('fs').existsSync(envFile)) {
-    require('dotenv').config({ path: '.env' });
+  const envFileByAppEnv = {
+    development: '.env.development',
+    production: '.env.production',
+    staging: '.env.staging',
+    test: '.env.test',
+  };
+
+  const envFiles = [];
+  if (envFileByAppEnv[appEnv]) {
+    envFiles.push(envFileByAppEnv[appEnv]);
+  }
+  envFiles.push(mode === 'production' ? '.env.production' : '.env.development');
+  envFiles.push('.env');
+
+  const seen = new Set();
+  for (const envFile of envFiles) {
+    if (!envFile || seen.has(envFile)) {
+      continue;
+    }
+    seen.add(envFile);
+    if (fs.existsSync(envFile)) {
+      require('dotenv').config({ path: envFile });
+    }
   }
 
   // Now that env vars are loaded, continue with the rest of config
@@ -103,7 +128,7 @@ module.exports = (envFlags, argv) => {
     'process.env.REACT_APP_WC_API_BASE':                JSON.stringify(env('REACT_APP_WC_API_BASE')),
     'process.env.REACT_APP_JWT_ENDPOINT':               JSON.stringify(env('REACT_APP_JWT_ENDPOINT')),
     'process.env.REACT_APP_SITE_URL':                   JSON.stringify(env('REACT_APP_SITE_URL')),
-    'process.env.REACT_APP_APP_ENV':                    JSON.stringify(env('REACT_APP_APP_ENV')),
+    'process.env.REACT_APP_APP_ENV':                    JSON.stringify(env('REACT_APP_APP_ENV') || appEnv),
 
     // WooCommerce legacy compat (previously VITE_WOOCOMMERCE_*)
     'process.env.REACT_APP_WOOCOMMERCE_STORE_URL':      JSON.stringify(env('REACT_APP_WOOCOMMERCE_STORE_URL')),
@@ -116,7 +141,7 @@ module.exports = (envFlags, argv) => {
     'process.env.REACT_APP_DTB_API_BASE':               JSON.stringify(env('REACT_APP_DTB_API_BASE')),
     'process.env.REACT_APP_STORE_API_BASE':             JSON.stringify(env('REACT_APP_STORE_API_BASE')),
     'process.env.REACT_APP_JWT_AUTH_ENDPOINT':          JSON.stringify(env('REACT_APP_JWT_AUTH_ENDPOINT')),
-    'process.env.REACT_APP_ENV':                        JSON.stringify(env('REACT_APP_ENV')),
+    'process.env.REACT_APP_ENV':                        JSON.stringify(env('REACT_APP_ENV') || appEnv),
     'process.env.REACT_APP_REWARDS_ENABLED':            JSON.stringify(env('REACT_APP_REWARDS_ENABLED')),
 
     // Build timestamp — set once at config evaluation time (not per-module).

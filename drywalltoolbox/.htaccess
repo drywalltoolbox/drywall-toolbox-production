@@ -35,6 +35,9 @@ Options +FollowSymLinks
   RewriteCond %{HTTP_HOST} ^www\.drywalltoolbox\.com$ [NC]
   RewriteRule ^ https://drywalltoolbox.com%{REQUEST_URI} [R=301,L]
 
+  # Force homepage to the static coming-soon landing page.
+  RewriteRule ^$ index.html [L]
+
   # WordPress admin/login aliases from the root URL space.
   RewriteRule ^wp-admin/?$ wp/wp-admin/ [L,QSA]
   RewriteRule ^wp-admin/(.*)$ wp/wp-admin/$1 [L,QSA]
