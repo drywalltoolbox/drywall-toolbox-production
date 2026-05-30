@@ -136,27 +136,33 @@ createRoot(document.getElementById('root')).render(
   </StrictMode>,
 )
 
-// ─── Service Worker registration (production only) ────────────────────────────
-// Deferred until after the 'load' event so the SW fetch does not compete with
-// critical resource loading or React hydration.  On GitHub Pages we explicitly
-// unregister SWs to avoid stale cached shells referencing deleted hashed assets.
+// ─── Service Worker policy ───────────────────────────────────────────────────
+// Production shared hosting/manual uploads must not keep a stale cached HTML
+// shell that references deleted JS/CSS bundle paths. Keep SW disabled unless a
+// future deployment intentionally sets REACT_APP_ENV=production-sw.
 if (process.env.NODE_ENV === 'production' && 'serviceWorker' in navigator) {
   const isGithubPagesHost = typeof window !== 'undefined' && /\.github\.io$/i.test(window.location.hostname);
+  const enableServiceWorker = process.env.REACT_APP_ENV === 'production-sw' && !isGithubPagesHost;
 
-  if (isGithubPagesHost) {
-    navigator.serviceWorker.getRegistrations().then((regs) => {
-      regs.forEach((reg) => {
-        reg.unregister();
-      });
-    }).catch(() => {});
-  } else {
-    window.addEventListener('load', () => {
+  window.addEventListener('load', () => {
+    if (enableServiceWorker) {
       const swUrl = joinRuntimeAssetUrl('service-worker.js');
       navigator.serviceWorker
         .register(swUrl)
         .catch(() => {
-          // SW registration failures are non-fatal; log silently.
+          // SW registration failures are non-fatal.
         });
-    });
-  }
+      return;
+    }
+
+    navigator.serviceWorker.getRegistrations()
+      .then((registrations) => {
+        registrations.forEach((registration) => {
+          registration.unregister();
+        });
+      })
+      .catch(() => {
+        // SW cleanup failures are non-fatal.
+      });
+  });
 }
