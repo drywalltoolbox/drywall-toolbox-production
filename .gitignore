@@ -66,14 +66,16 @@ xmlrpc.php
 license.txt
 readme.html
 
-# Keep the sample config (wp-*.php above would otherwise exclude it)
+# Keep sample configs (wp-*.php above would otherwise exclude them)
 !wp/wp-config-sample.php
+!*/wp/wp-config-sample.php
 
 # Sensitive configuration — configure manually on the server, never commit
 wp-config.php
 wp-config-local.php
 wp-config-*.php
 !wp/wp-config-sample.php
+!*/wp/wp-config-sample.php
 
 # WordPress server-side .env (real secrets — only .env.example is committed)
 wp/.env

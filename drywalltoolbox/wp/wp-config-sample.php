@@ -20,13 +20,13 @@
 
 // ** Database settings - You can get this info from your web host ** //
 /** The name of the database for WordPress */
-define( 'DB_NAME', 'benconkl_drywalltoolbox' );
+define( 'DB_NAME', 'database_name_here' );
 
 /** Database username */
-define( 'DB_USER', 'benconkl_drywalltoolbox' );
+define( 'DB_USER', 'username_here' );
 
 /** Database password */
-define( 'DB_PASSWORD', '3Qat=}^-8KER' );
+define( 'DB_PASSWORD', 'password_here' );
 
 /** Database hostname */
 define( 'DB_HOST', 'localhost' );
@@ -71,7 +71,7 @@ define( 'NONCE_SALT',       'put your unique phrase here' );
  *
  * @link https://developer.wordpress.org/advanced-administration/wordpress/wp-config/#table-prefix
  */
-$table_prefix = 'kf5_';
+$table_prefix = 'wp_';
 
 /**
  * For developers: WordPress debugging mode.
@@ -85,10 +85,27 @@ $table_prefix = 'kf5_';
  *
  * @link https://developer.wordpress.org/advanced-administration/debug/debug-wordpress/
  */
-define( 'WP_DEBUG', true );
+define( 'WP_DEBUG', false );
 
 /* Add any custom values between this line and the "stop editing" line. */
 
+/**
+ * Drywall Toolbox routing architecture (document root + /wp core).
+ *
+ * - Domain document root: /public_html/drywalltoolbox/
+ * - WordPress core files: /public_html/drywalltoolbox/wp/
+ * - Public site URL:       https://www.drywalltoolbox.com
+ * - WordPress core URL:    https://www.drywalltoolbox.com/wp
+ */
+define( 'WP_HOME', 'https://www.drywalltoolbox.com' );
+define( 'WP_SITEURL', 'https://www.drywalltoolbox.com/wp' );
+
+// Keep auth cookies site-wide while scoping admin cookies to /wp/wp-admin.
+define( 'COOKIEPATH', '/' );
+define( 'SITECOOKIEPATH', '/' );
+define( 'COOKIE_PATH', '/' );
+define( 'SITE_COOKIE_PATH', '/' );
+define( 'ADMIN_COOKIE_PATH', '/wp/wp-admin' );
 
 
 /* That's all, stop editing! Happy publishing. */
