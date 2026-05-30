@@ -99,6 +99,7 @@ define( 'WP_DEBUG', false );
  */
 define( 'WP_HOME', 'https://www.drywalltoolbox.com' );
 define( 'WP_SITEURL', 'https://www.drywalltoolbox.com/wp' );
+define( 'WP_CONTENT_URL', 'https://www.drywalltoolbox.com/wp-content' );
 
 // Keep auth cookies site-wide while scoping admin cookies to /wp/wp-admin.
 define( 'COOKIEPATH', '/' );
