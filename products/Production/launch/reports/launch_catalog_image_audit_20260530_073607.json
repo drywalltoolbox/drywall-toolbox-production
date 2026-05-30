@@ -1,0 +1,2671 @@
+{
+  "summary": {
+    "csv": "products\\Production\\launch\\dtb_woocommerce_official_catalog.csv",
+    "images_dir": "products\\Production\\launch\\launch_images",
+    "apply": false,
+    "parent_variable_rows": 87,
+    "parent_rows_updated": 3,
+    "rows_with_missing_images": 161,
+    "rows_with_empty_images": 20,
+    "missing_unique_basenames": 196
+  },
+  "backup_csv": null,
+  "parent_updates": [
+    {
+      "parent_sku": "TT-BASIC-FULL-SET",
+      "added_image_count": 13,
+      "before_count": 2,
+      "after_count": 15
+    },
+    {
+      "parent_sku": "TT-BASIC-JUMBO-SET",
+      "added_image_count": 14,
+      "before_count": 2,
+      "after_count": 16
+    },
+    {
+      "parent_sku": "TT-STANDARD-FULL-SET",
+      "added_image_count": 13,
+      "before_count": 4,
+      "after_count": 17
+    }
+  ],
+  "missing_rows": [
+    {
+      "sku": "HH19",
+      "row_type": "simple",
+      "parent": "",
+      "name": "Cap",
+      "missing_basenames": [
+        "columbia_tools_hh19_01.webp"
+      ]
+    },
+    {
+      "sku": "COL-ANGLE-HEAD",
+      "row_type": "variable",
+      "parent": "",
+      "name": "Columbia Angle Head",
+      "missing_basenames": [
+        "columbia_tools_tools_25ah_01.webp",
+        "columbia_tools_tools_25ah_02.webp",
+        "columbia_tools_tools_25ah_03.webp",
+        "columbia_tools_tools_25ah_04.webp",
+        "columbia_tools_tools_35ah_01.webp",
+        "columbia_tools_tools_35ah_02.webp",
+        "columbia_tools_tools_35ah_03.webp",
+        "columbia_tools_tools_35ah_04.webp"
+      ]
+    },
+    {
+      "sku": "2.5AH",
+      "row_type": "variation",
+      "parent": "COL-ANGLE-HEAD",
+      "name": "Columbia Angle Head - 2.5\"",
+      "missing_basenames": [
+        "columbia_tools_tools_25ah_01.webp",
+        "columbia_tools_tools_25ah_02.webp",
+        "columbia_tools_tools_25ah_03.webp",
+        "columbia_tools_tools_25ah_04.webp"
+      ]
+    },
+    {
+      "sku": "3.5AH",
+      "row_type": "variation",
+      "parent": "COL-ANGLE-HEAD",
+      "name": "Columbia Angle Head - 3.5\"",
+      "missing_basenames": [
+        "columbia_tools_tools_35ah_01.webp",
+        "columbia_tools_tools_35ah_02.webp",
+        "columbia_tools_tools_35ah_03.webp",
+        "columbia_tools_tools_35ah_04.webp"
+      ]
+    },
+    {
+      "sku": "COL-BILLET-MUD-APPLICATOR",
+      "row_type": "variable",
+      "parent": "",
+      "name": "Columbia Billet Mud Applicator",
+      "missing_basenames": [
+        "columbia_tools_tools_ica21_01.webp",
+        "columbia_tools_tools_ica21_02.webp",
+        "columbia_tools_tools_ica41_01.webp",
+        "columbia_tools_tools_ica41_02.webp"
+      ]
+    },
+    {
+      "sku": "ICA2-1",
+      "row_type": "variation",
+      "parent": "COL-BILLET-MUD-APPLICATOR",
+      "name": "Columbia Billet Mud Applicator - Inside Corner - 2 Wheels - 1\"",
+      "missing_basenames": [
+        "columbia_tools_tools_ica21_01.webp",
+        "columbia_tools_tools_ica21_02.webp"
+      ]
+    },
+    {
+      "sku": "ICA4-1",
+      "row_type": "variation",
+      "parent": "COL-BILLET-MUD-APPLICATOR",
+      "name": "Columbia Billet Mud Applicator - Inside Corner - 4 Wheels - 1\"",
+      "missing_basenames": [
+        "columbia_tools_tools_ica41_01.webp",
+        "columbia_tools_tools_ica41_02.webp"
+      ]
+    },
+    {
+      "sku": "COL-BOX-FILLER",
+      "row_type": "variable",
+      "parent": "",
+      "name": "Columbia Box Filler",
+      "missing_basenames": [
+        "columbia_tools_tools_tbbf_01.webp"
+      ]
+    },
+    {
+      "sku": "TBBF",
+      "row_type": "variation",
+      "parent": "COL-BOX-FILLER",
+      "name": "Columbia Box Filler - Tall Boy",
+      "missing_basenames": [
+        "columbia_tools_tools_tbbf_01.webp"
+      ]
+    },
+    {
+      "sku": "COL-COMBO-FLUSHER",
+      "row_type": "variable",
+      "parent": "",
+      "name": "Columbia Combo Flusher",
+      "missing_basenames": [
+        "columbia_tools_tools_2_5csf_01.webp",
+        "columbia_tools_tools_3_5csf_01.webp",
+        "columbia_tools_tools_3csf_01.webp"
+      ]
+    },
+    {
+      "sku": "2.5CSF",
+      "row_type": "variation",
+      "parent": "COL-COMBO-FLUSHER",
+      "name": "Columbia Combo Flusher - 2.5\"",
+      "missing_basenames": [
+        "columbia_tools_tools_2_5csf_01.webp"
+      ]
+    },
+    {
+      "sku": "3CSF",
+      "row_type": "variation",
+      "parent": "COL-COMBO-FLUSHER",
+      "name": "Columbia Combo Flusher - 3\"",
+      "missing_basenames": [
+        "columbia_tools_tools_3csf_01.webp"
+      ]
+    },
+    {
+      "sku": "3.5CSF",
+      "row_type": "variation",
+      "parent": "COL-COMBO-FLUSHER",
+      "name": "Columbia Combo Flusher - 3.5\"",
+      "missing_basenames": [
+        "columbia_tools_tools_3_5csf_01.webp"
+      ]
+    },
+    {
+      "sku": "COL-DIRECT-FLUSHER",
+      "row_type": "variable",
+      "parent": "",
+      "name": "Columbia Direct Flusher",
+      "missing_basenames": [
+        "columbia_tools_tools_2_5df_01.webp",
+        "columbia_tools_tools_3_5df_01.webp",
+        "columbia_tools_tools_3df_01.webp",
+        "columbia_tools_tools_4df_01.webp"
+      ]
+    },
+    {
+      "sku": "2.5DF",
+      "row_type": "variation",
+      "parent": "COL-DIRECT-FLUSHER",
+      "name": "Columbia Direct Flusher - 2.5\"",
+      "missing_basenames": [
+        "columbia_tools_tools_2_5df_01.webp"
+      ]
+    },
+    {
+      "sku": "3DF",
+      "row_type": "variation",
+      "parent": "COL-DIRECT-FLUSHER",
+      "name": "Columbia Direct Flusher - 3\"",
+      "missing_basenames": [
+        "columbia_tools_tools_3df_01.webp"
+      ]
+    },
+    {
+      "sku": "3.5DF",
+      "row_type": "variation",
+      "parent": "COL-DIRECT-FLUSHER",
+      "name": "Columbia Direct Flusher - 3.5\"",
+      "missing_basenames": [
+        "columbia_tools_tools_3_5df_01.webp"
+      ]
+    },
+    {
+      "sku": "4DF",
+      "row_type": "variation",
+      "parent": "COL-DIRECT-FLUSHER",
+      "name": "Columbia Direct Flusher - 4\"",
+      "missing_basenames": [
+        "columbia_tools_tools_4df_01.webp"
+      ]
+    },
+    {
+      "sku": "COL-FAT-BOY-FLAT-BOX",
+      "row_type": "variable",
+      "parent": "",
+      "name": "Columbia Fat Boy Flat Box",
+      "missing_basenames": [
+        "columbia_tools_tools_12fbb_01.webp"
+      ]
+    },
+    {
+      "sku": "12FBB",
+      "row_type": "variation",
+      "parent": "COL-FAT-BOY-FLAT-BOX",
+      "name": "Columbia Fat Boy Flat Box - 12\"",
+      "missing_basenames": [
+        "columbia_tools_tools_12fbb_01.webp"
+      ]
+    },
+    {
+      "sku": "COL-FLAT-FINISHER-BOX",
+      "row_type": "variable",
+      "parent": "",
+      "name": "Columbia Flat Finisher Box",
+      "missing_basenames": [
+        "columbia_tools_tools_10ffb_01.webp",
+        "columbia_tools_tools_12ffb_01.webp",
+        "columbia_tools_tools_14ffb_01.webp",
+        "columbia_tools_tools_55ffb_01.webp",
+        "columbia_tools_tools_7ffb_01.webp",
+        "columbia_tools_tools_8ffb_01.webp"
+      ]
+    },
+    {
+      "sku": "10FFB",
+      "row_type": "variation",
+      "parent": "COL-FLAT-FINISHER-BOX",
+      "name": "Columbia Flat Finisher Box - 10\"",
+      "missing_basenames": [
+        "columbia_tools_tools_10ffb_01.webp"
+      ]
+    },
+    {
+      "sku": "12FFB",
+      "row_type": "variation",
+      "parent": "COL-FLAT-FINISHER-BOX",
+      "name": "Columbia Flat Finisher Box - 12\"",
+      "missing_basenames": [
+        "columbia_tools_tools_12ffb_01.webp"
+      ]
+    },
+    {
+      "sku": "14FFB",
+      "row_type": "variation",
+      "parent": "COL-FLAT-FINISHER-BOX",
+      "name": "Columbia Flat Finisher Box - 14\"",
+      "missing_basenames": [
+        "columbia_tools_tools_14ffb_01.webp"
+      ]
+    },
+    {
+      "sku": "5.5FFB",
+      "row_type": "variation",
+      "parent": "COL-FLAT-FINISHER-BOX",
+      "name": "Columbia Flat Finisher Box - 5.5\"",
+      "missing_basenames": [
+        "columbia_tools_tools_55ffb_01.webp"
+      ]
+    },
+    {
+      "sku": "7FFB",
+      "row_type": "variation",
+      "parent": "COL-FLAT-FINISHER-BOX",
+      "name": "Columbia Flat Finisher Box - 7\"",
+      "missing_basenames": [
+        "columbia_tools_tools_7ffb_01.webp"
+      ]
+    },
+    {
+      "sku": "8FFB",
+      "row_type": "variation",
+      "parent": "COL-FLAT-FINISHER-BOX",
+      "name": "Columbia Flat Finisher Box - 8\"",
+      "missing_basenames": [
+        "columbia_tools_tools_8ffb_01.webp"
+      ]
+    },
+    {
+      "sku": "COL-GOOSENECK",
+      "row_type": "variable",
+      "parent": "",
+      "name": "Columbia Gooseneck",
+      "missing_basenames": [
+        "columbia_tools_tools_tbgn_01.webp"
+      ]
+    },
+    {
+      "sku": "TBGN",
+      "row_type": "variation",
+      "parent": "COL-GOOSENECK",
+      "name": "Columbia Gooseneck - Tall Boy",
+      "missing_basenames": [
+        "columbia_tools_tools_tbgn_01.webp"
+      ]
+    },
+    {
+      "sku": "COL-HOT-MUD-PUMP",
+      "row_type": "variable",
+      "parent": "",
+      "name": "Columbia Hot Mud Pump",
+      "missing_basenames": [
+        "columbia_tools_tools_hmp_01.webp"
+      ]
+    },
+    {
+      "sku": "HMP-C",
+      "row_type": "variation",
+      "parent": "COL-HOT-MUD-PUMP",
+      "name": "Columbia Hot Mud Pump - CDN",
+      "missing_basenames": [
+        "columbia_tools_tools_hmp_01.webp"
+      ]
+    },
+    {
+      "sku": "COL-MATRIX-FLAT-BOX-HANDLE",
+      "row_type": "variable",
+      "parent": "",
+      "name": "Columbia Matrix Flat Box Handle",
+      "missing_basenames": [
+        "columbia_tools_tools_mh_01.webp",
+        "columbia_tools_tools_mh_02.webp",
+        "columbia_tools_tools_mh_03.webp",
+        "columbia_tools_tools_mh_04.webp",
+        "columbia_tools_tools_mhl_01.webp",
+        "columbia_tools_tools_mhl_02.webp",
+        "columbia_tools_tools_mhl_03.webp",
+        "columbia_tools_tools_mhl_04.webp",
+        "columbia_tools_tools_mhs_01.webp",
+        "columbia_tools_tools_mhs_02.webp",
+        "columbia_tools_tools_mhs_03.webp",
+        "columbia_tools_tools_mhs_04.webp"
+      ]
+    },
+    {
+      "sku": "MHS",
+      "row_type": "variation",
+      "parent": "COL-MATRIX-FLAT-BOX-HANDLE",
+      "name": "Columbia Matrix Flat Box Handle - 29\"-39\"",
+      "missing_basenames": [
+        "columbia_tools_tools_mhs_01.webp",
+        "columbia_tools_tools_mhs_02.webp",
+        "columbia_tools_tools_mhs_03.webp",
+        "columbia_tools_tools_mhs_04.webp"
+      ]
+    },
+    {
+      "sku": "MH",
+      "row_type": "variation",
+      "parent": "COL-MATRIX-FLAT-BOX-HANDLE",
+      "name": "Columbia Matrix Flat Box Handle - 40\"-60\"",
+      "missing_basenames": [
+        "columbia_tools_tools_mh_01.webp",
+        "columbia_tools_tools_mh_02.webp",
+        "columbia_tools_tools_mh_03.webp",
+        "columbia_tools_tools_mh_04.webp"
+      ]
+    },
+    {
+      "sku": "MHL",
+      "row_type": "variation",
+      "parent": "COL-MATRIX-FLAT-BOX-HANDLE",
+      "name": "Columbia Matrix Flat Box Handle - 56\"-76\"",
+      "missing_basenames": [
+        "columbia_tools_tools_mhl_01.webp",
+        "columbia_tools_tools_mhl_02.webp",
+        "columbia_tools_tools_mhl_03.webp",
+        "columbia_tools_tools_mhl_04.webp"
+      ]
+    },
+    {
+      "sku": "COL-MUD-ROLLER-REPLACEMENT",
+      "row_type": "variable",
+      "parent": "",
+      "name": "Columbia Mud Roller Replacement",
+      "missing_basenames": [
+        "columbia_tools_tools_fmr3x18mm_01.webp",
+        "columbia_tools_tools_fmr9x18mm_01.webp"
+      ]
+    },
+    {
+      "sku": "FMR9X18MM",
+      "row_type": "variation",
+      "parent": "COL-MUD-ROLLER-REPLACEMENT",
+      "name": "Columbia Mud Roller Replacement - 220 mm / 9\"",
+      "missing_basenames": [
+        "columbia_tools_tools_fmr9x18mm_01.webp"
+      ]
+    },
+    {
+      "sku": "FMR3X18MM",
+      "row_type": "variation",
+      "parent": "COL-MUD-ROLLER-REPLACEMENT",
+      "name": "Columbia Mud Roller Replacement - 80 mm / 3\"",
+      "missing_basenames": [
+        "columbia_tools_tools_fmr3x18mm_01.webp"
+      ]
+    },
+    {
+      "sku": "COL-ONE-HANDLE",
+      "row_type": "variable",
+      "parent": "",
+      "name": "Columbia One Handle",
+      "missing_basenames": [
+        "columbia_tools_tools_chxl_01.webp"
+      ]
+    },
+    {
+      "sku": "CHXL",
+      "row_type": "variation",
+      "parent": "COL-ONE-HANDLE",
+      "name": "Columbia One Handle - Long Extendible 4'-8'",
+      "missing_basenames": [
+        "columbia_tools_tools_chxl_01.webp"
+      ]
+    },
+    {
+      "sku": "PDDM",
+      "row_type": "simple",
+      "parent": "",
+      "name": "Columbia Phantom DDM Sander",
+      "missing_basenames": [
+        "columbia_tools_tools_pddm_01.webp",
+        "columbia_tools_tools_pddm_02.webp"
+      ]
+    },
+    {
+      "sku": "COL-PREDATOR-MATRIX-HANDLE",
+      "row_type": "variable",
+      "parent": "",
+      "name": "Columbia Predator Matrix Handle",
+      "missing_basenames": [
+        "columbia_tools_tools_pmhs_01.webp",
+        "columbia_tools_tools_pmhs_02.webp",
+        "columbia_tools_tools_pmhs_03.webp",
+        "columbia_tools_tools_pmhs_04.webp",
+        "columbia_tools_tools_pmhs_05.webp"
+      ]
+    },
+    {
+      "sku": "PMHS",
+      "row_type": "variation",
+      "parent": "COL-PREDATOR-MATRIX-HANDLE",
+      "name": "Columbia Predator Matrix Handle - Short 29\"-39\"",
+      "missing_basenames": [
+        "columbia_tools_tools_pmhs_01.webp",
+        "columbia_tools_tools_pmhs_02.webp",
+        "columbia_tools_tools_pmhs_03.webp",
+        "columbia_tools_tools_pmhs_04.webp",
+        "columbia_tools_tools_pmhs_05.webp"
+      ]
+    },
+    {
+      "sku": "COL-PREDATOR-ONE-HANDLE",
+      "row_type": "variable",
+      "parent": "",
+      "name": "Columbia Predator One Handle",
+      "missing_basenames": [
+        "columbia_tools_tools_pc1hext_01.webp",
+        "columbia_tools_tools_pchxl_01.webp"
+      ]
+    },
+    {
+      "sku": "PC1HEXT",
+      "row_type": "variation",
+      "parent": "COL-PREDATOR-ONE-HANDLE",
+      "name": "Columbia Predator One Handle - Extendable 3'-5'",
+      "missing_basenames": [
+        "columbia_tools_tools_pc1hext_01.webp"
+      ]
+    },
+    {
+      "sku": "PCHXL",
+      "row_type": "variation",
+      "parent": "COL-PREDATOR-ONE-HANDLE",
+      "name": "Columbia Predator One Handle - Long Extendable 4'-8'",
+      "missing_basenames": [
+        "columbia_tools_tools_pchxl_01.webp"
+      ]
+    },
+    {
+      "sku": "COL-STANDARD-FLUSHER",
+      "row_type": "variable",
+      "parent": "",
+      "name": "Columbia Standard Flusher",
+      "missing_basenames": [
+        "columbia_tools_tools_25sf_01.webp",
+        "columbia_tools_tools_25sf_02.webp",
+        "columbia_tools_tools_35sf_01.webp",
+        "columbia_tools_tools_35sf_02.webp",
+        "columbia_tools_tools_3sf_01.webp",
+        "columbia_tools_tools_3sf_02.webp",
+        "columbia_tools_tools_3wtsf_01.webp",
+        "columbia_tools_tools_3wtsf_02.webp",
+        "columbia_tools_tools_4sf_01.webp",
+        "columbia_tools_tools_4sf_02.webp"
+      ]
+    },
+    {
+      "sku": "2.5SF",
+      "row_type": "variation",
+      "parent": "COL-STANDARD-FLUSHER",
+      "name": "Columbia Standard Flusher - 2.5\"",
+      "missing_basenames": [
+        "columbia_tools_tools_25sf_01.webp",
+        "columbia_tools_tools_25sf_02.webp"
+      ]
+    },
+    {
+      "sku": "3SF",
+      "row_type": "variation",
+      "parent": "COL-STANDARD-FLUSHER",
+      "name": "Columbia Standard Flusher - 3\"",
+      "missing_basenames": [
+        "columbia_tools_tools_3sf_01.webp",
+        "columbia_tools_tools_3sf_02.webp"
+      ]
+    },
+    {
+      "sku": "3WTSF",
+      "row_type": "variation",
+      "parent": "COL-STANDARD-FLUSHER",
+      "name": "Columbia Standard Flusher - 3\" Widetrack",
+      "missing_basenames": [
+        "columbia_tools_tools_3wtsf_01.webp",
+        "columbia_tools_tools_3wtsf_02.webp"
+      ]
+    },
+    {
+      "sku": "3.5SF",
+      "row_type": "variation",
+      "parent": "COL-STANDARD-FLUSHER",
+      "name": "Columbia Standard Flusher - 3.5\"",
+      "missing_basenames": [
+        "columbia_tools_tools_35sf_01.webp",
+        "columbia_tools_tools_35sf_02.webp"
+      ]
+    },
+    {
+      "sku": "4SF",
+      "row_type": "variation",
+      "parent": "COL-STANDARD-FLUSHER",
+      "name": "Columbia Standard Flusher - 4\"",
+      "missing_basenames": [
+        "columbia_tools_tools_4sf_01.webp",
+        "columbia_tools_tools_4sf_02.webp"
+      ]
+    },
+    {
+      "sku": "COL-TOMAHAWK-SMOOTHING-BLADE",
+      "row_type": "variable",
+      "parent": "",
+      "name": "Columbia Tomahawk Smoothing Blade",
+      "missing_basenames": [
+        "columbia_tools_tools_tsb10_01.webp",
+        "columbia_tools_tools_tsb10_02.webp",
+        "columbia_tools_tools_tsb12_01.webp",
+        "columbia_tools_tools_tsb12_02.webp",
+        "columbia_tools_tools_tsb14_01.webp",
+        "columbia_tools_tools_tsb14_02.webp",
+        "columbia_tools_tools_tsb18_01.webp",
+        "columbia_tools_tools_tsb18_02.webp",
+        "columbia_tools_tools_tsb24_01.webp",
+        "columbia_tools_tools_tsb24_02.webp",
+        "columbia_tools_tools_tsb32_01.webp",
+        "columbia_tools_tools_tsb32_02.webp",
+        "columbia_tools_tools_tsb40_01.webp",
+        "columbia_tools_tools_tsb40_02.webp",
+        "columbia_tools_tools_tsb48_01.webp",
+        "columbia_tools_tools_tsb48_02.webp",
+        "columbia_tools_tools_tsb7_01.webp",
+        "columbia_tools_tools_tsb7_02.webp"
+      ]
+    },
+    {
+      "sku": "TSB-10",
+      "row_type": "variation",
+      "parent": "COL-TOMAHAWK-SMOOTHING-BLADE",
+      "name": "Columbia Tomahawk Smoothing Blade - 10\"",
+      "missing_basenames": [
+        "columbia_tools_tools_tsb10_01.webp",
+        "columbia_tools_tools_tsb10_02.webp"
+      ]
+    },
+    {
+      "sku": "TSB-12",
+      "row_type": "variation",
+      "parent": "COL-TOMAHAWK-SMOOTHING-BLADE",
+      "name": "Columbia Tomahawk Smoothing Blade - 12\"",
+      "missing_basenames": [
+        "columbia_tools_tools_tsb12_01.webp",
+        "columbia_tools_tools_tsb12_02.webp"
+      ]
+    },
+    {
+      "sku": "TSB-14",
+      "row_type": "variation",
+      "parent": "COL-TOMAHAWK-SMOOTHING-BLADE",
+      "name": "Columbia Tomahawk Smoothing Blade - 14\"",
+      "missing_basenames": [
+        "columbia_tools_tools_tsb14_01.webp",
+        "columbia_tools_tools_tsb14_02.webp"
+      ]
+    },
+    {
+      "sku": "TSB-18",
+      "row_type": "variation",
+      "parent": "COL-TOMAHAWK-SMOOTHING-BLADE",
+      "name": "Columbia Tomahawk Smoothing Blade - 18\"",
+      "missing_basenames": [
+        "columbia_tools_tools_tsb18_01.webp",
+        "columbia_tools_tools_tsb18_02.webp"
+      ]
+    },
+    {
+      "sku": "TSB-24",
+      "row_type": "variation",
+      "parent": "COL-TOMAHAWK-SMOOTHING-BLADE",
+      "name": "Columbia Tomahawk Smoothing Blade - 24\"",
+      "missing_basenames": [
+        "columbia_tools_tools_tsb24_01.webp",
+        "columbia_tools_tools_tsb24_02.webp"
+      ]
+    },
+    {
+      "sku": "TSB-32",
+      "row_type": "variation",
+      "parent": "COL-TOMAHAWK-SMOOTHING-BLADE",
+      "name": "Columbia Tomahawk Smoothing Blade - 32\"",
+      "missing_basenames": [
+        "columbia_tools_tools_tsb32_01.webp",
+        "columbia_tools_tools_tsb32_02.webp"
+      ]
+    },
+    {
+      "sku": "TSB-40",
+      "row_type": "variation",
+      "parent": "COL-TOMAHAWK-SMOOTHING-BLADE",
+      "name": "Columbia Tomahawk Smoothing Blade - 40\"",
+      "missing_basenames": [
+        "columbia_tools_tools_tsb40_01.webp",
+        "columbia_tools_tools_tsb40_02.webp"
+      ]
+    },
+    {
+      "sku": "TSB-48",
+      "row_type": "variation",
+      "parent": "COL-TOMAHAWK-SMOOTHING-BLADE",
+      "name": "Columbia Tomahawk Smoothing Blade - 48\"",
+      "missing_basenames": [
+        "columbia_tools_tools_tsb48_01.webp",
+        "columbia_tools_tools_tsb48_02.webp"
+      ]
+    },
+    {
+      "sku": "TSB-7",
+      "row_type": "variation",
+      "parent": "COL-TOMAHAWK-SMOOTHING-BLADE",
+      "name": "Columbia Tomahawk Smoothing Blade - 7\"",
+      "missing_basenames": [
+        "columbia_tools_tools_tsb7_01.webp",
+        "columbia_tools_tools_tsb7_02.webp"
+      ]
+    },
+    {
+      "sku": "COL-TOOL-CASE",
+      "row_type": "variable",
+      "parent": "",
+      "name": "Columbia Tool Case",
+      "missing_basenames": [
+        "columbia_tools_tools_rc_01.webp",
+        "columbia_tools_tools_rc_02.webp",
+        "columbia_tools_tools_rc_03.webp",
+        "columbia_tools_tools_tcs_01.webp",
+        "columbia_tools_tools_tcs_02.webp"
+      ]
+    },
+    {
+      "sku": "TCS",
+      "row_type": "variation",
+      "parent": "COL-TOOL-CASE",
+      "name": "Columbia Tool Case - Gun Case",
+      "missing_basenames": [
+        "columbia_tools_tools_tcs_01.webp",
+        "columbia_tools_tools_tcs_02.webp"
+      ]
+    },
+    {
+      "sku": "RC",
+      "row_type": "variation",
+      "parent": "COL-TOOL-CASE",
+      "name": "Columbia Tool Case - Road Case",
+      "missing_basenames": [
+        "columbia_tools_tools_rc_01.webp",
+        "columbia_tools_tools_rc_02.webp",
+        "columbia_tools_tools_rc_03.webp"
+      ]
+    },
+    {
+      "sku": "TL-3-8",
+      "row_type": "simple",
+      "parent": "",
+      "name": "Columbia Twist Lock Handle w PHA",
+      "missing_basenames": [
+        "columbia_tools_tools_tl38_01.webp",
+        "columbia_tools_tools_tl38_02.webp"
+      ]
+    },
+    {
+      "sku": "COL-UHMW-MUD-APPLICATOR",
+      "row_type": "variable",
+      "parent": "",
+      "name": "Columbia UHMW Mud Applicator",
+      "missing_basenames": [
+        "columbia_tools_tools_fmh_01.webp"
+      ]
+    },
+    {
+      "sku": "OA90-325",
+      "row_type": "variation",
+      "parent": "COL-UHMW-MUD-APPLICATOR",
+      "name": "Columbia UHMW Mud Applicator - Outside 90\u00b0 325",
+      "missing_basenames": [
+        "columbia_tools_tools_fmh_01.webp"
+      ]
+    },
+    {
+      "sku": "DS-DURA-III",
+      "row_type": "variable",
+      "parent": "",
+      "name": "Dura-Stilts Dura-III Adjustable",
+      "missing_basenames": [
+        "dura_stilts_d_iii_01.webp",
+        "dura_stilts_d_iii_02.webp",
+        "dura_stilts_d_iii_03.webp"
+      ]
+    },
+    {
+      "sku": "D14-22",
+      "row_type": "variation",
+      "parent": "DS-DURA-III",
+      "name": "Dura-Stilts Dura-III Adjustable 14\u201d-22\u201d",
+      "missing_basenames": [
+        "dura_stilts_d_iii_01.webp",
+        "dura_stilts_d_iii_02.webp",
+        "dura_stilts_d_iii_03.webp"
+      ]
+    },
+    {
+      "sku": "D18-30",
+      "row_type": "variation",
+      "parent": "DS-DURA-III",
+      "name": "Dura-Stilts Dura-III Adjustable 18\u201d-30\u201d",
+      "missing_basenames": [
+        "dura_stilts_d_iii_01.webp",
+        "dura_stilts_d_iii_02.webp",
+        "dura_stilts_d_iii_03.webp"
+      ]
+    },
+    {
+      "sku": "D24-40",
+      "row_type": "variation",
+      "parent": "DS-DURA-III",
+      "name": "Dura-Stilts Dura-III Adjustable 24\u201d-40\u201d",
+      "missing_basenames": [
+        "dura_stilts_d_iii_01.webp",
+        "dura_stilts_d_iii_02.webp",
+        "dura_stilts_d_iii_03.webp"
+      ]
+    },
+    {
+      "sku": "D38-64",
+      "row_type": "variation",
+      "parent": "DS-DURA-III",
+      "name": "Dura-Stilts Dura-III Adjustable 38\u201d-64\u201d",
+      "missing_basenames": [
+        "dura_stilts_d_iii_01.webp",
+        "dura_stilts_d_iii_02.webp",
+        "dura_stilts_d_iii_03.webp"
+      ]
+    },
+    {
+      "sku": "4-768",
+      "row_type": "variation",
+      "parent": "LV5-FLAT-BOX-MEGA",
+      "name": "LEVEL5 10\u201d Flat Box (MEGA)",
+      "missing_basenames": [
+        "level5_4_768_01.webp",
+        "level5_4_768_02.webp",
+        "level5_4_768_03.webp"
+      ]
+    },
+    {
+      "sku": "4-765",
+      "row_type": "variation",
+      "parent": "LV5-FLAT-BOX-STANDARD",
+      "name": "LEVEL5 10\u201d Flat Box (Standard)",
+      "missing_basenames": [
+        "level5_4_765_01.webp"
+      ]
+    },
+    {
+      "sku": "4-629",
+      "row_type": "simple",
+      "parent": "",
+      "name": "LEVEL5 10\u201d/12\u201d Mega Boxes w/ Ext. Handle Set",
+      "missing_basenames": [
+        "level5_4_629_01.webp",
+        "level5_4_768_01.webp",
+        "level5_4_769_01.webp",
+        "level5_4_771_01.webp",
+        "level5_4_780_01.webp"
+      ]
+    },
+    {
+      "sku": "4-605",
+      "row_type": "simple",
+      "parent": "",
+      "name": "LEVEL5 10\u201d/12\u201d Standard Boxes w/ Ext. Handle Set",
+      "missing_basenames": [
+        "level5_4_605_01.webp",
+        "level5_4_765_01.webp",
+        "level5_4_766_01.webp",
+        "level5_4_771_01.webp",
+        "level5_4_780_01.webp"
+      ]
+    },
+    {
+      "sku": "4-769",
+      "row_type": "variation",
+      "parent": "LV5-FLAT-BOX-MEGA",
+      "name": "LEVEL5 12\u201d Flat Box (MEGA)",
+      "missing_basenames": [
+        "level5_4_769_01.webp",
+        "level5_4_769_02.webp",
+        "level5_4_769_03.webp"
+      ]
+    },
+    {
+      "sku": "4-766",
+      "row_type": "variation",
+      "parent": "LV5-FLAT-BOX-STANDARD",
+      "name": "LEVEL5 12\u201d Flat Box (Standard)",
+      "missing_basenames": [
+        "level5_4_766_01.webp"
+      ]
+    },
+    {
+      "sku": "4-770",
+      "row_type": "variation",
+      "parent": "LV5-FLAT-BOX-STANDARD",
+      "name": "LEVEL5 14\u201d Flat Box (Standard)",
+      "missing_basenames": [
+        "level5_4_770_01.webp",
+        "level5_4_770_02.webp",
+        "level5_4_770_03.webp"
+      ]
+    },
+    {
+      "sku": "4-732",
+      "row_type": "variation",
+      "parent": "LV5-CORNER-FINISHER",
+      "name": "LEVEL5 2.5\u201d Corner Finisher",
+      "missing_basenames": [
+        "level5_4_732_01.webp",
+        "level5_4_732_02.webp",
+        "level5_4_732_03.webp"
+      ]
+    },
+    {
+      "sku": "4-782",
+      "row_type": "variation",
+      "parent": "LV5-FLAT-BOX-HANDLE-EXT",
+      "name": "LEVEL5 23\u201d - 32\u201d Ext. Handle",
+      "missing_basenames": [
+        "level5_4_782_01.webp"
+      ]
+    },
+    {
+      "sku": "4-754",
+      "row_type": "variation",
+      "parent": "LV5-NAIL-SPOTTER",
+      "name": "LEVEL5 2\u201d Nail Spotter",
+      "missing_basenames": [
+        "level5_4_754_01.webp",
+        "level5_4_754_02.webp",
+        "level5_4_754_03.webp"
+      ]
+    },
+    {
+      "sku": "4-734",
+      "row_type": "variation",
+      "parent": "LV5-CORNER-FINISHER",
+      "name": "LEVEL5 3.5\u201d Corner Finisher",
+      "missing_basenames": [
+        "level5_4_734_01.webp",
+        "level5_4_734_02.webp",
+        "level5_4_734_03.webp"
+      ]
+    },
+    {
+      "sku": "4-781",
+      "row_type": "variation",
+      "parent": "LV5-FLAT-BOX-HANDLE-EXT",
+      "name": "LEVEL5 30\u201d - 42\u201d Ext. Handle",
+      "missing_basenames": [
+        "level5_4_781_01.webp"
+      ]
+    },
+    {
+      "sku": "4-792",
+      "row_type": "simple",
+      "parent": "",
+      "name": "LEVEL5 31\"- 50\" Corner Roller/Nail Spotter Handle",
+      "missing_basenames": [
+        "level5_4_792_01.webp"
+      ]
+    },
+    {
+      "sku": "4-794",
+      "row_type": "variation",
+      "parent": "LV5-CORNER-HANDLE-APPLICATOR-EXT",
+      "name": "LEVEL5 31\u201d- 50\u201d Ext Handle (Corner Applicator)",
+      "missing_basenames": [
+        "level5_4_794_01.webp"
+      ]
+    },
+    {
+      "sku": "4-795",
+      "row_type": "variation",
+      "parent": "LV5-CORNER-HANDLE-FINISHER-EXT",
+      "name": "LEVEL5 31\u201d- 50\u201d Ext Handle (Corner Finisher)",
+      "missing_basenames": [
+        "level5_4_795_01.webp"
+      ]
+    },
+    {
+      "sku": "4-711",
+      "row_type": "variation",
+      "parent": "LV5-FLAT-BOX-HANDLE-FIXED",
+      "name": "LEVEL5 34\u201d Fixed Length Handle",
+      "missing_basenames": [
+        "level5_4_711_01.webp"
+      ]
+    },
+    {
+      "sku": "4-733",
+      "row_type": "variation",
+      "parent": "LV5-CORNER-FINISHER",
+      "name": "LEVEL5 3\u201d Corner Finisher",
+      "missing_basenames": [
+        "level5_4_733_01.webp",
+        "level5_4_733_02.webp",
+        "level5_4_733_03.webp"
+      ]
+    },
+    {
+      "sku": "4-755",
+      "row_type": "variation",
+      "parent": "LV5-NAIL-SPOTTER",
+      "name": "LEVEL5 3\u201d Nail Spotter",
+      "missing_basenames": [
+        "level5_4_755_01.webp",
+        "level5_4_755_03.webp"
+      ]
+    },
+    {
+      "sku": "4-780",
+      "row_type": "variation",
+      "parent": "LV5-FLAT-BOX-HANDLE-EXT",
+      "name": "LEVEL5 40\u201d - 62\u201d Ext. Handle",
+      "missing_basenames": [
+        "level5_4_780_01.webp"
+      ]
+    },
+    {
+      "sku": "4-712",
+      "row_type": "variation",
+      "parent": "LV5-FLAT-BOX-HANDLE-FIXED",
+      "name": "LEVEL5 42\u201d Fixed Length Handle",
+      "missing_basenames": [
+        "level5_4_712_01.webp"
+      ]
+    },
+    {
+      "sku": "4-798",
+      "row_type": "variation",
+      "parent": "LV5-CORNER-HANDLE-APPLICATOR-EXT",
+      "name": "LEVEL5 43\u201d- 72\u201d Ext Handle (Corner Applicator)",
+      "missing_basenames": [
+        "level5_4_798_01.webp"
+      ]
+    },
+    {
+      "sku": "4-799",
+      "row_type": "variation",
+      "parent": "LV5-CORNER-HANDLE-FINISHER-EXT",
+      "name": "LEVEL5 43\u201d- 72\u201d Ext Handle (Corner Finisher)",
+      "missing_basenames": [
+        "level5_4_799_01.webp"
+      ]
+    },
+    {
+      "sku": "4-759",
+      "row_type": "variation",
+      "parent": "LV5-FLAT-BOX-HANDLE-EXT",
+      "name": "LEVEL5 48\u201d - 78\u201d Ext. Handle",
+      "missing_basenames": [
+        "level5_4_759_01.webp"
+      ]
+    },
+    {
+      "sku": "4-735",
+      "row_type": "variation",
+      "parent": "LV5-CORNER-FINISHER",
+      "name": "LEVEL5 4\u201d Corner Finisher",
+      "missing_basenames": [
+        "level5_4_735_01.webp",
+        "level5_4_735_02.webp",
+        "level5_4_735_03.webp"
+      ]
+    },
+    {
+      "sku": "4-778",
+      "row_type": "simple",
+      "parent": "",
+      "name": "LEVEL5 50\u201d Fixed Handle (Corner Applicator)",
+      "missing_basenames": [
+        "level5_4_778_01.webp"
+      ]
+    },
+    {
+      "sku": "4-779",
+      "row_type": "simple",
+      "parent": "",
+      "name": "LEVEL5 50\u201d Fixed Handle (Corner Finisher)",
+      "missing_basenames": [
+        "level5_4_779_01.webp"
+      ]
+    },
+    {
+      "sku": "4-777",
+      "row_type": "simple",
+      "parent": "",
+      "name": "LEVEL5 54\" Corner Roller Handle",
+      "missing_basenames": [
+        "level5_4_777_01.webp"
+      ]
+    },
+    {
+      "sku": "4-740",
+      "row_type": "variation",
+      "parent": "LV5-FLAT-BOX-HANDLE-FIXED",
+      "name": "LEVEL5 54\u201d Fixed Length Handle",
+      "missing_basenames": [
+        "level5_4_740_01.webp"
+      ]
+    },
+    {
+      "sku": "4-701",
+      "row_type": "variation",
+      "parent": "LV5-CORNER-APPLICATOR",
+      "name": "LEVEL5 7\u201d Corner Applicator",
+      "missing_basenames": [
+        "level5_4_701_01.webp",
+        "level5_4_701_02.webp",
+        "level5_4_701_03.webp"
+      ]
+    },
+    {
+      "sku": "4-767",
+      "row_type": "variation",
+      "parent": "LV5-FLAT-BOX-MEGA",
+      "name": "LEVEL5 7\u201d Flat Box (MEGA)",
+      "missing_basenames": [
+        "level5_4_767_01.webp",
+        "level5_4_767_02.webp",
+        "level5_4_767_03.webp"
+      ]
+    },
+    {
+      "sku": "4-764",
+      "row_type": "variation",
+      "parent": "LV5-FLAT-BOX-STANDARD",
+      "name": "LEVEL5 7\u201d Flat Box (Standard)",
+      "missing_basenames": [
+        "level5_4_764_01.webp",
+        "level5_4_764_02.webp",
+        "level5_4_764_03.webp"
+      ]
+    },
+    {
+      "sku": "4-702",
+      "row_type": "variation",
+      "parent": "LV5-CORNER-APPLICATOR",
+      "name": "LEVEL5 8\u201d Corner Applicator",
+      "missing_basenames": [
+        "level5_4_702_01.webp",
+        "level5_4_702_02.webp",
+        "level5_4_702_03.webp"
+      ]
+    },
+    {
+      "sku": "4-760",
+      "row_type": "simple",
+      "parent": "",
+      "name": "LEVEL5 Automatic Taper",
+      "missing_basenames": [
+        "level5_4_760_01.webp",
+        "level5_4_760_02.webp",
+        "level5_4_760_03.webp",
+        "level5_4_760_04.webp",
+        "level5_4_760_05.webp",
+        "level5_4_760_06.webp",
+        "level5_4_760_07.webp",
+        "level5_4_760_08.webp",
+        "level5_4_760_09.webp"
+      ]
+    },
+    {
+      "sku": "5-623",
+      "row_type": "simple",
+      "parent": "",
+      "name": "LEVEL5 Bonus Hand Tool Set",
+      "missing_basenames": [
+        "level5_5_623_01.webp"
+      ]
+    },
+    {
+      "sku": "4-715",
+      "row_type": "simple",
+      "parent": "",
+      "name": "LEVEL5 Box Filler",
+      "missing_basenames": [
+        "level5_4_715_01.webp"
+      ]
+    },
+    {
+      "sku": "4-771",
+      "row_type": "simple",
+      "parent": "",
+      "name": "LEVEL5 Compound Pump",
+      "missing_basenames": [
+        "level5_4_771_01.webp",
+        "level5_4_771_02.webp",
+        "level5_4_771_03.webp",
+        "level5_4_771_04.webp"
+      ]
+    },
+    {
+      "sku": "LV5-CORNER-APPLICATOR",
+      "row_type": "variable",
+      "parent": "",
+      "name": "LEVEL5 Corner Applicator",
+      "missing_basenames": [
+        "level5_4_701_01.webp",
+        "level5_4_701_02.webp",
+        "level5_4_701_03.webp",
+        "level5_4_702_01.webp",
+        "level5_4_702_02.webp",
+        "level5_4_702_03.webp"
+      ]
+    },
+    {
+      "sku": "LV5-CORNER-HANDLE-APPLICATOR-EXT",
+      "row_type": "variable",
+      "parent": "",
+      "name": "LEVEL5 Corner Applicator Handle (Extendable)",
+      "missing_basenames": [
+        "level5_4_794_01.webp",
+        "level5_4_798_01.webp"
+      ]
+    },
+    {
+      "sku": "LV5-CORNER-FINISHER",
+      "row_type": "variable",
+      "parent": "",
+      "name": "LEVEL5 Corner Finisher",
+      "missing_basenames": [
+        "level5_4_732_01.webp",
+        "level5_4_732_02.webp",
+        "level5_4_732_03.webp",
+        "level5_4_733_01.webp",
+        "level5_4_733_02.webp",
+        "level5_4_733_03.webp",
+        "level5_4_734_01.webp",
+        "level5_4_734_02.webp",
+        "level5_4_734_03.webp",
+        "level5_4_735_01.webp",
+        "level5_4_735_02.webp",
+        "level5_4_735_03.webp"
+      ]
+    },
+    {
+      "sku": "LV5-CORNER-HANDLE-FINISHER-EXT",
+      "row_type": "variable",
+      "parent": "",
+      "name": "LEVEL5 Corner Finisher Handle (Extendable)",
+      "missing_basenames": [
+        "level5_4_795_01.webp",
+        "level5_4_799_01.webp"
+      ]
+    },
+    {
+      "sku": "4-707",
+      "row_type": "simple",
+      "parent": "",
+      "name": "LEVEL5 Corner Roller",
+      "missing_basenames": [
+        "level5_4_707_01.webp"
+      ]
+    },
+    {
+      "sku": "4-687P",
+      "row_type": "simple",
+      "parent": "",
+      "name": "LEVEL5 Finishing Set w/ Ext. Handles & MiniShot",
+      "missing_basenames": [
+        "level5_4_687p_4_707_02.webp",
+        "level5_4_707_01.webp",
+        "level5_4_733_01.webp",
+        "level5_4_734_01.webp",
+        "level5_4_768_01.webp",
+        "level5_4_769_01.webp",
+        "level5_4_771_01.webp",
+        "level5_4_780_01.webp",
+        "level5_4_792_01.webp",
+        "level5_4_795_01.webp",
+        "level5_5_623_01.webp"
+      ]
+    },
+    {
+      "sku": "LV5-FLAT-BOX-MEGA",
+      "row_type": "variable",
+      "parent": "",
+      "name": "LEVEL5 Flat Box (MEGA)",
+      "missing_basenames": [
+        "level5_4_767_01.webp",
+        "level5_4_767_02.webp",
+        "level5_4_767_03.webp",
+        "level5_4_768_01.webp",
+        "level5_4_768_02.webp",
+        "level5_4_768_03.webp",
+        "level5_4_769_01.webp",
+        "level5_4_769_02.webp",
+        "level5_4_769_03.webp"
+      ]
+    },
+    {
+      "sku": "LV5-FLAT-BOX-STANDARD",
+      "row_type": "variable",
+      "parent": "",
+      "name": "LEVEL5 Flat Box (Standard)",
+      "missing_basenames": [
+        "level5_4_764_01.webp",
+        "level5_4_764_02.webp",
+        "level5_4_764_03.webp",
+        "level5_4_765_01.webp",
+        "level5_4_766_01.webp",
+        "level5_4_770_01.webp",
+        "level5_4_770_02.webp",
+        "level5_4_770_03.webp"
+      ]
+    },
+    {
+      "sku": "LV5-FLAT-BOX-HANDLE-EXT",
+      "row_type": "variable",
+      "parent": "",
+      "name": "LEVEL5 Flat Box Handle (Extendable)",
+      "missing_basenames": [
+        "level5_4_759_01.webp",
+        "level5_4_780_01.webp",
+        "level5_4_781_01.webp",
+        "level5_4_782_01.webp"
+      ]
+    },
+    {
+      "sku": "LV5-FLAT-BOX-HANDLE-FIXED",
+      "row_type": "variable",
+      "parent": "",
+      "name": "LEVEL5 Flat Box Handle (Fixed Length)",
+      "missing_basenames": [
+        "level5_4_711_01.webp",
+        "level5_4_712_01.webp",
+        "level5_4_740_01.webp"
+      ]
+    },
+    {
+      "sku": "4-714",
+      "row_type": "simple",
+      "parent": "",
+      "name": "LEVEL5 Gooseneck",
+      "missing_basenames": [
+        "level5_4_714_01.webp",
+        "level5_4_714_02.webp"
+      ]
+    },
+    {
+      "sku": "LV5-NAIL-SPOTTER",
+      "row_type": "variable",
+      "parent": "",
+      "name": "LEVEL5 Nail Spotter",
+      "missing_basenames": [
+        "level5_4_754_01.webp",
+        "level5_4_754_02.webp",
+        "level5_4_754_03.webp",
+        "level5_4_755_01.webp",
+        "level5_4_755_03.webp"
+      ]
+    },
+    {
+      "sku": "4-862",
+      "row_type": "simple",
+      "parent": "",
+      "name": "LEVEL5 Outsider Wheel Kit",
+      "missing_basenames": [
+        "level5_4_862_01.webp"
+      ]
+    },
+    {
+      "sku": "4-650",
+      "row_type": "simple",
+      "parent": "",
+      "name": "LEVEL5 Semi-Automatic Starter Set",
+      "missing_basenames": [
+        "level5_4_712_01.webp"
+      ]
+    },
+    {
+      "sku": "4-600P",
+      "row_type": "simple",
+      "parent": "",
+      "name": "LEVEL5 The Entry to Automatic Finishing Set",
+      "missing_basenames": [
+        "level5_4_600p_4_707_02.webp",
+        "level5_4_701_01.webp",
+        "level5_4_707_01.webp",
+        "level5_4_712_01.webp",
+        "level5_4_714_01.webp",
+        "level5_4_733_01.webp",
+        "level5_4_760_01.webp",
+        "level5_4_765_01.webp",
+        "level5_4_766_01.webp",
+        "level5_4_771_01.webp",
+        "level5_4_778_01.webp",
+        "level5_4_779_01.webp",
+        "level5_5_623_01.webp"
+      ]
+    },
+    {
+      "sku": "4-602",
+      "row_type": "simple",
+      "parent": "",
+      "name": "LEVEL5 The Entry to Automatic Finishing Set",
+      "missing_basenames": [
+        "level5_4_602_01.webp",
+        "level5_4_701_01.webp",
+        "level5_4_707_01.webp",
+        "level5_4_712_01.webp",
+        "level5_4_733_01.webp",
+        "level5_4_765_01.webp",
+        "level5_4_766_01.webp",
+        "level5_4_771_01.webp",
+        "level5_4_777_01.webp",
+        "level5_4_778_01.webp",
+        "level5_4_779_01.webp"
+      ]
+    },
+    {
+      "sku": "4-661P",
+      "row_type": "simple",
+      "parent": "",
+      "name": "LEVEL5 The Full Taping Set w/ Ext. Handles & MiniShot",
+      "missing_basenames": [
+        "level5_4_661p_4_707_02.webp",
+        "level5_4_707_01.webp",
+        "level5_4_714_01.webp",
+        "level5_4_733_01.webp",
+        "level5_4_760_01.webp",
+        "level5_4_765_01.webp",
+        "level5_4_766_01.webp",
+        "level5_4_771_01.webp",
+        "level5_4_780_01.webp",
+        "level5_4_792_01.webp",
+        "level5_4_795_01.webp",
+        "level5_5_623_01.webp"
+      ]
+    },
+    {
+      "sku": "4-630",
+      "row_type": "simple",
+      "parent": "",
+      "name": "LEVEL5 The Starter Taping Set",
+      "missing_basenames": [
+        "level5_4_630_4_707_02.webp",
+        "level5_4_707_01.webp",
+        "level5_4_714_01.webp",
+        "level5_4_760_01.webp",
+        "level5_4_771_01.webp",
+        "level5_4_777_01.webp"
+      ]
+    },
+    {
+      "sku": "4-677P",
+      "row_type": "simple",
+      "parent": "",
+      "name": "LEVEL5 The Ultimate Taping & Finishing Set",
+      "missing_basenames": [
+        "level5_4_677p_4_707_02.webp",
+        "level5_4_707_01.webp",
+        "level5_4_712_01.webp",
+        "level5_4_714_01.webp",
+        "level5_4_733_01.webp",
+        "level5_4_734_01.webp",
+        "level5_4_755_01.webp",
+        "level5_4_760_01.webp",
+        "level5_4_764_01.webp",
+        "level5_4_765_01.webp",
+        "level5_4_766_01.webp",
+        "level5_4_771_01.webp",
+        "level5_4_792_01.webp",
+        "level5_4_795_01.webp",
+        "level5_4_862_01.webp",
+        "level5_5_623_01.webp"
+      ]
+    },
+    {
+      "sku": "SP-S1-A",
+      "row_type": "variable",
+      "parent": "",
+      "name": "SurPro S1 Aluminum Stilts",
+      "missing_basenames": [
+        "surpro_s1_a_1624_01.webp",
+        "surpro_s1_a_2030_01.webp",
+        "surpro_s1_a_2640_01.webp"
+      ]
+    },
+    {
+      "sku": "S1-A-1624",
+      "row_type": "variation",
+      "parent": "SP-S1-A",
+      "name": "SurPro S1 Aluminum Stilts - 16\u201d-24\u201d",
+      "missing_basenames": [
+        "surpro_s1_a_1624_01.webp"
+      ]
+    },
+    {
+      "sku": "S1-A-2030",
+      "row_type": "variation",
+      "parent": "SP-S1-A",
+      "name": "SurPro S1 Aluminum Stilts - 20\u201d-30\u201d",
+      "missing_basenames": [
+        "surpro_s1_a_2030_01.webp"
+      ]
+    },
+    {
+      "sku": "S1-A-2640",
+      "row_type": "variation",
+      "parent": "SP-S1-A",
+      "name": "SurPro S1 Aluminum Stilts - 26\u201d-40\u201d",
+      "missing_basenames": [
+        "surpro_s1_a_2640_01.webp"
+      ]
+    },
+    {
+      "sku": "SP-S1-M",
+      "row_type": "variable",
+      "parent": "",
+      "name": "SurPro S1 Magnesium Stilts",
+      "missing_basenames": [
+        "surpro_s1_m_1624_01.webp",
+        "surpro_s1_m_2030_01.webp",
+        "surpro_s1_m_2640_01.webp"
+      ]
+    },
+    {
+      "sku": "S1-M-1624",
+      "row_type": "variation",
+      "parent": "SP-S1-M",
+      "name": "SurPro S1 Magnesium Stilts - 16\u201d-24\u201d",
+      "missing_basenames": [
+        "surpro_s1_m_1624_01.webp"
+      ]
+    },
+    {
+      "sku": "S1-M-2030",
+      "row_type": "variation",
+      "parent": "SP-S1-M",
+      "name": "SurPro S1 Magnesium Stilts - 20\u201d-30\u201d",
+      "missing_basenames": [
+        "surpro_s1_m_2030_01.webp"
+      ]
+    },
+    {
+      "sku": "S1-M-2640",
+      "row_type": "variation",
+      "parent": "SP-S1-M",
+      "name": "SurPro S1 Magnesium Stilts - 26\u201d-40\u201d",
+      "missing_basenames": [
+        "surpro_s1_m_2640_01.webp"
+      ]
+    },
+    {
+      "sku": "SP-S1X-A",
+      "row_type": "variable",
+      "parent": "",
+      "name": "SurPro S1X Aluminum Stilts",
+      "missing_basenames": [
+        "surpro_s1x_a_2131_01.webp",
+        "surpro_s1x_a_2640_01.webp"
+      ]
+    },
+    {
+      "sku": "S1X-A-2131",
+      "row_type": "variation",
+      "parent": "SP-S1X-A",
+      "name": "SurPro S1X Aluminum Stilts - 21\u201d-31\u201d",
+      "missing_basenames": [
+        "surpro_s1x_a_2131_01.webp"
+      ]
+    },
+    {
+      "sku": "S1X-A-2640",
+      "row_type": "variation",
+      "parent": "SP-S1X-A",
+      "name": "SurPro S1X Aluminum Stilts - 26\u201d-40\u201d",
+      "missing_basenames": [
+        "surpro_s1x_a_2640_01.webp"
+      ]
+    },
+    {
+      "sku": "SP-S1X-M",
+      "row_type": "variable",
+      "parent": "",
+      "name": "SurPro S1X Magnesium Stilts",
+      "missing_basenames": [
+        "surpro_s1x_m_2131_01.webp",
+        "surpro_s1x_m_2640_01.webp"
+      ]
+    },
+    {
+      "sku": "S1X-M-2131",
+      "row_type": "variation",
+      "parent": "SP-S1X-M",
+      "name": "SurPro S1X Magnesium Stilts - 21\u201d-31\u201d",
+      "missing_basenames": [
+        "surpro_s1x_m_2131_01.webp"
+      ]
+    },
+    {
+      "sku": "S1X-M-2640",
+      "row_type": "variation",
+      "parent": "SP-S1X-M",
+      "name": "SurPro S1X Magnesium Stilts - 26\u201d-40\u201d",
+      "missing_basenames": [
+        "surpro_s1x_m_2640_01.webp"
+      ]
+    },
+    {
+      "sku": "SP-S2-A",
+      "row_type": "variable",
+      "parent": "",
+      "name": "SurPro S2 Aluminum Stilts",
+      "missing_basenames": [
+        "surpro_s2_a_1624_01.webp",
+        "surpro_s2_a_2030_01.webp",
+        "surpro_s2_a_2640_01.webp"
+      ]
+    },
+    {
+      "sku": "S2-A-1624",
+      "row_type": "variation",
+      "parent": "SP-S2-A",
+      "name": "SurPro S2 Aluminum Stilts - 16\u201d-24\u201d",
+      "missing_basenames": [
+        "surpro_s2_a_1624_01.webp"
+      ]
+    },
+    {
+      "sku": "S2-A-2030",
+      "row_type": "variation",
+      "parent": "SP-S2-A",
+      "name": "SurPro S2 Aluminum Stilts - 20\u201d-30\u201d",
+      "missing_basenames": [
+        "surpro_s2_a_2030_01.webp"
+      ]
+    },
+    {
+      "sku": "S2-A-2640",
+      "row_type": "variation",
+      "parent": "SP-S2-A",
+      "name": "SurPro S2 Aluminum Stilts - 26\u201d-40\u201d",
+      "missing_basenames": [
+        "surpro_s2_a_2640_01.webp"
+      ]
+    },
+    {
+      "sku": "SP-S2-M",
+      "row_type": "variable",
+      "parent": "",
+      "name": "SurPro S2 Magnesium Stilts",
+      "missing_basenames": [
+        "surpro_s2_m_1624_01.webp",
+        "surpro_s2_m_2030_01.webp",
+        "surpro_s2_m_2640_01.webp"
+      ]
+    },
+    {
+      "sku": "S2-M-1624",
+      "row_type": "variation",
+      "parent": "SP-S2-M",
+      "name": "SurPro S2 Magnesium Stilts - 16\u201d-24\u201d",
+      "missing_basenames": [
+        "surpro_s2_m_1624_01.webp"
+      ]
+    },
+    {
+      "sku": "S2-M-2030",
+      "row_type": "variation",
+      "parent": "SP-S2-M",
+      "name": "SurPro S2 Magnesium Stilts - 20\u201d-30\u201d",
+      "missing_basenames": [
+        "surpro_s2_m_2030_01.webp"
+      ]
+    },
+    {
+      "sku": "S2-M-2640",
+      "row_type": "variation",
+      "parent": "SP-S2-M",
+      "name": "SurPro S2 Magnesium Stilts - 26\u201d-40\u201d",
+      "missing_basenames": [
+        "surpro_s2_m_2640_01.webp"
+      ]
+    },
+    {
+      "sku": "SP-S2X-A",
+      "row_type": "variable",
+      "parent": "",
+      "name": "SurPro S2X Aluminum Stilts",
+      "missing_basenames": [
+        "surpro_s2x_a_2131_01.webp",
+        "surpro_s2x_a_2640_01.webp"
+      ]
+    },
+    {
+      "sku": "S2X-A-2131",
+      "row_type": "variation",
+      "parent": "SP-S2X-A",
+      "name": "SurPro S2X Aluminum Stilts - 21\u201d-31\u201d",
+      "missing_basenames": [
+        "surpro_s2x_a_2131_01.webp"
+      ]
+    },
+    {
+      "sku": "S2X-A-2640",
+      "row_type": "variation",
+      "parent": "SP-S2X-A",
+      "name": "SurPro S2X Aluminum Stilts - 26\u201d-40\u201d",
+      "missing_basenames": [
+        "surpro_s2x_a_2640_01.webp"
+      ]
+    },
+    {
+      "sku": "SP-S2X-M",
+      "row_type": "variable",
+      "parent": "",
+      "name": "SurPro S2X Magnesium Stilts",
+      "missing_basenames": [
+        "surpro_s2x_m_2131_01.webp",
+        "surpro_s2x_m_2640_01.webp"
+      ]
+    },
+    {
+      "sku": "S2X-M-2131",
+      "row_type": "variation",
+      "parent": "SP-S2X-M",
+      "name": "SurPro S2X Magnesium Stilts - 21\u201d-31\u201d",
+      "missing_basenames": [
+        "surpro_s2x_m_2131_01.webp"
+      ]
+    },
+    {
+      "sku": "S2X-M-2640",
+      "row_type": "variation",
+      "parent": "SP-S2X-M",
+      "name": "SurPro S2X Magnesium Stilts - 26\u201d-40\u201d",
+      "missing_basenames": [
+        "surpro_s2x_m_2640_01.webp"
+      ]
+    },
+    {
+      "sku": "TT-BASIC-JUMBO-SET",
+      "row_type": "variable",
+      "parent": "",
+      "name": "TapeTech Basic Jumbo Set",
+      "missing_basenames": [
+        "tapetech_8034tt_01.webp"
+      ]
+    },
+    {
+      "sku": "TTJUMBO10/12",
+      "row_type": "variation",
+      "parent": "TT-BASIC-JUMBO-SET",
+      "name": "TapeTech Basic Jumbo Set - 10 in. & 12 in. Boxes",
+      "missing_basenames": [
+        "tapetech_8034tt_01.webp"
+      ]
+    },
+    {
+      "sku": "TTJUMBO7/10",
+      "row_type": "variation",
+      "parent": "TT-BASIC-JUMBO-SET",
+      "name": "TapeTech Basic Jumbo Set - 7 in. & 10 in. Boxes",
+      "missing_basenames": [
+        "tapetech_8034tt_01.webp"
+      ]
+    },
+    {
+      "sku": "TT-FLAT-BOX-HANDLE",
+      "row_type": "variable",
+      "parent": "",
+      "name": "TapeTech Flat Box Handle",
+      "missing_basenames": [
+        "tapetech_8034tt_01.webp"
+      ]
+    },
+    {
+      "sku": "8034TT",
+      "row_type": "variation",
+      "parent": "TT-FLAT-BOX-HANDLE",
+      "name": "TapeTech Flat Box Handle - 34\"",
+      "missing_basenames": [
+        "tapetech_8034tt_01.webp"
+      ]
+    }
+  ],
+  "empty_rows": [
+    {
+      "sku": "ICATW",
+      "row_type": "variation",
+      "parent": "COL-BILLET-MUD-APPLICATOR",
+      "name": "Columbia Billet Mud Applicator - Two-Way Internal Corner - 4 Wheels"
+    },
+    {
+      "sku": "5.5FBB",
+      "row_type": "variation",
+      "parent": "COL-FAT-BOY-FLAT-BOX",
+      "name": "Columbia Fat Boy Flat Box - 5.5\""
+    },
+    {
+      "sku": "4-722",
+      "row_type": "variation",
+      "parent": "LV5-FLAT-BOX-SEMI",
+      "name": "LEVEL5 10\u201d Flat Box"
+    },
+    {
+      "sku": "4-723",
+      "row_type": "variation",
+      "parent": "LV5-FLAT-BOX-SEMI",
+      "name": "LEVEL5 12\u201d Flat Box"
+    },
+    {
+      "sku": "4-744",
+      "row_type": "variation",
+      "parent": "LV5-CORNER-FLUSHER",
+      "name": "LEVEL5 3.5\u201d Corner Flusher"
+    },
+    {
+      "sku": "4-743",
+      "row_type": "variation",
+      "parent": "LV5-CORNER-FLUSHER",
+      "name": "LEVEL5 3\u201d Corner Flusher"
+    },
+    {
+      "sku": "5-777",
+      "row_type": "simple",
+      "parent": "",
+      "name": "LEVEL5 50\" Corner Roller Handle"
+    },
+    {
+      "sku": "4-741",
+      "row_type": "simple",
+      "parent": "",
+      "name": "LEVEL5 Compound Tube"
+    },
+    {
+      "sku": "LV5-CORNER-FLUSHER",
+      "row_type": "variable",
+      "parent": "",
+      "name": "LEVEL5 Corner Flusher"
+    },
+    {
+      "sku": "4-708",
+      "row_type": "simple",
+      "parent": "",
+      "name": "LEVEL5 Corner Roller"
+    },
+    {
+      "sku": "4-775",
+      "row_type": "simple",
+      "parent": "",
+      "name": "LEVEL5 Corner Roller/Nail Spotter Handle"
+    },
+    {
+      "sku": "5-311",
+      "row_type": "simple",
+      "parent": "",
+      "name": "LEVEL5 Drywall Banjo"
+    },
+    {
+      "sku": "LV5-FLAT-BOX-SEMI",
+      "row_type": "variable",
+      "parent": "",
+      "name": "LEVEL5 Flat Box (Semi-Automatic Line)"
+    },
+    {
+      "sku": "4-772",
+      "row_type": "simple",
+      "parent": "",
+      "name": "LEVEL5 MiniShot"
+    },
+    {
+      "sku": "4-773",
+      "row_type": "simple",
+      "parent": "",
+      "name": "LEVEL5 MiniShot Ext. Handle"
+    },
+    {
+      "sku": "4-746",
+      "row_type": "simple",
+      "parent": "",
+      "name": "LEVEL5 Outside Corner Tool"
+    },
+    {
+      "sku": "TT-CARBON-FIBER-BOX-HANDLE",
+      "row_type": "variable",
+      "parent": "",
+      "name": "TapeTech Carbon Fiber Box Handle"
+    },
+    {
+      "sku": "FBH2642TT-CF",
+      "row_type": "variation",
+      "parent": "TT-CARBON-FIBER-BOX-HANDLE",
+      "name": "TapeTech Carbon Fiber Box Handle - 26\"-42\""
+    },
+    {
+      "sku": "FBH4272TT-CF",
+      "row_type": "variation",
+      "parent": "TT-CARBON-FIBER-BOX-HANDLE",
+      "name": "TapeTech Carbon Fiber Box Handle - 42\"-72\""
+    },
+    {
+      "sku": "14TT",
+      "row_type": "simple",
+      "parent": "",
+      "name": "TapeTech MudRunner\u00ae"
+    }
+  ],
+  "missing_basenames": [
+    {
+      "basename": "level5_4_771_01.webp",
+      "count": 9
+    },
+    {
+      "basename": "level5_4_707_01.webp",
+      "count": 7
+    },
+    {
+      "basename": "level5_4_733_01.webp",
+      "count": 7
+    },
+    {
+      "basename": "level5_4_765_01.webp",
+      "count": 7
+    },
+    {
+      "basename": "level5_4_766_01.webp",
+      "count": 7
+    },
+    {
+      "basename": "level5_4_712_01.webp",
+      "count": 6
+    },
+    {
+      "basename": "level5_4_780_01.webp",
+      "count": 6
+    },
+    {
+      "basename": "dura_stilts_d_iii_01.webp",
+      "count": 5
+    },
+    {
+      "basename": "dura_stilts_d_iii_02.webp",
+      "count": 5
+    },
+    {
+      "basename": "dura_stilts_d_iii_03.webp",
+      "count": 5
+    },
+    {
+      "basename": "level5_4_714_01.webp",
+      "count": 5
+    },
+    {
+      "basename": "level5_4_760_01.webp",
+      "count": 5
+    },
+    {
+      "basename": "level5_4_795_01.webp",
+      "count": 5
+    },
+    {
+      "basename": "level5_5_623_01.webp",
+      "count": 5
+    },
+    {
+      "basename": "tapetech_8034tt_01.webp",
+      "count": 5
+    },
+    {
+      "basename": "level5_4_701_01.webp",
+      "count": 4
+    },
+    {
+      "basename": "level5_4_734_01.webp",
+      "count": 4
+    },
+    {
+      "basename": "level5_4_768_01.webp",
+      "count": 4
+    },
+    {
+      "basename": "level5_4_769_01.webp",
+      "count": 4
+    },
+    {
+      "basename": "level5_4_792_01.webp",
+      "count": 4
+    },
+    {
+      "basename": "level5_4_755_01.webp",
+      "count": 3
+    },
+    {
+      "basename": "level5_4_764_01.webp",
+      "count": 3
+    },
+    {
+      "basename": "level5_4_777_01.webp",
+      "count": 3
+    },
+    {
+      "basename": "level5_4_778_01.webp",
+      "count": 3
+    },
+    {
+      "basename": "level5_4_779_01.webp",
+      "count": 3
+    },
+    {
+      "basename": "columbia_tools_tools_10ffb_01.webp",
+      "count": 2
+    },
+    {
+      "basename": "columbia_tools_tools_12fbb_01.webp",
+      "count": 2
+    },
+    {
+      "basename": "columbia_tools_tools_12ffb_01.webp",
+      "count": 2
+    },
+    {
+      "basename": "columbia_tools_tools_14ffb_01.webp",
+      "count": 2
+    },
+    {
+      "basename": "columbia_tools_tools_25ah_01.webp",
+      "count": 2
+    },
+    {
+      "basename": "columbia_tools_tools_25ah_02.webp",
+      "count": 2
+    },
+    {
+      "basename": "columbia_tools_tools_25ah_03.webp",
+      "count": 2
+    },
+    {
+      "basename": "columbia_tools_tools_25ah_04.webp",
+      "count": 2
+    },
+    {
+      "basename": "columbia_tools_tools_25sf_01.webp",
+      "count": 2
+    },
+    {
+      "basename": "columbia_tools_tools_25sf_02.webp",
+      "count": 2
+    },
+    {
+      "basename": "columbia_tools_tools_2_5csf_01.webp",
+      "count": 2
+    },
+    {
+      "basename": "columbia_tools_tools_2_5df_01.webp",
+      "count": 2
+    },
+    {
+      "basename": "columbia_tools_tools_35ah_01.webp",
+      "count": 2
+    },
+    {
+      "basename": "columbia_tools_tools_35ah_02.webp",
+      "count": 2
+    },
+    {
+      "basename": "columbia_tools_tools_35ah_03.webp",
+      "count": 2
+    },
+    {
+      "basename": "columbia_tools_tools_35ah_04.webp",
+      "count": 2
+    },
+    {
+      "basename": "columbia_tools_tools_35sf_01.webp",
+      "count": 2
+    },
+    {
+      "basename": "columbia_tools_tools_35sf_02.webp",
+      "count": 2
+    },
+    {
+      "basename": "columbia_tools_tools_3_5csf_01.webp",
+      "count": 2
+    },
+    {
+      "basename": "columbia_tools_tools_3_5df_01.webp",
+      "count": 2
+    },
+    {
+      "basename": "columbia_tools_tools_3csf_01.webp",
+      "count": 2
+    },
+    {
+      "basename": "columbia_tools_tools_3df_01.webp",
+      "count": 2
+    },
+    {
+      "basename": "columbia_tools_tools_3sf_01.webp",
+      "count": 2
+    },
+    {
+      "basename": "columbia_tools_tools_3sf_02.webp",
+      "count": 2
+    },
+    {
+      "basename": "columbia_tools_tools_3wtsf_01.webp",
+      "count": 2
+    },
+    {
+      "basename": "columbia_tools_tools_3wtsf_02.webp",
+      "count": 2
+    },
+    {
+      "basename": "columbia_tools_tools_4df_01.webp",
+      "count": 2
+    },
+    {
+      "basename": "columbia_tools_tools_4sf_01.webp",
+      "count": 2
+    },
+    {
+      "basename": "columbia_tools_tools_4sf_02.webp",
+      "count": 2
+    },
+    {
+      "basename": "columbia_tools_tools_55ffb_01.webp",
+      "count": 2
+    },
+    {
+      "basename": "columbia_tools_tools_7ffb_01.webp",
+      "count": 2
+    },
+    {
+      "basename": "columbia_tools_tools_8ffb_01.webp",
+      "count": 2
+    },
+    {
+      "basename": "columbia_tools_tools_chxl_01.webp",
+      "count": 2
+    },
+    {
+      "basename": "columbia_tools_tools_fmh_01.webp",
+      "count": 2
+    },
+    {
+      "basename": "columbia_tools_tools_fmr3x18mm_01.webp",
+      "count": 2
+    },
+    {
+      "basename": "columbia_tools_tools_fmr9x18mm_01.webp",
+      "count": 2
+    },
+    {
+      "basename": "columbia_tools_tools_hmp_01.webp",
+      "count": 2
+    },
+    {
+      "basename": "columbia_tools_tools_ica21_01.webp",
+      "count": 2
+    },
+    {
+      "basename": "columbia_tools_tools_ica21_02.webp",
+      "count": 2
+    },
+    {
+      "basename": "columbia_tools_tools_ica41_01.webp",
+      "count": 2
+    },
+    {
+      "basename": "columbia_tools_tools_ica41_02.webp",
+      "count": 2
+    },
+    {
+      "basename": "columbia_tools_tools_mh_01.webp",
+      "count": 2
+    },
+    {
+      "basename": "columbia_tools_tools_mh_02.webp",
+      "count": 2
+    },
+    {
+      "basename": "columbia_tools_tools_mh_03.webp",
+      "count": 2
+    },
+    {
+      "basename": "columbia_tools_tools_mh_04.webp",
+      "count": 2
+    },
+    {
+      "basename": "columbia_tools_tools_mhl_01.webp",
+      "count": 2
+    },
+    {
+      "basename": "columbia_tools_tools_mhl_02.webp",
+      "count": 2
+    },
+    {
+      "basename": "columbia_tools_tools_mhl_03.webp",
+      "count": 2
+    },
+    {
+      "basename": "columbia_tools_tools_mhl_04.webp",
+      "count": 2
+    },
+    {
+      "basename": "columbia_tools_tools_mhs_01.webp",
+      "count": 2
+    },
+    {
+      "basename": "columbia_tools_tools_mhs_02.webp",
+      "count": 2
+    },
+    {
+      "basename": "columbia_tools_tools_mhs_03.webp",
+      "count": 2
+    },
+    {
+      "basename": "columbia_tools_tools_mhs_04.webp",
+      "count": 2
+    },
+    {
+      "basename": "columbia_tools_tools_pc1hext_01.webp",
+      "count": 2
+    },
+    {
+      "basename": "columbia_tools_tools_pchxl_01.webp",
+      "count": 2
+    },
+    {
+      "basename": "columbia_tools_tools_pmhs_01.webp",
+      "count": 2
+    },
+    {
+      "basename": "columbia_tools_tools_pmhs_02.webp",
+      "count": 2
+    },
+    {
+      "basename": "columbia_tools_tools_pmhs_03.webp",
+      "count": 2
+    },
+    {
+      "basename": "columbia_tools_tools_pmhs_04.webp",
+      "count": 2
+    },
+    {
+      "basename": "columbia_tools_tools_pmhs_05.webp",
+      "count": 2
+    },
+    {
+      "basename": "columbia_tools_tools_rc_01.webp",
+      "count": 2
+    },
+    {
+      "basename": "columbia_tools_tools_rc_02.webp",
+      "count": 2
+    },
+    {
+      "basename": "columbia_tools_tools_rc_03.webp",
+      "count": 2
+    },
+    {
+      "basename": "columbia_tools_tools_tbbf_01.webp",
+      "count": 2
+    },
+    {
+      "basename": "columbia_tools_tools_tbgn_01.webp",
+      "count": 2
+    },
+    {
+      "basename": "columbia_tools_tools_tcs_01.webp",
+      "count": 2
+    },
+    {
+      "basename": "columbia_tools_tools_tcs_02.webp",
+      "count": 2
+    },
+    {
+      "basename": "columbia_tools_tools_tsb10_01.webp",
+      "count": 2
+    },
+    {
+      "basename": "columbia_tools_tools_tsb10_02.webp",
+      "count": 2
+    },
+    {
+      "basename": "columbia_tools_tools_tsb12_01.webp",
+      "count": 2
+    },
+    {
+      "basename": "columbia_tools_tools_tsb12_02.webp",
+      "count": 2
+    },
+    {
+      "basename": "columbia_tools_tools_tsb14_01.webp",
+      "count": 2
+    },
+    {
+      "basename": "columbia_tools_tools_tsb14_02.webp",
+      "count": 2
+    },
+    {
+      "basename": "columbia_tools_tools_tsb18_01.webp",
+      "count": 2
+    },
+    {
+      "basename": "columbia_tools_tools_tsb18_02.webp",
+      "count": 2
+    },
+    {
+      "basename": "columbia_tools_tools_tsb24_01.webp",
+      "count": 2
+    },
+    {
+      "basename": "columbia_tools_tools_tsb24_02.webp",
+      "count": 2
+    },
+    {
+      "basename": "columbia_tools_tools_tsb32_01.webp",
+      "count": 2
+    },
+    {
+      "basename": "columbia_tools_tools_tsb32_02.webp",
+      "count": 2
+    },
+    {
+      "basename": "columbia_tools_tools_tsb40_01.webp",
+      "count": 2
+    },
+    {
+      "basename": "columbia_tools_tools_tsb40_02.webp",
+      "count": 2
+    },
+    {
+      "basename": "columbia_tools_tools_tsb48_01.webp",
+      "count": 2
+    },
+    {
+      "basename": "columbia_tools_tools_tsb48_02.webp",
+      "count": 2
+    },
+    {
+      "basename": "columbia_tools_tools_tsb7_01.webp",
+      "count": 2
+    },
+    {
+      "basename": "columbia_tools_tools_tsb7_02.webp",
+      "count": 2
+    },
+    {
+      "basename": "level5_4_701_02.webp",
+      "count": 2
+    },
+    {
+      "basename": "level5_4_701_03.webp",
+      "count": 2
+    },
+    {
+      "basename": "level5_4_702_01.webp",
+      "count": 2
+    },
+    {
+      "basename": "level5_4_702_02.webp",
+      "count": 2
+    },
+    {
+      "basename": "level5_4_702_03.webp",
+      "count": 2
+    },
+    {
+      "basename": "level5_4_711_01.webp",
+      "count": 2
+    },
+    {
+      "basename": "level5_4_732_01.webp",
+      "count": 2
+    },
+    {
+      "basename": "level5_4_732_02.webp",
+      "count": 2
+    },
+    {
+      "basename": "level5_4_732_03.webp",
+      "count": 2
+    },
+    {
+      "basename": "level5_4_733_02.webp",
+      "count": 2
+    },
+    {
+      "basename": "level5_4_733_03.webp",
+      "count": 2
+    },
+    {
+      "basename": "level5_4_734_02.webp",
+      "count": 2
+    },
+    {
+      "basename": "level5_4_734_03.webp",
+      "count": 2
+    },
+    {
+      "basename": "level5_4_735_01.webp",
+      "count": 2
+    },
+    {
+      "basename": "level5_4_735_02.webp",
+      "count": 2
+    },
+    {
+      "basename": "level5_4_735_03.webp",
+      "count": 2
+    },
+    {
+      "basename": "level5_4_740_01.webp",
+      "count": 2
+    },
+    {
+      "basename": "level5_4_754_01.webp",
+      "count": 2
+    },
+    {
+      "basename": "level5_4_754_02.webp",
+      "count": 2
+    },
+    {
+      "basename": "level5_4_754_03.webp",
+      "count": 2
+    },
+    {
+      "basename": "level5_4_755_03.webp",
+      "count": 2
+    },
+    {
+      "basename": "level5_4_759_01.webp",
+      "count": 2
+    },
+    {
+      "basename": "level5_4_764_02.webp",
+      "count": 2
+    },
+    {
+      "basename": "level5_4_764_03.webp",
+      "count": 2
+    },
+    {
+      "basename": "level5_4_767_01.webp",
+      "count": 2
+    },
+    {
+      "basename": "level5_4_767_02.webp",
+      "count": 2
+    },
+    {
+      "basename": "level5_4_767_03.webp",
+      "count": 2
+    },
+    {
+      "basename": "level5_4_768_02.webp",
+      "count": 2
+    },
+    {
+      "basename": "level5_4_768_03.webp",
+      "count": 2
+    },
+    {
+      "basename": "level5_4_769_02.webp",
+      "count": 2
+    },
+    {
+      "basename": "level5_4_769_03.webp",
+      "count": 2
+    },
+    {
+      "basename": "level5_4_770_01.webp",
+      "count": 2
+    },
+    {
+      "basename": "level5_4_770_02.webp",
+      "count": 2
+    },
+    {
+      "basename": "level5_4_770_03.webp",
+      "count": 2
+    },
+    {
+      "basename": "level5_4_781_01.webp",
+      "count": 2
+    },
+    {
+      "basename": "level5_4_782_01.webp",
+      "count": 2
+    },
+    {
+      "basename": "level5_4_794_01.webp",
+      "count": 2
+    },
+    {
+      "basename": "level5_4_798_01.webp",
+      "count": 2
+    },
+    {
+      "basename": "level5_4_799_01.webp",
+      "count": 2
+    },
+    {
+      "basename": "level5_4_862_01.webp",
+      "count": 2
+    },
+    {
+      "basename": "surpro_s1_a_1624_01.webp",
+      "count": 2
+    },
+    {
+      "basename": "surpro_s1_a_2030_01.webp",
+      "count": 2
+    },
+    {
+      "basename": "surpro_s1_a_2640_01.webp",
+      "count": 2
+    },
+    {
+      "basename": "surpro_s1_m_1624_01.webp",
+      "count": 2
+    },
+    {
+      "basename": "surpro_s1_m_2030_01.webp",
+      "count": 2
+    },
+    {
+      "basename": "surpro_s1_m_2640_01.webp",
+      "count": 2
+    },
+    {
+      "basename": "surpro_s1x_a_2131_01.webp",
+      "count": 2
+    },
+    {
+      "basename": "surpro_s1x_a_2640_01.webp",
+      "count": 2
+    },
+    {
+      "basename": "surpro_s1x_m_2131_01.webp",
+      "count": 2
+    },
+    {
+      "basename": "surpro_s1x_m_2640_01.webp",
+      "count": 2
+    },
+    {
+      "basename": "surpro_s2_a_1624_01.webp",
+      "count": 2
+    },
+    {
+      "basename": "surpro_s2_a_2030_01.webp",
+      "count": 2
+    },
+    {
+      "basename": "surpro_s2_a_2640_01.webp",
+      "count": 2
+    },
+    {
+      "basename": "surpro_s2_m_1624_01.webp",
+      "count": 2
+    },
+    {
+      "basename": "surpro_s2_m_2030_01.webp",
+      "count": 2
+    },
+    {
+      "basename": "surpro_s2_m_2640_01.webp",
+      "count": 2
+    },
+    {
+      "basename": "surpro_s2x_a_2131_01.webp",
+      "count": 2
+    },
+    {
+      "basename": "surpro_s2x_a_2640_01.webp",
+      "count": 2
+    },
+    {
+      "basename": "surpro_s2x_m_2131_01.webp",
+      "count": 2
+    },
+    {
+      "basename": "surpro_s2x_m_2640_01.webp",
+      "count": 2
+    },
+    {
+      "basename": "columbia_tools_hh19_01.webp",
+      "count": 1
+    },
+    {
+      "basename": "columbia_tools_tools_pddm_01.webp",
+      "count": 1
+    },
+    {
+      "basename": "columbia_tools_tools_pddm_02.webp",
+      "count": 1
+    },
+    {
+      "basename": "columbia_tools_tools_tl38_01.webp",
+      "count": 1
+    },
+    {
+      "basename": "columbia_tools_tools_tl38_02.webp",
+      "count": 1
+    },
+    {
+      "basename": "level5_4_600p_4_707_02.webp",
+      "count": 1
+    },
+    {
+      "basename": "level5_4_602_01.webp",
+      "count": 1
+    },
+    {
+      "basename": "level5_4_605_01.webp",
+      "count": 1
+    },
+    {
+      "basename": "level5_4_629_01.webp",
+      "count": 1
+    },
+    {
+      "basename": "level5_4_630_4_707_02.webp",
+      "count": 1
+    },
+    {
+      "basename": "level5_4_661p_4_707_02.webp",
+      "count": 1
+    },
+    {
+      "basename": "level5_4_677p_4_707_02.webp",
+      "count": 1
+    },
+    {
+      "basename": "level5_4_687p_4_707_02.webp",
+      "count": 1
+    },
+    {
+      "basename": "level5_4_714_02.webp",
+      "count": 1
+    },
+    {
+      "basename": "level5_4_715_01.webp",
+      "count": 1
+    },
+    {
+      "basename": "level5_4_760_02.webp",
+      "count": 1
+    },
+    {
+      "basename": "level5_4_760_03.webp",
+      "count": 1
+    },
+    {
+      "basename": "level5_4_760_04.webp",
+      "count": 1
+    },
+    {
+      "basename": "level5_4_760_05.webp",
+      "count": 1
+    },
+    {
+      "basename": "level5_4_760_06.webp",
+      "count": 1
+    },
+    {
+      "basename": "level5_4_760_07.webp",
+      "count": 1
+    },
+    {
+      "basename": "level5_4_760_08.webp",
+      "count": 1
+    },
+    {
+      "basename": "level5_4_760_09.webp",
+      "count": 1
+    },
+    {
+      "basename": "level5_4_771_02.webp",
+      "count": 1
+    },
+    {
+      "basename": "level5_4_771_03.webp",
+      "count": 1
+    },
+    {
+      "basename": "level5_4_771_04.webp",
+      "count": 1
+    }
+  ]
+}
