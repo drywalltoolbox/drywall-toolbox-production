@@ -1,43 +1,63 @@
-name: Deploy Drywall Toolbox Production
+name: Controlled Deploy Drywall Toolbox Production
 
 on:
-  push:
-    branches:
-      - main
   workflow_dispatch:
+    inputs:
+      action:
+        description: "Action to run"
+        required: true
+        type: choice
+        options:
+          - deploy
+          - restore
+        default: deploy
+      confirm:
+        description: "Type DEPLOY for deploy, or RESTORE for restore"
+        required: true
+        type: string
+      backup_run_id:
+        description: "Restore only: workflow run ID that contains the backup artifact"
+        required: false
+        type: string
+      backup_artifact_name:
+        description: "Restore only: artifact name to restore (for example hostgator-backup-123456789-abc1234-20260530-104500)"
+        required: false
+        type: string
 
 concurrency:
-  group: production-deploy-${{ github.ref }}
-  cancel-in-progress: true
+  group: production-release-control-${{ github.ref }}
+  cancel-in-progress: false
 
 permissions:
   contents: read
+  actions: read
+
+env:
+  NODE_ENV: production
+  # Production domain root. Do not set /drywall-toolbox here; that path is only
+  # for GitHub Pages and causes broken asset URLs on drywalltoolbox.com.
+  PUBLIC_URL: /
+  REACT_APP_WP_BASE_URL: https://drywalltoolbox.com
+  REACT_APP_WC_BASE_URL: https://drywalltoolbox.com/wp-json/wc/v3
+  REACT_APP_WP_API_BASE: https://drywalltoolbox.com/wp-json
+  REACT_APP_WC_API_BASE: https://drywalltoolbox.com/wp-json/wc/v3
+  REACT_APP_JWT_ENDPOINT: https://drywalltoolbox.com/wp-json/simple-jwt-login/v1/auth
+  REACT_APP_JWT_AUTH_ENDPOINT: /wp-json/simple-jwt-login/v1/auth
+  REACT_APP_API_BASE_URL: https://drywalltoolbox.com
+  REACT_APP_DTB_API_BASE: /wp-json/dtb/v1
+  REACT_APP_STORE_API_BASE: /wp-json/wc/store/v1
+  REACT_APP_SITE_URL: https://drywalltoolbox.com
+  REACT_APP_APP_ENV: production
+  REACT_APP_ENV: production
+  REACT_APP_REWARDS_ENABLED: '1'
+  REACT_APP_STORE_LAUNCH_DATE: ''
 
 jobs:
-  build-and-deploy:
-    name: Build and deploy React SPA + tracked WordPress app code
+  build-and-package:
+    name: Validate and build deployment payload
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.action == 'deploy' }}
     runs-on: ubuntu-latest
     timeout-minutes: 30
-
-    env:
-      NODE_ENV: production
-      # Production domain root. Do not set /drywall-toolbox here; that path is only
-      # for GitHub Pages and causes broken asset URLs on drywalltoolbox.com.
-      PUBLIC_URL: /
-      REACT_APP_WP_BASE_URL: https://drywalltoolbox.com
-      REACT_APP_WC_BASE_URL: https://drywalltoolbox.com/wp-json/wc/v3
-      REACT_APP_WP_API_BASE: https://drywalltoolbox.com/wp-json
-      REACT_APP_WC_API_BASE: https://drywalltoolbox.com/wp-json/wc/v3
-      REACT_APP_JWT_ENDPOINT: https://drywalltoolbox.com/wp-json/simple-jwt-login/v1/auth
-      REACT_APP_JWT_AUTH_ENDPOINT: /wp-json/simple-jwt-login/v1/auth
-      REACT_APP_API_BASE_URL: https://drywalltoolbox.com
-      REACT_APP_DTB_API_BASE: /wp-json/dtb/v1
-      REACT_APP_STORE_API_BASE: /wp-json/wc/store/v1
-      REACT_APP_SITE_URL: https://drywalltoolbox.com
-      REACT_APP_APP_ENV: production
-      REACT_APP_ENV: production
-      REACT_APP_REWARDS_ENABLED: '1'
-      REACT_APP_STORE_LAUNCH_DATE: ''
 
     steps:
       - name: Checkout repository
@@ -108,6 +128,99 @@ jobs:
             exit 1
           fi
 
+      - name: Upload deployment payload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: deploy-payload-${{ github.run_id }}
+          path: deploy-root/
+          if-no-files-found: error
+          retention-days: 14
+
+  backup-remote:
+    name: Backup current production state (pre-deploy)
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.action == 'deploy' && inputs.confirm == 'DEPLOY' }}
+    needs: build-and-package
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    environment:
+      name: hostgator-production
+    outputs:
+      backup_artifact_name: ${{ steps.meta.outputs.backup_artifact_name }}
+
+    steps:
+      - name: Compute backup artifact name
+        id: meta
+        shell: bash
+        run: |
+          set -euo pipefail
+          stamp="$(date -u +%Y%m%d-%H%M%S)"
+          short_sha="${GITHUB_SHA::7}"
+          echo "backup_artifact_name=hostgator-backup-${GITHUB_RUN_ID}-${short_sha}-${stamp}" >> "$GITHUB_OUTPUT"
+
+      - name: Install lftp
+        run: sudo apt-get update && sudo apt-get install -y lftp
+
+      - name: Download remote backup snapshot
+        shell: bash
+        env:
+          FTP_HOST: ${{ secrets.HOSTGATOR_FTP_HOST }}
+          FTP_USERNAME: ${{ secrets.HOSTGATOR_FTP_USERNAME }}
+          FTP_PASSWORD: ${{ secrets.HOSTGATOR_FTP_PASSWORD }}
+          FTP_REMOTE_DIR: ${{ secrets.HOSTGATOR_FTP_REMOTE_DIR }}
+        run: |
+          set -euo pipefail
+
+          : "${FTP_HOST:?Missing HOSTGATOR_FTP_HOST secret}"
+          : "${FTP_USERNAME:?Missing HOSTGATOR_FTP_USERNAME secret}"
+          : "${FTP_PASSWORD:?Missing HOSTGATOR_FTP_PASSWORD secret}"
+
+          REMOTE_DIR="${FTP_REMOTE_DIR:-/public_html/drywalltoolbox}"
+
+          rm -rf backup-root
+          mkdir -p backup-root
+
+          lftp -u "$FTP_USERNAME","$FTP_PASSWORD" "$FTP_HOST" <<EOF
+          set ftp:ssl-force true
+          set ftp:ssl-protect-data true
+          set ssl:verify-certificate false
+          set net:max-retries 3
+          set net:timeout 30
+          set xfer:clobber true
+          mirror --verbose --parallel=4 "$REMOTE_DIR" backup-root \
+            --exclude-glob .git* \
+            --exclude-glob node_modules/** \
+            --exclude-glob wp/wp-content/uploads/** \
+            --exclude-glob wp/wp-content/cache/** \
+            --exclude-glob wp/wp-content/upgrade/**
+          bye
+          EOF
+
+      - name: Upload backup artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.meta.outputs.backup_artifact_name }}
+          path: backup-root/
+          if-no-files-found: error
+          retention-days: 30
+
+  deploy-to-hostgator:
+    name: Deploy payload to HostGator
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.action == 'deploy' && inputs.confirm == 'DEPLOY' }}
+    needs:
+      - build-and-package
+      - backup-remote
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    environment:
+      name: hostgator-production
+
+    steps:
+      - name: Download deployment payload artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: deploy-payload-${{ github.run_id }}
+          path: deploy-root
+
       - name: Install lftp
         run: sudo apt-get update && sudo apt-get install -y lftp
 
@@ -145,6 +258,14 @@ jobs:
           bye
           EOF
 
+  smoke-check:
+    name: Smoke-check production endpoints
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.action == 'deploy' && inputs.confirm == 'DEPLOY' }}
+    needs: deploy-to-hostgator
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
       - name: Smoke-check production asset endpoints
         shell: bash
         run: |
@@ -157,3 +278,112 @@ jobs:
             echo "Checking $url"
             curl -I --fail --location --max-time 20 "$url"
           done
+
+  rollback-on-failure:
+    name: Roll back automatically if smoke checks fail
+    if: ${{ always() && github.event_name == 'workflow_dispatch' && inputs.action == 'deploy' && inputs.confirm == 'DEPLOY' && needs.smoke-check.result == 'failure' }}
+    needs:
+      - backup-remote
+      - smoke-check
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    environment:
+      name: hostgator-production
+
+    steps:
+      - name: Download backup artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ needs.backup-remote.outputs.backup_artifact_name }}
+          path: backup-root
+
+      - name: Install lftp
+        run: sudo apt-get update && sudo apt-get install -y lftp
+
+      - name: Restore backup snapshot to HostGator
+        shell: bash
+        env:
+          FTP_HOST: ${{ secrets.HOSTGATOR_FTP_HOST }}
+          FTP_USERNAME: ${{ secrets.HOSTGATOR_FTP_USERNAME }}
+          FTP_PASSWORD: ${{ secrets.HOSTGATOR_FTP_PASSWORD }}
+          FTP_REMOTE_DIR: ${{ secrets.HOSTGATOR_FTP_REMOTE_DIR }}
+        run: |
+          set -euo pipefail
+
+          : "${FTP_HOST:?Missing HOSTGATOR_FTP_HOST secret}"
+          : "${FTP_USERNAME:?Missing HOSTGATOR_FTP_USERNAME secret}"
+          : "${FTP_PASSWORD:?Missing HOSTGATOR_FTP_PASSWORD secret}"
+
+          REMOTE_DIR="${FTP_REMOTE_DIR:-/public_html/drywalltoolbox}"
+
+          lftp -u "$FTP_USERNAME","$FTP_PASSWORD" "$FTP_HOST" <<EOF
+          set ftp:ssl-force true
+          set ftp:ssl-protect-data true
+          set ssl:verify-certificate false
+          set net:max-retries 3
+          set net:timeout 30
+          set xfer:clobber true
+          mirror --reverse --verbose --parallel=4 --overwrite backup-root/ "$REMOTE_DIR"
+          bye
+          EOF
+
+
+      - name: Fail workflow after rollback
+        shell: bash
+        run: |
+          echo "Smoke checks failed. Automatic rollback executed from artifact '${{ needs.backup-remote.outputs.backup_artifact_name }}'." >&2
+          exit 1
+
+  restore-from-backup:
+    name: Manually restore from backup artifact
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.action == 'restore' && inputs.confirm == 'RESTORE' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    environment:
+      name: hostgator-production
+
+    steps:
+      - name: Validate restore inputs
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "${{ inputs.backup_run_id }}"
+          test -n "${{ inputs.backup_artifact_name }}"
+
+      - name: Download selected backup artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ inputs.backup_artifact_name }}
+          run-id: ${{ inputs.backup_run_id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: backup-root
+
+      - name: Install lftp
+        run: sudo apt-get update && sudo apt-get install -y lftp
+
+      - name: Restore backup snapshot to HostGator
+        shell: bash
+        env:
+          FTP_HOST: ${{ secrets.HOSTGATOR_FTP_HOST }}
+          FTP_USERNAME: ${{ secrets.HOSTGATOR_FTP_USERNAME }}
+          FTP_PASSWORD: ${{ secrets.HOSTGATOR_FTP_PASSWORD }}
+          FTP_REMOTE_DIR: ${{ secrets.HOSTGATOR_FTP_REMOTE_DIR }}
+        run: |
+          set -euo pipefail
+
+          : "${FTP_HOST:?Missing HOSTGATOR_FTP_HOST secret}"
+          : "${FTP_USERNAME:?Missing HOSTGATOR_FTP_USERNAME secret}"
+          : "${FTP_PASSWORD:?Missing HOSTGATOR_FTP_PASSWORD secret}"
+
+          REMOTE_DIR="${FTP_REMOTE_DIR:-/public_html/drywalltoolbox}"
+
+          lftp -u "$FTP_USERNAME","$FTP_PASSWORD" "$FTP_HOST" <<EOF
+          set ftp:ssl-force true
+          set ftp:ssl-protect-data true
+          set ssl:verify-certificate false
+          set net:max-retries 3
+          set net:timeout 30
+          set xfer:clobber true
+          mirror --reverse --verbose --parallel=4 --overwrite backup-root/ "$REMOTE_DIR"
+          bye
+          EOF
