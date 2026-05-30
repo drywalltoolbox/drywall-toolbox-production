@@ -171,10 +171,27 @@ export async function addToCart( productId, qty = 1, variation = {}, extensions 
  * @returns {Promise<Object>}
  */
 export async function updateCartItem( key, qty ) {
-  return storeFetch( `/cart/items/${ encodeURIComponent( key ) }`, {
-    method: 'PUT',
-    body: JSON.stringify( { quantity: qty } ),
-  } );
+  const encodedKey = encodeURIComponent( key );
+  const normalizedQty = Math.max( 1, Math.floor( Number( qty ) || 1 ) );
+
+  let payload = null;
+
+  try {
+    payload = await storeFetch( `/cart/items/${ encodedKey }`, {
+      method: 'PUT',
+      body: JSON.stringify( { quantity: normalizedQty } ),
+    } );
+  } catch ( err ) {
+    // Compatibility fallback for environments exposing update-item only.
+    payload = await storeFetch( '/cart/update-item', {
+      method: 'POST',
+      body: JSON.stringify( { key, quantity: normalizedQty } ),
+    } );
+  }
+
+  // Some stacks return a single line item shape here; force a full cart payload.
+  if ( payload && Array.isArray( payload.items ) ) return payload;
+  return getCart();
 }
 
 /**
@@ -184,9 +201,24 @@ export async function updateCartItem( key, qty ) {
  * @returns {Promise<Object>}
  */
 export async function removeCartItem( key ) {
-  return storeFetch( `/cart/items/${ encodeURIComponent( key ) }`, {
-    method: 'DELETE',
-  } );
+  const encodedKey = encodeURIComponent( key );
+  let payload = null;
+
+  try {
+    payload = await storeFetch( `/cart/items/${ encodedKey }`, {
+      method: 'DELETE',
+    } );
+  } catch ( err ) {
+    // Compatibility fallback for environments exposing remove-item only.
+    payload = await storeFetch( '/cart/remove-item', {
+      method: 'POST',
+      body: JSON.stringify( { key } ),
+    } );
+  }
+
+  // Some stacks return 204/no body; normalize by fetching the full cart.
+  if ( payload && Array.isArray( payload.items ) ) return payload;
+  return getCart();
 }
 
 /**

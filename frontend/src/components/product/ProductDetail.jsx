@@ -120,17 +120,72 @@ function isIncludesLabel(label) {
 function stripSetIncludesFromDescription(content) {
   if (!content || typeof content !== 'string') return content;
 
-  return content
-    // Remove dedicated HTML blocks that are only a Set/Kit Includes section.
+  const cleanedHtml = content
+    // Remove heading rows like "Set Includes" / "Kit Includes" (with optional bullet + colon).
     .replace(
-      /<(?:p|li)[^>]*>\s*(?:<[^>]+>\s*)*(?:set|kit)\s+includes?\s*:?\s*[\s\S]*?<\/(?:p|li)>\s*/gi,
+      /<(?:p|div|li|strong|b|h[1-6])[^>]*>\s*(?:<[^>]+>\s*)*(?:&bull;|&#8226;|•)?\s*(?:set|kit)\s+includes?\s*:?\s*(?:<\/[^>]+>\s*)*<\/(?:p|div|li|strong|b|h[1-6])>\s*/gi,
       ''
     )
-    // Remove plain text Set/Kit Includes lines for markdown/plain descriptions.
-    .replace(/(?:^|\n)\s*(?:set|kit)\s+includes?\s*:\s*[^\n]*(?=\n|$)/gi, '\n')
-    // Remove inline trailing Set Includes tails that occasionally append to prose.
-    .replace(/\s+(?:set|kit)\s+includes?\s*:\s*[\s\S]*$/i, '')
-    .trim();
+    // Remove an immediate includes list block if present.
+    .replace(/<(?:ul|ol)[^>]*>\s*(?:<li[^>]*>[\s\S]*?<\/li>\s*)+<\/(?:ul|ol)>\s*/gi, (listBlock) => {
+      return /(?:set|kit)\s+includes?/i.test(listBlock) ? '' : listBlock;
+    });
+
+  const lines = cleanedHtml
+    .replace(/<br\s*\/?>/gi, '\n')
+    .split('\n');
+
+  const out = [];
+  let skippingIncludes = false;
+
+  const isIncludesHeader = (line) => (
+    /^(?:\s|&nbsp;|<[^>]+>|&bull;|&#8226;|•|-|\*)*(?:set|kit)\s+includes?\s*:?\s*$/i
+      .test(String(line || '').trim())
+  );
+
+  const isIncludesItem = (line) => {
+    const plain = String(line || '')
+      .replace(/<[^>]*>/g, ' ')
+      .replace(/&nbsp;/gi, ' ')
+      .replace(/[ \t]+/g, ' ')
+      .trim();
+    if (!plain) return true;
+    // Typical includes item formats: "1x ...", "07TT ...", "SKU: ...", bullets, etc.
+    return (
+      /^(?:[-*•]\s*)?(?:\d+\s*x\s+)?[A-Z0-9][A-Z0-9.\- ]{1,20}(?:\s+SKU\b|\s+[A-Za-z].*)?$/i.test(plain)
+      || /^sku\s*:/i.test(plain)
+    );
+  };
+
+  const isSectionHeader = (line) => (
+    /^(?:features?|benefits?|overview|description|specifications?|notes?)\s*:?\s*$/i
+      .test(String(line || '').replace(/<[^>]*>/g, ' ').trim())
+  );
+
+  for (const line of lines) {
+    if (!skippingIncludes && isIncludesHeader(line)) {
+      skippingIncludes = true;
+      continue;
+    }
+
+    if (skippingIncludes) {
+      if (isSectionHeader(line)) {
+        skippingIncludes = false;
+        out.push(line);
+        continue;
+      }
+
+      if (isIncludesItem(line)) {
+        continue;
+      }
+
+      skippingIncludes = false;
+    }
+
+    out.push(line);
+  }
+
+  return out.join('\n').trim();
 }
 
 function ProductDescriptionContent({ html, text }) {

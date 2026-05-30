@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg
+  width="320"
+  height="110"
+  viewBox="0 14 70 24"
+  fill="none"
+  xmlns="http://www.w3.org/2000/svg"
+>
+  <!-- Card container (matches Google Pay canvas proportions). -->
+  <rect
+    x="0.5"
+    y="14.5"
+    width="69"
+    height="23"
+    rx="3.5"
+    fill="#FFFFFF"
+    stroke="#CBD5E1"
+    stroke-width="1"
+  />
+
+  <!-- Paste/position brand artwork inside this centered group. -->
+  <g id="brand-artwork-slot" transform="translate(0 0)">
+    <!-- brand artwork goes here -->
+  </g>
+</svg>

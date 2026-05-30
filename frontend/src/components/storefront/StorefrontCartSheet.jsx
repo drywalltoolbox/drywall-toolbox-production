@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import { ShoppingCart, X, Package, Minus, Plus, ArrowRight, Trash2 } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
-export default function StorefrontCartSheet({ isOpen, onClose, cartItems = [], removeFromCart, updateQuantity, getCartTotal }) {
+export default function StorefrontCartSheet({ isOpen, onClose, cartItems = [], removeFromCart, updateQuantity, getCartTotal, isMutating = false }) {
   const overlayRef = useRef(null);
   const closeButtonRef = useRef(null);
   const previouslyFocusedRef = useRef(null);
@@ -21,15 +21,17 @@ export default function StorefrontCartSheet({ isOpen, onClose, cartItems = [], r
   }, [handleClose]);
 
   const handleRemove = useCallback(async (key) => {
+    if (isMutating) return;
     setPendingKey(key);
     try {
       await removeFromCart?.(key);
     } finally {
       setPendingKey(null);
     }
-  }, [removeFromCart]);
+  }, [isMutating, removeFromCart]);
 
   const handleQtyChange = useCallback(async (key, delta, currentQty) => {
+    if (isMutating) return;
     const baseQty = Number(currentQty);
     const next = (Number.isFinite(baseQty) ? baseQty : 0) + Number(delta || 0);
     if (next < 1) {
@@ -43,7 +45,7 @@ export default function StorefrontCartSheet({ isOpen, onClose, cartItems = [], r
     } finally {
       setPendingKey(null);
     }
-  }, [updateQuantity, handleRemove]);
+  }, [isMutating, updateQuantity, handleRemove]);
 
   useEffect(() => {
     if (isOpen) {
@@ -122,7 +124,7 @@ export default function StorefrontCartSheet({ isOpen, onClose, cartItems = [], r
             <ul className="scs-item-list" role="list">
               {cartItems.map((item) => {
                 const key = item.cartKey || item.id;
-                const isPending = pendingKey === key;
+                const isPending = isMutating || pendingKey === key;
                 const optionText = Array.isArray(item.variation_attribute_values)
                   ? item.variation_attribute_values.map((a) => a.option).filter(Boolean).join(' / ')
                   : '';
