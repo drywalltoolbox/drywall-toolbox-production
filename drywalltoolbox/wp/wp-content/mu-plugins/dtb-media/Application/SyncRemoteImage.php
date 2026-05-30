@@ -23,14 +23,10 @@ defined( 'ABSPATH' ) || exit;
 function dtb_route_sync_images( WP_REST_Request $request ): WP_REST_Response|WP_Error {
 
 	// ── Acquire sync lock ────────────────────────────────────────────────────
-	if ( get_transient( DTB_SYNC_LOCK_KEY ) ) {
-		return new WP_Error(
-			'sync_locked',
-			'A sync is already in progress. Use /release-lock if the previous run crashed.',
-			[ 'status' => 423 ]
-		);
+	$lock_token = dtb_image_sync_acquire_lock( 'sync_images' );
+	if ( is_wp_error( $lock_token ) ) {
+		return $lock_token;
 	}
-	set_transient( DTB_SYNC_LOCK_KEY, true, DTB_SYNC_LOCK_TTL );
 
 	// ── Raise execution limits (best-effort on shared hosting) ──────────────
 	if ( function_exists( 'ini_set' ) ) {
@@ -40,9 +36,9 @@ function dtb_route_sync_images( WP_REST_Request $request ): WP_REST_Response|WP_
 		set_time_limit( 300 ); // phpcs:ignore
 	}
 
+	try {
 	$relative_path = dtb_image_sync_resolve_relative_upload_path( $request );
 	if ( is_wp_error( $relative_path ) ) {
-		delete_transient( DTB_SYNC_LOCK_KEY );
 		return $relative_path;
 	}
 
@@ -53,6 +49,10 @@ function dtb_route_sync_images( WP_REST_Request $request ): WP_REST_Response|WP_
 	$dry_run = (bool) $request->get_param( 'dry_run' );
 	$force   = (bool) $request->get_param( 'force' );
 	$register_only = (bool) $request->get_param( 'register_only' );
+	$skip_subsizes_in_register_only = defined( 'DTB_IMAGE_SYNC_SKIP_SUBSIZES_IN_REGISTER_ONLY' )
+		? (bool) DTB_IMAGE_SYNC_SKIP_SUBSIZES_IN_REGISTER_ONLY
+		: true;
+	$generate_subsizes = ! ( $register_only && $skip_subsizes_in_register_only );
 	$offset  = (int) $request->get_param( 'offset' );
 	$limit   = (int) $request->get_param( 'limit' );
 
@@ -63,12 +63,10 @@ function dtb_route_sync_images( WP_REST_Request $request ): WP_REST_Response|WP_
 	$real_scan = realpath( $scan_dir );
 	$real_base = realpath( $upload_dir['basedir'] );
 	if ( ! $real_scan || ! $real_base || strncmp( $real_scan, $real_base, strlen( $real_base ) ) !== 0 ) {
-		delete_transient( DTB_SYNC_LOCK_KEY );
 		return new WP_Error( 'invalid_path', 'Resolved path is outside the uploads directory.', [ 'status' => 400 ] );
 	}
 
 	if ( ! is_dir( $scan_dir ) ) {
-		delete_transient( DTB_SYNC_LOCK_KEY );
 		return new WP_Error( 'dir_not_found', "Directory not found: wp-content/uploads/{$relative_directory}", [ 'status' => 404 ] );
 	}
 
@@ -258,7 +256,7 @@ function dtb_route_sync_images( WP_REST_Request $request ): WP_REST_Response|WP_
 			} else {
 				$existing = attachment_url_to_postid( $entry['url'] );
 				if ( ! $existing || $force ) {
-					$att = dtb_register_image_attachment( $entry['path'], $entry['url'], 0 );
+					$att = dtb_register_image_attachment( $entry['path'], $entry['url'], 0, $generate_subsizes );
 					if ( is_wp_error( $att ) ) {
 						$errors[] = $basename_lower . ': ' . $att->get_error_message();
 						dtb_image_sync_log( 'image_sync file error [' . $basename_lower . ']: ' . $att->get_error_message() );
@@ -352,7 +350,7 @@ function dtb_route_sync_images( WP_REST_Request $request ): WP_REST_Response|WP_
 					++$gallery_images;
 				}
 			} else {
-				$att = dtb_register_image_attachment( $mf['path'], $mf['url'], $product_id );
+				$att = dtb_register_image_attachment( $mf['path'], $mf['url'], $product_id, $generate_subsizes );
 				if ( is_wp_error( $att ) ) {
 					$errors[] = "[{$sku_lower}] {$mf['basename']}: " . $att->get_error_message();
 					dtb_image_sync_log( "image_sync error [{$sku_lower}] {$mf['basename']}: " . $att->get_error_message() );
@@ -392,8 +390,13 @@ function dtb_route_sync_images( WP_REST_Request $request ): WP_REST_Response|WP_
 		WC_Cache_Helper::get_transient_version( 'product', true );
 	}
 
-	delete_transient( DTB_SYNC_LOCK_KEY );
-	delete_transient( DTB_SYNC_PROGRESS_KEY );
+	// Record the completed run if not a dry run and we finished this batch.
+	if ( ! $dry_run ) {
+		$final_offset = ( $limit > 0 && ( $offset + $limit ) < $total ) ? $offset + $limit : null;
+		if ( null === $final_offset ) {
+			dtb_image_sync_log_run( $registered + $linked, count( $errors ) );
+		}
+	}
 
 	return rest_ensure_response( [
 		'status'          => $dry_run ? 'dry_run' : 'completed',
@@ -415,19 +418,15 @@ function dtb_route_sync_images( WP_REST_Request $request ): WP_REST_Response|WP_
 		'errors'          => $errors,
 		'dry_run'         => $dry_run,
 		'register_only'   => $register_only,
+		'generate_subsizes' => $generate_subsizes,
 		'next_offset'     => ( $limit > 0 && ( $offset + $limit ) < $total )
 			? $offset + $limit
 			: null,
 		'file_based_sync' => ( 'file' === $batch_mode ),
 		'image_match_mode'=> 'csv_images_exact_basename',
 	] );
-
-	// Record the completed run if not a dry run and we finished this batch.
-	if ( ! $dry_run ) {
-		$final_offset = ( $limit > 0 && ( $offset + $limit ) < $total ) ? $offset + $limit : null;
-		if ( null === $final_offset ) {
-			dtb_image_sync_log_run( $registered + $linked, count( $errors ) );
-		}
+	} finally {
+		dtb_image_sync_release_lock( $lock_token, true );
 	}
 }
 

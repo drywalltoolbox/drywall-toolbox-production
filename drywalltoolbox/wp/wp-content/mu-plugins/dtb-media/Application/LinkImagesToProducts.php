@@ -12,6 +12,12 @@ defined( 'ABSPATH' ) || exit;
  * the CSV Images column (no filename inference from SKU).
  */
 function dtb_route_link_registered_images( WP_REST_Request $request ): WP_REST_Response|WP_Error {
+	$lock_token = dtb_image_sync_acquire_lock( 'link_registered_images' );
+	if ( is_wp_error( $lock_token ) ) {
+		return $lock_token;
+	}
+
+	try {
 	$relative_path = dtb_image_sync_resolve_relative_upload_path( $request );
 	if ( is_wp_error( $relative_path ) ) {
 		return $relative_path;
@@ -37,15 +43,6 @@ function dtb_route_link_registered_images( WP_REST_Request $request ): WP_REST_R
 	if ( ! is_dir( $scan_dir ) ) {
 		return new WP_Error( 'dir_not_found', "Directory not found: wp-content/uploads/{$relative_directory}", [ 'status' => 404 ] );
 	}
-
-	if ( get_transient( DTB_SYNC_LOCK_KEY ) ) {
-		return new WP_Error(
-			'sync_locked',
-			'A sync is already in progress. Use /release-lock if the previous run crashed.',
-			[ 'status' => 423 ]
-		);
-	}
-	set_transient( DTB_SYNC_LOCK_KEY, true, DTB_SYNC_LOCK_TTL );
 
 	global $wpdb;
 	// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
@@ -188,9 +185,6 @@ function dtb_route_link_registered_images( WP_REST_Request $request ): WP_REST_R
 		WC_Cache_Helper::get_transient_version( 'product', true );
 	}
 
-	delete_transient( DTB_SYNC_LOCK_KEY );
-	delete_transient( DTB_SYNC_PROGRESS_KEY );
-
 	return rest_ensure_response( [
 		'status'              => $dry_run ? 'dry_run' : 'completed',
 		'directory'           => "wp-content/uploads/{$relative_directory}",
@@ -210,6 +204,9 @@ function dtb_route_link_registered_images( WP_REST_Request $request ): WP_REST_R
 		'link_only'           => true,
 		'image_match_mode'    => 'csv_images_exact_basename',
 	] );
+	} finally {
+		dtb_image_sync_release_lock( $lock_token, true );
+	}
 }
 
 // ============================================================================

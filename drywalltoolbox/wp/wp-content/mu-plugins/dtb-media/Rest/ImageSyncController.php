@@ -181,8 +181,7 @@ function dtb_image_sync_register_routes(): void {
 	register_rest_route( $ns, '/sync-images/release-lock', [
 		'methods'             => 'POST',
 		'callback'            => function () {
-			delete_transient( DTB_SYNC_LOCK_KEY );
-			delete_transient( DTB_SYNC_PROGRESS_KEY );
+			dtb_image_sync_release_lock( null, true );
 			return rest_ensure_response( [ 'released' => true ] );
 		},
 		'permission_callback' => 'dtb_image_sync_permission',

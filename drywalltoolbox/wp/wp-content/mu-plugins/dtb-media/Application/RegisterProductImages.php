@@ -1,7 +1,7 @@
 <?php
 defined( 'ABSPATH' ) || exit;
 
-function dtb_register_image_attachment( string $file_path, string $file_url, int $product_id = 0 ): int|WP_Error {
+function dtb_register_image_attachment( string $file_path, string $file_url, int $product_id = 0, bool $generate_subsizes = true ): int|WP_Error {
 	if ( ! file_exists( $file_path ) ) {
 		return new WP_Error( 'file_not_found', "File not found: {$file_path}" );
 	}
@@ -83,10 +83,19 @@ function dtb_register_image_attachment( string $file_path, string $file_url, int
 	// fails or times out the attachment record is still valid.
 	wp_update_attachment_metadata( $attachment_id, $meta );
 
-	// ── 4. Generate WC-required sub-sizes via the public API ─────────────────
-	// wp_update_image_subsizes() checks which sizes are already generated and
-	// only creates the missing ones. It is safe to call repeatedly.
-	wp_update_image_subsizes( $attachment_id );
+	// ── 4. Generate optional sub-sizes via the public API ─────────────────────
+	// On shared hosting this can be the most expensive step and may timeout on
+	// certain files. Register-only runs can safely skip it.
+	if ( $generate_subsizes ) {
+		try {
+			$subsize_result = wp_update_image_subsizes( $attachment_id );
+			if ( is_wp_error( $subsize_result ) ) {
+				dtb_image_sync_log( 'image_subsizes warning [' . $filename . ']: ' . $subsize_result->get_error_message() );
+			}
+		} catch ( Throwable $throwable ) {
+			dtb_image_sync_log( 'image_subsizes exception [' . $filename . ']: ' . $throwable->getMessage() );
+		}
+	}
 
 	// ── 5. Clear attachment cache ─────────────────────────────────────────────
 	clean_attachment_cache( $attachment_id );

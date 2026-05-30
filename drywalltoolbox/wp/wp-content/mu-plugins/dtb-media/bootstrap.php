@@ -12,6 +12,7 @@ if ( ! dtb_is_admin_or_rest_request() ) {
 }
 
 dtb_module_require( 'dtb-media/Validation/ImagePathValidator.php' );
+dtb_module_require( 'dtb-media/Application/ImageSyncLock.php' );
 dtb_module_require( 'dtb-media/Services/ImageUrlResolver.php' );
 dtb_module_require( 'dtb-media/Validation/RemoteImageValidator.php' );
 dtb_module_require( 'dtb-media/Rest/ImageSyncController.php' );

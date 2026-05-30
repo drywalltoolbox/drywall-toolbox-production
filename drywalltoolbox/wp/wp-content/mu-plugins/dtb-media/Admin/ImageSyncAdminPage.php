@@ -224,8 +224,7 @@ function dtb_render_image_sync_admin_page(): void {
 			}
 
 		} elseif ( 'release_lock' === $action ) {
-			delete_transient( DTB_SYNC_LOCK_KEY );
-			delete_transient( DTB_SYNC_PROGRESS_KEY );
+			dtb_image_sync_release_lock( null, true );
 			$action_result = rest_ensure_response( [ 'released' => true, 'message' => 'Sync lock released.' ] );
 
 		} elseif ( 'status' === $action ) {
@@ -802,6 +801,42 @@ function dtb_render_image_sync_admin_page(): void {
 			}
 			return selected;
 		};
+		const sleep = ( ms ) => new Promise( ( resolve ) => window.setTimeout( resolve, ms ) );
+		const parseRetryAfterMs = ( response ) => {
+			if ( ! response || ! response.headers ) {
+				return 0;
+			}
+			const header = response.headers.get( 'Retry-After' );
+			if ( ! header ) {
+				return 0;
+			}
+			const seconds = parseInt( header, 10 );
+			if ( Number.isFinite( seconds ) && seconds > 0 ) {
+				return seconds * 1000;
+			}
+			const retryAt = Date.parse( header );
+			if ( Number.isFinite( retryAt ) ) {
+				return Math.max( 0, retryAt - Date.now() );
+			}
+			return 0;
+		};
+		const transientHttpStatuses = new Set( [ 429, 502, 503, 504 ] );
+		const computeBackoffDelayMs = ( attemptNumber ) => {
+			const baseMs = 700;
+			const cappedAttempt = Math.min( 6, Math.max( 1, attemptNumber ) );
+			const expDelay = baseMs * Math.pow( 2, cappedAttempt - 1 );
+			const jitter = Math.floor( Math.random() * 300 );
+			return expDelay + jitter;
+		};
+		const shouldRetryAjaxError = ( statusCode, attemptNumber, maxRetries, errorCode ) => {
+			if ( attemptNumber >= maxRetries ) {
+				return false;
+			}
+			if ( errorCode === 'network_error' ) {
+				return true;
+			}
+			return transientHttpStatuses.has( statusCode );
+		};
 		const postJson = async ( syncAction, body ) => {
 			const params = new URLSearchParams( {
 				action:      'dtb_image_sync',
@@ -811,19 +846,47 @@ function dtb_render_image_sync_admin_page(): void {
 			Object.entries( body ).forEach( ( [ k, v ] ) => {
 				params.set( k, String( v ?? '' ) );
 			} );
-			const res = await fetch( api.ajaxUrl, {
-				method:      'POST',
-				credentials: 'same-origin',
-				body:        params
-			} );
-			const envelope = await res.json().catch( () => null );
-			if ( ! res.ok || ( envelope && ! envelope.success ) ) {
+
+			const maxRetries = ( syncAction === 'progress' || syncAction === 'status' || syncAction === 'status_snapshot' ) ? 5 : 3;
+
+			for ( let attempt = 1; attempt <= maxRetries; attempt++ ) {
+				let res = null;
+				let envelope = null;
+				let statusCode = 0;
+
+				try {
+					res = await fetch( api.ajaxUrl, {
+						method:      'POST',
+						credentials: 'same-origin',
+						body:        params
+					} );
+					statusCode = res.status;
+					envelope = await res.json().catch( () => null );
+				} catch ( networkError ) {
+					if ( shouldRetryAjaxError( 0, attempt, maxRetries, 'network_error' ) ) {
+						await sleep( computeBackoffDelayMs( attempt ) );
+						continue;
+					}
+					throw networkError;
+				}
+
+				if ( res.ok && ( ! envelope || envelope.success ) ) {
+					return envelope ? envelope.data : null;
+				}
+
+				if ( shouldRetryAjaxError( statusCode, attempt, maxRetries, '' ) ) {
+					const retryAfterMs = parseRetryAfterMs( res );
+					await sleep( retryAfterMs > 0 ? retryAfterMs : computeBackoffDelayMs( attempt ) );
+					continue;
+				}
+
 				const message = ( envelope && envelope.data && envelope.data.message )
 					? envelope.data.message
-					: `Request failed (${res.status})`;
+					: `Request failed (${statusCode || 'network'})`;
 				throw new Error( message );
 			}
-			return envelope ? envelope.data : null;
+
+			throw new Error( 'Request failed after retries.' );
 		};
 		const readProgress = async () => {
 			if ( progressPollBusy ) {
@@ -1007,6 +1070,9 @@ function dtb_render_image_sync_admin_page(): void {
 					}
 					if ( batch.csv_source ) {
 						batchSummary.push( `csv_source ${batch.csv_source}` );
+					}
+					if ( 'generate_subsizes' in batch ) {
+						batchSummary.push( `generate_subsizes ${batch.generate_subsizes ? 'yes' : 'no'}` );
 					}
 					batchSummary.push( `errors ${Array.isArray( batch.errors ) ? batch.errors.length : 0}` );
 					appendLog( batchSummary.join( ' · ' ) );

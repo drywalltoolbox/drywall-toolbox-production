@@ -89,6 +89,16 @@ if ( ! defined( 'DTB_IMAGE_SYNC_DEFAULT_UPLOAD_RELATIVE_PATH' ) ) {
 }
 
 /**
+ * When true, Register Images Only skips generating intermediate image sub-sizes.
+ *
+ * This keeps attachment registration lightweight on shared hosting and avoids
+ * frequent stalls/timeouts inside image editor backends (Imagick/GD).
+ */
+if ( ! defined( 'DTB_IMAGE_SYNC_SKIP_SUBSIZES_IN_REGISTER_ONLY' ) ) {
+	define( 'DTB_IMAGE_SYNC_SKIP_SUBSIZES_IN_REGISTER_ONLY', true );
+}
+
+/**
  * Sanitize and validate a relative upload path.
  */
 function dtb_image_sync_validate_upload_path( string $value ): bool {
