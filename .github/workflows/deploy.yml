@@ -1,4 +1,4 @@
-name: Deploy Frontend to GitHub Pages
+name: Deploy Drywall Toolbox Production
 
 on:
   push:
@@ -7,18 +7,37 @@ on:
   workflow_dispatch:
 
 concurrency:
-  group: gh-pages-deploy-${{ github.ref }}
+  group: production-deploy-${{ github.ref }}
   cancel-in-progress: true
 
 permissions:
   contents: read
-  pages: write
-  id-token: write
 
 jobs:
-  build:
-    name: Build React Frontend
+  build-and-deploy:
+    name: Build and deploy React SPA + tracked WordPress app code
     runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    env:
+      NODE_ENV: production
+      # Production domain root. Do not set /drywall-toolbox here; that path is only
+      # for GitHub Pages and causes broken asset URLs on drywalltoolbox.com.
+      PUBLIC_URL: /
+      REACT_APP_WP_BASE_URL: https://drywalltoolbox.com
+      REACT_APP_WC_BASE_URL: https://drywalltoolbox.com/wp-json/wc/v3
+      REACT_APP_WP_API_BASE: https://drywalltoolbox.com/wp-json
+      REACT_APP_WC_API_BASE: https://drywalltoolbox.com/wp-json/wc/v3
+      REACT_APP_JWT_ENDPOINT: https://drywalltoolbox.com/wp-json/simple-jwt-login/v1/auth
+      REACT_APP_JWT_AUTH_ENDPOINT: /wp-json/simple-jwt-login/v1/auth
+      REACT_APP_API_BASE_URL: https://drywalltoolbox.com
+      REACT_APP_DTB_API_BASE: /wp-json/dtb/v1
+      REACT_APP_STORE_API_BASE: /wp-json/wc/store/v1
+      REACT_APP_SITE_URL: https://drywalltoolbox.com
+      REACT_APP_APP_ENV: production
+      REACT_APP_ENV: production
+      REACT_APP_REWARDS_ENABLED: '1'
+      REACT_APP_STORE_LAUNCH_DATE: ''
 
     steps:
       - name: Checkout repository
@@ -30,49 +49,111 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'npm'
+          cache: npm
           cache-dependency-path: frontend/package-lock.json
 
-      - name: Install dependencies
+      - name: Install frontend dependencies
         run: cd frontend && npm ci --prefer-offline --no-audit --no-fund
 
       - name: Lint frontend
         run: cd frontend && npm run lint --if-present
 
-      - name: Build frontend (webpack -> ../dist/)
+      - name: Build frontend for drywalltoolbox.com
         run: cd frontend && npm run build
         env:
-          NODE_ENV: production
-          PUBLIC_URL: /drywall-toolbox
-          REACT_APP_WP_BASE_URL: 'https://drywalltoolbox.com'
-          REACT_APP_WC_BASE_URL: 'https://drywalltoolbox.com/wp-json/wc/v3'
           REACT_APP_WC_AUTH_USER: ${{ secrets.REACT_APP_WC_AUTH_USER }}
           REACT_APP_WC_AUTH_PASS: ${{ secrets.REACT_APP_WC_AUTH_PASS }}
-          REACT_APP_WP_API_BASE: 'https://drywalltoolbox.com/wp-json'
-          REACT_APP_WC_API_BASE: 'https://drywalltoolbox.com/wp-json/wc/v3'
-          REACT_APP_JWT_ENDPOINT: 'https://drywalltoolbox.com/wp-json/simple-jwt-login/v1/auth'
-          REACT_APP_API_BASE_URL: 'https://drywalltoolbox.com'
-          REACT_APP_STORE_API_BASE: '/wp-json/wc/store/v1'
-          REACT_APP_SITE_URL: 'https://elliotttmiller.github.io/drywall-toolbox'
-          REACT_APP_APP_ENV: production
-          REACT_APP_ENV: production
           REACT_APP_STRIPE_PUBLISHABLE_KEY: ${{ secrets.REACT_APP_STRIPE_PUBLISHABLE_KEY }}
-          REACT_APP_STORE_LAUNCH_DATE: ''
 
-      - name: Upload Pages artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: dist/
+      - name: Assemble deployment payload
+        shell: bash
+        run: |
+          set -euo pipefail
 
-  deploy:
-    name: Deploy to GitHub Pages
-    runs-on: ubuntu-latest
-    needs: build
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+          rm -rf deploy-root
+          mkdir -p deploy-root
 
-    steps:
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+          # React production output. Upload CONTENTS of dist/ to the web root.
+          cp -a dist/. deploy-root/
+
+          # Live root routing for React + /wp WordPress subdirectory.
+          cp drywalltoolbox/.htaccess deploy-root/.htaccess
+
+          # Tracked WordPress application code only. Never deploy wp-config.php,
+          # uploads, cache, plugins, or full WordPress core from this repository.
+          mkdir -p deploy-root/wp/wp-content
+          cp -a drywalltoolbox/wp/.htaccess deploy-root/wp/.htaccess
+          cp -a drywalltoolbox/wp/index.php deploy-root/wp/index.php
+          cp -a drywalltoolbox/wp/wp-content/mu-plugins deploy-root/wp/wp-content/mu-plugins
+          cp -a drywalltoolbox/wp/wp-content/themes deploy-root/wp/wp-content/themes
+
+          echo 'Deployment payload:'
+          find deploy-root -maxdepth 3 -type f | sort | sed 's#^#  #' | head -200
+
+      - name: Verify deployment payload shape
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f deploy-root/index.html
+          test -f deploy-root/.htaccess
+          test -d deploy-root/assets/js
+          test -d deploy-root/assets/css
+          test -f deploy-root/wp/.htaccess
+          test -f deploy-root/wp/index.php
+          test -d deploy-root/wp/wp-content/mu-plugins
+          test -d deploy-root/wp/wp-content/themes
+
+          if find deploy-root -name 'wp-config.php' -o -path '*/wp-content/uploads/*' -o -path '*/wp-content/cache/*' | grep -q .; then
+            echo 'Refusing to deploy forbidden WordPress runtime/secrets payload.' >&2
+            exit 1
+          fi
+
+      - name: Install lftp
+        run: sudo apt-get update && sudo apt-get install -y lftp
+
+      - name: Deploy to HostGator via FTPS
+        shell: bash
+        env:
+          FTP_HOST: ${{ secrets.HOSTGATOR_FTP_HOST }}
+          FTP_USERNAME: ${{ secrets.HOSTGATOR_FTP_USERNAME }}
+          FTP_PASSWORD: ${{ secrets.HOSTGATOR_FTP_PASSWORD }}
+          FTP_REMOTE_DIR: ${{ secrets.HOSTGATOR_FTP_REMOTE_DIR }}
+        run: |
+          set -euo pipefail
+
+          : "${FTP_HOST:?Missing HOSTGATOR_FTP_HOST secret}"
+          : "${FTP_USERNAME:?Missing HOSTGATOR_FTP_USERNAME secret}"
+          : "${FTP_PASSWORD:?Missing HOSTGATOR_FTP_PASSWORD secret}"
+
+          REMOTE_DIR="${FTP_REMOTE_DIR:-/public_html/drywalltoolbox}"
+
+          lftp -u "$FTP_USERNAME","$FTP_PASSWORD" "$FTP_HOST" <<EOF
+          set ftp:ssl-force true
+          set ftp:ssl-protect-data true
+          set ssl:verify-certificate false
+          set net:max-retries 3
+          set net:timeout 30
+          set xfer:clobber true
+          mirror --reverse --verbose --parallel=4 --only-newer deploy-root/ "$REMOTE_DIR" \
+            --exclude-glob .git* \
+            --exclude-glob node_modules/** \
+            --exclude-glob wp-config.php \
+            --exclude-glob wp/wp-config.php \
+            --exclude-glob wp/wp-content/uploads/** \
+            --exclude-glob wp/wp-content/cache/** \
+            --exclude-glob wp/wp-content/upgrade/**
+          bye
+          EOF
+
+      - name: Smoke-check production asset endpoints
+        shell: bash
+        run: |
+          set -euo pipefail
+          for url in \
+            https://drywalltoolbox.com/ \
+            https://drywalltoolbox.com/assets/js/main.js \
+            https://drywalltoolbox.com/assets/css/main.css \
+            https://drywalltoolbox.com/wp-admin/; do
+            echo "Checking $url"
+            curl -I --fail --location --max-time 20 "$url"
+          done
