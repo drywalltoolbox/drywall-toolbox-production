@@ -730,9 +730,19 @@
 				const raw    = el.getAttribute( 'data-dtb-chart-config' );
 				const config = raw ? JSON.parse( raw ) : {};
 
-				// Apply DTB colour defaults if not overridden
+				// Apply DTB colour defaults read from CSS variables (falls back to brand hex).
 				if ( ! config.colors ) {
-					config.colors = [ '#1d4ed8', '#22c55e', '#f59e0b', '#ef4444', '#0ea5e9' ];
+					const cs = getComputedStyle( document.documentElement );
+					const v = function ( n, fb ) {
+						return cs.getPropertyValue( n ).trim() || fb;
+					};
+					config.colors = [
+						v( '--dtb-chart-color-1', '#1d4ed8' ),
+						v( '--dtb-chart-color-2', '#22c55e' ),
+						v( '--dtb-chart-color-3', '#f59e0b' ),
+						v( '--dtb-chart-color-4', '#ef4444' ),
+						v( '--dtb-chart-color-5', '#0ea5e9' ),
+					];
 				}
 				if ( ! config.chart ) config.chart = {};
 				config.chart.fontFamily = "Inter, 'Plus Jakarta Sans', sans-serif";
@@ -883,6 +893,20 @@
 				const badge = target.querySelector( '.dtb-update-available' );
 				if ( badge ) badge.classList.remove( 'is-visible' );
 
+				// Update polling interval if server suggests a different cadence.
+				if ( payload && payload.meta && payload.meta.poll_after_ms ) {
+					const newInterval = parseInt( payload.meta.poll_after_ms, 10 );
+					if ( newInterval > 0 ) {
+						target.setAttribute( 'data-dtb-refresh-interval', newInterval );
+					}
+				}
+
+				// Update last-updated label if present on the page.
+				if ( payload && payload.meta && payload.meta.updated_at ) {
+					const tsEl = document.querySelector( '[data-dtb-last-updated="' + regionId + '"]' );
+					if ( tsEl ) tsEl.textContent = payload.meta.updated_at;
+				}
+
 				DtbAdmin.rebind( target );
 
 				if ( pushHistory ) {
@@ -891,7 +915,7 @@
 
 				target.dispatchEvent( new CustomEvent( 'dtb:live:navigated', {
 					bubbles: true,
-					detail: { regionId, state },
+					detail: { regionId, state, payload },
 				} ) );
 			} )
 			.catch( function ( err ) {

@@ -315,6 +315,100 @@ body.dtb-repair-admin-screen {
   box-shadow: 0 8px 18px rgba(29, 78, 216, .28);
 }
 
+/* Compact header — queue and tool templates */
+.dtb-admin[data-dtb-template="queue"] .dtb-page-header,
+.dtb-admin[data-dtb-template="tool"] .dtb-page-header,
+.dtb-page-header--compact {
+  padding: 14px 20px;
+  border-radius: var(--dtb-radius-md);
+  background: var(--dtb-surface);
+  margin-bottom: 12px;
+}
+
+.dtb-admin[data-dtb-template="queue"] .dtb-page-title,
+.dtb-admin[data-dtb-template="tool"] .dtb-page-title,
+.dtb-page-header--compact .dtb-page-title {
+  font-size: 18px;
+}
+
+.dtb-admin[data-dtb-template="queue"] .dtb-page-title .dashicons,
+.dtb-admin[data-dtb-template="tool"] .dtb-page-title .dashicons,
+.dtb-page-header--compact .dtb-page-title .dashicons {
+  font-size: 17px;
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+}
+
+/* =============================================================================
+   4b. WORKBENCH LAYOUT
+   ============================================================================= */
+
+.dtb-workbench {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.dtb-workbench__summary {
+  margin-bottom: 16px;
+}
+
+.dtb-workbench__nav {
+  margin-bottom: 0;
+}
+
+.dtb-workbench__toolbar {
+  margin-bottom: 12px;
+}
+
+.dtb-workbench__main {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.dtb-workbench__context {
+  margin-top: 16px;
+}
+
+/* KPI strip — horizontal row of KPI cards */
+.dtb-kpi-strip {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.dtb-kpi-strip .dtb-kpi {
+  padding: 14px 16px;
+  gap: 12px;
+}
+
+.dtb-kpi-strip .dtb-kpi__value {
+  font-size: 22px;
+}
+
+.dtb-kpi-strip a.dtb-kpi {
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.dtb-kpi-strip a.dtb-kpi:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--dtb-shadow-md);
+  border-color: var(--dtb-primary);
+}
+
+/* CSS variables for chart colors — readable by JS via getComputedStyle */
+:root,
+.dtb-admin {
+  --dtb-chart-color-1: #1d4ed8;
+  --dtb-chart-color-2: #22c55e;
+  --dtb-chart-color-3: #f59e0b;
+  --dtb-chart-color-4: #ef4444;
+  --dtb-chart-color-5: #0ea5e9;
+}
+
 /* =============================================================================
    7. CARDS
    ============================================================================= */

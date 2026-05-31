@@ -130,8 +130,10 @@ function dtb_admin_assets_enqueue(): void {
 		}
 	}
 
-	// ── Support workflow assets (legacy dashboard runtime, centralized enqueue) ──
-	if ( 'dtb-support' === $page_slug ) {
+	// ── Support workflow assets (legacy dashboard runtime) ──
+	// Only loaded when dtb_support_legacy_mode filter returns true.
+	// Set to false by default since SupportPage now uses the global AdminShell / dtb-admin system.
+	if ( 'dtb-support' === $page_slug && apply_filters( 'dtb_support_legacy_mode', false ) ) {
 		$support_dir = WP_CONTENT_DIR . '/mu-plugins/dtb-support/Admin/assets/';
 		$support_url = content_url( '/mu-plugins/dtb-support/Admin/assets/' );
 		$support_filter = sanitize_key( (string) ( $_GET['filter'] ?? '' ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended

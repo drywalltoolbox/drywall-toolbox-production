@@ -51,7 +51,10 @@ function dtb_orders_admin_queue_handler( WP_REST_Request $request ): WP_REST_Res
 		'paged'  => $paged,
 		'return' => 'objects',
 	];
-	if ( $status ) {
+	// 'attention' pseudo-status maps to on-hold + failed + pending.
+	if ( 'attention' === $status ) {
+		$query_args['status'] = [ 'wc-on-hold', 'wc-failed', 'wc-pending' ];
+	} elseif ( $status ) {
 		$query_args['status'] = str_starts_with( $status, 'wc-' ) ? $status : 'wc-' . $status;
 	}
 	if ( $search ) {
@@ -59,8 +62,12 @@ function dtb_orders_admin_queue_handler( WP_REST_Request $request ): WP_REST_Res
 	}
 
 	$count_args = [ 'limit' => -1, 'return' => 'ids' ];
-	if ( $status ) $count_args['status'] = str_starts_with( $status, 'wc-' ) ? $status : 'wc-' . $status;
-	if ( $search )  $count_args['s']     = $search;
+	if ( 'attention' === $status ) {
+		$count_args['status'] = [ 'wc-on-hold', 'wc-failed', 'wc-pending' ];
+	} elseif ( $status ) {
+		$count_args['status'] = str_starts_with( $status, 'wc-' ) ? $status : 'wc-' . $status;
+	}
+	if ( $search ) $count_args['s'] = $search;
 
 	$total_count = count( wc_get_orders( $count_args ) );
 	$total_pages = $per > 0 ? (int) ceil( $total_count / $per ) : 1;
@@ -116,6 +123,29 @@ function dtb_orders_admin_queue_handler( WP_REST_Request $request ): WP_REST_Res
 	}
 
 	$html = ob_get_clean();
-	return new WP_REST_Response( [ 'ok' => true, 'html' => $html ], 200 );
+
+	// Build lightweight summary counts for KPI sync.
+	$summary_attention  = count( wc_get_orders( [ 'limit' => -1, 'return' => 'ids', 'status' => [ 'wc-on-hold', 'wc-failed', 'wc-pending' ] ] ) );
+	$summary_processing = count( wc_get_orders( [ 'limit' => -1, 'return' => 'ids', 'status' => 'wc-processing' ] ) );
+
+	return new WP_REST_Response( [
+		'ok'      => true,
+		'html'    => $html,
+		'state'   => [
+			'tab'    => $status ?: 'all',
+			'status' => $status,
+			'search' => $search,
+			'paged'  => $paged,
+		],
+		'summary' => [
+			'total'           => $total_count,
+			'needs_attention' => $summary_attention,
+			'processing'      => $summary_processing,
+		],
+		'meta'    => [
+			'updated_at'     => gmdate( 'c' ),
+			'poll_after_ms'  => 30000,
+		],
+	], 200 );
 }
 
