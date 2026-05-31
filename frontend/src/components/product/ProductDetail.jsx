@@ -117,6 +117,31 @@ function isIncludesLabel(label) {
   return /^(set\s+)?includes?$/i.test(String(label || '').trim());
 }
 
+function looksLikeSetContentsParagraph(value) {
+  const plain = String(value || '')
+    .replace(/<[^>]*>/g, ' ')
+    .replace(/&nbsp;/gi, ' ')
+    .replace(/&amp;/gi, '&')
+    .replace(/[ \t\r\n]+/g, ' ')
+    .trim();
+
+  if (!plain || plain.length < 40) return false;
+
+  const commaCount = (plain.match(/,/g) || []).length;
+  const slashSkuCount = (plain.match(/\b[A-Z0-9]{2,}(?:\/[A-Z0-9]{2,})+\b/g) || []).length;
+  const skuCount = (plain.match(/\b(?:[A-Z]{1,5}\d{1,5}[A-Z0-9-]*|\d+[A-Z]{2,}[A-Z0-9-]*)\b/g) || []).length;
+  const quantityMarkers = (plain.match(/\b(?:x\d+|\d+\s*x)\b/gi) || []).length;
+  const hasToolTerms = /(taper|box|roller|finisher|pump|spotter|handle|adapter|gooseneck|filler|applicator)/i.test(plain);
+
+  return (
+    hasToolTerms &&
+    (
+      (commaCount >= 4 && (skuCount + slashSkuCount) >= 3) ||
+      (commaCount >= 5 && quantityMarkers >= 2)
+    )
+  );
+}
+
 function stripSetIncludesFromDescription(content) {
   if (!content || typeof content !== 'string') return content;
 
@@ -129,6 +154,10 @@ function stripSetIncludesFromDescription(content) {
     // Remove an immediate includes list block if present.
     .replace(/<(?:ul|ol)[^>]*>\s*(?:<li[^>]*>[\s\S]*?<\/li>\s*)+<\/(?:ul|ol)>\s*/gi, (listBlock) => {
       return /(?:set|kit)\s+includes?/i.test(listBlock) ? '' : listBlock;
+    })
+    // Remove dense SKU/item list paragraphs that duplicate Set Includes content.
+    .replace(/<p[^>]*>[\s\S]*?<\/p>/gi, (paragraphBlock) => {
+      return looksLikeSetContentsParagraph(paragraphBlock) ? '' : paragraphBlock;
     });
 
   const lines = cleanedHtml
@@ -180,6 +209,10 @@ function stripSetIncludesFromDescription(content) {
       }
 
       skippingIncludes = false;
+    }
+
+    if (looksLikeSetContentsParagraph(line)) {
+      continue;
     }
 
     out.push(line);
