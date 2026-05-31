@@ -63,8 +63,10 @@ function dtb_repair_event_label( string $event_type ): string {
 $map = [
 'repair.submitted'       => __( 'Request submitted', 'drywall-toolbox' ),
 'repair.reviewed'        => __( 'Under review', 'drywall-toolbox' ),
+'repair.info_requested'  => __( 'Additional info requested', 'drywall-toolbox' ),
 'repair.approved'        => __( 'Approved for repair', 'drywall-toolbox' ),
 'repair.quoted'          => __( 'Quote ready', 'drywall-toolbox' ),
+'repair.quote_resent'    => __( 'Quote resent', 'drywall-toolbox' ),
 'repair.quote_accepted'  => __( 'Quote accepted', 'drywall-toolbox' ),
 'repair.quote_declined'  => __( 'Quote declined', 'drywall-toolbox' ),
 'repair.parts_allocated' => __( 'Parts allocated', 'drywall-toolbox' ),
@@ -74,7 +76,30 @@ $map = [
 'repair.closed'          => __( 'Closed', 'drywall-toolbox' ),
 'repair.cancelled'       => __( 'Cancelled', 'drywall-toolbox' ),
 'repair.note_added'      => __( 'Customer note added', 'drywall-toolbox' ),
+'repair.media_uploaded'  => __( 'Media uploaded', 'drywall-toolbox' ),
+'notification.email.queued' => __( 'Email queued', 'drywall-toolbox' ),
+'notification.email.sent'   => __( 'Email delivered', 'drywall-toolbox' ),
+'notification.email.failed' => __( 'Email delivery failed', 'drywall-toolbox' ),
+'integration.wc.order_created'    => __( 'WooCommerce order created', 'drywall-toolbox' ),
+'integration.wc.order_failed'     => __( 'WooCommerce order sync issue', 'drywall-toolbox' ),
+'integration.veeqo.synced'        => __( 'Veeqo synced', 'drywall-toolbox' ),
+'integration.veeqo.failed'        => __( 'Veeqo sync issue', 'drywall-toolbox' ),
+'integration.veeqo.tracking_set'  => __( 'Tracking updated', 'drywall-toolbox' ),
+'integration.qbo.invoice_created' => __( 'QuickBooks invoice created', 'drywall-toolbox' ),
+'integration.qbo.invoice_failed'  => __( 'QuickBooks sync issue', 'drywall-toolbox' ),
+'integration.rewards.issued'      => __( 'Rewards issued', 'drywall-toolbox' ),
+'integration.rewards.failed'      => __( 'Rewards issue', 'drywall-toolbox' ),
+'system.sla_recalculated'         => __( 'SLA recalculated', 'drywall-toolbox' ),
+'system.archived'                 => __( 'Archived', 'drywall-toolbox' ),
+'system.projection_refresh'       => __( 'System sync refresh', 'drywall-toolbox' ),
+'system.job_enqueued'             => __( 'Background task queued', 'drywall-toolbox' ),
+'system.job_retry'                => __( 'Background task retried', 'drywall-toolbox' ),
 ];
 
-return $map[ $event_type ] ?? ucwords( str_replace( [ 'repair.', '_' ], [ '', ' ' ], $event_type ) );
+if ( isset( $map[ $event_type ] ) ) {
+	return $map[ $event_type ];
+}
+
+$fallback = str_replace( [ 'repair.', 'integration.', 'notification.', 'system.', '_', '.' ], [ '', '', '', '', ' ', ' ' ], $event_type );
+return ucwords( trim( $fallback ) );
 }

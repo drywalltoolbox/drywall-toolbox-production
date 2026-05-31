@@ -49,7 +49,7 @@ $can_manage_settings = current_user_can( 'dtb_manage_support_settings' ) || curr
 </div>
 
 <div class="dtb-toolbar">
-<input type="search" id="dtb-search" class="dtb-search" placeholder="Search subject, email, ticket #" oninput="dtbSupport.applyFilters()">
+<input type="search" id="dtb-search" class="dtb-search" placeholder="Search ticket #, customer, email, phone, order #" oninput="dtbSupport.applyFilters()">
 <select id="dtb-filter-type" class="dtb-select" onchange="dtbSupport.applyFilters()">
 <option value="">All Types</option>
 <?php foreach ( dtb_support_all_types() as $slug => $label ) : ?>
@@ -63,6 +63,7 @@ $can_manage_settings = current_user_can( 'dtb_manage_support_settings' ) || curr
 <?php endforeach; ?>
 </select>
 <button type="button" class="dtb-btn dtb-btn--ghost dtb-btn--sm" id="dtb-clear-filters" onclick="dtbSupport.clearFilters()" style="display:none;">Clear</button>
+<button type="button" class="dtb-btn dtb-btn--ghost dtb-btn--sm" onclick="dtbSupport.openRepairsSearch()">Find In Repairs</button>
 <div style="margin-left:auto;display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
 <span id="dtb-ticket-count" style="font-size:12px;color:#718096;">Loading…</span>
 </div>
@@ -128,7 +129,7 @@ $can_manage_settings = current_user_can( 'dtb_manage_support_settings' ) || curr
 <div class="dtb-ctx-section">
 <div class="dtb-ctx-section__title">Queue summary</div>
 <?php foreach ( dtb_support_queue_rail_items() as $queue => $meta ) : ?>
-<div class="dtb-ctx-row"><span class="dtb-ctx-label"><?php echo esc_html( $meta['label'] ); ?></span><span class="dtb-ctx-value"><?php echo esc_html( (string) ( $queue_counts[ $queue ] ?? 0 ) ); ?></span></div>
+<div class="dtb-ctx-row"><span class="dtb-ctx-label"><?php echo esc_html( $meta['label'] ); ?></span><span class="dtb-ctx-value" data-queue-summary="<?php echo esc_attr( $queue ); ?>"><?php echo esc_html( (string) ( $queue_counts[ $queue ] ?? 0 ) ); ?></span></div>
 <?php endforeach; ?>
 </div>
 <div class="dtb-ctx-section">
@@ -151,16 +152,16 @@ $can_manage_settings = current_user_can( 'dtb_manage_support_settings' ) || curr
 
 function dtb_support_queue_rail_items(): array {
 return [
-'needs_reply'          => [ 'label' => 'Needs Reply',         'badge_class' => '' ],
-'overdue'              => [ 'label' => 'Overdue',             'badge_class' => 'dtb-rail-badge--urgent' ],
-'due_soon'             => [ 'label' => 'Due Soon',            'badge_class' => 'dtb-rail-badge--warning' ],
-'unassigned'           => [ 'label' => 'Unassigned',          'badge_class' => '' ],
-'urgent'               => [ 'label' => 'Urgent',              'badge_class' => 'dtb-rail-badge--urgent' ],
-'in_progress'          => [ 'label' => 'In Progress',         'badge_class' => '' ],
-'waiting_on_customer'  => [ 'label' => 'Waiting on Customer', 'badge_class' => '' ],
-'snoozed'              => [ 'label' => 'Snoozed',             'badge_class' => '' ],
-'resolved_pending_close' => [ 'label' => 'Resolved',          'badge_class' => '' ],
-'all_active'           => [ 'label' => 'All Active',          'badge_class' => '' ],
+'needs_reply'            => [ 'label' => 'Needs Reply',         'hint' => 'Customer-facing replies waiting', 'group' => 'Work Queue',   'badge_class' => '' ],
+'overdue'                => [ 'label' => 'Overdue',             'hint' => 'Past due response targets',       'group' => 'Work Queue',   'badge_class' => 'dtb-rail-badge--urgent' ],
+'due_soon'               => [ 'label' => 'Due Soon',            'hint' => 'Approaching 1-day deadline',      'group' => 'Work Queue',   'badge_class' => 'dtb-rail-badge--warning' ],
+'unassigned'             => [ 'label' => 'Unassigned',          'hint' => 'Needs owner assignment',          'group' => 'Ownership',    'badge_class' => '' ],
+'urgent'                 => [ 'label' => 'Urgent',              'hint' => 'Priority escalated tickets',      'group' => 'Ownership',    'badge_class' => 'dtb-rail-badge--urgent' ],
+'in_progress'            => [ 'label' => 'In Progress',         'hint' => 'Active handling by staff',        'group' => 'Workflow',     'badge_class' => '' ],
+'waiting_on_customer'    => [ 'label' => 'Waiting on Customer', 'hint' => 'Blocked pending customer reply',  'group' => 'Workflow',     'badge_class' => '' ],
+'snoozed'                => [ 'label' => 'Snoozed',             'hint' => 'Temporarily paused tickets',      'group' => 'Workflow',     'badge_class' => '' ],
+'resolved_pending_close' => [ 'label' => 'Resolved',            'hint' => 'Completed, pending closeout',     'group' => 'Closed Loop',  'badge_class' => '' ],
+'all_active'             => [ 'label' => 'All Active',          'hint' => 'Full open workload',              'group' => 'Closed Loop',  'badge_class' => '' ],
 ];
 }
 
@@ -170,11 +171,22 @@ return $items[ $queue ]['label'] ?? ucfirst( str_replace( '_', ' ', $queue ) );
 }
 
 function dtb_support_render_queue_rail( array $queue_counts, string $active_queue ): void {
+$current_group = '';
 ?>
-<div class="dtb-rail-header">Queues</div>
+<div class="dtb-rail-header">
+<div class="dtb-rail-header__title">Queues</div>
+<div class="dtb-rail-header__sub">Target response: 1 business day</div>
+</div>
 <?php foreach ( dtb_support_queue_rail_items() as $queue => $meta ) : ?>
+<?php if ( $current_group !== $meta['group'] ) : ?>
+<?php $current_group = $meta['group']; ?>
+<div class="dtb-rail-group"><?php echo esc_html( $current_group ); ?></div>
+<?php endif; ?>
 <a href="#" class="dtb-rail-item <?php echo $queue === $active_queue ? 'is-active' : ''; ?>" data-queue="<?php echo esc_attr( $queue ); ?>">
-<span><?php echo esc_html( $meta['label'] ); ?></span>
+<span class="dtb-rail-item__copy">
+<span class="dtb-rail-item__label"><?php echo esc_html( $meta['label'] ); ?></span>
+<span class="dtb-rail-item__hint"><?php echo esc_html( $meta['hint'] ); ?></span>
+</span>
 <span class="dtb-rail-badge <?php echo esc_attr( $meta['badge_class'] ); ?>"><?php echo esc_html( (string) ( $queue_counts[ $queue ] ?? 0 ) ); ?></span>
 </a>
 <?php endforeach; ?>

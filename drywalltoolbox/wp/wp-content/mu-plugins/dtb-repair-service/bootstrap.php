@@ -26,6 +26,7 @@ require_once __DIR__ . '/Infrastructure/RepairStatusStore.php';
 require_once __DIR__ . '/Services/RepairWorkflowTransitionMap.php';
 require_once __DIR__ . '/Services/RepairIdempotencyService.php';
 require_once __DIR__ . '/Services/RepairProjectionService.php';
+require_once __DIR__ . '/Services/RepairQuoteService.php';
 require_once __DIR__ . '/Services/RepairPublicTokenService.php';
 require_once __DIR__ . '/Services/RepairSlaService.php';
 require_once __DIR__ . '/Services/RepairOpsQueryService.php';

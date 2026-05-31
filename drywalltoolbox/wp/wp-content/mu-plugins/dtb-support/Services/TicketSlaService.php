@@ -8,6 +8,13 @@
 defined( 'ABSPATH' ) || exit;
 
 /**
+ * Return default action-due window in hours.
+ */
+function dtb_support_action_due_hours(): int {
+	return (int) apply_filters( 'dtb_support_action_due_hours', 24 );
+}
+
+/**
  * Compute first-response due datetime string given created_at and priority.
  */
 function dtb_support_compute_first_response_due( string $created_at, string $priority ): string {
@@ -16,7 +23,7 @@ function dtb_support_compute_first_response_due( string $created_at, string $pri
 		$timestamp = time();
 	}
 
-	return gmdate( 'Y-m-d H:i:s', $timestamp + ( dtb_support_sla_hours( $priority ) * HOUR_IN_SECONDS ) );
+	return gmdate( 'Y-m-d H:i:s', $timestamp + ( dtb_support_action_due_hours() * HOUR_IN_SECONDS ) );
 }
 
 /**
@@ -53,14 +60,10 @@ function dtb_support_compute_sla_state( object $ticket ): string {
 		return 'ok';
 	}
 
-	$due_at = empty( $ticket->first_reply_at )
-		? ( $ticket->sla_first_response_due ?? '' )
-		: ( $ticket->sla_resolution_due ?? '' );
+	$due_at = $ticket->sla_first_response_due ?? '';
 
 	if ( empty( $due_at ) ) {
-		$due_at = empty( $ticket->first_reply_at )
-			? dtb_support_compute_first_response_due( (string) $ticket->created_at, (string) $ticket->priority )
-			: dtb_support_compute_resolution_due( (string) $ticket->created_at, (string) $ticket->priority );
+		$due_at = dtb_support_compute_first_response_due( (string) $ticket->created_at, (string) $ticket->priority );
 	}
 
 	$remaining = dtb_support_sla_seconds_remaining( $ticket );
@@ -88,14 +91,10 @@ function dtb_support_sla_seconds_remaining( object $ticket ): int {
 		return 0;
 	}
 
-	$due_at = empty( $ticket->first_reply_at )
-		? ( $ticket->sla_first_response_due ?? '' )
-		: ( $ticket->sla_resolution_due ?? '' );
+	$due_at = $ticket->sla_first_response_due ?? '';
 
 	if ( empty( $due_at ) ) {
-		$due_at = empty( $ticket->first_reply_at )
-			? dtb_support_compute_first_response_due( (string) $ticket->created_at, (string) $ticket->priority )
-			: dtb_support_compute_resolution_due( (string) $ticket->created_at, (string) $ticket->priority );
+		$due_at = dtb_support_compute_first_response_due( (string) $ticket->created_at, (string) $ticket->priority );
 	}
 
 	$due_ts = strtotime( (string) $due_at );

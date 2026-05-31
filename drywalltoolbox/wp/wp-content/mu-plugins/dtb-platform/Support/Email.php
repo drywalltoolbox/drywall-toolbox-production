@@ -50,10 +50,16 @@ if ( ! function_exists( 'dtb_email_button' ) ) {
 			return '';
 		}
 
-		return '<table role="presentation" cellspacing="0" cellpadding="0" border="0" align="center" style="margin:30px auto 0;">
+		return '<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin:32px 0 0;">
 			<tr>
-				<td bgcolor="#155eef" style="background:#155eef;border-radius:8px;">
-					<a href="' . $url . '" style="display:inline-block;padding:13px 20px;color:#ffffff;font-family:Arial,Helvetica,sans-serif;font-size:15px;font-weight:700;line-height:20px;text-decoration:none;border-radius:8px;">' . $label . '</a>
+				<td align="center">
+					<table role="presentation" cellspacing="0" cellpadding="0" border="0">
+						<tr>
+							<td class="dtb-btn-td" bgcolor="#1d4ed8" style="background:#1d4ed8;border-radius:10px;">
+								<a href="' . $url . '" style="display:inline-block;padding:15px 32px;color:#ffffff;font-family:-apple-system,BlinkMacSystemFont,\'Segoe UI\',Arial,sans-serif;font-size:15px;font-weight:600;line-height:22px;text-decoration:none;border-radius:10px;letter-spacing:-0.01em;">' . $label . ' &rarr;</a>
+							</td>
+						</tr>
+					</table>
 				</td>
 			</tr>
 		</table>';
@@ -69,6 +75,7 @@ if ( ! function_exists( 'dtb_email_details_table' ) ) {
 	 */
 	function dtb_email_details_table( array $rows ): string {
 		$body = '';
+		$i    = 0;
 
 		foreach ( $rows as $row ) {
 			$label = trim( (string) ( $row['label'] ?? '' ) );
@@ -78,9 +85,13 @@ if ( ! function_exists( 'dtb_email_details_table' ) ) {
 				continue;
 			}
 
+			$bg          = ( 0 === $i % 2 ) ? '#f9fafb' : '#ffffff';
+			$row_class   = ( 0 === $i % 2 ) ? 'dtb-dt-even' : 'dtb-dt-odd';
+			++$i;
+
 			$body .= '<tr>
-				<td style="padding:12px 0;border-bottom:1px solid #dbe5f1;color:#4b5f79;font-family:Arial,Helvetica,sans-serif;font-size:12px;line-height:18px;vertical-align:top;width:38%;text-transform:uppercase;letter-spacing:0.04em;font-weight:700;">' . esc_html( $label ) . '</td>
-				<td style="padding:12px 0;border-bottom:1px solid #dbe5f1;color:#0f172a;font-family:Arial,Helvetica,sans-serif;font-size:14px;font-weight:700;line-height:20px;vertical-align:top;">' . wp_kses_post( nl2br( esc_html( $value ) ) ) . '</td>
+				<td class="dtb-dt-label ' . $row_class . '" style="padding:11px 14px;background:' . $bg . ';color:#6b7280;font-family:-apple-system,BlinkMacSystemFont,\'Segoe UI\',Arial,sans-serif;font-size:11px;line-height:17px;vertical-align:middle;width:36%;text-transform:uppercase;letter-spacing:0.07em;font-weight:600;white-space:nowrap;">' . esc_html( $label ) . '</td>
+				<td class="dtb-dt-val ' . $row_class . '" style="padding:11px 14px;background:' . $bg . ';color:#111827;font-family:-apple-system,BlinkMacSystemFont,\'Segoe UI\',Arial,sans-serif;font-size:14px;font-weight:600;line-height:20px;vertical-align:middle;">' . wp_kses_post( nl2br( esc_html( $value ) ) ) . '</td>
 			</tr>';
 		}
 
@@ -88,7 +99,7 @@ if ( ! function_exists( 'dtb_email_details_table' ) ) {
 			return '';
 		}
 
-		return '<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin:26px 0 0;border-collapse:collapse;">' . $body . '</table>';
+		return '<table class="dtb-details-table" role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin:28px 0 0;border-collapse:collapse;border-radius:8px;overflow:hidden;border:1px solid #e5e7eb;">' . $body . '</table>';
 	}
 }
 
@@ -132,63 +143,201 @@ if ( ! function_exists( 'dtb_render_branded_email' ) ) {
 		$button_html  = dtb_email_button( $cta_url, $cta_label );
 
 		return '<!doctype html>
-<html lang="en">
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<meta name="color-scheme" content="light dark">
 	<meta name="supported-color-schemes" content="light dark">
+	<!--[if !mso]><!-->
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<!--<![endif]-->
 	<title>' . esc_html( $title ) . '</title>
-	<style>
-		@media only screen and (max-width: 620px) {
-			.dtb-email-shell { padding: 18px 10px !important; }
-			.dtb-email-card { width: 100% !important; }
-			.dtb-email-header { padding: 24px 20px 18px !important; }
-			.dtb-email-body { padding: 28px 20px 24px !important; }
-			.dtb-email-footer { padding: 18px 20px !important; }
-			.dtb-email-title { font-size: 27px !important; line-height: 32px !important; }
+	<style type="text/css">
+		/* ── RESET ── */
+		body, table, td, a { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
+		table, td { mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
+		img { -ms-interpolation-mode: bicubic; border: 0; outline: 0; text-decoration: none; }
+
+		/* ── MOBILE ── */
+		@media only screen and (max-width: 600px) {
+			.dtb-shell       { padding: 0 !important; }
+			.dtb-card        { border-radius: 0 !important; border-left: none !important; border-right: none !important; }
+			.dtb-header      { padding: 28px 24px 22px !important; }
+			.dtb-body        { padding: 32px 24px 28px !important; }
+			.dtb-footer      { padding: 20px 24px !important; }
+			.dtb-title       { font-size: 26px !important; line-height: 33px !important; }
+			.dtb-logo        { width: 170px !important; }
+		}
+
+		/* ── DARK MODE ── */
+		/* Supported by: Apple Mail, iOS Mail 13+, Outlook iOS/Android app, Gmail app (2022+) */
+		@media (prefers-color-scheme: dark) {
+
+			/* Preheader — match dark bg so it stays invisible */
+			.dtb-preheader   { color: #000000 !important; }
+
+			/* Shell — pure black outer background */
+			.dtb-shell       { background: #000000 !important; }
+
+			/* Card — very dark charcoal, visible border */
+			.dtb-card        { background: #0d1117 !important; border-color: #21262d !important; }
+
+			/* Header — pure black so logo sits on solid black */
+			.dtb-header      { background: #000000 !important; }
+
+			/* Accent stripe — stays the same blue gradient, no change needed */
+
+			/* Body area */
+			.dtb-body        { background: #0d1117 !important; }
+
+			/* Eyebrow badge */
+			.dtb-eyebrow-td  { background: #1e3a8a !important; }
+			.dtb-eyebrow-lbl { color: #93c5fd !important; }
+
+			/* Title */
+			.dtb-title       { color: #f0f6fc !important; }
+
+			/* Greeting */
+			.dtb-greeting    { color: #e6edf3 !important; }
+
+			/* Intro / body copy */
+			.dtb-intro       { color: #8b949e !important; }
+
+			/* Details table */
+			.dtb-details-table               { border-color: #30363d !important; }
+			.dtb-dt-label.dtb-dt-even,
+			.dtb-dt-val.dtb-dt-even          { background: #161b22 !important; }
+			.dtb-dt-label.dtb-dt-odd,
+			.dtb-dt-val.dtb-dt-odd           { background: #0d1117 !important; }
+			.dtb-dt-label                    { color: #8b949e !important; }
+			.dtb-dt-val                      { color: #e6edf3 !important; }
+
+			/* Reply / body_html block */
+			.dtb-reply-accent  { background: #388bfd !important; }
+			.dtb-reply-body    { background: #161b22 !important; border-color: #30363d !important; color: #c9d1d9 !important; }
+
+			/* Button — stays solid blue, legible on dark */
+			.dtb-btn-td        { background: #388bfd !important; }
+
+			/* Sign-off */
+			.dtb-signoff       { color: #8b949e !important; }
+			.dtb-signoff-name  { color: #f0f6fc !important; }
+
+			/* Footer */
+			.dtb-footer        { background: #010409 !important; border-top-color: #21262d !important; }
+			.dtb-footer-note   { color: #484f58 !important; }
+			.dtb-footer-link   { color: #8b949e !important; }
+			.dtb-footer-sep    { color: #21262d !important; }
+
+			/* Below-card copyright */
+			.dtb-copyright     { color: #484f58 !important; }
 		}
 	</style>
 </head>
-<body bgcolor="#edf2f7" style="margin:0;padding:0;background:#edf2f7;font-family:Arial,Helvetica,sans-serif;-webkit-text-size-adjust:100%;text-size-adjust:100%;">
-	<div style="display:none;max-height:0;overflow:hidden;opacity:0;color:transparent;">' . esc_html( $preheader ) . '</div>
-	<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" bgcolor="#edf2f7" style="background:#edf2f7;">
+<body style="margin:0;padding:0;background:#f3f4f6;font-family:-apple-system,BlinkMacSystemFont,\'Segoe UI\',Helvetica,Arial,sans-serif;-webkit-text-size-adjust:100%;text-size-adjust:100%;">
+
+	<!--[if mso]><table role="presentation" width="100%" style="background:#f3f4f6;"><tr><td><![endif]-->
+
+	<!-- PREHEADER (hidden preview text) -->
+	<div class="dtb-preheader" style="display:none;max-height:0;overflow:hidden;mso-hide:all;font-size:1px;line-height:1px;color:#f3f4f6;">' . esc_html( $preheader ) . '&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;</div>
+
+	<!-- OUTER SHELL -->
+	<table class="dtb-shell" role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background:#f3f4f6;padding:48px 20px;">
 		<tr>
-			<td class="dtb-email-shell" align="center" bgcolor="#edf2f7" style="padding:34px 16px;background:#edf2f7;">
-				<table role="presentation" class="dtb-email-card" cellspacing="0" cellpadding="0" border="0" width="640" bgcolor="#ffffff" style="width:640px;max-width:640px;background:#ffffff;border:1px solid #d6e1ee;border-radius:12px;overflow:hidden;">
+			<td align="center" valign="top">
+
+				<!-- CARD -->
+				<table class="dtb-card" role="presentation" cellspacing="0" cellpadding="0" border="0" width="600" style="width:600px;max-width:600px;background:#ffffff;border-radius:16px;border:1px solid #e5e7eb;overflow:hidden;">
+
+					<!-- ── HEADER ── -->
 					<tr>
-						<td class="dtb-email-header" align="center" bgcolor="#0f172a" style="padding:26px 34px 20px;background:#0f172a;border-bottom:1px solid #1e293b;text-align:center;">
+						<td class="dtb-header" style="padding:32px 40px 28px;background:#111827;text-align:center;">
 							<a href="' . $home_url . '" style="text-decoration:none;display:inline-block;">
-								<img src="' . $logo_url . '" alt="' . esc_attr( $site ) . '" width="260" style="display:block;border:0;width:260px;max-width:90%;height:auto;color:#ffffff;margin:0 auto;">
+								<img class="dtb-logo" src="' . $logo_url . '" alt="' . esc_attr( $site ) . '" width="200" style="display:block;border:0;width:200px;max-width:85%;height:auto;margin:0 auto;">
 							</a>
 						</td>
 					</tr>
+
+					<!-- ── ACCENT STRIPE ── -->
 					<tr>
-						<td class="dtb-email-body" bgcolor="#ffffff" style="padding:36px 42px 30px;background:#ffffff;">
-							<p style="margin:0 0 14px;color:#1d4ed8;font-family:Arial,Helvetica,sans-serif;font-size:12px;font-weight:800;letter-spacing:0.08em;line-height:16px;text-transform:uppercase;text-align:center;">' . esc_html( $eyebrow ) . '</p>
-							<h1 class="dtb-email-title" style="margin:0 0 22px;color:#0f172a;font-family:Arial,Helvetica,sans-serif;font-size:32px;font-weight:800;line-height:38px;letter-spacing:0;text-align:center;">' . esc_html( $title ) . '</h1>
-							<p style="margin:0 0 16px;color:#334155;font-family:Arial,Helvetica,sans-serif;font-size:16px;line-height:25px;">' . esc_html( $greeting ) . '</p>
-							' . ( '' !== $intro ? '<p style="margin:0;color:#334155;font-family:Arial,Helvetica,sans-serif;font-size:16px;line-height:25px;">' . $intro . '</p>' : '' ) . '
+						<td style="background:linear-gradient(90deg,#1d4ed8 0%,#3b82f6 100%);height:3px;font-size:3px;line-height:3px;mso-line-height-rule:exactly;">&nbsp;</td>
+					</tr>
+
+					<!-- ── BODY ── -->
+					<tr>
+						<td class="dtb-body" style="padding:40px 44px 36px;background:#ffffff;">
+
+							<!-- Eyebrow badge -->
+							<table role="presentation" cellspacing="0" cellpadding="0" border="0" align="center" style="margin:0 auto 24px;">
+								<tr>
+									<td class="dtb-eyebrow-td" style="background:#eff6ff;border-radius:20px;padding:5px 14px;">
+										<span class="dtb-eyebrow-lbl" style="color:#1d4ed8;font-family:-apple-system,BlinkMacSystemFont,\'Segoe UI\',Helvetica,Arial,sans-serif;font-size:11px;font-weight:700;letter-spacing:0.08em;line-height:16px;text-transform:uppercase;">' . esc_html( $eyebrow ) . '</span>
+									</td>
+								</tr>
+							</table>
+
+							<!-- Title -->
+							<h1 class="dtb-title" style="margin:0 0 8px;color:#111827;font-family:-apple-system,BlinkMacSystemFont,\'Segoe UI\',Helvetica,Arial,sans-serif;font-size:28px;font-weight:700;line-height:36px;letter-spacing:-0.025em;text-align:center;">' . esc_html( $title ) . '</h1>
+
+							<!-- Short divider -->
+							<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="48" align="center" style="margin:16px auto 28px;">
+								<tr>
+									<td style="background:#1d4ed8;height:3px;border-radius:2px;font-size:3px;line-height:3px;mso-line-height-rule:exactly;">&nbsp;</td>
+								</tr>
+							</table>
+
+							<!-- Greeting -->
+							<p class="dtb-greeting" style="margin:0 0 8px;color:#374151;font-family:-apple-system,BlinkMacSystemFont,\'Segoe UI\',Helvetica,Arial,sans-serif;font-size:16px;line-height:26px;font-weight:600;">' . esc_html( $greeting ) . '</p>
+
+							<!-- Intro -->
+							' . ( '' !== $intro ? '<p class="dtb-intro" style="margin:0;color:#6b7280;font-family:-apple-system,BlinkMacSystemFont,\'Segoe UI\',Helvetica,Arial,sans-serif;font-size:15px;line-height:25px;">' . $intro . '</p>' : '' ) . '
+
+							<!-- Details table -->
 							' . $details_html . '
-							' . ( '' !== $body_html ? '<div style="margin:22px 0 0;padding:16px 18px;color:#334155;background:#f8fbff;border:1px solid #dbe5f1;border-radius:10px;font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:24px;">' . $body_html . '</div>' : '' ) . '
+
+							<!-- Body / reply block -->
+							' . ( '' !== $body_html ? '
+							<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin:28px 0 0;">
+								<tr>
+									<td class="dtb-reply-accent" width="3" style="background:#1d4ed8;border-radius:3px 0 0 3px;font-size:1px;line-height:1px;mso-line-height-rule:exactly;">&nbsp;</td>
+									<td class="dtb-reply-body" style="padding:16px 18px;background:#f9fafb;border:1px solid #e5e7eb;border-left:0;border-radius:0 8px 8px 0;color:#374151;font-family:-apple-system,BlinkMacSystemFont,\'Segoe UI\',Helvetica,Arial,sans-serif;font-size:14px;line-height:23px;">' . $body_html . '</td>
+								</tr>
+							</table>' : '' ) . '
+
+							<!-- CTA Button -->
 							' . $button_html . '
-							<p style="margin:30px 0 0;color:#334155;font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:24px;">Thanks,<br><strong style="color:#0f172a;">' . esc_html( $signoff ) . '</strong></p>
+
+							<!-- Sign-off -->
+							<p class="dtb-signoff" style="margin:36px 0 0;color:#6b7280;font-family:-apple-system,BlinkMacSystemFont,\'Segoe UI\',Helvetica,Arial,sans-serif;font-size:14px;line-height:22px;">Thanks,<br><strong class="dtb-signoff-name" style="color:#111827;font-weight:600;">' . esc_html( $signoff ) . '</strong></p>
+
 						</td>
 					</tr>
+
+					<!-- ── FOOTER ── -->
 					<tr>
-						<td class="dtb-email-footer" bgcolor="#f8fbff" style="padding:20px 42px;background:#f8fbff;border-top:1px solid #dbe5f1;text-align:center;">
-							<p style="margin:0;color:#64748b;font-family:Arial,Helvetica,sans-serif;font-size:12px;line-height:19px;">' . esc_html( $footer_note ) . '</p>
-							<p style="margin:12px 0 0;color:#64748b;font-family:Arial,Helvetica,sans-serif;font-size:12px;line-height:19px;">
-								<a href="' . $home_url . '" style="color:#1d4ed8;text-decoration:none;">drywalltoolbox.com</a>
-								<span style="color:#94a3b8;">&nbsp;|&nbsp;</span>
-								<a href="' . $support_url . '" style="color:#1d4ed8;text-decoration:none;">Contact support</a>
+						<td class="dtb-footer" style="padding:22px 44px;background:#f9fafb;border-top:1px solid #e5e7eb;text-align:center;">
+							<p class="dtb-footer-note" style="margin:0 0 10px;color:#9ca3af;font-family:-apple-system,BlinkMacSystemFont,\'Segoe UI\',Helvetica,Arial,sans-serif;font-size:12px;line-height:18px;">' . esc_html( $footer_note ) . '</p>
+							<p style="margin:0;font-family:-apple-system,BlinkMacSystemFont,\'Segoe UI\',Helvetica,Arial,sans-serif;font-size:12px;line-height:18px;">
+								<a class="dtb-footer-link" href="' . $home_url . '" style="color:#6b7280;text-decoration:none;font-weight:500;">drywalltoolbox.com</a>
+								<span class="dtb-footer-sep" style="color:#d1d5db;">&nbsp;&middot;&nbsp;</span>
+								<a class="dtb-footer-link" href="' . $support_url . '" style="color:#6b7280;text-decoration:none;font-weight:500;">Contact support</a>
 							</p>
 						</td>
 					</tr>
+
 				</table>
+				<!-- /CARD -->
+
+				<!-- Below-card copyright -->
+				<p class="dtb-copyright" style="margin:20px 0 0;color:#9ca3af;font-family:-apple-system,BlinkMacSystemFont,\'Segoe UI\',Helvetica,Arial,sans-serif;font-size:11px;line-height:17px;text-align:center;">&copy; ' . gmdate( 'Y' ) . ' Drywall Toolbox. All rights reserved.</p>
+
 			</td>
 		</tr>
 	</table>
+
+	<!--[if mso]></td></tr></table><![endif]-->
+
 </body>
 </html>';
 	}

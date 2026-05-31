@@ -153,7 +153,45 @@ class DTB_Repair_List_Table extends WP_List_Table {
 					'value'   => $search,
 					'compare' => 'LIKE',
 				],
+				[
+					'key'     => '_repair_customer_phone',
+					'value'   => $search,
+					'compare' => 'LIKE',
+				],
+				[
+					'key'     => '_repair_wc_order_id',
+					'value'   => $search,
+					'compare' => 'LIKE',
+				],
+				[
+					'key'     => '_repair_model',
+					'value'   => $search,
+					'compare' => 'LIKE',
+				],
+				[
+					'key'     => '_repair_tool_brand',
+					'value'   => $search,
+					'compare' => 'LIKE',
+				],
+				[
+					'key'     => '_repair_serial',
+					'value'   => $search,
+					'compare' => 'LIKE',
+				],
 			];
+
+			$search_digits = preg_replace( '/\D+/', '', $search );
+			if ( ! empty( $search_digits ) ) {
+				$args['meta_query'][] = [
+					'key'     => '_repair_wc_order_id',
+					'value'   => $search_digits,
+					'compare' => '=',
+				];
+			}
+
+			if ( preg_match( '/^#?(\d+)$/', trim( $search ), $m ) ) {
+				$args['post__in'] = [ (int) $m[1] ];
+			}
 		}
 
 		// Status filter — supports tab group (IN) and individual chip (=).
@@ -269,7 +307,19 @@ class DTB_Repair_List_Table extends WP_List_Table {
 			return '—';
 		}
 
-		$type_label = ucwords( str_replace( '_', ' ', esc_html( $ev->event_type ) ) );
+		if ( 'internal' === (string) ( $ev->visibility ?? '' ) && function_exists( 'dtb_repair_get_events' ) ) {
+			$recent_events = array_reverse( (array) dtb_repair_get_events( $item->ID, null, 12 ) );
+			foreach ( $recent_events as $candidate ) {
+				if ( 'internal' !== (string) ( $candidate->visibility ?? '' ) ) {
+					$ev = $candidate;
+					break;
+				}
+			}
+		}
+
+		$type_label = function_exists( 'dtb_repair_event_label' )
+			? dtb_repair_event_label( (string) $ev->event_type )
+			: ucwords( str_replace( [ 'repair.', '.', '_' ], [ '', ' ', ' ' ], (string) $ev->event_type ) );
 		$ts         = strtotime( $ev->created_at );
 		$ago        = $ts ? human_time_diff( $ts, time() ) . ' ago' : esc_html( $ev->created_at );
 
@@ -390,6 +440,35 @@ function dtb_repair_admin_search_filter( WP_Query $query ): void {
 				'value'   => $search,
 				'compare' => 'LIKE',
 			],
+			[
+				'key'     => '_repair_customer_phone',
+				'value'   => $search,
+				'compare' => 'LIKE',
+			],
+			[
+				'key'     => '_repair_wc_order_id',
+				'value'   => $search,
+				'compare' => 'LIKE',
+			],
+			[
+				'key'     => '_repair_model',
+				'value'   => $search,
+				'compare' => 'LIKE',
+			],
+			[
+				'key'     => '_repair_tool_brand',
+				'value'   => $search,
+				'compare' => 'LIKE',
+			],
+			[
+				'key'     => '_repair_serial',
+				'value'   => $search,
+				'compare' => 'LIKE',
+			],
 		]
 	);
+
+	if ( preg_match( '/^#?(\d+)$/', trim( $search ), $m ) ) {
+		$query->set( 'post__in', [ (int) $m[1] ] );
+	}
 }

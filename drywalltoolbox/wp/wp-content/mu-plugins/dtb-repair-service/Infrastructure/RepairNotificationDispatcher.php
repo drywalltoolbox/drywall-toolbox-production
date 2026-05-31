@@ -153,11 +153,74 @@ $name, $rid, $brand, $model, $tier, $turl, $site
 
 // ---- Customer: quote sent -----------------------------------------------
 case 'repair-quote-created':
+$quote_lines = is_array( $ctx['quote_lines'] ?? null ) ? $ctx['quote_lines'] : [];
+$quote_totals = is_array( $ctx['quote_totals'] ?? null ) ? $ctx['quote_totals'] : [];
+$quote_currency = sanitize_text_field( (string) ( $ctx['quote_currency'] ?? dtb_repair_quote_default_currency() ) );
+$quote_note = trim( wp_strip_all_tags( (string) ( $ctx['quote_customer_note'] ?? '' ) ) );
+$quote_expires = sanitize_text_field( (string) ( $ctx['quote_expires_at'] ?? '' ) );
+
+$quote_lines_text = '';
+if ( ! empty( $quote_lines ) ) {
+	$lines = [];
+	foreach ( $quote_lines as $line ) {
+		if ( ! is_array( $line ) ) {
+			continue;
+		}
+		$label = sanitize_text_field( (string) ( $line['label'] ?? '' ) );
+		if ( '' === $label ) {
+			continue;
+		}
+		$qty = (float) ( $line['quantity'] ?? 1 );
+		$unit = (float) ( $line['unit_price'] ?? 0 );
+		$total = (float) ( $line['line_total'] ?? ( $qty * $unit ) );
+		$lines[] = sprintf(
+			'- %1$s (Qty %2$s): %3$s %4$s',
+			$label,
+			rtrim( rtrim( number_format( max( 0.001, $qty ), 3, '.', '' ), '0' ), '.' ),
+			$quote_currency,
+			number_format( $total, 2, '.', '' )
+		);
+	}
+	if ( ! empty( $lines ) ) {
+		$quote_lines_text = implode( "\n", $lines ) . "\n";
+	}
+}
+
+$quote_total_text = '';
+if ( isset( $quote_totals['total'] ) ) {
+	$quote_total_text = sprintf(
+		__( "Quote Total: %1\$s %2\$0.2f\n", 'drywall-toolbox' ),
+		$quote_currency,
+		(float) $quote_totals['total']
+	);
+}
+
+$quote_expiry_text = '';
+if ( '' !== $quote_expires ) {
+	$exp_ts = strtotime( $quote_expires );
+	if ( false !== $exp_ts ) {
+		$quote_expiry_text = sprintf(
+			__( "Quote Expires: %s\n", 'drywall-toolbox' ),
+			date_i18n( 'M j, Y g:i a', $exp_ts )
+		);
+	}
+}
+
+$quote_note_text = '' !== $quote_note ? __( "\nNotes from our technician:\n", 'drywall-toolbox' ) . $quote_note . "\n" : '';
+
 return [
 'subject' => sprintf( __( '[%1$s] Your repair quote is ready — #%2$d', 'drywall-toolbox' ), $site, $rid ),
 'body'    => sprintf(
-__( "Hi %1\$s,\n\nWe have prepared a quote for your repair (#%2\$d — %3\$s %4\$s).\n\nPlease log in to review and accept or decline your quote:\n%5\$s\n\nThis quote will expire in 14 days. If you have any questions, please reply to this email.\n\n— %6\$s Team", 'drywall-toolbox' ),
-$name, $rid, $brand, $model, $turl, $site
+	__( "Hi %1\$s,\n\nWe have prepared a quote for your repair (#%2\$d — %3\$s %4\$s).\n\n%5\$s%6\$s%7\$sPlease log in to review and accept or decline your quote:\n%8\$s\n\nIf you have any questions, please reply to this email.\n\n— %9\$s Team", 'drywall-toolbox' ),
+	$name,
+	$rid,
+	$brand,
+	$model,
+	$quote_lines_text,
+	$quote_total_text,
+	$quote_expiry_text . $quote_note_text,
+	$turl,
+	$site
 ),
 ];
 
@@ -312,7 +375,68 @@ function dtb_repair_render_customer_email_html( string $template, array $ctx ): 
 			$eyebrow   = 'Quote ready';
 			$intro     = 'We prepared a repair quote for your review. Please review it when you have a moment.';
 			$cta_label = '' !== $tracking_url ? 'Review repair quote' : '';
-			$body_html = '<p style="margin:0;">This quote will expire in 14 days. Reply to this email if you have any questions.</p>';
+			$quote_lines = is_array( $ctx['quote_lines'] ?? null ) ? $ctx['quote_lines'] : [];
+			$quote_totals = is_array( $ctx['quote_totals'] ?? null ) ? $ctx['quote_totals'] : [];
+			$quote_currency = sanitize_text_field( (string) ( $ctx['quote_currency'] ?? dtb_repair_quote_default_currency() ) );
+			$quote_note = trim( sanitize_textarea_field( (string) ( $ctx['quote_customer_note'] ?? '' ) ) );
+			$quote_expires = sanitize_text_field( (string) ( $ctx['quote_expires_at'] ?? '' ) );
+
+			$rows_html = '';
+			foreach ( $quote_lines as $line ) {
+				if ( ! is_array( $line ) ) {
+					continue;
+				}
+				$label = sanitize_text_field( (string) ( $line['label'] ?? '' ) );
+				if ( '' === $label ) {
+					continue;
+				}
+				$qty = (float) ( $line['quantity'] ?? 1 );
+				$unit = (float) ( $line['unit_price'] ?? 0 );
+				$line_total = (float) ( $line['line_total'] ?? ( $qty * $unit ) );
+				$rows_html .= '<tr>'
+					. '<td style="padding:8px 10px;border-top:1px solid #334155;color:#e2e8f0;">' . esc_html( $label ) . '</td>'
+					. '<td style="padding:8px 10px;border-top:1px solid #334155;text-align:right;color:#cbd5e1;">' . esc_html( rtrim( rtrim( number_format( max( 0.001, $qty ), 3, '.', '' ), '0' ), '.' ) ) . '</td>'
+					. '<td style="padding:8px 10px;border-top:1px solid #334155;text-align:right;color:#cbd5e1;">' . esc_html( $quote_currency . ' ' . number_format( $unit, 2, '.', '' ) ) . '</td>'
+					. '<td style="padding:8px 10px;border-top:1px solid #334155;text-align:right;color:#e2e8f0;font-weight:700;">' . esc_html( $quote_currency . ' ' . number_format( $line_total, 2, '.', '' ) ) . '</td>'
+					. '</tr>';
+			}
+
+			$total_html = '';
+			if ( isset( $quote_totals['total'] ) ) {
+				$total_html = '<div style="margin-top:10px;text-align:right;font-size:14px;color:#e2e8f0;font-weight:800;">'
+					. esc_html( 'Total: ' . $quote_currency . ' ' . number_format( (float) $quote_totals['total'], 2, '.', '' ) )
+					. '</div>';
+			}
+
+			$expires_html = '';
+			if ( '' !== $quote_expires ) {
+				$ts = strtotime( $quote_expires );
+				if ( false !== $ts ) {
+					$expires_html = '<p style="margin:10px 0 0;color:#cbd5e1;">'
+						. esc_html( 'Quote expires: ' . date_i18n( 'M j, Y g:i a', $ts ) )
+						. '</p>';
+				}
+			}
+
+			$body_html = '';
+			if ( '' !== $rows_html ) {
+				$body_html .= '<table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="border:1px solid #334155;border-radius:8px;overflow:hidden;margin:6px 0 0;">'
+					. '<thead><tr>'
+					. '<th style="padding:8px 10px;text-align:left;background:#111827;color:#93c5fd;font-size:12px;">Item</th>'
+					. '<th style="padding:8px 10px;text-align:right;background:#111827;color:#93c5fd;font-size:12px;">Qty</th>'
+					. '<th style="padding:8px 10px;text-align:right;background:#111827;color:#93c5fd;font-size:12px;">Unit</th>'
+					. '<th style="padding:8px 10px;text-align:right;background:#111827;color:#93c5fd;font-size:12px;">Line Total</th>'
+					. '</tr></thead><tbody>' . $rows_html . '</tbody></table>';
+				$body_html .= $total_html;
+				$body_html .= $expires_html;
+			} else {
+				$body_html = '<p style="margin:0;">This quote is ready for your review.</p>' . $expires_html;
+			}
+			if ( '' !== $quote_note ) {
+				$body_html .= '<div style="margin-top:12px;padding:14px;border:1px solid #334155;border-radius:8px;background:#050b18;color:#cbd5e1;">'
+					. nl2br( esc_html( $quote_note ) )
+					. '</div>';
+			}
 			break;
 
 		case 'repair-quote-accepted':
@@ -503,6 +627,13 @@ $context = array_merge(
 ],
 $extra_context
 );
+
+if ( 'repair-quote-created' === $template && empty( $context['quote_lines'] ) && function_exists( 'dtb_repair_get_quote' ) ) {
+	$quote = dtb_repair_get_quote( $repair_id );
+	if ( is_array( $quote ) && function_exists( 'dtb_repair_quote_to_notification_context' ) ) {
+		$context = array_merge( $context, dtb_repair_quote_to_notification_context( $quote ) );
+	}
+}
 
 // Determine recipient: admin templates go to the admin address.
 $admin_templates = [ 'repair-submitted-admin', 'repair-customer-message-admin' ];

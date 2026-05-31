@@ -58,13 +58,10 @@ function dtb_support_default_priority(): string {
  * @return int  Hours.
  */
 function dtb_support_sla_hours( string $priority ): int {
-	$map = [
-		'low'    => 72,
-		'normal' => 24,
-		'high'   => 8,
-		'urgent' => 2,
-	];
-	return (int) apply_filters( 'dtb_support_sla_hours', $map[ $priority ] ?? 24 );
+	$default_hours = 24;
+
+	// Support command center target: first response within one business day.
+	return (int) apply_filters( 'dtb_support_sla_hours', $default_hours, $priority );
 }
 
 /**

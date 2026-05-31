@@ -74,8 +74,11 @@ function dtb_support_enqueue_admin_assets( string $hook ): void {
 			'nonce'         => wp_create_nonce( 'wp_rest' ),
 			'currentUserId' => get_current_user_id(),
 			'currentUser'   => $current_user->display_name,
+			'siteName'      => get_bloginfo( 'name' ),
+			'repairsAdminUrl' => admin_url( 'admin.php?page=dtb-repairs' ),
 			'defaultQueue'  => get_option( 'dtb_support_default_queue', 'needs_reply' ),
 			'pollInterval'  => max( 30, (int) get_option( 'dtb_support_poll_interval', 60 ) ),
+			'actionDueHours' => function_exists( 'dtb_support_action_due_hours' ) ? max( 1, (int) dtb_support_action_due_hours() ) : 24,
 			'capabilities'  => [
 				'manage'         => current_user_can( 'dtb_manage_support' ),
 				'reply'          => current_user_can( 'dtb_reply_support_tickets' ),

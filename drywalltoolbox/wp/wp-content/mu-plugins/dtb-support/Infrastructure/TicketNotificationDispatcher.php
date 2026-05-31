@@ -76,6 +76,34 @@ function dtb_support_wp_mail_from_name( string $original ): string {
 	return defined( 'DTB_SUPPORT_SENDING' ) ? dtb_support_email_from_name() : $original;
 }
 
+/**
+ * Expand macro-style placeholders in outbound reply bodies.
+ *
+ * Supports both {{variable}} and {variable} tokens for compatibility with
+ * historical macro content and UI-level macro insertion.
+ */
+function dtb_support_expand_reply_tokens( string $message, object $ticket, string $reply_link = '' ): string {
+	$values = [
+		'customer_name'  => (string) ( $ticket->customer_name ?? '' ),
+		'customer_email' => (string) ( $ticket->customer_email ?? '' ),
+		'ticket_number'  => (string) ( $ticket->ticket_number ?? '' ),
+		'subject'        => (string) ( $ticket->subject ?? '' ),
+		'order_id'       => ! empty( $ticket->order_id ) ? (string) $ticket->order_id : '',
+		'site_name'      => (string) get_bloginfo( 'name' ),
+		'support_email'  => function_exists( 'dtb_support_email_from' ) ? dtb_support_email_from() : (string) get_option( 'admin_email', '' ),
+		'ticket_url'     => '' !== $reply_link ? $reply_link : admin_url( 'admin.php?page=dtb-support&ticket_id=' . (int) ( $ticket->id ?? 0 ) ),
+	];
+
+	return (string) preg_replace_callback(
+		'/\{\{\s*([a-z0-9_]+)\s*\}\}|\{([a-z0-9_]+)\}/i',
+		static function ( array $matches ) use ( $values ): string {
+			$key = strtolower( (string) ( $matches[1] ?: $matches[2] ?: '' ) );
+			return array_key_exists( $key, $values ) ? (string) $values[ $key ] : (string) $matches[0];
+		},
+		(string) $message
+	);
+}
+
 // =============================================================================
 // SECTION 2 — EMAIL BUILDER
 // =============================================================================
@@ -400,6 +428,8 @@ function dtb_support_notify_staff_reply( object $ticket, string $reply_body ): v
 		[ 'token' => $reply_token ],
 		rest_url( 'dtb/v1/support/tickets/' . $ticket->id . '/reply/public' )
 	);
+
+	$reply_body = dtb_support_expand_reply_tokens( $reply_body, $ticket, esc_url_raw( $reply_link ) );
 
 	$ctx = [
 		'ticket_number'  => $ticket->ticket_number,

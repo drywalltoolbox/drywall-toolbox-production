@@ -33,6 +33,12 @@
     return Boolean(cfg.capabilities && cfg.capabilities[capability]);
   }
 
+  function actionDueHours() {
+    var configured = parseInt(cfg.actionDueHours, 10);
+    if (!configured || configured < 1) return 24;
+    return configured;
+  }
+
   window.dtbSupport = {
     activeQueue: cfg.defaultQueue || 'needs_reply',
     activeTicketId: null,
@@ -48,6 +54,8 @@
     filters: {},
     composerMode: 'reply',
     autoRefreshTimer: null,
+    actionDueTimer: null,
+    lastTicketLoadAt: Date.now(),
     queueLabels: {
       needs_reply: 'Needs Reply',
       overdue: 'Overdue',
@@ -69,6 +77,7 @@
       this.switchQueue(this.activeQueue);
       this.initKeyboardShortcuts();
       this.startAutoRefresh();
+      this.startActionDueTicker();
       this.bindLegacyReplyForm();
     },
 
@@ -94,6 +103,9 @@
         var $picker = $('#dtb-macro-picker');
         if ($picker.length && $picker.is(':visible') && !$(e.target).closest('.dtb-macro-host').length) {
           $picker.hide();
+        }
+        if (!$(e.target).closest('.dtb-row-menu').length) {
+          self.closeRowMenus();
         }
       });
     },
@@ -146,6 +158,10 @@
           var queue = $(this).data('queue');
           $(this).find('.dtb-rail-badge').text(counts[queue] || 0);
         });
+        $('[data-queue-summary]').each(function () {
+          var queue = $(this).data('queueSummary');
+          $(this).text(counts[queue] || 0);
+        });
       });
     },
 
@@ -188,6 +204,17 @@
       this.loadTickets(this.activeQueue, {});
     },
 
+    openRepairsSearch: function () {
+      var baseUrl = String(cfg.repairsAdminUrl || '');
+      if (!baseUrl) return;
+      var term = String($('#dtb-search').val() || '').trim();
+      var url = baseUrl;
+      if (term) {
+        url += (url.indexOf('?') === -1 ? '?' : '&') + $.param({ s: term });
+      }
+      window.location.href = url;
+    },
+
     loadTickets: function (queue, filters) {
       var self = this;
       $('#dtb-list-loading').show();
@@ -208,6 +235,8 @@
         $('#dtb-prev-page').prop('disabled', self.page <= 1);
         $('#dtb-next-page').prop('disabled', self.page >= self.pageCount);
         $('#dtb-tickets-tbody').html(self.tickets.map(function (ticket) { return self.renderTicketRow(ticket); }).join(''));
+        self.lastTicketLoadAt = Date.now();
+        self.refreshActionDueBadges();
         $('#dtb-list-loading').hide();
         if (self.tickets.length) {
           $('#dtb-tickets-table,#dtb-pagination').show();
@@ -226,17 +255,12 @@
       var assigned = ticket.assigned_user && ticket.assigned_user.display_name ? ticket.assigned_user.display_name : 'Unassigned';
       var lastReply = ticket.last_customer_reply_at || ticket.last_staff_reply_at || ticket.created_at;
       var selected = this.selectedTickets[ticket.id] ? ' is-selected' : '';
-      var rowActions = [
-        '<button class="dtb-btn dtb-btn--primary dtb-btn--xs dtb-open-ticket" data-ticket-id="' + ticket.id + '">Open</button>',
-        '<button class="dtb-btn dtb-btn--ghost dtb-btn--xs" onclick="dtbSupport.assignToMe(' + ticket.id + ')">Assign</button>',
-        '<button class="dtb-btn dtb-btn--ghost dtb-btn--xs" onclick="dtbSupport.resolveTicket(' + ticket.id + ')">Resolve</button>',
-        '<button class="dtb-btn dtb-btn--ghost dtb-btn--xs" onclick="dtbSupport.quickSnoozeHours(' + ticket.id + ',24)">Snooze</button>'
-      ].join(' ');
+      var rowActions = this.renderRowActionMenu(ticket.id);
 
       return '<tr id="dtb-row-' + ticket.id + '" class="' + selected + '">' +
         '<td><input type="checkbox" ' + (this.selectedTickets[ticket.id] ? 'checked' : '') + ' onchange="dtbSupport.toggleBulkSelect(' + ticket.id + ', this.checked)"></td>' +
         '<td><a href="#" class="dtb-row-link" data-ticket-id="' + ticket.id + '">' + esc(ticket.ticket_number) + '</a></td>' +
-        '<td><a href="#" class="dtb-row-link" data-ticket-id="' + ticket.id + '">' + esc(ticket.subject) + '</a><div class="dtb-subject-meta">' + esc(ticket.customer_name) + ' / ' + esc(ticket.customer_email) + '</div></td>' +
+        '<td><a href="#" class="dtb-row-link" data-ticket-id="' + ticket.id + '">' + esc(ticket.subject) + '</a><div class="dtb-subject-meta">' + esc(ticket.customer_name) + ' · ' + esc(ticket.customer_email) + '</div></td>' +
         '<td><span class="dtb-status dtb-status--' + esc(ticket.status) + '">' + esc(ticket.status_label || ticket.status) + '</span></td>' +
         '<td><span class="dtb-pri dtb-pri--' + esc(ticket.priority) + '">' + esc(ticket.priority_label || ticket.priority) + '</span></td>' +
         '<td>' + esc(ticket.type_label || ticket.ticket_type) + '</td>' +
@@ -248,9 +272,11 @@
     },
 
     renderActionBadge: function (ticket) {
-      var state = ticket.action_state || 'ok';
-      var label = state === 'overdue' ? 'Overdue' : state === 'due_soon' ? 'Due Soon' : this.formatActionTime(ticket.seconds_until_due);
-      return '<span class="dtb-action-state dtb-action-state--' + esc(state) + '">' + esc(label || 'On Track') + '</span>';
+      var baseSeconds = this.toSeconds(ticket.seconds_until_due);
+      var state = this.resolveActionState(baseSeconds, ticket.action_state);
+      var label = this.resolveActionLabel(state, baseSeconds);
+      var stateClass = state === 'due_soon' ? 'due-soon' : state;
+      return '<span class="dtb-action-state dtb-action-state--' + esc(stateClass) + '" data-action-seconds="' + esc(baseSeconds == null ? '' : String(baseSeconds)) + '" data-action-state="' + esc(state) + '">' + esc(label || 'On Track') + '</span>';
     },
 
     toggleRow: function (ticketId) {
@@ -288,10 +314,59 @@
 
     buildTimelineEvents: function (ticket, events) {
       var timeline = (events || []).slice();
-      if (ticket && ticket.message && !this.hasCustomerMessageEvent(timeline)) {
+      if (ticket && ticket.message && !this.hasCustomerAuthoredEvent(timeline)) {
         timeline.unshift({ id: 'origin-message', event_type: 'ticket.created', event_label: 'Original Contact Message', event_group: 'message', actor_type: 'customer', actor_label: ticket.customer_name || 'Customer', source: ticket.source || 'web_form', created_at: ticket.created_at || '', body: ticket.message, summary: ticket.message, payload: {}, synthetic: true });
       }
       return timeline;
+    },
+
+    renderRowActionMenu: function (ticketId) {
+      var menuId = 'dtb-row-menu-' + ticketId;
+      return '<div class="dtb-row-menu">' +
+        '<button type="button" class="dtb-btn dtb-btn--ghost dtb-btn--xs dtb-row-menu__trigger" onclick="dtbSupport.toggleRowMenu(' + ticketId + ');return false;" aria-expanded="false" aria-controls="' + menuId + '">Actions</button>' +
+        '<div id="' + menuId + '" class="dtb-row-menu__panel" role="menu">' +
+          '<button type="button" class="dtb-row-menu__item" role="menuitem" onclick="dtbSupport.openTicketFromMenu(' + ticketId + ')">Open</button>' +
+          '<button type="button" class="dtb-row-menu__item" role="menuitem" onclick="dtbSupport.assignToMeFromMenu(' + ticketId + ')">Assign</button>' +
+          '<button type="button" class="dtb-row-menu__item" role="menuitem" onclick="dtbSupport.resolveFromMenu(' + ticketId + ')">Resolve</button>' +
+          '<button type="button" class="dtb-row-menu__item" role="menuitem" onclick="dtbSupport.snoozeFromMenu(' + ticketId + ')">Snooze 24h</button>' +
+        '</div>' +
+      '</div>';
+    },
+
+    toggleRowMenu: function (ticketId) {
+      var menuId = '#dtb-row-menu-' + ticketId;
+      var triggerSelector = '[aria-controls="dtb-row-menu-' + ticketId + '"]';
+      var $menu = $(menuId);
+      var isOpen = $menu.hasClass('is-open');
+      this.closeRowMenus();
+      if (isOpen) return;
+      $menu.addClass('is-open');
+      $(triggerSelector).attr('aria-expanded', 'true');
+    },
+
+    closeRowMenus: function () {
+      $('.dtb-row-menu__panel').removeClass('is-open');
+      $('.dtb-row-menu__trigger').attr('aria-expanded', 'false');
+    },
+
+    openTicketFromMenu: function (ticketId) {
+      this.closeRowMenus();
+      return this.openTicket(ticketId);
+    },
+
+    assignToMeFromMenu: function (ticketId) {
+      this.closeRowMenus();
+      return this.assignToMe(ticketId);
+    },
+
+    resolveFromMenu: function (ticketId) {
+      this.closeRowMenus();
+      return this.resolveTicket(ticketId);
+    },
+
+    snoozeFromMenu: function (ticketId) {
+      this.closeRowMenus();
+      return this.quickSnoozeHours(ticketId, 24);
     },
 
     getInitialEventFilter: function (events) {
@@ -301,22 +376,25 @@
       return hasMessages ? 'message' : 'all';
     },
 
-    hasCustomerMessageEvent: function (events) {
+    hasCustomerAuthoredEvent: function (events) {
       return (events || []).some(function (event) {
         var body = String(event.body || event.summary || '').trim();
-        return body && ((event.event_group || '') === 'message' || (event.actor_type || '') === 'customer');
+        if (!body) return false;
+        if ((event.actor_type || '') === 'customer') return true;
+        return (event.event_type || '') === 'ticket.created';
       });
     },
 
     renderInsightStrip: function (ticket, events) {
       var assigned = ticket.assigned_user && ticket.assigned_user.display_name ? ticket.assigned_user.display_name : 'Unassigned';
-      return '<section class="dtb-insights-grid"><article class="dtb-insight-card"><div class="dtb-insight-card__title">Customer</div><div class="dtb-insight-card__primary">' + esc(ticket.customer_name || 'Unknown') + '</div><div class="dtb-insight-card__meta">' + esc(ticket.customer_email || 'No email') + '</div><div class="dtb-insight-card__meta">Assigned: ' + esc(assigned) + '</div></article><article class="dtb-insight-card"><div class="dtb-insight-card__title">Action Clock</div><div class="dtb-insight-card__primary">' + esc(ticket.action_state_label || ticket.action_state || 'On Track') + '</div><div class="dtb-insight-card__meta">Due: ' + esc(ticket.action_due_at ? this.formatDateTime(ticket.action_due_at) : 'Not set') + '</div><div class="dtb-insight-card__meta">Follow-up: ' + esc(ticket.followup_due_at ? this.formatDateTime(ticket.followup_due_at) : 'Not set') + '</div></article><article class="dtb-insight-card"><div class="dtb-insight-card__title">Activity</div><div class="dtb-insight-card__primary">' + esc((events || []).length) + ' Events</div><div class="dtb-insight-card__meta">Last customer: ' + esc(ticket.last_customer_reply_at ? this.formatDateTime(ticket.last_customer_reply_at) : 'None yet') + '</div><div class="dtb-insight-card__meta">Last staff: ' + esc(ticket.last_staff_reply_at ? this.formatDateTime(ticket.last_staff_reply_at) : 'None yet') + '</div></article><article class="dtb-insight-card"><div class="dtb-insight-card__title">Delivery Health</div><div class="dtb-insight-card__primary">' + esc(ticket.notification_status || 'unknown') + '</div><div class="dtb-insight-card__meta">Failures: ' + esc(ticket.notification_fail_count || 0) + '</div><div class="dtb-insight-card__meta">Last sent: ' + esc(ticket.notification_last_sent_at ? this.formatDateTime(ticket.notification_last_sent_at) : 'Never') + '</div></article></section>';
+      var deliveryState = String(ticket.notification_status || 'unknown').replace(/_/g, ' ').replace(/\b\w/g, function (char) { return char.toUpperCase(); });
+      return '<section class="dtb-insights-grid"><article class="dtb-insight-card"><div class="dtb-insight-card__title">Customer</div><div class="dtb-insight-card__primary">' + esc(ticket.customer_name || 'Unknown') + '</div><div class="dtb-insight-card__meta">' + esc(ticket.customer_email || 'No email') + '</div><div class="dtb-insight-card__meta">Assigned: ' + esc(assigned) + '</div></article><article class="dtb-insight-card"><div class="dtb-insight-card__title">Action Clock</div><div class="dtb-insight-card__primary">' + esc(ticket.action_state_label || ticket.action_state || 'On Track') + '</div><div class="dtb-insight-card__meta">Due: ' + esc(ticket.action_due_at ? this.formatDateTime(ticket.action_due_at) : 'Not set') + '</div><div class="dtb-insight-card__meta">Follow-up: ' + esc(ticket.followup_due_at ? this.formatDateTime(ticket.followup_due_at) : 'Not set') + '</div></article><article class="dtb-insight-card"><div class="dtb-insight-card__title">Activity</div><div class="dtb-insight-card__primary">' + esc((events || []).length) + ' Events</div><div class="dtb-insight-card__meta">Last customer: ' + esc(ticket.last_customer_reply_at ? this.formatDateTime(ticket.last_customer_reply_at) : 'None yet') + '</div><div class="dtb-insight-card__meta">Last staff: ' + esc(ticket.last_staff_reply_at ? this.formatDateTime(ticket.last_staff_reply_at) : 'None yet') + '</div></article><article class="dtb-insight-card"><div class="dtb-insight-card__title">Delivery Health</div><div class="dtb-insight-card__primary">' + esc(deliveryState) + '</div><div class="dtb-insight-card__meta">Failures: ' + esc(ticket.notification_fail_count || 0) + '</div><div class="dtb-insight-card__meta">Last sent: ' + esc(ticket.notification_last_sent_at ? this.formatDateTime(ticket.notification_last_sent_at) : 'Never') + '</div></article></section>';
     },
 
     renderEventFilters: function () {
       var self = this;
       return [['message', 'Messages'], ['all', 'All Activity'], ['workflow', 'Workflow'], ['internal', 'Internal'], ['delivery', 'Delivery'], ['system', 'System']].map(function (filter) {
-        return '<button class="dtb-event-filter' + (self.currentEventFilter === filter[0] ? ' is-active' : '') + '" data-filter="' + esc(filter[0]) + '">' + esc(filter[1]) + '</button>';
+        return '<button type="button" class="dtb-event-filter' + (self.currentEventFilter === filter[0] ? ' is-active' : '') + '" data-filter="' + esc(filter[0]) + '" onclick="dtbSupport.setEventFilter(\'' + esc(filter[0]) + '\');return false;">' + esc(filter[1]) + '</button>';
       }).join('');
     },
 
@@ -347,35 +425,186 @@
 
     renderEvent: function (event) {
       var group = event.event_group || 'system';
-      var actor = event.actor_label || 'System';
+      var actor = this.getEventActorLabel(event);
       var isCustomer = event.actor_type === 'customer';
       var body = this.resolveEventBody(event);
       var created = event.created_at ? this.formatDateTime(event.created_at) : '';
+      var label = this.getEventDisplayLabel(event);
       var messageClass = 'dtb-msg dtb-msg--' + (group === 'internal' ? 'internal' : isCustomer ? 'customer' : 'staff');
       if (group === 'delivery') messageClass += ' dtb-msg--delivery';
       if (group === 'system') messageClass += ' dtb-msg--system';
-      return '<article class="' + messageClass + '"><div class="dtb-msg__header"><span class="dtb-msg__author">' + esc(actor) + '</span><span class="dtb-msg__time">' + esc(created) + '</span><span class="dtb-msg__pill">' + esc(event.event_label || event.event_type || 'Event') + '</span></div><div class="dtb-msg__body">' + nl2br(body) + '</div>' + this.renderEventPayload(event.payload, group) + '</article>';
+      return '<article class="' + messageClass + '"><div class="dtb-msg__header"><span class="dtb-msg__author">' + esc(actor) + '</span><span class="dtb-msg__time">' + esc(created) + '</span><span class="dtb-msg__pill">' + esc(label) + '</span></div><div class="dtb-msg__body">' + nl2br(body) + '</div>' + this.renderEventDetails(event, group) + '</article>';
     },
 
-    renderEventPayload: function (payload, group) {
+    getEventActorLabel: function (event) {
+      var actor = String(event.actor_label || '').trim();
+      if (!actor) return 'Support System';
+      if (actor.toLowerCase() === 'system') return 'Support System';
+      return actor;
+    },
+
+    getEventDisplayLabel: function (event) {
+      if ((event.id || '') === 'origin-message') return 'Original Message';
+      var eventType = String(event.event_type || '');
+      var label = String(event.event_label || eventType || 'Event');
+      if (eventType === 'ticket.created' && event.actor_type === 'customer') return 'Customer Message';
+      return label;
+    },
+
+    renderEventDetails: function (event, group) {
       if (group !== 'internal' && group !== 'system' && group !== 'delivery') return '';
-      if (!payload || typeof payload !== 'object') return '';
+      var payload = event.payload || {};
+      var rows = this.buildEventDetailRows(event, payload);
+      if (!rows.length) return '';
+      var rowsHtml = rows.map(function (row) {
+        return '<div class="dtb-payload-row"><span class="dtb-payload-row__key">' + esc(row.label) + '</span><span class="dtb-payload-row__value">' + esc(row.value) + '</span></div>';
+      }).join('');
+      return '<div class="dtb-payload"><div class="dtb-payload__title">Details</div>' + rowsHtml + '</div>';
+    },
+
+    buildEventDetailRows: function (event, payload) {
+      if (!payload || typeof payload !== 'object') return [];
       var keys = Object.keys(payload);
-      if (!keys.length) return '';
-      var rows = keys.slice(0, 6).map(function (key) {
-        var value = payload[key];
-        if (value == null) value = '';
-        else if (typeof value === 'object') value = JSON.stringify(value);
-        else value = String(value);
-        return '<div class="dtb-payload-row"><span class="dtb-payload-row__key">' + esc(key) + '</span><span class="dtb-payload-row__value">' + esc(value) + '</span></div>';
-      });
-      return '<div class="dtb-payload">' + rows.join('') + '</div>';
+      if (!keys.length) return [];
+
+      var eventType = String(event.event_type || '');
+      var preferredByType = {
+        'ticket.created': ['subject', 'customer_name', 'customer_email', 'ticket_type'],
+        'ticket.assigned': ['assigned_to', 'assigned_user_name', 'strategy'],
+        'ticket.priority_changed': ['old_priority', 'new_priority', 'old_score', 'new_score'],
+        'ticket.status_changed': ['from_status', 'to_status', 'note', 'reason'],
+        'ticket.snoozed': ['snooze_until', 'reason'],
+        'ticket.unsnoozed': ['was_snooze_until', 'reason'],
+        'ticket.email_sent': ['recipient_email', 'subject', 'provider'],
+        'ticket.email_failed': ['recipient_email', 'error', 'attempt', 'provider']
+      };
+
+      var skipKeys = {
+        actor_type: true,
+        actor_id: true,
+        visibility: true,
+        source: true
+      };
+
+      var preferred = preferredByType[eventType] || [];
+      var orderedKeys = preferred.concat(keys.filter(function (key) { return preferred.indexOf(key) === -1; }));
+      var rows = [];
+      for (var i = 0; i < orderedKeys.length; i++) {
+        var key = orderedKeys[i];
+        if (!Object.prototype.hasOwnProperty.call(payload, key)) continue;
+        if (skipKeys[key]) continue;
+        var value = this.formatEventDetailValue(key, payload[key]);
+        if (!value) continue;
+        rows.push({
+          label: this.humanizeKeyLabel(key),
+          value: value
+        });
+        if (rows.length >= 6) break;
+      }
+
+      // Add explicit status transition details when present outside payload.
+      if (rows.length < 6 && (event.from_status || event.to_status)) {
+        if (event.from_status) {
+          rows.push({ label: 'From Status', value: this.humanizeStatus(event.from_status) });
+        }
+        if (rows.length < 6 && event.to_status) {
+          rows.push({ label: 'To Status', value: this.humanizeStatus(event.to_status) });
+        }
+      }
+
+      return rows;
+    },
+
+    humanizeKeyLabel: function (key) {
+      var custom = {
+        customer_name: 'Customer',
+        customer_email: 'Customer Email',
+        ticket_type: 'Ticket Type',
+        assigned_user_id: 'Assigned User ID',
+        assigned_user_name: 'Assigned To',
+        assigned_to: 'Assigned To',
+        old_score: 'Previous Score',
+        new_score: 'Updated Score',
+        old_priority: 'Previous Priority',
+        new_priority: 'Updated Priority',
+        snooze_until: 'Snoozed Until',
+        was_snooze_until: 'Previous Snooze',
+        recipient_email: 'Recipient'
+      };
+      if (custom[key]) return custom[key];
+      return String(key)
+        .replace(/_/g, ' ')
+        .replace(/\b\w/g, function (char) { return char.toUpperCase(); });
+    },
+
+    humanizeMetadataKey: function (key) {
+      var custom = {
+        customer_phone: 'Customer Phone',
+        ticket_url: 'Ticket URL',
+        order_id: 'Order ID',
+        order_number: 'Order Number',
+        source_channel: 'Source',
+        ip_address: 'IP Address',
+        user_agent: 'Browser'
+      };
+      if (custom[key]) return custom[key];
+      return this.humanizeKeyLabel(key);
+    },
+
+    normalizeMetadataEntries: function (metadata) {
+      var self = this;
+      if (!metadata || typeof metadata !== 'object') return [];
+      return Object.keys(metadata).filter(function (key) {
+        return !/token|secret|password|nonce/i.test(key);
+      }).map(function (key) {
+        var raw = metadata[key];
+        if (raw === null || raw === undefined || raw === '') return null;
+        var value;
+        if (typeof raw === 'object') {
+          value = Array.isArray(raw) ? raw.join(', ') : JSON.stringify(raw);
+        } else {
+          value = String(raw);
+        }
+        return {
+          key: self.humanizeMetadataKey(key),
+          value: value
+        };
+      }).filter(Boolean).slice(0, 8);
+    },
+
+    humanizeStatus: function (status) {
+      return String(status || '')
+        .replace(/_/g, ' ')
+        .replace(/\b\w/g, function (char) { return char.toUpperCase(); });
+    },
+
+    formatEventDetailValue: function (key, value) {
+      if (value == null) return '';
+      if (/_id$/.test(key) && key !== 'order_id') return '';
+      if (typeof value === 'boolean') return value ? 'Yes' : 'No';
+      if (Array.isArray(value)) return value.map(String).join(', ');
+      if (typeof value === 'object') return JSON.stringify(value);
+      var text = String(value).trim();
+      if (!text) return '';
+      if (/(_at|_until|_due)$/.test(key) && /^\d{4}-\d{2}-\d{2}/.test(text)) {
+        return this.formatDateTime(text);
+      }
+      if (key === 'from_status' || key === 'to_status' || key === 'status') {
+        return this.humanizeStatus(text);
+      }
+      return text;
     },
 
     resolveEventBody: function (event) {
-      if (event.summary) return String(event.summary);
-      if (event.body) return String(event.body);
-      if (event.from_status || event.to_status) return String(event.from_status || '') + ' -> ' + String(event.to_status || '');
+      var summary = String(event.summary || '').trim();
+      var body = String(event.body || '').trim();
+      if (summary) return summary;
+      if (body) return body;
+      if (event.from_status || event.to_status) {
+        var fromStatus = event.from_status ? this.humanizeStatus(event.from_status) : 'Unknown';
+        var toStatus = event.to_status ? this.humanizeStatus(event.to_status) : 'Unknown';
+        return 'Status moved from ' + fromStatus + ' to ' + toStatus + '.';
+      }
       return event.event_label || event.event_type || '-';
     },
 
@@ -386,9 +615,12 @@
     renderContextSidebar: function (ticket) {
       var assigned = ticket.assigned_user && ticket.assigned_user.display_name ? ticket.assigned_user.display_name : 'Unassigned';
       var tags = (ticket.tags || []).length ? ticket.tags.join(', ') : 'None';
-      var metadata = ticket.metadata && Object.keys(ticket.metadata).length ? JSON.stringify(ticket.metadata, null, 2) : '';
+      var metadataRows = this.normalizeMetadataEntries(ticket.metadata || {});
+      var metadataHtml = metadataRows.length ? '<div class="dtb-payload">' + metadataRows.map(function (row) {
+        return '<div class="dtb-payload-row"><span class="dtb-payload-row__key">' + esc(row.key) + '</span><span class="dtb-payload-row__value">' + esc(row.value) + '</span></div>';
+      }).join('') + '</div>' : '<p class="dtb-empty__sub" style="margin:8px 0 0;">No additional context attached.</p>';
       var messagePreview = String(ticket.message || '').trim();
-      return '<div class="dtb-ctx-section"><div class="dtb-ctx-section__title">Ticket Snapshot</div><div class="dtb-ctx-row"><span class="dtb-ctx-label">Ticket</span><span class="dtb-ctx-value">' + esc(ticket.ticket_number || ticket.id) + '</span></div><div class="dtb-ctx-row"><span class="dtb-ctx-label">Type</span><span class="dtb-ctx-value">' + esc(ticket.type_label || ticket.ticket_type || '-') + '</span></div><div class="dtb-ctx-row"><span class="dtb-ctx-label">Status</span><span class="dtb-ctx-value">' + esc(ticket.status_label || ticket.status) + '</span></div><div class="dtb-ctx-row"><span class="dtb-ctx-label">Priority</span><span class="dtb-ctx-value">' + esc(ticket.priority_label || ticket.priority) + '</span></div><div class="dtb-ctx-row"><span class="dtb-ctx-label">Assigned</span><span class="dtb-ctx-value">' + esc(assigned) + '</span></div><div class="dtb-ctx-row"><span class="dtb-ctx-label">Order</span><span class="dtb-ctx-value">' + esc(ticket.order_id || '-') + '</span></div><div class="dtb-ctx-row"><span class="dtb-ctx-label">Tags</span><span class="dtb-ctx-value">' + esc(tags) + '</span></div>' + (messagePreview ? '<div class="dtb-ctx-message-preview">' + nl2br(messagePreview) + '</div>' : '<p class="dtb-empty__sub" style="margin:8px 0 0;">No original contact message on this ticket record.</p>') + '</div><div class="dtb-ctx-section"><div class="dtb-ctx-section__title">Workflow Tools</div><div class="dtb-tool-field"><label class="dtb-tool-label">Status</label><select id="dtb-ticket-status" class="dtb-select">' + this.renderStatusOptions(ticket.status) + '</select></div><div class="dtb-tool-field"><label class="dtb-tool-label">Priority</label><select id="dtb-ticket-priority" class="dtb-select">' + this.renderPriorityOptions(ticket.priority) + '</select></div><button class="dtb-btn dtb-btn--primary dtb-btn--sm dtb-tool-apply" onclick="dtbSupport.applyTicketWorkflow(' + ticket.id + ')">Apply Ticket Updates</button><div class="dtb-quick-actions"><a href="#" class="dtb-qa-btn" onclick="dtbSupport.assignToMe(' + ticket.id + ');return false;">Assign to me</a><a href="#" class="dtb-qa-btn" onclick="dtbSupport.unassignTicket(' + ticket.id + ');return false;">Unassign</a><a href="#" class="dtb-qa-btn" onclick="dtbSupport.setStatus(' + ticket.id + ',\'in_progress\');return false;">In Progress</a><a href="#" class="dtb-qa-btn dtb-qa-btn--resolve" onclick="dtbSupport.resolveTicket(' + ticket.id + ');return false;">Resolve</a><a href="#" class="dtb-qa-btn" onclick="dtbSupport.setPriority(' + ticket.id + ',\'high\');return false;">High Priority</a><a href="#" class="dtb-qa-btn" onclick="dtbSupport.setPriority(' + ticket.id + ',\'urgent\');return false;">Urgent</a></div></div><div class="dtb-ctx-section"><div class="dtb-ctx-section__title">Snooze and Follow-up</div><div class="dtb-quick-actions"><a href="#" class="dtb-qa-btn" onclick="dtbSupport.quickSnoozeHours(' + ticket.id + ',4);return false;">Snooze 4h</a><a href="#" class="dtb-qa-btn" onclick="dtbSupport.quickSnoozeHours(' + ticket.id + ',24);return false;">Snooze 24h</a><a href="#" class="dtb-qa-btn" onclick="dtbSupport.quickSnoozeTomorrow(' + ticket.id + ');return false;">Snooze tomorrow</a>' + (ticket.is_snoozed ? '<a href="#" class="dtb-qa-btn" onclick="dtbSupport.unsnoozeTicket(' + ticket.id + ');return false;">Unsnooze</a>' : '') + '</div><div class="dtb-quick-actions" style="margin-top:8px;"><a href="#" class="dtb-qa-btn" onclick="dtbSupport.quickFollowupHours(' + ticket.id + ',2);return false;">Follow-up 2h</a><a href="#" class="dtb-qa-btn" onclick="dtbSupport.quickFollowupHours(' + ticket.id + ',24);return false;">Follow-up 24h</a><a href="#" class="dtb-qa-btn" onclick="dtbSupport.quickFollowupTomorrow(' + ticket.id + ');return false;">Follow-up tomorrow</a></div></div><div class="dtb-ctx-section"><div class="dtb-ctx-section__title">Diagnostics</div><div class="dtb-quick-actions"><a href="#" class="dtb-qa-btn" onclick="dtbSupport.copyTicketSummary();return false;">Copy Summary</a>' + (ticket.edit_url ? '<a href="' + esc(ticket.edit_url) + '" class="dtb-qa-btn" target="_blank" rel="noopener">Open Direct</a>' : '') + '</div><div class="dtb-ctx-row"><span class="dtb-ctx-label">Created</span><span class="dtb-ctx-value">' + esc(ticket.created_at ? this.formatDateTime(ticket.created_at) : '-') + '</span></div><div class="dtb-ctx-row"><span class="dtb-ctx-label">Updated</span><span class="dtb-ctx-value">' + esc(ticket.updated_at ? this.formatDateTime(ticket.updated_at) : '-') + '</span></div>' + (metadata ? '<pre class="dtb-ctx-metadata">' + esc(metadata) + '</pre>' : '<p class="dtb-empty__sub" style="margin:8px 0 0;">No metadata attached.</p>') + '</div>';
+      return '<div class="dtb-ctx-section"><div class="dtb-ctx-section__title">Ticket Snapshot</div><div class="dtb-ctx-row"><span class="dtb-ctx-label">Ticket</span><span class="dtb-ctx-value">' + esc(ticket.ticket_number || ticket.id) + '</span></div><div class="dtb-ctx-row"><span class="dtb-ctx-label">Type</span><span class="dtb-ctx-value">' + esc(ticket.type_label || ticket.ticket_type || '-') + '</span></div><div class="dtb-ctx-row"><span class="dtb-ctx-label">Status</span><span class="dtb-ctx-value">' + esc(ticket.status_label || ticket.status) + '</span></div><div class="dtb-ctx-row"><span class="dtb-ctx-label">Priority</span><span class="dtb-ctx-value">' + esc(ticket.priority_label || ticket.priority) + '</span></div><div class="dtb-ctx-row"><span class="dtb-ctx-label">Assigned</span><span class="dtb-ctx-value">' + esc(assigned) + '</span></div><div class="dtb-ctx-row"><span class="dtb-ctx-label">Order</span><span class="dtb-ctx-value">' + esc(ticket.order_id || '-') + '</span></div><div class="dtb-ctx-row"><span class="dtb-ctx-label">Tags</span><span class="dtb-ctx-value">' + esc(tags) + '</span></div>' + (messagePreview ? '<div class="dtb-ctx-message-preview">' + nl2br(messagePreview) + '</div>' : '<p class="dtb-empty__sub" style="margin:8px 0 0;">No original contact message on this ticket record.</p>') + '</div><div class="dtb-ctx-section"><div class="dtb-ctx-section__title">Workflow Tools</div><div class="dtb-tool-field"><label class="dtb-tool-label">Status</label><select id="dtb-ticket-status" class="dtb-select">' + this.renderStatusOptions(ticket.status) + '</select></div><div class="dtb-tool-field"><label class="dtb-tool-label">Priority</label><select id="dtb-ticket-priority" class="dtb-select">' + this.renderPriorityOptions(ticket.priority) + '</select></div><button class="dtb-btn dtb-btn--primary dtb-btn--sm dtb-tool-apply" onclick="dtbSupport.applyTicketWorkflow(' + ticket.id + ')">Apply Ticket Updates</button><div class="dtb-quick-actions"><a href="#" class="dtb-qa-btn" onclick="dtbSupport.assignToMe(' + ticket.id + ');return false;">Assign to me</a><a href="#" class="dtb-qa-btn" onclick="dtbSupport.unassignTicket(' + ticket.id + ');return false;">Unassign</a><a href="#" class="dtb-qa-btn" onclick="dtbSupport.setStatus(' + ticket.id + ',\'in_progress\');return false;">In Progress</a><a href="#" class="dtb-qa-btn dtb-qa-btn--resolve" onclick="dtbSupport.resolveTicket(' + ticket.id + ');return false;">Resolve</a><a href="#" class="dtb-qa-btn" onclick="dtbSupport.setPriority(' + ticket.id + ',\'high\');return false;">High Priority</a><a href="#" class="dtb-qa-btn" onclick="dtbSupport.setPriority(' + ticket.id + ',\'urgent\');return false;">Urgent</a></div></div><div class="dtb-ctx-section"><div class="dtb-ctx-section__title">Snooze and Follow-up</div><div class="dtb-quick-actions"><a href="#" class="dtb-qa-btn" onclick="dtbSupport.quickSnoozeHours(' + ticket.id + ',4);return false;">Snooze 4h</a><a href="#" class="dtb-qa-btn" onclick="dtbSupport.quickSnoozeHours(' + ticket.id + ',24);return false;">Snooze 24h</a><a href="#" class="dtb-qa-btn" onclick="dtbSupport.quickSnoozeTomorrow(' + ticket.id + ');return false;">Snooze tomorrow</a>' + (ticket.is_snoozed ? '<a href="#" class="dtb-qa-btn" onclick="dtbSupport.unsnoozeTicket(' + ticket.id + ');return false;">Unsnooze</a>' : '') + '</div><div class="dtb-quick-actions" style="margin-top:8px;"><a href="#" class="dtb-qa-btn" onclick="dtbSupport.quickFollowupHours(' + ticket.id + ',2);return false;">Follow-up 2h</a><a href="#" class="dtb-qa-btn" onclick="dtbSupport.quickFollowupHours(' + ticket.id + ',24);return false;">Follow-up 24h</a><a href="#" class="dtb-qa-btn" onclick="dtbSupport.quickFollowupTomorrow(' + ticket.id + ');return false;">Follow-up tomorrow</a></div></div><div class="dtb-ctx-section"><div class="dtb-ctx-section__title">Additional Context</div><div class="dtb-quick-actions"><a href="#" class="dtb-qa-btn" onclick="dtbSupport.copyTicketSummary();return false;">Copy Summary</a>' + (ticket.edit_url ? '<a href="' + esc(ticket.edit_url) + '" class="dtb-qa-btn" target="_blank" rel="noopener">Open Direct</a>' : '') + '</div><div class="dtb-ctx-row"><span class="dtb-ctx-label">Created</span><span class="dtb-ctx-value">' + esc(ticket.created_at ? this.formatDateTime(ticket.created_at) : '-') + '</span></div><div class="dtb-ctx-row"><span class="dtb-ctx-label">Updated</span><span class="dtb-ctx-value">' + esc(ticket.updated_at ? this.formatDateTime(ticket.updated_at) : '-') + '</span></div>' + metadataHtml + '</div>';
     },
 
     renderStatusOptions: function (current) {
@@ -480,9 +712,15 @@
         ticket_number: ticket.ticket_number || '',
         subject: ticket.subject || '',
         order_id: ticket.order_id || '',
-        agent_name: cfg.currentUser || ''
+        agent_name: cfg.currentUser || '',
+        customer_email: ticket.customer_email || '',
+        site_name: cfg.siteName || '',
+        ticket_url: ticket.edit_url || ''
       };
-      return String(template || '').replace(/\{([a-zA-Z0-9_]+)\}/g, function (match, key) { return values[key] != null ? values[key] : match; });
+      return String(template || '').replace(/\{\{\s*([a-zA-Z0-9_]+)\s*\}\}|\{([a-zA-Z0-9_]+)\}/g, function (match, keyDouble, keySingle) {
+        var key = (keyDouble || keySingle || '').toLowerCase();
+        return Object.prototype.hasOwnProperty.call(values, key) ? String(values[key]) : match;
+      });
     },
 
     updateTicket: function (ticketId, payload, successMessage) {
@@ -648,16 +886,62 @@
       return ['Ticket: ' + (ticket.ticket_number || ticket.id || ''), 'Subject: ' + (ticket.subject || ''), 'Customer: ' + (ticket.customer_name || '') + ' <' + (ticket.customer_email || '') + '>', 'Original Message: ' + (ticket.message ? ticket.message.replace(/\s+/g, ' ').trim() : 'n/a'), 'Status: ' + (ticket.status_label || ticket.status || ''), 'Priority: ' + (ticket.priority_label || ticket.priority || ''), 'Assigned: ' + assigned, 'Action State: ' + (ticket.action_state_label || ticket.action_state || 'On Track'), 'Action Due: ' + (ticket.action_due_at || 'n/a'), 'Follow-up: ' + (ticket.followup_due_at || 'n/a'), 'Notification: ' + (ticket.notification_status || 'unknown') + ' (failures: ' + (ticket.notification_fail_count || 0) + ')', '', 'Recent Timeline:', events.join('\n') || '- No events yet.'].join('\n');
     },
 
+    toSeconds: function (value) {
+      if (value === null || value === undefined || value === '') return null;
+      var parsed = parseInt(value, 10);
+      return Number.isNaN(parsed) ? null : parsed;
+    },
+
+    dueSoonThresholdSeconds: function () {
+      var threshold = Math.floor(actionDueHours() * 3600 * 0.25);
+      return Math.max(3600, threshold);
+    },
+
+    resolveActionState: function (seconds, fallbackState) {
+      if (seconds == null) return fallbackState || 'ok';
+      if (seconds < 0) return 'overdue';
+      if (seconds <= this.dueSoonThresholdSeconds()) return 'due_soon';
+      return 'ok';
+    },
+
+    resolveActionLabel: function (state, seconds) {
+      if (seconds == null) return 'On Track';
+      if (state === 'overdue') {
+        return 'Overdue ' + this.formatActionTime(Math.abs(seconds));
+      }
+      return this.formatActionTime(seconds);
+    },
+
+    refreshActionDueBadges: function () {
+      var self = this;
+      $('.dtb-action-state[data-action-seconds]').each(function () {
+        var $badge = $(this);
+        var baseSeconds = self.toSeconds($badge.data('actionSeconds'));
+        if (baseSeconds == null) return;
+        var previousState = String($badge.data('actionState') || 'ok');
+        var elapsed = Math.floor((Date.now() - self.lastTicketLoadAt) / 1000);
+        if (!Number.isFinite(elapsed) || elapsed < 0) elapsed = 0;
+        var remaining = baseSeconds - elapsed;
+        var state = self.resolveActionState(remaining, previousState);
+        var label = self.resolveActionLabel(state, remaining);
+        $badge
+          .text(label)
+          .attr('data-action-state', state)
+          .removeClass('dtb-action-state--ok dtb-action-state--due-soon dtb-action-state--overdue')
+          .addClass('dtb-action-state--' + (state === 'due_soon' ? 'due-soon' : state));
+      });
+    },
+
     formatActionTime: function (seconds) {
       var totalSeconds = parseInt(seconds, 10);
       if (!totalSeconds && totalSeconds !== 0) return 'On Track';
-      if (totalSeconds < 0) return 'Overdue';
       var days = Math.floor(totalSeconds / 86400);
       var hours = Math.floor((totalSeconds % 86400) / 3600);
       var minutes = Math.floor((totalSeconds % 3600) / 60);
       if (days > 0) return days + 'd ' + hours + 'h';
       if (hours > 0) return hours + 'h ' + minutes + 'm';
-      return minutes + 'm';
+      if (minutes > 0) return minutes + 'm';
+      return '<1m';
     },
 
     formatAge: function (datetime) {
@@ -685,6 +969,17 @@
 
     stopAutoRefresh: function () {
       if (this.autoRefreshTimer) { clearInterval(this.autoRefreshTimer); this.autoRefreshTimer = null; }
+    },
+
+    startActionDueTicker: function () {
+      var self = this;
+      this.stopActionDueTicker();
+      this.lastTicketLoadAt = Date.now();
+      this.actionDueTimer = setInterval(function () { self.refreshActionDueBadges(); }, 30000);
+    },
+
+    stopActionDueTicker: function () {
+      if (this.actionDueTimer) { clearInterval(this.actionDueTimer); this.actionDueTimer = null; }
     }
   };
 

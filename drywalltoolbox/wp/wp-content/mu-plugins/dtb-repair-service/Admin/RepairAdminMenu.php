@@ -298,6 +298,30 @@ function dtb_repair_admin_inline_styles(): void {
 
 	/* ── Table wrapper ────────────────────────────────────────── */
 	.dtb-table-wrap { padding: 0; }
+	.dtb-call-lookup-bar {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+		padding: 12px 20px 10px;
+		background: #fff;
+		border-bottom: 1px solid #f3f4f6;
+	}
+	.dtb-call-lookup-input {
+		flex: 1;
+		min-width: 280px;
+		max-width: 680px;
+		border: 1px solid #dbe3ef !important;
+		border-radius: 9px !important;
+		padding: 7px 12px !important;
+		font-size: 13px !important;
+		background: #f8fafc !important;
+	}
+	.dtb-call-lookup-input:focus {
+		border-color: var(--dtb-blue) !important;
+		background: #fff !important;
+		outline: none !important;
+		box-shadow: 0 0 0 3px rgba(29,78,216,.1) !important;
+	}
 
 	.dtb-table-wrap .search-box {
 		padding: 12px 20px;
@@ -510,6 +534,8 @@ function dtb_repair_admin_inline_styles(): void {
 		.dtb-chip-bar      { flex-wrap: nowrap; overflow-x: auto; -webkit-overflow-scrolling: touch; padding: 8px 10px; gap: 4px; }
 		.dtb-chip          { flex-shrink: 0; }
 		.dtb-table-wrap    { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+		.dtb-call-lookup-bar { flex-wrap: wrap; padding: 10px 12px; }
+		.dtb-call-lookup-input { min-width: 100%; max-width: 100%; }
 		.dtb-repairs-wrap .wp-list-table td,
 		.dtb-repairs-wrap .wp-list-table th { padding: 10px 8px !important; }
 		.dtb-repairs-wrap .tablenav { flex-wrap: wrap; }
@@ -891,6 +917,30 @@ function dtb_repair_admin_inline_styles(): void {
 		align-items: center;
 		gap: 8px;
 	}
+	.dtb-tech-selected-head {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 10px;
+	}
+	#dtb-tech-sync-parts-to-quote {
+		border-radius: 999px !important;
+		font-size: 11px !important;
+		font-weight: 700 !important;
+		border-color: #bfdbfe !important;
+		background: #eff6ff !important;
+		color: #1d4ed8 !important;
+	}
+	.dtb-tech-add-to-quote {
+		border: 0;
+		background: #dbeafe;
+		color: #1d4ed8;
+		font-size: 11px;
+		font-weight: 700;
+		border-radius: 999px;
+		padding: 4px 8px;
+		cursor: pointer;
+	}
 	.dtb-tech-selected-remove {
 		border: 0;
 		background: #fee2e2;
@@ -901,6 +951,136 @@ function dtb_repair_admin_inline_styles(): void {
 		padding: 4px 8px;
 		cursor: pointer;
 	}
+
+	/* ── Quote builder ───────────────────────────────────────────────────── */
+	.dtb-quote-builder { display: grid; gap: 14px; }
+	.dtb-quote-head {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 12px;
+	}
+	.dtb-quote-title {
+		font-size: 15px;
+		font-weight: 800;
+		color: #0f172a;
+	}
+	.dtb-quote-subtitle {
+		font-size: 12px;
+		color: #64748b;
+		margin-top: 3px;
+	}
+	.dtb-quote-pill {
+		display: inline-flex;
+		align-items: center;
+		padding: 4px 10px;
+		border-radius: 999px;
+		background: #e0f2fe;
+		color: #0c4a6e;
+		font-size: 11px;
+		font-weight: 700;
+		text-transform: uppercase;
+		letter-spacing: .4px;
+	}
+	.dtb-quote-controls {
+		display: grid;
+		grid-template-columns: repeat(5, minmax(0, 1fr));
+		gap: 10px;
+	}
+	.dtb-quote-controls label,
+	.dtb-quote-notes-grid label {
+		display: grid;
+		gap: 5px;
+	}
+	.dtb-quote-controls span,
+	.dtb-quote-notes-grid span {
+		font-size: 11px;
+		font-weight: 700;
+		letter-spacing: .35px;
+		text-transform: uppercase;
+		color: #64748b;
+	}
+	.dtb-quote-controls input,
+	.dtb-quote-notes-grid textarea,
+	.dtb-quote-table input,
+	.dtb-quote-table select {
+		border: 1px solid #d1d5db;
+		border-radius: 8px;
+		padding: 7px 9px;
+		font-size: 12px;
+	}
+	.dtb-quote-table-wrap {
+		border: 1px solid #dbe7ff;
+		border-radius: 10px;
+		padding: 8px;
+		background: #f8fbff;
+	}
+	.dtb-quote-table { width: 100%; border-collapse: collapse; margin-bottom: 8px; }
+	.dtb-quote-table th {
+		padding: 8px;
+		text-align: left;
+		font-size: 11px;
+		text-transform: uppercase;
+		letter-spacing: .3px;
+		color: #64748b;
+		border-bottom: 1px solid #e5e7eb;
+	}
+	.dtb-quote-table td {
+		padding: 8px;
+		vertical-align: top;
+		border-bottom: 1px solid #eef2f7;
+	}
+	.dtb-quote-line-desc { margin-top: 6px; width: 100%; }
+	.dtb-quote-notes-grid {
+		display: grid;
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		gap: 10px;
+	}
+	.dtb-quote-notes-grid textarea { min-height: 88px; resize: vertical; }
+	.dtb-quote-footer {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr) auto;
+		gap: 12px;
+		align-items: end;
+	}
+	.dtb-quote-totals {
+		display: grid;
+		gap: 4px;
+		padding: 10px 12px;
+		border: 1px solid #e5e7eb;
+		border-radius: 10px;
+		background: #fff;
+	}
+	.dtb-quote-totals > div {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		font-size: 12px;
+		color: #334155;
+	}
+	.dtb-quote-totals > div.is-total {
+		margin-top: 6px;
+		padding-top: 6px;
+		border-top: 1px solid #e5e7eb;
+		font-size: 13px;
+		font-weight: 800;
+		color: #0f172a;
+	}
+	.dtb-quote-actions {
+		display: inline-flex;
+		align-items: center;
+		flex-wrap: wrap;
+		gap: 8px;
+		justify-content: flex-end;
+	}
+	.dtb-quote-msg {
+		min-width: 190px;
+		font-size: 12px;
+		color: #64748b;
+		text-align: right;
+	}
+	.dtb-quote-msg.is-ok { color: #166534; }
+	.dtb-quote-msg.is-err { color: #b91c1c; }
 
 	/* ── Sticky action bar (appears on scroll) ──────────────────────────────── */
 	#dtb-sticky-bar {
@@ -972,9 +1152,10 @@ function dtb_repair_admin_inline_styles(): void {
 	}
 	#postbox-container-2 #dtb-repair-command-center { order: 1; }
 	#postbox-container-2 #dtb-repair-order-details { order: 2; }
-	#postbox-container-2 #dtb-repair-technician    { order: 3; }
-	#postbox-container-2 #dtb-repair-timeline      { order: 4; }
-	#postbox-container-2 #dtb-repair-notes         { order: 5; }
+	#postbox-container-2 #dtb-repair-quote-builder { order: 3; }
+	#postbox-container-2 #dtb-repair-technician    { order: 4; }
+	#postbox-container-2 #dtb-repair-timeline      { order: 5; }
+	#postbox-container-2 #dtb-repair-notes         { order: 6; }
 
 	@media (max-width: 1360px) {
 		#postbox-container-2 #normal-sortables {
@@ -1655,6 +1836,11 @@ function dtb_repair_admin_inline_styles(): void {
 		/* Tech grid */
 		.dtb-tech-grid { grid-template-columns: 1fr; }
 		.dtb-tech-row  { grid-template-columns: 1fr; }
+		.dtb-quote-controls { grid-template-columns: 1fr 1fr; }
+		.dtb-quote-notes-grid { grid-template-columns: 1fr; }
+		.dtb-quote-footer { grid-template-columns: 1fr; }
+		.dtb-quote-actions { justify-content: flex-start; }
+		.dtb-quote-msg { min-width: 0; text-align: left; }
 		/* Command center panels stack */
 		.dtb-cc-panel { padding: 14px 16px; }
 		.dtb-cc-panel + .dtb-cc-panel {
@@ -1874,6 +2060,9 @@ function dtb_repair_admin_hero_banner( WP_Post $post ): void {
 				<span class="dtb-workspace-tab-badge"><?php echo esc_html( (string) $unread_customer_messages ); ?></span>
 			<?php endif; ?>
 		</button>
+		<button type="button" class="dtb-workspace-tab" data-dtb-tab="quote_builder" role="tab" aria-selected="false">
+			Quote Builder
+		</button>
 		<button type="button" class="dtb-workspace-tab" data-dtb-tab="technician_details" role="tab" aria-selected="false">
 			Technician Details
 		</button>
@@ -2043,9 +2232,14 @@ function dtb_repair_admin_footer_scripts(): void {
 					'dtb-repair-command-center',
 					'dtb-repair-order-details'
 				],
+				quote_builder: [
+					'dtb-repair-command-center',
+					'dtb-repair-quote-builder'
+				],
 				technician_details: [
 					'dtb-repair-command-center',
 					'dtb-repair-technician',
+					'dtb-repair-quote-builder',
 					'dtb-repair-order-details',
 					'dtb-repair-notes',
 					'dtb-repair-queue'
@@ -2059,6 +2253,7 @@ function dtb_repair_admin_footer_scripts(): void {
 
 			var allKnownIds = [
 				'dtb-repair-command-center',
+				'dtb-repair-quote-builder',
 				'dtb-repair-technician',
 				'dtb-repair-order-details',
 				'dtb-repair-timeline',
@@ -2305,9 +2500,23 @@ function dtb_repair_admin_footer_scripts(): void {
 		var primaryPartSkuEl = document.getElementById('dtb-tech-primary-part-sku');
 		var primaryPartNameEl = document.getElementById('dtb-tech-primary-part-name');
 		var primaryPartBrandEl = document.getElementById('dtb-tech-primary-part-brand');
+		var syncPartsToQuoteBtn = document.getElementById('dtb-tech-sync-parts-to-quote');
 		var partsReq = null;
 		var partsTimer = null;
 		var selectedParts = [];
+
+		var pushPartToQuoteBuilder = function(part) {
+			if (!part) return;
+			document.dispatchEvent(new CustomEvent('dtb:quote:addPart', {
+				detail: { part: part }
+			}));
+		};
+
+		var pushAllPartsToQuoteBuilder = function() {
+			document.dispatchEvent(new CustomEvent('dtb:quote:syncParts', {
+				detail: { parts: selectedParts.slice() }
+			}));
+		};
 
 		var hidePartsLookupMenu = function() {
 			if (!partsLookupMenu) return;
@@ -2365,6 +2574,7 @@ function dtb_repair_admin_footer_scripts(): void {
 							'</div>' +
 						'</div>' +
 						'<div class="dtb-tech-selected-actions">' +
+							'<button type="button" class="dtb-tech-add-to-quote" data-index="' + idx + '">Add to Quote</button>' +
 							'<button type="button" class="dtb-tech-selected-remove" data-index="' + idx + '">Remove</button>' +
 						'</div>' +
 					'</div>'
@@ -2426,7 +2636,7 @@ function dtb_repair_admin_footer_scripts(): void {
 					return (partId > 0 && parseInt(item.part_id || 0, 10) === partId) || (sku && item.sku === sku);
 				});
 				if (!existing) {
-					selectedParts.push({
+					var newPart = {
 						part_id: partId,
 						sku: sku,
 						name: btn.getAttribute('data-name') || '',
@@ -2434,7 +2644,9 @@ function dtb_repair_admin_footer_scripts(): void {
 						manufacturer_sku: btn.getAttribute('data-manufacturer-sku') || '',
 						quantity: 1,
 						line_note: ''
-					});
+					};
+					selectedParts.push(newPart);
+					pushPartToQuoteBuilder(newPart);
 				}
 				partsLookupInput.value = '';
 				renderSelectedParts();
@@ -2442,6 +2654,15 @@ function dtb_repair_admin_footer_scripts(): void {
 			});
 
 			selectedPartsEl.addEventListener('click', function(e) {
+				var addBtn = e.target.closest('.dtb-tech-add-to-quote');
+				if (addBtn) {
+					var addIndex = parseInt(addBtn.getAttribute('data-index') || '-1', 10);
+					if (addIndex >= 0 && addIndex < selectedParts.length) {
+						pushPartToQuoteBuilder(selectedParts[addIndex]);
+					}
+					return;
+				}
+
 				var removeBtn = e.target.closest('.dtb-tech-selected-remove');
 				if (!removeBtn) return;
 				var index = parseInt(removeBtn.getAttribute('data-index') || '-1', 10);
@@ -2449,6 +2670,12 @@ function dtb_repair_admin_footer_scripts(): void {
 				selectedParts.splice(index, 1);
 				renderSelectedParts();
 			});
+
+			if (syncPartsToQuoteBtn) {
+				syncPartsToQuoteBtn.addEventListener('click', function() {
+					pushAllPartsToQuoteBuilder();
+				});
+			}
 
 			selectedPartsEl.addEventListener('input', function(e) {
 				var qtyEl = e.target.closest('.dtb-tech-part-qty');
@@ -2459,6 +2686,7 @@ function dtb_repair_admin_footer_scripts(): void {
 						if (!qtyVal || qtyVal < 1) qtyVal = 1;
 						selectedParts[idx].quantity = qtyVal;
 						partsLinksInput.value = JSON.stringify(selectedParts);
+						pushPartToQuoteBuilder(selectedParts[idx]);
 					}
 					return;
 				}
@@ -2468,6 +2696,7 @@ function dtb_repair_admin_footer_scripts(): void {
 					if (nidx >= 0 && nidx < selectedParts.length) {
 						selectedParts[nidx].line_note = noteEl.value || '';
 						partsLinksInput.value = JSON.stringify(selectedParts);
+						pushPartToQuoteBuilder(selectedParts[nidx]);
 					}
 				}
 			});
@@ -2531,6 +2760,21 @@ function dtb_repair_admin_footer_scripts(): void {
 function dtb_repair_admin_list_page(): void {
 	if ( ! current_user_can( 'dtb_manage_repairs' ) ) {
 		wp_die( esc_html__( 'You do not have permission to view this page.', 'drywall-toolbox' ) );
+	}
+
+	$lookup_term = isset( $_GET['dtb_lookup'] ) ? sanitize_text_field( wp_unslash( (string) $_GET['dtb_lookup'] ) ) : '';
+	if ( '' !== $lookup_term ) {
+		if ( preg_match( '/^#?(\d+)$/', trim( $lookup_term ), $match ) ) {
+			$lookup_id = (int) $match[1];
+			$lookup_post = get_post( $lookup_id );
+			if ( $lookup_post instanceof WP_Post && 'dtb_repair_request' === $lookup_post->post_type ) {
+				wp_safe_redirect( admin_url( 'post.php?post=' . $lookup_id . '&action=edit' ) );
+				exit;
+			}
+		}
+		if ( empty( $_GET['s'] ) ) {
+			$_GET['s'] = $lookup_term; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		}
 	}
 
 	if ( ! class_exists( 'WP_List_Table' ) ) {
@@ -2683,6 +2927,18 @@ function dtb_repair_admin_list_page(): void {
 
 			<!-- ── Table ────────────────────────────────────────────────── -->
 			<div class="dtb-table-wrap">
+				<form method="get" action="" class="dtb-call-lookup-bar">
+					<input type="hidden" name="page" value="dtb-repairs">
+					<?php if ( 'all' !== $current_tab ) : ?>
+						<input type="hidden" name="tab" value="<?php echo esc_attr( $current_tab ); ?>">
+					<?php endif; ?>
+					<?php if ( '' !== $current_status ) : ?>
+						<input type="hidden" name="repair_status" value="<?php echo esc_attr( $current_status ); ?>">
+					<?php endif; ?>
+					<label for="dtb_lookup_input" class="screen-reader-text"><?php esc_html_e( 'Call lookup', 'drywall-toolbox' ); ?></label>
+					<input type="search" id="dtb_lookup_input" name="dtb_lookup" class="dtb-call-lookup-input" value="<?php echo esc_attr( $lookup_term ); ?>" placeholder="<?php esc_attr_e( 'Call lookup: repair #, order #, name, email, phone, serial', 'drywall-toolbox' ); ?>">
+					<button type="submit" class="button button-primary"><?php esc_html_e( 'Find Repair', 'drywall-toolbox' ); ?></button>
+				</form>
 				<form method="get" action="">
 					<input type="hidden" name="page" value="dtb-repairs">
 					<?php if ( 'all' !== $current_tab ) : ?>
@@ -2696,6 +2952,14 @@ function dtb_repair_admin_list_page(): void {
 					$table->display();
 					?>
 				</form>
+				<script>
+				(function(){
+					var input = document.getElementById('dtb-repair-search-input');
+					if ( input ) {
+						input.setAttribute('placeholder', 'Search customer, email, phone, repair #, order #, serial');
+					}
+				}());
+				</script>
 			</div><!-- .dtb-table-wrap -->
 
 		</div><!-- .dtb-list-shell -->

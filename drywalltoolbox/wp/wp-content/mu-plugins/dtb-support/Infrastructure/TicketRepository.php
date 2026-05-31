@@ -166,7 +166,10 @@ function dtb_support_query_tickets( array $args = [] ): array {
 	}
 	if ( '' !== $search ) {
 		$like     = '%' . $wpdb->esc_like( $search ) . '%';
-		$where[]  = '(subject LIKE %s OR customer_name LIKE %s OR customer_email LIKE %s OR ticket_number LIKE %s)';
+		$where[]  = '(subject LIKE %s OR customer_name LIKE %s OR customer_email LIKE %s OR customer_phone LIKE %s OR company LIKE %s OR ticket_number LIKE %s OR CAST(order_id AS CHAR) LIKE %s)';
+		$params[] = $like;
+		$params[] = $like;
+		$params[] = $like;
 		$params[] = $like;
 		$params[] = $like;
 		$params[] = $like;
@@ -214,10 +217,14 @@ function dtb_support_query_queue( string $queue, array $args = [] ): array {
 	$search   = sanitize_text_field( $args['search'] ?? '' );
 	$active   = "(snooze_until IS NULL OR snooze_until <= UTC_TIMESTAMP())";
 	$closed   = "status NOT IN ('resolved','closed','spam')";
+	$action_due_hours    = function_exists( 'dtb_support_action_due_hours' ) ? max( 1, (int) dtb_support_action_due_hours() ) : 24;
+	$warning_window_secs = (int) floor( $action_due_hours * HOUR_IN_SECONDS * 0.25 );
+	$warning_window_secs = max( HOUR_IN_SECONDS, $warning_window_secs );
+	$action_due_expr     = "COALESCE(sla_first_response_due, DATE_ADD(created_at, INTERVAL {$action_due_hours} HOUR))";
 	$map = [
 		'needs_reply'            => "status IN ('open','pending_staff','in_progress') AND {$active}",
-		'due_soon'               => "sla_state IN ('warning','due_soon') AND {$closed} AND {$active}",
-		'overdue'                => "sla_state IN ('breach','overdue') AND {$closed} AND {$active}",
+		'due_soon'               => "{$action_due_expr} >= UTC_TIMESTAMP() AND TIMESTAMPDIFF(SECOND, UTC_TIMESTAMP(), {$action_due_expr}) <= {$warning_window_secs} AND {$closed} AND {$active}",
+		'overdue'                => "{$action_due_expr} < UTC_TIMESTAMP() AND {$closed} AND {$active}",
 		'unassigned'             => "assigned_user_id IS NULL AND {$closed} AND {$active}",
 		'urgent'                 => "priority = 'urgent' AND {$closed} AND {$active}",
 		'in_progress'            => "status = 'in_progress' AND {$active}",
@@ -232,11 +239,10 @@ function dtb_support_query_queue( string $queue, array $args = [] ): array {
 	if ( '' !== $priority ) { $where[] = 'priority = %s'; $params[] = $priority; }
 	if ( '' !== $search ) {
 		$like = '%' . $wpdb->esc_like( $search ) . '%';
-		$where[] = '(subject LIKE %s OR customer_name LIKE %s OR customer_email LIKE %s OR ticket_number LIKE %s)';
-		$params = array_merge( $params, [ $like, $like, $like, $like ] );
+		$where[] = '(subject LIKE %s OR customer_name LIKE %s OR customer_email LIKE %s OR customer_phone LIKE %s OR company LIKE %s OR ticket_number LIKE %s OR CAST(order_id AS CHAR) LIKE %s)';
+		$params = array_merge( $params, [ $like, $like, $like, $like, $like, $like, $like ] );
 	}
 	$where_sql = implode( ' AND ', $where );
-	$action_due_expr = "CASE WHEN first_reply_at IS NULL THEN COALESCE(sla_first_response_due, created_at) ELSE COALESCE(sla_resolution_due, created_at) END";
 	$order_by = in_array( $queue, [ 'due_soon', 'overdue' ], true ) ? "{$action_due_expr} ASC, priority_score DESC, created_at ASC" : "priority_score DESC, {$action_due_expr} ASC, created_at ASC";
 	// phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 	$total_sql = "SELECT COUNT(*) FROM {$table} WHERE {$where_sql}";
@@ -260,11 +266,15 @@ function dtb_support_count_by_status(): array {
 function dtb_support_get_queue_counts(): array {
 	global $wpdb;
 	$table = dtb_support_tickets_table();
+	$action_due_hours    = function_exists( 'dtb_support_action_due_hours' ) ? max( 1, (int) dtb_support_action_due_hours() ) : 24;
+	$warning_window_secs = (int) floor( $action_due_hours * HOUR_IN_SECONDS * 0.25 );
+	$warning_window_secs = max( HOUR_IN_SECONDS, $warning_window_secs );
+	$action_due_expr     = "COALESCE(sla_first_response_due, DATE_ADD(created_at, INTERVAL {$action_due_hours} HOUR))";
 	// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 	$row = $wpdb->get_row( "SELECT
 		SUM(CASE WHEN status IN ('open','pending_staff','in_progress') AND (snooze_until IS NULL OR snooze_until <= UTC_TIMESTAMP()) THEN 1 ELSE 0 END) AS needs_reply,
-		SUM(CASE WHEN sla_state IN ('warning','due_soon') AND status NOT IN ('resolved','closed','spam') AND (snooze_until IS NULL OR snooze_until <= UTC_TIMESTAMP()) THEN 1 ELSE 0 END) AS due_soon,
-		SUM(CASE WHEN sla_state IN ('breach','overdue') AND status NOT IN ('resolved','closed','spam') AND (snooze_until IS NULL OR snooze_until <= UTC_TIMESTAMP()) THEN 1 ELSE 0 END) AS overdue,
+		SUM(CASE WHEN {$action_due_expr} >= UTC_TIMESTAMP() AND TIMESTAMPDIFF(SECOND, UTC_TIMESTAMP(), {$action_due_expr}) <= {$warning_window_secs} AND status NOT IN ('resolved','closed','spam') AND (snooze_until IS NULL OR snooze_until <= UTC_TIMESTAMP()) THEN 1 ELSE 0 END) AS due_soon,
+		SUM(CASE WHEN {$action_due_expr} < UTC_TIMESTAMP() AND status NOT IN ('resolved','closed','spam') AND (snooze_until IS NULL OR snooze_until <= UTC_TIMESTAMP()) THEN 1 ELSE 0 END) AS overdue,
 		SUM(CASE WHEN assigned_user_id IS NULL AND status NOT IN ('resolved','closed','spam') AND (snooze_until IS NULL OR snooze_until <= UTC_TIMESTAMP()) THEN 1 ELSE 0 END) AS unassigned,
 		SUM(CASE WHEN priority = 'urgent' AND status NOT IN ('resolved','closed','spam') AND (snooze_until IS NULL OR snooze_until <= UTC_TIMESTAMP()) THEN 1 ELSE 0 END) AS urgent,
 		SUM(CASE WHEN status = 'in_progress' AND (snooze_until IS NULL OR snooze_until <= UTC_TIMESTAMP()) THEN 1 ELSE 0 END) AS in_progress,

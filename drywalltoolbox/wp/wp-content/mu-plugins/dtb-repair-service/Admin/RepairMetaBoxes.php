@@ -16,6 +16,7 @@ function dtb_repair_admin_add_metaboxes(): void {
 	$boxes = [
 		'dtb-repair-command-center' => [ __( 'Repair Command Center', 'drywall-toolbox' ), 'dtb_repair_metabox_command_center', 'normal', 'high' ],
 		'dtb-repair-order-details'  => [ __( 'Repair Order Details', 'drywall-toolbox' ), 'dtb_repair_metabox_order_details', 'normal', 'high' ],
+		'dtb-repair-quote-builder'  => [ __( 'Quote Builder', 'drywall-toolbox' ), 'dtb_repair_metabox_quote_builder', 'normal', 'high' ],
 		'dtb-repair-technician'     => [ __( 'Technician Workspace', 'drywall-toolbox' ), 'dtb_repair_metabox_technician', 'normal', 'high' ],
 		'dtb-repair-timeline'       => [ __( 'Repair Timeline', 'drywall-toolbox' ), 'dtb_repair_metabox_timeline', 'normal', 'default' ],
 		'dtb-repair-notes'          => [ __( 'Internal Notes', 'drywall-toolbox' ), 'dtb_repair_metabox_notes', 'normal', 'default' ],
@@ -383,6 +384,361 @@ function dtb_repair_render_customer_message_item( object $event, int $last_seen_
 	return $html;
 }
 
+// ---- Metabox: Quote Builder --------------------------------------------------
+
+function dtb_repair_metabox_quote_builder( WP_Post $post ): void {
+	if ( ! function_exists( 'dtb_repair_get_quote' ) ) {
+		echo '<p style="color:#9ca3af;">' . esc_html__( 'Quote service unavailable.', 'drywall-toolbox' ) . '</p>';
+		return;
+	}
+
+	$quote          = dtb_repair_get_quote( $post->ID );
+	$current_status = function_exists( 'dtb_get_repair_status' ) ? dtb_get_repair_status( $post->ID ) : '';
+	$allowed        = function_exists( 'dtb_get_allowed_transitions' ) ? ( dtb_get_allowed_transitions()[ $current_status ] ?? [] ) : [];
+	$can_send       = in_array( 'quoted', $allowed, true ) || 'quoted' === $current_status;
+	$can_accept     = in_array( 'quote_accepted', $allowed, true ) || 'quote_accepted' === $current_status;
+	$can_decline    = in_array( 'quote_declined', $allowed, true ) || 'quote_declined' === $current_status;
+	$status_label   = function_exists( 'dtb_repair_quote_status_label' )
+		? dtb_repair_quote_status_label( (string) ( $quote['status'] ?? 'draft' ) )
+		: __( 'Draft', 'drywall-toolbox' );
+
+	wp_nonce_field( 'dtb_repair_quote_' . $post->ID, 'dtb_repair_quote_nonce' );
+	?>
+	<div id="dtb-repair-quote-builder" class="dtb-quote-builder" data-repair-id="<?php echo esc_attr( (string) $post->ID ); ?>">
+		<div class="dtb-quote-head">
+			<div class="dtb-quote-head-main">
+				<div class="dtb-quote-title"><?php esc_html_e( 'Repair Quote', 'drywall-toolbox' ); ?></div>
+				<div class="dtb-quote-subtitle"><?php esc_html_e( 'Build line items, calculate totals, and send to customer.', 'drywall-toolbox' ); ?></div>
+			</div>
+			<div class="dtb-quote-head-status">
+				<span class="dtb-quote-pill"><?php echo esc_html( $status_label ); ?></span>
+			</div>
+		</div>
+
+		<div class="dtb-quote-controls">
+			<label>
+				<span><?php esc_html_e( 'Currency', 'drywall-toolbox' ); ?></span>
+				<input type="text" id="dtb-quote-currency" maxlength="6" value="<?php echo esc_attr( (string) ( $quote['currency'] ?? dtb_repair_quote_default_currency() ) ); ?>" />
+			</label>
+			<label>
+				<span><?php esc_html_e( 'Expires', 'drywall-toolbox' ); ?></span>
+				<input type="datetime-local" id="dtb-quote-expires-at" value="<?php echo esc_attr( ! empty( $quote['expires_at'] ) ? gmdate( 'Y-m-d\TH:i', strtotime( (string) $quote['expires_at'] ) ) : '' ); ?>" />
+			</label>
+			<label>
+				<span><?php esc_html_e( 'Discount %', 'drywall-toolbox' ); ?></span>
+				<input type="number" min="0" max="100" step="0.01" id="dtb-quote-discount-percent" value="<?php echo esc_attr( (string) ( $quote['totals']['discount_percent'] ?? 0 ) ); ?>" />
+			</label>
+			<label>
+				<span><?php esc_html_e( 'Tax %', 'drywall-toolbox' ); ?></span>
+				<input type="number" min="0" max="100" step="0.01" id="dtb-quote-tax-percent" value="<?php echo esc_attr( (string) ( $quote['totals']['tax_percent'] ?? 0 ) ); ?>" />
+			</label>
+			<label>
+				<span><?php esc_html_e( 'Shipping', 'drywall-toolbox' ); ?></span>
+				<input type="number" min="0" step="0.01" id="dtb-quote-shipping" value="<?php echo esc_attr( (string) ( $quote['totals']['shipping_amount'] ?? 0 ) ); ?>" />
+			</label>
+		</div>
+
+		<div class="dtb-quote-table-wrap">
+			<table class="dtb-quote-table">
+				<thead>
+					<tr>
+						<th><?php esc_html_e( 'Item', 'drywall-toolbox' ); ?></th>
+						<th><?php esc_html_e( 'Type', 'drywall-toolbox' ); ?></th>
+						<th><?php esc_html_e( 'Qty', 'drywall-toolbox' ); ?></th>
+						<th><?php esc_html_e( 'Unit', 'drywall-toolbox' ); ?></th>
+						<th><?php esc_html_e( 'Line Total', 'drywall-toolbox' ); ?></th>
+						<th></th>
+					</tr>
+				</thead>
+				<tbody id="dtb-quote-lines"></tbody>
+			</table>
+			<button type="button" id="dtb-quote-add-line" class="button"><?php esc_html_e( 'Add Line Item', 'drywall-toolbox' ); ?></button>
+		</div>
+
+		<div class="dtb-quote-notes-grid">
+			<label>
+				<span><?php esc_html_e( 'Customer Note', 'drywall-toolbox' ); ?></span>
+				<textarea id="dtb-quote-customer-note" placeholder="<?php esc_attr_e( 'Included in quote email…', 'drywall-toolbox' ); ?>"><?php echo esc_textarea( (string) ( $quote['customer_note'] ?? '' ) ); ?></textarea>
+			</label>
+			<label>
+				<span><?php esc_html_e( 'Internal Quote Note', 'drywall-toolbox' ); ?></span>
+				<textarea id="dtb-quote-internal-note" placeholder="<?php esc_attr_e( 'Internal context for your team…', 'drywall-toolbox' ); ?>"><?php echo esc_textarea( (string) ( $quote['internal_note'] ?? '' ) ); ?></textarea>
+			</label>
+		</div>
+
+		<div class="dtb-quote-footer">
+			<div class="dtb-quote-totals" id="dtb-quote-totals"></div>
+			<div class="dtb-quote-actions">
+				<span id="dtb-quote-msg" class="dtb-quote-msg"></span>
+				<button type="button" id="dtb-quote-save" class="button"><?php esc_html_e( 'Save Draft', 'drywall-toolbox' ); ?></button>
+				<button type="button" id="dtb-quote-send" class="button button-primary" <?php disabled( ! $can_send ); ?>><?php esc_html_e( 'Send Quote', 'drywall-toolbox' ); ?></button>
+				<button type="button" id="dtb-quote-accept" class="button" <?php disabled( ! $can_accept ); ?>><?php esc_html_e( 'Mark Accepted', 'drywall-toolbox' ); ?></button>
+				<button type="button" id="dtb-quote-decline" class="button" <?php disabled( ! $can_decline ); ?>><?php esc_html_e( 'Mark Declined', 'drywall-toolbox' ); ?></button>
+			</div>
+		</div>
+	</div>
+	<script>
+	(function($){
+		var $root = $('#dtb-repair-quote-builder');
+		if (!$root.length) return;
+
+		var repairId = Number($root.data('repair-id') || 0);
+		var nonce = $('input[name="dtb_repair_quote_nonce"]').val();
+		var quote = <?php echo wp_json_encode( $quote ); ?> || {};
+		var lines = Array.isArray(quote.lines) ? quote.lines.slice() : [];
+
+		var $msg = $('#dtb-quote-msg');
+		var $lineTbody = $('#dtb-quote-lines');
+		var $totals = $('#dtb-quote-totals');
+
+		var esc = function(v){ return $('<div>').text(String(v || '')).html(); };
+		var toNum = function(v){ var n = parseFloat(v); return isNaN(n) ? 0 : n; };
+		var money = function(n){ return (Math.round((toNum(n) + Number.EPSILON) * 100) / 100).toFixed(2); };
+		var currency = function(){ return ($('#dtb-quote-currency').val() || 'USD').toString().toUpperCase(); };
+
+		var setMsg = function(text, cls){
+			$msg.removeClass('is-ok is-err').text(text || '');
+			if (cls) $msg.addClass(cls);
+		};
+
+		var upsertPartLine = function(part){
+			if (!part) return;
+			var keySku = (part.sku || '').toString();
+			var partNote = (part.line_note || '').toString().trim();
+			var partDescription = '';
+			if (keySku) partDescription = 'SKU: ' + keySku;
+			if (partNote) partDescription = partDescription ? (partDescription + ' | ' + partNote) : partNote;
+			var foundIndex = -1;
+			lines.forEach(function(line, idx){
+				if (foundIndex !== -1) return;
+				var desc = String(line.description || '');
+				if (keySku && desc.indexOf('SKU: ' + keySku) !== -1) foundIndex = idx;
+			});
+
+			if (foundIndex === -1) {
+				lines.push({
+					label: part.name || part.sku || 'Part',
+					description: partDescription,
+					type: 'part',
+					quantity: Math.max(1, parseInt(part.quantity || 1, 10) || 1),
+					unit_price: 0
+				});
+			} else {
+				var q = Math.max(1, parseInt(part.quantity || 1, 10) || 1);
+				lines[foundIndex].quantity = q;
+				if (!lines[foundIndex].label && part.name) lines[foundIndex].label = part.name;
+				if ((!lines[foundIndex].description || String(lines[foundIndex].description).indexOf('SKU: ' + keySku) !== -1) && partDescription) {
+					lines[foundIndex].description = partDescription;
+				}
+			}
+
+			render();
+		};
+
+		var rowHtml = function(line, idx){
+			var qty = Math.max(0.001, toNum(line.quantity || 1));
+			var unit = toNum(line.unit_price || 0);
+			var total = qty * unit;
+			return '' +
+				'<tr data-index="' + idx + '">' +
+					'<td><input type="text" class="dtb-quote-line-label" value="' + esc(line.label || '') + '" placeholder="Item name" />' +
+					'<input type="text" class="dtb-quote-line-desc" value="' + esc(line.description || '') + '" placeholder="Description (optional)" /></td>' +
+					'<td><select class="dtb-quote-line-type">' +
+						'<option value="service"' + (line.type === 'service' ? ' selected' : '') + '>Service</option>' +
+						'<option value="labor"' + (line.type === 'labor' ? ' selected' : '') + '>Labor</option>' +
+						'<option value="part"' + (line.type === 'part' ? ' selected' : '') + '>Part</option>' +
+						'<option value="shipping"' + (line.type === 'shipping' ? ' selected' : '') + '>Shipping</option>' +
+						'<option value="misc"' + (line.type === 'misc' ? ' selected' : '') + '>Misc</option>' +
+					'</select></td>' +
+					'<td><input type="number" min="0.001" step="0.001" class="dtb-quote-line-qty" value="' + esc(qty) + '" /></td>' +
+					'<td><input type="number" min="0" step="0.01" class="dtb-quote-line-unit" value="' + esc(unit) + '" /></td>' +
+					'<td><span class="dtb-quote-line-total">' + esc(currency() + ' ' + money(total)) + '</span></td>' +
+					'<td><button type="button" class="button-link-delete dtb-quote-line-remove">Remove</button></td>' +
+				'</tr>';
+		};
+
+		var collectLines = function(){
+			var rows = [];
+			$lineTbody.find('tr').each(function(){
+				var $tr = $(this);
+				var label = ($tr.find('.dtb-quote-line-label').val() || '').toString().trim();
+				var desc = ($tr.find('.dtb-quote-line-desc').val() || '').toString().trim();
+				var type = ($tr.find('.dtb-quote-line-type').val() || 'service').toString();
+				var qty = toNum($tr.find('.dtb-quote-line-qty').val() || 1);
+				var unit = toNum($tr.find('.dtb-quote-line-unit').val() || 0);
+				if (!label && !desc && unit <= 0) return;
+				rows.push({
+					label: label,
+					description: desc,
+					type: type,
+					quantity: qty > 0 ? qty : 1,
+					unit_price: unit > 0 ? unit : 0
+				});
+			});
+			lines = rows;
+			return rows;
+		};
+
+		var calcTotals = function(rows){
+			var subtotal = 0;
+			rows.forEach(function(line){
+				subtotal += Math.max(0, toNum(line.quantity)) * Math.max(0, toNum(line.unit_price));
+			});
+			var discountPct = Math.max(0, Math.min(100, toNum($('#dtb-quote-discount-percent').val() || 0)));
+			var taxPct = Math.max(0, Math.min(100, toNum($('#dtb-quote-tax-percent').val() || 0)));
+			var shipping = Math.max(0, toNum($('#dtb-quote-shipping').val() || 0));
+			var discount = subtotal * (discountPct / 100);
+			var net = Math.max(0, subtotal - discount);
+			var tax = net * (taxPct / 100);
+			var total = net + tax + shipping;
+			return {
+				subtotal: subtotal,
+				discount_percent: discountPct,
+				discount_amount: discount,
+				net_subtotal: net,
+				tax_percent: taxPct,
+				tax_amount: tax,
+				shipping_amount: shipping,
+				total: total
+			};
+		};
+
+		var renderTotals = function(t){
+			var cur = currency();
+			$totals.html('' +
+				'<div><span>Subtotal</span><strong>' + esc(cur + ' ' + money(t.subtotal)) + '</strong></div>' +
+				'<div><span>Discount</span><strong>-' + esc(cur + ' ' + money(t.discount_amount)) + '</strong></div>' +
+				'<div><span>Tax</span><strong>' + esc(cur + ' ' + money(t.tax_amount)) + '</strong></div>' +
+				'<div><span>Shipping</span><strong>' + esc(cur + ' ' + money(t.shipping_amount)) + '</strong></div>' +
+				'<div class="is-total"><span>Total</span><strong>' + esc(cur + ' ' + money(t.total)) + '</strong></div>'
+			);
+		};
+
+		var render = function(){
+			if (!lines.length) {
+				lines = [{ label: '', description: '', type: 'service', quantity: 1, unit_price: 0 }];
+			}
+			$lineTbody.html(lines.map(rowHtml).join(''));
+			renderTotals(calcTotals(lines));
+		};
+
+		var collectPayload = function(status){
+			var payloadLines = collectLines();
+			var totals = calcTotals(payloadLines);
+			return {
+				status: status || 'draft',
+				currency: currency(),
+				expires_at: $('#dtb-quote-expires-at').val() || '',
+				discount_percent: totals.discount_percent,
+				tax_percent: totals.tax_percent,
+				shipping_amount: totals.shipping_amount,
+				customer_note: ($('#dtb-quote-customer-note').val() || '').toString(),
+				internal_note: ($('#dtb-quote-internal-note').val() || '').toString(),
+				lines: payloadLines
+			};
+		};
+
+		var runAction = function(action, status){
+			var payload = collectPayload(status);
+			setMsg('Saving…', '');
+			$root.find('button').each(function(){
+				var $btn = $(this);
+				if ($btn.prop('disabled')) $btn.attr('data-was-disabled', '1');
+				$btn.prop('disabled', true);
+			});
+
+			$.post(ajaxurl, {
+				action: 'dtb_repair_quote_action',
+				repair_id: repairId,
+				nonce: nonce,
+				quote_action: action,
+				quote_json: JSON.stringify(payload)
+			}, function(res){
+				$root.find('button').each(function(){
+					var $btn = $(this);
+					$btn.prop('disabled', false);
+					if ($btn.attr('data-was-disabled') === '1') {
+						$btn.prop('disabled', true).removeAttr('data-was-disabled');
+					}
+				});
+				if (!res || !res.success) {
+					setMsg((res && res.data && res.data.message) ? res.data.message : 'Unable to save quote.', 'is-err');
+					return;
+				}
+				if (res.data && res.data.quote && Array.isArray(res.data.quote.lines)) {
+					quote = res.data.quote;
+					lines = quote.lines.slice();
+					if (quote.totals) {
+						$('#dtb-quote-discount-percent').val(quote.totals.discount_percent || 0);
+						$('#dtb-quote-tax-percent').val(quote.totals.tax_percent || 0);
+						$('#dtb-quote-shipping').val(quote.totals.shipping_amount || 0);
+					}
+					if (quote.expires_at) {
+						var dt = new Date(quote.expires_at);
+						if (!isNaN(dt.getTime())) {
+							var yyyy = dt.getUTCFullYear();
+							var mm = String(dt.getUTCMonth() + 1).padStart(2, '0');
+							var dd = String(dt.getUTCDate()).padStart(2, '0');
+							var hh = String(dt.getUTCHours()).padStart(2, '0');
+							var ii = String(dt.getUTCMinutes()).padStart(2, '0');
+							$('#dtb-quote-expires-at').val(yyyy + '-' + mm + '-' + dd + 'T' + hh + ':' + ii);
+						}
+					}
+				}
+				render();
+				setMsg((res.data && res.data.message) ? res.data.message : 'Quote saved.', 'is-ok');
+				if (res.data && res.data.reload) {
+					window.setTimeout(function(){ window.location.reload(); }, 900);
+				}
+			});
+		};
+
+		$('#dtb-quote-add-line').on('click', function(){
+			collectLines();
+			lines.push({ label: '', description: '', type: 'service', quantity: 1, unit_price: 0 });
+			render();
+		});
+		$lineTbody.on('click', '.dtb-quote-line-remove', function(){
+			var idx = Number($(this).closest('tr').data('index'));
+			if (idx >= 0 && idx < lines.length) {
+				lines.splice(idx, 1);
+				render();
+			}
+		});
+		$root.on('input change', '.dtb-quote-line-label, .dtb-quote-line-desc, .dtb-quote-line-type, .dtb-quote-line-qty, .dtb-quote-line-unit, #dtb-quote-discount-percent, #dtb-quote-tax-percent, #dtb-quote-shipping, #dtb-quote-currency', function(){
+			collectLines();
+			renderTotals(calcTotals(lines));
+		});
+
+		$('#dtb-quote-save').on('click', function(){ runAction('save', 'draft'); });
+		$('#dtb-quote-send').on('click', function(){ runAction('send', 'sent'); });
+		$('#dtb-quote-accept').on('click', function(){ runAction('accept', 'accepted'); });
+		$('#dtb-quote-decline').on('click', function(){ runAction('decline', 'declined'); });
+
+		document.addEventListener('dtb:quote:addPart', function(evt){
+			var detail = evt && evt.detail ? evt.detail : null;
+			if (!detail || !detail.part) return;
+			upsertPartLine(detail.part);
+			setMsg('Part added to quote.', 'is-ok');
+		});
+
+		document.addEventListener('dtb:quote:syncParts', function(evt){
+			var detail = evt && evt.detail ? evt.detail : null;
+			var parts = detail && Array.isArray(detail.parts) ? detail.parts : [];
+			if (!parts.length) {
+				setMsg('No parts to sync.', 'is-err');
+				return;
+			}
+			parts.forEach(function(part){ upsertPartLine(part); });
+			setMsg('Parts synced to quote.', 'is-ok');
+		});
+
+		render();
+	}(jQuery));
+	</script>
+	<?php
+}
+
 // ---- Metabox: Timeline -------------------------------------------------------
 
 function dtb_repair_metabox_timeline( WP_Post $post ): void {
@@ -399,13 +755,35 @@ function dtb_repair_metabox_timeline( WP_Post $post ): void {
 
 	echo '<ul class="dtb-repair-timeline">';
 	foreach ( array_reverse( $events ) as $ev ) {
-		$vis       = esc_attr( (string) $ev->visibility );
-		$type_raw  = esc_html( (string) $ev->event_type );
+		$vis_raw   = sanitize_text_field( (string) $ev->visibility );
+		$vis       = esc_attr( $vis_raw );
+		$type_raw  = (string) $ev->event_type;
+		$type_label = function_exists( 'dtb_repair_event_label' )
+			? dtb_repair_event_label( $type_raw )
+			: ucwords( str_replace( [ '.', '_' ], ' ', $type_raw ) );
+		$payload   = is_string( $ev->payload_json ?? null ) ? json_decode( (string) $ev->payload_json, true ) : [];
+		$summary   = '';
+		if ( is_array( $payload ) ) {
+			if ( ! empty( $payload['note'] ) ) {
+				$summary = wp_strip_all_tags( (string) $payload['note'] );
+			} elseif ( ! empty( $payload['reason'] ) ) {
+				$summary = wp_strip_all_tags( (string) $payload['reason'] );
+			}
+		}
+		$vis_label = ucwords( str_replace( '_', ' ', $vis_raw ) );
+		if ( in_array( $vis_raw, [ 'customer', 'public' ], true ) ) {
+			$vis_label = __( 'Customer Visible', 'drywall-toolbox' );
+		} elseif ( 'operator' === $vis_raw ) {
+			$vis_label = __( 'Operator', 'drywall-toolbox' );
+		} elseif ( 'internal' === $vis_raw ) {
+			$vis_label = __( 'Internal', 'drywall-toolbox' );
+		}
 		$time_fmt  = $ev->created_at ? date_i18n( 'M j, Y g:i a', strtotime( (string) $ev->created_at ) ) : '';
 		echo '<li class="dtb-ev-' . $vis . '">'
 			. '<div class="dtb-tl-body">'
-			. '<span class="dtb-tl-type">' . $type_raw . '</span>'
-			. '<span class="dtb-tl-vis dtb-tl-vis-' . $vis . '">' . esc_html( (string) $ev->visibility ) . '</span>'
+			. '<span class="dtb-tl-type">' . esc_html( $type_label ) . '</span>'
+			. '<span class="dtb-tl-vis dtb-tl-vis-' . $vis . '">' . esc_html( $vis_label ) . '</span>'
+			. ( '' !== $summary ? '<span class="dtb-cell-sub">' . esc_html( wp_html_excerpt( $summary, 140, '…' ) ) . '</span>' : '' )
 			. '<span class="dtb-timeline-time">' . esc_html( $time_fmt ) . '</span>'
 			. '</div>'
 			. '</li>';
@@ -604,7 +982,10 @@ function dtb_repair_metabox_technician( WP_Post $post ): void {
 				<div id="dtb-tech-parts-lookup-menu" class="dtb-tech-lookup-menu" role="listbox" aria-label="Parts lookup results" hidden></div>
 				<input type="hidden" id="dtb_repair_parts_links_json" name="dtb_repair_parts_links_json" value="<?php echo esc_attr( wp_json_encode( $parts_list ) ); ?>" />
 				<div class="dtb-tech-selected-wrap">
-					<div class="dtb-tech-label">Selected Parts</div>
+					<div class="dtb-tech-selected-head">
+						<div class="dtb-tech-label">Selected Parts</div>
+						<button type="button" id="dtb-tech-sync-parts-to-quote" class="button button-small">Add All To Quote</button>
+					</div>
 					<div id="dtb-tech-selected-parts" class="dtb-tech-selected-list"></div>
 					<div class="dtb-tech-sync-meta" id="dtb-tech-primary-part-details">
 						<div><strong>Primary Part SKU:</strong> <span id="dtb-tech-primary-part-sku"><?php echo esc_html( (string) get_post_meta( $post->ID, '_repair_parts_primary_sku', true ) ); ?></span></div>
@@ -639,6 +1020,7 @@ add_action( 'wp_ajax_dtb_repair_schematic_lookup', 'dtb_repair_ajax_schematic_lo
 add_action( 'wp_ajax_dtb_repair_parts_lookup', 'dtb_repair_ajax_parts_lookup' );
 add_action( 'wp_ajax_dtb_repair_send_customer_update', 'dtb_repair_ajax_send_customer_update' );
 add_action( 'wp_ajax_dtb_repair_mark_customer_messages_read', 'dtb_repair_ajax_mark_customer_messages_read' );
+add_action( 'wp_ajax_dtb_repair_quote_action', 'dtb_repair_ajax_quote_action' );
 
 /**
  * Send a customer-visible admin update from the Order Details conversation card.
@@ -722,6 +1104,218 @@ function dtb_repair_ajax_mark_customer_messages_read(): void {
 	update_post_meta( $repair_id, '_repair_admin_last_seen_customer_note_id', (int) $alert['last_customer_note_id'] );
 
 	wp_send_json_success( [ 'message' => __( 'Customer messages marked read.', 'drywall-toolbox' ) ] );
+}
+
+/**
+ * Save/send/transition repair quotes from the quote builder panel.
+ */
+function dtb_repair_ajax_quote_action(): void {
+	$repair_id = (int) ( $_POST['repair_id'] ?? 0 );
+	$nonce = sanitize_text_field( wp_unslash( (string) ( $_POST['nonce'] ?? '' ) ) );
+	$action = sanitize_key( (string) ( $_POST['quote_action'] ?? 'save' ) );
+	$quote_json = wp_unslash( (string) ( $_POST['quote_json'] ?? '' ) );
+
+	if ( ! $repair_id || ! wp_verify_nonce( $nonce, 'dtb_repair_quote_' . $repair_id ) ) {
+		wp_send_json_error( [ 'message' => __( 'Security check failed.', 'drywall-toolbox' ) ], 403 );
+	}
+	if ( ! current_user_can( 'dtb_manage_repairs' ) ) {
+		wp_send_json_error( [ 'message' => __( 'Insufficient permissions.', 'drywall-toolbox' ) ], 403 );
+	}
+	if ( ! function_exists( 'dtb_repair_save_quote' ) || ! function_exists( 'dtb_repair_get_quote' ) ) {
+		wp_send_json_error( [ 'message' => __( 'Quote service unavailable.', 'drywall-toolbox' ) ], 500 );
+	}
+
+	$input = json_decode( $quote_json, true );
+	if ( ! is_array( $input ) ) {
+		$input = [];
+	}
+
+	if ( ! in_array( $action, [ 'save', 'send', 'accept', 'decline' ], true ) ) {
+		$action = 'save';
+	}
+
+	if ( 'save' === $action ) {
+		$input['status'] = 'draft';
+	} elseif ( 'send' === $action ) {
+		$input['status'] = 'sent';
+	} elseif ( 'accept' === $action ) {
+		$input['status'] = 'accepted';
+	} elseif ( 'decline' === $action ) {
+		$input['status'] = 'declined';
+	}
+
+	if ( 'send' === $action && function_exists( 'dtb_repair_quote_normalize_payload' ) ) {
+		$preview = dtb_repair_quote_normalize_payload( $input, dtb_repair_get_quote( $repair_id ) );
+		if ( empty( $preview['lines'] ) ) {
+			wp_send_json_error( [ 'message' => __( 'Add at least one quote line item before sending.', 'drywall-toolbox' ) ], 422 );
+		}
+		$preview_total = (float) ( $preview['totals']['total'] ?? 0 );
+		if ( $preview_total <= 0 ) {
+			wp_send_json_error( [ 'message' => __( 'Quote total must be greater than zero before sending.', 'drywall-toolbox' ) ], 422 );
+		}
+		$current = function_exists( 'dtb_get_repair_status' ) ? dtb_get_repair_status( $repair_id ) : '';
+		if ( 'quoted' !== $current ) {
+			$allowed = function_exists( 'dtb_get_allowed_transitions' ) ? ( dtb_get_allowed_transitions()[ $current ] ?? [] ) : [];
+			if ( ! in_array( 'quoted', $allowed, true ) ) {
+				$label = function_exists( 'dtb_get_repair_status_label' ) ? dtb_get_repair_status_label( $current ) : $current;
+				wp_send_json_error(
+					[
+						'message' => sprintf(
+							/* translators: %s: status label */
+							__( 'Cannot send quote from current status: %s', 'drywall-toolbox' ),
+							$label
+						),
+					],
+					409
+				);
+			}
+		}
+	}
+
+	$quote = dtb_repair_save_quote(
+		$repair_id,
+		$input,
+		[
+			'actor_type' => 'admin',
+			'actor_id'   => get_current_user_id(),
+			'source'     => 'admin_quote_builder',
+		]
+	);
+
+	$message = __( 'Quote saved.', 'drywall-toolbox' );
+	$reload  = false;
+
+	if ( 'send' === $action ) {
+		if ( empty( $quote['lines'] ) ) {
+			wp_send_json_error( [ 'message' => __( 'Add at least one quote line item before sending.', 'drywall-toolbox' ) ], 422 );
+		}
+		$total = (float) ( $quote['totals']['total'] ?? 0 );
+		if ( $total <= 0 ) {
+			wp_send_json_error( [ 'message' => __( 'Quote total must be greater than zero before sending.', 'drywall-toolbox' ) ], 422 );
+		}
+
+		$current = function_exists( 'dtb_get_repair_status' ) ? dtb_get_repair_status( $repair_id ) : '';
+		$payload = [
+			'quote_total'    => $total,
+			'quote_currency' => (string) ( $quote['currency'] ?? dtb_repair_quote_default_currency() ),
+			'line_count'     => count( (array) $quote['lines'] ),
+		];
+		$context = array_merge(
+			[
+				'actor_type' => 'admin',
+				'actor_id'   => get_current_user_id(),
+				'source'     => 'admin_quote_builder',
+				'note'       => __( 'Quote sent to customer.', 'drywall-toolbox' ),
+				'payload'    => $payload,
+			],
+			function_exists( 'dtb_repair_quote_to_notification_context' )
+				? dtb_repair_quote_to_notification_context( $quote )
+				: []
+		);
+
+		if ( 'quoted' === $current ) {
+			if ( function_exists( 'dtb_repair_dispatch_notification' ) ) {
+				dtb_repair_dispatch_notification(
+					$repair_id,
+					'repair-quote-created',
+					function_exists( 'dtb_repair_quote_to_notification_context' ) ? dtb_repair_quote_to_notification_context( $quote ) : []
+				);
+			}
+			if ( function_exists( 'dtb_repair_append_event' ) ) {
+				dtb_repair_append_event(
+					$repair_id,
+					'repair.quote_resent',
+					[
+						'actor_type' => 'admin',
+						'actor_id'   => get_current_user_id(),
+						'source'     => 'admin_quote_builder',
+						'visibility' => 'customer',
+						'payload'    => $payload,
+					]
+				);
+			}
+			$message = __( 'Quote resent to customer.', 'drywall-toolbox' );
+		} else {
+			$allowed = function_exists( 'dtb_get_allowed_transitions' ) ? ( dtb_get_allowed_transitions()[ $current ] ?? [] ) : [];
+			if ( ! in_array( 'quoted', $allowed, true ) ) {
+				$label = function_exists( 'dtb_get_repair_status_label' ) ? dtb_get_repair_status_label( $current ) : $current;
+				wp_send_json_error(
+					[
+						'message' => sprintf(
+							/* translators: %s: status label */
+							__( 'Cannot send quote from current status: %s', 'drywall-toolbox' ),
+							$label
+						),
+					],
+					409
+				);
+			}
+
+			if ( ! function_exists( 'dtb_transition_repair_status' ) ) {
+				wp_send_json_error( [ 'message' => __( 'Workflow module unavailable.', 'drywall-toolbox' ) ], 500 );
+			}
+
+			$result = dtb_transition_repair_status( $repair_id, 'quoted', $context );
+			if ( is_wp_error( $result ) ) {
+				wp_send_json_error( [ 'message' => $result->get_error_message() ], 409 );
+			}
+			$reload = true;
+			$message = __( 'Quote sent and repair status moved to Quote Sent.', 'drywall-toolbox' );
+		}
+	}
+
+	if ( 'accept' === $action || 'decline' === $action ) {
+		$target = 'accept' === $action ? 'quote_accepted' : 'quote_declined';
+		$current = function_exists( 'dtb_get_repair_status' ) ? dtb_get_repair_status( $repair_id ) : '';
+		if ( $current !== $target ) {
+			$allowed = function_exists( 'dtb_get_allowed_transitions' ) ? ( dtb_get_allowed_transitions()[ $current ] ?? [] ) : [];
+			if ( ! in_array( $target, $allowed, true ) ) {
+				$label = function_exists( 'dtb_get_repair_status_label' ) ? dtb_get_repair_status_label( $current ) : $current;
+				wp_send_json_error(
+					[
+						'message' => sprintf(
+							/* translators: %s: status label */
+							__( 'Cannot update quote decision from current status: %s', 'drywall-toolbox' ),
+							$label
+						),
+					],
+					409
+				);
+			}
+
+			$result = function_exists( 'dtb_transition_repair_status' )
+				? dtb_transition_repair_status(
+					$repair_id,
+					$target,
+					[
+						'actor_type' => 'admin',
+						'actor_id'   => get_current_user_id(),
+						'source'     => 'admin_quote_builder',
+						'note'       => 'accept' === $action
+							? __( 'Quote marked accepted by admin.', 'drywall-toolbox' )
+							: __( 'Quote marked declined by admin.', 'drywall-toolbox' ),
+					]
+				)
+				: new WP_Error( 'dtb_repair_workflow_unavailable', __( 'Workflow module unavailable.', 'drywall-toolbox' ) );
+
+			if ( is_wp_error( $result ) ) {
+				wp_send_json_error( [ 'message' => $result->get_error_message() ], 409 );
+			}
+			$reload = true;
+		}
+
+		$message = 'accept' === $action
+			? __( 'Quote marked accepted.', 'drywall-toolbox' )
+			: __( 'Quote marked declined.', 'drywall-toolbox' );
+	}
+
+	wp_send_json_success(
+		[
+			'message' => $message,
+			'quote'   => dtb_repair_get_quote( $repair_id ),
+			'reload'  => $reload,
+		]
+	);
 }
 
 function dtb_repair_save_technician_meta( int $post_id ): void {

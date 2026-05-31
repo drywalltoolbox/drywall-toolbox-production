@@ -11,14 +11,10 @@ defined( 'ABSPATH' ) || exit;
  * Return the current action due-at timestamp for a ticket.
  */
 function dtb_support_action_due_at( object $ticket ): ?string {
-	$due_at = empty( $ticket->first_reply_at )
-		? ( $ticket->sla_first_response_due ?? null )
-		: ( $ticket->sla_resolution_due ?? null );
+	$due_at = $ticket->sla_first_response_due ?? null;
 
 	if ( empty( $due_at ) ) {
-		$due_at = empty( $ticket->first_reply_at )
-			? dtb_support_compute_first_response_due( (string) $ticket->created_at, (string) $ticket->priority )
-			: dtb_support_compute_resolution_due( (string) $ticket->created_at, (string) $ticket->priority );
+		$due_at = dtb_support_compute_first_response_due( (string) $ticket->created_at, (string) $ticket->priority );
 	}
 
 	return ! empty( $due_at ) ? (string) $due_at : null;
@@ -213,14 +209,19 @@ function dtb_support_get_kpis(): array {
 		"SELECT COUNT(*) FROM {$table} WHERE assigned_user_id IS NULL AND status NOT IN ('resolved','closed','spam')"
 	);
 
-	// Overdue and due-soon counts (use stored sla_state column when present).
+	$action_due_hours    = max( 1, (int) dtb_support_action_due_hours() );
+	$warning_window_secs = (int) floor( $action_due_hours * HOUR_IN_SECONDS * 0.25 );
+	$warning_window_secs = max( HOUR_IN_SECONDS, $warning_window_secs );
+	$action_due_expr     = "COALESCE(sla_first_response_due, DATE_ADD(created_at, INTERVAL {$action_due_hours} HOUR))";
+
+	// Overdue and due-soon counts calculated from due timestamp.
 	$overdue_count  = (int) $wpdb->get_var(
 		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-		"SELECT COUNT(*) FROM {$table} WHERE sla_state IN ('breach','overdue') AND status NOT IN ('resolved','closed','spam')"
+		"SELECT COUNT(*) FROM {$table} WHERE {$action_due_expr} < UTC_TIMESTAMP() AND status NOT IN ('resolved','closed','spam')"
 	);
 	$due_soon_count = (int) $wpdb->get_var(
 		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-		"SELECT COUNT(*) FROM {$table} WHERE sla_state IN ('warning','due_soon') AND status NOT IN ('resolved','closed','spam')"
+		"SELECT COUNT(*) FROM {$table} WHERE {$action_due_expr} >= UTC_TIMESTAMP() AND TIMESTAMPDIFF(SECOND, UTC_TIMESTAMP(), {$action_due_expr}) <= {$warning_window_secs} AND status NOT IN ('resolved','closed','spam')"
 	);
 
 	// Needs reply = open/pending_staff/in_progress and not snoozed.
