@@ -1064,6 +1064,11 @@
 			DtbAdmin.registerLiveRegion( el );
 		} );
 
+		// Bind live controls that live OUTSIDE any live region (e.g. tab nav in
+		// the page header). The _dtbLiveControlBound guard prevents double-binding
+		// for controls that were already found inside a region above.
+		DtbAdmin.initLiveControls( document );
+
 		// Handle browser back/forward — re-apply URL state to active region
 		window.addEventListener( 'popstate', function ( e ) {
 			if ( ! e.state ) return;

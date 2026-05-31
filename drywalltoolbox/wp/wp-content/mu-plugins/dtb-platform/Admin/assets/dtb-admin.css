@@ -295,6 +295,18 @@ body.dtb-repair-admin-screen {
   border-color: rgba(29, 78, 216, .18);
   text-decoration: none;
 }
+/* Scope under .dtb-admin + add :visited/:focus to beat WP admin link specificity */
+.dtb-admin .dtb-section-nav .dtb-section-nav__tab--active,
+.dtb-admin .dtb-section-nav .dtb-section-nav__tab--active:visited,
+.dtb-admin .dtb-section-nav .dtb-section-nav__tab--active:hover,
+.dtb-admin .dtb-section-nav .dtb-section-nav__tab--active:focus {
+  color: #fff;
+  background: var(--dtb-primary);
+  border-color: var(--dtb-primary);
+  font-weight: 600;
+  box-shadow: 0 8px 18px rgba(29, 78, 216, .28);
+  text-decoration: none;
+}
 .dtb-section-nav__tab--active {
   color: #fff;
   background: var(--dtb-primary);
@@ -1884,6 +1896,37 @@ body.dtb-repair-admin-screen #collapse-button {
 body.dtb-admin-screen #adminmenu div.wp-menu-image:before,
 body.dtb-repair-admin-screen #adminmenu div.wp-menu-image:before {
   color: var(--dtb-muted);
+}
+
+/*
+ * Third-party plugin SVG/image icons (WooCommerce, WPForms, etc.)
+ * WP renders these as <img> inside div.wp-menu-image and colorises them via
+ * wp-svg-painter.js using the active scheme's icon color (#a7aaad for "fresh"
+ * scheme — designed for a dark sidebar). On our white sidebar that's invisible.
+ *
+ * Fix: use CSS filter to force a consistent dark-gray icon regardless of the
+ * original fill color — identical to what WP's own "light" color scheme does.
+ */
+body.dtb-admin-screen #adminmenu .wp-menu-image img,
+body.dtb-repair-admin-screen #adminmenu .wp-menu-image img {
+  filter: brightness(0) opacity(0.55);
+  transition: filter var(--dtb-motion-fast) var(--dtb-ease-standard);
+}
+
+/* Hover / open submenu: make icon more prominent */
+body.dtb-admin-screen #adminmenu li.menu-top:hover .wp-menu-image img,
+body.dtb-admin-screen #adminmenu li.opensub .wp-menu-image img,
+body.dtb-repair-admin-screen #adminmenu li.menu-top:hover .wp-menu-image img,
+body.dtb-repair-admin-screen #adminmenu li.opensub .wp-menu-image img {
+  filter: brightness(0) opacity(0.85);
+}
+
+/* Active / current item: sidebar bg is var(--dtb-primary) = dark blue, so icon must be white */
+body.dtb-admin-screen #adminmenu li.wp-has-current-submenu .wp-menu-image img,
+body.dtb-admin-screen #adminmenu li.current .wp-menu-image img,
+body.dtb-repair-admin-screen #adminmenu li.wp-has-current-submenu .wp-menu-image img,
+body.dtb-repair-admin-screen #adminmenu li.current .wp-menu-image img {
+  filter: brightness(0) invert(1);
 }
 
 body.dtb-admin-screen #adminmenu li.menu-top:hover,
