@@ -181,7 +181,7 @@ export async function updateCartItem( key, qty ) {
       method: 'POST',
       body: JSON.stringify( { key, quantity: normalizedQty } ),
     } );
-  } catch ( err ) {
+  } catch {
     // Compatibility fallback for environments exposing cart item routes only.
     payload = await storeFetch( `/cart/items/${ encodedKey }`, {
       method: 'PUT',
@@ -208,7 +208,7 @@ export async function removeCartItem( key ) {
     payload = await storeFetch( `/cart/items/${ encodedKey }`, {
       method: 'DELETE',
     } );
-  } catch ( err ) {
+  } catch {
     // Compatibility fallback for environments exposing remove-item only.
     payload = await storeFetch( '/cart/remove-item', {
       method: 'POST',
