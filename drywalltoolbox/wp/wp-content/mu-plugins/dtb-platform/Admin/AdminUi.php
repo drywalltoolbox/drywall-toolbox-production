@@ -97,12 +97,20 @@ function dtb_admin_ui_kpi( $value, string $label, array $args = [] ): string {
 		'trend'      => '',
 		'trend_dir'  => 'flat',
 		'href'       => '',
+		'data'       => [],
 	] );
 
 	$tag      = $args['href'] ? 'a' : 'div';
 	$href_att = $args['href'] ? ' href="' . esc_url( $args['href'] ) . '"' : '';
 
-	$html  = '<' . $tag . ' class="dtb-kpi"' . $href_att . '>';
+	$data_attrs = '';
+	if ( ! empty( $args['data'] ) && is_array( $args['data'] ) ) {
+		foreach ( $args['data'] as $dk => $dv ) {
+			$data_attrs .= ' data-' . esc_attr( $dk ) . '="' . esc_attr( $dv ) . '"';
+		}
+	}
+
+	$html  = '<' . $tag . ' class="dtb-kpi"' . $href_att . $data_attrs . '>';
 	$html .= '<div class="dtb-kpi__icon dtb-kpi__icon--' . esc_attr( $args['icon_color'] ) . '">';
 	$html .= '<span class="dashicons ' . esc_attr( $args['icon'] ) . '" aria-hidden="true"></span>';
 	$html .= '</div>';

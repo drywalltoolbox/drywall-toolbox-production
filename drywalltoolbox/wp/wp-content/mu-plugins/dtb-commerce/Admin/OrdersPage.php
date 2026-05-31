@@ -24,6 +24,7 @@ function dtb_orders_render_page(): void {
 	if ( '' === $status && '' !== $status_tab ) {
 		$status = $status_tab;
 	}
+	// 'attention' pseudo-tab maps to a multi-status query (handled below).
 	$search  = sanitize_text_field( $_GET['s'] ?? '' ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 	$live_search = sanitize_text_field( $_GET['search'] ?? '' ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 	if ( '' === $search && '' !== $live_search ) {
@@ -32,13 +33,22 @@ function dtb_orders_render_page(): void {
 	$paged   = max( 1, (int) ( $_GET['paged'] ?? 1 ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 	$per     = (int) get_option( 'dtb_admin_items_per_page', 25 );
 	$base    = admin_url( 'admin.php?page=dtb-orders' );
+	// KPI counts — lightweight wc_get_orders id-only queries for tab badges.
+	$kpi_attention  = count( wc_get_orders( [ 'limit' => -1, 'return' => 'ids', 'status' => [ 'wc-on-hold', 'wc-failed', 'wc-pending' ] ] ) );
+	$kpi_processing = count( wc_get_orders( [ 'limit' => -1, 'return' => 'ids', 'status' => 'wc-processing' ] ) );
+	$kpi_on_hold    = count( wc_get_orders( [ 'limit' => -1, 'return' => 'ids', 'status' => 'wc-on-hold' ] ) );
+	$kpi_pending    = count( wc_get_orders( [ 'limit' => -1, 'return' => 'ids', 'status' => 'wc-pending' ] ) );
+	$kpi_failed     = count( wc_get_orders( [ 'limit' => -1, 'return' => 'ids', 'status' => 'wc-failed' ] ) );
+	$kpi_total      = count( wc_get_orders( [ 'limit' => -1, 'return' => 'ids' ] ) );
+
 	$status_tabs = [
-		[ 'id' => 'all',        'label' => __( 'All', 'drywall-toolbox' ),         'active' => $status === '' || $status === 'all', 'url' => $base ],
-		[ 'id' => 'on-hold',    'label' => __( 'On Hold', 'drywall-toolbox' ),      'active' => $status === 'on-hold',    'url' => add_query_arg( 'status', 'on-hold', $base ) ],
-		[ 'id' => 'processing', 'label' => __( 'Processing', 'drywall-toolbox' ),   'active' => $status === 'processing', 'url' => add_query_arg( 'status', 'processing', $base ) ],
-		[ 'id' => 'pending',    'label' => __( 'Pending', 'drywall-toolbox' ),       'active' => $status === 'pending',    'url' => add_query_arg( 'status', 'pending', $base ) ],
-		[ 'id' => 'failed',     'label' => __( 'Failed', 'drywall-toolbox' ),        'active' => $status === 'failed',     'url' => add_query_arg( 'status', 'failed', $base ) ],
-		[ 'id' => 'completed',  'label' => __( 'Completed', 'drywall-toolbox' ),     'active' => $status === 'completed',  'url' => add_query_arg( 'status', 'completed', $base ) ],
+		[ 'id' => 'all',        'label' => __( 'All', 'drywall-toolbox' ),              'active' => $status === '' || $status === 'all', 'url' => $base ],
+		[ 'id' => 'attention',  'label' => __( 'Needs Attention', 'drywall-toolbox' ),  'active' => $status === 'attention', 'url' => add_query_arg( 'status', 'attention', $base ), 'count' => $kpi_attention ],
+		[ 'id' => 'on-hold',    'label' => __( 'On Hold', 'drywall-toolbox' ),          'active' => $status === 'on-hold',    'url' => add_query_arg( 'status', 'on-hold', $base ) ],
+		[ 'id' => 'processing', 'label' => __( 'Processing', 'drywall-toolbox' ),       'active' => $status === 'processing', 'url' => add_query_arg( 'status', 'processing', $base ) ],
+		[ 'id' => 'pending',    'label' => __( 'Pending', 'drywall-toolbox' ),          'active' => $status === 'pending',    'url' => add_query_arg( 'status', 'pending', $base ) ],
+		[ 'id' => 'failed',     'label' => __( 'Failed', 'drywall-toolbox' ),           'active' => $status === 'failed',     'url' => add_query_arg( 'status', 'failed', $base ) ],
+		[ 'id' => 'completed',  'label' => __( 'Completed', 'drywall-toolbox' ),        'active' => $status === 'completed',  'url' => add_query_arg( 'status', 'completed', $base ) ],
 	];
 
 	dtb_admin_shell_open( [
@@ -52,18 +62,71 @@ function dtb_orders_render_page(): void {
 		'live_target' => 'dtb-orders-workspace',
 	] );
 
-	// Toolbar: live search + new order button.
-	dtb_admin_ui_toolbar_open();
+	// KPI strip.
+	echo '<div class="dtb-kpi-strip">';
+	// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+	echo dtb_admin_ui_kpi( $kpi_total, __( 'Total Orders', 'drywall-toolbox' ), [
+		'icon'       => 'dashicons-cart',
+		'icon_color' => 'primary',
+		'href'       => $base,
+		'data'       => [ 'dtb-live-tab' => 'all', 'dtb-live-target' => 'dtb-orders-workspace' ],
+	] );
+	// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+	echo dtb_admin_ui_kpi( $kpi_attention, __( 'Needs Attention', 'drywall-toolbox' ), [
+		'icon'       => 'dashicons-warning',
+		'icon_color' => 'danger',
+		'href'       => add_query_arg( 'status', 'attention', $base ),
+		'data'       => [ 'dtb-live-tab' => 'attention', 'dtb-live-target' => 'dtb-orders-workspace' ],
+	] );
+	// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+	echo dtb_admin_ui_kpi( $kpi_processing, __( 'Processing', 'drywall-toolbox' ), [
+		'icon'       => 'dashicons-update',
+		'icon_color' => 'info',
+		'href'       => add_query_arg( 'status', 'processing', $base ),
+		'data'       => [ 'dtb-live-tab' => 'processing', 'dtb-live-target' => 'dtb-orders-workspace' ],
+	] );
+	// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+	echo dtb_admin_ui_kpi( $kpi_on_hold, __( 'On Hold', 'drywall-toolbox' ), [
+		'icon'       => 'dashicons-pause',
+		'icon_color' => 'warning',
+		'href'       => add_query_arg( 'status', 'on-hold', $base ),
+		'data'       => [ 'dtb-live-tab' => 'on-hold', 'dtb-live-target' => 'dtb-orders-workspace' ],
+	] );
+	// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+	echo dtb_admin_ui_kpi( $kpi_pending, __( 'Pending Payment', 'drywall-toolbox' ), [
+		'icon'       => 'dashicons-money-alt',
+		'icon_color' => 'warning',
+		'href'       => add_query_arg( 'status', 'pending', $base ),
+		'data'       => [ 'dtb-live-tab' => 'pending', 'dtb-live-target' => 'dtb-orders-workspace' ],
+	] );
+	// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+	echo dtb_admin_ui_kpi( $kpi_failed, __( 'Failed', 'drywall-toolbox' ), [
+		'icon'       => 'dashicons-dismiss',
+		'icon_color' => 'danger',
+		'href'       => add_query_arg( 'status', 'failed', $base ),
+		'data'       => [ 'dtb-live-tab' => 'failed', 'dtb-live-target' => 'dtb-orders-workspace' ],
+	] );
+	echo '</div>';
+
+	// Toolbar: live search + filter controls + refresh + new order.
+	echo dtb_admin_ui_toolbar_open();
 	// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 	echo dtb_admin_ui_search_input( __( 'Search orders…', 'drywall-toolbox' ), $search, true, 's', 'dtb-orders-workspace' );
-	dtb_admin_ui_toolbar_spacer();
+	echo dtb_admin_ui_toolbar_spacer();
+	// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+	echo dtb_admin_ui_button( __( 'Refresh', 'drywall-toolbox' ), [
+		'type' => 'secondary',
+		'icon' => 'dashicons-update',
+		'size' => 'sm',
+		'data' => [ 'dtb-live-refresh' => 'dtb-orders-workspace' ],
+	] );
 	// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 	echo dtb_admin_ui_button( __( 'New Order', 'drywall-toolbox' ), [
 		'href' => admin_url( 'post-new.php?post_type=shop_order' ),
 		'icon' => 'dashicons-plus-alt2',
 		'size' => 'sm',
 	] );
-	dtb_admin_ui_toolbar_close();
+	echo dtb_admin_ui_toolbar_close();
 
 	// Query orders.
 	$query_args = [
@@ -71,7 +134,10 @@ function dtb_orders_render_page(): void {
 		'paged'  => $paged,
 		'return' => 'objects',
 	];
-	if ( $status ) {
+	// 'attention' pseudo-status queries on-hold + failed + pending in one call.
+	if ( 'attention' === $status ) {
+		$query_args['status'] = [ 'wc-on-hold', 'wc-failed', 'wc-pending' ];
+	} elseif ( $status ) {
 		$query_args['status'] = str_starts_with( $status, 'wc-' ) ? $status : 'wc-' . $status;
 	}
 	if ( $search ) {
@@ -79,8 +145,12 @@ function dtb_orders_render_page(): void {
 	}
 	// Total count for pagination (separate lightweight query).
 	$count_args = [ 'limit' => -1, 'return' => 'ids' ];
-	if ( $status ) $count_args['status'] = str_starts_with( $status, 'wc-' ) ? $status : 'wc-' . $status;
-	if ( $search ) $count_args['s']      = $search;
+	if ( 'attention' === $status ) {
+		$count_args['status'] = [ 'wc-on-hold', 'wc-failed', 'wc-pending' ];
+	} elseif ( $status ) {
+		$count_args['status'] = str_starts_with( $status, 'wc-' ) ? $status : 'wc-' . $status;
+	}
+	if ( $search ) $count_args['s'] = $search;
 	$total_count = count( wc_get_orders( $count_args ) );
 	$total_pages = $per > 0 ? (int) ceil( $total_count / $per ) : 1;
 
