@@ -25,16 +25,26 @@ function dtb_register_parts_manager_submenu(): void {
 add_action( 'admin_menu', 'dtb_register_parts_manager_submenu' );
 
 function dtb_parts_manager_render_page(): void {
-	if ( ! current_user_can( 'manage_woocommerce' ) ) {
-		wp_die( esc_html__( 'You do not have permission to access this page.', 'dtb' ) );
+	if ( ! current_user_can( 'dtb_manage_parts' ) ) {
+		dtb_admin_shell_access_denied();
+		return;
 	}
 
 	$nonce  = wp_create_nonce( 'dtb_parts_manager_nonce' );
 	$brands = defined( 'DTB_BRANDS' ) && is_array( DTB_BRANDS ) ? DTB_BRANDS : [];
+
+	dtb_admin_shell_open( [
+		'title'    => __( 'Parts Manager', 'drywall-toolbox' ),
+		'subtitle' => __( 'Manage repair parts inventory and schematic part associations.', 'drywall-toolbox' ),
+		'section'  => 'tools',
+		'page'     => 'dtb-parts-manager',
+		'template' => 'tool',
+		'icon'     => 'dashicons-admin-tools',
+	] );
 	?>
-	<div class="wrap dtb-parts-manager">
-		<h1 class="wp-heading-inline">Parts</h1>
-		<hr class="wp-header-end">
+	<div class="dtb-pm-inner">
+		<h1 class="wp-heading-inline" style="display:none">Parts</h1>
+		<hr class="wp-header-end" style="display:none">
 
 		<style>
 			.dtb-parts-manager { max-width: 1200px; }
@@ -381,5 +391,7 @@ function dtb_parts_manager_render_page(): void {
 		loadParts(1);
 	})(jQuery);
 	</script>
+	</div><?php // .dtb-pm-inner ?>
 	<?php
+	dtb_admin_shell_close();
 }

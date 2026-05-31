@@ -2,7 +2,7 @@
 /**
  * Catalog Health admin page shell.
  *
- * Owns: admin menu registration, asset enqueue, page render.
+ * Render callback registered via ToolLibraryMenu (dtb-catalog-health).
  * Scan logic    => Application/RunCatalogHealthScan.php
  * Render helpers => Admin/CatalogHealthRenderer.php
  * AJAX handlers  => Admin/CatalogHealthActions.php
@@ -12,45 +12,52 @@
 
 defined( 'ABSPATH' ) || exit;
 
-if ( ! is_admin() ) {
-return;
-}
-
-add_action( 'admin_menu', 'dtb_catalog_health_register_menu', 20 );
-
-function dtb_catalog_health_register_menu(): void {
-if ( ! function_exists( 'dtb_ops_menu_slug' ) ) {
-add_menu_page( 'DTB Catalog Health', 'Catalog Health', DTB_CAP_CATALOG, 'dtb-catalog-health', 'dtb_catalog_health_render_page', 'dashicons-chart-bar', 58 );
-return;
-}
-add_submenu_page( 'dtb-ops', 'Catalog Health', 'Catalog Health', DTB_CAP_CATALOG, 'dtb-catalog-health', 'dtb_catalog_health_render_page' );
-}
-
+// Legacy asset localisation - keeps dtbCH.nonce available for existing AJAX scan handlers.
 add_action( 'admin_enqueue_scripts', 'dtb_catalog_health_enqueue' );
 
 function dtb_catalog_health_enqueue( string $hook ): void {
 if ( false === strpos( $hook, 'dtb-catalog-health' ) ) {
 return;
 }
-wp_enqueue_style( 'wp-admin' );
-wp_add_inline_script( 'jquery', 'jQuery(function($){var L={scan:"Scan Variable Products",metaScan:"Scan DTB Meta",flush:"Flush Product Cache"};$(document).on("click","#dtb-ch-scan-btn",function(){var $b=$(this);$b.prop("disabled",true).text("Scanning\u2026");$.post(ajaxurl,{action:"dtb_catalog_health_scan",nonce:dtbCH.nonce,page:1,per_page:20},function(r){r.success?$("#dtb-ch-results").html(r.data.html):$("#dtb-ch-results").html("<p class=\"error\">Scan failed: "+(r.data||"unknown error")+"</p>");$b.prop("disabled",false).text(L.scan)}).fail(function(){$("#dtb-ch-results").html("<p class=\"error\">Request failed.</p>");$b.prop("disabled",false).text(L.scan)});});$(document).on("click","#dtb-ch-meta-scan-btn",function(){var $b=$(this);$b.prop("disabled",true).text("Scanning DTB Meta\u2026");$.post(ajaxurl,{action:"dtb_catalog_health_meta_scan",nonce:dtbCH.nonce,page:1,per_page:50},function(r){r.success?$("#dtb-ch-results").html("<h3>DTB Meta Scan Results</h3>"+r.data.html):$("#dtb-ch-results").html("<p class=\"error\">Meta scan failed: "+(r.data||"unknown error")+"</p>");$b.prop("disabled",false).text(L.metaScan)}).fail(function(){$("#dtb-ch-results").html("<p class=\"error\">Request failed.</p>");$b.prop("disabled",false).text(L.metaScan)});});$(document).on("click","#dtb-ch-flush-btn",function(){var $b=$(this);$b.prop("disabled",true).text("Flushing\u2026");$.post(ajaxurl,{action:"dtb_catalog_health_flush",nonce:dtbCH.nonce},function(r){r.success?alert("Cache flushed. "+r.data.message):alert("Flush failed: "+(r.data||"unknown error"));$b.prop("disabled",false).text(L.flush)});});});' );
-wp_localize_script( 'jquery', 'dtbCH', array( 'nonce' => wp_create_nonce( 'dtb_catalog_health' ) ) );
+wp_localize_script( 'dtb-admin', 'dtbCH', [ 'nonce' => wp_create_nonce( 'dtb_catalog_health' ) ] );
 }
 
 function dtb_catalog_health_render_page(): void {
-if ( ! current_user_can( DTB_CAP_CATALOG ) ) {
-wp_die( esc_html__( 'You do not have permission to access this page.', 'drywall-toolbox' ) );
+if ( ! current_user_can( 'dtb_manage_catalog_health' ) ) {
+dtb_admin_shell_access_denied();
+return;
 }
-echo '<div class="wrap">';
-echo '<h1>&#x1F4CA; DTB Catalog Health</h1>';
-echo '<p class="description">Scans WooCommerce variable products for parent/child integrity issues, missing variation SKUs, and stock anomalies.</p>';
-echo '<div style="display:flex;gap:10px;margin:16px 0;">';
-echo '<button id="dtb-ch-scan-btn" class="button button-primary">Scan Variable Products</button>';
-echo '<button id="dtb-ch-meta-scan-btn" class="button button-primary" style="background:#2563eb;border-color:#1d4ed8;">Scan DTB Meta</button>';
-echo '<button id="dtb-ch-flush-btn" class="button">Flush Product Cache</button>';
+
+dtb_admin_shell_open( [
+'title'    => __( 'Catalog Health', 'drywall-toolbox' ),
+'subtitle' => __( 'Scan WooCommerce products for data quality issues.', 'drywall-toolbox' ),
+'section'  => 'tools',
+'page'     => 'dtb-catalog-health',
+'template' => 'tool',
+'icon'     => 'dashicons-chart-bar',
+] );
+
 $export_url = admin_url( 'admin-ajax.php?action=dtb_catalog_health_export_csv&nonce=' . wp_create_nonce( 'dtb_catalog_health' ) );
-echo '<a href="' . esc_url( $export_url ) . '" class="button" download="dtb-catalog-health.csv">Export CSV</a>';
+
+dtb_admin_ui_toolbar_open();
+// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+echo dtb_admin_ui_button( __( 'Scan Variable Products', 'drywall-toolbox' ), [ 'type' => 'primary',    'attr' => 'id="dtb-ch-scan-btn"',      'icon' => 'dashicons-search',   'loading' => true ] );
+// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+echo dtb_admin_ui_button( __( 'Scan DTB Meta', 'drywall-toolbox' ),          [ 'type' => 'secondary',  'attr' => 'id="dtb-ch-meta-scan-btn"', 'icon' => 'dashicons-tag',      'loading' => true ] );
+// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+echo dtb_admin_ui_button( __( 'Flush Cache', 'drywall-toolbox' ),             [ 'type' => 'ghost',      'attr' => 'id="dtb-ch-flush-btn"',     'icon' => 'dashicons-update',   'loading' => true ] );
+dtb_admin_ui_toolbar_spacer();
+// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+echo dtb_admin_ui_button( __( 'Export CSV', 'drywall-toolbox' ), [ 'href' => $export_url, 'type' => 'ghost', 'icon' => 'dashicons-download', 'attr' => 'download="dtb-catalog-health.csv"' ] );
+dtb_admin_ui_toolbar_close();
+
+echo '<div id="dtb-ch-results" class="dtb-results-container">';
+// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+echo dtb_admin_ui_empty_state(
+__( 'No scan results yet', 'drywall-toolbox' ),
+__( 'Click a scan button above to run a catalog health check.', 'drywall-toolbox' )
+);
 echo '</div>';
-echo '<div id="dtb-ch-results" style="margin-top:20px;"><p style="color:#666;">Click <em>Scan Now</em> to run the catalog health check.</p></div>';
-echo '</div>';
+
+dtb_admin_shell_close();
 }

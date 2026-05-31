@@ -8,12 +8,26 @@
 defined( 'ABSPATH' ) || exit;
 
 function dtb_product_mapping_render_page() {
+	if ( ! current_user_can( 'dtb_manage_product_mapping' ) ) {
+		dtb_admin_shell_access_denied();
+		return;
+	}
+
 	$nonce  = wp_create_nonce( 'dtb_mapping_nonce' );
 	$brands = [ 'Asgard', 'Columbia Taping Tools', 'Platinum Drywall Tools', 'SurPro', 'TapeTech' ];
+
+	dtb_admin_shell_open( [
+		'title'    => __( 'Product Mapping', 'drywall-toolbox' ),
+		'subtitle' => __( 'Map external catalog IDs and variations to WooCommerce products.', 'drywall-toolbox' ),
+		'section'  => 'tools',
+		'page'     => 'dtb-product-mapping',
+		'template' => 'tool',
+		'icon'     => 'dashicons-randomize',
+	] );
 	?>
-	<div class="wrap dtb-mapping">
-		<h1 class="wp-heading-inline">Product Mapping</h1>
-		<hr class="wp-header-end">
+	<div class="dtb-mapping-inner">
+		<h1 class="wp-heading-inline" style="display:none">Product Mapping</h1>
+		<hr class="wp-header-end" style="display:none">
 
 		<style>
 			.dtb-mapping { max-width:1200px; }
@@ -701,6 +715,9 @@ function dtb_product_mapping_render_page() {
 
 	})(jQuery);
 	</script>
+	</div><?php // .dtb-mapping-inner ?>
 	<?php
+	dtb_admin_shell_close();
 }
+
 

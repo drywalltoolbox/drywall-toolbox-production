@@ -1,0 +1,159 @@
+<?php
+/**
+ * DTB Admin — AdminShell
+ *
+ * Owns the opening and closing of the DTB admin page shell.
+ * Every DTB admin page should call:
+ *
+ *   dtb_admin_shell_open( $args )
+ *   // ... page content ...
+ *   dtb_admin_shell_close()
+ *
+ * Also renders the shared drawer overlay and toast container.
+ *
+ * @package drywall-toolbox
+ */
+
+defined( 'ABSPATH' ) || exit;
+
+/**
+ * Open the DTB admin page shell.
+ *
+ * @param array $args {
+ *   @type string $title      Page title (shown in header).
+ *   @type string $subtitle   Optional subtitle/description.
+ *   @type string $section    Library section: 'operations' | 'tools'.
+ *   @type string $page       Page slug.
+ *   @type string $template   Template: 'dashboard' | 'queue' | 'tool' | 'settings'.
+ *   @type array  $actions    Array of action HTML strings for the page header right area.
+ *   @type array  $tabs       Optional tab definitions for section nav.
+ *                             Each entry: [ 'id' => '', 'label' => '', 'active' => bool, 'url' => '' ]
+ *   @type string $icon       Optional dashicon class (e.g. 'dashicons-hammer').
+ * }
+ */
+function dtb_admin_shell_open( array $args ): void {
+	$args = wp_parse_args( $args, [
+		'title'    => '',
+		'subtitle' => '',
+		'section'  => 'operations',
+		'page'     => '',
+		'template' => 'dashboard',
+		'actions'  => [],
+		'tabs'     => [],
+		'icon'     => '',
+	] );
+
+	echo '<div class="wrap dtb-admin-page">';
+	echo '<div class="dtb-admin" '
+		. 'data-dtb-section="' . esc_attr( $args['section'] ) . '" '
+		. 'data-dtb-page="'    . esc_attr( $args['page'] ) . '" '
+		. 'data-dtb-template="' . esc_attr( $args['template'] ) . '">';
+
+	// Drawer overlay (shared, hidden by default).
+	echo '<div class="dtb-drawer-overlay" aria-hidden="true"></div>';
+
+	// Toast container.
+	echo '<div class="dtb-toast-container" role="region" aria-label="Notifications" aria-live="polite"></div>';
+
+	// Page header.
+	dtb_admin_shell_render_header( $args );
+
+	echo '<main class="dtb-page-body">';
+}
+
+/**
+ * Render the page header section.
+ *
+ * @param array $args Same as dtb_admin_shell_open args.
+ */
+function dtb_admin_shell_render_header( array $args ): void {
+	echo '<header class="dtb-page-header">';
+	echo '<div class="dtb-page-header__left">';
+
+	// Title.
+	echo '<h1 class="dtb-page-title">';
+	if ( ! empty( $args['icon'] ) ) {
+		echo '<span class="dashicons ' . esc_attr( $args['icon'] ) . '" aria-hidden="true"></span>';
+	}
+	echo esc_html( $args['title'] );
+	echo '</h1>';
+
+	// Subtitle.
+	if ( ! empty( $args['subtitle'] ) ) {
+		echo '<p class="dtb-page-subtitle">' . esc_html( $args['subtitle'] ) . '</p>';
+	}
+
+	echo '</div>'; // .__left
+
+	// Actions.
+	if ( ! empty( $args['actions'] ) ) {
+		echo '<div class="dtb-page-header__right"><div class="dtb-page-actions">';
+		foreach ( $args['actions'] as $action_html ) {
+			echo $action_html; // Already escaped by callers using dtb_admin_ui_*
+		}
+		echo '</div></div>';
+	}
+
+	echo '</header>'; // .dtb-page-header
+
+	// Section nav / tabs.
+	if ( ! empty( $args['tabs'] ) ) {
+		dtb_admin_shell_render_tabs( $args['tabs'] );
+	}
+}
+
+/**
+ * Render section navigation tabs.
+ *
+ * @param array $tabs Each: [ 'id' => string, 'label' => string, 'active' => bool, 'url' => string ]
+ */
+function dtb_admin_shell_render_tabs( array $tabs ): void {
+	echo '<nav class="dtb-section-nav" aria-label="Page sections">';
+	foreach ( $tabs as $tab ) {
+		$active_class = ! empty( $tab['active'] ) ? ' dtb-section-nav__tab--active' : '';
+		$href         = $tab['url'] ?? '#';
+		$data_tab     = ! empty( $tab['id'] ) ? ' data-dtb-tab="' . esc_attr( $tab['id'] ) . '"' : '';
+		$aria_sel     = ! empty( $tab['active'] ) ? 'true' : 'false';
+		$role         = empty( $tab['url'] ) || $tab['url'] === '#' ? ' role="tab"' : '';
+
+		printf(
+			'<a href="%s" class="dtb-section-nav__tab%s" aria-selected="%s"%s%s>%s</a>',
+			esc_url( $href ),
+			esc_attr( $active_class ),
+			esc_attr( $aria_sel ),
+			$data_tab,
+			$role,
+			esc_html( $tab['label'] ?? '' )
+		);
+	}
+	echo '</nav>';
+}
+
+/**
+ * Close the DTB admin page shell.
+ */
+function dtb_admin_shell_close(): void {
+	echo '</main>'; // .dtb-page-body
+	echo '</div>';  // .dtb-admin
+	echo '</div>';  // .wrap.dtb-admin-page
+}
+
+/**
+ * Render a full DTB page access-denied screen.
+ */
+function dtb_admin_shell_access_denied(): void {
+	dtb_admin_shell_open( [
+		'title'   => __( 'Access Denied', 'drywall-toolbox' ),
+		'section' => 'operations',
+		'icon'    => 'dashicons-lock',
+	] );
+
+	// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+	echo dtb_admin_ui_alert(
+		__( 'You do not have permission to view this page.', 'drywall-toolbox' ),
+		'danger',
+		__( 'Access Denied', 'drywall-toolbox' )
+	);
+
+	dtb_admin_shell_close();
+}
