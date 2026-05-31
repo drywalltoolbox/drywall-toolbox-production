@@ -68,6 +68,7 @@ jobs:
           mkdir -p deploy-root
 
           cp -a dist/. deploy-root/
+          cp -a drywalltoolbox/logos deploy-root/logos
           cp drywalltoolbox/.htaccess deploy-root/.htaccess
 
           mkdir -p deploy-root/wp/wp-content
@@ -82,6 +83,7 @@ jobs:
           set -euo pipefail
           test -f deploy-root/index.html
           test -f deploy-root/.htaccess
+          test -f deploy-root/logos/favicon.ico
           test -d deploy-root/assets/js
           test -d deploy-root/assets/css
           test -f deploy-root/wp/.htaccess

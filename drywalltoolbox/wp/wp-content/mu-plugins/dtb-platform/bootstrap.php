@@ -41,6 +41,7 @@ require_once $_dtb_platform . '/Support/Url.php';
 require_once $_dtb_platform . '/Support/Str.php';
 require_once $_dtb_platform . '/Support/DateTime.php';
 require_once $_dtb_platform . '/Support/Money.php';
+require_once $_dtb_platform . '/Support/Email.php';
 
 // =============================================================================
 // 3. SECURITY

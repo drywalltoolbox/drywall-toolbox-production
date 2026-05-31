@@ -60,7 +60,7 @@ function dtb_support_submit_contact_request( array $data ): array|WP_Error {
 		'actor_type' => 'customer',
 		'source'     => 'web_form',
 		'visibility' => 'all',
-		'body'       => $ticket_data['body'],
+		'body'       => $ticket_data['message'],
 		'payload'    => [
 			'subject'        => $ticket_data['subject'],
 			'customer_name'  => $ticket_data['customer_name'],
@@ -84,6 +84,6 @@ function dtb_support_submit_contact_request( array $data ): array|WP_Error {
 
 	return [
 		'ticket_id'     => $ticket_id,
-		'ticket_number' => $ticket['ticket_number'],
+		'ticket_number' => $ticket->ticket_number,
 	];
 }

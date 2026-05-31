@@ -57,7 +57,7 @@ function dtb_support_add_reply(
 
 	// Auto-reopen if a customer replies to a resolved/closed ticket.
 	if ( 'customer' === $actor_type ) {
-		dtb_support_maybe_reopen_on_customer_reply( $ticket_id, $ticket['status'] );
+		dtb_support_maybe_reopen_on_customer_reply( $ticket_id );
 		// Refresh ticket after possible status change.
 		$ticket = dtb_support_get_ticket( $ticket_id );
 	}

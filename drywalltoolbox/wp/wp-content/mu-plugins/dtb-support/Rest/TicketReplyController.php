@@ -82,7 +82,7 @@ function dtb_support_rest_customer_reply( WP_REST_Request $request ): WP_REST_Re
 	}
 
 	// Verify token.
-	$expected = hash_hmac( 'sha256', $ticket_id . ':' . $ticket['customer_email'], AUTH_KEY );
+	$expected = hash_hmac( 'sha256', $ticket_id . ':' . $ticket->customer_email, AUTH_KEY );
 	if ( ! hash_equals( $expected, $token ) ) {
 		return new WP_Error( 'dtb_support_forbidden', __( 'Invalid reply token.', 'drywall-toolbox' ), [ 'status' => 403 ] );
 	}

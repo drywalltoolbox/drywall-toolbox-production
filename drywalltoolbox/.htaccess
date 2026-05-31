@@ -38,6 +38,9 @@ Options +FollowSymLinks
   # Force homepage to the static coming-soon landing page.
   RewriteRule ^$ index.html [L]
 
+  # Conventional browser favicon path backed by the shared logo assets folder.
+  RewriteRule ^favicon\.ico$ logos/favicon.ico [L]
+
   # WordPress admin/login aliases from the root URL space.
   RewriteRule ^wp-admin/?$ wp/wp-admin/ [L,QSA]
   RewriteRule ^wp-admin/(.*)$ wp/wp-admin/$1 [L,QSA]

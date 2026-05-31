@@ -67,16 +67,16 @@ return (string) apply_filters( 'dtb_repair_tracking_base_url', home_url( '/repai
  * @return array{subject: string, body: string}|WP_Error
  */
 function dtb_repair_get_email_template( string $template, array $ctx ): array|WP_Error {
-$site   = esc_html( $ctx['site_name'] ?? get_bloginfo( 'name' ) );
-$name   = esc_html( $ctx['customer_name'] ?? 'Customer' );
+$site   = sanitize_text_field( (string) ( $ctx['site_name'] ?? get_bloginfo( 'name' ) ) );
+$name   = sanitize_text_field( (string) ( $ctx['customer_name'] ?? 'Customer' ) );
 $rid    = (int) ( $ctx['repair_id'] ?? 0 );
-$brand  = esc_html( $ctx['brand'] ?? '' );
-$model  = esc_html( $ctx['model'] ?? '' );
-$serial = esc_html( $ctx['serial'] ?? '' );
-$tier   = esc_html( ucfirst( $ctx['service_tier'] ?? 'standard' ) );
-$issue  = esc_html( wp_strip_all_tags( $ctx['issue'] ?? '' ) );
-$turl   = esc_url( $ctx['tracking_url'] ?? '' );
-$aurl   = esc_url( $ctx['admin_url'] ?? '' );
+$brand  = sanitize_text_field( (string) ( $ctx['brand'] ?? '' ) );
+$model  = sanitize_text_field( (string) ( $ctx['model'] ?? '' ) );
+$serial = sanitize_text_field( (string) ( $ctx['serial'] ?? '' ) );
+$tier   = sanitize_text_field( ucfirst( (string) ( $ctx['service_tier'] ?? 'standard' ) ) );
+$issue  = wp_strip_all_tags( (string) ( $ctx['issue'] ?? '' ) );
+$turl   = esc_url_raw( (string) ( $ctx['tracking_url'] ?? '' ) );
+$aurl   = esc_url_raw( (string) ( $ctx['admin_url'] ?? '' ) );
 
 switch ( $template ) {
 
@@ -229,6 +229,156 @@ sprintf( __( 'Email template "%s" not found.', 'drywall-toolbox' ), esc_html( $t
 // =============================================================================
 
 /**
+ * Return whether a repair template is sent to the customer.
+ *
+ * @param string $template Template slug.
+ * @return bool
+ */
+function dtb_repair_is_customer_email_template( string $template ): bool {
+	return in_array(
+		$template,
+		[
+			'repair-submitted-customer',
+			'repair-info-requested',
+			'repair-reviewed',
+			'repair-approved',
+			'repair-quote-created',
+			'repair-quote-accepted',
+			'repair-in-progress',
+			'repair-ready-to-ship',
+			'repair-completed',
+			'repair-cancelled',
+		],
+		true
+	);
+}
+
+/**
+ * Render branded HTML for a customer repair notification.
+ *
+ * @param string $template Template slug.
+ * @param array  $ctx      Template context.
+ * @return string
+ */
+function dtb_repair_render_customer_email_html( string $template, array $ctx ): string {
+	$site         = sanitize_text_field( (string) ( $ctx['site_name'] ?? get_bloginfo( 'name' ) ) );
+	$name         = sanitize_text_field( (string) ( $ctx['customer_name'] ?? 'Customer' ) );
+	$rid          = (int) ( $ctx['repair_id'] ?? 0 );
+	$brand        = sanitize_text_field( (string) ( $ctx['brand'] ?? '' ) );
+	$model        = sanitize_text_field( (string) ( $ctx['model'] ?? '' ) );
+	$serial       = sanitize_text_field( (string) ( $ctx['serial'] ?? '' ) );
+	$tier         = sanitize_text_field( ucfirst( (string) ( $ctx['service_tier'] ?? 'standard' ) ) );
+	$issue        = trim( wp_strip_all_tags( (string) ( $ctx['issue'] ?? '' ) ) );
+	$tracking_url = esc_url_raw( (string) ( $ctx['tracking_url'] ?? '' ) );
+	$tracking_num = sanitize_text_field( (string) ( $ctx['tracking_number'] ?? '' ) );
+	$tool         = trim( $brand . ' ' . $model );
+
+	$title     = 'Your repair update';
+	$eyebrow   = 'Repair update';
+	$intro     = 'There is an update on your repair request.';
+	$cta_label = '' !== $tracking_url ? 'Track repair status' : '';
+	$body_html = '';
+
+	switch ( $template ) {
+		case 'repair-submitted-customer':
+			$title   = 'We received your repair request';
+			$eyebrow = 'Repair request received';
+			$intro   = 'Thanks for submitting your repair request. Our service team will review the details and follow up with next steps.';
+			if ( '' !== $issue ) {
+				$body_html = '<p style="margin:0 0 10px;color:#9aa7bd;font-size:13px;font-weight:800;line-height:18px;text-transform:uppercase;">Issue description</p><div style="padding:18px 20px;background:#050b18;border:1px solid #334155;border-radius:8px;color:#cbd5e1;">' . nl2br( esc_html( $issue ) ) . '</div>';
+			}
+			break;
+
+		case 'repair-info-requested':
+			$title   = 'We need more information';
+			$eyebrow = 'Action requested';
+			$intro   = 'Our technicians reviewed your repair request and need a few more details before we can continue.';
+			break;
+
+		case 'repair-reviewed':
+			$title   = 'Your repair is under review';
+			$eyebrow = 'Repair under review';
+			$intro   = 'Our team has reviewed your repair request and it is now under review. We will notify you once a decision has been made.';
+			break;
+
+		case 'repair-approved':
+			$title   = 'Your repair has been approved';
+			$eyebrow = 'Repair approved';
+			$intro   = sprintf( 'Your repair has been approved and we will proceed with your %s service.', esc_html( $tier ) );
+			break;
+
+		case 'repair-quote-created':
+			$title     = 'Your repair quote is ready';
+			$eyebrow   = 'Quote ready';
+			$intro     = 'We prepared a repair quote for your review. Please review it when you have a moment.';
+			$cta_label = '' !== $tracking_url ? 'Review repair quote' : '';
+			$body_html = '<p style="margin:0;">This quote will expire in 14 days. Reply to this email if you have any questions.</p>';
+			break;
+
+		case 'repair-quote-accepted':
+			$title   = 'Quote accepted';
+			$eyebrow = 'Repair will proceed';
+			$intro   = 'Thank you for accepting your repair quote. We will begin ordering the required parts and keep you updated.';
+			break;
+
+		case 'repair-in-progress':
+			$title   = 'Work has started on your repair';
+			$eyebrow = 'Repair in progress';
+			$intro   = 'Our technicians have started work on your repair. We will notify you when it is complete and ready to ship.';
+			break;
+
+		case 'repair-ready-to-ship':
+			$title   = 'Your repair is ready to ship';
+			$eyebrow = 'Ready to ship';
+			$intro   = 'Your repaired tool is packed and ready to ship.';
+			break;
+
+		case 'repair-completed':
+			$title   = 'Your repair is complete';
+			$eyebrow = 'Repair completed';
+			$intro   = 'Your repair has been completed and shipped. Loyalty reward points have been credited to your account as a thank-you.';
+			break;
+
+		case 'repair-cancelled':
+			$title     = 'Your repair request was cancelled';
+			$eyebrow   = 'Repair cancelled';
+			$intro     = 'This is to let you know that your repair request has been cancelled.';
+			$cta_label = '';
+			break;
+	}
+
+	$details = [
+		[ 'label' => 'Repair ID', 'value' => '#' . $rid ],
+		[ 'label' => 'Tool', 'value' => '' !== $tool ? $tool : 'N/A' ],
+		[ 'label' => 'Service tier', 'value' => '' !== $tier ? $tier : 'Standard' ],
+	];
+
+	if ( '' !== $serial ) {
+		$details[] = [ 'label' => 'Serial', 'value' => $serial ];
+	}
+
+	if ( '' !== $tracking_num ) {
+		$details[] = [ 'label' => 'Tracking number', 'value' => $tracking_num ];
+	}
+
+	return dtb_render_branded_email(
+		[
+			'title'       => $title,
+			'preheader'   => sprintf( 'Repair #%d update from Drywall Toolbox.', $rid ),
+			'eyebrow'     => $eyebrow,
+			'greeting'    => sprintf( 'Hi %s,', $name ),
+			'intro'       => $intro,
+			'details'     => $details,
+			'body_html'   => $body_html,
+			'cta_url'     => $tracking_url,
+			'cta_label'   => $cta_label,
+			'signoff'     => $site . ' Team',
+			'footer_note' => 'You can reply directly to this email if you have questions about your repair.',
+		]
+	);
+}
+
+/**
  * Send a repair notification email via wp_mail().
  *
  * @param string $to        Recipient email address.
@@ -250,12 +400,24 @@ return false;
 }
 
 $from    = dtb_repair_email_from_name() . ' <' . dtb_repair_email_from_address() . '>';
+$is_html = dtb_repair_is_customer_email_template( $template ) && function_exists( 'dtb_render_branded_email' );
+$body    = $is_html ? dtb_repair_render_customer_email_html( $template, $context ) : $rendered['body'];
 $headers = [
-'Content-Type: text/plain; charset=UTF-8',
+'Content-Type: ' . ( $is_html ? 'text/html' : 'text/plain' ) . '; charset=UTF-8',
 'From: ' . $from,
 ];
 
-return (bool) wp_mail( $to, $rendered['subject'], $rendered['body'], $headers );
+$alt_body_hook = $is_html && function_exists( 'dtb_mail_alt_body_hook' )
+? dtb_mail_alt_body_hook( (string) $rendered['body'] )
+: null;
+
+$sent = (bool) wp_mail( $to, $rendered['subject'], $body, $headers );
+
+if ( is_callable( $alt_body_hook ) ) {
+remove_action( 'phpmailer_init', $alt_body_hook );
+}
+
+return $sent;
 }
 
 // =============================================================================

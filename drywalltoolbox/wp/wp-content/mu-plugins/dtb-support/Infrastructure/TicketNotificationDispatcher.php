@@ -85,9 +85,9 @@ function dtb_support_wp_mail_from_name( string $original ): string {
  *
  * @return string[]
  */
-function dtb_support_email_headers(): array {
+function dtb_support_email_headers( string $content_type = 'text/plain' ): array {
 	return [
-		'Content-Type: text/plain; charset=UTF-8',
+		'Content-Type: ' . sanitize_text_field( $content_type ) . '; charset=UTF-8',
 		'From: ' . dtb_support_email_from_name() . ' <' . dtb_support_email_from() . '>',
 	];
 }
@@ -101,20 +101,36 @@ function dtb_support_email_headers(): array {
  * @return array{subject:string,body:string}|WP_Error
  */
 function dtb_support_get_email_template( string $template, array $ctx ): array|WP_Error {
-	$site   = esc_html( $ctx['site_name']       ?? get_bloginfo( 'name' ) );
-	$name   = esc_html( $ctx['customer_name']   ?? 'Customer' );
-	$tnum   = esc_html( $ctx['ticket_number']   ?? '' );
-	$subj   = esc_html( $ctx['subject']         ?? 'Your enquiry' );
-	$aurl   = esc_url(  $ctx['admin_url']       ?? admin_url( 'admin.php?page=dtb-support' ) );
+	$site   = sanitize_text_field( (string) ( $ctx['site_name'] ?? get_bloginfo( 'name' ) ) );
+	$name   = sanitize_text_field( (string) ( $ctx['customer_name'] ?? 'Customer' ) );
+	$tnum   = sanitize_text_field( (string) ( $ctx['ticket_number'] ?? '' ) );
+	$subj   = sanitize_text_field( (string) ( $ctx['subject'] ?? 'Your enquiry' ) );
+	$aurl   = esc_url_raw( (string) ( $ctx['admin_url'] ?? admin_url( 'admin.php?page=dtb-support' ) ) );
 
 	switch ( $template ) {
 
 		case 'ticket-opened-customer':
+			$body = sprintf(
+				"Hi %1\$s,\n\nThank you for reaching out to us. We've received your message and a member of our team will be in touch shortly.\n\nTicket Reference: %2\$s\nSubject: %3\$s\n\nYou can reply directly to this email to add more information.\n\nThanks,\n%4\$s Support Team",
+				$name, $tnum, $subj, $site
+			);
 			return [
 				'subject' => sprintf( '[%1$s] We received your message — Ticket %2$s', $site, $tnum ),
-				'body'    => sprintf(
-					"Hi %1\$s,\n\nThank you for reaching out to us! We've received your message and a member of our team will be in touch shortly.\n\nTicket Reference: %2\$s\nSubject: %3\$s\n\nYou can reply directly to this email to add more information.\n\nThanks,\n— %4\$s Support Team",
-					$name, $tnum, $subj, $site
+				'body'    => $body,
+				'html'    => dtb_render_branded_email(
+					[
+						'title'       => 'We received your message',
+						'preheader'   => sprintf( 'Ticket %s has been opened with Drywall Toolbox support.', $tnum ),
+						'eyebrow'     => 'Support request received',
+						'greeting'    => sprintf( 'Hi %s,', $name ),
+						'intro'       => 'Thanks for reaching out. Your message is in our support queue and a team member will follow up shortly.',
+						'details'     => [
+							[ 'label' => 'Ticket reference', 'value' => $tnum ],
+							[ 'label' => 'Subject', 'value' => $subj ],
+						],
+						'signoff'     => $site . ' Support Team',
+						'footer_note' => 'You can reply directly to this email to add more information to your ticket.',
+					]
 				),
 			];
 
@@ -135,14 +151,32 @@ function dtb_support_get_email_template( string $template, array $ctx ): array|W
 			];
 
 		case 'ticket-reply-customer':
+			$reply_body = wp_strip_all_tags( (string) ( $ctx['reply_body'] ?? '' ) );
+			$body       = sprintf(
+				"Hi %1\$s,\n\nA member of our support team has replied to your ticket (%2\$s).\n\n---\n%3\$s\n---\n\nReply directly to this email to continue the conversation.\n\n%4\$s Support Team",
+				$name,
+				$tnum,
+				$reply_body,
+				$site
+			);
 			return [
 				'subject' => sprintf( 'Re: [%1$s] %2$s (Ticket %3$s)', $site, $subj, $tnum ),
-				'body'    => sprintf(
-					"Hi %1\$s,\n\nA member of our support team has replied to your ticket (%2\$s).\n\n---\n%3\$s\n---\n\nReply directly to this email to continue the conversation.\n\n— %4\$s Support Team",
-					$name,
-					$tnum,
-					esc_html( wp_strip_all_tags( $ctx['reply_body'] ?? '' ) ),
-					$site
+				'body'    => $body,
+				'html'    => dtb_render_branded_email(
+					[
+						'title'       => 'You have a new support reply',
+						'preheader'   => sprintf( 'A Drywall Toolbox team member replied to ticket %s.', $tnum ),
+						'eyebrow'     => 'Support update',
+						'greeting'    => sprintf( 'Hi %s,', $name ),
+						'intro'       => sprintf( 'A member of our support team replied to your ticket %s.', esc_html( $tnum ) ),
+						'details'     => [
+							[ 'label' => 'Ticket reference', 'value' => $tnum ],
+							[ 'label' => 'Subject', 'value' => $subj ],
+						],
+						'body_html'   => '<div style="padding:18px 20px;background:#050b18;border:1px solid #334155;border-radius:8px;color:#cbd5e1;">' . nl2br( esc_html( $reply_body ) ) . '</div>',
+						'signoff'     => $site . ' Support Team',
+						'footer_note' => 'Reply directly to this email to continue the conversation.',
+					]
 				),
 			];
 
@@ -160,20 +194,53 @@ function dtb_support_get_email_template( string $template, array $ctx ): array|W
 			];
 
 		case 'ticket-resolved-customer':
+			$body = sprintf(
+				"Hi %1\$s,\n\nWe're happy to let you know that your support ticket (%2\$s - %3\$s) has been marked as resolved.\n\nIf you feel the issue is not fully resolved, please reply to this email and we'll reopen it for you.\n\n%4\$s Support Team",
+				$name, $tnum, $subj, $site
+			);
 			return [
 				'subject' => sprintf( '[%1$s] Your ticket %2$s has been resolved', $site, $tnum ),
-				'body'    => sprintf(
-					"Hi %1\$s,\n\nWe're happy to let you know that your support ticket (%2\$s — %3\$s) has been marked as resolved.\n\nIf you feel the issue is not fully resolved, please reply to this email and we'll reopen it for you.\n\n— %4\$s Support Team",
-					$name, $tnum, $subj, $site
+				'body'    => $body,
+				'html'    => dtb_render_branded_email(
+					[
+						'title'       => 'Your ticket has been resolved',
+						'preheader'   => sprintf( 'Ticket %s has been marked as resolved.', $tnum ),
+						'eyebrow'     => 'Support resolved',
+						'greeting'    => sprintf( 'Hi %s,', $name ),
+						'intro'       => 'Your support ticket has been marked as resolved.',
+						'details'     => [
+							[ 'label' => 'Ticket reference', 'value' => $tnum ],
+							[ 'label' => 'Subject', 'value' => $subj ],
+						],
+						'body_html'   => '<p style="margin:0;">If the issue is not fully resolved, reply to this email and we will reopen it for you.</p>',
+						'signoff'     => $site . ' Support Team',
+						'footer_note' => 'Reply directly to this email if you need this ticket reopened.',
+					]
 				),
 			];
 
 		case 'ticket-reopened-customer':
+			$body = sprintf(
+				"Hi %1\$s,\n\nYour support ticket (%2\$s) has been reopened and our team will continue looking into it.\n\n%3\$s Support Team",
+				$name, $tnum, $site
+			);
 			return [
 				'subject' => sprintf( '[%1$s] Your ticket %2$s has been reopened', $site, $tnum ),
-				'body'    => sprintf(
-					"Hi %1\$s,\n\nYour support ticket (%2\$s) has been reopened and our team will continue looking into it.\n\n— %3\$s Support Team",
-					$name, $tnum, $site
+				'body'    => $body,
+				'html'    => dtb_render_branded_email(
+					[
+						'title'       => 'Your ticket has been reopened',
+						'preheader'   => sprintf( 'Ticket %s is open again with Drywall Toolbox support.', $tnum ),
+						'eyebrow'     => 'Support reopened',
+						'greeting'    => sprintf( 'Hi %s,', $name ),
+						'intro'       => 'Your support ticket has been reopened and our team will continue looking into it.',
+						'details'     => [
+							[ 'label' => 'Ticket reference', 'value' => $tnum ],
+							[ 'label' => 'Subject', 'value' => $subj ],
+						],
+						'signoff'     => $site . ' Support Team',
+						'footer_note' => 'Reply directly to this email to add more information to your ticket.',
+					]
 				),
 			];
 
@@ -205,12 +272,23 @@ function dtb_support_send_email( string $to, string $template, array $ctx ): boo
 		define( 'DTB_SUPPORT_SENDING', true );
 	}
 
+	$is_html       = ! empty( $result['html'] );
+	$message       = $is_html ? (string) $result['html'] : (string) $result['body'];
+	$content_type  = $is_html ? 'text/html' : 'text/plain';
+	$alt_body_hook = $is_html && function_exists( 'dtb_mail_alt_body_hook' )
+		? dtb_mail_alt_body_hook( (string) $result['body'] )
+		: null;
+
 	$sent = wp_mail(
 		$to,
 		$result['subject'],
-		$result['body'],
-		dtb_support_email_headers()
+		$message,
+		dtb_support_email_headers( $content_type )
 	);
+
+	if ( is_callable( $alt_body_hook ) ) {
+		remove_action( 'phpmailer_init', $alt_body_hook );
+	}
 
 	if ( ! $sent ) {
 		return new WP_Error( 'dtb_support_mail_failed', "wp_mail failed for template {$template} to {$to}" );
@@ -234,7 +312,7 @@ function dtb_support_notify_ticket_opened( object $ticket ): void {
 		'customer_email' => $ticket->customer_email,
 		'ticket_type'    => $ticket->ticket_type,
 		'priority'       => $ticket->priority,
-		'message'        => $ticket->body,
+		'message'        => $ticket->message,
 		'admin_url'      => $admin_url,
 	];
 

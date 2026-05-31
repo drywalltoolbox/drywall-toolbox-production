@@ -1,220 +1,291 @@
-<?php
+﻿<?php
 /**
- * Admin — SupportHubDetailPage: renders the full ticket conversation + management sidebar.
+ * Admin — SupportHubDetailPage
+ *
+ * Full single-ticket view: thread, reply composer, sidebar with status /
+ * priority / assignment controls and customer/metadata info.
+ *
+ * Called from SupportHubDashboard when ?ticket_id is present.
  *
  * @package drywall-toolbox
  */
 
 defined( 'ABSPATH' ) || exit;
 
-/**
- * Render the full ticket detail page.
- *
- * @param int $ticket_id
- */
 function dtb_support_render_ticket_detail_page( int $ticket_id ): void {
-	$ticket = dtb_support_get_ticket( $ticket_id );
+	if ( ! current_user_can( 'dtb_manage_support' ) && ! current_user_can( 'manage_options' ) ) {
+		wp_die( 'You do not have permission to view this page.' );
+	}
 
-	if ( ! $ticket ) {
-		echo '<div class="wrap"><div class="notice notice-error"><p>'
-			. esc_html__( 'Ticket not found.', 'drywall-toolbox' )
-			. '</p></div></div>';
+	// ── Data ──────────────────────────────────────────────────────────────────
+	$ticket_raw = dtb_support_get_ticket( $ticket_id );
+
+	if ( ! $ticket_raw ) {
+		echo '<div class="dtb-wrap"><div class="dtb-card" style="padding:2rem;">Ticket not found.</div></div>';
 		return;
 	}
 
-	$view   = dtb_support_project_ticket( $ticket );
-	$events = dtb_support_get_events( $ticket_id, 'operator' );
-	$agents = dtb_support_get_agents();
+	$ticket     = (array) $ticket_raw;
+	$projected  = dtb_support_project_ticket( $ticket_raw );
+	$events_raw = dtb_support_get_events( $ticket_id, 'operator' );
+	$events     = is_array( $events_raw ) ? array_map( 'get_object_vars', $events_raw ) : [];
 
-	$list_url    = admin_url( 'admin.php?page=dtb-support' );
+	$transitions = dtb_support_allowed_transitions()[ $ticket['status'] ] ?? [];
 	$statuses    = dtb_support_all_statuses();
-	$transitions = dtb_support_allowed_transitions( $ticket['status'] );
 	$priorities  = dtb_support_all_priorities();
+	$agents      = dtb_support_get_agents();
 
+	$base_url    = admin_url( 'admin.php?page=dtb-support' );
+	$current_uid = get_current_user_id();
 	?>
-	<div class="wrap dtb-support-wrap">
-		<h1>
-			<a href="<?php echo esc_url( $list_url ); ?>" style="font-weight:400;color:#6b7280;font-size:14px;margin-right:8px;">
-				&larr; <?php esc_html_e( 'All Tickets', 'drywall-toolbox' ); ?>
-			</a>
-			<?php echo esc_html( $ticket['ticket_number'] ); ?>
-			— <?php echo esc_html( $ticket['subject'] ); ?>
-		</h1>
-		<hr class="wp-header-end">
+<div class="dtb-wrap">
 
-		<div class="dtb-detail-grid">
+	<!-- ── Back + Detail topbar ─────────────────────────────────────────────── -->
+	<div class="dtb-back-bar">
+		<a href="<?php echo esc_url( $base_url ); ?>" class="dtb-back">
+			<svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+				<polyline points="15 18 9 12 15 6"/>
+			</svg>
+			All Tickets
+		</a>
+	</div>
 
-			<?php // ── Left: Thread ──────────────────────────────────────────── ?>
-			<div>
+	<div class="dtb-detail-topbar">
+		<div class="dtb-detail-topbar__left">
+			<h2 class="dtb-detail-title">
+				<?php echo esc_html( $projected['subject'] ); ?>
+			</h2>
+			<div class="dtb-detail-meta">
+				<span class="dtb-tid"><?php echo esc_html( $projected['ticket_number'] ); ?></span>
+				<span class="dtb-status">
+					<span class="dtb-status__dot dtb-status__dot--<?php echo esc_attr( $ticket['status'] ); ?>"></span>
+					<?php echo esc_html( $projected['status_label'] ?? $ticket['status'] ); ?>
+				</span>
+				<span class="dtb-pri dtb-pri--<?php echo esc_attr( $ticket['priority'] ); ?>">
+					<?php echo esc_html( $projected['priority_label'] ?? $ticket['priority'] ); ?>
+				</span>
+				<span class="dtb-type">
+					<?php echo esc_html( $projected['type_label'] ?? $ticket['ticket_type'] ); ?>
+				</span>
+			</div>
+		</div>
+	</div>
+
+	<!-- ── Detail grid: thread + sidebar ────────────────────────────────────── -->
+	<div class="dtb-detail-grid">
+
+		<!-- Left: Thread + composer -->
+		<div>
+			<div class="dtb-thread-card">
 				<div class="dtb-thread">
 					<?php if ( empty( $events ) ) : ?>
-						<p style="color:#9ca3af;font-style:italic;">
-							<?php esc_html_e( 'No events yet.', 'drywall-toolbox' ); ?>
-						</p>
+						<p style="color:var(--dtb-muted);font-size:.85rem;padding:1rem 0;">No activity yet.</p>
 					<?php else : ?>
-						<?php foreach ( $events as $ev ) : ?>
-							<?php
-							$ev_class = 'dtb-event';
-							if ( 'customer' === $ev['actor_type'] ) {
-								$ev_class .= ' dtb-event--customer';
-							} elseif ( 'operator' === $ev['visibility'] ) {
-								$ev_class .= ' dtb-event--operator';
-							} else {
-								$ev_class .= ' dtb-event--staff';
-							}
-							$actor_label = 'customer' === $ev['actor_type']
-								? esc_html( $ticket['customer_name'] )
-								: esc_html( get_userdata( (int) ( $ev['actor_id'] ?? 0 ) )->display_name ?? __( 'Staff', 'drywall-toolbox' ) );
+						<?php foreach ( $events as $ev ) :
+							$actor   = $ev['actor_label'] ?? ( $ev['actor_name'] ?? 'System' );
+							$initials = strtoupper( mb_substr( $actor, 0, 1 ) );
+							$age     = $ev['age_label'] ?? '';
+							$type    = $ev['event_type'] ?? 'note';
+							$is_reply = in_array( $type, [ 'reply', 'customer_reply' ], true );
+							$cls     = 'dtb-event dtb-event--' . esc_attr( $type );
+							if ( $is_reply ) $cls .= ' dtb-event--reply';
 							?>
-							<div class="<?php echo esc_attr( $ev_class ); ?>">
-								<div style="display:flex;justify-content:space-between;margin-bottom:6px;">
-									<strong><?php echo $actor_label; ?></strong>
-									<span style="color:#6b7280;font-size:12px;">
-										<?php echo esc_html( wp_date( 'M j, Y g:i a', strtotime( $ev['created_at'] ) ) ); ?>
-										<?php if ( 'operator' === $ev['visibility'] ) : ?>
-											&nbsp;<em style="color:#9ca3af;"><?php esc_html_e( '(internal)', 'drywall-toolbox' ); ?></em>
-										<?php endif; ?>
-									</span>
+							<div class="<?php echo esc_attr( $cls ); ?>">
+								<div class="dtb-event__avatar"><?php echo esc_html( $initials ); ?></div>
+								<div class="dtb-event__body">
+									<div class="dtb-event__header">
+										<span class="dtb-event__actor"><?php echo esc_html( $actor ); ?></span>
+										<span class="dtb-event__time"><?php echo esc_html( $age ); ?></span>
+										<span class="dtb-event__type"><?php echo esc_html( $type ); ?></span>
+									</div>
+									<div class="dtb-event__content">
+										<?php echo nl2br( esc_html( $ev['body'] ?? $ev['content'] ?? '' ) ); ?>
+									</div>
 								</div>
-								<?php if ( ! empty( $ev['body'] ) ) : ?>
-									<div style="white-space:pre-wrap;line-height:1.6;"><?php echo wp_kses_post( $ev['body'] ); ?></div>
-								<?php elseif ( ! empty( $ev['event_type'] ) ) : ?>
-									<em style="color:#6b7280;font-size:12px;"><?php echo esc_html( $ev['event_type'] ); ?></em>
-								<?php endif; ?>
 							</div>
 						<?php endforeach; ?>
 					<?php endif; ?>
-				</div>
+				</div><!-- .dtb-thread -->
 
-				<?php // ── Reply Form ─────────────────────────────────────────── ?>
-				<?php if ( ! in_array( $ticket['status'], dtb_support_terminal_statuses(), true ) ) : ?>
-					<div class="dtb-thread" style="margin-top:14px;">
-						<h3 style="margin-top:0;"><?php esc_html_e( 'Send Reply', 'drywall-toolbox' ); ?></h3>
-						<form id="dtb-reply-form" data-ticket-id="<?php echo absint( $ticket_id ); ?>">
-							<?php wp_nonce_field( 'dtb_reply_' . $ticket_id, 'dtb_reply_nonce' ); ?>
-							<textarea name="message" rows="6" style="width:100%;box-sizing:border-box;"
-								placeholder="<?php esc_attr_e( 'Write your reply…', 'drywall-toolbox' ); ?>"></textarea>
-							<div style="display:flex;align-items:center;gap:12px;margin-top:8px;">
-								<label style="font-size:13px;">
-									<input type="checkbox" name="is_internal" value="1">
-									<?php esc_html_e( 'Internal note (not visible to customer)', 'drywall-toolbox' ); ?>
-								</label>
-								<button type="submit" class="button button-primary">
-									<?php esc_html_e( 'Send Reply', 'drywall-toolbox' ); ?>
-								</button>
-							</div>
-						</form>
+				<!-- Reply composer -->
+				<form id="dtb-reply-form"
+					class="dtb-compose"
+					data-ticket-id="<?php echo absint( $ticket_id ); ?>"
+					onsubmit="event.preventDefault(); dtbSupport.submitReply(this);">
+					<div class="dtb-compose__header">Reply to Customer</div>
+					<textarea
+						name="message"
+						class="dtb-compose__body"
+						rows="5"
+						placeholder="Type your reply..."
+						required></textarea>
+					<div class="dtb-compose__footer">
+						<button type="submit" class="dtb-btn dtb-btn--primary dtb-reply-submit">
+							Send Reply
+						</button>
+						<label class="dtb-compose__internal">
+							<input type="checkbox" name="internal" value="1">
+							Internal note
+						</label>
 					</div>
-				<?php endif; ?>
-			</div>
+				</form>
+			</div><!-- .dtb-thread-card -->
+		</div>
 
-			<?php // ── Right: Sidebar ────────────────────────────────────────── ?>
-			<div class="dtb-sidebar">
+		<!-- Right: Sidebar -->
+		<aside class="dtb-sidebar">
 
-				<?php // Status box ?>
-				<div class="dtb-sidebar-box">
-					<h3><?php esc_html_e( 'Status', 'drywall-toolbox' ); ?></h3>
-					<span class="dtb-badge dtb-badge--<?php echo esc_attr( $ticket['status'] ); ?>">
-						<?php echo esc_html( dtb_support_status_label( $ticket['status'] ) ); ?>
+			<!-- Status -->
+			<div class="dtb-sidebar-card">
+				<div class="dtb-sidebar-card__title">Status</div>
+				<div class="dtb-sidebar-card__body">
+					<span class="dtb-status">
+						<span class="dtb-status__dot dtb-status__dot--<?php echo esc_attr( $ticket['status'] ); ?>"></span>
+						<?php echo esc_html( $projected['status_label'] ?? $ticket['status'] ); ?>
 					</span>
 					<?php if ( ! empty( $transitions ) ) : ?>
-						<div style="margin-top:10px;">
-							<label style="font-size:12px;display:block;margin-bottom:4px;"><?php esc_html_e( 'Change to:', 'drywall-toolbox' ); ?></label>
-							<select id="dtb-transition-select" style="width:100%;margin-bottom:6px;">
-								<option value=""><?php esc_html_e( '— Select —', 'drywall-toolbox' ); ?></option>
+						<div style="margin-top:.75rem;display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;">
+							<select id="dtb-status-select" class="dtb-select">
 								<?php foreach ( $transitions as $slug ) : ?>
 									<option value="<?php echo esc_attr( $slug ); ?>">
-										<?php echo esc_html( dtb_support_status_label( $slug ) ); ?>
+										<?php echo esc_html( $statuses[ $slug ] ?? $slug ); ?>
 									</option>
 								<?php endforeach; ?>
 							</select>
-							<button class="button" onclick="
-								var sel=document.getElementById('dtb-transition-select');
-								if(sel.value) dtbSupport.transitionTicket(<?php echo absint( $ticket_id ); ?>,sel.value,this);
-							">
-								<?php esc_html_e( 'Apply', 'drywall-toolbox' ); ?>
+							<button class="dtb-btn dtb-btn--sm dtb-btn--ghost"
+								onclick="dtbSupport.transitionTicket(<?php echo absint( $ticket_id ); ?>, document.getElementById('dtb-status-select').value)">
+								Apply
 							</button>
 						</div>
+					<?php else : ?>
+						<p style="font-size:.8rem;color:var(--dtb-muted);margin-top:.5rem;">No transitions available.</p>
 					<?php endif; ?>
 				</div>
+			</div>
 
-				<?php // Priority box ?>
-				<div class="dtb-sidebar-box">
-					<h3><?php esc_html_e( 'Priority', 'drywall-toolbox' ); ?></h3>
-					<select id="dtb-priority-select" style="width:100%;" onchange="
-						dtbSupport.request('/support/tickets/<?php echo absint( $ticket_id ); ?>','PATCH',{priority:this.value});
-					">
-						<?php foreach ( $priorities as $slug => $cfg ) : ?>
-							<option value="<?php echo esc_attr( $slug ); ?>" <?php selected( $ticket['priority'], $slug ); ?>>
-								<?php echo esc_html( $cfg['label'] ); ?>
-							</option>
-						<?php endforeach; ?>
-					</select>
-				</div>
-
-				<?php // SLA box ?>
-				<?php if ( isset( $view['sla_state'] ) ) : ?>
-					<div class="dtb-sidebar-box">
-						<h3><?php esc_html_e( 'SLA', 'drywall-toolbox' ); ?></h3>
-						<span class="dtb-sla dtb-sla--<?php echo esc_attr( $view['sla_state'] ); ?>">
-							<?php echo esc_html( strtoupper( $view['sla_state'] ) ); ?>
-						</span>
-						<?php if ( ! empty( $view['sla_deadline'] ) ) : ?>
-							<p style="font-size:12px;color:#6b7280;margin-top:4px;">
-								<?php echo esc_html__( 'Deadline:', 'drywall-toolbox' ); ?>
-								<?php echo esc_html( wp_date( 'M j, g:i a', strtotime( $view['sla_deadline'] ) ) ); ?>
-							</p>
-						<?php endif; ?>
+			<!-- Priority -->
+			<div class="dtb-sidebar-card">
+				<div class="dtb-sidebar-card__title">Priority</div>
+				<div class="dtb-sidebar-card__body">
+					<div style="display:flex;gap:.5rem;align-items:center;flex-wrap:wrap;">
+						<select id="dtb-priority-select" class="dtb-select">
+							<?php foreach ( $priorities as $slug => $label ) : ?>
+								<option value="<?php echo esc_attr( $slug ); ?>" <?php selected( $ticket['priority'], $slug ); ?>>
+									<?php echo esc_html( $label ); ?>
+								</option>
+							<?php endforeach; ?>
+						</select>
+						<button class="dtb-btn dtb-btn--sm dtb-btn--ghost"
+							onclick="dtbSupport.request(
+								'/support/tickets/<?php echo absint( $ticket_id ); ?>',
+								'PATCH',
+								{ priority: document.getElementById('dtb-priority-select').value }
+							).then(function(){ location.reload(); })">
+							Apply
+						</button>
 					</div>
-				<?php endif; ?>
-
-				<?php // Assignment box ?>
-				<div class="dtb-sidebar-box">
-					<h3><?php esc_html_e( 'Assigned To', 'drywall-toolbox' ); ?></h3>
-					<select id="dtb-assign-select" style="width:100%;" onchange="
-						if(this.value) dtbSupport.assignTicket(<?php echo absint( $ticket_id ); ?>,this.value,this);
-					">
-						<option value=""><?php esc_html_e( 'Unassigned', 'drywall-toolbox' ); ?></option>
-						<?php foreach ( $agents as $agent_id ) :
-							$agent = get_userdata( $agent_id );
-							if ( ! $agent ) continue;
-							?>
-							<option value="<?php echo absint( $agent_id ); ?>"
-								<?php selected( (int) ( $ticket['assigned_user_id'] ?? 0 ), $agent_id ); ?>>
-								<?php echo esc_html( $agent->display_name ); ?>
-							</option>
-						<?php endforeach; ?>
-					</select>
 				</div>
+			</div>
 
-				<?php // Customer info box ?>
-				<div class="dtb-sidebar-box">
-					<h3><?php esc_html_e( 'Customer', 'drywall-toolbox' ); ?></h3>
-					<p style="margin:0;font-size:13px;">
-						<strong><?php echo esc_html( $ticket['customer_name'] ); ?></strong><br>
-						<a href="mailto:<?php echo esc_attr( $ticket['customer_email'] ); ?>">
-							<?php echo esc_html( $ticket['customer_email'] ); ?>
+			<!-- Assignment -->
+			<div class="dtb-sidebar-card">
+				<div class="dtb-sidebar-card__title">Assigned To</div>
+				<div class="dtb-sidebar-card__body">
+					<div style="display:flex;gap:.5rem;align-items:center;flex-wrap:wrap;">
+						<select id="dtb-assign-select" class="dtb-select">
+							<option value="">Unassigned</option>
+							<?php foreach ( $agents as $agent_id ) :
+								$u = get_userdata( $agent_id );
+								if ( ! $u ) continue;
+								?>
+								<option value="<?php echo absint( $agent_id ); ?>"
+									<?php selected( (int) ( $ticket['assigned_to'] ?? 0 ), $agent_id ); ?>>
+									<?php echo esc_html( $u->display_name ); ?>
+								</option>
+							<?php endforeach; ?>
+						</select>
+						<button class="dtb-btn dtb-btn--sm dtb-btn--ghost"
+							onclick="dtbSupport.assignTicket(<?php echo absint( $ticket_id ); ?>, document.getElementById('dtb-assign-select').value)">
+							Assign
+						</button>
+					</div>
+				</div>
+			</div>
+
+			<!-- Customer info -->
+			<div class="dtb-sidebar-card">
+				<div class="dtb-sidebar-card__title">Customer</div>
+				<div class="dtb-sidebar-card__body">
+					<p class="dtb-sidebar-card__row">
+						<strong>Name:</strong>
+						<?php echo esc_html( $ticket['customer_name'] ?? '—' ); ?>
+					</p>
+					<p class="dtb-sidebar-card__row">
+						<strong>Email:</strong>
+						<a href="mailto:<?php echo esc_attr( $ticket['customer_email'] ?? '' ); ?>">
+							<?php echo esc_html( $ticket['customer_email'] ?? '—' ); ?>
 						</a>
 					</p>
 					<?php if ( ! empty( $ticket['order_id'] ) ) : ?>
-						<p style="margin:8px 0 0;font-size:12px;color:#6b7280;">
-							<?php esc_html_e( 'Order:', 'drywall-toolbox' ); ?>
+						<p class="dtb-sidebar-card__row">
+							<strong>Order:</strong>
 							<a href="<?php echo esc_url( admin_url( 'post.php?post=' . absint( $ticket['order_id'] ) . '&action=edit' ) ); ?>">
 								#<?php echo absint( $ticket['order_id'] ); ?>
 							</a>
 						</p>
 					<?php endif; ?>
-					<p style="margin:8px 0 0;font-size:12px;color:#9ca3af;">
-						<?php echo esc_html( sprintf(
-							/* translators: %s: relative time label */
-							__( 'Opened %s ago', 'drywall-toolbox' ),
-							$view['age_label'] ?? '—'
-						) ); ?>
+				</div>
+			</div>
+
+			<!-- Ticket metadata -->
+			<div class="dtb-sidebar-card">
+				<div class="dtb-sidebar-card__title">Details</div>
+				<div class="dtb-sidebar-card__body">
+					<p class="dtb-sidebar-card__row">
+						<strong>Source:</strong>
+						<?php echo esc_html( $ticket['source'] ?? '—' ); ?>
+					</p>
+					<p class="dtb-sidebar-card__row">
+						<strong>Age:</strong>
+						<?php echo esc_html( $projected['age_label'] ?? '—' ); ?>
+					</p>
+					<?php if ( ! empty( $projected['sla_state'] ) ) : ?>
+						<p class="dtb-sidebar-card__row">
+							<strong>SLA:</strong>
+							<span class="dtb-sla dtb-sla--<?php echo esc_attr( $projected['sla_state'] ); ?>">
+								<?php echo esc_html( strtoupper( $projected['sla_state'] ) ); ?>
+							</span>
+						</p>
+					<?php endif; ?>
+					<p class="dtb-sidebar-card__row">
+						<strong>Created:</strong>
+						<?php echo esc_html( dtb_support_format_date( $ticket['created_at'] ?? '' ) ); ?>
+					</p>
+					<p class="dtb-sidebar-card__row">
+						<strong>Updated:</strong>
+						<?php echo esc_html( dtb_support_format_date( $ticket['updated_at'] ?? '' ) ); ?>
 					</p>
 				</div>
+			</div>
 
-			</div><!-- .dtb-sidebar -->
-		</div><!-- .dtb-detail-grid -->
-	</div><!-- .dtb-support-wrap -->
+		</aside>
+	</div><!-- .dtb-detail-grid -->
+
+</div><!-- .dtb-wrap -->
 	<?php
+}
+
+// ---------------------------------------------------------------------------
+// Helpers
+// ---------------------------------------------------------------------------
+
+/**
+ * Format a MySQL datetime string to a readable local date/time.
+ */
+function dtb_support_format_date( string $mysql_date ): string {
+	if ( ! $mysql_date ) {
+		return '—';
+	}
+	$ts = strtotime( $mysql_date );
+	return $ts ? wp_date( get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), $ts ) : $mysql_date;
 }

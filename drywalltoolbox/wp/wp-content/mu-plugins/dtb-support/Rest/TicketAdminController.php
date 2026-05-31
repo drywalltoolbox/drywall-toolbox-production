@@ -60,6 +60,13 @@ function dtb_support_register_admin_ticket_routes(): void {
 		'callback'            => 'dtb_support_rest_get_kpis',
 		'permission_callback' => 'dtb_support_admin_permission',
 	] );
+
+	// ── Ticket events (for inline expand) ─────────────────────────────────────
+	register_rest_route( 'dtb/v1', '/support/tickets/(?P<id>\d+)/events', [
+		'methods'             => WP_REST_Server::READABLE,
+		'callback'            => 'dtb_support_rest_get_ticket_events',
+		'permission_callback' => 'dtb_support_admin_permission',
+	] );
 }
 add_action( 'rest_api_init', 'dtb_support_register_admin_ticket_routes' );
 
@@ -148,7 +155,7 @@ function dtb_support_rest_update_ticket( WP_REST_Request $request ): WP_REST_Res
 	$actor_id = get_current_user_id();
 
 	// Status transition.
-	if ( ! empty( $request['status'] ) && $request['status'] !== $ticket['status'] ) {
+	if ( ! empty( $request['status'] ) && $request['status'] !== $ticket->status ) {
 		$result = dtb_support_do_transition( $ticket_id, $request['status'], $request['note'] ?? '', $actor_id );
 		if ( is_wp_error( $result ) ) {
 			return new WP_REST_Response( [ 'success' => false, 'message' => $result->get_error_message() ], 422 );
@@ -183,4 +190,45 @@ function dtb_support_rest_update_ticket( WP_REST_Request $request ): WP_REST_Res
  */
 function dtb_support_rest_get_kpis(): WP_REST_Response {
 	return new WP_REST_Response( dtb_support_get_kpis(), 200 );
+}
+
+/**
+ * GET /dtb/v1/support/tickets/{id}/events
+ *
+ * Returns the operator-visible event stream for inline expand.
+ *
+ * @param WP_REST_Request $request
+ * @return WP_REST_Response|WP_Error
+ */
+function dtb_support_rest_get_ticket_events( WP_REST_Request $request ): WP_REST_Response|WP_Error {
+	$ticket_id = (int) $request->get_param( 'id' );
+
+	if ( ! dtb_support_get_ticket( $ticket_id ) ) {
+		return new WP_Error( 'dtb_support_not_found', __( 'Ticket not found.', 'drywall-toolbox' ), [ 'status' => 404 ] );
+	}
+
+	$events = dtb_support_get_events( $ticket_id, 'operator' );
+	$now    = time();
+	$out    = [];
+
+	foreach ( (array) $events as $ev ) {
+		$ev_arr = is_object( $ev ) ? get_object_vars( $ev ) : (array) $ev;
+		// Add human-readable age label.
+		$ev_arr['age_label'] = ! empty( $ev_arr['created_at'] )
+			? dtb_support_age_label( $now - strtotime( $ev_arr['created_at'] ) )
+			: '';
+		// Resolve actor label.
+		if ( 'customer' === ( $ev_arr['actor_type'] ?? '' ) ) {
+			$ticket = dtb_support_get_ticket( $ticket_id );
+			$ev_arr['actor_label'] = $ticket ? $ticket->customer_name : 'Customer';
+		} elseif ( ! empty( $ev_arr['actor_id'] ) ) {
+			$u = get_userdata( (int) $ev_arr['actor_id'] );
+			$ev_arr['actor_label'] = $u ? $u->display_name : 'Staff';
+		} else {
+			$ev_arr['actor_label'] = 'System';
+		}
+		$out[] = $ev_arr;
+	}
+
+	return new WP_REST_Response( $out, 200 );
 }

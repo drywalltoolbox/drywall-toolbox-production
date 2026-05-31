@@ -107,6 +107,7 @@ jobs:
 
           # React production output. Upload CONTENTS of dist/ to the web root.
           cp -a dist/. deploy-root/
+          cp -a drywalltoolbox/logos deploy-root/logos
 
           # Live root routing for React + /wp WordPress subdirectory.
           cp drywalltoolbox/.htaccess deploy-root/.htaccess
@@ -128,6 +129,7 @@ jobs:
           set -euo pipefail
           test -f deploy-root/index.html
           test -f deploy-root/.htaccess
+          test -f deploy-root/logos/favicon.ico
           test -d deploy-root/assets/js
           test -d deploy-root/assets/css
           test -f deploy-root/wp/.htaccess
