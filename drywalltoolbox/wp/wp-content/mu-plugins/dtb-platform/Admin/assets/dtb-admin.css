@@ -126,6 +126,11 @@
   50%       { opacity: 1; }
 }
 
+@keyframes dtbShimmer {
+  from { background-position: 200% 0; }
+  to   { background-position: -200% 0; }
+}
+
 @keyframes dtbSpin {
   to { transform: rotate(360deg); }
 }
@@ -142,7 +147,7 @@
 }
 
 .dtb-admin {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-family: 'Inter', 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   font-size: 14px;
   line-height: 1.55;
   color: var(--dtb-text);
@@ -1078,7 +1083,7 @@ a.dtb-kpi:hover { text-decoration: none; }
   background: linear-gradient(90deg, var(--dtb-border-soft) 25%, var(--dtb-border) 50%, var(--dtb-border-soft) 75%);
   background-size: 200% 100%;
   border-radius: var(--dtb-radius-sm);
-  animation: dtbPulse 1.4s ease-in-out infinite;
+  animation: dtbShimmer 1.6s linear infinite;
   display: block;
 }
 
@@ -1473,3 +1478,412 @@ a.dtb-kpi:hover { text-decoration: none; }
   white-space: nowrap;
   border-width: 0;
 }
+
+/* =============================================================================
+   24. DROPDOWN MENUS
+   ============================================================================= */
+
+.dtb-dropdown { position: relative; display: inline-flex; }
+
+[data-dtb-dropdown-menu] {
+  display: none;
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  min-width: 180px;
+  background: var(--dtb-surface);
+  border: 1px solid var(--dtb-border-soft);
+  border-radius: var(--dtb-radius-md);
+  box-shadow: 0 8px 24px rgba(0,0,0,.10);
+  z-index: 200;
+  padding: 6px 0;
+  animation: dtbFadeIn .12s ease;
+}
+
+[data-dtb-dropdown-menu].is-open { display: block; }
+
+[data-dtb-dropdown-menu] a,
+[data-dtb-dropdown-menu] button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 8px 16px;
+  background: none;
+  border: 0;
+  color: var(--dtb-text);
+  font-size: .8125rem;
+  font-weight: 500;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background .12s;
+}
+
+[data-dtb-dropdown-menu] a:hover,
+[data-dtb-dropdown-menu] button:hover {
+  background: var(--dtb-hover);
+  color: var(--dtb-primary);
+}
+
+[data-dtb-dropdown-menu] hr {
+  margin: 6px 0;
+  border: 0;
+  border-top: 1px solid var(--dtb-border-soft);
+}
+
+[data-dtb-dropdown-menu] .dtb-dropdown-item--danger:hover {
+  background: rgba(239,68,68,.06);
+  color: var(--dtb-danger);
+}
+
+/* =============================================================================
+   25. TIMELINE WIDGET  (derived from Modernize _dashboard1.scss)
+   ============================================================================= */
+
+.dtb-timeline { padding: 0; list-style: none; margin: 0; }
+
+.dtb-timeline-item {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  padding-bottom: 20px;
+  position: relative;
+}
+
+.dtb-timeline-item:last-child { padding-bottom: 0; }
+
+.dtb-timeline-item:not(:last-child)::before {
+  content: '';
+  position: absolute;
+  left: 5px;
+  top: 16px;
+  bottom: 0;
+  width: 1px;
+  background: var(--dtb-border-soft);
+}
+
+.dtb-timeline-badge-wrap {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 2px;
+}
+
+.dtb-timeline-badge {
+  width: 12px;
+  height: 12px;
+  border-radius: 50px;
+  display: block;
+  flex-shrink: 0;
+}
+
+.dtb-timeline-badge--primary  { background: var(--dtb-primary); }
+.dtb-timeline-badge--success  { background: var(--dtb-success); }
+.dtb-timeline-badge--warning  { background: var(--dtb-warning); }
+.dtb-timeline-badge--danger   { background: var(--dtb-danger); }
+.dtb-timeline-badge--muted    { background: var(--dtb-text-muted); }
+.dtb-timeline-badge--info     { background: #0ea5e9; }
+
+.dtb-timeline-body { flex: 1; min-width: 0; }
+
+.dtb-timeline-title {
+  font-size: .8125rem;
+  font-weight: 600;
+  color: var(--dtb-text);
+  line-height: 1.3;
+  margin-bottom: 2px;
+}
+
+.dtb-timeline-desc {
+  font-size: .75rem;
+  color: var(--dtb-text-muted);
+  line-height: 1.5;
+}
+
+.dtb-timeline-time {
+  font-size: .6875rem;
+  color: var(--dtb-text-muted);
+  white-space: nowrap;
+  min-width: 72px;
+  text-align: right;
+  padding-top: 2px;
+  flex-shrink: 0;
+}
+
+/* =============================================================================
+   26. LIVE REGION STATES
+   ============================================================================= */
+
+.dtb-live-region { position: relative; }
+
+/* Loading overlay */
+.dtb-region-loading-overlay {
+  display: none;
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  background: rgba(var(--dtb-surface-rgb, 255 255 255) / .88);
+  backdrop-filter: blur(1px);
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--dtb-radius-lg);
+  transition: opacity .15s;
+}
+
+.dtb-live-region--loading .dtb-region-loading-overlay {
+  display: flex;
+}
+
+.dtb-region-loading-overlay::after {
+  content: '';
+  width: 24px;
+  height: 24px;
+  border: 3px solid var(--dtb-border);
+  border-top-color: var(--dtb-primary);
+  border-radius: 50%;
+  animation: dtbSpin .7s linear infinite;
+}
+
+/* Loading bar (top edge) */
+.dtb-live-region::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: var(--dtb-primary);
+  border-radius: 0 2px 2px 0;
+  z-index: 11;
+  transition: width 0s;
+  opacity: 0;
+}
+
+.dtb-live-region--loading::before {
+  width: 80%;
+  opacity: 1;
+  transition: width 2s cubic-bezier(.1,.8,.6,1);
+}
+
+/* Updates-available nudge badge */
+.dtb-update-available {
+  display: none;
+  align-items: center;
+  gap: 8px;
+  font-size: .75rem;
+  font-weight: 600;
+  color: var(--dtb-primary);
+  background: rgba(29,78,216,.07);
+  border: 1px solid rgba(29,78,216,.15);
+  border-radius: var(--dtb-radius-sm);
+  padding: 5px 12px;
+  cursor: pointer;
+  animation: dtbFadeIn .2s ease;
+}
+
+.dtb-update-available.is-visible { display: flex; }
+
+.dtb-update-available::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--dtb-primary);
+  animation: dtbPulse 1.4s ease-in-out infinite;
+  flex-shrink: 0;
+}
+
+/* =============================================================================
+   27. WP ADMIN HOST OVERRIDES
+   (Neutralise WP admin chrome so the DTB surface sits cleanly.)
+   ============================================================================= */
+
+/* Match WP admin backgrounds to DTB surface token */
+body.wp-admin,
+#wpwrap,
+#wpcontent,
+#wpbody,
+#wpbody-content {
+  background: #f5f7fb !important;
+}
+
+/* Remove WP default .wrap h1 left-border / colour inside DTB pages */
+.dtb-admin-page .wrap > h1,
+.dtb-admin-page h1.wp-heading-inline {
+  display: none !important;
+}
+
+/* Suppress WP default link colour inside DTB chrome */
+.dtb-admin a,
+.dtb-admin button {
+  outline-offset: 2px;
+}
+
+/* Ensure WP admin bar doesn't push fixed DTB headers unexpectedly */
+.wp-toolbar .dtb-admin-page {
+  padding-top: 0;
+}
+
+/* =============================================================================
+   28. PAGINATION
+   ============================================================================= */
+
+.dtb-pagination {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 0 4px;
+  flex-wrap: wrap;
+}
+
+.dtb-pagination__list {
+  display: flex;
+  gap: 4px;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.dtb-pagination__btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 32px;
+  height: 32px;
+  padding: 0 8px;
+  border: 1px solid var(--dtb-border-soft);
+  border-radius: var(--dtb-radius-sm);
+  background: var(--dtb-surface);
+  color: var(--dtb-text);
+  font-size: .8125rem;
+  font-weight: 500;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background .12s, border-color .12s, color .12s;
+}
+
+.dtb-pagination__btn:hover {
+  background: var(--dtb-hover);
+  border-color: var(--dtb-primary);
+  color: var(--dtb-primary);
+}
+
+.dtb-pagination__btn.is-current {
+  background: var(--dtb-primary);
+  border-color: var(--dtb-primary);
+  color: #fff;
+  pointer-events: none;
+}
+
+.dtb-pagination__ellipsis {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 32px;
+  height: 32px;
+  color: var(--dtb-text-muted);
+  font-size: .8125rem;
+}
+
+.dtb-pagination__info {
+  font-size: .75rem;
+  color: var(--dtb-text-muted);
+  margin-left: auto;
+}
+
+/* =============================================================================
+   29. STAT CARD (compact horizontal)
+   ============================================================================= */
+
+.dtb-stat-card {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--dtb-surface);
+  border: 1px solid var(--dtb-border-soft);
+  border-radius: var(--dtb-radius-md);
+  padding: 10px 16px;
+}
+
+.dtb-stat-card__icon {
+  font-size: 1.25rem;
+  color: var(--dtb-primary);
+  flex-shrink: 0;
+}
+
+.dtb-stat-card__value {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--dtb-text);
+  line-height: 1.2;
+}
+
+.dtb-stat-card__label {
+  font-size: .6875rem;
+  color: var(--dtb-text-muted);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+}
+
+.dtb-stat-card--success .dtb-stat-card__icon { color: var(--dtb-success); }
+.dtb-stat-card--warning .dtb-stat-card__icon { color: var(--dtb-warning); }
+.dtb-stat-card--danger  .dtb-stat-card__icon { color: var(--dtb-danger); }
+.dtb-stat-card--info    .dtb-stat-card__icon { color: #0ea5e9; }
+
+/* =============================================================================
+   30. SEARCH WRAP
+   ============================================================================= */
+
+.dtb-search-wrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.dtb-search-icon {
+  position: absolute;
+  left: 10px;
+  color: var(--dtb-text-muted);
+  font-size: 1rem;
+  pointer-events: none;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.dtb-search-input {
+  padding-left: 32px !important;
+}
+
+/* =============================================================================
+   31. FILTER CHIPS
+   ============================================================================= */
+
+.dtb-filter-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 14px;
+  border: 1px solid var(--dtb-border-soft);
+  border-radius: 50px;
+  background: var(--dtb-surface);
+  color: var(--dtb-text-muted);
+  font-size: .8125rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background .12s, color .12s, border-color .12s;
+}
+
+.dtb-filter-chip:hover {
+  background: var(--dtb-hover);
+  color: var(--dtb-primary);
+  border-color: var(--dtb-primary);
+}
+
+.dtb-filter-chip.is-active {
+  background: var(--dtb-primary);
+  border-color: var(--dtb-primary);
+  color: #fff;
+}
+

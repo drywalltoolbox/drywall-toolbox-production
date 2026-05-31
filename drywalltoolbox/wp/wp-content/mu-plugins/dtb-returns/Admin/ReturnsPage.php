@@ -76,11 +76,10 @@ function dtb_returns_render_page(): void {
 
 	if ( empty( $items ) ) {
 		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-		echo dtb_admin_ui_empty_state( [
-			'icon'    => 'dashicons-undo',
-			'title'   => __( 'No returns found.', 'drywall-toolbox' ),
-			'message' => __( 'No return requests match the current filter.', 'drywall-toolbox' ),
-		] );
+		echo dtb_admin_ui_empty_state(
+			__( 'No returns found.', 'drywall-toolbox' ),
+			__( 'No return requests match the current filter.', 'drywall-toolbox' )
+		);
 		dtb_admin_shell_close();
 		return;
 	}
@@ -107,7 +106,7 @@ function dtb_returns_render_page(): void {
 		echo '<td>' . esc_html( ucwords( str_replace( '_', ' ', $item->resolution ) ) ) . '</td>';
 		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		echo '<td>' . dtb_admin_ui_badge( $item->status->label(), $badge_type ) . '</td>';
-		echo '<td>' . esc_html( dtb_admin_format_date( $item->created_at ) ) . '</td>';
+		echo '<td>' . esc_html( wp_date( get_option( 'date_format' ), strtotime( $item->created_at ) ) ) . '</td>';
 		echo '<td><a href="' . esc_url( $view_url ) . '" class="dtb-btn dtb-btn--sm">' . esc_html__( 'View', 'drywall-toolbox' ) . '</a></td>';
 		echo '</tr>';
 	}

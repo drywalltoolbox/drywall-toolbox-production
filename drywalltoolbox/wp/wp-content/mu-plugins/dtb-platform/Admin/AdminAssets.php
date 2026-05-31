@@ -23,6 +23,14 @@ function dtb_admin_assets_enqueue(): void {
 	$assets_dir = __DIR__ . '/assets/';
 	$assets_url = plugin_dir_url( __FILE__ ) . 'assets/';
 
+	// ── Web Fonts (Inter + Plus Jakarta Sans via Bunny Fonts — privacy-respecting CDN) ──
+	wp_enqueue_style(
+		'dtb-fonts',
+		'https://fonts.bunny.net/css?family=inter:400,500,600,700|plus-jakarta-sans:400,500,600,700&display=swap',
+		[],
+		null
+	);
+
 	// ── Shared CSS ──
 	$css_file = $assets_dir . 'dtb-admin.css';
 	$css_ver  = file_exists( $css_file ) ? (string) filemtime( $css_file ) : '2.0.0';
@@ -30,7 +38,7 @@ function dtb_admin_assets_enqueue(): void {
 	wp_enqueue_style(
 		'dtb-admin',
 		$assets_url . 'dtb-admin.css',
-		[],
+		[ 'dtb-fonts' ],
 		$css_ver
 	);
 

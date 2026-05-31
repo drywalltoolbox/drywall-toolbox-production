@@ -157,3 +157,52 @@ function dtb_admin_shell_access_denied(): void {
 
 	dtb_admin_shell_close();
 }
+
+/**
+ * Open a live region workspace container.
+ *
+ * Outputs the opening div for a [data-dtb-live-region] block used by the
+ * Live Interaction Layer (DtbAdmin.initLiveRegions / liveNavigate).
+ *
+ * @param array{
+ *   id:       string,
+ *   module:   string,
+ *   endpoint: string,
+ *   interval: int,
+ *   class:    string,
+ * } $args
+ */
+function dtb_admin_shell_live_region_open( array $args ): void {
+	$defaults = [
+		'id'       => '',
+		'module'   => '',
+		'endpoint' => '',
+		'interval' => 0,
+		'class'    => '',
+	];
+	$a = wp_parse_args( $args, $defaults );
+
+	$id_attr       = $a['id']       ? ' id="' . esc_attr( $a['id'] ) . '"' : '';
+	$module_attr   = $a['module']   ? ' data-dtb-live-module="' . esc_attr( $a['module'] ) . '"' : '';
+	$endpoint_attr = $a['endpoint'] ? ' data-dtb-endpoint="' . esc_url( $a['endpoint'] ) . '"' : '';
+	$interval_attr = $a['interval'] ? ' data-dtb-refresh-interval="' . (int) $a['interval'] . '"' : '';
+	$class_extra   = $a['class']    ? ' ' . esc_attr( $a['class'] ) : '';
+	$live_id       = $a['id']       ? esc_attr( $a['id'] ) : ( $a['module'] ? esc_attr( $a['module'] ) . '-region' : '' );
+
+	printf(
+		'<div class="dtb-live-region%s" data-dtb-live-region="%s" aria-live="polite" aria-atomic="false"%s%s%s%s>',
+		esc_attr( $class_extra ),
+		esc_attr( $live_id ),
+		$id_attr,
+		$module_attr,
+		$endpoint_attr,
+		$interval_attr
+	);
+}
+
+/**
+ * Close a live region workspace container.
+ */
+function dtb_admin_shell_live_region_close(): void {
+	echo '</div><!-- /.dtb-live-region -->';
+}

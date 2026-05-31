@@ -64,6 +64,7 @@ require_once __DIR__ . '/Rest/RepairHealthController.php';
 
 // Admin (only in admin context)
 if ( is_admin() ) {
+require_once __DIR__ . '/Admin/RepairsPage.php';
 require_once __DIR__ . '/Admin/RepairAdminMenu.php';
 require_once __DIR__ . '/Admin/RepairListTable.php';
 require_once __DIR__ . '/Admin/RepairMetaBoxes.php';

@@ -52,6 +52,9 @@
 		DtbAdmin.initBulkSelect();
 		DtbAdmin.initTableRowDrawer();
 		DtbAdmin.initToastContainer();
+		DtbAdmin.initLiveRegions();
+		DtbAdmin.initSidebarNav();
+		DtbAdmin.initCharts( document );
 	} );
 
 	// =========================================================================
@@ -624,6 +627,428 @@
 		if ( diffH < 24 )  return diffH + 'h ago';
 		if ( diffD < 7 )   return diffD + 'd ago';
 		return date.toLocaleDateString();
+	};
+
+	// =========================================================================
+	// REBIND — re-initialise all scoped behaviours after HTML fragment replace
+	// =========================================================================
+
+	/**
+	 * Re-bind all DtbAdmin behaviours on a container that has just had its
+	 * innerHTML replaced (e.g. after a live region refresh).
+	 *
+	 * @param {Element|Document} container
+	 */
+	DtbAdmin.rebind = function ( container ) {
+		DtbAdmin.initAlerts( container );
+		DtbAdmin.initDropdowns( container );
+		DtbAdmin.initDrawers( container );
+		DtbAdmin.initModals( container );
+		DtbAdmin.initTabs( container );
+		DtbAdmin.initLoadingButtons( container );
+		DtbAdmin.initBulkSelect( container );
+		DtbAdmin.initTableRowDrawer( container );
+		DtbAdmin.initLiveControls( container );
+		DtbAdmin.initCharts( container );
+		container.dispatchEvent( new CustomEvent( 'dtb:admin:rebound', { bubbles: true } ) );
+	};
+
+	// =========================================================================
+	// SIDEBAR NAV  (vanilla JS port of Modernize sidebarmenu.js)
+	// =========================================================================
+
+	/**
+	 * Activate the sidebar nav item matching the current page and expand its
+	 * parent submenu (.in) if it has one.  Targets #dtb-sidebarnav (if present).
+	 */
+	DtbAdmin.initSidebarNav = function () {
+		const nav = document.getElementById( 'dtb-sidebarnav' );
+		if ( ! nav ) return;
+
+		const href = window.location.href;
+
+		nav.querySelectorAll( 'a[href]' ).forEach( function ( link ) {
+			if ( link.href && href.indexOf( link.getAttribute( 'href' ) ) !== -1 ) {
+				link.classList.add( 'active' );
+
+				// Walk up and expand parent .sidebar-item submenu
+				let parent = link.parentElement;
+				while ( parent && parent !== nav ) {
+					if ( parent.tagName === 'LI' ) {
+						parent.classList.add( 'active' );
+					}
+					if ( parent.tagName === 'UL' && parent.classList.contains( 'collapse' ) ) {
+						parent.classList.add( 'in' );
+						// Toggle caret on trigger
+						const trigger = parent.previousElementSibling;
+						if ( trigger ) trigger.setAttribute( 'aria-expanded', 'true' );
+					}
+					parent = parent.parentElement;
+				}
+			}
+		} );
+
+		// Submenu toggle (click on items with nested ul.collapse)
+		nav.querySelectorAll( '[data-dtb-nav-toggle]' ).forEach( function ( trigger ) {
+			trigger.addEventListener( 'click', function ( e ) {
+				e.preventDefault();
+				const targetId = trigger.getAttribute( 'data-dtb-nav-toggle' );
+				const sub = targetId ? document.getElementById( targetId ) : trigger.nextElementSibling;
+				if ( ! sub ) return;
+
+				const isOpen = sub.classList.contains( 'in' );
+				// Close siblings
+				const siblings = trigger.closest( 'ul' );
+				if ( siblings ) {
+					siblings.querySelectorAll( 'ul.collapse.in' ).forEach( function ( s ) {
+						s.classList.remove( 'in' );
+						const sib = s.previousElementSibling;
+						if ( sib ) sib.setAttribute( 'aria-expanded', 'false' );
+					} );
+				}
+				sub.classList.toggle( 'in', ! isOpen );
+				trigger.setAttribute( 'aria-expanded', String( ! isOpen ) );
+			} );
+		} );
+	};
+
+	// =========================================================================
+	// CHARTS — lightweight wrapper around ApexCharts
+	// =========================================================================
+
+	/**
+	 * Scan container for [data-dtb-chart] elements and initialise ApexCharts.
+	 * Chart config is provided via data-dtb-chart-config (JSON).
+	 *
+	 * @param {Element|Document} container
+	 */
+	DtbAdmin.initCharts = function ( container ) {
+		if ( typeof ApexCharts === 'undefined' ) return;
+
+		( container || document ).querySelectorAll( '[data-dtb-chart]:not([data-dtb-chart-ready])' ).forEach( function ( el ) {
+			try {
+				const raw    = el.getAttribute( 'data-dtb-chart-config' );
+				const config = raw ? JSON.parse( raw ) : {};
+
+				// Apply DTB colour defaults if not overridden
+				if ( ! config.colors ) {
+					config.colors = [ '#1d4ed8', '#22c55e', '#f59e0b', '#ef4444', '#0ea5e9' ];
+				}
+				if ( ! config.chart ) config.chart = {};
+				config.chart.fontFamily = "Inter, 'Plus Jakarta Sans', sans-serif";
+				config.chart.background = 'transparent';
+				if ( ! config.grid ) config.grid = {};
+				config.grid.borderColor = getComputedStyle( document.documentElement )
+					.getPropertyValue( '--dtb-border-soft' ).trim() || '#e5e7eb';
+
+				const chart = new ApexCharts( el, config );
+				chart.render();
+				el.setAttribute( 'data-dtb-chart-ready', '1' );
+				el._dtbChart = chart;
+			} catch ( err ) {
+				console.warn( '[DtbAdmin] Chart init failed:', el, err );
+			}
+		} );
+	};
+
+	// =========================================================================
+	// LIVE INTERACTION LAYER  (P0 — documented in mu-plugins-rebuild.md)
+	// =========================================================================
+
+	/** Tracks region IDs that have unsaved user input. */
+	DtbAdmin._dirtyRegions = new Set();
+
+	/** Mark a live region as having unsaved changes (suppress auto-refresh). */
+	DtbAdmin.markDirty = function ( regionId ) {
+		DtbAdmin._dirtyRegions.add( regionId );
+	};
+
+	/** Clear dirty flag (call after a successful save/submit). */
+	DtbAdmin.clearDirty = function ( regionId ) {
+		DtbAdmin._dirtyRegions.delete( regionId );
+	};
+
+	/** Returns true if the region is safe to auto-replace. */
+	DtbAdmin.canReplace = function ( regionId ) {
+		return ! DtbAdmin._dirtyRegions.has( regionId );
+	};
+
+	// ── setRegionLoading ─────────────────────────────────────────────────────
+
+	/**
+	 * Show or hide the loading overlay on a live region element.
+	 *
+	 * @param {Element} regionEl
+	 * @param {boolean} loading
+	 */
+	DtbAdmin.setRegionLoading = function ( regionEl, loading ) {
+		if ( ! regionEl ) return;
+		regionEl.classList.toggle( 'dtb-live-region--loading', loading );
+		regionEl.setAttribute( 'aria-busy', loading ? 'true' : 'false' );
+	};
+
+	// ── readLiveState / applyHistoryState ────────────────────────────────────
+
+	/**
+	 * Read URL search params into a plain state object.
+	 *
+	 * @returns {Object}
+	 */
+	DtbAdmin.readLiveState = function () {
+		const params = new URLSearchParams( window.location.search );
+		const state  = {};
+		params.forEach( function ( val, key ) { state[ key ] = val; } );
+		return state;
+	};
+
+	/**
+	 * Push (or replace) a live state into the browser history.
+	 *
+	 * @param {Object}  state
+	 * @param {boolean} [replace=false]
+	 */
+	DtbAdmin.applyHistoryState = function ( state, replace ) {
+		const params = new URLSearchParams( state );
+		const url    = window.location.pathname + ( params.toString() ? '?' + params.toString() : '' );
+		if ( replace ) {
+			history.replaceState( state, '', url );
+		} else {
+			history.pushState( state, '', url );
+		}
+	};
+
+	// ── liveNavigate ─────────────────────────────────────────────────────────
+
+	/** In-flight AbortControllers keyed by region element. */
+	const _liveAbort = new WeakMap();
+
+	/**
+	 * Fetch a URL and replace a live region's inner HTML, then rebind.
+	 *
+	 * @param {Object} opts
+	 * @param {Element}          opts.target     - .dtb-live-region element to replace
+	 * @param {string}           opts.endpoint   - REST URL to fetch
+	 * @param {Object}           [opts.query]    - Extra query params to merge
+	 * @param {boolean}          [opts.history]  - Push state to history (default true)
+	 */
+	DtbAdmin.liveNavigate = function ( opts ) {
+		const { target, endpoint, query = {}, history: pushHistory = true } = opts;
+		if ( ! target || ! endpoint ) return;
+
+		const regionId = target.getAttribute( 'data-dtb-live-region' );
+
+		// Abort any pending request for this region
+		if ( _liveAbort.has( target ) ) {
+			_liveAbort.get( target ).abort();
+		}
+		const controller = new AbortController();
+		_liveAbort.set( target, controller );
+
+		DtbAdmin.setRegionLoading( target, true );
+
+		const url    = new URL( endpoint, window.location.origin );
+		const state  = Object.assign( DtbAdmin.readLiveState(), query );
+		Object.entries( state ).forEach( ( [ k, v ] ) => url.searchParams.set( k, v ) );
+
+		fetch( url.toString(), {
+			signal:  controller.signal,
+			headers: {
+				'X-WP-Nonce': cfg.nonce || '',
+				'Accept':     'text/html',
+			},
+		} )
+			.then( function ( res ) {
+				if ( ! res.ok ) throw new Error( 'HTTP ' + res.status );
+				return res.text();
+			} )
+			.then( function ( html ) {
+				target.innerHTML = html;
+				DtbAdmin.setRegionLoading( target, false );
+				DtbAdmin.clearDirty( regionId );
+
+				// Hide "updates available" badge if present
+				const badge = target.querySelector( '.dtb-update-available' );
+				if ( badge ) badge.classList.remove( 'is-visible' );
+
+				DtbAdmin.rebind( target );
+
+				if ( pushHistory ) {
+					DtbAdmin.applyHistoryState( state );
+				}
+
+				target.dispatchEvent( new CustomEvent( 'dtb:live:navigated', {
+					bubbles: true,
+					detail: { regionId, state },
+				} ) );
+			} )
+			.catch( function ( err ) {
+				if ( err.name === 'AbortError' ) return; // superseded request
+				DtbAdmin.setRegionLoading( target, false );
+				console.warn( '[DtbAdmin] liveNavigate failed:', err );
+			} );
+	};
+
+	// ── liveRefresh ──────────────────────────────────────────────────────────
+
+	/**
+	 * Silently refresh a live region using its registered endpoint.
+	 * Skips if the region is dirty (has unsaved user input).
+	 *
+	 * @param {Element} regionEl
+	 */
+	DtbAdmin.liveRefresh = function ( regionEl ) {
+		if ( ! regionEl ) return;
+
+		const regionId = regionEl.getAttribute( 'data-dtb-live-region' );
+		if ( regionId && ! DtbAdmin.canReplace( regionId ) ) return;
+
+		const endpoint = regionEl.getAttribute( 'data-dtb-endpoint' );
+		if ( ! endpoint ) return;
+
+		DtbAdmin.liveNavigate( { target: regionEl, endpoint, history: false } );
+	};
+
+	// ── initLiveControls ─────────────────────────────────────────────────────
+
+	/**
+	 * Bind live-navigation controls inside a container.
+	 * Looks for: data-dtb-live-tab, data-dtb-live-filter, data-dtb-live-search,
+	 *             data-dtb-live-sort, data-dtb-live-page, data-dtb-live-refresh.
+	 *
+	 * @param {Element|Document} container
+	 */
+	DtbAdmin.initLiveControls = function ( container ) {
+		const root = container || document;
+
+		// Tabs, filter pills, sort controls → immediate navigate
+		root.querySelectorAll( '[data-dtb-live-tab],[data-dtb-live-filter],[data-dtb-live-sort],[data-dtb-live-page]' )
+			.forEach( function ( el ) {
+				if ( el._dtbLiveControlBound ) return;
+				el._dtbLiveControlBound = true;
+
+				el.addEventListener( 'click', function ( e ) {
+					e.preventDefault();
+					const region = el.closest( '[data-dtb-live-region]' );
+					if ( ! region ) return;
+
+					const endpoint = region.getAttribute( 'data-dtb-endpoint' );
+					const query    = {};
+
+					if ( el.hasAttribute( 'data-dtb-live-tab' ) )    query.tab    = el.getAttribute( 'data-dtb-live-tab' );
+					if ( el.hasAttribute( 'data-dtb-live-filter' ) )  query.filter = el.getAttribute( 'data-dtb-live-filter' );
+					if ( el.hasAttribute( 'data-dtb-live-sort' ) )    query.sort   = el.getAttribute( 'data-dtb-live-sort' );
+					if ( el.hasAttribute( 'data-dtb-live-page' ) )    query.paged  = el.getAttribute( 'data-dtb-live-page' );
+
+					DtbAdmin.liveNavigate( { target: region, endpoint, query } );
+				} );
+			} );
+
+		// Search input → debounced navigate
+		root.querySelectorAll( '[data-dtb-live-search]' ).forEach( function ( el ) {
+			if ( el._dtbLiveSearchBound ) return;
+			el._dtbLiveSearchBound = true;
+
+			let timer;
+			el.addEventListener( 'input', function () {
+				clearTimeout( timer );
+				timer = setTimeout( function () {
+					const region = el.closest( '[data-dtb-live-region]' );
+					if ( ! region ) return;
+					const endpoint = region.getAttribute( 'data-dtb-endpoint' );
+					DtbAdmin.liveNavigate( {
+						target: region,
+						endpoint,
+						query: { search: el.value, paged: 1 },
+					} );
+				}, 320 );
+			} );
+		} );
+
+		// Explicit refresh button
+		root.querySelectorAll( '[data-dtb-live-refresh]' ).forEach( function ( el ) {
+			if ( el._dtbLiveRefreshBound ) return;
+			el._dtbLiveRefreshBound = true;
+
+			el.addEventListener( 'click', function ( e ) {
+				e.preventDefault();
+				const regionId = el.getAttribute( 'data-dtb-live-refresh' );
+				const region   = regionId
+					? document.querySelector( '[data-dtb-live-region="' + regionId + '"]' )
+					: el.closest( '[data-dtb-live-region]' );
+				DtbAdmin.liveRefresh( region );
+			} );
+		} );
+	};
+
+	// ── registerLiveRegion ───────────────────────────────────────────────────
+
+	/**
+	 * Register a single [data-dtb-live-region] element:
+	 * - Bind its controls via initLiveControls.
+	 * - Start polling if data-dtb-refresh-interval is set.
+	 * - Dirty-mark when user types inside the region.
+	 *
+	 * @param {Element} el
+	 */
+	DtbAdmin.registerLiveRegion = function ( el ) {
+		const regionId = el.getAttribute( 'data-dtb-live-region' );
+		const interval = parseInt( el.getAttribute( 'data-dtb-refresh-interval' ) || '0', 10 );
+
+		// Mark loading overlay wrapper present
+		if ( ! el.querySelector( '.dtb-region-loading-overlay' ) ) {
+			const overlay = document.createElement( 'div' );
+			overlay.className = 'dtb-region-loading-overlay';
+			el.appendChild( overlay );
+		}
+
+		// Dirty detection — any user input in the region blocks auto-refresh
+		el.addEventListener( 'input', function () {
+			if ( regionId ) DtbAdmin.markDirty( regionId );
+		} );
+		el.addEventListener( 'change', function () {
+			if ( regionId ) DtbAdmin.markDirty( regionId );
+		} );
+		// Re-arm dirty flag after form submit/reset
+		el.addEventListener( 'submit', function () {
+			if ( regionId ) DtbAdmin.clearDirty( regionId );
+		} );
+
+		// Bind inline controls
+		DtbAdmin.initLiveControls( el );
+
+		// Auto-polling
+		if ( interval > 0 ) {
+			setInterval( function () {
+				if ( document.hidden ) return; // don't poll background tabs
+				DtbAdmin.liveRefresh( el );
+			}, interval );
+		}
+	};
+
+	// ── initLiveRegions ──────────────────────────────────────────────────────
+
+	/**
+	 * Bootstrap the live interaction layer for the current page.
+	 * Called once on DOMContentLoaded.
+	 */
+	DtbAdmin.initLiveRegions = function () {
+		document.querySelectorAll( '[data-dtb-live-region]' ).forEach( function ( el ) {
+			DtbAdmin.registerLiveRegion( el );
+		} );
+
+		// Handle browser back/forward — re-apply URL state to active region
+		window.addEventListener( 'popstate', function ( e ) {
+			if ( ! e.state ) return;
+			const regions = document.querySelectorAll( '[data-dtb-live-region][data-dtb-endpoint]' );
+			regions.forEach( function ( region ) {
+				DtbAdmin.liveNavigate( {
+					target:   region,
+					endpoint: region.getAttribute( 'data-dtb-endpoint' ),
+					query:    e.state,
+					history:  false,
+				} );
+			} );
+		} );
 	};
 
 } )();

@@ -686,3 +686,322 @@ function dtb_admin_ui_grid( string $inner_html, string $variant = 'two' ): strin
 		. $inner_html
 		. '</div>';
 }
+
+// =============================================================================
+// LIVE REGION
+// =============================================================================
+
+/**
+ * Open a live region container (use dtb_admin_ui_live_region_close() to close).
+ *
+ * @param string $region_id  Unique ID used by JS layer (data-dtb-live-region).
+ * @param string $module     Module slug (data-dtb-live-module).
+ * @param string $endpoint   REST endpoint URL (data-dtb-endpoint).
+ * @param int    $interval   Auto-refresh ms (0 = disabled).
+ * @param string $class      Extra CSS classes.
+ * @return string
+ */
+function dtb_admin_ui_live_region_open(
+	string $region_id,
+	string $module    = '',
+	string $endpoint  = '',
+	int    $interval  = 0,
+	string $class     = ''
+): string {
+	$module_attr   = $module   ? ' data-dtb-live-module="' . esc_attr( $module ) . '"' : '';
+	$endpoint_attr = $endpoint ? ' data-dtb-endpoint="' . esc_url( $endpoint ) . '"' : '';
+	$interval_attr = $interval ? ' data-dtb-refresh-interval="' . (int) $interval . '"' : '';
+	$class_extra   = $class    ? ' ' . esc_attr( $class ) : '';
+
+	return sprintf(
+		'<div class="dtb-live-region%s" data-dtb-live-region="%s" aria-live="polite" aria-atomic="false"%s%s%s>',
+		$class_extra,
+		esc_attr( $region_id ),
+		$module_attr,
+		$endpoint_attr,
+		$interval_attr
+	);
+}
+
+/**
+ * Close a live region container.
+ *
+ * @return string
+ */
+function dtb_admin_ui_live_region_close(): string {
+	return '</div><!-- /.dtb-live-region -->';
+}
+
+// =============================================================================
+// TIMELINE WIDGET
+// =============================================================================
+
+/**
+ * Open a timeline list (use dtb_admin_ui_timeline_close() to close).
+ *
+ * @return string
+ */
+function dtb_admin_ui_timeline_open(): string {
+	return '<ul class="dtb-timeline">';
+}
+
+/**
+ * Render a single timeline item.
+ *
+ * @param string $time        Human-readable time string (e.g. "2h ago").
+ * @param string $title       Short item title.
+ * @param string $desc        Supporting description HTML.
+ * @param string $badge_type  'primary' | 'success' | 'warning' | 'danger' | 'muted' | 'info'
+ * @return string
+ */
+function dtb_admin_ui_timeline_item(
+	string $time,
+	string $title,
+	string $desc       = '',
+	string $badge_type = 'primary'
+): string {
+	$desc_html = $desc
+		? '<div class="dtb-timeline-desc">' . wp_kses_post( $desc ) . '</div>'
+		: '';
+
+	return sprintf(
+		'<li class="dtb-timeline-item">
+			<div class="dtb-timeline-badge-wrap">
+				<span class="dtb-timeline-badge dtb-timeline-badge--%s"></span>
+			</div>
+			<div class="dtb-timeline-body">
+				<div class="dtb-timeline-title">%s</div>
+				%s
+			</div>
+			<div class="dtb-timeline-time">%s</div>
+		</li>',
+		esc_attr( $badge_type ),
+		esc_html( $title ),
+		$desc_html,
+		esc_html( $time )
+	);
+}
+
+/**
+ * Close a timeline list.
+ *
+ * @return string
+ */
+function dtb_admin_ui_timeline_close(): string {
+	return '</ul><!-- /.dtb-timeline -->';
+}
+
+/**
+ * Render a complete timeline from an array of items.
+ *
+ * @param array<array{time: string, title: string, desc?: string, badge?: string}> $items
+ * @return string
+ */
+function dtb_admin_ui_timeline( array $items ): string {
+	if ( empty( $items ) ) return '';
+	$html = dtb_admin_ui_timeline_open();
+	foreach ( $items as $item ) {
+		$html .= dtb_admin_ui_timeline_item(
+			$item['time']  ?? '',
+			$item['title'] ?? '',
+			$item['desc']  ?? '',
+			$item['badge'] ?? 'primary'
+		);
+	}
+	$html .= dtb_admin_ui_timeline_close();
+	return $html;
+}
+
+// =============================================================================
+// PAGINATION
+// =============================================================================
+
+/**
+ * Render a simple numeric pagination bar.
+ *
+ * @param int    $current    Current page (1-indexed).
+ * @param int    $total      Total pages.
+ * @param string $base_url   Base URL — page number appended as ?paged=N.
+ *                           Leave empty to use data-dtb-live-page attributes for live navigation.
+ * @return string
+ */
+function dtb_admin_ui_pagination( int $current, int $total, string $base_url = '' ): string {
+	if ( $total <= 1 ) return '';
+
+	$html  = '<nav class="dtb-pagination" aria-label="' . esc_attr__( 'Pagination', 'drywall-toolbox' ) . '">';
+	$html .= '<ul class="dtb-pagination__list">';
+
+	// Previous
+	if ( $current > 1 ) {
+		$prev = $current - 1;
+		$href = $base_url ? add_query_arg( 'paged', $prev, $base_url ) : '#';
+		$data = ! $base_url ? ' data-dtb-live-page="' . (int) $prev . '"' : '';
+		$html .= '<li><a href="' . esc_url( $href ) . '" class="dtb-pagination__btn" aria-label="Previous"' . $data . '>&#8249;</a></li>';
+	}
+
+	// Numbered pages (show ±2 around current, always show first & last)
+	for ( $i = 1; $i <= $total; $i++ ) {
+		if ( $i === 1 || $i === $total || abs( $i - $current ) <= 2 ) {
+			$active = $i === $current ? ' is-current' : '';
+			$href   = $base_url ? add_query_arg( 'paged', $i, $base_url ) : '#';
+			$data   = ! $base_url ? ' data-dtb-live-page="' . (int) $i . '"' : '';
+			$html  .= '<li><a href="' . esc_url( $href ) . '" class="dtb-pagination__btn' . $active . '"' . $data . ' aria-current="' . ( $i === $current ? 'page' : 'false' ) . '">' . (int) $i . '</a></li>';
+		} elseif ( abs( $i - $current ) === 3 ) {
+			$html .= '<li><span class="dtb-pagination__ellipsis">&hellip;</span></li>';
+		}
+	}
+
+	// Next
+	if ( $current < $total ) {
+		$next = $current + 1;
+		$href = $base_url ? add_query_arg( 'paged', $next, $base_url ) : '#';
+		$data = ! $base_url ? ' data-dtb-live-page="' . (int) $next . '"' : '';
+		$html .= '<li><a href="' . esc_url( $href ) . '" class="dtb-pagination__btn" aria-label="Next"' . $data . '>&#8250;</a></li>';
+	}
+
+	$html .= '</ul>';
+	$html .= '<span class="dtb-pagination__info">' . sprintf(
+		/* translators: 1: current page, 2: total pages */
+		esc_html__( 'Page %1$d of %2$d', 'drywall-toolbox' ),
+		$current,
+		$total
+	) . '</span>';
+	$html .= '</nav>';
+
+	return $html;
+}
+
+// =============================================================================
+// SEARCH INPUT
+// =============================================================================
+
+/**
+ * Render a live-search input field.
+ *
+ * @param string $placeholder
+ * @param string $value        Current search value.
+ * @param bool   $live         If true, adds data-dtb-live-search for JS binding.
+ * @param string $name         Input name attribute.
+ * @return string
+ */
+function dtb_admin_ui_search_input(
+	string $placeholder = '',
+	string $value       = '',
+	bool   $live        = true,
+	string $name        = 'search'
+): string {
+	$live_attr = $live ? ' data-dtb-live-search' : '';
+	$placeholder = $placeholder ?: __( 'Search…', 'drywall-toolbox' );
+
+	return sprintf(
+		'<div class="dtb-search-wrap">
+			<span class="dtb-search-icon dashicons dashicons-search" aria-hidden="true"></span>
+			<input type="search" class="dtb-input dtb-search-input" name="%s" value="%s" placeholder="%s"%s autocomplete="off">
+		</div>',
+		esc_attr( $name ),
+		esc_attr( $value ),
+		esc_attr( $placeholder ),
+		$live_attr
+	);
+}
+
+// =============================================================================
+// FILTER CHIP
+// =============================================================================
+
+/**
+ * Render a filter chip / pill.
+ *
+ * @param string $label
+ * @param string $value     data-dtb-live-filter value.
+ * @param bool   $active    Whether this chip is currently active.
+ * @param string $type      'filter' | 'tab' — determines the data attribute used.
+ * @return string
+ */
+function dtb_admin_ui_filter_chip(
+	string $label,
+	string $value,
+	bool   $active = false,
+	string $type   = 'filter'
+): string {
+	$active_class = $active ? ' is-active' : '';
+	$data_attr    = 'filter' === $type
+		? 'data-dtb-live-filter="' . esc_attr( $value ) . '"'
+		: 'data-dtb-live-tab="' . esc_attr( $value ) . '"';
+
+	return sprintf(
+		'<button type="button" class="dtb-filter-chip%s" %s>%s</button>',
+		$active_class,
+		$data_attr,
+		esc_html( $label )
+	);
+}
+
+// =============================================================================
+// STAT CARD (compact)
+// =============================================================================
+
+/**
+ * Render a compact horizontal stat card.
+ *
+ * Lighter than dtb_admin_ui_kpi — intended for inline stat rows.
+ *
+ * @param string $label
+ * @param string $value
+ * @param string $icon    Dashicons class (e.g. 'dashicons-cart').
+ * @param string $variant '' | 'success' | 'warning' | 'danger' | 'info'
+ * @return string
+ */
+function dtb_admin_ui_stat_card(
+	string $label,
+	string $value,
+	string $icon    = '',
+	string $variant = ''
+): string {
+	$variant_class = $variant ? ' dtb-stat-card--' . esc_attr( $variant ) : '';
+	$icon_html     = $icon
+		? '<span class="dtb-stat-card__icon dashicons ' . esc_attr( $icon ) . '" aria-hidden="true"></span>'
+		: '';
+
+	return sprintf(
+		'<div class="dtb-stat-card%s">
+			%s
+			<div class="dtb-stat-card__body">
+				<div class="dtb-stat-card__value">%s</div>
+				<div class="dtb-stat-card__label">%s</div>
+			</div>
+		</div>',
+		$variant_class,
+		$icon_html,
+		esc_html( $value ),
+		esc_html( $label )
+	);
+}
+
+// =============================================================================
+// UPDATE-AVAILABLE BADGE
+// =============================================================================
+
+/**
+ * Render the "New updates available" nudge badge for a live region.
+ *
+ * The badge is hidden by default (.dtb-update-available).
+ * JS adds .is-visible when it detects stale data.
+ *
+ * @param string $region_id  Matching [data-dtb-live-region] ID.
+ * @param string $label      Optional override label.
+ * @return string
+ */
+function dtb_admin_ui_update_badge(
+	string $region_id,
+	string $label = ''
+): string {
+	$label = $label ?: __( 'New updates available', 'drywall-toolbox' );
+
+	return sprintf(
+		'<button type="button" class="dtb-update-available" data-dtb-live-refresh="%s" aria-label="%s">%s</button>',
+		esc_attr( $region_id ),
+		esc_attr__( 'Refresh to load new updates', 'drywall-toolbox' ),
+		esc_html( $label )
+	);
+}

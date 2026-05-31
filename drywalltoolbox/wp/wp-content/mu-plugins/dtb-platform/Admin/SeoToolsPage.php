@@ -59,11 +59,10 @@ function dtb_seo_tools_render_audit_tab(): void {
 
 	if ( empty( $products ) ) {
 		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-		echo dtb_admin_ui_empty_state( [
-			'icon'    => 'dashicons-yes-alt',
-			'title'   => __( 'All products have SEO meta.', 'drywall-toolbox' ),
-			'message' => __( 'No products are missing title or description meta.', 'drywall-toolbox' ),
-		] );
+		echo dtb_admin_ui_empty_state(
+			__( 'All products have SEO meta.', 'drywall-toolbox' ),
+			__( 'No products are missing title or description meta.', 'drywall-toolbox' )
+		);
 		return;
 	}
 

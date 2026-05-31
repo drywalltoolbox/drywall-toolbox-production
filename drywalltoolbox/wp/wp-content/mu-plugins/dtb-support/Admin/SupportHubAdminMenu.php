@@ -62,7 +62,16 @@ function dtb_support_enqueue_admin_assets( string $hook ): void {
 	$css_ver    = file_exists( $css_file ) ? (string) filemtime( $css_file ) : DTB_SUPPORT_DB_VERSION;
 	$js_ver     = file_exists( $js_file ) ? (string) filemtime( $js_file ) : DTB_SUPPORT_DB_VERSION;
 
-	wp_enqueue_style( 'dtb-support-admin', $assets_url . 'dtb-support.css', [], $css_ver );
+	// The new DTB shell Support page is registered as a submenu of dtb-command-center.
+	// Its admin_enqueue_scripts hook is 'dtb-command-center_page_dtb-support'.
+	// dtb-admin.css owns the layout on that page — suppress the legacy support CSS there.
+	// The legacy standalone top-level hook is 'toplevel_page_dtb-support'.
+	$is_new_dtb_shell_page = ( false !== strpos( $hook, '_page_dtb-support' ) );
+
+	if ( ! $is_new_dtb_shell_page ) {
+		wp_enqueue_style( 'dtb-support-admin', $assets_url . 'dtb-support.css', [], $css_ver );
+	}
+
 	wp_enqueue_script( 'dtb-support-admin', $assets_url . 'dtb-support.js', [ 'jquery' ], $js_ver, true );
 
 	$current_user = wp_get_current_user();

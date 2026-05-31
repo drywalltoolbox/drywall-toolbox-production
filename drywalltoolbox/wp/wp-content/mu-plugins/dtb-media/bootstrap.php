@@ -33,3 +33,4 @@ dtb_module_require( 'dtb-media/Services/ProductImageLinker.php' );
 dtb_module_require( 'dtb-media/Infrastructure/MediaAttachmentRepository.php' );
 dtb_module_require( 'dtb-media/Admin/MediaDiagnosticsPage.php' );
 dtb_module_require( 'dtb-media/Admin/ImageSyncAdminPage.php' );
+dtb_module_require( 'dtb-media/Admin/ImageSyncPage.php' );

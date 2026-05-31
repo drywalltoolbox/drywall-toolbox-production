@@ -13,5 +13,9 @@ defined( 'ABSPATH' ) || exit;
 require_once __DIR__ . '/Cart/ToolsetCartItemData.php';
 require_once __DIR__ . '/Orders/ToolsetOrderLineMeta.php';
 
+if ( is_admin() ) {
+	require_once __DIR__ . '/Admin/OrdersPage.php';
+}
+
 DTB_ToolsetCartItemData::register();
 DTB_ToolsetOrderLineMeta::register();
