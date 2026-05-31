@@ -8,9 +8,10 @@
 **Last implementation update:** 2026-05-31  
 
 **Phase 10 checkpoint (2026-05-31):**
-- Module page CSS files are present as header-only stubs and are enqueued by page slug through `dtb-platform/Admin/AdminAssets.php`.
+- Module page CSS files are present and are enqueued by page slug through `dtb-platform/Admin/AdminAssets.php`; Repairs now uses its module CSS for queue layout geometry while other module sheets remain header-only until detail layouts require geometry.
 - Scope rule remains enforced: module CSS is reserved for page layout geometry only, must use existing `var(--dtb-*)` tokens, and must not define global/component styles.
 - Priority visual hardening pass is complete for legacy inline-heavy pages (`PartsManagerPage.php`, `ProductMappingRenderer.php`, `SchematicEditorPage.php`, `SupportHubDashboard.php`) with inline style drift removed and shared DTB classes applied.
+- Repairs queue and repair CPT edit screens are now Modernize-aligned: shared tokens/chrome load on DTB bodies, the queue renders KPI/list/progress patterns, live refresh reuses the same renderer, and the former repair admin inline stylesheet has been replaced by scoped external assets.
 - Modernize reference extraction/mapping notes are documented in `docs/design-reference/modernize-notes.md`.
 
 ---

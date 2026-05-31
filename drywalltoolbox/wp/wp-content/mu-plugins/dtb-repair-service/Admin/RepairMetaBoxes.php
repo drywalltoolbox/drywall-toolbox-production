@@ -82,7 +82,7 @@ function dtb_repair_metabox_issue( WP_Post $post ): void {
 	echo '<p>' . wp_kses_post( $issue ) . '</p>';
 
 	if ( ! empty( $images ) && is_array( $images ) ) {
-		echo '<p><strong>' . esc_html__( 'Attached Images:', 'drywall-toolbox' ) . '</strong></p><div style="display:flex;gap:8px;flex-wrap:wrap;">';
+		echo '<p class="dtb-attachment-label"><strong>' . esc_html__( 'Attached Images:', 'drywall-toolbox' ) . '</strong></p><div class="dtb-attachment-grid">';
 		foreach ( $images as $att_id ) {
 			$att_id = absint( $att_id );
 			$thumb  = wp_get_attachment_image( $att_id, [ 80, 80 ] );
@@ -118,13 +118,13 @@ function dtb_repair_metabox_order_details( WP_Post $post ): void {
 	}
 	echo '</table>';
 
-	echo '<div style="margin-top:14px;border-top:1px solid #eef2f7;padding-top:12px;">';
-	echo '<div style="font-size:11px;font-weight:700;color:#64748b;letter-spacing:.45px;text-transform:uppercase;margin-bottom:6px;">'
+	echo '<div class="dtb-issue-summary">';
+	echo '<div class="dtb-issue-summary__title">'
 		. esc_html__( 'Issue Description', 'drywall-toolbox' ) . '</div>';
-	echo '<p style="margin:0 0 10px;color:#111827;font-size:13px;line-height:1.5;">' . wp_kses_post( $issue ) . '</p>';
+	echo '<p class="dtb-issue-summary__text">' . wp_kses_post( $issue ) . '</p>';
 
 	if ( ! empty( $images ) && is_array( $images ) ) {
-		echo '<p style="margin:0 0 6px;"><strong>' . esc_html__( 'Attached Images:', 'drywall-toolbox' ) . '</strong></p><div style="display:flex;gap:8px;flex-wrap:wrap;">';
+		echo '<p class="dtb-attachment-label"><strong>' . esc_html__( 'Attached Images:', 'drywall-toolbox' ) . '</strong></p><div class="dtb-attachment-grid">';
 		foreach ( $images as $att_id ) {
 			$att_id = absint( $att_id );
 			$thumb  = wp_get_attachment_image( $att_id, [ 80, 80 ] );
@@ -394,7 +394,7 @@ function dtb_repair_render_customer_message_item( object $event, int $last_seen_
 
 function dtb_repair_metabox_quote_builder( WP_Post $post ): void {
 	if ( ! function_exists( 'dtb_repair_get_quote' ) ) {
-		echo '<p style="color:#9ca3af;">' . esc_html__( 'Quote service unavailable.', 'drywall-toolbox' ) . '</p>';
+		echo '<p class="dtb-muted-message">' . esc_html__( 'Quote service unavailable.', 'drywall-toolbox' ) . '</p>';
 		return;
 	}
 
@@ -1240,7 +1240,7 @@ function dtb_repair_metabox_timeline( WP_Post $post ): void {
 
 	$events = dtb_repair_get_events( $post->ID, null, 50 );
 	if ( empty( $events ) ) {
-		echo '<p style="color:#9ca3af;font-size:13px;">' . esc_html__( 'No events recorded yet.', 'drywall-toolbox' ) . '</p>';
+		echo '<p class="dtb-muted-message">' . esc_html__( 'No events recorded yet.', 'drywall-toolbox' ) . '</p>';
 		return;
 	}
 
@@ -1288,7 +1288,7 @@ function dtb_repair_metabox_notes( WP_Post $post ): void {
 	wp_nonce_field( 'dtb_repair_save_notes_' . $post->ID, 'dtb_repair_notes_nonce' );
 	$notes = wp_kses_post( (string) get_post_meta( $post->ID, '_repair_internal_notes', true ) );
 	echo '<div class="dtb-repair-metabox">';
-	echo '<textarea name="dtb_repair_internal_notes" style="width:100%;min-height:120px;" placeholder="'
+	echo '<textarea name="dtb_repair_internal_notes" class="dtb-notes-textarea" placeholder="'
 		. esc_attr__( 'Internal notes (not visible to customers)…', 'drywall-toolbox' )
 		. '">' . esc_textarea( $notes ) . '</textarea>';
 	echo '</div>';
@@ -1451,7 +1451,7 @@ function dtb_repair_metabox_technician( WP_Post $post ): void {
 						<div><strong>Synced Model:</strong> <span id="dtb-tech-primary-model"><?php echo esc_html( (string) get_post_meta( $post->ID, '_repair_schematic_tool_model', true ) ); ?></span></div>
 						<div><strong>Synced SKU:</strong> <span id="dtb-tech-primary-sku"><?php echo esc_html( (string) get_post_meta( $post->ID, '_repair_schematic_tool_sku', true ) ); ?></span></div>
 					</div>
-					<p class="dtb-tech-help" style="margin-top:8px;">Selections are saved with this repair and used as technician reference.</p>
+					<p class="dtb-tech-help dtb-tech-help--spaced">Selections are saved with this repair and used as technician reference.</p>
 				</div>
 
 				<?php if ( ! empty( $sch_meta ) ) : ?>
@@ -1485,7 +1485,7 @@ function dtb_repair_metabox_technician( WP_Post $post ): void {
 						<div><strong>Primary Part Name:</strong> <span id="dtb-tech-primary-part-name"><?php echo esc_html( (string) get_post_meta( $post->ID, '_repair_parts_primary_name', true ) ); ?></span></div>
 						<div><strong>Primary Part Brand:</strong> <span id="dtb-tech-primary-part-brand"><?php echo esc_html( (string) get_post_meta( $post->ID, '_repair_parts_primary_brand', true ) ); ?></span></div>
 					</div>
-					<p class="dtb-tech-help" style="margin-top:8px;">Selected parts are saved with this repair and can be reordered to set the primary part at top.</p>
+					<p class="dtb-tech-help dtb-tech-help--spaced">Selected parts are saved with this repair and can be reordered to set the primary part at top.</p>
 				</div>
 			</section>
 
@@ -2173,7 +2173,7 @@ function dtb_repair_ajax_parts_lookup(): void {
  */
 function dtb_repair_metabox_command_center( WP_Post $post ): void {
 	if ( ! function_exists( 'dtb_get_repair_status' ) || ! function_exists( 'dtb_get_allowed_transitions' ) ) {
-		echo '<p style="padding:16px;color:#9ca3af;">' . esc_html__( 'Workflow module unavailable.', 'drywall-toolbox' ) . '</p>';
+		echo '<p class="dtb-muted-message dtb-muted-message--padded">' . esc_html__( 'Workflow module unavailable.', 'drywall-toolbox' ) . '</p>';
 		return;
 	}
 
@@ -2241,7 +2241,7 @@ function dtb_repair_metabox_command_center( WP_Post $post ): void {
 
 			<?php if ( ! $is_negative ) : ?>
 				<div class="dtb-cc-progress-track">
-					<div class="dtb-cc-progress-fill <?php echo $is_complete ? 'dtb-cc-progress-fill-complete' : ''; ?>" style="width:<?php echo esc_attr( (string) $progress ); ?>%;"></div>
+					<div class="dtb-cc-progress-fill dtb-cc-progress-fill--<?php echo esc_attr( (string) $progress ); ?> <?php echo $is_complete ? 'dtb-cc-progress-fill-complete' : ''; ?>"></div>
 				</div>
 				<div class="dtb-cc-milestones">
 					<?php foreach ( $milestones as $i => $m ) :
@@ -2294,7 +2294,7 @@ function dtb_repair_metabox_command_center( WP_Post $post ): void {
 					<input type="hidden" id="dtb-repair-to-status" value="">
 					<button type="button" id="dtb-cc-action-toggle" class="dtb-cc-action-toggle" aria-expanded="false" aria-controls="dtb-cc-action-menu">
 						<span class="dtb-cc-action-toggle-label">Select transition action</span>
-						<span class="dashicons dashicons-arrow-down-alt2" style="font-size:14px;width:14px;height:14px;"></span>
+						<span class="dashicons dashicons-arrow-down-alt2 dtb-cc-action-icon" aria-hidden="true"></span>
 					</button>
 					<div id="dtb-cc-action-menu" class="dtb-cc-action-menu" hidden>
 						<?php foreach ( $allowed as $ts ) : ?>
@@ -2318,7 +2318,7 @@ function dtb_repair_metabox_command_center( WP_Post $post ): void {
 				        id="dtb-repair-transition-btn"
 				        class="dtb-cc-btn"
 				        data-repair-id="<?php echo esc_attr( (string) $post->ID ); ?>">
-					<span class="dashicons dashicons-update" style="font-size:14px;width:14px;height:14px;line-height:1.4;"></span>
+					<span class="dashicons dashicons-update dtb-cc-action-icon" aria-hidden="true"></span>
 					<?php esc_html_e( 'Transition', 'drywall-toolbox' ); ?>
 				</button>
 				<span id="dtb-repair-transition-msg" class="dtb-cc-msg"></span>
@@ -2436,9 +2436,9 @@ function dtb_repair_metabox_queue( WP_Post $post ): void {
 		return;
 	}
 
-	echo '<ul style="margin:0;padding:0;list-style:none;">';
+	echo '<ul class="dtb-queue-job-list">';
 	foreach ( $actions as $action ) {
-		echo '<li style="padding:3px 0;font-size:12px;">'
+		echo '<li class="dtb-queue-job-list__item">'
 			. esc_html( $action->get_hook() )
 			. '</li>';
 	}

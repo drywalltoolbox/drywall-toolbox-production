@@ -1,8 +1,8 @@
 ---
 
-## Status: LIVE LAYER + CORE WIRING COMPLETE, TARGETED UI HARDENING COMPLETE FOR PRIORITY PAGES — 2026-05-31
+## Status: LIVE LAYER + CORE WIRING COMPLETE, MODERNIZE-ALIGNED REPAIR UI HARDENING COMPLETE — 2026-05-31
 
-Core scaffolding, module page renderers, REST admin queue endpoints, order detail drawer, and module CSS enqueue wiring are complete. Priority legacy drift in four inline-heavy pages has been removed and migrated to DTB shared styling patterns; broader platform parity/migration work remains.
+Core scaffolding, module page renderers, REST admin queue endpoints, order detail drawer, and module CSS enqueue wiring are complete. Priority legacy drift in four inline-heavy pages has been removed and migrated to DTB shared styling patterns. Repairs queue and repair CPT edit screens now load the shared DTB/Modernize visual system instead of inline page CSS; broader platform parity/migration work remains.
 
 ---
 
@@ -66,7 +66,8 @@ All seven module pages are fully converted. Each uses:
 
 **RepairAdminMenu.php legacy conflicts resolved:**
 - `add_action('admin_menu', 'dtb_repair_admin_menu')` commented out — duplicate `dtb-repairs` slug removed, registry renderer wins
-- `dtb_repair_admin_inline_styles()` screen guard narrowed to CPT edit screen only (`dtb_repair_request` post type) — no longer fires on the queue list page
+- `dtb_repair_admin_inline_styles()` is now a deprecated no-op; repair CPT screens enqueue `dtb-admin.css` plus `dtb-repair-admin-modern.css`
+- Repair CPT edit screens receive the `dtb-repair-admin-screen` body class so Modernize-derived wp-admin chrome, hero, tabs, metabox cards, buttons, forms, and workflow panels are scoped to repair screens only
 
 ---
 
@@ -99,8 +100,8 @@ Each handler: runs the same query as the corresponding page renderer → renders
 
 ### Phase 8 — Module CSS Files + Enqueue Wiring ✅
 
-**Four module CSS stubs created** (empty except doc-comment header with scope rules):
-- `dtb-repair-service/Admin/assets/dtb-repairs-page.css`
+**Four module CSS files wired**:
+- `dtb-repair-service/Admin/assets/dtb-repairs-page.css` — repairs queue layout geometry for KPI grid, toolbar, live region, and responsive table width
 - `dtb-support/Admin/assets/dtb-support-page.css`
 - `dtb-returns/Admin/assets/dtb-returns-page.css`
 - `dtb-commerce/Admin/assets/dtb-orders-page.css`
@@ -122,9 +123,9 @@ Each handler: runs the same query as the corresponding page renderer → renders
 
 Legacy submenu registrations in migrated Tool Library modules were removed so registry-owned menus remain authoritative.
 
-### 2. Module CSS — stubs only, no content yet ✅
+### 2. Module CSS ✅
 
-The four module CSS files remain intentionally header-only stubs by design. They are wired and ready; page-specific geometry will be added only when those detailed layouts are built.
+The module CSS files are wired. Repairs now contains page-specific layout geometry for the queue; remaining module files stay header-only until their detail layouts require page-specific geometry. Component styling remains in shared DTB assets.
 
 ### 3. Legacy Inline UI Hardening (Priority 4 Pages) ✅
 
@@ -139,6 +140,14 @@ Shared styling was consolidated into:
 
 - `dtb-platform/Admin/assets/dtb-tool-library-modern.css`
 - `dtb-support/Admin/assets/dtb-support.css`
+
+### 4. Repairs Modernize Alignment ✅
+
+- `dtb-platform/Admin/assets/dtb-admin.css` now exposes shared Modernize-derived tokens to DTB page bodies and repair CPT edit bodies.
+- `dtb-repair-service/Admin/RepairsPage.php` renders Modernize-style KPI cards, richer queue rows, progress indicators, and shared toolbar/table primitives.
+- `dtb-repair-service/Rest/RepairAdminQueueController.php` reuses the same repairs queue renderer so live refresh does not fall back to sparse legacy markup.
+- `dtb-repair-service/Admin/RepairAdminMenu.php` no longer emits the former large inline stylesheet.
+- `dtb-repair-service/Admin/assets/dtb-repair-admin-modern.css` owns scoped repair CPT edit styling for the hero, workspace tabs, metabox cards, workflow controls, chat, quote builder, and native wp-admin chrome.
 
 Design-source mapping notes are documented in:
 

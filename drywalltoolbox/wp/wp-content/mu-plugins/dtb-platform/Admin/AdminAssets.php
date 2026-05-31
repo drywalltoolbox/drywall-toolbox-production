@@ -14,6 +14,7 @@
 defined( 'ABSPATH' ) || exit;
 
 add_action( 'admin_enqueue_scripts', 'dtb_admin_assets_enqueue' );
+add_filter( 'admin_body_class', 'dtb_admin_assets_body_class' );
 
 function dtb_admin_assets_enqueue(): void {
 	$page_meta = dtb_current_page_meta();
@@ -227,6 +228,27 @@ function dtb_admin_assets_enqueue(): void {
 			'featureFlags'    => dtb_admin_assets_feature_flags(),
 		]
 	);
+}
+
+/**
+ * Add a stable body class while rendering DTB admin pages.
+ *
+ * This lets the shared stylesheet modernize the surrounding wp-admin chrome
+ * without leaking those overrides into unrelated WordPress screens.
+ *
+ * @param string $classes Existing admin body class string.
+ * @return string
+ */
+function dtb_admin_assets_body_class( string $classes ): string {
+	$page_meta = dtb_current_page_meta();
+	$page_slug = sanitize_key( (string) ( $_GET['page'] ?? '' ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+	$is_dtb_slug = '' !== $page_slug && str_starts_with( $page_slug, 'dtb-' );
+
+	if ( $page_meta || $is_dtb_slug ) {
+		$classes .= ' dtb-admin-screen';
+	}
+
+	return $classes;
 }
 
 /**

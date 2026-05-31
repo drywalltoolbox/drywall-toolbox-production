@@ -1,8 +1,6 @@
 /**
  * DTB Repair Service — Repairs page module styles
  *
- * Stub only. Do not add component styles here until detail layouts are built.
- *
  * Allowed scope:
  * - Repairs-page layout geometry only.
  * - Existing var(--dtb-*) custom properties only.
@@ -13,3 +11,42 @@
  *
  * @package drywall-toolbox
  */
+
+.dtb-admin[data-dtb-page="dtb-repairs"] .dtb-grid--kpi {
+	grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
+.dtb-admin[data-dtb-page="dtb-repairs"] .dtb-toolbar .dtb-search-wrap {
+	flex: 0 1 min(100%, 28rem);
+	max-width: 28rem;
+}
+
+.dtb-admin[data-dtb-page="dtb-repairs"] .dtb-live-region {
+	display: grid;
+	gap: var(--dtb-radius-md);
+}
+
+.dtb-admin[data-dtb-page="dtb-repairs"] .dtb-table {
+	min-width: 58rem;
+}
+
+.dtb-admin[data-dtb-page="dtb-repairs"] .dtb-progress-pill {
+	margin-top: calc(var(--dtb-radius-sm) / 2);
+}
+
+@media (max-width: 1320px) {
+	.dtb-admin[data-dtb-page="dtb-repairs"] .dtb-grid--kpi {
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+	}
+}
+
+@media (max-width: 782px) {
+	.dtb-admin[data-dtb-page="dtb-repairs"] .dtb-grid--kpi {
+		grid-template-columns: 1fr;
+	}
+
+	.dtb-admin[data-dtb-page="dtb-repairs"] .dtb-toolbar .dtb-search-wrap {
+		flex-basis: 100%;
+		max-width: none;
+	}
+}

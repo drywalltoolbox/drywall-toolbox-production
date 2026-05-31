@@ -292,11 +292,11 @@ class DTB_Repair_List_Table extends WP_List_Table {
 	protected function column_wc_order( $item ): string {
 		$order_id = (int) get_post_meta( $item->ID, '_repair_wc_order_id', true );
 		if ( ! $order_id ) {
-			return '<span style="color:#d1d5db;">—</span>';
+			return '<span class="dtb-empty-dash">—</span>';
 		}
 		$order_url = admin_url( 'post.php?post=' . $order_id . '&action=edit' );
 		return sprintf(
-			'<a href="%s" style="font-weight:600;">#%d</a>',
+			'<a href="%s" class="dtb-strong-link">#%d</a>',
 			esc_url( $order_url ),
 			$order_id
 		);
@@ -354,7 +354,7 @@ class DTB_Repair_List_Table extends WP_List_Table {
 
 		$age_label = $days === 0 ? 'Today' : ( $days === 1 ? '1 day ago' : $days . 'd ago' );
 
-		return '<span style="font-size:12px;font-weight:500;">' . esc_html( $date ) . '</span>'
+		return '<span class="dtb-date-primary">' . esc_html( $date ) . '</span>'
 			. '<span class="dtb-cell-sub">' . esc_html( $time ) . '</span>'
 			. '<span class="dtb-cell-sub ' . esc_attr( $age_cls ) . '">' . esc_html( $age_label ) . '</span>';
 	}

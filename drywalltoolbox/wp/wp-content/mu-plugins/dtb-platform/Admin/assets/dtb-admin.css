@@ -39,23 +39,25 @@
    1. DESIGN TOKENS
    ============================================================================= */
 
-.dtb-admin {
+.dtb-admin,
+body.dtb-admin-screen,
+body.dtb-repair-admin-screen {
   /* Core surfaces */
-  --dtb-bg:            #f5f7fb;
+  --dtb-bg:            #f6f9fc;
   --dtb-surface:       #ffffff;
-  --dtb-surface-soft:  #f8fafc;
-  --dtb-border:        #dbe3ec;
-  --dtb-border-soft:   #edf1f6;
+  --dtb-surface-soft:  #f8fbff;
+  --dtb-border:        #dfe7f3;
+  --dtb-border-soft:   #ebf1f6;
 
   /* Text */
-  --dtb-text:   #172033;
-  --dtb-muted:  #64748b;
-  --dtb-soft:   #94a3b8;
+  --dtb-text:   #2a3547;
+  --dtb-muted:  #5a6a85;
+  --dtb-soft:   #9aa9bc;
 
   /* Brand */
-  --dtb-primary:       #1d4ed8;
-  --dtb-primary-hover: #1e40af;
-  --dtb-primary-soft:  #eff6ff;
+  --dtb-primary:       #5d87ff;
+  --dtb-primary-hover: #4570ea;
+  --dtb-primary-soft:  #ecf2ff;
 
   /* Trade/construction accent */
   --dtb-accent:       #f59e0b;
@@ -72,22 +74,22 @@
   --dtb-danger:       #dc2626;
   --dtb-danger-soft:  #fef2f2;
 
-  --dtb-info:         #0369a1;
-  --dtb-info-soft:    #f0f9ff;
+  --dtb-info:         #49beff;
+  --dtb-info-soft:    #e8f7ff;
 
   --dtb-neutral:      #475569;
   --dtb-neutral-soft: #f1f5f9;
 
   /* Shape */
   --dtb-radius-sm: 6px;
-  --dtb-radius-md: 10px;
-  --dtb-radius-lg: 14px;
-  --dtb-radius-xl: 18px;
+  --dtb-radius-md: 12px;
+  --dtb-radius-lg: 16px;
+  --dtb-radius-xl: 22px;
 
   /* Shadows */
-  --dtb-shadow-sm: 0 1px 2px rgba(15, 23, 42, .06);
-  --dtb-shadow-md: 0 8px 24px rgba(15, 23, 42, .10);
-  --dtb-shadow-lg: 0 18px 48px rgba(15, 23, 42, .16);
+  --dtb-shadow-sm: 0 1px 2px rgba(42, 53, 71, .04), 0 8px 24px rgba(42, 53, 71, .05);
+  --dtb-shadow-md: 0 12px 28px rgba(42, 53, 71, .10);
+  --dtb-shadow-lg: 0 24px 60px rgba(42, 53, 71, .16);
 
   /* Motion */
   --dtb-motion-fast: 120ms;
@@ -147,7 +149,7 @@
 }
 
 .dtb-admin {
-  font-family: 'Inter', 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   font-size: 14px;
   line-height: 1.55;
   color: var(--dtb-text);
@@ -179,12 +181,12 @@
 
 /* WordPress .wrap override within dtb pages */
 .wrap.dtb-admin-page {
-  margin-right: 20px;
+  margin: 0 20px 0 20px;
 }
 
 .dtb-admin {
   min-height: 80vh;
-  padding: 0;
+  padding: 24px 0 40px;
   animation: dtbFadeIn var(--dtb-motion-base) var(--dtb-ease-standard);
 }
 
@@ -201,9 +203,14 @@
   align-items: flex-start;
   justify-content: space-between;
   gap: 16px;
-  padding: 20px 0 16px;
-  border-bottom: 1px solid var(--dtb-border);
-  margin-bottom: 24px;
+  padding: 22px 24px;
+  border: 1px solid var(--dtb-border-soft);
+  border-radius: var(--dtb-radius-xl);
+  margin-bottom: 18px;
+  background:
+    radial-gradient(circle at top right, rgba(93, 135, 255, .14), transparent 34%),
+    var(--dtb-surface);
+  box-shadow: var(--dtb-shadow-sm);
   animation: dtbSlideUp var(--dtb-motion-base) var(--dtb-ease-standard);
 }
 
@@ -211,7 +218,7 @@
 .dtb-page-header__right { flex: 0 0 auto; display: flex; align-items: center; gap: 8px; }
 
 .dtb-page-title {
-  font-size: 22px;
+  font-size: 24px;
   font-weight: 700;
   color: var(--dtb-text);
   margin: 0 0 2px;
@@ -221,10 +228,15 @@
 }
 
 .dtb-page-title .dashicons {
-  font-size: 24px;
-  width: 24px;
-  height: 24px;
+  font-size: 22px;
+  width: 42px;
+  height: 42px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   color: var(--dtb-primary);
+  background: var(--dtb-primary-soft);
+  border-radius: 14px;
 }
 
 .dtb-page-subtitle {
@@ -247,9 +259,13 @@
 .dtb-section-nav {
   display: flex;
   align-items: center;
-  gap: 0;
-  border-bottom: 2px solid var(--dtb-border);
-  margin-bottom: 24px;
+  gap: 8px;
+  border: 1px solid var(--dtb-border-soft);
+  border-radius: var(--dtb-radius-xl);
+  margin-bottom: 18px;
+  padding: 10px;
+  background: var(--dtb-surface);
+  box-shadow: var(--dtb-shadow-sm);
   overflow-x: auto;
   scrollbar-width: none;
 }
@@ -259,30 +275,32 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 10px 16px;
+  padding: 9px 14px;
   font-size: 13px;
   font-weight: 500;
   color: var(--dtb-muted);
   cursor: pointer;
-  border-bottom: 2px solid transparent;
-  margin-bottom: -2px;
+  border: 1px solid transparent;
+  border-radius: 12px;
+  margin-bottom: 0;
   white-space: nowrap;
   transition: color var(--dtb-motion-fast) var(--dtb-ease-standard),
               border-color var(--dtb-motion-fast) var(--dtb-ease-standard);
-  background: none;
-  border-top: 0;
-  border-left: 0;
-  border-right: 0;
+  background: transparent;
   text-decoration: none;
 }
 .dtb-section-nav__tab:hover {
   color: var(--dtb-primary);
+  background: var(--dtb-primary-soft);
+  border-color: rgba(93, 135, 255, .18);
   text-decoration: none;
 }
 .dtb-section-nav__tab--active {
-  color: var(--dtb-primary);
-  border-bottom-color: var(--dtb-primary);
+  color: #fff;
+  background: var(--dtb-primary);
+  border-color: var(--dtb-primary);
   font-weight: 600;
+  box-shadow: 0 8px 18px rgba(93, 135, 255, .28);
 }
 
 /* =============================================================================
@@ -292,7 +310,7 @@
 .dtb-card {
   background: var(--dtb-surface);
   border: 1px solid var(--dtb-border);
-  border-radius: var(--dtb-radius-lg);
+  border-radius: var(--dtb-radius-xl);
   box-shadow: var(--dtb-shadow-sm);
   overflow: hidden;
   transition: box-shadow var(--dtb-motion-base) var(--dtb-ease-standard),
@@ -302,7 +320,7 @@
 
 .dtb-card:hover {
   box-shadow: var(--dtb-shadow-md);
-  border-color: #c4cfe0;
+  border-color: rgba(93, 135, 255, .20);
 }
 
 .dtb-card--flat {
@@ -375,8 +393,8 @@
 .dtb-kpi {
   background: var(--dtb-surface);
   border: 1px solid var(--dtb-border);
-  border-radius: var(--dtb-radius-lg);
-  padding: 20px;
+  border-radius: var(--dtb-radius-xl);
+  padding: 18px;
   display: flex;
   align-items: flex-start;
   gap: 16px;
@@ -394,7 +412,7 @@
   flex-shrink: 0;
   width: 48px;
   height: 48px;
-  border-radius: var(--dtb-radius-md);
+  border-radius: 16px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -477,7 +495,12 @@ a.dtb-kpi:hover { text-decoration: none; }
   display: flex;
   align-items: center;
   gap: 10px;
-  margin-bottom: 16px;
+  margin-bottom: 18px;
+  padding: 14px;
+  background: var(--dtb-surface);
+  border: 1px solid var(--dtb-border-soft);
+  border-radius: var(--dtb-radius-xl);
+  box-shadow: var(--dtb-shadow-sm);
   flex-wrap: wrap;
 }
 
@@ -537,7 +560,7 @@ a.dtb-kpi:hover { text-decoration: none; }
 .dtb-table-wrap {
   background: var(--dtb-surface);
   border: 1px solid var(--dtb-border);
-  border-radius: var(--dtb-radius-lg);
+  border-radius: var(--dtb-radius-xl);
   overflow: hidden;
   box-shadow: var(--dtb-shadow-sm);
 }
@@ -549,14 +572,14 @@ a.dtb-kpi:hover { text-decoration: none; }
 }
 
 .dtb-table__head th {
-  padding: 11px 16px;
+  padding: 14px 16px;
   text-align: left;
   font-size: 11px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: .6px;
   color: var(--dtb-muted);
-  background: var(--dtb-surface-soft);
+  background: #fff;
   border-bottom: 1px solid var(--dtb-border);
   white-space: nowrap;
 }
@@ -631,6 +654,94 @@ a.dtb-kpi:hover { text-decoration: none; }
 }
 .dtb-table__head .sortable:hover { color: var(--dtb-primary); }
 
+.dtb-object-cell {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.dtb-object-avatar {
+  width: 40px;
+  height: 40px;
+  flex: 0 0 40px;
+  border-radius: 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--dtb-primary-soft);
+  color: var(--dtb-primary);
+  font-weight: 700;
+  letter-spacing: -.02em;
+}
+
+.dtb-object-avatar--primary { background: var(--dtb-primary-soft); color: var(--dtb-primary); }
+.dtb-object-avatar--success { background: var(--dtb-success-soft); color: var(--dtb-success); }
+.dtb-object-avatar--warning { background: var(--dtb-warning-soft); color: var(--dtb-warning); }
+.dtb-object-avatar--info    { background: var(--dtb-info-soft); color: var(--dtb-info); }
+.dtb-object-avatar--accent  { background: var(--dtb-accent-soft); color: var(--dtb-accent-hover); }
+
+.dtb-object-title {
+  margin: 0;
+  color: var(--dtb-text);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.dtb-object-title a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.dtb-object-title a:hover {
+  color: var(--dtb-primary);
+  text-decoration: none;
+}
+
+.dtb-object-meta {
+  margin-top: 3px;
+  color: var(--dtb-muted);
+  font-size: 12px;
+}
+
+.dtb-progress-pill {
+  width: min(160px, 100%);
+}
+
+.dtb-progress-pill__track {
+  width: 100%;
+  height: 8px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--dtb-primary-soft);
+}
+
+.dtb-progress-pill__bar {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--dtb-primary);
+  box-shadow: 0 0 0 1px rgba(255,255,255,.35) inset;
+}
+
+.dtb-progress-pill__bar--15  { width: 15%; }
+.dtb-progress-pill__bar--25  { width: 25%; }
+.dtb-progress-pill__bar--40  { width: 40%; }
+.dtb-progress-pill__bar--50  { width: 50%; }
+.dtb-progress-pill__bar--60  { width: 60%; }
+.dtb-progress-pill__bar--70  { width: 70%; }
+.dtb-progress-pill__bar--80  { width: 80%; }
+.dtb-progress-pill__bar--92  { width: 92%; }
+.dtb-progress-pill__bar--100 { width: 100%; }
+
+.dtb-progress-pill__label {
+  display: block;
+  margin-top: 6px;
+  color: var(--dtb-muted);
+  font-size: 11px;
+  font-weight: 600;
+}
+
 /* =============================================================================
    12. BUTTONS
    ============================================================================= */
@@ -644,7 +755,7 @@ a.dtb-kpi:hover { text-decoration: none; }
   font-size: 13px;
   font-weight: 500;
   line-height: 1.4;
-  border-radius: var(--dtb-radius-sm);
+  border-radius: 10px;
   border: 1px solid transparent;
   cursor: pointer;
   white-space: nowrap;
@@ -678,12 +789,12 @@ a.dtb-kpi:hover { text-decoration: none; }
   background: var(--dtb-primary);
   color: #fff;
   border-color: var(--dtb-primary);
-  box-shadow: 0 1px 3px rgba(29, 78, 216, .25);
+  box-shadow: 0 8px 18px rgba(93, 135, 255, .25);
 }
 .dtb-btn--primary:hover {
   background: var(--dtb-primary-hover);
   border-color: var(--dtb-primary-hover);
-  box-shadow: 0 4px 12px rgba(29, 78, 216, .30);
+  box-shadow: 0 10px 22px rgba(93, 135, 255, .30);
   color: #fff;
   text-decoration: none;
 }
@@ -692,7 +803,7 @@ a.dtb-kpi:hover { text-decoration: none; }
 .dtb-btn--secondary {
   background: var(--dtb-surface);
   color: var(--dtb-text);
-  border-color: var(--dtb-border);
+  border-color: var(--dtb-border-soft);
 }
 .dtb-btn--secondary:hover {
   background: var(--dtb-surface-soft);
@@ -754,6 +865,12 @@ a.dtb-kpi:hover { text-decoration: none; }
 .dtb-btn--lg {
   padding: 11px 22px;
   font-size: 14px;
+}
+
+.dtb-btn--xs {
+  padding: 4px 9px;
+  font-size: 11px;
+  border-radius: 8px;
 }
 
 /* Icon-only */
@@ -1521,7 +1638,7 @@ a.dtb-kpi:hover { text-decoration: none; }
 
 [data-dtb-dropdown-menu] a:hover,
 [data-dtb-dropdown-menu] button:hover {
-  background: var(--dtb-hover);
+  background: var(--dtb-primary-soft);
   color: var(--dtb-primary);
 }
 
@@ -1582,7 +1699,7 @@ a.dtb-kpi:hover { text-decoration: none; }
 .dtb-timeline-badge--success  { background: var(--dtb-success); }
 .dtb-timeline-badge--warning  { background: var(--dtb-warning); }
 .dtb-timeline-badge--danger   { background: var(--dtb-danger); }
-.dtb-timeline-badge--muted    { background: var(--dtb-text-muted); }
+.dtb-timeline-badge--muted    { background: var(--dtb-muted); }
 .dtb-timeline-badge--info     { background: #0ea5e9; }
 
 .dtb-timeline-body { flex: 1; min-width: 0; }
@@ -1597,13 +1714,13 @@ a.dtb-kpi:hover { text-decoration: none; }
 
 .dtb-timeline-desc {
   font-size: .75rem;
-  color: var(--dtb-text-muted);
+  color: var(--dtb-muted);
   line-height: 1.5;
 }
 
 .dtb-timeline-time {
   font-size: .6875rem;
-  color: var(--dtb-text-muted);
+  color: var(--dtb-muted);
   white-space: nowrap;
   min-width: 72px;
   text-align: right;
@@ -1699,13 +1816,115 @@ a.dtb-kpi:hover { text-decoration: none; }
    (Neutralise WP admin chrome so the DTB surface sits cleanly.)
    ============================================================================= */
 
-/* Match WP admin backgrounds to DTB surface token */
-body.wp-admin,
-#wpwrap,
-#wpcontent,
-#wpbody,
-#wpbody-content {
-  background: #f5f7fb !important;
+/* Match WP admin backgrounds to DTB surface token on DTB-owned screens only. */
+body.dtb-admin-screen,
+body.dtb-admin-screen #wpwrap,
+body.dtb-admin-screen #wpcontent,
+body.dtb-admin-screen #wpbody,
+body.dtb-admin-screen #wpbody-content,
+body.dtb-repair-admin-screen,
+body.dtb-repair-admin-screen #wpwrap,
+body.dtb-repair-admin-screen #wpcontent,
+body.dtb-repair-admin-screen #wpbody,
+body.dtb-repair-admin-screen #wpbody-content {
+  background: var(--dtb-bg) !important;
+}
+
+body.dtb-admin-screen #wpadminbar,
+body.dtb-repair-admin-screen #wpadminbar {
+  background: var(--dtb-surface);
+  border-bottom: 1px solid var(--dtb-border-soft);
+  box-shadow: 0 8px 20px rgba(42, 53, 71, .05);
+}
+
+body.dtb-admin-screen #wpadminbar .ab-item,
+body.dtb-admin-screen #wpadminbar a.ab-item,
+body.dtb-admin-screen #wpadminbar > #wp-toolbar span.ab-label,
+body.dtb-admin-screen #wpadminbar > #wp-toolbar span.noticon,
+body.dtb-repair-admin-screen #wpadminbar .ab-item,
+body.dtb-repair-admin-screen #wpadminbar a.ab-item,
+body.dtb-repair-admin-screen #wpadminbar > #wp-toolbar span.ab-label,
+body.dtb-repair-admin-screen #wpadminbar > #wp-toolbar span.noticon {
+  color: var(--dtb-text);
+}
+
+body.dtb-admin-screen #wpadminbar:not(.mobile) .ab-top-menu > li:hover > .ab-item,
+body.dtb-admin-screen #wpadminbar:not(.mobile) .ab-top-menu > li > .ab-item:focus,
+body.dtb-repair-admin-screen #wpadminbar:not(.mobile) .ab-top-menu > li:hover > .ab-item,
+body.dtb-repair-admin-screen #wpadminbar:not(.mobile) .ab-top-menu > li > .ab-item:focus {
+  background: var(--dtb-primary-soft);
+  color: var(--dtb-primary);
+}
+
+body.dtb-admin-screen #adminmenuback,
+body.dtb-admin-screen #adminmenuwrap,
+body.dtb-repair-admin-screen #adminmenuback,
+body.dtb-repair-admin-screen #adminmenuwrap {
+  background: var(--dtb-surface);
+  border-right: 1px solid var(--dtb-border-soft);
+  box-shadow: 8px 0 24px rgba(42, 53, 71, .05);
+}
+
+body.dtb-admin-screen #adminmenu,
+body.dtb-admin-screen #adminmenu .wp-submenu,
+body.dtb-admin-screen #adminmenu .wp-has-current-submenu .wp-submenu,
+body.dtb-repair-admin-screen #adminmenu,
+body.dtb-repair-admin-screen #adminmenu .wp-submenu,
+body.dtb-repair-admin-screen #adminmenu .wp-has-current-submenu .wp-submenu {
+  background: var(--dtb-surface);
+}
+
+body.dtb-admin-screen #adminmenu a,
+body.dtb-admin-screen #collapse-button,
+body.dtb-repair-admin-screen #adminmenu a,
+body.dtb-repair-admin-screen #collapse-button {
+  color: var(--dtb-text);
+}
+
+body.dtb-admin-screen #adminmenu div.wp-menu-image:before,
+body.dtb-repair-admin-screen #adminmenu div.wp-menu-image:before {
+  color: var(--dtb-muted);
+}
+
+body.dtb-admin-screen #adminmenu li.menu-top:hover,
+body.dtb-admin-screen #adminmenu li.opensub > a.menu-top,
+body.dtb-admin-screen #adminmenu li > a.menu-top:focus,
+body.dtb-repair-admin-screen #adminmenu li.menu-top:hover,
+body.dtb-repair-admin-screen #adminmenu li.opensub > a.menu-top,
+body.dtb-repair-admin-screen #adminmenu li > a.menu-top:focus {
+  background: var(--dtb-primary-soft);
+  color: var(--dtb-primary);
+}
+
+body.dtb-admin-screen #adminmenu li.wp-has-current-submenu a.wp-has-current-submenu,
+body.dtb-admin-screen #adminmenu li.current a.menu-top,
+body.dtb-admin-screen #adminmenu .wp-menu-arrow,
+body.dtb-repair-admin-screen #adminmenu li.wp-has-current-submenu a.wp-has-current-submenu,
+body.dtb-repair-admin-screen #adminmenu li.current a.menu-top,
+body.dtb-repair-admin-screen #adminmenu .wp-menu-arrow {
+  background: var(--dtb-primary);
+  color: #fff;
+}
+
+body.dtb-admin-screen #adminmenu li.wp-has-current-submenu div.wp-menu-image:before,
+body.dtb-admin-screen #adminmenu li.current div.wp-menu-image:before,
+body.dtb-repair-admin-screen #adminmenu li.wp-has-current-submenu div.wp-menu-image:before,
+body.dtb-repair-admin-screen #adminmenu li.current div.wp-menu-image:before {
+  color: #fff;
+}
+
+body.dtb-admin-screen #adminmenu .wp-submenu a,
+body.dtb-repair-admin-screen #adminmenu .wp-submenu a {
+  color: var(--dtb-muted);
+}
+
+body.dtb-admin-screen #adminmenu .wp-submenu a:focus,
+body.dtb-admin-screen #adminmenu .wp-submenu a:hover,
+body.dtb-admin-screen #adminmenu .wp-submenu li.current a,
+body.dtb-repair-admin-screen #adminmenu .wp-submenu a:focus,
+body.dtb-repair-admin-screen #adminmenu .wp-submenu a:hover,
+body.dtb-repair-admin-screen #adminmenu .wp-submenu li.current a {
+  color: var(--dtb-primary);
 }
 
 /* Remove WP default .wrap h1 left-border / colour inside DTB pages */
@@ -1764,7 +1983,7 @@ body.wp-admin,
 }
 
 .dtb-pagination__btn:hover {
-  background: var(--dtb-hover);
+  background: var(--dtb-primary-soft);
   border-color: var(--dtb-primary);
   color: var(--dtb-primary);
 }
@@ -1782,13 +2001,13 @@ body.wp-admin,
   justify-content: center;
   min-width: 32px;
   height: 32px;
-  color: var(--dtb-text-muted);
+  color: var(--dtb-muted);
   font-size: .8125rem;
 }
 
 .dtb-pagination__info {
   font-size: .75rem;
-  color: var(--dtb-text-muted);
+  color: var(--dtb-muted);
   margin-left: auto;
 }
 
@@ -1821,7 +2040,7 @@ body.wp-admin,
 
 .dtb-stat-card__label {
   font-size: .6875rem;
-  color: var(--dtb-text-muted);
+  color: var(--dtb-muted);
   font-weight: 500;
   text-transform: uppercase;
   letter-spacing: .04em;
@@ -1845,7 +2064,7 @@ body.wp-admin,
 .dtb-search-icon {
   position: absolute;
   left: 10px;
-  color: var(--dtb-text-muted);
+  color: var(--dtb-muted);
   font-size: 1rem;
   pointer-events: none;
   top: 50%;
@@ -1868,7 +2087,7 @@ body.wp-admin,
   border: 1px solid var(--dtb-border-soft);
   border-radius: 50px;
   background: var(--dtb-surface);
-  color: var(--dtb-text-muted);
+  color: var(--dtb-muted);
   font-size: .8125rem;
   font-weight: 500;
   cursor: pointer;
@@ -1876,7 +2095,7 @@ body.wp-admin,
 }
 
 .dtb-filter-chip:hover {
-  background: var(--dtb-hover);
+  background: var(--dtb-primary-soft);
   color: var(--dtb-primary);
   border-color: var(--dtb-primary);
 }
@@ -1886,4 +2105,3 @@ body.wp-admin,
   border-color: var(--dtb-primary);
   color: #fff;
 }
-

@@ -33,6 +33,9 @@ function dtb_repairs_admin_queue_handler( WP_REST_Request $request ): WP_REST_Re
 	if ( '' === $status && '' !== $tab ) {
 		$status = $tab;
 	}
+	$status = function_exists( 'dtb_repairs_normalize_status_filter' )
+		? dtb_repairs_normalize_status_filter( $status )
+		: $status;
 	$search = sanitize_text_field( $request->get_param( 's' ) ?? '' );
 	if ( '' === $search ) {
 		$search = sanitize_text_field( $request->get_param( 'search' ) ?? '' );
@@ -40,77 +43,26 @@ function dtb_repairs_admin_queue_handler( WP_REST_Request $request ): WP_REST_Re
 	$paged  = max( 1, (int) ( $request->get_param( 'paged' ) ?: 1 ) );
 	$per    = (int) get_option( 'dtb_admin_items_per_page', 25 );
 
-	$status_aliases = [
-		'awaiting-review' => 'awaiting_review',
-		'awaiting-quote'  => 'awaiting_quote_approval',
-		'in-progress'     => 'in_repair',
-		'ready-to-ship'   => 'ready_to_ship',
-	];
-	if ( isset( $status_aliases[ $status ] ) ) {
-		$status = $status_aliases[ $status ];
-	}
-
-	$meta_query = [];
-	if ( $status ) {
-		$meta_query = function_exists( 'dtb_repairs_build_status_meta_query' )
-			? dtb_repairs_build_status_meta_query( $status )
-			: [ [ 'key' => '_repair_status', 'value' => $status ] ];
-	}
-	$query = new WP_Query( [
-		'post_type'      => 'dtb_repair_request',
-		'post_status'    => 'publish',
-		'posts_per_page' => $per,
-		'paged'          => $paged,
-		's'              => $search,
-		'meta_query'     => $meta_query, // phpcs:ignore WordPress.DB.SlowDBQuery
-	] );
+	$query = function_exists( 'dtb_repairs_query' )
+		? dtb_repairs_query( $status, $search, $paged, $per )
+		: new WP_Query( [
+			'post_type'      => 'dtb_repair_request',
+			'post_status'    => 'publish',
+			'posts_per_page' => $per,
+			'paged'          => $paged,
+			's'              => $search,
+		] );
 	$total_pages = $query->max_num_pages ?: 1;
 
 	ob_start();
 
-	if ( ! $query->have_posts() ) {
+	if ( function_exists( 'dtb_repairs_render_queue_workspace' ) ) {
+		dtb_repairs_render_queue_workspace( $query, $paged, $total_pages );
+	} else {
 		echo dtb_admin_ui_empty_state( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 			__( 'No repairs found', 'drywall-toolbox' ),
 			__( 'Try adjusting your filters.', 'drywall-toolbox' )
 		);
-	} else {
-		echo dtb_admin_ui_update_badge( 'dtb-repairs-workspace' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-		echo dtb_admin_ui_table_open( [ // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-			[ 'label' => __( 'ID',       'drywall-toolbox' ), 'key' => 'id' ],
-			[ 'label' => __( 'Customer', 'drywall-toolbox' ), 'key' => 'customer' ],
-			[ 'label' => __( 'Device',   'drywall-toolbox' ), 'key' => 'device' ],
-			[ 'label' => __( 'Status',   'drywall-toolbox' ), 'key' => 'status' ],
-			[ 'label' => __( 'Created',  'drywall-toolbox' ), 'key' => 'created' ],
-			[ 'label' => '',                                   'key' => 'actions' ],
-		], [] );
-
-		while ( $query->have_posts() ) {
-			$query->the_post();
-			$id       = get_the_ID();
-			$st       = get_post_meta( $id, '_repair_status', true ) ?: 'submitted';
-			$customer = get_post_meta( $id, '_repair_customer_name', true ) ?: '—';
-			$brand    = (string) get_post_meta( $id, '_repair_tool_brand', true );
-			$model    = (string) get_post_meta( $id, '_repair_model', true );
-			$device   = trim( $brand . ' ' . $model );
-			if ( '' === $device ) {
-				$device = get_the_title();
-			}
-
-			echo '<tr>';
-			echo '<td><a href="' . esc_url( get_edit_post_link( $id ) ) . '">#' . esc_html( $id ) . '</a></td>';
-			echo '<td>' . esc_html( $customer ) . '</td>';
-			echo '<td>' . esc_html( $device ) . '</td>';
-			echo '<td>' . dtb_admin_ui_badge( esc_html( $st ), dtb_admin_ui_status_badge_type( $st ) ) . '</td>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-			echo '<td>' . esc_html( get_the_date() ) . '</td>';
-			echo '<td>';
-			echo dtb_admin_ui_button( __( 'View', 'drywall-toolbox' ), [ 'href' => get_edit_post_link( $id ), 'size' => 'xs', 'type' => 'ghost' ] ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-			echo '</td>';
-			echo '</tr>';
-		}
-		wp_reset_postdata();
-
-		echo dtb_admin_ui_table_close(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-		echo dtb_admin_ui_pagination( $paged, $total_pages ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 	}
 
 	$html = ob_get_clean();
