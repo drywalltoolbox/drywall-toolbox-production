@@ -74,8 +74,14 @@ function dtb_repair_quote_normalize_lines( mixed $raw_lines ): array {
 			continue;
 		}
 
-		$label = sanitize_text_field( (string) ( $line['label'] ?? '' ) );
-		$description = sanitize_textarea_field( (string) ( $line['description'] ?? '' ) );
+		$label_raw = sanitize_text_field( (string) ( $line['label'] ?? '' ) );
+		$desc_raw  = sanitize_textarea_field( (string) ( $line['description'] ?? '' ) );
+		$label = function_exists( 'dtb_str_normalize_display' )
+			? dtb_str_normalize_display( $label_raw )
+			: $label_raw;
+		$description = function_exists( 'dtb_str_normalize_display' )
+			? dtb_str_normalize_display( $desc_raw, true )
+			: $desc_raw;
 		$type = sanitize_key( (string) ( $line['type'] ?? 'service' ) );
 		if ( ! in_array( $type, [ 'service', 'labor', 'part', 'shipping', 'misc' ], true ) ) {
 			$type = 'service';
@@ -283,6 +289,18 @@ function dtb_repair_get_quote( int $repair_id ): array {
 }
 
 /**
+ * Compare two normalized quote payloads, ignoring volatile metadata keys.
+ *
+ * @param array<string,mixed> $left
+ * @param array<string,mixed> $right
+ * @return bool
+ */
+function dtb_repair_quote_payload_equals( array $left, array $right ): bool {
+	unset( $left['updated_at'], $right['updated_at'] );
+	return wp_json_encode( $left ) === wp_json_encode( $right );
+}
+
+/**
  * Save quote payload for a repair and return the normalized payload.
  *
  * @param int                 $repair_id Repair post ID.
@@ -298,6 +316,11 @@ function dtb_repair_save_quote( int $repair_id, array $input, array $context = [
 		$quote['sent_at'] = gmdate( 'Y-m-d\TH:i:s\Z' );
 	}
 
+	$payload_changed = ! dtb_repair_quote_payload_equals( $existing, $quote );
+	if ( ! $payload_changed ) {
+		return $existing;
+	}
+
 	update_post_meta( $repair_id, '_repair_quote_payload', wp_json_encode( $quote ) );
 	update_post_meta( $repair_id, '_repair_quote_status', sanitize_text_field( (string) $quote['status'] ) );
 	update_post_meta( $repair_id, '_repair_quote_currency', sanitize_text_field( (string) $quote['currency'] ) );
@@ -305,7 +328,7 @@ function dtb_repair_save_quote( int $repair_id, array $input, array $context = [
 	update_post_meta( $repair_id, '_repair_quote_sent_at', sanitize_text_field( (string) $quote['sent_at'] ) );
 	update_post_meta( $repair_id, '_repair_quote_updated_at', sanitize_text_field( (string) $quote['updated_at'] ) );
 
-	if ( function_exists( 'dtb_repair_append_event' ) ) {
+	if ( empty( $context['suppress_event'] ) && function_exists( 'dtb_repair_append_event' ) ) {
 		dtb_repair_append_event(
 			$repair_id,
 			'repair.quote_updated',
@@ -342,4 +365,3 @@ function dtb_repair_quote_to_notification_context( array $quote ): array {
 		'quote_customer_note' => $quote['customer_note'] ?? '',
 	];
 }
-

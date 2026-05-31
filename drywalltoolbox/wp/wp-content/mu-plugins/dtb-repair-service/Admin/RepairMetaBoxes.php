@@ -296,6 +296,9 @@ function dtb_repair_get_customer_message_thread( int $repair_id, int $limit = 12
 			? json_decode( (string) $event->payload_json, true )
 			: [];
 		$message = trim( wp_strip_all_tags( (string) ( $payload['note'] ?? '' ) ) );
+		$message = function_exists( 'dtb_str_normalize_display' )
+			? dtb_str_normalize_display( $message, true )
+			: $message;
 		if ( '' === $message ) {
 			continue;
 		}
@@ -349,6 +352,9 @@ function dtb_repair_render_customer_message_item( object $event, int $last_seen_
 		? json_decode( (string) $event->payload_json, true )
 		: [];
 	$message = trim( wp_strip_all_tags( (string) ( $payload['note'] ?? '' ) ) );
+	$message = function_exists( 'dtb_str_normalize_display' )
+		? dtb_str_normalize_display( $message, true )
+		: $message;
 	if ( '' === $message ) {
 		return '';
 	}
@@ -401,6 +407,9 @@ function dtb_repair_metabox_quote_builder( WP_Post $post ): void {
 	$status_label   = function_exists( 'dtb_repair_quote_status_label' )
 		? dtb_repair_quote_status_label( (string) ( $quote['status'] ?? 'draft' ) )
 		: __( 'Draft', 'drywall-toolbox' );
+	$parts_lookup_nonce = wp_create_nonce( 'dtb_repair_parts_lookup' );
+	$tech_parts = get_post_meta( $post->ID, '_repair_parts_links', true );
+	$tech_parts = is_array( $tech_parts ) ? $tech_parts : [];
 
 	wp_nonce_field( 'dtb_repair_quote_' . $post->ID, 'dtb_repair_quote_nonce' );
 	?>
@@ -438,21 +447,34 @@ function dtb_repair_metabox_quote_builder( WP_Post $post ): void {
 			</label>
 		</div>
 
-		<div class="dtb-quote-table-wrap">
-			<table class="dtb-quote-table">
-				<thead>
-					<tr>
-						<th><?php esc_html_e( 'Item', 'drywall-toolbox' ); ?></th>
-						<th><?php esc_html_e( 'Type', 'drywall-toolbox' ); ?></th>
-						<th><?php esc_html_e( 'Qty', 'drywall-toolbox' ); ?></th>
-						<th><?php esc_html_e( 'Unit', 'drywall-toolbox' ); ?></th>
-						<th><?php esc_html_e( 'Line Total', 'drywall-toolbox' ); ?></th>
-						<th></th>
-					</tr>
-				</thead>
-				<tbody id="dtb-quote-lines"></tbody>
-			</table>
-			<button type="button" id="dtb-quote-add-line" class="button"><?php esc_html_e( 'Add Line Item', 'drywall-toolbox' ); ?></button>
+		<div class="dtb-quote-workspace">
+			<div class="dtb-quote-table-wrap">
+				<table class="dtb-quote-table">
+					<thead>
+						<tr>
+							<th><?php esc_html_e( 'Item', 'drywall-toolbox' ); ?></th>
+							<th><?php esc_html_e( 'Type', 'drywall-toolbox' ); ?></th>
+							<th><?php esc_html_e( 'Qty', 'drywall-toolbox' ); ?></th>
+							<th><?php esc_html_e( 'Unit', 'drywall-toolbox' ); ?></th>
+							<th><?php esc_html_e( 'Line Total', 'drywall-toolbox' ); ?></th>
+							<th></th>
+						</tr>
+					</thead>
+					<tbody id="dtb-quote-lines"></tbody>
+				</table>
+				<button type="button" id="dtb-quote-add-line" class="button"><?php esc_html_e( 'Add Line Item', 'drywall-toolbox' ); ?></button>
+			</div>
+			<aside class="dtb-quote-parts-panel">
+				<div class="dtb-quote-parts-panel__title"><?php esc_html_e( 'Parts Lookup', 'drywall-toolbox' ); ?></div>
+				<p class="dtb-quote-parts-panel__help"><?php esc_html_e( 'Search your parts catalog and add items directly into quote lines.', 'drywall-toolbox' ); ?></p>
+				<label class="dtb-quote-parts-label" for="dtb-quote-parts-lookup"><?php esc_html_e( 'Search Parts', 'drywall-toolbox' ); ?></label>
+				<input id="dtb-quote-parts-lookup" type="text" class="dtb-tech-input" value="" placeholder="<?php esc_attr_e( 'Search by SKU, title, or brand...', 'drywall-toolbox' ); ?>" autocomplete="off" data-lookup-nonce="<?php echo esc_attr( $parts_lookup_nonce ); ?>" />
+				<div id="dtb-quote-parts-menu" class="dtb-tech-lookup-menu dtb-quote-parts-menu" role="listbox" aria-label="<?php esc_attr_e( 'Quote parts lookup results', 'drywall-toolbox' ); ?>" hidden></div>
+				<div class="dtb-quote-parts-selected-head"><?php esc_html_e( 'Technician Selected Parts', 'drywall-toolbox' ); ?></div>
+				<div id="dtb-quote-parts-selected" class="dtb-quote-parts-selected"></div>
+				<div class="dtb-quote-parts-selected-head"><?php esc_html_e( 'Recently Used Parts', 'drywall-toolbox' ); ?></div>
+				<div id="dtb-quote-parts-recent" class="dtb-quote-parts-selected"></div>
+			</aside>
 		</div>
 
 		<div class="dtb-quote-notes-grid">
@@ -485,11 +507,25 @@ function dtb_repair_metabox_quote_builder( WP_Post $post ): void {
 		var repairId = Number($root.data('repair-id') || 0);
 		var nonce = $('input[name="dtb_repair_quote_nonce"]').val();
 		var quote = <?php echo wp_json_encode( $quote ); ?> || {};
+		var technicianParts = <?php echo wp_json_encode( $tech_parts ); ?> || [];
 		var lines = Array.isArray(quote.lines) ? quote.lines.slice() : [];
 
 		var $msg = $('#dtb-quote-msg');
 		var $lineTbody = $('#dtb-quote-lines');
 		var $totals = $('#dtb-quote-totals');
+		var $partsLookupInput = $('#dtb-quote-parts-lookup');
+		var $partsLookupMenu = $('#dtb-quote-parts-menu');
+		var $partsSelected = $('#dtb-quote-parts-selected');
+		var $partsRecent = $('#dtb-quote-parts-recent');
+		var lookupTimer = null;
+		var lookupReq = null;
+		var autosaveTimer = null;
+		var autosaveReq = null;
+		var autosaveInFlight = false;
+		var pendingAutosave = false;
+		var lastSavedHash = '';
+		var RECENT_PARTS_KEY = 'dtbRepairRecentParts.v1';
+		var recentParts = [];
 
 		var esc = function(v){ return $('<div>').text(String(v || '')).html(); };
 		var toNum = function(v){ var n = parseFloat(v); return isNaN(n) ? 0 : n; };
@@ -501,12 +537,127 @@ function dtb_repair_metabox_quote_builder( WP_Post $post ): void {
 			if (cls) $msg.addClass(cls);
 		};
 
+		var uniquePartKey = function(part){
+			if (!part) return '';
+			var id = parseInt(part.part_id || 0, 10) || 0;
+			if (id > 0) return 'id:' + id;
+			var sku = (part.sku || '').toString().trim().toLowerCase();
+			if (sku) return 'sku:' + sku;
+			var name = (part.name || '').toString().trim().toLowerCase();
+			return name ? ('name:' + name) : '';
+		};
+
+		var loadRecentParts = function(){
+			try {
+				var raw = window.localStorage.getItem(RECENT_PARTS_KEY);
+				var parsed = raw ? JSON.parse(raw) : [];
+				return Array.isArray(parsed) ? parsed : [];
+			} catch (e) {
+				return [];
+			}
+		};
+
+		var saveRecentParts = function(){
+			try {
+				window.localStorage.setItem(RECENT_PARTS_KEY, JSON.stringify(recentParts.slice(0, 16)));
+			} catch (e) {}
+		};
+
+		var normalizePart = function(part){
+			if (!part) return null;
+			var qty = Math.max(1, parseInt(part.quantity || 1, 10) || 1);
+			var price = Math.max(0, toNum(part.unit_price || part.price || 0));
+			return {
+				part_id: parseInt(part.part_id || 0, 10) || 0,
+				sku: (part.sku || '').toString(),
+				name: (part.name || '').toString(),
+				brand_label: (part.brand_label || '').toString(),
+				manufacturer_sku: (part.manufacturer_sku || '').toString(),
+				line_note: (part.line_note || '').toString(),
+				quantity: qty,
+				unit_price: price
+			};
+		};
+
+		var rememberRecentPart = function(part){
+			var normalized = normalizePart(part);
+			if (!normalized) return;
+			var key = uniquePartKey(normalized);
+			if (!key) return;
+			recentParts = recentParts.filter(function(item){
+				return uniquePartKey(item) !== key;
+			});
+			recentParts.unshift(normalized);
+			recentParts = recentParts.slice(0, 16);
+			saveRecentParts();
+			renderRecentParts();
+			document.dispatchEvent(new CustomEvent('dtb:parts:recentUpdated', {
+				detail: { parts: recentParts.slice() }
+			}));
+		};
+
+		var mergeTechnicianPart = function(part){
+			var normalized = normalizePart(part);
+			if (!normalized) return;
+			var foundIndex = -1;
+			technicianParts.forEach(function(item, idx){
+				if (foundIndex !== -1) return;
+				var samePartId = normalized.part_id > 0 && parseInt(item.part_id || 0, 10) === normalized.part_id;
+				var sameSku = normalized.sku && String(item.sku || '') === normalized.sku;
+				if (samePartId || sameSku) foundIndex = idx;
+			});
+			if (foundIndex === -1) {
+				technicianParts.push(normalized);
+			} else {
+				technicianParts[foundIndex] = $.extend({}, technicianParts[foundIndex], normalized);
+			}
+		};
+
+		var partSecondaryText = function(part){
+			var chunks = [];
+			if (part.brand_label) chunks.push(part.brand_label);
+			if (part.manufacturer_sku) chunks.push('MFG: ' + part.manufacturer_sku);
+			if (toNum(part.unit_price) > 0) chunks.push(currency() + ' ' + money(part.unit_price));
+			return chunks.join(' · ');
+		};
+
+		var renderPartButton = function(item, className){
+			var title = (item.sku || 'No SKU') + ' — ' + (item.name || 'Part');
+			return '<button type="button" class="' + className + '" data-part-id="' + esc(item.part_id || '') + '" data-sku="' + esc(item.sku || '') + '" data-name="' + esc(item.name || '') + '" data-brand="' + esc(item.brand_label || '') + '" data-manufacturer-sku="' + esc(item.manufacturer_sku || '') + '" data-qty="' + esc(item.quantity || 1) + '" data-unit-price="' + esc(item.unit_price || 0) + '" data-line-note="' + esc(item.line_note || '') + '"><span class="dtb-quote-selected-part__title">' + esc(title) + '</span><span class="dtb-quote-selected-part__sub">' + esc(partSecondaryText(item) || 'Parts library item') + '</span></button>';
+		};
+
+		var renderSelectedParts = function(){
+			if (!$partsSelected.length) return;
+			if (!Array.isArray(technicianParts) || !technicianParts.length) {
+				$partsSelected.html('<div class="dtb-tech-selected-empty">No parts selected yet in technician workspace.</div>');
+				return;
+			}
+			$partsSelected.html(technicianParts.slice(0, 12).map(function(item){
+				return renderPartButton(item, 'dtb-quote-selected-part');
+			}).join(''));
+		};
+
+		var renderRecentParts = function(){
+			if (!$partsRecent.length) return;
+			if (!Array.isArray(recentParts) || !recentParts.length) {
+				$partsRecent.html('<div class="dtb-tech-selected-empty">No recently used parts yet.</div>');
+				return;
+			}
+			$partsRecent.html(recentParts.slice(0, 12).map(function(item){
+				return renderPartButton(item, 'dtb-quote-selected-part dtb-quote-selected-part-recent');
+			}).join(''));
+		};
+
 		var upsertPartLine = function(part){
-			if (!part) return;
-			var keySku = (part.sku || '').toString();
-			var partNote = (part.line_note || '').toString().trim();
+			var normalized = normalizePart(part);
+			if (!normalized) return;
+			var keySku = normalized.sku;
+			var partNote = normalized.line_note.trim();
 			var partDescription = '';
 			if (keySku) partDescription = 'SKU: ' + keySku;
+			if (normalized.manufacturer_sku) {
+				partDescription = partDescription ? (partDescription + ' | MFG: ' + normalized.manufacturer_sku) : ('MFG: ' + normalized.manufacturer_sku);
+			}
 			if (partNote) partDescription = partDescription ? (partDescription + ' | ' + partNote) : partNote;
 			var foundIndex = -1;
 			lines.forEach(function(line, idx){
@@ -517,44 +668,191 @@ function dtb_repair_metabox_quote_builder( WP_Post $post ): void {
 
 			if (foundIndex === -1) {
 				lines.push({
-					label: part.name || part.sku || 'Part',
+					label: normalized.name || normalized.sku || 'Part',
 					description: partDescription,
 					type: 'part',
-					quantity: Math.max(1, parseInt(part.quantity || 1, 10) || 1),
-					unit_price: 0
+					quantity: normalized.quantity,
+					unit_price: normalized.unit_price
 				});
 			} else {
-				var q = Math.max(1, parseInt(part.quantity || 1, 10) || 1);
+				var q = normalized.quantity;
 				lines[foundIndex].quantity = q;
-				if (!lines[foundIndex].label && part.name) lines[foundIndex].label = part.name;
+				if (!lines[foundIndex].label && normalized.name) lines[foundIndex].label = normalized.name;
+				if (toNum(lines[foundIndex].unit_price) <= 0 && normalized.unit_price > 0) {
+					lines[foundIndex].unit_price = normalized.unit_price;
+				}
 				if ((!lines[foundIndex].description || String(lines[foundIndex].description).indexOf('SKU: ' + keySku) !== -1) && partDescription) {
 					lines[foundIndex].description = partDescription;
 				}
 			}
-
+			mergeTechnicianPart(normalized);
+			rememberRecentPart(normalized);
 			render();
+			renderSelectedParts();
+			scheduleAutosave(true);
+		};
+
+		var hidePartsLookupMenu = function(){
+			if (!$partsLookupMenu.length) return;
+			$partsLookupMenu.prop('hidden', true).html('');
+		};
+
+		var renderPartsLookupMenu = function(items){
+			if (!$partsLookupMenu.length) return;
+			if (!items || !items.length) {
+				hidePartsLookupMenu();
+				return;
+			}
+			$partsLookupMenu.html(items.map(function(item){
+				var primary = (item.sku || 'No SKU') + ' — ' + (item.name || 'Part');
+				var chunks = [];
+				if (item.brand_label) chunks.push(item.brand_label);
+				if (item.manufacturer_sku) chunks.push('MFG: ' + item.manufacturer_sku);
+				if (toNum(item.unit_price) > 0) chunks.push(currency() + ' ' + money(item.unit_price));
+				var secondary = chunks.join(' · ');
+				return (
+					'<button type="button" class="dtb-tech-lookup-option dtb-quote-parts-option" ' +
+					'data-part-id="' + esc(item.part_id || 0) + '" ' +
+					'data-sku="' + esc(item.sku || '') + '" ' +
+					'data-name="' + esc(item.name || '') + '" ' +
+					'data-brand="' + esc(item.brand_label || '') + '" ' +
+					'data-manufacturer-sku="' + esc(item.manufacturer_sku || '') + '" ' +
+					'data-unit-price="' + esc(item.unit_price || 0) + '">' +
+						'<span class="dtb-tech-lookup-primary">' + esc(primary) + '</span>' +
+						'<span class="dtb-tech-lookup-secondary">' + esc(secondary || 'Parts library item') + '</span>' +
+					'</button>'
+				);
+			}).join('')).prop('hidden', false);
+		};
+
+		var TYPE_CONFIG = {
+			service: {
+				defaultLabel: 'Service',
+				labelPlaceholder: 'Service name',
+				descPlaceholder: 'Service scope and what is included',
+				qtyLabel: 'Qty',
+				unitLabel: 'Flat Fee',
+				qtyStep: 1,
+				qtyMin: 1,
+				lockQtyToOne: true,
+				presets: [{label: 'Diagnostic Service', qty: 1}, {label: 'Bench Inspection', qty: 1}]
+			},
+			labor: {
+				defaultLabel: 'Labor',
+				labelPlaceholder: 'Labor task',
+				descPlaceholder: 'Labor notes (time breakdown, complexity)',
+				qtyLabel: 'Hours',
+				unitLabel: 'Rate / Hr',
+				qtyStep: 0.25,
+				qtyMin: 0.25,
+				lockQtyToOne: false,
+				presets: [{label: 'Repair Labor', qty: 1}, {label: 'Advanced Diagnostic', qty: 1.5}]
+			},
+			part: {
+				defaultLabel: 'Part',
+				labelPlaceholder: 'Part name or SKU',
+				descPlaceholder: 'Auto-filled SKU, fitment, and install notes',
+				qtyLabel: 'Units',
+				unitLabel: 'Unit Cost',
+				qtyStep: 1,
+				qtyMin: 1,
+				lockQtyToOne: false,
+				presets: []
+			},
+			shipping: {
+				defaultLabel: 'Shipping',
+				labelPlaceholder: 'Shipping method',
+				descPlaceholder: 'Carrier/service notes',
+				qtyLabel: 'Qty',
+				unitLabel: 'Shipping Cost',
+				qtyStep: 1,
+				qtyMin: 1,
+				lockQtyToOne: true,
+				presets: [{label: 'Ground Shipping', qty: 1}, {label: 'Expedited Shipping', qty: 1}]
+			},
+			misc: {
+				defaultLabel: 'Misc',
+				labelPlaceholder: 'Miscellaneous charge',
+				descPlaceholder: 'Reason for this charge',
+				qtyLabel: 'Qty',
+				unitLabel: 'Unit Cost',
+				qtyStep: 1,
+				qtyMin: 1,
+				lockQtyToOne: false,
+				presets: [{label: 'Shop Supplies', qty: 1}, {label: 'Disposal / Handling', qty: 1}]
+			}
+		};
+
+		var typeConfig = function(type){
+			return TYPE_CONFIG[type] || TYPE_CONFIG.service;
 		};
 
 		var rowHtml = function(line, idx){
+			var type = (line.type || 'service').toString();
+			var cfg = typeConfig(type);
 			var qty = Math.max(0.001, toNum(line.quantity || 1));
+			if (cfg.lockQtyToOne) qty = 1;
 			var unit = toNum(line.unit_price || 0);
 			var total = qty * unit;
 			return '' +
-				'<tr data-index="' + idx + '">' +
-					'<td><input type="text" class="dtb-quote-line-label" value="' + esc(line.label || '') + '" placeholder="Item name" />' +
-					'<input type="text" class="dtb-quote-line-desc" value="' + esc(line.description || '') + '" placeholder="Description (optional)" /></td>' +
+				'<tr data-index="' + idx + '" data-type="' + esc(type) + '">' +
+					'<td><input type="text" class="dtb-quote-line-label" value="' + esc(line.label || '') + '" placeholder="' + esc(cfg.labelPlaceholder) + '" />' +
+					'<input type="text" class="dtb-quote-line-desc" value="' + esc(line.description || '') + '" placeholder="' + esc(cfg.descPlaceholder) + '" />' +
+					'<div class="dtb-quote-line-presets"></div></td>' +
 					'<td><select class="dtb-quote-line-type">' +
-						'<option value="service"' + (line.type === 'service' ? ' selected' : '') + '>Service</option>' +
-						'<option value="labor"' + (line.type === 'labor' ? ' selected' : '') + '>Labor</option>' +
-						'<option value="part"' + (line.type === 'part' ? ' selected' : '') + '>Part</option>' +
-						'<option value="shipping"' + (line.type === 'shipping' ? ' selected' : '') + '>Shipping</option>' +
-						'<option value="misc"' + (line.type === 'misc' ? ' selected' : '') + '>Misc</option>' +
+						'<option value="service"' + (type === 'service' ? ' selected' : '') + '>Service</option>' +
+						'<option value="labor"' + (type === 'labor' ? ' selected' : '') + '>Labor</option>' +
+						'<option value="part"' + (type === 'part' ? ' selected' : '') + '>Part</option>' +
+						'<option value="shipping"' + (type === 'shipping' ? ' selected' : '') + '>Shipping</option>' +
+						'<option value="misc"' + (type === 'misc' ? ' selected' : '') + '>Misc</option>' +
 					'</select></td>' +
-					'<td><input type="number" min="0.001" step="0.001" class="dtb-quote-line-qty" value="' + esc(qty) + '" /></td>' +
-					'<td><input type="number" min="0" step="0.01" class="dtb-quote-line-unit" value="' + esc(unit) + '" /></td>' +
+					'<td><span class="dtb-quote-field-caption">' + esc(cfg.qtyLabel) + '</span><input type="number" min="' + esc(cfg.qtyMin) + '" step="' + esc(cfg.qtyStep) + '" class="dtb-quote-line-qty" value="' + esc(qty) + '" /></td>' +
+					'<td><span class="dtb-quote-field-caption">' + esc(cfg.unitLabel) + '</span><input type="number" min="0" step="0.01" class="dtb-quote-line-unit" value="' + esc(unit) + '" /></td>' +
 					'<td><span class="dtb-quote-line-total">' + esc(currency() + ' ' + money(total)) + '</span></td>' +
 					'<td><button type="button" class="button-link-delete dtb-quote-line-remove">Remove</button></td>' +
 				'</tr>';
+		};
+
+		var applyTypePresentation = function($tr){
+			if (!$tr || !$tr.length) return;
+			var type = ($tr.find('.dtb-quote-line-type').val() || 'service').toString();
+			var cfg = typeConfig(type);
+			var $label = $tr.find('.dtb-quote-line-label');
+			var $desc = $tr.find('.dtb-quote-line-desc');
+			var $qty = $tr.find('.dtb-quote-line-qty');
+			var $unit = $tr.find('.dtb-quote-line-unit');
+			var $caps = $tr.find('.dtb-quote-field-caption');
+			var $presetWrap = $tr.find('.dtb-quote-line-presets');
+			var labelVal = ($label.val() || '').toString().trim();
+
+			$tr.attr('data-type', type);
+			$label.attr('placeholder', cfg.labelPlaceholder || 'Item name');
+			$desc.attr('placeholder', cfg.descPlaceholder || 'Description (optional)');
+			$qty.attr('min', cfg.qtyMin || 0.001).attr('step', cfg.qtyStep || 0.001);
+			$qty.prop('readonly', !!cfg.lockQtyToOne);
+			$qty.toggleClass('is-readonly', !!cfg.lockQtyToOne);
+			if (cfg.lockQtyToOne && toNum($qty.val()) !== 1) {
+				$qty.val('1');
+			}
+
+			if ($caps.length >= 2) {
+				$($caps.get(0)).text(cfg.qtyLabel || 'Qty');
+				$($caps.get(1)).text(cfg.unitLabel || 'Unit');
+			}
+
+			if (!labelVal && cfg.defaultLabel) {
+				$label.val(cfg.defaultLabel);
+			}
+
+			if ($presetWrap.length) {
+				if (!Array.isArray(cfg.presets) || !cfg.presets.length) {
+					$presetWrap.html(type === 'part' ? '<span class="dtb-quote-line-hint">Use Parts Lookup or Recently Used Parts to add matched catalog items.</span>' : '');
+				} else {
+					$presetWrap.html(cfg.presets.map(function(preset){
+						return '<button type="button" class="dtb-quote-preset" data-preset-label="' + esc(preset.label || '') + '" data-preset-qty="' + esc(preset.qty || '') + '">' + esc(preset.label || 'Preset') + '</button>';
+					}).join(''));
+				}
+			}
 		};
 
 		var collectLines = function(){
@@ -567,6 +865,8 @@ function dtb_repair_metabox_quote_builder( WP_Post $post ): void {
 				var qty = toNum($tr.find('.dtb-quote-line-qty').val() || 1);
 				var unit = toNum($tr.find('.dtb-quote-line-unit').val() || 0);
 				if (!label && !desc && unit <= 0) return;
+				var cfg = typeConfig(type);
+				if (cfg.lockQtyToOne) qty = 1;
 				rows.push({
 					label: label,
 					description: desc,
@@ -619,6 +919,9 @@ function dtb_repair_metabox_quote_builder( WP_Post $post ): void {
 				lines = [{ label: '', description: '', type: 'service', quantity: 1, unit_price: 0 }];
 			}
 			$lineTbody.html(lines.map(rowHtml).join(''));
+			$lineTbody.find('tr').each(function(){
+				applyTypePresentation($(this));
+			});
 			renderTotals(calcTotals(lines));
 		};
 
@@ -638,82 +941,259 @@ function dtb_repair_metabox_quote_builder( WP_Post $post ): void {
 			};
 		};
 
-		var runAction = function(action, status){
-			var payload = collectPayload(status);
-			setMsg('Saving…', '');
-			$root.find('button').each(function(){
-				var $btn = $(this);
-				if ($btn.prop('disabled')) $btn.attr('data-was-disabled', '1');
-				$btn.prop('disabled', true);
-			});
+		var toLocalDateTime = function(zDateString){
+			if (!zDateString) return '';
+			var dt = new Date(zDateString);
+			if (isNaN(dt.getTime())) return '';
+			var offset = dt.getTimezoneOffset() * 60000;
+			var local = new Date(dt.getTime() - offset);
+			return local.toISOString().slice(0, 16);
+		};
 
-			$.post(ajaxurl, {
+		var payloadHash = function(payload){
+			var clone = $.extend(true, {}, payload || {});
+			clone.status = 'draft';
+			return JSON.stringify(clone);
+		};
+
+		var applyServerQuote = function(serverQuote){
+			if (!serverQuote || !Array.isArray(serverQuote.lines)) return;
+			quote = serverQuote;
+			lines = quote.lines.slice();
+			if (quote.totals) {
+				$('#dtb-quote-discount-percent').val(quote.totals.discount_percent || 0);
+				$('#dtb-quote-tax-percent').val(quote.totals.tax_percent || 0);
+				$('#dtb-quote-shipping').val(quote.totals.shipping_amount || 0);
+			}
+			$('#dtb-quote-expires-at').val(toLocalDateTime(quote.expires_at || ''));
+			render();
+		};
+
+		var runAction = function(action, status, opts){
+			opts = opts || {};
+			var payload = collectPayload(status);
+			var isSilent = !!opts.silent;
+			if (!isSilent) {
+				setMsg('Saving…', '');
+				$root.find('button').each(function(){
+					var $btn = $(this);
+					if ($btn.prop('disabled')) $btn.attr('data-was-disabled', '1');
+					$btn.prop('disabled', true);
+				});
+			}
+
+			return $.post(ajaxurl, {
 				action: 'dtb_repair_quote_action',
 				repair_id: repairId,
 				nonce: nonce,
 				quote_action: action,
+				autosave: isSilent ? '1' : '',
 				quote_json: JSON.stringify(payload)
-			}, function(res){
-				$root.find('button').each(function(){
-					var $btn = $(this);
-					$btn.prop('disabled', false);
-					if ($btn.attr('data-was-disabled') === '1') {
-						$btn.prop('disabled', true).removeAttr('data-was-disabled');
-					}
-				});
+			}).done(function(res){
+				if (!isSilent) {
+					$root.find('button').each(function(){
+						var $btn = $(this);
+						$btn.prop('disabled', false);
+						if ($btn.attr('data-was-disabled') === '1') {
+							$btn.prop('disabled', true).removeAttr('data-was-disabled');
+						}
+					});
+				}
 				if (!res || !res.success) {
 					setMsg((res && res.data && res.data.message) ? res.data.message : 'Unable to save quote.', 'is-err');
 					return;
 				}
-				if (res.data && res.data.quote && Array.isArray(res.data.quote.lines)) {
-					quote = res.data.quote;
-					lines = quote.lines.slice();
-					if (quote.totals) {
-						$('#dtb-quote-discount-percent').val(quote.totals.discount_percent || 0);
-						$('#dtb-quote-tax-percent').val(quote.totals.tax_percent || 0);
-						$('#dtb-quote-shipping').val(quote.totals.shipping_amount || 0);
-					}
-					if (quote.expires_at) {
-						var dt = new Date(quote.expires_at);
-						if (!isNaN(dt.getTime())) {
-							var yyyy = dt.getUTCFullYear();
-							var mm = String(dt.getUTCMonth() + 1).padStart(2, '0');
-							var dd = String(dt.getUTCDate()).padStart(2, '0');
-							var hh = String(dt.getUTCHours()).padStart(2, '0');
-							var ii = String(dt.getUTCMinutes()).padStart(2, '0');
-							$('#dtb-quote-expires-at').val(yyyy + '-' + mm + '-' + dd + 'T' + hh + ':' + ii);
-						}
-					}
+				if (res.data && res.data.quote) {
+					applyServerQuote(res.data.quote);
 				}
-				render();
-				setMsg((res.data && res.data.message) ? res.data.message : 'Quote saved.', 'is-ok');
+				lastSavedHash = payloadHash(collectPayload('draft'));
+				if (!isSilent) {
+					setMsg((res.data && res.data.message) ? res.data.message : 'Quote saved.', 'is-ok');
+				} else {
+					setMsg('Draft auto-saved.', 'is-ok');
+				}
 				if (res.data && res.data.reload) {
 					window.setTimeout(function(){ window.location.reload(); }, 900);
 				}
+			}).fail(function(){
+				if (!isSilent) {
+					$root.find('button').each(function(){
+						var $btn = $(this);
+						$btn.prop('disabled', false);
+						if ($btn.attr('data-was-disabled') === '1') {
+							$btn.prop('disabled', true).removeAttr('data-was-disabled');
+						}
+					});
+				}
+				if (!isSilent) {
+					setMsg('Unable to save quote.', 'is-err');
+				}
 			});
+		};
+
+		var runAutosave = function(){
+			if (autosaveInFlight) {
+				pendingAutosave = true;
+				return;
+			}
+			var payload = collectPayload('draft');
+			var nextHash = payloadHash(payload);
+			if (nextHash === lastSavedHash) return;
+			autosaveInFlight = true;
+			autosaveReq = runAction('save', 'draft', { silent: true });
+			$.when(autosaveReq).always(function(){
+				autosaveInFlight = false;
+				if (pendingAutosave) {
+					pendingAutosave = false;
+					runAutosave();
+				}
+			});
+		};
+
+		var scheduleAutosave = function(markDirty){
+			if (markDirty) {
+				setMsg('Unsaved changes…', '');
+			}
+			if (autosaveTimer) window.clearTimeout(autosaveTimer);
+			autosaveTimer = window.setTimeout(function(){
+				runAutosave();
+			}, 800);
 		};
 
 		$('#dtb-quote-add-line').on('click', function(){
 			collectLines();
 			lines.push({ label: '', description: '', type: 'service', quantity: 1, unit_price: 0 });
 			render();
+			scheduleAutosave(true);
 		});
 		$lineTbody.on('click', '.dtb-quote-line-remove', function(){
 			var idx = Number($(this).closest('tr').data('index'));
 			if (idx >= 0 && idx < lines.length) {
 				lines.splice(idx, 1);
 				render();
+				scheduleAutosave(true);
 			}
 		});
-		$root.on('input change', '.dtb-quote-line-label, .dtb-quote-line-desc, .dtb-quote-line-type, .dtb-quote-line-qty, .dtb-quote-line-unit, #dtb-quote-discount-percent, #dtb-quote-tax-percent, #dtb-quote-shipping, #dtb-quote-currency', function(){
+
+		$lineTbody.on('change', '.dtb-quote-line-type', function(){
+			var $tr = $(this).closest('tr');
+			applyTypePresentation($tr);
 			collectLines();
 			renderTotals(calcTotals(lines));
+			scheduleAutosave(true);
+		});
+
+		$lineTbody.on('click', '.dtb-quote-preset', function(){
+			var $btn = $(this);
+			var $tr = $btn.closest('tr');
+			if (!$tr.length) return;
+			var label = ($btn.attr('data-preset-label') || '').toString();
+			var qty = toNum($btn.attr('data-preset-qty') || 1);
+			if (label) {
+				$tr.find('.dtb-quote-line-label').val(label);
+			}
+			if (qty > 0) {
+				$tr.find('.dtb-quote-line-qty').val(qty);
+			}
+			collectLines();
+			renderTotals(calcTotals(lines));
+			scheduleAutosave(true);
+		});
+
+		$root.on('input change', '.dtb-quote-line-label, .dtb-quote-line-desc, .dtb-quote-line-qty, .dtb-quote-line-unit, #dtb-quote-discount-percent, #dtb-quote-tax-percent, #dtb-quote-shipping, #dtb-quote-currency, #dtb-quote-customer-note, #dtb-quote-internal-note, #dtb-quote-expires-at', function(){
+			collectLines();
+			renderTotals(calcTotals(lines));
+			scheduleAutosave(true);
 		});
 
 		$('#dtb-quote-save').on('click', function(){ runAction('save', 'draft'); });
 		$('#dtb-quote-send').on('click', function(){ runAction('send', 'sent'); });
 		$('#dtb-quote-accept').on('click', function(){ runAction('accept', 'accepted'); });
 		$('#dtb-quote-decline').on('click', function(){ runAction('decline', 'declined'); });
+
+		if ($partsLookupInput.length && typeof ajaxurl === 'string') {
+			$partsLookupInput.on('input', function(){
+				var term = ($partsLookupInput.val() || '').toString().trim();
+				if (lookupTimer) window.clearTimeout(lookupTimer);
+				if (term.length < 2) {
+					hidePartsLookupMenu();
+					return;
+				}
+				lookupTimer = window.setTimeout(function(){
+					if (lookupReq && typeof lookupReq.abort === 'function') {
+						lookupReq.abort();
+					}
+					lookupReq = $.post(ajaxurl, {
+						action: 'dtb_repair_parts_lookup',
+						term: term,
+						nonce: $partsLookupInput.attr('data-lookup-nonce') || ''
+					}).done(function(payload){
+						var items = payload && payload.success && payload.data ? payload.data.items : [];
+						renderPartsLookupMenu(items || []);
+					}).fail(function(){
+						hidePartsLookupMenu();
+					});
+				}, 180);
+			});
+
+			$partsLookupMenu.on('click', '.dtb-quote-parts-option', function(){
+				var $btn = $(this);
+				var part = {
+					part_id: parseInt($btn.attr('data-part-id') || '0', 10),
+					sku: $btn.attr('data-sku') || '',
+					name: $btn.attr('data-name') || '',
+					brand_label: $btn.attr('data-brand') || '',
+					manufacturer_sku: $btn.attr('data-manufacturer-sku') || '',
+					quantity: 1,
+					unit_price: toNum($btn.attr('data-unit-price') || 0)
+				};
+				upsertPartLine(part);
+				document.dispatchEvent(new CustomEvent('dtb:tech:partSelected', { detail: { part: part } }));
+				setMsg('Part added to quote.', 'is-ok');
+				$partsLookupInput.val('');
+				hidePartsLookupMenu();
+			});
+
+			$partsSelected.on('click', '.dtb-quote-selected-part', function(){
+				var $btn = $(this);
+				var part = {
+					part_id: parseInt($btn.attr('data-part-id') || '0', 10),
+					sku: $btn.attr('data-sku') || '',
+					name: $btn.attr('data-name') || '',
+					brand_label: $btn.attr('data-brand') || '',
+					manufacturer_sku: $btn.attr('data-manufacturer-sku') || '',
+					quantity: parseInt($btn.attr('data-qty') || '1', 10),
+					unit_price: toNum($btn.attr('data-unit-price') || 0),
+					line_note: $btn.attr('data-line-note') || ''
+				};
+				upsertPartLine(part);
+				document.dispatchEvent(new CustomEvent('dtb:tech:partSelected', { detail: { part: part } }));
+				setMsg('Part added to quote.', 'is-ok');
+			});
+			$partsRecent.on('click', '.dtb-quote-selected-part', function(){
+				var $btn = $(this);
+				var part = {
+					part_id: parseInt($btn.attr('data-part-id') || '0', 10),
+					sku: $btn.attr('data-sku') || '',
+					name: $btn.attr('data-name') || '',
+					brand_label: $btn.attr('data-brand') || '',
+					manufacturer_sku: $btn.attr('data-manufacturer-sku') || '',
+					quantity: parseInt($btn.attr('data-qty') || '1', 10),
+					unit_price: toNum($btn.attr('data-unit-price') || 0),
+					line_note: $btn.attr('data-line-note') || ''
+				};
+				upsertPartLine(part);
+				document.dispatchEvent(new CustomEvent('dtb:tech:partSelected', { detail: { part: part } }));
+				setMsg('Part added to quote.', 'is-ok');
+			});
+
+			$(document).on('click', function(e){
+				if (!$partsLookupMenu.length) return;
+				if ($(e.target).closest('#dtb-quote-parts-menu').length) return;
+				if (e.target === $partsLookupInput[0]) return;
+				hidePartsLookupMenu();
+			});
+		}
 
 		document.addEventListener('dtb:quote:addPart', function(evt){
 			var detail = evt && evt.detail ? evt.detail : null;
@@ -733,7 +1213,18 @@ function dtb_repair_metabox_quote_builder( WP_Post $post ): void {
 			setMsg('Parts synced to quote.', 'is-ok');
 		});
 
+		document.addEventListener('dtb:parts:recentUpdated', function(evt){
+			var detail = evt && evt.detail ? evt.detail : null;
+			if (!detail || !Array.isArray(detail.parts)) return;
+			recentParts = detail.parts.slice(0, 16);
+			renderRecentParts();
+		});
+
+		recentParts = loadRecentParts();
 		render();
+		renderSelectedParts();
+		renderRecentParts();
+		lastSavedHash = payloadHash(collectPayload('draft'));
 	}(jQuery));
 	</script>
 	<?php
@@ -987,6 +1478,8 @@ function dtb_repair_metabox_technician( WP_Post $post ): void {
 						<button type="button" id="dtb-tech-sync-parts-to-quote" class="button button-small">Add All To Quote</button>
 					</div>
 					<div id="dtb-tech-selected-parts" class="dtb-tech-selected-list"></div>
+					<div class="dtb-tech-label dtb-tech-recent-head">Recently Used Parts</div>
+					<div id="dtb-tech-recent-parts" class="dtb-tech-selected-list"></div>
 					<div class="dtb-tech-sync-meta" id="dtb-tech-primary-part-details">
 						<div><strong>Primary Part SKU:</strong> <span id="dtb-tech-primary-part-sku"><?php echo esc_html( (string) get_post_meta( $post->ID, '_repair_parts_primary_sku', true ) ); ?></span></div>
 						<div><strong>Primary Part Name:</strong> <span id="dtb-tech-primary-part-name"><?php echo esc_html( (string) get_post_meta( $post->ID, '_repair_parts_primary_name', true ) ); ?></span></div>
@@ -1113,6 +1606,7 @@ function dtb_repair_ajax_quote_action(): void {
 	$repair_id = (int) ( $_POST['repair_id'] ?? 0 );
 	$nonce = sanitize_text_field( wp_unslash( (string) ( $_POST['nonce'] ?? '' ) ) );
 	$action = sanitize_key( (string) ( $_POST['quote_action'] ?? 'save' ) );
+	$is_autosave = ! empty( $_POST['autosave'] );
 	$quote_json = wp_unslash( (string) ( $_POST['quote_json'] ?? '' ) );
 
 	if ( ! $repair_id || ! wp_verify_nonce( $nonce, 'dtb_repair_quote_' . $repair_id ) ) {
@@ -1178,7 +1672,8 @@ function dtb_repair_ajax_quote_action(): void {
 		[
 			'actor_type' => 'admin',
 			'actor_id'   => get_current_user_id(),
-			'source'     => 'admin_quote_builder',
+			'source'     => $is_autosave ? 'admin_quote_autosave' : 'admin_quote_builder',
+			'suppress_event' => $is_autosave,
 		]
 	);
 
@@ -1349,7 +1844,8 @@ function dtb_repair_save_technician_meta( int $post_id ): void {
 			if ( ! is_array( $row ) ) {
 				continue;
 			}
-			$sid = sanitize_text_field( (string) ( $row['schematic_id'] ?? '' ) );
+			$sid_raw = sanitize_text_field( (string) ( $row['schematic_id'] ?? '' ) );
+			$sid = function_exists( 'dtb_str_normalize_display' ) ? dtb_str_normalize_display( $sid_raw ) : $sid_raw;
 			$url = esc_url_raw( (string) ( $row['url'] ?? '' ) );
 			if ( '' === $sid && '' === $url ) {
 				continue;
@@ -1357,12 +1853,12 @@ function dtb_repair_save_technician_meta( int $post_id ): void {
 			$sch_list[] = [
 				'schematic_id' => $sid,
 				'url'          => $url,
-				'version'      => sanitize_text_field( (string) ( $row['version'] ?? '' ) ),
-				'brand'        => sanitize_text_field( (string) ( $row['brand'] ?? '' ) ),
-				'model_number' => sanitize_text_field( (string) ( $row['model_number'] ?? '' ) ),
-				'model_name'   => sanitize_text_field( (string) ( $row['model_name'] ?? '' ) ),
-				'sku'          => sanitize_text_field( (string) ( $row['sku'] ?? '' ) ),
-				'product_name' => sanitize_text_field( (string) ( $row['product_name'] ?? '' ) ),
+				'version'      => function_exists( 'dtb_str_normalize_display' ) ? dtb_str_normalize_display( sanitize_text_field( (string) ( $row['version'] ?? '' ) ) ) : sanitize_text_field( (string) ( $row['version'] ?? '' ) ),
+				'brand'        => function_exists( 'dtb_str_normalize_display' ) ? dtb_str_normalize_display( sanitize_text_field( (string) ( $row['brand'] ?? '' ) ) ) : sanitize_text_field( (string) ( $row['brand'] ?? '' ) ),
+				'model_number' => function_exists( 'dtb_str_normalize_display' ) ? dtb_str_normalize_display( sanitize_text_field( (string) ( $row['model_number'] ?? '' ) ) ) : sanitize_text_field( (string) ( $row['model_number'] ?? '' ) ),
+				'model_name'   => function_exists( 'dtb_str_normalize_display' ) ? dtb_str_normalize_display( sanitize_text_field( (string) ( $row['model_name'] ?? '' ) ) ) : sanitize_text_field( (string) ( $row['model_name'] ?? '' ) ),
+				'sku'          => function_exists( 'dtb_str_normalize_display' ) ? dtb_str_normalize_display( sanitize_text_field( (string) ( $row['sku'] ?? '' ) ) ) : sanitize_text_field( (string) ( $row['sku'] ?? '' ) ),
+				'product_name' => function_exists( 'dtb_str_normalize_display' ) ? dtb_str_normalize_display( sanitize_text_field( (string) ( $row['product_name'] ?? '' ) ) ) : sanitize_text_field( (string) ( $row['product_name'] ?? '' ) ),
 			];
 		}
 	}
@@ -1375,18 +1871,20 @@ function dtb_repair_save_technician_meta( int $post_id ): void {
 				continue;
 			}
 			$part_id = absint( $row['part_id'] ?? 0 );
-			$sku = sanitize_text_field( (string) ( $row['sku'] ?? '' ) );
+			$sku_raw = sanitize_text_field( (string) ( $row['sku'] ?? '' ) );
+			$sku = function_exists( 'dtb_str_normalize_display' ) ? dtb_str_normalize_display( $sku_raw ) : $sku_raw;
 			if ( $part_id <= 0 && '' === $sku ) {
 				continue;
 			}
 			$parts_list[] = [
 				'part_id'           => $part_id,
 				'sku'               => $sku,
-				'name'              => sanitize_text_field( (string) ( $row['name'] ?? '' ) ),
-				'brand_label'       => sanitize_text_field( (string) ( $row['brand_label'] ?? '' ) ),
-				'manufacturer_sku'  => sanitize_text_field( (string) ( $row['manufacturer_sku'] ?? '' ) ),
+				'name'              => function_exists( 'dtb_str_normalize_display' ) ? dtb_str_normalize_display( sanitize_text_field( (string) ( $row['name'] ?? '' ) ) ) : sanitize_text_field( (string) ( $row['name'] ?? '' ) ),
+				'brand_label'       => function_exists( 'dtb_str_normalize_display' ) ? dtb_str_normalize_display( sanitize_text_field( (string) ( $row['brand_label'] ?? '' ) ) ) : sanitize_text_field( (string) ( $row['brand_label'] ?? '' ) ),
+				'manufacturer_sku'  => function_exists( 'dtb_str_normalize_display' ) ? dtb_str_normalize_display( sanitize_text_field( (string) ( $row['manufacturer_sku'] ?? '' ) ) ) : sanitize_text_field( (string) ( $row['manufacturer_sku'] ?? '' ) ),
+				'unit_price'        => max( 0, (float) ( $row['unit_price'] ?? 0 ) ),
 				'quantity'          => max( 1, absint( $row['quantity'] ?? 1 ) ),
-				'line_note'         => sanitize_textarea_field( (string) ( $row['line_note'] ?? '' ) ),
+				'line_note'         => function_exists( 'dtb_str_normalize_display' ) ? dtb_str_normalize_display( sanitize_textarea_field( (string) ( $row['line_note'] ?? '' ) ), true ) : sanitize_textarea_field( (string) ( $row['line_note'] ?? '' ) ),
 			];
 		}
 	}
@@ -1514,10 +2012,14 @@ function dtb_repair_ajax_schematic_lookup(): void {
 	$items = [];
 	foreach ( (array) $query->posts as $attachment_id ) {
 		$attachment_id = (int) $attachment_id;
-		$sid           = (string) get_post_meta( $attachment_id, '_dtb_schematic_id', true );
-		$brand         = (string) get_post_meta( $attachment_id, '_dtb_schematic_brand', true );
-		$model_number  = (string) get_post_meta( $attachment_id, '_dtb_schematic_model_number', true );
-		$model_name    = (string) get_post_meta( $attachment_id, '_dtb_schematic_model_name', true );
+		$sid_raw          = (string) get_post_meta( $attachment_id, '_dtb_schematic_id', true );
+		$brand_raw        = (string) get_post_meta( $attachment_id, '_dtb_schematic_brand', true );
+		$model_number_raw = (string) get_post_meta( $attachment_id, '_dtb_schematic_model_number', true );
+		$model_name_raw   = (string) get_post_meta( $attachment_id, '_dtb_schematic_model_name', true );
+		$sid          = function_exists( 'dtb_str_normalize_display' ) ? dtb_str_normalize_display( $sid_raw ) : $sid_raw;
+		$brand        = function_exists( 'dtb_str_normalize_display' ) ? dtb_str_normalize_display( $brand_raw ) : $brand_raw;
+		$model_number = function_exists( 'dtb_str_normalize_display' ) ? dtb_str_normalize_display( $model_number_raw ) : $model_number_raw;
+		$model_name   = function_exists( 'dtb_str_normalize_display' ) ? dtb_str_normalize_display( $model_name_raw ) : $model_name_raw;
 		$url           = (string) wp_get_attachment_url( $attachment_id );
 		$version       = get_post_modified_time( 'Y-m-d\TH:i:s\Z', true, $attachment_id );
 		$product_ids   = get_post_meta( $attachment_id, '_dtb_schematic_product_ids', true );
@@ -1530,8 +2032,10 @@ function dtb_repair_ajax_schematic_lookup(): void {
 		if ( ! empty( $product_ids ) && function_exists( 'wc_get_product' ) ) {
 			$product = wc_get_product( (int) $product_ids[0] );
 			if ( $product ) {
-				$product_sku  = (string) $product->get_sku();
-				$product_name = (string) $product->get_name();
+				$product_sku_raw  = (string) $product->get_sku();
+				$product_name_raw = (string) $product->get_name();
+				$product_sku  = function_exists( 'dtb_str_normalize_display' ) ? dtb_str_normalize_display( $product_sku_raw ) : $product_sku_raw;
+				$product_name = function_exists( 'dtb_str_normalize_display' ) ? dtb_str_normalize_display( $product_name_raw ) : $product_name_raw;
 			}
 		}
 
@@ -1630,10 +2134,17 @@ function dtb_repair_ajax_parts_lookup(): void {
 	foreach ( $product_ids as $product_id ) {
 		$product_id = (int) $product_id;
 		$product    = function_exists( 'wc_get_product' ) ? wc_get_product( $product_id ) : null;
-		$sku        = $product ? (string) $product->get_sku() : (string) get_post_meta( $product_id, '_sku', true );
-		$name       = get_the_title( $product_id );
-		$brand      = (string) get_post_meta( $product_id, '_dtb_brand_label', true );
-		$manu_sku   = (string) get_post_meta( $product_id, '_dtb_manufacturer_sku', true );
+		$sku_raw  = $product ? (string) $product->get_sku() : (string) get_post_meta( $product_id, '_sku', true );
+		$name_raw = get_the_title( $product_id );
+		$brand_raw = (string) get_post_meta( $product_id, '_dtb_brand_label', true );
+		$manu_sku_raw = (string) get_post_meta( $product_id, '_dtb_manufacturer_sku', true );
+		$sku      = function_exists( 'dtb_str_normalize_display' ) ? dtb_str_normalize_display( $sku_raw ) : $sku_raw;
+		$name     = function_exists( 'dtb_str_normalize_display' ) ? dtb_str_normalize_display( (string) $name_raw ) : (string) $name_raw;
+		$brand    = function_exists( 'dtb_str_normalize_display' ) ? dtb_str_normalize_display( $brand_raw ) : $brand_raw;
+		$manu_sku = function_exists( 'dtb_str_normalize_display' ) ? dtb_str_normalize_display( $manu_sku_raw ) : $manu_sku_raw;
+		$unit_price = $product ? (float) $product->get_price() : 0.0;
+		$stock_qty  = $product && method_exists( $product, 'get_stock_quantity' ) ? $product->get_stock_quantity() : null;
+		$stock_text = $product && method_exists( $product, 'get_stock_status' ) ? (string) $product->get_stock_status() : '';
 		$haystack   = strtolower( trim( $sku . ' ' . $name . ' ' . $brand . ' ' . $manu_sku ) );
 
 		if ( false === strpos( $haystack, strtolower( $term ) ) ) {
@@ -1646,6 +2157,9 @@ function dtb_repair_ajax_parts_lookup(): void {
 			'name'              => $name,
 			'brand_label'       => $brand,
 			'manufacturer_sku'  => $manu_sku,
+			'unit_price'        => $unit_price,
+			'stock_quantity'    => null === $stock_qty ? null : (int) $stock_qty,
+			'stock_status'      => $stock_text,
 		];
 	}
 

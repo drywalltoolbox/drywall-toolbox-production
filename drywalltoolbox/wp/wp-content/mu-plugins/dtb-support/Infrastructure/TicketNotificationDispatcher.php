@@ -84,17 +84,17 @@ function dtb_support_wp_mail_from_name( string $original ): string {
  */
 function dtb_support_expand_reply_tokens( string $message, object $ticket, string $reply_link = '' ): string {
 	$values = [
-		'customer_name'  => (string) ( $ticket->customer_name ?? '' ),
+		'customer_name'  => function_exists( 'dtb_str_normalize_display' ) ? dtb_str_normalize_display( (string) ( $ticket->customer_name ?? '' ) ) : (string) ( $ticket->customer_name ?? '' ),
 		'customer_email' => (string) ( $ticket->customer_email ?? '' ),
-		'ticket_number'  => (string) ( $ticket->ticket_number ?? '' ),
-		'subject'        => (string) ( $ticket->subject ?? '' ),
+		'ticket_number'  => function_exists( 'dtb_str_normalize_display' ) ? dtb_str_normalize_display( (string) ( $ticket->ticket_number ?? '' ) ) : (string) ( $ticket->ticket_number ?? '' ),
+		'subject'        => function_exists( 'dtb_str_normalize_display' ) ? dtb_str_normalize_display( (string) ( $ticket->subject ?? '' ) ) : (string) ( $ticket->subject ?? '' ),
 		'order_id'       => ! empty( $ticket->order_id ) ? (string) $ticket->order_id : '',
-		'site_name'      => (string) get_bloginfo( 'name' ),
+		'site_name'      => function_exists( 'dtb_str_normalize_display' ) ? dtb_str_normalize_display( (string) get_bloginfo( 'name' ) ) : (string) get_bloginfo( 'name' ),
 		'support_email'  => function_exists( 'dtb_support_email_from' ) ? dtb_support_email_from() : (string) get_option( 'admin_email', '' ),
 		'ticket_url'     => '' !== $reply_link ? $reply_link : admin_url( 'admin.php?page=dtb-support&ticket_id=' . (int) ( $ticket->id ?? 0 ) ),
 	];
 
-	return (string) preg_replace_callback(
+	$expanded = (string) preg_replace_callback(
 		'/\{\{\s*([a-z0-9_]+)\s*\}\}|\{([a-z0-9_]+)\}/i',
 		static function ( array $matches ) use ( $values ): string {
 			$key = strtolower( (string) ( $matches[1] ?: $matches[2] ?: '' ) );
@@ -102,6 +102,7 @@ function dtb_support_expand_reply_tokens( string $message, object $ticket, strin
 		},
 		(string) $message
 	);
+	return function_exists( 'dtb_str_normalize_display' ) ? dtb_str_normalize_display( $expanded, true ) : $expanded;
 }
 
 // =============================================================================
@@ -129,10 +130,14 @@ function dtb_support_email_headers( string $content_type = 'text/plain' ): array
  * @return array{subject:string,body:string}|WP_Error
  */
 function dtb_support_get_email_template( string $template, array $ctx ): array|WP_Error {
-	$site   = sanitize_text_field( (string) ( $ctx['site_name'] ?? get_bloginfo( 'name' ) ) );
-	$name   = sanitize_text_field( (string) ( $ctx['customer_name'] ?? 'Customer' ) );
-	$tnum   = sanitize_text_field( (string) ( $ctx['ticket_number'] ?? '' ) );
-	$subj   = sanitize_text_field( (string) ( $ctx['subject'] ?? 'Your enquiry' ) );
+	$site_raw = sanitize_text_field( (string) ( $ctx['site_name'] ?? get_bloginfo( 'name' ) ) );
+	$name_raw = sanitize_text_field( (string) ( $ctx['customer_name'] ?? 'Customer' ) );
+	$tnum_raw = sanitize_text_field( (string) ( $ctx['ticket_number'] ?? '' ) );
+	$subj_raw = sanitize_text_field( (string) ( $ctx['subject'] ?? 'Your enquiry' ) );
+	$site = function_exists( 'dtb_str_normalize_display' ) ? dtb_str_normalize_display( $site_raw ) : $site_raw;
+	$name = function_exists( 'dtb_str_normalize_display' ) ? dtb_str_normalize_display( $name_raw ) : $name_raw;
+	$tnum = function_exists( 'dtb_str_normalize_display' ) ? dtb_str_normalize_display( $tnum_raw ) : $tnum_raw;
+	$subj = function_exists( 'dtb_str_normalize_display' ) ? dtb_str_normalize_display( $subj_raw ) : $subj_raw;
 	$aurl   = esc_url_raw( (string) ( $ctx['admin_url'] ?? admin_url( 'admin.php?page=dtb-support' ) ) );
 
 	switch ( $template ) {
@@ -179,7 +184,8 @@ function dtb_support_get_email_template( string $template, array $ctx ): array|W
 			];
 
 		case 'ticket-reply-customer':
-			$reply_body  = wp_strip_all_tags( (string) ( $ctx['reply_body'] ?? '' ) );
+			$reply_body_raw  = wp_strip_all_tags( (string) ( $ctx['reply_body'] ?? '' ) );
+			$reply_body = function_exists( 'dtb_str_normalize_display' ) ? dtb_str_normalize_display( $reply_body_raw, true ) : $reply_body_raw;
 			$reply_link  = esc_url_raw( (string) ( $ctx['reply_link'] ?? '' ) );
 			$reply_cta   = $reply_link ? "\n\nReply to this ticket:\n" . $reply_link : "\n\nReply directly to this email to continue the conversation.";
 			$body        = sprintf(

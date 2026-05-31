@@ -75,15 +75,15 @@ function dtb_support_create_ticket( array $data ): int|WP_Error {
 		'status'                   => sanitize_text_field( $data['status'] ?? 'open' ),
 		'ticket_type'              => sanitize_text_field( $data['ticket_type'] ?? 'contact' ),
 		'priority'                 => sanitize_text_field( $data['priority'] ?? 'normal' ),
-		'subject'                  => sanitize_text_field( $data['subject'] ?? '' ),
-		'customer_name'            => sanitize_text_field( $data['customer_name'] ?? '' ),
+		'subject'                  => function_exists( 'dtb_str_normalize_display' ) ? dtb_str_normalize_display( sanitize_text_field( $data['subject'] ?? '' ) ) : sanitize_text_field( $data['subject'] ?? '' ),
+		'customer_name'            => function_exists( 'dtb_str_normalize_display' ) ? dtb_str_normalize_display( sanitize_text_field( $data['customer_name'] ?? '' ) ) : sanitize_text_field( $data['customer_name'] ?? '' ),
 		'customer_email'           => sanitize_email( $data['customer_email'] ?? '' ),
-		'customer_phone'           => sanitize_text_field( $data['customer_phone'] ?? '' ),
-		'company'                  => sanitize_text_field( $data['company'] ?? '' ),
-		'message'                  => wp_kses_post( $data['message'] ?? '' ),
-		'source'                   => sanitize_text_field( $data['source'] ?? 'website' ),
+		'customer_phone'           => function_exists( 'dtb_str_normalize_display' ) ? dtb_str_normalize_display( sanitize_text_field( $data['customer_phone'] ?? '' ) ) : sanitize_text_field( $data['customer_phone'] ?? '' ),
+		'company'                  => function_exists( 'dtb_str_normalize_display' ) ? dtb_str_normalize_display( sanitize_text_field( $data['company'] ?? '' ) ) : sanitize_text_field( $data['company'] ?? '' ),
+		'message'                  => wp_kses_post( function_exists( 'dtb_str_normalize_display' ) ? dtb_str_normalize_display( (string) ( $data['message'] ?? '' ), true ) : (string) ( $data['message'] ?? '' ) ),
+		'source'                   => function_exists( 'dtb_str_normalize_display' ) ? dtb_str_normalize_display( sanitize_text_field( $data['source'] ?? 'website' ) ) : sanitize_text_field( $data['source'] ?? 'website' ),
 		'order_id'                 => isset( $data['order_id'] ) ? absint( $data['order_id'] ) : null,
-		'tags'                     => sanitize_text_field( $data['tags'] ?? '' ),
+		'tags'                     => function_exists( 'dtb_str_normalize_display' ) ? dtb_str_normalize_display( sanitize_text_field( $data['tags'] ?? '' ) ) : sanitize_text_field( $data['tags'] ?? '' ),
 		'sla_first_response_due'   => ! empty( $data['sla_first_response_due'] ) ? (string) $data['sla_first_response_due'] : null,
 		'sla_resolution_due'       => ! empty( $data['sla_resolution_due'] ) ? (string) $data['sla_resolution_due'] : null,
 		'sla_state'                => sanitize_text_field( $data['sla_state'] ?? 'ok' ),
@@ -113,9 +113,20 @@ function dtb_support_update_ticket( int $ticket_id, array $data ): bool|WP_Error
 	$table = dtb_support_tickets_table();
 	$allowed = [ 'status', 'priority', 'ticket_type', 'subject', 'assigned_user_id', 'tags', 'internal_notes', 'first_reply_at', 'resolved_at', 'closed_at', 'sla_first_response_due', 'sla_resolution_due', 'sla_state', 'last_customer_reply_at', 'last_staff_reply_at', 'priority_score', 'metadata_json', 'snooze_until', 'snooze_reason', 'followup_due_at', 'notification_status', 'notification_fail_count', 'notification_last_sent_at' ];
 	$update  = [ 'updated_at' => gmdate( 'Y-m-d H:i:s' ) ];
+	$text_fields = [ 'status', 'priority', 'ticket_type', 'subject', 'tags', 'internal_notes', 'sla_state', 'snooze_reason', 'notification_status' ];
 	foreach ( $allowed as $field ) {
 		if ( array_key_exists( $field, $data ) ) {
-			$update[ $field ] = $data[ $field ];
+			$value = $data[ $field ];
+			if ( in_array( $field, $text_fields, true ) ) {
+				if ( 'internal_notes' === $field ) {
+					$value = sanitize_textarea_field( (string) $value );
+					$value = function_exists( 'dtb_str_normalize_display' ) ? dtb_str_normalize_display( (string) $value, true ) : (string) $value;
+				} else {
+					$value = sanitize_text_field( (string) $value );
+					$value = function_exists( 'dtb_str_normalize_display' ) ? dtb_str_normalize_display( (string) $value ) : (string) $value;
+				}
+			}
+			$update[ $field ] = $value;
 		}
 	}
 	$result = $wpdb->update( $table, $update, [ 'id' => $ticket_id ] );
@@ -139,7 +150,8 @@ function dtb_support_query_tickets( array $args = [] ): array {
 	$type        = sanitize_text_field( $args['type'] ?? '' );
 	$priority    = sanitize_text_field( $args['priority'] ?? '' );
 	$assigned_to = isset( $args['assigned_to'] ) ? absint( $args['assigned_to'] ) : 0;
-	$search      = sanitize_text_field( $args['search'] ?? '' );
+	$search_raw  = sanitize_text_field( $args['search'] ?? '' );
+	$search      = function_exists( 'dtb_str_normalize_display' ) ? dtb_str_normalize_display( $search_raw ) : $search_raw;
 	$orderby     = in_array( $args['orderby'] ?? $args['order_by'] ?? '', [ 'created_at', 'updated_at', 'priority', 'status', 'customer_name', 'priority_score' ], true ) ? ( $args['orderby'] ?? $args['order_by'] ) : 'created_at';
 	$order       = strtoupper( $args['order'] ?? 'DESC' ) === 'ASC' ? 'ASC' : 'DESC';
 	$per_page    = min( 200, max( 1, (int) ( $args['per_page'] ?? 25 ) ) );
@@ -214,7 +226,8 @@ function dtb_support_query_queue( string $queue, array $args = [] ): array {
 	$offset   = ( $page - 1 ) * $per_page;
 	$type     = sanitize_text_field( $args['type'] ?? '' );
 	$priority = sanitize_text_field( $args['priority'] ?? '' );
-	$search   = sanitize_text_field( $args['search'] ?? '' );
+	$search_raw = sanitize_text_field( $args['search'] ?? '' );
+	$search   = function_exists( 'dtb_str_normalize_display' ) ? dtb_str_normalize_display( $search_raw ) : $search_raw;
 	$active   = "(snooze_until IS NULL OR snooze_until <= UTC_TIMESTAMP())";
 	$closed   = "status NOT IN ('resolved','closed','spam')";
 	$action_due_hours    = function_exists( 'dtb_support_action_due_hours' ) ? max( 1, (int) dtb_support_action_due_hours() ) : 24;

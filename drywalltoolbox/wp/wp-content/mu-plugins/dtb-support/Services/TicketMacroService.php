@@ -43,15 +43,16 @@ function dtb_support_get_macro( int $macro_id ): ?object {
  */
 function dtb_support_render_macro( string $template, object $ticket ): string {
 	$replacements = [
-		'{{customer_name}}' => (string) ( $ticket->customer_name ?? '' ),
-		'{{ticket_number}}' => (string) ( $ticket->ticket_number ?? '' ),
+		'{{customer_name}}' => function_exists( 'dtb_str_normalize_display' ) ? dtb_str_normalize_display( (string) ( $ticket->customer_name ?? '' ) ) : (string) ( $ticket->customer_name ?? '' ),
+		'{{ticket_number}}' => function_exists( 'dtb_str_normalize_display' ) ? dtb_str_normalize_display( (string) ( $ticket->ticket_number ?? '' ) ) : (string) ( $ticket->ticket_number ?? '' ),
 		'{{order_id}}'      => ! empty( $ticket->order_id ) ? (string) $ticket->order_id : '',
 		'{{support_email}}' => function_exists( 'dtb_support_email_from' ) ? dtb_support_email_from() : (string) get_option( 'admin_email', '' ),
-		'{{site_name}}'     => (string) get_bloginfo( 'name' ),
+		'{{site_name}}'     => function_exists( 'dtb_str_normalize_display' ) ? dtb_str_normalize_display( (string) get_bloginfo( 'name' ) ) : (string) get_bloginfo( 'name' ),
 		'{{ticket_url}}'    => admin_url( 'admin.php?page=dtb-support&ticket_id=' . (int) ( $ticket->id ?? 0 ) ),
 	];
 
-	return strtr( $template, $replacements );
+	$rendered = strtr( $template, $replacements );
+	return function_exists( 'dtb_str_normalize_display' ) ? dtb_str_normalize_display( $rendered, true ) : $rendered;
 }
 
 /**
@@ -67,19 +68,22 @@ function dtb_support_save_macro( array $data, int $macro_id = 0 ): int|WP_Error 
 	$now   = gmdate( 'Y-m-d H:i:s' );
 	$existing = $macro_id > 0 ? dtb_support_get_macro( $macro_id ) : null;
 
-	$macro_name = sanitize_text_field( $data['macro_name'] ?? ( $existing->macro_name ?? '' ) );
-	$body       = wp_kses_post( $data['body_template'] ?? ( $existing->body_template ?? '' ) );
+	$macro_name_raw = sanitize_text_field( $data['macro_name'] ?? ( $existing->macro_name ?? '' ) );
+	$macro_name = function_exists( 'dtb_str_normalize_display' ) ? dtb_str_normalize_display( $macro_name_raw ) : $macro_name_raw;
+	$body_raw   = wp_kses_post( $data['body_template'] ?? ( $existing->body_template ?? '' ) );
+	$body       = function_exists( 'dtb_str_normalize_display' ) ? dtb_str_normalize_display( $body_raw, true ) : $body_raw;
 	if ( '' === $macro_name || '' === trim( wp_strip_all_tags( $body ) ) ) {
 		return new WP_Error( 'dtb_support_invalid_macro', __( 'Macro name and body template are required.', 'drywall-toolbox' ), [ 'status' => 400 ] );
 	}
 
-	$subject_template = sanitize_text_field( $data['subject_template'] ?? ( $existing->subject_template ?? '' ) );
+	$subject_raw = sanitize_text_field( $data['subject_template'] ?? ( $existing->subject_template ?? '' ) );
+	$subject_template = function_exists( 'dtb_str_normalize_display' ) ? dtb_str_normalize_display( $subject_raw ) : $subject_raw;
 	preg_match_all( '/\{\{\s*([a-z0-9_]+)\s*\}\}/i', $subject_template . "\n" . $body, $matches );
 	$variables = array_values( array_unique( array_map( 'strtolower', $matches[1] ?? [] ) ) );
 
 	$row = [
 		'macro_name'       => $macro_name,
-		'category'         => sanitize_text_field( $data['category'] ?? ( $existing->category ?? 'general' ) ),
+		'category'         => function_exists( 'dtb_str_normalize_display' ) ? dtb_str_normalize_display( sanitize_text_field( $data['category'] ?? ( $existing->category ?? 'general' ) ) ) : sanitize_text_field( $data['category'] ?? ( $existing->category ?? 'general' ) ),
 		'subject_template' => $subject_template,
 		'body_template'    => $body,
 		'variables'        => wp_json_encode( $variables ),

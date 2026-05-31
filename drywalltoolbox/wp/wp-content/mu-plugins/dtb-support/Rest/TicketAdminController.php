@@ -415,6 +415,9 @@ function dtb_support_rest_event_group( string $event_type, string $visibility = 
  */
 function dtb_support_rest_event_summary( array $event ): string {
 	$body = trim( (string) ( $event['body'] ?? '' ) );
+	if ( function_exists( 'dtb_str_normalize_display' ) ) {
+		$body = dtb_str_normalize_display( $body, true );
+	}
 	if ( '' !== $body ) {
 		return $body;
 	}
@@ -541,6 +544,13 @@ function dtb_support_rest_prepare_ticket_events( int $ticket_id, array $events )
 			(string) ( $event['visibility'] ?? '' )
 		);
 		$event['summary'] = dtb_support_rest_event_summary( $event );
+		if ( function_exists( 'dtb_str_normalize_display' ) ) {
+			$event['actor_label'] = dtb_str_normalize_display( (string) ( $event['actor_label'] ?? '' ) );
+			$event['summary'] = dtb_str_normalize_display( (string) ( $event['summary'] ?? '' ), true );
+			if ( isset( $event['body'] ) && is_string( $event['body'] ) ) {
+				$event['body'] = dtb_str_normalize_display( $event['body'], true );
+			}
+		}
 
 		$created_at = (string) ( $event['created_at'] ?? '' );
 		if ( '' !== $created_at ) {

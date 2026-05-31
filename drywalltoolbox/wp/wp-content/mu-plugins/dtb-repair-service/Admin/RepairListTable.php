@@ -258,14 +258,18 @@ class DTB_Repair_List_Table extends WP_List_Table {
 	}
 
 	protected function column_customer( $item ): string {
-		$name  = esc_html( (string) get_post_meta( $item->ID, '_repair_customer_name', true ) );
+		$name_raw  = (string) get_post_meta( $item->ID, '_repair_customer_name', true );
+		$name_norm = function_exists( 'dtb_str_normalize_display' ) ? dtb_str_normalize_display( $name_raw ) : $name_raw;
+		$name  = esc_html( $name_norm );
 		$email = esc_html( (string) get_post_meta( $item->ID, '_repair_customer_email', true ) );
 		return $name . ( $email ? '<span class="dtb-cell-sub">' . $email . '</span>' : '' );
 	}
 
 	protected function column_tool( $item ): string {
-		$brand  = esc_html( (string) get_post_meta( $item->ID, '_repair_tool_brand', true ) );
-		$model  = esc_html( (string) get_post_meta( $item->ID, '_repair_model', true ) );
+		$brand_raw = (string) get_post_meta( $item->ID, '_repair_tool_brand', true );
+		$model_raw = (string) get_post_meta( $item->ID, '_repair_model', true );
+		$brand  = esc_html( function_exists( 'dtb_str_normalize_display' ) ? dtb_str_normalize_display( $brand_raw ) : $brand_raw );
+		$model  = esc_html( function_exists( 'dtb_str_normalize_display' ) ? dtb_str_normalize_display( $model_raw ) : $model_raw );
 		$serial = esc_html( (string) get_post_meta( $item->ID, '_repair_serial', true ) );
 		$main   = trim( $brand . ' ' . $model );
 		return $main . ( $serial ? '<span class="dtb-cell-sub">S/N: ' . $serial . '</span>' : '' );

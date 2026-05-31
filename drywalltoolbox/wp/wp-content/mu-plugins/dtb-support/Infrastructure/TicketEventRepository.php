@@ -36,7 +36,9 @@ function dtb_support_append_event( array $event ): int|WP_Error {
 		'actor_id'     => $event['actor_id'] ?: null,
 		'source'       => $event['source'],
 		'visibility'   => $event['visibility'],
-		'body'         => sanitize_textarea_field( (string) ( $event['body'] ?? '' ) ),
+		'body'         => function_exists( 'dtb_str_normalize_display' )
+			? dtb_str_normalize_display( sanitize_textarea_field( (string) ( $event['body'] ?? '' ) ), true )
+			: sanitize_textarea_field( (string) ( $event['body'] ?? '' ) ),
 		'payload_json' => ! empty( $event['payload'] ) ? wp_json_encode( $event['payload'] ) : null,
 		'created_at'   => $event['created_at'] ?? gmdate( 'Y-m-d H:i:s' ),
 	];
@@ -93,8 +95,14 @@ function dtb_support_get_events( int $ticket_id, string $visibility = 'all' ): a
 	foreach ( (array) $rows as $row ) {
 		if ( ! empty( $row->payload_json ) ) {
 			$row->payload = json_decode( $row->payload_json, true );
+			if ( is_array( $row->payload ) && function_exists( 'dtb_str_normalize_display_mixed' ) ) {
+				$row->payload = dtb_str_normalize_display_mixed( $row->payload );
+			}
 		} else {
 			$row->payload = [];
+		}
+		if ( isset( $row->body ) && is_string( $row->body ) && function_exists( 'dtb_str_normalize_display' ) ) {
+			$row->body = dtb_str_normalize_display( $row->body, true );
 		}
 	}
 

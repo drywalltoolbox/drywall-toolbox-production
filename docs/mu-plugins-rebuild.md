@@ -1,1271 +1,844 @@
-Architecture / Approach
+## Architecture / Approach
 
-I audited the current GitHub repo elliotttmiller/drywall-toolbox, specifically wp/wp-content/mu-plugins/, against the actual loader, README, and active module bootstraps.
+Merge the two decisions into one admin platform architecture:
 
-The current codebase is no longer just a flat mu-plugin stack. It has evolved into a hybrid backend architecture:
+1. **Navigation/domain refactor** controls *where each module belongs*.
+2. **Global UI/UX design system** controls *how every module looks and behaves*.
 
-1. Root-level procedural mu-plugin files
-2. Two modular folder-based systems:
-   - dtb-catalog-platform/
-   - dtb-commerce/
-3. Newly added root-level repair workflow files
-4. Newly added root-level order workflow/tracking files
-5. Legacy/host mu-plugins still present
+Drywall Toolbox is already a headless React + WordPress/WooCommerce platform where WordPress owns backend APIs, admin tooling, product/order/customer data, custom workflows, and operational modules.  The mu-plugin layer is the correct place for the backend/admin platform because the project structure explicitly treats `wp/wp-content/mu-plugins/` as the custom backend feature/module layer. 
 
-The most important finding: the current README is partially stale. It says it is the source of truth, but the actual 00-dtb-loader.php now loads modules that the README’s loader list does not fully document, including dtb-catalog-platform/bootstrap.php, repair modules, order-event modules, order-tracking modules, payment webhook handling, and order admin modules. The README claims to document the current mu-plugin system and lists an older loader-managed chain.  ￼ The actual loader contains the newer load order and additional modules.  ￼
+The merged rebuild should produce:
 
-The revised rebuild document below is therefore based on the real current codebase, not the earlier proposed idealized structure.
+```text
+1. Drywall Toolbox        = business operations library
+2. DTB Tool Library       = maintenance/tooling library
+3. Shared DTB Admin UI    = global design system used by both libraries
+4. Command Center         = business observability
+5. System Manager         = backend/system observability
+```
 
-⸻
+The key rule:
 
-DTB MU-Plugins Architecture Rebuild Document
+> Every module uses the same visual shell, components, buttons, cards, tables, badges, forms, spacing, typography, loading states, and notices — but each module only displays content appropriate to its domain.
 
-Truthful Current-Codebase Audit + Production Remapping Plan
+---
 
-1. Current Runtime Reality
+# 1. Final Admin Menu Architecture
 
-wp/wp-content/mu-plugins/ currently acts as the backend application layer for Drywall Toolbox. WordPress/WooCommerce remain the backend system of record, while mu-plugins provide custom APIs, security controls, catalog enrichment, repair workflows, order tracking, integrations, admin tooling, cache management, and operational dashboards.
+## 1.1 Primary Business Operations Menu
 
-The current loader is 00-dtb-loader.php. It is intentionally named with a 00- prefix so it loads first, defines shared origin/security helpers, and then manually require_onces DTB modules in a specific order.  ￼
+```text
+Drywall Toolbox
+├─ Command Center
+├─ Orders
+├─ Repairs
+├─ Returns
+├─ Support
+├─ System Manager
+└─ Settings
+```
 
-The loader also defines:
+### Purpose
 
-dtb_feature_enabled()
-dtb_security_log()
-dtb_allowed_origins()
-dtb_check_origin()
-_dtb_require()
+This is the core business operations library.
 
-It centralizes origin allowlisting, environment-safe feature flags, and missing-file admin notices.  ￼
+It is for:
 
-This is directionally correct. The issue is that root-level files have grown beyond a clean composition layer.
+```text
+- product/purchase order operations
+- repair workflow operations
+- returns/RMA operations
+- customer support operations
+- business-facing observability
+- backend/system management access
+- centralized business settings
+```
 
-⸻
+It should not include catalog/media maintenance tools like Schematics, Image Sync, Product Mapping, Catalog Health, SEO tools, import/export tools, or cache utilities.
 
-2. Current mu-plugins/ Inventory
+---
 
-Based on the screenshots and actual loader, the current root contains these active or relevant entries:
+## 1.2 Secondary Tool Library Menu
 
+```text
+DTB Tool Library
+├─ Schematics
+├─ Image Sync
+├─ Product Mapping
+├─ Catalog Health
+├─ Cache Tools
+├─ API Health
+├─ SEO Tools
+├─ Import / Export
+└─ Config Reference
+```
+
+### Purpose
+
+This is the internal maintenance/tooling library.
+
+It is for:
+
+```text
+- product data maintenance
+- schematic/media mapping
+- image synchronization
+- catalog integrity checks
+- metadata backfills
+- cache utilities
+- API health utility views
+- SEO/admin tools
+- import/export tools
+```
+
+This keeps the main business dashboard clean.
+
+---
+
+# 2. Final Content Boundaries
+
+## 2.1 Command Center
+
+The **Command Center** is business observability only.
+
+It should show:
+
+```text
+- orders requiring attention
+- repairs awaiting review/quote/approval
+- returns pending inspection/refund/exchange
+- support tickets past SLA
+- fulfillment exceptions
+- payment issues
+- shipping/tracking delays
+- customer-impacting workflow bottlenecks
+- redirect cards into Orders, Repairs, Returns, and Support
+```
+
+It should not show raw backend logs, API traces, cron details, webhook payloads, SQL diagnostics, PHP notices, or module-loader/debug state.
+
+---
+
+## 2.2 System Manager
+
+The **System Manager** is backend/system observability.
+
+It should show:
+
+```text
+- system health
+- API health
+- queue status
+- cron status
+- webhook delivery status
+- failed jobs
+- retry queues
+- Veeqo diagnostics
+- QuickBooks diagnostics
+- cache diagnostics
+- audit logs
+- security events
+- integration credential/config status
+- raw payload inspection where required
+```
+
+This is the only main business menu item that may expose backend/system internals.
+
+---
+
+## 2.3 Tool Pages
+
+Tool pages must remain task-focused.
+
+Examples:
+
+| Page           | Allowed UI Content                                                              | Not Allowed                                             |
+| -------------- | ------------------------------------------------------------------------------- | ------------------------------------------------------- |
+| Orders         | product order queue, fulfillment status, payment status, customer/order actions | raw Veeqo payloads, webhook traces, stack traces        |
+| Repairs        | repair queue, quote status, approval state, parts allocation, shipping state    | event bus internals, cron logs, debug payloads          |
+| Returns        | RMA queue, eligibility, inspection, refund/exchange status                      | payment gateway traces, raw refund payloads             |
+| Support        | tickets, messages, macros, SLA state, linked customer context                   | REST route diagnostics, queue internals                 |
+| Schematics     | diagram/media mapping, brand/model/product associations                         | manifest internals unless opened through System Manager |
+| Image Sync     | missing images, source URL, sync status, retry action                           | raw HTTP traces by default                              |
+| Catalog Health | scan result, issue category, actionable fix/export                              | SQL/debug/backend internals                             |
+
+The operational rule:
+
+```text
+Show summarized, actionable status in the module.
+Show technical diagnostics only in System Manager.
+```
+
+---
+
+# 3. Current-Codebase Problem This Solves
+
+The current admin UI is fragmented.
+
+Examples from the existing codebase:
+
+* `OpsDashboard.php` registers its own top-level `DTB Ops` menu and owns a large inline dashboard design system. 
+* `CatalogHealthPage.php` conditionally attaches to `dtb-ops` or creates its own top-level page, then renders plain `.wrap` markup with inline button styling. 
+* `SupportHubAdminMenu.php` registers its own top-level Support menu and uses separate external support-specific assets. 
+* `SchematicAdminMenu.php` creates a separate `DTB Tools` top-level menu. 
+* `RepairAdminMenu.php` creates a separate Repairs top-level menu and injects its own inline design-token CSS through `admin_head`. 
+
+The rebuild consolidates this into two intentional libraries plus one global UI system.
+
+---
+
+# 4. Merged Target File Structure
+
+```text
 wp/wp-content/mu-plugins/
 ├─ 00-dtb-loader.php
-├─ README.md
-├─ dtb-admin-performance.php
-├─ dtb-admin-security.php
-├─ dtb-api-health-monitor.php
-├─ dtb-api-security.php
-├─ dtb-auth.php
-├─ dtb-cache-admin.php
-├─ dtb-cache.php
-├─ dtb-catalog-health.php
-├─ dtb-catalog-platform/
-├─ dtb-coming-soon.php
-├─ dtb-commerce/
-├─ dtb-config-reference.php
-├─ dtb-frontend-security.php
-├─ dtb-image-sync.md
-├─ dtb-image-sync.php
-├─ dtb-ops-dashboard.php
-├─ dtb-product-mapping.php
-├─ dtb-quickbooks.php
-├─ dtb-repair-admin.php
-├─ dtb-repair-events.php
-├─ dtb-repair-notifications.php
-├─ dtb-repair-queue.php
-├─ dtb-repair-workflows.php
-├─ dtb-repairs.php
-├─ dtb-rest-api.php
-├─ dtb-rewards.php
-├─ dtb-schematics-admin.php
-├─ dtb-schematics-api.php
-├─ dtb-seo.php
-├─ dtb-utils.php
-├─ dtb-veeqo.php
-├─ dtb-woocommerce.php
-├─ dtb-order-events.php
-├─ dtb-order-workflows.php
-├─ dtb-order-queue.php
-├─ dtb-order-tracking.php
-├─ dtb-payment-webhooks.php
-├─ dtb-order-admin.php
-├─ endurance-page-cache.php
-└─ sso.php
-
-The last two files, endurance-page-cache.php and sso.php, appear to be host-provided or non-DTB mu-plugins and should be treated as external runtime files, not first-party DTB architecture.
-
-⸻
-
-3. Current Loader-Managed Load Order
-
-The actual current loader sequence is:
-
-1.  dtb-utils.php
-2.  dtb-auth.php
-3.  dtb-cache.php
-4.  dtb-cache-admin.php
-5.  dtb-rest-api.php
-6.  dtb-catalog-platform/bootstrap.php
-7.  dtb-api-security.php
-8.  dtb-frontend-security.php
-9.  dtb-admin-security.php
-10. dtb-rewards.php
-11. dtb-image-sync.php
-12. dtb-woocommerce.php
-13. dtb-commerce/bootstrap.php
-14. dtb-veeqo.php
-15. dtb-ops-dashboard.php
-16. dtb-catalog-health.php
-17. dtb-quickbooks.php
-18. dtb-schematics-api.php
-19. dtb-coming-soon.php
-20. dtb-seo.php
-21. dtb-config-reference.php
-22. dtb-repair-events.php
-23. dtb-repair-workflows.php
-24. dtb-repair-queue.php
-25. dtb-repair-notifications.php
-26. dtb-repairs.php
-27. dtb-repair-admin.php
-28. dtb-order-events.php
-29. dtb-order-workflows.php
-30. dtb-order-queue.php
-31. dtb-order-tracking.php
-32. dtb-payment-webhooks.php
-33. dtb-order-admin.php
-
-This is confirmed directly in the loader.  ￼
-
-Evaluation
-
-The load order is mostly logical, but there are structural problems:
-
-Finding	Evaluation
-dtb-utils, auth, cache, REST load early	Correct
-dtb-catalog-platform/bootstrap.php loads early	Correct; catalog read-model should load before consumers
-Security modules load after REST and catalog	Acceptable, but should eventually move into platform bootstrap
-Rewards loads before WooCommerce/Veeqo/QuickBooks	Works currently, but integration sequencing should be explicit
-Repair modules load after integrations	Partially questionable; repair should load before downstream integration consumers if integrations hook into repair events
-Product-order modules load last	Works if they only hook into Woo/WP events, but should become an dtb-order-platform/ module
-README does not match current loader	Documentation drift; must be corrected
-
-⸻
-
-4. Existing Modular Domains
-
-4.1 dtb-catalog-platform/
-
-Current structure from screenshots and bootstrap:
-
-dtb-catalog-platform/
-├─ Admin/
-│  └─ MetaBackfillTool.php
-├─ Domain/
-│  ├─ ProductMeta.php
-│  ├─ ToolFamilies.php
-│  └─ ToolsetData.php
-├─ Rest/
-│  ├─ CatalogFacetsController.php
-│  ├─ CatalogProductsController.php
-│  ├─ CompatiblePartsController.php
-│  ├─ ProductDetailController.php
-│  ├─ ToolsetOptionsController.php
-│  ├─ ToolsetTemplatesController.php
-│  └─ ToolsetValidationController.php
-├─ Services/
-│  ├─ BrandNormalizer.php
-│  ├─ CatalogFacetService.php
-│  ├─ CatalogProductNormalizer.php
-│  ├─ CatalogProductRepository.php
-│  ├─ CategoryNormalizer.php
-│  ├─ DefaultVariationResolver.php
-│  ├─ ToolFamilyResolver.php
-│  ├─ ToolsetEligibilityService.php
-│  ├─ ToolsetValidationService.php
-│  └─ VariationReadModelService.php
-├─ Validation/
-│  ├─ CatalogValidationService.php
-│  ├─ ImageValidator.php
-│  ├─ PricingValidator.php
-│  ├─ ProductMetaValidator.php
-│  ├─ SeoValidator.php
-│  ├─ ToolsetEligibilityValidator.php
-│  └─ VariationValidator.php
-└─ bootstrap.php
-
-The bootstrap confirms this exact internal loading pattern.  ￼
-
-Evaluation
-
-This is the best existing production pattern in the repo.
-
-Strengths:
-
-clear bounded domain
-clear REST controller layer
-clear service layer
-clear validation layer
-explicit bootstrap
-feature flag support
-REST route registration centralized in module bootstrap
-
-Weaknesses:
-
-no Application/ layer
-no Infrastructure/ layer
-CatalogProductRepository currently lives under Services/
-global class names instead of namespaced classes
-manual require_once instead of autoloading
-
-Verdict: Keep this pattern and evolve it. Do not replace it.
-
-⸻
-
-4.2 dtb-commerce/
-
-Current structure:
-
-dtb-commerce/
-├─ Cart/
-│  └─ ToolsetCartItemData.php
-├─ Orders/
-│  └─ ToolsetOrderLineMeta.php
-└─ bootstrap.php
-
-The bootstrap loads exactly these two files and registers them.  ￼
-
-Evaluation
-
-This is a small, focused module. It is not wrong, but it is underdeveloped relative to the rest of the platform.
-
-Strengths:
-
-clean bootstrap
-bounded commerce concern
-keeps cart/order metadata logic out of root
-
-Weaknesses:
-
-no domain layer
-no REST layer
-no validation layer
-no shared order read model
-overlaps conceptually with new root-level dtb-order-* files
-
-Verdict: Keep it, but merge/evolve the new order workflow files into a larger dtb-order-platform/ or expanded dtb-commerce/ module.
-
-⸻
-
-5. Repair System Audit
-
-The repair system is currently implemented as root-level files:
-
-dtb-repair-events.php
-dtb-repair-workflows.php
-dtb-repair-queue.php
-dtb-repair-notifications.php
-dtb-repairs.php
-dtb-repair-admin.php
-
-dtb-repairs.php registers the dtb_repair_request CPT, meta fields, and REST endpoints for repair submission, status, media upload, SSE event stream, and health.  ￼
-
-The repair CPT is private, hidden from public queries, custom-routed through dtb/v1, and capability-controlled through dtb_manage_repairs.  ￼
-
-The repair REST routes include:
-
-GET  /dtb/v1/repairs/health
-POST /dtb/v1/repairs/submit
-GET  /dtb/v1/repairs/status/{repair_id}
-POST /dtb/v1/repairs/{repair_id}/media
-GET  /dtb/v1/repairs/{repair_id}/events/stream
-
-These are implemented in dtb_repair_register_rest_routes().  ￼
-
-The repair event ledger is already implemented as wp_dtb_repair_events, with visibility levels, event type mapping, append helpers, and customer timeline support.  ￼
-
-Evaluation
-
-This is much more complete than the earlier architecture discussion assumed. The codebase already contains:
-
-repair CPT
-repair meta schema
-repair event ledger
-repair customer/operator/internal visibility model
-repair REST submit/status/media/SSE/health endpoints
-public-token access model
-rate limiting
-idempotency handling
-workflow separation
-queue separation
-notification separation
-admin separation
-
-The issue is not missing capability. The issue is organization.
-
-Correct Remapping
-
-These files should not remain root-level long term. They should become:
-
-dtb-repair-service/
-├─ bootstrap.php
-├─ Admin/
-├─ Application/
-├─ Domain/
-├─ Infrastructure/
-├─ Rest/
-├─ Services/
-├─ Tracking/
-└─ Validation/
-
-The current files are already cleanly separable enough to move with low conceptual risk.
-
-⸻
-
-6. Product Order System Audit
-
-The current codebase now includes a separate product-order event/tracking subsystem:
-
-dtb-order-events.php
-dtb-order-workflows.php
-dtb-order-queue.php
-dtb-order-tracking.php
-dtb-payment-webhooks.php
-dtb-order-admin.php
-
-dtb-order-events.php creates and manages wp_dtb_order_events, including event visibility, idempotency, customer timelines, and event helpers.  ￼
-
-dtb-order-tracking.php provides customer-safe order tracking projections and REST endpoints:
-
-GET /dtb/v1/orders
-GET /dtb/v1/orders/{id}
-GET /dtb/v1/orders/{id}/tracking
-GET /dtb/v1/orders/{id}/events/stream
-GET /dtb/v1/orders/health
-
-This is documented directly in the file header.  ￼
-
-It also explicitly prevents exposing raw payment payloads, gateway internals, Veeqo errors, QuickBooks IDs, admin notes, fraud metadata, or raw exceptions.  ￼
-
-Evaluation
-
-This is architecturally important. The repo now has two event-backed workflow domains:
-
-Repair workflow domain:
-  dtb-repair-*
-Product order workflow domain:
-  dtb-order-*
-
-That means the rebuild architecture should not force all order logic into dtb-commerce/Cart and dtb-commerce/Orders only. The current codebase deserves a dedicated dtb-order-platform/ module, or a substantially expanded dtb-commerce/ module.
-
-Recommendation
-
-Use a separate module:
-
-dtb-order-platform/
-
-Reason:
-
-order event ledger
-payment webhooks
-fulfillment workflow
-tracking projection
-customer-safe SSE
-admin operations
-queue jobs
-integration status
-
-This is bigger than cart/order metadata persistence. It is now an operational order lifecycle system.
-
-⸻
-
-7. Current Architecture Problems
-
-7.1 Root Directory Is Overloaded
-
-Root currently mixes:
-
-composition loader
-platform utilities
-auth/security/cache
-REST proxy
-catalog admin tools
-image sync
-Veeqo/QuickBooks integrations
-repair workflow engine
-product-order workflow engine
-SEO
-coming soon
-ops dashboard
-host plugins
-
-This makes ownership unclear and causes future scalability issues.
-
-7.2 Multiple Architectural Styles Coexist
-
-Current styles:
-
-flat procedural root files
-folder module with bootstrap
-folder module with partial feature folders
-host mu-plugins
-docs in root
-
-This is tolerable during transition, but not a clean production end-state.
-
-7.3 README Is Out of Sync
-
-The README says the loader-managed chain ends at dtb-config-reference.php and separately mentions some auto-loaded files.  ￼ But the loader now includes catalog-platform, catalog-health, repair modules, and order modules.  ￼
-
-This is a governance problem. The code is more current than the documentation.
-
-7.4 Platform Concerns Are Scattered
-
-These should become one platform module:
-
-dtb-utils.php
-dtb-auth.php
-dtb-cache.php
-dtb-cache-admin.php
-dtb-rest-api.php
-dtb-api-security.php
-dtb-frontend-security.php
-dtb-admin-security.php
-dtb-api-health-monitor.php
-dtb-admin-performance.php
-dtb-ops-dashboard.php
-dtb-config-reference.php
-
-7.5 Integrations Are Still Flat
-
-These should become integration modules:
-
-dtb-veeqo.php
-dtb-quickbooks.php
-dtb-woocommerce.php
-dtb-rewards.php
-
-The current flat files probably work, but they are not the right long-term architecture.
-
-⸻
-
-8. Revised Production Target Structure
-
-This is the revised target structure for the real current codebase.
-
-wp/wp-content/mu-plugins/
-├─ 00-dtb-loader.php
-├─ README.md
-├─ index.php
 │
 ├─ dtb-platform/
 │  ├─ bootstrap.php
-│  ├─ Auth/
-│  ├─ Cache/
-│  ├─ Config/
-│  ├─ Health/
-│  ├─ Observability/
-│  ├─ Rest/
-│  ├─ Security/
-│  └─ Support/
-│
-├─ dtb-catalog-platform/
-│  ├─ bootstrap.php
+│  │
 │  ├─ Admin/
-│  ├─ Application/
-│  ├─ Domain/
-│  ├─ Infrastructure/
-│  ├─ Rest/
-│  ├─ Services/
-│  └─ Validation/
+│  │  ├─ AdminAssets.php
+│  │  ├─ AdminCapabilities.php
+│  │  ├─ AdminMenuRegistry.php
+│  │  ├─ AdminPageRegistry.php
+│  │  ├─ AdminShell.php
+│  │  ├─ AdminUi.php
+│  │  ├─ OperationsMenu.php
+│  │  ├─ ToolLibraryMenu.php
+│  │  └─ assets/
+│  │     ├─ dtb-admin.css
+│  │     └─ dtb-admin.js
+│  │
+│  ├─ CommandCenter/
+│  │  ├─ CommandCenterPage.php
+│  │  ├─ CommandCenterService.php
+│  │  └─ Rest/
+│  │     └─ CommandCenterController.php
+│  │
+│  └─ SystemManager/
+│     ├─ SystemManagerPage.php
+│     ├─ SystemHealthService.php
+│     ├─ QueueHealthService.php
+│     ├─ IntegrationHealthService.php
+│     ├─ AuditLogService.php
+│     └─ Rest/
+│        ├─ SystemHealthController.php
+│        ├─ QueueController.php
+│        ├─ IntegrationController.php
+│        └─ AuditLogController.php
 │
 ├─ dtb-commerce/
-│  ├─ bootstrap.php
-│  ├─ Cart/
-│  ├─ Orders/
-│  ├─ Domain/
-│  ├─ Infrastructure/
-│  ├─ Services/
-│  └─ Validation/
-│
-├─ dtb-order-platform/
-│  ├─ bootstrap.php
-│  ├─ Admin/
-│  ├─ Application/
-│  ├─ Domain/
-│  ├─ Infrastructure/
-│  ├─ Rest/
-│  ├─ Services/
-│  ├─ Tracking/
-│  ├─ Webhooks/
-│  └─ Validation/
+│  └─ Admin/
+│     └─ OrdersPage.php
 │
 ├─ dtb-repair-service/
+│  └─ Admin/
+│     └─ RepairsPage.php
+│
+├─ dtb-returns/
 │  ├─ bootstrap.php
 │  ├─ Admin/
-│  ├─ Application/
+│  │  └─ ReturnsPage.php
 │  ├─ Domain/
-│  ├─ Infrastructure/
-│  ├─ Rest/
 │  ├─ Services/
-│  ├─ Tracking/
-│  └─ Validation/
+│  └─ Rest/
+│
+├─ dtb-support/
+│  └─ Admin/
+│     └─ SupportPage.php
 │
 ├─ dtb-schematics/
-│  ├─ bootstrap.php
-│  ├─ Admin/
-│  ├─ Domain/
-│  ├─ Infrastructure/
-│  ├─ Rest/
-│  ├─ Services/
-│  └─ Validation/
+│  └─ Admin/
+│     └─ SchematicsPage.php
 │
-├─ dtb-media/
-│  ├─ bootstrap.php
-│  ├─ Admin/
-│  ├─ Application/
-│  ├─ Infrastructure/
-│  ├─ Services/
-│  └─ Validation/
-│
-├─ dtb-marketing/
-│  ├─ bootstrap.php
-│  ├─ ComingSoon/
-│  ├─ Seo/
-│  └─ Validation/
-│
-├─ dtb-integrations/
-│  ├─ bootstrap.php
-│  ├─ WooCommerce/
-│  ├─ Veeqo/
-│  ├─ QuickBooks/
-│  ├─ Rewards/
-│  └─ Notifications/
-│
-├─ endurance-page-cache.php
-└─ sso.php
-
-Root Policy
-
-Root should contain only:
-
-00-dtb-loader.php
-README.md
-index.php
-host-provided mu-plugins
-module folders
-
-Temporary legacy root files may remain during migration, but no new long-term business logic should be added at root.
-
-⸻
-
-9. Exact Current-to-Target Remapping
-
-9.1 Platform Module
-
-Target:
-
-dtb-platform/
-
-Move these files:
-
-dtb-utils.php
-dtb-auth.php
-dtb-cache.php
-dtb-cache-admin.php
-dtb-rest-api.php
-dtb-api-security.php
-dtb-frontend-security.php
-dtb-admin-security.php
-dtb-api-health-monitor.php
-dtb-admin-performance.php
-dtb-ops-dashboard.php
-dtb-config-reference.php
-
-Recommended structure:
-
-dtb-platform/
-├─ bootstrap.php
-├─ Auth/
-│  ├─ AuthController.php
-│  ├─ AuthRoutes.php
-│  ├─ JwtService.php
-│  ├─ SessionService.php
-│  └─ TokenService.php
-├─ Cache/
-│  ├─ CacheAdminPage.php
-│  ├─ CacheInvalidationService.php
-│  ├─ CacheKeyBuilder.php
-│  └─ CacheService.php
-├─ Config/
-│  ├─ Constants.php
-│  ├─ Environment.php
-│  ├─ FeatureFlags.php
-│  └─ RuntimeConfig.php
-├─ Health/
-│  ├─ ApiHealthController.php
-│  ├─ ApiHealthMonitor.php
-│  └─ DependencyHealthCheck.php
-├─ Observability/
-│  ├─ AdminNoticeService.php
-│  ├─ Diagnostics.php
-│  ├─ Logger.php
-│  ├─ OpsAuditLog.php
-│  └─ OpsDashboard.php
-├─ Rest/
-│  ├─ AbstractRestController.php
-│  ├─ LegacyProxyRoutes.php
-│  ├─ RestResponseFactory.php
-│  └─ RestRouteRegistrar.php
-├─ Security/
-│  ├─ AdminSecurity.php
-│  ├─ ApiSecurity.php
-│  ├─ CapabilityService.php
-│  ├─ CorsPolicy.php
-│  ├─ FrontendSecurity.php
-│  ├─ NonceController.php
-│  ├─ NonceGuard.php
-│  ├─ OriginAllowlist.php
-│  ├─ PermissionGuard.php
-│  └─ RateLimiter.php
-└─ Support/
-   ├─ Arr.php
-   ├─ DateTime.php
-   ├─ Http.php
-   ├─ Json.php
-   ├─ Sanitize.php
-   ├─ Str.php
-   └─ Url.php
-
-⸻
-
-9.2 Catalog Platform
-
-Current dtb-catalog-platform/ should remain and be expanded, not replaced.
-
-Target:
-
-dtb-catalog-platform/
-├─ bootstrap.php
-├─ Admin/
-│  ├─ CatalogHealthPage.php
-│  ├─ CatalogToolsPage.php
-│  └─ MetaBackfillTool.php
-├─ Application/
-│  ├─ BackfillProductMeta.php
-│  ├─ BuildCatalogFacets.php
-│  ├─ NormalizeCatalogProduct.php
-│  ├─ ResolveCompatibleParts.php
-│  ├─ ResolveDefaultVariation.php
-│  └─ ValidateCatalogProduct.php
-├─ Domain/
-│  ├─ ProductMeta.php
-│  ├─ ToolFamilies.php
-│  └─ ToolsetData.php
-├─ Infrastructure/
-│  ├─ CatalogCache.php
-│  ├─ CatalogProductRepository.php
-│  ├─ WooProductRepository.php
-│  └─ WordPressProductMetaStore.php
-├─ Rest/
-│  ├─ CatalogFacetsController.php
-│  ├─ CatalogProductsController.php
-│  ├─ CompatiblePartsController.php
-│  ├─ ProductDetailController.php
-│  ├─ ToolsetOptionsController.php
-│  ├─ ToolsetTemplatesController.php
-│  └─ ToolsetValidationController.php
-├─ Services/
-│  ├─ BrandNormalizer.php
-│  ├─ CatalogFacetService.php
-│  ├─ CatalogProductNormalizer.php
-│  ├─ CategoryNormalizer.php
-│  ├─ DefaultVariationResolver.php
-│  ├─ ToolFamilyResolver.php
-│  ├─ ToolsetEligibilityService.php
-│  ├─ ToolsetValidationService.php
-│  └─ VariationReadModelService.php
-└─ Validation/
-   ├─ CatalogValidationService.php
-   ├─ ImageValidator.php
-   ├─ PricingValidator.php
-   ├─ ProductMetaValidator.php
-   ├─ SeoValidator.php
-   ├─ ToolsetEligibilityValidator.php
-   └─ VariationValidator.php
-
-Specific change: move Services/CatalogProductRepository.php to Infrastructure/CatalogProductRepository.php because it is repository/storage access, not a pure service.
-
-⸻
-
-9.3 Commerce Module
-
-Current:
-
-dtb-commerce/
-├─ Cart/
-├─ Orders/
-└─ bootstrap.php
-
-Target:
-
-dtb-commerce/
-├─ bootstrap.php
-├─ Cart/
-│  ├─ ToolsetCartItemData.php
-│  ├─ CartItemNormalizer.php
-│  └─ CartService.php
-├─ Orders/
-│  ├─ ToolsetOrderLineMeta.php
-│  ├─ OrderLineMetaService.php
-│  └─ OrderReadModel.php
-├─ Domain/
-│  ├─ CartItem.php
-│  ├─ OrderLineItem.php
-│  └─ ToolsetLineItemMeta.php
-├─ Infrastructure/
-│  ├─ WooCartStore.php
-│  └─ WooOrderRepository.php
-├─ Services/
-│  ├─ CartMetadataService.php
-│  └─ OrderMetadataService.php
-└─ Validation/
-   ├─ CartItemValidator.php
-   └─ OrderMetadataValidator.php
-
-Do not move dtb-order-* files here unless you want commerce to become very large. Prefer dtb-order-platform/.
-
-⸻
-
-9.4 Product Order Platform
-
-Move:
-
-dtb-order-events.php
-dtb-order-workflows.php
-dtb-order-queue.php
-dtb-order-tracking.php
-dtb-payment-webhooks.php
-dtb-order-admin.php
-
-Target:
-
-dtb-order-platform/
-├─ bootstrap.php
-├─ Admin/
-│  ├─ OrderAdminColumns.php
-│  ├─ OrderAdminMenu.php
-│  ├─ OrderBulkActions.php
-│  ├─ OrderIntegrationPanel.php
-│  ├─ OrderQueuePanel.php
-│  └─ OrderTimelinePanel.php
-├─ Application/
-│  ├─ BuildOrderTrackingProjection.php
-│  ├─ HandlePaymentWebhook.php
-│  ├─ RefreshOrderProjection.php
-│  ├─ TransitionOrderStatus.php
-│  └─ UpdateOrderTracking.php
-├─ Domain/
-│  ├─ OrderEvent.php
-│  ├─ OrderLifecycleStatus.php
-│  ├─ OrderTrackingProjection.php
-│  └─ OrderTransition.php
-├─ Infrastructure/
-│  ├─ OrderEventRepository.php
-│  ├─ OrderIntegrationStateStore.php
-│  ├─ OrderQueue.php
-│  ├─ OrderSchemaInstaller.php
-│  └─ WooOrderStatusStore.php
-├─ Rest/
-│  ├─ OrderDetailController.php
-│  ├─ OrderEventStreamController.php
-│  ├─ OrderHealthController.php
-│  ├─ OrderListController.php
-│  └─ OrderTrackingController.php
-├─ Services/
-│  ├─ OrderProjectionService.php
-│  ├─ OrderTrackingUrlService.php
-│  └─ OrderWorkflowService.php
-├─ Tracking/
-│  ├─ OrderCustomerTimeline.php
-│  ├─ OrderEventStream.php
-│  ├─ OrderOperatorTimeline.php
-│  └─ OrderStatusProjector.php
-├─ Webhooks/
-│  ├─ PaymentWebhookController.php
-│  ├─ PaymentWebhookIdempotency.php
-│  └─ PaymentWebhookVerifier.php
-└─ Validation/
-   ├─ OrderAccessValidator.php
-   ├─ OrderTransitionValidator.php
-   └─ PaymentWebhookValidator.php
-
-This structure reflects the real current existence of order events, order tracking, SSE, payment webhooks, and order admin.
-
-⸻
-
-9.5 Repair Service
-
-Move:
-
-dtb-repair-events.php
-dtb-repair-workflows.php
-dtb-repair-queue.php
-dtb-repair-notifications.php
-dtb-repairs.php
-dtb-repair-admin.php
-
-Target:
-
-dtb-repair-service/
-├─ bootstrap.php
-├─ Admin/
-│  ├─ RepairAdminMenu.php
-│  ├─ RepairBulkActions.php
-│  ├─ RepairDetailPage.php
-│  ├─ RepairIntegrationPanel.php
-│  ├─ RepairListTable.php
-│  ├─ RepairMetaBoxes.php
-│  ├─ RepairQueuePanel.php
-│  ├─ RepairSlaPanel.php
-│  └─ RepairTimelinePanel.php
-├─ Application/
-│  ├─ AssignRepairTechnician.php
-│  ├─ AttachRepairMedia.php
-│  ├─ BuildRepairStatusProjection.php
-│  ├─ CloseRepairRequest.php
-│  ├─ CreateRepairQuote.php
-│  ├─ SubmitRepairRequest.php
-│  ├─ TransitionRepairStatus.php
-│  └─ UpdateRepairTracking.php
-├─ Domain/
-│  ├─ RepairAccessPolicy.php
-│  ├─ RepairEvent.php
-│  ├─ RepairMedia.php
-│  ├─ RepairPolicy.php
-│  ├─ RepairQuote.php
-│  ├─ RepairRequest.php
-│  ├─ RepairStatus.php
-│  ├─ RepairTimeline.php
-│  └─ RepairTransition.php
-├─ Infrastructure/
-│  ├─ RepairEventRepository.php
-│  ├─ RepairMediaStorage.php
-│  ├─ RepairMetaRepository.php
-│  ├─ RepairNotificationDispatcher.php
-│  ├─ RepairPostType.php
-│  ├─ RepairQueue.php
-│  ├─ RepairSchemaInstaller.php
-│  └─ RepairStatusStore.php
-├─ Rest/
-│  ├─ RepairEventStreamController.php
-│  ├─ RepairHealthController.php
-│  ├─ RepairMediaController.php
-│  ├─ RepairStatusController.php
-│  └─ SubmitRepairController.php
-├─ Services/
-│  ├─ RepairIdempotencyService.php
-│  ├─ RepairProjectionService.php
-│  ├─ RepairPublicTokenService.php
-│  ├─ RepairSlaService.php
-│  ├─ RepairWorkflowService.php
-│  └─ RepairWorkflowTransitionMap.php
-├─ Tracking/
-│  ├─ RepairCustomerTimeline.php
-│  ├─ RepairEventStream.php
-│  ├─ RepairOperatorTimeline.php
-│  └─ RepairStatusProjector.php
-└─ Validation/
-   ├─ RepairAccessValidator.php
-   ├─ RepairMediaValidator.php
-   ├─ RepairStatusTransitionValidator.php
-   └─ RepairSubmitValidator.php
-
-This maps directly to what already exists in the repair root files.
-
-⸻
-
-9.6 Integrations
-
-Move:
-
-dtb-woocommerce.php
-dtb-veeqo.php
-dtb-quickbooks.php
-dtb-rewards.php
-
-Target:
-
-dtb-integrations/
-├─ bootstrap.php
-├─ WooCommerce/
-│  ├─ WooCommerceBridge.php
-│  ├─ WooCommerceHealthCheck.php
-│  ├─ WooWebhookManager.php
-│  ├─ ProductWebhookHandler.php
-│  ├─ ProductLookupService.php
-│  └─ RepairOrderService.php
-├─ Veeqo/
-│  ├─ VeeqoClient.php
-│  ├─ VeeqoConfig.php
-│  ├─ VeeqoHealthCheck.php
-│  ├─ VeeqoInventoryService.php
-│  ├─ VeeqoShippingService.php
-│  ├─ VeeqoSyncJob.php
-│  └─ VeeqoWebhookController.php
-├─ QuickBooks/
-│  ├─ QuickBooksClient.php
-│  ├─ QuickBooksConfig.php
-│  ├─ QuickBooksCustomerMapper.php
-│  ├─ QuickBooksHealthCheck.php
-│  ├─ QuickBooksInvoiceService.php
-│  ├─ QuickBooksOAuthController.php
-│  └─ QuickBooksSyncJob.php
-├─ Rewards/
-│  ├─ ProCareEligibilityService.php
-│  ├─ RewardsAdjustmentController.php
-│  ├─ RewardsBalanceController.php
-│  ├─ RewardsHealthCheck.php
-│  ├─ RewardsIssueJob.php
-│  └─ RewardsService.php
-└─ Notifications/
-   ├─ EmailTemplateRenderer.php
-   ├─ NotificationDispatcher.php
-   ├─ NotificationJob.php
-   ├─ NotificationTemplateRepository.php
-   └─ SmsGateway.php
-
-⸻
-
-9.7 Schematics
-
-Move:
-
-dtb-schematics-api.php
-dtb-schematics-admin.php
-
-Target:
-
-dtb-schematics/
-├─ bootstrap.php
-├─ Admin/
-│  ├─ SchematicAdminMenu.php
-│  ├─ SchematicEditorPage.php
-│  ├─ SchematicMediaPage.php
-│  └─ SchematicSyncPage.php
-├─ Application/
-│  ├─ BuildSchematicManifest.php
-│  ├─ ResolveSchematicParts.php
-│  └─ SyncSchematicMedia.php
-├─ Domain/
-│  ├─ Schematic.php
-│  ├─ SchematicAsset.php
-│  ├─ SchematicBrand.php
-│  └─ SchematicPart.php
-├─ Infrastructure/
-│  ├─ SchematicManifestRepository.php
-│  ├─ SchematicMediaRepository.php
-│  └─ WordPressMediaStore.php
-├─ Rest/
-│  ├─ SchematicManifestController.php
-│  ├─ SchematicMediaController.php
-│  └─ SchematicPartsController.php
-├─ Services/
-│  ├─ SchematicFallbackResolver.php
-│  ├─ SchematicMediaService.php
-│  └─ SchematicPartResolver.php
-└─ Validation/
-   ├─ SchematicBrandValidator.php
-   ├─ SchematicManifestValidator.php
-   └─ SchematicMediaValidator.php
-
-⸻
-
-9.8 Media
-
-Move:
-
-dtb-image-sync.php
-dtb-image-sync.md
-
-Target:
-
-dtb-media/
-├─ README.md
-├─ bootstrap.php
-├─ Admin/
-│  ├─ ImageSyncAdminPage.php
-│  └─ MediaDiagnosticsPage.php
-├─ Application/
-│  ├─ LinkImagesToProducts.php
-│  ├─ PurgeUnlinkedImages.php
-│  ├─ RegisterProductImages.php
-│  ├─ ReleaseImageSyncLock.php
-│  ├─ ResetImageSync.php
-│  └─ SyncRemoteImage.php
-├─ Infrastructure/
-│  ├─ ImageSyncRepository.php
-│  ├─ MediaAttachmentRepository.php
-│  └─ RemoteImageFetcher.php
-├─ Rest/
-│  ├─ ImageSyncController.php
-│  ├─ ImageSyncProgressController.php
-│  └─ ImageSyncStatusController.php
-├─ Services/
-│  ├─ ImageNormalizer.php
-│  ├─ ImageSyncService.php
-│  ├─ ImageUrlResolver.php
-│  └─ ProductImageLinker.php
-└─ Validation/
-   ├─ ImageMimeValidator.php
-   ├─ ImagePathValidator.php
-   └─ RemoteImageValidator.php
-
-⸻
-
-9.9 Marketing
-
-Move:
-
-dtb-coming-soon.php
-dtb-seo.php
-
-Target:
-
-dtb-marketing/
-├─ bootstrap.php
-├─ ComingSoon/
-│  ├─ ComingSoonAdminPage.php
-│  ├─ ComingSoonController.php
-│  ├─ ComingSoonSubscriberRepository.php
-│  └─ SubscriberExportService.php
-├─ Seo/
-│  ├─ ProductSeoController.php
-│  ├─ SeoMetaService.php
-│  └─ SeoRepository.php
-└─ Validation/
-   ├─ SeoValidator.php
-   └─ SubscriberValidator.php
-
-⸻
-
-10. Revised Final Loader Order
-
-After rebuild, 00-dtb-loader.php should load only module bootstraps:
-
-1.  dtb-platform/bootstrap.php
-2.  dtb-catalog-platform/bootstrap.php
-3.  dtb-commerce/bootstrap.php
-4.  dtb-order-platform/bootstrap.php
-5.  dtb-schematics/bootstrap.php
-6.  dtb-media/bootstrap.php
-7.  dtb-marketing/bootstrap.php
-8.  dtb-repair-service/bootstrap.php
-9.  dtb-integrations/bootstrap.php
-
-Why This Order
-
-Order	Module	Reason
-1	dtb-platform	shared config, auth, REST helpers, security, logging
-2	dtb-catalog-platform	canonical product metadata and tool families
-3	dtb-commerce	cart/order metadata persistence
-4	dtb-order-platform	order lifecycle, event ledger, tracking, payment webhooks
-5	dtb-schematics	schematic lookup depends on catalog/product mapping
-6	dtb-media	image sync and media operational tooling
-7	dtb-marketing	SEO and coming-soon surfaces
-8	dtb-repair-service	repair depends on catalog, commerce, media, and order capabilities
-9	dtb-integrations	downstream systems consume domain events and queues
-
-This is cleaner than the current interleaving of platform, domain, integration, and admin files at root.
-
-⸻
-
-11. Migration Strategy
-
-Phase 1 — Documentation Correction
-
-Update wp/wp-content/mu-plugins/README.md immediately.
-
-It currently lags behind the loader and should document:
-
-dtb-catalog-platform/bootstrap.php
-dtb-catalog-health.php
-dtb-repair-*.php
-dtb-order-*.php
-dtb-payment-webhooks.php
-dtb-order-admin.php
-
-This is required because the README currently says it is the source of truth, but the loader is already ahead of it.  ￼
-
-⸻
-
-Phase 2 — Freeze Root Growth
-
-No new root-level DTB files.
-
-Allowed root files after this point:
-
-00-dtb-loader.php
-README.md
-index.php
-temporary legacy proxies
-host-provided files
-module folders
-
-⸻
-
-Phase 3 — Move Repair Files Into dtb-repair-service/
-
-Priority: highest.
-
-Reason: repair is already event-backed, route-backed, queue-backed, and admin-backed. It has crossed the threshold where root files are no longer acceptable.
-
-Move:
-
-dtb-repair-events.php
-dtb-repair-workflows.php
-dtb-repair-queue.php
-dtb-repair-notifications.php
-dtb-repairs.php
-dtb-repair-admin.php
-
-Into the repair module.
-
-Keep compatibility wrapper files temporarily if needed.
-
-⸻
-
-Phase 4 — Move Order Files Into dtb-order-platform/
-
-Move:
-
-dtb-order-events.php
-dtb-order-workflows.php
-dtb-order-queue.php
-dtb-order-tracking.php
-dtb-payment-webhooks.php
-dtb-order-admin.php
-
-This is now a full order lifecycle platform and should not remain flat.
-
-⸻
-
-Phase 5 — Extract Platform Core
-
-Move shared infrastructure into dtb-platform/.
-
-This reduces duplicated security, REST, config, cache, and logging logic.
-
-⸻
-
-Phase 6 — Normalize Integrations
-
-Move Veeqo, QuickBooks, WooCommerce, and Rewards into dtb-integrations/.
-
-Keep public function compatibility shims until all hooks are migrated.
-
-⸻
-
-Phase 7 — Expand Existing Modular Folders
-
-Normalize:
-
-dtb-catalog-platform/
-dtb-commerce/
-
-Do not rewrite them wholesale. Evolve them incrementally.
-
-⸻
-
-12. Revised Production Rule Set
-
-Hard Rules
-
-1. Root files may load modules, but must not own long-term business logic.
-2. Every major backend domain must live in a folder with bootstrap.php.
-3. Every module must explicitly register its hooks/routes from bootstrap.php.
-4. REST controllers live under Rest/.
-5. Domain concepts live under Domain/.
-6. WordPress/WooCommerce persistence lives under Infrastructure/.
-7. Use-case orchestration lives under Application/.
-8. Reusable business operations live under Services/.
-9. Validators live under Validation/.
-10. Customer-safe read projections live under Tracking/ where applicable.
-11. Integrations live under dtb-integrations/.
-12. Platform-wide utilities live under dtb-platform/.
-
-Naming Rules
-
-Top-level module folders: kebab-case
-Layer folders: PascalCase
-Class files: PascalCase.php
-Bootstrap files: bootstrap.php
-Root loader: 00-dtb-loader.php
-
-Namespace Direction
-
-Current code uses many global functions and global classes. Do not force a risky namespace rewrite immediately.
-
-Transition direction:
-
-Current compatibility:
-  global functions remain available
-New module internals:
-  DTB\Platform
-  DTB\Catalog
-  DTB\Commerce
-  DTB\Order
-  DTB\Repair
-  DTB\Schematics
-  DTB\Media
-  DTB\Marketing
-  DTB\Integrations
-
-⸻
-
-13. Final Assessment
-
-The real current codebase is more advanced than the earlier proposed architecture assumed.
-
-You already have:
-
-catalog platform module
-commerce module
-repair event ledger
-repair status tracking
-repair SSE endpoint
-repair CPT and REST API
-order event ledger
-order tracking projection
-order SSE endpoint
-payment webhook handling
-Action Scheduler-style queue separation
-ops dashboard
-health monitoring
-Veeqo integration
-QuickBooks integration
-Rewards integration
-schematics API/admin
-image sync pipeline
-security hardening modules
-
-The problem is not capability. The problem is architecture consolidation.
-
-The correct rebuild is not to invent a new system. It is to re-house the current working system into clean bounded modules while preserving behavior.
-
-Final recommended target:
-
-mu-plugins/
-├─ 00-dtb-loader.php
-├─ README.md
-├─ index.php
-├─ dtb-platform/
-├─ dtb-catalog-platform/
-├─ dtb-commerce/
-├─ dtb-order-platform/
-├─ dtb-repair-service/
-├─ dtb-schematics/
-├─ dtb-media/
-├─ dtb-marketing/
-├─ dtb-integrations/
-├─ endurance-page-cache.php
-└─ sso.php
-
-This is the most truthful production architecture for the current drywall-toolbox GitHub repo.
+└─ dtb-catalog-platform/
+   └─ Admin/
+      ├─ CatalogHealthPage.php
+      ├─ ProductMappingPage.php
+      └─ ImageSyncPage.php
+```
+
+`dtb-platform/Admin/` becomes the shared admin UI and menu foundation. All modules consume it.
+
+---
+
+# 5. Global UI/UX Design System Contract
+
+## 5.1 Every admin page uses the same shell
+
+Standard wrapper:
+
+```html
+<div class="wrap dtb-admin-page">
+  <div class="dtb-admin" data-dtb-section="operations" data-dtb-page="orders">
+    <header class="dtb-page-header">
+      ...
+    </header>
+
+    <main class="dtb-page-body">
+      ...
+    </main>
+  </div>
+</div>
+```
+
+No new page should create its own root system such as:
+
+```text
+.dtb-ops-wrap
+.dtb-repairs-wrap
+.dtb-wrap
+raw .wrap only
+```
+
+Legacy wrappers can temporarily remain as compatibility aliases, but all refactored pages should use `.dtb-admin`.
+
+---
+
+## 5.2 Shared design tokens
+
+One source of truth:
+
+```css
+.dtb-admin {
+  --dtb-color-bg: #f5f7fb;
+  --dtb-color-surface: #ffffff;
+  --dtb-color-surface-soft: #f8fafc;
+  --dtb-color-border: #e2e8f0;
+  --dtb-color-border-soft: #eef2f7;
+
+  --dtb-color-text: #172033;
+  --dtb-color-muted: #64748b;
+  --dtb-color-soft: #94a3b8;
+
+  --dtb-color-primary: #2563eb;
+  --dtb-color-primary-soft: #eff6ff;
+
+  --dtb-color-success: #15803d;
+  --dtb-color-success-soft: #f0fdf4;
+
+  --dtb-color-warning: #d97706;
+  --dtb-color-warning-soft: #fffbeb;
+
+  --dtb-color-danger: #dc2626;
+  --dtb-color-danger-soft: #fef2f2;
+
+  --dtb-radius-sm: 6px;
+  --dtb-radius-md: 10px;
+  --dtb-radius-lg: 14px;
+
+  --dtb-shadow-sm: 0 1px 2px rgba(15, 23, 42, .05);
+  --dtb-shadow-md: 0 8px 24px rgba(15, 23, 42, .08);
+}
+```
+
+All modules use these tokens. No module gets its own competing color/radius/shadow system.
+
+---
+
+## 5.3 Shared component classes
+
+```text
+.dtb-page-header
+.dtb-page-title
+.dtb-page-subtitle
+.dtb-page-actions
+
+.dtb-card
+.dtb-card-header
+.dtb-card-title
+.dtb-card-body
+.dtb-card-footer
+
+.dtb-grid
+.dtb-grid--kpi
+.dtb-grid--two
+.dtb-grid--three
+
+.dtb-kpi
+.dtb-kpi-value
+.dtb-kpi-label
+
+.dtb-toolbar
+.dtb-filter-bar
+
+.dtb-table
+.dtb-table-actions
+.dtb-table-empty
+
+.dtb-btn
+.dtb-btn--primary
+.dtb-btn--secondary
+.dtb-btn--danger
+.dtb-btn--ghost
+
+.dtb-badge
+.dtb-badge--success
+.dtb-badge--warning
+.dtb-badge--danger
+.dtb-badge--info
+.dtb-badge--neutral
+
+.dtb-alert
+.dtb-alert--success
+.dtb-alert--warning
+.dtb-alert--danger
+.dtb-alert--info
+
+.dtb-form
+.dtb-field
+.dtb-label
+.dtb-input
+.dtb-select
+.dtb-hint
+
+.dtb-empty-state
+.dtb-loading
+.dtb-skeleton
+.dtb-drawer
+.dtb-modal
+.dtb-toast
+```
+
+The same components apply to both menus:
+
+```text
+Drywall Toolbox modules use the shared UI.
+DTB Tool Library modules use the shared UI.
+System Manager uses the shared UI plus deeper observability widgets.
+```
+
+---
+
+# 6. Page-Type Templates
+
+## 6.1 Business Command Center Template
+
+Used by:
+
+```text
+Drywall Toolbox → Command Center
+```
+
+Layout:
+
+```text
+Header
+├─ title
+├─ subtitle
+├─ last refreshed
+└─ refresh button
+
+KPI Summary
+├─ Orders needing attention
+├─ Repairs waiting
+├─ Returns pending
+├─ Support SLA risk
+└─ Fulfillment exceptions
+
+Workflow Cards
+├─ Orders
+├─ Repairs
+├─ Returns
+└─ Support
+
+Exception Queue
+└─ customer-impacting issues only
+```
+
+No backend logs.
+
+---
+
+## 6.2 Module Queue Template
+
+Used by:
+
+```text
+Orders
+Repairs
+Returns
+Support
+```
+
+Layout:
+
+```text
+Header
+KPI strip
+Toolbar / filters / search
+Primary queue table
+Row actions
+Bulk actions
+Optional detail drawer
+```
+
+Examples:
+
+```text
+Orders      → order queue table
+Repairs     → repair request table
+Returns     → RMA table
+Support     → ticket table
+```
+
+---
+
+## 6.3 Tool Page Template
+
+Used by:
+
+```text
+Schematics
+Image Sync
+Product Mapping
+Catalog Health
+SEO Tools
+Import / Export
+```
+
+Layout:
+
+```text
+Header
+Tool explanation
+Action toolbar
+Focused work area
+Results card/table
+Export/download actions
+```
+
+No system/backend observability clutter.
+
+---
+
+## 6.4 System Manager Template
+
+Used by:
+
+```text
+Drywall Toolbox → System Manager
+```
+
+Layout:
+
+```text
+Header
+System status grid
+Integration status
+Queue/cron/webhook status
+Failed job table
+Audit/security event table
+Diagnostic drilldowns
+Raw payload viewer only behind explicit expand/open action
+```
+
+This is the only page allowed to carry technical diagnostics.
+
+---
+
+## 6.5 Settings Template
+
+Used by:
+
+```text
+Drywall Toolbox → Settings
+```
+
+Layout:
+
+```text
+Settings sections
+├─ Business Operations
+├─ Orders
+├─ Repairs
+├─ Returns
+├─ Support
+├─ Notifications
+├─ Roles / Capabilities
+└─ Integrations
+```
+
+Settings should use cards, forms, and section tabs from the shared UI system.
+
+---
+
+# 7. Admin Registry Model
+
+Every admin page should register itself with metadata instead of independently calling `add_menu_page()` or `add_submenu_page()`.
+
+Conceptual registration object:
+
+```php
+[
+  'library'     => 'operations', // operations | tools
+  'slug'        => 'dtb-orders',
+  'title'       => 'Orders',
+  'menu_title'  => 'Orders',
+  'capability'  => 'dtb_manage_orders',
+  'callback'    => 'dtb_orders_render_page',
+  'position'    => 20,
+  'template'    => 'queue',
+  'section'     => 'Commerce',
+]
+```
+
+Tool Library example:
+
+```php
+[
+  'library'     => 'tools',
+  'slug'        => 'dtb-image-sync',
+  'title'       => 'Image Sync',
+  'menu_title'  => 'Image Sync',
+  'capability'  => 'dtb_manage_image_sync',
+  'callback'    => 'dtb_image_sync_render_page',
+  'position'    => 20,
+  'template'    => 'tool',
+  'section'     => 'Catalog Maintenance',
+]
+```
+
+This prevents each module from inventing its own menu behavior.
+
+---
+
+# 8. Capability Model
+
+## Operations capabilities
+
+```text
+dtb_view_command_center
+dtb_manage_orders
+dtb_manage_repairs
+dtb_manage_returns
+dtb_read_support_tickets
+dtb_manage_support
+dtb_manage_system
+dtb_manage_settings
+```
+
+## Tool Library capabilities
+
+```text
+dtb_manage_schematics
+dtb_manage_image_sync
+dtb_manage_product_mapping
+dtb_manage_catalog_health
+dtb_manage_cache_tools
+dtb_view_api_health
+dtb_manage_seo_tools
+dtb_manage_import_export
+dtb_view_config_reference
+```
+
+## Default role mapping
+
+```text
+Administrator
+├─ all capabilities
+
+Operations Manager
+├─ command center
+├─ orders
+├─ repairs
+├─ returns
+├─ support
+└─ settings read/update where appropriate
+
+Support Agent
+├─ support
+├─ limited order context
+├─ limited repair context
+└─ limited return context
+
+Repair Manager
+├─ repairs
+├─ repair-linked support context
+└─ repair-linked order/shipping context
+
+Catalog Manager
+├─ DTB Tool Library
+├─ schematics
+├─ image sync
+├─ product mapping
+├─ catalog health
+└─ import/export
+
+Technical Admin
+├─ System Manager
+├─ API health
+├─ cache tools
+├─ integration diagnostics
+└─ audit logs
+```
+
+---
+
+# 9. Migration Plan
+
+## Phase 1 — Platform foundation
+
+Build shared admin infrastructure:
+
+```text
+dtb-platform/Admin/AdminAssets.php
+dtb-platform/Admin/AdminCapabilities.php
+dtb-platform/Admin/AdminMenuRegistry.php
+dtb-platform/Admin/AdminPageRegistry.php
+dtb-platform/Admin/AdminShell.php
+dtb-platform/Admin/AdminUi.php
+dtb-platform/Admin/OperationsMenu.php
+dtb-platform/Admin/ToolLibraryMenu.php
+dtb-platform/Admin/assets/dtb-admin.css
+dtb-platform/Admin/assets/dtb-admin.js
+```
+
+Goal:
+
+```text
+- one global admin CSS file
+- one global admin JS file
+- one operations menu
+- one tool library menu
+- one shared page shell
+- one shared component language
+```
+
+---
+
+## Phase 2 — Register final menus
+
+Create:
+
+```text
+Drywall Toolbox
+DTB Tool Library
+```
+
+Move existing pages conceptually:
+
+```text
+DTB Ops / Ops Dashboard       → Drywall Toolbox / Command Center
+Repairs                       → Drywall Toolbox / Repairs
+Support Hub                   → Drywall Toolbox / Support
+Schematics                    → DTB Tool Library / Schematics
+Catalog Health                → DTB Tool Library / Catalog Health
+Product Mapping               → DTB Tool Library / Product Mapping
+Image Sync                    → DTB Tool Library / Image Sync
+Cache/API tools               → DTB Tool Library or System Manager depending on depth
+```
+
+---
+
+## Phase 3 — Convert visual shell
+
+Replace page wrappers:
+
+```text
+Before:
+<div class="wrap">
+<div class="dtb-wrap">
+<div class="dtb-ops-wrap">
+<div class="dtb-repairs-wrap">
+
+After:
+<div class="wrap dtb-admin-page">
+  <div class="dtb-admin" data-dtb-page="...">
+```
+
+Move common CSS out of:
+
+```text
+dtb_ops_inline_css()
+dtb_repair_admin_inline_styles()
+page-level inline style attributes
+large inline JS blocks
+```
+
+Into:
+
+```text
+dtb-platform/Admin/assets/dtb-admin.css
+dtb-platform/Admin/assets/dtb-admin.js
+```
+
+---
+
+## Phase 4 — Convert pages by priority
+
+Recommended order:
+
+```text
+1. Catalog Health
+2. Schematics
+3. Image Sync
+4. Repairs
+5. Support
+6. Orders
+7. Returns
+8. Command Center
+9. System Manager
+10. Settings
+```
+
+Rationale:
+
+* Catalog Health is currently visually minimal and easiest to normalize.
+* Schematics/Image Sync should be moved into the Tool Library early.
+* Repairs and Support are high-value but more complex.
+* Command Center and System Manager should be built after the source modules expose clean summarized data.
+
+---
+
+# 10. Final Visual Consistency Rules
+
+## Every page must have
+
+```text
+- same header structure
+- same spacing scale
+- same card style
+- same table style
+- same button style
+- same badge/status style
+- same alert/notice style
+- same empty/loading/error states
+- same mobile behavior
+```
+
+## No page may have
+
+```text
+- independent color tokens
+- independent button systems
+- independent table systems
+- random inline styles
+- raw backend debug blocks unless inside System Manager
+- standalone top-level menu registration outside the registry
+```
+
+## Allowed page-specific styling
+
+Only when the page has a truly unique layout:
+
+```text
+Support       → three-pane ticket command center
+SystemManager → observability graphs/drilldowns
+Schematics    → media/diagram selector grid
+ProductMapping→ mapping/diff layout
+```
+
+Even then, page-specific CSS must inherit global design tokens.
+
+---
+
+# 11. Final Merged System Definition
+
+Use this as the governing rebuild statement:
+
+```text
+Drywall Toolbox wp-admin will be rebuilt around two intentional admin libraries and one shared UI system. The Drywall Toolbox menu contains business operations: Command Center, Orders, Repairs, Returns, Support, System Manager, and Settings. The DTB Tool Library contains maintenance tools: Schematics, Image Sync, Product Mapping, Catalog Health, Cache Tools, API Health, SEO Tools, Import/Export, and Config Reference. Both libraries consume the same DTB Admin UI design system for page shells, cards, tables, buttons, badges, forms, notices, loading states, spacing, typography, and responsive behavior. Individual modules remain business-task-focused and do not expose backend diagnostics. Business observability belongs in Command Center; backend/system observability belongs in System Manager; catalog/media/platform maintenance belongs in DTB Tool Library.
+```
+
+This gives you one coherent admin product instead of separate plugin pages stitched together.

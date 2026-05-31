@@ -902,6 +902,12 @@ function dtb_repair_admin_inline_styles(): void {
 	.dtb-tech-selected-item.is-dragging { opacity: .55; cursor: grabbing; }
 	.dtb-tech-selected-item.is-drop-target { border-color: #60a5fa; background: #eff6ff; }
 	.dtb-tech-selected-main { min-width: 0; }
+	.dtb-tech-selected-fields {
+		display: grid;
+		grid-template-columns: 120px minmax(0, 1fr);
+		gap: 8px;
+		margin-top: 8px;
+	}
 	.dtb-tech-selected-title {
 		font-size: 12px;
 		font-weight: 700;
@@ -951,9 +957,21 @@ function dtb_repair_admin_inline_styles(): void {
 		padding: 4px 8px;
 		cursor: pointer;
 	}
+	.dtb-tech-recent-head { margin-top: 10px; }
+	.dtb-table-wrap.is-loading {
+		opacity: .55;
+		pointer-events: none;
+		transition: opacity .18s ease;
+	}
 
 	/* ── Quote builder ───────────────────────────────────────────────────── */
 	.dtb-quote-builder { display: grid; gap: 14px; }
+	.dtb-quote-workspace {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr) 320px;
+		gap: 12px;
+		align-items: start;
+	}
 	.dtb-quote-head {
 		display: flex;
 		align-items: center;
@@ -1015,6 +1033,80 @@ function dtb_repair_admin_inline_styles(): void {
 		padding: 8px;
 		background: #f8fbff;
 	}
+	.dtb-quote-parts-panel {
+		border: 1px solid #dbe7ff;
+		border-radius: 10px;
+		padding: 10px;
+		background: #f8fbff;
+		display: grid;
+		gap: 8px;
+	}
+	.dtb-quote-parts-panel__title {
+		font-size: 12px;
+		font-weight: 800;
+		text-transform: uppercase;
+		letter-spacing: .4px;
+		color: #0f172a;
+	}
+	.dtb-quote-parts-panel__help {
+		margin: 0;
+		font-size: 11px;
+		color: #64748b;
+	}
+	.dtb-quote-parts-label {
+		font-size: 11px;
+		font-weight: 700;
+		letter-spacing: .35px;
+		text-transform: uppercase;
+		color: #64748b;
+	}
+	.dtb-quote-parts-menu {
+		max-height: 220px;
+		overflow-y: auto;
+	}
+	.dtb-quote-parts-selected-head {
+		font-size: 11px;
+		font-weight: 700;
+		letter-spacing: .35px;
+		text-transform: uppercase;
+		color: #64748b;
+		margin-top: 6px;
+	}
+	.dtb-quote-parts-selected {
+		display: grid;
+		gap: 6px;
+		max-height: 240px;
+		overflow-y: auto;
+	}
+	.dtb-quote-selected-part {
+		border: 1px solid #d8e2f3;
+		border-radius: 8px;
+		background: #fff;
+		padding: 8px;
+		text-align: left;
+		cursor: pointer;
+	}
+	.dtb-quote-selected-part:hover,
+	.dtb-quote-selected-part:focus {
+		border-color: #93c5fd;
+		background: #eff6ff;
+		outline: none;
+	}
+	.dtb-quote-selected-part__title {
+		display: block;
+		font-size: 12px;
+		font-weight: 700;
+		color: #0f172a;
+	}
+	.dtb-quote-selected-part__sub {
+		display: block;
+		margin-top: 3px;
+		font-size: 11px;
+		color: #64748b;
+	}
+	.dtb-quote-selected-part-recent {
+		border-style: dashed;
+	}
 	.dtb-quote-table { width: 100%; border-collapse: collapse; margin-bottom: 8px; }
 	.dtb-quote-table th {
 		padding: 8px;
@@ -1031,6 +1123,39 @@ function dtb_repair_admin_inline_styles(): void {
 		border-bottom: 1px solid #eef2f7;
 	}
 	.dtb-quote-line-desc { margin-top: 6px; width: 100%; }
+	.dtb-quote-field-caption {
+		display: block;
+		font-size: 10px;
+		font-weight: 700;
+		text-transform: uppercase;
+		letter-spacing: .3px;
+		color: #64748b;
+		margin-bottom: 4px;
+	}
+	.dtb-quote-line-presets {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 6px;
+		margin-top: 6px;
+	}
+	.dtb-quote-preset {
+		border: 1px solid #bfdbfe;
+		border-radius: 999px;
+		background: #eff6ff;
+		color: #1d4ed8;
+		font-size: 10px;
+		font-weight: 700;
+		padding: 3px 8px;
+		cursor: pointer;
+	}
+	.dtb-quote-line-hint {
+		font-size: 11px;
+		color: #64748b;
+	}
+	.dtb-quote-line-qty.is-readonly {
+		background: #f8fafc;
+		color: #64748b;
+	}
 	.dtb-quote-notes-grid {
 		display: grid;
 		grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1836,7 +1961,9 @@ function dtb_repair_admin_inline_styles(): void {
 		/* Tech grid */
 		.dtb-tech-grid { grid-template-columns: 1fr; }
 		.dtb-tech-row  { grid-template-columns: 1fr; }
+		.dtb-tech-selected-fields { grid-template-columns: 1fr; }
 		.dtb-quote-controls { grid-template-columns: 1fr 1fr; }
+		.dtb-quote-workspace { grid-template-columns: 1fr; }
 		.dtb-quote-notes-grid { grid-template-columns: 1fr; }
 		.dtb-quote-footer { grid-template-columns: 1fr; }
 		.dtb-quote-actions { justify-content: flex-start; }
@@ -2497,6 +2624,7 @@ function dtb_repair_admin_footer_scripts(): void {
 		var partsLookupMenu = document.getElementById('dtb-tech-parts-lookup-menu');
 		var partsLinksInput = document.getElementById('dtb_repair_parts_links_json');
 		var selectedPartsEl = document.getElementById('dtb-tech-selected-parts');
+		var recentPartsEl = document.getElementById('dtb-tech-recent-parts');
 		var primaryPartSkuEl = document.getElementById('dtb-tech-primary-part-sku');
 		var primaryPartNameEl = document.getElementById('dtb-tech-primary-part-name');
 		var primaryPartBrandEl = document.getElementById('dtb-tech-primary-part-brand');
@@ -2504,6 +2632,50 @@ function dtb_repair_admin_footer_scripts(): void {
 		var partsReq = null;
 		var partsTimer = null;
 		var selectedParts = [];
+		var recentParts = [];
+		var RECENT_PARTS_KEY = 'dtbRepairRecentParts.v1';
+
+		var uniquePartKey = function(part) {
+			if (!part) return '';
+			var id = parseInt(part.part_id || 0, 10) || 0;
+			if (id > 0) return 'id:' + id;
+			var sku = (part.sku || '').toString().trim().toLowerCase();
+			if (sku) return 'sku:' + sku;
+			var name = (part.name || '').toString().trim().toLowerCase();
+			return name ? ('name:' + name) : '';
+		};
+
+		var loadRecentParts = function() {
+			try {
+				var raw = window.localStorage.getItem(RECENT_PARTS_KEY);
+				var parsed = raw ? JSON.parse(raw) : [];
+				return Array.isArray(parsed) ? parsed : [];
+			} catch (e) {
+				return [];
+			}
+		};
+
+		var saveRecentParts = function() {
+			try {
+				window.localStorage.setItem(RECENT_PARTS_KEY, JSON.stringify(recentParts.slice(0, 16)));
+			} catch (e) {}
+		};
+
+		var rememberRecentPart = function(part) {
+			if (!part) return;
+			var key = uniquePartKey(part);
+			if (!key) return;
+			recentParts = recentParts.filter(function(item) {
+				return uniquePartKey(item) !== key;
+			});
+			recentParts.unshift(Object.assign({}, part));
+			recentParts = recentParts.slice(0, 16);
+			saveRecentParts();
+			renderRecentParts();
+			document.dispatchEvent(new CustomEvent('dtb:parts:recentUpdated', {
+				detail: { parts: recentParts.slice() }
+			}));
+		};
 
 		var pushPartToQuoteBuilder = function(part) {
 			if (!part) return;
@@ -2532,14 +2704,20 @@ function dtb_repair_admin_footer_scripts(): void {
 			}
 			partsLookupMenu.innerHTML = items.map(function(item) {
 				var primary = (item.sku || 'No SKU') + ' — ' + (item.name || 'Part');
-				var secondary = [item.brand_label, item.manufacturer_sku ? ('MFG: ' + item.manufacturer_sku) : ''].filter(Boolean).join(' · ');
+				var price = parseFloat(item.unit_price || 0);
+				var secondary = [
+					item.brand_label,
+					item.manufacturer_sku ? ('MFG: ' + item.manufacturer_sku) : '',
+					(price > 0 ? ('USD ' + price.toFixed(2)) : '')
+				].filter(Boolean).join(' · ');
 				return (
 					'<button type="button" class="dtb-tech-lookup-option" ' +
 					'data-part-id="' + String(item.part_id || 0).replace(/"/g, '&quot;') + '" ' +
 					'data-sku="' + String(item.sku || '').replace(/"/g, '&quot;') + '" ' +
 					'data-name="' + String(item.name || '').replace(/"/g, '&quot;') + '" ' +
 					'data-brand="' + String(item.brand_label || '').replace(/"/g, '&quot;') + '" ' +
-					'data-manufacturer-sku="' + String(item.manufacturer_sku || '').replace(/"/g, '&quot;') + '">' +
+					'data-manufacturer-sku="' + String(item.manufacturer_sku || '').replace(/"/g, '&quot;') + '" ' +
+					'data-unit-price="' + String(item.unit_price || 0).replace(/"/g, '&quot;') + '">' +
 						'<span class="dtb-tech-lookup-primary">' + primary + '</span>' +
 						'<span class="dtb-tech-lookup-secondary">' + (secondary || 'Parts library item') + '</span>' +
 					'</button>'
@@ -2559,7 +2737,8 @@ function dtb_repair_admin_footer_scripts(): void {
 				return;
 			}
 			selectedPartsEl.innerHTML = selectedParts.map(function(item, idx) {
-				var subtitle = [item.brand_label, item.manufacturer_sku ? ('MFG: ' + item.manufacturer_sku) : ''].filter(Boolean).join(' · ');
+				var price = parseFloat(item.unit_price || 0);
+				var subtitle = [item.brand_label, item.manufacturer_sku ? ('MFG: ' + item.manufacturer_sku) : '', (price > 0 ? ('USD ' + price.toFixed(2)) : '')].filter(Boolean).join(' · ');
 				var qty = parseInt(item.quantity || 1, 10);
 				if (!qty || qty < 1) qty = 1;
 				var lineNote = item.line_note || '';
@@ -2568,7 +2747,7 @@ function dtb_repair_admin_footer_scripts(): void {
 						'<div class="dtb-tech-selected-main">' +
 							'<div class="dtb-tech-selected-title">' + (item.sku || 'No SKU') + ' — ' + (item.name || 'Part') + '</div>' +
 							'<div class="dtb-tech-selected-sub">' + (subtitle || 'Parts library item') + '</div>' +
-							'<div class="dtb-tech-selected-fields" style="display:grid;grid-template-columns:120px 1fr;gap:8px;margin-top:8px;">' +
+							'<div class="dtb-tech-selected-fields">' +
 								'<input type="number" min="1" step="1" class="dtb-tech-part-qty" data-index="' + idx + '" value="' + qty + '" placeholder="Qty" />' +
 								'<input type="text" class="dtb-tech-part-note" data-index="' + idx + '" value="' + String(lineNote).replace(/"/g, '&quot;') + '" placeholder="Line note (installed position, condition, torque, etc.)" />' +
 							'</div>' +
@@ -2585,6 +2764,60 @@ function dtb_repair_admin_footer_scripts(): void {
 			if (primaryPartSkuEl) primaryPartSkuEl.textContent = primary.sku || '';
 			if (primaryPartNameEl) primaryPartNameEl.textContent = primary.name || '';
 			if (primaryPartBrandEl) primaryPartBrandEl.textContent = primary.brand_label || '';
+		};
+
+		var renderRecentParts = function() {
+			if (!recentPartsEl) return;
+			if (!recentParts.length) {
+				recentPartsEl.innerHTML = '<div class="dtb-tech-selected-empty">No recent parts yet.</div>';
+				return;
+			}
+			recentPartsEl.innerHTML = recentParts.slice(0, 8).map(function(item, idx) {
+				var price = parseFloat(item.unit_price || 0);
+				var subtitle = [item.brand_label, item.manufacturer_sku ? ('MFG: ' + item.manufacturer_sku) : '', (price > 0 ? ('USD ' + price.toFixed(2)) : '')].filter(Boolean).join(' · ');
+				return (
+					'<div class="dtb-tech-selected-item">' +
+						'<div class="dtb-tech-selected-main">' +
+							'<div class="dtb-tech-selected-title">' + (item.sku || 'No SKU') + ' — ' + (item.name || 'Part') + '</div>' +
+							'<div class="dtb-tech-selected-sub">' + (subtitle || 'Parts library item') + '</div>' +
+						'</div>' +
+						'<div class="dtb-tech-selected-actions">' +
+							'<button type="button" class="dtb-tech-add-to-quote dtb-tech-add-recent" data-index="' + idx + '">Add</button>' +
+						'</div>' +
+					'</div>'
+				);
+			}).join('');
+		};
+
+		var upsertSelectedPart = function(part, pushToQuote) {
+			if (!part) return;
+			var partId = parseInt(part.part_id || 0, 10);
+			var sku = (part.sku || '').toString();
+			var index = selectedParts.findIndex(function(item) {
+				var samePartId = partId > 0 && parseInt(item.part_id || 0, 10) === partId;
+				var sameSku = sku && String(item.sku || '') === sku;
+				return samePartId || sameSku;
+			});
+			var normalized = {
+				part_id: partId,
+				sku: sku,
+				name: (part.name || '').toString(),
+				brand_label: (part.brand_label || '').toString(),
+				manufacturer_sku: (part.manufacturer_sku || '').toString(),
+				unit_price: parseFloat(part.unit_price || 0) || 0,
+				quantity: Math.max(1, parseInt(part.quantity || 1, 10) || 1),
+				line_note: (part.line_note || '').toString()
+			};
+			if (index === -1) {
+				selectedParts.push(normalized);
+			} else {
+				selectedParts[index] = Object.assign({}, selectedParts[index], normalized);
+			}
+			rememberRecentPart(normalized);
+			renderSelectedParts();
+			if (pushToQuote) {
+				pushPartToQuoteBuilder(normalized);
+			}
 		};
 
 		if (partsLookupInput && partsLookupMenu && partsLinksInput && selectedPartsEl && typeof ajaxurl === 'string') {
@@ -2630,26 +2863,17 @@ function dtb_repair_admin_footer_scripts(): void {
 			partsLookupMenu.addEventListener('click', function(e) {
 				var btn = e.target.closest('.dtb-tech-lookup-option');
 				if (!btn) return;
-				var partId = parseInt(btn.getAttribute('data-part-id') || '0', 10);
-				var sku = btn.getAttribute('data-sku') || '';
-				var existing = selectedParts.find(function(item) {
-					return (partId > 0 && parseInt(item.part_id || 0, 10) === partId) || (sku && item.sku === sku);
-				});
-				if (!existing) {
-					var newPart = {
-						part_id: partId,
-						sku: sku,
-						name: btn.getAttribute('data-name') || '',
-						brand_label: btn.getAttribute('data-brand') || '',
-						manufacturer_sku: btn.getAttribute('data-manufacturer-sku') || '',
-						quantity: 1,
-						line_note: ''
-					};
-					selectedParts.push(newPart);
-					pushPartToQuoteBuilder(newPart);
-				}
+				upsertSelectedPart({
+					part_id: parseInt(btn.getAttribute('data-part-id') || '0', 10),
+					sku: btn.getAttribute('data-sku') || '',
+					name: btn.getAttribute('data-name') || '',
+					brand_label: btn.getAttribute('data-brand') || '',
+					manufacturer_sku: btn.getAttribute('data-manufacturer-sku') || '',
+					unit_price: parseFloat(btn.getAttribute('data-unit-price') || '0') || 0,
+					quantity: 1,
+					line_note: ''
+				}, true);
 				partsLookupInput.value = '';
-				renderSelectedParts();
 				hidePartsLookupMenu();
 			});
 
@@ -2670,6 +2894,16 @@ function dtb_repair_admin_footer_scripts(): void {
 				selectedParts.splice(index, 1);
 				renderSelectedParts();
 			});
+
+			if (recentPartsEl) {
+				recentPartsEl.addEventListener('click', function(e) {
+					var addBtn = e.target.closest('.dtb-tech-add-recent');
+					if (!addBtn) return;
+					var idx = parseInt(addBtn.getAttribute('data-index') || '-1', 10);
+					if (idx < 0 || idx >= recentParts.length) return;
+					upsertSelectedPart(recentParts[idx], true);
+				});
+			}
 
 			if (syncPartsToQuoteBtn) {
 				syncPartsToQuoteBtn.addEventListener('click', function() {
@@ -2743,6 +2977,22 @@ function dtb_repair_admin_footer_scripts(): void {
 					hidePartsLookupMenu();
 				}
 			});
+
+			document.addEventListener('dtb:tech:partSelected', function(evt) {
+				var detail = evt && evt.detail ? evt.detail : null;
+				if (!detail || !detail.part) return;
+				upsertSelectedPart(detail.part, false);
+			});
+
+			document.addEventListener('dtb:parts:recentUpdated', function(evt) {
+				var detail = evt && evt.detail ? evt.detail : null;
+				if (!detail || !Array.isArray(detail.parts)) return;
+				recentParts = detail.parts.slice(0, 16);
+				renderRecentParts();
+			});
+
+			recentParts = loadRecentParts();
+			renderRecentParts();
 		}
 
 	}());
@@ -2926,8 +3176,8 @@ function dtb_repair_admin_list_page(): void {
 			</div><!-- .dtb-chip-bar -->
 
 			<!-- ── Table ────────────────────────────────────────────────── -->
-			<div class="dtb-table-wrap">
-				<form method="get" action="" class="dtb-call-lookup-bar">
+			<div class="dtb-table-wrap" id="dtb-repairs-table-wrap" data-page="dtb-repairs" data-tab="<?php echo esc_attr( $current_tab ); ?>" data-status="<?php echo esc_attr( $current_status ); ?>">
+				<form method="get" action="" class="dtb-call-lookup-bar" id="dtb-call-lookup-form">
 					<input type="hidden" name="page" value="dtb-repairs">
 					<?php if ( 'all' !== $current_tab ) : ?>
 						<input type="hidden" name="tab" value="<?php echo esc_attr( $current_tab ); ?>">
@@ -2939,7 +3189,7 @@ function dtb_repair_admin_list_page(): void {
 					<input type="search" id="dtb_lookup_input" name="dtb_lookup" class="dtb-call-lookup-input" value="<?php echo esc_attr( $lookup_term ); ?>" placeholder="<?php esc_attr_e( 'Call lookup: repair #, order #, name, email, phone, serial', 'drywall-toolbox' ); ?>">
 					<button type="submit" class="button button-primary"><?php esc_html_e( 'Find Repair', 'drywall-toolbox' ); ?></button>
 				</form>
-				<form method="get" action="">
+				<form method="get" action="" id="dtb-repair-search-form">
 					<input type="hidden" name="page" value="dtb-repairs">
 					<?php if ( 'all' !== $current_tab ) : ?>
 						<input type="hidden" name="tab" value="<?php echo esc_attr( $current_tab ); ?>">
@@ -2954,10 +3204,106 @@ function dtb_repair_admin_list_page(): void {
 				</form>
 				<script>
 				(function(){
-					var input = document.getElementById('dtb-repair-search-input');
-					if ( input ) {
-						input.setAttribute('placeholder', 'Search customer, email, phone, repair #, order #, serial');
+					var debounceTimer = null;
+					var fetchController = null;
+
+					function buildUrl(term) {
+						var wrap = document.getElementById('dtb-repairs-table-wrap');
+						var url = new URL(window.location.href);
+						url.searchParams.set('page', wrap ? (wrap.getAttribute('data-page') || 'dtb-repairs') : 'dtb-repairs');
+						if (wrap && wrap.getAttribute('data-tab') && wrap.getAttribute('data-tab') !== 'all') {
+							url.searchParams.set('tab', wrap.getAttribute('data-tab'));
+						} else {
+							url.searchParams.delete('tab');
+						}
+						if (wrap && wrap.getAttribute('data-status')) {
+							url.searchParams.set('repair_status', wrap.getAttribute('data-status'));
+						} else {
+							url.searchParams.delete('repair_status');
+						}
+						if (term) {
+							url.searchParams.set('s', term);
+						} else {
+							url.searchParams.delete('s');
+						}
+						url.searchParams.delete('dtb_lookup');
+						url.searchParams.set('dtb_live_search', '1');
+						return url;
 					}
+
+					function syncInputs(term) {
+						var searchInput = document.getElementById('dtb-repair-search-input');
+						var lookupInput = document.getElementById('dtb_lookup_input');
+						if (searchInput && searchInput.value !== term) searchInput.value = term;
+						if (lookupInput && lookupInput.value !== term) lookupInput.value = term;
+					}
+
+					function attachHandlers() {
+						var wrap = document.getElementById('dtb-repairs-table-wrap');
+						var searchInput = document.getElementById('dtb-repair-search-input');
+						var lookupInput = document.getElementById('dtb_lookup_input');
+						var searchForm = document.getElementById('dtb-repair-search-form');
+						var lookupForm = document.getElementById('dtb-call-lookup-form');
+						if (searchInput) {
+							searchInput.setAttribute('placeholder', 'Search customer, email, phone, repair #, order #, serial');
+						}
+						if (!wrap || !searchInput || !lookupInput) return;
+
+						var triggerLiveSearch = function(term) {
+							syncInputs(term);
+							if (debounceTimer) window.clearTimeout(debounceTimer);
+							debounceTimer = window.setTimeout(function() {
+								if (fetchController) {
+									fetchController.abort();
+								}
+								fetchController = new AbortController();
+								wrap.classList.add('is-loading');
+								fetch(buildUrl(term).toString(), {
+									credentials: 'same-origin',
+									signal: fetchController.signal
+								})
+								.then(function(resp){ return resp.text(); })
+								.then(function(html){
+									var parser = new DOMParser();
+									var doc = parser.parseFromString(html, 'text/html');
+									var newWrap = doc.getElementById('dtb-repairs-table-wrap');
+									if (!newWrap) return;
+									wrap.replaceWith(newWrap);
+									attachHandlers();
+								})
+								.catch(function(err){
+									if (err && err.name === 'AbortError') return;
+								})
+								.finally(function(){
+									var currentWrap = document.getElementById('dtb-repairs-table-wrap');
+									if (currentWrap) currentWrap.classList.remove('is-loading');
+								});
+							}, 220);
+						};
+
+						var onInput = function(ev) {
+							var term = (ev.target && ev.target.value ? ev.target.value : '').trim();
+							triggerLiveSearch(term);
+						};
+
+						searchInput.addEventListener('input', onInput);
+						lookupInput.addEventListener('input', onInput);
+
+						if (searchForm) {
+							searchForm.addEventListener('submit', function(ev){
+								ev.preventDefault();
+								triggerLiveSearch((searchInput.value || '').trim());
+							});
+						}
+						if (lookupForm) {
+							lookupForm.addEventListener('submit', function(ev){
+								ev.preventDefault();
+								triggerLiveSearch((lookupInput.value || '').trim());
+							});
+						}
+					}
+
+					attachHandlers();
 				}());
 				</script>
 			</div><!-- .dtb-table-wrap -->

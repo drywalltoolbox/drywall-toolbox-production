@@ -92,8 +92,37 @@ function dtb_support_project_ticket( object $ticket ): array {
 			$metadata = $decoded;
 		}
 	}
+	if ( function_exists( 'dtb_str_normalize_display_mixed' ) ) {
+		$metadata = dtb_str_normalize_display_mixed( $metadata );
+	}
 
 	$is_snoozed = ! empty( $ticket->snooze_until ) && strtotime( (string) $ticket->snooze_until ) > time();
+
+	$subject = (string) ( $ticket->subject ?? '' );
+	$customer_name = (string) ( $ticket->customer_name ?? '' );
+	$customer_phone = (string) ( $ticket->customer_phone ?? '' );
+	$company = (string) ( $ticket->company ?? '' );
+	$message = (string) ( $ticket->message ?? '' );
+	$source = (string) ( $ticket->source ?? '' );
+	if ( function_exists( 'dtb_str_normalize_display' ) ) {
+		$subject = dtb_str_normalize_display( $subject );
+		$customer_name = dtb_str_normalize_display( $customer_name );
+		$customer_phone = dtb_str_normalize_display( $customer_phone );
+		$company = dtb_str_normalize_display( $company );
+		$message = dtb_str_normalize_display( $message, true );
+		$source = dtb_str_normalize_display( $source );
+	}
+	$tags = array_values( array_filter( explode( ',', (string) ( $ticket->tags ?? '' ) ) ) );
+	if ( function_exists( 'dtb_str_normalize_display' ) ) {
+		$tags = array_values(
+			array_filter(
+				array_map(
+					static fn( string $tag ): string => dtb_str_normalize_display( $tag ),
+					$tags
+				)
+			)
+		);
+	}
 
 	return [
 		// Core identity.
@@ -111,15 +140,15 @@ function dtb_support_project_ticket( object $ticket ): array {
 		'priority_score' => $priority_score,
 
 		// Content.
-		'subject'        => $ticket->subject,
-		'customer_name'  => $ticket->customer_name,
+		'subject'        => $subject,
+		'customer_name'  => $customer_name,
 		'customer_email' => $ticket->customer_email,
-		'customer_phone' => $ticket->customer_phone,
-		'company'        => $ticket->company,
-		'message'        => $ticket->message,
-		'source'         => $ticket->source,
+		'customer_phone' => $customer_phone,
+		'company'        => $company,
+		'message'        => $message,
+		'source'         => $source,
 		'order_id'       => ! empty( $ticket->order_id ) ? (int) $ticket->order_id : null,
-		'tags'           => array_values( array_filter( explode( ',', $ticket->tags ?? '' ) ) ),
+		'tags'           => $tags,
 		'metadata'       => $metadata,
 
 		// Assignment.
