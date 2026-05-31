@@ -1,0 +1,15 @@
+/**
+ * DTB Support — Support page module styles
+ *
+ * Stub only. Do not add component styles here until detail layouts are built.
+ *
+ * Allowed scope:
+ * - Support-page layout geometry only.
+ * - Existing var(--dtb-*) custom properties only.
+ *
+ * Forbidden scope:
+ * - New token definitions on :root or inside .dtb-admin.
+ * - Buttons, badges, tables, cards, or form controls.
+ *
+ * @package drywall-toolbox
+ */

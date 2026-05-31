@@ -28,14 +28,23 @@ function dtb_system_manager_render_page(): void {
 	];
 
 	dtb_admin_shell_open( [
-		'title'    => __( 'System Manager', 'drywall-toolbox' ),
-		'subtitle' => __( 'Platform health, queues, integrations, and audit log.', 'drywall-toolbox' ),
-		'section'  => 'operations',
-		'page'     => 'dtb-system-manager',
-		'template' => 'dashboard',
-		'icon'     => 'dashicons-monitor',
+		'title'       => __( 'System Manager', 'drywall-toolbox' ),
+		'subtitle'    => __( 'Platform health, queues, integrations, and audit log.', 'drywall-toolbox' ),
+		'section'     => 'operations',
+		'page'        => 'dtb-system-manager',
+		'template'    => 'dashboard',
+		'icon'        => 'dashicons-monitor',
+		'tabs'        => $tabs,
+		'live_target' => 'dtb-system-workspace',
 	] );
-	dtb_admin_shell_render_tabs( $tabs );
+
+	// Live region wraps all tab content panels.
+	dtb_admin_shell_live_region_open( [
+		'id'       => 'dtb-system-workspace',
+		'module'   => 'system-manager',
+		'endpoint' => rest_url( 'dtb/v1/admin/system' ),
+		'interval' => 20000,
+	] );
 
 	switch ( $active_tab ) {
 		case 'queues':
@@ -55,6 +64,7 @@ function dtb_system_manager_render_page(): void {
 			break;
 	}
 
+	dtb_admin_shell_live_region_close();
 	dtb_admin_shell_close();
 }
 

@@ -61,6 +61,7 @@ require_once __DIR__ . '/Rest/RepairMediaController.php';
 require_once __DIR__ . '/Rest/RepairCommentController.php';
 require_once __DIR__ . '/Rest/RepairEventStreamController.php';
 require_once __DIR__ . '/Rest/RepairHealthController.php';
+require_once __DIR__ . '/Rest/RepairAdminQueueController.php';
 
 // Admin (only in admin context)
 if ( is_admin() ) {

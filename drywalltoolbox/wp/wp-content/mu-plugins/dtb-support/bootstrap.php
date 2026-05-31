@@ -53,6 +53,7 @@ _dtb_require( $_dtb_support_dir . '/Validation/ContactSubmitValidator.php' );
 _dtb_require( $_dtb_support_dir . '/Rest/SubmitContactController.php' );
 _dtb_require( $_dtb_support_dir . '/Rest/TicketAdminController.php' );
 _dtb_require( $_dtb_support_dir . '/Rest/TicketReplyController.php' );
+_dtb_require( $_dtb_support_dir . '/Rest/SupportAdminQueueController.php' );
 
 // ── 7. Admin (only on admin requests) ─────────────────────────────────────────
 if ( is_admin() ) {

@@ -43,36 +43,36 @@ function dtb_returns_render_page(): void {
 	}
 
 	dtb_admin_shell_open( [
-		'title'    => __( 'Returns', 'drywall-toolbox' ),
-		'subtitle' => __( 'Manage return requests and RMA workflows.', 'drywall-toolbox' ),
-		'section'  => 'operations',
-		'page'     => 'dtb-returns',
-		'template' => 'queue',
-		'icon'     => 'dashicons-undo',
-		'tabs'     => $tabs,
+		'title'       => __( 'Returns', 'drywall-toolbox' ),
+		'subtitle'    => __( 'Manage return requests and RMA workflows.', 'drywall-toolbox' ),
+		'section'     => 'operations',
+		'page'        => 'dtb-returns',
+		'template'    => 'queue',
+		'icon'        => 'dashicons-undo',
+		'tabs'        => $tabs,
+		'live_target' => 'dtb-returns-workspace',
 	] );
 
 	// Toolbar.
-	echo '<div class="dtb-toolbar">';
-	echo '<form method="get" class="dtb-toolbar__search">';
-	echo '<input type="hidden" name="page" value="dtb-returns">';
-	echo '<input type="hidden" name="tab" value="' . esc_attr( $active_tab ) . '">';
+	dtb_admin_ui_toolbar_open();
 	// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-	echo dtb_admin_ui_input( 's', $search, [ 'placeholder' => __( 'Search returns…', 'drywall-toolbox' ), 'type' => 'search' ] );
-	// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-	echo dtb_admin_ui_button( __( 'Search', 'drywall-toolbox' ), [ 'attr' => 'type="submit"' ] );
-	echo '</form>';
-	echo '</div>';
+	echo dtb_admin_ui_search_input( __( 'Search returns…', 'drywall-toolbox' ), $search, true, 's' );
+	dtb_admin_ui_toolbar_close();
 
 	// Query.
+	$paged_returns = max( 1, (int) ( $_GET['paged'] ?? 1 ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 	$result = dtb_returns_query( [
 		'status'   => $active_tab,
 		'search'   => $search,
 		'per_page' => 25,
+		'paged'    => $paged_returns,
 	] );
 
 	/** @var DTB_Return_Entity[] $items */
-	$items = $result['items'];
+	$items       = $result['items'];
+	$total_pages = isset( $result['total'], $result['per_page'] ) && $result['per_page'] > 0
+		? (int) ceil( $result['total'] / $result['per_page'] )
+		: 1;
 
 	if ( empty( $items ) ) {
 		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
@@ -83,6 +83,17 @@ function dtb_returns_render_page(): void {
 		dtb_admin_shell_close();
 		return;
 	}
+
+	// Live region wraps the data grid.
+	dtb_admin_shell_live_region_open( [
+		'id'       => 'dtb-returns-workspace',
+		'module'   => 'returns',
+		'endpoint' => rest_url( 'dtb/v1/admin/returns' ),
+		'interval' => 30000,
+	] );
+
+	// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+	echo dtb_admin_ui_update_badge( 'dtb-returns-workspace' );
 
 	// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 	echo dtb_admin_ui_table_open( [
@@ -113,6 +124,8 @@ function dtb_returns_render_page(): void {
 
 	// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 	echo dtb_admin_ui_table_close();
-
+	// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+	echo dtb_admin_ui_pagination( $paged_returns, $total_pages );
+	dtb_admin_shell_live_region_close();
 	dtb_admin_shell_close();
 }

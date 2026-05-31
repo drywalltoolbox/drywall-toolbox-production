@@ -23,7 +23,11 @@ function dtb_repair_admin_add_capability(): void {
 // SECTION 2 — ADMIN MENU
 // =============================================================================
 
-add_action( 'admin_menu', 'dtb_repair_admin_menu' );
+// Legacy menu registration removed — the Repairs top-level menu is now owned by
+// dtb-platform/Admin/OperationsMenu.php via the DTB admin registry. The callback
+// dtb_repair_admin_list_page() below is preserved for reference only; it is no
+// longer the active page renderer (dtb_repairs_render_page in RepairsPage.php is).
+// add_action( 'admin_menu', 'dtb_repair_admin_menu' );
 add_filter( 'get_user_option_screen_layout_dtb_repair_request', 'dtb_repair_force_two_column_layout' );
 
 /**
@@ -73,8 +77,9 @@ function dtb_repair_admin_inline_styles(): void {
 		return;
 	}
 
-	$repair_screens = [ 'toplevel_page_dtb-repairs', 'dtb_repair_request', 'dtb_repair_request_page_dtb-repairs' ];
-	if ( ! in_array( $screen->id, $repair_screens, true ) && 'dtb_repair_request' !== $screen->post_type ) {
+	// Only load legacy inline styles on the CPT edit/new screen (metabox styles).
+	// The queue list page (toplevel_page_dtb-repairs) now uses dtb-admin.css exclusively.
+	if ( 'dtb_repair_request' !== $screen->post_type ) {
 		return;
 	}
 

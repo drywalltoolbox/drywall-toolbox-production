@@ -35,6 +35,12 @@ function dtb_command_center_render_page(): void {
 		'template' => 'dashboard',
 		'icon'     => 'dashicons-dashboard',
 		'actions'  => [
+			dtb_admin_ui_button( __( 'Refresh', 'drywall-toolbox' ), [
+				'type' => 'secondary',
+				'icon' => 'dashicons-update',
+				'size' => 'sm',
+				'attr' => 'data-dtb-live-refresh="dtb-command-center-workspace"',
+			] ),
 			dtb_admin_ui_button( __( 'System Manager', 'drywall-toolbox' ), [
 				'type' => 'secondary',
 				'href' => $links['system_manager'] ?? admin_url( 'admin.php?page=dtb-system-manager' ),
@@ -42,6 +48,14 @@ function dtb_command_center_render_page(): void {
 				'size' => 'sm',
 			] ),
 		],
+	] );
+
+	// Live region wraps all business-data content so Refresh + polling update it.
+	dtb_admin_shell_live_region_open( [
+		'id'       => 'dtb-command-center-workspace',
+		'module'   => 'command-center',
+		'endpoint' => rest_url( 'dtb/v1/admin/overview' ),
+		'interval' => 30000,
 	] );
 
 	// Customer-impacting exceptions banner.
@@ -166,5 +180,6 @@ function dtb_command_center_render_page(): void {
 
 	echo '</div>'; // .dtb-grid--two
 
+	dtb_admin_shell_live_region_close();
 	dtb_admin_shell_close();
 }

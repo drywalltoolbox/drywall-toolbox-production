@@ -138,6 +138,7 @@ function dtb_support_get_email_template( string $template, array $ctx ): array|W
 	$name = function_exists( 'dtb_str_normalize_display' ) ? dtb_str_normalize_display( $name_raw ) : $name_raw;
 	$tnum = function_exists( 'dtb_str_normalize_display' ) ? dtb_str_normalize_display( $tnum_raw ) : $tnum_raw;
 	$subj = function_exists( 'dtb_str_normalize_display' ) ? dtb_str_normalize_display( $subj_raw ) : $subj_raw;
+	$theme = (string) apply_filters( 'dtb_support_email_theme', 'auto', $template, $ctx );
 	$aurl   = esc_url_raw( (string) ( $ctx['admin_url'] ?? admin_url( 'admin.php?page=dtb-support' ) ) );
 
 	switch ( $template ) {
@@ -163,6 +164,7 @@ function dtb_support_get_email_template( string $template, array $ctx ): array|W
 						],
 						'signoff'     => $site . ' Support Team',
 						'footer_note' => 'You can reply directly to this email to add more information to your ticket.',
+						'theme'       => $theme,
 					]
 				),
 			];
@@ -215,6 +217,7 @@ function dtb_support_get_email_template( string $template, array $ctx ): array|W
 						'cta_label'   => $reply_link ? 'Reply to this ticket' : '',
 						'signoff'     => $site . ' Support Team',
 						'footer_note' => 'Reply directly to this email or click the button above to continue the conversation.',
+						'theme'       => $theme,
 					]
 				),
 			];
@@ -254,6 +257,7 @@ function dtb_support_get_email_template( string $template, array $ctx ): array|W
 						'body_html'   => '<p style="margin:0;">If the issue is not fully resolved, reply to this email and we will reopen it for you.</p>',
 						'signoff'     => $site . ' Support Team',
 						'footer_note' => 'Reply directly to this email if you need this ticket reopened.',
+						'theme'       => $theme,
 					]
 				),
 			];
@@ -279,6 +283,7 @@ function dtb_support_get_email_template( string $template, array $ctx ): array|W
 						],
 						'signoff'     => $site . ' Support Team',
 						'footer_note' => 'Reply directly to this email to add more information to your ticket.',
+						'theme'       => $theme,
 					]
 				),
 			];

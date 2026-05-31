@@ -41,33 +41,26 @@ function dtb_support_render_page(): void {
 	}
 
 	dtb_admin_shell_open( [
-		'title'    => __( 'Support', 'drywall-toolbox' ),
-		'subtitle' => __( 'Manage customer support tickets.', 'drywall-toolbox' ),
-		'section'  => 'operations',
-		'page'     => 'dtb-support',
-		'template' => 'queue',
-		'icon'     => 'dashicons-format-chat',
-		'tabs'     => $tabs,
+		'title'       => __( 'Support', 'drywall-toolbox' ),
+		'subtitle'    => __( 'Manage customer support tickets.', 'drywall-toolbox' ),
+		'section'     => 'operations',
+		'page'        => 'dtb-support',
+		'template'    => 'queue',
+		'icon'        => 'dashicons-format-chat',
+		'tabs'        => $tabs,
+		'live_target' => 'dtb-support-workspace',
 	] );
 
 	dtb_admin_ui_toolbar_open();
-	echo '<form method="get" style="display:contents">';
-	echo '<input type="hidden" name="page" value="dtb-support">';
-	if ( $status ) {
-		echo '<input type="hidden" name="status" value="' . esc_attr( $status ) . '">';
-	}
 	// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-	echo dtb_admin_ui_input( 's', $search, [ 'placeholder' => __( 'Search tickets…', 'drywall-toolbox' ) ] );
-	// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-	echo dtb_admin_ui_button( __( 'Search', 'drywall-toolbox' ), [ 'type' => 'secondary', 'attr' => 'type="submit"', 'size' => 'sm' ] );
-	echo '</form>';
+	echo dtb_admin_ui_search_input( __( 'Search tickets…', 'drywall-toolbox' ), $search, true, 's' );
 	dtb_admin_ui_toolbar_close();
 
 	$meta_query = [];
 	if ( $status ) {
 		$meta_query[] = [ 'key' => '_dtb_ticket_status', 'value' => $status ];
 	}
-	$query = new WP_Query( [
+	$query       = new WP_Query( [
 		'post_type'      => 'dtb_support_ticket',
 		'post_status'    => 'publish',
 		'posts_per_page' => $per,
@@ -75,6 +68,7 @@ function dtb_support_render_page(): void {
 		's'              => $search,
 		'meta_query'     => $meta_query, // phpcs:ignore WordPress.DB.SlowDBQuery
 	] );
+	$total_pages = $query->max_num_pages ?: 1;
 
 	if ( ! $query->have_posts() ) {
 		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
@@ -82,6 +76,17 @@ function dtb_support_render_page(): void {
 		dtb_admin_shell_close();
 		return;
 	}
+
+	// Live region wraps the data grid.
+	dtb_admin_shell_live_region_open( [
+		'id'       => 'dtb-support-workspace',
+		'module'   => 'support',
+		'endpoint' => rest_url( 'dtb/v1/admin/support' ),
+		'interval' => 30000,
+	] );
+
+	// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+	echo dtb_admin_ui_update_badge( 'dtb-support-workspace' );
 
 	// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 	echo dtb_admin_ui_table_open( [
@@ -114,5 +119,8 @@ function dtb_support_render_page(): void {
 	wp_reset_postdata();
 
 	echo dtb_admin_ui_table_close();
+	// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+	echo dtb_admin_ui_pagination( $paged, $total_pages );
+	dtb_admin_shell_live_region_close();
 	dtb_admin_shell_close();
 }

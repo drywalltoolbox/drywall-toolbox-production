@@ -859,9 +859,11 @@
 		} )
 			.then( function ( res ) {
 				if ( ! res.ok ) throw new Error( 'HTTP ' + res.status );
-				return res.text();
+				const ct = res.headers.get( 'Content-Type' ) || '';
+				return ct.includes( 'application/json' ) ? res.json() : res.text();
 			} )
-			.then( function ( html ) {
+			.then( function ( payload ) {
+				const html = ( payload && typeof payload === 'object' ) ? ( payload.html || '' ) : String( payload );
 				target.innerHTML = html;
 				DtbAdmin.setRegionLoading( target, false );
 				DtbAdmin.clearDirty( regionId );
@@ -928,7 +930,10 @@
 
 				el.addEventListener( 'click', function ( e ) {
 					e.preventDefault();
-					const region = el.closest( '[data-dtb-live-region]' );
+					const targetId = el.getAttribute( 'data-dtb-live-target' );
+					const region   = targetId
+						? document.querySelector( '[data-dtb-live-region="' + targetId + '"]' )
+						: el.closest( '[data-dtb-live-region]' );
 					if ( ! region ) return;
 
 					const endpoint = region.getAttribute( 'data-dtb-endpoint' );
@@ -952,7 +957,10 @@
 			el.addEventListener( 'input', function () {
 				clearTimeout( timer );
 				timer = setTimeout( function () {
-					const region = el.closest( '[data-dtb-live-region]' );
+					const targetId = el.getAttribute( 'data-dtb-live-target' );
+					const region   = targetId
+						? document.querySelector( '[data-dtb-live-region="' + targetId + '"]' )
+						: el.closest( '[data-dtb-live-region]' );
 					if ( ! region ) return;
 					const endpoint = region.getAttribute( 'data-dtb-endpoint' );
 					DtbAdmin.liveNavigate( {

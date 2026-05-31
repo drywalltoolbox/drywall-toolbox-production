@@ -59,4 +59,46 @@ function dtb_system_manager_register_routes(): void {
 		},
 		'permission_callback' => $read_cap,
 	] );
+
+	// Live-region refresh endpoint for the System Manager admin page.
+	register_rest_route( 'dtb/v1', '/admin/system', [
+		'methods'             => WP_REST_Server::READABLE,
+		'callback'            => 'dtb_system_manager_admin_system_handler',
+		'permission_callback' => fn() => current_user_can( 'dtb_manage_system' ),
+		'args'                => [
+			'tab' => [ 'sanitize_callback' => 'sanitize_key' ],
+		],
+	] );
+}
+
+/**
+ * Live-region refresh handler for GET /dtb/v1/admin/system.
+ *
+ * Renders the active tab content for the System Manager live region.
+ */
+function dtb_system_manager_admin_system_handler( WP_REST_Request $request ): WP_REST_Response {
+	$active_tab = sanitize_key( $request->get_param( 'tab' ) ?: 'system' );
+
+	ob_start();
+
+	switch ( $active_tab ) {
+		case 'queues':
+			dtb_system_manager_render_queues_tab();
+			break;
+		case 'integrations':
+			dtb_system_manager_render_integrations_tab();
+			break;
+		case 'webhooks':
+			dtb_system_manager_render_webhooks_tab();
+			break;
+		case 'audit':
+			dtb_system_manager_render_audit_tab();
+			break;
+		default:
+			dtb_system_manager_render_system_tab();
+			break;
+	}
+
+	$html = ob_get_clean();
+	return new WP_REST_Response( [ 'ok' => true, 'html' => $html ], 200 );
 }

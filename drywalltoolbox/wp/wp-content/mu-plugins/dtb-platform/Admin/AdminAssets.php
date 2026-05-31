@@ -54,8 +54,51 @@ function dtb_admin_assets_enqueue(): void {
 		true
 	);
 
-	// ── ApexCharts (dashboard pages only) ──
+	// ── Module-specific CSS (keyed by page slug) ──
 	$page_meta = dtb_current_page_meta();
+	$page_slug = $page_meta['slug'] ?? '';
+
+	$module_css_map = [
+		'dtb-repairs' => [
+			'id'  => 'dtb-repairs-page',
+			'dir' => WP_CONTENT_DIR . '/mu-plugins/dtb-repair-service/Admin/assets/',
+			'url' => content_url( '/mu-plugins/dtb-repair-service/Admin/assets/' ),
+			'file' => 'dtb-repairs-page.css',
+		],
+		'dtb-support' => [
+			'id'  => 'dtb-support-page',
+			'dir' => WP_CONTENT_DIR . '/mu-plugins/dtb-support/Admin/assets/',
+			'url' => content_url( '/mu-plugins/dtb-support/Admin/assets/' ),
+			'file' => 'dtb-support-page.css',
+		],
+		'dtb-returns' => [
+			'id'  => 'dtb-returns-page',
+			'dir' => WP_CONTENT_DIR . '/mu-plugins/dtb-returns/Admin/assets/',
+			'url' => content_url( '/mu-plugins/dtb-returns/Admin/assets/' ),
+			'file' => 'dtb-returns-page.css',
+		],
+		'dtb-orders' => [
+			'id'  => 'dtb-orders-page',
+			'dir' => WP_CONTENT_DIR . '/mu-plugins/dtb-commerce/Admin/assets/',
+			'url' => content_url( '/mu-plugins/dtb-commerce/Admin/assets/' ),
+			'file' => 'dtb-orders-page.css',
+		],
+	];
+
+	if ( isset( $module_css_map[ $page_slug ] ) ) {
+		$mod      = $module_css_map[ $page_slug ];
+		$mod_file = $mod['dir'] . $mod['file'];
+		$mod_ver  = file_exists( $mod_file ) ? (string) filemtime( $mod_file ) : '1.0.0';
+
+		wp_enqueue_style(
+			$mod['id'],
+			$mod['url'] . $mod['file'],
+			[ 'dtb-admin' ],  // Always loads after the shared stylesheet.
+			$mod_ver
+		);
+	}
+
+	// ── ApexCharts (dashboard pages only) ──
 	if ( in_array( $page_meta['template'] ?? '', [ 'dashboard' ], true ) ) {
 		$apex_file = $assets_dir . 'vendor/apexcharts.min.js';
 		$apex_ver  = file_exists( $apex_file ) ? (string) filemtime( $apex_file ) : '3.44.0';

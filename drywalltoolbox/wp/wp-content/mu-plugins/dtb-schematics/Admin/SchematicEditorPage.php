@@ -818,6 +818,10 @@ function dtb_schematics_render_page() {
 				$('#dtb-import-msg').text(errorMsg).css('color', '#d63638');
 				if (details) {
 					$('#dtb-import-errors').show().text(details);
+				} else {
+					$('#dtb-import-errors')
+						.show()
+						.text('No raw trace is shown here by default. Open System Manager for technical diagnostics.');
 				}
 			}
 
@@ -937,7 +941,7 @@ function dtb_schematics_render_page() {
 					if (timedOut) {
 						errorMsg = 'Import batch timed out after retries. The session remains staged; click Import CSV to retry.';
 					}
-					finishFailure(errorMsg, responseText ? responseText.slice(0, 5000) : '');
+					finishFailure(errorMsg, '');
 
 					if (window.console && console.error) {
 						console.error('DTB schematics import batch AJAX failure', {
@@ -989,7 +993,7 @@ function dtb_schematics_render_page() {
 				if ('timeout' === textStatus) {
 					errorMsg = 'Import initialization timed out. Try a smaller ZIP or rerun.';
 				}
-				finishFailure(errorMsg, responseText ? responseText.slice(0, 5000) : '');
+				finishFailure(errorMsg, '');
 
 				if (window.console && console.error) {
 					console.error('DTB schematics import AJAX failure', {

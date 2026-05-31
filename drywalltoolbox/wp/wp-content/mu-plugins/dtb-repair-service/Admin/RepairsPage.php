@@ -42,27 +42,20 @@ function dtb_repairs_render_page(): void {
 	}
 
 	dtb_admin_shell_open( [
-		'title'    => __( 'Repairs', 'drywall-toolbox' ),
-		'subtitle' => __( 'Manage repair service tickets.', 'drywall-toolbox' ),
-		'section'  => 'operations',
-		'page'     => 'dtb-repairs',
-		'template' => 'queue',
-		'icon'     => 'dashicons-hammer',
-		'tabs'     => $tabs,
+		'title'       => __( 'Repairs', 'drywall-toolbox' ),
+		'subtitle'    => __( 'Manage repair service tickets.', 'drywall-toolbox' ),
+		'section'     => 'operations',
+		'page'        => 'dtb-repairs',
+		'template'    => 'queue',
+		'icon'        => 'dashicons-hammer',
+		'tabs'        => $tabs,
+		'live_target' => 'dtb-repairs-workspace',
 	] );
 
 	// Toolbar.
 	dtb_admin_ui_toolbar_open();
-	echo '<form method="get" style="display:contents">';
-	echo '<input type="hidden" name="page" value="dtb-repairs">';
-	if ( $status ) {
-		echo '<input type="hidden" name="status" value="' . esc_attr( $status ) . '">';
-	}
 	// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-	echo dtb_admin_ui_input( 's', $search, [ 'placeholder' => __( 'Search repairs…', 'drywall-toolbox' ) ] );
-	// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-	echo dtb_admin_ui_button( __( 'Search', 'drywall-toolbox' ), [ 'type' => 'secondary', 'attr' => 'type="submit"', 'size' => 'sm' ] );
-	echo '</form>';
+	echo dtb_admin_ui_search_input( __( 'Search repairs…', 'drywall-toolbox' ), $search, true, 's' );
 	dtb_admin_ui_toolbar_spacer();
 	if ( current_user_can( 'dtb_manage_repairs' ) ) {
 		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
@@ -88,6 +81,7 @@ function dtb_repairs_render_page(): void {
 		'meta_query'     => $meta_query, // phpcs:ignore WordPress.DB.SlowDBQuery
 	];
 	$query = new WP_Query( $args );
+	$total_pages = $query->max_num_pages ?: 1;
 
 	if ( ! $query->have_posts() ) {
 		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
@@ -95,6 +89,17 @@ function dtb_repairs_render_page(): void {
 		dtb_admin_shell_close();
 		return;
 	}
+
+	// Live region wraps the data grid so AJAX partial-renders target it.
+	dtb_admin_shell_live_region_open( [
+		'id'       => 'dtb-repairs-workspace',
+		'module'   => 'repairs',
+		'endpoint' => rest_url( 'dtb/v1/admin/repairs' ),
+		'interval' => 45000,
+	] );
+
+	// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+	echo dtb_admin_ui_update_badge( 'dtb-repairs-workspace' );
 
 	// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 	echo dtb_admin_ui_table_open( [
@@ -127,6 +132,10 @@ function dtb_repairs_render_page(): void {
 	}
 	wp_reset_postdata();
 
+	// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 	echo dtb_admin_ui_table_close();
+	// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+	echo dtb_admin_ui_pagination( $paged, $total_pages );
+	dtb_admin_shell_live_region_close();
 	dtb_admin_shell_close();
 }

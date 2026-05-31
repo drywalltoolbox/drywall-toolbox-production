@@ -33,27 +33,20 @@ function dtb_orders_render_page(): void {
 	];
 
 	dtb_admin_shell_open( [
-		'title'    => __( 'Orders', 'drywall-toolbox' ),
-		'subtitle' => __( 'Manage WooCommerce orders.', 'drywall-toolbox' ),
-		'section'  => 'operations',
-		'page'     => 'dtb-orders',
-		'template' => 'queue',
-		'icon'     => 'dashicons-cart',
-		'tabs'     => $status_tabs,
+		'title'       => __( 'Orders', 'drywall-toolbox' ),
+		'subtitle'    => __( 'Manage WooCommerce orders.', 'drywall-toolbox' ),
+		'section'     => 'operations',
+		'page'        => 'dtb-orders',
+		'template'    => 'queue',
+		'icon'        => 'dashicons-cart',
+		'tabs'        => $status_tabs,
+		'live_target' => 'dtb-orders-workspace',
 	] );
 
-	// Toolbar: search + filter.
+	// Toolbar: live search + new order button.
 	dtb_admin_ui_toolbar_open();
-	echo '<form method="get" style="display:contents">';
-	echo '<input type="hidden" name="page" value="dtb-orders">';
-	if ( $status ) {
-		echo '<input type="hidden" name="status" value="' . esc_attr( $status ) . '">';
-	}
 	// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-	echo dtb_admin_ui_input( 's', $search, 'search', [ 'placeholder' => __( 'Search orders…', 'drywall-toolbox' ) ] );
-	// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-	echo dtb_admin_ui_button( __( 'Search', 'drywall-toolbox' ), [ 'type' => 'secondary', 'attr' => 'type="submit"', 'size' => 'sm' ] );
-	echo '</form>';
+	echo dtb_admin_ui_search_input( __( 'Search orders…', 'drywall-toolbox' ), $search, true, 's' );
 	dtb_admin_ui_toolbar_spacer();
 	// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 	echo dtb_admin_ui_button( __( 'New Order', 'drywall-toolbox' ), [
@@ -75,6 +68,13 @@ function dtb_orders_render_page(): void {
 	if ( $search ) {
 		$query_args['s'] = $search;
 	}
+	// Total count for pagination (separate lightweight query).
+	$count_args = [ 'limit' => -1, 'return' => 'ids' ];
+	if ( $status ) $count_args['status'] = 'wc-' . $status;
+	if ( $search ) $count_args['s']      = $search;
+	$total_count = count( wc_get_orders( $count_args ) );
+	$total_pages = $per > 0 ? (int) ceil( $total_count / $per ) : 1;
+
 	$orders = wc_get_orders( $query_args );
 
 	if ( empty( $orders ) ) {
@@ -83,6 +83,17 @@ function dtb_orders_render_page(): void {
 		dtb_admin_shell_close();
 		return;
 	}
+
+	// Live region wraps the data grid.
+	dtb_admin_shell_live_region_open( [
+		'id'       => 'dtb-orders-workspace',
+		'module'   => 'orders',
+		'endpoint' => rest_url( 'dtb/v1/admin/orders' ),
+		'interval' => 30000,
+	] );
+
+	// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+	echo dtb_admin_ui_update_badge( 'dtb-orders-workspace' );
 
 	// Table.
 	echo dtb_admin_ui_table_open( [
@@ -101,7 +112,15 @@ function dtb_orders_render_page(): void {
 		$badge_type = dtb_admin_ui_status_badge_type( $raw_status );
 		$status_label = wc_get_order_status_name( $raw_status );
 
-		echo '<tr data-dtb-row-drawer="dtb-order-drawer-' . esc_attr( $order_id ) . '">';
+		echo '<tr class="dtb-table__row--clickable"'
+			. ' data-dtb-drawer="dtb-orders-detail-drawer"'
+			. ' data-dtb-drawer-title="' . esc_attr( sprintf( __( 'Order #%s', 'drywall-toolbox' ), $order_id ) ) . '"'
+			. ' data-dtb-field-orderid="' . esc_attr( '#' . $order_id ) . '"'
+			. ' data-dtb-field-customer="' . esc_attr( $order->get_formatted_billing_full_name() ?: __( 'Guest', 'drywall-toolbox' ) ) . '"'
+			. ' data-dtb-field-status="' . esc_attr( $status_label ) . '"'
+			. ' data-dtb-field-total="' . esc_attr( $order->get_formatted_order_total() ) . '"'
+			. ' data-dtb-field-date="' . esc_attr( $order->get_date_created() ? $order->get_date_created()->date_i18n( get_option( 'date_format' ) ) : '—' ) . '"'
+			. ' data-dtb-field-viewurl="' . esc_attr( get_edit_post_link( $order_id ) ) . '">';
 		echo '<td><a href="' . esc_url( get_edit_post_link( $order_id ) ) . '">#' . esc_html( $order_id ) . '</a></td>';
 		echo '<td>' . esc_html( $order->get_date_created() ? $order->get_date_created()->date_i18n( get_option( 'date_format' ) ) : '—' ) . '</td>';
 		echo '<td>' . esc_html( $order->get_formatted_billing_full_name() ?: __( 'Guest', 'drywall-toolbox' ) ) . '</td>';
@@ -119,6 +138,38 @@ function dtb_orders_render_page(): void {
 	}
 
 	echo dtb_admin_ui_table_close();
+	// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+	echo dtb_admin_ui_pagination( $paged, $total_pages );
+	dtb_admin_shell_live_region_close();
+
+	// Shared order detail drawer — lives outside the live region so it survives partial refreshes.
+	// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+	echo dtb_admin_ui_drawer(
+		'dtb-orders-detail-drawer',
+		__( 'Order', 'drywall-toolbox' ),
+		dtb_admin_ui_detail_row( __( 'Order',    'drywall-toolbox' ), '<span data-dtb-target="orderid">—</span>' )
+		. dtb_admin_ui_detail_row( __( 'Customer', 'drywall-toolbox' ), '<span data-dtb-target="customer">—</span>' )
+		. dtb_admin_ui_detail_row( __( 'Status',   'drywall-toolbox' ), '<span data-dtb-target="status">—</span>' )
+		. dtb_admin_ui_detail_row( __( 'Total',    'drywall-toolbox' ), '<span data-dtb-target="total">—</span>' )
+		. dtb_admin_ui_detail_row( __( 'Date',     'drywall-toolbox' ), '<span data-dtb-target="date">—</span>' ),
+		'<a href="#" class="dtb-btn dtb-btn--sm dtb-orders-detail-view-btn">'
+			. esc_html__( 'View Full Order', 'drywall-toolbox' )
+		. '</a>'
+	);
+	// Update the View Full Order href when drawer populates from a row click.
+	?>
+	<script>
+	(function () {
+		var d = document.getElementById( 'dtb-orders-detail-drawer' );
+		if ( ! d ) return;
+		d.addEventListener( 'dtb:drawer:populate', function ( e ) {
+			var url = e.detail.rowData.dtbFieldViewurl;
+			var btn = d.querySelector( '.dtb-orders-detail-view-btn' );
+			if ( btn && url ) btn.href = url;
+		} );
+	}());
+	</script>
+	<?php
 
 	dtb_admin_shell_close();
 }

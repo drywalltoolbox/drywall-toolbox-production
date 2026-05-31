@@ -63,6 +63,9 @@ function dtb_ajax_run_health_checks() {
 	if ( ! current_user_can( 'manage_options' ) ) {
 		wp_send_json_error( [ 'message' => 'Insufficient permissions.' ], 403 );
 	}
+	$include_raw_diagnostics = current_user_can( 'dtb_manage_system' )
+		&& isset( $_POST['include_raw'] )
+		&& '1' === sanitize_text_field( wp_unslash( $_POST['include_raw'] ) );
 
 	$wc_user = defined( 'DTB_WC_AUTH_USER' ) ? DTB_WC_AUTH_USER : get_option( 'dtb_wc_auth_user', '' );
 	$wc_pass = defined( 'DTB_WC_AUTH_PASS' ) ? DTB_WC_AUTH_PASS : get_option( 'dtb_wc_auth_pass', '' );
@@ -225,7 +228,7 @@ function dtb_ajax_run_health_checks() {
 		$pass = in_array( $status, $ep['expects'], true );
 
 		$body_preview = '';
-		if ( ! $pass ) {
+		if ( $include_raw_diagnostics && ! $pass ) {
 			$raw          = wp_remote_retrieve_body( $response );
 			$decoded      = json_decode( $raw, true );
 			$body_preview = is_array( $decoded ) && isset( $decoded['message'] ) ? $decoded['message'] : substr( $raw, 0, 120 );
@@ -447,6 +450,10 @@ function dtb_api_health_render_page() {
 		<div class="dtb-card">
 			<h2>Endpoint Diagnostics</h2>
 			<p class="dtb-card-desc">Live checks against every REST endpoint the React SPA depends on. Runs server-side — results reflect real reachability from this server.</p>
+			<p class="dtb-card-desc">
+				Technical traces are intentionally hidden here by default.
+				Use <a href="<?php echo esc_url( admin_url( 'admin.php?page=dtb-system-manager&tab=integrations' ) ); ?>">System Manager</a> for backend diagnostics.
+			</p>
 
 			<div style="display:flex;align-items:center;gap:12px;margin-bottom:18px;">
 				<button id="dtb-btn-run" class="dtb-btn dtb-btn-primary">
@@ -577,8 +584,11 @@ function dtb_api_health_render_page() {
 							: '<span class="dtb-badge fail">✗ Fail</span>';
 						var detail = '<div class="dtb-url">' + $('<div>').text(r.url).html() + '</div>';
 						if (r.note) detail += '<div class="dtb-note">' + $('<div>').text(r.note).html() + '</div>';
-						if (r.error) detail += '<div class="dtb-err">' + $('<div>').text(r.error).html() + '</div>';
-						if (!r.pass && r.body_preview) detail += '<div class="dtb-err">' + $('<div>').text(r.body_preview).html() + '</div>';
+						if (r.error) {
+							detail += '<div class="dtb-err">Request failed. Open System Manager for technical diagnostics.</div>';
+						} else if (!r.pass) {
+							detail += '<div class="dtb-note">Endpoint did not return an expected status. Open System Manager for detailed diagnostics.</div>';
+						}
 						html += '<tr>';
 						html += '<td><strong>' + $('<div>').text(r.label).html() + '</strong>' + detail + '</td>';
 						html += '<td><code>' + r.method + '</code></td>';
@@ -601,7 +611,7 @@ function dtb_api_health_render_page() {
 			}).fail(function(){
 				$btn.prop('disabled', false);
 				$('#dtb-spinner').hide();
-				$('#dtb-results').html('<p style="color:#d63638;">AJAX request failed. Check PHP error log.</p>');
+				$('#dtb-results').html('<p style="color:#d63638;">AJAX request failed. Open System Manager for diagnostics.</p>');
 			});
 		});
 

@@ -33,14 +33,15 @@ defined( 'ABSPATH' ) || exit;
  */
 function dtb_admin_shell_open( array $args ): void {
 	$args = wp_parse_args( $args, [
-		'title'    => '',
-		'subtitle' => '',
-		'section'  => 'operations',
-		'page'     => '',
-		'template' => 'dashboard',
-		'actions'  => [],
-		'tabs'     => [],
-		'icon'     => '',
+		'title'       => '',
+		'subtitle'    => '',
+		'section'     => 'operations',
+		'page'        => '',
+		'template'    => 'dashboard',
+		'actions'     => [],
+		'tabs'        => [],
+		'icon'        => '',
+		'live_target' => '', // ID of [data-dtb-live-region] that shell tabs should navigate
 	] );
 
 	echo '<div class="wrap dtb-admin-page">';
@@ -98,7 +99,7 @@ function dtb_admin_shell_render_header( array $args ): void {
 
 	// Section nav / tabs.
 	if ( ! empty( $args['tabs'] ) ) {
-		dtb_admin_shell_render_tabs( $args['tabs'] );
+		dtb_admin_shell_render_tabs( $args['tabs'], $args['live_target'] );
 	}
 }
 
@@ -107,7 +108,7 @@ function dtb_admin_shell_render_header( array $args ): void {
  *
  * @param array $tabs Each: [ 'id' => string, 'label' => string, 'active' => bool, 'url' => string ]
  */
-function dtb_admin_shell_render_tabs( array $tabs ): void {
+function dtb_admin_shell_render_tabs( array $tabs, string $live_target = '' ): void {
 	echo '<nav class="dtb-section-nav" aria-label="Page sections">';
 	foreach ( $tabs as $tab ) {
 		$active_class = ! empty( $tab['active'] ) ? ' dtb-section-nav__tab--active' : '';
@@ -115,14 +116,21 @@ function dtb_admin_shell_render_tabs( array $tabs ): void {
 		$data_tab     = ! empty( $tab['id'] ) ? ' data-dtb-tab="' . esc_attr( $tab['id'] ) . '"' : '';
 		$aria_sel     = ! empty( $tab['active'] ) ? 'true' : 'false';
 		$role         = empty( $tab['url'] ) || $tab['url'] === '#' ? ' role="tab"' : '';
+		// Live navigation attributes — emitted only when a live_target region ID is provided.
+		$live_attrs = '';
+		if ( $live_target && ! empty( $tab['id'] ) ) {
+			$live_attrs = ' data-dtb-live-tab="' . esc_attr( $tab['id'] ) . '"'
+						. ' data-dtb-live-target="' . esc_attr( $live_target ) . '"';
+		}
 
 		printf(
-			'<a href="%s" class="dtb-section-nav__tab%s" aria-selected="%s"%s%s>%s</a>',
+			'<a href="%s" class="dtb-section-nav__tab%s" aria-selected="%s"%s%s%s>%s</a>',
 			esc_url( $href ),
 			esc_attr( $active_class ),
 			esc_attr( $aria_sel ),
 			$data_tab,
 			$role,
+			$live_attrs,
 			esc_html( $tab['label'] ?? '' )
 		);
 	}

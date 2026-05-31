@@ -348,7 +348,7 @@ function dtb_repair_render_customer_email_html( string $template, array $ctx ): 
 			$eyebrow = 'Repair request received';
 			$intro   = 'Thanks for submitting your repair request. Our service team will review the details and follow up with next steps.';
 			if ( '' !== $issue ) {
-				$body_html = '<p style="margin:0 0 10px;color:#9aa7bd;font-size:13px;font-weight:800;line-height:18px;text-transform:uppercase;">Issue description</p><div style="padding:18px 20px;background:#050b18;border:1px solid #334155;border-radius:8px;color:#cbd5e1;">' . nl2br( esc_html( $issue ) ) . '</div>';
+				$body_html = '<p style="margin:0 0 10px;font-size:12px;font-weight:700;line-height:18px;letter-spacing:0.04em;text-transform:uppercase;">Issue description</p><div class="dtb-quote-note" style="padding:18px 20px;border:1px solid #dbe5f2;border-radius:8px;background:#f8fafc;">' . nl2br( esc_html( $issue ) ) . '</div>';
 			}
 			break;
 
@@ -394,16 +394,16 @@ function dtb_repair_render_customer_email_html( string $template, array $ctx ): 
 				$unit = (float) ( $line['unit_price'] ?? 0 );
 				$line_total = (float) ( $line['line_total'] ?? ( $qty * $unit ) );
 				$rows_html .= '<tr>'
-					. '<td style="padding:8px 10px;border-top:1px solid #334155;color:#e2e8f0;">' . esc_html( $label ) . '</td>'
-					. '<td style="padding:8px 10px;border-top:1px solid #334155;text-align:right;color:#cbd5e1;">' . esc_html( rtrim( rtrim( number_format( max( 0.001, $qty ), 3, '.', '' ), '0' ), '.' ) ) . '</td>'
-					. '<td style="padding:8px 10px;border-top:1px solid #334155;text-align:right;color:#cbd5e1;">' . esc_html( $quote_currency . ' ' . number_format( $unit, 2, '.', '' ) ) . '</td>'
-					. '<td style="padding:8px 10px;border-top:1px solid #334155;text-align:right;color:#e2e8f0;font-weight:700;">' . esc_html( $quote_currency . ' ' . number_format( $line_total, 2, '.', '' ) ) . '</td>'
+					. '<td style="padding:9px 10px;border-top:1px solid #dbe5f2;">' . esc_html( $label ) . '</td>'
+					. '<td style="padding:9px 10px;border-top:1px solid #dbe5f2;text-align:right;">' . esc_html( rtrim( rtrim( number_format( max( 0.001, $qty ), 3, '.', '' ), '0' ), '.' ) ) . '</td>'
+					. '<td style="padding:9px 10px;border-top:1px solid #dbe5f2;text-align:right;">' . esc_html( $quote_currency . ' ' . number_format( $unit, 2, '.', '' ) ) . '</td>'
+					. '<td style="padding:9px 10px;border-top:1px solid #dbe5f2;text-align:right;font-weight:700;">' . esc_html( $quote_currency . ' ' . number_format( $line_total, 2, '.', '' ) ) . '</td>'
 					. '</tr>';
 			}
 
 			$total_html = '';
 			if ( isset( $quote_totals['total'] ) ) {
-				$total_html = '<div style="margin-top:10px;text-align:right;font-size:14px;color:#e2e8f0;font-weight:800;">'
+				$total_html = '<div class="dtb-quote-total" style="margin-top:10px;text-align:right;font-size:14px;font-weight:800;">'
 					. esc_html( 'Total: ' . $quote_currency . ' ' . number_format( (float) $quote_totals['total'], 2, '.', '' ) )
 					. '</div>';
 			}
@@ -412,7 +412,7 @@ function dtb_repair_render_customer_email_html( string $template, array $ctx ): 
 			if ( '' !== $quote_expires ) {
 				$ts = strtotime( $quote_expires );
 				if ( false !== $ts ) {
-					$expires_html = '<p style="margin:10px 0 0;color:#cbd5e1;">'
+					$expires_html = '<p class="dtb-quote-expiry" style="margin:10px 0 0;">'
 						. esc_html( 'Quote expires: ' . date_i18n( 'M j, Y g:i a', $ts ) )
 						. '</p>';
 				}
@@ -420,12 +420,12 @@ function dtb_repair_render_customer_email_html( string $template, array $ctx ): 
 
 			$body_html = '';
 			if ( '' !== $rows_html ) {
-				$body_html .= '<table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="border:1px solid #334155;border-radius:8px;overflow:hidden;margin:6px 0 0;">'
+				$body_html .= '<table class="dtb-quote-table" role="presentation" cellpadding="0" cellspacing="0" width="100%" style="border:1px solid #dbe5f2;border-radius:8px;overflow:hidden;margin:6px 0 0;">'
 					. '<thead><tr>'
-					. '<th style="padding:8px 10px;text-align:left;background:#111827;color:#93c5fd;font-size:12px;">Item</th>'
-					. '<th style="padding:8px 10px;text-align:right;background:#111827;color:#93c5fd;font-size:12px;">Qty</th>'
-					. '<th style="padding:8px 10px;text-align:right;background:#111827;color:#93c5fd;font-size:12px;">Unit</th>'
-					. '<th style="padding:8px 10px;text-align:right;background:#111827;color:#93c5fd;font-size:12px;">Line Total</th>'
+					. '<th style="padding:8px 10px;text-align:left;background:#f8fafc;color:#475569;font-size:12px;">Item</th>'
+					. '<th style="padding:8px 10px;text-align:right;background:#f8fafc;color:#475569;font-size:12px;">Qty</th>'
+					. '<th style="padding:8px 10px;text-align:right;background:#f8fafc;color:#475569;font-size:12px;">Unit</th>'
+					. '<th style="padding:8px 10px;text-align:right;background:#f8fafc;color:#475569;font-size:12px;">Line Total</th>'
 					. '</tr></thead><tbody>' . $rows_html . '</tbody></table>';
 				$body_html .= $total_html;
 				$body_html .= $expires_html;
@@ -433,7 +433,7 @@ function dtb_repair_render_customer_email_html( string $template, array $ctx ): 
 				$body_html = '<p style="margin:0;">This quote is ready for your review.</p>' . $expires_html;
 			}
 			if ( '' !== $quote_note ) {
-				$body_html .= '<div style="margin-top:12px;padding:14px;border:1px solid #334155;border-radius:8px;background:#050b18;color:#cbd5e1;">'
+				$body_html .= '<div class="dtb-quote-note" style="margin-top:12px;padding:14px;border:1px solid #dbe5f2;border-radius:8px;background:#f8fafc;">'
 					. nl2br( esc_html( $quote_note ) )
 					. '</div>';
 			}
@@ -498,6 +498,7 @@ function dtb_repair_render_customer_email_html( string $template, array $ctx ): 
 			'cta_label'   => $cta_label,
 			'signoff'     => $site . ' Team',
 			'footer_note' => 'You can reply directly to this email if you have questions about your repair.',
+			'theme'       => (string) apply_filters( 'dtb_repair_email_theme', 'auto', $template, $ctx ),
 		]
 	);
 }
