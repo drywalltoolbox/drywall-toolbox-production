@@ -402,6 +402,27 @@ return false;
 $from    = dtb_repair_email_from_name() . ' <' . dtb_repair_email_from_address() . '>';
 $is_html = dtb_repair_is_customer_email_template( $template ) && function_exists( 'dtb_render_branded_email' );
 $body    = $is_html ? dtb_repair_render_customer_email_html( $template, $context ) : $rendered['body'];
+
+if ( function_exists( 'dtb_send_email' ) ) {
+return dtb_send_email(
+[
+'to'           => $to,
+'subject'      => (string) $rendered['subject'],
+'message'      => (string) $body,
+'is_html'      => $is_html,
+'content_type' => $is_html ? 'text/html' : 'text/plain',
+'from_name'    => dtb_repair_email_from_name(),
+'from_email'   => dtb_repair_email_from_address(),
+'alt_body'     => $is_html ? (string) $rendered['body'] : '',
+'context'      => [
+'module'   => 'dtb-repair-service',
+'template' => $template,
+'repair_id' => (int) ( $context['repair_id'] ?? 0 ),
+],
+]
+);
+}
+
 $headers = [
 'Content-Type: ' . ( $is_html ? 'text/html' : 'text/plain' ) . '; charset=UTF-8',
 'From: ' . $from,

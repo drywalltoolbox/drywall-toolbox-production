@@ -62,19 +62,38 @@ function dtb_support_process_email_outbox(): void {
 			define( 'DTB_SUPPORT_SENDING', true );
 		}
 
-		$alt_body_hook = $is_html && function_exists( 'dtb_mail_alt_body_hook' )
-			? dtb_mail_alt_body_hook( (string) $item->body_text )
-			: null;
+		if ( function_exists( 'dtb_send_email' ) ) {
+			$sent = dtb_send_email(
+				[
+					'to'           => (string) $item->recipient_email,
+					'subject'      => (string) $item->subject,
+					'message'      => $is_html ? (string) $item->body_html : (string) $item->body_text,
+					'is_html'      => $is_html,
+					'content_type' => $is_html ? 'text/html' : 'text/plain',
+					'alt_body'     => $is_html ? (string) $item->body_text : '',
+					'headers'      => $headers,
+					'context'      => [
+						'module'   => 'dtb-support',
+						'source'   => 'email-outbox',
+						'outbox_id' => (int) $item->id,
+					],
+				]
+			);
+		} else {
+			$alt_body_hook = $is_html && function_exists( 'dtb_mail_alt_body_hook' )
+				? dtb_mail_alt_body_hook( (string) $item->body_text )
+				: null;
 
-		$sent = wp_mail(
-			(string) $item->recipient_email,
-			(string) $item->subject,
-			$is_html ? (string) $item->body_html : (string) $item->body_text,
-			$headers
-		);
+			$sent = wp_mail(
+				(string) $item->recipient_email,
+				(string) $item->subject,
+				$is_html ? (string) $item->body_html : (string) $item->body_text,
+				$headers
+			);
 
-		if ( is_callable( $alt_body_hook ) ) {
-			remove_action( 'phpmailer_init', $alt_body_hook );
+			if ( is_callable( $alt_body_hook ) ) {
+				remove_action( 'phpmailer_init', $alt_body_hook );
+			}
 		}
 
 		$ticket_id = ! empty( $item->ticket_id ) ? (int) $item->ticket_id : 0;

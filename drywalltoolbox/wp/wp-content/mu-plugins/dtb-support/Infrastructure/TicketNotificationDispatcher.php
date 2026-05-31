@@ -278,19 +278,38 @@ function dtb_support_send_email( string $to, string $template, array $ctx ): boo
 	$is_html       = ! empty( $result['html'] );
 	$message       = $is_html ? (string) $result['html'] : (string) $result['body'];
 	$content_type  = $is_html ? 'text/html' : 'text/plain';
-	$alt_body_hook = $is_html && function_exists( 'dtb_mail_alt_body_hook' )
-		? dtb_mail_alt_body_hook( (string) $result['body'] )
-		: null;
 
-	$sent = wp_mail(
-		$to,
-		$result['subject'],
-		$message,
-		dtb_support_email_headers( $content_type )
-	);
+	if ( function_exists( 'dtb_send_email' ) ) {
+		$sent = dtb_send_email(
+			[
+				'to'           => $to,
+				'subject'      => (string) $result['subject'],
+				'message'      => $message,
+				'is_html'      => $is_html,
+				'content_type' => $content_type,
+				'headers'      => dtb_support_email_headers( $content_type ),
+				'alt_body'     => $is_html ? (string) $result['body'] : '',
+				'context'      => [
+					'module'   => 'dtb-support',
+					'template' => $template,
+				],
+			]
+		);
+	} else {
+		$alt_body_hook = $is_html && function_exists( 'dtb_mail_alt_body_hook' )
+			? dtb_mail_alt_body_hook( (string) $result['body'] )
+			: null;
 
-	if ( is_callable( $alt_body_hook ) ) {
-		remove_action( 'phpmailer_init', $alt_body_hook );
+		$sent = wp_mail(
+			$to,
+			$result['subject'],
+			$message,
+			dtb_support_email_headers( $content_type )
+		);
+
+		if ( is_callable( $alt_body_hook ) ) {
+			remove_action( 'phpmailer_init', $alt_body_hook );
+		}
 	}
 
 	if ( ! $sent ) {

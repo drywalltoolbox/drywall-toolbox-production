@@ -1296,9 +1296,26 @@ function dtb_veeqo_send_alert( string $subject, string $body ): void {
 		return;
 	}
 
+	$mail_subject = '[Drywall Toolbox] ' . $subject;
+	if ( function_exists( 'dtb_send_email' ) ) {
+		dtb_send_email(
+			[
+				'to'           => (string) $to,
+				'subject'      => $mail_subject,
+				'message'      => $body,
+				'content_type' => 'text/plain',
+				'context'      => [
+					'module' => 'dtb-integrations-veeqo',
+					'event'  => 'admin-alert',
+				],
+			]
+		);
+		return;
+	}
+
 	wp_mail(
 		$to,
-		'[Drywall Toolbox] ' . $subject,
+		$mail_subject,
 		$body,
 		[ 'Content-Type: text/plain; charset=UTF-8' ]
 	);
@@ -1716,15 +1733,36 @@ function dtb_veeqo_send_repair_confirmation( WC_Order $order, string $tool_desc,
 		$priority
 	);
 
-	wp_mail(
-		$to,
-		$subject,
-		$body,
-		[
-			'Content-Type: text/plain; charset=UTF-8',
-			'From: Drywall Toolbox Service <' . ( get_option( 'admin_email' ) ?: 'noreply@drywalltoolbox.com' ) . '>',
-		]
-	);
+	$from_email = (string) ( get_option( 'admin_email' ) ?: 'noreply@drywalltoolbox.com' );
+	$headers    = [
+		'Content-Type: text/plain; charset=UTF-8',
+		'From: Drywall Toolbox Service <' . $from_email . '>',
+	];
+
+	if ( function_exists( 'dtb_send_email' ) ) {
+		dtb_send_email(
+			[
+				'to'           => (string) $to,
+				'subject'      => $subject,
+				'message'      => $body,
+				'headers'      => $headers,
+				'content_type' => 'text/plain',
+				'context'      => [
+					'module'        => 'dtb-integrations-veeqo',
+					'event'         => 'repair-confirmation',
+					'wc_order_id'   => (int) $order->get_id(),
+					'wc_order_no'   => (string) $order_n,
+				],
+			]
+		);
+	} else {
+		wp_mail(
+			$to,
+			$subject,
+			$body,
+			$headers
+		);
+	}
 
 	// Also notify the admin.
 	dtb_veeqo_send_alert(

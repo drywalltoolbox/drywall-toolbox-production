@@ -30,6 +30,18 @@ final class DTB_NotificationDispatcher {
 			? DTB_EmailTemplateRenderer::render_template( $template_key, $context )
 			: [ 'subject' => 'Drywall Toolbox notification', 'body' => '', 'content_type' => 'text/plain' ];
 
+		if ( function_exists( 'dtb_send_email' ) ) {
+			return dtb_send_email(
+				[
+					'to'           => $to,
+					'subject'      => (string) $payload['subject'],
+					'message'      => (string) $payload['body'],
+					'content_type' => sanitize_text_field( (string) $payload['content_type'] ),
+					'is_html'      => 'text/html' === sanitize_text_field( (string) $payload['content_type'] ),
+				]
+			);
+		}
+
 		$headers = [ 'Content-Type: ' . sanitize_text_field( (string) $payload['content_type'] ) . '; charset=UTF-8' ];
 		return (bool) wp_mail( $to, (string) $payload['subject'], (string) $payload['body'], $headers );
 	}

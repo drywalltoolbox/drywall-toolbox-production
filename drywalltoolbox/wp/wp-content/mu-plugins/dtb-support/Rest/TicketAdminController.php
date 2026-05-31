@@ -336,6 +336,224 @@ function dtb_support_bulk_action_permission( WP_REST_Request $request ): bool|WP
 }
 
 /**
+ * Return a human label for a support event type.
+ */
+function dtb_support_rest_event_label( string $event_type ): string {
+	$labels = [
+		'ticket.created'         => 'Ticket Created',
+		'ticket.status_changed'  => 'Status Changed',
+		'ticket.assigned'        => 'Assigned',
+		'ticket.unassigned'      => 'Unassigned',
+		'ticket.priority_changed'=> 'Priority Changed',
+		'ticket.note_added'      => 'Internal Note',
+		'ticket.reply_customer'  => 'Staff Reply',
+		'ticket.reply_staff'     => 'Customer Reply',
+		'ticket.snoozed'         => 'Snoozed',
+		'ticket.unsnoozed'       => 'Unsnoozed',
+		'ticket.email_sent'      => 'Email Sent',
+		'ticket.email_failed'    => 'Email Failed',
+		'ticket.tag_added'       => 'Tag Added',
+		'ticket.tag_removed'     => 'Tag Removed',
+		'ticket.resolved'        => 'Resolved',
+		'ticket.reopened'        => 'Reopened',
+		'ticket.closed'          => 'Closed',
+		'ticket.merged'          => 'Merged',
+		'ticket.spam_flagged'    => 'Marked as Spam',
+		'ticket.macro_applied'   => 'Macro Applied',
+		'ticket.automation_applied' => 'Automation Applied',
+		'ticket.bulk_updated'    => 'Bulk Updated',
+		'ticket.followup_set'    => 'Follow-up Set',
+		'ticket.score_updated'   => 'Priority Score Updated',
+	];
+
+	if ( isset( $labels[ $event_type ] ) ) {
+		return $labels[ $event_type ];
+	}
+
+	$event_type = str_replace( 'ticket.', '', $event_type );
+	$event_type = str_replace( [ '.', '_' ], ' ', $event_type );
+	return ucwords( trim( $event_type ) );
+}
+
+/**
+ * Group event types for timeline filtering.
+ */
+function dtb_support_rest_event_group( string $event_type, string $visibility = '' ): string {
+	if ( 'ticket.note_added' === $event_type || 'operator' === $visibility ) {
+		return 'internal';
+	}
+
+	if ( in_array( $event_type, [ 'ticket.reply_customer', 'ticket.reply_staff' ], true ) ) {
+		return 'message';
+	}
+
+	if ( in_array( $event_type, [
+		'ticket.status_changed',
+		'ticket.resolved',
+		'ticket.reopened',
+		'ticket.closed',
+		'ticket.spam_flagged',
+		'ticket.assigned',
+		'ticket.unassigned',
+		'ticket.priority_changed',
+		'ticket.snoozed',
+		'ticket.unsnoozed',
+		'ticket.followup_set',
+	], true ) ) {
+		return 'workflow';
+	}
+
+	if ( in_array( $event_type, [ 'ticket.email_sent', 'ticket.email_failed' ], true ) ) {
+		return 'delivery';
+	}
+
+	return 'system';
+}
+
+/**
+ * Build a readable summary for event cards.
+ */
+function dtb_support_rest_event_summary( array $event ): string {
+	$body = trim( (string) ( $event['body'] ?? '' ) );
+	if ( '' !== $body ) {
+		return $body;
+	}
+
+	$event_type  = (string) ( $event['event_type'] ?? '' );
+	$from_status = (string) ( $event['from_status'] ?? '' );
+	$to_status   = (string) ( $event['to_status'] ?? '' );
+	$payload     = is_array( $event['payload'] ?? null ) ? $event['payload'] : [];
+
+	switch ( $event_type ) {
+		case 'ticket.status_changed':
+		case 'ticket.resolved':
+		case 'ticket.reopened':
+		case 'ticket.closed':
+		case 'ticket.spam_flagged':
+			if ( '' !== $from_status || '' !== $to_status ) {
+				$from_label = '' !== $from_status ? dtb_support_status_label( $from_status ) : 'Unknown';
+				$to_label   = '' !== $to_status ? dtb_support_status_label( $to_status ) : 'Unknown';
+				return sprintf( 'Status changed from %s to %s.', $from_label, $to_label );
+			}
+			break;
+
+		case 'ticket.assigned':
+			$assigned_user_id = absint( $payload['assigned_user_id'] ?? 0 );
+			if ( $assigned_user_id > 0 ) {
+				$assigned_user = get_userdata( $assigned_user_id );
+				if ( $assigned_user ) {
+					return sprintf( 'Assigned to %s.', $assigned_user->display_name );
+				}
+			}
+			return 'Ticket assignment updated.';
+
+		case 'ticket.snoozed':
+			$until  = (string) ( $payload['snooze_until'] ?? '' );
+			$reason = trim( (string) ( $payload['reason'] ?? '' ) );
+			if ( '' !== $until && '' !== $reason ) {
+				return sprintf( 'Snoozed until %s. Reason: %s', $until, $reason );
+			}
+			if ( '' !== $until ) {
+				return sprintf( 'Snoozed until %s.', $until );
+			}
+			break;
+
+		case 'ticket.unsnoozed':
+			$previous = (string) ( $payload['was_snooze_until'] ?? '' );
+			return '' !== $previous ? sprintf( 'Snooze removed (was %s).', $previous ) : 'Snooze removed.';
+
+		case 'ticket.followup_set':
+			$followup = (string) ( $payload['followup_due_at'] ?? '' );
+			return '' !== $followup ? sprintf( 'Follow-up due at %s.', $followup ) : 'Follow-up schedule updated.';
+
+		case 'ticket.score_updated':
+			$old_score = isset( $payload['old_score'] ) ? (int) $payload['old_score'] : null;
+			$new_score = isset( $payload['new_score'] ) ? (int) $payload['new_score'] : null;
+			if ( null !== $old_score && null !== $new_score ) {
+				return sprintf( 'Priority score changed from %d to %d.', $old_score, $new_score );
+			}
+			break;
+
+		case 'ticket.email_sent':
+			$recipient = (string) ( $payload['recipient_email'] ?? '' );
+			return '' !== $recipient ? sprintf( 'Email sent to %s.', $recipient ) : 'Email sent successfully.';
+
+		case 'ticket.email_failed':
+			$error = trim( (string) ( $payload['error'] ?? '' ) );
+			return '' !== $error ? sprintf( 'Email delivery failed: %s', $error ) : 'Email delivery failed.';
+	}
+
+	if ( '' !== $from_status || '' !== $to_status ) {
+		$from = '' !== $from_status ? $from_status : 'unknown';
+		$to   = '' !== $to_status ? $to_status : 'unknown';
+		return sprintf( '%s -> %s', $from, $to );
+	}
+
+	return dtb_support_rest_event_label( $event_type );
+}
+
+/**
+ * Normalize and enrich event rows for operator-facing UIs.
+ *
+ * @param int      $ticket_id Ticket ID.
+ * @param object[] $events    Raw event rows.
+ * @return array[]
+ */
+function dtb_support_rest_prepare_ticket_events( int $ticket_id, array $events ): array {
+	$ticket = dtb_support_get_ticket( $ticket_id );
+	$now    = time();
+	$out    = [];
+
+	foreach ( $events as $ev ) {
+		$event = is_object( $ev ) ? get_object_vars( $ev ) : (array) $ev;
+
+		if ( ! isset( $event['payload'] ) ) {
+			$decoded = [];
+			if ( ! empty( $event['payload_json'] ) ) {
+				$decoded = json_decode( (string) $event['payload_json'], true );
+			}
+			$event['payload'] = is_array( $decoded ) ? $decoded : [];
+		}
+
+		$actor_type = (string) ( $event['actor_type'] ?? '' );
+		if ( 'customer' === $actor_type ) {
+			$event['actor_label'] = $ticket ? (string) $ticket->customer_name : 'Customer';
+		} elseif ( ! empty( $event['actor_id'] ) ) {
+			$user = get_userdata( (int) $event['actor_id'] );
+			$event['actor_label'] = $user ? (string) $user->display_name : 'Staff';
+		} else {
+			$event['actor_label'] = 'System';
+		}
+
+		$event['event_label'] = dtb_support_rest_event_label( (string) ( $event['event_type'] ?? '' ) );
+		$event['event_group'] = dtb_support_rest_event_group(
+			(string) ( $event['event_type'] ?? '' ),
+			(string) ( $event['visibility'] ?? '' )
+		);
+		$event['summary'] = dtb_support_rest_event_summary( $event );
+
+		$created_at = (string) ( $event['created_at'] ?? '' );
+		if ( '' !== $created_at ) {
+			$timestamp = strtotime( $created_at );
+			if ( false !== $timestamp ) {
+				$event['age_label'] = dtb_support_age_label( max( 0, $now - $timestamp ) );
+				$event['created_at_iso'] = gmdate( 'c', $timestamp );
+			} else {
+				$event['age_label'] = '';
+				$event['created_at_iso'] = null;
+			}
+		} else {
+			$event['age_label'] = '';
+			$event['created_at_iso'] = null;
+		}
+
+		$out[] = $event;
+	}
+
+	return $out;
+}
+
+/**
  * GET /dtb/v1/support/tickets
  *
  * @param WP_REST_Request $request
@@ -400,6 +618,7 @@ function dtb_support_rest_get_ticket( WP_REST_Request $request ): WP_REST_Respon
 	}
 
 	$events = dtb_support_get_events( $ticket_id, 'operator' );
+	$events = dtb_support_rest_prepare_ticket_events( $ticket_id, (array) $events );
 
 	return new WP_REST_Response( [
 		'ticket' => dtb_support_project_ticket( $ticket ),
@@ -477,29 +696,9 @@ function dtb_support_rest_get_ticket_events( WP_REST_Request $request ): WP_REST
 	}
 
 	$events = dtb_support_get_events( $ticket_id, 'operator' );
-	$now    = time();
-	$out    = [];
+	$events = dtb_support_rest_prepare_ticket_events( $ticket_id, (array) $events );
 
-	foreach ( (array) $events as $ev ) {
-		$ev_arr = is_object( $ev ) ? get_object_vars( $ev ) : (array) $ev;
-		// Add human-readable age label.
-		$ev_arr['age_label'] = ! empty( $ev_arr['created_at'] )
-			? dtb_support_age_label( $now - strtotime( $ev_arr['created_at'] ) )
-			: '';
-		// Resolve actor label.
-		if ( 'customer' === ( $ev_arr['actor_type'] ?? '' ) ) {
-			$ticket = dtb_support_get_ticket( $ticket_id );
-			$ev_arr['actor_label'] = $ticket ? $ticket->customer_name : 'Customer';
-		} elseif ( ! empty( $ev_arr['actor_id'] ) ) {
-			$u = get_userdata( (int) $ev_arr['actor_id'] );
-			$ev_arr['actor_label'] = $u ? $u->display_name : 'Staff';
-		} else {
-			$ev_arr['actor_label'] = 'System';
-		}
-		$out[] = $ev_arr;
-	}
-
-	return new WP_REST_Response( $out, 200 );
+	return new WP_REST_Response( $events, 200 );
 }
 
 // ── v2 endpoint handlers ──────────────────────────────────────────────────────

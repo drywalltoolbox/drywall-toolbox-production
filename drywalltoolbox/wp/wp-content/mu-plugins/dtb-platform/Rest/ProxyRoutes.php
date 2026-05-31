@@ -2148,7 +2148,23 @@ function dtb_contact_form_handler( WP_REST_Request $request ): WP_REST_Response 
 		'Reply-To: ' . $safe_name . ' <' . $email . '>',
 	];
 
-	$sent = wp_mail( $to, $subject, $body, $headers );
+	if ( function_exists( 'dtb_send_email' ) ) {
+		$sent = dtb_send_email(
+			[
+				'to'           => $to,
+				'subject'      => $subject,
+				'message'      => $body,
+				'headers'      => $headers,
+				'content_type' => 'text/plain',
+				'context'      => [
+					'module' => 'dtb-platform',
+					'route'  => 'contact-form',
+				],
+			]
+		);
+	} else {
+		$sent = wp_mail( $to, $subject, $body, $headers );
+	}
 
 	if ( ! $sent ) {
 		error_log( '[DTB Contact] wp_mail() failed for submission from ' . dtb_anonymise_ip( $ip ) );

@@ -699,7 +699,22 @@ function dtb_auth_forgot_password( WP_REST_Request $request ): WP_REST_Response 
 	$message .= "If you did not request this, you can safely ignore this email.\r\n\r\n";
 	$message .= '— ' . $site_name;
 
-	wp_mail( $user->user_email, $subject, $message );
+	if ( function_exists( 'dtb_send_email' ) ) {
+		dtb_send_email(
+			[
+				'to'           => (string) $user->user_email,
+				'subject'      => $subject,
+				'message'      => $message,
+				'content_type' => 'text/plain',
+				'context'      => [
+					'module' => 'dtb-platform-auth',
+					'event'  => 'password-reset-request',
+				],
+			]
+		);
+	} else {
+		wp_mail( $user->user_email, $subject, $message );
+	}
 
 	return $generic;
 }

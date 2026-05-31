@@ -812,7 +812,23 @@ function dtb_notify_admin( string $email ): void {
 		'From: ' . $site_name . ' <' . $from_email . '>',
 	);
 
-	wp_mail( $admin_email, $subject, $message, $headers );
+	if ( function_exists( 'dtb_send_email' ) ) {
+		dtb_send_email(
+			[
+				'to'           => $admin_email,
+				'subject'      => $subject,
+				'message'      => $message,
+				'headers'      => $headers,
+				'content_type' => 'text/plain',
+				'context'      => [
+					'module' => 'dtb-marketing',
+					'event'  => 'coming-soon-admin-notify',
+				],
+			]
+		);
+	} else {
+		wp_mail( $admin_email, $subject, $message, $headers );
+	}
 }
 
 /**
@@ -979,17 +995,6 @@ function dtb_send_confirmation_email( string $email ): void {
 		$site_url
 	);
 
-	// Hook phpmailer_init once to inject the plain-text AltBody.
-	// PHPMailer then sends a proper multipart/alternative message automatically.
-	// The hook is removed immediately after wp_mail() returns so it never
-	// affects any other email sent during the same request.
-	// The cleanest way to set AltBody without a persistent filter:
-	// hook phpmailer_init once, set AltBody, then remove ourselves.
-	$set_alt_body = static function ( $phpmailer ) use ( $plain_message ) {
-		$phpmailer->AltBody = $plain_message;
-	};
-	add_action( 'phpmailer_init', $set_alt_body );
-
 	$headers = array(
 		'Content-Type: text/html; charset=UTF-8',
 		// From address must exactly match the domain authorised in SPF/DKIM.
@@ -998,10 +1003,37 @@ function dtb_send_confirmation_email( string $email ): void {
 		'Reply-To: ' . $site_name . ' <' . $admin_email . '>',
 	);
 
-	$sent = wp_mail( $email, $subject, $html_message, $headers );
+	if ( function_exists( 'dtb_send_email' ) ) {
+		$sent = dtb_send_email(
+			[
+				'to'           => $email,
+				'subject'      => $subject,
+				'message'      => $html_message,
+				'headers'      => $headers,
+				'is_html'      => true,
+				'content_type' => 'text/html',
+				'alt_body'     => $plain_message,
+				'context'      => [
+					'module' => 'dtb-marketing',
+					'event'  => 'coming-soon-confirmation',
+				],
+			]
+		);
+	} else {
+		// Hook phpmailer_init once to inject the plain-text AltBody.
+		// PHPMailer then sends a proper multipart/alternative message automatically.
+		// The hook is removed immediately after wp_mail() returns so it never
+		// affects any other email sent during the same request.
+		$set_alt_body = static function ( $phpmailer ) use ( $plain_message ) {
+			$phpmailer->AltBody = $plain_message;
+		};
+		add_action( 'phpmailer_init', $set_alt_body );
 
-	// Always remove the one-shot hook regardless of send result.
-	remove_action( 'phpmailer_init', $set_alt_body );
+		$sent = wp_mail( $email, $subject, $html_message, $headers );
+
+		// Always remove the one-shot hook regardless of send result.
+		remove_action( 'phpmailer_init', $set_alt_body );
+	}
 
 	if ( ! $sent ) {
 		error_log( // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log

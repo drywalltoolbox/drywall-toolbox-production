@@ -210,3 +210,118 @@ if ( ! function_exists( 'dtb_mail_alt_body_hook' ) ) {
 		return $set_alt_body;
 	}
 }
+
+if ( ! function_exists( 'dtb_email_headers' ) ) {
+	/**
+	 * Build normalized email headers.
+	 *
+	 * @param array<string,mixed> $args Header args.
+	 * @return string[]
+	 */
+	function dtb_email_headers( array $args = [] ): array {
+		$content_type = sanitize_text_field( (string) ( $args['content_type'] ?? 'text/plain' ) );
+		$from_name    = sanitize_text_field( (string) ( $args['from_name'] ?? '' ) );
+		$from_email   = sanitize_email( (string) ( $args['from_email'] ?? '' ) );
+		$reply_to     = (string) ( $args['reply_to'] ?? '' );
+		$headers      = [];
+
+		$headers[] = 'Content-Type: ' . ( '' !== $content_type ? $content_type : 'text/plain' ) . '; charset=UTF-8';
+
+		if ( '' !== $from_email ) {
+			$headers[] = 'From: ' . ( '' !== $from_name ? $from_name . ' <' . $from_email . '>' : $from_email );
+		}
+
+		if ( '' !== $reply_to ) {
+			$headers[] = 'Reply-To: ' . str_replace( [ "\r", "\n" ], ' ', $reply_to );
+		}
+
+		return $headers;
+	}
+}
+
+if ( ! function_exists( 'dtb_send_email' ) ) {
+	/**
+	 * Send outbound email through a single shared pathway.
+	 *
+	 * @param array<string,mixed> $args Send args.
+	 * @return bool
+	 */
+	function dtb_send_email( array $args ): bool {
+		$to      = sanitize_email( (string) ( $args['to'] ?? '' ) );
+		$subject = sanitize_text_field( (string) ( $args['subject'] ?? '' ) );
+		$message = (string) ( $args['message'] ?? '' );
+
+		if ( '' === $to || ! is_email( $to ) || '' === $subject ) {
+			/**
+			 * Fires when dtb_send_email rejects invalid send arguments.
+			 *
+			 * @param array<string,mixed> $args Raw send args.
+			 */
+			do_action( 'dtb_email_send_invalid', $args );
+			return false;
+		}
+
+		$is_html      = ! empty( $args['is_html'] );
+		$content_type = sanitize_text_field( (string) ( $args['content_type'] ?? ( $is_html ? 'text/html' : 'text/plain' ) ) );
+		$headers      = [];
+		$raw_headers  = $args['headers'] ?? [];
+
+		if ( is_string( $raw_headers ) && '' !== $raw_headers ) {
+			$headers = [ $raw_headers ];
+		} elseif ( is_array( $raw_headers ) ) {
+			$headers = array_values(
+				array_filter(
+					array_map( static fn( $h ) => is_string( $h ) ? trim( $h ) : '', $raw_headers ),
+					static fn( string $h ) => '' !== $h
+				)
+			);
+		}
+
+		if ( empty( $headers ) ) {
+			$headers = dtb_email_headers(
+				[
+					'content_type' => $content_type,
+					'from_name'    => (string) ( $args['from_name'] ?? '' ),
+					'from_email'   => (string) ( $args['from_email'] ?? '' ),
+					'reply_to'     => (string) ( $args['reply_to'] ?? '' ),
+				]
+			);
+		} elseif ( ! array_filter( $headers, static fn( string $h ) => 0 === stripos( $h, 'Content-Type:' ) ) ) {
+			array_unshift( $headers, 'Content-Type: ' . $content_type . '; charset=UTF-8' );
+		}
+
+		$alt_body = isset( $args['alt_body'] ) ? (string) $args['alt_body'] : '';
+		$alt_hook = ( '' !== $alt_body && function_exists( 'dtb_mail_alt_body_hook' ) )
+			? dtb_mail_alt_body_hook( $alt_body )
+			: null;
+
+		/**
+		 * Fires right before an outbound email is sent.
+		 *
+		 * @param string              $to      Recipient email.
+		 * @param string              $subject Email subject.
+		 * @param string              $message Email body.
+		 * @param string[]            $headers Headers.
+		 * @param array<string,mixed> $args    Original send args.
+		 */
+		do_action( 'dtb_email_before_send', $to, $subject, $message, $headers, $args );
+
+		$sent = (bool) wp_mail( $to, $subject, $message, $headers );
+
+		if ( is_callable( $alt_hook ) ) {
+			remove_action( 'phpmailer_init', $alt_hook );
+		}
+
+		/**
+		 * Fires after an outbound email attempt.
+		 *
+		 * @param bool                $sent    Whether wp_mail accepted the email.
+		 * @param string              $to      Recipient email.
+		 * @param string              $subject Email subject.
+		 * @param array<string,mixed> $args    Original send args.
+		 */
+		do_action( 'dtb_email_after_send', $sent, $to, $subject, $args );
+
+		return $sent;
+	}
+}
