@@ -58,7 +58,6 @@ _dtb_require( $_dtb_support_dir . '/Rest/SupportAdminQueueController.php' );
 // ── 7. Admin (only on admin requests) ─────────────────────────────────────────
 if ( is_admin() ) {
 	_dtb_require( $_dtb_support_dir . '/Admin/SupportPage.php' );
-	_dtb_require( $_dtb_support_dir . '/Admin/SupportHubAdminMenu.php' );
 	_dtb_require( $_dtb_support_dir . '/Admin/SupportHubDetailPage.php' );
 	_dtb_require( $_dtb_support_dir . '/Admin/SupportHubDashboard.php' );
 }

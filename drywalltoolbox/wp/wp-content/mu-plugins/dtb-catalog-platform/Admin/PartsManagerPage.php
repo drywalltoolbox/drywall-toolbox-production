@@ -11,19 +11,6 @@ if ( ! dtb_is_admin_or_ajax_request() ) {
 	return;
 }
 
-function dtb_register_parts_manager_submenu(): void {
-	add_submenu_page(
-		'dtb-toolbox',
-		__( 'Parts', 'dtb' ),
-		__( 'Parts', 'dtb' ),
-		'manage_woocommerce',
-		'dtb-parts-manager',
-		'dtb_parts_manager_render_page'
-	);
-}
-
-add_action( 'admin_menu', 'dtb_register_parts_manager_submenu' );
-
 function dtb_parts_manager_render_page(): void {
 	if ( ! current_user_can( 'dtb_manage_parts' ) ) {
 		dtb_admin_shell_access_denied();
@@ -43,35 +30,12 @@ function dtb_parts_manager_render_page(): void {
 	] );
 	?>
 	<div class="dtb-pm-inner">
-		<h1 class="wp-heading-inline" style="display:none">Parts</h1>
-		<hr class="wp-header-end" style="display:none">
-
-		<style>
-			.dtb-parts-manager { max-width: 1200px; }
-			.dtb-pm-card { background:#fff;border:1px solid #dcdcde;border-radius:4px;padding:16px 18px;margin:14px 0; }
-			.dtb-pm-toolbar { display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-bottom:14px; }
-			.dtb-pm-input, .dtb-pm-select { padding:6px 10px; border:1px solid #c3c4c7; border-radius:4px; min-height:34px; }
-			.dtb-pm-btn { border:1px solid transparent; border-radius:4px; min-height:34px; padding:0 12px; font-weight:600; cursor:pointer; }
-			.dtb-pm-btn-primary { background:#2271b1; color:#fff; border-color:#2271b1; }
-			.dtb-pm-btn-secondary { background:#f6f7f7; color:#2c3338; border-color:#c3c4c7; }
-			.dtb-pm-btn-danger { background:#fff; color:#d63638; border-color:#d63638; }
-			.dtb-pm-btn:disabled { opacity:.6; cursor:not-allowed; }
-			.dtb-pm-grid { display:grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap:10px; }
-			.dtb-pm-table { width:100%; border-collapse:collapse; }
-			.dtb-pm-table th, .dtb-pm-table td { text-align:left; padding:9px 10px; border-bottom:1px solid #f0f0f1; vertical-align:top; }
-			.dtb-pm-table th { border-bottom:2px solid #dcdcde; background:#f6f7f7; }
-			.dtb-pm-status { display:inline-block;padding:2px 8px;border-radius:999px;font-size:11px;font-weight:700;background:#eef4ff;color:#1d4ed8; }
-			.dtb-pm-modal-overlay { position:fixed; inset:0; z-index:100000; background:rgba(0,0,0,.45); display:none; align-items:center; justify-content:center; }
-			.dtb-pm-modal-overlay.open { display:flex; }
-			.dtb-pm-modal { width:min(760px,95vw); max-height:90vh; overflow:auto; background:#fff; border-radius:8px; padding:18px; }
-			.dtb-pm-row label { display:block; font-size:12px; font-weight:600; margin-bottom:4px; }
-			.dtb-pm-row { margin-bottom:10px; }
-			@media (max-width: 840px) { .dtb-pm-grid { grid-template-columns: 1fr; } }
-		</style>
+		<h1 class="wp-heading-inline dtb-inline-hidden">Parts</h1>
+		<hr class="wp-header-end dtb-inline-hidden">
 
 		<div class="dtb-pm-card">
 			<div class="dtb-pm-toolbar">
-				<input id="dtb-pm-search" class="dtb-pm-input" type="text" placeholder="Search part title or SKU..." style="min-width:230px;">
+				<input id="dtb-pm-search" class="dtb-pm-input dtb-pm-input--wide" type="text" placeholder="Search part title or SKU...">
 				<select id="dtb-pm-brand" class="dtb-pm-select">
 					<option value="">All brands</option>
 					<?php foreach ( $brands as $brand ) : ?>
@@ -87,64 +51,64 @@ function dtb_parts_manager_render_page(): void {
 				<button id="dtb-pm-btn-add" class="dtb-pm-btn dtb-pm-btn-primary">Add Part</button>
 				<button id="dtb-pm-export-csv" class="dtb-pm-btn dtb-pm-btn-secondary">Export CSV</button>
 				<button id="dtb-pm-export-json" class="dtb-pm-btn dtb-pm-btn-secondary">Export JSON</button>
-				<span id="dtb-pm-count" style="margin-left:auto;color:#787c82;"></span>
+				<span id="dtb-pm-count" class="dtb-toolbar-inline-end"></span>
 			</div>
-			<div id="dtb-pm-loading" style="color:#787c82;">Loading parts...</div>
-			<table class="dtb-pm-table" id="dtb-pm-table" style="display:none;">
+			<div id="dtb-pm-loading" class="dtb-pm-loading">Loading parts...</div>
+			<table class="dtb-pm-table dtb-inline-hidden" id="dtb-pm-table">
 				<thead>
 					<tr><th>ID</th><th>Title</th><th>SKU</th><th>Brand</th><th>Price</th><th>Status</th><th>Actions</th></tr>
 				</thead>
 				<tbody id="dtb-pm-body"></tbody>
 			</table>
-			<div id="dtb-pm-empty" style="display:none;color:#787c82;padding:10px 0;">No parts found.</div>
-			<div id="dtb-pm-pagination" style="display:flex;gap:8px;align-items:center;margin-top:12px;"></div>
+			<div id="dtb-pm-empty" class="dtb-pm-empty">No parts found.</div>
+			<div id="dtb-pm-pagination" class="dtb-pm-pagination"></div>
 		</div>
 
 		<div class="dtb-pm-card">
-			<h2 style="margin-top:0;">Import Parts</h2>
-			<p style="margin-top:0;color:#787c82;">CSV required columns: <code>sku</code>, <code>title</code>. Optional: <code>id</code>, <code>brand_label</code>, <code>manufacturer_sku</code>, <code>price</code>, <code>status</code>, <code>description</code>.</p>
+			<h2 class="dtb-form-title">Import Parts</h2>
+			<p class="dtb-form-note">CSV required columns: <code>sku</code>, <code>title</code>. Optional: <code>id</code>, <code>brand_label</code>, <code>manufacturer_sku</code>, <code>price</code>, <code>status</code>, <code>description</code>.</p>
 			<input id="dtb-pm-import-file" type="file" accept=".csv,text/csv">
-			<div style="margin-top:10px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+			<div class="dtb-toolbar-inline-wrap">
 				<button id="dtb-pm-import" class="dtb-pm-btn dtb-pm-btn-primary">Import CSV</button>
-				<span id="dtb-pm-import-spinner" style="display:none;"><span class="spinner is-active" style="float:none;margin:0;"></span></span>
+				<span id="dtb-pm-import-spinner" class="dtb-inline-hidden"><span class="spinner is-active"></span></span>
 			</div>
-			<div id="dtb-pm-import-msg" style="margin-top:10px;font-size:13px;"></div>
-			<pre id="dtb-pm-import-errors" style="display:none;margin-top:10px;background:#fff8f8;border:1px solid #f0c0c1;padding:10px;border-radius:4px;white-space:pre-wrap;color:#8a2424;"></pre>
+			<div id="dtb-pm-import-msg" class="dtb-form-msg"></div>
+			<pre id="dtb-pm-import-errors" class="dtb-pm-error-log dtb-inline-hidden"></pre>
 		</div>
 
 		<div class="dtb-pm-card">
-			<h2 style="margin-top:0;">Import Schematic Parts Map</h2>
-			<p style="margin-top:0;color:#787c82;">Upload flattened schematic parts CSV for technician cross-mapping. Required columns: <code>schematic_id</code>, <code>part_id</code>, <code>part_name</code>, <code>qty</code>, <code>source_sku</code>.</p>
+			<h2 class="dtb-form-title">Import Schematic Parts Map</h2>
+			<p class="dtb-form-note">Upload flattened schematic parts CSV for technician cross-mapping. Required columns: <code>schematic_id</code>, <code>part_id</code>, <code>part_name</code>, <code>qty</code>, <code>source_sku</code>.</p>
 			<input id="dtb-pm-map-import-file" type="file" accept=".csv,text/csv">
-			<div style="margin-top:10px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+			<div class="dtb-toolbar-inline-wrap">
 				<button id="dtb-pm-map-import" class="dtb-pm-btn dtb-pm-btn-primary">Import Schematic Map</button>
-				<span id="dtb-pm-map-import-spinner" style="display:none;"><span class="spinner is-active" style="float:none;margin:0;"></span></span>
+				<span id="dtb-pm-map-import-spinner" class="dtb-inline-hidden"><span class="spinner is-active"></span></span>
 			</div>
-			<div id="dtb-pm-map-import-msg" style="margin-top:10px;font-size:13px;"></div>
-			<pre id="dtb-pm-map-import-errors" style="display:none;margin-top:10px;background:#fff8f8;border:1px solid #f0c0c1;padding:10px;border-radius:4px;white-space:pre-wrap;color:#8a2424;"></pre>
+			<div id="dtb-pm-map-import-msg" class="dtb-form-msg"></div>
+			<pre id="dtb-pm-map-import-errors" class="dtb-pm-error-log dtb-inline-hidden"></pre>
 		</div>
 	</div>
 
 	<div class="dtb-pm-modal-overlay" id="dtb-pm-modal-wrap">
 		<div class="dtb-pm-modal">
-			<h2 id="dtb-pm-modal-title" style="margin-top:0;">Add Part</h2>
+			<h2 id="dtb-pm-modal-title" class="dtb-form-title">Add Part</h2>
 			<input type="hidden" id="dtb-pm-id" value="0">
 			<div class="dtb-pm-grid">
-				<div class="dtb-pm-row"><label>Title *</label><input id="dtb-pm-title" class="dtb-pm-input" type="text" style="width:100%;"></div>
-				<div class="dtb-pm-row"><label>SKU *</label><input id="dtb-pm-sku" class="dtb-pm-input" type="text" style="width:100%;"></div>
-				<div class="dtb-pm-row"><label>Brand</label><input id="dtb-pm-brand-label" class="dtb-pm-input" type="text" style="width:100%;"></div>
-				<div class="dtb-pm-row"><label>Manufacturer SKU</label><input id="dtb-pm-msku" class="dtb-pm-input" type="text" style="width:100%;"></div>
-				<div class="dtb-pm-row"><label>Price</label><input id="dtb-pm-price" class="dtb-pm-input" type="text" placeholder="0.00" style="width:100%;"></div>
-				<div class="dtb-pm-row"><label>Status</label><select id="dtb-pm-post-status" class="dtb-pm-select" style="width:100%;"><option value="draft">Draft</option><option value="publish">Publish</option></select></div>
+				<div class="dtb-pm-row"><label>Title *</label><input id="dtb-pm-title" class="dtb-pm-input dtb-w-full" type="text"></div>
+				<div class="dtb-pm-row"><label>SKU *</label><input id="dtb-pm-sku" class="dtb-pm-input dtb-w-full" type="text"></div>
+				<div class="dtb-pm-row"><label>Brand</label><input id="dtb-pm-brand-label" class="dtb-pm-input dtb-w-full" type="text"></div>
+				<div class="dtb-pm-row"><label>Manufacturer SKU</label><input id="dtb-pm-msku" class="dtb-pm-input dtb-w-full" type="text"></div>
+				<div class="dtb-pm-row"><label>Price</label><input id="dtb-pm-price" class="dtb-pm-input dtb-w-full" type="text" placeholder="0.00"></div>
+				<div class="dtb-pm-row"><label>Status</label><select id="dtb-pm-post-status" class="dtb-pm-select dtb-w-full"><option value="draft">Draft</option><option value="publish">Publish</option></select></div>
 			</div>
-			<div class="dtb-pm-row"><label>Description</label><textarea id="dtb-pm-description" class="dtb-pm-input" style="width:100%;min-height:110px;"></textarea></div>
-			<div style="display:flex;gap:8px;align-items:center;">
+			<div class="dtb-pm-row"><label>Description</label><textarea id="dtb-pm-description" class="dtb-pm-input dtb-pm-textarea"></textarea></div>
+			<div class="dtb-pm-modal-actions">
 				<button id="dtb-pm-save" class="dtb-pm-btn dtb-pm-btn-primary">Save Part</button>
 				<button id="dtb-pm-close" class="dtb-pm-btn dtb-pm-btn-secondary">Close</button>
-				<button id="dtb-pm-trash" class="dtb-pm-btn dtb-pm-btn-danger" style="margin-left:auto;display:none;">Move to Trash</button>
-				<span id="dtb-pm-spinner" style="display:none;"><span class="spinner is-active" style="float:none;margin:0;"></span></span>
+				<button id="dtb-pm-trash" class="dtb-pm-btn dtb-pm-btn-danger dtb-pm-trash dtb-inline-hidden">Move to Trash</button>
+				<span id="dtb-pm-spinner" class="dtb-inline-hidden"><span class="spinner is-active"></span></span>
 			</div>
-			<div id="dtb-pm-msg" style="margin-top:10px;font-size:13px;"></div>
+			<div id="dtb-pm-msg" class="dtb-form-msg"></div>
 		</div>
 	</div>
 
@@ -395,3 +359,4 @@ function dtb_parts_manager_render_page(): void {
 	<?php
 	dtb_admin_shell_close();
 }
+

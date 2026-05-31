@@ -15,11 +15,35 @@ function dtb_support_render_page(): void {
 		return;
 	}
 
+	// Keep the full workflow dashboard active during migration. This preserves
+	// queue rail navigation, ticket actions, and detail tooling.
+	if ( function_exists( 'dtb_support_render_dashboard_page' ) ) {
+		dtb_support_render_dashboard_page();
+		return;
+	}
+
 	$status = sanitize_key( $_GET['status'] ?? '' );   // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+	$tab    = sanitize_key( $_GET['tab'] ?? '' );      // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+	if ( '' === $status && '' !== $tab ) {
+		$status = $tab;
+	}
 	$search = sanitize_text_field( $_GET['s'] ?? '' ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+	$live_search = sanitize_text_field( $_GET['search'] ?? '' ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+	if ( '' === $search && '' !== $live_search ) {
+		$search = $live_search;
+	}
 	$paged  = max( 1, (int) ( $_GET['paged'] ?? 1 ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 	$per    = (int) get_option( 'dtb_admin_items_per_page', 25 );
 	$base   = admin_url( 'admin.php?page=dtb-support' );
+
+	$status_aliases = [
+		'all'         => '',
+		'needs_reply' => 'needs-reply',
+		'past_sla'    => 'past-sla',
+	];
+	if ( isset( $status_aliases[ $status ] ) ) {
+		$status = $status_aliases[ $status ];
+	}
 
 	$support_statuses = [
 		''             => __( 'All', 'drywall-toolbox' ),

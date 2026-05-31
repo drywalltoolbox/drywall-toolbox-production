@@ -6,7 +6,7 @@ defined( 'ABSPATH' ) || exit;
 add_action( 'wp_ajax_dtb_schematics_list', 'dtb_ajax_schematics_list' );
 function dtb_ajax_schematics_list() {
 	check_ajax_referer( 'dtb_schematics_nonce', 'nonce' );
-	if ( ! current_user_can( 'manage_options' ) ) wp_send_json_error( [], 403 );
+	if ( ! dtb_schematics_can_manage() ) wp_send_json_error( [], 403 );
 
 	if ( ! function_exists( 'dtb_get_schematics' ) ) {
 		wp_send_json_error( [ 'message' => 'Schematics module not loaded.' ], 503 );
@@ -26,7 +26,7 @@ function dtb_ajax_schematics_list() {
 add_action( 'wp_ajax_dtb_schematics_get', 'dtb_ajax_schematics_get' );
 function dtb_ajax_schematics_get() {
 	check_ajax_referer( 'dtb_schematics_nonce', 'nonce' );
-	if ( ! current_user_can( 'manage_options' ) ) wp_send_json_error( [], 403 );
+	if ( ! dtb_schematics_can_manage() ) wp_send_json_error( [], 403 );
 
 	$id = absint( $_POST['id'] ?? 0 );
 	if ( ! dtb_validate_schematic_attachment_id( $id ) ) {
@@ -41,7 +41,7 @@ function dtb_ajax_schematics_get() {
 add_action( 'wp_ajax_dtb_schematics_save', 'dtb_ajax_schematics_save' );
 function dtb_ajax_schematics_save() {
 	check_ajax_referer( 'dtb_schematics_nonce', 'nonce' );
-	if ( ! current_user_can( 'manage_options' ) ) wp_send_json_error( [], 403 );
+	if ( ! dtb_schematics_can_manage() ) wp_send_json_error( [], 403 );
 
 	$id = absint( $_POST['attachment_id'] ?? 0 );
 	if ( ! dtb_validate_schematic_attachment_id( $id ) ) {
@@ -69,7 +69,7 @@ function dtb_ajax_schematics_save() {
 add_action( 'wp_ajax_dtb_schematics_remove', 'dtb_ajax_schematics_remove' );
 function dtb_ajax_schematics_remove() {
 	check_ajax_referer( 'dtb_schematics_nonce', 'nonce' );
-	if ( ! current_user_can( 'manage_options' ) ) wp_send_json_error( [], 403 );
+	if ( ! dtb_schematics_can_manage() ) wp_send_json_error( [], 403 );
 
 	$id = absint( $_POST['id'] ?? 0 );
 	if ( ! $id ) wp_send_json_error( [ 'message' => 'Invalid ID.' ] );
@@ -85,7 +85,7 @@ function dtb_ajax_schematics_remove() {
 add_action( 'wp_ajax_dtb_schematics_purge', 'dtb_ajax_schematics_purge' );
 function dtb_ajax_schematics_purge() {
 	check_ajax_referer( 'dtb_schematics_nonce', 'nonce' );
-	if ( ! current_user_can( 'manage_options' ) ) wp_send_json_error( [], 403 );
+	if ( ! dtb_schematics_can_manage() ) wp_send_json_error( [], 403 );
 
 	$deleted = dtb_schematics_manifest_repo_delete_cache();
 	wp_send_json_success( [ 'deleted' => $deleted, 'message' => $deleted ? 'Manifest cache purged.' : 'Cache was already empty.' ] );
@@ -96,7 +96,7 @@ function dtb_ajax_schematics_purge() {
 add_action( 'wp_ajax_dtb_schematics_search_products', 'dtb_ajax_schematics_search_products' );
 function dtb_ajax_schematics_search_products() {
 	check_ajax_referer( 'dtb_schematics_nonce', 'nonce' );
-	if ( ! current_user_can( 'manage_options' ) ) wp_send_json_error( [], 403 );
+	if ( ! dtb_schematics_can_manage() ) wp_send_json_error( [], 403 );
 
 	$q = sanitize_text_field( $_POST['q'] ?? '' );
 	if ( strlen( $q ) < 1 ) wp_send_json_success( [] );
@@ -109,7 +109,7 @@ function dtb_ajax_schematics_search_products() {
 add_action( 'wp_ajax_dtb_schematics_audit', 'dtb_ajax_schematics_audit' );
 function dtb_ajax_schematics_audit() {
 	check_ajax_referer( 'dtb_schematics_nonce', 'nonce' );
-	if ( ! current_user_can( 'manage_options' ) ) {
+	if ( ! dtb_schematics_can_manage() ) {
 		wp_send_json_error( [], 403 );
 	}
 
@@ -710,7 +710,7 @@ function dtb_schematics_build_attachment_index_from_upload_subdir( string $folde
 
 function dtb_ajax_schematics_register_staged_images(): void {
 	check_ajax_referer( 'dtb_schematics_nonce', 'nonce' );
-	if ( ! current_user_can( 'manage_options' ) ) {
+	if ( ! dtb_schematics_can_manage() ) {
 		wp_send_json_error( [], 403 );
 	}
 	if ( function_exists( 'set_time_limit' ) ) {
@@ -787,7 +787,7 @@ function dtb_ajax_schematics_register_staged_images(): void {
 
 function dtb_ajax_schematics_import_preflight(): void {
 	check_ajax_referer( 'dtb_schematics_nonce', 'nonce' );
-	if ( ! current_user_can( 'manage_options' ) ) {
+	if ( ! dtb_schematics_can_manage() ) {
 		wp_send_json_error( [], 403 );
 	}
 
@@ -1126,7 +1126,7 @@ function dtb_schematics_import_run_batch( array &$state, array $image_index, int
 
 function dtb_ajax_schematics_import_csv() {
 	check_ajax_referer( 'dtb_schematics_nonce', 'nonce' );
-	if ( ! current_user_can( 'manage_options' ) ) {
+	if ( ! dtb_schematics_can_manage() ) {
 		wp_send_json_error( [], 403 );
 	}
 
@@ -1308,7 +1308,7 @@ function dtb_ajax_schematics_import_csv() {
 add_action( 'wp_ajax_dtb_schematics_export', 'dtb_ajax_schematics_export' );
 function dtb_ajax_schematics_export() {
 	check_ajax_referer( 'dtb_schematics_nonce', 'nonce' );
-	if ( ! current_user_can( 'manage_options' ) ) {
+	if ( ! dtb_schematics_can_manage() ) {
 		wp_send_json_error( [], 403 );
 	}
 
@@ -1388,5 +1388,6 @@ function dtb_ajax_schematics_export() {
 }
 
 // ── Page Render ───────────────────────────────────────────────────────────────
+
 
 

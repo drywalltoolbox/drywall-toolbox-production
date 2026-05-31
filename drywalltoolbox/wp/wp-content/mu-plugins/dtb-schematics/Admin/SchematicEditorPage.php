@@ -2,6 +2,11 @@
 defined( 'ABSPATH' ) || exit;
 
 function dtb_schematics_render_page() {
+	if ( ! dtb_schematics_can_manage() ) {
+		dtb_admin_shell_access_denied();
+		return;
+	}
+
 	$nonce        = wp_create_nonce( 'dtb_schematics_nonce' );
 	$brands       = dtb_schematics_get_brand_options();
 	$manifest_age = '';
@@ -12,61 +17,19 @@ function dtb_schematics_render_page() {
 	} else {
 		$manifest_age = 'No manifest cache found — will be generated on next request.';
 	}
-	?>
-	<div class="wrap dtb-schematics">
-		<h1 class="wp-heading-inline">Schematics Manager</h1>
-		<hr class="wp-header-end">
 
-		<style>
-			.dtb-schematics { max-width:1100px; }
-			.dtb-tabs { display:flex; gap:0; border-bottom:2px solid #dcdcde; margin:16px 0 0; }
-			.dtb-tab { padding:10px 18px; cursor:pointer; font-size:13px; font-weight:600; color:#787c82; border:2px solid transparent; border-bottom:none; margin-bottom:-2px; border-radius:3px 3px 0 0; background:transparent; }
-			.dtb-tab.active { color:#1d2327; border-color:#dcdcde; border-bottom-color:#fff; background:#fff; }
-			.dtb-tab-panel { display:none; }
-			.dtb-tab-panel.active { display:block; }
-			.dtb-card { background:#fff; border:1px solid #dcdcde; border-radius:0 4px 4px 4px; padding:20px 24px; margin-bottom:16px; }
-			.dtb-toolbar { display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-bottom:16px; }
-			.dtb-btn { display:inline-flex; align-items:center; gap:5px; padding:7px 14px; border-radius:3px; font-size:13px; font-weight:600; cursor:pointer; border:1px solid transparent; }
-			.dtb-btn-primary { background:#2271b1; color:#fff; border-color:#2271b1; }
-			.dtb-btn-primary:hover { background:#135e96; border-color:#135e96; color:#fff; }
-			.dtb-btn-secondary { background:#f6f7f7; color:#2c3338; border-color:#c3c4c7; }
-			.dtb-btn-secondary:hover { background:#f0f0f1; }
-			.dtb-btn-danger { background:#fff; color:#d63638; border-color:#d63638; }
-			.dtb-btn-danger:hover { background:#d63638; color:#fff; }
-			.dtb-btn:disabled { opacity:.5; cursor:not-allowed; }
-			.dtb-select, .dtb-input { padding:5px 9px; border:1px solid #c3c4c7; border-radius:3px; font-size:13px; }
-			.dtb-tbl { width:100%; border-collapse:collapse; font-size:13px; }
-			.dtb-tbl th { text-align:left; padding:9px 12px; border-bottom:2px solid #dcdcde; background:#f6f7f7; font-weight:600; }
-			.dtb-tbl td { padding:9px 12px; border-bottom:1px solid #f0f0f1; vertical-align:middle; }
-			.dtb-tbl tr:last-child td { border-bottom:0; }
-			.dtb-tbl tr:hover td { background:#fafafa; }
-			.dtb-thumb { width:56px; height:56px; object-fit:contain; border:1px solid #dcdcde; border-radius:3px; background:#f6f7f7; cursor:pointer; }
-			.dtb-thumb-placeholder { width:56px; height:56px; background:#f6f7f7; border:1px solid #dcdcde; border-radius:3px; display:flex; align-items:center; justify-content:center; color:#c3c4c7; font-size:22px; }
-			.dtb-badge-brand { display:inline-block; padding:2px 8px; border-radius:20px; font-size:11px; font-weight:600; background:#e8f4fd; color:#1d6fa4; }
-			.dtb-link-chips { display:flex; flex-wrap:wrap; gap:4px; }
-			.dtb-chip { display:inline-flex; align-items:center; gap:4px; padding:2px 8px; background:#f0f0f1; border-radius:20px; font-size:11px; }
-			.dtb-chip-remove { cursor:pointer; color:#d63638; font-weight:700; background:none; border:none; padding:0; line-height:1; }
-			.dtb-modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.55); z-index:100000; align-items:center; justify-content:center; }
-			.dtb-modal-overlay.open { display:flex; }
-			.dtb-modal { background:#fff; border-radius:6px; padding:28px 32px; max-width:620px; width:90%; max-height:90vh; overflow-y:auto; position:relative; box-shadow:0 8px 32px rgba(0,0,0,.22); }
-			.dtb-modal h2 { margin:0 0 16px; font-size:16px; }
-			.dtb-modal-close { position:absolute; top:14px; right:16px; font-size:20px; cursor:pointer; background:none; border:none; color:#787c82; }
-			.dtb-form-row { margin-bottom:14px; }
-			.dtb-form-row label { font-size:12px; font-weight:600; display:block; margin-bottom:4px; color:#3c434a; }
-			.dtb-form-row input[type=text], .dtb-form-row input[type=number], .dtb-form-row select, .dtb-form-row textarea { width:100%; padding:6px 10px; border:1px solid #c3c4c7; border-radius:3px; font-size:13px; box-sizing:border-box; }
-			.dtb-form-row textarea { resize:vertical; min-height:70px; }
-			.dtb-product-search-wrap { position:relative; }
-			.dtb-product-dropdown { position:absolute; top:100%; left:0; right:0; background:#fff; border:1px solid #c3c4c7; border-top:0; border-radius:0 0 3px 3px; z-index:100; max-height:200px; overflow-y:auto; display:none; }
-			.dtb-product-dropdown li { padding:8px 12px; cursor:pointer; font-size:13px; list-style:none; }
-			.dtb-product-dropdown li:hover { background:#f0f0f1; }
-			.dtb-product-dropdown ul { margin:0; padding:0; }
-			.dtb-linked-products { display:flex; flex-wrap:wrap; gap:6px; margin-top:8px; }
-			.dtb-media-preview { margin-top:8px; }
-			.dtb-media-preview img { max-width:120px; max-height:120px; border:1px solid #dcdcde; border-radius:3px; }
-			.dtb-manifest-status { font-size:13px; color:#787c82; padding:8px 0; }
-			.dtb-pagination { display:flex; align-items:center; gap:8px; margin-top:14px; font-size:13px; }
-			#dtb-list-loading { color:#787c82; padding:20px 0; text-align:center; }
-		</style>
+	dtb_admin_shell_open(
+		[
+			'title'    => __( 'Schematics', 'drywall-toolbox' ),
+			'subtitle' => __( 'Manage schematic media, metadata, and product links.', 'drywall-toolbox' ),
+			'section'  => 'tools',
+			'page'     => 'dtb-schematics',
+			'template' => 'tool',
+			'icon'     => 'dashicons-networking',
+		]
+	);
+	?>
+	<div class="dtb-schematics">
 
 		<!-- Tabs -->
 		<div class="dtb-tabs">
@@ -86,14 +49,14 @@ function dtb_schematics_render_page() {
 							<option value="<?php echo esc_attr( $b ); ?>"><?php echo esc_html( $b ); ?></option>
 						<?php endforeach; ?>
 					</select>
-					<input type="text" id="dtb-filter-search" class="dtb-input" placeholder="Search model number or name…" style="min-width:220px;">
+					<input type="text" id="dtb-filter-search" class="dtb-input dtb-input--wide" placeholder="Search model number or name…">
 					<button id="dtb-btn-search" class="dtb-btn dtb-btn-secondary">
-						<span class="dashicons dashicons-search" style="font-size:15px;"></span> Search
+						<span class="dashicons dashicons-search dtb-icon-sm"></span> Search
 					</button>
-					<span id="dtb-list-count" style="color:#787c82;font-size:13px;margin-left:auto;"></span>
+					<span id="dtb-list-count" class="dtb-toolbar-inline-end"></span>
 				</div>
 				<div id="dtb-list-loading">Loading schematics…</div>
-				<div id="dtb-list-container" style="display:none;">
+				<div id="dtb-list-container" class="dtb-list-container">
 					<table class="dtb-tbl">
 						<thead>
 							<tr>
@@ -110,31 +73,31 @@ function dtb_schematics_render_page() {
 					</table>
 					<div class="dtb-pagination" id="dtb-pagination"></div>
 				</div>
-				<div id="dtb-list-empty" style="display:none;color:#787c82;padding:20px 0;">No schematics found.</div>
+				<div id="dtb-list-empty" class="dtb-list-empty">No schematics found.</div>
 			</div>
 		</div>
 
 		<!-- Tab: Add -->
 		<div id="dtb-tab-add" class="dtb-tab-panel">
-			<div class="dtb-card" style="max-width:600px;">
-				<h3 style="margin-top:0;">Register a Schematic from Media Library</h3>
-				<p style="color:#787c82;font-size:13px;margin-top:0;">Select an existing image from the WP Media Library (WebP preferred), then fill in the schematic metadata below.</p>
+			<div class="dtb-card dtb-card--sm">
+				<h3 class="dtb-title-reset">Register a Schematic from Media Library</h3>
+				<p class="dtb-note-muted">Select an existing image from the WP Media Library (WebP preferred), then fill in the schematic metadata below.</p>
 
 				<div class="dtb-form-row">
 					<label>Schematic Image</label>
-					<div style="display:flex;gap:10px;align-items:center;">
+					<div class="dtb-row-inline">
 						<button id="dtb-add-select-media" class="dtb-btn dtb-btn-secondary">
-							<span class="dashicons dashicons-upload" style="font-size:15px;"></span> Select from Media Library
+							<span class="dashicons dashicons-upload dtb-icon-sm"></span> Select from Media Library
 						</button>
-						<span id="dtb-add-filename" style="color:#787c82;font-size:12px;"></span>
+						<span id="dtb-add-filename" class="dtb-text-muted-xs"></span>
 					</div>
 					<input type="hidden" id="dtb-add-attachment-id">
 					<div class="dtb-media-preview" id="dtb-add-preview"></div>
 				</div>
 
 				<div class="dtb-form-row">
-					<label>Brand <span style="color:#d63638;">*</span></label>
-					<select id="dtb-add-brand" class="dtb-select" style="width:100%;">
+					<label>Brand <span class="dtb-required">*</span></label>
+					<select id="dtb-add-brand" class="dtb-select dtb-w-full">
 						<option value="">— Select Brand —</option>
 						<?php foreach ( $brands as $b ) : ?>
 							<option value="<?php echo esc_attr( $b ); ?>"><?php echo esc_html( $b ); ?></option>
@@ -142,7 +105,7 @@ function dtb_schematics_render_page() {
 					</select>
 				</div>
 				<div class="dtb-form-row">
-					<label>Model Number <span style="color:#d63638;">*</span></label>
+					<label>Model Number <span class="dtb-required">*</span></label>
 					<input type="text" id="dtb-add-model-number" placeholder="e.g. AT-EX">
 				</div>
 				<div class="dtb-form-row">
@@ -151,7 +114,7 @@ function dtb_schematics_render_page() {
 				</div>
 				<div class="dtb-form-row">
 					<label>Part Count</label>
-					<input type="number" id="dtb-add-part-count" placeholder="0" min="0" style="width:120px;">
+					<input type="number" id="dtb-add-part-count" class="dtb-w-120" placeholder="0" min="0">
 				</div>
 				<div class="dtb-form-row">
 					<label>Notes</label>
@@ -160,98 +123,98 @@ function dtb_schematics_render_page() {
 				<div class="dtb-form-row">
 					<label>Linked Products</label>
 					<div class="dtb-product-search-wrap">
-						<input type="text" id="dtb-add-product-search" class="dtb-input" placeholder="Search products by name or SKU…" style="width:100%;">
+						<input type="text" id="dtb-add-product-search" class="dtb-input dtb-w-full" placeholder="Search products by name or SKU…">
 						<div class="dtb-product-dropdown" id="dtb-add-product-dropdown"><ul></ul></div>
 					</div>
 					<div class="dtb-linked-products" id="dtb-add-linked-products"></div>
 					<input type="hidden" id="dtb-add-product-ids" value="">
 				</div>
-				<button id="dtb-btn-add-save" class="dtb-btn dtb-btn-primary" style="margin-top:6px;">
-					<span class="dashicons dashicons-yes" style="font-size:15px;"></span> Register Schematic
+				<button id="dtb-btn-add-save" class="dtb-btn dtb-btn-primary dtb-mt-6">
+					<span class="dashicons dashicons-yes dtb-icon-sm"></span> Register Schematic
 				</button>
-				<span id="dtb-add-spinner" style="display:none;margin-left:8px;"><span class="spinner is-active" style="float:none;margin:0;"></span></span>
-				<div id="dtb-add-msg" style="margin-top:10px;font-size:13px;"></div>
+				<span id="dtb-add-spinner" class="dtb-spinner-inline"><span class="spinner is-active"></span></span>
+				<div id="dtb-add-msg" class="dtb-msg-inline"></div>
 			</div>
 		</div>
 
 		<!-- Tab: Manifest -->
 		<div id="dtb-tab-manifest" class="dtb-tab-panel">
-			<div class="dtb-card" style="max-width:600px;">
-				<h3 style="margin-top:0;">Manifest Cache</h3>
+			<div class="dtb-card dtb-card--sm">
+				<h3 class="dtb-title-reset">Manifest Cache</h3>
 				<p class="dtb-manifest-status" id="dtb-manifest-status"><?php echo esc_html( $manifest_age ); ?></p>
-				<p style="font-size:13px;color:#787c82;margin-top:0;">
+				<p class="dtb-note-muted">
 					The manifest is a cached JSON response served to the React SPA at <code><?php echo esc_html( rest_url( 'dtb/v1/schematics/manifest' ) ); ?></code>.
 					It is rebuilt automatically on the next request after being purged. Purge it after adding or updating schematics to push changes to the frontend immediately.
 				</p>
 				<button id="dtb-btn-purge" class="dtb-btn dtb-btn-secondary">
-					<span class="dashicons dashicons-trash" style="font-size:15px;"></span> Purge Manifest Cache
+					<span class="dashicons dashicons-trash dtb-icon-sm"></span> Purge Manifest Cache
 				</button>
-				<span id="dtb-purge-spinner" style="display:none;margin-left:8px;"><span class="spinner is-active" style="float:none;margin:0;"></span></span>
-				<div id="dtb-purge-msg" style="margin-top:10px;font-size:13px;"></div>
+				<span id="dtb-purge-spinner" class="dtb-spinner-inline"><span class="spinner is-active"></span></span>
+				<div id="dtb-purge-msg" class="dtb-msg-inline"></div>
 			</div>
 		</div>
 
 		<!-- Tab: Import & Audit -->
 		<div id="dtb-tab-import" class="dtb-tab-panel">
-			<div class="dtb-card" style="max-width:760px;">
-				<h3 style="margin-top:0;">Schematic Library Audit</h3>
-				<p style="font-size:13px;color:#787c82;margin-top:0;">Check how complete your schematics metadata is before frontend/admin lookups depend on it.</p>
-				<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+			<div class="dtb-card dtb-card--md">
+				<h3 class="dtb-title-reset">Schematic Library Audit</h3>
+				<p class="dtb-note-muted">Check how complete your schematics metadata is before frontend/admin lookups depend on it.</p>
+				<div class="dtb-row-inline-wrap">
 					<button id="dtb-btn-audit" class="dtb-btn dtb-btn-secondary">
-						<span class="dashicons dashicons-search" style="font-size:15px;"></span> Run Audit
+						<span class="dashicons dashicons-search dtb-icon-sm"></span> Run Audit
 					</button>
-					<span id="dtb-audit-spinner" style="display:none;"><span class="spinner is-active" style="float:none;margin:0;"></span></span>
+					<span id="dtb-audit-spinner" class="dtb-inline-hidden"><span class="spinner is-active"></span></span>
 				</div>
-				<pre id="dtb-audit-output" style="display:none;margin-top:12px;background:#f6f7f7;border:1px solid #dcdcde;padding:10px;border-radius:4px;white-space:pre-wrap;"></pre>
-				<div style="margin-top:10px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+				<pre id="dtb-audit-output" class="dtb-pre-block"></pre>
+				<div class="dtb-row-inline-wrap dtb-mt-10">
 					<button id="dtb-export-csv" class="dtb-btn dtb-btn-secondary">
-						<span class="dashicons dashicons-download" style="font-size:15px;"></span> Export CSV
+						<span class="dashicons dashicons-download dtb-icon-sm"></span> Export CSV
 					</button>
 					<button id="dtb-export-json" class="dtb-btn dtb-btn-secondary">
-						<span class="dashicons dashicons-download" style="font-size:15px;"></span> Export JSON
+						<span class="dashicons dashicons-download dtb-icon-sm"></span> Export JSON
 					</button>
 				</div>
 			</div>
 
-			<div class="dtb-card" style="max-width:760px;">
-				<h3 style="margin-top:0;">Import Preflight</h3>
-				<p style="font-size:13px;color:#787c82;margin-top:0;">Validate staged-folder readiness and estimate CSV token match coverage before running import.</p>
-				<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+			<div class="dtb-card dtb-card--md">
+				<h3 class="dtb-title-reset">Import Preflight</h3>
+				<p class="dtb-note-muted">Validate staged-folder readiness and estimate CSV token match coverage before running import.</p>
+				<div class="dtb-row-inline-wrap">
 					<button id="dtb-btn-preflight" class="dtb-btn dtb-btn-secondary">
-						<span class="dashicons dashicons-yes-alt" style="font-size:15px;"></span> Run Preflight
+						<span class="dashicons dashicons-yes-alt dtb-icon-sm"></span> Run Preflight
 					</button>
-					<span id="dtb-preflight-spinner" style="display:none;"><span class="spinner is-active" style="float:none;margin:0;"></span></span>
+					<span id="dtb-preflight-spinner" class="dtb-inline-hidden"><span class="spinner is-active"></span></span>
 				</div>
-				<pre id="dtb-preflight-output" style="display:none;margin-top:12px;background:#f6f7f7;border:1px solid #dcdcde;padding:10px;border-radius:4px;white-space:pre-wrap;"></pre>
+				<pre id="dtb-preflight-output" class="dtb-pre-block"></pre>
 			</div>
 
-			<div class="dtb-card" style="max-width:760px;">
-				<h3 style="margin-top:0;">Bulk Import (CSV)</h3>
-				<p style="font-size:13px;color:#787c82;margin-top:0;">Required columns: <code>schematic_id</code>, <code>brand</code>, <code>model_number</code>. Optional: <code>attachment_id</code>, <code>model_name</code>, <code>part_count</code>, <code>notes</code>, <code>product_ids</code>. If <code>attachment_id</code> is missing/blank, use staged uploads folder matching (recommended) or upload a ZIP.</p>
+			<div class="dtb-card dtb-card--md">
+				<h3 class="dtb-title-reset">Bulk Import (CSV)</h3>
+				<p class="dtb-note-muted">Required columns: <code>schematic_id</code>, <code>brand</code>, <code>model_number</code>. Optional: <code>attachment_id</code>, <code>model_name</code>, <code>part_count</code>, <code>notes</code>, <code>product_ids</code>. If <code>attachment_id</code> is missing/blank, use staged uploads folder matching (recommended) or upload a ZIP.</p>
 				<input type="file" id="dtb-import-file" accept=".csv,text/csv">
-				<div style="margin-top:10px;">
-					<label for="dtb-import-staged-folder" style="display:block;font-size:12px;font-weight:600;margin-bottom:4px;color:#3c434a;">Staged Uploads Folder (recommended)</label>
-					<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
-						<input type="text" id="dtb-import-staged-folder" class="dtb-input" value="2026/schematics" style="min-width:260px;" />
+				<div class="dtb-mt-10">
+					<label for="dtb-import-staged-folder" class="dtb-label-compact">Staged Uploads Folder (recommended)</label>
+					<div class="dtb-row-inline-wrap">
+						<input type="text" id="dtb-import-staged-folder" class="dtb-input dtb-input--staged" value="2026/schematics" />
 						<button id="dtb-register-staged-images" class="dtb-btn dtb-btn-secondary">
-							<span class="dashicons dashicons-images-alt2" style="font-size:15px;"></span> Register staged images
+							<span class="dashicons dashicons-images-alt2 dtb-icon-sm"></span> Register staged images
 						</button>
-						<span id="dtb-register-staged-spinner" style="display:none;"><span class="spinner is-active" style="float:none;margin:0;"></span></span>
+						<span id="dtb-register-staged-spinner" class="dtb-inline-hidden"><span class="spinner is-active"></span></span>
 					</div>
-					<div id="dtb-register-staged-msg" style="margin-top:6px;font-size:12px;color:#787c82;">Registers files from <code>wp-content/uploads/&lt;folder&gt;</code> into Media Library for fast CSV matching.</div>
+					<div id="dtb-register-staged-msg" class="dtb-note-inline">Registers files from <code>wp-content/uploads/&lt;folder&gt;</code> into Media Library for fast CSV matching.</div>
 				</div>
-				<div style="margin-top:10px;">
-					<label for="dtb-import-images-zip" style="display:block;font-size:12px;font-weight:600;margin-bottom:4px;color:#3c434a;">Optional Schematics Images ZIP</label>
+				<div class="dtb-mt-10">
+					<label for="dtb-import-images-zip" class="dtb-label-compact">Optional Schematics Images ZIP</label>
 					<input type="file" id="dtb-import-images-zip" accept=".zip,application/zip,application/x-zip-compressed">
 				</div>
-				<div style="margin-top:10px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+				<div class="dtb-row-inline-wrap dtb-mt-10">
 					<button id="dtb-btn-import" class="dtb-btn dtb-btn-primary">
-						<span class="dashicons dashicons-upload" style="font-size:15px;"></span> Import CSV
+						<span class="dashicons dashicons-upload dtb-icon-sm"></span> Import CSV
 					</button>
-					<span id="dtb-import-spinner" style="display:none;"><span class="spinner is-active" style="float:none;margin:0;"></span></span>
+					<span id="dtb-import-spinner" class="dtb-inline-hidden"><span class="spinner is-active"></span></span>
 				</div>
-				<div id="dtb-import-msg" style="margin-top:10px;font-size:13px;"></div>
-				<pre id="dtb-import-errors" style="display:none;margin-top:10px;background:#fff8f8;border:1px solid #f0c0c1;padding:10px;border-radius:4px;white-space:pre-wrap;color:#8a2424;"></pre>
+				<div id="dtb-import-msg" class="dtb-msg-inline"></div>
+				<pre id="dtb-import-errors" class="dtb-pre-block dtb-pre-block--danger"></pre>
 			</div>
 		</div>
 
@@ -268,8 +231,8 @@ function dtb_schematics_render_page() {
 				<div id="dtb-edit-preview"></div>
 			</div>
 			<div class="dtb-form-row">
-				<label>Brand <span style="color:#d63638;">*</span></label>
-				<select id="dtb-edit-brand" class="dtb-select" style="width:100%;">
+				<label>Brand <span class="dtb-required">*</span></label>
+				<select id="dtb-edit-brand" class="dtb-select dtb-w-full">
 					<option value="">— Select Brand —</option>
 					<?php foreach ( $brands as $b ) : ?>
 						<option value="<?php echo esc_attr( $b ); ?>"><?php echo esc_html( $b ); ?></option>
@@ -277,7 +240,7 @@ function dtb_schematics_render_page() {
 				</select>
 			</div>
 			<div class="dtb-form-row">
-				<label>Model Number <span style="color:#d63638;">*</span></label>
+				<label>Model Number <span class="dtb-required">*</span></label>
 				<input type="text" id="dtb-edit-model-number">
 			</div>
 			<div class="dtb-form-row">
@@ -286,7 +249,7 @@ function dtb_schematics_render_page() {
 			</div>
 			<div class="dtb-form-row">
 				<label>Part Count</label>
-				<input type="number" id="dtb-edit-part-count" min="0" style="width:120px;">
+				<input type="number" id="dtb-edit-part-count" class="dtb-w-120" min="0">
 			</div>
 			<div class="dtb-form-row">
 				<label>Notes</label>
@@ -295,18 +258,18 @@ function dtb_schematics_render_page() {
 			<div class="dtb-form-row">
 				<label>Linked Products</label>
 				<div class="dtb-product-search-wrap">
-					<input type="text" id="dtb-edit-product-search" class="dtb-input" placeholder="Search products by name or SKU…" style="width:100%;">
+					<input type="text" id="dtb-edit-product-search" class="dtb-input dtb-w-full" placeholder="Search products by name or SKU…">
 					<div class="dtb-product-dropdown" id="dtb-edit-product-dropdown"><ul></ul></div>
 				</div>
 				<div class="dtb-linked-products" id="dtb-edit-linked-products"></div>
 				<input type="hidden" id="dtb-edit-product-ids" value="">
 			</div>
-			<div style="display:flex;gap:10px;align-items:center;margin-top:16px;">
+			<div class="dtb-inline-flex-end">
 				<button id="dtb-edit-save" class="dtb-btn dtb-btn-primary">Save Changes</button>
-				<span id="dtb-edit-spinner" style="display:none;"><span class="spinner is-active" style="float:none;margin:0;"></span></span>
-				<button id="dtb-edit-delete" class="dtb-btn dtb-btn-danger" style="margin-left:auto;">Remove Schematic</button>
+				<span id="dtb-edit-spinner" class="dtb-inline-hidden"><span class="spinner is-active"></span></span>
+				<button id="dtb-edit-delete" class="dtb-btn dtb-btn-danger dtb-justify-end">Remove Schematic</button>
 			</div>
-			<div id="dtb-edit-msg" style="margin-top:10px;font-size:13px;"></div>
+			<div id="dtb-edit-msg" class="dtb-msg-inline"></div>
 		</div>
 	</div>
 
@@ -373,17 +336,17 @@ function dtb_schematics_render_page() {
 					rows += '<td><code>' + $('<div>').text(s.model_number).html() + '</code></td>';
 					rows += '<td>' + $('<div>').text(s.model_name).html() + '</td>';
 					rows += '<td>' + (s.part_count || '—') + '</td>';
-					rows += '<td><div class="dtb-link-chips">' + (chips || '<span style="color:#c3c4c7">—</span>') + '</div></td>';
-					rows += '<td><button class="dtb-btn dtb-btn-secondary dtb-edit-btn" style="font-size:12px;padding:4px 10px;" data-id="' + s.id + '">Edit</button></td>';
+					rows += '<td><div class="dtb-link-chips">' + (chips || '<span class="dtb-empty-note">—</span>') + '</div></td>';
+					rows += '<td><button class="dtb-btn dtb-btn-secondary dtb-btn-sm dtb-edit-btn" data-id="' + s.id + '">Edit</button></td>';
 					rows += '</tr>';
 				});
 				$('#dtb-list-body').html(rows);
 
 				var pg = '';
 				if (totalPages > 1) {
-					pg += '<button class="dtb-btn dtb-btn-secondary" id="dtb-pg-prev" style="padding:4px 10px;font-size:12px;"' + (paged <= 1 ? ' disabled' : '') + '>‹ Prev</button>';
+					pg += '<button class="dtb-btn dtb-btn-secondary dtb-btn-sm" id="dtb-pg-prev"' + (paged <= 1 ? ' disabled' : '') + '>‹ Prev</button>';
 					pg += '<span>Page ' + paged + ' of ' + totalPages + '</span>';
-					pg += '<button class="dtb-btn dtb-btn-secondary" id="dtb-pg-next" style="padding:4px 10px;font-size:12px;"' + (paged >= totalPages ? ' disabled' : '') + '>Next ›</button>';
+					pg += '<button class="dtb-btn dtb-btn-secondary dtb-btn-sm" id="dtb-pg-next"' + (paged >= totalPages ? ' disabled' : '') + '>Next ›</button>';
 				}
 				$('#dtb-pagination').html(pg);
 				$('#dtb-list-container').show();
@@ -413,7 +376,7 @@ function dtb_schematics_render_page() {
 				$('#dtb-edit-model-name').val(s.model_name);
 				$('#dtb-edit-part-count').val(s.part_count || '');
 				$('#dtb-edit-notes').val(s.notes || '');
-				$('#dtb-edit-preview').html(s.thumb ? '<img src="' + s.thumb + '" style="max-width:80px;max-height:80px;border:1px solid #dcdcde;border-radius:3px;">' : '');
+				$('#dtb-edit-preview').html(s.thumb ? '<img src="' + s.thumb + '" class="dtb-thumb-preview">' : '');
 				var ids = [], chips = '';
 				$.each(s.products, function(i, p){
 					ids.push(p.id);
@@ -479,7 +442,7 @@ function dtb_schematics_render_page() {
 						if (!res.success || !res.data.length) { $('#' + dropdownId).hide(); return; }
 						var items = '';
 						$.each(res.data, function(i, p){
-							items += '<li data-id="' + p.id + '" data-name="' + $('<div>').text(p.name).html() + '" data-sku="' + $('<div>').text(p.sku).html() + '">' + $('<div>').text(p.name).html() + ' <small style="color:#787c82">(' + $('<div>').text(p.sku).html() + ')</small></li>';
+							items += '<li data-id="' + p.id + '" data-name="' + $('<div>').text(p.name).html() + '" data-sku="' + $('<div>').text(p.sku).html() + '">' + $('<div>').text(p.name).html() + ' <small class="dtb-sku-subtle">(' + $('<div>').text(p.sku).html() + ')</small></li>';
 						});
 						$('#' + dropdownId + ' ul').html(items);
 						$('#' + dropdownId).show();
@@ -534,7 +497,7 @@ function dtb_schematics_render_page() {
 				var attachment = mediaFrame.state().get('selection').first().toJSON();
 				$('#dtb-add-attachment-id').val(attachment.id);
 				$('#dtb-add-filename').text(attachment.filename);
-				$('#dtb-add-preview').html('<img src="' + (attachment.sizes && attachment.sizes.thumbnail ? attachment.sizes.thumbnail.url : attachment.url) + '" style="max-width:80px;max-height:80px;border:1px solid #dcdcde;border-radius:3px;">');
+				$('#dtb-add-preview').html('<img src="' + (attachment.sizes && attachment.sizes.thumbnail ? attachment.sizes.thumbnail.url : attachment.url) + '" class="dtb-thumb-preview">');
 				// Pre-fill model name from filename
 				if (!$('#dtb-add-model-number').val()) {
 					var basename = attachment.filename.replace(/\.[^.]+$/, '').replace(/[-_]/g,' ').toUpperCase();
@@ -1023,5 +986,7 @@ function dtb_schematics_render_page() {
 	})(jQuery);
 	</script>
 	<?php
+	dtb_admin_shell_close();
 }
+
 

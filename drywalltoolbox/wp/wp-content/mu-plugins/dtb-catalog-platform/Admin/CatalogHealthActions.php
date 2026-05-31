@@ -13,12 +13,20 @@ add_action( 'wp_ajax_dtb_catalog_health_flush', 'dtb_catalog_health_ajax_flush' 
 add_action( 'wp_ajax_dtb_catalog_health_export_csv', 'dtb_catalog_health_ajax_export_csv' );
 
 /**
+ * Canonical capability check for Catalog Health admin actions.
+ */
+function dtb_catalog_health_can_manage(): bool {
+	$legacy_cap = defined( 'DTB_CAP_CATALOG' ) ? DTB_CAP_CATALOG : 'manage_woocommerce';
+	return current_user_can( 'dtb_manage_catalog_health' ) || current_user_can( $legacy_cap );
+}
+
+/**
  * AJAX: scan variable products.
  */
 function dtb_catalog_health_ajax_scan(): void {
 	check_ajax_referer( 'dtb_catalog_health', 'nonce' );
 
-	if ( ! current_user_can( DTB_CAP_CATALOG ) ) {
+	if ( ! dtb_catalog_health_can_manage() ) {
 		wp_send_json_error( 'Permission denied.' );
 	}
 
@@ -35,7 +43,7 @@ function dtb_catalog_health_ajax_scan(): void {
 function dtb_catalog_health_ajax_flush(): void {
 	check_ajax_referer( 'dtb_catalog_health', 'nonce' );
 
-	if ( ! current_user_can( DTB_CAP_CATALOG ) ) {
+	if ( ! dtb_catalog_health_can_manage() ) {
 		wp_send_json_error( 'Permission denied.' );
 	}
 
@@ -56,7 +64,7 @@ function dtb_catalog_health_ajax_flush(): void {
 function dtb_catalog_health_ajax_export_csv(): void {
 	check_ajax_referer( 'dtb_catalog_health', 'nonce' );
 
-	if ( ! current_user_can( DTB_CAP_CATALOG ) ) {
+	if ( ! dtb_catalog_health_can_manage() ) {
 		wp_die( 'Permission denied.' );
 	}
 
@@ -91,7 +99,7 @@ function dtb_catalog_health_ajax_export_csv(): void {
 function dtb_catalog_health_ajax_meta_scan(): void {
 	check_ajax_referer( 'dtb_catalog_health', 'nonce' );
 
-	if ( ! current_user_can( DTB_CAP_CATALOG ) ) {
+	if ( ! dtb_catalog_health_can_manage() ) {
 		wp_send_json_error( 'Permission denied.' );
 	}
 

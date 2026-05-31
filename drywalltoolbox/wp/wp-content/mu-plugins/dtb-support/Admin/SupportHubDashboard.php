@@ -23,7 +23,7 @@ $initial_queue = (string) get_option( 'dtb_support_default_queue', 'needs_reply'
 $queue_counts  = function_exists( 'dtb_support_get_queue_counts' ) ? dtb_support_get_queue_counts() : [];
 $queue_counts  = function_exists( 'dtb_support_normalize_queue_counts' ) ? dtb_support_normalize_queue_counts( $queue_counts ) : $queue_counts;
 $kpis          = dtb_support_get_kpis();
-$settings_url  = admin_url( 'admin.php?page=dtb-support-settings' );
+$settings_url  = admin_url( 'admin.php?page=dtb-settings' );
 $can_manage_settings = current_user_can( 'dtb_manage_support_settings' ) || current_user_can( 'manage_options' );
 ?>
 <div class="dtb-wrap">
@@ -36,7 +36,7 @@ $can_manage_settings = current_user_can( 'dtb_manage_support_settings' ) || curr
 <div class="dtb-topbar">
 <h1 class="dtb-topbar__title">Support Command Center</h1>
 <p class="dtb-topbar__queue">Queue: <strong id="dtb-active-queue-label"><?php echo esc_html( dtb_support_queue_label( $initial_queue ) ); ?></strong></p>
-<div style="margin-left:auto;display:flex;gap:8px;flex-wrap:wrap;">
+<div class="dtb-topbar__actions">
 <button type="button" class="dtb-btn dtb-btn--ghost dtb-btn--sm" onclick="dtbSupport.refresh()">Refresh</button>
 <?php if ( $can_manage_settings ) : ?>
 <a href="<?php echo esc_url( $settings_url ); ?>" class="dtb-btn dtb-btn--ghost dtb-btn--sm">Settings</a>
@@ -62,14 +62,14 @@ $can_manage_settings = current_user_can( 'dtb_manage_support_settings' ) || curr
 <option value="<?php echo esc_attr( $slug ); ?>"><?php echo esc_html( $label ); ?></option>
 <?php endforeach; ?>
 </select>
-<button type="button" class="dtb-btn dtb-btn--ghost dtb-btn--sm" id="dtb-clear-filters" onclick="dtbSupport.clearFilters()" style="display:none;">Clear</button>
+<button type="button" class="dtb-btn dtb-btn--ghost dtb-btn--sm dtb-hidden" id="dtb-clear-filters" onclick="dtbSupport.clearFilters()">Clear</button>
 <button type="button" class="dtb-btn dtb-btn--ghost dtb-btn--sm" onclick="dtbSupport.openRepairsSearch()">Find In Repairs</button>
-<div style="margin-left:auto;display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
-<span id="dtb-ticket-count" style="font-size:12px;color:#718096;">Loading…</span>
+<div class="dtb-toolbar__meta-wrap">
+<span id="dtb-ticket-count" class="dtb-toolbar-count">Loading…</span>
 </div>
 </div>
 
-<div class="dtb-toolbar" id="dtb-bulk-bar" style="display:none;border-top:1px solid #f0f2f5;">
+<div class="dtb-toolbar dtb-bulk-bar dtb-hidden" id="dtb-bulk-bar">
 <strong id="dtb-bulk-count">0 selected</strong>
 <select id="dtb-bulk-action" class="dtb-select">
 <option value="">Bulk action…</option>
@@ -86,30 +86,30 @@ $can_manage_settings = current_user_can( 'dtb_manage_support_settings' ) || curr
 
 <section class="dtb-ticket-list">
 <div class="dtb-loading" id="dtb-list-loading"><div class="dtb-spinner"></div>Loading queue…</div>
-<div class="dtb-empty" id="dtb-empty-state" style="display:none;">
+<div class="dtb-empty dtb-hidden" id="dtb-empty-state">
 <p class="dtb-empty__msg">No tickets in this queue.</p>
 <p class="dtb-empty__sub">Try another queue or clear filters.</p>
 </div>
-<table class="dtb-table" id="dtb-tickets-table" style="display:none;">
+<table class="dtb-table dtb-hidden" id="dtb-tickets-table">
 <thead>
 <tr>
-<th style="width:36px"><input id="dtb-select-all" type="checkbox" onchange="dtbSupport.selectAll(this.checked)"></th>
-<th style="width:120px">Ticket #</th>
+<th class="dtb-col-select"><input id="dtb-select-all" type="checkbox" onchange="dtbSupport.selectAll(this.checked)"></th>
+<th class="dtb-col-ticket">Ticket #</th>
 <th>Subject</th>
-<th style="width:120px">Status</th>
-<th style="width:90px">Priority</th>
-<th style="width:110px">Type</th>
-<th style="width:120px">Assigned</th>
-<th style="width:120px">Action Due</th>
-<th style="width:80px">Age</th>
-<th style="width:110px"></th>
+<th class="dtb-col-status">Status</th>
+<th class="dtb-col-priority">Priority</th>
+<th class="dtb-col-type">Type</th>
+<th class="dtb-col-assigned">Assigned</th>
+<th class="dtb-col-action-due">Action Due</th>
+<th class="dtb-col-age">Age</th>
+<th class="dtb-col-actions"></th>
 </tr>
 </thead>
 <tbody id="dtb-tickets-tbody"></tbody>
 </table>
 </section>
 
-<div class="dtb-table-footer" id="dtb-pagination" style="display:none;">
+<div class="dtb-table-footer dtb-hidden" id="dtb-pagination">
 <div class="dtb-pager">
 <button type="button" class="dtb-btn dtb-btn--ghost dtb-btn--sm" id="dtb-prev-page" onclick="dtbSupport.prevPage()">Prev</button>
 <span id="dtb-page-info">Page 1 of 1</span>
@@ -134,18 +134,18 @@ $can_manage_settings = current_user_can( 'dtb_manage_support_settings' ) || curr
 </div>
 <div class="dtb-ctx-section">
 <div class="dtb-ctx-section__title">Selected ticket</div>
-<p class="dtb-empty__sub" style="margin:0;">Open a ticket to load customer context, actions, and reply tools.</p>
+<p class="dtb-empty__sub dtb-empty__sub--tight">Open a ticket to load customer context, actions, and reply tools.</p>
 </div>
 </aside>
 </div>
 
-<div id="dtb-detail-overlay" style="display:none;position:fixed;inset:0;background:rgba(15,23,42,.55);z-index:99998;" onclick="dtbSupport.closeDetail(event)">
-<div id="dtb-detail-panel" style="position:absolute;inset:32px 32px 32px 180px;background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 24px 80px rgba(15,23,42,.35);" onclick="event.stopPropagation()">
+<div id="dtb-detail-overlay" class="dtb-detail-overlay dtb-hidden" onclick="dtbSupport.closeDetail(event)">
+<div id="dtb-detail-panel" class="dtb-detail-panel" onclick="event.stopPropagation()">
 <div class="dtb-loading" id="dtb-detail-loading"><div class="dtb-spinner"></div>Loading ticket…</div>
-<div id="dtb-detail-content" style="display:none;height:100%;"></div>
+<div id="dtb-detail-content" class="dtb-detail-content dtb-hidden"></div>
 </div>
 </div>
-<div id="dtb-toast-container" style="position:fixed;right:24px;bottom:24px;display:flex;flex-direction:column;gap:8px;z-index:99999;"></div>
+<div id="dtb-toast-container" class="dtb-toast-container"></div>
 </div>
 <?php
 }

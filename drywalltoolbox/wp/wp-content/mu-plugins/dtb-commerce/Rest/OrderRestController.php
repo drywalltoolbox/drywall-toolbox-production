@@ -31,7 +31,14 @@ function dtb_orders_admin_register_routes(): void {
 
 function dtb_orders_admin_queue_handler( WP_REST_Request $request ): WP_REST_Response {
 	$status = sanitize_key( $request->get_param( 'status' ) ?? '' );
+	$tab    = sanitize_key( $request->get_param( 'tab' ) ?? '' );
+	if ( '' === $status && '' !== $tab ) {
+		$status = $tab;
+	}
 	$search = sanitize_text_field( $request->get_param( 's' ) ?? '' );
+	if ( '' === $search ) {
+		$search = sanitize_text_field( $request->get_param( 'search' ) ?? '' );
+	}
 	$paged  = max( 1, (int) ( $request->get_param( 'paged' ) ?: 1 ) );
 	$per    = (int) get_option( 'dtb_admin_items_per_page', 25 );
 
@@ -41,14 +48,14 @@ function dtb_orders_admin_queue_handler( WP_REST_Request $request ): WP_REST_Res
 		'return' => 'objects',
 	];
 	if ( $status ) {
-		$query_args['status'] = 'wc-' . $status;
+		$query_args['status'] = str_starts_with( $status, 'wc-' ) ? $status : 'wc-' . $status;
 	}
 	if ( $search ) {
 		$query_args['s'] = $search;
 	}
 
 	$count_args = [ 'limit' => -1, 'return' => 'ids' ];
-	if ( $status ) $count_args['status'] = 'wc-' . $status;
+	if ( $status ) $count_args['status'] = str_starts_with( $status, 'wc-' ) ? $status : 'wc-' . $status;
 	if ( $search )  $count_args['s']     = $search;
 
 	$total_count = count( wc_get_orders( $count_args ) );

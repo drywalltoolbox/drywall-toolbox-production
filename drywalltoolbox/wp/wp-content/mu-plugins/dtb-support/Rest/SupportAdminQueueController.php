@@ -21,7 +21,9 @@ function dtb_support_admin_register_routes(): void {
 		'permission_callback' => fn() => current_user_can( 'dtb_read_support_tickets' ),
 		'args'                => [
 			'status' => [ 'sanitize_callback' => 'sanitize_key' ],
+			'tab'    => [ 'sanitize_callback' => 'sanitize_key' ],
 			's'      => [ 'sanitize_callback' => 'sanitize_text_field' ],
+			'search' => [ 'sanitize_callback' => 'sanitize_text_field' ],
 			'paged'  => [ 'sanitize_callback' => 'absint' ],
 		],
 	] );
@@ -29,7 +31,23 @@ function dtb_support_admin_register_routes(): void {
 
 function dtb_support_admin_queue_handler( WP_REST_Request $request ): WP_REST_Response {
 	$status = sanitize_key( $request->get_param( 'status' ) ?? '' );
+	$tab    = sanitize_key( $request->get_param( 'tab' ) ?? '' );
+	if ( '' === $status && '' !== $tab ) {
+		$status = $tab;
+	}
+	$status_aliases = [
+		'all'         => '',
+		'needs_reply' => 'needs-reply',
+		'past_sla'    => 'past-sla',
+	];
+	if ( isset( $status_aliases[ $status ] ) ) {
+		$status = $status_aliases[ $status ];
+	}
+
 	$search = sanitize_text_field( $request->get_param( 's' ) ?? '' );
+	if ( '' === $search ) {
+		$search = sanitize_text_field( $request->get_param( 'search' ) ?? '' );
+	}
 	$paged  = max( 1, (int) ( $request->get_param( 'paged' ) ?: 1 ) );
 	$per    = (int) get_option( 'dtb_admin_items_per_page', 25 );
 

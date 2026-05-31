@@ -145,10 +145,17 @@ function dtb_command_center_returns_summary(): array {
 
 	if ( function_exists( 'dtb_returns_count_by_status' ) ) {
 		$counts = dtb_returns_count_by_status();
-		$totals['pending_review']     = (int) ( $counts['under_review'] ?? 0 );
-		$totals['pending_inspection'] = (int) ( $counts['inspection_pending'] ?? 0 );
-		$totals['refund_pending']     = (int) ( $counts['refund_pending'] ?? 0 );
-		$totals['total_open']         = array_sum( array_values( $counts ) );
+		$totals['pending_review']     = (int) ( $counts['pending_review'] ?? 0 );
+		$totals['pending_inspection'] = (int) ( $counts['item_received'] ?? 0 );
+		$totals['refund_pending']     = (int) ( $counts['refund_issued'] ?? 0 );
+		$totals['total_open']         =
+			(int) ( $counts['pending_review'] ?? 0 )
+			+ (int) ( $counts['approved'] ?? 0 )
+			+ (int) ( $counts['rejected'] ?? 0 )
+			+ (int) ( $counts['awaiting_item'] ?? 0 )
+			+ (int) ( $counts['item_received'] ?? 0 )
+			+ (int) ( $counts['refund_issued'] ?? 0 )
+			+ (int) ( $counts['exchange_sent'] ?? 0 );
 	}
 
 	set_transient( $cache_key, $totals, 2 * MINUTE_IN_SECONDS );

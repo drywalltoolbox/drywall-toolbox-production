@@ -1,8 +1,8 @@
 ---
 
-## Status: LIVE LAYER FULLY OPERATIONAL — 2026-05-31
+## Status: LIVE LAYER + CORE WIRING COMPLETE, TARGETED UI HARDENING COMPLETE FOR PRIORITY PAGES — 2026-05-31
 
-All global scaffolding, module page renderers, REST admin queue endpoints, order detail drawer, and module CSS enqueue wiring are complete. The admin live layer is end-to-end functional.
+Core scaffolding, module page renderers, REST admin queue endpoints, order detail drawer, and module CSS enqueue wiring are complete. Priority legacy drift in four inline-heavy pages has been removed and migrated to DTB shared styling patterns; broader platform parity/migration work remains.
 
 ---
 
@@ -109,20 +109,40 @@ Each handler: runs the same query as the corresponding page renderer → renders
 
 ---
 
-## Remaining Work
+## Completion Notes
 
-### 1. Tool Library Pages — not yet migrated ⬜
+### 1. Tool Library Pages — migration complete ✅
 
-| Page | Status | Notes |
-|------|--------|-------|
-| Image Sync | Static — no live region | Add live region + 5–10s polling while job running |
-| Catalog Health | Static — no live region | Add live region + filter chips on issue type |
-| Schematics | Legacy renderer | Convert to AdminShell |
-| Product Mapping | Legacy renderer | Convert to AdminShell + conflict-resolution drawer |
+| Page | Result |
+|------|--------|
+| Image Sync | Rebuilt on DTB Admin shell with live region endpoint and active-run polling controls |
+| Catalog Health | Live region + issue-type chips + shared shell/toolbars |
+| Schematics | Callback now enforced through DTB shell and DTB capability checks |
+| Product Mapping | Conflict-resolution drawer added for failed mutations |
+
+Legacy submenu registrations in migrated Tool Library modules were removed so registry-owned menus remain authoritative.
 
 ### 2. Module CSS — stubs only, no content yet ✅
 
-The four module CSS files exist, are enqueued, and remain intentionally header-only stubs. Page-specific layout geometry (e.g. repair detail three-panel rail, returns resolution grid) should be added here only when the relevant detail views are built.
+The four module CSS files remain intentionally header-only stubs by design. They are wired and ready; page-specific geometry will be added only when those detailed layouts are built.
+
+### 3. Legacy Inline UI Hardening (Priority 4 Pages) ✅
+
+Inline `style=""` drift removed and class-based DTB styling applied to:
+
+- `dtb-catalog-platform/Admin/PartsManagerPage.php`
+- `dtb-catalog-platform/Admin/ProductMappingRenderer.php`
+- `dtb-schematics/Admin/SchematicEditorPage.php`
+- `dtb-support/Admin/SupportHubDashboard.php`
+
+Shared styling was consolidated into:
+
+- `dtb-platform/Admin/assets/dtb-tool-library-modern.css`
+- `dtb-support/Admin/assets/dtb-support.css`
+
+Design-source mapping notes are documented in:
+
+- `docs/design-reference/modernize-notes.md`
 
 ---
 

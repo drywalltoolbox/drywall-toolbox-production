@@ -16,8 +16,20 @@ defined( 'ABSPATH' ) || exit;
 add_action( 'admin_enqueue_scripts', 'dtb_admin_assets_enqueue' );
 
 function dtb_admin_assets_enqueue(): void {
-	if ( ! dtb_is_dtb_admin_page() ) {
+	$page_meta = dtb_current_page_meta();
+	$page_slug = sanitize_key( (string) ( $_GET['page'] ?? '' ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+	$is_dtb_slug = '' !== $page_slug && str_starts_with( $page_slug, 'dtb-' );
+
+	if ( ! $page_meta && ! $is_dtb_slug ) {
 		return;
+	}
+
+	// Fallback runtime metadata for migrated pages if registry lookup failed.
+	if ( ! is_array( $page_meta ) ) {
+		$page_meta = [
+			'slug'     => $page_slug,
+			'template' => in_array( $page_slug, [ 'dtb-command-center', 'dtb-system-manager' ], true ) ? 'dashboard' : 'tool',
+		];
 	}
 
 	$assets_dir = __DIR__ . '/assets/';
@@ -54,8 +66,9 @@ function dtb_admin_assets_enqueue(): void {
 		true
 	);
 
+	$current_user = wp_get_current_user();
+
 	// ── Module-specific CSS (keyed by page slug) ──
-	$page_meta = dtb_current_page_meta();
 	$page_slug = $page_meta['slug'] ?? '';
 
 	$module_css_map = [
@@ -98,6 +111,88 @@ function dtb_admin_assets_enqueue(): void {
 		);
 	}
 
+	// ── Shared hardening stylesheet for inline-legacy Tool Library pages ──
+	$legacy_tool_pages = [
+		'dtb-parts-manager',
+		'dtb-product-mapping',
+		'dtb-schematics',
+	];
+	if ( in_array( $page_slug, $legacy_tool_pages, true ) ) {
+		$tools_file = $assets_dir . 'dtb-tool-library-modern.css';
+		if ( file_exists( $tools_file ) ) {
+			wp_enqueue_style(
+				'dtb-tool-library-modern',
+				$assets_url . 'dtb-tool-library-modern.css',
+				[ 'dtb-admin' ],
+				(string) filemtime( $tools_file )
+			);
+		}
+	}
+
+	// ── Support workflow assets (legacy dashboard runtime, centralized enqueue) ──
+	if ( 'dtb-support' === $page_slug ) {
+		$support_dir = WP_CONTENT_DIR . '/mu-plugins/dtb-support/Admin/assets/';
+		$support_url = content_url( '/mu-plugins/dtb-support/Admin/assets/' );
+		$support_filter = sanitize_key( (string) ( $_GET['filter'] ?? '' ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$queue_map = [
+			'open'       => 'all_active',
+			'past_sla'   => 'overdue',
+			'needs_reply'=> 'needs_reply',
+		];
+		$default_queue = $queue_map[ $support_filter ] ?? get_option( 'dtb_support_default_queue', 'needs_reply' );
+
+		$support_css = $support_dir . 'dtb-support.css';
+		$support_js  = $support_dir . 'dtb-support.js';
+		$support_cver = file_exists( $support_css ) ? (string) filemtime( $support_css ) : '1.0.0';
+		$support_jver = file_exists( $support_js ) ? (string) filemtime( $support_js ) : '1.0.0';
+
+		if ( file_exists( $support_css ) ) {
+			wp_enqueue_style(
+				'dtb-support-admin',
+				$support_url . 'dtb-support.css',
+				[ 'dtb-admin' ],
+				$support_cver
+			);
+		}
+
+		if ( file_exists( $support_js ) ) {
+			wp_enqueue_script(
+				'dtb-support-admin',
+				$support_url . 'dtb-support.js',
+				[ 'jquery' ],
+				$support_jver,
+				true
+			);
+
+			wp_localize_script(
+				'dtb-support-admin',
+				'dtbSupportConfig',
+				[
+					'restUrl'         => esc_url_raw( rest_url( 'dtb/v1/support/' ) ),
+					'nonce'           => wp_create_nonce( 'wp_rest' ),
+					'currentUserId'   => get_current_user_id(),
+					'currentUser'     => $current_user->display_name,
+					'siteName'        => get_bloginfo( 'name' ),
+					'repairsAdminUrl' => admin_url( 'admin.php?page=dtb-repairs' ),
+					'defaultQueue'    => $default_queue,
+					'pollInterval'    => max( 30, (int) get_option( 'dtb_support_poll_interval', 60 ) ),
+					'actionDueHours'  => function_exists( 'dtb_support_action_due_hours' ) ? max( 1, (int) dtb_support_action_due_hours() ) : 24,
+					'capabilities'    => [
+						'manage'         => current_user_can( 'dtb_manage_support' ),
+						'reply'          => current_user_can( 'dtb_reply_support_tickets' ),
+						'addNote'        => current_user_can( 'dtb_add_support_notes' ),
+						'assign'         => current_user_can( 'dtb_assign_support_tickets' ),
+						'changeStatus'   => current_user_can( 'dtb_change_support_status' ),
+						'changePriority' => current_user_can( 'dtb_change_support_priority' ),
+						'manageMacros'   => current_user_can( 'dtb_manage_support_macros' ),
+						'viewReports'    => current_user_can( 'dtb_view_support_reports' ),
+						'manageSettings' => current_user_can( 'dtb_manage_support_settings' ) || current_user_can( 'manage_options' ),
+					],
+				]
+			);
+		}
+	}
+
 	// ── ApexCharts (dashboard pages only) ──
 	if ( in_array( $page_meta['template'] ?? '', [ 'dashboard' ], true ) ) {
 		$apex_file = $assets_dir . 'vendor/apexcharts.min.js';
@@ -115,8 +210,6 @@ function dtb_admin_assets_enqueue(): void {
 	}
 
 	// ── Localized config ──
-	$current_user = wp_get_current_user();
-
 	wp_localize_script(
 		'dtb-admin',
 		'dtbAdminConfig',

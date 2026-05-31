@@ -29,14 +29,33 @@ function dtb_returns_admin_register_routes(): void {
 
 function dtb_returns_admin_queue_handler( WP_REST_Request $request ): WP_REST_Response {
 	$active_tab = sanitize_key( $request->get_param( 'tab' ) ?: 'all' );
+	$status_arg = sanitize_key( $request->get_param( 'status' ) ?? '' );
+	$status_to_tab = [
+		'pending_review'   => 'pending_review',
+		'approved'         => 'approved',
+		'awaiting_item'    => 'awaiting_item',
+		'item_received'    => 'item_received',
+		'refund_issued'    => 'refund_issued',
+		'exchange_sent'    => 'exchange_sent',
+		'closed'           => 'closed',
+		'under_review'     => 'pending_review',
+		'inspection_pending' => 'item_received',
+		'refund_pending'   => 'refund_issued',
+	];
+	if ( 'all' === $active_tab && isset( $status_to_tab[ $status_arg ] ) ) {
+		$active_tab = $status_to_tab[ $status_arg ];
+	}
 	$search     = sanitize_text_field( $request->get_param( 's' ) ?? '' );
+	if ( '' === $search ) {
+		$search = sanitize_text_field( $request->get_param( 'search' ) ?? '' );
+	}
 	$paged      = max( 1, (int) ( $request->get_param( 'paged' ) ?: 1 ) );
 
 	$result = dtb_returns_query( [
 		'status'   => $active_tab,
 		'search'   => $search,
-		'per_page' => 25,
-		'paged'    => $paged,
+		'per_page' => (int) get_option( 'dtb_admin_items_per_page', 25 ),
+		'page'     => $paged,
 	] );
 
 	/** @var DTB_Return_Entity[] $items */

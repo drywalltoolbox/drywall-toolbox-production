@@ -17,12 +17,18 @@ function dtb_orders_render_page(): void {
 
 	// Filters from querystring.
 	$status  = sanitize_key( $_GET['status'] ?? '' );   // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+	$status_tab = sanitize_key( $_GET['tab'] ?? '' );   // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+	if ( '' === $status && '' !== $status_tab ) {
+		$status = $status_tab;
+	}
 	$search  = sanitize_text_field( $_GET['s'] ?? '' ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+	$live_search = sanitize_text_field( $_GET['search'] ?? '' ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+	if ( '' === $search && '' !== $live_search ) {
+		$search = $live_search;
+	}
 	$paged   = max( 1, (int) ( $_GET['paged'] ?? 1 ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 	$per     = (int) get_option( 'dtb_admin_items_per_page', 25 );
 	$base    = admin_url( 'admin.php?page=dtb-orders' );
-
-	$wc_statuses = wc_get_order_statuses();
 	$status_tabs = [
 		[ 'id' => '',           'label' => __( 'All', 'drywall-toolbox' ),         'active' => $status === '',           'url' => $base ],
 		[ 'id' => 'on-hold',    'label' => __( 'On Hold', 'drywall-toolbox' ),      'active' => $status === 'on-hold',    'url' => add_query_arg( 'status', 'on-hold', $base ) ],
@@ -63,14 +69,14 @@ function dtb_orders_render_page(): void {
 		'return' => 'objects',
 	];
 	if ( $status ) {
-		$query_args['status'] = 'wc-' . $status;
+		$query_args['status'] = str_starts_with( $status, 'wc-' ) ? $status : 'wc-' . $status;
 	}
 	if ( $search ) {
 		$query_args['s'] = $search;
 	}
 	// Total count for pagination (separate lightweight query).
 	$count_args = [ 'limit' => -1, 'return' => 'ids' ];
-	if ( $status ) $count_args['status'] = 'wc-' . $status;
+	if ( $status ) $count_args['status'] = str_starts_with( $status, 'wc-' ) ? $status : 'wc-' . $status;
 	if ( $search ) $count_args['s']      = $search;
 	$total_count = count( wc_get_orders( $count_args ) );
 	$total_pages = $per > 0 ? (int) ceil( $total_count / $per ) : 1;

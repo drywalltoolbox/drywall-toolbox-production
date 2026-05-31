@@ -21,42 +21,14 @@ if ( ! dtb_is_admin_or_ajax_request() ) {
 	return;
 }
 
-// ── Shared top-level DTB admin menu ──────────────────────────────────────────
-
-if ( ! function_exists( 'dtb_register_top_level_menu' ) ) {
-	function dtb_register_top_level_menu() {
-		add_menu_page(
-			__( 'Drywall Toolbox', 'dtb' ),
-			__( 'DTB Tools', 'dtb' ),
-			'manage_options',
-			'dtb-toolbox',
-			'dtb_toolbox_dashboard_page',
-			'dashicons-hammer',
-			30
-		);
-	}
-	add_action( 'admin_menu', 'dtb_register_top_level_menu', 5 );
-}
-
-if ( ! function_exists( 'dtb_toolbox_dashboard_page' ) ) {
-	function dtb_toolbox_dashboard_page() {
-		echo '<div class="wrap"><h1>' . esc_html__( 'DTB Tools', 'dtb' ) . '</h1>';
-		echo '<p>' . esc_html__( 'Select a tool from the menu on the left.', 'dtb' ) . '</p></div>';
+/**
+ * Canonical schematics capability check.
+ */
+if ( ! function_exists( 'dtb_schematics_can_manage' ) ) {
+	function dtb_schematics_can_manage(): bool {
+		return current_user_can( 'dtb_manage_schematics' ) || current_user_can( 'manage_options' );
 	}
 }
-
-// ── Submenu ───────────────────────────────────────────────────────────────────
-
-add_action( 'admin_menu', function () {
-	add_submenu_page(
-		'dtb-toolbox',
-		__( 'Schematics Manager', 'dtb' ),
-		__( 'Schematics', 'dtb' ),
-		'manage_options',
-		'dtb-schematics',
-		'dtb_schematics_render_page'
-	);
-} );
 
 // ── Enqueue WP media uploader on our page ────────────────────────────────────
 

@@ -16,7 +16,27 @@ function dtb_returns_render_page(): void {
 	}
 
 	$active_tab = sanitize_key( $_GET['tab'] ?? 'all' ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+	$status_arg = sanitize_key( $_GET['status'] ?? '' ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+	$status_to_tab = [
+		'pending_review'   => 'pending_review',
+		'approved'         => 'approved',
+		'awaiting_item'    => 'awaiting_item',
+		'item_received'    => 'item_received',
+		'refund_issued'    => 'refund_issued',
+		'exchange_sent'    => 'exchange_sent',
+		'closed'           => 'closed',
+		'under_review'     => 'pending_review',
+		'inspection_pending' => 'item_received',
+		'refund_pending'   => 'refund_issued',
+	];
+	if ( 'all' === $active_tab && isset( $status_to_tab[ $status_arg ] ) ) {
+		$active_tab = $status_to_tab[ $status_arg ];
+	}
 	$search     = sanitize_text_field( $_GET['s'] ?? '' ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+	$live_search = sanitize_text_field( $_GET['search'] ?? '' ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+	if ( '' === $search && '' !== $live_search ) {
+		$search = $live_search;
+	}
 	$base_url   = admin_url( 'admin.php?page=dtb-returns' );
 
 	$status_labels = [
@@ -36,7 +56,7 @@ function dtb_returns_render_page(): void {
 		$count    = $id === 'all' ? array_sum( $counts ) : ( $counts[ $id ] ?? 0 );
 		$tabs[]   = [
 			'id'     => $id,
-			'label'  => $label . ( $count > 0 ? ' <span class="dtb-badge dtb-badge--count">' . (int) $count . '</span>' : '' ),
+			'label'  => $count > 0 ? sprintf( '%s (%d)', $label, (int) $count ) : $label,
 			'active' => $active_tab === $id,
 			'url'    => add_query_arg( 'tab', $id, $base_url ),
 		];
@@ -64,8 +84,8 @@ function dtb_returns_render_page(): void {
 	$result = dtb_returns_query( [
 		'status'   => $active_tab,
 		'search'   => $search,
-		'per_page' => 25,
-		'paged'    => $paged_returns,
+		'per_page' => (int) get_option( 'dtb_admin_items_per_page', 25 ),
+		'page'     => $paged_returns,
 	] );
 
 	/** @var DTB_Return_Entity[] $items */

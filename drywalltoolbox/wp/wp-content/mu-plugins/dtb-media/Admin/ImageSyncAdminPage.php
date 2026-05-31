@@ -2,19 +2,7 @@
 defined( 'ABSPATH' ) || exit;
 
 if ( is_admin() ) {
-	add_action( 'admin_menu', 'dtb_image_sync_add_management_page' );
 	add_action( 'wp_ajax_dtb_image_sync', 'dtb_ajax_image_sync_handler' );
-}
-
-function dtb_image_sync_add_management_page(): void {
-	add_submenu_page(
-		'dtb-toolbox',
-		'Drywall Toolbox Image Sync',
-		'DTB Image Sync',
-		'manage_woocommerce',
-		'dtb-image-sync',
-		'dtb_render_image_sync_admin_page'
-	);
 }
 
 /**

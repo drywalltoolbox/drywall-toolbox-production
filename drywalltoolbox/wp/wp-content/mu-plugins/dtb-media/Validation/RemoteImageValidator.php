@@ -11,7 +11,9 @@ defined( 'ABSPATH' ) || exit;
  * a capability reset, or a WC version upgrade that regenerates role data.
  */
 function dtb_image_sync_can_manage(): bool {
-	return current_user_can( 'manage_woocommerce' ) || current_user_can( 'manage_options' );
+	return current_user_can( 'dtb_manage_image_sync' )
+		|| current_user_can( 'manage_woocommerce' )
+		|| current_user_can( 'manage_options' );
 }
 
 /**

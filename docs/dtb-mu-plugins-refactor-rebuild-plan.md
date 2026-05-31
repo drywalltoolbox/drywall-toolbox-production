@@ -10,6 +10,8 @@
 **Phase 10 checkpoint (2026-05-31):**
 - Module page CSS files are present as header-only stubs and are enqueued by page slug through `dtb-platform/Admin/AdminAssets.php`.
 - Scope rule remains enforced: module CSS is reserved for page layout geometry only, must use existing `var(--dtb-*)` tokens, and must not define global/component styles.
+- Priority visual hardening pass is complete for legacy inline-heavy pages (`PartsManagerPage.php`, `ProductMappingRenderer.php`, `SchematicEditorPage.php`, `SupportHubDashboard.php`) with inline style drift removed and shared DTB classes applied.
+- Modernize reference extraction/mapping notes are documented in `docs/design-reference/modernize-notes.md`.
 
 ---
 
