@@ -808,8 +808,13 @@
 	 * @param {boolean} [replace=false]
 	 */
 	DtbAdmin.applyHistoryState = function ( state, replace ) {
-		const params = new URLSearchParams( state );
-		const url    = window.location.pathname + ( params.toString() ? '?' + params.toString() : '' );
+		const params = new URLSearchParams();
+		Object.entries( state ).forEach( function ( [ k, v ] ) {
+			if ( v !== '' && v !== null && v !== undefined ) {
+				params.set( k, v );
+			}
+		} );
+		const url = window.location.pathname + ( params.toString() ? '?' + params.toString() : '' );
 		if ( replace ) {
 			history.replaceState( state, '', url );
 		} else {
@@ -848,7 +853,13 @@
 
 		const url    = new URL( endpoint, window.location.origin );
 		const state  = Object.assign( DtbAdmin.readLiveState(), query );
-		Object.entries( state ).forEach( ( [ k, v ] ) => url.searchParams.set( k, v ) );
+		Object.entries( state ).forEach( function ( [ k, v ] ) {
+			if ( v === '' || v === null || v === undefined ) {
+				url.searchParams.delete( k );
+			} else {
+				url.searchParams.set( k, v );
+			}
+		} );
 
 		fetch( url.toString(), {
 			signal:  controller.signal,
@@ -887,6 +898,7 @@
 				if ( err.name === 'AbortError' ) return; // superseded request
 				DtbAdmin.setRegionLoading( target, false );
 				console.warn( '[DtbAdmin] liveNavigate failed:', err );
+				DtbAdmin.toast( 'Failed to load content. Please try again.', 'danger', 'Load Error' );
 			} );
 	};
 
@@ -939,10 +951,18 @@
 					const endpoint = region.getAttribute( 'data-dtb-endpoint' );
 					const query    = {};
 
-					if ( el.hasAttribute( 'data-dtb-live-tab' ) )    query.tab    = el.getAttribute( 'data-dtb-live-tab' );
-					if ( el.hasAttribute( 'data-dtb-live-filter' ) )  query.filter = el.getAttribute( 'data-dtb-live-filter' );
-					if ( el.hasAttribute( 'data-dtb-live-sort' ) )    query.sort   = el.getAttribute( 'data-dtb-live-sort' );
-					if ( el.hasAttribute( 'data-dtb-live-page' ) )    query.paged  = el.getAttribute( 'data-dtb-live-page' );
+					if ( el.hasAttribute( 'data-dtb-live-tab' ) ) {
+					const tab = el.getAttribute( 'data-dtb-live-tab' );
+					query.tab    = tab;
+					query.status = ( tab === 'all' || tab === '' ) ? '' : tab;
+					query.paged  = 1;
+				}
+				if ( el.hasAttribute( 'data-dtb-live-filter' ) ) {
+					query.status = el.getAttribute( 'data-dtb-live-filter' );
+					query.paged  = 1;
+				}
+				if ( el.hasAttribute( 'data-dtb-live-sort' ) )  query.sort  = el.getAttribute( 'data-dtb-live-sort' );
+				if ( el.hasAttribute( 'data-dtb-live-page' ) )  query.paged = el.getAttribute( 'data-dtb-live-page' );
 
 					DtbAdmin.liveNavigate( { target: region, endpoint, query } );
 				} );
@@ -966,7 +986,7 @@
 					DtbAdmin.liveNavigate( {
 						target: region,
 						endpoint,
-						query: { search: el.value, paged: 1 },
+						query: { search: el.value, paged: 1, status: '' },
 					} );
 				}, 320 );
 			} );

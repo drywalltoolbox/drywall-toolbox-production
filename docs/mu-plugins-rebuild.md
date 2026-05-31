@@ -1,166 +1,646 @@
----
+## Architecture / Approach
 
-## Status: LIVE LAYER + CORE WIRING COMPLETE, MODERNIZE-ALIGNED REPAIR UI HARDENING COMPLETE — 2026-05-31
+Your current `wp-content/mu-plugins/` state is now **partially migrated**:
 
-Core scaffolding, module page renderers, REST admin queue endpoints, order detail drawer, and module CSS enqueue wiring are complete. Priority legacy drift in four inline-heavy pages has been removed and migrated to DTB shared styling patterns. Repairs queue and repair CPT edit screens now load the shared DTB/Modernize visual system instead of inline page CSS; broader platform parity/migration work remains.
+```text
+Implemented:
+- shared AdminShell
+- shared AdminUi component helpers
+- shared dtb-admin.css
+- shared dtb-admin.js
+- live-region scaffolding
+- Orders / Repairs / Returns moved toward shared page templates
 
----
+Not fully working:
+- brand palette is still mostly Modernize-default
+- some markup does not match the shared CSS component contract
+- in-page tabs/search/live refresh are only partially wired
+- Support still depends on legacy module-specific runtime
+- live updates are polling fragments, not true streaming
+- some query-state logic prevents tab changes from actually updating data
+```
 
-## Completed Work
-
-### Phase 1 — Architecture + Wiring Fixes ✅
-
-| # | Fix | File |
-|---|-----|------|
-| 1 | Registry callbacks matched to actual renderers — wrapper callbacks added for all Operations pages | `dtb-repairs/`, `dtb-support/`, `dtb-order-platform/`, `dtb-returns/` |
-| 2 | All module bootstrap `require()` paths corrected | All module `bootstrap.php` files |
-| 3 | `dtb_admin_ui_empty_state` array-call bug | `ReturnsPage.php`, `SeoToolsPage.php` |
-| 4 | `dtb_admin_format_date` undefined | `ReturnsPage.php` — replaced with `wp_date()` |
-| 5 | Conflicting function declarations | `ApiHealthPage.php` + `SchematicsPage.php` deleted |
-| 6 | Support loads `dtb-support.css` on new DTB shell pages | `SupportHubAdminMenu.php` — suppressed when hook contains `_page_dtb-support` |
-
----
-
-### Phase 4 — Global Admin UI / Shell / Skeleton ✅
-
-**`AdminAssets.php`** — Inter + Plus Jakarta Sans via Bunny Fonts CDN. Module-specific CSS map (keyed by page slug → `wp_enqueue_style` with `dep: ['dtb-admin']`, filemtime versioned) wires four module sheets on their respective pages only.
-
-**`dtb-admin.css`** — 31 sections including: font stack, skeleton shimmer, dropdowns, timeline widget, live region states, WP host overrides, pagination, stat card, search wrap, filter chips, full drawer layer (`.dtb-drawer`, `.dtb-drawer-overlay`, `.dtb-drawer__header/body/footer/close`, responsive breakpoint).
-
-**`dtb-admin.js`** — Live Interaction Layer:
-- `liveNavigate` — fetches endpoint with `Accept: text/html`; response handler inspects `Content-Type`: if `application/json` extracts `payload.html`, otherwise reads raw text. Replaces `target.innerHTML`, calls `rebind()`, dispatches `dtb:live:navigated`.
-- `liveRefresh`, `initLiveControls`, `registerLiveRegion`, `initLiveRegions`
-- `initLiveControls` resolves region via `data-dtb-live-target` (explicit cross-region ID lookup) **before** falling back to `el.closest('[data-dtb-live-region]')` — required for shell-header tabs which live outside the region div
-- Polling with `document.hidden` pause, dirty-region protection, AbortController stale-cancel
-- `rebind`, `initSidebarNav`, `initCharts`
-- `openDrawer`, `closeDrawer`, `initDrawers`, `initTableRowDrawer`, `populateDrawerFromRow` — full drawer layer. `initTableRowDrawer` requires `.dtb-table__row--clickable` on `<tr>` and `data-dtb-drawer="{id}"`. `populateDrawerFromRow` fills `[data-dtb-target="{field}"]` slots from `data-dtb-field-{name}` row attributes; dispatches `dtb:drawer:populate` custom event.
-
-**`AdminShell.php`**:
-- `dtb_admin_shell_open($args)` — accepts `title`, `subtitle`, `section`, `page`, `template`, `icon`, `actions`, `tabs`, **`live_target`**
-- `dtb_admin_shell_render_tabs($tabs, $live_target)` — emits `data-dtb-live-tab` + `data-dtb-live-target` on each tab anchor when `live_target` is set
-- `dtb_admin_shell_live_region_open($args)` / `_close()`
-- `dtb_admin_shell_access_denied()`
-- Drawer overlay (`<div class="dtb-drawer-overlay">`) and toast container rendered inside `dtb_admin_shell_open()` — shared across all module pages, required once per page.
-
-**`AdminUi.php`** — helpers include: `dtb_admin_ui_pagination`, `dtb_admin_ui_search_input`, `dtb_admin_ui_filter_chip`, `dtb_admin_ui_stat_card`, `dtb_admin_ui_update_badge`, `dtb_admin_ui_timeline_*`, `dtb_admin_ui_live_region_open/close`, `dtb_admin_ui_drawer($id, $title, $body_html, $footer_html)`, `dtb_admin_ui_detail_row($label, $value_html)`.
+The screenshot confirms this: the Orders page is using the new shell visually, but the page still has broken/partial component behavior: tabs are not functionally updating, search is not wired to the live region, and the order total is rendering escaped WooCommerce HTML instead of formatted currency.
 
 ---
 
-### Phase 5 — Module Page Renderers ✅
+# 1. Current Theme / Branding Audit
 
-All seven module pages are fully converted. Each uses:
-- `dtb_admin_shell_open()` with `live_target` wired to its live region
-- `dtb_admin_shell_live_region_open/close()` wrapping all data content
-- `dtb_admin_ui_search_input($placeholder, $value, true, 's')` — live search, no form submit
-- `dtb_admin_ui_update_badge($region_id)` — "new updates" nudge
-- `dtb_admin_ui_pagination($paged, $total_pages)` — live-nav compatible
+## 1.1 Current admin theme is still Modernize-colored
 
-| Page | File | Live Region ID | Endpoint | Interval |
-|------|------|---------------|----------|----------|
-| Repairs | `dtb-repair-service/Admin/RepairsPage.php` | `dtb-repairs-workspace` | `dtb/v1/admin/repairs` | 45s |
-| Support | `dtb-support/Admin/SupportPage.php` | `dtb-support-workspace` | `dtb/v1/admin/support` | 30s |
-| Returns | `dtb-returns/Admin/ReturnsPage.php` | `dtb-returns-workspace` | `dtb/v1/admin/returns` | 30s |
-| Orders | `dtb-commerce/Admin/OrdersPage.php` | `dtb-orders-workspace` | `dtb/v1/admin/orders` | 30s |
-| System Manager | `dtb-platform/SystemManager/SystemManagerPage.php` | `dtb-system-workspace` | `dtb/v1/admin/system` | 20s |
-| Command Center | `dtb-platform/CommandCenter/CommandCenterPage.php` | `dtb-command-center-workspace` | `dtb/v1/admin/overview` | 30s |
+Your global admin CSS says it is a DTB UI system, but the active token palette is still visibly Modernize-derived:
 
-**RepairAdminMenu.php legacy conflicts resolved:**
-- `add_action('admin_menu', 'dtb_repair_admin_menu')` commented out — duplicate `dtb-repairs` slug removed, registry renderer wins
-- `dtb_repair_admin_inline_styles()` is now a deprecated no-op; repair CPT screens enqueue `dtb-admin.css` plus `dtb-repair-admin-modern.css`
-- Repair CPT edit screens receive the `dtb-repair-admin-screen` body class so Modernize-derived wp-admin chrome, hero, tabs, metabox cards, buttons, forms, and workflow panels are scoped to repair screens only
+```css
+--dtb-primary: #5d87ff;
+--dtb-info: #49beff;
+```
 
----
+These are set in `dtb-admin.css` as the current primary/info theme values. 
 
-### Phase 6 — REST Admin Queue Endpoints ✅
+That explains the soft blue Modernize look in the screenshot. It is clean, but it is not fully DTB-branded yet.
 
-All six `dtb/v1/admin/*` endpoints are implemented and registered. Each returns `{ "ok": true, "html": "..." }` (JSON-wrapped HTML fragment) consumed by `liveNavigate`. Permission callback mirrors the page capability. Params: `status`/`tab`, `s`, `paged` — all sanitized.
+## 1.2 Correct rebrand strategy
 
-| Endpoint | Controller File | Bootstrapped In |
-|----------|----------------|----------------|
-| `GET /dtb/v1/admin/orders` | `dtb-commerce/Rest/OrderRestController.php` | `dtb-commerce/bootstrap.php` |
-| `GET /dtb/v1/admin/repairs` | `dtb-repair-service/Rest/RepairAdminQueueController.php` | `dtb-repair-service/bootstrap.php` |
-| `GET /dtb/v1/admin/support` | `dtb-support/Rest/SupportAdminQueueController.php` | `dtb-support/bootstrap.php` |
-| `GET /dtb/v1/admin/returns` | `dtb-returns/Rest/ReturnsAdminQueueController.php` | `dtb-returns/bootstrap.php` |
-| `GET /dtb/v1/admin/overview` | `dtb-platform/CommandCenter/Rest/CommandCenterController.php` (handler added) | already in platform bootstrap |
-| `GET /dtb/v1/admin/system` | `dtb-platform/SystemManager/Rest/SystemManagerController.php` (handler added) | already in platform bootstrap |
+Do **not** restyle every component individually.
 
-Each handler: runs the same query as the corresponding page renderer → renders table/card HTML via `ob_start` + AdminUi helpers → returns `new WP_REST_Response(['ok'=>true,'html'=>$html], 200)`.
+Rebrand only the global token layer first:
 
----
+```text
+dtb-admin.css
+└─ .dtb-admin / body.dtb-admin-screen token block
+   ├─ brand colors
+   ├─ surface colors
+   ├─ border colors
+   ├─ text colors
+   ├─ state colors
+   ├─ shadows
+   └─ motion
+```
 
-### Phase 7 — Order Detail Drawer ✅
+Then every component using `var(--dtb-*)` inherits the brand automatically.
 
-**`dtb-commerce/Admin/OrdersPage.php`**:
-- Each `<tr>` now carries: class `dtb-table__row--clickable`, `data-dtb-drawer="dtb-orders-detail-drawer"`, `data-dtb-drawer-title="Order #{id}"`, and five `data-dtb-field-*` attributes: `orderid`, `customer`, `status`, `total`, `date`, `viewurl`.
-- A single shared `dtb_admin_ui_drawer('dtb-orders-detail-drawer', ...)` is rendered **outside** the live region (below `dtb_admin_shell_live_region_close()`) so it survives partial refreshes. Body uses `[data-dtb-target]` slots populated by `populateDrawerFromRow`.
-- An inline `<script>` listens for `dtb:drawer:populate` to update the footer "View Full Order" link `href` from `data-dtb-field-viewurl`.
-- `dtb-commerce/Rest/OrderRestController.php` — the queue refresh handler emits the same `data-dtb-drawer` + `data-dtb-field-*` attributes on each row, so the drawer works after live refreshes too.
+Target file:
 
----
+```text
+wp/wp-content/mu-plugins/dtb-platform/Admin/assets/dtb-admin.css
+```
 
-### Phase 8 — Module CSS Files + Enqueue Wiring ✅
+Recommended DTB brand token direction:
 
-**Four module CSS files wired**:
-- `dtb-repair-service/Admin/assets/dtb-repairs-page.css` — repairs queue layout geometry for KPI grid, toolbar, live region, and responsive table width
-- `dtb-support/Admin/assets/dtb-support-page.css`
-- `dtb-returns/Admin/assets/dtb-returns-page.css`
-- `dtb-commerce/Admin/assets/dtb-orders-page.css`
+```css
+/* wp/wp-content/mu-plugins/dtb-platform/Admin/assets/dtb-admin.css */
+.dtb-admin,
+body.dtb-admin-screen,
+body.dtb-repair-admin-screen {
+  --dtb-bg: #f6f8fb;
+  --dtb-surface: #ffffff;
+  --dtb-surface-soft: #f8fafc;
+  --dtb-border: #d9e2ec;
+  --dtb-border-soft: #edf2f7;
 
-**`dtb-platform/Admin/AdminAssets.php`** — a `$module_css_map` (slug → id/dir/url/file) is evaluated inside `dtb_admin_assets_enqueue()`. When `$page_meta['slug']` matches an entry, `wp_enqueue_style()` loads the module sheet with `dep: ['dtb-admin']` and filemtime versioning. No AdminMenu files touched — all enqueue logic stays in the single authoritative asset entry point.
+  --dtb-text: #172033;
+  --dtb-muted: #64748b;
+  --dtb-soft: #94a3b8;
 
----
+  --dtb-primary: #1d4ed8;
+  --dtb-primary-hover: #1e40af;
+  --dtb-primary-soft: #eff6ff;
 
-## Completion Notes
+  --dtb-accent: #f59e0b;
+  --dtb-accent-hover: #d97706;
+  --dtb-accent-soft: #fffbeb;
 
-### 1. Tool Library Pages — migration complete ✅
+  --dtb-success: #15803d;
+  --dtb-success-soft: #f0fdf4;
 
-| Page | Result |
-|------|--------|
-| Image Sync | Rebuilt on DTB Admin shell with live region endpoint and active-run polling controls |
-| Catalog Health | Live region + issue-type chips + shared shell/toolbars |
-| Schematics | Callback now enforced through DTB shell and DTB capability checks |
-| Product Mapping | Conflict-resolution drawer added for failed mutations |
+  --dtb-warning: #d97706;
+  --dtb-warning-soft: #fffbeb;
 
-Legacy submenu registrations in migrated Tool Library modules were removed so registry-owned menus remain authoritative.
+  --dtb-danger: #dc2626;
+  --dtb-danger-soft: #fef2f2;
 
-### 2. Module CSS ✅
+  --dtb-info: #0369a1;
+  --dtb-info-soft: #f0f9ff;
+}
+```
 
-The module CSS files are wired. Repairs now contains page-specific layout geometry for the queue; remaining module files stay header-only until their detail layouts require page-specific geometry. Component styling remains in shared DTB assets.
-
-### 3. Legacy Inline UI Hardening (Priority 4 Pages) ✅
-
-Inline `style=""` drift removed and class-based DTB styling applied to:
-
-- `dtb-catalog-platform/Admin/PartsManagerPage.php`
-- `dtb-catalog-platform/Admin/ProductMappingRenderer.php`
-- `dtb-schematics/Admin/SchematicEditorPage.php`
-- `dtb-support/Admin/SupportHubDashboard.php`
-
-Shared styling was consolidated into:
-
-- `dtb-platform/Admin/assets/dtb-tool-library-modern.css`
-- `dtb-support/Admin/assets/dtb-support.css`
-
-### 4. Repairs Modernize Alignment ✅
-
-- `dtb-platform/Admin/assets/dtb-admin.css` now exposes shared Modernize-derived tokens to DTB page bodies and repair CPT edit bodies.
-- `dtb-repair-service/Admin/RepairsPage.php` renders Modernize-style KPI cards, richer queue rows, progress indicators, and shared toolbar/table primitives.
-- `dtb-repair-service/Rest/RepairAdminQueueController.php` reuses the same repairs queue renderer so live refresh does not fall back to sparse legacy markup.
-- `dtb-repair-service/Admin/RepairAdminMenu.php` no longer emits the former large inline stylesheet.
-- `dtb-repair-service/Admin/assets/dtb-repair-admin-modern.css` owns scoped repair CPT edit styling for the hero, workspace tabs, metabox cards, workflow controls, chat, quote builder, and native wp-admin chrome.
-
-Design-source mapping notes are documented in:
-
-- `docs/design-reference/modernize-notes.md`
+Use the exact DTB logo/site brand hex values if they are already defined elsewhere. The key is to remove template-default colors from the source-of-truth token block.
 
 ---
 
-## CSS Scope Rule (standing constraint)
+# 2. Component Contract Problems
 
-Module-specific page CSS files may only contain:
-- Layout geometry specific to that page (three-panel rail, quote builder grid, etc.)
-- Must use `var(--dtb-*)` custom properties — no hardcoded values
-- Must not define new token values on `:root` or inside `.dtb-admin`
-- Must not define buttons, badges, tables, cards, or form controls — those are global
+## 2.1 Table markup does not fully match CSS expectations
+
+The global CSS expects rows/cells like:
+
+```text
+.dtb-table__row
+.dtb-table__cell
+```
+
+Those classes drive spacing, hover state, muted text, and right-aligned action cells. 
+
+But Orders renders rows as:
+
+```php
+<tr class="dtb-table__row--clickable">
+```
+
+and cells as raw `<td>`, without `dtb-table__row` and `dtb-table__cell`. 
+
+So the table is only partially styled. Repairs is better, because its row renderer uses `dtb-table__cell` classes. 
+
+Required fix:
+
+```php
+/* wp/wp-content/mu-plugins/dtb-commerce/Admin/OrdersPage.php */
+echo '<tr class="dtb-table__row dtb-table__row--clickable" ...>';
+echo '<td class="dtb-table__cell">...</td>';
+```
+
+Do the same in the Orders REST fragment.
 
 ---
+
+## 2.2 WooCommerce order total is incorrectly escaped
+
+Your screenshot shows raw HTML:
+
+```text
+<span class="woocommerce-Price-amount amount">...
+```
+
+That comes from this code:
+
+```php
+echo '<td>' . esc_html( $order->get_formatted_order_total() ) . '</td>';
+```
+
+`get_formatted_order_total()` returns safe WooCommerce HTML, but `esc_html()` turns it into visible text. This appears in both the initial Orders page and REST fragment.  
+
+Required fix:
+
+```php
+/* wp/wp-content/mu-plugins/dtb-commerce/Admin/OrdersPage.php */
+echo '<td class="dtb-table__cell">' . wp_kses_post( $order->get_formatted_order_total() ) . '</td>';
+```
+
+And the same in:
+
+```text
+wp/wp-content/mu-plugins/dtb-commerce/Rest/OrderRestController.php
+```
+
+---
+
+# 3. Why Tabs Are Not Loading / Updating Reliably
+
+## 3.1 The shell emits live-tab attributes, but only for non-empty tab IDs
+
+`AdminShell.php` adds `data-dtb-live-tab` only when `live_target` exists and the tab has a non-empty `id`. 
+
+Orders defines the “All” tab with an empty ID:
+
+```php
+[ 'id' => '', 'label' => 'All', ... ]
+```
+
+
+
+Result:
+
+```text
+All tab does not get data-dtb-live-tab.
+All tab behaves like a normal link / partial fallback.
+```
+
+Fix:
+
+```php
+/* wp/wp-content/mu-plugins/dtb-commerce/Admin/OrdersPage.php */
+[ 'id' => 'all', 'label' => __( 'All', 'drywall-toolbox' ), ... ]
+```
+
+Then normalize `'all'` back to empty status in the page and REST endpoint.
+
+---
+
+## 3.2 Live tab navigation sends `tab`, but stale `status` stays in URL state
+
+The live JS builds state like this:
+
+```js
+const state = Object.assign( DtbAdmin.readLiveState(), query );
+```
+
+That means old query params remain unless explicitly cleared. 
+
+When a tab is clicked, the JS adds `query.tab`, but does not remove old `status`. 
+
+The Orders REST endpoint prioritizes `status` over `tab`:
+
+```php
+$status = $request->get_param( 'status' );
+$tab    = $request->get_param( 'tab' );
+
+if ( '' === $status && '' !== $tab ) {
+    $status = $tab;
+}
+```
+
+
+
+So this sequence breaks:
+
+```text
+1. Click On Hold → URL/state has status=on-hold
+2. Click Processing → JS sends tab=processing but keeps status=on-hold
+3. Endpoint still uses status=on-hold
+4. Table appears not to change
+```
+
+This is likely the main reason the in-page tabs appear broken.
+
+Required fix in `dtb-admin.js`:
+
+```js
+/* wp/wp-content/mu-plugins/dtb-platform/Admin/assets/dtb-admin.js */
+if ( el.hasAttribute( 'data-dtb-live-tab' ) ) {
+  query.tab = el.getAttribute( 'data-dtb-live-tab' );
+  query.status = query.tab === 'all' ? '' : query.tab;
+  query.paged = 1;
+}
+```
+
+And in `liveNavigate()`, delete empty/null params instead of always setting them.
+
+---
+
+## 3.3 Search inputs are outside live regions and have no live target
+
+Orders renders the search toolbar **before** the live region. The search input has `data-dtb-live-search`, but no target. 
+
+The JS tries to find a region by `data-dtb-live-target`; if missing, it falls back to `closest('[data-dtb-live-region]')`. Since the toolbar is outside the live region, it finds nothing and exits. 
+
+Required fix: make `dtb_admin_ui_search_input()` accept a target ID, or wrap the toolbar inside the live region.
+
+Better fix:
+
+```php
+/* wp/wp-content/mu-plugins/dtb-platform/Admin/AdminUi.php */
+function dtb_admin_ui_search_input(
+    string $placeholder = '',
+    string $value = '',
+    bool $live = true,
+    string $name = 'search',
+    string $live_target = ''
+): string
+```
+
+Then output:
+
+```html
+data-dtb-live-target="dtb-orders-workspace"
+```
+
+Use it like:
+
+```php
+/* wp/wp-content/mu-plugins/dtb-commerce/Admin/OrdersPage.php */
+echo dtb_admin_ui_search_input(
+    __( 'Search orders…', 'drywall-toolbox' ),
+    $search,
+    true,
+    's',
+    'dtb-orders-workspace'
+);
+```
+
+---
+
+## 3.4 Filter chips send `filter`, but endpoints expect `status`
+
+`dtb_admin_ui_filter_chip()` emits `data-dtb-live-filter`. 
+
+The JS converts that into:
+
+```js
+query.filter = ...
+```
+
+
+
+But Orders and Repairs endpoints only define `status`, `s`, and `paged` args.  
+
+So any filter-chip-driven module will fail unless the endpoint also reads `filter`, or the JS maps filter → status.
+
+Recommended fix:
+
+```js
+/* wp/wp-content/mu-plugins/dtb-platform/Admin/assets/dtb-admin.js */
+if ( el.hasAttribute( 'data-dtb-live-filter' ) ) {
+  query.status = el.getAttribute( 'data-dtb-live-filter' );
+  query.paged = 1;
+}
+```
+
+Keep `filter` only for modules that explicitly need a generic filter key.
+
+---
+
+# 4. Why Live Data Is Not Streaming / Syncing
+
+## 4.1 Current live layer is polling, not streaming
+
+`dtb-admin.js` registers live regions and starts `setInterval()` polling when `data-dtb-refresh-interval` is present. 
+
+That is not true streaming. It is interval-based refresh.
+
+Current behavior:
+
+```text
+Orders: poll every 30s
+Repairs: poll every 45s
+Returns: poll every 30s
+```
+
+Orders opens its live region with `interval => 30000`.  Repairs opens with `interval => 45000`.  Returns opens with `interval => 30000`. 
+
+So if you expected actual streaming, that has not been implemented. You currently have polling infrastructure.
+
+Use this rule:
+
+```text
+Queues and dashboards: polling is fine.
+Long-running jobs and observability: use SSE or WebSocket only where needed.
+```
+
+For DTB, I would use:
+
+```text
+Orders / Repairs / Returns / Support: REST polling
+Image Sync / Catalog Scan / System Manager jobs: SSE or short-interval polling while job is active
+```
+
+---
+
+## 4.2 REST responses only return `ok` and `html`
+
+Orders REST returns:
+
+```php
+return new WP_REST_Response( [ 'ok' => true, 'html' => $html ], 200 );
+```
+
+
+
+That is enough to replace the table, but not enough for robust real-time UX.
+
+Missing:
+
+```text
+updated_at
+poll_after_ms
+counts
+active_state
+errors
+version/hash
+```
+
+Recommended response shape:
+
+```json
+{
+  "ok": true,
+  "html": "...",
+  "state": {
+    "tab": "processing",
+    "status": "processing",
+    "search": "",
+    "paged": 1
+  },
+  "summary": {
+    "total": 12,
+    "processing": 4,
+    "pending": 2
+  },
+  "meta": {
+    "updated_at": "2026-05-31T08:21:13-05:00",
+    "poll_after_ms": 30000
+  }
+}
+```
+
+Then the frontend can update tabs, counters, timestamps, and badges, not just table HTML.
+
+---
+
+## 4.3 Empty states can remove live functionality
+
+Orders returns early before opening the live region when there are no orders:
+
+```php
+if ( empty( $orders ) ) {
+    echo dtb_admin_ui_empty_state(...);
+    dtb_admin_shell_close();
+    return;
+}
+```
+
+
+
+Returns does the same when empty. 
+
+That means when a queue is empty, the page has no live region, so tabs/search/refresh cannot recover without a full reload.
+
+Required fix:
+
+```text
+Always render the live region.
+Put the empty state inside the live region.
+Never return before dtb_admin_shell_live_region_open().
+```
+
+---
+
+# 5. Support Is Still Legacy Runtime
+
+Support is not yet fully using the global live system. `AdminAssets.php` still explicitly loads Support’s legacy CSS/JS and localizes `dtbSupportConfig`. 
+
+That means Support is still using an island architecture:
+
+```text
+Global dtb-admin.js
++
+Support-specific dtb-support.js
++
+Support-specific dtb-support.css
++
+Support-specific config object
+```
+
+That is acceptable only temporarily. Final target should be:
+
+```text
+Support-specific JS only handles support business actions:
+- reply
+- assign
+- snooze
+- status transition
+
+Global DtbAdmin handles:
+- live tabs
+- live search
+- live refresh
+- dirty-state protection
+- drawers
+- toasts
+- dropdowns
+```
+
+---
+
+# 6. Required Fix Plan
+
+## P0 — Fix live navigation bugs
+
+Update:
+
+```text
+wp/wp-content/mu-plugins/dtb-platform/Admin/assets/dtb-admin.js
+```
+
+Required changes:
+
+```text
+1. Map live tab → status.
+2. Clear stale status when tab changes.
+3. Map live filter → status unless explicitly overridden.
+4. Reset paged=1 on tab/filter/search changes.
+5. Delete empty query params instead of serializing status=.
+6. Show visible toast on failed liveNavigate().
+7. Add data-dtb-live-target support to search controls.
+```
+
+Core fix:
+
+```js
+/* wp/wp-content/mu-plugins/dtb-platform/Admin/assets/dtb-admin.js */
+if ( el.hasAttribute( 'data-dtb-live-tab' ) ) {
+  const tab = el.getAttribute( 'data-dtb-live-tab' );
+  query.tab = tab;
+  query.status = tab === 'all' ? '' : tab;
+  query.paged = 1;
+}
+
+if ( el.hasAttribute( 'data-dtb-live-filter' ) ) {
+  query.status = el.getAttribute( 'data-dtb-live-filter' );
+  query.paged = 1;
+}
+```
+
+Then in `liveNavigate()`:
+
+```js
+Object.entries( state ).forEach( function ( [ key, value ] ) {
+  if ( value === '' || value === null || value === undefined ) {
+    url.searchParams.delete( key );
+  } else {
+    url.searchParams.set( key, value );
+  }
+});
+```
+
+---
+
+## P1 — Fix Orders page
+
+Update:
+
+```text
+wp/wp-content/mu-plugins/dtb-commerce/Admin/OrdersPage.php
+wp/wp-content/mu-plugins/dtb-commerce/Rest/OrderRestController.php
+```
+
+Required changes:
+
+```text
+1. Change All tab id from '' to 'all'.
+2. Normalize all → empty status in PHP.
+3. Add data-dtb-live-target to search input.
+4. Always render live region even when no orders exist.
+5. Fix order total rendering with wp_kses_post().
+6. Add dtb-table__row and dtb-table__cell classes.
+7. Return response metadata from REST.
+```
+
+The order total fix is mandatory because it is visibly broken in the screenshot.
+
+---
+
+## P2 — Fix Returns page before it hardens
+
+Returns has the same empty-state problem: it returns before opening the live region when there are no matching returns. 
+
+Fix it now while the module is new:
+
+```text
+Always render dtb-returns-workspace.
+Render empty state inside it.
+Ensure tab changes map to status consistently.
+Add live target to search.
+```
+
+---
+
+## P3 — Normalize Repairs
+
+Repairs is closer to correct now. It uses `AdminShell`, `AdminUi`, and a live region. 
+
+Remaining issues:
+
+```text
+1. KPI card links are still normal hrefs.
+2. Search is outside live region without target.
+3. Live tab state can still preserve stale status.
+4. Summary cards do not update when live table updates.
+```
+
+Fix by making KPI cards live controls, or placing KPI cards inside a refreshable summary region.
+
+---
+
+## P4 — Rebrand global theme
+
+Update only the token layer first:
+
+```text
+wp/wp-content/mu-plugins/dtb-platform/Admin/assets/dtb-admin.css
+```
+
+Current primary/info values are template-default. Replace them with DTB brand colors. 
+
+Then audit component hard-coded colors. Examples still exist in CSS, such as chart fallback colors in `dtb-admin.js`.  Those should read from CSS variables instead of hard-coded Modernize colors.
+
+---
+
+# 7. Final Diagnosis
+
+The current admin interface is halfway between:
+
+```text
+Modernize-inspired static admin template
+```
+
+and:
+
+```text
+DTB-branded live operational admin platform
+```
+
+The foundation is there. The failures are specific and fixable:
+
+```text
+Branding:
+- global tokens still use Modernize-default blue/info colors
+
+Tabs:
+- All tab has no live ID in Orders
+- tab clicks preserve stale status params
+- JS sends tab/filter keys that endpoints do not consistently consume
+
+Search:
+- search fields are outside live regions and lack live targets
+
+Live refresh:
+- implemented as polling, not streaming
+- some pages remove live regions on empty results
+- REST responses are too thin for full UI sync
+
+Rendering:
+- Orders table does not fully use global table classes
+- WooCommerce totals are escaped incorrectly
+```
+
+Next implementation should be a focused stabilization pass, not another architecture rewrite.

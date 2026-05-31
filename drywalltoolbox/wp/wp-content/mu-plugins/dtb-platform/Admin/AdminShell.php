@@ -118,9 +118,14 @@ function dtb_admin_shell_render_tabs( array $tabs, string $live_target = '' ): v
 		$role         = empty( $tab['url'] ) || $tab['url'] === '#' ? ' role="tab"' : '';
 		// Live navigation attributes — emitted only when a live_target region ID is provided.
 		$live_attrs = '';
-		if ( $live_target && ! empty( $tab['id'] ) ) {
-			$live_attrs = ' data-dtb-live-tab="' . esc_attr( $tab['id'] ) . '"'
-						. ' data-dtb-live-target="' . esc_attr( $live_target ) . '"';
+		if ( $live_target && isset( $tab['id'] ) ) {
+			// Include 'all' tabs — the JS normalises 'all' → empty status.
+			$tab_id = (string) $tab['id'];
+			if ( '' !== $tab_id || 'all' === strtolower( $tab['label'] ?? '' ) ) {
+				$emit_id    = ( '' === $tab_id ) ? 'all' : $tab_id;
+				$live_attrs = ' data-dtb-live-tab="' . esc_attr( $emit_id ) . '"'
+							. ' data-dtb-live-target="' . esc_attr( $live_target ) . '"';
+			}
 		}
 
 		printf(

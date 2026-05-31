@@ -76,7 +76,7 @@ function dtb_returns_render_page(): void {
 	// Toolbar.
 	dtb_admin_ui_toolbar_open();
 	// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-	echo dtb_admin_ui_search_input( __( 'Search returns…', 'drywall-toolbox' ), $search, true, 's' );
+	echo dtb_admin_ui_search_input( __( 'Search returns…', 'drywall-toolbox' ), $search, true, 's', 'dtb-returns-workspace' );
 	dtb_admin_ui_toolbar_close();
 
 	// Query.
@@ -94,23 +94,24 @@ function dtb_returns_render_page(): void {
 		? (int) ceil( $result['total'] / $result['per_page'] )
 		: 1;
 
-	if ( empty( $items ) ) {
-		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-		echo dtb_admin_ui_empty_state(
-			__( 'No returns found.', 'drywall-toolbox' ),
-			__( 'No return requests match the current filter.', 'drywall-toolbox' )
-		);
-		dtb_admin_shell_close();
-		return;
-	}
-
-	// Live region wraps the data grid.
+	// Live region always wraps the data grid (even when empty, so tabs/search survive).
 	dtb_admin_shell_live_region_open( [
 		'id'       => 'dtb-returns-workspace',
 		'module'   => 'returns',
 		'endpoint' => rest_url( 'dtb/v1/admin/returns' ),
 		'interval' => 30000,
 	] );
+
+	if ( empty( $items ) ) {
+		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		echo dtb_admin_ui_empty_state(
+			__( 'No returns found.', 'drywall-toolbox' ),
+			__( 'No return requests match the current filter.', 'drywall-toolbox' )
+		);
+		dtb_admin_shell_live_region_close();
+		dtb_admin_shell_close();
+		return;
+	}
 
 	// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 	echo dtb_admin_ui_update_badge( 'dtb-returns-workspace' );
@@ -130,15 +131,15 @@ function dtb_returns_render_page(): void {
 		$badge_type  = dtb_admin_ui_status_badge_type( $item->status->value() );
 		$view_url    = admin_url( 'admin.php?page=dtb-returns&action=view&return_id=' . $item->id );
 
-		echo '<tr>';
-		echo '<td>#' . (int) $item->id . '</td>';
-		echo '<td>' . ( $item->order_id ? '<a href="' . esc_url( admin_url( 'post.php?post=' . $item->order_id . '&action=edit' ) ) . '">#' . (int) $item->order_id . '</a>' : '—' ) . '</td>';
-		echo '<td>' . esc_html( $item->customer_name ) . '</td>';
-		echo '<td>' . esc_html( ucwords( str_replace( '_', ' ', $item->resolution ) ) ) . '</td>';
+		echo '<tr class="dtb-table__row">';
+		echo '<td class="dtb-table__cell">#' . (int) $item->id . '</td>';
+		echo '<td class="dtb-table__cell">' . ( $item->order_id ? '<a href="' . esc_url( admin_url( 'post.php?post=' . $item->order_id . '&action=edit' ) ) . '">#' . (int) $item->order_id . '</a>' : '—' ) . '</td>';
+		echo '<td class="dtb-table__cell">' . esc_html( $item->customer_name ) . '</td>';
+		echo '<td class="dtb-table__cell">' . esc_html( ucwords( str_replace( '_', ' ', $item->resolution ) ) ) . '</td>';
 		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-		echo '<td>' . dtb_admin_ui_badge( $item->status->label(), $badge_type ) . '</td>';
-		echo '<td>' . esc_html( wp_date( get_option( 'date_format' ), strtotime( $item->created_at ) ) ) . '</td>';
-		echo '<td><a href="' . esc_url( $view_url ) . '" class="dtb-btn dtb-btn--sm">' . esc_html__( 'View', 'drywall-toolbox' ) . '</a></td>';
+		echo '<td class="dtb-table__cell">' . dtb_admin_ui_badge( $item->status->label(), $badge_type ) . '</td>';
+		echo '<td class="dtb-table__cell">' . esc_html( wp_date( get_option( 'date_format' ), strtotime( $item->created_at ) ) ) . '</td>';
+		echo '<td class="dtb-table__cell"><a href="' . esc_url( $view_url ) . '" class="dtb-btn dtb-btn--sm">' . esc_html__( 'View', 'drywall-toolbox' ) . '</a></td>';
 		echo '</tr>';
 	}
 

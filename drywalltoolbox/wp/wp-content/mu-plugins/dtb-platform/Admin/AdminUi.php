@@ -882,26 +882,30 @@ function dtb_admin_ui_pagination( int $current, int $total, string $base_url = '
  * @param string $value        Current search value.
  * @param bool   $live         If true, adds data-dtb-live-search for JS binding.
  * @param string $name         Input name attribute.
+ * @param string $live_target  Optional ID of the live region to target.
  * @return string
  */
 function dtb_admin_ui_search_input(
 	string $placeholder = '',
 	string $value       = '',
 	bool   $live        = true,
-	string $name        = 'search'
+	string $name        = 'search',
+	string $live_target = ''
 ): string {
-	$live_attr = $live ? ' data-dtb-live-search' : '';
+	$live_attr   = $live ? ' data-dtb-live-search' : '';
+	$target_attr = ( $live && $live_target ) ? ' data-dtb-live-target="' . esc_attr( $live_target ) . '"' : '';
 	$placeholder = $placeholder ?: __( 'Search…', 'drywall-toolbox' );
 
 	return sprintf(
 		'<div class="dtb-search-wrap">
 			<span class="dtb-search-icon dashicons dashicons-search" aria-hidden="true"></span>
-			<input type="search" class="dtb-input dtb-search-input" name="%s" value="%s" placeholder="%s"%s autocomplete="off">
+			<input type="search" class="dtb-input dtb-search-input" name="%s" value="%s" placeholder="%s"%s%s autocomplete="off">
 		</div>',
 		esc_attr( $name ),
 		esc_attr( $value ),
 		esc_attr( $placeholder ),
-		$live_attr
+		$live_attr,
+		$target_attr
 	);
 }
 

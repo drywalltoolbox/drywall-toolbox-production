@@ -23,6 +23,7 @@ function dtb_orders_admin_register_routes(): void {
 		'permission_callback' => fn() => current_user_can( 'dtb_manage_orders' ),
 		'args'                => [
 			'status' => [ 'sanitize_callback' => 'sanitize_key' ],
+			'tab'    => [ 'sanitize_callback' => 'sanitize_key' ],
 			's'      => [ 'sanitize_callback' => 'sanitize_text_field' ],
 			'paged'  => [ 'sanitize_callback' => 'absint' ],
 		],
@@ -32,6 +33,9 @@ function dtb_orders_admin_register_routes(): void {
 function dtb_orders_admin_queue_handler( WP_REST_Request $request ): WP_REST_Response {
 	$status = sanitize_key( $request->get_param( 'status' ) ?? '' );
 	$tab    = sanitize_key( $request->get_param( 'tab' ) ?? '' );
+	// Normalize 'all' (live tab value) to empty string for WC query.
+	if ( 'all' === $status ) $status = '';
+	if ( 'all' === $tab )    $tab    = '';
 	if ( '' === $status && '' !== $tab ) {
 		$status = $tab;
 	}
@@ -87,21 +91,21 @@ function dtb_orders_admin_queue_handler( WP_REST_Request $request ): WP_REST_Res
 			$badge_type   = dtb_admin_ui_status_badge_type( $raw_status );
 			$status_label = wc_get_order_status_name( $raw_status );
 
-			echo '<tr class="dtb-table__row--clickable"'
+			echo '<tr class="dtb-table__row dtb-table__row--clickable"'
 				. ' data-dtb-drawer="dtb-orders-detail-drawer"'
 				. ' data-dtb-drawer-title="' . esc_attr( sprintf( __( 'Order #%s', 'drywall-toolbox' ), $order_id ) ) . '"'
 				. ' data-dtb-field-orderid="' . esc_attr( '#' . $order_id ) . '"'
 				. ' data-dtb-field-customer="' . esc_attr( $order->get_formatted_billing_full_name() ?: __( 'Guest', 'drywall-toolbox' ) ) . '"'
 				. ' data-dtb-field-status="' . esc_attr( $status_label ) . '"'
-				. ' data-dtb-field-total="' . esc_attr( $order->get_formatted_order_total() ) . '"'
+				. ' data-dtb-field-total="' . esc_attr( wp_strip_all_tags( $order->get_formatted_order_total() ) ) . '"'
 				. ' data-dtb-field-date="' . esc_attr( $order->get_date_created() ? $order->get_date_created()->date_i18n( get_option( 'date_format' ) ) : '—' ) . '"'
 				. ' data-dtb-field-viewurl="' . esc_attr( get_edit_post_link( $order_id ) ) . '">';
-			echo '<td><a href="' . esc_url( get_edit_post_link( $order_id ) ) . '">#' . esc_html( $order_id ) . '</a></td>';
-			echo '<td>' . esc_html( $order->get_date_created() ? $order->get_date_created()->date_i18n( get_option( 'date_format' ) ) : '—' ) . '</td>';
-			echo '<td>' . esc_html( $order->get_formatted_billing_full_name() ?: __( 'Guest', 'drywall-toolbox' ) ) . '</td>';
-			echo '<td>' . dtb_admin_ui_badge( esc_html( $status_label ), $badge_type ) . '</td>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-			echo '<td>' . esc_html( $order->get_formatted_order_total() ) . '</td>';
-			echo '<td>';
+			echo '<td class="dtb-table__cell"><a href="' . esc_url( get_edit_post_link( $order_id ) ) . '">#' . esc_html( $order_id ) . '</a></td>';
+			echo '<td class="dtb-table__cell">' . esc_html( $order->get_date_created() ? $order->get_date_created()->date_i18n( get_option( 'date_format' ) ) : '—' ) . '</td>';
+			echo '<td class="dtb-table__cell">' . esc_html( $order->get_formatted_billing_full_name() ?: __( 'Guest', 'drywall-toolbox' ) ) . '</td>';
+			echo '<td class="dtb-table__cell">' . dtb_admin_ui_badge( esc_html( $status_label ), $badge_type ) . '</td>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+			echo '<td class="dtb-table__cell">' . wp_kses_post( $order->get_formatted_order_total() ) . '</td>';
+			echo '<td class="dtb-table__cell">';
 			echo dtb_admin_ui_button( __( 'View', 'drywall-toolbox' ), [ 'href' => get_edit_post_link( $order_id ), 'size' => 'xs', 'type' => 'ghost' ] ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 			echo '</td>';
 			echo '</tr>';
