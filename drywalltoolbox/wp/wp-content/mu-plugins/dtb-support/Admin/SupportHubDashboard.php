@@ -86,7 +86,6 @@ $can_manage_settings = current_user_can( 'dtb_manage_support_settings' ) || curr
 <section class="dtb-ticket-list">
 <div class="dtb-loading" id="dtb-list-loading"><div class="dtb-spinner"></div>Loading queue…</div>
 <div class="dtb-empty" id="dtb-empty-state" style="display:none;">
-<span class="dtb-empty__icon">📭</span>
 <p class="dtb-empty__msg">No tickets in this queue.</p>
 <p class="dtb-empty__sub">Try another queue or clear filters.</p>
 </div>
@@ -111,9 +110,9 @@ $can_manage_settings = current_user_can( 'dtb_manage_support_settings' ) || curr
 
 <div class="dtb-table-footer" id="dtb-pagination" style="display:none;">
 <div class="dtb-pager">
-<button type="button" class="dtb-btn dtb-btn--ghost dtb-btn--sm" id="dtb-prev-page" onclick="dtbSupport.prevPage()">← Prev</button>
+<button type="button" class="dtb-btn dtb-btn--ghost dtb-btn--sm" id="dtb-prev-page" onclick="dtbSupport.prevPage()">Prev</button>
 <span id="dtb-page-info">Page 1 of 1</span>
-<button type="button" class="dtb-btn dtb-btn--ghost dtb-btn--sm" id="dtb-next-page" onclick="dtbSupport.nextPage()">Next →</button>
+<button type="button" class="dtb-btn dtb-btn--ghost dtb-btn--sm" id="dtb-next-page" onclick="dtbSupport.nextPage()">Next</button>
 </div>
 <div id="dtb-last-refresh">Waiting for first refresh…</div>
 </div>
