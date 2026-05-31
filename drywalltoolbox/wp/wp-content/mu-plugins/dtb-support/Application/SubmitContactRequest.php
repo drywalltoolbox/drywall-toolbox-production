@@ -29,7 +29,7 @@ function dtb_support_submit_contact_request( array $data ): array|WP_Error {
 		: dtb_support_default_type();
 
 	$ticket_data = [
-		'type'        => $ticket_type,
+		'ticket_type' => $ticket_type,
 		'status'      => DTB_SUPPORT_STATUS_OPEN,
 		'priority'    => dtb_support_default_priority(),
 		'subject'     => sanitize_text_field( $data['subject'] ?? '' ),
@@ -37,7 +37,7 @@ function dtb_support_submit_contact_request( array $data ): array|WP_Error {
 		'customer_email' => sanitize_email( $data['email'] ?? '' ),
 		'order_id'    => ! empty( $data['order_id'] )   ? absint( $data['order_id'] )   : null,
 		'product_id'  => ! empty( $data['product_id'] ) ? absint( $data['product_id'] ) : null,
-		'body'        => wp_kses_post( $data['message'] ?? '' ),
+		'message'     => wp_kses_post( $data['message'] ?? '' ),
 		'ip_address'  => sanitize_text_field( $_SERVER['REMOTE_ADDR'] ?? '' ),
 		'user_agent'  => sanitize_text_field( $_SERVER['HTTP_USER_AGENT'] ?? '' ),
 		'meta'        => ! empty( $data['meta'] ) && is_array( $data['meta'] ) ? $data['meta'] : [],

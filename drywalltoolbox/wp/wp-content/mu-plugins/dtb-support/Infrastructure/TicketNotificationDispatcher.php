@@ -14,18 +14,28 @@ defined( 'ABSPATH' ) || exit;
 /**
  * Return the from-name for support notification emails.
  *
+ * Reads the saved Support Hub setting first, falls back to blog name.
+ *
  * @return string
  */
 function dtb_support_email_from_name(): string {
-	return (string) apply_filters( 'dtb_support_email_from_name', get_bloginfo( 'name' ) );
+	$saved = (string) get_option( 'dtb_support_from_name', '' );
+	$value = '' !== $saved ? $saved : get_bloginfo( 'name' );
+	return (string) apply_filters( 'dtb_support_email_from_name', $value );
 }
 
 /**
  * Return the from-address for support notification emails.
  *
+ * Reads the saved Support Hub setting first, falls back to site-derived address.
+ *
  * @return string
  */
 function dtb_support_email_from(): string {
+	$saved = (string) get_option( 'dtb_support_from_email', '' );
+	if ( '' !== $saved && is_email( $saved ) ) {
+		return (string) apply_filters( 'dtb_support_email_from', $saved );
+	}
 	$host    = (string) wp_parse_url( home_url(), PHP_URL_HOST );
 	$default = 'support@' . $host;
 	return (string) apply_filters( 'dtb_support_email_from', $default );
@@ -34,10 +44,36 @@ function dtb_support_email_from(): string {
 /**
  * Return the admin/staff recipient address for notification emails.
  *
+ * Reads the saved Support Hub setting first, falls back to WP admin_email.
+ *
  * @return string
  */
 function dtb_support_admin_email(): string {
-	return (string) apply_filters( 'dtb_support_admin_email', get_option( 'admin_email', '' ) );
+	$saved = (string) get_option( 'dtb_support_admin_email', '' );
+	$value = ( '' !== $saved && is_email( $saved ) ) ? $saved : (string) get_option( 'admin_email', '' );
+	return (string) apply_filters( 'dtb_support_admin_email', $value );
+}
+
+// =============================================================================
+// SECTION 1b — WP MAIL FROM HOOKS
+// =============================================================================
+
+/**
+ * Override WordPress' default From address for all dtb-support emails.
+ *
+ * WP ignores From: headers unless these filters are set — this ensures our
+ * configured address is actually used rather than wordpress@domain.
+ */
+add_filter( 'wp_mail_from',      'dtb_support_wp_mail_from'      );
+add_filter( 'wp_mail_from_name', 'dtb_support_wp_mail_from_name' );
+
+function dtb_support_wp_mail_from( string $original ): string {
+	// Only override when we're inside a dtb-support send (guarded by flag).
+	return defined( 'DTB_SUPPORT_SENDING' ) ? dtb_support_email_from() : $original;
+}
+
+function dtb_support_wp_mail_from_name( string $original ): string {
+	return defined( 'DTB_SUPPORT_SENDING' ) ? dtb_support_email_from_name() : $original;
 }
 
 // =============================================================================
@@ -164,6 +200,11 @@ function dtb_support_send_email( string $to, string $template, array $ctx ): boo
 		return $result;
 	}
 
+	// Set flag so wp_mail_from / wp_mail_from_name filters use our configured address.
+	if ( ! defined( 'DTB_SUPPORT_SENDING' ) ) {
+		define( 'DTB_SUPPORT_SENDING', true );
+	}
+
 	$sent = wp_mail(
 		$to,
 		$result['subject'],
@@ -193,7 +234,7 @@ function dtb_support_notify_ticket_opened( object $ticket ): void {
 		'customer_email' => $ticket->customer_email,
 		'ticket_type'    => $ticket->ticket_type,
 		'priority'       => $ticket->priority,
-		'message'        => $ticket->message,
+		'message'        => $ticket->body,
 		'admin_url'      => $admin_url,
 	];
 

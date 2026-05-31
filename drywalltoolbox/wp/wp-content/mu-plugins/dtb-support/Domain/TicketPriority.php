@@ -54,7 +54,7 @@ function dtb_support_sla_hours( string $priority ): int {
 		'high'   => 8,
 		'urgent' => 2,
 	];
-	return (int) apply_filters( 'dtb_support_sla_hours', $map[ $priority ] ?? 24, $priority );
+	return (int) apply_filters( 'dtb_support_sla_hours', $map[ $priority ] ?? 24 );
 }
 
 /**

@@ -79,6 +79,22 @@ export async function searchProducts( query, params = {} ) {
   return apiClient( `/wp-json/drywall/v1/search?${ qs }` );
 }
 
+/**
+ * Search parent products by partial variation SKU token.
+ *
+ * Example: q=PAHC should return the parent variable product even when
+ * parent product text fields do not include the variation SKU token.
+ *
+ * @param {string} query
+ * @param {Object} params  Additional params (limit)
+ * @returns {Promise<any>}
+ */
+export async function searchProductsByVariationSku( query, params = {} ) {
+  const merged = { q: query, ...params };
+  const qs = new URLSearchParams( merged ).toString();
+  return apiClient( `/wp-json/drywall/v1/search/variation-sku?${ qs }` );
+}
+
 // ─── Backward-compatible helpers (used by Schematics.jsx / services/) ─────────
 
 /**

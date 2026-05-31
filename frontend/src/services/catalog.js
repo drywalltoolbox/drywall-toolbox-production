@@ -16,7 +16,11 @@
  * All paths return objects in the normalizeProduct() shape from services/api.js.
  */
 
-import { fetchProducts as proxyFetchProducts, fetchProduct as proxyFetchProduct } from '../api/products.js';
+import {
+  fetchProducts as proxyFetchProducts,
+  fetchProduct as proxyFetchProduct,
+  searchProductsByVariationSku as proxySearchProductsByVariationSku,
+} from '../api/products.js';
 import { normalizeProduct } from '../services/api.js';
 import { readCache, writeCache, bustCache, isCacheAvailable } from './productCache.js';
 
@@ -227,6 +231,84 @@ export async function getProductById(idOrSku) {
   );
 }
 
+function normalizeSearchValue(value) {
+  return String(value || '').trim().toLowerCase();
+}
+
+function canonicalSearchValue(value) {
+  return normalizeSearchValue(value).replace(/[^a-z0-9]/g, '');
+}
+
+function isLikelySkuQuery(value) {
+  const normalized = normalizeSearchValue(value);
+  if (!normalized || normalized.length < 3) return false;
+  if (normalized.includes(' ')) return false;
+  return /^[a-z0-9._-]+$/i.test(normalized);
+}
+
+function flattenMetaValue(value) {
+  if (value == null) return '';
+  if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
+    return String(value);
+  }
+  if (Array.isArray(value)) {
+    return value.map(flattenMetaValue).filter(Boolean).join(' ');
+  }
+  if (typeof value === 'object') {
+    return Object.values(value).map(flattenMetaValue).filter(Boolean).join(' ');
+  }
+  return '';
+}
+
+function scoreSearchResult(product, q, qCanonical) {
+  const name = normalizeSearchValue(product?.name);
+  const sku = normalizeSearchValue(product?.sku);
+  const partNumber = normalizeSearchValue(product?.part_number);
+  const upc = normalizeSearchValue(product?.upc);
+  const brand = normalizeSearchValue(product?.brand);
+  const slug = normalizeSearchValue(product?.slug);
+  const description = normalizeSearchValue(`${product?.short_description || ''} ${product?.description_full || ''}`);
+  const metaText = normalizeSearchValue(
+    (Array.isArray(product?.meta_data) ? product.meta_data : [])
+      .map((entry) => flattenMetaValue(entry?.value))
+      .join(' ')
+  );
+  const categoryText = normalizeSearchValue(
+    (Array.isArray(product?.categories) ? product.categories : [])
+      .map((category) => category?.name || category?.slug || '')
+      .join(' ')
+  );
+
+  const skuFields = [sku, partNumber, upc].filter(Boolean);
+  const skuCanonicals = skuFields.map((value) => canonicalSearchValue(value));
+
+  if (skuCanonicals.some((value) => value && value === qCanonical)) return 1200;
+  if (skuCanonicals.some((value) => value && value.startsWith(qCanonical))) return 1100;
+  if (skuFields.some((value) => value.includes(q))) return 1000;
+  if (name.startsWith(q)) return 920;
+  if (name.includes(q)) return 860;
+  if (brand.startsWith(q)) return 820;
+  if (brand.includes(q)) return 780;
+  if (slug.includes(q)) return 730;
+  if (categoryText.includes(q)) return 700;
+  if (description.includes(q)) return 650;
+  if (metaText.includes(q)) return 620;
+
+  if (qCanonical.length >= 3) {
+    const canonicalHaystacks = [
+      canonicalSearchValue(name),
+      canonicalSearchValue(brand),
+      canonicalSearchValue(slug),
+      canonicalSearchValue(categoryText),
+      canonicalSearchValue(description),
+      canonicalSearchValue(metaText),
+    ];
+    if (canonicalHaystacks.some((value) => value.includes(qCanonical))) return 560;
+  }
+
+  return 0;
+}
+
 /**
  * Full-text product search across name, SKU, UPC, and brand.
  * Uses the local catalog to avoid per-keystroke API traffic.
@@ -235,18 +317,71 @@ export async function getProductById(idOrSku) {
  * @returns {Promise<Object[]>}
  */
 export async function searchProducts(query) {
-  if (!query) return getProducts();
+  const trimmed = String(query || '').trim();
+  if (!trimmed) return getProducts();
 
-  // In-memory fallback
-  const q   = query.toLowerCase();
+  const q = normalizeSearchValue(trimmed);
+  const qCanonical = canonicalSearchValue(trimmed);
   const all = await loadCatalog();
-  return all.filter(p =>
-    (p.name         || '').toLowerCase().includes(q) ||
-    (p.sku          || '').toLowerCase().includes(q) ||
-    (p.upc          || '').toLowerCase().includes(q) ||
-    (p.brand        || '').toLowerCase().includes(q) ||
-    (p.part_number  || '').toLowerCase().includes(q)
-  );
+  const byId = new Map(all.map((product) => [Number(product?.id || 0), product]));
+
+  const rankedLocalResults = all
+    .map((product) => ({ product, score: scoreSearchResult(product, q, qCanonical) }))
+    .filter(({ score }) => score > 0)
+    .sort((a, b) => {
+      if (b.score !== a.score) return b.score - a.score;
+      return String(a.product?.name || '').localeCompare(String(b.product?.name || ''));
+    })
+    .map(({ product }) => product);
+
+  if (rankedLocalResults.length > 0) return rankedLocalResults;
+  if (!isLikelySkuQuery(trimmed)) return [];
+
+  try {
+    // Exact-SKU fallback against live WooCommerce data.
+    // This catches child-variation SKUs that may not exist on parent name fields.
+    const live = await proxyFetchProducts({ sku: trimmed, per_page: 20, status: 'publish' });
+    const normalized = (Array.isArray(live) ? live : live?.products || [])
+      .map(normalizeProduct)
+      .filter(Boolean);
+
+    const mappedToParents = normalized.map((item) => {
+      if (item.type === 'variation' && item.parent_id) {
+        return byId.get(Number(item.parent_id)) || item;
+      }
+      return item;
+    });
+
+    const deduped = [];
+    const seen = new Set();
+    mappedToParents.forEach((item) => {
+      const key = String(item?.id || item?.slug || item?.sku || '');
+      if (!key || seen.has(key)) return;
+      seen.add(key);
+      deduped.push(item);
+    });
+
+    if (deduped.length > 0) return deduped;
+
+    // Partial variation-SKU fallback (e.g. "PAHC" token).
+    const variationLive = await proxySearchProductsByVariationSku(trimmed, { limit: 24 });
+    const variationNormalized = (Array.isArray(variationLive) ? variationLive : variationLive?.products || [])
+      .map(normalizeProduct)
+      .filter(Boolean);
+
+    const variationDeduped = [];
+    const variationSeen = new Set();
+    variationNormalized.forEach((item) => {
+      const key = String(item?.id || item?.slug || item?.sku || '');
+      if (!key || variationSeen.has(key)) return;
+      variationSeen.add(key);
+      variationDeduped.push(item);
+    });
+
+    return variationDeduped;
+  } catch {
+    return [];
+  }
 }
 
 /**

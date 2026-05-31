@@ -9,21 +9,32 @@
  * - Tax/shipping estimates are provisional unless returned by Store API.
  */
 
-function parseMoney(value) {
+function parseMoney(value, minorUnit = null) {
+  const rawString = String(value ?? '').trim();
   const raw = typeof value === 'number'
     ? value
-    : parseFloat(String(value || '0'));
+    : parseFloat(rawString || '0');
 
   if (!Number.isFinite(raw)) return 0;
 
-  // Woo Store API totals are commonly integer minor units.
+  const parsedMinor = Number(minorUnit);
+  const hasMinorUnit = Number.isFinite(parsedMinor) && parsedMinor >= 0;
+  const hasDecimalPoint = rawString.includes('.');
+
+  // Woo Store API totals are typically integer minor units with
+  // currency_minor_unit metadata.
+  if (hasMinorUnit && Number.isInteger(raw) && !hasDecimalPoint) {
+    return raw / (10 ** parsedMinor);
+  }
+
+  // Fallback for payloads that do not include minor-unit metadata.
   return raw > 999 ? raw / 100 : raw;
 }
 
 export function getAuthoritativeSubtotal(cart, cartItems = []) {
   const storeSubtotal = cart?.totals?.subtotal;
   if (storeSubtotal != null) {
-    return parseMoney(storeSubtotal);
+    return parseMoney(storeSubtotal, cart?.totals?.currency_minor_unit);
   }
 
   return cartItems.reduce(
@@ -35,7 +46,7 @@ export function getAuthoritativeSubtotal(cart, cartItems = []) {
 export function getAuthoritativeTax(cart, fallbackSubtotal = 0, fallbackRate = 0.08) {
   const storeTax = cart?.totals?.total_tax;
   if (storeTax != null) {
-    return parseMoney(storeTax);
+    return parseMoney(storeTax, cart?.totals?.currency_minor_unit);
   }
 
   return fallbackSubtotal * fallbackRate;
@@ -44,7 +55,7 @@ export function getAuthoritativeTax(cart, fallbackSubtotal = 0, fallbackRate = 0
 export function getAuthoritativeShipping(cart, fallbackShipping = 0) {
   const storeShipping = cart?.totals?.total_shipping;
   if (storeShipping != null) {
-    return parseMoney(storeShipping);
+    return parseMoney(storeShipping, cart?.totals?.currency_minor_unit);
   }
 
   return fallbackShipping;
@@ -53,7 +64,7 @@ export function getAuthoritativeShipping(cart, fallbackShipping = 0) {
 export function getAuthoritativeTotal(cart, subtotal, shipping, tax) {
   const storeTotal = cart?.totals?.total_price;
   if (storeTotal != null) {
-    return parseMoney(storeTotal);
+    return parseMoney(storeTotal, cart?.totals?.currency_minor_unit);
   }
 
   return subtotal + shipping + tax;

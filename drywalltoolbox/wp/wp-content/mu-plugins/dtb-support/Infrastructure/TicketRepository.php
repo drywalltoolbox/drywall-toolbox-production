@@ -224,8 +224,11 @@ function dtb_support_query_tickets( array $args = [] ): array {
 	$tickets = $params ? $wpdb->get_results( $wpdb->prepare( $rows_sql, ...$rows_params ) ) : $wpdb->get_results( $wpdb->prepare( $rows_sql, $per_page, $offset ) );
 
 	return [
-		'tickets' => $tickets ?: [],
-		'total'   => $total,
+		'tickets'    => $tickets ?: [],
+		'total'      => $total,
+		'page'       => $page,
+		'per_page'   => $per_page,
+		'page_count' => $per_page > 0 ? (int) ceil( $total / $per_page ) : 1,
 	];
 }
 

@@ -8,6 +8,18 @@
 defined( 'ABSPATH' ) || exit;
 
 // ---------------------------------------------------------------------------
+// STATUS CONSTANTS
+// ---------------------------------------------------------------------------
+
+if ( ! defined( 'DTB_SUPPORT_STATUS_OPEN' ) )             define( 'DTB_SUPPORT_STATUS_OPEN',             'open' );
+if ( ! defined( 'DTB_SUPPORT_STATUS_PENDING_CUSTOMER' ) ) define( 'DTB_SUPPORT_STATUS_PENDING_CUSTOMER', 'pending_customer' );
+if ( ! defined( 'DTB_SUPPORT_STATUS_PENDING_STAFF' ) )    define( 'DTB_SUPPORT_STATUS_PENDING_STAFF',    'pending_staff' );
+if ( ! defined( 'DTB_SUPPORT_STATUS_IN_PROGRESS' ) )      define( 'DTB_SUPPORT_STATUS_IN_PROGRESS',      'in_progress' );
+if ( ! defined( 'DTB_SUPPORT_STATUS_RESOLVED' ) )         define( 'DTB_SUPPORT_STATUS_RESOLVED',         'resolved' );
+if ( ! defined( 'DTB_SUPPORT_STATUS_CLOSED' ) )           define( 'DTB_SUPPORT_STATUS_CLOSED',           'closed' );
+if ( ! defined( 'DTB_SUPPORT_STATUS_SPAM' ) )             define( 'DTB_SUPPORT_STATUS_SPAM',             'spam' );
+
+// ---------------------------------------------------------------------------
 // STATUS REGISTRY
 // ---------------------------------------------------------------------------
 

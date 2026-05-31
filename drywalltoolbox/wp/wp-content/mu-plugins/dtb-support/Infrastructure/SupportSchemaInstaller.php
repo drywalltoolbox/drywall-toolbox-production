@@ -101,3 +101,17 @@ function dtb_support_force_reinstall_schema(): void {
 	delete_option( 'dtb_support_db_version' );
 	dtb_support_maybe_install_schema();
 }
+
+/**
+ * Grant the `dtb_manage_support` capability to the administrator role.
+ *
+ * Runs on every load but is a no-op once the cap is already present (WP
+ * stores capabilities in the role option, so this only writes on first run).
+ */
+function dtb_support_grant_admin_capability(): void {
+	$role = get_role( 'administrator' );
+	if ( $role && ! $role->has_cap( 'dtb_manage_support' ) ) {
+		$role->add_cap( 'dtb_manage_support' );
+	}
+}
+add_action( 'init', 'dtb_support_grant_admin_capability', 1 );

@@ -21,9 +21,22 @@ export function useCart() {
   return context;
 }
 
-function parsePriceFromStoreApi(value) {
-  const raw = typeof value === 'number' ? value : parseFloat(String(value || '0'));
+function parsePriceFromStoreApi(value, minorUnit = null) {
+  const rawString = String(value ?? '').trim();
+  const raw = typeof value === 'number' ? value : parseFloat(rawString || '0');
   if (!Number.isFinite(raw)) return 0;
+
+  const parsedMinor = Number(minorUnit);
+  const hasMinorUnit = Number.isFinite(parsedMinor) && parsedMinor >= 0;
+  const hasDecimalPoint = rawString.includes('.');
+
+  // Woo Store API price fields are typically integer minor units with a
+  // companion currency_minor_unit. Example: "100" + minor_unit=2 => $1.00.
+  if (hasMinorUnit && Number.isInteger(raw) && !hasDecimalPoint) {
+    return raw / (10 ** parsedMinor);
+  }
+
+  // Fallback for payloads that omit minor-unit metadata.
   return raw > 999 ? raw / 100 : raw;
 }
 
@@ -46,7 +59,7 @@ function normalizeStoreCartItem(item) {
     key: item.key,
     name: decodeHtmlEntities(item.name),
     brand: item.brand || '',
-    price: parsePriceFromStoreApi(item?.prices?.price ?? item?.price),
+    price: parsePriceFromStoreApi(item?.prices?.price ?? item?.price, item?.prices?.currency_minor_unit),
     image: getStoreItemImage(item),
     part_number: item.sku || String(item.id || ''),
     sku: item.sku || '',
@@ -328,7 +341,7 @@ export function CartProvider({ children }) {
   const getCartTotal = useCallback(() => {
     const safeItems = asCartItems(cartItems);
     const totalPrice = cart?.totals?.total_price;
-    if (totalPrice != null) return parsePriceFromStoreApi(totalPrice);
+    if (totalPrice != null) return parsePriceFromStoreApi(totalPrice, cart?.totals?.currency_minor_unit);
     return safeItems.reduce((total, item) => total + (item.price * item.quantity), 0);
   }, [cart, cartItems]);
 

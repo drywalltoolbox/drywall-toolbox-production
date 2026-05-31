@@ -76,15 +76,16 @@ function resolvePreferredPaymentMethod( methods = [] ) {
   return ( online?.id || methods[0]?.id || '' );
 }
 
-// BNPL gateway identifier keywords — update when adding new providers.
-const BNPL_KEYWORDS = ['klarna', 'affirm', 'afterpay', 'bnpl', 'pay_later'];
 // Card gateway identifier keywords.
 const CARD_KEYWORDS = ['stripe', 'square', 'card', 'credit'];
 
-function paymentTabForMethod( methodId = '' ) {
+function paymentProviderForMethod( methodId = '' ) {
   const m = String( methodId ).toLowerCase();
   if ( m.includes( 'paypal' ) ) return 'paypal';
-  if ( BNPL_KEYWORDS.some( ( kw ) => m.includes( kw ) ) ) return 'bnpl';
+  if ( m.includes( 'klarna' ) ) return 'klarna';
+  if ( m.includes( 'google' ) || m.includes( 'gpay' ) ) return 'google_pay';
+  if ( m.includes( 'apple' ) || m.includes( 'applepay' ) ) return 'apple_pay';
+  if ( m.includes( 'affirm' ) ) return 'affirm';
   if ( CARD_KEYWORDS.some( ( kw ) => m.includes( kw ) ) ) return 'card';
   return 'other';
 }
@@ -109,6 +110,9 @@ function resolveCartItemImage( item ) {
 const PAYMENT_LOGO_BASE = `${ process.env.PUBLIC_URL || '' }/payment_logos`;
 const APPLE_PAY_LOGO = `${ PAYMENT_LOGO_BASE }/apple-pay.svg`;
 const GOOGLE_PAY_LOGO = `${ PAYMENT_LOGO_BASE }/google-pay.svg`;
+const PAYPAL_LOGO = `${ PAYMENT_LOGO_BASE }/paypal.svg`;
+const KLARNA_LOGO = `${ PAYMENT_LOGO_BASE }/klarna.svg`;
+const AFFIRM_LOGO = `${ PAYMENT_LOGO_BASE }/affirm.svg`;
 const VISA_LOGO = `${ PAYMENT_LOGO_BASE }/visa.svg`;
 const MASTERCARD_LOGO = `${ PAYMENT_LOGO_BASE }/mastercard.svg`;
 const AMERICAN_EXPRESS_LOGO = `${ PAYMENT_LOGO_BASE }/american-express.svg`;
@@ -118,6 +122,17 @@ const CHECKOUT_CARD_BRAND_LOGOS = [
   { key: 'mastercard', src: MASTERCARD_LOGO, alt: 'Mastercard', className: 'h-[12px]' },
   { key: 'amex', src: AMERICAN_EXPRESS_LOGO, alt: 'American Express', className: 'h-[11px]' },
 ];
+
+const CHECKOUT_PROVIDER_BUTTONS = [
+  { key: 'paypal', label: 'PayPal', src: PAYPAL_LOGO, className: 'h-[32px] sm:h-[42px]' },
+  { key: 'klarna', label: 'Klarna', src: KLARNA_LOGO, className: 'h-[36px] sm:h-[42px]' },
+  { key: 'google_pay', label: 'Google Pay', src: GOOGLE_PAY_LOGO, className: 'h-[32px] sm:h-[42px]' },
+  { key: 'apple_pay', label: 'Apple Pay', src: APPLE_PAY_LOGO, className: 'h-[32px] sm:h-[42px]' },
+  { key: 'affirm', label: 'Affirm', src: AFFIRM_LOGO, className: 'h-[36px] sm:h-[42px]' },
+];
+
+const EXPRESS_PROVIDER_KEYS = [ 'paypal', 'apple_pay', 'google_pay' ];
+const BNPL_PROVIDER_KEYS = [ 'affirm', 'klarna' ];
 
 // ─── StepProgress ─────────────────────────────────────────────────────────────
 // Visual 3-step checkout progress indicator.
@@ -527,7 +542,14 @@ export default function Checkout() {
   const [step,          setStep         ] = useState( 'form' ); // 'form' | 'syncing' | 'placing'
   const [paymentMethod, setPaymentMethod] = useState( '' );
   const [paymentMethods, setPaymentMethods] = useState( [] );
-  const [paymentTab, setPaymentTab] = useState( 'card' );
+  const [selectedProvider, setSelectedProvider] = useState( 'card' );
+  const [cardDetails, setCardDetails] = useState( {
+    cardNumber: '',
+    cardholder: '',
+    expiry: '',
+    cvc: '',
+    postalCode: '',
+  } );
   const [couponInput, setCouponInput] = useState( '' );
   const [manualCoupons, setManualCoupons] = useState( [] );
 
@@ -572,41 +594,100 @@ export default function Checkout() {
         const preferredMethod = resolvePreferredPaymentMethod( methods );
         if ( preferredMethod ) {
           setPaymentMethod( preferredMethod );
-          setPaymentTab( paymentTabForMethod( preferredMethod ) );
+          const provider = paymentProviderForMethod( preferredMethod );
+          setSelectedProvider( provider === 'other' ? 'card' : provider );
         }
       } )
       .catch( () => {} );
     return () => { mounted = false; };
   }, [] );
 
+  const onlinePaymentMethods = useMemo(
+    () => paymentMethods.filter( ( method ) => ! isManualPaymentMethod( method ) ),
+    [ paymentMethods ],
+  );
+
   const selectedPaymentMethod = useMemo(
     () => paymentMethods.find( ( method ) => method.id === paymentMethod ) || null,
     [ paymentMethod, paymentMethods ],
   );
-  const filteredPaymentMethods = useMemo(
-    () => paymentMethods.filter( ( method ) => paymentTabForMethod( method.id ) === paymentTab ),
-    [ paymentMethods, paymentTab ],
+
+  const paymentMethodsByProvider = useMemo( () => {
+    const buckets = {
+      paypal: [],
+      klarna: [],
+      google_pay: [],
+      apple_pay: [],
+      affirm: [],
+      card: [],
+      other: [],
+    };
+    onlinePaymentMethods.forEach( ( method ) => {
+      const provider = paymentProviderForMethod( method.id );
+      if ( buckets[provider] ) buckets[provider].push( method );
+      else buckets.other.push( method );
+    } );
+    return buckets;
+  }, [ onlinePaymentMethods ] );
+
+  const providerButtonsByKey = useMemo(
+    () => Object.fromEntries( CHECKOUT_PROVIDER_BUTTONS.map( ( provider ) => [ provider.key, provider ] ) ),
+    [],
+  );
+
+  const handleSelectProvider = useCallback( ( providerKey ) => {
+    setSelectedProvider( providerKey );
+    const directMatch = paymentMethodsByProvider[providerKey]?.[0];
+    if ( directMatch ) {
+      setPaymentMethod( directMatch.id );
+      return;
+    }
+    const cardFallback = paymentMethodsByProvider.card?.[0] || onlinePaymentMethods[0];
+    if ( cardFallback ) {
+      setPaymentMethod( cardFallback.id );
+    }
+  }, [ onlinePaymentMethods, paymentMethodsByProvider ] );
+
+  const activeProviderMethod = useMemo(
+    () => paymentMethodsByProvider[selectedProvider]?.[0] || null,
+    [ paymentMethodsByProvider, selectedProvider ],
   );
 
   useEffect( () => {
-    if ( filteredPaymentMethods.length === 0 ) return;
-    const existsInTab = filteredPaymentMethods.some( ( method ) => method.id === paymentMethod );
-    if ( !existsInTab ) {
-      setPaymentMethod( filteredPaymentMethods[0].id );
+    if ( paymentMethods.length === 0 ) return;
+    const exists = paymentMethods.some( ( method ) => method.id === paymentMethod );
+    if ( exists ) return;
+    const preferredMethod = resolvePreferredPaymentMethod( paymentMethods );
+    if ( preferredMethod ) {
+      setPaymentMethod( preferredMethod );
+      const provider = paymentProviderForMethod( preferredMethod );
+      setSelectedProvider( provider === 'other' ? 'card' : provider );
     }
-  }, [ filteredPaymentMethods, paymentMethod ] );
-
-  // Clear the selected payment method when the user switches to the BNPL tab
-  // (coming-soon tab has no real methods; clearing ensures checkout stays disabled
-  // until the user switches back to a tab with a valid method selected).
-  useEffect( () => {
-    if ( paymentTab === 'bnpl' ) setPaymentMethod( '' );
-  }, [ paymentTab ] );
+  }, [ paymentMethod, paymentMethods ] );
 
   const manualPaymentSelected = useMemo(
     () => isManualPaymentMethod( selectedPaymentMethod || paymentMethod ),
     [ paymentMethod, selectedPaymentMethod ],
   );
+
+  const handleCardDetailsChange = useCallback( ( e ) => {
+    const { name, value } = e.target;
+    setCardDetails( ( prev ) => {
+      let next = value;
+      if ( name === 'cardNumber' ) {
+        const digits = value.replace( /\D/g, '' ).slice( 0, 19 );
+        next = digits.replace( /(.{4})/g, '$1 ' ).trim();
+      } else if ( name === 'expiry' ) {
+        const digits = value.replace( /\D/g, '' ).slice( 0, 4 );
+        next = digits.length > 2 ? `${ digits.slice( 0, 2 ) }/${ digits.slice( 2 ) }` : digits;
+      } else if ( name === 'cvc' ) {
+        next = value.replace( /\D/g, '' ).slice( 0, 4 );
+      } else if ( name === 'postalCode' ) {
+        next = value.replace( /[^a-zA-Z0-9 -]/g, '' ).slice( 0, 12 );
+      }
+      return { ...prev, [name]: next };
+    } );
+  }, [] );
 
   const pointsUsd         = pointsToUsd( pointsToRedeem );
   const availablePts      = pointsBalance?.points ?? 0;
@@ -1311,166 +1392,192 @@ export default function Checkout() {
 
               {/* ── Payment ──────────────────────────────────────────────── */}
               <StepCard delay={ 0.21 } className="p-5 sm:p-6" id="payment-section">
-                <div className="flex items-center justify-between mb-5">
-                  <div className="flex items-center gap-2.5">
-                    <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-primary-50 text-primary-600">
-                      <CreditCard size={ 15 } strokeWidth={ 2 } />
-                    </span>
-                    <h2 className="text-[0.95rem] font-bold text-slate-900 tracking-tight">Payment</h2>
-                  </div>
-                  <div className="flex items-center gap-2 flex-wrap justify-end max-w-50">
-                    { CHECKOUT_CARD_BRAND_LOGOS.map( ( logo ) => (
-                      <img
-                        key={ logo.key }
-                        src={ logo.src }
-                        alt={ logo.alt }
-                        className={ `${ logo.className } w-auto object-contain shrink-0` }
-                        loading="lazy"
-                        decoding="async"
-                      />
-                    ) ) }
-                  </div>
+                <div className="flex items-center gap-2.5 mb-5">
+                  <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-primary-50 text-primary-600">
+                    <CreditCard size={ 15 } strokeWidth={ 2 } />
+                  </span>
+                  <h2 className="text-[0.95rem] font-bold text-slate-900 tracking-tight">Payment</h2>
                 </div>
 
-                {/* Express checkout row */}
-                <div className="mb-5">
-                  <p className="text-[10px] font-bold uppercase tracking-[0.13em] text-slate-400 mb-2.5 text-center">
-                    Express Checkout
-                  </p>
-                  <div className="grid grid-cols-2 gap-2 mb-4">
-                    <button
-                      type="button"
-                      disabled
-                      title="Apple Pay coming soon"
-                      className="relative flex items-center justify-center gap-2 h-11 rounded-xl bg-black border border-black/80 text-white text-[13px] font-semibold opacity-60 cursor-not-allowed select-none"
-                    >
-                      <img src={ APPLE_PAY_LOGO } alt="Apple Pay" className="h-[13px] w-auto object-contain" loading="lazy" decoding="async" />
-                      <span className="absolute -top-2 -right-1.5 bg-slate-200 text-slate-600 text-[8px] font-bold px-1.5 py-0.5 rounded-full leading-none">
-                        Soon
-                      </span>
-                    </button>
-                    <button
-                      type="button"
-                      disabled
-                      title="Google Pay coming soon"
-                      className="relative flex items-center justify-center gap-2 h-11 rounded-xl bg-white border border-slate-200 text-[13px] font-semibold text-slate-700 opacity-60 cursor-not-allowed select-none"
-                    >
-                      <img src={ GOOGLE_PAY_LOGO } alt="Google Pay" className="h-[16px] w-auto object-contain" loading="lazy" decoding="async" />
-                      <span className="absolute -top-2 -right-1.5 bg-slate-200 text-slate-600 text-[8px] font-bold px-1.5 py-0.5 rounded-full leading-none">
-                        Soon
-                      </span>
-                    </button>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <div className="flex-1 h-px bg-slate-200" />
-                    <span className="text-[11px] text-slate-400 font-medium whitespace-nowrap">or pay another way</span>
-                    <div className="flex-1 h-px bg-slate-200" />
-                  </div>
-                </div>
-
-                {/* Payment type tabs */}
-                <div className="flex gap-1 p-1 bg-slate-100 rounded-xl mb-5">
-                  { [
-                    { id: 'card',   label: 'Card' },
-                    { id: 'paypal', label: 'PayPal' },
-                    { id: 'bnpl',   label: 'Pay Later' },
-                    { id: 'other',  label: 'Other' },
-                  ].map( ( tab ) => (
-                    <button
-                      key={ tab.id }
-                      type="button"
-                      onClick={ () => setPaymentTab( tab.id ) }
-                      className={ `flex-1 rounded-lg py-2 text-[11px] font-semibold transition-all
-                                   ${ paymentTab === tab.id
-                                     ? 'bg-white text-slate-900 shadow-sm'
-                                     : 'text-slate-500 hover:text-slate-700' }` }
-                    >
-                      { tab.label }
-                    </button>
-                  ) ) }
-                </div>
-
-                {/* BNPL coming-soon cards (always shown when on bnpl tab) */}
-                { paymentTab === 'bnpl' && (
-                  <div className="mb-4 space-y-2.5">
-                    <div className="flex items-center gap-3.5 rounded-xl border border-pink-200/60 bg-[#fdf0f4] px-4 py-3.5">
-                      <div className="h-8 w-8 shrink-0 rounded-lg bg-[#ffb3c7] flex items-center justify-center">
-                        <span className="text-[#17120e] text-sm font-black">K</span>
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-bold text-slate-900">Klarna</p>
-                        <p className="text-xs text-slate-500 mt-0.5">Pay in 4 · 0% interest · No fees</p>
-                      </div>
-                      <span className="shrink-0 text-[10px] font-bold bg-pink-100 text-pink-600 px-2 py-0.5 rounded-full">
-                        Coming Soon
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-3.5 rounded-xl border border-indigo-200/60 bg-indigo-50 px-4 py-3.5">
-                      <div className="h-8 w-8 shrink-0 rounded-lg bg-indigo-100 flex items-center justify-center">
-                        <span className="text-indigo-700 text-[10px] font-black leading-none">aff</span>
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-bold text-slate-900">Affirm</p>
-                        <p className="text-xs text-slate-500 mt-0.5">Monthly payments · 0–30% APR</p>
-                      </div>
-                      <span className="shrink-0 text-[10px] font-bold bg-indigo-100 text-indigo-600 px-2 py-0.5 rounded-full">
-                        Coming Soon
-                      </span>
-                    </div>
-                    <p className="text-[11px] text-slate-400 text-center pt-1">
-                      Buy now, pay later options launching soon.
+                {/* Provider quick-pay buttons */}
+                <div className="mb-6 space-y-5">
+                  <div>
+                    <p className="text-[10px] font-bold uppercase tracking-[0.13em] text-slate-400 mb-2.5">
+                      Express Checkout
                     </p>
+                    <div className="flex items-center justify-between gap-1.5 sm:gap-3 pb-1">
+                      { EXPRESS_PROVIDER_KEYS.map( ( key ) => {
+                        const provider = providerButtonsByKey[key];
+                        if ( !provider ) return null;
+                        const isSelected = selectedProvider === provider.key;
+                        const isAvailable = Boolean( paymentMethodsByProvider[provider.key]?.length );
+                        return (
+                          <button
+                            key={ provider.key }
+                            type="button"
+                            onClick={ () => handleSelectProvider( provider.key ) }
+                            className={ `relative inline-flex items-center justify-center shrink-0 rounded-xl p-0 bg-transparent border-0 transition-all
+                                         ${ isSelected ? 'ring-2 ring-primary-500/35' : '' }` }
+                          >
+                            <img
+                              src={ provider.src }
+                              alt={ provider.label }
+                              className={ `${ provider.className } w-auto object-contain mx-auto` }
+                              loading="lazy"
+                              decoding="async"
+                            />
+                            { !isAvailable && (
+                              <span className="absolute -top-1.5 -right-1 bg-slate-200 text-slate-600 text-[8px] font-bold px-1.5 py-0.5 rounded-full leading-none">
+                                Soon
+                              </span>
+                            ) }
+                          </button>
+                        );
+                      } ) }
+                    </div>
                   </div>
-                ) }
 
-                {/* Standard payment method error (non-BNPL tabs only) */}
-                { paymentTab !== 'bnpl' && paymentMethods.length === 0 && (
+                  <div>
+                    <p className="text-[10px] font-bold uppercase tracking-[0.13em] text-slate-400 mb-2.5">
+                      Buy Now Pay Later
+                    </p>
+                    <div className="flex items-center justify-between gap-2 sm:gap-3 pb-1">
+                      { BNPL_PROVIDER_KEYS.map( ( key ) => {
+                        const provider = providerButtonsByKey[key];
+                        if ( !provider ) return null;
+                        const isSelected = selectedProvider === provider.key;
+                        const isAvailable = Boolean( paymentMethodsByProvider[provider.key]?.length );
+                        return (
+                          <button
+                            key={ provider.key }
+                            type="button"
+                            onClick={ () => handleSelectProvider( provider.key ) }
+                            className={ `relative inline-flex items-center justify-center shrink-0 rounded-xl p-0 bg-transparent border-0 transition-all
+                                         ${ isSelected ? 'ring-2 ring-primary-500/35' : '' }` }
+                          >
+                            <img
+                              src={ provider.src }
+                              alt={ provider.label }
+                              className={ `${ provider.className } w-auto object-contain mx-auto` }
+                              loading="lazy"
+                              decoding="async"
+                            />
+                            { !isAvailable && (
+                              <span className="absolute -top-1.5 -right-1 bg-slate-200 text-slate-600 text-[8px] font-bold px-1.5 py-0.5 rounded-full leading-none">
+                                Soon
+                              </span>
+                            ) }
+                          </button>
+                        );
+                      } ) }
+                    </div>
+                  </div>
+                </div>
+
+                {/* Card details form */}
+                <div className="mb-4 rounded-2xl border border-slate-200 bg-slate-50/70 p-4 sm:p-5">
+                  <div className="mb-3 flex items-center justify-between gap-3">
+                    <p className="text-[10px] font-bold uppercase tracking-[0.13em] text-slate-500">
+                      Card Details
+                    </p>
+                    <div className="flex items-center gap-2.5 flex-wrap justify-end">
+                      { CHECKOUT_CARD_BRAND_LOGOS.map( ( logo ) => (
+                        <img
+                          key={ logo.key }
+                          src={ logo.src }
+                          alt={ logo.alt }
+                          className={ `${ logo.className } w-auto object-contain shrink-0` }
+                          loading="lazy"
+                          decoding="async"
+                        />
+                      ) ) }
+                    </div>
+                  </div>
+                  <div className="space-y-3.5">
+                    <div>
+                      <label htmlFor="field-cardNumber" className={ labelClass }>Card Number</label>
+                      <input
+                        id="field-cardNumber"
+                        name="cardNumber"
+                        type="text"
+                        inputMode="numeric"
+                        autoComplete="cc-number"
+                        placeholder="1234 5678 9012 3456"
+                        value={ cardDetails.cardNumber }
+                        onChange={ handleCardDetailsChange }
+                        className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20 transition-all"
+                      />
+                    </div>
+                    <div>
+                      <label htmlFor="field-cardholder" className={ labelClass }>Name on Card</label>
+                      <input
+                        id="field-cardholder"
+                        name="cardholder"
+                        type="text"
+                        autoComplete="cc-name"
+                        placeholder="Full name"
+                        value={ cardDetails.cardholder }
+                        onChange={ handleCardDetailsChange }
+                        className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20 transition-all"
+                      />
+                    </div>
+                    <div className="grid grid-cols-3 gap-3">
+                      <div className="col-span-1">
+                        <label htmlFor="field-expiry" className={ labelClass }>Expiry</label>
+                        <input
+                          id="field-expiry"
+                          name="expiry"
+                          type="text"
+                          inputMode="numeric"
+                          autoComplete="cc-exp"
+                          placeholder="MM/YY"
+                          value={ cardDetails.expiry }
+                          onChange={ handleCardDetailsChange }
+                          className="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20 transition-all"
+                        />
+                      </div>
+                      <div className="col-span-1">
+                        <label htmlFor="field-cvc" className={ labelClass }>CVC</label>
+                        <input
+                          id="field-cvc"
+                          name="cvc"
+                          type="text"
+                          inputMode="numeric"
+                          autoComplete="cc-csc"
+                          placeholder="123"
+                          value={ cardDetails.cvc }
+                          onChange={ handleCardDetailsChange }
+                          className="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20 transition-all"
+                        />
+                      </div>
+                      <div className="col-span-1">
+                        <label htmlFor="field-postalCode" className={ labelClass }>ZIP</label>
+                        <input
+                          id="field-postalCode"
+                          name="postalCode"
+                          type="text"
+                          autoComplete="postal-code"
+                          placeholder="ZIP"
+                          value={ cardDetails.postalCode }
+                          onChange={ handleCardDetailsChange }
+                          className="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20 transition-all"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                { paymentMethods.length === 0 && (
                   <div className="mb-4 flex items-start gap-2.5 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-xs text-red-700">
                     <AlertCircle size={ 14 } className="shrink-0 mt-0.5" />
                     No payment methods configured. Please contact support.
                   </div>
                 ) }
 
-                {/* Standard payment methods (non-BNPL tabs) */}
-                { paymentTab !== 'bnpl' && paymentMethods.length > 0 && (
-                  <div className="mb-4 space-y-2" role="radiogroup" aria-label="Payment Method">
-                    { filteredPaymentMethods.map( ( method ) => {
-                      const isSelected = paymentMethod === method.id;
-                      const isManual   = isManualPaymentMethod( method );
-                      return (
-                        <label
-                          key={ method.id }
-                          className={ `flex items-center gap-3 rounded-xl border px-4 py-3.5 cursor-pointer transition-all
-                                       ${ isSelected
-                                           ? 'border-primary-500 bg-primary-50/60 ring-1 ring-primary-400/30'
-                                           : 'border-slate-200 bg-white hover:border-slate-300' }` }
-                        >
-                          <input
-                            type="radio"
-                            name="paymentMethod"
-                            value={ method.id }
-                            checked={ isSelected }
-                            onChange={ () => setPaymentMethod( method.id ) }
-                            className="accent-primary-600 shrink-0"
-                          />
-                          <div className="flex-1 min-w-0">
-                            <p className="text-sm font-semibold text-slate-900">{ method.title || method.id }</p>
-                            { method.description && (
-                              <p className="text-xs text-slate-500 mt-0.5">{ method.description }</p>
-                            ) }
-                          </div>
-                          <span className={ `shrink-0 rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.06em]
-                                             ${ isManual ? 'bg-amber-100 text-amber-700' : 'bg-emerald-100 text-emerald-700' }` }>
-                            { isManual ? 'Manual' : 'Online' }
-                          </span>
-                        </label>
-                      );
-                    } ) }
-                    { filteredPaymentMethods.length === 0 && (
-                      <div className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-xs text-slate-500 italic">
-                        No methods available in this payment type.
-                      </div>
-                    ) }
+                { paymentMethods.length > 0 && !activeProviderMethod && (
+                  <div className="mb-4 flex items-start gap-2.5 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-xs text-amber-700">
+                    <AlertTriangle size={ 13 } className="shrink-0 mt-0.5" />
+                    This provider is not active yet. Card checkout is selected instead.
                   </div>
                 ) }
 

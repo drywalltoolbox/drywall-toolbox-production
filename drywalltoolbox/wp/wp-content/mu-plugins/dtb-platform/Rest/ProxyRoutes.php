@@ -131,6 +131,12 @@ function dtb_register_proxy_routes(): void {
 		'permission_callback' => '__return_true',
 	] );
 
+	register_rest_route( $ns, '/search/variation-sku', [
+		'methods'             => 'GET',
+		'callback'            => 'dtb_proxy_search_variation_sku',
+		'permission_callback' => '__return_true',
+	] );
+
 	// ── JWT-gated order routes ────────────────────────────────────────────────
 
 	register_rest_route( $ns, '/orders', [
@@ -1527,6 +1533,61 @@ function dtb_proxy_search( WP_REST_Request $request ): WP_REST_Response {
 		}
 	}
 	return dtb_cached_wc_get( 'wc/v3/products', $params );
+}
+
+/** GET /drywall/v1/search/variation-sku?q={query} */
+function dtb_proxy_search_variation_sku( WP_REST_Request $request ): WP_REST_Response {
+	$q = strtoupper( trim( sanitize_text_field( (string) ( $request->get_param( 'q' ) ?? '' ) ) ) );
+	if ( '' === $q ) {
+		return new WP_REST_Response( dtb_error_envelope( 'missing_param', 'Query parameter "q" is required.', 400 ), 400 );
+	}
+
+	// Guard against expensive wildcard scans on 1-char probes.
+	if ( strlen( $q ) < 2 ) {
+		return new WP_REST_Response( [], 200 );
+	}
+
+	if ( ! dtb_check_origin() ) {
+		return new WP_REST_Response( dtb_error_envelope( 'forbidden_origin', 'Origin not allowed.', 403 ), 403 );
+	}
+
+	$rl = dtb_rate_limit_get( 'wc/v3/products/variations/sku-search' );
+	if ( $rl ) {
+		return $rl;
+	}
+
+	$limit = absint( $request->get_param( 'limit' ) ?? 24 );
+	$limit = max( 1, min( 100, $limit ) );
+
+	global $wpdb;
+	$like = '%' . $wpdb->esc_like( $q ) . '%';
+	$sql  = $wpdb->prepare(
+		"SELECT DISTINCT p.post_parent AS parent_id
+		FROM {$wpdb->posts} p
+		INNER JOIN {$wpdb->postmeta} pm ON pm.post_id = p.ID AND pm.meta_key = '_sku'
+		INNER JOIN {$wpdb->posts} parent ON parent.ID = p.post_parent
+		WHERE p.post_type = 'product_variation'
+		AND p.post_status IN ('publish', 'private')
+		AND parent.post_type = 'product'
+		AND parent.post_status = 'publish'
+		AND UPPER(pm.meta_value) LIKE %s
+		ORDER BY parent_id ASC
+		LIMIT %d",
+		$like,
+		$limit
+	);
+
+	$parent_ids = array_values( array_filter( array_map( 'absint', (array) $wpdb->get_col( $sql ) ) ) );
+	if ( empty( $parent_ids ) ) {
+		return new WP_REST_Response( [], 200 );
+	}
+
+	return dtb_cached_wc_get( 'wc/v3/products', [
+		'include'  => implode( ',', $parent_ids ),
+		'orderby'  => 'include',
+		'per_page' => count( $parent_ids ),
+		'status'   => 'publish',
+	] );
 }
 
 /** POST /drywall/v1/orders  (JWT-gated, rate-limited) */

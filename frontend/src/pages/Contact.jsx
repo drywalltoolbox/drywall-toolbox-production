@@ -16,12 +16,22 @@ const contactInfo = [
   {
     icon: (
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-        <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+        <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.8 19.8 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.12 4.2 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.12.9.34 1.78.66 2.61a2 2 0 0 1-.45 2.11L8 9.99a16 16 0 0 0 6 6l1.55-1.32a2 2 0 0 1 2.11-.45c.83.32 1.71.54 2.61.66A2 2 0 0 1 22 16.92z"/>
       </svg>
     ),
-    label: 'Hours',
-    value: 'Mon - Fri: 8am - 6pm EST',
-    href: null
+    label: 'Phone',
+    value: '(609) 866-5269',
+    href: 'tel:+16098665269'
+  },
+  {
+    icon: (
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>
+      </svg>
+    ),
+    label: 'Location',
+    value: 'Tool Repair Services',
+    href: '/repairs'
   }
 ];
 
@@ -55,13 +65,15 @@ export default function Contact() {
     setSubmitting(true);
 
     try {
-      await apiClient('/wp-json/dtb/v1/contact', {
+      await apiClient('/wp-json/dtb/v1/support/submit', {
         method: 'POST',
         body: JSON.stringify({
-          name:         formData.name,
-          email:        formData.email,
-          inquiry_type: formData.inquiryType || 'General Question',
-          message:      formData.message,
+          name:    formData.name,
+          email:   formData.email,
+          subject: formData.inquiryType || 'General Question',
+          message: formData.message,
+          type:    'contact',
+          website: '', // honeypot — intentionally blank
         }),
       });
       setSuccess(true);
@@ -80,7 +92,7 @@ export default function Contact() {
     <div style={{ minHeight: '100vh' }} className="page-wrapper">
       <SEOHead
         title="Contact Us"
-        description="Get in touch with the Drywall Toolbox team. Expert support from real people who know drywall tools. Email us or check our business hours."
+        description="Get in touch with the Drywall Toolbox team. Expert support from real people who know drywall tools."
         canonical="https://drywalltoolbox.com/contact"
       />
 
@@ -201,36 +213,6 @@ export default function Contact() {
               ))}
             </div>
 
-            {/* Response time badge */}
-            <div style={{
-              background: 'white',
-              border: '1px solid var(--machined-border)',
-              borderRadius: '14px',
-              padding: '20px 24px',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '16px'
-            }}>
-              <div style={{
-                width: '44px',
-                height: '44px',
-                background: 'linear-gradient(135deg, #f0fdf4, #dcfce7)',
-                borderRadius: '10px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: '#16a34a',
-                flexShrink: 0
-              }}>
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                  <polyline points="20 6 9 17 4 12"/>
-                </svg>
-              </div>
-              <div>
-                <div style={{ fontWeight: 700, fontSize: '0.875rem', color: 'black', marginBottom: '2px' }}>Fast Response</div>
-                <div style={{ fontSize: '0.775rem', color: 'rgba(15,23,42,0.5)' }}>We reply within 1 business day</div>
-              </div>
-            </div>
           </div>
 
           {/* Right: form */}
