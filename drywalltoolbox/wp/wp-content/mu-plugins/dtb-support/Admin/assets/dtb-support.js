@@ -34,6 +34,7 @@
     activeTicketId: null,
     currentTicket: null,
     currentEvents: [],
+    currentDisplayEvents: [],
     currentEventFilter: 'all',
     tickets: [],
     macros: [],
@@ -378,7 +379,8 @@
         .done(function (res) {
           self.currentTicket = res.ticket || null;
           self.currentEvents = res.events || [];
-          self.renderDetail(self.currentTicket, self.currentEvents);
+          self.currentDisplayEvents = self.buildTimelineEvents(self.currentTicket, self.currentEvents);
+          self.renderDetail(self.currentTicket, self.currentDisplayEvents);
           $('#dtb-detail-loading').hide();
           $('#dtb-detail-content').show();
         })
@@ -426,6 +428,41 @@
         '</div>';
 
       $('#dtb-detail-content').html(detail);
+    },
+
+    buildTimelineEvents: function (ticket, events) {
+      var timeline = (events || []).slice();
+      if (!ticket) {
+        return timeline;
+      }
+
+      if (ticket.message && !this.hasCustomerMessageEvent(timeline)) {
+        timeline.unshift({
+          id: 'origin-message',
+          event_type: 'ticket.created',
+          event_label: 'Original Contact Message',
+          event_group: 'message',
+          actor_type: 'customer',
+          actor_label: ticket.customer_name || 'Customer',
+          source: ticket.source || 'web_form',
+          created_at: ticket.created_at || '',
+          body: ticket.message,
+          summary: ticket.message,
+          payload: {},
+          synthetic: true
+        });
+      }
+
+      return timeline;
+    },
+
+    hasCustomerMessageEvent: function (events) {
+      return (events || []).some(function (event) {
+        var group = event.event_group || '';
+        var actorType = event.actor_type || '';
+        var body = String(event.body || event.summary || '').trim();
+        return body && (group === 'message' || actorType === 'customer');
+      });
     },
 
     renderInsightStrip: function (ticket, events) {
@@ -505,7 +542,7 @@
     setEventFilter: function (filter) {
       this.currentEventFilter = filter || 'all';
       if ($('#dtb-thread-panel-host').length) {
-        $('#dtb-thread-panel-host').html(this.renderThreadPanel(this.currentEvents || []));
+        $('#dtb-thread-panel-host').html(this.renderThreadPanel(this.currentDisplayEvents || []));
       }
     },
 
@@ -645,6 +682,7 @@
       var assigned = ticket.assigned_user && ticket.assigned_user.display_name ? ticket.assigned_user.display_name : 'Unassigned';
       var tags = (ticket.tags || []).length ? ticket.tags.join(', ') : 'None';
       var metadata = ticket.metadata && Object.keys(ticket.metadata).length ? JSON.stringify(ticket.metadata, null, 2) : '';
+      var messagePreview = String(ticket.message || '').trim();
 
       return (
         '<div class="dtb-ctx-section"><div class="dtb-ctx-section__title">Ticket Snapshot</div>' +
@@ -669,6 +707,12 @@
         '<div class="dtb-ctx-row"><span class="dtb-ctx-label">Tags</span><span class="dtb-ctx-value">' +
         esc(tags) +
         '</span></div>' +
+        '<div class="dtb-ctx-row"><span class="dtb-ctx-label">Contact message</span><span class="dtb-ctx-value">' +
+        esc(messagePreview ? 'Available' : 'Missing') +
+        '</span></div>' +
+        (messagePreview
+          ? '<div class="dtb-ctx-message-preview">' + nl2br(messagePreview) + '</div>'
+          : '<p class="dtb-empty__sub" style="margin:8px 0 0;">No original contact message on this ticket record.</p>') +
         '</div>' +
         '<div class="dtb-ctx-section"><div class="dtb-ctx-section__title">Workflow Tools</div>' +
         '<div class="dtb-tool-field"><label class="dtb-tool-label">Status</label><select id="dtb-ticket-status" class="dtb-select">' +
@@ -1123,6 +1167,7 @@
       this.activeTicketId = null;
       this.currentTicket = null;
       this.currentEvents = [];
+      this.currentDisplayEvents = [];
     },
 
     api: function (method, path, data) {
@@ -1193,7 +1238,7 @@
 
     buildTicketSummary: function () {
       var ticket = this.currentTicket || {};
-      var events = (this.currentEvents || []).slice(-5).map(function (event) {
+      var events = (this.currentDisplayEvents || this.currentEvents || []).slice(-5).map(function (event) {
         return '- [' + (event.event_label || event.event_type || 'Event') + '] ' + (event.summary || event.body || 'No details');
       });
 
@@ -1203,6 +1248,7 @@
         'Ticket: ' + (ticket.ticket_number || ticket.id || ''),
         'Subject: ' + (ticket.subject || ''),
         'Customer: ' + (ticket.customer_name || '') + ' <' + (ticket.customer_email || '') + '>',
+        'Original Message: ' + (ticket.message ? ticket.message.replace(/\s+/g, ' ').trim() : 'n/a'),
         'Status: ' + (ticket.status_label || ticket.status || ''),
         'Priority: ' + (ticket.priority_label || ticket.priority || ''),
         'Assigned: ' + assigned,

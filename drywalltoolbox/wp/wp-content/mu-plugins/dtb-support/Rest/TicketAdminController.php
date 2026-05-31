@@ -515,6 +515,16 @@ function dtb_support_rest_prepare_ticket_events( int $ticket_id, array $events )
 			$event['payload'] = is_array( $decoded ) ? $decoded : [];
 		}
 
+		// Backfill legacy ticket.created events that stored message only on the ticket row.
+		if (
+			'ticket.created' === (string) ( $event['event_type'] ?? '' ) &&
+			'' === trim( (string) ( $event['body'] ?? '' ) ) &&
+			$ticket &&
+			! empty( $ticket->message )
+		) {
+			$event['body'] = (string) $ticket->message;
+		}
+
 		$actor_type = (string) ( $event['actor_type'] ?? '' );
 		if ( 'customer' === $actor_type ) {
 			$event['actor_label'] = $ticket ? (string) $ticket->customer_name : 'Customer';
