@@ -39,7 +39,7 @@
     currentTicket: null,
     currentEvents: [],
     currentDisplayEvents: [],
-    currentEventFilter: 'all',
+    currentEventFilter: 'message',
     tickets: [],
     macros: [],
     selectedTickets: {},
@@ -262,7 +262,6 @@
     openTicket: function (ticketId) {
       var self = this;
       this.activeTicketId = ticketId;
-      this.currentEventFilter = 'all';
       $('#dtb-detail-overlay').show();
       $('#dtb-detail-loading').show();
       $('#dtb-detail-content').hide();
@@ -271,6 +270,7 @@
         self.currentTicket = res.ticket || null;
         self.currentEvents = res.events || [];
         self.currentDisplayEvents = self.buildTimelineEvents(self.currentTicket, self.currentEvents);
+        self.currentEventFilter = self.getInitialEventFilter(self.currentDisplayEvents);
         self.renderDetail(self.currentTicket, self.currentDisplayEvents);
         $('#dtb-detail-loading').hide();
         $('#dtb-detail-content').show();
@@ -294,6 +294,13 @@
       return timeline;
     },
 
+    getInitialEventFilter: function (events) {
+      var hasMessages = (events || []).some(function (event) {
+        return (event.event_group || '') === 'message';
+      });
+      return hasMessages ? 'message' : 'all';
+    },
+
     hasCustomerMessageEvent: function (events) {
       return (events || []).some(function (event) {
         var body = String(event.body || event.summary || '').trim();
@@ -308,24 +315,27 @@
 
     renderEventFilters: function () {
       var self = this;
-      return [['all', 'All'], ['message', 'Messages'], ['workflow', 'Workflow'], ['internal', 'Internal'], ['delivery', 'Delivery'], ['system', 'System']].map(function (filter) {
+      return [['message', 'Messages'], ['all', 'All Activity'], ['workflow', 'Workflow'], ['internal', 'Internal'], ['delivery', 'Delivery'], ['system', 'System']].map(function (filter) {
         return '<button class="dtb-event-filter' + (self.currentEventFilter === filter[0] ? ' is-active' : '') + '" data-filter="' + esc(filter[0]) + '">' + esc(filter[1]) + '</button>';
       }).join('');
     },
 
     setEventFilter: function (filter) {
-      this.currentEventFilter = filter || 'all';
+      this.currentEventFilter = filter || 'message';
       $('#dtb-thread-panel-host').html(this.renderThreadPanel(this.currentDisplayEvents || []));
     },
 
     getFilteredEvents: function (events) {
-      var filter = this.currentEventFilter || 'all';
+      var filter = this.currentEventFilter || 'message';
       if (filter === 'all') return events || [];
       return (events || []).filter(function (event) { return (event.event_group || 'system') === filter; });
     },
 
     renderThreadPanel: function (events) {
-      return '<section class="dtb-thread-panel"><div class="dtb-thread-panel__header"><div class="dtb-thread-panel__title">Timeline & History</div><div class="dtb-thread-panel__filters">' + this.renderEventFilters() + '</div></div><div class="dtb-thread">' + this.renderThread(events) + '</div></section>';
+      var helper = this.currentEventFilter === 'message'
+        ? '<div class="dtb-thread-panel__helper">Showing customer and staff conversation first.</div>'
+        : '';
+      return '<section class="dtb-thread-panel"><div class="dtb-thread-panel__header"><div><div class="dtb-thread-panel__title">Timeline & History</div>' + helper + '</div><div class="dtb-thread-panel__filters">' + this.renderEventFilters() + '</div></div><div class="dtb-thread">' + this.renderThread(events) + '</div></section>';
     },
 
     renderThread: function (events) {
@@ -344,10 +354,11 @@
       var messageClass = 'dtb-msg dtb-msg--' + (group === 'internal' ? 'internal' : isCustomer ? 'customer' : 'staff');
       if (group === 'delivery') messageClass += ' dtb-msg--delivery';
       if (group === 'system') messageClass += ' dtb-msg--system';
-      return '<article class="' + messageClass + '"><div class="dtb-msg__header"><span class="dtb-msg__author">' + esc(actor) + '</span><span class="dtb-msg__time">' + esc(created) + '</span><span class="dtb-msg__pill">' + esc(event.event_label || event.event_type || 'Event') + '</span></div><div class="dtb-msg__body">' + nl2br(body) + '</div>' + this.renderEventPayload(event.payload) + '</article>';
+      return '<article class="' + messageClass + '"><div class="dtb-msg__header"><span class="dtb-msg__author">' + esc(actor) + '</span><span class="dtb-msg__time">' + esc(created) + '</span><span class="dtb-msg__pill">' + esc(event.event_label || event.event_type || 'Event') + '</span></div><div class="dtb-msg__body">' + nl2br(body) + '</div>' + this.renderEventPayload(event.payload, group) + '</article>';
     },
 
-    renderEventPayload: function (payload) {
+    renderEventPayload: function (payload, group) {
+      if (group !== 'internal' && group !== 'system' && group !== 'delivery') return '';
       if (!payload || typeof payload !== 'object') return '';
       var keys = Object.keys(payload);
       if (!keys.length) return '';

@@ -67,6 +67,20 @@ function dtb_support_get_events( int $ticket_id, string $visibility = 'all' ): a
 			"SELECT * FROM {$table} WHERE ticket_id = %d ORDER BY created_at ASC, id ASC",
 			$ticket_id
 		) );
+	} elseif ( 'operator' === $visibility ) {
+		// Operator timelines should include public ('all') events plus internal notes.
+		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		$rows = $wpdb->get_results( $wpdb->prepare(
+			"SELECT * FROM {$table} WHERE ticket_id = %d AND visibility IN ('operator','all') ORDER BY created_at ASC, id ASC",
+			$ticket_id
+		) );
+	} elseif ( 'customer' === $visibility ) {
+		// Customer views should include public ('all') events plus customer-specific events.
+		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		$rows = $wpdb->get_results( $wpdb->prepare(
+			"SELECT * FROM {$table} WHERE ticket_id = %d AND visibility IN ('customer','all') ORDER BY created_at ASC, id ASC",
+			$ticket_id
+		) );
 	} else {
 		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 		$rows = $wpdb->get_results( $wpdb->prepare(

@@ -176,8 +176,9 @@ function dtb_support_get_email_template( string $template, array $ctx ): array|W
 							[ 'label' => 'Ticket reference', 'value' => $tnum ],
 							[ 'label' => 'Subject', 'value' => $subj ],
 						],
-						'body_html'   => '<div style="padding:18px 20px;background:#050b18;border:1px solid #334155;border-radius:8px;color:#cbd5e1;">' . nl2br( esc_html( $reply_body ) ) . '</div>',
-						'cta'         => $reply_link ? [ 'label' => 'Reply to this ticket', 'url' => $reply_link ] : null,
+						'body_html'   => '<div style="white-space:pre-wrap;">' . nl2br( esc_html( $reply_body ) ) . '</div>',
+						'cta_url'     => $reply_link,
+						'cta_label'   => $reply_link ? 'Reply to this ticket' : '',
 						'signoff'     => $site . ' Support Team',
 						'footer_note' => 'Reply directly to this email or click the button above to continue the conversation.',
 					]

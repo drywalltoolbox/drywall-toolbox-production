@@ -120,10 +120,11 @@
 .dtb-spinner { display: inline-block; width: 16px; height: 16px; margin-right: 8px; border: 2px solid #dbeafe; border-top-color: var(--dtb-accent); border-radius: 50%; vertical-align: -3px; animation: dtb-spin .75s linear infinite; }
 @keyframes dtb-spin { to { transform: rotate(360deg); } }
 
-.dtb-detail-overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, .56); z-index: 99998; }
-.dtb-detail-panel { position: absolute; inset: 30px 30px 30px 170px; background: #fff; border-radius: 16px; overflow: hidden; box-shadow: 0 28px 80px rgba(15, 23, 42, .35); }
-.dtb-detail-shell { display: grid; grid-template-columns: minmax(0, 1fr) 330px; gap: 16px; height: calc(100% - 62px); padding: 16px; overflow: auto; background: var(--dtb-bg); }
-.dtb-detail-main, .dtb-detail-sidebar, .dtb-sidebar { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+.dtb-detail-overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, .56); backdrop-filter: blur(2px); z-index: 99998; }
+.dtb-detail-panel { position: absolute; top: 24px; bottom: 24px; left: 50%; transform: translateX(-50%); width: min(1500px, calc(100vw - 48px)); background: #fff; border-radius: 16px; overflow: hidden; box-shadow: 0 28px 80px rgba(15, 23, 42, .35); }
+.dtb-detail-shell { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 16px; height: calc(100% - 62px); padding: 16px; overflow: hidden; background: var(--dtb-bg); }
+.dtb-detail-main, .dtb-detail-sidebar, .dtb-sidebar { display: flex; flex-direction: column; gap: 14px; min-width: 0; min-height: 0; }
+.dtb-detail-sidebar { overflow: auto; padding-right: 2px; }
 .dtb-detail-chip-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 6px; }
 .dtb-detail-chip { padding: 4px 9px; background: #f1f5f9; color: #475569; }
 .dtb-detail-chip--action { background: var(--dtb-accent-soft); color: #1d4ed8; }
@@ -134,12 +135,15 @@
 .dtb-insight-card__primary { margin-top: 5px; color: var(--dtb-text); font-size: 14px; font-weight: 800; overflow-wrap: anywhere; }
 .dtb-insight-card__meta { margin-top: 3px; color: var(--dtb-text-muted); font-size: 11px; overflow-wrap: anywhere; }
 
-.dtb-thread-panel__header { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 14px; border-bottom: 1px solid var(--dtb-border); }
+.dtb-thread-panel__header { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; padding: 12px 14px; border-bottom: 1px solid var(--dtb-border); }
 .dtb-thread-panel__title, .dtb-ctx-section__title, .dtb-settings-section__title { color: var(--dtb-text); font-size: 12px; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; }
+.dtb-thread-panel__helper { margin-top: 3px; color: var(--dtb-text-muted); font-size: 11px; }
 .dtb-thread-panel__filters { display: flex; gap: 6px; flex-wrap: wrap; }
 .dtb-event-filter { border: 1px solid var(--dtb-border); border-radius: 999px; background: #fff; color: var(--dtb-text-muted); cursor: pointer; font-size: 11px; font-weight: 700; padding: 4px 8px; }
 .dtb-event-filter.is-active { background: var(--dtb-accent); border-color: var(--dtb-accent); color: #fff; }
-.dtb-thread { padding: 12px; display: flex; flex-direction: column; gap: 10px; }
+.dtb-thread-panel { display: flex; flex-direction: column; min-height: 0; flex: 1; }
+#dtb-thread-panel-host { display: flex; flex-direction: column; min-height: 0; flex: 1; }
+.dtb-thread { padding: 12px; display: flex; flex-direction: column; gap: 10px; overflow: auto; min-height: 0; }
 .dtb-msg { border: 1px solid var(--dtb-border); border-radius: 10px; background: #fff; padding: 12px; }
 .dtb-msg--customer { border-left: 4px solid #2563eb; }
 .dtb-msg--staff { border-left: 4px solid #64748b; }
@@ -213,6 +217,6 @@
   .dtb-cc-rail { width: 100%; display: flex; overflow-x: auto; }
   .dtb-rail-header { display: none; }
   .dtb-rail-item { flex: 0 0 auto; border-left: 0; border-bottom: 3px solid transparent; }
-  .dtb-detail-panel { inset: 12px; }
+  .dtb-detail-panel { inset: 12px; left: auto; transform: none; width: auto; }
   .dtb-insights-grid { grid-template-columns: 1fr; }
 }
