@@ -151,12 +151,15 @@ function dtb_support_get_email_template( string $template, array $ctx ): array|W
 			];
 
 		case 'ticket-reply-customer':
-			$reply_body = wp_strip_all_tags( (string) ( $ctx['reply_body'] ?? '' ) );
-			$body       = sprintf(
-				"Hi %1\$s,\n\nA member of our support team has replied to your ticket (%2\$s).\n\n---\n%3\$s\n---\n\nReply directly to this email to continue the conversation.\n\n%4\$s Support Team",
+			$reply_body  = wp_strip_all_tags( (string) ( $ctx['reply_body'] ?? '' ) );
+			$reply_link  = esc_url_raw( (string) ( $ctx['reply_link'] ?? '' ) );
+			$reply_cta   = $reply_link ? "\n\nReply to this ticket:\n" . $reply_link : "\n\nReply directly to this email to continue the conversation.";
+			$body        = sprintf(
+				"Hi %1\$s,\n\nA member of our support team has replied to your ticket (%2\$s).\n\n---\n%3\$s\n---\n%4\$s\n\n%5\$s Support Team",
 				$name,
 				$tnum,
 				$reply_body,
+				$reply_cta,
 				$site
 			);
 			return [
@@ -174,8 +177,9 @@ function dtb_support_get_email_template( string $template, array $ctx ): array|W
 							[ 'label' => 'Subject', 'value' => $subj ],
 						],
 						'body_html'   => '<div style="padding:18px 20px;background:#050b18;border:1px solid #334155;border-radius:8px;color:#cbd5e1;">' . nl2br( esc_html( $reply_body ) ) . '</div>',
+						'cta'         => $reply_link ? [ 'label' => 'Reply to this ticket', 'url' => $reply_link ] : null,
 						'signoff'     => $site . ' Support Team',
-						'footer_note' => 'Reply directly to this email to continue the conversation.',
+						'footer_note' => 'Reply directly to this email or click the button above to continue the conversation.',
 					]
 				),
 			];
@@ -267,7 +271,6 @@ function dtb_support_send_email( string $to, string $template, array $ctx ): boo
 		return $result;
 	}
 
-	// Set flag so wp_mail_from / wp_mail_from_name filters use our configured address.
 	if ( ! defined( 'DTB_SUPPORT_SENDING' ) ) {
 		define( 'DTB_SUPPORT_SENDING', true );
 	}
@@ -298,12 +301,39 @@ function dtb_support_send_email( string $to, string $template, array $ctx ): boo
 }
 
 /**
+ * Queue a support email in the outbox when available, falling back to direct delivery.
+ */
+function dtb_support_queue_email_notification( ?object $ticket, string $to, string $recipient_name, string $template, array $ctx ): bool|WP_Error {
+	$result = dtb_support_get_email_template( $template, $ctx );
+	if ( is_wp_error( $result ) ) {
+		return $result;
+	}
+
+	$is_html = ! empty( $result['html'] );
+	if ( function_exists( 'dtb_support_outbox_enqueue' ) ) {
+		$enqueued = dtb_support_outbox_enqueue( [
+			'ticket_id'       => $ticket ? (int) $ticket->id : null,
+			'recipient_email' => $to,
+			'recipient_name'  => $recipient_name,
+			'subject'         => (string) $result['subject'],
+			'body_html'       => $is_html ? (string) $result['html'] : '',
+			'body_text'       => (string) $result['body'],
+			'headers'         => dtb_support_email_headers( $is_html ? 'text/html' : 'text/plain' ),
+		] );
+
+		return is_wp_error( $enqueued ) ? $enqueued : true;
+	}
+
+	return dtb_support_send_email( $to, $template, $ctx );
+}
+
+/**
  * Fire all standard notifications for a newly-opened ticket.
  *
  * @param object $ticket  Full ticket row from the DB.
  */
 function dtb_support_notify_ticket_opened( object $ticket ): void {
-	$admin_url = admin_url( 'admin.php?page=dtb-support-detail&ticket_id=' . $ticket->id );
+	$admin_url = admin_url( 'admin.php?page=dtb-support&ticket_id=' . $ticket->id );
 
 	$ctx = [
 		'ticket_number'  => $ticket->ticket_number,
@@ -318,16 +348,16 @@ function dtb_support_notify_ticket_opened( object $ticket ): void {
 
 	// Notify customer.
 	if ( is_email( $ticket->customer_email ) ) {
-		dtb_support_send_email( $ticket->customer_email, 'ticket-opened-customer', $ctx );
+		dtb_support_queue_email_notification( $ticket, $ticket->customer_email, (string) $ticket->customer_name, 'ticket-opened-customer', $ctx );
 	}
 
 	// Notify staff (admin email or assigned agent).
-	$staff_email = $ticket->assigned_user_id
-		? get_userdata( (int) $ticket->assigned_user_id )->user_email ?? dtb_support_admin_email()
-		: dtb_support_admin_email();
+	$assigned_user = $ticket->assigned_user_id ? get_userdata( (int) $ticket->assigned_user_id ) : null;
+	$staff_email   = $assigned_user->user_email ?? dtb_support_admin_email();
+	$staff_name    = $assigned_user->display_name ?? __( 'Support Team', 'drywall-toolbox' );
 
 	if ( is_email( $staff_email ) ) {
-		dtb_support_send_email( $staff_email, 'ticket-opened-admin', $ctx );
+		dtb_support_queue_email_notification( $ticket, $staff_email, $staff_name, 'ticket-opened-admin', $ctx );
 	}
 }
 
@@ -342,15 +372,25 @@ function dtb_support_notify_staff_reply( object $ticket, string $reply_body ): v
 		return;
 	}
 
+	// Generate an expiring token so the customer can reply via the REST endpoint
+	// from their email client without needing to be logged in.
+	$reply_token = dtb_support_generate_public_reply_token( (int) $ticket->id, $ticket->customer_email );
+	// The ticket ID is already in the REST URL path; only the token is a query parameter.
+	$reply_link  = add_query_arg(
+		[ 'token' => $reply_token ],
+		rest_url( 'dtb/v1/support/tickets/' . $ticket->id . '/reply/public' )
+	);
+
 	$ctx = [
 		'ticket_number'  => $ticket->ticket_number,
 		'subject'        => $ticket->subject,
 		'customer_name'  => $ticket->customer_name,
 		'customer_email' => $ticket->customer_email,
 		'reply_body'     => $reply_body,
+		'reply_link'     => esc_url_raw( $reply_link ),
 	];
 
-	dtb_support_send_email( $ticket->customer_email, 'ticket-reply-customer', $ctx );
+	dtb_support_queue_email_notification( $ticket, $ticket->customer_email, (string) $ticket->customer_name, 'ticket-reply-customer', $ctx );
 }
 
 /**
@@ -360,15 +400,15 @@ function dtb_support_notify_staff_reply( object $ticket, string $reply_body ): v
  * @param string $reply_body
  */
 function dtb_support_notify_customer_reply( object $ticket, string $reply_body ): void {
-	$staff_email = $ticket->assigned_user_id
-		? ( get_userdata( (int) $ticket->assigned_user_id )->user_email ?? dtb_support_admin_email() )
-		: dtb_support_admin_email();
+	$assigned_user = $ticket->assigned_user_id ? get_userdata( (int) $ticket->assigned_user_id ) : null;
+	$staff_email   = $assigned_user->user_email ?? dtb_support_admin_email();
+	$staff_name    = $assigned_user->display_name ?? __( 'Support Team', 'drywall-toolbox' );
 
 	if ( ! is_email( $staff_email ) ) {
 		return;
 	}
 
-	$admin_url = admin_url( 'admin.php?page=dtb-support-detail&ticket_id=' . $ticket->id );
+	$admin_url = admin_url( 'admin.php?page=dtb-support&ticket_id=' . $ticket->id );
 	$ctx = [
 		'ticket_number' => $ticket->ticket_number,
 		'subject'       => $ticket->subject,
@@ -377,5 +417,5 @@ function dtb_support_notify_customer_reply( object $ticket, string $reply_body )
 		'admin_url'     => $admin_url,
 	];
 
-	dtb_support_send_email( $staff_email, 'ticket-reply-staff', $ctx );
+	dtb_support_queue_email_notification( $ticket, $staff_email, $staff_name, 'ticket-reply-staff', $ctx );
 }
