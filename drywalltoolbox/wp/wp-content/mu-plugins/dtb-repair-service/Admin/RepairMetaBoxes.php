@@ -465,14 +465,7 @@ function dtb_repair_metabox_quote_builder( WP_Post $post ): void {
 			<div class="dtb-quote-table-wrap">
 				<table class="dtb-quote-table">
 					<thead>
-						<tr>
-							<th><?php esc_html_e( 'Item', 'drywall-toolbox' ); ?></th>
-							<th><?php esc_html_e( 'Type', 'drywall-toolbox' ); ?></th>
-							<th><?php esc_html_e( 'Qty', 'drywall-toolbox' ); ?></th>
-							<th><?php esc_html_e( 'Unit', 'drywall-toolbox' ); ?></th>
-							<th><?php esc_html_e( 'Line Total', 'drywall-toolbox' ); ?></th>
-							<th></th>
-						</tr>
+						<tr><th><?php esc_html_e( 'Line Items', 'drywall-toolbox' ); ?></th></tr>
 					</thead>
 					<tbody id="dtb-quote-lines"></tbody>
 				</table>
@@ -810,20 +803,39 @@ function dtb_repair_metabox_quote_builder( WP_Post $post ): void {
 			var total = qty * unit;
 			return '' +
 				'<tr data-index="' + idx + '" data-type="' + esc(type) + '">' +
-					'<td><input type="text" class="dtb-quote-line-label" value="' + esc(line.label || '') + '" placeholder="' + esc(cfg.labelPlaceholder) + '" />' +
-					'<input type="text" class="dtb-quote-line-desc" value="' + esc(line.description || '') + '" placeholder="' + esc(cfg.descPlaceholder) + '" />' +
-					'<div class="dtb-quote-line-presets"></div></td>' +
-					'<td><select class="dtb-quote-line-type">' +
-						'<option value="service"' + (type === 'service' ? ' selected' : '') + '>Service</option>' +
-						'<option value="labor"' + (type === 'labor' ? ' selected' : '') + '>Labor</option>' +
-						'<option value="part"' + (type === 'part' ? ' selected' : '') + '>Part</option>' +
-						'<option value="shipping"' + (type === 'shipping' ? ' selected' : '') + '>Shipping</option>' +
-						'<option value="misc"' + (type === 'misc' ? ' selected' : '') + '>Misc</option>' +
-					'</select></td>' +
-					'<td><span class="dtb-quote-field-caption">' + esc(cfg.qtyLabel) + '</span><input type="number" min="' + esc(cfg.qtyMin) + '" step="' + esc(cfg.qtyStep) + '" class="dtb-quote-line-qty" value="' + esc(qty) + '" /></td>' +
-					'<td><span class="dtb-quote-field-caption">' + esc(cfg.unitLabel) + '</span><input type="number" min="0" step="0.01" class="dtb-quote-line-unit" value="' + esc(unit) + '" /></td>' +
-					'<td><span class="dtb-quote-line-total">' + esc(currency() + ' ' + money(total)) + '</span></td>' +
-					'<td><button type="button" class="button-link-delete dtb-quote-line-remove">Remove</button></td>' +
+					'<td class="dtb-ql-item-cell">' +
+						'<div class="dtb-ql-card">' +
+							'<div class="dtb-ql-card-top">' +
+								'<div class="dtb-ql-card-fields">' +
+									'<input type="text" class="dtb-quote-line-label dtb-ql-label" value="' + esc(line.label || '') + '" placeholder="' + esc(cfg.labelPlaceholder) + '" />' +
+									'<input type="text" class="dtb-quote-line-desc dtb-ql-desc" value="' + esc(line.description || '') + '" placeholder="' + esc(cfg.descPlaceholder) + '" />' +
+								'</div>' +
+								'<select class="dtb-quote-line-type dtb-ql-type">' +
+									'<option value="service"' + (type === 'service' ? ' selected' : '') + '>Service</option>' +
+									'<option value="labor"' + (type === 'labor' ? ' selected' : '') + '>Labor</option>' +
+									'<option value="part"' + (type === 'part' ? ' selected' : '') + '>Part</option>' +
+									'<option value="shipping"' + (type === 'shipping' ? ' selected' : '') + '>Shipping</option>' +
+									'<option value="misc"' + (type === 'misc' ? ' selected' : '') + '>Misc</option>' +
+								'</select>' +
+								'<button type="button" class="dtb-ql-remove dtb-quote-line-remove" aria-label="Remove line">×</button>' +
+							'</div>' +
+							'<div class="dtb-ql-card-bottom">' +
+								'<div class="dtb-ql-num-field">' +
+									'<span class="dtb-quote-field-caption">' + esc(cfg.qtyLabel) + '</span>' +
+									'<input type="number" min="' + esc(cfg.qtyMin) + '" step="' + esc(cfg.qtyStep) + '" class="dtb-quote-line-qty dtb-ql-num" value="' + esc(qty) + '" />' +
+								'</div>' +
+								'<div class="dtb-ql-num-field">' +
+									'<span class="dtb-quote-field-caption">' + esc(cfg.unitLabel) + '</span>' +
+									'<input type="number" min="0" step="0.01" class="dtb-quote-line-unit dtb-ql-num" value="' + esc(unit) + '" />' +
+								'</div>' +
+								'<div class="dtb-ql-total">' +
+									'<span class="dtb-quote-field-caption">Line Total</span>' +
+									'<span class="dtb-quote-line-total">' + esc(currency() + ' ' + money(total)) + '</span>' +
+								'</div>' +
+								'<div class="dtb-ql-presets"><div class="dtb-quote-line-presets"></div></div>' +
+							'</div>' +
+						'</div>' +
+					'</td>' +
 				'</tr>';
 		};
 
@@ -850,8 +862,8 @@ function dtb_repair_metabox_quote_builder( WP_Post $post ): void {
 			}
 
 			if ($caps.length >= 2) {
-				$($caps.get(0)).text(cfg.qtyLabel || 'Qty');
-				$($caps.get(1)).text(cfg.unitLabel || 'Unit');
+				$tr.find('.dtb-ql-num-field').eq(0).find('.dtb-quote-field-caption').text(cfg.qtyLabel || 'Qty');
+				$tr.find('.dtb-ql-num-field').eq(1).find('.dtb-quote-field-caption').text(cfg.unitLabel || 'Unit');
 			}
 
 			if (!labelVal && cfg.defaultLabel) {
@@ -860,7 +872,7 @@ function dtb_repair_metabox_quote_builder( WP_Post $post ): void {
 
 			if ($presetWrap.length) {
 				if (!Array.isArray(cfg.presets) || !cfg.presets.length) {
-					$presetWrap.html(type === 'part' ? '<span class="dtb-quote-line-hint">Use Parts Lookup or Recently Used Parts to add matched catalog items.</span>' : '');
+					$presetWrap.html('');
 				} else {
 					$presetWrap.html(cfg.presets.map(function(preset){
 						return '<button type="button" class="dtb-quote-preset" data-preset-label="' + esc(preset.label || '') + '" data-preset-qty="' + esc(preset.qty || '') + '">' + esc(preset.label || 'Preset') + '</button>';
@@ -1424,101 +1436,177 @@ function dtb_repair_metabox_technician( WP_Post $post ): void {
 
 	?>
 	<div class="dtb-tech-workspace">
-		<div class="dtb-tech-grid">
-			<section class="dtb-tech-card">
-				<h3>Repair Order Log & Notes</h3>
-				<p class="dtb-tech-help">Unified technician log for diagnostics, parts work, and labor notes.</p>
-				<textarea
-					name="dtb_repair_diag_notes"
-					class="dtb-tech-textarea"
-					placeholder="Example: Motor draws 4.2A at idle. Replaced PN-AX21 bearing x2. Threadlocked fasteners and validated runout."
-				><?php echo esc_textarea( $order_log ); ?></textarea>
-				<input type="hidden" name="dtb_repair_parts_worklog" value="">
-			</section>
-		</div>
 
-		<div class="dtb-tech-grid">
-			<section class="dtb-tech-card">
-				<h3>Schematic Reference</h3>
-				<p class="dtb-tech-help">Synced against the same schematics catalog powering your frontend Schematics workflow.</p>
-				<label class="dtb-tech-label" for="dtb_repair_schematic_catalog_id">Schematic Look up</label>
-				<input id="dtb_repair_schematic_catalog_id" name="dtb_repair_schematic_catalog_id" type="text" class="dtb-tech-input" value="" placeholder="Search by schematic ID, brand, or model..." autocomplete="off" data-lookup-nonce="<?php echo esc_attr( wp_create_nonce( 'dtb_repair_schematic_lookup' ) ); ?>" />
-				<div id="dtb-tech-schematic-lookup-menu" class="dtb-tech-lookup-menu" role="listbox" aria-label="Schematic lookup results" hidden></div>
-				<input type="hidden" id="dtb_repair_schematic_links_json" name="dtb_repair_schematic_links_json" value="<?php echo esc_attr( wp_json_encode( $sch_list ) ); ?>" />
-				<datalist id="dtb_repair_schematic_catalog_list">
-					<?php foreach ( (array) $catalog_seed as $att_id ) :
-						$sid = (string) get_post_meta( (int) $att_id, '_dtb_schematic_id', true );
-						if ( '' === trim( $sid ) ) {
-							continue;
-						}
-						$sbrand = (string) get_post_meta( (int) $att_id, '_dtb_schematic_brand', true );
-						$smodel = (string) get_post_meta( (int) $att_id, '_dtb_schematic_model_number', true );
-					?>
-						<option value="<?php echo esc_attr( $sid ); ?>"><?php echo esc_html( trim( $sbrand . ' ' . $smodel ) ); ?></option>
-					<?php endforeach; ?>
-				</datalist>
-				<div class="dtb-tech-selected-wrap">
-					<div class="dtb-tech-label">Selected Schematics</div>
+		<!-- ── Two-column upper layout ─────────────────────────────────── -->
+		<div class="dtb-tw-layout">
+
+			<!-- Left primary: Log -->
+			<div class="dtb-tw-primary">
+				<section class="dtb-tw-section">
+					<div class="dtb-tw-section-hd">
+						<span class="dtb-tw-step">1</span>
+						<div>
+							<div class="dtb-tw-section-title">Repair Order Log</div>
+							<div class="dtb-tw-section-sub">Diagnostics, labor notes, and parts work log — saved with this repair.</div>
+						</div>
+					</div>
+					<textarea
+						name="dtb_repair_diag_notes"
+						id="dtb-tech-order-log"
+						class="dtb-tw-log-textarea"
+						placeholder="e.g. Motor draws 4.2A at idle. Replaced PN-AX21 bearing x2. Threadlocked fasteners and validated runout at 0.003″ TIR."
+					><?php echo esc_textarea( $order_log ); ?></textarea>
+					<input type="hidden" name="dtb_repair_parts_worklog" value="">
+				</section>
+			</div>
+
+			<!-- Right secondary: Schematics + Parts -->
+			<div class="dtb-tw-secondary">
+
+				<section class="dtb-tw-section">
+					<div class="dtb-tw-section-hd">
+						<span class="dtb-tw-step">2</span>
+						<div>
+							<div class="dtb-tw-section-title">Schematic Reference</div>
+							<div class="dtb-tw-section-sub">Synced to the schematics catalog.</div>
+						</div>
+					</div>
+					<div class="dtb-tw-lookup-wrap">
+						<input
+							id="dtb_repair_schematic_catalog_id"
+							name="dtb_repair_schematic_catalog_id"
+							type="text"
+							class="dtb-tw-input"
+							value=""
+							placeholder="Search by schematic ID, brand, or model…"
+							autocomplete="off"
+							data-lookup-nonce="<?php echo esc_attr( wp_create_nonce( 'dtb_repair_schematic_lookup' ) ); ?>"
+						/>
+						<div id="dtb-tech-schematic-lookup-menu" class="dtb-tech-lookup-menu" role="listbox" aria-label="Schematic lookup results" hidden></div>
+					</div>
+					<input type="hidden" id="dtb_repair_schematic_links_json" name="dtb_repair_schematic_links_json" value="<?php echo esc_attr( wp_json_encode( $sch_list ) ); ?>" />
+					<datalist id="dtb_repair_schematic_catalog_list">
+						<?php foreach ( (array) $catalog_seed as $att_id ) :
+							$sid = (string) get_post_meta( (int) $att_id, '_dtb_schematic_id', true );
+							if ( '' === trim( $sid ) ) { continue; }
+							$sbrand = (string) get_post_meta( (int) $att_id, '_dtb_schematic_brand', true );
+							$smodel = (string) get_post_meta( (int) $att_id, '_dtb_schematic_model_number', true );
+						?>
+							<option value="<?php echo esc_attr( $sid ); ?>"><?php echo esc_html( trim( $sbrand . ' ' . $smodel ) ); ?></option>
+						<?php endforeach; ?>
+					</datalist>
+
+					<div class="dtb-tw-field-label">Selected Schematics</div>
 					<div id="dtb-tech-selected-schematics" class="dtb-tech-selected-list"></div>
-					<div class="dtb-tech-sync-meta" id="dtb-tech-primary-details">
-						<div><strong>Synced Brand:</strong> <span id="dtb-tech-primary-brand"><?php echo esc_html( (string) get_post_meta( $post->ID, '_repair_schematic_tool_brand', true ) ); ?></span></div>
-						<div><strong>Synced Model:</strong> <span id="dtb-tech-primary-model"><?php echo esc_html( (string) get_post_meta( $post->ID, '_repair_schematic_tool_model', true ) ); ?></span></div>
-						<div><strong>Synced SKU:</strong> <span id="dtb-tech-primary-sku"><?php echo esc_html( (string) get_post_meta( $post->ID, '_repair_schematic_tool_sku', true ) ); ?></span></div>
+
+					<div class="dtb-tw-meta-row" id="dtb-tech-primary-details">
+						<div class="dtb-tw-meta-item"><span class="dtb-tw-meta-key">Brand</span><span id="dtb-tech-primary-brand"><?php echo esc_html( (string) get_post_meta( $post->ID, '_repair_schematic_tool_brand', true ) ); ?></span></div>
+						<div class="dtb-tw-meta-item"><span class="dtb-tw-meta-key">Model</span><span id="dtb-tech-primary-model"><?php echo esc_html( (string) get_post_meta( $post->ID, '_repair_schematic_tool_model', true ) ); ?></span></div>
+						<div class="dtb-tw-meta-item"><span class="dtb-tw-meta-key">SKU</span><span id="dtb-tech-primary-sku"><?php echo esc_html( (string) get_post_meta( $post->ID, '_repair_schematic_tool_sku', true ) ); ?></span></div>
 					</div>
-					<p class="dtb-tech-help dtb-tech-help--spaced">Selections are saved with this repair and used as technician reference.</p>
+
+					<?php if ( ! empty( $sch_meta ) ) : ?>
+						<details class="dtb-tw-sync-details">
+							<summary>Catalog sync details</summary>
+							<div class="dtb-tw-meta-row">
+								<div class="dtb-tw-meta-item"><span class="dtb-tw-meta-key">Catalog ID</span><?php echo esc_html( (string) ( $sch_meta['catalog_id'] ?? 'Unresolved' ) ); ?></div>
+								<div class="dtb-tw-meta-item"><span class="dtb-tw-meta-key">Source</span><?php echo esc_html( (string) ( $sch_meta['source_host'] ?? 'n/a' ) ); ?></div>
+								<div class="dtb-tw-meta-item"><span class="dtb-tw-meta-key">Synced</span><?php echo esc_html( (string) ( $sch_meta['synced_at_gmt'] ?? '' ) ); ?> UTC</div>
+								<div class="dtb-tw-meta-item"><span class="dtb-tw-meta-key">Version</span><?php echo esc_html( (string) ( $sch_meta['catalog_version'] ?? 'n/a' ) ); ?></div>
+							</div>
+						</details>
+					<?php endif; ?>
+				</section>
+
+				<!-- Parts Reference (moved to right column, step 2) -->
+				<section class="dtb-tw-section dtb-tw-parts-section">
+					<div class="dtb-tw-parts-header">
+						<div class="dtb-tw-section-hd">
+							<span class="dtb-tw-step">2</span>
+							<div>
+								<div class="dtb-tw-section-title">Parts Reference</div>
+								<div class="dtb-tw-section-sub">Search your parts catalog, build the selected list, then push to the Quote Builder.</div>
+							</div>
+						</div>
+						<button type="button" id="dtb-tech-sync-parts-to-quote" class="dtb-tw-sync-btn">
+							<span class="dashicons dashicons-arrow-right-alt" aria-hidden="true"></span>
+							Add All to Quote
+						</button>
+					</div>
+
+					<div class="dtb-tw-lookup-wrap">
+						<input
+							id="dtb_repair_parts_lookup"
+							type="text"
+							class="dtb-tw-input dtb-tw-parts-search"
+							value=""
+							placeholder="Search by SKU, part title, or brand…"
+							autocomplete="off"
+							data-lookup-nonce="<?php echo esc_attr( wp_create_nonce( 'dtb_repair_parts_lookup' ) ); ?>"
+						/>
+						<div id="dtb-tech-parts-lookup-menu" class="dtb-tech-lookup-menu" role="listbox" aria-label="Parts lookup results" hidden></div>
+					</div>
+					<input type="hidden" id="dtb_repair_parts_links_json" name="dtb_repair_parts_links_json" value="<?php echo esc_attr( wp_json_encode( $parts_list ) ); ?>" />
+
+					<div class="dtb-tw-parts-cols">
+						<div class="dtb-tw-parts-col">
+							<div class="dtb-tw-parts-col-hd">
+								<span class="dtb-tw-parts-col-title">Selected Parts</span>
+								<span class="dtb-tw-parts-col-hint">Drag to reorder · top item = primary</span>
+							</div>
+							<div id="dtb-tech-selected-parts" class="dtb-tech-selected-list"></div>
+							<div class="dtb-tw-meta-row" id="dtb-tech-primary-part-details">
+								<div class="dtb-tw-meta-item"><span class="dtb-tw-meta-key">Primary SKU</span><span id="dtb-tech-primary-part-sku"><?php echo esc_html( (string) get_post_meta( $post->ID, '_repair_parts_primary_sku', true ) ); ?></span></div>
+								<div class="dtb-tw-meta-item"><span class="dtb-tw-meta-key">Name</span><span id="dtb-tech-primary-part-name"><?php echo esc_html( (string) get_post_meta( $post->ID, '_repair_parts_primary_name', true ) ); ?></span></div>
+								<div class="dtb-tw-meta-item"><span class="dtb-tw-meta-key">Brand</span><span id="dtb-tech-primary-part-brand"><?php echo esc_html( (string) get_post_meta( $post->ID, '_repair_parts_primary_brand', true ) ); ?></span></div>
+							</div>
+						</div>
+						<div class="dtb-tw-parts-col dtb-tw-parts-col--recent">
+							<div class="dtb-tw-parts-col-hd">
+								<span class="dtb-tw-parts-col-title">Recently Used</span>
+								<span class="dtb-tw-parts-col-hint">Click Add to insert into selected list</span>
+							</div>
+							<div id="dtb-tech-recent-parts" class="dtb-tech-selected-list"></div>
+						</div>
+					</div>
+				</section>
+
+			</div><!-- /.dtb-tw-secondary -->
+		</div><!-- /.dtb-tw-layout -->
+
+		<!-- ── Full-width QA Sign-off (step 3) ──────────────────────────── -->
+		<section class="dtb-tw-section dtb-tw-qa-section <?php echo $qa_ok === '1' ? 'is-passed' : ''; ?>">
+			<div class="dtb-tw-section-hd">
+				<span class="dtb-tw-step dtb-tw-step--qa">3</span>
+				<div>
+					<div class="dtb-tw-section-title">Final QA & Sign-off</div>
+					<div class="dtb-tw-section-sub">Complete before ready-to-ship transition.</div>
 				</div>
+			</div>
 
-				<?php if ( ! empty( $sch_meta ) ) : ?>
-					<div class="dtb-tech-sync-meta">
-						<div><strong>Catalog Match:</strong> <?php echo esc_html( (string) ( $sch_meta['catalog_id'] ?? 'Unresolved' ) ); ?></div>
-						<div><strong>Source Host:</strong> <?php echo esc_html( (string) ( $sch_meta['source_host'] ?? 'n/a' ) ); ?></div>
-						<div><strong>Synced:</strong> <?php echo esc_html( (string) ( $sch_meta['synced_at_gmt'] ?? '' ) ); ?> UTC</div>
-						<div><strong>Version:</strong> <?php echo esc_html( (string) ( $sch_meta['catalog_version'] ?? 'n/a' ) ); ?></div>
-						<div class="dtb-tech-sync-checksum"><strong>Checksum:</strong> <?php echo esc_html( (string) ( $sch_meta['catalog_checksum'] ?? 'n/a' ) ); ?></div>
-					</div>
-				<?php endif; ?>
-			</section>
+			<label class="dtb-tw-qa-check <?php echo $qa_ok === '1' ? 'is-checked' : ''; ?>">
+				<input type="checkbox" name="dtb_repair_qa_passed" value="1" id="dtb-tw-qa-checkbox" <?php checked( $qa_ok, '1' ); ?> />
+				<span class="dtb-tw-qa-check-inner">
+					<span class="dtb-tw-qa-check-icon">✓</span>
+					<span class="dtb-tw-qa-check-label">QA Passed</span>
+				</span>
+			</label>
 
-			<section class="dtb-tech-card">
-				<h3>Parts Reference</h3>
-				<p class="dtb-tech-help">Synced to your Parts library for fast lookup and technician selection.</p>
-				<label class="dtb-tech-label" for="dtb_repair_parts_lookup">Parts Look up</label>
-				<input id="dtb_repair_parts_lookup" type="text" class="dtb-tech-input" value="" placeholder="Search by SKU, title, or brand..." autocomplete="off" data-lookup-nonce="<?php echo esc_attr( wp_create_nonce( 'dtb_repair_parts_lookup' ) ); ?>" />
-				<div id="dtb-tech-parts-lookup-menu" class="dtb-tech-lookup-menu" role="listbox" aria-label="Parts lookup results" hidden></div>
-				<input type="hidden" id="dtb_repair_parts_links_json" name="dtb_repair_parts_links_json" value="<?php echo esc_attr( wp_json_encode( $parts_list ) ); ?>" />
-				<div class="dtb-tech-selected-wrap">
-					<div class="dtb-tech-selected-head">
-						<div class="dtb-tech-label">Selected Parts</div>
-						<button type="button" id="dtb-tech-sync-parts-to-quote" class="button button-small">Add All To Quote</button>
-					</div>
-					<div id="dtb-tech-selected-parts" class="dtb-tech-selected-list"></div>
-					<div class="dtb-tech-label dtb-tech-recent-head">Recently Used Parts</div>
-					<div id="dtb-tech-recent-parts" class="dtb-tech-selected-list"></div>
-					<div class="dtb-tech-sync-meta" id="dtb-tech-primary-part-details">
-						<div><strong>Primary Part SKU:</strong> <span id="dtb-tech-primary-part-sku"><?php echo esc_html( (string) get_post_meta( $post->ID, '_repair_parts_primary_sku', true ) ); ?></span></div>
-						<div><strong>Primary Part Name:</strong> <span id="dtb-tech-primary-part-name"><?php echo esc_html( (string) get_post_meta( $post->ID, '_repair_parts_primary_name', true ) ); ?></span></div>
-						<div><strong>Primary Part Brand:</strong> <span id="dtb-tech-primary-part-brand"><?php echo esc_html( (string) get_post_meta( $post->ID, '_repair_parts_primary_brand', true ) ); ?></span></div>
-					</div>
-					<p class="dtb-tech-help dtb-tech-help--spaced">Selected parts are saved with this repair and can be reordered to set the primary part at top.</p>
+			<div class="dtb-tw-row-2col">
+				<div>
+					<label class="dtb-tw-field-label" for="dtb_repair_qa_signed_by">Signed By</label>
+					<input id="dtb_repair_qa_signed_by" name="dtb_repair_qa_signed_by" type="text" class="dtb-tw-input" value="<?php echo esc_attr( $qa_by ); ?>" placeholder="Technician name" />
 				</div>
-			</section>
+				<div>
+					<label class="dtb-tw-field-label" for="dtb_repair_qa_signed_at">Signed At</label>
+					<input id="dtb_repair_qa_signed_at" name="dtb_repair_qa_signed_at" type="datetime-local" class="dtb-tw-input" value="<?php echo esc_attr( $qa_at ); ?>" />
+				</div>
+			</div>
+			<label class="dtb-tw-field-label" for="dtb_repair_qa_notes">QA Notes</label>
+			<textarea id="dtb_repair_qa_notes" name="dtb_repair_qa_notes" class="dtb-tw-input dtb-tw-qa-notes" placeholder="Final validation summary, test results, torque specs…"><?php echo esc_textarea( $qa_notes ); ?></textarea>
+		</section>
 
-			<section class="dtb-tech-card">
-				<h3>Final QA & Sign-off</h3>
-				<p class="dtb-tech-help">Complete final checks before ready-to-ship transition.</p>
-				<label class="dtb-tech-checkbox">
-					<input type="checkbox" name="dtb_repair_qa_passed" value="1" <?php checked( $qa_ok, '1' ); ?> />
-					<span>QA Passed</span>
-				</label>
-				<label class="dtb-tech-label" for="dtb_repair_qa_signed_by">Signed By</label>
-				<input id="dtb_repair_qa_signed_by" name="dtb_repair_qa_signed_by" type="text" class="dtb-tech-input" value="<?php echo esc_attr( $qa_by ); ?>" placeholder="Technician name" />
-				<label class="dtb-tech-label" for="dtb_repair_qa_signed_at">Signed At</label>
-				<input id="dtb_repair_qa_signed_at" name="dtb_repair_qa_signed_at" type="datetime-local" class="dtb-tech-input" value="<?php echo esc_attr( $qa_at ); ?>" />
-				<label class="dtb-tech-label" for="dtb_repair_qa_notes">QA Notes</label>
-				<textarea id="dtb_repair_qa_notes" name="dtb_repair_qa_notes" class="dtb-tech-textarea dtb-tech-textarea-sm" placeholder="Final validation summary..."><?php echo esc_textarea( $qa_notes ); ?></textarea>
-			</section>
-		</div>
-	</div>
+	</div><!-- /.dtb-tech-workspace -->
 	<?php
 }
 
@@ -2243,103 +2331,8 @@ function dtb_repair_metabox_command_center( WP_Post $post ): void {
 	$is_complete   = in_array( $current, [ 'completed', 'closed' ], true );
 	$progress      = $progress_pct[ $current ] ?? 0;
 
+	// HTML is rendered inline in the hero banner — only emit the JS here.
 	?>
-	<div class="dtb-command-center">
-		<div class="dtb-cc-progress-wrap">
-			<div class="dtb-cc-progress-head">
-				<span class="dtb-cc-progress-kicker"><?php esc_html_e( 'Current Status', 'drywall-toolbox' ); ?></span>
-				<span class="dtb-status-badge dtb-status-<?php echo esc_attr( $current ); ?>">
-					<?php echo esc_html( $current_lbl ); ?>
-				</span>
-			</div>
-
-			<?php if ( ! $is_negative ) : ?>
-				<div class="dtb-cc-progress-track">
-					<div class="dtb-cc-progress-fill dtb-cc-progress-fill--<?php echo esc_attr( (string) $progress ); ?> <?php echo $is_complete ? 'dtb-cc-progress-fill-complete' : ''; ?>"></div>
-				</div>
-				<div class="dtb-cc-milestones">
-					<?php foreach ( $milestones as $i => $m ) :
-						$done   = $milestone_idx > $i || $is_complete;
-						$active = ! $is_complete && $milestone_idx === $i;
-						$cls    = $done ? 'dtb-ms-done' : ( $active ? 'dtb-ms-active' : 'dtb-ms-future' );
-						$dot_target = '';
-						foreach ( ( $milestone_targets[ $m['key'] ] ?? [] ) as $candidate ) {
-							if ( in_array( $candidate, $allowed, true ) ) {
-								$dot_target = $candidate;
-								break;
-							}
-						}
-						$is_clickable = '' !== $dot_target;
-						$target_label = $is_clickable ? dtb_get_repair_status_label( $dot_target ) : '';
-					?>
-						<div class="dtb-cc-ms-item">
-							<button
-								type="button"
-								class="dtb-cc-ms-dot-btn <?php echo $is_clickable ? 'is-clickable' : 'is-disabled'; ?>"
-								<?php if ( ! $is_clickable ) : ?>disabled<?php endif; ?>
-								<?php if ( $is_clickable ) : ?>
-									data-status="<?php echo esc_attr( $dot_target ); ?>"
-									data-label="<?php echo esc_attr( $target_label ); ?>"
-									title="<?php echo esc_attr( sprintf( __( 'Transition to %s', 'drywall-toolbox' ), $target_label ) ); ?>"
-								<?php else : ?>
-									title="<?php esc_attr_e( 'No valid transition to this stage right now', 'drywall-toolbox' ); ?>"
-								<?php endif; ?>
-							>
-								<span class="dtb-cc-ms-dot <?php echo esc_attr( $cls ); ?>"></span>
-							</button>
-							<span class="dtb-cc-ms-label <?php echo esc_attr( $cls ); ?>"><?php echo esc_html( $m['label'] ); ?></span>
-						</div>
-					<?php endforeach; ?>
-				</div>
-			<?php else : ?>
-				<div class="dtb-cc-terminal-msg"><?php esc_html_e( 'Terminal state', 'drywall-toolbox' ); ?></div>
-			<?php endif; ?>
-		</div>
-
-		<div class="dtb-cc-panel">
-			<div class="dtb-cc-section-title">Status Transition</div>
-
-			<?php if ( empty( $allowed ) ) : ?>
-				<p class="dtb-cc-terminal">Terminal state — no transitions available.</p>
-			<?php else : ?>
-				<?php wp_nonce_field( 'dtb_repair_transition_' . $post->ID, 'dtb_repair_transition_nonce' ); ?>
-
-				<div class="dtb-cc-action-picker" id="dtb-cc-action-picker">
-					<input type="hidden" id="dtb-repair-to-status" value="">
-					<button type="button" id="dtb-cc-action-toggle" class="dtb-cc-action-toggle" aria-expanded="false" aria-controls="dtb-cc-action-menu">
-						<span class="dtb-cc-action-toggle-label">Select transition action</span>
-						<span class="dashicons dashicons-arrow-down-alt2 dtb-cc-action-icon" aria-hidden="true"></span>
-					</button>
-					<div id="dtb-cc-action-menu" class="dtb-cc-action-menu" hidden>
-						<?php foreach ( $allowed as $ts ) : ?>
-							<button
-								type="button"
-								class="dtb-cc-action-option"
-								data-status="<?php echo esc_attr( $ts ); ?>"
-							>
-								<?php echo esc_html( dtb_get_repair_status_label( $ts ) ); ?>
-							</button>
-						<?php endforeach; ?>
-					</div>
-				</div>
-
-				<input type="text"
-				       id="dtb-repair-transition-note"
-				       class="dtb-cc-note"
-				       placeholder="<?php esc_attr_e( 'Optional note…', 'drywall-toolbox' ); ?>">
-
-				<button type="button"
-				        id="dtb-repair-transition-btn"
-				        class="dtb-cc-btn"
-				        data-repair-id="<?php echo esc_attr( (string) $post->ID ); ?>">
-					<span class="dashicons dashicons-update dtb-cc-action-icon" aria-hidden="true"></span>
-					<?php esc_html_e( 'Transition', 'drywall-toolbox' ); ?>
-				</button>
-				<span id="dtb-repair-transition-msg" class="dtb-cc-msg"></span>
-			<?php endif; ?>
-		</div><!-- .dtb-cc-panel -->
-	</div><!-- .dtb-command-center -->
-
 	<script>
 	(function($) {
 		var $picker = $('#dtb-cc-action-picker');
@@ -2402,7 +2395,7 @@ function dtb_repair_metabox_command_center( WP_Post $post ): void {
 			});
 		};
 
-		$('.dtb-cc-milestones').on('click', '.dtb-cc-ms-dot-btn.is-clickable', function() {
+		$('.dtb-hcc-milestones').on('click', '.dtb-cc-ms-dot-btn.is-clickable', function() {
 			var toStatus = $(this).data('status');
 			var labelTxt = $(this).data('label');
 			$('#dtb-repair-to-status').val(toStatus);

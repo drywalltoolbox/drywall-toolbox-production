@@ -117,7 +117,7 @@ export default function ReturnPortal() {
   };
 
   /* ─────────────────────────────────────────────────────────────────────────── */
-  /* Step 2 — submit the return request via the contact endpoint                 */
+  /* Step 2 — submit the return request via the dedicated returns endpoint       */
   /* ─────────────────────────────────────────────────────────────────────────── */
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -130,29 +130,22 @@ export default function ReturnPortal() {
 
     setSubmitLoading(true);
 
-    const messageBody = [
-      `Return request for Order #${orderNumber.trim()}`,
-      `Reason: ${returnReason}`,
-      additionalNotes.trim() ? `Additional notes: ${additionalNotes.trim()}` : null,
-    ]
-      .filter(Boolean)
-      .join('\n');
-
     try {
-      await apiClient('/wp-json/dtb/v1/contact', {
+      await apiClient('/wp-json/dtb/v1/returns/request', {
         method: 'POST',
         body:   JSON.stringify({
-          name:         lookupName.trim(),
-          email:        lookupEmail.trim(),
-          inquiry_type: 'Returns & Warranty',
-          message:      messageBody,
+          order_number:   orderNumber.trim(),
+          customer_name:  lookupName.trim(),
+          customer_email: lookupEmail.trim(),
+          reason:         returnReason,
+          notes:          additionalNotes.trim(),
         }),
       });
       setStep(3);
     } catch (err) {
       setSubmitError(
         err?.message ||
-        'Unable to submit your return request. Please email us directly at support@drywalltoolbox.com.'
+        'Unable to submit your return request. Please email us directly at elliott.miller@drywalltoolbox.com.'
       );
     } finally {
       setSubmitLoading(false);

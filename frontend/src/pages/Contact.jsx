@@ -81,7 +81,7 @@ export default function Contact() {
     } catch (err) {
       setError(
         err?.message ||
-        'Unable to send your message. Please email us directly at support@drywalltoolbox.com.'
+        'Unable to send your message. Please email us directly at elliott.miller@drywalltoolbox.com.'
       );
     } finally {
       setSubmitting(false);

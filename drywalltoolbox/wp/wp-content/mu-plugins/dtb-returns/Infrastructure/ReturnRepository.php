@@ -141,9 +141,11 @@ function dtb_returns_save( array $data ) {
 
 	$meta_map = [
 		'_dtb_return_order_id'      => 'order_id',
+		'_dtb_return_order_number'  => 'order_number',
 		'_dtb_return_customer_name' => 'customer_name',
 		'_dtb_return_customer_email'=> 'customer_email',
 		'_dtb_return_reason'        => 'reason',
+		'_dtb_return_notes'         => 'notes',
 		'_dtb_return_resolution'    => 'resolution',
 		'_dtb_return_status'        => 'status',
 	];

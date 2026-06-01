@@ -249,38 +249,35 @@ function dtb_repair_admin_hero_banner( WP_Post $post ): void {
 	$submitted_fmt = $submitted ? date_i18n( 'M j, Y g:i a', strtotime( $submitted ) ) : '';
 	?>
 	<div id="dtb-repair-hero">
-		<div class="dtb-hero-left">
-			<div class="dtb-hero-top">
-				<div class="dtb-hero-identity">
-					<div class="dtb-hero-id">Repair #<?php echo esc_html( (string) $repair_id ); ?></div>
-					<div class="dtb-hero-title"><?php echo $customer ? esc_html( $customer ) : esc_html__( '(No customer name)', 'drywall-toolbox' ); ?></div>
-					<div class="dtb-hero-status-inline">
-						<span class="dtb-status-badge dtb-status-<?php echo esc_attr( $status ); ?>"><?php echo esc_html( $status_lbl ); ?></span>
-					</div>
-				</div>
 
-				<div class="dtb-hero-integrations">
-					<div class="dtb-hero-int-item">
-						<span class="dtb-hero-int-name">WooCommerce</span>
-						<?php echo dtb_repair_admin_integration_badge( $wc_state ); // phpcs:ignore ?>
-						<?php if ( $wc_id ) : ?>
-							<a class="dtb-hero-int-meta" href="<?php echo esc_url( admin_url( 'post.php?post=' . $wc_id . '&action=edit' ) ); ?>">
-								Order #<?php echo esc_html( (string) $wc_id ); ?> →
-							</a>
-						<?php endif; ?>
-					</div>
-					<div class="dtb-hero-int-item">
-						<span class="dtb-hero-int-name">Veeqo</span>
-						<?php echo dtb_repair_admin_integration_badge( $veeqo_state ); // phpcs:ignore ?>
-					</div>
-					<div class="dtb-hero-int-item">
-						<span class="dtb-hero-int-name">QuickBooks</span>
-						<?php echo dtb_repair_admin_integration_badge( $qb_state ); // phpcs:ignore ?>
-					</div>
-					<div class="dtb-hero-int-item">
-						<span class="dtb-hero-int-name">Rewards</span>
-						<?php echo dtb_repair_admin_integration_badge( $rw_state ); // phpcs:ignore ?>
-					</div>
+		<!-- Left: Identity + integration badges + meta -->
+		<div class="dtb-hero-left">
+			<div class="dtb-hero-id">Repair #<?php echo esc_html( (string) $repair_id ); ?></div>
+			<div class="dtb-hero-title"><?php echo $customer ? esc_html( $customer ) : esc_html__( '(No customer name)', 'drywall-toolbox' ); ?></div>
+			<div class="dtb-hero-status-inline">
+				<span class="dtb-status-badge dtb-status-<?php echo esc_attr( $status ); ?>"><?php echo esc_html( $status_lbl ); ?></span>
+			</div>
+
+			<!-- Integration badges: inline row under name -->
+			<div class="dtb-hero-int-row">
+				<div class="dtb-hero-int-pill dtb-hero-int-pill--wc dtb-int-<?php echo esc_attr( $wc_state ); ?>">
+					<span class="dtb-hip-name">WooCommerce</span>
+					<span class="dtb-hip-dot"></span>
+					<?php if ( $wc_id ) : ?>
+						<a class="dtb-hip-link" href="<?php echo esc_url( admin_url( 'post.php?post=' . $wc_id . '&action=edit' ) ); ?>">#<?php echo esc_html( (string) $wc_id ); ?> →</a>
+					<?php else : ?>
+						<span class="dtb-hip-state"><?php echo esc_html( ucfirst( str_replace( '_', ' ', $wc_state ) ) ); ?></span>
+					<?php endif; ?>
+				</div>
+				<div class="dtb-hero-int-pill dtb-int-<?php echo esc_attr( $veeqo_state ); ?>">
+					<span class="dtb-hip-name">Veeqo</span>
+					<span class="dtb-hip-dot"></span>
+					<span class="dtb-hip-state"><?php echo esc_html( ucfirst( str_replace( '_', ' ', $veeqo_state ) ) ); ?></span>
+				</div>
+				<div class="dtb-hero-int-pill dtb-int-<?php echo esc_attr( $qb_state ); ?>">
+					<span class="dtb-hip-name">QuickBooks</span>
+					<span class="dtb-hip-dot"></span>
+					<span class="dtb-hip-state"><?php echo esc_html( ucfirst( str_replace( '_', ' ', $qb_state ) ) ); ?></span>
 				</div>
 			</div>
 
@@ -302,7 +299,107 @@ function dtb_repair_admin_hero_banner( WP_Post $post ): void {
 				<?php endif; ?>
 			</div>
 		</div>
-	</div>
+
+		<!-- Right: Inline command center (status progress + transition) -->
+		<div class="dtb-hero-cc" id="dtb-hero-command-center">
+			<?php if ( function_exists( 'dtb_get_repair_status' ) && function_exists( 'dtb_get_allowed_transitions' ) ) :
+				$_cc_current     = dtb_get_repair_status( $repair_id );
+				$_cc_current_lbl = dtb_get_repair_status_label( $_cc_current );
+				$_cc_transitions = dtb_get_allowed_transitions();
+				$_cc_allowed     = $_cc_transitions[ $_cc_current ] ?? [];
+				$_cc_milestones  = [
+					[ 'key' => 'submitted',     'label' => 'Submitted' ],
+					[ 'key' => 'in_progress',   'label' => 'In Progress' ],
+					[ 'key' => 'ready_to_ship', 'label' => 'Ready to Ship' ],
+					[ 'key' => 'completed',     'label' => 'Completed' ],
+				];
+				$_cc_milestone_order = [
+					'submitted' => 0, 'reviewed' => 0, 'awaiting_customer' => 0,
+					'approved' => 1, 'quoted' => 1, 'quote_accepted' => 1, 'parts_allocated' => 1, 'in_progress' => 1,
+					'ready_to_ship' => 2, 'completed' => 3, 'closed' => 3,
+					'cancelled' => -1, 'quote_declined' => -1,
+				];
+				$_cc_progress_pct = [
+					'submitted' => 8, 'reviewed' => 16, 'awaiting_customer' => 20,
+					'approved' => 28, 'quoted' => 35, 'quote_accepted' => 42, 'quote_declined' => 100,
+					'parts_allocated' => 55, 'in_progress' => 70, 'ready_to_ship' => 88,
+					'completed' => 100, 'closed' => 100, 'cancelled' => 100,
+				];
+				$_cc_milestone_targets = [
+					'submitted'     => [ 'submitted', 'reviewed' ],
+					'in_progress'   => [ 'approved', 'quoted', 'quote_accepted', 'parts_allocated', 'in_progress' ],
+					'ready_to_ship' => [ 'ready_to_ship' ],
+					'completed'     => [ 'completed', 'closed' ],
+				];
+				$_cc_idx         = $_cc_milestone_order[ $_cc_current ] ?? 0;
+				$_cc_negative    = in_array( $_cc_current, [ 'cancelled', 'quote_declined' ], true );
+				$_cc_complete    = in_array( $_cc_current, [ 'completed', 'closed' ], true );
+				$_cc_progress    = $_cc_progress_pct[ $_cc_current ] ?? 0;
+			?>
+
+			<!-- Progress track -->
+			<div class="dtb-hcc-progress">
+				<div class="dtb-hcc-status-row">
+					<span class="dtb-hcc-kicker">Current Status</span>
+					<span class="dtb-status-badge dtb-status-<?php echo esc_attr( $_cc_current ); ?>"><?php echo esc_html( $_cc_current_lbl ); ?></span>
+				</div>
+				<?php if ( ! $_cc_negative ) : ?>
+					<div class="dtb-hcc-track">
+						<div class="dtb-hcc-fill <?php echo $_cc_complete ? 'is-complete' : ''; ?>" style="width:<?php echo esc_attr( (string) $_cc_progress ); ?>%"></div>
+					</div>
+					<div class="dtb-hcc-milestones">
+						<?php foreach ( $_cc_milestones as $_i => $_m ) :
+							$_done   = $_cc_idx > $_i || $_cc_complete;
+							$_active = ! $_cc_complete && $_cc_idx === $_i;
+							$_cls    = $_done ? 'dtb-ms-done' : ( $_active ? 'dtb-ms-active' : 'dtb-ms-future' );
+							$_dot_target = '';
+							foreach ( ( $_cc_milestone_targets[ $_m['key'] ] ?? [] ) as $_candidate ) {
+								if ( in_array( $_candidate, $_cc_allowed, true ) ) { $_dot_target = $_candidate; break; }
+							}
+						?>
+							<div class="dtb-cc-ms-item">
+								<button type="button"
+									class="dtb-cc-ms-dot-btn <?php echo $_dot_target ? 'is-clickable' : 'is-disabled'; ?>"
+									<?php if ( ! $_dot_target ) : ?>disabled<?php endif; ?>
+									<?php if ( $_dot_target ) : ?>data-status="<?php echo esc_attr( $_dot_target ); ?>" data-label="<?php echo esc_attr( dtb_get_repair_status_label( $_dot_target ) ); ?>"<?php endif; ?>
+								><span class="dtb-cc-ms-dot <?php echo esc_attr( $_cls ); ?>"></span></button>
+								<span class="dtb-cc-ms-label <?php echo esc_attr( $_cls ); ?>"><?php echo esc_html( $_m['label'] ); ?></span>
+							</div>
+						<?php endforeach; ?>
+					</div>
+				<?php endif; ?>
+			</div>
+
+			<!-- Transition panel -->
+			<div class="dtb-hcc-transition">
+				<?php if ( ! empty( $_cc_allowed ) ) : ?>
+					<?php wp_nonce_field( 'dtb_repair_transition_' . $repair_id, 'dtb_repair_transition_nonce' ); ?>
+					<div class="dtb-cc-action-picker" id="dtb-cc-action-picker">
+						<input type="hidden" id="dtb-repair-to-status" value="">
+						<button type="button" id="dtb-cc-action-toggle" class="dtb-cc-action-toggle" aria-expanded="false" aria-controls="dtb-cc-action-menu">
+							<span class="dtb-cc-action-toggle-label">Select transition action</span>
+							<span class="dashicons dashicons-arrow-down-alt2 dtb-cc-action-icon" aria-hidden="true"></span>
+						</button>
+						<div id="dtb-cc-action-menu" class="dtb-cc-action-menu" hidden>
+							<?php foreach ( $_cc_allowed as $_ts ) : ?>
+								<button type="button" class="dtb-cc-action-option" data-status="<?php echo esc_attr( $_ts ); ?>"><?php echo esc_html( dtb_get_repair_status_label( $_ts ) ); ?></button>
+							<?php endforeach; ?>
+						</div>
+					</div>
+					<input type="text" id="dtb-repair-transition-note" class="dtb-cc-note" placeholder="Optional note…">
+					<button type="button" id="dtb-repair-transition-btn" class="dtb-cc-btn" data-repair-id="<?php echo esc_attr( (string) $repair_id ); ?>">
+						<span class="dashicons dashicons-update dtb-cc-action-icon" aria-hidden="true"></span> Transition
+					</button>
+					<span id="dtb-repair-transition-msg" class="dtb-cc-msg"></span>
+				<?php else : ?>
+					<p class="dtb-cc-terminal">Terminal state — no transitions available.</p>
+				<?php endif; ?>
+			</div>
+
+			<?php endif; ?>
+		</div><!-- .dtb-hero-cc -->
+
+	</div><!-- #dtb-repair-hero -->
 
 	<div id="dtb-sticky-bar">
 		<span class="dtb-sb-title">
@@ -426,6 +523,31 @@ function dtb_repair_admin_footer_scripts(): void {
 				this.style.height = 'auto';
 				this.style.height = ( this.scrollHeight + 2 ) + 'px';
 			});
+		}
+
+		/* ── Auto-expand order log textarea ── */
+		var orderLog = document.getElementById('dtb-tech-order-log');
+		if ( orderLog ) {
+			var resizeLog = function() {
+				orderLog.style.height = 'auto';
+				orderLog.style.height = ( orderLog.scrollHeight + 2 ) + 'px';
+			};
+			orderLog.addEventListener('input', resizeLog);
+			resizeLog();
+		}
+
+		/* ── QA checkbox: live toggle is-passed / is-checked ── */
+		var qaCheckbox = document.getElementById('dtb-tw-qa-checkbox');
+		if ( qaCheckbox ) {
+			var qaSection = qaCheckbox.closest('.dtb-tw-qa-section');
+			var qaLabel   = qaCheckbox.closest('.dtb-tw-qa-check');
+			var syncQa = function() {
+				var checked = qaCheckbox.checked;
+				if ( qaSection ) qaSection.classList.toggle('is-passed', checked);
+				if ( qaLabel )   qaLabel.classList.toggle('is-checked', checked);
+			};
+			qaCheckbox.addEventListener('change', syncQa);
+			syncQa();
 		}
 
 		/* ── Move the transition metabox to top of #side-sortables ── */
