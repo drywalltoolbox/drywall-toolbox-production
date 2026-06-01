@@ -926,17 +926,39 @@ function dtb_checkout_woo_native_finalize( array $context, WP_REST_Request $requ
 
 /**
  * Build the Basic-auth header for WC REST API v3 server-to-server calls.
+ *
+ * Priority:
+ *   1) WC REST API consumer key/secret (preferred for service-to-service proxying)
+ *   2) WordPress Application Password credentials (staging fallback)
+ *
+ * Returns an empty string when neither credential pair is configured.
  */
 function dtb_wc_auth_header(): string {
 	$config = dtb_get_config();
-	return 'Basic ' . base64_encode( $config['wc_proxy_key'] . ':' . $config['wc_proxy_secret'] ); // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_encode
+
+	$proxy_key    = trim( (string) ( $config['wc_proxy_key'] ?? '' ) );
+	$proxy_secret = trim( (string) ( $config['wc_proxy_secret'] ?? '' ) );
+	if ( '' !== $proxy_key && '' !== $proxy_secret ) {
+		return 'Basic ' . base64_encode( $proxy_key . ':' . $proxy_secret ); // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_encode
+	}
+
+	$auth_user = trim( (string) ( $config['wc_auth_user'] ?? '' ) );
+	// WP app passwords are often displayed with spaces; strip all whitespace.
+	$auth_pass = preg_replace( '/\s+/', '', (string) ( $config['wc_auth_pass'] ?? '' ) );
+	if ( '' !== $auth_user && '' !== $auth_pass ) {
+		return 'Basic ' . base64_encode( $auth_user . ':' . $auth_pass ); // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_encode
+	}
+
+	return '';
 }
 
 /**
  * Resolve a WC REST path to an absolute URL.
  */
 function dtb_wc_url( string $path ): string {
-	return rest_url( ltrim( $path, '/' ) );
+	$normalized = ltrim( $path, '/' );
+	$base       = rtrim( home_url( '/wp-json' ), '/' );
+	return $base . '/' . $normalized;
 }
 
 /**
@@ -953,19 +975,27 @@ function dtb_cached_wc_get( string $wc_path, array $params ): WP_REST_Response {
 		return new WP_REST_Response( dtb_error_envelope( 'forbidden_origin', 'Origin not allowed.', 403 ), 403 );
 	}
 
+	$auth_header = dtb_wc_auth_header();
+	if ( '' === $auth_header ) {
+		return new WP_REST_Response(
+			dtb_error_envelope( 'wc_auth_not_configured', 'Store backend credentials are not configured.', 500 ),
+			500
+		);
+	}
+
 	$rl = dtb_rate_limit_get( $wc_path );
 	if ( $rl ) {
 		return $rl;
 	}
 
-	$result = dtb_cached_proxy( $wc_path, $params, function () use ( $wc_path, $params ) {
+	$result = dtb_cached_proxy( $wc_path, $params, function () use ( $wc_path, $params, $auth_header ) {
 		$wc_url = dtb_wc_url( $wc_path );
 		if ( ! empty( $params ) ) {
 			$wc_url = add_query_arg( $params, $wc_url );
 		}
 
 		$raw = wp_remote_get( $wc_url, [
-			'headers' => [ 'Authorization' => dtb_wc_auth_header() ],
+			'headers' => [ 'Authorization' => $auth_header ],
 			'timeout' => 15,
 		] );
 
@@ -1002,9 +1032,17 @@ function dtb_wc_post( string $wc_path, array $body ): WP_REST_Response {
 		return new WP_REST_Response( dtb_error_envelope( 'forbidden_origin', 'Origin not allowed.', 403 ), 403 );
 	}
 
+	$auth_header = dtb_wc_auth_header();
+	if ( '' === $auth_header ) {
+		return new WP_REST_Response(
+			dtb_error_envelope( 'wc_auth_not_configured', 'Store backend credentials are not configured.', 500 ),
+			500
+		);
+	}
+
 	$raw = wp_remote_post( dtb_wc_url( $wc_path ), [
 		'headers' => [
-			'Authorization' => dtb_wc_auth_header(),
+			'Authorization' => $auth_header,
 			'Content-Type'  => 'application/json',
 		],
 		'body'    => wp_json_encode( $body ),
@@ -1039,6 +1077,14 @@ function dtb_wc_get( string $wc_path, array $params = [] ): WP_REST_Response {
 		return new WP_REST_Response( dtb_error_envelope( 'forbidden_origin', 'Origin not allowed.', 403 ), 403 );
 	}
 
+	$auth_header = dtb_wc_auth_header();
+	if ( '' === $auth_header ) {
+		return new WP_REST_Response(
+			dtb_error_envelope( 'wc_auth_not_configured', 'Store backend credentials are not configured.', 500 ),
+			500
+		);
+	}
+
 	$rl = dtb_rate_limit_get( $wc_path );
 	if ( $rl ) {
 		return $rl;
@@ -1050,7 +1096,7 @@ function dtb_wc_get( string $wc_path, array $params = [] ): WP_REST_Response {
 	}
 
 	$raw = wp_remote_get( $wc_url, [
-		'headers' => [ 'Authorization' => dtb_wc_auth_header() ],
+		'headers' => [ 'Authorization' => $auth_header ],
 		'timeout' => 15,
 	] );
 
