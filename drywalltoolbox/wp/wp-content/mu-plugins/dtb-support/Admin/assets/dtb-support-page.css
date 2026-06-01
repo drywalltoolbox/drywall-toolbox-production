@@ -1,180 +1,386 @@
 /**
  * DTB Support — Support page module styles
  *
- * Layout geometry for the Support AdminShell page.
- *
- * Allowed scope:
- * - Support-page layout geometry only.
- * - Existing var(--dtb-*) custom properties only.
- *
- * Forbidden scope:
- * - New token definitions on :root or inside .dtb-admin.
- * - Buttons, badges, tables, cards, or form controls.
+ * Scoped geometry/layout styles for the Support AdminShell workbench.
  *
  * @package drywall-toolbox
  */
 
 .dtb-admin[data-dtb-page="dtb-support"] .dtb-page-body {
 	display: block;
-	padding-bottom: 40px;
+	padding-bottom: 24px;
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-workbench {
+	display: grid;
+	grid-template-columns: minmax(220px, 240px) minmax(0, 1fr) minmax(260px, 300px);
+	gap: 12px;
+	align-items: start;
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-rail,
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-context {
+	position: sticky;
+	top: 0;
+	align-self: start;
+	background: var(--dtb-surface);
+	border: 1px solid var(--dtb-border-soft);
+	border-radius: var(--dtb-radius-md);
+	padding: 12px;
+	box-shadow: var(--dtb-shadow-sm);
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-main {
+	min-width: 0;
+	display: grid;
+	gap: 12px;
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-rail-group {
+	margin: 12px 0 8px;
+	font-size: 11px;
+	font-weight: 700;
+	text-transform: uppercase;
+	letter-spacing: .05em;
+	color: var(--dtb-text-muted);
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-rail-group:first-child {
+	margin-top: 0;
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-queue {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 10px;
+	padding: 9px 10px;
+	border-radius: var(--dtb-radius-base);
+	border: 1px solid transparent;
+	color: var(--dtb-text);
+	text-decoration: none;
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-queue:hover {
+	background: var(--dtb-surface-soft);
+	border-color: var(--dtb-border-soft);
+	text-decoration: none;
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-queue.is-active {
+	background: var(--dtb-primary-soft);
+	border-color: rgba(29, 78, 216, .25);
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-queue__copy {
+	min-width: 0;
+	display: grid;
+	gap: 2px;
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-queue__label {
+	font-size: 13px;
+	font-weight: 700;
+	color: var(--dtb-text);
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-queue__hint {
+	font-size: 11px;
+	color: var(--dtb-text-muted);
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-queue__count {
+	flex-shrink: 0;
+	min-width: 28px;
+	text-align: center;
+	padding: 2px 8px;
+	border-radius: var(--dtb-radius-full);
+	background: var(--dtb-bg-muted);
+	color: var(--dtb-text);
+	font-weight: 700;
 }
 
 .dtb-admin[data-dtb-page="dtb-support"] .dtb-toolbar {
-	margin-bottom: 12px;
 	display: flex;
 	align-items: center;
 	gap: 10px;
+	flex-wrap: wrap;
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-toolbar .dtb-search-wrap {
+	flex: 1 1 360px;
+	max-width: 520px;
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-filter {
+	min-width: 170px;
 }
 
 .dtb-admin[data-dtb-page="dtb-support"] .dtb-live-region {
-	display: grid;
-	gap: var(--dtb-radius-md);
+	position: relative;
 	margin: 0;
 	padding: 0;
 }
 
-.dtb-admin[data-dtb-page="dtb-support"] .dtb-grid--kpi {
-	grid-template-columns: repeat(5, minmax(0, 1fr));
+.dtb-admin[data-dtb-page="dtb-support"] #dtb-support-workspace .dtb-table-wrap {
+	margin: 0;
 }
 
-.dtb-admin[data-dtb-page="dtb-support"] .dtb-toolbar .dtb-search-wrap {
-	flex: 0 1 min(100%, 28rem);
-	max-width: 28rem;
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-context-card {
+	background: var(--dtb-surface);
+	border: 1px solid var(--dtb-border-soft);
+	border-radius: var(--dtb-radius-base);
+	padding: 10px;
 }
 
-.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-refresh-btn {
-	margin-left: 0;
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-context-card + .dtb-support-context-card {
+	margin-top: 10px;
 }
 
-.dtb-admin[data-dtb-page="dtb-support"] #dtb-support-detail-drawer {
-	width: min(980px, 100vw);
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-context-card h3 {
+	margin: 0 0 8px;
+	font-size: 12px;
+	letter-spacing: .04em;
+	text-transform: uppercase;
+	color: var(--dtb-text-muted);
 }
 
-.dtb-admin[data-dtb-page="dtb-support"] #dtb-support-detail-drawer .dtb-drawer__body {
-	padding: 16px;
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-context-row {
+	display: flex;
+	justify-content: space-between;
+	gap: 8px;
+	padding: 6px 0;
+	border-top: 1px solid var(--dtb-border-soft);
+	font-size: 12px;
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-context-row:first-of-type {
+	border-top: 0;
+	padding-top: 0;
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-context-row span {
+	color: var(--dtb-text-muted);
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-context-row strong {
+	color: var(--dtb-text);
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-context-muted {
+	margin: 0;
+	font-size: 12px;
+	color: var(--dtb-text-muted);
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] #dtb-support-ticket-modal.dtb-modal-overlay--open {
+	align-items: stretch;
+	padding: 12px;
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] #dtb-support-ticket-modal .dtb-modal {
+	width: calc(100vw - 24px);
+	height: calc(100vh - 24px);
+	max-width: none;
+	max-height: none;
+	border-radius: var(--dtb-radius-md);
+	display: flex;
+	flex-direction: column;
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] #dtb-support-ticket-modal .dtb-modal__body {
+	flex: 1 1 auto;
+	overflow: auto;
+	padding: 0;
 	background: var(--dtb-bg);
 }
 
-.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-modal-grid {
-	display: grid;
-	grid-template-columns: 1.5fr .85fr;
-	gap: 14px;
-}
-
-.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-modal-main,
-.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-modal-side {
-	display: flex;
-	flex-direction: column;
-	gap: 12px;
-	min-width: 0;
-}
-
-.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-modal-card {
-	background: var(--dtb-surface);
-	border: 1px solid var(--dtb-border);
-	border-radius: var(--dtb-radius-md);
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-modal-loading,
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-modal-error {
+	margin: 16px;
 	padding: 14px;
-}
-
-.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-modal-card h6 {
-	margin: 0 0 10px;
-	font-size: 12px;
-	text-transform: uppercase;
-	letter-spacing: .06em;
-	color: var(--dtb-text-muted);
-}
-
-.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-kv {
-	display: grid;
-	grid-template-columns: 140px 1fr;
-	gap: 10px;
-	padding: 7px 0;
-	border-bottom: 1px solid var(--dtb-border-soft);
-}
-
-.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-kv:last-child {
-	border-bottom: 0;
-}
-
-.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-kv span {
-	color: var(--dtb-text-muted);
-	font-size: 12px;
-	font-weight: 600;
-}
-
-.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-kv strong {
-	color: var(--dtb-text);
-	font-size: 13px;
-	font-weight: 600;
-}
-
-.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-events {
-	display: flex;
-	flex-direction: column;
-	gap: 8px;
-}
-
-.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-event {
-	padding: 10px;
 	border: 1px solid var(--dtb-border-soft);
 	border-radius: var(--dtb-radius-base);
-	background: var(--dtb-surface-soft);
-}
-
-.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-event__head {
-	display: flex;
-	justify-content: space-between;
-	gap: 10px;
-	font-size: 11px;
-	margin-bottom: 6px;
+	background: var(--dtb-surface);
 	color: var(--dtb-text-muted);
 }
 
-.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-event__body {
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-ticket-modal {
+	min-height: 100%;
+	padding: 14px;
+	display: grid;
+	gap: 12px;
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-ticket-modal__header {
+	background: var(--dtb-surface);
+	border: 1px solid var(--dtb-border-soft);
+	border-radius: var(--dtb-radius-base);
+	padding: 12px;
+	display: flex;
+	align-items: flex-start;
+	justify-content: space-between;
+	gap: 12px;
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-ticket-modal__header h3 {
+	margin: 0;
+	font-size: 16px;
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-ticket-modal__header p {
+	margin: 4px 0 0;
+	color: var(--dtb-text-muted);
+	font-size: 12px;
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-ticket-modal__badges {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 6px;
+	justify-content: flex-end;
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-ticket-pill {
+	display: inline-flex;
+	align-items: center;
+	padding: 4px 9px;
+	border-radius: var(--dtb-radius-full);
+	background: var(--dtb-surface-soft);
+	border: 1px solid var(--dtb-border-soft);
+	font-size: 11px;
+	font-weight: 700;
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-ticket-modal__body {
+	display: grid;
+	grid-template-columns: minmax(0, 1.6fr) minmax(260px, .8fr);
+	gap: 12px;
+	min-height: 0;
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-ticket-thread,
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-ticket-context {
+	min-height: 0;
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-ticket-thread {
+	background: var(--dtb-surface);
+	border: 1px solid var(--dtb-border-soft);
+	border-radius: var(--dtb-radius-base);
+	padding: 12px;
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+	overflow: auto;
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-ticket-message {
+	border: 1px solid var(--dtb-border-soft);
+	border-left: 3px solid var(--dtb-border);
+	border-radius: var(--dtb-radius-base);
+	background: var(--dtb-surface-soft);
+	padding: 10px;
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-ticket-message--message,
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-ticket-message--customer {
+	border-left-color: var(--dtb-primary);
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-ticket-message--workflow {
+	border-left-color: var(--dtb-warning);
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-ticket-message--delivery {
+	border-left-color: var(--dtb-danger);
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-ticket-message__meta {
+	display: flex;
+	justify-content: space-between;
+	gap: 8px;
+	font-size: 11px;
+	color: var(--dtb-text-muted);
+	margin-bottom: 5px;
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-ticket-message__body {
 	font-size: 13px;
 	color: var(--dtb-text);
 	line-height: 1.5;
 	white-space: pre-wrap;
 }
 
-.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-event-empty,
-.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-modal-error,
-.dtb-admin[data-dtb-page="dtb-support"] .dtb-drawer-loading {
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-ticket-empty {
 	margin: 0;
-	padding: 14px;
-	border: 1px solid var(--dtb-border-soft);
-	border-radius: var(--dtb-radius-md);
-	background: var(--dtb-surface);
 	color: var(--dtb-text-muted);
 }
 
-.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-message {
-	margin: 0;
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-ticket-context {
+	display: grid;
+	gap: 10px;
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-ticket-card {
+	background: var(--dtb-surface);
+	border: 1px solid var(--dtb-border-soft);
+	border-radius: var(--dtb-radius-base);
+	padding: 10px;
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-ticket-card h4 {
+	margin: 0 0 7px;
+	font-size: 12px;
+	text-transform: uppercase;
+	letter-spacing: .04em;
+	color: var(--dtb-text-muted);
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-ticket-kv {
+	display: grid;
+	grid-template-columns: 110px 1fr;
+	gap: 8px;
+	font-size: 12px;
+	padding: 5px 0;
+	border-top: 1px solid var(--dtb-border-soft);
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-ticket-kv:first-of-type {
+	border-top: 0;
+	padding-top: 0;
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-ticket-kv span {
+	color: var(--dtb-text-muted);
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-ticket-kv strong {
 	color: var(--dtb-text);
-	font-size: 13px;
-	line-height: 1.55;
-	white-space: pre-wrap;
 }
 
-@media (max-width: 1320px) {
-	.dtb-admin[data-dtb-page="dtb-support"] .dtb-grid--kpi {
-		grid-template-columns: repeat(3, minmax(0, 1fr));
+@media (max-width: 1460px) {
+	.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-workbench {
+		grid-template-columns: minmax(210px, 230px) minmax(0, 1fr);
+	}
+
+	.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-context {
+		grid-column: 1 / -1;
+		position: static;
 	}
 }
 
-@media (max-width: 960px) {
-	.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-modal-grid {
-		grid-template-columns: 1fr;
-	}
-}
-
-@media (max-width: 782px) {
-	.dtb-admin[data-dtb-page="dtb-support"] .dtb-grid--kpi {
+@media (max-width: 980px) {
+	.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-workbench {
 		grid-template-columns: 1fr;
 	}
 
-	.dtb-admin[data-dtb-page="dtb-support"] .dtb-toolbar .dtb-search-wrap {
-		flex-basis: 100%;
-		max-width: none;
+	.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-rail,
+	.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-context {
+		position: static;
+	}
+
+	.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-ticket-modal__body {
+		grid-template-columns: 1fr;
 	}
 }

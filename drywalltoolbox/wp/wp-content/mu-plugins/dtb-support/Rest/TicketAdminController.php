@@ -76,6 +76,22 @@ function dtb_support_register_admin_ticket_routes(): void {
 		'permission_callback' => 'dtb_support_read_permission',
 	] );
 
+	// ── Workbench aggregate payload ───────────────────────────────────────────
+	register_rest_route( 'dtb/v1', '/support/workbench', [
+		'methods'             => WP_REST_Server::READABLE,
+		'callback'            => 'dtb_support_rest_get_workbench',
+		'permission_callback' => 'dtb_support_read_permission',
+		'args'                => [
+			'status'   => [ 'type' => 'string',  'required' => false ],
+			'queue'    => [ 'type' => 'string',  'required' => false ],
+			'search'   => [ 'type' => 'string',  'required' => false ],
+			'type'     => [ 'type' => 'string',  'required' => false ],
+			'priority' => [ 'type' => 'string',  'required' => false ],
+			'page'     => [ 'type' => 'integer', 'required' => false, 'default' => 1 ],
+			'per_page' => [ 'type' => 'integer', 'required' => false, 'default' => 25 ],
+		],
+	] );
+
 	// ── Snooze / unsnooze ─────────────────────────────────────────────────────
 	register_rest_route( 'dtb/v1', '/support/tickets/(?P<id>\d+)/snooze', [
 		[
@@ -743,6 +759,90 @@ function dtb_support_rest_get_queues(): WP_REST_Response {
 	$payload['counts'] = $counts;
 
 	return new WP_REST_Response( $payload, 200 );
+}
+
+/**
+ * GET /dtb/v1/support/workbench
+ *
+ * Aggregate payload for Support Admin shell queue + context synchronisation.
+ *
+ * @param WP_REST_Request $request
+ * @return WP_REST_Response
+ */
+function dtb_support_rest_get_workbench( WP_REST_Request $request ): WP_REST_Response {
+	$status = sanitize_key( (string) ( $request->get_param( 'status' ) ?? '' ) );
+	$status = function_exists( 'dtb_support_admin_normalize_status' )
+		? dtb_support_admin_normalize_status( $status )
+		: $status;
+	$queue = sanitize_key( (string) ( $request->get_param( 'queue' ) ?? '' ) );
+	$search = sanitize_text_field( (string) ( $request->get_param( 'search' ) ?? '' ) );
+	$type = sanitize_key( (string) ( $request->get_param( 'type' ) ?? '' ) );
+	$priority = sanitize_key( (string) ( $request->get_param( 'priority' ) ?? '' ) );
+	$page = max( 1, (int) ( $request->get_param( 'page' ) ?: 1 ) );
+	$per_page = min( 100, max( 1, (int) ( $request->get_param( 'per_page' ) ?: 25 ) ) );
+
+	$query_args = [
+		'search'   => $search,
+		'type'     => $type,
+		'priority' => $priority,
+		'page'     => $page,
+		'per_page' => $per_page,
+		'order_by' => 'created_at',
+		'order'    => 'DESC',
+	];
+
+	if ( '' !== $queue ) {
+		$result = dtb_support_query_queue( $queue, $query_args );
+	} elseif ( 'needs-reply' === $status ) {
+		$result = dtb_support_query_queue( 'needs_reply', $query_args );
+	} elseif ( 'past-sla' === $status ) {
+		$result = dtb_support_query_queue( 'overdue', $query_args );
+	} else {
+		$query_args['status'] = '' !== $status ? $status : 'all';
+		$result = dtb_support_query_tickets( $query_args );
+	}
+
+	$tickets = array_map(
+		static function ( $ticket ): array {
+			return is_object( $ticket ) ? dtb_support_project_ticket( $ticket ) : [];
+		},
+		(array) ( $result['tickets'] ?? [] )
+	);
+
+	$queues = function_exists( 'dtb_support_normalize_queue_counts' )
+		? dtb_support_normalize_queue_counts( (array) dtb_support_get_queue_counts() )
+		: (array) dtb_support_get_queue_counts();
+	$kpis = dtb_support_get_kpis();
+	$macros = function_exists( 'dtb_support_get_macros' ) ? dtb_support_get_macros() : [];
+
+	$macro_payload = array_map(
+		static function ( $macro ): array {
+			return [
+				'id'       => (int) ( $macro->id ?? 0 ),
+				'name'     => (string) ( $macro->macro_name ?? '' ),
+				'category' => (string) ( $macro->category ?? 'general' ),
+			];
+		},
+		is_array( $macros ) ? $macros : []
+	);
+
+	return new WP_REST_Response( [
+		'queues'  => $queues,
+		'kpis'    => $kpis,
+		'tickets' => $tickets,
+		'macros'  => $macro_payload,
+		'meta'    => [
+			'status'    => $status,
+			'queue'     => $queue,
+			'search'    => $search,
+			'type'      => $type,
+			'priority'  => $priority,
+			'page'      => (int) ( $result['page'] ?? $page ),
+			'per_page'  => (int) ( $result['per_page'] ?? $per_page ),
+			'total'     => (int) ( $result['total'] ?? 0 ),
+			'page_count'=> (int) ( $result['page_count'] ?? 1 ),
+		],
+	], 200 );
 }
 
 /**

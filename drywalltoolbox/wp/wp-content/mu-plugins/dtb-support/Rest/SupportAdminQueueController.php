@@ -22,6 +22,9 @@ function dtb_support_admin_register_routes(): void {
 		'args'                => [
 			'status' => [ 'sanitize_callback' => 'sanitize_key' ],
 			'tab'    => [ 'sanitize_callback' => 'sanitize_key' ],
+			'queue'  => [ 'sanitize_callback' => 'sanitize_key' ],
+			'type'   => [ 'sanitize_callback' => 'sanitize_key' ],
+			'priority' => [ 'sanitize_callback' => 'sanitize_key' ],
 			's'      => [ 'sanitize_callback' => 'sanitize_text_field' ],
 			'search' => [ 'sanitize_callback' => 'sanitize_text_field' ],
 			'paged'  => [ 'sanitize_callback' => 'absint' ],
@@ -47,14 +50,21 @@ function dtb_support_admin_normalize_status( string $status ): string {
 /**
  * Resolve support admin queue/status to table-backed ticket query results.
  */
-function dtb_support_admin_query_tickets( string $status, string $search, int $paged, int $per ): array {
+function dtb_support_admin_query_tickets( string $status, string $search, int $paged, int $per, string $queue = '', string $type = '', string $priority = '' ): array {
 	$query_args = [
 		'search'   => $search,
 		'page'     => $paged,
 		'per_page' => $per,
+		'type'     => sanitize_key( $type ),
+		'priority' => sanitize_key( $priority ),
 		'order_by' => 'created_at',
 		'order'    => 'DESC',
 	];
+	$queue = sanitize_key( $queue );
+
+	if ( '' !== $queue ) {
+		return dtb_support_query_queue( $queue, $query_args );
+	}
 
 	if ( 'needs-reply' === $status ) {
 		return dtb_support_query_queue( 'needs_reply', $query_args );
@@ -130,8 +140,6 @@ function dtb_support_admin_render_queue_markup( array $result, int $paged ): str
 		}
 
 		echo '<tr class="dtb-table__row dtb-table__row--clickable dtb-support-row"'
-			. ' data-dtb-drawer="dtb-support-detail-drawer"'
-			. ' data-dtb-drawer-title="' . esc_attr( sprintf( __( 'Ticket %s', 'drywall-toolbox' ), $ticket_ref ) ) . '"'
 			. ' data-dtb-ticket-id="' . esc_attr( (string) $id ) . '"'
 			. ' data-dtb-ticket-ref="' . esc_attr( $ticket_ref ) . '"'
 			. ' data-dtb-ticket-subject="' . esc_attr( $subject ) . '"'
@@ -158,6 +166,9 @@ function dtb_support_admin_render_queue_markup( array $result, int $paged ): str
 function dtb_support_admin_queue_handler( WP_REST_Request $request ): WP_REST_Response {
 	$status = sanitize_key( $request->get_param( 'status' ) ?? '' );
 	$tab    = sanitize_key( $request->get_param( 'tab' ) ?? '' );
+	$queue  = sanitize_key( $request->get_param( 'queue' ) ?? '' );
+	$type   = sanitize_key( $request->get_param( 'type' ) ?? '' );
+	$priority = sanitize_key( $request->get_param( 'priority' ) ?? '' );
 	if ( '' === $status && '' !== $tab ) {
 		$status = $tab;
 	}
@@ -170,7 +181,7 @@ function dtb_support_admin_queue_handler( WP_REST_Request $request ): WP_REST_Re
 	$paged  = max( 1, (int) ( $request->get_param( 'paged' ) ?: 1 ) );
 	$per    = (int) get_option( 'dtb_admin_items_per_page', 25 );
 
-	$result = dtb_support_admin_query_tickets( $status, $search, $paged, $per );
+	$result = dtb_support_admin_query_tickets( $status, $search, $paged, $per, $queue, $type, $priority );
 	$html   = dtb_support_admin_render_queue_markup( $result, $paged );
 
 	return new WP_REST_Response( [ 'ok' => true, 'html' => $html ], 200 );
