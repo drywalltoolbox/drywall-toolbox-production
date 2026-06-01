@@ -18,7 +18,7 @@ function dtb_support_admin_register_routes(): void {
 	register_rest_route( 'dtb/v1', '/admin/support', [
 		'methods'             => WP_REST_Server::READABLE,
 		'callback'            => 'dtb_support_admin_queue_handler',
-		'permission_callback' => fn() => current_user_can( 'dtb_read_support_tickets' ),
+		'permission_callback' => 'dtb_support_read_permission',
 		'args'                => [
 			'status' => [ 'sanitize_callback' => 'sanitize_key' ],
 			'tab'    => [ 'sanitize_callback' => 'sanitize_key' ],
@@ -29,20 +29,137 @@ function dtb_support_admin_register_routes(): void {
 	] );
 }
 
+/**
+ * Normalize support status aliases from legacy and live controls.
+ */
+function dtb_support_admin_normalize_status( string $status ): string {
+	$status = sanitize_key( $status );
+
+	$status_aliases = [
+		'all'         => '',
+		'needs_reply' => 'needs-reply',
+		'past_sla'    => 'past-sla',
+	];
+
+	return $status_aliases[ $status ] ?? $status;
+}
+
+/**
+ * Resolve support admin queue/status to table-backed ticket query results.
+ */
+function dtb_support_admin_query_tickets( string $status, string $search, int $paged, int $per ): array {
+	$query_args = [
+		'search'   => $search,
+		'page'     => $paged,
+		'per_page' => $per,
+		'order_by' => 'created_at',
+		'order'    => 'DESC',
+	];
+
+	if ( 'needs-reply' === $status ) {
+		return dtb_support_query_queue( 'needs_reply', $query_args );
+	}
+
+	if ( 'past-sla' === $status ) {
+		return dtb_support_query_queue( 'overdue', $query_args );
+	}
+
+	$query_args['status'] = '' !== $status ? $status : 'all';
+
+	return dtb_support_query_tickets( $query_args );
+}
+
+/**
+ * Render support admin table or empty state from table-backed ticket rows.
+ */
+function dtb_support_admin_render_queue_markup( array $result, int $paged ): string {
+	$tickets     = array_map( 'dtb_support_project_ticket', $result['tickets'] ?? [] );
+	$total_pages = max( 1, (int) ( $result['page_count'] ?? 1 ) );
+
+	ob_start();
+
+	if ( empty( $tickets ) ) {
+		echo dtb_admin_ui_empty_state( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+			__( 'No tickets found', 'drywall-toolbox' ),
+			__( 'Try adjusting your filters.', 'drywall-toolbox' )
+		);
+		return (string) ob_get_clean();
+	}
+
+	echo dtb_admin_ui_update_badge( 'dtb-support-workspace' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+	echo dtb_admin_ui_table_open( [ // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		[ 'label' => __( 'ID', 'drywall-toolbox' ),       'key' => 'id' ],
+		[ 'label' => __( 'Subject', 'drywall-toolbox' ),   'key' => 'subject' ],
+		[ 'label' => __( 'Customer', 'drywall-toolbox' ),  'key' => 'customer' ],
+		[ 'label' => __( 'Status', 'drywall-toolbox' ),    'key' => 'status' ],
+		[ 'label' => __( 'Created', 'drywall-toolbox' ),   'key' => 'created' ],
+		[ 'label' => '', 'key' => 'actions' ],
+	], [] );
+
+	foreach ( $tickets as $ticket ) {
+		$id         = (int) ( $ticket['id'] ?? 0 );
+		$ticket_ref = (string) ( $ticket['ticket_number'] ?? '' );
+		if ( '' === $ticket_ref ) {
+			$ticket_ref = '#' . $id;
+		}
+
+		$subject = (string) ( $ticket['subject'] ?? '' );
+		$status  = (string) ( $ticket['status'] ?? 'open' );
+		$status_label = (string) ( $ticket['status_label'] ?? dtb_support_status_label( $status ) );
+		$customer = trim( (string) ( $ticket['customer_name'] ?? '' ) );
+		if ( '' === $customer ) {
+			$customer = trim( (string) ( $ticket['customer_email'] ?? '' ) );
+		}
+		if ( '' === $customer ) {
+			$customer = '—';
+		}
+
+		$view_url = (string) ( $ticket['edit_url'] ?? admin_url( 'admin.php?page=dtb-support&ticket_id=' . $id ) );
+
+		$created_raw   = (string) ( $ticket['created_at'] ?? '' );
+		$created_label = '';
+		if ( '' !== $created_raw ) {
+			$created_label = mysql2date(
+				get_option( 'date_format' ) . ' ' . get_option( 'time_format' ),
+				$created_raw,
+				true
+			);
+		}
+		if ( '' === $created_label ) {
+			$created_label = '—';
+		}
+
+		echo '<tr class="dtb-table__row dtb-table__row--clickable dtb-support-row"'
+			. ' data-dtb-ticket-id="' . esc_attr( (string) $id ) . '"'
+			. ' data-dtb-ticket-ref="' . esc_attr( $ticket_ref ) . '"'
+			. ' data-dtb-ticket-subject="' . esc_attr( $subject ) . '"'
+			. ' data-dtb-ticket-customer="' . esc_attr( $customer ) . '"'
+			. ' data-dtb-ticket-status="' . esc_attr( $status_label ) . '"'
+			. ' data-dtb-ticket-url="' . esc_attr( $view_url ) . '">';
+		echo '<td class="dtb-table__cell"><a class="dtb-support-open-ticket" data-dtb-ticket-id="' . esc_attr( (string) $id ) . '" data-dtb-ticket-ref="' . esc_attr( $ticket_ref ) . '" data-dtb-ticket-url="' . esc_attr( $view_url ) . '" href="' . esc_url( $view_url ) . '">' . esc_html( $ticket_ref ) . '</a></td>';
+		echo '<td class="dtb-table__cell"><a class="dtb-support-open-ticket" data-dtb-ticket-id="' . esc_attr( (string) $id ) . '" data-dtb-ticket-ref="' . esc_attr( $ticket_ref ) . '" data-dtb-ticket-url="' . esc_attr( $view_url ) . '" href="' . esc_url( $view_url ) . '">' . esc_html( $subject ) . '</a></td>';
+		echo '<td class="dtb-table__cell">' . esc_html( $customer ) . '</td>';
+		echo '<td class="dtb-table__cell">' . dtb_admin_ui_badge( esc_html( $status_label ), dtb_admin_ui_status_badge_type( $status ) ) . '</td>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		echo '<td class="dtb-table__cell">' . esc_html( $created_label ) . '</td>';
+		echo '<td class="dtb-table__cell">';
+		echo dtb_admin_ui_button( __( 'Open', 'drywall-toolbox' ), [ 'href' => $view_url, 'size' => 'xs', 'type' => 'ghost', 'class' => 'dtb-support-open-ticket', 'data' => [ 'dtb-ticket-id' => (string) $id, 'dtb-ticket-ref' => $ticket_ref, 'dtb-ticket-url' => $view_url ] ] ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		echo '</td>';
+		echo '</tr>';
+	}
+
+	echo dtb_admin_ui_table_close(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+	echo dtb_admin_ui_pagination( $paged, $total_pages ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+
+	return (string) ob_get_clean();
+}
+
 function dtb_support_admin_queue_handler( WP_REST_Request $request ): WP_REST_Response {
 	$status = sanitize_key( $request->get_param( 'status' ) ?? '' );
 	$tab    = sanitize_key( $request->get_param( 'tab' ) ?? '' );
 	if ( '' === $status && '' !== $tab ) {
 		$status = $tab;
 	}
-	$status_aliases = [
-		'all'         => '',
-		'needs_reply' => 'needs-reply',
-		'past_sla'    => 'past-sla',
-	];
-	if ( isset( $status_aliases[ $status ] ) ) {
-		$status = $status_aliases[ $status ];
-	}
+	$status = dtb_support_admin_normalize_status( $status );
 
 	$search = sanitize_text_field( $request->get_param( 's' ) ?? '' );
 	if ( '' === $search ) {
@@ -51,61 +168,8 @@ function dtb_support_admin_queue_handler( WP_REST_Request $request ): WP_REST_Re
 	$paged  = max( 1, (int) ( $request->get_param( 'paged' ) ?: 1 ) );
 	$per    = (int) get_option( 'dtb_admin_items_per_page', 25 );
 
-	$meta_query = [];
-	if ( $status ) {
-		$meta_query[] = [ 'key' => '_dtb_ticket_status', 'value' => $status ];
-	}
-	$query = new WP_Query( [
-		'post_type'      => 'dtb_support_ticket',
-		'post_status'    => 'publish',
-		'posts_per_page' => $per,
-		'paged'          => $paged,
-		's'              => $search,
-		'meta_query'     => $meta_query, // phpcs:ignore WordPress.DB.SlowDBQuery
-	] );
-	$total_pages = $query->max_num_pages ?: 1;
+	$result = dtb_support_admin_query_tickets( $status, $search, $paged, $per );
+	$html   = dtb_support_admin_render_queue_markup( $result, $paged );
 
-	ob_start();
-
-	if ( ! $query->have_posts() ) {
-		echo dtb_admin_ui_empty_state( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-			__( 'No tickets found', 'drywall-toolbox' ),
-			__( 'Try adjusting your filters.', 'drywall-toolbox' )
-		);
-	} else {
-		echo dtb_admin_ui_update_badge( 'dtb-support-workspace' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-		echo dtb_admin_ui_table_open( [ // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-			[ 'label' => __( 'ID',       'drywall-toolbox' ), 'key' => 'id' ],
-			[ 'label' => __( 'Subject',  'drywall-toolbox' ), 'key' => 'subject' ],
-			[ 'label' => __( 'Customer', 'drywall-toolbox' ), 'key' => 'customer' ],
-			[ 'label' => __( 'Status',   'drywall-toolbox' ), 'key' => 'status' ],
-			[ 'label' => __( 'Created',  'drywall-toolbox' ), 'key' => 'created' ],
-			[ 'label' => '',                                   'key' => 'actions' ],
-		], [] );
-
-		while ( $query->have_posts() ) {
-			$query->the_post();
-			$id       = get_the_ID();
-			$st       = get_post_meta( $id, '_dtb_ticket_status', true ) ?: 'open';
-			$customer = get_post_meta( $id, '_dtb_ticket_customer_name', true ) ?: '—';
-
-			echo '<tr>';
-			echo '<td><a href="' . esc_url( get_edit_post_link( $id ) ) . '">#' . esc_html( $id ) . '</a></td>';
-			echo '<td>' . esc_html( get_the_title() ) . '</td>';
-			echo '<td>' . esc_html( $customer ) . '</td>';
-			echo '<td>' . dtb_admin_ui_badge( esc_html( $st ), dtb_admin_ui_status_badge_type( $st ) ) . '</td>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-			echo '<td>' . esc_html( get_the_date() ) . '</td>';
-			echo '<td>';
-			echo dtb_admin_ui_button( __( 'View', 'drywall-toolbox' ), [ 'href' => get_edit_post_link( $id ), 'size' => 'xs', 'type' => 'ghost' ] ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-			echo '</td>';
-			echo '</tr>';
-		}
-		wp_reset_postdata();
-
-		echo dtb_admin_ui_table_close(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-		echo dtb_admin_ui_pagination( $paged, $total_pages ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-	}
-
-	$html = ob_get_clean();
 	return new WP_REST_Response( [ 'ok' => true, 'html' => $html ], 200 );
 }

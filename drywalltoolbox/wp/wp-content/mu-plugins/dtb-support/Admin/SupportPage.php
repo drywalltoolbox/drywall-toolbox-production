@@ -32,14 +32,7 @@ function dtb_support_render_page(): void {
 	$per    = (int) get_option( 'dtb_admin_items_per_page', 25 );
 	$base   = admin_url( 'admin.php?page=dtb-support' );
 
-	$status_aliases = [
-		'all'         => '',
-		'needs_reply' => 'needs-reply',
-		'past_sla'    => 'past-sla',
-	];
-	if ( isset( $status_aliases[ $status ] ) ) {
-		$status = $status_aliases[ $status ];
-	}
+	$status = dtb_support_admin_normalize_status( $status );
 
 	$support_statuses = [
 		''             => __( 'All', 'drywall-toolbox' ),
@@ -75,29 +68,16 @@ function dtb_support_render_page(): void {
 	// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 	echo dtb_admin_ui_search_input( __( 'Search tickets…', 'drywall-toolbox' ), $search, true, 's', 'dtb-support-workspace' );
 	// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-	echo dtb_admin_ui_toolbar_spacer();
-	// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 	echo dtb_admin_ui_button( __( 'Refresh', 'drywall-toolbox' ), [
 		'type' => 'secondary',
 		'icon' => 'dashicons-update',
 		'size' => 'sm',
+		'class' => 'dtb-support-refresh-btn',
 		'data' => [ 'dtb-live-refresh' => 'dtb-support-workspace' ],
 	] );
 	echo dtb_admin_ui_toolbar_close();
 
-	$meta_query = [];
-	if ( $status ) {
-		$meta_query[] = [ 'key' => '_dtb_ticket_status', 'value' => $status ];
-	}
-	$query       = new WP_Query( [
-		'post_type'      => 'dtb_support_ticket',
-		'post_status'    => 'publish',
-		'posts_per_page' => $per,
-		'paged'          => $paged,
-		's'              => $search,
-		'meta_query'     => $meta_query, // phpcs:ignore WordPress.DB.SlowDBQuery
-	] );
-	$total_pages = $query->max_num_pages ?: 1;
+	$result = dtb_support_admin_query_tickets( $status, $search, $paged, $per );
 
 	// Live region always wraps the data grid (even when empty, so tabs/search survive).
 	dtb_admin_shell_live_region_open( [
@@ -106,86 +86,28 @@ function dtb_support_render_page(): void {
 		'endpoint' => rest_url( 'dtb/v1/admin/support' ),
 		'interval' => 30000,
 	] );
-
-	if ( ! $query->have_posts() ) {
-		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-		echo dtb_admin_ui_empty_state( __( 'No tickets found', 'drywall-toolbox' ), __( 'Try adjusting your filters.', 'drywall-toolbox' ) );
-		dtb_admin_shell_live_region_close();
-		dtb_admin_shell_close();
-		return;
-	}
-
 	// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-	echo dtb_admin_ui_update_badge( 'dtb-support-workspace' );
-
-	// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-	echo dtb_admin_ui_table_open( [
-		[ 'label' => __( 'ID', 'drywall-toolbox' ),       'key' => 'id' ],
-		[ 'label' => __( 'Subject', 'drywall-toolbox' ),   'key' => 'subject' ],
-		[ 'label' => __( 'Customer', 'drywall-toolbox' ),  'key' => 'customer' ],
-		[ 'label' => __( 'Status', 'drywall-toolbox' ),    'key' => 'status' ],
-		[ 'label' => __( 'Created', 'drywall-toolbox' ),   'key' => 'created' ],
-		[ 'label' => '', 'key' => 'actions' ],
-	], [] );
-
-	while ( $query->have_posts() ) {
-		$query->the_post();
-		$id       = get_the_ID();
-		$st       = get_post_meta( $id, '_dtb_ticket_status', true ) ?: 'open';
-		$customer = get_post_meta( $id, '_dtb_ticket_customer_name', true ) ?: '—';
-
-		echo '<tr class="dtb-table__row dtb-table__row--clickable"'
-			. ' data-dtb-drawer="dtb-support-detail-drawer"'
-			. ' data-dtb-drawer-title="' . esc_attr( sprintf( __( 'Ticket #%s', 'drywall-toolbox' ), $id ) ) . '"'
-			. ' data-dtb-field-ticketid="' . esc_attr( '#' . $id ) . '"'
-			. ' data-dtb-field-subject="' . esc_attr( get_the_title() ) . '"'
-			. ' data-dtb-field-customer="' . esc_attr( $customer ) . '"'
-			. ' data-dtb-field-status="' . esc_attr( $st ) . '"'
-			. ' data-dtb-field-viewurl="' . esc_attr( get_edit_post_link( $id ) ) . '">';
-		echo '<td class="dtb-table__cell"><a href="' . esc_url( get_edit_post_link( $id ) ) . '">#' . esc_html( $id ) . '</a></td>';
-		echo '<td class="dtb-table__cell">' . esc_html( get_the_title() ) . '</td>';
-		echo '<td class="dtb-table__cell">' . esc_html( $customer ) . '</td>';
-		echo '<td class="dtb-table__cell">' . dtb_admin_ui_badge( esc_html( $st ), dtb_admin_ui_status_badge_type( $st ) ) . '</td>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-		echo '<td class="dtb-table__cell">' . esc_html( get_the_date() ) . '</td>';
-		echo '<td class="dtb-table__cell">';
-		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-		echo dtb_admin_ui_button( __( 'View', 'drywall-toolbox' ), [ 'href' => get_edit_post_link( $id ), 'size' => 'xs', 'type' => 'ghost' ] );
-		echo '</td>';
-		echo '</tr>';
-	}
-	wp_reset_postdata();
-
-	// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-	echo dtb_admin_ui_table_close();
-	// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-	echo dtb_admin_ui_pagination( $paged, $total_pages );
+	echo dtb_support_admin_render_queue_markup( $result, $paged );
 	dtb_admin_shell_live_region_close();
 
-	// Detail drawer — lives outside the live region so it survives partial refreshes.
-	// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-	echo dtb_admin_ui_drawer(
-		'dtb-support-detail-drawer',
-		__( 'Ticket', 'drywall-toolbox' ),
-		dtb_admin_ui_detail_row( __( 'Ticket',   'drywall-toolbox' ), '<span data-dtb-target="ticketid">—</span>' )
-		. dtb_admin_ui_detail_row( __( 'Subject',  'drywall-toolbox' ), '<span data-dtb-target="subject">—</span>' )
-		. dtb_admin_ui_detail_row( __( 'Customer', 'drywall-toolbox' ), '<span data-dtb-target="customer">—</span>' )
-		. dtb_admin_ui_detail_row( __( 'Status',   'drywall-toolbox' ), '<span data-dtb-target="status">—</span>' ),
-		'<a href="#" class="dtb-btn dtb-btn--sm dtb-support-detail-view-btn">'
-			. esc_html__( 'View Full Ticket', 'drywall-toolbox' )
-		. '</a>'
-	);
 	?>
-	<script>
-	(function () {
-		var d = document.getElementById( 'dtb-support-detail-drawer' );
-		if ( ! d ) return;
-		d.addEventListener( 'dtb:drawer:populate', function ( e ) {
-			var url = e.detail.rowData.dtbFieldViewurl;
-			var btn = d.querySelector( '.dtb-support-detail-view-btn' );
-			if ( btn && url ) btn.href = url;
-		} );
-	}());
-	</script>
+	<div class="modal fade dtb-support-modal" id="dtb-support-ticket-modal" aria-hidden="true" role="dialog" aria-modal="true">
+		<div class="modal-dialog modal-fullscreen">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title h4" id="dtb-support-modal-title"><?php esc_html_e( 'Support Ticket', 'drywall-toolbox' ); ?></h5>
+					<button type="button" class="btn-close" data-dtb-support-modal-close aria-label="<?php esc_attr_e( 'Close', 'drywall-toolbox' ); ?>"></button>
+				</div>
+				<div class="modal-body" id="dtb-support-modal-body">
+					<div class="dtb-support-modal-loading"><?php esc_html_e( 'Loading ticket…', 'drywall-toolbox' ); ?></div>
+				</div>
+				<div class="modal-footer">
+					<a href="#" class="dtb-btn dtb-btn--primary dtb-support-modal-open-link" target="_self"><?php esc_html_e( 'Open Full Ticket', 'drywall-toolbox' ); ?></a>
+					<button type="button" class="dtb-btn dtb-btn--ghost" data-dtb-support-modal-close><?php esc_html_e( 'Close', 'drywall-toolbox' ); ?></button>
+				</div>
+			</div>
+		</div>
+	</div>
 	<?php
 
 	dtb_admin_shell_close();

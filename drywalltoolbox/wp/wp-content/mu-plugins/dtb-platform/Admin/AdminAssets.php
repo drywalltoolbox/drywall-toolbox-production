@@ -112,6 +112,32 @@ function dtb_admin_assets_enqueue(): void {
 		);
 	}
 
+	// ── Module-specific JS (keyed by page slug) ──
+	$module_js_map = [
+		'dtb-support' => [
+			'id'   => 'dtb-support-page-script',
+			'dir'  => WP_CONTENT_DIR . '/mu-plugins/dtb-support/Admin/assets/',
+			'url'  => content_url( '/mu-plugins/dtb-support/Admin/assets/' ),
+			'file' => 'dtb-support-page.js',
+		],
+	];
+
+	if ( isset( $module_js_map[ $page_slug ] ) ) {
+		$mod_js      = $module_js_map[ $page_slug ];
+		$mod_js_file = $mod_js['dir'] . $mod_js['file'];
+		$mod_js_ver  = file_exists( $mod_js_file ) ? (string) filemtime( $mod_js_file ) : '1.0.0';
+
+		if ( file_exists( $mod_js_file ) ) {
+			wp_enqueue_script(
+				$mod_js['id'],
+				$mod_js['url'] . $mod_js['file'],
+				[ 'dtb-admin' ],
+				$mod_js_ver,
+				true
+			);
+		}
+	}
+
 	// ── Shared hardening stylesheet for inline-legacy Tool Library pages ──
 	$legacy_tool_pages = [
 		'dtb-parts-manager',

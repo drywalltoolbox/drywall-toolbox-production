@@ -1,7 +1,7 @@
 /**
  * DTB Support — Support page module styles
  *
- * Stub only. Do not add component styles here until detail layouts are built.
+ * Layout geometry for the Support AdminShell page.
  *
  * Allowed scope:
  * - Support-page layout geometry only.
@@ -13,3 +13,233 @@
  *
  * @package drywall-toolbox
  */
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-page-body {
+	display: block;
+	padding-bottom: 40px;
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-toolbar {
+	margin-bottom: 12px;
+	display: flex;
+	align-items: center;
+	gap: 10px;
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-live-region {
+	display: block !important;
+	min-height: auto;
+	margin: 0;
+	padding: 0;
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-search-wrap {
+	max-width: 520px;
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-refresh-btn {
+	margin-left: auto;
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .modal.fade {
+	display: none;
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .modal.fade.show {
+	display: block;
+	position: fixed;
+	inset: 0;
+	z-index: 99999;
+	background: rgba(15, 23, 42, .54);
+	backdrop-filter: blur(2px);
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .modal-dialog.modal-fullscreen {
+	position: absolute;
+	inset: 18px;
+	margin: 0;
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .modal-content {
+	display: flex;
+	flex-direction: column;
+	height: 100%;
+	background: var(--dtb-surface);
+	border: 1px solid var(--dtb-border);
+	border-radius: var(--dtb-radius-xl);
+	box-shadow: var(--dtb-shadow-lg);
+	overflow: hidden;
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .modal-header,
+.dtb-admin[data-dtb-page="dtb-support"] .modal-footer {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	padding: 14px 18px;
+	border-color: var(--dtb-border);
+	background: var(--dtb-surface);
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .modal-header {
+	justify-content: space-between;
+	border-bottom: 1px solid var(--dtb-border);
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .modal-footer {
+	border-top: 1px solid var(--dtb-border);
+	justify-content: flex-end;
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .modal-title.h4 {
+	margin: 0;
+	font-size: 22px;
+	font-weight: 700;
+	color: var(--dtb-text);
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .btn-close {
+	width: 34px;
+	height: 34px;
+	border: 1px solid var(--dtb-border);
+	border-radius: 999px;
+	background: var(--dtb-surface-soft);
+	color: var(--dtb-text-muted);
+	cursor: pointer;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .btn-close::before {
+	content: "✕";
+	font-size: 14px;
+	line-height: 1;
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .modal-body {
+	flex: 1 1 auto;
+	overflow: auto;
+	padding: 18px;
+	background: var(--dtb-bg);
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-modal-grid {
+	display: grid;
+	grid-template-columns: 1.5fr .85fr;
+	gap: 14px;
+	min-height: 100%;
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-modal-main,
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-modal-side {
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+	min-width: 0;
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-modal-card {
+	background: var(--dtb-surface);
+	border: 1px solid var(--dtb-border);
+	border-radius: var(--dtb-radius-md);
+	padding: 14px;
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-modal-card h6 {
+	margin: 0 0 10px;
+	font-size: 12px;
+	text-transform: uppercase;
+	letter-spacing: .06em;
+	color: var(--dtb-text-muted);
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-kv {
+	display: grid;
+	grid-template-columns: 140px 1fr;
+	gap: 10px;
+	padding: 7px 0;
+	border-bottom: 1px solid var(--dtb-border-soft);
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-kv:last-child {
+	border-bottom: 0;
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-kv span {
+	color: var(--dtb-text-muted);
+	font-size: 12px;
+	font-weight: 600;
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-kv strong {
+	color: var(--dtb-text);
+	font-size: 13px;
+	font-weight: 600;
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-events {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-event {
+	padding: 10px;
+	border: 1px solid var(--dtb-border-soft);
+	border-radius: var(--dtb-radius-base);
+	background: var(--dtb-surface-soft);
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-event__head {
+	display: flex;
+	justify-content: space-between;
+	gap: 10px;
+	font-size: 11px;
+	margin-bottom: 6px;
+	color: var(--dtb-text-muted);
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-event__body {
+	font-size: 13px;
+	color: var(--dtb-text);
+	line-height: 1.5;
+	white-space: pre-wrap;
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-event-empty,
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-modal-loading,
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-modal-error {
+	margin: 0;
+	padding: 14px;
+	border: 1px solid var(--dtb-border-soft);
+	border-radius: var(--dtb-radius-md);
+	background: var(--dtb-surface);
+	color: var(--dtb-text-muted);
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-message {
+	margin: 0;
+	color: var(--dtb-text);
+	font-size: 13px;
+	line-height: 1.55;
+	white-space: pre-wrap;
+}
+
+body.dtb-support-modal-open {
+	overflow: hidden;
+}
+
+@media (max-width: 960px) {
+	.dtb-admin[data-dtb-page="dtb-support"] .modal-dialog.modal-fullscreen {
+		inset: 0;
+	}
+
+	.dtb-admin[data-dtb-page="dtb-support"] .modal-content {
+		border-radius: 0;
+	}
+
+	.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-modal-grid {
+		grid-template-columns: 1fr;
+	}
+}

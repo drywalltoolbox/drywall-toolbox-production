@@ -68,10 +68,13 @@ function dtb_support_enqueue_admin_assets( string $hook ): void {
 	// The legacy standalone top-level hook is 'toplevel_page_dtb-support'.
 	$is_new_dtb_shell_page = ( false !== strpos( $hook, '_page_dtb-support' ) );
 
-	if ( ! $is_new_dtb_shell_page ) {
-		wp_enqueue_style( 'dtb-support-admin', $assets_url . 'dtb-support.css', [], $css_ver );
+	// On the new AdminShell page, legacy Support Hub CSS/JS must stay disabled.
+	// They target a different DOM and can interfere with layout and interactions.
+	if ( $is_new_dtb_shell_page ) {
+		return;
 	}
 
+	wp_enqueue_style( 'dtb-support-admin', $assets_url . 'dtb-support.css', [], $css_ver );
 	wp_enqueue_script( 'dtb-support-admin', $assets_url . 'dtb-support.js', [ 'jquery' ], $js_ver, true );
 
 	$current_user = wp_get_current_user();
