@@ -63,9 +63,12 @@ require_once __DIR__ . '/Rest/RepairEventStreamController.php';
 require_once __DIR__ . '/Rest/RepairHealthController.php';
 require_once __DIR__ . '/Rest/RepairAdminQueueController.php';
 
-// Admin (only in admin context)
-if ( is_admin() ) {
+// Admin query/filter helpers — loaded for both admin and REST API contexts
+// so that REST endpoints can use dtb_repairs_query, dtb_repairs_normalize_status_filter, etc.
 require_once __DIR__ . '/Admin/RepairsPage.php';
+
+// Admin UI (only in admin context)
+if ( is_admin() ) {
 require_once __DIR__ . '/Admin/RepairAdminMenu.php';
 require_once __DIR__ . '/Admin/RepairListTable.php';
 require_once __DIR__ . '/Admin/RepairMetaBoxes.php';

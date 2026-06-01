@@ -171,6 +171,7 @@ function dtb_repair_metabox_order_details( WP_Post $post ): void {
 	echo '<textarea id="dtb-repair-chat-input" class="dtb-repair-chat-input" maxlength="600" placeholder="'
 		. esc_attr__( 'Send an update to the customer…', 'drywall-toolbox' )
 		. '"></textarea>';
+	echo '<span class="dtb-repair-chat-charcount" id="dtb-repair-chat-charcount" aria-live="polite">0 / 600</span>';
 	echo '<div class="dtb-repair-chat-actions">';
 	echo '<span id="dtb-repair-chat-msg" class="dtb-repair-chat-msg"></span>';
 	if ( (int) $thread_alert['unread_count'] > 0 ) {
@@ -199,6 +200,19 @@ function dtb_repair_metabox_order_details( WP_Post $post ): void {
 		var $msg = $('#dtb-repair-chat-msg');
 		var $send = $('#dtb-repair-chat-send');
 		var $markRead = $('#dtb-repair-chat-mark-read');
+
+		var MAX_CHARS = 600;
+		var $charCount = $('#dtb-repair-chat-charcount');
+		$input.on('input', function() {
+			var len = ($input.val() || '').length;
+			$charCount.text(len + ' / ' + MAX_CHARS);
+			$charCount.removeClass('is-near is-limit');
+			if (len >= MAX_CHARS) {
+				$charCount.addClass('is-limit');
+			} else if (len >= MAX_CHARS * 0.8) {
+				$charCount.addClass('is-near');
+			}
+		});
 
 		var esc = function(str){
 			return $('<div>').text(String(str || '')).html();

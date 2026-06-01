@@ -318,7 +318,7 @@ function dtb_repair_admin_hero_banner( WP_Post $post ): void {
 	</div>
 
 	<div id="dtb-repair-workspace-tabs" role="tablist" aria-label="Repair Workspace Tabs">
-		<button type="button" class="dtb-workspace-tab is-active" data-dtb-tab="order_details" role="tab" aria-selected="true">
+		<button type="button" class="dtb-workspace-tab" data-dtb-tab="order_details" role="tab" aria-selected="false">
 			Order Details
 			<?php if ( $unread_customer_messages > 0 ) : ?>
 				<span class="dtb-workspace-tab-badge"><?php echo esc_html( (string) $unread_customer_messages ); ?></span>
@@ -327,14 +327,17 @@ function dtb_repair_admin_hero_banner( WP_Post $post ): void {
 		<button type="button" class="dtb-workspace-tab" data-dtb-tab="quote_builder" role="tab" aria-selected="false">
 			Quote Builder
 		</button>
-		<button type="button" class="dtb-workspace-tab" data-dtb-tab="technician_details" role="tab" aria-selected="false">
-			Technician Details
+		<button type="button" class="dtb-workspace-tab" data-dtb-tab="technician" role="tab" aria-selected="false">
+			Technician
 		</button>
 		<button type="button" class="dtb-workspace-tab" data-dtb-tab="timeline" role="tab" aria-selected="false">
 			Timeline
 		</button>
+		<button type="button" class="dtb-workspace-tab" data-dtb-tab="notes" role="tab" aria-selected="false">
+			Notes
+		</button>
 		<button type="button" class="dtb-workspace-tab" data-dtb-tab="all" role="tab" aria-selected="false">
-			All Sections
+			All
 		</button>
 	</div>
 	<?php
@@ -373,9 +376,10 @@ function dtb_repair_admin_footer_scripts(): void {
 			}, { passive: true });
 		}
 
-		/* ── Keep all postboxes open (prevent WP collapse toggle) ── */
-		document.querySelectorAll('.postbox').forEach(function(box) {
-			box.classList.remove('closed');
+		/* ── Keep all postboxes open; strip WP hidden/closed/hide-if-js so tab JS owns visibility ── */
+		document.querySelectorAll('#normal-sortables .postbox, #side-sortables .postbox').forEach(function(box) {
+			box.classList.remove('closed', 'hidden', 'hide-if-js');
+			if ( box.style.display === 'none' ) box.style.display = '';
 		});
 		document.querySelectorAll('.handlediv, .toggle-indicator').forEach(function(el) {
 			el.style.display = 'none';
@@ -491,6 +495,14 @@ function dtb_repair_admin_footer_scripts(): void {
 		mountTopGrid();
 		if ( tabButtons.length ) {
 			var byId = function(id) { return document.getElementById(id); };
+			// Debug: log which IDs are missing from the DOM
+			['dtb-repair-command-center','dtb-repair-order-details','dtb-repair-quote-builder',
+			 'dtb-repair-technician','dtb-repair-timeline','dtb-repair-notes','dtb-repair-queue'].forEach(function(id) {
+				var el = document.getElementById(id);
+				if ( ! el ) { console.warn('[DTB Tabs] Postbox not found in DOM: #' + id); }
+				else { console.log('[DTB Tabs] Found #' + id + ' classes:', el.className); }
+			});
+			var SESSION_KEY = 'dtb_repair_tab_' + (window.location.search.match(/[?&]post=(\d+)/) || ['',''])[1];
 			var groups = {
 				order_details: [
 					'dtb-repair-command-center',
@@ -500,26 +512,27 @@ function dtb_repair_admin_footer_scripts(): void {
 					'dtb-repair-command-center',
 					'dtb-repair-quote-builder'
 				],
-				technician_details: [
+				technician: [
 					'dtb-repair-command-center',
-					'dtb-repair-technician',
-					'dtb-repair-quote-builder',
-					'dtb-repair-order-details',
-					'dtb-repair-notes',
-					'dtb-repair-queue'
+					'dtb-repair-technician'
 				],
 				timeline: [
 					'dtb-repair-command-center',
 					'dtb-repair-timeline'
+				],
+				notes: [
+					'dtb-repair-command-center',
+					'dtb-repair-notes',
+					'dtb-repair-queue'
 				],
 				all: []
 			};
 
 			var allKnownIds = [
 				'dtb-repair-command-center',
+				'dtb-repair-order-details',
 				'dtb-repair-quote-builder',
 				'dtb-repair-technician',
-				'dtb-repair-order-details',
 				'dtb-repair-timeline',
 				'dtb-repair-notes',
 				'dtb-repair-queue'
@@ -532,19 +545,19 @@ function dtb_repair_admin_footer_scripts(): void {
 					btn.setAttribute('aria-selected', isActive ? 'true' : 'false');
 				});
 
-				if ( tabKey === 'all' ) {
-					allKnownIds.forEach(function(id) {
-						var el = byId(id);
-						if ( el ) el.classList.remove('dtb-workspace-hidden');
-					});
-					return;
-				}
+				try { window.sessionStorage.setItem(SESSION_KEY, tabKey); } catch(e) {}
 
-				var visibleSet = new Set(groups[tabKey] || groups.order_details);
+				var visibleSet = ( tabKey === 'all' )
+					? new Set(allKnownIds)
+					: new Set(groups[tabKey] || groups.order_details);
+
 				allKnownIds.forEach(function(id) {
 					var el = byId(id);
 					if ( ! el ) return;
-					el.classList.toggle('dtb-workspace-hidden', ! visibleSet.has(id));
+					var show = visibleSet.has(id);
+					el.classList.remove('hidden'); // strip WP Screen Options class
+					el.classList.toggle('dtb-workspace-hidden', ! show);
+					el.style.display = show ? '' : 'none';
 				});
 			};
 
@@ -556,7 +569,10 @@ function dtb_repair_admin_footer_scripts(): void {
 				});
 			});
 
-			setActiveTab('order_details');
+			var savedTab = '';
+			try { savedTab = window.sessionStorage.getItem(SESSION_KEY) || ''; } catch(e) {}
+			var initialTab = (savedTab && groups.hasOwnProperty(savedTab)) ? savedTab : 'order_details';
+			setActiveTab(initialTab);
 			mountTopGrid();
 		}
 

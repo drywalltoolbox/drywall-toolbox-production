@@ -148,6 +148,78 @@
 		return parts[ 0 ].slice( 0, 2 ).toUpperCase();
 	}
 
+	/**
+	 * Converts an ISO or MySQL datetime string to a human-readable format.
+	 * e.g. "2026-06-01 05:16:19" → "Jun 1, 2026 at 5:16 AM"
+	 * Falls back to the original value if it cannot be parsed.
+	 */
+	function formatDate( raw ) {
+		if ( ! raw || raw === '—' ) {
+			return raw || '—';
+		}
+		// MySQL datetimes use space; ISO uses T — normalise for Safari/Firefox.
+		var normalised = String( raw ).replace( ' ', 'T' );
+		var d = new Date( normalised );
+		if ( isNaN( d.getTime() ) ) {
+			return raw;
+		}
+		var now   = new Date();
+		var diffS = ( now - d ) / 1000;
+
+		// Within the last 60 s
+		if ( diffS >= 0 && diffS < 60 ) {
+			return 'Just now';
+		}
+		// Within the last hour
+		if ( diffS >= 0 && diffS < 3600 ) {
+			var m = Math.floor( diffS / 60 );
+			return m + ' minute' + ( m === 1 ? '' : 's' ) + ' ago';
+		}
+		// Today (same calendar day)
+		var isToday = d.toDateString() === now.toDateString();
+		if ( isToday ) {
+			return 'Today at ' + d.toLocaleTimeString( undefined, { hour: 'numeric', minute: '2-digit' } );
+		}
+		// Yesterday
+		var yesterday = new Date( now );
+		yesterday.setDate( now.getDate() - 1 );
+		if ( d.toDateString() === yesterday.toDateString() ) {
+			return 'Yesterday at ' + d.toLocaleTimeString( undefined, { hour: 'numeric', minute: '2-digit' } );
+		}
+		// Full date
+		return d.toLocaleDateString( undefined, { month: 'short', day: 'numeric', year: 'numeric' } )
+			+ ' at ' + d.toLocaleTimeString( undefined, { hour: 'numeric', minute: '2-digit' } );
+	}
+
+	/**
+	 * Format a date for the "Due" field — shows just the date if it is a future
+	 * date (not today), or "Today at HH:MM" / "Overdue since …" if past.
+	 */
+	function formatDue( raw ) {
+		if ( ! raw || raw === '—' ) {
+			return raw || '—';
+		}
+		var normalised = String( raw ).replace( ' ', 'T' );
+		var d = new Date( normalised );
+		if ( isNaN( d.getTime() ) ) {
+			return raw;
+		}
+		var now = new Date();
+		if ( d < now ) {
+			var diffS = ( now - d ) / 1000;
+			if ( diffS < 3600 ) {
+				return 'Overdue ' + Math.floor( diffS / 60 ) + 'm ago';
+			}
+			if ( diffS < 86400 ) {
+				return 'Overdue ' + Math.floor( diffS / 3600 ) + 'h ago';
+			}
+			return 'Overdue since ' + d.toLocaleDateString( undefined, { month: 'short', day: 'numeric' } );
+		}
+		// Future — show friendly date
+		return d.toLocaleDateString( undefined, { month: 'short', day: 'numeric', year: 'numeric' } )
+			+ ' at ' + d.toLocaleTimeString( undefined, { hour: 'numeric', minute: '2-digit' } );
+	}
+
 	function buildTimeline( events, message, customerName ) {
 		var html = '';
 
@@ -194,9 +266,14 @@
 			}
 
 			if ( group === 'message' ) {
-				// Determine direction: customer replies = inbound, staff replies = outbound
-				var isCustomerMessage = actorType === 'customer'
-					|| eventType === 'ticket.reply_customer';
+				// Determine direction: actorType drives alignment.
+			// 'ticket.reply_customer' = staff reply SENT TO customer (outbound).
+			// Only actorType === 'customer', or known inbound event types, are left-aligned.
+			var isCustomerMessage = actorType === 'customer'
+				|| ( ! actorType && (
+					eventType === 'customer.reply'
+					|| eventType === 'ticket.customer_reply'
+				) );
 
 				if ( isCustomerMessage ) {
 					var cInitials = avatarInitials( customerName || 'Customer' );
@@ -227,17 +304,10 @@
 				}
 
 			} else if ( group === 'internal' ) {
-				// Internal note — centered amber card
-				html += '<div class="dtb-chat-row dtb-chat-row--note">'
-					+ '<div class="dtb-chat-note">'
-					+ '<div class="dtb-chat-note__label">'
-					+ '🔒 Internal Note'
-					+ ( authorName ? ' · <span class="dtb-chat-note__author">' + escHtml( authorName ) + '</span>' : '' )
-					+ ( evWhen ? ' <span class="dtb-chat-note__time">' + escHtml( evWhen ) + '</span>' : '' )
-					+ '</div>'
-					+ '<div class="dtb-chat-note__body">' + escHtml( evBody || '—' ) + '</div>'
-					+ '</div>'
-					+ '</div>';
+				// Internal notes — suppressed from conversation view to reduce clutter.
+				// Only system-generated internal notes (priority changes, assignments,
+				// email delivery receipts) are hidden; these are visible in the audit log.
+				return;
 
 			} else if ( group === 'delivery' ) {
 				// Email delivery events — subtle inline pill with status indicator
@@ -325,6 +395,100 @@
 			.catch( function () {} );
 	}
 
+	// ── Smart macros ────────────────────────────────────────────────────────────
+	// Tokens: {{customer}} {{ticket}} {{order}}
+	var MACROS = [
+		{
+			category: 'Greetings',
+			items: [
+				{
+					label: 'Welcome greeting',
+					text: 'Hi {{customer}},\n\nThank you for reaching out to us! We received your message and our team is looking into it now. We\'ll have an update for you shortly.\n\nBest regards,\nDrywall Toolbox Support',
+				},
+				{
+					label: 'Follow-up check-in',
+					text: 'Hi {{customer}},\n\nJust following up on your ticket {{ticket}} to see if everything has been resolved to your satisfaction. Please don\'t hesitate to reply if you need any further assistance.\n\nBest,\nDrywall Toolbox Support',
+				},
+			],
+		},
+		{
+			category: 'Returns & Warranty',
+			items: [
+				{
+					label: 'Return approved',
+					text: 'Hi {{customer}},\n\nWe\'ve reviewed your return request for ticket {{ticket}} and are happy to approve it. Please ship the item back to us using the address on your original packing slip. Once we receive and inspect the item, we\'ll process your refund or replacement within 3–5 business days.\n\nIf you have any questions, just reply here.\n\nBest,\nDrywall Toolbox Support',
+				},
+				{
+					label: 'Warranty claim — need more info',
+					text: 'Hi {{customer}},\n\nThank you for submitting your warranty claim. To move forward, could you please provide:\n\n• A photo of the issue\n• Your order number (if not already included)\n• A brief description of when the issue first appeared\n\nOnce we have those details, we can process your claim right away.\n\nThanks,\nDrywall Toolbox Support',
+				},
+				{
+					label: 'Damaged item received',
+					text: 'Hi {{customer}},\n\nWe\'re so sorry to hear that your item arrived damaged — that\'s not the experience we want for you. We\'d like to make this right immediately.\n\nCould you share a photo of the damage so we can arrange a replacement or refund? You won\'t need to return the damaged item.\n\nAppreciate your patience,\nDrywall Toolbox Support',
+				},
+			],
+		},
+		{
+			category: 'Shipping & Orders',
+			items: [
+				{
+					label: 'Order shipped — tracking',
+					text: 'Hi {{customer}},\n\nGreat news — your order {{order}} has shipped! You should receive a tracking email shortly with the carrier details. Most shipments arrive within 5–7 business days.\n\nIf you haven\'t received tracking within 24 hours, just reply here and we\'ll look into it.\n\nBest,\nDrywall Toolbox Support',
+				},
+				{
+					label: 'Shipping delay',
+					text: 'Hi {{customer}},\n\nWe wanted to proactively let you know that your order {{order}} is experiencing a slight shipping delay. We\'re actively working with the carrier to get it moving and will update you as soon as we have a confirmed delivery estimate.\n\nWe truly appreciate your patience and are sorry for the inconvenience.\n\nBest,\nDrywall Toolbox Support',
+				},
+				{
+					label: 'Order not received',
+					text: 'Hi {{customer}},\n\nI\'m sorry to hear your order hasn\'t arrived yet. I\'ve pulled up the tracking on our end and will investigate right away.\n\nIn the meantime, could you confirm that the shipping address on your order {{order}} is correct? This helps us work with the carrier quickly.\n\nWe\'ll follow up with an update within 1 business day.\n\nThank you,\nDrywall Toolbox Support',
+				},
+			],
+		},
+		{
+			category: 'Closing & Resolution',
+			items: [
+				{
+					label: 'Resolved — closing ticket',
+					text: 'Hi {{customer}},\n\nI\'m glad we were able to resolve your issue! We\'ll go ahead and close ticket {{ticket}} now. If anything else comes up, feel free to open a new ticket — we\'re always happy to help.\n\nHave a great day!\nDrywall Toolbox Support',
+				},
+				{
+					label: 'No response — closing',
+					text: 'Hi {{customer}},\n\nWe haven\'t heard back from you regarding ticket {{ticket}}, so we\'ll go ahead and mark it resolved. If you still need assistance, simply reply to this message or open a new ticket.\n\nTake care,\nDrywall Toolbox Support',
+				},
+			],
+		},
+	];
+
+	function buildMacroHtml( customerName, ticketLabel, orderId ) {
+		var html = '<div class="dtb-macro-panel" id="dtb-macro-panel" hidden>'
+			+ '<div class="dtb-macro-panel__header">'
+			+ '<span class="dtb-macro-panel__title">Quick Responses</span>'
+			+ '<button type="button" class="dtb-macro-close" aria-label="Close">✕</button>'
+			+ '</div>'
+			+ '<div class="dtb-macro-panel__body">';
+
+		MACROS.forEach( function ( group ) {
+			html += '<div class="dtb-macro-group">'
+				+ '<div class="dtb-macro-group__label">' + escHtml( group.category ) + '</div>'
+				+ '<div class="dtb-macro-group__items">';
+			group.items.forEach( function ( macro ) {
+				// Store the resolved text as a data attribute
+				var resolved = macro.text
+					.replace( /\{\{customer\}\}/g, customerName )
+					.replace( /\{\{ticket\}\}/g, ticketLabel )
+					.replace( /\{\{order\}\}/g, orderId !== '—' ? orderId : '' );
+				html += '<button type="button" class="dtb-macro-btn" data-macro-text="' + escHtml( resolved ) + '">'
+					+ escHtml( macro.label )
+					+ '</button>';
+			} );
+			html += '</div></div>';
+		} );
+
+		html += '</div></div>';
+		return html;
+	}
+
 	function renderTicketModal( els, payload ) {
 		var ticket = payload && payload.ticket ? payload.ticket : {};
 		var events = payload && payload.events ? payload.events : [];
@@ -338,9 +502,10 @@
 		var prioritySlug = ticket.priority || 'normal';
 		var typeLabel = ticket.type_label || ticket.ticket_type || '—';
 		var message = ticket.message || '';
-		var created = ticket.created_at || '—';
-		var updated = ticket.updated_at || '—';
-		var dueAt = ticket.action_due_at || '—';
+		var created = formatDate( ticket.created_at ) || '—';
+		var updated = formatDate( ticket.updated_at ) || '—';
+		var dueAt = formatDue( ticket.action_due_at ) || '—';
+		var dueRaw = ticket.action_due_at || '';
 		var assignedUserId = ticket.assigned_user_id ? String( ticket.assigned_user_id ) : '';
 		var assignedName = ticket.assigned_user_name || '';
 		var orderId = ticket.order_id ? '#' + ticket.order_id : '—';
@@ -390,7 +555,7 @@
 			+ ( orderId !== '—' ? '<span>Order ' + escHtml( orderId ) + '</span><span class="dtb-support-email-sep">·</span>' : '' )
 			+ ( assignedName ? '<span>→ ' + escHtml( assignedName ) + '</span><span class="dtb-support-email-sep">·</span>' : '' )
 			+ '<span>Created ' + escHtml( created ) + '</span>'
-			+ ( dueAt !== '—' ? '<span class="dtb-support-email-sep">·</span><span class="dtb-support-email-due">Due ' + escHtml( dueAt ) + '</span>' : '' )
+			+ ( dueAt !== '—' ? '<span class="dtb-support-email-sep">·</span><span class="dtb-support-email-due' + ( dueRaw && new Date( dueRaw.replace( ' ', 'T' ) ) < new Date() ? ' is-overdue' : '' ) + '">Due ' + escHtml( dueAt ) + '</span>' : '' )
 			+ '</div>'
 
 			+ '</header>'
@@ -417,9 +582,11 @@
 
 			// Pinned compose bar
 			+ '<div class="dtb-chat-compose">'
+			+ buildMacroHtml( customerName, ticketLabel, orderId )
 			+ '<div class="dtb-chat-compose__toolbar">'
 			+ '<button type="button" class="dtb-chat-mode-btn is-active" data-dtb-compose-mode="reply">Reply to Customer</button>'
 			+ '<button type="button" class="dtb-chat-mode-btn" data-dtb-compose-mode="note">Internal Note</button>'
+			+ '<button type="button" class="dtb-chat-macro-toggle dtb-btn dtb-btn--ghost dtb-btn--sm" title="Quick response macros" aria-expanded="false" aria-controls="dtb-macro-panel">⚡ Quick Responses</button>'
 			+ '</div>'
 			+ '<form class="dtb-chat-compose__form dtb-support-reply-form" data-dtb-reply-type="reply">'
 			+ '<div class="dtb-chat-compose__input-row">'
@@ -471,7 +638,7 @@
 			+ '<div class="dtb-support-ticket-kv"><span>Ticket</span><strong>' + escHtml( ticketLabel ) + '</strong></div>'
 			+ '<div class="dtb-support-ticket-kv"><span>Status</span><strong>' + escHtml( status ) + '</strong></div>'
 			+ '<div class="dtb-support-ticket-kv"><span>Priority</span><strong>' + escHtml( priority ) + '</strong></div>'
-			+ '<div class="dtb-support-ticket-kv"><span>Action Due</span><strong>' + escHtml( dueAt ) + '</strong></div>'
+			+ '<div class="dtb-support-ticket-kv"><span>Action Due</span><strong' + ( dueRaw && new Date( dueRaw.replace( ' ', 'T' ) ) < new Date() ? ' class="dtb-kv-overdue"' : '' ) + '>' + escHtml( dueAt ) + '</strong></div>'
 			+ '<div class="dtb-support-ticket-kv"><span>Created</span><strong>' + escHtml( created ) + '</strong></div>'
 			+ '<div class="dtb-support-ticket-kv"><span>Updated</span><strong>' + escHtml( updated ) + '</strong></div>'
 			+ '</div>'
@@ -943,6 +1110,72 @@
 				.finally( function () {
 					if ( submitBtn ) { submitBtn.disabled = false; }
 				} );
+		} );
+
+		// ── Macro panel toggle ─────────────────────────────────────────────────
+		document.addEventListener( 'click', function ( evt ) {
+			var toggleBtn = evt.target && evt.target.closest ? evt.target.closest( '.dtb-chat-macro-toggle' ) : null;
+			if ( ! toggleBtn || ! toggleBtn.closest( '#' + MODAL_ID ) ) {
+				return;
+			}
+			var compose = toggleBtn.closest( '.dtb-chat-compose' );
+			var panel = compose ? compose.querySelector( '#dtb-macro-panel' ) : null;
+			if ( ! panel ) {
+				return;
+			}
+			var isOpen = ! panel.hidden;
+			panel.hidden = isOpen;
+			toggleBtn.setAttribute( 'aria-expanded', isOpen ? 'false' : 'true' );
+			toggleBtn.classList.toggle( 'is-active', ! isOpen );
+		} );
+
+		// ── Macro close button ─────────────────────────────────────────────────
+		document.addEventListener( 'click', function ( evt ) {
+			var closeBtn = evt.target && evt.target.closest ? evt.target.closest( '.dtb-macro-close' ) : null;
+			if ( ! closeBtn || ! closeBtn.closest( '#' + MODAL_ID ) ) {
+				return;
+			}
+			var panel = closeBtn.closest( '#dtb-macro-panel' );
+			if ( panel ) {
+				panel.hidden = true;
+				var compose = panel.closest( '.dtb-chat-compose' );
+				var toggleBtn = compose ? compose.querySelector( '.dtb-chat-macro-toggle' ) : null;
+				if ( toggleBtn ) {
+					toggleBtn.setAttribute( 'aria-expanded', 'false' );
+					toggleBtn.classList.remove( 'is-active' );
+				}
+			}
+		} );
+
+		// ── Macro insert ───────────────────────────────────────────────────────
+		document.addEventListener( 'click', function ( evt ) {
+			var macroBtn = evt.target && evt.target.closest ? evt.target.closest( '.dtb-macro-btn' ) : null;
+			if ( ! macroBtn || ! macroBtn.closest( '#' + MODAL_ID ) ) {
+				return;
+			}
+			var text = macroBtn.getAttribute( 'data-macro-text' ) || '';
+			var compose = macroBtn.closest( '.dtb-chat-compose' );
+			if ( ! compose ) {
+				return;
+			}
+			var ta = compose.querySelector( 'textarea[name="message"]' );
+			if ( ta ) {
+				ta.value = text;
+				ta.focus();
+				// Auto-resize if needed
+				ta.style.height = 'auto';
+				ta.style.height = Math.min( ta.scrollHeight, 280 ) + 'px';
+			}
+			// Close the macro panel
+			var panel = compose.querySelector( '#dtb-macro-panel' );
+			if ( panel ) {
+				panel.hidden = true;
+			}
+			var toggleBtn = compose.querySelector( '.dtb-chat-macro-toggle' );
+			if ( toggleBtn ) {
+				toggleBtn.setAttribute( 'aria-expanded', 'false' );
+				toggleBtn.classList.remove( 'is-active' );
+			}
 		} );
 
 		// ── "Open Full Ticket" button + modal close ────────────────────────────

@@ -62,7 +62,6 @@ function dtb_support_workbench_kpi_cards(): array {
 			'label'      => __( 'Active', 'drywall-toolbox' ),
 			'icon'       => 'dashicons-tickets-alt',
 			'icon_color' => 'primary',
-			'trend'      => __( 'Open workload', 'drywall-toolbox' ),
 			'href'       => admin_url( 'admin.php?page=dtb-support' ),
 		],
 		[
@@ -70,7 +69,6 @@ function dtb_support_workbench_kpi_cards(): array {
 			'label'      => __( 'Needs Reply', 'drywall-toolbox' ),
 			'icon'       => 'dashicons-email-alt2',
 			'icon_color' => 'warning',
-			'trend'      => __( 'Customer response pending', 'drywall-toolbox' ),
 			'href'       => add_query_arg( [ 'page' => 'dtb-support', 'status' => 'needs-reply' ], admin_url( 'admin.php' ) ),
 		],
 		[
@@ -78,36 +76,13 @@ function dtb_support_workbench_kpi_cards(): array {
 			'label'      => __( 'Overdue', 'drywall-toolbox' ),
 			'icon'       => 'dashicons-warning',
 			'icon_color' => 'danger',
-			'trend'      => __( 'Past response target', 'drywall-toolbox' ),
 			'href'       => add_query_arg( [ 'page' => 'dtb-support', 'status' => 'past-sla' ], admin_url( 'admin.php' ) ),
-		],
-		[
-			'value'      => number_format_i18n( (int) ( $kpis['due_soon_count'] ?? 0 ) ),
-			'label'      => __( 'Due Soon', 'drywall-toolbox' ),
-			'icon'       => 'dashicons-clock',
-			'icon_color' => 'accent',
-			'trend'      => __( 'Approaching target', 'drywall-toolbox' ),
-		],
-		[
-			'value'      => number_format_i18n( (int) ( $kpis['unassigned'] ?? 0 ) ),
-			'label'      => __( 'Unassigned', 'drywall-toolbox' ),
-			'icon'       => 'dashicons-admin-users',
-			'icon_color' => 'accent',
-			'trend'      => __( 'Needs owner', 'drywall-toolbox' ),
 		],
 		[
 			'value'      => number_format_i18n( (int) ( $kpis['urgent'] ?? 0 ) ),
 			'label'      => __( 'Urgent', 'drywall-toolbox' ),
 			'icon'       => 'dashicons-flag',
 			'icon_color' => 'danger',
-			'trend'      => __( 'Escalated', 'drywall-toolbox' ),
-		],
-		[
-			'value'      => number_format_i18n( (int) ( $kpis['email_failures'] ?? 0 ) ),
-			'label'      => __( 'Email Failures', 'drywall-toolbox' ),
-			'icon'       => 'dashicons-email',
-			'icon_color' => 'warning',
-			'trend'      => __( 'Delivery health', 'drywall-toolbox' ),
 		],
 	];
 }
@@ -233,27 +208,6 @@ function dtb_support_render_workbench( array $args ): void {
 	echo dtb_support_admin_render_queue_markup( $result, $paged );
 	dtb_admin_shell_live_region_close();
 	echo '</section>';
-
-	echo '<aside class="dtb-support-context">';
-	echo '<div class="dtb-support-context-card">';
-	echo '<h3>' . esc_html__( 'Queue Context', 'drywall-toolbox' ) . '</h3>';
-	echo '<div class="dtb-support-context-row"><span>' . esc_html__( 'Selected Queue', 'drywall-toolbox' ) . '</span><strong data-dtb-support-current-queue>' . esc_html( $queue_items[ $active_queue ]['label'] ?? __( 'All Active', 'drywall-toolbox' ) ) . '</strong></div>';
-	echo '<div class="dtb-support-context-row"><span>' . esc_html__( 'Auto-refresh', 'drywall-toolbox' ) . '</span><strong>30s</strong></div>';
-	echo '<div class="dtb-support-context-row"><span>' . esc_html__( 'Ticket Count', 'drywall-toolbox' ) . '</span><strong data-dtb-support-current-total>' . esc_html( (string) (int) ( $result['total'] ?? 0 ) ) . '</strong></div>';
-	echo '</div>';
-
-	echo '<div class="dtb-support-context-card">';
-	echo '<h3>' . esc_html__( 'Queue Summary', 'drywall-toolbox' ) . '</h3>';
-	foreach ( $queue_items as $queue_key => $meta ) {
-		echo '<div class="dtb-support-context-row"><span>' . esc_html( $meta['label'] ) . '</span><strong data-dtb-support-summary="' . esc_attr( $queue_key ) . '">' . esc_html( (string) ( (int) ( $queue_counts[ $queue_key ] ?? 0 ) ) ) . '</strong></div>';
-	}
-	echo '</div>';
-
-	echo '<div class="dtb-support-context-card">';
-	echo '<h3>' . esc_html__( 'Selected Ticket', 'drywall-toolbox' ) . '</h3>';
-	echo '<p class="dtb-support-context-muted">' . esc_html__( 'Open a ticket to load customer context, timeline, and workflow tools.', 'drywall-toolbox' ) . '</p>';
-	echo '</div>';
-	echo '</aside>';
 
 	echo '</div>';
 

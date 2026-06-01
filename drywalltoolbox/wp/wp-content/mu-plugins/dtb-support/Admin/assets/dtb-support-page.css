@@ -13,13 +13,12 @@
 
 .dtb-admin[data-dtb-page="dtb-support"] .dtb-support-workbench {
 	display: grid;
-	grid-template-columns: minmax(220px, 240px) minmax(0, 1fr) minmax(260px, 300px);
+	grid-template-columns: minmax(220px, 240px) minmax(0, 1fr);
 	gap: 12px;
 	align-items: start;
 }
 
-.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-rail,
-.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-context {
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-rail {
 	position: sticky;
 	top: 0;
 	align-self: start;
@@ -190,7 +189,9 @@
 
 .dtb-admin[data-dtb-page="dtb-support"] #dtb-support-ticket-modal .dtb-modal__body {
 	flex: 1 1 auto;
-	overflow: auto;
+	overflow: hidden;
+	display: flex;
+	flex-direction: column;
 	padding: 0;
 	background: var(--dtb-bg);
 }
@@ -206,10 +207,13 @@
 }
 
 .dtb-admin[data-dtb-page="dtb-support"] .dtb-support-ticket-modal {
-	min-height: 100%;
+	flex: 1 1 auto;
+	min-height: 0;
 	padding: 14px;
-	display: grid;
+	display: flex;
+	flex-direction: column;
 	gap: 12px;
+	box-sizing: border-box;
 }
 
 .dtb-admin[data-dtb-page="dtb-support"] .dtb-support-ticket-modal__header {
@@ -256,6 +260,7 @@
 	display: grid;
 	grid-template-columns: minmax(0, 1.6fr) minmax(260px, .8fr);
 	gap: 12px;
+	flex: 1 1 auto;
 	min-height: 0;
 }
 
@@ -482,14 +487,15 @@
 
 /* ── Avatar circle ────────────────────────────────────────────────────────── */
 
+/* Customer avatar — neutral grey (left side, inbound) */
 .dtb-admin[data-dtb-page="dtb-support"] .dtb-chat-avatar {
 	flex-shrink: 0;
 	width: 36px;
 	height: 36px;
 	border-radius: 50%;
-	background: var(--dtb-primary-soft);
-	border: 1px solid rgba(29, 78, 216, .25);
-	color: var(--dtb-primary);
+	background: var(--dtb-bg-muted);
+	border: 1px solid var(--dtb-border-soft);
+	color: var(--dtb-text-muted);
 	font-size: 11px;
 	font-weight: 800;
 	display: flex;
@@ -543,11 +549,11 @@
 	border-bottom-right-radius: 3px;
 }
 
-/* ── Staff avatar (outbound side) ─────────────────────────────────────────── */
+/* ── Staff avatar (outbound, right side) — blue to distinguish from customer ── */
 
 .dtb-admin[data-dtb-page="dtb-support"] .dtb-chat-avatar--staff {
-	background: rgba(29, 78, 216, .15);
-	border-color: rgba(29, 78, 216, .3);
+	background: var(--dtb-primary-soft);
+	border-color: rgba(29, 78, 216, .35);
 	color: var(--dtb-primary);
 	flex-shrink: 0;
 	align-self: flex-end;
@@ -828,24 +834,12 @@
 	color: var(--dtb-text);
 }
 
-@media (max-width: 1460px) {
-	.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-workbench {
-		grid-template-columns: minmax(210px, 230px) minmax(0, 1fr);
-	}
-
-	.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-context {
-		grid-column: 1 / -1;
-		position: static;
-	}
-}
-
 @media (max-width: 980px) {
 	.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-workbench {
 		grid-template-columns: 1fr;
 	}
 
-	.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-rail,
-	.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-context {
+	.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-rail {
 		position: static;
 	}
 
@@ -1115,6 +1109,7 @@
 	flex-direction: column;
 	gap: 0;
 	overflow: hidden;
+	flex-shrink: 0;
 }
 
 /* Toolbar row */
@@ -1257,4 +1252,136 @@
 .dtb-admin[data-dtb-page="dtb-support"] .dtb-support-email-due {
 	color: var(--dtb-danger, #dc2626);
 	font-weight: 600;
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-email-due.is-overdue {
+	color: var(--dtb-danger, #dc2626);
+	font-weight: 700;
+}
+
+/* Overdue KV value in right sidebar */
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-kv-overdue {
+	color: var(--dtb-danger, #dc2626) !important;
+	font-weight: 700;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Macro / Quick Responses panel
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-macro-panel {
+	position: absolute;
+	bottom: 100%;
+	left: 0;
+	right: 0;
+	z-index: 20;
+	background: var(--dtb-surface);
+	border: 1px solid var(--dtb-border-soft);
+	border-bottom: none;
+	border-radius: var(--dtb-radius-md) var(--dtb-radius-md) 0 0;
+	box-shadow: 0 -4px 16px rgba(0, 0, 0, .08);
+	max-height: 320px;
+	display: flex;
+	flex-direction: column;
+	overflow: hidden;
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-macro-panel[hidden] {
+	display: none;
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-macro-panel__header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 8px 12px;
+	border-bottom: 1px solid var(--dtb-border-soft);
+	background: var(--dtb-bg);
+	flex-shrink: 0;
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-macro-panel__title {
+	font-size: 11px;
+	font-weight: 700;
+	text-transform: uppercase;
+	letter-spacing: .05em;
+	color: var(--dtb-text-muted);
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-macro-close {
+	background: transparent;
+	border: none;
+	cursor: pointer;
+	font-size: 13px;
+	color: var(--dtb-text-muted);
+	padding: 2px 6px;
+	border-radius: var(--dtb-radius-base);
+	line-height: 1;
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-macro-close:hover {
+	background: var(--dtb-surface-soft);
+	color: var(--dtb-text);
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-macro-panel__body {
+	overflow-y: auto;
+	padding: 10px 12px;
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-macro-group__label {
+	font-size: 10px;
+	font-weight: 700;
+	text-transform: uppercase;
+	letter-spacing: .06em;
+	color: var(--dtb-text-muted);
+	margin-bottom: 6px;
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-macro-group__items {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 6px;
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-macro-btn {
+	display: inline-flex;
+	align-items: center;
+	padding: 5px 11px;
+	background: var(--dtb-bg-muted);
+	border: 1px solid var(--dtb-border-soft);
+	border-radius: var(--dtb-radius-full);
+	font-size: 12px;
+	font-weight: 600;
+	color: var(--dtb-text);
+	cursor: pointer;
+	transition: background .12s, border-color .12s, color .12s;
+	white-space: nowrap;
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-macro-btn:hover {
+	background: var(--dtb-primary-soft);
+	border-color: rgba(29, 78, 216, .3);
+	color: var(--dtb-primary);
+}
+
+/* Macro toggle button active state */
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-chat-macro-toggle {
+	margin-left: auto;
+	font-size: 12px;
+	padding: 5px 10px;
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-chat-macro-toggle.is-active {
+	background: var(--dtb-primary-soft);
+	border-color: rgba(29, 78, 216, .3);
+	color: var(--dtb-primary);
+}
+
+/* Compose bar needs position:relative for the absolute panel */
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-chat-compose {
+	position: relative;
 }

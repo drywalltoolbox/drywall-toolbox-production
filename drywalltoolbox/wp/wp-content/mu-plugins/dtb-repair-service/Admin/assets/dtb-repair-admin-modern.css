@@ -675,11 +675,17 @@
 		border-radius: 999px;
 	}
 	.dtb-workspace-hidden { display: none !important; }
-	.dtb-tech-workspace { display: grid; gap: 14px; }
+	/* Override WP Screen Options hidden class — our tab system controls visibility */
+	#normal-sortables .postbox.hidden,
+	#normal-sortables .postbox.hide-if-js,
+	#side-sortables .postbox.hidden,
+	#side-sortables .postbox.hide-if-js { display: block !important; }
+	.dtb-tech-workspace { display: flex; flex-direction: column; gap: 16px; }
 	.dtb-tech-grid {
 		display: grid;
-		grid-template-columns: repeat(2, minmax(0,1fr));
-		gap: 12px;
+		grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+		gap: 16px;
+		align-items: start;
 	}
 	.dtb-tech-card {
 		border: 1px solid var(--dtb-border);
@@ -2447,4 +2453,298 @@ body.dtb-repair-admin-screen .dtb-strong-link {
 body.dtb-repair-admin-screen .dtb-date-primary {
 	font-size: 12px;
 	font-weight: 700;
+}
+
+/* =============================================================================
+   DETAIL PAGE — Comprehensive UI/UX Fixes
+   ============================================================================= */
+
+/* ── Quote table: structural column widths ─────────────────────────────────── */
+.dtb-quote-table { table-layout: fixed; }
+.dtb-quote-table th:nth-child(1),
+.dtb-quote-table td:nth-child(1) { width: auto; }             /* Item — fills remaining */
+.dtb-quote-table th:nth-child(2),
+.dtb-quote-table td:nth-child(2) { width: 100px; }            /* Type */
+.dtb-quote-table th:nth-child(3),
+.dtb-quote-table td:nth-child(3) { width: 84px; }             /* Qty */
+.dtb-quote-table th:nth-child(4),
+.dtb-quote-table td:nth-child(4) { width: 100px; }            /* Unit */
+.dtb-quote-table th:nth-child(5),
+.dtb-quote-table td:nth-child(5) { width: 116px; white-space: nowrap; } /* Line Total */
+.dtb-quote-table th:nth-child(6),
+.dtb-quote-table td:nth-child(6) { width: 64px; text-align: right; }   /* Remove */
+
+.dtb-quote-line-label,
+.dtb-quote-line-desc,
+.dtb-quote-line-qty,
+.dtb-quote-line-unit,
+.dtb-quote-line-type { width: 100% !important; min-width: 0; box-sizing: border-box; }
+
+/* Scroll table on constrained widths rather than overflowing the card */
+.dtb-quote-table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+
+/* ── Quote workspace: responsive collapse ──────────────────────────────────── */
+@media (max-width: 1160px) {
+	.dtb-quote-workspace {
+		grid-template-columns: 1fr;
+	}
+	.dtb-quote-parts-panel {
+		display: grid;
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+		gap: 12px;
+		align-items: start;
+	}
+	.dtb-quote-parts-panel__title,
+	.dtb-quote-parts-panel__help,
+	.dtb-quote-parts-label,
+	#dtb-quote-parts-lookup,
+	#dtb-quote-parts-menu { grid-column: 1 / -1; }
+}
+@media (max-width: 860px) {
+	.dtb-quote-parts-panel { grid-template-columns: 1fr; }
+}
+
+/* ── Command center: side-by-side on wide screens ──────────────────────────── */
+@media (min-width: 880px) {
+	.dtb-command-center {
+		display: grid;
+		grid-template-columns: 1fr 260px;
+		align-items: stretch;
+	}
+	.dtb-cc-progress-wrap {
+		border-bottom: none;
+		border-right: 1px solid var(--dtb-border);
+	}
+}
+
+/* ── Admin chat bubbles: fix text contrast on primary-blue background ───────── */
+.dtb-repair-chat-item.from-admin .dtb-repair-chat-author,
+.dtb-repair-chat-item.from-admin .dtb-repair-chat-time {
+	color: rgba(255,255,255,.75);
+}
+.dtb-repair-chat-item.from-admin .dtb-repair-chat-text {
+	color: #fff;
+}
+body.dtb-repair-admin-screen .dtb-repair-chat-item.from-customer .dtb-repair-chat-bubble {
+	background: var(--dtb-surface-soft);
+	border-color: var(--dtb-border-soft);
+}
+body.dtb-repair-admin-screen .dtb-repair-chat-item.from-admin .dtb-repair-chat-bubble {
+	background: var(--dtb-primary);
+	border-color: var(--dtb-primary);
+}
+body.dtb-repair-admin-screen .dtb-repair-chat-item.from-admin .dtb-repair-chat-author,
+body.dtb-repair-admin-screen .dtb-repair-chat-item.from-admin .dtb-repair-chat-time {
+	color: rgba(255,255,255,.72);
+}
+body.dtb-repair-admin-screen .dtb-repair-chat-item.from-admin .dtb-repair-chat-text {
+	color: #fff;
+}
+
+/* ── Chat compose: taller on order-details tab, char-count hint ─────────────── */
+.dtb-repair-chat-input { min-height: 88px; }
+.dtb-repair-chat-compose { position: relative; }
+.dtb-repair-chat-charcount {
+	position: absolute;
+	bottom: 46px;
+	right: 6px;
+	font-size: 10px;
+	font-weight: 600;
+	color: #94a3b8;
+	pointer-events: none;
+}
+.dtb-repair-chat-charcount.is-near  { color: #b45309; }
+.dtb-repair-chat-charcount.is-limit { color: #b91c1c; }
+
+/* ── Chat list: grow taller when space is available ─────────────────────────── */
+@media (min-width: 1200px) {
+	.dtb-repair-chat-list { max-height: 420px; }
+}
+
+/* ── Modernize token overrides: tech workspace ──────────────────────────────── */
+body.dtb-repair-admin-screen .dtb-tech-card {
+	background: var(--dtb-surface);
+	border-color: var(--dtb-border-soft);
+}
+body.dtb-repair-admin-screen .dtb-tech-card h3 { color: var(--dtb-text); }
+body.dtb-repair-admin-screen .dtb-tech-input,
+body.dtb-repair-admin-screen .dtb-tech-textarea {
+	background: var(--dtb-surface);
+	border-color: var(--dtb-border-soft);
+	color: var(--dtb-text);
+	border-radius: var(--dtb-radius-md);
+}
+body.dtb-repair-admin-screen .dtb-tech-selected-item {
+	background: var(--dtb-surface-soft);
+	border-color: var(--dtb-border-soft);
+}
+body.dtb-repair-admin-screen .dtb-tech-selected-empty {
+	background: var(--dtb-surface-soft);
+	border-color: var(--dtb-border-soft);
+	color: var(--dtb-muted);
+}
+body.dtb-repair-admin-screen .dtb-tech-sync-meta {
+	background: var(--dtb-surface-soft);
+	border-color: var(--dtb-border-soft);
+	color: var(--dtb-text);
+}
+body.dtb-repair-admin-screen .dtb-tech-lookup-menu {
+	background: var(--dtb-surface);
+	border-color: var(--dtb-border-soft);
+}
+body.dtb-repair-admin-screen .dtb-tech-lookup-option { background: var(--dtb-surface); }
+body.dtb-repair-admin-screen .dtb-tech-lookup-option:hover,
+body.dtb-repair-admin-screen .dtb-tech-lookup-option:focus {
+	background: var(--dtb-primary-soft);
+}
+
+/* ── Modernize token overrides: quote builder ───────────────────────────────── */
+body.dtb-repair-admin-screen .dtb-quote-table-wrap {
+	background: var(--dtb-surface);
+	border-color: var(--dtb-border-soft);
+	border-radius: var(--dtb-radius-lg);
+}
+body.dtb-repair-admin-screen .dtb-quote-parts-panel {
+	background: var(--dtb-surface-soft);
+	border-color: var(--dtb-border-soft);
+	border-radius: var(--dtb-radius-lg);
+}
+body.dtb-repair-admin-screen .dtb-quote-totals {
+	background: var(--dtb-surface);
+	border-color: var(--dtb-border-soft);
+}
+body.dtb-repair-admin-screen .dtb-quote-totals > div { color: var(--dtb-text); }
+body.dtb-repair-admin-screen .dtb-quote-totals > div.is-total {
+	border-top-color: var(--dtb-border-soft);
+	color: var(--dtb-text);
+	font-weight: 800;
+}
+body.dtb-repair-admin-screen .dtb-quote-selected-part {
+	background: var(--dtb-surface);
+	border-color: var(--dtb-border-soft);
+}
+body.dtb-repair-admin-screen .dtb-quote-selected-part:hover,
+body.dtb-repair-admin-screen .dtb-quote-selected-part:focus {
+	background: var(--dtb-primary-soft);
+	border-color: rgba(93,135,255,.35);
+	outline: none;
+}
+body.dtb-repair-admin-screen .dtb-quote-preset {
+	background: var(--dtb-primary-soft);
+	border-color: rgba(93,135,255,.25);
+	color: var(--dtb-primary);
+}
+
+/* ── Modernize token overrides: repair chat card ────────────────────────────── */
+body.dtb-repair-admin-screen .dtb-repair-chat-card {
+	background: var(--dtb-surface);
+	border-color: var(--dtb-border-soft);
+}
+body.dtb-repair-admin-screen .dtb-repair-chat-input {
+	background: var(--dtb-surface);
+	border-color: var(--dtb-border-soft);
+	color: var(--dtb-text);
+	border-radius: var(--dtb-radius-md);
+}
+body.dtb-repair-admin-screen .dtb-repair-chat-input:focus {
+	border-color: var(--dtb-primary);
+	box-shadow: 0 0 0 3px rgba(93,135,255,.14);
+}
+
+/* ── Issue summary Modernize ───────────────────────────────────────────────── */
+body.dtb-repair-admin-screen .dtb-issue-summary {
+	border-top-color: var(--dtb-border-soft);
+}
+
+/* ── Repair metabox table Modernize ────────────────────────────────────────── */
+body.dtb-repair-admin-screen .dtb-repair-metabox th { color: var(--dtb-muted); }
+body.dtb-repair-admin-screen .dtb-repair-metabox td { color: var(--dtb-text); }
+body.dtb-repair-admin-screen .dtb-repair-metabox tr { border-bottom-color: var(--dtb-border-soft); }
+
+/* ── Command center Modernize: panel border ────────────────────────────────── */
+body.dtb-repair-admin-screen .dtb-cc-progress-wrap {
+	border-color: var(--dtb-border-soft);
+}
+body.dtb-repair-admin-screen .dtb-cc-action-toggle {
+	background: var(--dtb-surface);
+	border-color: var(--dtb-border-soft);
+	color: var(--dtb-text);
+}
+body.dtb-repair-admin-screen .dtb-cc-action-menu {
+	background: var(--dtb-surface);
+	border-color: var(--dtb-border-soft);
+}
+body.dtb-repair-admin-screen .dtb-cc-action-option { background: var(--dtb-surface); color: var(--dtb-text); }
+body.dtb-repair-admin-screen .dtb-cc-action-option:hover { background: var(--dtb-surface-soft); }
+body.dtb-repair-admin-screen .dtb-cc-action-option:focus { background: var(--dtb-primary-soft); color: var(--dtb-primary); }
+body.dtb-repair-admin-screen .dtb-cc-note { background: var(--dtb-surface); color: var(--dtb-text); }
+@media (min-width: 880px) {
+	body.dtb-repair-admin-screen .dtb-cc-progress-wrap {
+		border-right-color: var(--dtb-border-soft);
+	}
+}
+
+/* ── cc-progress-fill: remove duplicate widths / unify under body scope ─────── */
+body.dtb-repair-admin-screen .dtb-cc-progress-fill--8   { width: 8%; }
+body.dtb-repair-admin-screen .dtb-cc-progress-fill--16  { width: 16%; }
+body.dtb-repair-admin-screen .dtb-cc-progress-fill--20  { width: 20%; }
+body.dtb-repair-admin-screen .dtb-cc-progress-fill--28  { width: 28%; }
+body.dtb-repair-admin-screen .dtb-cc-progress-fill--35  { width: 35%; }
+body.dtb-repair-admin-screen .dtb-cc-progress-fill--42  { width: 42%; }
+body.dtb-repair-admin-screen .dtb-cc-progress-fill--55  { width: 55%; }
+body.dtb-repair-admin-screen .dtb-cc-progress-fill--70  { width: 70%; }
+body.dtb-repair-admin-screen .dtb-cc-progress-fill--88  { width: 88%; }
+body.dtb-repair-admin-screen .dtb-cc-progress-fill--100 { width: 100%; }
+
+/* ── Timeline Modernize: use card tokens ───────────────────────────────────── */
+body.dtb-repair-admin-screen .dtb-repair-timeline li {
+	border-radius: var(--dtb-radius-md);
+	padding: 10px 12px;
+}
+body.dtb-repair-admin-screen .dtb-tl-vis-customer { background: rgba(124,58,237,.12); color: #7c3aed; }
+body.dtb-repair-admin-screen .dtb-tl-vis-operator { background: var(--dtb-primary-soft); color: var(--dtb-primary); }
+body.dtb-repair-admin-screen .dtb-tl-vis-internal { background: var(--dtb-surface-soft); color: var(--dtb-muted); }
+
+/* ── Queue job list Modernize ───────────────────────────────────────────────── */
+body.dtb-repair-admin-screen .dtb-queue-job-list__item {
+	padding: 5px 0;
+	color: var(--dtb-text);
+	font-size: 12px;
+	border-bottom: 1px solid var(--dtb-border-soft);
+}
+body.dtb-repair-admin-screen .dtb-queue-job-list__item:last-child { border-bottom: none; }
+
+/* ── Side column submitdiv modernize ────────────────────────────────────────── */
+body.dtb-repair-admin-screen #publish {
+	width: 100%;
+	border-radius: var(--dtb-radius-md) !important;
+	font-weight: 800 !important;
+	padding: 10px 0 !important;
+}
+body.dtb-repair-admin-screen #publishing-action { padding: 14px 0 0; }
+
+/* ── Notes textarea Modernize ───────────────────────────────────────────────── */
+body.dtb-repair-admin-screen .dtb-notes-textarea {
+	background: var(--dtb-surface);
+	border-color: var(--dtb-border-soft);
+	color: var(--dtb-text);
+	border-radius: var(--dtb-radius-md);
+}
+
+/* ── Overall responsive: between 782px and 1160px ──────────────────────────── */
+@media (min-width: 783px) and (max-width: 1160px) {
+	.dtb-quote-controls { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+	.dtb-quote-footer { grid-template-columns: 1fr; }
+	.dtb-quote-actions { justify-content: flex-start; flex-wrap: wrap; }
+}
+
+/* ── Prevent postbox overflow on narrow admin ───────────────────────────────── */
+body.dtb-repair-admin-screen .postbox .inside {
+	overflow-x: hidden;
+}
+
+/* ── Attachment grid Modernize ──────────────────────────────────────────────── */
+body.dtb-repair-admin-screen .dtb-attachment-grid a img {
+	border-radius: 8px;
+	border: 1px solid var(--dtb-border-soft);
 }
