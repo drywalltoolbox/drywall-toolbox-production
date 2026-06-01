@@ -130,6 +130,8 @@ function dtb_support_admin_render_queue_markup( array $result, int $paged ): str
 		}
 
 		echo '<tr class="dtb-table__row dtb-table__row--clickable dtb-support-row"'
+			. ' data-dtb-drawer="dtb-support-detail-drawer"'
+			. ' data-dtb-drawer-title="' . esc_attr( sprintf( __( 'Ticket %s', 'drywall-toolbox' ), $ticket_ref ) ) . '"'
 			. ' data-dtb-ticket-id="' . esc_attr( (string) $id ) . '"'
 			. ' data-dtb-ticket-ref="' . esc_attr( $ticket_ref ) . '"'
 			. ' data-dtb-ticket-subject="' . esc_attr( $subject ) . '"'

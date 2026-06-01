@@ -27,100 +27,31 @@
 }
 
 .dtb-admin[data-dtb-page="dtb-support"] .dtb-live-region {
-	display: block !important;
-	min-height: auto;
+	display: grid;
+	gap: var(--dtb-radius-md);
 	margin: 0;
 	padding: 0;
 }
 
-.dtb-admin[data-dtb-page="dtb-support"] .dtb-search-wrap {
-	max-width: 520px;
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-grid--kpi {
+	grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-toolbar .dtb-search-wrap {
+	flex: 0 1 min(100%, 28rem);
+	max-width: 28rem;
 }
 
 .dtb-admin[data-dtb-page="dtb-support"] .dtb-support-refresh-btn {
-	margin-left: auto;
+	margin-left: 0;
 }
 
-.dtb-admin[data-dtb-page="dtb-support"] .modal.fade {
-	display: none;
+.dtb-admin[data-dtb-page="dtb-support"] #dtb-support-detail-drawer {
+	width: min(980px, 100vw);
 }
 
-.dtb-admin[data-dtb-page="dtb-support"] .modal.fade.show {
-	display: block;
-	position: fixed;
-	inset: 0;
-	z-index: 99999;
-	background: rgba(15, 23, 42, .54);
-	backdrop-filter: blur(2px);
-}
-
-.dtb-admin[data-dtb-page="dtb-support"] .modal-dialog.modal-fullscreen {
-	position: absolute;
-	inset: 18px;
-	margin: 0;
-}
-
-.dtb-admin[data-dtb-page="dtb-support"] .modal-content {
-	display: flex;
-	flex-direction: column;
-	height: 100%;
-	background: var(--dtb-surface);
-	border: 1px solid var(--dtb-border);
-	border-radius: var(--dtb-radius-xl);
-	box-shadow: var(--dtb-shadow-lg);
-	overflow: hidden;
-}
-
-.dtb-admin[data-dtb-page="dtb-support"] .modal-header,
-.dtb-admin[data-dtb-page="dtb-support"] .modal-footer {
-	display: flex;
-	align-items: center;
-	gap: 10px;
-	padding: 14px 18px;
-	border-color: var(--dtb-border);
-	background: var(--dtb-surface);
-}
-
-.dtb-admin[data-dtb-page="dtb-support"] .modal-header {
-	justify-content: space-between;
-	border-bottom: 1px solid var(--dtb-border);
-}
-
-.dtb-admin[data-dtb-page="dtb-support"] .modal-footer {
-	border-top: 1px solid var(--dtb-border);
-	justify-content: flex-end;
-}
-
-.dtb-admin[data-dtb-page="dtb-support"] .modal-title.h4 {
-	margin: 0;
-	font-size: 22px;
-	font-weight: 700;
-	color: var(--dtb-text);
-}
-
-.dtb-admin[data-dtb-page="dtb-support"] .btn-close {
-	width: 34px;
-	height: 34px;
-	border: 1px solid var(--dtb-border);
-	border-radius: 999px;
-	background: var(--dtb-surface-soft);
-	color: var(--dtb-text-muted);
-	cursor: pointer;
-	display: inline-flex;
-	align-items: center;
-	justify-content: center;
-}
-
-.dtb-admin[data-dtb-page="dtb-support"] .btn-close::before {
-	content: "✕";
-	font-size: 14px;
-	line-height: 1;
-}
-
-.dtb-admin[data-dtb-page="dtb-support"] .modal-body {
-	flex: 1 1 auto;
-	overflow: auto;
-	padding: 18px;
+.dtb-admin[data-dtb-page="dtb-support"] #dtb-support-detail-drawer .dtb-drawer__body {
+	padding: 16px;
 	background: var(--dtb-bg);
 }
 
@@ -128,7 +59,6 @@
 	display: grid;
 	grid-template-columns: 1.5fr .85fr;
 	gap: 14px;
-	min-height: 100%;
 }
 
 .dtb-admin[data-dtb-page="dtb-support"] .dtb-support-modal-main,
@@ -208,8 +138,8 @@
 }
 
 .dtb-admin[data-dtb-page="dtb-support"] .dtb-support-event-empty,
-.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-modal-loading,
-.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-modal-error {
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-modal-error,
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-drawer-loading {
 	margin: 0;
 	padding: 14px;
 	border: 1px solid var(--dtb-border-soft);
@@ -226,20 +156,25 @@
 	white-space: pre-wrap;
 }
 
-body.dtb-support-modal-open {
-	overflow: hidden;
+@media (max-width: 1320px) {
+	.dtb-admin[data-dtb-page="dtb-support"] .dtb-grid--kpi {
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+	}
 }
 
 @media (max-width: 960px) {
-	.dtb-admin[data-dtb-page="dtb-support"] .modal-dialog.modal-fullscreen {
-		inset: 0;
-	}
-
-	.dtb-admin[data-dtb-page="dtb-support"] .modal-content {
-		border-radius: 0;
-	}
-
 	.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-modal-grid {
 		grid-template-columns: 1fr;
+	}
+}
+
+@media (max-width: 782px) {
+	.dtb-admin[data-dtb-page="dtb-support"] .dtb-grid--kpi {
+		grid-template-columns: 1fr;
+	}
+
+	.dtb-admin[data-dtb-page="dtb-support"] .dtb-toolbar .dtb-search-wrap {
+		flex-basis: 100%;
+		max-width: none;
 	}
 }

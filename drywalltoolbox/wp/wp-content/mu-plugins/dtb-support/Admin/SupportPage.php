@@ -55,7 +55,7 @@ function dtb_support_render_page(): void {
 
 	dtb_admin_shell_open( [
 		'title'       => __( 'Support', 'drywall-toolbox' ),
-		'subtitle'    => __( 'Manage customer support tickets.', 'drywall-toolbox' ),
+		'subtitle'    => __( 'Manage customer tickets, SLA response queues, assignments, replies, and follow-ups.', 'drywall-toolbox' ),
 		'section'     => 'operations',
 		'page'        => 'dtb-support',
 		'template'    => 'queue',
@@ -64,9 +64,12 @@ function dtb_support_render_page(): void {
 		'live_target' => 'dtb-support-workspace',
 	] );
 
-	dtb_admin_ui_toolbar_open();
+	dtb_support_render_summary_cards();
+
+	echo dtb_admin_ui_toolbar_open(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 	// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 	echo dtb_admin_ui_search_input( __( 'Search tickets…', 'drywall-toolbox' ), $search, true, 's', 'dtb-support-workspace' );
+	echo dtb_admin_ui_toolbar_spacer(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 	// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 	echo dtb_admin_ui_button( __( 'Refresh', 'drywall-toolbox' ), [
 		'type' => 'secondary',
@@ -75,7 +78,15 @@ function dtb_support_render_page(): void {
 		'class' => 'dtb-support-refresh-btn',
 		'data' => [ 'dtb-live-refresh' => 'dtb-support-workspace' ],
 	] );
-	echo dtb_admin_ui_toolbar_close();
+	if ( current_user_can( 'dtb_manage_support_settings' ) || current_user_can( 'manage_options' ) ) {
+		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		echo dtb_admin_ui_button( __( 'Settings', 'drywall-toolbox' ), [
+			'href' => admin_url( 'admin.php?page=dtb-support-settings' ),
+			'type' => 'ghost',
+			'size' => 'sm',
+		] );
+	}
+	echo dtb_admin_ui_toolbar_close(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 
 	$result = dtb_support_admin_query_tickets( $status, $search, $paged, $per );
 
@@ -90,25 +101,65 @@ function dtb_support_render_page(): void {
 	echo dtb_support_admin_render_queue_markup( $result, $paged );
 	dtb_admin_shell_live_region_close();
 
-	?>
-	<div class="modal fade dtb-support-modal" id="dtb-support-ticket-modal" aria-hidden="true" role="dialog" aria-modal="true">
-		<div class="modal-dialog modal-fullscreen">
-			<div class="modal-content">
-				<div class="modal-header">
-					<h5 class="modal-title h4" id="dtb-support-modal-title"><?php esc_html_e( 'Support Ticket', 'drywall-toolbox' ); ?></h5>
-					<button type="button" class="btn-close" data-dtb-support-modal-close aria-label="<?php esc_attr_e( 'Close', 'drywall-toolbox' ); ?>"></button>
-				</div>
-				<div class="modal-body" id="dtb-support-modal-body">
-					<div class="dtb-support-modal-loading"><?php esc_html_e( 'Loading ticket…', 'drywall-toolbox' ); ?></div>
-				</div>
-				<div class="modal-footer">
-					<a href="#" class="dtb-btn dtb-btn--primary dtb-support-modal-open-link" target="_self"><?php esc_html_e( 'Open Full Ticket', 'drywall-toolbox' ); ?></a>
-					<button type="button" class="dtb-btn dtb-btn--ghost" data-dtb-support-modal-close><?php esc_html_e( 'Close', 'drywall-toolbox' ); ?></button>
-				</div>
-			</div>
-		</div>
-	</div>
-	<?php
+	// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+	echo dtb_admin_ui_drawer(
+		'dtb-support-detail-drawer',
+		__( 'Support Ticket', 'drywall-toolbox' ),
+		'<div class="dtb-drawer-loading">' . esc_html__( 'Select a ticket to view details.', 'drywall-toolbox' ) . '</div>',
+		dtb_admin_ui_button( __( 'Open Full Ticket', 'drywall-toolbox' ), [
+			'type' => 'secondary',
+			'size' => 'sm',
+			'data' => [ 'dtb-drawer-action' => 'view' ],
+		] )
+	);
 
 	dtb_admin_shell_close();
+}
+
+function dtb_support_render_summary_cards(): void {
+	$kpis = dtb_support_get_kpis();
+
+	$cards = [
+		[
+			'value'      => number_format_i18n( (int) ( $kpis['active_total'] ?? 0 ) ),
+			'label'      => __( 'Active', 'drywall-toolbox' ),
+			'icon'       => 'dashicons-tickets-alt',
+			'icon_color' => 'primary',
+			'trend'      => __( 'Open workload', 'drywall-toolbox' ),
+			'href'       => admin_url( 'admin.php?page=dtb-support' ),
+		],
+		[
+			'value'      => number_format_i18n( (int) ( $kpis['needs_reply'] ?? 0 ) ),
+			'label'      => __( 'Needs Reply', 'drywall-toolbox' ),
+			'icon'       => 'dashicons-email-alt2',
+			'icon_color' => 'warning',
+			'trend'      => __( 'Customer response pending', 'drywall-toolbox' ),
+			'href'       => add_query_arg( [ 'page' => 'dtb-support', 'status' => 'needs-reply' ], admin_url( 'admin.php' ) ),
+		],
+		[
+			'value'      => number_format_i18n( (int) ( $kpis['overdue_count'] ?? 0 ) ),
+			'label'      => __( 'Overdue', 'drywall-toolbox' ),
+			'icon'       => 'dashicons-warning',
+			'icon_color' => 'danger',
+			'trend'      => __( 'Past response target', 'drywall-toolbox' ),
+			'href'       => add_query_arg( [ 'page' => 'dtb-support', 'status' => 'past-sla' ], admin_url( 'admin.php' ) ),
+		],
+		[
+			'value'      => number_format_i18n( (int) ( $kpis['unassigned'] ?? 0 ) ),
+			'label'      => __( 'Unassigned', 'drywall-toolbox' ),
+			'icon'       => 'dashicons-admin-users',
+			'icon_color' => 'accent',
+			'trend'      => __( 'Needs owner', 'drywall-toolbox' ),
+		],
+		[
+			'value'      => number_format_i18n( (int) ( $kpis['email_failures'] ?? 0 ) ),
+			'label'      => __( 'Email Failures', 'drywall-toolbox' ),
+			'icon'       => 'dashicons-email',
+			'icon_color' => 'warning',
+			'trend'      => __( 'Delivery health', 'drywall-toolbox' ),
+		],
+	];
+
+	// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+	echo dtb_admin_ui_kpi_grid( $cards );
 }
