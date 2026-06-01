@@ -63,6 +63,10 @@ function dtb_support_admin_query_tickets( string $status, string $search, int $p
 	$queue = sanitize_key( $queue );
 
 	if ( '' !== $queue ) {
+		if ( 'closed' === $queue ) {
+			$query_args['status'] = 'closed';
+			return dtb_support_query_tickets( $query_args );
+		}
 		return dtb_support_query_queue( $queue, $query_args );
 	}
 

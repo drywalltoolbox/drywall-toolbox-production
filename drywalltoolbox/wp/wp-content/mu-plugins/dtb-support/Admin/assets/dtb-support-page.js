@@ -60,6 +60,7 @@
 			'needs-reply': 'needs_reply',
 			'past-sla': 'overdue',
 			resolved: 'resolved_pending_close',
+			closed: 'closed',
 		};
 		return map[ status ] || 'all_active';
 	}
@@ -347,6 +348,18 @@
 		var searchTimer;
 
 		document.addEventListener( 'click', function ( evt ) {
+			var tabLink = evt.target && evt.target.closest ? evt.target.closest( '.dtb-section-nav__tab[data-dtb-live-tab]' ) : null;
+			if ( ! tabLink || ! tabLink.closest( '.dtb-admin[data-dtb-page="dtb-support"]' ) ) {
+				return;
+			}
+			var tab = tabLink.getAttribute( 'data-dtb-live-tab' ) || '';
+			var status = ( tab === 'all' ) ? '' : normalizeStatus( tab );
+			evt.preventDefault();
+			evt.stopImmediatePropagation();
+			navigateRegion( { status: status, queue: '', paged: '1' } );
+		}, true );
+
+		document.addEventListener( 'click', function ( evt ) {
 			var queueLink = evt.target && evt.target.closest ? evt.target.closest( '[data-dtb-support-queue]' ) : null;
 			if ( queueLink ) {
 				evt.preventDefault();
@@ -374,6 +387,7 @@
 			if ( row && ! evt.target.closest( 'a,button,input,select,textarea,label' ) ) {
 				var rowContext = parseRowContext( row );
 				if ( rowContext && rowContext.ticketId ) {
+					evt.preventDefault();
 					openModalWithTicket( rowContext.ticketId, rowContext.ticketRef, rowContext.ticketUrl );
 				}
 			}
@@ -405,6 +419,29 @@
 					paged: '1',
 				} );
 			}, 260 );
+		} );
+	}
+
+	function bindRowKeyboardOpen() {
+		document.querySelectorAll( '.dtb-support-row' ).forEach( function ( row ) {
+			if ( row.dataset.dtbSupportKeyboardBound ) {
+				return;
+			}
+			row.dataset.dtbSupportKeyboardBound = '1';
+			row.setAttribute( 'tabindex', '0' );
+			row.addEventListener( 'keydown', function ( evt ) {
+				if ( evt.key !== 'Enter' && evt.key !== ' ' ) {
+					return;
+				}
+				if ( evt.target && evt.target.closest && evt.target.closest( 'a,button,input,select,textarea,label' ) ) {
+					return;
+				}
+				var context = parseRowContext( row );
+				if ( context && context.ticketId ) {
+					evt.preventDefault();
+					openModalWithTicket( context.ticketId, context.ticketRef, context.ticketUrl );
+				}
+			} );
 		} );
 	}
 
@@ -452,6 +489,7 @@
 		var activeQueue = resolveActiveQueue( query );
 		updateQueueUi( activeQueue );
 		syncFiltersFromQuery( query );
+		bindRowKeyboardOpen();
 		fetchWorkbenchAggregate();
 	}
 

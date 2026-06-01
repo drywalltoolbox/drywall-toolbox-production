@@ -25,6 +25,7 @@ function dtb_support_workbench_queue_items(): array {
 		'waiting_on_customer'    => [ 'label' => __( 'Waiting on Customer', 'drywall-toolbox' ), 'hint' => __( 'Blocked pending customer reply', 'drywall-toolbox' ),  'group' => __( 'Workflow', 'drywall-toolbox' ),    'status' => 'open' ],
 		'snoozed'                => [ 'label' => __( 'Snoozed', 'drywall-toolbox' ),             'hint' => __( 'Temporarily paused tickets', 'drywall-toolbox' ),      'group' => __( 'Workflow', 'drywall-toolbox' ),    'status' => 'open' ],
 		'resolved_pending_close' => [ 'label' => __( 'Resolved', 'drywall-toolbox' ),            'hint' => __( 'Completed pending closeout', 'drywall-toolbox' ),      'group' => __( 'Closed Loop', 'drywall-toolbox' ), 'status' => 'resolved' ],
+		'closed'                 => [ 'label' => __( 'Closed', 'drywall-toolbox' ),              'hint' => __( 'Archived and closed tickets', 'drywall-toolbox' ),     'group' => __( 'Closed Loop', 'drywall-toolbox' ), 'status' => 'closed' ],
 		'all_active'             => [ 'label' => __( 'All Active', 'drywall-toolbox' ),          'hint' => __( 'Full open workload', 'drywall-toolbox' ),              'group' => __( 'Closed Loop', 'drywall-toolbox' ), 'status' => 'open' ],
 	];
 }
@@ -41,6 +42,7 @@ function dtb_support_workbench_status_to_queue( string $status ): string {
 		'needs-reply' => 'needs_reply',
 		'past-sla'    => 'overdue',
 		'resolved'    => 'resolved_pending_close',
+		'closed'      => 'closed',
 	];
 
 	return $map[ $status ] ?? 'all_active';
@@ -156,10 +158,20 @@ function dtb_support_render_workbench( array $args ): void {
 			echo '<div class="dtb-support-rail-group">' . esc_html( $current_group ) . '</div>';
 		}
 		$is_active = $queue_key === $active_queue;
-		$queue_url = add_query_arg( [
+		$query_args = [
 			'page'  => 'dtb-support',
 			'queue' => $queue_key,
-		], admin_url( 'admin.php' ) );
+		];
+		if ( '' !== $search ) {
+			$query_args['search'] = $search;
+		}
+		if ( '' !== $type ) {
+			$query_args['type'] = $type;
+		}
+		if ( '' !== $priority ) {
+			$query_args['priority'] = $priority;
+		}
+		$queue_url = add_query_arg( $query_args, admin_url( 'admin.php' ) );
 
 		echo '<a class="dtb-support-queue' . ( $is_active ? ' is-active' : '' ) . '"'
 			. ' href="' . esc_url( $queue_url ) . '"'

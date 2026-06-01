@@ -791,7 +791,10 @@ function dtb_support_rest_get_workbench( WP_REST_Request $request ): WP_REST_Res
 		'order'    => 'DESC',
 	];
 
-	if ( '' !== $queue ) {
+	if ( 'closed' === $queue ) {
+		$query_args['status'] = 'closed';
+		$result = dtb_support_query_tickets( $query_args );
+	} elseif ( '' !== $queue ) {
 		$result = dtb_support_query_queue( $queue, $query_args );
 	} elseif ( 'needs-reply' === $status ) {
 		$result = dtb_support_query_queue( 'needs_reply', $query_args );
@@ -812,6 +815,8 @@ function dtb_support_rest_get_workbench( WP_REST_Request $request ): WP_REST_Res
 	$queues = function_exists( 'dtb_support_normalize_queue_counts' )
 		? dtb_support_normalize_queue_counts( (array) dtb_support_get_queue_counts() )
 		: (array) dtb_support_get_queue_counts();
+	$status_counts = dtb_support_count_by_status();
+	$queues['closed'] = (int) ( $status_counts['closed'] ?? 0 );
 	$kpis = dtb_support_get_kpis();
 	$macros = function_exists( 'dtb_support_get_macros' ) ? dtb_support_get_macros() : [];
 
