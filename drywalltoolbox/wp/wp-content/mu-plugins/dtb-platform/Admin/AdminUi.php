@@ -991,6 +991,69 @@ function dtb_admin_ui_stat_card(
 }
 
 // =============================================================================
+// WORKBENCH PRIMITIVES — Next Action · Age Badge · Linked Entity Chip
+// =============================================================================
+
+/**
+ * Render a "Next action" pill for queue table rows.
+ *
+ * @param string $label   Short action label (e.g. "Send Quote", "Approve").
+ * @param string $type    'primary' | 'warning' | 'danger' | 'success' | 'muted'
+ * @return string
+ */
+function dtb_admin_ui_next_action( string $label, string $type = 'primary' ): string {
+	return sprintf(
+		'<span class="dtb-next-action dtb-next-action--%s">%s</span>',
+		esc_attr( $type ),
+		esc_html( $label )
+	);
+}
+
+/**
+ * Render an age badge that turns amber/red based on elapsed time.
+ *
+ * @param string $created_at   Date string parseable by strtotime().
+ * @param int    $warn_hours   Hours before badge turns warning. Default 48.
+ * @param int    $danger_hours Hours before badge turns danger.  Default 72.
+ * @return string
+ */
+function dtb_admin_ui_age_badge( string $created_at, int $warn_hours = 48, int $danger_hours = 72 ): string {
+	$ts      = strtotime( $created_at );
+	if ( ! $ts ) {
+		return '<span class="dtb-age-badge dtb-age-badge--muted">—</span>';
+	}
+	$hours   = (int) floor( ( time() - $ts ) / HOUR_IN_SECONDS );
+	$days    = (int) floor( $hours / 24 );
+	$label   = $days > 0
+		? sprintf( _n( '%dd', '%dd', $days, 'drywall-toolbox' ), $days )
+		: sprintf( _n( '%dh', '%dh', $hours, 'drywall-toolbox' ), $hours );
+	$mod     = $hours >= $danger_hours ? 'danger' : ( $hours >= $warn_hours ? 'warn' : 'ok' );
+	return sprintf(
+		'<span class="dtb-age-badge dtb-age-badge--%s" title="%s">%s</span>',
+		esc_attr( $mod ),
+		esc_attr( human_time_diff( $ts ) . ' ago' ),
+		esc_html( $label )
+	);
+}
+
+/**
+ * Render a linked-entity chip (order, repair, RMA number, etc.).
+ *
+ * @param string $label   Display label (e.g. "#1042").
+ * @param string $href    Admin URL for the entity.
+ * @param string $type    'order' | 'repair' | 'return' — used as CSS modifier.
+ * @return string
+ */
+function dtb_admin_ui_linked_entity_chip( string $label, string $href, string $type = 'order' ): string {
+	return sprintf(
+		'<a href="%s" class="dtb-linked-entity dtb-linked-entity--%s">%s</a>',
+		esc_url( $href ),
+		esc_attr( $type ),
+		esc_html( $label )
+	);
+}
+
+// =============================================================================
 // UPDATE-AVAILABLE BADGE
 // =============================================================================
 

@@ -66,5 +66,29 @@ function dtb_repairs_admin_queue_handler( WP_REST_Request $request ): WP_REST_Re
 	}
 
 	$html = ob_get_clean();
-	return new WP_REST_Response( [ 'ok' => true, 'html' => $html ], 200 );
+
+	$repair_counts = function_exists( 'dtb_repairs_count_by_status' ) ? dtb_repairs_count_by_status() : [];
+	$needs_attention = (int) ( $repair_counts['awaiting_review'] ?? 0 )
+		+ (int) ( $repair_counts['ready_to_ship'] ?? 0 );
+
+	return new WP_REST_Response( [
+		'ok'      => true,
+		'html'    => $html,
+		'state'   => [
+			'tab'    => $tab ?: $status,
+			'search' => $search,
+			'paged'  => $paged,
+		],
+		'summary' => [
+			'total'           => array_sum( $repair_counts ),
+			'awaiting_review' => (int) ( $repair_counts['awaiting_review'] ?? 0 ),
+			'in_repair'       => (int) ( $repair_counts['in_repair'] ?? 0 ),
+			'ready_to_ship'   => (int) ( $repair_counts['ready_to_ship'] ?? 0 ),
+			'needs_attention' => $needs_attention,
+		],
+		'meta'    => [
+			'updated_at'    => gmdate( 'c' ),
+			'poll_after_ms' => 45000,
+		],
+	], 200 );
 }

@@ -35,6 +35,9 @@
  * @package drywall-toolbox
  */
 
+/* Google Fonts — Inter (variable, 300–900) + Plus Jakarta Sans (500–800) */
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,300..900;1,14..32,300..900&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap');
+
 /* =============================================================================
    1. DESIGN TOKENS
    ============================================================================= */
@@ -48,11 +51,13 @@ body.dtb-repair-admin-screen {
   --dtb-surface-soft:  #f8fbff;
   --dtb-border:        #dfe7f3;
   --dtb-border-soft:   #ebf1f6;
+  --dtb-bg-muted:      #f1f5f9;
 
   /* Text */
-  --dtb-text:   #2a3547;
-  --dtb-muted:  #5a6a85;
-  --dtb-soft:   #9aa9bc;
+  --dtb-text:       #1a2233;
+  --dtb-text-muted: #5a6a85;
+  --dtb-muted:      #5a6a85;
+  --dtb-soft:       #9aa9bc;
 
   /* Brand */
   --dtb-primary:       #1d4ed8;
@@ -81,15 +86,22 @@ body.dtb-repair-admin-screen {
   --dtb-neutral-soft: #f1f5f9;
 
   /* Shape */
-  --dtb-radius-sm: 6px;
-  --dtb-radius-md: 12px;
-  --dtb-radius-lg: 16px;
-  --dtb-radius-xl: 22px;
+  --dtb-radius-sm:   5px;
+  --dtb-radius-base: 8px;
+  --dtb-radius-md:   12px;
+  --dtb-radius-lg:   16px;
+  --dtb-radius-xl:   22px;
+  --dtb-radius-full: 9999px;
+
+  /* Typography */
+  --dtb-font-sans:    'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --dtb-font-display: 'Plus Jakarta Sans', 'Inter', sans-serif;
+  --dtb-font-mono:    'JetBrains Mono', 'Fira Code', ui-monospace, 'Cascadia Code', monospace;
 
   /* Shadows */
-  --dtb-shadow-sm: 0 1px 2px rgba(42, 53, 71, .04), 0 8px 24px rgba(42, 53, 71, .05);
-  --dtb-shadow-md: 0 12px 28px rgba(42, 53, 71, .10);
-  --dtb-shadow-lg: 0 24px 60px rgba(42, 53, 71, .16);
+  --dtb-shadow-sm: 0 1px 2px rgba(26, 34, 51, .04), 0 4px 16px rgba(26, 34, 51, .05);
+  --dtb-shadow-md: 0 8px 24px rgba(26, 34, 51, .10);
+  --dtb-shadow-lg: 0 20px 56px rgba(26, 34, 51, .16);
 
   /* Motion */
   --dtb-motion-fast: 120ms;
@@ -149,13 +161,16 @@ body.dtb-repair-admin-screen {
 }
 
 .dtb-admin {
-  font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  font-size: 14px;
-  line-height: 1.55;
+  font-family: var(--dtb-font-sans);
+  font-size: 13.5px;
+  line-height: 1.6;
   color: var(--dtb-text);
   background: var(--dtb-bg);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  font-feature-settings: 'ss01', 'cv01', 'kern';
+  font-optical-sizing: auto;
 }
 
 .dtb-admin a {
@@ -170,9 +185,11 @@ body.dtb-repair-admin-screen {
 .dtb-admin h1, .dtb-admin h2, .dtb-admin h3,
 .dtb-admin h4, .dtb-admin h5, .dtb-admin h6 {
   margin: 0;
-  font-weight: 600;
-  line-height: 1.3;
+  font-family: var(--dtb-font-display);
+  font-weight: 700;
+  line-height: 1.25;
   color: var(--dtb-text);
+  letter-spacing: -.2px;
 }
 
 /* =============================================================================
@@ -218,13 +235,16 @@ body.dtb-repair-admin-screen {
 .dtb-page-header__right { flex: 0 0 auto; display: flex; align-items: center; gap: 8px; }
 
 .dtb-page-title {
-  font-size: 24px;
-  font-weight: 700;
+  font-family: var(--dtb-font-display);
+  font-size: 22px;
+  font-weight: 800;
   color: var(--dtb-text);
   margin: 0 0 2px;
+  letter-spacing: -.4px;
   display: flex;
   align-items: center;
   gap: 10px;
+  line-height: 1.2;
 }
 
 .dtb-page-title .dashicons {
@@ -240,9 +260,11 @@ body.dtb-repair-admin-screen {
 }
 
 .dtb-page-subtitle {
-  font-size: 13px;
+  font-size: 12.5px;
+  font-weight: 400;
   color: var(--dtb-muted);
   margin: 0;
+  letter-spacing: .01em;
 }
 
 .dtb-page-actions {
@@ -275,13 +297,14 @@ body.dtb-repair-admin-screen {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 9px 14px;
-  font-size: 13px;
+  padding: 7px 13px;
+  font-size: 12.5px;
   font-weight: 500;
+  letter-spacing: .01em;
   color: var(--dtb-muted);
   cursor: pointer;
   border: 1px solid transparent;
-  border-radius: 12px;
+  border-radius: 10px;
   margin-bottom: 0;
   white-space: nowrap;
   transition: color var(--dtb-motion-fast) var(--dtb-ease-standard),
@@ -328,7 +351,8 @@ body.dtb-repair-admin-screen {
 .dtb-admin[data-dtb-template="queue"] .dtb-page-title,
 .dtb-admin[data-dtb-template="tool"] .dtb-page-title,
 .dtb-page-header--compact .dtb-page-title {
-  font-size: 18px;
+  font-size: 17px;
+  letter-spacing: -.3px;
 }
 
 .dtb-admin[data-dtb-template="queue"] .dtb-page-title .dashicons,
@@ -385,7 +409,8 @@ body.dtb-repair-admin-screen {
 }
 
 .dtb-kpi-strip .dtb-kpi__value {
-  font-size: 22px;
+  font-size: 24px;
+  letter-spacing: -.6px;
 }
 
 .dtb-kpi-strip a.dtb-kpi {
@@ -398,6 +423,65 @@ body.dtb-repair-admin-screen {
   box-shadow: var(--dtb-shadow-md);
   border-color: var(--dtb-primary);
 }
+
+/* =============================================================================
+   WORKBENCH INLINE PRIMITIVES — Next Action · Age Badge · Linked Entity
+   ============================================================================= */
+
+/* Next-action pill */
+.dtb-next-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: var(--dtb-radius-full);
+  font-size: .72rem;
+  font-weight: 600;
+  letter-spacing: .02em;
+  white-space: nowrap;
+  background: rgba(29, 78, 216, .08);
+  color: var(--dtb-primary);
+  border: 1px solid rgba(29, 78, 216, .18);
+}
+.dtb-next-action--warning  { background: rgba(245,158,11,.09); color: #92400e; border-color: rgba(245,158,11,.28); }
+.dtb-next-action--danger   { background: rgba(239, 68, 68,.09); color: #991b1b; border-color: rgba(239,68,68,.28); }
+.dtb-next-action--success  { background: rgba(34,197, 94,.09); color: #166534; border-color: rgba(34,197,94,.28); }
+.dtb-next-action--muted    { background: var(--dtb-bg-muted); color: var(--dtb-text-muted); border-color: var(--dtb-border); }
+
+/* Age badge */
+.dtb-age-badge {
+  display: inline-block;
+  padding: 1px 6px;
+  border-radius: var(--dtb-radius-sm);
+  font-size: .72rem;
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  background: var(--dtb-bg-muted);
+  color: var(--dtb-text-muted);
+}
+.dtb-age-badge--warn   { background: rgba(245,158,11,.12); color: #92400e; }
+.dtb-age-badge--danger { background: rgba(239, 68, 68,.12); color: #991b1b; }
+.dtb-age-badge--ok     { background: rgba(34, 197, 94,.10); color: #166534; }
+
+/* Linked-entity chip */
+.dtb-linked-entity {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 2px 7px;
+  border-radius: var(--dtb-radius-base);
+  font-size: .75rem;
+  font-weight: 600;
+  text-decoration: none;
+  background: var(--dtb-bg-muted);
+  color: var(--dtb-primary);
+  border: 1px solid var(--dtb-border);
+  transition: background var(--dtb-motion-fast) var(--dtb-ease-standard),
+              border-color var(--dtb-motion-fast) var(--dtb-ease-standard);
+}
+.dtb-linked-entity:hover { background: rgba(29,78,216,.08); border-color: rgba(29,78,216,.25); }
+.dtb-linked-entity--repair { color: #0369a1; }
+.dtb-linked-entity--return { color: #7c3aed; }
 
 /* CSS variables for chart colors — readable by JS via getComputedStyle */
 :root,
@@ -454,19 +538,22 @@ body.dtb-repair-admin-screen {
 }
 
 .dtb-card__title {
-  font-size: 15px;
-  font-weight: 600;
+  font-family: var(--dtb-font-display);
+  font-size: 14px;
+  font-weight: 700;
   color: var(--dtb-text);
   margin: 0;
   display: flex;
   align-items: center;
   gap: 8px;
+  letter-spacing: -.1px;
 }
 
 .dtb-card__subtitle {
-  font-size: 12px;
+  font-size: 11.5px;
   color: var(--dtb-muted);
   margin: 2px 0 0;
+  letter-spacing: .01em;
 }
 
 .dtb-card__actions {
@@ -536,20 +623,22 @@ body.dtb-repair-admin-screen {
 .dtb-kpi__content { flex: 1 1 auto; min-width: 0; }
 
 .dtb-kpi__value {
+  font-family: var(--dtb-font-display);
   font-size: 28px;
-  font-weight: 700;
+  font-weight: 800;
   line-height: 1.1;
   color: var(--dtb-text);
-  letter-spacing: -.5px;
+  letter-spacing: -.8px;
+  font-variant-numeric: tabular-nums;
 }
 
 .dtb-kpi__label {
-  font-size: 12px;
-  font-weight: 500;
+  font-size: 10.5px;
+  font-weight: 600;
   color: var(--dtb-muted);
   margin-top: 4px;
   text-transform: uppercase;
-  letter-spacing: .5px;
+  letter-spacing: .7px;
 }
 
 .dtb-kpi__trend {
@@ -623,11 +712,11 @@ a.dtb-kpi:hover { text-decoration: none; }
 }
 
 .dtb-filter-bar__label {
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--dtb-muted);
+  font-size: 10.5px;
+  font-weight: 700;
+  color: var(--dtb-soft);
   text-transform: uppercase;
-  letter-spacing: .5px;
+  letter-spacing: .7px;
   white-space: nowrap;
 }
 
@@ -678,16 +767,17 @@ a.dtb-kpi:hover { text-decoration: none; }
 }
 
 .dtb-table__head th {
-  padding: 14px 16px;
+  padding: 12px 16px;
   text-align: left;
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: .6px;
-  color: var(--dtb-muted);
-  background: #fff;
+  letter-spacing: .8px;
+  color: var(--dtb-soft);
+  background: var(--dtb-surface-soft);
   border-bottom: 1px solid var(--dtb-border);
   white-space: nowrap;
+  font-family: var(--dtb-font-sans);
 }
 
 .dtb-table__head th:first-child { padding-left: 20px; }
@@ -707,9 +797,11 @@ a.dtb-kpi:hover { text-decoration: none; }
 .dtb-table__row--attention:hover { background: #fff8e6; }
 
 .dtb-table__cell {
-  padding: 13px 16px;
+  padding: 12px 16px;
   color: var(--dtb-text);
   vertical-align: middle;
+  font-size: 13px;
+  line-height: 1.5;
 }
 .dtb-table__cell:first-child { padding-left: 20px; }
 .dtb-table__cell:last-child  { padding-right: 20px; text-align: right; }
@@ -718,9 +810,10 @@ a.dtb-kpi:hover { text-decoration: none; }
 .dtb-table__cell--bold  { font-weight: 600; }
 
 .dtb-table__meta {
-  font-size: 11px;
+  font-size: 10.5px;
   color: var(--dtb-soft);
   margin-top: 2px;
+  letter-spacing: .01em;
 }
 
 .dtb-table__actions {
@@ -791,7 +884,8 @@ a.dtb-kpi:hover { text-decoration: none; }
   margin: 0;
   color: var(--dtb-text);
   font-size: 13px;
-  font-weight: 700;
+  font-weight: 600;
+  letter-spacing: -.1px;
 }
 
 .dtb-object-title a {
@@ -805,9 +899,10 @@ a.dtb-kpi:hover { text-decoration: none; }
 }
 
 .dtb-object-meta {
-  margin-top: 3px;
+  margin-top: 2px;
   color: var(--dtb-muted);
-  font-size: 12px;
+  font-size: 11.5px;
+  letter-spacing: .01em;
 }
 
 .dtb-progress-pill {
@@ -844,8 +939,9 @@ a.dtb-kpi:hover { text-decoration: none; }
   display: block;
   margin-top: 6px;
   color: var(--dtb-muted);
-  font-size: 11px;
+  font-size: 10.5px;
   font-weight: 600;
+  letter-spacing: .3px;
 }
 
 /* =============================================================================
@@ -857,11 +953,12 @@ a.dtb-kpi:hover { text-decoration: none; }
   align-items: center;
   justify-content: center;
   gap: 6px;
-  padding: 8px 16px;
+  padding: 7px 15px;
   font-size: 13px;
-  font-weight: 500;
+  font-weight: 600;
   line-height: 1.4;
-  border-radius: 10px;
+  letter-spacing: .01em;
+  border-radius: 9px;
   border: 1px solid transparent;
   cursor: pointer;
   white-space: nowrap;
@@ -874,6 +971,7 @@ a.dtb-kpi:hover { text-decoration: none; }
   vertical-align: middle;
   position: relative;
   overflow: hidden;
+  font-family: var(--dtb-font-sans);
 }
 
 .dtb-btn:focus-visible {
@@ -960,7 +1058,9 @@ a.dtb-kpi:hover { text-decoration: none; }
 .dtb-btn--sm {
   padding: 5px 10px;
   font-size: 12px;
-  border-radius: 5px;
+  border-radius: 7px;
+  font-weight: 600;
+  letter-spacing: .02em;
 }
 .dtb-btn--sm .dashicons {
   font-size: 13px;
@@ -969,14 +1069,18 @@ a.dtb-kpi:hover { text-decoration: none; }
 }
 
 .dtb-btn--lg {
-  padding: 11px 22px;
+  padding: 10px 22px;
   font-size: 14px;
+  font-weight: 700;
+  letter-spacing: -.1px;
 }
 
 .dtb-btn--xs {
-  padding: 4px 9px;
+  padding: 3px 8px;
   font-size: 11px;
-  border-radius: 8px;
+  border-radius: 6px;
+  font-weight: 600;
+  letter-spacing: .02em;
 }
 
 /* Icon-only */
@@ -1025,13 +1129,15 @@ a.dtb-kpi:hover { text-decoration: none; }
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  padding: 3px 8px;
-  font-size: 11px;
-  font-weight: 600;
-  line-height: 1.3;
+  padding: 2px 7px;
+  font-size: 10.5px;
+  font-weight: 700;
+  line-height: 1.4;
   border-radius: 20px;
   white-space: nowrap;
-  letter-spacing: .2px;
+  letter-spacing: .35px;
+  text-transform: uppercase;
+  font-family: var(--dtb-font-sans);
 }
 
 .dtb-badge--success  { background: var(--dtb-success-soft);  color: var(--dtb-success); }
@@ -1099,8 +1205,8 @@ a.dtb-kpi:hover { text-decoration: none; }
 }
 
 .dtb-alert__body  { flex: 1 1 auto; }
-.dtb-alert__title { font-weight: 600; margin: 0 0 3px; }
-.dtb-alert__text  { margin: 0; color: inherit; opacity: .85; }
+.dtb-alert__title { font-weight: 700; margin: 0 0 3px; letter-spacing: -.05px; }
+.dtb-alert__text  { margin: 0; color: inherit; opacity: .85; font-size: 12.5px; letter-spacing: .01em; }
 
 .dtb-alert__close {
   flex-shrink: 0;
@@ -1132,11 +1238,11 @@ a.dtb-kpi:hover { text-decoration: none; }
   margin-bottom: 28px;
 }
 .dtb-form-section__title {
-  font-size: 13px;
+  font-size: 10px;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: .6px;
-  color: var(--dtb-muted);
+  letter-spacing: .9px;
+  color: var(--dtb-soft);
   margin: 0 0 14px;
   padding-bottom: 8px;
   border-bottom: 1px solid var(--dtb-border-soft);
@@ -1148,10 +1254,11 @@ a.dtb-kpi:hover { text-decoration: none; }
 
 .dtb-label {
   display: block;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 600;
   color: var(--dtb-text);
   margin-bottom: 5px;
+  letter-spacing: .01em;
 }
 .dtb-label--required::after {
   content: ' *';
@@ -1163,13 +1270,13 @@ a.dtb-kpi:hover { text-decoration: none; }
 .dtb-textarea {
   display: block;
   width: 100%;
-  padding: 8px 12px;
+  padding: 7px 11px;
   font-size: 13px;
-  font-family: inherit;
+  font-family: var(--dtb-font-sans);
   color: var(--dtb-text);
   background: var(--dtb-surface);
   border: 1px solid var(--dtb-border);
-  border-radius: var(--dtb-radius-sm);
+  border-radius: var(--dtb-radius-base);
   line-height: 1.5;
   transition: border-color var(--dtb-motion-fast) var(--dtb-ease-standard),
               box-shadow var(--dtb-motion-fast) var(--dtb-ease-standard);
@@ -1192,6 +1299,7 @@ a.dtb-kpi:hover { text-decoration: none; }
   font-size: 11px;
   color: var(--dtb-soft);
   margin-top: 4px;
+  letter-spacing: .01em;
 }
 .dtb-hint--error { color: var(--dtb-danger); }
 
@@ -1230,8 +1338,8 @@ a.dtb-kpi:hover { text-decoration: none; }
   border-bottom: 1px solid var(--dtb-border-soft);
 }
 .dtb-settings-row:last-child { border-bottom: none; }
-.dtb-settings-row__label { font-weight: 600; font-size: 13px; }
-.dtb-settings-row__desc  { font-size: 12px; color: var(--dtb-muted); margin-top: 3px; }
+.dtb-settings-row__label { font-weight: 600; font-size: 13px; letter-spacing: -.05px; }
+.dtb-settings-row__desc  { font-size: 11.5px; color: var(--dtb-muted); margin-top: 3px; letter-spacing: .01em; }
 
 /* =============================================================================
    16. EMPTY & LOADING STATES
@@ -1265,17 +1373,20 @@ a.dtb-kpi:hover { text-decoration: none; }
 }
 
 .dtb-empty-state__title {
-  font-size: 16px;
-  font-weight: 600;
+  font-family: var(--dtb-font-display);
+  font-size: 15px;
+  font-weight: 700;
   color: var(--dtb-text);
   margin: 0 0 6px;
+  letter-spacing: -.15px;
 }
 
 .dtb-empty-state__text {
-  font-size: 13px;
+  font-size: 12.5px;
   color: var(--dtb-muted);
   max-width: 340px;
   margin: 0 0 20px;
+  letter-spacing: .01em;
 }
 
 .dtb-loading {
@@ -1364,10 +1475,12 @@ a.dtb-kpi:hover { text-decoration: none; }
 }
 
 .dtb-drawer__title {
+  font-family: var(--dtb-font-display);
   font-size: 15px;
-  font-weight: 600;
+  font-weight: 700;
   color: var(--dtb-text);
   margin: 0;
+  letter-spacing: -.15px;
 }
 
 .dtb-drawer__close {
@@ -1414,11 +1527,11 @@ a.dtb-kpi:hover { text-decoration: none; }
   margin-bottom: 20px;
 }
 .dtb-drawer-section__title {
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: .6px;
-  color: var(--dtb-muted);
+  letter-spacing: .9px;
+  color: var(--dtb-soft);
   margin: 0 0 10px;
   padding-bottom: 6px;
   border-bottom: 1px solid var(--dtb-border-soft);
@@ -1433,8 +1546,8 @@ a.dtb-kpi:hover { text-decoration: none; }
   border-bottom: 1px solid var(--dtb-border-soft);
 }
 .dtb-detail-row:last-child { border-bottom: none; }
-.dtb-detail-row__label { flex: 0 0 140px; font-weight: 500; color: var(--dtb-muted); }
-.dtb-detail-row__value { flex: 1 1 auto; color: var(--dtb-text); word-break: break-word; }
+.dtb-detail-row__label { flex: 0 0 140px; font-size: 11.5px; font-weight: 600; color: var(--dtb-muted); letter-spacing: .01em; }
+.dtb-detail-row__value { flex: 1 1 auto; font-size: 13px; color: var(--dtb-text); word-break: break-word; }
 
 /* =============================================================================
    19. MODALS
@@ -1479,7 +1592,7 @@ a.dtb-kpi:hover { text-decoration: none; }
   flex-shrink: 0;
 }
 
-.dtb-modal__title { font-size: 16px; font-weight: 700; margin: 0; }
+.dtb-modal__title { font-family: var(--dtb-font-display); font-size: 16px; font-weight: 700; margin: 0; letter-spacing: -.2px; }
 
 .dtb-modal__close {
   width: 30px;
@@ -1564,8 +1677,8 @@ a.dtb-kpi:hover { text-decoration: none; }
 .dtb-toast--info    .dtb-toast__icon { color: var(--dtb-info); }
 
 .dtb-toast__body  { flex: 1 1 auto; }
-.dtb-toast__title { font-weight: 600; margin: 0 0 2px; }
-.dtb-toast__text  { color: var(--dtb-muted); margin: 0; }
+.dtb-toast__title { font-weight: 700; margin: 0 0 2px; letter-spacing: -.05px; }
+.dtb-toast__text  { color: var(--dtb-muted); margin: 0; font-size: 12px; letter-spacing: .01em; }
 
 .dtb-toast__close {
   flex-shrink: 0;
@@ -1816,12 +1929,14 @@ a.dtb-kpi:hover { text-decoration: none; }
   color: var(--dtb-text);
   line-height: 1.3;
   margin-bottom: 2px;
+  letter-spacing: -.05px;
 }
 
 .dtb-timeline-desc {
-  font-size: .75rem;
+  font-size: .71875rem;
   color: var(--dtb-muted);
   line-height: 1.5;
+  letter-spacing: .01em;
 }
 
 .dtb-timeline-time {
@@ -1832,6 +1947,8 @@ a.dtb-kpi:hover { text-decoration: none; }
   text-align: right;
   padding-top: 2px;
   flex-shrink: 0;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: .01em;
 }
 
 /* =============================================================================
@@ -1938,9 +2055,9 @@ body.dtb-repair-admin-screen #wpbody-content {
 
 body.dtb-admin-screen #wpadminbar,
 body.dtb-repair-admin-screen #wpadminbar {
-  background: var(--dtb-surface);
-  border-bottom: 1px solid var(--dtb-border-soft);
-  box-shadow: 0 8px 20px rgba(42, 53, 71, .05);
+  background: #1e2d4f;
+  border-bottom: none;
+  box-shadow: none;
 }
 
 body.dtb-admin-screen #wpadminbar .ab-item,
@@ -1951,24 +2068,24 @@ body.dtb-repair-admin-screen #wpadminbar .ab-item,
 body.dtb-repair-admin-screen #wpadminbar a.ab-item,
 body.dtb-repair-admin-screen #wpadminbar > #wp-toolbar span.ab-label,
 body.dtb-repair-admin-screen #wpadminbar > #wp-toolbar span.noticon {
-  color: var(--dtb-text);
+  color: #c4cbdc;
 }
 
 body.dtb-admin-screen #wpadminbar:not(.mobile) .ab-top-menu > li:hover > .ab-item,
 body.dtb-admin-screen #wpadminbar:not(.mobile) .ab-top-menu > li > .ab-item:focus,
 body.dtb-repair-admin-screen #wpadminbar:not(.mobile) .ab-top-menu > li:hover > .ab-item,
 body.dtb-repair-admin-screen #wpadminbar:not(.mobile) .ab-top-menu > li > .ab-item:focus {
-  background: var(--dtb-primary-soft);
-  color: var(--dtb-primary);
+  background: rgba(255, 255, 255, .08);
+  color: #fff;
 }
 
 body.dtb-admin-screen #adminmenuback,
 body.dtb-admin-screen #adminmenuwrap,
 body.dtb-repair-admin-screen #adminmenuback,
 body.dtb-repair-admin-screen #adminmenuwrap {
-  background: var(--dtb-surface);
-  border-right: 1px solid var(--dtb-border-soft);
-  box-shadow: 8px 0 24px rgba(42, 53, 71, .05);
+  background: #1e2d4f;
+  border-right: none;
+  box-shadow: none;
 }
 
 body.dtb-admin-screen #adminmenu,
@@ -1977,45 +2094,40 @@ body.dtb-admin-screen #adminmenu .wp-has-current-submenu .wp-submenu,
 body.dtb-repair-admin-screen #adminmenu,
 body.dtb-repair-admin-screen #adminmenu .wp-submenu,
 body.dtb-repair-admin-screen #adminmenu .wp-has-current-submenu .wp-submenu {
-  background: var(--dtb-surface);
+  background: #1e2d4f;
 }
 
 body.dtb-admin-screen #adminmenu a,
 body.dtb-admin-screen #collapse-button,
 body.dtb-repair-admin-screen #adminmenu a,
 body.dtb-repair-admin-screen #collapse-button {
-  color: var(--dtb-text);
+  color: #c4cbdc;
 }
 
 body.dtb-admin-screen #adminmenu div.wp-menu-image:before,
 body.dtb-repair-admin-screen #adminmenu div.wp-menu-image:before {
-  color: var(--dtb-muted);
+  color: #8b95aa;
 }
 
 /*
  * Third-party plugin SVG/image icons (WooCommerce, WPForms, etc.)
- * WP renders these as <img> inside div.wp-menu-image and colorises them via
- * wp-svg-painter.js using the active scheme's icon color (#a7aaad for "fresh"
- * scheme — designed for a dark sidebar). On our white sidebar that's invisible.
- *
- * Fix: use CSS filter to force a consistent dark-gray icon regardless of the
- * original fill color — identical to what WP's own "light" color scheme does.
+ * Dark sidebar: invert the icon to white so it's visible.
  */
 body.dtb-admin-screen #adminmenu .wp-menu-image img,
 body.dtb-repair-admin-screen #adminmenu .wp-menu-image img {
-  filter: brightness(0) opacity(0.55);
+  filter: brightness(0) invert(1) opacity(0.65);
   transition: filter var(--dtb-motion-fast) var(--dtb-ease-standard);
 }
 
-/* Hover / open submenu: make icon more prominent */
+/* Hover / open submenu */
 body.dtb-admin-screen #adminmenu li.menu-top:hover .wp-menu-image img,
 body.dtb-admin-screen #adminmenu li.opensub .wp-menu-image img,
 body.dtb-repair-admin-screen #adminmenu li.menu-top:hover .wp-menu-image img,
 body.dtb-repair-admin-screen #adminmenu li.opensub .wp-menu-image img {
-  filter: brightness(0) opacity(0.85);
+  filter: brightness(0) invert(1) opacity(1);
 }
 
-/* Active / current item: sidebar bg is var(--dtb-primary) = dark blue, so icon must be white */
+/* Active / current item */
 body.dtb-admin-screen #adminmenu li.wp-has-current-submenu .wp-menu-image img,
 body.dtb-admin-screen #adminmenu li.current .wp-menu-image img,
 body.dtb-repair-admin-screen #adminmenu li.wp-has-current-submenu .wp-menu-image img,
@@ -2029,8 +2141,8 @@ body.dtb-admin-screen #adminmenu li > a.menu-top:focus,
 body.dtb-repair-admin-screen #adminmenu li.menu-top:hover,
 body.dtb-repair-admin-screen #adminmenu li.opensub > a.menu-top,
 body.dtb-repair-admin-screen #adminmenu li > a.menu-top:focus {
-  background: var(--dtb-primary-soft);
-  color: var(--dtb-primary);
+  background: rgba(255, 255, 255, .06);
+  color: #fff;
 }
 
 body.dtb-admin-screen #adminmenu li.wp-has-current-submenu a.wp-has-current-submenu,
@@ -2052,7 +2164,7 @@ body.dtb-repair-admin-screen #adminmenu li.current div.wp-menu-image:before {
 
 body.dtb-admin-screen #adminmenu .wp-submenu a,
 body.dtb-repair-admin-screen #adminmenu .wp-submenu a {
-  color: var(--dtb-muted);
+  color: #a0aab8;
 }
 
 body.dtb-admin-screen #adminmenu .wp-submenu a:focus,
@@ -2061,7 +2173,7 @@ body.dtb-admin-screen #adminmenu .wp-submenu li.current a,
 body.dtb-repair-admin-screen #adminmenu .wp-submenu a:focus,
 body.dtb-repair-admin-screen #adminmenu .wp-submenu a:hover,
 body.dtb-repair-admin-screen #adminmenu .wp-submenu li.current a {
-  color: var(--dtb-primary);
+  color: #fff;
 }
 
 /* Remove WP default .wrap h1 left-border / colour inside DTB pages */
@@ -2112,8 +2224,8 @@ body.dtb-repair-admin-screen #adminmenu .wp-submenu li.current a {
   border-radius: var(--dtb-radius-sm);
   background: var(--dtb-surface);
   color: var(--dtb-text);
-  font-size: .8125rem;
-  font-weight: 500;
+  font-size: .75rem;
+  font-weight: 600;
   text-decoration: none;
   cursor: pointer;
   transition: background .12s, border-color .12s, color .12s;
@@ -2143,9 +2255,10 @@ body.dtb-repair-admin-screen #adminmenu .wp-submenu li.current a {
 }
 
 .dtb-pagination__info {
-  font-size: .75rem;
+  font-size: .6875rem;
   color: var(--dtb-muted);
   margin-left: auto;
+  letter-spacing: .01em;
 }
 
 /* =============================================================================
@@ -2169,18 +2282,21 @@ body.dtb-repair-admin-screen #adminmenu .wp-submenu li.current a {
 }
 
 .dtb-stat-card__value {
+  font-family: var(--dtb-font-display);
   font-size: 1.125rem;
   font-weight: 700;
   color: var(--dtb-text);
   line-height: 1.2;
+  letter-spacing: -.3px;
+  font-variant-numeric: tabular-nums;
 }
 
 .dtb-stat-card__label {
-  font-size: .6875rem;
+  font-size: .625rem;
   color: var(--dtb-muted);
-  font-weight: 500;
+  font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: .04em;
+  letter-spacing: .7px;
 }
 
 .dtb-stat-card--success .dtb-stat-card__icon { color: var(--dtb-success); }
@@ -2225,8 +2341,9 @@ body.dtb-repair-admin-screen #adminmenu .wp-submenu li.current a {
   border-radius: 50px;
   background: var(--dtb-surface);
   color: var(--dtb-muted);
-  font-size: .8125rem;
-  font-weight: 500;
+  font-size: .75rem;
+  font-weight: 600;
+  letter-spacing: .01em;
   cursor: pointer;
   transition: background .12s, color .12s, border-color .12s;
 }

@@ -292,12 +292,13 @@ function dtb_repairs_render_queue_workspace( WP_Query $query, int $paged, int $t
 
 	// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 	echo dtb_admin_ui_table_open( [
-		[ 'label' => __( 'Repair', 'drywall-toolbox' ),   'key' => 'repair' ],
-		[ 'label' => __( 'Customer', 'drywall-toolbox' ), 'key' => 'customer' ],
-		[ 'label' => __( 'Workflow', 'drywall-toolbox' ), 'key' => 'workflow' ],
-		[ 'label' => __( 'Device', 'drywall-toolbox' ),   'key' => 'device' ],
-		[ 'label' => __( 'Created', 'drywall-toolbox' ),  'key' => 'created' ],
-		[ 'label' => '',                                  'key' => 'actions' ],
+		[ 'label' => __( 'Repair',      'drywall-toolbox' ), 'key' => 'repair' ],
+		[ 'label' => __( 'Customer',    'drywall-toolbox' ), 'key' => 'customer' ],
+		[ 'label' => __( 'Workflow',    'drywall-toolbox' ), 'key' => 'workflow' ],
+		[ 'label' => __( 'Device',      'drywall-toolbox' ), 'key' => 'device' ],
+		[ 'label' => __( 'Age',         'drywall-toolbox' ), 'key' => 'age' ],
+		[ 'label' => __( 'Next Action', 'drywall-toolbox' ), 'key' => 'next_action' ],
+		[ 'label' => '',                                     'key' => 'actions' ],
 	], [] );
 
 	while ( $query->have_posts() ) {
@@ -330,11 +331,38 @@ function dtb_repairs_render_queue_row( int $repair_id ): void {
 	$edit_link   = (string) get_edit_post_link( $repair_id );
 	$initial     = strtoupper( substr( trim( wp_strip_all_tags( $customer ) ), 0, 1 ) );
 	$initial     = '' !== $initial ? $initial : 'R';
-	$created     = get_the_date( '', $repair_id );
+	$created_at  = get_post_field( 'post_date_gmt', $repair_id );
 	$badge_type  = dtb_admin_ui_status_badge_type( $status );
 	$avatar_type = in_array( $badge_type, [ 'success', 'warning', 'info', 'accent' ], true ) ? $badge_type : 'primary';
 
-	echo '<tr class="dtb-table__row">';
+	// Derive next action.
+	$next_action_map = [
+		'submitted'         => [ __( 'Review Intake',   'drywall-toolbox' ), 'warning' ],
+		'reviewed'          => [ __( 'Send Quote',      'drywall-toolbox' ), 'warning' ],
+		'awaiting_customer' => [ __( 'Await Approval',  'drywall-toolbox' ), 'primary' ],
+		'approved'          => [ __( 'Start Repair',    'drywall-toolbox' ), 'primary' ],
+		'quoted'            => [ __( 'Await Approval',  'drywall-toolbox' ), 'primary' ],
+		'quote_accepted'    => [ __( 'Allocate Parts',  'drywall-toolbox' ), 'primary' ],
+		'parts_allocated'   => [ __( 'Begin Work',      'drywall-toolbox' ), 'primary' ],
+		'in_progress'       => [ __( 'In Progress',     'drywall-toolbox' ), 'info' ],
+		'in_repair'         => [ __( 'In Progress',     'drywall-toolbox' ), 'info' ],
+		'ready_to_ship'     => [ __( 'Ship Now',        'drywall-toolbox' ), 'success' ],
+		'completed'         => [ __( 'Completed',       'drywall-toolbox' ), 'muted' ],
+		'closed'            => [ __( 'Closed',          'drywall-toolbox' ), 'muted' ],
+		'cancelled'         => [ __( 'Cancelled',       'drywall-toolbox' ), 'muted' ],
+		'quote_declined'    => [ __( 'Declined',        'drywall-toolbox' ), 'muted' ],
+	];
+	[ $na_label, $na_type ] = $next_action_map[ $status ] ?? [ ucwords( str_replace( '_', ' ', $status ) ), 'muted' ];
+
+	echo '<tr class="dtb-table__row dtb-table__row--clickable"'
+		. ' data-dtb-drawer="dtb-repairs-detail-drawer"'
+		. ' data-dtb-drawer-title="' . esc_attr( sprintf( __( 'Repair #%d', 'drywall-toolbox' ), $repair_id ) ) . '"'
+		. ' data-dtb-field-repair-id="' . esc_attr( (string) $repair_id ) . '"'
+		. ' data-dtb-field-customer="' . esc_attr( $customer ) . '"'
+		. ' data-dtb-field-device="' . esc_attr( $device ) . '"'
+		. ' data-dtb-field-status="' . esc_attr( $status ) . '"'
+		. '>';
+
 	echo '<td class="dtb-table__cell">';
 	echo '<div class="dtb-object-cell">';
 	echo '<span class="dtb-object-avatar dtb-object-avatar--' . esc_attr( $avatar_type ) . '">' . esc_html( $initial ) . '</span>';
@@ -367,7 +395,12 @@ function dtb_repairs_render_queue_row( int $repair_id ): void {
 	}
 	echo '</td>';
 
-	echo '<td class="dtb-table__cell"><span class="dtb-table__cell--muted">' . esc_html( $created ) . '</span></td>';
+	// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+	echo '<td class="dtb-table__cell">' . dtb_admin_ui_age_badge( $created_at ) . '</td>';
+
+	// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+	echo '<td class="dtb-table__cell">' . dtb_admin_ui_next_action( $na_label, $na_type ) . '</td>';
+
 	echo '<td class="dtb-table__cell"><div class="dtb-table__actions">';
 	// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 	echo dtb_admin_ui_button( __( 'Open', 'drywall-toolbox' ), [
@@ -441,6 +474,20 @@ function dtb_repairs_render_page(): void {
 	] );
 
 	dtb_repairs_render_queue_workspace( $query, $paged, $total_pages );
+
+	// Repair detail drawer.
+	// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+	echo dtb_admin_ui_drawer(
+		'dtb-repairs-detail-drawer',
+		__( 'Repair Detail', 'drywall-toolbox' ),
+		'<div class="dtb-drawer-loading">' . esc_html__( 'Select a repair to view details.', 'drywall-toolbox' ) . '</div>',
+		dtb_admin_ui_button( __( 'Open Full Record', 'drywall-toolbox' ), [
+			'type' => 'secondary',
+			'size' => 'sm',
+			'data' => [ 'dtb-drawer-action' => 'view' ],
+		] )
+	);
+
 	dtb_admin_shell_live_region_close();
 	dtb_admin_shell_close();
 }

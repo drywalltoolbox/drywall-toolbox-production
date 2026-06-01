@@ -74,27 +74,82 @@ function dtb_returns_admin_queue_handler( WP_REST_Request $request ): WP_REST_Re
 	} else {
 		echo dtb_admin_ui_update_badge( 'dtb-returns-workspace' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		echo dtb_admin_ui_table_open( [ // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-			[ 'label' => __( 'ID',         'drywall-toolbox' ), 'key' => 'id' ],
-			[ 'label' => __( 'Order',      'drywall-toolbox' ), 'key' => 'order' ],
-			[ 'label' => __( 'Customer',   'drywall-toolbox' ), 'key' => 'customer' ],
-			[ 'label' => __( 'Resolution', 'drywall-toolbox' ), 'key' => 'resolution' ],
-			[ 'label' => __( 'Status',     'drywall-toolbox' ), 'key' => 'status' ],
-			[ 'label' => __( 'Created',    'drywall-toolbox' ), 'key' => 'created' ],
+			[ 'label' => __( 'RMA / ID',    'drywall-toolbox' ), 'key' => 'rma' ],
+			[ 'label' => __( 'Customer',    'drywall-toolbox' ), 'key' => 'customer' ],
+			[ 'label' => __( 'Order',       'drywall-toolbox' ), 'key' => 'order' ],
+			[ 'label' => __( 'Reason',      'drywall-toolbox' ), 'key' => 'reason' ],
+			[ 'label' => __( 'Resolution',  'drywall-toolbox' ), 'key' => 'resolution' ],
+			[ 'label' => __( 'Status',      'drywall-toolbox' ), 'key' => 'status' ],
+			[ 'label' => __( 'Age',         'drywall-toolbox' ), 'key' => 'age' ],
+			[ 'label' => __( 'Next Action', 'drywall-toolbox' ), 'key' => 'next_action' ],
 			[ 'label' => '',                                     'key' => 'actions' ],
 		], [] );
+
+		$next_action_map = [
+			'pending_review' => [ __( 'Review Request',    'drywall-toolbox' ), 'warning' ],
+			'approved'       => [ __( 'Awaiting Drop-off', 'drywall-toolbox' ), 'primary' ],
+			'awaiting_item'  => [ __( 'Monitor Transit',   'drywall-toolbox' ), 'primary' ],
+			'item_received'  => [ __( 'Inspect Item',      'drywall-toolbox' ), 'warning' ],
+			'refund_issued'  => [ __( 'Confirm Refund',    'drywall-toolbox' ), 'success' ],
+			'exchange_sent'  => [ __( 'Track Exchange',    'drywall-toolbox' ), 'info' ],
+			'closed'         => [ __( 'Closed',            'drywall-toolbox' ), 'muted' ],
+		];
 
 		foreach ( $items as $item ) {
 			$badge_type = dtb_admin_ui_status_badge_type( $item->status->value() );
 			$view_url   = admin_url( 'admin.php?page=dtb-returns&action=view&return_id=' . $item->id );
+			$order_url  = $item->order_id ? admin_url( 'post.php?post=' . $item->order_id . '&action=edit' ) : '';
+			$rma_label  = $item->rma_number ?? ( '#' . $item->id );
+			$reason     = (string) ( $item->reason ?? '' );
+			$status_val = $item->status->value();
+			[ $na_label, $na_type ] = $next_action_map[ $status_val ] ?? [ ucwords( str_replace( '_', ' ', $status_val ) ), 'muted' ];
 
-			echo '<tr>';
-			echo '<td>#' . (int) $item->id . '</td>';
-			echo '<td>' . ( $item->order_id ? '<a href="' . esc_url( admin_url( 'post.php?post=' . $item->order_id . '&action=edit' ) ) . '">#' . (int) $item->order_id . '</a>' : '—' ) . '</td>';
-			echo '<td>' . esc_html( $item->customer_name ) . '</td>';
-			echo '<td>' . esc_html( ucwords( str_replace( '_', ' ', $item->resolution ) ) ) . '</td>';
-			echo '<td>' . dtb_admin_ui_badge( $item->status->label(), $badge_type ) . '</td>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-			echo '<td>' . esc_html( wp_date( get_option( 'date_format' ), strtotime( $item->created_at ) ) ) . '</td>';
-			echo '<td><a href="' . esc_url( $view_url ) . '" class="dtb-btn dtb-btn--sm">' . esc_html__( 'View', 'drywall-toolbox' ) . '</a></td>';
+			echo '<tr class="dtb-table__row dtb-table__row--clickable"'
+				. ' data-dtb-drawer="dtb-returns-detail-drawer"'
+				. ' data-dtb-drawer-title="' . esc_attr( sprintf( __( 'Return %s', 'drywall-toolbox' ), $rma_label ) ) . '"'
+				. ' data-dtb-field-return-id="' . esc_attr( (string) $item->id ) . '"'
+				. ' data-dtb-field-customer="' . esc_attr( $item->customer_name ) . '"'
+				. ' data-dtb-field-status="' . esc_attr( $status_val ) . '"'
+				. '>';
+
+			echo '<td class="dtb-table__cell">';
+			echo '<p class="dtb-object-title">' . esc_html( $rma_label ) . '</p>';
+			echo '<div class="dtb-object-meta">' . esc_html__( 'Return request', 'drywall-toolbox' ) . '</div>';
+			echo '</td>';
+
+			echo '<td class="dtb-table__cell">' . esc_html( $item->customer_name ) . '</td>';
+
+			echo '<td class="dtb-table__cell">';
+			if ( $item->order_id ) {
+				echo dtb_admin_ui_linked_entity_chip( '#' . $item->order_id, $order_url, 'order' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+			} else {
+				echo '<span class="dtb-table__cell--muted">—</span>';
+			}
+			echo '</td>';
+
+			echo '<td class="dtb-table__cell">';
+			echo $reason ? esc_html( ucwords( str_replace( '_', ' ', $reason ) ) ) : '<span class="dtb-table__cell--muted">—</span>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+			echo '</td>';
+
+			echo '<td class="dtb-table__cell">' . esc_html( ucwords( str_replace( '_', ' ', $item->resolution ) ) ) . '</td>';
+
+			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+			echo '<td class="dtb-table__cell">' . dtb_admin_ui_badge( $item->status->label(), $badge_type ) . '</td>';
+
+			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+			echo '<td class="dtb-table__cell">' . dtb_admin_ui_age_badge( $item->created_at ) . '</td>';
+
+			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+			echo '<td class="dtb-table__cell">' . dtb_admin_ui_next_action( $na_label, $na_type ) . '</td>';
+
+			echo '<td class="dtb-table__cell"><div class="dtb-table__actions">';
+			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+			echo dtb_admin_ui_button( __( 'View', 'drywall-toolbox' ), [
+				'href' => $view_url,
+				'size' => 'xs',
+				'type' => 'ghost',
+			] );
+			echo '</div></td>';
 			echo '</tr>';
 		}
 
@@ -103,5 +158,27 @@ function dtb_returns_admin_queue_handler( WP_REST_Request $request ): WP_REST_Re
 	}
 
 	$html = ob_get_clean();
-	return new WP_REST_Response( [ 'ok' => true, 'html' => $html ], 200 );
+
+	// Counts for summary.
+	$all_counts = function_exists( 'dtb_returns_count_by_status' ) ? dtb_returns_count_by_status() : [];
+	$total_open = (int) ( ( $all_counts['pending_review'] ?? 0 ) + ( $all_counts['awaiting_item'] ?? 0 ) + ( $all_counts['item_received'] ?? 0 ) );
+
+	return new WP_REST_Response( [
+		'ok'      => true,
+		'html'    => $html,
+		'state'   => [
+			'tab'    => $active_tab,
+			'search' => $search,
+			'paged'  => $paged,
+		],
+		'summary' => [
+			'total'          => array_sum( $all_counts ),
+			'pending_review' => (int) ( $all_counts['pending_review'] ?? 0 ),
+			'open'           => $total_open,
+		],
+		'meta'    => [
+			'updated_at'   => gmdate( 'c' ),
+			'poll_after_ms' => 30000,
+		],
+	], 200 );
 }
