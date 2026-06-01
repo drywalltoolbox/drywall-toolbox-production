@@ -1,1119 +1,286 @@
-## Architecture / Approach
+## Implementation Status — Updated 2026-05-31
 
-The support module should move from a **ticket queue + viewer modal** into an **intelligent support operations workspace**.
-
-Your backend already has the foundation: ticket listing, ticket detail, update, KPI, event, queue, snooze, follow-up, bulk, macro, health, and outbox routes are already present in the support REST controller.  The current support JS also already manages active queue, active ticket, events, macros, filters, selected tickets, pagination, auto-refresh, and action-due timers. 
-
-The next upgrade is not just styling. It is workflow intelligence:
-
-```text
-Support Admin vNext
-├─ smart triage
-├─ SLA/action due automation
-├─ next-best-action guidance
-├─ customer/order/repair/return context
-├─ reply quality tooling
-├─ macro/reply acceleration
-├─ workload balancing
-├─ bulk workflow actions
-├─ escalation/follow-up management
-├─ delivery-health monitoring
-└─ live operational synchronization
-```
-
-The goal is to reduce support handling time, prevent missed customer replies, improve answer accuracy, and give admins immediate context before replying.
+All six tasks in this plan are **complete**. The Support module has been fully rebuilt as a command center. Below is the authoritative status per deliverable.
 
 ---
 
-# 1. Core Product Model
+### ✅ Task 1 — CSS scoped component classes (`Admin/assets/dtb-support.css`)
 
-## Current support UI
+Appended ~200 lines of scoped `.dtb-support-*` component classes after the existing `@media` blocks. Classes implemented:
 
-```text
-Queue → click ticket → modal viewer → manually decide what to do
-```
-
-## Target support UI
-
-```text
-Queue → click ticket → operational workspace → system recommends/accelerates next action
-```
-
-Each ticket should answer:
-
-```text
-1. What is this customer asking?
-2. What customer/order/repair/return context matters?
-3. Is the ticket urgent, overdue, blocked, or waiting?
-4. What is the correct next action?
-5. What reply or workflow transition should happen now?
-6. Did the customer actually receive the response?
-```
+- Shell: `.dtb-support-workspace`, `.dtb-support-tabs`, `.dtb-support-tab`, `.dtb-support-tab__badge`, `.dtb-support-tab-panel`
+- Queue: `.dtb-support-table`, `.dtb-support-ticket-cell`, `.dtb-support-customer-cell` (avatar + initials), `.dtb-support-status-badge`, `.dtb-support-sla`, `.dtb-support-progress`, `.dtb-support-linked-chips`, `.dtb-support-chip` variants
+- Conversation: `.dtb-support-conversation`, `.dtb-support-ticket-list`, `.dtb-support-ticket-preview`, `.dtb-support-thread`, `.dtb-support-message` (customer/staff/internal/system bubble variants), `.dtb-support-composer`, `.dtb-support-empty-selection`
+- Inbox: `.dtb-support-inbox`, `.dtb-support-reader`, `.dtb-support-attachment`, `.dtb-support-bulkbar`
+- Sidebar: `.dtb-support-command-sidebar`, `.dtb-support-nba`, `.dtb-support-risk-flags`, `.dtb-support-risk-flag`
+- Tabs: `.dtb-support-followup-due` (+ `--soon`/`--ok`), `.dtb-support-macros-shell`, `.dtb-support-macro-card`, `.dtb-support-macro-grid`, `.dtb-support-macro-category`, `.dtb-support-delivery-status`
+- Responsive overrides at 1100 px and 800 px breakpoints
 
 ---
 
-# 2. Advanced Support Workload Features
+### ✅ Task 2 — 6-tab command center shell (`Admin/SupportHubDashboard.php`)
 
-## 2.1 Smart Queue Prioritization
+Replaced the single main column with a full `<nav class="dtb-support-tabs">` bar and 6 `dtb-support-tab-panel` divs:
 
-### Problem
-
-The current queues are useful but mostly static:
-
-```text
-Needs Reply
-Overdue
-Due Soon
-Unassigned
-Urgent
-In Progress
-Waiting on Customer
-Snoozed
-Resolved
-All Active
-```
-
-These queue labels already exist in `dtb-support.js`. 
-
-### Upgrade
-
-Add a computed **Support Priority Score** per ticket.
-
-Suggested scoring model:
-
-```text
-priority_score =
-  SLA urgency
-+ customer replied recently
-+ ticket priority
-+ customer order/repair/return impact
-+ failed email/delivery risk
-+ unassigned penalty
-+ reopened penalty
-+ age penalty
-```
-
-Example weighting:
-
-```text
-Overdue SLA                 +500
-Due within 2h               +250
-Urgent priority             +200
-High priority               +125
-Unassigned                  +100
-Linked paid order blocked   +150
-Linked repair blocked       +150
-Email delivery failure      +200
-Customer replied after staff +175
-Ticket age > 24h            +75
-```
-
-### UI
-
-Add a “Recommended Queue” default sort:
-
-```text
-Needs Reply
-├─ highest priority score first
-├─ SLA breach first
-├─ customer-impacting workflows first
-└─ unassigned urgent tickets elevated
-```
-
-### Files
-
-```text
-drywalltoolbox/wp/wp-content/mu-plugins/dtb-support/Services/SupportPriorityService.php
-drywalltoolbox/wp/wp-content/mu-plugins/dtb-support/Rest/TicketAdminController.php
-drywalltoolbox/wp/wp-content/mu-plugins/dtb-support/Admin/assets/dtb-support.js
-```
+| Tab | Panel ID | Badge ID | Content |
+|-----|----------|----------|---------|
+| Queue | `#dtb-tab-queue` | `#dtb-tab-badge-queue` | Existing toolbar + bulkbar + 9-col table |
+| Conversation | `#dtb-tab-conversation` | — | Ticket list rail + thread pane + empty state |
+| Inbox | `#dtb-tab-inbox` | `#dtb-tab-badge-inbox` | Search + bulkbar + list rail + reader pane + empty state |
+| Follow-Ups | `#dtb-tab-followups` | — | Toolbar + `#dtb-followups-host` |
+| Macros | `#dtb-tab-macros` | — | Macro search + `#dtb-macros-tab-host` |
+| Delivery | `#dtb-tab-delivery` | `#dtb-tab-badge-delivery` | Toolbar + `#dtb-delivery-host` |
 
 ---
 
-## 2.2 Next-Best-Action Engine
+### ✅ Task 3 — Ticket intelligence REST endpoint (`Rest/TicketAdminController.php`)
 
-### Problem
+Registered `GET /dtb/v1/support/tickets/(?P<id>\d+)/intelligence`.
 
-The modal currently shows detail, but does not guide the admin.
-
-### Upgrade
-
-Each ticket should expose one computed `next_action`.
-
-Examples:
-
-```text
-Reply to customer
-Assign owner
-Escalate urgent issue
-Request order number
-Link related order
-Follow up on repair
-Resolve after reply
-Retry failed email
-Wait until snooze expires
-```
-
-### Data model
-
-Add projected fields:
-
+Response shape:
 ```json
 {
-  "next_action": {
-    "key": "reply_to_customer",
-    "label": "Reply to customer",
-    "reason": "Customer replied 7h ago and ticket is in Needs Reply.",
-    "severity": "warning",
-    "primary_action": "Open Composer"
-  }
+  "priority_score": 85,
+  "next_action": { "action": "reply", "label": "Send initial reply", "reason": "No staff reply yet" },
+  "risk_flags": ["sla_breach", "urgent_priority"],
+  "customer_context": { "order_count": 4, "repair_count": 1, "recent_orders": [...] },
+  "linked_records": { "order_id": 1042, "repair_id": null, "return_id": null },
+  "delivery_health": { "status": "ok", "fail_count": 0, "last_sent_at": "2026-05-30T18:00:00Z" },
+  "recommended_macros": [...],
+  "meta": { "updated_at": "2026-05-31T10:00:00Z" }
 }
 ```
 
-### UI
+---
 
-In the ticket row:
+### ✅ Task 4 — Next-action + risk-flag service (`Services/SupportNextActionService.php`)
+
+New file. Two exported functions:
+
+- `dtb_support_compute_next_action(object $ticket): array` — deterministic NBA: delivery failures → snoozed → resolved/closed → SLA breach + urgency → SLA warning → unassigned → no first reply → waiting-on-customer with no follow-up → in-progress → default review
+- `dtb_support_compute_risk_flags(object $ticket): string[]` — SLA breach, urgent priority, delivery failures, unassigned, no reply in 72 h, hot-word keywords (refund / damaged / missing / wrong item)
+
+---
+
+### ✅ Task 5 — Customer context service (`Services/SupportCustomerContextService.php`)
+
+New file. One exported function:
+
+- `dtb_support_get_customer_context(object $ticket): array` — returns `customer_name`, `customer_email`, `customer_user_id`, `order_count`, `repair_count`, `ticket_count`, `recent_orders` (last 3 WooCommerce orders with id/number/status/total/date/admin_url), `customer_since`
+
+Both new services are required in `bootstrap.php` under the Services load block.
+
+---
+
+### ✅ Task 6 — JS tab system + all tab renderers (`Admin/assets/dtb-support.js`)
+
+All methods added. Zero lint errors.
+
+| Method | Tab | Description |
+|--------|-----|-------------|
+| `switchTab(tab)` | All | Toggles `.is-active` on buttons + panels; lazy-loads each tab on first activation |
+| `loadConversationTickets()` | Conversation | `GET /support/tickets?queue=…&per_page=50` → left rail |
+| `filterConversationList(q)` | Conversation | Client-side filter of `convTickets` |
+| `renderConversationTicketList(tickets)` | Conversation | Renders `.dtb-support-ticket-preview` cards |
+| `openConversationTicket(id)` | Conversation | Loads ticket + events → `renderConversationThread()` |
+| `renderConversationThread(ticket, events)` | Conversation | Chat bubble thread + sticky composer |
+| `setConvComposerMode(mode)` / `sendConvReply(id)` / `sendConvAndResolve(id)` | Conversation | Composer actions |
+| `loadInbox()` / `filterInboxList(q)` / `renderInboxList(tickets)` | Inbox | Left rail with bulk-select checkboxes |
+| `toggleInboxSelect(id, checked)` / `inboxSelectAll(checked)` / `executeInboxBulk()` | Inbox | Bulk ops wired to existing `applyBulkActionToIds()` |
+| `openInboxReader(id)` / `renderInboxReader(ticket, events)` | Inbox | Reader pane with action toolbar + attachment list |
+| `loadFollowUps()` / `renderFollowUpsTable(tickets)` / `clearFollowUp(id)` | Follow-Ups | Due-date table with snooze/clear/open actions |
+| `renderMacrosTab(filter)` / `filterMacrosTab(q)` / `applyMacroToActiveTicket(id)` / `previewMacro(id)` | Macros | Category-grouped macro grid; inserts into active composer |
+| `loadDelivery()` / `renderDeliveryTable(records)` / `retryEmailRecord(recId, ticketId)` / `markDeliveryReviewed(id)` | Delivery | Email failure recovery table |
+| `retryEmail(ticketId)` | Sidebar | `POST /support/tickets/{id}/retry-notification` |
+| `reopenTicket(ticketId)` | Sidebar | Delegates to `setStatus(id, 'open')` |
+| `createReturn(ticketId)` / `openReturn(ticketId)` | Sidebar | Return admin nav via `cfg.createReturnUrl` / `cfg.returnAdminUrl` |
+| `loadIntelligence(ticketId, cb)` | Sidebar | Non-blocking GET to intelligence endpoint |
+| `loadKpis()` *(updated)* | KPI strip | Now also writes `#dtb-tab-badge-queue`, `#dtb-tab-badge-inbox`, `#dtb-tab-badge-delivery` |
+
+`renderTicketRow()` updated: customer avatar cell with initials, linked chips (`renderLinkedChips()`), scoped class status/priority badges, 9-column layout.
+
+`renderContextSidebar()` updated: Linked Records section (order/repair/return chips + create return), enhanced delivery health block with Retry Email quick action, Reopen quick action.
+
+---
+
+## Revised Support Implementation Plan Addendum
+
+Use the three template HTMLs as **design references only**. Do not wire to them, import them, or preserve Bootstrap/Modernize class contracts. Extract the interaction patterns and rebuild them as DTB-owned Support components backed by your support REST data.
 
 ```text
-Next Action: Reply to customer
-Reason: Customer replied 7h ago
-```
-
-In the modal header:
-
-```text
-Recommended: Reply to customer
-[Open composer] [Assign to me] [Snooze]
-```
-
-### Files
-
-```text
-drywalltoolbox/wp/wp-content/mu-plugins/dtb-support/Services/SupportNextActionService.php
-drywalltoolbox/wp/wp-content/mu-plugins/dtb-support/Projection/SupportTicketProjection.php
-drywalltoolbox/wp/wp-content/mu-plugins/dtb-support/Admin/assets/dtb-support.js
+chat_template.html  → conversation/detail workspace
+email_template.html → inbox/queue/folder workflow
+list_template.html  → dense operational ticket table
 ```
 
 ---
 
-## 2.3 SLA / Action Clock Intelligence
+# 1. Template Pattern Audit
 
-The current JS already renders action due badges and runs an action due timer. It has `actionDueTimer`, `actionDueHours()`, and action badge rendering.  
+## `docs/design-reference/chat_template.html`
 
-### Upgrade
+The chat template provides the best model for the **ticket detail modal and Conversation tab**.
 
-Make the SLA/action clock first-class:
-
-```text
-On Track
-Due Soon
-Overdue
-Waiting on Customer
-Snoozed
-Resolved
-Email Failed
-```
-
-### UI
-
-Add row-level badge:
+Useful patterns:
 
 ```text
-Action Due: 1h 42m
+- two-pane chat shell
+- searchable contact/ticket list
+- selected conversation header
+- left/right message bubbles
+- customer/staff distinction
+- empty state: “open chat from the list”
+- responsive sidebar/offcanvas behavior
+- sticky conversation area
 ```
 
-Add modal insight:
+Evidence: the template starts with a card-based chat application wrapper and mobile search/header controls, then splits into a sidebar and chat container.  It renders a scrollable chat/user list with avatar, status indicator, preview, and timestamp.  The conversation section uses left/right message rows with message bubbles and timestamps. 
+
+### DTB Support usage
+
+Use this pattern for:
 
 ```text
-Action Clock
-├─ Due in 1h 42m
-├─ SLA target: 1 business day
-├─ Last customer reply: 7h ago
-└─ Owner: elliotttmiller
+- ticket modal thread
+- Conversation tab
+- customer/staff message rendering
+- internal note rendering
+- sticky reply composer
+- selected-ticket empty state
 ```
 
-### Workflow
-
-When replying:
+Target DTB classes:
 
 ```text
-customer-facing reply sent
-→ ticket moves to Waiting on Customer or Resolved depending action
-→ action clock resets/stops
+.dtb-support-conversation
+.dtb-support-thread
+.dtb-support-message
+.dtb-support-message--customer
+.dtb-support-message--staff
+.dtb-support-message--internal
+.dtb-support-message--system
+.dtb-support-composer
+.dtb-support-ticket-list
+.dtb-support-empty-selection
 ```
 
-When internal note added:
+Do not use:
 
 ```text
-no customer response
-→ action clock continues
-```
-
----
-
-## 2.4 Customer Context Panel
-
-### Problem
-
-Admins need context before replying: orders, repairs, returns, prior tickets, customer email history.
-
-The current detail sidebar already includes a `Ticket Snapshot`, workflow tools, snooze/follow-up, additional context, and metadata normalization. 
-
-### Upgrade
-
-Add a true **Customer 360** panel.
-
-Sections:
-
-```text
-Customer
-├─ name
-├─ email
-├─ phone
-├─ account status
-└─ prior tickets
-
-Linked Records
-├─ Orders
-├─ Repairs
-├─ Returns/RMAs
-└─ Related support tickets
-
-Customer Risk
-├─ open problems
-├─ failed notifications
-├─ overdue support
-└─ unresolved order/repair/return state
-```
-
-### UI actions
-
-```text
-Open order
-Open repair
-Open return
-Create linked return
-Create linked repair
-Copy customer summary
-```
-
-### Files
-
-```text
-drywalltoolbox/wp/wp-content/mu-plugins/dtb-support/Services/SupportCustomerContextService.php
-drywalltoolbox/wp/wp-content/mu-plugins/dtb-support/Rest/TicketAdminController.php
-drywalltoolbox/wp/wp-content/mu-plugins/dtb-support/Admin/assets/dtb-support.js
-```
-
----
-
-## 2.5 Reply Quality Toolkit
-
-### Problem
-
-Support quality depends on response clarity, tone, completeness, and correct context.
-
-### Upgrade
-
-Add composer-side quality tools.
-
-Features:
-
-```text
-- macro insertion
-- reply templates by ticket type
-- missing-context warnings
-- suggested customer greeting/signoff
-- shipping/order/repair status snippets
-- internal note vs customer reply guardrail
-- “Send and Resolve” confirmation
-- unsent draft protection
-```
-
-Current JS already supports macros and composer modes. It renders Reply/Internal Note mode tabs, macro picker, Send, and Send and Resolve. 
-
-### Add
-
-```text
-Before sending:
-- warn if reply is empty
-- warn if internal note contains customer-facing language and is marked internal
-- warn if customer reply contains unresolved placeholders
-- warn if ticket is urgent and resolving without customer reply
-```
-
-### UI
-
-```text
-Composer Quality Panel
-├─ Context included: Order #1976
-├─ Tone: neutral/helpful
-├─ Missing: tracking number
-└─ Action: insert order status snippet
-```
-
-This can start rule-based. No AI dependency required.
-
----
-
-## 2.6 Macro System Upgrade
-
-The current support JS loads macros during initialization. 
-
-### Upgrade macro model
-
-Macro categories:
-
-```text
-Order
-Repair
-Return
-Shipping
-Pricing / Promotions
-Warranty
-General Question
-Escalation
-Closeout
-```
-
-Macro variables:
-
-```text
-{{customer_name}}
-{{order_number}}
-{{repair_id}}
-{{return_id}}
-{{tracking_number}}
-{{agent_name}}
-{{support_email}}
-```
-
-### Features
-
-```text
-- search macros
-- recently used macros
-- recommended macros by ticket type
-- insert without replacing drafted text
-- preview resolved variables
-- missing-variable warning
-```
-
-### Files
-
-```text
-drywalltoolbox/wp/wp-content/mu-plugins/dtb-support/Services/SupportMacroService.php
-drywalltoolbox/wp/wp-content/mu-plugins/dtb-support/Admin/assets/dtb-support.js
-```
-
----
-
-## 2.7 Bulk Workload Operations
-
-Current support JS tracks selected tickets and supports bulk behavior. It has `selectedTickets` in state and bulk UI logic.  The REST layer has a bulk route. 
-
-### Upgrade
-
-Bulk actions should become workflow-aware:
-
-```text
-Assign selected
-Mark in progress
-Set priority
-Snooze selected
-Resolve selected
-Add internal note
-Apply macro
-Export selected
-```
-
-### Safety rules
-
-```text
-- confirmation required for resolve/close
-- block bulk customer replies unless macro preview is confirmed
-- show per-ticket success/failure results
-- refresh queues/KPIs after completion
-```
-
-### UI
-
-Persistent bulk bar:
-
-```text
-3 selected
-[Assign] [Priority] [Snooze] [Resolve] [Clear]
-```
-
----
-
-## 2.8 Workload Balancing / Assignment Intelligence
-
-### Problem
-
-Unassigned tickets require manual triage.
-
-### Upgrade
-
-Add intelligent assignment:
-
-```text
-- assign to me
-- auto-assign unassigned urgent
-- show agent workload
-- show oldest assigned ticket per agent
-- show overdue count per agent
-```
-
-### UI
-
-In queue rail or right context panel:
-
-```text
-Agent Load
-├─ elliotttmiller: 4 active / 1 overdue
-├─ agent2: 2 active / 0 overdue
-└─ unassigned: 3 active
-```
-
-### Assignment recommendation
-
-```text
-Recommended owner: elliotttmiller
-Reason: currently lowest overdue workload and handled similar ticket type.
-```
-
-This can start with a simple weighted workload algorithm.
-
----
-
-## 2.9 Delivery Health / Outbox Recovery
-
-The support module already has outbox/health routes. 
-
-### Upgrade
-
-Make delivery failures visible and actionable.
-
-UI indicators:
-
-```text
-Email Sent
-Email Failed
-Retry Pending
-Retry Failed
-No Email on Customer
-```
-
-Actions:
-
-```text
-Retry email
-Copy reply manually
-Mark delivery reviewed
-Open outbox error
-```
-
-This directly improves customer experience because a support reply that fails delivery is effectively no reply.
-
----
-
-## 2.10 Follow-Up Automation
-
-The REST layer already supports follow-up due dates. 
-
-### Upgrade
-
-Add follow-up workflows:
-
-```text
-Follow up in 2h
-Follow up tomorrow
-Follow up in 3 business days
-Custom follow-up
-Clear follow-up
-```
-
-### Queue
-
-Add a queue:
-
-```text
-Follow-Up Due
-```
-
-### UI
-
-Right sidebar:
-
-```text
-Follow-Up
-├─ No follow-up set
-├─ 2h
-├─ tomorrow
-├─ 3 business days
-└─ custom
-```
-
----
-
-## 2.11 Cross-Module Escalation
-
-Support should be the routing layer into Orders, Repairs, and Returns.
-
-### Actions
-
-From a ticket modal:
-
-```text
-Create linked return
-Create linked repair
-Open linked order
-Escalate to order issue
-Escalate to repair issue
-Escalate to return issue
-```
-
-### Workflow
-
-Example:
-
-```text
-Customer asks about defective product
-→ support ticket opened
-→ admin clicks Create Return
-→ RMA draft opens with customer/order prefilled
-→ ticket gets linked to return
-→ timeline event added
-```
-
-This is the difference between support as an inbox and support as an operational hub.
-
----
-
-# 3. Support Modal vNext
-
-The current modal should become the main workspace.
-
-## Required modal layout
-
-```text
-Ticket Modal
-├─ Header
-│  ├─ ticket number
-│  ├─ subject
-│  ├─ status / priority / SLA badges
-│  └─ actions
-│
-├─ Insight Strip
-│  ├─ Customer
-│  ├─ Action Clock
-│  ├─ Activity
-│  └─ Delivery Health
-│
-├─ Main Column
-│  ├─ Conversation / Timeline
-│  ├─ event filters
-│  ├─ reply composer
-│  └─ macro picker
-│
-└─ Sidebar
-   ├─ Next Best Action
-   ├─ Workflow Tools
-   ├─ Snooze / Follow-Up
-   ├─ Linked Records
-   ├─ Customer Context
-   └─ Metadata
-```
-
-The existing JS already contains much of this richer renderer; the current visible modal is just not using it fully. The rich renderer builds insight strip, thread panel, composer, and context sidebar. 
-
----
-
-# 4. Backend Additions
-
-## 4.1 Add Support Workbench Aggregate Endpoint
-
-Current initialization calls multiple endpoints: macros, queue counts, KPIs, and tickets. 
-
-Add:
-
-```text
-GET /dtb/v1/support/workbench
-```
-
-Response:
-
-```json
-{
-  "ok": true,
-  "queues": {},
-  "kpis": {},
-  "tickets": [],
-  "macros": [],
-  "agents": [],
-  "agent_load": {},
-  "selected_ticket": null,
-  "meta": {
-    "updated_at": "2026-05-31T12:23:07-05:00",
-    "poll_after_ms": 30000
-  }
-}
-```
-
-## 4.2 Add Ticket Intelligence Endpoint
-
-```text
-GET /dtb/v1/support/tickets/{id}/intelligence
-```
-
-Response:
-
-```json
-{
-  "priority_score": 725,
-  "next_action": {},
-  "customer_context": {},
-  "linked_records": {},
-  "reply_suggestions": [],
-  "risk_flags": [],
-  "delivery_health": {}
-}
-```
-
-This can be rule-based first.
-
----
-
-# 5. Implementation Plan
-
-## Phase 1 — Make modal operational
-
-Files:
-
-```text
-drywalltoolbox/wp/wp-content/mu-plugins/dtb-support/Admin/assets/dtb-support.js
-drywalltoolbox/wp/wp-content/mu-plugins/dtb-support/Admin/assets/dtb-support.css
-```
-
-Tasks:
-
-```text
-1. Replace current viewer modal body with full workflow modal.
-2. Render insight strip.
-3. Render thread/timeline filters.
-4. Render reply/internal note composer.
-5. Render workflow tools.
-6. Render snooze/follow-up actions.
-7. Render linked context and delivery health.
-8. Ensure every action uses REST without page reload.
-```
-
----
-
-## Phase 2 — Add intelligence services
-
-Files:
-
-```text
-drywalltoolbox/wp/wp-content/mu-plugins/dtb-support/Services/SupportPriorityService.php
-drywalltoolbox/wp/wp-content/mu-plugins/dtb-support/Services/SupportNextActionService.php
-drywalltoolbox/wp/wp-content/mu-plugins/dtb-support/Services/SupportCustomerContextService.php
-drywalltoolbox/wp/wp-content/mu-plugins/dtb-support/Services/SupportAgentLoadService.php
-```
-
-Tasks:
-
-```text
-1. Compute priority score.
-2. Compute next best action.
-3. Load linked customer/order/repair/return context.
-4. Compute agent workload.
-5. Add projected fields to ticket list/detail payloads.
-```
-
----
-
-## Phase 3 — Add aggregate REST endpoints
-
-Files:
-
-```text
-drywalltoolbox/wp/wp-content/mu-plugins/dtb-support/Rest/TicketAdminController.php
-```
-
-Tasks:
-
-```text
-1. Add /support/workbench.
-2. Add /support/tickets/{id}/intelligence.
-3. Add summary/meta to list responses.
-4. Add agent workload payload.
-5. Add delivery health payload.
-```
-
----
-
-## Phase 4 — Upgrade queue table
-
-Tasks:
-
-```text
-1. Add priority score.
-2. Add next action column.
-3. Add SLA/action due column.
-4. Add linked records chips.
-5. Add delivery health indicator.
-6. Make queue rows update after modal actions.
-```
-
----
-
-## Phase 5 — Advanced admin acceleration
-
-Tasks:
-
-```text
-1. Recommended macros by ticket type.
-2. Macro variable substitution.
-3. Reply quality checks.
-4. Keyboard shortcuts.
-5. Bulk workflow actions.
-6. Dirty-state protection.
-7. “New update available” while composing.
-```
-
----
-
-# 6. Workflow Examples
-
-## Needs Reply workflow
-
-```text
-Admin opens Needs Reply
-→ tickets sorted by priority score
-→ row shows Next Action: Reply to customer
-→ admin opens modal
-→ modal shows customer/order/repair context
-→ recommended macro appears
-→ admin sends reply
-→ ticket moves to Waiting on Customer or Resolved
-→ queue counts and KPIs refresh
-```
-
-## Failed email workflow
-
-```text
-Ticket shows Email Failed
-→ admin opens modal
-→ Delivery Health shows failure
-→ admin retries email
-→ outbox status refreshes
-→ if success, ticket timeline records retry
-```
-
-## Return escalation workflow
-
-```text
-Customer asks to return product
-→ modal detects order context
-→ Next Action: Create Return
-→ admin creates RMA from modal
-→ return is linked to ticket
-→ ticket timeline records linked RMA
-```
-
----
-
-# 7. Acceptance Criteria
-
-The support workload is properly optimized when:
-
-```text
-- Admin can reply, note, assign, prioritize, snooze, follow up, and resolve inside the modal.
-- No routine support action requires opening a full ticket page.
-- Queue counts, KPIs, and selected ticket detail refresh after actions.
-- Tickets show next action, SLA/action clock, delivery health, and linked records.
-- Macros are searchable and insertable in composer.
-- Bulk actions are safe, confirmed, and show per-ticket results.
-- Composer protects unsent drafts.
-- Failed email delivery is visible and recoverable.
-- Support tickets can route into Orders, Repairs, and Returns workflows.
-```
-
----
-
-# 8. Final Recommendation
-
-Build support around one principle:
-
-```text
-Every ticket must expose the next correct customer-impacting action directly inside the admin workspace.
-```
-
-The backend is already strong. The key upgrades are:
-
-```text
-1. Make the ticket modal operational, not read-only.
-2. Add priority scoring and next-best-action logic.
-3. Add customer/order/repair/return context.
-4. Add delivery health and follow-up management.
-5. Add macro/reply acceleration.
-6. Add bulk workload controls and agent load visibility.
-```
-
-That turns Support from an inbox into a customer operations command center.
-
-
-
-## Architecture / Approach
-
-The three reference templates should be treated as **layout and component pattern sources**, not runtime dependencies. We should not wire Support to those HTML files, Bootstrap classes, Tabler icon classes, demo avatars, SimpleBar wrappers, or demo content. Instead, extract the UI concepts and rebuild them into DTB-owned classes/components inside:
-
-```text
-drywalltoolbox/wp/wp-content/mu-plugins/dtb-support/Admin/
-drywalltoolbox/wp/wp-content/mu-plugins/dtb-support/Admin/assets/dtb-support.css
-drywalltoolbox/wp/wp-content/mu-plugins/dtb-support/Admin/assets/dtb-support.js
-drywalltoolbox/wp/wp-content/mu-plugins/dtb-platform/Admin/assets/dtb-admin.css
-```
-
-The correct target is:
-
-```text
-chat_template.html   → ticket conversation/detail modal UX
-email_template.html  → support inbox/queue + message reading UX
-list_template.html   → dense ticket list/table row design
-```
-
-The implementation should remain DTB-branded, AdminShell-native, and live-data-backed.
-
----
-
-# 1. `chat_template.html` Audit
-
-## Useful patterns
-
-The chat template has a strong support-detail structure:
-
-```text
-left contact/chat list
-center conversation panel
-chat header
-message bubbles
-empty “open chat” state
-mobile offcanvas/sidebar pattern
-```
-
-The template starts with a card-based chat app wrapper, mobile search/header controls, and a desktop sidebar/chat split layout.  It then uses a left chat/user list with avatars, online/status indicators, recent message previews, and timestamps.  It also has an “open chat from the list” empty state before a conversation is selected. 
-
-The conversation area uses directional message rows: customer/staff messages align left/right with metadata above and message bubbles below. 
-
-## How to use it in Support
-
-Use this template for the **ticket detail modal / ticket conversation workspace**.
-
-### Convert into DTB components
-
-```text
-Template concept                  DTB Support implementation
-
-chat-application wrapper           .dtb-support-ticket-modal
-chat user list                     .dtb-support-ticket-list / .dtb-support-thread-list
-chat header                        .dtb-ticket-modal__header
-message bubbles                    .dtb-support-message
-incoming message                   .dtb-support-message--customer
-outgoing/staff message             .dtb-support-message--staff
-image/file message pattern         .dtb-support-attachment
-empty open-chat state              .dtb-support-empty-selection
-mobile offcanvas sidebar           responsive drawer/collapsible ticket rail
-```
-
-### Modal body should become
-
-```text
-Ticket Detail Modal
-├─ Header
-│  ├─ ticket number
-│  ├─ subject
-│  ├─ customer
-│  ├─ status / priority / SLA badges
-│  └─ refresh / copy / open full / close
-│
-├─ Insight Strip
-│  ├─ Customer
-│  ├─ Action Clock
-│  ├─ Activity
-│  └─ Delivery Health
-│
-├─ Conversation Workspace
-│  ├─ event filters: Messages / All / Workflow / Internal / Delivery / System
-│  ├─ customer messages, left aligned
-│  ├─ staff replies, right aligned
-│  ├─ internal notes, neutral/yellow style
-│  └─ system/workflow events, compact timeline style
-│
-└─ Composer
-   ├─ Reply
-   ├─ Internal Note
-   ├─ Macro picker
-   ├─ Send
-   └─ Send and Resolve
-```
-
-### Do not copy
-
-```text
-Bootstrap utility classes
-Tabler icon class names
+.chat-application
+.chat-user
+.chat-box
+.d-flex / hstack / w-30 / w-70
+.ti ti-*
+SimpleBar wrappers
 demo avatars/images
-SimpleBar-generated wrapper markup
-hard-coded data-user-id chat mocks
-phone/video chat actions
 ```
-
-The chat template’s phone/video icons are not relevant for DTB Support. The useful idea is the **conversation-first detail experience**, not generic chat functionality.
 
 ---
 
-# 2. `email_template.html` Audit
+## `docs/design-reference/email_template.html`
 
-## Useful patterns
+The email template provides the best model for the **main Support queue, Inbox tab, Delivery tab, and attachment/message reader patterns**.
 
-The email template is closer to a support inbox. It has:
-
-```text
-left folder/label navigation
-compose/action button
-message list
-checkbox selection
-labels/badges
-star/important indicators
-message reader panel
-attachment blocks
-```
-
-The template begins with a left navigation column containing a Compose button and folder/label links like Inbox, Sent, Draft, Spam, Trash, Starred, Important, and category labels. 
-
-It then renders a searchable message list with checkboxes, sender/customer, subject, badges, star/important icons, and timestamps.  The reader panel has a top action toolbar, sender block, subject/body content, labels, and attachment blocks.   
-
-## How to use it in Support
-
-Use this template for the **main Support page tabs and queue UX**, especially the inbox/list mode.
-
-### Convert into DTB Support sections
+Useful patterns:
 
 ```text
-Template concept                  DTB Support implementation
-
-folder sidebar                    smart queue rail
-Compose button                    New ticket / manual support note / create ticket, optional later
-Inbox/Sent/Draft labels           Needs Reply / Overdue / Due Soon / Unassigned / Urgent
-Important labels                  priority / SLA / delivery health indicators
-message list                      ticket queue list
-checkboxes                        bulk selection
-star/important indicators         priority flag / watched ticket / SLA risk
-message reader panel              ticket detail modal or side panel
-attachments block                 ticket attachments / uploaded photos / customer files
+- folder/label rail
+- compose/action button
+- searchable message list
+- row checkboxes
+- sender/customer + subject + label + timestamp
+- reader/detail pane
+- message action toolbar
+- attachment cards
 ```
 
-### Support smart queue rail should use this structure
+Evidence: the template includes a left folder/label navigation with Compose, Inbox, Sent, Draft, Spam, Trash, Starred, Important, and Labels sections.  It includes message rows with checkboxes, sender, subject, badges, star/important icons, and timestamp.  The reader pane includes message actions, sender block, subject/body, and attachments.   
+
+### DTB Support usage
+
+Use this pattern for:
 
 ```text
-Support Queue Rail
-├─ WORK QUEUE
-│  ├─ Needs Reply
-│  ├─ Overdue
-│  └─ Due Soon
-├─ OWNERSHIP
-│  ├─ Unassigned
-│  └─ Assigned to Me
-├─ PRIORITY
-│  ├─ Urgent
-│  └─ High Priority
-├─ WORKFLOW
-│  ├─ In Progress
-│  ├─ Waiting on Customer
-│  └─ Snoozed
-└─ CLOSED LOOP
-   ├─ Resolved
-   └─ All Active
+- Smart Queue Rail
+- Inbox tab
+- bulk selection
+- ticket row preview
+- delivery/failure recovery
+- attachment display inside modal
 ```
 
-### Support ticket queue should use the email list pattern
-
-Current Support already has a table/list, but the email template suggests a better operator-friendly layout:
+Target DTB classes:
 
 ```text
-[checkbox] Customer + subject + preview + linked context + badges + action due + timestamp
+.dtb-support-rail
+.dtb-support-rail-section
+.dtb-support-queue-item
+.dtb-support-inbox
+.dtb-support-ticket-preview
+.dtb-support-reader
+.dtb-support-attachment-list
+.dtb-support-attachment
+.dtb-support-bulkbar
 ```
 
-Recommended row model:
+Support queue rail mapping:
 
 ```text
-Ticket Row
-├─ selection checkbox
-├─ customer/avatar/initials
-├─ ticket number + subject
-├─ preview: latest customer/staff message
-├─ badges: status, priority, type
-├─ linked context chips: Order / Repair / Return
-├─ action clock: due in / overdue
-├─ delivery health indicator
-└─ row actions
+WORK QUEUE
+- Needs Reply
+- Overdue
+- Due Soon
+
+OWNERSHIP
+- Unassigned
+- Assigned to Me
+
+PRIORITY
+- Urgent
+- High Priority
+
+WORKFLOW
+- In Progress
+- Waiting on Customer
+- Snoozed
+
+CLOSED LOOP
+- Resolved
+- All Active
 ```
-
-This is more useful than a generic table when admins need to process tickets quickly.
-
-### Attachment pattern
-
-The email template’s attachment cards can become:
-
-```text
-Support Attachments
-├─ customer-uploaded photos
-├─ PDF invoice / receipt
-├─ repair tool images
-├─ return photos
-└─ email attachments
-```
-
-Use compact attachment cards inside the modal/detail panel.
 
 ---
 
-# 3. `list_template.html` Audit
+## `docs/design-reference/list_template.html`
 
-## Useful patterns
+The list template provides the best model for the **dense operational queue table**.
 
-The list template provides a good dense table pattern:
-
-```text
-object identifier
-status badge with icon
-customer object cell with avatar/name/email
-progress indicator
-dropdown actions
-```
-
-The table has clear columns for invoice/status/customer/progress/actions.  Each row uses a bold object identifier, badge with icon, customer avatar/name/email, compact progress bar, and dropdown action menu. 
-
-## How to use it in Support
-
-Use this template for the **dense Support queue/table mode** and for secondary list views inside the modal.
-
-### Convert into DTB components
+Useful patterns:
 
 ```text
-Template concept                  DTB Support implementation
-
-Invoice identifier                Ticket number
-Status badge with icon            Ticket status / SLA state
-Customer avatar cell              Customer object cell
-Progress bar                      SLA/action clock progress
-Dropdown menu                     Ticket row actions
+- compact table density
+- object identifier column
+- status badge with icon
+- customer object cell with avatar/name/email
+- progress indicator
+- dropdown row action menu
 ```
 
-### Better Support table columns
+Evidence: the template table is structured around identifier, status, customer, progress, and actions.  Rows use bold identifiers, icon badges, avatar/name/email cells, progress bars, and dropdown actions. 
+
+### DTB Support usage
+
+Use this pattern for:
+
+```text
+- Queue tab dense ticket table
+- Follow-Ups tab
+- Delivery tab
+- bulk action tables
+```
+
+Target columns:
 
 ```text
 Ticket
@@ -1127,51 +294,23 @@ Next Action
 Actions
 ```
 
-### SLA progress bar
-
-Use the progress pattern from `list_template.html`, but adapt it to Support:
+Target DTB classes:
 
 ```text
-0–60%     On Track
-60–90%    Due Soon
-90–100%   Critical
-100%+     Overdue
+.dtb-support-table
+.dtb-support-ticket-cell
+.dtb-support-customer-cell
+.dtb-support-status-badge
+.dtb-support-sla
+.dtb-support-progress
+.dtb-support-row-actions
 ```
-
-Visual implementation:
-
-```html
-<div class="dtb-support-sla">
-  <div class="dtb-support-sla__bar">
-    <div class="dtb-support-sla__fill" style="--dtb-sla-progress: 72%"></div>
-  </div>
-  <span class="dtb-support-sla__label">Due in 2h</span>
-</div>
-```
-
-### Row action menu
-
-Adopt the dropdown-action idea but with DTB actions:
-
-```text
-Open
-Assign to Me
-Mark In Progress
-Reply
-Snooze 24h
-Resolve
-Escalate
-```
-
-Use `data-dtb-support-action`, not inline `onclick`.
 
 ---
 
-# 4. Revised Support Module Tabs UI/UX
+# 2. Revised Support Tabs UI/UX
 
-The Support page should not just have generic tabs. It should have **view modes** inspired by the three templates.
-
-## Support tabs / view modes
+The support module should have **same-page live tabs**. These tabs are not separate URLs; they are views inside the Support workspace.
 
 ```text
 Support
@@ -1183,9 +322,9 @@ Support
 └─ Delivery
 ```
 
-### 4.1 Queue tab
+## Queue tab
 
-Source pattern:
+Template basis:
 
 ```text
 list_template.html + email_template.html
@@ -1194,7 +333,7 @@ list_template.html + email_template.html
 Purpose:
 
 ```text
-Fast triage and batch processing.
+High-speed triage and batch processing.
 ```
 
 Layout:
@@ -1202,24 +341,28 @@ Layout:
 ```text
 KPI strip
 Smart queue rail
-Dense ticket queue
+Dense ticket table
 Bulk action bar
 Right context panel
 ```
 
-Best for:
+Features:
 
 ```text
-Needs Reply
-Overdue
-Unassigned
-Urgent
-SLA-driven triage
+- checkbox selection
+- SLA/action clock
+- priority score
+- next best action
+- linked Order/Repair/Return chips
+- row dropdown actions
+- bulk assign/snooze/resolve/escalate
 ```
 
-### 4.2 Conversation tab
+---
 
-Source pattern:
+## Conversation tab
+
+Template basis:
 
 ```text
 chat_template.html
@@ -1228,7 +371,7 @@ chat_template.html
 Purpose:
 
 ```text
-Focused ticket response workflow.
+Focused response workflow.
 ```
 
 Layout:
@@ -1236,22 +379,27 @@ Layout:
 ```text
 left ticket list
 center conversation thread
-right customer/workflow panel
-sticky composer
+right customer/workflow context
+sticky reply/internal note composer
 ```
 
-Best for:
+Features:
 
 ```text
-replying
-internal notes
-macros
-conversation history
+- customer messages left
+- staff replies right
+- internal notes visually distinct
+- system events compact
+- macro picker
+- send / send and resolve
+- dirty draft protection
 ```
 
-### 4.3 Inbox tab
+---
 
-Source pattern:
+## Inbox tab
+
+Template basis:
 
 ```text
 email_template.html
@@ -1260,33 +408,37 @@ email_template.html
 Purpose:
 
 ```text
-Email/message-style review of ticket traffic.
+Message-review workflow for recent customer activity.
 ```
 
 Layout:
 
 ```text
-folder/label rail
+folder-like queue rail
 message/ticket list
-reader/detail panel
+reader/detail pane
 attachments
 ```
 
-Best for:
+Features:
 
 ```text
-recent messages
-customer replies
-email failures
-message audits
+- latest customer replies
+- unread/new activity indicators
+- important/urgent markers
+- attachment cards
+- row checkboxes
+- quick reply/open modal
 ```
 
-### 4.4 Follow-Ups tab
+---
 
-Source pattern:
+## Follow-Ups tab
+
+Template basis:
 
 ```text
-email_template.html label folders + list_template status/progress
+email_template.html + list_template.html
 ```
 
 Purpose:
@@ -1304,39 +456,66 @@ Follow-up due
 Reason
 Owner
 Next Action
+Actions
 ```
 
-### 4.5 Macros tab
-
-Source pattern:
+Actions:
 
 ```text
-email compose/category concepts
+- clear follow-up
+- snooze again
+- open modal
+- assign
+- resolve
+```
+
+---
+
+## Macros tab
+
+Template basis:
+
+```text
+email compose/category patterns
 ```
 
 Purpose:
 
 ```text
-Manage and use macros without leaving support.
+Find and apply response templates quickly.
 ```
 
 Sections:
 
 ```text
-Recommended macros
-Recently used
-Order macros
-Repair macros
-Return macros
-General macros
+Recommended
+Recently Used
+Order
+Repair
+Return
+Shipping
+Pricing / Promotions
+General
+Closeout
 ```
 
-### 4.6 Delivery tab
-
-Source pattern:
+Features:
 
 ```text
-email_template.html message reader + list_template badges
+- macro search
+- preview resolved variables
+- insert into composer
+- detect missing variables
+```
+
+---
+
+## Delivery tab
+
+Template basis:
+
+```text
+email_template.html + list_template.html
 ```
 
 Purpose:
@@ -1351,30 +530,119 @@ Rows:
 Ticket
 Customer
 Recipient
-Delivery status
-Failure reason
-Last attempt
-Actions: Retry / Copy / Mark reviewed
+Delivery Status
+Failure Reason
+Last Attempt
+Actions
+```
+
+Actions:
+
+```text
+- retry email
+- copy reply manually
+- open ticket
+- mark reviewed
 ```
 
 ---
 
-# 5. Updated Implementation Plan Addendum
+# 3. Ticket Detail Modal vNext
 
-## Phase 1 — Extract component patterns into DTB class contracts
+The current modal is now visually redesigned, but still a passive viewer. It needs to become the command tool center.
 
-Add/extend these support-specific components:
+## Build from all three templates
 
 ```text
-.dtb-support-layout
+chat_template.html  → conversation bubbles + composer
+email_template.html → reader, attachments, action toolbar
+list_template.html  → badges, progress/SLA, row action patterns
+```
+
+## Modal target structure
+
+```text
+Ticket Detail Command Center
+├─ Header
+│  ├─ ticket number
+│  ├─ subject
+│  ├─ customer
+│  ├─ status / priority / type badges
+│  └─ refresh / copy / open full / close
+│
+├─ Insight Strip
+│  ├─ Customer
+│  ├─ Action Clock
+│  ├─ Activity
+│  └─ Delivery Health
+│
+├─ Main Column
+│  ├─ event filters
+│  ├─ conversation thread
+│  ├─ attachments
+│  └─ composer
+│
+└─ Sidebar
+   ├─ Next Best Action
+   ├─ Workflow Tools
+   ├─ Snooze / Follow-Up
+   ├─ Linked Records
+   ├─ Customer Context
+   └─ Metadata
+```
+
+## Required modal actions
+
+```text
+Reply
+Internal Note
+Send
+Send and Resolve
+Assign to Me
+Change Status
+Change Priority
+Snooze
+Set Follow-Up
+Resolve
+Reopen
+Retry Email
+Create Return
+Open Order
+Open Repair
+Open Return
+```
+
+The modal should not require opening “Full Ticket” for routine work.
+
+---
+
+# 4. Component Extraction Plan
+
+## Add Support component classes
+
+Add to:
+
+```text
+drywalltoolbox/wp/wp-content/mu-plugins/dtb-support/Admin/assets/dtb-support.css
+```
+
+Required classes:
+
+```text
+.dtb-support-workspace
+.dtb-support-tabs
 .dtb-support-rail
+.dtb-support-rail-section
 .dtb-support-queue-item
 .dtb-support-ticket-list
 .dtb-support-ticket-row
-.dtb-support-ticket-object
+.dtb-support-ticket-cell
 .dtb-support-customer-cell
 .dtb-support-sla
-.dtb-support-message-thread
+.dtb-support-progress
+.dtb-support-action-menu
+.dtb-support-conversation
+.dtb-support-thread
 .dtb-support-message
 .dtb-support-message--customer
 .dtb-support-message--staff
@@ -1383,275 +651,176 @@ Add/extend these support-specific components:
 .dtb-support-composer
 .dtb-support-reader
 .dtb-support-attachment
-.dtb-support-action-menu
+.dtb-support-bulkbar
+.dtb-support-command-sidebar
 ```
 
-Do **not** use:
+All must live under:
 
-```text
-.card
-.d-flex
-.hstack
-.w-30
-.w-70
-.btn
-.badge
-.table
-.ti ti-*
-.simplebar-*
+```css
+.dtb-admin .dtb-support-...
 ```
 
-Use DTB-owned classes only.
+No duplicated global `.dtb-btn`, `.dtb-table`, `.dtb-card`, or `.dtb-kpi` systems.
 
 ---
 
-## Phase 2 — Rebuild ticket modal using chat/email patterns
+# 5. REST / Live Data Plan
 
-The ticket modal should combine:
+Every tab must use real support REST data.
 
-```text
-chat_template.html  → conversation bubbles and composer
-email_template.html → message reader, attachments, action toolbar
-list_template.html  → status badges, progress/action indicators
-```
-
-Target modal:
-
-```text
-Ticket Modal
-├─ Header
-│  ├─ ticket number / subject
-│  ├─ status / priority / SLA badges
-│  └─ actions
-├─ Insight strip
-├─ Main thread
-│  ├─ message filters
-│  ├─ conversation bubbles
-│  ├─ attachments
-│  └─ composer
-└─ Sidebar
-   ├─ next best action
-   ├─ customer context
-   ├─ linked records
-   ├─ workflow controls
-   ├─ snooze/follow-up
-   └─ delivery health
-```
-
----
-
-## Phase 3 — Add Support view tabs
-
-Add same-page tabs inside `SupportPage.php`:
+## Required data sources
 
 ```text
 Queue
+- /support/tickets
+- /support/queues
+- /support/kpis
+
 Conversation
+- /support/tickets/{id}
+- /support/tickets/{id}/events
+- /support/macros
+
 Inbox
+- /support/tickets?sort=latest_activity
+- /support/tickets/{id}
+
 Follow-Ups
+- /support/tickets?queue=followups
+- /support/tickets/{id}/followup
+
 Macros
+- /support/macros
+
 Delivery
+- /support/outbox
+- delivery metadata from ticket detail
 ```
 
-Each tab should be live, not full page reload.
-
-Use global AdminShell tabs, but render Support-specific workspaces inside the live region:
-
-```php
-dtb_admin_shell_open([
-  'title'       => 'Support',
-  'template'    => 'queue',
-  'live_target' => 'dtb-support-workspace',
-  'tabs'        => [
-    [ 'id' => 'queue',        'label' => 'Queue' ],
-    [ 'id' => 'conversation', 'label' => 'Conversation' ],
-    [ 'id' => 'inbox',        'label' => 'Inbox' ],
-    [ 'id' => 'followups',    'label' => 'Follow-Ups' ],
-    [ 'id' => 'macros',       'label' => 'Macros' ],
-    [ 'id' => 'delivery',     'label' => 'Delivery' ],
-  ],
-]);
-```
-
----
-
-## Phase 4 — Add render functions per Support tab
-
-Create:
-
-```text
-drywalltoolbox/wp/wp-content/mu-plugins/dtb-support/Admin/SupportWorkbench.php
-```
-
-Functions:
-
-```php
-dtb_support_render_workbench()
-dtb_support_render_queue_tab()
-dtb_support_render_conversation_tab()
-dtb_support_render_inbox_tab()
-dtb_support_render_followups_tab()
-dtb_support_render_macros_tab()
-dtb_support_render_delivery_tab()
-```
-
-REST fragment endpoint should accept:
-
-```text
-view=queue|conversation|inbox|followups|macros|delivery
-queue=needs_reply|overdue|...
-status=...
-search=...
-page=...
-```
-
----
-
-# 6. Mapping by Current Support Features
-
-## Existing Support feature → Template-inspired upgrade
-
-| Existing Support Feature | Template Source                              | Upgrade                                             |
-| ------------------------ | -------------------------------------------- | --------------------------------------------------- |
-| Smart queue rail         | `email_template.html` left folders           | Rebuild as grouped queue/label rail                 |
-| Ticket table             | `list_template.html`                         | Add object cells, SLA progress, row action menu     |
-| Ticket modal             | `chat_template.html` + `email_template.html` | Conversation-first modal with reader + composer     |
-| Timeline events          | `chat_template.html` bubbles                 | Separate customer/staff/internal/system event types |
-| Reply composer           | `chat_template.html` composer                | Sticky Reply/Internal Note composer with macros     |
-| Bulk actions             | `email_template.html` checkboxes             | Persistent selected-ticket action bar               |
-| Delivery health          | `email_template.html` mail reader            | Dedicated Delivery tab + modal block                |
-| Linked records           | `list_template.html` status/object cells     | Chips for Order / Repair / Return                   |
-
----
-
-# 7. Design Rules for Perfect Integration
-
-## Use the templates for layout only
-
-Allowed:
-
-```text
-panel structure
-list density
-message bubble model
-reader panel structure
-attachment card layout
-dropdown action pattern
-progress/status pattern
-mobile collapsible sidebar concept
-```
-
-Forbidden:
-
-```text
-copying Bootstrap class contracts into production
-copying demo images/avatar paths
-copying SimpleBar wrapper output
-copying Tabler icon dependencies as required runtime
-copying demo data structures
-building a Bootstrap app inside wp-admin
-```
-
-## Everything must be DTB-branded
-
-Use:
-
-```text
-var(--dtb-primary)
-var(--dtb-primary-soft)
-var(--dtb-surface)
-var(--dtb-border)
-var(--dtb-text)
-var(--dtb-muted)
-var(--dtb-success)
-var(--dtb-warning)
-var(--dtb-danger)
-```
-
-## Everything must remain live-data-backed
-
-Every support tab should update from real REST state:
-
-```text
-Queue         → /support/tickets + /support/queues + /support/kpis
-Conversation  → /support/tickets/{id} + /events
-Inbox         → /support/tickets ordered by latest activity
-Follow-Ups    → /support/tickets filtered by followup/snooze state
-Macros        → /support/macros
-Delivery      → /support/outbox + ticket delivery metadata
-```
-
----
-
-# 8. Revised Support Implementation Priority
-
-## P0 — Modal upgrade
-
-Use `chat_template.html` + `email_template.html` patterns to make the current ticket modal operational:
-
-```text
-message thread
-reply/internal composer
-macro picker
-workflow tools
-linked context
-delivery health
-```
-
-## P1 — Queue tab upgrade
-
-Use `list_template.html` + `email_template.html` patterns:
-
-```text
-object rows
-checkbox selection
-SLA progress
-status badges
-row action dropdown
-bulk action bar
-```
-
-## P2 — Support view tabs
+## Add aggregate endpoint
 
 Add:
 
 ```text
-Queue
-Conversation
-Inbox
-Follow-Ups
-Macros
-Delivery
+GET /dtb/v1/support/workbench
 ```
 
-## P3 — Specialized tabs
+Response:
 
-Implement:
-
-```text
-Follow-Ups tab
-Macros tab
-Delivery tab
+```json
+{
+  "ok": true,
+  "view": "queue",
+  "queues": {},
+  "kpis": {},
+  "tickets": [],
+  "macros": [],
+  "selected_ticket": null,
+  "meta": {
+    "updated_at": "2026-05-31T12:23:07-05:00",
+    "poll_after_ms": 30000
+  }
+}
 ```
 
-## P4 — Responsive behavior
+## Add intelligence endpoint
 
-Use the chat/email template mobile sidebar idea:
+Add:
 
 ```text
-desktop: three-pane workspace
-tablet: rail collapses
-mobile/narrow wp-admin: modal/drawer stack
+GET /dtb/v1/support/tickets/{id}/intelligence
+```
+
+Response:
+
+```json
+{
+  "priority_score": 725,
+  "next_action": {},
+  "customer_context": {},
+  "linked_records": {},
+  "delivery_health": {},
+  "recommended_macros": [],
+  "risk_flags": []
+}
 ```
 
 ---
 
-# Final Plan Addition
+# 6. Updated Implementation Priority
 
-Add this to the support module implementation plan:
+## P0 — Make current modal operational
 
 ```text
-The Support UI will use the design-reference HTML files as layout references only. chat_template.html informs the ticket conversation/detail modal: conversation bubbles, selected ticket state, responsive sidebar, and composer experience. email_template.html informs the Support inbox/queue workspace: folder-like queue rail, message list density, checkbox bulk selection, message reader panel, attachment cards, and delivery-oriented actions. list_template.html informs dense operational ticket tables: object identifiers, customer object cells, status badges, SLA/progress bars, and dropdown row actions. These patterns will be rebuilt as DTB-owned AdminShell-compatible components using DTB class names, DTB brand tokens, and real support REST data. No production support UI should depend on Bootstrap/Modernize class names, demo images, SimpleBar wrappers, or static template content.
+1. Replace static detail viewer with command modal.
+2. Add conversation thread bubbles.
+3. Add reply/internal note composer.
+4. Add workflow sidebar.
+5. Add snooze/follow-up controls.
+6. Add linked context chips.
+7. Add delivery health block.
+8. Wire all actions to existing REST routes.
 ```
 
-This gives you the best of those templates without turning the support module into a pasted Modernize page.
+## P1 — Rebuild Queue tab from `list_template.html`
+
+```text
+1. Dense ticket table/list.
+2. Customer object cells.
+3. SLA progress/action clock.
+4. Next action column.
+5. Row action dropdown.
+6. Persistent bulk action bar.
+```
+
+## P2 — Add Conversation tab from `chat_template.html`
+
+```text
+1. Left ticket list.
+2. Center conversation thread.
+3. Right workflow/customer context.
+4. Sticky composer.
+5. Empty selected-ticket state.
+```
+
+## P3 — Add Inbox tab from `email_template.html`
+
+```text
+1. Folder/label-style queue rail.
+2. Message list with checkboxes.
+3. Reader pane.
+4. Attachment cards.
+5. Recent activity/unread indicators.
+```
+
+## P4 — Add Follow-Ups / Macros / Delivery tabs
+
+```text
+1. Follow-up due queue.
+2. Macro browser and insertion.
+3. Delivery failure recovery center.
+```
+
+## P5 — Add intelligence layer
+
+```text
+1. SupportPriorityService.
+2. SupportNextActionService.
+3. SupportCustomerContextService.
+4. Recommended macros.
+5. Risk flags.
+6. Agent workload.
+```
+
+---
+
+# 7. Final Plan Addition
+
+Add this directly to the Support rebuild plan:
+
+```text
+The Support module will use `chat_template.html`, `email_template.html`, and `list_template.html` as design-reference sources only. `chat_template.html` defines the conversation/detail interaction model: selected-ticket state, message bubbles, response composer, and responsive side navigation. `email_template.html` defines the inbox/queue model: folder-style queue rail, searchable message list, checkbox bulk selection, reader pane, action toolbar, and attachment cards. `list_template.html` defines the dense operational table model: object identifier, customer object cell, status badge, SLA/progress indicator, and dropdown row actions. These patterns will be rebuilt under DTB-owned classes, DTB brand tokens, AdminShell-compatible layout, and live support REST data. The production Support UI must not depend on the template files, Bootstrap class names, SimpleBar wrappers, demo images, static demo data, or Tabler icon runtime contracts.
+```
+
+This gives you a clean implementation path: template-quality UX patterns, DTB-owned architecture, real data, and a support module that functions as a command center instead of a static ticket viewer.

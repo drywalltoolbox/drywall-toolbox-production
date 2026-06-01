@@ -40,6 +40,8 @@ _dtb_require( $_dtb_support_dir . '/Services/TicketMacroService.php' );
 _dtb_require( $_dtb_support_dir . '/Services/TicketQueryService.php' );
 _dtb_require( $_dtb_support_dir . '/Services/TicketWorkflowService.php' );
 _dtb_require( $_dtb_support_dir . '/Services/TicketAutoAssignService.php' );
+_dtb_require( $_dtb_support_dir . '/Services/SupportNextActionService.php' );
+_dtb_require( $_dtb_support_dir . '/Services/SupportCustomerContextService.php' );
 
 // ── 4. Application ────────────────────────────────────────────────────────────
 _dtb_require( $_dtb_support_dir . '/Application/SubmitContactRequest.php' );
@@ -59,8 +61,6 @@ _dtb_require( $_dtb_support_dir . '/Rest/SupportAdminQueueController.php' );
 if ( is_admin() ) {
 	_dtb_require( $_dtb_support_dir . '/Admin/SupportPage.php' );
 	_dtb_require( $_dtb_support_dir . '/Admin/SupportWorkbench.php' );
-	_dtb_require( $_dtb_support_dir . '/Admin/SupportHubDetailPage.php' );
-	_dtb_require( $_dtb_support_dir . '/Admin/SupportHubDashboard.php' );
 }
 
 unset( $_dtb_support_dir );

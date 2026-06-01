@@ -84,7 +84,101 @@ function dtb_support_admin_query_tickets( string $status, string $search, int $p
 }
 
 /**
- * Render support admin table or empty state from table-backed ticket rows.
+ * Generate 2-letter avatar initials from a display name.
+ */
+function dtb_support_admin_avatar_initials( string $name ): string {
+	$name = trim( $name );
+	if ( '' === $name || '—' === $name ) {
+		return '?';
+	}
+	$parts = preg_split( '/\s+/', $name, -1, PREG_SPLIT_NO_EMPTY );
+	if ( count( $parts ) >= 2 ) {
+		return strtoupper( mb_substr( $parts[0], 0, 1 ) . mb_substr( $parts[ count( $parts ) - 1 ], 0, 1 ) );
+	}
+	return strtoupper( mb_substr( $parts[0], 0, 2 ) );
+}
+
+/**
+ * Return a human-readable relative time string from a MySQL datetime.
+ */
+function dtb_support_admin_relative_time( string $datetime ): string {
+	if ( '' === $datetime ) {
+		return '';
+	}
+	$timestamp = strtotime( $datetime );
+	if ( false === $timestamp ) {
+		return '';
+	}
+	$diff = time() - $timestamp;
+	if ( $diff < 90 ) {
+		return 'just now';
+	}
+	return human_time_diff( $timestamp ) . ' ago';
+}
+
+/**
+ * Map a support ticket type slug to a CSS modifier class.
+ */
+function dtb_support_admin_type_badge_class( string $type ): string {
+	$map = [
+		'repair'         => 'dtb-support-type--warning',
+		'repair_service' => 'dtb-support-type--warning',
+		'warranty'       => 'dtb-support-type--danger',
+		'parts'          => 'dtb-support-type--danger',
+		'order'          => 'dtb-support-type--primary',
+		'billing'        => 'dtb-support-type--primary',
+		'shipping'       => 'dtb-support-type--info',
+		'general'        => 'dtb-support-type--muted',
+	];
+	return $map[ $type ] ?? 'dtb-support-type--muted';
+}
+
+/**
+ * Calculate ticket lifecycle progress (0–100) from status + priority.
+ * Used to drive the progress bar in the queue list.
+ */
+function dtb_support_admin_ticket_progress( string $status, string $priority ): int {
+	$base = [
+		'open'             => 15,
+		'needs-reply'      => 25,
+		'needs_reply'      => 25,
+		'in_progress'      => 45,
+		'pending_customer' => 60,
+		'pending_staff'    => 50,
+		'snoozed'          => 40,
+		'resolved'         => 85,
+		'closed'           => 100,
+		'spam'             => 5,
+	];
+	$pct = $base[ $status ] ?? 20;
+	// Urgent tickets that are still open get a slight boost to surface urgency visually
+	if ( in_array( $priority, [ 'high', 'urgent' ], true ) && $pct < 50 ) {
+		$pct = min( 50, $pct + 10 );
+	}
+	return $pct;
+}
+
+/**
+ * Return the CSS modifier for the progress bar fill based on ticket state.
+ */
+function dtb_support_admin_progress_bar_class( string $status, string $priority ): string {
+	if ( in_array( $status, [ 'resolved', 'closed' ], true ) ) {
+		return 'dtb-support-progress__fill--success';
+	}
+	if ( 'spam' === $status ) {
+		return 'dtb-support-progress__fill--muted';
+	}
+	if ( 'urgent' === $priority ) {
+		return 'dtb-support-progress__fill--danger';
+	}
+	if ( 'high' === $priority ) {
+		return 'dtb-support-progress__fill--warning';
+	}
+	return 'dtb-support-progress__fill--primary';
+}
+
+/**
+ * Render support admin queue as a structured list table with progress bars.
  */
 function dtb_support_admin_render_queue_markup( array $result, int $paged ): string {
 	$tickets     = array_map( 'dtb_support_project_ticket', $result['tickets'] ?? [] );
@@ -101,15 +195,25 @@ function dtb_support_admin_render_queue_markup( array $result, int $paged ): str
 	}
 
 	echo dtb_admin_ui_update_badge( 'dtb-support-workspace' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-	echo dtb_admin_ui_table_open( [ // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-		[ 'label' => __( 'ID', 'drywall-toolbox' ),       'key' => 'id' ],
-		[ 'label' => __( 'Subject', 'drywall-toolbox' ),   'key' => 'subject' ],
-		[ 'label' => __( 'Customer', 'drywall-toolbox' ),  'key' => 'customer' ],
-		[ 'label' => __( 'Status', 'drywall-toolbox' ),    'key' => 'status' ],
-		[ 'label' => __( 'Created', 'drywall-toolbox' ),   'key' => 'created' ],
-		[ 'label' => '', 'key' => 'actions' ],
-	], [] );
-
+	?>
+	<div class="dtb-support-list-wrap">
+		<table class="dtb-support-list-table">
+			<thead>
+				<tr>
+					<th class="dtb-support-list-th dtb-support-list-th--check">
+						<label class="dtb-support-list-check-all">
+							<input type="checkbox" class="dtb-support-row__checkbox" id="dtb-support-select-all" title="Select all">
+						</label>
+					</th>
+					<th class="dtb-support-list-th"><?php esc_html_e( 'Ticket', 'drywall-toolbox' ); ?></th>
+					<th class="dtb-support-list-th"><?php esc_html_e( 'Status', 'drywall-toolbox' ); ?></th>
+					<th class="dtb-support-list-th"><?php esc_html_e( 'Customer', 'drywall-toolbox' ); ?></th>
+					<th class="dtb-support-list-th dtb-support-list-th--progress"><?php esc_html_e( 'Progress', 'drywall-toolbox' ); ?></th>
+					<th class="dtb-support-list-th dtb-support-list-th--actions"></th>
+				</tr>
+			</thead>
+			<tbody>
+	<?php
 	foreach ( $tickets as $ticket ) {
 		$id         = (int) ( $ticket['id'] ?? 0 );
 		$ticket_ref = (string) ( $ticket['ticket_number'] ?? '' );
@@ -117,51 +221,149 @@ function dtb_support_admin_render_queue_markup( array $result, int $paged ): str
 			$ticket_ref = '#' . $id;
 		}
 
-		$subject = (string) ( $ticket['subject'] ?? '' );
-		$status  = (string) ( $ticket['status'] ?? 'open' );
+		$subject      = (string) ( $ticket['subject'] ?? '' );
+		$status       = (string) ( $ticket['status'] ?? 'open' );
 		$status_label = (string) ( $ticket['status_label'] ?? dtb_support_status_label( $status ) );
-		$customer = trim( (string) ( $ticket['customer_name'] ?? '' ) );
-		if ( '' === $customer ) {
-			$customer = trim( (string) ( $ticket['customer_email'] ?? '' ) );
-		}
-		if ( '' === $customer ) {
-			$customer = '—';
+		$type         = sanitize_key( $ticket['ticket_type'] ?? $ticket['type'] ?? '' );
+		$priority     = sanitize_key( $ticket['priority'] ?? 'normal' );
+		$priority_label = ucfirst( $priority );
+
+		$customer_name  = trim( (string) ( $ticket['customer_name'] ?? '' ) );
+		$customer_email = trim( (string) ( $ticket['customer_email'] ?? '' ) );
+		$customer_display = '' !== $customer_name ? $customer_name : $customer_email;
+		if ( '' === $customer_display ) {
+			$customer_display = '—';
 		}
 
-		$view_url = (string) ( $ticket['edit_url'] ?? admin_url( 'admin.php?page=dtb-support&ticket_id=' . $id ) );
+		$view_url    = (string) ( $ticket['edit_url'] ?? admin_url( 'admin.php?page=dtb-support&ticket_id=' . $id ) );
+		$created_raw = (string) ( $ticket['created_at'] ?? '' );
+		$rel_time    = dtb_support_admin_relative_time( $created_raw );
 
-		$created_raw   = (string) ( $ticket['created_at'] ?? '' );
-		$created_label = '';
-		if ( '' !== $created_raw ) {
-			$created_label = mysql2date(
-				get_option( 'date_format' ) . ' ' . get_option( 'time_format' ),
-				$created_raw,
-				true
-			);
-		}
-		if ( '' === $created_label ) {
-			$created_label = '—';
+		// Progress bar
+		$progress_pct   = dtb_support_admin_ticket_progress( $status, $priority );
+		$progress_class = dtb_support_admin_progress_bar_class( $status, $priority );
+
+		// Unread (needs attention) state
+		$is_unread    = in_array( $status, [ 'open', 'needs-reply', 'needs_reply' ], true );
+		$row_class    = 'dtb-support-row dtb-support-list-row' . ( $is_unread ? ' dtb-support-row--unread' : '' );
+
+		// Status badge icon
+		$status_icon_map = [
+			'open'             => '●',
+			'in_progress'      => '▶',
+			'pending_customer' => '⏳',
+			'pending_staff'    => '⏸',
+			'needs-reply'      => '↩',
+			'needs_reply'      => '↩',
+			'resolved'         => '✓',
+			'closed'           => '✗',
+			'snoozed'          => '💤',
+			'spam'             => '⊘',
+		];
+		$status_icon = $status_icon_map[ $status ] ?? '●';
+		$badge_type  = dtb_admin_ui_status_badge_type( $status );
+
+		// Type badge
+		$type_badge_html = '';
+		if ( '' !== $type ) {
+			$type_label       = ucwords( str_replace( '_', ' ', $type ) );
+			$type_badge_class = dtb_support_admin_type_badge_class( $type );
+			$type_badge_html  = ' <span class="dtb-support-row__type ' . esc_attr( $type_badge_class ) . '">' . esc_html( $type_label ) . '</span>';
 		}
 
-		echo '<tr class="dtb-table__row dtb-table__row--clickable dtb-support-row"'
-			. ' data-dtb-ticket-id="' . esc_attr( (string) $id ) . '"'
-			. ' data-dtb-ticket-ref="' . esc_attr( $ticket_ref ) . '"'
-			. ' data-dtb-ticket-subject="' . esc_attr( $subject ) . '"'
-			. ' data-dtb-ticket-customer="' . esc_attr( $customer ) . '"'
-			. ' data-dtb-ticket-status="' . esc_attr( $status_label ) . '"'
-			. ' data-dtb-ticket-url="' . esc_attr( $view_url ) . '">';
-		echo '<td class="dtb-table__cell"><a class="dtb-support-open-ticket" data-dtb-ticket-id="' . esc_attr( (string) $id ) . '" data-dtb-ticket-ref="' . esc_attr( $ticket_ref ) . '" data-dtb-ticket-url="' . esc_attr( $view_url ) . '" href="' . esc_url( $view_url ) . '">' . esc_html( $ticket_ref ) . '</a></td>';
-		echo '<td class="dtb-table__cell"><a class="dtb-support-open-ticket" data-dtb-ticket-id="' . esc_attr( (string) $id ) . '" data-dtb-ticket-ref="' . esc_attr( $ticket_ref ) . '" data-dtb-ticket-url="' . esc_attr( $view_url ) . '" href="' . esc_url( $view_url ) . '">' . esc_html( $subject ) . '</a></td>';
-		echo '<td class="dtb-table__cell">' . esc_html( $customer ) . '</td>';
-		echo '<td class="dtb-table__cell">' . dtb_admin_ui_badge( esc_html( $status_label ), dtb_admin_ui_status_badge_type( $status ) ) . '</td>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-		echo '<td class="dtb-table__cell">' . esc_html( $created_label ) . '</td>';
-		echo '<td class="dtb-table__cell">';
-		echo dtb_admin_ui_button( __( 'Open', 'drywall-toolbox' ), [ 'href' => $view_url, 'size' => 'xs', 'type' => 'ghost', 'class' => 'dtb-support-open-ticket', 'data' => [ 'dtb-ticket-id' => (string) $id, 'dtb-ticket-ref' => $ticket_ref, 'dtb-ticket-url' => $view_url ] ] ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-		echo '</td>';
-		echo '</tr>';
+		// Priority flag for high/urgent only
+		$priority_html = '';
+		if ( in_array( $priority, [ 'high', 'urgent' ], true ) ) {
+			$p_class       = 'urgent' === $priority ? 'dtb-support-row__priority--urgent' : 'dtb-support-row__priority--high';
+			$priority_html = ' <span class="dtb-support-row__priority ' . esc_attr( $p_class ) . '">' . esc_html( $priority_label ) . '</span>';
+		}
+		?>
+		<tr class="<?php echo esc_attr( $row_class ); ?>"
+			data-dtb-ticket-id="<?php echo esc_attr( (string) $id ); ?>"
+			data-dtb-ticket-ref="<?php echo esc_attr( $ticket_ref ); ?>"
+			data-dtb-ticket-url="<?php echo esc_attr( $view_url ); ?>"
+			tabindex="0">
+
+			<td class="dtb-support-list-td dtb-support-list-td--check">
+				<label onclick="event.stopPropagation()">
+					<input type="checkbox" class="dtb-support-row__checkbox" data-dtb-ticket-id="<?php echo esc_attr( (string) $id ); ?>">
+				</label>
+			</td>
+
+			<td class="dtb-support-list-td dtb-support-list-td--ticket">
+				<div class="dtb-support-list-ref"><?php echo esc_html( $ticket_ref ); ?></div>
+				<div class="dtb-support-list-subject">
+					<a class="dtb-support-open-ticket"
+						data-dtb-ticket-id="<?php echo esc_attr( (string) $id ); ?>"
+						data-dtb-ticket-ref="<?php echo esc_attr( $ticket_ref ); ?>"
+						data-dtb-ticket-url="<?php echo esc_attr( $view_url ); ?>"
+						href="<?php echo esc_url( $view_url ); ?>"><?php echo esc_html( '' !== $subject ? $subject : '(no subject)' ); ?></a>
+					<?php
+					echo $type_badge_html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+					echo $priority_html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+					?>
+				</div>
+				<?php if ( '' !== $rel_time ) : ?>
+				<div class="dtb-support-list-time"><?php echo esc_html( $rel_time ); ?></div>
+				<?php endif; ?>
+			</td>
+
+			<td class="dtb-support-list-td dtb-support-list-td--status">
+				<?php
+				echo dtb_admin_ui_badge( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+					esc_html( $status_icon . ' ' . $status_label ),
+					$badge_type
+				);
+				?>
+			</td>
+
+			<td class="dtb-support-list-td dtb-support-list-td--customer">
+				<div class="dtb-support-list-customer-name"><?php echo esc_html( $customer_display ); ?></div>
+				<?php if ( '' !== $customer_name && '' !== $customer_email ) : ?>
+				<div class="dtb-support-list-customer-email"><?php echo esc_html( $customer_email ); ?></div>
+				<?php endif; ?>
+			</td>
+
+			<td class="dtb-support-list-td dtb-support-list-td--progress">
+				<div class="dtb-support-list-progress-wrap">
+					<div class="dtb-support-list-progress">
+						<div class="dtb-support-progress__fill <?php echo esc_attr( $progress_class ); ?>"
+							role="progressbar"
+							style="width:<?php echo esc_attr( (string) $progress_pct ); ?>%"
+							aria-valuenow="<?php echo esc_attr( (string) $progress_pct ); ?>"
+							aria-valuemin="0"
+							aria-valuemax="100"></div>
+					</div>
+					<span class="dtb-support-list-progress-pct"><?php echo esc_html( $progress_pct . '%' ); ?></span>
+				</div>
+			</td>
+
+			<td class="dtb-support-list-td dtb-support-list-td--actions">
+				<?php
+				echo dtb_admin_ui_button( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+					__( 'Open', 'drywall-toolbox' ),
+					[
+						'href'  => $view_url,
+						'size'  => 'xs',
+						'type'  => 'ghost',
+						'class' => 'dtb-support-open-ticket',
+						'data'  => [
+							'dtb-ticket-id'  => (string) $id,
+							'dtb-ticket-ref' => $ticket_ref,
+							'dtb-ticket-url' => $view_url,
+						],
+					]
+				);
+				?>
+			</td>
+		</tr>
+		<?php
 	}
-
-	echo dtb_admin_ui_table_close(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+	?>
+			</tbody>
+		</table>
+	</div>
+	<?php
 	echo dtb_admin_ui_pagination( $paged, $total_pages ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 
 	return (string) ob_get_clean();

@@ -140,76 +140,355 @@
 		}
 	}
 
+	function avatarInitials( name ) {
+		var parts = String( name || '?' ).trim().split( /\s+/ );
+		if ( parts.length >= 2 ) {
+			return ( parts[ 0 ][ 0 ] + parts[ parts.length - 1 ][ 0 ] ).toUpperCase();
+		}
+		return parts[ 0 ].slice( 0, 2 ).toUpperCase();
+	}
+
+	function buildTimeline( events, message, customerName ) {
+		var html = '';
+
+		// Track event IDs we've rendered to avoid duplicate customer message display
+		// (ticket.created events often duplicate the original message)
+		var renderedCreatedEvent = false;
+
+		// Original customer message — always first, left bubble
+		if ( message ) {
+			var initials = avatarInitials( customerName || 'Customer' );
+			html += '<div class="dtb-chat-row dtb-chat-row--inbound">'
+				+ '<div class="dtb-chat-avatar" aria-hidden="true">' + escHtml( initials ) + '</div>'
+				+ '<div class="dtb-chat-bubble-wrap">'
+				+ '<div class="dtb-chat-meta"><strong>' + escHtml( customerName || 'Customer' ) + '</strong></div>'
+				+ '<div class="dtb-chat-bubble dtb-chat-bubble--inbound">' + escHtml( message ) + '</div>'
+				+ '</div>'
+				+ '</div>';
+		}
+
+		if ( ! Array.isArray( events ) || ! events.length ) {
+			if ( ! message ) {
+				html += '<p class="dtb-chat-empty">No activity yet.</p>';
+			}
+			return html;
+		}
+
+		events.forEach( function ( ev ) {
+			// API sends event_group; fall back to legacy group field
+			var group      = ev.event_group || ev.group || 'system';
+			var eventType  = ev.event_type || '';
+			var evLabel    = ev.event_label || eventType || 'Event';
+			// Use age_label (human relative time) first, then raw created_at
+			var evWhen     = ev.age_label || ev.created_at || '';
+			var evBody     = ev.summary || ev.body || '';
+			// API sends actor_label; fall back to legacy fields
+			var authorName = ev.actor_label || ev.actor_name || ev.author_name || '';
+			var actorType  = ev.actor_type || '';
+
+			// Skip ticket.created when the original message was already rendered above
+			// to avoid showing the same text twice in the thread
+			if ( eventType === 'ticket.created' && message ) {
+				renderedCreatedEvent = true;
+				return;
+			}
+
+			if ( group === 'message' ) {
+				// Determine direction: customer replies = inbound, staff replies = outbound
+				var isCustomerMessage = actorType === 'customer'
+					|| eventType === 'ticket.reply_customer';
+
+				if ( isCustomerMessage ) {
+					var cInitials = avatarInitials( customerName || 'Customer' );
+					html += '<div class="dtb-chat-row dtb-chat-row--inbound">'
+						+ '<div class="dtb-chat-avatar" aria-hidden="true">' + escHtml( cInitials ) + '</div>'
+						+ '<div class="dtb-chat-bubble-wrap">'
+						+ '<div class="dtb-chat-meta">'
+						+ '<strong>' + escHtml( customerName || 'Customer' ) + '</strong>'
+						+ ( evWhen ? ' <span class="dtb-chat-meta__time">· ' + escHtml( evWhen ) + '</span>' : '' )
+						+ '</div>'
+						+ '<div class="dtb-chat-bubble dtb-chat-bubble--inbound">' + escHtml( evBody || '—' ) + '</div>'
+						+ '</div>'
+						+ '</div>';
+				} else {
+					// Staff reply — right-aligned outbound bubble
+					html += '<div class="dtb-chat-row dtb-chat-row--outbound">'
+						+ '<div class="dtb-chat-bubble-wrap">'
+						+ '<div class="dtb-chat-meta dtb-chat-meta--right">'
+						+ ( authorName ? '<strong>' + escHtml( authorName ) + '</strong>' : '<strong>Staff</strong>' )
+						+ ( evWhen ? ' <span class="dtb-chat-meta__time">· ' + escHtml( evWhen ) + '</span>' : '' )
+						+ '</div>'
+						+ '<div class="dtb-chat-bubble dtb-chat-bubble--outbound">' + escHtml( evBody || '—' ) + '</div>'
+						+ '</div>'
+						+ '<div class="dtb-chat-avatar dtb-chat-avatar--staff" aria-hidden="true">'
+						+ escHtml( avatarInitials( authorName || 'Staff' ) )
+						+ '</div>'
+						+ '</div>';
+				}
+
+			} else if ( group === 'internal' ) {
+				// Internal note — centered amber card
+				html += '<div class="dtb-chat-row dtb-chat-row--note">'
+					+ '<div class="dtb-chat-note">'
+					+ '<div class="dtb-chat-note__label">'
+					+ '🔒 Internal Note'
+					+ ( authorName ? ' · <span class="dtb-chat-note__author">' + escHtml( authorName ) + '</span>' : '' )
+					+ ( evWhen ? ' <span class="dtb-chat-note__time">' + escHtml( evWhen ) + '</span>' : '' )
+					+ '</div>'
+					+ '<div class="dtb-chat-note__body">' + escHtml( evBody || '—' ) + '</div>'
+					+ '</div>'
+					+ '</div>';
+
+			} else if ( group === 'delivery' ) {
+				// Email delivery events — subtle inline pill with status indicator
+				var isFailure = eventType === 'ticket.email_failed';
+				html += '<div class="dtb-chat-row dtb-chat-row--system">'
+					+ '<span class="dtb-chat-system-event dtb-chat-system-event--' + ( isFailure ? 'danger' : 'muted' ) + '">'
+					+ ( isFailure ? '✗ ' : '✉ ' ) + escHtml( evBody || evLabel )
+					+ ( evWhen ? ' <span class="dtb-chat-system-time">' + escHtml( evWhen ) + '</span>' : '' )
+					+ '</span>'
+					+ '</div>';
+
+			} else if ( group === 'workflow' ) {
+				// Workflow changes (status, assign, priority) — compact timeline marker
+				html += '<div class="dtb-chat-row dtb-chat-row--system">'
+					+ '<span class="dtb-chat-system-event">'
+					+ escHtml( evBody || evLabel )
+					+ ( evWhen ? ' <span class="dtb-chat-system-time">' + escHtml( evWhen ) + '</span>' : '' )
+					+ '</span>'
+					+ '</div>';
+
+			} else {
+				// Catch-all system events
+				if ( ! evBody && ! evLabel ) {
+					return; // Skip empty/unknown events entirely
+				}
+				html += '<div class="dtb-chat-row dtb-chat-row--system">'
+					+ '<span class="dtb-chat-system-event">'
+					+ escHtml( evLabel )
+					+ ( evBody && evBody !== evLabel ? ' — ' + escHtml( evBody ) : '' )
+					+ ( evWhen ? ' <span class="dtb-chat-system-time">' + escHtml( evWhen ) + '</span>' : '' )
+					+ '</span>'
+					+ '</div>';
+			}
+		} );
+
+		return html;
+	}
+
+	function renderStatusOptions( current ) {
+		return [
+			{ slug: 'open',             label: 'Open' },
+			{ slug: 'in_progress',      label: 'In Progress' },
+			{ slug: 'pending_customer', label: 'Waiting on Customer' },
+			{ slug: 'pending_staff',    label: 'Waiting on Staff' },
+			{ slug: 'resolved',         label: 'Resolved' },
+			{ slug: 'closed',           label: 'Closed' },
+			{ slug: 'spam',             label: 'Spam' },
+		].map( function ( s ) {
+			return '<option value="' + escHtml( s.slug ) + '"' + ( s.slug === current ? ' selected' : '' ) + '>' + escHtml( s.label ) + '</option>';
+		} ).join( '' );
+	}
+
+	function renderPriorityOptions( current ) {
+		return [
+			{ slug: 'low',    label: 'Low' },
+			{ slug: 'normal', label: 'Normal' },
+			{ slug: 'high',   label: 'High' },
+			{ slug: 'urgent', label: 'Urgent' },
+		].map( function ( p ) {
+			return '<option value="' + escHtml( p.slug ) + '"' + ( p.slug === current ? ' selected' : '' ) + '>' + escHtml( p.label ) + '</option>';
+		} ).join( '' );
+	}
+
+	function reloadModalTicket() {
+		if ( ! state.currentTicketId ) {
+			return;
+		}
+		var els = getModalElements();
+		if ( ! els ) {
+			return;
+		}
+		var restBase = ( window.dtbAdminConfig && window.dtbAdminConfig.restUrl ? window.dtbAdminConfig.restUrl : '/wp-json/' ).replace( /\/$/, '' );
+		var endpoint = restBase + '/dtb/v1/support/tickets/' + encodeURIComponent( String( state.currentTicketId ) );
+		var nonce = window.dtbAdminConfig && window.dtbAdminConfig.nonce ? window.dtbAdminConfig.nonce : '';
+		fetch( endpoint, {
+			headers: { Accept: 'application/json', 'X-WP-Nonce': nonce },
+			credentials: 'same-origin',
+		} )
+			.then( function ( res ) {
+				return res.ok ? res.json() : Promise.reject();
+			} )
+			.then( function ( payload ) {
+				renderTicketModal( els, payload );
+			} )
+			.catch( function () {} );
+	}
+
 	function renderTicketModal( els, payload ) {
 		var ticket = payload && payload.ticket ? payload.ticket : {};
 		var events = payload && payload.events ? payload.events : [];
 		var ticketLabel = ticket.ticket_number || ( '#' + ( ticket.id || '' ) );
-		var customer = ticket.customer_name || ticket.customer_email || '—';
+		var customerName = ticket.customer_name || ticket.customer_email || 'Customer';
+		var customerEmail = ticket.customer_email || '';
 		var subject = ticket.subject || '—';
 		var status = ticket.status_label || ticket.status || '—';
+		var statusSlug = ticket.status || '';
 		var priority = ticket.priority_label || ticket.priority || '—';
+		var prioritySlug = ticket.priority || 'normal';
 		var typeLabel = ticket.type_label || ticket.ticket_type || '—';
 		var message = ticket.message || '';
 		var created = ticket.created_at || '—';
 		var updated = ticket.updated_at || '—';
 		var dueAt = ticket.action_due_at || '—';
-
-		var timeline = '';
-		if ( Array.isArray( events ) && events.length ) {
-			timeline = events.slice( 0, 60 ).map( function ( ev ) {
-				var evGroup = ev.group || 'system';
-				var evLabel = ev.event_label || ev.event_type || 'Event';
-				var evWhen = ev.created_at || '';
-				var evBody = ev.summary || ev.body || '—';
-				return '<article class="dtb-support-ticket-message dtb-support-ticket-message--' + escHtml( evGroup ) + '">'
-					+ '<header class="dtb-support-ticket-message__meta"><strong>' + escHtml( evLabel ) + '</strong><span>' + escHtml( evWhen ) + '</span></header>'
-					+ '<div class="dtb-support-ticket-message__body">' + escHtml( evBody ) + '</div>'
-					+ '</article>';
-			} ).join( '' );
-		} else {
-			timeline = '<p class="dtb-support-ticket-empty">No timeline events yet.</p>';
-		}
+		var assignedUserId = ticket.assigned_user_id ? String( ticket.assigned_user_id ) : '';
+		var assignedName = ticket.assigned_user_name || '';
+		var orderId = ticket.order_id ? '#' + ticket.order_id : '—';
 
 		if ( els.title ) {
 			els.title.textContent = 'Ticket ' + ticketLabel;
 		}
 
-		if ( els.body ) {
-			els.body.innerHTML =
-				'<div class="dtb-support-ticket-modal">'
-				+ '<header class="dtb-support-ticket-modal__header">'
-				+ '<div><h3>' + escHtml( subject ) + '</h3><p>' + escHtml( customer ) + '</p></div>'
-				+ '<div class="dtb-support-ticket-modal__badges">'
-				+ '<span class="dtb-support-ticket-pill">' + escHtml( status ) + '</span>'
-				+ '<span class="dtb-support-ticket-pill">' + escHtml( priority ) + '</span>'
-				+ '<span class="dtb-support-ticket-pill">' + escHtml( typeLabel ) + '</span>'
-				+ '</div>'
-				+ '</header>'
-				+ '<div class="dtb-support-ticket-modal__body">'
-				+ '<section class="dtb-support-ticket-thread">'
-				+ '<article class="dtb-support-ticket-message dtb-support-ticket-message--customer">'
-				+ '<header class="dtb-support-ticket-message__meta"><strong>Customer Message</strong></header>'
-				+ '<div class="dtb-support-ticket-message__body">' + escHtml( message || 'No original message body.' ) + '</div>'
-				+ '</article>'
-				+ timeline
-				+ '</section>'
-				+ '<aside class="dtb-support-ticket-context">'
-				+ '<div class="dtb-support-ticket-card"><h4>Ticket Snapshot</h4>'
-				+ '<div class="dtb-support-ticket-kv"><span>Ticket</span><strong>' + escHtml( ticketLabel ) + '</strong></div>'
-				+ '<div class="dtb-support-ticket-kv"><span>Status</span><strong>' + escHtml( status ) + '</strong></div>'
-				+ '<div class="dtb-support-ticket-kv"><span>Priority</span><strong>' + escHtml( priority ) + '</strong></div>'
-				+ '<div class="dtb-support-ticket-kv"><span>Action Due</span><strong>' + escHtml( dueAt ) + '</strong></div>'
-				+ '<div class="dtb-support-ticket-kv"><span>Created</span><strong>' + escHtml( created ) + '</strong></div>'
-				+ '<div class="dtb-support-ticket-kv"><span>Updated</span><strong>' + escHtml( updated ) + '</strong></div>'
-				+ '</div>'
-				+ '<div class="dtb-support-ticket-card"><h4>Customer</h4>'
-				+ '<div class="dtb-support-ticket-kv"><span>Name</span><strong>' + escHtml( ticket.customer_name || '—' ) + '</strong></div>'
-				+ '<div class="dtb-support-ticket-kv"><span>Email</span><strong>' + escHtml( ticket.customer_email || '—' ) + '</strong></div>'
-				+ '<div class="dtb-support-ticket-kv"><span>Order</span><strong>' + escHtml( ticket.order_id ? '#' + ticket.order_id : '—' ) + '</strong></div>'
-				+ '</div>'
-				+ '</aside>'
-				+ '</div>'
-				+ '</div>';
+		if ( ! els.body ) {
+			return;
+		}
+
+		els.body.innerHTML =
+			'<div class="dtb-support-ticket-modal">'
+
+			// ── Email reading-pane header ──────────────────────────────────────
+			+ '<header class="dtb-support-email-header">'
+
+			// Toolbar: pills left, quick-action Reply/Note right
+			+ '<div class="dtb-support-email-toolbar">'
+			+ '<div class="dtb-support-email-toolbar__pills">'
+			+ '<span class="dtb-support-ticket-pill dtb-support-ticket-pill--status dtb-status--' + escHtml( statusSlug ) + '">' + escHtml( status ) + '</span>'
+			+ '<span class="dtb-support-ticket-pill dtb-support-ticket-pill--priority dtb-priority--' + escHtml( prioritySlug ) + '">' + escHtml( priority ) + '</span>'
+			+ ( typeLabel !== '—' ? '<span class="dtb-support-ticket-pill">' + escHtml( typeLabel ) + '</span>' : '' )
+			+ '</div>'
+			+ '<div class="dtb-support-email-toolbar__btns">'
+			+ '<button type="button" class="dtb-btn dtb-btn--sm dtb-btn--ghost dtb-email-quick-reply" data-dtb-compose-mode="reply" title="Reply to customer">↩ Reply</button>'
+			+ '<button type="button" class="dtb-btn dtb-btn--sm dtb-btn--ghost dtb-email-quick-reply" data-dtb-compose-mode="note" title="Add internal note">📋 Note</button>'
+			+ '</div>'
+			+ '</div>'
+
+			// From row: customer avatar + name + email | ticket ref on right
+			+ '<div class="dtb-support-email-from">'
+			+ '<div class="dtb-support-email-avatar">' + escHtml( avatarInitials( customerName ) ) + '</div>'
+			+ '<div class="dtb-support-email-from__copy">'
+			+ '<strong>' + escHtml( customerName ) + '</strong>'
+			+ ( customerEmail ? '<span class="dtb-support-email-from__email">' + escHtml( customerEmail ) + '</span>' : '' )
+			+ '</div>'
+			+ '<span class="dtb-support-email-ticket-ref">' + escHtml( ticketLabel ) + '</span>'
+			+ '</div>'
+
+			// Subject
+			+ '<h3 class="dtb-support-email-subject">' + escHtml( subject ) + '</h3>'
+
+			// Meta row: order · assigned staff · created · due
+			+ '<div class="dtb-support-email-meta">'
+			+ ( orderId !== '—' ? '<span>Order ' + escHtml( orderId ) + '</span><span class="dtb-support-email-sep">·</span>' : '' )
+			+ ( assignedName ? '<span>→ ' + escHtml( assignedName ) + '</span><span class="dtb-support-email-sep">·</span>' : '' )
+			+ '<span>Created ' + escHtml( created ) + '</span>'
+			+ ( dueAt !== '—' ? '<span class="dtb-support-email-sep">·</span><span class="dtb-support-email-due">Due ' + escHtml( dueAt ) + '</span>' : '' )
+			+ '</div>'
+
+			+ '</header>'
+
+			// ── Two-column body ────────────────────────────────────────────────
+			+ '<div class="dtb-support-ticket-modal__body">'
+
+			// ── Left pane: Tab nav + panels ────────────────────────────────────
+			+ '<div class="dtb-support-ticket-left">'
+
+			// Tab navigation — Thread (chat) + Actions
+			+ '<nav class="dtb-support-modal-tabs" role="tablist">'
+			+ '<button class="dtb-support-modal-tab is-active" data-dtb-modal-tab="thread" role="tab" aria-selected="true">Conversation</button>'
+			+ '<button class="dtb-support-modal-tab" data-dtb-modal-tab="actions" role="tab" aria-selected="false">Actions</button>'
+			+ '</nav>'
+
+			// ── Panel: Conversation (chat + pinned compose) ────────────────────
+			+ '<div class="dtb-support-modal-panel is-active dtb-support-chat-panel" data-dtb-modal-panel="thread">'
+
+			// Scrollable chat thread
+			+ '<div class="dtb-chat-thread" id="dtb-chat-thread">'
+			+ buildTimeline( events, message, customerName )
+			+ '</div>'
+
+			// Pinned compose bar
+			+ '<div class="dtb-chat-compose">'
+			+ '<div class="dtb-chat-compose__toolbar">'
+			+ '<button type="button" class="dtb-chat-mode-btn is-active" data-dtb-compose-mode="reply">Reply to Customer</button>'
+			+ '<button type="button" class="dtb-chat-mode-btn" data-dtb-compose-mode="note">Internal Note</button>'
+			+ '</div>'
+			+ '<form class="dtb-chat-compose__form dtb-support-reply-form" data-dtb-reply-type="reply">'
+			+ '<div class="dtb-chat-compose__input-row">'
+			+ '<textarea class="dtb-chat-compose__textarea" name="message" placeholder="Write a reply to the customer…" rows="3" autocomplete="off"></textarea>'
+			+ '<div class="dtb-chat-compose__actions">'
+			+ '<button type="submit" class="dtb-btn dtb-btn--primary dtb-btn--sm">Send</button>'
+			+ '<span class="dtb-support-form-status"></span>'
+			+ '</div>'
+			+ '</div>'
+			+ '</form>'
+			+ '</div>'
+
+			+ '</div>' // .dtb-support-chat-panel
+
+			// ── Panel: Actions ─────────────────────────────────────────────────
+			+ '<div class="dtb-support-modal-panel" data-dtb-modal-panel="actions">'
+			+ '<form class="dtb-support-actions-form">'
+			+ '<div class="dtb-support-actions-grid">'
+			+ '<div class="dtb-support-form-group">'
+			+ '<label class="dtb-support-form-label">Status</label>'
+			+ '<select class="dtb-select" name="status">' + renderStatusOptions( statusSlug ) + '</select>'
+			+ '</div>'
+			+ '<div class="dtb-support-form-group">'
+			+ '<label class="dtb-support-form-label">Priority</label>'
+			+ '<select class="dtb-select" name="priority">' + renderPriorityOptions( prioritySlug ) + '</select>'
+			+ '</div>'
+			+ '<div class="dtb-support-form-group">'
+			+ '<label class="dtb-support-form-label">Assign to (User ID)</label>'
+			+ '<input class="dtb-input" type="number" name="assigned_user_id" value="' + escHtml( assignedUserId ) + '" placeholder="User ID…" min="1">'
+			+ ( assignedName ? '<p class="dtb-support-form-hint">Currently: ' + escHtml( assignedName ) + '</p>' : '' )
+			+ '</div>'
+			+ '<div class="dtb-support-form-group dtb-support-form-group--full">'
+			+ '<label class="dtb-support-form-label">Change note <span class="dtb-support-form-badge">Optional</span></label>'
+			+ '<textarea class="dtb-support-reply-textarea dtb-support-reply-textarea--sm" name="note" placeholder="Reason for this change…" rows="3"></textarea>'
+			+ '</div>'
+			+ '</div>'
+			+ '<div class="dtb-support-form-actions">'
+			+ '<button type="submit" class="dtb-btn dtb-btn--primary dtb-btn--sm">Save Changes</button>'
+			+ '<span class="dtb-support-form-status"></span>'
+			+ '</div>'
+			+ '</form>'
+			+ '</div>'
+
+			+ '</div>' // .dtb-support-ticket-left
+
+			// ── Right sidebar — always-visible context ─────────────────────────
+			+ '<aside class="dtb-support-ticket-context">'
+			+ '<div class="dtb-support-ticket-card"><h4>Ticket Snapshot</h4>'
+			+ '<div class="dtb-support-ticket-kv"><span>Ticket</span><strong>' + escHtml( ticketLabel ) + '</strong></div>'
+			+ '<div class="dtb-support-ticket-kv"><span>Status</span><strong>' + escHtml( status ) + '</strong></div>'
+			+ '<div class="dtb-support-ticket-kv"><span>Priority</span><strong>' + escHtml( priority ) + '</strong></div>'
+			+ '<div class="dtb-support-ticket-kv"><span>Action Due</span><strong>' + escHtml( dueAt ) + '</strong></div>'
+			+ '<div class="dtb-support-ticket-kv"><span>Created</span><strong>' + escHtml( created ) + '</strong></div>'
+			+ '<div class="dtb-support-ticket-kv"><span>Updated</span><strong>' + escHtml( updated ) + '</strong></div>'
+			+ '</div>'
+			+ '<div class="dtb-support-ticket-card"><h4>Customer</h4>'
+			+ '<div class="dtb-support-ticket-kv"><span>Name</span><strong>' + escHtml( ticket.customer_name || '—' ) + '</strong></div>'
+			+ '<div class="dtb-support-ticket-kv"><span>Email</span><strong>' + escHtml( ticket.customer_email || '—' ) + '</strong></div>'
+			+ '<div class="dtb-support-ticket-kv"><span>Order</span><strong>' + escHtml( orderId ) + '</strong></div>'
+			+ '</div>'
+			+ '</aside>'
+
+			+ '</div>' // .dtb-support-ticket-modal__body
+			+ '</div>'; // .dtb-support-ticket-modal
+
+		// Auto-scroll thread to bottom
+		var thread = document.getElementById( 'dtb-chat-thread' );
+		if ( thread ) {
+			thread.scrollTop = thread.scrollHeight;
 		}
 	}
 
@@ -348,18 +627,6 @@
 		var searchTimer;
 
 		document.addEventListener( 'click', function ( evt ) {
-			var tabLink = evt.target && evt.target.closest ? evt.target.closest( '.dtb-section-nav__tab[data-dtb-live-tab]' ) : null;
-			if ( ! tabLink || ! tabLink.closest( '.dtb-admin[data-dtb-page="dtb-support"]' ) ) {
-				return;
-			}
-			var tab = tabLink.getAttribute( 'data-dtb-live-tab' ) || '';
-			var status = ( tab === 'all' ) ? '' : normalizeStatus( tab );
-			evt.preventDefault();
-			evt.stopImmediatePropagation();
-			navigateRegion( { status: status, queue: '', paged: '1' } );
-		}, true );
-
-		document.addEventListener( 'click', function ( evt ) {
 			var queueLink = evt.target && evt.target.closest ? evt.target.closest( '[data-dtb-support-queue]' ) : null;
 			if ( queueLink ) {
 				evt.preventDefault();
@@ -446,6 +713,239 @@
 	}
 
 	function bindModalActions() {
+		// ── Email toolbar quick-reply shortcuts ────────────────────────────────
+		document.addEventListener( 'click', function ( evt ) {
+			var quickBtn = evt.target && evt.target.closest ? evt.target.closest( '.dtb-email-quick-reply' ) : null;
+			if ( ! quickBtn || ! quickBtn.closest( '#' + MODAL_ID ) ) {
+				return;
+			}
+			var mode = quickBtn.getAttribute( 'data-dtb-compose-mode' ) || 'reply';
+			var overlay = byId( MODAL_ID );
+			if ( ! overlay ) {
+				return;
+			}
+			// Switch to Conversation tab
+			overlay.querySelectorAll( '.dtb-support-modal-tab' ).forEach( function ( t ) {
+				var isThread = t.getAttribute( 'data-dtb-modal-tab' ) === 'thread';
+				t.classList.toggle( 'is-active', isThread );
+				t.setAttribute( 'aria-selected', isThread ? 'true' : 'false' );
+			} );
+			overlay.querySelectorAll( '.dtb-support-modal-panel' ).forEach( function ( p ) {
+				p.classList.toggle( 'is-active', p.getAttribute( 'data-dtb-modal-panel' ) === 'thread' );
+			} );
+			// Set compose mode
+			var compose = overlay.querySelector( '.dtb-chat-compose' );
+			if ( ! compose ) {
+				return;
+			}
+			compose.querySelectorAll( '.dtb-chat-mode-btn' ).forEach( function ( b ) {
+				b.classList.toggle( 'is-active', b.getAttribute( 'data-dtb-compose-mode' ) === mode );
+			} );
+			var form = compose.querySelector( '.dtb-support-reply-form' );
+			if ( form ) {
+				form.setAttribute( 'data-dtb-reply-type', mode );
+				compose.classList.toggle( 'dtb-chat-compose--note', mode === 'note' );
+				var ta = form.querySelector( 'textarea[name="message"]' );
+				if ( ta ) {
+					ta.placeholder = mode === 'note'
+						? 'Write a private note visible only to staff…'
+						: 'Write a reply to the customer…';
+					ta.focus();
+				}
+			}
+		} );
+
+		// ── Compose mode toggle (Reply / Internal Note) ────────────────────────
+		document.addEventListener( 'click', function ( evt ) {
+			var modeBtn = evt.target && evt.target.closest ? evt.target.closest( '.dtb-chat-mode-btn' ) : null;
+			if ( ! modeBtn || ! modeBtn.closest( '#' + MODAL_ID ) ) {
+				return;
+			}
+			var mode = modeBtn.getAttribute( 'data-dtb-compose-mode' ) || 'reply';
+			var compose = modeBtn.closest( '.dtb-chat-compose' );
+			if ( ! compose ) {
+				return;
+			}
+			compose.querySelectorAll( '.dtb-chat-mode-btn' ).forEach( function ( b ) {
+				b.classList.toggle( 'is-active', b === modeBtn );
+			} );
+			var form = compose.querySelector( '.dtb-support-reply-form' );
+			if ( form ) {
+				form.setAttribute( 'data-dtb-reply-type', mode );
+				var ta = form.querySelector( 'textarea[name="message"]' );
+				if ( ta ) {
+					ta.placeholder = mode === 'note'
+						? 'Write a private note visible only to staff…'
+						: 'Write a reply to the customer…';
+				}
+				compose.classList.toggle( 'dtb-chat-compose--note', mode === 'note' );
+			}
+		} );
+
+		// ── Tab switching ──────────────────────────────────────────────────────
+		document.addEventListener( 'click', function ( evt ) {
+			var tab = evt.target && evt.target.closest ? evt.target.closest( '.dtb-support-modal-tab' ) : null;
+			if ( ! tab || ! tab.closest( '#' + MODAL_ID ) ) {
+				return;
+			}
+			var tabKey = tab.getAttribute( 'data-dtb-modal-tab' ) || '';
+			var overlay = byId( MODAL_ID );
+			if ( ! overlay ) {
+				return;
+			}
+			overlay.querySelectorAll( '.dtb-support-modal-tab' ).forEach( function ( t ) {
+				t.classList.toggle( 'is-active', t === tab );
+				t.setAttribute( 'aria-selected', t === tab ? 'true' : 'false' );
+			} );
+			overlay.querySelectorAll( '.dtb-support-modal-panel' ).forEach( function ( p ) {
+				p.classList.toggle( 'is-active', p.getAttribute( 'data-dtb-modal-panel' ) === tabKey );
+			} );
+		} );
+
+		// ── Reply / Internal Note form submit ──────────────────────────────────
+		document.addEventListener( 'submit', function ( evt ) {
+			var form = evt.target && evt.target.closest ? evt.target.closest( '.dtb-support-reply-form' ) : null;
+			if ( ! form || ! form.closest( '#' + MODAL_ID ) ) {
+				return;
+			}
+			evt.preventDefault();
+			var isNote = form.getAttribute( 'data-dtb-reply-type' ) === 'note';
+			var messageEl = form.querySelector( '[name="message"]' );
+			var message = messageEl ? messageEl.value : '';
+			var statusEl = form.querySelector( '.dtb-support-form-status' );
+			var submitBtn = form.querySelector( '[type="submit"]' );
+			if ( ! message.trim() ) {
+				if ( statusEl ) {
+					statusEl.textContent = 'Message cannot be empty.';
+					statusEl.className = 'dtb-support-form-status is-error';
+				}
+				return;
+			}
+			if ( submitBtn ) { submitBtn.disabled = true; }
+			if ( statusEl ) {
+				statusEl.textContent = 'Sending…';
+				statusEl.className = 'dtb-support-form-status';
+			}
+			var restBase = ( window.dtbAdminConfig && window.dtbAdminConfig.restUrl ? window.dtbAdminConfig.restUrl : '/wp-json/' ).replace( /\/$/, '' );
+			var endpoint = restBase + '/dtb/v1/support/tickets/' + encodeURIComponent( String( state.currentTicketId ) ) + '/reply';
+			var nonce = window.dtbAdminConfig && window.dtbAdminConfig.nonce ? window.dtbAdminConfig.nonce : '';
+			fetch( endpoint, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+					Accept: 'application/json',
+					'X-WP-Nonce': nonce,
+				},
+				credentials: 'same-origin',
+				body: JSON.stringify( { message: message, is_internal: isNote } ),
+			} )
+				.then( function ( res ) {
+					return res.json().then( function ( d ) {
+						return { ok: res.ok, data: d };
+					} );
+				} )
+				.then( function ( r ) {
+					if ( r.ok && r.data && r.data.success ) {
+						form.reset();
+						if ( statusEl ) {
+							statusEl.textContent = isNote ? 'Note saved.' : 'Reply sent.';
+							statusEl.className = 'dtb-support-form-status is-success';
+						}
+						reloadModalTicket();
+					} else {
+						var msg = ( r.data && r.data.message ) ? r.data.message : 'Failed to send.';
+						if ( statusEl ) {
+							statusEl.textContent = msg;
+							statusEl.className = 'dtb-support-form-status is-error';
+						}
+					}
+				} )
+				.catch( function () {
+					if ( statusEl ) {
+						statusEl.textContent = 'Network error. Please try again.';
+						statusEl.className = 'dtb-support-form-status is-error';
+					}
+				} )
+				.finally( function () {
+					if ( submitBtn ) { submitBtn.disabled = false; }
+				} );
+		} );
+
+		// ── Actions form submit (status / priority / assign) ───────────────────
+		document.addEventListener( 'submit', function ( evt ) {
+			var form = evt.target && evt.target.closest ? evt.target.closest( '.dtb-support-actions-form' ) : null;
+			if ( ! form || ! form.closest( '#' + MODAL_ID ) ) {
+				return;
+			}
+			evt.preventDefault();
+			var statusEl = form.querySelector( '.dtb-support-form-status' );
+			var submitBtn = form.querySelector( '[type="submit"]' );
+			var statusVal = ( form.querySelector( '[name="status"]' ) || {} ).value || '';
+			var priorityVal = ( form.querySelector( '[name="priority"]' ) || {} ).value || '';
+			var assignVal = ( form.querySelector( '[name="assigned_user_id"]' ) || {} ).value || '';
+			var noteVal = ( form.querySelector( '[name="note"]' ) || {} ).value || '';
+			var body = {};
+			if ( statusVal ) { body.status = statusVal; }
+			if ( priorityVal ) { body.priority = priorityVal; }
+			if ( assignVal ) { body.assigned_user_id = parseInt( assignVal, 10 ); }
+			if ( noteVal.trim() ) { body.note = noteVal; }
+			if ( Object.keys( body ).length === 0 ) {
+				if ( statusEl ) {
+					statusEl.textContent = 'No changes to save.';
+					statusEl.className = 'dtb-support-form-status is-error';
+				}
+				return;
+			}
+			if ( submitBtn ) { submitBtn.disabled = true; }
+			if ( statusEl ) {
+				statusEl.textContent = 'Saving…';
+				statusEl.className = 'dtb-support-form-status';
+			}
+			var restBase = ( window.dtbAdminConfig && window.dtbAdminConfig.restUrl ? window.dtbAdminConfig.restUrl : '/wp-json/' ).replace( /\/$/, '' );
+			var endpoint = restBase + '/dtb/v1/support/tickets/' + encodeURIComponent( String( state.currentTicketId ) );
+			var nonce = window.dtbAdminConfig && window.dtbAdminConfig.nonce ? window.dtbAdminConfig.nonce : '';
+			fetch( endpoint, {
+				method: 'PATCH',
+				headers: {
+					'Content-Type': 'application/json',
+					Accept: 'application/json',
+					'X-WP-Nonce': nonce,
+				},
+				credentials: 'same-origin',
+				body: JSON.stringify( body ),
+			} )
+				.then( function ( res ) {
+					return res.json().then( function ( d ) {
+						return { ok: res.ok, data: d };
+					} );
+				} )
+				.then( function ( r ) {
+					if ( r.ok && r.data && r.data.success ) {
+						if ( statusEl ) {
+							statusEl.textContent = 'Changes saved.';
+							statusEl.className = 'dtb-support-form-status is-success';
+						}
+						reloadModalTicket();
+					} else {
+						var msg = ( r.data && r.data.message ) ? r.data.message : 'Save failed.';
+						if ( statusEl ) {
+							statusEl.textContent = msg;
+							statusEl.className = 'dtb-support-form-status is-error';
+						}
+					}
+				} )
+				.catch( function () {
+					if ( statusEl ) {
+						statusEl.textContent = 'Network error. Please try again.';
+						statusEl.className = 'dtb-support-form-status is-error';
+					}
+				} )
+				.finally( function () {
+					if ( submitBtn ) { submitBtn.disabled = false; }
+				} );
+		} );
+
+		// ── "Open Full Ticket" button + modal close ────────────────────────────
 		document.addEventListener( 'click', function ( evt ) {
 			var viewBtn = evt.target && evt.target.closest ? evt.target.closest( '[data-dtb-support-modal-action="view"]' ) : null;
 			if ( viewBtn ) {

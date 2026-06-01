@@ -198,8 +198,102 @@ function dtb_support_register_admin_ticket_routes(): void {
 			'per_page' => [ 'type' => 'integer', 'required' => false, 'default' => 25 ],
 		],
 	] );
+
+	// ── Ticket intelligence ───────────────────────────────────────────────────
+	register_rest_route( 'dtb/v1', '/support/tickets/(?P<id>\d+)/intelligence', [
+		'methods'             => WP_REST_Server::READABLE,
+		'callback'            => 'dtb_support_rest_get_ticket_intelligence',
+		'permission_callback' => 'dtb_support_read_permission',
+	] );
 }
 add_action( 'rest_api_init', 'dtb_support_register_admin_ticket_routes' );
+
+/**
+ * GET /dtb/v1/support/tickets/{id}/intelligence
+ *
+ * Returns scored priority, next best action, customer context, linked records,
+ * delivery health, recommended macros, and risk flags for a single ticket.
+ *
+ * @param WP_REST_Request $request
+ * @return WP_REST_Response|WP_Error
+ */
+function dtb_support_rest_get_ticket_intelligence( WP_REST_Request $request ): WP_REST_Response|WP_Error {
+	$ticket_id = (int) $request->get_param( 'id' );
+	$ticket    = dtb_support_get_ticket( $ticket_id );
+
+	if ( ! $ticket ) {
+		return new WP_Error( 'not_found', __( 'Ticket not found.', 'drywall-toolbox' ), [ 'status' => 404 ] );
+	}
+
+	// ── Priority score ──────────────────────────────────────────────────────
+	$priority_score = function_exists( 'dtb_support_compute_priority_score' )
+		? dtb_support_compute_priority_score( $ticket )
+		: (int) ( $ticket->priority_score ?? 0 );
+
+	// ── Next best action ────────────────────────────────────────────────────
+	$next_action = function_exists( 'dtb_support_compute_next_action' )
+		? dtb_support_compute_next_action( $ticket )
+		: [ 'action' => 'review', 'label' => 'Review ticket', 'reason' => '' ];
+
+	// ── Risk flags ──────────────────────────────────────────────────────────
+	$risk_flags = function_exists( 'dtb_support_compute_risk_flags' )
+		? dtb_support_compute_risk_flags( $ticket )
+		: [];
+
+	// ── Customer context ────────────────────────────────────────────────────
+	$customer_context = function_exists( 'dtb_support_get_customer_context' )
+		? dtb_support_get_customer_context( $ticket )
+		: [];
+
+	// ── Linked records ──────────────────────────────────────────────────────
+	$linked_records = [
+		'order_id'   => ! empty( $ticket->order_id ) ? (int) $ticket->order_id : null,
+		'repair_id'  => ! empty( $ticket->repair_id ) ? (int) $ticket->repair_id : null,
+		'return_id'  => ! empty( $ticket->return_id ) ? (int) $ticket->return_id : null,
+	];
+
+	// ── Delivery health ─────────────────────────────────────────────────────
+	$delivery_health = [
+		'status'       => (string) ( $ticket->notification_status ?? 'unknown' ),
+		'fail_count'   => (int) ( $ticket->notification_fail_count ?? 0 ),
+		'last_sent_at' => ! empty( $ticket->notification_last_sent_at ) ? (string) $ticket->notification_last_sent_at : null,
+	];
+
+	// ── Recommended macros ──────────────────────────────────────────────────
+	$all_macros = function_exists( 'dtb_support_get_macros' ) ? (array) dtb_support_get_macros() : [];
+	$type       = (string) ( $ticket->ticket_type ?? 'general' );
+
+	$recommended_macros = array_values( array_slice(
+		array_filter( $all_macros, static function ( $macro ) use ( $type ): bool {
+			$category = strtolower( (string) ( $macro->category ?? 'general' ) );
+			return false !== strpos( $category, $type ) || 'general' === $category;
+		} ),
+		0,
+		4
+	) );
+	$recommended_macros = array_map( static function ( $macro ): array {
+		return [
+			'id'       => (int) ( $macro->id ?? 0 ),
+			'name'     => (string) ( $macro->macro_name ?? '' ),
+			'category' => (string) ( $macro->category ?? 'general' ),
+		];
+	}, $recommended_macros );
+
+	return new WP_REST_Response( [
+		'ok'                 => true,
+		'ticket_id'          => $ticket_id,
+		'priority_score'     => $priority_score,
+		'next_action'        => $next_action,
+		'customer_context'   => $customer_context,
+		'linked_records'     => $linked_records,
+		'delivery_health'    => $delivery_health,
+		'recommended_macros' => $recommended_macros,
+		'risk_flags'         => $risk_flags,
+		'meta'               => [
+			'updated_at' => gmdate( 'c' ),
+		],
+	], 200 );
+}
 
 /**
  * Permission check: user must be logged in and have manage_support capability.
