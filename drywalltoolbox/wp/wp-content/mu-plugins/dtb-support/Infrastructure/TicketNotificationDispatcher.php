@@ -410,10 +410,9 @@ function dtb_support_notify_ticket_opened( object $ticket ): void {
 		dtb_support_queue_email_notification( $ticket, $ticket->customer_email, (string) $ticket->customer_name, 'ticket-opened-customer', $ctx );
 	}
 
-	// Notify staff (admin email or assigned agent).
-	$assigned_user = $ticket->assigned_user_id ? get_userdata( (int) $ticket->assigned_user_id ) : null;
-	$staff_email   = $assigned_user->user_email ?? dtb_support_admin_email();
-	$staff_name    = $assigned_user->display_name ?? __( 'Support Team', 'drywall-toolbox' );
+	// Notify the single support admin mailbox.
+	$staff_email = dtb_support_admin_email();
+	$staff_name  = __( 'Support Team', 'drywall-toolbox' );
 
 	if ( is_email( $staff_email ) ) {
 		dtb_support_queue_email_notification( $ticket, $staff_email, $staff_name, 'ticket-opened-admin', $ctx );
@@ -461,9 +460,8 @@ function dtb_support_notify_staff_reply( object $ticket, string $reply_body ): v
  * @param string $reply_body
  */
 function dtb_support_notify_customer_reply( object $ticket, string $reply_body ): void {
-	$assigned_user = $ticket->assigned_user_id ? get_userdata( (int) $ticket->assigned_user_id ) : null;
-	$staff_email   = $assigned_user->user_email ?? dtb_support_admin_email();
-	$staff_name    = $assigned_user->display_name ?? __( 'Support Team', 'drywall-toolbox' );
+	$staff_email = dtb_support_admin_email();
+	$staff_name  = __( 'Support Team', 'drywall-toolbox' );
 
 	if ( ! is_email( $staff_email ) ) {
 		return;

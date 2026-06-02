@@ -75,14 +75,11 @@ function dtb_support_submit_contact_request( array $data ): array|WP_Error {
 		],
 	] ) );
 
-	// Auto-assign to an agent.
-	dtb_support_auto_assign( $ticket_id, $ticket_type );
-
 	// Notifications.
 	dtb_support_notify_ticket_opened( $ticket );
 
 	/**
-	 * Fires after a new support ticket has been fully created, assigned, and notified.
+	 * Fires after a new support ticket has been fully created and notified.
 	 *
 	 * @param int   $ticket_id
 	 * @param array $ticket

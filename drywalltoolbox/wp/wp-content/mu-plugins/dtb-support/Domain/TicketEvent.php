@@ -20,8 +20,6 @@ function dtb_support_all_event_types(): array {
 	return [
 		'ticket.created',
 		'ticket.status_changed',
-		'ticket.assigned',
-		'ticket.unassigned',
 		'ticket.priority_changed',
 		'ticket.note_added',
 		'ticket.reply_customer',

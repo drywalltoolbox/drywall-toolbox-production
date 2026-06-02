@@ -305,7 +305,7 @@
 
 			} else if ( group === 'internal' ) {
 				// Internal notes — suppressed from conversation view to reduce clutter.
-				// Only system-generated internal notes (priority changes, assignments,
+				// Only system-generated internal notes (priority changes,
 				// email delivery receipts) are hidden; these are visible in the audit log.
 				return;
 
@@ -320,7 +320,7 @@
 					+ '</div>';
 
 			} else if ( group === 'workflow' ) {
-				// Workflow changes (status, assign, priority) — compact timeline marker
+				// Workflow changes (status and priority) — compact timeline marker
 				html += '<div class="dtb-chat-row dtb-chat-row--system">'
 					+ '<span class="dtb-chat-system-event">'
 					+ escHtml( evBody || evLabel )
@@ -391,8 +391,16 @@
 			} )
 			.then( function ( payload ) {
 				renderTicketModal( els, payload );
+				refreshSupportRegion();
 			} )
 			.catch( function () {} );
+	}
+
+	function refreshSupportRegion() {
+		var region = getLiveRegion();
+		if ( region && typeof DtbAdmin !== 'undefined' && DtbAdmin.liveRefresh ) {
+			DtbAdmin.liveRefresh( region );
+		}
 	}
 
 	// ── Smart macros ────────────────────────────────────────────────────────────
@@ -506,8 +514,6 @@
 		var updated = formatDate( ticket.updated_at ) || '—';
 		var dueAt = formatDue( ticket.action_due_at ) || '—';
 		var dueRaw = ticket.action_due_at || '';
-		var assignedUserId = ticket.assigned_user_id ? String( ticket.assigned_user_id ) : '';
-		var assignedName = ticket.assigned_user_name || '';
 		var orderId = ticket.order_id ? '#' + ticket.order_id : '—';
 
 		if ( els.title ) {
@@ -550,10 +556,9 @@
 			// Subject
 			+ '<h3 class="dtb-support-email-subject">' + escHtml( subject ) + '</h3>'
 
-			// Meta row: order · assigned staff · created · due
+			// Meta row: order · created · due
 			+ '<div class="dtb-support-email-meta">'
 			+ ( orderId !== '—' ? '<span>Order ' + escHtml( orderId ) + '</span><span class="dtb-support-email-sep">·</span>' : '' )
-			+ ( assignedName ? '<span>→ ' + escHtml( assignedName ) + '</span><span class="dtb-support-email-sep">·</span>' : '' )
 			+ '<span>Created ' + escHtml( created ) + '</span>'
 			+ ( dueAt !== '—' ? '<span class="dtb-support-email-sep">·</span><span class="dtb-support-email-due' + ( dueRaw && new Date( dueRaw.replace( ' ', 'T' ) ) < new Date() ? ' is-overdue' : '' ) + '">Due ' + escHtml( dueAt ) + '</span>' : '' )
 			+ '</div>'
@@ -602,21 +607,20 @@
 			+ '</div>' // .dtb-support-chat-panel
 
 			// ── Panel: Actions ─────────────────────────────────────────────────
-			+ '<div class="dtb-support-modal-panel" data-dtb-modal-panel="actions">'
+			+ '<div class="dtb-support-modal-panel dtb-support-actions-panel" data-dtb-modal-panel="actions">'
+			+ '<div class="dtb-support-action-summary">'
+			+ '<div><span class="dtb-support-form-label">Recommended next step</span><strong>' + escHtml( ticket.next_action_label || ticket.next_action || 'Review and respond' ) + '</strong></div>'
+			+ '<p>' + escHtml( ticket.next_action_reason || 'Keep the customer status current and use follow-ups for anything that should return to the queue later.' ) + '</p>'
+			+ '</div>'
 			+ '<form class="dtb-support-actions-form">'
 			+ '<div class="dtb-support-actions-grid">'
 			+ '<div class="dtb-support-form-group">'
-			+ '<label class="dtb-support-form-label">Status</label>'
+			+ '<label class="dtb-support-form-label">Workflow Status</label>'
 			+ '<select class="dtb-select" name="status">' + renderStatusOptions( statusSlug ) + '</select>'
 			+ '</div>'
 			+ '<div class="dtb-support-form-group">'
 			+ '<label class="dtb-support-form-label">Priority</label>'
 			+ '<select class="dtb-select" name="priority">' + renderPriorityOptions( prioritySlug ) + '</select>'
-			+ '</div>'
-			+ '<div class="dtb-support-form-group">'
-			+ '<label class="dtb-support-form-label">Assign to (User ID)</label>'
-			+ '<input class="dtb-input" type="number" name="assigned_user_id" value="' + escHtml( assignedUserId ) + '" placeholder="User ID…" min="1">'
-			+ ( assignedName ? '<p class="dtb-support-form-hint">Currently: ' + escHtml( assignedName ) + '</p>' : '' )
 			+ '</div>'
 			+ '<div class="dtb-support-form-group dtb-support-form-group--full">'
 			+ '<label class="dtb-support-form-label">Change note <span class="dtb-support-form-badge">Optional</span></label>'
@@ -628,6 +632,18 @@
 			+ '<span class="dtb-support-form-status"></span>'
 			+ '</div>'
 			+ '</form>'
+			+ '<div class="dtb-support-action-quickforms">'
+			+ '<form class="dtb-support-followup-form">'
+			+ '<label class="dtb-support-form-label">Follow-up</label>'
+			+ '<div class="dtb-support-inline-form"><input class="dtb-input" type="datetime-local" name="followup_due_at"><button type="submit" class="dtb-btn dtb-btn--sm">Set</button></div>'
+			+ '<span class="dtb-support-form-status"></span>'
+			+ '</form>'
+			+ '<form class="dtb-support-snooze-form">'
+			+ '<label class="dtb-support-form-label">Snooze</label>'
+			+ '<div class="dtb-support-inline-form"><input class="dtb-input" type="datetime-local" name="snooze_until"><button type="submit" class="dtb-btn dtb-btn--sm">Pause</button></div>'
+			+ '<span class="dtb-support-form-status"></span>'
+			+ '</form>'
+			+ '</div>'
 			+ '</div>'
 
 			+ '</div>' // .dtb-support-ticket-left
@@ -1052,7 +1068,7 @@
 				} );
 		} );
 
-		// ── Actions form submit (status / priority / assign) ───────────────────
+		// ── Actions form submit (status / priority) ────────────────────────────
 		document.addEventListener( 'submit', function ( evt ) {
 			var form = evt.target && evt.target.closest ? evt.target.closest( '.dtb-support-actions-form' ) : null;
 			if ( ! form || ! form.closest( '#' + MODAL_ID ) ) {
@@ -1063,12 +1079,10 @@
 			var submitBtn = form.querySelector( '[type="submit"]' );
 			var statusVal = ( form.querySelector( '[name="status"]' ) || {} ).value || '';
 			var priorityVal = ( form.querySelector( '[name="priority"]' ) || {} ).value || '';
-			var assignVal = ( form.querySelector( '[name="assigned_user_id"]' ) || {} ).value || '';
 			var noteVal = ( form.querySelector( '[name="note"]' ) || {} ).value || '';
 			var body = {};
 			if ( statusVal ) { body.status = statusVal; }
 			if ( priorityVal ) { body.priority = priorityVal; }
-			if ( assignVal ) { body.assigned_user_id = parseInt( assignVal, 10 ); }
 			if ( noteVal.trim() ) { body.note = noteVal; }
 			if ( Object.keys( body ).length === 0 ) {
 				if ( statusEl ) {
@@ -1104,6 +1118,81 @@
 					if ( r.ok && r.data && r.data.success ) {
 						if ( statusEl ) {
 							statusEl.textContent = 'Changes saved.';
+							statusEl.className = 'dtb-support-form-status is-success';
+						}
+						reloadModalTicket();
+					} else {
+						var msg = ( r.data && r.data.message ) ? r.data.message : 'Save failed.';
+						if ( statusEl ) {
+							statusEl.textContent = msg;
+							statusEl.className = 'dtb-support-form-status is-error';
+						}
+					}
+				} )
+				.catch( function () {
+					if ( statusEl ) {
+						statusEl.textContent = 'Network error. Please try again.';
+						statusEl.className = 'dtb-support-form-status is-error';
+					}
+				} )
+				.finally( function () {
+					if ( submitBtn ) { submitBtn.disabled = false; }
+				} );
+		} );
+
+		// ── Follow-up / snooze quick actions ───────────────────────────────────
+		document.addEventListener( 'submit', function ( evt ) {
+			var form = evt.target && evt.target.closest ? evt.target.closest( '.dtb-support-followup-form, .dtb-support-snooze-form' ) : null;
+			if ( ! form || ! form.closest( '#' + MODAL_ID ) ) {
+				return;
+			}
+			evt.preventDefault();
+
+			var isSnooze = form.classList.contains( 'dtb-support-snooze-form' );
+			var fieldName = isSnooze ? 'snooze_until' : 'followup_due_at';
+			var value = ( form.querySelector( '[name="' + fieldName + '"]' ) || {} ).value || '';
+			var statusEl = form.querySelector( '.dtb-support-form-status' );
+			var submitBtn = form.querySelector( '[type="submit"]' );
+
+			if ( ! value ) {
+				if ( statusEl ) {
+					statusEl.textContent = 'Choose a date and time.';
+					statusEl.className = 'dtb-support-form-status is-error';
+				}
+				return;
+			}
+
+			if ( submitBtn ) { submitBtn.disabled = true; }
+			if ( statusEl ) {
+				statusEl.textContent = 'Saving…';
+				statusEl.className = 'dtb-support-form-status';
+			}
+
+			var restBase = ( window.dtbAdminConfig && window.dtbAdminConfig.restUrl ? window.dtbAdminConfig.restUrl : '/wp-json/' ).replace( /\/$/, '' );
+			var endpoint = restBase + '/dtb/v1/support/tickets/' + encodeURIComponent( String( state.currentTicketId ) ) + '/' + ( isSnooze ? 'snooze' : 'followup' );
+			var nonce = window.dtbAdminConfig && window.dtbAdminConfig.nonce ? window.dtbAdminConfig.nonce : '';
+			var body = {};
+			body[ fieldName ] = value;
+
+			fetch( endpoint, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+					Accept: 'application/json',
+					'X-WP-Nonce': nonce,
+				},
+				credentials: 'same-origin',
+				body: JSON.stringify( body ),
+			} )
+				.then( function ( res ) {
+					return res.json().then( function ( d ) {
+						return { ok: res.ok, data: d };
+					} );
+				} )
+				.then( function ( r ) {
+					if ( r.ok && r.data && r.data.success ) {
+						if ( statusEl ) {
+							statusEl.textContent = isSnooze ? 'Ticket paused.' : 'Follow-up set.';
 							statusEl.className = 'dtb-support-form-status is-success';
 						}
 						reloadModalTicket();

@@ -68,22 +68,12 @@ function dtb_support_project_ticket( object $ticket ): array {
 	$age_seconds = time() - strtotime( (string) $ticket->created_at );
 	$age_label   = dtb_support_age_label( $age_seconds );
 
-	$assigned_user = null;
-	if ( ! empty( $ticket->assigned_user_id ) ) {
-		$u = get_userdata( (int) $ticket->assigned_user_id );
-		if ( $u ) {
-			$assigned_user = [
-				'id'           => $u->ID,
-				'display_name' => $u->display_name,
-				'email'        => $u->user_email,
-				'avatar'       => get_avatar_url( $u->ID, [ 'size' => 36 ] ),
-			];
-		}
-	}
-
 	$priority_score = isset( $ticket->priority_score )
 		? (int) $ticket->priority_score
 		: ( function_exists( 'dtb_support_compute_priority_score' ) ? dtb_support_compute_priority_score( $ticket ) : 0 );
+	$next_action = function_exists( 'dtb_support_compute_next_action' )
+		? dtb_support_compute_next_action( $ticket )
+		: [ 'action' => 'review', 'label' => __( 'Review Ticket', 'drywall-toolbox' ), 'reason' => '' ];
 
 	$metadata = [];
 	if ( ! empty( $ticket->metadata_json ) ) {
@@ -138,6 +128,9 @@ function dtb_support_project_ticket( object $ticket ): array {
 		'priority'       => $priority,
 		'priority_label' => dtb_support_priority_label( $priority ),
 		'priority_score' => $priority_score,
+		'next_action'    => (string) ( $next_action['action'] ?? 'review' ),
+		'next_action_label' => (string) ( $next_action['label'] ?? __( 'Review Ticket', 'drywall-toolbox' ) ),
+		'next_action_reason' => (string) ( $next_action['reason'] ?? '' ),
 
 		// Content.
 		'subject'        => $subject,
@@ -150,10 +143,6 @@ function dtb_support_project_ticket( object $ticket ): array {
 		'order_id'       => ! empty( $ticket->order_id ) ? (int) $ticket->order_id : null,
 		'tags'           => $tags,
 		'metadata'       => $metadata,
-
-		// Assignment.
-		'assigned_user'  => $assigned_user,
-		'assigned_user_id' => ! empty( $ticket->assigned_user_id ) ? (int) $ticket->assigned_user_id : null,
 
 		// Operational target (action-due) — admin-facing language, never "SLA".
 		'action_state'        => $action_state,
@@ -232,12 +221,6 @@ function dtb_support_get_kpis(): array {
 		"SELECT COUNT(*) FROM {$table} WHERE priority = 'high' AND status NOT IN ('resolved','closed','spam')"
 	);
 
-	// Unassigned open tickets.
-	$unassigned = (int) $wpdb->get_var(
-		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-		"SELECT COUNT(*) FROM {$table} WHERE assigned_user_id IS NULL AND status NOT IN ('resolved','closed','spam')"
-	);
-
 	$action_due_hours    = max( 1, (int) dtb_support_action_due_hours() );
 	$warning_window_secs = (int) floor( $action_due_hours * HOUR_IN_SECONDS * 0.25 );
 	$warning_window_secs = max( HOUR_IN_SECONDS, $warning_window_secs );
@@ -295,7 +278,6 @@ function dtb_support_get_kpis(): array {
 		'spam'             => $by_status['spam']             ?? 0,
 		'urgent'           => $urgent,
 		'high'             => $high,
-		'unassigned'       => $unassigned,
 		'needs_reply'      => $needs_reply,
 		'overdue_count'    => $overdue_count,
 		'sla_breach'       => $overdue_count,

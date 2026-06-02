@@ -50,10 +50,6 @@ function dtb_support_compute_priority_score( object $ticket ): int {
 		$score += 50;
 	}
 
-	if ( empty( $ticket->assigned_user_id ) ) {
-		$score += 75;
-	}
-
 	if ( ! empty( $ticket->order_id ) ) {
 		$score += 25;
 	}

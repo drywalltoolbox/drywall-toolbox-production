@@ -34,7 +34,7 @@ function dtb_support_render_page(): void {
 
 	dtb_admin_shell_open( [
 		'title'       => __( 'Support', 'drywall-toolbox' ),
-		'subtitle'    => __( 'Manage customer tickets, SLA response queues, assignments, replies, and follow-ups.', 'drywall-toolbox' ),
+		'subtitle'    => __( 'Manage customer tickets, response queues, replies, and follow-ups.', 'drywall-toolbox' ),
 		'section'     => 'operations',
 		'page'        => 'dtb-support',
 		'template'    => 'queue',

@@ -68,6 +68,7 @@ function dtb_support_add_reply(
 			$update['first_reply_at'] = $now;
 		}
 		dtb_support_update_ticket( $ticket_id, $update );
+		dtb_support_auto_transition_after_reply( $ticket_id, 'staff' );
 		if ( function_exists( 'dtb_support_refresh_ticket_sla_state' ) ) {
 			dtb_support_refresh_ticket_sla_state( $ticket_id );
 		}
@@ -84,6 +85,8 @@ function dtb_support_add_reply(
 			] );
 			$ticket = dtb_support_get_ticket( $ticket_id );
 		}
+		dtb_support_auto_transition_after_reply( $ticket_id, 'customer' );
+		$ticket = dtb_support_get_ticket( $ticket_id );
 	}
 
 	// Dispatch notifications (skip internal notes — those never go to customer).
@@ -110,4 +113,34 @@ function dtb_support_add_reply(
 	do_action( 'dtb_support_reply_added', $ticket_id, $event_id, $actor_type, $event_type );
 
 	return $event_id;
+}
+
+/**
+ * Move tickets to the correct waiting state after public replies.
+ */
+function dtb_support_auto_transition_after_reply( int $ticket_id, string $actor_type ): void {
+	if ( ! function_exists( 'dtb_support_transition_ticket' ) || ! function_exists( 'dtb_support_is_valid_transition' ) ) {
+		return;
+	}
+
+	$ticket = dtb_support_get_ticket( $ticket_id );
+	if ( ! $ticket ) {
+		return;
+	}
+
+	$current = (string) ( $ticket->status ?? '' );
+	$target  = 'staff' === $actor_type ? 'pending_customer' : 'pending_staff';
+
+	if ( $current === $target || in_array( $current, [ 'closed', 'spam' ], true ) ) {
+		return;
+	}
+
+	if ( dtb_support_is_valid_transition( $current, $target ) ) {
+		dtb_support_transition_ticket( $ticket_id, $target, [
+			'actor_type' => 'staff' === $actor_type ? 'staff' : 'customer',
+			'actor_id'   => 'staff' === $actor_type ? get_current_user_id() : 0,
+			'source'     => 'reply_auto_status',
+			'note'       => 'Auto-updated after public reply.',
+		] );
+	}
 }

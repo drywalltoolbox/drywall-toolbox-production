@@ -111,7 +111,7 @@ function dtb_support_create_ticket( array $data ): int|WP_Error {
 function dtb_support_update_ticket( int $ticket_id, array $data ): bool|WP_Error {
 	global $wpdb;
 	$table = dtb_support_tickets_table();
-	$allowed = [ 'status', 'priority', 'ticket_type', 'subject', 'assigned_user_id', 'tags', 'internal_notes', 'first_reply_at', 'resolved_at', 'closed_at', 'sla_first_response_due', 'sla_resolution_due', 'sla_state', 'last_customer_reply_at', 'last_staff_reply_at', 'priority_score', 'metadata_json', 'snooze_until', 'snooze_reason', 'followup_due_at', 'notification_status', 'notification_fail_count', 'notification_last_sent_at' ];
+	$allowed = [ 'status', 'priority', 'ticket_type', 'subject', 'tags', 'internal_notes', 'first_reply_at', 'resolved_at', 'closed_at', 'sla_first_response_due', 'sla_resolution_due', 'sla_state', 'last_customer_reply_at', 'last_staff_reply_at', 'priority_score', 'metadata_json', 'snooze_until', 'snooze_reason', 'followup_due_at', 'notification_status', 'notification_fail_count', 'notification_last_sent_at' ];
 	$update  = [ 'updated_at' => gmdate( 'Y-m-d H:i:s' ) ];
 	$text_fields = [ 'status', 'priority', 'ticket_type', 'subject', 'tags', 'internal_notes', 'sla_state', 'snooze_reason', 'notification_status' ];
 	foreach ( $allowed as $field ) {
@@ -149,7 +149,6 @@ function dtb_support_query_tickets( array $args = [] ): array {
 	$status      = sanitize_text_field( $args['status'] ?? 'all' );
 	$type        = sanitize_text_field( $args['type'] ?? '' );
 	$priority    = sanitize_text_field( $args['priority'] ?? '' );
-	$assigned_to = isset( $args['assigned_to'] ) ? absint( $args['assigned_to'] ) : 0;
 	$search_raw  = sanitize_text_field( $args['search'] ?? '' );
 	$search      = function_exists( 'dtb_str_normalize_display' ) ? dtb_str_normalize_display( $search_raw ) : $search_raw;
 	$orderby     = in_array( $args['orderby'] ?? $args['order_by'] ?? '', [ 'created_at', 'updated_at', 'priority', 'status', 'customer_name', 'priority_score' ], true ) ? ( $args['orderby'] ?? $args['order_by'] ) : 'created_at';
@@ -171,10 +170,6 @@ function dtb_support_query_tickets( array $args = [] ): array {
 	if ( '' !== $priority ) {
 		$where[]  = 'priority = %s';
 		$params[] = $priority;
-	}
-	if ( $assigned_to > 0 ) {
-		$where[]  = 'assigned_user_id = %d';
-		$params[] = $assigned_to;
 	}
 	if ( '' !== $search ) {
 		$like     = '%' . $wpdb->esc_like( $search ) . '%';
@@ -211,7 +206,7 @@ function dtb_support_normalize_queue_counts( array $counts ): array {
 	if ( isset( $counts['sla_breached'] ) && ! isset( $counts['overdue'] ) ) {
 		$counts['overdue'] = (int) $counts['sla_breached'];
 	}
-	foreach ( [ 'needs_reply', 'due_soon', 'overdue', 'unassigned', 'urgent', 'in_progress', 'waiting_on_customer', 'snoozed', 'resolved_pending_close', 'all_active' ] as $key ) {
+	foreach ( [ 'needs_reply', 'due_soon', 'overdue', 'urgent', 'in_progress', 'waiting_on_customer', 'snoozed', 'resolved_pending_close', 'all_active' ] as $key ) {
 		$counts[ $key ] = isset( $counts[ $key ] ) ? (int) $counts[ $key ] : 0;
 	}
 	return $counts;
@@ -238,7 +233,6 @@ function dtb_support_query_queue( string $queue, array $args = [] ): array {
 		'needs_reply'            => "status IN ('open','pending_staff','in_progress') AND {$active}",
 		'due_soon'               => "{$action_due_expr} >= UTC_TIMESTAMP() AND TIMESTAMPDIFF(SECOND, UTC_TIMESTAMP(), {$action_due_expr}) <= {$warning_window_secs} AND {$closed} AND {$active}",
 		'overdue'                => "{$action_due_expr} < UTC_TIMESTAMP() AND {$closed} AND {$active}",
-		'unassigned'             => "assigned_user_id IS NULL AND {$closed} AND {$active}",
 		'urgent'                 => "priority = 'urgent' AND {$closed} AND {$active}",
 		'in_progress'            => "status = 'in_progress' AND {$active}",
 		'waiting_on_customer'    => "status = 'pending_customer' AND {$active}",
@@ -288,7 +282,6 @@ function dtb_support_get_queue_counts(): array {
 		SUM(CASE WHEN status IN ('open','pending_staff','in_progress') AND (snooze_until IS NULL OR snooze_until <= UTC_TIMESTAMP()) THEN 1 ELSE 0 END) AS needs_reply,
 		SUM(CASE WHEN {$action_due_expr} >= UTC_TIMESTAMP() AND TIMESTAMPDIFF(SECOND, UTC_TIMESTAMP(), {$action_due_expr}) <= {$warning_window_secs} AND status NOT IN ('resolved','closed','spam') AND (snooze_until IS NULL OR snooze_until <= UTC_TIMESTAMP()) THEN 1 ELSE 0 END) AS due_soon,
 		SUM(CASE WHEN {$action_due_expr} < UTC_TIMESTAMP() AND status NOT IN ('resolved','closed','spam') AND (snooze_until IS NULL OR snooze_until <= UTC_TIMESTAMP()) THEN 1 ELSE 0 END) AS overdue,
-		SUM(CASE WHEN assigned_user_id IS NULL AND status NOT IN ('resolved','closed','spam') AND (snooze_until IS NULL OR snooze_until <= UTC_TIMESTAMP()) THEN 1 ELSE 0 END) AS unassigned,
 		SUM(CASE WHEN priority = 'urgent' AND status NOT IN ('resolved','closed','spam') AND (snooze_until IS NULL OR snooze_until <= UTC_TIMESTAMP()) THEN 1 ELSE 0 END) AS urgent,
 		SUM(CASE WHEN status = 'in_progress' AND (snooze_until IS NULL OR snooze_until <= UTC_TIMESTAMP()) THEN 1 ELSE 0 END) AS in_progress,
 		SUM(CASE WHEN status = 'pending_customer' AND (snooze_until IS NULL OR snooze_until <= UTC_TIMESTAMP()) THEN 1 ELSE 0 END) AS waiting_on_customer,
@@ -297,7 +290,7 @@ function dtb_support_get_queue_counts(): array {
 		SUM(CASE WHEN status NOT IN ('resolved','closed','spam') AND (snooze_until IS NULL OR snooze_until <= UTC_TIMESTAMP()) THEN 1 ELSE 0 END) AS all_active
 	FROM {$table}" , ARRAY_A );
 	$counts = [];
-	foreach ( [ 'needs_reply', 'due_soon', 'overdue', 'unassigned', 'urgent', 'in_progress', 'waiting_on_customer', 'snoozed', 'resolved_pending_close', 'all_active' ] as $key ) {
+	foreach ( [ 'needs_reply', 'due_soon', 'overdue', 'urgent', 'in_progress', 'waiting_on_customer', 'snoozed', 'resolved_pending_close', 'all_active' ] as $key ) {
 		$counts[ $key ] = isset( $row[ $key ] ) ? (int) $row[ $key ] : 0;
 	}
 	$counts['sla_at_risk'] = $counts['due_soon'];

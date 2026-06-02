@@ -49,7 +49,6 @@ function dtb_support_register_admin_ticket_routes(): void {
 			'args'                => [
 				'status'           => [ 'type' => 'string',  'required' => false ],
 				'priority'         => [ 'type' => 'string',  'required' => false ],
-				'assigned_user_id' => [ 'type' => 'integer', 'required' => false ],
 				'note'             => [ 'type' => 'string',  'required' => false, 'default' => '' ],
 			],
 		],
@@ -399,9 +398,6 @@ function dtb_support_update_ticket_permission( WP_REST_Request $request ): bool|
 	if ( null !== $request->get_param( 'priority' ) ) {
 		$checks['dtb_change_support_priority'] = __( 'You do not have permission to change support ticket priority.', 'drywall-toolbox' );
 	}
-	if ( null !== $request->get_param( 'assigned_user_id' ) ) {
-		$checks['dtb_assign_support_tickets'] = __( 'You do not have permission to assign support tickets.', 'drywall-toolbox' );
-	}
 
 	foreach ( $checks as $cap => $message ) {
 		$allowed = dtb_support_rest_require_capabilities( [ $cap, 'dtb_manage_support' ], $message );
@@ -428,9 +424,6 @@ function dtb_support_bulk_action_permission( WP_REST_Request $request ): bool|WP
 		'set_status'  => [ 'dtb_change_support_status', __( 'You do not have permission to change support ticket status.', 'drywall-toolbox' ) ],
 		'priority'    => [ 'dtb_change_support_priority', __( 'You do not have permission to change support ticket priority.', 'drywall-toolbox' ) ],
 		'set_priority'=> [ 'dtb_change_support_priority', __( 'You do not have permission to change support ticket priority.', 'drywall-toolbox' ) ],
-		'assign'      => [ 'dtb_assign_support_tickets', __( 'You do not have permission to assign support tickets.', 'drywall-toolbox' ) ],
-		'assign_me'   => [ 'dtb_assign_support_tickets', __( 'You do not have permission to assign support tickets.', 'drywall-toolbox' ) ],
-		'unassign'    => [ 'dtb_assign_support_tickets', __( 'You do not have permission to assign support tickets.', 'drywall-toolbox' ) ],
 		'close'       => [ 'dtb_change_support_status', __( 'You do not have permission to change support ticket status.', 'drywall-toolbox' ) ],
 		'spam'        => [ 'dtb_change_support_status', __( 'You do not have permission to change support ticket status.', 'drywall-toolbox' ) ],
 		'snooze'      => [ 'dtb_change_support_status', __( 'You do not have permission to change support ticket status.', 'drywall-toolbox' ) ],
@@ -452,8 +445,6 @@ function dtb_support_rest_event_label( string $event_type ): string {
 	$labels = [
 		'ticket.created'         => 'Ticket Created',
 		'ticket.status_changed'  => 'Status Changed',
-		'ticket.assigned'        => 'Assigned',
-		'ticket.unassigned'      => 'Unassigned',
 		'ticket.priority_changed'=> 'Priority Changed',
 		'ticket.note_added'      => 'Internal Note',
 		'ticket.reply_customer'  => 'Staff Reply',
@@ -503,8 +494,6 @@ function dtb_support_rest_event_group( string $event_type, string $visibility = 
 		'ticket.reopened',
 		'ticket.closed',
 		'ticket.spam_flagged',
-		'ticket.assigned',
-		'ticket.unassigned',
 		'ticket.priority_changed',
 		'ticket.snoozed',
 		'ticket.unsnoozed',
@@ -549,16 +538,6 @@ function dtb_support_rest_event_summary( array $event ): string {
 				return sprintf( 'Status changed from %s to %s.', $from_label, $to_label );
 			}
 			break;
-
-		case 'ticket.assigned':
-			$assigned_user_id = absint( $payload['assigned_user_id'] ?? 0 );
-			if ( $assigned_user_id > 0 ) {
-				$assigned_user = get_userdata( $assigned_user_id );
-				if ( $assigned_user ) {
-					return sprintf( 'Assigned to %s.', $assigned_user->display_name );
-				}
-			}
-			return 'Ticket assignment updated.';
 
 		case 'ticket.snoozed':
 			$until  = (string) ( $payload['snooze_until'] ?? '' );
@@ -708,7 +687,6 @@ function dtb_support_rest_list_tickets( WP_REST_Request $request ): WP_REST_Resp
 		'needs_reply',
 		'overdue',
 		'due_soon',
-		'unassigned',
 		'urgent',
 		'snoozed',
 		'in_progress',
@@ -783,14 +761,6 @@ function dtb_support_rest_update_ticket( WP_REST_Request $request ): WP_REST_Res
 	// Priority update.
 	if ( ! empty( $request['priority'] ) && dtb_support_is_valid_priority( $request['priority'] ) ) {
 		dtb_support_update_ticket( $ticket_id, [ 'priority' => $request['priority'] ] );
-	}
-
-	// Assignment.
-	if ( ! empty( $request['assigned_user_id'] ) ) {
-		$assign_result = dtb_support_assign_ticket( $ticket_id, (int) $request['assigned_user_id'] );
-		if ( is_wp_error( $assign_result ) ) {
-			return new WP_REST_Response( [ 'success' => false, 'message' => $assign_result->get_error_message() ], 422 );
-		}
 	}
 
 	$fresh = dtb_support_get_ticket( $ticket_id );
@@ -1039,7 +1009,7 @@ return new WP_REST_Response( [
 /**
  * POST /dtb/v1/support/bulk
  *
- * Supported actions: status, priority, assign, unassign, snooze, close, spam.
+ * Supported actions: status, priority, snooze, close, spam.
  *
  * @param WP_REST_Request $request
  * @return WP_REST_Response|WP_Error
@@ -1095,32 +1065,6 @@ function dtb_support_rest_bulk_action( WP_REST_Request $request ): WP_REST_Respo
 					}
 					$updated[] = $ticket_id;
 				}
-				break;
-
-			case 'assign':
-				$uid = absint( $value );
-				if ( $uid ) {
-					$r = dtb_support_assign_ticket( $ticket_id, $uid );
-					if ( ! is_wp_error( $r ) ) {
-						$updated[] = $ticket_id;
-					} else {
-						$errors[] = $ticket_id;
-					}
-				}
-				break;
-
-			case 'assign_me':
-				$r = dtb_support_assign_ticket( $ticket_id, $actor_id );
-				if ( ! is_wp_error( $r ) ) {
-					$updated[] = $ticket_id;
-				} else {
-					$errors[] = $ticket_id;
-				}
-				break;
-
-			case 'unassign':
-				dtb_support_update_ticket( $ticket_id, [ 'assigned_user_id' => null ] );
-				$updated[] = $ticket_id;
 				break;
 
 			case 'close':

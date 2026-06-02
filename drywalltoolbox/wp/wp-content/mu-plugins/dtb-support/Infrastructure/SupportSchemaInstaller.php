@@ -268,7 +268,6 @@ function dtb_support_grant_admin_capability(): void {
 		'dtb_read_support_tickets',
 		'dtb_reply_support_tickets',
 		'dtb_add_support_notes',
-		'dtb_assign_support_tickets',
 		'dtb_change_support_status',
 		'dtb_change_support_priority',
 		'dtb_manage_support_macros',

@@ -78,8 +78,8 @@ function dtb_support_is_terminal( string $status ): bool {
 function dtb_support_allowed_transitions(): array {
 	return [
 		'open'             => [ 'pending_customer', 'pending_staff', 'in_progress', 'resolved', 'closed', 'spam' ],
-		'pending_customer' => [ 'open', 'in_progress', 'resolved', 'closed', 'spam' ],
-		'pending_staff'    => [ 'open', 'in_progress', 'resolved', 'closed', 'spam' ],
+		'pending_customer' => [ 'open', 'pending_staff', 'in_progress', 'resolved', 'closed', 'spam' ],
+		'pending_staff'    => [ 'open', 'pending_customer', 'in_progress', 'resolved', 'closed', 'spam' ],
 		'in_progress'      => [ 'pending_customer', 'pending_staff', 'resolved', 'closed', 'spam' ],
 		'resolved'         => [ 'open', 'closed' ],
 		'closed'           => [ 'open' ],   // re-open

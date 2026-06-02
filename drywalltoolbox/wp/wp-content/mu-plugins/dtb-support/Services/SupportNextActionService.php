@@ -14,7 +14,7 @@ defined( 'ABSPATH' ) || exit;
  * Compute the next best action for a ticket.
  *
  * Returns an array with keys:
- *   action  — machine key (e.g. 'reply', 'assign', 'escalate', 'resolve', 'follow_up')
+ *   action  — machine key (e.g. 'reply', 'escalate', 'resolve', 'follow_up')
  *   label   — human-readable label
  *   reason  — short explanation
  *
@@ -24,10 +24,9 @@ defined( 'ABSPATH' ) || exit;
 function dtb_support_compute_next_action( object $ticket ): array {
 	$status        = (string) ( $ticket->status ?? 'open' );
 	$priority      = (string) ( $ticket->priority ?? 'normal' );
-	$is_assigned   = ! empty( $ticket->assigned_user_id );
 	$has_reply     = ! empty( $ticket->last_staff_reply_at );
 	$fail_count    = (int) ( $ticket->notification_fail_count ?? 0 );
-	$is_snoozed    = ! empty( $ticket->snoozed_until ) && strtotime( (string) $ticket->snoozed_until ) > time();
+	$is_snoozed    = ! empty( $ticket->snooze_until ) && strtotime( (string) $ticket->snooze_until ) > time();
 
 	$sla_state = function_exists( 'dtb_support_compute_sla_state' )
 		? dtb_support_compute_sla_state( $ticket )
@@ -64,15 +63,8 @@ function dtb_support_compute_next_action( object $ticket ): array {
 		];
 	}
 
-	// SLA breach or urgent — escalate or reply immediately.
+	// SLA breach or urgent — reply immediately.
 	if ( 'breach' === $sla_state || 'urgent' === $priority ) {
-		if ( ! $is_assigned ) {
-			return [
-				'action' => 'assign_escalate',
-				'label'  => __( 'Assign and Escalate', 'drywall-toolbox' ),
-				'reason' => __( 'Urgent or breached SLA — assign an owner immediately.', 'drywall-toolbox' ),
-			];
-		}
 		return [
 			'action' => 'reply',
 			'label'  => __( 'Reply Immediately', 'drywall-toolbox' ),
@@ -86,15 +78,6 @@ function dtb_support_compute_next_action( object $ticket ): array {
 			'action' => 'reply',
 			'label'  => __( 'Reply Soon', 'drywall-toolbox' ),
 			'reason' => __( 'Approaching response target — reply within the hour.', 'drywall-toolbox' ),
-		];
-	}
-
-	// Unassigned.
-	if ( ! $is_assigned ) {
-		return [
-			'action' => 'assign',
-			'label'  => __( 'Assign Ticket', 'drywall-toolbox' ),
-			'reason' => __( 'No owner yet — assign to a support agent.', 'drywall-toolbox' ),
 		];
 	}
 
@@ -167,10 +150,6 @@ function dtb_support_compute_risk_flags( object $ticket ): array {
 			_n( '%d email delivery failure on this ticket.', '%d email delivery failures on this ticket.', $fail_count, 'drywall-toolbox' ),
 			$fail_count
 		);
-	}
-
-	if ( empty( $ticket->assigned_user_id ) && ! in_array( $status, [ 'resolved', 'closed' ], true ) ) {
-		$flags[] = __( 'Unassigned — no owner for this ticket.', 'drywall-toolbox' );
 	}
 
 	if ( $age_seconds > ( 72 * HOUR_IN_SECONDS ) && empty( $ticket->last_staff_reply_at ) ) {
