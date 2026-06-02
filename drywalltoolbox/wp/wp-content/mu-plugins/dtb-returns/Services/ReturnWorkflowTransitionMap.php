@@ -3,8 +3,8 @@
  * DTB Returns — Workflow Transition Map
  *
  * Authoritative definition of which status transitions are permitted for a
- * returns record.  Mirrors the domain model documented in
- * docs/mu-plugins-rebuild.md §B.
+ * returns record. Keep this map aligned with the admin-workbench implementation
+ * plan and the customer-impacting returns workflow.
  *
  * @package DTB_Returns
  */
@@ -16,16 +16,16 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Returns the allowed next statuses for a given current status.
  *
- * The map encodes the directed graph of permitted transitions:
+ * The directed workflow is intentionally narrow:
  *
- *   pending_review → approved | rejected
- *   approved       → awaiting_item | rejected | closed
+ *   pending_review → approved | rejected | closed
+ *   approved       → awaiting_item | closed
  *   awaiting_item  → item_received | closed
  *   item_received  → refund_issued | exchange_sent | closed
  *   refund_issued  → closed
  *   exchange_sent  → closed
- *   rejected       → (terminal — no outbound transitions)
- *   closed         → (terminal — no outbound transitions)
+ *   rejected       → closed
+ *   closed         → terminal
  *
  * @param  string $current_status  Current return status slug.
  * @return string[]                Allowed next status slugs (empty = terminal).
@@ -35,13 +35,13 @@ function dtb_return_get_allowed_transitions( string $current_status ): array {
 
 	if ( null === $map ) {
 		$map = [
-			'pending_review' => [ 'approved', 'rejected' ],
-			'approved'       => [ 'awaiting_item', 'rejected', 'closed' ],
+			'pending_review' => [ 'approved', 'rejected', 'closed' ],
+			'approved'       => [ 'awaiting_item', 'closed' ],
 			'awaiting_item'  => [ 'item_received', 'closed' ],
 			'item_received'  => [ 'refund_issued', 'exchange_sent', 'closed' ],
 			'refund_issued'  => [ 'closed' ],
 			'exchange_sent'  => [ 'closed' ],
-			'rejected'       => [],
+			'rejected'       => [ 'closed' ],
 			'closed'         => [],
 		];
 	}
