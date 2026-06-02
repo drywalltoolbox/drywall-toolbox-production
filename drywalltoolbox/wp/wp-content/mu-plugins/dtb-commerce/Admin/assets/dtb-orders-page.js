@@ -1,0 +1,216 @@
+/**
+ * DTB Orders Page — canonical order workbench modal.
+ */
+( function ( window, document ) {
+	'use strict';
+
+	var WB = window.DtbWorkbench || null;
+	if ( ! WB ) { return; }
+
+	var MODAL_ID = 'dtb-orders-modal';
+	var state = {
+		orderId: null,
+		payload: null,
+	};
+
+	function bodyEl() {
+		var modal = document.getElementById( MODAL_ID );
+		return modal ? modal.querySelector( '.dtb-modal__body' ) : null;
+	}
+
+	function footerEl() {
+		var modal = document.getElementById( MODAL_ID );
+		return modal ? modal.querySelector( '.dtb-modal__footer' ) : null;
+	}
+
+	function editUrl( record, linked ) {
+		if ( record && record.id ) {
+			var adminUrl = ( window.dtbAdminConfig && window.dtbAdminConfig.adminUrl ) || '/wp-admin/admin.php';
+			return adminUrl.replace( /admin\.php.*$/, '' ) + 'post.php?post=' + encodeURIComponent( record.id ) + '&action=edit';
+		}
+		if ( linked && Array.isArray( linked.records ) ) {
+			for ( var i = 0; i < linked.records.length; i++ ) {
+				if ( linked.records[ i ].module === 'order' && linked.records[ i ].url ) {
+					return linked.records[ i ].url;
+				}
+			}
+		}
+		return '';
+	}
+
+	function renderItems( items, currency ) {
+		items = Array.isArray( items ) ? items : [];
+		if ( ! items.length ) {
+			return '<div class="dtb-wb-empty">No line items.</div>';
+		}
+		var html = '<table class="dtb-orders-items"><thead><tr><th>Item</th><th>Qty</th><th>Total</th></tr></thead><tbody>';
+		items.forEach( function ( item ) {
+			html += '<tr>';
+			html += '<td>' + WB.escapeHtml( item.name || 'Item' ) + '</td>';
+			html += '<td>' + WB.escapeHtml( item.quantity || 0 ) + '</td>';
+			html += '<td>' + WB.escapeHtml( WB.formatMoney( item.total || 0, currency ) ) + '</td>';
+			html += '</tr>';
+		} );
+		html += '</tbody></table>';
+		return html;
+	}
+
+	function renderAddress( title, addr ) {
+		addr = addr || {};
+		var name = [ addr.first_name, addr.last_name ].filter( Boolean ).join( ' ' );
+		var lines = [ addr.address_1, addr.address_2, addr.city, addr.state, addr.postcode, addr.country ].filter( Boolean );
+		var html = '<div class="dtb-wb-card"><div class="dtb-wb-card__title">' + WB.escapeHtml( title ) + '</div><div class="dtb-wb-card__body">';
+		html += WB.renderKeyValue( 'Name', WB.escapeHtml( name || '—' ) );
+		html += WB.renderKeyValue( 'Address', WB.escapeHtml( lines.join( ', ' ) || '—' ) );
+		if ( addr.email ) {
+			html += WB.renderKeyValue( 'Email', '<a href="mailto:' + WB.escapeHtml( addr.email ) + '">' + WB.escapeHtml( addr.email ) + '</a>' );
+		}
+		if ( addr.phone ) {
+			html += WB.renderKeyValue( 'Phone', '<a href="tel:' + WB.escapeHtml( addr.phone ) + '">' + WB.escapeHtml( addr.phone ) + '</a>' );
+		}
+		html += '</div></div>';
+		return html;
+	}
+
+	function renderActions( payload ) {
+		var perms = payload.permissions || {};
+		var html = '<div class="dtb-wb-command-bar dtb-orders-command-bar">';
+		if ( perms.can_refresh ) {
+			html += '<button type="button" class="button" data-dtb-order-action="refresh_snapshot">Refresh Snapshot</button>';
+		}
+		if ( perms.can_retry_sync ) {
+			html += '<button type="button" class="button" data-dtb-order-action="retry_veeqo">Retry Veeqo</button>';
+			html += '<button type="button" class="button" data-dtb-order-action="retry_quickbooks">Retry QuickBooks</button>';
+		}
+		html += '</div>';
+		return html;
+	}
+
+	function renderWorkbench( payload ) {
+		payload = payload || {};
+		state.payload = payload;
+		var record = payload.record || payload.order || {};
+		var linked = payload.linked_records || {};
+		var workflow = payload.workflow || {};
+		var intelligence = payload.intelligence || {};
+		var currency = record.currency || 'USD';
+		var body = bodyEl();
+		var footer = footerEl();
+		if ( ! body ) { return; }
+
+		var html = '<div class="dtb-orders-workbench">';
+		html += '<nav class="dtb-modal-tabs" role="tablist">';
+		[ 'overview', 'customer', 'linked', 'integrations', 'timeline', 'actions' ].forEach( function ( tab, index ) {
+			html += '<button type="button" class="dtb-modal-tab' + ( index === 0 ? ' dtb-modal-tab--active' : '' ) + '" data-dtb-tab="' + tab + '" aria-selected="' + ( index === 0 ? 'true' : 'false' ) + '">' + WB.escapeHtml( tab.charAt( 0 ).toUpperCase() + tab.slice( 1 ) ) + '</button>';
+		} );
+		html += '</nav>';
+
+		html += '<div class="dtb-modal-tab-panel dtb-modal-tab-panel--active" data-dtb-tab="overview">';
+		html += '<div class="dtb-orders-overview-grid">';
+		html += '<div class="dtb-wb-card"><div class="dtb-wb-card__title">Order</div><div class="dtb-wb-card__body">';
+		html += WB.renderKeyValue( 'Order', '#' + WB.escapeHtml( record.id || '' ) );
+		html += WB.renderKeyValue( 'Status', WB.renderStatusBadge( workflow.status || record.status, workflow.label || record.status_label ) );
+		html += WB.renderKeyValue( 'Payment', WB.escapeHtml( record.payment_method_title || record.payment_method || '—' ) );
+		html += WB.renderKeyValue( 'Fulfillment', WB.escapeHtml( record.fulfillment_substate || '—' ) );
+		html += WB.renderKeyValue( 'Total', WB.escapeHtml( WB.formatMoney( record.total || 0, currency ) ) );
+		html += WB.renderKeyValue( 'Created', WB.escapeHtml( WB.formatDateFull( record.date_created ) ) );
+		if ( intelligence.next_best_action ) {
+			html += '<div class="dtb-wb-note dtb-wb-note--info">' + WB.escapeHtml( intelligence.next_best_action ) + '</div>';
+		}
+		html += '</div></div>';
+		html += renderAddress( 'Billing', record.billing || {} );
+		html += renderAddress( 'Shipping', record.shipping || {} );
+		html += '<div class="dtb-wb-card dtb-orders-line-items"><div class="dtb-wb-card__title">Line Items</div><div class="dtb-wb-card__body">' + renderItems( record.line_items, currency ) + '</div></div>';
+		html += '</div></div>';
+
+		html += '<div class="dtb-modal-tab-panel" data-dtb-tab="customer" hidden>' + WB.renderCustomerRail( payload.customer || {} ) + '</div>';
+		html += '<div class="dtb-modal-tab-panel" data-dtb-tab="linked" hidden>' + WB.renderLinkedRecords( linked ) + '</div>';
+		html += '<div class="dtb-modal-tab-panel" data-dtb-tab="integrations" hidden>' + WB.renderIntegrationHealth( payload.integrations || {} ) + '</div>';
+		html += '<div class="dtb-modal-tab-panel" data-dtb-tab="timeline" hidden>' + WB.renderTimeline( payload.timeline || [] ) + '</div>';
+		html += '<div class="dtb-modal-tab-panel" data-dtb-tab="actions" hidden>' + renderActions( payload ) + '</div>';
+		html += '</div>';
+
+		body.innerHTML = html;
+		if ( footer ) {
+			var url = editUrl( record, linked );
+			footer.innerHTML = url ? '<a class="button button-primary" href="' + WB.escapeHtml( url ) + '">Open WooCommerce Order</a>' : '';
+		}
+	}
+
+	function fetchOrder( orderId ) {
+		WB.setModalLoading( MODAL_ID, 'Loading order…' );
+		return WB.apiFetch( 'dtb/v1/admin/orders/' + encodeURIComponent( orderId ) + '/detail' )
+			.then( renderWorkbench )
+			.catch( function ( err ) {
+				WB.setModalError( MODAL_ID, err.message || 'Unable to load order.' );
+			} );
+	}
+
+	function openOrder( orderId, trigger ) {
+		orderId = parseInt( orderId, 10 );
+		if ( ! orderId ) { return; }
+		state.orderId = orderId;
+		WB.openRecordModal( {
+			modalId: MODAL_ID,
+			title: 'Order #' + orderId,
+			loadingLabel: 'Loading order…',
+			urlParam: 'open_order',
+			urlParamValue: String( orderId ),
+			focusReturnEl: trigger || null,
+		} );
+		fetchOrder( orderId );
+	}
+
+	function runAction( action, button ) {
+		if ( ! state.orderId || ! action ) { return; }
+		WB.lockAction( button, 'Working…' );
+		WB.apiFetch( 'dtb/v1/admin/orders/' + encodeURIComponent( state.orderId ) + '/actions', {
+			method: 'POST',
+			body: {
+				action_type: action,
+				idempotency_key: 'orders-' + state.orderId + '-' + action + '-' + Date.now(),
+			},
+		} ).then( function ( data ) {
+			WB.showToast( data.message || 'Order action queued.', 'success' );
+			renderWorkbench( data.detail || state.payload || {} );
+		} ).catch( function ( err ) {
+			WB.showToast( err.message || 'Order action failed.', 'error' );
+		} ).finally( function () {
+			WB.unlockAction( button );
+		} );
+	}
+
+	document.addEventListener( 'click', function ( event ) {
+		var actionButton = event.target.closest ? event.target.closest( '[data-dtb-order-action]' ) : null;
+		if ( actionButton ) {
+			event.preventDefault();
+			runAction( actionButton.getAttribute( 'data-dtb-order-action' ), actionButton );
+			return;
+		}
+
+		var explicit = event.target.closest ? event.target.closest( '[data-dtb-open-order]' ) : null;
+		var row = explicit || ( event.target.closest ? event.target.closest( 'tr[data-dtb-open-order]' ) : null );
+		if ( ! row ) { return; }
+		if ( ! explicit && event.target.closest( 'a,button,input,select,textarea,label' ) ) { return; }
+		event.preventDefault();
+		openOrder( row.getAttribute( 'data-dtb-open-order' ), explicit || row );
+	} );
+
+	document.addEventListener( 'click', function ( event ) {
+		var tab = event.target.closest ? event.target.closest( '#dtb-orders-modal .dtb-modal-tab[data-dtb-tab]' ) : null;
+		if ( ! tab ) { return; }
+		event.preventDefault();
+		WB.switchTabs( document.getElementById( MODAL_ID ), tab.getAttribute( 'data-dtb-tab' ) );
+	} );
+
+	document.addEventListener( 'dtb:deeplink', function ( event ) {
+		if ( event.detail && event.detail.module === 'order' ) {
+			openOrder( event.detail.id );
+		}
+	} );
+
+	var initialOrder = WB.getUrlParam( 'open_order' );
+	if ( initialOrder ) {
+		openOrder( initialOrder );
+	}
+}( window, document ) );

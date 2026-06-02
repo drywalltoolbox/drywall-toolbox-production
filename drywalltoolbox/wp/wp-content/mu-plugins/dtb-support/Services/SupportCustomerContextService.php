@@ -81,9 +81,10 @@ function dtb_support_get_customer_context( object $ticket ): array {
 
 			// Total count query.
 			$count_args                = $query_args;
-			$count_args['limit']       = -1;
-			$count_args['return']      = 'ids';
-			$context['order_count']    = count( wc_get_orders( $count_args ) );
+			unset( $count_args['limit'], $count_args['return'] );
+			$context['order_count'] = function_exists( 'dtb_admin_wc_order_count' )
+				? dtb_admin_wc_order_count( $count_args )
+				: 0;
 
 			$context['recent_orders'] = array_map( static function ( $order ): array {
 				return [

@@ -61,7 +61,14 @@ function dtb_operations_menu_register_pages(): void {
 					'file' => 'dtb-orders-page.css',
 				],
 			],
-			'js'  => [],
+			'js'  => [
+				[
+					'id'   => 'dtb-orders-page-script',
+					'dir'  => WP_CONTENT_DIR . '/mu-plugins/dtb-commerce/Admin/assets/',
+					'url'  => content_url( '/mu-plugins/dtb-commerce/Admin/assets/' ),
+					'file' => 'dtb-orders-page.js',
+				],
+			],
 		],
 	] );
 

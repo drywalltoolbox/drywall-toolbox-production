@@ -115,3 +115,100 @@ function dtb_order_rest_get_admin_detail( WP_REST_Request $request ): WP_REST_Re
 
 	return new WP_REST_Response( $payload, 200 );
 }
+
+/**
+ * POST /dtb/v1/admin/orders/{id}/actions
+ *
+ * Safe order workbench actions that queue background work and return refreshed
+ * canonical detail payloads.
+ *
+ * @param WP_REST_Request $request REST request.
+ * @return WP_REST_Response|WP_Error
+ */
+function dtb_order_rest_admin_action( WP_REST_Request $request ): WP_REST_Response|WP_Error {
+	$order_id = absint( $request->get_param( 'id' ) );
+	$action   = sanitize_key( (string) $request->get_param( 'action_type' ) );
+
+	if ( ! function_exists( 'wc_get_order' ) || ! wc_get_order( $order_id ) ) {
+		return new WP_Error( 'dtb_not_found', __( 'Order not found.', 'drywall-toolbox' ), [ 'status' => 404 ] );
+	}
+
+	$integration_action = in_array( $action, [ 'retry_veeqo', 'retry_quickbooks' ], true );
+	if ( $integration_action && ! ( current_user_can( 'dtb_manage_integrations' ) || current_user_can( 'manage_woocommerce' ) ) ) {
+		return new WP_Error( 'dtb_forbidden', __( 'You do not have permission to retry integrations.', 'drywall-toolbox' ), [ 'status' => 403 ] );
+	}
+
+	$idempotency = sanitize_text_field( (string) ( $request->get_header( 'X-DTB-Idempotency-Key' ) ?: $request->get_param( 'idempotency_key' ) ) );
+	if ( '' !== $idempotency ) {
+		$lock_key = 'dtb_order_action_' . md5( $order_id . '|' . $action . '|' . $idempotency );
+		if ( get_transient( $lock_key ) ) {
+			$detail = dtb_order_rest_get_admin_detail( $request );
+			$data   = $detail instanceof WP_REST_Response ? $detail->get_data() : [];
+			return new WP_REST_Response( [ 'ok' => true, 'duplicate' => true, 'detail' => $data ], 200 );
+		}
+		set_transient( $lock_key, 1, MINUTE_IN_SECONDS );
+	}
+
+	switch ( $action ) {
+		case 'refresh_snapshot':
+			if ( function_exists( 'dtb_order_enqueue_job' ) ) {
+				dtb_order_enqueue_job( 'dtb_order_refresh_tracking_projection', $order_id );
+			}
+			if ( function_exists( 'dtb_order_append_event' ) ) {
+				dtb_order_append_event( $order_id, 'order.admin_refreshed', [
+					'source'     => 'admin',
+					'actor_type' => 'admin',
+					'visibility' => 'operator',
+				] );
+			}
+			break;
+
+		case 'retry_veeqo':
+			if ( function_exists( 'dtb_order_enqueue_job' ) ) {
+				dtb_order_enqueue_job( 'dtb_order_sync_veeqo', $order_id );
+			}
+			if ( function_exists( 'dtb_order_append_event' ) ) {
+				dtb_order_append_event( $order_id, 'integration.veeqo.queued', [
+					'source'     => 'admin',
+					'actor_type' => 'admin',
+					'visibility' => 'operator',
+				] );
+			}
+			break;
+
+		case 'retry_quickbooks':
+			if ( function_exists( 'dtb_order_enqueue_job' ) ) {
+				dtb_order_enqueue_job( 'dtb_order_sync_quickbooks', $order_id, [ 'action' => 'create' ] );
+			}
+			if ( function_exists( 'dtb_order_append_event' ) ) {
+				dtb_order_append_event( $order_id, 'integration.quickbooks.queued', [
+					'source'     => 'admin',
+					'actor_type' => 'admin',
+					'visibility' => 'operator',
+				] );
+			}
+			break;
+
+		default:
+			return new WP_Error( 'dtb_invalid_action', __( 'Invalid order action.', 'drywall-toolbox' ), [ 'status' => 400 ] );
+	}
+
+	if ( function_exists( 'dtb_admin_audit_write' ) ) {
+		dtb_admin_audit_write( 'order', $order_id, 'order.' . $action, [
+			'action' => $action,
+		] );
+	}
+	if ( function_exists( 'dtb_command_center_flush_cache' ) ) {
+		dtb_command_center_flush_cache();
+	}
+
+	$detail = dtb_order_rest_get_admin_detail( $request );
+	$data   = $detail instanceof WP_REST_Response ? $detail->get_data() : [];
+
+	return new WP_REST_Response( [
+		'ok'      => true,
+		'action'  => $action,
+		'detail'  => $data,
+		'message' => __( 'Order action queued.', 'drywall-toolbox' ),
+	], 200 );
+}

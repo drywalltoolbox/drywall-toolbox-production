@@ -12,6 +12,83 @@
 defined( 'ABSPATH' ) || exit;
 
 /**
+ * Count WooCommerce orders without materializing all matching IDs.
+ *
+ * @param array<string,mixed> $args WooCommerce order query args.
+ * @return int
+ */
+function dtb_admin_wc_order_count( array $args = [] ): int {
+	if ( ! function_exists( 'wc_get_orders' ) ) {
+		return 0;
+	}
+
+	$args = array_filter(
+		$args,
+		static fn( $value ): bool => null !== $value && '' !== $value && [] !== $value
+	);
+
+	if ( isset( $args['status'] ) && 1 === count( $args ) && function_exists( 'wc_orders_count' ) ) {
+		$status = is_array( $args['status'] ) ? array_map( 'sanitize_key', $args['status'] ) : [ sanitize_key( (string) $args['status'] ) ];
+		$total  = 0;
+		foreach ( $status as $single_status ) {
+			$total += (int) wc_orders_count( str_starts_with( $single_status, 'wc-' ) ? substr( $single_status, 3 ) : $single_status );
+		}
+		return $total;
+	}
+
+	$result = wc_get_orders( array_merge( $args, [
+		'limit'    => 1,
+		'paginate' => true,
+		'return'   => 'ids',
+	] ) );
+
+	return is_object( $result ) && isset( $result->total ) ? (int) $result->total : 0;
+}
+
+/**
+ * Compute WooCommerce order spend in bounded pages.
+ *
+ * @param array<string,mixed> $args      WooCommerce order query args.
+ * @param int                 $max_pages Maximum pages to inspect.
+ * @return array{total:float,count:int,partial:bool}
+ */
+function dtb_admin_wc_order_spend_summary( array $args, int $max_pages = 20 ): array {
+	$args = array_merge( $args, [
+		'limit'   => 50,
+		'orderby' => 'date',
+		'order'   => 'DESC',
+		'return'  => 'objects',
+	] );
+
+	$total       = 0.0;
+	$count       = 0;
+	$page        = 1;
+	$total_pages = 1;
+
+	do {
+		$result = wc_get_orders( array_merge( $args, [
+			'paged'    => $page,
+			'paginate' => true,
+		] ) );
+		$orders = is_object( $result ) && isset( $result->orders ) ? (array) $result->orders : (array) $result;
+		foreach ( $orders as $order ) {
+			if ( $order instanceof WC_Order ) {
+				$total += (float) $order->get_total();
+				$count++;
+			}
+		}
+		$total_pages = is_object( $result ) && isset( $result->max_num_pages ) ? max( 1, (int) $result->max_num_pages ) : 1;
+		$page++;
+	} while ( $page <= $total_pages && $page <= $max_pages );
+
+	return [
+		'total'   => $total,
+		'count'   => $count,
+		'partial' => $page <= $total_pages,
+	];
+}
+
+/**
  * Assemble customer context for a given customer resolved by email, user ID,
  * or WooCommerce order ID.
  *
@@ -120,6 +197,7 @@ function dtb_admin_build_customer_context( string $email, int $user_id, string $
 	// ── Order counts ────────────────────────────────────────────────────────────
 	$order_count    = 0;
 	$lifetime_spend = 0.0;
+	$lifetime_spend_partial = false;
 	$recent_orders  = [];
 
 	if ( function_exists( 'wc_get_orders' ) ) {
@@ -136,13 +214,22 @@ function dtb_admin_build_customer_context( string $email, int $user_id, string $
 		}
 
 		if ( $user_id || $email ) {
-			$all_orders = wc_get_orders( array_merge( $order_args, [ 'limit' => -1, 'fields' => 'ids' ] ) );
-			$order_count = is_array( $all_orders ) ? count( $all_orders ) : 0;
-			foreach ( (array) $all_orders as $all_order_id ) {
-				$spend_order = wc_get_order( $all_order_id );
-				if ( $spend_order instanceof WC_Order ) {
-					$lifetime_spend += (float) $spend_order->get_total();
+			if ( $user_id && class_exists( 'WC_Customer' ) ) {
+				try {
+					$wc_customer    = new WC_Customer( $user_id );
+					$order_count    = (int) $wc_customer->get_order_count();
+					$lifetime_spend = (float) $wc_customer->get_total_spent();
+				} catch ( Throwable $e ) {
+					$order_count = dtb_admin_wc_order_count( $order_args );
+					$spend       = dtb_admin_wc_order_spend_summary( $order_args );
+					$lifetime_spend = (float) $spend['total'];
+					$lifetime_spend_partial = (bool) $spend['partial'];
 				}
+			} else {
+				$order_count = dtb_admin_wc_order_count( $order_args );
+				$spend       = dtb_admin_wc_order_spend_summary( $order_args );
+				$lifetime_spend = (float) $spend['total'];
+				$lifetime_spend_partial = (bool) $spend['partial'];
 			}
 
 			$recent = wc_get_orders( array_merge( $order_args, [ 'limit' => 5 ] ) );
@@ -209,6 +296,7 @@ function dtb_admin_build_customer_context( string $email, int $user_id, string $
 		'open_repairs'   => $open_repairs,
 		'open_returns'   => $open_returns,
 		'lifetime_spend' => round( $lifetime_spend, 2 ),
+		'lifetime_spend_partial' => $lifetime_spend_partial,
 		'is_high_value'  => $is_high_value,
 		'risk_notes'     => $risk_notes,
 		'cached_at'      => gmdate( 'c' ),

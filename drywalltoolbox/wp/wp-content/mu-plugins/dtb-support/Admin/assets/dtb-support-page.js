@@ -497,9 +497,79 @@
 		return html;
 	}
 
+	function supportNextAction( ticket, intelligence ) {
+		intelligence = intelligence || {};
+		var next = intelligence.next_action || {};
+		if ( typeof next === 'string' ) {
+			next = { label: next, reason: '' };
+		}
+		return {
+			label: next.label || ticket.next_action_label || ticket.next_action || 'Review and respond',
+			reason: next.reason || ticket.next_action_reason || 'Keep the customer status current and use follow-ups for anything that should return to the queue later.',
+		};
+	}
+
+	function renderSupportCanonicalRail( ticket, payload, dueAt, dueRaw, created, updated ) {
+		var WB = window.DtbWorkbench || {};
+		var intelligence = ( payload && payload.intelligence ) || {};
+		var communication = ( payload && payload.communication ) || {};
+		var delivery = communication.delivery_health || {};
+		var customer = ( payload && ( payload.customer || payload.customer_context ) ) || {};
+		var linked = ( payload && payload.linked_records ) || {};
+		var integrations = ( payload && payload.integrations ) || {};
+		var macros = intelligence.recommended_macros || payload.recommended_macros || [];
+		var riskFlags = intelligence.risk_flags || [];
+		var next = supportNextAction( ticket, intelligence );
+		var failCount = parseInt( delivery.fail_count || ticket.notification_fail_count || 0, 10 ) || 0;
+		var status = delivery.status || ticket.notification_status || 'unknown';
+		var html = '';
+
+		html += '<div class="dtb-support-ticket-card"><h4>Intelligence</h4>';
+		html += '<div class="dtb-support-ticket-kv"><span>Priority score</span><strong>' + escHtml( intelligence.priority_score != null ? intelligence.priority_score : ticket.priority_score || 0 ) + '</strong></div>';
+		html += '<div class="dtb-support-ticket-kv"><span>Next action</span><strong>' + escHtml( next.label ) + '</strong></div>';
+		html += '<div class="dtb-support-ticket-kv"><span>Action due</span><strong' + ( dueRaw && new Date( dueRaw.replace( ' ', 'T' ) ) < new Date() ? ' class="dtb-kv-overdue"' : '' ) + '>' + escHtml( dueAt ) + '</strong></div>';
+		html += '<div class="dtb-support-ticket-kv"><span>Delivery</span><strong>' + escHtml( status ) + '</strong></div>';
+		if ( failCount > 0 ) {
+			html += '<div class="dtb-wb-note dtb-wb-note--danger">Outbox warnings: ' + escHtml( failCount ) + ' failed notification attempt(s).</div>';
+		}
+		if ( riskFlags.length ) {
+			html += '<div class="dtb-wb-note dtb-wb-note--warning">' + riskFlags.map( escHtml ).join( ', ' ) + '</div>';
+		}
+		html += '</div>';
+
+		html += '<div class="dtb-support-ticket-card"><h4>Ticket Snapshot</h4>';
+		html += '<div class="dtb-support-ticket-kv"><span>Status</span><strong>' + escHtml( ticket.status_label || ticket.status || '—' ) + '</strong></div>';
+		html += '<div class="dtb-support-ticket-kv"><span>Priority</span><strong>' + escHtml( ticket.priority_label || ticket.priority || '—' ) + '</strong></div>';
+		html += '<div class="dtb-support-ticket-kv"><span>Created</span><strong>' + escHtml( created ) + '</strong></div>';
+		html += '<div class="dtb-support-ticket-kv"><span>Updated</span><strong>' + escHtml( updated ) + '</strong></div>';
+		html += '</div>';
+
+		if ( WB.renderCustomerRail ) {
+			html += WB.renderCustomerRail( customer );
+		}
+		if ( WB.renderLinkedRecords ) {
+			html += '<div class="dtb-support-ticket-card"><h4>Linked Records</h4>' + WB.renderLinkedRecords( linked ) + '</div>';
+		}
+		if ( WB.renderIntegrationHealth ) {
+			html += '<div class="dtb-support-ticket-card"><h4>Integrations</h4>' + WB.renderIntegrationHealth( integrations ) + '</div>';
+		}
+		if ( macros.length ) {
+			html += '<div class="dtb-support-ticket-card"><h4>Recommended Macros</h4><ul class="dtb-support-rail-list">';
+			macros.forEach( function ( macro ) {
+				html += '<li>' + escHtml( macro.name || macro.label || macro.macro_name || 'Macro' ) + '</li>';
+			} );
+			html += '</ul></div>';
+		}
+
+		return html;
+	}
+
 	function renderTicketModal( els, payload ) {
-		var ticket = payload && payload.ticket ? payload.ticket : {};
-		var events = payload && payload.events ? payload.events : [];
+		state.currentPayload = payload || {};
+		var ticket = payload && ( payload.record || payload.ticket ) ? ( payload.record || payload.ticket ) : {};
+		var events = payload && ( payload.timeline || payload.events ) ? ( payload.timeline || payload.events ) : [];
+		var intelligence = ( payload && payload.intelligence ) || {};
+		var next = supportNextAction( ticket, intelligence );
 		var ticketLabel = ticket.ticket_number || ( '#' + ( ticket.id || '' ) );
 		var customerName = ticket.customer_name || ticket.customer_email || 'Customer';
 		var customerEmail = ticket.customer_email || '';
@@ -609,8 +679,8 @@
 			// ── Panel: Actions ─────────────────────────────────────────────────
 			+ '<div class="dtb-support-modal-panel dtb-support-actions-panel" data-dtb-modal-panel="actions">'
 			+ '<div class="dtb-support-action-summary">'
-			+ '<div><span class="dtb-support-form-label">Recommended next step</span><strong>' + escHtml( ticket.next_action_label || ticket.next_action || 'Review and respond' ) + '</strong></div>'
-			+ '<p>' + escHtml( ticket.next_action_reason || 'Keep the customer status current and use follow-ups for anything that should return to the queue later.' ) + '</p>'
+			+ '<div><span class="dtb-support-form-label">Recommended next step</span><strong>' + escHtml( next.label ) + '</strong></div>'
+			+ '<p>' + escHtml( next.reason ) + '</p>'
 			+ '</div>'
 			+ '<form class="dtb-support-actions-form">'
 			+ '<div class="dtb-support-actions-grid">'
@@ -650,19 +720,7 @@
 
 			// ── Right sidebar — always-visible context ─────────────────────────
 			+ '<aside class="dtb-support-ticket-context">'
-			+ '<div class="dtb-support-ticket-card"><h4>Ticket Snapshot</h4>'
-			+ '<div class="dtb-support-ticket-kv"><span>Ticket</span><strong>' + escHtml( ticketLabel ) + '</strong></div>'
-			+ '<div class="dtb-support-ticket-kv"><span>Status</span><strong>' + escHtml( status ) + '</strong></div>'
-			+ '<div class="dtb-support-ticket-kv"><span>Priority</span><strong>' + escHtml( priority ) + '</strong></div>'
-			+ '<div class="dtb-support-ticket-kv"><span>Action Due</span><strong' + ( dueRaw && new Date( dueRaw.replace( ' ', 'T' ) ) < new Date() ? ' class="dtb-kv-overdue"' : '' ) + '>' + escHtml( dueAt ) + '</strong></div>'
-			+ '<div class="dtb-support-ticket-kv"><span>Created</span><strong>' + escHtml( created ) + '</strong></div>'
-			+ '<div class="dtb-support-ticket-kv"><span>Updated</span><strong>' + escHtml( updated ) + '</strong></div>'
-			+ '</div>'
-			+ '<div class="dtb-support-ticket-card"><h4>Customer</h4>'
-			+ '<div class="dtb-support-ticket-kv"><span>Name</span><strong>' + escHtml( ticket.customer_name || '—' ) + '</strong></div>'
-			+ '<div class="dtb-support-ticket-kv"><span>Email</span><strong>' + escHtml( ticket.customer_email || '—' ) + '</strong></div>'
-			+ '<div class="dtb-support-ticket-kv"><span>Order</span><strong>' + escHtml( orderId ) + '</strong></div>'
-			+ '</div>'
+			+ renderSupportCanonicalRail( ticket, payload || {}, dueAt, dueRaw, created, updated )
 			+ '</aside>'
 
 			+ '</div>' // .dtb-support-ticket-modal__body
@@ -1081,6 +1139,21 @@
 			var priorityVal = ( form.querySelector( '[name="priority"]' ) || {} ).value || '';
 			var noteVal = ( form.querySelector( '[name="note"]' ) || {} ).value || '';
 			var body = {};
+			var closing = [ 'resolved', 'resolved_pending_close', 'closed' ].indexOf( statusVal ) !== -1;
+			if ( closing && ! noteVal.trim() ) {
+				if ( statusEl ) {
+					statusEl.textContent = 'Add a resolution note before closing this ticket.';
+					statusEl.className = 'dtb-support-form-status is-error';
+				}
+				return;
+			}
+			if ( closing ) {
+				var linked = ( state.currentPayload && state.currentPayload.linked_records ) || {};
+				var hasWarnings = ( Array.isArray( linked.warnings ) && linked.warnings.length ) || ( Array.isArray( linked.mismatches ) && linked.mismatches.length );
+				if ( hasWarnings && ! window.confirm( 'Linked record warnings exist. Close this ticket anyway?' ) ) {
+					return;
+				}
+			}
 			if ( statusVal ) { body.status = statusVal; }
 			if ( priorityVal ) { body.priority = priorityVal; }
 			if ( noteVal.trim() ) { body.note = noteVal; }

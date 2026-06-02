@@ -38,7 +38,7 @@ function dtb_command_center_get_dashboard_data(): array {
 	$admin = admin_url( 'admin.php' );
 
 	$model['links'] = [
-		'orders_attention'   => add_query_arg( [ 'page' => 'dtb-orders',  'status' => 'on-hold' ], $admin ),
+		'orders_attention'   => add_query_arg( [ 'page' => 'dtb-orders',  'status' => 'attention' ], $admin ),
 		'orders_failed'      => add_query_arg( [ 'page' => 'dtb-orders',  'status' => 'failed' ], $admin ),
 		'orders_processing'  => add_query_arg( [ 'page' => 'dtb-orders',  'status' => 'processing' ], $admin ),
 		'repairs_review'     => add_query_arg( [ 'page' => 'dtb-repairs', 'status' => 'review' ], $admin ),

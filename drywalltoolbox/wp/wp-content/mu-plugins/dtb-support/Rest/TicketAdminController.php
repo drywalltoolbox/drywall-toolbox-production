@@ -752,7 +752,16 @@ function dtb_support_rest_update_ticket( WP_REST_Request $request ): WP_REST_Res
 
 	// Status transition.
 	if ( ! empty( $request['status'] ) && $request['status'] !== $ticket->status ) {
-		$result = dtb_support_do_transition( $ticket_id, $request['status'], $request['note'] ?? '', $actor_id );
+		$next_status = sanitize_key( (string) $request['status'] );
+		$note        = sanitize_textarea_field( (string) ( $request['note'] ?? '' ) );
+		if ( in_array( $next_status, [ 'resolved', 'resolved_pending_close', 'closed' ], true ) && '' === trim( $note ) ) {
+			return new WP_REST_Response( [
+				'success' => false,
+				'message' => __( 'A resolution note is required before closing or resolving a support ticket.', 'drywall-toolbox' ),
+			], 422 );
+		}
+
+		$result = dtb_support_do_transition( $ticket_id, $next_status, $note, $actor_id );
 		if ( is_wp_error( $result ) ) {
 			return new WP_REST_Response( [ 'success' => false, 'message' => $result->get_error_message() ], 422 );
 		}

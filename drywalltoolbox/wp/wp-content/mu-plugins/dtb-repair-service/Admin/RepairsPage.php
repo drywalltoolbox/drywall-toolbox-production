@@ -336,7 +336,9 @@ function dtb_repairs_render_queue_row( int $repair_id ): void {
 	$next_action = function_exists( 'dtb_admin_compute_next_best_action' )
 		? dtb_admin_compute_next_best_action( 'repair', [ 'id' => $repair_id, 'status' => $status ] )
 		: [];
-	$na_label    = (string) ( $next_action['label'] ?? ucwords( str_replace( '_', ' ', $status ) ) );
+	$na_label    = is_array( $next_action )
+		? (string) ( $next_action['label'] ?? ucwords( str_replace( '_', ' ', $status ) ) )
+		: (string) ( $next_action ?: ucwords( str_replace( '_', ' ', $status ) ) );
 	$na_type     = 'muted';
 	if ( in_array( $status, [ 'submitted', 'reviewed', 'awaiting_customer', 'approved', 'quoted' ], true ) ) {
 		$na_type = 'warning';

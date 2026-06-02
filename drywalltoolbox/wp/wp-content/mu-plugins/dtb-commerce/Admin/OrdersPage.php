@@ -24,7 +24,7 @@ function dtb_orders_render_page(): void {
 	if ( '' === $status && '' !== $status_tab ) {
 		$status = $status_tab;
 	}
-	// 'attention' pseudo-tab maps to a multi-status query (handled below).
+	$status = function_exists( 'dtb_orders_admin_normalize_filter' ) ? dtb_orders_admin_normalize_filter( $status ) : $status;
 	$search  = sanitize_text_field( $_GET['s'] ?? '' ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 	$live_search = sanitize_text_field( $_GET['search'] ?? '' ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 	if ( '' === $search && '' !== $live_search ) {
@@ -33,13 +33,12 @@ function dtb_orders_render_page(): void {
 	$paged   = max( 1, (int) ( $_GET['paged'] ?? 1 ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 	$per     = (int) get_option( 'dtb_admin_items_per_page', 25 );
 	$base    = admin_url( 'admin.php?page=dtb-orders' );
-	// KPI counts — lightweight wc_get_orders id-only queries for tab badges.
-	$kpi_attention  = count( wc_get_orders( [ 'limit' => -1, 'return' => 'ids', 'status' => [ 'wc-on-hold', 'wc-failed', 'wc-pending' ] ] ) );
-	$kpi_processing = count( wc_get_orders( [ 'limit' => -1, 'return' => 'ids', 'status' => 'wc-processing' ] ) );
-	$kpi_on_hold    = count( wc_get_orders( [ 'limit' => -1, 'return' => 'ids', 'status' => 'wc-on-hold' ] ) );
-	$kpi_pending    = count( wc_get_orders( [ 'limit' => -1, 'return' => 'ids', 'status' => 'wc-pending' ] ) );
-	$kpi_failed     = count( wc_get_orders( [ 'limit' => -1, 'return' => 'ids', 'status' => 'wc-failed' ] ) );
-	$kpi_total      = count( wc_get_orders( [ 'limit' => -1, 'return' => 'ids' ] ) );
+	$kpi_attention  = dtb_orders_admin_count( 'attention' );
+	$kpi_processing = dtb_orders_admin_count( 'processing' );
+	$kpi_on_hold    = dtb_orders_admin_count( 'on-hold' );
+	$kpi_pending    = dtb_orders_admin_count( 'pending' );
+	$kpi_failed     = dtb_orders_admin_count( 'failed' );
+	$kpi_total      = dtb_orders_admin_count();
 
 	$status_tabs = [
 		[ 'id' => 'all',        'label' => __( 'All', 'drywall-toolbox' ),              'active' => $status === '' || $status === 'all', 'url' => $base ],
@@ -129,29 +128,8 @@ function dtb_orders_render_page(): void {
 	echo dtb_admin_ui_toolbar_close();
 
 	// Query orders.
-	$query_args = [
-		'limit'  => $per,
-		'paged'  => $paged,
-		'return' => 'objects',
-	];
-	// 'attention' pseudo-status queries on-hold + failed + pending in one call.
-	if ( 'attention' === $status ) {
-		$query_args['status'] = [ 'wc-on-hold', 'wc-failed', 'wc-pending' ];
-	} elseif ( $status ) {
-		$query_args['status'] = str_starts_with( $status, 'wc-' ) ? $status : 'wc-' . $status;
-	}
-	if ( $search ) {
-		$query_args['s'] = $search;
-	}
-	// Total count for pagination (separate lightweight query).
-	$count_args = [ 'limit' => -1, 'return' => 'ids' ];
-	if ( 'attention' === $status ) {
-		$count_args['status'] = [ 'wc-on-hold', 'wc-failed', 'wc-pending' ];
-	} elseif ( $status ) {
-		$count_args['status'] = str_starts_with( $status, 'wc-' ) ? $status : 'wc-' . $status;
-	}
-	if ( $search ) $count_args['s'] = $search;
-	$total_count = count( wc_get_orders( $count_args ) );
+	$query_args  = dtb_orders_admin_build_query_args( $status, $search, $paged, $per );
+	$total_count = dtb_orders_admin_count( $status, $search );
 	$total_pages = $per > 0 ? (int) ceil( $total_count / $per ) : 1;
 
 	$orders = wc_get_orders( $query_args );
@@ -194,6 +172,7 @@ function dtb_orders_render_page(): void {
 
 		echo '<tr class="dtb-table__row dtb-table__row--clickable"'
 			. ' data-dtb-drawer="dtb-orders-detail-drawer"'
+			. ' data-dtb-open-order="' . esc_attr( (string) $order_id ) . '"'
 			. ' data-dtb-drawer-title="' . esc_attr( sprintf( __( 'Order #%s', 'drywall-toolbox' ), $order_id ) ) . '"'
 			. ' data-dtb-field-orderid="' . esc_attr( '#' . $order_id ) . '"'
 			. ' data-dtb-field-customer="' . esc_attr( $order->get_formatted_billing_full_name() ?: __( 'Guest', 'drywall-toolbox' ) ) . '"'
@@ -209,9 +188,10 @@ function dtb_orders_render_page(): void {
 		echo '<td class="dtb-table__cell">';
 		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		echo dtb_admin_ui_button( __( 'View', 'drywall-toolbox' ), [
-			'href' => get_edit_post_link( $order_id ),
+			'href' => '#',
 			'size' => 'xs',
 			'type' => 'ghost',
+			'data' => [ 'dtb-open-order' => $order_id ],
 		] );
 		echo '</td>';
 		echo '</tr>';
@@ -236,6 +216,21 @@ function dtb_orders_render_page(): void {
 			. esc_html__( 'View Full Order', 'drywall-toolbox' )
 		. '</a>'
 	);
+	?>
+	<div id="dtb-orders-modal" class="dtb-modal-overlay" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="dtb-orders-modal-title" hidden>
+		<div class="dtb-modal dtb-modal--fullscreen">
+			<header class="dtb-modal__header">
+				<div>
+					<h2 id="dtb-orders-modal-title" class="dtb-modal__title"><?php esc_html_e( 'Order', 'drywall-toolbox' ); ?></h2>
+					<p class="dtb-modal__meta"><?php esc_html_e( 'Order workbench', 'drywall-toolbox' ); ?></p>
+				</div>
+				<button type="button" class="dtb-modal__close" aria-label="<?php esc_attr_e( 'Close', 'drywall-toolbox' ); ?>">&times;</button>
+			</header>
+			<div class="dtb-modal__body"></div>
+			<footer class="dtb-modal__footer"></footer>
+		</div>
+	</div>
+	<?php
 	// Update the View Full Order href when drawer populates from a row click.
 	?>
 	<script>

@@ -184,15 +184,23 @@ function dtb_admin_get_workflow_definitions(): array {
 			'queue_filters'             => [
 				'attention'  => [
 					'label'    => __( 'Attention', 'drywall-toolbox' ),
-					'statuses' => [ 'on-hold' ],
+					'statuses' => [ 'on-hold', 'failed', 'pending' ],
 				],
 				'failed'     => [
 					'label'    => __( 'Failed', 'drywall-toolbox' ),
 					'statuses' => [ 'failed' ],
 				],
+				'pending'    => [
+					'label'    => __( 'Pending Payment', 'drywall-toolbox' ),
+					'statuses' => [ 'pending' ],
+				],
 				'processing' => [
 					'label'    => __( 'Processing', 'drywall-toolbox' ),
 					'statuses' => [ 'processing' ],
+				],
+				'completed'  => [
+					'label'    => __( 'Completed', 'drywall-toolbox' ),
+					'statuses' => [ 'completed' ],
 				],
 			],
 			'next_best_action_defaults' => [

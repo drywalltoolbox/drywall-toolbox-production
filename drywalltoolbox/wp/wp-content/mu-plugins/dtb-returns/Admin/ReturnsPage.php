@@ -210,18 +210,18 @@ function dtb_returns_render_page(): void {
 		$resolution  = ucwords( str_replace( '_', ' ', $item->resolution ) );
 		$rma_label   = $item->rma_number ?? ( '#' . $item->id );
 
-		// Derive next action from status.
-		$next_action_map = [
-			'pending_review' => [ __( 'Review Request', 'drywall-toolbox' ), 'warning' ],
-			'approved'       => [ __( 'Awaiting Drop-off', 'drywall-toolbox' ), 'primary' ],
-			'awaiting_item'  => [ __( 'Monitor Transit', 'drywall-toolbox' ), 'primary' ],
-			'item_received'  => [ __( 'Inspect Item', 'drywall-toolbox' ), 'warning' ],
-			'refund_issued'  => [ __( 'Confirm Refund', 'drywall-toolbox' ), 'success' ],
-			'exchange_sent'  => [ __( 'Track Exchange', 'drywall-toolbox' ), 'info' ],
-			'closed'         => [ __( 'Closed', 'drywall-toolbox' ), 'muted' ],
-		];
 		$status_val = $item->status->value();
-		[ $na_label, $na_type ] = $next_action_map[ $status_val ] ?? [ ucwords( str_replace( '_', ' ', $status_val ) ), 'muted' ];
+		$na_label = function_exists( 'dtb_admin_compute_next_best_action' )
+			? dtb_admin_compute_next_best_action( 'returns', [
+				'id'       => (int) $item->id,
+				'status'   => $status_val,
+				'order_id' => (int) $item->order_id,
+				'resolution' => (string) $item->resolution,
+			] )
+			: ucwords( str_replace( '_', ' ', $status_val ) );
+		$na_type = in_array( $status_val, [ 'pending_review', 'item_received' ], true )
+			? 'warning'
+			: ( in_array( $status_val, [ 'refund_issued', 'exchange_sent' ], true ) ? 'success' : 'muted' );
 
 		echo '<tr class="dtb-table__row dtb-table__row--clickable dtb-returns-row"'
 			. ' data-dtb-return-id="' . esc_attr( (string) $item->id ) . '"'

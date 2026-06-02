@@ -641,6 +641,7 @@
 			open_ticket: 'ticket',
 			open_return: 'return',
 			open_repair: 'repair',
+			open_order: 'order',
 		};
 		Object.keys( paramMap ).forEach( function ( param ) {
 			var val = params.get( param );
