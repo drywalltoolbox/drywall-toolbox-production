@@ -121,6 +121,22 @@ function dtb_admin_assets_enqueue(): void {
 		);
 	}
 
+	// ── Shared admin chat component ──
+	$admin_chat_js_file = $assets_dir . 'dtb-admin-chat.js';
+	if ( file_exists( $admin_chat_js_file ) ) {
+		$admin_chat_js_deps = [ 'dtb-admin' ];
+		if ( wp_script_is( 'dtb-admin-workbench', 'enqueued' ) ) {
+			$admin_chat_js_deps[] = 'dtb-admin-workbench';
+		}
+		wp_enqueue_script(
+			'dtb-admin-chat',
+			$assets_url . 'dtb-admin-chat.js',
+			$admin_chat_js_deps,
+			(string) filemtime( $admin_chat_js_file ),
+			true
+		);
+	}
+
 	$current_user = wp_get_current_user();
 
 	// ── Module-specific CSS (declared by page metadata) ──
@@ -160,6 +176,9 @@ function dtb_admin_assets_enqueue(): void {
 			}
 			if ( wp_script_is( 'dtb-admin-workbench-actions', 'enqueued' ) ) {
 				$js_deps[] = 'dtb-admin-workbench-actions';
+			}
+			if ( wp_script_is( 'dtb-admin-chat', 'enqueued' ) ) {
+				$js_deps[] = 'dtb-admin-chat';
 			}
 
 			wp_enqueue_script(
