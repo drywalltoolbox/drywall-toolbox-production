@@ -247,11 +247,40 @@ function dtb_returns_rest_public_submit( WP_REST_Request $request ): WP_REST_Res
 		wp_mail( $admin_to, $subject, $body, $headers );
 	}
 
+	$status_url = add_query_arg( [ 'token' => $public_token ], home_url( '/returns/status/' . $return_id ) );
+	$customer_subject = sprintf( '[%s] Return request received — #%d', $site_name, $return_id );
+	$customer_body  = "Hi {$customer_name},\n\n";
+	$customer_body .= "We received your return request for order {$order_number}.\n\n";
+	$customer_body .= "Return reference: #{$return_id}\n";
+	$customer_body .= "Current status: Pending Review\n\n";
+	$customer_body .= "Track your return status here:\n{$status_url}\n\n";
+	$customer_body .= "Please do not ship items back until our team sends your RMA instructions.\n\n";
+	$customer_body .= "{$site_name} Support Team\n";
+	$customer_headers = [
+		'Content-Type: text/plain; charset=UTF-8',
+		'Reply-To: ' . $site_name . ' Support <' . get_option( 'admin_email' ) . '>',
+	];
+
+	if ( is_email( $customer_email ) ) {
+		if ( function_exists( 'dtb_send_email' ) ) {
+			dtb_send_email( [
+				'to'           => $customer_email,
+				'subject'      => $customer_subject,
+				'message'      => $customer_body,
+				'headers'      => $customer_headers,
+				'content_type' => 'text/plain',
+				'context'      => [ 'module' => 'dtb-returns', 'route' => 'public-submit-customer' ],
+			] );
+		} else {
+			wp_mail( $customer_email, $customer_subject, $customer_body, $customer_headers );
+		}
+	}
+
 	return new WP_REST_Response(
 		[
 			'return_id'    => $return_id,
 			'public_token' => $public_token,
-			'status_url'   => add_query_arg( [ 'token' => $public_token ], home_url( '/returns/status/' . $return_id ) ),
+			'status_url'   => $status_url,
 			'message'      => __( 'Return request submitted successfully.', 'drywall-toolbox' ),
 		],
 		201

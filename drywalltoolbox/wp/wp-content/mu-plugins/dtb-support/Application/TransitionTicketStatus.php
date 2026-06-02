@@ -58,6 +58,7 @@ function dtb_support_do_transition( int $ticket_id, string $new_status, string $
 					'ticket_number' => $fresh->ticket_number,
 					'subject'       => $fresh->subject,
 					'customer_name' => $fresh->customer_name,
+					'status_url'    => function_exists( 'dtb_support_public_status_url' ) ? dtb_support_public_status_url( $fresh ) : '',
 				]
 			);
 		}
@@ -74,6 +75,7 @@ function dtb_support_do_transition( int $ticket_id, string $new_status, string $
 					'ticket_number' => $fresh->ticket_number,
 					'subject'       => $fresh->subject,
 					'customer_name' => $fresh->customer_name,
+					'status_url'    => function_exists( 'dtb_support_public_status_url' ) ? dtb_support_public_status_url( $fresh ) : '',
 				]
 			);
 		}

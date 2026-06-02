@@ -48,7 +48,8 @@ function dtb_support_render_macro( string $template, object $ticket ): string {
 		'{{order_id}}'      => ! empty( $ticket->order_id ) ? (string) $ticket->order_id : '',
 		'{{support_email}}' => function_exists( 'dtb_support_email_from' ) ? dtb_support_email_from() : (string) get_option( 'admin_email', '' ),
 		'{{site_name}}'     => function_exists( 'dtb_str_normalize_display' ) ? dtb_str_normalize_display( (string) get_bloginfo( 'name' ) ) : (string) get_bloginfo( 'name' ),
-		'{{ticket_url}}'    => admin_url( 'admin.php?page=dtb-support&ticket_id=' . (int) ( $ticket->id ?? 0 ) ),
+		'{{ticket_url}}'    => function_exists( 'dtb_support_public_status_url' ) ? dtb_support_public_status_url( $ticket ) : home_url( '/support/status/' . (int) ( $ticket->id ?? 0 ) ),
+		'{{admin_ticket_url}}' => admin_url( 'admin.php?page=dtb-support&ticket_id=' . (int) ( $ticket->id ?? 0 ) ),
 	];
 
 	$rendered = strtr( $template, $replacements );
