@@ -53,13 +53,21 @@ export default function usePublicStatus( id, token, fetcher, terminalStatuses = 
     }
   }, [ clearTimer, fetcher, id, scheduleNextPoll, terminalStatuses, token ] );
 
-  fetchStatusRef.current = fetchStatus;
+  useEffect( () => {
+    fetchStatusRef.current = fetchStatus;
+  }, [ fetchStatus ] );
 
   useEffect( () => {
     cancelledRef.current = false;
-    fetchStatus( false );
+    const initialTimer = setTimeout( () => {
+      if ( ! cancelledRef.current && typeof fetchStatusRef.current === 'function' ) {
+        fetchStatusRef.current( false );
+      }
+    }, 0 );
+
     return () => {
       cancelledRef.current = true;
+      clearTimeout( initialTimer );
       clearTimer();
     };
   }, [ clearTimer, fetchStatus ] );
