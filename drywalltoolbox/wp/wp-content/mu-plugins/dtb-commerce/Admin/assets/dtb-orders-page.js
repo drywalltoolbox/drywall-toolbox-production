@@ -23,17 +23,13 @@
 		return modal ? modal.querySelector( '.dtb-modal__footer' ) : null;
 	}
 
-	function editUrl( record, linked ) {
+	// Returns the WooCommerce post.php edit URL for fallback use only.
+	// The linked-records URL fallback was intentionally removed; order URLs are
+	// available inside the linked records panel, not as a primary footer CTA.
+	function editUrl( record ) {
 		if ( record && record.id ) {
 			var adminUrl = ( window.dtbAdminConfig && window.dtbAdminConfig.adminUrl ) || '/wp-admin/admin.php';
 			return adminUrl.replace( /admin\.php.*$/, '' ) + 'post.php?post=' + encodeURIComponent( record.id ) + '&action=edit';
-		}
-		if ( linked && Array.isArray( linked.records ) ) {
-			for ( var i = 0; i < linked.records.length; i++ ) {
-				if ( linked.records[ i ].module === 'order' && linked.records[ i ].url ) {
-					return linked.records[ i ].url;
-				}
-			}
 		}
 		return '';
 	}
@@ -74,14 +70,84 @@
 
 	function renderActions( payload ) {
 		var perms = payload.permissions || {};
+		var linked = payload.linked_records || {};
+		var workflow = payload.workflow || {};
 		var html = '<div class="dtb-wb-command-bar dtb-orders-command-bar">';
 		if ( perms.can_refresh ) {
 			html += '<button type="button" class="button" data-dtb-order-action="refresh_snapshot">Refresh Snapshot</button>';
 		}
-		if ( perms.can_retry_sync ) {
-			html += '<button type="button" class="button" data-dtb-order-action="retry_veeqo">Retry Veeqo</button>';
-			html += '<button type="button" class="button" data-dtb-order-action="retry_quickbooks">Retry QuickBooks</button>';
+		html += '</div>';
+
+		// Workflow transitions (server-provided, not hardcoded).
+		var allowed = Array.isArray( workflow.allowed_transitions ) ? workflow.allowed_transitions : [];
+		var labels = workflow.labels || {};
+		if ( perms.can_manage_status && allowed.length ) {
+			html += '<div class="dtb-wb-section" style="padding:1rem">';
+			html += '<h3 class="dtb-wb-section__title">Transition status</h3>';
+			html += '<div style="display:flex;flex-wrap:wrap;gap:.5rem">';
+			allowed.forEach( function ( s ) {
+				var label = labels[ s ] || s.replace( /_/g, ' ' );
+				html += '<button type="button" class="button dtb-orders-transition-btn" data-status="' + WB.escapeHtml( s ) + '">' + WB.escapeHtml( label ) + '</button>';
+			} );
+			html += '</div></div>';
 		}
+
+		// Linked records — quick-open buttons.
+		var ticketIds = Array.isArray( linked.ticket_ids ) ? linked.ticket_ids : [];
+		var returnIds = Array.isArray( linked.return_ids ) ? linked.return_ids : [];
+		var repairIds = Array.isArray( linked.repair_ids ) ? linked.repair_ids : [];
+		if ( ticketIds.length || returnIds.length || repairIds.length ) {
+			html += '<div class="dtb-wb-section" style="padding:1rem">';
+			html += '<h3 class="dtb-wb-section__title">Linked records</h3>';
+			html += '<div style="display:flex;flex-wrap:wrap;gap:.5rem">';
+			ticketIds.forEach( function ( id ) {
+				html += '<button type="button" class="button dtb-wb-open-record-btn" data-dtb-open-module="support" data-dtb-open-record-id="' + WB.escapeHtml( String( id ) ) + '">Support #' + WB.escapeHtml( String( id ) ) + '</button>';
+			} );
+			returnIds.forEach( function ( id ) {
+				html += '<button type="button" class="button dtb-wb-open-record-btn" data-dtb-open-module="returns" data-dtb-open-record-id="' + WB.escapeHtml( String( id ) ) + '">Return #' + WB.escapeHtml( String( id ) ) + '</button>';
+			} );
+			repairIds.forEach( function ( id ) {
+				html += '<button type="button" class="button dtb-wb-open-record-btn" data-dtb-open-module="repair" data-dtb-open-record-id="' + WB.escapeHtml( String( id ) ) + '">Repair #' + WB.escapeHtml( String( id ) ) + '</button>';
+			} );
+			html += '</div></div>';
+		}
+
+		// Integration retries are available via System Manager only (not primary actions).
+		if ( perms.can_retry_sync ) {
+			var sysUrl = ( ( window.dtbAdminConfig && window.dtbAdminConfig.adminUrl ) || '/wp-admin/admin.php' )
+				.replace( /admin\.php.*$/, 'admin.php' ) + '?page=dtb-system-manager';
+			html += '<div class="dtb-wb-section" style="padding:.5rem 1rem">';
+			html += '<p class="dtb-wb-note dtb-wb-note--info">Integration retries (Veeqo, QuickBooks) are available in <a href="' + WB.escapeHtml( sysUrl ) + '" target="_blank" rel="noopener">System Manager ↗</a>.</p>';
+			html += '</div>';
+		}
+
+		return html;
+	}
+
+	function renderRecordIssues( integrations ) {
+		var blockerKeys = [ 'sync_failed', 'notification_failed', 'payment_failed', 'shipping_blocked', 'refund_unavailable' ];
+		var issues = [];
+		var sysUrl = ( window.dtbAdminConfig && window.dtbAdminConfig.adminUrl
+			? window.dtbAdminConfig.adminUrl.replace( /admin\.php.*$/, 'admin.php' )
+			: '/wp-admin/admin.php' )
+			+ '?page=dtb-system-manager';
+		Object.keys( integrations || {} ).forEach( function ( key ) {
+			var item = integrations[ key ] || {};
+			var status = item.status || item.state || '';
+			if ( status !== 'error' && status !== 'failed' && blockerKeys.indexOf( key ) === -1 ) { return; }
+			var err = item.last_error || item.error || item.last_error_code || null;
+			issues.push( { label: item.label || key, error: err, url: sysUrl } );
+		} );
+		if ( ! issues.length ) { return ''; }
+		var html = '<div class="dtb-wb-record-issues">';
+		html += '<div class="dtb-wb-record-issues__title">Record Issues</div>';
+		issues.forEach( function ( issue ) {
+			html += '<div class="dtb-wb-note dtb-wb-note--error">';
+			html += WB.escapeHtml( issue.label );
+			if ( issue.error ) { html += ' — ' + WB.escapeHtml( issue.error ); }
+			html += ' <a href="' + WB.escapeHtml( issue.url ) + '">System Manager ↗</a>';
+			html += '</div>';
+		} );
 		html += '</div>';
 		return html;
 	}
@@ -98,15 +164,21 @@
 		var footer = footerEl();
 		if ( ! body ) { return; }
 
+		var tabs = [ 'overview', 'customer', 'linked', 'timeline', 'actions' ];
+		var tabLabels = { overview: 'Overview', customer: 'Customer', linked: 'Linked', timeline: 'Timeline', actions: 'Actions' };
+
 		var html = '<div class="dtb-orders-workbench">';
 		html += '<nav class="dtb-modal-tabs" role="tablist">';
-		[ 'overview', 'customer', 'linked', 'integrations', 'timeline', 'actions' ].forEach( function ( tab, index ) {
-			html += '<button type="button" class="dtb-modal-tab' + ( index === 0 ? ' dtb-modal-tab--active' : '' ) + '" data-dtb-tab="' + tab + '" aria-selected="' + ( index === 0 ? 'true' : 'false' ) + '">' + WB.escapeHtml( tab.charAt( 0 ).toUpperCase() + tab.slice( 1 ) ) + '</button>';
+		tabs.forEach( function ( tab, index ) {
+			html += '<button type="button" class="dtb-modal-tab' + ( index === 0 ? ' dtb-modal-tab--active' : '' ) + '" data-dtb-tab="' + tab + '" aria-selected="' + ( index === 0 ? 'true' : 'false' ) + '">' + WB.escapeHtml( tabLabels[ tab ] ) + '</button>';
 		} );
 		html += '</nav>';
 
+		var issuesHtml = renderRecordIssues( payload.integrations || {} );
+
 		html += '<div class="dtb-modal-tab-panel dtb-modal-tab-panel--active" data-dtb-tab="overview">';
 		html += '<div class="dtb-orders-overview-grid">';
+		if ( issuesHtml ) { html += issuesHtml; }
 		html += '<div class="dtb-wb-card"><div class="dtb-wb-card__title">Order</div><div class="dtb-wb-card__body">';
 		html += WB.renderKeyValue( 'Order', '#' + WB.escapeHtml( record.id || '' ) );
 		html += WB.renderKeyValue( 'Status', WB.renderStatusBadge( workflow.status || record.status, workflow.label || record.status_label ) );
@@ -125,15 +197,16 @@
 
 		html += '<div class="dtb-modal-tab-panel" data-dtb-tab="customer" hidden>' + WB.renderCustomerRail( payload.customer || {} ) + '</div>';
 		html += '<div class="dtb-modal-tab-panel" data-dtb-tab="linked" hidden>' + WB.renderLinkedRecords( linked ) + '</div>';
-		html += '<div class="dtb-modal-tab-panel" data-dtb-tab="integrations" hidden>' + WB.renderIntegrationHealth( payload.integrations || {} ) + '</div>';
 		html += '<div class="dtb-modal-tab-panel" data-dtb-tab="timeline" hidden>' + WB.renderTimeline( payload.timeline || [] ) + '</div>';
 		html += '<div class="dtb-modal-tab-panel" data-dtb-tab="actions" hidden>' + renderActions( payload ) + '</div>';
 		html += '</div>';
 
 		body.innerHTML = html;
 		if ( footer ) {
-			var url = editUrl( record, linked );
-			footer.innerHTML = url ? '<a class="button button-primary" href="' + WB.escapeHtml( url ) + '">Open WooCommerce Order</a>' : '';
+			var url = editUrl( record );
+			footer.innerHTML = url
+				? '<span class="dtb-wb-fallback-links">Fallback: <a class="button button-small" href="' + WB.escapeHtml( url ) + '" target="_blank">WooCommerce order ↗</a></span>'
+				: '';
 		}
 	}
 
@@ -161,14 +234,38 @@
 		fetchOrder( orderId );
 	}
 
+	function runTransition( toStatus, button ) {
+		if ( ! state.orderId || ! toStatus ) { return; }
+		WB.lockAction( button, 'Working…' );
+		var opNonce = Math.random().toString( 36 ).slice( 2, 8 );
+		WB.apiFetch( 'dtb/v1/admin/orders/' + encodeURIComponent( state.orderId ) + '/actions', {
+			method: 'POST',
+			body: {
+				action_type: 'transition',
+				to_status:   toStatus,
+				idempotency_key: 'orders-' + state.orderId + '-transition-' + toStatus,
+			},
+		} ).then( function ( data ) {
+			WB.showToast( data.message || 'Order status updated.', 'success' );
+			renderWorkbench( data.detail || state.payload || {} );
+		} ).catch( function ( err ) {
+			WB.showToast( err.message || 'Transition failed.', 'error' );
+		} ).finally( function () {
+			WB.unlockAction( button );
+		} );
+	}
+
 	function runAction( action, button ) {
 		if ( ! state.orderId || ! action ) { return; }
 		WB.lockAction( button, 'Working…' );
+		// Derive idempotency key: record + action + short per-click nonce so the same
+		// action can be repeated without being blocked by the server-side idempotency cache.
+		var opNonce = Math.random().toString( 36 ).slice( 2, 8 );
 		WB.apiFetch( 'dtb/v1/admin/orders/' + encodeURIComponent( state.orderId ) + '/actions', {
 			method: 'POST',
 			body: {
 				action_type: action,
-				idempotency_key: 'orders-' + state.orderId + '-' + action + '-' + Date.now(),
+				idempotency_key: 'orders-' + state.orderId + '-' + action + '-' + opNonce,
 			},
 		} ).then( function ( data ) {
 			WB.showToast( data.message || 'Order action queued.', 'success' );
@@ -185,6 +282,27 @@
 		if ( actionButton ) {
 			event.preventDefault();
 			runAction( actionButton.getAttribute( 'data-dtb-order-action' ), actionButton );
+			return;
+		}
+
+		// Transition button inside the modal actions panel.
+		var transBtn = event.target.closest ? event.target.closest( '#' + MODAL_ID + ' .dtb-orders-transition-btn' ) : null;
+		if ( transBtn ) {
+			event.preventDefault();
+			var toStatus = transBtn.getAttribute( 'data-status' );
+			WB.confirmDanger( 'Transition order to "' + toStatus.replace( /_/g, ' ' ) + '"?', function () {
+				runTransition( toStatus, transBtn );
+			} );
+			return;
+		}
+
+		// Open linked record buttons (dispatch module-specific deeplink event).
+		var openBtn = event.target.closest ? event.target.closest( '#' + MODAL_ID + ' .dtb-wb-open-record-btn' ) : null;
+		if ( openBtn ) {
+			event.preventDefault();
+			var mod = openBtn.getAttribute( 'data-dtb-open-module' );
+			var rid = openBtn.getAttribute( 'data-dtb-open-record-id' );
+			document.dispatchEvent( new CustomEvent( 'dtb:deeplink', { detail: { module: mod, id: rid } } ) );
 			return;
 		}
 
