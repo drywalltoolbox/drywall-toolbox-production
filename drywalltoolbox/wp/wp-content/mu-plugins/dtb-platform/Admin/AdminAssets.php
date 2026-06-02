@@ -55,6 +55,17 @@ function dtb_admin_assets_enqueue(): void {
 		$css_ver
 	);
 
+	// ── WordPress admin chrome override CSS (restores default black WP sidebar/topbar on DTB pages) ──
+	$wp_chrome_css_file = $assets_dir . 'dtb-admin-wp-chrome.css';
+	if ( file_exists( $wp_chrome_css_file ) ) {
+		wp_enqueue_style(
+			'dtb-admin-wp-chrome',
+			$assets_url . 'dtb-admin-wp-chrome.css',
+			[ 'dtb-admin' ],
+			(string) filemtime( $wp_chrome_css_file )
+		);
+	}
+
 	// ── Workbench shared CSS (loads after dtb-admin) ──
 	$wb_css_file = $assets_dir . 'dtb-admin-workbench.css';
 	if ( file_exists( $wb_css_file ) ) {
@@ -72,6 +83,9 @@ function dtb_admin_assets_enqueue(): void {
 		$wb_actions_css_deps = [ 'dtb-admin' ];
 		if ( wp_style_is( 'dtb-admin-workbench', 'enqueued' ) ) {
 			$wb_actions_css_deps[] = 'dtb-admin-workbench';
+		}
+		if ( wp_style_is( 'dtb-admin-wp-chrome', 'enqueued' ) ) {
+			$wb_actions_css_deps[] = 'dtb-admin-wp-chrome';
 		}
 		wp_enqueue_style(
 			'dtb-admin-workbench-actions',
@@ -148,6 +162,9 @@ function dtb_admin_assets_enqueue(): void {
 
 		// Build CSS deps: always dtb-admin; add workbench/action CSS if available.
 		$css_deps = [ 'dtb-admin' ];
+		if ( file_exists( $assets_dir . 'dtb-admin-wp-chrome.css' ) ) {
+			$css_deps[] = 'dtb-admin-wp-chrome';
+		}
 		if ( file_exists( $assets_dir . 'dtb-admin-workbench.css' ) ) {
 			$css_deps[] = 'dtb-admin-workbench';
 		}
