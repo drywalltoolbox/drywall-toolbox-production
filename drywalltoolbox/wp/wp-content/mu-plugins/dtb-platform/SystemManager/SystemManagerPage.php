@@ -218,15 +218,27 @@ function dtb_system_manager_render_audit_tab(): void {
 	ob_start();
 	echo dtb_admin_ui_table_open( [
 		[ 'label' => __( 'Time (UTC)', 'drywall-toolbox' ), 'key' => 'ts' ],
+		[ 'label' => __( 'Module', 'drywall-toolbox' ),     'key' => 'module' ],
+		[ 'label' => __( 'Record', 'drywall-toolbox' ),     'key' => 'record_id' ],
 		[ 'label' => __( 'User', 'drywall-toolbox' ),       'key' => 'user_id' ],
 		[ 'label' => __( 'Action', 'drywall-toolbox' ),     'key' => 'action' ],
+		[ 'label' => __( 'Source', 'drywall-toolbox' ),     'key' => 'source' ],
 	], [] );
 	foreach ( $entries as $e ) {
-		$user = get_userdata( $e['user_id'] );
+		$user_id = absint( $e['user_id'] ?? 0 );
+		$user    = $user_id ? get_userdata( $user_id ) : false;
+		$actor   = ! empty( $e['actor_label'] ) ? (string) $e['actor_label'] : ( $user ? $user->display_name : ( $user_id ? '#' . $user_id : __( 'System', 'drywall-toolbox' ) ) );
+		$module  = sanitize_key( (string) ( $e['module'] ?? '' ) );
+		$record  = absint( $e['record_id'] ?? 0 );
+		$summary = (string) ( $e['summary'] ?? $e['action'] ?? '' );
+
 		echo '<tr>';
-		echo '<td>' . esc_html( $e['ts'] ) . '</td>';
-		echo '<td>' . esc_html( $user ? $user->display_name : '#' . $e['user_id'] ) . '</td>';
-		echo '<td>' . esc_html( $e['action'] ) . '</td>';
+		echo '<td>' . esc_html( (string) ( $e['ts'] ?? '' ) ) . '</td>';
+		echo '<td>' . ( $module ? esc_html( $module ) : '&mdash;' ) . '</td>';
+		echo '<td>' . ( $record ? esc_html( '#' . $record ) : '&mdash;' ) . '</td>';
+		echo '<td>' . esc_html( $actor ) . '</td>';
+		echo '<td><strong>' . esc_html( $summary ) . '</strong><br><code>' . esc_html( (string) ( $e['action'] ?? '' ) ) . '</code></td>';
+		echo '<td>' . esc_html( (string) ( $e['source'] ?? '' ) ) . '</td>';
 		echo '</tr>';
 	}
 	echo dtb_admin_ui_table_close();
