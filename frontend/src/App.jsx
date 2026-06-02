@@ -81,6 +81,8 @@ const CategoryPage = lazyWithReload(() => import('./pages/CategoryPage'));
 const Schematics = lazyWithReload(() => import('./pages/Schematics'));
 const Repairs = lazyWithReload(() => import('./pages/Repairs'));
 const RepairStatus = lazyWithReload(() => import('./pages/RepairStatus'));
+const ReturnStatus = lazyWithReload(() => import('./pages/ReturnStatus'));
+const SupportStatus = lazyWithReload(() => import('./pages/SupportStatus'));
 const Cart = lazyWithReload(() => import('./pages/Cart'));
 const Checkout = lazyWithReload(() => import('./pages/Checkout'));
 const OrderConfirmation = lazyWithReload(() => import('./pages/OrderConfirmation'));
@@ -151,6 +153,7 @@ function AppRoutes() {
           <Route path="/calculators" element={<Calculators />} />
           <Route path="/shipping-policy" element={<ShippingPolicy />} />
           <Route path="/returns" element={<ReturnPortal />} />
+          <Route path="/returns/status/:id" element={<ReturnStatus />} />
           <Route path="/policies" element={<StorePolicies />} />
           {/* <Route path="/toolset-builder" element={<ToolsetBuilder />} /> */}
           <Route path="/preview/technical-specifications" element={<TechnicalSpecificationsPreview />} />
@@ -159,6 +162,7 @@ function AppRoutes() {
           <Route path="/order/:id" element={<OrderConfirmation />} />
           <Route path="/order-tracking/:id" element={<OrderTracking />} />
           <Route path="/contact" element={<Contact />} />
+          <Route path="/support/status/:id" element={<SupportStatus />} />
           <Route path="/settings/woocommerce" element={<ProtectedRoute><WooCommerceSettings /></ProtectedRoute>} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />

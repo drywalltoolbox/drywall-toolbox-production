@@ -1,4 +1,5 @@
 ﻿import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import SEOHead from '../components/shared/SEOHead';
 import { apiClient } from '../api/client';
 
@@ -53,6 +54,7 @@ export default function Contact() {
   });
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess]       = useState(false);
+  const [tracking, setTracking]     = useState(null);
   const [error, setError]           = useState('');
 
   const handleChange = (e) => {
@@ -65,7 +67,7 @@ export default function Contact() {
     setSubmitting(true);
 
     try {
-      await apiClient('/wp-json/dtb/v1/support/submit', {
+      const response = await apiClient('/wp-json/dtb/v1/support/submit', {
         method: 'POST',
         body: JSON.stringify({
           name:    formData.name,
@@ -76,6 +78,11 @@ export default function Contact() {
           website: '', // honeypot — intentionally blank
         }),
       });
+      setTracking(
+        response?.ticket_id && response?.public_token
+          ? { id: response.ticket_id, token: response.public_token, number: response.ticket_number }
+          : null
+      );
       setSuccess(true);
       setFormData({ name: '', email: '', inquiryType: '', message: '' });
     } catch (err) {
@@ -255,9 +262,22 @@ export default function Contact() {
                   <p style={{ fontSize: '0.875rem', color: 'rgba(15,23,42,0.6)', margin: 0 }}>
                     Our engineers will get back to you within one business day.
                   </p>
+                  {tracking && (
+                    <p style={{ fontSize: '0.875rem', margin: '12px 0 0' }}>
+                      <Link
+                        to={`/support/status/${tracking.id}?token=${encodeURIComponent(tracking.token)}`}
+                        style={{ color: 'var(--primary-600)', fontWeight: 700, textDecoration: 'none' }}
+                      >
+                        Track {tracking.number || 'your ticket'}
+                      </Link>
+                    </p>
+                  )}
                 </div>
                 <button
-                  onClick={() => setSuccess(false)}
+                  onClick={() => {
+                    setSuccess(false);
+                    setTracking(null);
+                  }}
                   className="alloy-button"
                   style={{ marginTop: '8px' }}
                 >

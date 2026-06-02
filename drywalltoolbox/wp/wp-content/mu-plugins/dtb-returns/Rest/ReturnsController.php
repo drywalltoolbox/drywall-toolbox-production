@@ -41,6 +41,16 @@ function dtb_returns_rest_register_routes(): void {
 		],
 	] );
 
+	register_rest_route( 'dtb/v1', '/returns/status/(?P<id>\d+)', [
+		'methods'             => WP_REST_Server::READABLE,
+		'callback'            => 'dtb_returns_rest_public_status',
+		'permission_callback' => '__return_true',
+		'args'                => [
+			'id'    => [ 'type' => 'integer', 'minimum' => 1 ],
+			'token' => [ 'type' => 'string', 'required' => true ],
+		],
+	] );
+
 	register_rest_route( 'dtb/v1', '/returns/(?P<id>\d+)', [
 		'methods'             => WP_REST_Server::READABLE,
 		'callback'            => 'dtb_returns_rest_get',
@@ -201,6 +211,7 @@ function dtb_returns_rest_public_submit( WP_REST_Request $request ): WP_REST_Res
 	}
 
 	$return_id = (int) $result;
+	$public_token = dtb_returns_generate_public_status_token( $return_id, $customer_email );
 
 	// ── Notify admin ──────────────────────────────────────────────────────────
 	$site_name  = get_bloginfo( 'name' ) ?: 'Drywall Toolbox';
@@ -237,9 +248,86 @@ function dtb_returns_rest_public_submit( WP_REST_Request $request ): WP_REST_Res
 	}
 
 	return new WP_REST_Response(
-		[ 'return_id' => $return_id, 'message' => __( 'Return request submitted successfully.', 'drywall-toolbox' ) ],
+		[
+			'return_id'    => $return_id,
+			'public_token' => $public_token,
+			'status_url'   => add_query_arg( [ 'token' => $public_token ], home_url( '/returns/status/' . $return_id ) ),
+			'message'      => __( 'Return request submitted successfully.', 'drywall-toolbox' ),
+		],
 		201
 	);
+}
+
+function dtb_returns_rest_public_status( WP_REST_Request $request ): WP_REST_Response|WP_Error {
+	$return_id = (int) $request->get_param( 'id' );
+	$token     = sanitize_text_field( (string) $request->get_param( 'token' ) );
+	$entity    = dtb_returns_validate_public_status_token( $return_id, $token );
+
+	if ( is_wp_error( $entity ) ) {
+		return $entity;
+	}
+
+	$data   = $entity->to_array();
+	$events = function_exists( 'dtb_returns_admin_get_events' ) ? dtb_returns_admin_get_events( $return_id ) : [];
+
+	return new WP_REST_Response( [
+		'id'              => (int) $entity->id,
+		'return_number'   => '#' . (int) $entity->id,
+		'status'          => (string) $entity->status->value(),
+		'label'           => (string) $entity->status->label(),
+		'order_number'    => (string) ( $data['order_number'] ?? '' ),
+		'reason'          => (string) ( $data['reason'] ?? '' ),
+		'resolution'      => (string) ( $data['resolution'] ?? '' ),
+		'customer_name'   => (string) ( $data['customer_name'] ?? '' ),
+		'created_at'      => get_post_time( 'Y-m-d H:i:s', true, $return_id ) ?: '',
+		'last_updated_at' => get_post_modified_time( 'Y-m-d H:i:s', true, $return_id ) ?: '',
+		'timeline'        => array_map(
+			static fn( $event ) => [
+				'type'        => (string) ( $event['action'] ?? 'return.updated' ),
+				'label'       => (string) ( $event['summary'] ?? 'Return updated' ),
+				'occurred_at' => (string) ( $event['ts'] ?? '' ),
+			],
+			(array) $events
+		),
+	] );
+}
+
+function dtb_returns_generate_public_status_token( int $return_id, string $customer_email, ?int $ttl = null ): string {
+	if ( null === $ttl ) {
+		$ttl = (int) apply_filters( 'dtb_returns_public_status_token_ttl', 30 * DAY_IN_SECONDS );
+	}
+	$expires = time() + max( 1, $ttl );
+	$hmac    = hash_hmac( 'sha256', $return_id . ':' . sanitize_email( $customer_email ) . ':' . $expires, AUTH_KEY );
+	return $expires . ':' . $hmac;
+}
+
+function dtb_returns_validate_public_status_token( int $return_id, string $token ): DTB_Return_Entity|WP_Error {
+	$entity = dtb_returns_get( $return_id );
+	if ( ! $entity ) {
+		return new WP_Error( 'dtb_returns_forbidden', __( 'Invalid or expired return tracking link.', 'drywall-toolbox' ), [ 'status' => 403 ] );
+	}
+
+	$parts = explode( ':', $token, 2 );
+	if ( 2 !== count( $parts ) ) {
+		return new WP_Error( 'dtb_returns_forbidden', __( 'Invalid or expired return tracking link.', 'drywall-toolbox' ), [ 'status' => 403 ] );
+	}
+
+	[ $expires_str, $provided_hmac ] = $parts;
+	if ( ! ctype_digit( $expires_str ) || 64 !== strlen( $provided_hmac ) || ! ctype_xdigit( $provided_hmac ) ) {
+		return new WP_Error( 'dtb_returns_forbidden', __( 'Invalid or expired return tracking link.', 'drywall-toolbox' ), [ 'status' => 403 ] );
+	}
+
+	$expires = (int) $expires_str;
+	if ( $expires < time() ) {
+		return new WP_Error( 'dtb_returns_forbidden', __( 'Invalid or expired return tracking link.', 'drywall-toolbox' ), [ 'status' => 403 ] );
+	}
+
+	$expected_hmac = hash_hmac( 'sha256', $return_id . ':' . sanitize_email( (string) $entity->customer_email ) . ':' . $expires, AUTH_KEY );
+	if ( ! hash_equals( $expected_hmac, $provided_hmac ) ) {
+		return new WP_Error( 'dtb_returns_forbidden', __( 'Invalid or expired return tracking link.', 'drywall-toolbox' ), [ 'status' => 403 ] );
+	}
+
+	return $entity;
 }
 
 function dtb_returns_rest_transition_status( WP_REST_Request $request ): WP_REST_Response {

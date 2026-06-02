@@ -58,7 +58,9 @@ function dtb_support_rest_submit_contact( WP_REST_Request $request ): WP_REST_Re
 
 	return new WP_REST_Response( [
 		'success'       => true,
+		'ticket_id'     => $result['ticket_id'],
 		'ticket_number' => $result['ticket_number'],
+		'public_token'  => $result['public_token'] ?? '',
 		'message'       => __( 'Your message has been received. We\'ll be in touch shortly.', 'drywall-toolbox' ),
 	], 201 );
 }

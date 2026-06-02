@@ -436,7 +436,7 @@ function dtb_support_notify_staff_reply( object $ticket, string $reply_body ): v
 	// The ticket ID is already in the REST URL path; only the token is a query parameter.
 	$reply_link  = add_query_arg(
 		[ 'token' => $reply_token ],
-		rest_url( 'dtb/v1/support/tickets/' . $ticket->id . '/reply/public' )
+		home_url( '/support/status/' . (int) $ticket->id )
 	);
 
 	$reply_body = dtb_support_expand_reply_tokens( $reply_body, $ticket, esc_url_raw( $reply_link ) );

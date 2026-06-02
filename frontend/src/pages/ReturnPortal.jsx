@@ -86,6 +86,7 @@ export default function ReturnPortal() {
   const [additionalNotes, setAdditionalNotes] = useState('');
   const [submitLoading, setSubmitLoading] = useState(false);
   const [submitError, setSubmitError]   = useState('');
+  const [returnTracking, setReturnTracking] = useState(null);
   /* ─────────────────────────────────────────────────────────────────────────── */
   /* Step 1 — look up the order                                                  */
   /* We validate the input and then advance to the form. In the absence of a     */
@@ -131,7 +132,7 @@ export default function ReturnPortal() {
     setSubmitLoading(true);
 
     try {
-      await apiClient('/wp-json/dtb/v1/returns/request', {
+      const response = await apiClient('/wp-json/dtb/v1/returns/request', {
         method: 'POST',
         body:   JSON.stringify({
           order_number:   orderNumber.trim(),
@@ -141,6 +142,11 @@ export default function ReturnPortal() {
           notes:          additionalNotes.trim(),
         }),
       });
+      setReturnTracking(
+        response?.return_id && response?.public_token
+          ? { id: response.return_id, token: response.public_token }
+          : null
+      );
       setStep(3);
     } catch (err) {
       setSubmitError(
@@ -163,6 +169,7 @@ export default function ReturnPortal() {
     setReturnReason('');
     setAdditionalNotes('');
     setSubmitError('');
+    setReturnTracking(null);
   };
 
   return (
@@ -698,6 +705,26 @@ export default function ReturnPortal() {
                   >
                     <RotateCcw size={14} /> Start Another Return
                   </button>
+
+                  {returnTracking && (
+                    <Link
+                      to={`/returns/status/${returnTracking.id}?token=${encodeURIComponent(returnTracking.token)}`}
+                      style={{
+                        display:        'inline-flex',
+                        alignItems:     'center',
+                        gap:            '6px',
+                        background:     '#16a34a',
+                        color:          'white',
+                        padding:        '10px 20px',
+                        borderRadius:   '4px',
+                        fontSize:       '0.875rem',
+                        fontWeight:     700,
+                        textDecoration: 'none',
+                      }}
+                    >
+                      Track Return <ArrowRight size={14} />
+                    </Link>
+                  )}
 
                   <Link
                     to="/contact"

@@ -89,5 +89,8 @@ function dtb_support_submit_contact_request( array $data ): array|WP_Error {
 	return [
 		'ticket_id'     => $ticket_id,
 		'ticket_number' => $ticket->ticket_number,
+		'public_token'  => function_exists( 'dtb_support_generate_public_reply_token' )
+			? dtb_support_generate_public_reply_token( $ticket_id, (string) $ticket->customer_email )
+			: '',
 	];
 }

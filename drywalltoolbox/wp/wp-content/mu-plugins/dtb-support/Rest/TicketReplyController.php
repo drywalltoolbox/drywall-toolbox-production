@@ -28,12 +28,31 @@ function dtb_support_register_reply_routes(): void {
 
 	// Customer reply (public, token-authenticated via hash).
 	register_rest_route( 'dtb/v1', '/support/tickets/(?P<id>\d+)/reply/public', [
-		'methods'             => WP_REST_Server::CREATABLE,
-		'callback'            => 'dtb_support_rest_customer_reply',
+		[
+			'methods'             => WP_REST_Server::READABLE,
+			'callback'            => 'dtb_support_rest_public_reply_redirect',
+			'permission_callback' => '__return_true',
+			'args'                => [
+				'token' => [ 'type' => 'string', 'required' => true ],
+			],
+		],
+		[
+			'methods'             => WP_REST_Server::CREATABLE,
+			'callback'            => 'dtb_support_rest_customer_reply',
+			'permission_callback' => '__return_true',
+			'args'                => [
+				'message' => [ 'type' => 'string', 'required' => true ],
+				'token'   => [ 'type' => 'string', 'required' => true ],
+			],
+		],
+	] );
+
+	register_rest_route( 'dtb/v1', '/support/tickets/(?P<id>\d+)/status/public', [
+		'methods'             => WP_REST_Server::READABLE,
+		'callback'            => 'dtb_support_rest_public_status',
 		'permission_callback' => '__return_true',
 		'args'                => [
-			'message' => [ 'type' => 'string', 'required' => true ],
-			'token'   => [ 'type' => 'string', 'required' => true ],
+			'token' => [ 'type' => 'string', 'required' => true ],
 		],
 	] );
 }
@@ -122,42 +141,9 @@ function dtb_support_rest_customer_reply( WP_REST_Request $request ): WP_REST_Re
 	$token     = sanitize_text_field( $request->get_param( 'token' ) ?? '' );
 	$message   = trim( sanitize_textarea_field( wp_unslash( (string) ( $request->get_param( 'message' ) ?? '' ) ) ) );
 
-	$ticket = dtb_support_get_ticket( $ticket_id );
-	if ( ! $ticket ) {
-		// Return generic 403 to avoid leaking ticket existence to unauthenticated callers.
-		return new WP_Error( 'dtb_support_forbidden', __( 'Invalid or expired reply link.', 'drywall-toolbox' ), [ 'status' => 403 ] );
-	}
-
-	// Verify expiring token: format "{expires}:{hmac-sha256}".
-	// The expires component must be a positive integer string (Unix timestamp),
-	// and the HMAC must be a 64-character lowercase hex string (SHA-256 output).
-	$parts = explode( ':', $token, 2 );
-	if ( 2 !== count( $parts ) ) {
-		return new WP_Error( 'dtb_support_forbidden', __( 'Invalid or expired reply link.', 'drywall-toolbox' ), [ 'status' => 403 ] );
-	}
-
-	[ $expires_str, $provided_hmac ] = $parts;
-
-	// Validate formats before use to prevent type-coercion edge cases and
-	// length-based timing discrimination.
-	if ( ! ctype_digit( $expires_str ) || 64 !== strlen( $provided_hmac ) || ! ctype_xdigit( $provided_hmac ) ) {
-		return new WP_Error( 'dtb_support_forbidden', __( 'Invalid or expired reply link.', 'drywall-toolbox' ), [ 'status' => 403 ] );
-	}
-
-	$expires = (int) $expires_str;
-
-	if ( $expires < time() ) {
-		return new WP_Error( 'dtb_support_forbidden', __( 'Invalid or expired reply link.', 'drywall-toolbox' ), [ 'status' => 403 ] );
-	}
-
-	$expected_hmac = hash_hmac(
-		'sha256',
-		$ticket_id . ':' . $ticket->customer_email . ':' . $expires,
-		AUTH_KEY
-	);
-
-	if ( ! hash_equals( $expected_hmac, $provided_hmac ) ) {
-		return new WP_Error( 'dtb_support_forbidden', __( 'Invalid or expired reply link.', 'drywall-toolbox' ), [ 'status' => 403 ] );
+	$ticket = dtb_support_validate_public_reply_token( $ticket_id, $token );
+	if ( is_wp_error( $ticket ) ) {
+		return $ticket;
 	}
 
 	if ( '' === $message ) {
@@ -174,6 +160,93 @@ function dtb_support_rest_customer_reply( WP_REST_Request $request ): WP_REST_Re
 		'event_id' => $event_id,
 		'message'  => __( 'Your reply has been sent.', 'drywall-toolbox' ),
 	], 201 );
+}
+
+function dtb_support_rest_public_reply_redirect( WP_REST_Request $request ): WP_REST_Response {
+	$ticket_id = (int) $request->get_param( 'id' );
+	$token     = sanitize_text_field( $request->get_param( 'token' ) ?? '' );
+	$location  = add_query_arg(
+		[ 'token' => $token ],
+		home_url( '/support/status/' . $ticket_id )
+	);
+
+	return new WP_REST_Response(
+		[
+			'success'  => true,
+			'location' => esc_url_raw( $location ),
+		],
+		302,
+		[ 'Location' => esc_url_raw( $location ) ]
+	);
+}
+
+function dtb_support_rest_public_status( WP_REST_Request $request ): WP_REST_Response|WP_Error {
+	$ticket_id = (int) $request->get_param( 'id' );
+	$token     = sanitize_text_field( $request->get_param( 'token' ) ?? '' );
+	$ticket    = dtb_support_validate_public_reply_token( $ticket_id, $token );
+
+	if ( is_wp_error( $ticket ) ) {
+		return $ticket;
+	}
+
+	$events = array_filter(
+		dtb_support_get_events( $ticket_id, 'customer' ),
+		static fn( $event ) => dtb_support_event_is_public( (string) $event->event_type, (string) $event->visibility )
+	);
+
+	$timeline = array_map(
+		static fn( $event ) => [
+			'id'          => (int) $event->id,
+			'type'        => (string) $event->event_type,
+			'body'        => (string) $event->body,
+			'actor_type'  => (string) $event->actor_type,
+			'occurred_at' => (string) $event->created_at,
+		],
+		array_values( $events )
+	);
+
+	return new WP_REST_Response( [
+		'id'              => (int) $ticket->id,
+		'ticket_number'   => (string) $ticket->ticket_number,
+		'status'          => (string) $ticket->status,
+		'label'           => function_exists( 'dtb_support_status_label' ) ? dtb_support_status_label( (string) $ticket->status ) : ucwords( str_replace( '_', ' ', (string) $ticket->status ) ),
+		'subject'         => (string) $ticket->subject,
+		'ticket_type'     => (string) $ticket->ticket_type,
+		'priority'        => (string) $ticket->priority,
+		'customer_name'   => (string) $ticket->customer_name,
+		'created_at'      => (string) $ticket->created_at,
+		'last_updated_at' => (string) $ticket->updated_at,
+		'timeline'        => $timeline,
+	] );
+}
+
+function dtb_support_validate_public_reply_token( int $ticket_id, string $token ) {
+	$ticket = dtb_support_get_ticket( $ticket_id );
+	if ( ! $ticket ) {
+		return new WP_Error( 'dtb_support_forbidden', __( 'Invalid or expired reply link.', 'drywall-toolbox' ), [ 'status' => 403 ] );
+	}
+
+	$parts = explode( ':', $token, 2 );
+	if ( 2 !== count( $parts ) ) {
+		return new WP_Error( 'dtb_support_forbidden', __( 'Invalid or expired reply link.', 'drywall-toolbox' ), [ 'status' => 403 ] );
+	}
+
+	[ $expires_str, $provided_hmac ] = $parts;
+	if ( ! ctype_digit( $expires_str ) || 64 !== strlen( $provided_hmac ) || ! ctype_xdigit( $provided_hmac ) ) {
+		return new WP_Error( 'dtb_support_forbidden', __( 'Invalid or expired reply link.', 'drywall-toolbox' ), [ 'status' => 403 ] );
+	}
+
+	$expires = (int) $expires_str;
+	if ( $expires < time() ) {
+		return new WP_Error( 'dtb_support_forbidden', __( 'Invalid or expired reply link.', 'drywall-toolbox' ), [ 'status' => 403 ] );
+	}
+
+	$expected_hmac = hash_hmac( 'sha256', $ticket_id . ':' . $ticket->customer_email . ':' . $expires, AUTH_KEY );
+	if ( ! hash_equals( $expected_hmac, $provided_hmac ) ) {
+		return new WP_Error( 'dtb_support_forbidden', __( 'Invalid or expired reply link.', 'drywall-toolbox' ), [ 'status' => 403 ] );
+	}
+
+	return $ticket;
 }
 
 /**
