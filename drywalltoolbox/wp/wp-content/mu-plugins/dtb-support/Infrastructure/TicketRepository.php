@@ -225,14 +225,15 @@ function dtb_support_query_queue( string $queue, array $args = [] ): array {
 	$search   = function_exists( 'dtb_str_normalize_display' ) ? dtb_str_normalize_display( $search_raw ) : $search_raw;
 	$active   = "(snooze_until IS NULL OR snooze_until <= UTC_TIMESTAMP())";
 	$closed   = "status NOT IN ('resolved','closed','spam')";
+	$staff_actionable = "status IN ('open','pending_staff','in_progress')";
 	$action_due_hours    = function_exists( 'dtb_support_action_due_hours' ) ? max( 1, (int) dtb_support_action_due_hours() ) : 24;
 	$warning_window_secs = (int) floor( $action_due_hours * HOUR_IN_SECONDS * 0.25 );
 	$warning_window_secs = max( HOUR_IN_SECONDS, $warning_window_secs );
 	$action_due_expr     = "COALESCE(sla_first_response_due, DATE_ADD(created_at, INTERVAL {$action_due_hours} HOUR))";
 	$map = [
 		'needs_reply'            => "status IN ('open','pending_staff','in_progress') AND {$active}",
-		'due_soon'               => "{$action_due_expr} >= UTC_TIMESTAMP() AND TIMESTAMPDIFF(SECOND, UTC_TIMESTAMP(), {$action_due_expr}) <= {$warning_window_secs} AND {$closed} AND {$active}",
-		'overdue'                => "{$action_due_expr} < UTC_TIMESTAMP() AND {$closed} AND {$active}",
+		'due_soon'               => "{$action_due_expr} >= UTC_TIMESTAMP() AND TIMESTAMPDIFF(SECOND, UTC_TIMESTAMP(), {$action_due_expr}) <= {$warning_window_secs} AND {$staff_actionable} AND {$active}",
+		'overdue'                => "{$action_due_expr} < UTC_TIMESTAMP() AND {$staff_actionable} AND {$active}",
 		'urgent'                 => "priority = 'urgent' AND {$closed} AND {$active}",
 		'in_progress'            => "status = 'in_progress' AND {$active}",
 		'waiting_on_customer'    => "status = 'pending_customer' AND {$active}",
@@ -280,8 +281,8 @@ function dtb_support_get_queue_counts(): array {
 	// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 	$row = $wpdb->get_row( "SELECT
 		SUM(CASE WHEN status IN ('open','pending_staff','in_progress') AND (snooze_until IS NULL OR snooze_until <= UTC_TIMESTAMP()) THEN 1 ELSE 0 END) AS needs_reply,
-		SUM(CASE WHEN {$action_due_expr} >= UTC_TIMESTAMP() AND TIMESTAMPDIFF(SECOND, UTC_TIMESTAMP(), {$action_due_expr}) <= {$warning_window_secs} AND status NOT IN ('resolved','closed','spam') AND (snooze_until IS NULL OR snooze_until <= UTC_TIMESTAMP()) THEN 1 ELSE 0 END) AS due_soon,
-		SUM(CASE WHEN {$action_due_expr} < UTC_TIMESTAMP() AND status NOT IN ('resolved','closed','spam') AND (snooze_until IS NULL OR snooze_until <= UTC_TIMESTAMP()) THEN 1 ELSE 0 END) AS overdue,
+		SUM(CASE WHEN {$action_due_expr} >= UTC_TIMESTAMP() AND TIMESTAMPDIFF(SECOND, UTC_TIMESTAMP(), {$action_due_expr}) <= {$warning_window_secs} AND status IN ('open','pending_staff','in_progress') AND (snooze_until IS NULL OR snooze_until <= UTC_TIMESTAMP()) THEN 1 ELSE 0 END) AS due_soon,
+		SUM(CASE WHEN {$action_due_expr} < UTC_TIMESTAMP() AND status IN ('open','pending_staff','in_progress') AND (snooze_until IS NULL OR snooze_until <= UTC_TIMESTAMP()) THEN 1 ELSE 0 END) AS overdue,
 		SUM(CASE WHEN priority = 'urgent' AND status NOT IN ('resolved','closed','spam') AND (snooze_until IS NULL OR snooze_until <= UTC_TIMESTAMP()) THEN 1 ELSE 0 END) AS urgent,
 		SUM(CASE WHEN status = 'in_progress' AND (snooze_until IS NULL OR snooze_until <= UTC_TIMESTAMP()) THEN 1 ELSE 0 END) AS in_progress,
 		SUM(CASE WHEN status = 'pending_customer' AND (snooze_until IS NULL OR snooze_until <= UTC_TIMESTAMP()) THEN 1 ELSE 0 END) AS waiting_on_customer,

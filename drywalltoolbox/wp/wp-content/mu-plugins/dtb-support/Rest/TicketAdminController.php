@@ -889,6 +889,21 @@ function dtb_support_build_workbench_detail_payload( object $ticket, array $even
 }
 
 /**
+ * Build a fresh support detail payload for mutation responses.
+ */
+function dtb_support_rest_fresh_ticket_detail( int $ticket_id ): array {
+	$fresh = dtb_support_get_ticket( $ticket_id );
+	if ( ! $fresh ) {
+		return [];
+	}
+
+	$events = dtb_support_get_events( $ticket_id, 'operator' );
+	$events = dtb_support_rest_prepare_ticket_events( $ticket_id, (array) $events );
+
+	return dtb_support_build_workbench_detail_payload( $fresh, $events );
+}
+
+/**
  * GET /dtb/v1/support/kpis
  *
  * @return WP_REST_Response
@@ -1063,6 +1078,7 @@ return new WP_REST_Response( [ 'success' => false, 'message' => $result->get_err
 return new WP_REST_Response( [
 'success' => true,
 'ticket'  => dtb_support_project_ticket( dtb_support_get_ticket( $ticket_id ) ),
+'detail'  => dtb_support_rest_fresh_ticket_detail( $ticket_id ),
 ], 200 );
 }
 
@@ -1089,6 +1105,7 @@ dtb_support_unsnooze_ticket( $ticket_id, [
 return new WP_REST_Response( [
 'success' => true,
 'ticket'  => dtb_support_project_ticket( dtb_support_get_ticket( $ticket_id ) ),
+'detail'  => dtb_support_rest_fresh_ticket_detail( $ticket_id ),
 ], 200 );
 }
 
@@ -1120,6 +1137,7 @@ dtb_support_update_ticket( $ticket_id, [ 'followup_due_at' => $due_at ] );
 return new WP_REST_Response( [
 'success' => true,
 'ticket'  => dtb_support_project_ticket( dtb_support_get_ticket( $ticket_id ) ),
+'detail'  => dtb_support_rest_fresh_ticket_detail( $ticket_id ),
 ], 200 );
 }
 

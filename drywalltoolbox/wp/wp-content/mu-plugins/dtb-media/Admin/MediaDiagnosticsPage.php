@@ -16,8 +16,9 @@ defined( 'ABSPATH' ) || exit;
  * @return never — always terminates via wp_send_json_*().
  */
 function dtb_ajax_image_sync_handler(): void {
-	// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
-	check_ajax_referer( 'dtb_image_sync_admin', 'nonce' );
+	if ( false === check_ajax_referer( 'dtb_image_sync_admin', 'nonce', false ) ) {
+		wp_send_json_error( [ 'message' => 'Image sync security check failed. Refresh the page and try again.' ], 403 );
+	}
 
 	if ( ! dtb_image_sync_can_manage() ) {
 		wp_send_json_error( [ 'message' => 'Unauthorized' ], 403 );

@@ -247,16 +247,24 @@
 		}
 
 		events.forEach( function ( ev ) {
-			// API sends event_group; fall back to legacy group field
+			// API sends event_group; fall back to legacy group field.
 			var group      = ev.event_group || ev.group || 'system';
 			var eventType  = ev.event_type || '';
+			if ( eventType === 'ticket.reply_customer' || eventType === 'ticket.reply_staff' ) {
+				group = 'message';
+			}
 			var evLabel    = ev.event_label || eventType || 'Event';
 			// Use age_label (human relative time) first, then raw created_at
 			var evWhen     = ev.age_label || ev.created_at || '';
 			var evBody     = ev.summary || ev.body || '';
 			// API sends actor_label; fall back to legacy fields
-			var authorName = ev.actor_label || ev.actor_name || ev.author_name || '';
-			var actorType  = ev.actor_type || '';
+			var authorName = ev.actor_label || ev.actor_name || ev.author_name || ( ev.actor && ev.actor.label ) || '';
+			var actorType  = ev.actor_type || ( ev.actor && ev.actor.type ) || '';
+			if ( ! actorType && eventType === 'ticket.reply_customer' ) {
+				actorType = 'staff';
+			} else if ( ! actorType && eventType === 'ticket.reply_staff' ) {
+				actorType = 'customer';
+			}
 
 			// Skip ticket.created when the original message was already rendered above
 			// to avoid showing the same text twice in the thread
@@ -394,6 +402,21 @@
 				refreshSupportRegion();
 			} )
 			.catch( function () {} );
+	}
+
+	function applyMutationResult( payload ) {
+		if ( payload && payload.detail ) {
+			var els = getModalElements();
+			if ( els ) {
+				renderTicketModal( els, payload.detail );
+			}
+			refreshSupportRegion();
+			fetchWorkbenchAggregate();
+			return;
+		}
+
+		reloadModalTicket();
+		fetchWorkbenchAggregate();
 	}
 
 	function refreshSupportRegion() {
@@ -595,7 +618,7 @@
 	function renderTicketModal( els, payload ) {
 		state.currentPayload = payload || {};
 		var ticket = payload && ( payload.record || payload.ticket ) ? ( payload.record || payload.ticket ) : {};
-		var events = payload && ( payload.timeline || payload.events ) ? ( payload.timeline || payload.events ) : [];
+		var events = payload && ( payload.events || payload.timeline ) ? ( payload.events || payload.timeline ) : [];
 		var intelligence = ( payload && payload.intelligence ) || {};
 		var next = supportNextAction( ticket, intelligence );
 		var ticketLabel = ticket.ticket_number || ( '#' + ( ticket.id || '' ) );
@@ -1134,7 +1157,7 @@
 							statusEl.textContent = isNote ? 'Note saved.' : 'Reply sent.';
 							statusEl.className = 'dtb-support-form-status is-success';
 						}
-						reloadModalTicket();
+						applyMutationResult( r.data );
 					} else {
 						var msg = ( r.data && r.data.message ) ? r.data.message : 'Failed to send.';
 						if ( statusEl ) {
@@ -1221,7 +1244,7 @@
 							statusEl.textContent = 'Changes saved.';
 							statusEl.className = 'dtb-support-form-status is-success';
 						}
-						reloadModalTicket();
+						applyMutationResult( r.data );
 					} else {
 						var msg = ( r.data && r.data.message ) ? r.data.message : 'Save failed.';
 						if ( statusEl ) {
@@ -1296,7 +1319,7 @@
 							statusEl.textContent = isSnooze ? 'Ticket paused.' : 'Follow-up set.';
 							statusEl.className = 'dtb-support-form-status is-success';
 						}
-						reloadModalTicket();
+						applyMutationResult( r.data );
 					} else {
 						var msg = ( r.data && r.data.message ) ? r.data.message : 'Save failed.';
 						if ( statusEl ) {

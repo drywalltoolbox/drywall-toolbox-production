@@ -153,7 +153,12 @@ function dtb_image_sync_render_page(): void {
 	</div>
 	<script>
 	(function () {
-		var cfg = window.dtbImageSyncPage || {};
+		var cfg = Object.assign({
+			ajaxUrl: <?php echo wp_json_encode( admin_url( 'admin-ajax.php' ) ); ?>,
+			nonce: <?php echo wp_json_encode( wp_create_nonce( 'dtb_image_sync_admin' ) ); ?>,
+			diagnosticsPageUrl: <?php echo wp_json_encode( admin_url( 'admin.php?page=dtb-system-manager' ) ); ?>,
+			defaultPath: <?php echo wp_json_encode( dtb_image_sync_page_default_path() ); ?>
+		}, window.dtbImageSyncPage || {});
 		var regionId = 'dtb-image-sync-workspace';
 		var region = document.querySelector('[data-dtb-live-region="' + regionId + '"]');
 		var pathSelect = document.getElementById('dtb-image-sync-upload-path');

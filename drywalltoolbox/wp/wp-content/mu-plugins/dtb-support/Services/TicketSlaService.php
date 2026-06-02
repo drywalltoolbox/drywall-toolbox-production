@@ -56,7 +56,7 @@ function dtb_support_sla_resolution_hours( string $priority ): int {
  * Compute SLA state ('ok','warning','breach') for a ticket given current SLA due time.
  */
 function dtb_support_compute_sla_state( object $ticket ): string {
-	if ( in_array( (string) $ticket->status, [ 'resolved', 'closed', 'spam' ], true ) ) {
+	if ( in_array( (string) $ticket->status, [ 'pending_customer', 'resolved', 'closed', 'spam' ], true ) ) {
 		return 'ok';
 	}
 
@@ -87,7 +87,7 @@ function dtb_support_compute_sla_state( object $ticket ): string {
  * Return seconds remaining until SLA due (negative means already breached).
  */
 function dtb_support_sla_seconds_remaining( object $ticket ): int {
-	if ( in_array( (string) $ticket->status, [ 'resolved', 'closed', 'spam' ], true ) ) {
+	if ( in_array( (string) $ticket->status, [ 'pending_customer', 'resolved', 'closed', 'spam' ], true ) ) {
 		return 0;
 	}
 

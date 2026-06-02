@@ -11,6 +11,10 @@ defined( 'ABSPATH' ) || exit;
  * Return the current action due-at timestamp for a ticket.
  */
 function dtb_support_action_due_at( object $ticket ): ?string {
+	if ( 'pending_customer' === (string) ( $ticket->status ?? '' ) ) {
+		return ! empty( $ticket->followup_due_at ) ? (string) $ticket->followup_due_at : null;
+	}
+
 	$due_at = $ticket->sla_first_response_due ?? null;
 
 	if ( empty( $due_at ) ) {

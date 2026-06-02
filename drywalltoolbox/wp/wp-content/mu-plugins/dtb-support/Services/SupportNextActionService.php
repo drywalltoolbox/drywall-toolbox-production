@@ -63,6 +63,15 @@ function dtb_support_compute_next_action( object $ticket ): array {
 		];
 	}
 
+	// Waiting on customer status with no follow-up scheduled.
+	if ( 'pending_customer' === $status && empty( $ticket->followup_due_at ) ) {
+		return [
+			'action' => 'set_follow_up',
+			'label'  => __( 'Set Follow-Up', 'drywall-toolbox' ),
+			'reason' => __( 'Waiting on customer — schedule a follow-up to avoid going cold.', 'drywall-toolbox' ),
+		];
+	}
+
 	// SLA breach or urgent — reply immediately.
 	if ( 'breach' === $sla_state || 'urgent' === $priority ) {
 		return [
@@ -87,15 +96,6 @@ function dtb_support_compute_next_action( object $ticket ): array {
 			'action' => 'reply',
 			'label'  => __( 'Send First Reply', 'drywall-toolbox' ),
 			'reason' => __( 'Customer has not yet received a staff response.', 'drywall-toolbox' ),
-		];
-	}
-
-	// Waiting on customer status with no follow-up scheduled.
-	if ( 'pending_customer' === $status && empty( $ticket->followup_due_at ) ) {
-		return [
-			'action' => 'set_follow_up',
-			'label'  => __( 'Set Follow-Up', 'drywall-toolbox' ),
-			'reason' => __( 'Waiting on customer — schedule a follow-up to avoid going cold.', 'drywall-toolbox' ),
 		];
 	}
 
