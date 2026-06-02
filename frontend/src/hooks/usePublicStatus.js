@@ -9,13 +9,23 @@ export default function usePublicStatus( id, token, fetcher, terminalStatuses = 
   const timerRef = useRef( null );
   const cancelledRef = useRef( false );
   const dataRef = useRef( null );
+  const fetchStatusRef = useRef( null );
 
-  const clearTimer = () => {
+  const clearTimer = useCallback( () => {
     if ( timerRef.current ) {
       clearTimeout( timerRef.current );
       timerRef.current = null;
     }
-  };
+  }, [] );
+
+  const scheduleNextPoll = useCallback( () => {
+    clearTimer();
+    timerRef.current = setTimeout( () => {
+      if ( ! cancelledRef.current && typeof fetchStatusRef.current === 'function' ) {
+        fetchStatusRef.current( false );
+      }
+    }, POLL_INTERVAL_MS );
+  }, [ clearTimer ] );
 
   const fetchStatus = useCallback( async ( manual = false ) => {
     if ( ! id || ! token || typeof fetcher !== 'function' ) return;
@@ -31,19 +41,19 @@ export default function usePublicStatus( id, token, fetcher, terminalStatuses = 
       setLoading( false );
 
       if ( ! terminalStatuses.includes( result?.status ) ) {
-        clearTimer();
-        timerRef.current = setTimeout( () => fetchStatus( false ), POLL_INTERVAL_MS );
+        scheduleNextPoll();
       }
     } catch ( err ) {
       if ( cancelledRef.current ) return;
       setError( err?.message || 'Unable to load status.' );
       setLoading( false );
       if ( ! terminalStatuses.includes( dataRef.current?.status ) ) {
-        clearTimer();
-        timerRef.current = setTimeout( () => fetchStatus( false ), POLL_INTERVAL_MS );
+        scheduleNextPoll();
       }
     }
-  }, [ fetcher, id, terminalStatuses, token ] );
+  }, [ clearTimer, fetcher, id, scheduleNextPoll, terminalStatuses, token ] );
+
+  fetchStatusRef.current = fetchStatus;
 
   useEffect( () => {
     cancelledRef.current = false;
@@ -52,12 +62,16 @@ export default function usePublicStatus( id, token, fetcher, terminalStatuses = 
       cancelledRef.current = true;
       clearTimer();
     };
+  }, [ clearTimer, fetchStatus ] );
+
+  const refresh = useCallback( () => {
+    fetchStatus( true );
   }, [ fetchStatus ] );
 
   return {
     data,
     loading,
     error,
-    refresh: () => fetchStatus( true ),
+    refresh,
   };
 }
