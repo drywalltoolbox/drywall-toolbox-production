@@ -42,7 +42,7 @@ function dtb_system_manager_render_page(): void {
 	dtb_admin_shell_live_region_open( [
 		'id'       => 'dtb-system-workspace',
 		'module'   => 'system-manager',
-		'endpoint' => rest_url( 'dtb/v1/admin/system' ),
+		'endpoint' => add_query_arg( 'tab', $active_tab, rest_url( 'dtb/v1/admin/system' ) ),
 		'interval' => 20000,
 	] );
 
