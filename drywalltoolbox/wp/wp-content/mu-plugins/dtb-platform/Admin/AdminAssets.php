@@ -66,6 +66,21 @@ function dtb_admin_assets_enqueue(): void {
 		);
 	}
 
+	// ── Workbench action/menu + modal hero CSS ──
+	$wb_actions_css_file = $assets_dir . 'dtb-admin-workbench-actions.css';
+	if ( file_exists( $wb_actions_css_file ) ) {
+		$wb_actions_css_deps = [ 'dtb-admin' ];
+		if ( wp_style_is( 'dtb-admin-workbench', 'enqueued' ) ) {
+			$wb_actions_css_deps[] = 'dtb-admin-workbench';
+		}
+		wp_enqueue_style(
+			'dtb-admin-workbench-actions',
+			$assets_url . 'dtb-admin-workbench-actions.css',
+			$wb_actions_css_deps,
+			(string) filemtime( $wb_actions_css_file )
+		);
+	}
+
 	// ── Shared JS ──
 	$js_file = $assets_dir . 'dtb-admin.js';
 	$js_ver  = file_exists( $js_file ) ? (string) filemtime( $js_file ) : '2.0.0';
@@ -90,6 +105,22 @@ function dtb_admin_assets_enqueue(): void {
 		);
 	}
 
+	// ── Workbench action/menu + modal hero JS (progressive enhancement) ──
+	$wb_actions_js_file = $assets_dir . 'dtb-admin-workbench-actions.js';
+	if ( file_exists( $wb_actions_js_file ) ) {
+		$wb_actions_js_deps = [ 'dtb-admin' ];
+		if ( wp_script_is( 'dtb-admin-workbench', 'enqueued' ) ) {
+			$wb_actions_js_deps[] = 'dtb-admin-workbench';
+		}
+		wp_enqueue_script(
+			'dtb-admin-workbench-actions',
+			$assets_url . 'dtb-admin-workbench-actions.js',
+			$wb_actions_js_deps,
+			(string) filemtime( $wb_actions_js_file ),
+			true
+		);
+	}
+
 	$current_user = wp_get_current_user();
 
 	// ── Module-specific CSS (declared by page metadata) ──
@@ -99,10 +130,13 @@ function dtb_admin_assets_enqueue(): void {
 		$mod_file = $mod['dir'] . $mod['file'];
 		$mod_ver  = file_exists( $mod_file ) ? (string) filemtime( $mod_file ) : '1.0.0';
 
-		// Build CSS deps: always dtb-admin; add workbench if file exists.
+		// Build CSS deps: always dtb-admin; add workbench/action CSS if available.
 		$css_deps = [ 'dtb-admin' ];
 		if ( file_exists( $assets_dir . 'dtb-admin-workbench.css' ) ) {
 			$css_deps[] = 'dtb-admin-workbench';
+		}
+		if ( file_exists( $assets_dir . 'dtb-admin-workbench-actions.css' ) ) {
+			$css_deps[] = 'dtb-admin-workbench-actions';
 		}
 
 		wp_enqueue_style(
@@ -119,10 +153,13 @@ function dtb_admin_assets_enqueue(): void {
 		$mod_js_ver  = file_exists( $mod_js_file ) ? (string) filemtime( $mod_js_file ) : '1.0.0';
 
 		if ( file_exists( $mod_js_file ) ) {
-			// Build deps: always include dtb-admin; add workbench if it was enqueued.
+			// Build deps: always include dtb-admin; add workbench/action enhancers if enqueued.
 			$js_deps = [ 'dtb-admin' ];
 			if ( wp_script_is( 'dtb-admin-workbench', 'enqueued' ) ) {
 				$js_deps[] = 'dtb-admin-workbench';
+			}
+			if ( wp_script_is( 'dtb-admin-workbench-actions', 'enqueued' ) ) {
+				$js_deps[] = 'dtb-admin-workbench-actions';
 			}
 
 			wp_enqueue_script(
