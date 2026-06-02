@@ -34,6 +34,63 @@
 	margin-top: calc(var(--dtb-radius-sm) / 2);
 }
 
+.dtb-admin[data-dtb-page="dtb-repairs"] .dtb-repair-parts-table {
+	margin-top: var(--dtb-radius-sm);
+}
+
+.dtb-admin[data-dtb-page="dtb-repairs"] .dtb-repair-parts-editor textarea {
+	font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+.dtb-admin[data-dtb-page="dtb-repairs"] .dtb-wb-inline-form {
+	display: flex;
+	flex-wrap: wrap;
+	gap: var(--dtb-radius-sm);
+	align-items: center;
+}
+
+.dtb-admin[data-dtb-page="dtb-repairs"] .dtb-wb-checklist {
+	display: grid;
+	gap: 6px;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.dtb-admin[data-dtb-page="dtb-repairs"] .dtb-wb-checklist__item {
+	display: grid;
+	grid-template-columns: 22px 1fr;
+	gap: 8px;
+	align-items: start;
+	padding: 7px 8px;
+	border: 1px solid var(--dtb-border-soft);
+	border-radius: var(--dtb-radius-sm);
+	background: var(--dtb-surface);
+	font-size: 12px;
+	line-height: 1.35;
+}
+
+.dtb-admin[data-dtb-page="dtb-repairs"] .dtb-wb-checklist__mark {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 18px;
+	height: 18px;
+	border-radius: 50%;
+	font-weight: 700;
+	font-size: 11px;
+}
+
+.dtb-admin[data-dtb-page="dtb-repairs"] .dtb-wb-checklist__item.is-done .dtb-wb-checklist__mark {
+	background: #dcfce7;
+	color: #166534;
+}
+
+.dtb-admin[data-dtb-page="dtb-repairs"] .dtb-wb-checklist__item.is-open .dtb-wb-checklist__mark {
+	background: #fef3c7;
+	color: #92400e;
+}
+
 @media (max-width: 1320px) {
 	.dtb-admin[data-dtb-page="dtb-repairs"] .dtb-grid--kpi {
 		grid-template-columns: repeat(3, minmax(0, 1fr));

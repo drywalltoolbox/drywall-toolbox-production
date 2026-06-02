@@ -1,4 +1,14 @@
 {
+  "_meta": {
+    "schema":      "dtb-taxonomy-policy",
+    "version":     "2.0.0",
+    "description": "Universal taxonomy policy for Drywall Toolbox. A single canonical functional-category set is applied to every brand. The allowed WC path is always: {wc_root} > {brand_label} > {canonical_wc_label}. No per-brand divergence is permitted.",
+    "updated":     "2026-06-02",
+    "authority":   "products/Production/catalogs/config/production_taxonomy_policy.json"
+  },
+
+  "_design_rule": "All brands share the same 12 functional categories. Brand name is a WC path namespace only — it does not change which categories are available.",
+
   "catalog_path": "products/Production/catalogs/official/woocommerce_catalog_production.csv",
   "required_columns": [
     "SKU",
@@ -16,19 +26,91 @@
       "meta:series"
     ]
   },
-  "deprecated_phrases": [
-    "Repair Kits & Parts",
-    "Parts & Accessories",
-    "Replacement Parts",
-    "Repair Parts"
+  "canonical_functional_categories": [
+    { "id": "automatic-tapers",      "wc_label": "Automatic Taping Tools"      },
+    { "id": "semi-automatic-tapers", "wc_label": "Semi-Automatic Taping Tools" },
+    { "id": "finishing-boxes",       "wc_label": "Finishing Boxes"             },
+    { "id": "handles",               "wc_label": "Handles & Extensions"        },
+    { "id": "corner-tools",          "wc_label": "Corner Tools"                },
+    { "id": "pumps",                 "wc_label": "Mud Pans & Pumps"            },
+    { "id": "nailspotters",          "wc_label": "Nail Spotters"               },
+    { "id": "smoothing-blades",      "wc_label": "Smoothing Blades"            },
+    { "id": "toolsets",              "wc_label": "Tool Sets & Kits"            },
+    { "id": "stilts",                "wc_label": "Stilts"                      },
+    { "id": "parts",                 "wc_label": "Parts"                       },
+    { "id": "accessories",           "wc_label": "Accessories"                 }
   ],
-  "phrase_normalizations": {
-    "Repair Kits & Parts": "Parts",
-    "Parts & Accessories": "Parts",
-    "Replacement Parts": "Parts",
-    "Repair Parts": "Parts"
+
+  "brands": [
+    { "label": "Columbia Tools",         "key": "columbia-tools",         "wc_root": "Drywall Finishing Tools" },
+    { "label": "TapeTech",               "key": "tapetech",               "wc_root": "Drywall Finishing Tools" },
+    { "label": "Platinum Drywall Tools", "key": "platinum-drywall-tools", "wc_root": "Drywall Finishing Tools" },
+    { "label": "LEVEL5",                 "key": "level5",                 "wc_root": "Drywall Finishing Tools" },
+    { "label": "Asgard",                 "key": "asgard",                 "wc_root": "Drywall Finishing Tools" },
+    { "label": "Dura-Stilts",            "key": "dura-stilts",            "wc_root": "Drywall Finishing Tools" },
+    { "label": "SurPro",                 "key": "surpro",                 "wc_root": "Drywall Finishing Tools" }
+  ],
+
+  "deprecated_phrases": [
+    "Repair Kits & Parts", "Parts & Accessories", "Replacement Parts", "Repair Parts",
+    "Predator Carbon Fiber Tools", "Corner Flushers", "Corner Rollers", "Angle Heads",
+    "Flat Boxes", "Flat Box Handles", "Automatic Flat Boxes", "Compound Rollers",
+    "Applicator Heads", "MudRunner Pro", "Pumps & Adapters", "Support Handles & Adapters",
+    "Semi-Automatic Tools", "Automatic Tapers", "Tool Cases", "Corner Applicators",
+    "Corner Finishers", "Mud Applicators", "Throttle Boxes", "Sanders", "Parts & Accessories"
+  ],
+
+  "category_key_normalization": {
+    "_comment": "Maps any _dtb_category_key value (legacy, shorthand, brand-specific) to the canonical ID. Applied by build_launch_catalog.py before generating WC paths.",
+    "accessory":                    "accessories",
+    "angle-heads":                  "corner-tools",
+    "applicator-heads":             "corner-tools",
+    "automatic-flat-boxes":         "finishing-boxes",
+    "automatic-tapers":             "automatic-tapers",
+    "compound-rollers":             "corner-tools",
+    "corner":                       "corner-tools",
+    "corner-applicators":           "corner-tools",
+    "corner-finishers":             "corner-tools",
+    "corner-flushers":              "corner-tools",
+    "corner-rollers":               "corner-tools",
+    "corner-tools":                 "corner-tools",
+    "finishing":                    "finishing-boxes",
+    "finishing-boxes":              "finishing-boxes",
+    "flat-box-handles":             "handles",
+    "flat-boxes":                   "finishing-boxes",
+    "handles":                      "handles",
+    "handles-and-extensions":       "handles",
+    "mud-applicators":              "corner-tools",
+    "mudboxes":                     "pumps",
+    "mudrunner-pro":                "pumps",
+    "nail-spotters":                "nailspotters",
+    "nailspotters":                 "nailspotters",
+    "parts":                        "parts",
+    "predator-carbon-fiber-tools":  "corner-tools",
+    "pumps":                        "pumps",
+    "pumps-and-adapters":           "pumps",
+    "sanders":                      "smoothing-blades",
+    "semi-automatic-tapers":        "semi-automatic-tapers",
+    "semi-automatic-tools":         "semi-automatic-tapers",
+    "smoothing-blades":             "smoothing-blades",
+    "stilts":                       "stilts",
+    "support-handles-and-adapters": "handles",
+    "taping":                       "automatic-tapers",
+    "throttle-boxes":               "corner-tools",
+    "tool-cases":                   "accessories",
+    "tool-sets-and-kits":           "toolsets",
+    "toolsets":                     "toolsets"
   },
+
+  "sku_category_overrides": {
+    "_comment": "Per-SKU canonical category overrides for products whose _dtb_category_key maps to the wrong canonical ID.",
+    "COL-PREDATOR-MATRIX-HANDLE": "handles",
+    "COL-PREDATOR-ONE-HANDLE":    "handles",
+    "PHMP":                       "pumps"
+  },
+
   "category_aliases": {
+    "_comment": "Normalizes any legacy or brand-specific WC path to the current canonical path. Applied by build_launch_catalog.py normalize_category() before import.",
     "Drywall Finishing Tools > Asgard > Repair Kits & Parts": "Drywall Finishing Tools > Asgard > Parts",
     "Drywall Finishing Tools > Asgard > Knives & Blades": "Drywall Finishing Tools > Asgard > Smoothing Blades",
     "Drywall Finishing Tools > Columbia > Knives & Blades": "Drywall Finishing Tools > Columbia > Smoothing Blades",

@@ -177,6 +177,7 @@ function dtb_repair_admin_detail_handler( WP_REST_Request $request ): WP_REST_Re
 		'can_message'         => current_user_can( 'dtb_manage_repairs' ),
 		'can_edit_quote'      => current_user_can( 'dtb_manage_repairs' ) && in_array( $status, [ 'reviewed', 'approved', 'quoted' ], true ),
 		'can_allocate_parts'  => current_user_can( 'dtb_manage_repairs' ) && in_array( $status, [ 'approved', 'quote_accepted' ], true ),
+		'can_assign_technician' => current_user_can( 'dtb_manage_repairs' ) && ! $is_terminal,
 		'can_close'           => current_user_can( 'dtb_manage_repairs' ),
 	];
 
@@ -195,6 +196,19 @@ function dtb_repair_admin_detail_handler( WP_REST_Request $request ): WP_REST_Re
 		'tracking_number' => $tracking_number,
 		'veeqo_order_id'  => (string) get_post_meta( $repair_id, '_repair_veeqo_order_id', true ),
 	];
+
+	$allocated_parts_raw = (string) get_post_meta( $repair_id, '_repair_parts_allocated', true );
+	$allocated_parts     = json_decode( $allocated_parts_raw, true );
+	if ( ! is_array( $allocated_parts ) ) {
+		$allocated_parts = [];
+	}
+	$allocated_parts = array_values( array_map( static function ( $part ): array {
+		return [
+			'sku'  => sanitize_text_field( (string) ( $part['sku'] ?? '' ) ),
+			'qty'  => absint( $part['qty'] ?? 1 ),
+			'note' => sanitize_text_field( (string) ( $part['note'] ?? '' ) ),
+		];
+	}, $allocated_parts ) );
 
 	// ── Assemble response ──
 	$payload = [
@@ -224,6 +238,11 @@ function dtb_repair_admin_detail_handler( WP_REST_Request $request ): WP_REST_Re
 			'technician_id'      => (int) get_post_meta( $repair_id, '_repair_technician_id', true ),
 		],
 		'quote'        => $quote,
+		'parts'        => [
+			'allocated' => $allocated_parts,
+			'count'     => count( $allocated_parts ),
+			'source'    => 'repair_meta',
+		],
 		'shipping'     => $shipping,
 		'conversation' => $conversation,
 		'workflow'     => [

@@ -468,7 +468,17 @@
 		},
 	];
 
-	function buildMacroHtml( customerName, ticketLabel, orderId ) {
+	function resolveMacroText( text, customerName, ticketLabel, orderId ) {
+		return String( text || '' )
+			.replace( /\{\{customer\}\}/g, customerName )
+			.replace( /\{\{customer_name\}\}/g, customerName )
+			.replace( /\{\{ticket\}\}/g, ticketLabel )
+			.replace( /\{\{ticket_number\}\}/g, ticketLabel )
+			.replace( /\{\{order\}\}/g, orderId !== '—' ? orderId : '' )
+			.replace( /\{\{order_id\}\}/g, orderId !== '—' ? orderId : '' );
+	}
+
+	function buildMacroHtml( customerName, ticketLabel, orderId, recommendedMacros ) {
 		var html = '<div class="dtb-macro-panel" id="dtb-macro-panel" hidden>'
 			+ '<div class="dtb-macro-panel__header">'
 			+ '<span class="dtb-macro-panel__title">Quick Responses</span>'
@@ -476,16 +486,30 @@
 			+ '</div>'
 			+ '<div class="dtb-macro-panel__body">';
 
+		if ( Array.isArray( recommendedMacros ) && recommendedMacros.length ) {
+			html += '<div class="dtb-macro-group dtb-macro-group--recommended">'
+				+ '<div class="dtb-macro-group__label">Recommended</div>'
+				+ '<div class="dtb-macro-group__items">';
+			recommendedMacros.forEach( function ( macro ) {
+				var label = macro.label || macro.name || macro.macro_name || 'Recommended response';
+				var text = macro.body || macro.text || macro.body_template || '';
+				var resolved = resolveMacroText( text, customerName, ticketLabel, orderId );
+				if ( ! resolved ) {
+					return;
+				}
+				html += '<button type="button" class="dtb-macro-btn" data-macro-text="' + escHtml( resolved ) + '">'
+					+ escHtml( label )
+					+ '</button>';
+			} );
+			html += '</div></div>';
+		}
+
 		MACROS.forEach( function ( group ) {
 			html += '<div class="dtb-macro-group">'
 				+ '<div class="dtb-macro-group__label">' + escHtml( group.category ) + '</div>'
 				+ '<div class="dtb-macro-group__items">';
 			group.items.forEach( function ( macro ) {
-				// Store the resolved text as a data attribute
-				var resolved = macro.text
-					.replace( /\{\{customer\}\}/g, customerName )
-					.replace( /\{\{ticket\}\}/g, ticketLabel )
-					.replace( /\{\{order\}\}/g, orderId !== '—' ? orderId : '' );
+				var resolved = resolveMacroText( macro.text, customerName, ticketLabel, orderId );
 				html += '<button type="button" class="dtb-macro-btn" data-macro-text="' + escHtml( resolved ) + '">'
 					+ escHtml( macro.label )
 					+ '</button>';
@@ -657,7 +681,7 @@
 
 			// Pinned compose bar
 			+ '<div class="dtb-chat-compose">'
-			+ buildMacroHtml( customerName, ticketLabel, orderId )
+			+ buildMacroHtml( customerName, ticketLabel, orderId, ( intelligence.recommended_macros || payload.recommended_macros || [] ) )
 			+ '<div class="dtb-chat-compose__toolbar">'
 			+ '<button type="button" class="dtb-chat-mode-btn is-active" data-dtb-compose-mode="reply">Reply to Customer</button>'
 			+ '<button type="button" class="dtb-chat-mode-btn" data-dtb-compose-mode="note">Internal Note</button>'

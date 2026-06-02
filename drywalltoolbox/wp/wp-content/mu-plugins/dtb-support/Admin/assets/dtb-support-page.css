@@ -878,6 +878,24 @@
 	color: var(--dtb-text);
 }
 
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-rail-list {
+	display: grid;
+	gap: 6px;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-rail-list li {
+	padding: 6px 8px;
+	border: 1px solid var(--dtb-border-soft);
+	border-radius: var(--dtb-radius-sm);
+	background: var(--dtb-surface-muted);
+	color: var(--dtb-text);
+	font-size: 12px;
+	line-height: 1.35;
+}
+
 @media (max-width: 980px) {
 	.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-workbench {
 		grid-template-columns: 1fr;

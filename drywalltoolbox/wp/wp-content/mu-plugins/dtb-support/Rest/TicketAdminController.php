@@ -272,11 +272,23 @@ function dtb_support_rest_get_ticket_intelligence( WP_REST_Request $request ): W
 		0,
 		4
 	) );
-	$recommended_macros = array_map( static function ( $macro ): array {
+	$recommended_macros = array_map( static function ( $macro ) use ( $ticket ): array {
+		$body_template    = (string) ( $macro->body_template ?? '' );
+		$subject_template = (string) ( $macro->subject_template ?? '' );
+		$rendered_body    = function_exists( 'dtb_support_render_macro' )
+			? dtb_support_render_macro( $body_template, $ticket )
+			: $body_template;
+
 		return [
-			'id'       => (int) ( $macro->id ?? 0 ),
-			'name'     => (string) ( $macro->macro_name ?? '' ),
-			'category' => (string) ( $macro->category ?? 'general' ),
+			'id'               => (int) ( $macro->id ?? 0 ),
+			'name'             => (string) ( $macro->macro_name ?? '' ),
+			'macro_name'       => (string) ( $macro->macro_name ?? '' ),
+			'label'            => (string) ( $macro->macro_name ?? '' ),
+			'category'         => (string) ( $macro->category ?? 'general' ),
+			'subject_template' => $subject_template,
+			'body_template'    => $body_template,
+			'body'             => wp_strip_all_tags( $rendered_body, false ),
+			'text'             => wp_strip_all_tags( $rendered_body, false ),
 		];
 	}, $recommended_macros );
 

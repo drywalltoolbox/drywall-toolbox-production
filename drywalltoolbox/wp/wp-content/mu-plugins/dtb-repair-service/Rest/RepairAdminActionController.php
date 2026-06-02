@@ -101,6 +101,7 @@ function dtb_repair_admin_action_register_routes(): void {
 		'/customer-message'   => 'dtb_repair_admin_customer_message_handler',
 		'/internal-note'      => 'dtb_repair_admin_internal_note_handler',
 		'/mark-customer-read' => 'dtb_repair_admin_mark_customer_read_handler',
+		'/technician/assign'  => 'dtb_repair_admin_technician_assign_handler',
 		'/quote/save'         => 'dtb_repair_admin_quote_save_handler',
 		'/quote/send'         => 'dtb_repair_admin_quote_send_handler',
 		'/parts/allocate'     => 'dtb_repair_admin_parts_allocate_handler',
@@ -316,6 +317,34 @@ function dtb_repair_admin_mark_customer_read_handler( WP_REST_Request $request )
 	if ( function_exists( 'dtb_admin_audit_write' ) ) {
 		dtb_admin_audit_write( 'repair', $repair_id, 'repair.customer_messages_read', [
 			'user_id' => get_current_user_id(),
+		] );
+	}
+
+	return _dtb_repair_action_refresh( $repair_id );
+}
+
+// ── Technician assignment ─────────────────────────────────────────────────────
+
+function dtb_repair_admin_technician_assign_handler( WP_REST_Request $request ): WP_REST_Response|WP_Error {
+	$repair_id = (int) $request->get_param( 'id' );
+	$guard     = _dtb_repair_action_guard( $repair_id );
+	if ( is_wp_error( $guard ) ) {
+		return $guard;
+	}
+
+	$body          = $request->get_json_params() ?: [];
+	$technician_id = absint( $body['technician_id'] ?? 0 );
+
+	if ( $technician_id > 0 ) {
+		update_post_meta( $repair_id, '_repair_technician_id', $technician_id );
+	} else {
+		delete_post_meta( $repair_id, '_repair_technician_id' );
+	}
+
+	if ( function_exists( 'dtb_admin_audit_write' ) ) {
+		dtb_admin_audit_write( 'repair', $repair_id, 'repair.technician_assigned', [
+			'technician_id' => $technician_id,
+			'user_id'       => get_current_user_id(),
 		] );
 	}
 

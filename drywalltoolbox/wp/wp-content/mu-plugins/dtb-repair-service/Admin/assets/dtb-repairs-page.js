@@ -397,21 +397,73 @@
 
 	// ── Panel: Parts ──────────────────────────────────────────────────────────
 
+	function getAllocatedParts( d ) {
+		var partsState = d.parts || {};
+		if ( Array.isArray( partsState.allocated ) ) {
+			return partsState.allocated;
+		}
+		if ( Array.isArray( d.parts ) ) {
+			return d.parts;
+		}
+		return [];
+	}
+
+	function partsToInput( parts ) {
+		return parts.map( function ( part ) {
+			return [
+				part.sku || '',
+				part.qty || 1,
+				part.note || '',
+			].join( ', ' );
+		} ).join( '\n' );
+	}
+
+	function parsePartsInput( value ) {
+		return String( value || '' ).split( /\n+/ ).map( function ( line ) {
+			var cols = line.split( ',' );
+			return {
+				sku:  ( cols[0] || '' ).trim(),
+				qty:  parseInt( ( cols[1] || '1' ).trim(), 10 ) || 1,
+				note: ( cols.slice( 2 ).join( ',' ) || '' ).trim(),
+			};
+		} ).filter( function ( part ) {
+			return !! part.sku;
+		} );
+	}
+
 	function renderParts( d ) {
 		var panel = getOrCreatePanel( 'parts' );
 		var perms = d.permissions || {};
-		var parts = [];
-		var html = '<p style="color:#64748b;padding:1rem">Parts allocation coming from record meta.</p>';
+		var parts = getAllocatedParts( d );
+		var html = '<div class="dtb-wb-section" style="padding:1rem">';
+		html += '<h3 class="dtb-wb-section__title">Allocated parts</h3>';
+		if ( parts.length ) {
+			html += '<table class="widefat striped dtb-repair-parts-table"><thead><tr><th>SKU</th><th>Qty</th><th>Note</th></tr></thead><tbody>';
+			parts.forEach( function ( part ) {
+				html += '<tr><td>' + WB.escapeHtml( part.sku || '' ) + '</td><td>' + WB.escapeHtml( part.qty || 1 ) + '</td><td>' + WB.escapeHtml( part.note || '' ) + '</td></tr>';
+			} );
+			html += '</tbody></table>';
+		} else {
+			html += '<p class="dtb-wb-empty">No parts are allocated yet.</p>';
+		}
+		html += '</div>';
 		if ( perms.can_allocate_parts ) {
+			html += '<div class="dtb-wb-section dtb-repair-parts-editor" style="padding:1rem">';
+			html += '<h3 class="dtb-wb-section__title">Allocation editor</h3>';
+			html += '<label class="screen-reader-text" for="dtb-repair-parts-input">Parts list</label>';
+			html += '<textarea id="dtb-repair-parts-input" class="widefat" rows="5" placeholder="SKU, qty, note">' + WB.escapeHtml( partsToInput( parts ) ) + '</textarea>';
+			html += '<p class="description">One part per line: SKU, quantity, note.</p>';
 			html += '<div class="dtb-wb-command-bar">';
 			html += actionButton( 'Allocate parts', 'dtb-repair-parts-allocate', { repairId: d.record.id }, 'button-primary' );
+			html += '</div>';
 			html += '</div>';
 		}
 		panel.innerHTML = html;
 
 		if ( perms.can_allocate_parts ) {
 			bindActionButton( panel, 'dtb-repair-parts-allocate', function () {
-				doAction( d.record.id, 'parts/allocate', { parts: [] } );
+				var input = panel.querySelector( '#dtb-repair-parts-input' );
+				doAction( d.record.id, 'parts/allocate', { parts: parsePartsInput( input ? input.value : '' ) } );
 			} );
 		}
 	}
@@ -421,9 +473,31 @@
 	function renderTechnician( d ) {
 		var panel = getOrCreatePanel( 'technician' );
 		var r     = d.record;
-		panel.innerHTML = kvSection( 'Assignment', [
+		var perms = d.permissions || {};
+		var html = kvSection( 'Assignment', [
 			[ 'Technician ID', r.technician_id ? String( r.technician_id ) : 'Unassigned' ],
 		] );
+
+		if ( perms.can_assign_technician ) {
+			html += '<div class="dtb-wb-section" style="padding:1rem">';
+			html += '<h3 class="dtb-wb-section__title">Assign technician</h3>';
+			html += '<div class="dtb-wb-inline-form">';
+			html += '<input id="dtb-repair-technician-id" type="number" min="0" class="regular-text" value="' + WB.escapeHtml( r.technician_id || '' ) + '" placeholder="User ID">';
+			html += actionButton( 'Save assignment', 'dtb-repair-technician-save', {}, 'button-primary' );
+			html += '</div>';
+			html += '</div>';
+		}
+
+		panel.innerHTML = html;
+
+		if ( perms.can_assign_technician ) {
+			bindActionButton( panel, 'dtb-repair-technician-save', function () {
+				var input = panel.querySelector( '#dtb-repair-technician-id' );
+				doAction( d.record.id, 'technician/assign', {
+					technician_id: input ? input.value : 0,
+				} );
+			} );
+		}
 	}
 
 	// ── Panel: Conversation ───────────────────────────────────────────────────
@@ -488,6 +562,61 @@
 
 	// ── Panel: Shipping ───────────────────────────────────────────────────────
 
+	function hasIntegrationWarnings( integrations ) {
+		var text = JSON.stringify( integrations || {} ).toLowerCase();
+		return /failed|error|blocked|degraded|stale/.test( text );
+	}
+
+	function renderChecklist( items ) {
+		var html = '<ul class="dtb-wb-checklist">';
+		items.forEach( function ( item ) {
+			html += '<li class="dtb-wb-checklist__item ' + ( item.done ? 'is-done' : 'is-open' ) + '">';
+			html += '<span class="dtb-wb-checklist__mark">' + ( item.done ? '✓' : '!' ) + '</span>';
+			html += '<span>' + WB.escapeHtml( item.label ) + '</span>';
+			html += '</li>';
+		} );
+		html += '</ul>';
+		return html;
+	}
+
+	function repairCloseoutChecklist( d ) {
+		var r = d.record || {};
+		var sh = d.shipping || {};
+		var quote = d.quote || {};
+		var statusesPastParts = [ 'parts_allocated', 'in_progress', 'ready_to_ship', 'closed', 'resolved' ];
+		var statusesPastWork = [ 'ready_to_ship', 'closed', 'resolved' ];
+		var parts = getAllocatedParts( d );
+		var messages = d.conversation || [];
+		var integrations = d.integrations || d.integration || {};
+
+		return [
+			{
+				label: 'Customer has been messaged from the repair thread',
+				done: messages.some( function ( msg ) { return msg.type === 'staff' || msg.type === 'customer'; } ),
+			},
+			{
+				label: 'Quote is not waiting on a draft/send step',
+				done: !! quote.sent_at || !! quote.accepted_at || [ 'quote_accepted', 'parts_allocated', 'in_progress', 'ready_to_ship', 'closed', 'resolved' ].indexOf( r.status ) !== -1,
+			},
+			{
+				label: 'Parts are allocated or the repair status is past parts allocation',
+				done: parts.length > 0 || statusesPastParts.indexOf( r.status ) !== -1,
+			},
+			{
+				label: 'Repair work is complete or ready to ship',
+				done: statusesPastWork.indexOf( r.status ) !== -1,
+			},
+			{
+				label: 'Tracking or Veeqo order reference is present',
+				done: !! ( sh.tracking_number || sh.veeqo_order_id ),
+			},
+			{
+				label: 'No integration warnings are currently visible',
+				done: ! hasIntegrationWarnings( integrations ),
+			},
+		];
+	}
+
 	function renderShipping( d ) {
 		var panel = getOrCreatePanel( 'shipping' );
 		var sh    = d.shipping || {};
@@ -507,12 +636,18 @@
 			[ 'Tracking #',     sh.tracking_number || '—' ],
 			[ 'Veeqo order ID', sh.veeqo_order_id || '—' ],
 		] );
+		html += '<div class="dtb-wb-section" style="padding:1rem">';
+		html += '<h3 class="dtb-wb-section__title">Shipping readiness</h3>';
+		html += renderChecklist( repairCloseoutChecklist( d ) );
+		html += '</div>';
 
 		var canShip = perms.can_transition && r.status === 'in_progress';
 		if ( canShip ) {
 			html += '<div style="padding:1rem">';
 			html += '<label style="display:block;font-size:.8125rem;margin-bottom:.25rem">Tracking number</label>';
 			html += '<input id="dtb-repair-tracking" type="text" class="regular-text" value="' + WB.escapeHtml( sh.tracking_number || '' ) + '">';
+			html += '<label style="display:block;font-size:.8125rem;margin:.75rem 0 .25rem">Veeqo order ID</label>';
+			html += '<input id="dtb-repair-veeqo-order-id" type="text" class="regular-text" value="' + WB.escapeHtml( sh.veeqo_order_id || '' ) + '">';
 			html += '</div>';
 			html += '<div class="dtb-wb-command-bar">';
 			html += actionButton( 'Mark ready to ship', 'dtb-repair-ready-ship', {}, 'button-primary' );
@@ -524,8 +659,10 @@
 		if ( canShip ) {
 			bindActionButton( panel, 'dtb-repair-ready-ship', function () {
 				var tin = panel.querySelector( '#dtb-repair-tracking' );
+				var vin = panel.querySelector( '#dtb-repair-veeqo-order-id' );
 				doAction( d.record.id, 'ready-to-ship', {
 					tracking_number: tin ? tin.value.trim() : '',
+					veeqo_order_id: vin ? vin.value.trim() : '',
 				} );
 			} );
 		}
@@ -566,6 +703,7 @@
 		if ( perms.can_close && ! r.is_terminal ) {
 			html += '<div class="dtb-wb-section" style="padding:0 1rem 1rem">';
 			html += '<h3 class="dtb-wb-section__title">Close repair</h3>';
+			html += renderChecklist( repairCloseoutChecklist( d ) );
 			html += '<textarea id="dtb-repair-close-note" class="widefat" rows="2" placeholder="Closing note (optional)"></textarea>';
 			html += '<div class="dtb-wb-command-bar" style="padding:.5rem 0 0">';
 			html += actionButton( 'Close repair', 'dtb-repair-close', {}, 'button button-link-delete' );
