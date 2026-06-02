@@ -128,6 +128,16 @@
   color: #94a3b8;
 }
 
+/* Remove redundant desktop order summary header totals.
+   The authoritative desktop total remains in the bottom totals section. */
+.dtb-checkout .dtb-summary-panel > div:nth-child(2) > div:nth-child(2) {
+  display: none;
+}
+
+.dtb-checkout .dtb-summary-panel > div:nth-child(2) > div:first-child {
+  margin-bottom: 0;
+}
+
 .dtb-checkout .font-black {
   font-weight: 900;
 }
