@@ -1,7 +1,7 @@
 <?php
 defined( 'ABSPATH' ) || exit;
 
-function dtb_route_sync_images_status( WP_REST_Request $request ): WP_REST_Response {
+function dtb_route_sync_images_status( WP_REST_Request $request ): WP_REST_Response|WP_Error {
 	$relative_path = dtb_image_sync_resolve_relative_upload_path( $request );
 	if ( is_wp_error( $relative_path ) ) {
 		return $relative_path;

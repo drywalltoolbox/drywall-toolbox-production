@@ -37,17 +37,39 @@ function dtb_ajax_image_sync_handler(): void {
 	$request->set_param( 'offset',        max( 0, absint( $_POST['offset'] ?? 0 ) ) );
 	// phpcs:enable WordPress.Security.NonceVerification.Missing
 
-	if ( 'progress' === $sync_action ) {
-		$result = dtb_route_sync_images_progress();
-	} elseif ( 'status' === $sync_action || 'status_snapshot' === $sync_action ) {
-		$result = dtb_route_sync_images_status( $request );
-	} elseif ( 'link_only' === $sync_action ) {
-		$result = dtb_route_link_registered_images( $request );
-	} elseif ( 'fix_renamed' === $sync_action ) {
-		$result = dtb_route_fix_renamed_files( $request );
-	} else {
-		// Default: register (+ link unless register_only).
-		$result = dtb_route_sync_images( $request );
+	try {
+		if ( 'progress' === $sync_action ) {
+			$result = dtb_route_sync_images_progress();
+		} elseif ( 'status' === $sync_action || 'status_snapshot' === $sync_action ) {
+			$result = dtb_route_sync_images_status( $request );
+		} elseif ( 'link_only' === $sync_action ) {
+			$result = dtb_route_link_registered_images( $request );
+		} elseif ( 'fix_renamed' === $sync_action ) {
+			$result = dtb_route_fix_renamed_files( $request );
+		} elseif ( 'release_lock' === $sync_action ) {
+			dtb_image_sync_release_lock( null, true );
+			$result = rest_ensure_response( [ 'released' => true, 'message' => 'Sync lock released.' ] );
+		} else {
+			// Default: register (+ link unless register_only).
+			$result = dtb_route_sync_images( $request );
+		}
+	} catch ( Throwable $throwable ) {
+		dtb_image_sync_log(
+			sprintf(
+				'image_sync ajax exception [%s]: %s in %s:%d',
+				$sync_action ?: 'sync',
+				$throwable->getMessage(),
+				$throwable->getFile(),
+				$throwable->getLine()
+			)
+		);
+
+		wp_send_json_error(
+			[
+				'message' => 'Image sync failed before the batch completed. Open System Manager for diagnostics.',
+			],
+			500
+		);
 	}
 
 	if ( is_wp_error( $result ) ) {

@@ -115,6 +115,7 @@ function dtb_image_sync_render_page(): void {
 	echo '</label>';
 	echo dtb_admin_ui_toolbar_spacer();
 	echo dtb_admin_ui_button( __( 'Refresh Snapshot', 'drywall-toolbox' ), [ 'type' => 'secondary', 'data' => [ 'dtb-image-sync-refresh' => '1' ] ] ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+	echo dtb_admin_ui_button( __( 'Release Lock', 'drywall-toolbox' ), [ 'type' => 'ghost', 'data' => [ 'dtb-image-sync-action' => 'release_lock' ] ] ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 	echo dtb_admin_ui_button( __( 'Fix Renamed Files', 'drywall-toolbox' ), [ 'type' => 'ghost', 'data' => [ 'dtb-image-sync-action' => 'fix_renamed' ] ] ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 	echo dtb_admin_ui_button( __( 'Register Only', 'drywall-toolbox' ), [ 'type' => 'secondary', 'data' => [ 'dtb-image-sync-action' => 'register_only' ] ] ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 	echo dtb_admin_ui_button( __( 'Link Only', 'drywall-toolbox' ), [ 'type' => 'secondary', 'data' => [ 'dtb-image-sync-action' => 'link_only' ] ] ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
@@ -164,6 +165,10 @@ function dtb_image_sync_render_page(): void {
 		var logEl = document.getElementById('dtb-image-sync-log');
 		var running = false;
 		var pollTimer = null;
+		var snapshotTimer = null;
+		var progressPollBusy = false;
+		var snapshotPollBusy = false;
+		var MAX_BATCHES = 2000;
 
 		function appendLog(line) {
 			if (!logEl) return;
@@ -226,45 +231,144 @@ function dtb_image_sync_render_page(): void {
 			return body;
 		}
 
+		function sleep(ms) {
+			return new Promise(function (resolve) {
+				window.setTimeout(resolve, ms);
+			});
+		}
+
+		function parseRetryAfterMs(res) {
+			if (!res || !res.headers) return 0;
+			var header = res.headers.get('Retry-After');
+			if (!header) return 0;
+			var seconds = parseInt(header, 10);
+			if (Number.isFinite(seconds) && seconds > 0) return seconds * 1000;
+			var retryAt = Date.parse(header);
+			return Number.isFinite(retryAt) ? Math.max(0, retryAt - Date.now()) : 0;
+		}
+
+		function computeBackoffDelayMs(attempt) {
+			var capped = Math.min(6, Math.max(1, attempt));
+			return (700 * Math.pow(2, capped - 1)) + Math.floor(Math.random() * 300);
+		}
+
+		function shouldRetry(statusCode, attempt, maxRetries, isNetwork) {
+			if (attempt >= maxRetries) return false;
+			if (isNetwork) return true;
+			return [429, 502, 503, 504].indexOf(statusCode) !== -1;
+		}
+
 		function post(syncAction, extra) {
-			return fetch(cfg.ajaxUrl || window.ajaxurl, {
-				method: 'POST',
-				credentials: 'same-origin',
-				headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' },
-				body: formBody(syncAction, extra).toString()
-			}).then(function (res) {
-				return res.json().then(function (payload) {
-					if (!payload || !payload.success) {
+			var maxRetries = ['progress', 'status', 'status_snapshot'].indexOf(syncAction) !== -1 ? 5 : 3;
+
+			function attemptFetch(attempt) {
+				return fetch(cfg.ajaxUrl || window.ajaxurl, {
+					method: 'POST',
+					credentials: 'same-origin',
+					headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' },
+					body: formBody(syncAction, extra).toString()
+				}).then(function (res) {
+					return res.text().then(function (text) {
+						var payload = null;
+						if (text) {
+							try {
+								payload = JSON.parse(text);
+							} catch (err) {
+								payload = null;
+							}
+						}
+
+						if (res.ok && payload && payload.success) {
+							return payload.data || {};
+						}
+
+						if (shouldRetry(res.status, attempt, maxRetries, false)) {
+							var retryAfter = parseRetryAfterMs(res);
+							return sleep(retryAfter > 0 ? retryAfter : computeBackoffDelayMs(attempt)).then(function () {
+								return attemptFetch(attempt + 1);
+							});
+						}
+
 						var msg = payload && payload.data && payload.data.message
 							? payload.data.message
-							: 'Image sync request failed.';
-						throw new Error(msg);
+							: 'Image sync request failed (' + (res.status || 'network') + ').';
+						var error = new Error(msg);
+						error.dtbNoRetry = true;
+						throw error;
+					});
+				}).catch(function (err) {
+					if (err && err.dtbNoRetry) {
+						throw err;
 					}
-					return payload.data || {};
+					if (shouldRetry(0, attempt, maxRetries, true)) {
+						return sleep(computeBackoffDelayMs(attempt)).then(function () {
+							return attemptFetch(attempt + 1);
+						});
+					}
+					throw err;
 				});
+			}
+
+			return attemptFetch(1);
+		}
+
+		function readProgress() {
+			if (progressPollBusy) return Promise.resolve();
+			progressPollBusy = true;
+			return post('progress', {}).then(function (payload) {
+				var p = payload && payload.progress ? payload.progress : null;
+				if (!p) return;
+				var processed = parseInt(p.processed || 0, 10);
+				var total = parseInt(p.batch_total || 0, 10);
+				var pct = total > 0 ? processed / total : 0;
+				var label = p.last_sku || p.last_item || 'working';
+				var throughput = p.throughput_per_min ? p.throughput_per_min + '/min' : 'n/a';
+				if (total > 0) setProgress(pct);
+				if (running) {
+					setStatus('Running... ' + processed + '/' + (total || '?') + ' | ' + label + ' | ' + throughput);
+				}
+			}).catch(function () {
+				/* Keep the active run moving if a progress poll drops. */
+			}).finally(function () {
+				progressPollBusy = false;
 			});
 		}
 
 		function startProgressPolling() {
 			if (pollTimer) return;
-			pollTimer = window.setInterval(function () {
-				post('progress', {}).then(function (payload) {
-					var p = payload && payload.progress ? payload.progress : null;
-					if (!p) return;
-					var processed = parseInt(p.processed || 0, 10);
-					var total = parseInt(p.batch_total || 0, 10);
-					if (total > 0) setProgress(processed / total);
-					if (running) {
-						setStatus('Running... ' + processed + '/' + (total || '?'));
-					}
-				}).catch(function () { /* noop */ });
-			}, 1500);
+			pollTimer = window.setInterval(readProgress, 1500);
+			readProgress();
 		}
 
 		function stopProgressPolling() {
 			if (pollTimer) {
 				window.clearInterval(pollTimer);
 				pollTimer = null;
+			}
+		}
+
+		function readSnapshot() {
+			if (snapshotPollBusy) return Promise.resolve();
+			snapshotPollBusy = true;
+			return post('status', { upload_path: getUploadPath() }).then(function () {
+				refreshWorkspace();
+			}).catch(function () {
+				/* Keep the existing snapshot rendered if a single poll fails. */
+			}).finally(function () {
+				snapshotPollBusy = false;
+			});
+		}
+
+		function startSnapshotPolling() {
+			if (snapshotTimer) return;
+			snapshotTimer = window.setInterval(readSnapshot, 8000);
+			readSnapshot();
+		}
+
+		function stopSnapshotPolling() {
+			if (snapshotTimer) {
+				window.clearInterval(snapshotTimer);
+				snapshotTimer = null;
 			}
 		}
 
@@ -275,12 +379,17 @@ function dtb_image_sync_render_page(): void {
 			setStatus('Starting run...');
 			appendLog('Starting ' + syncAction + ' for ' + getUploadPath());
 			startProgressPolling();
+			startSnapshotPolling();
 
 			var offset = 0;
 			var batch = 0;
+			var missingFiles = [];
 
 			function next() {
 				batch += 1;
+				if (batch > MAX_BATCHES) {
+					throw new Error('Maximum batch limit exceeded.');
+				}
 				return post(syncAction, { offset: offset }).then(function (data) {
 					var scanned = parseInt(data.scanned || 0, 10);
 					var total = Math.max(scanned, parseInt(data.total || 0, 10));
@@ -294,13 +403,35 @@ function dtb_image_sync_render_page(): void {
 						' | scanned ' + (data.scanned || 0) +
 						' | registered ' + (data.registered || 0) +
 						' | linked ' + (data.linked || 0) +
-						' | skipped ' + (data.skipped || 0)
+						' | skipped ' + (data.skipped || 0) +
+						' | no_file ' + (data.no_file || 0) +
+						' | errors ' + (Array.isArray(data.errors) ? data.errors.length : 0)
 					);
 
-					refreshWorkspace();
+					if (data.active_csv) {
+						appendLog('Active CSV: ' + data.active_csv);
+					}
+					if (typeof data.generate_subsizes !== 'undefined') {
+						appendLog('Subsizes: ' + (data.generate_subsizes ? 'generated' : 'skipped'));
+					}
+					if (Array.isArray(data.errors) && data.errors.length) {
+						data.errors.slice(0, 10).forEach(function (item) {
+							appendLog('  error ' + item);
+						});
+					}
+					if (Array.isArray(data.missing_files) && data.missing_files.length) {
+						data.missing_files.forEach(function (item) { missingFiles.push(item); });
+						data.missing_files.slice(0, 10).forEach(function (item) {
+							var sku = item && item.sku ? item.sku : '(unknown sku)';
+							var expected = item && Array.isArray(item.expected) ? item.expected.join(', ') : '';
+							appendLog('  no_file ' + sku + ': ' + expected);
+						});
+					}
+
+					readSnapshot();
 
 					if (typeof data.next_offset === 'undefined' || data.next_offset === null) {
-						setStatus('Completed.');
+						setStatus('Completed.' + (missingFiles.length ? ' Missing file samples were logged.' : ''));
 						setProgress(1);
 						return;
 					}
@@ -310,11 +441,12 @@ function dtb_image_sync_render_page(): void {
 				});
 			}
 
-			return next().catch(function () {
-				throw new Error('Run failed. View System Manager for diagnostics.');
+			return next().catch(function (err) {
+				throw new Error(err && err.message ? err.message : 'Run failed. View System Manager for diagnostics.');
 			}).finally(function () {
 				running = false;
 				stopProgressPolling();
+				stopSnapshotPolling();
 				setToolbarDisabled(false);
 				refreshWorkspace();
 			});
@@ -339,6 +471,22 @@ function dtb_image_sync_render_page(): void {
 
 			event.preventDefault();
 			var syncAction = actionBtn.getAttribute('data-dtb-image-sync-action') || 'status';
+
+			if (syncAction === 'release_lock') {
+				setToolbarDisabled(true);
+				setStatus('Releasing sync lock...');
+				post('release_lock', {}).then(function (payload) {
+					appendLog(payload && payload.message ? payload.message : 'Sync lock released.');
+					setStatus('Sync lock released.');
+					refreshWorkspace();
+				}).catch(function (err) {
+					setStatus(err.message || 'Release lock failed.', true);
+					appendLog(err.message || 'Release lock failed.');
+				}).finally(function () {
+					setToolbarDisabled(false);
+				});
+				return;
+			}
 
 			if (syncAction === 'fix_renamed') {
 				setToolbarDisabled(true);
