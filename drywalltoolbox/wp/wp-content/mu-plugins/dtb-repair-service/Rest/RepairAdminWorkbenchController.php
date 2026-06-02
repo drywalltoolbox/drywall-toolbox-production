@@ -41,14 +41,15 @@ function dtb_repair_admin_technicians_handler(): WP_REST_Response {
 	$role_candidates = [ 'administrator', 'shop_manager', 'editor' ];
 	$users = get_users( [
 		'role__in' => $role_candidates,
-		'fields'   => [ 'ID', 'display_name', 'user_email', 'roles' ],
+		'fields'   => 'all',
 		'number'   => 100,
 		'orderby'  => 'display_name',
 		'order'    => 'ASC',
 	] );
 
 	$current = wp_get_current_user();
-	if ( $current && $current->ID && ! in_array( $current->ID, wp_list_pluck( $users, 'ID' ), true ) ) {
+	$ids = array_map( static fn( WP_User $user ): int => (int) $user->ID, $users );
+	if ( $current instanceof WP_User && $current->ID && ! in_array( (int) $current->ID, $ids, true ) ) {
 		$users[] = $current;
 	}
 
@@ -89,7 +90,10 @@ function dtb_repair_admin_workbench_action_handler( WP_REST_Request $request ): 
 
 	switch ( $action_type ) {
 		case 'quote_save':
-			$result = dtb_repair_admin_workbench_save_quote( $repair_id, $body );
+			$result = dtb_repair_admin_workbench_save_quote( $repair_id, $body, false );
+			break;
+		case 'quote_send':
+			$result = dtb_repair_admin_workbench_save_quote( $repair_id, $body, true );
 			break;
 		case 'parts_save':
 			$result = dtb_repair_admin_workbench_save_parts( $repair_id, $body, false );
@@ -119,24 +123,29 @@ function dtb_repair_admin_workbench_action_handler( WP_REST_Request $request ): 
 		: new WP_REST_Response( [ 'ok' => true ], 200 );
 }
 
-function dtb_repair_admin_workbench_save_quote( int $repair_id, array $body ): true|WP_Error {
+function dtb_repair_admin_workbench_save_quote( int $repair_id, array $body, bool $send = false ): bool|WP_Error {
 	if ( ! function_exists( 'dtb_repair_save_quote' ) ) {
 		return new WP_Error( 'quote_service_missing', __( 'Quote service is not available.', 'drywall-toolbox' ), [ 'status' => 503 ] );
 	}
 
 	$quote_input = is_array( $body['quote'] ?? null ) ? $body['quote'] : $body;
-	$quote_input['status'] = sanitize_key( (string) ( $quote_input['status'] ?? 'draft' ) );
-	if ( 'sent' === $quote_input['status'] ) {
-		$quote_input['status'] = 'draft';
-	}
+	$quote_input['status'] = $send ? 'sent' : sanitize_key( (string) ( $quote_input['status'] ?? 'draft' ) );
 
 	dtb_repair_save_quote( $repair_id, $quote_input, [
 		'actor_id' => get_current_user_id(),
-		'source'   => 'admin_repair_workbench',
+		'source'   => $send ? 'admin_repair_workbench_quote_send' : 'admin_repair_workbench_quote_save',
 	] );
 
+	$current = (string) get_post_meta( $repair_id, '_repair_status', true );
+	if ( $send && 'quoted' !== $current && in_array( $current, [ 'reviewed', 'approved' ], true ) && function_exists( 'dtb_transition_repair_status' ) ) {
+		$result = dtb_transition_repair_status( $repair_id, 'quoted', [ 'actor_id' => get_current_user_id() ] );
+		if ( is_wp_error( $result ) ) {
+			return $result;
+		}
+	}
+
 	if ( function_exists( 'dtb_admin_audit_write' ) ) {
-		dtb_admin_audit_write( 'repair', $repair_id, 'repair.quote_saved', [ 'user_id' => get_current_user_id() ] );
+		dtb_admin_audit_write( 'repair', $repair_id, $send ? 'repair.quote_sent' : 'repair.quote_saved', [ 'user_id' => get_current_user_id() ] );
 	}
 
 	return true;
@@ -162,7 +171,7 @@ function dtb_repair_admin_workbench_clean_parts( array $parts ): array {
 	return array_slice( $clean, 0, 100 );
 }
 
-function dtb_repair_admin_workbench_save_parts( int $repair_id, array $body, bool $advance_workflow ): true|WP_Error {
+function dtb_repair_admin_workbench_save_parts( int $repair_id, array $body, bool $advance_workflow ): bool|WP_Error {
 	$parts = dtb_repair_admin_workbench_clean_parts( is_array( $body['parts'] ?? null ) ? $body['parts'] : [] );
 	update_post_meta( $repair_id, '_repair_parts_allocated', wp_json_encode( $parts ) );
 
@@ -184,7 +193,7 @@ function dtb_repair_admin_workbench_save_parts( int $repair_id, array $body, boo
 	return true;
 }
 
-function dtb_repair_admin_workbench_assign_technician( int $repair_id, array $body ): true {
+function dtb_repair_admin_workbench_assign_technician( int $repair_id, array $body ): bool {
 	$technician_id = absint( $body['technician_id'] ?? 0 );
 	if ( $technician_id > 0 ) {
 		update_post_meta( $repair_id, '_repair_technician_id', $technician_id );
@@ -218,7 +227,7 @@ function dtb_repair_admin_workbench_assign_technician( int $repair_id, array $bo
 	return true;
 }
 
-function dtb_repair_admin_workbench_save_shipping( int $repair_id, array $body ): true {
+function dtb_repair_admin_workbench_save_shipping( int $repair_id, array $body ): bool {
 	$fields = [
 		'tracking_number' => '_repair_veeqo_tracking',
 		'veeqo_order_id'  => '_repair_veeqo_order_id',
@@ -252,7 +261,7 @@ function dtb_repair_admin_workbench_save_shipping( int $repair_id, array $body )
 	return true;
 }
 
-function dtb_repair_admin_workbench_request_customer_info( int $repair_id, array $body ): true|WP_Error {
+function dtb_repair_admin_workbench_request_customer_info( int $repair_id, array $body ): bool|WP_Error {
 	$message = sanitize_textarea_field( (string) ( $body['body'] ?? '' ) );
 	if ( '' === $message ) {
 		return new WP_Error( 'missing_message', __( 'Message body is required.', 'drywall-toolbox' ), [ 'status' => 400 ] );
