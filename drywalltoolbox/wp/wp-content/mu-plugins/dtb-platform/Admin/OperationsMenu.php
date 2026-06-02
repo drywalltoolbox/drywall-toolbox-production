@@ -98,6 +98,12 @@ function dtb_operations_menu_register_pages(): void {
 					'url'  => content_url( '/mu-plugins/dtb-repair-service/Admin/assets/' ),
 					'file' => 'dtb-repairs-workbench-interactive.css',
 				],
+				[
+					'id'   => 'dtb-repairs-support-chat',
+					'dir'  => WP_CONTENT_DIR . '/mu-plugins/dtb-repair-service/Admin/assets/',
+					'url'  => content_url( '/mu-plugins/dtb-repair-service/Admin/assets/' ),
+					'file' => 'dtb-repairs-support-chat.css',
+				],
 			],
 			'js'  => [
 				[
@@ -111,6 +117,12 @@ function dtb_operations_menu_register_pages(): void {
 					'dir'  => WP_CONTENT_DIR . '/mu-plugins/dtb-repair-service/Admin/assets/',
 					'url'  => content_url( '/mu-plugins/dtb-repair-service/Admin/assets/' ),
 					'file' => 'dtb-repairs-workbench-interactive.js',
+				],
+				[
+					'id'   => 'dtb-repairs-support-chat-script',
+					'dir'  => WP_CONTENT_DIR . '/mu-plugins/dtb-repair-service/Admin/assets/',
+					'url'  => content_url( '/mu-plugins/dtb-repair-service/Admin/assets/' ),
+					'file' => 'dtb-repairs-support-chat.js',
 				],
 			],
 		],
