@@ -15,14 +15,14 @@ defined( 'ABSPATH' ) || exit;
  * @return array<string, array<int, string>>
  */
 function dtb_repairs_status_filter_map(): array {
-	return [
-		'awaiting_review'         => [ 'submitted', 'reviewed', 'awaiting_customer' ],
-		'awaiting_quote_approval' => [ 'approved', 'quoted', 'quote_accepted' ],
-		'in_repair'               => [ 'parts_allocated', 'in_progress' ],
-		'ready_to_ship'           => [ 'ready_to_ship' ],
-		'completed'               => [ 'completed', 'closed' ],
-		'cancelled'               => [ 'cancelled', 'quote_declined' ],
-	];
+	if ( function_exists( 'dtb_admin_get_workflow_queue_filters' ) ) {
+		return array_map(
+			static fn( array $filter ): array => array_values( (array) ( $filter['statuses'] ?? [] ) ),
+			dtb_admin_get_workflow_queue_filters( 'repair' )
+		);
+	}
+
+	return [];
 }
 
 /**
@@ -70,14 +70,17 @@ function dtb_repairs_count_by_status(): array {
 		return $total;
 	};
 
-	return [
-		'awaiting_review'         => $sum( [ 'submitted', 'reviewed', 'awaiting_customer' ] ),
-		'awaiting_quote_approval' => $sum( [ 'approved', 'quoted', 'quote_accepted' ] ),
-		'in_repair'               => $sum( [ 'parts_allocated', 'in_progress' ] ),
-		'ready_to_ship'           => $sum( [ 'ready_to_ship' ] ),
-		'completed'               => $sum( [ 'completed', 'closed' ] ),
-		'cancelled'               => $sum( [ 'cancelled', 'quote_declined' ] ),
-	];
+	$counts = [];
+	foreach ( dtb_repairs_status_filter_map() as $filter => $statuses ) {
+		$counts[ $filter ] = $sum( $statuses );
+	}
+
+	// Transitional aliases for already-open admin screens and bookmarked URLs.
+	$counts['awaiting_review']         = (int) ( $counts['review'] ?? 0 );
+	$counts['awaiting_quote_approval'] = (int) ( $counts['quote_pending'] ?? 0 );
+	$counts['in_repair']               = (int) ( $counts['in_progress'] ?? 0 );
+
+	return $counts;
 }
 
 /**
@@ -86,15 +89,14 @@ function dtb_repairs_count_by_status(): array {
  * @return array<string, string>
  */
 function dtb_repairs_filter_labels(): array {
-	return [
-		''                        => __( 'All', 'drywall-toolbox' ),
-		'awaiting_review'         => __( 'Awaiting Review', 'drywall-toolbox' ),
-		'awaiting_quote_approval' => __( 'Awaiting Quote Approval', 'drywall-toolbox' ),
-		'in_repair'               => __( 'In Progress', 'drywall-toolbox' ),
-		'ready_to_ship'           => __( 'Ready to Ship', 'drywall-toolbox' ),
-		'completed'               => __( 'Completed', 'drywall-toolbox' ),
-		'cancelled'               => __( 'Cancelled', 'drywall-toolbox' ),
-	];
+	$labels = [ '' => __( 'All', 'drywall-toolbox' ) ];
+	if ( function_exists( 'dtb_admin_get_workflow_queue_filters' ) ) {
+		foreach ( dtb_admin_get_workflow_queue_filters( 'repair' ) as $filter => $meta ) {
+			$labels[ $filter ] = (string) ( $meta['label'] ?? ucwords( str_replace( '_', ' ', $filter ) ) );
+		}
+	}
+
+	return $labels;
 }
 
 /**
@@ -105,16 +107,12 @@ function dtb_repairs_filter_labels(): array {
  */
 function dtb_repairs_normalize_status_filter( string $status ): string {
 	$status = sanitize_key( $status );
-	$aliases = [
-		'all'             => '',
-		'awaiting-review' => 'awaiting_review',
-		'awaiting-quote'  => 'awaiting_quote_approval',
-		'in-progress'     => 'in_repair',
-		'ready-to-ship'   => 'ready_to_ship',
-	];
+	if ( '' === $status || 'all' === $status ) {
+		return '';
+	}
 
-	if ( isset( $aliases[ $status ] ) ) {
-		$status = $aliases[ $status ];
+	if ( function_exists( 'dtb_admin_normalize_workflow_queue_filter' ) ) {
+		return dtb_admin_normalize_workflow_queue_filter( 'repair', $status );
 	}
 
 	return array_key_exists( $status, dtb_repairs_filter_labels() ) ? $status : '';
@@ -186,9 +184,9 @@ function dtb_repairs_progress_class( string $status ): string {
  */
 function dtb_repairs_render_summary_cards( string $active_status = '' ): void {
 	$counts = dtb_repairs_count_by_status();
-	$active_total = (int) ( $counts['awaiting_review'] ?? 0 )
-		+ (int) ( $counts['awaiting_quote_approval'] ?? 0 )
-		+ (int) ( $counts['in_repair'] ?? 0 )
+	$active_total = (int) ( $counts['review'] ?? 0 )
+		+ (int) ( $counts['quote_pending'] ?? 0 )
+		+ (int) ( $counts['in_progress'] ?? 0 )
 		+ (int) ( $counts['ready_to_ship'] ?? 0 );
 	$base = admin_url( 'admin.php?page=dtb-repairs' );
 
@@ -203,31 +201,31 @@ function dtb_repairs_render_summary_cards( string $active_status = '' ): void {
 			'href'       => $base,
 		],
 		[
-			'value'      => (int) ( $counts['awaiting_review'] ?? 0 ),
+			'value'      => (int) ( $counts['review'] ?? 0 ),
 			'label'      => __( 'Awaiting Review', 'drywall-toolbox' ),
 			'icon'       => 'dashicons-visibility',
 			'icon_color' => 'warning',
 			'trend'      => __( 'Needs intake', 'drywall-toolbox' ),
 			'trend_dir'  => 'flat',
-			'href'       => add_query_arg( 'status', 'awaiting_review', $base ),
+			'href'       => add_query_arg( 'status', 'review', $base ),
 		],
 		[
-			'value'      => (int) ( $counts['awaiting_quote_approval'] ?? 0 ),
+			'value'      => (int) ( $counts['quote_pending'] ?? 0 ),
 			'label'      => __( 'Quote Queue', 'drywall-toolbox' ),
 			'icon'       => 'dashicons-media-spreadsheet',
 			'icon_color' => 'info',
 			'trend'      => __( 'Approval flow', 'drywall-toolbox' ),
 			'trend_dir'  => 'flat',
-			'href'       => add_query_arg( 'status', 'awaiting_quote_approval', $base ),
+			'href'       => add_query_arg( 'status', 'quote_pending', $base ),
 		],
 		[
-			'value'      => (int) ( $counts['in_repair'] ?? 0 ),
+			'value'      => (int) ( $counts['in_progress'] ?? 0 ),
 			'label'      => __( 'In Progress', 'drywall-toolbox' ),
 			'icon'       => 'dashicons-hammer',
 			'icon_color' => 'primary',
 			'trend'      => __( 'Shop floor', 'drywall-toolbox' ),
 			'trend_dir'  => 'flat',
-			'href'       => add_query_arg( 'status', 'in_repair', $base ),
+			'href'       => add_query_arg( 'status', 'in_progress', $base ),
 		],
 		[
 			'value'      => (int) ( $counts['ready_to_ship'] ?? 0 ),
@@ -335,24 +333,18 @@ function dtb_repairs_render_queue_row( int $repair_id ): void {
 	$badge_type  = dtb_admin_ui_status_badge_type( $status );
 	$avatar_type = in_array( $badge_type, [ 'success', 'warning', 'info', 'accent' ], true ) ? $badge_type : 'primary';
 
-	// Derive next action.
-	$next_action_map = [
-		'submitted'         => [ __( 'Review Intake',   'drywall-toolbox' ), 'warning' ],
-		'reviewed'          => [ __( 'Send Quote',      'drywall-toolbox' ), 'warning' ],
-		'awaiting_customer' => [ __( 'Await Approval',  'drywall-toolbox' ), 'primary' ],
-		'approved'          => [ __( 'Start Repair',    'drywall-toolbox' ), 'primary' ],
-		'quoted'            => [ __( 'Await Approval',  'drywall-toolbox' ), 'primary' ],
-		'quote_accepted'    => [ __( 'Allocate Parts',  'drywall-toolbox' ), 'primary' ],
-		'parts_allocated'   => [ __( 'Begin Work',      'drywall-toolbox' ), 'primary' ],
-		'in_progress'       => [ __( 'In Progress',     'drywall-toolbox' ), 'info' ],
-		'in_repair'         => [ __( 'In Progress',     'drywall-toolbox' ), 'info' ],
-		'ready_to_ship'     => [ __( 'Ship Now',        'drywall-toolbox' ), 'success' ],
-		'completed'         => [ __( 'Completed',       'drywall-toolbox' ), 'muted' ],
-		'closed'            => [ __( 'Closed',          'drywall-toolbox' ), 'muted' ],
-		'cancelled'         => [ __( 'Cancelled',       'drywall-toolbox' ), 'muted' ],
-		'quote_declined'    => [ __( 'Declined',        'drywall-toolbox' ), 'muted' ],
-	];
-	[ $na_label, $na_type ] = $next_action_map[ $status ] ?? [ ucwords( str_replace( '_', ' ', $status ) ), 'muted' ];
+	$next_action = function_exists( 'dtb_admin_compute_next_best_action' )
+		? dtb_admin_compute_next_best_action( 'repair', [ 'id' => $repair_id, 'status' => $status ] )
+		: [];
+	$na_label    = (string) ( $next_action['label'] ?? ucwords( str_replace( '_', ' ', $status ) ) );
+	$na_type     = 'muted';
+	if ( in_array( $status, [ 'submitted', 'reviewed', 'awaiting_customer', 'approved', 'quoted' ], true ) ) {
+		$na_type = 'warning';
+	} elseif ( in_array( $status, [ 'parts_allocated', 'in_progress' ], true ) ) {
+		$na_type = 'info';
+	} elseif ( 'ready_to_ship' === $status ) {
+		$na_type = 'success';
+	}
 
 	echo '<tr class="dtb-table__row dtb-table__row--clickable"'
 		. ' data-dtb-open-repair="' . esc_attr( (string) $repair_id ) . '"'

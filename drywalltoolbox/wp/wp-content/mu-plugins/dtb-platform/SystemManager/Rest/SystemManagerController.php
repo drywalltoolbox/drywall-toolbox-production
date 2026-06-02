@@ -26,6 +26,8 @@ function dtb_system_manager_register_routes(): void {
 		'integrations' => fn() => dtb_integration_health_get(),
 		'webhooks'     => fn() => dtb_webhook_health_get(),
 		'cron'         => fn() => dtb_cron_health_get(),
+		'workflow-links' => fn() => dtb_system_workflow_link_diagnostics(),
+		'workbench-contracts' => fn() => dtb_system_workbench_contract_diagnostics(),
 	];
 
 	foreach ( $routes as $slug => $callback ) {
@@ -69,6 +71,87 @@ function dtb_system_manager_register_routes(): void {
 			'tab' => [ 'sanitize_callback' => 'sanitize_key' ],
 		],
 	] );
+}
+
+/**
+ * Validate registered Command Center/module links against canonical workflow filters.
+ *
+ * @return array<string,mixed>
+ */
+function dtb_system_workflow_link_diagnostics(): array {
+	$data    = function_exists( 'dtb_command_center_get_dashboard_data' ) ? dtb_command_center_get_dashboard_data() : [ 'links' => [] ];
+	$links   = (array) ( $data['links'] ?? [] );
+	$results = [];
+
+	foreach ( $links as $key => $url ) {
+		$parts = wp_parse_url( (string) $url );
+		$query = [];
+		if ( ! empty( $parts['query'] ) ) {
+			wp_parse_str( $parts['query'], $query );
+		}
+
+		$page   = sanitize_key( (string) ( $query['page'] ?? '' ) );
+		$filter = sanitize_key( (string) ( $query['status'] ?? $query['tab'] ?? $query['filter'] ?? $query['queue'] ?? '' ) );
+		$ok     = true;
+		$module = '';
+
+		if ( 'dtb-repairs' === $page && '' !== $filter ) {
+			$module = 'repair';
+			$ok     = '' !== dtb_admin_normalize_workflow_queue_filter( 'repair', $filter );
+		} elseif ( 'dtb-returns' === $page && '' !== $filter ) {
+			$module = 'return';
+			$ok     = '' !== dtb_admin_normalize_workflow_queue_filter( 'return', $filter );
+		} elseif ( 'dtb-support' === $page && '' !== $filter ) {
+			$module = 'support_ticket';
+			$ok     = '' !== dtb_admin_normalize_workflow_queue_filter( 'support_ticket', $filter );
+		} elseif ( 'dtb-orders' === $page && '' !== $filter ) {
+			$module = 'product_order';
+			$ok     = '' !== dtb_admin_normalize_workflow_queue_filter( 'product_order', $filter );
+		}
+
+		$results[ $key ] = [
+			'url'    => esc_url_raw( (string) $url ),
+			'page'   => $page,
+			'filter' => $filter,
+			'module' => $module,
+			'ok'     => $ok,
+		];
+	}
+
+	return [
+		'ok'      => ! in_array( false, wp_list_pluck( $results, 'ok' ), true ),
+		'links'   => $results,
+		'checked' => count( $results ),
+	];
+}
+
+/**
+ * Return AdminWorkbenchContract diagnostics for each operational module.
+ *
+ * @return array<string,mixed>
+ */
+function dtb_system_workbench_contract_diagnostics(): array {
+	$modules = [ 'support', 'returns', 'repairs', 'orders' ];
+	$results = [];
+	foreach ( $modules as $module ) {
+		$payload = function_exists( 'dtb_admin_prepare_workbench_payload' )
+			? dtb_admin_prepare_workbench_payload( [ 'meta' => [ 'module' => $module ] ] )
+			: [];
+		$errors = function_exists( 'dtb_admin_validate_workbench_payload' )
+			? dtb_admin_validate_workbench_payload( $payload )
+			: [ 'AdminWorkbenchContract unavailable.' ];
+
+		$results[ $module ] = [
+			'ok'       => empty( $errors ),
+			'errors'   => $errors,
+			'required' => function_exists( 'dtb_admin_workbench_contract_required_keys' ) ? dtb_admin_workbench_contract_required_keys() : [],
+		];
+	}
+
+	return [
+		'ok'      => ! in_array( false, wp_list_pluck( $results, 'ok' ), true ),
+		'modules' => $results,
+	];
 }
 
 /**

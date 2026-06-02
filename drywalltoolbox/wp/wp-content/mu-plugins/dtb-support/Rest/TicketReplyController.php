@@ -82,7 +82,7 @@ function dtb_support_staff_reply_permission( WP_REST_Request $request ): bool|WP
  */
 function dtb_support_rest_staff_reply( WP_REST_Request $request ): WP_REST_Response|WP_Error {
 	$ticket_id  = (int) $request->get_param( 'id' );
-	$message    = trim( $request->get_param( 'message' ) ?? '' );
+	$message    = trim( sanitize_textarea_field( wp_unslash( (string) ( $request->get_param( 'message' ) ?? '' ) ) ) );
 	$is_internal = (bool) $request->get_param( 'is_internal' );
 	$actor_id   = get_current_user_id();
 
@@ -95,7 +95,16 @@ function dtb_support_rest_staff_reply( WP_REST_Request $request ): WP_REST_Respo
 		return new WP_REST_Response( [ 'success' => false, 'message' => $event_id->get_error_message() ], 422 );
 	}
 
-	return new WP_REST_Response( [ 'success' => true, 'event_id' => $event_id ], 201 );
+	$ticket = dtb_support_get_ticket( $ticket_id );
+	$events = dtb_support_get_events( $ticket_id, 'operator' );
+	$events = function_exists( 'dtb_support_rest_prepare_ticket_events' )
+		? dtb_support_rest_prepare_ticket_events( $ticket_id, (array) $events )
+		: (array) $events;
+	$detail = $ticket && function_exists( 'dtb_support_build_workbench_detail_payload' )
+		? dtb_support_build_workbench_detail_payload( $ticket, $events )
+		: [];
+
+	return new WP_REST_Response( [ 'success' => true, 'event_id' => $event_id, 'detail' => $detail ], 201 );
 }
 
 /**
@@ -111,7 +120,7 @@ function dtb_support_rest_staff_reply( WP_REST_Request $request ): WP_REST_Respo
 function dtb_support_rest_customer_reply( WP_REST_Request $request ): WP_REST_Response|WP_Error {
 	$ticket_id = (int) $request->get_param( 'id' );
 	$token     = sanitize_text_field( $request->get_param( 'token' ) ?? '' );
-	$message   = trim( $request->get_param( 'message' ) ?? '' );
+	$message   = trim( sanitize_textarea_field( wp_unslash( (string) ( $request->get_param( 'message' ) ?? '' ) ) ) );
 
 	$ticket = dtb_support_get_ticket( $ticket_id );
 	if ( ! $ticket ) {

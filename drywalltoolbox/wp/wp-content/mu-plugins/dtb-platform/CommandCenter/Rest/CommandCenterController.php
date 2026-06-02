@@ -82,6 +82,10 @@ function dtb_command_center_admin_overview_handler(): WP_REST_Response {
 		);
 	}
 
+	if ( function_exists( 'dtb_command_center_render_exception_queues' ) ) {
+		echo dtb_command_center_render_exception_queues( $exc ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+	}
+
 	// KPI grid.
 	echo dtb_admin_ui_kpi_grid( [ // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		[

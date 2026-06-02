@@ -99,6 +99,150 @@
 			'</div>';
 	}
 
+	/**
+	 * Render a status badge.
+	 *
+	 * @param {string} status
+	 * @param {string=} label
+	 * @return {string}
+	 */
+	function renderStatusBadge( status, label ) {
+		status = String( status || 'unknown' ).replace( /[^a-z0-9_-]/gi, '' ).toLowerCase();
+		label = label || status.replace( /[_-]/g, ' ' );
+		return '<span class="dtb-wb-badge dtb-wb-badge--' + escapeHtml( status || 'unknown' ) + '">' +
+			escapeHtml( label ) + '</span>';
+	}
+
+	/**
+	 * Render a Customer 360 rail card.
+	 *
+	 * @param {Object} customer
+	 * @return {string}
+	 */
+	function renderCustomerRail( customer ) {
+		customer = customer || {};
+		var html = '<div class="dtb-wb-card dtb-wb-card--customer">';
+		html += '<div class="dtb-wb-card__title">Customer</div>';
+		html += '<div class="dtb-wb-card__body">';
+		html += renderKeyValue( 'Name', escapeHtml( customer.name || 'Unknown Customer' ) );
+		html += renderKeyValue( 'Email', customer.email ? '<a href="mailto:' + escapeHtml( customer.email ) + '">' + escapeHtml( customer.email ) + '</a>' : '\u2014' );
+		html += renderKeyValue( 'Phone', customer.phone ? '<a href="tel:' + escapeHtml( customer.phone ) + '">' + escapeHtml( customer.phone ) + '</a>' : '\u2014' );
+		html += renderKeyValue( 'Orders', escapeHtml( customer.order_count || 0 ) );
+		html += renderKeyValue( 'Open tickets', escapeHtml( customer.open_tickets || 0 ) );
+		html += renderKeyValue( 'Open returns', escapeHtml( customer.open_returns || 0 ) );
+		html += renderKeyValue( 'Open repairs', escapeHtml( customer.open_repairs || 0 ) );
+		html += renderKeyValue( 'Lifetime spend', formatMoney( customer.lifetime_spend || customer.lifetime_value || 0 ) );
+		if ( customer.is_high_value ) {
+			html += '<div class="dtb-wb-note dtb-wb-note--success">High-value customer</div>';
+		}
+		if ( Array.isArray( customer.risk_notes ) && customer.risk_notes.length ) {
+			html += '<div class="dtb-wb-note dtb-wb-note--warning">' +
+				customer.risk_notes.map( escapeHtml ).join( ', ' ) + '</div>';
+		}
+		html += '</div></div>';
+		return html;
+	}
+
+	/**
+	 * Render normalized linked records.
+	 *
+	 * @param {Object} linked
+	 * @return {string}
+	 */
+	function renderLinkedRecords( linked ) {
+		linked = linked || {};
+		var records = Array.isArray( linked.records ) ? linked.records : [];
+		var warnings = Array.isArray( linked.warnings ) ? linked.warnings : [];
+		var mismatches = Array.isArray( linked.mismatches ) ? linked.mismatches : [];
+		var html = '';
+		if ( warnings.length || mismatches.length ) {
+			html += '<div class="dtb-wb-link-warnings">';
+			warnings.forEach( function ( warning ) {
+				html += '<div class="dtb-wb-note dtb-wb-note--' + escapeHtml( warning.severity || 'warning' ) + '">' +
+					escapeHtml( warning.label || warning.code || 'Linked record warning' ) +
+					( warning.message ? '<span>' + escapeHtml( warning.message ) + '</span>' : '' ) +
+					'</div>';
+			} );
+			mismatches.forEach( function ( mismatch ) {
+				html += '<div class="dtb-wb-note dtb-wb-note--' + escapeHtml( mismatch.severity || 'warning' ) + '">' +
+					escapeHtml( mismatch.label || mismatch.code || 'Mismatch' ) +
+					'<span>' + escapeHtml( mismatch.expected || 'unknown' ) + ' / ' + escapeHtml( mismatch.actual || 'unknown' ) + '</span>' +
+					'</div>';
+			} );
+			html += '</div>';
+		}
+		if ( ! records.length ) {
+			return html + '<div class="dtb-wb-empty">No linked records.</div>';
+		}
+		html += '<ul class="dtb-wb-links">';
+		records.forEach( function ( rec ) {
+			var confidence = rec.confidence ? ' <span class="dtb-wb-link-confidence">' + escapeHtml( rec.confidence ) + '</span>' : '';
+			var label = escapeHtml( rec.label || ( rec.module + ' #' + rec.id ) );
+			html += '<li class="dtb-wb-link dtb-wb-link--' + escapeHtml( rec.module || 'record' ) + '">';
+			if ( rec.url ) {
+				html += '<a href="' + escapeHtml( rec.url ) + '">' + label + '</a>';
+			} else {
+				html += '<span>' + label + '</span>';
+			}
+			html += confidence + '</li>';
+		} );
+		html += '</ul>';
+		return html;
+	}
+
+	/**
+	 * Render canonical integration health.
+	 *
+	 * @param {Object} integrations
+	 * @return {string}
+	 */
+	function renderIntegrationHealth( integrations ) {
+		integrations = integrations || {};
+		var keys = Object.keys( integrations );
+		if ( ! keys.length ) {
+			return '<div class="dtb-wb-empty">No integration state available.</div>';
+		}
+		var html = '<div class="dtb-wb-integrations">';
+		keys.forEach( function ( key ) {
+			var item = integrations[ key ] || {};
+			var status = item.status || item.state || 'unknown';
+			html += '<div class="dtb-wb-integration dtb-wb-integration--' + escapeHtml( status ) + '">';
+			html += '<span class="dtb-wb-integration__name">' + escapeHtml( item.label || key ) + '</span>';
+			html += renderStatusBadge( status );
+			if ( item.last_error ) {
+				html += '<span class="dtb-wb-integration__error">' + escapeHtml( item.last_error ) + '</span>';
+			}
+			html += '</div>';
+		} );
+		html += '</div>';
+		return html;
+	}
+
+	/**
+	 * Render a normalized timeline.
+	 *
+	 * @param {Array} events
+	 * @return {string}
+	 */
+	function renderTimeline( events ) {
+		events = Array.isArray( events ) ? events : [];
+		if ( ! events.length ) {
+			return '<div class="dtb-wb-empty">No timeline events yet.</div>';
+		}
+		var html = '<ol class="dtb-wb-timeline">';
+		events.forEach( function ( ev ) {
+			var actor = ev.actor && ev.actor.label ? ev.actor.label : ( ev.actor_label || 'System' );
+			html += '<li class="dtb-wb-timeline__item">';
+			html += '<div class="dtb-wb-timeline__summary">' + escapeHtml( ev.summary || ev.event_type || ev.action || 'Event' ) + '</div>';
+			html += '<div class="dtb-wb-timeline__meta">' + escapeHtml( formatDateFull( ev.created_at || ev.ts || ev.date ) ) +
+				' · ' + escapeHtml( actor ) +
+				' · ' + escapeHtml( ev.visibility || 'internal' ) + '</div>';
+			html += '</li>';
+		} );
+		html += '</ol>';
+		return html;
+	}
+
 	// ── URL helpers ────────────────────────────────────────────────────────────
 
 	/**
@@ -126,6 +270,20 @@
 			url.searchParams.delete( key );
 			window.history.replaceState( null, '', url.toString() );
 		} catch ( e ) { /* noop */ }
+	}
+
+	/**
+	 * Read a URL search param.
+	 *
+	 * @param {string} key
+	 * @return {?string}
+	 */
+	function getUrlParam( key ) {
+		try {
+			return new URL( window.location.href ).searchParams.get( String( key || '' ) );
+		} catch ( e ) {
+			return null;
+		}
 	}
 
 	// ── Toast ──────────────────────────────────────────────────────────────────
@@ -506,6 +664,7 @@
 		switchTabs:       switchTabs,
 		replaceUrlParam:  replaceUrlParam,
 		clearUrlParam:    clearUrlParam,
+		getUrlParam:      getUrlParam,
 		showToast:        showToast,
 		lockAction:       lockAction,
 		unlockAction:     unlockAction,
@@ -515,6 +674,11 @@
 		formatMoney:      formatMoney,
 		escapeHtml:       escapeHtml,
 		renderKeyValue:   renderKeyValue,
+		renderStatusBadge: renderStatusBadge,
+		renderCustomerRail: renderCustomerRail,
+		renderLinkedRecords: renderLinkedRecords,
+		renderIntegrationHealth: renderIntegrationHealth,
+		renderTimeline:    renderTimeline,
 	};
 
 }( window ) );

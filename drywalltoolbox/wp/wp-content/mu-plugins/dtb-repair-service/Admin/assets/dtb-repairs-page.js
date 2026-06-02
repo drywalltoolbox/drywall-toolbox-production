@@ -283,7 +283,7 @@
 	function renderOverview( d ) {
 		var panel = getOrCreatePanel( 'overview' );
 		var r     = d.record;
-		var intel = d.intel || {};
+		var intel = d.intelligence || d.intel || {};
 
 		var html = '<div class="dtb-modal__body">';
 
@@ -309,37 +309,18 @@
 			html += '</div>';
 		}
 
-		// Linked records
-		var linked = d.linked || {};
-		if ( linked.records && linked.records.length ) {
-			html += '<div class="dtb-wb-section">';
-			html += '<h3 class="dtb-wb-section__title">Linked records</h3>';
-			html += '<ul class="dtb-wb-links">';
-			linked.records.forEach( function ( rec ) {
-				html += '<li>' + linkedRecordChip( rec ) + '</li>';
-			} );
-			html += '</ul>';
-			html += '</div>';
-		}
+		var linked = d.linked_records || d.linked || {};
+		html += '<div class="dtb-wb-section">';
+		html += '<h3 class="dtb-wb-section__title">Linked records</h3>';
+		html += WB.renderLinkedRecords ? WB.renderLinkedRecords( linked ) : '';
+		html += '</div>';
 
 		html += '</div>'; // left col
 
 		// Right rail: customer context
 		var ctx = d.customer || {};
 		html += '<div class="dtb-wb-rail">';
-		if ( ctx.name ) {
-			html += '<div class="dtb-wb-card">';
-			html += '<div class="dtb-wb-card__title">Customer</div>';
-			html += '<div class="dtb-wb-card__body">';
-			html += kv( 'Name',    WB.escapeHtml( ctx.name ) );
-			html += kv( 'Email',   WB.escapeHtml( ctx.email || '—' ) );
-			html += kv( 'Orders',  String( ctx.order_count || 0 ) );
-			html += kv( 'LTV',     WB.formatMoney( ctx.lifetime_value || 0 ) );
-			if ( ctx.risk_notes && ctx.risk_notes.length ) {
-				html += kv( 'Notes', ctx.risk_notes.map( function ( n ) { return WB.escapeHtml( n ); } ).join( ', ' ) );
-			}
-			html += '</div></div>';
-		}
+		html += WB.renderCustomerRail ? WB.renderCustomerRail( ctx ) : '';
 		html += '</div>'; // rail
 
 		html += '</div>'; // body flex
@@ -501,24 +482,8 @@
 
 	function renderTimeline( d ) {
 		var panel  = getOrCreatePanel( 'timeline' );
-		var events = d.audit || [];
-		var html   = '';
-
-		if ( ! events.length ) {
-			html = '<p style="color:#64748b;padding:1rem">No audit events.</p>';
-		} else {
-			html += '<ul style="list-style:none;margin:0;padding:1rem;font-size:.8125rem">';
-			events.forEach( function ( ev ) {
-				html += '<li style="border-bottom:1px solid #f1f5f9;padding:.375rem 0">';
-				html += '<strong>' + WB.escapeHtml( ev.event ) + '</strong> ';
-				html += WB.escapeHtml( ev.actor_label || '' ) + ' &middot; ';
-				html += WB.formatDate( ev.created_at );
-				html += '</li>';
-			} );
-			html += '</ul>';
-		}
-
-		panel.innerHTML = html;
+		var events = d.timeline || d.audit || [];
+		panel.innerHTML = WB.renderTimeline ? WB.renderTimeline( events ) : '';
 	}
 
 	// ── Panel: Shipping ───────────────────────────────────────────────────────
@@ -570,21 +535,8 @@
 
 	function renderIntegrations( d ) {
 		var panel = getOrCreatePanel( 'integrations' );
-		var intg  = d.integration || {};
-		var html  = '';
-
-		if ( ! Object.keys( intg ).length ) {
-			html = '<p style="color:#64748b;padding:1rem">No integration data.</p>';
-		} else {
-			Object.keys( intg ).forEach( function ( key ) {
-				var val = intg[ key ];
-				html += kvSection( key, Object.keys( val ).map( function ( k ) {
-					return [ k, String( val[ k ] ) ];
-				} ) );
-			} );
-		}
-
-		panel.innerHTML = html;
+		var intg  = d.integrations || d.integration || {};
+		panel.innerHTML = WB.renderIntegrationHealth ? WB.renderIntegrationHealth( intg ) : '';
 	}
 
 	// ── Panel: Actions ────────────────────────────────────────────────────────
@@ -596,11 +548,12 @@
 		var html   = '';
 
 		// Status transitions
-		if ( perms.can_transition && r.allowed_next && r.allowed_next.length ) {
+		var allowed = ( d.workflow && Array.isArray( d.workflow.allowed_transitions ) ) ? d.workflow.allowed_transitions : ( r.allowed_next || [] );
+		if ( perms.can_transition && allowed.length ) {
 			html += '<div class="dtb-wb-section" style="padding:1rem">';
 			html += '<h3 class="dtb-wb-section__title">Transition status</h3>';
 			html += '<div style="display:flex;flex-wrap:wrap;gap:.5rem">';
-			r.allowed_next.forEach( function ( nextStatus ) {
+			allowed.forEach( function ( nextStatus ) {
 				html += '<button type="button" class="button dtb-repair-transition-btn" data-status="' + WB.escapeHtml( nextStatus ) + '">'
 				      + WB.escapeHtml( nextStatus.replace( /_/g, ' ' ) )
 				      + '</button>';

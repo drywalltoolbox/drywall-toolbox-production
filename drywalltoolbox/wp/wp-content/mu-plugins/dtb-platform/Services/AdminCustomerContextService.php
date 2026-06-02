@@ -69,7 +69,7 @@ function dtb_admin_get_customer_context( array $args ): array {
 		}
 	}
 
-	$cache_key = 'dtb_cctx_' . md5( $email . '_' . $user_id );
+	$cache_key = 'dtb_cctx_' . md5( $email . '_' . $user_id . '_' . $order_id . '_' . $exclude );
 	if ( isset( $memo[ $cache_key ] ) ) {
 		return $memo[ $cache_key ];
 	}
@@ -138,6 +138,12 @@ function dtb_admin_build_customer_context( string $email, int $user_id, string $
 		if ( $user_id || $email ) {
 			$all_orders = wc_get_orders( array_merge( $order_args, [ 'limit' => -1, 'fields' => 'ids' ] ) );
 			$order_count = is_array( $all_orders ) ? count( $all_orders ) : 0;
+			foreach ( (array) $all_orders as $all_order_id ) {
+				$spend_order = wc_get_order( $all_order_id );
+				if ( $spend_order instanceof WC_Order ) {
+					$lifetime_spend += (float) $spend_order->get_total();
+				}
+			}
 
 			$recent = wc_get_orders( array_merge( $order_args, [ 'limit' => 5 ] ) );
 			if ( is_array( $recent ) ) {
@@ -145,7 +151,6 @@ function dtb_admin_build_customer_context( string $email, int $user_id, string $
 					if ( ! is_a( $ord, 'WC_Order' ) ) {
 						continue;
 					}
-					$lifetime_spend += (float) $ord->get_total();
 					$recent_orders[] = [
 						'id'         => $ord->get_id(),
 						'status'     => $ord->get_status(),

@@ -37,6 +37,15 @@ function dtb_order_register_rest_routes(): void {
 		],
 	] );
 
+	register_rest_route( $ns, '/admin/orders/(?P<id>[0-9]+)/detail', [
+		'methods'             => WP_REST_Server::READABLE,
+		'callback'            => 'dtb_order_rest_get_admin_detail',
+		'permission_callback' => static fn() => is_user_logged_in() && ( current_user_can( 'dtb_manage_orders' ) || current_user_can( 'manage_woocommerce' ) ),
+		'args'                => [
+			'id' => [ 'type' => 'integer', 'required' => true, 'minimum' => 1 ],
+		],
+	] );
+
 	register_rest_route( $ns, '/orders/(?P<id>[0-9]+)/tracking', [
 		'methods'             => WP_REST_Server::READABLE,
 		'callback'            => 'dtb_order_rest_get_tracking',

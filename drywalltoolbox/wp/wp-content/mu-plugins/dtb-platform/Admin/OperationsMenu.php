@@ -52,6 +52,17 @@ function dtb_operations_menu_register_pages(): void {
 		'template'   => 'queue',
 		'section'    => 'Commerce',
 		'icon'       => 'dashicons-cart',
+		'assets'     => [
+			'css' => [
+				[
+					'id'   => 'dtb-orders-page',
+					'dir'  => WP_CONTENT_DIR . '/mu-plugins/dtb-commerce/Admin/assets/',
+					'url'  => content_url( '/mu-plugins/dtb-commerce/Admin/assets/' ),
+					'file' => 'dtb-orders-page.css',
+				],
+			],
+			'js'  => [],
+		],
 	] );
 
 	// Repairs.
@@ -66,6 +77,24 @@ function dtb_operations_menu_register_pages(): void {
 		'template'   => 'queue',
 		'section'    => 'Service',
 		'icon'       => 'dashicons-hammer',
+		'assets'     => [
+			'css' => [
+				[
+					'id'   => 'dtb-repairs-page',
+					'dir'  => WP_CONTENT_DIR . '/mu-plugins/dtb-repair-service/Admin/assets/',
+					'url'  => content_url( '/mu-plugins/dtb-repair-service/Admin/assets/' ),
+					'file' => 'dtb-repairs-page.css',
+				],
+			],
+			'js'  => [
+				[
+					'id'   => 'dtb-repairs-page-script',
+					'dir'  => WP_CONTENT_DIR . '/mu-plugins/dtb-repair-service/Admin/assets/',
+					'url'  => content_url( '/mu-plugins/dtb-repair-service/Admin/assets/' ),
+					'file' => 'dtb-repairs-page.js',
+				],
+			],
+		],
 	] );
 
 	// Returns.
@@ -80,6 +109,24 @@ function dtb_operations_menu_register_pages(): void {
 		'template'   => 'queue',
 		'section'    => 'Service',
 		'icon'       => 'dashicons-undo',
+		'assets'     => [
+			'css' => [
+				[
+					'id'   => 'dtb-returns-page',
+					'dir'  => WP_CONTENT_DIR . '/mu-plugins/dtb-returns/Admin/assets/',
+					'url'  => content_url( '/mu-plugins/dtb-returns/Admin/assets/' ),
+					'file' => 'dtb-returns-page.css',
+				],
+			],
+			'js'  => [
+				[
+					'id'   => 'dtb-returns-page-script',
+					'dir'  => WP_CONTENT_DIR . '/mu-plugins/dtb-returns/Admin/assets/',
+					'url'  => content_url( '/mu-plugins/dtb-returns/Admin/assets/' ),
+					'file' => 'dtb-returns-page.js',
+				],
+			],
+		],
 	] );
 
 	// Support.
@@ -92,6 +139,24 @@ function dtb_operations_menu_register_pages(): void {
 		'callback'   => 'dtb_support_render_page',
 		'position'   => 50,
 		'template'   => 'queue',
+		'assets'     => [
+			'css' => [
+				[
+					'id'   => 'dtb-support-page',
+					'dir'  => WP_CONTENT_DIR . '/mu-plugins/dtb-support/Admin/assets/',
+					'url'  => content_url( '/mu-plugins/dtb-support/Admin/assets/' ),
+					'file' => 'dtb-support-page.css',
+				],
+			],
+			'js'  => [
+				[
+					'id'   => 'dtb-support-page-script',
+					'dir'  => WP_CONTENT_DIR . '/mu-plugins/dtb-support/Admin/assets/',
+					'url'  => content_url( '/mu-plugins/dtb-support/Admin/assets/' ),
+					'file' => 'dtb-support-page.js',
+				],
+			],
+		],
 		'section'    => 'Communication',
 		'icon'       => 'dashicons-format-chat',
 	] );

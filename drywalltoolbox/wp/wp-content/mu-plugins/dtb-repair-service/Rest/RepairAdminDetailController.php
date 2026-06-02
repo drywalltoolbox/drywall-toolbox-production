@@ -50,8 +50,13 @@ function dtb_repair_admin_detail_handler( WP_REST_Request $request ): WP_REST_Re
 
 	// ── Status / workflow ──
 	$status         = (string) get_post_meta( $repair_id, '_repair_status', true ) ?: $post->post_status;
-	$allowed_next   = function_exists( 'dtb_get_allowed_transitions' )
-		? ( dtb_get_allowed_transitions()[ $status ] ?? [] )
+	$allowed_next   = function_exists( 'dtb_admin_get_allowed_workflow_transitions' )
+		? dtb_admin_get_allowed_workflow_transitions( 'repair', $status )
+		: ( function_exists( 'dtb_get_allowed_transitions' )
+			? ( dtb_get_allowed_transitions()[ $status ] ?? [] )
+			: [] );
+	$workflow_def = function_exists( 'dtb_admin_get_workflow_definition' )
+		? dtb_admin_get_workflow_definition( 'repair' )
 		: [];
 	$is_terminal    = empty( $allowed_next );
 
@@ -61,9 +66,11 @@ function dtb_repair_admin_detail_handler( WP_REST_Request $request ): WP_REST_Re
 		: [];
 
 	// ── Integration state ──
-	$integration = function_exists( 'dtb_get_repair_integration_state' )
-		? dtb_get_repair_integration_state( $repair_id )
-		: [];
+	$integration = function_exists( 'dtb_admin_get_integration_state' )
+		? dtb_admin_get_integration_state( 'repair', $repair_id )
+		: ( function_exists( 'dtb_get_repair_integration_state' )
+			? dtb_get_repair_integration_state( $repair_id )
+			: [] );
 
 	// ── Comments / conversation ──
 	$comments_raw = get_comments( [
@@ -86,9 +93,34 @@ function dtb_repair_admin_detail_handler( WP_REST_Request $request ): WP_REST_Re
 
 	// ── Customer context ──
 	$customer_email = sanitize_email( (string) get_post_meta( $repair_id, '_repair_customer_email', true ) );
+	$customer_user_id = absint( get_post_meta( $repair_id, '_repair_customer_user_id', true ) );
+	$wc_order_id = absint( get_post_meta( $repair_id, '_repair_wc_order_id', true ) );
+	if ( ! $wc_order_id ) {
+		$wc_order_id = absint( get_post_meta( $repair_id, '_repair_order_id', true ) );
+	}
+	if ( $wc_order_id && function_exists( 'wc_get_order' ) ) {
+		$wc_order = wc_get_order( $wc_order_id );
+		if ( $wc_order instanceof WC_Order ) {
+			if ( ! $customer_email ) {
+				$customer_email = sanitize_email( $wc_order->get_billing_email() );
+			}
+			if ( ! $customer_user_id ) {
+				$customer_user_id = absint( $wc_order->get_customer_id() );
+			}
+		}
+	}
 	$customer_ctx   = [];
-	if ( $customer_email && function_exists( 'dtb_admin_get_customer_context' ) ) {
-		$customer_ctx = dtb_admin_get_customer_context( [ 'email' => $customer_email ] );
+	if ( function_exists( 'dtb_admin_get_customer_context' ) ) {
+		$customer_ctx = dtb_admin_get_customer_context( [
+			'customer_email'   => $customer_email,
+			'customer_user_id' => $customer_user_id,
+			'order_id'         => $wc_order_id,
+			'exclude_module'   => 'repair',
+		] );
+		if ( isset( $customer_ctx['lifetime_spend'] ) && ! isset( $customer_ctx['lifetime_value'] ) ) {
+			// TODO: remove when all admin JS reads lifetime_spend.
+			$customer_ctx['lifetime_value'] = $customer_ctx['lifetime_spend'];
+		}
 	}
 
 	// ── Linked records ──
@@ -134,6 +166,9 @@ function dtb_repair_admin_detail_handler( WP_REST_Request $request ): WP_REST_Re
 	if ( function_exists( 'dtb_admin_audit_get_events' ) ) {
 		$audit_events = dtb_admin_audit_get_events( 'repair', $repair_id, 50 );
 	}
+	$timeline = function_exists( 'dtb_admin_get_timeline' )
+		? dtb_admin_get_timeline( 'repair', $repair_id, [ 'events' => $audit_events ] )
+		: $audit_events;
 
 	// ── Permissions for this operator ──
 	$perms = [
@@ -185,17 +220,35 @@ function dtb_repair_admin_detail_handler( WP_REST_Request $request ): WP_REST_Re
 			'issue_start'        => (string) get_post_meta( $repair_id, '_repair_issue_start', true ),
 			'issue_description'  => (string) get_post_meta( $repair_id, '_repair_issue', true ),
 			'contact_preference' => (string) get_post_meta( $repair_id, '_repair_contact_preference', true ),
-			'wc_order_id'        => (int) get_post_meta( $repair_id, '_repair_wc_order_id', true ),
+			'wc_order_id'        => $wc_order_id,
 			'technician_id'      => (int) get_post_meta( $repair_id, '_repair_technician_id', true ),
 		],
 		'quote'        => $quote,
 		'shipping'     => $shipping,
 		'conversation' => $conversation,
-		'linked'       => $linked,
+		'workflow'     => [
+			'key'                 => 'repair',
+			'status'              => $status,
+			'label'               => (string) ( $workflow_def['labels'][ $status ] ?? ( function_exists( 'dtb_get_repair_status_label' ) ? dtb_get_repair_status_label( $status ) : $status ) ),
+			'all_statuses'        => array_values( (array) ( $workflow_def['statuses'] ?? [] ) ),
+			'labels'              => (array) ( $workflow_def['labels'] ?? [] ),
+			'terminal_statuses'   => array_values( (array) ( $workflow_def['terminal_statuses'] ?? [] ) ),
+			'allowed_transitions' => $allowed_next,
+		],
+		'linked_records' => $linked,
+		'linked'       => $linked, // TODO: remove after repairs JS reads linked_records only.
 		'customer'     => $customer_ctx,
-		'intel'        => $intel,
-		'integration'  => $integration,
-		'audit'        => $audit_events,
+		'intelligence' => $intel,
+		'intel'        => $intel, // TODO: remove after repairs JS reads intelligence only.
+		'integrations' => $integration,
+		'integration'  => $integration, // TODO: remove after repairs JS reads integrations only.
+		'communication' => [
+			'conversation' => $conversation,
+			'unread_customer_messages' => (int) get_post_meta( $repair_id, '_repair_customer_unread', true ),
+		],
+		'timeline'     => $timeline,
+		'audit'        => $audit_events, // TODO: remove after repairs JS reads timeline only.
+		'actions'      => array_values( (array) $allowed_next ),
 		'permissions'  => $perms,
 		'meta'         => [
 			'nonce'       => wp_create_nonce( 'wp_rest' ),
@@ -203,6 +256,10 @@ function dtb_repair_admin_detail_handler( WP_REST_Request $request ): WP_REST_Re
 			'fetched_at'  => gmdate( 'c' ),
 		],
 	];
+
+	if ( function_exists( 'dtb_admin_prepare_workbench_payload' ) ) {
+		$payload = dtb_admin_prepare_workbench_payload( $payload );
+	}
 
 	return new WP_REST_Response( $payload, 200 );
 }

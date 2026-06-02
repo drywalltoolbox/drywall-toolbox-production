@@ -379,10 +379,12 @@
 			events.forEach( function ( ev ) {
 				html += '<li class="dtb-returns-timeline-item">';
 				html += '<div class="dtb-returns-timeline-dot"></div>';
-				html += '<p class="dtb-returns-timeline-summary">' + esc( ev.action || ev.event || '' ) + '</p>';
-				var meta = formatDate( ev.created_at || ev.date );
-				if ( ev.user_login || ev.user ) {
-					meta += ' \u00b7 ' + esc( ev.user_login || ev.user );
+				html += '<p class="dtb-returns-timeline-summary">' + esc( ev.summary || ev.action || ev.event_type || ev.event || '' ) + '</p>';
+				var meta = formatDate( ev.created_at || ev.ts || ev.date );
+				if ( ev.actor && ev.actor.label ) {
+					meta += ' \u00b7 ' + esc( ev.actor.label );
+				} else if ( ev.user_login || ev.user || ev.actor_label ) {
+					meta += ' \u00b7 ' + esc( ev.user_login || ev.user || ev.actor_label );
 				}
 				html += '<p class="dtb-returns-timeline-meta">' + meta + '</p>';
 				html += '</li>';
@@ -396,21 +398,96 @@
 		return html;
 	}
 
+	// ── Tab builder: Customer ──────────────────────────────────────────────────
+	function buildCustomerTab( customer, linked ) {
+		var WB = window.DtbWorkbench || {};
+		var html = '<div class="dtb-returns-overview-grid">';
+		html += sectionOpen( 'Customer 360' );
+		if ( WB.renderCustomerRail ) {
+			html += WB.renderCustomerRail( customer || {} );
+		} else {
+			customer = customer || {};
+			html += kv( 'Name', esc( customer.name || '\u2014' ) );
+			html += kv( 'Email', customer.email ? '<a href="mailto:' + esc( customer.email ) + '">' + esc( customer.email ) + '</a>' : '\u2014' );
+			html += kv( 'Lifetime spend', esc( customer.lifetime_spend || 0 ) );
+		}
+		html += sectionClose();
+		html += sectionOpen( 'Linked Records' );
+		html += WB.renderLinkedRecords ? WB.renderLinkedRecords( linked || {} ) : '<p class="dtb-returns-activity-empty">No linked records.</p>';
+		html += sectionClose();
+		html += '</div>';
+		return html;
+	}
+
+	// ── Tab builder: Integrations ──────────────────────────────────────────────
+	function buildIntegrationsTab( integrations ) {
+		var WB = window.DtbWorkbench || {};
+		var html = sectionOpen( 'Integration Health' );
+		html += WB.renderIntegrationHealth
+			? WB.renderIntegrationHealth( integrations || {} )
+			: '<p class="dtb-returns-activity-empty">No integration state available.</p>';
+		html += sectionClose();
+		return html;
+	}
+
+	// ── Tab builder: Decision ─────────────────────────────────────────────────
+	function buildDecisionTab( ret, order, linked ) {
+		linked = linked || {};
+		var warnings = Array.isArray( linked.warnings ) ? linked.warnings : [];
+		var mismatches = Array.isArray( linked.mismatches ) ? linked.mismatches : [];
+		var allowed = Array.isArray( ret.allowed_transitions ) ? ret.allowed_transitions : [];
+		var checklist = [
+			{ label: 'WooCommerce order linked', done: !! ( order && order.id ) },
+			{ label: 'Customer/order links verified', done: ! warnings.length && ! mismatches.length },
+			{ label: 'Resolution selected', done: !! ret.resolution },
+			{ label: 'Return item received', done: [ 'item_received', 'refund_issued', 'exchange_sent', 'closed' ].indexOf( ret.status ) !== -1 },
+			{ label: 'Valid next transition available', done: !! allowed.length },
+		];
+
+		var html = sectionOpen( 'Decision' );
+		html += kv( 'Current status', '<span class="' + statusBadgeClass( ret.status ) + '">' + statusLabel( ret.status ) + '</span>' );
+		html += kv( 'Resolution', esc( ret.resolution ? statusLabel( ret.resolution ) : 'Not selected' ) );
+		html += kv( 'Next statuses', allowed.length ? esc( allowed.map( statusLabel ).join( ', ' ) ) : '\u2014' );
+		html += sectionClose();
+
+		html += sectionOpen( 'Readiness Checklist' );
+		html += '<ul class="dtb-returns-readiness-list">';
+		checklist.forEach( function ( item ) {
+			html += '<li class="dtb-returns-readiness-item ' + ( item.done ? 'is-ready' : 'is-blocked' ) + '">';
+			html += '<span class="dtb-returns-readiness-mark">' + ( item.done ? '\u2713' : '!' ) + '</span>';
+			html += '<span>' + esc( item.label ) + '</span>';
+			html += '</li>';
+		} );
+		html += '</ul>';
+		html += sectionClose();
+
+		if ( warnings.length || mismatches.length ) {
+			var WB = window.DtbWorkbench || {};
+			html += sectionOpen( 'Link Integrity' );
+			html += WB.renderLinkedRecords ? WB.renderLinkedRecords( linked ) : '';
+			html += sectionClose();
+		}
+
+		return html;
+	}
+
 	// ── Tab builder: Actions ───────────────────────────────────────────────────
 	function buildActionsTab( ret ) {
-		var allStatuses = [ 'pending_review', 'approved', 'rejected', 'awaiting_item', 'item_received', 'refund_issued', 'exchange_sent', 'closed' ];
+		var allowedTransitions = Array.isArray( ret.allowed_transitions ) ? ret.allowed_transitions : [];
 		var html = '';
 
 		// Status transitions
 		html += sectionOpen( 'Update Status' );
 		html += '<div class="dtb-returns-workflow-btns">';
-		allStatuses.forEach( function ( s ) {
-			if ( s === ret.status ) { return; }
+		allowedTransitions.forEach( function ( s ) {
 			html += '<button type="button" class="dtb-returns-action-btn" ' +
 				'data-dtb-returns-action="status" data-dtb-returns-value="' + esc( s ) + '">' +
 				statusLabel( s ) + '</button>';
 		} );
 		html += '</div>';
+		if ( ! allowedTransitions.length ) {
+			html += '<p class="dtb-returns-activity-empty">No valid status transitions are available from the current return status.</p>';
+		}
 		html += sectionClose();
 
 		// Resolution
@@ -446,8 +523,11 @@
 	// ── Render modal ───────────────────────────────────────────────────────────
 	function renderModal( els, payload ) {
 		var ret    = payload['return'] || payload.return_data || {};
-		var events = payload.events || [];
+		var events = payload.timeline || payload.events || [];
 		var order  = payload.order  || null;
+		var customer = payload.customer || {};
+		var linked = payload.linked_records || payload.linked || {};
+		var integrations = payload.integrations || {};
 
 		state.lastOrder = order;
 
@@ -466,7 +546,10 @@
 		html += '<nav class="dtb-returns-modal-tabs" role="tablist">';
 		html += '<button class="dtb-returns-modal-tab is-active" role="tab" aria-selected="true"  data-dtb-returns-tab="overview">Overview</button>';
 		html += '<button class="dtb-returns-modal-tab"           role="tab" aria-selected="false" data-dtb-returns-tab="order">'    + orderTabLabel + '</button>';
+		html += '<button class="dtb-returns-modal-tab"           role="tab" aria-selected="false" data-dtb-returns-tab="decision">Decision</button>';
 		html += '<button class="dtb-returns-modal-tab"           role="tab" aria-selected="false" data-dtb-returns-tab="activity">Activity</button>';
+		html += '<button class="dtb-returns-modal-tab"           role="tab" aria-selected="false" data-dtb-returns-tab="customer">Customer</button>';
+		html += '<button class="dtb-returns-modal-tab"           role="tab" aria-selected="false" data-dtb-returns-tab="integrations">Integrations</button>';
 		html += '<button class="dtb-returns-modal-tab"           role="tab" aria-selected="false" data-dtb-returns-tab="actions">Actions</button>';
 		html += '</nav>';
 
@@ -474,7 +557,10 @@
 		html += '<div class="dtb-returns-modal-body">';
 		html += '<div data-dtb-returns-panel="overview" class="dtb-returns-modal-panel is-active">' + buildOverviewTab( ret, order )  + '</div>';
 		html += '<div data-dtb-returns-panel="order"    class="dtb-returns-modal-panel">'           + buildOrderTab( order, ret )     + '</div>';
+		html += '<div data-dtb-returns-panel="decision" class="dtb-returns-modal-panel">'           + buildDecisionTab( ret, order, linked ) + '</div>';
 		html += '<div data-dtb-returns-panel="activity" class="dtb-returns-modal-panel">'           + buildActivityTab( ret, events ) + '</div>';
+		html += '<div data-dtb-returns-panel="customer" class="dtb-returns-modal-panel">'           + buildCustomerTab( customer, linked ) + '</div>';
+		html += '<div data-dtb-returns-panel="integrations" class="dtb-returns-modal-panel">'       + buildIntegrationsTab( integrations ) + '</div>';
 		html += '<div data-dtb-returns-panel="actions"  class="dtb-returns-modal-panel">'           + buildActionsTab( ret )          + '</div>';
 		html += '</div>';
 

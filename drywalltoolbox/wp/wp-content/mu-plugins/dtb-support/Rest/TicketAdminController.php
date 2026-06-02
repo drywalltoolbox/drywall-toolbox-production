@@ -245,11 +245,13 @@ function dtb_support_rest_get_ticket_intelligence( WP_REST_Request $request ): W
 		: [];
 
 	// ── Linked records ──────────────────────────────────────────────────────
-	$linked_records = [
-		'order_id'   => ! empty( $ticket->order_id ) ? (int) $ticket->order_id : null,
-		'repair_id'  => ! empty( $ticket->repair_id ) ? (int) $ticket->repair_id : null,
-		'return_id'  => ! empty( $ticket->return_id ) ? (int) $ticket->return_id : null,
-	];
+	$linked_records = function_exists( 'dtb_admin_get_linked_records' )
+		? dtb_admin_get_linked_records( 'support', $ticket_id )
+		: [
+			'order_id'   => ! empty( $ticket->order_id ) ? (int) $ticket->order_id : null,
+			'repair_id'  => ! empty( $ticket->repair_id ) ? (int) $ticket->repair_id : null,
+			'return_id'  => ! empty( $ticket->return_id ) ? (int) $ticket->return_id : null,
+		];
 
 	// ── Delivery health ─────────────────────────────────────────────────────
 	$delivery_health = [
@@ -727,11 +729,9 @@ function dtb_support_rest_get_ticket( WP_REST_Request $request ): WP_REST_Respon
 
 	$events = dtb_support_get_events( $ticket_id, 'operator' );
 	$events = dtb_support_rest_prepare_ticket_events( $ticket_id, (array) $events );
+	$detail = dtb_support_build_workbench_detail_payload( $ticket, $events );
 
-	return new WP_REST_Response( [
-		'ticket' => dtb_support_project_ticket( $ticket ),
-		'events' => $events,
-	], 200 );
+	return new WP_REST_Response( $detail, 200 );
 }
 
 /**
@@ -764,11 +764,107 @@ function dtb_support_rest_update_ticket( WP_REST_Request $request ): WP_REST_Res
 	}
 
 	$fresh = dtb_support_get_ticket( $ticket_id );
+	$events = dtb_support_get_events( $ticket_id, 'operator' );
+	$events = dtb_support_rest_prepare_ticket_events( $ticket_id, (array) $events );
+	$detail = $fresh ? dtb_support_build_workbench_detail_payload( $fresh, $events ) : [];
 
 	return new WP_REST_Response( [
 		'success' => true,
 		'ticket'  => dtb_support_project_ticket( $fresh ),
+		'detail'  => $detail,
 	], 200 );
+}
+
+/**
+ * Build the canonical support workbench detail payload while preserving aliases.
+ *
+ * @param object $ticket Ticket row/entity.
+ * @param array  $events Prepared operator events.
+ * @return array
+ */
+function dtb_support_build_workbench_detail_payload( object $ticket, array $events ): array {
+	$ticket_id = (int) ( $ticket->id ?? 0 );
+	$record    = dtb_support_project_ticket( $ticket );
+	$status    = sanitize_key( (string) ( $ticket->status ?? $record['status'] ?? '' ) );
+
+	$workflow_def = function_exists( 'dtb_admin_get_workflow_definition' )
+		? dtb_admin_get_workflow_definition( 'support_ticket' )
+		: [];
+	$allowed = function_exists( 'dtb_admin_get_allowed_workflow_transitions' )
+		? dtb_admin_get_allowed_workflow_transitions( 'support_ticket', $status )
+		: ( function_exists( 'dtb_support_allowed_transitions' ) ? ( dtb_support_allowed_transitions()[ $status ] ?? [] ) : [] );
+
+	$customer = function_exists( 'dtb_admin_get_customer_context' )
+		? dtb_admin_get_customer_context( [
+			'customer_email'   => sanitize_email( (string) ( $ticket->customer_email ?? '' ) ),
+			'customer_user_id' => absint( $ticket->customer_user_id ?? 0 ),
+			'order_id'         => absint( $ticket->order_id ?? 0 ),
+			'exclude_module'   => 'support',
+		] )
+		: [];
+	$linked = function_exists( 'dtb_admin_get_linked_records' )
+		? dtb_admin_get_linked_records( 'support', $ticket_id )
+		: [];
+
+	$intel_request = new WP_REST_Request( 'GET', '/dtb/v1/support/tickets/' . $ticket_id . '/intelligence' );
+	$intel_request->set_param( 'id', $ticket_id );
+	$intel_response = dtb_support_rest_get_ticket_intelligence( $intel_request );
+	$intel_data = $intel_response instanceof WP_REST_Response ? $intel_response->get_data() : [];
+	$integrations = function_exists( 'dtb_admin_get_integration_state' )
+		? dtb_admin_get_integration_state( 'support', $ticket_id, [
+			'order_id'                   => absint( $ticket->order_id ?? 0 ),
+			'notification_status'        => (string) ( $ticket->notification_status ?? '' ),
+			'notification_fail_count'    => absint( $ticket->notification_fail_count ?? 0 ),
+			'notification_last_sent_at'  => $ticket->notification_last_sent_at ?? null,
+		] )
+		: [ 'email' => $intel_data['delivery_health'] ?? [] ];
+	$timeline = function_exists( 'dtb_admin_get_timeline' )
+		? dtb_admin_get_timeline( 'support', $ticket_id, [ 'events' => $events ] )
+		: $events;
+
+	$payload = [
+		'ok'             => true,
+		'record'         => $record,
+		'ticket'         => $record, // TODO: remove after support JS reads record only.
+		'customer'       => $customer,
+		'customer_context' => $intel_data['customer_context'] ?? $customer, // TODO: remove after support JS reads customer only.
+		'linked_records' => $linked,
+		'workflow'       => [
+			'key'                 => 'support_ticket',
+			'status'              => $status,
+			'label'               => (string) ( $workflow_def['labels'][ $status ] ?? ( function_exists( 'dtb_support_status_label' ) ? dtb_support_status_label( $status ) : $status ) ),
+			'all_statuses'        => array_values( (array) ( $workflow_def['statuses'] ?? [] ) ),
+			'labels'              => (array) ( $workflow_def['labels'] ?? [] ),
+			'terminal_statuses'   => array_values( (array) ( $workflow_def['terminal_statuses'] ?? [] ) ),
+			'allowed_transitions' => array_values( (array) $allowed ),
+		],
+		'intelligence'   => [
+			'priority_score'     => $intel_data['priority_score'] ?? null,
+			'next_action'        => $intel_data['next_action'] ?? null,
+			'recommended_macros' => $intel_data['recommended_macros'] ?? [],
+			'risk_flags'         => $intel_data['risk_flags'] ?? [],
+		],
+		'communication'  => [
+			'delivery_health' => $intel_data['delivery_health'] ?? [],
+		],
+		'integrations'   => $integrations,
+		'timeline'       => $timeline,
+		'events'         => $events, // TODO: remove after support JS reads timeline only.
+		'actions'        => array_values( (array) $allowed ),
+		'permissions'    => [
+			'can_transition' => dtb_support_user_can_any( [ 'dtb_change_support_status', 'dtb_manage_support' ] ),
+			'can_reply'      => dtb_support_user_can_any( [ 'dtb_manage_support' ] ),
+			'can_note'       => dtb_support_user_can_any( [ 'dtb_manage_support' ] ),
+		],
+		'meta'           => [
+			'fetched_at'    => gmdate( 'c' ),
+			'poll_after_ms' => 60000,
+		],
+	];
+
+	return function_exists( 'dtb_admin_prepare_workbench_payload' )
+		? dtb_admin_prepare_workbench_payload( $payload )
+		: $payload;
 }
 
 /**

@@ -92,38 +92,10 @@ function dtb_admin_assets_enqueue(): void {
 
 	$current_user = wp_get_current_user();
 
-	// ── Module-specific CSS (keyed by page slug) ──
+	// ── Module-specific CSS (declared by page metadata) ──
 	$page_slug = $page_meta['slug'] ?? '';
 
-	$module_css_map = [
-		'dtb-repairs' => [
-			'id'  => 'dtb-repairs-page',
-			'dir' => WP_CONTENT_DIR . '/mu-plugins/dtb-repair-service/Admin/assets/',
-			'url' => content_url( '/mu-plugins/dtb-repair-service/Admin/assets/' ),
-			'file' => 'dtb-repairs-page.css',
-		],
-		'dtb-support' => [
-			'id'  => 'dtb-support-page',
-			'dir' => WP_CONTENT_DIR . '/mu-plugins/dtb-support/Admin/assets/',
-			'url' => content_url( '/mu-plugins/dtb-support/Admin/assets/' ),
-			'file' => 'dtb-support-page.css',
-		],
-		'dtb-returns' => [
-			'id'  => 'dtb-returns-page',
-			'dir' => WP_CONTENT_DIR . '/mu-plugins/dtb-returns/Admin/assets/',
-			'url' => content_url( '/mu-plugins/dtb-returns/Admin/assets/' ),
-			'file' => 'dtb-returns-page.css',
-		],
-		'dtb-orders' => [
-			'id'  => 'dtb-orders-page',
-			'dir' => WP_CONTENT_DIR . '/mu-plugins/dtb-commerce/Admin/assets/',
-			'url' => content_url( '/mu-plugins/dtb-commerce/Admin/assets/' ),
-			'file' => 'dtb-orders-page.css',
-		],
-	];
-
-	if ( isset( $module_css_map[ $page_slug ] ) ) {
-		$mod      = $module_css_map[ $page_slug ];
+	foreach ( (array) ( $page_meta['assets']['css'] ?? [] ) as $mod ) {
 		$mod_file = $mod['dir'] . $mod['file'];
 		$mod_ver  = file_exists( $mod_file ) ? (string) filemtime( $mod_file ) : '1.0.0';
 
@@ -141,30 +113,8 @@ function dtb_admin_assets_enqueue(): void {
 		);
 	}
 
-	// ── Module-specific JS (keyed by page slug) ──
-	$module_js_map = [
-		'dtb-support' => [
-			'id'   => 'dtb-support-page-script',
-			'dir'  => WP_CONTENT_DIR . '/mu-plugins/dtb-support/Admin/assets/',
-			'url'  => content_url( '/mu-plugins/dtb-support/Admin/assets/' ),
-			'file' => 'dtb-support-page.js',
-		],
-		'dtb-returns' => [
-			'id'   => 'dtb-returns-page-script',
-			'dir'  => WP_CONTENT_DIR . '/mu-plugins/dtb-returns/Admin/assets/',
-			'url'  => content_url( '/mu-plugins/dtb-returns/Admin/assets/' ),
-			'file' => 'dtb-returns-page.js',
-		],
-		'dtb-repairs' => [
-			'id'   => 'dtb-repairs-page-script',
-			'dir'  => WP_CONTENT_DIR . '/mu-plugins/dtb-repair-service/Admin/assets/',
-			'url'  => content_url( '/mu-plugins/dtb-repair-service/Admin/assets/' ),
-			'file' => 'dtb-repairs-page.js',
-		],
-	];
-
-	if ( isset( $module_js_map[ $page_slug ] ) ) {
-		$mod_js      = $module_js_map[ $page_slug ];
+	// ── Module-specific JS (declared by page metadata) ──
+	foreach ( (array) ( $page_meta['assets']['js'] ?? [] ) as $mod_js ) {
 		$mod_js_file = $mod_js['dir'] . $mod_js['file'];
 		$mod_js_ver  = file_exists( $mod_js_file ) ? (string) filemtime( $mod_js_file ) : '1.0.0';
 

@@ -89,6 +89,33 @@ function dtb_system_manager_render_system_tab(): void {
 
 	// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 	echo dtb_admin_ui_card( $body, [ 'title' => __( 'PHP & WordPress Environment', 'drywall-toolbox' ) ] );
+
+	$php_log = (array) ( $h['php_log'] ?? [] );
+	$rest    = (array) ( $h['rest'] ?? [] );
+	$cache   = (array) ( $h['cache'] ?? [] );
+	$proj    = (array) ( $h['projections'] ?? [] );
+
+	ob_start();
+	echo dtb_admin_ui_detail_row( __( 'PHP Log', 'drywall-toolbox' ), dtb_admin_ui_badge( ! empty( $php_log['available'] ) ? __( 'Available', 'drywall-toolbox' ) : __( 'Unavailable', 'drywall-toolbox' ), ! empty( $php_log['available'] ) ? 'success' : 'neutral' ) );
+	echo dtb_admin_ui_detail_row( __( 'PHP Log Size', 'drywall-toolbox' ), esc_html( size_format( (int) ( $php_log['size_bytes'] ?? 0 ) ) ) );
+	echo dtb_admin_ui_detail_row( __( 'DTB REST Routes', 'drywall-toolbox' ), dtb_admin_ui_badge( (string) ( $rest['dtb_routes'] ?? 0 ), ( (int) ( $rest['dtb_routes'] ?? 0 ) > 0 ) ? 'success' : 'warning' ) );
+	echo dtb_admin_ui_detail_row( __( 'Expired DTB Cache Entries', 'drywall-toolbox' ), dtb_admin_ui_badge( (string) ( $cache['expired_dtb_transients'] ?? 0 ), ( (int) ( $cache['expired_dtb_transients'] ?? 0 ) > 25 ) ? 'warning' : 'neutral' ) );
+	echo dtb_admin_ui_detail_row( __( 'Stale Projections', 'drywall-toolbox' ), dtb_admin_ui_badge( (string) ( $proj['stale'] ?? 0 ), ( (int) ( $proj['stale'] ?? 0 ) > 0 ) ? 'warning' : 'success' ) );
+	$ops_body = ob_get_clean();
+	// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+	echo dtb_admin_ui_card( $ops_body, [ 'title' => __( 'Diagnostics Summary', 'drywall-toolbox' ) ] );
+
+	$catalog    = (array) ( $h['catalog'] ?? [] );
+	$media      = (array) ( $h['media'] ?? [] );
+	$schematics = (array) ( $h['schematics'] ?? [] );
+	ob_start();
+	echo dtb_admin_ui_detail_row( __( 'Catalog Services', 'drywall-toolbox' ), dtb_admin_ui_badge( ! empty( $catalog['dtb_catalog_available'] ) ? __( 'Available', 'drywall-toolbox' ) : __( 'Missing', 'drywall-toolbox' ), ! empty( $catalog['dtb_catalog_available'] ) ? 'success' : 'warning' ) );
+	echo dtb_admin_ui_detail_row( __( 'Uploads Writable', 'drywall-toolbox' ), dtb_admin_ui_badge( ! empty( $media['uploads_writable'] ) ? __( 'Yes', 'drywall-toolbox' ) : __( 'No', 'drywall-toolbox' ), ! empty( $media['uploads_writable'] ) ? 'success' : 'danger' ) );
+	echo dtb_admin_ui_detail_row( __( 'Image Sync', 'drywall-toolbox' ), dtb_admin_ui_badge( ! empty( $media['image_sync_available'] ) ? __( 'Available', 'drywall-toolbox' ) : __( 'Missing', 'drywall-toolbox' ), ! empty( $media['image_sync_available'] ) ? 'success' : 'neutral' ) );
+	echo dtb_admin_ui_detail_row( __( 'Schematics', 'drywall-toolbox' ), dtb_admin_ui_badge( ! empty( $schematics['schematics_available'] ) ? __( 'Available', 'drywall-toolbox' ) : __( 'Missing', 'drywall-toolbox' ), ! empty( $schematics['schematics_available'] ) ? 'success' : 'warning' ) );
+	$library_body = ob_get_clean();
+	// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+	echo dtb_admin_ui_card( $library_body, [ 'title' => __( 'Catalog, Media & Schematics', 'drywall-toolbox' ) ] );
 }
 
 function dtb_system_manager_render_queues_tab(): void {
@@ -101,9 +128,13 @@ function dtb_system_manager_render_queues_tab(): void {
 	echo dtb_admin_ui_detail_row( __( 'Running', 'drywall-toolbox' ),   dtb_admin_ui_badge( (string) $q['running'], 'processing' ) );
 	echo dtb_admin_ui_detail_row( __( 'Failed', 'drywall-toolbox' ),    dtb_admin_ui_badge( (string) $q['failed'], $q['failed'] > 0 ? 'danger' : 'success' ) );
 	echo dtb_admin_ui_detail_row( __( 'Completed', 'drywall-toolbox' ), esc_html( number_format( $q['complete'] ) ) );
+	echo dtb_admin_ui_detail_row( __( 'Failed Notification Jobs', 'drywall-toolbox' ), dtb_admin_ui_badge( (string) ( $q['failed_notification_jobs'] ?? 0 ), ( (int) ( $q['failed_notification_jobs'] ?? 0 ) > 0 ) ? 'danger' : 'success' ) );
 	if ( $q['oldest_pending_seconds'] > 0 ) {
 		$mins = round( $q['oldest_pending_seconds'] / 60 );
 		echo dtb_admin_ui_detail_row( __( 'Oldest Pending', 'drywall-toolbox' ), dtb_admin_ui_badge( "{$mins}m ago", $mins > 30 ? 'danger' : 'neutral' ) );
+	}
+	foreach ( array_slice( (array) ( $q['failed_notification_hooks'] ?? [] ), 0, 5 ) as $hook ) {
+		echo dtb_admin_ui_detail_row( esc_html( (string) ( $hook['hook'] ?? '' ) ), dtb_admin_ui_badge( (string) ( $hook['count'] ?? 0 ), 'danger' ) );
 	}
 	$q_body = ob_get_clean();
 	// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped

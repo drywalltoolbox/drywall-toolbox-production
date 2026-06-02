@@ -247,6 +247,15 @@ function dtb_returns_rest_admin_detail( WP_REST_Request $request ): WP_REST_Resp
 
 	$data              = $entity->to_array();
 	$data['rma_label'] = '#' . $entity->id;
+	$data['allowed_transitions'] = function_exists( 'dtb_return_get_allowed_transitions' )
+		? array_values( dtb_return_get_allowed_transitions( sanitize_key( (string) $entity->status->value() ) ) )
+		: [];
+	$data['all_statuses'] = class_exists( 'DTB_Return_Status' )
+		? array_values( DTB_Return_Status::all() )
+		: [];
+	$workflow_def = function_exists( 'dtb_admin_get_workflow_definition' )
+		? dtb_admin_get_workflow_definition( 'return' )
+		: [];
 
 	// ── Staff notes (appended JSON array in meta) ─────────────────────────────
 	$raw_notes           = get_post_meta( $id, '_dtb_return_staff_notes', true );
@@ -293,12 +302,69 @@ function dtb_returns_rest_admin_detail( WP_REST_Request $request ): WP_REST_Resp
 		}
 	}
 
-	return new WP_REST_Response( [
+	$customer = function_exists( 'dtb_admin_get_customer_context' )
+		? dtb_admin_get_customer_context( [
+			'customer_email'   => sanitize_email( (string) ( $data['customer_email'] ?? '' ) ),
+			'customer_user_id' => absint( $data['customer_user_id'] ?? 0 ),
+			'order_id'         => absint( $data['order_id'] ?? 0 ),
+			'exclude_module'   => 'returns',
+		] )
+		: [];
+	$linked_records = function_exists( 'dtb_admin_get_linked_records' )
+		? dtb_admin_get_linked_records( 'returns', $id )
+		: [];
+	$integrations = function_exists( 'dtb_admin_get_integration_state' )
+		? dtb_admin_get_integration_state( 'returns', $id, $data )
+		: [];
+	$timeline = function_exists( 'dtb_admin_get_timeline' )
+		? dtb_admin_get_timeline( 'returns', $id, [ 'events' => $events ] )
+		: $events;
+
+	$payload = [
 		'ok'     => true,
+		'record' => $data,
 		'return' => $data,
+		'customer' => $customer,
+		'linked_records' => $linked_records,
+		'linked' => $linked_records, // TODO: remove after returns JS reads linked_records only.
+		'workflow' => [
+			'key'                 => 'return',
+			'status'              => $entity->status->value(),
+			'label'               => (string) ( $workflow_def['labels'][ $entity->status->value() ] ?? $entity->status->label() ),
+			'all_statuses'        => array_values( (array) ( $workflow_def['statuses'] ?? $data['all_statuses'] ) ),
+			'labels'              => (array) ( $workflow_def['labels'] ?? [] ),
+			'terminal_statuses'   => array_values( (array) ( $workflow_def['terminal_statuses'] ?? [] ) ),
+			'allowed_transitions' => $data['allowed_transitions'],
+		],
+		'intelligence' => [
+			'next_best_action' => (string) ( $workflow_def['next_best_action_defaults'][ $entity->status->value() ] ?? '' ),
+			'risk_flags'       => in_array( $entity->status->value(), (array) ( $workflow_def['risk_states'] ?? [] ), true ) ? [ 'return_attention' ] : [],
+		],
+		'communication' => [
+			'customer_email' => sanitize_email( (string) ( $data['customer_email'] ?? '' ) ),
+			'staff_notes_count' => count( (array) ( $data['staff_notes'] ?? [] ) ),
+		],
+		'integrations' => $integrations,
+		'timeline' => $timeline,
 		'events' => $events,
 		'order'  => $order_data,
-	] );
+		'actions' => array_values( (array) $data['allowed_transitions'] ),
+		'permissions' => [
+			'can_transition' => current_user_can( 'dtb_manage_returns' ) && ! empty( $data['allowed_transitions'] ),
+			'can_note'       => current_user_can( 'dtb_manage_returns' ),
+			'can_sync_order' => current_user_can( 'dtb_manage_returns' ),
+		],
+		'meta' => [
+			'fetched_at'    => gmdate( 'c' ),
+			'poll_after_ms' => 60000,
+		],
+	];
+
+	if ( function_exists( 'dtb_admin_prepare_workbench_payload' ) ) {
+		$payload = dtb_admin_prepare_workbench_payload( $payload );
+	}
+
+	return new WP_REST_Response( $payload );
 }
 
 /**
@@ -436,9 +502,15 @@ function dtb_returns_rest_admin_patch( WP_REST_Request $request ): WP_REST_Respo
 	}
 
 	$updated = dtb_returns_get( $id );
+	$detail_request = new WP_REST_Request( 'GET', '/dtb/v1/returns/' . $id . '/detail' );
+	$detail_request->set_param( 'id', $id );
+	$detail_response = dtb_returns_rest_admin_detail( $detail_request );
+	$detail = $detail_response instanceof WP_REST_Response ? $detail_response->get_data() : [];
+
 	return new WP_REST_Response( [
 		'success' => true,
 		'return'  => $updated ? $updated->to_array() : [],
+		'detail'  => $detail,
 	] );
 }
 
@@ -486,6 +558,12 @@ function dtb_returns_rest_sync_order( WP_REST_Request $request ): WP_REST_Respon
 		'success' => true,
 		'order'   => dtb_returns_format_order_snapshot( $wc_order ),
 		'return'  => dtb_returns_get( $id )?->to_array(),
+		'detail'  => ( function () use ( $id ) {
+			$detail_request = new WP_REST_Request( 'GET', '/dtb/v1/returns/' . $id . '/detail' );
+			$detail_request->set_param( 'id', $id );
+			$detail_response = dtb_returns_rest_admin_detail( $detail_request );
+			return $detail_response instanceof WP_REST_Response ? $detail_response->get_data() : [];
+		} )(),
 	] );
 }
 

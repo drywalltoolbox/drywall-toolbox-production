@@ -126,6 +126,11 @@ require_once $_dtb_platform . '/Services/AdminCustomerContextService.php';
 require_once $_dtb_platform . '/Services/AdminLinkedRecordService.php';
 require_once $_dtb_platform . '/Services/AdminWorkloadIntelligenceService.php';
 require_once $_dtb_platform . '/Services/AdminActionAuditService.php';
+require_once $_dtb_platform . '/Services/AdminWorkflowRegistry.php';
+require_once $_dtb_platform . '/Services/AdminIntegrationStateService.php';
+require_once $_dtb_platform . '/Services/AdminTimelineService.php';
+require_once $_dtb_platform . '/Services/AdminWorkbenchContract.php';
+require_once $_dtb_platform . '/Services/AdminExceptionQueueService.php';
 
 // =============================================================================
 // 9. ADMIN UI

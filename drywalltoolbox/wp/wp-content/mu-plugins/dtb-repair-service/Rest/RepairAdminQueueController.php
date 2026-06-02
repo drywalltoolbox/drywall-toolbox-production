@@ -68,8 +68,12 @@ function dtb_repairs_admin_queue_handler( WP_REST_Request $request ): WP_REST_Re
 	$html = ob_get_clean();
 
 	$repair_counts = function_exists( 'dtb_repairs_count_by_status' ) ? dtb_repairs_count_by_status() : [];
-	$needs_attention = (int) ( $repair_counts['awaiting_review'] ?? 0 )
+	$needs_attention = (int) ( $repair_counts['review'] ?? 0 )
 		+ (int) ( $repair_counts['ready_to_ship'] ?? 0 );
+	$total = 0;
+	foreach ( array_keys( function_exists( 'dtb_repairs_status_filter_map' ) ? dtb_repairs_status_filter_map() : [] ) as $filter ) {
+		$total += (int) ( $repair_counts[ $filter ] ?? 0 );
+	}
 
 	return new WP_REST_Response( [
 		'ok'      => true,
@@ -80,9 +84,10 @@ function dtb_repairs_admin_queue_handler( WP_REST_Request $request ): WP_REST_Re
 			'paged'  => $paged,
 		],
 		'summary' => [
-			'total'           => array_sum( $repair_counts ),
-			'awaiting_review' => (int) ( $repair_counts['awaiting_review'] ?? 0 ),
-			'in_repair'       => (int) ( $repair_counts['in_repair'] ?? 0 ),
+			'total'           => $total,
+			'review'          => (int) ( $repair_counts['review'] ?? 0 ),
+			'quote_pending'   => (int) ( $repair_counts['quote_pending'] ?? 0 ),
+			'in_progress'     => (int) ( $repair_counts['in_progress'] ?? 0 ),
 			'ready_to_ship'   => (int) ( $repair_counts['ready_to_ship'] ?? 0 ),
 			'needs_attention' => $needs_attention,
 		],

@@ -49,50 +49,43 @@ function dtb_command_center_orders_summary(): array {
 	];
 
 	if ( function_exists( 'wc_get_orders' ) ) {
-		// Attention: on-hold orders.
-		$on_hold = wc_get_orders( [
-			'status' => 'on-hold',
-			'limit'  => -1,
-			'return' => 'ids',
-		] );
-		$totals['needs_attention'] = count( $on_hold );
-
-		// Payment issues: failed orders.
-		$failed = wc_get_orders( [
-			'status' => 'failed',
-			'limit'  => -1,
-			'return' => 'ids',
-		] );
-		$totals['payment_issues'] = count( $failed );
-
-		// Processing.
-		$processing = wc_get_orders( [
-			'status' => 'processing',
-			'limit'  => -1,
-			'return' => 'ids',
-		] );
-		$totals['processing'] = count( $processing );
-
-		// Pending payment.
-		$pending = wc_get_orders( [
-			'status' => 'pending',
-			'limit'  => -1,
-			'return' => 'ids',
-		] );
-		$totals['pending_payment'] = count( $pending );
-
-		// Today's orders.
-		$today = wc_get_orders( [
+		$totals['needs_attention'] = dtb_command_center_wc_order_count( [ 'status' => 'on-hold' ] );
+		$totals['payment_issues']  = dtb_command_center_wc_order_count( [ 'status' => 'failed' ] );
+		$totals['processing']      = dtb_command_center_wc_order_count( [ 'status' => 'processing' ] );
+		$totals['pending_payment'] = dtb_command_center_wc_order_count( [ 'status' => 'pending' ] );
+		$totals['total_today']     = dtb_command_center_wc_order_count( [
 			'date_created' => '>' . ( time() - DAY_IN_SECONDS ),
-			'limit'        => -1,
-			'return'       => 'ids',
 		] );
-		$totals['total_today'] = count( $today );
 	}
 
 	set_transient( $cache_key, $totals, 2 * MINUTE_IN_SECONDS );
 
 	return $totals;
+}
+
+/**
+ * Count WooCommerce orders without materializing every matching order ID.
+ *
+ * @param array<string,mixed> $args WC order query args.
+ * @return int
+ */
+function dtb_command_center_wc_order_count( array $args ): int {
+	if ( isset( $args['status'] ) && 1 === count( $args ) && function_exists( 'wc_orders_count' ) ) {
+		return (int) wc_orders_count( (string) $args['status'] );
+	}
+
+	if ( ! function_exists( 'wc_get_orders' ) ) {
+		return 0;
+	}
+
+	$query_args = array_merge( $args, [
+		'limit'    => 1,
+		'paginate' => true,
+		'return'   => 'ids',
+	] );
+	$result = wc_get_orders( $query_args );
+
+	return is_object( $result ) && isset( $result->total ) ? (int) $result->total : 0;
 }
 
 /**
@@ -115,11 +108,24 @@ function dtb_command_center_repairs_summary(): array {
 
 	if ( function_exists( 'dtb_repairs_count_by_status' ) ) {
 		$counts = dtb_repairs_count_by_status();
-		$totals['awaiting_review']         = (int) ( $counts['awaiting_review'] ?? 0 );
-		$totals['awaiting_quote_approval'] = (int) ( $counts['awaiting_quote_approval'] ?? 0 );
-		$totals['in_progress']             = (int) ( $counts['in_repair'] ?? 0 );
+		$sum_statuses = static function ( array $statuses ) use ( $counts ): int {
+			$total = 0;
+			foreach ( $statuses as $status ) {
+				$total += (int) ( $counts[ $status ] ?? 0 );
+			}
+			return $total;
+		};
+		$totals['awaiting_review']         = (int) ( $counts['review'] ?? 0 )
+			?: $sum_statuses( [ 'submitted', 'reviewed', 'awaiting_customer' ] );
+		$totals['awaiting_quote_approval'] = (int) ( $counts['quote_pending'] ?? 0 )
+			?: $sum_statuses( [ 'approved', 'quoted', 'quote_accepted' ] );
+		$totals['in_progress']             = (int) ( $counts['in_progress'] ?? 0 )
+			?: $sum_statuses( [ 'parts_allocated', 'in_progress' ] );
 		$totals['ready_to_ship']           = (int) ( $counts['ready_to_ship'] ?? 0 );
-		$totals['total_open']              = array_sum( array_values( $counts ) );
+		$totals['total_open']              = (int) $totals['awaiting_review']
+			+ (int) $totals['awaiting_quote_approval']
+			+ (int) $totals['in_progress']
+			+ (int) $totals['ready_to_ship'];
 	}
 
 	set_transient( $cache_key, $totals, 2 * MINUTE_IN_SECONDS );
@@ -199,6 +205,14 @@ function dtb_command_center_support_summary(): array {
  * @return array
  */
 function dtb_command_center_exceptions_summary(): array {
+	if ( function_exists( 'dtb_admin_get_exception_queues' ) ) {
+		$queues = dtb_admin_get_exception_queues();
+		return [
+			'total'  => array_sum( array_map( static fn( $queue ) => (int) ( $queue['count'] ?? 0 ), $queues ) ),
+			'queues' => $queues,
+		];
+	}
+
 	$orders  = dtb_command_center_orders_summary();
 	$repairs = dtb_command_center_repairs_summary();
 	$support = dtb_command_center_support_summary();

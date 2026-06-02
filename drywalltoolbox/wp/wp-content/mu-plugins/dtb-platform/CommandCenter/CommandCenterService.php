@@ -41,9 +41,9 @@ function dtb_command_center_get_dashboard_data(): array {
 		'orders_attention'   => add_query_arg( [ 'page' => 'dtb-orders',  'status' => 'on-hold' ], $admin ),
 		'orders_failed'      => add_query_arg( [ 'page' => 'dtb-orders',  'status' => 'failed' ], $admin ),
 		'orders_processing'  => add_query_arg( [ 'page' => 'dtb-orders',  'status' => 'processing' ], $admin ),
-		'repairs_review'     => add_query_arg( [ 'page' => 'dtb-repairs', 'status' => 'awaiting_review' ], $admin ),
-		'repairs_quote'      => add_query_arg( [ 'page' => 'dtb-repairs', 'status' => 'awaiting_quote_approval' ], $admin ),
-		'repairs_progress'   => add_query_arg( [ 'page' => 'dtb-repairs', 'status' => 'in_repair' ], $admin ),
+		'repairs_review'     => add_query_arg( [ 'page' => 'dtb-repairs', 'status' => 'review' ], $admin ),
+		'repairs_quote'      => add_query_arg( [ 'page' => 'dtb-repairs', 'status' => 'quote_pending' ], $admin ),
+		'repairs_progress'   => add_query_arg( [ 'page' => 'dtb-repairs', 'status' => 'in_progress' ], $admin ),
 		'returns_review'     => add_query_arg( [ 'page' => 'dtb-returns', 'tab' => 'pending_review' ], $admin ),
 		'returns_inspection' => add_query_arg( [ 'page' => 'dtb-returns', 'tab' => 'item_received' ], $admin ),
 		'returns_refund'     => add_query_arg( [ 'page' => 'dtb-returns', 'tab' => 'refund_issued' ], $admin ),
@@ -53,4 +53,48 @@ function dtb_command_center_get_dashboard_data(): array {
 	];
 
 	return $model;
+}
+
+/**
+ * Render visible exception queue chips/cards for the Command Center.
+ *
+ * @param array<string,mixed> $exceptions Exception summary.
+ * @return string
+ */
+function dtb_command_center_render_exception_queues( array $exceptions ): string {
+	$queues = (array) ( $exceptions['queues'] ?? [] );
+	if ( empty( $queues ) ) {
+		return '';
+	}
+
+	$kpis = [];
+	foreach ( $queues as $queue ) {
+		$count = (int) ( $queue['count'] ?? 0 );
+		if ( $count <= 0 ) {
+			continue;
+		}
+
+		$module = sanitize_key( (string) ( $queue['module'] ?? 'operations' ) );
+		$kpis[] = [
+			'value'      => $count,
+			'label'      => (string) ( $queue['label'] ?? __( 'Exception', 'drywall-toolbox' ) ),
+			'icon'       => 'dashicons-flag',
+			'icon_color' => in_array( $module, [ 'support', 'integrations' ], true ) ? 'danger' : 'warning',
+			'href'       => (string) ( $queue['href'] ?? '' ),
+			'trend'      => ucwords( str_replace( '_', ' ', $module ) ),
+			'trend_dir'  => 'flat',
+		];
+	}
+
+	if ( empty( $kpis ) ) {
+		return '';
+	}
+
+	ob_start();
+	echo '<div class="dtb-section">';
+	echo '<div class="dtb-section__header"><h2>' . esc_html__( 'Exception Queues', 'drywall-toolbox' ) . '</h2></div>';
+	echo dtb_admin_ui_kpi_grid( $kpis ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+	echo '</div>';
+
+	return (string) ob_get_clean();
 }

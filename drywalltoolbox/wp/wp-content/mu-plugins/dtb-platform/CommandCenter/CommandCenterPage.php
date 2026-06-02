@@ -78,6 +78,10 @@ function dtb_command_center_render_page(): void {
 		);
 	}
 
+	if ( function_exists( 'dtb_command_center_render_exception_queues' ) ) {
+		echo dtb_command_center_render_exception_queues( $exc ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+	}
+
 	// ── KPI Overview ──────────────────────────────────────────────────────────
 	// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 	echo dtb_admin_ui_kpi_grid( [
