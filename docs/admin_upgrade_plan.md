@@ -24,138 +24,49 @@ This section records what has now been implemented in `drywalltoolbox/wp/wp-cont
 
 ### Completed and Implemented
 
-1. Removed the temporary stabilization MU-plugin.
-   - Deleted `01-dtb-admin-workbench-stabilization.php`.
-   - Eliminated the top-level DTB compatibility shim from WordPress MU-plugin autoloading.
-   - Moved its behavior into canonical platform, returns, and repairs files.
+1. Removed the temporary stabilization MU-plugin and moved its behavior into canonical platform, returns, and repairs files.
+2. Added the canonical workflow registry for support tickets, returns, repairs, product orders, and repair orders, including statuses, labels, terminal states, allowed transitions, queue filters, aliases, and next-best-action defaults.
+3. Standardized workbench payloads for support, returns, repairs, and orders around canonical `record`, `customer`, `linked_records`, `workflow`, `intelligence`, `integrations`, `timeline`, `actions`, `permissions`, and `meta` keys while preserving temporary aliases during migration.
+4. Added platform services for workbench contracts, integration state, timeline assembly, linked records, customer context, workload intelligence, and deterministic exception queues.
+5. Added shared browser workbench renderers for status badges, Customer 360 rails, linked records, integration health, and timeline rendering.
+6. Upgraded linked-record resolution with normalized `records[]`, confidence/source metadata, mismatch warnings, missing-order warnings, orphaned WooCommerce-order detection, and unverified-link surfacing.
+7. Replaced expensive order/customer reads with bounded order queries and cached read-model helpers where the admin pages and Customer 360 context perform counts and spend summaries.
+8. Added `OrderAdminQueryService` for bounded WooCommerce order counts, normalized order filters, and canonical order-list queries.
+9. Built the orders workbench modal using the canonical payload, with overview, customer, linked records, integrations, timeline, and action tabs.
+10. Added safe order workbench actions for projection refresh, Veeqo retry, and QuickBooks retry, each returning a refreshed order detail payload.
+11. Upgraded the support modal to consume the canonical workbench payload directly.
+12. Added the support intelligence rail, shared Customer 360 rail, linked records, integration health, outbox warnings, risk flags, closing guardrails, command actions, and recommended backend-rendered macros.
+13. Finished the returns modal Decision tab and readiness checklist, including link-integrity surfacing for warnings and mismatches.
+14. Upgraded the repairs modal into production workflows for quote, parts allocation, technician assignment, conversation, shipping readiness, integration health, timeline, actions, and closeout.
+15. Added persisted repair parts state to the repair detail payload and a technician assignment action that updates repair metadata and returns a refreshed workbench payload.
+16. Added visible module-scoped exception queue chips for orders, support, returns, and repairs, backed by the centralized deterministic exception queue service.
+17. Added order exception queues for order attention and failed-payment states.
+18. Moved order page admin assets into page/manifest metadata through the admin page registration path.
+19. Extended System Manager and Command Center surfaces with shared integration, timeline, exception, and operational-health summaries already available in the platform services.
+20. Kept transitional response aliases in place intentionally until all remaining module JavaScript reads only canonical keys.
 
-2. Made `DtbWorkbench.getUrlParam()` native.
-   - Added `getUrlParam()` to `dtb-platform/Admin/assets/dtb-admin-workbench.js`.
-   - The shared browser API no longer depends on the deleted stabilization shim for URL-param reads.
+### Remaining UI/Backend Upgrade Work
 
-3. Moved returns transition data into the native returns detail endpoint.
-   - `dtb-returns/Rest/ReturnsController.php` now includes `allowed_transitions` and `all_statuses` in the return detail payload.
-   - `dtb-returns/Admin/assets/dtb-returns-page.js` now renders status buttons only from `ret.allowed_transitions`.
-   - Invalid return transitions are no longer rendered by the modal action panel.
-   - Returns PATCH and sync-order mutations now include a refreshed `detail` payload.
+The following implementation work remains after the latest UI/backend pass:
 
-4. Moved repair customer and linked-record stabilization into canonical services.
-   - `dtb-repair-service/Rest/RepairAdminDetailController.php` now resolves customer email/user/order context from repair meta and linked WooCommerce orders.
-   - Repair detail now exposes canonical `linked_records`, `intelligence`, `integrations`, and `timeline` keys while preserving temporary aliases for existing JS.
-   - `dtb-repair-service/Admin/assets/dtb-repairs-page.js` now prefers canonical keys and displays `lifetime_spend`.
-   - `lifetime_value` remains only as a temporary compatibility alias.
+1. Finish replacing legacy hardcoded workflow/status arrays in older repair admin screens, legacy queue controllers, and any remaining non-modern module UI with `AdminWorkflowRegistry`.
+2. Continue replacing any remaining module-native integration displays in queue rows and older System Manager panels with `AdminIntegrationStateService` output.
+3. Continue replacing any remaining module-native timeline rendering in older UI code with `AdminTimelineService`.
+4. Expand deterministic workload scoring into any older list-table rows that still do not expose workload score, next action, or blocker chips.
+5. Remove transitional response aliases only after all module JavaScript reads canonical keys exclusively.
+6. Continue folding catalog, media, schematic, cron, notification, cache, and projection health summaries into the System Manager UI where older pages still render their own health fragments.
 
-5. Hardened shared Customer 360 context.
-   - `dtb-platform/Services/AdminCustomerContextService.php` now keys cache entries by email, user ID, order ID, and excluded module.
-   - Customer lifetime spend is now computed from the customer’s full WooCommerce order set instead of only the five most recent orders.
-   - Existing fields remain available: name, email, phone, user ID, customer since, recent orders, counts, open totals, lifetime spend, high-value indicator, risk notes, and cache timestamp.
+### Deferred Validation, Security, and Release Work
 
-6. Hardened shared linked-record resolution.
-   - `dtb-platform/Services/AdminLinkedRecordService.php` now normalizes linked rows into `records[]`.
-   - Link rows include module, id, label, URL, source, confidence, and `last_verified_at`.
-   - Repair links now prefer `_repair_wc_order_id` before legacy repair order meta.
-   - Added order-origin linked-record lookup for WooCommerce orders.
-   - Repair cross-link queries are bounded instead of unbounded.
+Per the current implementation directive, this pass did not focus on validation/security checks or hardening work. The following remain intentionally deferred:
 
-7. Added the canonical admin workflow registry.
-   - Added `dtb-platform/Services/AdminWorkflowRegistry.php`.
-   - Registered workflow definitions for support tickets, returns, repairs, product orders, and repair orders.
-   - Definitions include statuses, labels, terminal statuses, allowed transitions, queue filters, next-best-action defaults, risk states, and aliases.
-   - Repair aliases now normalize:
-     - `awaiting_review` to `submitted`
-     - `awaiting_quote_approval` to `quoted`
-     - `in_repair` to `in_progress`
-
-8. Normalized Command Center repair links and counts.
-   - `dtb-platform/CommandCenter/CommandCenterService.php` now builds repair links through workflow alias normalization.
-   - `dtb-platform/CommandCenter/CommandCenterReadModel.php` now accepts both canonical repair status counts and legacy aggregate keys during migration.
-
-9. Standardized high-volume workbench detail payloads.
-   - Returns detail now exposes canonical keys: `record`, `customer`, `linked_records`, `workflow`, `timeline`, `permissions`, and `meta`.
-   - Repairs detail now exposes canonical keys: `record`, `customer`, `linked_records`, `workflow`, `intelligence`, `integrations`, `timeline`, `permissions`, and `meta`.
-   - Support ticket detail now exposes canonical keys while keeping `ticket`, `events`, and `customer_context` aliases.
-   - Support ticket PATCH and staff reply mutations now return refreshed canonical `detail` payloads.
-   - Added order admin workbench endpoint: `GET /wp-json/dtb/v1/admin/orders/{id}/detail`.
-   - Order detail exposes `record`, `customer`, `linked_records`, `workflow`, `intelligence`, `integrations`, `timeline`, `actions`, `permissions`, and `meta`.
-
-10. Preserved operator safety on touched flows.
-    - Existing repair action endpoints remain capability-gated, sanitized, audited, idempotency-locked where already implemented, invalid-transition guarded, and return refreshed detail payloads.
-    - Touched returns and support mutations now return refreshed authoritative detail payloads.
-    - Transitional aliases are marked with TODO comments for later removal after module JS fully migrates.
-
-11. Completed code-level verification for touched files.
-    - Targeted `php -l` passed for all changed PHP files.
-    - `node --check` passed for edited admin JS files.
-    - `git diff --check` passed.
-    - Confirmed no remaining references to the deleted stabilization plugin.
-
-12. Added contract, integration, timeline, and exception queue platform services.
-    - Added `dtb-platform/Services/AdminWorkbenchContract.php`.
-    - Added `dtb-platform/Services/AdminIntegrationStateService.php`.
-    - Added `dtb-platform/Services/AdminTimelineService.php`.
-    - Added `dtb-platform/Services/AdminExceptionQueueService.php`.
-    - Loaded these services from `dtb-platform/bootstrap.php`.
-
-13. Wired canonical services into workbench payloads.
-    - Returns, repairs, support, and orders now use the platform integration-state facade.
-    - Returns, repairs, support, and orders now use the platform timeline facade where their detail payloads are assembled.
-    - Workbench payloads now pass through the additive contract normalizer where wired.
-    - Command Center exceptions now use centralized deterministic exception queue counts.
-
-14. Expanded the shared browser workbench API.
-    - Added `renderStatusBadge`.
-    - Added `renderCustomerRail`.
-    - Added `renderLinkedRecords`.
-    - Added `renderIntegrationHealth`.
-    - Added `renderTimeline`.
-
-15. Upgraded the returns modal toward the canonical workbench contract.
-    - Added Customer tab.
-    - Added Integrations tab.
-    - Activity tab now consumes canonical timeline events while preserving legacy event compatibility.
-
-16. Re-ran targeted verification after the second implementation pass.
-    - New platform service files pass `php -l`.
-    - Changed tracked PHP files under `mu-plugins/` pass `php -l`.
-    - Changed tracked JS files under `mu-plugins/` pass `node --check`.
-    - `git diff --check` passes for the touched MU-plugin files and this plan.
-
-### Verification Not Yet Completed
-
-Live WordPress/browser verification remains outstanding because no local WordPress web server was running on common ports, no local MySQL/MariaDB process was visible, and WP-CLI was not available in PATH during the implementation pass.
-
-Still required:
-
-1. Load every DTB admin page in an authenticated WordPress session.
-2. Capture browser console output for Command Center, System Manager, Orders, Support, Returns, Repairs, Product Mapping, Parts Manager, Schematics, and Image Sync.
-3. Exercise support, returns, repairs, and order modals in the browser.
-4. Confirm admin REST endpoints return JSON and not HTML/notices.
-5. Confirm PHP logs remain clean after loading all DTB admin pages and performing representative mutations.
-6. Complete a full-tree `php -l` sweep without timeout.
-
-### Remaining Upgrade Work
-
-The following work is still left after the completed foundational and service-integration passes:
-
-1. Finish Phase 2 by replacing remaining hardcoded status/filter arrays in module pages, queue controllers, and legacy admin UI with `AdminWorkflowRegistry`.
-2. Add CLI or automated diagnostics validating all Command Center and module queue links point to valid canonical filters.
-3. Add automated or CLI contract diagnostics around `AdminWorkbenchContract` for support, returns, repairs, and orders.
-4. Finish Phase 4 by rendering shared Customer 360 and Linked Records components in support, repairs, and orders instead of each module rendering its own partial view.
-5. Add mismatch detection for email/order/customer conflicts, missing linked orders, orphaned WooCommerce orders, and unverified links.
-6. Continue replacing ad hoc integration arrays with `AdminIntegrationStateService` in remaining module pages, queue rows, and System Manager views.
-7. Continue replacing module-native timeline rendering with `AdminTimelineService` in remaining module UI code.
-8. Expand deterministic `AdminWorkloadIntelligenceService` scoring and connect all exception queues to visible Command Center/module queue chips.
-9. Upgrade support modal UI to consume the canonical workbench payload directly, including intelligence rail, macros, outbox warnings, closing guardrails, and command bar actions.
-10. Finish returns modal UI with Decision and readiness-checklist workflows.
-11. Upgrade repairs modal UI into full production workflows for quote, parts, technician, conversation, shipping, integrations, and closeout.
-12. Build the orders modal/workbench UI and safe order/integration actions.
-13. Replace remaining expensive `wc_get_orders( limit => -1 )` counts with bounded queries or cached read models.
-14. Move module-specific admin asset declarations into page/manifest metadata instead of manual slug maps.
-15. Extend System Manager with PHP log summaries, REST health, cron queue health, failed notification jobs, stale projections, cache health, and catalog/media/schematic health.
-16. Add automated REST endpoint contract tests and browser smoke tests for all DTB admin pages and modals.
-17. Remove transitional response aliases only after all module JS reads canonical keys.
-18. Complete Phase 13 capability, nonce, sanitization, escaping, idempotency, and guardrail hardening across every remaining REST mutation.
-19. Complete Phase 14 QA, release notes, rollback plan validation, and production smoke verification.
+1. CLI diagnostics validating Command Center and module queue links against canonical filters.
+2. Automated contract diagnostics around `AdminWorkbenchContract`.
+3. REST endpoint contract tests.
+4. Browser smoke tests for all DTB admin pages and modals.
+5. PHP log review, browser console review, and production smoke verification.
+6. Phase 13 capability, nonce, sanitization, escaping, idempotency, and guardrail hardening beyond what already existed or was directly required by the implemented backend actions.
+7. Phase 14 release notes, rollback plan validation, and QA sign-off.
 
 ---
 
@@ -190,13 +101,13 @@ Strengths:
 Risks:
 
 - WordPress still auto-loads every top-level `*.php` file in `mu-plugins/` outside the loader.
-- The recently added `01-dtb-admin-workbench-stabilization.php` is intentionally temporary but now participates in MU-plugin autoloading outside the canonical module bootstrap chain.
+- The temporary `01-dtb-admin-workbench-stabilization.php` file has been removed, and that rule must hold for future admin work.
 - The `README.md` still describes many legacy compatibility wrappers; those wrappers must be reduced over time to prevent runtime ambiguity.
 
 Required direction:
 
 - Keep `00-dtb-loader.php` as the only DTB composition root.
-- Fold the stabilization plugin into canonical files during Phase 1.
+- Keep stabilization behavior inside canonical module/platform files.
 - Maintain a hard rule: new DTB code belongs inside a module directory and is loaded by that module bootstrap, not as a top-level MU-plugin file, unless explicitly temporary and documented.
 
 ---
@@ -318,11 +229,11 @@ The returns module is smaller and more procedural than support/repairs. Its boot
 - Admin page
 - REST controllers
 
-Recent stabilization work added:
+Implemented stabilization migration added:
 
 - Approved transition map alignment.
 - REST response augmentation for `allowed_transitions` and `all_statuses`.
-- Frontend guard that hides invalid status buttons until canonical rendering is implemented.
+- Canonical frontend rendering that uses server-provided allowed transitions.
 
 Strengths:
 
@@ -333,16 +244,14 @@ Strengths:
 
 Risks:
 
-- The frontend still builds status buttons from static JS instead of rendering server-provided allowed transitions natively.
-- The current guard is a stabilization layer, not the final implementation.
-- Returns lacks a proper decision assistant, refund/exchange readiness checklist, customer 360 panel, and integration-health panel.
+- Older returns UI fragments outside the modern modal may still duplicate workflow/status assumptions.
+- Returns now has a decision assistant, readiness checklist, Customer 360 panel, and integration-health panel in the modern modal.
 - Return audit events currently read from legacy audit structures while the new admin action audit service exists separately.
 
 Required direction:
 
-- Move `allowed_transitions` into the native returns detail response permanently.
-- Refactor returns JS so it renders only server-provided allowed actions and does not need `01-dtb-admin-workbench-stabilization.php`.
-- Add deterministic return decision tooling: eligibility, item received state, refund/exchange readiness, customer notification state, and closeout guardrails.
+- Continue migrating older returns fragments to the canonical detail response and server-provided allowed actions.
+- Continue expanding deterministic return decision tooling where queue rows or legacy fragments do not yet surface it.
 
 ---
 
@@ -370,9 +279,9 @@ Strengths:
 
 Risks:
 
-- The current repair modal is still thin in some panels. Parts allocation, quote editing, technician assignment, shipping closeout, and integration actions need production-grade workflows instead of placeholders.
-- The repair detail controller currently needed stabilization for customer context and linked-record shape.
-- Repair statuses in command center links appear to drift from canonical repair workflow naming. For example, command center links use values like `awaiting_review`, `awaiting_quote_approval`, and `in_repair`, while repair workflow/domain code uses operational statuses such as `submitted`, `reviewed`, `quoted`, `in_progress`, and `ready_to_ship`. This needs explicit normalization.
+- The modern repair modal now covers parts allocation, quote workflows, technician assignment, shipping readiness, integration health, conversation, timeline, and closeout; older CPT meta boxes still duplicate some workflows.
+- The repair detail controller now exposes canonical customer context and linked-record shape.
+- Repair command-center links now normalize legacy aliases such as `awaiting_review`, `awaiting_quote_approval`, and `in_repair` to canonical repair workflow statuses.
 - There is overlap between CPT meta boxes and the new modal; duplicate admin workflows can cause staff confusion.
 
 Required direction:

@@ -438,6 +438,9 @@ function dtb_repairs_render_page(): void {
 	] );
 
 	dtb_repairs_render_summary_cards( $status );
+	if ( function_exists( 'dtb_admin_render_module_exception_chips' ) ) {
+		echo dtb_admin_render_module_exception_chips( 'repair' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+	}
 
 	// Toolbar.
 	echo dtb_admin_ui_toolbar_open(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped

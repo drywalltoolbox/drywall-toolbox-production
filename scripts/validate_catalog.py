@@ -26,6 +26,7 @@ from pathlib import Path
 # ── Default CSV path ──────────────────────────────────────────────────────────
 REPO_ROOT = Path(__file__).parent.parent
 DEFAULT_CSV = REPO_ROOT / "products" / "Production" / "catalogs" / "official" / "woocommerce_catalog_production_optimized.csv"
+DEFAULT_POLICY = REPO_ROOT / "products" / "Production" / "catalogs" / "config" / "production_taxonomy_policy.json"
 
 # ── Column aliases ─────────────────────────────────────────────────────────────
 COL_TYPE       = "Type"
@@ -134,7 +135,114 @@ def is_sku_normalized(sku: str) -> bool:
 # MAIN VALIDATOR
 # =============================================================================
 
-def validate(csv_path: Path):
+def load_taxonomy_policy(policy_path: Path) -> dict:
+    """Load production_taxonomy_policy.json; return empty dict on failure."""
+    if not policy_path.exists():
+        return {}
+    try:
+        return json.loads(policy_path.read_text(encoding="utf-8"))
+    except (json.JSONDecodeError, OSError):
+        return {}
+
+
+def validate_categories(all_rows, policy_path: Path, errors: list, warnings: list) -> None:
+    """Cross-check Categories and _dtb_category_key against the taxonomy policy.
+
+    Rules:
+      - Variation rows with blank _dtb_category_key are intentionally blank — skip.
+      - Non-variation rows with a non-canonical _dtb_category_key emit a hard error.
+      - Non-variation rows whose Categories WC path is not in allowed_categories emit a hard error.
+    """
+    policy = load_taxonomy_policy(policy_path)
+    if not policy:
+        warnings.append({
+            "rule": "policy_not_found",
+            "message": f"Taxonomy policy not found at {policy_path}; skipping category validation.",
+        })
+        return
+
+    canonical_keys: set[str] = {
+        entry["id"] for entry in policy.get("canonical_functional_categories", [])
+        if isinstance(entry, dict) and "id" in entry
+    }
+    allowed_wc: set[str] = {
+        v for v in policy.get("allowed_categories", [])
+        if isinstance(v, str) and not v.startswith("_comment")
+    }
+    key_normalization: dict[str, str] = {
+        k: v for k, v in policy.get("category_key_normalization", {}).items()
+        if not k.startswith("_")
+    }
+    sku_overrides: dict[str, str] = {
+        k: v for k, v in policy.get("sku_category_overrides", {}).items()
+        if not k.startswith("_")
+    }
+
+    for row in all_rows:
+        row_type = str(row.get(COL_TYPE, "") or "").strip().lower()
+        sku = str(row.get(COL_SKU, "") or "").strip()
+        line = row.get("__line__", "?")
+
+        raw_key = str(row.get("Meta: _dtb_category_key", "") or "").strip()
+        wc_path = str(row.get("Categories", "") or "").strip()
+
+        # Variation rows may inherit category from parent — blank key is correct
+        if row_type == "variation" and not raw_key:
+            continue
+
+        # Resolve canonical key (same logic as build script)
+        if sku in sku_overrides:
+            resolved_key = sku_overrides[sku]
+        elif raw_key in key_normalization:
+            resolved_key = key_normalization[raw_key]
+        else:
+            resolved_key = raw_key
+
+        # Validate _dtb_category_key
+        if resolved_key and resolved_key not in canonical_keys:
+            errors.append({
+                "rule": "non_canonical_category_key",
+                "sku": sku,
+                "line": line,
+                "value": raw_key,
+                "resolved": resolved_key,
+                "message": (
+                    f"SKU '{sku}' (line {line}) has _dtb_category_key='{raw_key}' "
+                    f"(resolved: '{resolved_key}') which is not a canonical category ID. "
+                    f"Canonical IDs: {sorted(canonical_keys)}."
+                ),
+            })
+        elif not resolved_key and row_type not in {"variation"}:
+            warnings.append({
+                "rule": "missing_category_key",
+                "sku": sku,
+                "line": line,
+                "message": f"SKU '{sku}' (line {line}) has a blank _dtb_category_key.",
+            })
+
+        # Validate WC Categories path
+        if wc_path and wc_path not in allowed_wc:
+            errors.append({
+                "rule": "non_allowed_wc_category",
+                "sku": sku,
+                "line": line,
+                "value": wc_path,
+                "message": (
+                    f"SKU '{sku}' (line {line}) has Categories='{wc_path}' "
+                    f"which is not in the allowed_categories list in the taxonomy policy. "
+                    f"Add an alias to category_aliases or add the path to allowed_categories."
+                ),
+            })
+        elif not wc_path and row_type not in {"variation"}:
+            warnings.append({
+                "rule": "missing_wc_category",
+                "sku": sku,
+                "line": line,
+                "message": f"SKU '{sku}' (line {line}) has a blank Categories field.",
+            })
+
+
+
     errors   = []  # hard errors — block import
     warnings = []  # soft warnings — report but allow
 
@@ -559,7 +667,10 @@ def validate(csv_path: Path):
                     f"but no child variation has that SKU. "
                     f"Known child SKUs: {sorted(child_skus) if child_skus else '(none)'}."
                 ),
-            })
+            ))
+
+    # ── Category validation ───────────────────────────────────────────────────
+    validate_categories(all_rows, DEFAULT_POLICY, errors, warnings)
 
     return errors, warnings
 

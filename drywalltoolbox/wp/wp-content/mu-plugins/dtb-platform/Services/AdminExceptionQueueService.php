@@ -17,6 +17,18 @@ defined( 'ABSPATH' ) || exit;
 function dtb_admin_get_exception_queues(): array {
 	$admin = admin_url( 'admin.php' );
 	$queues = [
+		'orders_attention' => [
+			'label'  => __( 'Order Attention', 'drywall-toolbox' ),
+			'count'  => dtb_admin_exception_order_attention(),
+			'module' => 'orders',
+			'href'   => add_query_arg( [ 'page' => 'dtb-orders', 'status' => 'attention' ], $admin ),
+		],
+		'orders_failed_payment' => [
+			'label'  => __( 'Payment Failed', 'drywall-toolbox' ),
+			'count'  => dtb_admin_exception_order_failed(),
+			'module' => 'orders',
+			'href'   => add_query_arg( [ 'page' => 'dtb-orders', 'status' => 'failed' ], $admin ),
+		],
 		'needs_reply' => [
 			'label'  => __( 'Needs Reply', 'drywall-toolbox' ),
 			'count'  => dtb_admin_exception_support_needs_reply(),
@@ -62,6 +74,53 @@ function dtb_admin_get_exception_queues(): array {
 	];
 
 	return $queues;
+}
+
+/**
+ * Render module-scoped exception queue chips for queue workbenches.
+ *
+ * @param string|string[] $modules Module keys to include.
+ * @return string
+ */
+function dtb_admin_render_module_exception_chips( string|array $modules ): string {
+	$modules = array_map( 'sanitize_key', (array) $modules );
+	$queues  = dtb_admin_get_exception_queues();
+	$kpis    = [];
+
+	foreach ( $queues as $queue ) {
+		$module = sanitize_key( (string) ( $queue['module'] ?? '' ) );
+		$count  = (int) ( $queue['count'] ?? 0 );
+		if ( $count <= 0 || ! in_array( $module, $modules, true ) ) {
+			continue;
+		}
+
+		$kpis[] = [
+			'value'      => $count,
+			'label'      => (string) ( $queue['label'] ?? __( 'Exception', 'drywall-toolbox' ) ),
+			'icon'       => 'dashicons-flag',
+			'icon_color' => in_array( $module, [ 'support', 'orders' ], true ) ? 'danger' : 'warning',
+			'href'       => (string) ( $queue['href'] ?? '' ),
+			'trend'      => __( 'Exception queue', 'drywall-toolbox' ),
+			'trend_dir'  => 'flat',
+		];
+	}
+
+	if ( empty( $kpis ) || ! function_exists( 'dtb_admin_ui_kpi_grid' ) ) {
+		return '';
+	}
+
+	return '<div class="dtb-section dtb-section--exceptions">'
+		. '<div class="dtb-section__header"><h2>' . esc_html__( 'Exception Queues', 'drywall-toolbox' ) . '</h2></div>'
+		. dtb_admin_ui_kpi_grid( $kpis )
+		. '</div>';
+}
+
+function dtb_admin_exception_order_attention(): int {
+	return function_exists( 'dtb_orders_admin_count' ) ? (int) dtb_orders_admin_count( 'attention' ) : 0;
+}
+
+function dtb_admin_exception_order_failed(): int {
+	return function_exists( 'dtb_orders_admin_count' ) ? (int) dtb_orders_admin_count( 'failed' ) : 0;
 }
 
 function dtb_admin_exception_support_needs_reply(): int {

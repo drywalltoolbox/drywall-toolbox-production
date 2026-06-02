@@ -68,20 +68,11 @@ BRANDS = {
     "dura stilts": ("Dura-Stilts", "dura-stilts"),
     "surpro": ("SurPro", "surpro"),
     "sur-pro": ("SurPro", "surpro"),
+    "level5": ("LEVEL5", "level5"),
+    "level 5": ("LEVEL5", "level5"),
 }
 
 KEEP_KINDS = {"tool", "variation", "kit", "stilt", "accessory"}
-
-DISPLAY_BY_CATEGORY_KEY = {
-    "corner": "corner_tools",
-    "finishing": "finishing_boxes",
-    "handles": "handles_and_extensions",
-    "mudboxes": "mud_pans_and_pumps",
-    "toolsets": "tool_sets_and_kits",
-    "taping": "automatic_taping_tools",
-    "stilts": "stilts",
-    "accessory": "accessories",
-}
 
 BOOLEAN_COLUMNS = [
     "Published",
@@ -229,14 +220,19 @@ def valid_catalog_image(images: str) -> bool:
     return bool(normalize_images_cell(images))
 
 
-def load_policy_aliases(path: Path) -> dict[str, str]:
+def load_policy(path: Path) -> dict:
+    """Load production_taxonomy_policy.json and return the parsed dict (empty dict on failure)."""
     if not path.exists():
         return {}
     try:
-        data = json.loads(path.read_text(encoding="utf-8"))
+        return json.loads(path.read_text(encoding="utf-8"))
     except json.JSONDecodeError:
         return {}
-    aliases = data.get("category_aliases")
+
+
+def load_policy_aliases(path: Path) -> dict[str, str]:
+    """Compatibility shim — returns only the category_aliases sub-dict."""
+    aliases = load_policy(path).get("category_aliases", {})
     return aliases if isinstance(aliases, dict) else {}
 
 
@@ -245,8 +241,26 @@ def normalize_category(value: str, aliases: dict[str, str]) -> str:
     if not category:
         return ""
     for old, new in aliases.items():
+        if old.startswith("_"):
+            continue  # skip _comment keys
         category = category.replace(old, new)
     return category
+
+
+def resolve_category_key(sku: str, raw_key: str, key_normalization: dict[str, str], sku_overrides: dict[str, str]) -> str:
+    """Return the canonical _dtb_category_key for a given SKU + raw key.
+
+    Priority:
+      1. sku_overrides  (per-SKU hard overrides)
+      2. key_normalization map (slug → canonical slug)
+      3. raw_key as-is if already canonical, else blank
+    """
+    if sku and sku in sku_overrides:
+        return sku_overrides[sku]
+    cleaned = clean_space(raw_key)
+    if cleaned in key_normalization:
+        return key_normalization[cleaned]
+    return cleaned
 
 
 def infer_brand(row: dict[str, str]) -> tuple[str, str]:
@@ -635,6 +649,12 @@ def process_catalog(input_path: Path, output_path: Path, policy_path: Path) -> t
     if SPECS_META_JSON_COL not in fieldnames:
         fieldnames.append(SPECS_META_JSON_COL)
     aliases = load_policy_aliases(policy_path)
+    policy = load_policy(policy_path)
+    key_normalization: dict[str, str] = policy.get("category_key_normalization", {})
+    sku_overrides: dict[str, str] = policy.get("sku_category_overrides", {})
+    # Strip internal _comment keys
+    key_normalization = {k: v for k, v in key_normalization.items() if not k.startswith("_")}
+    sku_overrides = {k: v for k, v in sku_overrides.items() if not k.startswith("_")}
     image_lookup = build_image_lookup(IMAGE_LOOKUP_CSVS)
     price_lookup = build_price_lookup(PRICE_LOOKUP_CSVS)
 
@@ -696,9 +716,15 @@ def process_catalog(input_path: Path, output_path: Path, policy_path: Path) -> t
         row["Meta: _dtb_brand_label"] = brand
         row["Meta: _dtb_brand"] = brand
 
-        category_key = clean_space(row.get("Meta: _dtb_category_key"))
-        if category_key in DISPLAY_BY_CATEGORY_KEY:
-            row["Meta: _dtb_display_category_key"] = DISPLAY_BY_CATEGORY_KEY[category_key]
+        category_key = resolve_category_key(
+            row.get("SKU", ""),
+            row.get("Meta: _dtb_category_key", ""),
+            key_normalization,
+            sku_overrides,
+        )
+        if category_key:
+            row["Meta: _dtb_category_key"] = category_key
+            row["Meta: _dtb_display_category_key"] = category_key
 
         row["Tags"] = clean_tags(row.get("Tags", ""), [brand, row.get("SKU", ""), category_key])
         row["Description"] = sanitize_html_fragment(row.get("Description", ""))

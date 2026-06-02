@@ -137,6 +137,9 @@ function dtb_returns_render_page(): void {
 		);
 	}
 	echo '</div>';
+	if ( function_exists( 'dtb_admin_render_module_exception_chips' ) ) {
+		echo dtb_admin_render_module_exception_chips( 'returns' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+	}
 
 	// Toolbar.
 	echo dtb_admin_ui_toolbar_open(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped

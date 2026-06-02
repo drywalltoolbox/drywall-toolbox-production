@@ -163,6 +163,9 @@ function dtb_support_render_workbench( array $args ): void {
 	echo '<section class="dtb-support-main">';
 	// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 	echo dtb_admin_ui_kpi_grid( dtb_support_workbench_kpi_cards() );
+	if ( function_exists( 'dtb_admin_render_module_exception_chips' ) ) {
+		echo dtb_admin_render_module_exception_chips( 'support' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+	}
 
 	echo dtb_admin_ui_toolbar_open(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 	echo '<div class="dtb-search-wrap">';

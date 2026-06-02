@@ -106,6 +106,9 @@ function dtb_orders_render_page(): void {
 		'data'       => [ 'dtb-live-tab' => 'failed', 'dtb-live-target' => 'dtb-orders-workspace' ],
 	] );
 	echo '</div>';
+	if ( function_exists( 'dtb_admin_render_module_exception_chips' ) ) {
+		echo dtb_admin_render_module_exception_chips( 'orders' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+	}
 
 	// Toolbar: live search + filter controls + refresh + new order.
 	echo dtb_admin_ui_toolbar_open();
