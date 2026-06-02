@@ -64,6 +64,7 @@ require_once __DIR__ . '/Rest/RepairHealthController.php';
 require_once __DIR__ . '/Rest/RepairAdminQueueController.php';
 require_once __DIR__ . '/Rest/RepairAdminDetailController.php';
 require_once __DIR__ . '/Rest/RepairAdminActionController.php';
+require_once __DIR__ . '/Rest/RepairAdminWorkbenchController.php';
 
 // Admin query/filter helpers — loaded for both admin and REST API contexts
 // so that REST endpoints can use dtb_repairs_query, dtb_repairs_normalize_status_filter, etc.
