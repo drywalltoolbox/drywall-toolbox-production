@@ -793,6 +793,43 @@
 	function bindQueueAndFilters() {
 		var searchTimer;
 
+		// ── Ticket open — capture phase so nothing can stop propagation ───────
+		document.addEventListener( 'click', function ( evt ) {
+			// Never intercept clicks that originate inside the modal itself.
+			if ( evt.target && evt.target.closest && evt.target.closest( '#' + MODAL_ID ) ) {
+				return;
+			}
+
+			var link = evt.target && evt.target.closest ? evt.target.closest( '.dtb-support-open-ticket[data-dtb-ticket-id]' ) : null;
+			var row  = ! link && evt.target && evt.target.closest ? evt.target.closest( '.dtb-support-row[data-dtb-ticket-id]' ) : null;
+			var el   = link || row;
+			if ( ! el ) {
+				return;
+			}
+
+			// For bare-row clicks, ignore interactive child elements (except the ticket link itself).
+			if ( row && evt.target.closest( 'a, button, input, select, textarea, label' ) && ! link ) {
+				return;
+			}
+
+			// Allow native browser open for modifier-key combos.
+			if ( evt.metaKey || evt.ctrlKey || evt.shiftKey || evt.altKey ) {
+				return;
+			}
+
+			var ticketId  = el.getAttribute( 'data-dtb-ticket-id' );
+			var ticketRef = el.getAttribute( 'data-dtb-ticket-ref' ) || ( '#' + ticketId );
+			var ticketUrl = el.getAttribute( 'data-dtb-ticket-url' ) || getTicketUrl( ticketId, '' );
+			if ( ! ticketId ) {
+				return;
+			}
+
+			evt.preventDefault();
+			evt.stopPropagation();
+			openModalWithTicket( ticketId, ticketRef, ticketUrl );
+		}, true ); // capture phase
+
+		// ── Queue rail + other controls — bubble phase ────────────────────────
 		document.addEventListener( 'click', function ( evt ) {
 			var queueLink = evt.target && evt.target.closest ? evt.target.closest( '[data-dtb-support-queue]' ) : null;
 			if ( queueLink ) {
@@ -801,29 +838,6 @@
 				var status = queueLink.getAttribute( 'data-dtb-support-status' ) || '';
 				navigateRegion( { queue: queue, status: status, paged: '1' } );
 				return;
-			}
-
-			var rowLink = evt.target && evt.target.closest ? evt.target.closest( '.dtb-support-open-ticket' ) : null;
-			if ( rowLink ) {
-				if ( evt.metaKey || evt.ctrlKey || evt.shiftKey || evt.altKey || evt.button !== 0 ) {
-					return;
-				}
-				var row = rowLink.closest( '.dtb-support-row' );
-				var context = parseRowContext( row );
-				if ( context && context.ticketId ) {
-					evt.preventDefault();
-					openModalWithTicket( context.ticketId, context.ticketRef, context.ticketUrl );
-				}
-				return;
-			}
-
-			var row = evt.target && evt.target.closest ? evt.target.closest( '.dtb-support-row' ) : null;
-			if ( row && ! evt.target.closest( 'a,button,input,select,textarea,label' ) ) {
-				var rowContext = parseRowContext( row );
-				if ( rowContext && rowContext.ticketId ) {
-					evt.preventDefault();
-					openModalWithTicket( rowContext.ticketId, rowContext.ticketRef, rowContext.ticketUrl );
-				}
 			}
 		} );
 

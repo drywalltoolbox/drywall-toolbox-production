@@ -223,11 +223,9 @@ function dtb_returns_render_page(): void {
 		$status_val = $item->status->value();
 		[ $na_label, $na_type ] = $next_action_map[ $status_val ] ?? [ ucwords( str_replace( '_', ' ', $status_val ) ), 'muted' ];
 
-		echo '<tr class="dtb-table__row dtb-table__row--clickable"'
-			. ' data-dtb-drawer="dtb-returns-detail-drawer"'
-			. ' data-dtb-drawer-title="' . esc_attr( sprintf( __( 'Return %s', 'drywall-toolbox' ), $rma_label ) ) . '"'
-			. ' data-dtb-field-return-id="' . esc_attr( (string) $item->id ) . '"'
-			. ' data-dtb-field-customer="' . esc_attr( $item->customer_name ) . '"'
+		echo '<tr class="dtb-table__row dtb-table__row--clickable dtb-returns-row"'
+			. ' data-dtb-return-id="' . esc_attr( (string) $item->id ) . '"'
+			. ' data-dtb-return-ref="' . esc_attr( $rma_label ) . '"'
 			. ' data-dtb-field-status="' . esc_attr( $status_val ) . '"'
 			. ' data-dtb-field-resolution="' . esc_attr( $item->resolution ) . '"'
 			. '>';
@@ -284,24 +282,24 @@ function dtb_returns_render_page(): void {
 	// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 	echo dtb_admin_ui_pagination( $paged_returns, $total_pages );
 
-	// Returns detail drawer.
+	dtb_admin_shell_live_region_close();
+
+	// Returns fullscreen modal command center.
 	// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-	echo dtb_admin_ui_drawer(
-		'dtb-returns-detail-drawer',
-		__( 'Return Detail', 'drywall-toolbox' ),
-		'<div class="dtb-drawer-loading">' . esc_html__( 'Select a return to view details.', 'drywall-toolbox' ) . '</div>',
-		dtb_admin_ui_button( __( 'View Full Record', 'drywall-toolbox' ), [
-			'type' => 'secondary',
-			'size' => 'sm',
-			'data' => [ 'dtb-drawer-action' => 'view' ],
-		] )
-		. dtb_admin_ui_button( __( 'Approve', 'drywall-toolbox' ), [
-			'type' => 'primary',
-			'size' => 'sm',
-			'data' => [ 'dtb-drawer-action' => 'approve' ],
-		] )
+	echo dtb_admin_ui_modal(
+		'dtb-returns-modal',
+		__( 'Return Request', 'drywall-toolbox' ),
+		'<div class="dtb-returns-modal-loading">' . esc_html__( 'Select a return to view details.', 'drywall-toolbox' ) . '</div>',
+		'<div class="dtb-returns-modal__footer-actions">'
+			. dtb_admin_ui_button( __( 'Open Full Record', 'drywall-toolbox' ), [
+				'type' => 'secondary',
+				'size' => 'sm',
+				'data' => [ 'dtb-returns-modal-action' => 'view' ],
+			] )
+		. '</div>',
+		'returns'
 	);
 
-	dtb_admin_shell_live_region_close();
 	dtb_admin_shell_close();
 }
+

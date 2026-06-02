@@ -57,6 +57,43 @@ function dtb_returns_rest_register_routes(): void {
 			'status' => [ 'type' => 'string',  'required' => true ],
 		],
 	] );
+
+	// ── Admin: sync customer/order data from WooCommerce ─────────────────────
+	register_rest_route( 'dtb/v1', '/returns/(?P<id>\d+)/sync-order', [
+		'methods'             => WP_REST_Server::CREATABLE,
+		'callback'            => 'dtb_returns_rest_sync_order',
+		'permission_callback' => fn() => current_user_can( 'dtb_manage_returns' ),
+		'args'                => [ 'id' => [ 'type' => 'integer', 'minimum' => 1 ] ],
+	] );
+
+	// ── Admin: enriched detail (modal) ────────────────────────────────────────
+	register_rest_route( 'dtb/v1', '/returns/(?P<id>\d+)/detail', [
+		'methods'             => WP_REST_Server::READABLE,
+		'callback'            => 'dtb_returns_rest_admin_detail',
+		'permission_callback' => fn() => current_user_can( 'dtb_manage_returns' ),
+		'args'                => [ 'id' => [ 'type' => 'integer', 'minimum' => 1 ] ],
+	] );
+
+	// ── Admin: PATCH update (status / resolution / note) ─────────────────────
+	register_rest_route( 'dtb/v1', '/returns/(?P<id>\d+)', [
+		[
+			'methods'             => WP_REST_Server::READABLE,
+			'callback'            => 'dtb_returns_rest_get',
+			'permission_callback' => fn() => current_user_can( 'dtb_manage_returns' ),
+			'args'                => [ 'id' => [ 'type' => 'integer', 'minimum' => 1 ] ],
+		],
+		[
+			'methods'             => 'PATCH',
+			'callback'            => 'dtb_returns_rest_admin_patch',
+			'permission_callback' => fn() => current_user_can( 'dtb_manage_returns' ),
+			'args'                => [
+				'id'         => [ 'type' => 'integer', 'minimum' => 1 ],
+				'status'     => [ 'type' => 'string',  'required' => false ],
+				'resolution' => [ 'type' => 'string',  'required' => false ],
+				'note'       => [ 'type' => 'string',  'required' => false ],
+			],
+		],
+	] );
 }
 
 function dtb_returns_rest_list( WP_REST_Request $request ): WP_REST_Response {
@@ -195,3 +232,325 @@ function dtb_returns_rest_transition_status( WP_REST_Request $request ): WP_REST
 
 	return new WP_REST_Response( dtb_returns_get( (int) $request->get_param( 'id' ) )?->to_array() );
 }
+
+// =============================================================================
+// ADMIN: ENRICHED DETAIL (modal) — GET /dtb/v1/returns/{id}/detail
+// =============================================================================
+
+function dtb_returns_rest_admin_detail( WP_REST_Request $request ): WP_REST_Response {
+	$id     = (int) $request->get_param( 'id' );
+	$entity = dtb_returns_get( $id );
+
+	if ( ! $entity ) {
+		return new WP_REST_Response( [ 'error' => 'Return not found.' ], 404 );
+	}
+
+	$data              = $entity->to_array();
+	$data['rma_label'] = '#' . $entity->id;
+
+	// ── Staff notes (appended JSON array in meta) ─────────────────────────────
+	$raw_notes           = get_post_meta( $id, '_dtb_return_staff_notes', true );
+	$notes               = is_array( $raw_notes ) ? $raw_notes : ( $raw_notes ? json_decode( $raw_notes, true ) : [] );
+	$data['staff_notes'] = is_array( $notes ) ? $notes : [];
+
+	// ── Audit log events for this return ─────────────────────────────────────
+	$events = dtb_returns_admin_get_events( $id );
+
+	// ── Live WooCommerce order data ───────────────────────────────────────────
+	$order_data = null;
+	if ( $entity->order_id && function_exists( 'wc_get_order' ) ) {
+		$wc_order = wc_get_order( $entity->order_id );
+		if ( $wc_order instanceof WC_Order ) {
+			$order_data = dtb_returns_format_order_snapshot( $wc_order );
+
+			// Auto-sync: silently backfill blank return meta fields from live order.
+			$changed   = false;
+			$wc_name   = trim( $wc_order->get_billing_first_name() . ' ' . $wc_order->get_billing_last_name() );
+			$wc_email  = $wc_order->get_billing_email();
+			$wc_number = '#' . $wc_order->get_id();
+
+			if ( '' === $entity->customer_name && '' !== $wc_name ) {
+				update_post_meta( $id, '_dtb_return_customer_name', $wc_name );
+				$data['customer_name'] = $wc_name;
+				$changed = true;
+			}
+			if ( '' === $entity->customer_email && '' !== $wc_email ) {
+				update_post_meta( $id, '_dtb_return_customer_email', $wc_email );
+				$data['customer_email'] = $wc_email;
+				$changed = true;
+			}
+			if ( '' === $entity->order_number ) {
+				update_post_meta( $id, '_dtb_return_order_number', $wc_number );
+				$data['order_number'] = $wc_number;
+				$changed = true;
+			}
+			if ( $changed ) {
+				dtb_audit_log_write( 'return.auto_synced', [
+					'return_id' => $id,
+					'order_id'  => $entity->order_id,
+				] );
+			}
+		}
+	}
+
+	return new WP_REST_Response( [
+		'ok'     => true,
+		'return' => $data,
+		'events' => $events,
+		'order'  => $order_data,
+	] );
+}
+
+/**
+ * Fetch audit-log events relevant to a specific return ID.
+ *
+ * @param int $return_id
+ * @return array<int, array{action:string,ts:string,actor_label:string,summary:string,age_label:string}>
+ */
+function dtb_returns_admin_get_events( int $return_id ): array {
+	global $wpdb;
+
+	// phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+	$rows = $wpdb->get_results(
+		$wpdb->prepare(
+			"SELECT action, context_json, created_at_utc, user_id
+			 FROM {$wpdb->prefix}dtb_audit_log
+			 WHERE action LIKE 'return.%%' AND context_json LIKE %s
+			 ORDER BY id ASC
+			 LIMIT 100",
+			'%"return_id":' . $return_id . '%'
+		),
+		ARRAY_A
+	);
+
+	if ( empty( $rows ) ) {
+		return [];
+	}
+
+	$events = [];
+	foreach ( (array) $rows as $row ) {
+		$ctx        = json_decode( $row['context_json'] ?? '{}', true );
+		$action     = (string) $row['action'];
+		$ts         = (string) $row['created_at_utc'];
+		$user_id    = (int) $row['user_id'];
+		$actor      = $user_id ? ( get_userdata( $user_id )->display_name ?? 'Admin' ) : 'System';
+
+		// Human-readable summary per action type.
+		$summary_map = [
+			'return.created'        => 'Return request created',
+			'return.status_changed' => sprintf(
+				'Status changed: %s → %s',
+				ucwords( str_replace( '_', ' ', (string) ( $ctx['ctx']['from'] ?? $ctx['from'] ?? '' ) ) ),
+				ucwords( str_replace( '_', ' ', (string) ( $ctx['ctx']['to']   ?? $ctx['to']   ?? '' ) ) )
+			),
+		];
+		$summary = $summary_map[ $action ] ?? ucwords( str_replace( [ '_', '.' ], ' ', $action ) );
+
+		// Age label relative to now.
+		$ts_parsed = strtotime( $ts );
+		$diff      = max( 0, time() - (int) $ts_parsed );
+		if ( $diff < 60 ) {
+			$age = 'Just now';
+		} elseif ( $diff < 3600 ) {
+			$age = (int) round( $diff / 60 ) . 'm ago';
+		} elseif ( $diff < 86400 ) {
+			$age = (int) round( $diff / 3600 ) . 'h ago';
+		} else {
+			$age = (int) round( $diff / 86400 ) . 'd ago';
+		}
+
+		$events[] = [
+			'action'      => $action,
+			'ts'          => $ts,
+			'actor_label' => $actor,
+			'summary'     => $summary,
+			'age_label'   => $age,
+		];
+	}
+
+	return $events;
+}
+
+// =============================================================================
+// ADMIN: PATCH UPDATE — PATCH /dtb/v1/returns/{id}
+// =============================================================================
+
+function dtb_returns_rest_admin_patch( WP_REST_Request $request ): WP_REST_Response {
+	$id     = (int) $request->get_param( 'id' );
+	$entity = dtb_returns_get( $id );
+
+	if ( ! $entity ) {
+		return new WP_REST_Response( [ 'success' => false, 'message' => 'Return not found.' ], 404 );
+	}
+
+	$body       = (array) ( $request->get_json_params() ?: [] );
+	$new_status = isset( $body['status'] ) ? sanitize_key( $body['status'] ) : '';
+	$resolution = isset( $body['resolution'] ) ? sanitize_key( $body['resolution'] ) : '';
+	$note       = isset( $body['note'] ) ? sanitize_textarea_field( wp_unslash( (string) $body['note'] ) ) : '';
+	$changed    = false;
+
+	// ── Status transition ─────────────────────────────────────────────────────
+	if ( '' !== $new_status && $new_status !== $entity->status->value() ) {
+		$result = dtb_return_transition_status( $id, $new_status );
+		if ( is_wp_error( $result ) ) {
+			return new WP_REST_Response( [ 'success' => false, 'message' => $result->get_error_message() ], 400 );
+		}
+		$changed = true;
+	}
+
+	// ── Resolution update ─────────────────────────────────────────────────────
+	$valid_resolutions = [ '', 'refund', 'exchange', 'store_credit', 'replacement' ];
+	if ( '' !== $resolution && in_array( $resolution, $valid_resolutions, true ) && $resolution !== $entity->resolution ) {
+		update_post_meta( $id, '_dtb_return_resolution', $resolution );
+		dtb_audit_log_write( 'return.resolution_updated', [
+			'return_id'  => $id,
+			'resolution' => $resolution,
+			'user_id'    => get_current_user_id(),
+		] );
+		$changed = true;
+	}
+
+	// ── Staff note ────────────────────────────────────────────────────────────
+	if ( '' !== trim( $note ) ) {
+		$raw_notes = get_post_meta( $id, '_dtb_return_staff_notes', true );
+		$notes     = is_array( $raw_notes ) ? $raw_notes : ( $raw_notes ? json_decode( $raw_notes, true ) : [] );
+		if ( ! is_array( $notes ) ) {
+			$notes = [];
+		}
+		$notes[] = [
+			'note'       => $note,
+			'user_id'    => get_current_user_id(),
+			'user_label' => wp_get_current_user()->display_name ?? 'Admin',
+			'created_at' => current_time( 'mysql', true ),
+		];
+		update_post_meta( $id, '_dtb_return_staff_notes', $notes );
+		dtb_audit_log_write( 'return.note_added', [
+			'return_id' => $id,
+			'user_id'   => get_current_user_id(),
+		] );
+		$changed = true;
+	}
+
+	if ( ! $changed ) {
+		return new WP_REST_Response( [ 'success' => false, 'message' => 'No changes provided.' ], 400 );
+	}
+
+	$updated = dtb_returns_get( $id );
+	return new WP_REST_Response( [
+		'success' => true,
+		'return'  => $updated ? $updated->to_array() : [],
+	] );
+}
+
+// =============================================================================
+// ADMIN: SYNC ORDER — POST /dtb/v1/returns/{id}/sync-order
+// Pulls fresh WooCommerce order data and overwrites return meta.
+// =============================================================================
+
+function dtb_returns_rest_sync_order( WP_REST_Request $request ): WP_REST_Response {
+	$id     = (int) $request->get_param( 'id' );
+	$entity = dtb_returns_get( $id );
+
+	if ( ! $entity ) {
+		return new WP_REST_Response( [ 'success' => false, 'message' => 'Return not found.' ], 404 );
+	}
+	if ( ! $entity->order_id ) {
+		return new WP_REST_Response( [ 'success' => false, 'message' => 'No WooCommerce order is linked to this return.' ], 400 );
+	}
+	if ( ! function_exists( 'wc_get_order' ) ) {
+		return new WP_REST_Response( [ 'success' => false, 'message' => 'WooCommerce is not available.' ], 500 );
+	}
+
+	$wc_order = wc_get_order( $entity->order_id );
+	if ( ! $wc_order instanceof WC_Order ) {
+		return new WP_REST_Response(
+			[ 'success' => false, 'message' => 'Order #' . $entity->order_id . ' was not found in WooCommerce.' ],
+			404
+		);
+	}
+
+	// Full sync — overwrite return meta with live WC values.
+	$wc_name  = trim( $wc_order->get_billing_first_name() . ' ' . $wc_order->get_billing_last_name() );
+	$wc_email = $wc_order->get_billing_email();
+	if ( $wc_name )  { update_post_meta( $id, '_dtb_return_customer_name',  $wc_name ); }
+	if ( $wc_email ) { update_post_meta( $id, '_dtb_return_customer_email', $wc_email ); }
+	update_post_meta( $id, '_dtb_return_order_number', '#' . $wc_order->get_id() );
+
+	dtb_audit_log_write( 'return.order_synced', [
+		'return_id' => $id,
+		'order_id'  => $entity->order_id,
+		'user_id'   => get_current_user_id(),
+	] );
+
+	return new WP_REST_Response( [
+		'success' => true,
+		'order'   => dtb_returns_format_order_snapshot( $wc_order ),
+		'return'  => dtb_returns_get( $id )?->to_array(),
+	] );
+}
+
+/**
+ * Build a standardised order snapshot array from a live WC_Order.
+ * Used by both the /detail endpoint and the /sync-order endpoint.
+ *
+ * @param WC_Order $order
+ * @return array
+ */
+function dtb_returns_format_order_snapshot( WC_Order $order ): array {
+	$items = [];
+	foreach ( $order->get_items() as $item ) {
+		/** @var WC_Order_Item_Product $item */
+		$items[] = [
+			'name'      => wp_strip_all_tags( $item->get_name() ),
+			'quantity'  => (int) $item->get_quantity(),
+			'total'     => html_entity_decode( wp_strip_all_tags( wc_price( $item->get_total() ) ), ENT_QUOTES ),
+			'total_raw' => (float) $item->get_total(),
+		];
+	}
+
+	$status = $order->get_status();
+
+	return [
+		'id'                   => (int) $order->get_id(),
+		'status'               => $status,
+		'status_label'         => wc_get_order_status_name( $status ),
+		'total'                => html_entity_decode( wp_strip_all_tags( wc_price( $order->get_total(), [ 'currency' => $order->get_currency() ] ) ), ENT_QUOTES ),
+		'total_raw'            => (float) $order->get_total(),
+		'subtotal'             => html_entity_decode( wp_strip_all_tags( wc_price( $order->get_subtotal() ) ), ENT_QUOTES ),
+		'shipping_total'       => html_entity_decode( wp_strip_all_tags( wc_price( $order->get_shipping_total() ) ), ENT_QUOTES ),
+		'total_tax'            => html_entity_decode( wp_strip_all_tags( wc_price( $order->get_total_tax() ) ), ENT_QUOTES ),
+		'discount_total'       => html_entity_decode( wp_strip_all_tags( wc_price( $order->get_discount_total() ) ), ENT_QUOTES ),
+		'discount_total_raw'   => (float) $order->get_discount_total(),
+		'currency'             => $order->get_currency(),
+		'payment_method_title' => $order->get_payment_method_title(),
+		'date_created'         => $order->get_date_created() ? $order->get_date_created()->date( 'Y-m-d H:i:s' ) : '',
+		'items_count'          => count( $order->get_items() ),
+		'items'                => $items,
+		'billing'              => [
+			'name'    => trim( $order->get_billing_first_name() . ' ' . $order->get_billing_last_name() ),
+			'company' => $order->get_billing_company(),
+			'address' => implode( "\n", array_filter( [
+				$order->get_billing_address_1(),
+				$order->get_billing_address_2(),
+				trim( $order->get_billing_city() . ', ' . $order->get_billing_state() . ' ' . $order->get_billing_postcode() ),
+				( $order->get_billing_country() && 'US' !== $order->get_billing_country() ) ? $order->get_billing_country() : '',
+			] ) ),
+			'email'   => $order->get_billing_email(),
+			'phone'   => $order->get_billing_phone(),
+		],
+		'shipping'             => [
+			'name'    => trim( $order->get_shipping_first_name() . ' ' . $order->get_shipping_last_name() ),
+			'company' => $order->get_shipping_company(),
+			'address' => implode( "\n", array_filter( [
+				$order->get_shipping_address_1(),
+				$order->get_shipping_address_2(),
+				trim( $order->get_shipping_city() . ', ' . $order->get_shipping_state() . ' ' . $order->get_shipping_postcode() ),
+				( $order->get_shipping_country() && 'US' !== $order->get_shipping_country() ) ? $order->get_shipping_country() : '',
+			] ) ),
+		],
+		'customer_note'        => wp_strip_all_tags( $order->get_customer_note() ),
+		'admin_url'            => admin_url( 'post.php?post=' . $order->get_id() . '&action=edit' ),
+	];
+}
+
+

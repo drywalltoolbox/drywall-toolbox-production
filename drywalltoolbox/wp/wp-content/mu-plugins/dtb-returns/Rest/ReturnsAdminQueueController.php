@@ -99,16 +99,14 @@ function dtb_returns_admin_queue_handler( WP_REST_Request $request ): WP_REST_Re
 			$badge_type = dtb_admin_ui_status_badge_type( $item->status->value() );
 			$view_url   = admin_url( 'admin.php?page=dtb-returns&action=view&return_id=' . $item->id );
 			$order_url  = $item->order_id ? admin_url( 'post.php?post=' . $item->order_id . '&action=edit' ) : '';
-			$rma_label  = $item->rma_number ?? ( '#' . $item->id );
+			$rma_label  = '#' . $item->id;
 			$reason     = (string) ( $item->reason ?? '' );
 			$status_val = $item->status->value();
 			[ $na_label, $na_type ] = $next_action_map[ $status_val ] ?? [ ucwords( str_replace( '_', ' ', $status_val ) ), 'muted' ];
 
-			echo '<tr class="dtb-table__row dtb-table__row--clickable"'
-				. ' data-dtb-drawer="dtb-returns-detail-drawer"'
-				. ' data-dtb-drawer-title="' . esc_attr( sprintf( __( 'Return %s', 'drywall-toolbox' ), $rma_label ) ) . '"'
-				. ' data-dtb-field-return-id="' . esc_attr( (string) $item->id ) . '"'
-				. ' data-dtb-field-customer="' . esc_attr( $item->customer_name ) . '"'
+			echo '<tr class="dtb-table__row dtb-table__row--clickable dtb-returns-row"'
+				. ' data-dtb-return-id="' . esc_attr( (string) $item->id ) . '"'
+				. ' data-dtb-return-ref="' . esc_attr( $rma_label ) . '"'
 				. ' data-dtb-field-status="' . esc_attr( $status_val ) . '"'
 				. '>';
 

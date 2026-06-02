@@ -120,6 +120,12 @@ function dtb_admin_assets_enqueue(): void {
 			'url'  => content_url( '/mu-plugins/dtb-support/Admin/assets/' ),
 			'file' => 'dtb-support-page.js',
 		],
+		'dtb-returns' => [
+			'id'   => 'dtb-returns-page-script',
+			'dir'  => WP_CONTENT_DIR . '/mu-plugins/dtb-returns/Admin/assets/',
+			'url'  => content_url( '/mu-plugins/dtb-returns/Admin/assets/' ),
+			'file' => 'dtb-returns-page.js',
+		],
 	];
 
 	if ( isset( $module_js_map[ $page_slug ] ) ) {
