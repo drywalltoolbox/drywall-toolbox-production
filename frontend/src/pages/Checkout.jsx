@@ -134,6 +134,47 @@ const CHECKOUT_PROVIDER_BUTTONS = [
 const EXPRESS_PROVIDER_KEYS = [ 'paypal', 'apple_pay', 'google_pay' ];
 const BNPL_PROVIDER_KEYS = [ 'affirm', 'klarna' ];
 
+function PaymentProviderButton( { provider, selectedProvider, onSelect } ) {
+  const isSelected = selectedProvider === provider.key;
+
+  return (
+    <button
+      type="button"
+      onClick={ () => onSelect( provider.key ) }
+      className={ `inline-flex h-12 w-full items-center justify-center rounded-xl border border-slate-200 bg-white px-3 py-2 transition-all hover:border-slate-300 focus:outline-none focus:ring-2 focus:ring-primary-500/25 sm:h-14 sm:px-4
+                   ${ isSelected ? 'border-primary-300 ring-2 ring-primary-500/35' : '' }` }
+    >
+      <img
+        src={ provider.src }
+        alt={ provider.label }
+        className={ `${ provider.className } max-h-full max-w-full object-contain` }
+        loading="lazy"
+        decoding="async"
+      />
+    </button>
+  );
+}
+
+function PaymentProviderGrid( { providerKeys, providerButtonsByKey, selectedProvider, onSelect, className = '' } ) {
+  return (
+    <div className={ `grid gap-3 pb-1 ${ className }` }>
+      { providerKeys.map( ( key ) => {
+        const provider = providerButtonsByKey[key];
+        if ( !provider ) return null;
+
+        return (
+          <PaymentProviderButton
+            key={ provider.key }
+            provider={ provider }
+            selectedProvider={ selectedProvider }
+            onSelect={ onSelect }
+          />
+        );
+      } ) }
+    </div>
+  );
+}
+
 // ─── StepProgress ─────────────────────────────────────────────────────────────
 // Visual 3-step checkout progress indicator.
 const CHECKOUT_STEPS = [
@@ -1405,72 +1446,26 @@ export default function Checkout() {
                     <p className="text-[10px] font-bold uppercase tracking-[0.13em] text-slate-400 mb-2.5">
                       Express Checkout
                     </p>
-                    <div className="flex items-center justify-between gap-1.5 sm:gap-3 pb-1">
-                      { EXPRESS_PROVIDER_KEYS.map( ( key ) => {
-                        const provider = providerButtonsByKey[key];
-                        if ( !provider ) return null;
-                        const isSelected = selectedProvider === provider.key;
-                        const isAvailable = Boolean( paymentMethodsByProvider[provider.key]?.length );
-                        return (
-                          <button
-                            key={ provider.key }
-                            type="button"
-                            onClick={ () => handleSelectProvider( provider.key ) }
-                            className={ `relative inline-flex items-center justify-center shrink-0 rounded-xl p-0 bg-transparent border-0 transition-all
-                                         ${ isSelected ? 'ring-2 ring-primary-500/35' : '' }` }
-                          >
-                            <img
-                              src={ provider.src }
-                              alt={ provider.label }
-                              className={ `${ provider.className } w-auto object-contain mx-auto` }
-                              loading="lazy"
-                              decoding="async"
-                            />
-                            { !isAvailable && (
-                              <span className="absolute -top-1.5 -right-1 bg-slate-200 text-slate-600 text-[8px] font-bold px-1.5 py-0.5 rounded-full leading-none">
-                                Soon
-                              </span>
-                            ) }
-                          </button>
-                        );
-                      } ) }
-                    </div>
+                    <PaymentProviderGrid
+                      providerKeys={ EXPRESS_PROVIDER_KEYS }
+                      providerButtonsByKey={ providerButtonsByKey }
+                      selectedProvider={ selectedProvider }
+                      onSelect={ handleSelectProvider }
+                      className="grid-cols-3"
+                    />
                   </div>
 
                   <div>
                     <p className="text-[10px] font-bold uppercase tracking-[0.13em] text-slate-400 mb-2.5">
                       Buy Now Pay Later
                     </p>
-                    <div className="flex items-center justify-between gap-2 sm:gap-3 pb-1">
-                      { BNPL_PROVIDER_KEYS.map( ( key ) => {
-                        const provider = providerButtonsByKey[key];
-                        if ( !provider ) return null;
-                        const isSelected = selectedProvider === provider.key;
-                        const isAvailable = Boolean( paymentMethodsByProvider[provider.key]?.length );
-                        return (
-                          <button
-                            key={ provider.key }
-                            type="button"
-                            onClick={ () => handleSelectProvider( provider.key ) }
-                            className={ `relative inline-flex items-center justify-center shrink-0 rounded-xl p-0 bg-transparent border-0 transition-all
-                                         ${ isSelected ? 'ring-2 ring-primary-500/35' : '' }` }
-                          >
-                            <img
-                              src={ provider.src }
-                              alt={ provider.label }
-                              className={ `${ provider.className } w-auto object-contain mx-auto` }
-                              loading="lazy"
-                              decoding="async"
-                            />
-                            { !isAvailable && (
-                              <span className="absolute -top-1.5 -right-1 bg-slate-200 text-slate-600 text-[8px] font-bold px-1.5 py-0.5 rounded-full leading-none">
-                                Soon
-                              </span>
-                            ) }
-                          </button>
-                        );
-                      } ) }
-                    </div>
+                    <PaymentProviderGrid
+                      providerKeys={ BNPL_PROVIDER_KEYS }
+                      providerButtonsByKey={ providerButtonsByKey }
+                      selectedProvider={ selectedProvider }
+                      onSelect={ handleSelectProvider }
+                      className="grid-cols-2 sm:max-w-[26rem]"
+                    />
                   </div>
                 </div>
 
