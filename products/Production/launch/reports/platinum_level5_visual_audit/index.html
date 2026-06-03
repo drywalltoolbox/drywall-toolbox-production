@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Platinum ↔ Level5 Schematic Visual Audit</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      background: #f6f7f9;
+      color: #111827;
+    }
+    main {
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 32px;
+    }
+    h1 {
+      margin: 0 0 12px;
+      font-size: 28px;
+    }
+    .warning {
+      padding: 16px;
+      border: 1px solid #d97706;
+      background: #fffbeb;
+      margin: 16px 0 24px;
+    }
+    .pair {
+      background: #fff;
+      border: 1px solid #d1d5db;
+      border-radius: 12px;
+      margin: 0 0 24px;
+      padding: 20px;
+      box-shadow: 0 1px 2px rgba(0,0,0,.04);
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      align-items: start;
+    }
+    article {
+      border: 1px solid #e5e7eb;
+      border-radius: 10px;
+      padding: 12px;
+      background: #fafafa;
+      overflow: auto;
+    }
+    img, embed {
+      display: block;
+      width: 100%;
+      max-height: 900px;
+      object-fit: contain;
+      background: white;
+      border: 1px solid #e5e7eb;
+    }
+    embed {
+      height: 780px;
+    }
+    code {
+      font-size: 12px;
+      overflow-wrap: anywhere;
+    }
+    .missing {
+      padding: 40px;
+      border: 1px dashed #9ca3af;
+      color: #6b7280;
+      background: white;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+<main>
+  <h1>Platinum ↔ Level5 Schematic Visual Audit</h1>
+  <div class="warning">
+    This report is for visual review only. It intentionally does not infer final Platinum part names.
+    A part can be mapped only after component shape, callout target, and assembly location are visually confirmed.
+  </div>
+  
+            <section class="pair">
+              <header>
+                <h2>Platinum Flat Finishing Box</h2>
+                <p><strong>Status:</strong> candidate_family_only</p>
+                <p>Flat-box family candidate. Do not assign size-specific part numbers unless Platinum size is confirmed.</p>
+                <p><strong>Platinum labels:</strong> none</p>
+              </header>
+              <div class="grid">
+                <article>
+                  <h3>Platinum source</h3>
+                  <p><code>frontend/public/brands/Platinum/Schematics/FlatBox/schematic_data.json</code></p>
+                  <div class="missing">Missing visual source</div>
+                </article>
+                <article>
+                  <h3>Level5 candidate</h3>
+                  <p><strong>4-765</strong> — 10in Standard Flat Box, 2nd Gen</p>
+                  <p><code>products/scraped_results/brands/Level5/schematics_pdfs/Flat Boxes/4-765 - 10in Standard Flat Box, 2nd Gen</code></p>
+                  <embed src="../../../../products/scraped_results/brands/Level5/schematics_pdfs/Flat Boxes/4-765 - 10in Standard Flat Box, 2nd Gen/4-764-765-766-770-New-Hinge-box-Final.pdf" type="application/pdf" />
+                </article>
+              </div>
+            </section>
+            
+            <section class="pair">
+              <header>
+                <h2>Platinum Drywall Pump w/Filler</h2>
+                <p><strong>Status:</strong> candidate_family_only</p>
+                <p>Pump family candidate. Current Platinum JSON has no label rows.</p>
+                <p><strong>Platinum labels:</strong> none</p>
+              </header>
+              <div class="grid">
+                <article>
+                  <h3>Platinum source</h3>
+                  <p><code>frontend/public/brands/Platinum/Schematics/CompoundPump/schematic_data.json</code></p>
+                  <div class="missing">Missing visual source</div>
+                </article>
+                <article>
+                  <h3>Level5 candidate</h3>
+                  <p><strong>4-771</strong> — Compound Pump, 2nd Gen</p>
+                  <p><code>products/scraped_results/brands/Level5/schematics_pdfs/Compound Pump &amp; Accessories/4-771 - Compound Pump, 2nd Gen</code></p>
+                  <embed src="../../../../products/scraped_results/brands/Level5/schematics_pdfs/Compound Pump &amp; Accessories/4-771 - Compound Pump, 2nd Gen/4-771-Pump.pdf" type="application/pdf" />
+                </article>
+              </div>
+            </section>
+            
+            <section class="pair">
+              <header>
+                <h2>Platinum 50&quot; Corner Roller Handle</h2>
+                <p><strong>Status:</strong> manual_visual_required</p>
+                <p>Closest same-family handle candidate. Do not map by numeric label.</p>
+                <p><strong>Platinum labels:</strong> none</p>
+              </header>
+              <div class="grid">
+                <article>
+                  <h3>Platinum source</h3>
+                  <p><code>frontend/public/brands/Platinum/Schematics/CornerRollerHandle/schematic_data.json</code></p>
+                  <div class="missing">Missing visual source</div>
+                </article>
+                <article>
+                  <h3>Level5 candidate</h3>
+                  <p><strong>4-880</strong> — Extendable Handle Only, 31in - 50in</p>
+                  <p><code>products/scraped_results/brands/Level5/schematics_pdfs/Tool Handles/4-880 - Extendable Handle Only, 31in - 50in</code></p>
+                  <embed src="../../../../products/scraped_results/brands/Level5/schematics_pdfs/Tool Handles/4-880 - Extendable Handle Only, 31in - 50in/52-inch-Extendable-Accessory-Handle-4-880.pdf" type="application/pdf" />
+                </article>
+              </div>
+            </section>
+            
+            <section class="pair">
+              <header>
+                <h2>Platinum Outside 90 Degree Corner Roller</h2>
+                <p><strong>Status:</strong> blocked_pending_exact_level5_outside_roller_source</p>
+                <p>Level5 4-707 is an inside-corner roller; do not use it as a part-level source for the Platinum outside 90-degree roller.</p>
+                <p><strong>Platinum labels:</strong> none</p>
+              </header>
+              <div class="grid">
+                <article>
+                  <h3>Platinum source</h3>
+                  <p><code>frontend/public/brands/Platinum/Schematics/OutsideCornerRoller/schematic_data.json</code></p>
+                  <div class="missing">Missing visual source</div>
+                </article>
+                <article>
+                  <h3>Level5 candidate</h3>
+                  <p><strong>4-707</strong> — Corner Roller, 2nd Gen</p>
+                  <p><code>products/scraped_results/brands/Level5/schematics_pdfs/Corner Roller/4-707 - Corner Roller, 2nd Gen</code></p>
+                  <embed src="../../../../products/scraped_results/brands/Level5/schematics_pdfs/Corner Roller/4-707 - Corner Roller, 2nd Gen/Corner-Roller-4-707.pdf" type="application/pdf" />
+                </article>
+              </div>
+            </section>
+            
+</main>
+</body>
+</html>

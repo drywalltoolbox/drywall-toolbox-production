@@ -1,0 +1,72 @@
+{
+  "schema_version": "1.0",
+  "generated_at_utc": "2026-06-03T09:45:36Z",
+  "purpose": "Conservative Platinum-to-Level5 schematic audit candidates. These are not direct Platinum OEM mappings.",
+  "global_rules": [
+    "Do not copy Level5 numeric callout labels onto Platinum labels.",
+    "Do not write Level5 part numbers into Platinum sku fields.",
+    "Only write a Platinum part name after visual match by component shape, callout target, and assembly location.",
+    "Keep Level5 part number under source.derivedFromPartNumber when used as provenance.",
+    "Mark size-sensitive flat-box names generic unless Platinum model size is known."
+  ],
+  "platinum_schematics": {
+    "platinum-flat-finishing-box-sch": {
+      "tool_name": "Platinum Flat Finishing Box",
+      "current_status": "parts_empty",
+      "candidate_level5_sources": [
+        {
+          "sku": "4-764",
+          "schematic": "7in Standard Flat Box, 2nd Gen"
+        },
+        {
+          "sku": "4-765",
+          "schematic": "10in Standard Flat Box, 2nd Gen"
+        },
+        {
+          "sku": "4-766",
+          "schematic": "12in Standard Flat Box, 2nd Gen"
+        },
+        {
+          "sku": "4-770",
+          "schematic": "Standard Flat Boxes, 2nd Gen"
+        }
+      ],
+      "mapping_action": "extract Platinum labels first; then map to generic flat-box component names; defer size-specific Level5 part numbers."
+    },
+    "platinum-drywall-pump-w-filler-sch": {
+      "tool_name": "Platinum Drywall Pump w/Filler",
+      "current_status": "parts_empty",
+      "candidate_level5_sources": [
+        {
+          "sku": "4-771",
+          "schematic": "Compound Pump, 2nd Gen"
+        }
+      ],
+      "mapping_action": "extract Platinum labels first; then compare label targets against Level5 pump components."
+    },
+    "platinum-50-corner-roller-handle-sch": {
+      "tool_name": "Platinum 50\" Corner Roller Handle",
+      "current_status": "numeric_labels_only",
+      "candidate_level5_sources": [
+        {
+          "sku": "4-880",
+          "schematic": "Extendable Handle Only, 31in - 50in"
+        }
+      ],
+      "mapping_action": "manual visual crosswalk required; no safe label-level mapping yet."
+    },
+    "platinum-outside-90-degree-corner-roller-sch": {
+      "tool_name": "Platinum Outside 90 Degree Corner Roller",
+      "current_status": "numeric_labels_only_with_duplicates",
+      "candidate_level5_sources": [],
+      "rejected_level5_sources": [
+        {
+          "sku": "4-707",
+          "schematic": "Corner Roller, 2nd Gen",
+          "reason": "visual product geometry is inside-corner roller, not Platinum outside 90-degree roller"
+        }
+      ],
+      "mapping_action": "find an exact Level5 outside-corner roller source or use Platinum/OEM source; do not map from Level5 4-707."
+    }
+  }
+}

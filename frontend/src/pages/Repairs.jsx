@@ -1038,16 +1038,6 @@ export function RepairStartExperience() {
     setFormData((prev) => ({ ...prev, serviceType: '', pricingTierId: '' }));
   }, [formData.pricingTierId, servicePackageOptions]);
 
-  // Derive which legacy pricing tab category maps to the selected toolCategory.
-  const repairCategory = useMemo(() => {
-    const cat = (formData.toolCategory || '').toLowerCase();
-    if (/auto.?tap/i.test(cat)) return 'autoTaper';
-    if (/flat|angle/i.test(cat)) return 'flatBoxes';
-    if (/pump/i.test(cat)) return 'mudPumps';
-    if (/handle|corner|nail|gooseneck|flusher|spotter/i.test(cat)) return 'handles';
-    return 'diagnostic';
-  }, [formData.toolCategory]);
-
   // Service type selection helper
   function selectTier(tier) {
     setFormData((prev) => ({
@@ -2071,16 +2061,18 @@ export function RepairStartExperience() {
                         })}
                       </div>
                       {formData.approvalMode === 'preapprove_limit' && (
-                        <input
-                          type="number"
-                          min="0"
-                          step="25"
-                          className={inputCls}
-                          placeholder="Approval limit in dollars"
-                          value={formData.preapprovalLimit}
-                          onChange={(e) => { set('preapprovalLimit')(e); clearErr('preapprovalLimit'); }}
-                        />
-                        {errors.preapprovalLimit && <p style={errStyle}>{errors.preapprovalLimit}</p>}
+                        <>
+                          <input
+                            type="number"
+                            min="0"
+                            step="25"
+                            className={inputCls}
+                            placeholder="Approval limit in dollars"
+                            value={formData.preapprovalLimit}
+                            onChange={(e) => { set('preapprovalLimit')(e); clearErr('preapprovalLimit'); }}
+                          />
+                          {errors.preapprovalLimit && <p style={errStyle}>{errors.preapprovalLimit}</p>}
+                        </>
                       )}
                     </Field>
 
