@@ -25,6 +25,13 @@ import {
 import SEOHead from '../components/shared/SEOHead';
 import { FREE_SHIP_THRESHOLD, ESTIMATED_SHIP_RATE } from '../constants/shipping';
 
+const PAYMENT_LOGO_BASE = `${ process.env.PUBLIC_URL || '' }/payment_logos`;
+const CART_PAYMENT_LOGOS = [
+  { key: 'visa', src: `${ PAYMENT_LOGO_BASE }/visa.svg`, alt: 'Visa' },
+  { key: 'mastercard', src: `${ PAYMENT_LOGO_BASE }/mastercard.svg`, alt: 'Mastercard' },
+  { key: 'amex', src: `${ PAYMENT_LOGO_BASE }/american-express.svg`, alt: 'American Express' },
+];
+
 // ─── Framer Motion variants ────────────────────────────────────────────────────
 const itemVariants = {
   hidden:  { opacity: 0, y: 14 },
@@ -80,14 +87,14 @@ export default function Cart() {
   return (
     <div className="min-h-screen bg-slate-50 page-wrapper">
       <SEOHead noindex title="Shopping Cart" />
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-14 pb-8 sm:py-12">
 
         {/* Page header */}
         <Motion.div
           initial={ { opacity: 0, y: -8 } }
           animate={ { opacity: 1, y: 0 } }
           transition={ { duration: 0.3 } }
-          className="flex items-center justify-between mb-8"
+          className="flex items-start justify-between gap-4 mb-8"
         >
           <div>
             <h1 className="text-2xl sm:text-3xl font-black text-slate-950 tracking-tight">
@@ -99,7 +106,7 @@ export default function Cart() {
           </div>
           <Link
             to="/products"
-            className="flex items-center gap-1.5 text-sm font-semibold text-slate-500 hover:text-primary-600 transition-colors"
+            className="flex items-center gap-1.5 pt-1 text-sm font-semibold text-slate-500 hover:text-primary-600 transition-colors"
           >
             <ChevronLeft size={ 16 } strokeWidth={ 2.5 } />
             Continue Shopping
@@ -295,31 +302,20 @@ export default function Cart() {
 
                 {/* Accepted payments */}
                 <div className="mt-5 pt-4 border-t border-slate-100">
-                  <p className="text-[9px] font-bold uppercase tracking-[0.14em] text-slate-400 text-center mb-2.5">
+                  <p className="text-[9px] font-bold uppercase tracking-[0.14em] text-slate-400 text-center mb-3">
                     Accepted Payments
                   </p>
-                  <div className="flex items-center justify-center gap-1.5 flex-wrap">
-                    { [ ['VISA', '#1A1F71'], ['MC', '#EB001B'], ['AMEX', '#006FCF'] ].map( ( [ label, color ] ) => (
-                      <span
-                        key={ label }
-                        style={ { color } }
-                        className="rounded border border-slate-200 bg-white px-1.5 py-0.5 text-[9px] font-black"
-                      >
-                        { label }
-                      </span>
+                  <div className="flex items-center justify-center gap-3">
+                    { CART_PAYMENT_LOGOS.map( ( logo ) => (
+                      <img
+                        key={ logo.key }
+                        src={ logo.src }
+                        alt={ logo.alt }
+                        className="h-4 w-auto object-contain"
+                        loading="lazy"
+                        decoding="async"
+                      />
                     ) ) }
-                    <span className="rounded border border-gray-800 bg-black text-white px-1.5 py-0.5 text-[9px] font-semibold">
-                      Apple Pay
-                    </span>
-                    <span
-                      className="rounded border border-slate-200 bg-white px-1.5 py-0.5 text-[9px] font-bold"
-                      style={ { color: '#4285F4' } }
-                    >
-                      G Pay
-                    </span>
-                    <span className="rounded border border-pink-200 bg-pink-50 text-[#17120e] px-1.5 py-0.5 text-[9px] font-black">
-                      Klarna
-                    </span>
                   </div>
                 </div>
 
