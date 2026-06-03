@@ -101,6 +101,79 @@
   color: var(--checkout-muted);
 }
 
+/* Payment method cards: the card button owns the outline.
+   Provider SVG artwork is cropped slightly so embedded logo-card borders do not
+   create a second nested container inside the actual selectable method card. */
+.dtb-checkout button:has(> img[src*="/payment_logos/paypal.svg"]),
+.dtb-checkout button:has(> img[src*="/payment_logos/apple-pay.svg"]),
+.dtb-checkout button:has(> img[src*="/payment_logos/google-pay.svg"]),
+.dtb-checkout button:has(> img[src*="/payment_logos/affirm.svg"]),
+.dtb-checkout button:has(> img[src*="/payment_logos/klarna.svg"]) {
+  align-items: center !important;
+  background: #ffffff !important;
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 14px !important;
+  box-shadow: none !important;
+  display: inline-flex !important;
+  justify-content: center !important;
+  min-height: 58px !important;
+  overflow: hidden !important;
+  padding: 0.6rem 1rem !important;
+  transition: border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease !important;
+}
+
+.dtb-checkout button:has(> img[src*="/payment_logos/paypal.svg"]):hover,
+.dtb-checkout button:has(> img[src*="/payment_logos/apple-pay.svg"]):hover,
+.dtb-checkout button:has(> img[src*="/payment_logos/google-pay.svg"]):hover,
+.dtb-checkout button:has(> img[src*="/payment_logos/affirm.svg"]):hover,
+.dtb-checkout button:has(> img[src*="/payment_logos/klarna.svg"]):hover {
+  border-color: #cbd5e1 !important;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.06) !important;
+  transform: translateY(-1px);
+}
+
+.dtb-checkout button:has(> img[src*="/payment_logos/paypal.svg"]):focus-visible,
+.dtb-checkout button:has(> img[src*="/payment_logos/apple-pay.svg"]):focus-visible,
+.dtb-checkout button:has(> img[src*="/payment_logos/google-pay.svg"]):focus-visible,
+.dtb-checkout button:has(> img[src*="/payment_logos/affirm.svg"]):focus-visible,
+.dtb-checkout button:has(> img[src*="/payment_logos/klarna.svg"]):focus-visible {
+  outline: none !important;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.18) !important;
+}
+
+.dtb-checkout button:has(> img[src*="/payment_logos/paypal.svg"]) > img,
+.dtb-checkout button:has(> img[src*="/payment_logos/apple-pay.svg"]) > img,
+.dtb-checkout button:has(> img[src*="/payment_logos/google-pay.svg"]) > img,
+.dtb-checkout button:has(> img[src*="/payment_logos/affirm.svg"]) > img,
+.dtb-checkout button:has(> img[src*="/payment_logos/klarna.svg"]) > img {
+  clip-path: inset(1.5px round 4px);
+  display: block !important;
+  height: auto !important;
+  max-height: 34px !important;
+  max-width: 74% !important;
+  object-fit: contain !important;
+  width: auto !important;
+}
+
+.dtb-checkout button:has(> img[src*="/payment_logos/apple-pay.svg"]) > img {
+  max-height: 32px !important;
+  max-width: 66% !important;
+}
+
+.dtb-checkout button:has(> img[src*="/payment_logos/affirm.svg"]) > img,
+.dtb-checkout button:has(> img[src*="/payment_logos/klarna.svg"]) > img {
+  max-height: 36px !important;
+  max-width: 68% !important;
+}
+
+.dtb-checkout button:has(> img[src*="/payment_logos/paypal.svg"].h-\[32px\]),
+.dtb-checkout button:has(> img[src*="/payment_logos/apple-pay.svg"].h-\[32px\]),
+.dtb-checkout button:has(> img[src*="/payment_logos/google-pay.svg"].h-\[32px\]),
+.dtb-checkout button:has(> img[src*="/payment_logos/affirm.svg"].h-\[36px\]),
+.dtb-checkout button:has(> img[src*="/payment_logos/klarna.svg"].h-\[36px\]) {
+  min-height: 58px !important;
+}
+
 /* Dark summary panel text overrides */
 .dtb-checkout .dtb-summary-panel {
   color: #e5ecf8;
