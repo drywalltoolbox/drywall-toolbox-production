@@ -101,25 +101,28 @@
   color: var(--checkout-muted);
 }
 
-/* Payment method cards: the card button owns the outline.
-   Provider SVG artwork is cropped slightly so embedded logo-card borders do not
-   create a second nested container inside the actual selectable method card. */
+/* Payment method cards.
+   The imported brand SVGs already contain the visible payment-card artwork.
+   Remove the oversized selectable wrapper so the clickable/focus area shrink-wraps
+   the visible card instead of drawing a second large container around it. */
 .dtb-checkout button:has(> img[src*="/payment_logos/paypal.svg"]),
 .dtb-checkout button:has(> img[src*="/payment_logos/apple-pay.svg"]),
 .dtb-checkout button:has(> img[src*="/payment_logos/google-pay.svg"]),
 .dtb-checkout button:has(> img[src*="/payment_logos/affirm.svg"]),
 .dtb-checkout button:has(> img[src*="/payment_logos/klarna.svg"]) {
-  align-items: center !important;
-  background: #ffffff !important;
-  border: 1px solid #e2e8f0 !important;
-  border-radius: 14px !important;
+  align-self: center !important;
+  background: transparent !important;
+  border: 0 !important;
+  border-radius: 8px !important;
   box-shadow: none !important;
   display: inline-flex !important;
+  height: auto !important;
   justify-content: center !important;
-  min-height: 58px !important;
-  overflow: hidden !important;
-  padding: 0.6rem 1rem !important;
-  transition: border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease !important;
+  justify-self: center !important;
+  min-height: 0 !important;
+  overflow: visible !important;
+  padding: 0 !important;
+  width: max-content !important;
 }
 
 .dtb-checkout button:has(> img[src*="/payment_logos/paypal.svg"]):hover,
@@ -127,8 +130,9 @@
 .dtb-checkout button:has(> img[src*="/payment_logos/google-pay.svg"]):hover,
 .dtb-checkout button:has(> img[src*="/payment_logos/affirm.svg"]):hover,
 .dtb-checkout button:has(> img[src*="/payment_logos/klarna.svg"]):hover {
-  border-color: #cbd5e1 !important;
-  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.06) !important;
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
   transform: translateY(-1px);
 }
 
@@ -138,32 +142,7 @@
 .dtb-checkout button:has(> img[src*="/payment_logos/affirm.svg"]):focus-visible,
 .dtb-checkout button:has(> img[src*="/payment_logos/klarna.svg"]):focus-visible {
   outline: none !important;
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.18) !important;
-}
-
-.dtb-checkout button:has(> img[src*="/payment_logos/paypal.svg"]) > img,
-.dtb-checkout button:has(> img[src*="/payment_logos/apple-pay.svg"]) > img,
-.dtb-checkout button:has(> img[src*="/payment_logos/google-pay.svg"]) > img,
-.dtb-checkout button:has(> img[src*="/payment_logos/affirm.svg"]) > img,
-.dtb-checkout button:has(> img[src*="/payment_logos/klarna.svg"]) > img {
-  clip-path: inset(1.5px round 4px);
-  display: block !important;
-  height: auto !important;
-  max-height: 34px !important;
-  max-width: 74% !important;
-  object-fit: contain !important;
-  width: auto !important;
-}
-
-.dtb-checkout button:has(> img[src*="/payment_logos/apple-pay.svg"]) > img {
-  max-height: 32px !important;
-  max-width: 66% !important;
-}
-
-.dtb-checkout button:has(> img[src*="/payment_logos/affirm.svg"]) > img,
-.dtb-checkout button:has(> img[src*="/payment_logos/klarna.svg"]) > img {
-  max-height: 36px !important;
-  max-width: 68% !important;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2) !important;
 }
 
 .dtb-checkout button:has(> img[src*="/payment_logos/paypal.svg"].h-\[32px\]),
@@ -171,7 +150,41 @@
 .dtb-checkout button:has(> img[src*="/payment_logos/google-pay.svg"].h-\[32px\]),
 .dtb-checkout button:has(> img[src*="/payment_logos/affirm.svg"].h-\[36px\]),
 .dtb-checkout button:has(> img[src*="/payment_logos/klarna.svg"].h-\[36px\]) {
-  min-height: 58px !important;
+  height: auto !important;
+  min-height: 0 !important;
+}
+
+.dtb-checkout button:has(> img[src*="/payment_logos/paypal.svg"]) > img,
+.dtb-checkout button:has(> img[src*="/payment_logos/apple-pay.svg"]) > img,
+.dtb-checkout button:has(> img[src*="/payment_logos/google-pay.svg"]) > img,
+.dtb-checkout button:has(> img[src*="/payment_logos/affirm.svg"]) > img,
+.dtb-checkout button:has(> img[src*="/payment_logos/klarna.svg"]) > img {
+  display: block !important;
+  height: auto !important;
+  max-height: none !important;
+  max-width: none !important;
+  object-fit: contain !important;
+  width: clamp(118px, 18vw, 136px) !important;
+}
+
+.dtb-checkout button:has(> img[src*="/payment_logos/apple-pay.svg"]) > img {
+  width: clamp(118px, 17vw, 132px) !important;
+}
+
+.dtb-checkout button:has(> img[src*="/payment_logos/affirm.svg"]) > img,
+.dtb-checkout button:has(> img[src*="/payment_logos/klarna.svg"]) > img {
+  width: clamp(118px, 16vw, 132px) !important;
+}
+
+/* Selected payment provider state: draw the active outline tightly around the
+   actual visible card, not around the grid column. Tailwind ring utilities on
+   the button remain active; the button now shrink-wraps the logo card. */
+.dtb-checkout button:has(> img[src*="/payment_logos/paypal.svg"].object-contain),
+.dtb-checkout button:has(> img[src*="/payment_logos/apple-pay.svg"].object-contain),
+.dtb-checkout button:has(> img[src*="/payment_logos/google-pay.svg"].object-contain),
+.dtb-checkout button:has(> img[src*="/payment_logos/affirm.svg"].object-contain),
+.dtb-checkout button:has(> img[src*="/payment_logos/klarna.svg"].object-contain) {
+  line-height: 0 !important;
 }
 
 /* Dark summary panel text overrides */
@@ -227,5 +240,13 @@
   .dtb-checkout h1 {
     font-size: 1.75rem;
     line-height: 1.07;
+  }
+
+  .dtb-checkout button:has(> img[src*="/payment_logos/paypal.svg"]) > img,
+  .dtb-checkout button:has(> img[src*="/payment_logos/apple-pay.svg"]) > img,
+  .dtb-checkout button:has(> img[src*="/payment_logos/google-pay.svg"]) > img,
+  .dtb-checkout button:has(> img[src*="/payment_logos/affirm.svg"]) > img,
+  .dtb-checkout button:has(> img[src*="/payment_logos/klarna.svg"]) > img {
+    width: clamp(104px, 27vw, 126px) !important;
   }
 }
