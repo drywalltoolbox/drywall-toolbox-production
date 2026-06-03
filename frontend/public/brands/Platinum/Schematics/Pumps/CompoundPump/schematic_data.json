@@ -11,273 +11,279 @@
   "parts": [
     {
       "id": "17",
-      "name": "Part (17)",
-      "quantity": 1,
+      "name": "Screw",
+      "quantity": 4,
       "sku": "17"
     },
     {
       "id": "16",
-      "name": "Part (16)",
-      "quantity": 1,
+      "name": "Lock Washer",
+      "quantity": 4,
       "sku": "16"
     },
     {
       "id": "11",
-      "name": "Part (11)",
-      "quantity": 1,
+      "name": "Pump Latch",
+      "quantity": 2,
       "sku": "11"
     },
     {
       "id": "54",
-      "name": "Part (54)",
+      "name": "Pump Tube",
       "quantity": 1,
       "sku": "54"
     },
     {
       "id": "30",
-      "name": "Part (30)",
-      "quantity": 1,
+      "name": "Screw",
+      "quantity": 4,
       "sku": "30"
     },
     {
       "id": "55",
-      "name": "Part (55)",
+      "name": "Pump Tube Foot",
       "quantity": 1,
       "sku": "55"
     },
     {
       "id": "56",
-      "name": "Part (56)",
+      "name": "Screen",
       "quantity": 1,
       "sku": "56"
     },
     {
       "id": "58",
-      "name": "Part (58)",
+      "name": "Screw",
       "quantity": 1,
       "sku": "58"
     },
     {
       "id": "59",
-      "name": "Part (59)",
+      "name": "Nut",
       "quantity": 1,
       "sku": "59"
     },
     {
       "id": "45",
-      "name": "Part (45)",
-      "quantity": 1,
+      "name": "Valve Disc",
+      "quantity": 2,
       "sku": "45"
     },
     {
       "id": "60",
-      "name": "Part (60)",
+      "name": "Screw",
       "quantity": 1,
       "sku": "60"
     },
     {
       "id": "29",
-      "name": "Part (29)",
-      "quantity": 1,
+      "name": "S-Hook",
+      "quantity": 2,
       "sku": "29"
     },
     {
       "id": "22",
-      "name": "Part (22)",
+      "name": "Pump Head",
       "quantity": 1,
       "sku": "22"
     },
     {
       "id": "31",
-      "name": "Part (31)",
+      "name": "Filler/Gooseneck Gasket",
       "quantity": 1,
       "sku": "31"
     },
     {
       "id": "32",
-      "name": "Part (32)",
-      "quantity": 1,
+      "name": "Nut",
+      "quantity": 2,
       "sku": "32"
     },
     {
       "id": "25",
-      "name": "Part (25)",
-      "quantity": 1,
+      "name": "Stud Screw",
+      "quantity": 2,
       "sku": "25"
     },
     {
       "id": "1",
-      "name": "Part (1)",
+      "name": "Pump O-Ring",
       "quantity": 1,
       "sku": "1"
     },
     {
       "id": "46",
-      "name": "Part (46)",
+      "name": "Small Retainer",
       "quantity": 1,
       "sku": "46"
     },
     {
       "id": "48",
-      "name": "Part (48)",
+      "name": "Piston Cup",
       "quantity": 1,
       "sku": "48"
     },
     {
       "id": "47",
-      "name": "Part (47)",
+      "name": "Large Retainer",
       "quantity": 1,
       "sku": "47"
     },
     {
       "id": "49",
-      "name": "Part (49)",
+      "name": "Lock Clip",
       "quantity": 1,
       "sku": "49"
     },
     {
       "id": "50",
-      "name": "Part (50)",
+      "name": "Lock Nut",
       "quantity": 1,
       "sku": "50"
     },
     {
       "id": "51",
-      "name": "Part (51)",
+      "name": "Filler Body",
       "quantity": 1,
       "sku": "51"
     },
     {
       "id": "52",
-      "name": "Part (52)",
+      "name": "Filler/Gooseneck O-Ring",
       "quantity": 1,
       "sku": "52"
     },
     {
       "id": "18",
-      "name": "Part (18)",
+      "name": "Filler Cable",
       "quantity": 1,
       "sku": "18"
     },
     {
       "id": "3",
-      "name": "Part (3)",
-      "quantity": 1,
+      "name": "Screw",
+      "quantity": 2,
       "sku": "3"
     },
     {
       "id": "4",
-      "name": "Part (4)",
-      "quantity": 1,
+      "name": "Wrench Bracket",
+      "quantity": 2,
       "sku": "4"
     },
     {
       "id": "20",
-      "name": "Part (20)",
+      "name": "Discharge Tube",
       "quantity": 1,
       "sku": "20"
     },
     {
       "id": "2",
-      "name": "Part (2)",
+      "name": "Pump Foot Bracket",
       "quantity": 1,
       "sku": "2"
     },
     {
       "id": "43",
-      "name": "Part (43)",
+      "name": "Pump Ball Screw",
       "quantity": 1,
       "sku": "43"
     },
     {
       "id": "38",
-      "name": "Part (38)",
+      "name": "Ball",
       "quantity": 1,
       "sku": "38"
     },
     {
       "id": "39",
-      "name": "Part (39)",
+      "name": "Pump Handle",
       "quantity": 1,
       "sku": "39"
     },
     {
       "id": "40",
-      "name": "Part (40)",
+      "name": "Pump Handle Tube",
       "quantity": 1,
       "sku": "40"
     },
     {
       "id": "35",
-      "name": "Part (35)",
+      "name": "Pump Handle Bracket",
       "quantity": 1,
       "sku": "35"
     },
     {
       "id": "42",
-      "name": "Part (42)",
+      "name": "Pump Handle Nut",
       "quantity": 1,
       "sku": "42"
     },
     {
       "id": "7",
-      "name": "Part (7)",
+      "name": "Release Pin with key ring",
       "quantity": 1,
       "sku": "7"
     },
     {
       "id": "27",
-      "name": "Part (27)",
+      "name": "Brass Nut",
       "quantity": 1,
       "sku": "27"
     },
     {
       "id": "26",
-      "name": "Part (26)",
+      "name": "U-Cup",
       "quantity": 1,
       "sku": "26"
     },
     {
       "id": "24",
-      "name": "Part (24)",
-      "quantity": 1,
+      "name": "Plastic Nut Bearing",
+      "quantity": 2,
       "sku": "24"
     },
     {
       "id": "44",
-      "name": "Part (44)",
+      "name": "Piston Rod",
       "quantity": 1,
       "sku": "44"
     },
     {
       "id": "28",
-      "name": "Part (28)",
+      "name": "Bolt",
       "quantity": 1,
       "sku": "28"
     },
     {
       "id": "6",
-      "name": "Part (6)",
-      "quantity": 1,
+      "name": "Black Plastic Washer (Link)",
+      "quantity": 2,
       "sku": "6"
     },
     {
       "id": "33",
-      "name": "Part (33)",
+      "name": "Pump Link",
       "quantity": 1,
       "sku": "33"
     },
     {
       "id": "34",
-      "name": "Part (34)",
+      "name": "Hex head screw",
       "quantity": 1,
       "sku": "34"
     },
     {
       "id": "5",
-      "name": "Part (5)",
+      "name": "Metal Link Washer",
       "quantity": 1,
       "sku": "5"
+    },
+    {
+      "id": "57",
+      "name": "Metal Washer",
+      "quantity": 1,
+      "sku": "57"
     }
   ],
   "coordinates": {
@@ -730,10 +736,21 @@
       "shape": "circle",
       "widthPx": 94,
       "heightPx": 94
+    },
+    "57": {
+      "pageNumber": 1,
+      "x_pct": 27.55,
+      "y_pct": 46.15,
+      "x_px": 564,
+      "y_px": 945,
+      "shape": "circle",
+      "widthPx": 96,
+      "heightPx": 96
     }
   },
   "schema_version": "1.0",
   "source_schema_version": "2.0",
   "image_natural_width": 2048,
-  "image_natural_height": 2048
+  "image_natural_height": 2048,
+  "preview_image": "product_preview.webp"
 }

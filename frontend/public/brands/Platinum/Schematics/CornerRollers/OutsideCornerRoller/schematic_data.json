@@ -159,5 +159,6 @@
   "schema_version": "1.0",
   "source_schema_version": "2.0",
   "image_natural_width": 2048,
-  "image_natural_height": 2048
+  "image_natural_height": 2048,
+  "preview_image": "product_preview.webp"
 }

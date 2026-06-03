@@ -111,6 +111,11 @@ import asgardAT01ADData    from '/brands/Asgard/Schematics/Tapers/AT01-AD/schema
 import platinumCompoundPumpData       from '/brands/Platinum/Schematics/Pumps/CompoundPump/schematic_data.json';
 import platinumFlatBoxData            from '/brands/Platinum/Schematics/FinishingBoxes/FlatBox/schematic_data.json';
 import platinumOutsideCornerRollerData from '/brands/Platinum/Schematics/CornerRollers/OutsideCornerRoller/schematic_data.json';
+import platinumCornerFinisherData     from '/brands/Platinum/Schematics/CornerFinishers/CornerFinisher/schematic_data.json';
+import platinumCornerApplicatorHandleData from '/brands/Platinum/Schematics/Handles/CornerApplicatorHandle/schematic_data.json';
+import platinumCornerFinisherHandleData from '/brands/Platinum/Schematics/Handles/CornerFinisherHandle/schematic_data.json';
+import platinumCornerRollerHandleData from '/brands/Platinum/Schematics/Handles/CornerRollerHandle/schematic_data.json';
+import platinumFlatBoxHandleData      from '/brands/Platinum/Schematics/Handles/FlatBoxHandle/schematic_data.json';
 
 // ---------------------------------------------------------------------------
 // TapeTech schematic JSON data imports
@@ -446,15 +451,35 @@ const _fallbacks = {
   // ── Platinum ──────────────────────────────────────────────────────────────
   'platinum-compound-pump': {
     pages:   { 1: `${_BASE}brands/Platinum/Schematics/Pumps/CompoundPump/platinum_compound_pump-page-001.webp` },
-    preview: `${_BASE}brands/Platinum/Schematics/Pumps/CompoundPump/platinum_compound_pump-page-001.webp`,
+    preview: `${_BASE}brands/Platinum/Schematics/Pumps/CompoundPump/product_preview.webp`,
   },
   'platinum-flat-box': {
     pages:   { 1: `${_BASE}brands/Platinum/Schematics/FinishingBoxes/FlatBox/Platinum_Flat_Box-page-001.webp` },
-    preview: `${_BASE}brands/Platinum/Schematics/FinishingBoxes/FlatBox/Platinum_Flat_Box-page-001.webp`,
+    preview: `${_BASE}brands/Platinum/Schematics/FinishingBoxes/FlatBox/product_preview.webp`,
   },
   'platinum-outside-corner-roller': {
     pages:   { 1: `${_BASE}brands/Platinum/Schematics/CornerRollers/OutsideCornerRoller/platinum_outside_cornerroller-page-001.webp` },
-    preview: `${_BASE}brands/Platinum/Schematics/CornerRollers/OutsideCornerRoller/platinum_outside_cornerroller-page-001.webp`,
+    preview: `${_BASE}brands/Platinum/Schematics/CornerRollers/OutsideCornerRoller/product_preview.webp`,
+  },
+  'platinum-corner-finisher': {
+    pages:   { 1: `${_BASE}brands/Platinum/Schematics/CornerFinishers/CornerFinisher/Platinum_Corner_Finisher-page-001.webp` },
+    preview: `${_BASE}brands/Platinum/Schematics/CornerFinishers/CornerFinisher/product_preview.webp`,
+  },
+  'platinum-corner-applicator-handle': {
+    pages:   { 1: `${_BASE}brands/Platinum/Schematics/Handles/CornerApplicatorHandle/platinum_corner_applicator_handle-page-001.webp` },
+    preview: `${_BASE}brands/Platinum/Schematics/Handles/CornerApplicatorHandle/product_preview.webp`,
+  },
+  'platinum-corner-finisher-handle': {
+    pages:   { 1: `${_BASE}brands/Platinum/Schematics/Handles/CornerFinisherHandle/platinum_corner_finisher_handle-page-001.webp` },
+    preview: `${_BASE}brands/Platinum/Schematics/Handles/CornerFinisherHandle/product_preview.webp`,
+  },
+  'platinum-corner-roller-handle': {
+    pages:   { 1: `${_BASE}brands/Platinum/Schematics/Handles/CornerRollerHandle/platinum_corner_roller_Handle-page-001.webp` },
+    preview: `${_BASE}brands/Platinum/Schematics/Handles/CornerRollerHandle/product_preview.webp`,
+  },
+  'platinum-flat-box-handle': {
+    pages:   { 1: `${_BASE}brands/Platinum/Schematics/Handles/FlatBoxHandle/platinum_flatbox_handle-page-001.webp` },
+    preview: `${_BASE}brands/Platinum/Schematics/Handles/FlatBoxHandle/product_preview.webp`,
   },
 
   // ── TapeTech ────────────────────────────────────────────────────────────
@@ -958,6 +983,11 @@ const ALLOWED_BRANDS = [
   const platinumCompoundPumpParts       = buildPartsFromData(platinumCompoundPumpData);
   const platinumFlatBoxParts            = buildPartsFromData(platinumFlatBoxData);
   const platinumOutsideCornerRollerParts = buildPartsFromData(platinumOutsideCornerRollerData);
+  const platinumCornerFinisherParts     = buildPartsFromData(platinumCornerFinisherData);
+  const platinumCornerApplicatorHandleParts = buildPartsFromData(platinumCornerApplicatorHandleData);
+  const platinumCornerFinisherHandleParts = buildPartsFromData(platinumCornerFinisherHandleData);
+  const platinumCornerRollerHandleParts = buildPartsFromData(platinumCornerRollerHandleData);
+  const platinumFlatBoxHandleParts      = buildPartsFromData(platinumFlatBoxHandleData);
 
   // TapeTech parts arrays
   const tapeTech8054TTParts = buildPartsFromData(tapeTech8054TTData);
@@ -1746,6 +1776,61 @@ const ALLOWED_BRANDS = [
       imagePages: { 1: schImg('platinum-outside-corner-roller', 1) },
       previewImage: schPrev('platinum-outside-corner-roller'),
       parts: platinumOutsideCornerRollerParts,
+    },
+    {
+      id: 'platinum-corner-finisher',
+      title: 'Corner Finisher',
+      description: 'Platinum Drywall Tools Corner Finisher schematic diagram',
+      brand: 'Platinum Drywall Tools',
+      category: 'Corner Finishers',
+      diagramPages: [1],
+      imagePages: { 1: schImg('platinum-corner-finisher', 1) },
+      previewImage: schPrev('platinum-corner-finisher'),
+      parts: platinumCornerFinisherParts,
+    },
+    {
+      id: 'platinum-corner-applicator-handle',
+      title: 'Corner Applicator Handle',
+      description: 'Platinum Drywall Tools Corner Applicator Handle schematic diagram',
+      brand: 'Platinum Drywall Tools',
+      category: 'Handles',
+      diagramPages: [1],
+      imagePages: { 1: schImg('platinum-corner-applicator-handle', 1) },
+      previewImage: schPrev('platinum-corner-applicator-handle'),
+      parts: platinumCornerApplicatorHandleParts,
+    },
+    {
+      id: 'platinum-corner-finisher-handle',
+      title: 'Corner Finisher Handle',
+      description: 'Platinum Drywall Tools Corner Finisher Handle schematic diagram',
+      brand: 'Platinum Drywall Tools',
+      category: 'Handles',
+      diagramPages: [1],
+      imagePages: { 1: schImg('platinum-corner-finisher-handle', 1) },
+      previewImage: schPrev('platinum-corner-finisher-handle'),
+      parts: platinumCornerFinisherHandleParts,
+    },
+    {
+      id: 'platinum-corner-roller-handle',
+      title: 'Corner Roller Handle',
+      description: 'Platinum Drywall Tools Corner Roller Handle schematic diagram',
+      brand: 'Platinum Drywall Tools',
+      category: 'Handles',
+      diagramPages: [1],
+      imagePages: { 1: schImg('platinum-corner-roller-handle', 1) },
+      previewImage: schPrev('platinum-corner-roller-handle'),
+      parts: platinumCornerRollerHandleParts,
+    },
+    {
+      id: 'platinum-flat-box-handle',
+      title: 'Flat Box Handle',
+      description: 'Platinum Drywall Tools Flat Box Handle schematic diagram',
+      brand: 'Platinum Drywall Tools',
+      category: 'Handles',
+      diagramPages: [1],
+      imagePages: { 1: schImg('platinum-flat-box-handle', 1) },
+      previewImage: schPrev('platinum-flat-box-handle'),
+      parts: platinumFlatBoxHandleParts,
     },
 
     // ── TapeTech ────────────────────────────────────────────────────────────
