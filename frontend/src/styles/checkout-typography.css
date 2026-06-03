@@ -102,27 +102,29 @@
 }
 
 /* Payment method cards.
-   The imported brand SVGs already contain the visible payment-card artwork.
-   Remove the oversized selectable wrapper so the clickable/focus area shrink-wraps
-   the visible card instead of drawing a second large container around it. */
+   The selectable button keeps the old larger grid-card footprint, but its own
+   background/border is invisible. The provider SVG artwork fills the footprint,
+   so there is one visual card instead of a small card nested inside a large one. */
 .dtb-checkout button:has(> img[src*="/payment_logos/paypal.svg"]),
 .dtb-checkout button:has(> img[src*="/payment_logos/apple-pay.svg"]),
 .dtb-checkout button:has(> img[src*="/payment_logos/google-pay.svg"]),
 .dtb-checkout button:has(> img[src*="/payment_logos/affirm.svg"]),
 .dtb-checkout button:has(> img[src*="/payment_logos/klarna.svg"]) {
-  align-self: center !important;
+  align-items: center !important;
+  align-self: stretch !important;
   background: transparent !important;
   border: 0 !important;
-  border-radius: 8px !important;
+  border-radius: 16px !important;
   box-shadow: none !important;
-  display: inline-flex !important;
-  height: auto !important;
+  display: flex !important;
+  height: clamp(52px, 14vw, 62px) !important;
   justify-content: center !important;
-  justify-self: center !important;
-  min-height: 0 !important;
+  justify-self: stretch !important;
+  line-height: 0 !important;
+  min-height: clamp(52px, 14vw, 62px) !important;
   overflow: visible !important;
   padding: 0 !important;
-  width: max-content !important;
+  width: 100% !important;
 }
 
 .dtb-checkout button:has(> img[src*="/payment_logos/paypal.svg"]):hover,
@@ -142,7 +144,14 @@
 .dtb-checkout button:has(> img[src*="/payment_logos/affirm.svg"]):focus-visible,
 .dtb-checkout button:has(> img[src*="/payment_logos/klarna.svg"]):focus-visible {
   outline: none !important;
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2) !important;
+}
+
+.dtb-checkout button:has(> img[src*="/payment_logos/paypal.svg"]):focus-visible > img,
+.dtb-checkout button:has(> img[src*="/payment_logos/apple-pay.svg"]):focus-visible > img,
+.dtb-checkout button:has(> img[src*="/payment_logos/google-pay.svg"]):focus-visible > img,
+.dtb-checkout button:has(> img[src*="/payment_logos/affirm.svg"]):focus-visible > img,
+.dtb-checkout button:has(> img[src*="/payment_logos/klarna.svg"]):focus-visible > img {
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.22) !important;
 }
 
 .dtb-checkout button:has(> img[src*="/payment_logos/paypal.svg"].h-\[32px\]),
@@ -150,8 +159,8 @@
 .dtb-checkout button:has(> img[src*="/payment_logos/google-pay.svg"].h-\[32px\]),
 .dtb-checkout button:has(> img[src*="/payment_logos/affirm.svg"].h-\[36px\]),
 .dtb-checkout button:has(> img[src*="/payment_logos/klarna.svg"].h-\[36px\]) {
-  height: auto !important;
-  min-height: 0 !important;
+  height: clamp(52px, 14vw, 62px) !important;
+  min-height: clamp(52px, 14vw, 62px) !important;
 }
 
 .dtb-checkout button:has(> img[src*="/payment_logos/paypal.svg"]) > img,
@@ -159,32 +168,13 @@
 .dtb-checkout button:has(> img[src*="/payment_logos/google-pay.svg"]) > img,
 .dtb-checkout button:has(> img[src*="/payment_logos/affirm.svg"]) > img,
 .dtb-checkout button:has(> img[src*="/payment_logos/klarna.svg"]) > img {
+  border-radius: 12px !important;
   display: block !important;
-  height: auto !important;
-  max-height: none !important;
-  max-width: none !important;
-  object-fit: contain !important;
-  width: clamp(118px, 18vw, 136px) !important;
-}
-
-.dtb-checkout button:has(> img[src*="/payment_logos/apple-pay.svg"]) > img {
-  width: clamp(118px, 17vw, 132px) !important;
-}
-
-.dtb-checkout button:has(> img[src*="/payment_logos/affirm.svg"]) > img,
-.dtb-checkout button:has(> img[src*="/payment_logos/klarna.svg"]) > img {
-  width: clamp(118px, 16vw, 132px) !important;
-}
-
-/* Selected payment provider state: draw the active outline tightly around the
-   actual visible card, not around the grid column. Tailwind ring utilities on
-   the button remain active; the button now shrink-wraps the logo card. */
-.dtb-checkout button:has(> img[src*="/payment_logos/paypal.svg"].object-contain),
-.dtb-checkout button:has(> img[src*="/payment_logos/apple-pay.svg"].object-contain),
-.dtb-checkout button:has(> img[src*="/payment_logos/google-pay.svg"].object-contain),
-.dtb-checkout button:has(> img[src*="/payment_logos/affirm.svg"].object-contain),
-.dtb-checkout button:has(> img[src*="/payment_logos/klarna.svg"].object-contain) {
-  line-height: 0 !important;
+  height: 100% !important;
+  max-height: 100% !important;
+  max-width: 100% !important;
+  object-fit: fill !important;
+  width: 100% !important;
 }
 
 /* Dark summary panel text overrides */
@@ -242,11 +232,12 @@
     line-height: 1.07;
   }
 
-  .dtb-checkout button:has(> img[src*="/payment_logos/paypal.svg"]) > img,
-  .dtb-checkout button:has(> img[src*="/payment_logos/apple-pay.svg"]) > img,
-  .dtb-checkout button:has(> img[src*="/payment_logos/google-pay.svg"]) > img,
-  .dtb-checkout button:has(> img[src*="/payment_logos/affirm.svg"]) > img,
-  .dtb-checkout button:has(> img[src*="/payment_logos/klarna.svg"]) > img {
-    width: clamp(104px, 27vw, 126px) !important;
+  .dtb-checkout button:has(> img[src*="/payment_logos/paypal.svg"]),
+  .dtb-checkout button:has(> img[src*="/payment_logos/apple-pay.svg"]),
+  .dtb-checkout button:has(> img[src*="/payment_logos/google-pay.svg"]),
+  .dtb-checkout button:has(> img[src*="/payment_logos/affirm.svg"]),
+  .dtb-checkout button:has(> img[src*="/payment_logos/klarna.svg"]) {
+    height: 58px !important;
+    min-height: 58px !important;
   }
 }
