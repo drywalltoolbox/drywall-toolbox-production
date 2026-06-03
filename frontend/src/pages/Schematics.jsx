@@ -108,9 +108,9 @@ import asgardAT01ADData    from '/brands/Asgard/Schematics/Tapers/AT01-AD/schema
 // ---------------------------------------------------------------------------
 // Platinum schematic JSON data imports
 // ---------------------------------------------------------------------------
-import platinumCompoundPumpData       from '/brands/Platinum/Schematics/CompoundPump/schematic_data.json';
-import platinumFlatBoxData            from '/brands/Platinum/Schematics/FlatBox/schematic_data.json';
-import platinumOutsideCornerRollerData from '/brands/Platinum/Schematics/OutsideCornerRoller/schematic_data.json';
+import platinumCompoundPumpData       from '/brands/Platinum/Schematics/Pumps/CompoundPump/schematic_data.json';
+import platinumFlatBoxData            from '/brands/Platinum/Schematics/FinishingBoxes/FlatBox/schematic_data.json';
+import platinumOutsideCornerRollerData from '/brands/Platinum/Schematics/CornerRollers/OutsideCornerRoller/schematic_data.json';
 
 // ---------------------------------------------------------------------------
 // TapeTech schematic JSON data imports
@@ -445,16 +445,16 @@ const _fallbacks = {
 
   // ── Platinum ──────────────────────────────────────────────────────────────
   'platinum-compound-pump': {
-    pages:   { 1: `${_BASE}brands/Platinum/Schematics/CompoundPump/PT-Compound-Pump-page-01.webp` },
-    preview: `${_BASE}brands/Platinum/Schematics/CompoundPump/PT-Compound-Pump-preview.webp`,
+    pages:   { 1: `${_BASE}brands/Platinum/Schematics/Pumps/CompoundPump/platinum_compound_pump-page-001.webp` },
+    preview: `${_BASE}brands/Platinum/Schematics/Pumps/CompoundPump/platinum_compound_pump-page-001.webp`,
   },
   'platinum-flat-box': {
-    pages:   { 1: `${_BASE}brands/Platinum/Schematics/FlatBox/Platinum_Flat_Box-page-01.webp` },
-    preview: `${_BASE}brands/Platinum/Schematics/FlatBox/Platinum_Flat_Box-preview.webp`,
+    pages:   { 1: `${_BASE}brands/Platinum/Schematics/FinishingBoxes/FlatBox/Platinum_Flat_Box-page-001.webp` },
+    preview: `${_BASE}brands/Platinum/Schematics/FinishingBoxes/FlatBox/Platinum_Flat_Box-page-001.webp`,
   },
   'platinum-outside-corner-roller': {
-    pages:   { 1: `${_BASE}brands/Platinum/Schematics/OutsideCornerRoller/platinum_outside_cornerroller-page-01.webp` },
-    preview: `${_BASE}brands/Platinum/Schematics/OutsideCornerRoller/platinum_outside_cornerroller_preview.webp`,
+    pages:   { 1: `${_BASE}brands/Platinum/Schematics/CornerRollers/OutsideCornerRoller/platinum_outside_cornerroller-page-001.webp` },
+    preview: `${_BASE}brands/Platinum/Schematics/CornerRollers/OutsideCornerRoller/platinum_outside_cornerroller-page-001.webp`,
   },
 
   // ── TapeTech ────────────────────────────────────────────────────────────
