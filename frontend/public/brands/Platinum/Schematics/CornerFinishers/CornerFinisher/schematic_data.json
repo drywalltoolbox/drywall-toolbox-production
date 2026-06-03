@@ -11,97 +11,97 @@
   "parts": [
     {
       "id": "13",
-      "name": "Part (13)",
+      "name": "Large Spring",
       "quantity": 1,
       "sku": "13"
     },
     {
       "id": "12",
-      "name": "Part (12)",
+      "name": "Small Spring",
       "quantity": 1,
       "sku": "12"
     },
     {
       "id": "17",
-      "name": "Part (17)",
-      "quantity": 1,
+      "name": "6-32 x 1/2 FillisterHeadScrew",
+      "quantity": 2,
       "sku": "17"
     },
     {
       "id": "15",
-      "name": "Part (15)",
+      "name": "Insert Socket",
       "quantity": 1,
       "sku": "15"
     },
     {
       "id": "11",
-      "name": "Part (11)",
+      "name": "CF Ball Locking Clip",
       "quantity": 1,
       "sku": "11"
     },
     {
       "id": "14",
-      "name": "Part (14)",
+      "name": "Spring Tension Pin",
       "quantity": 1,
       "sku": "14"
     },
     {
       "id": "4",
-      "name": "Part (4)",
-      "quantity": 1,
+      "name": "CF 6-32 x 1/8 SS Hex",
+      "quantity": 10,
       "sku": "4"
     },
     {
       "id": "5",
-      "name": "Part (5)",
-      "quantity": 1,
+      "name": "Skids",
+      "quantity": 2,
       "sku": "5"
     },
     {
       "id": "3",
-      "name": "Part (3)",
+      "name": "Right Frame",
       "quantity": 1,
       "sku": "3"
     },
     {
       "id": "6",
-      "name": "Part (6)",
-      "quantity": 1,
+      "name": "Blade-Corner Finisher",
+      "quantity": 2,
       "sku": "6"
     },
     {
       "id": "1",
-      "name": "Part (1)",
+      "name": "CF Body",
       "quantity": 1,
       "sku": "1"
     },
     {
       "id": "16",
-      "name": "Part (16)",
-      "quantity": 1,
+      "name": "CF Frame Tabs",
+      "quantity": 2,
       "sku": "16"
     },
     {
       "id": "7",
-      "name": "Part (7)",
+      "name": "CF Bottom Clip",
       "quantity": 1,
       "sku": "7"
     },
     {
       "id": "10",
-      "name": "Part (10)",
+      "name": "CF Lock Clip Spring",
       "quantity": 1,
       "sku": "10"
     },
     {
       "id": "9",
-      "name": "Part (9)",
-      "quantity": 1,
+      "name": "CF Slotted Screw 8-32 x 6.35",
+      "quantity": 2,
       "sku": "9"
     },
     {
       "id": "2",
-      "name": "Part (2)",
+      "name": "CF Left Frame",
       "quantity": 1,
       "sku": "2"
     }

@@ -11,31 +11,31 @@
   "parts": [
     {
       "id": "5",
-      "name": "Part (5)",
+      "name": "Handle End",
       "quantity": 1,
       "sku": "5"
     },
     {
       "id": "1",
-      "name": "Part (1)",
+      "name": "Handle Tube",
       "quantity": 1,
       "sku": "1"
     },
     {
       "id": "3",
-      "name": "Part (3)",
+      "name": "Wing Nut",
       "quantity": 1,
       "sku": "3"
     },
     {
       "id": "2",
-      "name": "Part (2)",
+      "name": "Ball Grip",
       "quantity": 1,
       "sku": "2"
     },
     {
       "id": "4",
-      "name": "Part (4)",
+      "name": "Corner Finisher Adapter",
       "quantity": 1,
       "sku": "4"
     }
