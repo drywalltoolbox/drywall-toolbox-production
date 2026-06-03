@@ -1,0 +1,412 @@
+{
+  "schema_version": "2.0",
+  "diagram": {
+    "id": "platinum-outside-cornerroller-page-001-enhanced",
+    "title": "platinum_outside_cornerroller-page-001-enhanced",
+    "description": "Interactive parts schematic with normalized hotspot geometry.",
+    "pages": [
+      {
+        "page": 1,
+        "image": {
+          "src": "platinum-outside-cornerroller-page-001-enhanced-page-01.png",
+          "natural_width": 2048,
+          "natural_height": 2048
+        },
+        "coordinate_space": {
+          "origin": "top-left",
+          "x_axis": "right",
+          "y_axis": "down",
+          "unit": "px"
+        }
+      }
+    ]
+  },
+  "parts_catalog": [
+    {
+      "part_id": "7",
+      "display_id": "7",
+      "name": "Part (7)",
+      "sku": "7",
+      "quantity": 1,
+      "notes": ""
+    },
+    {
+      "part_id": "10",
+      "display_id": "10",
+      "name": "Part (10)",
+      "sku": "10",
+      "quantity": 1,
+      "notes": ""
+    },
+    {
+      "part_id": "9",
+      "display_id": "9",
+      "name": "Part (9)",
+      "sku": "9",
+      "quantity": 1,
+      "notes": ""
+    },
+    {
+      "part_id": "5",
+      "display_id": "5",
+      "name": "Part (5)",
+      "sku": "5",
+      "quantity": 1,
+      "notes": ""
+    },
+    {
+      "part_id": "8",
+      "display_id": "8",
+      "name": "Part (8)",
+      "sku": "8",
+      "quantity": 1,
+      "notes": ""
+    },
+    {
+      "part_id": "1",
+      "display_id": "1",
+      "name": "Part (1)",
+      "sku": "1",
+      "quantity": 1,
+      "notes": ""
+    },
+    {
+      "part_id": "6",
+      "display_id": "6",
+      "name": "Part (6)",
+      "sku": "6",
+      "quantity": 1,
+      "notes": ""
+    },
+    {
+      "part_id": "4",
+      "display_id": "4",
+      "name": "Part (4)",
+      "sku": "4",
+      "quantity": 1,
+      "notes": ""
+    },
+    {
+      "part_id": "3",
+      "display_id": "3",
+      "name": "Part (3)",
+      "sku": "3",
+      "quantity": 1,
+      "notes": ""
+    }
+  ],
+  "hotspots": [
+    {
+      "hotspot_id": "p1-7-01",
+      "part_ref": "7",
+      "page": 1,
+      "shape": {
+        "type": "circle",
+        "cx_px": 1408,
+        "cy_px": 124,
+        "r_px": 69
+      },
+      "rotation_deg": 0,
+      "anchor": "center",
+      "z_index": 100,
+      "interaction": {
+        "tap_target_min_px": 40,
+        "hit_slop_px": 6,
+        "enabled": true
+      },
+      "normalized": {
+        "cx_pct": 68.75,
+        "cy_pct": 6.05,
+        "r_pct_w": 2.55,
+        "r_pct_h": 3.35
+      }
+    },
+    {
+      "hotspot_id": "p1-10-01",
+      "part_ref": "10",
+      "page": 1,
+      "shape": {
+        "type": "circle",
+        "cx_px": 1408,
+        "cy_px": 341,
+        "r_px": 56
+      },
+      "rotation_deg": 0,
+      "anchor": "center",
+      "z_index": 101,
+      "interaction": {
+        "tap_target_min_px": 40,
+        "hit_slop_px": 6,
+        "enabled": true
+      },
+      "normalized": {
+        "cx_pct": 68.75,
+        "cy_pct": 16.65,
+        "r_pct_w": 2.55,
+        "r_pct_h": 2.75
+      }
+    },
+    {
+      "hotspot_id": "p1-9-01",
+      "part_ref": "9",
+      "page": 1,
+      "shape": {
+        "type": "circle",
+        "cx_px": 1408,
+        "cy_px": 502,
+        "r_px": 52
+      },
+      "rotation_deg": 0,
+      "anchor": "center",
+      "z_index": 102,
+      "interaction": {
+        "tap_target_min_px": 40,
+        "hit_slop_px": 6,
+        "enabled": true
+      },
+      "normalized": {
+        "cx_pct": 68.75,
+        "cy_pct": 24.5,
+        "r_pct_w": 2.55,
+        "r_pct_h": 2.5
+      }
+    },
+    {
+      "hotspot_id": "p1-5-01",
+      "part_ref": "5",
+      "page": 1,
+      "shape": {
+        "type": "circle",
+        "cx_px": 673,
+        "cy_px": 472,
+        "r_px": 65
+      },
+      "rotation_deg": 0,
+      "anchor": "center",
+      "z_index": 103,
+      "interaction": {
+        "tap_target_min_px": 40,
+        "hit_slop_px": 6,
+        "enabled": true
+      },
+      "normalized": {
+        "cx_pct": 32.85,
+        "cy_pct": 23.05,
+        "r_pct_w": 3.15,
+        "r_pct_h": 3.05
+      }
+    },
+    {
+      "hotspot_id": "p1-8-01",
+      "part_ref": "8",
+      "page": 1,
+      "shape": {
+        "type": "circle",
+        "cx_px": 464,
+        "cy_px": 604,
+        "r_px": 65
+      },
+      "rotation_deg": 0,
+      "anchor": "center",
+      "z_index": 104,
+      "interaction": {
+        "tap_target_min_px": 40,
+        "hit_slop_px": 6,
+        "enabled": true
+      },
+      "normalized": {
+        "cx_pct": 22.65,
+        "cy_pct": 29.5,
+        "r_pct_w": 3.15,
+        "r_pct_h": 2.5
+      }
+    },
+    {
+      "hotspot_id": "p1-5-02",
+      "part_ref": "5",
+      "page": 1,
+      "shape": {
+        "type": "circle",
+        "cx_px": 1410,
+        "cy_px": 675,
+        "r_px": 54
+      },
+      "rotation_deg": 0,
+      "anchor": "center",
+      "z_index": 105,
+      "interaction": {
+        "tap_target_min_px": 40,
+        "hit_slop_px": 6,
+        "enabled": true
+      },
+      "normalized": {
+        "cx_pct": 68.84,
+        "cy_pct": 32.971,
+        "r_pct_w": 2.65,
+        "r_pct_h": 2.5
+      }
+    },
+    {
+      "hotspot_id": "p1-1-01",
+      "part_ref": "1",
+      "page": 1,
+      "shape": {
+        "type": "circle",
+        "cx_px": 1486,
+        "cy_px": 790,
+        "r_px": 56
+      },
+      "rotation_deg": 0,
+      "anchor": "center",
+      "z_index": 106,
+      "interaction": {
+        "tap_target_min_px": 40,
+        "hit_slop_px": 6,
+        "enabled": true
+      },
+      "normalized": {
+        "cx_pct": 72.55,
+        "cy_pct": 38.55,
+        "r_pct_w": 2.55,
+        "r_pct_h": 2.75
+      }
+    },
+    {
+      "hotspot_id": "p1-6-01",
+      "part_ref": "6",
+      "page": 1,
+      "shape": {
+        "type": "circle",
+        "cx_px": 470,
+        "cy_px": 1047,
+        "r_px": 66
+      },
+      "rotation_deg": 0,
+      "anchor": "center",
+      "z_index": 107,
+      "interaction": {
+        "tap_target_min_px": 40,
+        "hit_slop_px": 6,
+        "enabled": true
+      },
+      "normalized": {
+        "cx_pct": 22.95,
+        "cy_pct": 51.1,
+        "r_pct_w": 3.15,
+        "r_pct_h": 3.2
+      }
+    },
+    {
+      "hotspot_id": "p1-4-01",
+      "part_ref": "4",
+      "page": 1,
+      "shape": {
+        "type": "circle",
+        "cx_px": 1192,
+        "cy_px": 1329,
+        "r_px": 66
+      },
+      "rotation_deg": 0,
+      "anchor": "center",
+      "z_index": 108,
+      "interaction": {
+        "tap_target_min_px": 40,
+        "hit_slop_px": 6,
+        "enabled": true
+      },
+      "normalized": {
+        "cx_pct": 58.2,
+        "cy_pct": 64.9,
+        "r_pct_w": 3.2,
+        "r_pct_h": 3.1
+      }
+    },
+    {
+      "hotspot_id": "p1-6-02",
+      "part_ref": "6",
+      "page": 1,
+      "shape": {
+        "type": "circle",
+        "cx_px": 1395,
+        "cy_px": 1544,
+        "r_px": 58
+      },
+      "rotation_deg": 0,
+      "anchor": "center",
+      "z_index": 109,
+      "interaction": {
+        "tap_target_min_px": 40,
+        "hit_slop_px": 6,
+        "enabled": true
+      },
+      "normalized": {
+        "cx_pct": 68.1,
+        "cy_pct": 75.4,
+        "r_pct_w": 2.85,
+        "r_pct_h": 2.6
+      }
+    },
+    {
+      "hotspot_id": "p1-3-01",
+      "part_ref": "3",
+      "page": 1,
+      "shape": {
+        "type": "circle",
+        "cx_px": 473,
+        "cy_px": 1651,
+        "r_px": 66
+      },
+      "rotation_deg": 0,
+      "anchor": "center",
+      "z_index": 110,
+      "interaction": {
+        "tap_target_min_px": 40,
+        "hit_slop_px": 6,
+        "enabled": true
+      },
+      "normalized": {
+        "cx_pct": 23.1,
+        "cy_pct": 80.6,
+        "r_pct_w": 3.2,
+        "r_pct_h": 2.6
+      }
+    },
+    {
+      "hotspot_id": "p1-3-02",
+      "part_ref": "3",
+      "page": 1,
+      "shape": {
+        "type": "circle",
+        "cx_px": 1518,
+        "cy_px": 1737,
+        "r_px": 66
+      },
+      "rotation_deg": 0,
+      "anchor": "center",
+      "z_index": 111,
+      "interaction": {
+        "tap_target_min_px": 40,
+        "hit_slop_px": 6,
+        "enabled": true
+      },
+      "normalized": {
+        "cx_pct": 74.1,
+        "cy_pct": 84.8,
+        "r_pct_w": 2.6,
+        "r_pct_h": 3.2
+      }
+    }
+  ],
+  "ui_defaults": {
+    "shape_render": "auto",
+    "show_labels": false,
+    "hotspot_style": "outline",
+    "tap_target_min_px": 40
+  },
+  "validation": {
+    "require_unique_hotspot_id": true,
+    "require_part_ref_exists": true,
+    "clamp_hotspots_to_page_bounds": true,
+    "normalized_is_derived_from_px": true
+  }
+}

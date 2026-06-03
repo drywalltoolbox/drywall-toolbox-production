@@ -1,5 +1,5 @@
-import { useState, useRef, useCallback, useMemo } from 'react';
-import { Link } from 'react-router-dom';
+import { useState, useRef, useCallback, useMemo, useEffect } from 'react';
+import { Link, useSearchParams } from 'react-router-dom';
 import { motion as Motion, AnimatePresence } from 'framer-motion';
 import SEOHead from '../components/shared/SEOHead';
 import Dropdown from '../components/ui/Dropdown';
@@ -14,6 +14,12 @@ import {
   getOfficialRepairCategoriesForBrand,
   getOfficialRepairModelsForBrandCategory,
 } from '../data/repairCatalogMap.js';
+import {
+  getRepairPackageById,
+  getRepairPackagesForToolFamily,
+  getRepairToolFamilyFromCategory,
+} from '../data/repairPackages.js';
+import { uploadRepairMedia } from '../api/repairs.js';
 import veeqoService from '../services/veeqo';
 
 /* ─────────────────────────────────────────────────────────────────────────────
@@ -99,6 +105,13 @@ const BLANK_FORM = {
   // pricingTierId: machine-readable tier id for logic/validation (e.g. "standard")
   // Both set together when the user picks a tier card in Step 3.
   serviceType: '', pricingTierId: '', priority: '', issueStart: '', issueDescription: '',
+  approvalMode: 'quote_required',
+  preapprovalLimit: '',
+  warrantyRequested: 'no',
+  purchaseDate: '',
+  oldPartsReturn: 'discard',
+  inboundShippingMethod: 'ship_to_dtb',
+  returnShippingPreference: 'standard',
   contactPreference: 'email',
   // Shipping fields (Step 4)
   address: '', city: '', state: '', zip: '', country: 'US',
@@ -372,6 +385,163 @@ function Field({ label, required, optional, children, hint }) {
         </p>
       )}
       {children}
+    </div>
+  );
+}
+
+export default function Repairs() {
+  const serviceRoutes = [
+    {
+      to: '/repairs/start',
+      title: 'Begin a Repair',
+      description: 'Start the package-driven repair intake for one tool, with photos, shipping, warranty, and approval rules.',
+      action: 'Start repair',
+    },
+    {
+      to: '/repairs/packages',
+      title: 'Compare Packages',
+      description: 'Review standard rebuilds, tune-ups, diagnostic quotes, turnaround expectations, and warranty coverage.',
+      action: 'View packages',
+    },
+    {
+      to: '/repairs/track',
+      title: 'Track a Repair',
+      description: 'Look up an existing repair by repair number and token, then review current status and next steps.',
+      action: 'Track repair',
+    },
+  ];
+
+  const processSteps = [
+    'Choose a service path',
+    'Identify the tool',
+    'Add symptoms and photos',
+    'Choose shipping or drop-off',
+    'Set approval rules',
+    'Review status and quotes',
+  ];
+
+  return (
+    <div style={{ minHeight: '100vh' }} className="page-wrapper">
+      <SEOHead
+        title="Drywall Tool Repair Services"
+        description="Package-driven drywall tool repair services for TapeTech, Columbia, Asgard, Graco, and other professional finishing tools."
+        canonical="https://drywalltoolbox.com/repairs"
+      />
+
+      <section style={{
+        padding: 'clamp(70px, 10vw, 110px) clamp(1.5rem, 5vw, 3rem) clamp(44px, 7vw, 72px)',
+        background: 'linear-gradient(135deg, #0f172a 0%, #1e3a8a 55%, #1d4ed8 100%)',
+        color: 'white',
+      }}>
+        <div style={{ maxWidth: '1180px', margin: '0 auto' }}>
+          <div style={{ maxWidth: '760px' }}>
+            <p style={{
+              margin: '0 0 14px',
+              color: 'rgba(219,234,254,0.86)',
+              textTransform: 'uppercase',
+              fontSize: '0.75rem',
+              fontWeight: 900,
+              letterSpacing: '0.12em',
+            }}>
+              DTB Repair Services
+            </p>
+            <h1 style={{
+              margin: '0 0 18px',
+              fontSize: 'clamp(2.4rem, 6vw, 4.9rem)',
+              lineHeight: 0.96,
+              fontWeight: 950,
+              letterSpacing: '0',
+            }}>
+              Tool repair built around packages, quotes, and tracking.
+            </h1>
+            <p style={{
+              margin: '0 0 28px',
+              color: 'rgba(255,255,255,0.78)',
+              fontSize: 'clamp(1rem, 2vw, 1.18rem)',
+              lineHeight: 1.65,
+              maxWidth: '650px',
+            }}>
+              Choose a standard service package, request a quote-first diagnostic, or send a warranty evaluation.
+              DTB keeps the intake tied to your brand, tool family, model, shipping choice, photos, and approval limits.
+            </p>
+            <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+              <Link to="/repairs/start" className="alloy-button" style={{ textDecoration: 'none' }}>
+                Start a repair
+              </Link>
+              <Link to="/repairs/packages" className="alloy-button" style={{
+                textDecoration: 'none',
+                background: 'rgba(255,255,255,0.08)',
+                border: '1px solid rgba(255,255,255,0.32)',
+              }}>
+                View packages
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section style={{ padding: 'clamp(2rem, 5vw, 4rem) clamp(1.5rem, 5vw, 3rem)', background: 'white' }}>
+        <div style={{
+          maxWidth: '1180px',
+          margin: '0 auto',
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 260px), 1fr))',
+          gap: '18px',
+        }}>
+          {serviceRoutes.map((route) => (
+            <Link key={route.to} to={route.to} style={{ textDecoration: 'none', color: 'inherit' }}>
+              <article style={{
+                height: '100%',
+                padding: '24px',
+                border: '1px solid var(--machined-border)',
+                borderRadius: '8px',
+                background: '#fff',
+                display: 'flex',
+                flexDirection: 'column',
+              }}>
+                <h2 style={{ margin: '0 0 10px', color: '#0f172a', fontSize: '1.15rem', fontWeight: 900 }}>
+                  {route.title}
+                </h2>
+                <p style={{ margin: '0 0 18px', color: 'rgba(15,23,42,0.62)', fontSize: '0.88rem', lineHeight: 1.55, flex: 1 }}>
+                  {route.description}
+                </p>
+                <span style={{ color: 'var(--primary-600)', fontSize: '0.76rem', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+                  {route.action}
+                </span>
+              </article>
+            </Link>
+          ))}
+        </div>
+      </section>
+
+      <section style={{ padding: 'clamp(2rem, 5vw, 4rem) clamp(1.5rem, 5vw, 3rem)', background: 'var(--alloy-base)', borderTop: '1px solid var(--machined-border)' }}>
+        <div style={{ maxWidth: '1180px', margin: '0 auto' }}>
+          <h2 style={{ margin: '0 0 18px', color: '#0f172a', fontSize: 'clamp(1.5rem, 3vw, 2.1rem)', fontWeight: 950 }}>
+            How Repair Works
+          </h2>
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 170px), 1fr))',
+            gap: '12px',
+          }}>
+            {processSteps.map((stepLabel, index) => (
+              <div key={stepLabel} style={{
+                background: 'white',
+                border: '1px solid var(--machined-border)',
+                borderRadius: '8px',
+                padding: '18px',
+              }}>
+                <span style={{ display: 'block', color: 'var(--primary-600)', fontSize: '0.72rem', fontWeight: 900, marginBottom: '8px' }}>
+                  {String(index + 1).padStart(2, '0')}
+                </span>
+                <span style={{ color: '#0f172a', fontSize: '0.92rem', fontWeight: 800 }}>
+                  {stepLabel}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
     </div>
   );
 }
@@ -835,15 +1005,40 @@ function PricingTabs() {
 /* ─────────────────────────────────────────────────────────────────────────────
    Main Repairs page
    ───────────────────────────────────────────────────────────────────────── */
-export default function Repairs() {
+export function RepairStartExperience() {
+  const [searchParams] = useSearchParams();
+  const initialPackage = getRepairPackageById(searchParams.get('package'));
   const [step, setStep] = useState(1);
-  const [formData, setFormData] = useState(BLANK_FORM);
+  const [formData, setFormData] = useState(() => ({
+    ...BLANK_FORM,
+    serviceType: initialPackage?.name || BLANK_FORM.serviceType,
+    pricingTierId: initialPackage?.id || BLANK_FORM.pricingTierId,
+    approvalMode: initialPackage?.requiresApproval ? 'quote_required' : BLANK_FORM.approvalMode,
+  }));
   const [photos, setPhotos] = useState([]);
   const [errors, setErrors] = useState({});
   const [submitted, setSubmitted] = useState(false);
   const formRef = useRef(null);
 
-  // Derive which REPAIR_PRICING category maps to the selected toolCategory
+  const selectedToolFamily = useMemo(
+    () => formData.toolCategory
+      ? getRepairToolFamilyFromCategory(formData.toolCategory)
+      : (initialPackage?.toolFamily || 'diagnostic'),
+    [formData.toolCategory, initialPackage],
+  );
+
+  const servicePackageOptions = useMemo(
+    () => getRepairPackagesForToolFamily(selectedToolFamily),
+    [selectedToolFamily],
+  );
+
+  useEffect(() => {
+    if (!formData.pricingTierId) return;
+    if (servicePackageOptions.some((pkg) => pkg.id === formData.pricingTierId)) return;
+    setFormData((prev) => ({ ...prev, serviceType: '', pricingTierId: '' }));
+  }, [formData.pricingTierId, servicePackageOptions]);
+
+  // Derive which legacy pricing tab category maps to the selected toolCategory.
   const repairCategory = useMemo(() => {
     const cat = (formData.toolCategory || '').toLowerCase();
     if (/auto.?tap/i.test(cat)) return 'autoTaper';
@@ -859,6 +1054,7 @@ export default function Repairs() {
       ...prev,
       serviceType:    tier.name,
       pricingTierId:  tier.id,
+      approvalMode:   tier.requiresApproval ? 'quote_required' : prev.approvalMode,
     }));
     setErrors((prev) => { const n = { ...prev }; delete n.serviceType; return n; });
   }
@@ -1044,6 +1240,8 @@ export default function Repairs() {
       if (!formData.serviceType)                 errs.serviceType  = 'Please select a service type.';
       if (!formData.priority)                    errs.priority     = 'Please select a priority level.';
       if (!formData.issueDescription.trim())     errs.issueDescription = 'Please describe the issue.';
+      if (formData.approvalMode === 'preapprove_limit' && (!formData.preapprovalLimit || Number(formData.preapprovalLimit) <= 0))
+                                                 errs.preapprovalLimit = 'Enter a pre-approval limit.';
     }
     if (s === 4) {
       if (!formData.address.trim())              errs.address      = 'Street address is required.';
@@ -1126,6 +1324,14 @@ export default function Repairs() {
         serialNumber:       formData.serialNumber,
         toolAge:            formData.toolAge,
         serviceType:        formData.serviceType,
+        pricingTierId:      formData.pricingTierId,
+        approvalMode:       formData.approvalMode,
+        preapprovalLimit:   formData.preapprovalLimit,
+        warrantyRequested:  formData.warrantyRequested,
+        purchaseDate:       formData.purchaseDate,
+        oldPartsReturn:     formData.oldPartsReturn,
+        inboundShippingMethod: formData.inboundShippingMethod,
+        returnShippingPreference: formData.returnShippingPreference,
         priority:           formData.priority,
         issueStart:         formData.issueStart,
         issueDescription:   formData.issueDescription,
@@ -1140,7 +1346,18 @@ export default function Repairs() {
         shippingRatePrice:  formData.shippingRatePrice,
       });
 
-      setOrderResult(result);
+      let mediaUploadError = '';
+      if (photos.length > 0 && result?.repair_id && result?.public_token) {
+        try {
+          const mediaFormData = new FormData();
+          photos.forEach((photo) => mediaFormData.append('files[]', photo.file));
+          await uploadRepairMedia(result.repair_id, mediaFormData, result.public_token);
+        } catch (mediaErr) {
+          mediaUploadError = mediaErr.message || 'Repair request submitted, but photo upload failed.';
+        }
+      }
+
+      setOrderResult(mediaUploadError ? { ...result, media_upload_error: mediaUploadError } : result);
       setSubmitted(true);
       formRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     } catch (err) {
@@ -1343,6 +1560,11 @@ export default function Repairs() {
                       your repair status page
                     </Link>
                     .
+                  </p>
+                )}
+                {orderResult?.media_upload_error && (
+                  <p style={{ fontSize: '0.82rem', color: '#b45309', margin: '0 0 20px 0', lineHeight: 1.5 }}>
+                    {orderResult.media_upload_error} You can add photos from the repair status page after submission.
                   </p>
                 )}
                 {/* What Happens Next */}
@@ -1740,7 +1962,7 @@ export default function Repairs() {
                         gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))',
                         gap: '12px',
                       }}>
-                        {(REPAIR_PRICING[repairCategory]?.tiers || []).map((tier) => {
+                        {servicePackageOptions.map((tier) => {
                           const selected = formData.pricingTierId === tier.id;
                           return (
                             <div
@@ -1771,10 +1993,28 @@ export default function Repairs() {
                               )}
                               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                                 <span style={{ fontWeight: 700, color: '#0f172a', fontSize: '0.9rem' }}>{tier.name}</span>
+                                <span style={{ fontSize: '0.72rem', fontWeight: 800, color: 'var(--primary-600)', marginLeft: '10px', whiteSpace: 'nowrap' }}>
+                                  {tier.priceLabel}
+                                </span>
                               </div>
                               <p style={{ margin: '6px 0 0', fontSize: '0.78rem', color: 'rgba(15,23,42,0.55)' }}>
-                                {tier.desc}
+                                {tier.recommendedFor?.[0] || tier.commonSymptoms?.[0] || 'Technician-guided service path'}
                               </p>
+                              {Array.isArray(tier.includes) && tier.includes.length > 0 && (
+                                <ul style={{ margin: '10px 0 0', paddingLeft: '16px', color: 'rgba(15,23,42,0.6)', fontSize: '0.72rem', lineHeight: 1.45 }}>
+                                  {tier.includes.slice(0, 3).map((item) => (
+                                    <li key={item}>{item}</li>
+                                  ))}
+                                </ul>
+                              )}
+                              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginTop: '12px' }}>
+                                <span style={{ fontSize: '0.66rem', fontWeight: 800, color: 'rgba(15,23,42,0.48)', textTransform: 'uppercase' }}>
+                                  {tier.estimatedTurnaroundDays?.standard || 7} day est.
+                                </span>
+                                <span style={{ fontSize: '0.66rem', fontWeight: 800, color: 'rgba(15,23,42,0.48)', textTransform: 'uppercase' }}>
+                                  {tier.warrantyDays ? `${tier.warrantyDays} day warranty` : 'quote first'}
+                                </span>
+                              </div>
                             </div>
                           );
                         })}
@@ -1797,6 +2037,76 @@ export default function Repairs() {
                         </span>
                       ))}
                     </div>
+
+                    <Field label="Approval Preference" required hint="Choose how we should handle work that needs parts or labor beyond the selected package.">
+                      <div style={{ display: 'grid', gap: '10px', marginBottom: '10px' }}>
+                        {[
+                          { value: 'quote_required', label: 'Send me a quote before any repair.', help: 'No bench work begins until you approve the estimate.' },
+                          { value: 'package_only', label: 'Pre-approve this package price only.', help: 'Package work can begin; added parts still require approval.' },
+                          { value: 'preapprove_limit', label: 'Pre-approve added work up to a limit.', help: 'Useful when you want faster turnaround under a fixed ceiling.' },
+                        ].map((option) => {
+                          const active = formData.approvalMode === option.value;
+                          return (
+                            <button
+                              key={option.value}
+                              type="button"
+                              onClick={() => setFormData((prev) => ({ ...prev, approvalMode: option.value }))}
+                              style={{
+                                textAlign: 'left',
+                                border: active ? '2px solid var(--primary-600)' : '1.5px solid rgba(15,23,42,0.12)',
+                                borderRadius: '12px',
+                                padding: '12px 14px',
+                                background: active ? 'rgba(37,99,235,0.05)' : 'white',
+                                cursor: 'pointer',
+                              }}
+                            >
+                              <span style={{ display: 'block', color: '#0f172a', fontSize: '0.84rem', fontWeight: 800 }}>
+                                {option.label}
+                              </span>
+                              <span style={{ display: 'block', color: 'rgba(15,23,42,0.52)', fontSize: '0.74rem', marginTop: '3px', lineHeight: 1.45 }}>
+                                {option.help}
+                              </span>
+                            </button>
+                          );
+                        })}
+                      </div>
+                      {formData.approvalMode === 'preapprove_limit' && (
+                        <input
+                          type="number"
+                          min="0"
+                          step="25"
+                          className={inputCls}
+                          placeholder="Approval limit in dollars"
+                          value={formData.preapprovalLimit}
+                          onChange={(e) => { set('preapprovalLimit')(e); clearErr('preapprovalLimit'); }}
+                        />
+                        {errors.preapprovalLimit && <p style={errStyle}>{errors.preapprovalLimit}</p>}
+                      )}
+                    </Field>
+
+                    <Field label="Warranty Request" hint="Select yes or not sure when the tool may qualify for warranty review.">
+                      <Dropdown
+                        value={formData.warrantyRequested}
+                        options={[
+                          { value: 'no', label: 'No — paid repair request' },
+                          { value: 'yes', label: 'Yes — evaluate as warranty' },
+                          { value: 'not_sure', label: 'Not sure — please check eligibility' },
+                        ]}
+                        fullWidth
+                        onChange={(value) => setFormData((prev) => ({ ...prev, warrantyRequested: value }))}
+                      />
+                    </Field>
+
+                    {(formData.warrantyRequested === 'yes' || formData.warrantyRequested === 'not_sure') && (
+                      <Field label="Purchase Date" optional>
+                        <input
+                          type="date"
+                          className={inputCls}
+                          value={formData.purchaseDate}
+                          onChange={set('purchaseDate')}
+                        />
+                      </Field>
+                    )}
 
                     <div style={{
                       display: 'grid',
@@ -1966,6 +2276,50 @@ export default function Repairs() {
                       Enter the address where we should return your repaired tool. We'll email you a prepaid inbound
                       shipping label, and the selected option covers return delivery.
                     </p>
+
+                    <div style={{
+                      display: 'grid',
+                      gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+                      gap: '0 20px',
+                    }}>
+                      <Field label="How will the tool get to DTB?">
+                        <Dropdown
+                          value={formData.inboundShippingMethod}
+                          options={[
+                            { value: 'ship_to_dtb', label: 'Ship to DTB with a label' },
+                            { value: 'local_dropoff', label: 'Local drop-off' },
+                            { value: 'partner_dropoff', label: 'Partner drop-off' },
+                          ]}
+                          fullWidth
+                          onChange={(value) => setFormData((prev) => ({ ...prev, inboundShippingMethod: value }))}
+                        />
+                      </Field>
+
+                      <Field label="Return Preference">
+                        <Dropdown
+                          value={formData.returnShippingPreference}
+                          options={[
+                            { value: 'standard', label: 'Standard return shipping' },
+                            { value: 'expedited', label: 'Expedited return if available' },
+                            { value: 'hold_for_pickup', label: 'Hold for pickup' },
+                          ]}
+                          fullWidth
+                          onChange={(value) => setFormData((prev) => ({ ...prev, returnShippingPreference: value }))}
+                        />
+                      </Field>
+                    </div>
+
+                    <Field label="Old Parts">
+                      <Dropdown
+                        value={formData.oldPartsReturn}
+                        options={[
+                          { value: 'discard', label: 'Recycle or discard replaced parts' },
+                          { value: 'return', label: 'Return replaced parts with my tool' },
+                        ]}
+                        fullWidth
+                        onChange={(value) => setFormData((prev) => ({ ...prev, oldPartsReturn: value }))}
+                      />
+                    </Field>
 
                     {/* Packaging Tips */}
                     <div style={{
@@ -2246,6 +2600,17 @@ export default function Repairs() {
                         Service Request
                       </div>
                       <ReviewRow label="Service Type"   value={formData.serviceType} />
+                      <ReviewRow label="Approval"       value={
+                        formData.approvalMode === 'preapprove_limit'
+                          ? `Pre-approve up to $${formData.preapprovalLimit}`
+                          : formData.approvalMode === 'package_only'
+                            ? 'Package price only'
+                            : 'Quote required before repair'
+                      } />
+                      <ReviewRow label="Warranty"       value={formData.warrantyRequested === 'no' ? 'No' : formData.warrantyRequested === 'yes' ? 'Yes' : 'Not sure'} />
+                      {(formData.warrantyRequested === 'yes' || formData.warrantyRequested === 'not_sure') && (
+                        <ReviewRow label="Purchase Date" value={formData.purchaseDate} />
+                      )}
                       <ReviewRow label="Priority"       value={formData.priority} />
                       <ReviewRow label="Issue Start"    value={formData.issueStart} />
                       <ReviewRow label="Details & Notes" value={formData.issueDescription} />
@@ -2310,6 +2675,9 @@ export default function Repairs() {
                       <ReviewRow label="State"      value={formData.state} />
                       <ReviewRow label="ZIP"        value={formData.zip} />
                       <ReviewRow label="Country"    value={formData.country} />
+                      <ReviewRow label="Inbound"    value={formData.inboundShippingMethod === 'local_dropoff' ? 'Local drop-off' : formData.inboundShippingMethod === 'partner_dropoff' ? 'Partner drop-off' : 'Ship to DTB'} />
+                      <ReviewRow label="Return"     value={formData.returnShippingPreference === 'expedited' ? 'Expedited if available' : formData.returnShippingPreference === 'hold_for_pickup' ? 'Hold for pickup' : 'Standard return shipping'} />
+                      <ReviewRow label="Old Parts"  value={formData.oldPartsReturn === 'return' ? 'Return replaced parts' : 'Recycle or discard'} />
                       <ReviewRow
                         label="Shipping Option"
                         value={formData.shippingRateName

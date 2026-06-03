@@ -18,7 +18,7 @@
 
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { Check, CheckCircle } from 'lucide-react';
-import { submitRepair } from '../../api/repairs.js';
+import { submitRepair, uploadRepairMedia } from '../../api/repairs.js';
 import RepairMediaUploader from './RepairMediaUploader.jsx';
 
 // ─── Constants ────────────────────────────────────────────────────────────────
@@ -147,6 +147,16 @@ export default function RepairRequestForm( { onSuccess } ) {
         service_tier: form.service_tier,
         issue:        form.issue.trim(),
       } );
+
+      if ( mediaFiles.length > 0 && result?.repair_id && result?.public_token ) {
+        try {
+          const mediaFormData = new FormData();
+          mediaFiles.forEach( ( file ) => mediaFormData.append( 'files[]', file ) );
+          await uploadRepairMedia( result.repair_id, mediaFormData, result.public_token );
+        } catch ( mediaErr ) {
+          result.media_upload_error = mediaErr.message || 'Photo upload failed.';
+        }
+      }
 
       setSuccess( result );
       if ( onSuccess ) onSuccess( result.repair_id, result.public_token );
@@ -571,8 +581,10 @@ function SuccessScreen( { result, mediaFiles } ) {
       ) }
 
       { mediaFiles.length > 0 && result.public_token && (
-        <p className="text-xs text-neutral-400">
-          Upload your { mediaFiles.length } photo{ mediaFiles.length !== 1 ? 's' : '' } from the tracking page.
+        <p className={ `text-xs ${ result.media_upload_error ? 'text-amber-600' : 'text-neutral-400' }` }>
+          { result.media_upload_error
+            ? `${ result.media_upload_error } You can add photos from the tracking page.`
+            : `${ mediaFiles.length } photo${ mediaFiles.length !== 1 ? 's' : '' } attached to this repair.` }
         </p>
       ) }
     </div>

@@ -87,6 +87,8 @@ function pickRepairField( payload, keys, fallback = '' ) {
 function normalizeRepairSubmitPayload( payload = {} ) {
   const shippingRatePrice = pickRepairField( payload, [ 'shipping_rate_price', 'shippingRatePrice' ], 0 );
   const shippingRatePriceNum = Number( shippingRatePrice );
+  const preapprovalLimit = pickRepairField( payload, [ 'preapproval_limit', 'preapprovalLimit' ], '' );
+  const preapprovalLimitNum = Number( preapprovalLimit );
 
   return {
     idempotency_key: pickRepairField( payload, [ 'idempotency_key', 'idempotencyKey' ], generateIdempotencyKey() ),
@@ -100,6 +102,14 @@ function normalizeRepairSubmitPayload( payload = {} ) {
     serial_number: pickRepairField( payload, [ 'serial_number', 'tool_serial', 'serialNumber' ] ),
     tool_age: pickRepairField( payload, [ 'tool_age', 'toolAge' ] ),
     service_tier: pickRepairField( payload, [ 'service_tier', 'serviceType', 'pricingTierId' ] ),
+    package_id: pickRepairField( payload, [ 'package_id', 'packageId', 'pricingTierId' ] ),
+    approval_mode: pickRepairField( payload, [ 'approval_mode', 'approvalMode' ], 'quote_required' ),
+    preapproval_limit: Number.isFinite( preapprovalLimitNum ) ? preapprovalLimitNum : '',
+    warranty_requested: pickRepairField( payload, [ 'warranty_requested', 'warrantyRequested' ], 'no' ),
+    purchase_date: pickRepairField( payload, [ 'purchase_date', 'purchaseDate' ] ),
+    old_parts_return: pickRepairField( payload, [ 'old_parts_return', 'oldPartsReturn' ], 'discard' ),
+    inbound_shipping_method: pickRepairField( payload, [ 'inbound_shipping_method', 'inboundShippingMethod' ], 'ship_to_dtb' ),
+    return_shipping_preference: pickRepairField( payload, [ 'return_shipping_preference', 'returnShippingPreference' ], 'standard' ),
     priority: pickRepairField( payload, [ 'priority' ] ),
     issue_start: pickRepairField( payload, [ 'issue_start', 'issueStart' ] ),
     description: pickRepairField( payload, [ 'description', 'issue', 'issueDescription' ] ),

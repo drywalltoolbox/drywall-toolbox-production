@@ -80,6 +80,9 @@ const ProductDetailPage = lazyWithReload(() => import('./pages/ProductDetailPage
 const CategoryPage = lazyWithReload(() => import('./pages/CategoryPage'));
 const Schematics = lazyWithReload(() => import('./pages/Schematics'));
 const Repairs = lazyWithReload(() => import('./pages/Repairs'));
+const RepairStart = lazyWithReload(() => import('./pages/RepairStart'));
+const RepairPackages = lazyWithReload(() => import('./pages/RepairPackages'));
+const RepairTrack = lazyWithReload(() => import('./pages/RepairTrack'));
 const RepairStatus = lazyWithReload(() => import('./pages/RepairStatus'));
 const ReturnStatus = lazyWithReload(() => import('./pages/ReturnStatus'));
 const SupportStatus = lazyWithReload(() => import('./pages/SupportStatus'));
@@ -148,6 +151,9 @@ function AppRoutes() {
           <Route path="/category/:slug" element={<CategoryPage />} />
           <Route path="/schematics" element={<Schematics />} />
           <Route path="/repairs" element={<Repairs />} />
+          <Route path="/repairs/start" element={<RepairStart />} />
+          <Route path="/repairs/packages" element={<RepairPackages />} />
+          <Route path="/repairs/track" element={<RepairTrack />} />
           <Route path="/repairs/status/:id" element={<RepairStatus />} />
           <Route path="/faq" element={<FAQ />} />
           <Route path="/calculators" element={<Calculators />} />
@@ -169,6 +175,7 @@ function AppRoutes() {
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+          <Route path="/dashboard/repairs/:id" element={<ProtectedRoute><RepairStatus /></ProtectedRoute>} />
           <Route path="/orders" element={<Navigate to="/dashboard?tab=orders" replace />} />
           <Route path="/rewards" element={<Navigate to={rewardsEnabled ? "/dashboard?tab=rewards" : "/dashboard"} replace />} />
           <Route path="/account-settings" element={<Navigate to="/dashboard?tab=settings" replace />} />

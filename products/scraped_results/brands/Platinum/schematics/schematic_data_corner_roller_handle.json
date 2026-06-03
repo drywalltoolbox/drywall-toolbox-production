@@ -1,0 +1,172 @@
+{
+  "schema_version": "2.0",
+  "diagram": {
+    "id": "platinum-corner-roller-handle-page-001-enhanced",
+    "title": "platinum_corner_roller_Handle-page-001-enhanced",
+    "description": "Interactive parts schematic with normalized hotspot geometry.",
+    "pages": [
+      {
+        "page": 1,
+        "image": {
+          "src": "platinum-corner-roller-handle-page-001-enhanced-page-01.png",
+          "natural_width": 2752,
+          "natural_height": 1536
+        },
+        "coordinate_space": {
+          "origin": "top-left",
+          "x_axis": "right",
+          "y_axis": "down",
+          "unit": "px"
+        }
+      }
+    ]
+  },
+  "parts_catalog": [
+    {
+      "part_id": "4",
+      "display_id": "4",
+      "name": "Part (4)",
+      "sku": "4",
+      "quantity": 1,
+      "notes": ""
+    },
+    {
+      "part_id": "1",
+      "display_id": "1",
+      "name": "Part (1)",
+      "sku": "1",
+      "quantity": 1,
+      "notes": ""
+    },
+    {
+      "part_id": "2",
+      "display_id": "2",
+      "name": "Part (2)",
+      "sku": "2",
+      "quantity": 1,
+      "notes": ""
+    },
+    {
+      "part_id": "3",
+      "display_id": "3",
+      "name": "Part (3)",
+      "sku": "3",
+      "quantity": 1,
+      "notes": ""
+    }
+  ],
+  "hotspots": [
+    {
+      "hotspot_id": "p1-4-01",
+      "part_ref": "4",
+      "page": 1,
+      "shape": {
+        "type": "circle",
+        "cx_px": 358,
+        "cy_px": 60,
+        "r_px": 72
+      },
+      "rotation_deg": 0,
+      "anchor": "center",
+      "z_index": 100,
+      "interaction": {
+        "tap_target_min_px": 40,
+        "hit_slop_px": 6,
+        "enabled": true
+      },
+      "normalized": {
+        "cx_pct": 13,
+        "cy_pct": 3.9,
+        "r_pct_w": 2.6,
+        "r_pct_h": 3.9
+      }
+    },
+    {
+      "hotspot_id": "p1-1-01",
+      "part_ref": "1",
+      "page": 1,
+      "shape": {
+        "type": "circle",
+        "cx_px": 1007,
+        "cy_px": 402,
+        "r_px": 72
+      },
+      "rotation_deg": 0,
+      "anchor": "center",
+      "z_index": 101,
+      "interaction": {
+        "tap_target_min_px": 40,
+        "hit_slop_px": 6,
+        "enabled": true
+      },
+      "normalized": {
+        "cx_pct": 36.6,
+        "cy_pct": 26.2,
+        "r_pct_w": 2.6,
+        "r_pct_h": 4
+      }
+    },
+    {
+      "hotspot_id": "p1-2-01",
+      "part_ref": "2",
+      "page": 1,
+      "shape": {
+        "type": "circle",
+        "cx_px": 2024,
+        "cy_px": 922,
+        "r_px": 73
+      },
+      "rotation_deg": 0,
+      "anchor": "center",
+      "z_index": 102,
+      "interaction": {
+        "tap_target_min_px": 40,
+        "hit_slop_px": 6,
+        "enabled": true
+      },
+      "normalized": {
+        "cx_pct": 73.55,
+        "cy_pct": 60,
+        "r_pct_w": 2.65,
+        "r_pct_h": 4.1
+      }
+    },
+    {
+      "hotspot_id": "p1-3-01",
+      "part_ref": "3",
+      "page": 1,
+      "shape": {
+        "type": "circle",
+        "cx_px": 1683,
+        "cy_px": 1453,
+        "r_px": 73
+      },
+      "rotation_deg": 0,
+      "anchor": "center",
+      "z_index": 103,
+      "interaction": {
+        "tap_target_min_px": 40,
+        "hit_slop_px": 6,
+        "enabled": true
+      },
+      "normalized": {
+        "cx_pct": 61.15,
+        "cy_pct": 94.6,
+        "r_pct_w": 2.65,
+        "r_pct_h": 4.1
+      }
+    }
+  ],
+  "ui_defaults": {
+    "shape_render": "auto",
+    "show_labels": false,
+    "hotspot_style": "outline",
+    "tap_target_min_px": 40
+  },
+  "validation": {
+    "require_unique_hotspot_id": true,
+    "require_part_ref_exists": true,
+    "clamp_hotspots_to_page_bounds": true,
+    "normalized_is_derived_from_px": true
+  }
+}

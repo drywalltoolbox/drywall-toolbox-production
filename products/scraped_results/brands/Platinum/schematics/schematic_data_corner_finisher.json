@@ -1,0 +1,768 @@
+{
+  "schema_version": "2.0",
+  "diagram": {
+    "id": "platinum-corner-finisher-page-001-enhanced",
+    "title": "Platinum_Corner_Finisher-page-001-enhanced",
+    "description": "Interactive parts schematic with normalized hotspot geometry.",
+    "pages": [
+      {
+        "page": 1,
+        "image": {
+          "src": "platinum-corner-finisher-page-001-enhanced-page-01.png",
+          "natural_width": 2400,
+          "natural_height": 1792
+        },
+        "coordinate_space": {
+          "origin": "top-left",
+          "x_axis": "right",
+          "y_axis": "down",
+          "unit": "px"
+        }
+      }
+    ]
+  },
+  "parts_catalog": [
+    {
+      "part_id": "13",
+      "display_id": "13",
+      "name": "Part (13)",
+      "sku": "13",
+      "quantity": 1,
+      "notes": ""
+    },
+    {
+      "part_id": "12",
+      "display_id": "12",
+      "name": "Part (12)",
+      "sku": "12",
+      "quantity": 1,
+      "notes": ""
+    },
+    {
+      "part_id": "17",
+      "display_id": "17",
+      "name": "Part (17)",
+      "sku": "17",
+      "quantity": 1,
+      "notes": ""
+    },
+    {
+      "part_id": "15",
+      "display_id": "15",
+      "name": "Part (15)",
+      "sku": "15",
+      "quantity": 1,
+      "notes": ""
+    },
+    {
+      "part_id": "11",
+      "display_id": "11",
+      "name": "Part (11)",
+      "sku": "11",
+      "quantity": 1,
+      "notes": ""
+    },
+    {
+      "part_id": "14",
+      "display_id": "14",
+      "name": "Part (14)",
+      "sku": "14",
+      "quantity": 1,
+      "notes": ""
+    },
+    {
+      "part_id": "4",
+      "display_id": "4",
+      "name": "Part (4)",
+      "sku": "4",
+      "quantity": 1,
+      "notes": ""
+    },
+    {
+      "part_id": "5",
+      "display_id": "5",
+      "name": "Part (5)",
+      "sku": "5",
+      "quantity": 1,
+      "notes": ""
+    },
+    {
+      "part_id": "3",
+      "display_id": "3",
+      "name": "Part (3)",
+      "sku": "3",
+      "quantity": 1,
+      "notes": ""
+    },
+    {
+      "part_id": "6",
+      "display_id": "6",
+      "name": "Part (6)",
+      "sku": "6",
+      "quantity": 1,
+      "notes": ""
+    },
+    {
+      "part_id": "1",
+      "display_id": "1",
+      "name": "Part (1)",
+      "sku": "1",
+      "quantity": 1,
+      "notes": ""
+    },
+    {
+      "part_id": "16",
+      "display_id": "16",
+      "name": "Part (16)",
+      "sku": "16",
+      "quantity": 1,
+      "notes": ""
+    },
+    {
+      "part_id": "7",
+      "display_id": "7",
+      "name": "Part (7)",
+      "sku": "7",
+      "quantity": 1,
+      "notes": ""
+    },
+    {
+      "part_id": "10",
+      "display_id": "10",
+      "name": "Part (10)",
+      "sku": "10",
+      "quantity": 1,
+      "notes": ""
+    },
+    {
+      "part_id": "9",
+      "display_id": "9",
+      "name": "Part (9)",
+      "sku": "9",
+      "quantity": 1,
+      "notes": ""
+    },
+    {
+      "part_id": "2",
+      "display_id": "2",
+      "name": "Part (2)",
+      "sku": "2",
+      "quantity": 1,
+      "notes": ""
+    }
+  ],
+  "hotspots": [
+    {
+      "hotspot_id": "p1-13-01",
+      "part_ref": "13",
+      "page": 1,
+      "shape": {
+        "type": "circle",
+        "cx_px": 1200,
+        "cy_px": 37,
+        "r_px": 50
+      },
+      "rotation_deg": 0,
+      "anchor": "center",
+      "z_index": 100,
+      "interaction": {
+        "tap_target_min_px": 40,
+        "hit_slop_px": 6,
+        "enabled": true
+      },
+      "normalized": {
+        "cx_pct": 49.98,
+        "cy_pct": 2.05,
+        "r_pct_w": 2.1,
+        "r_pct_h": 2.05
+      }
+    },
+    {
+      "hotspot_id": "p1-12-01",
+      "part_ref": "12",
+      "page": 1,
+      "shape": {
+        "type": "circle",
+        "cx_px": 1196,
+        "cy_px": 199,
+        "r_px": 44
+      },
+      "rotation_deg": 0,
+      "anchor": "center",
+      "z_index": 101,
+      "interaction": {
+        "tap_target_min_px": 40,
+        "hit_slop_px": 6,
+        "enabled": true
+      },
+      "normalized": {
+        "cx_pct": 49.85,
+        "cy_pct": 11.1,
+        "r_pct_w": 1.85,
+        "r_pct_h": 2.3
+      }
+    },
+    {
+      "hotspot_id": "p1-17-01",
+      "part_ref": "17",
+      "page": 1,
+      "shape": {
+        "type": "circle",
+        "cx_px": 1166,
+        "cy_px": 401,
+        "r_px": 46
+      },
+      "rotation_deg": 0,
+      "anchor": "center",
+      "z_index": 102,
+      "interaction": {
+        "tap_target_min_px": 40,
+        "hit_slop_px": 6,
+        "enabled": true
+      },
+      "normalized": {
+        "cx_pct": 48.6,
+        "cy_pct": 22.4,
+        "r_pct_w": 1.9,
+        "r_pct_h": 2.3
+      }
+    },
+    {
+      "hotspot_id": "p1-15-01",
+      "part_ref": "15",
+      "page": 1,
+      "shape": {
+        "type": "circle",
+        "cx_px": 1304,
+        "cy_px": 540,
+        "r_px": 42
+      },
+      "rotation_deg": 0,
+      "anchor": "center",
+      "z_index": 103,
+      "interaction": {
+        "tap_target_min_px": 40,
+        "hit_slop_px": 6,
+        "enabled": true
+      },
+      "normalized": {
+        "cx_pct": 54.35,
+        "cy_pct": 30.15,
+        "r_pct_w": 1.45,
+        "r_pct_h": 2.35
+      }
+    },
+    {
+      "hotspot_id": "p1-11-01",
+      "part_ref": "11",
+      "page": 1,
+      "shape": {
+        "type": "circle",
+        "cx_px": 548,
+        "cy_px": 599,
+        "r_px": 44
+      },
+      "rotation_deg": 0,
+      "anchor": "center",
+      "z_index": 104,
+      "interaction": {
+        "tap_target_min_px": 40,
+        "hit_slop_px": 6,
+        "enabled": true
+      },
+      "normalized": {
+        "cx_pct": 22.85,
+        "cy_pct": 33.4,
+        "r_pct_w": 1.85,
+        "r_pct_h": 2.3
+      }
+    },
+    {
+      "hotspot_id": "p1-14-01",
+      "part_ref": "14",
+      "page": 1,
+      "shape": {
+        "type": "circle",
+        "cx_px": 548,
+        "cy_px": 854,
+        "r_px": 44
+      },
+      "rotation_deg": 0,
+      "anchor": "center",
+      "z_index": 105,
+      "interaction": {
+        "tap_target_min_px": 40,
+        "hit_slop_px": 6,
+        "enabled": true
+      },
+      "normalized": {
+        "cx_pct": 22.85,
+        "cy_pct": 47.65,
+        "r_pct_w": 1.85,
+        "r_pct_h": 2.35
+      }
+    },
+    {
+      "hotspot_id": "p1-4-01",
+      "part_ref": "4",
+      "page": 1,
+      "shape": {
+        "type": "circle",
+        "cx_px": 1480,
+        "cy_px": 296,
+        "r_px": 44
+      },
+      "rotation_deg": 0,
+      "anchor": "center",
+      "z_index": 106,
+      "interaction": {
+        "tap_target_min_px": 40,
+        "hit_slop_px": 6,
+        "enabled": true
+      },
+      "normalized": {
+        "cx_pct": 61.65,
+        "cy_pct": 16.5,
+        "r_pct_w": 1.85,
+        "r_pct_h": 2.3
+      }
+    },
+    {
+      "hotspot_id": "p1-4-02",
+      "part_ref": "4",
+      "page": 1,
+      "shape": {
+        "type": "circle",
+        "cx_px": 1782,
+        "cy_px": 633,
+        "r_px": 44
+      },
+      "rotation_deg": 0,
+      "anchor": "center",
+      "z_index": 107,
+      "interaction": {
+        "tap_target_min_px": 40,
+        "hit_slop_px": 6,
+        "enabled": true
+      },
+      "normalized": {
+        "cx_pct": 74.25,
+        "cy_pct": 35.3,
+        "r_pct_w": 1.85,
+        "r_pct_h": 2.3
+      }
+    },
+    {
+      "hotspot_id": "p1-4-03",
+      "part_ref": "4",
+      "page": 1,
+      "shape": {
+        "type": "circle",
+        "cx_px": 2158,
+        "cy_px": 185,
+        "r_px": 41
+      },
+      "rotation_deg": 0,
+      "anchor": "center",
+      "z_index": 108,
+      "interaction": {
+        "tap_target_min_px": 40,
+        "hit_slop_px": 6,
+        "enabled": true
+      },
+      "normalized": {
+        "cx_pct": 89.9,
+        "cy_pct": 10.3,
+        "r_pct_w": 1.3,
+        "r_pct_h": 2.3
+      }
+    },
+    {
+      "hotspot_id": "p1-5-01",
+      "part_ref": "5",
+      "page": 1,
+      "shape": {
+        "type": "circle",
+        "cx_px": 2336,
+        "cy_px": 692,
+        "r_px": 44
+      },
+      "rotation_deg": 0,
+      "anchor": "center",
+      "z_index": 109,
+      "interaction": {
+        "tap_target_min_px": 40,
+        "hit_slop_px": 6,
+        "enabled": true
+      },
+      "normalized": {
+        "cx_pct": 97.35,
+        "cy_pct": 38.6,
+        "r_pct_w": 1.85,
+        "r_pct_h": 2.3
+      }
+    },
+    {
+      "hotspot_id": "p1-3-01",
+      "part_ref": "3",
+      "page": 1,
+      "shape": {
+        "type": "circle",
+        "cx_px": 2336,
+        "cy_px": 826,
+        "r_px": 44
+      },
+      "rotation_deg": 0,
+      "anchor": "center",
+      "z_index": 110,
+      "interaction": {
+        "tap_target_min_px": 40,
+        "hit_slop_px": 6,
+        "enabled": true
+      },
+      "normalized": {
+        "cx_pct": 97.35,
+        "cy_pct": 46.1,
+        "r_pct_w": 1.85,
+        "r_pct_h": 2.3
+      }
+    },
+    {
+      "hotspot_id": "p1-6-01",
+      "part_ref": "6",
+      "page": 1,
+      "shape": {
+        "type": "circle",
+        "cx_px": 2144,
+        "cy_px": 826,
+        "r_px": 41
+      },
+      "rotation_deg": 0,
+      "anchor": "center",
+      "z_index": 111,
+      "interaction": {
+        "tap_target_min_px": 40,
+        "hit_slop_px": 6,
+        "enabled": true
+      },
+      "normalized": {
+        "cx_pct": 89.35,
+        "cy_pct": 46.1,
+        "r_pct_w": 1.5,
+        "r_pct_h": 2.3
+      }
+    },
+    {
+      "hotspot_id": "p1-1-01",
+      "part_ref": "1",
+      "page": 1,
+      "shape": {
+        "type": "circle",
+        "cx_px": 1642,
+        "cy_px": 1124,
+        "r_px": 46
+      },
+      "rotation_deg": 0,
+      "anchor": "center",
+      "z_index": 112,
+      "interaction": {
+        "tap_target_min_px": 40,
+        "hit_slop_px": 6,
+        "enabled": true
+      },
+      "normalized": {
+        "cx_pct": 68.4,
+        "cy_pct": 62.75,
+        "r_pct_w": 1.9,
+        "r_pct_h": 2.35
+      }
+    },
+    {
+      "hotspot_id": "p1-16-01",
+      "part_ref": "16",
+      "page": 1,
+      "shape": {
+        "type": "circle",
+        "cx_px": 1649,
+        "cy_px": 1260,
+        "r_px": 46
+      },
+      "rotation_deg": 0,
+      "anchor": "center",
+      "z_index": 113,
+      "interaction": {
+        "tap_target_min_px": 40,
+        "hit_slop_px": 6,
+        "enabled": true
+      },
+      "normalized": {
+        "cx_pct": 68.7,
+        "cy_pct": 70.3,
+        "r_pct_w": 1.9,
+        "r_pct_h": 2.3
+      }
+    },
+    {
+      "hotspot_id": "p1-17-02",
+      "part_ref": "17",
+      "page": 1,
+      "shape": {
+        "type": "circle",
+        "cx_px": 1649,
+        "cy_px": 1365,
+        "r_px": 46
+      },
+      "rotation_deg": 0,
+      "anchor": "center",
+      "z_index": 114,
+      "interaction": {
+        "tap_target_min_px": 40,
+        "hit_slop_px": 6,
+        "enabled": true
+      },
+      "normalized": {
+        "cx_pct": 68.7,
+        "cy_pct": 76.15,
+        "r_pct_w": 1.9,
+        "r_pct_h": 2.1
+      }
+    },
+    {
+      "hotspot_id": "p1-7-01",
+      "part_ref": "7",
+      "page": 1,
+      "shape": {
+        "type": "circle",
+        "cx_px": 1642,
+        "cy_px": 1503,
+        "r_px": 46
+      },
+      "rotation_deg": 0,
+      "anchor": "center",
+      "z_index": 115,
+      "interaction": {
+        "tap_target_min_px": 40,
+        "hit_slop_px": 6,
+        "enabled": true
+      },
+      "normalized": {
+        "cx_pct": 68.4,
+        "cy_pct": 83.85,
+        "r_pct_w": 1.9,
+        "r_pct_h": 2.35
+      }
+    },
+    {
+      "hotspot_id": "p1-10-01",
+      "part_ref": "10",
+      "page": 1,
+      "shape": {
+        "type": "circle",
+        "cx_px": 1226,
+        "cy_px": 1657,
+        "r_px": 42
+      },
+      "rotation_deg": 0,
+      "anchor": "center",
+      "z_index": 116,
+      "interaction": {
+        "tap_target_min_px": 40,
+        "hit_slop_px": 6,
+        "enabled": true
+      },
+      "normalized": {
+        "cx_pct": 51.1,
+        "cy_pct": 92.45,
+        "r_pct_w": 1.5,
+        "r_pct_h": 2.35
+      }
+    },
+    {
+      "hotspot_id": "p1-9-01",
+      "part_ref": "9",
+      "page": 1,
+      "shape": {
+        "type": "circle",
+        "cx_px": 930,
+        "cy_px": 1503,
+        "r_px": 42
+      },
+      "rotation_deg": 0,
+      "anchor": "center",
+      "z_index": 117,
+      "interaction": {
+        "tap_target_min_px": 40,
+        "hit_slop_px": 6,
+        "enabled": true
+      },
+      "normalized": {
+        "cx_pct": 38.75,
+        "cy_pct": 83.85,
+        "r_pct_w": 1.25,
+        "r_pct_h": 2.35
+      }
+    },
+    {
+      "hotspot_id": "p1-2-01",
+      "part_ref": "2",
+      "page": 1,
+      "shape": {
+        "type": "circle",
+        "cx_px": 998,
+        "cy_px": 1657,
+        "r_px": 42
+      },
+      "rotation_deg": 0,
+      "anchor": "center",
+      "z_index": 118,
+      "interaction": {
+        "tap_target_min_px": 40,
+        "hit_slop_px": 6,
+        "enabled": true
+      },
+      "normalized": {
+        "cx_pct": 41.6,
+        "cy_pct": 92.45,
+        "r_pct_w": 1.3,
+        "r_pct_h": 2.35
+      }
+    },
+    {
+      "hotspot_id": "p1-5-02",
+      "part_ref": "5",
+      "page": 1,
+      "shape": {
+        "type": "circle",
+        "cx_px": 42,
+        "cy_px": 1564,
+        "r_px": 42
+      },
+      "rotation_deg": 0,
+      "anchor": "center",
+      "z_index": 119,
+      "interaction": {
+        "tap_target_min_px": 40,
+        "hit_slop_px": 6,
+        "enabled": true
+      },
+      "normalized": {
+        "cx_pct": 1.75,
+        "cy_pct": 87.25,
+        "r_pct_w": 1.75,
+        "r_pct_h": 2.35
+      }
+    },
+    {
+      "hotspot_id": "p1-6-02",
+      "part_ref": "6",
+      "page": 1,
+      "shape": {
+        "type": "circle",
+        "cx_px": 42,
+        "cy_px": 1391,
+        "r_px": 42
+      },
+      "rotation_deg": 0,
+      "anchor": "center",
+      "z_index": 120,
+      "interaction": {
+        "tap_target_min_px": 40,
+        "hit_slop_px": 6,
+        "enabled": true
+      },
+      "normalized": {
+        "cx_pct": 1.75,
+        "cy_pct": 77.6,
+        "r_pct_w": 1.75,
+        "r_pct_h": 2.3
+      }
+    },
+    {
+      "hotspot_id": "p1-4-04",
+      "part_ref": "4",
+      "page": 1,
+      "shape": {
+        "type": "circle",
+        "cx_px": 42,
+        "cy_px": 1284,
+        "r_px": 42
+      },
+      "rotation_deg": 0,
+      "anchor": "center",
+      "z_index": 121,
+      "interaction": {
+        "tap_target_min_px": 40,
+        "hit_slop_px": 6,
+        "enabled": true
+      },
+      "normalized": {
+        "cx_pct": 1.75,
+        "cy_pct": 71.65,
+        "r_pct_w": 1.75,
+        "r_pct_h": 2.1
+      }
+    },
+    {
+      "hotspot_id": "p1-4-05",
+      "part_ref": "4",
+      "page": 1,
+      "shape": {
+        "type": "circle",
+        "cx_px": 185,
+        "cy_px": 977,
+        "r_px": 46
+      },
+      "rotation_deg": 0,
+      "anchor": "center",
+      "z_index": 122,
+      "interaction": {
+        "tap_target_min_px": 40,
+        "hit_slop_px": 6,
+        "enabled": true
+      },
+      "normalized": {
+        "cx_pct": 7.7,
+        "cy_pct": 54.5,
+        "r_pct_w": 1.9,
+        "r_pct_h": 2.1
+      }
+    },
+    {
+      "hotspot_id": "p1-4-06",
+      "part_ref": "4",
+      "page": 1,
+      "shape": {
+        "type": "circle",
+        "cx_px": 541,
+        "cy_px": 980,
+        "r_px": 44
+      },
+      "rotation_deg": 0,
+      "anchor": "center",
+      "z_index": 123,
+      "interaction": {
+        "tap_target_min_px": 40,
+        "hit_slop_px": 6,
+        "enabled": true
+      },
+      "normalized": {
+        "cx_pct": 22.55,
+        "cy_pct": 54.7,
+        "r_pct_w": 1.85,
+        "r_pct_h": 2.3
+      }
+    }
+  ],
+  "ui_defaults": {
+    "shape_render": "auto",
+    "show_labels": false,
+    "hotspot_style": "outline",
+    "tap_target_min_px": 40
+  },
+  "validation": {
+    "require_unique_hotspot_id": true,
+    "require_part_ref_exists": true,
+    "clamp_hotspots_to_page_bounds": true,
+    "normalized_is_derived_from_px": true
+  }
+}
