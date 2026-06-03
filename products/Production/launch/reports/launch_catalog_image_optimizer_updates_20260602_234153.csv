@@ -1,0 +1,96 @@
+sku,row_type,name,before_count,after_count,added_count,replaced_duplicate_count
+COL-ANGLE-HEAD,variable,Columbia Angle Head,10,16,6,0
+2AH,variation,"Columbia Angle Head - 2""",1,4,3,0
+3AH,variation,"Columbia Angle Head - 3""",1,4,3,0
+COL-AUTOMATIC-TAPER,variable,Columbia Automatic Taper,4,6,2,0
+PTAPER,variation,"Columbia Automatic Taper - Predator Carbon Fiber 53""",1,2,1,0
+STAPER,variation,"Columbia Automatic Taper - Sawed Off 39""",1,2,1,0
+COL-BILLET-MUD-APPLICATOR,variable,Columbia Billet Mud Applicator,6,7,1,0
+CEXT90,variation,Columbia Billet Mud Applicator - External 90,1,2,1,0
+COL-CAM-LOCK-TUBE,variable,Columbia Cam Lock Tube,1,4,3,0
+CLT32,variation,"Columbia Cam Lock Tube - 32""",1,2,1,0
+CLT42,variation,"Columbia Cam Lock Tube - 42""",1,2,1,0
+CLT55,variation,"Columbia Cam Lock Tube - 55""",1,2,1,0
+COL-COMPOUND-TUBE,variable,Columbia Compound Tube,1,4,3,0
+CMT32,variation,"Columbia Compound Tube - 32""",1,2,1,0
+CMT42,variation,"Columbia Compound Tube - 42""",1,2,1,0
+CMT55,variation,"Columbia Compound Tube - 55""",1,2,1,0
+COL-HOT-MUD-PUMP,variable,Columbia Hot Mud Pump,3,2,0,0
+COL-ONE-HANDLE,variable,Columbia One Handle,3,10,7,0
+C1HEXT,variation,Columbia One Handle - Extendible 3'-5',1,3,2,0
+C1H,variation,Columbia One Handle - Fixed,1,3,2,0
+C1HS,variation,Columbia One Handle - Stubby,1,4,3,0
+COL-OUTSIDE-CORNER-ROLLER,variable,Columbia Outside Corner Roller,4,12,8,0
+CBNCR,variation,Columbia Outside Corner Roller - Bullnose,1,3,2,0
+COBCRE,variation,Columbia Outside Corner Roller - European,1,3,2,0
+COBCR,variation,Columbia Outside Corner Roller - Standard,1,3,2,0
+COBCRW,variation,Columbia Outside Corner Roller - Wide,1,3,2,0
+PCMT42,simple,"Columbia Predator Compound Tube 42""",1,8,7,0
+COL-THROTTLE-CORNER-FLUSHER-BOX,variable,Columbia Throttle Corner Flusher Box,2,8,6,0
+7CFB,variation,"Columbia Throttle Corner Flusher Box - 7""",1,4,3,0
+8CFB,variation,"Columbia Throttle Corner Flusher Box - 8""",1,4,3,0
+COL-TOOL-SET,variable,Columbia Tool Set,4,6,2,0
+SACS,variation,Columbia Tool Set - Commando Set,1,2,1,0
+TWS,variation,Columbia Tool Set - Warrior Set,1,2,1,0
+COL-UHMW-MUD-APPLICATOR,variable,Columbia UHMW Mud Applicator,3,2,0,0
+ATX01TT,simple,TapeTech Automatic Taper Extension,3,5,2,0
+TT-BASIC-FULL-SET,variable,TapeTech Basic Full Set,2,15,13,0
+TT-BASIC-JUMBO-SET,variable,TapeTech Basic Jumbo Set,2,15,13,0
+88TTE,simple,TapeTech Box XTender Handle,4,5,1,0
+TT-BRAKELESS-BOX-HANDLE,variable,TapeTech Brakeless Box Handle,4,6,2,0
+BHE,variation,"TapeTech Brakeless Box Handle - Extendable 34""-60""",2,3,1,0
+BH,variation,"TapeTech Brakeless Box Handle - Fixed 34""",2,3,1,0
+CROLLHAN2,simple,TapeTech Compound Roller Support Handle,4,7,3,0
+TT-CORNER-APPLICATOR,variable,TapeTech Corner Applicator,2,10,8,0
+CA07TT,variation,"TapeTech Corner Applicator - 7""",1,4,3,0
+CA08TT,variation,"TapeTech Corner Applicator - 8""",1,6,5,0
+TT-CORNER-FINISHER,variable,TapeTech Corner Finisher,4,11,7,0
+40XTT,variation,"TapeTech Corner Finisher - 2""",1,3,2,0
+42TT,variation,"TapeTech Corner Finisher - 2.5""",1,2,1,0
+48TT,variation,"TapeTech Corner Finisher - 3"" EasyRoll® Adjustable",1,2,1,0
+48XTT,variation,"TapeTech Corner Finisher - 3.5"" EasyRoll® Adjustable",1,4,3,0
+TT-CORNER-ROLLER,variable,TapeTech Corner Roller,7,16,9,0
+17TTE,variation,TapeTech Corner Roller - Flex Tape Outside Corner,2,3,1,0
+15TTE,variation,TapeTech Corner Roller - Inside Corner,3,8,5,0
+17TT,variation,TapeTech Corner Roller - Outside Corner,2,5,3,0
+TT-EASYCLEAN-AUTOMATIC-TAPER,variable,TapeTech EasyClean® Automatic Taper,17,18,1,0
+03TT,variation,"TapeTech EasyClean® Automatic Taper - Mini-Taper 40.5""",2,3,1,0
+TT-EASYCLEAN-FINISHING-BOX,variable,TapeTech EasyClean® Finishing Box,4,35,31,0
+EZ10TT,variation,"TapeTech EasyClean® Finishing Box - 10""",1,6,5,0
+EZ12TT,variation,"TapeTech EasyClean® Finishing Box - 12""",1,9,8,0
+EZ15TT,variation,"TapeTech EasyClean® Finishing Box - 15""",1,11,10,0
+EZ07TT,variation,"TapeTech EasyClean® Finishing Box - 7""",1,9,8,0
+TT-EASYCLEAN-PUMP,variable,TapeTech EasyClean® Pump,9,18,9,0
+76XLTT,variation,TapeTech EasyClean® Pump - Extra Long,1,6,5,0
+76TT,variation,TapeTech EasyClean® Pump - Standard,1,5,4,0
+TT-EASYFINISH-BOX-HANDLE,variable,TapeTech EasyFinish™ Box Handle,4,14,10,0
+8134TT,variation,"TapeTech EasyFinish™ Box Handle - 34""",1,6,5,0
+8142TT,variation,"TapeTech EasyFinish™ Box Handle - 42""",1,3,2,0
+8154TT,variation,"TapeTech EasyFinish™ Box Handle - 54""",1,3,2,0
+8172TT,variation,"TapeTech EasyFinish™ Box Handle - 72""",1,2,1,0
+90T,simple,TapeTech Filler Adapter,2,4,2,0
+TT-FLAT-BOX-HANDLE,variable,TapeTech Flat Box Handle,4,13,9,0
+8034TT,variation,"TapeTech Flat Box Handle - 34""",1,3,2,0
+8042TT,variation,"TapeTech Flat Box Handle - 42""",1,4,3,0
+8054TT,variation,"TapeTech Flat Box Handle - 54""",1,3,2,0
+8072TT,variation,"TapeTech Flat Box Handle - 72""",1,3,2,0
+TT-GOOSENECK,variable,TapeTech Gooseneck,3,5,2,0
+85XLTT,variation,TapeTech Gooseneck - Extra Long,2,3,1,0
+85T,variation,TapeTech Gooseneck - Standard,1,2,1,0
+TT-MAXXBOX-HIGH-CAPACITY-FINISHING-BOX,variable,TapeTech MaxxBox® High Capacity Finishing Box,3,12,9,0
+EHC10,variation,"TapeTech MaxxBox® High Capacity Finishing Box - 10""",1,4,3,0
+EHC12,variation,"TapeTech MaxxBox® High Capacity Finishing Box - 12""",1,5,4,0
+EHC07,variation,"TapeTech MaxxBox® High Capacity Finishing Box - 7""",1,3,2,0
+TT-NAIL-SPOTTER,variable,TapeTech Nail Spotter,2,9,7,0
+NS02TT,variation,"TapeTech Nail Spotter - 2""",1,5,4,0
+NS03TT,variation,"TapeTech Nail Spotter - 3""",1,4,3,0
+TT-POWER-ASSIST-MAXXBOX-FINISHING-BOX,variable,TapeTech Power Assist® MaxxBox® Finishing Box,3,22,19,0
+PAHC10,variation,"TapeTech Power Assist® MaxxBox® Finishing Box - 10""",1,8,7,0
+PAHC12,variation,"TapeTech Power Assist® MaxxBox® Finishing Box - 12""",1,7,6,0
+PAHC07,variation,"TapeTech Power Assist® MaxxBox® Finishing Box - 7""",1,7,6,0
+TT-STANDARD-FULL-SET,variable,TapeTech Standard Full Set,4,17,13,0
+TT-SUPPORT-HANDLE,variable,TapeTech Support Handle,20,26,6,0
+XHTT,variation,TapeTech Support Handle - Extension,7,10,3,0
+FHTT,variation,TapeTech Support Handle - Fiberglass,6,9,3,0
+TT-WIZARD-COMPACT-FINISHING-BOX-HANDLE,variable,TapeTech Wizard® Compact Finishing Box Handle,5,12,7,0
+8000TT,variation,TapeTech Wizard® Compact Finishing Box Handle - Standard,1,8,7,0

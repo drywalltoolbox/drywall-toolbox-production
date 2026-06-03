@@ -1,0 +1,12 @@
+sku,row_type,parent,name,missing_basenames
+HH19,simple,,Cap,columbia_tools_hh19_01.webp
+PDDM,simple,,Columbia Phantom DDM Sander,columbia_tools_pddm_01.webp; columbia_tools_pddm_02.webp
+TT-BASIC-JUMBO-SET,variable,,TapeTech Basic Jumbo Set,tapetech_8034tt_01.webp
+TTJUMBO10/12,variation,TT-BASIC-JUMBO-SET,TapeTech Basic Jumbo Set - 10 in. & 12 in. Boxes,tapetech_8034tt_01.webp
+TTJUMBO7/10,variation,TT-BASIC-JUMBO-SET,TapeTech Basic Jumbo Set - 7 in. & 10 in. Boxes,tapetech_8034tt_01.webp
+TT-FLAT-BOX-HANDLE,variable,,TapeTech Flat Box Handle,tapetech_8034tt_01.webp
+8034TT,variation,TT-FLAT-BOX-HANDLE,"TapeTech Flat Box Handle - 34""",tapetech_8034tt_01.webp
+TT-COMPOUND-ROLLER-WITH-FRAME,variable,,TapeTech Premium Compound Roller with Frame,tapetech_croll04cg_01.webp; tapetech_croll09cg_01.webp; tapetech_croll12cg_01.webp
+CROLL12CG,variation,TT-COMPOUND-ROLLER-WITH-FRAME,"TapeTech Premium Compound Roller with Frame - 12""",tapetech_croll12cg_01.webp
+CROLL04CG,variation,TT-COMPOUND-ROLLER-WITH-FRAME,"TapeTech Premium Compound Roller with Frame - 4""",tapetech_croll04cg_01.webp
+CROLL09CG,variation,TT-COMPOUND-ROLLER-WITH-FRAME,"TapeTech Premium Compound Roller with Frame - 9""",tapetech_croll09cg_01.webp
