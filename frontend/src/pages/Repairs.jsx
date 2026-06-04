@@ -412,12 +412,30 @@ export default function Repairs() {
   ];
 
   const processSteps = [
-    'Choose a service path',
-    'Identify the tool',
-    'Add symptoms and photos',
-    'Choose shipping or drop-off',
-    'Set approval rules',
-    'Review status and quotes',
+    {
+      title: 'Choose a service path',
+      description: 'Select a standard package, quote-first diagnostic, or warranty evaluation.',
+    },
+    {
+      title: 'Identify the tool',
+      description: 'Match the brand, family, model, and serial details so the repair is routed correctly.',
+    },
+    {
+      title: 'Add symptoms and photos',
+      description: 'Share issue notes and upload media that helps the technician evaluate the tool faster.',
+    },
+    {
+      title: 'Choose shipping or drop-off',
+      description: 'Pick the receiving method and keep shipping decisions connected to the repair record.',
+    },
+    {
+      title: 'Set approval rules',
+      description: 'Define quote limits and warranty context before work begins.',
+    },
+    {
+      title: 'Review status and quotes',
+      description: 'Approve recommended work and track the repair through completion.',
+    },
   ];
 
   return (
@@ -452,7 +470,7 @@ export default function Repairs() {
               fontWeight: 950,
               letterSpacing: '0',
             }}>
-              Tool repair built around packages, quotes, and tracking.
+              Keep your tools working. Keep your crews moving.
             </h1>
             <p style={{
               margin: '0 0 28px',
@@ -461,11 +479,15 @@ export default function Repairs() {
               lineHeight: 1.65,
               maxWidth: '650px',
             }}>
-              Choose a standard service package, request a quote-first diagnostic, or send a warranty evaluation.
-              DTB keeps the intake tied to your brand, tool family, model, shipping choice, photos, and approval limits.
+              Submit a repair request, receive a professional evaluation, approve recommended work,
+              and track progress every step of the way.
             </p>
             <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
-              <Link to="/repairs/start" className="alloy-button" style={{ textDecoration: 'none' }}>
+              <Link to="/repairs/start" className="alloy-button" style={{
+                textDecoration: 'none',
+                background: '#fff',
+                color: '#1d4ed8',
+              }}>
                 Start a repair
               </Link>
               <Link to="/repairs/packages" className="alloy-button" style={{
@@ -514,31 +536,122 @@ export default function Repairs() {
         </div>
       </section>
 
-      <section style={{ padding: 'clamp(2rem, 5vw, 4rem) clamp(1.5rem, 5vw, 3rem)', background: 'var(--alloy-base)', borderTop: '1px solid var(--machined-border)' }}>
+      <section style={{
+        padding: 'clamp(2.75rem, 6vw, 5rem) clamp(1.25rem, 5vw, 3rem)',
+        background: 'linear-gradient(180deg, #f8fafc 0%, #eef4ff 100%)',
+        borderTop: '1px solid rgba(15,23,42,0.08)',
+      }}>
         <div style={{ maxWidth: '1180px', margin: '0 auto' }}>
-          <h2 style={{ margin: '0 0 18px', color: '#0f172a', fontSize: 'clamp(1.5rem, 3vw, 2.1rem)', fontWeight: 950 }}>
-            How Repair Works
-          </h2>
           <div style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 170px), 1fr))',
-            gap: '12px',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 340px), 1fr))',
+            gap: 'clamp(1.5rem, 4vw, 3rem)',
+            alignItems: 'start',
           }}>
-            {processSteps.map((stepLabel, index) => (
-              <div key={stepLabel} style={{
-                background: 'white',
-                border: '1px solid var(--machined-border)',
-                borderRadius: '8px',
-                padding: '18px',
+            <div>
+              <p style={{
+                margin: '0 0 10px',
+                color: 'var(--primary-600)',
+                fontSize: '0.74rem',
+                fontWeight: 950,
+                textTransform: 'uppercase',
+                letterSpacing: '0.12em',
               }}>
-                <span style={{ display: 'block', color: 'var(--primary-600)', fontSize: '0.72rem', fontWeight: 900, marginBottom: '8px' }}>
-                  {String(index + 1).padStart(2, '0')}
-                </span>
-                <span style={{ color: '#0f172a', fontSize: '0.92rem', fontWeight: 800 }}>
-                  {stepLabel}
-                </span>
-              </div>
-            ))}
+                Repair workflow
+              </p>
+              <h2 style={{
+                margin: '0 0 14px',
+                color: '#0f172a',
+                fontSize: 'clamp(1.8rem, 4vw, 3rem)',
+                lineHeight: 1,
+                fontWeight: 950,
+                letterSpacing: '0',
+              }}>
+                How Repair Works
+              </h2>
+              <p style={{
+                margin: 0,
+                maxWidth: '520px',
+                color: 'rgba(15,23,42,0.64)',
+                fontSize: 'clamp(0.96rem, 1.8vw, 1.08rem)',
+                lineHeight: 1.7,
+              }}>
+                A guided intake keeps the repair organized from first request to final approval, with the details your crew and our technicians need in one place.
+              </p>
+            </div>
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 240px), 1fr))',
+              gap: '14px',
+            }}>
+              {processSteps.map((step, index) => (
+                <article key={step.title} style={{
+                  background: 'white',
+                  border: '1px solid rgba(15,23,42,0.08)',
+                  borderRadius: '8px',
+                  padding: '20px',
+                  minHeight: '178px',
+                  boxShadow: '0 18px 45px rgba(15,23,42,0.07)',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  position: 'relative',
+                  overflow: 'hidden',
+                }}>
+                  <span aria-hidden="true" style={{
+                    position: 'absolute',
+                    inset: '0 auto auto 0',
+                    width: '4px',
+                    height: '100%',
+                    background: index === 0 ? 'var(--primary-600)' : 'rgba(37,99,235,0.18)',
+                  }} />
+                  <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    gap: '12px',
+                    marginBottom: '18px',
+                  }}>
+                    <span style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      width: '38px',
+                      height: '38px',
+                      borderRadius: '8px',
+                      background: index === 0 ? 'var(--primary-600)' : '#eff6ff',
+                      color: index === 0 ? '#fff' : 'var(--primary-600)',
+                      fontSize: '0.78rem',
+                      fontWeight: 950,
+                    }}>
+                      {String(index + 1).padStart(2, '0')}
+                    </span>
+                    <span style={{
+                      flex: 1,
+                      height: '1px',
+                      background: 'linear-gradient(90deg, rgba(37,99,235,0.22), rgba(15,23,42,0.04))',
+                    }} />
+                  </div>
+                  <h3 style={{
+                    margin: '0 0 10px',
+                    color: '#0f172a',
+                    fontSize: '1rem',
+                    lineHeight: 1.25,
+                    fontWeight: 900,
+                    letterSpacing: '0',
+                  }}>
+                    {step.title}
+                  </h3>
+                  <p style={{
+                    margin: 0,
+                    color: 'rgba(15,23,42,0.62)',
+                    fontSize: '0.88rem',
+                    lineHeight: 1.58,
+                  }}>
+                    {step.description}
+                  </p>
+                </article>
+              ))}
+            </div>
           </div>
         </div>
       </section>

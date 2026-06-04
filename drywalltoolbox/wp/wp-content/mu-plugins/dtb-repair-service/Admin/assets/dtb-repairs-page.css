@@ -484,6 +484,39 @@
 	white-space: nowrap;
 }
 
+#dtb-repair-modal .dtb-repair-modal-parts-list {
+	display: grid;
+	gap: 10px;
+}
+
+#dtb-repair-modal .dtb-repair-modal-parts-list div {
+	background: #f8fafc;
+	border: 1px solid #e2e8f0;
+	border-radius: 10px;
+	padding: 10px 12px;
+}
+
+#dtb-repair-modal .dtb-repair-modal-parts-list strong {
+	color: #0f172a;
+	display: block;
+	font-size: 13px;
+	font-weight: 900;
+}
+
+#dtb-repair-modal .dtb-repair-modal-parts-list span {
+	color: #2563eb;
+	display: block;
+	font-size: 12px;
+	font-weight: 800;
+	margin-top: 3px;
+}
+
+#dtb-repair-modal .dtb-repair-modal-parts-list p {
+	color: #64748b;
+	font-size: 12px;
+	margin: 6px 0 0;
+}
+
 #dtb-repair-modal .dtb-repair-modal-note {
 	background: #f8fafc;
 	border: 1px solid #e2e8f0;
@@ -501,20 +534,20 @@
 	color: #64748b;
 }
 
-.dtb-admin[data-dtb-page="dtb-repairs"] .dtb-repair-action-brief p {
+#dtb-repair-modal .dtb-repair-action-brief p {
 	color: #334155;
 	font-size: 13px;
 	line-height: 1.45;
 	margin: 0 0 8px;
 }
 
-.dtb-admin[data-dtb-page="dtb-repairs"] .dtb-repair-action-blockers {
+#dtb-repair-modal .dtb-repair-action-blockers {
 	display: grid;
 	gap: 6px;
 	margin-top: 10px;
 }
 
-.dtb-admin[data-dtb-page="dtb-repairs"] .dtb-repair-action-blockers p {
+#dtb-repair-modal .dtb-repair-action-blockers p {
 	background: #fff7ed;
 	border: 1px solid #fed7aa;
 	border-radius: var(--dtb-radius-sm);
@@ -526,13 +559,13 @@
 	padding: 7px 8px;
 }
 
-.dtb-admin[data-dtb-page="dtb-repairs"] .dtb-repair-transition-grid {
+#dtb-repair-modal .dtb-repair-transition-grid {
 	display: grid;
 	gap: 8px;
 	grid-template-columns: repeat( auto-fit, minmax( 170px, 1fr ) );
 }
 
-.dtb-admin[data-dtb-page="dtb-repairs"] .dtb-repair-transition-btn {
+#dtb-repair-modal .dtb-repair-transition-btn {
 	height: auto;
 	min-height: 58px;
 	padding: 8px 10px;
@@ -540,18 +573,18 @@
 	white-space: normal;
 }
 
-.dtb-admin[data-dtb-page="dtb-repairs"] .dtb-repair-transition-btn strong,
-.dtb-admin[data-dtb-page="dtb-repairs"] .dtb-repair-transition-btn span {
+#dtb-repair-modal .dtb-repair-transition-btn strong,
+#dtb-repair-modal .dtb-repair-transition-btn span {
 	display: block;
 }
 
-.dtb-admin[data-dtb-page="dtb-repairs"] .dtb-repair-transition-btn strong {
+#dtb-repair-modal .dtb-repair-transition-btn strong {
 	color: #1d4ed8;
 	font-size: 13px;
 	text-transform: capitalize;
 }
 
-.dtb-admin[data-dtb-page="dtb-repairs"] .dtb-repair-transition-btn span {
+#dtb-repair-modal .dtb-repair-transition-btn span {
 	color: #64748b;
 	font-size: 11px;
 	line-height: 1.35;
@@ -593,4 +626,5 @@
 		grid-template-columns: repeat(2, minmax(0, 1fr));
 	}
 }
+
 

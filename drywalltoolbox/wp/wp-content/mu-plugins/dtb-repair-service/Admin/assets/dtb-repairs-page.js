@@ -332,6 +332,8 @@
 		var panel = getOrCreatePanel( 'overview' );
 		var r     = d.record;
 		var media = d.media && Array.isArray( d.media.items ) ? d.media.items : [];
+		var parts = getAllocatedParts( d );
+		var sh = d.shipping || {};
 
 		var html = '<div class="dtb-repair-modal-workspace-grid">';
 		var issuesHtml = renderRepairRecordIssues( d.integrations || d.integration || {} );
@@ -371,6 +373,19 @@
 		html += '<section class="dtb-repair-modal-card"><header><h3>Customer Media</h3></header><div class="dtb-repair-modal-card__body">';
 		html += renderMediaTiles( media );
 		html += '</div></section>';
+		html += '<section class="dtb-repair-modal-card"><header><h3>Allocated Parts</h3></header><div class="dtb-repair-modal-card__body">';
+		html += renderPartsSummary( parts );
+		html += '</div></section>';
+		html += '<section class="dtb-repair-modal-card"><header><h3>Shipping</h3></header><div class="dtb-repair-modal-card__body">';
+		html += detailRows( [
+			[ 'Inbound Method', sh.inbound_method ],
+			[ 'Return Preference', sh.return_preference ],
+			[ 'Rate Name', sh.rate_name ],
+			[ 'Rate Price', sh.rate_price ? WB.formatMoney( sh.rate_price ) : '' ],
+			[ 'Tracking Number', sh.tracking_number ],
+			[ 'Veeqo Order ID', sh.veeqo_order_id ],
+		] );
+		html += '</div></section>';
 		html += '</aside>';
 
 		html += '</div>';
@@ -401,6 +416,15 @@
 				'<img src="' + WB.escapeHtml( item.thumbnail || item.url || '' ) + '" alt="' + WB.escapeHtml( item.alt || label ) + '">' +
 				'<span>' + WB.escapeHtml( label ) + '</span>' +
 			'</a>';
+		} ).join( '' ) + '</div>';
+	}
+
+	function renderPartsSummary( parts ) {
+		if ( ! parts || ! parts.length ) {
+			return '<p class="dtb-wb-empty">No parts are allocated yet.</p>';
+		}
+		return '<div class="dtb-repair-modal-parts-list">' + parts.map( function ( part ) {
+			return '<div><strong>' + WB.escapeHtml( part.sku || 'Unspecified SKU' ) + '</strong><span>Qty ' + WB.escapeHtml( part.qty || 1 ) + '</span><p>' + WB.escapeHtml( part.note || '' ) + '</p></div>';
 		} ).join( '' ) + '</div>';
 	}
 
