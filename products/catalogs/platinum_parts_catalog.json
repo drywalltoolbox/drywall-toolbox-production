@@ -1,0 +1,829 @@
+{
+  "brand": "Platinum",
+  "generated": "2026-06-04",
+  "total_products": 8,
+  "total_parts": 145,
+  "products": [
+    {
+      "product_id": "platinum-corner-finisher",
+      "product_name": "Corner Finisher",
+      "brand": "Platinum",
+      "category": "Corner Finishers",
+      "subcategory": "CornerFinisher",
+      "schematic_image": "Platinum_Corner_Finisher-page-001.webp",
+      "schematic_data_path": "frontend/public/brands/Platinum/Schematics/CornerFinishers/CornerFinisher/schematic_data.json",
+      "part_count": 16,
+      "parts": [
+        {
+          "part_number": "13",
+          "part_name": "Large Spring",
+          "quantity": 1
+        },
+        {
+          "part_number": "12",
+          "part_name": "Small Spring",
+          "quantity": 1
+        },
+        {
+          "part_number": "17",
+          "part_name": "6-32 x 1/2 FillisterHeadScrew",
+          "quantity": 2
+        },
+        {
+          "part_number": "15",
+          "part_name": "Insert Socket",
+          "quantity": 1
+        },
+        {
+          "part_number": "11",
+          "part_name": "CF Ball Locking Clip",
+          "quantity": 1
+        },
+        {
+          "part_number": "14",
+          "part_name": "Spring Tension Pin",
+          "quantity": 1
+        },
+        {
+          "part_number": "4",
+          "part_name": "CF 6-32 x 1/8 SS Hex",
+          "quantity": 10
+        },
+        {
+          "part_number": "5",
+          "part_name": "Skids",
+          "quantity": 2
+        },
+        {
+          "part_number": "3",
+          "part_name": "Right Frame",
+          "quantity": 1
+        },
+        {
+          "part_number": "6",
+          "part_name": "Blade-Corner Finisher",
+          "quantity": 2
+        },
+        {
+          "part_number": "1",
+          "part_name": "CF Body",
+          "quantity": 1
+        },
+        {
+          "part_number": "16",
+          "part_name": "CF Frame Tabs",
+          "quantity": 2
+        },
+        {
+          "part_number": "7",
+          "part_name": "CF Bottom Clip",
+          "quantity": 1
+        },
+        {
+          "part_number": "10",
+          "part_name": "CF Lock Clip Spring",
+          "quantity": 1
+        },
+        {
+          "part_number": "9",
+          "part_name": "CF Slotted Screw 8-32 x 6.35",
+          "quantity": 2
+        },
+        {
+          "part_number": "2",
+          "part_name": "CF Left Frame",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "product_id": "platinum-outside-corner-roller",
+      "product_name": "Outside Corner Roller",
+      "brand": "Platinum",
+      "category": "Corner Rollers",
+      "subcategory": "OutsideCornerRoller",
+      "schematic_image": "platinum_outside_cornerroller-page-001.webp",
+      "schematic_data_path": "frontend/public/brands/Platinum/Schematics/CornerRollers/OutsideCornerRoller/schematic_data.json",
+      "part_count": 9,
+      "parts": [
+        {
+          "part_number": "7",
+          "part_name": "Corner Roller Handle Connecting Link",
+          "quantity": 1
+        },
+        {
+          "part_number": "10",
+          "part_name": "Jam Nut",
+          "quantity": 1
+        },
+        {
+          "part_number": "9",
+          "part_name": "Corner Roller Handle Mounting Swivel",
+          "quantity": 1
+        },
+        {
+          "part_number": "5",
+          "part_name": "Bearing Sleeve",
+          "quantity": 2
+        },
+        {
+          "part_number": "8",
+          "part_name": "1/4-20 x 1-1/2 Hex Bolt",
+          "quantity": 1
+        },
+        {
+          "part_number": "1",
+          "part_name": "Corner Roller Head Casting",
+          "quantity": 1
+        },
+        {
+          "part_number": "6",
+          "part_name": "Roller Wheel",
+          "quantity": 4
+        },
+        {
+          "part_number": "4",
+          "part_name": "1/4-20 Nyloc Nut",
+          "quantity": 1
+        },
+        {
+          "part_number": "3",
+          "part_name": "1/4-20 Nyloc Nut",
+          "quantity": 4
+        }
+      ]
+    },
+    {
+      "product_id": "platinum-flat-box",
+      "product_name": "Flat Box",
+      "brand": "Platinum",
+      "category": "Finishing Boxes",
+      "subcategory": "FlatBox",
+      "schematic_image": "Platinum_Flat_Box-page-001.webp",
+      "schematic_data_path": "frontend/public/brands/Platinum/Schematics/FinishingBoxes/FlatBox/schematic_data.json",
+      "part_count": 40,
+      "parts": [
+        {
+          "part_number": "27",
+          "part_name": "#10 Brass Washer",
+          "quantity": 1
+        },
+        {
+          "part_number": "16",
+          "part_name": "FB Screw (Side Plate)",
+          "quantity": 1
+        },
+        {
+          "part_number": "44",
+          "part_name": "Dial Assembly",
+          "quantity": 1
+        },
+        {
+          "part_number": "42",
+          "part_name": "8-32 X 3/8, BHC Screw",
+          "quantity": 1
+        },
+        {
+          "part_number": "41",
+          "part_name": "Spring Anchor",
+          "quantity": 1
+        },
+        {
+          "part_number": "18",
+          "part_name": "FB Pressure Spring Holder",
+          "quantity": 1
+        },
+        {
+          "part_number": "12",
+          "part_name": "Left Side Plate",
+          "quantity": 1
+        },
+        {
+          "part_number": "43",
+          "part_name": "Flat Box Seal",
+          "quantity": 1
+        },
+        {
+          "part_number": "25",
+          "part_name": "FB Box Tire",
+          "quantity": 1
+        },
+        {
+          "part_number": "4",
+          "part_name": "Flat Box Screw (#4)",
+          "quantity": 1
+        },
+        {
+          "part_number": "2",
+          "part_name": "Blade Holder Assembly",
+          "quantity": 1
+        },
+        {
+          "part_number": "8",
+          "part_name": "FB Washer",
+          "quantity": 1
+        },
+        {
+          "part_number": "23",
+          "part_name": "#10-32 Hex Head Shoulder Screw",
+          "quantity": 1
+        },
+        {
+          "part_number": "22",
+          "part_name": "Bearing Nyliner",
+          "quantity": 1
+        },
+        {
+          "part_number": "37",
+          "part_name": "T-Nut",
+          "quantity": 1
+        },
+        {
+          "part_number": "38",
+          "part_name": "AT Wing Nut",
+          "quantity": 1
+        },
+        {
+          "part_number": "26",
+          "part_name": "FB Box Wheel, Black",
+          "quantity": 1
+        },
+        {
+          "part_number": "28",
+          "part_name": "Axle",
+          "quantity": 1
+        },
+        {
+          "part_number": "35",
+          "part_name": "Pressure Plate",
+          "quantity": 1
+        },
+        {
+          "part_number": "39",
+          "part_name": "#10-32 X 1in SHC Screw",
+          "quantity": 1
+        },
+        {
+          "part_number": "40",
+          "part_name": "Lightweight Pressure Plate Spring",
+          "quantity": 1
+        },
+        {
+          "part_number": "34",
+          "part_name": "FB Screw",
+          "quantity": 1
+        },
+        {
+          "part_number": "21",
+          "part_name": "#10 Brass Washer",
+          "quantity": 1
+        },
+        {
+          "part_number": "20",
+          "part_name": "#10-32 Lock Nut",
+          "quantity": 1
+        },
+        {
+          "part_number": "17",
+          "part_name": "Bottom Plate",
+          "quantity": 1
+        },
+        {
+          "part_number": "19",
+          "part_name": "FB Screw",
+          "quantity": 1
+        },
+        {
+          "part_number": "1",
+          "part_name": "Flat Box Blade",
+          "quantity": 1
+        },
+        {
+          "part_number": "29",
+          "part_name": "#14 Brass Washer",
+          "quantity": 1
+        },
+        {
+          "part_number": "3",
+          "part_name": "#4-40 x 1/4 Fillister Head Screw",
+          "quantity": 1
+        },
+        {
+          "part_number": "24",
+          "part_name": "Nyliner Bearing-Straight",
+          "quantity": 1
+        },
+        {
+          "part_number": "5",
+          "part_name": "Blade Holder Bracket",
+          "quantity": 1
+        },
+        {
+          "part_number": "33",
+          "part_name": "Flat Box Metal Hinge",
+          "quantity": 1
+        },
+        {
+          "part_number": "31",
+          "part_name": "Right Side Plate",
+          "quantity": 1
+        },
+        {
+          "part_number": "6",
+          "part_name": "Front Plate",
+          "quantity": 1
+        },
+        {
+          "part_number": "9",
+          "part_name": "Latch",
+          "quantity": 1
+        },
+        {
+          "part_number": "10",
+          "part_name": "Spring Washer",
+          "quantity": 1
+        },
+        {
+          "part_number": "15",
+          "part_name": "#6-32 x 1/4 Fillister Head",
+          "quantity": 1
+        },
+        {
+          "part_number": "14",
+          "part_name": "Skid Cover Left Side Universal",
+          "quantity": 1
+        },
+        {
+          "part_number": "11",
+          "part_name": "Shoulder Screw",
+          "quantity": 1
+        },
+        {
+          "part_number": "30",
+          "part_name": "FB Bolt (holds axle on)",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "product_id": "platinum-corner-applicator-handle",
+      "product_name": "Corner Applicator Handle",
+      "brand": "Platinum",
+      "category": "Handles",
+      "subcategory": "CornerApplicatorHandle",
+      "schematic_image": "platinum_corner_applicator_handle-page-001.webp",
+      "schematic_data_path": "frontend/public/brands/Platinum/Schematics/Handles/CornerApplicatorHandle/schematic_data.json",
+      "part_count": 4,
+      "parts": [
+        {
+          "part_number": "4",
+          "part_name": "Handle End",
+          "quantity": 1
+        },
+        {
+          "part_number": "1",
+          "part_name": "Handle Tube",
+          "quantity": 1
+        },
+        {
+          "part_number": "2",
+          "part_name": "Ball Grip",
+          "quantity": 1
+        },
+        {
+          "part_number": "3",
+          "part_name": "Thumb Screw",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "product_id": "platinum-corner-finisher-handle",
+      "product_name": "Corner Finisher Handle",
+      "brand": "Platinum",
+      "category": "Handles",
+      "subcategory": "CornerFinisherHandle",
+      "schematic_image": "platinum_corner_finisher_handle-page-001.webp",
+      "schematic_data_path": "frontend/public/brands/Platinum/Schematics/Handles/CornerFinisherHandle/schematic_data.json",
+      "part_count": 5,
+      "parts": [
+        {
+          "part_number": "5",
+          "part_name": "Handle End",
+          "quantity": 1
+        },
+        {
+          "part_number": "1",
+          "part_name": "Handle Tube",
+          "quantity": 1
+        },
+        {
+          "part_number": "3",
+          "part_name": "Wing Nut",
+          "quantity": 1
+        },
+        {
+          "part_number": "2",
+          "part_name": "Ball Grip",
+          "quantity": 1
+        },
+        {
+          "part_number": "4",
+          "part_name": "Corner Finisher Adapter",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "product_id": "platinum-corner-roller-handle",
+      "product_name": "Corner Roller Handle",
+      "brand": "Platinum",
+      "category": "Handles",
+      "subcategory": "CornerRollerHandle",
+      "schematic_image": "platinum_corner_roller_Handle-page-001.webp",
+      "schematic_data_path": "frontend/public/brands/Platinum/Schematics/Handles/CornerRollerHandle/schematic_data.json",
+      "part_count": 4,
+      "parts": [
+        {
+          "part_number": "4",
+          "part_name": "Handle End",
+          "quantity": 1
+        },
+        {
+          "part_number": "1",
+          "part_name": "Handle Tube",
+          "quantity": 1
+        },
+        {
+          "part_number": "2",
+          "part_name": "Ball Grip",
+          "quantity": 1
+        },
+        {
+          "part_number": "3",
+          "part_name": "Wing Nut",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "product_id": "platinum-flat-box-handle",
+      "product_name": "Flat Box Handle",
+      "brand": "Platinum",
+      "category": "Handles",
+      "subcategory": "FlatBoxHandle",
+      "schematic_image": "platinum_flatbox_handle-page-001.webp",
+      "schematic_data_path": "frontend/public/brands/Platinum/Schematics/Handles/FlatBoxHandle/schematic_data.json",
+      "part_count": 21,
+      "parts": [
+        {
+          "part_number": "15",
+          "part_name": "Screw",
+          "quantity": 1
+        },
+        {
+          "part_number": "16",
+          "part_name": "Large Pivot Pin",
+          "quantity": 1
+        },
+        {
+          "part_number": "18",
+          "part_name": "Set Screw",
+          "quantity": 2
+        },
+        {
+          "part_number": "14",
+          "part_name": "Brake Mechanism Block",
+          "quantity": 1
+        },
+        {
+          "part_number": "8",
+          "part_name": "Lock Nut",
+          "quantity": 1
+        },
+        {
+          "part_number": "17",
+          "part_name": "Connector Plate",
+          "quantity": 1
+        },
+        {
+          "part_number": "13",
+          "part_name": "Box Handle Head",
+          "quantity": 1
+        },
+        {
+          "part_number": "19",
+          "part_name": "Screw",
+          "quantity": 2
+        },
+        {
+          "part_number": "20",
+          "part_name": "Brake Dog",
+          "quantity": 1
+        },
+        {
+          "part_number": "5",
+          "part_name": "Screw",
+          "quantity": 1
+        },
+        {
+          "part_number": "1",
+          "part_name": "Handle Tube",
+          "quantity": 1
+        },
+        {
+          "part_number": "21",
+          "part_name": "Ball Grip",
+          "quantity": 1
+        },
+        {
+          "part_number": "22",
+          "part_name": "Wing Nut",
+          "quantity": 1
+        },
+        {
+          "part_number": "3",
+          "part_name": "Trigger Sleeve",
+          "quantity": 1
+        },
+        {
+          "part_number": "9",
+          "part_name": "Brake Rod",
+          "quantity": 1
+        },
+        {
+          "part_number": "10",
+          "part_name": "Linkage Plate",
+          "quantity": 2
+        },
+        {
+          "part_number": "6",
+          "part_name": "Connecting Rod Pin",
+          "quantity": 1
+        },
+        {
+          "part_number": "2",
+          "part_name": "Trigger",
+          "quantity": 1
+        },
+        {
+          "part_number": "4",
+          "part_name": "Shoulder Screw",
+          "quantity": 1
+        },
+        {
+          "part_number": "7",
+          "part_name": "Trigger Spring",
+          "quantity": 1
+        },
+        {
+          "part_number": "11",
+          "part_name": "Lock Nut",
+          "quantity": 2
+        }
+      ]
+    },
+    {
+      "product_id": "platinum-compound-pump",
+      "product_name": "Compound Pump",
+      "brand": "Platinum",
+      "category": "Pumps",
+      "subcategory": "CompoundPump",
+      "schematic_image": "platinum_compound_pump-page-001.webp",
+      "schematic_data_path": "frontend/public/brands/Platinum/Schematics/Pumps/CompoundPump/schematic_data.json",
+      "part_count": 46,
+      "parts": [
+        {
+          "part_number": "17",
+          "part_name": "Screw",
+          "quantity": 4
+        },
+        {
+          "part_number": "16",
+          "part_name": "Lock Washer",
+          "quantity": 4
+        },
+        {
+          "part_number": "11",
+          "part_name": "Pump Latch",
+          "quantity": 2
+        },
+        {
+          "part_number": "54",
+          "part_name": "Pump Tube",
+          "quantity": 1
+        },
+        {
+          "part_number": "30",
+          "part_name": "Screw",
+          "quantity": 4
+        },
+        {
+          "part_number": "55",
+          "part_name": "Pump Tube Foot",
+          "quantity": 1
+        },
+        {
+          "part_number": "56",
+          "part_name": "Screen",
+          "quantity": 1
+        },
+        {
+          "part_number": "58",
+          "part_name": "Screw",
+          "quantity": 1
+        },
+        {
+          "part_number": "59",
+          "part_name": "Nut",
+          "quantity": 1
+        },
+        {
+          "part_number": "45",
+          "part_name": "Valve Disc",
+          "quantity": 2
+        },
+        {
+          "part_number": "60",
+          "part_name": "Screw",
+          "quantity": 1
+        },
+        {
+          "part_number": "29",
+          "part_name": "S-Hook",
+          "quantity": 2
+        },
+        {
+          "part_number": "22",
+          "part_name": "Pump Head",
+          "quantity": 1
+        },
+        {
+          "part_number": "31",
+          "part_name": "Filler/Gooseneck Gasket",
+          "quantity": 1
+        },
+        {
+          "part_number": "32",
+          "part_name": "Nut",
+          "quantity": 2
+        },
+        {
+          "part_number": "25",
+          "part_name": "Stud Screw",
+          "quantity": 2
+        },
+        {
+          "part_number": "1",
+          "part_name": "Pump O-Ring",
+          "quantity": 1
+        },
+        {
+          "part_number": "46",
+          "part_name": "Small Retainer",
+          "quantity": 1
+        },
+        {
+          "part_number": "48",
+          "part_name": "Piston Cup",
+          "quantity": 1
+        },
+        {
+          "part_number": "47",
+          "part_name": "Large Retainer",
+          "quantity": 1
+        },
+        {
+          "part_number": "49",
+          "part_name": "Lock Clip",
+          "quantity": 1
+        },
+        {
+          "part_number": "50",
+          "part_name": "Lock Nut",
+          "quantity": 1
+        },
+        {
+          "part_number": "51",
+          "part_name": "Filler Body",
+          "quantity": 1
+        },
+        {
+          "part_number": "52",
+          "part_name": "Filler/Gooseneck O-Ring",
+          "quantity": 1
+        },
+        {
+          "part_number": "18",
+          "part_name": "Filler Cable",
+          "quantity": 1
+        },
+        {
+          "part_number": "3",
+          "part_name": "Screw",
+          "quantity": 2
+        },
+        {
+          "part_number": "4",
+          "part_name": "Wrench Bracket",
+          "quantity": 2
+        },
+        {
+          "part_number": "20",
+          "part_name": "Discharge Tube",
+          "quantity": 1
+        },
+        {
+          "part_number": "2",
+          "part_name": "Pump Foot Bracket",
+          "quantity": 1
+        },
+        {
+          "part_number": "43",
+          "part_name": "Pump Ball Screw",
+          "quantity": 1
+        },
+        {
+          "part_number": "38",
+          "part_name": "Ball",
+          "quantity": 1
+        },
+        {
+          "part_number": "39",
+          "part_name": "Pump Handle",
+          "quantity": 1
+        },
+        {
+          "part_number": "40",
+          "part_name": "Pump Handle Tube",
+          "quantity": 1
+        },
+        {
+          "part_number": "35",
+          "part_name": "Pump Handle Bracket",
+          "quantity": 1
+        },
+        {
+          "part_number": "42",
+          "part_name": "Pump Handle Nut",
+          "quantity": 1
+        },
+        {
+          "part_number": "7",
+          "part_name": "Release Pin with key ring",
+          "quantity": 1
+        },
+        {
+          "part_number": "27",
+          "part_name": "Brass Nut",
+          "quantity": 1
+        },
+        {
+          "part_number": "26",
+          "part_name": "U-Cup",
+          "quantity": 1
+        },
+        {
+          "part_number": "24",
+          "part_name": "Plastic Nut Bearing",
+          "quantity": 2
+        },
+        {
+          "part_number": "44",
+          "part_name": "Piston Rod",
+          "quantity": 1
+        },
+        {
+          "part_number": "28",
+          "part_name": "Bolt",
+          "quantity": 1
+        },
+        {
+          "part_number": "6",
+          "part_name": "Black Plastic Washer (Link)",
+          "quantity": 2
+        },
+        {
+          "part_number": "33",
+          "part_name": "Pump Link",
+          "quantity": 1
+        },
+        {
+          "part_number": "34",
+          "part_name": "Hex head screw",
+          "quantity": 1
+        },
+        {
+          "part_number": "5",
+          "part_name": "Metal Link Washer",
+          "quantity": 1
+        },
+        {
+          "part_number": "57",
+          "part_name": "Metal Washer",
+          "quantity": 1
+        }
+      ]
+    }
+  ]
+}
