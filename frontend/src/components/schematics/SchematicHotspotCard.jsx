@@ -137,7 +137,7 @@ export default function SchematicHotspotCard({
   // No footer. Price and CTA flow naturally with the right column.
   // CSS class 'schematic-hotspot-card' handles responsive sizing and dark mode.
   return (
-    <div className="schematic-hotspot-card">
+    <div className={`schematic-hotspot-card${isResolving ? ' schematic-hotspot-card--resolving' : ''}`}>
       {/* Left column — thumbnail (fixed width, square) */}
       <div className="schematic-hotspot-card__image">
         {product?.images?.[0] ? (
@@ -154,7 +154,9 @@ export default function SchematicHotspotCard({
             />
           </button>
         ) : isResolving ? (
-          <div className="hotspot-modal-image-skeleton" aria-hidden="true" />
+          <div className="hotspot-modal-image-skeleton" aria-hidden="true">
+            <span className="hotspot-modal-loader-ring" />
+          </div>
         ) : null}
       </div>
 
@@ -177,6 +179,14 @@ export default function SchematicHotspotCard({
         <div className="schematic-hotspot-card__stock">
           <StockBadge stockStatus={stockStatus} />
         </div>
+
+        {isResolving ? (
+          <div className="schematic-hotspot-card__loading-line" aria-hidden="true">
+            <span />
+            <span />
+            <span />
+          </div>
+        ) : null}
 
         {/* Title */}
         <h3 className="schematic-hotspot-card__title">

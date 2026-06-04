@@ -87,17 +87,18 @@ function dtb_command_center_admin_overview_handler(): WP_REST_Response {
 	}
 
 	// KPI grid.
+	echo '<div class="dtb-command-center-kpis">';
 	echo dtb_admin_ui_kpi_grid( [ // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		[
-			'value'      => $ord['total_today'] ?? 0,
-			'label'      => __( 'Orders Today', 'drywall-toolbox' ),
+			'value'      => $ord['active'] ?? 0,
+			'label'      => __( 'Active Orders', 'drywall-toolbox' ),
 			'icon'       => 'dashicons-cart',
 			'icon_color' => 'primary',
-			'href'       => $links['orders_processing'] ?? '',
+			'href'       => add_query_arg( [ 'page' => 'dtb-orders', 'status' => 'active' ], admin_url( 'admin.php' ) ),
 		],
 		[
 			'value'      => $ord['needs_attention'] ?? 0,
-			'label'      => __( 'Orders Needing Attention', 'drywall-toolbox' ),
+			'label'      => __( 'Urgent Orders', 'drywall-toolbox' ),
 			'icon'       => 'dashicons-flag',
 			'icon_color' => ( ( $ord['needs_attention'] ?? 0 ) > 0 ) ? 'warning' : 'success',
 			'href'       => $links['orders_attention'] ?? '',
@@ -118,7 +119,7 @@ function dtb_command_center_admin_overview_handler(): WP_REST_Response {
 		],
 		[
 			'value'      => $sup['total_open'] ?? 0,
-			'label'      => __( 'Open Support Tickets', 'drywall-toolbox' ),
+			'label'      => __( 'Support Tickets', 'drywall-toolbox' ),
 			'icon'       => 'dashicons-format-chat',
 			'icon_color' => ( ( $sup['past_sla'] ?? 0 ) > 0 ) ? 'danger' : 'neutral',
 			'href'       => $links['support_open'] ?? '',
@@ -131,14 +132,15 @@ function dtb_command_center_admin_overview_handler(): WP_REST_Response {
 			'href'       => $links['orders_failed'] ?? '',
 		],
 	] );
+	echo '</div>';
 
 	// Workflow status cards.
 	echo '<div class="dtb-grid dtb-grid--two">';
 
 	ob_start();
 	echo dtb_admin_ui_detail_row( __( 'Processing',      'drywall-toolbox' ), dtb_admin_ui_badge( (string) ( $ord['processing'] ?? 0 ), 'processing' ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-	echo dtb_admin_ui_detail_row( __( 'On Hold',         'drywall-toolbox' ), dtb_admin_ui_badge( (string) ( $ord['needs_attention'] ?? 0 ), ( ( $ord['needs_attention'] ?? 0 ) > 0 ) ? 'warning' : 'neutral' ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-	echo dtb_admin_ui_detail_row( __( 'Pending Payment', 'drywall-toolbox' ), dtb_admin_ui_badge( (string) ( $ord['pending_payment'] ?? 0 ), 'info' ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+	echo dtb_admin_ui_detail_row( __( 'On Hold',         'drywall-toolbox' ), dtb_admin_ui_badge( (string) ( $ord['on_hold'] ?? 0 ), ( ( $ord['on_hold'] ?? 0 ) > 0 ) ? 'warning' : 'neutral' ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+	echo dtb_admin_ui_detail_row( __( 'Pending',         'drywall-toolbox' ), dtb_admin_ui_badge( (string) ( $ord['pending'] ?? 0 ), 'info' ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 	echo dtb_admin_ui_detail_row( __( 'Payment Issues',  'drywall-toolbox' ), dtb_admin_ui_badge( (string) ( $ord['payment_issues'] ?? 0 ), ( ( $ord['payment_issues'] ?? 0 ) > 0 ) ? 'danger' : 'neutral' ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 	echo dtb_admin_ui_card( ob_get_clean(), [ 'title' => __( 'Orders', 'drywall-toolbox' ), 'header_html' => dtb_admin_ui_button( __( 'View All', 'drywall-toolbox' ), [ 'href' => add_query_arg( [ 'page' => 'dtb-orders' ], admin_url( 'admin.php' ) ), 'size' => 'sm', 'type' => 'ghost' ] ) ] ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 

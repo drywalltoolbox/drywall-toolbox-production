@@ -996,6 +996,8 @@ function dtb_support_rest_get_workbench( WP_REST_Request $request ): WP_REST_Res
 		$result = dtb_support_query_queue( 'needs_reply', $query_args );
 	} elseif ( 'past-sla' === $status ) {
 		$result = dtb_support_query_queue( 'overdue', $query_args );
+	} elseif ( '' === $status || 'open' === $status ) {
+		$result = dtb_support_query_queue( 'all_active', $query_args );
 	} else {
 		$query_args['status'] = '' !== $status ? $status : 'all';
 		$result = dtb_support_query_tickets( $query_args );

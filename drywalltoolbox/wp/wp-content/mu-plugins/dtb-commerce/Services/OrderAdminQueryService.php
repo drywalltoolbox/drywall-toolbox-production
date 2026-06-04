@@ -28,6 +28,10 @@ function dtb_orders_admin_normalize_filter( string $filter ): string {
 		}
 	}
 
+	if ( in_array( $filter, [ 'active', 'pending_all' ], true ) ) {
+		return str_replace( '_', '-', $filter );
+	}
+
 	$filter = str_replace( '_', '-', $filter );
 	$valid  = array_map(
 		static fn( string $status ): string => sanitize_key( preg_replace( '/^wc-/', '', $status ) ),
@@ -47,6 +51,17 @@ function dtb_orders_admin_statuses_for_filter( string $filter ): array {
 	$filter = dtb_orders_admin_normalize_filter( $filter );
 	if ( '' === $filter ) {
 		return [];
+	}
+
+	$aggregate_filters = [
+		'active'      => [ 'pending', 'on-hold', 'processing' ],
+		'pending-all' => [ 'pending', 'on-hold' ],
+	];
+	if ( isset( $aggregate_filters[ $filter ] ) ) {
+		return array_map(
+			static fn( string $status ): string => 'wc-' . $status,
+			$aggregate_filters[ $filter ]
+		);
 	}
 
 	$statuses = function_exists( 'dtb_admin_get_workflow_queue_filter_statuses' )

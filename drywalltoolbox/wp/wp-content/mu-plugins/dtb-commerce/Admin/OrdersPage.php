@@ -36,12 +36,11 @@ function dtb_orders_render_page(): void {
 	$paged   = max( 1, (int) ( $_GET['paged'] ?? 1 ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 	$per     = (int) get_option( 'dtb_admin_items_per_page', 25 );
 	$base    = admin_url( 'admin.php?page=dtb-orders' );
-	$kpi_attention  = dtb_orders_admin_count( 'attention', '', $order_type );
-	$kpi_processing = dtb_orders_admin_count( 'processing', '', $order_type );
+	$kpi_active     = dtb_orders_admin_count( 'active', '', $order_type );
+	$kpi_urgent     = dtb_orders_admin_count( 'attention', '', $order_type );
 	$kpi_on_hold    = dtb_orders_admin_count( 'on-hold', '', $order_type );
-	$kpi_pending    = dtb_orders_admin_count( 'pending', '', $order_type );
-	$kpi_failed     = dtb_orders_admin_count( 'failed', '', $order_type );
-	$kpi_total      = dtb_orders_admin_count( '', '', $order_type );
+	$kpi_pending    = dtb_orders_admin_count( 'pending-all', '', $order_type );
+	$kpi_attention  = $kpi_urgent;
 	$status_base    = $order_type ? add_query_arg( 'order_type', $order_type, $base ) : $base;
 
 	$status_tabs = [
@@ -68,46 +67,32 @@ function dtb_orders_render_page(): void {
 	// KPI strip.
 	echo '<div class="dtb-kpi-strip">';
 	// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-	echo dtb_admin_ui_kpi( $kpi_total, __( 'Total Orders', 'drywall-toolbox' ), [
+	echo dtb_admin_ui_kpi( $kpi_active, __( 'Active', 'drywall-toolbox' ), [
 		'icon'       => 'dashicons-cart',
 		'icon_color' => 'primary',
-		'href'       => $base,
-		'data'       => [ 'dtb-live-tab' => 'all', 'dtb-live-target' => 'dtb-orders-workspace' ],
+		'href'       => add_query_arg( 'status', 'active', $status_base ),
+		'data'       => [ 'dtb-live-tab' => 'active', 'dtb-live-target' => 'dtb-orders-workspace' ],
 	] );
 	// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-	echo dtb_admin_ui_kpi( $kpi_attention, __( 'Needs Attention', 'drywall-toolbox' ), [
+	echo dtb_admin_ui_kpi( $kpi_urgent, __( 'Urgent', 'drywall-toolbox' ), [
 		'icon'       => 'dashicons-warning',
 		'icon_color' => 'danger',
-		'href'       => add_query_arg( 'status', 'attention', $base ),
+		'href'       => add_query_arg( 'status', 'attention', $status_base ),
 		'data'       => [ 'dtb-live-tab' => 'attention', 'dtb-live-target' => 'dtb-orders-workspace' ],
-	] );
-	// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-	echo dtb_admin_ui_kpi( $kpi_processing, __( 'Processing', 'drywall-toolbox' ), [
-		'icon'       => 'dashicons-update',
-		'icon_color' => 'info',
-		'href'       => add_query_arg( 'status', 'processing', $base ),
-		'data'       => [ 'dtb-live-tab' => 'processing', 'dtb-live-target' => 'dtb-orders-workspace' ],
 	] );
 	// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 	echo dtb_admin_ui_kpi( $kpi_on_hold, __( 'On Hold', 'drywall-toolbox' ), [
 		'icon'       => 'dashicons-pause',
 		'icon_color' => 'warning',
-		'href'       => add_query_arg( 'status', 'on-hold', $base ),
+		'href'       => add_query_arg( 'status', 'on-hold', $status_base ),
 		'data'       => [ 'dtb-live-tab' => 'on-hold', 'dtb-live-target' => 'dtb-orders-workspace' ],
 	] );
 	// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-	echo dtb_admin_ui_kpi( $kpi_pending, __( 'Pending Payment', 'drywall-toolbox' ), [
+	echo dtb_admin_ui_kpi( $kpi_pending, __( 'Pending', 'drywall-toolbox' ), [
 		'icon'       => 'dashicons-money-alt',
 		'icon_color' => 'warning',
-		'href'       => add_query_arg( 'status', 'pending', $base ),
-		'data'       => [ 'dtb-live-tab' => 'pending', 'dtb-live-target' => 'dtb-orders-workspace' ],
-	] );
-	// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-	echo dtb_admin_ui_kpi( $kpi_failed, __( 'Failed', 'drywall-toolbox' ), [
-		'icon'       => 'dashicons-dismiss',
-		'icon_color' => 'danger',
-		'href'       => add_query_arg( 'status', 'failed', $base ),
-		'data'       => [ 'dtb-live-tab' => 'failed', 'dtb-live-target' => 'dtb-orders-workspace' ],
+		'href'       => add_query_arg( 'status', 'pending-all', $status_base ),
+		'data'       => [ 'dtb-live-tab' => 'pending-all', 'dtb-live-target' => 'dtb-orders-workspace' ],
 	] );
 	echo '</div>';
 	if ( function_exists( 'dtb_admin_render_module_exception_chips' ) ) {

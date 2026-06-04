@@ -682,6 +682,50 @@ a.dtb-kpi:hover { text-decoration: none; }
 .dtb-grid--three { grid-template-columns: repeat(3, 1fr); }
 .dtb-grid--four  { grid-template-columns: repeat(4, 1fr); }
 
+.dtb-command-center-kpis .dtb-grid--kpi {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  margin-bottom: 28px;
+}
+
+.dtb-command-center-kpis .dtb-kpi {
+  position: relative;
+  min-height: 116px;
+  padding: 20px;
+  border-radius: 14px;
+  align-items: center;
+  background: linear-gradient(180deg, #fff 0%, #f8fbff 100%);
+  box-shadow: 0 12px 30px rgba(15, 23, 42, .06);
+  overflow: hidden;
+}
+
+.dtb-command-center-kpis .dtb-kpi::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 4px;
+  background: currentColor;
+  opacity: .12;
+}
+
+.dtb-command-center-kpis .dtb-kpi__icon {
+  width: 46px;
+  height: 46px;
+  border-radius: 14px;
+}
+
+.dtb-command-center-kpis .dtb-kpi__value {
+  font-size: 30px;
+  letter-spacing: 0;
+}
+
+.dtb-command-center-kpis .dtb-kpi__label {
+  max-width: 18ch;
+  margin-top: 6px;
+  letter-spacing: .04em;
+  line-height: 1.35;
+}
+
 /* =============================================================================
    10. TOOLBAR & FILTER BAR
    ============================================================================= */
@@ -1720,6 +1764,7 @@ a.dtb-kpi:hover { text-decoration: none; }
 @media (max-width: 1200px) {
   .dtb-grid--four  { grid-template-columns: repeat(2, 1fr); }
   .dtb-grid--three { grid-template-columns: repeat(2, 1fr); }
+  .dtb-command-center-kpis .dtb-grid--kpi { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
 @media (max-width: 900px) {
@@ -1751,6 +1796,11 @@ a.dtb-kpi:hover { text-decoration: none; }
 
 @media (max-width: 600px) {
   .dtb-grid--kpi { grid-template-columns: 1fr; }
+  .dtb-command-center-kpis .dtb-grid--kpi { grid-template-columns: 1fr; }
+  .dtb-command-center-kpis .dtb-kpi {
+    min-height: 104px;
+    padding: 16px;
+  }
   .dtb-filter-bar { flex-direction: column; align-items: stretch; }
   .dtb-toolbar { flex-direction: column; align-items: stretch; }
   .dtb-page-actions { justify-content: flex-start; }

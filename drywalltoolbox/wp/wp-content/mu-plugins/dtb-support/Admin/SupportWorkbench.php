@@ -16,6 +16,7 @@ defined( 'ABSPATH' ) || exit;
  */
 function dtb_support_workbench_queue_items(): array {
 	return [
+		'all_active'             => [ 'label' => __( 'All Active', 'drywall-toolbox' ),          'hint' => __( 'Full open workload', 'drywall-toolbox' ),              'group' => __( 'Work Queue', 'drywall-toolbox' ),  'status' => '' ],
 		'needs_reply'            => [ 'label' => __( 'Needs Reply', 'drywall-toolbox' ),         'hint' => __( 'Customer-facing replies waiting', 'drywall-toolbox' ), 'group' => __( 'Work Queue', 'drywall-toolbox' ),  'status' => 'needs-reply' ],
 		'overdue'                => [ 'label' => __( 'Overdue', 'drywall-toolbox' ),             'hint' => __( 'Past due response targets', 'drywall-toolbox' ),       'group' => __( 'Work Queue', 'drywall-toolbox' ),  'status' => 'past-sla' ],
 		'due_soon'               => [ 'label' => __( 'Due Soon', 'drywall-toolbox' ),            'hint' => __( 'Approaching response target', 'drywall-toolbox' ),      'group' => __( 'Work Queue', 'drywall-toolbox' ),  'status' => '' ],
@@ -25,7 +26,6 @@ function dtb_support_workbench_queue_items(): array {
 		'snoozed'                => [ 'label' => __( 'Snoozed', 'drywall-toolbox' ),             'hint' => __( 'Temporarily paused tickets', 'drywall-toolbox' ),      'group' => __( 'Workflow', 'drywall-toolbox' ),    'status' => 'open' ],
 		'resolved_pending_close' => [ 'label' => __( 'Resolved', 'drywall-toolbox' ),            'hint' => __( 'Completed pending closeout', 'drywall-toolbox' ),      'group' => __( 'Closed Loop', 'drywall-toolbox' ), 'status' => 'resolved' ],
 		'closed'                 => [ 'label' => __( 'Closed', 'drywall-toolbox' ),              'hint' => __( 'Archived and closed tickets', 'drywall-toolbox' ),     'group' => __( 'Closed Loop', 'drywall-toolbox' ), 'status' => 'closed' ],
-		'all_active'             => [ 'label' => __( 'All Active', 'drywall-toolbox' ),          'hint' => __( 'Full open workload', 'drywall-toolbox' ),              'group' => __( 'Closed Loop', 'drywall-toolbox' ), 'status' => 'open' ],
 	];
 }
 

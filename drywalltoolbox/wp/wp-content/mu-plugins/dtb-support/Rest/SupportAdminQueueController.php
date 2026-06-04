@@ -78,6 +78,10 @@ function dtb_support_admin_query_tickets( string $status, string $search, int $p
 		return dtb_support_query_queue( 'overdue', $query_args );
 	}
 
+	if ( '' === $status || 'open' === $status ) {
+		return dtb_support_query_queue( 'all_active', $query_args );
+	}
+
 	$query_args['status'] = '' !== $status ? $status : 'all';
 
 	return dtb_support_query_tickets( $query_args );

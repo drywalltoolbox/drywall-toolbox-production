@@ -239,7 +239,7 @@ function dtb_support_query_queue( string $queue, array $args = [] ): array {
 		'waiting_on_customer'    => "status = 'pending_customer' AND {$active}",
 		'snoozed'                => "snooze_until IS NOT NULL AND snooze_until > UTC_TIMESTAMP() AND {$closed}",
 		'resolved_pending_close' => "status = 'resolved'",
-		'all_active'             => "{$closed} AND {$active}",
+		'all_active'             => $closed,
 	];
 	$where  = [ $map[ $queue ] ?? $map['needs_reply'] ];
 	$params = [];
@@ -288,7 +288,7 @@ function dtb_support_get_queue_counts(): array {
 		SUM(CASE WHEN status = 'pending_customer' AND (snooze_until IS NULL OR snooze_until <= UTC_TIMESTAMP()) THEN 1 ELSE 0 END) AS waiting_on_customer,
 		SUM(CASE WHEN snooze_until IS NOT NULL AND snooze_until > UTC_TIMESTAMP() AND status NOT IN ('resolved','closed','spam') THEN 1 ELSE 0 END) AS snoozed,
 		SUM(CASE WHEN status = 'resolved' THEN 1 ELSE 0 END) AS resolved_pending_close,
-		SUM(CASE WHEN status NOT IN ('resolved','closed','spam') AND (snooze_until IS NULL OR snooze_until <= UTC_TIMESTAMP()) THEN 1 ELSE 0 END) AS all_active
+		SUM(CASE WHEN status NOT IN ('resolved','closed','spam') THEN 1 ELSE 0 END) AS all_active
 	FROM {$table}" , ARRAY_A );
 	$counts = [];
 	foreach ( [ 'needs_reply', 'due_soon', 'overdue', 'urgent', 'in_progress', 'waiting_on_customer', 'snoozed', 'resolved_pending_close', 'all_active' ] as $key ) {

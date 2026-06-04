@@ -40,7 +40,10 @@ function dtb_command_center_orders_summary(): array {
 	}
 
 	$totals = [
+		'active'                   => 0,
 		'needs_attention'         => 0,
+		'on_hold'                  => 0,
+		'pending'                  => 0,
 		'payment_issues'          => 0,
 		'fulfillment_exceptions'  => 0,
 		'pending_payment'         => 0,
@@ -49,10 +52,13 @@ function dtb_command_center_orders_summary(): array {
 	];
 
 	if ( function_exists( 'wc_get_orders' ) ) {
-		$totals['needs_attention'] = dtb_command_center_wc_order_count( [ 'status' => 'on-hold' ] );
+		$totals['on_hold']         = dtb_command_center_wc_order_count( [ 'status' => 'on-hold' ] );
+		$totals['needs_attention'] = $totals['on_hold'];
 		$totals['payment_issues']  = dtb_command_center_wc_order_count( [ 'status' => 'failed' ] );
 		$totals['processing']      = dtb_command_center_wc_order_count( [ 'status' => 'processing' ] );
 		$totals['pending_payment'] = dtb_command_center_wc_order_count( [ 'status' => 'pending' ] );
+		$totals['pending']         = $totals['pending_payment'] + $totals['on_hold'];
+		$totals['active']          = $totals['pending'] + $totals['processing'];
 		$totals['total_today']     = dtb_command_center_wc_order_count( [
 			'date_created' => '>' . ( time() - DAY_IN_SECONDS ),
 		] );

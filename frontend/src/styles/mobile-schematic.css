@@ -52,7 +52,7 @@
   margin-bottom: 10px;
   background: #f8fafc;
   /* Fade in once the browser has loaded the image src */
-  animation: hotspotImgFadeIn 220ms ease-out both;
+  animation: hotspotImgFadeIn 260ms cubic-bezier(.2, .8, .2, 1) both;
 }
 
 /* Clickable wrapper button for the hotspot modal image */
@@ -103,8 +103,8 @@
 }
 
 @keyframes hotspotImgFadeIn {
-  from { opacity: 0; }
-  to   { opacity: 1; }
+  from { opacity: 0; transform: scale(.985); filter: blur(2px); }
+  to   { opacity: 1; transform: scale(1); filter: blur(0); }
 }
 
 /* Thumbnail image inside the mobile overlay horizontal row */
@@ -156,19 +156,47 @@
 
 /* Loading skeleton displayed while hotspotProduct is still fetching */
 .hotspot-modal-image-skeleton {
-  display: block;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   width: 100%;
   height: clamp(80px, 22vw, 140px);
   border-radius: 10px;
   margin-bottom: 14px;
-  background: linear-gradient(
-    90deg,
-    #f1f5f9 25%,
-    #e2e8f0 50%,
-    #f1f5f9 75%
-  );
-  background-size: 200% 100%;
-  animation: skeletonShimmer 1.4s ease-in-out infinite;
+  position: relative;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 50% 48%, rgba(37, 99, 235, .16), transparent 34%),
+    linear-gradient(135deg, #f8fbff 0%, #e8eef8 100%);
+  box-shadow: inset 0 0 0 1px rgba(37, 99, 235, .08);
+}
+
+.hotspot-modal-image-skeleton::before {
+  content: "";
+  position: absolute;
+  inset: -35%;
+  background: conic-gradient(from 90deg, transparent 0deg, rgba(255,255,255,.72) 62deg, transparent 126deg);
+  animation: hotspotSkeletonSweep 1.8s cubic-bezier(.45, 0, .2, 1) infinite;
+}
+
+.hotspot-modal-image-skeleton::after {
+  content: "";
+  position: absolute;
+  inset: 12px;
+  border-radius: 9px;
+  background: linear-gradient(135deg, rgba(255,255,255,.56), rgba(255,255,255,.16));
+  opacity: .66;
+}
+
+.hotspot-modal-loader-ring {
+  position: relative;
+  z-index: 1;
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  border: 2px solid rgba(37, 99, 235, .18);
+  border-top-color: rgba(37, 99, 235, .72);
+  animation: hotspotLoaderSpin .9s linear infinite;
 }
 
 /* Compact skeleton for the fixed-width desktop detached modal */
@@ -224,6 +252,38 @@
   100% { background-position: -200% 0; }
 }
 
+@keyframes hotspotCardIn {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 12px, 0) scale(.975);
+    filter: blur(2px);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+    filter: blur(0);
+  }
+}
+
+@keyframes hotspotSkeletonSweep {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes hotspotLoaderSpin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes hotspotLoadingDot {
+  0%, 72%, 100% {
+    opacity: .34;
+    transform: translateY(0) scale(.88);
+  }
+  32% {
+    opacity: 1;
+    transform: translateY(-2px) scale(1);
+  }
+}
+
 /* =============================================
    SCHEMATIC HOTSPOT CARD — UNIFIED HORIZONTAL DESIGN
    Clean, sleek card for schematic diagram hotspot popups.
@@ -244,11 +304,21 @@
   border: 1px solid rgba(15, 23, 42, 0.08);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   overflow: hidden;
-  transition: box-shadow 0.2s ease;
+  transform-origin: center bottom;
+  animation: hotspotCardIn 280ms cubic-bezier(.2, .8, .2, 1) both;
+  transition:
+    box-shadow 180ms ease,
+    transform 180ms ease,
+    border-color 180ms ease;
 }
 
 .schematic-hotspot-card:hover {
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
+}
+
+.schematic-hotspot-card--resolving {
+  border-color: rgba(37, 99, 235, .2);
+  box-shadow: 0 16px 40px rgba(15, 23, 42, .18);
 }
 
 /* Left column — thumbnail fills full height, flush to card edge */
@@ -388,6 +458,25 @@
   margin-top: 0;
 }
 
+.schematic-hotspot-card__loading-line {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 16px;
+  margin: 2px 0 8px;
+}
+
+.schematic-hotspot-card__loading-line span {
+  width: 4px;
+  height: 4px;
+  border-radius: 999px;
+  background: #60a5fa;
+  animation: hotspotLoadingDot 1.2s ease-in-out infinite;
+}
+
+.schematic-hotspot-card__loading-line span:nth-child(2) { animation-delay: .14s; }
+.schematic-hotspot-card__loading-line span:nth-child(3) { animation-delay: .28s; }
+
 .schematic-hotspot-card__price-group {
   display: inline-flex;
   align-items: baseline;
@@ -447,9 +536,10 @@
 }
 
 .schematic-hotspot-card__cta:disabled {
-  background: #cbd5e1;
+  background: linear-gradient(135deg, #dbe7f6, #aebed0);
   cursor: not-allowed;
-  opacity: 0.7;
+  opacity: .92;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.28);
 }
 
 /* Dark mode support */
@@ -466,6 +556,26 @@
 
   .schematic-hotspot-card__image {
     background: linear-gradient(135deg, #334155 0%, #1e293b 100%);
+  }
+
+  .hotspot-modal-image-skeleton {
+    background:
+      radial-gradient(circle at 50% 48%, rgba(96, 165, 250, .24), transparent 36%),
+      linear-gradient(135deg, #334155 0%, #1e293b 100%);
+    box-shadow: inset 0 0 0 1px rgba(148, 163, 184, .14);
+  }
+
+  .hotspot-modal-image-skeleton::before {
+    background: conic-gradient(from 90deg, transparent 0deg, rgba(148, 163, 184, .28) 62deg, transparent 126deg);
+  }
+
+  .hotspot-modal-image-skeleton::after {
+    background: linear-gradient(135deg, rgba(255,255,255,.08), rgba(255,255,255,.02));
+  }
+
+  .hotspot-modal-loader-ring {
+    border-color: rgba(96, 165, 250, .2);
+    border-top-color: rgba(96, 165, 250, .86);
   }
 
   .schematic-hotspot-card__title {
@@ -530,6 +640,17 @@
     right: 6px;
     width: 26px;
     height: 26px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .schematic-hotspot-card,
+  .hotspot-modal-image,
+  .hotspot-modal-image-skeleton::before,
+  .hotspot-modal-loader-ring,
+  .schematic-hotspot-card__loading-line span {
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
   }
 }
 
