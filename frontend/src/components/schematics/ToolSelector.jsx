@@ -1,6 +1,58 @@
+import { useState } from 'react';
 import { ChevronRight } from 'lucide-react';
 import '../../styles/tool-selector.css';
 import BackButton from '../shared/BackButton';
+
+function uniqueImageCandidates(candidates) {
+  return candidates.filter(Boolean).filter((value, index, arr) => arr.indexOf(value) === index);
+}
+
+function getFirstImagePage(tool) {
+  if (!tool?.imagePages || Object.keys(tool.imagePages).length === 0) return '';
+  const firstPageKey = Object.keys(tool.imagePages).sort((a, b) => Number(a) - Number(b))[0];
+  return tool.imagePages[firstPageKey] || '';
+}
+
+function getToolImageCandidates(tool) {
+  return uniqueImageCandidates([
+    tool?.previewImage,
+    getFirstImagePage(tool),
+  ]);
+}
+
+function SchematicPreviewImage({ tool, alt, className, fallback }) {
+  const candidates = getToolImageCandidates(tool);
+  const [candidateIndex, setCandidateIndex] = useState(0);
+  const src = candidates[candidateIndex];
+
+  if (!src) return fallback || null;
+
+  return (
+    <img
+      src={src}
+      alt={alt}
+      className={className}
+      loading="lazy"
+      decoding="async"
+      onError={() => {
+        setCandidateIndex((current) => {
+          const next = current + 1;
+          return next < candidates.length ? next : current;
+        });
+      }}
+    />
+  );
+}
+
+function PlaceholderIcon() {
+  return (
+    <svg className="placeholder-icon" width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="3" y="3" width="18" height="18" rx="2" />
+      <circle cx="8.5" cy="8.5" r="1.5" />
+      <path d="M21 15l-5-5L5 21" />
+    </svg>
+  );
+}
 
 export default function ToolSelector({ brand, brandLogo, tools, onSelectTool, onBack, selectedCategory, onSelectCategory }) {
 
@@ -49,21 +101,24 @@ export default function ToolSelector({ brand, brandLogo, tools, onSelectTool, on
         <div className="categories-grid">
           {categories.map((category, index) => {
             const firstTool = groupedTools[category][0];
-            const categoryImage = firstTool?.previewImage ||
-              (firstTool?.imagePages && firstTool.imagePages[Object.keys(firstTool.imagePages)[0]]);
+            const hasCategoryImage = getToolImageCandidates(firstTool).length > 0;
             const count = groupedTools[category].length;
             return (
             <button
               key={category}
-              className={`category-card${categoryImage ? '' : ' category-card--no-image'}`}
+              className={`category-card${hasCategoryImage ? '' : ' category-card--no-image'}`}
               style={{ animationDelay: `${(index + 1) * 0.07}s` }}
               onClick={() => {
                 onSelectCategory(category);
                 setTimeout(() => window.scrollTo({ top: 0, behavior: 'smooth' }), 0);
               }}
             >
-              {categoryImage && (
-                <img src={categoryImage} alt={category} className="category-card-img" />
+              {hasCategoryImage && (
+                <SchematicPreviewImage
+                  tool={firstTool}
+                  alt={category}
+                  className="category-card-img"
+                />
               )}
               <div className="category-card-scrim" />
               <div className="category-card-content">
@@ -89,17 +144,11 @@ export default function ToolSelector({ brand, brandLogo, tools, onSelectTool, on
             >
               {/* Image Background */}
               <div className="tool-card-image-bg">
-                {tool.previewImage ? (
-                  <img src={tool.previewImage} alt={tool.title} />
-                ) : tool.imagePages && Object.keys(tool.imagePages).length > 0 ? (
-                  <img src={tool.imagePages[Object.keys(tool.imagePages)[0]]} alt={tool.title} />
-                ) : (
-                  <svg className="placeholder-icon" width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                    <rect x="3" y="3" width="18" height="18" rx="2" />
-                    <circle cx="8.5" cy="8.5" r="1.5" />
-                    <path d="M21 15l-5-5L5 21" />
-                  </svg>
-                )}
+                <SchematicPreviewImage
+                  tool={tool}
+                  alt={tool.title}
+                  fallback={<PlaceholderIcon />}
+                />
               </div>
               {/* Title Overlay */}
               <div className="tool-card-overlay">
@@ -122,17 +171,11 @@ export default function ToolSelector({ brand, brandLogo, tools, onSelectTool, on
             >
               {/* Image Background */}
               <div className="tool-card-image-bg">
-                {tool.previewImage ? (
-                  <img src={tool.previewImage} alt={tool.title} />
-                ) : tool.imagePages && Object.keys(tool.imagePages).length > 0 ? (
-                  <img src={tool.imagePages[Object.keys(tool.imagePages)[0]]} alt={tool.title} />
-                ) : (
-                  <svg className="placeholder-icon" width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                    <rect x="3" y="3" width="18" height="18" rx="2" />
-                    <circle cx="8.5" cy="8.5" r="1.5" />
-                    <path d="M21 15l-5-5L5 21" />
-                  </svg>
-                )}
+                <SchematicPreviewImage
+                  tool={tool}
+                  alt={tool.title}
+                  fallback={<PlaceholderIcon />}
+                />
               </div>
               {/* Title Overlay */}
               <div className="tool-card-overlay">
