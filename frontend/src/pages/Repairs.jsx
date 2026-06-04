@@ -452,7 +452,7 @@ export default function Repairs() {
         color: 'white',
       }}>
         <div style={{ maxWidth: '1180px', margin: '0 auto' }}>
-          <div style={{ maxWidth: '760px' }}>
+          <div style={{ maxWidth: '1120px' }}>
             <p style={{
               margin: '0 0 14px',
               color: 'rgba(219,234,254,0.86)',
@@ -477,7 +477,7 @@ export default function Repairs() {
               color: 'rgba(255,255,255,0.78)',
               fontSize: 'clamp(1rem, 2vw, 1.18rem)',
               lineHeight: 1.65,
-              maxWidth: '650px',
+              maxWidth: '820px',
             }}>
               Submit a repair request, receive a professional evaluation, approve recommended work,
               and track progress every step of the way.

@@ -24,6 +24,7 @@ function dtb_orders_admin_register_routes(): void {
 		'args'                => [
 			'status' => [ 'sanitize_callback' => 'sanitize_key' ],
 			'tab'    => [ 'sanitize_callback' => 'sanitize_key' ],
+			'order_type' => [ 'sanitize_callback' => 'sanitize_key' ],
 			's'      => [ 'sanitize_callback' => 'sanitize_text_field' ],
 			'paged'  => [ 'sanitize_callback' => 'absint' ],
 		],
@@ -40,6 +41,9 @@ function dtb_orders_admin_queue_handler( WP_REST_Request $request ): WP_REST_Res
 		$status = $tab;
 	}
 	$status = function_exists( 'dtb_orders_admin_normalize_filter' ) ? dtb_orders_admin_normalize_filter( $status ) : $status;
+	$order_type = function_exists( 'dtb_order_type_normalize' )
+		? dtb_order_type_normalize( sanitize_key( $request->get_param( 'order_type' ) ?? '' ) )
+		: '';
 	$search = sanitize_text_field( $request->get_param( 's' ) ?? '' );
 	if ( '' === $search ) {
 		$search = sanitize_text_field( $request->get_param( 'search' ) ?? '' );
@@ -47,8 +51,8 @@ function dtb_orders_admin_queue_handler( WP_REST_Request $request ): WP_REST_Res
 	$paged  = max( 1, (int) ( $request->get_param( 'paged' ) ?: 1 ) );
 	$per    = (int) get_option( 'dtb_admin_items_per_page', 25 );
 
-	$query_args  = dtb_orders_admin_build_query_args( $status, $search, $paged, $per );
-	$total_count = dtb_orders_admin_count( $status, $search );
+	$query_args  = dtb_orders_admin_build_query_args( $status, $search, $paged, $per, $order_type );
+	$total_count = dtb_orders_admin_count( $status, $search, $order_type );
 	$total_pages = $per > 0 ? (int) ceil( $total_count / $per ) : 1;
 	$orders      = wc_get_orders( $query_args );
 
@@ -64,6 +68,7 @@ function dtb_orders_admin_queue_handler( WP_REST_Request $request ): WP_REST_Res
 		echo dtb_admin_ui_table_open( [ // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 			[ 'label' => __( 'Order',    'drywall-toolbox' ), 'key' => 'id' ],
 			[ 'label' => __( 'Date',     'drywall-toolbox' ), 'key' => 'date' ],
+			[ 'label' => __( 'Type',     'drywall-toolbox' ), 'key' => 'type' ],
 			[ 'label' => __( 'Customer', 'drywall-toolbox' ), 'key' => 'customer' ],
 			[ 'label' => __( 'Status',   'drywall-toolbox' ), 'key' => 'status' ],
 			[ 'label' => __( 'Total',    'drywall-toolbox' ), 'key' => 'total' ],
@@ -76,12 +81,16 @@ function dtb_orders_admin_queue_handler( WP_REST_Request $request ): WP_REST_Res
 			$raw_status   = $order->get_status();
 			$badge_type   = dtb_admin_ui_status_badge_type( $raw_status );
 			$status_label = wc_get_order_status_name( $raw_status );
+			$type         = function_exists( 'dtb_order_type_from_order' ) ? dtb_order_type_from_order( $order ) : 'product';
+			$type_label   = function_exists( 'dtb_order_type_label' ) ? dtb_order_type_label( $type ) : ucfirst( $type );
+			$type_badge   = function_exists( 'dtb_order_type_badge_type' ) ? dtb_order_type_badge_type( $type ) : 'info';
 
 			echo '<tr class="dtb-table__row dtb-table__row--clickable"'
 				. ' data-dtb-drawer="dtb-orders-detail-drawer"'
 				. ' data-dtb-open-order="' . esc_attr( (string) $order_id ) . '"'
 				. ' data-dtb-drawer-title="' . esc_attr( sprintf( __( 'Order #%s', 'drywall-toolbox' ), $order_id ) ) . '"'
 				. ' data-dtb-field-orderid="' . esc_attr( '#' . $order_id ) . '"'
+				. ' data-dtb-field-type="' . esc_attr( $type_label ) . '"'
 				. ' data-dtb-field-customer="' . esc_attr( $order->get_formatted_billing_full_name() ?: __( 'Guest', 'drywall-toolbox' ) ) . '"'
 				. ' data-dtb-field-status="' . esc_attr( $status_label ) . '"'
 				. ' data-dtb-field-total="' . esc_attr( wp_strip_all_tags( $order->get_formatted_order_total() ) ) . '"'
@@ -89,6 +98,7 @@ function dtb_orders_admin_queue_handler( WP_REST_Request $request ): WP_REST_Res
 				. ' data-dtb-field-viewurl="' . esc_attr( get_edit_post_link( $order_id ) ) . '">';
 			echo '<td class="dtb-table__cell"><a href="' . esc_url( get_edit_post_link( $order_id ) ) . '">#' . esc_html( $order_id ) . '</a></td>';
 			echo '<td class="dtb-table__cell">' . esc_html( $order->get_date_created() ? $order->get_date_created()->date_i18n( get_option( 'date_format' ) ) : '—' ) . '</td>';
+			echo '<td class="dtb-table__cell">' . dtb_admin_ui_badge( esc_html( $type_label ), $type_badge ) . '</td>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 			echo '<td class="dtb-table__cell">' . esc_html( $order->get_formatted_billing_full_name() ?: __( 'Guest', 'drywall-toolbox' ) ) . '</td>';
 			echo '<td class="dtb-table__cell">' . dtb_admin_ui_badge( esc_html( $status_label ), $badge_type ) . '</td>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 			echo '<td class="dtb-table__cell">' . wp_kses_post( $order->get_formatted_order_total() ) . '</td>';
@@ -105,8 +115,8 @@ function dtb_orders_admin_queue_handler( WP_REST_Request $request ): WP_REST_Res
 	$html = ob_get_clean();
 
 	// Build lightweight summary counts for KPI sync.
-	$summary_attention  = dtb_orders_admin_count( 'attention' );
-	$summary_processing = dtb_orders_admin_count( 'processing' );
+	$summary_attention  = dtb_orders_admin_count( 'attention', '', $order_type );
+	$summary_processing = dtb_orders_admin_count( 'processing', '', $order_type );
 
 	return new WP_REST_Response( [
 		'ok'      => true,
@@ -114,6 +124,7 @@ function dtb_orders_admin_queue_handler( WP_REST_Request $request ): WP_REST_Res
 		'state'   => [
 			'tab'    => $status ?: 'all',
 			'status' => $status,
+			'order_type' => $order_type,
 			'search' => $search,
 			'paged'  => $paged,
 		],
@@ -124,7 +135,7 @@ function dtb_orders_admin_queue_handler( WP_REST_Request $request ): WP_REST_Res
 		],
 		'meta'    => [
 			'updated_at'     => gmdate( 'c' ),
-			'poll_after_ms'  => 30000,
+			'poll_after_ms'  => 180000,
 		],
 	], 200 );
 }

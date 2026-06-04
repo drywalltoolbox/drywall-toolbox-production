@@ -12,6 +12,7 @@ defined( 'ABSPATH' ) || exit;
 
 require_once __DIR__ . '/Cart/ToolsetCartItemData.php';
 require_once __DIR__ . '/Orders/ToolsetOrderLineMeta.php';
+require_once __DIR__ . '/Services/OrderTypeService.php';
 require_once __DIR__ . '/Services/OrderAdminQueryService.php';
 
 if ( is_admin() ) {

@@ -9,6 +9,13 @@
 	gap: 1rem;
 }
 
+.dtb-orders-type-filter {
+	align-items: center;
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+}
+
 .dtb-orders-overview-grid {
 	display: grid;
 	gap: 1rem;

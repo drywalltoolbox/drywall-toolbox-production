@@ -71,7 +71,7 @@ function dtb_orders_admin_statuses_for_filter( string $filter ): array {
  * @param int    $limit  Page size.
  * @return array<string,mixed>
  */
-function dtb_orders_admin_build_query_args( string $filter, string $search = '', int $paged = 1, int $limit = 25 ): array {
+function dtb_orders_admin_build_query_args( string $filter, string $search = '', int $paged = 1, int $limit = 25, string $order_type = '' ): array {
 	$args = [
 		'limit'  => max( 1, $limit ),
 		'paged'  => max( 1, $paged ),
@@ -85,6 +85,12 @@ function dtb_orders_admin_build_query_args( string $filter, string $search = '',
 	if ( '' !== $search ) {
 		$args['s'] = $search;
 	}
+	if ( function_exists( 'dtb_order_type_meta_query' ) ) {
+		$type_query = dtb_order_type_meta_query( $order_type );
+		if ( $type_query ) {
+			$args['meta_query'] = $type_query;
+		}
+	}
 
 	return $args;
 }
@@ -96,7 +102,7 @@ function dtb_orders_admin_build_query_args( string $filter, string $search = '',
  * @param string $search Search string.
  * @return int
  */
-function dtb_orders_admin_count( string $filter = '', string $search = '' ): int {
+function dtb_orders_admin_count( string $filter = '', string $search = '', string $order_type = '' ): int {
 	$args     = [];
 	$statuses = dtb_orders_admin_statuses_for_filter( $filter );
 	if ( $statuses ) {
@@ -104,6 +110,12 @@ function dtb_orders_admin_count( string $filter = '', string $search = '' ): int
 	}
 	if ( '' !== $search ) {
 		$args['s'] = $search;
+	}
+	if ( function_exists( 'dtb_order_type_meta_query' ) ) {
+		$type_query = dtb_order_type_meta_query( $order_type );
+		if ( $type_query ) {
+			$args['meta_query'] = $type_query;
+		}
 	}
 
 	return function_exists( 'dtb_admin_wc_order_count' ) ? dtb_admin_wc_order_count( $args ) : 0;

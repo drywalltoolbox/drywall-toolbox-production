@@ -601,7 +601,7 @@ if ( $shipping_rate_price > 0 ) {
 }
 
 $order->update_meta_data( '_dtb_is_repair_order', '1' );
-$order->update_meta_data( '_dtb_order_type', 'repair_service' );
+$order->update_meta_data( '_dtb_order_type', 'repair' );
 $order->update_meta_data( '_dtb_repair_id', $repair_id );
 $order->update_meta_data( '_dtb_repair_tool_brand', $brand );
 $order->update_meta_data( '_dtb_repair_tool_category', $tool_category );

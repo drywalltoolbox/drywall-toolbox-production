@@ -294,9 +294,7 @@
 		panelContainer.innerHTML = '';
 
 		renderOverview( d );
-		renderIntake( d );
 		renderQuote( d );
-		renderParts( d );
 		renderTechnician( d );
 		renderConversation( d );
 		renderTimeline( d );
@@ -342,7 +340,22 @@
 		}
 
 		html += '<section class="dtb-repair-modal-card">';
-		html += '<header><h3>Repair Order Details</h3></header>';
+		html += '<header><h3>Customer Submitted Repair Request</h3></header>';
+		html += '<div class="dtb-repair-modal-card__body">';
+		html += detailRows( [
+			[ 'Submitted', r.submitted_at || r.created_at ],
+			[ 'Source', r.source ],
+			[ 'Status', statusLabel( r.status ) ],
+			[ 'Priority', r.priority ],
+			[ 'Service Tier', r.service_tier ],
+			[ 'Package ID', r.package_id ],
+			[ 'Woo Order ID', r.wc_order_id ],
+		] );
+		html += '<div class="dtb-repair-modal-issue"><span>Customer Issue</span><p>' + WB.escapeHtml( r.issue_description || '—' ) + '</p></div>';
+		html += '</div></section>';
+
+		html += '<section class="dtb-repair-modal-card">';
+		html += '<header><h3>Tool / Repair Details</h3></header>';
 		html += '<div class="dtb-repair-modal-card__body">';
 		html += detailRows( [
 			[ 'Brand', r.tool_brand ],
@@ -350,15 +363,21 @@
 			[ 'Category', r.tool_category ],
 			[ 'Serial Number', r.serial_number ],
 			[ 'Tool Age', r.tool_age ],
-			[ 'Service Tier', r.service_tier ],
-			[ 'Woo Order ID', r.wc_order_id ],
-			[ 'Priority', r.priority ],
-			[ 'Approval Mode', r.approval_mode ],
-			[ 'Preapproval Limit', r.preapproval_limit ? WB.formatMoney( r.preapproval_limit ) : '' ],
 			[ 'Issue Started', r.issue_start ],
 			[ 'Contact Preference', r.contact_preference ],
 		] );
-		html += '<div class="dtb-repair-modal-issue"><span>Customer Issue</span><p>' + WB.escapeHtml( r.issue_description || '—' ) + '</p></div>';
+		html += '</div></section>';
+
+		html += '<section class="dtb-repair-modal-card">';
+		html += '<header><h3>Approval / Warranty Rules</h3></header>';
+		html += '<div class="dtb-repair-modal-card__body">';
+		html += detailRows( [
+			[ 'Approval Mode', r.approval_mode ],
+			[ 'Preapproval Limit', r.preapproval_limit ? WB.formatMoney( r.preapproval_limit ) : '' ],
+			[ 'Warranty Requested', r.warranty_requested ],
+			[ 'Purchase Date', r.purchase_date ],
+			[ 'Old Parts Return', r.old_parts_return ],
+		] );
 		html += '</div></section>';
 
 		html += '<aside class="dtb-repair-modal-side-stack">';
@@ -380,6 +399,8 @@
 		html += detailRows( [
 			[ 'Inbound Method', sh.inbound_method ],
 			[ 'Return Preference', sh.return_preference ],
+			[ 'Return Address', formatAddress( sh.return_address ) ],
+			[ 'Shipping Rate ID', sh.rate_id ],
 			[ 'Rate Name', sh.rate_name ],
 			[ 'Rate Price', sh.rate_price ? WB.formatMoney( sh.rate_price ) : '' ],
 			[ 'Tracking Number', sh.tracking_number ],
@@ -391,6 +412,11 @@
 		html += '</div>';
 
 		panel.innerHTML = html;
+	}
+
+	function formatAddress( address ) {
+		address = address || {};
+		return [ address.line1, address.city, address.state, address.postcode, address.country ].filter( Boolean ).join( ', ' );
 	}
 
 	function detailRows( rows ) {
@@ -412,8 +438,13 @@
 		}
 		return '<div class="dtb-repair-modal-media-grid">' + media.map( function ( item ) {
 			var label = item.filename || item.title || ( 'Attachment #' + item.id );
+			var mime = String( item.mime_type || '' );
+			var src = item.thumbnail || item.url || '';
+			var isImage = mime.indexOf( 'image/' ) === 0 || /\.(png|jpe?g|gif|webp|avif|bmp|svg)$/i.test( src );
 			return '<a href="' + WB.escapeHtml( item.full || item.url || '#' ) + '" target="_blank" rel="noopener">' +
-				'<img src="' + WB.escapeHtml( item.thumbnail || item.url || '' ) + '" alt="' + WB.escapeHtml( item.alt || label ) + '">' +
+				( isImage
+					? '<img src="' + WB.escapeHtml( src ) + '" alt="' + WB.escapeHtml( item.alt || label ) + '">'
+					: '<span class="dtb-repair-modal-file-thumb" aria-hidden="true">FILE</span>' ) +
 				'<span>' + WB.escapeHtml( label ) + '</span>' +
 			'</a>';
 		} ).join( '' ) + '</div>';

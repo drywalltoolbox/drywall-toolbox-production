@@ -891,6 +891,7 @@ function dtb_checkout_woo_native_finalize( array $context, WP_REST_Request $requ
 	$order->update_meta_data( '_dtb_checkout_contract_version', '1' );
 	$order->update_meta_data( '_dtb_checkout_session_id', $sid );
 	$order->update_meta_data( '_dtb_checkout_idempotency_key', $idempotency_key );
+	$order->update_meta_data( '_dtb_order_type', 'product' );
 	$order->calculate_totals( true );
 	$order->save();
 	set_transient( 'dtb_checkout_idem_' . md5( $idempotency_key ), (int) $order->get_id(), DAY_IN_SECONDS );

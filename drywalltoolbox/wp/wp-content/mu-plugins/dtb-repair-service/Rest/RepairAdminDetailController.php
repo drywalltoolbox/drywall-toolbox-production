@@ -195,6 +195,7 @@ function dtb_repair_admin_detail_handler( WP_REST_Request $request ): WP_REST_Re
 		'rate_price'      => (float) get_post_meta( $repair_id, '_repair_shipping_rate_price', true ),
 		'inbound_method'  => (string) get_post_meta( $repair_id, '_repair_inbound_shipping_method', true ),
 		'return_preference' => (string) get_post_meta( $repair_id, '_repair_return_shipping_preference', true ),
+		'rate_id'           => (string) get_post_meta( $repair_id, '_repair_shipping_rate_id', true ),
 		'tracking_number' => $tracking_number,
 		'veeqo_order_id'  => (string) get_post_meta( $repair_id, '_repair_veeqo_order_id', true ),
 	];
@@ -272,6 +273,9 @@ function dtb_repair_admin_detail_handler( WP_REST_Request $request ): WP_REST_Re
 			'is_terminal'        => $is_terminal,
 			'created_at'         => get_the_date( 'c', $post ),
 			'updated_at'         => get_the_modified_date( 'c', $post ),
+			'submitted_at'       => (string) get_post_meta( $repair_id, '_repair_submitted_at', true ),
+			'source'             => (string) get_post_meta( $repair_id, '_repair_source', true ),
+			'submission_ip'      => (string) get_post_meta( $repair_id, '_repair_submission_ip', true ),
 			'customer_name'      => (string) get_post_meta( $repair_id, '_repair_customer_name', true ),
 			'customer_email'     => $customer_email,
 			'customer_phone'     => (string) get_post_meta( $repair_id, '_repair_customer_phone', true ),

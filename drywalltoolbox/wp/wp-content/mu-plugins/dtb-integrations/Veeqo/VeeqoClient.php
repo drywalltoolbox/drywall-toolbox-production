@@ -1637,7 +1637,7 @@ function dtb_veeqo_route_repair_request( WP_REST_Request $request ): WP_REST_Res
 	$wc_order->update_meta_data( '_dtb_repair_issue_start',    $issue_start );
 	$wc_order->update_meta_data( '_dtb_repair_contact_pref',   $contact_pref );
 	$wc_order->update_meta_data( '_dtb_repair_shipping_rate',  $rate_id );
-	$wc_order->update_meta_data( '_dtb_order_type',            'repair_service' );
+	$wc_order->update_meta_data( '_dtb_order_type',            'repair' );
 
 	// Add a readable internal note.
 	$wc_order->add_order_note( sprintf(
