@@ -11,7 +11,7 @@
 
 export const BRAND_TO_SLUG = {
   TapeTech: 'tapetech',
-  'Columbia Tools': 'columbia-taping-tools',
+  'Columbia Taping Tools': 'columbia-taping-tools',
   Asgard: 'asgard',
   SurPro: 'surpro',
   Graco: 'graco',
@@ -21,27 +21,44 @@ export const BRAND_TO_SLUG = {
 };
 
 export const BRAND_ALIASES = {
-  Columbia: 'Columbia Tools',
-  COLUMBIA: 'Columbia Tools',
-  columbia: 'Columbia Tools',
-  'Columbia Taping Tools': 'Columbia Tools',
-  'columbia taping tools': 'Columbia Tools',
-  'COLUMBIA TAPING TOOLS': 'Columbia Tools',
-  'columbia-tools': 'Columbia Tools',
+  Columbia: 'Columbia Taping Tools',
+  COLUMBIA: 'Columbia Taping Tools',
+  columbia: 'Columbia Taping Tools',
+  'Columbia Tools': 'Columbia Taping Tools',
+  'columbia tools': 'Columbia Taping Tools',
+  'COLUMBIA TOOLS': 'Columbia Taping Tools',
+  'Columbia Taping Tools': 'Columbia Taping Tools',
+  'columbia taping tools': 'Columbia Taping Tools',
+  'COLUMBIA TAPING TOOLS': 'Columbia Taping Tools',
+  'columbia-tools': 'Columbia Taping Tools',
+  'columbia-taping-tools': 'Columbia Taping Tools',
   Platinum: 'Platinum Drywall Tools',
   PLATINUM: 'Platinum Drywall Tools',
   TAPETECH: 'TapeTech',
   'Tape Tech': 'TapeTech',
+  'tape tech': 'TapeTech',
   'Dura Stilts': 'Dura-Stilts',
+  'Dura-Stilt': 'Dura-Stilts',
+  'Dura Stilt': 'Dura-Stilts',
   'DURA-STILTS': 'Dura-Stilts',
   SURPRO: 'SurPro',
   'Sur-Pro': 'SurPro',
   'SUR PRO': 'SurPro',
+  'Sur Pro': 'SurPro',
   GRACO: 'Graco',
   ASGARD: 'Asgard',
   Level5: 'Level 5',
+  level5: 'Level 5',
+  'Level 5': 'Level 5',
   'LEVEL 5': 'Level 5',
+  'level 5': 'Level 5',
+  'Level-5': 'Level 5',
+  'level-5': 'Level 5',
 };
+
+const NORMALIZED_BRAND_ALIASES = Object.fromEntries(
+  Object.entries(BRAND_ALIASES).map(([alias, label]) => [normalizeBrandKey(alias), label])
+);
 
 export const SLUG_TO_BRAND = Object.fromEntries(
   Object.entries(BRAND_TO_SLUG).map(([name, slug]) => [slug, name])
@@ -177,6 +194,15 @@ export function buildCatalogUrl(query, pathParams = {}) {
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
+function normalizeBrandKey(value) {
+  return String(value || '')
+    .trim()
+    .toLowerCase()
+    .replace(/&/g, 'and')
+    .replace(/[^a-z0-9]+/g, '')
+    .trim();
+}
+
 export function canonicalBrandLabel(value) {
   if (!value) return '';
   const decoded = decodeURIComponent(String(value).trim());
@@ -184,6 +210,9 @@ export function canonicalBrandLabel(value) {
   if (BRAND_ALIASES[decoded]) return BRAND_ALIASES[decoded];
   if (BRAND_TO_SLUG[decoded]) return decoded;
   if (SLUG_TO_BRAND[decoded]) return SLUG_TO_BRAND[decoded];
+
+  const normalized = normalizeBrandKey(decoded);
+  if (NORMALIZED_BRAND_ALIASES[normalized]) return NORMALIZED_BRAND_ALIASES[normalized];
 
   const lower = decoded.toLowerCase();
   for (const [alias, label] of Object.entries(BRAND_ALIASES)) {
