@@ -169,6 +169,7 @@ function dtb_ajax_schematics_smart_link_products() {
 			'id'       => $pid,
 			'sku'      => (string) $product->get_sku(),
 			'name'     => (string) $product->get_name(),
+			'name_text'=> dtb_schematics_smart_normalize_text( (string) $product->get_name() ),
 			'brand'    => dtb_schematics_smart_normalize_brand(
 				(string) get_post_meta( $pid, '_dtb_brand_label', true )
 					?: (string) get_post_meta( $pid, '_dtb_brand', true )
@@ -271,9 +272,42 @@ function dtb_schematics_smart_tokens( string $value ): array {
 	$tokens = preg_split( '/\s+/', dtb_schematics_smart_normalize_text( $value ) );
 	$tokens = array_filter(
 		array_map( 'trim', (array) $tokens ),
-		static fn( $token ) => strlen( $token ) >= 2 && ! in_array( $token, [ 'sch', 'schematic', 'page', 'tool', 'tools', 'drywall' ], true )
+		static fn( $token ) => strlen( $token ) >= 2 && ! in_array( $token, [ 'sch', 'schematic', 'page', 'webp', 'png', 'jpg', 'jpeg', 'tool', 'tools', 'drywall' ], true )
 	);
 	return array_values( array_unique( $tokens ) );
+}
+
+function dtb_schematics_smart_extract_image_text( string $notes ): string {
+	if ( ! preg_match( '/(?:^|[;\s])images=([^;]+)/i', $notes, $match ) ) {
+		return '';
+	}
+
+	$chunks = preg_split( '/[|,\s]+/', (string) $match[1] );
+	$phrases = [];
+	foreach ( (array) $chunks as $chunk ) {
+		$base = pathinfo( basename( trim( $chunk ) ), PATHINFO_FILENAME );
+		if ( '' === $base ) {
+			continue;
+		}
+		$text = dtb_schematics_smart_normalize_text( $base );
+		$text = preg_replace( '/\b(?:sch|schematic|page|webp|png|jpg|jpeg|preview|product|image|images)\b/', ' ', (string) $text );
+		$text = preg_replace( '/\b0*\d+\b/', ' ', (string) $text );
+		$text = trim( preg_replace( '/\s+/', ' ', (string) $text ) );
+		if ( '' !== $text ) {
+			$phrases[] = $text;
+		}
+	}
+
+	return trim( implode( ' ', array_unique( $phrases ) ) );
+}
+
+function dtb_schematics_smart_significant_token_count( string $value ): int {
+	$tokens = dtb_schematics_smart_tokens( $value );
+	$tokens = array_filter(
+		$tokens,
+		static fn( $token ) => ! in_array( $token, [ 'columbia', 'tapetech', 'platinum', 'asgard', 'level5', 'level', 'surpro', 'dura', 'stilts' ], true )
+	);
+	return count( $tokens );
 }
 
 function dtb_schematics_smart_score_candidates( array $schematic, array $products, int $limit ): array {
@@ -281,7 +315,8 @@ function dtb_schematics_smart_score_candidates( array $schematic, array $product
 	$model_number = dtb_schematics_smart_normalize_text( (string) ( $schematic['model_number'] ?? '' ) );
 	$model_name = dtb_schematics_smart_normalize_text( (string) ( $schematic['model_name'] ?? '' ) );
 	$schematic_id = dtb_schematics_smart_normalize_text( (string) ( $schematic['schematic_id'] ?? '' ) );
-	$tokens = dtb_schematics_smart_tokens( $model_number . ' ' . $model_name . ' ' . $schematic_id . ' ' . (string) ( $schematic['notes'] ?? '' ) );
+	$image_text = dtb_schematics_smart_extract_image_text( (string) ( $schematic['notes'] ?? '' ) );
+	$tokens = dtb_schematics_smart_tokens( $model_number . ' ' . $model_name . ' ' . $schematic_id . ' ' . $image_text );
 
 	$candidates = [];
 	foreach ( $products as $product ) {
@@ -290,6 +325,7 @@ function dtb_schematics_smart_score_candidates( array $schematic, array $product
 		}
 
 		$text = (string) $product['text'];
+		$product_name = (string) $product['name_text'];
 		$score = 0;
 		$reasons = [];
 
@@ -298,8 +334,17 @@ function dtb_schematics_smart_score_candidates( array $schematic, array $product
 			$reasons[] = 'model/SKU';
 		}
 
-		if ( '' !== $model_name && str_contains( $text, $model_name ) ) {
-			$score += 34;
+		if (
+			'' !== $image_text &&
+			'' !== $product_name &&
+			( str_contains( $image_text, $product_name ) || str_contains( $product_name, $image_text ) )
+		) {
+			$score += 70;
+			$reasons[] = 'image filename';
+		}
+
+		if ( '' !== $model_name && str_contains( $text, $model_name ) && dtb_schematics_smart_significant_token_count( $model_name ) >= 2 ) {
+			$score += 55;
 			$reasons[] = 'exact name';
 		}
 
