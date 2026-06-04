@@ -104,6 +104,242 @@ function dtb_ajax_schematics_search_products() {
 	wp_send_json_success( dtb_schematic_media_repo_search_products( $q, 20 ) );
 }
 
+// ── AJAX: Smart-link schematics to live WooCommerce tool products ───────────
+
+add_action( 'wp_ajax_dtb_schematics_smart_link_products', 'dtb_ajax_schematics_smart_link_products' );
+function dtb_ajax_schematics_smart_link_products() {
+	check_ajax_referer( 'dtb_schematics_nonce', 'nonce' );
+	if ( ! dtb_schematics_can_manage() ) {
+		wp_send_json_error( [], 403 );
+	}
+
+	$apply     = ! empty( $_POST['apply'] );
+	$threshold = max( 0, min( 100, absint( $_POST['threshold'] ?? 74 ) ) );
+	$limit     = max( 1, min( 10, absint( $_POST['limit'] ?? 3 ) ) );
+
+	$schematic_ids = get_posts(
+		[
+			'post_type'      => 'attachment',
+			'post_status'    => 'inherit',
+			'posts_per_page' => -1,
+			'fields'         => 'ids',
+			'meta_query'     => [
+				[
+					'key'     => '_dtb_schematic_id',
+					'value'   => '',
+					'compare' => '!=',
+				],
+			],
+		]
+	);
+
+	$product_ids = get_posts(
+		[
+			'post_type'      => 'product',
+			'post_status'    => 'publish',
+			'posts_per_page' => -1,
+			'fields'         => 'ids',
+			'meta_query'     => [
+				'relation' => 'OR',
+				[
+					'key'     => '_dtb_is_parts',
+					'value'   => '1',
+					'compare' => '!=',
+				],
+				[
+					'key'     => '_dtb_is_parts',
+					'compare' => 'NOT EXISTS',
+				],
+			],
+		]
+	);
+
+	$products = [];
+	foreach ( (array) $product_ids as $pid ) {
+		$pid = (int) $pid;
+		$product = function_exists( 'wc_get_product' ) ? wc_get_product( $pid ) : null;
+		if ( ! $product ) {
+			continue;
+		}
+		$kind = strtolower( trim( (string) get_post_meta( $pid, '_dtb_product_kind', true ) ) );
+		if ( in_array( $kind, [ 'part', 'variation', 'toolset', 'toolset_family', 'kit' ], true ) ) {
+			continue;
+		}
+		$products[] = [
+			'id'       => $pid,
+			'sku'      => (string) $product->get_sku(),
+			'name'     => (string) $product->get_name(),
+			'brand'    => dtb_schematics_smart_normalize_brand(
+				(string) get_post_meta( $pid, '_dtb_brand_label', true )
+					?: (string) get_post_meta( $pid, '_dtb_brand', true )
+					?: (string) get_post_meta( $pid, '_dtb_brand_key', true )
+			),
+			'category' => (string) get_post_meta( $pid, '_dtb_category_key', true ) . ' ' . (string) get_post_meta( $pid, '_dtb_display_category_key', true ),
+			'mpn'      => (string) get_post_meta( $pid, '_dtb_model_number', true ) . ' ' . (string) get_post_meta( $pid, '_dtb_schematic_model_number', true ) . ' ' . (string) get_post_meta( $pid, 'schema_mpn', true ),
+			'text'     => dtb_schematics_smart_normalize_text(
+				(string) $product->get_name() . ' ' .
+				(string) $product->get_sku() . ' ' .
+				(string) get_post_meta( $pid, '_dtb_model_number', true ) . ' ' .
+				(string) get_post_meta( $pid, '_dtb_schematic_model_number', true ) . ' ' .
+				(string) get_post_meta( $pid, '_dtb_category_key', true ) . ' ' .
+				(string) get_post_meta( $pid, '_dtb_display_category_key', true )
+			),
+		];
+	}
+
+	$results = [];
+	$applied = 0;
+	foreach ( (array) $schematic_ids as $att_id ) {
+		$att_id = (int) $att_id;
+		$schematic = [
+			'attachment_id' => $att_id,
+			'schematic_id'  => (string) get_post_meta( $att_id, '_dtb_schematic_id', true ),
+			'brand'         => (string) get_post_meta( $att_id, '_dtb_schematic_brand', true ),
+			'model_number'  => (string) get_post_meta( $att_id, '_dtb_schematic_model_number', true ),
+			'model_name'    => (string) get_post_meta( $att_id, '_dtb_schematic_model_name', true ),
+			'notes'         => (string) get_post_meta( $att_id, '_dtb_schematic_notes', true ),
+		];
+
+		$candidates = dtb_schematics_smart_score_candidates( $schematic, $products, $limit );
+		$best = $candidates[0] ?? null;
+		$status = $best && (int) $best['score'] >= $threshold ? 'auto' : ( $best ? 'review' : 'none' );
+
+		if ( $apply && 'auto' === $status ) {
+			$matched_ids = [ (int) $best['id'] ];
+			update_post_meta( $att_id, '_dtb_schematic_product_ids', $matched_ids );
+			update_post_meta( (int) $best['id'], '_dtb_schematic_id', $schematic['schematic_id'] );
+			update_post_meta( (int) $best['id'], '_dtb_schematic_attachment_id', $att_id );
+			$applied++;
+		}
+
+		$results[] = [
+			'attachment_id' => $att_id,
+			'schematic_id'  => $schematic['schematic_id'],
+			'brand'         => $schematic['brand'],
+			'model_number'  => $schematic['model_number'],
+			'model_name'    => $schematic['model_name'],
+			'status'        => $status,
+			'candidates'    => $candidates,
+		];
+	}
+
+	if ( $apply && $applied > 0 ) {
+		dtb_schematics_manifest_repo_delete_cache();
+	}
+
+	$counts = [
+		'auto'   => 0,
+		'review' => 0,
+		'none'   => 0,
+	];
+	foreach ( $results as $row ) {
+		$counts[ $row['status'] ]++;
+	}
+
+	wp_send_json_success(
+		[
+			'applied'      => $applied,
+			'threshold'    => $threshold,
+			'schematics'   => count( $results ),
+			'products'     => count( $products ),
+			'counts'       => $counts,
+			'results'      => $results,
+			'message'      => $apply
+				? sprintf( 'Smart-link applied %d high-confidence schematic product mappings.', $applied )
+				: sprintf( 'Smart-link preview: %d auto, %d review, %d unmatched.', $counts['auto'], $counts['review'], $counts['none'] ),
+		]
+	);
+}
+
+function dtb_schematics_smart_normalize_brand( string $value ): string {
+	$value = strtolower( trim( $value ) );
+	$value = str_replace( [ 'drywall tools', 'drywall', 'taping tools', 'tools', 'tool' ], '', $value );
+	$value = preg_replace( '/[^a-z0-9]+/', ' ', $value );
+	return trim( (string) $value );
+}
+
+function dtb_schematics_smart_normalize_text( string $value ): string {
+	$value = strtolower( html_entity_decode( $value, ENT_QUOTES | ENT_HTML5 ) );
+	$value = str_replace( [ '″', '”', '"' ], ' inch ', $value );
+	$value = str_replace( [ '–', '—', '_' ], ' ', $value );
+	$value = preg_replace( '/[^a-z0-9.]+/', ' ', $value );
+	$value = preg_replace( '/\s+/', ' ', (string) $value );
+	return trim( (string) $value );
+}
+
+function dtb_schematics_smart_tokens( string $value ): array {
+	$tokens = preg_split( '/\s+/', dtb_schematics_smart_normalize_text( $value ) );
+	$tokens = array_filter(
+		array_map( 'trim', (array) $tokens ),
+		static fn( $token ) => strlen( $token ) >= 2 && ! in_array( $token, [ 'sch', 'schematic', 'page', 'tool', 'tools', 'drywall' ], true )
+	);
+	return array_values( array_unique( $tokens ) );
+}
+
+function dtb_schematics_smart_score_candidates( array $schematic, array $products, int $limit ): array {
+	$brand = dtb_schematics_smart_normalize_brand( (string) ( $schematic['brand'] ?? '' ) );
+	$model_number = dtb_schematics_smart_normalize_text( (string) ( $schematic['model_number'] ?? '' ) );
+	$model_name = dtb_schematics_smart_normalize_text( (string) ( $schematic['model_name'] ?? '' ) );
+	$schematic_id = dtb_schematics_smart_normalize_text( (string) ( $schematic['schematic_id'] ?? '' ) );
+	$tokens = dtb_schematics_smart_tokens( $model_number . ' ' . $model_name . ' ' . $schematic_id . ' ' . (string) ( $schematic['notes'] ?? '' ) );
+
+	$candidates = [];
+	foreach ( $products as $product ) {
+		if ( '' !== $brand && '' !== $product['brand'] && ! str_contains( $product['brand'], $brand ) && ! str_contains( $brand, $product['brand'] ) ) {
+			continue;
+		}
+
+		$text = (string) $product['text'];
+		$score = 0;
+		$reasons = [];
+
+		if ( '' !== $model_number && ( str_contains( dtb_schematics_smart_normalize_text( (string) $product['sku'] ), $model_number ) || str_contains( dtb_schematics_smart_normalize_text( (string) $product['mpn'] ), $model_number ) ) ) {
+			$score += 52;
+			$reasons[] = 'model/SKU';
+		}
+
+		if ( '' !== $model_name && str_contains( $text, $model_name ) ) {
+			$score += 34;
+			$reasons[] = 'exact name';
+		}
+
+		$hits = 0;
+		foreach ( $tokens as $token ) {
+			if ( str_contains( $text, $token ) ) {
+				$hits++;
+			}
+		}
+		if ( $hits > 0 ) {
+			$score += min( 38, $hits * 7 );
+			$reasons[] = "tokens {$hits}/" . count( $tokens );
+		}
+
+		if ( '' !== $brand && '' !== $product['brand'] ) {
+			$score += 12;
+			$reasons[] = 'brand';
+		}
+
+		$score = min( 100, $score );
+		if ( $score <= 0 ) {
+			continue;
+		}
+		$candidates[] = [
+			'id'      => (int) $product['id'],
+			'sku'     => (string) $product['sku'],
+			'name'    => (string) $product['name'],
+			'score'   => $score,
+			'reasons' => implode( ', ', $reasons ),
+		];
+	}
+
+	usort(
+		$candidates,
+		static fn( $a, $b ) => ( (int) $b['score'] <=> (int) $a['score'] ) ?: strcmp( (string) $a['name'], (string) $b['name'] )
+	);
+
+	return array_slice( $candidates, 0, $limit );
+}
+
 // ── AJAX: Audit schematic library coverage ──────────────────────────────────
 
 add_action( 'wp_ajax_dtb_schematics_audit', 'dtb_ajax_schematics_audit' );

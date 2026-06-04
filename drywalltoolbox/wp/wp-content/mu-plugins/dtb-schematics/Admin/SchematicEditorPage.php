@@ -177,6 +177,24 @@ function dtb_schematics_render_page() {
 			</div>
 
 			<div class="dtb-card dtb-card--md">
+				<h3 class="dtb-title-reset">Smart-Link Tool Products</h3>
+				<p class="dtb-note-muted">Automatically match imported schematic media to live WooCommerce tool products using brand, model number, model name, SKU, and category tokens. Parts, kits, and toolsets are ignored.</p>
+				<div class="dtb-row-inline-wrap">
+					<label for="dtb-smart-link-threshold" class="dtb-label-compact">Auto-apply threshold</label>
+					<input type="number" id="dtb-smart-link-threshold" class="dtb-input dtb-w-120" value="74" min="0" max="100">
+					<button id="dtb-btn-smart-link-preview" class="dtb-btn dtb-btn-secondary">
+						<span class="dashicons dashicons-search dtb-icon-sm"></span> Preview Matches
+					</button>
+					<button id="dtb-btn-smart-link-apply" class="dtb-btn dtb-btn-primary">
+						<span class="dashicons dashicons-admin-links dtb-icon-sm"></span> Apply High-Confidence
+					</button>
+					<span id="dtb-smart-link-spinner" class="dtb-inline-hidden"><span class="spinner is-active"></span></span>
+				</div>
+				<div id="dtb-smart-link-msg" class="dtb-msg-inline"></div>
+				<pre id="dtb-smart-link-output" class="dtb-pre-block"></pre>
+			</div>
+
+			<div class="dtb-card dtb-card--md">
 				<h3 class="dtb-title-reset">Import Preflight</h3>
 				<p class="dtb-note-muted">Validate staged-folder readiness and estimate CSV token match coverage before running import.</p>
 				<div class="dtb-row-inline-wrap">
@@ -591,6 +609,92 @@ function dtb_schematics_render_page() {
 				];
 				$('#dtb-audit-output').show().text(lines.join('\n'));
 			});
+		});
+
+		function runSmartLink(apply) {
+			var threshold = parseInt($('#dtb-smart-link-threshold').val() || '74', 10);
+			if (Number.isNaN(threshold)) threshold = 74;
+			threshold = Math.max(0, Math.min(100, threshold));
+
+			var $preview = $('#dtb-btn-smart-link-preview');
+			var $apply = $('#dtb-btn-smart-link-apply');
+			$preview.prop('disabled', true);
+			$apply.prop('disabled', true);
+			$('#dtb-smart-link-spinner').show();
+			$('#dtb-smart-link-msg').text(apply ? 'Applying high-confidence product links…' : 'Finding product link candidates…').css('color', '#1d6fa4');
+			$('#dtb-smart-link-output').hide().text('');
+
+			$.post(ajaxurl, {
+				action: 'dtb_schematics_smart_link_products',
+				nonce: nonce,
+				apply: apply ? 1 : 0,
+				threshold: threshold,
+				limit: 3
+			}, function(res){
+				$preview.prop('disabled', false);
+				$apply.prop('disabled', false);
+				$('#dtb-smart-link-spinner').hide();
+
+				if (!res || !res.success) {
+					var failMsg = (res && res.data && res.data.message) ? res.data.message : 'Smart-link failed.';
+					$('#dtb-smart-link-msg').text('✗ ' + failMsg).css('color', '#d63638');
+					return;
+				}
+
+				var d = res.data || {};
+				var counts = d.counts || {};
+				$('#dtb-smart-link-msg').text('✓ ' + (d.message || 'Smart-link complete.')).css('color', '#1a7f37');
+
+				var lines = [
+					'Schematics scanned: ' + (d.schematics || 0),
+					'Candidate products scanned: ' + (d.products || 0),
+					'Threshold: ' + (d.threshold || threshold),
+					'Auto matches: ' + (counts.auto || 0),
+					'Needs review: ' + (counts.review || 0),
+					'Unmatched: ' + (counts.none || 0),
+					'Applied: ' + (d.applied || 0),
+					''
+				];
+
+				(d.results || []).slice(0, 120).forEach(function(row){
+					var best = row.candidates && row.candidates.length ? row.candidates[0] : null;
+					lines.push(
+						'[' + (row.status || 'none').toUpperCase() + '] ' +
+						(row.schematic_id || '') + ' | ' +
+						(row.model_number || '') + ' | ' +
+						(row.model_name || '')
+					);
+					if (best) {
+						lines.push('  -> ' + best.id + ' | ' + (best.sku || '') + ' | ' + best.name + ' | score ' + best.score + ' | ' + (best.reasons || ''));
+					} else {
+						lines.push('  -> no candidate');
+					}
+				});
+
+				if ((d.results || []).length > 120) {
+					lines.push('');
+					lines.push('Showing first 120 rows in the browser report.');
+				}
+
+				$('#dtb-smart-link-output').show().text(lines.join('\n'));
+				loadList(1);
+			}).fail(function(xhr, textStatus){
+				$preview.prop('disabled', false);
+				$apply.prop('disabled', false);
+				$('#dtb-smart-link-spinner').hide();
+				$('#dtb-smart-link-msg').text('✗ Smart-link request failed (' + (xhr.status || textStatus || 'network') + ').').css('color', '#d63638');
+			});
+		}
+
+		$('#dtb-btn-smart-link-preview').on('click', function(){
+			runSmartLink(false);
+		});
+
+		$('#dtb-btn-smart-link-apply').on('click', function(){
+			if (!confirm('Apply high-confidence schematic product links now? Run Preview Matches first if you have not reviewed candidates.')) {
+				return;
+			}
+			runSmartLink(true);
 		});
 
 		function registerStagedImages(folderRel, done) {
