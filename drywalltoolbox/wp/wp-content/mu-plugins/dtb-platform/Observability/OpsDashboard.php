@@ -159,7 +159,7 @@ function dtb_ops_enqueue_assets( string $hook ): void {
 	$bootstrap = [
 		'ajaxUrl'     => admin_url( 'admin-ajax.php' ),
 		'nonce'       => wp_create_nonce( 'dtb_ops_nonce' ),
-		'pollInterval'=> 30000,
+		'pollInterval'=> 180000,
 		'version'     => DTB_OPS_VERSION,
 	];
 

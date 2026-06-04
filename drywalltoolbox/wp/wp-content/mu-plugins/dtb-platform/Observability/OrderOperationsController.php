@@ -657,9 +657,9 @@ function dtb_oo_save_settings( array $raw ): array {
 	$current  = dtb_oo_get_settings();
 	$updated  = [];
 
-	// poll_interval: 10–300 seconds.
+	// poll_interval: 180–300 seconds.
 	if ( isset( $raw['poll_interval'] ) ) {
-		$updated['poll_interval'] = max( 10, min( 300, (int) $raw['poll_interval'] ) );
+		$updated['poll_interval'] = max( 180, min( 300, (int) $raw['poll_interval'] ) );
 	}
 
 	// SLA thresholds.

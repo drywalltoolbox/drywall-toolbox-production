@@ -64,7 +64,7 @@ if ( ! defined( 'DTB_OO_NONCE_ACTION' ) ) {
  */
 function dtb_oo_get_settings(): array {
 	$defaults = [
-		'poll_interval'       => 30,      // seconds
+		'poll_interval'       => 180,     // seconds
 		'sla_warning_hours'   => 72,
 		'sla_breach_hours'    => 120,
 		'page_size'           => 25,

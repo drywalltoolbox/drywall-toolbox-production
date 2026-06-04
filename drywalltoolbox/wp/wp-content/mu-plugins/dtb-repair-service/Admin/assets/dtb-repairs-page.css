@@ -91,9 +91,482 @@
 	color: #92400e;
 }
 
+#dtb-repair-modal-overlay.dtb-modal-overlay--open {
+	align-items: stretch;
+	padding: 12px;
+}
+
+#dtb-repair-modal.dtb-repair-modal--fullpage {
+	background: #f4f7fb;
+	border-radius: 14px;
+	display: flex;
+	flex-direction: column;
+	height: calc(100vh - 24px);
+	max-height: none;
+	max-width: none;
+	min-height: 0;
+	width: calc(100vw - 24px);
+}
+
+#dtb-repair-modal.dtb-repair-modal--fullpage .dtb-wb-modal-hero--repair {
+	display: none;
+}
+
+#dtb-repair-modal.dtb-repair-modal--fullpage .dtb-modal__header {
+	flex: 0 0 auto;
+}
+
+#dtb-repair-modal.dtb-repair-modal--fullpage .dtb-modal__title {
+	height: 1px;
+	margin: -1px;
+	overflow: hidden;
+	position: absolute;
+	width: 1px;
+	clip: rect(1px, 1px, 1px, 1px);
+	clip-path: inset(50%);
+	white-space: nowrap;
+}
+
+#dtb-repair-modal.dtb-repair-modal--fullpage .dtb-modal__meta {
+	height: 1px;
+	margin: -1px;
+	overflow: hidden;
+	position: absolute;
+	width: 1px;
+	clip: rect(1px, 1px, 1px, 1px);
+	clip-path: inset(50%);
+	white-space: nowrap;
+}
+
+#dtb-repair-modal.dtb-repair-modal--fullpage .dtb-modal__body {
+	background: #f4f7fb;
+	display: block;
+	flex: 1 1 auto;
+	min-height: 0;
+	overflow: auto;
+	padding: 16px 18px 24px;
+}
+
+#dtb-repair-modal.dtb-repair-modal--fullpage .dtb-modal__footer {
+	flex: 0 0 auto;
+}
+
+#dtb-repair-modal.dtb-repair-modal--fullpage .dtb-wb-main {
+	display: block;
+	max-width: none;
+	width: 100%;
+}
+
+#dtb-repair-modal .dtb-repair-modal-hero {
+	background: linear-gradient(135deg, #f8fbff 0%, #ffffff 55%, #eef5ff 100%);
+	border-left: 5px solid #2563eb;
+	border-radius: 18px;
+	box-shadow: 0 16px 36px rgba(15, 23, 42, 0.08);
+	display: grid;
+	gap: 24px;
+	grid-template-columns: minmax(0, 1fr) minmax(330px, 0.34fr);
+	margin: 0 0 18px;
+	padding: 32px;
+}
+
+#dtb-repair-modal .dtb-repair-modal-hero__id {
+	color: #64748b;
+	font-size: 12px;
+	font-weight: 800;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+}
+
+#dtb-repair-modal .dtb-repair-modal-hero h3 {
+	color: #0f172a;
+	font-size: clamp(26px, 3vw, 38px);
+	font-weight: 900;
+	letter-spacing: 0;
+	line-height: 1.12;
+	margin: 6px 0 12px;
+}
+
+#dtb-repair-modal .dtb-repair-modal-hero__status {
+	margin-bottom: 14px;
+}
+
+#dtb-repair-modal .dtb-repair-modal-int-row,
+#dtb-repair-modal .dtb-repair-modal-hero__meta {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 9px 12px;
+}
+
+#dtb-repair-modal .dtb-repair-modal-int-row {
+	margin-bottom: 16px;
+}
+
+#dtb-repair-modal .dtb-repair-modal-int-pill {
+	align-items: center;
+	background: #fff;
+	border: 1px solid #dbeafe;
+	border-radius: 999px;
+	color: #334155;
+	display: inline-flex;
+	font-size: 12px;
+	font-weight: 800;
+	gap: 8px;
+	line-height: 1;
+	padding: 7px 12px;
+}
+
+#dtb-repair-modal .dtb-repair-modal-int-pill i {
+	background: #f59e0b;
+	border-radius: 999px;
+	height: 7px;
+	width: 7px;
+}
+
+#dtb-repair-modal .dtb-repair-modal-int-pill--synced i,
+#dtb-repair-modal .dtb-repair-modal-int-pill--ok i,
+#dtb-repair-modal .dtb-repair-modal-int-pill--connected i {
+	background: #22c55e;
+}
+
+#dtb-repair-modal .dtb-repair-modal-int-pill a {
+	color: #0f766e;
+	text-decoration: none;
+}
+
+#dtb-repair-modal .dtb-repair-modal-hero__meta span {
+	align-items: center;
+	color: #64748b;
+	display: inline-flex;
+	font-size: 14px;
+	gap: 7px;
+	min-width: 0;
+}
+
+#dtb-repair-modal .dtb-repair-modal-hero__meta b {
+	color: #2563eb;
+	font-weight: 800;
+}
+
+#dtb-repair-modal .dtb-repair-modal-workflow-card {
+	background: rgba(255, 255, 255, 0.88);
+	border: 1px solid #e2e8f0;
+	border-radius: 16px;
+	box-shadow: 0 10px 28px rgba(15, 23, 42, 0.06);
+	padding: 22px;
+}
+
+#dtb-repair-modal .dtb-repair-modal-workflow-card__top {
+	align-items: center;
+	display: flex;
+	justify-content: space-between;
+	gap: 12px;
+	margin-bottom: 14px;
+}
+
+#dtb-repair-modal .dtb-repair-modal-workflow-card__top > span {
+	color: #64748b;
+	font-size: 12px;
+	font-weight: 800;
+	letter-spacing: 0.07em;
+	text-transform: uppercase;
+}
+
+#dtb-repair-modal .dtb-repair-modal-track {
+	background: #e2e8f0;
+	border-radius: 999px;
+	height: 8px;
+	margin-bottom: 16px;
+	overflow: hidden;
+}
+
+#dtb-repair-modal .dtb-repair-modal-track i {
+	background: #2563eb;
+	display: block;
+	height: 100%;
+}
+
+#dtb-repair-modal .dtb-repair-modal-milestones {
+	display: grid;
+	gap: 8px;
+	grid-template-columns: repeat(4, minmax(0, 1fr));
+	margin-bottom: 14px;
+}
+
+#dtb-repair-modal .dtb-repair-modal-milestones span {
+	align-items: center;
+	color: #64748b;
+	display: grid;
+	font-size: 11px;
+	font-weight: 800;
+	gap: 5px;
+	justify-items: center;
+	text-align: center;
+}
+
+#dtb-repair-modal .dtb-repair-modal-milestones i {
+	background: #f8fafc;
+	border: 2px solid #cbd5e1;
+	border-radius: 999px;
+	height: 18px;
+	width: 18px;
+}
+
+#dtb-repair-modal .dtb-repair-modal-milestones .is-done,
+#dtb-repair-modal .dtb-repair-modal-milestones .is-active {
+	color: #2563eb;
+}
+
+#dtb-repair-modal .dtb-repair-modal-milestones .is-done i,
+#dtb-repair-modal .dtb-repair-modal-milestones .is-active i {
+	background: #2563eb;
+	border-color: #2563eb;
+	box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12);
+}
+
+#dtb-repair-modal .dtb-repair-modal-workflow-card p {
+	color: #64748b;
+	font-size: 13px;
+	margin: 0;
+}
+
+#dtb-repair-modal.dtb-repair-modal--fullpage .dtb-modal-tabs {
+	background: #fff;
+	border: 1px solid #e2e8f0;
+	border-radius: 16px;
+	box-shadow: 0 8px 22px rgba(15, 23, 42, 0.05);
+	gap: 8px;
+	margin-bottom: 18px;
+	padding: 10px;
+}
+
+#dtb-repair-modal.dtb-repair-modal--fullpage .dtb-modal-tab {
+	border: 0;
+	border-radius: 12px;
+	color: #64748b;
+	font-size: 14px;
+	font-weight: 800;
+	padding: 12px 18px;
+}
+
+#dtb-repair-modal.dtb-repair-modal--fullpage .dtb-modal-tab[aria-selected="true"] {
+	background: #2563eb;
+	box-shadow: 0 8px 18px rgba(37, 99, 235, 0.25);
+	color: #fff;
+}
+
+#dtb-repair-modal .dtb-repair-modal-workspace-grid {
+	display: grid;
+	gap: 18px;
+	grid-template-columns: minmax(0, 1fr) minmax(320px, 0.42fr);
+}
+
+#dtb-repair-modal .dtb-repair-modal-side-stack,
+#dtb-repair-modal .dtb-repair-modal-all-grid {
+	display: grid;
+	gap: 18px;
+}
+
+#dtb-repair-modal .dtb-repair-modal-all-grid {
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+#dtb-repair-modal .dtb-repair-modal-card {
+	background: #fff;
+	border: 1px solid #e2e8f0;
+	border-radius: 14px;
+	box-shadow: 0 10px 24px rgba(15, 23, 42, 0.04);
+	overflow: hidden;
+}
+
+#dtb-repair-modal .dtb-repair-modal-card > header {
+	background: #f8fafc;
+	border-bottom: 1px solid #e2e8f0;
+	padding: 16px 20px;
+}
+
+#dtb-repair-modal .dtb-repair-modal-card h3 {
+	color: #64748b;
+	font-size: 13px;
+	font-weight: 900;
+	letter-spacing: 0.06em;
+	margin: 0;
+	text-transform: uppercase;
+}
+
+#dtb-repair-modal .dtb-repair-modal-card__body {
+	padding: 18px 20px;
+}
+
+#dtb-repair-modal .dtb-repair-modal-detail-list {
+	display: grid;
+	margin: 0;
+}
+
+#dtb-repair-modal .dtb-repair-modal-detail-list div {
+	align-items: baseline;
+	border-bottom: 1px solid #edf2f7;
+	display: grid;
+	gap: 16px;
+	grid-template-columns: 180px minmax(0, 1fr);
+	padding: 12px 0;
+}
+
+#dtb-repair-modal .dtb-repair-modal-detail-list div:first-child {
+	padding-top: 0;
+}
+
+#dtb-repair-modal .dtb-repair-modal-detail-list dt {
+	color: #64748b;
+	font-size: 12px;
+	font-weight: 900;
+	letter-spacing: 0.05em;
+	text-transform: uppercase;
+}
+
+#dtb-repair-modal .dtb-repair-modal-detail-list dd {
+	color: #0f172a;
+	font-size: 15px;
+	font-weight: 650;
+	margin: 0;
+	min-width: 0;
+	overflow-wrap: anywhere;
+}
+
+#dtb-repair-modal .dtb-repair-modal-issue {
+	margin-top: 18px;
+}
+
+#dtb-repair-modal .dtb-repair-modal-issue span {
+	color: #64748b;
+	display: block;
+	font-size: 12px;
+	font-weight: 900;
+	letter-spacing: 0.05em;
+	margin-bottom: 8px;
+	text-transform: uppercase;
+}
+
+#dtb-repair-modal .dtb-repair-modal-issue p {
+	background: #f8fafc;
+	border: 1px solid #e2e8f0;
+	border-radius: 10px;
+	color: #334155;
+	line-height: 1.55;
+	margin: 0;
+	padding: 12px 14px;
+}
+
+#dtb-repair-modal .dtb-repair-modal-media-grid {
+	display: grid;
+	gap: 10px;
+	grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+}
+
+#dtb-repair-modal .dtb-repair-modal-media-grid a {
+	color: #334155;
+	display: grid;
+	font-size: 11px;
+	font-weight: 800;
+	gap: 6px;
+	text-decoration: none;
+}
+
+#dtb-repair-modal .dtb-repair-modal-media-grid img {
+	aspect-ratio: 1 / 1;
+	border-radius: 8px;
+	object-fit: cover;
+	width: 100%;
+}
+
+#dtb-repair-modal .dtb-repair-modal-media-grid span {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+#dtb-repair-modal .dtb-repair-modal-note {
+	background: #f8fafc;
+	border: 1px solid #e2e8f0;
+	border-radius: 10px;
+	margin-bottom: 10px;
+	padding: 10px 12px;
+}
+
+#dtb-repair-modal .dtb-repair-modal-note p {
+	margin: 0 0 6px;
+	white-space: pre-wrap;
+}
+
+#dtb-repair-modal .dtb-repair-modal-note small {
+	color: #64748b;
+}
+
+.dtb-admin[data-dtb-page="dtb-repairs"] .dtb-repair-action-brief p {
+	color: #334155;
+	font-size: 13px;
+	line-height: 1.45;
+	margin: 0 0 8px;
+}
+
+.dtb-admin[data-dtb-page="dtb-repairs"] .dtb-repair-action-blockers {
+	display: grid;
+	gap: 6px;
+	margin-top: 10px;
+}
+
+.dtb-admin[data-dtb-page="dtb-repairs"] .dtb-repair-action-blockers p {
+	background: #fff7ed;
+	border: 1px solid #fed7aa;
+	border-radius: var(--dtb-radius-sm);
+	color: #9a3412;
+	font-size: 12px;
+	font-weight: 700;
+	line-height: 1.35;
+	margin: 0;
+	padding: 7px 8px;
+}
+
+.dtb-admin[data-dtb-page="dtb-repairs"] .dtb-repair-transition-grid {
+	display: grid;
+	gap: 8px;
+	grid-template-columns: repeat( auto-fit, minmax( 170px, 1fr ) );
+}
+
+.dtb-admin[data-dtb-page="dtb-repairs"] .dtb-repair-transition-btn {
+	height: auto;
+	min-height: 58px;
+	padding: 8px 10px;
+	text-align: left;
+	white-space: normal;
+}
+
+.dtb-admin[data-dtb-page="dtb-repairs"] .dtb-repair-transition-btn strong,
+.dtb-admin[data-dtb-page="dtb-repairs"] .dtb-repair-transition-btn span {
+	display: block;
+}
+
+.dtb-admin[data-dtb-page="dtb-repairs"] .dtb-repair-transition-btn strong {
+	color: #1d4ed8;
+	font-size: 13px;
+	text-transform: capitalize;
+}
+
+.dtb-admin[data-dtb-page="dtb-repairs"] .dtb-repair-transition-btn span {
+	color: #64748b;
+	font-size: 11px;
+	line-height: 1.35;
+	margin-top: 4px;
+}
+
 @media (max-width: 1320px) {
 	.dtb-admin[data-dtb-page="dtb-repairs"] .dtb-grid--kpi {
 		grid-template-columns: repeat(3, minmax(0, 1fr));
+	}
+
+	#dtb-repair-modal .dtb-repair-modal-hero,
+	#dtb-repair-modal .dtb-repair-modal-workspace-grid,
+	#dtb-repair-modal .dtb-repair-modal-all-grid {
+		grid-template-columns: 1fr;
 	}
 }
 
@@ -106,4 +579,18 @@
 		flex-basis: 100%;
 		max-width: none;
 	}
+
+	#dtb-repair-modal .dtb-repair-modal-hero {
+		padding: 20px;
+	}
+
+	#dtb-repair-modal .dtb-repair-modal-detail-list div {
+		grid-template-columns: 1fr;
+		gap: 4px;
+	}
+
+	#dtb-repair-modal .dtb-repair-modal-milestones {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
 }
+

@@ -55,7 +55,7 @@ function dtb_command_center_render_page(): void {
 		'id'       => 'dtb-command-center-workspace',
 		'module'   => 'command-center',
 		'endpoint' => rest_url( 'dtb/v1/admin/overview' ),
-		'interval' => 30000,
+		'interval' => 180000,
 	] );
 
 	// Customer-impacting exceptions banner.

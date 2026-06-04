@@ -61,7 +61,7 @@ function dtb_admin_prepare_workbench_payload( array $payload ): array {
 		$payload['meta']['fetched_at'] = gmdate( 'c' );
 	}
 	if ( empty( $payload['meta']['poll_after_ms'] ) ) {
-		$payload['meta']['poll_after_ms'] = 60000;
+		$payload['meta']['poll_after_ms'] = 180000;
 	}
 
 	if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {

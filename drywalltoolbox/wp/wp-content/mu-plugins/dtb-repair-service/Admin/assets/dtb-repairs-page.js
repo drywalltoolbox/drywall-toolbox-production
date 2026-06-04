@@ -14,8 +14,16 @@
 	var WB     = window.DtbWorkbench;
 	var CONFIG = window.dtbAdminConfig || {};
 	var REST   = ( CONFIG.restUrl || '' ).replace( /\/$/, '' );
-	var TABS   = [ 'overview', 'intake', 'quote', 'parts', 'technician',
-	               'conversation', 'timeline', 'shipping', 'actions' ];
+	var TABS   = [ 'overview', 'quote', 'technician', 'timeline', 'conversation', 'all', 'actions' ];
+	var TAB_LABELS = {
+		overview: 'Order Details',
+		quote: 'Quote Builder',
+		technician: 'Technician',
+		timeline: 'Timeline',
+		conversation: 'Notes',
+		all: 'All',
+		actions: 'Actions',
+	};
 
 	// ── State ─────────────────────────────────────────────────────────────────
 
@@ -29,7 +37,7 @@
 
 	// ── DOM ───────────────────────────────────────────────────────────────────
 
-	var overlay, modal, tabBar, panelContainer, titleEl, metaEl, footerEl;
+	var overlay, modal, tabBar, panelContainer, titleEl, metaEl, footerEl, heroEl;
 
 	function buildDOM() {
 		if ( document.getElementById( 'dtb-repair-modal-overlay' ) ) {
@@ -44,7 +52,7 @@
 		overlay.setAttribute( 'aria-labelledby', 'dtb-repair-modal-title' );
 
 		modal = document.createElement( 'div' );
-		modal.className = 'dtb-modal dtb-modal--fullscreen';
+		modal.className = 'dtb-modal dtb-modal--fullscreen dtb-repair-modal--fullpage';
 		modal.setAttribute( 'id', 'dtb-repair-modal' );
 
 		// Header
@@ -76,13 +84,16 @@
 		tabBar.setAttribute( 'role', 'tablist' );
 
 		TABS.forEach( function ( tab ) {
+			if ( tab === 'actions' ) {
+				return;
+			}
 			var btn = document.createElement( 'button' );
 			btn.type             = 'button';
 			btn.className        = 'dtb-modal-tab';
 			btn.dataset.tab      = tab;
 			btn.setAttribute( 'role', 'tab' );
 			btn.setAttribute( 'aria-selected', tab === 'overview' ? 'true' : 'false' );
-			btn.textContent = tab.charAt(0).toUpperCase() + tab.slice(1).replace( /-/g, ' ' );
+			btn.textContent = TAB_LABELS[ tab ] || tab.charAt(0).toUpperCase() + tab.slice(1).replace( /-/g, ' ' );
 			btn.addEventListener( 'click', function () {
 				switchTab( tab );
 			} );
@@ -96,9 +107,14 @@
 		var mainCol = document.createElement( 'div' );
 		mainCol.className = 'dtb-wb-main';
 
+		heroEl = document.createElement( 'section' );
+		heroEl.className = 'dtb-repair-modal-hero';
+		heroEl.setAttribute( 'aria-label', 'Repair summary' );
+
 		panelContainer = document.createElement( 'div' );
 		panelContainer.id = 'dtb-repair-panels';
 
+		mainCol.appendChild( heroEl );
 		mainCol.appendChild( tabBar );
 		mainCol.appendChild( panelContainer );
 		body.appendChild( mainCol );
@@ -156,11 +172,11 @@
 		renderLoading();
 		loadRepair( state.repairId );
 
-		// Refresh every 60 seconds while open.
+		// Refresh every 3 minutes while open.
 		clearInterval( state.refreshTimer );
 		state.refreshTimer = setInterval( function () {
 			if ( state.repairId ) { loadRepair( state.repairId ); }
-		}, 60000 );
+		}, 180000 );
 	}
 
 	function closeModal() {
@@ -202,6 +218,7 @@
 
 	function switchTab( tab ) {
 		if ( ! TABS.includes( tab ) ) { tab = 'overview'; }
+		if ( tab === 'actions' ) { tab = 'overview'; }
 		state.activeTab = tab;
 
 		tabBar.querySelectorAll( '.dtb-modal-tab' ).forEach( function ( btn ) {
@@ -211,6 +228,10 @@
 		} );
 
 		panelContainer.querySelectorAll( '.dtb-modal-tab-panel' ).forEach( function ( p ) {
+			if ( p.dataset.panel === 'actions' ) {
+				p.setAttribute( 'hidden', '' );
+				return;
+			}
 			if ( p.dataset.panel === tab ) {
 				p.removeAttribute( 'hidden' );
 			} else {
@@ -259,6 +280,9 @@
 		// Update header
 		titleEl.textContent = 'Repair #' + d.record.id + ' — ' + WB.escapeHtml( d.record.customer_name || '' );
 		metaEl.innerHTML    = statusBadge( d.record.status );
+		if ( heroEl ) {
+			heroEl.innerHTML = renderModalHero( d );
+		}
 
 		// Edit link
 		var editLink = document.getElementById( 'dtb-repair-modal-edit-link' );
@@ -276,7 +300,7 @@
 		renderTechnician( d );
 		renderConversation( d );
 		renderTimeline( d );
-		renderShipping( d );
+		renderAllPanel( d );
 		renderActions( d );
 
 		// Activate correct tab.
@@ -307,55 +331,77 @@
 	function renderOverview( d ) {
 		var panel = getOrCreatePanel( 'overview' );
 		var r     = d.record;
-		var intel = d.intelligence || d.intel || {};
+		var media = d.media && Array.isArray( d.media.items ) ? d.media.items : [];
 
-		var html = '<div class="dtb-modal__body">';
-
-		// Compact record-level blocker signals (integration errors only)
+		var html = '<div class="dtb-repair-modal-workspace-grid">';
 		var issuesHtml = renderRepairRecordIssues( d.integrations || d.integration || {} );
 		if ( issuesHtml ) {
 			html += issuesHtml;
 		}
 
-		// Left: core KVs + linked records
-		html += '<div class="dtb-wb-main dtb-modal-tab-panel" data-panel-inner="overview-main">';
-		html += '<div class="dtb-wb-section">';
-		html += '<h3 class="dtb-wb-section__title">Record</h3>';
-		html += kv( 'Status',       statusBadge( r.status ) );
-		html += kv( 'Customer',     WB.escapeHtml( r.customer_name ) + ' &lt;' + WB.escapeHtml( r.customer_email ) + '&gt;' );
-		html += kv( 'Created',      WB.formatDate( r.created_at ) );
-		html += kv( 'Priority',     WB.escapeHtml( r.priority || '—' ) );
-		html += kv( 'Service tier', WB.escapeHtml( r.service_tier || '—' ) );
-		if ( intel.sla_state ) {
-			html += kv( 'SLA', '<span class="dtb-wb-badge dtb-wb-badge--' + slaBadgeClass( intel.sla_state ) + '">' + WB.escapeHtml( intel.sla_state ) + '</span>' );
-		}
+		html += '<section class="dtb-repair-modal-card">';
+		html += '<header><h3>Repair Order Details</h3></header>';
+		html += '<div class="dtb-repair-modal-card__body">';
+		html += detailRows( [
+			[ 'Brand', r.tool_brand ],
+			[ 'Model', r.tool_model ],
+			[ 'Category', r.tool_category ],
+			[ 'Serial Number', r.serial_number ],
+			[ 'Tool Age', r.tool_age ],
+			[ 'Service Tier', r.service_tier ],
+			[ 'Woo Order ID', r.wc_order_id ],
+			[ 'Priority', r.priority ],
+			[ 'Approval Mode', r.approval_mode ],
+			[ 'Preapproval Limit', r.preapproval_limit ? WB.formatMoney( r.preapproval_limit ) : '' ],
+			[ 'Issue Started', r.issue_start ],
+			[ 'Contact Preference', r.contact_preference ],
+		] );
+		html += '<div class="dtb-repair-modal-issue"><span>Customer Issue</span><p>' + WB.escapeHtml( r.issue_description || '—' ) + '</p></div>';
+		html += '</div></section>';
+
+		html += '<aside class="dtb-repair-modal-side-stack">';
+		html += '<section class="dtb-repair-modal-card"><header><h3>Customer</h3></header><div class="dtb-repair-modal-card__body">';
+		html += detailRows( [
+			[ 'Name', r.customer_name ],
+			[ 'Email', r.customer_email ],
+			[ 'Phone', r.customer_phone ],
+			[ 'Company', r.company ],
+		] );
+		html += '</div></section>';
+		html += '<section class="dtb-repair-modal-card"><header><h3>Customer Media</h3></header><div class="dtb-repair-modal-card__body">';
+		html += renderMediaTiles( media );
+		html += '</div></section>';
+		html += '</aside>';
+
 		html += '</div>';
-
-		// Workload
-		if ( intel.next_best_action ) {
-			html += '<div class="dtb-wb-section">';
-			html += '<h3 class="dtb-wb-section__title">Recommended action</h3>';
-			html += '<p style="font-size:.875rem;color:#334155">' + WB.escapeHtml( intel.next_best_action ) + '</p>';
-			html += '</div>';
-		}
-
-		var linked = d.linked_records || d.linked || {};
-		html += '<div class="dtb-wb-section">';
-		html += '<h3 class="dtb-wb-section__title">Linked records</h3>';
-		html += WB.renderLinkedRecords ? WB.renderLinkedRecords( linked ) : '';
-		html += '</div>';
-
-		html += '</div>'; // left col
-
-		// Right rail: customer context
-		var ctx = d.customer || {};
-		html += '<div class="dtb-wb-rail">';
-		html += WB.renderCustomerRail ? WB.renderCustomerRail( ctx ) : '';
-		html += '</div>'; // rail
-
-		html += '</div>'; // body flex
 
 		panel.innerHTML = html;
+	}
+
+	function detailRows( rows ) {
+		var html = '<dl class="dtb-repair-modal-detail-list">';
+		rows.forEach( function ( row ) {
+			var value = row[1];
+			if ( value === null || value === undefined || value === '' ) {
+				value = '—';
+			}
+			html += '<div><dt>' + WB.escapeHtml( row[0] ) + '</dt><dd>' + WB.escapeHtml( value ) + '</dd></div>';
+		} );
+		html += '</dl>';
+		return html;
+	}
+
+	function renderMediaTiles( media ) {
+		if ( ! media || ! media.length ) {
+			return '<p class="dtb-wb-empty">No customer media has been attached yet.</p>';
+		}
+		return '<div class="dtb-repair-modal-media-grid">' + media.map( function ( item ) {
+			var label = item.filename || item.title || ( 'Attachment #' + item.id );
+			return '<a href="' + WB.escapeHtml( item.full || item.url || '#' ) + '" target="_blank" rel="noopener">' +
+				'<img src="' + WB.escapeHtml( item.thumbnail || item.url || '' ) + '" alt="' + WB.escapeHtml( item.alt || label ) + '">' +
+				'<span>' + WB.escapeHtml( label ) + '</span>' +
+			'</a>';
+		} ).join( '' ) + '</div>';
 	}
 
 	// ── Panel: Intake ─────────────────────────────────────────────────────────
@@ -698,24 +744,219 @@
 		}
 	}
 
+	function statusLabel( status ) {
+		return String( status || '' ).replace( /_/g, ' ' );
+	}
+
+	function formatIntegrationState( value ) {
+		var state = value && typeof value === 'object' ? ( value.state || value.status || 'pending' ) : ( value || 'pending' );
+		return String( state ).replace( /_/g, ' ' );
+	}
+
+	function integrationPill( label, state, href, hrefText ) {
+		var stateLabel = formatIntegrationState( state );
+		var cls = stateLabel.replace( /\s+/g, '-' ).toLowerCase();
+		return '<span class="dtb-repair-modal-int-pill dtb-repair-modal-int-pill--' + WB.escapeHtml( cls ) + '">' +
+			'<strong>' + WB.escapeHtml( label ) + '</strong><i aria-hidden="true"></i>' +
+			( href ? '<a href="' + WB.escapeHtml( href ) + '" target="_blank" rel="noopener">' + WB.escapeHtml( hrefText || stateLabel ) + '</a>' : '<span>' + WB.escapeHtml( stateLabel ) + '</span>' ) +
+		'</span>';
+	}
+
+	function renderModalHero( d ) {
+		var r = d.record || {};
+		var integrations = d.integrations || d.integration || {};
+		var tool = [ r.tool_brand, r.tool_model || r.tool_category ].filter( Boolean ).join( ' — ' );
+		var wcHref = r.wc_order_id ? ( CONFIG.adminUrl || '' ) + 'post.php?post=' + r.wc_order_id + '&action=edit' : '';
+		var allowed = ( d.workflow && Array.isArray( d.workflow.allowed_transitions ) ) ? d.workflow.allowed_transitions : ( r.allowed_next || [] );
+		var progress = repairProgress( r.status );
+
+		return '<div class="dtb-repair-modal-hero__left">' +
+			'<div class="dtb-repair-modal-hero__id">Repair #' + WB.escapeHtml( r.id || '' ) + '</div>' +
+			'<h3>' + WB.escapeHtml( r.customer_name || '(No customer name)' ) + '</h3>' +
+			'<div class="dtb-repair-modal-hero__status">' + statusBadge( r.status ) + '</div>' +
+			'<div class="dtb-repair-modal-int-row">' +
+				integrationPill( 'WooCommerce', integrations.woocommerce || ( r.wc_order_id ? 'synced' : 'pending' ), wcHref, r.wc_order_id ? '#' + r.wc_order_id + ' →' : '' ) +
+				integrationPill( 'Veeqo', integrations.veeqo || 'pending' ) +
+				integrationPill( 'QuickBooks', integrations.quickbooks || 'pending' ) +
+			'</div>' +
+			'<div class="dtb-repair-modal-hero__meta">' +
+				( r.customer_email ? '<span><b>✉</b>' + WB.escapeHtml( r.customer_email ) + '</span>' : '' ) +
+				( r.customer_phone ? '<span><b>☎</b>' + WB.escapeHtml( r.customer_phone ) + '</span>' : '' ) +
+				( tool ? '<span><b>↗</b>' + WB.escapeHtml( tool ) + '</span>' : '' ) +
+				( r.service_tier ? '<span><b>★</b>' + WB.escapeHtml( r.service_tier ) + '</span>' : '' ) +
+				( r.created_at ? '<span><b>▣</b>Submitted ' + WB.escapeHtml( WB.formatDate ? WB.formatDate( r.created_at ) : r.created_at ) + '</span>' : '' ) +
+			'</div>' +
+		'</div>' +
+		'<aside class="dtb-repair-modal-hero__workflow">' +
+			'<div class="dtb-repair-modal-workflow-card">' +
+				'<div class="dtb-repair-modal-workflow-card__top"><span>Current Status</span>' + statusBadge( r.status ) + '</div>' +
+				'<div class="dtb-repair-modal-track"><i style="width:' + WB.escapeHtml( progress ) + '%"></i></div>' +
+				'<div class="dtb-repair-modal-milestones">' +
+					renderMilestone( 'Submitted', progress >= 8, progress < 28 ) +
+					renderMilestone( 'In Progress', progress >= 28, progress >= 28 && progress < 88 ) +
+					renderMilestone( 'Ready to Ship', progress >= 88, progress >= 88 && progress < 100 ) +
+					renderMilestone( 'Completed', progress >= 100, progress >= 100 ) +
+				'</div>' +
+				'<p>' + ( allowed.length ? WB.escapeHtml( allowed.length + ' workflow transition' + ( allowed.length === 1 ? '' : 's' ) + ' available from ' + statusLabel( r.status ) + '.' ) : 'No transitions available from this status.' ) + '</p>' +
+			'</div>' +
+		'</aside>';
+	}
+
+	function renderMilestone( label, done, active ) {
+		return '<span class="' + ( active ? 'is-active' : ( done ? 'is-done' : '' ) ) + '"><i></i>' + WB.escapeHtml( label ) + '</span>';
+	}
+
+	function repairProgress( status ) {
+		var map = {
+			submitted: 8,
+			reviewed: 16,
+			awaiting_customer: 20,
+			approved: 28,
+			quoted: 35,
+			quote_accepted: 42,
+			parts_allocated: 55,
+			in_progress: 70,
+			ready_to_ship: 88,
+			completed: 100,
+			closed: 100,
+			cancelled: 100,
+			quote_declined: 100,
+		};
+		return map[ status ] || 8;
+	}
+
+	function renderAllPanel( d ) {
+		var panel = getOrCreatePanel( 'all' );
+		var r = d.record || {};
+		var q = d.quote || {};
+		var parts = getAllocatedParts( d );
+		var events = d.timeline || d.audit || [];
+		var messages = d.conversation || [];
+		var shipping = d.shipping || {};
+
+		var html = '<div class="dtb-repair-modal-all-grid">';
+		html += '<section class="dtb-repair-modal-card"><header><h3>Repair Order Details</h3></header><div class="dtb-repair-modal-card__body">' +
+			detailRows( [
+				[ 'Brand', r.tool_brand ],
+				[ 'Model', r.tool_model ],
+				[ 'Serial Number', r.serial_number ],
+				[ 'Service Tier', r.service_tier ],
+				[ 'Priority', r.priority ],
+				[ 'Status', statusLabel( r.status ) ],
+			] ) +
+			'<div class="dtb-repair-modal-issue"><span>Customer Issue</span><p>' + WB.escapeHtml( r.issue_description || '—' ) + '</p></div>' +
+		'</div></section>';
+		html += '<section class="dtb-repair-modal-card"><header><h3>Quote Summary</h3></header><div class="dtb-repair-modal-card__body">' +
+			detailRows( [
+				[ 'Status', q.status || 'draft' ],
+				[ 'Lines', Array.isArray( q.lines ) ? q.lines.length : 0 ],
+				[ 'Subtotal', q.totals && q.totals.subtotal ? WB.formatMoney( q.totals.subtotal ) : '$0.00' ],
+				[ 'Total', q.totals && ( q.totals.total || q.totals.grand_total ) ? WB.formatMoney( q.totals.total || q.totals.grand_total ) : '$0.00' ],
+			] ) +
+		'</div></section>';
+		html += '<section class="dtb-repair-modal-card"><header><h3>Parts / Shipping</h3></header><div class="dtb-repair-modal-card__body">' +
+			detailRows( [
+				[ 'Allocated Parts', parts.length ],
+				[ 'Tracking Number', shipping.tracking_number ],
+				[ 'Veeqo Order ID', shipping.veeqo_order_id ],
+				[ 'Return Preference', shipping.return_preference ],
+			] ) +
+		'</div></section>';
+		html += '<section class="dtb-repair-modal-card"><header><h3>Recent Timeline</h3></header><div class="dtb-repair-modal-card__body">' +
+			( events.length && WB.renderTimeline ? WB.renderTimeline( events.slice( -8 ) ) : '<p class="dtb-wb-empty">No timeline events yet.</p>' ) +
+		'</div></section>';
+		html += '<section class="dtb-repair-modal-card"><header><h3>Notes / Conversation</h3></header><div class="dtb-repair-modal-card__body">' +
+			( messages.length ? messages.slice( -5 ).map( function ( msg ) {
+				return '<article class="dtb-repair-modal-note"><p>' + WB.escapeHtml( msg.body || '' ) + '</p><small>' + WB.escapeHtml( msg.user_label || msg.author || 'Unknown' ) + ' · ' + WB.escapeHtml( WB.formatDate ? WB.formatDate( msg.created_at ) : msg.created_at || '' ) + '</small></article>';
+			} ).join( '' ) : '<p class="dtb-wb-empty">No notes or customer conversation yet.</p>' ) +
+		'</div></section>';
+		html += '</div>';
+		panel.innerHTML = html;
+	}
+
+	function repairNextActionFallback( d ) {
+		var r = d.record || {};
+		var media = d.media || {};
+		var quote = d.quote || {};
+		var parts = d.parts || {};
+		if ( ! media.count ) {
+			return 'Request customer photos before diagnosis.';
+		}
+		if ( r.status === 'submitted' ) {
+			return 'Review intake details and mark reviewed.';
+		}
+		if ( quote.status === 'draft' && [ 'reviewed', 'approved', 'quoted' ].indexOf( r.status ) !== -1 ) {
+			return 'Finalize and send the repair quote.';
+		}
+		if ( r.status === 'quote_accepted' && ! parts.count ) {
+			return 'Allocate parts before technician work starts.';
+		}
+		if ( r.status === 'in_progress' ) {
+			return 'Record work outcome and prepare shipping handoff.';
+		}
+		return 'Use the next valid workflow transition.';
+	}
+
+	function repairTransitionHint( status ) {
+		var hints = {
+			reviewed: 'Intake has enough detail for diagnosis or quoting.',
+			awaiting_customer: 'Pause the queue while customer info/photos are pending.',
+			approved: 'Repair is accepted for quote/work preparation.',
+			quoted: 'Quote is prepared and ready for customer decision.',
+			quote_accepted: 'Customer approved the quote and work can proceed.',
+			parts_allocated: 'Required parts are reserved for the technician.',
+			in_progress: 'Technician work is actively underway.',
+			ready_to_ship: 'Repair work is complete and shipping needs handoff.',
+			cancelled: 'Stop the repair and remove it from active workload.',
+			closed: 'Repair is fully complete with no remaining staff action.',
+		};
+		return hints[ status ] || 'Move this repair to ' + String( status || 'the selected status' ).replace( /_/g, ' ' ) + '.';
+	}
+
 	// ── Panel: Actions ────────────────────────────────────────────────────────
 
 	function renderActions( d ) {
 		var panel  = getOrCreatePanel( 'actions' );
 		var r      = d.record;
 		var perms  = d.permissions || {};
+		var intel  = d.intelligence || d.intel || {};
+		var quote  = d.quote || {};
+		var parts  = d.parts || {};
+		var media  = d.media || {};
+		var blockers = Array.isArray( intel.blockers ) ? intel.blockers : [];
 		var html   = '';
+
+		html += '<div class="dtb-wb-section" style="padding:1rem">';
+		html += '<h3 class="dtb-wb-section__title">Action intelligence</h3>';
+		html += '<div class="dtb-repair-action-brief">';
+		html += '<p><strong>Recommended:</strong> ' + WB.escapeHtml( intel.next_best_action || repairNextActionFallback( d ) ) + '</p>';
+		html += '<p><strong>Signals:</strong> ' + WB.escapeHtml( [
+			'SLA ' + ( intel.sla_state || 'unknown' ),
+			'media ' + ( media.count || 0 ),
+			'quote ' + ( quote.status || 'draft' ),
+			'parts ' + ( parts.count || 0 ),
+		].join( ' · ' ) ) + '</p>';
+		html += '</div>';
+		if ( blockers.length ) {
+			html += '<div class="dtb-repair-action-blockers">';
+			blockers.forEach( function ( blocker ) {
+				html += '<p>' + WB.escapeHtml( blocker ) + '</p>';
+			} );
+			html += '</div>';
+		}
+		html += '</div>';
 
 		// Status transitions
 		var allowed = ( d.workflow && Array.isArray( d.workflow.allowed_transitions ) ) ? d.workflow.allowed_transitions : ( r.allowed_next || [] );
 		if ( perms.can_transition && allowed.length ) {
 			html += '<div class="dtb-wb-section" style="padding:1rem">';
 			html += '<h3 class="dtb-wb-section__title">Transition status</h3>';
-			html += '<div style="display:flex;flex-wrap:wrap;gap:.5rem">';
+			html += '<div class="dtb-repair-transition-grid">';
 			allowed.forEach( function ( nextStatus ) {
-				html += '<button type="button" class="button dtb-repair-transition-btn" data-status="' + WB.escapeHtml( nextStatus ) + '">'
-				      + WB.escapeHtml( nextStatus.replace( /_/g, ' ' ) )
-				      + '</button>';
+				html += '<button type="button" class="button dtb-repair-transition-btn" data-status="' + WB.escapeHtml( nextStatus ) + '">';
+				html += '<strong>' + WB.escapeHtml( nextStatus.replace( /_/g, ' ' ) ) + '</strong>';
+				html += '<span>' + WB.escapeHtml( repairTransitionHint( nextStatus ) ) + '</span>';
+				html += '</button>';
 			} );
 			html += '</div>';
 			html += '</div>';

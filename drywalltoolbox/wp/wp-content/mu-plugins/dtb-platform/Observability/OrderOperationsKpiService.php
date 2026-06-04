@@ -96,7 +96,7 @@ function dtb_oo_enqueue_assets( string $hook ): void {
     $bootstrap = [
 		'ajaxUrl'         => admin_url( 'admin-ajax.php' ),
 		'nonce'           => wp_create_nonce( DTB_OO_NONCE_ACTION ),
-		'pollInterval'    => ( (int) ( $settings['poll_interval'] ?? 30 ) ) * 1000,
+		'pollInterval'    => max( 180, (int) ( $settings['poll_interval'] ?? 180 ) ) * 1000,
 		'slaWarningHours' => (int) ( $settings['sla_warning_hours'] ?? 72 ),
 		'slaBreachHours'  => (int) ( $settings['sla_breach_hours'] ?? 120 ),
 		'repairStatuses'  => function_exists( 'dtb_get_all_repair_statuses' ) ? dtb_get_all_repair_statuses() : [],
@@ -437,7 +437,7 @@ function dtb_oo_render_settings_form(): void {
 					<th scope="row"><label for="dtb-oo-poll-interval"><?php esc_html_e( 'Polling Interval', 'dtb' ); ?></label></th>
 					<td>
 						<input type="number" id="dtb-oo-poll-interval" name="poll_interval"
-							value="<?php echo esc_attr( $s['poll_interval'] ?? 30 ); ?>" min="10" max="300" />
+							value="<?php echo esc_attr( $s['poll_interval'] ?? 180 ); ?>" min="180" max="300" />
 						<span class="description"><?php esc_html_e( 'seconds (10–300)', 'dtb' ); ?></span>
 					</td>
 				</tr>
@@ -644,7 +644,7 @@ function dtb_oo_inline_js(): string {
     var cfg = window.dtbOpsOrd || {};
     var ajaxUrl      = cfg.ajaxUrl    || window.ajaxurl || '';
     var nonce        = cfg.nonce      || '';
-    var pollInterval = cfg.pollInterval || 30000;
+    var pollInterval = Math.max(cfg.pollInterval || 180000, 180000);
     var strings      = cfg.strings    || {};
 
     var state = {

@@ -16,6 +16,13 @@
 	padding: 1rem;
 }
 
+.dtb-repair-overview-layout {
+	display: grid;
+	gap: 1rem;
+	grid-template-columns: minmax( 0, 1.1fr ) minmax( 300px, 0.65fr );
+	padding: 1rem;
+}
+
 .dtb-repair-workbench-card {
 	background: #fff;
 	border: 1px solid #e2e8f0;
@@ -150,6 +157,102 @@ textarea.dtb-repair-input {
 	margin: 0 0 0.65rem;
 }
 
+.dtb-repair-overview-brief p {
+	color: #334155;
+	font-size: 0.94rem;
+	line-height: 1.55;
+	margin: 0 0 0.7rem;
+}
+
+.dtb-repair-chip-row {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.45rem;
+	margin-top: 0.75rem;
+}
+
+.dtb-repair-chip-row span {
+	background: #eef2ff;
+	border: 1px solid #c7d2fe;
+	border-radius: 999px;
+	color: #3730a3;
+	display: inline-flex;
+	font-size: 0.75rem;
+	font-weight: 800;
+	line-height: 1;
+	padding: 0.42rem 0.6rem;
+	text-transform: capitalize;
+}
+
+.dtb-repair-accelerator-list {
+	display: grid;
+	gap: 0.55rem;
+}
+
+.dtb-repair-accelerator-list .button {
+	justify-content: center;
+	text-align: center;
+	width: 100%;
+}
+
+.dtb-repair-alert-list {
+	display: grid;
+	gap: 0.45rem;
+	margin-top: 0.75rem;
+}
+
+.dtb-repair-alert-list p {
+	background: #fff7ed;
+	border: 1px solid #fed7aa;
+	border-radius: 8px;
+	color: #9a3412;
+	font-size: 0.82rem;
+	font-weight: 700;
+	margin: 0;
+	padding: 0.55rem 0.65rem;
+}
+
+.dtb-repair-media-grid {
+	display: grid;
+	gap: 0.7rem;
+	grid-template-columns: repeat( auto-fill, minmax( 120px, 1fr ) );
+}
+
+.dtb-repair-media-tile {
+	background: #f8fafc;
+	border: 1px solid #e2e8f0;
+	border-radius: 8px;
+	color: #0f172a;
+	display: grid;
+	gap: 0.45rem;
+	overflow: hidden;
+	padding: 0.45rem;
+	text-decoration: none;
+}
+
+.dtb-repair-media-tile:hover {
+	border-color: #93c5fd;
+	color: #1d4ed8;
+}
+
+.dtb-repair-media-tile img {
+	aspect-ratio: 1 / 1;
+	background: #e2e8f0;
+	border-radius: 6px;
+	display: block;
+	object-fit: cover;
+	width: 100%;
+}
+
+.dtb-repair-media-tile span {
+	display: block;
+	font-size: 0.74rem;
+	font-weight: 700;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
 .dtb-repair-message-thread {
 	display: flex;
 	flex-direction: column;
@@ -198,6 +301,7 @@ textarea.dtb-repair-input {
 @media ( max-width: 1040px ) {
 	.dtb-repair-workbench-grid,
 	.dtb-repair-workbench-grid--wide,
+	.dtb-repair-overview-layout,
 	.dtb-repair-conversation-layout {
 		grid-template-columns: 1fr;
 	}

@@ -465,7 +465,7 @@ function dtb_repairs_render_page(): void {
 		'id'       => 'dtb-repairs-workspace',
 		'module'   => 'repairs',
 		'endpoint' => rest_url( 'dtb/v1/admin/repairs' ),
-		'interval' => 30000,
+		'interval' => 180000,
 	] );
 
 	dtb_repairs_render_queue_workspace( $query, $paged, $total_pages );

@@ -33,6 +33,7 @@
 		{
 			module: 'repairs',
 			label: 'Repair',
+			skipGeneratedHero: true,
 			modalSelector: '#dtb-repair-modal',
 			headerSelector: '.dtb-modal__header',
 			titleSelector: '.dtb-modal__title',
@@ -59,6 +60,7 @@
 		{
 			module: 'support',
 			label: 'Ticket',
+			skipGeneratedHero: true,
 			modalSelector: '#dtb-support-ticket-modal',
 			headerSelector: '.dtb-modal__header',
 			titleSelector: '.dtb-modal__title',
@@ -382,7 +384,14 @@
 		if ( ! modal || ! modal.ownerDocument ) {
 			return;
 		}
-		enhanceHero( modal, spec );
+		if ( ! spec.skipGeneratedHero ) {
+			enhanceHero( modal, spec );
+		} else {
+			var generatedHero = modal.querySelector( '[data-dtb-modal-hero="' + spec.module + '"]' );
+			if ( generatedHero && generatedHero.parentNode ) {
+				generatedHero.parentNode.removeChild( generatedHero );
+			}
+		}
 		movePanelActionsToMenu( modal, spec );
 	}
 

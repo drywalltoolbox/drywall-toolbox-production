@@ -31,6 +31,7 @@
 
 	/** @type {DtbAdminConfig} dtbAdminConfig — localized via AdminAssets.php */
 	const cfg = window.dtbAdminConfig || {};
+	const DTB_ADMIN_AUTO_REFRESH_INTERVAL_MS = 180000;
 
 	const DtbAdmin = {
 		version: '2.0.0',
@@ -897,7 +898,7 @@
 				if ( payload && payload.meta && payload.meta.poll_after_ms ) {
 					const newInterval = parseInt( payload.meta.poll_after_ms, 10 );
 					if ( newInterval > 0 ) {
-						target.setAttribute( 'data-dtb-refresh-interval', newInterval );
+						target.setAttribute( 'data-dtb-refresh-interval', Math.max( newInterval, DTB_ADMIN_AUTO_REFRESH_INTERVAL_MS ) );
 					}
 				}
 
@@ -1044,7 +1045,11 @@
 	 */
 	DtbAdmin.registerLiveRegion = function ( el ) {
 		const regionId = el.getAttribute( 'data-dtb-live-region' );
-		const interval = parseInt( el.getAttribute( 'data-dtb-refresh-interval' ) || '0', 10 );
+		const configuredInterval = parseInt( el.getAttribute( 'data-dtb-refresh-interval' ) || '0', 10 );
+		const interval = configuredInterval > 0 ? Math.max( configuredInterval, DTB_ADMIN_AUTO_REFRESH_INTERVAL_MS ) : 0;
+		if ( interval > 0 ) {
+			el.setAttribute( 'data-dtb-refresh-interval', interval );
+		}
 
 		// Mark loading overlay wrapper present
 		if ( ! el.querySelector( '.dtb-region-loading-overlay' ) ) {

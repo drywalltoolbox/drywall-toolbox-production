@@ -93,7 +93,7 @@ function dtb_repairs_admin_queue_handler( WP_REST_Request $request ): WP_REST_Re
 		],
 		'meta'    => [
 			'updated_at'    => gmdate( 'c' ),
-			'poll_after_ms' => 45000,
+			'poll_after_ms' => 180000,
 		],
 	], 200 );
 }

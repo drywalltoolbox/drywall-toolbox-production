@@ -199,6 +199,38 @@ function dtb_repair_admin_detail_handler( WP_REST_Request $request ): WP_REST_Re
 		'veeqo_order_id'  => (string) get_post_meta( $repair_id, '_repair_veeqo_order_id', true ),
 	];
 
+	$media_raw = (string) get_post_meta( $repair_id, '_repair_images', true );
+	$media_ids = '' !== $media_raw ? json_decode( $media_raw, true ) : [];
+	if ( ! is_array( $media_ids ) ) {
+		$media_ids = [];
+	}
+	$media = array_values( array_filter( array_map( static function ( $attachment_id ): ?array {
+		$attachment_id = absint( $attachment_id );
+		if ( ! $attachment_id ) {
+			return null;
+		}
+
+		$url = wp_get_attachment_url( $attachment_id );
+		if ( ! $url ) {
+			return null;
+		}
+
+		$thumb = wp_get_attachment_image_src( $attachment_id, 'thumbnail' );
+		$full  = wp_get_attachment_image_src( $attachment_id, 'full' );
+		$file  = get_attached_file( $attachment_id );
+
+		return [
+			'id'        => $attachment_id,
+			'url'       => esc_url_raw( $url ),
+			'thumbnail' => esc_url_raw( is_array( $thumb ) && ! empty( $thumb[0] ) ? $thumb[0] : $url ),
+			'full'      => esc_url_raw( is_array( $full ) && ! empty( $full[0] ) ? $full[0] : $url ),
+			'alt'       => (string) get_post_meta( $attachment_id, '_wp_attachment_image_alt', true ),
+			'title'     => get_the_title( $attachment_id ),
+			'mime_type' => (string) get_post_mime_type( $attachment_id ),
+			'filename'  => $file ? wp_basename( $file ) : wp_basename( wp_parse_url( $url, PHP_URL_PATH ) ?: '' ),
+		];
+	}, $media_ids ) ) );
+
 	$allocated_parts_raw = (string) get_post_meta( $repair_id, '_repair_parts_allocated', true );
 	$allocated_parts     = json_decode( $allocated_parts_raw, true );
 	if ( ! is_array( $allocated_parts ) ) {
@@ -252,6 +284,10 @@ function dtb_repair_admin_detail_handler( WP_REST_Request $request ): WP_REST_Re
 			'source'    => 'repair_meta',
 		],
 		'shipping'     => $shipping,
+		'media'        => [
+			'items' => $media,
+			'count' => count( $media ),
+		],
 		'conversation' => $conversation,
 		'workflow'     => [
 			'key'                 => 'repair',

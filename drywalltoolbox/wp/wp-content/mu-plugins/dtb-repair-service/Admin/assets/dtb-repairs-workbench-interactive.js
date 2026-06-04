@@ -263,6 +263,111 @@
 		return d.parts && Array.isArray( d.parts.allocated ) ? d.parts.allocated : [];
 	}
 
+	function getMediaItems( d ) {
+		return d.media && Array.isArray( d.media.items ) ? d.media.items : [];
+	}
+
+	function shortStatus( value ) {
+		return String( value || 'unknown' ).replace( /_/g, ' ' );
+	}
+
+	function metric( label, value ) {
+		return '<div class="dtb-repair-summary-metric"><span>' + esc( label ) + '</span><strong>' + esc( value || '—' ) + '</strong></div>';
+	}
+
+	function renderMediaGrid( d ) {
+		var media = getMediaItems( d );
+		if ( ! media.length ) {
+			return '<p class="dtb-wb-empty">No customer photos or media are attached to this repair yet.</p>';
+		}
+		return '<div class="dtb-repair-media-grid">' + media.map( function ( item ) {
+			var label = item.alt || item.title || item.filename || ( 'Attachment #' + item.id );
+			return '<a class="dtb-repair-media-tile" href="' + esc( item.full || item.url || '#' ) + '" target="_blank" rel="noopener">' +
+				'<img src="' + esc( item.thumbnail || item.url || '' ) + '" alt="' + esc( label ) + '">' +
+				'<span>' + esc( item.filename || label ) + '</span>' +
+			'</a>';
+		} ).join( '' ) + '</div>';
+	}
+
+	function renderOverview( d ) {
+		var target = panel( 'overview' );
+		if ( ! target ) { return; }
+		var r = d.record || {};
+		var q = normalizeQuote( d.quote );
+		var intel = d.intelligence || d.intel || {};
+		var blockers = Array.isArray( intel.blockers ) ? intel.blockers : [];
+		var flags = [].concat( intel.intent_flags || [], intel.sentiment_flags || [] );
+		var media = getMediaItems( d );
+		var linked = d.linked_records || d.linked || {};
+		var timeline = Array.isArray( d.timeline ) ? d.timeline : [];
+		var nextAction = intel.next_best_action || deriveNextAction( d );
+
+		target.innerHTML = '<div class="dtb-repair-overview-layout">' +
+			section( 'Operational brief', '<div class="dtb-repair-overview-brief">' +
+				'<p><strong>Next best action:</strong> ' + esc( nextAction ) + '</p>' +
+				'<p><strong>Customer issue:</strong> ' + esc( r.issue_description || 'No issue details submitted.' ) + '</p>' +
+				'<p><strong>Tool:</strong> ' + esc( [ r.tool_brand, r.tool_model, r.tool_category ].filter( Boolean ).join( ' / ' ) || 'Unspecified' ) + '</p>' +
+			'</div><div class="dtb-repair-chip-row">' +
+				'<span>' + esc( shortStatus( r.status ) ) + '</span>' +
+				'<span>' + esc( intel.sla_state || 'SLA unknown' ) + '</span>' +
+				'<span>' + esc( media.length + ' media' ) + '</span>' +
+				'<span>' + esc( q.lines.length + ' quote lines' ) + '</span>' +
+			'</div>' ) +
+			section( 'Efficiency accelerators', renderAccelerators( d ) ) +
+			section( 'Workload intelligence', metric( 'Score', intel.workload_score || '—' ) +
+				metric( 'Age', intel.age_bucket || '—' ) +
+				metric( 'SLA', intel.sla_state || '—' ) +
+				metric( 'Quote', q.status || 'draft' ) +
+				( blockers.length ? '<div class="dtb-repair-alert-list">' + blockers.map( function ( blocker ) { return '<p>' + esc( blocker ) + '</p>'; } ).join( '' ) + '</div>' : '<p class="dtb-wb-empty">No current blockers detected.</p>' ) +
+				( flags.length ? '<div class="dtb-repair-chip-row">' + flags.map( function ( flag ) { return '<span>' + esc( flag ) + '</span>'; } ).join( '' ) + '</div>' : '' ) ) +
+			section( 'Customer media', renderMediaGrid( d ) ) +
+			section( 'Record context', metric( 'Customer', r.customer_name || '—' ) +
+				metric( 'Email', r.customer_email || '—' ) +
+				metric( 'Priority', r.priority || 'normal' ) +
+				metric( 'Service tier', r.service_tier || '—' ) +
+				metric( 'Linked records', linked && linked.records ? linked.records.length : 0 ) +
+				metric( 'Timeline events', timeline.length ) ) +
+		'</div>';
+	}
+
+	function deriveNextAction( d ) {
+		var r = d.record || {};
+		var q = normalizeQuote( d.quote );
+		var media = getMediaItems( d );
+		if ( ! media.length ) {
+			return 'Request diagnostic photos from customer';
+		}
+		if ( r.status === 'submitted' ) {
+			return 'Review intake and move to reviewed';
+		}
+		if ( q.status === 'draft' && [ 'reviewed', 'approved', 'quoted' ].indexOf( r.status ) !== -1 ) {
+			return 'Finalize and send quote';
+		}
+		if ( ( d.parts || {} ).count > 0 && r.status === 'quote_accepted' ) {
+			return 'Allocate parts and assign technician';
+		}
+		return 'Advance the repair through the next valid workflow step';
+	}
+
+	function renderAccelerators( d ) {
+		var r = d.record || {};
+		var allowed = ( d.workflow && Array.isArray( d.workflow.allowed_transitions ) ) ? d.workflow.allowed_transitions : ( r.allowed_next || [] );
+		var html = '<div class="dtb-repair-accelerator-list">';
+		html += '<button type="button" class="button button-primary" data-dtb-repair-ui-action="request-customer-info">Request missing info</button>';
+		if ( allowed.indexOf( 'reviewed' ) !== -1 ) {
+			html += '<button type="button" class="button" data-dtb-repair-ui-action="quick-transition" data-status="reviewed">Mark reviewed</button>';
+		}
+		if ( allowed.indexOf( 'awaiting_customer' ) !== -1 ) {
+			html += '<button type="button" class="button" data-dtb-repair-ui-action="quick-transition" data-status="awaiting_customer">Awaiting customer</button>';
+		}
+		if ( [ 'reviewed', 'approved', 'quoted' ].indexOf( r.status ) !== -1 ) {
+			html += '<button type="button" class="button" data-dtb-repair-ui-action="jump-tab" data-tab="quote">Build quote</button>';
+		}
+		html += '<button type="button" class="button" data-dtb-repair-ui-action="jump-tab" data-tab="conversation">Open thread</button>';
+		html += '</div>';
+		return html;
+	}
+
 	function renderParts( d ) {
 		var target = panel( 'parts' );
 		if ( ! target ) { return; }
@@ -341,6 +446,7 @@
 				'<p><strong>Serial:</strong> ' + esc( r.serial_number || '—' ) + '</p>' +
 				'<p><strong>Issue:</strong> ' + esc( r.issue_description || '—' ) + '</p>' +
 			'</div>' ) +
+			section( 'Customer photos / media', renderMediaGrid( d ) ) +
 			section( 'Request more information', field( 'Message to customer', textarea( 'body', body, 7 ) ) + '<div class="dtb-repair-command-row">' + button( 'Send request', 'request-customer-info', 'primary' ) + '</div>' ) +
 		'</div>';
 	}
@@ -474,6 +580,15 @@
 				promise = workbenchAction( 'shipping_save', collectFormValues( root ) );
 			} else if ( action === 'shipping-ready' ) {
 				promise = legacyAction( 'ready-to-ship', collectFormValues( root ) );
+			} else if ( action === 'quick-transition' ) {
+				var toStatus = actionEl.getAttribute( 'data-status' ) || '';
+				if ( ! toStatus ) { return; }
+				promise = legacyAction( 'transition', { to_status: toStatus } );
+			} else if ( action === 'jump-tab' ) {
+				var tab = actionEl.getAttribute( 'data-tab' ) || '';
+				var tabButton = tab ? qs( '#dtb-repair-modal [data-tab="' + tab + '"]' ) : null;
+				if ( tabButton ) { tabButton.click(); }
+				return;
 			} else if ( action === 'conversation-send' ) {
 				var sendBody = ( qs( '[name="body"]', root ) || {} ).value || '';
 				if ( ! sendBody.trim() ) { toast( 'Message body is empty.', 'warning' ); return; }
@@ -485,7 +600,11 @@
 			} else if ( action === 'conversation-read' ) {
 				promise = legacyAction( 'mark-customer-read', {} );
 			} else if ( action === 'request-customer-info' ) {
-				promise = workbenchAction( 'request_customer_info', collectFormValues( root ) );
+				var infoPayload = collectFormValues( root );
+				if ( ! infoPayload.body ) {
+					infoPayload.body = 'Hi ' + ( ( state.payload && state.payload.record && state.payload.record.customer_name ) || 'there' ) + ',\n\nWe need a little more information to continue your repair review. Please reply with any additional photos, symptoms, or tool details that would help our technician diagnose the issue.\n\nThank you.';
+				}
+				promise = workbenchAction( 'request_customer_info', infoPayload );
 			}
 
 			if ( promise ) {
