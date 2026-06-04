@@ -484,100 +484,100 @@ const _fallbacks = {
 
   // ── TapeTech ────────────────────────────────────────────────────────────
   'tapetech-80xxtt': {
-    pages:   { 1: `${_BASE}brands/TapeTech/Schematics/80XXTT/8034TT_SCH_page_1-enhanced.png` },
+    pages:   { 1: `${_BASE}brands/TapeTech/Schematics/80XXTT/8034TT_SCH_page_1.webp` },
     preview: `${_BASE}brands/TapeTech/Schematics/80XXTT/reference_images/8034tt_01.webp`,
   },
   'tapetech-07tt': {
     pages: {
-      1: `${_BASE}brands/TapeTech/Schematics/07TT/tapetech-tapetech-lock-block-for-07tt-050212f-sch-schematic-page-001.png`,
-      2: `${_BASE}brands/TapeTech/Schematics/07TT/tapetech-tapetech-lock-block-for-07tt-050212f-sch-schematic-page-002.png`,
-      3: `${_BASE}brands/TapeTech/Schematics/07TT/tapetech-tapetech-lock-block-for-07tt-050212f-sch-schematic-page-003.png`,
-      4: `${_BASE}brands/TapeTech/Schematics/07TT/tapetech-tapetech-lock-block-for-07tt-050212f-sch-schematic-page-004.png`,
+      1: `${_BASE}brands/TapeTech/Schematics/07TT/tapetech-tapetech-lock-block-for-07tt-050212f-sch-schematic-page-001.webp`,
+      2: `${_BASE}brands/TapeTech/Schematics/07TT/tapetech-tapetech-lock-block-for-07tt-050212f-sch-schematic-page-002.webp`,
+      3: `${_BASE}brands/TapeTech/Schematics/07TT/tapetech-tapetech-lock-block-for-07tt-050212f-sch-schematic-page-003.webp`,
+      4: `${_BASE}brands/TapeTech/Schematics/07TT/tapetech-tapetech-lock-block-for-07tt-050212f-sch-schematic-page-004.webp`,
     },
-    preview: `${_BASE}brands/TapeTech/Schematics/07TT/07TT_Full_Full__37672.png`,
+    preview: `${_BASE}brands/TapeTech/Schematics/07TT/07TT_Full_Full__37672.webp`,
   },
   'tapetech-17tt': {
-    pages:   { 1: `${_BASE}brands/TapeTech/Schematics/17TT/schematic_page_1.png` },
-    preview: `${_BASE}brands/TapeTech/Schematics/17TT/tapetech_17tta__59147.png`,
+    pages:   { 1: `${_BASE}brands/TapeTech/Schematics/17TT/schematic_page_1.webp` },
+    preview: `${_BASE}brands/TapeTech/Schematics/17TT/tapetech_17tta__59147.webp`,
   },
   'tapetech-42tt': {
-    pages:   { 1: `${_BASE}brands/TapeTech/Schematics/42TT/tapetech-90-inside-corner-edger-tapetech-42tt-sch-schematic-page-001.png` },
-    preview: `${_BASE}brands/TapeTech/Schematics/42TT/42tt.png`,
+    pages:   { 1: `${_BASE}brands/TapeTech/Schematics/42TT/tapetech-90-inside-corner-edger-tapetech-42tt-sch-schematic-page-001.webp` },
+    preview: `${_BASE}brands/TapeTech/Schematics/42TT/42tt.webp`,
   },
   'tapetech-48tt': {
-    pages:   { 1: `${_BASE}brands/TapeTech/Schematics/48TT/tapetech-90-inside-corner-edger-tapetech-48tt-sch-schematic-page-001.png` },
-    preview: `${_BASE}brands/TapeTech/Schematics/48TT/tapetech-90-inside-corner-edger-tapetech-48tt-sch-schematic-page-001.png`,
+    pages:   { 1: `${_BASE}brands/TapeTech/Schematics/48TT/tapetech-90-inside-corner-edger-tapetech-48tt-sch-schematic-page-001.webp` },
+    preview: `${_BASE}brands/TapeTech/Schematics/48TT/tapetech-90-inside-corner-edger-tapetech-48tt-sch-schematic-page-001.webp`,
   },
   'tapetech-76tt': {
-    pages:   { 1: `${_BASE}brands/TapeTech/Schematics/76TT/76TT-page_1.png` },
+    pages:   { 1: `${_BASE}brands/TapeTech/Schematics/76TT/76TT-page_1.webp` },
     preview: `${_BASE}brands/TapeTech/Schematics/76TT/reference_images/76tt_01.webp`,
   },
   'tapetech-81xxtt': {
-    pages:   { 1: `${_BASE}brands/TapeTech/Schematics/81XXTT/8154TT_SCH_page_1.png` },
+    pages:   { 1: `${_BASE}brands/TapeTech/Schematics/81XXTT/reference_images/8154tt_01.webp` },
     preview: `${_BASE}brands/TapeTech/Schematics/81XXTT/reference_images/8154tt_01.webp`,
   },
   'tapetech-85t': {
-    pages:   { 1: `${_BASE}brands/TapeTech/Schematics/85T/85T_SCH_page_1.png` },
+    pages:   { 1: `${_BASE}brands/TapeTech/Schematics/85T/85T_SCH_page_1.webp` },
     preview: `${_BASE}brands/TapeTech/Schematics/85T/reference_images/85t_01.webp`,
   },
   'tapetech-88tte': {
-    pages:   { 1: `${_BASE}brands/TapeTech/Schematics/88TTE/88TTE_SCH_page_1.png` },
+    pages:   { 1: `${_BASE}brands/TapeTech/Schematics/88TTE/88TTE_SCH-1.webp` },
     preview: `${_BASE}brands/TapeTech/Schematics/88TTE/reference_images/88tte_01.webp`,
   },
   'tapetech-90t': {
-    pages:   { 1: `${_BASE}brands/TapeTech/Schematics/90T/90T_SCH_page_1.png` },
+    pages:   { 1: `${_BASE}brands/TapeTech/Schematics/90T/90T_SCH_page_1.webp` },
     preview: `${_BASE}brands/TapeTech/Schematics/90T/reference_images/90t_01.webp`,
   },
   'tapetech-ehc07': {
-    pages:   { 1: `${_BASE}brands/TapeTech/Schematics/EHC07/EHC07_SCH_page_1-enhanced.png` },
+    pages:   { 1: `${_BASE}brands/TapeTech/Schematics/EHC07/EHC07_SCH_page_1.webp` },
     preview: `${_BASE}brands/TapeTech/Schematics/EHC07/reference_images/ehc07_01.webp`,
   },
   'tapetech-ehc10': {
-    pages:   { 1: `${_BASE}brands/TapeTech/Schematics/EHC10/EHC10_SCH_page_1.png` },
+    pages:   { 1: `${_BASE}brands/TapeTech/Schematics/EHC10/EHC10_SCH_page_1.webp` },
     preview: `${_BASE}brands/TapeTech/Schematics/EHC10/reference_images/ehc10_01.webp`,
   },
   'tapetech-ehc12': {
-    pages:   { 1: `${_BASE}brands/TapeTech/Schematics/EHC12/EHC12_SCH_page_1.png` },
+    pages:   { 1: `${_BASE}brands/TapeTech/Schematics/EHC12/EHC12_SCH_page_1.webp` },
     preview: `${_BASE}brands/TapeTech/Schematics/EHC12/reference_images/ehc12_01.webp`,
   },
   'tapetech-ez07tt': {
-    pages:   { 1: `${_BASE}brands/TapeTech/Schematics/EZ07TT/EZ07TT_SCH_page_1.png` },
+    pages:   { 1: `${_BASE}brands/TapeTech/Schematics/EZ07TT/EZ07TT_SCH_page_1.webp` },
     preview: `${_BASE}brands/TapeTech/Schematics/EZ07TT/reference_images/ez07tt_01.webp`,
   },
   'tapetech-ez10tt': {
-    pages:   { 1: `${_BASE}brands/TapeTech/Schematics/EZ10TT/EZ10TT_SCH_page_1.png` },
+    pages:   { 1: `${_BASE}brands/TapeTech/Schematics/EZ10TT/EZ10TT_SCH_page_1.webp` },
     preview: `${_BASE}brands/TapeTech/Schematics/EZ10TT/reference_images/ez10tt_01.webp`,
   },
   'tapetech-ez12tt': {
-    pages:   { 1: `${_BASE}brands/TapeTech/Schematics/EZ12TT/EZ12TT_SCH_page_1.png` },
+    pages:   { 1: `${_BASE}brands/TapeTech/Schematics/EZ12TT/EZ12TT_SCH_page_1.webp` },
     preview: `${_BASE}brands/TapeTech/Schematics/EZ12TT/reference_images/ez12tt_01.webp`,
   },
   'tapetech-ez15tt': {
-    pages:   { 1: `${_BASE}brands/TapeTech/Schematics/EZ15TT/EZ15TT_SCH_page_1.png` },
+    pages:   { 1: `${_BASE}brands/TapeTech/Schematics/EZ15TT/EZ15TT_SCH_page_1.webp` },
     preview: `${_BASE}brands/TapeTech/Schematics/EZ15TT/reference_images/ez15tt_01.webp`,
   },
   'tapetech-pahc07': {
-    pages:   { 1: `${_BASE}brands/TapeTech/Schematics/PAHC07/PAHC07_SCH_page_1.png` },
+    pages:   { 1: `${_BASE}brands/TapeTech/Schematics/PAHC07/PAHC07_SCH_page_1.webp` },
     preview: `${_BASE}brands/TapeTech/Schematics/PAHC07/reference_images/pahc07_01.webp`,
   },
   'tapetech-pahc10': {
-    pages:   { 1: `${_BASE}brands/TapeTech/Schematics/PAHC10/PAHC10_SCH_v2_page_1.png` },
+    pages:   { 1: `${_BASE}brands/TapeTech/Schematics/PAHC10/PAHC10_SCH_v2_page_1.webp` },
     preview: `${_BASE}brands/TapeTech/Schematics/PAHC10/reference_images/pahc10_01.webp`,
   },
   'tapetech-pahc12': {
-    pages:   { 1: `${_BASE}brands/TapeTech/Schematics/PAHC12/PAHC12_SCH_page_1.png` },
+    pages:   { 1: `${_BASE}brands/TapeTech/Schematics/PAHC12/PAHC12_SCH_page_1.webp` },
     preview: `${_BASE}brands/TapeTech/Schematics/PAHC12/reference_images/pahc12_01.webp`,
   },
   'tapetech-qb06-qsx': {
-    pages:   { 1: `${_BASE}brands/TapeTech/Schematics/QB06-QSX/QB06-QSX_SCH_page_1.png` },
+    pages:   { 1: `${_BASE}brands/TapeTech/Schematics/QB06-QSX/QB06-QSX_SCH_page_1.webp` },
     preview: `${_BASE}brands/TapeTech/Schematics/QB06-QSX/reference_images/qb06-qsx_01.webp`,
   },
   'tapetech-qb08-qsx': {
-    pages:   { 1: `${_BASE}brands/TapeTech/Schematics/QB08-QSX/QB08-QSX_SCH_page_1.png` },
+    pages:   { 1: `${_BASE}brands/TapeTech/Schematics/QB08-QSX/QB08-QSX_SCH_page_1.webp` },
     preview: `${_BASE}brands/TapeTech/Schematics/QB08-QSX/reference_images/qb08-qsx_01.webp`,
   },
   'tapetech-xhtt': {
-    pages:   { 1: `${_BASE}brands/TapeTech/Schematics/XHTT/XHTT_SCH_page_1-enhanced.png` },
+    pages:   { 1: `${_BASE}brands/TapeTech/Schematics/XHTT/XHTT_SCH_page_1.webp` },
     preview: `${_BASE}brands/TapeTech/Schematics/XHTT/reference_images/xhtt_01.webp`,
   },
 
@@ -798,7 +798,7 @@ const ALLOWED_BRANDS = [
   useEffect(() => {
     const params = new URLSearchParams();
     if (selectedBrand)    params.set('brand',     BRAND_TO_SLUG[selectedBrand] ?? selectedBrand);
-    if (selectedCategory) params.set('category',  encodeURIComponent(selectedCategory));
+    if (selectedCategory) params.set('category', selectedCategory);
     if (selectedSchematic) params.set('schematic', selectedSchematic);
     const depth = (selectedBrand ? 1 : 0) + (selectedCategory ? 1 : 0) + (selectedSchematic ? 1 : 0);
     const isForward = depth > _prevDepthRef.current;
@@ -815,7 +815,7 @@ const ALLOWED_BRANDS = [
     const categorySlug = params.get('category');
     const schematicId  = params.get('schematic');
     const newBrand     = brandSlug    ? (SLUG_TO_BRAND[brandSlug] ?? null) : null;
-    const newCategory  = categorySlug ? decodeURIComponent(categorySlug)    : null;
+    const newCategory  = categorySlug ?? null;
     const newSchematic = schematicId  ?? null;
     // Only call setters when values actually differ to avoid re-render loops.
     setSelectedBrand(prev     => prev     === newBrand     ? prev     : newBrand);

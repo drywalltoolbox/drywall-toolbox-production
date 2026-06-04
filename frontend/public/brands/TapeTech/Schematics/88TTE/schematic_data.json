@@ -8,9 +8,9 @@
       {
         "page": 1,
         "image": {
-          "src": "88tte-sch-page-1-page-01.png",
-          "natural_width": 4800,
-          "natural_height": 3584
+          "src": "88TTE_SCH-1.webp",
+          "natural_width": 3400,
+          "natural_height": 2200
         },
         "coordinate_space": {
           "origin": "top-left",

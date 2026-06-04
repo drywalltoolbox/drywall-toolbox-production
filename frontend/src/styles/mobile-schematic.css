@@ -199,7 +199,7 @@
 
   /* The card itself is the detached modal */
   .part-modal-detached .schematic-hotspot-card {
-    width: clamp(280px, 90vw, 380px);
+    width: clamp(320px, 90vw, 420px);
   }
 
   /* Hide old grid-based image styling */
@@ -253,7 +253,7 @@
 
 /* Left column — thumbnail fills full height, flush to card edge */
 .schematic-hotspot-card__image {
-  flex: 0 0 40%;
+  flex: 0 0 30%;
   position: relative;
   align-self: stretch;
   border-radius: 0;
@@ -498,7 +498,7 @@
 /* Responsive adjustments for small screens */
 @media (max-width: 768px) {
   .mobile-part-modal-overlay .schematic-hotspot-card__image {
-    flex: 0 0 33%;
+    flex: 0 0 28%;
   }
 
   .mobile-part-modal-overlay .schematic-hotspot-card__stock {
