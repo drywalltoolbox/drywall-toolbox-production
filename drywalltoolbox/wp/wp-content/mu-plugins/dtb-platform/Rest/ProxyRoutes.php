@@ -89,6 +89,14 @@ function dtb_register_proxy_routes(): void {
 		'permission_callback' => '__return_true',
 	] );
 
+	// resolve-sku MUST be registered before the generic /{id} numeric route
+	// so WordPress matches the literal prefix before the digit pattern.
+	register_rest_route( $ns, '/products/resolve-sku/(?P<sku>[a-zA-Z0-9._-]+)', [
+		'methods'             => 'GET',
+		'callback'            => 'dtb_proxy_resolve_sku',
+		'permission_callback' => '__return_true',
+	] );
+
 	register_rest_route( $ns, '/products/(?P<id>\d+)', [
 		'methods'             => 'GET',
 		'callback'            => 'dtb_proxy_product_by_id',
@@ -1280,6 +1288,58 @@ function dtb_proxy_product_by_id( WP_REST_Request $request ): WP_REST_Response {
 /** GET /drywall/v1/products/slug/{slug} */
 function dtb_proxy_product_by_slug( WP_REST_Request $request ): WP_REST_Response {
 	return dtb_cached_wc_get( 'wc/v3/products', [ 'slug' => sanitize_title( $request->get_param( 'slug' ) ) ] );
+}
+
+/**
+ * GET /drywall/v1/products/resolve-sku/{sku}
+ *
+ * Resolves any product SKU — including variation SKUs — to its canonical URL
+ * components.  Used by the React /product/:sku legacy route to redirect
+ * variation SKUs to the correct /products/{parentSlug}?variant={id} URL.
+ *
+ * Returns:
+ *   { "type": "simple",    "id": N, "slug": "..." }
+ *   { "type": "variation", "id": N, "parentId": N, "parentSlug": "..." }
+ */
+function dtb_proxy_resolve_sku( WP_REST_Request $request ): WP_REST_Response {
+	$sku = sanitize_text_field( trim( (string) ( $request->get_param( 'sku' ) ?? '' ) ) );
+
+	if ( '' === $sku || ! function_exists( 'wc_get_product_id_by_sku' ) ) {
+		return new WP_REST_Response( dtb_error_envelope( 'not_found', 'Product not found.', 404 ), 404 );
+	}
+
+	$product_id = (int) wc_get_product_id_by_sku( $sku );
+	if ( $product_id <= 0 ) {
+		return new WP_REST_Response( dtb_error_envelope( 'not_found', 'Product not found.', 404 ), 404 );
+	}
+
+	$post = get_post( $product_id );
+	if ( ! $post ) {
+		return new WP_REST_Response( dtb_error_envelope( 'not_found', 'Product not found.', 404 ), 404 );
+	}
+
+	if ( 'product_variation' === $post->post_type ) {
+		$parent_id   = (int) $post->post_parent;
+		$parent_post = $parent_id > 0 ? get_post( $parent_id ) : null;
+		$parent_slug = $parent_post ? (string) $parent_post->post_name : '';
+
+		if ( '' === $parent_slug ) {
+			return new WP_REST_Response( dtb_error_envelope( 'not_found', 'Parent product not found.', 404 ), 404 );
+		}
+
+		return new WP_REST_Response( [
+			'type'       => 'variation',
+			'id'         => $product_id,
+			'parentId'   => $parent_id,
+			'parentSlug' => $parent_slug,
+		], 200 );
+	}
+
+	return new WP_REST_Response( [
+		'type' => 'simple',
+		'id'   => $product_id,
+		'slug' => (string) $post->post_name,
+	], 200 );
 }
 
 /** GET /drywall/v1/products/{parent_id}/variations/{id} */

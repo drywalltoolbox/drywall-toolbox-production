@@ -193,3 +193,24 @@ export async function getProductBySku( sku ) {
   }
 }
 
+/**
+ * Resolve a SKU (parent or variation) to its canonical product URL components.
+ *
+ * For simple products: returns { type: 'simple', id, slug }
+ * For variation SKUs:  returns { type: 'variation', id, parentId, parentSlug }
+ *
+ * Used by the /product/:sku legacy route to redirect variation SKUs to the
+ * correct /products/{parentSlug}?variant={id} URL.
+ *
+ * @param {string} sku
+ * @returns {Promise<{ type: string, id: number, slug?: string, parentId?: number, parentSlug?: string } | null>}
+ */
+export async function resolveProductBySku( sku ) {
+  if ( ! sku ) return null;
+  try {
+    return await apiClient( `/wp-json/drywall/v1/products/resolve-sku/${ encodeURIComponent( sku ) }` );
+  } catch {
+    return null;
+  }
+}
+

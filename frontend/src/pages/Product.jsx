@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { getProductById } from '../services/catalog';
+import { resolveProductBySku } from '../api/products.js';
 import { useCart } from '../context/CartContext';
 import { useWorkflowTransition } from '../context/WorkflowTransitionContext.jsx';
 import ProductDetail from '../components/product/ProductDetail';
@@ -43,19 +44,39 @@ export default function Product() {
     // Support both /products/:slug (current) and /product/:partNumber (legacy)
     const key = slug || partNumber;
 
-    const load = async () => {
-      // catalog service resolves by numeric ID, slug, SKU, or part_number
-      // using the live WooCommerce REST API.
-      return getProductById(key);
-    };
+    async function loadProduct() {
+      try {
+        // catalog service resolves by numeric ID, slug, SKU, or part_number
+        // using the live WooCommerce REST API.
+        const found = await getProductById(key);
+        if (!mounted) return;
 
-    load()
-      .then(found => { if (mounted) setProduct(found || null); })
-      .catch(() => { if (mounted) setProduct(null); })
-      .finally(() => { if (mounted) setLoading(false); });
+        if (found) {
+          setProduct(found);
+        } else {
+          // Not found as a parent product — check if this is a variation SKU.
+          // If so, redirect to the canonical /products/{slug}?variant={id} URL.
+          const resolved = await resolveProductBySku(key);
+          if (!mounted) return;
+
+          if (resolved?.type === 'variation' && resolved.parentSlug) {
+            navigate(`/products/${resolved.parentSlug}?variant=${resolved.id}`, { replace: true });
+            return; // navigation is taking over, skip setLoading
+          }
+
+          setProduct(null);
+        }
+      } catch {
+        if (mounted) setProduct(null);
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    }
+
+    loadProduct();
 
     return () => { mounted = false; };
-  }, [slug, partNumber]);
+  }, [slug, partNumber, navigate]);
 
   if (loading) {
     return (
