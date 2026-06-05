@@ -152,11 +152,11 @@ export async function getCart() {
  *
  * @param {number|string} productId   WooCommerce product ID
  * @param {number}        qty         Quantity (default: 1)
- * @param {Object}        variation   Variation attribute map (optional)
+ * @param {Array<Object>} variation   Store API variation array (optional)
  * @param {Object}        extensions  Store API extension payload (optional)
  * @returns {Promise<Object>}
  */
-export async function addToCart( productId, qty = 1, variation = {}, extensions = {} ) {
+export async function addToCart( productId, qty = 1, variation = [], extensions = {} ) {
   return storeFetch( '/cart/add-item', {
     method: 'POST',
     body: JSON.stringify( { id: productId, quantity: qty, variation, extensions } ),

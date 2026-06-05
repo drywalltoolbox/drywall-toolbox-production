@@ -80,12 +80,13 @@ function asCartItems(value) {
 }
 
 function buildStoreApiVariation(variationAttributeValues) {
-  if (!Array.isArray(variationAttributeValues)) return {};
-  return Object.fromEntries(
-    variationAttributeValues
-      .filter((attr) => attr?.name && attr?.option)
-      .map((attr) => [attr.name, attr.option]),
-  );
+  if (!Array.isArray(variationAttributeValues)) return [];
+  return variationAttributeValues
+    .filter((attr) => attr?.name && attr?.option)
+    .map((attr) => ({
+      attribute: attr.slug || attr.name,
+      value: attr.option,
+    }));
 }
 
 function buildStoreApiExtensions(product) {
