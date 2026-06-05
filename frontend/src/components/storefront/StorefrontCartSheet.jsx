@@ -125,9 +125,7 @@ export default function StorefrontCartSheet({ isOpen, onClose, cartItems = [], r
               {cartItems.map((item) => {
                 const key = item.cartKey || item.id;
                 const isPending = isMutating || pendingKey === key;
-                const optionText = Array.isArray(item.variation_attribute_values)
-                  ? item.variation_attribute_values.map((a) => a.option).filter(Boolean).join(' / ')
-                  : '';
+                const skuText = item.sku || item.part_number || '';
                 const lineTotal = (item.price * item.quantity).toFixed(2);
 
                 return (
@@ -152,7 +150,7 @@ export default function StorefrontCartSheet({ isOpen, onClose, cartItems = [], r
                         </button>
                       </div>
 
-                      {optionText ? <span className="scs-item-variant">{optionText}</span> : null}
+                      {skuText ? <span className="scs-item-sku">SKU: {skuText}</span> : null}
 
                       <div className="scs-item-bottom">
                         <div className="scs-item-qty-row" role="group" aria-label={`Quantity for ${item.name}`}>
@@ -452,6 +450,17 @@ export default function StorefrontCartSheet({ isOpen, onClose, cartItems = [], r
           font-size: 0.72rem;
           color: #94a3b8;
           line-height: 1.3;
+        }
+
+        .scs-item-sku {
+          font-family: var(--font-mono);
+          font-size: 0.7rem;
+          color: #64748b;
+          line-height: 1.25;
+          letter-spacing: 0.01em;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
         }
 
         .scs-item-remove {

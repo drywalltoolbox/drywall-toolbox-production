@@ -12,7 +12,7 @@ export default function ProductsCategorySelector({
   return (
     <div className="product-selector">
       <div className="product-selector-header">
-        <BackButton onClick={onBack} label="Brands" />
+        <BackButton onClick={onBack} label="Brands" className="dtb-product-nav-back" />
         <div className="product-selector-header-content">
           {brandLogo && (
             <img

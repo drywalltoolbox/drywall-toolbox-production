@@ -314,7 +314,11 @@ export default function ProductsCatalogPlatform({ forceProductGrid = false, titl
       <div className="container mx-auto px-4 py-4 pt-6">
         {!showCategoryLanding && selectedBrand && (
           <div className="mb-4 hidden sm:block">
-            <BackButton onClick={query.displayCategory ? resetToCategoryCards : resetToBrandList} label={query.displayCategory ? selectedBrand : 'Brands'} />
+            <BackButton
+              onClick={query.displayCategory ? resetToCategoryCards : resetToBrandList}
+              label={query.displayCategory ? selectedBrand : 'Brands'}
+              className="dtb-product-nav-back"
+            />
           </div>
         )}
 

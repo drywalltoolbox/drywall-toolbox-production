@@ -18,5 +18,9 @@ export function decodeHtmlEntities(str) {
     .replace(/&gt;/g,   '>')
     .replace(/&quot;/g, '"')
     .replace(/&#039;/g, "'")
-    .replace(/&nbsp;/g, ' ');
+    .replace(/&nbsp;/g, ' ')
+    // Numeric decimal entities: &#8243; → ″
+    .replace(/&#(\d+);/g, (_, code) => String.fromCharCode(Number(code)))
+    // Numeric hex entities: &#x2033; → ″
+    .replace(/&#x([0-9a-f]+);/gi, (_, hex) => String.fromCharCode(parseInt(hex, 16)));
 }

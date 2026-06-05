@@ -49,20 +49,30 @@ function normalizeStoreCartItem(item) {
   const variationValues = Array.isArray(item?.variation)
     ? item.variation.map((attr) => ({
         name: attr?.attribute || attr?.name || '',
-        option: attr?.value || attr?.option || '',
+        option: decodeHtmlEntities(attr?.value || attr?.option || ''),
       })).filter((attr) => attr.name && attr.option)
     : null;
+
+  const parentName = decodeHtmlEntities(item.name || '');
+  const optionsSuffix = variationValues?.length
+    ? variationValues.map((v) => v.option).join(' / ')
+    : '';
+  const displayName = (item.variation_id && optionsSuffix)
+    ? `${parentName} – ${optionsSuffix}`
+    : parentName;
+
+  const decodedSku = decodeHtmlEntities(item.sku || '');
 
   return {
     cartKey: item.key,
     id: item.id,
     key: item.key,
-    name: decodeHtmlEntities(item.name),
+    name: displayName,
     brand: item.brand || '',
     price: parsePriceFromStoreApi(item?.prices?.price ?? item?.price, item?.prices?.currency_minor_unit),
     image: getStoreItemImage(item),
-    part_number: item.sku || String(item.id || ''),
-    sku: item.sku || '',
+    part_number: decodedSku || String(item.id || ''),
+    sku: decodedSku,
     parent_id: item.variation_id ? item.id : null,
     variation_id: item.variation_id || null,
     variation_attribute_values: variationValues,

@@ -215,7 +215,7 @@ const _fallbacks = {
       1: `${_BASE}brands/Columbia/Schematics/Applicators/InsideCornerApplicator/2Wheel/columbia-billet-mud-applicator-inside-corner-2-wheels-1-ica2-1-sch-schematic-page-01.webp`,
       2: `${_BASE}brands/Columbia/Schematics/Applicators/InsideCornerApplicator/4Wheel/columbia-billet-mud-applicator-inside-corner-4-wheels-1-ica4-1-sch-schematic-page-01.webp`,
     },
-    preview: `${_BASE}brands/Columbia/Schematics/Applicators/InsideCornerApplicator/Inside_Corner_Applicator_4_Wheels_ICA1-4_-_BACK.webp`,
+    preview: `${_BASE}brands/Columbia/Schematics/Applicators/InsideCornerApplicator/columbia_tools_ica21_01.webp`,
   },
   // (Inside Corner Roller images/data intentionally removed from parts schematics)
   'columbia-standard-outside-corner-roller': {

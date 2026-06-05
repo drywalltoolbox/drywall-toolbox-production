@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ShoppingCart, Eye } from 'lucide-react';
+import { ShoppingCart, Eye, Info } from 'lucide-react';
 import ProductCardImage from '../product/ProductCardImage';
 
 function useIsMobile() {
@@ -62,6 +62,7 @@ export default function StorefrontProductTile({
   const name = displayProduct.name || commerceProduct.name || displayProduct.part_number || 'Product';
   const sku = displayProduct.sku || commerceProduct.sku || '';
   const desc = stripHtml(displayProduct.short_description || displayProduct.description || '');
+  const shortDescription = stripHtml(displayProduct.short_description || '', 132);
 
   const priceStr = isVariable && displayProduct.min_price != null
     ? `From $${money(displayProduct.min_price)}`
@@ -181,6 +182,7 @@ export default function StorefrontProductTile({
   const badgePositionClass = variant === 'list'
     ? 'dtb-product-card__badge--left'
     : 'dtb-product-card__badge--right';
+  const stockLabel = outOfStock ? 'Out of stock' : 'In stock';
 
   return (
     <article
@@ -282,6 +284,33 @@ export default function StorefrontProductTile({
           </div>
         )}
       </div>
+
+      {variant !== 'list' && (
+        <div className="dtb-product-card__inside" aria-hidden="true">
+          <div className="dtb-product-card__inside-icon">
+            <Info size={18} strokeWidth={2.4} />
+          </div>
+          <div className="dtb-product-card__inside-contents">
+            <dl className="dtb-product-card__inside-grid">
+              <div>
+                <dt>Brand</dt>
+                <dd>{displayProduct.brand || 'DTB'}</dd>
+              </div>
+              <div>
+                <dt>SKU</dt>
+                <dd>{sku || 'N/A'}</dd>
+              </div>
+              <div>
+                <dt>Status</dt>
+                <dd>{stockLabel}</dd>
+              </div>
+            </dl>
+            {shortDescription ? (
+              <p className="dtb-product-card__inside-desc">{shortDescription}</p>
+            ) : null}
+          </div>
+        </div>
+      )}
 
       <div className="dtb-product-card__meta">
         {displayProduct.brand ? (
