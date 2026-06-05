@@ -511,7 +511,7 @@
     width: 100%;
     height: calc(100% - 122px);
     border-radius: 0;
-    background: linear-gradient(145deg, #06152e 0%, #0f2f5f 52%, #17365d 100%);
+    background: linear-gradient(145deg, #0c1b45 0%, #0e2666 52%, #1a3a8f 100%);
     box-shadow: none;
   }
 
