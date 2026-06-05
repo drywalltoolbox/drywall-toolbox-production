@@ -224,7 +224,7 @@ const _fallbacks = {
   },
   'columbia-inside-corner-roller': {
     pages: { 1: `${_BASE}brands/Columbia/Schematics/CornerRollers/InsideCornerRoller/columbia-corner-roller-sch-schematic-page-01.webp` },
-    preview: `${_BASE}brands/Columbia/Schematics/CornerRollers/InsideCornerRoller/columbia-corner-roller-sch-schematic-page-01.webp`,
+    preview: `${_BASE}brands/Columbia/Schematics/CornerRollers/InsideCornerRoller/columbia-corner-roller-preview.webp`,
   },
   'columbia-throttle-box': {
     pages: { 1: `${_BASE}brands/Columbia/Schematics/CornerBoxes/ThrottleBox/columbia-throttle-box-sch-schematic-page-01.webp` },
@@ -322,7 +322,7 @@ const _fallbacks = {
   },
   'columbia-corner-cobra': {
     pages: { 1: `${_BASE}brands/Columbia/Schematics/CornerRollers/CornerCobra/columbia-corner-cobra-sch-schematic-page-01.webp` },
-    preview: `${_BASE}brands/Columbia/Schematics/CornerRollers/CornerCobra/NEWCORNERCOBRA-scaled.webp`,
+    preview: `${_BASE}brands/Columbia/Schematics/CornerRollers/CornerCobra/columbia-corner-cobra-preview.webp`,
   },
 
   // ── Asgard ─────────────────────────────────────────────────────────────────
