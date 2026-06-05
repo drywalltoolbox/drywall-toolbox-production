@@ -185,7 +185,7 @@ function FilterContent({
 
   return (
     <div
-      className={`overflow-hidden border border-slate-200 bg-gradient-to-b from-slate-50 to-white ${
+      className={`overflow-hidden border border-slate-200 bg-linear-to-b from-slate-50 to-white ${
         isMobile ? 'rounded-2xl' : 'rounded-2xl shadow-sm'
       }`}
     >
