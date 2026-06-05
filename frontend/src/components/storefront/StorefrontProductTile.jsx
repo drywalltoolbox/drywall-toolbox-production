@@ -182,7 +182,6 @@ export default function StorefrontProductTile({
   const badgePositionClass = variant === 'list'
     ? 'dtb-product-card__badge--left'
     : 'dtb-product-card__badge--right';
-  const stockLabel = outOfStock ? 'Out of stock' : 'In stock';
 
   return (
     <article
@@ -283,34 +282,30 @@ export default function StorefrontProductTile({
             </div>
           </div>
         )}
-      </div>
 
-      {variant !== 'list' && (
-        <div className="dtb-product-card__inside" aria-hidden="true">
-          <div className="dtb-product-card__inside-icon">
-            <Info size={18} strokeWidth={2.4} />
+        {variant !== 'list' && (
+          <div className="dtb-product-card__inside" aria-hidden="true">
+            <div className="dtb-product-card__inside-icon">
+              <Info size={18} strokeWidth={2.4} />
+            </div>
+            <div className="dtb-product-card__inside-contents">
+              <dl className="dtb-product-card__inside-grid">
+                <div>
+                  <dt>Brand</dt>
+                  <dd>{displayProduct.brand || 'DTB'}</dd>
+                </div>
+                <div>
+                  <dt>SKU</dt>
+                  <dd>{sku || 'N/A'}</dd>
+                </div>
+              </dl>
+              {shortDescription ? (
+                <p className="dtb-product-card__inside-desc">{shortDescription}</p>
+              ) : null}
+            </div>
           </div>
-          <div className="dtb-product-card__inside-contents">
-            <dl className="dtb-product-card__inside-grid">
-              <div>
-                <dt>Brand</dt>
-                <dd>{displayProduct.brand || 'DTB'}</dd>
-              </div>
-              <div>
-                <dt>SKU</dt>
-                <dd>{sku || 'N/A'}</dd>
-              </div>
-              <div>
-                <dt>Status</dt>
-                <dd>{stockLabel}</dd>
-              </div>
-            </dl>
-            {shortDescription ? (
-              <p className="dtb-product-card__inside-desc">{shortDescription}</p>
-            ) : null}
-          </div>
-        </div>
-      )}
+        )}
+      </div>
 
       <div className="dtb-product-card__meta">
         {displayProduct.brand ? (
@@ -339,14 +334,19 @@ export default function StorefrontProductTile({
         <div className="dtb-product-card__divider" />
 
         <div className="dtb-product-card__footer">
-          <div className="dtb-product-card__price-group">
-            <strong
-              className="dtb-product-card__price"
-              style={{ color: outOfStock ? 'var(--dtb-muted)' : 'var(--dtb-text)' }}
-            >
-              {priceStr}
-            </strong>
-            {comparePriceStr ? <span className="dtb-product-card__compare-price">{comparePriceStr}</span> : null}
+          <div className="dtb-product-card__price-col">
+            <span className={`dtb-product-card__stock-badge${outOfStock ? ' dtb-product-card__stock-badge--out' : ' dtb-product-card__stock-badge--in'}`}>
+              {outOfStock ? 'Out of Stock' : 'In Stock'}
+            </span>
+            <div className="dtb-product-card__price-group">
+              <strong
+                className="dtb-product-card__price"
+                style={{ color: outOfStock ? 'var(--dtb-muted)' : 'var(--dtb-text)' }}
+              >
+                {priceStr}
+              </strong>
+              {comparePriceStr ? <span className="dtb-product-card__compare-price">{comparePriceStr}</span> : null}
+            </div>
           </div>
 
           {!isVariable && (
