@@ -266,11 +266,11 @@ const _fallbacks = {
   },
   'columbia-nailspotter': {
     pages: { 1: `${_BASE}brands/Columbia/Schematics/Nailspotters/Nailspotter/columbia-nail-spotter-sch-schematic-page-01.webp` },
-    preview: `${_BASE}brands/Columbia/Schematics/Nailspotters/Nailspotter/2023Nailspotter3inch.webp`,
+    preview: `${_BASE}brands/Columbia/Schematics/Nailspotters/Nailspotter/2023nailspotter3inch.webp`,
   },
   'columbia-tomahawk-smoothing-blades': {
     pages: { 1: `${_BASE}brands/Columbia/Schematics/SmoothingBlades/TomahawkSmoothingBlades/columbia-tomahawk-smoothing-blade-sch-schematic-page-01.webp` },
-    preview: `${_BASE}brands/Columbia/Schematics/SmoothingBlades/TomahawkSmoothingBlades/Tomahawksmoothingblade.webp`,
+    preview: `${_BASE}brands/Columbia/Schematics/SmoothingBlades/TomahawkSmoothingBlades/tomahawksmoothingblade.webp`,
   },
   'columbia-standard-corner-flusher': {
     pages: { 1: `${_BASE}brands/Columbia/Schematics/CornerFlushers/StandardCornerFlusher/columbia-standard-flusher-sch-schematic-page-01.webp` },
