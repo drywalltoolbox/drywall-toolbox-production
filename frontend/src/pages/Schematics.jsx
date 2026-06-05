@@ -675,6 +675,12 @@ Object.entries(SCHEMATIC_DEFINITIONS).forEach(([brand, list]) => {
   list.forEach(({ id }) => { SCHEMATIC_ID_TO_BRAND[id] = brand; });
 });
 
+// Module-level SKU result cache — persists for the browser session so revisiting
+// a hotspot (same SKU) resolves instantly without a loading flash or network
+// round-trip.  Stored outside the component so it survives remounts and React
+// Strict Mode double-invoke.  Key: sku string  Value: { product, stockStatus }
+const _hotspotSkuCache = new Map();
+
 export default function Parts() {
   // Allowed brands to display
 const ALLOWED_BRANDS = [
@@ -2453,6 +2459,15 @@ const ALLOWED_BRANDS = [
       setHotspotProduct(null);
       return;
     }
+
+    // Cache hit — resolve synchronously with no loading state.
+    const cached = _hotspotSkuCache.get(activeHotspotPart.sku);
+    if (cached) {
+      setHotspotStockStatus(cached.stockStatus);
+      setHotspotProduct(cached.product);
+      return;
+    }
+
     let cancelled = false;
     setHotspotStockStatus(null); // reset to loading while fetching
     setHotspotProduct(null);
@@ -2460,17 +2475,22 @@ const ALLOWED_BRANDS = [
       if (!cancelled) {
         setHotspotStockStatus('unknown');
         setHotspotProduct(null);
+        _hotspotSkuCache.set(activeHotspotPart.sku, { stockStatus: 'unknown', product: null });
       }
     }, 10000);
     getProductBySku(activeHotspotPart.sku).then((wc) => {
       if (!cancelled) {
         clearTimeout(timeoutId);
-        setHotspotStockStatus(wc ? (wc.stock_status || 'instock') : 'unknown');
-        setHotspotProduct(wc || null);
+        const stockStatus = wc ? (wc.stock_status || 'instock') : 'unknown';
+        const product = wc || null;
+        _hotspotSkuCache.set(activeHotspotPart.sku, { stockStatus, product });
+        setHotspotStockStatus(stockStatus);
+        setHotspotProduct(product);
       }
     }).catch(() => {
       if (!cancelled) {
         clearTimeout(timeoutId);
+        _hotspotSkuCache.set(activeHotspotPart.sku, { stockStatus: 'unknown', product: null });
         setHotspotStockStatus('unknown');
         setHotspotProduct(null);
       }
@@ -2489,6 +2509,8 @@ const ALLOWED_BRANDS = [
         setScale(1);
         setPosition({ x: 0, y: 0 });
       }, 0);
+      // Always dismiss any open hotspot modal when switching schematics or pages.
+      closeModal();
       return () => clearTimeout(t);
     }, [selectedSchematic, currentPage]);
 
@@ -3049,6 +3071,7 @@ const ALLOWED_BRANDS = [
               className="schematic-container"
               ref={schematicContainerRef}
               onMouseDown={handleMouseDown}
+              onClick={() => { if (activeHotspotPart) closeModal(); }}
               style={{
                 // On desktop keep overflow visible so the detached modal (position:absolute
                 // inside this container) is never clipped by the boundary.
@@ -3137,7 +3160,14 @@ const ALLOWED_BRANDS = [
                     position: 'relative',
                     width: '100%',
                   }}
-                  onClick={(e) => e.stopPropagation()}
+                  onClick={(e) => {
+                    // Close the open hotspot modal when the user clicks open space on
+                    // the diagram (image has pointerEvents:none so clicks land here).
+                    // Keep stopPropagation so the outer section backdrop handler is
+                    // unaffected.
+                    e.stopPropagation();
+                    if (activeHotspotPart) closeModal();
+                  }}
                 >
                 {schematicImageSrc ? (
                   <>
@@ -3399,6 +3429,7 @@ const ALLOWED_BRANDS = [
                   stockStatus={hotspotStockStatus}
                   addingToCart={addingToCart}
                   onAddToCart={() => handleAddToCart(activeHotspotPart)}
+                  onClose={closeModal}
                   onLightboxOpen={() => setHotspotLightbox(true)}
                 />
               </div>

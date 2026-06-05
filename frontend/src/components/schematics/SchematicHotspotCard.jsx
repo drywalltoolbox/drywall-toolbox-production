@@ -154,9 +154,7 @@ export default function SchematicHotspotCard({
             />
           </button>
         ) : isResolving ? (
-          <div className="hotspot-modal-image-skeleton" aria-hidden="true">
-            <span className="hotspot-modal-loader-ring" />
-          </div>
+          <div className="hotspot-modal-image-skeleton" aria-hidden="true" />
         ) : null}
       </div>
 
@@ -179,14 +177,6 @@ export default function SchematicHotspotCard({
         <div className="schematic-hotspot-card__stock">
           <StockBadge stockStatus={stockStatus} />
         </div>
-
-        {isResolving ? (
-          <div className="schematic-hotspot-card__loading-line" aria-hidden="true">
-            <span />
-            <span />
-            <span />
-          </div>
-        ) : null}
 
         {/* Title */}
         <h3 className="schematic-hotspot-card__title">
@@ -223,11 +213,7 @@ export default function SchematicHotspotCard({
                 {ctaLabel}
               </button>
             </>
-          ) : (
-            <span className="schematic-hotspot-card__price schematic-hotspot-card__price--unavailable">
-              Unavailable
-            </span>
-          )}
+          ) : null}
         </div>
       </div>
     </div>
