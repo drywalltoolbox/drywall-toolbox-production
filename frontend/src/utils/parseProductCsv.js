@@ -478,6 +478,18 @@ function hasStructuredIncludes(metaItems = []) {
   return metaItems.some(({ key }) => /^_includes_\d+_(name|sku)$/.test(String(key || '')));
 }
 
+function collectCsvMetaData(row) {
+  return Object.entries(row)
+    .map(([column, value]) => {
+      if (!column.startsWith('Meta: ')) return null;
+      const key = column.replace(/^Meta:\s*/, '').trim();
+      const normalizedValue = String(value || '').trim();
+      if (!key || !normalizedValue) return null;
+      return { key, value: normalizedValue };
+    })
+    .filter(Boolean);
+}
+
 function normalizeRow(row, idx, attrIndexes = []) {
   // Images: pipe-separated URLs. CSV columns may contain "Images" or "Images (comma separated)"
   const NO_IMAGE = PLACEHOLDER_IMAGE;
@@ -591,16 +603,40 @@ function normalizeRow(row, idx, attrIndexes = []) {
   const csvSpecRows = buildSpecificationsFromCsvRow(row, attrIndexes);
   const csvSpecsMeta = buildSpecsMetaFromRows(csvSpecRows);
   const inferredIncludes = buildIncludesMetaFromContent(rawDescription, { sku });
+  const explicitMeta = collectCsvMetaData(row);
+  const explicitCanonicalSpecMeta = explicitMeta.filter(({ key }) =>
+    key === '_dtb_specs_json' ||
+    key === 'dtb_specs_json'
+  );
+  const explicitIndexedSpecMeta = explicitMeta.filter(({ key }) =>
+    /^_specs_\d+_(label|value)$/.test(String(key || ''))
+  );
+  const explicitIncludesMeta = explicitMeta.filter(({ key }) =>
+    /^_includes_\d+_(name|sku)$/.test(String(key || ''))
+  );
+  const explicitOtherMeta = explicitMeta.filter(({ key }) =>
+    key !== '_dtb_specs_json' &&
+    key !== 'dtb_specs_json' &&
+    !/^_specs_\d+_(label|value)$/.test(String(key || '')) &&
+    !/^_includes_\d+_(name|sku)$/.test(String(key || ''))
+  );
   const specsMeta = mergeSpecMeta(
-    mergeSpecMeta(csvSpecsMeta, htmlSpecsMeta),
+    mergeSpecMeta(
+      mergeSpecMeta(csvSpecsMeta, explicitIndexedSpecMeta),
+      htmlSpecsMeta
+    ),
     inferredIncludes.specsMeta
   );
 
-  // Build meta_data: UPC first (if present), then extracted spec entries
+  // Build meta_data: UPC first (if present), explicit CSV meta, then extracted spec entries.
   const meta_data = [];
   if (upc) meta_data.push({ key: 'upc', value: upc });
+  meta_data.push(...explicitOtherMeta);
+  meta_data.push(...explicitCanonicalSpecMeta);
   meta_data.push(...specsMeta);
-  if (hasStructuredIncludes(htmlSpecsMeta)) {
+  if (hasStructuredIncludes(explicitIncludesMeta)) {
+    meta_data.push(...explicitIncludesMeta);
+  } else if (hasStructuredIncludes(htmlSpecsMeta)) {
     meta_data.push(...htmlSpecsMeta.filter(({ key }) => /^_includes_\d+_(name|sku)$/.test(String(key || ''))));
   } else {
     meta_data.push(...inferredIncludes.includesMeta);
