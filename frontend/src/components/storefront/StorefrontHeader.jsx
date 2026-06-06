@@ -2,7 +2,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { useCart } from '../../context/CartContext';
 import { useAuthContext } from '../../auth/AuthContext.js';
-import { ShoppingCart, Menu, X, ChevronDown, ChevronRight, User, LogIn, UserPlus, LogOut, Bell, Search } from 'lucide-react';
+import { ShoppingCart, X, ChevronDown, ChevronRight, User, LogIn, UserPlus, LogOut } from 'lucide-react';
 import LogoWhite from '/logo-white.svg';
 import NotificationsBell from '../shell/NotificationsBell';
 import StorefrontSearchOverlay from './StorefrontSearchOverlay';
@@ -11,6 +11,7 @@ import AccountHubSheet from '../account/AccountHubSheet.jsx';
 import { searchProducts } from '../../services/catalog';
 import StorefrontSearchDock from './StorefrontSearchDock';
 import { useCatalogFacets } from '../../hooks/useCatalogFacets.js';
+import '../../styles/mobile-hamburger.css';
 import {
   buildDisplayCategoryUrl,
   mapCatalogBrands,
@@ -51,6 +52,29 @@ function MobileDrawerChevron({ expanded = false, className = '' }) {
       className={`storefront-mobile-drawer__chevron${expanded ? ' is-expanded' : ''}${className ? ` ${className}` : ''}`}
       aria-hidden="true"
     />
+  );
+}
+
+function MobileHamburgerToggle({ checked, onCheckedChange }) {
+  const label = checked ? 'Close menu' : 'Open menu';
+
+  return (
+    <label className="header-mobile-toggle header-icon hamburger" aria-label={label}>
+      <input
+        type="checkbox"
+        checked={checked}
+        onChange={(event) => onCheckedChange(event.target.checked)}
+        aria-label={label}
+        aria-expanded={checked}
+      />
+      <svg viewBox="0 0 32 32" aria-hidden="true" focusable="false">
+        <path
+          className="line line-top-bottom"
+          d="M27 10 13 10C10.8 10 9 8.2 9 6 9 3.5 10.8 2 13 2 15.2 2 17 3.8 17 6L17 26C17 28.2 18.8 30 21 30 23.2 30 25 28.2 25 26 25 23.8 23.2 22 21 22L7 22"
+        />
+        <path className="line" d="M7 16 27 16" />
+      </svg>
+    </label>
   );
 }
 
@@ -128,7 +152,6 @@ export default function Header({ onCartToggle, hasTopTicker = false }) {
     [drawerCategoryLinks]
   );
 
-  const toggleMobileMenu = () => setMobileMenuOpen((open) => !open);
   const closeMobileMenu = () => setMobileMenuOpen(false);
   const closeMenus = () => {
     setShopDropdownOpen(false);
@@ -383,9 +406,7 @@ export default function Header({ onCartToggle, hasTopTicker = false }) {
         <div className="site-header-inner">
           <div className="header-mobile-layout" style={{ display: isTablet ? 'flex' : undefined }}>
             <div className="header-mobile-slot header-mobile-slot--left">
-              <button onClick={toggleMobileMenu} className="header-mobile-toggle header-icon" aria-label="Toggle menu" aria-expanded={mobileMenuOpen}>
-                {mobileMenuOpen ? <X size={22} /> : <Menu size={22} />}
-              </button>
+              <MobileHamburgerToggle checked={mobileMenuOpen} onCheckedChange={setMobileMenuOpen} />
             </div>
 
             <Link to="/" className="header-mobile-logo" onClick={closeMobileMenu}>
