@@ -20,6 +20,26 @@ function getToolImageCandidates(tool) {
   ]);
 }
 
+/**
+ * Pick the most representative tool from a category for the card preview image.
+ * For "Handles", prefer flat box handles over mini/extension handles so the
+ * category card shows the recognisable full-size flat box handle product.
+ * Falls back to the first tool that has any image, then the first tool overall.
+ */
+function getCategoryRepresentativeTool(tools, categoryName) {
+  if (!tools || tools.length === 0) return null;
+
+  if (/handles?/i.test(categoryName)) {
+    const flatBox = tools.find((t) =>
+      /flat[\s-]?box/i.test(t.title || t.name || ''),
+    );
+    if (flatBox) return flatBox;
+  }
+
+  // Default: first tool that actually has a usable preview image
+  return tools.find((t) => getToolImageCandidates(t).length > 0) || tools[0];
+}
+
 function SchematicPreviewImage({ tool, alt, className, fallback }) {
   const candidates = getToolImageCandidates(tool);
   const [candidateIndex, setCandidateIndex] = useState(0);
@@ -100,8 +120,8 @@ export default function ToolSelector({ brand, brandLogo, tools, onSelectTool, on
         // Show category cards — image-forward landscape cards
         <div className="categories-grid">
           {categories.map((category, index) => {
-            const firstTool = groupedTools[category][0];
-            const hasCategoryImage = getToolImageCandidates(firstTool).length > 0;
+            const representativeTool = getCategoryRepresentativeTool(groupedTools[category], category);
+            const hasCategoryImage = getToolImageCandidates(representativeTool).length > 0;
             const count = groupedTools[category].length;
             return (
             <button
@@ -115,7 +135,7 @@ export default function ToolSelector({ brand, brandLogo, tools, onSelectTool, on
             >
               {hasCategoryImage && (
                 <SchematicPreviewImage
-                  tool={firstTool}
+                  tool={representativeTool}
                   alt={category}
                   className="category-card-img"
                 />

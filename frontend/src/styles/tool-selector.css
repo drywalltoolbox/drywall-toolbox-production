@@ -148,19 +148,18 @@
   outline-offset: 3px;
 }
 
-/* Background image — sharp, no blur */
+/* Background image — contained so the full product is always visible */
 .category-card-img {
   position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+  /* Reserve bottom ~36% for the gradient scrim + text; 8% breathing room on sides/top */
+  inset: 8% 8% 36% 8%;
+  object-fit: contain;
   object-position: center;
   transition: transform 0.5s cubic-bezier(0.23, 1, 0.32, 1);
 }
 
 .category-card:hover .category-card-img {
-  transform: scale(1.06);
+  transform: scale(1.03);
 }
 
 /* Bottom-heavy dark gradient for legible text */
@@ -324,7 +323,7 @@
   opacity: 0.06;
 }
 
-/* Full-coverage image — no blur for a cleaner look */
+/* Full-coverage image container — padded so the full schematic is visible */
 .tool-card-image-bg {
   position: absolute;
   inset: 0;
@@ -336,12 +335,15 @@
   background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
   overflow: hidden;
   z-index: 1;
+  /* Extra bottom padding leaves room for the title overlay scrim */
+  padding: 10% 10% 28% 10%;
+  box-sizing: border-box;
 }
 
 .tool-card-image-bg img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
   object-position: center;
   transition: transform 0.4s ease-out;
 }
