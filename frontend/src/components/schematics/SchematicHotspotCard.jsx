@@ -4,6 +4,67 @@ import { Link } from 'react-router-dom';
 // Helpers — purely derived from props, no external state needed.
 // ---------------------------------------------------------------------------
 
+const COLUMBIA_THROTTLE_BOX_VARIANT_PARTS = {
+  '7': {
+    CFB18: { id: 'CFB1-7', name: 'Rear Plate 7 in (CFB1-7)', sku: 'CFB1-7in' },
+    CFB18IN: { id: 'CFB1-7', name: 'Rear Plate 7 in (CFB1-7)', sku: 'CFB1-7in' },
+    CFB28: { id: 'CFB2-7', name: '7" Roll Face (CFB27)', sku: 'CFB2-7in' },
+    CFB28IN: { id: 'CFB2-7', name: '7" Roll Face (CFB27)', sku: 'CFB2-7in' },
+    CFB38: { id: 'CFB3-7', name: 'Side Plate 7" (CFB3-7)', sku: 'CFB3-7' },
+    CFB48: { id: 'CFB4-7', name: '7" Pressure Door (CFB47)', sku: 'CFB4-7' },
+    CFB78: { id: 'CFB7-7', name: '7" Door Gasket for Angle Box (CFB77)', sku: 'CFB7-7' },
+  },
+  '8': {
+    CFB18: { id: 'CFB1-8', name: 'Rear Plate 8 in (CFB1-8)', sku: 'CFB1-8in' },
+    CFB18IN: { id: 'CFB1-8', name: 'Rear Plate 8 in (CFB1-8)', sku: 'CFB1-8in' },
+    CFB28: { id: 'CFB2-8', name: '8" Roll Face (CFB28)', sku: 'CFB2-8in' },
+    CFB28IN: { id: 'CFB2-8', name: '8" Roll Face (CFB28)', sku: 'CFB2-8in' },
+    CFB38: { id: 'CFB3-8', name: 'Side Plate 8" (CFB3-8)', sku: 'CFB3-8' },
+    CFB48: { id: 'CFB4-8', name: '8" Pressure Door (CFB48)', sku: 'CFB4-8' },
+    CFB78: { id: 'CFB7-8', name: '8" Door Gasket for Angle Box (CFB78)', sku: 'CFB7-8' },
+  },
+};
+
+function normalizeSchematicPartKey(value) {
+  return String(value || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
+}
+
+function getCurrentSchematicParams() {
+  if (typeof window === 'undefined') {
+    return { schematic: '', variant: '' };
+  }
+
+  const params = new URLSearchParams(window.location.search);
+  return {
+    schematic: params.get('schematic') || '',
+    variant: params.get('variant') || '',
+  };
+}
+
+function getThrottleBoxVariantPart(part) {
+  const { schematic, variant } = getCurrentSchematicParams();
+
+  if (schematic !== 'columbia-throttle-box') return part;
+  if (!COLUMBIA_THROTTLE_BOX_VARIANT_PARTS[variant]) return part;
+
+  const candidates = [part?.id, part?.sku, part?.source_sku, part?.name]
+    .map(normalizeSchematicPartKey)
+    .filter(Boolean);
+
+  const override = candidates
+    .map((key) => COLUMBIA_THROTTLE_BOX_VARIANT_PARTS[variant][key])
+    .find(Boolean);
+
+  return override
+    ? {
+      ...part,
+      ...override,
+      schematicVariantId: variant,
+      schematicVariantLabel: `${variant} in.`,
+    }
+    : part;
+}
+
 function getDisplayCode(part) {
   return part?.sku || part?.source_sku || '';
 }
@@ -108,12 +169,13 @@ export default function SchematicHotspotCard({
 }) {
   if (!part) return null;
 
-  const displayCode  = getDisplayCode(part);
-  const codeLabel    = getCodeLabel(part);
-  const { priceLabel, comparePriceLabel } = getPriceData(product, part, stockStatus);
+  const displayPart = getThrottleBoxVariantPart(part);
+  const displayCode  = getDisplayCode(displayPart);
+  const codeLabel    = getCodeLabel(displayPart);
+  const { priceLabel, comparePriceLabel } = getPriceData(product, displayPart, stockStatus);
   const isAdding     = addingToCart === part.id;
   const canAdd       = Boolean(product?.id) && stockStatus !== null;
-  const isResolving  = Boolean(part.sku) && stockStatus === null;
+  const isResolving  = Boolean(displayPart.sku) && stockStatus === null;
   const isUnavailable = !canAdd && !isResolving;
 
   const ctaLabel = isAdding    ? 'Adding…'
@@ -128,9 +190,9 @@ export default function SchematicHotspotCard({
       style={{ color: 'inherit', textDecoration: 'none' }}
       className="hotspot-modal-title-link"
     >
-      {part.name}
+      {displayPart.name}
     </Link>
-  ) : part.name;
+  ) : displayPart.name;
 
   // ── Both variants: horizontal sleek card ────────────────────────────────────
   // Layout: fixed-width image on left → flex info column on right
@@ -149,7 +211,7 @@ export default function SchematicHotspotCard({
           >
             <img
               src={product.images[0]}
-              alt={part.name}
+              alt={displayPart.name}
               className="hotspot-modal-image"
             />
           </button>
@@ -187,7 +249,7 @@ export default function SchematicHotspotCard({
         {displayCode ? (
           <div className="schematic-hotspot-card__sku">
             {codeLabel}: {displayCode}
-            {part.quantity > 1 && ` | Qty: ${part.quantity}`}
+            {displayPart.quantity > 1 && ` | Qty: ${displayPart.quantity}`}
           </div>
         ) : null}
 
