@@ -1186,6 +1186,21 @@ const ALLOWED_BRANDS = [
       if (!Number.isFinite(n)) return 50;
       return Math.min(100, Math.max(0, n));
     };
+    // Columbia (and some other) JSON sources embed the SKU inside the part name,
+    // e.g. "Flat Box Thumb Release Clip Screw (FFB32A)". Since the sku field is
+    // always present separately, strip the redundant trailing parenthetical so
+    // the hotspot card doesn't show the SKU twice (once in the title, once in
+    // the "SKU: …" line below it).
+    const normSku = s => s.replace(/[\s-]+/g, '').toUpperCase();
+    const stripSkuFromName = (name, sku) => {
+      if (!name || !sku) return name || '';
+      const ns = normSku(sku);
+      // Strip a trailing "(…)" whose contents normalise to the same SKU string.
+      return name
+        .replace(/\s*\(([^)]+)\)\s*$/, (_, inner) =>
+          normSku(inner) === ns ? '' : `(${inner})`)
+        .trim();
+    };
     return data.parts.map((p) => {
       // Look up coordinate entry by part id first; fall back to part sku so that
       // schematics where the coordinates dict is keyed by part number (sku) rather
@@ -1227,7 +1242,7 @@ const ALLOWED_BRANDS = [
       const skipHotspot = c !== null && leftVal === 0 && topVal === 0;
       return {
         id: p.id,
-        name: p.name,
+        name: stripSkuFromName(p.name, p.sku),
         sku: p.sku || '',
         quantity: p.quantity || 1,
         price: p.price || 0,
@@ -2770,7 +2785,7 @@ const ALLOWED_BRANDS = [
     return () => window.removeEventListener('keydown', handler);
   }, [hotspotLightbox]);
 
-  // Calculate and apply an optimal position for the detached desktop modal so it
+  // Calculate and set an optimal position for the detached desktop modal so it
   // remains fully visible within the schematic-container regardless of where the
   // clicked hotspot is located (edges, corners, etc.).
   const calculateAndSetModalPosition = useCallback((hotspotRect) => {
@@ -2988,9 +3003,9 @@ const ALLOWED_BRANDS = [
         // Constrain pan based on scale and image size (NOT container — container can be
         // taller than the rendered image which would allow panning the image off-screen).
         const container = schematicContainerRef.current;
-        const imageDiv   = schematicImageRef.current;
-        const containerW = container ? container.offsetWidth : 400;
-        const containerH = imageDiv ? imageDiv.offsetHeight : (container ? container.offsetHeight : 400);
+        const imageDiv  = schematicImageRef.current;
+        const containerW = container ? container.offsetWidth  : 400;
+        const containerH = imageDiv   ? imageDiv.offsetHeight : (container ? container.offsetHeight : 400);
         const maxPanX = Math.max(0, ((scale - 1) * containerW) / 2);
         const maxPanY = Math.max(0, ((scale - 1) * containerH) / 2);
 
