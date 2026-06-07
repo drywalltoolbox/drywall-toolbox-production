@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { Link } from 'react-router-dom';
 import { useCart } from '../../context/CartContext';
 import { getProductBySku } from '../../api/products';
@@ -91,7 +92,7 @@ function StockBadge({ stockStatus }) {
 // and the desktop detached modal. The card also guards Columbia schematic size
 // variants against stale base-schematic SKU/product state, so selected variation
 // hotspots resolve against the selected variation part number, image, price,
-// stock status, and add-to-cart target.
+// stock status, add-to-cart target, and image lightbox.
 // ---------------------------------------------------------------------------
 
 export default function SchematicHotspotCard({
@@ -107,8 +108,9 @@ export default function SchematicHotspotCard({
   const [variantProduct, setVariantProduct] = useState(null);
   const [variantStockStatus, setVariantStockStatus] = useState(null);
   const [variantAdding, setVariantAdding] = useState(false);
+  const [localLightboxOpen, setLocalLightboxOpen] = useState(false);
 
-  const displayPart = resolveSchematicVariantPart(part);
+  const displayPart = useMemo(() => resolveSchematicVariantPart(part), [part]);
   const usesVariantPart = schematicPartKeysDiffer(part, displayPart);
   const parentProductMatches = productMatchesSchematicPart(product, displayPart);
   const needsVariantLookup = Boolean(usesVariantPart && displayPart?.sku && !parentProductMatches);
@@ -167,6 +169,15 @@ export default function SchematicHotspotCard({
     };
   }, [displayPart?.sku, needsVariantLookup]);
 
+  useEffect(() => {
+    if (!localLightboxOpen) return undefined;
+    const handleKeyDown = (event) => {
+      if (event.key === 'Escape') setLocalLightboxOpen(false);
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [localLightboxOpen]);
+
   if (!part) return null;
 
   const displayCode  = getDisplayCode(displayPart);
@@ -192,6 +203,15 @@ export default function SchematicHotspotCard({
       {displayPart.name}
     </Link>
   ) : displayPart.name;
+
+  const openLightbox = (event) => {
+    event.stopPropagation();
+    if (usesVariantPart) {
+      setLocalLightboxOpen(true);
+      return;
+    }
+    onLightboxOpen?.();
+  };
 
   const handleAdd = async (event) => {
     event.stopPropagation();
@@ -223,78 +243,145 @@ export default function SchematicHotspotCard({
   };
 
   return (
-    <div className={`schematic-hotspot-card${isResolving ? ' schematic-hotspot-card--resolving' : ''}`}>
-      <div className="schematic-hotspot-card__image">
-        {effectiveProduct?.images?.[0] ? (
-          <button
-            className="hotspot-modal-image-btn"
-            onClick={(e) => { e.stopPropagation(); onLightboxOpen?.(); }}
-            aria-label="View full-size image"
-            title="View full-size image"
-          >
-            <img
-              src={effectiveProduct.images[0]}
-              alt={displayPart.name}
-              className="hotspot-modal-image"
-            />
-          </button>
-        ) : isResolving ? (
-          <div className="hotspot-modal-image-skeleton" aria-hidden="true" />
-        ) : null}
+    <>
+      <div className={`schematic-hotspot-card${isResolving ? ' schematic-hotspot-card--resolving' : ''}`}>
+        <div className="schematic-hotspot-card__image">
+          {effectiveProduct?.images?.[0] ? (
+            <button
+              className="hotspot-modal-image-btn"
+              onClick={openLightbox}
+              aria-label="View full-size image"
+              title="View full-size image"
+            >
+              <img
+                src={effectiveProduct.images[0]}
+                alt={displayPart.name}
+                className="hotspot-modal-image"
+              />
+            </button>
+          ) : isResolving ? (
+            <div className="hotspot-modal-image-skeleton" aria-hidden="true" />
+          ) : null}
+        </div>
+
+        <div className="schematic-hotspot-card__info">
+          {onClose && (
+            <button
+              className="schematic-hotspot-card__close"
+              onClick={onClose}
+              aria-label="Close"
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+                <path d="M18 6L6 18M6 6l12 12"/>
+              </svg>
+            </button>
+          )}
+
+          <div className="schematic-hotspot-card__stock">
+            <StockBadge stockStatus={effectiveStockStatus} />
+          </div>
+
+          <h3 className="schematic-hotspot-card__title">
+            {titleNode}
+          </h3>
+
+          {displayCode ? (
+            <div className="schematic-hotspot-card__sku">
+              {codeLabel}: {displayCode}
+              {displayPart.quantity > 1 && ` | Qty: ${displayPart.quantity}`}
+            </div>
+          ) : null}
+
+          <div className="schematic-hotspot-card__footer">
+            {!isUnavailable ? (
+              <>
+                <span className="schematic-hotspot-card__price-group">
+                  <span className="schematic-hotspot-card__price">
+                    {priceLabel}
+                  </span>
+                  {comparePriceLabel ? (
+                    <span className="schematic-hotspot-card__compare-price">
+                      {comparePriceLabel}
+                    </span>
+                  ) : null}
+                </span>
+                <button
+                  className="schematic-hotspot-card__cta"
+                  disabled={!canAdd || isAdding}
+                  onClick={handleAdd}
+                >
+                  {ctaLabel}
+                </button>
+              </>
+            ) : null}
+          </div>
+        </div>
       </div>
 
-      <div className="schematic-hotspot-card__info">
-        {onClose && (
+      {localLightboxOpen && effectiveProduct?.images?.[0] && typeof document !== 'undefined' && createPortal(
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-label={`Full-size image: ${displayPart.name}`}
+          style={{
+            position: 'fixed',
+            inset: 0,
+            zIndex: 999999,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+          onClick={() => setLocalLightboxOpen(false)}
+        >
+          <div
+            style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.96)' }}
+            aria-hidden="true"
+          />
+          <img
+            src={effectiveProduct.images[0]}
+            alt={displayPart.name}
+            style={{
+              position: 'relative',
+              maxWidth: '90vw',
+              maxHeight: '78vh',
+              width: 'auto',
+              height: 'auto',
+              objectFit: 'contain',
+              borderRadius: '8px',
+              pointerEvents: 'none',
+              userSelect: 'none',
+            }}
+            draggable={false}
+          />
           <button
-            className="schematic-hotspot-card__close"
-            onClick={onClose}
-            aria-label="Close"
+            onClick={(event) => { event.stopPropagation(); setLocalLightboxOpen(false); }}
+            aria-label="Close full-size image"
+            autoFocus
+            style={{
+              position: 'absolute',
+              top: '16px',
+              right: '16px',
+              width: '40px',
+              height: '40px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              background: 'rgba(255,255,255,0.1)',
+              border: 'none',
+              borderRadius: '50%',
+              color: '#fff',
+              cursor: 'pointer',
+              fontSize: '20px',
+              lineHeight: 1,
+            }}
           >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
               <path d="M18 6L6 18M6 6l12 12"/>
             </svg>
           </button>
-        )}
-
-        <div className="schematic-hotspot-card__stock">
-          <StockBadge stockStatus={effectiveStockStatus} />
-        </div>
-
-        <h3 className="schematic-hotspot-card__title">
-          {titleNode}
-        </h3>
-
-        {displayCode ? (
-          <div className="schematic-hotspot-card__sku">
-            {codeLabel}: {displayCode}
-            {displayPart.quantity > 1 && ` | Qty: ${displayPart.quantity}`}
-          </div>
-        ) : null}
-
-        <div className="schematic-hotspot-card__footer">
-          {!isUnavailable ? (
-            <>
-              <span className="schematic-hotspot-card__price-group">
-                <span className="schematic-hotspot-card__price">
-                  {priceLabel}
-                </span>
-                {comparePriceLabel ? (
-                  <span className="schematic-hotspot-card__compare-price">
-                    {comparePriceLabel}
-                  </span>
-                ) : null}
-              </span>
-              <button
-                className="schematic-hotspot-card__cta"
-                disabled={!canAdd || isAdding}
-                onClick={handleAdd}
-              >
-                {ctaLabel}
-              </button>
-            </>
-          ) : null}
-        </div>
-      </div>
-    </div>
+        </div>,
+        document.body
+      )}
+    </>
   );
 }
