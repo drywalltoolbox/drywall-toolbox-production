@@ -681,6 +681,330 @@ Object.entries(SCHEMATIC_DEFINITIONS).forEach(([brand, list]) => {
 // Strict Mode double-invoke.  Key: sku string  Value: { product, stockStatus }
 const _hotspotSkuCache = new Map();
 
+function normalizeSchematicPartKey(value) {
+  return String(value || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
+}
+
+function findSchematicPartOverride(part, replacements = {}) {
+  const candidates = [
+    part?.id,
+    part?.sku,
+    normalizeSchematicPartKey(part?.id),
+    normalizeSchematicPartKey(part?.sku),
+  ].filter(Boolean);
+
+  for (const key of candidates) {
+    if (replacements[key]) return replacements[key];
+  }
+
+  return null;
+}
+
+function applySchematicVariantParts(parts = [], variant) {
+  if (!variant?.partReplacements) return parts;
+
+  return parts.map((part) => {
+    const override = findSchematicPartOverride(part, variant.partReplacements);
+    if (!override) return part;
+
+    return {
+      ...part,
+      ...override,
+      id: override.id || part.id,
+      name: override.name || part.name,
+      sku: override.sku !== undefined ? override.sku : part.sku,
+      schematicVariantId: variant.id,
+      schematicVariantLabel: variant.label,
+    };
+  });
+}
+
+function SchematicVariantSelector({ variants = [], activeVariantId, onChange }) {
+  if (!Array.isArray(variants) || variants.length <= 1) return null;
+
+  const activeVariant = variants.find((variant) => variant.id === activeVariantId) || variants[0];
+
+  return (
+    <div className="schematic-variant-bar" aria-label="Schematic variation selector">
+      <div className="schematic-variant-bar__summary">
+        <span className="schematic-variant-bar__label">{variants[0]?.axis || 'Variation'}</span>
+        <span className="schematic-variant-bar__value">{activeVariant.label}</span>
+      </div>
+      <div className="schematic-variant-pills" role="tablist" aria-label={`${variants[0]?.axis || 'Variation'} options`}>
+        {variants.map((variant) => {
+          const isActive = variant.id === activeVariant.id;
+          return (
+            <button
+              key={variant.id}
+              type="button"
+              role="tab"
+              aria-selected={isActive}
+              className={`schematic-variant-pill${isActive ? ' is-active' : ''}`}
+              onClick={() => onChange(variant.id)}
+            >
+              <span className="schematic-variant-pill__label">{variant.label}</span>
+              {variant.sku && <span className="schematic-variant-pill__sku">{variant.sku}</span>}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+function SchematicPageSelector({ diagramPages = [], pageLabels = {}, currentPage, onPageChange }) {
+  if (!Array.isArray(diagramPages) || diagramPages.length <= 1) return null;
+  const currentLabel = pageLabels[currentPage] || `Page ${currentPage}`;
+  return (
+    <div className="schematic-variant-bar" aria-label="Schematic page selector">
+      <div className="schematic-variant-bar__summary">
+        <span className="schematic-variant-bar__label">Page</span>
+        <span className="schematic-variant-bar__value">{currentLabel}</span>
+      </div>
+      <div className="schematic-variant-pills" role="tablist" aria-label="Schematic pages">
+        {diagramPages.map((pageNum) => {
+          const isActive = pageNum === currentPage;
+          const label = pageLabels[pageNum] || `Page ${pageNum}`;
+          return (
+            <button
+              key={pageNum}
+              type="button"
+              role="tab"
+              aria-selected={isActive}
+              className={`schematic-variant-pill${isActive ? ' is-active' : ''}`}
+              onClick={() => onPageChange(pageNum)}
+            >
+              <span className="schematic-variant-pill__label">{label}</span>
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+const schematicSizeVariant = (id, label, sku, partReplacements, isDefault = false) => ({
+  id,
+  label,
+  axis: 'Size',
+  sku,
+  default: isDefault,
+  partReplacements,
+});
+
+const sizePartName = (label, partName, sku) => `${label} ${partName}${sku ? ` (${sku})` : ''}`;
+
+const columbiaBoxPartReplacements = (size, options = {}) => {
+  const label = `${size}"`;
+  const bladeSku = `FFB9-${size}`;
+  const springSku = options.springSku || '';
+  const hingedGasketSku = options.hingedGasketSku || '';
+  const retainerSku = options.retainerSku || '';
+  const mudSealSku = options.mudSealSku || '';
+
+  return {
+    'FFB9-10': {
+      id: bladeSku,
+      name: sizePartName(label, 'Blade', bladeSku),
+      sku: bladeSku,
+    },
+    'FFB11': {
+      id: springSku || `FFB11-${size}`,
+      name: sizePartName(label, 'Adjuster Spring', springSku),
+      sku: springSku,
+    },
+    'FFB11-10': {
+      id: springSku || `FFB11-${size}`,
+      name: sizePartName(label, 'Adjuster Spring', springSku),
+      sku: springSku,
+    },
+    'HFFB14-10': {
+      id: hingedGasketSku || `HFFB14-${size}`,
+      name: sizePartName(label, 'Flat Box Hinged Door Gasket', hingedGasketSku),
+      sku: hingedGasketSku,
+    },
+    'HFBB14-10': {
+      id: `HFBB14-${size}`,
+      name: sizePartName(label, 'Flat Box Hinged Door Gasket', hingedGasketSku),
+      sku: hingedGasketSku,
+    },
+    'FFB40-10': {
+      id: `FFB40-${size}`,
+      name: `${label} Flat Box Door Gasket`,
+      sku: '',
+    },
+    'FFB25-10': {
+      id: retainerSku || `FFB25-${size}`,
+      name: sizePartName(label, 'Rubber Gasket Retainer', retainerSku),
+      sku: retainerSku,
+    },
+    'FFB2-10': {
+      id: `FFB2-${size}`,
+      name: `${label} Roll Face`,
+      sku: '',
+    },
+    'FFB10-10': {
+      id: `FFB10-${size}`,
+      name: `${label} Flat Box Side Cover`,
+      sku: '',
+    },
+    'FFB24-10': {
+      id: `FFB24-${size}`,
+      name: `${label} Flat Box Wheel Axle`,
+      sku: '',
+    },
+    'HFFB1-10': {
+      id: `HFFB1-${size}`,
+      name: `${label} Heavy Flat Box Body`,
+      sku: '',
+    },
+    'HFFB4-10': {
+      id: `HFFB4-${size}`,
+      name: `${label} Heavy Flat Box Door`,
+      sku: '',
+    },
+    'HFFB1A-10': {
+      id: mudSealSku || `HFFB1A-${size}`,
+      name: sizePartName(label, 'Mud Seal Strip', mudSealSku),
+      sku: mudSealSku,
+    },
+  };
+};
+
+const columbiaFlatBoxVariants = [
+  schematicSizeVariant('5-5', '5.5 in.', '5.5FFB', columbiaBoxPartReplacements('5.5'), true),
+  schematicSizeVariant('7', '7 in.', '7FFB', columbiaBoxPartReplacements('7')),
+  schematicSizeVariant('8', '8 in.', '8FFB', columbiaBoxPartReplacements('8', {
+    springSku: 'FFB11-8',
+    hingedGasketSku: 'HFFB14-8',
+  })),
+  schematicSizeVariant('10', '10 in.', '10FFB', columbiaBoxPartReplacements('10', {
+    springSku: 'FFB11-10',
+    hingedGasketSku: 'HFFB14-10',
+    retainerSku: 'FFB25-10',
+    mudSealSku: 'HFFB1A-10',
+  })),
+  schematicSizeVariant('12', '12 in.', '12FFB', columbiaBoxPartReplacements('12', {
+    springSku: 'FFB11-12',
+    hingedGasketSku: 'HFFB14-12',
+    retainerSku: 'FFB25-12',
+  })),
+  schematicSizeVariant('14', '14 in.', '14FFB', columbiaBoxPartReplacements('14', {
+    hingedGasketSku: 'HFFB14-14',
+  })),
+];
+
+const columbiaAutomaticFlatBoxVariants = [
+  schematicSizeVariant('8', '8 in.', '8FFBA', columbiaBoxPartReplacements('8', {
+    springSku: 'FFB11-8',
+    hingedGasketSku: 'HFFB14-8',
+  }), true),
+  schematicSizeVariant('10', '10 in.', '10FFBA', columbiaBoxPartReplacements('10', {
+    springSku: 'FFB11-10',
+    hingedGasketSku: 'HFFB14-10',
+    retainerSku: 'FFB25-10',
+  })),
+  schematicSizeVariant('12', '12 in.', '12FFBA', columbiaBoxPartReplacements('12', {
+    springSku: 'FFB11-12',
+    hingedGasketSku: 'HFFB14-12',
+    retainerSku: 'FFB25-12',
+  })),
+  schematicSizeVariant('14', '14 in.', '14FFBA', columbiaBoxPartReplacements('14', {
+    hingedGasketSku: 'HFFB14-14',
+  })),
+];
+
+const columbiaFatBoyBoxVariants = [
+  schematicSizeVariant('5-5', '5.5 in.', '5.5FBB', {
+    'FFB 2S-10': { id: 'FFB 2S-5.5', name: 'Flat Box Side Plate 5.5 in Short', sku: '' },
+    'FFB 9-10': { id: 'FFB 9-5.5', name: 'Flat Box Blade 5.5" (FFB9-5.5)', sku: 'FFB9-5.5' },
+    'FF8A 10-10': { id: 'FF8A 5.5-5.5', name: 'Blade Bar Assembly 5.5 in', sku: '' },
+    'FFB 40-10': { id: 'FFB 40-5.5', name: 'Flat Box Door Gasket 5.5 in', sku: '' },
+    'HFBB 14-10': { id: 'HFBB 14-5.5', name: 'Hinged Door Gasket 5.5 in Fat Boy', sku: '' },
+  }, true),
+  schematicSizeVariant('8', '8 in.', '8FBB', {
+    'FFB 11': { id: 'FFB 11-8', name: 'Adjuster Spring - 8" (FFB11-8)', sku: 'FFB11-8' },
+    'FFB 2S-10': { id: 'FFB 2S-8', name: 'Flat Box Side Plate 8 in Short', sku: '' },
+    'FFB 9-10': { id: 'FFB 9-8', name: 'Flat Box Blade 8" (FFB9-8)', sku: 'FFB9-8' },
+    'FF8A 10-10': { id: 'FF8A 8-8', name: 'Blade Bar Assembly 8 in', sku: '' },
+    'FFB 40-10': { id: 'FFB 40-8', name: 'Flat Box Door Gasket 8 in', sku: '' },
+    'HFBB 14-10': { id: 'HFBB 14-8', name: 'Hinged Door Gasket 8 in Fat Boy (HFFB14-8)', sku: 'HFFB14-8' },
+  }),
+  schematicSizeVariant('10', '10 in.', '10FBB', {
+    'FFB 11': { id: 'FFB 11-10', name: 'Adjuster Spring - 10" (FFB11-10)', sku: 'FFB11-10' },
+    'HFBB 14-10': { id: 'HFBB 14-10', name: 'Hinged Door Gasket 10 in Fat Boy (HFFB14-10)', sku: 'HFFB14-10' },
+  }),
+  schematicSizeVariant('12', '12 in.', '12FBB', {
+    'FFB 11': { id: 'FFB 11-12', name: 'Adjuster Spring - 12" (FFB11-12)', sku: 'FFB11-12' },
+    'FFB 2S-10': { id: 'FFB 2S-12', name: 'Flat Box Side Plate 12 in Short', sku: '' },
+    'FFB 9-10': { id: 'FFB 9-12', name: 'Flat Box Blade 12" (FFB9-12)', sku: 'FFB9-12' },
+    'FF8A 10-10': { id: 'FF8A 12-12', name: 'Blade Bar Assembly 12 in', sku: '' },
+    'FFB 40-10': { id: 'FFB 40-12', name: 'Flat Box Door Gasket 12 in', sku: '' },
+    'HFBB 14-10': { id: 'HFBB 14-12', name: 'Hinged Door Gasket 12 in Fat Boy (HFFB14-12)', sku: 'HFFB14-12' },
+  }),
+];
+
+const columbiaAngleHeadPartReplacements = (size) => {
+  const label = `${size}"`;
+  const springSku = `AH7-${size}`;
+  const bladeSku = `AH3-${size}`;
+  const castingSku = `AH1-${size}`;
+
+  return {
+    'AH7-2.5': { id: `AH 7-${label}`, name: sizePartName(label, 'Frame Tension Spring', springSku), sku: springSku },
+    'AH7-3': { id: `AH 7-${label}`, name: sizePartName(label, 'Frame Tension Spring', springSku), sku: springSku },
+    'AH3-3': { id: `AH 3-${label}`, name: sizePartName(label, 'Top Blade', bladeSku), sku: bladeSku },
+    'AH1-2': { id: `AH 1-${label}`, name: sizePartName(label, 'Head Casting', castingSku), sku: castingSku },
+    'AH1-3.5': { id: `AH 1-${label}`, name: sizePartName(label, 'Head Casting', castingSku), sku: castingSku },
+    'AH 2-3" L': { id: `AH 2-${label} L`, name: `${label} Left Frame Sub-Assembly`, sku: '' },
+    'AH 2-3" R': { id: `AH 2-${label} R`, name: `${label} Right Frame Sub-Assembly`, sku: '' },
+  };
+};
+
+const columbiaAngleHeadVariants = [
+  schematicSizeVariant('2', '2 in.', '2AH', columbiaAngleHeadPartReplacements('2'), true),
+  schematicSizeVariant('2-5', '2.5 in.', '2.5AH', columbiaAngleHeadPartReplacements('2.5')),
+  schematicSizeVariant('3', '3 in.', '3AH', columbiaAngleHeadPartReplacements('3')),
+  schematicSizeVariant('3-5', '3.5 in.', '3.5AH', columbiaAngleHeadPartReplacements('3.5')),
+];
+
+const columbiaNailSpotterPartReplacements = (size) => {
+  const label = `${size}"`;
+
+  return {
+    'HNS19-3': { id: `HNS19-${size}`, name: `Triangle Shoe ${label}`, sku: '' },
+    'HNS4-3': { id: `HNS4-${size}`, name: sizePartName(label, 'Door', `HNS4-${size}`), sku: `HNS4-${size}` },
+    'HNS15-3': { id: `HNS15-${size}`, name: sizePartName(label, 'Door Gasket', `HNS15-${size}`), sku: `HNS15-${size}` },
+    'HNS7-3': { id: `HNS7-${size}`, name: sizePartName(label, 'Blade', `HNS7-${size}`), sku: `HNS7-${size}` },
+    'HNS8-3': { id: `HNS8-${size}`, name: sizePartName(label, 'Blade Holder', `HNS8-${size}`), sku: `HNS8-${size}` },
+    'HNS2-3': { id: `HNS2-${size}`, name: `Nail Spotter Front Plate ${label}`, sku: '' },
+    'HNS9-3': { id: `HNS9-${size}`, name: `Face Plate ${label}`, sku: '' },
+  };
+};
+
+const columbiaNailSpotterVariants = [
+  schematicSizeVariant('2', '2 in.', '2NS', columbiaNailSpotterPartReplacements('2'), true),
+  schematicSizeVariant('3', '3 in.', '3NS', columbiaNailSpotterPartReplacements('3')),
+];
+
+const columbiaThrottleBoxVariants = [
+  schematicSizeVariant('7', '7 in.', '7CFB', {
+    'CFB3-8': { id: 'CFB3-7', name: 'Side Plate 7" (CFB3-7)', sku: 'CFB3-7' },
+    'CFB7-8': { id: 'CFB7-7', name: 'Door Gasket 7" (CFB7-7)', sku: 'CFB7-7' },
+  }, true),
+  schematicSizeVariant('8', '8 in.', '8CFB', {
+    'CFB3-8': { id: 'CFB3-8', name: 'Side Plate 8" (CFB3-8)', sku: 'CFB3-8' },
+    'CFB7-8': { id: 'CFB7-8', name: 'Door Gasket 8" (CFB7-8)', sku: 'CFB7-8' },
+  }),
+];
+
+const columbiaTomahawkVariants = ['7', '10', '12', '14', '18', '24', '32', '40', '48'].map((size) => (
+  schematicSizeVariant(size, `${size} in.`, `TSB-${size}`, {
+    'SB1-12IN': { id: `SB1-${size}IN`, name: `Tomahawk ${size} in Smoothing Blade (TSB-${size})`, sku: `TSB-${size}` },
+    'SB2-12IN': { id: `SB2-${size}IN`, name: `Replacement ${size}" Blade for Tomahawk`, sku: '' },
+  }, size === '7')
+));
+
 export default function Parts() {
   // Allowed brands to display
 const ALLOWED_BRANDS = [
@@ -715,6 +1039,7 @@ const ALLOWED_BRANDS = [
   const _initBrandSlug = _initParams.get('brand');
   const _initSchematicId = _initParams.get('schematic');
   const _initCategorySlug = _initParams.get('category');
+  const _initVariantId = _initParams.get('variant');
   const [selectedBrand, setSelectedBrand] = useState(
     () => {
       if (_initBrandSlug) return SLUG_TO_BRAND[_initBrandSlug] ?? null;
@@ -727,6 +1052,9 @@ const ALLOWED_BRANDS = [
   );
   const [selectedCategory, setSelectedCategory] = useState(
     () => _initCategorySlug ? decodeURIComponent(_initCategorySlug) : null
+  );
+  const [selectedSchematicVariant, setSelectedSchematicVariant] = useState(
+    () => _initVariantId ?? null
   );
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -806,12 +1134,13 @@ const ALLOWED_BRANDS = [
     if (selectedBrand)    params.set('brand',     BRAND_TO_SLUG[selectedBrand] ?? selectedBrand);
     if (selectedCategory) params.set('category', selectedCategory);
     if (selectedSchematic) params.set('schematic', selectedSchematic);
+    if (selectedSchematicVariant) params.set('variant', selectedSchematicVariant);
     const depth = (selectedBrand ? 1 : 0) + (selectedCategory ? 1 : 0) + (selectedSchematic ? 1 : 0);
     const isForward = depth > _prevDepthRef.current;
     _prevDepthRef.current = depth;
     const qs = params.toString();
     navigate(qs ? `/schematics?${qs}` : '/schematics', { replace: !isForward });
-  }, [selectedBrand, selectedCategory, selectedSchematic, navigate]);
+  }, [selectedBrand, selectedCategory, selectedSchematic, selectedSchematicVariant, navigate]);
 
   // Sync URL → state when the user navigates with the browser back/forward buttons.
   // Without this, clicking browser-back changes the URL but not the React state.
@@ -820,13 +1149,16 @@ const ALLOWED_BRANDS = [
     const brandSlug   = params.get('brand');
     const categorySlug = params.get('category');
     const schematicId  = params.get('schematic');
+    const variantId = params.get('variant');
     const newBrand     = brandSlug    ? (SLUG_TO_BRAND[brandSlug] ?? null) : null;
     const newCategory  = categorySlug ?? null;
     const newSchematic = schematicId  ?? null;
+    const newVariant = variantId ?? null;
     // Only call setters when values actually differ to avoid re-render loops.
     setSelectedBrand(prev     => prev     === newBrand     ? prev     : newBrand);
     setSelectedCategory(prev  => prev     === newCategory  ? prev     : newCategory);
     setSelectedSchematic(prev => prev     === newSchematic ? prev     : newSchematic);
+    setSelectedSchematicVariant(prev => prev === newVariant ? prev : newVariant);
   }, [location.search]);
 
   // Schematic data for tools
@@ -1168,6 +1500,7 @@ const ALLOWED_BRANDS = [
       diagramPages: [1],
       imagePages: { 1: schImg('columbia-throttle-box', 1) },
       previewImage: schPrev('columbia-throttle-box'),
+      variants: columbiaThrottleBoxVariants,
       parts: throttleBoxParts
     },
     {
@@ -1179,6 +1512,7 @@ const ALLOWED_BRANDS = [
       diagramPages: [1],
       imagePages: { 1: schImg('columbia-automatic-flat-box', 1) },
       previewImage: schPrev('columbia-automatic-flat-box'),
+      variants: columbiaAutomaticFlatBoxVariants,
       parts: automaticFlatBoxParts
     },
     {
@@ -1190,6 +1524,7 @@ const ALLOWED_BRANDS = [
       diagramPages: [1],
       imagePages: { 1: schImg('columbia-flat-box', 1) },
       previewImage: schPrev('columbia-flat-box'),
+      variants: columbiaFlatBoxVariants,
       parts: flatBoxParts
     },
     {
@@ -1201,6 +1536,7 @@ const ALLOWED_BRANDS = [
       diagramPages: [1],
       imagePages: { 1: schImg('columbia-fat-boy-box', 1) },
       previewImage: schPrev('columbia-fat-boy-box'),
+      variants: columbiaFatBoyBoxVariants,
       parts: fatBoyBoxParts
     },
     {
@@ -1212,6 +1548,7 @@ const ALLOWED_BRANDS = [
       diagramPages: [1],
       imagePages: { 1: schImg('columbia-angle-head', 1) },
       previewImage: schPrev('columbia-angle-head'),
+      variants: columbiaAngleHeadVariants,
       parts: angleHeadParts
     },
     {
@@ -1263,13 +1600,14 @@ const ALLOWED_BRANDS = [
     },
     {
       id: 'columbia-nailspotter',
-      title: 'Nailspotter 3"',
-      description: 'Columbia Nailspotter 3" schematic diagram',
+      title: 'Nailspotter',
+      description: 'Columbia Nailspotter schematic diagram',
       brand: 'Columbia Taping Tools',
       category: 'Nailspotters',
       diagramPages: [1],
       imagePages: { 1: schImg('columbia-nailspotter', 1) },
       previewImage: schPrev('columbia-nailspotter'),
+      variants: columbiaNailSpotterVariants,
       parts: nailspotterParts
     },
     {
@@ -1281,6 +1619,7 @@ const ALLOWED_BRANDS = [
       diagramPages: [1],
       imagePages: { 1: schImg('columbia-tomahawk-smoothing-blades', 1) },
       previewImage: schPrev('columbia-tomahawk-smoothing-blades'),
+      variants: columbiaTomahawkVariants,
       parts: tomahawkParts
     },
     {
@@ -2304,7 +2643,30 @@ const ALLOWED_BRANDS = [
 
   // When schematic changes we reset the page in the schematic selector's onChange handler below.
   const currentSchematic = allowedSchematics.find(s => s.id === selectedSchematic);
+  const currentSchematicVariants = currentSchematic?.variants || [];
+  const defaultSchematicVariant = currentSchematicVariants.find((variant) => variant.default) || currentSchematicVariants[0] || null;
+  const activeSchematicVariant = currentSchematicVariants.find((variant) => variant.id === selectedSchematicVariant)
+    || defaultSchematicVariant;
+  const currentSchematicParts = currentSchematic
+    ? applySchematicVariantParts(currentSchematic.parts || [], activeSchematicVariant)
+    : [];
   const [currentPage, setCurrentPage] = useState(1);
+
+  useEffect(() => {
+    if (!currentSchematic) {
+      setSelectedSchematicVariant(null);
+      return;
+    }
+
+    if (currentSchematicVariants.length === 0) {
+      setSelectedSchematicVariant(null);
+      return;
+    }
+
+    if (!activeSchematicVariant || selectedSchematicVariant !== activeSchematicVariant.id) {
+      setSelectedSchematicVariant(activeSchematicVariant.id);
+    }
+  }, [currentSchematic, currentSchematicVariants, activeSchematicVariant, selectedSchematicVariant]);
 
   // When schematic changes we reset the page in the schematic selector's onChange handler below.
 
@@ -2320,7 +2682,7 @@ const ALLOWED_BRANDS = [
   //   2) metadata size from part records
   //   3) conservative visual fallback ratio
   const currentPageFirstPart = currentSchematic
-    ? currentSchematic.parts.find(p => !p.pageNumber || p.pageNumber === currentPage)
+    ? currentSchematicParts.find(p => !p.pageNumber || p.pageNumber === currentPage)
     : null;
   const measuredPageAspectRatio =
     schematicImageSrc &&
@@ -2512,7 +2874,7 @@ const ALLOWED_BRANDS = [
       // Always dismiss any open hotspot modal when switching schematics or pages.
       closeModal();
       return () => clearTimeout(t);
-    }, [selectedSchematic, currentPage]);
+    }, [selectedSchematic, currentPage, selectedSchematicVariant]);
 
   // Reset the loaded flag whenever the diagram image src changes so the
   // skeleton re-appears and the new image fades in cleanly.
@@ -2941,6 +3303,7 @@ const ALLOWED_BRANDS = [
           }}
           onSelectTool={(tool) => {
             setSelectedSchematic(tool.id);
+            setSelectedSchematicVariant(null);
             const s = allowedSchematics.find(sch => sch.id === tool.id);
             const firstPage = (s && s.diagramPages && s.diagramPages[0]) || 1;
             setCurrentPage(firstPage);
@@ -2949,6 +3312,7 @@ const ALLOWED_BRANDS = [
           onBack={() => {
             setSelectedBrand(null);
             setSelectedSchematic(null);
+            setSelectedSchematicVariant(null);
             setSelectedCategory(null);
             window.scrollTo({ top: 0, behavior: 'smooth' });
           }}
@@ -2972,6 +3336,7 @@ const ALLOWED_BRANDS = [
               className="back-button"
               onClick={() => {
                 setSelectedSchematic(null);
+                setSelectedSchematicVariant(null);
                 setScale(1);
                 setPosition({ x: 0, y: 0 });
                 window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -2995,64 +3360,26 @@ const ALLOWED_BRANDS = [
               <h1 id="viewer-tool-title-id" className="viewer-tool-title">{currentSchematic?.title}</h1>
             </div>
 
-            {/* Inline pager for multi-page schematics */}
-            {currentSchematic.diagramPages && currentSchematic.diagramPages.length > 1 && (
-              <div className="viewer-pager schematic-pager" role="group" aria-label="Schematic pages">
-                <button
-                  className={`pager-pill${currentSchematic.diagramPages.indexOf(currentPage) <= 0 ? ' disabled' : ''}`}
-                  onClick={() => {
-                    const pages = currentSchematic.diagramPages;
-                    const idx = pages.indexOf(currentPage);
-                    if (idx > 0) setCurrentPage(pages[idx - 1]);
-                  }}
-                  aria-label="Previous page"
-                  disabled={currentSchematic.diagramPages.indexOf(currentPage) <= 0}
-                >
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden>
-                    <path d="M15 18L9 12L15 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
-                </button>
-                <div className="pager-counter" role="status" aria-live="polite">
-                  {currentSchematic.pageLabels?.[currentPage]
-                    ? `${currentSchematic.pageLabels[currentPage]} (${currentSchematic.diagramPages.indexOf(currentPage) + 1}/${currentSchematic.diagramPages.length})`
-                    : `${currentSchematic.diagramPages.indexOf(currentPage) + 1} / ${currentSchematic.diagramPages.length}`
-                  }
-                </div>
-                <button
-                  className={`pager-pill${currentSchematic.diagramPages.indexOf(currentPage) >= currentSchematic.diagramPages.length - 1 ? ' disabled' : ''}`}
-                  onClick={() => {
-                    const pages = currentSchematic.diagramPages;
-                    const idx = pages.indexOf(currentPage);
-                    if (idx < pages.length - 1) setCurrentPage(pages[idx + 1]);
-                  }}
-                  aria-label="Next page"
-                  disabled={currentSchematic.diagramPages.indexOf(currentPage) >= currentSchematic.diagramPages.length - 1}
-                >
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden>
-                    <path d="M9 6L15 12L9 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
-                </button>
-              </div>
-            )}
+            {/* Inline pager removed — multi-page nav rendered via SchematicPageSelector bar below */}
           </div>
 
-          {/* ── Mobile page-tab strip — one tappable pill per page, shown only on mobile ── */}
-          {currentSchematic.diagramPages && currentSchematic.diagramPages.length > 1 && (
-            <div className="viewer-page-tabs" role="tablist" aria-label="Schematic pages" aria-orientation="horizontal">
-              {currentSchematic.diagramPages.map((pageNum) => (
-                <button
-                  key={pageNum}
-                  role="tab"
-                  className={`page-tab${currentPage === pageNum ? ' active' : ''}`}
-                  aria-selected={currentPage === pageNum}
-                  aria-controls="schematic-diagram-panel"
-                  onClick={() => setCurrentPage(pageNum)}
-                >
-                  {currentSchematic.pageLabels?.[pageNum] || `Page ${pageNum}`}
-                </button>
-              ))}
-            </div>
-          )}
+          <SchematicVariantSelector
+            variants={currentSchematicVariants}
+            activeVariantId={activeSchematicVariant?.id}
+            onChange={(variantId) => {
+              if (variantId === activeSchematicVariant?.id) return;
+              closeModal();
+              setSelectedSchematicVariant(variantId);
+            }}
+          />
+
+          {/* ── Page nav bar — same design as variant selector, no SKUs ── */}
+          <SchematicPageSelector
+            diagramPages={currentSchematic.diagramPages}
+            pageLabels={currentSchematic.pageLabels || {}}
+            currentPage={currentPage}
+            onPageChange={setCurrentPage}
+          />
 
           {/* ── Schematic body — fills remaining viewport height ── */}
           <div
@@ -3228,7 +3555,7 @@ const ALLOWED_BRANDS = [
                 )}
 
                 {/* Hotspots rendered INSIDE the transformed container so they scale and pan with the image */}
-                {currentSchematic.parts.filter(part => (!part.pageNumber || part.pageNumber === currentPage) && !part.skipHotspot).map((part, index) => {
+                {currentSchematicParts.filter(part => (!part.pageNumber || part.pageNumber === currentPage) && !part.skipHotspot).map((part, index) => {
                   // Use a composite key so duplicate part IDs (e.g. shared fasteners
                   // that appear twice on a schematic) each get an independent active
                   // state — only the clicked instance highlights, not all copies.
