@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
@@ -2288,6 +2288,7 @@ const ALLOWED_BRANDS = [
       parts: tapeTech90TParts,
     },
     {
+
       id: 'tapetech-81xxtt',
       title: 'TapeTech EasyFinish™ Box Handle Assemblies (81XXTT)',
       description: 'TapeTech EasyFinish box handle assembly schematic covering 8134TT, 8142TT, 8154TT, and 8172TT replacement parts',
@@ -2658,7 +2659,10 @@ const ALLOWED_BRANDS = [
 
   // When schematic changes we reset the page in the schematic selector's onChange handler below.
   const currentSchematic = allowedSchematics.find(s => s.id === selectedSchematic);
-  const currentSchematicVariants = currentSchematic?.variants || [];
+  const currentSchematicVariants = useMemo(
+    () => currentSchematic?.variants || [],
+    [currentSchematic]
+  );
   const defaultSchematicVariant = currentSchematicVariants.find((variant) => variant.default) || currentSchematicVariants[0] || null;
   const activeSchematicVariant = currentSchematicVariants.find((variant) => variant.id === selectedSchematicVariant)
     || defaultSchematicVariant;
@@ -3125,7 +3129,7 @@ const ALLOWED_BRANDS = [
         // Zoom towards the cursor position
         const rect = container ? container.getBoundingClientRect() : { left: 0, top: 0, width: containerW, height: containerH };
         const cursorX = e.clientX - (rect.left + rect.width  / 2);
-        const cursorY = e.clientY - (rect.top  + rect.height / 2);
+        const cursorY = e.clientY - (rect.top + rect.height / 2);
         const ratio = newScale / scale;
         const newX = cursorX - (cursorX - position.x) * ratio;
         const newY = cursorY - (cursorY - position.y) * ratio;
@@ -3671,6 +3675,7 @@ const ALLOWED_BRANDS = [
                       const downX = parseFloat(e.currentTarget.dataset.pdX ?? e.clientX);
                       const downY = parseFloat(e.currentTarget.dataset.pdY ?? e.clientY);
                       const drift = Math.hypot(e.clientX - downX, e.clientY - downY);
+
                       // Mobile taps while zoomed can jitter more; use a slightly
                       // larger threshold to avoid false negatives.
                       if (drift > 14) return;
