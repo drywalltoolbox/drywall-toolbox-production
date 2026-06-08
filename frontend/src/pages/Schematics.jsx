@@ -144,14 +144,7 @@ import tapeTechQB06QSXData from '/brands/TapeTech/Schematics/QB06-QSX/schematic_
 import tapeTechQB08QSXData from '/brands/TapeTech/Schematics/QB08-QSX/schematic_data.json';
 import tapeTechXHTTData from '/brands/TapeTech/Schematics/XHTT/schematic_data.json';
 
-// ---------------------------------------------------------------------------
-// Dura-Stilts schematic JSON data imports
-// schematic_data2.json → Model IV 18″–30″ range (with hotspots)
-// schematic_data3.json → Model IV 24″–40″ range (with hotspots)
-// The 14″–22″ range has no hotspot data file; only the diagram image is shown.
-// ---------------------------------------------------------------------------
-import duraStiltsModelIV1830Data from '/brands/Dura-Stilts/Schematics/Model-IV/schematic_data2.json';
-import duraStiltsModelIV2440Data from '/brands/Dura-Stilts/Schematics/Model-IV/schematic_data3.json';
+// TODO: Dura-Stilts Model IV hotspot JSON files will be replaced with new hotspot schematic data.
 
 // ---------------------------------------------------------------------------
 // Level5 schematic JSON data imports
@@ -1383,12 +1376,9 @@ const ALLOWED_BRANDS = [
   const level5MegaFlatBox12Parts = buildPartsFromData(level5MegaFlatBox12Data);
   const level5CompoundPumpParts = buildPartsFromData(level5CompoundPumpData);
 
-  // Dura-Stilts parts arrays
-  // Page 1 (14″–22″) has no hotspot JSON — parts array is empty.
-  // Page 2 (18″–30″) → schematic_data2.json
-  // Page 3 (24″–40″) → schematic_data3.json
-  const duraStiltsModelIV1830Parts = buildPartsFromData(duraStiltsModelIV1830Data);
-  const duraStiltsModelIV2440Parts = buildPartsFromData(duraStiltsModelIV2440Data);
+  // Dura-Stilts parts arrays — hotspot JSON removed; new files pending.
+  const duraStiltsModelIV1830Parts = [];
+  const duraStiltsModelIV2440Parts = [];
 
   const schematics = [
     {
@@ -2612,9 +2602,7 @@ const ALLOWED_BRANDS = [
 
     // ── Dura-Stilts ──────────────────────────────────────────────────────────
     // Model IV stilt schematic — three height-range pages in a single viewer.
-    //   Page 1: 14″–22″  (diagram image only, no hotspot data)
-    //   Page 2: 18″–30″  (hotspots from schematic_data2.json, pageNumber remapped to 2)
-    //   Page 3: 24″–40″  (hotspots from schematic_data3.json, pageNumber remapped to 3)
+    // TODO: Hotspot JSON files removed; replace with new hotspot schematic data.
     {
       id: 'dura-stilts-model-iv',
       title: 'Model IV Drywall Stilts',
