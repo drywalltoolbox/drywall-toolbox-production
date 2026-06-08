@@ -1334,10 +1334,32 @@ const ALLOWED_BRANDS = [
           },
           pageNumber,
           shape:    shapeType,
-          width:    norm?.width_pct  ?? null,
-          height:   norm?.height_pct ?? null,
-          widthPx:  shp?.width_px  ?? null,
-          heightPx: shp?.height_px ?? null,
+          // ── Shape-aware dimension resolution ─────────────────────────────
+          // Provides precise width/height for hasPreciseSize so the renderer
+          // scales hotspots to their exact schematic footprint on all screens.
+          //   rect    → bbox width_pct / height_pct (unchanged)
+          //   circle  → diameter = r_pct_w * 2 / r_pct_h * 2
+          //   polygon → span of bounding box over vertex coordinate arrays
+          width:   shapeType === 'polygon' && norm?.points_pct?.length
+                     ? Math.max(...norm.points_pct.map(pt => pt[0])) - Math.min(...norm.points_pct.map(pt => pt[0]))
+                     : shapeType === 'circle'
+                       ? (norm?.r_pct_w != null ? norm.r_pct_w * 2 : null)
+                       : (norm?.width_pct ?? null),
+          height:  shapeType === 'polygon' && norm?.points_pct?.length
+                     ? Math.max(...norm.points_pct.map(pt => pt[1])) - Math.min(...norm.points_pct.map(pt => pt[1]))
+                     : shapeType === 'circle'
+                       ? (norm?.r_pct_h != null ? norm.r_pct_h * 2 : null)
+                       : (norm?.height_pct ?? null),
+          widthPx:  shapeType === 'polygon' && shp?.points_px?.length
+                      ? Math.max(...shp.points_px.map(pt => pt[0])) - Math.min(...shp.points_px.map(pt => pt[0]))
+                      : shapeType === 'circle'
+                        ? (shp?.r_px != null ? shp.r_px * 2 : null)
+                        : (shp?.width_px ?? null),
+          heightPx: shapeType === 'polygon' && shp?.points_px?.length
+                      ? Math.max(...shp.points_px.map(pt => pt[1])) - Math.min(...shp.points_px.map(pt => pt[1]))
+                      : shapeType === 'circle'
+                        ? (shp?.r_px != null ? shp.r_px * 2 : null)
+                        : (shp?.height_px ?? null),
           rotation: hs?.rotation_deg ?? 0,
           skipHotspot,
           xPx:  shp?.x_px ?? null,
