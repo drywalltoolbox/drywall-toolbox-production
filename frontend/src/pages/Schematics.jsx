@@ -649,6 +649,24 @@ const _fallbacks = {
     },
     preview: `${_BASE}brands/Dura-Stilts/Schematics/Model-IV/model_iv.webp`,
   },
+
+  // ── SurPro ───────────────────────────────────────────────────────────────
+  'surpro-s1': {
+    pages: { 1: `${_BASE}brands/SurPro/Schematics/S1/surpro_s1.webp` },
+    preview: `${_BASE}brands/SurPro/Schematics/S1/surpro_s1_preview.webp`,
+  },
+  'surpro-s1x': {
+    pages: { 1: `${_BASE}brands/SurPro/Schematics/S1X/surpro_s1x.webp` },
+    preview: `${_BASE}brands/SurPro/Schematics/S1X/surpro_s1x_preview.webp`,
+  },
+  'surpro-s2': {
+    pages: { 1: `${_BASE}brands/SurPro/Schematics/S2/surpro_s2.webp` },
+    preview: `${_BASE}brands/SurPro/Schematics/S2/surpro_s2_preview.webp`,
+  },
+  'surpro-s2x': {
+    pages: { 1: `${_BASE}brands/SurPro/Schematics/S2X/surpro_s2x.webp` },
+    preview: `${_BASE}brands/SurPro/Schematics/S2X/surpro_s2x_preview.webp`,
+  },
 };
 
 // Brand name ↔ URL slug maps so navigation produces readable URLs like
@@ -2656,6 +2674,57 @@ const ALLOWED_BRANDS = [
         ...duraStiltsModelIV1830Parts.map(p => ({ ...p, pageNumber: 2 })),
         ...duraStiltsModelIV2440Parts.map(p => ({ ...p, pageNumber: 3 })),
       ],
+    },
+
+    // ── SurPro ───────────────────────────────────────────────────────────────
+    // TODO: Hotspot JSON files pending; parts arrays will be wired up when ready.
+    {
+      id: 'surpro-s1',
+      title: 'S1',
+      description: 'SurPro S1 drywall stilt schematic diagram',
+      brand: 'SurPro',
+      category: 'Stilts',
+      diagramPages: [1],
+      pageLabels: { 1: 'S1' },
+      imagePages: { 1: schImg('surpro-s1', 1) },
+      previewImage: schPrev('surpro-s1'),
+      parts: [],
+    },
+    {
+      id: 'surpro-s1x',
+      title: 'S1X',
+      description: 'SurPro S1X drywall stilt schematic diagram',
+      brand: 'SurPro',
+      category: 'Stilts',
+      diagramPages: [1],
+      pageLabels: { 1: 'S1X' },
+      imagePages: { 1: schImg('surpro-s1x', 1) },
+      previewImage: schPrev('surpro-s1x'),
+      parts: [],
+    },
+    {
+      id: 'surpro-s2',
+      title: 'S2',
+      description: 'SurPro S2 drywall stilt schematic diagram',
+      brand: 'SurPro',
+      category: 'Stilts',
+      diagramPages: [1],
+      pageLabels: { 1: 'S2' },
+      imagePages: { 1: schImg('surpro-s2', 1) },
+      previewImage: schPrev('surpro-s2'),
+      parts: [],
+    },
+    {
+      id: 'surpro-s2x',
+      title: 'S2X',
+      description: 'SurPro S2X drywall stilt schematic diagram',
+      brand: 'SurPro',
+      category: 'Stilts',
+      diagramPages: [1],
+      pageLabels: { 1: 'S2X' },
+      imagePages: { 1: schImg('surpro-s2x', 1) },
+      previewImage: schPrev('surpro-s2x'),
+      parts: [],
     },
   ];
 
