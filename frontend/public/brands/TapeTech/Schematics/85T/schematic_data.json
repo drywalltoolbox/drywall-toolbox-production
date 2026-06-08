@@ -1,4 +1,5 @@
 {
+  "schema_version": "2.0",
   "diagram": {
     "id": "85t-sch-page-1",
     "title": "85T_SCH_page_1",
@@ -22,10 +23,10 @@
   },
   "parts_catalog": [
     {
-      "part_id": "859016 X 2",
-      "display_id": "859016 X 2",
-      "name": "Part (859016 X 2)",
-      "sku": "859016 X 2",
+      "part_id": "856003F",
+      "display_id": "856003F",
+      "name": "Part (856003F)",
+      "sku": "856003F",
       "quantity": 1,
       "notes": ""
     },
@@ -46,25 +47,25 @@
       "notes": ""
     },
     {
-      "part_id": "856003F",
-      "display_id": "856003F",
-      "name": "Part (856003F)",
-      "sku": "856003F",
+      "part_id": "859016 X 2",
+      "display_id": "859016 X 2",
+      "name": "Part (859016 X 2)",
+      "sku": "859016 X 2",
       "quantity": 1,
       "notes": ""
     }
   ],
   "hotspots": [
     {
-      "hotspot_id": "p1-859016x2-01",
-      "part_ref": "859016 X 2",
+      "hotspot_id": "p1-856003f-01",
+      "part_ref": "856003F",
       "page": 1,
       "shape": {
         "type": "rect",
-        "x_px": 1259,
-        "y_px": 267,
-        "width_px": 243,
-        "height_px": 156
+        "x_px": 34,
+        "y_px": 835,
+        "width_px": 286,
+        "height_px": 75
       },
       "rotation_deg": 0,
       "anchor": "center",
@@ -75,10 +76,10 @@
         "enabled": true
       },
       "normalized": {
-        "x_pct": 82,
-        "y_pct": 15.9,
-        "width_pct": 15.8,
-        "height_pct": 9.3
+        "x_pct": 2.2,
+        "y_pct": 49.8,
+        "width_pct": 18.6,
+        "height_pct": 4.5
       }
     },
     {
@@ -89,7 +90,7 @@
         "type": "rect",
         "x_px": 1042,
         "y_px": 523,
-        "width_px": 243,
+        "width_px": 250,
         "height_px": 75
       },
       "rotation_deg": 0,
@@ -103,7 +104,7 @@
       "normalized": {
         "x_pct": 67.9,
         "y_pct": 31.2,
-        "width_pct": 15.8,
+        "width_pct": 16.3,
         "height_pct": 4.5
       }
     },
@@ -114,9 +115,9 @@
       "shape": {
         "type": "rect",
         "x_px": 1062,
-        "y_px": 716,
+        "y_px": 719,
         "width_px": 241,
-        "height_px": 80
+        "height_px": 75
       },
       "rotation_deg": 0,
       "anchor": "center",
@@ -128,21 +129,21 @@
       },
       "normalized": {
         "x_pct": 69.2,
-        "y_pct": 42.7,
+        "y_pct": 42.9,
         "width_pct": 15.7,
-        "height_pct": 4.8
+        "height_pct": 4.5
       }
     },
     {
-      "hotspot_id": "p1-856003f-01",
-      "part_ref": "856003F",
+      "hotspot_id": "p1-859016x2-01",
+      "part_ref": "859016 X 2",
       "page": 1,
       "shape": {
         "type": "rect",
-        "x_px": 34,
-        "y_px": 833,
-        "width_px": 272,
-        "height_px": 74
+        "x_px": 1260,
+        "y_px": 272,
+        "width_px": 243,
+        "height_px": 148
       },
       "rotation_deg": 0,
       "anchor": "center",
@@ -153,10 +154,10 @@
         "enabled": true
       },
       "normalized": {
-        "x_pct": 2.2,
-        "y_pct": 49.7,
-        "width_pct": 17.7,
-        "height_pct": 4.4
+        "x_pct": 82.1,
+        "y_pct": 16.2,
+        "width_pct": 15.8,
+        "height_pct": 8.8
       }
     }
   ],

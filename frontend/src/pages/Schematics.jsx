@@ -166,6 +166,14 @@ import level5MegaFlatBox12Data from '/brands/Level5/Schematics/FinishingBoxes/12
 import level5CompoundPumpData from '/brands/Level5/Schematics/Pumps/Compound-Pump/schematic_data.json';
 
 // ---------------------------------------------------------------------------
+// SurPro schematic JSON data imports
+// ---------------------------------------------------------------------------
+import surproS1Data  from '/brands/SurPro/Schematics/S1/schematic_data.json';
+import surproS1XData from '/brands/SurPro/Schematics/S1X/schematic_data.json';
+import surproS2Data  from '/brands/SurPro/Schematics/S2/schematic_data.json';
+import surproS2XData from '/brands/SurPro/Schematics/S2X/schematic_data.json';
+
+// ---------------------------------------------------------------------------
 // Schematic image paths — static fallbacks served from public/brands/…
 // Primary source: WordPress Media Library WebP images (via useSchematicMedia).
 // Fallback: original PNG/JPG files from public/brands/ (used before WP upload).
@@ -1579,6 +1587,12 @@ const ALLOWED_BRANDS = [
   const level5MegaFlatBox12Parts = buildPartsFromData(level5MegaFlatBox12Data);
   const level5CompoundPumpParts = buildPartsFromData(level5CompoundPumpData);
 
+  // ── SurPro parts ─────────────────────────────────────────────────────────
+  const surproS1Parts  = buildPartsFromData(surproS1Data);
+  const surproS1XParts = buildPartsFromData(surproS1XData);
+  const surproS2Parts  = buildPartsFromData(surproS2Data);
+  const surproS2XParts = buildPartsFromData(surproS2XData);
+
   // Dura-Stilts parts arrays — hotspot JSON removed; new files pending.
   const duraStiltsModelIV1830Parts = [];
   const duraStiltsModelIV2440Parts = [];
@@ -2816,7 +2830,6 @@ const ALLOWED_BRANDS = [
     },
 
     // ── SurPro ───────────────────────────────────────────────────────────────
-    // TODO: Hotspot JSON files pending; parts arrays will be wired up when ready.
     {
       id: 'surpro-s1',
       title: 'S1',
@@ -2827,7 +2840,7 @@ const ALLOWED_BRANDS = [
       pageLabels: { 1: 'S1' },
       imagePages: { 1: schImg('surpro-s1', 1) },
       previewImage: schPrev('surpro-s1'),
-      parts: [],
+      parts: surproS1Parts,
     },
     {
       id: 'surpro-s1x',
@@ -2839,7 +2852,7 @@ const ALLOWED_BRANDS = [
       pageLabels: { 1: 'S1X' },
       imagePages: { 1: schImg('surpro-s1x', 1) },
       previewImage: schPrev('surpro-s1x'),
-      parts: [],
+      parts: surproS1XParts,
     },
     {
       id: 'surpro-s2',
@@ -2851,7 +2864,7 @@ const ALLOWED_BRANDS = [
       pageLabels: { 1: 'S2' },
       imagePages: { 1: schImg('surpro-s2', 1) },
       previewImage: schPrev('surpro-s2'),
-      parts: [],
+      parts: surproS2Parts,
     },
     {
       id: 'surpro-s2x',
@@ -2863,7 +2876,7 @@ const ALLOWED_BRANDS = [
       pageLabels: { 1: 'S2X' },
       imagePages: { 1: schImg('surpro-s2x', 1) },
       previewImage: schPrev('surpro-s2x'),
-      parts: [],
+      parts: surproS2XParts,
     },
   ];
 

@@ -81,6 +81,12 @@ export const SCHEMATIC_DEFINITIONS = {
   'Dura-Stilts': [
     { id: 'dura-stilts-model-iv', title: 'Model IV Drywall Stilts', mpn: 'DS-M4', category: 'Stilts' },
   ],
+  'SurPro': [
+    { id: 'surpro-s1',  title: 'SurPro S1 Stilts',  mpn: 'S1',  category: 'Stilts' },
+    { id: 'surpro-s1x', title: 'SurPro S1X Stilts', mpn: 'S1X', category: 'Stilts' },
+    { id: 'surpro-s2',  title: 'SurPro S2 Stilts',  mpn: 'S2',  category: 'Stilts' },
+    { id: 'surpro-s2x', title: 'SurPro S2X Stilts', mpn: 'S2X', category: 'Stilts' },
+  ],
   'Level5': [
     { id: 'level5-7377-cover-plate-assembly-old-style', title: 'Cover Plate Assembly (Old Style)', mpn: '7377', category: 'Automatic Tapers' },
     { id: 'level5-9333-cutter-chain-assembly',          title: 'Cutter Chain Assembly',            mpn: '9333', category: 'Automatic Tapers' },
