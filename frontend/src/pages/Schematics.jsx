@@ -144,6 +144,8 @@ import tapeTechPAHC12Data from '/brands/TapeTech/Schematics/PAHC12/schematic_dat
 import tapeTechQB06QSXData from '/brands/TapeTech/Schematics/QB06-QSX/schematic_data.json';
 import tapeTechQB08QSXData from '/brands/TapeTech/Schematics/QB08-QSX/schematic_data.json';
 import tapeTechXHTTData from '/brands/TapeTech/Schematics/XHTT/schematic_data.json';
+import tapeTechCA07TTData from '/brands/TapeTech/Schematics/CA07TT/schematic_data.json';
+import tapeTechCA08TTData from '/brands/TapeTech/Schematics/CA08TT/schematic_data.json';
 
 // TODO: Dura-Stilts Model IV hotspot JSON files will be replaced with new hotspot schematic data.
 
@@ -504,11 +506,11 @@ const _fallbacks = {
   },
   'tapetech-42tt': {
     pages:   { 1: `${_BASE}brands/TapeTech/Schematics/42TT/tapetech-90-inside-corner-edger-tapetech-42tt-sch-schematic-page-001.webp` },
-    preview: `${_BASE}brands/TapeTech/Schematics/42TT/42tt.webp`,
+    preview: `${_BASE}brands/TapeTech/Schematics/42TT/42tt_preview.webp`,
   },
   'tapetech-48tt': {
     pages:   { 1: `${_BASE}brands/TapeTech/Schematics/48TT/tapetech-90-inside-corner-edger-tapetech-48tt-sch-schematic-page-001.webp` },
-    preview: `${_BASE}brands/TapeTech/Schematics/48TT/tapetech-90-inside-corner-edger-tapetech-48tt-sch-schematic-page-001.webp`,
+    preview: `${_BASE}brands/TapeTech/Schematics/48TT/48tt_preview.webp`,
   },
   'tapetech-76tt': {
     pages:   { 1: `${_BASE}brands/TapeTech/Schematics/76TT/76TT-page_1.webp` },
@@ -572,6 +574,14 @@ const _fallbacks = {
   'tapetech-xhtt': {
     pages:   { 1: `${_BASE}brands/TapeTech/Schematics/XHTT/XHTT_SCH_page_1.webp` },
     preview: `${_BASE}brands/TapeTech/Schematics/XHTT/reference_images/xhtt_01.webp`,
+  },
+  'tapetech-ca07tt': {
+    pages:   { 1: `${_BASE}brands/TapeTech/Schematics/CA07TT/CA07TT_SCH-1.webp` },
+    preview: `${_BASE}brands/TapeTech/Schematics/CA07TT/tapetech_ca07tt_preview.webp`,
+  },
+  'tapetech-ca08tt': {
+    pages:   { 1: `${_BASE}brands/TapeTech/Schematics/CA08TT/CA08TT_SCH-1.webp` },
+    preview: `${_BASE}brands/TapeTech/Schematics/CA08TT/tapetech_ca08tt_preview.webp`,
   },
 
   // ── Level5 ───────────────────────────────────────────────────────────────
@@ -1570,6 +1580,8 @@ const ALLOWED_BRANDS = [
   const tapeTechQB06QSXParts = buildPartsFromData(tapeTechQB06QSXData);
   const tapeTechQB08QSXParts = buildPartsFromData(tapeTechQB08QSXData);
   const tapeTechXHTTParts = buildPartsFromData(tapeTechXHTTData);
+  const tapeTechCA07TTParts = buildPartsFromData(tapeTechCA07TTData);
+  const tapeTechCA08TTParts = buildPartsFromData(tapeTechCA08TTData);
 
   // Level5 parts arrays
   const level5CoverPlateAssemblyParts = buildPartsFromData(level5CoverPlateAssemblyData);
@@ -2434,7 +2446,7 @@ const ALLOWED_BRANDS = [
       title: 'Corner Roller - Outside Corner (17TT)',
       description: 'TapeTech 17TT schematic diagram with replacement parts',
       brand: 'TapeTech',
-      category: 'Corner Rollers',
+      category: 'Corner Tools',
       diagramPages: [1],
       imagePages: { 1: schImg('tapetech-17tt', 1) },
       previewImage: schPrev('tapetech-17tt'),
@@ -2445,7 +2457,7 @@ const ALLOWED_BRANDS = [
       title: 'Corner Finisher - 2.5" (42TT)',
       description: 'TapeTech 42TT schematic diagram with replacement parts',
       brand: 'TapeTech',
-      category: 'Corner Finishers',
+      category: 'Corner Tools',
       diagramPages: [1],
       imagePages: { 1: schImg('tapetech-42tt', 1) },
       previewImage: schPrev('tapetech-42tt'),
@@ -2456,7 +2468,7 @@ const ALLOWED_BRANDS = [
       title: 'Corner Finisher - 3" EasyRoll Adjustable (48TT)',
       description: 'TapeTech 48TT schematic diagram with replacement parts',
       brand: 'TapeTech',
-      category: 'Corner Finishers',
+      category: 'Corner Tools',
       diagramPages: [1],
       imagePages: { 1: schImg('tapetech-48tt', 1) },
       previewImage: schPrev('tapetech-48tt'),
@@ -2535,6 +2547,28 @@ const ALLOWED_BRANDS = [
       imagePages: { 1: schImg('tapetech-xhtt', 1) },
       previewImage: schPrev('tapetech-xhtt'),
       parts: tapeTechXHTTParts,
+    },
+    {
+      id: 'tapetech-ca07tt',
+      title: '7" Corner Applicator (CA07TT)',
+      description: 'TapeTech 7" Corner Applicator schematic diagram with replacement parts',
+      brand: 'TapeTech',
+      category: 'Corner Tools',
+      diagramPages: [1],
+      imagePages: { 1: schImg('tapetech-ca07tt', 1) },
+      previewImage: schPrev('tapetech-ca07tt'),
+      parts: tapeTechCA07TTParts,
+    },
+    {
+      id: 'tapetech-ca08tt',
+      title: '8" Corner Applicator (CA08TT)',
+      description: 'TapeTech 8" Corner Applicator schematic diagram with replacement parts',
+      brand: 'TapeTech',
+      category: 'Corner Tools',
+      diagramPages: [1],
+      imagePages: { 1: schImg('tapetech-ca08tt', 1) },
+      previewImage: schPrev('tapetech-ca08tt'),
+      parts: tapeTechCA08TTParts,
     },
     // ── MaxxBox® High Capacity Finishing Box (EHC) — 7", 10", 12" ──────────
     {
