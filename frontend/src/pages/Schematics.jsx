@@ -633,8 +633,14 @@ const _fallbacks = {
   },
 
   // ── Dura-Stilts ──────────────────────────────────────────────────────────
-  // Three height-range pages for the Model IV stilt.
-  // Pages 1 (14-22) is diagram-only; pages 2 (18-30) and 3 (24-40) have hotspots.
+  'dura-stilts-dura-iii': {
+    pages: {
+      1: `${_BASE}brands/Dura-Stilts/Schematics/Dura_III/dura-3-14-22.webp`,
+      2: `${_BASE}brands/Dura-Stilts/Schematics/Dura_III/dura-3-18-30.webp`,
+      3: `${_BASE}brands/Dura-Stilts/Schematics/Dura_III/dura-3-24-40.webp`,
+    },
+    preview: `${_BASE}brands/Dura-Stilts/Schematics/Dura_III/dura-3-14-22.webp`,
+  },
   'dura-stilts-model-iv': {
     pages: {
       1: `${_BASE}brands/Dura-Stilts/Schematics/Model-IV/model-4-14-22.webp`,
@@ -2601,11 +2607,34 @@ const ALLOWED_BRANDS = [
     },
 
     // ── Dura-Stilts ──────────────────────────────────────────────────────────
+    // DURA III stilt schematic — three height-range pages in a single viewer.
+    // TODO: Hotspot JSON files pending; parts arrays will be wired up when ready.
+    {
+      id: 'dura-stilts-dura-iii',
+      title: 'DURA III',
+      description: 'Dura-Stilts DURA III drywall stilt schematic diagrams',
+      brand: 'Dura-Stilts',
+      category: 'Stilts',
+      diagramPages: [1, 2, 3],
+      pageLabels: {
+        1: '14″–22″',
+        2: '18″–30″',
+        3: '24″–40″',
+      },
+      imagePages: {
+        1: schImg('dura-stilts-dura-iii', 1),
+        2: schImg('dura-stilts-dura-iii', 2),
+        3: schImg('dura-stilts-dura-iii', 3),
+      },
+      previewImage: schPrev('dura-stilts-dura-iii'),
+      parts: [],
+    },
+
     // Model IV stilt schematic — three height-range pages in a single viewer.
     // TODO: Hotspot JSON files removed; replace with new hotspot schematic data.
     {
       id: 'dura-stilts-model-iv',
-      title: 'Model IV Drywall Stilts',
+      title: 'MODEL IV',
       description: 'Dura-Stilts Model IV drywall stilt schematic diagrams with parts hotspots',
       brand: 'Dura-Stilts',
       category: 'Stilts',
