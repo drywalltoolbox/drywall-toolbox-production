@@ -1,0 +1,403 @@
+.repair-packages-page {
+  min-height: 100vh;
+  color: #0f172a;
+  background: #f8fafc;
+}
+
+.repair-packages-shell {
+  width: min(1180px, calc(100% - clamp(2rem, 8vw, 6rem)));
+  margin: 0 auto;
+}
+
+.repair-packages-hero {
+  background: #0f172a;
+}
+
+.repair-packages-tabs-section {
+  position: sticky;
+  top: var(--header-height, 70px);
+  z-index: 15;
+  padding: 0.72rem 0;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.09);
+  background: rgba(248, 250, 252, 0.92);
+  box-shadow: 0 14px 34px rgba(15, 23, 42, 0.08);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+}
+
+.repair-package-tabs-wrap {
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x proximity;
+  scrollbar-width: none;
+}
+
+.repair-package-tabs-wrap::-webkit-scrollbar {
+  display: none;
+}
+
+.repair-package-tabs {
+  position: relative;
+  display: flex;
+  width: 100%;
+  min-width: 0;
+  gap: 0.25rem;
+  padding: 0.32rem;
+  border: 1px solid rgba(15, 23, 42, 0.13);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.86);
+  box-shadow: 0 18px 48px rgba(15, 23, 42, 0.09);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+}
+
+.repair-package-tabs__active {
+  position: absolute;
+  inset-block: 0.32rem;
+  z-index: 0;
+  border-radius: 999px;
+  background: linear-gradient(135deg, var(--primary-600, #2563eb), #0f172a);
+  box-shadow: 0 12px 24px rgba(37, 99, 235, 0.24);
+}
+
+.repair-package-tab {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  align-content: center;
+  gap: 0;
+  flex: 1 1 0;
+  width: auto;
+  min-width: 0;
+  min-height: 46px;
+  padding: 0.62rem 0.52rem;
+  border: 0;
+  border-radius: 999px;
+  color: rgba(15, 23, 42, 0.62);
+  background: transparent;
+  cursor: pointer;
+  text-align: center;
+  scroll-snap-align: start;
+  transition: color 0.18s ease;
+}
+
+.repair-package-tab span {
+  font-size: clamp(0.66rem, 0.72vw, 0.76rem);
+  font-weight: 900;
+  line-height: 1.16;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  overflow-wrap: normal;
+}
+
+.repair-package-tab:hover,
+.repair-package-tab.is-active {
+  color: #fff;
+}
+
+.repair-packages-main {
+  padding: clamp(2rem, 5vw, 3.4rem) 0 clamp(3rem, 7vw, 5rem);
+  background:
+    radial-gradient(80% 58% at 50% 0%, rgba(37, 99, 235, 0.09), transparent 68%),
+    linear-gradient(180deg, #f8fafc 0%, #eef2f7 48%, #f8fafc 100%);
+}
+
+.repair-packages-panel-heading {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 1.25rem;
+  margin-bottom: 1.35rem;
+}
+
+.repair-packages-panel-heading p {
+  margin: 0 0 0.28rem;
+  color: var(--primary-600, #2563eb);
+  font-size: 0.74rem;
+  font-weight: 950;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.repair-packages-panel-heading h2 {
+  margin: 0;
+  color: #0f172a;
+  font-size: clamp(1.45rem, 3vw, 2.25rem);
+  font-weight: 950;
+  letter-spacing: 0;
+}
+
+.repair-packages-quote-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  min-height: 40px;
+  color: var(--primary-600, #2563eb);
+  font-size: 0.78rem;
+  font-weight: 900;
+  letter-spacing: 0.05em;
+  text-decoration: none;
+  text-transform: uppercase;
+}
+
+.repair-packages-quote-link:hover {
+  color: var(--primary-700, #1d4ed8);
+}
+
+.repair-packages-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 318px), 1fr));
+  gap: clamp(0.9rem, 2vw, 1.15rem);
+  align-items: stretch;
+}
+
+.repair-package-card {
+  position: relative;
+  display: flex;
+  min-height: 100%;
+  flex-direction: column;
+  padding: clamp(1.05rem, 2vw, 1.55rem);
+  border: 1px solid rgba(15, 23, 42, 0.1);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.84);
+  box-shadow: 0 12px 34px rgba(15, 23, 42, 0.07);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+}
+
+.repair-package-card--featured {
+  border-color: rgba(37, 99, 235, 0.45);
+  background:
+    linear-gradient(180deg, rgba(37, 99, 235, 0.07), transparent 38%),
+    rgba(255, 255, 255, 0.94);
+  box-shadow: 0 18px 46px rgba(37, 99, 235, 0.16);
+}
+
+.repair-package-card__header {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  min-height: 98px;
+}
+
+.repair-package-card__eyebrow {
+  margin: 0 0 0.5rem;
+  color: rgba(15, 23, 42, 0.44);
+  font-size: 0.66rem;
+  font-weight: 950;
+  letter-spacing: 0.1em;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+.repair-package-card h3 {
+  margin: 0;
+  color: #0f172a;
+  font-size: clamp(1.62rem, 2.25vw, 2.08rem);
+  font-weight: 950;
+  line-height: 1.04;
+  letter-spacing: 0;
+}
+
+.repair-package-card__price {
+  display: flex;
+  align-items: baseline;
+  min-height: 36px;
+  margin-top: 0.35rem;
+}
+
+.repair-package-card__price-value {
+  display: inline-block;
+  color: rgba(15, 23, 42, 0.72);
+  font-size: clamp(1.02rem, 1.45vw, 1.28rem);
+  font-weight: 900;
+  line-height: 1.15;
+  letter-spacing: 0;
+  overflow-wrap: anywhere;
+}
+
+.repair-package-card__summary {
+  min-height: 58px;
+  margin: 0.75rem 0 0;
+  color: rgba(15, 23, 42, 0.62);
+  font-size: 0.84rem;
+  line-height: 1.55;
+}
+
+.repair-package-card__features {
+  display: grid;
+  align-content: start;
+  gap: 0.64rem;
+  min-height: 136px;
+  margin: 1rem 0 1.2rem;
+  padding: 0;
+  list-style: none;
+}
+
+.repair-package-card__features li {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.58rem;
+  color: rgba(15, 23, 42, 0.72);
+  font-size: 0.84rem;
+  font-weight: 650;
+  line-height: 1.36;
+}
+
+.repair-package-card__features svg {
+  flex: 0 0 auto;
+  margin-top: 0.12rem;
+  color: var(--primary-600, #2563eb);
+}
+
+.repair-package-card__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin: 0 0 1rem;
+}
+
+.repair-package-card__meta span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  min-height: 28px;
+  padding: 0.3rem 0.55rem;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 999px;
+  color: rgba(15, 23, 42, 0.58);
+  background: rgba(15, 23, 42, 0.04);
+  font-size: 0.68rem;
+  font-weight: 850;
+}
+
+.repair-package-card__button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 44px;
+  margin-top: auto;
+  padding: 0.75rem 1rem;
+  border: 1px solid rgba(37, 99, 235, 0.32);
+  border-radius: 8px;
+  color: var(--primary-600, #2563eb);
+  background: rgba(255, 255, 255, 0.84);
+  font-size: 0.84rem;
+  font-weight: 900;
+  line-height: 1.1;
+  text-align: center;
+  text-decoration: none;
+  transition:
+    transform 0.18s ease,
+    border-color 0.18s ease,
+    background 0.18s ease,
+    color 0.18s ease;
+}
+
+.repair-package-card__button:hover {
+  transform: translateY(-1px);
+  border-color: rgba(37, 99, 235, 0.6);
+  background: rgba(37, 99, 235, 0.08);
+}
+
+.repair-package-card__button--primary {
+  border-color: var(--primary-600, #2563eb);
+  color: #fff;
+  background: var(--primary-600, #2563eb);
+  box-shadow: 0 12px 26px rgba(37, 99, 235, 0.24);
+}
+
+.repair-package-card__button--primary:hover {
+  color: #fff;
+  background: var(--primary-700, #1d4ed8);
+}
+
+@media (min-width: 1120px) {
+  .repair-packages-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 860px) {
+  .repair-package-tabs-wrap {
+    margin-inline: calc((100vw - 100%) / -2);
+    padding-inline: calc((100vw - 100%) / 2);
+  }
+
+  .repair-package-tabs {
+    display: inline-flex;
+    width: max-content;
+    min-width: max-content;
+  }
+
+  .repair-package-tab {
+    flex: 0 0 auto;
+    width: 132px;
+    padding-inline: 0.8rem;
+  }
+
+  .repair-package-tab span {
+    font-size: 0.76rem;
+    overflow: visible;
+    text-overflow: clip;
+    overflow-wrap: anywhere;
+  }
+}
+
+@media (max-width: 640px) {
+  .repair-packages-shell {
+    width: min(100% - 1.25rem, 1180px);
+  }
+
+  .repair-packages-tabs-section {
+    top: var(--header-height, 70px);
+    padding: 0.55rem 0;
+  }
+
+  .repair-packages-panel-heading {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 0.85rem;
+  }
+
+  .repair-packages-quote-link {
+    width: 100%;
+    border: 1px solid rgba(37, 99, 235, 0.24);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.74);
+  }
+
+  .repair-package-card__header {
+    min-height: auto;
+  }
+
+  .repair-package-card__summary,
+  .repair-package-card__features {
+    min-height: 0;
+  }
+}
+
+@media (max-width: 380px) {
+  .repair-package-card h3 {
+    font-size: 1.42rem;
+  }
+
+  .repair-package-card__price-value {
+    font-size: 0.98rem;
+  }
+
+  .repair-package-card__button {
+    padding-inline: 0.7rem;
+    font-size: 0.78rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .repair-package-card,
+  .repair-package-card__button {
+    transition: none;
+  }
+}

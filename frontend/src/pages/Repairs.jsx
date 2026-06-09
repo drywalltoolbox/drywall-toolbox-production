@@ -1,6 +1,15 @@
 import { useState, useRef, useCallback, useMemo, useEffect } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { motion as Motion, AnimatePresence } from 'framer-motion';
+import {
+  Camera,
+  ClipboardList,
+  FileCheck2,
+  PackageCheck,
+  SearchCheck,
+  ShieldCheck,
+  Truck,
+} from 'lucide-react';
 import SEOHead from '../components/shared/SEOHead';
 import Dropdown from '../components/ui/Dropdown';
 import { useCatalogFacets } from '../hooks/useCatalogFacets.js';
@@ -21,6 +30,7 @@ import {
 } from '../data/repairPackages.js';
 import { uploadRepairMedia } from '../api/repairs.js';
 import veeqoService from '../services/veeqo';
+import '../styles/repairs-workflow.css';
 
 /* ─────────────────────────────────────────────────────────────────────────────
    Brands & tools sourced from schematicMappings — the single source of truth
@@ -389,6 +399,58 @@ function Field({ label, required, optional, children, hint }) {
   );
 }
 
+const WORKFLOW_ICONS = [ClipboardList, SearchCheck, Camera, Truck, ShieldCheck, FileCheck2];
+
+function RepairWorkflowSection({ steps }) {
+  return (
+    <section className="repairs-workflow-section" aria-labelledby="repairs-workflow-title">
+      <div className="repairs-workflow-shell">
+        <div className="repairs-workflow-intro">
+          <p className="repairs-workflow-kicker">Repair workflow</p>
+          <h2 id="repairs-workflow-title">How Repairs Work</h2>
+          <p>
+            A guided intake keeps the repair organized from first request to final approval,
+            with the details your crew and our technicians need in one place.
+          </p>
+          <Link to="/repairs/start" className="repairs-workflow-cta">
+            Start a repair
+            <PackageCheck size={17} aria-hidden="true" />
+          </Link>
+        </div>
+
+        <div className="repairs-workflow-track">
+          {steps.map((step, index) => {
+            const Icon = WORKFLOW_ICONS[index] || ClipboardList;
+
+            return (
+              <Motion.article
+                key={step.title}
+                className="repairs-workflow-card"
+                initial={{ opacity: 0, y: 18 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: '-80px' }}
+                transition={{ duration: 0.28, delay: index * 0.035, ease: 'easeOut' }}
+              >
+                <div className="repairs-workflow-card__rail" aria-hidden="true" />
+                <div className="repairs-workflow-card__top">
+                  <span className="repairs-workflow-card__number">
+                    {String(index + 1).padStart(2, '0')}
+                  </span>
+                  <span className="repairs-workflow-card__icon">
+                    <Icon size={19} aria-hidden="true" />
+                  </span>
+                </div>
+                <h3>{step.title}</h3>
+                <p>{step.description}</p>
+              </Motion.article>
+            );
+          })}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 export default function Repairs() {
   const serviceRoutes = [
     {
@@ -461,7 +523,7 @@ export default function Repairs() {
               fontWeight: 900,
               letterSpacing: '0.12em',
             }}>
-              DTB Repair Services
+              Repair Services
             </p>
             <h1 style={{
               margin: '0 0 18px',
@@ -470,7 +532,7 @@ export default function Repairs() {
               fontWeight: 950,
               letterSpacing: '0',
             }}>
-              Keep your tools working. Keep your crews moving.
+              Keep your tools working. And your crews moving.
             </h1>
             <p style={{
               margin: '0 0 28px',
@@ -536,125 +598,7 @@ export default function Repairs() {
         </div>
       </section>
 
-      <section style={{
-        padding: 'clamp(2.75rem, 6vw, 5rem) clamp(1.25rem, 5vw, 3rem)',
-        background: 'linear-gradient(180deg, #f8fafc 0%, #eef4ff 100%)',
-        borderTop: '1px solid rgba(15,23,42,0.08)',
-      }}>
-        <div style={{ maxWidth: '1180px', margin: '0 auto' }}>
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 340px), 1fr))',
-            gap: 'clamp(1.5rem, 4vw, 3rem)',
-            alignItems: 'start',
-          }}>
-            <div>
-              <p style={{
-                margin: '0 0 10px',
-                color: 'var(--primary-600)',
-                fontSize: '0.74rem',
-                fontWeight: 950,
-                textTransform: 'uppercase',
-                letterSpacing: '0.12em',
-              }}>
-                Repair workflow
-              </p>
-              <h2 style={{
-                margin: '0 0 14px',
-                color: '#0f172a',
-                fontSize: 'clamp(1.8rem, 4vw, 3rem)',
-                lineHeight: 1,
-                fontWeight: 950,
-                letterSpacing: '0',
-              }}>
-                How Repair Works
-              </h2>
-              <p style={{
-                margin: 0,
-                maxWidth: '520px',
-                color: 'rgba(15,23,42,0.64)',
-                fontSize: 'clamp(0.96rem, 1.8vw, 1.08rem)',
-                lineHeight: 1.7,
-              }}>
-                A guided intake keeps the repair organized from first request to final approval, with the details your crew and our technicians need in one place.
-              </p>
-            </div>
-            <div style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 240px), 1fr))',
-              gap: '14px',
-            }}>
-              {processSteps.map((step, index) => (
-                <article key={step.title} style={{
-                  background: 'white',
-                  border: '1px solid rgba(15,23,42,0.08)',
-                  borderRadius: '8px',
-                  padding: '20px',
-                  minHeight: '178px',
-                  boxShadow: '0 18px 45px rgba(15,23,42,0.07)',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  position: 'relative',
-                  overflow: 'hidden',
-                }}>
-                  <span aria-hidden="true" style={{
-                    position: 'absolute',
-                    inset: '0 auto auto 0',
-                    width: '4px',
-                    height: '100%',
-                    background: index === 0 ? 'var(--primary-600)' : 'rgba(37,99,235,0.18)',
-                  }} />
-                  <div style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    gap: '12px',
-                    marginBottom: '18px',
-                  }}>
-                    <span style={{
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      width: '38px',
-                      height: '38px',
-                      borderRadius: '8px',
-                      background: index === 0 ? 'var(--primary-600)' : '#eff6ff',
-                      color: index === 0 ? '#fff' : 'var(--primary-600)',
-                      fontSize: '0.78rem',
-                      fontWeight: 950,
-                    }}>
-                      {String(index + 1).padStart(2, '0')}
-                    </span>
-                    <span style={{
-                      flex: 1,
-                      height: '1px',
-                      background: 'linear-gradient(90deg, rgba(37,99,235,0.22), rgba(15,23,42,0.04))',
-                    }} />
-                  </div>
-                  <h3 style={{
-                    margin: '0 0 10px',
-                    color: '#0f172a',
-                    fontSize: '1rem',
-                    lineHeight: 1.25,
-                    fontWeight: 900,
-                    letterSpacing: '0',
-                  }}>
-                    {step.title}
-                  </h3>
-                  <p style={{
-                    margin: 0,
-                    color: 'rgba(15,23,42,0.62)',
-                    fontSize: '0.88rem',
-                    lineHeight: 1.58,
-                  }}>
-                    {step.description}
-                  </p>
-                </article>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
+      <RepairWorkflowSection steps={processSteps} />
     </div>
   );
 }
