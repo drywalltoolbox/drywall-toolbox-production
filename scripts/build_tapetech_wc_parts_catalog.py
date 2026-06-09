@@ -86,11 +86,132 @@ def image_url(sku: str) -> str:
     return ""
 
 
+# ---------------------------------------------------------------------------
+# Pre-compiled patterns used by normalize_part_name() and sanitize_sku()
+# ---------------------------------------------------------------------------
+
+# Bare SKU: digits (3+) optionally followed by letters/digits/hyphens, nothing else
+_RE_SKU_ONLY        = re.compile(r"^[0-9]{3,}[A-Z0-9\-]*$", re.IGNORECASE)
+# Part (ref) schematic callout — re.DOTALL so .* matches across embedded newlines
+_RE_PART_REF        = re.compile(r"^Part\s*\(.*\)$", re.IGNORECASE | re.DOTALL)
+# Name that begins with a 5+ digit SKU prefix followed by description
+_RE_SKU_PREFIXED    = re.compile(r"^[0-9]{5,}[A-Z0-9\-]*\b")
+# Strip the leading SKU token from an SKU-prefixed name
+_RE_SKU_PREFIX_STRIP = re.compile(r"^[0-9]{5,}[A-Z0-9\-]*\s*", re.IGNORECASE)
+# Standalone quantity multiplier tokens
+_RE_MULTIPLIER_ONLY = re.compile(r"^[xX]\d+$")
+# Schematic annotation-only rows
+_RE_DETAIL          = re.compile(r"^Details?$", re.IGNORECASE)
+# Trailing instruction noise
+_RE_LOCTITE         = re.compile(r",?\s*(W\s+)?LOCTITE\s+\w+.*$", re.IGNORECASE | re.DOTALL)
+_RE_TORQUE          = re.compile(r",?\s*TORQUE\s+SECURELY.*$", re.IGNORECASE | re.DOTALL)
+_RE_INSTALL_RTV     = re.compile(r",?\s*INSTALL\s+W\s+RTV.*$", re.IGNORECASE | re.DOTALL)
+# "TYP." / "(TYP)" — both at end-of-string and mid-string (e.g. "Rubber Pad, Typ. (Repair Only)")
+_RE_TYP_INLINE      = re.compile(r",?\s*\bTYP\.?\b.*$", re.IGNORECASE | re.DOTALL)
+_RE_TYP_SUFFIX      = re.compile(r"\s*\(?TYP\.?\)?$", re.IGNORECASE)
+# Trailing quantity multiplier " x 2" — only bare integers, not fractions like "X 1/4"
+_RE_QTY_SUFFIX      = re.compile(r"\s+[xX]\s*\d+\s*$")
+# Trailing "(REPAIR ONLY)" / "(repair only)" style instruction annotations
+_RE_REPAIR_ONLY     = re.compile(r",?\s*\(\s*repair\s+only\s*\)\s*$", re.IGNORECASE)
+# Trailing branding parentheticals e.g. "(Tapetech)", "(Gold)"
+# — keep these; they add useful context, so no pattern here
+
+
+def normalize_part_name(raw: str) -> str:
+    """Return a clean, human-readable part name for a WooCommerce product title.
+
+    Pipeline:
+      0.  Collapse embedded \\n / \\r / \\t to single space  ← root-cause fix
+      1.  Part (...) schematic cross-refs         → 'Unknown Part'
+      2.  Pure bare SKU names                     → 'Unknown Part'
+      3.  Standalone multiplier tokens (X4 …)     → 'Unknown Part'
+      4.  'Details' / empty                       → 'Unknown Part'
+      5.  SKU-prefixed names: strip leading SKU,
+          attempt to salvage the description;
+          if remainder is empty/noise             → 'Unknown Part'
+      6.  Strip trailing instruction annotations
+          (LOCTITE, TORQUE, INSTALL W RTV, TYP, X N, REPAIR ONLY)
+      7.  Final whitespace + comma cleanup
+      8.  Re-check result against bare-SKU pattern → 'Unknown Part'
+    """
+    name = raw.strip()
+
+    # ── Step 0: collapse all embedded control whitespace ──────────────────────
+    # Root cause: master CSV parts have \n inside part_name/normalized_sku
+    # fields so multi-line regex patterns like .* (no DOTALL) fail to match.
+    name = re.sub(r"[\r\n\t]+", " ", name)
+    name = re.sub(r" {2,}", " ", name).strip()
+
+    if not name:
+        return "Unknown Part"
+
+    # ── Step 1–4: hard discard patterns ───────────────────────────────────────
+    if _RE_PART_REF.match(name):
+        return "Unknown Part"
+    if _RE_SKU_ONLY.match(name):
+        return "Unknown Part"
+    if _RE_MULTIPLIER_ONLY.match(name):
+        return "Unknown Part"
+    if _RE_DETAIL.match(name):
+        return "Unknown Part"
+
+    # ── Step 5: SKU-prefixed names — strip prefix, salvage description ─────────
+    # e.g. "050422 Rubber Pad, Typ. (Repair Only)" → "Rubber Pad"
+    # e.g. "059057 LOCTITE AND TORQUE SECURELY"     → "Unknown Part"
+    if _RE_SKU_PREFIXED.match(name):
+        remainder = _RE_SKU_PREFIX_STRIP.sub("", name).strip(" ,.-;:")
+        # Strip instruction noise from the salvaged remainder
+        remainder = _RE_LOCTITE.sub("", remainder).strip()
+        remainder = _RE_TORQUE.sub("", remainder).strip()
+        remainder = _RE_TYP_INLINE.sub("", remainder).strip()
+        remainder = _RE_REPAIR_ONLY.sub("", remainder).strip()
+        remainder = remainder.replace(",", "")
+        remainder = re.sub(r" {2,}", " ", remainder).strip()
+        # Accept only if it looks like a real description (not another bare SKU)
+        if remainder and not _RE_SKU_ONLY.match(remainder) and not _RE_MULTIPLIER_ONLY.match(remainder) and len(remainder) > 2:
+            name = remainder
+        else:
+            return "Unknown Part"
+
+    # ── Step 6: strip trailing instruction / annotation tokens ─────────────────
+    name = _RE_LOCTITE.sub("", name).strip()
+    name = _RE_TORQUE.sub("", name).strip()
+    name = _RE_INSTALL_RTV.sub("", name).strip()
+    name = _RE_TYP_INLINE.sub("", name).strip()
+    name = _RE_TYP_SUFFIX.sub("", name).strip()
+    name = _RE_QTY_SUFFIX.sub("", name).strip()
+    name = _RE_REPAIR_ONLY.sub("", name).strip()
+
+    # ── Step 7: final cleanup ──────────────────────────────────────────────────
+    name = name.replace(",", "")
+    name = re.sub(r" {2,}", " ", name).strip()
+
+    # ── Step 8: re-check ──────────────────────────────────────────────────────
+    if not name or _RE_SKU_ONLY.match(name):
+        return "Unknown Part"
+
+    return name
+
+
+def sanitize_sku(raw: str) -> str:
+    """Collapse embedded whitespace in a SKU and strip schematic quantity
+    annotations (e.g. '059012\\nX 4' → '059012', 'DETAIL A\\nSCALE 3 : 4' → 'DETAIL-A-SCALE-3-4').
+    Returns 'UNKNOWN-PART-SKU' for empty/junk values."""
+    sku = re.sub(r"[\r\n\t]+", " ", raw).strip()
+    # Strip trailing quantity annotation " X N"
+    sku = re.sub(r"\s+[xX]\s*\d+\s*$", "", sku).strip()
+    # Strip schematic scale annotations like "SCALE 3 : 4"
+    sku = re.sub(r"\s*SCALE\s+\d+\s*:\s*\d+.*$", "", sku, flags=re.IGNORECASE).strip()
+    # Strip LOCTITE / instruction noise from SKU
+    sku = re.sub(r"\s+(W\s+)?LOCTITE.*$", "", sku, flags=re.IGNORECASE).strip()
+    # Replace remaining whitespace with hyphen for WC-safe SKU
+    sku = re.sub(r"\s+", "-", sku).strip("-")
+    return sku if sku else "UNKNOWN-PART-SKU"
+
+
 def build_name(part_name: str, sku: str) -> str:
-    # Strip commas, collapse extra whitespace — no brand prefix, no SKU suffix
-    clean = part_name.replace(",", "")
-    clean = re.sub(r" {2,}", " ", clean).strip()
-    return clean
+    # part_name is already normalized by build_wc_row before reaching here
+    return part_name
 
 
 def build_short_description(part_name: str, sku: str, model: str, model_label: str) -> str:
@@ -170,8 +291,8 @@ def build_wc_row(
 ) -> dict[str, str]:
     """Map a single tapetech_parts_master row → a WC catalog row dict."""
 
-    sku         = master_row["normalized_sku"].strip()
-    part_name   = master_row["part_name"].strip()
+    sku         = sanitize_sku(master_row["normalized_sku"].strip())
+    part_name   = normalize_part_name(master_row["part_name"].strip())
     model       = master_row["model"].strip()
     confidence  = master_row["source_confidence"].strip()
 
