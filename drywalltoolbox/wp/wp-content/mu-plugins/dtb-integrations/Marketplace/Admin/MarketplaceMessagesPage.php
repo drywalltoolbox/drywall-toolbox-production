@@ -28,6 +28,18 @@ function dtb_marketplace_render_messages_page(): void {
 		'template' => 'list',
 		'icon'     => 'dashicons-email',
 		'tabs'     => dtb_marketplace_admin_tabs( 'messages' ),
+		'actions'  => current_user_can( 'dtb_manage_marketplace' ) ? [
+			dtb_admin_ui_button( __( 'Amazon Composer', 'drywall-toolbox' ), [
+				'type' => 'secondary',
+				'size' => 'sm',
+				'href' => admin_url( 'admin.php?page=dtb-marketplace-amazon-comms' ),
+			] ),
+			dtb_admin_ui_button( __( 'eBay Inbox', 'drywall-toolbox' ), [
+				'type' => 'secondary',
+				'size' => 'sm',
+				'href' => admin_url( 'admin.php?page=dtb-marketplace-ebay-inbox' ),
+			] ),
+		] : [],
 	] );
 
 	echo '<form method="get" class="dtb-filter-row">';

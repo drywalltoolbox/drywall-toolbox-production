@@ -113,7 +113,8 @@ function dtb_admin_shell_render_tabs( array $tabs, string $live_target = '' ): v
 	foreach ( $tabs as $tab ) {
 		$active_class = ! empty( $tab['active'] ) ? ' dtb-section-nav__tab--active' : '';
 		$href         = $tab['url'] ?? '#';
-		$data_tab     = ! empty( $tab['id'] ) ? ' data-dtb-tab="' . esc_attr( $tab['id'] ) . '"' : '';
+		$is_page_link = ! empty( $tab['url'] ) && '#' !== $tab['url'];
+		$data_tab     = ! $is_page_link && ! empty( $tab['id'] ) ? ' data-dtb-tab="' . esc_attr( $tab['id'] ) . '"' : '';
 		$aria_sel     = ! empty( $tab['active'] ) ? 'true' : 'false';
 		$role         = empty( $tab['url'] ) || $tab['url'] === '#' ? ' role="tab"' : '';
 		// Live navigation attributes — emitted only when a live_target region ID is provided.

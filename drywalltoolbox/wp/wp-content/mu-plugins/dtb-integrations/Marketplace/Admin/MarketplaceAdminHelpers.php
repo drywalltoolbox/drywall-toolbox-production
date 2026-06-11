@@ -104,6 +104,11 @@ function dtb_marketplace_enqueue_assets( string $hook ): void {
 		'marketplace_page_dtb-marketplace-ebay-inbox',
 		'marketplace_page_dtb-marketplace-exceptions',
 		'marketplace_page_dtb-marketplace-settings',
+		'admin_page_dtb-marketplace-orders',
+		'admin_page_dtb-marketplace-messages',
+		'admin_page_dtb-marketplace-amazon-comms',
+		'admin_page_dtb-marketplace-ebay-inbox',
+		'admin_page_dtb-marketplace-exceptions',
 	];
 
 	if ( ! in_array( $hook, $pages, true ) ) {

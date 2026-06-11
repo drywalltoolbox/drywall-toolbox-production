@@ -64,8 +64,10 @@ function dtb_register_operations_library_menu(): void {
 			continue;
 		}
 
+		$submenu_parent = empty( $page['menu_visible'] ) ? null : $parent;
+
 		add_submenu_page(
-			$parent,
+			$submenu_parent,
 			$page['title'],
 			$page['menu_title'],
 			$page['capability'],
@@ -103,8 +105,10 @@ function dtb_register_tool_library_menu(): void {
 			continue;
 		}
 
+		$submenu_parent = empty( $page['menu_visible'] ) ? null : $parent;
+
 		add_submenu_page(
-			$parent,
+			$submenu_parent,
 			$page['title'],
 			$page['menu_title'],
 			$page['capability'],

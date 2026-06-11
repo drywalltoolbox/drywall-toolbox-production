@@ -218,6 +218,7 @@ function dtb_operations_menu_register_pages(): void {
 		'template'   => 'list',
 		'section'    => 'Operations',
 		'icon'       => 'dashicons-store',
+		'menu_visible' => false,
 	] );
 
 	dtb_register_admin_page( [
@@ -232,6 +233,7 @@ function dtb_operations_menu_register_pages(): void {
 		'template'   => 'list',
 		'section'    => 'Operations',
 		'icon'       => 'dashicons-email',
+		'menu_visible' => false,
 	] );
 
 	dtb_register_admin_page( [
@@ -246,6 +248,7 @@ function dtb_operations_menu_register_pages(): void {
 		'template'   => 'list',
 		'section'    => 'Operations',
 		'icon'       => 'dashicons-email',
+		'menu_visible' => false,
 	] );
 
 	dtb_register_admin_page( [
@@ -260,6 +263,7 @@ function dtb_operations_menu_register_pages(): void {
 		'template'   => 'list',
 		'section'    => 'Operations',
 		'icon'       => 'dashicons-email',
+		'menu_visible' => false,
 	] );
 
 	dtb_register_admin_page( [
@@ -274,13 +278,14 @@ function dtb_operations_menu_register_pages(): void {
 		'template'   => 'queue',
 		'section'    => 'Operations',
 		'icon'       => 'dashicons-warning',
+		'menu_visible' => false,
 	] );
 
 	dtb_register_admin_page( [
 		'library'    => 'operations',
 		'slug'       => 'dtb-marketplace-settings',
 		'title'      => __( 'Marketplace Settings', 'drywall-toolbox' ),
-		'menu_title' => __( 'Settings', 'drywall-toolbox' ),
+		'menu_title' => __( 'Marketplace Settings', 'drywall-toolbox' ),
 		'capability' => 'dtb_manage_marketplace_settings',
 		'callback'   => 'dtb_marketplace_render_settings_page',
 		'parent'     => 'dtb-marketplace',

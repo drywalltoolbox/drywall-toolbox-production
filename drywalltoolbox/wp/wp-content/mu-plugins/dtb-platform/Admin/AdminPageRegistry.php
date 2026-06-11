@@ -17,6 +17,7 @@
  *   template    (string) 'dashboard' | 'queue' | 'tool' | 'settings'
  *   section     (string) Optional grouping label.
  *   icon        (string) Optional dashicon for top-level items only.
+ *   menu_visible (bool) Whether to show this page in the left admin menu.
  *
  * @package drywall-toolbox
  */
@@ -70,6 +71,7 @@ function dtb_register_admin_page( array $meta ): void {
 		'template'   => 'dashboard',
 		'section'    => '',
 		'icon'       => '',
+		'menu_visible' => true,
 	] );
 }
 
