@@ -258,7 +258,7 @@ function dtb_returns_rest_public_submit( WP_REST_Request $request ): WP_REST_Res
 	$customer_body .= "{$site_name} Support Team\n";
 	$customer_headers = [
 		'Content-Type: text/plain; charset=UTF-8',
-		'Reply-To: ' . $site_name . ' Support <' . get_option( 'admin_email' ) . '>',
+		'Reply-To: ' . $site_name . ' Support <info@drywalltoolbox.com>',
 	];
 
 	if ( is_email( $customer_email ) ) {

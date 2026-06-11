@@ -36,9 +36,7 @@ function dtb_support_email_from(): string {
 	if ( '' !== $saved && is_email( $saved ) ) {
 		return (string) apply_filters( 'dtb_support_email_from', $saved );
 	}
-	$host    = (string) wp_parse_url( home_url(), PHP_URL_HOST );
-	$default = 'support@' . $host;
-	return (string) apply_filters( 'dtb_support_email_from', $default );
+	return (string) apply_filters( 'dtb_support_email_from', 'info@drywalltoolbox.com' );
 }
 
 /**
@@ -50,7 +48,7 @@ function dtb_support_email_from(): string {
  */
 function dtb_support_admin_email(): string {
 	$saved = (string) get_option( 'dtb_support_admin_email', '' );
-	$value = ( '' !== $saved && is_email( $saved ) ) ? $saved : (string) get_option( 'admin_email', '' );
+	$value = ( '' !== $saved && is_email( $saved ) ) ? $saved : 'info@drywalltoolbox.com';
 	return (string) apply_filters( 'dtb_support_admin_email', $value );
 }
 

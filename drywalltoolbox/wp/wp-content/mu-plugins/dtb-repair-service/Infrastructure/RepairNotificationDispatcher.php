@@ -26,7 +26,7 @@ return (string) apply_filters( 'dtb_repair_email_from_name', get_bloginfo( 'name
  * @return string
  */
 function dtb_repair_email_from_address(): string {
-$default = 'repairs@' . wp_parse_url( home_url(), PHP_URL_HOST );
+$default = 'info@drywalltoolbox.com';
 return (string) apply_filters( 'dtb_repair_email_from_address', $default );
 }
 
@@ -36,7 +36,7 @@ return (string) apply_filters( 'dtb_repair_email_from_address', $default );
  * @return string
  */
 function dtb_repair_admin_email(): string {
-return (string) apply_filters( 'dtb_repair_admin_email', get_option( 'admin_email', '' ) );
+return (string) apply_filters( 'dtb_repair_admin_email', 'info@drywalltoolbox.com' );
 }
 
 /**

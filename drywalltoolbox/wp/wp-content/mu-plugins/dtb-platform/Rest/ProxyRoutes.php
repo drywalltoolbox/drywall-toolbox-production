@@ -2235,8 +2235,7 @@ function dtb_contact_form_handler( WP_REST_Request $request ): WP_REST_Response 
 
 	// ── Build and send email ──────────────────────────────────────────────────
 	$site_name = get_bloginfo( 'name' ) ?: 'Drywall Toolbox';
-	// TODO: revert to support@drywalltoolbox.com once the support inbox is created.
-	$to        = 'elliott.miller@drywalltoolbox.com';
+	$to        = 'info@drywalltoolbox.com';
 	$subject   = sprintf( '[%s Contact] %s — %s', $site_name, $inquiry_type, $name );
 
 	$body  = "New contact form submission from {$name} <{$email}>.\n\n";
@@ -2277,7 +2276,7 @@ function dtb_contact_form_handler( WP_REST_Request $request ): WP_REST_Response 
 	if ( ! $sent ) {
 		error_log( '[DTB Contact] wp_mail() failed for submission from ' . dtb_anonymise_ip( $ip ) );
 		return new WP_REST_Response(
-			dtb_error_envelope( 'mail_failed', 'Unable to send your message. Please email us directly at elliott.miller@drywalltoolbox.com.', 500 ),
+			dtb_error_envelope( 'mail_failed', 'Unable to send your message. Please email us directly at info@drywalltoolbox.com.', 500 ),
 			500
 		);
 	}

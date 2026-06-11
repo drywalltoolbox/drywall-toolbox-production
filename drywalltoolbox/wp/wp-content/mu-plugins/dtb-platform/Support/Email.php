@@ -7,6 +7,36 @@
 
 defined( 'ABSPATH' ) || exit;
 
+// =============================================================================
+// GLOBAL FROM-ADDRESS OVERRIDE
+// =============================================================================
+
+/**
+ * Return the platform-wide outbound From address.
+ *
+ * All wp_mail() calls in the platform use info@drywalltoolbox.com unless a
+ * module-specific filter (e.g. dtb_support_email_from) overrides it at a
+ * higher priority.
+ *
+ * @return string
+ */
+function dtb_platform_from_email(): string {
+	return (string) apply_filters( 'dtb_platform_from_email', 'info@drywalltoolbox.com' );
+}
+
+/**
+ * Return the platform-wide outbound From name.
+ *
+ * @return string
+ */
+function dtb_platform_from_name(): string {
+	return (string) apply_filters( 'dtb_platform_from_name', 'Drywall Toolbox' );
+}
+
+// Priority 1 — runs before any module-specific wp_mail_from filters (priority 10).
+add_filter( 'wp_mail_from',      static fn( string $original ): string => dtb_platform_from_email(), 1 );
+add_filter( 'wp_mail_from_name', static fn( string $original ): string => dtb_platform_from_name(), 1 );
+
 if ( ! function_exists( 'dtb_email_logo_url' ) ) {
 	/**
 	 * Return the public logo URL used in customer emails.

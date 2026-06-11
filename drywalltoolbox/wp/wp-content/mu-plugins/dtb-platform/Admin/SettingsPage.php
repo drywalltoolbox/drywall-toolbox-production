@@ -155,7 +155,7 @@ function dtb_settings_render_general_tab(): void {
 	);
 	// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 	echo dtb_admin_ui_field(
-		dtb_admin_ui_input( 'dtb_support_email', get_option( 'dtb_support_email', get_option( 'admin_email' ) ), [ 'type' => 'email' ] ),
+		dtb_admin_ui_input( 'dtb_support_email', get_option( 'dtb_support_email', 'info@drywalltoolbox.com' ), [ 'type' => 'email' ] ),
 		__( 'Support Email', 'drywall-toolbox' ),
 		[ 'description' => __( 'Primary contact email for platform notifications.', 'drywall-toolbox' ) ]
 	);
