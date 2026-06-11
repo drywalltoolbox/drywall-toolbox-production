@@ -142,7 +142,7 @@ function PackageCard({ pkg, index, packageCount }) {
 
       <Link
         to={`/repairs/start?package=${encodeURIComponent(pkg.id)}`}
-        className={featured ? 'repair-package-card__button repair-package-card__button--primary' : 'repair-package-card__button'}
+        className="repair-package-card__button repair-package-card__button--primary"
       >
         Start with this package
         <ArrowRight size={16} aria-hidden="true" />

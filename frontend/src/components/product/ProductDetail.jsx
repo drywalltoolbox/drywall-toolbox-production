@@ -11,7 +11,12 @@ import ProductDetailTabs from './ProductDetailTabs';
 import ProductSpecTable from './ProductSpecTable';
 import { getProductSpecifications } from '../../utils/productSpecifications';
 import { getProductVariations } from '../../services/api';
-import { findMatchingVariation, getVariationSelectionMap } from '../../utils/variationSelection';
+import {
+  canonicalizeAttributeValue,
+  findMatchingVariation,
+  getVariationSelectionMap,
+  normalizeAttributeKey,
+} from '../../utils/variationSelection';
 import { setCachedVariations } from '../../utils/variationCache';
 import { apiClient } from '../../api/client.js';
 import { getBrandLogo } from '../../utils/brandAssets.js';
@@ -624,14 +629,17 @@ export default function ProductDetail({
     variationAttributes.forEach((attr) => {
       const name = attr.name;
       const options = Array.isArray(attr.options) ? attr.options : [];
-      const attrMatrix = matrix[name] ?? {};
+      const attrMatrix = matrix[name] ?? matrix[normalizeAttributeKey(name)] ?? {};
       const lowerMatrix = Object.entries(attrMatrix).reduce((acc, [key, value]) => {
         acc[String(key).toLowerCase()] = value;
+        acc[canonicalizeAttributeValue(key)] = value;
         return acc;
       }, {});
 
       meta[name] = options.map((option) => {
-        const matrixEntry = attrMatrix[option] ?? lowerMatrix[String(option).toLowerCase()];
+        const matrixEntry = attrMatrix[option]
+          ?? lowerMatrix[String(option).toLowerCase()]
+          ?? lowerMatrix[canonicalizeAttributeValue(option)];
 
         if (matrixEntry) {
           const matchedVariation = variations.find((v) => v.id === matrixEntry.variation_id) || null;
@@ -649,7 +657,8 @@ export default function ProductDetail({
         const fallback = exact || variations.find((variation) => {
           const map = getVariationSelectionMap(variation);
           return Object.entries(map).some(([attrName, attrValue]) => (
-            attrName.toLowerCase() === name.toLowerCase() && `${attrValue}` === `${option}`
+            normalizeAttributeKey(attrName) === normalizeAttributeKey(name)
+              && canonicalizeAttributeValue(attrValue) === canonicalizeAttributeValue(option)
           ));
         });
 

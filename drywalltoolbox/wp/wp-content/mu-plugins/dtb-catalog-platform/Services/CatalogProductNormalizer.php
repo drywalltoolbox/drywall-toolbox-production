@@ -220,14 +220,21 @@ final class DTB_CatalogProductNormalizer {
 
 	/** Extract display category identity. */
 	private static function extract_display_category( array $meta, array $category ): array {
-		$display_key = (string) ( $meta[ DTB_ProductMeta::DISPLAY_CATEGORY_KEY ] ?? '' );
-		if ( '' === $display_key ) {
+		$raw_key = (string) ( $meta[ DTB_ProductMeta::DISPLAY_CATEGORY_KEY ] ?? '' );
+		if ( '' === $raw_key ) {
 			return [ 'key' => '', 'label' => '', 'slug' => '' ];
 		}
+
+		// Normalize the raw meta value to a canonical slug so the facets API
+		// always returns consistent keys regardless of how the product was imported.
+		$canonical = DTB_CategoryNormalizer::canonical_display_slug( $raw_key );
+		$label     = DTB_CategoryNormalizer::DISPLAY_CATEGORY_LABELS[ $canonical ]
+			?? ucwords( str_replace( '_', ' ', $canonical ) );
+
 		return [
-			'key'   => $display_key,
-			'label' => ucwords( str_replace( [ '_', '-' ], ' ', $display_key ) ),
-			'slug'  => sanitize_title( $display_key ),
+			'key'   => $canonical,
+			'label' => $label,
+			'slug'  => str_replace( '_', '-', $canonical ),
 		];
 	}
 

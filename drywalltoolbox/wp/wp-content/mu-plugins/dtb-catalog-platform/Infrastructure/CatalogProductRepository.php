@@ -99,24 +99,28 @@ final class DTB_CatalogProductRepository {
 				];
 				$is_parts_constrained = true;
 			} else {
-				// Build all normalised forms of the display-category key so products
-				// imported with hyphens, underscores, spaces, or title-case are matched.
-				$space_form   = str_replace( '_', ' ', $display_category_key );
-				$title_form   = ucwords( $space_form );
+				// Resolve to canonical slug and expand to all known raw DB forms so
+				// products imported with any alias variant (e.g. 'Nailspotters',
+				// 'nail_spotters', 'Nail Spotters') are matched correctly.
+				$canonical  = DTB_CategoryNormalizer::canonical_display_slug( $display_category_key );
+				$raw_forms  = DTB_CategoryNormalizer::display_category_raw_forms( $canonical );
+
+				// Always include the standard derived forms as a safety net for
+				// any unknown/custom values not covered by the alias map.
+				$space_form = str_replace( '_', ' ', $display_category_key );
+				$title_form = ucwords( $space_form );
+				$all_forms  = array_values( array_unique( array_filter( array_merge(
+					$raw_forms,
+					[ $display_category_key, $display_category_slug, $space_form, $title_form ]
+				) ) ) );
+
 				$meta_query[] = [
 					'key'     => DTB_ProductMeta::DISPLAY_CATEGORY_KEY,
-					'value'   => array_values( array_unique( array_filter( [
-						$display_category_key,
-						$display_category_slug,
-						$space_form,
-						$title_form,
-					] ) ) ),
+					'value'   => $all_forms,
 					'compare' => 'IN',
 				];
 
 				// Tool/category filters must not leak schematic replacement parts.
-				// Use NOT EXISTS OR != '1' so products whose meta is absent are
-				// treated as non-parts (handles legacy imports without this key).
 				if ( ! array_key_exists( 'is_parts', $filters ) || null === $filters['is_parts'] ) {
 					$meta_query[] = [
 						'relation' => 'OR',

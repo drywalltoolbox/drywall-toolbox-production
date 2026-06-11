@@ -8,12 +8,13 @@ function hasSelectedValue([, value]) {
   return value != null && `${value}`.trim() !== '';
 }
 
-const normalizeAttributeKey = (value) => {
+export const normalizeAttributeKey = (value) => {
   return `${value || ''}`
     .trim()
     .toLowerCase()
     .replace(/^attribute(_pa)?_/, '')
     .replace(/^pa_/, '')
+    .replace(/[_-]+/g, ' ')
     .replace(/\s+/g, ' ');
 };
 
@@ -29,7 +30,7 @@ function decodeAttributeEntity(value) {
     .replace(/&nbsp;/g, ' ');
 }
 
-function normalizeAttributeValue(value) {
+export function normalizeAttributeValue(value) {
   return decodeAttributeEntity(value)
     .replace(/[‘’]/g, "'")
     .replace(/[“”]/g, '"')
@@ -47,8 +48,9 @@ function normalizeAttributeValue(value) {
  * @param {any} value
  * @returns {string}
  */
-function canonicalizeAttributeValue(value) {
+export function canonicalizeAttributeValue(value) {
   return normalizeAttributeValue(value)
+    .replace(/[_-]+/g, ' ')
     .replace(/\b(inches|inch|in)\b/g, '')
     .replace(/\b(feet|foot|ft)\b/g, '')
     .replace(/["']/g, '')
@@ -56,7 +58,7 @@ function canonicalizeAttributeValue(value) {
     .trim();
 }
 
-function attributeValuesEqual(left, right) {
+export function attributeValuesEqual(left, right) {
   const normalizedLeft = normalizeAttributeValue(left);
   const normalizedRight = normalizeAttributeValue(right);
   if (normalizedLeft === normalizedRight) return true;

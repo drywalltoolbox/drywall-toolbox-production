@@ -4,10 +4,35 @@ import {
   mergeSpecMeta,
 } from './csvSpecificationMapping.js';
 import { buildIncludesMetaFromContent } from './includesExtraction.js';
+import { canonicalizeAttributeValue, normalizeAttributeKey } from './variationSelection.js';
 
 function toNumber(value, fallback = 0) {
   const parsed = typeof value === 'number' ? value : parseFloat(String(value ?? ''));
   return Number.isFinite(parsed) ? parsed : fallback;
+}
+
+export function normalizeCatalogDisplayName(name = '', context = {}) {
+  const raw = String(name || '').trim();
+  if (!raw) return raw;
+
+  const brand = String(context?.brand || context?.brandLabel || context?.brand?.label || '').trim();
+  const sku = String(context?.sku || '').trim();
+  const parentSku = String(context?.parentSku || context?.parent_sku || context?.parentId || '').trim();
+  const isDuraStilts = /dura-?stilts/i.test(brand)
+    || /^D(?:SS)?(?:14|18|24|38)/i.test(sku)
+    || /DS-?DURA-?III/i.test(sku)
+    || /DS-?DURA-?III/i.test(parentSku)
+    || /dura-?stilts\s+dura-?iii/i.test(raw);
+
+  if (!isDuraStilts || !/dura-?iii/i.test(raw)) return raw;
+
+  return raw
+    .replace(/\bAjustable\b/gi, 'Adjustable')
+    .replace(/^Dura-Stilts\s+/i, '')
+    .replace(/^Dura-III\s+Dura\s+Stilts\b/i, 'Dura-III Adjustable')
+    .replace(/^Dura-III\s+Stilts\s+Uni-Strut\b/i, 'Dura-III Adjustable')
+    .replace(/\s+/g, ' ')
+    .trim();
 }
 
 function toLegacyMetaData(metaData = []) {
@@ -121,6 +146,7 @@ function expandOptionAliases(values = []) {
     if (!value) return;
     out.add(value);
     out.add(normalizeOptionKey(value));
+    out.add(canonicalizeAttributeValue(value));
 
     const inchMatch = value.match(/^(\d+(?:\.\d+)?)\s*(?:in|inch|inches|")?$/i);
     if (inchMatch) {
@@ -133,10 +159,17 @@ function expandOptionAliases(values = []) {
       out.add(normalizeOptionKey(`${n}"`));
     }
 
-    const normalizedInches = value.replace(/\b(inches|inch|in)\b/gi, 'in').replace(/\s+/g, ' ').trim();
+    const normalizedInches = value
+      .replace(/[“”]/g, '"')
+      .replace(/[‘’]/g, "'")
+      .replace(/[_-]+/g, ' ')
+      .replace(/\b(inches|inch|in)\b/gi, 'in')
+      .replace(/\s+/g, ' ')
+      .trim();
     if (normalizedInches !== value) {
       out.add(normalizedInches);
       out.add(normalizeOptionKey(normalizedInches));
+      out.add(canonicalizeAttributeValue(normalizedInches));
     }
   });
 
@@ -216,13 +249,20 @@ function buildAvailableOptionMatrix(product, variations, computed = null) {
   const axis = firstVariationAxis(product, variations, computed);
   if (!axis) return {};
 
-  const matrix = { [axis]: {} };
+  const matrix = { [axis]: {}, [normalizeAttributeKey(axis)]: {} };
+  const addMatrixEntry = (optionKey, entry) => {
+    [optionKey, normalizeOptionKey(optionKey), canonicalizeAttributeValue(optionKey)]
+      .filter(Boolean)
+      .forEach((key) => {
+        matrix[axis][key] = entry;
+        matrix[normalizeAttributeKey(axis)][key] = entry;
+      });
+  };
 
   variations.forEach((variation) => {
     const entry = matrixEntryForVariation(variation);
     optionKeysForVariation(variation, axis).forEach((key) => {
-      matrix[axis][key] = entry;
-      matrix[axis][normalizeOptionKey(key)] = entry;
+      addMatrixEntry(key, entry);
     });
   });
 
@@ -240,8 +280,7 @@ function buildAvailableOptionMatrix(product, variations, computed = null) {
       };
 
       expandOptionAliases([option.value, option.label]).forEach((key) => {
-        matrix[axis][key] = entry;
-        matrix[axis][normalizeOptionKey(key)] = entry;
+        addMatrixEntry(key, entry);
       });
     });
   }
@@ -276,7 +315,14 @@ export function toCatalogProductCardDTO(dto = {}) {
   const variationLabel = card?.variationLabel || dto?.variation?.label || '';
   const parentDtoName = dto?.name || '';
   const rawCardName = card?.name || dto?.name || '';
-  const displayName = composeVariationName(rawCardName, parentDtoName, variationLabel);
+  const displayName = normalizeCatalogDisplayName(
+    composeVariationName(rawCardName, parentDtoName, variationLabel),
+    {
+      sku: card?.sku || dto?.sku || '',
+      parentSku: dto?.sku || '',
+      brand: dto?.brand?.label || '',
+    }
+  );
 
   return {
     id: card?.id ?? dto?.id ?? 0,
@@ -308,7 +354,14 @@ export function toLegacyVariationDTO(variationDto = {}, parentDto = null) {
   const variationLabel = variationDto?.variation?.label || variationDto?.variation?.value || '';
   const parentName = parentDto?.name || '';
   const rawName = variationDto?.name || '';
-  const displayName = composeVariationName(rawName, parentName, variationLabel);
+  const displayName = normalizeCatalogDisplayName(
+    composeVariationName(rawName, parentName, variationLabel),
+    {
+      sku: variationDto?.sku || '',
+      parentSku: variationDto?.parentSku || parentDto?.sku || '',
+      brand: variationDto?.brand?.label || parentDto?.brand?.label || '',
+    }
+  );
 
   const legacyMeta = toLegacyMetaData(variationDto?.metaData);
   const mergedMeta = synthesizeSpecMetaData(
@@ -377,7 +430,10 @@ export function toLegacyProductCardDTO(dto = {}, computed = null) {
     id: dto?.id ?? 0,
     slug: dto?.slug || '',
     type: dto?.type || 'simple',
-    name: dto?.name || '',
+    name: normalizeCatalogDisplayName(dto?.name || '', {
+      sku: dto?.sku || '',
+      brand: dto?.brand?.label || '',
+    }),
     description: dto?.description || '',
     description_full: dto?.description || dto?.description_full || '',
     short_description: dto?.shortDescription || '',

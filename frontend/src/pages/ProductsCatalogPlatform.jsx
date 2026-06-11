@@ -30,6 +30,72 @@ import {
 } from '../utils/catalogUrlState.js';
 import { normalizeDisplayCategorySlug } from '../utils/catalogFacets.js';
 
+// Canonical display category labels for the customer-facing filter UI.
+// Mirrors CategoryNormalizer::DISPLAY_CATEGORY_LABELS on the backend.
+const DISPLAY_CATEGORY_LABELS = {
+  automatic_tapers:      'Automatic Tapers',
+  nail_spotters:         'Nail Spotters',
+  finishing_boxes:       'Finishing Boxes',
+  handles:               'Handles & Extensions',
+  pumps:                 'Pumps',
+  corner_tools:          'Corner Tools',
+  accessories:           'Accessories',
+  smoothing_blades:      'Smoothing Blades',
+  toolsets:              'Tool Sets & Kits',
+  parts:                 'Parts',
+  stilts:                'Stilts',
+  semi_automatic_tapers: 'Semi-Automatic Tapers',
+};
+
+// Alias map: normalized raw slug → canonical slug.
+// Mirrors CategoryNormalizer::DISPLAY_CATEGORY_ALIASES on the backend.
+// Keys are lowercased with spaces/hyphens collapsed to underscores.
+const DISPLAY_CATEGORY_ALIASES = {
+  automatic_taping_tools:    'automatic_tapers',
+  automatic_tapers:          'automatic_tapers',
+  automatic_taper:           'automatic_tapers',
+  taper:                     'automatic_tapers',
+  nail_spotters:             'nail_spotters',
+  nail_spotter:              'nail_spotters',
+  nailspotter:               'nail_spotters',
+  nailspotters:              'nail_spotters',
+  spotter:                   'nail_spotters',
+  finishing_boxes:           'finishing_boxes',
+  finishing_box:             'finishing_boxes',
+  flat_box:                  'finishing_boxes',
+  flatbox:                   'finishing_boxes',
+  drywall_box:               'finishing_boxes',
+  handles:                   'handles',
+  handle:                    'handles',
+  handles_and_extensions:    'handles',
+  pumps:                     'pumps',
+  pump:                      'pumps',
+  mud_pans_and_pumps:        'pumps',
+  corner_tools:              'corner_tools',
+  corner_tool:               'corner_tools',
+  corner_finisher:           'corner_tools',
+  accessories:               'accessories',
+  smoothing_blades:          'smoothing_blades',
+  smoothing_blade:           'smoothing_blades',
+  toolsets:                  'toolsets',
+  toolset:                   'toolsets',
+  tool_sets_and_kits:        'toolsets',
+  parts:                     'parts',
+  replacement_parts:         'parts',
+  stilts:                    'stilts',
+  semi_automatic_tapers:     'semi_automatic_tapers',
+};
+
+/**
+ * Resolve a raw display category slug/key to its canonical slug.
+ * Handles inconsistently stored meta values from legacy imports.
+ */
+function canonicalDisplayCategoryId(raw = '') {
+  const normalized = normalizeDisplayCategorySlug(raw); // lowercase + underscores
+  return DISPLAY_CATEGORY_ALIASES[normalized] || normalized;
+}
+import { normalizeCatalogDisplayName } from '../utils/catalogDtoAdapters.js';
+
 function toCardProduct(dto) {
   const card = dto?.cardProduct || null;
   const categoryKey = dto?.category?.key || '';
@@ -52,6 +118,10 @@ function toCardProduct(dto) {
     sale_price: salePrice,
     compare_at_price: regularPrice,
     stock_status: dto?.inventory?.stockStatus || card?.stockStatus || 'instock',
+    name: normalizeCatalogDisplayName(dto?.name || '', {
+      sku: dto?.sku || '',
+      brand: dto?.brand?.label || dto?.brandLabel || '',
+    }),
     is_variable: dto?.type === 'variable',
     is_parts: Boolean(dto?.isParts),
     min_price: dto?.price?.min ?? null,
@@ -73,6 +143,11 @@ function toCardProduct(dto) {
         sale_price: card?.salePrice ?? card?.sale_price ?? mapped.sale_price,
         compare_at_price: card?.regularPrice ?? card?.regular_price ?? mapped.compare_at_price,
         brand: mapped.brand,
+        name: normalizeCatalogDisplayName(card?.name || mapped.name || '', {
+          sku: card?.sku || '',
+          parentSku: dto?.sku || '',
+          brand: mapped.brand,
+        }),
         parentName: mapped.name,
         variation_label: card?.variationLabel || card?.variation_label || '',
       }
@@ -83,7 +158,7 @@ function toCardProduct(dto) {
 
 function canonicalCategoryKey(category = {}) {
   const raw = category?.slug || category?.key || category?.label || category?.name || '';
-  return normalizeDisplayCategorySlug(raw);
+  return canonicalDisplayCategoryId(raw);
 }
 
 function mergeCategoryEntries(items = []) {
@@ -94,11 +169,13 @@ function mergeCategoryEntries(items = []) {
     if (!id) return;
 
     const existing = merged.get(id);
+    // Use the canonical label if available, else fall back to the entry's label.
+    const canonicalLabel = DISPLAY_CATEGORY_LABELS[id];
     merged.set(id, {
       id,
       key: cat?.key || existing?.key || id,
       slug: cat?.slug || existing?.slug || id,
-      name: cat?.label || cat?.name || existing?.name || formatCategoryLabel(id),
+      name: canonicalLabel || cat?.label || cat?.name || existing?.name || formatCategoryLabel(id),
       count: (existing?.count || 0) + Number(cat?.productCount || cat?.count || 0),
       image: existing?.image || cat?.image || '',
     });
