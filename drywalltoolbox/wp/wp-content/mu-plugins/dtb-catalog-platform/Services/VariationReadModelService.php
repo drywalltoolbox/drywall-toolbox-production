@@ -218,9 +218,28 @@ final class DTB_VariationReadModelService {
 		if ( $product instanceof WC_Product_Variation ) {
 			foreach ( $product->get_variation_attributes() as $name => $value ) {
 				$clean_name = preg_replace( '/^attribute_/', '', (string) $name );
+
+				// Resolve the attribute key to its display label (e.g. "pa_size-model"
+				// → "Size / Model") so the frontend can match it against the product's
+				// variation_attributes axis which uses the display label.
+				$display_name = wc_attribute_label( $clean_name );
+				if ( '' === $display_name ) {
+					$display_name = $clean_name;
+				}
+
+				// Resolve slug → display label for taxonomy-backed attributes
+				// (e.g. "3-5-easyroll-adjustable" → "3.5\" EasyRoll® Adjustable").
+				$display_value = (string) $value;
+				if ( '' !== $value && taxonomy_exists( $clean_name ) ) {
+					$term = get_term_by( 'slug', $value, $clean_name );
+					if ( $term instanceof WP_Term ) {
+						$display_value = $term->name;
+					}
+				}
+
 				$attributes[] = [
-					'name'   => $clean_name,
-					'option' => (string) $value,
+					'name'   => $display_name,
+					'option' => $display_value,
 				];
 			}
 		} else {

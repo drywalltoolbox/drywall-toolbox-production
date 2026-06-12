@@ -23,6 +23,7 @@ import {
 } from '../api/products.js';
 import { normalizeProduct } from '../services/api.js';
 import { readCache, writeCache, bustCache, isCacheAvailable } from './productCache.js';
+import { fetchCatalogProducts as fetchPlatformProducts } from './catalogPlatformCache.js';
 
 // ─── In-memory promise cache ──────────────────────────────────────────────────
 // Prevents duplicate in-flight requests within the same page session.
@@ -246,6 +247,26 @@ function isLikelySkuQuery(value) {
   return /^[a-z0-9._-]+$/i.test(normalized);
 }
 
+/**
+ * Map a DTB catalog-platform DTO to the flat product shape used by the
+ * global header search dropdown and local-catalog search consumers.
+ */
+function adaptPlatformSearchResult(dto) {
+  if (!dto?.id) return null;
+  const card = dto?.cardProduct || null;
+  const effectivePrice = dto?.price?.effective ?? dto?.price?.current ?? dto?.price?.min ?? card?.price;
+  return {
+    id: dto.id,
+    name: dto.name || '',
+    slug: dto.slug || '',
+    sku: dto.sku || '',
+    brand: dto?.brand?.label || dto?.brandLabel || '',
+    image: dto?.media?.image || card?.image || '',
+    price: typeof effectivePrice === 'number' ? effectivePrice : parseFloat(String(effectivePrice || '0')),
+    type: dto?.type || 'simple',
+  };
+}
+
 function flattenMetaValue(value) {
   if (value == null) return '';
   if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
@@ -335,53 +356,69 @@ export async function searchProducts(query) {
     .map(({ product }) => product);
 
   if (rankedLocalResults.length > 0) return rankedLocalResults;
-  if (!isLikelySkuQuery(trimmed)) return [];
 
-  try {
-    // Exact-SKU fallback against live WooCommerce data.
-    // This catches child-variation SKUs that may not exist on parent name fields.
-    const live = await proxyFetchProducts({ sku: trimmed, per_page: 20, status: 'publish' });
-    const normalized = (Array.isArray(live) ? live : live?.products || [])
-      .map(normalizeProduct)
-      .filter(Boolean);
+  if (isLikelySkuQuery(trimmed)) {
+    try {
+      // Exact-SKU fallback against live WooCommerce data.
+      // This catches child-variation SKUs that may not exist on parent name fields.
+      const live = await proxyFetchProducts({ sku: trimmed, per_page: 20, status: 'publish' });
+      const normalized = (Array.isArray(live) ? live : live?.products || [])
+        .map(normalizeProduct)
+        .filter(Boolean);
 
-    const mappedToParents = normalized.map((item) => {
-      if (item.type === 'variation' && item.parent_id) {
-        return byId.get(Number(item.parent_id)) || item;
-      }
-      return item;
-    });
+      const mappedToParents = normalized.map((item) => {
+        if (item.type === 'variation' && item.parent_id) {
+          return byId.get(Number(item.parent_id)) || item;
+        }
+        return item;
+      });
 
-    const deduped = [];
-    const seen = new Set();
-    mappedToParents.forEach((item) => {
-      const key = String(item?.id || item?.slug || item?.sku || '');
-      if (!key || seen.has(key)) return;
-      seen.add(key);
-      deduped.push(item);
-    });
+      const deduped = [];
+      const seen = new Set();
+      mappedToParents.forEach((item) => {
+        const key = String(item?.id || item?.slug || item?.sku || '');
+        if (!key || seen.has(key)) return;
+        seen.add(key);
+        deduped.push(item);
+      });
 
-    if (deduped.length > 0) return deduped;
+      if (deduped.length > 0) return deduped;
 
-    // Partial variation-SKU fallback (e.g. "PAHC" token).
-    const variationLive = await proxySearchProductsByVariationSku(trimmed, { limit: 24 });
-    const variationNormalized = (Array.isArray(variationLive) ? variationLive : variationLive?.products || [])
-      .map(normalizeProduct)
-      .filter(Boolean);
+      // Partial variation-SKU fallback (e.g. "PAHC" token).
+      const variationLive = await proxySearchProductsByVariationSku(trimmed, { limit: 24 });
+      const variationNormalized = (Array.isArray(variationLive) ? variationLive : variationLive?.products || [])
+        .map(normalizeProduct)
+        .filter(Boolean);
 
-    const variationDeduped = [];
-    const variationSeen = new Set();
-    variationNormalized.forEach((item) => {
-      const key = String(item?.id || item?.slug || item?.sku || '');
-      if (!key || variationSeen.has(key)) return;
-      variationSeen.add(key);
-      variationDeduped.push(item);
-    });
+      const variationDeduped = [];
+      const variationSeen = new Set();
+      variationNormalized.forEach((item) => {
+        const key = String(item?.id || item?.slug || item?.sku || '');
+        if (!key || variationSeen.has(key)) return;
+        variationSeen.add(key);
+        variationDeduped.push(item);
+      });
 
-    return variationDeduped;
-  } catch {
-    return [];
+      if (variationDeduped.length > 0) return variationDeduped;
+    } catch {
+      // Fall through to catalog platform fallback.
+    }
   }
+
+  // Final fallback: DTB catalog platform full-text search.
+  // Covers queries not resolved by the local WC cache or the legacy variation-SKU
+  // endpoints — e.g. SKU prefixes like "FFBS" that only appear on child variations.
+  try {
+    const platformData = await fetchPlatformProducts({ search: trimmed });
+    const platformItems = Array.isArray(platformData?.items) ? platformData.items : [];
+    if (platformItems.length > 0) {
+      return platformItems.map(adaptPlatformSearchResult).filter(Boolean);
+    }
+  } catch {
+    // Silently swallow — returning [] below is the safe default.
+  }
+
+  return [];
 }
 
 /**

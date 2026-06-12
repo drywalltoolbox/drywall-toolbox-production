@@ -74,7 +74,9 @@ export function buildCatalogProductParams(query = {}) {
     params.brand = brandToSlug(query.brands[0]);
   }
   if (query.category) params.category = query.category;
-  if (query.displayCategory) params.display_category = query.displayCategory;
+  // Never send display_category and search together — the backend ANDs them,
+  // which returns zero results even when matches exist.  Search takes precedence.
+  if (!query.search && query.displayCategory) params.display_category = query.displayCategory;
   if (query.toolFamily) params.tool_family = query.toolFamily;
   if (query.productKind) params.product_kind = query.productKind;
   if (query.builderSlot) params.builder_slot = query.builderSlot;

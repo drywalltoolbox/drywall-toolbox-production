@@ -14,8 +14,11 @@ export const normalizeAttributeKey = (value) => {
     .toLowerCase()
     .replace(/^attribute(_pa)?_/, '')
     .replace(/^pa_/, '')
-    .replace(/[_-]+/g, ' ')
-    .replace(/\s+/g, ' ');
+    // Collapse underscores, hyphens, slashes, and surrounding spaces to a
+    // single space so that "size / model", "size-model", "pa_size-model",
+    // and "size_model" all resolve to the same canonical key "size model".
+    .replace(/[\s_\-/]+/g, ' ')
+    .trim();
 };
 
 function decodeAttributeEntity(value) {

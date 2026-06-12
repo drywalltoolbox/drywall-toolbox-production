@@ -266,8 +266,9 @@ export default function ProductsCatalogPlatform({ forceProductGrid = false, titl
   const isSelectorRoute = !forceProductGrid && (isBrandSelectorRoute || isBrandCategorySelectorRoute);
   const productsEnabled = !isSelectorRoute || Boolean(query.search);
 
-  const scopedFacets = isPartsFilter === null ? { brand: selectedBrand } : { isParts: isPartsFilter, brand: selectedBrand };
-  const productQuery = isPartsFilter === null ? query : { ...query, isParts: isPartsFilter };
+  const effectivePartsFilter = isPartsFilter === 0 && Boolean(query.search) ? null : isPartsFilter;
+  const scopedFacets = effectivePartsFilter === null ? { brand: selectedBrand } : { isParts: effectivePartsFilter, brand: selectedBrand };
+  const productQuery = effectivePartsFilter === null ? query : { ...query, isParts: effectivePartsFilter };
 
   const { facets, loading: facetsLoading, error: facetsError } = useCatalogFacets(scopedFacets);
   const { items, pagination, loading: itemsLoading, error: productsError } = useCatalogProducts(productQuery, { enabled: productsEnabled });
@@ -369,7 +370,12 @@ export default function ProductsCatalogPlatform({ forceProductGrid = false, titl
     setQuery({ brands: nextBrand ? [nextBrand] : [], displayCategory: '', category: '', search: query.search || '', sort: query.sort || 'popular', perPage: query.perPage || 24 });
   };
 
-  const toggleDisplayCategory = (displayCategory) => setQuery({ displayCategory: query.displayCategory === displayCategory ? '' : displayCategory, category: '' });
+  const toggleDisplayCategory = (displayCategory) => {
+    const next = query.displayCategory === displayCategory ? '' : displayCategory;
+    // When activating a category filter, clear any active search — the backend
+    // ANDs display_category + search together which returns zero results.
+    setQuery({ displayCategory: next, category: '', ...(next ? { search: '' } : {}) });
+  };
   const resetToBrandList = () => navigate('/products/brands');
   const resetToCategoryCards = () => navigate(`/products/brands/${brandToSlug(selectedBrand)}`);
   const getCardDisplayProduct = useCallback((product) => product?.cardProduct || null, []);
@@ -446,7 +452,18 @@ export default function ProductsCatalogPlatform({ forceProductGrid = false, titl
         ) : (
           <>
             <div className="dtb-listing-search">
-              <SearchBar placeholder={isPartsPage ? 'Search parts by name, SKU, or brand...' : 'Search products by name, SKU, or brand...'} value={query.search || ''} onChange={(e) => setQuery({ search: e.target.value }, { replace: true })} />
+              <SearchBar placeholder={isPartsPage ? 'Search parts by name, SKU, or brand...' : 'Search products by name, SKU, or brand...'} value={query.search || ''} onChange={(e) => {
+                const val = e.target.value;
+                // Clear active category/display-category filters when the user
+                // starts typing a search — prevents the AND-filter dead-end where
+                // e.g. display_category=pumps + search=Axle returns zero results.
+                setQuery(
+                  val
+                    ? { search: val, displayCategory: '', category: '' }
+                    : { search: '' },
+                  { replace: true },
+                );
+              }} />
             </div>
             <div className="flex flex-col lg:flex-row gap-8">
               <FilterPanel

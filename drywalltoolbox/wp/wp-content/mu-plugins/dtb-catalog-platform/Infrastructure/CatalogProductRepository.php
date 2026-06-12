@@ -45,7 +45,49 @@ final class DTB_CatalogProductRepository {
 		];
 
 		if ( '' !== $search ) {
-			$args['s'] = $search;
+			global $wpdb;
+
+			$like = '%' . $wpdb->esc_like( $search ) . '%';
+
+			// WP_Query 's' only searches post_title and post_content.
+			// Parts are commonly searched by SKU token (e.g. "BD-100", "PAHC"),
+			// so we supplement with a direct meta lookup against _sku.
+			$sku_ids = array_map( 'absint', (array) $wpdb->get_col(
+				$wpdb->prepare(
+					"SELECT DISTINCT pm.post_id
+					   FROM {$wpdb->postmeta} pm
+					  INNER JOIN {$wpdb->posts} p ON pm.post_id = p.ID
+					  WHERE pm.meta_key = '_sku'
+					    AND pm.meta_value LIKE %s
+					    AND p.post_status = 'publish'
+					    AND p.post_type   = 'product'",
+					$like
+				)
+			) );
+
+			if ( ! empty( $sku_ids ) ) {
+				// Also collect title/excerpt matches so we don't lose non-SKU results.
+				$title_ids = array_map( 'absint', (array) $wpdb->get_col(
+					$wpdb->prepare(
+						"SELECT DISTINCT ID FROM {$wpdb->posts}
+						  WHERE ( post_title   LIKE %s
+						       OR post_excerpt LIKE %s )
+						    AND post_status = 'publish'
+						    AND post_type   = 'product'",
+						$like,
+						$like
+					)
+				) );
+
+				$combined = array_values( array_unique( array_merge( $sku_ids, $title_ids ) ) );
+				// Use post__in so WP_Query applies all remaining meta filters
+				// (brand, display_category, is_parts, etc.) against these IDs.
+				$args['post__in'] = ! empty( $combined ) ? $combined : [ 0 ];
+				// Do NOT set 's' — post__in already covers both title and SKU hits.
+			} else {
+				// No SKU matches — fall back to WP native full-text search.
+				$args['s'] = $search;
+			}
 		}
 
 		$args = array_merge( $args, self::sort_args( $sort ) );

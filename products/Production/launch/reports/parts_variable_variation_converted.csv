@@ -1,0 +1,12 @@
+parent_sku,parent_name,axis,default_variation_sku,variation_values,child_skus,child_count
+BH9,Brake Connecting Strap,Length,BH9-3,3' | 4' | 5' | 6',BH9-3 | BH9-4 | BH9-5 | BH9-6,4
+AH7,Frame Tension Spring,Size,AH7-2,"2"" | 2.5"" | 3.5""",AH7-2 | AH7-2.5 | AH7-3.5,3
+AH1,Head Casting,Size,AH1-2,"2"" | 2.5"" | 3"" | 3.5""",AH1-2 | AH1-2.5 | AH1-3 | AH1-3.5,4
+CFB4,Door,Size,CFB4-7,"7"" | 8""",CFB4-7 | CFB4-8,2
+CFB7,Door Gasket,Size,CFB7-7,"7"" | 8""",CFB7-7 | CFB7-8,2
+CFB3,Side Plate,Size,CFB3-7,"7"" | 8""",CFB3-7 | CFB3-8,2
+FFB11,Adjuster Spring,Size,FFB11-8,"8"" | 10"" | 12""",FFB11-8 | FFB11-10 | FFB11-12,3
+HNS7,Blade,Size,HNS7-2,"2"" | 3""",HNS7-2 | HNS7-3,2
+HNS8,Blade Holder,Size,HNS8-2,"2"" | 3""",HNS8-2 | HNS8-3,2
+HNS4,Door,Size,HNS4-2,"2"" | 3""",HNS4-2 | HNS4-3,2
+HNS15,Door Gasket,Size,HNS15-2,"2"" | 3""",HNS15-2 | HNS15-3,2

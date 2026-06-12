@@ -134,9 +134,19 @@ export function parseCatalogQuery(searchParams, pathParams = {}) {
     }
   }
 
-  const displayCategory = pathParams.categorySlug
+  const rawDisplayCategory = pathParams.categorySlug
     ? pathParams.categorySlug
     : (searchParams.get('display_category') || '');
+
+  const search = searchParams.get('search')
+    ? decodeURIComponent(searchParams.get('search'))
+    : '';
+
+  // `search` and `displayCategory` are mutually exclusive — the backend ANDs
+  // them together which always produces zero results.  If both are present in
+  // the URL (e.g. from a stale/shared link), search takes priority and the
+  // display_category is silently cleared so the query makes sense.
+  const displayCategory = search ? '' : rawDisplayCategory;
 
   return {
     brands,
@@ -146,9 +156,7 @@ export function parseCatalogQuery(searchParams, pathParams = {}) {
     productKind: searchParams.get('product_kind') || '',
     builderSlot: searchParams.get('builder_slot') || '',
     workflowScope: searchParams.get('workflow_scope') || '',
-    search: searchParams.get('search')
-      ? decodeURIComponent(searchParams.get('search'))
-      : '',
+    search,
     page: Math.max(1, parseInt(searchParams.get('page') || '1', 10)),
     perPage: Math.max(1, Math.min(100, parseInt(searchParams.get('per_page') || '24', 10))),
     sort: searchParams.get('sort') || 'popular',
@@ -168,7 +176,9 @@ export function buildCatalogUrl(query, pathParams = {}) {
   if (!pathParams.brandSlug && query.brands && query.brands.length > 0) {
     params.set('brand', query.brands.map((b) => brandToSlug(b)).join(','));
   }
-  if (!pathParams.categorySlug && query.displayCategory) {
+  // Never include display_category and search in the same URL — they are
+  // mutually exclusive.  Search takes priority.
+  if (!pathParams.categorySlug && query.displayCategory && !query.search) {
     params.set('display_category', query.displayCategory);
   }
   if (query.category) params.set('category', query.category);
