@@ -89,6 +89,11 @@ dtb_integrations_require_files( [
 	'dtb-integrations/QuickBooks/QuickBooksHealthCheck.php',
 ] );
 
+// 4.5) Canonical order-platform contracts for Veeqo/QuickBooks orchestration.
+dtb_integrations_require_files( [
+	'dtb-integrations/OperationalPipeline/OrderIntegrationContracts.php',
+] );
+
 // 5) Rewards module-layer files.
 dtb_integrations_require_files( [
 	'dtb-integrations/Rewards/RewardsIssueJob.php',
