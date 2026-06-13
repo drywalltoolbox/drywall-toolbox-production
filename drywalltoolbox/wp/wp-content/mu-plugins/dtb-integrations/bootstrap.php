@@ -29,7 +29,7 @@ if ( ! function_exists( 'dtb_integrations_require_files' ) ) {
 }
 
 if ( ! function_exists( 'dtb_integrations_register_health_checks' ) ) {
-	/** Register all major integration health checks with DTB health registry. */
+	/** Register major integration health checks with DTB health registry. */
 	function dtb_integrations_register_health_checks(): void {
 		if ( class_exists( 'DTB_WooCommerceHealthCheck' ) ) {
 			DTB_WooCommerceHealthCheck::register();
@@ -48,9 +48,6 @@ if ( ! function_exists( 'dtb_integrations_register_health_checks' ) ) {
 		}
 		if ( class_exists( 'DTB_EbayHealthCheck' ) ) {
 			DTB_EbayHealthCheck::register();
-		}
-		if ( class_exists( 'DTB_OperationalPipelineHealthCheck' ) ) {
-			DTB_OperationalPipelineHealthCheck::register();
 		}
 	}
 }
@@ -101,7 +98,6 @@ dtb_integrations_require_files( [
 	'dtb-integrations/OperationalPipeline/VeeqoWebhookEchoGuard.php',
 	'dtb-integrations/OperationalPipeline/VeeqoWebhookPipelineController.php',
 	'dtb-integrations/OperationalPipeline/QuickBooksQueueController.php',
-	'dtb-integrations/OperationalPipeline/OperationalPipelineHealthCheck.php',
 ] );
 
 // 5) Rewards module-layer files.
@@ -189,5 +185,5 @@ dtb_integrations_require_files( [
 	'dtb-integrations/Marketplace/Admin/MarketplaceSettingsPage.php',
 ] );
 
-// Register structured integration diagnostics with platform health registry.
+// Register existing lightweight integration diagnostics.
 dtb_integrations_register_health_checks();
