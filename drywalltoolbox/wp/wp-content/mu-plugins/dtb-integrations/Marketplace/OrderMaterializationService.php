@@ -13,42 +13,19 @@ defined( 'ABSPATH' ) || exit;
 
 if ( ! class_exists( 'DTB_MarketplaceOrderMaterializationService' ) ) {
 	final class DTB_MarketplaceOrderMaterializationService {
-		/**
-		 * Materialize an Amazon order when it is safe to do so.
-		 *
-		 * @param int   $marketplace_row_id Marketplace order row ID.
-		 * @param array $normalized         Normalized order data.
-		 * @param array $raw_order          Raw Amazon order payload.
-		 * @param array $order_items        Raw Amazon order-item payloads.
-		 * @return array{status:string,woo_order_id:int,message:string}
-		 */
+		private const LOCK_TTL = 300;
+
+		/** Materialize an Amazon order when it is safe to do so. */
 		public static function materialize_amazon( int $marketplace_row_id, array $normalized, array $raw_order, array $order_items = [] ): array {
 			return self::materialize( DTB_CHANNEL_AMAZON, $marketplace_row_id, $normalized, $raw_order, $order_items );
 		}
 
-		/**
-		 * Materialize an eBay order when it is safe to do so.
-		 *
-		 * @param int   $marketplace_row_id Marketplace order row ID.
-		 * @param array $normalized         Normalized order data.
-		 * @param array $raw_order          Raw eBay order payload.
-		 * @return array{status:string,woo_order_id:int,message:string}
-		 */
+		/** Materialize an eBay order when it is safe to do so. */
 		public static function materialize_ebay( int $marketplace_row_id, array $normalized, array $raw_order ): array {
 			$items = is_array( $raw_order['lineItems'] ?? null ) ? $raw_order['lineItems'] : [];
 			return self::materialize( DTB_CHANNEL_EBAY, $marketplace_row_id, $normalized, $raw_order, $items );
 		}
 
-		/**
-		 * Shared materialization flow.
-		 *
-		 * @param string $channel_key        Channel key.
-		 * @param int    $marketplace_row_id Marketplace row ID.
-		 * @param array  $normalized         Normalized order.
-		 * @param array  $raw_order          Raw order.
-		 * @param array  $raw_items          Raw order line items.
-		 * @return array{status:string,woo_order_id:int,message:string}
-		 */
 		private static function materialize( string $channel_key, int $marketplace_row_id, array $normalized, array $raw_order, array $raw_items ): array {
 			if ( ! function_exists( 'wc_create_order' ) ) {
 				return self::fail( $channel_key, $marketplace_row_id, 'woocommerce_unavailable', 'WooCommerce order creation is unavailable.', false );
@@ -59,35 +36,53 @@ if ( ! class_exists( 'DTB_MarketplaceOrderMaterializationService' ) ) {
 				return self::fail( $channel_key, $marketplace_row_id, 'missing_external_order_id', 'Marketplace order ID is missing.', false );
 			}
 
+			$current_link = self::current_linked_woo_order_id( $marketplace_row_id );
+			if ( $current_link > 0 ) {
+				return [ 'status' => 'already_linked', 'woo_order_id' => $current_link, 'message' => 'Marketplace row is already linked to a Woo order.' ];
+			}
+
 			$existing_woo_id = self::find_existing_woo_order( $channel_key, $external_id );
 			if ( $existing_woo_id > 0 ) {
 				self::link_marketplace_order( $channel_key, $external_id, $marketplace_row_id, $existing_woo_id );
 				return [ 'status' => 'already_linked', 'woo_order_id' => $existing_woo_id, 'message' => 'Marketplace order already has a Woo order.' ];
 			}
 
-			$payment_state = sanitize_key( (string) ( $normalized['payment_state'] ?? 'unknown' ) );
-			if ( ! in_array( $payment_state, [ 'paid', 'pending' ], true ) ) {
-				return self::fail( $channel_key, $marketplace_row_id, 'payment_state_not_materializable', 'Marketplace order payment state is not safe to materialize: ' . $payment_state, false );
+			$lock_key = self::lock_key( $channel_key, $external_id );
+			if ( get_transient( $lock_key ) ) {
+				return [ 'status' => 'locked', 'woo_order_id' => 0, 'message' => 'Marketplace order materialization is already in progress.' ];
 			}
-
-			$line_items = self::normalize_line_items( $channel_key, $raw_items );
-			if ( empty( $line_items ) ) {
-				return self::fail( $channel_key, $marketplace_row_id, 'missing_line_items', 'Marketplace order has no materializable line items.', true );
-			}
-
-			$unmapped = array_values( array_filter( $line_items, static fn( array $line ): bool => empty( $line['product_id'] ) ) );
-			if ( ! empty( $unmapped ) ) {
-				return self::fail(
-					$channel_key,
-					$marketplace_row_id,
-					'sku_mapping_failed',
-					'Marketplace order contains unmapped SKU(s): ' . implode( ', ', array_map( static fn( array $line ): string => $line['sku'] ?: $line['title'], $unmapped ) ),
-					false,
-					[ 'unmapped' => $unmapped ]
-				);
-			}
+			set_transient( $lock_key, '1', self::LOCK_TTL );
 
 			try {
+				// Re-check after acquiring lock to avoid duplicate Woo orders under concurrent imports.
+				$existing_woo_id = self::find_existing_woo_order( $channel_key, $external_id );
+				if ( $existing_woo_id > 0 ) {
+					self::link_marketplace_order( $channel_key, $external_id, $marketplace_row_id, $existing_woo_id );
+					return [ 'status' => 'already_linked', 'woo_order_id' => $existing_woo_id, 'message' => 'Marketplace order already has a Woo order.' ];
+				}
+
+				$payment_state = sanitize_key( (string) ( $normalized['payment_state'] ?? 'unknown' ) );
+				if ( ! in_array( $payment_state, [ 'paid', 'pending' ], true ) ) {
+					return self::fail( $channel_key, $marketplace_row_id, 'payment_state_not_materializable', 'Marketplace order payment state is not safe to materialize: ' . $payment_state, false );
+				}
+
+				$line_items = self::normalize_line_items( $channel_key, $raw_items );
+				if ( empty( $line_items ) ) {
+					return self::fail( $channel_key, $marketplace_row_id, 'missing_line_items', 'Marketplace order has no materializable line items.', true );
+				}
+
+				$unmapped = array_values( array_filter( $line_items, static fn( array $line ): bool => empty( $line['product_id'] ) ) );
+				if ( ! empty( $unmapped ) ) {
+					return self::fail(
+						$channel_key,
+						$marketplace_row_id,
+						'sku_mapping_failed',
+						'Marketplace order contains unmapped SKU(s): ' . implode( ', ', array_map( static fn( array $line ): string => $line['sku'] ?: $line['title'], $unmapped ) ),
+						false,
+						[ 'unmapped' => $unmapped ]
+					);
+				}
+
 				$order = wc_create_order( [ 'status' => 'pending' ] );
 				if ( is_wp_error( $order ) || ! $order instanceof WC_Order ) {
 					$message = is_wp_error( $order ) ? $order->get_error_message() : 'WooCommerce did not return an order object.';
@@ -95,16 +90,19 @@ if ( ! class_exists( 'DTB_MarketplaceOrderMaterializationService' ) ) {
 				}
 
 				$order_id = (int) $order->get_id();
-				self::apply_billing_shipping( $order, $channel_key, $raw_order );
+				self::apply_billing_shipping( $order, $channel_key, $raw_order, $external_id );
 
 				foreach ( $line_items as $line ) {
 					$product = wc_get_product( (int) $line['product_id'] );
 					if ( ! $product ) {
 						throw new RuntimeException( 'Mapped Woo product no longer exists for SKU: ' . $line['sku'] );
 					}
-					$order->add_product( $product, max( 1, (int) $line['quantity'] ), [
-						'subtotal' => (float) $line['subtotal'],
-						'total'    => (float) $line['total'],
+
+					$quantity = max( 1, (int) $line['quantity'] );
+					$total    = self::line_total_or_product_price( $line, $product, $quantity );
+					$order->add_product( $product, $quantity, [
+						'subtotal' => $total,
+						'total'    => $total,
 					] );
 				}
 
@@ -141,6 +139,8 @@ if ( ! class_exists( 'DTB_MarketplaceOrderMaterializationService' ) ) {
 				return [ 'status' => 'materialized', 'woo_order_id' => $order_id, 'message' => 'Marketplace order materialized into WooCommerce.' ];
 			} catch ( Throwable $e ) {
 				return self::fail( $channel_key, $marketplace_row_id, 'materialization_exception', $e->getMessage(), true );
+			} finally {
+				delete_transient( $lock_key );
 			}
 		}
 
@@ -160,17 +160,26 @@ if ( ! class_exists( 'DTB_MarketplaceOrderMaterializationService' ) ) {
 				}
 
 				$product_id = self::find_product_id_by_sku( $sku );
-				$line_total = $total > 0 ? $total : 0.0;
-				$lines[] = [
+				$lines[]    = [
 					'sku'        => $sku,
-					'title'      => $title,
+					'title'      => $title ?: $sku,
 					'quantity'   => $qty,
-					'subtotal'   => $line_total,
-					'total'      => $line_total,
+					'subtotal'   => max( 0, $total ),
+					'total'      => max( 0, $total ),
 					'product_id' => $product_id,
 				];
 			}
 			return $lines;
+		}
+
+		private static function line_total_or_product_price( array $line, WC_Product $product, int $quantity ): float {
+			$total = (float) ( $line['total'] ?? 0 );
+			if ( $total > 0 ) {
+				return (float) wc_format_decimal( $total, 2 );
+			}
+
+			$unit = (float) wc_format_decimal( (float) $product->get_price(), 2 );
+			return max( 0.0, (float) wc_format_decimal( $unit * max( 1, $quantity ), 2 ) );
 		}
 
 		private static function find_product_id_by_sku( string $sku ): int {
@@ -191,17 +200,18 @@ if ( ! class_exists( 'DTB_MarketplaceOrderMaterializationService' ) ) {
 			if ( DTB_CHANNEL_EBAY === $channel_key ) {
 				return self::amount_from_money( $raw_order['pricingSummary']['deliveryCost'] ?? [] );
 			}
-			return self::amount_from_money( $raw_order['OrderTotal'] ?? [] ) > 0 ? 0.0 : 0.0;
+
+			return 0.0;
 		}
 
-		private static function apply_billing_shipping( WC_Order $order, string $channel_key, array $raw_order ): void {
-			$email = self::buyer_email( $channel_key, $raw_order );
+		private static function apply_billing_shipping( WC_Order $order, string $channel_key, array $raw_order, string $external_id ): void {
+			$email = self::buyer_email( $channel_key, $raw_order, $external_id );
 			$name  = self::buyer_name( $channel_key, $raw_order );
 			$addr  = self::shipping_address( $channel_key, $raw_order );
 
 			$order->set_billing_first_name( $name['first_name'] );
 			$order->set_billing_last_name( $name['last_name'] );
-			$order->set_billing_email( $email ?: 'marketplace+' . wp_generate_uuid4() . '@drywalltoolbox.local' );
+			$order->set_billing_email( $email );
 			$order->set_shipping_first_name( $name['first_name'] );
 			$order->set_shipping_last_name( $name['last_name'] );
 			$order->set_shipping_address_1( $addr['address_1'] );
@@ -212,11 +222,16 @@ if ( ! class_exists( 'DTB_MarketplaceOrderMaterializationService' ) ) {
 			$order->set_shipping_country( $addr['country'] ?: 'US' );
 		}
 
-		private static function buyer_email( string $channel_key, array $raw_order ): string {
-			if ( DTB_CHANNEL_AMAZON === $channel_key ) {
-				return sanitize_email( (string) ( $raw_order['BuyerInfo']['BuyerEmail'] ?? '' ) );
+		private static function buyer_email( string $channel_key, array $raw_order, string $external_id ): string {
+			$email = DTB_CHANNEL_AMAZON === $channel_key
+				? sanitize_email( (string) ( $raw_order['BuyerInfo']['BuyerEmail'] ?? '' ) )
+				: sanitize_email( (string) ( $raw_order['buyer']['email'] ?? '' ) );
+
+			if ( '' !== $email ) {
+				return $email;
 			}
-			return sanitize_email( (string) ( $raw_order['buyer']['email'] ?? '' ) );
+
+			return 'marketplace+' . sanitize_key( $channel_key ) . '-' . substr( md5( $external_id ), 0, 12 ) . '@drywalltoolbox.local';
 		}
 
 		private static function buyer_name( string $channel_key, array $raw_order ): array {
@@ -234,24 +249,41 @@ if ( ! class_exists( 'DTB_MarketplaceOrderMaterializationService' ) ) {
 
 			if ( DTB_CHANNEL_EBAY === $channel_key ) {
 				$contact = (array) ( $addr['contactAddress'] ?? [] );
-				return [
-					'address_1' => sanitize_text_field( (string) ( $contact['addressLine1'] ?? '' ) ),
-					'address_2' => sanitize_text_field( (string) ( $contact['addressLine2'] ?? '' ) ),
-					'city'      => sanitize_text_field( (string) ( $contact['city'] ?? '' ) ),
-					'state'     => sanitize_text_field( (string) ( $contact['stateOrProvince'] ?? '' ) ),
-					'postcode'  => sanitize_text_field( (string) ( $contact['postalCode'] ?? '' ) ),
-					'country'   => sanitize_text_field( (string) ( $contact['countryCode'] ?? 'US' ) ),
-				];
+				return self::normalize_address( [
+					'address_1' => $contact['addressLine1'] ?? '',
+					'address_2' => $contact['addressLine2'] ?? '',
+					'city'      => $contact['city'] ?? '',
+					'state'     => $contact['stateOrProvince'] ?? '',
+					'postcode'  => $contact['postalCode'] ?? '',
+					'country'   => $contact['countryCode'] ?? 'US',
+				] );
 			}
 
-			return [
-				'address_1' => sanitize_text_field( (string) ( $addr['AddressLine1'] ?? '' ) ),
-				'address_2' => sanitize_text_field( (string) ( $addr['AddressLine2'] ?? '' ) ),
-				'city'      => sanitize_text_field( (string) ( $addr['City'] ?? '' ) ),
-				'state'     => sanitize_text_field( (string) ( $addr['StateOrRegion'] ?? '' ) ),
-				'postcode'  => sanitize_text_field( (string) ( $addr['PostalCode'] ?? '' ) ),
-				'country'   => sanitize_text_field( (string) ( $addr['CountryCode'] ?? 'US' ) ),
+			return self::normalize_address( [
+				'address_1' => $addr['AddressLine1'] ?? '',
+				'address_2' => $addr['AddressLine2'] ?? '',
+				'city'      => $addr['City'] ?? '',
+				'state'     => $addr['StateOrRegion'] ?? '',
+				'postcode'  => $addr['PostalCode'] ?? '',
+				'country'   => $addr['CountryCode'] ?? 'US',
+			] );
+		}
+
+		private static function normalize_address( array $addr ): array {
+			$normalized = [
+				'address_1' => sanitize_text_field( (string) ( $addr['address_1'] ?? '' ) ),
+				'address_2' => sanitize_text_field( (string) ( $addr['address_2'] ?? '' ) ),
+				'city'      => sanitize_text_field( (string) ( $addr['city'] ?? '' ) ),
+				'state'     => sanitize_text_field( (string) ( $addr['state'] ?? '' ) ),
+				'postcode'  => sanitize_text_field( (string) ( $addr['postcode'] ?? '' ) ),
+				'country'   => sanitize_text_field( (string) ( $addr['country'] ?? 'US' ) ),
 			];
+
+			if ( '' === $normalized['address_1'] ) {
+				$normalized['address_1'] = 'Marketplace address pending';
+			}
+
+			return $normalized;
 		}
 
 		private static function apply_order_dates( WC_Order $order, array $normalized ): void {
@@ -316,14 +348,25 @@ if ( ! class_exists( 'DTB_MarketplaceOrderMaterializationService' ) ) {
 
 		private static function find_existing_woo_order( string $channel_key, string $external_id ): int {
 			global $wpdb;
-			$keys = [ '_dtb_marketplace_order_id', '_' . sanitize_key( $channel_key ) . '_order_id' ];
-			foreach ( $keys as $key ) {
+			$keys = [ '_dtb_marketplace_order_id', '_' . sanitize_key( $channel_key ) . '_order_id', '_' . sanitize_key( $channel_key ) . '_order_id' ];
+			foreach ( array_unique( $keys ) as $key ) {
 				$found = $wpdb->get_var( $wpdb->prepare( "SELECT post_id FROM {$wpdb->postmeta} WHERE meta_key = %s AND meta_value = %s LIMIT 1", $key, $external_id ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
 				if ( $found ) {
 					return absint( $found );
 				}
 			}
 			return 0;
+		}
+
+		private static function current_linked_woo_order_id( int $marketplace_row_id ): int {
+			global $wpdb;
+			$table = $wpdb->prefix . 'dtb_marketplace_orders';
+			$found = $wpdb->get_var( $wpdb->prepare( "SELECT woo_order_id FROM {$table} WHERE id = %d LIMIT 1", $marketplace_row_id ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+			return absint( $found );
+		}
+
+		private static function lock_key( string $channel_key, string $external_id ): string {
+			return 'dtb_marketplace_materialize_' . sanitize_key( $channel_key ) . '_' . md5( $external_id );
 		}
 
 		private static function external_order_id( string $channel_key, array $raw_order ): string {
