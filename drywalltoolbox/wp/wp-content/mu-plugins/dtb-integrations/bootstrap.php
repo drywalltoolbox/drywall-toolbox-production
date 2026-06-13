@@ -134,6 +134,7 @@ dtb_integrations_require_files( [
 	'dtb-integrations/Marketplace/EventService.php',
 	'dtb-integrations/Marketplace/AuditService.php',
 	'dtb-integrations/Marketplace/ReadModels.php',
+	'dtb-integrations/Marketplace/OrderMaterializationService.php',
 ] );
 
 // 8) Amazon module.
