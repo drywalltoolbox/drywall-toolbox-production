@@ -44,6 +44,29 @@ if ( ! function_exists( 'dtb_operational_pipeline_map_wc_to_veeqo_status' ) ) {
 	}
 }
 
+if ( ! function_exists( 'dtb_operational_pipeline_get_veeqo_order_id' ) ) {
+	/**
+	 * Resolve the Veeqo order ID from explicit job args or canonical/legacy order meta.
+	 *
+	 * @param WC_Order $order Woo order.
+	 * @param array    $args  Optional job args.
+	 * @return int
+	 */
+	function dtb_operational_pipeline_get_veeqo_order_id( WC_Order $order, array $args = [] ): int {
+		$arg_id = absint( $args['veeqo_order_id'] ?? 0 );
+		if ( $arg_id > 0 ) {
+			return $arg_id;
+		}
+
+		$canonical = absint( $order->get_meta( '_dtb_veeqo_order_id', true ) );
+		if ( $canonical > 0 ) {
+			return $canonical;
+		}
+
+		return absint( $order->get_meta( '_veeqo_order_id', true ) );
+	}
+}
+
 if ( ! function_exists( 'dtb_operational_pipeline_route_veeqo_status_change' ) ) {
 	/**
 	 * Queue Veeqo side effects when Woo order status changes.
@@ -64,7 +87,7 @@ if ( ! function_exists( 'dtb_operational_pipeline_route_veeqo_status_change' ) )
 			return;
 		}
 
-		$veeqo_order_id = absint( $order->get_meta( '_dtb_veeqo_order_id', true ) ?: $order->get_meta( '_veeqo_order_id', true ) );
+		$veeqo_order_id = dtb_operational_pipeline_get_veeqo_order_id( $order );
 
 		if ( 'processing' === sanitize_key( $new_status ) && $veeqo_order_id <= 0 ) {
 			if ( function_exists( 'dtb_order_append_event' ) ) {
@@ -120,7 +143,7 @@ if ( ! function_exists( 'dtb_operational_pipeline_sync_veeqo_status_job' ) ) {
 		}
 
 		$attempt        = isset( $args['attempt'] ) ? max( 1, absint( $args['attempt'] ) ) : 1;
-		$veeqo_order_id = absint( $args['veeqo_order_id'] ?? $order->get_meta( '_dtb_veeqo_order_id', true ) ?: $order->get_meta( '_veeqo_order_id', true ) );
+		$veeqo_order_id = dtb_operational_pipeline_get_veeqo_order_id( $order, $args );
 		$veeqo_status   = sanitize_key( (string) ( $args['veeqo_status'] ?? '' ) );
 
 		if ( $veeqo_order_id <= 0 || '' === $veeqo_status ) {
@@ -136,6 +159,15 @@ if ( ! function_exists( 'dtb_operational_pipeline_sync_veeqo_status_job' ) ) {
 		}
 
 		if ( ! function_exists( 'dtb_veeqo_request' ) ) {
+			if ( function_exists( 'dtb_order_update_integration_state' ) ) {
+				dtb_order_update_integration_state( $order_id, 'veeqo', [
+					'status'        => 'failed',
+					'order_id'      => $veeqo_order_id,
+					'error'         => 'Veeqo request function is unavailable.',
+					'retryable'     => false,
+					'last_error_at' => current_time( 'mysql', true ),
+				] );
+			}
 			return;
 		}
 
