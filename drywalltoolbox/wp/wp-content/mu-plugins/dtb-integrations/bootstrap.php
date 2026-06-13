@@ -49,6 +49,9 @@ if ( ! function_exists( 'dtb_integrations_register_health_checks' ) ) {
 		if ( class_exists( 'DTB_EbayHealthCheck' ) ) {
 			DTB_EbayHealthCheck::register();
 		}
+		if ( class_exists( 'DTB_OperationalPipelineHealthCheck' ) ) {
+			DTB_OperationalPipelineHealthCheck::register();
+		}
 	}
 }
 
@@ -98,6 +101,7 @@ dtb_integrations_require_files( [
 	'dtb-integrations/OperationalPipeline/VeeqoWebhookEchoGuard.php',
 	'dtb-integrations/OperationalPipeline/VeeqoWebhookPipelineController.php',
 	'dtb-integrations/OperationalPipeline/QuickBooksQueueController.php',
+	'dtb-integrations/OperationalPipeline/OperationalPipelineHealthCheck.php',
 ] );
 
 // 5) Rewards module-layer files.
