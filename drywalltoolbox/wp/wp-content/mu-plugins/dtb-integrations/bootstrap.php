@@ -93,6 +93,7 @@ dtb_integrations_require_files( [
 dtb_integrations_require_files( [
 	'dtb-integrations/OperationalPipeline/OrderIntegrationContracts.php',
 	'dtb-integrations/OperationalPipeline/OrderPipelineHookOverrides.php',
+	'dtb-integrations/OperationalPipeline/VeeqoWebhookEchoGuard.php',
 	'dtb-integrations/OperationalPipeline/VeeqoWebhookPipelineController.php',
 	'dtb-integrations/OperationalPipeline/QuickBooksQueueController.php',
 ] );
