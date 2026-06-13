@@ -163,6 +163,7 @@ dtb_integrations_require_files( [
 // 10) Marketplace queue jobs.
 dtb_integrations_require_files( [
 	'dtb-integrations/Marketplace/Jobs/MarketplaceQueueJobs.php',
+	'dtb-integrations/Marketplace/Jobs/MarketplaceMaterializationQueue.php',
 ] );
 
 // 11) Marketplace REST controllers.
