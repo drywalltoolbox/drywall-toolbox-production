@@ -20,6 +20,7 @@ export default function ProductDetailPlatform({
     product: detailProduct,
     variations,
     computed,
+    status,
   } = useCatalogProductDetail(slug);
 
   const fallbackProduct = product ? toLegacyProductCardDTO(product) : null;
@@ -52,6 +53,7 @@ export default function ProductDetailPlatform({
       initialResolvedVariation={resolvedDefaultVariation}
       initialSelectedAttrs={resolvedSelectedAttrs}
       initialComputedData={computed}
+      variationsHydrating={status === 'idle' || status === 'loading'}
       disableLegacyDetailFetch
       autoSelectDefaultVariation
     />

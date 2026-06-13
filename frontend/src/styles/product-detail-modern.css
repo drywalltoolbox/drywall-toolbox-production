@@ -461,8 +461,9 @@
 }
 
 .dtb-variant-pill.is-loading {
-  opacity: 0.55;
-  cursor: wait;
+  opacity: 0.86;
+  cursor: pointer;
+  background: linear-gradient(90deg, #fff 0%, #f8fbff 50%, #fff 100%);
 }
 
 .dtb-variant-pill:focus-visible {

@@ -171,10 +171,11 @@ function mergeCategoryEntries(items = []) {
     const existing = merged.get(id);
     // Use the canonical label if available, else fall back to the entry's label.
     const canonicalLabel = DISPLAY_CATEGORY_LABELS[id];
+    const slug = cat?.slug || String(id).replace(/_/g, '-');
     merged.set(id, {
-      id,
+      id: slug,
       key: cat?.key || existing?.key || id,
-      slug: cat?.slug || existing?.slug || id,
+      slug,
       name: canonicalLabel || cat?.label || cat?.name || existing?.name || formatCategoryLabel(id),
       count: (existing?.count || 0) + Number(cat?.productCount || cat?.count || 0),
       image: existing?.image || cat?.image || '',

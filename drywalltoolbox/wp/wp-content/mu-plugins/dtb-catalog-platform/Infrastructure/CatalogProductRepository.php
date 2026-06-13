@@ -151,9 +151,10 @@ final class DTB_CatalogProductRepository {
 				// any unknown/custom values not covered by the alias map.
 				$space_form = str_replace( '_', ' ', $display_category_key );
 				$title_form = ucwords( $space_form );
+				$hyphen_form = str_replace( '_', '-', $display_category_key );
 				$all_forms  = array_values( array_unique( array_filter( array_merge(
 					$raw_forms,
-					[ $display_category_key, $display_category_slug, $space_form, $title_form ]
+					[ $display_category_key, $display_category_slug, $hyphen_form, $space_form, $title_form ]
 				) ) ) );
 
 				$meta_query[] = [

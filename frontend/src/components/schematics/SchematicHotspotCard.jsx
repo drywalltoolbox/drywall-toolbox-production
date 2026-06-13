@@ -24,6 +24,26 @@ function getCodeLabel(part) {
   return part?.sku ? 'SKU' : part?.source_sku ? 'Ref' : 'SKU';
 }
 
+function getTitleFitStyle(name = '') {
+  const value = String(name || '').trim();
+  const length = value.length;
+  const longestToken = value
+    .split(/[\s/|,()]+/)
+    .reduce((max, token) => Math.max(max, token.length), 0);
+
+  let fontSize = 16;
+  if (length > 34) fontSize -= Math.min(5.2, (length - 34) * 0.12);
+  if (longestToken > 14) fontSize -= Math.min(1.8, (longestToken - 14) * 0.11);
+
+  fontSize = Math.max(9.5, Math.round(fontSize * 10) / 10);
+
+  return {
+    '--hotspot-title-font-size': `${fontSize}px`,
+    '--hotspot-title-line-height': fontSize <= 10.5 ? 1.12 : fontSize <= 12 ? 1.16 : 1.2,
+    '--hotspot-title-letter-spacing': fontSize <= 11 ? '0.01em' : fontSize <= 13 ? '0.02em' : '0.035em',
+  };
+}
+
 function parsePrice(value) {
   if (typeof value === 'number') return Number.isFinite(value) ? value : null;
   if (typeof value === 'string') {
@@ -281,7 +301,7 @@ export default function SchematicHotspotCard({
             <StockBadge stockStatus={effectiveStockStatus} />
           </div>
 
-          <h3 className="schematic-hotspot-card__title">
+          <h3 className="schematic-hotspot-card__title" style={getTitleFitStyle(displayPart.name)}>
             {titleNode}
           </h3>
 

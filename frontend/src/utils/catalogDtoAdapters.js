@@ -289,7 +289,9 @@ function buildAvailableOptionMatrix(product, variations, computed = null) {
 }
 
 function buildVariationAttributes(dto = {}, computed = null) {
-  const attrs = Array.isArray(dto?.attributes) ? dto.attributes : [];
+  const attrs = Array.isArray(dto?.attributes) && dto.attributes.length > 0
+    ? dto.attributes
+    : (Array.isArray(dto?.variation_attributes) ? dto.variation_attributes : []);
   const axis = computed?.variationMatrix?.axis || firstVariationAttribute(dto)?.name || '';
   const matrixOptions = Array.isArray(computed?.variationMatrix?.options) ? computed.variationMatrix.options : [];
 
@@ -329,9 +331,9 @@ export function toCatalogProductCardDTO(dto = {}) {
     parent_id: card?.parentId ?? dto?.parentId ?? null,
     sku: card?.sku || dto?.sku || '',
     name: displayName,
-    price: toNumber(card?.price ?? dto?.price?.value ?? 0, 0),
-    image: card?.image || dto?.media?.image || '',
-    stock_status: card?.stockStatus || dto?.inventory?.stockStatus || 'instock',
+    price: toNumber(card?.price ?? dto?.price?.value ?? dto?.price ?? 0, 0),
+    image: card?.image || dto?.media?.image || dto?.image || '',
+    stock_status: card?.stockStatus || dto?.inventory?.stockStatus || dto?.stock_status || 'instock',
     variation_label: variationLabel,
     addToCartType: card?.addToCartType || (dto?.type === 'variable' ? 'variation' : 'simple'),
     attributes: Array.isArray(card?.attributes) ? card.attributes : [],
@@ -405,7 +407,14 @@ export function toLegacyVariationDTO(variationDto = {}, parentDto = null) {
 export function toLegacyProductCardDTO(dto = {}, computed = null) {
   const categoryKey = dto?.category?.key || '';
   const displayCategoryKey = dto?.displayCategory?.slug || dto?.displayCategory?.key || '';
-  const price = dto?.price || {};
+  const price = dto?.price && typeof dto.price === 'object'
+    ? dto.price
+    : {
+        value: dto?.price,
+        regular: dto?.regular_price ?? dto?.regularPrice,
+        sale: dto?.sale_price ?? dto?.salePrice,
+        min: dto?.min_price ?? dto?.minPrice,
+      };
   const inventory = dto?.inventory || {};
   const media = dto?.media || {};
   const cardProduct = toCatalogProductCardDTO(dto);
@@ -429,7 +438,7 @@ export function toLegacyProductCardDTO(dto = {}, computed = null) {
   return {
     id: dto?.id ?? 0,
     slug: dto?.slug || '',
-    type: dto?.type || 'simple',
+    type: dto?.type || (dto?.is_variable ? 'variable' : 'simple'),
     name: normalizeCatalogDisplayName(dto?.name || '', {
       sku: dto?.sku || '',
       brand: dto?.brand?.label || '',
@@ -439,23 +448,25 @@ export function toLegacyProductCardDTO(dto = {}, computed = null) {
     short_description: dto?.shortDescription || '',
     sku: dto?.sku || '',
     part_number: dto?.sku || '',
-    brand: dto?.brand?.label || '',
+    brand: dto?.brand?.label || dto?.brand || '',
     category: categoryKey,
     display_category: displayCategoryKey,
     display_category_label: dto?.displayCategory?.label || displayCategoryKey,
     product_kind: dto?.productKind || '',
-    is_variable: dto?.type === 'variable',
+    is_variable: dto?.type === 'variable' || Boolean(dto?.is_variable),
     is_parts: Boolean(dto?.isParts),
     price: toNumber(price?.value, 0),
     regular_price: price?.regular != null ? String(price.regular) : '',
     sale_price: price?.sale != null ? String(price.sale) : '',
     on_sale: Boolean(price?.onSale),
     min_price: price?.min != null ? toNumber(price.min, 0) : null,
-    stock_status: inventory?.stockStatus || 'instock',
+    stock_status: inventory?.stockStatus || dto?.stock_status || 'instock',
     stock_quantity: inventory?.stockQuantity ?? null,
     purchasable: inventory?.purchasable ?? true,
-    image: media?.image || cardProduct.image || '',
-    images: Array.isArray(media?.images) ? media.images : [],
+    image: media?.image || dto?.image || cardProduct.image || '',
+    images: Array.isArray(media?.images) && media.images.length > 0
+      ? media.images
+      : (Array.isArray(dto?.images) ? dto.images : []),
     meta_data: mergedMeta,
     attributes: variationAttributes,
     variation_attributes: variationAttributes,
@@ -463,7 +474,7 @@ export function toLegacyProductCardDTO(dto = {}, computed = null) {
     variation: dto?.variation || {},
     cardProduct: {
       ...cardProduct,
-      brand: dto?.brand?.label || '',
+      brand: dto?.brand?.label || dto?.brand || '',
       parent_id: cardProduct.parent_id,
       stock_status: cardProduct.stock_status,
       add_to_cart_type: cardProduct.addToCartType,

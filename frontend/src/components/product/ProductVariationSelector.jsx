@@ -47,7 +47,7 @@ export default function ProductVariationSelector({
                 const selected = `${selectedValue}` === `${option.value}`;
                 const soldOut = option.status === 'sold-out';
                 const unavailable = option.status === 'unavailable';
-                const disabled = variationsLoading || soldOut || unavailable;
+                const disabled = !variationsLoading && (soldOut || unavailable);
 
                 // Build aria-label and className independently for clarity.
                 let ariaLabel = option.value;

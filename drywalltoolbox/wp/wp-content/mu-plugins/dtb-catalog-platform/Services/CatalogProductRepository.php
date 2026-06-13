@@ -100,18 +100,23 @@ final class DTB_CatalogProductRepository {
 				];
 				$is_parts_constrained = true;
 			} else {
-				// Build all normalised forms of the display-category key so products
-				// imported with hyphens, underscores, spaces, or title-case are matched.
-				$space_form   = str_replace( '_', ' ', $display_category_key );
-				$title_form   = ucwords( $space_form );
+				// Resolve to canonical slug and expand to all known raw DB forms so
+				// products imported with any alias variant (e.g. hyphenated CSV
+				// values, underscores, spaces, or title case) are matched.
+				$canonical   = DTB_CategoryNormalizer::canonical_display_slug( $display_category_key );
+				$raw_forms   = DTB_CategoryNormalizer::display_category_raw_forms( $canonical );
+				$space_form  = str_replace( '_', ' ', $display_category_key );
+				$title_form  = ucwords( $space_form );
+				$hyphen_form = str_replace( '_', '-', $display_category_key );
 				$meta_query[] = [
 					'key'     => DTB_ProductMeta::DISPLAY_CATEGORY_KEY,
-					'value'   => array_values( array_unique( array_filter( [
+					'value'   => array_values( array_unique( array_filter( array_merge( $raw_forms, [
 						$display_category_key,
 						$display_category_slug,
+						$hyphen_form,
 						$space_form,
 						$title_form,
-					] ) ) ),
+					] ) ) ) ),
 					'compare' => 'IN',
 				];
 

@@ -466,6 +466,7 @@ export default function ProductDetail({
   disableLegacyDetailFetch = false,
   initialComputedData = null,
   autoSelectDefaultVariation = true,
+  variationsHydrating = false,
 }) {
   const { addToCart } = useCart();
   const [quantity, setQuantity] = useState(1);
@@ -485,6 +486,7 @@ export default function ProductDetail({
   const [computedData, setComputedData] = useState(initialComputedData);
 
   const hasInitialVariations = Array.isArray(initialVariations) && initialVariations.length > 0;
+  const hasSeedVariations = seededVariations.length > 0;
 
   useEffect(() => {
     if (!product?.is_variable || !product.id) return;
@@ -502,10 +504,10 @@ export default function ProductDetail({
         initialSelectedAttrs: currentInitialAttrs,
         seededVariations: currentSeeded,
       }));
-      setVariationsLoading(!hasInitialVariations && !disableLegacyDetailFetch);
+      setVariationsLoading(Boolean(product.is_variable && (variationsHydrating || !hasInitialVariations)));
     });
 
-    if (disableLegacyDetailFetch && hasInitialVariations) {
+    if (disableLegacyDetailFetch) {
       return () => { mounted = false; };
     }
 
@@ -598,7 +600,7 @@ export default function ProductDetail({
       });
 
     return () => { mounted = false; };
-  }, [product?.id, product?.slug, product?.is_variable, hasInitialVariations]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [product?.id, product?.slug, product?.is_variable, hasInitialVariations, hasSeedVariations, variationsHydrating]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const selectedVariation = useMemo(
     () => (product?.is_variable ? findMatchingVariation(variations, selectedAttrs) : null),
