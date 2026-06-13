@@ -91,8 +91,10 @@ dtb_integrations_require_files( [
 
 // 4.5) Canonical order-platform contracts and hook overrides for Veeqo/QuickBooks orchestration.
 dtb_integrations_require_files( [
+	'dtb-integrations/OperationalPipeline/QuickBooksAccountingPipeline.php',
 	'dtb-integrations/OperationalPipeline/OrderIntegrationContracts.php',
 	'dtb-integrations/OperationalPipeline/OrderPipelineHookOverrides.php',
+	'dtb-integrations/OperationalPipeline/QuickBooksJobOverride.php',
 	'dtb-integrations/OperationalPipeline/VeeqoWebhookEchoGuard.php',
 	'dtb-integrations/OperationalPipeline/VeeqoWebhookPipelineController.php',
 	'dtb-integrations/OperationalPipeline/QuickBooksQueueController.php',
