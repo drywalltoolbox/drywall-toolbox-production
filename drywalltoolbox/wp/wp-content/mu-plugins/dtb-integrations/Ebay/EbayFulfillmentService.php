@@ -69,8 +69,9 @@ if ( ! class_exists( 'DTB_EbayFulfillmentService' ) ) {
 
 				foreach ( $orders as $raw_order ) {
 					try {
-						$existing = DTB_MarketplaceReadModels::find_order( DTB_CHANNEL_EBAY, $raw_order['orderId'] ?? '' );
-						$id       = DTB_MarketplaceReadModels::upsert_order( DTB_MarketplaceOrderNormalizer::from_ebay( $raw_order ) );
+						$existing   = DTB_MarketplaceReadModels::find_order( DTB_CHANNEL_EBAY, $raw_order['orderId'] ?? '' );
+						$normalized = DTB_MarketplaceOrderNormalizer::from_ebay( $raw_order );
+						$id         = DTB_MarketplaceReadModels::upsert_order( $normalized );
 
 						if ( ! $existing ) {
 							$imported++;
@@ -78,6 +79,10 @@ if ( ! class_exists( 'DTB_EbayFulfillmentService' ) ) {
 								'linked_order_id' => $id,
 								'payload'         => [ 'ebay_order_id' => $raw_order['orderId'] ?? '' ],
 							] );
+
+							if ( class_exists( 'DTB_MarketplaceOrderMaterializationService' ) ) {
+								DTB_MarketplaceOrderMaterializationService::materialize_ebay( $id, $normalized, $raw_order );
+							}
 						} else {
 							$updated++;
 						}
