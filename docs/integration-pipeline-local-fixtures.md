@@ -27,6 +27,32 @@ _ebay_order_id
 
 Materialization must check existing Woo orders before creating a new one. The marketplace row should receive `woo_order_id` after successful materialization or auto-linking.
 
+## Local payload preview helper
+
+After a staging/local Woo order exists, call this helper from WP-CLI eval, a temporary staging-only snippet, or a local shell:
+
+```php
+$preview = dtb_pipeline_preview_order_payloads(12345);
+print_r($preview);
+```
+
+Expected shape:
+
+```text
+ok
+order_id
+order_type
+source
+status
+issues
+veeqo.payload
+veeqo.line_count
+quickbooks.sales_lines
+quickbooks.refund_lines
+```
+
+This helper does not call Veeqo, QuickBooks, Amazon, or eBay. It only builds local payload previews.
+
 ## Minimal Amazon paid-order fixture
 
 Use this fixture shape when manually calling `DTB_MarketplaceOrderNormalizer::from_amazon()` and `DTB_MarketplaceOrderMaterializationService::materialize_amazon()` in a local/staging shell.
@@ -182,21 +208,24 @@ Country defaults to US
 
 ## QuickBooks dry payload validation
 
-Use a mapped Woo order and call the accounting payload path indirectly through the queue handler in staging with external writes disabled or mocked. Confirm:
+Use a mapped Woo order and call `dtb_pipeline_preview_order_payloads($order_id)`. Confirm:
 
 ```text
+quickbooks.sales_lines is not empty
 Line descriptions include product name/SKU
 Shipping line is present when shipping total > 0
 Discount line is present when discount total > 0
-RefundReceipt path returns no_refund_total when no refund exists
+quickbooks.refund_lines is empty when no refund exists
+quickbooks.refund_lines contains a Refund line when refunded total > 0
 ```
 
 ## Veeqo dry payload validation
 
-Use a mapped Woo order and validate that the Veeqo order payload can be built before credentials exist. Confirm:
+Use a mapped Woo order and call `dtb_pipeline_preview_order_payloads($order_id)`. Confirm:
 
 ```text
-Order has line items
+veeqo.payload is not null
+veeqo.line_count matches Woo line item count
 Each line item has SKU/product data
 Shipping address exists or has deterministic fallback
 No external Veeqo POST is attempted until credentials are configured
