@@ -1,78 +1,127 @@
-# SYSTEM ROLE: Elite AI Engineering Partner
+# Copilot Repository Instructions
 
-You are a Staff-level Software Engineer and world-class AI development partner. Your mandate is to deliver precise, production-ready, and architecturally sound implementations. You operate with high technical rigor, zero fluff, and a deep respect for existing system boundaries.
+Use this file as the first source of truth for Copilot cloud agent work in this repository. Trust these instructions and search only when the requested change needs details not covered here or when source code proves this file stale.
 
----
+## Repository Summary
 
-## 1. CORE DIRECTIVES & COMMUNICATION
-- **Zero Fluff:** Omit generic greetings, broad summaries, and platitudes. Deliver actionable, high-confidence technical directives.
-- **Minimal Assumptions:** If product outcomes, edge cases, or architectural intents are ambiguous, halt and ask the user for clarification. Do not guess.
-- **Architectural Reverence:** Favor safe, non-invasive changes. Preserve existing intent, structure, and design patterns. Never initiate unsolicited refactoring unless explicitly requested.
-- **Dependency Discipline:** Write maintainable, production-quality, native solutions. Do not introduce new libraries, packages, or large dependencies unless strictly necessary and explicitly justified.
+Drywall Toolbox powers `drywalltoolbox.com`: a contractor-focused headless ecommerce platform for drywall tools, replacement parts, schematics, repairs, returns, support, accounts, rewards, and catalog/media operations.
 
----
+The repo is mixed application source plus operations workspace:
 
-## 2. ARCHITECTURE (Drywall Toolbox)
+- `frontend/`: React 19 SPA, React Router 7, Webpack 5, Babel, Tailwind/PostCSS, ESLint 9.
+- `drywalltoolbox/`: tracked production deploy mirror for HostGator, including WordPress support files, logos, `.htaccess`, themes, and DTB mu-plugins.
+- `products/`: production catalogs, images, schematics, reports, and taxonomy/media data.
+- `scripts/`: Python and PowerShell operational tooling.
+- `memory-bank/`: concise durable project context. Read `product.md`, `structure.md`, and `tech.md` when architecture context is needed.
 
-**One-line truth:** Headless React 19 + WordPress/WooCommerce contractor platform unifying ecommerce, schematics-driven parts lookup, and repair workflows — with integrated catalog/media operations tooling in the same repo.
+Root files of interest: `README.md`, `AGENTS.md`, `.gitignore`, `.markdownlint.json`, `coming-soon.html`, `package-lock.json`.
 
-### Four primary layers
+## Architecture And Ownership
 
-| Layer | Path | Role |
-|-------|------|------|
-| React SPA | `frontend/` | Public customer UX — all rendering |
-| WP Backend | `drywalltoolbox/wp/` (deployed) / `wp/` (source) | Headless API, auth, business logic |
-| Catalog/Media Ops | `products/` | Production catalog data, images, taxonomy |
-| Operational Scripts | `scripts/` | Python + PowerShell catalog/image/audit tooling |
+Request flow:
 
-`drywalltoolbox/` is the **production live-server mirror** — never edit it directly; it is populated by the deploy workflow.
-
-### Request flow
-```
-Browser → React routes (App.jsx) → frontend/src/api/* (NOT services/*)
-  → /wp-json/dtb/v1  /wp-json/drywall/v1  /wp-json/headless/v1  /wc/store/v1
-  → WooCommerce + DTB mu-plugin business logic
+```text
+Browser -> frontend/src/App.jsx routes -> frontend/src/api/* and hooks/providers
+  -> /wp-json/dtb/v1, /wp-json/drywall/v1, /wp-json/headless/v1, /wp-json/wc/store/v1
+  -> WooCommerce + DTB mu-plugin modules
 ```
 
-### Backend MU-Plugin composition model
+Frontend rules:
 
-`00-dtb-loader.php` is the **composition root** — it enforces load order via `_dtb_require()`. All custom backend logic belongs inside a module under `mu-plugins/`. The chain loads these module bootstraps in order:
-1. `dtb-platform/` → `dtb-catalog-platform/` → `dtb-commerce/` → `dtb-order-platform/`
-2. `dtb-schematics/` → `dtb-media/` → `dtb-marketing/` → `dtb-repair-service/` → `dtb-integrations/` → `dtb-support/`
+- React owns customer-facing rendering. WordPress themes are backend/headless support, not the public storefront.
+- Add data access in `frontend/src/api/*.js`; avoid growing `frontend/src/services/`, which is legacy compatibility.
+- Keep route changes in `frontend/src/App.jsx`.
+- Reuse existing components under `frontend/src/components/`: `ui`, `shared`, `shell`, `routing`, `storefront`, `catalog`, `product`, `schematics`, `repairs`, `dashboard`, `account`.
+- Keep auth tokens in memory only through `frontend/src/auth/tokenStore.js`; never use localStorage/sessionStorage for credentials. Preserve the `auth:expired` event on 401 behavior in `frontend/src/api/client.js`.
 
-Legacy root-level `.php` files (e.g. `dtb-utils.php`, `dtb-auth.php`, `dtb-order-events.php`) are **compatibility wrappers** currently being extracted into module internals — do not add new logic to them.
+Backend rules:
 
-### Frontend data layer rule
-Always use `frontend/src/api/*.js` (e.g. `api/products.js`, `api/orders.js`, `api/repairs.js`). The `frontend/src/services/` directory is a **legacy compatibility layer** — do not add to it.
+- Backend business logic lives under `drywalltoolbox/wp/wp-content/mu-plugins/`.
+- `00-dtb-loader.php` is the composition root and controls module load order with `_dtb_require(...)`.
+- Current modules: `dtb-platform`, `dtb-catalog-platform`, `dtb-commerce`, `dtb-order-platform`, `dtb-schematics`, `dtb-media`, `dtb-marketing`, `dtb-repair-service`, `dtb-integrations`, `dtb-support`, `dtb-returns`.
+- Put new PHP logic inside the relevant module subtree. Do not add new business logic to legacy root-level compatibility wrappers.
+- Use WordPress security discipline: `defined( 'ABSPATH' ) || exit;`, capability checks, nonces, sanitized input, escaped output, prepared SQL, explicit REST permission callbacks.
+- For mu-plugin load order/API details, consult `drywalltoolbox/wp/wp-content/mu-plugins/README.md`.
 
-### Frontend component structure
-- `components/ui/` — presentation primitives and design-system building blocks (use these first)
-- `components/shell/` — app chrome (Header, Footer, CartSidebar)
-- Domain trees: `components/catalog/`, `components/product/`, `components/schematics/`, `components/account/`
-- Guards: `components/routing/ProtectedRoute.jsx`
+Data/operations rules:
 
+- Treat SKUs, part numbers, brand names, image mappings, schematic paths, and taxonomy policy as business-critical.
+- Do not rewrite generated catalog/report files unless the task requires it.
+- Prefer deterministic scripts and audit output over manual CSV edits for bulk data changes.
 
----
+## Build, Run, And Validation
 
-## 3. DEVELOPER WORKFLOWS
+Local shell is PowerShell. CI uses Ubuntu bash, but local commands below are PowerShell-safe.
+
+Prerequisites confirmed from workflows and package metadata:
+
+- Node.js 20 in GitHub Actions.
+- Frontend dependencies are installed from `frontend/package-lock.json` with `npm ci --include=dev`.
+- Production frontend build writes to repo-root `dist/`; development build output is local to `frontend/dist/`.
+
+Validated command sequence for frontend changes:
 
 ```powershell
-# Frontend dev server
-cd frontend; npm run dev
-
-# Production build (outputs to repo-root dist/)
-cd frontend; npm run build
-
-# Bundle analysis
-cd frontend; $env:ANALYZE="true"; npm run build
-
+cd frontend
+npm ci --include=dev
+npm run lint
+npm run build
 ```
 
-**Deploy:** Push to `main` triggers CI build only. Production deploy requires **manual** GitHub Actions run with `action=deploy` + `confirm=DEPLOY` targeting the `hostgator-production` environment (requires reviewer approval).
+Run the dev server:
 
----
+```powershell
+cd frontend
+npm run dev
+```
 
-## 4. OUTPUT & FORMATTING RULES
-- **Terminal/CLI:** Default to **PowerShell** syntax unless the user explicitly requests another shell.
-- **Code Blocks:** Always specify the file path and language at the top (e.g., `// File: frontend/src/api/rewards.js`).
-- **Diffs & Updates:** Output only the changed functions/sections with `// ... existing code ...` markers. Do not rewrite entire files unless necessary.
+Optional production preview:
+
+```powershell
+cd frontend
+npm run preview
+```
+
+Optional bundle analysis:
+
+```powershell
+cd frontend
+$env:ANALYZE="true"
+npm run build
+```
+
+Known validation gaps:
+
+- `frontend/package.json` has no `test` script. Do not invent a test command; use lint/build and targeted manual or smoke validation.
+- Markdown linting is effectively disabled by `.markdownlint.json`.
+- Backend PHP has no repo-level Composer/PHPUnit pipeline. For mu-plugin wiring changes, prefer source inspection plus available smoke scripts.
+
+Backend/catalog smoke checks when relevant:
+
+```powershell
+.\scripts\smoke-dtb-mu-modules.ps1
+.\scripts\smoke-dtb-catalog-api.ps1
+```
+
+Run these when touching loader/bootstrap, REST route wiring, catalog platform behavior, or deployment packaging. If a script is absent or environment credentials are unavailable, state that in the PR summary.
+
+## CI/CD
+
+Active workflows:
+
+- `.github/workflows/ci-build.yml`: runs on `main` push and manual dispatch. Installs Node 20, runs `cd frontend && npm ci --include=dev`, `npm run lint --if-present`, `npm run build`, then assembles and verifies deploy payload shape.
+- `.github/workflows/deploy.yml`: manual controlled deploy/restore. Deploy requires `workflow_dispatch`, `action=deploy`, `confirm=DEPLOY`, and `hostgator-production` environment approval.
+
+Deploy packaging uses `dist/`, `drywalltoolbox/logos`, `drywalltoolbox/.htaccess`, `drywalltoolbox/wp/.htaccess`, `drywalltoolbox/wp/index.php`, `drywalltoolbox/wp/wp-content/mu-plugins`, and `drywalltoolbox/wp/wp-content/themes`.
+
+Never package or commit runtime secrets, `wp-config.php`, `wp-content/uploads/`, `wp-content/cache/`, or full WordPress runtime state.
+
+## Working Rules For Agents
+
+- First determine the owning layer, then edit only that layer.
+- Keep changes minimal and production-safe; do not perform unrelated refactors or mass formatting.
+- Do not add dependencies unless the task clearly requires it.
+- Preserve existing local/user changes.
+- For frontend JS/JSX changes, run lint and build unless impossible.
+- For backend route/module changes, inspect loader/module docs and run relevant smoke checks when available.
+- Report exactly what changed, which validation ran, and any commands that could not run.
