@@ -35,7 +35,25 @@ Options +FollowSymLinks
   RewriteCond %{HTTP_HOST} ^www\.drywalltoolbox\.com$ [NC]
   RewriteRule ^ https://drywalltoolbox.com%{REQUEST_URI} [R=301,L]
 
-  # Force homepage to the static coming-soon landing page.
+  # Route root/query-string REST fallback into WordPress before the SPA homepage.
+  # Woo.com and some diagnostics probe ?rest_route=/ instead of /wp-json/.
+  RewriteCond %{QUERY_STRING} (^|&)rest_route= [NC]
+  RewriteRule ^$ wp/index.php [QSA,L]
+
+  # Route direct rest_route=index.php calls into /wp/index.php.
+  RewriteCond %{QUERY_STRING} (^|&)rest_route= [NC]
+  RewriteRule ^index\.php$ wp/index.php [QSA,L]
+
+  # Root REST aliases -> WordPress in /wp.
+  RewriteRule ^wp-json/?$ wp/index.php?rest_route=/ [QSA,L]
+  RewriteRule ^wp-json/(.*)$ wp/index.php?rest_route=/$1 [QSA,L]
+  RewriteRule ^dtb/(.*)$ wp/index.php?rest_route=/dtb/$1 [QSA,L]
+
+  # WooCommerce legacy callback/API compatibility from the root URL space.
+  RewriteCond %{QUERY_STRING} (^|&)wc-api= [NC]
+  RewriteRule ^$ wp/index.php [QSA,L]
+
+  # Force homepage to the static React landing page after API fallbacks.
   RewriteRule ^$ index.html [L]
 
   # Conventional browser favicon path backed by the shared logo assets folder.
@@ -51,15 +69,6 @@ Options +FollowSymLinks
   RewriteRule ^wp-includes/(.*)$ wp/wp-includes/$1 [L,QSA]
   RewriteRule ^wp-cron\.php$ wp/wp-cron.php [L,QSA]
   RewriteRule ^xmlrpc\.php$ wp/xmlrpc.php [L,QSA]
-
-  # Root REST aliases -> WordPress in /wp.
-  RewriteRule ^wp-json/?$ wp/index.php?rest_route=/ [QSA,L]
-  RewriteRule ^wp-json/(.*)$ wp/index.php?rest_route=/$1 [QSA,L]
-  RewriteRule ^dtb/(.*)$ wp/index.php?rest_route=/dtb/$1 [QSA,L]
-
-  # Route direct rest_route=index.php calls into /wp/index.php.
-  RewriteCond %{QUERY_STRING} (^|&)rest_route= [NC]
-  RewriteRule ^index\.php$ wp/index.php [QSA,L]
 
   # Staging SPA deep-link fallback.
   RewriteCond %{REQUEST_URI} ^/staging/2972/ [NC]
