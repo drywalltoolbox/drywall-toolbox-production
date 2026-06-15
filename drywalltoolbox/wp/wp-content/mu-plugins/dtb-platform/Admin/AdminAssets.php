@@ -17,8 +17,8 @@ add_action( 'admin_enqueue_scripts', 'dtb_admin_assets_enqueue' );
 add_filter( 'admin_body_class', 'dtb_admin_assets_body_class' );
 
 function dtb_admin_assets_enqueue(): void {
-	$page_meta = dtb_current_page_meta();
-	$page_slug = sanitize_key( (string) ( $_GET['page'] ?? '' ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+	$page_meta   = dtb_current_page_meta();
+	$page_slug   = sanitize_key( (string) ( $_GET['page'] ?? '' ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 	$is_dtb_slug = '' !== $page_slug && str_starts_with( $page_slug, 'dtb-' );
 
 	if ( ! $page_meta && ! $is_dtb_slug ) {
@@ -154,7 +154,8 @@ function dtb_admin_assets_enqueue(): void {
 	$current_user = wp_get_current_user();
 
 	// ── Module-specific CSS (declared by page metadata) ──
-	$page_slug = $page_meta['slug'] ?? '';
+	$page_slug          = $page_meta['slug'] ?? '';
+	$module_css_handles = [];
 
 	foreach ( (array) ( $page_meta['assets']['css'] ?? [] ) as $mod ) {
 		$mod_file = $mod['dir'] . $mod['file'];
@@ -178,6 +179,7 @@ function dtb_admin_assets_enqueue(): void {
 			$css_deps,
 			$mod_ver
 		);
+		$module_css_handles[] = $mod['id'];
 	}
 
 	// ── Module-specific JS (declared by page metadata) ──
@@ -209,21 +211,43 @@ function dtb_admin_assets_enqueue(): void {
 	}
 
 	// ── Shared hardening stylesheet for inline-legacy Tool Library pages ──
-	$legacy_tool_pages = [
+	$legacy_tool_pages       = [
 		'dtb-parts-manager',
 		'dtb-product-mapping',
 		'dtb-schematics',
 	];
+	$legacy_tool_css_handle = null;
 	if ( in_array( $page_slug, $legacy_tool_pages, true ) ) {
 		$tools_file = $assets_dir . 'dtb-tool-library-modern.css';
 		if ( file_exists( $tools_file ) ) {
+			$legacy_tool_css_handle = 'dtb-tool-library-modern';
 			wp_enqueue_style(
-				'dtb-tool-library-modern',
+				$legacy_tool_css_handle,
 				$assets_url . 'dtb-tool-library-modern.css',
 				[ 'dtb-admin' ],
 				(string) filemtime( $tools_file )
 			);
 		}
+	}
+
+	// ── Final shared visual polish override. Loads last so no DTB page falls back to generic WP styling. ──
+	$modern_polish_css_file = $assets_dir . 'dtb-admin-modern-polish.css';
+	if ( file_exists( $modern_polish_css_file ) ) {
+		$modern_polish_deps = array_values( array_filter( array_merge(
+			[ 'dtb-admin' ],
+			wp_style_is( 'dtb-admin-wp-chrome', 'enqueued' ) ? [ 'dtb-admin-wp-chrome' ] : [],
+			wp_style_is( 'dtb-admin-workbench', 'enqueued' ) ? [ 'dtb-admin-workbench' ] : [],
+			wp_style_is( 'dtb-admin-workbench-actions', 'enqueued' ) ? [ 'dtb-admin-workbench-actions' ] : [],
+			$module_css_handles,
+			$legacy_tool_css_handle ? [ $legacy_tool_css_handle ] : []
+		) ) );
+
+		wp_enqueue_style(
+			'dtb-admin-modern-polish',
+			$assets_url . 'dtb-admin-modern-polish.css',
+			$modern_polish_deps,
+			(string) filemtime( $modern_polish_css_file )
+		);
 	}
 
 	// ── ApexCharts (dashboard pages only) ──
@@ -272,8 +296,8 @@ function dtb_admin_assets_enqueue(): void {
  * @return string
  */
 function dtb_admin_assets_body_class( string $classes ): string {
-	$page_meta = dtb_current_page_meta();
-	$page_slug = sanitize_key( (string) ( $_GET['page'] ?? '' ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+	$page_meta   = dtb_current_page_meta();
+	$page_slug   = sanitize_key( (string) ( $_GET['page'] ?? '' ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 	$is_dtb_slug = '' !== $page_slug && str_starts_with( $page_slug, 'dtb-' );
 
 	if ( $page_meta || $is_dtb_slug ) {
