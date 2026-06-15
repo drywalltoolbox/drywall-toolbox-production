@@ -55,9 +55,9 @@ OFFICIAL_STEM_TO_NORMALIZED: dict[str, str] = {
 
     # ── Angle Heads ──────────────────────────────────────────────────────────
     "columbia-angleheads-angleheads-2ah":                       "columbia_tools_2ah_01",
-    "columbia-angleheads-angleheads-2-5ah":                     "columbia_tools_25ah_01",
+    "columbia-angleheads-angleheads-2-5ah":                     "columbia_tools_2_5ah_01",
     "columbia-angleheads-angleheads-3ah":                       "columbia_tools_3ah_01",
-    "columbia-angleheads-angleheads-3-5ah":                     "columbia_tools_35ah_01",
+    "columbia-angleheads-angleheads-3-5ah":                     "columbia_tools_3_5ah_01",
     "columbia-angleheads-angleheads-aha":                       "columbia_tools_aha_01",
     "columbia-angleheads-angleheads-angle-head-front":          "columbia_tools_ah_front_01",
     "columbia-angleheads-angleheads-angle-head-all-sizes-ah-1": "columbia_tools_ah_all_sizes_01",
@@ -300,28 +300,13 @@ NEW_IMAGES_FOR_PRODUCTS: dict[str, list[str]] = {
     ],
 
     # ── 180° Grip Box Handle ─────────────────────────────────────────────────
-    # Primary image is replaced (flat_box_handle_01 → bh_01 via explicit rename).
-    # Add the multi-view shots and numbered catalog reference photos.
+    # Keep this parent gallery scoped to the 180° Grip handle itself. Do not
+    # mix in bent, hydra, closet, JKB, or generic catalog aliases.
     "COL-180-GRIP-FLAT-BOX-HANDLE": [
         "columbia_tools_bh_02",
         "columbia_tools_bh_03",
         "columbia_tools_bh_04",
         "columbia_tools_bh_05",
-        "columbia_tools_bbh_01",
-        "columbia_tools_ebh_01",
-        "columbia_tools_ebh_02",
-        "columbia_tools_ebh_03",
-        "columbia_tools_ebh_04",
-        "columbia_tools_ebh_05",
-        "columbia_tools_ebh_06",
-        "columbia_tools_ebh_07",
-        "columbia_tools_jkb7823_01",
-        "columbia_tools_bh_catalog_01",
-        "columbia_tools_bh_catalog_02",
-        "columbia_tools_bh_catalog_03",
-        "columbia_tools_bh_catalog_04",
-        "columbia_tools_bh_catalog_05",
-        "columbia_tools_bh_catalog_06",
     ],
 
     # ── Automatic Flat Boxes (auto / "A" suffix size variants) ───────────────
@@ -475,6 +460,86 @@ NEW_IMAGES_FOR_PRODUCTS: dict[str, list[str]] = {
     ],
 }
 
+# Exact product-row image assignments for variable products where broad family
+# aliases would incorrectly leak all sizes or unrelated product families into
+# child variation rows.
+EXACT_IMAGES_FOR_PRODUCTS: dict[str, list[str]] = {
+    "COL-180-GRIP-FLAT-BOX-HANDLE": [
+        "columbia_tools_bh_01",
+        "columbia_tools_bh_02",
+        "columbia_tools_bh_03",
+        "columbia_tools_bh_04",
+        "columbia_tools_bh_05",
+        "columbia_tools_3bh_01",
+        "columbia_tools_4bh_01",
+        "columbia_tools_42bh_01",
+        "columbia_tools_5bh_01",
+        "columbia_tools_6bh_01",
+    ],
+    "3BH": ["columbia_tools_3bh_01"],
+    "42BH": ["columbia_tools_42bh_01"],
+    "4BH": ["columbia_tools_4bh_01"],
+    "5BH": ["columbia_tools_5bh_01"],
+    "6BH": ["columbia_tools_6bh_01"],
+    "COL-ANGLE-HEAD": [
+        "columbia_tools_2ah_01",
+        "columbia_tools_2_5ah_01",
+        "columbia_tools_3ah_01",
+        "columbia_tools_3_5ah_01",
+        "columbia_tools_ah_front_01",
+        "columbia_tools_ah_all_sizes_01",
+        "columbia_tools_ah_all_sizes_02",
+        "columbia_tools_ah_all_sizes_03",
+    ],
+    "2AH": ["columbia_tools_2ah_01"],
+    "2.5AH": ["columbia_tools_2_5ah_01"],
+    "3AH": ["columbia_tools_3ah_01"],
+    "3.5AH": ["columbia_tools_3_5ah_01"],
+    "COL-CAM-LOCK-TUBE": [
+        "columbia_tools_clt_01",
+        "columbia_tools_compound_tube_01",
+        "columbia_tools_clt24_01",
+        "columbia_tools_clt32_01",
+        "columbia_tools_clt42_01",
+        "columbia_tools_clt55_01",
+    ],
+    "CLT24": ["columbia_tools_clt24_01"],
+    "CLT32": ["columbia_tools_clt32_01"],
+    "CLT42": ["columbia_tools_clt42_01"],
+    "CLT55": ["columbia_tools_clt55_01"],
+    "COL-COMPOUND-TUBE": [
+        "columbia_tools_cmt_01",
+        "columbia_tools_compound_tube_01",
+        "columbia_tools_cmt24_01",
+        "columbia_tools_cmt32_01",
+        "columbia_tools_cmt42_01",
+        "columbia_tools_cmt55_01",
+    ],
+    "CMT24": ["columbia_tools_cmt24_01"],
+    "CMT32": ["columbia_tools_cmt32_01"],
+    "CMT42": ["columbia_tools_cmt42_01"],
+    "CMT55": ["columbia_tools_cmt55_01"],
+}
+
+# The official 180° Grip box-handle asset set does not provide length-specific
+# filenames for the 3', 42", 4', 5', and 6' child SKUs. Keep the catalog precise
+# by exposing SKU-specific filenames while deriving them from the official 180°
+# Grip primary image, not from BH9 repair-part strap images.
+DERIVED_IMAGE_COPIES: dict[str, list[str]] = {
+    "columbia_tools_bh_01": [
+        "columbia_tools_3bh_01",
+        "columbia_tools_42bh_01",
+        "columbia_tools_4bh_01",
+        "columbia_tools_5bh_01",
+        "columbia_tools_6bh_01",
+    ],
+}
+
+OBSOLETE_NORMALIZED_STEMS: set[str] = {
+    "columbia_tools_25ah_01",
+    "columbia_tools_35ah_01",
+}
+
 
 # ---------------------------------------------------------------------------
 # The catalog currently uses URLs with some `-scaled` variants.
@@ -552,6 +617,7 @@ def build_old_to_new_url_map() -> dict[str, str]:
         "columbia_tools_mhl_04": "columbia_tools_mhl_01",
 
         # ANGLE HEAD (the numbered views become the proper per-size images)
+        "columbia_tools_25ah_01": "columbia_tools_2_5ah_01",
         "columbia_tools_25ah_02": "columbia_tools_ah_all_sizes_01",
         "columbia_tools_25ah_03": "columbia_tools_ah_all_sizes_02",
         "columbia_tools_25ah_04": "columbia_tools_ah_all_sizes_03",
@@ -561,6 +627,7 @@ def build_old_to_new_url_map() -> dict[str, str]:
         "columbia_tools_3ah_02":  "columbia_tools_ah_all_sizes_01",
         "columbia_tools_3ah_03":  "columbia_tools_ah_all_sizes_02",
         "columbia_tools_3ah_04":  "columbia_tools_ah_all_sizes_03",
+        "columbia_tools_35ah_01": "columbia_tools_3_5ah_01",
         "columbia_tools_35ah_02": "columbia_tools_ah_all_sizes_01",
         "columbia_tools_35ah_03": "columbia_tools_ah_all_sizes_02",
         "columbia_tools_35ah_04": "columbia_tools_ah_all_sizes_03",
@@ -572,7 +639,6 @@ def build_old_to_new_url_map() -> dict[str, str]:
         "columbia_tools_cobcre_03": "columbia_tools_cobcre_01",
         "columbia_tools_cobcrw_02": "columbia_tools_cobcrw_01",
         "columbia_tools_cobcrw_03": "columbia_tools_cobcrw_01",
-        "columbia_tools_cbncr_02":  "columbia_tools_cbncr_01",
         "columbia_tools_cbncr_03":  "columbia_tools_cbncr_01",
 
         # COLUMBIA ONE HANDLE (extra numbered views)
@@ -672,7 +738,52 @@ def copy_official_images(dry_run: bool) -> list[tuple[str, str, str]]:
 
         results.append((str(src), str(dest), normalized))
 
+    for source_stem, target_stems in DERIVED_IMAGE_COPIES.items():
+        src = LAUNCH_IMAGES / f"{source_stem}.webp"
+        if not src.exists():
+            continue
+
+        for target_stem in target_stems:
+            dest = LAUNCH_IMAGES / f"{target_stem}.webp"
+            if not dry_run:
+                shutil.copy2(src, dest)
+            results.append((str(src), str(dest), target_stem))
+
     return results
+
+
+def canonical_normalized_stems() -> set[str]:
+    stems = set(OFFICIAL_STEM_TO_NORMALIZED.values())
+    for target_stems in DERIVED_IMAGE_COPIES.values():
+        stems.update(target_stems)
+    return stems
+
+
+def cleanup_stale_canonical_siblings(dry_run: bool) -> list[Path]:
+    """
+    Remove stale root files that share a canonical official product group but
+    are not themselves canonical official targets.
+
+    Example: ``columbia_tools_3ah_02.webp`` used to contain an all-sizes angle
+    head view, but the official canonical files are ``columbia_tools_3ah_01``
+    and ``columbia_tools_ah_all_sizes_01``/``_02``/``_03``.
+    """
+    canonical = canonical_normalized_stems()
+    canonical_bases = {re.sub(r"_\d{2}$", "", stem) for stem in canonical}
+    stale: list[Path] = []
+
+    for path in sorted(LAUNCH_IMAGES.glob("columbia_tools_*.webp")):
+        base = re.sub(r"_\d{2}(?:-scaled)?$", "", path.stem)
+        if path.stem in OBSOLETE_NORMALIZED_STEMS:
+            stale.append(path)
+        elif base in canonical_bases and path.stem not in canonical:
+            stale.append(path)
+
+    if not dry_run:
+        for path in stale:
+            path.unlink()
+
+    return stale
 
 
 def update_catalog_csv(
@@ -699,10 +810,22 @@ def update_catalog_csv(
         # Only touch Columbia rows
         if "columbia" not in row.get("Meta: _dtb_brand_key", "").lower():
             continue
+        if row.get("Meta: _dtb_is_parts", "").strip() == "1":
+            continue
+        if "part" in row.get("Meta: _dtb_product_kind", "").lower():
+            continue
 
         sku = row.get("SKU", "")
         images_raw = row.get("Images", "")
         row_dirty = False
+
+        exact_stems = EXACT_IMAGES_FOR_PRODUCTS.get(sku)
+        if exact_stems is not None:
+            exact_parts = [f"{IMAGE_BASE_URL}/{stem}.webp" for stem in exact_stems]
+            if images_raw != ", ".join(exact_parts):
+                row["Images"] = ", ".join(exact_parts)
+                rows_changed += 1
+            continue
 
         # ── Step A: substitute old URLs with new ones ──────────────────────
         parts = [p.strip() for p in images_raw.split(",") if p.strip()]
@@ -855,8 +978,13 @@ def main(argv: list[str]) -> int:
     rows_changed, urls_substituted, urls_added = update_catalog_csv(old_to_new, dry_run=args.dry_run)
     log(f"  → {rows_changed} rows changed, {urls_substituted} URL substitutions, {urls_added} new URLs added.\n")
 
-    # 4. Write report
-    log("=== Step 3: Write migration report ===")
+    # 4. Remove stale, misnamed siblings in canonical official groups.
+    log("=== Step 3: Clean stale canonical siblings ===")
+    stale = cleanup_stale_canonical_siblings(dry_run=args.dry_run)
+    log(f"  → {len(stale)} stale files {'would be removed' if args.dry_run else 'were removed'}.\n")
+
+    # 5. Write report
+    log("=== Step 4: Write migration report ===")
     report_path = write_report(copied, rows_changed, urls_substituted, urls_added, old_to_new, args.dry_run)
     if not args.dry_run:
         log(f"  → Report written to: {report_path}\n")
