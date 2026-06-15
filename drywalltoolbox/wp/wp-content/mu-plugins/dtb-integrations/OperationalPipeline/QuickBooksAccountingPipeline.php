@@ -21,8 +21,8 @@ if ( ! function_exists( 'dtb_qbo_accounting_ref' ) ) {
 	 * @return array{value:string,name:string}
 	 */
 	function dtb_qbo_accounting_ref( string $key, string $default_id, string $default_name ): array {
-		$key      = strtoupper( sanitize_key( $key ) );
-		$id_const = 'DTB_QBO_ITEM_' . $key . '_ID';
+		$key        = strtoupper( sanitize_key( $key ) );
+		$id_const   = 'DTB_QBO_ITEM_' . $key . '_ID';
 		$name_const = 'DTB_QBO_ITEM_' . $key . '_NAME';
 
 		$value = defined( $id_const ) ? constant( $id_const ) : get_option( strtolower( $id_const ), $default_id );
@@ -36,24 +36,14 @@ if ( ! function_exists( 'dtb_qbo_accounting_ref' ) ) {
 }
 
 if ( ! function_exists( 'dtb_qbo_money' ) ) {
-	/**
-	 * Normalize a money value for QBO payloads.
-	 *
-	 * @param mixed $amount Amount.
-	 * @return float
-	 */
+	/** Normalize a money value for QBO payloads. */
 	function dtb_qbo_money( mixed $amount ): float {
 		return (float) wc_format_decimal( (float) $amount, 2 );
 	}
 }
 
 if ( ! function_exists( 'dtb_qbo_product_item_ref_for_order_item' ) ) {
-	/**
-	 * Resolve the QBO item ref for a Woo line item.
-	 *
-	 * @param WC_Order_Item_Product $item Order item.
-	 * @return array{value:string,name:string}
-	 */
+	/** Resolve the QBO item ref for a Woo line item. */
 	function dtb_qbo_product_item_ref_for_order_item( WC_Order_Item_Product $item ): array {
 		$product = $item->get_product();
 		if ( $product instanceof WC_Product ) {
@@ -70,13 +60,7 @@ if ( ! function_exists( 'dtb_qbo_product_item_ref_for_order_item' ) ) {
 }
 
 if ( ! function_exists( 'dtb_qbo_build_sales_lines_for_order' ) ) {
-	/**
-	 * Build SalesReceipt/RefundReceipt lines from a Woo order.
-	 *
-	 * @param WC_Order $order Woo order.
-	 * @param bool     $refund_mode Whether to build refund lines.
-	 * @return array<int,array<string,mixed>>
-	 */
+	/** Build SalesReceipt lines from a Woo order. */
 	function dtb_qbo_build_sales_lines_for_order( WC_Order $order, bool $refund_mode = false ): array {
 		$lines = [];
 
@@ -137,7 +121,7 @@ if ( ! function_exists( 'dtb_qbo_build_sales_lines_for_order' ) ) {
 			];
 		}
 
-		$tax = dtb_qbo_money( $order->get_total_tax() );
+		$tax     = dtb_qbo_money( $order->get_total_tax() );
 		$tax_ref = dtb_qbo_accounting_ref( 'tax', '', 'Sales Tax' );
 		if ( $tax > 0 && '' !== $tax_ref['value'] ) {
 			$lines[] = [
@@ -156,26 +140,38 @@ if ( ! function_exists( 'dtb_qbo_build_sales_lines_for_order' ) ) {
 	}
 }
 
+if ( ! function_exists( 'dtb_qbo_build_refund_lines_for_order' ) ) {
+	/** Build RefundReceipt lines from a Woo order refund total. */
+	function dtb_qbo_build_refund_lines_for_order( WC_Order $order ): array {
+		$refund_total = dtb_qbo_money( abs( (float) $order->get_total_refunded() ) );
+		if ( $refund_total <= 0 ) {
+			return [];
+		}
+
+		return [
+			[
+				'Amount'      => $refund_total,
+				'DetailType'  => 'SalesItemLineDetail',
+				'Description' => 'Refund for Drywall Toolbox order #' . $order->get_order_number(),
+				'SalesItemLineDetail' => [
+					'Qty'       => 1,
+					'UnitPrice' => $refund_total,
+					'ItemRef'   => dtb_qbo_accounting_ref( 'refund', '1', 'Refund' ),
+				],
+			],
+		];
+	}
+}
+
 if ( ! function_exists( 'dtb_qbo_order_doc_number' ) ) {
-	/**
-	 * Build a deterministic QBO document number for an order/refund.
-	 *
-	 * @param WC_Order $order  Woo order.
-	 * @param string   $prefix Prefix.
-	 * @return string
-	 */
+	/** Build a deterministic QBO document number for an order/refund. */
 	function dtb_qbo_order_doc_number( WC_Order $order, string $prefix = 'DTB' ): string {
 		return substr( sanitize_text_field( $prefix . '-' . $order->get_order_number() ), 0, 21 );
 	}
 }
 
 if ( ! function_exists( 'dtb_qbo_sync_order_pipeline' ) ) {
-	/**
-	 * Queue-safe SalesReceipt sync for one Woo order.
-	 *
-	 * @param WC_Order $order Woo order.
-	 * @return array|WP_Error
-	 */
+	/** Queue-safe SalesReceipt sync for one Woo order. */
 	function dtb_qbo_sync_order_pipeline( WC_Order $order ): array|WP_Error {
 		$existing_id = (string) ( $order->get_meta( '_dtb_quickbooks_entity_id', true ) ?: $order->get_meta( '_dtb_qbo_receipt_id', true ) ?: $order->get_meta( '_dtb_quickbooks_invoice_id', true ) );
 		if ( '' !== $existing_id || $order->get_meta( '_dtb_qbo_synced' ) ) {
@@ -216,35 +212,17 @@ if ( ! function_exists( 'dtb_qbo_sync_order_pipeline' ) ) {
 }
 
 if ( ! function_exists( 'dtb_qbo_sync_refund' ) ) {
-	/**
-	 * Queue-safe RefundReceipt sync for one Woo order refund event.
-	 *
-	 * @param WC_Order $order Woo order.
-	 * @return array|WP_Error
-	 */
+	/** Queue-safe RefundReceipt sync for one Woo order refund event. */
 	function dtb_qbo_sync_refund( WC_Order $order ): array|WP_Error {
 		$existing_id = (string) $order->get_meta( '_dtb_quickbooks_refund_id', true );
 		if ( '' !== $existing_id ) {
 			return new WP_Error( 'already_synced', 'Order refund already synced to QuickBooks.' );
 		}
 
-		$refund_total = dtb_qbo_money( abs( (float) $order->get_total_refunded() ) );
-		if ( $refund_total <= 0 ) {
+		$lines = dtb_qbo_build_refund_lines_for_order( $order );
+		if ( empty( $lines ) ) {
 			return new WP_Error( 'no_refund_total', 'Order has no refunded amount to sync.' );
 		}
-
-		$lines = [
-			[
-				'Amount'      => $refund_total,
-				'DetailType'  => 'SalesItemLineDetail',
-				'Description' => 'Refund for Drywall Toolbox order #' . $order->get_order_number(),
-				'SalesItemLineDetail' => [
-					'Qty'       => 1,
-					'UnitPrice' => $refund_total,
-					'ItemRef'   => dtb_qbo_accounting_ref( 'refund', '1', 'Refund' ),
-				],
-			],
-		];
 
 		$payload = [
 			'Line'        => $lines,
