@@ -1,16 +1,16 @@
 # Drywall Toolbox Initial Launch Roadmap
 
-**Document status:** Initial launch plan  
-**Scope:** Fastest production-grade public launch using the current storefront, WooCommerce backend, existing catalog, and manually supported operations.  
-**Primary objective:** Get Drywall Toolbox deployed, online, browsable, and able to accept real customer orders without waiting for every automation/integration to be complete.
+**Document status:** Revised initial launch plan  
+**Scope:** Fastest production-grade public launch using the current storefront, WooCommerce backend, existing catalog, and required day-one Veeqo + QuickBooks integrations.  
+**Primary objective:** Get Drywall Toolbox deployed, online, browsable, able to accept real customer orders, and able to push required fulfillment/accounting records through Veeqo and QuickBooks from day one.
 
 ---
 
 ## 1. Executive Launch Verdict
 
-Drywall Toolbox is close enough to launch a production-grade initial storefront, but only if launch scope is disciplined.
+Drywall Toolbox is close enough to launch a production-grade initial storefront, but only if launch scope is disciplined and the required operational integrations are treated as launch gates.
 
-The initial launch should focus on the customer-facing ecommerce and service intake experience:
+The initial launch must include:
 
 - Public React storefront
 - Current WooCommerce catalog
@@ -22,20 +22,20 @@ The initial launch should focus on the customer-facing ecommerce and service int
 - Repair request intake and repair status
 - Basic returns/support intake and status
 - WP-admin operational handling
-- Manual fulfillment/accounting fallback
+- Veeqo fulfillment/order sync from WooCommerce orders
+- QuickBooks accounting sync from WooCommerce orders
+- Manual exception handling when Veeqo or QuickBooks sync fails
 
 The first public launch should **not** depend on:
 
 - Amazon marketplace integration
 - eBay marketplace integration
-- QuickBooks automation
-- Veeqo automation
-- Rewards automation
+- Advanced rewards automation
 - Universal parts intelligence
 - Full repair workflow automation
-- Advanced admin dashboards
+- Advanced admin dashboards beyond what operators need for day-one order handling
 
-Those systems are useful, and several are already scaffolded or partially wired, but they are not required to get the business online and taking real customer orders.
+Veeqo and QuickBooks are no longer post-launch automation. They are required day-one operational dependencies.
 
 ---
 
@@ -43,19 +43,19 @@ Those systems are useful, and several are already scaffolded or partially wired,
 
 The recommended initial launch mode is:
 
-> **Manual-ops ecommerce launch**
+> **Controlled ecommerce launch with required fulfillment/accounting sync**
 
 Meaning:
 
-- WooCommerce is the internal order source of truth.
-- The React storefront accepts orders.
-- Admins process orders manually in WP-admin / WooCommerce.
-- Veeqo is not required on day one.
-- QuickBooks is not required on day one.
+- WooCommerce remains the internal ecommerce order source of truth.
+- The React storefront accepts real customer orders.
+- Veeqo receives required fulfillment/order data from WooCommerce orders.
+- QuickBooks receives required accounting records from WooCommerce orders.
+- Admins can manually review and repair failed Veeqo/QuickBooks syncs.
 - Amazon/eBay marketplace imports remain disabled or deferred.
 - Repairs, returns, and support can be manually triaged from WP-admin.
 
-This is the fastest production-grade path because it proves customer demand and operational flow without blocking launch on external API keys or automation completeness.
+This launch mode is still fast, but it adds one non-negotiable requirement: a paid order must successfully move through WooCommerce, Veeqo, and QuickBooks before launch.
 
 ---
 
@@ -106,7 +106,8 @@ The backend architecture is mature. The mu-plugin layer is modular and includes:
 - Repair service
 - Integrations layer
 - Marketplace scaffolding
-- Veeqo/QuickBooks scaffolding
+- Veeqo integration layer
+- QuickBooks integration layer
 
 For launch, the important backend capabilities are:
 
@@ -114,6 +115,9 @@ For launch, the important backend capabilities are:
 - WooCommerce products/orders
 - Cart/checkout support
 - Customer auth/session behavior
+- Order event ledger and integration state
+- Veeqo order sync / fulfillment path
+- QuickBooks SalesReceipt/refund accounting path
 - Repair request submission/status
 - Returns/support basic flows
 - WP-admin order and repair management
@@ -123,8 +127,10 @@ For launch, the important backend capabilities are:
 1. Checkout must create real WooCommerce orders reliably.
 2. Order confirmation must work for both guest and logged-in customers.
 3. Transactional emails must send.
-4. WP-admin order and repair management must be usable.
-5. External integrations must stay non-blocking until credentials are available and tested.
+4. Veeqo credentials/configuration must be present and validated.
+5. QuickBooks OAuth/configuration/accounting item references must be present and validated.
+6. WP-admin order, repair, and integration-exception handling must be usable.
+7. Amazon/eBay must remain non-blocking until intentionally enabled.
 
 ---
 
@@ -140,6 +146,7 @@ Launch should use:
 - Available product images
 - Available product pricing
 - Available SKU/stock data
+- Product SKUs that can map cleanly into Veeqo and QuickBooks
 
 Do not delay launch for perfect universal-parts intelligence or complete marketplace catalog synchronization.
 
@@ -150,6 +157,7 @@ Do not delay launch for perfect universal-parts intelligence or complete marketp
 3. Variable products/variations must be verified.
 4. SKU duplication must be audited.
 5. Product names should not expose import artifacts or raw SKU suffixes unless intentional.
+6. Launch-critical SKUs must have a usable Veeqo and QuickBooks handling strategy.
 
 ---
 
@@ -169,7 +177,7 @@ Deployment should be simple and controlled:
 3. Keep `/wp/` intact.
 4. Keep uploads intact.
 5. Purge caches.
-6. Smoke test core public and admin routes.
+6. Smoke test core public, admin, REST, Veeqo, and QuickBooks paths.
 
 ---
 
@@ -191,12 +199,12 @@ Deployment should be simple and controlled:
 - Shipping, return, privacy, and terms pages
 - WP-admin order handling
 - WP-admin repair handling
-- Manual fulfillment/accounting process
+- Veeqo order/fulfillment sync
+- QuickBooks accounting sync
+- Admin exception handling for failed Veeqo/QuickBooks syncs
 
 ### Deferred until after launch
 
-- Veeqo automation
-- QuickBooks automation
 - Amazon marketplace imports
 - eBay marketplace imports
 - Advanced rewards automation
@@ -210,7 +218,7 @@ Deployment should be simple and controlled:
 
 ## 5. Sprint Roadmap
 
-The fastest production-grade launch path is four focused sprints plus a short scope-freeze sprint.
+The fastest production-grade launch path is five focused sprints plus a short scope-freeze sprint. The added sprint is required because Veeqo and QuickBooks are day-one dependencies.
 
 ---
 
@@ -224,7 +232,7 @@ The fastest production-grade launch path is four focused sprints plus a short sc
 
 ### 0.1 Freeze v1 launch scope
 
-Confirm that the first public launch includes only:
+Confirm that the first public launch includes:
 
 - Products/catalog
 - Cart
@@ -234,6 +242,8 @@ Confirm that the first public launch includes only:
 - Repair request intake/status
 - Returns/support/contact basics
 - WP-admin manual operations
+- Veeqo order/fulfillment sync
+- QuickBooks accounting sync
 
 ### 0.2 Hide or de-emphasize non-launch surfaces
 
@@ -250,26 +260,26 @@ Defer or hide primary navigation links for:
 Choose one reliable launch payment strategy:
 
 - Preferred: working WooCommerce payment gateway.
-- Acceptable fallback: manual/invoice payment if business process supports it.
+- Acceptable fallback: manual/invoice payment only if it still produces the correct WooCommerce order state for Veeqo/QuickBooks sync.
 
-### 0.4 Define manual operations fallback
+### 0.4 Define operations fallback
 
 Document who handles:
 
-- New orders
-- Shipping/fulfillment
+- New order review
+- Veeqo sync verification/failure resolution
+- QuickBooks sync verification/failure resolution
 - Customer emails
 - Repair requests
 - Returns/support inquiries
-- Accounting entry
 
 ## Acceptance criteria
 
 - Launch scope is documented.
 - Primary navigation exposes only launch-ready surfaces.
 - Payment launch mode is selected.
-- Manual fulfillment/accounting fallback is accepted.
-- Non-launch integrations are explicitly non-blocking.
+- Veeqo and QuickBooks are listed as required launch gates.
+- Amazon/eBay integrations are explicitly non-blocking.
 
 ---
 
@@ -353,12 +363,13 @@ Test:
 - Admin sees the order.
 - Emails send.
 - Product/cart/checkout pages have no blocking console errors.
+- Order state is suitable for downstream Veeqo/QuickBooks sync.
 
 ---
 
 # Sprint 2 — Catalog Readiness and Customer Trust
 
-**Goal:** Make the current catalog credible enough for public customers.
+**Goal:** Make the current catalog credible enough for public customers and clean enough for Veeqo/QuickBooks sync.
 
 **Estimated duration:** 3–4 days
 
@@ -405,10 +416,20 @@ Temporarily unpublish products that:
 - Have severe content/image gaps.
 - Have incorrect variations.
 - Create trust issues.
+- Cannot be handled operationally by Veeqo/QuickBooks on day one.
 
 Do not delay launch for minor enrichment.
 
-### 2.5 SEO/content basics
+### 2.5 Integration mapping sanity check
+
+For launch-critical SKUs, confirm:
+
+- Woo SKU is clean and stable.
+- Veeqo can identify/fulfill the SKU or order line.
+- QuickBooks can receive the line using product-specific item mapping or a valid fallback item reference.
+- Shipping/discount/tax/refund accounting references are configured or intentionally handled by fallback references.
+
+### 2.6 SEO/content basics
 
 Confirm:
 
@@ -429,18 +450,112 @@ Confirm:
 - No severe product card breakage.
 - No obvious raw import artifacts.
 - Purchasable products can be added to cart.
+- Launch-critical SKUs are safe for Veeqo/QuickBooks sync.
 
 ---
 
-# Sprint 3 — Service Workflows and Admin Operations
+# Sprint 3 — Required Veeqo and QuickBooks Integration Readiness
 
-**Goal:** Ensure non-commerce workflows are usable without full automation.
+**Goal:** Make Veeqo and QuickBooks reliable enough for day-one production order flow.
+
+**Estimated duration:** 3–5 days after API credentials are available
+
+## Work
+
+### 3.1 Veeqo credential/configuration setup
+
+Configure and verify:
+
+- Veeqo API key
+- Veeqo warehouse ID
+- Veeqo channel/source ID if required by the current integration path
+- Veeqo webhook secret if webhooks are enabled for launch
+- Server-side storage only; no frontend exposure
+
+### 3.2 QuickBooks credential/configuration setup
+
+Configure and verify:
+
+- QuickBooks app/client credentials
+- QuickBooks OAuth connection
+- QuickBooks realm/company ID
+- Required refresh/access token behavior
+- Sandbox/production mode is correct
+- Server-side storage only; no frontend exposure
+
+### 3.3 QuickBooks accounting reference setup
+
+Configure/verify day-one accounting references:
+
+- Product revenue item reference or product-specific item references
+- Shipping item reference
+- Discount item reference
+- Tax item reference if used
+- Refund item reference
+- Default customer handling
+
+### 3.4 Veeqo order sync test
+
+Using a real low-value or staging order, verify:
+
+- Woo order queues Veeqo sync.
+- Veeqo receives the order/order lines.
+- Shipping/billing address is usable.
+- Product SKU/quantity are correct.
+- Duplicate sync is prevented.
+- Failed sync leaves a clear admin-visible failure state.
+
+### 3.5 QuickBooks order sync test
+
+Using the same order or a controlled test order, verify:
+
+- Woo order queues QuickBooks sync.
+- QuickBooks receives SalesReceipt/accounting record.
+- Line item totals are correct.
+- Shipping/discount/tax handling is correct.
+- Duplicate sync is prevented.
+- Failed sync leaves a clear admin-visible failure state.
+
+### 3.6 Refund/accounting test
+
+Verify at least one controlled refund case:
+
+- Woo refund event can queue QuickBooks refund sync.
+- RefundReceipt or configured refund path is correct.
+- Duplicate refund sync is prevented.
+- No-refund orders do not generate refund records.
+
+### 3.7 Operational exception process
+
+Document the day-one operator flow for:
+
+- Veeqo sync failure
+- QuickBooks sync failure
+- Order stuck in pending/on-hold
+- Missing product mapping
+- Incorrect customer/accounting reference
+
+## Acceptance criteria
+
+- Veeqo credentials are configured and working.
+- QuickBooks credentials are configured and working.
+- One paid order syncs to Veeqo successfully.
+- One paid order syncs to QuickBooks successfully.
+- One refund/accounting path has been tested or explicitly deferred with a documented manual workaround.
+- Duplicate sync protection is confirmed.
+- Failed syncs are visible and manually recoverable.
+
+---
+
+# Sprint 4 — Service Workflows and Admin Operations
+
+**Goal:** Ensure non-commerce workflows and admin handling are usable around the required commerce/integration path.
 
 **Estimated duration:** 2–4 days
 
 ## Work
 
-### 3.1 Repair flow
+### 4.1 Repair flow
 
 Test:
 
@@ -453,7 +568,7 @@ Test:
 - Admin repair detail modal
 - Admin manual status update
 
-### 3.2 Returns flow
+### 4.2 Returns flow
 
 Test:
 
@@ -463,7 +578,7 @@ Test:
 - Admin returns detail/workbench
 - Customer-facing return language
 
-### 3.3 Support/contact flow
+### 4.3 Support/contact flow
 
 Test:
 
@@ -472,7 +587,7 @@ Test:
 - Admin support queue
 - Email notification or stored inquiry
 
-### 3.4 WP-admin operations
+### 4.4 WP-admin operations
 
 Verify:
 
@@ -484,48 +599,51 @@ Verify:
 - Product/admin catalog tools load if needed
 - Modals are scrollable
 - Raw enum labels are normalized
+- Operators can view order integration status/failure metadata
 - Operators can manually process orders and repairs
 
-### 3.5 Manual operations checklist
+### 4.5 Manual operations checklist
 
 Document basic manual handling:
 
 - New order review
 - Payment verification
-- Shipping/fulfillment action
+- Veeqo sync verification
+- QuickBooks sync verification
 - Customer communication
 - Repair request triage
 - Return/support triage
-- Accounting entry
 
 ## Acceptance criteria
 
 - Customer can submit repair request.
 - Admin can view/manage repair request.
 - Admin can view/manage orders.
+- Admin can identify Veeqo/QuickBooks sync status/failures.
 - Admin modals are usable and scrollable.
-- No major admin page blocks manual operations.
+- No major admin page blocks day-one operations.
 
 ---
 
-# Sprint 4 — Production Deployment and Soft Launch
+# Sprint 5 — Production Deployment and Soft Launch
 
-**Goal:** Deploy the public site and validate live customer behavior.
+**Goal:** Deploy the public site and validate live customer behavior plus required Veeqo/QuickBooks sync.
 
 **Estimated duration:** 1–3 days
 
 ## Work
 
-### 4.1 Credential cleanup
+### 5.1 Credential cleanup
 
 Before deployment:
 
 - Remove frontend-bundled WooCommerce consumer secrets/app passwords.
 - Rotate any exposed/staging credentials.
 - Confirm production secrets are server-side only.
+- Confirm Veeqo and QuickBooks credentials are not frontend-accessible.
 - Rebuild frontend after cleanup.
 
-### 4.2 Build frontend
+### 5.2 Build frontend
 
 Run production build and confirm:
 
@@ -535,7 +653,7 @@ Run production build and confirm:
 - Service worker is correct if enabled.
 - No source CSVs or secrets are bundled.
 
-### 4.3 Deploy files
+### 5.3 Deploy files
 
 Upload build to the live document root:
 
@@ -545,7 +663,7 @@ Upload build to the live document root:
 - Do not overwrite live `wp-config.php` unintentionally.
 - Do not overwrite server-only files unintentionally.
 
-### 4.4 WordPress/WooCommerce production checks
+### 5.4 WordPress/WooCommerce production checks
 
 Verify:
 
@@ -558,8 +676,10 @@ Verify:
 - Product visibility
 - Customer registration/login
 - Admin access
+- Veeqo config present
+- QuickBooks config present
 
-### 4.5 Live smoke test
+### 5.5 Live smoke test
 
 Test these routes:
 
@@ -575,7 +695,7 @@ Test these routes:
 - `/wp-admin`
 - Catalog REST endpoint
 
-### 4.6 Soft launch transaction
+### 5.6 Soft launch transaction
 
 Perform:
 
@@ -591,6 +711,8 @@ Confirm:
 - Admin sees order
 - Admin sees repair request
 - Customer-facing pages work on mobile
+- Veeqo sync completes or produces a recoverable failure with clear reason
+- QuickBooks sync completes or produces a recoverable failure with clear reason
 
 ## Acceptance criteria
 
@@ -600,7 +722,9 @@ Confirm:
 - Checkout works.
 - Orders are created.
 - Emails send.
-- Admin can process orders manually.
+- Veeqo sync works for a paid order.
+- QuickBooks sync works for a paid order.
+- Admin can identify and resolve sync failures.
 - No exposed test credentials or secrets remain.
 
 ---
@@ -621,6 +745,11 @@ Only these issues should block launch.
 - Production frontend contains exposed credentials.
 - Critical policy/contact/shipping pages are missing.
 - Customer emails do not send.
+- Veeqo API credentials/configuration are missing or unusable.
+- QuickBooks API credentials/OAuth/configuration are missing or unusable.
+- Paid order cannot sync to Veeqo.
+- Paid order cannot sync to QuickBooks.
+- Veeqo/QuickBooks failures are invisible or unrecoverable by operators.
 
 ### P1 blockers
 
@@ -629,44 +758,47 @@ Only these issues should block launch.
 - Repair intake fails while being advertised.
 - Search/filtering returns obviously wrong results.
 - Major admin modals are not scrollable/usable.
+- Launch-critical SKUs do not map cleanly into the integration workflow.
 
 ### Not launch blockers
 
-- Veeqo API keys not ready.
-- QuickBooks API keys not ready.
 - Amazon/eBay API keys not ready.
 - Rewards not fully automated.
 - Universal parts mapping incomplete.
 - Marketplace imports incomplete.
 - Advanced admin dashboards incomplete.
+- Full repair automation incomplete.
 
 ---
 
 ## 7. Fastest Practical Timeline
 
-If checkout is already working:
+If checkout is already working and Veeqo/QuickBooks credentials are available:
 
 | Sprint | Duration |
 |---|---:|
 | Sprint 0 — Scope lock | 1 day |
 | Sprint 1 — Commerce path | 3 days |
 | Sprint 2 — Catalog readiness | 3 days |
-| Sprint 3 — Services/admin ops | 2 days |
-| Sprint 4 — Deployment/soft launch | 1–2 days |
+| Sprint 3 — Veeqo/QuickBooks readiness | 3–5 days |
+| Sprint 4 — Services/admin ops | 2 days |
+| Sprint 5 — Deployment/soft launch | 1–2 days |
 
-**Best case:** 10–11 working days.
+**Best case:** 13–16 working days after credentials are available.
 
 If checkout backend is not working, add **2–5 working days**.
 
-**Realistic launch window:** 2–3 weeks.
+If Veeqo/QuickBooks credentials are not available, the launch clock should be considered blocked until they are obtained and configured.
+
+**Realistic launch window:** 3–4 weeks if credentials arrive quickly and checkout is already close.
 
 ---
 
 ## 8. Recommended Immediate Next Step
 
-Start with Sprint 1 checkout verification.
+Start with two parallel tracks:
 
-Do not work on marketplace, QuickBooks, Veeqo, rewards, or universal parts until the following is proven:
+### Track A — Commerce verification
 
 1. Product loads.
 2. Product adds to cart.
@@ -676,22 +808,33 @@ Do not work on marketplace, QuickBooks, Veeqo, rewards, or universal parts until
 6. Admin can see/process order.
 7. Customer/admin emails send.
 
-If Sprint 1 passes, the site can move rapidly toward deployment.
+### Track B — Veeqo/QuickBooks credential readiness
 
-If Sprint 1 fails, fix checkout before touching anything else.
+1. Obtain Veeqo API key and required warehouse/channel identifiers.
+2. Obtain QuickBooks app credentials and complete OAuth connection.
+3. Configure QuickBooks item references for product, shipping, discount, tax, and refund handling.
+4. Run one paid order through Veeqo.
+5. Run one paid order through QuickBooks.
+
+If Track A fails, fix checkout before frontend polish.
+
+If Track B fails, do not launch publicly until the integration failure is understood and recoverable.
 
 ---
 
 ## 9. Final Launch Principle
 
-The launch should prove the business, not every automation.
+The launch should prove the business and the required operational backbone.
 
 A correct first launch is:
 
 - Customer can find products.
 - Customer can place an order.
+- WooCommerce records the order.
+- Veeqo receives the fulfillment/order data.
+- QuickBooks receives the accounting data.
 - Customer can request service.
-- Admin can fulfill/respond manually.
+- Admin can manage orders, repairs, and integration exceptions.
 - The website is stable, credible, and public.
 
-Automation can follow once real customer traffic and operational needs are validated.
+Amazon/eBay marketplace automation, advanced rewards, universal parts intelligence, and deeper operational automation can follow after the public launch is stable.
