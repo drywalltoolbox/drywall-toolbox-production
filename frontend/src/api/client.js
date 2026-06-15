@@ -90,6 +90,49 @@ const WC_API_BASE =
 let WC_AUTH_USER = process.env.REACT_APP_WC_AUTH_USER || '';
 let WC_AUTH_PASS = process.env.REACT_APP_WC_AUTH_PASS || '';
 
+function normalizeBaseUrl( value = '' ) {
+  return String( value || '' ).replace( /\/+$/, '' );
+}
+
+function uniqueUrls( urls ) {
+  return Array.from( new Set( urls.filter( Boolean ) ) );
+}
+
+function buildApiRequestUrls( endpoint ) {
+  if ( /^https?:\/\//i.test( endpoint ) ) {
+    return [ endpoint ];
+  }
+
+  const normalizedEndpoint = endpoint.startsWith( '/' ) ? endpoint : `/${ endpoint }`;
+
+  // Staging is served from nested static paths such as /staging/2972, while
+  // WordPress lives under /wp. For /wp-json/* calls, try the canonical root
+  // alias first and then the direct /wp/wp-json path. This keeps production
+  // behavior unchanged while making staging resilient when the root alias is
+  // missing or blocked.
+  if ( normalizedEndpoint.startsWith( '/wp-json/' ) ) {
+    const restPath = normalizedEndpoint.replace( /^\/wp-json/, '' );
+    const bases = uniqueUrls( [
+      normalizeBaseUrl( API_BASE_URL ),
+      runtimeOrigin ? normalizeBaseUrl( runtimeOrigin ) : '',
+    ] );
+
+    const urls = [];
+    for ( const base of bases ) {
+      urls.push( `${ base }${ normalizedEndpoint }` );
+      urls.push( `${ base }/wp/wp-json${ restPath }` );
+    }
+
+    if ( WP_API_BASE ) {
+      urls.push( `${ normalizeBaseUrl( WP_API_BASE ) }${ restPath }` );
+    }
+
+    return uniqueUrls( urls );
+  }
+
+  return [ `${ API_BASE_URL }${ normalizedEndpoint }` ];
+}
+
 // ─── Runtime credential bootstrap (backward compat) ──────────────────────────
 // Only attempt the config fetch when a WP base URL is explicitly configured.
 // On GitHub Pages, _wpBase is empty — skip entirely to avoid 404 noise.
@@ -177,7 +220,7 @@ wcClient.interceptors.response.use(
  * @throws {{ code: string, message: string, status: number, retryAfter?: number }}
  */
 export async function apiClient( endpoint, options = {} ) {
-  const url = `${ API_BASE_URL }${ endpoint }`;
+  const requestUrls = buildApiRequestUrls( endpoint );
 
   const method = ( options.method || 'GET' ).toUpperCase();
   const headers = { ...( options.headers || {} ) };
@@ -193,7 +236,7 @@ export async function apiClient( endpoint, options = {} ) {
     headers[ 'Authorization' ] = `Bearer ${ token }`;
   }
 
-  const requestKey = `${ method } ${ url } ${ headers[ 'Authorization' ] || '' }`;
+  const requestKey = `${ method } ${ requestUrls[0] } ${ headers[ 'Authorization' ] || '' }`;
   const now = Date.now();
 
   if ( method === 'GET' ) {
@@ -213,57 +256,72 @@ export async function apiClient( endpoint, options = {} ) {
   }
 
   const execute = async () => {
-    let response;
-    try {
-      response = await fetch( url, { ...options, method, headers, credentials: 'include' } );
-    } catch {
-      throw { code: 'network_error', message: 'Network request failed.', status: 0 };
-    }
+    let lastError = null;
 
-    if ( response.status === 401 ) {
-      clearToken();
-      const shouldExpireSession = await shouldDispatchAuthExpired();
-      if ( shouldExpireSession && typeof window !== 'undefined' ) {
-        window.dispatchEvent( new Event( 'auth:expired' ) );
+    for ( const url of requestUrls ) {
+      let response;
+      try {
+        response = await fetch( url, { ...options, method, headers, credentials: 'include' } );
+      } catch {
+        lastError = { code: 'network_error', message: 'Network request failed.', status: 0 };
+        continue;
       }
-      let envelope = {};
-      try { envelope = await response.json(); } catch { /**/ }
-      throw {
-        code:    envelope.code    || 'unauthorized',
-        message: envelope.message || 'Authentication required.',
-        status:  401,
-      };
-    }
 
-    if ( response.status === 429 ) {
-      let envelope = {};
-      try { envelope = await response.json(); } catch { /**/ }
-      const retryAfterSec = parseInt( response.headers.get( 'Retry-After' ) || '60', 10 );
-      const retryAfterMs = retryAfterSec * 1000;
-      if ( method === 'GET' ) {
-        getCooldowns.set( requestKey, Date.now() + retryAfterMs );
+      if ( response.status === 401 ) {
+        clearToken();
+        const shouldExpireSession = await shouldDispatchAuthExpired();
+        if ( shouldExpireSession && typeof window !== 'undefined' ) {
+          window.dispatchEvent( new Event( 'auth:expired' ) );
+        }
+        let envelope = {};
+        try { envelope = await response.json(); } catch { /**/ }
+        throw {
+          code:    envelope.code    || 'unauthorized',
+          message: envelope.message || 'Authentication required.',
+          status:  401,
+        };
       }
-      throw {
-        code:       envelope.code    || 'rate_limited',
-        message:    envelope.message || 'Too many requests.',
-        status:     429,
-        retryAfter: retryAfterMs,
-      };
+
+      if ( response.status === 429 ) {
+        let envelope = {};
+        try { envelope = await response.json(); } catch { /**/ }
+        const retryAfterSec = parseInt( response.headers.get( 'Retry-After' ) || '60', 10 );
+        const retryAfterMs = retryAfterSec * 1000;
+        if ( method === 'GET' ) {
+          getCooldowns.set( requestKey, Date.now() + retryAfterMs );
+        }
+        throw {
+          code:       envelope.code    || 'rate_limited',
+          message:    envelope.message || 'Too many requests.',
+          status:     429,
+          retryAfter: retryAfterMs,
+        };
+      }
+
+      if ( ! response.ok ) {
+        let envelope = {};
+        try { envelope = await response.json(); } catch { /**/ }
+        lastError = {
+          code:    envelope.code    || 'api_error',
+          message: envelope.message || `Request failed with status ${ response.status }.`,
+          status:  response.status,
+        };
+
+        // Only fall back for transport/routing style failures. Do not mask real
+        // application errors from the canonical endpoint.
+        if ( method === 'GET' && [ 404, 405, 500, 502, 503, 504 ].includes( response.status ) ) {
+          continue;
+        }
+
+        throw lastError;
+      }
+
+      if ( response.status === 204 ) return null;
+
+      return response.json();
     }
 
-    if ( ! response.ok ) {
-      let envelope = {};
-      try { envelope = await response.json(); } catch { /**/ }
-      throw {
-        code:    envelope.code    || 'api_error',
-        message: envelope.message || `Request failed with status ${ response.status }.`,
-        status:  response.status,
-      };
-    }
-
-    if ( response.status === 204 ) return null;
-
-    return response.json();
+    throw lastError || { code: 'network_error', message: 'Network request failed.', status: 0 };
   };
 
   if ( method !== 'GET' ) {
@@ -276,4 +334,3 @@ export async function apiClient( endpoint, options = {} ) {
   inflightGetRequests.set( requestKey, promise );
   return promise;
 }
-
