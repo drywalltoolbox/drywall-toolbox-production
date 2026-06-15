@@ -173,22 +173,94 @@ body.dtb-admin-screen .wrap:has(.dtb-admin) {
 	border-radius: 18px;
 }
 
-.dtb-admin :where(.dtb-modal-overlay, .dtb-pm-modal-overlay) {
-	background: rgba(15, 23, 42, .68);
-	backdrop-filter: blur(8px) saturate(1.08);
+/* -------------------------------------------------------------------------- */
+/* Shared modal scroll contract                                               */
+/* -------------------------------------------------------------------------- */
+
+body.dtb-admin-screen.dtb-modal-open {
+	overflow: hidden;
 }
 
-.dtb-admin :where(.dtb-modal, .dtb-pm-modal) {
+body.dtb-admin-screen :where(.dtb-modal-overlay, .dtb-pm-modal-overlay) {
+	align-items: center;
+	background: rgba(15, 23, 42, .68);
+	backdrop-filter: blur(8px) saturate(1.08);
+	display: none;
+	inset: 0;
+	justify-content: center;
+	overflow: auto;
+	padding: 28px;
+	position: fixed;
+	scrollbar-gutter: stable;
+}
+
+body.dtb-admin-screen :where(.dtb-modal-overlay--open, .dtb-pm-modal-overlay--open) {
+	display: flex;
+}
+
+body.dtb-admin-screen :where(.dtb-modal, .dtb-pm-modal) {
 	border: 1px solid rgba(226, 232, 240, .9);
 	border-radius: 22px;
 	box-shadow: 0 28px 80px rgba(2, 6, 23, .34);
+	display: flex;
+	flex-direction: column;
+	margin: auto;
+	max-height: calc(100dvh - 56px);
+	min-height: 0;
+	overflow: hidden;
+	width: min(1320px, calc(100vw - 56px));
 }
 
-.dtb-admin :where(.dtb-modal__header, .dtb-modal__footer) {
+body.dtb-admin-screen :where(.dtb-modal--fullscreen) {
+	max-height: calc(100dvh - 32px);
+	width: min(1480px, calc(100vw - 32px));
+}
+
+body.dtb-admin-screen :where(.dtb-modal__header, .dtb-modal__footer) {
 	background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+	flex: 0 0 auto;
 }
 
-.dtb-admin :where(.dtb-modal-tab--active, .dtb-modal-tab[aria-selected='true']) {
+body.dtb-admin-screen :where(.dtb-modal__body) {
+	display: flex;
+	flex: 1 1 auto;
+	min-height: 0;
+	overflow-x: hidden;
+	overflow-y: auto;
+	overscroll-behavior: contain;
+}
+
+body.dtb-admin-screen :where(.dtb-wb-main) {
+	flex: 1 1 auto;
+	min-height: 0;
+	overflow-x: hidden;
+	overflow-y: auto;
+	overscroll-behavior: contain;
+}
+
+body.dtb-admin-screen :where(.dtb-wb-rail) {
+	flex: 0 0 auto;
+	max-height: 100%;
+	overflow-y: auto;
+	overscroll-behavior: contain;
+}
+
+body.dtb-admin-screen :where(.dtb-orders-workbench, .dtb-repair-modal-workspace-grid, .dtb-modal-tab-panel) {
+	min-height: 0;
+}
+
+body.dtb-admin-screen :where(.dtb-orders-workbench) {
+	box-sizing: border-box;
+	min-width: 0;
+	padding-bottom: 32px;
+	width: 100%;
+}
+
+body.dtb-admin-screen :where(.dtb-orders-overview-grid, .dtb-repair-modal-workspace-grid) {
+	min-width: 0;
+}
+
+body.dtb-admin-screen :where(.dtb-modal-tab--active, .dtb-modal-tab[aria-selected='true']) {
 	background: #fff;
 	border-color: rgba(226, 232, 240, .95);
 	color: #2563eb;
@@ -203,6 +275,21 @@ body.dtb-admin-screen .wrap:has(.dtb-admin) {
 	.dtb-admin :where(.dtb-page-header) {
 		border-radius: 18px;
 		padding: 18px;
+	}
+
+	body.dtb-admin-screen :where(.dtb-modal-overlay, .dtb-pm-modal-overlay) {
+		align-items: stretch;
+		padding: 10px;
+	}
+
+	body.dtb-admin-screen :where(.dtb-modal, .dtb-pm-modal, .dtb-modal--fullscreen) {
+		border-radius: 18px;
+		max-height: calc(100dvh - 20px);
+		width: calc(100vw - 20px);
+	}
+
+	body.dtb-admin-screen :where(.dtb-modal__body) {
+		flex-direction: column;
 	}
 }
 
