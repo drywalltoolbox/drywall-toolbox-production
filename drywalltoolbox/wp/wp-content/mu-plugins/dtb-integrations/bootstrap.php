@@ -98,6 +98,7 @@ dtb_integrations_require_files( [
 	'dtb-integrations/OperationalPipeline/VeeqoWebhookEchoGuard.php',
 	'dtb-integrations/OperationalPipeline/VeeqoWebhookPipelineController.php',
 	'dtb-integrations/OperationalPipeline/QuickBooksQueueController.php',
+	'dtb-integrations/OperationalPipeline/PipelinePayloadPreview.php',
 ] );
 
 // 5) Rewards module-layer files.
