@@ -3,20 +3,13 @@
  * DTB Platform — AdminIntegrationStateService
  *
  * Canonical integration-state facade for admin workbench payloads.
+ * Rewards are intentionally omitted from launch integration state.
  *
  * @package drywall-toolbox
  */
 
 defined( 'ABSPATH' ) || exit;
 
-/**
- * Build integration state for a workbench record.
- *
- * @param string $module    support|returns|repair|order.
- * @param int    $record_id Record ID.
- * @param array  $context   Optional record context.
- * @return array
- */
 function dtb_admin_get_integration_state( string $module, int $record_id, array $context = [] ): array {
 	$module = sanitize_key( $module );
 
@@ -37,30 +30,17 @@ function dtb_admin_get_integration_state( string $module, int $record_id, array 
 	}
 }
 
-/**
- * Default integration state shape.
- *
- * @return array
- */
 function dtb_admin_integration_state_defaults(): array {
 	return [
 		'woocommerce'   => [ 'status' => 'unknown', 'label' => __( 'WooCommerce', 'drywall-toolbox' ), 'last_checked_at' => gmdate( 'c' ) ],
 		'veeqo'         => [ 'status' => 'unknown', 'label' => __( 'Veeqo', 'drywall-toolbox' ), 'last_checked_at' => gmdate( 'c' ) ],
 		'quickbooks'    => [ 'status' => 'unknown', 'label' => __( 'QuickBooks', 'drywall-toolbox' ), 'last_checked_at' => gmdate( 'c' ) ],
-		'rewards'       => [ 'status' => 'unknown', 'label' => __( 'Rewards', 'drywall-toolbox' ), 'last_checked_at' => gmdate( 'c' ) ],
 		'notifications' => [ 'status' => 'unknown', 'label' => __( 'Notifications', 'drywall-toolbox' ), 'last_checked_at' => gmdate( 'c' ) ],
 		'shipment'      => [ 'status' => 'unknown', 'label' => __( 'Shipment', 'drywall-toolbox' ), 'last_checked_at' => gmdate( 'c' ) ],
 		'webhooks'      => [ 'status' => 'unknown', 'label' => __( 'Webhooks', 'drywall-toolbox' ), 'last_checked_at' => gmdate( 'c' ) ],
 	];
 }
 
-/**
- * Normalize one integration state slice.
- *
- * @param array  $slice Integration slice.
- * @param string $label Human label.
- * @return array
- */
 function dtb_admin_normalize_integration_slice( array $slice, string $label ): array {
 	$status = sanitize_key( (string) ( $slice['status'] ?? $slice['state'] ?? 'unknown' ) );
 	if ( '' === $status ) {
@@ -79,12 +59,6 @@ function dtb_admin_normalize_integration_slice( array $slice, string $label ): a
 	);
 }
 
-/**
- * Integration state for WooCommerce orders.
- *
- * @param int $order_id Order ID.
- * @return array
- */
 function dtb_admin_integration_state_for_order( int $order_id ): array {
 	$state = dtb_admin_integration_state_defaults();
 	$order = function_exists( 'wc_get_order' ) ? wc_get_order( $order_id ) : null;
@@ -123,45 +97,38 @@ function dtb_admin_integration_state_for_order( int $order_id ): array {
 		],
 		__( 'WooCommerce', 'drywall-toolbox' )
 	);
-	$state['veeqo'] = dtb_admin_normalize_integration_slice(
+	$state['veeqo']       = dtb_admin_normalize_integration_slice(
 		array_merge(
 			(array) ( $stored['veeqo'] ?? [] ),
 			[
-				'status'        => $veeqo_status,
-				'order_id'      => $veeqo_order_id,
-				'tracking'      => $veeqo_tracking,
-				'last_error'    => $stored['veeqo']['error'] ?? $order->get_meta( '_dtb_veeqo_sync_error', true ) ?: null,
-				'sync_status'   => $order->get_meta( '_dtb_veeqo_sync_status', true ) ?: $veeqo_status,
+				'status'      => $veeqo_status,
+				'order_id'    => $veeqo_order_id,
+				'tracking'    => $veeqo_tracking,
+				'last_error'  => $stored['veeqo']['error'] ?? $order->get_meta( '_dtb_veeqo_sync_error', true ) ?: null,
+				'sync_status' => $order->get_meta( '_dtb_veeqo_sync_status', true ) ?: $veeqo_status,
 			]
 		),
 		__( 'Veeqo', 'drywall-toolbox' )
 	);
-	$state['quickbooks'] = dtb_admin_normalize_integration_slice(
+	$state['quickbooks']  = dtb_admin_normalize_integration_slice(
 		array_merge(
 			(array) ( $stored['quickbooks'] ?? [] ),
 			[
-				'status'       => $qbo_status,
-				'entity_id'    => $qbo_entity_id,
-				'entity_type'  => $stored['quickbooks']['entity_type'] ?? $order->get_meta( '_dtb_quickbooks_entity_type', true ) ?: null,
-				'last_error'   => $stored['quickbooks']['error'] ?? $order->get_meta( '_dtb_quickbooks_sync_error', true ) ?: null,
-				'sync_status'  => $order->get_meta( '_dtb_quickbooks_sync_status', true ) ?: $qbo_status,
+				'status'      => $qbo_status,
+				'entity_id'   => $qbo_entity_id,
+				'entity_type' => $stored['quickbooks']['entity_type'] ?? $order->get_meta( '_dtb_quickbooks_entity_type', true ) ?: null,
+				'last_error'  => $stored['quickbooks']['error'] ?? $order->get_meta( '_dtb_quickbooks_sync_error', true ) ?: null,
+				'sync_status' => $order->get_meta( '_dtb_quickbooks_sync_status', true ) ?: $qbo_status,
 			]
 		),
 		__( 'QuickBooks', 'drywall-toolbox' )
 	);
-	$state['rewards']       = dtb_admin_normalize_integration_slice( (array) ( $stored['rewards'] ?? [] ), __( 'Rewards', 'drywall-toolbox' ) );
 	$state['notifications'] = dtb_admin_normalize_integration_slice( [ 'status' => empty( $stored['notifications'] ) ? 'none' : 'available', 'items' => $stored['notifications'] ?? [] ], __( 'Notifications', 'drywall-toolbox' ) );
 	$state['shipment']      = dtb_admin_normalize_integration_slice( [ 'status' => $state['veeqo']['tracking'] ? 'tracking_available' : 'pending', 'tracking' => $state['veeqo']['tracking'] ?? null ], __( 'Shipment', 'drywall-toolbox' ) );
 
 	return $state;
 }
 
-/**
- * Integration state for repair records.
- *
- * @param int $repair_id Repair ID.
- * @return array
- */
 function dtb_admin_integration_state_for_repair( int $repair_id ): array {
 	$state    = dtb_admin_integration_state_defaults();
 	$raw      = function_exists( 'dtb_get_repair_integration_state' ) ? dtb_get_repair_integration_state( $repair_id ) : [];
@@ -185,19 +152,11 @@ function dtb_admin_integration_state_for_repair( int $repair_id ): array {
 		__( 'Veeqo', 'drywall-toolbox' )
 	);
 	$state['quickbooks']  = dtb_admin_normalize_integration_slice( (array) ( $raw['quickbooks'] ?? [] ), __( 'QuickBooks', 'drywall-toolbox' ) );
-	$state['rewards']     = dtb_admin_normalize_integration_slice( (array) ( $raw['rewards'] ?? [] ), __( 'Rewards', 'drywall-toolbox' ) );
 	$state['shipment']    = dtb_admin_normalize_integration_slice( [ 'status' => $state['veeqo']['tracking'] ? 'tracking_available' : 'pending', 'tracking' => $state['veeqo']['tracking'] ?? null ], __( 'Shipment', 'drywall-toolbox' ) );
 
 	return $state;
 }
 
-/**
- * Integration state for return records.
- *
- * @param int   $return_id Return ID.
- * @param array $context   Return context.
- * @return array
- */
 function dtb_admin_integration_state_for_return( int $return_id, array $context = [] ): array {
 	$state    = dtb_admin_integration_state_defaults();
 	$order_id = absint( $context['order_id'] ?? 0 );
@@ -218,29 +177,8 @@ function dtb_admin_integration_state_for_return( int $return_id, array $context 
 	return $state;
 }
 
-/**
- * Integration state for support tickets.
- *
- * @param int   $ticket_id Ticket ID.
- * @param array $context   Ticket context.
- * @return array
- */
 function dtb_admin_integration_state_for_support( int $ticket_id, array $context = [] ): array {
-	$state    = dtb_admin_integration_state_defaults();
-	$order_id = absint( $context['order_id'] ?? 0 );
-
-	if ( $order_id ) {
-		$state = array_replace_recursive( $state, dtb_admin_integration_state_for_order( $order_id ) );
-	}
-
-	$state['notifications'] = dtb_admin_normalize_integration_slice(
-		[
-			'status'       => sanitize_key( (string) ( $context['notification_status'] ?? 'unknown' ) ),
-			'fail_count'   => absint( $context['notification_fail_count'] ?? 0 ),
-			'last_sent_at' => $context['notification_last_sent_at'] ?? null,
-		],
-		__( 'Notifications', 'drywall-toolbox' )
-	);
-
+	$state = dtb_admin_integration_state_defaults();
+	$state['notifications'] = dtb_admin_normalize_integration_slice( [ 'status' => 'manual', 'ticket_id' => $ticket_id, 'context' => $context ], __( 'Notifications', 'drywall-toolbox' ) );
 	return $state;
 }
