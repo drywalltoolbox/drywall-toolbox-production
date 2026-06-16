@@ -6,66 +6,105 @@
  */
 
 import { useState, useEffect, useRef } from 'react';
-import { fetchCatalogProducts, getCachedCatalogProducts } from '../services/catalogPlatformCache.js';
+import {
+  fetchCatalogProductSnapshot,
+  fetchCatalogProducts,
+  getRenderableCatalogProducts,
+} from '../services/catalogPlatformCache.js';
 
 const DEFAULT_PAGINATION = { page: 1, perPage: 24, total: 0, totalPages: 0 };
 
+function normalizeItems(data) {
+  return Array.isArray(data?.items) ? data.items : [];
+}
+
+function normalizePagination(data) {
+  return data?.pagination ?? DEFAULT_PAGINATION;
+}
+
 export function useCatalogProducts(query = {}, options = {}) {
   const enabled = options.enabled !== false;
-  const initialCached = enabled ? getCachedCatalogProducts(query) : null;
-  const [items, setItems] = useState(() => Array.isArray(initialCached?.items) ? initialCached.items : []);
-  const [pagination, setPagination] = useState(() => initialCached?.pagination ?? DEFAULT_PAGINATION);
+  const initialCached = enabled ? getRenderableCatalogProducts(query) : null;
+  const [items, setItems] = useState(() => normalizeItems(initialCached?.data));
+  const [pagination, setPagination] = useState(() => normalizePagination(initialCached?.data));
   const [loading, setLoading] = useState(() => enabled && !initialCached);
+  const [refreshing, setRefreshing] = useState(() => enabled && Boolean(initialCached?.isStale));
+  const [cacheSource, setCacheSource] = useState(() => initialCached?.source || 'none');
   const [error, setError] = useState(null);
 
   const queryKey = JSON.stringify({ query, enabled });
   const prevKey = useRef(null);
-  const hasLoadedOnce = useRef(Boolean(initialCached));
+  const hasRenderableItems = useRef(Boolean(initialCached?.data));
 
   useEffect(() => {
     if (queryKey === prevKey.current) return undefined;
     prevKey.current = queryKey;
 
     if (!enabled) {
+      setItems([]);
+      setPagination(DEFAULT_PAGINATION);
+      setLoading(false);
+      setRefreshing(false);
+      setCacheSource('disabled');
       return undefined;
     }
 
     let cancelled = false;
+    const cached = getRenderableCatalogProducts(query);
 
-    const cached = getCachedCatalogProducts(query);
-    if (cached) {
+    if (cached?.data) {
       Promise.resolve().then(() => {
         if (cancelled) return;
-        setItems(Array.isArray(cached?.items) ? cached.items : []);
-        setPagination(cached?.pagination ?? DEFAULT_PAGINATION);
+        setItems(normalizeItems(cached.data));
+        setPagination(normalizePagination(cached.data));
         setLoading(false);
+        setRefreshing(true);
+        setCacheSource(cached.source || 'cache');
         setError(null);
-        hasLoadedOnce.current = true;
+        hasRenderableItems.current = true;
       });
-      return () => { cancelled = true; };
+    } else {
+      setLoading(true);
+      setRefreshing(false);
+      setCacheSource('none');
+      setError(null);
     }
 
-    const load = () => {
-      setLoading(true);
-      setError(null);
+    const load = async () => {
+      try {
+        if (!cached?.data) {
+          const snapshot = await fetchCatalogProductSnapshot(query);
+          if (!cancelled && snapshot) {
+            setItems(normalizeItems(snapshot));
+            setPagination(normalizePagination(snapshot));
+            setLoading(false);
+            setRefreshing(true);
+            setCacheSource('snapshot');
+            setError(null);
+            hasRenderableItems.current = true;
+          }
+        }
 
-      fetchCatalogProducts(query)
-        .then((data) => {
-          if (cancelled) return;
-          setItems(Array.isArray(data?.items) ? data.items : []);
-          setPagination(data?.pagination ?? DEFAULT_PAGINATION);
-          setLoading(false);
-          hasLoadedOnce.current = true;
-        })
-        .catch((err) => {
-          if (cancelled) return;
-          setError(err);
-          setLoading(false);
-          hasLoadedOnce.current = true;
-        });
+        const data = await fetchCatalogProducts(query);
+        if (cancelled) return;
+        setItems(normalizeItems(data));
+        setPagination(normalizePagination(data));
+        setLoading(false);
+        setRefreshing(false);
+        setCacheSource('network');
+        setError(null);
+        hasRenderableItems.current = true;
+      } catch (err) {
+        if (cancelled) return;
+        setError(err);
+        setLoading(false);
+        setRefreshing(false);
+      }
     };
 
-    const delay = hasLoadedOnce.current ? 300 : 0;
+    // Do not debounce a route with no visible data. Once there is visible data,
+    // defer the refresh very slightly so filtering/navigation stays responsive.
+    const delay = hasRenderableItems.current ? 120 : 0;
     const timer = delay > 0 ? setTimeout(load, delay) : null;
     if (!timer) load();
 
@@ -80,11 +119,13 @@ export function useCatalogProducts(query = {}, options = {}) {
       items: [],
       pagination: DEFAULT_PAGINATION,
       loading: false,
+      refreshing: false,
+      cacheSource: 'disabled',
       error: null,
     };
   }
 
-  return { items, pagination, loading, error };
+  return { items, pagination, loading, refreshing, cacheSource, error };
 }
 
 export default useCatalogProducts;
