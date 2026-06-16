@@ -2,7 +2,7 @@
  * frontend/src/pages/Checkout.jsx
  *
  * Branded DTB checkout intake with native WooPayments handoff.
- * Rewards are intentionally omitted for the initial production launch.
+ * React owns order intake. WooCommerce/WooPayments owns final payment capture.
  */
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -37,8 +37,10 @@ import { ESTIMATED_SHIP_RATE, FREE_SHIP_THRESHOLD } from '../constants/shipping'
 import veeqoService from '../services/veeqo';
 import SEOHead from '../components/shared/SEOHead';
 
-const WOO_NATIVE_PAYMENT_METHOD = 'woocommerce_payments';
+const WOO_NATIVE_GATEWAY_ID = 'woo_native';
+const WOO_PAYMENTS_METHOD_ID = 'woocommerce_payments';
 const MANUAL_PAYMENT_METHOD_IDS = new Set(['cod', 'bacs', 'cheque']);
+const PREFERRED_ONLINE_PAYMENT_IDS = [WOO_PAYMENTS_METHOD_ID, 'stripe', 'ppcp-gateway'];
 const PAYMENT_LOGO_BASE = `${process.env.PUBLIC_URL || ''}/payment_logos`;
 const CARD_BRAND_LOGOS = [
   { key: 'visa', src: `${PAYMENT_LOGO_BASE}/visa.svg`, alt: 'Visa', className: 'h-[12px]' },
@@ -69,6 +71,41 @@ function toMoney(value) {
 function isManualPaymentMethod(method) {
   const methodId = typeof method === 'string' ? method : method?.id;
   return methodId ? MANUAL_PAYMENT_METHOD_IDS.has(String(methodId).toLowerCase()) || Boolean(method?.is_manual) : false;
+}
+
+function normalizeGatewayTitle(method) {
+  const raw = method?.title || method?.label || method?.id || 'WooPayments';
+  return String(raw).trim() || 'WooPayments';
+}
+
+function resolveWooNativePaymentSelection(capabilities) {
+  const gateways = Array.isArray(capabilities?.gateways) ? capabilities.gateways : [];
+  const wooNativeGateway = gateways.find((gateway) => gateway?.id === WOO_NATIVE_GATEWAY_ID) || null;
+  const rawMethods = Array.isArray(wooNativeGateway?.payment_methods)
+    ? wooNativeGateway.payment_methods
+    : gateways.filter((gateway) => gateway?.id && gateway.id !== WOO_NATIVE_GATEWAY_ID);
+
+  const onlineMethods = rawMethods
+    .filter((method) => method && method.enabled !== false && method.id)
+    .filter((method) => !isManualPaymentMethod(method));
+
+  const preferred = PREFERRED_ONLINE_PAYMENT_IDS
+    .map((id) => onlineMethods.find((method) => String(method.id).toLowerCase() === id))
+    .find(Boolean) || onlineMethods[0] || null;
+
+  if (!preferred) {
+    return {
+      methodId: '',
+      label: 'WooPayments unavailable',
+      setupError: 'No online WooCommerce payment gateway is currently available. Enable WooPayments in WP Admin before launch.',
+    };
+  }
+
+  return {
+    methodId: String(preferred.id),
+    label: normalizeGatewayTitle(preferred),
+    setupError: null,
+  };
 }
 
 function resolveCartItemImage(item) {
@@ -133,14 +170,7 @@ function StepProgress({ activeStep }) {
 
 function StepCard({ children, delay = 0, className = '', id }) {
   return (
-    <Motion.div
-      id={id}
-      variants={cardVariants}
-      initial="hidden"
-      animate="visible"
-      custom={delay}
-      className={`bg-white rounded-2xl border border-slate-200/90 shadow-[0_2px_16px_rgba(15,23,42,0.06)] ${className}`}
-    >
+    <Motion.div id={id} variants={cardVariants} initial="hidden" animate="visible" custom={delay} className={`bg-white rounded-2xl border border-slate-200/90 shadow-[0_2px_16px_rgba(15,23,42,0.06)] ${className}`}>
       {children}
     </Motion.div>
   );
@@ -165,12 +195,7 @@ function MobileSummaryStrip({ cartItems, subtotal, shipping, tax, total }) {
 
   return (
     <Motion.div className="lg:hidden mb-5">
-      <button
-        type="button"
-        onClick={() => setOpen((value) => !value)}
-        className="w-full flex items-center justify-between rounded-2xl bg-white border border-slate-200 px-4 py-3 shadow-sm"
-        aria-expanded={open}
-      >
+      <button type="button" onClick={() => setOpen((value) => !value)} className="w-full flex items-center justify-between rounded-2xl bg-white border border-slate-200 px-4 py-3 shadow-sm" aria-expanded={open}>
         <span className="flex items-center gap-2.5 text-sm font-bold text-slate-900">
           <ShoppingBag size={16} className="text-primary-600" />
           Order Summary
@@ -193,17 +218,13 @@ function MobileSummaryStrip({ cartItems, subtotal, shipping, tax, total }) {
                     <div key={item.cartKey || item.id} className="flex items-center gap-3">
                       <div className="relative h-12 w-12 rounded-xl border border-slate-100 bg-slate-50 overflow-hidden shrink-0">
                         {image ? <img src={image} alt={item.name} className="h-full w-full object-contain p-1" loading="lazy" /> : null}
-                        <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-slate-900 px-1 text-[10px] font-bold text-white">
-                          {item.quantity}
-                        </span>
+                        <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-slate-900 px-1 text-[10px] font-bold text-white">{item.quantity}</span>
                       </div>
                       <div className="min-w-0 flex-1">
                         <p className="truncate text-xs font-semibold text-slate-900">{item.name}</p>
                         <p className="text-[11px] text-slate-500 tabular-nums">${toMoney(item.price).toFixed(2)} ea</p>
                       </div>
-                      <span className="text-xs font-bold text-slate-900 tabular-nums">
-                        ${(toMoney(item.price) * Number(item.quantity || 1)).toFixed(2)}
-                      </span>
+                      <span className="text-xs font-bold text-slate-900 tabular-nums">${(toMoney(item.price) * Number(item.quantity || 1)).toFixed(2)}</span>
                     </div>
                   );
                 })}
@@ -295,7 +316,7 @@ function DesktopSummaryPanel({ cartItems, subtotal, shipping, tax, total, coupon
   );
 }
 
-function NativePaymentCard({ gatewayLabel, capabilitiesLoading }) {
+function NativePaymentCard({ gatewayLabel, capabilitiesLoading, setupError }) {
   return (
     <StepCard delay={0.21} className="p-5 sm:p-6" id="payment-section">
       <div className="flex items-start gap-3 mb-5">
@@ -316,11 +337,18 @@ function NativePaymentCard({ gatewayLabel, capabilitiesLoading }) {
             {CARD_BRAND_LOGOS.map((logo) => <img key={logo.key} src={logo.src} alt={logo.alt} className={`${logo.className} w-auto object-contain`} loading="lazy" decoding="async" />)}
           </div>
         </div>
-        <div className="mt-4 grid gap-2 sm:grid-cols-3 text-xs text-slate-600">
-          <div className="flex items-center gap-2"><ShieldCheck size={14} className="text-primary-600" />PCI-safe payment</div>
-          <div className="flex items-center gap-2"><Lock size={14} className="text-primary-600" />Native gateway page</div>
-          <div className="flex items-center gap-2"><PackageCheck size={14} className="text-primary-600" />Order securely held</div>
-        </div>
+        {setupError ? (
+          <div className="mt-4 flex items-start gap-2 rounded-xl border border-amber-200 bg-amber-50 px-3.5 py-3 text-xs leading-relaxed text-amber-800">
+            <AlertTriangle size={14} className="mt-0.5 shrink-0" />
+            <span>{setupError}</span>
+          </div>
+        ) : (
+          <div className="mt-4 grid gap-2 sm:grid-cols-3 text-xs text-slate-600">
+            <div className="flex items-center gap-2"><ShieldCheck size={14} className="text-primary-600" />PCI-safe payment</div>
+            <div className="flex items-center gap-2"><Lock size={14} className="text-primary-600" />Native gateway page</div>
+            <div className="flex items-center gap-2"><PackageCheck size={14} className="text-primary-600" />Order securely held</div>
+          </div>
+        )}
       </div>
     </StepCard>
   );
@@ -340,8 +368,9 @@ export default function Checkout() {
   const [orderComplete, setOrderComplete] = useState(false);
   const [orderDetails, setOrderDetails] = useState(null);
   const [step, setStep] = useState('form');
-  const [paymentMethod, setPaymentMethod] = useState(WOO_NATIVE_PAYMENT_METHOD);
+  const [paymentMethod, setPaymentMethod] = useState(WOO_PAYMENTS_METHOD_ID);
   const [paymentGatewayLabel, setPaymentGatewayLabel] = useState('WooPayments');
+  const [paymentSetupError, setPaymentSetupError] = useState(null);
   const [capabilitiesLoading, setCapabilitiesLoading] = useState(true);
   const [couponInput, setCouponInput] = useState('');
   const [manualCoupons, setManualCoupons] = useState([]);
@@ -357,16 +386,16 @@ export default function Checkout() {
     getCheckoutCapabilities()
       .then((caps) => {
         if (!mounted) return;
-        const gateways = Array.isArray(caps?.gateways) ? caps.gateways : [];
-        const defaultGatewayId = caps?.default_gateway || WOO_NATIVE_PAYMENT_METHOD;
-        const preferredGateway = gateways.find((gateway) => gateway.id === WOO_NATIVE_PAYMENT_METHOD) || gateways.find((gateway) => gateway.id === defaultGatewayId) || gateways.find((gateway) => !isManualPaymentMethod(gateway)) || null;
-        setPaymentMethod(preferredGateway?.id || defaultGatewayId || WOO_NATIVE_PAYMENT_METHOD);
-        setPaymentGatewayLabel(preferredGateway?.title || preferredGateway?.label || 'WooPayments');
+        const selection = resolveWooNativePaymentSelection(caps);
+        setPaymentMethod(selection.methodId);
+        setPaymentGatewayLabel(selection.label);
+        setPaymentSetupError(selection.setupError);
       })
       .catch(() => {
         if (!mounted) return;
-        setPaymentMethod(WOO_NATIVE_PAYMENT_METHOD);
+        setPaymentMethod(WOO_PAYMENTS_METHOD_ID);
         setPaymentGatewayLabel('WooPayments');
+        setPaymentSetupError(null);
       })
       .finally(() => { if (mounted) setCapabilitiesLoading(false); });
     return () => { mounted = false; };
@@ -378,7 +407,7 @@ export default function Checkout() {
   const total = toMoney(subtotal + shipping + tax);
   const isFormComplete = useMemo(() => formData.firstName.trim() !== '' && formData.lastName.trim() !== '' && formData.email.trim() !== '' && formData.phone.trim() !== '' && formData.address.trim() !== '' && formData.city.trim() !== '' && formData.state.trim() !== '' && formData.zip.trim() !== '', [formData]);
   const isAddressComplete = useMemo(() => formData.address.trim() !== '' && formData.city.trim() !== '' && formData.state.trim() !== '' && formData.zip.trim() !== '', [formData]);
-  const canSubmitCheckout = useMemo(() => !processing && isFormComplete && safeCartItems.length > 0 && Boolean(paymentMethod) && !isManualPaymentMethod(paymentMethod), [isFormComplete, paymentMethod, processing, safeCartItems.length]);
+  const canSubmitCheckout = useMemo(() => !processing && !capabilitiesLoading && !paymentSetupError && isFormComplete && safeCartItems.length > 0 && Boolean(paymentMethod) && !isManualPaymentMethod(paymentMethod), [capabilitiesLoading, isFormComplete, paymentMethod, paymentSetupError, processing, safeCartItems.length]);
 
   const fetchShippingRates = useCallback(async (data, items) => {
     if (!data.address || !data.city || !data.state || !data.zip) return;
@@ -409,6 +438,7 @@ export default function Checkout() {
     setFormData((prev) => ({ ...prev, [name]: sanitize(value) }));
     if (errors[name]) setErrors((prev) => ({ ...prev, [name]: '' }));
   };
+
   const validateForm = useCallback(() => {
     const nextErrors = {};
     if (!formData.firstName.trim()) nextErrors.firstName = 'Required';
@@ -436,8 +466,8 @@ export default function Checkout() {
 
   const handlePlaceOrder = useCallback(async () => {
     if (!validateForm()) return;
-    if (!paymentMethod || isManualPaymentMethod(paymentMethod)) {
-      setCheckoutError('WooPayments is not currently available. Please contact support.');
+    if (!paymentMethod || isManualPaymentMethod(paymentMethod) || paymentSetupError) {
+      setCheckoutError(paymentSetupError || 'WooPayments is not currently available. Please contact support.');
       return;
     }
 
@@ -460,7 +490,18 @@ export default function Checkout() {
     const wcRateId = selectedRate ? `dtb_veeqo_rates:${selectedRate.id}` : '';
 
     try {
-      const response = await syncAndPlace(safeCartItems, billingAddress, billingAddress, paymentMethod, [], formData.customerNote, wcRateId, selectedRate ? selectedRate.price : '', manualCoupons);
+      const response = await syncAndPlace(
+        safeCartItems,
+        billingAddress,
+        billingAddress,
+        paymentMethod,
+        [],
+        formData.customerNote,
+        wcRateId,
+        selectedRate ? selectedRate.price : '',
+        manualCoupons,
+        paymentGatewayLabel,
+      );
       setStep('placing');
       const orderPayload = resolveOrderPayload(response);
       const paymentUrl = resolveNativePaymentUrl(orderPayload);
@@ -478,7 +519,7 @@ export default function Checkout() {
       setProcessing(false);
       setStep('form');
     }
-  }, [clearCart, formData, manualCoupons, paymentMethod, safeCartItems, selectedRate, validateForm]);
+  }, [clearCart, formData, manualCoupons, paymentGatewayLabel, paymentMethod, paymentSetupError, safeCartItems, selectedRate, validateForm]);
 
   useEffect(() => {
     if (processing) {
@@ -628,7 +669,7 @@ export default function Checkout() {
                 <textarea id="field-customerNote" name="customerNote" value={formData.customerNote} onChange={handleInputChange} rows={2} placeholder="Special instructions for your order…" className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-sm resize-none placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all hover:border-slate-300" />
               </StepCard>
 
-              <NativePaymentCard gatewayLabel={paymentGatewayLabel} capabilitiesLoading={capabilitiesLoading} />
+              <NativePaymentCard gatewayLabel={paymentGatewayLabel} capabilitiesLoading={capabilitiesLoading} setupError={paymentSetupError} />
 
               {checkoutError && <Motion.div initial={{ opacity: 0, y: -6 }} animate={{ opacity: 1, y: 0 }} className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 flex items-start gap-2"><AlertCircle size={16} className="shrink-0 mt-0.5" /><span>{checkoutError}</span></Motion.div>}
 
