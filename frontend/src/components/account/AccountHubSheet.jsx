@@ -1,9 +1,8 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Home, Package, LifeBuoy, User, X, ShoppingBag, Heart, Sparkles, ChevronRight, Clock, CheckCircle, AlertCircle, Truck, Loader } from 'lucide-react';
+import { Home, Package, LifeBuoy, User, X, ShoppingBag, Heart, ChevronRight, Clock, CheckCircle, AlertCircle, Truck, Loader } from 'lucide-react';
 import { getCustomerOrders } from '../../api/orders.js';
 import { getRecentlyViewed } from '../../utils/recentlyViewed.js';
-import { isRewardsEnabled } from '../../utils/featureFlags.js';
 
 const TABS = [
   { id: 'home',    label: 'Home',    Icon: Home },
@@ -11,8 +10,6 @@ const TABS = [
   { id: 'support', label: 'Support', Icon: LifeBuoy },
   { id: 'account', label: 'Account', Icon: User },
 ];
-
-// ─── Order status badge ───────────────────────────────────────────────────────
 
 const ORDER_STATUS_CFG = {
   pending:    { label: 'Pending',    color: '#d97706', bg: '#fffbeb', Icon: Clock        },
@@ -44,8 +41,6 @@ function OrderStatusBadge( { status } ) {
     </span>
   );
 }
-
-// ─── Recently viewed tile ─────────────────────────────────────────────────────
 
 function RecentlyViewedTile( { product, onClose } ) {
   return (
@@ -96,24 +91,16 @@ function RecentlyViewedTile( { product, onClose } ) {
   );
 }
 
-// ─── Branded unauthenticated account CTA ──────────────────────────────────────
-
-function AccountHubSignInCTA( { rewardsEnabled, onSignIn } ) {
+function AccountHubSignInCTA( { onSignIn } ) {
   return (
     <section className="account-hub-cta" aria-labelledby="account-hub-cta-title">
       <div className="account-hub-cta__glow" aria-hidden="true" />
       <div className="account-hub-cta__inner">
-        { rewardsEnabled && (
-          <div className="account-hub-cta__eyebrow">
-            <Sparkles size={ 14 } strokeWidth={ 2 } />
-            <span>Rewards available</span>
-          </div>
-        ) }
         <h2 id="account-hub-cta-title" className="account-hub-cta__headline">
-          Earn rewards, track orders, and save your tools
+          Track orders and save your tools
         </h2>
         <p className="account-hub-cta__body">
-          Sign in for order tracking, rewards, saved products, and contractor account tools.
+          Sign in for order tracking, saved products, repair requests, addresses, and contractor account tools.
         </p>
         <button
           type="button"
@@ -132,7 +119,6 @@ function AccountHubSignInCTA( { rewardsEnabled, onSignIn } ) {
 }
 
 export default function AccountHubSheet({ isOpen, onClose, user, onLogout }) {
-  const rewardsEnabled = isRewardsEnabled();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('home');
   const [recentlyViewed, setRecentlyViewed] = useState([]);
@@ -144,13 +130,11 @@ export default function AccountHubSheet({ isOpen, onClose, user, onLogout }) {
     onClose?.();
   }, [onClose]);
 
-  // Refresh recently viewed whenever sheet opens — deferred to avoid sync setState-in-effect
   useEffect(() => {
     if (!isOpen) return;
     Promise.resolve(getRecentlyViewed()).then(setRecentlyViewed);
   }, [isOpen]);
 
-  // Fetch orders when sheet opens and user is authenticated
   useEffect(() => {
     if (!isOpen || !user?.id) return;
     let cancelled = false;
@@ -169,7 +153,6 @@ export default function AccountHubSheet({ isOpen, onClose, user, onLogout }) {
     return () => { cancelled = true; };
   }, [isOpen, user?.id]);
 
-  // Body scroll lock + Escape key
   useEffect(() => {
     if (!isOpen) return undefined;
     const previousOverflow = document.body.style.overflow;
@@ -199,7 +182,6 @@ export default function AccountHubSheet({ isOpen, onClose, user, onLogout }) {
       aria-label="Account hub"
       aria-hidden={!isOpen}
     >
-      {/* Backdrop */}
       <button
         type="button"
         className="account-hub__backdrop"
@@ -208,10 +190,7 @@ export default function AccountHubSheet({ isOpen, onClose, user, onLogout }) {
         tabIndex={isOpen ? 0 : -1}
       />
 
-      {/* Sheet */}
       <section className="account-hub__sheet">
-
-        {/* Close button */}
         <button
           type="button"
           className="account-hub__close"
@@ -222,14 +201,10 @@ export default function AccountHubSheet({ isOpen, onClose, user, onLogout }) {
           <X size={18} strokeWidth={2.5} />
         </button>
 
-        {/* Scrollable content */}
         <div className="account-hub__content">
-
-          {/* ── UNAUTHENTICATED ── */}
           {!user && (
             <div className="account-hub__panel account-hub__panel--guest">
               <AccountHubSignInCTA
-                rewardsEnabled={rewardsEnabled}
                 onSignIn={() => { closeSheet(); navigate('/login'); }}
               />
 
@@ -275,7 +250,6 @@ export default function AccountHubSheet({ isOpen, onClose, user, onLogout }) {
             </div>
           )}
 
-          {/* ── AUTHENTICATED: HOME ── */}
           {user && activeTab === 'home' && (
             <div className="account-hub__panel">
               <h2 className="account-hub__welcome">
@@ -322,7 +296,6 @@ export default function AccountHubSheet({ isOpen, onClose, user, onLogout }) {
             </div>
           )}
 
-          {/* ── AUTHENTICATED: ORDERS ── */}
           {user && activeTab === 'orders' && (
             <div className="account-hub__panel">
               { ordersLoading ? (
@@ -417,7 +390,6 @@ export default function AccountHubSheet({ isOpen, onClose, user, onLogout }) {
             </div>
           )}
 
-          {/* ── AUTHENTICATED: SUPPORT ── */}
           {user && activeTab === 'support' && (
             <div className="account-hub__panel">
               <h2 className="account-hub__welcome">Support</h2>
@@ -439,7 +411,6 @@ export default function AccountHubSheet({ isOpen, onClose, user, onLogout }) {
             </div>
           )}
 
-          {/* ── AUTHENTICATED: ACCOUNT ── */}
           {user && activeTab === 'account' && (
             <div className="account-hub__panel">
               <h2 className="account-hub__welcome">{displayName}</h2>
@@ -451,7 +422,6 @@ export default function AccountHubSheet({ isOpen, onClose, user, onLogout }) {
                   {[
                     { to: '/dashboard',                label: 'My Dashboard'      },
                     { to: '/dashboard?tab=orders',     label: 'Order History'     },
-                    ...( rewardsEnabled ? [ { to: '/dashboard?tab=rewards', label: 'Rewards' } ] : [] ),
                     { to: '/dashboard?tab=addresses',  label: 'Saved Addresses'   },
                     { to: '/dashboard?tab=settings',   label: 'Account Settings'  },
                   ].map(({ to, label }) => (
@@ -475,7 +445,6 @@ export default function AccountHubSheet({ isOpen, onClose, user, onLogout }) {
           )}
         </div>
 
-        {/* ── BOTTOM TAB BAR (authenticated only) ── */}
         {user && (
           <nav className="account-hub-nav" aria-label="Account hub navigation">
             {TABS.map(({ id, label, Icon }) => (
