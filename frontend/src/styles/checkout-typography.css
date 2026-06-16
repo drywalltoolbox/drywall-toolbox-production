@@ -101,83 +101,9 @@
   color: var(--checkout-muted);
 }
 
-/* Payment method cards.
-   The selectable button keeps the old larger grid-card footprint, but its own
-   background/border is invisible. The provider SVG artwork fills the footprint,
-   so there is one visual card instead of a small card nested inside a large one. */
-.dtb-checkout button:has(> img[src*="/payment_logos/paypal.svg"]),
-.dtb-checkout button:has(> img[src*="/payment_logos/apple-pay.svg"]),
-.dtb-checkout button:has(> img[src*="/payment_logos/google-pay.svg"]),
-.dtb-checkout button:has(> img[src*="/payment_logos/affirm.svg"]),
-.dtb-checkout button:has(> img[src*="/payment_logos/klarna.svg"]) {
-  align-items: center !important;
-  align-self: stretch !important;
-  background: transparent !important;
-  border: 0 !important;
-  border-radius: 16px !important;
-  box-shadow: none !important;
-  display: flex !important;
-  height: clamp(52px, 14vw, 62px) !important;
-  justify-content: center !important;
-  justify-self: stretch !important;
-  line-height: 0 !important;
-  min-height: clamp(52px, 14vw, 62px) !important;
-  overflow: visible !important;
-  padding: 0 !important;
-  width: 100% !important;
-}
-
-.dtb-checkout button:has(> img[src*="/payment_logos/paypal.svg"]):hover,
-.dtb-checkout button:has(> img[src*="/payment_logos/apple-pay.svg"]):hover,
-.dtb-checkout button:has(> img[src*="/payment_logos/google-pay.svg"]):hover,
-.dtb-checkout button:has(> img[src*="/payment_logos/affirm.svg"]):hover,
-.dtb-checkout button:has(> img[src*="/payment_logos/klarna.svg"]):hover {
-  background: transparent !important;
-  border: 0 !important;
-  box-shadow: none !important;
-  transform: translateY(-1px);
-}
-
-.dtb-checkout button:has(> img[src*="/payment_logos/paypal.svg"]):focus-visible,
-.dtb-checkout button:has(> img[src*="/payment_logos/apple-pay.svg"]):focus-visible,
-.dtb-checkout button:has(> img[src*="/payment_logos/google-pay.svg"]):focus-visible,
-.dtb-checkout button:has(> img[src*="/payment_logos/affirm.svg"]):focus-visible,
-.dtb-checkout button:has(> img[src*="/payment_logos/klarna.svg"]):focus-visible {
-  outline: none !important;
-}
-
-.dtb-checkout button:has(> img[src*="/payment_logos/paypal.svg"]):focus-visible > img,
-.dtb-checkout button:has(> img[src*="/payment_logos/apple-pay.svg"]):focus-visible > img,
-.dtb-checkout button:has(> img[src*="/payment_logos/google-pay.svg"]):focus-visible > img,
-.dtb-checkout button:has(> img[src*="/payment_logos/affirm.svg"]):focus-visible > img,
-.dtb-checkout button:has(> img[src*="/payment_logos/klarna.svg"]):focus-visible > img {
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.22) !important;
-}
-
-.dtb-checkout button:has(> img[src*="/payment_logos/paypal.svg"].h-\[32px\]),
-.dtb-checkout button:has(> img[src*="/payment_logos/apple-pay.svg"].h-\[32px\]),
-.dtb-checkout button:has(> img[src*="/payment_logos/google-pay.svg"].h-\[32px\]),
-.dtb-checkout button:has(> img[src*="/payment_logos/affirm.svg"].h-\[36px\]),
-.dtb-checkout button:has(> img[src*="/payment_logos/klarna.svg"].h-\[36px\]) {
-  height: clamp(52px, 14vw, 62px) !important;
-  min-height: clamp(52px, 14vw, 62px) !important;
-}
-
-.dtb-checkout button:has(> img[src*="/payment_logos/paypal.svg"]) > img,
-.dtb-checkout button:has(> img[src*="/payment_logos/apple-pay.svg"]) > img,
-.dtb-checkout button:has(> img[src*="/payment_logos/google-pay.svg"]) > img,
-.dtb-checkout button:has(> img[src*="/payment_logos/affirm.svg"]) > img,
-.dtb-checkout button:has(> img[src*="/payment_logos/klarna.svg"]) > img {
-  border-radius: 12px !important;
-  display: block !important;
-  height: 100% !important;
-  max-height: 100% !important;
-  max-width: 100% !important;
-  object-fit: fill !important;
-  width: 100% !important;
-}
-
-/* Dark summary panel text overrides */
+/* Native WooPayments handoff page styling.
+   Provider buttons/card fields are intentionally not styled here because the
+   final payment surface is rendered by WooCommerce/WooPayments. */
 .dtb-checkout .dtb-summary-panel {
   color: #e5ecf8;
 }
@@ -204,8 +130,6 @@
   color: #94a3b8;
 }
 
-/* Remove redundant desktop order summary header totals.
-   The authoritative desktop total remains in the bottom totals section. */
 .dtb-checkout .dtb-summary-panel > div:nth-child(2) > div:nth-child(2) {
   display: none;
 }
@@ -230,14 +154,5 @@
   .dtb-checkout h1 {
     font-size: 1.75rem;
     line-height: 1.07;
-  }
-
-  .dtb-checkout button:has(> img[src*="/payment_logos/paypal.svg"]),
-  .dtb-checkout button:has(> img[src*="/payment_logos/apple-pay.svg"]),
-  .dtb-checkout button:has(> img[src*="/payment_logos/google-pay.svg"]),
-  .dtb-checkout button:has(> img[src*="/payment_logos/affirm.svg"]),
-  .dtb-checkout button:has(> img[src*="/payment_logos/klarna.svg"]) {
-    height: 58px !important;
-    min-height: 58px !important;
   }
 }
