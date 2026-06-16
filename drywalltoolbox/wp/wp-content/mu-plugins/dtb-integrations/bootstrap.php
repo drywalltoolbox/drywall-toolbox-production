@@ -3,12 +3,7 @@
  * DTB Integrations bootstrap.
  *
  * Composition root for external-system integrations.
- *
- * Loads module-layer files in explicit dependency order:
- *   1. Base bridges/clients (contract owners)
- *   2. Module config + services + controllers
- *   3. Health-check adapters
- *   4. Cross-integration notifications
+ * Rewards are intentionally not loaded for the initial production launch.
  *
  * @package drywall-toolbox
  */
@@ -40,9 +35,6 @@ if ( ! function_exists( 'dtb_integrations_register_health_checks' ) ) {
 		if ( class_exists( 'DTB_QuickBooksHealthCheck' ) ) {
 			DTB_QuickBooksHealthCheck::register();
 		}
-		if ( class_exists( 'DTB_RewardsHealthCheck' ) ) {
-			DTB_RewardsHealthCheck::register();
-		}
 		if ( class_exists( 'DTB_AmazonHealthCheck' ) ) {
 			DTB_AmazonHealthCheck::register();
 		}
@@ -57,7 +49,6 @@ dtb_integrations_require_files( [
 	'dtb-integrations/WooCommerce/WooCommerceBridge.php',
 	'dtb-integrations/Veeqo/VeeqoClient.php',
 	'dtb-integrations/QuickBooks/QuickBooksClient.php',
-	'dtb-integrations/Rewards/RewardsService.php',
 ] );
 
 // 2) WooCommerce module-layer files.
@@ -101,15 +92,14 @@ dtb_integrations_require_files( [
 	'dtb-integrations/OperationalPipeline/PipelinePayloadPreview.php',
 ] );
 
-// 5) Rewards module-layer files.
-dtb_integrations_require_files( [
-	'dtb-integrations/Rewards/RewardsIssueJob.php',
-	'dtb-integrations/Rewards/RewardsAdjustmentController.php',
-	'dtb-integrations/Rewards/RewardsBalanceController.php',
-	'dtb-integrations/Rewards/RewardsHealthCheck.php',
-] );
+// Rewards module intentionally omitted for launch:
+// - RewardsService.php
+// - RewardsIssueJob.php
+// - RewardsAdjustmentController.php
+// - RewardsBalanceController.php
+// - RewardsHealthCheck.php
 
-// 6) Notifications last (cross-integration consumers).
+// 5) Notifications last (cross-integration consumers).
 dtb_integrations_require_files( [
 	'dtb-integrations/Notifications/NotificationTemplateRepository.php',
 	'dtb-integrations/Notifications/EmailTemplateRenderer.php',
@@ -118,7 +108,7 @@ dtb_integrations_require_files( [
 	'dtb-integrations/Notifications/SmsGateway.php',
 ] );
 
-// 7) Marketplace shared infrastructure (schema + contracts + credentials).
+// 6) Marketplace shared infrastructure (schema + contracts + credentials).
 dtb_integrations_require_files( [
 	'dtb-integrations/Marketplace/Schema/MarketplaceSchemaInstaller.php',
 	'dtb-integrations/Marketplace/ChannelContract.php',
@@ -134,7 +124,7 @@ dtb_integrations_require_files( [
 	'dtb-integrations/Marketplace/OrderMaterializationService.php',
 ] );
 
-// 8) Amazon module.
+// 7) Amazon module.
 dtb_integrations_require_files( [
 	'dtb-integrations/Amazon/AmazonConfig.php',
 	'dtb-integrations/Amazon/AmazonLwaTokenService.php',
@@ -146,7 +136,7 @@ dtb_integrations_require_files( [
 	'dtb-integrations/Amazon/AmazonWebhookController.php',
 ] );
 
-// 9) eBay module.
+// 8) eBay module.
 dtb_integrations_require_files( [
 	'dtb-integrations/Ebay/EbayConfig.php',
 	'dtb-integrations/Ebay/EbayOAuthTokenService.php',
@@ -157,13 +147,13 @@ dtb_integrations_require_files( [
 	'dtb-integrations/Ebay/EbayHealthCheck.php',
 ] );
 
-// 10) Marketplace queue jobs.
+// 9) Marketplace queue jobs.
 dtb_integrations_require_files( [
 	'dtb-integrations/Marketplace/Jobs/MarketplaceQueueJobs.php',
 	'dtb-integrations/Marketplace/Jobs/MarketplaceMaterializationQueue.php',
 ] );
 
-// 11) Marketplace REST controllers.
+// 10) Marketplace REST controllers.
 dtb_integrations_require_files( [
 	'dtb-integrations/Marketplace/Rest/MarketplaceOverviewController.php',
 	'dtb-integrations/Marketplace/Rest/MarketplaceOrdersController.php',
@@ -174,7 +164,7 @@ dtb_integrations_require_files( [
 	'dtb-integrations/Marketplace/Rest/MarketplaceSettingsController.php',
 ] );
 
-// 12) Marketplace admin helpers + pages.
+// 11) Marketplace admin helpers + pages.
 dtb_integrations_require_files( [
 	'dtb-integrations/Marketplace/Admin/MarketplaceAdminHelpers.php',
 	'dtb-integrations/Marketplace/Admin/MarketplaceOverviewPage.php',
