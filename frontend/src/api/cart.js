@@ -1,16 +1,8 @@
 /**
  * frontend/src/api/cart.js
  *
- * WooCommerce Store API cart helpers (/wc/store/v1/cart).
- *
- * All calls include:
- *   credentials: 'include'        — sends session cookies cross-origin
- *   X-WC-Store-API-Nonce header   — refreshed via initCart()
- *
- * On 401: initCart() is called to refresh the nonce and the request is
- * retried once.  A second consecutive 401 throws to the caller.
- *
- * Docs: https://github.com/woocommerce/woocommerce/tree/trunk/plugins/woocommerce/src/StoreApi
+ * WooCommerce Store API cart helpers (/wc/store/v1/cart) plus DTB checkout
+ * orchestration helpers for native WooPayments handoff.
  */
 import { createCheckoutSession, confirmCheckout, finalizeCheckout } from './checkout.js';
 
@@ -36,7 +28,6 @@ function currentStoreBase() {
   return STORE_BASE_CANDIDATES[ _activeStoreBaseIndex ] || STORE_BASE_CANDIDATES[0] || '';
 }
 
-// Nonce stored at module scope — refreshed by initCart().
 let _storeNonce = '';
 let _cartToken = '';
 
@@ -51,8 +42,6 @@ function updateStoreSessionHeaders( res ) {
     _cartToken = updatedCartToken;
   }
 }
-
-// ─── Fetch helper ─────────────────────────────────────────────────────────────
 
 async function storeFetch( path, options = {}, isRetry = false ) {
   const url = `${ currentStoreBase() }${ path }`;
@@ -69,19 +58,13 @@ async function storeFetch( path, options = {}, isRetry = false ) {
     headers,
   } );
 
-  // WooCommerce 8+ returns the nonce as 'Nonce'; older versions use
-  // 'X-WC-Store-API-Nonce'.  Capture it from every response so the
-  // in-memory nonce stays fresh for subsequent mutations.
   updateStoreSessionHeaders( res );
 
-  // Some production hosts expose Store API under /wp/wp-json only.
-  // On first 404, flip base once and retry this exact request.
   if ( res.status === 404 && ! isRetry && _activeStoreBaseIndex < STORE_BASE_CANDIDATES.length - 1 ) {
     _activeStoreBaseIndex += 1;
     return storeFetch( path, options, true );
   }
 
-  // 401 — refresh nonce via initCart() and retry once.
   if ( res.status === 401 ) {
     if ( isRetry ) {
       let message = `Store API 401: ${ url }`;
@@ -108,14 +91,6 @@ async function storeFetch( path, options = {}, isRetry = false ) {
   return res.json();
 }
 
-// ─── Cart API ─────────────────────────────────────────────────────────────────
-
-/**
- * Initialise the cart session and capture the Store API nonce.
- * Must be called on mount before any cart operation.
- *
- * @returns {Promise<Object>}  WooCommerce cart object
- */
 export async function initCart() {
   const url = `${ currentStoreBase() }/cart`;
   const res = await fetch( url, {
@@ -138,24 +113,10 @@ export async function initCart() {
   return res.json();
 }
 
-/**
- * Retrieve the current cart.
- *
- * @returns {Promise<Object>}
- */
 export async function getCart() {
   return storeFetch( '/cart' );
 }
 
-/**
- * Add an item to the cart.
- *
- * @param {number|string} productId   WooCommerce product ID
- * @param {number}        qty         Quantity (default: 1)
- * @param {Array<Object>} variation   Store API variation array (optional)
- * @param {Object}        extensions  Store API extension payload (optional)
- * @returns {Promise<Object>}
- */
 export async function addToCart( productId, qty = 1, variation = [], extensions = {} ) {
   return storeFetch( '/cart/add-item', {
     method: 'POST',
@@ -163,17 +124,9 @@ export async function addToCart( productId, qty = 1, variation = [], extensions 
   } );
 }
 
-/**
- * Update the quantity of a cart item.
- *
- * @param {string} key  Cart item key
- * @param {number} qty  New quantity
- * @returns {Promise<Object>}
- */
 export async function updateCartItem( key, qty ) {
   const encodedKey = encodeURIComponent( key );
   const normalizedQty = Math.max( 1, Math.floor( Number( qty ) || 1 ) );
-
   let payload = null;
 
   try {
@@ -182,24 +135,16 @@ export async function updateCartItem( key, qty ) {
       body: JSON.stringify( { key, quantity: normalizedQty } ),
     } );
   } catch {
-    // Compatibility fallback for environments exposing cart item routes only.
     payload = await storeFetch( `/cart/items/${ encodedKey }`, {
       method: 'PUT',
       body: JSON.stringify( { quantity: normalizedQty } ),
     } );
   }
 
-  // Some stacks return a single line item shape here; force a full cart payload.
   if ( payload && Array.isArray( payload.items ) ) return payload;
   return getCart();
 }
 
-/**
- * Remove an item from the cart.
- *
- * @param {string} key  Cart item key
- * @returns {Promise<Object>}
- */
 export async function removeCartItem( key ) {
   const encodedKey = encodeURIComponent( key );
   let payload = null;
@@ -209,24 +154,16 @@ export async function removeCartItem( key ) {
       method: 'DELETE',
     } );
   } catch {
-    // Compatibility fallback for environments exposing remove-item only.
     payload = await storeFetch( '/cart/remove-item', {
       method: 'POST',
       body: JSON.stringify( { key } ),
     } );
   }
 
-  // Some stacks return 204/no body; normalize by fetching the full cart.
   if ( payload && Array.isArray( payload.items ) ) return payload;
   return getCart();
 }
 
-/**
- * Apply a coupon to the cart.
- *
- * @param {string} code  Coupon code
- * @returns {Promise<Object>}
- */
 export async function applyCoupon( code ) {
   return storeFetch( '/cart/coupons', {
     method: 'POST',
@@ -234,26 +171,12 @@ export async function applyCoupon( code ) {
   } );
 }
 
-/**
- * Remove a coupon from the cart.
- *
- * @param {string} code  Coupon code
- * @returns {Promise<Object>}
- */
 export async function removeCoupon( code ) {
   return storeFetch( `/cart/coupons/${ encodeURIComponent( code ) }`, {
     method: 'DELETE',
   } );
 }
 
-/**
- * Update the WooCommerce cart customer (billing/shipping address).
- * Call this after syncing items to the WC cart and before selecting a
- * shipping rate so the cart knows which shipping zone applies.
- *
- * @param {Object} customerData  Partial customer object accepted by the Store API.
- * @returns {Promise<Object>}    Updated WooCommerce cart object.
- */
 export async function updateCartCustomer( customerData ) {
   return storeFetch( '/cart/update-customer', {
     method: 'POST',
@@ -261,16 +184,6 @@ export async function updateCartCustomer( customerData ) {
   } );
 }
 
-/**
- * Select a WooCommerce shipping rate for a specific package.
- *
- * The rate_id must match a rate registered by a WC shipping method, e.g.
- * 'dtb_veeqo_rates:standard' for the standard tier of DTB_Veeqo_Shipping_Method.
- *
- * @param {string} rateId    WC shipping rate ID (method:key format).
- * @param {number} packageId Package index (default: 0 — the default cart package).
- * @returns {Promise<Object>}
- */
 export async function selectShippingRate( rateId, packageId = 0 ) {
   return storeFetch( '/cart/select-shipping-rate', {
     method: 'POST',
@@ -278,15 +191,6 @@ export async function selectShippingRate( rateId, packageId = 0 ) {
   } );
 }
 
-
-
-/**
- * Remove all items currently in the WooCommerce server-side cart.
- * Call this before syncing the React CartContext into the Store API cart to
- * avoid accumulating stale items from a previous session.
- *
- * @returns {Promise<Object>}  Empty cart object.
- */
 export async function clearStoreCart() {
   const cart = await storeFetch( '/cart' );
   if ( ! cart?.items?.length ) return cart;
@@ -298,25 +202,6 @@ export async function clearStoreCart() {
   return storeFetch( '/cart' );
 }
 
-/**
- * Submit the WooCommerce Store API checkout.
- *
- * The WC server-side cart must be populated (via addToCart) before calling
- * this function. On success the server creates the WooCommerce order and
- * returns the order ID + order key used for the confirmation page.
- *
- * Payment method must match a gateway enabled in WP Admin
- * (WooCommerce → Settings → Payments). Default: 'cod' (Cash on Delivery /
- * Check / Invoice). For card wallets or third-party gateways, pass the
- * gateway ID and any required payment_data from that provider's SDK.
- *
- * @param {Object} billingAddress   WC billing address object
- * @param {Object} shippingAddress  WC shipping address object (optional, defaults to billing)
- * @param {string} paymentMethod    WC payment gateway ID (default: 'cod')
- * @param {Array}  paymentData      Gateway-specific payment tokens (default: [])
- * @param {string} customerNote     Optional note for the order
- * @returns {Promise<Object>}       { order_id, order_key, status, payment_result, … }
- */
 export async function placeOrder(
   billingAddress,
   shippingAddress = null,
@@ -338,38 +223,23 @@ export async function placeOrder(
 }
 
 /**
- * Synchronise the React CartContext items into the WC server-side cart and
- * submit the Store API checkout in one atomic operation.
+ * Synchronise CartContext items into the DTB backend checkout contract and
+ * create a pending WooCommerce order for native WooPayments collection.
  *
- * Steps:
- *   1. initCart()              — obtain a fresh Store API nonce
- *   2. clearStoreCart()        — remove any stale server-side items from previous sessions
- *   3. addToCart()             — add each item from cartItems sequentially
- *   4. updateCartCustomer()    — set the shipping address so WC knows the correct zone
- *   5. selectShippingRate()    — select the rate the user chose (when shippingRateId provided)
- *   6. placeOrder()            — POST /wc/store/v1/checkout
- *
- * @param {Array}  cartItems       Items from CartContext (id, quantity required)
- * @param {Object} billingAddress
- * @param {Object} shippingAddress
- * @param {string} paymentMethod
- * @param {Array}  paymentData
- * @param {string} customerNote
- * @param {string} [shippingRateId]  WC rate ID to select (e.g. 'dtb_veeqo_rates:standard').
- *                                   When omitted, WC uses the first available rate.
- * @param {string[]} [couponCodes]   Coupon codes to apply to the cart (e.g. loyalty redemptions).
- * @returns {Promise<Object>}  WC checkout response (order_id, order_key, …)
+ * paymentMethod must be an actual WooCommerce payment gateway ID such as
+ * `woocommerce_payments`; `gateway` remains the DTB orchestration adapter.
  */
 export async function syncAndPlace(
   cartItems,
   billingAddress,
   shippingAddress = null,
-  paymentMethod = 'cod',
+  paymentMethod = 'woocommerce_payments',
   paymentData = [],
   customerNote = '',
   shippingRateId = '',
   shippingRateTotal = '',
   couponCodes = [],
+  paymentMethodTitle = '',
 ) {
   const safeItems = Array.isArray( cartItems ) ? cartItems : [];
   if ( safeItems.length === 0 ) {
@@ -427,6 +297,7 @@ export async function syncAndPlace(
     session_token: sessionToken,
     idempotency_key: idempotencyKey,
     payment_method: paymentMethod,
+    payment_method_title: paymentMethodTitle || paymentMethod,
     payment_ref: paymentRef,
     customer_note: customerNote || '',
     billing: billingAddress,
