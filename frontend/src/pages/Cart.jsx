@@ -85,9 +85,9 @@ export default function Cart() {
 
   // ── Cart ─────────────────────────────────────────────────────────────────────
   return (
-    <div className="min-h-screen bg-slate-50 page-wrapper">
+    <div className="min-h-screen bg-slate-50 page-wrapper dtb-cart-page">
       <SEOHead noindex title="Shopping Cart" />
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-14 pb-8 sm:py-12">
+      <div className="dtb-cart-page__container max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-14 pb-8 sm:py-12">
 
         {/* Page header */}
         <Motion.div
