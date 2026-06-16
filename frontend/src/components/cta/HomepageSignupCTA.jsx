@@ -1,4 +1,4 @@
-import { ChevronRight, Sparkles, X } from 'lucide-react';
+import { ChevronRight, UserPlus, X } from 'lucide-react';
 import './HomepageSignupCTA.css';
 
 export default function HomepageSignupCTA({ isOpen, onClose, onSignup }) {
@@ -25,14 +25,14 @@ export default function HomepageSignupCTA({ isOpen, onClose, onSignup }) {
           <div className="homepage-signup-cta__glow" aria-hidden="true" />
           <div className="homepage-signup-cta__inner">
             <div className="homepage-signup-cta__eyebrow">
-              <Sparkles size={ 14 } strokeWidth={ 2 } />
-              <span>Rewards available</span>
+              <UserPlus size={ 14 } strokeWidth={ 2 } />
+              <span>Contractor account tools</span>
             </div>
             <h2 id="homepage-signup-cta-title" className="homepage-signup-cta__headline">
-              Earn rewards, track orders, and save your tools
+              Track orders and save your tools
             </h2>
             <p className="homepage-signup-cta__body">
-              Create your account for order tracking, rewards, saved products, and contractor account tools.
+              Create your account for order tracking, saved products, repair requests, addresses, and contractor account tools.
             </p>
             <button
               type="button"
