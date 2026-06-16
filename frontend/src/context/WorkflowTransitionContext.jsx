@@ -13,10 +13,14 @@ export function WorkflowTransitionProvider({ children }) {
   const reduceMotion = useReducedMotion();
 
   const showWorkflow = useCallback((payload = {}) => {
+    if (payload.blocking === false) {
+      return;
+    }
+
     setWorkflow({
       label: payload.label || 'Processing…',
       sublabel: payload.sublabel || '',
-      blocking: payload.blocking !== false,
+      blocking: true,
     });
   }, []);
 
@@ -54,7 +58,7 @@ export function WorkflowTransitionProvider({ children }) {
             transition={reduceMotion ? reducedTransition : { duration: dtbDuration.fast, ease: dtbEase.standard }}
             aria-live="polite"
             aria-busy="true"
-            role={workflow.blocking ? 'alertdialog' : 'status'}
+            role="alertdialog"
           >
             <Motion.div
               className="dtb-workflow-card"
