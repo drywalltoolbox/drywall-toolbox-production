@@ -17,46 +17,53 @@ import {
 export function useCatalogFacets(scope = {}) {
   const normalizedScope = normalizeCatalogScope(scope);
   const scopeKey = JSON.stringify(Object.entries(normalizedScope).sort(([a], [b]) => a.localeCompare(b)));
+  const initialCached = getCachedCatalogFacets(normalizedScope, { allowStale: true, returnEntry: true });
 
-  const [facets, setFacets] = useState(() => getCachedCatalogFacets(normalizedScope));
-  const [loading, setLoading] = useState(() => !getCachedCatalogFacets(normalizedScope));
+  const [facets, setFacets] = useState(() => initialCached?.data || null);
+  const [loading, setLoading] = useState(() => !initialCached?.data);
+  const [refreshing, setRefreshing] = useState(() => Boolean(initialCached?.isStale));
   const [error, setError] = useState(null);
 
   useEffect(() => {
     let mounted = true;
-    const cached = getCachedCatalogFacets(normalizedScope);
+    const cached = getCachedCatalogFacets(normalizedScope, { allowStale: true, returnEntry: true });
 
-    if (cached) {
+    if (cached?.data) {
       Promise.resolve().then(() => {
         if (!mounted) return;
-        setFacets(cached);
+        setFacets(cached.data);
         setLoading(false);
+        setRefreshing(true);
+        setError(null);
       });
-      return () => { mounted = false; };
+    } else {
+      Promise.resolve().then(() => {
+        if (!mounted) return;
+        setLoading(true);
+        setRefreshing(false);
+        setError(null);
+      });
     }
-
-    Promise.resolve().then(() => {
-      if (!mounted) return;
-      setLoading(true);
-      setError(null);
-    });
 
     fetchCatalogFacets(normalizedScope)
       .then((data) => {
         if (!mounted) return;
         setFacets(data);
         setLoading(false);
+        setRefreshing(false);
+        setError(null);
       })
       .catch((err) => {
         if (!mounted) return;
         setError(err);
         setLoading(false);
+        setRefreshing(false);
       });
 
     return () => { mounted = false; };
   }, [scopeKey]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  return { facets, loading, error };
+  return { facets, loading, refreshing, error };
 }
 
 /** Invalidate the module-level facets cache (e.g. after an admin action). */
