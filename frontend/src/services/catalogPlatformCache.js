@@ -162,8 +162,6 @@ export function buildCatalogProductParams(query = {}) {
     params.brand = brandToSlug(query.brands[0]);
   }
   if (query.category) params.category = query.category;
-  // Never send display_category and search together — the backend ANDs them,
-  // which returns zero results even when matches exist. Search takes precedence.
   if (!query.search && query.displayCategory) params.display_category = query.displayCategory;
   if (query.toolFamily) params.tool_family = query.toolFamily;
   if (query.productKind) params.product_kind = query.productKind;
@@ -266,11 +264,11 @@ export function fetchCatalogProductSnapshot(query = {}) {
   return snapshotInflight.get(key);
 }
 
-export function fetchCatalogProducts(query = {}) {
+export function fetchCatalogProducts(query = {}, options = {}) {
   const params = buildCatalogProductParams(query);
   const key = sortedKey(params);
   const cached = getCacheEntry(productCache, key, PRODUCT_STORAGE_PREFIX);
-  if (cached?.data) return Promise.resolve(cached.data);
+  if (!options.forceNetwork && cached?.data) return Promise.resolve(cached.data);
 
   if (!productInflight.has(key)) {
     productInflight.set(
@@ -317,5 +315,5 @@ export function prewarmCatalogPlatformForCurrentRoute() {
 
   fetchCatalogProductSnapshot(productQuery).catch(() => {});
   fetchCatalogFacets(facetScope).catch(() => {});
-  fetchCatalogProducts(productQuery).catch(() => {});
+  fetchCatalogProducts(productQuery, { forceNetwork: true }).catch(() => {});
 }
