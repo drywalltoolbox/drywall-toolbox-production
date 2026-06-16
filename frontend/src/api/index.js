@@ -1,8 +1,8 @@
 /**
  * frontend/src/api/index.js
  *
- * Barrel re-export of all src/api/* modules.
- * Import from '@api' instead of individual files.
+ * Barrel re-export of active src/api/* modules.
+ * Rewards are intentionally omitted from launch exports.
  */
 
 export * from './client.js';
@@ -11,4 +11,3 @@ export * from './cart.js';
 export * from './orders.js';
 export * from './customers.js';
 export * from './coupons.js';
-export * from './rewards.js';
