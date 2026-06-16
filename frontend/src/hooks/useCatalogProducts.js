@@ -1,10 +1,3 @@
-/**
- * frontend/src/hooks/useCatalogProducts.js
- *
- * Fetches a paginated page of catalog products from
- * GET /wp-json/dtb/v1/catalog/products.
- */
-
 import { useState, useEffect, useRef } from 'react';
 import {
   fetchCatalogProductSnapshot,
@@ -39,15 +32,7 @@ export function useCatalogProducts(query = {}, options = {}) {
   useEffect(() => {
     if (queryKey === prevKey.current) return undefined;
     prevKey.current = queryKey;
-
-    if (!enabled) {
-      setItems([]);
-      setPagination(DEFAULT_PAGINATION);
-      setLoading(false);
-      setRefreshing(false);
-      setCacheSource('disabled');
-      return undefined;
-    }
+    if (!enabled) return undefined;
 
     let cancelled = false;
     const cached = getRenderableCatalogProducts(query);
@@ -64,10 +49,13 @@ export function useCatalogProducts(query = {}, options = {}) {
         hasRenderableItems.current = true;
       });
     } else {
-      setLoading(true);
-      setRefreshing(false);
-      setCacheSource('none');
-      setError(null);
+      Promise.resolve().then(() => {
+        if (cancelled) return;
+        setLoading(true);
+        setRefreshing(false);
+        setCacheSource('none');
+        setError(null);
+      });
     }
 
     const load = async () => {
@@ -102,8 +90,6 @@ export function useCatalogProducts(query = {}, options = {}) {
       }
     };
 
-    // Do not debounce a route with no visible data. Once there is visible data,
-    // defer the refresh very slightly so filtering/navigation stays responsive.
     const delay = hasRenderableItems.current ? 120 : 0;
     const timer = delay > 0 ? setTimeout(load, delay) : null;
     if (!timer) load();
