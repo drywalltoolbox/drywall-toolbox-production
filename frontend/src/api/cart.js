@@ -223,7 +223,7 @@ export async function placeOrder(
 }
 
 function normalizeShippingMethodTitle(rateId = '', explicitTitle = '') {
-  const title = String( explicitTitle || '' ).trim();
+  const title = typeof explicitTitle === 'string' ? explicitTitle.trim() : '';
   if ( title ) return title;
 
   const [, rawCode = rateId] = String( rateId || '' ).split( ':' );
@@ -267,6 +267,18 @@ export async function syncAndPlace(
     throw new Error( 'Cart is empty.' );
   }
 
+  let resolvedShippingRateTitle = shippingRateTitle;
+  let resolvedCouponCodes = couponCodes;
+  let resolvedPaymentMethodTitle = paymentMethodTitle;
+  let resolvedIdempotencyKey = idempotencyKey;
+
+  if ( Array.isArray( shippingRateTitle ) ) {
+    resolvedShippingRateTitle = '';
+    resolvedCouponCodes = shippingRateTitle;
+    resolvedPaymentMethodTitle = typeof couponCodes === 'string' ? couponCodes : '';
+    resolvedIdempotencyKey = typeof paymentMethodTitle === 'string' ? paymentMethodTitle : '';
+  }
+
   const line_items = safeItems.map( ( item ) => {
     const productId = Number( item?.parent_id || item?.product_id || item?.id || 0 );
     const variationId = Number( item?.parent_id ? item.id : ( item?.variation_id || 0 ) );
@@ -289,12 +301,12 @@ export async function syncAndPlace(
   const shippingLines = shippingRateId
     ? [ {
       method_id: shippingRateId.split( ':' )[0] || 'flat_rate',
-      method_title: normalizeShippingMethodTitle( shippingRateId, shippingRateTitle ),
+      method_title: normalizeShippingMethodTitle( shippingRateId, resolvedShippingRateTitle ),
       total: shippingLineTotal,
     } ]
     : [];
 
-  const resolvedIdempotencyKey = idempotencyKey || `dtb-${ Date.now() }-${ Math.random().toString( 36 ).slice( 2, 10 ) }`;
+  const finalIdempotencyKey = resolvedIdempotencyKey || `dtb-${ Date.now() }-${ Math.random().toString( 36 ).slice( 2, 10 ) }`;
   const gateway = 'woo_native';
 
   const session = await createCheckoutSession( {
@@ -320,16 +332,16 @@ export async function syncAndPlace(
   return finalizeCheckout( {
     gateway,
     session_token: sessionToken,
-    idempotency_key: resolvedIdempotencyKey,
+    idempotency_key: finalIdempotencyKey,
     payment_method: paymentMethod,
-    payment_method_title: paymentMethodTitle || paymentMethod,
+    payment_method_title: resolvedPaymentMethodTitle || paymentMethod,
     payment_ref: paymentRef,
     customer_note: customerNote || '',
     billing: billingAddress,
     shipping: shippingAddress || billingAddress,
     line_items,
     shipping_lines: shippingLines,
-    coupon_codes: Array.isArray( couponCodes ) ? couponCodes : [],
+    coupon_codes: Array.isArray( resolvedCouponCodes ) ? resolvedCouponCodes : [],
     set_paid: markPaid,
   } );
 }
