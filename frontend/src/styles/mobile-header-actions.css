@@ -8,6 +8,16 @@
  * targets for account/cart.
  */
 
+.header-mobile-search-dock {
+  display: none !important;
+}
+
+@media (max-width: 1024px) {
+  .header-mobile-search-dock {
+    display: block !important;
+  }
+}
+
 @media (max-width: 767px) {
   .header-mobile-layout {
     --mobile-header-action-size: 46px;
