@@ -19,7 +19,7 @@ defined( 'ABSPATH' ) || exit;
 final class DTB_VariationReadModelService {
 
 	/** Fields requested from WC REST API for variations. */
-	const VARIATION_FIELDS = 'id,sku,slug,name,type,status,price,regular_price,sale_price,on_sale,purchasable,stock_status,manage_stock,stock_quantity,images,attributes,meta_data,parent_id,description,short_description,backorders_allowed,backordered';
+	const VARIATION_FIELDS = 'id,sku,slug,name,type,status,price,regular_price,sale_price,on_sale,purchasable,stock_status,stock_quantity,manage_stock,image,images,attributes,meta_data,parent_id,description,short_description,backorders_allowed,backordered';
 
 	/** @var array<string,mixed> */
 	private static array $last_diagnostics = [];

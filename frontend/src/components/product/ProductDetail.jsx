@@ -151,6 +151,12 @@ function stripSetIncludesFromDescription(content) {
   if (!content || typeof content !== 'string') return content;
 
   const cleanedHtml = content
+    // Remove a complete Set/Kit Includes section when it is stored in the
+    // product description; structured specs own this content in the PDP.
+    .replace(
+      /<h[1-6][^>]*>\s*(?:set|kit)\s+includes?\s*:?\s*<\/h[1-6]>\s*<(?:ul|ol)[^>]*>\s*(?:<li[^>]*>[\s\S]*?<\/li>\s*)+<\/(?:ul|ol)>\s*/gi,
+      ''
+    )
     // Remove heading rows like "Set Includes" / "Kit Includes" (with optional bullet + colon).
     .replace(
       /<(?:p|div|li|strong|b|h[1-6])[^>]*>\s*(?:<[^>]+>\s*)*(?:&bull;|&#8226;|•)?\s*(?:set|kit)\s+includes?\s*:?\s*(?:<\/[^>]+>\s*)*<\/(?:p|div|li|strong|b|h[1-6])>\s*/gi,

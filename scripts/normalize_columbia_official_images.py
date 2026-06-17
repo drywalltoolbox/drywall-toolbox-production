@@ -339,17 +339,18 @@ NEW_IMAGES_FOR_PRODUCTS: dict[str, list[str]] = {
     ],
     "PTAPER": [
         "columbia_tools_ptaper_01",
-        "columbia_tools_predator_family_01",
+        "columbia_tools_ptaper_02",
+        "columbia_tools_ptaper_03",
+        "columbia_tools_ptaper_04",
+        "columbia_tools_ptaper_05",
     ],
     "SPTAPER": [
         "columbia_tools_sptaper_01",
-        "columbia_tools_predator_family_01",
     ],
     "COL-PREDATOR-MATRIX-HANDLE": [
         "columbia_tools_pmhs_01",
         "columbia_tools_pmh_01",
         "columbia_tools_pmhl_01",
-        "columbia_tools_predator_family_01",
     ],
     "PMHS": [ "columbia_tools_pmhs_01" ],
     "PMH": [ "columbia_tools_pmh_01" ],
@@ -359,28 +360,20 @@ NEW_IMAGES_FOR_PRODUCTS: dict[str, list[str]] = {
         "columbia_tools_pc1hext_01",
         "columbia_tools_pc1h_01",
         "columbia_tools_pchxl_01",
-        "columbia_tools_predator_family_01",
     ],
     "PC1HEXT": [ "columbia_tools_pc1hext_01" ],
     "PC1H": [ "columbia_tools_pc1h_01" ],
     "PCHXL": [ "columbia_tools_pchxl_01" ],
     "PCLT42": [
         "columbia_tools_pclt42_01",
-        "columbia_tools_predator_family_01",
     ],
     "PCMT42": [
         "columbia_tools_pcmt42_01",
         "columbia_tools_pcmt42_02",
         "columbia_tools_pcmt42_03",
-        "columbia_tools_pcmt42_04",
-        "columbia_tools_pcmt42_05",
-        "columbia_tools_pcmt42_06",
-        "columbia_tools_pcmt42_07",
-        "columbia_tools_predator_family_01",
     ],
     "PHMP": [
         "columbia_tools_phmp_01",
-        "columbia_tools_predator_family_01",
     ],
 
     # ── Billet Mud Applicator ─────────────────────────────────────────────────

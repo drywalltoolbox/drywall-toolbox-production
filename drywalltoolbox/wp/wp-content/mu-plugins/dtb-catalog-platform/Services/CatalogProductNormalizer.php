@@ -300,14 +300,39 @@ final class DTB_CatalogProductNormalizer {
 		$images    = $wc['images'] ?? [];
 		$first_url = '';
 		$all_urls  = [];
+		$seen      = [];
+
+		$push_src = static function ( string $src ) use ( &$first_url, &$all_urls, &$seen ): void {
+			$src = trim( $src );
+			if ( '' === $src ) {
+				return;
+			}
+
+			$key = strtolower( rtrim( strtok( $src, '?' ) ?: $src, '/' ) );
+			if ( isset( $seen[ $key ] ) ) {
+				return;
+			}
+
+			$seen[ $key ] = true;
+			if ( '' === $first_url ) {
+				$first_url = $src;
+			}
+			$all_urls[] = $src;
+		};
+
+		if ( isset( $wc['image'] ) ) {
+			if ( is_array( $wc['image'] ) ) {
+				$push_src( (string) ( $wc['image']['src'] ?? '' ) );
+			} elseif ( is_string( $wc['image'] ) ) {
+				$push_src( $wc['image'] );
+			}
+		}
 
 		foreach ( $images as $img ) {
-			$src = (string) ( $img['src'] ?? '' );
-			if ( '' !== $src ) {
-				if ( '' === $first_url ) {
-					$first_url = $src;
-				}
-				$all_urls[] = $src;
+			if ( is_array( $img ) ) {
+				$push_src( (string) ( $img['src'] ?? '' ) );
+			} elseif ( is_string( $img ) ) {
+				$push_src( $img );
 			}
 		}
 
