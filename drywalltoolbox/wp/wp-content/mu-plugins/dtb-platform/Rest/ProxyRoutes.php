@@ -434,6 +434,41 @@ function dtb_checkout_build_idempotency_key( array $context ): string {
 	return 'checkout:auto:' . md5( wp_json_encode( $stable ) ?: '' );
 }
 
+function dtb_checkout_payment_url( WC_Order $order ): string {
+	if ( ! method_exists( $order, 'get_checkout_payment_url' ) ) {
+		return '';
+	}
+
+	$url = (string) $order->get_checkout_payment_url();
+	if ( '' === $url ) {
+		return '';
+	}
+
+	$parts = wp_parse_url( $url );
+	if ( ! is_array( $parts ) ) {
+		return $url;
+	}
+
+	$path = (string) ( $parts['path'] ?? '' );
+	if ( preg_match( '#^/checkout/order-pay(?:/|$)#', $path ) ) {
+		$path = '/wp' . $path;
+	} elseif ( preg_match( '#^/order-pay(?:/|$)#', $path ) ) {
+		$path = '/wp/checkout' . $path;
+	} else {
+		return $url;
+	}
+
+	$normalized = home_url( $path );
+	if ( ! empty( $parts['query'] ) ) {
+		$normalized .= '?' . (string) $parts['query'];
+	}
+	if ( ! empty( $parts['fragment'] ) ) {
+		$normalized .= '#' . (string) $parts['fragment'];
+	}
+
+	return $normalized;
+}
+
 function dtb_checkout_default_gateway(): string {
 	return (string) apply_filters( 'dtb_checkout_default_gateway', 'woo_native' );
 }
@@ -799,8 +834,8 @@ function dtb_checkout_woo_native_finalize( array $context, WP_REST_Request $requ
 		if ( $existing_order ) {
 			$existing_status = (string) $existing_order->get_status();
 			$existing_payment_required = in_array( $existing_status, [ 'pending', 'on-hold', 'failed' ], true );
-			$existing_payment_url = $existing_payment_required && method_exists( $existing_order, 'get_checkout_payment_url' )
-				? (string) $existing_order->get_checkout_payment_url()
+			$existing_payment_url = $existing_payment_required
+				? dtb_checkout_payment_url( $existing_order )
 				: '';
 
 			return [
@@ -912,8 +947,8 @@ function dtb_checkout_woo_native_finalize( array $context, WP_REST_Request $requ
 	}
 
 	$payment_required = ! $set_paid;
-	$payment_url = $payment_required && method_exists( $order, 'get_checkout_payment_url' )
-		? (string) $order->get_checkout_payment_url()
+	$payment_url = $payment_required
+		? dtb_checkout_payment_url( $order )
 		: '';
 
 	return [
@@ -2585,6 +2620,7 @@ function dtb_normalize_detail_variation( array $v ): array {
 		'backordered'             => (bool) ( $v['backordered'] ?? false ),
 		'purchasable'             => (bool) ( $v['purchasable'] ?? false ),
 		'image'                   => $v['image'] ?? null,
+		'images'                  => (array) ( $v['images'] ?? [] ),
 		'attributes'              => $attrs,
 		'variation_attribute_values' => $attr_vals,
 		'description'             => (string) ( $v['description'] ?? '' ),

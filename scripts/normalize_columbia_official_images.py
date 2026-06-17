@@ -100,9 +100,9 @@ OFFICIAL_STEM_TO_NORMALIZED: dict[str, str] = {
     # ── Automatic Taper ──────────────────────────────────────────────────────
     "columbia-automatic-taper-taper-taper-1":                   "columbia_tools_taper_01",
     "columbia-automatic-taper-taper-taper-2":                   "columbia_tools_taper_02",
-    "columbia-automatic-taper-taper-taperhead":                 "columbia_tools_taperhead_01",
-    "columbia-automatic-taper-taper-pumpactionsleeve":          "columbia_tools_pumpactionsleeve_01",
-    "columbia-automatic-taper-taper-taperwnewsleeve":           "columbia_tools_taperwnewsleeve_01",
+    "columbia-automatic-taper-taper-taperhead":                 "columbia_tools_taper_03",
+    "columbia-automatic-taper-taper-taperwnewsleeve":           "columbia_tools_taper_04",
+    "columbia-automatic-taper-taper-pumpactionsleeve":          "columbia_tools_taper_05",
 
     # ── Box Handles (180° Grip / BH) ─────────────────────────────────────────
     # Primary product shot
@@ -331,9 +331,42 @@ NEW_IMAGES_FOR_PRODUCTS: dict[str, list[str]] = {
 
     # ── Automatic Taper ──────────────────────────────────────────────────────
     "COL-AUTOMATIC-TAPER": [
+        "columbia_tools_taper_01",
         "columbia_tools_taper_02",
-        "columbia_tools_taperhead_01",
+        "columbia_tools_taper_03",
+        "columbia_tools_taper_04",
+        "columbia_tools_taper_05",
     ],
+    "PTAPER": [
+        "columbia_tools_ptaper_01",
+        "columbia_tools_predator_family_01",
+    ],
+    "SPTAPER": [
+        "columbia_tools_sptaper_01",
+        "columbia_tools_predator_family_01",
+    ],
+    "COL-PREDATOR-MATRIX-HANDLE": [
+        "columbia_tools_pmhs_01",
+        "columbia_tools_pmh_01",
+        "columbia_tools_pmhl_01",
+        "columbia_tools_predator_family_01",
+    ],
+    "PMHS": [ "columbia_tools_pmhs_01" ],
+    "PMH": [ "columbia_tools_pmh_01" ],
+    "PMHL": [ "columbia_tools_pmhl_01" ],
+    "COL-PREDATOR-ONE-HANDLE": [
+        "columbia_tools_pc1_handles_01",
+        "columbia_tools_pc1hext_01",
+        "columbia_tools_pc1h_01",
+        "columbia_tools_pchxl_01",
+        "columbia_tools_predator_family_01",
+    ],
+    "PC1HEXT": [ "columbia_tools_pc1hext_01" ],
+    "PC1H": [ "columbia_tools_pc1h_01" ],
+    "PCHXL": [ "columbia_tools_pchxl_01" ],
+    "PCLT42": [ "columbia_tools_pclt42_01" ],
+    "PCMT42": [ "columbia_tools_pcmt42_01" ],
+    "PHMP": [ "columbia_tools_phmp_01" ],
 
     # ── Billet Mud Applicator ─────────────────────────────────────────────────
     "COL-BILLET-MUD-APPLICATOR": [
@@ -599,11 +632,8 @@ def build_old_to_new_url_map() -> dict[str, str]:
         "columbia_tools_tws_02":  "columbia_tools_ts_complete_01",
 
         # TAPER (pump-action sleeve, etc.)
-        "columbia_tools_ptaper_01":   "columbia_tools_pumpactionsleeve_01",
-        "columbia_tools_ptaper_02":   "columbia_tools_pumpactionsleeve_01",
-        "columbia_tools_sptaper_01":  "columbia_tools_taperwnewsleeve_01",
-        "columbia_tools_staper_01":   "columbia_tools_taperwnewsleeve_01",
-        "columbia_tools_staper_03":   "columbia_tools_taperwnewsleeve_01",
+        "columbia_tools_staper_01":   "columbia_tools_taper_04",
+        "columbia_tools_staper_03":   "columbia_tools_taper_04",
 
         # MATRIX HANDLES (remove duplicate views)
         "columbia_tools_mhs_02": "columbia_tools_mhs_01",

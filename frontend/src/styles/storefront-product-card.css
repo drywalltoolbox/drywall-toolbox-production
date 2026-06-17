@@ -278,8 +278,8 @@
 
   .dtb-product-card--grid {
     display: grid;
-    grid-template-rows: minmax(0, 1fr) auto;
-    min-height: clamp(430px, 35vw, 520px);
+    grid-template-rows: auto auto;
+    min-height: clamp(350px, 29vw, 430px);
     border-radius: 10px;
     border-color: rgba(203, 213, 225, 0.72);
     background: #ffffff;
@@ -295,10 +295,10 @@
   }
 
   .dtb-product-card--grid .dtb-product-card__image {
-    aspect-ratio: auto;
-    min-height: clamp(270px, 24vw, 390px);
-    height: 100%;
-    padding: clamp(12px, 1.2vw, 18px);
+    aspect-ratio: 4 / 3;
+    min-height: clamp(200px, 17vw, 270px);
+    height: clamp(200px, 17vw, 270px);
+    padding: clamp(10px, 1vw, 16px);
     background: #ffffff;
     position: relative;
     overflow: hidden;
@@ -308,8 +308,8 @@
   .dtb-product-card--grid:hover .dtb-product-card__image .product-card-image { transform: scale(1.035); }
 
   .dtb-product-card--grid .dtb-product-card__meta {
-    min-height: 122px;
-    padding: 14px 16px 15px;
+    min-height: 112px;
+    padding: 12px 15px 14px;
     gap: 0.16rem;
     background: #f4f4f4;
     border-top: 1px solid rgba(15, 23, 42, 0.08);
@@ -409,6 +409,41 @@
   .dtb-product-card--list .dtb-product-card__footer {
     grid-template-columns: minmax(0, max-content) auto;
     justify-content: space-between;
+  }
+
+  .dtb-product-card--list {
+    grid-template-columns: minmax(176px, 220px) minmax(0, 1fr);
+    min-height: 144px;
+    transform: none;
+  }
+
+  .dtb-product-card--list:hover {
+    transform: translateY(-1px);
+  }
+
+  .dtb-product-card--list .dtb-product-card__image {
+    min-height: 144px;
+    height: auto;
+    padding: 14px;
+    background: #ffffff;
+  }
+
+  .dtb-product-card--list .dtb-product-card__meta {
+    display: grid;
+    grid-template-rows: auto auto auto 1px auto;
+    align-content: center;
+    min-height: 0;
+    padding: 14px 16px;
+  }
+
+  .dtb-product-card--list .dtb-product-card__name {
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+  }
+
+  .dtb-product-card--list .dtb-product-card__desc {
+    -webkit-line-clamp: 1;
+    line-clamp: 1;
   }
 
   .dtb-product-card__inside {

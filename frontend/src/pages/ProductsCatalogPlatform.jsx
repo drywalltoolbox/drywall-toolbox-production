@@ -45,6 +45,7 @@ const DISPLAY_CATEGORY_LABELS = {
   parts:                 'Parts',
   stilts:                'Stilts',
   semi_automatic_tapers: 'Semi-Automatic Tapers',
+  predator_family:       'Predator Family',
 };
 
 // Alias map: normalized raw slug → canonical slug.
@@ -84,6 +85,8 @@ const DISPLAY_CATEGORY_ALIASES = {
   replacement_parts:         'parts',
   stilts:                    'stilts',
   semi_automatic_tapers:     'semi_automatic_tapers',
+  predator_family:           'predator_family',
+  predator:                  'predator_family',
 };
 
 /**

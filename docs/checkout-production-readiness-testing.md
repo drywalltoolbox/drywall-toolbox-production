@@ -28,6 +28,7 @@ Required assertions:
 - Staging checkout displays only customer-safe frontend labels such as `Secure card payment` / `Secure Payment`.
 - No customer-facing frontend copy references backend gateway IDs such as `woocommerce_payments`, `WooPayments`, or `WooCommerce payment`.
 - The secure payment page can still use the real backend gateway internally.
+- Checkout initiated from `/staging/2972/checkout` opens the WordPress-backed payment URL at `/wp/checkout/order-pay/...`, not a staged React route.
 
 ### 1.2 Staging isolation
 
@@ -83,6 +84,8 @@ RewriteRule ^order-pay/.*$ wp/index.php [QSA,L]
 ```
 
 These rules ensure payment/order-pay URLs are handled by WordPress instead of the React SPA fallback.
+
+Checkout code also normalizes WooCommerce payment handoff URLs to `/wp/checkout/order-pay/...` before redirecting. This is required for both production checkout at `/checkout` and staging checkout at `/staging/2972/checkout`, because both use the same root WordPress/WooCommerce payment runtime.
 
 ---
 

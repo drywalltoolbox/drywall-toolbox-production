@@ -167,6 +167,7 @@ final class DTB_CategoryNormalizer {
 		'parts'                 => 'Parts',
 		'stilts'                => 'Stilts',
 		'semi_automatic_tapers' => 'Semi-Automatic Tapers',
+		'predator_family'       => 'Predator Family',
 	];
 
 	/**
@@ -252,6 +253,9 @@ final class DTB_CategoryNormalizer {
 		// Semi-Automatic Tapers
 		'semi_automatic_tapers'     => 'semi_automatic_tapers',
 		'semi_automatic_taper'      => 'semi_automatic_tapers',
+		// Predator Family
+		'predator_family'           => 'predator_family',
+		'predator'                  => 'predator_family',
 	];
 
 	/**
@@ -314,6 +318,10 @@ final class DTB_CategoryNormalizer {
 		'semi_automatic_tapers' => [
 			'semi_automatic_tapers', 'semi automatic tapers', 'Semi Automatic Tapers',
 			'semi_automatic_taper',
+		],
+		'predator_family' => [
+			'predator_family', 'predator family', 'Predator Family',
+			'predator-family', 'Predator-Family', 'predator', 'Predator',
 		],
 	];
 

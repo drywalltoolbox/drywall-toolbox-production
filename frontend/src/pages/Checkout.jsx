@@ -144,16 +144,36 @@ function getPaymentBaseUrl() {
   return '';
 }
 
+function normalizeWooPaymentUrl(value) {
+  if (typeof value !== 'string' || !value.trim()) return '';
+
+  const fallbackBase = getPaymentBaseUrl() || 'https://drywalltoolbox.com';
+
+  try {
+    const url = new URL(value.trim(), fallbackBase);
+
+    if (/^\/checkout\/order-pay(?:\/|$)/.test(url.pathname)) {
+      url.pathname = `/wp${url.pathname}`;
+    } else if (/^\/order-pay(?:\/|$)/.test(url.pathname)) {
+      url.pathname = `/wp/checkout${url.pathname}`;
+    }
+
+    return url.toString();
+  } catch {
+    return value.trim();
+  }
+}
+
 function resolvePaymentUrl(orderPayload) {
   const order = orderPayload?.finalize || orderPayload?.order || orderPayload || {};
   const direct = order.payment_url || order.paymentUrl || order.pay_url || order.payUrl || order.checkout_payment_url;
-  if (typeof direct === 'string' && direct.trim()) return direct;
+  if (typeof direct === 'string' && direct.trim()) return normalizeWooPaymentUrl(direct);
 
   const id = order.order_id || order.id || order.orderId;
   const key = order.order_key || order.key || order.orderKey;
   const base = getPaymentBaseUrl();
   if (!id || !key || !base) return '';
-  return `${base}/wp/checkout/order-pay/${encodeURIComponent(id)}/?pay_for_order=true&key=${encodeURIComponent(key)}`;
+  return normalizeWooPaymentUrl(`${base}/wp/checkout/order-pay/${encodeURIComponent(id)}/?pay_for_order=true&key=${encodeURIComponent(key)}`);
 }
 
 function resolveOrderPayload(response) {
@@ -479,7 +499,8 @@ export default function Checkout() {
 
   const resumePendingPayment = useCallback(() => {
     if (pendingPayment?.paymentUrl) {
-      window.location.assign(pendingPayment.paymentUrl);
+      const paymentUrl = normalizeWooPaymentUrl(pendingPayment.paymentUrl);
+      window.location.assign(paymentUrl);
     }
   }, [pendingPayment]);
 

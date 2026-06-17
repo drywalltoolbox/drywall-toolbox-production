@@ -402,12 +402,52 @@ function shouldComposeVariationName(parentProduct, selectedVariation, selectedLa
   return false;
 }
 
+function productImageKey(image) {
+  if (!image) return '';
+  if (typeof image === 'string') return image.trim().split('?')[0].replace(/\/+$/, '').toLowerCase();
+  return String(image.src || image.url || image.full || image.large || '')
+    .trim()
+    .split('?')[0]
+    .replace(/\/+$/, '')
+    .toLowerCase();
+}
+
+function mergeProductImages(...sets) {
+  const out = [];
+  const seen = new Set();
+
+  sets.flat().forEach((image) => {
+    const key = productImageKey(image);
+    if (!key || seen.has(key)) return;
+    seen.add(key);
+    out.push(image);
+  });
+
+  return out;
+}
+
+function getEffectiveVariationImages(parentProduct, selectedVariation) {
+  const selectedImages = mergeProductImages(
+    Array.isArray(selectedVariation?.images) ? selectedVariation.images : [],
+    selectedVariation?.image ? [selectedVariation.image] : []
+  );
+
+  if (selectedImages.length > 1) return selectedImages;
+
+  return mergeProductImages(
+    selectedImages,
+    Array.isArray(parentProduct?.images) ? parentProduct.images : [],
+    parentProduct?.image ? [parentProduct.image] : []
+  );
+}
+
 function composeEffectiveVariationProduct(parentProduct, selectedVariation, selectedLabel) {
   if (!selectedVariation) return parentProduct;
 
   const name = shouldComposeVariationName(parentProduct, selectedVariation, selectedLabel)
     ? `${parentProduct.name} - ${selectedLabel}`
     : (selectedVariation.name || parentProduct.name);
+  const images = getEffectiveVariationImages(parentProduct, selectedVariation);
 
   return {
     ...selectedVariation,
@@ -415,10 +455,8 @@ function composeEffectiveVariationProduct(parentProduct, selectedVariation, sele
     description: selectedVariation.description || parentProduct.description,
     description_full: selectedVariation.description_full || parentProduct.description_full,
     short_description: selectedVariation.short_description || parentProduct.short_description,
-    images: Array.isArray(selectedVariation.images) && selectedVariation.images.length > 0
-      ? selectedVariation.images
-      : parentProduct.images,
-    image: selectedVariation.image || parentProduct.image,
+    images: images.length > 0 ? images : parentProduct.images,
+    image: selectedVariation.image || images[0] || parentProduct.image,
     name,
   };
 }

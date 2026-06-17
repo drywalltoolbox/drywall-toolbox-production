@@ -8,6 +8,10 @@ import './products-selector.css';
  * Used when the API returns a non-representative image for a category card.
  */
 const CATEGORY_IMAGE_OVERRIDES = {
+  'columbia-tools': {
+    'predator_family': 'https://drywalltoolbox.com/wp-content/uploads/2026/media/columbia_tools_predator_family_01.webp',
+    'predator-family': 'https://drywalltoolbox.com/wp-content/uploads/2026/media/columbia_tools_predator_family_01.webp',
+  },
   'platinum-drywall-tools': {
     // Show a flat box handle — not the mini box handle — for this category card
     'handles': 'https://drywalltoolbox.com/wp-content/uploads/2026/media/platinum_pt_bh34_01.webp',
@@ -22,7 +26,10 @@ function toBrandSlug(brandLabel = '') {
 function resolveCategoryImage(brand, category) {
   const slug = toBrandSlug(brand);
   const catKey = (category.key || category.slug || '').toLowerCase();
-  return CATEGORY_IMAGE_OVERRIDES[slug]?.[catKey] || category.image || '';
+  const normalizedCatKey = catKey.replace(/_/g, '-');
+  const underscoredCatKey = catKey.replace(/-/g, '_');
+  const overrides = CATEGORY_IMAGE_OVERRIDES[slug] || {};
+  return overrides[catKey] || overrides[normalizedCatKey] || overrides[underscoredCatKey] || category.image || '';
 }
 
 export default function ProductsCategorySelector({
