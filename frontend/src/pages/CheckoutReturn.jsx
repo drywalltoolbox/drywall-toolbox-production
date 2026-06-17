@@ -57,7 +57,7 @@ export default function CheckoutReturn({ fallbackState = 'complete' }) {
         const state = resolveStatusState(data?.status);
         if (state === 'success') {
           clearPendingCheckoutPayment();
-          clearCart().catch(() => {});
+          Promise.resolve(clearCart()).catch(() => {});
         }
       })
       .catch((err) => {
