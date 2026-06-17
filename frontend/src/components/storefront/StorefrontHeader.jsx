@@ -13,6 +13,7 @@ import StorefrontSearchDock from './StorefrontSearchDock';
 import StorefrontShopMegaMenu from './StorefrontShopMegaMenu.jsx';
 import { useCatalogFacets } from '../../hooks/useCatalogFacets.js';
 import '../../styles/mobile-hamburger.css';
+import '../../styles/mobile-header-actions.css';
 import {
   buildDisplayCategoryUrl,
   mapCatalogBrands,
@@ -550,36 +551,19 @@ export default function Header({ onCartToggle, hasTopTicker = false }) {
               className={`storefront-mobile-drawer__row-link${isActive(to) ? ' is-active' : ''}`}
               onClick={closeMobileMenu}
             >
-              <span>{label}</span>
-              <MobileDrawerChevron />
+              {label}
             </Link>
           ))}
         </nav>
-        <div className="storefront-mobile-drawer__account">
-          {!isLoading && (isAuthenticated ? (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-              <button type="button" onClick={handleMobileAccountClick} className="storefront-mobile-drawer__account-link"><User size={14} />My Account</button>
-              <button type="button" onClick={async () => { closeMobileMenu(); await logout(); }} className="storefront-mobile-drawer__account-link storefront-mobile-drawer__account-link--danger"><LogOut size={14} />Sign Out</button>
-            </div>
-          ) : (
-            <div style={{ display: 'flex', gap: 8 }}>
-              <Link to="/login" onClick={closeMobileMenu} className="storefront-mobile-drawer__account-cta storefront-mobile-drawer__account-cta--ghost"><LogIn size={14} />Sign In</Link>
-              <Link to="/register" onClick={closeMobileMenu} className="storefront-mobile-drawer__account-cta storefront-mobile-drawer__account-cta--primary"><UserPlus size={14} />Register</Link>
-            </div>
-          ))}
-        </div>
       </StorefrontMobileDrawer>
 
       <StorefrontSearchOverlay
         isOpen={searchOverlayOpen}
         query={mobileSearchQuery}
-        setQuery={setMobileSearchQuery}
+        results={searchSuggestions}
+        loading={searchLoading}
         onClose={closeSearchOverlay}
         onViewAll={handleMobileViewAll}
-        loading={searchLoading}
-        brands={drawerBrands.map((brand) => brand.name)}
-        categories={drawerCategoryLinks}
-        suggestions={searchSuggestions}
       />
 
       <AccountHubSheet
@@ -588,29 +572,6 @@ export default function Header({ onCartToggle, hasTopTicker = false }) {
         user={user}
         onLogout={logout}
       />
-
-      <style>{`
-        .header-mobile-search-dock {
-          display: none;
-          width: 100%;
-          padding: 8px 12px 12px;
-          background: transparent;
-          border-top: 1px solid rgba(96, 165, 250, 0.08);
-        }
-
-        @media (max-width: 767px) {
-          .header-mobile-search-dock {
-            display: block;
-          }
-        }
-
-        @media (min-width: 641px) and (max-width: 1024px) {
-          .header-mobile-search-dock {
-            display: block;
-          }
-        }
-
-      `}</style>
     </>
   );
 }
