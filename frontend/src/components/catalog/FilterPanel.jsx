@@ -1,6 +1,32 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { X, ChevronDown, Sliders, RefreshCw, Check } from 'lucide-react';
 import '../../styles/filter-panel.css';
+
+const LAUNCH_FILTER_BRANDS = [
+  'TapeTech',
+  'Columbia Tools',
+  'Level 5',
+  'SurPro',
+  'Dura-Stilts',
+  'Platinum Drywall Tools',
+  'Asgard',
+  'Graco',
+];
+
+function normalizeFilterBrands(brands = []) {
+  const source = Array.isArray(brands) && brands.length > 0 ? brands : LAUNCH_FILTER_BRANDS;
+  const seen = new Set();
+
+  return source
+    .map((brand) => String(brand || '').trim())
+    .filter((brand) => {
+      if (!brand) return false;
+      const key = brand.toLowerCase();
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+}
 
 export default function FilterPanel({
   isOpen,
@@ -23,6 +49,8 @@ export default function FilterPanel({
     price: true,
   });
 
+  const filterBrands = useMemo(() => normalizeFilterBrands(brands), [brands]);
+
   // Close on escape key
   useEffect(() => {
     const handleEscape = (e) => {
@@ -34,6 +62,7 @@ export default function FilterPanel({
       document.addEventListener('keydown', handleEscape);
       return () => document.removeEventListener('keydown', handleEscape);
     }
+    return undefined;
   }, [isOpen, onClose]);
 
   useEffect(() => {
@@ -65,7 +94,7 @@ export default function FilterPanel({
         <div className="lg:sticky lg:top-24 h-full">
           <FilterContent
             categories={categories}
-            brands={brands}
+            brands={filterBrands}
             maxPrice={maxPrice}
             selectedBrands={selectedBrands}
             selectedCategories={selectedCategories}
@@ -85,7 +114,7 @@ export default function FilterPanel({
       {/* Mobile Sidebar - Slide In */}
       {isOpen && (
         <div className="fixed inset-0 z-50 lg:hidden" style={{ top: 'var(--header-height)' }}>
-          <div 
+          <div
             className="absolute inset-0 bg-black/35 backdrop-blur-[1px] filter-mobile-overlay-enter"
             onClick={(e) => {
               if (e.target === e.currentTarget) {
@@ -93,7 +122,7 @@ export default function FilterPanel({
               }
             }}
           />
-          
+
           <div className="absolute inset-x-0 top-0">
             <div
               className="w-full bg-white shadow-2xl overflow-hidden flex flex-col rounded-b-2xl filter-mobile-sheet-enter"
@@ -120,7 +149,7 @@ export default function FilterPanel({
               <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain px-3 py-3">
                 <FilterContent
                   categories={categories}
-                  brands={brands}
+                  brands={filterBrands}
                   maxPrice={maxPrice}
                   selectedBrands={selectedBrands}
                   selectedCategories={selectedCategories}
@@ -311,7 +340,7 @@ function FilterContent({
                   step="50"
                   value={priceRange[0]}
                   onChange={(e) => {
-                    const newMin = parseInt(e.target.value);
+                    const newMin = parseInt(e.target.value, 10);
                     if (newMin <= priceRange[1]) {
                       onPriceChange([newMin, priceRange[1]]);
                     }
@@ -336,7 +365,7 @@ function FilterContent({
                   step="50"
                   value={priceRange[1]}
                   onChange={(e) => {
-                    const newMax = parseInt(e.target.value);
+                    const newMax = parseInt(e.target.value, 10);
                     if (newMax >= priceRange[0]) {
                       onPriceChange([priceRange[0], newMax]);
                     }
