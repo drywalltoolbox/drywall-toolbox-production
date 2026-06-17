@@ -2,7 +2,7 @@
  * frontend/src/api/cart.js
  *
  * WooCommerce Store API cart helpers (/wc/store/v1/cart) plus DTB checkout
- * orchestration helpers for native WooPayments handoff.
+ * orchestration helpers for secure payment handoff.
  */
 import { createCheckoutSession, confirmCheckout, finalizeCheckout } from './checkout.js';
 
@@ -224,7 +224,7 @@ export async function placeOrder(
 
 /**
  * Synchronise CartContext items into the DTB backend checkout contract and
- * create a pending WooCommerce order for native WooPayments collection.
+ * create a pending WooCommerce order for secure payment collection.
  *
  * paymentMethod must be an actual WooCommerce payment gateway ID such as
  * `woocommerce_payments`; `gateway` remains the DTB orchestration adapter.
@@ -240,6 +240,7 @@ export async function syncAndPlace(
   shippingRateTotal = '',
   couponCodes = [],
   paymentMethodTitle = '',
+  idempotencyKey = '',
 ) {
   const safeItems = Array.isArray( cartItems ) ? cartItems : [];
   if ( safeItems.length === 0 ) {
@@ -269,7 +270,7 @@ export async function syncAndPlace(
     ? [ { method_id: shippingRateId.split( ':' )[0] || 'flat_rate', method_title: shippingRateId, total: shippingLineTotal } ]
     : [];
 
-  const idempotencyKey = `dtb-${ Date.now() }-${ Math.random().toString( 36 ).slice( 2, 10 ) }`;
+  const resolvedIdempotencyKey = idempotencyKey || `dtb-${ Date.now() }-${ Math.random().toString( 36 ).slice( 2, 10 ) }`;
   const gateway = 'woo_native';
 
   const session = await createCheckoutSession( {
@@ -295,7 +296,7 @@ export async function syncAndPlace(
   return finalizeCheckout( {
     gateway,
     session_token: sessionToken,
-    idempotency_key: idempotencyKey,
+    idempotency_key: resolvedIdempotencyKey,
     payment_method: paymentMethod,
     payment_method_title: paymentMethodTitle || paymentMethod,
     payment_ref: paymentRef,
