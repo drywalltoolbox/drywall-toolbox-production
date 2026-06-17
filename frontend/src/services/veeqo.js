@@ -12,6 +12,7 @@
  * Documentation: https://developers.veeqo.com/
  */
 
+import { FREE_SHIP_THRESHOLD } from '../constants/shipping.js';
 import { submitRepair } from '../api/repairs.js';
 
 // Server-side proxy base (Veeqo API key kept on the WordPress server).
@@ -21,6 +22,54 @@ const envApiBase = ( process.env.REACT_APP_API_BASE_URL || '' ).replace( /\/+$/,
 const resolvedApiBase = envApiBase || ( /github\.io$/i.test( runtimeHost ) ? 'https://drywalltoolbox.com' : runtimeOrigin );
 
 const DTB_PROXY_BASE = `${ resolvedApiBase.replace( /\/+$/, '' ) }/wp-json/dtb/v1`;
+const FREE_SHIPPING_EXCLUDED_STATES = new Set( [ 'AK', 'ALASKA', 'HI', 'HAWAII' ] );
+
+function normalizeStateCode( value = '' ) {
+  return String( value || '' ).trim().toUpperCase().replace( /\./g, '' );
+}
+
+function isContiguousUsDestination( destination = {} ) {
+  const country = String( destination.country || 'US' ).trim().toUpperCase();
+  const state = normalizeStateCode( destination.state );
+  return ( country === 'US' || country === 'USA' || country === 'UNITED STATES' )
+    && ! FREE_SHIPPING_EXCLUDED_STATES.has( state );
+}
+
+function calculateItemsSubtotal( items = [] ) {
+  return ( Array.isArray( items ) ? items : [] ).reduce( ( total, item ) => {
+    const price = Number( item?.price || 0 );
+    const quantity = Math.max( 1, Number( item?.quantity || 1 ) );
+    return total + ( Number.isFinite( price ) ? price * quantity : 0 );
+  }, 0 );
+}
+
+function isStandardGroundRate( rate = {} ) {
+  const haystack = `${ rate.id || '' } ${ rate.name || '' } ${ rate.service || '' } ${ rate.method || '' }`.toLowerCase();
+  if ( /express|expedited|overnight|next\s*day|2\s*day|two\s*day|priority/.test( haystack ) ) {
+    return false;
+  }
+  return /standard|ground|economy|free|default/.test( haystack );
+}
+
+function normalizeFreeShippingRates( rates = [], destination = {}, items = [] ) {
+  const subtotal = calculateItemsSubtotal( items );
+  const qualifiesForFreeStandard = subtotal >= FREE_SHIP_THRESHOLD && isContiguousUsDestination( destination );
+
+  if ( ! qualifiesForFreeStandard || ! Array.isArray( rates ) ) {
+    return Array.isArray( rates ) ? rates : [];
+  }
+
+  return rates.map( ( rate ) => {
+    if ( ! isStandardGroundRate( rate ) ) return rate;
+    return {
+      ...rate,
+      price: 0,
+      original_price: rate.price,
+      free_shipping_applied: true,
+      name: rate.name || 'Standard Shipping',
+    };
+  } );
+}
 
 class VeeqoService {
   /**
@@ -28,7 +77,9 @@ class VeeqoService {
    *
    * The rate calculation runs on the WordPress server via dtb-veeqo.php and
    * returns tiered domestic / international rates (or a prepaid-label option
-   * for repair service orders).
+   * for repair service orders). Standard ground rates are normalized on the
+   * storefront to honor DTB's free-shipping threshold before checkout totals and
+   * order shipping lines are finalized.
    *
    * @param {{ address: string, city: string, state: string, zip: string, country: string }} destination
    * @param {Array<{ id: number, sku: string, name: string, quantity: number, price: number, weight: number, category: string }>} items
@@ -50,7 +101,7 @@ class VeeqoService {
     }
 
     const data = await res.json();
-    return data.rates || [];
+    return normalizeFreeShippingRates( data.rates || [], destination, items );
   }
 
   /**
@@ -60,7 +111,7 @@ class VeeqoService {
    * workflow so the request is created in WP-Admin and queued for WooCommerce.
    *
    * @param {Object} formData  All fields from the 5-step repair form.
-   * @returns {Promise<{ success: boolean, repair_id: number, public_token: string, status: string, message: string }>}
+   * @returns {Promise<{ success: boolean, repair_id: number, public_token: string, status: string, message: string }>} 
    */
   async submitRepairRequest( formData ) {
     return submitRepair( formData );
