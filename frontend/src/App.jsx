@@ -88,6 +88,7 @@ const ReturnStatus = lazyWithReload(() => import('./pages/ReturnStatus'));
 const SupportStatus = lazyWithReload(() => import('./pages/SupportStatus'));
 const Cart = lazyWithReload(() => import('./pages/Cart'));
 const Checkout = lazyWithReload(() => import('./pages/Checkout'));
+const CheckoutReturn = lazyWithReload(() => import('./pages/CheckoutReturn'));
 const OrderConfirmation = lazyWithReload(() => import('./pages/OrderConfirmation'));
 const OrderTracking = lazyWithReload(() => import('./pages/OrderTracking'));
 const Contact = lazyWithReload(() => import('./pages/Contact'));
@@ -165,6 +166,10 @@ function AppRoutes() {
           <Route path="/preview/technical-specifications" element={<TechnicalSpecificationsPreview />} />
           <Route path="/cart" element={<Cart />} />
           <Route path="/checkout" element={<Checkout />} />
+          <Route path="/checkout/complete" element={<CheckoutReturn fallbackState="complete" />} />
+          <Route path="/checkout/payment-failed" element={<CheckoutReturn fallbackState="failed" />} />
+          <Route path="/checkout/payment-cancelled" element={<CheckoutReturn fallbackState="cancelled" />} />
+          <Route path="/checkout/order-received/:id" element={<CheckoutReturn fallbackState="complete" />} />
           <Route path="/order/:id" element={<OrderConfirmation />} />
           <Route path="/order-tracking/:id" element={<OrderTracking />} />
           <Route path="/contact" element={<Contact />} />
