@@ -1,0 +1,71 @@
+/*
+ * frontend/src/styles/storefront-search-product-cards.css
+ *
+ * Search overlay product results should use the same compact horizontal product
+ * list-card language as the catalog list view, not the legacy custom search row.
+ */
+
+.storefront-search-overlay__results--product-cards {
+  display: grid;
+  gap: 12px;
+}
+
+.storefront-search-overlay__results--product-cards .dtb-product-card--list {
+  width: 100%;
+  color: #0f172a;
+  text-align: left;
+}
+
+.storefront-search-overlay__results--product-cards .dtb-product-card--list:hover {
+  border-color: rgba(147, 197, 253, 0.34);
+}
+
+.storefront-search-overlay__results--product-cards .dtb-product-card__name,
+.storefront-search-overlay__results--product-cards .dtb-product-card__image {
+  -webkit-tap-highlight-color: transparent;
+}
+
+.storefront-search-overlay__result-thumb {
+  position: relative;
+}
+
+@media (max-width: 767px) {
+  .storefront-search-overlay__body {
+    padding: 14px 16px 18px;
+  }
+
+  .storefront-search-overlay__results--product-cards {
+    gap: 12px;
+  }
+
+  .storefront-search-overlay__results--product-cards .dtb-product-card--list {
+    grid-template-columns: minmax(104px, 31.5%) minmax(0, 1fr);
+    min-height: clamp(132px, 36vw, 164px);
+    background: #ffffff;
+  }
+
+  .storefront-search-overlay__results--product-cards .dtb-product-card--list .dtb-product-card__image {
+    background: #ffffff;
+  }
+
+  .storefront-search-overlay__results--product-cards .dtb-product-card--list .dtb-product-card__brand {
+    color: #2563eb;
+  }
+
+  .storefront-search-overlay__results--product-cards .dtb-product-card--list .dtb-product-card__name {
+    color: #0f172a;
+  }
+
+  .storefront-search-overlay__results--product-cards .dtb-product-card--list .dtb-product-card__desc,
+  .storefront-search-overlay__results--product-cards .dtb-product-card--list .dtb-product-card__sku {
+    color: #64748b;
+  }
+
+  .storefront-search-overlay__results--product-cards .dtb-product-card--list .dtb-product-card__price {
+    color: #0f172a !important;
+  }
+
+  .storefront-search-overlay__results--product-cards .dtb-product-card--list .dtb-product-card__compare-price {
+    color: #94a3b8;
+  }
+}
