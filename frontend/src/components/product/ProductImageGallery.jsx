@@ -126,13 +126,19 @@ export default function ProductImageGallery({ product }) {
   const images = imageMeta.map((image) => image.src);
   const hasMultiple = images.length > 1;
   const productKey = `${product?.id ?? ''}|${product?.sku ?? ''}|${product?.parent_id ?? product?.parentId ?? ''}`;
+  const [lastProductKey, setLastProductKey] = useState(productKey);
 
-  useEffect(() => {
+  if (productKey !== lastProductKey) {
+    setLastProductKey(productKey);
     setCurrentIndex(0);
     setDirection(0);
     setImgLoaded({});
+    setLightbox({ open: false, index: 0, dir: 0 });
     setParentImageMeta([]);
-  }, [productKey]);
+  }
+
+  const activeIndex = images.length > 0 ? Math.min(currentIndex, images.length - 1) : 0;
+  const activeLightboxIndex = images.length > 0 ? Math.min(lightbox.index, images.length - 1) : 0;
 
   useEffect(() => {
     const parentId = product?.parent_id || product?.parentId;
@@ -196,16 +202,10 @@ export default function ProductImageGallery({ product }) {
   }, []);
 
   useEffect(() => {
-    currentIndexRef.current = currentIndex;
+    currentIndexRef.current = activeIndex;
     lightboxRef.current = lightbox;
     imagesRef.current = images;
-  }, [currentIndex, lightbox, images]);
-
-  useEffect(() => {
-    if (currentIndex >= images.length) {
-      setCurrentIndex(0);
-    }
-  }, [currentIndex, images.length]);
+  }, [activeIndex, lightbox, images]);
 
   useEffect(() => {
     const handler = (event) => {
@@ -250,12 +250,12 @@ export default function ProductImageGallery({ product }) {
   useEffect(() => {
     if (images.length <= 1) return;
     const length = images.length;
-    [images[(currentIndex + 1) % length], images[(currentIndex - 1 + length) % length]].forEach((src) => {
+    [images[(activeIndex + 1) % length], images[(activeIndex - 1 + length) % length]].forEach((src) => {
       if (!src) return;
       const image = new Image();
       image.src = src;
     });
-  }, [currentIndex, images]);
+  }, [activeIndex, images]);
 
   useEffect(() => {
     const element = galleryRef.current;
@@ -309,8 +309,8 @@ export default function ProductImageGallery({ product }) {
     lbTouchStartTime.current = null;
   };
 
-  const activeMeta = imageMeta[currentIndex] || imageMeta[0];
-  const activeLightboxMeta = imageMeta[lightbox.index] || imageMeta[0];
+  const activeMeta = imageMeta[activeIndex] || imageMeta[0];
+  const activeLightboxMeta = imageMeta[activeLightboxIndex] || imageMeta[0];
 
   return (
     <>
@@ -328,14 +328,14 @@ export default function ProductImageGallery({ product }) {
           onKeyDown={(event) => {
             if (event.key === 'Enter' || event.key === ' ') {
               event.preventDefault();
-              openLightbox(currentIndex);
+              openLightbox(activeIndex);
             }
           }}
         >
           <AnimatePresence>
-            {!imgLoaded[currentIndex] && (
+            {!imgLoaded[activeIndex] && (
               <Motion.div
-                key={`skeleton-${currentIndex}`}
+                key={`skeleton-${activeIndex}`}
                 className="absolute inset-0 bg-linear-to-br from-white to-gray-100 animate-pulse"
                 style={{ zIndex: 1 }}
                 initial={{ opacity: 1 }}
@@ -347,28 +347,28 @@ export default function ProductImageGallery({ product }) {
 
           <AnimatePresence initial={false} custom={direction}>
             <Motion.img
-              key={`${currentIndex}-${images[currentIndex]}`}
-              src={images[currentIndex]}
+              key={`${activeIndex}-${images[activeIndex]}`}
+              src={images[activeIndex]}
               srcSet={activeMeta?.srcSet || undefined}
               sizes={activeMeta?.sizes || '(max-width: 767px) 92vw, 48vw'}
-              alt={`${product?.name || 'Product'} — image ${currentIndex + 1} of ${images.length}`}
+              alt={`${product?.name || 'Product'} — image ${activeIndex + 1} of ${images.length}`}
               custom={direction}
               variants={slideVariants}
               initial="enter"
               animate="center"
               exit="exit"
               transition={slideTransition}
-              loading={currentIndex === 0 ? 'eager' : 'lazy'}
-              fetchPriority={currentIndex === 0 ? 'high' : undefined}
+              loading={activeIndex === 0 ? 'eager' : 'lazy'}
+              fetchPriority={activeIndex === 0 ? 'high' : undefined}
               decoding="async"
               draggable={false}
               className="absolute inset-0 w-full h-full object-contain p-3 sm:p-4"
               style={{ zIndex: 2, backfaceVisibility: 'hidden', WebkitBackfaceVisibility: 'hidden' }}
-              onLoad={() => setImgLoaded((state) => ({ ...state, [currentIndex]: true }))}
+              onLoad={() => setImgLoaded((state) => ({ ...state, [activeIndex]: true }))}
               onError={(event) => {
                 event.currentTarget.onerror = null;
                 event.currentTarget.src = PLACEHOLDER_IMAGE;
-                setImgLoaded((state) => ({ ...state, [currentIndex]: true }));
+                setImgLoaded((state) => ({ ...state, [activeIndex]: true }));
               }}
             />
           </AnimatePresence>
@@ -393,7 +393,7 @@ export default function ProductImageGallery({ product }) {
               </button>
 
               <div className="absolute bottom-3 right-3 z-10 flex items-center px-2.5 py-1 rounded-full bg-black/40 text-white text-xs font-medium tabular-nums backdrop-blur-sm pointer-events-none">
-                {currentIndex + 1} / {images.length}
+                {activeIndex + 1} / {images.length}
               </div>
 
               {images.length <= 8 && (
@@ -401,7 +401,7 @@ export default function ProductImageGallery({ product }) {
                   {images.map((_, index) => (
                     <span
                       key={index}
-                      className={`rounded-full transition-all duration-300 ${index === currentIndex ? 'w-4 h-1.5 bg-white shadow-sm' : 'w-1.5 h-1.5 bg-white/50'}`}
+                      className={`rounded-full transition-all duration-300 ${index === activeIndex ? 'w-4 h-1.5 bg-white shadow-sm' : 'w-1.5 h-1.5 bg-white/50'}`}
                     />
                   ))}
                 </div>
@@ -416,10 +416,10 @@ export default function ProductImageGallery({ product }) {
               <button
                 key={`${image}-${index}`}
                 type="button"
-                onClick={() => goTo(index, index > currentIndex ? 1 : -1)}
+                onClick={() => goTo(index, index > activeIndex ? 1 : -1)}
                 aria-label={`View image ${index + 1}`}
-                aria-current={index === currentIndex ? 'true' : undefined}
-                className={`shrink-0 w-16 h-16 rounded-xl overflow-hidden border-2 transition-all duration-200 ${index === currentIndex ? 'border-blue-600 bg-white ring-2 ring-blue-100/80 scale-[1.04] shadow-sm' : 'border-gray-100 bg-white hover:border-gray-300'}`}
+                aria-current={index === activeIndex ? 'true' : undefined}
+                className={`shrink-0 w-16 h-16 rounded-xl overflow-hidden border-2 transition-all duration-200 ${index === activeIndex ? 'border-blue-600 bg-white ring-2 ring-blue-100/80 scale-[1.04] shadow-sm' : 'border-gray-100 bg-white hover:border-gray-300'}`}
               >
                 <img
                   src={image}
@@ -464,11 +464,11 @@ export default function ProductImageGallery({ product }) {
               >
                 <AnimatePresence initial={false} custom={lightbox.dir}>
                   <Motion.img
-                    key={`${lightbox.index}-${images[lightbox.index]}`}
-                    src={images[lightbox.index]}
+                    key={`${activeLightboxIndex}-${images[activeLightboxIndex]}`}
+                    src={images[activeLightboxIndex]}
                     srcSet={activeLightboxMeta?.srcSet || undefined}
                     sizes={activeLightboxMeta?.sizes || '100vw'}
-                    alt={`${product?.name || 'Product'} — image ${lightbox.index + 1} of ${images.length}`}
+                    alt={`${product?.name || 'Product'} — image ${activeLightboxIndex + 1} of ${images.length}`}
                     custom={lightbox.dir}
                     variants={slideVariants}
                     initial="enter"
@@ -494,7 +494,7 @@ export default function ProductImageGallery({ product }) {
                       <ChevronRight size={26} />
                     </button>
                     <div className="absolute bottom-4 left-1/2 -translate-x-1/2 px-3 py-1.5 rounded-full bg-white/10 text-white text-sm tabular-nums backdrop-blur-sm">
-                      {lightbox.index + 1} / {images.length}
+                      {activeLightboxIndex + 1} / {images.length}
                     </div>
                   </>
                 )}
