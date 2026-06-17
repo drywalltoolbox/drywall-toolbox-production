@@ -1,4 +1,5 @@
 @import url("https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Roboto+Mono:wght@500;600;700&display=swap");
+@import "./mobile-responsive.css";
 
 .dtb-checkout {
   --checkout-font: "Manrope", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
@@ -148,6 +149,14 @@
 
 .dtb-checkout .font-semibold {
   font-weight: 600;
+}
+
+@media (max-width: 767px) {
+  .dtb-checkout input,
+  .dtb-checkout textarea,
+  .dtb-checkout select {
+    font-size: 16px !important;
+  }
 }
 
 @media (max-width: 640px) {
