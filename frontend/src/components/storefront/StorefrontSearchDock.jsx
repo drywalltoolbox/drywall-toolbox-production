@@ -26,6 +26,11 @@ export default function StorefrontSearchDock({
         onKeyDown={onKeyDown}
         placeholder={placeholder}
         aria-label="Search for products"
+        autoComplete="off"
+        autoCorrect="off"
+        autoCapitalize="none"
+        spellCheck={false}
+        enterKeyHint="search"
       />
       {endAdornment ? <span className="storefront-search-dock__action">{endAdornment}</span> : null}
     </label>
