@@ -1,0 +1,92 @@
+/*
+ * Mobile header action sizing.
+ *
+ * The mobile header right slot contains two actions (account + cart). The prior
+ * side-slot width was sized for one action, which caused the two right actions
+ * to compress visually on narrow mobile screens. Keep both side slots symmetric
+ * so the centered logo stays visually centered while preserving full-size touch
+ * targets for account/cart.
+ */
+
+@media (max-width: 767px) {
+  .header-mobile-layout {
+    --mobile-header-action-size: 46px;
+    --mobile-header-action-icon-size: 24px;
+    --mobile-header-side-slot: clamp(92px, 25vw, 108px);
+  }
+
+  .header-mobile-slot {
+    width: var(--mobile-header-side-slot) !important;
+    min-width: var(--mobile-header-side-slot);
+    flex: 0 0 var(--mobile-header-side-slot) !important;
+  }
+
+  .header-mobile-slot--right {
+    gap: clamp(4px, 1.6vw, 8px) !important;
+    padding-right: clamp(2px, 1.2vw, 6px) !important;
+  }
+
+  .header-mobile-slot--left {
+    padding-left: clamp(2px, 1.2vw, 6px) !important;
+  }
+
+  .header-mobile-logo {
+    min-width: 0;
+  }
+
+  .header-mobile-account-toggle,
+  .header-mobile-cart-toggle {
+    width: var(--mobile-header-action-size) !important;
+    height: var(--mobile-header-action-size) !important;
+    min-width: var(--mobile-header-action-size) !important;
+    min-height: var(--mobile-header-action-size) !important;
+    flex: 0 0 var(--mobile-header-action-size) !important;
+    padding: 0 !important;
+    border: 0;
+    border-radius: 12px;
+    background: transparent;
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    color: rgba(255, 255, 255, 0.94);
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
+
+  .header-mobile-account-toggle svg,
+  .header-mobile-cart-toggle svg {
+    width: var(--mobile-header-action-icon-size) !important;
+    height: var(--mobile-header-action-icon-size) !important;
+    min-width: var(--mobile-header-action-icon-size);
+    min-height: var(--mobile-header-action-icon-size);
+    stroke-width: 2.15;
+  }
+
+  .header-mobile-account-toggle:active,
+  .header-mobile-cart-toggle:active {
+    background: rgba(37, 99, 235, 0.12);
+  }
+
+  .header-mobile-cart-toggle .cart-badge {
+    top: 1px !important;
+    right: 1px !important;
+    min-width: 20px !important;
+    height: 20px !important;
+    padding: 0 5px !important;
+    font-size: 10px !important;
+    line-height: 20px;
+    border: 2px solid #070d1c;
+  }
+}
+
+@media (max-width: 374px) {
+  .header-mobile-layout {
+    --mobile-header-action-size: 42px;
+    --mobile-header-action-icon-size: 22px;
+    --mobile-header-side-slot: 88px;
+  }
+
+  .logo-image-mobile {
+    width: clamp(128px, 40vw, 150px) !important;
+  }
+}
