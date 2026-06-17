@@ -7,32 +7,12 @@ const contactInfo = [
   {
     icon: (
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/>
-      </svg>
-    ),
-    label: 'Email',
-    value: 'support@drywalltoolbox.com',
-    href: 'mailto:support@drywalltoolbox.com'
-  },
-  {
-    icon: (
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
         <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.8 19.8 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.12 4.2 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.12.9.34 1.78.66 2.61a2 2 0 0 1-.45 2.11L8 9.99a16 16 0 0 0 6 6l1.55-1.32a2 2 0 0 1 2.11-.45c.83.32 1.71.54 2.61.66A2 2 0 0 1 22 16.92z"/>
       </svg>
     ),
     label: 'Phone',
     value: '(609) 866-5269',
     href: 'tel:+16098665269'
-  },
-  {
-    icon: (
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>
-      </svg>
-    ),
-    label: 'Location',
-    value: 'Tool Repair Services',
-    href: '/repairs'
   }
 ];
 
@@ -86,10 +66,7 @@ export default function Contact() {
       setSuccess(true);
       setFormData({ name: '', email: '', inquiryType: '', message: '' });
     } catch (err) {
-      setError(
-        err?.message ||
-        'Unable to send your message. Please email us directly at elliott.miller@drywalltoolbox.com.'
-      );
+      setError(err?.message || 'Unable to send your message. Please call us directly at (609) 866-5269.');
     } finally {
       setSubmitting(false);
     }
@@ -180,7 +157,7 @@ export default function Contact() {
               Contact Information
             </h2>
             <p style={{ fontSize: '0.875rem', color: 'rgba(15,23,42,0.6)', margin: '0 0 32px 0', lineHeight: 1.6 }}>
-              Reach out directly or use the form and we&apos;ll get back to you within one business day.
+              Call us directly or use the form and we&apos;ll get back to you within one business day.
             </p>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', marginBottom: '32px' }}>
@@ -203,23 +180,18 @@ export default function Contact() {
                     <div style={{ fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '0.1em', color: 'rgba(15,23,42,0.4)', marginBottom: '3px' }}>
                       {item.label}
                     </div>
-                    {item.href ? (
-                      <a
-                        href={item.href}
-                        style={{ fontSize: '0.9rem', color: 'black', textDecoration: 'none', fontFamily: 'var(--font-mono)', wordBreak: 'break-word' }}
-                        onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--primary-600)')}
-                        onMouseLeave={(e) => (e.currentTarget.style.color = 'black')}
-                      >
-                        {item.value}
-                      </a>
-                    ) : (
-                      <div style={{ fontSize: '0.9rem', color: 'black' }}>{item.value}</div>
-                    )}
+                    <a
+                      href={item.href}
+                      style={{ fontSize: '0.9rem', color: 'black', textDecoration: 'none', fontFamily: 'var(--font-mono)', wordBreak: 'break-word' }}
+                      onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--primary-600)')}
+                      onMouseLeave={(e) => (e.currentTarget.style.color = 'black')}
+                    >
+                      {item.value}
+                    </a>
                   </div>
                 </div>
               ))}
             </div>
-
           </div>
 
           {/* Right: form */}
