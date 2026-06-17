@@ -222,6 +222,25 @@ export async function placeOrder(
   } );
 }
 
+function normalizeShippingMethodTitle(rateId = '', explicitTitle = '') {
+  const title = String( explicitTitle || '' ).trim();
+  if ( title ) return title;
+
+  const [, rawCode = rateId] = String( rateId || '' ).split( ':' );
+  const code = rawCode.toLowerCase().trim();
+  const labels = {
+    standard: 'Standard Shipping',
+    express: 'Express Shipping',
+    overnight: 'Overnight Shipping',
+    intl_standard: 'International Standard Shipping',
+    intl_express: 'International Express Shipping',
+    repair_standard: 'Repair Service Shipping',
+  };
+
+  if ( labels[ code ] ) return labels[ code ];
+  return 'Shipping';
+}
+
 /**
  * Synchronise CartContext items into the DTB backend checkout contract and
  * create a pending WooCommerce order for secure payment collection.
@@ -238,6 +257,7 @@ export async function syncAndPlace(
   customerNote = '',
   shippingRateId = '',
   shippingRateTotal = '',
+  shippingRateTitle = '',
   couponCodes = [],
   paymentMethodTitle = '',
   idempotencyKey = '',
@@ -267,7 +287,11 @@ export async function syncAndPlace(
   const paymentRef = paymentData?.[0]?.value || '';
   const markPaid = paymentRef !== '';
   const shippingLines = shippingRateId
-    ? [ { method_id: shippingRateId.split( ':' )[0] || 'flat_rate', method_title: shippingRateId, total: shippingLineTotal } ]
+    ? [ {
+      method_id: shippingRateId.split( ':' )[0] || 'flat_rate',
+      method_title: normalizeShippingMethodTitle( shippingRateId, shippingRateTitle ),
+      total: shippingLineTotal,
+    } ]
     : [];
 
   const resolvedIdempotencyKey = idempotencyKey || `dtb-${ Date.now() }-${ Math.random().toString( 36 ).slice( 2, 10 ) }`;
