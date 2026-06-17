@@ -8,12 +8,25 @@ import {
 
 const WorkflowTransitionContext = createContext(null);
 
+function shouldSuppressWorkflowOverlay(payload = {}) {
+  if (payload.blocking === false) {
+    return true;
+  }
+
+  const label = String(payload.label || '').toLowerCase();
+  const sublabel = String(payload.sublabel || '').toLowerCase();
+
+  return label.includes('preparing secure payment')
+    || label.includes('creating your order')
+    || sublabel.includes('secure payment page');
+}
+
 export function WorkflowTransitionProvider({ children }) {
   const [workflow, setWorkflow] = useState(null);
   const reduceMotion = useReducedMotion();
 
   const showWorkflow = useCallback((payload = {}) => {
-    if (payload.blocking === false) {
+    if (shouldSuppressWorkflowOverlay(payload)) {
       return;
     }
 
