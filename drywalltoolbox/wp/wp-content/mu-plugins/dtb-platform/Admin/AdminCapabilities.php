@@ -141,6 +141,31 @@ function dtb_admin_assign_capabilities(): void {
 add_action( 'init', 'dtb_admin_assign_capabilities', 5 );
 
 /**
+ * Allow WordPress administrators to pass DTB custom capability checks even if
+ * role capability rows are stale after a deployment or database restore.
+ *
+ * @param array<string,bool> $allcaps User's resolved capabilities.
+ * @param string[]           $caps    Primitive capabilities being checked.
+ * @return array<string,bool>
+ */
+function dtb_admin_grant_custom_caps_to_site_admins( array $allcaps, array $caps ): array {
+	if ( empty( $allcaps['manage_options'] ) ) {
+		return $allcaps;
+	}
+
+	$dtb_caps = array_flip( dtb_admin_all_capabilities() );
+	foreach ( $caps as $cap ) {
+		if ( isset( $dtb_caps[ $cap ] ) ) {
+			$allcaps[ $cap ] = true;
+		}
+	}
+
+	return $allcaps;
+}
+
+add_filter( 'user_has_cap', 'dtb_admin_grant_custom_caps_to_site_admins', 10, 2 );
+
+/**
  * Create custom DTB roles if they do not exist.
  * Called once on plugin activation or from admin init.
  */

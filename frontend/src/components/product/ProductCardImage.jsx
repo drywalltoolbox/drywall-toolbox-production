@@ -62,11 +62,14 @@ export default function ProductCardImage({
     [preferThumbnail, product, src],
   );
 
-  const [failedSrc, setFailedSrc] = useState(null);
-  const [loadedSrc, setLoadedSrc] = useState(null);
+  const [failedState, setFailedState] = useState({ key: '', src: null });
+  const [loadedState, setLoadedState] = useState({ key: '', src: null });
   const imgRef = useRef(null);
+  const failedSrc = failedState.key === initialSrc ? failedState.src : null;
+  const loadedSrc = loadedState.key === initialSrc ? loadedState.src : null;
   const imgSrc = failedSrc === initialSrc ? PLACEHOLDER : initialSrc;
   const loaded = loadedSrc === imgSrc;
+  const effectiveSrcSet = imgSrc === PLACEHOLDER ? undefined : (srcSet || product?.image_srcset || undefined);
 
   // When an image is already in the browser cache the browser fires onLoad
   // synchronously while the <img> src is being set — before React has committed
@@ -83,10 +86,10 @@ export default function ProductCardImage({
     // we are not calling setState synchronously inside the effect body.
     queueMicrotask(() => {
       if (el.naturalWidth === 0) {
-        if (imgSrc !== PLACEHOLDER) setFailedSrc(initialSrc);
-        else setLoadedSrc(PLACEHOLDER);
+        if (imgSrc !== PLACEHOLDER) setFailedState({ key: initialSrc, src: initialSrc });
+        else setLoadedState({ key: initialSrc, src: PLACEHOLDER });
       } else {
-        setLoadedSrc(imgSrc);
+        setLoadedState({ key: initialSrc, src: imgSrc });
       }
     });
   }, [imgSrc, initialSrc]); // re-run whenever the resolved src changes
@@ -112,7 +115,7 @@ export default function ProductCardImage({
       <img
         ref={imgRef}
         src={imgSrc}
-        srcSet={srcSet || product?.image_srcset || undefined}
+        srcSet={effectiveSrcSet}
         sizes={sizes || product?.image_sizes || undefined}
         alt={alt || product?.name || 'Product image'}
         width={width}
@@ -136,13 +139,13 @@ export default function ProductCardImage({
           transitionDelay: loaded ? '50ms' : '0ms',
           zIndex: 1,
         }}
-        onLoad={() => setLoadedSrc(imgSrc)}
+        onLoad={() => setLoadedState({ key: initialSrc, src: imgSrc })}
         onError={() => {
           if (imgSrc !== PLACEHOLDER) {
-            setFailedSrc(initialSrc);
+            setFailedState({ key: initialSrc, src: initialSrc });
             return;
           }
-          setLoadedSrc(PLACEHOLDER);
+          setLoadedState({ key: initialSrc, src: PLACEHOLDER });
         }}
       />
     </div>

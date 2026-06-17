@@ -297,6 +297,8 @@ function dtb_operations_menu_register_pages(): void {
 
 	// System Manager.
 	dtb_register_admin_page( [
+		'library'    => 'operations',
+		'slug'       => 'dtb-system-manager',
 		'title'      => __( 'System Manager', 'drywall-toolbox' ),
 		'menu_title' => __( 'System Manager', 'drywall-toolbox' ),
 		'capability' => 'dtb_manage_system',

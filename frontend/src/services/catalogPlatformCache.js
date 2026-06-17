@@ -3,7 +3,7 @@ import { brandToSlug, parseCatalogQuery } from '../utils/catalogUrlState.js';
 
 const FRESH_CACHE_TTL = 5 * 60 * 1000;
 const STALE_CACHE_TTL = 24 * 60 * 60 * 1000;
-const CACHE_VERSION = 'v3';
+const CACHE_VERSION = 'v4';
 const PRODUCT_STORAGE_PREFIX = `dtb:catalog-products:${CACHE_VERSION}:`;
 const FACETS_STORAGE_PREFIX = `dtb:catalog-facets:${CACHE_VERSION}:`;
 

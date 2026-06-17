@@ -25,6 +25,7 @@ function dtb_system_manager_render_page(): void {
 		[ 'id' => 'integrations', 'label' => __( 'Integrations', 'drywall-toolbox' ),  'active' => $active_tab === 'integrations', 'url' => add_query_arg( 'tab', 'integrations', $base_url ) ],
 		[ 'id' => 'webhooks',     'label' => __( 'Webhooks', 'drywall-toolbox' ),       'active' => $active_tab === 'webhooks',     'url' => add_query_arg( 'tab', 'webhooks',     $base_url ) ],
 		[ 'id' => 'audit',        'label' => __( 'Audit Log', 'drywall-toolbox' ),      'active' => $active_tab === 'audit',        'url' => add_query_arg( 'tab', 'audit',        $base_url ) ],
+		[ 'id' => 'logs',         'label' => __( 'Debug Log', 'drywall-toolbox' ),      'active' => $active_tab === 'logs',         'url' => add_query_arg( 'tab', 'logs',         $base_url ) ],
 	];
 
 	dtb_admin_shell_open( [
@@ -58,6 +59,9 @@ function dtb_system_manager_render_page(): void {
 			break;
 		case 'audit':
 			dtb_system_manager_render_audit_tab();
+			break;
+		case 'logs':
+			dtb_system_manager_render_logs_tab();
 			break;
 		default:
 			dtb_system_manager_render_system_tab();
@@ -245,4 +249,47 @@ function dtb_system_manager_render_audit_tab(): void {
 	$body = ob_get_clean();
 	// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 	echo dtb_admin_ui_card( $body, [ 'title' => __( 'Recent Audit Events', 'drywall-toolbox' ) ] );
+}
+
+function dtb_system_manager_render_logs_tab(): void {
+	$log = dtb_system_php_log_tail( 200 );
+
+	ob_start();
+	echo dtb_admin_ui_detail_row(
+		__( 'Status', 'drywall-toolbox' ),
+		dtb_admin_ui_badge(
+			! empty( $log['available'] ) ? __( 'Readable', 'drywall-toolbox' ) : __( 'Unavailable', 'drywall-toolbox' ),
+			! empty( $log['available'] ) ? 'success' : 'warning'
+		)
+	);
+	echo dtb_admin_ui_detail_row( __( 'Path', 'drywall-toolbox' ), $log['path'] ? '<code>' . esc_html( $log['path'] ) . '</code>' : '&mdash;' );
+	echo dtb_admin_ui_detail_row( __( 'Size', 'drywall-toolbox' ), esc_html( size_format( (int) ( $log['size_bytes'] ?? 0 ) ) ) );
+	echo dtb_admin_ui_detail_row( __( 'Modified', 'drywall-toolbox' ), $log['modified_gmt'] ? esc_html( $log['modified_gmt'] ) : '&mdash;' );
+	$summary = ob_get_clean();
+
+	// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+	echo dtb_admin_ui_card( $summary, [ 'title' => __( 'Debug Log Source', 'drywall-toolbox' ) ] );
+
+	if ( empty( $log['available'] ) ) {
+		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		echo dtb_admin_ui_empty_state(
+			__( 'Debug Log Unavailable', 'drywall-toolbox' ),
+			esc_html( (string) ( $log['error'] ?? __( 'Enable WP_DEBUG_LOG or make the configured log path readable.', 'drywall-toolbox' ) ) )
+		);
+		return;
+	}
+
+	$lines = (array) ( $log['lines'] ?? [] );
+	if ( empty( $lines ) ) {
+		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		echo dtb_admin_ui_empty_state( __( 'Debug Log Empty', 'drywall-toolbox' ), __( 'No log entries were found in the readable log file.', 'drywall-toolbox' ) );
+		return;
+	}
+
+	$body = '<pre class="dtb-system-log-tail" style="max-height:560px;overflow:auto;white-space:pre-wrap;word-break:break-word;margin:0;font-size:12px;line-height:1.55;">'
+		. esc_html( implode( "\n", $lines ) )
+		. '</pre>';
+
+	// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+	echo dtb_admin_ui_card( $body, [ 'title' => __( 'Latest Log Entries', 'drywall-toolbox' ) ] );
 }

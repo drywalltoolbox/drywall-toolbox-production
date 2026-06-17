@@ -96,7 +96,7 @@ function dtb_settings_render_page(): void {
 	// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 	echo dtb_admin_ui_button( __( 'Save Settings', 'drywall-toolbox' ), [
 		'type'    => 'primary',
-		'attr'    => 'type="submit"',
+		'btn_type' => 'submit',
 		'icon'    => 'dashicons-saved',
 		'loading' => true,
 	] );

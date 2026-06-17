@@ -177,6 +177,9 @@ function dtb_system_manager_admin_system_handler( WP_REST_Request $request ): WP
 		case 'audit':
 			dtb_system_manager_render_audit_tab();
 			break;
+		case 'logs':
+			dtb_system_manager_render_logs_tab();
+			break;
 		default:
 			dtb_system_manager_render_system_tab();
 			break;

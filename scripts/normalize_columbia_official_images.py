@@ -364,9 +364,24 @@ NEW_IMAGES_FOR_PRODUCTS: dict[str, list[str]] = {
     "PC1HEXT": [ "columbia_tools_pc1hext_01" ],
     "PC1H": [ "columbia_tools_pc1h_01" ],
     "PCHXL": [ "columbia_tools_pchxl_01" ],
-    "PCLT42": [ "columbia_tools_pclt42_01" ],
-    "PCMT42": [ "columbia_tools_pcmt42_01" ],
-    "PHMP": [ "columbia_tools_phmp_01" ],
+    "PCLT42": [
+        "columbia_tools_pclt42_01",
+        "columbia_tools_predator_family_01",
+    ],
+    "PCMT42": [
+        "columbia_tools_pcmt42_01",
+        "columbia_tools_pcmt42_02",
+        "columbia_tools_pcmt42_03",
+        "columbia_tools_pcmt42_04",
+        "columbia_tools_pcmt42_05",
+        "columbia_tools_pcmt42_06",
+        "columbia_tools_pcmt42_07",
+        "columbia_tools_predator_family_01",
+    ],
+    "PHMP": [
+        "columbia_tools_phmp_01",
+        "columbia_tools_predator_family_01",
+    ],
 
     # ── Billet Mud Applicator ─────────────────────────────────────────────────
     "COL-BILLET-MUD-APPLICATOR": [

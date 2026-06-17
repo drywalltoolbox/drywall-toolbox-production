@@ -198,6 +198,32 @@ function mergeDisplayCategories(displayCategoriesByBrand = {}) {
   return mergeCategoryEntries(allCategories);
 }
 
+function getDisplayCategoriesForBrand(displayCategoriesByBrand = {}, brandFacet = null, selectedBrand = '', routeBrandSlug = '') {
+  if (!displayCategoriesByBrand || typeof displayCategoriesByBrand !== 'object') return [];
+
+  const selectedLabel = canonicalBrandLabel(selectedBrand);
+  const candidates = [
+    brandFacet?.key,
+    brandFacet?.slug,
+    routeBrandSlug,
+    selectedBrand,
+    selectedLabel,
+    brandToSlug(selectedBrand),
+    brandToSlug(selectedLabel),
+  ].filter(Boolean);
+
+  for (const candidate of candidates) {
+    const direct = displayCategoriesByBrand[candidate];
+    if (Array.isArray(direct)) return direct;
+
+    const slug = brandToSlug(candidate);
+    if (slug && Array.isArray(displayCategoriesByBrand[slug])) return displayCategoriesByBrand[slug];
+  }
+
+  const scopedEntries = Object.values(displayCategoriesByBrand).filter(Array.isArray);
+  return scopedEntries.length === 1 ? scopedEntries[0] : [];
+}
+
 function toBrandFacet(rawBrand = {}) {
   const label = canonicalBrandLabel(rawBrand.label || rawBrand.name || rawBrand.key || rawBrand.slug || '');
   const slug = rawBrand.slug || rawBrand.key || brandToSlug(label);
@@ -294,20 +320,20 @@ export default function ProductsCatalogPlatform({ forceProductGrid = false, titl
 
   const filterCategories = useMemo(() => {
     if (!facets) return [];
-    if (selectedBrandFacet?.key) {
-      const byBrand = facets.displayCategoriesByBrand?.[selectedBrandFacet.key] || facets.displayCategoriesByBrand?.[selectedBrandFacet.slug];
+    if (selectedBrand) {
+      const byBrand = getDisplayCategoriesForBrand(facets.displayCategoriesByBrand, selectedBrandFacet, selectedBrand, brandSlug);
       if (!Array.isArray(byBrand)) return [];
       return mergeCategoryEntries(byBrand);
     }
     return mergeDisplayCategories(facets.displayCategoriesByBrand);
-  }, [facets, selectedBrandFacet]);
+  }, [brandSlug, facets, selectedBrand, selectedBrandFacet]);
 
   const brandCategoryCards = useMemo(() => {
-    if (!selectedBrandFacet?.key) return [];
-    const byBrand = facets?.displayCategoriesByBrand?.[selectedBrandFacet.key] || facets?.displayCategoriesByBrand?.[selectedBrandFacet.slug];
+    if (!selectedBrand) return [];
+    const byBrand = getDisplayCategoriesForBrand(facets?.displayCategoriesByBrand, selectedBrandFacet, selectedBrand, brandSlug);
     if (!Array.isArray(byBrand)) return [];
     return mergeCategoryEntries(byBrand);
-  }, [facets, selectedBrandFacet]);
+  }, [brandSlug, facets, selectedBrand, selectedBrandFacet]);
 
   const selectedCategoryLabel = useMemo(() => {
     if (!query.displayCategory) return '';

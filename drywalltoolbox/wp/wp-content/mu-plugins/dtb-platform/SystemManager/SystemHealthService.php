@@ -104,6 +104,66 @@ function dtb_system_php_log_summary(): array {
 	];
 }
 
+/**
+ * Read the last lines from the active PHP/WP debug log.
+ *
+ * @param int $max_lines Maximum lines to return.
+ * @return array{available:bool,path:string,size_bytes:int,modified_gmt:string,lines:string[],error:string}
+ */
+function dtb_system_php_log_tail( int $max_lines = 200 ): array {
+	$summary = dtb_system_php_log_summary();
+	$path    = (string) ( $summary['path'] ?? '' );
+
+	$result = [
+		'available'    => (bool) ( $summary['available'] ?? false ),
+		'path'         => $path,
+		'size_bytes'   => (int) ( $summary['size_bytes'] ?? 0 ),
+		'modified_gmt' => (string) ( $summary['modified_gmt'] ?? '' ),
+		'lines'        => [],
+		'error'        => '',
+	];
+
+	if ( '' === $path || ! is_readable( $path ) ) {
+		$result['available'] = false;
+		$result['error']     = __( 'No readable WP debug/PHP log file was found.', 'drywall-toolbox' );
+		return $result;
+	}
+
+	$max_lines  = max( 20, min( 500, $max_lines ) );
+	$max_bytes  = 256 * 1024;
+	$size_bytes = (int) filesize( $path );
+	$offset     = max( 0, $size_bytes - $max_bytes );
+	$handle     = fopen( $path, 'rb' ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fopen
+
+	if ( false === $handle ) {
+		$result['available'] = false;
+		$result['error']     = __( 'The log file exists but could not be opened.', 'drywall-toolbox' );
+		return $result;
+	}
+
+	if ( $offset > 0 ) {
+		fseek( $handle, $offset );
+		fgets( $handle ); // discard a partial first line.
+	}
+
+	$contents = stream_get_contents( $handle );
+	fclose( $handle ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fclose
+
+	if ( false === $contents || '' === $contents ) {
+		return $result;
+	}
+
+	$lines = preg_split( '/\R/', $contents );
+	if ( ! is_array( $lines ) ) {
+		return $result;
+	}
+
+	$lines           = array_values( array_filter( $lines, static fn( string $line ): bool => '' !== trim( $line ) ) );
+	$result['lines'] = array_slice( $lines, -$max_lines );
+
+	return $result;
+}
+
 function dtb_system_rest_health_summary(): array {
 	$routes = rest_get_server()->get_routes();
 	$dtb    = array_filter( array_keys( $routes ), static fn( string $route ): bool => str_starts_with( $route, '/dtb/v1/' ) );
