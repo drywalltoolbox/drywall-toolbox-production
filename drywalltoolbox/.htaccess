@@ -53,6 +53,13 @@ Options +FollowSymLinks
   RewriteCond %{QUERY_STRING} (^|&)wc-api= [NC]
   RewriteRule ^$ wp/index.php [QSA,L]
 
+  # WooCommerce payment/order-pay endpoints must be handled by WordPress, not by
+  # the React SPA shell. Without this rule, secure-payment redirects can fall
+  # back into the public landing/coming-soon page instead of the payment runtime.
+  RewriteRule ^checkout/order-pay/.*$ wp/index.php [QSA,L]
+  RewriteRule ^checkout/.*order-pay.*$ wp/index.php [QSA,L]
+  RewriteRule ^order-pay/.*$ wp/index.php [QSA,L]
+
   # Force homepage to the static React landing page after API fallbacks.
   RewriteRule ^$ index.html [L]
 
