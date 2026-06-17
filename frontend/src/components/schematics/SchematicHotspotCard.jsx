@@ -16,12 +16,25 @@ import {
 
 const _variantSkuCache = new Map();
 
-function getDisplayCode(part) {
-  return part?.sku || part?.source_sku || '';
+function getDisplayCode(part, product) {
+  return product?.sku || part?.sku || part?.source_sku || '';
 }
 
-function getCodeLabel(part) {
-  return part?.sku ? 'SKU' : part?.source_sku ? 'Ref' : 'SKU';
+function getCodeLabel(part, product) {
+  return product?.sku || part?.sku ? 'SKU' : part?.source_sku ? 'Ref' : 'SKU';
+}
+
+function getDisplayName(part, product) {
+  return product?.name || part?.name || '';
+}
+
+function getDisplayBrand(part, product) {
+  return product?.brand || part?.brand || 'Parts';
+}
+
+function getPrimaryImage(product) {
+  if (Array.isArray(product?.images) && product.images[0]) return product.images[0];
+  return product?.image || '';
 }
 
 function getTitleFitStyle(name = '') {
@@ -109,10 +122,10 @@ function StockBadge({ stockStatus }) {
 // SchematicHotspotCard
 //
 // Renders the hotspot part detail card used in both the mobile overlay modal
-// and the desktop detached modal. The card also guards Columbia schematic size
-// variants against stale base-schematic SKU/product state, so selected variation
-// hotspots resolve against the selected variation part number, image, price,
-// stock status, add-to-cart target, and image lightbox.
+// and the desktop detached modal. The hotspot identity is SKU-first: schematic
+// JSON supplies the clickable coordinate and fallback metadata, but live product
+// data fetched by SKU is authoritative for customer-facing name, SKU, price,
+// image, stock status, product link, and add-to-cart payload.
 // ---------------------------------------------------------------------------
 
 export default function SchematicHotspotCard({
@@ -136,6 +149,11 @@ export default function SchematicHotspotCard({
   const needsVariantLookup = Boolean(usesVariantPart && displayPart?.sku && !parentProductMatches);
   const effectiveProduct = needsVariantLookup ? variantProduct : product;
   const effectiveStockStatus = needsVariantLookup ? variantStockStatus : stockStatus;
+  const displayName = getDisplayName(displayPart, effectiveProduct);
+  const displayBrand = getDisplayBrand(displayPart, effectiveProduct);
+  const displayCode = getDisplayCode(displayPart, effectiveProduct);
+  const codeLabel = getCodeLabel(displayPart, effectiveProduct);
+  const primaryImage = getPrimaryImage(effectiveProduct);
 
   useEffect(() => {
     if (!needsVariantLookup) {
@@ -200,12 +218,10 @@ export default function SchematicHotspotCard({
 
   if (!part) return null;
 
-  const displayCode  = getDisplayCode(displayPart);
-  const codeLabel    = getCodeLabel(displayPart);
   const { priceLabel, comparePriceLabel } = getPriceData(effectiveProduct, displayPart, effectiveStockStatus);
-  const isAdding     = addingToCart === part.id || variantAdding;
-  const canAdd       = Boolean(effectiveProduct?.id) && effectiveStockStatus !== null;
-  const isResolving  = Boolean(displayPart.sku) && effectiveStockStatus === null;
+  const isAdding = addingToCart === part.id || variantAdding;
+  const canAdd = Boolean(effectiveProduct?.id) && effectiveStockStatus !== null;
+  const isResolving = Boolean(displayPart.sku) && effectiveStockStatus === null;
   const isUnavailable = !canAdd && !isResolving;
 
   const ctaLabel = isAdding    ? 'Adding…'
@@ -220,9 +236,9 @@ export default function SchematicHotspotCard({
       style={{ color: 'inherit', textDecoration: 'none' }}
       className="hotspot-modal-title-link"
     >
-      {displayPart.name}
+      {displayName}
     </Link>
-  ) : displayPart.name;
+  ) : displayName;
 
   const openLightbox = (event) => {
     event.stopPropagation();
@@ -248,11 +264,11 @@ export default function SchematicHotspotCard({
       await addToCart({
         id: effectiveProduct.id,
         name: effectiveProduct.name || displayPart.name,
-        brand: displayPart.brand || 'Parts',
+        brand: displayBrand,
         price: parseFloat(effectiveProduct.price) || 0,
         part_number: effectiveProduct.sku || displayPart.sku,
         sku: effectiveProduct.sku || displayPart.sku,
-        image: effectiveProduct.images?.[0] || PLACEHOLDER_IMAGE,
+        image: primaryImage || PLACEHOLDER_IMAGE,
         permalink: effectiveProduct.permalink || '',
         _wcProduct: effectiveProduct,
       }, 1);
@@ -266,7 +282,7 @@ export default function SchematicHotspotCard({
     <>
       <div className={`schematic-hotspot-card${isResolving ? ' schematic-hotspot-card--resolving' : ''}`}>
         <div className="schematic-hotspot-card__image">
-          {effectiveProduct?.images?.[0] ? (
+          {primaryImage ? (
             <button
               className="hotspot-modal-image-btn"
               onClick={openLightbox}
@@ -274,8 +290,8 @@ export default function SchematicHotspotCard({
               title="View full-size image"
             >
               <img
-                src={effectiveProduct.images[0]}
-                alt={displayPart.name}
+                src={primaryImage}
+                alt={displayName}
                 className="hotspot-modal-image"
               />
             </button>
@@ -301,7 +317,7 @@ export default function SchematicHotspotCard({
             <StockBadge stockStatus={effectiveStockStatus} />
           </div>
 
-          <h3 className="schematic-hotspot-card__title" style={getTitleFitStyle(displayPart.name)}>
+          <h3 className="schematic-hotspot-card__title" style={getTitleFitStyle(displayName)}>
             {titleNode}
           </h3>
 
@@ -338,11 +354,11 @@ export default function SchematicHotspotCard({
         </div>
       </div>
 
-      {localLightboxOpen && effectiveProduct?.images?.[0] && typeof document !== 'undefined' && createPortal(
+      {localLightboxOpen && primaryImage && typeof document !== 'undefined' && createPortal(
         <div
           role="dialog"
           aria-modal="true"
-          aria-label={`Full-size image: ${displayPart.name}`}
+          aria-label={`Full-size image: ${displayName}`}
           style={{
             position: 'fixed',
             inset: 0,
@@ -358,8 +374,8 @@ export default function SchematicHotspotCard({
             aria-hidden="true"
           />
           <img
-            src={effectiveProduct.images[0]}
-            alt={displayPart.name}
+            src={primaryImage}
+            alt={displayName}
             style={{
               position: 'relative',
               maxWidth: '90vw',
