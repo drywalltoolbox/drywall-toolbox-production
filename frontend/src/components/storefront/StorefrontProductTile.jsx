@@ -130,6 +130,11 @@ export default function StorefrontProductTile({
   }, [overlayActive, isMobile]);
 
   const handleImageClick = useCallback(() => {
+    if (variant === 'list') {
+      if (productUrl) navigate(productUrl);
+      return;
+    }
+
     if (!isMobile) {
       if (productUrl) navigate(productUrl);
       return;
@@ -144,7 +149,7 @@ export default function StorefrontProductTile({
     }
 
     setOverlayActive(true);
-  }, [closeOverlay, isMobile, navigate, overlayActive, productUrl]);
+  }, [closeOverlay, isMobile, navigate, overlayActive, productUrl, variant]);
 
   const handleMouseEnter = useCallback(() => {
     if (!isMobile) setOverlayActive(true);
@@ -226,7 +231,7 @@ export default function StorefrontProductTile({
             variant === 'rail'
               ? '(max-width: 767px) 44vw, 188px'
               : variant === 'list'
-                ? '(max-width: 767px) 42vw, 240px'
+                ? '(max-width: 767px) 32vw, 240px'
                 : '(max-width: 767px) 50vw, (max-width: 1024px) 33vw, 240px'
           }
           alt={name}
