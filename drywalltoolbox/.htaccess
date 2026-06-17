@@ -53,6 +53,13 @@ Options +FollowSymLinks
   RewriteCond %{QUERY_STRING} (^|&)wc-api= [NC]
   RewriteRule ^$ wp/index.php [QSA,L]
 
+  # Canonicalize wp-prefixed WooCommerce payment endpoints back to the public
+  # checkout URL. WooCommerce order-pay is a checkout endpoint, not a React route;
+  # when served under /wp/checkout/order-pay it can miss the public checkout page
+  # context and fall through to the coming-soon/front-page template.
+  RewriteRule ^wp/checkout/order-pay/(.*)$ /checkout/order-pay/$1 [R=302,L,QSA]
+  RewriteRule ^wp/order-pay/(.*)$ /checkout/order-pay/$1 [R=302,L,QSA]
+
   # WooCommerce payment/order-pay endpoints must be handled by WordPress, not by
   # the React SPA shell. Without this rule, secure-payment redirects can fall
   # back into the public landing/coming-soon page instead of the payment runtime.
