@@ -1,135 +1,180 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { motion as Motion, AnimatePresence } from 'framer-motion';
+import { AnimatePresence, motion as Motion } from 'framer-motion';
 import { ChevronLeft, ChevronRight, X } from 'lucide-react';
 import { PLACEHOLDER_IMAGE } from '../../constants/images.js';
+import { apiClient } from '../../api/client.js';
 
-// Sits above the product modal (10002) and its backdrop (10001)
 const LIGHTBOX_Z_INDEX = 10010;
+const parentGalleryCache = new Map();
 
-// Directional slide variants — enter from the side, exit to the opposite side.
-// Opacity stays at 1 throughout so framer-motion never fights CSS opacity classes.
 const slideVariants = {
-  enter: (dir) => ({ x: dir >= 0 ? '100%' : '-100%', opacity: 0 }),
+  enter: (direction) => ({ x: direction >= 0 ? '100%' : '-100%', opacity: 0 }),
   center: { x: 0, opacity: 1 },
-  exit: (dir) => ({ x: dir >= 0 ? '-80%' : '80%', opacity: 0 }),
+  exit: (direction) => ({ x: direction >= 0 ? '-80%' : '80%', opacity: 0 }),
 };
 
-// Natural deceleration curve: higher damping removes spring overshoot while
-// keeping the slide crisp; opacity fades in quickly so the skeleton shows through.
 const slideTransition = {
   x: { type: 'spring', stiffness: 340, damping: 44, mass: 0.75 },
   opacity: { duration: 0.14, ease: [0.4, 0, 0.2, 1] },
 };
 
-// Shared className for the lightbox prev/next nav buttons
 const LB_NAV_BTN_CLASS = 'absolute top-1/2 -translate-y-1/2 z-10 flex items-center justify-center w-11 h-11 rounded-full bg-white/10 hover:bg-white/[0.22] text-white transition-all hover:scale-105 active:scale-95 focus-visible:outline-2 focus-visible:outline-white';
+
+function normalizeImageMeta(rawImage, product = {}, index = 0) {
+  if (!rawImage) return null;
+
+  if (typeof rawImage === 'string') {
+    const src = rawImage.trim();
+    if (!src) return null;
+    return {
+      src,
+      srcSet: index === 0 ? (product?.image_srcset || '') : '',
+      sizes: index === 0 ? (product?.image_sizes || '') : '',
+    };
+  }
+
+  const src = String(rawImage.src || rawImage.url || rawImage.full || rawImage.large || '').trim();
+  if (!src) return null;
+
+  return {
+    src,
+    srcSet: rawImage.srcset || rawImage.srcSet || '',
+    sizes: rawImage.sizes || '',
+  };
+}
+
+function pushUniqueImage(out, seen, imageMeta) {
+  if (!imageMeta?.src) return;
+  const key = imageMeta.src.split('?')[0].replace(/\/+$/, '').toLowerCase();
+  if (!key || seen.has(key)) return;
+  seen.add(key);
+  out.push(imageMeta);
+}
+
+function collectImageMeta(product = {}) {
+  const out = [];
+  const seen = new Set();
+
+  const push = (image, index = out.length) => pushUniqueImage(out, seen, normalizeImageMeta(image, product, index));
+  const pushArray = (images = []) => {
+    if (!Array.isArray(images)) return;
+    images.forEach((image) => push(image));
+  };
+
+  pushArray(product?.media?.images);
+  push(product?.media?.image);
+  pushArray(product?.images);
+  push(product?.image);
+
+  return out;
+}
+
+function collectRawWooImageMeta(rawProduct = {}) {
+  const out = [];
+  const seen = new Set();
+  const images = Array.isArray(rawProduct?.images) ? rawProduct.images : [];
+  images.forEach((image, index) => pushUniqueImage(out, seen, normalizeImageMeta(image, rawProduct, index)));
+  return out;
+}
+
+async function fetchParentGallery(parentId) {
+  const normalizedParentId = Number(parentId || 0);
+  if (!normalizedParentId) return [];
+
+  if (parentGalleryCache.has(normalizedParentId)) {
+    return parentGalleryCache.get(normalizedParentId);
+  }
+
+  const request = apiClient(`/wp-json/drywall/v1/products/${encodeURIComponent(normalizedParentId)}`)
+    .then((parentProduct) => collectRawWooImageMeta(parentProduct))
+    .catch(() => []);
+
+  parentGalleryCache.set(normalizedParentId, request);
+  return request;
+}
+
+function mergeImageSets(...sets) {
+  const out = [];
+  const seen = new Set();
+  sets.flat().forEach((imageMeta) => pushUniqueImage(out, seen, imageMeta));
+  return out.length > 0 ? out : [{ src: PLACEHOLDER_IMAGE, srcSet: '', sizes: '' }];
+}
 
 export default function ProductImageGallery({ product }) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [direction, setDirection] = useState(0);
   const [imgLoaded, setImgLoaded] = useState({});
   const [lightbox, setLightbox] = useState({ open: false, index: 0, dir: 0 });
+  const [parentImageMeta, setParentImageMeta] = useState([]);
 
   const thumbsRef = useRef(null);
   const galleryRef = useRef(null);
-  // Refs for latest values — avoids stale closures in event handlers
   const currentIndexRef = useRef(currentIndex);
   const lightboxRef = useRef(lightbox);
-  // Touch swipe refs
+  const imagesRef = useRef([]);
   const touchStartX = useRef(null);
   const touchStartY = useRef(null);
   const isDragging = useRef(false);
   const lbTouchStartX = useRef(null);
   const lbTouchStartTime = useRef(null);
-  // Focus management for lightbox
   const lbCloseBtnRef = useRef(null);
   const lbPrevFocusRef = useRef(null);
 
-  // ── Images normalisation ──────────────────────────────────────────────────
-  // Accepts three shapes:
-  //   1. DTB catalog DTO  — product.media.images (string[]) + product.media.image
-  //   2. WooCommerce shape — product.images ([{ src, alt }]) + product.image (string)
-  //   3. Normalised shape  — product.image (string), product.image_srcset, etc.
-  const toImageMeta = (img, index = 0) => {
-    if (typeof img === 'string') {
-      return {
-        src: img,
-        srcSet: index === 0 ? (product?.image_srcset || '') : '',
-        sizes: index === 0 ? (product?.image_sizes || '') : '',
-      };
-    }
-    return {
-      src: img?.src ?? '',
-      srcSet: img?.srcset || '',
-      sizes: img?.sizes || '',
-    };
-  };
-  const imageMeta = (() => {
-    // Priority 1: DTB media DTO — product.media.images (string[])
-    const mediaSrcs = product?.media?.images;
-    if (Array.isArray(mediaSrcs) && mediaSrcs.length) {
-      const mapped = mediaSrcs.map((s, i) => toImageMeta(s, i)).filter((img) => img.src);
-      if (mapped.length) return mapped;
-    }
-
-    // Priority 2: DTB media DTO — product.media.image (single string)
-    const mediaSingle = product?.media?.image;
-    if (typeof mediaSingle === 'string' && mediaSingle) {
-      return [toImageMeta(mediaSingle, 0)];
-    }
-
-    // Priority 3: WC/normalised — product.images (array of strings or objects)
-    const arr = Array.isArray(product?.images) && product.images.length
-      ? product.images.map((img, index) => toImageMeta(img, index)).filter((img) => img.src)
-      : product?.image ? [toImageMeta(product.image, 0)] : [];
-
-    return arr.length ? arr : [{ src: PLACEHOLDER_IMAGE, srcSet: '', sizes: '' }];
-  })();
-  const images = imageMeta.map((img) => img.src);
-  const imagesRef = useRef(images);
+  const baseImageMeta = useMemo(() => collectImageMeta(product), [product]);
+  const imageMeta = useMemo(() => mergeImageSets(baseImageMeta, parentImageMeta), [baseImageMeta, parentImageMeta]);
+  const images = imageMeta.map((image) => image.src);
   const hasMultiple = images.length > 1;
+  const productKey = `${product?.id ?? ''}|${product?.sku ?? ''}|${product?.parent_id ?? product?.parentId ?? ''}`;
 
-  // ── Reset on product change (during render, avoids effect warning) ────────
-  const productKey = `${product?.id ?? ''}|${product?.sku ?? ''}`;
-  const [lastKey, setLastKey] = useState(productKey);
-  if (productKey !== lastKey) {
-    setLastKey(productKey);
+  useEffect(() => {
     setCurrentIndex(0);
     setDirection(0);
     setImgLoaded({});
-  }
+    setParentImageMeta([]);
+  }, [productKey]);
 
-  // ── Navigation helpers ────────────────────────────────────────────────────
-  const scrollThumb = useCallback((idx) => {
-    const el = thumbsRef.current?.children[idx];
-    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+  useEffect(() => {
+    const parentId = product?.parent_id || product?.parentId;
+    if (!parentId || baseImageMeta.length > 1) return undefined;
+
+    let cancelled = false;
+    fetchParentGallery(parentId).then((parentImages) => {
+      if (!cancelled) setParentImageMeta(parentImages);
+    });
+
+    return () => { cancelled = true; };
+  }, [baseImageMeta.length, product?.parent_id, product?.parentId]);
+
+  const scrollThumb = useCallback((index) => {
+    thumbsRef.current?.children[index]?.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
   }, []);
 
-  const goTo = useCallback((idx, dir) => {
-    setDirection(dir);
-    setCurrentIndex(idx);
-    scrollThumb(idx);
+  const goTo = useCallback((index, nextDirection) => {
+    setDirection(nextDirection);
+    setCurrentIndex(index);
+    scrollThumb(index);
   }, [scrollThumb]);
 
   const prev = useCallback(() => {
-    const len = imagesRef.current.length;
-    goTo((currentIndexRef.current - 1 + len) % len, -1);
+    const length = imagesRef.current.length;
+    if (length <= 1) return;
+    goTo((currentIndexRef.current - 1 + length) % length, -1);
   }, [goTo]);
 
   const next = useCallback(() => {
-    const len = imagesRef.current.length;
-    goTo((currentIndexRef.current + 1) % len, 1);
+    const length = imagesRef.current.length;
+    if (length <= 1) return;
+    goTo((currentIndexRef.current + 1) % length, 1);
   }, [goTo]);
 
-  // ── Lightbox helpers ──────────────────────────────────────────────────────
-  const openLb = useCallback((idx) => {
+  const openLightbox = useCallback((index) => {
     lbPrevFocusRef.current = document.activeElement;
-    setLightbox({ open: true, index: idx, dir: 0 });
+    setLightbox({ open: true, index, dir: 0 });
   }, []);
-  const closeLb = useCallback(() => {
-    setLightbox(lb => ({ ...lb, open: false }));
-    // Restore focus after exit animation (~220 ms)
+
+  const closeLightbox = useCallback(() => {
+    setLightbox((state) => ({ ...state, open: false }));
     setTimeout(() => {
       if (lbPrevFocusRef.current && typeof lbPrevFocusRef.current.focus === 'function') {
         lbPrevFocusRef.current.focus({ preventScroll: true });
@@ -137,134 +182,139 @@ export default function ProductImageGallery({ product }) {
       lbPrevFocusRef.current = null;
     }, 280);
   }, []);
-  const lbPrev = useCallback(() => {
-    const len = imagesRef.current.length;
-    setLightbox(lb => ({ ...lb, dir: -1, index: (lb.index - 1 + len) % len }));
-  }, []);
-  const lbNext = useCallback(() => {
-    const len = imagesRef.current.length;
-    setLightbox(lb => ({ ...lb, dir: 1, index: (lb.index + 1) % len }));
+
+  const lightboxPrev = useCallback(() => {
+    const length = imagesRef.current.length;
+    if (length <= 1) return;
+    setLightbox((state) => ({ ...state, dir: -1, index: (state.index - 1 + length) % length }));
   }, []);
 
-  // ── Keyboard navigation (stable — uses refs for current values) ───────────
-  useEffect(() => {
-    const handler = (e) => {
-      const tag = document.activeElement?.tagName.toLowerCase();
-      if (['input', 'textarea', 'select'].includes(tag)) return;
-      const lb = lightboxRef.current;
-      if (e.key === 'ArrowLeft') {
-        e.preventDefault();
-        lb.open ? lbPrev() : (imagesRef.current.length > 1 && prev());
-      } else if (e.key === 'ArrowRight') {
-        e.preventDefault();
-        lb.open ? lbNext() : (imagesRef.current.length > 1 && next());
-      } else if (e.key === 'Escape' && lb.open) {
-        // Stop here so ProductModal's Escape handler doesn't also close the modal
-        e.stopImmediatePropagation();
-        closeLb();
-      }
-    };
-    window.addEventListener('keydown', handler);
-    return () => window.removeEventListener('keydown', handler);
-  }, [prev, next, lbPrev, lbNext, closeLb]);
+  const lightboxNext = useCallback(() => {
+    const length = imagesRef.current.length;
+    if (length <= 1) return;
+    setLightbox((state) => ({ ...state, dir: 1, index: (state.index + 1) % length }));
+  }, []);
 
-  // ── Body scroll lock while lightbox is open ──────────────────────────────
-  useEffect(() => {
-    if (!lightbox.open) return;
-    const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
-    const prevOverflow = document.body.style.overflow;
-    const prevPaddingRight = document.body.style.paddingRight;
-    document.body.style.overflow = 'hidden';
-    if (scrollbarWidth > 0) document.body.style.paddingRight = `${scrollbarWidth}px`;
-    return () => {
-      document.body.style.overflow = prevOverflow;
-      document.body.style.paddingRight = prevPaddingRight;
-    };
-  }, [lightbox.open]);
-
-  // ── Focus the close button when lightbox opens ───────────────────────────
-  useEffect(() => {
-    if (lightbox.open && lbCloseBtnRef.current) {
-      lbCloseBtnRef.current.focus({ preventScroll: true });
-    }
-  }, [lightbox.open]);
-
-  // ── Update refs outside of render ────────────────────────────────────────
   useEffect(() => {
     currentIndexRef.current = currentIndex;
     lightboxRef.current = lightbox;
     imagesRef.current = images;
   }, [currentIndex, lightbox, images]);
 
-  // ── Preload the next/prev images so swiping feels instant ────────────────
+  useEffect(() => {
+    if (currentIndex >= images.length) {
+      setCurrentIndex(0);
+    }
+  }, [currentIndex, images.length]);
+
+  useEffect(() => {
+    const handler = (event) => {
+      const tag = document.activeElement?.tagName?.toLowerCase();
+      if (['input', 'textarea', 'select'].includes(tag)) return;
+
+      const activeLightbox = lightboxRef.current;
+      if (event.key === 'ArrowLeft') {
+        event.preventDefault();
+        activeLightbox.open ? lightboxPrev() : prev();
+      } else if (event.key === 'ArrowRight') {
+        event.preventDefault();
+        activeLightbox.open ? lightboxNext() : next();
+      } else if (event.key === 'Escape' && activeLightbox.open) {
+        event.stopImmediatePropagation();
+        closeLightbox();
+      }
+    };
+
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, [closeLightbox, lightboxNext, lightboxPrev, next, prev]);
+
+  useEffect(() => {
+    if (!lightbox.open) return undefined;
+    const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+    const previousOverflow = document.body.style.overflow;
+    const previousPaddingRight = document.body.style.paddingRight;
+    document.body.style.overflow = 'hidden';
+    if (scrollbarWidth > 0) document.body.style.paddingRight = `${scrollbarWidth}px`;
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      document.body.style.paddingRight = previousPaddingRight;
+    };
+  }, [lightbox.open]);
+
+  useEffect(() => {
+    if (lightbox.open) lbCloseBtnRef.current?.focus({ preventScroll: true });
+  }, [lightbox.open]);
+
   useEffect(() => {
     if (images.length <= 1) return;
-    const len = images.length;
-    const toPreload = [
-      images[(currentIndex + 1) % len],
-      images[(currentIndex - 1 + len) % len],
-    ];
-    toPreload.forEach((src) => {
+    const length = images.length;
+    [images[(currentIndex + 1) % length], images[(currentIndex - 1 + length) % length]].forEach((src) => {
       if (!src) return;
-      const img = new Image();
-      img.src = src;
+      const image = new Image();
+      image.src = src;
     });
   }, [currentIndex, images]);
+
   useEffect(() => {
-    const el = galleryRef.current;
-    if (!el) return;
-    const onMove = (e) => {
+    const element = galleryRef.current;
+    if (!element) return undefined;
+
+    const onMove = (event) => {
       if (touchStartX.current === null) return;
-      const dx = Math.abs(e.touches[0].clientX - touchStartX.current);
-      const dy = Math.abs(e.touches[0].clientY - (touchStartY.current ?? 0));
-      if (dx > dy && dx > 6) {
-        e.preventDefault();
+      const deltaX = Math.abs(event.touches[0].clientX - touchStartX.current);
+      const deltaY = Math.abs(event.touches[0].clientY - (touchStartY.current ?? 0));
+      if (deltaX > deltaY && deltaX > 6) {
+        event.preventDefault();
         isDragging.current = true;
       }
     };
-    el.addEventListener('touchmove', onMove, { passive: false });
-    return () => el.removeEventListener('touchmove', onMove);
+
+    element.addEventListener('touchmove', onMove, { passive: false });
+    return () => element.removeEventListener('touchmove', onMove);
   }, []);
 
-  // ── Gallery touch handlers ────────────────────────────────────────────────
-  const onTouchStart = (e) => {
-    touchStartX.current = e.touches[0].clientX;
-    touchStartY.current = e.touches[0].clientY;
+  const onTouchStart = (event) => {
+    touchStartX.current = event.touches[0].clientX;
+    touchStartY.current = event.touches[0].clientY;
     isDragging.current = false;
   };
-  const onTouchEnd = (e) => {
+
+  const onTouchEnd = (event) => {
     if (touchStartX.current === null) return;
-    const diff = touchStartX.current - e.changedTouches[0].clientX;
+    const diff = touchStartX.current - event.changedTouches[0].clientX;
     if (Math.abs(diff) > 40) diff > 0 ? next() : prev();
     touchStartX.current = null;
   };
+
   const onGalleryClick = () => {
-    if (!isDragging.current) openLb(currentIndexRef.current);
+    if (!isDragging.current) openLightbox(currentIndexRef.current);
   };
 
-  // ── Lightbox touch handlers ───────────────────────────────────────────────
-  const onLbTouchStart = (e) => {
-    lbTouchStartX.current = e.touches[0].clientX;
+  const onLightboxTouchStart = (event) => {
+    lbTouchStartX.current = event.touches[0].clientX;
     lbTouchStartTime.current = Date.now();
   };
-  const onLbTouchEnd = (e) => {
+
+  const onLightboxTouchEnd = (event) => {
     if (lbTouchStartX.current === null || lbTouchStartTime.current === null) return;
-    const diff = lbTouchStartX.current - e.changedTouches[0].clientX;
+    const diff = lbTouchStartX.current - event.changedTouches[0].clientX;
     const elapsed = Date.now() - lbTouchStartTime.current;
-    // Trigger on distance >40 px OR fast flick >0.3 px/ms over at least 10 px
     const velocity = Math.abs(diff) / Math.max(elapsed, 1);
     if (Math.abs(diff) > 40 || (velocity > 0.3 && Math.abs(diff) > 10)) {
-      diff > 0 ? lbNext() : lbPrev();
+      diff > 0 ? lightboxNext() : lightboxPrev();
     }
     lbTouchStartX.current = null;
     lbTouchStartTime.current = null;
   };
 
+  const activeMeta = imageMeta[currentIndex] || imageMeta[0];
+  const activeLightboxMeta = imageMeta[lightbox.index] || imageMeta[0];
+
   return (
     <>
-      {/* ── Gallery ──────────────────────────────────────────────────────── */}
       <div className="flex flex-col gap-3">
-        {/* Main image container */}
         <div
           ref={galleryRef}
           className="product-image-gallery__main relative w-full rounded-2xl overflow-hidden bg-white border border-gray-100 group cursor-zoom-in select-none"
@@ -275,9 +325,13 @@ export default function ProductImageGallery({ product }) {
           role="button"
           tabIndex={0}
           aria-label="Tap to view fullscreen"
-          onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openLb(currentIndex); } }}
+          onKeyDown={(event) => {
+            if (event.key === 'Enter' || event.key === ' ') {
+              event.preventDefault();
+              openLightbox(currentIndex);
+            }
+          }}
         >
-          {/* Per-image skeleton loader — fades out smoothly once the image loads */}
           <AnimatePresence>
             {!imgLoaded[currentIndex] && (
               <Motion.div
@@ -291,14 +345,12 @@ export default function ProductImageGallery({ product }) {
             )}
           </AnimatePresence>
 
-          {/* Slide-animated image — framer-motion owns opacity; no CSS opacity class
-              so the two systems never fight. The skeleton above fades out once loaded. */}
           <AnimatePresence initial={false} custom={direction}>
             <Motion.img
-              key={currentIndex}
+              key={`${currentIndex}-${images[currentIndex]}`}
               src={images[currentIndex]}
-              srcSet={imageMeta[currentIndex]?.srcSet || undefined}
-              sizes={imageMeta[currentIndex]?.sizes || '(max-width: 767px) 92vw, 48vw'}
+              srcSet={activeMeta?.srcSet || undefined}
+              sizes={activeMeta?.sizes || '(max-width: 767px) 92vw, 48vw'}
               alt={`${product?.name || 'Product'} — image ${currentIndex + 1} of ${images.length}`}
               custom={direction}
               variants={slideVariants}
@@ -312,52 +364,44 @@ export default function ProductImageGallery({ product }) {
               draggable={false}
               className="absolute inset-0 w-full h-full object-contain p-3 sm:p-4"
               style={{ zIndex: 2, backfaceVisibility: 'hidden', WebkitBackfaceVisibility: 'hidden' }}
-              onLoad={() => setImgLoaded(prev => ({ ...prev, [currentIndex]: true }))}
-              onError={(e) => {
-                e.currentTarget.onerror = null;
-                e.currentTarget.src = PLACEHOLDER_IMAGE;
-                setImgLoaded(prev => ({ ...prev, [currentIndex]: true }));
+              onLoad={() => setImgLoaded((state) => ({ ...state, [currentIndex]: true }))}
+              onError={(event) => {
+                event.currentTarget.onerror = null;
+                event.currentTarget.src = PLACEHOLDER_IMAGE;
+                setImgLoaded((state) => ({ ...state, [currentIndex]: true }));
               }}
             />
           </AnimatePresence>
 
-          {/* Prev / Next arrows */}
           {hasMultiple && (
             <>
               <button
-                onClick={(e) => { e.stopPropagation(); prev(); }}
+                type="button"
+                onClick={(event) => { event.stopPropagation(); prev(); }}
                 className="absolute left-2.5 top-1/2 -translate-y-1/2 z-10 flex items-center justify-center w-9 h-9 rounded-full bg-white/95 shadow-md hover:bg-white hover:scale-105 active:scale-95 transition-all"
                 aria-label="Previous image"
               >
                 <ChevronLeft size={17} className="text-gray-700" />
               </button>
               <button
-                onClick={(e) => { e.stopPropagation(); next(); }}
+                type="button"
+                onClick={(event) => { event.stopPropagation(); next(); }}
                 className="absolute right-2.5 top-1/2 -translate-y-1/2 z-10 flex items-center justify-center w-9 h-9 rounded-full bg-white/95 shadow-md hover:bg-white hover:scale-105 active:scale-95 transition-all"
                 aria-label="Next image"
               >
                 <ChevronRight size={17} className="text-gray-700" />
               </button>
 
-              {/* "1 / N" counter pill */}
-              <div
-                className="absolute bottom-3 right-3 z-10 flex items-center px-2.5 py-1 rounded-full bg-black/40 text-white text-xs font-medium tabular-nums backdrop-blur-sm pointer-events-none"
-                aria-label={`Image ${currentIndex + 1} of ${images.length}`}
-              >
+              <div className="absolute bottom-3 right-3 z-10 flex items-center px-2.5 py-1 rounded-full bg-black/40 text-white text-xs font-medium tabular-nums backdrop-blur-sm pointer-events-none">
                 {currentIndex + 1} / {images.length}
               </div>
 
-              {/* Dot indicators (up to 8 images) */}
               {images.length <= 8 && (
                 <div className="absolute bottom-3 left-3 right-16 flex items-center gap-1.5 z-10 pointer-events-none">
-                  {images.map((_, i) => (
+                  {images.map((_, index) => (
                     <span
-                      key={i}
-                      className={`rounded-full transition-all duration-300 ${
-                        i === currentIndex
-                          ? 'w-4 h-1.5 bg-white shadow-sm'
-                          : 'w-1.5 h-1.5 bg-white/50'
-                      }`}
+                      key={index}
+                      className={`rounded-full transition-all duration-300 ${index === currentIndex ? 'w-4 h-1.5 bg-white shadow-sm' : 'w-1.5 h-1.5 bg-white/50'}`}
                     />
                   ))}
                 </div>
@@ -366,34 +410,26 @@ export default function ProductImageGallery({ product }) {
           )}
         </div>
 
-        {/* ── Thumbnail strip (2+ images) ─────────────────────────────── */}
         {hasMultiple && (
-          <div
-            ref={thumbsRef}
-            className="flex gap-2 overflow-x-auto rounded-2xl border border-gray-50 bg-white p-2 pb-2 shadow-[inset_0_1px_0_rgba(255,255,255,0.96)]"
-            style={{ scrollbarWidth: 'none' }}
-          >
-            {images.map((img, i) => (
+          <div ref={thumbsRef} className="flex gap-2 overflow-x-auto rounded-2xl border border-gray-50 bg-white p-2 pb-2 shadow-[inset_0_1px_0_rgba(255,255,255,0.96)]" style={{ scrollbarWidth: 'none' }}>
+            {images.map((image, index) => (
               <button
-                key={i}
-                onClick={() => goTo(i, i > currentIndex ? 1 : -1)}
-                aria-label={`View image ${i + 1}`}
-                aria-current={i === currentIndex ? 'true' : undefined}
-                className={`shrink-0 w-16 h-16 rounded-xl overflow-hidden border-2 transition-all duration-200 ${
-                  i === currentIndex
-                    ? 'border-blue-600 bg-white ring-2 ring-blue-100/80 scale-[1.04] shadow-sm'
-                    : 'border-gray-100 bg-white hover:border-gray-300'
-                }`}
+                key={`${image}-${index}`}
+                type="button"
+                onClick={() => goTo(index, index > currentIndex ? 1 : -1)}
+                aria-label={`View image ${index + 1}`}
+                aria-current={index === currentIndex ? 'true' : undefined}
+                className={`shrink-0 w-16 h-16 rounded-xl overflow-hidden border-2 transition-all duration-200 ${index === currentIndex ? 'border-blue-600 bg-white ring-2 ring-blue-100/80 scale-[1.04] shadow-sm' : 'border-gray-100 bg-white hover:border-gray-300'}`}
               >
                 <img
-                  src={img}
-                  alt={`Thumbnail ${i + 1}`}
+                  src={image}
+                  alt={`Thumbnail ${index + 1}`}
                   width={64}
                   height={64}
                   loading="lazy"
                   decoding="async"
                   className="w-full h-full object-contain bg-white p-1"
-                  onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = PLACEHOLDER_IMAGE; }}
+                  onError={(event) => { event.currentTarget.onerror = null; event.currentTarget.src = PLACEHOLDER_IMAGE; }}
                 />
               </button>
             ))}
@@ -401,7 +437,6 @@ export default function ProductImageGallery({ product }) {
         )}
       </div>
 
-      {/* ── Fullscreen Lightbox (React portal → renders outside modal stacking context) ── */}
       {typeof document !== 'undefined' && createPortal(
         <AnimatePresence>
           {lightbox.open && (
@@ -416,14 +451,7 @@ export default function ProductImageGallery({ product }) {
               exit={{ opacity: 0 }}
               transition={{ duration: 0.22 }}
             >
-              {/* Backdrop */}
-              <div
-                className="absolute inset-0 bg-black/96"
-                onClick={closeLb}
-                aria-hidden="true"
-              />
-
-              {/* Inner — spring-scale entrance */}
+              <div className="absolute inset-0 bg-black/96" onClick={closeLightbox} aria-hidden="true" />
               <Motion.div
                 className="relative flex items-center justify-center w-full h-full"
                 initial={{ scale: 0.92, opacity: 0 }}
@@ -431,16 +459,15 @@ export default function ProductImageGallery({ product }) {
                 exit={{ scale: 0.88, opacity: 0 }}
                 transition={{ type: 'spring', stiffness: 380, damping: 40, mass: 0.85 }}
                 style={{ willChange: 'transform, opacity' }}
-                onTouchStart={onLbTouchStart}
-                onTouchEnd={onLbTouchEnd}
+                onTouchStart={onLightboxTouchStart}
+                onTouchEnd={onLightboxTouchEnd}
               >
-                {/* Slide-animated lightbox image */}
                 <AnimatePresence initial={false} custom={lightbox.dir}>
                   <Motion.img
-                    key={lightbox.index}
+                    key={`${lightbox.index}-${images[lightbox.index]}`}
                     src={images[lightbox.index]}
-                    srcSet={imageMeta[lightbox.index]?.srcSet || undefined}
-                    sizes={imageMeta[lightbox.index]?.sizes || '100vw'}
+                    srcSet={activeLightboxMeta?.srcSet || undefined}
+                    sizes={activeLightboxMeta?.sizes || '100vw'}
                     alt={`${product?.name || 'Product'} — image ${lightbox.index + 1} of ${images.length}`}
                     custom={lightbox.dir}
                     variants={slideVariants}
@@ -454,81 +481,29 @@ export default function ProductImageGallery({ product }) {
                   />
                 </AnimatePresence>
 
-                {/* Close button — receives focus when lightbox opens */}
-                <button
-                  ref={lbCloseBtnRef}
-                  onClick={closeLb}
-                  className="absolute top-4 right-4 z-10 flex items-center justify-center w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 text-white transition-all hover:scale-105 active:scale-95 focus-visible:outline-2 focus-visible:outline-white"
-                  aria-label="Close fullscreen image"
-                >
-                  <X size={20} />
+                <button ref={lbCloseBtnRef} type="button" onClick={closeLightbox} className="absolute top-4 right-4 z-10 flex items-center justify-center w-11 h-11 rounded-full bg-white/10 hover:bg-white/[0.22] text-white transition-colors focus-visible:outline-2 focus-visible:outline-white" aria-label="Close full-screen image">
+                  <X size={22} />
                 </button>
 
-                {/* Lightbox prev / next arrows */}
                 {hasMultiple && (
                   <>
-                    <button
-                      onClick={lbPrev}
-                      className={`${LB_NAV_BTN_CLASS} left-3 sm:left-5`}
-                      aria-label="Previous image"
-                    >
-                      <ChevronLeft size={24} />
+                    <button type="button" onClick={lightboxPrev} className={`${LB_NAV_BTN_CLASS} left-4`} aria-label="Previous image">
+                      <ChevronLeft size={26} />
                     </button>
-                    <button
-                      onClick={lbNext}
-                      className={`${LB_NAV_BTN_CLASS} right-3 sm:right-5`}
-                      aria-label="Next image"
-                    >
-                      <ChevronRight size={24} />
+                    <button type="button" onClick={lightboxNext} className={`${LB_NAV_BTN_CLASS} right-4`} aria-label="Next image">
+                      <ChevronRight size={26} />
                     </button>
+                    <div className="absolute bottom-4 left-1/2 -translate-x-1/2 px-3 py-1.5 rounded-full bg-white/10 text-white text-sm tabular-nums backdrop-blur-sm">
+                      {lightbox.index + 1} / {images.length}
+                    </div>
                   </>
                 )}
-
-                {/* Bottom bar: counter + thumbnail strip */}
-                <div className="absolute bottom-0 left-0 right-0 flex flex-col items-center gap-3 pb-6 pointer-events-none">
-                  {/* "1 / N" counter */}
-                  <div
-                    className="px-3 py-1 rounded-full bg-white/10 text-white text-sm font-medium tabular-nums backdrop-blur-sm pointer-events-auto"
-                    aria-label={`Image ${lightbox.index + 1} of ${images.length}`}
-                  >
-                    {lightbox.index + 1} / {images.length}
-                  </div>
-
-                  {/* Thumbnail strip inside lightbox */}
-                  {hasMultiple && (
-                    <div
-                      className="flex gap-2 overflow-x-auto px-4 pointer-events-auto"
-                      style={{ scrollbarWidth: 'none' }}
-                    >
-                      {images.map((img, i) => (
-                        <button
-                          key={i}
-                          onClick={() => setLightbox(lb => ({ ...lb, dir: i > lb.index ? 1 : -1, index: i }))}
-                          aria-label={`View image ${i + 1}`}
-                          className={`shrink-0 w-12 h-12 rounded-lg overflow-hidden border-2 transition-all duration-200 ${
-                            i === lightbox.index
-                              ? 'border-white scale-[1.08] opacity-100'
-                              : 'border-white/20 opacity-50 hover:opacity-80 hover:border-white/50'
-                          }`}
-                        >
-                          <img
-                            src={img}
-                            alt={`Thumbnail ${i + 1}`}
-                            className="w-full h-full object-contain bg-black/30 p-0.5"
-                            draggable={false}
-                          />
-                        </button>
-                      ))}
-                    </div>
-                  )}
-                </div>
               </Motion.div>
             </Motion.div>
           )}
         </AnimatePresence>,
-        document.body
+        document.body,
       )}
     </>
   );
 }
-
