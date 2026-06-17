@@ -2,6 +2,14 @@
 <IfModule mod_rewrite.c>
 RewriteEngine On
 RewriteBase /wp/
+
+# Canonicalize WooCommerce payment endpoints to the public checkout URL.
+# /wp/checkout/order-pay/* is not the storefront checkout permalink; route it
+# back through /checkout/order-pay/* so the root router sends the request into
+# WordPress with the correct WooCommerce checkout endpoint context.
+RewriteRule ^checkout/order-pay/(.*)$ /checkout/order-pay/$1 [R=302,L,QSA]
+RewriteRule ^order-pay/(.*)$ /checkout/order-pay/$1 [R=302,L,QSA]
+
 RewriteRule ^index\.php$ - [L]
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
