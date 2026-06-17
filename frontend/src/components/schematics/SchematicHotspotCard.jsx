@@ -15,6 +15,7 @@ import {
 // ---------------------------------------------------------------------------
 
 const _variantSkuCache = new Map();
+const RESOLVING_TITLE = 'Resolving official part…';
 
 function getDisplayCode(part, product) {
   return product?.sku || part?.sku || part?.source_sku || '';
@@ -24,8 +25,10 @@ function getCodeLabel(part, product) {
   return product?.sku || part?.sku ? 'SKU' : part?.source_sku ? 'Ref' : 'SKU';
 }
 
-function getDisplayName(part, product) {
-  return product?.name || part?.name || '';
+function getDisplayName(part, product, allowFallback = true) {
+  if (product?.name) return product.name;
+  if (allowFallback) return part?.name || 'Part';
+  return RESOLVING_TITLE;
 }
 
 function getDisplayBrand(part, product) {
@@ -98,7 +101,7 @@ function getPriceData(product, part, stockStatus) {
     };
   }
 
-  if (part?.sku && stockStatus === null) {
+  if (part?.sku && stockStatus == null) {
     return { priceLabel: '...', comparePriceLabel: null };
   }
 
@@ -125,7 +128,9 @@ function StockBadge({ stockStatus }) {
 // and the desktop detached modal. The hotspot identity is SKU-first: schematic
 // JSON supplies the clickable coordinate and fallback metadata, but live product
 // data fetched by SKU is authoritative for customer-facing name, SKU, price,
-// image, stock status, product link, and add-to-cart payload.
+// image, stock status, product link, and add-to-cart payload. Schematic JSON
+// part names are hidden while SKU resolution is pending, then used only as a
+// fallback when the SKU cannot be resolved to a catalog product.
 // ---------------------------------------------------------------------------
 
 export default function SchematicHotspotCard({
@@ -149,7 +154,9 @@ export default function SchematicHotspotCard({
   const needsVariantLookup = Boolean(usesVariantPart && displayPart?.sku && !parentProductMatches);
   const effectiveProduct = needsVariantLookup ? variantProduct : product;
   const effectiveStockStatus = needsVariantLookup ? variantStockStatus : stockStatus;
-  const displayName = getDisplayName(displayPart, effectiveProduct);
+  const isResolving = Boolean(displayPart?.sku) && effectiveStockStatus == null;
+  const allowSchematicFallback = !displayPart?.sku || !isResolving;
+  const displayName = getDisplayName(displayPart, effectiveProduct, allowSchematicFallback);
   const displayBrand = getDisplayBrand(displayPart, effectiveProduct);
   const displayCode = getDisplayCode(displayPart, effectiveProduct);
   const codeLabel = getCodeLabel(displayPart, effectiveProduct);
@@ -220,8 +227,7 @@ export default function SchematicHotspotCard({
 
   const { priceLabel, comparePriceLabel } = getPriceData(effectiveProduct, displayPart, effectiveStockStatus);
   const isAdding = addingToCart === part.id || variantAdding;
-  const canAdd = Boolean(effectiveProduct?.id) && effectiveStockStatus !== null;
-  const isResolving = Boolean(displayPart.sku) && effectiveStockStatus === null;
+  const canAdd = Boolean(effectiveProduct?.id) && effectiveStockStatus != null;
   const isUnavailable = !canAdd && !isResolving;
 
   const ctaLabel = isAdding    ? 'Adding…'
