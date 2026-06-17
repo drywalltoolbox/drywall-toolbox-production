@@ -2,15 +2,10 @@ import { Link } from 'react-router-dom';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { brandToSlug } from '../../utils/catalogUrlState.js';
 import { buildDisplayCategoryUrl, normalizeCatalogCategoryEntry } from '../../utils/catalogFacets.js';
-import ProductCardImage from '../product/ProductCardImage.jsx';
 import ProductModal from '../product/ProductModal.jsx';
 import ProductDetail from '../product/ProductDetail.jsx';
+import StorefrontProductTile from './StorefrontProductTile.jsx';
 import { useCart } from '../../context/CartContext.jsx';
-
-function formatPrice(value) {
-  const numeric = Number(value || 0);
-  return Number.isFinite(numeric) && numeric > 0 ? `$${numeric.toFixed(2)}` : '';
-}
 
 export default function StorefrontSearchOverlay({
   isOpen,
@@ -62,9 +57,7 @@ export default function StorefrontSearchOverlay({
     };
   }, [isOpen, onClose, isModalOpen, closeQuickView]);
 
-  const openQuickView = useCallback((product, event) => {
-    event?.preventDefault?.();
-    event?.stopPropagation?.();
+  const openQuickView = useCallback((product) => {
     if (!product?.id) return;
     setModalProduct(product);
     setIsModalOpen(true);
@@ -86,7 +79,7 @@ export default function StorefrontSearchOverlay({
               <div className="storefront-search-overlay__topline">
                 <p className="storefront-search-overlay__panel-label">Search results</p>
                 <button type="button" className="storefront-search-overlay__view-all-inline" onClick={onViewAll}>
-                  View all results for "{query.trim()}"
+                  View all results for &quot;{query.trim()}&quot;
                 </button>
               </div>
             ) : null}
@@ -150,22 +143,18 @@ export default function StorefrontSearchOverlay({
                     ))}
                   </section>
                 ) : suggestions.length > 0 ? (
-                  <section className="storefront-search-overlay__results">
-                    {suggestions.map((product) => {
-                      const price = formatPrice(product.price);
-                      return (
-                        <button key={product.id} type="button" onClick={(event) => openQuickView(product, event)} className="storefront-search-overlay__result" aria-label={`Quick view ${product.name}`}>
-                          <div className="storefront-search-overlay__result-thumb">
-                            <ProductCardImage product={product} alt={product.name} padding="8px" fit="contain" width={144} height={144} className="storefront-search-overlay__result-thumb-image" />
-                          </div>
-                          <div className="storefront-search-overlay__result-copy">
-                            <span className="storefront-search-overlay__result-brand">{product.brand || 'Product'}</span>
-                            <strong className="storefront-search-overlay__result-name">{product.name}</strong>
-                            {price ? <span className="storefront-search-overlay__result-price">{price}</span> : null}
-                          </div>
-                        </button>
-                      );
-                    })}
+                  <section className="storefront-search-overlay__results storefront-search-overlay__results--product-cards">
+                    {suggestions.map((product, index) => (
+                      <StorefrontProductTile
+                        key={product.id}
+                        product={product}
+                        cardProduct={product?.cardProduct || null}
+                        variant="list"
+                        index={index}
+                        onOpenModal={() => openQuickView(product)}
+                        onAddToCart={() => handleAddToCart(product, 1)}
+                      />
+                    ))}
                     <button type="button" onClick={onViewAll} className="storefront-search-overlay__view-all">
                       View all results
                     </button>
@@ -173,7 +162,7 @@ export default function StorefrontSearchOverlay({
                 ) : (
                   <section className="storefront-search-overlay__results">
                     <div className="storefront-search-overlay__empty-message">
-                      No products matched "{query.trim()}". Try a brand, SKU, or broader term.
+                      No products matched &quot;{query.trim()}&quot;. Try a brand, SKU, or broader term.
                     </div>
                     <button type="button" onClick={onViewAll} className="storefront-search-overlay__view-all">
                       Browse all products
