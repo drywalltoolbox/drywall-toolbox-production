@@ -1,8 +1,8 @@
 /**
  * frontend/src/pages/Checkout.jsx
  *
- * Branded DTB checkout intake with native WooPayments handoff.
- * React owns order intake. WooCommerce/WooPayments owns final payment capture.
+ * Branded DTB checkout intake with secure backend payment handoff.
+ * React owns order intake. The backend payment gateway owns final payment capture.
  */
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -41,6 +41,8 @@ const WOO_NATIVE_GATEWAY_ID = 'woo_native';
 const WOO_PAYMENTS_METHOD_ID = 'woocommerce_payments';
 const MANUAL_PAYMENT_METHOD_IDS = new Set(['cod', 'bacs', 'cheque']);
 const PREFERRED_ONLINE_PAYMENT_IDS = [WOO_PAYMENTS_METHOD_ID, 'stripe', 'ppcp-gateway'];
+const PUBLIC_PAYMENT_LABEL = 'Secure card payment';
+const PUBLIC_PAYMENT_TITLE = 'Secure Card Payment';
 const PAYMENT_LOGO_BASE = `${process.env.PUBLIC_URL || ''}/payment_logos`;
 const CARD_BRAND_LOGOS = [
   { key: 'visa', src: `${PAYMENT_LOGO_BASE}/visa.svg`, alt: 'Visa', className: 'h-[12px]' },
@@ -73,9 +75,17 @@ function isManualPaymentMethod(method) {
   return methodId ? MANUAL_PAYMENT_METHOD_IDS.has(String(methodId).toLowerCase()) || Boolean(method?.is_manual) : false;
 }
 
-function normalizeGatewayTitle(method) {
-  const raw = method?.title || method?.label || method?.id || 'WooPayments';
-  return String(raw).trim() || 'WooPayments';
+function getPublicPaymentCopy(method) {
+  const methodId = String(method?.id || method || '').toLowerCase();
+  if (!methodId) {
+    return { label: PUBLIC_PAYMENT_LABEL, title: PUBLIC_PAYMENT_TITLE };
+  }
+
+  if (methodId.includes('paypal') || methodId.includes('ppcp')) {
+    return { label: 'Secure online payment', title: 'Secure Online Payment' };
+  }
+
+  return { label: PUBLIC_PAYMENT_LABEL, title: PUBLIC_PAYMENT_TITLE };
 }
 
 function resolveWooNativePaymentSelection(capabilities) {
@@ -96,14 +106,17 @@ function resolveWooNativePaymentSelection(capabilities) {
   if (!preferred) {
     return {
       methodId: '',
-      label: 'WooPayments unavailable',
-      setupError: 'No online WooCommerce payment gateway is currently available. Enable WooPayments in WP Admin before launch.',
+      label: 'Secure payment unavailable',
+      orderTitle: PUBLIC_PAYMENT_TITLE,
+      setupError: 'Secure online payment is currently unavailable. Please contact support before placing this order.',
     };
   }
 
+  const publicCopy = getPublicPaymentCopy(preferred);
   return {
     methodId: String(preferred.id),
-    label: normalizeGatewayTitle(preferred),
+    label: publicCopy.label,
+    orderTitle: publicCopy.title,
     setupError: null,
   };
 }
@@ -310,7 +323,7 @@ function DesktopSummaryPanel({ cartItems, subtotal, shipping, tax, total, coupon
           {processing ? 'Preparing Payment…' : 'Continue to Secure Payment'}
           <ExternalLink size={15} strokeWidth={2.5} />
         </button>
-        <p className="text-center text-[11px] leading-relaxed text-slate-400">Payment opens on the native WooCommerce/WooPayments secure payment page.</p>
+        <p className="text-center text-[11px] leading-relaxed text-slate-400">Payment opens on our secure encrypted payment page.</p>
       </div>
     </aside>
   );
@@ -318,37 +331,43 @@ function DesktopSummaryPanel({ cartItems, subtotal, shipping, tax, total, coupon
 
 function NativePaymentCard({ gatewayLabel, capabilitiesLoading, setupError }) {
   return (
-    <StepCard delay={0.21} className="p-5 sm:p-6" id="payment-section">
-      <div className="flex items-start gap-3 mb-5">
-        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-primary-50 text-primary-600"><ShieldCheck size={18} strokeWidth={2.2} /></span>
-        <div className="min-w-0">
-          <h2 className="text-lg font-black text-slate-950 tracking-tight">Secure Payment</h2>
-          <p className="mt-1 text-sm leading-relaxed text-slate-500">Your payment will be completed through the native WooPayments checkout page after order review.</p>
-        </div>
-      </div>
-      <div className="rounded-2xl border border-primary-100 bg-gradient-to-br from-primary-50 via-white to-slate-50 p-4 sm:p-5">
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-primary-500">Payment Gateway</p>
-            <p className="mt-1 text-base font-black text-slate-950">{capabilitiesLoading ? 'Loading secure payment…' : gatewayLabel}</p>
-            <p className="mt-1 max-w-md text-xs leading-relaxed text-slate-500">Apple Pay, Google Pay, WooPay, saved cards, and other eligible methods are rendered by WooPayments based on device, browser, and store settings.</p>
-          </div>
-          <div className="flex items-center gap-3 rounded-xl border border-slate-200 bg-white px-4 py-3 shadow-sm">
-            {CARD_BRAND_LOGOS.map((logo) => <img key={logo.key} src={logo.src} alt={logo.alt} className={`${logo.className} w-auto object-contain`} loading="lazy" decoding="async" />)}
+    <StepCard delay={0.21} className="overflow-hidden p-0" id="payment-section">
+      <div className="p-5 sm:p-6">
+        <div className="flex items-start gap-3 mb-5">
+          <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-primary-50 text-primary-600 ring-1 ring-primary-100"><ShieldCheck size={19} strokeWidth={2.2} /></span>
+          <div className="min-w-0">
+            <div className="flex flex-wrap items-center gap-2">
+              <h2 className="text-lg font-black text-slate-950 tracking-tight">Secure Payment</h2>
+              <span className="rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.12em] text-emerald-700">Encrypted</span>
+            </div>
+            <p className="mt-1 text-sm leading-relaxed text-slate-500">Your order is reviewed first. Payment is completed on a protected checkout page.</p>
           </div>
         </div>
-        {setupError ? (
-          <div className="mt-4 flex items-start gap-2 rounded-xl border border-amber-200 bg-amber-50 px-3.5 py-3 text-xs leading-relaxed text-amber-800">
-            <AlertTriangle size={14} className="mt-0.5 shrink-0" />
-            <span>{setupError}</span>
+
+        <div className="rounded-[1.35rem] border border-primary-100/90 bg-[radial-gradient(circle_at_top_left,rgba(37,99,235,0.12),transparent_42%),linear-gradient(135deg,#ffffff_0%,#f8fbff_100%)] p-4 sm:p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.85)]">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="min-w-0">
+              <p className="text-[10px] font-black uppercase tracking-[0.16em] text-primary-600">Payment Method</p>
+              <p className="mt-1 text-xl font-black tracking-tight text-slate-950">{capabilitiesLoading ? 'Loading secure payment…' : gatewayLabel}</p>
+              <p className="mt-2 max-w-md text-sm leading-relaxed text-slate-600">Card details are never stored in this storefront. Accepted payment options are shown on the secure payment page.</p>
+            </div>
+            <div className="flex w-full items-center justify-center gap-4 rounded-2xl border border-slate-200 bg-white px-4 py-4 shadow-[0_10px_24px_rgba(15,23,42,0.08)] sm:w-auto sm:min-w-[220px]">
+              {CARD_BRAND_LOGOS.map((logo) => <img key={logo.key} src={logo.src} alt={logo.alt} className={`${logo.className} w-auto object-contain`} loading="lazy" decoding="async" />)}
+            </div>
           </div>
-        ) : (
-          <div className="mt-4 grid gap-2 sm:grid-cols-3 text-xs text-slate-600">
-            <div className="flex items-center gap-2"><ShieldCheck size={14} className="text-primary-600" />PCI-safe payment</div>
-            <div className="flex items-center gap-2"><Lock size={14} className="text-primary-600" />Native gateway page</div>
-            <div className="flex items-center gap-2"><PackageCheck size={14} className="text-primary-600" />Order securely held</div>
-          </div>
-        )}
+          {setupError ? (
+            <div className="mt-4 flex items-start gap-2 rounded-xl border border-amber-200 bg-amber-50 px-3.5 py-3 text-xs leading-relaxed text-amber-800">
+              <AlertTriangle size={14} className="mt-0.5 shrink-0" />
+              <span>{setupError}</span>
+            </div>
+          ) : (
+            <div className="mt-4 grid gap-2 text-xs font-semibold text-slate-600 sm:grid-cols-3">
+              <div className="flex items-center gap-2 rounded-xl bg-white/70 px-3 py-2"><ShieldCheck size={14} className="text-primary-600" />PCI-safe flow</div>
+              <div className="flex items-center gap-2 rounded-xl bg-white/70 px-3 py-2"><Lock size={14} className="text-primary-600" />Encrypted checkout</div>
+              <div className="flex items-center gap-2 rounded-xl bg-white/70 px-3 py-2"><PackageCheck size={14} className="text-primary-600" />Order securely held</div>
+            </div>
+          )}
+        </div>
       </div>
     </StepCard>
   );
@@ -369,7 +388,8 @@ export default function Checkout() {
   const [orderDetails, setOrderDetails] = useState(null);
   const [step, setStep] = useState('form');
   const [paymentMethod, setPaymentMethod] = useState(WOO_PAYMENTS_METHOD_ID);
-  const [paymentGatewayLabel, setPaymentGatewayLabel] = useState('WooPayments');
+  const [paymentGatewayLabel, setPaymentGatewayLabel] = useState(PUBLIC_PAYMENT_LABEL);
+  const [paymentMethodTitle, setPaymentMethodTitle] = useState(PUBLIC_PAYMENT_TITLE);
   const [paymentSetupError, setPaymentSetupError] = useState(null);
   const [capabilitiesLoading, setCapabilitiesLoading] = useState(true);
   const [couponInput, setCouponInput] = useState('');
@@ -389,12 +409,14 @@ export default function Checkout() {
         const selection = resolveWooNativePaymentSelection(caps);
         setPaymentMethod(selection.methodId);
         setPaymentGatewayLabel(selection.label);
+        setPaymentMethodTitle(selection.orderTitle);
         setPaymentSetupError(selection.setupError);
       })
       .catch(() => {
         if (!mounted) return;
         setPaymentMethod(WOO_PAYMENTS_METHOD_ID);
-        setPaymentGatewayLabel('WooPayments');
+        setPaymentGatewayLabel(PUBLIC_PAYMENT_LABEL);
+        setPaymentMethodTitle(PUBLIC_PAYMENT_TITLE);
         setPaymentSetupError(null);
       })
       .finally(() => { if (mounted) setCapabilitiesLoading(false); });
@@ -467,7 +489,7 @@ export default function Checkout() {
   const handlePlaceOrder = useCallback(async () => {
     if (!validateForm()) return;
     if (!paymentMethod || isManualPaymentMethod(paymentMethod) || paymentSetupError) {
-      setCheckoutError(paymentSetupError || 'WooPayments is not currently available. Please contact support.');
+      setCheckoutError(paymentSetupError || 'Secure online payment is not currently available. Please contact support.');
       return;
     }
 
@@ -500,7 +522,7 @@ export default function Checkout() {
         wcRateId,
         selectedRate ? selectedRate.price : '',
         manualCoupons,
-        paymentGatewayLabel,
+        paymentMethodTitle,
       );
       setStep('placing');
       const orderPayload = resolveOrderPayload(response);
@@ -519,11 +541,11 @@ export default function Checkout() {
       setProcessing(false);
       setStep('form');
     }
-  }, [clearCart, formData, manualCoupons, paymentGatewayLabel, paymentMethod, paymentSetupError, safeCartItems, selectedRate, validateForm]);
+  }, [clearCart, formData, manualCoupons, paymentMethod, paymentMethodTitle, paymentSetupError, safeCartItems, selectedRate, validateForm]);
 
   useEffect(() => {
     if (processing) {
-      showWorkflow({ label: step === 'syncing' ? 'Preparing secure payment…' : 'Creating your order…', sublabel: 'You will be redirected to the secure WooPayments payment page.', blocking: true });
+      showWorkflow({ label: step === 'syncing' ? 'Preparing secure payment…' : 'Creating your order…', sublabel: 'You will be redirected to the secure payment page.', blocking: true });
       return;
     }
     hideWorkflow();
@@ -680,7 +702,7 @@ export default function Checkout() {
                     {processing ? 'Preparing Payment…' : 'Continue to Secure Payment'}
                     <ExternalLink size={15} strokeWidth={2.5} />
                   </button>
-                  <p className="mt-2 text-center text-[11px] text-slate-500">Secure payment handled by WooPayments.</p>
+                  <p className="mt-2 text-center text-[11px] text-slate-500">Secure payment handled by our encrypted payment gateway.</p>
                 </div>
               </div>
             </div>
