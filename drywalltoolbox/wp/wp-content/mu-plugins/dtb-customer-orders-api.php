@@ -50,6 +50,40 @@ function dtb_customer_orders_register_routes(): void {
 	] );
 }
 
+function dtb_customer_orders_current_user_id(): int {
+	$user_id = absint( get_current_user_id() );
+	if ( $user_id > 0 ) {
+		return $user_id;
+	}
+
+	if ( function_exists( 'dtb_jwt_get_user_id' ) ) {
+		$user_id = absint( dtb_jwt_get_user_id() );
+		if ( $user_id > 0 ) {
+			return $user_id;
+		}
+	}
+
+	return 0;
+}
+
+function dtb_customer_orders_current_user(): ?WP_User {
+	$user_id = dtb_customer_orders_current_user_id();
+	if ( $user_id <= 0 ) {
+		return null;
+	}
+
+	$user = get_userdata( $user_id );
+	return $user instanceof WP_User ? $user : null;
+}
+
+function dtb_customer_orders_user_can_manage_orders( int $user_id ): bool {
+	if ( $user_id <= 0 ) {
+		return false;
+	}
+
+	return user_can( $user_id, 'manage_woocommerce' ) || user_can( $user_id, 'edit_shop_orders' );
+}
+
 function dtb_customer_orders_auth_permission( WP_REST_Request $request ): bool|WP_Error {
 	if ( function_exists( 'dtb_check_origin' ) && ! dtb_check_origin() ) {
 		return new WP_Error( 'forbidden_origin', 'Origin not allowed.', [ 'status' => 403 ] );
@@ -94,13 +128,13 @@ function dtb_customer_orders_order_permission( WP_REST_Request $request ): bool|
 		}
 	}
 
-	$current_user_id = get_current_user_id();
-	$current_user    = $current_user_id > 0 ? get_userdata( $current_user_id ) : null;
+	$current_user_id = dtb_customer_orders_current_user_id();
+	$current_user    = dtb_customer_orders_current_user();
 	$user_email      = $current_user ? strtolower( (string) $current_user->user_email ) : '';
 	$order_email     = strtolower( (string) $order->get_billing_email() );
 	$order_customer  = absint( $order->get_customer_id() );
 
-	if ( current_user_can( 'manage_woocommerce' ) || current_user_can( 'edit_shop_orders' ) ) {
+	if ( dtb_customer_orders_user_can_manage_orders( $current_user_id ) ) {
 		return true;
 	}
 
@@ -120,8 +154,8 @@ function dtb_customer_orders_list_route( WP_REST_Request $request ): WP_REST_Res
 		return new WP_REST_Response( [ 'orders' => [], 'page' => 1, 'per_page' => 20, 'has_more' => false ], 200 );
 	}
 
-	$user_id  = get_current_user_id();
-	$user     = $user_id > 0 ? get_userdata( $user_id ) : null;
+	$user_id  = dtb_customer_orders_current_user_id();
+	$user     = dtb_customer_orders_current_user();
 	$email    = $user ? sanitize_email( (string) $user->user_email ) : '';
 	$page     = max( 1, absint( $request->get_param( 'page' ) ?: 1 ) );
 	$per_page = min( 50, max( 1, absint( $request->get_param( 'per_page' ) ?: 20 ) ) );
