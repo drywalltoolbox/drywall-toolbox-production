@@ -18,11 +18,17 @@ export default function StorefrontSearchOverlay({
   brands = [],
   categories = [],
   suggestions = [],
+  results = [],
 }) {
   const { addToCart } = useCart();
   const [modalProduct, setModalProduct] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const hasQuery = useMemo(() => query.trim().length > 0, [query]);
+  const resolvedSuggestions = useMemo(() => {
+    const primary = Array.isArray(suggestions) ? suggestions : [];
+    if (primary.length > 0) return primary;
+    return Array.isArray(results) ? results : [];
+  }, [suggestions, results]);
   const normalizedCategories = useMemo(
     () => categories
       .map((category) => normalizeCatalogCategoryEntry(category))
@@ -142,11 +148,11 @@ export default function StorefrontSearchOverlay({
                       </div>
                     ))}
                   </section>
-                ) : suggestions.length > 0 ? (
+                ) : resolvedSuggestions.length > 0 ? (
                   <section className="storefront-search-overlay__results storefront-search-overlay__results--product-cards">
-                    {suggestions.map((product, index) => (
+                    {resolvedSuggestions.map((product, index) => (
                       <StorefrontProductTile
-                        key={product.id}
+                        key={product.id || product.slug || product.sku || index}
                         product={product}
                         cardProduct={product?.cardProduct || null}
                         variant="list"
