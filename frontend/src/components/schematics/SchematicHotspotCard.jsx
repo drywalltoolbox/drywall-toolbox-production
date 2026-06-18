@@ -9,6 +9,7 @@ import {
   resolveSchematicVariantPart,
   schematicPartKeysDiffer,
 } from '../../utils/schematicVariantParts.js';
+import '../../styles/schematic-hotspot-card-polish.css';
 
 // ---------------------------------------------------------------------------
 // Helpers — purely derived from props, no external state needed.
