@@ -1,12 +1,57 @@
 import { Link } from 'react-router-dom';
 import { ShoppingCart, X, Package, Minus, Plus, ArrowRight, Trash2 } from 'lucide-react';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
-export default function StorefrontCartSheet({ isOpen, onClose, cartItems = [], removeFromCart, updateQuantity, getCartTotal, isMutating = false }) {
+const CART_QTY_SYNC_DELAY_MS = 260;
+const MAX_CART_QUANTITY = 99;
+
+function getCartItemKey(item) {
+  return String(item?.cartKey || item?.key || item?.id || '');
+}
+
+function getDisplayQuantity(item, localQuantities) {
+  const key = getCartItemKey(item);
+  const localQty = Number(localQuantities[key]);
+  const itemQty = Number(item?.quantity);
+  if (Number.isFinite(localQty) && localQty >= 1) return localQty;
+  if (Number.isFinite(itemQty) && itemQty >= 1) return itemQty;
+  return 1;
+}
+
+export default function StorefrontCartSheet({
+  isOpen,
+  onClose,
+  cartItems = [],
+  removeFromCart,
+  updateQuantity,
+}) {
   const overlayRef = useRef(null);
   const closeButtonRef = useRef(null);
   const previouslyFocusedRef = useRef(null);
-  const [pendingKey, setPendingKey] = useState(null);
+  const syncTimersRef = useRef(new Map());
+  const syncingKeysRef = useRef(new Set());
+  const localQuantitiesRef = useRef({});
+
+  const [removingKey, setRemovingKey] = useState(null);
+  const [syncingKeys, setSyncingKeys] = useState(() => new Set());
+  const [localQuantities, setLocalQuantities] = useState({});
+
+  const setItemSyncing = useCallback((key, isSyncing) => {
+    if (!key) return;
+    const next = new Set(syncingKeysRef.current);
+    if (isSyncing) next.add(key);
+    else next.delete(key);
+    syncingKeysRef.current = next;
+    setSyncingKeys(next);
+  }, []);
+
+  const clearQuantityTimer = useCallback((key) => {
+    const timer = syncTimersRef.current.get(key);
+    if (timer) {
+      window.clearTimeout(timer);
+      syncTimersRef.current.delete(key);
+    }
+  }, []);
 
   const handleClose = useCallback(() => {
     if (overlayRef.current?.contains(document.activeElement)) {
@@ -21,31 +66,77 @@ export default function StorefrontCartSheet({ isOpen, onClose, cartItems = [], r
   }, [handleClose]);
 
   const handleRemove = useCallback(async (key) => {
-    if (isMutating) return;
-    setPendingKey(key);
+    if (!key || removingKey === key) return;
+    clearQuantityTimer(key);
+    setItemSyncing(key, false);
+    setRemovingKey(key);
+
     try {
       await removeFromCart?.(key);
     } finally {
-      setPendingKey(null);
+      setRemovingKey((current) => (current === key ? null : current));
     }
-  }, [isMutating, removeFromCart]);
+  }, [clearQuantityTimer, removeFromCart, removingKey, setItemSyncing]);
 
-  const handleQtyChange = useCallback(async (key, delta, currentQty) => {
-    if (isMutating) return;
-    const baseQty = Number(currentQty);
-    const next = (Number.isFinite(baseQty) ? baseQty : 0) + Number(delta || 0);
-    if (next < 1) {
-      await handleRemove(key);
+  const scheduleQuantitySync = useCallback((key, quantity) => {
+    clearQuantityTimer(key);
+    setItemSyncing(key, true);
+
+    const timer = window.setTimeout(async () => {
+      syncTimersRef.current.delete(key);
+      try {
+        await updateQuantity?.(key, quantity);
+      } finally {
+        setItemSyncing(key, false);
+      }
+    }, CART_QTY_SYNC_DELAY_MS);
+
+    syncTimersRef.current.set(key, timer);
+  }, [clearQuantityTimer, setItemSyncing, updateQuantity]);
+
+  const handleQtyChange = useCallback((key, delta, currentQty) => {
+    if (!key || removingKey === key) return;
+
+    const baseQty = Number(localQuantitiesRef.current[key] ?? currentQty);
+    const nextQuantity = (Number.isFinite(baseQty) ? baseQty : 1) + Number(delta || 0);
+
+    if (nextQuantity < 1) {
+      handleRemove(key);
       return;
     }
-    if (next > 99) return;
-    setPendingKey(key);
-    try {
-      await updateQuantity?.(key, next);
-    } finally {
-      setPendingKey(null);
+
+    if (nextQuantity > MAX_CART_QUANTITY) return;
+
+    setLocalQuantities((current) => {
+      const next = { ...current, [key]: nextQuantity };
+      localQuantitiesRef.current = next;
+      return next;
+    });
+
+    scheduleQuantitySync(key, nextQuantity);
+  }, [handleRemove, removingKey, scheduleQuantitySync]);
+
+  useEffect(() => {
+    const next = {};
+    const activeSyncKeys = syncingKeysRef.current;
+
+    for (const item of cartItems) {
+      const key = getCartItemKey(item);
+      if (!key) continue;
+      const localQty = localQuantitiesRef.current[key];
+      next[key] = activeSyncKeys.has(key) && Number.isFinite(Number(localQty))
+        ? Number(localQty)
+        : item.quantity;
     }
-  }, [isMutating, updateQuantity, handleRemove]);
+
+    localQuantitiesRef.current = next;
+    setLocalQuantities(next);
+  }, [cartItems]);
+
+  useEffect(() => () => {
+    syncTimersRef.current.forEach((timer) => window.clearTimeout(timer));
+    syncTimersRef.current.clear();
+  }, []);
 
   useEffect(() => {
     if (isOpen) {
@@ -73,8 +164,15 @@ export default function StorefrontCartSheet({ isOpen, onClose, cartItems = [], r
     };
   }, [isOpen, handleClose]);
 
-  const subtotal = getCartTotal();
-  const itemCount = cartItems.reduce((n, item) => n + item.quantity, 0);
+  const subtotal = useMemo(
+    () => cartItems.reduce((total, item) => total + (Number(item.price) || 0) * getDisplayQuantity(item, localQuantities), 0),
+    [cartItems, localQuantities]
+  );
+
+  const itemCount = useMemo(
+    () => cartItems.reduce((count, item) => count + getDisplayQuantity(item, localQuantities), 0),
+    [cartItems, localQuantities]
+  );
 
   return (
     <div
@@ -91,7 +189,6 @@ export default function StorefrontCartSheet({ isOpen, onClose, cartItems = [], r
         aria-modal={isOpen ? 'true' : 'false'}
         aria-label="Shopping cart"
       >
-        {/* ── Header ── */}
         <header className="scs-header">
           <div className="scs-header-left">
             <div className="scs-header-icon">
@@ -107,7 +204,6 @@ export default function StorefrontCartSheet({ isOpen, onClose, cartItems = [], r
           </button>
         </header>
 
-        {/* ── Items ── */}
         <div className="scs-body">
           {cartItems.length === 0 ? (
             <div className="scs-empty">
@@ -123,13 +219,20 @@ export default function StorefrontCartSheet({ isOpen, onClose, cartItems = [], r
           ) : (
             <ul className="scs-item-list" role="list">
               {cartItems.map((item) => {
-                const key = item.cartKey || item.id;
-                const isPending = isMutating || pendingKey === key;
+                const key = getCartItemKey(item);
+                const quantity = getDisplayQuantity(item, localQuantities);
+                const isSyncing = syncingKeys.has(key);
+                const isRemoving = removingKey === key;
                 const skuText = item.sku || item.part_number || '';
-                const lineTotal = (item.price * item.quantity).toFixed(2);
+                const lineTotal = ((Number(item.price) || 0) * quantity).toFixed(2);
 
                 return (
-                  <li key={key} className={`scs-item${isPending ? ' scs-item--pending' : ''}`} role="listitem">
+                  <li
+                    key={key}
+                    className={`scs-item${isSyncing ? ' scs-item--syncing' : ''}${isRemoving ? ' scs-item--removing' : ''}`}
+                    role="listitem"
+                    aria-busy={isSyncing || isRemoving ? 'true' : 'false'}
+                  >
                     <div className="scs-item-img">
                       {item.image
                         ? <img src={item.image} alt={item.name} loading="lazy" decoding="async" />
@@ -144,7 +247,7 @@ export default function StorefrontCartSheet({ isOpen, onClose, cartItems = [], r
                           onClick={() => handleRemove(key)}
                           aria-label={`Remove ${item.name}`}
                           className="scs-item-remove"
-                          disabled={isPending}
+                          disabled={isRemoving}
                         >
                           <X size={13} strokeWidth={2.5} />
                         </button>
@@ -157,27 +260,30 @@ export default function StorefrontCartSheet({ isOpen, onClose, cartItems = [], r
                           <button
                             type="button"
                             className="scs-qty-btn"
-                            onClick={() => handleQtyChange(key, -1, item.quantity)}
-                            aria-label={item.quantity === 1 ? `Remove ${item.name}` : 'Decrease quantity'}
-                            disabled={isPending}
+                            onClick={() => handleQtyChange(key, -1, quantity)}
+                            aria-label={quantity === 1 ? `Remove ${item.name}` : 'Decrease quantity'}
+                            disabled={isRemoving}
                           >
-                            {item.quantity === 1
+                            {quantity === 1
                               ? <Trash2 size={11} strokeWidth={2.2} />
                               : <Minus size={11} strokeWidth={2.5} />}
                           </button>
-                          <span className="scs-qty-display" aria-live="polite">{item.quantity}</span>
+                          <span className="scs-qty-display" aria-live="polite">{quantity}</span>
                           <button
                             type="button"
                             className="scs-qty-btn"
-                            onClick={() => handleQtyChange(key, 1, item.quantity)}
+                            onClick={() => handleQtyChange(key, 1, quantity)}
                             aria-label="Increase quantity"
-                            disabled={isPending || item.quantity >= 99}
+                            disabled={isRemoving || quantity >= MAX_CART_QUANTITY}
                           >
                             <Plus size={11} strokeWidth={2.5} />
                           </button>
                         </div>
 
-                        <span className="scs-item-line-total">${lineTotal}</span>
+                        <span className="scs-item-line-total">
+                          {isSyncing ? <span className="scs-sync-dot" aria-hidden="true" /> : null}
+                          ${lineTotal}
+                        </span>
                       </div>
                     </div>
                   </li>
@@ -187,7 +293,6 @@ export default function StorefrontCartSheet({ isOpen, onClose, cartItems = [], r
           )}
         </div>
 
-        {/* ── Footer ── */}
         {cartItems.length > 0 && (
           <footer className="scs-footer">
             <div className="scs-subtotal-row">
@@ -226,7 +331,6 @@ export default function StorefrontCartSheet({ isOpen, onClose, cartItems = [], r
           overflow: hidden;
         }
 
-        /* ── Header ── */
         .scs-header {
           display: flex;
           align-items: center;
@@ -304,7 +408,6 @@ export default function StorefrontCartSheet({ isOpen, onClose, cartItems = [], r
           color: #0f172a;
         }
 
-        /* ── Body ── */
         .scs-body {
           flex: 1 1 auto;
           overflow-y: auto;
@@ -321,7 +424,6 @@ export default function StorefrontCartSheet({ isOpen, onClose, cartItems = [], r
         }
         .scs-body::-webkit-scrollbar-track { background: transparent; }
 
-        /* ── Empty state ── */
         .scs-empty {
           display: flex;
           flex-direction: column;
@@ -377,7 +479,6 @@ export default function StorefrontCartSheet({ isOpen, onClose, cartItems = [], r
         .scs-browse-btn:hover  { background: #1e293b; }
         .scs-browse-btn:active { transform: scale(0.97); }
 
-        /* ── Item list ── */
         .scs-item-list {
           list-style: none;
           margin: 0;
@@ -390,11 +491,16 @@ export default function StorefrontCartSheet({ isOpen, onClose, cartItems = [], r
           gap: 11px;
           padding: 13px 16px;
           border-bottom: 1px solid #f8fafc;
-          transition: background 100ms ease, opacity 160ms ease;
+          transition: background 140ms ease, opacity 160ms ease, transform 160ms ease;
         }
 
-        .scs-item--pending {
-          opacity: 0.55;
+        .scs-item--syncing {
+          background: linear-gradient(90deg, rgba(37,99,235,0.045), transparent 72%);
+        }
+
+        .scs-item--removing {
+          opacity: 0.48;
+          transform: translateX(3px);
           pointer-events: none;
         }
 
@@ -446,12 +552,6 @@ export default function StorefrontCartSheet({ isOpen, onClose, cartItems = [], r
           -webkit-box-orient: vertical;
         }
 
-        .scs-item-variant {
-          font-size: 0.72rem;
-          color: #94a3b8;
-          line-height: 1.3;
-        }
-
         .scs-item-sku {
           font-family: var(--font-mono);
           font-size: 0.7rem;
@@ -483,7 +583,6 @@ export default function StorefrontCartSheet({ isOpen, onClose, cartItems = [], r
         .scs-item-remove:hover { color: #ef4444; background: #fef2f2; }
         .scs-item-remove:disabled { opacity: 0.4; cursor: not-allowed; }
 
-        /* ── Qty stepper + line total ── */
         .scs-item-bottom {
           display: flex;
           align-items: center;
@@ -500,6 +599,13 @@ export default function StorefrontCartSheet({ isOpen, onClose, cartItems = [], r
           border-radius: 8px;
           overflow: hidden;
           border: 1px solid #e2e8f0;
+          transition: border-color 140ms ease, background 140ms ease, box-shadow 140ms ease;
+        }
+
+        .scs-item--syncing .scs-item-qty-row {
+          border-color: rgba(37, 99, 235, 0.28);
+          background: #eef4ff;
+          box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.08);
         }
 
         .scs-qty-btn {
@@ -514,11 +620,12 @@ export default function StorefrontCartSheet({ isOpen, onClose, cartItems = [], r
           cursor: pointer;
           padding: 0;
           flex-shrink: 0;
-          transition: background 100ms ease, color 100ms ease;
+          transition: background 100ms ease, color 100ms ease, transform 90ms ease;
+          touch-action: manipulation;
         }
 
         .scs-qty-btn:hover:not(:disabled) { background: #e2e8f0; color: #0f172a; }
-        .scs-qty-btn:active:not(:disabled) { background: #cbd5e1; }
+        .scs-qty-btn:active:not(:disabled) { background: #cbd5e1; transform: scale(0.94); }
         .scs-qty-btn:disabled { color: #cbd5e1; cursor: not-allowed; }
 
         .scs-qty-display {
@@ -530,17 +637,38 @@ export default function StorefrontCartSheet({ isOpen, onClose, cartItems = [], r
           font-variant-numeric: tabular-nums;
           padding: 0 2px;
           user-select: none;
+          transition: color 140ms ease, transform 140ms ease;
+        }
+
+        .scs-item--syncing .scs-qty-display {
+          color: #2563eb;
+          transform: scale(1.04);
         }
 
         .scs-item-line-total {
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
           font-size: 0.84rem;
           font-weight: 800;
           color: #0f172a;
           font-variant-numeric: tabular-nums;
           white-space: nowrap;
+          transition: color 140ms ease, transform 140ms ease;
         }
 
-        /* ── Footer ── */
+        .scs-item--syncing .scs-item-line-total {
+          color: #2563eb;
+        }
+
+        .scs-sync-dot {
+          width: 6px;
+          height: 6px;
+          border-radius: 999px;
+          background: #2563eb;
+          box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12);
+        }
+
         .scs-footer {
           padding: 14px 16px calc(env(safe-area-inset-bottom, 0px) + 14px);
           border-top: 1px solid #f1f5f9;
