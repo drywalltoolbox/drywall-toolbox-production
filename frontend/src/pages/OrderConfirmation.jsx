@@ -24,20 +24,20 @@ import SEOHead from '../components/shared/SEOHead';
 import '../styles/order-pages.css';
 
 const STATUS_CONFIG = {
-  pending: { label: 'Pending Payment', color: 'yellow', Icon: Clock },
-  processing: { label: 'Processing', color: 'blue', Icon: Package },
-  'on-hold': { label: 'Payment Under Review', color: 'orange', Icon: Clock },
-  completed: { label: 'Completed', color: 'green', Icon: CheckCircle },
-  cancelled: { label: 'Cancelled', color: 'red', Icon: AlertCircle },
-  refunded: { label: 'Refunded', color: 'gray', Icon: AlertCircle },
-  failed: { label: 'Payment Failed', color: 'red', Icon: AlertCircle },
-  shipped: { label: 'Shipped', color: 'blue', Icon: Truck },
-  'repair-received': { label: 'Repair Received', color: 'blue', Icon: Package },
-  'repair-in-progress': { label: 'Repair In Progress', color: 'blue', Icon: Package },
-  'repair-awaiting-approval': { label: 'Awaiting Your Approval', color: 'orange', Icon: Clock },
-  'repair-approved': { label: 'Repair Approved', color: 'blue', Icon: Package },
-  'repair-complete': { label: 'Repair Complete', color: 'green', Icon: CheckCircle },
-  'repair-shipped': { label: 'Tool Shipped Back', color: 'green', Icon: Truck },
+  pending: { label: 'Pending Payment', Icon: Clock },
+  processing: { label: 'Processing', Icon: Package },
+  'on-hold': { label: 'Payment Under Review', Icon: Clock },
+  completed: { label: 'Completed', Icon: CheckCircle },
+  cancelled: { label: 'Cancelled', Icon: AlertCircle },
+  refunded: { label: 'Refunded', Icon: AlertCircle },
+  failed: { label: 'Payment Failed', Icon: AlertCircle },
+  shipped: { label: 'Shipped', Icon: Truck },
+  'repair-received': { label: 'Repair Received', Icon: Package },
+  'repair-in-progress': { label: 'Repair In Progress', Icon: Package },
+  'repair-awaiting-approval': { label: 'Awaiting Your Approval', Icon: Clock },
+  'repair-approved': { label: 'Repair Approved', Icon: Package },
+  'repair-complete': { label: 'Repair Complete', Icon: CheckCircle },
+  'repair-shipped': { label: 'Tool Shipped Back', Icon: Truck },
 };
 
 function StatusBadge({ status }) {
@@ -79,11 +79,11 @@ function DetailRow({ icon: Icon, label, children }) {
   if (!children) return null;
   return (
     <div className="dtb-order-detail-row">
-      <span className="dtb-order-detail-label">{label}</span>
-      <span className="dtb-order-detail-value">
+      <dt className="dtb-order-detail-label">{label}</dt>
+      <dd className="dtb-order-detail-value">
         {Icon ? <Icon size={15} style={{ display: 'inline', marginRight: 8, verticalAlign: '-2px', color: '#2563eb' }} /> : null}
         {children}
-      </span>
+      </dd>
     </div>
   );
 }
