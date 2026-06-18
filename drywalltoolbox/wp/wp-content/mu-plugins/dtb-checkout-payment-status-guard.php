@@ -77,6 +77,29 @@ if ( ! function_exists( 'dtb_checkout_status_guard_normalize_order' ) ) {
 	}
 }
 
+if ( ! function_exists( 'dtb_checkout_status_guard_is_unpaid_native_order' ) ) {
+	/**
+	 * Identify DTB-created native payment orders that still need gateway payment.
+	 */
+	function dtb_checkout_status_guard_is_unpaid_native_order( WC_Order $order ): bool {
+		$gateway = (string) $order->get_meta( '_dtb_checkout_gateway', true );
+		if ( 'woo_native' !== $gateway ) {
+			return false;
+		}
+
+		$payment_method = sanitize_key( (string) $order->get_payment_method() );
+		if ( in_array( $payment_method, [ 'cod', 'bacs', 'cheque' ], true ) ) {
+			return false;
+		}
+
+		if ( '' !== (string) $order->get_meta( '_dtb_payment_ref', true ) ) {
+			return false;
+		}
+
+		return ! $order->get_transaction_id() && ! $order->get_date_paid() && (float) $order->get_total() > 0;
+	}
+}
+
 add_action( 'woocommerce_update_order', 'dtb_checkout_status_guard_normalize_order', 999, 1 );
 add_action(
 	'woocommerce_order_status_changed',
@@ -85,4 +108,30 @@ add_action(
 	},
 	999,
 	1
+);
+
+add_filter(
+	'woocommerce_valid_order_statuses_for_payment',
+	static function ( array $statuses, WC_Order $order ): array {
+		if ( ! dtb_checkout_status_guard_is_unpaid_native_order( $order ) ) {
+			return $statuses;
+		}
+
+		return array_values( array_unique( array_merge( $statuses, [ 'pending', 'failed', 'on-hold', 'processing' ] ) ) );
+	},
+	20,
+	2
+);
+
+add_filter(
+	'woocommerce_order_needs_payment',
+	static function ( bool $needs_payment, WC_Order $order ): bool {
+		if ( $needs_payment || ! dtb_checkout_status_guard_is_unpaid_native_order( $order ) ) {
+			return $needs_payment;
+		}
+
+		return in_array( (string) $order->get_status(), [ 'pending', 'failed', 'on-hold', 'processing' ], true );
+	},
+	20,
+	2
 );
