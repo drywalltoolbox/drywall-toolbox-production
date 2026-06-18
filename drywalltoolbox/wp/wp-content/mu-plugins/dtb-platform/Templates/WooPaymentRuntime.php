@@ -368,7 +368,7 @@ defined( 'ABSPATH' ) || exit;
 <main class="dtb-payment-shell">
 	<div class="dtb-payment-wrap">
 		<header class="dtb-payment-brand" aria-label="Drywall Toolbox secure payment">
-			<img src="<?php echo esc_url( home_url( '/logo-white.svg' ) ); ?>" alt="Drywall Toolbox" onerror="this.style.display='none';this.nextElementSibling.style.display='block';">
+			<img src="<?php echo esc_url( home_url( '/logos/drywall-logo-white.png' ) ); ?>" alt="Drywall Toolbox" onerror="this.style.display='none';this.nextElementSibling.style.display='block';">
 			<span class="dtb-payment-brand__fallback">Drywall Toolbox</span>
 		</header>
 		<section class="dtb-payment-card" aria-labelledby="dtb-payment-title">
@@ -385,13 +385,14 @@ defined( 'ABSPATH' ) || exit;
 				</div>
 			</div>
 			<?php
-			if ( have_posts() ) {
+			if ( shortcode_exists( 'woocommerce_checkout' ) ) {
+				// Order-pay must use the classic checkout shortcode so gateways can render their payment form.
+				echo do_shortcode( '[woocommerce_checkout]' );
+			} elseif ( have_posts() ) {
 				while ( have_posts() ) {
 					the_post();
 					the_content();
 				}
-			} elseif ( shortcode_exists( 'woocommerce_checkout' ) ) {
-				echo do_shortcode( '[woocommerce_checkout]' );
 			} else {
 				echo '<p>Secure payment is temporarily unavailable. Please contact support.</p>';
 			}

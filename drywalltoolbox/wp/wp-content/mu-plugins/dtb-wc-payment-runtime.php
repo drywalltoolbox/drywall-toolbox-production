@@ -59,6 +59,12 @@ add_action(
 		if ( function_exists( 'hb_dequeue_all_frontend_assets' ) ) {
 			remove_action( 'wp_enqueue_scripts', 'hb_dequeue_all_frontend_assets', 9999 );
 		}
+		if ( function_exists( 'dtb_dequeue_non_react_assets' ) ) {
+			remove_action( 'wp_enqueue_scripts', 'dtb_dequeue_non_react_assets', 9999 );
+		}
+		if ( function_exists( 'dtb_enqueue_react_app' ) ) {
+			remove_action( 'wp_enqueue_scripts', 'dtb_enqueue_react_app' );
+		}
 	},
 	1
 );

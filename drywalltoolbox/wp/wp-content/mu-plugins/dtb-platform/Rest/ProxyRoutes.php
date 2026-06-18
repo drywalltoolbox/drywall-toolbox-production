@@ -923,6 +923,9 @@ function dtb_checkout_woo_native_finalize( array $context, WP_REST_Request $requ
 
 	$order->set_payment_method( $payment_method );
 	$order->set_payment_method_title( sanitize_text_field( (string) ( $context['payment_method_title'] ?? strtoupper( $payment_method ) ) ) );
+	if ( ! $set_paid ) {
+		$order->set_status( 'pending' );
+	}
 	if ( '' !== $customer_note ) {
 		$order->set_customer_note( $customer_note );
 	}
