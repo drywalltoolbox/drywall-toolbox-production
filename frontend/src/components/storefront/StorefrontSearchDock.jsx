@@ -1,5 +1,6 @@
 import { Search } from 'lucide-react';
 import { useId } from 'react';
+import '../../styles/mobile-search-dock-polish.css';
 
 export default function StorefrontSearchDock({
   value,
