@@ -31,6 +31,7 @@ import { useOrderStatus } from '../hooks/useOrderStatus.js';
 import { useOrderEventStream } from '../hooks/useOrderEventStream.js';
 import { ORDER_STATUS_LABELS, ORDER_TERMINAL_STATUSES } from '../api/orders.js';
 import '../styles/order-pages.css';
+import '../styles/order-tracking.css';
 
 const STATUS_ICONS = {
   pending: Clock,
