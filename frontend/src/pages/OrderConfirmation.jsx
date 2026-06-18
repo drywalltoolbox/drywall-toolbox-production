@@ -1,14 +1,7 @@
 /**
  * frontend/src/pages/OrderConfirmation.jsx
  *
- * Order status page: /order/:id
- *
- * Fetches the WooCommerce order via the drywall/v1 proxy.
- * The proxy endpoint (GET /drywall/v1/orders/{id}) is JWT-gated, so this page
- * is only fully functional for authenticated customers.
- *
- * Guest customers can still see the summary shown on the Checkout success
- * screen; this page provides the persistent order status URL.
+ * Customer-facing order summary page: /order/:id
  */
 
 import { useState, useEffect } from 'react';
@@ -22,13 +15,18 @@ import {
   AlertCircle,
   Loader,
   ArrowLeft,
+  CreditCard,
+  Mail,
+  MapPin,
+  User,
 } from 'lucide-react';
 import SEOHead from '../components/shared/SEOHead';
+import '../styles/order-pages.css';
 
 const STATUS_CONFIG = {
   pending: { label: 'Pending Payment', color: 'yellow', Icon: Clock },
   processing: { label: 'Processing', color: 'blue', Icon: Package },
-  'on-hold': { label: 'On Hold', color: 'orange', Icon: Clock },
+  'on-hold': { label: 'Payment Under Review', color: 'orange', Icon: Clock },
   completed: { label: 'Completed', color: 'green', Icon: CheckCircle },
   cancelled: { label: 'Cancelled', color: 'red', Icon: AlertCircle },
   refunded: { label: 'Refunded', color: 'gray', Icon: AlertCircle },
@@ -42,23 +40,51 @@ const STATUS_CONFIG = {
   'repair-shipped': { label: 'Tool Shipped Back', color: 'green', Icon: Truck },
 };
 
-const COLOR_CLASSES = {
-  yellow: 'bg-yellow-50 text-yellow-800 border-yellow-200',
-  blue: 'bg-blue-50 text-blue-800 border-blue-200',
-  orange: 'bg-orange-50 text-orange-800 border-orange-200',
-  green: 'bg-green-50 text-green-800 border-green-200',
-  red: 'bg-red-50 text-red-800 border-red-200',
-  gray: 'bg-gray-100 text-gray-800 border-gray-200',
-};
-
 function StatusBadge({ status }) {
-  const cfg = STATUS_CONFIG[status] || { label: status, color: 'gray', Icon: Package };
-  const { label, color, Icon } = cfg;
+  const cfg = STATUS_CONFIG[status] || { label: status || 'Order Received', Icon: Package };
+  const Icon = cfg.Icon;
   return (
-    <span className={`inline-flex items-center gap-2 px-3 py-1 rounded-full border text-sm font-semibold ${COLOR_CLASSES[color]}`}>
+    <span className="dtb-order-status-badge">
       <Icon size={14} />
-      {label}
+      {cfg.label}
     </span>
+  );
+}
+
+function parseMoney(value) {
+  const numeric = typeof value === 'number' ? value : parseFloat(String(value ?? ''));
+  return Number.isFinite(numeric) ? numeric : 0;
+}
+
+function money(value) {
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(parseMoney(value));
+}
+
+function hasMoneyField(value) {
+  return value !== null && value !== undefined && value !== '';
+}
+
+function buildAddress(fields = {}) {
+  return [fields.address_1, fields.address_2, fields.city, fields.state, fields.postcode]
+    .filter(Boolean)
+    .join(', ');
+}
+
+function DetailRow({ icon: Icon, label, children }) {
+  if (!children) return null;
+  return (
+    <div className="dtb-order-detail-row">
+      <span className="dtb-order-detail-label">{label}</span>
+      <span className="dtb-order-detail-value">
+        {Icon ? <Icon size={15} style={{ display: 'inline', marginRight: 8, verticalAlign: '-2px', color: '#2563eb' }} /> : null}
+        {children}
+      </span>
+    </div>
   );
 }
 
@@ -96,10 +122,17 @@ export default function OrderConfirmation() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <Loader className="h-12 w-12 animate-spin text-primary-600 mx-auto mb-4" />
-          <p className="text-gray-600">Loading order details…</p>
+      <div className="dtb-order-page page-wrapper">
+        <SEOHead noindex title={`Order #${id}`} />
+        <div className="dtb-order-shell">
+          <div className="dtb-order-hero">
+            <span className="dtb-order-status-icon dtb-order-status-icon--neutral">
+              <Loader className="animate-spin" size={42} strokeWidth={1.8} />
+            </span>
+            <p className="dtb-order-eyebrow">Secure order</p>
+            <h1 className="dtb-order-title">Loading order</h1>
+            <p className="dtb-order-subtitle">Retrieving your order summary and tracking details.</p>
+          </div>
         </div>
       </div>
     );
@@ -107,24 +140,21 @@ export default function OrderConfirmation() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gray-50 py-16">
-        <div className="container mx-auto px-4 max-w-2xl">
-          <div className="bg-white rounded-lg shadow-md p-8 text-center">
-            <AlertCircle className="h-16 w-16 text-red-500 mx-auto mb-4" />
-            <h2 className="text-2xl font-bold text-gray-900 mb-3">Unable to load order</h2>
-            <p className="text-gray-600 mb-6">{error}</p>
-            <div className="flex gap-4 justify-center">
-              <button
-                type="button"
-                onClick={() => navigate(-1)}
-                className="inline-flex items-center gap-2 border border-gray-300 text-gray-700 hover:bg-gray-50 px-5 py-3 rounded-lg font-semibold transition-all"
-              >
+      <div className="dtb-order-page page-wrapper">
+        <SEOHead noindex title="Order unavailable" />
+        <div className="dtb-order-shell" style={{ maxWidth: 720 }}>
+          <div className="dtb-order-hero">
+            <span className="dtb-order-status-icon dtb-order-status-icon--neutral">
+              <AlertCircle size={42} strokeWidth={1.8} />
+            </span>
+            <p className="dtb-order-eyebrow">Order lookup</p>
+            <h1 className="dtb-order-title">Unable to load order</h1>
+            <p className="dtb-order-subtitle">{error}</p>
+            <div className="dtb-order-actions">
+              <button type="button" onClick={() => navigate(-1)} className="dtb-order-button dtb-order-button--secondary">
                 <ArrowLeft size={16} /> Go Back
               </button>
-              <Link
-                to="/products"
-                className="inline-flex items-center gap-2 bg-primary-600 hover:bg-primary-700 text-white px-5 py-3 rounded-lg font-semibold transition-all"
-              >
+              <Link to="/products" className="dtb-order-button dtb-order-button--primary">
                 Continue Shopping
               </Link>
             </div>
@@ -135,113 +165,130 @@ export default function OrderConfirmation() {
   }
 
   const billing = order?.billing || {};
-  const lineItems = order?.line_items || [];
+  const lineItems = Array.isArray(order?.line_items) ? order.line_items : [];
+  const billingName = [billing.first_name, billing.last_name].filter(Boolean).join(' ');
+  const billingAddress = buildAddress(billing);
+  const shippingTotal = parseMoney(order?.shipping_total);
+  const trackingUrl = order?.id ? `/order-tracking/${encodeURIComponent(order.id)}` : `/order-tracking/${encodeURIComponent(id)}`;
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8 page-wrapper">
+    <div className="dtb-order-page page-wrapper">
       <SEOHead noindex title={`Order #${id}`} />
-      <div className="container mx-auto px-4 max-w-3xl">
-        <div className="mb-8 text-center">
-          <CheckCircle className="h-16 w-16 text-green-600 mx-auto mb-4" />
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">Order #{id}</h1>
-          {order?.status && <StatusBadge status={order.status} />}
-        </div>
+      <div className="dtb-order-shell">
+        <Link to="/dashboard?tab=orders" className="dtb-order-back-link">
+          <ArrowLeft size={14} /> Back to orders
+        </Link>
 
-        <div className="grid md:grid-cols-2 gap-6">
-          <div className="bg-white rounded-lg shadow-md p-6 border border-gray-200">
-            <h2 className="text-lg font-bold text-gray-900 mb-4">Items Ordered</h2>
-            <div className="space-y-3">
-              {lineItems.map((item) => (
-                <div key={item.id} className="flex justify-between text-sm">
-                  <div>
-                    <p className="font-semibold text-gray-900">{item.name}</p>
-                    <p className="text-gray-500">Qty: {item.quantity}</p>
-                  </div>
-                  <p className="font-semibold text-gray-900">
-                    ${parseFloat(item.total || 0).toFixed(2)}
-                  </p>
-                </div>
-              ))}
-            </div>
+        <section className="dtb-order-hero" aria-labelledby="order-title">
+          <span className="dtb-order-success-icon">
+            <CheckCircle size={54} strokeWidth={1.7} />
+          </span>
+          <p className="dtb-order-eyebrow">Order summary</p>
+          <h1 id="order-title" className="dtb-order-title">Order #{id}</h1>
+          <p className="dtb-order-subtitle">
+            Your order has been received. Use this page to review your order details and track status updates.
+          </p>
+          <div className="dtb-order-badges">
+            {order?.status ? <StatusBadge status={order.status} /> : null}
+            {order?.date_created ? (
+              <span className="dtb-order-status-badge">
+                <Clock size={14} /> {new Date(order.date_created).toLocaleDateString()}
+              </span>
+            ) : null}
+          </div>
+        </section>
 
-            {order && (
-              <div className="border-t border-gray-200 mt-4 pt-4 space-y-2 text-sm">
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Subtotal</span>
-                  <span>${parseFloat(order.subtotal || 0).toFixed(2)}</span>
+        <div className="dtb-order-grid">
+          <div className="dtb-order-stack">
+            <section className="dtb-order-card" aria-labelledby="items-title">
+              <header className="dtb-order-card__header">
+                <h2 id="items-title" className="dtb-order-card__title">
+                  <Package size={20} /> Items ordered
+                </h2>
+              </header>
+              <div className="dtb-order-card__body">
+                <div className="dtb-order-items">
+                  {lineItems.map((item) => (
+                    <article key={item.id || item.name} className="dtb-order-item">
+                      <div>
+                        <h3 className="dtb-order-item__name">{item.name}</h3>
+                        <p className="dtb-order-item__meta">Qty: {item.quantity || 1}</p>
+                      </div>
+                      <strong className="dtb-order-item__price">{money(item.total)}</strong>
+                    </article>
+                  ))}
                 </div>
-                {order.shipping_total && (
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Shipping</span>
-                    <span>
-                      {parseFloat(order.shipping_total) === 0
-                        ? <span className="text-green-600">FREE</span>
-                        : `$${parseFloat(order.shipping_total).toFixed(2)}`}
-                    </span>
+
+                {order ? (
+                  <div className="dtb-order-totals" aria-label="Order totals">
+                    <div className="dtb-order-total-row">
+                      <span>Subtotal</span>
+                      <strong>{money(order.subtotal)}</strong>
+                    </div>
+                    {hasMoneyField(order.shipping_total) ? (
+                      <div className="dtb-order-total-row">
+                        <span>Shipping</span>
+                        <strong>{shippingTotal === 0 ? <span className="dtb-order-free">FREE</span> : money(shippingTotal)}</strong>
+                      </div>
+                    ) : null}
+                    {hasMoneyField(order.total_tax) ? (
+                      <div className="dtb-order-total-row">
+                        <span>Tax</span>
+                        <strong>{money(order.total_tax)}</strong>
+                      </div>
+                    ) : null}
+                    <div className="dtb-order-total-row dtb-order-total-row--grand">
+                      <span>Total</span>
+                      <strong>{money(order.total)}</strong>
+                    </div>
                   </div>
-                )}
-                {order.total_tax && (
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Tax</span>
-                    <span>${parseFloat(order.total_tax).toFixed(2)}</span>
-                  </div>
-                )}
-                <div className="flex justify-between font-bold text-base border-t pt-2">
-                  <span>Total</span>
-                  <span className="text-primary-600">${parseFloat(order.total || 0).toFixed(2)}</span>
-                </div>
+                ) : null}
               </div>
-            )}
+            </section>
           </div>
 
-          <div className="bg-white rounded-lg shadow-md p-6 border border-gray-200">
-            <h2 className="text-lg font-bold text-gray-900 mb-4">Billing &amp; Contact</h2>
-            {billing.email && (
-              <p className="text-sm text-gray-700 mb-1">
-                <span className="font-semibold">Email:</span> {billing.email}
-              </p>
-            )}
-            {(billing.first_name || billing.last_name) && (
-              <p className="text-sm text-gray-700 mb-1">
-                <span className="font-semibold">Name:</span>{' '}
-                {billing.first_name} {billing.last_name}
-              </p>
-            )}
-            {billing.address_1 && (
-              <p className="text-sm text-gray-700">
-                <span className="font-semibold">Address:</span>{' '}
-                {[billing.address_1, billing.city, billing.state, billing.postcode].filter(Boolean).join(', ')}
-              </p>
-            )}
+          <aside className="dtb-order-stack">
+            <section className="dtb-order-card" aria-labelledby="contact-title">
+              <header className="dtb-order-card__header">
+                <h2 id="contact-title" className="dtb-order-card__title">
+                  <User size={20} /> Billing &amp; contact
+                </h2>
+              </header>
+              <div className="dtb-order-card__body">
+                <dl className="dtb-order-detail-list">
+                  <DetailRow icon={Mail} label="Email">{billing.email}</DetailRow>
+                  <DetailRow icon={User} label="Name">{billingName}</DetailRow>
+                  <DetailRow icon={MapPin} label="Address">{billingAddress}</DetailRow>
+                  <DetailRow icon={CreditCard} label="Payment">{order?.payment_method_title}</DetailRow>
+                </dl>
+              </div>
+            </section>
 
-            {order?.payment_method_title && (
-              <div className="mt-4 pt-4 border-t">
-                <p className="text-sm text-gray-700">
-                  <span className="font-semibold">Payment:</span>{' '}
-                  {order.payment_method_title}
+            <section className="dtb-order-card" aria-labelledby="tracking-title">
+              <header className="dtb-order-card__header">
+                <h2 id="tracking-title" className="dtb-order-card__title">
+                  <Truck size={20} /> Tracking
+                </h2>
+              </header>
+              <div className="dtb-order-card__body">
+                <p className="dtb-order-subtitle" style={{ margin: 0, textAlign: 'left' }}>
+                  Shipment and fulfillment updates will appear on your tracking page as they become available.
                 </p>
+                <div className="dtb-order-actions" style={{ justifyContent: 'flex-start', marginTop: '1rem' }}>
+                  <Link to={trackingUrl} className="dtb-order-button dtb-order-button--secondary">
+                    View tracking status
+                  </Link>
+                </div>
               </div>
-            )}
-
-            {order?.date_created && (
-              <p className="text-xs text-gray-500 mt-3">
-                Placed on {new Date(order.date_created).toLocaleString()}
-              </p>
-            )}
-          </div>
+            </section>
+          </aside>
         </div>
 
-        <div className="flex gap-4 justify-center mt-8 flex-wrap">
-          <Link
-            to="/products"
-            className="inline-flex items-center gap-2 bg-primary-600 hover:bg-primary-700 text-white px-6 py-3 rounded-lg font-semibold transition-all"
-          >
+        <div className="dtb-order-actions">
+          <Link to="/products" className="dtb-order-button dtb-order-button--primary">
             Continue Shopping
           </Link>
-          <Link
-            to="/"
-            className="inline-flex items-center gap-2 border border-gray-300 text-gray-700 hover:bg-gray-50 px-6 py-3 rounded-lg font-semibold transition-all"
-          >
+          <Link to="/" className="dtb-order-button dtb-order-button--secondary">
             Back to Home
           </Link>
         </div>
