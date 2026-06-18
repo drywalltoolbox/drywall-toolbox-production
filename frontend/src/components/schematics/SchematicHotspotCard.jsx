@@ -55,7 +55,7 @@ function buildProductUrl(product, resolvedSku) {
   }
 
   if (product?.type === 'variation') {
-    return '';
+    return product?.sku ? `/product/${encodePathSegment(product.sku)}` : '';
   }
 
   if (product?.slug) {
@@ -172,18 +172,6 @@ function HotspotCardSkeleton({ displayCode, codeLabel, quantity }) {
     </>
   );
 }
-
-// ---------------------------------------------------------------------------
-// SchematicHotspotCard
-//
-// Renders the hotspot part detail card used in both the mobile overlay modal
-// and the desktop detached modal. The hotspot identity is SKU-first: schematic
-// JSON supplies the clickable coordinate and fallback metadata, but live product
-// data fetched by SKU is authoritative for customer-facing name, SKU, price,
-// image, stock status, product link, and add-to-cart payload. Schematic JSON
-// part names are hidden while SKU resolution is pending, then used only as a
-// fallback when the SKU cannot be resolved to a catalog product.
-// ---------------------------------------------------------------------------
 
 export default function SchematicHotspotCard({
   part,
