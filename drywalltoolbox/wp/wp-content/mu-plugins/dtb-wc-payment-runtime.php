@@ -2,11 +2,67 @@
 /**
  * Plugin Name: DTB WooCommerce Payment Runtime
  * Description: Allows native WooCommerce/WooPayments order-payment pages to render inside the otherwise headless WordPress runtime.
- * Version: 1.0.0
+ * Version: 1.1.0
  * Author: Drywall Toolbox
  */
 
 defined( 'ABSPATH' ) || exit;
+
+if ( ! function_exists( 'dtb_wc_payment_runtime_order_pay_id' ) ) {
+	/**
+	 * Resolve the order-pay order id even when the headless runtime selected the
+	 * payment template by raw path matching instead of normal Woo rewrite context.
+	 */
+	function dtb_wc_payment_runtime_order_pay_id(): int {
+		$order_pay = function_exists( 'get_query_var' ) ? get_query_var( 'order-pay' ) : 0;
+		$order_id  = absint( $order_pay );
+		if ( $order_id > 0 ) {
+			return $order_id;
+		}
+
+		$request_uri = isset( $_SERVER['REQUEST_URI'] )
+			? sanitize_text_field( wp_unslash( $_SERVER['REQUEST_URI'] ) )
+			: '';
+		$path = (string) wp_parse_url( $request_uri, PHP_URL_PATH );
+
+		if ( preg_match( '#/(?:wp/)?checkout/order-pay/(\d+)/?#', $path, $matches ) ) {
+			return absint( $matches[1] ?? 0 );
+		}
+
+		return 0;
+	}
+}
+
+if ( ! function_exists( 'dtb_wc_payment_runtime_prime_order_pay_query_vars' ) ) {
+	/**
+	 * WooCommerce's classic checkout shortcode depends on the `order-pay` query
+	 * var. On this headless site, the `/wp/checkout/order-pay/{id}` URL can be
+	 * intercepted by the runtime template without WordPress resolving the checkout
+	 * endpoint. Prime the query var explicitly so WooPayments receives the exact
+	 * order context and renders the real payment form instead of a false
+	 * "order cannot be paid" notice.
+	 */
+	function dtb_wc_payment_runtime_prime_order_pay_query_vars(): void {
+		$order_id = dtb_wc_payment_runtime_order_pay_id();
+		if ( $order_id <= 0 ) {
+			return;
+		}
+
+		global $wp, $wp_query;
+
+		if ( isset( $wp ) && is_object( $wp ) ) {
+			$wp->query_vars['order-pay'] = $order_id;
+		}
+
+		if ( isset( $wp_query ) && is_object( $wp_query ) ) {
+			$wp_query->query_vars['order-pay'] = $order_id;
+		}
+
+		if ( function_exists( 'set_query_var' ) ) {
+			set_query_var( 'order-pay', $order_id );
+		}
+	}
+}
 
 if ( ! function_exists( 'dtb_wc_payment_runtime_request' ) ) {
 	/**
@@ -24,6 +80,10 @@ if ( ! function_exists( 'dtb_wc_payment_runtime_request' ) ) {
 			return false;
 		}
 
+		if ( dtb_wc_payment_runtime_order_pay_id() > 0 ) {
+			return true;
+		}
+
 		if ( function_exists( 'is_checkout_pay_page' ) && is_checkout_pay_page() ) {
 			return true;
 		}
@@ -38,11 +98,6 @@ if ( ! function_exists( 'dtb_wc_payment_runtime_request' ) ) {
 
 		if ( '' === $request_uri ) {
 			return false;
-		}
-
-		$path = (string) wp_parse_url( $request_uri, PHP_URL_PATH );
-		if ( preg_match( '#/(?:wp/)?checkout/order-pay/\d+/?#', $path ) ) {
-			return true;
 		}
 
 		return false !== strpos( $request_uri, 'pay_for_order=true' ) && false !== strpos( $request_uri, 'key=wc_order_' );
@@ -142,6 +197,10 @@ if ( ! function_exists( 'dtb_wc_payment_runtime_is_block_checkout_asset' ) ) {
 	}
 }
 
+add_action( 'parse_request', 'dtb_wc_payment_runtime_prime_order_pay_query_vars', 0 );
+add_action( 'wp', 'dtb_wc_payment_runtime_prime_order_pay_query_vars', 0 );
+add_action( 'template_redirect', 'dtb_wc_payment_runtime_prime_order_pay_query_vars', 0 );
+
 add_action(
 	'wp_enqueue_scripts',
 	static function (): void {
@@ -225,6 +284,8 @@ add_filter(
 		if ( ! dtb_wc_payment_runtime_request() ) {
 			return $template;
 		}
+
+		dtb_wc_payment_runtime_prime_order_pay_query_vars();
 
 		$runtime_template = __DIR__ . '/dtb-platform/Templates/WooPaymentRuntime.php';
 		return file_exists( $runtime_template ) ? $runtime_template : $template;
