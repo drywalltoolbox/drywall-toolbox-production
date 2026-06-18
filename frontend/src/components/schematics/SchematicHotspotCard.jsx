@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { Link } from 'react-router-dom';
 import { useCart } from '../../context/CartContext';
-import { getProductBySku } from '../../api/products';
+import { getProductBySku, resolveProductBySku } from '../../api/products';
 import { PLACEHOLDER_IMAGE } from '../../constants/images.js';
 import {
   productMatchesSchematicPart,
@@ -15,7 +15,7 @@ import {
 // ---------------------------------------------------------------------------
 
 const _variantSkuCache = new Map();
-const RESOLVING_TITLE = 'Resolving official part…';
+const RESOLVING_TITLE = 'Part details';
 
 function getDisplayCode(part, product) {
   return product?.sku || part?.sku || part?.source_sku || '';
@@ -38,6 +38,30 @@ function getDisplayBrand(part, product) {
 function getPrimaryImage(product) {
   if (Array.isArray(product?.images) && product.images[0]) return product.images[0];
   return product?.image || '';
+}
+
+function encodePathSegment(value) {
+  return encodeURIComponent(String(value || '').trim());
+}
+
+function buildProductUrl(product, resolvedSku) {
+  if (resolvedSku?.type === 'variation' && resolvedSku.parentSlug && resolvedSku.id) {
+    return `/products/${encodePathSegment(resolvedSku.parentSlug)}?variant=${encodeURIComponent(resolvedSku.id)}`;
+  }
+
+  if (resolvedSku?.type === 'simple' && resolvedSku.slug) {
+    return `/products/${encodePathSegment(resolvedSku.slug)}`;
+  }
+
+  if (product?.type === 'variation') {
+    return '';
+  }
+
+  if (product?.slug) {
+    return `/products/${encodePathSegment(product.slug)}`;
+  }
+
+  return '';
 }
 
 function getTitleFitStyle(name = '') {
@@ -121,6 +145,33 @@ function StockBadge({ stockStatus }) {
   return <span style={{ fontWeight: 700, color, fontSize: 'inherit' }}>{label}</span>;
 }
 
+function HotspotCardSkeleton({ displayCode, codeLabel, quantity }) {
+  return (
+    <>
+      <div className="schematic-hotspot-card__stock" aria-hidden="true">
+        <span className="schematic-hotspot-card__stock-skeleton" />
+      </div>
+
+      <div className="schematic-hotspot-card__title-skeleton" aria-hidden="true">
+        <span />
+        <span />
+      </div>
+
+      {displayCode ? (
+        <div className="schematic-hotspot-card__sku">
+          {codeLabel}: {displayCode}
+          {quantity > 1 && ` | Qty: ${quantity}`}
+        </div>
+      ) : null}
+
+      <div className="schematic-hotspot-card__footer schematic-hotspot-card__footer--loading" aria-hidden="true">
+        <span className="schematic-hotspot-card__price-skeleton" />
+        <span className="schematic-hotspot-card__cta-skeleton" />
+      </div>
+    </>
+  );
+}
+
 // ---------------------------------------------------------------------------
 // SchematicHotspotCard
 //
@@ -145,6 +196,7 @@ export default function SchematicHotspotCard({
   const { addToCart } = useCart();
   const [variantProduct, setVariantProduct] = useState(null);
   const [variantStockStatus, setVariantStockStatus] = useState(null);
+  const [variantProductUrl, setVariantProductUrl] = useState('');
   const [variantAdding, setVariantAdding] = useState(false);
   const [localLightboxOpen, setLocalLightboxOpen] = useState(false);
 
@@ -161,11 +213,15 @@ export default function SchematicHotspotCard({
   const displayCode = getDisplayCode(displayPart, effectiveProduct);
   const codeLabel = getCodeLabel(displayPart, effectiveProduct);
   const primaryImage = getPrimaryImage(effectiveProduct);
+  const effectiveProductUrl = needsVariantLookup
+    ? variantProductUrl
+    : buildProductUrl(effectiveProduct, null);
 
   useEffect(() => {
     if (!needsVariantLookup) {
       setVariantProduct(null);
       setVariantStockStatus(null);
+      setVariantProductUrl('');
       return undefined;
     }
 
@@ -174,38 +230,47 @@ export default function SchematicHotspotCard({
     if (cached) {
       setVariantProduct(cached.product);
       setVariantStockStatus(cached.stockStatus);
+      setVariantProductUrl(cached.productUrl || '');
       return undefined;
     }
 
     let cancelled = false;
     setVariantProduct(null);
     setVariantStockStatus(null);
+    setVariantProductUrl('');
 
     const timeoutId = setTimeout(() => {
       if (cancelled) return;
-      const fallback = { product: null, stockStatus: 'unknown' };
+      const fallback = { product: null, stockStatus: 'unknown', productUrl: '' };
       _variantSkuCache.set(sku, fallback);
       setVariantProduct(fallback.product);
       setVariantStockStatus(fallback.stockStatus);
+      setVariantProductUrl(fallback.productUrl);
     }, 10000);
 
-    getProductBySku(sku).then((wcProduct) => {
+    Promise.all([
+      getProductBySku(sku).catch(() => null),
+      resolveProductBySku(sku).catch(() => null),
+    ]).then(([wcProduct, resolvedSku]) => {
       if (cancelled) return;
       clearTimeout(timeoutId);
       const payload = {
         product: wcProduct || null,
         stockStatus: wcProduct ? (wcProduct.stock_status || 'instock') : 'unknown',
+        productUrl: buildProductUrl(wcProduct, resolvedSku),
       };
       _variantSkuCache.set(sku, payload);
       setVariantProduct(payload.product);
       setVariantStockStatus(payload.stockStatus);
+      setVariantProductUrl(payload.productUrl);
     }).catch(() => {
       if (cancelled) return;
       clearTimeout(timeoutId);
-      const payload = { product: null, stockStatus: 'unknown' };
+      const payload = { product: null, stockStatus: 'unknown', productUrl: '' };
       _variantSkuCache.set(sku, payload);
       setVariantProduct(payload.product);
       setVariantStockStatus(payload.stockStatus);
+      setVariantProductUrl(payload.productUrl);
     });
 
     return () => {
@@ -230,14 +295,11 @@ export default function SchematicHotspotCard({
   const canAdd = Boolean(effectiveProduct?.id) && effectiveStockStatus != null;
   const isUnavailable = !canAdd && !isResolving;
 
-  const ctaLabel = isAdding    ? 'Adding…'
-    : isResolving ? 'Resolving…'
-    : canAdd      ? 'Add'
-    : '';
+  const ctaLabel = isAdding ? 'Adding…' : canAdd ? 'Add' : '';
 
-  const titleNode = effectiveProduct?.slug ? (
+  const titleNode = effectiveProductUrl ? (
     <Link
-      to={`/products/${effectiveProduct.slug}`}
+      to={effectiveProductUrl}
       onClick={(e) => e.stopPropagation()}
       style={{ color: 'inherit', textDecoration: 'none' }}
       className="hotspot-modal-title-link"
@@ -286,7 +348,7 @@ export default function SchematicHotspotCard({
 
   return (
     <>
-      <div className={`schematic-hotspot-card${isResolving ? ' schematic-hotspot-card--resolving' : ''}`}>
+      <div className={`schematic-hotspot-card${isResolving ? ' schematic-hotspot-card--resolving' : ''}`} aria-busy={isResolving ? 'true' : 'false'}>
         <div className="schematic-hotspot-card__image">
           {primaryImage ? (
             <button
@@ -319,44 +381,50 @@ export default function SchematicHotspotCard({
             </button>
           )}
 
-          <div className="schematic-hotspot-card__stock">
-            <StockBadge stockStatus={effectiveStockStatus} />
-          </div>
+          {isResolving ? (
+            <HotspotCardSkeleton displayCode={displayCode} codeLabel={codeLabel} quantity={displayPart.quantity} />
+          ) : (
+            <>
+              <div className="schematic-hotspot-card__stock">
+                <StockBadge stockStatus={effectiveStockStatus} />
+              </div>
 
-          <h3 className="schematic-hotspot-card__title" style={getTitleFitStyle(displayName)}>
-            {titleNode}
-          </h3>
+              <h3 className="schematic-hotspot-card__title" style={getTitleFitStyle(displayName)}>
+                {titleNode}
+              </h3>
 
-          {displayCode ? (
-            <div className="schematic-hotspot-card__sku">
-              {codeLabel}: {displayCode}
-              {displayPart.quantity > 1 && ` | Qty: ${displayPart.quantity}`}
-            </div>
-          ) : null}
+              {displayCode ? (
+                <div className="schematic-hotspot-card__sku">
+                  {codeLabel}: {displayCode}
+                  {displayPart.quantity > 1 && ` | Qty: ${displayPart.quantity}`}
+                </div>
+              ) : null}
 
-          <div className="schematic-hotspot-card__footer">
-            {!isUnavailable ? (
-              <>
-                <span className="schematic-hotspot-card__price-group">
-                  <span className="schematic-hotspot-card__price">
-                    {priceLabel}
-                  </span>
-                  {comparePriceLabel ? (
-                    <span className="schematic-hotspot-card__compare-price">
-                      {comparePriceLabel}
+              <div className="schematic-hotspot-card__footer">
+                {!isUnavailable ? (
+                  <>
+                    <span className="schematic-hotspot-card__price-group">
+                      <span className="schematic-hotspot-card__price">
+                        {priceLabel}
+                      </span>
+                      {comparePriceLabel ? (
+                        <span className="schematic-hotspot-card__compare-price">
+                          {comparePriceLabel}
+                        </span>
+                      ) : null}
                     </span>
-                  ) : null}
-                </span>
-                <button
-                  className="schematic-hotspot-card__cta"
-                  disabled={!canAdd || isAdding}
-                  onClick={handleAdd}
-                >
-                  {ctaLabel}
-                </button>
-              </>
-            ) : null}
-          </div>
+                    <button
+                      className="schematic-hotspot-card__cta"
+                      disabled={!canAdd || isAdding}
+                      onClick={handleAdd}
+                    >
+                      {ctaLabel}
+                    </button>
+                  </>
+                ) : null}
+              </div>
+            </>
+          )}
         </div>
       </div>
 
