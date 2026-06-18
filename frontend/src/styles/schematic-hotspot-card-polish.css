@@ -1,0 +1,114 @@
+/*
+ * frontend/src/styles/schematic-hotspot-card-polish.css
+ *
+ * Polished loading/transition states for schematic hotspot part cards.
+ * Scoped to .schematic-hotspot-card to avoid leaking into product pages.
+ */
+
+.schematic-hotspot-card {
+  isolation: isolate;
+}
+
+.schematic-hotspot-card[aria-busy='true'] {
+  cursor: progress;
+}
+
+.schematic-hotspot-card__stock-skeleton,
+.schematic-hotspot-card__title-skeleton span,
+.schematic-hotspot-card__price-skeleton,
+.schematic-hotspot-card__cta-skeleton {
+  display: block;
+  position: relative;
+  overflow: hidden;
+  border-radius: 999px;
+  background: linear-gradient(90deg, rgba(226, 232, 240, 0.72), rgba(248, 250, 252, 0.94), rgba(226, 232, 240, 0.72));
+  background-size: 220% 100%;
+  animation: schematicHotspotSoftShimmer 1.15s ease-in-out infinite;
+}
+
+.schematic-hotspot-card__stock-skeleton {
+  width: 74px;
+  height: 12px;
+  margin: 1px 0 8px;
+}
+
+.schematic-hotspot-card__title-skeleton {
+  display: grid;
+  gap: 7px;
+  margin: 1px 34px 8px 0;
+}
+
+.schematic-hotspot-card__title-skeleton span:first-child {
+  width: min(96%, 210px);
+  height: 15px;
+}
+
+.schematic-hotspot-card__title-skeleton span:last-child {
+  width: min(68%, 148px);
+  height: 15px;
+}
+
+.schematic-hotspot-card__footer--loading {
+  margin-top: 8px;
+}
+
+.schematic-hotspot-card__price-skeleton {
+  width: 72px;
+  height: 18px;
+}
+
+.schematic-hotspot-card__cta-skeleton {
+  width: 74px;
+  height: 38px;
+  border-radius: 10px;
+}
+
+.schematic-hotspot-card--resolving .schematic-hotspot-card__image {
+  background:
+    radial-gradient(circle at 50% 42%, rgba(37, 99, 235, 0.09), transparent 44%),
+    linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+}
+
+.schematic-hotspot-card--resolving .hotspot-modal-image-skeleton {
+  background:
+    linear-gradient(90deg, rgba(226, 232, 240, 0.64), rgba(255, 255, 255, 0.94), rgba(226, 232, 240, 0.64));
+  background-size: 220% 100%;
+  animation: schematicHotspotSoftShimmer 1.15s ease-in-out infinite;
+}
+
+.schematic-hotspot-card--resolving .schematic-hotspot-card__sku {
+  color: #64748b;
+  font-weight: 650;
+}
+
+@keyframes schematicHotspotSoftShimmer {
+  0% { background-position: 140% 0; }
+  100% { background-position: -140% 0; }
+}
+
+@media (prefers-color-scheme: dark) {
+  .schematic-hotspot-card__stock-skeleton,
+  .schematic-hotspot-card__title-skeleton span,
+  .schematic-hotspot-card__price-skeleton,
+  .schematic-hotspot-card__cta-skeleton {
+    background: linear-gradient(90deg, rgba(51, 65, 85, 0.78), rgba(71, 85, 105, 0.9), rgba(51, 65, 85, 0.78));
+    background-size: 220% 100%;
+  }
+
+  .schematic-hotspot-card--resolving .schematic-hotspot-card__image {
+    background:
+      radial-gradient(circle at 50% 42%, rgba(96, 165, 250, 0.14), transparent 44%),
+      linear-gradient(180deg, #1e293b 0%, #172033 100%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .schematic-hotspot-card__stock-skeleton,
+  .schematic-hotspot-card__title-skeleton span,
+  .schematic-hotspot-card__price-skeleton,
+  .schematic-hotspot-card__cta-skeleton,
+  .schematic-hotspot-card--resolving .hotspot-modal-image-skeleton {
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
