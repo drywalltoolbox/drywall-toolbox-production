@@ -1,0 +1,475 @@
+/*
+ * frontend/src/styles/order-pages.css
+ *
+ * Shared order confirmation / tracking presentation layer.
+ * Scope is intentionally narrow to avoid changing checkout, product, or account UI.
+ */
+
+.dtb-order-page {
+  min-height: 100vh;
+  padding: clamp(2rem, 5vw, 4.5rem) 0;
+  background:
+    radial-gradient(circle at 50% 0%, rgba(37, 99, 235, 0.08), transparent 34rem),
+    linear-gradient(180deg, #f8fafc 0%, #eef3f8 100%);
+  color: #0f172a;
+}
+
+.dtb-order-shell {
+  width: min(1120px, calc(100% - 2rem));
+  margin: 0 auto;
+}
+
+.dtb-order-back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  min-height: 40px;
+  margin-bottom: 1.1rem;
+  color: #64748b;
+  font-size: 0.875rem;
+  font-weight: 800;
+  text-decoration: none;
+  transition: color 160ms ease, transform 160ms ease;
+}
+
+.dtb-order-back-link:hover {
+  color: #2563eb;
+  transform: translateX(-2px);
+}
+
+.dtb-order-hero {
+  position: relative;
+  overflow: hidden;
+  display: grid;
+  justify-items: center;
+  text-align: center;
+  padding: clamp(1.8rem, 5vw, 3.25rem) clamp(1rem, 4vw, 2rem);
+  margin-bottom: clamp(1.2rem, 3vw, 1.75rem);
+  border: 1px solid rgba(203, 213, 225, 0.78);
+  border-radius: clamp(1.5rem, 4vw, 2.25rem);
+  background:
+    radial-gradient(circle at 50% 0%, rgba(37, 99, 235, 0.08), transparent 28rem),
+    rgba(255, 255, 255, 0.92);
+  box-shadow:
+    0 24px 70px rgba(15, 23, 42, 0.09),
+    inset 0 1px 0 rgba(255, 255, 255, 0.92);
+}
+
+.dtb-order-hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image: radial-gradient(rgba(37, 99, 235, 0.12) 0.75px, transparent 0.75px);
+  background-size: 18px 18px;
+  opacity: 0.18;
+}
+
+.dtb-order-hero > * {
+  position: relative;
+  z-index: 1;
+}
+
+.dtb-order-success-icon,
+.dtb-order-status-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: clamp(4.5rem, 13vw, 6.5rem);
+  height: clamp(4.5rem, 13vw, 6.5rem);
+  margin-bottom: clamp(1rem, 3vw, 1.35rem);
+  border-radius: 999px;
+  background: linear-gradient(180deg, #f0fdf4 0%, #dcfce7 100%);
+  color: #16a34a;
+  box-shadow: 0 18px 42px rgba(22, 163, 74, 0.18);
+}
+
+.dtb-order-status-icon--neutral {
+  background: linear-gradient(180deg, #eff6ff 0%, #dbeafe 100%);
+  color: #2563eb;
+  box-shadow: 0 18px 42px rgba(37, 99, 235, 0.16);
+}
+
+.dtb-order-eyebrow {
+  margin: 0 0 0.45rem;
+  color: #2563eb;
+  font-size: 0.72rem;
+  font-weight: 950;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+.dtb-order-title {
+  max-width: 100%;
+  margin: 0;
+  color: #0f172a;
+  font-size: clamp(2.15rem, 9vw, 4rem);
+  font-weight: 950;
+  line-height: 0.98;
+  letter-spacing: -0.055em;
+  overflow-wrap: anywhere;
+}
+
+.dtb-order-subtitle {
+  max-width: 42rem;
+  margin: 0.85rem auto 0;
+  color: #64748b;
+  font-size: clamp(0.95rem, 2.4vw, 1.08rem);
+  font-weight: 600;
+  line-height: 1.65;
+}
+
+.dtb-order-badges {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.65rem;
+  margin-top: 1rem;
+}
+
+.dtb-order-status-badge,
+.dtb-order-live-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  min-height: 36px;
+  padding: 0 0.9rem;
+  border: 1px solid rgba(203, 213, 225, 0.9);
+  border-radius: 999px;
+  background: #fff;
+  color: #334155;
+  font-size: 0.86rem;
+  font-weight: 900;
+  white-space: nowrap;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.06);
+}
+
+.dtb-order-live-badge {
+  color: #15803d;
+  border-color: rgba(187, 247, 208, 0.95);
+  background: #f0fdf4;
+}
+
+.dtb-order-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.12fr) minmax(320px, 0.88fr);
+  gap: clamp(1rem, 2vw, 1.35rem);
+  align-items: start;
+}
+
+.dtb-order-stack {
+  display: grid;
+  gap: clamp(1rem, 2vw, 1.25rem);
+}
+
+.dtb-order-card {
+  overflow: hidden;
+  border: 1px solid rgba(203, 213, 225, 0.82);
+  border-radius: clamp(1.25rem, 3vw, 1.65rem);
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: 0 18px 46px rgba(15, 23, 42, 0.07);
+}
+
+.dtb-order-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: clamp(1rem, 3vw, 1.35rem) clamp(1rem, 3vw, 1.45rem);
+  border-bottom: 1px solid rgba(226, 232, 240, 0.95);
+  background: linear-gradient(180deg, rgba(248, 250, 252, 0.94), rgba(255, 255, 255, 0.98));
+}
+
+.dtb-order-card__title {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin: 0;
+  color: #0f172a;
+  font-size: clamp(1.05rem, 3.8vw, 1.35rem);
+  font-weight: 950;
+  line-height: 1.1;
+  letter-spacing: -0.025em;
+}
+
+.dtb-order-card__body {
+  padding: clamp(1rem, 3vw, 1.45rem);
+}
+
+.dtb-order-items {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.dtb-order-item {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 1rem;
+  align-items: start;
+  padding: 0.95rem;
+  border: 1px solid rgba(226, 232, 240, 0.86);
+  border-radius: 1rem;
+  background: #f8fafc;
+}
+
+.dtb-order-item__name {
+  margin: 0;
+  color: #0f172a;
+  font-size: clamp(0.98rem, 3.5vw, 1.08rem);
+  font-weight: 900;
+  line-height: 1.22;
+  letter-spacing: -0.018em;
+  overflow-wrap: anywhere;
+  word-break: normal;
+  hyphens: auto;
+}
+
+.dtb-order-item__meta {
+  margin: 0.35rem 0 0;
+  color: #64748b;
+  font-size: 0.88rem;
+  font-weight: 750;
+}
+
+.dtb-order-item__price {
+  color: #0f172a;
+  font-size: 0.98rem;
+  font-weight: 950;
+  white-space: nowrap;
+  text-align: right;
+}
+
+.dtb-order-totals {
+  display: grid;
+  gap: 0.7rem;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(203, 213, 225, 0.9);
+}
+
+.dtb-order-total-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 1rem;
+  align-items: baseline;
+  color: #475569;
+  font-size: clamp(0.95rem, 3.3vw, 1.05rem);
+  font-weight: 700;
+}
+
+.dtb-order-total-row strong {
+  color: #0f172a;
+  font-weight: 950;
+}
+
+.dtb-order-total-row--grand {
+  margin-top: 0.15rem;
+  padding-top: 0.9rem;
+  border-top: 2px solid #0f172a;
+  color: #0f172a;
+  font-size: clamp(1.05rem, 4.4vw, 1.32rem);
+  font-weight: 950;
+}
+
+.dtb-order-total-row--grand strong {
+  color: #2563eb;
+  font-size: clamp(1.35rem, 5.5vw, 1.8rem);
+  letter-spacing: -0.035em;
+  white-space: nowrap;
+}
+
+.dtb-order-free {
+  color: #16a34a;
+  font-weight: 950;
+  letter-spacing: 0.02em;
+}
+
+.dtb-order-detail-list {
+  display: grid;
+  gap: 0.85rem;
+  margin: 0;
+}
+
+.dtb-order-detail-row {
+  display: grid;
+  gap: 0.18rem;
+  padding: 0.9rem 0;
+  border-bottom: 1px solid rgba(226, 232, 240, 0.85);
+}
+
+.dtb-order-detail-row:last-child {
+  border-bottom: 0;
+}
+
+.dtb-order-detail-label {
+  color: #94a3b8;
+  font-size: 0.68rem;
+  font-weight: 950;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.dtb-order-detail-value {
+  color: #0f172a;
+  font-size: 0.98rem;
+  font-weight: 800;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
+.dtb-order-timeline {
+  position: relative;
+  display: grid;
+  gap: 0.9rem;
+}
+
+.dtb-order-timeline__item {
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr);
+  gap: 0.8rem;
+}
+
+.dtb-order-timeline__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  background: #eff6ff;
+  color: #2563eb;
+  box-shadow: inset 0 0 0 1px rgba(147, 197, 253, 0.8);
+}
+
+.dtb-order-timeline__label {
+  margin: 0;
+  color: #0f172a;
+  font-size: 0.95rem;
+  font-weight: 850;
+  line-height: 1.25;
+}
+
+.dtb-order-timeline__time {
+  display: block;
+  margin-top: 0.18rem;
+  color: #94a3b8;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.dtb-order-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.8rem;
+  margin-top: clamp(1.35rem, 3vw, 2rem);
+}
+
+.dtb-order-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 48px;
+  padding: 0 1.1rem;
+  border-radius: 0.95rem;
+  font-size: 0.94rem;
+  font-weight: 900;
+  text-decoration: none;
+  transition: transform 160ms ease, box-shadow 160ms ease, background-color 160ms ease;
+}
+
+.dtb-order-button:hover {
+  transform: translateY(-1px);
+}
+
+.dtb-order-button--primary {
+  border: 1px solid #2563eb;
+  background: linear-gradient(180deg, #3b82f6, #2563eb);
+  color: #fff;
+  box-shadow: 0 14px 30px rgba(37, 99, 235, 0.24);
+}
+
+.dtb-order-button--secondary {
+  border: 1px solid rgba(203, 213, 225, 0.95);
+  background: #fff;
+  color: #334155;
+}
+
+.dtb-order-footnote {
+  margin: 1rem 0 0;
+  color: #94a3b8;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-align: center;
+}
+
+@media (max-width: 900px) {
+  .dtb-order-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 767px) {
+  .dtb-order-page {
+    padding: 1rem 0 calc(2.5rem + env(safe-area-inset-bottom, 0px));
+  }
+
+  .dtb-order-shell {
+    width: min(100% - 1.5rem, 680px);
+  }
+
+  .dtb-order-back-link {
+    margin-left: 0.1rem;
+  }
+
+  .dtb-order-hero {
+    padding: 1.55rem 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .dtb-order-title {
+    letter-spacing: -0.045em;
+  }
+
+  .dtb-order-card__header,
+  .dtb-order-card__body {
+    padding: 1rem;
+  }
+
+  .dtb-order-item {
+    grid-template-columns: 1fr;
+    gap: 0.6rem;
+  }
+
+  .dtb-order-item__price {
+    justify-self: start;
+    text-align: left;
+    padding-top: 0.1rem;
+  }
+
+  .dtb-order-total-row {
+    gap: 0.75rem;
+  }
+
+  .dtb-order-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .dtb-order-button {
+    width: 100%;
+  }
+}
+
+@media (max-width: 390px) {
+  .dtb-order-shell {
+    width: min(100% - 1rem, 680px);
+  }
+
+  .dtb-order-card__header,
+  .dtb-order-card__body {
+    padding: 0.9rem;
+  }
+}
