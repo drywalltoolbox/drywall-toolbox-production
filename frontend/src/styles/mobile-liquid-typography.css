@@ -1,0 +1,347 @@
+/*
+ * frontend/src/styles/mobile-liquid-typography.css
+ *
+ * Final mobile-only typography normalization layer.
+ * Goal: preserve Drywall Toolbox visual system while making mobile screens feel
+ * more like a professionally scaled-down desktop commerce UI: calmer type,
+ * lighter weights, tighter rhythm, fewer oversized price/title blocks.
+ */
+
+@media (max-width: 767px) {
+  :root {
+    --dtb-mobile-type-body: 0.94rem;
+    --dtb-mobile-type-small: 0.82rem;
+    --dtb-mobile-type-label: 0.68rem;
+    --dtb-mobile-type-h1: clamp(1.62rem, 7.2vw, 2.12rem);
+    --dtb-mobile-type-h2: clamp(1.18rem, 5vw, 1.48rem);
+    --dtb-mobile-type-h3: clamp(1.02rem, 4.2vw, 1.22rem);
+    --dtb-mobile-type-price: clamp(1.62rem, 7.4vw, 2.06rem);
+    --dtb-mobile-weight-heading: 760;
+    --dtb-mobile-weight-strong: 700;
+    --dtb-mobile-weight-label: 720;
+    --dtb-mobile-leading-tight: 1.1;
+    --dtb-mobile-leading-copy: 1.45;
+  }
+
+  body {
+    font-size: var(--dtb-mobile-type-body);
+    line-height: var(--dtb-mobile-leading-copy);
+  }
+
+  :where(
+    .page-wrapper,
+    .storefront-shell,
+    .dtb-checkout,
+    .dtb-cart-page,
+    .dtb-order-page,
+    .dtb-order-tracking-shell,
+    .dtb-pdp,
+    .products-brand-selector,
+    .account-hub,
+    .account-hub-panel,
+    .storefront-search-overlay
+  ) {
+    font-size: var(--dtb-mobile-type-body);
+  }
+
+  :where(
+    .page-wrapper,
+    .storefront-shell,
+    .dtb-checkout,
+    .dtb-cart-page,
+    .dtb-order-page,
+    .dtb-order-tracking-shell,
+    .dtb-pdp,
+    .products-brand-selector,
+    .account-hub,
+    .account-hub-panel,
+    .storefront-search-overlay
+  ) :where(h1, .text-4xl, .text-5xl, .text-6xl) {
+    font-size: var(--dtb-mobile-type-h1) !important;
+    line-height: var(--dtb-mobile-leading-tight) !important;
+    font-weight: var(--dtb-mobile-weight-heading) !important;
+    letter-spacing: -0.038em !important;
+  }
+
+  :where(
+    .page-wrapper,
+    .storefront-shell,
+    .dtb-checkout,
+    .dtb-cart-page,
+    .dtb-order-page,
+    .dtb-order-tracking-shell,
+    .dtb-pdp,
+    .products-brand-selector,
+    .account-hub,
+    .account-hub-panel,
+    .storefront-search-overlay
+  ) :where(h2, .text-3xl) {
+    font-size: var(--dtb-mobile-type-h2) !important;
+    line-height: 1.14 !important;
+    font-weight: var(--dtb-mobile-weight-heading) !important;
+    letter-spacing: -0.026em !important;
+  }
+
+  :where(
+    .page-wrapper,
+    .storefront-shell,
+    .dtb-checkout,
+    .dtb-cart-page,
+    .dtb-order-page,
+    .dtb-order-tracking-shell,
+    .dtb-pdp,
+    .products-brand-selector,
+    .account-hub,
+    .account-hub-panel,
+    .storefront-search-overlay
+  ) :where(h3, .text-2xl, .text-xl) {
+    font-size: var(--dtb-mobile-type-h3) !important;
+    line-height: 1.18 !important;
+    font-weight: var(--dtb-mobile-weight-strong) !important;
+    letter-spacing: -0.018em !important;
+  }
+
+  :where(
+    .page-wrapper,
+    .storefront-shell,
+    .dtb-checkout,
+    .dtb-cart-page,
+    .dtb-order-page,
+    .dtb-order-tracking-shell,
+    .dtb-pdp,
+    .products-brand-selector,
+    .account-hub,
+    .account-hub-panel,
+    .storefront-search-overlay
+  ) :where(.font-black) {
+    font-weight: var(--dtb-mobile-weight-heading) !important;
+  }
+
+  :where(
+    .page-wrapper,
+    .storefront-shell,
+    .dtb-checkout,
+    .dtb-cart-page,
+    .dtb-order-page,
+    .dtb-order-tracking-shell,
+    .dtb-pdp,
+    .products-brand-selector,
+    .account-hub,
+    .account-hub-panel,
+    .storefront-search-overlay
+  ) :where(.font-bold, strong, b) {
+    font-weight: var(--dtb-mobile-weight-strong) !important;
+  }
+
+  /* Product detail page: reduce oversized title/price treatment while keeping hierarchy. */
+  .dtb-pdp-header__title {
+    font-size: clamp(1.28rem, 5.8vw, 1.68rem) !important;
+    line-height: 1.12 !important;
+    font-weight: 760 !important;
+    letter-spacing: -0.034em !important;
+    text-wrap: balance;
+  }
+
+  .dtb-pdp-header__meta,
+  .dtb-pdp-header__meta-brand,
+  .dtb-pdp-header__meta-label,
+  .dtb-pdp-header__meta-value,
+  .dtb-pdp-header__reviews,
+  .dtb-pdp-header__reviews-label,
+  .dtb-pdp-header__meta-stock {
+    font-size: 0.82rem !important;
+    line-height: 1.28 !important;
+    font-weight: 560 !important;
+  }
+
+  .dtb-pdp-header__meta-brand,
+  .dtb-pdp-header__meta-value,
+  .dtb-pdp-header__meta-stock {
+    font-weight: 650 !important;
+  }
+
+  .dtb-pdp-header__price {
+    font-size: var(--dtb-mobile-type-price) !important;
+    line-height: 1 !important;
+    font-weight: 780 !important;
+    letter-spacing: -0.046em !important;
+  }
+
+  .dtb-pdp-header__compare-at {
+    font-size: clamp(0.84rem, 3.2vw, 0.96rem) !important;
+    font-weight: 520 !important;
+  }
+
+  .dtb-pdp-shipping-note {
+    font-size: clamp(0.86rem, 3.65vw, 0.96rem) !important;
+    line-height: 1.36 !important;
+    font-weight: 480 !important;
+    letter-spacing: -0.01em !important;
+  }
+
+  .dtb-pdp-shipping-note__link {
+    font-weight: 650 !important;
+  }
+
+  .product-variation-group__label,
+  .dtb-order-detail-label,
+  .dtb-order-eyebrow,
+  .dtb-order-alert-card__kicker,
+  .storefront-search-overlay__title,
+  .storefront-search-overlay__eyebrow {
+    font-size: var(--dtb-mobile-type-label) !important;
+    font-weight: var(--dtb-mobile-weight-label) !important;
+    letter-spacing: 0.14em !important;
+  }
+
+  .product-variation-group__selected,
+  .dtb-pdp-stock-meter__label {
+    font-size: 0.82rem !important;
+    font-weight: 650 !important;
+  }
+
+  .dtb-variant-pill__label {
+    font-size: 0.9rem !important;
+    font-weight: 700 !important;
+    letter-spacing: -0.01em !important;
+  }
+
+  .dtb-pdp-qty-input,
+  .dtb-pdp-add-to-cart {
+    font-weight: 720 !important;
+  }
+
+  .dtb-pdp-add-to-cart {
+    font-size: 0.92rem !important;
+    min-height: 48px !important;
+  }
+
+  /* Product cards/search results: closer to compact retail cards, less billboard text. */
+  .dtb-product-card--list .dtb-product-card__brand {
+    font-size: clamp(0.62rem, 2.35vw, 0.72rem) !important;
+    font-weight: 720 !important;
+    letter-spacing: 0.12em !important;
+  }
+
+  .dtb-product-card--list .dtb-product-card__name {
+    font-size: clamp(0.9rem, 3.45vw, 1rem) !important;
+    line-height: 1.22 !important;
+    font-weight: 720 !important;
+    letter-spacing: -0.012em !important;
+  }
+
+  .dtb-product-card--list .dtb-product-card__desc,
+  .dtb-product-card--list .dtb-product-card__sku {
+    font-size: clamp(0.74rem, 2.9vw, 0.84rem) !important;
+    line-height: 1.32 !important;
+    font-weight: 480 !important;
+  }
+
+  .dtb-product-card--list .dtb-product-card__stock-badge {
+    font-size: clamp(0.58rem, 2.2vw, 0.66rem) !important;
+    font-weight: 700 !important;
+  }
+
+  .dtb-product-card--list .dtb-product-card__price {
+    font-size: clamp(0.98rem, 3.7vw, 1.12rem) !important;
+    font-weight: 760 !important;
+    letter-spacing: -0.015em !important;
+  }
+
+  .dtb-product-card--list .dtb-product-card__compare-price {
+    font-size: clamp(0.72rem, 2.75vw, 0.82rem) !important;
+    font-weight: 520 !important;
+  }
+
+  /* Checkout/order surfaces: preserve cards, reduce heavy app-like typography. */
+  .dtb-checkout :where(label, .text-xs, .text-sm),
+  .dtb-order-page :where(p, span, small),
+  .dtb-order-tracking-shell :where(p, span, small) {
+    line-height: var(--dtb-mobile-leading-copy);
+  }
+
+  .dtb-order-title,
+  .dtb-order-tracking-title {
+    font-size: clamp(1.74rem, 8.1vw, 2.28rem) !important;
+    line-height: 1.04 !important;
+    font-weight: 780 !important;
+    letter-spacing: -0.042em !important;
+  }
+
+  .dtb-order-subtitle,
+  .dtb-order-tracking-copy,
+  .dtb-order-status-panel__summary p,
+  .dtb-order-alert-card p:last-child,
+  .dtb-order-empty-state p {
+    font-size: clamp(0.88rem, 3.5vw, 0.98rem) !important;
+    line-height: 1.46 !important;
+    font-weight: 500 !important;
+  }
+
+  .dtb-order-card__title,
+  .dtb-order-status-panel__summary h2,
+  .dtb-order-alert-card h2,
+  .dtb-order-empty-state h3 {
+    font-size: clamp(1rem, 4.1vw, 1.2rem) !important;
+    font-weight: 730 !important;
+    letter-spacing: -0.018em !important;
+  }
+
+  .dtb-order-item__name {
+    font-size: clamp(0.92rem, 3.65vw, 1.04rem) !important;
+    line-height: 1.24 !important;
+    font-weight: 720 !important;
+    letter-spacing: -0.012em !important;
+  }
+
+  .dtb-order-item__meta,
+  .dtb-order-detail-value,
+  .dtb-order-timeline__label,
+  .dtb-order-timeline__time,
+  .dtb-order-progress-step strong,
+  .dtb-order-progress-step small {
+    font-weight: 600 !important;
+  }
+
+  .dtb-order-item__price,
+  .dtb-order-total-row strong,
+  .dtb-order-total-row--grand,
+  .dtb-order-total-row--grand strong {
+    font-weight: 760 !important;
+  }
+
+  .dtb-order-total-row--grand strong {
+    font-size: clamp(1.14rem, 5vw, 1.44rem) !important;
+    letter-spacing: -0.028em !important;
+  }
+
+  .dtb-order-status-badge,
+  .dtb-order-live-badge,
+  .dtb-order-status-meta > span,
+  .dtb-order-card__chip {
+    font-size: clamp(0.72rem, 2.9vw, 0.82rem) !important;
+    font-weight: 680 !important;
+  }
+
+  .dtb-order-button,
+  .dtb-checkout button,
+  .dtb-cart-page button {
+    font-weight: 720 !important;
+    letter-spacing: -0.006em !important;
+  }
+}
+
+@media (max-width: 390px) {
+  .dtb-pdp-header__title {
+    font-size: clamp(1.2rem, 5.9vw, 1.48rem) !important;
+  }
+
+  .dtb-pdp-header__price {
+    font-size: clamp(1.48rem, 7.2vw, 1.9rem) !important;
+  }
+
+  .dtb-order-title,
+  .dtb-order-tracking-title {
+    font-size: clamp(1.6rem, 8vw, 2.05rem) !important;
+  }
+}
