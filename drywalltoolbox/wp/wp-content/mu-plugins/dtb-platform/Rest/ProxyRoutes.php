@@ -826,7 +826,6 @@ function dtb_checkout_woo_native_finalize( array $context, WP_REST_Request $requ
 	$customer_note  = sanitize_textarea_field( (string) ( $context['customer_note'] ?? '' ) );
 	$shipping_lines = is_array( $context['shipping_lines'] ?? null ) ? $context['shipping_lines'] : [];
 	$coupon_codes   = is_array( $context['coupon_codes'] ?? null ) ? $context['coupon_codes'] : [];
-	$set_paid = ! empty( $context['set_paid'] );
 	$idempotency_key = dtb_checkout_build_idempotency_key( $context );
 	$existing_order_id = absint( (string) get_transient( 'dtb_checkout_idem_' . md5( $idempotency_key ) ) );
 	if ( $existing_order_id > 0 ) {
@@ -923,9 +922,7 @@ function dtb_checkout_woo_native_finalize( array $context, WP_REST_Request $requ
 
 	$order->set_payment_method( $payment_method );
 	$order->set_payment_method_title( sanitize_text_field( (string) ( $context['payment_method_title'] ?? strtoupper( $payment_method ) ) ) );
-	if ( ! $set_paid ) {
-		$order->set_status( 'pending' );
-	}
+	$order->set_status( 'pending' );
 	if ( '' !== $customer_note ) {
 		$order->set_customer_note( $customer_note );
 	}
@@ -943,16 +940,9 @@ function dtb_checkout_woo_native_finalize( array $context, WP_REST_Request $requ
 	set_transient( 'dtb_checkout_idem_' . md5( $idempotency_key ), (int) $order->get_id(), DAY_IN_SECONDS );
 	delete_transient( 'dtb_checkout_session_' . md5( $sid ) );
 
-	$final_status = 'pending';
-	if ( $set_paid ) {
-		$order->payment_complete( $payment_ref );
-		$final_status = (string) $order->get_status();
-	}
-
-	$payment_required = ! $set_paid;
-	$payment_url = $payment_required
-		? dtb_checkout_payment_url( $order )
-		: '';
+	$final_status     = 'pending';
+	$payment_required = true;
+	$payment_url      = dtb_checkout_payment_url( $order );
 
 	return [
 		'order_id'        => (int) $order->get_id(),

@@ -250,9 +250,10 @@ if ( ! function_exists( 'dtb_wc_payment_runtime_prepare_current_order' ) ) {
 
 if ( ! function_exists( 'dtb_wc_payment_runtime_dequeue_block_checkout_assets' ) ) {
 	/**
-	 * Remove WooCommerce Blocks checkout assets from the classic gateway order-pay
-	 * runtime. Their Store API hydration expects block checkout order context and
-	 * can request /wc/store/v1/order/null on native pay-for-order pages.
+	 * Remove block/express checkout assets and address-field enhancements from the
+	 * classic gateway order-pay runtime. Their Store API hydration expects block
+	 * checkout order context and can request /wc/store/v1/order/null on native
+	 * pay-for-order pages. The classic UPE/Stripe assets remain registered.
 	 */
 	function dtb_wc_payment_runtime_dequeue_block_checkout_assets(): void {
 		if ( ! dtb_wc_payment_runtime_request() ) {
@@ -270,30 +271,38 @@ if ( ! function_exists( 'dtb_wc_payment_runtime_dequeue_block_checkout_assets' )
 			'wc-blocks-shared-context',
 			'wc-blocks-shared-hocs',
 			'wc-stripe-blocks-integration',
+			'WCPAY_WOOPAY',
+			'WCPAY_WOOPAY_EXPRESS_BUTTON',
+			'wc-address-autocomplete-common',
+			'wc-address-autocomplete',
+			'a8c-address-autocomplete-service',
 		];
 
-		foreach ( dtb_wc_payment_runtime_matching_asset_handles( 'scripts', [ 'blocks-checkout', 'dependency-error', 'frontend-tracks', 'checkout-block', 'express-checkout', 'stripe-blocks', 'wcpay_blocks_checkout' ] ) as $handle ) {
+		foreach ( dtb_wc_payment_runtime_matching_asset_handles( 'scripts', [ 'blocks-checkout', 'dependency-error', 'frontend-tracks', 'checkout-block', 'express-checkout', 'stripe-blocks', 'wcpay_blocks_checkout', 'wcpay_woopay', 'cart-checkout-base', 'cart-checkout-vendors', 'ppcp-block' ] ) as $handle ) {
 			$script_handles[] = $handle;
 		}
 
 		foreach ( array_unique( $script_handles ) as $handle ) {
 			wp_dequeue_script( $handle );
-			wp_deregister_script( $handle );
 		}
 
 		$style_handles = [
 			'wc-blocks-checkout-style',
 			'wc-blocks-style',
 			'wc-blocks-vendors-style',
+			'select2',
+			'wc-address-autocomplete',
+			'wc-ppcp-blocks',
+			'wc-ppcp-axo-block',
+			'WCPAY_WOOPAY',
 		];
 
-		foreach ( dtb_wc_payment_runtime_matching_asset_handles( 'styles', [ 'blocks-checkout', 'checkout-block', 'express-checkout' ] ) as $handle ) {
+		foreach ( dtb_wc_payment_runtime_matching_asset_handles( 'styles', [ 'blocks-checkout', 'checkout-block', 'express-checkout', 'ppcp-block', 'wcpay_woopay' ] ) as $handle ) {
 			$style_handles[] = $handle;
 		}
 
 		foreach ( array_unique( $style_handles ) as $handle ) {
 			wp_dequeue_style( $handle );
-			wp_deregister_style( $handle );
 		}
 	}
 }
@@ -331,7 +340,7 @@ if ( ! function_exists( 'dtb_wc_payment_runtime_is_block_checkout_asset' ) ) {
 	 */
 	function dtb_wc_payment_runtime_is_block_checkout_asset( string $handle, string $src ): bool {
 		$haystack = strtolower( $handle . ' ' . $src );
-		foreach ( [ 'blocks-checkout', 'dependency-error', 'frontend-tracks', 'checkout-block', 'express-checkout', 'stripe-blocks', 'wcpay_blocks_checkout' ] as $needle ) {
+		foreach ( [ 'blocks-checkout', 'dependency-error', 'frontend-tracks', 'checkout-block', 'express-checkout', 'stripe-blocks', 'wcpay_blocks_checkout', 'wcpay_woopay', 'cart-checkout-base', 'cart-checkout-vendors', 'ppcp-block', 'address-autocomplete', 'select2' ] as $needle ) {
 			if ( false !== strpos( $haystack, $needle ) ) {
 				return true;
 			}
