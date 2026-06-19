@@ -1,8 +1,8 @@
 <?php
 /**
  * Plugin Name: DTB WooCommerce Payment Runtime
- * Description: Allows native WooCommerce/WooPayments order-payment pages to render inside the otherwise headless WordPress runtime.
- * Version: 1.3.0
+ * Description: Routes keyed order-payment requests to the native WooCommerce payment runtime while the React storefront owns checkout intake.
+ * Version: 1.4.0
  * Author: Drywall Toolbox
  */
 
@@ -34,9 +34,6 @@ if ( ! function_exists( 'dtb_wc_payment_runtime_order_pay_id' ) ) {
 }
 
 if ( ! function_exists( 'dtb_wc_payment_runtime_request_order_key' ) ) {
-	/**
-	 * Get the WooCommerce order key from the current order-pay request.
-	 */
 	function dtb_wc_payment_runtime_request_order_key(): string {
 		return isset( $_GET['key'] ) ? sanitize_text_field( wp_unslash( $_GET['key'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 	}
@@ -44,12 +41,7 @@ if ( ! function_exists( 'dtb_wc_payment_runtime_request_order_key' ) ) {
 
 if ( ! function_exists( 'dtb_wc_payment_runtime_prime_order_pay_query_vars' ) ) {
 	/**
-	 * WooCommerce's classic checkout shortcode depends on the `order-pay` query
-	 * var. On this headless site, the `/wp/checkout/order-pay/{id}` URL can be
-	 * intercepted by the runtime template without WordPress resolving the checkout
-	 * endpoint. Prime the query var explicitly so WooPayments receives the exact
-	 * order context and renders the real payment form instead of a false
-	 * "order cannot be paid" notice.
+	 * Prime WooCommerce endpoint query vars on the headless `/wp/checkout/order-pay/{id}` path.
 	 */
 	function dtb_wc_payment_runtime_prime_order_pay_query_vars(): void {
 		$order_id = dtb_wc_payment_runtime_order_pay_id();
@@ -74,17 +66,13 @@ if ( ! function_exists( 'dtb_wc_payment_runtime_prime_order_pay_query_vars' ) ) 
 }
 
 if ( ! function_exists( 'dtb_wc_payment_runtime_request' ) ) {
-	/**
-	 * Determine whether the current request must render the native WooCommerce
-	 * payment runtime instead of the React/headless placeholder.
-	 */
 	function dtb_wc_payment_runtime_request(): bool {
 		if (
-			is_admin() ||
-			( defined( 'REST_REQUEST' ) && REST_REQUEST ) ||
-			( defined( 'DOING_CRON' ) && DOING_CRON ) ||
-			( defined( 'WP_CLI' ) && WP_CLI ) ||
-			( defined( 'DOING_AJAX' ) && DOING_AJAX )
+			is_admin()
+			|| ( defined( 'REST_REQUEST' ) && REST_REQUEST )
+			|| ( defined( 'DOING_CRON' ) && DOING_CRON )
+			|| ( defined( 'WP_CLI' ) && WP_CLI )
+			|| ( defined( 'DOING_AJAX' ) && DOING_AJAX )
 		) {
 			return false;
 		}
@@ -105,11 +93,9 @@ if ( ! function_exists( 'dtb_wc_payment_runtime_request' ) ) {
 			? sanitize_text_field( wp_unslash( $_SERVER['REQUEST_URI'] ) )
 			: '';
 
-		if ( '' === $request_uri ) {
-			return false;
-		}
-
-		return false !== strpos( $request_uri, 'pay_for_order=true' ) && false !== strpos( $request_uri, 'key=wc_order_' );
+		return '' !== $request_uri
+			&& false !== strpos( $request_uri, 'pay_for_order=true' )
+			&& false !== strpos( $request_uri, 'key=wc_order_' );
 	}
 }
 
@@ -120,9 +106,6 @@ if ( ! function_exists( 'dtb_wc_payment_runtime_is_manual_payment_method' ) ) {
 }
 
 if ( ! function_exists( 'dtb_wc_payment_runtime_order_key_matches_request' ) ) {
-	/**
-	 * Only mutate or override payment eligibility when the order-pay key matches.
-	 */
 	function dtb_wc_payment_runtime_order_key_matches_request( WC_Order $order ): bool {
 		$request_key = dtb_wc_payment_runtime_request_order_key();
 		$order_key   = (string) $order->get_order_key();
@@ -131,13 +114,15 @@ if ( ! function_exists( 'dtb_wc_payment_runtime_order_key_matches_request' ) ) {
 	}
 }
 
-if ( ! function_exists( 'dtb_wc_payment_runtime_is_dtb_checkout_order' ) ) {
-	function dtb_wc_payment_runtime_is_dtb_checkout_order( WC_Order $order ): bool {
-		return '' !== (string) $order->get_meta( '_dtb_checkout_gateway', true )
-			|| '' !== (string) $order->get_meta( '_dtb_checkout_contract_version', true )
-			|| '' !== (string) $order->get_meta( '_dtb_checkout_session_id', true )
-			|| '' !== (string) $order->get_meta( '_dtb_checkout_idempotency_key', true )
-			|| 'product' === (string) $order->get_meta( '_dtb_order_type', true );
+if ( ! function_exists( 'dtb_wc_payment_runtime_has_gateway_reference' ) ) {
+	function dtb_wc_payment_runtime_has_gateway_reference( WC_Order $order ): bool {
+		foreach ( [ '_transaction_id', '_wcpay_intent_id', '_wcpay_charge_id', '_stripe_intent_id', '_stripe_charge_id', '_payment_intent_id', '_paypal_order_id', '_paypal_transaction_id' ] as $meta_key ) {
+			if ( '' !== trim( (string) $order->get_meta( $meta_key, true ) ) ) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 }
 
@@ -146,21 +131,14 @@ if ( ! function_exists( 'dtb_wc_payment_runtime_has_captured_payment' ) ) {
 		$transaction_id = trim( (string) $order->get_transaction_id() );
 		$date_paid      = $order->get_date_paid();
 
-		return '' !== $transaction_id && null !== $date_paid;
+		return null !== $date_paid && ( '' !== $transaction_id || dtb_wc_payment_runtime_has_gateway_reference( $order ) );
 	}
 }
 
 if ( ! function_exists( 'dtb_wc_payment_runtime_is_unpaid_online_order' ) ) {
 	/**
-	 * Resolve whether an order-pay request represents an unpaid online payment.
-	 *
-	 * Safety boundaries:
-	 * - native order-pay request
-	 * - matching order key
-	 * - online payment method
-	 * - positive order total
-	 * - non-terminal order status
-	 * - no confirmed captured payment
+	 * Identify a keyed, positive-total, unpaid online order. Do not touch unrelated
+	 * admin, webhook, cron, callback, manual-payment, or terminal orders.
 	 */
 	function dtb_wc_payment_runtime_is_unpaid_online_order( WC_Order $order ): bool {
 		if ( ! dtb_wc_payment_runtime_request() || ! dtb_wc_payment_runtime_order_key_matches_request( $order ) ) {
@@ -186,11 +164,7 @@ if ( ! function_exists( 'dtb_wc_payment_runtime_is_unpaid_online_order' ) ) {
 
 if ( ! function_exists( 'dtb_wc_payment_runtime_prepare_payable_order' ) ) {
 	/**
-	 * Force an unpaid online order-pay request back into a payable state before
-	 * WooCommerce renders the classic pay-for-order form. This fixes the checkout
-	 * handoff where the order exists in WooCommerce but Woo blocks gateway testing
-	 * with "This order cannot be paid for." because the order was prematurely
-	 * marked processing by a callback or integration.
+	 * Keep headless-created online-payment orders payable until gateway capture.
 	 */
 	function dtb_wc_payment_runtime_prepare_payable_order( int $order_id = 0 ): void {
 		static $running = false;
@@ -217,10 +191,7 @@ if ( ! function_exists( 'dtb_wc_payment_runtime_prepare_payable_order' ) ) {
 			$changed = true;
 		}
 
-		// Some gateway/bootstrap callbacks can set date_paid without a real transaction.
-		// That makes WC_Order::needs_payment() return false. Clear only this incomplete
-		// marker; never clear a confirmed transaction id.
-		if ( null !== $order->get_date_paid() && '' === trim( (string) $order->get_transaction_id() ) ) {
+		if ( null !== $order->get_date_paid() && '' === trim( (string) $order->get_transaction_id() ) && ! dtb_wc_payment_runtime_has_gateway_reference( $order ) ) {
 			$order->set_date_paid( null );
 			$changed = true;
 		}
@@ -231,7 +202,7 @@ if ( ! function_exists( 'dtb_wc_payment_runtime_prepare_payable_order' ) ) {
 
 		$running = true;
 		try {
-			$order->add_order_note( 'Payment runtime prepared unpaid online order for secure gateway completion.' );
+			$order->add_order_note( 'Payment runtime prepared unpaid online order for native gateway completion.' );
 			$order->save();
 		} finally {
 			$running = false;
@@ -248,108 +219,6 @@ if ( ! function_exists( 'dtb_wc_payment_runtime_prepare_current_order' ) ) {
 	}
 }
 
-if ( ! function_exists( 'dtb_wc_payment_runtime_dequeue_block_checkout_assets' ) ) {
-	/**
-	 * Remove block/express checkout assets and address-field enhancements from the
-	 * classic gateway order-pay runtime. Their Store API hydration expects block
-	 * checkout order context and can request /wc/store/v1/order/null on native
-	 * pay-for-order pages. The classic UPE/Stripe assets remain registered.
-	 */
-	function dtb_wc_payment_runtime_dequeue_block_checkout_assets(): void {
-		if ( ! dtb_wc_payment_runtime_request() ) {
-			return;
-		}
-
-		$script_handles = [
-			'WCPAY_BLOCKS_CHECKOUT',
-			'wc-blocks-checkout',
-			'wc-blocks-checkout-block',
-			'wc-blocks-checkout-block-frontend',
-			'wc-blocks-frontend-tracks',
-			'wc-blocks-middleware',
-			'wc-blocks-registry',
-			'wc-blocks-shared-context',
-			'wc-blocks-shared-hocs',
-			'wc-stripe-blocks-integration',
-			'WCPAY_WOOPAY',
-			'WCPAY_WOOPAY_EXPRESS_BUTTON',
-			'wc-address-autocomplete-common',
-			'wc-address-autocomplete',
-			'a8c-address-autocomplete-service',
-		];
-
-		foreach ( dtb_wc_payment_runtime_matching_asset_handles( 'scripts', [ 'blocks-checkout', 'dependency-error', 'frontend-tracks', 'checkout-block', 'express-checkout', 'stripe-blocks', 'wcpay_blocks_checkout', 'wcpay_woopay', 'cart-checkout-base', 'cart-checkout-vendors', 'ppcp-block' ] ) as $handle ) {
-			$script_handles[] = $handle;
-		}
-
-		foreach ( array_unique( $script_handles ) as $handle ) {
-			wp_dequeue_script( $handle );
-		}
-
-		$style_handles = [
-			'wc-blocks-checkout-style',
-			'wc-blocks-style',
-			'wc-blocks-vendors-style',
-			'select2',
-			'wc-address-autocomplete',
-			'wc-ppcp-blocks',
-			'wc-ppcp-axo-block',
-			'WCPAY_WOOPAY',
-		];
-
-		foreach ( dtb_wc_payment_runtime_matching_asset_handles( 'styles', [ 'blocks-checkout', 'checkout-block', 'express-checkout', 'ppcp-block', 'wcpay_woopay' ] ) as $handle ) {
-			$style_handles[] = $handle;
-		}
-
-		foreach ( array_unique( $style_handles ) as $handle ) {
-			wp_dequeue_style( $handle );
-		}
-	}
-}
-
-if ( ! function_exists( 'dtb_wc_payment_runtime_matching_asset_handles' ) ) {
-	/**
-	 * Find enqueued asset handles by matching registered handle names or sources.
-	 *
-	 * @return string[]
-	 */
-	function dtb_wc_payment_runtime_matching_asset_handles( string $type, array $needles ): array {
-		$registry = 'styles' === $type ? wp_styles() : wp_scripts();
-		$matches  = [];
-
-		foreach ( (array) $registry->queue as $handle ) {
-			$registered = $registry->registered[ $handle ] ?? null;
-			$src        = is_object( $registered ) ? (string) $registered->src : '';
-			$haystack   = strtolower( $handle . ' ' . $src );
-
-			foreach ( $needles as $needle ) {
-				if ( false !== strpos( $haystack, strtolower( (string) $needle ) ) ) {
-					$matches[] = (string) $handle;
-					break;
-				}
-			}
-		}
-
-		return array_values( array_unique( $matches ) );
-	}
-}
-
-if ( ! function_exists( 'dtb_wc_payment_runtime_is_block_checkout_asset' ) ) {
-	/**
-	 * Detect checkout-block assets by printed handle or URL.
-	 */
-	function dtb_wc_payment_runtime_is_block_checkout_asset( string $handle, string $src ): bool {
-		$haystack = strtolower( $handle . ' ' . $src );
-		foreach ( [ 'blocks-checkout', 'dependency-error', 'frontend-tracks', 'checkout-block', 'express-checkout', 'stripe-blocks', 'wcpay_blocks_checkout', 'wcpay_woopay', 'cart-checkout-base', 'cart-checkout-vendors', 'ppcp-block', 'address-autocomplete', 'select2' ] as $needle ) {
-			if ( false !== strpos( $haystack, $needle ) ) {
-				return true;
-			}
-		}
-
-		return false;
-	}
-}
-
 add_action( 'parse_request', 'dtb_wc_payment_runtime_prime_order_pay_query_vars', 0 );
 add_action( 'parse_request', 'dtb_wc_payment_runtime_prepare_current_order', 1 );
 add_action( 'wp', 'dtb_wc_payment_runtime_prepare_current_order', 0 );
@@ -363,7 +232,7 @@ add_filter(
 			return $statuses;
 		}
 
-		return array_values( array_unique( array_merge( $statuses, [ 'pending', 'failed', 'on-hold', 'processing' ] ) ) );
+		return array_values( array_unique( array_merge( $statuses, [ 'pending', 'failed', 'on-hold', 'processing', 'checkout-draft' ] ) ) );
 	},
 	PHP_INT_MAX,
 	2
@@ -376,7 +245,7 @@ add_filter(
 			return $needs_payment;
 		}
 
-		return in_array( (string) $order->get_status(), [ 'pending', 'failed', 'on-hold', 'processing' ], true );
+		return true;
 	},
 	PHP_INT_MAX,
 	2
@@ -389,6 +258,9 @@ add_action(
 			return;
 		}
 
+		// Keep only the React/headless storefront from hijacking the order-pay page.
+		// Do not dequeue or suppress WooCommerce/payment-gateway assets; those scripts
+		// are required for card fields, wallets, fraud checks, and test-mode payment UI.
 		if ( function_exists( 'hb_dequeue_all_frontend_assets' ) ) {
 			remove_action( 'wp_enqueue_scripts', 'hb_dequeue_all_frontend_assets', 9999 );
 		}
@@ -400,63 +272,6 @@ add_action(
 		}
 	},
 	1
-);
-
-add_action(
-	'wp_enqueue_scripts',
-	'dtb_wc_payment_runtime_dequeue_block_checkout_assets',
-	PHP_INT_MAX
-);
-add_action( 'wp_print_scripts', 'dtb_wc_payment_runtime_dequeue_block_checkout_assets', 0 );
-add_action( 'wp_print_footer_scripts', 'dtb_wc_payment_runtime_dequeue_block_checkout_assets', 0 );
-add_action( 'wp_print_styles', 'dtb_wc_payment_runtime_dequeue_block_checkout_assets', 0 );
-
-add_filter(
-	'script_loader_tag',
-	static function ( string $tag, string $handle, string $src ): string {
-		if ( dtb_wc_payment_runtime_request() && dtb_wc_payment_runtime_is_block_checkout_asset( $handle, $src ) ) {
-			return '';
-		}
-
-		return $tag;
-	},
-	20,
-	3
-);
-
-add_filter(
-	'style_loader_tag',
-	static function ( string $tag, string $handle, string $href ): string {
-		if ( dtb_wc_payment_runtime_request() && dtb_wc_payment_runtime_is_block_checkout_asset( $handle, $href ) ) {
-			return '';
-		}
-
-		return $tag;
-	},
-	20,
-	3
-);
-
-add_filter(
-	'wp_preload_resources',
-	static function ( array $preloads ): array {
-		if ( ! dtb_wc_payment_runtime_request() ) {
-			return $preloads;
-		}
-
-		return array_values(
-			array_filter(
-				$preloads,
-				static function ( array $preload ): bool {
-					$href = isset( $preload['href'] ) ? (string) $preload['href'] : '';
-					$as   = isset( $preload['as'] ) ? (string) $preload['as'] : '';
-
-					return ! dtb_wc_payment_runtime_is_block_checkout_asset( $as, $href );
-				}
-			)
-		);
-	},
-	20
 );
 
 add_filter(
