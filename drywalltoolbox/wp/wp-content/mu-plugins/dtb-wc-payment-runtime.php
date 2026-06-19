@@ -2,7 +2,7 @@
 /**
  * Plugin Name: DTB WooCommerce Payment Runtime
  * Description: Allows native WooCommerce/WooPayments order-payment pages to render inside the otherwise headless WordPress runtime.
- * Version: 1.2.0
+ * Version: 1.3.0
  * Author: Drywall Toolbox
  */
 
@@ -131,14 +131,36 @@ if ( ! function_exists( 'dtb_wc_payment_runtime_order_key_matches_request' ) ) {
 	}
 }
 
+if ( ! function_exists( 'dtb_wc_payment_runtime_is_dtb_checkout_order' ) ) {
+	function dtb_wc_payment_runtime_is_dtb_checkout_order( WC_Order $order ): bool {
+		return '' !== (string) $order->get_meta( '_dtb_checkout_gateway', true )
+			|| '' !== (string) $order->get_meta( '_dtb_checkout_contract_version', true )
+			|| '' !== (string) $order->get_meta( '_dtb_checkout_session_id', true )
+			|| '' !== (string) $order->get_meta( '_dtb_checkout_idempotency_key', true )
+			|| 'product' === (string) $order->get_meta( '_dtb_order_type', true );
+	}
+}
+
+if ( ! function_exists( 'dtb_wc_payment_runtime_has_captured_payment' ) ) {
+	function dtb_wc_payment_runtime_has_captured_payment( WC_Order $order ): bool {
+		$transaction_id = trim( (string) $order->get_transaction_id() );
+		$date_paid      = $order->get_date_paid();
+
+		return '' !== $transaction_id && null !== $date_paid;
+	}
+}
+
 if ( ! function_exists( 'dtb_wc_payment_runtime_is_unpaid_online_order' ) ) {
 	/**
 	 * Resolve whether an order-pay request represents an unpaid online payment.
 	 *
-	 * This intentionally does not require DTB-only metadata because older staging
-	 * orders may have been created before those metadata writes were deployed. The
-	 * matching order key, positive total, online payment method, and missing paid
-	 * markers are the safety boundaries.
+	 * Safety boundaries:
+	 * - native order-pay request
+	 * - matching order key
+	 * - online payment method
+	 * - positive order total
+	 * - non-terminal order status
+	 * - no confirmed captured payment
 	 */
 	function dtb_wc_payment_runtime_is_unpaid_online_order( WC_Order $order ): bool {
 		if ( ! dtb_wc_payment_runtime_request() || ! dtb_wc_payment_runtime_order_key_matches_request( $order ) ) {
@@ -154,7 +176,11 @@ if ( ! function_exists( 'dtb_wc_payment_runtime_is_unpaid_online_order' ) ) {
 			return false;
 		}
 
-		return ! $order->get_transaction_id() && ! $order->get_date_paid();
+		if ( in_array( (string) $order->get_status(), [ 'completed', 'cancelled', 'refunded', 'trash' ], true ) ) {
+			return false;
+		}
+
+		return ! dtb_wc_payment_runtime_has_captured_payment( $order );
 	}
 }
 
@@ -167,7 +193,9 @@ if ( ! function_exists( 'dtb_wc_payment_runtime_prepare_payable_order' ) ) {
 	 * marked processing by a callback or integration.
 	 */
 	function dtb_wc_payment_runtime_prepare_payable_order( int $order_id = 0 ): void {
-		if ( ! function_exists( 'wc_get_order' ) ) {
+		static $running = false;
+
+		if ( $running || ! function_exists( 'wc_get_order' ) ) {
 			return;
 		}
 
@@ -181,14 +209,33 @@ if ( ! function_exists( 'dtb_wc_payment_runtime_prepare_payable_order' ) ) {
 			return;
 		}
 
-		$status = (string) $order->get_status();
-		if ( in_array( $status, [ 'pending', 'failed', 'on-hold' ], true ) ) {
+		$changed = false;
+		$status  = (string) $order->get_status();
+
+		if ( ! in_array( $status, [ 'pending', 'failed', 'on-hold' ], true ) ) {
+			$order->set_status( 'pending' );
+			$changed = true;
+		}
+
+		// Some gateway/bootstrap callbacks can set date_paid without a real transaction.
+		// That makes WC_Order::needs_payment() return false. Clear only this incomplete
+		// marker; never clear a confirmed transaction id.
+		if ( null !== $order->get_date_paid() && '' === trim( (string) $order->get_transaction_id() ) ) {
+			$order->set_date_paid( null );
+			$changed = true;
+		}
+
+		if ( ! $changed ) {
 			return;
 		}
 
-		$order->set_status( 'pending' );
-		$order->add_order_note( 'Payment runtime reset unpaid online order to pending so the secure payment gateway can be completed.' );
-		$order->save();
+		$running = true;
+		try {
+			$order->add_order_note( 'Payment runtime prepared unpaid online order for secure gateway completion.' );
+			$order->save();
+		} finally {
+			$running = false;
+		}
 	}
 }
 
@@ -295,8 +342,10 @@ if ( ! function_exists( 'dtb_wc_payment_runtime_is_block_checkout_asset' ) ) {
 }
 
 add_action( 'parse_request', 'dtb_wc_payment_runtime_prime_order_pay_query_vars', 0 );
-add_action( 'wp', 'dtb_wc_payment_runtime_prime_order_pay_query_vars', 0 );
+add_action( 'parse_request', 'dtb_wc_payment_runtime_prepare_current_order', 1 );
+add_action( 'wp', 'dtb_wc_payment_runtime_prepare_current_order', 0 );
 add_action( 'template_redirect', 'dtb_wc_payment_runtime_prepare_current_order', 0 );
+add_action( 'woocommerce_before_checkout_form', 'dtb_wc_payment_runtime_prepare_current_order', 0 );
 
 add_filter(
 	'woocommerce_valid_order_statuses_for_payment',
