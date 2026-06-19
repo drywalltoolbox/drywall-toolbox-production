@@ -2,15 +2,50 @@
 /**
  * WooCommerce order-payment runtime template.
  *
- * This template is intentionally scoped to protected WooCommerce payment routes
- * only. It lets the headless WordPress backend render the native WooCommerce /
- * WooPayments payment form while the React storefront continues to own every
- * public catalog and checkout-intake route.
+ * Scoped to protected WooCommerce payment routes only. The React storefront owns
+ * checkout intake; this template renders the native WooCommerce payment form for
+ * pay-for-order URLs.
  *
  * @package drywall-toolbox
  */
 
 defined( 'ABSPATH' ) || exit;
+
+if ( ! function_exists( 'dtb_payment_runtime_render_native_checkout' ) ) {
+	function dtb_payment_runtime_render_native_checkout(): void {
+		$order_pay_id = function_exists( 'dtb_wc_payment_runtime_order_pay_id' )
+			? dtb_wc_payment_runtime_order_pay_id()
+			: 0;
+
+		if ( $order_pay_id > 0 && function_exists( 'dtb_wc_payment_runtime_prepare_payable_order' ) ) {
+			dtb_wc_payment_runtime_prepare_payable_order( $order_pay_id );
+		}
+
+		if (
+			$order_pay_id > 0
+			&& class_exists( 'WC_Shortcode_Checkout' )
+			&& is_callable( [ 'WC_Shortcode_Checkout', 'order_pay' ] )
+		) {
+			call_user_func( [ 'WC_Shortcode_Checkout', 'order_pay' ], $order_pay_id );
+			return;
+		}
+
+		if ( shortcode_exists( 'woocommerce_checkout' ) ) {
+			echo do_shortcode( '[woocommerce_checkout]' );
+			return;
+		}
+
+		if ( have_posts() ) {
+			while ( have_posts() ) {
+				the_post();
+				the_content();
+			}
+			return;
+		}
+
+		echo '<p class="dtb-payment-runtime__fallback">Secure payment is temporarily unavailable. Please contact support.</p>';
+	}
+}
 
 ?><!doctype html>
 <html <?php language_attributes(); ?>>
@@ -23,15 +58,12 @@ defined( 'ABSPATH' ) || exit;
 		:root {
 			--dtb-ink: #020817;
 			--dtb-navy: #071126;
-			--dtb-panel: #0f1a2d;
 			--dtb-blue: #2563eb;
 			--dtb-blue-strong: #1d4ed8;
-			--dtb-blue-soft: #eff6ff;
 			--dtb-border: #dbe4f0;
-			--dtb-border-strong: #cbd5e1;
 			--dtb-text: #0f172a;
 			--dtb-muted: #64748b;
-			--dtb-soft: #f8fafc;
+			--dtb-soft: #f7f9fc;
 			--dtb-danger: #dc2626;
 		}
 
@@ -40,7 +72,7 @@ defined( 'ABSPATH' ) || exit;
 		body.dtb-payment-runtime {
 			margin: 0;
 			min-height: 100vh;
-			background: #f5f7fb;
+			background: #f4f7fb;
 			color: var(--dtb-text);
 			font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 			-webkit-font-smoothing: antialiased;
@@ -51,11 +83,10 @@ defined( 'ABSPATH' ) || exit;
 			position: relative;
 			isolation: isolate;
 			min-height: 100vh;
-			padding: max(26px, env(safe-area-inset-top)) 16px max(34px, env(safe-area-inset-bottom));
+			padding: max(22px, env(safe-area-inset-top)) 14px max(34px, env(safe-area-inset-bottom));
 			background:
-				radial-gradient(circle at 50% 6%, rgba(37, 99, 235, 0.24), transparent 31%),
-				radial-gradient(circle at 8% 20%, rgba(59, 130, 246, 0.13), transparent 24%),
-				linear-gradient(180deg, #050b19 0%, #081329 330px, #f5f7fb 330px, #f5f7fb 100%);
+				radial-gradient(circle at 50% 8%, rgba(37, 99, 235, 0.22), transparent 30%),
+				linear-gradient(180deg, #050b19 0%, #081329 255px, #f4f7fb 255px, #f4f7fb 100%);
 			overflow: hidden;
 		}
 
@@ -66,12 +97,12 @@ defined( 'ABSPATH' ) || exit;
 			z-index: -1;
 			background-image: radial-gradient(circle at 1px 1px, rgba(255,255,255,0.16) 1px, transparent 0);
 			background-size: 34px 34px;
-			opacity: 0.18;
-			mask-image: linear-gradient(180deg, #000 0%, transparent 62%);
+			opacity: 0.16;
+			mask-image: linear-gradient(180deg, #000 0%, transparent 58%);
 		}
 
 		.dtb-payment-wrap {
-			width: min(880px, 100%);
+			width: min(760px, 100%);
 			margin: 0 auto;
 		}
 
@@ -79,21 +110,21 @@ defined( 'ABSPATH' ) || exit;
 			display: flex;
 			align-items: center;
 			justify-content: center;
-			min-height: 68px;
-			margin-bottom: clamp(24px, 4vw, 42px);
+			min-height: 58px;
+			margin-bottom: clamp(18px, 4vw, 30px);
 		}
 
 		.dtb-payment-brand img {
-			width: min(300px, 68vw);
+			width: min(255px, 68vw);
 			height: auto;
 			display: block;
-			filter: drop-shadow(0 0 30px rgba(37, 99, 235, 0.34));
+			filter: drop-shadow(0 0 28px rgba(37, 99, 235, 0.32));
 		}
 
 		.dtb-payment-brand__fallback {
 			display: none;
 			color: #fff;
-			font-size: 28px;
+			font-size: 24px;
 			font-weight: 900;
 			letter-spacing: -0.04em;
 		}
@@ -101,13 +132,11 @@ defined( 'ABSPATH' ) || exit;
 		.dtb-payment-card {
 			position: relative;
 			overflow: hidden;
-			padding: clamp(22px, 4vw, 42px);
-			border: 1px solid rgba(203, 213, 225, 0.86);
-			border-radius: 30px;
-			background:
-				linear-gradient(180deg, rgba(255,255,255,0.98), rgba(255,255,255,0.95)),
-				radial-gradient(circle at 100% 0%, rgba(37, 99, 235, 0.14), transparent 28%);
-			box-shadow: 0 30px 90px rgba(15, 23, 42, 0.18), 0 1px 0 rgba(255,255,255,0.8) inset;
+			padding: clamp(22px, 4vw, 36px);
+			border: 1px solid rgba(203, 213, 225, 0.9);
+			border-radius: 28px;
+			background: linear-gradient(180deg, rgba(255,255,255,0.99), rgba(255,255,255,0.96));
+			box-shadow: 0 28px 78px rgba(15, 23, 42, 0.16), 0 1px 0 rgba(255,255,255,0.8) inset;
 		}
 
 		.dtb-payment-card::before {
@@ -116,14 +145,6 @@ defined( 'ABSPATH' ) || exit;
 			inset: 0 0 auto;
 			height: 4px;
 			background: linear-gradient(90deg, #2563eb, #60a5fa, #2563eb);
-		}
-
-		.dtb-payment-hero {
-			display: grid;
-			grid-template-columns: minmax(0, 1fr) auto;
-			gap: 18px;
-			align-items: start;
-			margin-bottom: 26px;
 		}
 
 		.dtb-payment-kicker {
@@ -154,45 +175,19 @@ defined( 'ABSPATH' ) || exit;
 
 		.dtb-payment-title {
 			margin: 0 0 10px;
-			font-size: clamp(30px, 5vw, 50px);
-			line-height: 0.98;
+			font-size: clamp(30px, 5vw, 46px);
+			line-height: 1;
 			font-weight: 950;
 			letter-spacing: -0.055em;
 			color: var(--dtb-text);
 		}
 
 		.dtb-payment-copy {
-			max-width: 620px;
-			margin: 0;
+			max-width: 560px;
+			margin: 0 0 22px;
 			color: var(--dtb-muted);
 			font-size: 15px;
-			line-height: 1.65;
-		}
-
-		.dtb-payment-trust {
-			display: grid;
-			gap: 8px;
-			min-width: 180px;
-			padding: 14px;
-			border: 1px solid var(--dtb-border);
-			border-radius: 18px;
-			background: #f8fafc;
-		}
-
-		.dtb-payment-trust span {
-			display: flex;
-			align-items: center;
-			gap: 8px;
-			font-size: 12px;
-			font-weight: 750;
-			color: #475569;
-		}
-
-		.dtb-payment-trust svg {
-			width: 15px;
-			height: 15px;
-			color: var(--dtb-blue);
-			flex: 0 0 auto;
+			line-height: 1.6;
 		}
 
 		.dtb-payment-runtime .woocommerce {
@@ -209,13 +204,14 @@ defined( 'ABSPATH' ) || exit;
 		.dtb-payment-runtime .woocommerce-error,
 		.dtb-payment-runtime .woocommerce-info,
 		.dtb-payment-runtime .woocommerce-message {
-			border: 0;
-			border-left: 4px solid var(--dtb-blue);
-			border-radius: 16px;
+			border: 1px solid var(--dtb-border);
+			border-left: 5px solid var(--dtb-blue);
+			border-radius: 18px;
 			background: #f8fafc;
 			box-shadow: none;
 			color: #334155;
 			line-height: 1.55;
+			padding: 16px 18px 16px 20px;
 		}
 
 		.dtb-payment-runtime .woocommerce-error {
@@ -223,15 +219,10 @@ defined( 'ABSPATH' ) || exit;
 			background: #fff7f7;
 		}
 
-		.dtb-payment-runtime .woocommerce-order-pay #order_review,
-		.dtb-payment-runtime .woocommerce form {
-			border-radius: 22px;
-		}
-
 		.dtb-payment-runtime .woocommerce table.shop_table {
-			margin-bottom: 22px;
+			margin-bottom: 20px;
 			border: 1px solid var(--dtb-border);
-			border-radius: 22px;
+			border-radius: 20px;
 			background: #fff;
 			overflow: hidden;
 			box-shadow: 0 1px 0 rgba(15,23,42,0.03);
@@ -239,7 +230,7 @@ defined( 'ABSPATH' ) || exit;
 
 		.dtb-payment-runtime .woocommerce table.shop_table th,
 		.dtb-payment-runtime .woocommerce table.shop_table td {
-			padding: 15px 18px;
+			padding: 14px 16px;
 			border-color: #e5edf7;
 		}
 
@@ -261,30 +252,30 @@ defined( 'ABSPATH' ) || exit;
 
 		.dtb-payment-runtime .woocommerce #payment {
 			border: 1px solid var(--dtb-border);
-			border-radius: 24px;
+			border-radius: 22px;
 			background: #f8fafc;
 			overflow: hidden;
 		}
 
 		.dtb-payment-runtime .woocommerce #payment ul.payment_methods {
-			padding: 18px;
+			padding: 16px;
 			border-bottom-color: #dbe4f0;
 		}
 
 		.dtb-payment-runtime .woocommerce #payment ul.payment_methods li {
-			padding: 14px 0;
+			padding: 12px 0;
 		}
 
 		.dtb-payment-runtime .woocommerce #payment ul.payment_methods label {
-			font-size: 16px;
+			font-size: 15px;
 			font-weight: 850;
 			color: #0f172a;
 		}
 
 		.dtb-payment-runtime .woocommerce #payment div.payment_box {
-			margin: 14px 0 0;
+			margin: 12px 0 0;
 			border: 1px solid #cfe0ff;
-			border-radius: 18px;
+			border-radius: 16px;
 			background: #eff6ff;
 			color: var(--dtb-text);
 			font-size: 14px;
@@ -296,7 +287,7 @@ defined( 'ABSPATH' ) || exit;
 		}
 
 		.dtb-payment-runtime .woocommerce #payment div.form-row {
-			padding: 18px;
+			padding: 16px;
 		}
 
 		.dtb-payment-runtime .woocommerce button.button,
@@ -304,16 +295,16 @@ defined( 'ABSPATH' ) || exit;
 			display: inline-flex;
 			align-items: center;
 			justify-content: center;
-			min-height: 56px;
+			min-height: 54px;
 			width: 100%;
 			border: 0;
-			border-radius: 16px;
+			border-radius: 15px;
 			background: linear-gradient(135deg, #2563eb, #1d4ed8);
 			color: #fff;
 			font-size: 15px;
 			font-weight: 950;
 			letter-spacing: -0.01em;
-			box-shadow: 0 18px 42px rgba(37, 99, 235, 0.30);
+			box-shadow: 0 16px 38px rgba(37, 99, 235, 0.28);
 			transition: transform 160ms ease, box-shadow 160ms ease, background 160ms ease;
 		}
 
@@ -322,17 +313,17 @@ defined( 'ABSPATH' ) || exit;
 			transform: translateY(-1px);
 			background: linear-gradient(135deg, #1d4ed8, #1e40af);
 			color: #fff;
-			box-shadow: 0 20px 48px rgba(37, 99, 235, 0.36);
+			box-shadow: 0 18px 42px rgba(37, 99, 235, 0.34);
 		}
 
 		.dtb-payment-runtime .wcpay-express-checkout-wrapper,
 		.dtb-payment-runtime #wcpay-express-checkout-element,
 		.dtb-payment-runtime .wc-stripe-payment-request-wrapper,
 		.dtb-payment-runtime .woocommerce-payments-express-checkout {
-			margin: 0 0 18px;
-			padding: 14px;
+			margin: 0 0 16px;
+			padding: 12px;
 			border: 1px solid var(--dtb-border);
-			border-radius: 20px;
+			border-radius: 18px;
 			background: #fff;
 			box-shadow: 0 1px 0 rgba(15,23,42,0.03);
 		}
@@ -342,7 +333,7 @@ defined( 'ABSPATH' ) || exit;
 		}
 
 		.dtb-payment-footer {
-			width: min(880px, 100%);
+			width: min(760px, 100%);
 			margin: 18px auto 0;
 			text-align: center;
 			font-size: 12px;
@@ -351,14 +342,20 @@ defined( 'ABSPATH' ) || exit;
 			color: #94a3b8;
 		}
 
+		.dtb-payment-runtime__fallback {
+			margin: 0;
+			color: var(--dtb-muted);
+			font-weight: 700;
+		}
+
 		@media (max-width: 740px) {
-			.dtb-payment-shell { padding: 18px 12px 34px; }
-			.dtb-payment-brand { margin-bottom: 20px; }
+			.dtb-payment-shell { padding: 18px 10px 34px; }
+			.dtb-payment-brand { margin-bottom: 18px; }
 			.dtb-payment-card { border-radius: 24px; }
-			.dtb-payment-hero { grid-template-columns: 1fr; }
-			.dtb-payment-trust { grid-template-columns: 1fr; min-width: 0; }
+			.dtb-payment-title { font-size: clamp(28px, 10vw, 40px); }
+			.dtb-payment-copy { font-size: 14px; margin-bottom: 18px; }
 			.dtb-payment-runtime .woocommerce table.shop_table th,
-			.dtb-payment-runtime .woocommerce table.shop_table td { padding: 12px; }
+			.dtb-payment-runtime .woocommerce table.shop_table td { padding: 11px; }
 			.dtb-payment-runtime .woocommerce table.shop_table { font-size: 13px; }
 		}
 	</style>
@@ -372,33 +369,12 @@ defined( 'ABSPATH' ) || exit;
 			<span class="dtb-payment-brand__fallback">Drywall Toolbox</span>
 		</header>
 		<section class="dtb-payment-card" aria-labelledby="dtb-payment-title">
-			<div class="dtb-payment-hero">
-				<div>
-					<p class="dtb-payment-kicker">Protected payment</p>
-					<h1 id="dtb-payment-title" class="dtb-payment-title">Complete your secure payment</h1>
-					<p class="dtb-payment-copy">Your order has been reserved. Finish the secure payment step below to confirm processing and receive your order confirmation.</p>
-				</div>
-				<div class="dtb-payment-trust" aria-label="Secure payment safeguards">
-					<span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>Encrypted checkout</span>
-					<span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>Card and wallet ready</span>
-					<span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 10c0 7-9 12-9 12S3 17 3 10a9 9 0 1 1 18 0Z"/><circle cx="12" cy="10" r="3"/></svg>Order confirmation by email</span>
-				</div>
-			</div>
-			<?php
-			if ( shortcode_exists( 'woocommerce_checkout' ) ) {
-				// Order-pay must use the classic checkout shortcode so gateways can render their payment form.
-				echo do_shortcode( '[woocommerce_checkout]' );
-			} elseif ( have_posts() ) {
-				while ( have_posts() ) {
-					the_post();
-					the_content();
-				}
-			} else {
-				echo '<p>Secure payment is temporarily unavailable. Please contact support.</p>';
-			}
-			?>
+			<p class="dtb-payment-kicker">Protected payment</p>
+			<h1 id="dtb-payment-title" class="dtb-payment-title">Complete payment</h1>
+			<p class="dtb-payment-copy">Confirm your order using the secure payment form below.</p>
+			<?php dtb_payment_runtime_render_native_checkout(); ?>
 		</section>
-		<p class="dtb-payment-footer">Secure card processing · Digital wallet availability depends on device, browser, and wallet configuration.</p>
+		<p class="dtb-payment-footer">Secure card processing · Digital wallet availability depends on device and browser support.</p>
 	</div>
 </main>
 <script>
