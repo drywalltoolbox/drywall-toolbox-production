@@ -1,39 +1,50 @@
 /*
  * frontend/src/styles/order-pages.css
  *
- * Shared order confirmation / tracking presentation layer.
- * Scope is intentionally narrow to avoid changing checkout, product, or account UI.
+ * Shared order confirmation / order-summary presentation layer.
+ * Optimized for a calmer desktop-scale viewport while preserving mobile-first fluidity.
  */
 
 .dtb-order-page {
+  --dtb-order-page-gutter: clamp(1rem, 3.6vw, 3.75rem);
+  --dtb-order-shell-max: 1180px;
+  --dtb-order-border: rgba(203, 213, 225, 0.78);
+  --dtb-order-border-soft: rgba(226, 232, 240, 0.88);
+  --dtb-order-text: #111827;
+  --dtb-order-muted: #64748b;
+  --dtb-order-soft: #f8fafc;
+  --dtb-order-blue: #2563eb;
+
   min-height: 100vh;
-  padding: clamp(2rem, 5vw, 4.5rem) 0;
+  padding: clamp(2rem, 3.8vw, 3.75rem) 0;
   background:
-    radial-gradient(circle at 50% 0%, rgba(37, 99, 235, 0.08), transparent 34rem),
+    radial-gradient(circle at 50% 0%, rgba(37, 99, 235, 0.06), transparent 34rem),
     linear-gradient(180deg, #f8fafc 0%, #eef3f8 100%);
-  color: #0f172a;
+  color: var(--dtb-order-text);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
 .dtb-order-shell {
-  width: min(1120px, calc(100% - 2rem));
+  width: min(var(--dtb-order-shell-max), calc(100% - (var(--dtb-order-page-gutter) * 2)));
   margin: 0 auto;
 }
 
 .dtb-order-back-link {
   display: inline-flex;
   align-items: center;
-  gap: 0.45rem;
-  min-height: 40px;
-  margin-bottom: 1.1rem;
-  color: #64748b;
-  font-size: 0.875rem;
-  font-weight: 800;
+  gap: 0.42rem;
+  min-height: 34px;
+  margin-bottom: 0.95rem;
+  color: var(--dtb-order-muted);
+  font-size: 0.84rem;
+  font-weight: 700;
   text-decoration: none;
   transition: color 160ms ease, transform 160ms ease;
 }
 
 .dtb-order-back-link:hover {
-  color: #2563eb;
+  color: var(--dtb-order-blue);
   transform: translateX(-2px);
 }
 
@@ -43,15 +54,15 @@
   display: grid;
   justify-items: center;
   text-align: center;
-  padding: clamp(1.8rem, 5vw, 3.25rem) clamp(1rem, 4vw, 2rem);
-  margin-bottom: clamp(1.2rem, 3vw, 1.75rem);
-  border: 1px solid rgba(203, 213, 225, 0.78);
-  border-radius: clamp(1.5rem, 4vw, 2.25rem);
+  padding: clamp(1.55rem, 3.6vw, 2.55rem) clamp(1rem, 3vw, 2rem);
+  margin-bottom: clamp(1rem, 2.2vw, 1.45rem);
+  border: 1px solid var(--dtb-order-border);
+  border-radius: clamp(1.25rem, 2.4vw, 1.85rem);
   background:
-    radial-gradient(circle at 50% 0%, rgba(37, 99, 235, 0.08), transparent 28rem),
-    rgba(255, 255, 255, 0.92);
+    radial-gradient(circle at 50% 0%, rgba(37, 99, 235, 0.065), transparent 26rem),
+    rgba(255, 255, 255, 0.94);
   box-shadow:
-    0 24px 70px rgba(15, 23, 42, 0.09),
+    0 20px 54px rgba(15, 23, 42, 0.075),
     inset 0 1px 0 rgba(255, 255, 255, 0.92);
 }
 
@@ -60,9 +71,9 @@
   position: absolute;
   inset: 0;
   pointer-events: none;
-  background-image: radial-gradient(rgba(37, 99, 235, 0.12) 0.75px, transparent 0.75px);
+  background-image: radial-gradient(rgba(37, 99, 235, 0.10) 0.7px, transparent 0.7px);
   background-size: 18px 18px;
-  opacity: 0.18;
+  opacity: 0.14;
 }
 
 .dtb-order-hero > * {
@@ -75,27 +86,27 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: clamp(4.5rem, 13vw, 6.5rem);
-  height: clamp(4.5rem, 13vw, 6.5rem);
-  margin-bottom: clamp(1rem, 3vw, 1.35rem);
+  width: clamp(3.5rem, 6vw, 4.75rem);
+  height: clamp(3.5rem, 6vw, 4.75rem);
+  margin-bottom: clamp(0.78rem, 1.9vw, 1.05rem);
   border-radius: 999px;
   background: linear-gradient(180deg, #f0fdf4 0%, #dcfce7 100%);
   color: #16a34a;
-  box-shadow: 0 18px 42px rgba(22, 163, 74, 0.18);
+  box-shadow: 0 16px 34px rgba(22, 163, 74, 0.15);
 }
 
 .dtb-order-status-icon--neutral {
   background: linear-gradient(180deg, #eff6ff 0%, #dbeafe 100%);
-  color: #2563eb;
-  box-shadow: 0 18px 42px rgba(37, 99, 235, 0.16);
+  color: var(--dtb-order-blue);
+  box-shadow: 0 16px 34px rgba(37, 99, 235, 0.14);
 }
 
 .dtb-order-eyebrow {
-  margin: 0 0 0.45rem;
-  color: #2563eb;
-  font-size: 0.72rem;
-  font-weight: 950;
-  letter-spacing: 0.2em;
+  margin: 0 0 0.42rem;
+  color: var(--dtb-order-blue);
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.18em;
   text-transform: uppercase;
 }
 
@@ -103,28 +114,28 @@
   max-width: 100%;
   margin: 0;
   color: #0f172a;
-  font-size: clamp(2.15rem, 9vw, 4rem);
-  font-weight: 950;
-  line-height: 0.98;
-  letter-spacing: -0.055em;
+  font-size: clamp(2rem, 4.25vw, 3.25rem);
+  font-weight: 800;
+  line-height: 1.03;
+  letter-spacing: -0.04em;
   overflow-wrap: anywhere;
 }
 
 .dtb-order-subtitle {
-  max-width: 42rem;
-  margin: 0.85rem auto 0;
-  color: #64748b;
-  font-size: clamp(0.95rem, 2.4vw, 1.08rem);
-  font-weight: 600;
-  line-height: 1.65;
+  max-width: 39rem;
+  margin: 0.72rem auto 0;
+  color: var(--dtb-order-muted);
+  font-size: clamp(0.9rem, 1.2vw, 1rem);
+  font-weight: 500;
+  line-height: 1.58;
 }
 
 .dtb-order-badges {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 0.65rem;
-  margin-top: 1rem;
+  gap: 0.55rem;
+  margin-top: 0.9rem;
 }
 
 .dtb-order-status-badge,
@@ -132,17 +143,17 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 0.45rem;
-  min-height: 36px;
-  padding: 0 0.9rem;
+  gap: 0.42rem;
+  min-height: 32px;
+  padding: 0 0.78rem;
   border: 1px solid rgba(203, 213, 225, 0.9);
   border-radius: 999px;
   background: #fff;
   color: #334155;
-  font-size: 0.86rem;
-  font-weight: 900;
+  font-size: 0.78rem;
+  font-weight: 700;
   white-space: nowrap;
-  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.06);
+  box-shadow: 0 9px 20px rgba(15, 23, 42, 0.05);
 }
 
 .dtb-order-live-badge {
@@ -153,30 +164,30 @@
 
 .dtb-order-grid {
   display: grid;
-  grid-template-columns: minmax(0, 1.12fr) minmax(320px, 0.88fr);
-  gap: clamp(1rem, 2vw, 1.35rem);
+  grid-template-columns: minmax(0, 1.12fr) minmax(340px, 0.88fr);
+  gap: clamp(1rem, 1.65vw, 1.3rem);
   align-items: start;
 }
 
 .dtb-order-stack {
   display: grid;
-  gap: clamp(1rem, 2vw, 1.25rem);
+  gap: clamp(0.9rem, 1.45vw, 1.15rem);
 }
 
 .dtb-order-card {
   overflow: hidden;
-  border: 1px solid rgba(203, 213, 225, 0.82);
-  border-radius: clamp(1.25rem, 3vw, 1.65rem);
+  border: 1px solid var(--dtb-order-border);
+  border-radius: clamp(1.05rem, 1.7vw, 1.4rem);
   background: rgba(255, 255, 255, 0.96);
-  box-shadow: 0 18px 46px rgba(15, 23, 42, 0.07);
+  box-shadow: 0 14px 36px rgba(15, 23, 42, 0.06);
 }
 
 .dtb-order-card__header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 1rem;
-  padding: clamp(1rem, 3vw, 1.35rem) clamp(1rem, 3vw, 1.45rem);
+  gap: 0.9rem;
+  padding: clamp(0.88rem, 1.6vw, 1.1rem) clamp(0.95rem, 1.8vw, 1.2rem);
   border-bottom: 1px solid rgba(226, 232, 240, 0.95);
   background: linear-gradient(180deg, rgba(248, 250, 252, 0.94), rgba(255, 255, 255, 0.98));
 }
@@ -184,22 +195,22 @@
 .dtb-order-card__title {
   display: inline-flex;
   align-items: center;
-  gap: 0.6rem;
+  gap: 0.55rem;
   margin: 0;
   color: #0f172a;
-  font-size: clamp(1.05rem, 3.8vw, 1.35rem);
-  font-weight: 950;
-  line-height: 1.1;
-  letter-spacing: -0.025em;
+  font-size: clamp(0.98rem, 1.35vw, 1.12rem);
+  font-weight: 750;
+  line-height: 1.14;
+  letter-spacing: -0.018em;
 }
 
 .dtb-order-card__body {
-  padding: clamp(1rem, 3vw, 1.45rem);
+  padding: clamp(0.95rem, 1.85vw, 1.2rem);
 }
 
 .dtb-order-items {
   display: grid;
-  gap: 0.75rem;
+  gap: 0.7rem;
 }
 
 .dtb-order-item {
@@ -207,45 +218,45 @@
   grid-template-columns: minmax(0, 1fr) auto;
   gap: 1rem;
   align-items: start;
-  padding: 0.95rem;
+  padding: 0.86rem 0.9rem;
   border: 1px solid rgba(226, 232, 240, 0.86);
-  border-radius: 1rem;
+  border-radius: 0.9rem;
   background: #f8fafc;
 }
 
 .dtb-order-item__name {
   margin: 0;
   color: #0f172a;
-  font-size: clamp(0.98rem, 3.5vw, 1.08rem);
-  font-weight: 900;
-  line-height: 1.22;
-  letter-spacing: -0.018em;
+  font-size: clamp(0.92rem, 1.1vw, 1rem);
+  font-weight: 700;
+  line-height: 1.28;
+  letter-spacing: -0.012em;
   overflow-wrap: anywhere;
   word-break: normal;
   hyphens: auto;
 }
 
 .dtb-order-item__meta {
-  margin: 0.35rem 0 0;
-  color: #64748b;
-  font-size: 0.88rem;
-  font-weight: 750;
+  margin: 0.28rem 0 0;
+  color: var(--dtb-order-muted);
+  font-size: 0.82rem;
+  font-weight: 650;
 }
 
 .dtb-order-item__price {
   color: #0f172a;
-  font-size: 0.98rem;
-  font-weight: 950;
+  font-size: 0.92rem;
+  font-weight: 750;
   white-space: nowrap;
   text-align: right;
 }
 
 .dtb-order-totals {
   display: grid;
-  gap: 0.7rem;
-  margin-top: 1rem;
-  padding-top: 1rem;
-  border-top: 1px solid rgba(203, 213, 225, 0.9);
+  gap: 0.58rem;
+  margin-top: 0.9rem;
+  padding-top: 0.9rem;
+  border-top: 1px solid rgba(203, 213, 225, 0.86);
 }
 
 .dtb-order-total-row {
@@ -254,48 +265,49 @@
   gap: 1rem;
   align-items: baseline;
   color: #475569;
-  font-size: clamp(0.95rem, 3.3vw, 1.05rem);
-  font-weight: 700;
+  font-size: clamp(0.9rem, 1.1vw, 0.98rem);
+  font-weight: 600;
 }
 
 .dtb-order-total-row strong {
   color: #0f172a;
-  font-weight: 950;
+  font-weight: 750;
 }
 
 .dtb-order-total-row--grand {
-  margin-top: 0.15rem;
-  padding-top: 0.9rem;
-  border-top: 2px solid #0f172a;
+  margin-top: 0.1rem;
+  padding-top: 0.82rem;
+  border-top: 1.5px solid #0f172a;
   color: #0f172a;
-  font-size: clamp(1.05rem, 4.4vw, 1.32rem);
-  font-weight: 950;
+  font-size: clamp(1rem, 1.4vw, 1.14rem);
+  font-weight: 750;
 }
 
 .dtb-order-total-row--grand strong {
-  color: #2563eb;
-  font-size: clamp(1.35rem, 5.5vw, 1.8rem);
-  letter-spacing: -0.035em;
+  color: var(--dtb-order-blue);
+  font-size: clamp(1.2rem, 2.05vw, 1.5rem);
+  font-weight: 800;
+  letter-spacing: -0.028em;
   white-space: nowrap;
 }
 
 .dtb-order-free {
   color: #16a34a;
-  font-weight: 950;
+  font-weight: 750;
   letter-spacing: 0.02em;
 }
 
 .dtb-order-detail-list {
   display: grid;
-  gap: 0.85rem;
+  gap: 0.7rem;
   margin: 0;
 }
 
 .dtb-order-detail-row {
   display: grid;
-  gap: 0.18rem;
-  padding: 0.9rem 0;
-  border-bottom: 1px solid rgba(226, 232, 240, 0.85);
+  gap: 0.16rem;
+  padding: 0.78rem 0;
+  border-bottom: 1px solid rgba(226, 232, 240, 0.82);
 }
 
 .dtb-order-detail-row:last-child {
@@ -304,16 +316,16 @@
 
 .dtb-order-detail-label {
   color: #94a3b8;
-  font-size: 0.68rem;
-  font-weight: 950;
-  letter-spacing: 0.16em;
+  font-size: 0.64rem;
+  font-weight: 800;
+  letter-spacing: 0.15em;
   text-transform: uppercase;
 }
 
 .dtb-order-detail-value {
   color: #0f172a;
-  font-size: 0.98rem;
-  font-weight: 800;
+  font-size: 0.92rem;
+  font-weight: 650;
   line-height: 1.45;
   overflow-wrap: anywhere;
 }
@@ -321,61 +333,61 @@
 .dtb-order-timeline {
   position: relative;
   display: grid;
-  gap: 0.9rem;
+  gap: 0.85rem;
 }
 
 .dtb-order-timeline__item {
   display: grid;
-  grid-template-columns: 34px minmax(0, 1fr);
-  gap: 0.8rem;
+  grid-template-columns: 32px minmax(0, 1fr);
+  gap: 0.75rem;
 }
 
 .dtb-order-timeline__icon {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 34px;
-  height: 34px;
+  width: 32px;
+  height: 32px;
   border-radius: 999px;
   background: #eff6ff;
-  color: #2563eb;
-  box-shadow: inset 0 0 0 1px rgba(147, 197, 253, 0.8);
+  color: var(--dtb-order-blue);
+  box-shadow: inset 0 0 0 1px rgba(147, 197, 253, 0.78);
 }
 
 .dtb-order-timeline__label {
   margin: 0;
   color: #0f172a;
-  font-size: 0.95rem;
-  font-weight: 850;
-  line-height: 1.25;
+  font-size: 0.9rem;
+  font-weight: 700;
+  line-height: 1.26;
 }
 
 .dtb-order-timeline__time {
   display: block;
-  margin-top: 0.18rem;
+  margin-top: 0.16rem;
   color: #94a3b8;
-  font-size: 0.78rem;
-  font-weight: 700;
+  font-size: 0.74rem;
+  font-weight: 600;
 }
 
 .dtb-order-actions {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 0.8rem;
-  margin-top: clamp(1.35rem, 3vw, 2rem);
+  gap: 0.72rem;
+  margin-top: clamp(1.1rem, 2.3vw, 1.6rem);
 }
 
 .dtb-order-button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 0.5rem;
-  min-height: 48px;
-  padding: 0 1.1rem;
-  border-radius: 0.95rem;
-  font-size: 0.94rem;
-  font-weight: 900;
+  gap: 0.48rem;
+  min-height: 42px;
+  padding: 0 1rem;
+  border-radius: 0.82rem;
+  font-size: 0.88rem;
+  font-weight: 750;
   text-decoration: none;
   transition: transform 160ms ease, box-shadow 160ms ease, background-color 160ms ease;
 }
@@ -385,10 +397,10 @@
 }
 
 .dtb-order-button--primary {
-  border: 1px solid #2563eb;
-  background: linear-gradient(180deg, #3b82f6, #2563eb);
+  border: 1px solid var(--dtb-order-blue);
+  background: linear-gradient(180deg, #3b82f6, var(--dtb-order-blue));
   color: #fff;
-  box-shadow: 0 14px 30px rgba(37, 99, 235, 0.24);
+  box-shadow: 0 12px 26px rgba(37, 99, 235, 0.22);
 }
 
 .dtb-order-button--secondary {
@@ -398,22 +410,30 @@
 }
 
 .dtb-order-footnote {
-  margin: 1rem 0 0;
+  margin: 0.9rem 0 0;
   color: #94a3b8;
-  font-size: 0.8rem;
-  font-weight: 700;
+  font-size: 0.76rem;
+  font-weight: 650;
   text-align: center;
 }
 
-@media (max-width: 900px) {
+@media (min-width: 1280px) {
+  .dtb-order-hero {
+    padding-top: 2.25rem;
+    padding-bottom: 2.25rem;
+  }
+}
+
+@media (max-width: 1024px) {
   .dtb-order-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 }
 
 @media (max-width: 767px) {
   .dtb-order-page {
-    padding: 1rem 0 calc(2.5rem + env(safe-area-inset-bottom, 0px));
+    --dtb-order-page-gutter: 0.75rem;
+    padding: 0.9rem 0 calc(2.25rem + env(safe-area-inset-bottom, 0px));
   }
 
   .dtb-order-shell {
@@ -422,31 +442,38 @@
 
   .dtb-order-back-link {
     margin-left: 0.1rem;
+    font-size: 0.86rem;
   }
 
   .dtb-order-hero {
-    padding: 1.55rem 1rem;
-    margin-bottom: 1rem;
+    padding: 1.35rem 1rem;
+    margin-bottom: 0.95rem;
   }
 
   .dtb-order-title {
-    letter-spacing: -0.045em;
+    font-size: clamp(2rem, 9vw, 2.7rem);
+    letter-spacing: -0.04em;
+  }
+
+  .dtb-order-subtitle {
+    font-size: 0.92rem;
+    line-height: 1.55;
   }
 
   .dtb-order-card__header,
   .dtb-order-card__body {
-    padding: 1rem;
+    padding: 0.95rem;
   }
 
   .dtb-order-item {
     grid-template-columns: 1fr;
-    gap: 0.6rem;
+    gap: 0.55rem;
   }
 
   .dtb-order-item__price {
     justify-self: start;
     text-align: left;
-    padding-top: 0.1rem;
+    padding-top: 0.05rem;
   }
 
   .dtb-order-total-row {
@@ -470,6 +497,6 @@
 
   .dtb-order-card__header,
   .dtb-order-card__body {
-    padding: 0.9rem;
+    padding: 0.88rem;
   }
 }
