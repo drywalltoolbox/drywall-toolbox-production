@@ -75,6 +75,36 @@ function buildAddress(fields = {}) {
     .join(', ');
 }
 
+function resolveItemImage(item = {}) {
+  if (typeof item.image === 'string' && item.image.trim()) return item.image.trim();
+  if (item.image && typeof item.image === 'object') {
+    return item.image.src || item.image.url || item.image.thumbnail || '';
+  }
+  return item.image_url || item.image_thumb || item.thumbnail || item.thumbnail_url || '';
+}
+
+function OrderItemMedia({ item }) {
+  const imageUrl = resolveItemImage(item);
+  const imageAlt = item?.image_alt || item?.name || 'Ordered product';
+
+  return (
+    <span className={`dtb-order-item__thumb ${imageUrl ? 'has-image' : ''}`} aria-hidden={!imageUrl}>
+      {imageUrl ? (
+        <img
+          src={imageUrl}
+          srcSet={item?.image_srcset || undefined}
+          sizes="72px"
+          alt={imageAlt}
+          loading="lazy"
+          decoding="async"
+        />
+      ) : (
+        <Package size={18} />
+      )}
+    </span>
+  );
+}
+
 function DetailRow({ icon: Icon, label, children }) {
   if (!children) return null;
   return (
@@ -210,9 +240,12 @@ export default function OrderConfirmation() {
                 <div className="dtb-order-items">
                   {lineItems.map((item) => (
                     <article key={item.id || item.name} className="dtb-order-item">
-                      <div>
-                        <h3 className="dtb-order-item__name">{item.name}</h3>
-                        <p className="dtb-order-item__meta">Qty: {item.quantity || 1}</p>
+                      <div className="dtb-order-item__main">
+                        <OrderItemMedia item={item} />
+                        <div>
+                          <h3 className="dtb-order-item__name">{item.name}</h3>
+                          <p className="dtb-order-item__meta">Qty: {item.quantity || 1}</p>
+                        </div>
                       </div>
                       <strong className="dtb-order-item__price">{money(item.total)}</strong>
                     </article>
