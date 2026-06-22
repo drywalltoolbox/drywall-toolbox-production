@@ -201,6 +201,36 @@ function getLineItems(order) {
   return [];
 }
 
+function resolveItemImage(item = {}) {
+  if (typeof item.image === 'string' && item.image.trim()) return item.image.trim();
+  if (item.image && typeof item.image === 'object') {
+    return item.image.src || item.image.url || item.image.thumbnail || '';
+  }
+  return item.image_url || item.image_thumb || item.thumbnail || item.thumbnail_url || '';
+}
+
+function OrderItemMedia({ item }) {
+  const imageUrl = resolveItemImage(item);
+  const imageAlt = item?.image_alt || item?.name || 'Ordered product';
+
+  return (
+    <span className={`dtb-order-item__thumb ${imageUrl ? 'has-image' : ''}`} aria-hidden={!imageUrl}>
+      {imageUrl ? (
+        <img
+          src={imageUrl}
+          srcSet={item?.image_srcset || undefined}
+          sizes="72px"
+          alt={imageAlt}
+          loading="lazy"
+          decoding="async"
+        />
+      ) : (
+        <Package size={18} />
+      )}
+    </span>
+  );
+}
+
 function getTracking(order) {
   const source = order?.tracking && typeof order.tracking === 'object' ? order.tracking : order || {};
   return {
@@ -366,7 +396,7 @@ function ItemsCard({ items, currency }) {
             return (
               <article key={`${item.id || item.name || 'item'}-${i}`} className="dtb-order-item dtb-order-item--friendly">
                 <div className="dtb-order-item__main">
-                  <span className="dtb-order-item__thumb"><Package size={18} /></span>
+                  <OrderItemMedia item={item} />
                   <div>
                     <h3 className="dtb-order-item__name">{item.name || 'Ordered item'}</h3>
                     <p className="dtb-order-item__meta">Quantity: {item.quantity || 1}</p>
