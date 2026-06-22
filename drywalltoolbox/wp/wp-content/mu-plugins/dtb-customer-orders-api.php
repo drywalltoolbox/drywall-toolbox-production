@@ -212,6 +212,8 @@ function dtb_customer_orders_tracking_route( WP_REST_Request $request ): WP_REST
 	}
 
 	$summary = dtb_customer_orders_format_order_summary( $order );
+	$summary['line_items'] = dtb_customer_orders_format_line_items( $order );
+	$summary['items']      = $summary['line_items'];
 	$summary['tracking'] = [
 		'number'   => (string) $order->get_meta( '_dtb_tracking_number', true ),
 		'carrier'  => (string) $order->get_meta( '_dtb_tracking_carrier', true ),
@@ -231,6 +233,112 @@ function dtb_customer_orders_health_route(): WP_REST_Response {
 		'quickbooks'  => true,
 		'events_table'=> true,
 	], 200 );
+}
+
+function dtb_customer_orders_get_line_item_product( $item ) {
+	$product = method_exists( $item, 'get_product' ) ? $item->get_product() : false;
+	if ( $product instanceof WC_Product ) {
+		return $product;
+	}
+
+	$variation_id = method_exists( $item, 'get_variation_id' ) ? absint( $item->get_variation_id() ) : 0;
+	$product_id   = method_exists( $item, 'get_product_id' ) ? absint( $item->get_product_id() ) : 0;
+	$candidate_id = $variation_id ?: $product_id;
+
+	if ( $candidate_id > 0 && function_exists( 'wc_get_product' ) ) {
+		$product = wc_get_product( $candidate_id );
+		return $product instanceof WC_Product ? $product : null;
+	}
+
+	return null;
+}
+
+function dtb_customer_orders_get_product_image_data( $product ): array {
+	if ( ! $product instanceof WC_Product ) {
+		return [
+			'id'      => 0,
+			'src'     => '',
+			'thumb'   => '',
+			'full'    => '',
+			'srcset'  => '',
+			'alt'     => '',
+		];
+	}
+
+	$image_id = absint( $product->get_image_id() );
+	if ( ! $image_id && method_exists( $product, 'get_gallery_image_ids' ) ) {
+		$gallery_ids = array_filter( array_map( 'absint', (array) $product->get_gallery_image_ids() ) );
+		$image_id    = $gallery_ids ? (int) reset( $gallery_ids ) : 0;
+	}
+
+	if ( ! $image_id && method_exists( $product, 'get_parent_id' ) ) {
+		$parent_id = absint( $product->get_parent_id() );
+		if ( $parent_id > 0 && function_exists( 'wc_get_product' ) ) {
+			$parent = wc_get_product( $parent_id );
+			if ( $parent instanceof WC_Product ) {
+				$image_id = absint( $parent->get_image_id() );
+				if ( ! $image_id && method_exists( $parent, 'get_gallery_image_ids' ) ) {
+					$parent_gallery_ids = array_filter( array_map( 'absint', (array) $parent->get_gallery_image_ids() ) );
+					$image_id           = $parent_gallery_ids ? (int) reset( $parent_gallery_ids ) : 0;
+				}
+			}
+		}
+	}
+
+	if ( ! $image_id ) {
+		return [
+			'id'      => 0,
+			'src'     => '',
+			'thumb'   => '',
+			'full'    => '',
+			'srcset'  => '',
+			'alt'     => '',
+		];
+	}
+
+	$thumb  = (string) ( wp_get_attachment_image_url( $image_id, 'woocommerce_thumbnail' ) ?: wp_get_attachment_image_url( $image_id, 'medium' ) ?: wp_get_attachment_url( $image_id ) );
+	$full   = (string) ( wp_get_attachment_image_url( $image_id, 'full' ) ?: $thumb );
+	$srcset = (string) wp_get_attachment_image_srcset( $image_id, 'woocommerce_thumbnail' );
+	$alt    = (string) get_post_meta( $image_id, '_wp_attachment_image_alt', true );
+
+	return [
+		'id'      => $image_id,
+		'src'     => esc_url_raw( $thumb ),
+		'thumb'   => esc_url_raw( $thumb ),
+		'full'    => esc_url_raw( $full ),
+		'srcset'  => $srcset,
+		'alt'     => $alt ?: (string) $product->get_name(),
+	];
+}
+
+function dtb_customer_orders_format_line_items( WC_Order $order ): array {
+	$items = [];
+
+	foreach ( $order->get_items( 'line_item' ) as $item ) {
+		$product    = dtb_customer_orders_get_line_item_product( $item );
+		$image_data = dtb_customer_orders_get_product_image_data( $product );
+
+		$items[] = [
+			'id'           => (int) $item->get_id(),
+			'product_id'   => method_exists( $item, 'get_product_id' ) ? (int) $item->get_product_id() : 0,
+			'variation_id' => method_exists( $item, 'get_variation_id' ) ? (int) $item->get_variation_id() : 0,
+			'name'         => (string) $item->get_name(),
+			'quantity'     => (int) $item->get_quantity(),
+			'total'        => (string) $item->get_total(),
+			'subtotal'     => (string) $item->get_subtotal(),
+			'sku'          => $product ? (string) $product->get_sku() : '',
+			'permalink'    => $product ? (string) $product->get_permalink() : '',
+			'image'        => $image_data['src'],
+			'image_url'    => $image_data['src'],
+			'image_id'     => $image_data['id'],
+			'image_thumb'  => $image_data['thumb'],
+			'image_full'   => $image_data['full'],
+			'image_srcset' => $image_data['srcset'],
+			'image_alt'    => $image_data['alt'] ?: (string) $item->get_name(),
+		];
+	}
+
+	return $items;
 }
 
 function dtb_customer_orders_format_order_summary( WC_Order $order ): array {
@@ -255,23 +363,8 @@ function dtb_customer_orders_format_order_summary( WC_Order $order ): array {
 
 function dtb_customer_orders_format_order_detail( WC_Order $order ): array {
 	$summary = dtb_customer_orders_format_order_summary( $order );
-	$summary['line_items'] = [];
-
-	foreach ( $order->get_items( 'line_item' ) as $item ) {
-		$product = $item->get_product();
-		$image   = '';
-		if ( $product && $product->get_image_id() ) {
-			$image = (string) wp_get_attachment_image_url( $product->get_image_id(), 'woocommerce_thumbnail' );
-		}
-		$summary['line_items'][] = [
-			'id'       => (int) $item->get_id(),
-			'name'     => (string) $item->get_name(),
-			'quantity' => (int) $item->get_quantity(),
-			'total'    => (string) $item->get_total(),
-			'sku'      => $product ? (string) $product->get_sku() : '',
-			'image'    => $image,
-		];
-	}
+	$summary['line_items'] = dtb_customer_orders_format_line_items( $order );
+	$summary['items']      = $summary['line_items'];
 
 	return $summary;
 }
