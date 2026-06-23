@@ -87,7 +87,7 @@ const RepairStatus = lazyWithReload(() => import('./pages/RepairStatus'));
 const ReturnStatus = lazyWithReload(() => import('./pages/ReturnStatus'));
 const SupportStatus = lazyWithReload(() => import('./pages/SupportStatus'));
 const Cart = lazyWithReload(() => import('./pages/Cart'));
-const Checkout = lazyWithReload(() => import('./pages/Checkout'));
+const Checkout = lazyWithReload(() => import('./pages/CheckoutNativeRedirect'));
 const CheckoutReturn = lazyWithReload(() => import('./pages/CheckoutReturn'));
 const OrderConfirmation = lazyWithReload(() => import('./pages/OrderConfirmation'));
 const OrderTracking = lazyWithReload(() => import('./pages/OrderTracking'));
@@ -219,65 +219,55 @@ function App() {
 function AppShell({ cartOpen, toggleCart, closeCart }) {
   const location = useLocation();
   const navigate = useNavigate();
-  const { isAuthenticated, isLoading } = useAuthContext();
-  const [homepageSignupCtaOpen, setHomepageSignupCtaOpen] = useState(false);
-  const isHomePage = location.pathname === '/';
+  const { user } = useAuthContext();
+  const [showSignupCta, setShowSignupCta] = useState(false);
 
-  const closeHomepageSignupCta = useCallback(() => {
-    setHomepageSignupCtaOpen(false);
+  useEffect(() => {
+    if (user || getLocalStorageFlag(HOMEPAGE_SIGNUP_CTA_SEEN_KEY)) {
+      setShowSignupCta(false);
+      return undefined;
+    }
+
+    const timer = setTimeout(() => {
+      setShowSignupCta(true);
+      setLocalStorageFlag(HOMEPAGE_SIGNUP_CTA_SEEN_KEY);
+    }, HOMEPAGE_SIGNUP_CTA_DELAY_MS);
+
+    return () => clearTimeout(timer);
+  }, [user]);
+
+  const handleSignupCtaClose = useCallback(() => {
+    setShowSignupCta(false);
   }, []);
 
-  const handleHomepageSignup = useCallback(() => {
-    setHomepageSignupCtaOpen(false);
+  const handleSignupCtaCreateAccount = useCallback(() => {
+    setShowSignupCta(false);
     navigate('/register');
   }, [navigate]);
 
-  useEffect(() => {
-    if (!isHomePage || isLoading || isAuthenticated || homepageSignupCtaOpen) return undefined;
-    if (getLocalStorageFlag(HOMEPAGE_SIGNUP_CTA_SEEN_KEY)) return undefined;
+  const handleSignupCtaSignIn = useCallback(() => {
+    setShowSignupCta(false);
+    navigate('/login');
+  }, [navigate]);
 
-    const timer = window.setTimeout(() => {
-      if (getLocalStorageFlag(HOMEPAGE_SIGNUP_CTA_SEEN_KEY)) return;
-      setLocalStorageFlag(HOMEPAGE_SIGNUP_CTA_SEEN_KEY);
-      setHomepageSignupCtaOpen(true);
-    }, HOMEPAGE_SIGNUP_CTA_DELAY_MS);
-
-    return () => window.clearTimeout(timer);
-  }, [homepageSignupCtaOpen, isAuthenticated, isHomePage, isLoading]);
-
-  useEffect(() => {
-    if (isHomePage || !homepageSignupCtaOpen) return undefined;
-
-    const timer = window.setTimeout(() => {
-      setHomepageSignupCtaOpen(false);
-    }, 0);
-
-    return () => window.clearTimeout(timer);
-  }, [homepageSignupCtaOpen, isHomePage]);
+  const isHome = location.pathname === '/';
+  const minimalChrome = false;
 
   return (
     <>
-      <ScrollToTop />
-      <div className="machined-bg" />
-      <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
-        {/* Temporarily disabled top shipping ticker (kept for quick re-enable)
-        {isHomePage && (
-          <div className="site-top-ticker">
-            <ShippingTicker items={[{ text: 'FREE SHIPPING ON ALL ORDERS $75+ (CONTIGUOUS USA ONLY)' }, { text: 'Expert Support - Real Pros' }, { text: 'Professional Repair Services' }]} duration={33} className="dtb-desktop-shipping-bar dtb-top-shipping-bar" />
-          </div>
-        )}
-        */}
-        <Header onCartToggle={toggleCart} cartOpen={cartOpen} hasTopTicker={false} />
-        <main style={{ flexGrow: 1 }} className="main-content"><AppRoutes /></main>
-        <Footer />
-      </div>
-      <CartSidebar isOpen={cartOpen} onClose={closeCart} />
+      {!minimalChrome && <Header onCartClick={toggleCart} />}
+      <main className={!isHome && !minimalChrome ? 'main-content' : minimalChrome ? '' : 'main-content home-main'}>
+        <AppRoutes />
+      </main>
+      {!minimalChrome && <Footer />}
+      {!minimalChrome && <CartSidebar isOpen={cartOpen} onClose={closeCart} />}
+      <MobileInstallNudge />
       <HomepageSignupCTA
-        isOpen={homepageSignupCtaOpen}
-        onClose={closeHomepageSignupCta}
-        onSignup={handleHomepageSignup}
+        isOpen={showSignupCta}
+        onClose={handleSignupCtaClose}
+        onCreateAccount={handleSignupCtaCreateAccount}
+        onSignIn={handleSignupCtaSignIn}
       />
-      <MobileInstallNudge suppressed={homepageSignupCtaOpen || cartOpen} />
     </>
   );
 }
