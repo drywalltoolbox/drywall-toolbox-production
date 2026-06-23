@@ -1,14 +1,14 @@
 /**
  * frontend/src/components/dashboard/RepairsTab.jsx
  *
- * Dashboard Repairs tab — quick access + repair-service order history.
+ * Dashboard Repairs tab — quick access + authenticated repair-service history.
  */
 
 import { useState, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { motion as Motion } from 'framer-motion';
 import { Wrench, Clock3, CheckCircle2, Loader, ArrowRight, Package } from 'lucide-react';
-import { getOrders } from '../../api/orders.js';
+import { getCustomerRepairs, REPAIR_STATUS_LABELS, TERMINAL_STATUSES } from '../../api/repairs.js';
 
 const CARD = {
   background:   'white',
@@ -26,9 +26,39 @@ const fadeUp = {
   } ),
 };
 
-function isRepairOrder( order ) {
-  const type = typeof order?.order_type === 'string' ? order.order_type.trim().toLowerCase() : '';
-  return type === 'repair_service';
+function normalizeRepairsResponse( data ) {
+  if ( Array.isArray( data ) ) return data;
+  if ( Array.isArray( data?.repairs ) ) return data.repairs;
+  if ( Array.isArray( data?.data?.repairs ) ) return data.data.repairs;
+  return [];
+}
+
+function formatRepairNumber( repair ) {
+  const number = repair?.number || repair?.repair_id || repair?.id;
+  return number ? `Repair #${ number }` : 'Repair request';
+}
+
+function formatStatus( repair ) {
+  const status = String( repair?.status || 'submitted' );
+  return repair?.label || REPAIR_STATUS_LABELS[ status ] || status.replace( /_/g, ' ' ).replace( /\b\w/g, ( char ) => char.toUpperCase() );
+}
+
+function formatDate( value ) {
+  if ( ! value ) return '';
+  try {
+    return new Date( value ).toLocaleDateString( 'en-US', { month: 'short', day: 'numeric', year: 'numeric' } );
+  } catch {
+    return '';
+  }
+}
+
+function repairStatusPath( repair ) {
+  const repairId = repair?.repair_id || repair?.id || repair?.number;
+  if ( ! repairId ) return '/dashboard?tab=repairs';
+  const token = repair?.public_token || repair?.token;
+  return token
+    ? `/repairs/status/${ encodeURIComponent( repairId ) }?token=${ encodeURIComponent( token ) }`
+    : `/repairs/status/${ encodeURIComponent( repairId ) }`;
 }
 
 function StatTile( { icon: Icon, label, value, color, bg, delay = 0 } ) {
@@ -51,45 +81,43 @@ function StatTile( { icon: Icon, label, value, color, bg, delay = 0 } ) {
   );
 }
 
-export default function RepairsTab( { userId } ) {
-  const [ orders, setOrders ] = useState( [] );
+export default function RepairsTab() {
+  const [ repairs, setRepairs ] = useState( [] );
   const [ loading, setLoading ] = useState( true );
   const [ error, setError ] = useState( null );
 
   useEffect( () => {
-    if ( ! userId ) return;
     let cancelled = false;
 
     ( async () => {
       setLoading( true );
       setError( null );
       try {
-        const data = await getOrders( 1, 50 );
-        const allOrders = Array.isArray( data ) ? data : ( data?.orders ?? [] );
-        if ( ! cancelled ) setOrders( allOrders.filter( isRepairOrder ) );
+        const data = await getCustomerRepairs( 1, 50 );
+        if ( ! cancelled ) setRepairs( normalizeRepairsResponse( data ) );
       } catch ( err ) {
-        if ( ! cancelled ) setError( err?.message || 'Unable to load repairs.' );
+        if ( ! cancelled ) setError( err?.message || 'Unable to load repair requests.' );
       } finally {
         if ( ! cancelled ) setLoading( false );
       }
     } )();
 
     return () => { cancelled = true; };
-  }, [ userId ] );
+  }, [] );
 
   const activeCount = useMemo(
-    () => orders.filter( ( o ) => ! [ 'completed', 'cancelled', 'refunded', 'failed' ].includes( o.status ) ).length,
-    [ orders ],
+    () => repairs.filter( ( repair ) => ! TERMINAL_STATUSES.includes( repair.status ) ).length,
+    [ repairs ],
   );
   const completedCount = useMemo(
-    () => orders.filter( ( o ) => o.status === 'completed' ).length,
-    [ orders ],
+    () => repairs.filter( ( repair ) => [ 'completed', 'closed' ].includes( repair.status ) ).length,
+    [ repairs ],
   );
 
   return (
     <div style={ { display: 'flex', flexDirection: 'column', gap: '14px' } }>
       <div style={ { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '12px' } }>
-        <StatTile icon={ Wrench } label="Repairs" value={ loading ? '…' : String( orders.length ) } color="#0ea5e9" bg="#ecfeff" delay={ 0 } />
+        <StatTile icon={ Wrench } label="Repairs" value={ loading ? '…' : String( repairs.length ) } color="#0ea5e9" bg="#ecfeff" delay={ 0 } />
         <StatTile icon={ Clock3 } label="Active" value={ loading ? '…' : String( activeCount ) } color="#d97706" bg="#fffbeb" delay={ 0.04 } />
         <StatTile icon={ CheckCircle2 } label="Completed" value={ loading ? '…' : String( completedCount ) } color="#16a34a" bg="#f0fdf4" delay={ 0.08 } />
       </div>
@@ -110,7 +138,7 @@ export default function RepairsTab( { userId } ) {
         { loading && (
           <div style={ { display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 0' } }>
             <Loader size={ 15 } className="animate-spin" style={ { color: '#0284c7' } } />
-            <span style={ { fontSize: '0.82rem', color: 'rgba(15,23,42,0.45)' } }>Loading repairs…</span>
+            <span style={ { fontSize: '0.82rem', color: 'rgba(15,23,42,0.45)' } }>Loading repair requests…</span>
           </div>
         ) }
 
@@ -120,11 +148,11 @@ export default function RepairsTab( { userId } ) {
           </div>
         ) }
 
-        { ! loading && ! error && orders.length === 0 && (
+        { ! loading && ! error && repairs.length === 0 && (
           <div style={ { textAlign: 'center', padding: '20px 14px', borderRadius: '10px', background: '#f8fafc' } }>
             <Package size={ 24 } style={ { color: 'rgba(15,23,42,0.2)', display: 'block', margin: '0 auto 8px' } } />
             <p style={ { margin: '0 0 12px', fontSize: '0.82rem', color: 'rgba(15,23,42,0.45)' } }>
-              No repair orders yet.
+              No repair requests yet.
             </p>
             <Link to="/repairs" style={ { textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '6px', fontSize: '0.78rem', fontWeight: 700, color: '#0284c7', background: '#ecfeff', padding: '7px 12px', borderRadius: '7px' } }>
               <Wrench size={ 12 } /> Start a repair
@@ -132,19 +160,19 @@ export default function RepairsTab( { userId } ) {
           </div>
         ) }
 
-        { ! loading && ! error && orders.length > 0 && (
+        { ! loading && ! error && repairs.length > 0 && (
           <div style={ { display: 'flex', flexDirection: 'column', gap: '8px' } }>
-            { orders.slice( 0, 5 ).map( ( order ) => (
-              <Link key={ order.id } to={ `/order/${ order.id }` } style={ { textDecoration: 'none' } }>
+            { repairs.slice( 0, 5 ).map( ( repair ) => (
+              <Link key={ repair.repair_id || repair.id } to={ repairStatusPath( repair ) } style={ { textDecoration: 'none' } }>
                 <div style={ { border: '1px solid rgba(15,23,42,0.08)', borderRadius: '9px', padding: '10px 12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '10px' } }>
-                  <div>
-                    <p style={ { margin: 0, fontSize: '0.82rem', fontWeight: 700, color: '#0f172a' } }>Repair Order #{ order.id }</p>
-                    <p style={ { margin: '2px 0 0', fontSize: '0.72rem', color: 'rgba(15,23,42,0.45)' } }>
-                      { order.date_created ? new Date( order.date_created ).toLocaleDateString( 'en-US', { month: 'short', day: 'numeric', year: 'numeric' } ) : '' }
+                  <div style={ { minWidth: 0 } }>
+                    <p style={ { margin: 0, fontSize: '0.82rem', fontWeight: 700, color: '#0f172a' } }>{ formatRepairNumber( repair ) }</p>
+                    <p style={ { margin: '2px 0 0', fontSize: '0.72rem', color: 'rgba(15,23,42,0.45)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' } }>
+                      { repair.tool_label || 'Repair request' }{ repair.submitted_at ? ` • ${ formatDate( repair.submitted_at ) }` : '' }
                     </p>
                   </div>
-                  <span style={ { fontSize: '0.72rem', fontWeight: 700, color: '#0284c7', background: '#ecfeff', borderRadius: '999px', padding: '3px 8px', textTransform: 'capitalize' } }>
-                    { String( order.status || 'submitted' ).replace( /-/g, ' ' ) }
+                  <span style={ { fontSize: '0.72rem', fontWeight: 700, color: '#0284c7', background: '#ecfeff', borderRadius: '999px', padding: '3px 8px', textTransform: 'capitalize', whiteSpace: 'nowrap' } }>
+                    { formatStatus( repair ) }
                   </span>
                 </div>
               </Link>
