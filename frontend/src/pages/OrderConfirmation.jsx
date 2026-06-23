@@ -71,6 +71,12 @@ function hasMoneyField(value) {
   return value !== null && value !== undefined && value !== '';
 }
 
+function humanizeToken(value) {
+  return String(value || '')
+    .replace(/[-_]+/g, ' ')
+    .replace(/\b\w/g, (char) => char.toUpperCase());
+}
+
 function buildAddress(fields = {}) {
   return [fields.address_1, fields.address_2, fields.city, fields.state, fields.postcode]
     .filter(Boolean)
@@ -196,6 +202,8 @@ export default function OrderConfirmation() {
   const billingAddress = buildAddress(billing);
   const shippingTotal = parseMoney(order?.shipping_total);
   const trackingUrl = order?.id ? `/order-tracking/${encodeURIComponent(order.id)}` : `/order-tracking/${encodeURIComponent(id)}`;
+  const placedLabel = order?.date_created ? new Date(order.date_created).toLocaleDateString() : '';
+  const orderTotal = order?.total ? money(order.total) : '';
 
   return (
     <div className="dtb-order-page page-wrapper">
@@ -205,113 +213,127 @@ export default function OrderConfirmation() {
           <ArrowLeft size={14} /> Back to orders
         </Link>
 
-        <section className="dtb-order-hero" aria-labelledby="order-title">
-          <span className="dtb-order-success-icon">
-            <CheckCircle size={54} strokeWidth={1.7} />
-          </span>
-          <p className="dtb-order-eyebrow">Order summary</p>
-          <h1 id="order-title" className="dtb-order-title">Order #{id}</h1>
-          <p className="dtb-order-subtitle">
-            Your order has been received. Use this page to review your order details and track status updates.
-          </p>
-          <div className="dtb-order-badges">
-            {order?.status ? <StatusBadge status={order.status} /> : null}
-            {order?.date_created ? (
-              <span className="dtb-order-status-badge">
-                <Clock size={14} /> {new Date(order.date_created).toLocaleDateString()}
-              </span>
-            ) : null}
-          </div>
-        </section>
-
-        <div className="dtb-order-grid">
-          <div className="dtb-order-stack">
-            <section className="dtb-order-card" aria-labelledby="items-title">
-              <header className="dtb-order-card__header">
-                <h2 id="items-title" className="dtb-order-card__title">
-                  <Package size={20} /> Items ordered
-                </h2>
-              </header>
-              <div className="dtb-order-card__body">
-                <div className="dtb-order-items">
-                  {lineItems.map((item) => (
-                    <article key={item.id || item.name} className="dtb-order-item">
-                      <div className="dtb-order-item__main">
-                        <OrderItemMedia item={item} fallbackImage={itemImageFallbacks[getOrderItemKey(item)]} />
-                        <div>
-                          <h3 className="dtb-order-item__name">{item.name}</h3>
-                          <p className="dtb-order-item__meta">Qty: {item.quantity || 1}</p>
-                        </div>
-                      </div>
-                      <strong className="dtb-order-item__price">{money(item.total)}</strong>
-                    </article>
-                  ))}
+        <section className="dtb-order-sheet" aria-labelledby="order-title">
+          <header className="dtb-order-sheet__hero">
+            <span className="dtb-order-success-icon">
+              <CheckCircle size={54} strokeWidth={1.7} />
+            </span>
+            <p className="dtb-order-eyebrow">Order summary</p>
+            <h1 id="order-title" className="dtb-order-title">Order #{id}</h1>
+            <p className="dtb-order-subtitle">
+              Your order has been received. Use this page to review your order details and track status updates.
+            </p>
+            <div className="dtb-order-hero__metrics" aria-label="Order summary">
+              <div>
+                <span>Status</span>
+                <strong>{order?.status ? humanizeToken(order.status) : 'Received'}</strong>
+              </div>
+              {placedLabel ? (
+                <div>
+                  <span>Placed</span>
+                  <strong>{placedLabel}</strong>
                 </div>
+              ) : null}
+              {orderTotal ? (
+                <div>
+                  <span>Total</span>
+                  <strong>{orderTotal}</strong>
+                </div>
+              ) : null}
+            </div>
+            <div className="dtb-order-badges">
+              {order?.status ? <StatusBadge status={order.status} /> : null}
+              {placedLabel ? (
+                <span className="dtb-order-status-badge">
+                  <Clock size={14} /> {placedLabel}
+                </span>
+              ) : null}
+            </div>
+          </header>
 
-                {order ? (
-                  <div className="dtb-order-totals" aria-label="Order totals">
-                    <div className="dtb-order-total-row">
-                      <span>Subtotal</span>
-                      <strong>{money(order.subtotal)}</strong>
-                    </div>
-                    {hasMoneyField(order.shipping_total) ? (
-                      <div className="dtb-order-total-row">
-                        <span>Shipping</span>
-                        <strong>{shippingTotal === 0 ? <span className="dtb-order-free">FREE</span> : money(shippingTotal)}</strong>
-                      </div>
-                    ) : null}
-                    {hasMoneyField(order.total_tax) ? (
-                      <div className="dtb-order-total-row">
-                        <span>Tax</span>
-                        <strong>{money(order.total_tax)}</strong>
-                      </div>
-                    ) : null}
-                    <div className="dtb-order-total-row dtb-order-total-row--grand">
-                      <span>Total</span>
-                      <strong>{money(order.total)}</strong>
-                    </div>
+          <div className="dtb-order-sheet__content">
+            <div className="dtb-order-sheet__grid">
+              <section className="dtb-order-sheet-section dtb-order-sheet-section--items" aria-labelledby="items-title">
+                <header className="dtb-order-sheet-section__header">
+                  <h2 id="items-title" className="dtb-order-card__title">
+                  <Package size={20} /> Items ordered
+                  </h2>
+                </header>
+                <div className="dtb-order-sheet-section__body">
+                  <div className="dtb-order-items">
+                    {lineItems.map((item) => (
+                      <article key={item.id || item.name} className="dtb-order-item">
+                        <div className="dtb-order-item__main">
+                          <OrderItemMedia item={item} fallbackImage={itemImageFallbacks[getOrderItemKey(item)]} />
+                          <div>
+                            <h3 className="dtb-order-item__name">{item.name}</h3>
+                            <p className="dtb-order-item__meta">Qty: {item.quantity || 1}</p>
+                          </div>
+                        </div>
+                        <strong className="dtb-order-item__price">{money(item.total)}</strong>
+                      </article>
+                    ))}
                   </div>
-                ) : null}
-              </div>
-            </section>
-          </div>
 
-          <aside className="dtb-order-stack">
-            <section className="dtb-order-card" aria-labelledby="contact-title">
-              <header className="dtb-order-card__header">
-                <h2 id="contact-title" className="dtb-order-card__title">
-                  <User size={20} /> Billing &amp; contact
-                </h2>
-              </header>
-              <div className="dtb-order-card__body">
-                <dl className="dtb-order-detail-list">
-                  <DetailRow icon={Mail} label="Email">{billing.email}</DetailRow>
-                  <DetailRow icon={User} label="Name">{billingName}</DetailRow>
-                  <DetailRow icon={MapPin} label="Address">{billingAddress}</DetailRow>
-                  <DetailRow icon={CreditCard} label="Payment">{order?.payment_method_title}</DetailRow>
-                </dl>
-              </div>
-            </section>
+                  {order ? (
+                    <div className="dtb-order-totals" aria-label="Order totals">
+                      <div className="dtb-order-total-row">
+                        <span>Subtotal</span>
+                        <strong>{money(order.subtotal)}</strong>
+                      </div>
+                      {hasMoneyField(order.shipping_total) ? (
+                        <div className="dtb-order-total-row">
+                          <span>Shipping</span>
+                          <strong>{shippingTotal === 0 ? <span className="dtb-order-free">FREE</span> : money(shippingTotal)}</strong>
+                        </div>
+                      ) : null}
+                      {hasMoneyField(order.total_tax) ? (
+                        <div className="dtb-order-total-row">
+                          <span>Tax</span>
+                          <strong>{money(order.total_tax)}</strong>
+                        </div>
+                      ) : null}
+                      <div className="dtb-order-total-row dtb-order-total-row--grand">
+                        <span>Total</span>
+                        <strong>{money(order.total)}</strong>
+                      </div>
+                    </div>
+                  ) : null}
+                </div>
+              </section>
 
-            <section className="dtb-order-card" aria-labelledby="tracking-title">
-              <header className="dtb-order-card__header">
+              <section className="dtb-order-sheet-section" aria-labelledby="contact-title">
+                <header className="dtb-order-sheet-section__header">
+                  <h2 id="contact-title" className="dtb-order-card__title">
+                    <User size={20} /> Billing &amp; contact
+                  </h2>
+                </header>
+                <div className="dtb-order-sheet-section__body">
+                  <dl className="dtb-order-detail-list">
+                    <DetailRow icon={Mail} label="Email">{billing.email}</DetailRow>
+                    <DetailRow icon={User} label="Name">{billingName}</DetailRow>
+                    <DetailRow icon={MapPin} label="Address">{billingAddress}</DetailRow>
+                    <DetailRow icon={CreditCard} label="Payment">{order?.payment_method_title}</DetailRow>
+                  </dl>
+                </div>
+              </section>
+            </div>
+
+            <section className="dtb-order-sheet-tracking" aria-labelledby="tracking-title">
+              <div>
                 <h2 id="tracking-title" className="dtb-order-card__title">
                   <Truck size={20} /> Tracking
                 </h2>
-              </header>
-              <div className="dtb-order-card__body">
-                <p className="dtb-order-subtitle" style={{ margin: 0, textAlign: 'left' }}>
+                <p className="dtb-order-card-copy">
                   Shipment and fulfillment updates will appear on your tracking page as they become available.
                 </p>
-                <div className="dtb-order-actions" style={{ justifyContent: 'flex-start', marginTop: '1rem' }}>
-                  <Link to={trackingUrl} className="dtb-order-button dtb-order-button--secondary">
-                    View tracking status
-                  </Link>
-                </div>
               </div>
+              <Link to={trackingUrl} className="dtb-order-button dtb-order-button--secondary">
+                View tracking status
+              </Link>
             </section>
-          </aside>
-        </div>
+          </div>
+        </section>
 
         <div className="dtb-order-actions">
           <Link to="/products" className="dtb-order-button dtb-order-button--primary">
