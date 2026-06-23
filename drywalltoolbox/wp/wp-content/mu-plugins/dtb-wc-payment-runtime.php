@@ -270,6 +270,30 @@ add_action(
 		if ( function_exists( 'dtb_enqueue_react_app' ) ) {
 			remove_action( 'wp_enqueue_scripts', 'dtb_enqueue_react_app' );
 		}
+
+		$asset_dir = __DIR__ . '/dtb-platform/assets';
+		$asset_url = plugin_dir_url( __FILE__ ) . 'dtb-platform/assets';
+
+		$style_path = $asset_dir . '/payment-runtime.css';
+		if ( file_exists( $style_path ) ) {
+			wp_enqueue_style(
+				'dtb-payment-runtime',
+				$asset_url . '/payment-runtime.css',
+				[],
+				(string) filemtime( $style_path )
+			);
+		}
+
+		$script_path = $asset_dir . '/payment-runtime.js';
+		if ( file_exists( $script_path ) ) {
+			wp_enqueue_script(
+				'dtb-payment-runtime',
+				$asset_url . '/payment-runtime.js',
+				[],
+				(string) filemtime( $script_path ),
+				true
+			);
+		}
 	},
 	1
 );

@@ -8,6 +8,20 @@
 
 defined( 'ABSPATH' ) || exit;
 
+if ( ! function_exists( 'dtb_payment_handoff_suppress_frontend_warning_output' ) ) {
+	function dtb_payment_handoff_suppress_frontend_warning_output(): void {
+		$request_uri = isset( $_SERVER['REQUEST_URI'] )
+			? sanitize_text_field( wp_unslash( $_SERVER['REQUEST_URI'] ) )
+			: '';
+
+		if ( false !== strpos( $request_uri, '/checkout/order-pay/' ) && false !== strpos( $request_uri, 'key=wc_order_' ) ) {
+			@ini_set( 'display_errors', '0' ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+		}
+	}
+
+	dtb_payment_handoff_suppress_frontend_warning_output();
+}
+
 if ( ! function_exists( 'dtb_payment_handoff_order_pay_id' ) ) {
 	function dtb_payment_handoff_order_pay_id(): int {
 		$order_pay = function_exists( 'get_query_var' ) ? get_query_var( 'order-pay' ) : 0;
@@ -269,6 +283,38 @@ add_action( 'wp', 'dtb_payment_handoff_prepare_current_order', -1000 );
 add_action( 'template_redirect', 'dtb_payment_handoff_prepare_current_order', -1000 );
 add_action( 'woocommerce_before_checkout_form', 'dtb_payment_handoff_prepare_current_order', -1000 );
 add_action( 'woocommerce_before_template_part', 'dtb_payment_handoff_prepare_current_order', -1000 );
+
+add_filter(
+	'user_has_cap',
+	static function ( array $allcaps, array $caps, array $args ): array {
+		$requested_cap = isset( $args[0] ) ? (string) $args[0] : '';
+		if ( 'pay_for_order' !== $requested_cap || ! dtb_payment_handoff_is_payment_request() ) {
+			return $allcaps;
+		}
+
+		$order_id = isset( $args[2] ) ? absint( $args[2] ) : dtb_payment_handoff_order_pay_id();
+		if ( $order_id <= 0 || ! function_exists( 'wc_get_order' ) ) {
+			return $allcaps;
+		}
+
+		$order = wc_get_order( $order_id );
+		if ( ! dtb_payment_handoff_order_should_be_payable( $order ) ) {
+			return $allcaps;
+		}
+
+		$allcaps['pay_for_order'] = true;
+		foreach ( $caps as $cap ) {
+			$cap = (string) $cap;
+			if ( '' !== $cap ) {
+				$allcaps[ $cap ] = true;
+			}
+		}
+
+		return $allcaps;
+	},
+	PHP_INT_MAX,
+	3
+);
 
 add_filter(
 	'woocommerce_valid_order_statuses_for_payment',

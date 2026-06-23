@@ -1,6 +1,8 @@
 import { loadCatalog } from '../services/catalog.js';
 
 export function getOrderItemKey(item = {}) {
+  if (!item || typeof item !== 'object') return '';
+
   return String(
     item.id ||
     item.cartKey ||
@@ -15,6 +17,8 @@ export function getOrderItemKey(item = {}) {
 }
 
 export function resolveOrderItemImage(item = {}) {
+  if (!item || typeof item !== 'object') return '';
+
   if (typeof item.image === 'string' && item.image.trim()) return item.image.trim();
   if (item.image && typeof item.image === 'object') {
     return item.image.src || item.image.url || item.image.thumbnail || '';
@@ -28,6 +32,8 @@ export function resolveOrderItemImage(item = {}) {
 }
 
 export function resolveCatalogProductImage(product = {}) {
+  if (!product || typeof product !== 'object') return '';
+
   if (typeof product.image === 'string' && product.image.trim()) return product.image.trim();
   if (product.image && typeof product.image === 'object') {
     return product.image.src || product.image.url || product.image.thumbnail || '';

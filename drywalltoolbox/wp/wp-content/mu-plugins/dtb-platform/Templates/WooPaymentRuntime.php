@@ -39,6 +39,19 @@ if ( ! function_exists( 'dtb_payment_runtime_render_native_checkout' ) ) {
 	}
 }
 
+if ( ! function_exists( 'dtb_payment_runtime_logo_url' ) ) {
+	function dtb_payment_runtime_logo_url(): string {
+		$logo_path = ABSPATH . '../logos/logo-white.svg';
+		$logo_url  = home_url( '/logos/logo-white.svg' );
+
+		if ( file_exists( $logo_path ) ) {
+			return esc_url( $logo_url );
+		}
+
+		return '';
+	}
+}
+
 ?><!doctype html>
 <html <?php language_attributes(); ?>>
 <head>
@@ -49,7 +62,26 @@ if ( ! function_exists( 'dtb_payment_runtime_render_native_checkout' ) ) {
 </head>
 <body <?php body_class( 'dtb-payment-runtime woocommerce-checkout woocommerce-order-pay' ); ?>>
 <?php wp_body_open(); ?>
-<?php dtb_payment_runtime_render_native_checkout(); ?>
+<main class="dtb-payment-shell">
+	<section class="dtb-payment-card" aria-labelledby="dtb-payment-title">
+		<header class="dtb-payment-header">
+			<div class="dtb-payment-brand">
+				<?php $dtb_payment_logo_url = dtb_payment_runtime_logo_url(); ?>
+				<?php if ( $dtb_payment_logo_url ) : ?>
+					<img class="dtb-payment-logo" src="<?php echo esc_url( $dtb_payment_logo_url ); ?>" alt="<?php echo esc_attr( get_bloginfo( 'name' ) ); ?>">
+				<?php else : ?>
+					<strong><?php echo esc_html( get_bloginfo( 'name' ) ?: 'Drywall Toolbox' ); ?></strong>
+				<?php endif; ?>
+				<span class="dtb-payment-secure-pill"><?php esc_html_e( 'Secure Payment', 'drywall-toolbox' ); ?></span>
+			</div>
+			<h1 id="dtb-payment-title" class="dtb-payment-title"><?php esc_html_e( 'Complete Your Payment', 'drywall-toolbox' ); ?></h1>
+			<p class="dtb-payment-subtitle"><?php esc_html_e( 'Review your order and finish payment through the active WooCommerce gateway. Wallet availability depends on your browser, device, and enabled payment providers.', 'drywall-toolbox' ); ?></p>
+		</header>
+		<div class="dtb-payment-content woocommerce">
+			<?php dtb_payment_runtime_render_native_checkout(); ?>
+		</div>
+	</section>
+</main>
 <?php wp_footer(); ?>
 </body>
 </html>
