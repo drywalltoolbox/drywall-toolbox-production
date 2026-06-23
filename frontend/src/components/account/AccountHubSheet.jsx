@@ -3,6 +3,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Home, Package, LifeBuoy, User, X, ShoppingBag, ChevronRight, Clock, CheckCircle, AlertCircle, Truck, Loader } from 'lucide-react';
 import { getCustomerOrders } from '../../api/orders.js';
 import { getRecentlyViewed } from '../../utils/recentlyViewed.js';
+import { useOrderItemImageFallbacks } from '../../hooks/useOrderItemImageFallbacks.js';
+import { getOrderItemKey, getOrderPreviewItem, resolveOrderItemImage } from '../../utils/orderItemImages.js';
 
 const TABS = [
   { id: 'home',    label: 'Home',    Icon: Home },
@@ -58,6 +60,19 @@ function RecentlyViewedTile({ product, onClose }) {
       </div>
       <ChevronRight size={14} strokeWidth={2.5} style={{ color: 'rgba(15,23,42,0.25)', flexShrink: 0 }} />
     </Link>
+  );
+}
+
+function OrderPreviewThumb({ item, fallbackImage = '' }) {
+  const image = item ? (resolveOrderItemImage(item) || fallbackImage) : '';
+
+  return (
+    <div style={{ width: '36px', height: '36px', borderRadius: '8px', background: '#eff6ff', border: '1px solid rgba(37,99,235,0.14)', flexShrink: 0, overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      {image
+        ? <img src={image} alt={item?.name || 'Ordered product'} loading="lazy" decoding="async" style={{ width: '100%', height: '100%', objectFit: 'contain', padding: '4px', background: '#fff' }} />
+        : <Package size={15} style={{ color: '#2563eb' }} />
+      }
+    </div>
   );
 }
 
@@ -169,6 +184,8 @@ export default function AccountHubSheet({ isOpen, onClose, user, onLogout }) {
 
   const firstName = useMemo(() => user?.first_name || user?.name?.split(' ')?.[0] || 'there', [user]);
   const displayName = useMemo(() => [user?.first_name, user?.last_name].filter(Boolean).join(' ') || user?.name || 'My Account', [user]);
+  const orderPreviewItems = useMemo(() => orders.map(getOrderPreviewItem).filter(Boolean), [orders]);
+  const itemImageFallbacks = useOrderItemImageFallbacks(orderPreviewItems);
 
   return (
     <div className={`account-hub${isOpen ? ' account-hub--open' : ''}`} role="dialog" aria-modal="true" aria-label="Account hub" aria-hidden={!isOpen}>
@@ -232,6 +249,7 @@ export default function AccountHubSheet({ isOpen, onClose, user, onLogout }) {
                         onMouseEnter={(e) => { e.currentTarget.style.background = '#f8fafc'; }}
                         onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}
                       >
+                        <OrderPreviewThumb item={getOrderPreviewItem(order)} fallbackImage={itemImageFallbacks[getOrderItemKey(getOrderPreviewItem(order))]} />
                         <div style={{ flex: 1, minWidth: 0 }}>
                           <div style={{ display: 'flex', alignItems: 'center', gap: '7px', marginBottom: '3px' }}>
                             <span style={{ fontSize: '0.82rem', fontWeight: 700, color: '#0f172a' }}>Order #{order.number || order.id}</span>

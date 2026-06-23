@@ -29,7 +29,9 @@ import {
 import SEOHead from '../components/shared/SEOHead';
 import { useOrderStatus } from '../hooks/useOrderStatus.js';
 import { useOrderEventStream } from '../hooks/useOrderEventStream.js';
+import { useOrderItemImageFallbacks } from '../hooks/useOrderItemImageFallbacks.js';
 import { ORDER_STATUS_LABELS, ORDER_TERMINAL_STATUSES } from '../api/orders.js';
+import { getOrderItemKey, resolveOrderItemImage } from '../utils/orderItemImages.js';
 import '../styles/order-pages.css';
 import '../styles/order-tracking.css';
 
@@ -201,16 +203,8 @@ function getLineItems(order) {
   return [];
 }
 
-function resolveItemImage(item = {}) {
-  if (typeof item.image === 'string' && item.image.trim()) return item.image.trim();
-  if (item.image && typeof item.image === 'object') {
-    return item.image.src || item.image.url || item.image.thumbnail || '';
-  }
-  return item.image_url || item.image_thumb || item.thumbnail || item.thumbnail_url || '';
-}
-
-function OrderItemMedia({ item }) {
-  const imageUrl = resolveItemImage(item);
+function OrderItemMedia({ item, fallbackImage = '' }) {
+  const imageUrl = resolveOrderItemImage(item) || fallbackImage;
   const imageAlt = item?.image_alt || item?.name || 'Ordered product';
 
   return (
@@ -379,7 +373,7 @@ function PaymentActionCard({ order }) {
   );
 }
 
-function ItemsCard({ items, currency }) {
+function ItemsCard({ items, currency, imageFallbacks = {} }) {
   if (!items.length) return null;
   return (
     <section className="dtb-order-card dtb-order-card--tracking" aria-labelledby="tracking-items-title">
@@ -396,7 +390,7 @@ function ItemsCard({ items, currency }) {
             return (
               <article key={`${item.id || item.name || 'item'}-${i}`} className="dtb-order-item dtb-order-item--friendly">
                 <div className="dtb-order-item__main">
-                  <OrderItemMedia item={item} />
+                  <OrderItemMedia item={item} fallbackImage={imageFallbacks[getOrderItemKey(item)]} />
                   <div>
                     <h3 className="dtb-order-item__name">{item.name || 'Ordered item'}</h3>
                     <p className="dtb-order-item__meta">Quantity: {item.quantity || 1}</p>
@@ -529,6 +523,7 @@ export default function OrderTracking() {
       timeline: normalizeTimeline(order?.timeline, order),
     };
   }, [data, id]);
+  const itemImageFallbacks = useOrderItemImageFallbacks(viewModel.items);
 
   if (loading && !data) {
     return <TrackingSkeleton />;
@@ -592,7 +587,7 @@ export default function OrderTracking() {
 
         <div className="dtb-order-tracking-grid">
           <main className="dtb-order-stack">
-            <ItemsCard items={items} currency={order?.currency} />
+            <ItemsCard items={items} currency={order?.currency} imageFallbacks={itemImageFallbacks} />
             <OrderTimeline timeline={timeline} />
           </main>
 

@@ -4,11 +4,13 @@
  * Dashboard Orders tab — paginated customer order history.
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { motion as Motion } from 'framer-motion';
 import { Package, Clock, CheckCircle, AlertCircle, Truck, Loader, ChevronRight, ShoppingCart } from 'lucide-react';
 import { getOrders } from '../../api/orders.js';
+import { useOrderItemImageFallbacks } from '../../hooks/useOrderItemImageFallbacks.js';
+import { getOrderItemKey, getOrderPreviewItem, resolveOrderItemImage } from '../../utils/orderItemImages.js';
 
 const fadeUp = {
   hidden:  { opacity: 0, y: 12 },
@@ -68,6 +70,19 @@ function StatusBadge( { status } ) {
   );
 }
 
+function OrderPreviewThumb( { item, fallbackImage = '' } ) {
+  const image = item ? ( resolveOrderItemImage( item ) || fallbackImage ) : '';
+
+  return (
+    <div style={ { width: '36px', height: '36px', borderRadius: '9px', background: '#eff6ff', border: '1px solid rgba(37,99,235,0.14)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, overflow: 'hidden' } }>
+      { image
+        ? <img src={ image } alt={ item?.name || 'Ordered product' } loading="lazy" decoding="async" style={ { width: '100%', height: '100%', objectFit: 'contain', padding: '4px', background: '#fff' } } />
+        : <Package size={ 15 } style={ { color: '#2563eb' } } />
+      }
+    </div>
+  );
+}
+
 const PER_PAGE = 20;
 
 export default function OrdersTab() {
@@ -95,6 +110,9 @@ export default function OrdersTab() {
   }, [] );
 
   useEffect( () => { loadPage( 1 ); }, [ loadPage ] );
+
+  const orderPreviewItems = useMemo( () => orders.map( getOrderPreviewItem ).filter( Boolean ), [ orders ] );
+  const itemImageFallbacks = useOrderItemImageFallbacks( orderPreviewItems );
 
   if ( loading ) {
     return (
@@ -129,7 +147,7 @@ export default function OrdersTab() {
             <Link to={ `/order/${ order.id }${ order.order_key ? `?order_key=${ encodeURIComponent( order.order_key ) }` : '' }` } style={ { textDecoration: 'none', flex: 1, display: 'block', padding: '14px 16px' } }>
               <div style={ { display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '10px' } }>
                 <div style={ { display: 'flex', alignItems: 'center', gap: '11px' } }>
-                  <div style={ { width: '36px', height: '36px', borderRadius: '9px', background: '#eff6ff', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 } }><Package size={ 15 } style={ { color: '#2563eb' } } /></div>
+                  <OrderPreviewThumb item={ getOrderPreviewItem( order ) } fallbackImage={ itemImageFallbacks[ getOrderItemKey( getOrderPreviewItem( order ) ) ] } />
                   <div>
                     <div style={ { display: 'flex', alignItems: 'center', gap: '7px', marginBottom: '3px', flexWrap: 'wrap' } }>
                       <span style={ { fontWeight: 700, color: '#0f172a', fontSize: '0.9rem' } }>Order #{ order.number || order.id }</span>

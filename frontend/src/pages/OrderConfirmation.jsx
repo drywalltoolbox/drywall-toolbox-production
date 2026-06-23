@@ -21,6 +21,8 @@ import {
   User,
 } from 'lucide-react';
 import SEOHead from '../components/shared/SEOHead';
+import { useOrderItemImageFallbacks } from '../hooks/useOrderItemImageFallbacks.js';
+import { getOrderItemKey, resolveOrderItemImage } from '../utils/orderItemImages.js';
 import '../styles/order-pages.css';
 
 const STATUS_CONFIG = {
@@ -75,16 +77,8 @@ function buildAddress(fields = {}) {
     .join(', ');
 }
 
-function resolveItemImage(item = {}) {
-  if (typeof item.image === 'string' && item.image.trim()) return item.image.trim();
-  if (item.image && typeof item.image === 'object') {
-    return item.image.src || item.image.url || item.image.thumbnail || '';
-  }
-  return item.image_url || item.image_thumb || item.thumbnail || item.thumbnail_url || '';
-}
-
-function OrderItemMedia({ item }) {
-  const imageUrl = resolveItemImage(item);
+function OrderItemMedia({ item, fallbackImage = '' }) {
+  const imageUrl = resolveOrderItemImage(item) || fallbackImage;
   const imageAlt = item?.image_alt || item?.name || 'Ordered product';
 
   return (
@@ -150,6 +144,9 @@ export default function OrderConfirmation() {
     return () => { cancelled = true; };
   }, [id]);
 
+  const lineItems = Array.isArray(order?.line_items) ? order.line_items : [];
+  const itemImageFallbacks = useOrderItemImageFallbacks(lineItems);
+
   if (loading) {
     return (
       <div className="dtb-order-page page-wrapper">
@@ -195,7 +192,6 @@ export default function OrderConfirmation() {
   }
 
   const billing = order?.billing || {};
-  const lineItems = Array.isArray(order?.line_items) ? order.line_items : [];
   const billingName = [billing.first_name, billing.last_name].filter(Boolean).join(' ');
   const billingAddress = buildAddress(billing);
   const shippingTotal = parseMoney(order?.shipping_total);
@@ -241,7 +237,7 @@ export default function OrderConfirmation() {
                   {lineItems.map((item) => (
                     <article key={item.id || item.name} className="dtb-order-item">
                       <div className="dtb-order-item__main">
-                        <OrderItemMedia item={item} />
+                        <OrderItemMedia item={item} fallbackImage={itemImageFallbacks[getOrderItemKey(item)]} />
                         <div>
                           <h3 className="dtb-order-item__name">{item.name}</h3>
                           <p className="dtb-order-item__meta">Qty: {item.quantity || 1}</p>

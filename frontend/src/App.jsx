@@ -225,7 +225,7 @@ function AppShell({ cartOpen, toggleCart, closeCart }) {
 
   return (
     <>
-      {!minimalChrome && <Header onCartClick={toggleCart} />}
+      {!minimalChrome && <Header onCartToggle={toggleCart} />}
       <main className={!isHome && !minimalChrome ? 'main-content' : minimalChrome ? '' : 'main-content home-main'}>
         <AppRoutes />
       </main>

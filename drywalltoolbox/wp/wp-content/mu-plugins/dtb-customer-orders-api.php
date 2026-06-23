@@ -344,6 +344,7 @@ function dtb_customer_orders_format_line_items( WC_Order $order ): array {
 function dtb_customer_orders_format_order_summary( WC_Order $order ): array {
 	$date_created = $order->get_date_created();
 	$line_items   = $order->get_items( 'line_item' );
+	$preview_items = array_slice( dtb_customer_orders_format_line_items( $order ), 0, 3 );
 
 	return [
 		'id'           => (int) $order->get_id(),
@@ -355,6 +356,8 @@ function dtb_customer_orders_format_order_summary( WC_Order $order ): array {
 		'total'        => (string) $order->get_total(),
 		'currency'     => (string) $order->get_currency(),
 		'items_count'  => array_sum( array_map( static fn( $item ) => max( 1, absint( $item->get_quantity() ) ), $line_items ) ),
+		'line_items'   => $preview_items,
+		'items'        => $preview_items,
 		'payment_method' => (string) $order->get_payment_method(),
 		'payment_required' => in_array( (string) $order->get_status(), [ 'pending', 'failed', 'on-hold' ], true ),
 		'payment_url'  => method_exists( $order, 'get_checkout_payment_url' ) ? (string) $order->get_checkout_payment_url() : '',

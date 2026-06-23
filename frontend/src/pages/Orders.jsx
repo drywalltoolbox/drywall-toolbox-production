@@ -9,7 +9,7 @@
  * Auth: Redirects to /login if unauthenticated (via AccountLayout).
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { motion as Motion } from 'framer-motion';
 import { Package, Clock, CheckCircle, AlertCircle, Truck, Loader, ChevronRight, ShoppingCart } from 'lucide-react';
@@ -17,6 +17,8 @@ import { useAuthContext } from '../auth/AuthContext.js';
 import AccountLayout from '../components/account/AccountLayout.jsx';
 import SEOHead from '../components/shared/SEOHead';
 import { getCustomerOrders } from '../api/orders.js';
+import { useOrderItemImageFallbacks } from '../hooks/useOrderItemImageFallbacks.js';
+import { getOrderItemKey, getOrderPreviewItem, resolveOrderItemImage } from '../utils/orderItemImages.js';
 
 // ─── Status badge helpers ──────────────────────────────────────────────────────
 
@@ -50,6 +52,19 @@ function StatusBadge( { status } ) {
       <Icon size={ 11 } />
       { label }
     </span>
+  );
+}
+
+function OrderPreviewThumb( { item, fallbackImage = '' } ) {
+  const image = item ? ( resolveOrderItemImage( item ) || fallbackImage ) : '';
+
+  return (
+    <div style={ { width: '38px', height: '38px', borderRadius: '9px', background: '#eff6ff', border: '1px solid rgba(37,99,235,0.14)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, overflow: 'hidden' } }>
+      { image
+        ? <img src={ image } alt={ item?.name || 'Ordered product' } loading="lazy" decoding="async" style={ { width: '100%', height: '100%', objectFit: 'contain', padding: '4px', background: '#fff' } } />
+        : <Package size={ 16 } style={ { color: '#2563eb' } } />
+      }
+    </div>
   );
 }
 
@@ -93,6 +108,9 @@ export default function Orders() {
   }, [ user?.id ] );
 
   useEffect( () => { loadPage( 1 ); }, [ loadPage ] );
+
+  const orderPreviewItems = useMemo( () => orders.map( getOrderPreviewItem ).filter( Boolean ), [ orders ] );
+  const itemImageFallbacks = useOrderItemImageFallbacks( orderPreviewItems );
 
   return (
     <AccountLayout title="My Orders" subtitle="View and track your order history">
@@ -164,9 +182,7 @@ export default function Orders() {
               <Link to={ `/order/${ order.id }` } style={ { textDecoration: 'none', display: 'block', padding: '15px 18px' } }>
                 <div style={ { display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '10px' } }>
                   <div style={ { display: 'flex', alignItems: 'center', gap: '12px' } }>
-                    <div style={ { width: '38px', height: '38px', borderRadius: '9px', background: '#eff6ff', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 } }>
-                      <Package size={ 16 } style={ { color: '#2563eb' } } />
-                    </div>
+                    <OrderPreviewThumb item={ getOrderPreviewItem( order ) } fallbackImage={ itemImageFallbacks[ getOrderItemKey( getOrderPreviewItem( order ) ) ] } />
                     <div>
                       <div style={ { display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '3px' } }>
                         <span style={ { fontWeight: 700, color: '#0f172a', fontSize: '0.92rem' } }>Order #{ order.id }</span>
