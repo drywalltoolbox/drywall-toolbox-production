@@ -1,0 +1,52 @@
+Country code,State code,Postcode / ZIP,City,Rate %,Tax name,Priority,Compound,Shipping,Tax class
+US,AL,,,4,AL State Tax,1,0,1,reduced-rate
+US,AK,,,0,AK No State Tax,1,0,0,reduced-rate
+US,AZ,,,5.6,AZ State Tax,1,0,1,reduced-rate
+US,AR,,,6.5,AR State Tax,1,0,1,reduced-rate
+US,CA,,,7.25,CA State Tax,1,0,1,reduced-rate
+US,CO,,,2.9,CO State Tax,1,0,1,reduced-rate
+US,CT,,,6.35,CT State Tax,1,0,1,reduced-rate
+US,DC,,,6,DC State Tax,1,0,1,reduced-rate
+US,DE,,,0,DE No State Tax,1,0,0,reduced-rate
+US,FL,,,6,FL State Tax,1,0,1,reduced-rate
+US,GA,,,4,GA State Tax,1,0,1,reduced-rate
+US,HI,,,4,HI State Tax,1,0,1,reduced-rate
+US,ID,,,6,ID State Tax,1,0,1,reduced-rate
+US,IL,,,6.25,IL State Tax,1,0,1,reduced-rate
+US,IN,,,7,IN State Tax,1,0,1,reduced-rate
+US,IA,,,6,IA State Tax,1,0,1,reduced-rate
+US,KS,,,6.5,KS State Tax,1,0,1,reduced-rate
+US,KY,,,6,KY State Tax,1,0,1,reduced-rate
+US,LA,,,5,LA State Tax,1,0,1,reduced-rate
+US,ME,,,5.5,ME State Tax,1,0,1,reduced-rate
+US,MD,,,6,MD State Tax,1,0,1,reduced-rate
+US,MA,,,6.25,MA State Tax,1,0,1,reduced-rate
+US,MI,,,6,MI State Tax,1,0,1,reduced-rate
+US,MN,,,6.875,MN State Tax,1,0,1,reduced-rate
+US,MS,,,7,MS State Tax,1,0,1,reduced-rate
+US,MO,,,4.225,MO State Tax,1,0,1,reduced-rate
+US,MT,,,0,MT No State Tax,1,0,0,reduced-rate
+US,NE,,,5.5,NE State Tax,1,0,1,reduced-rate
+US,NV,,,6.85,NV State Tax,1,0,1,reduced-rate
+US,NH,,,0,NH No State Tax,1,0,0,reduced-rate
+US,NJ,,,6.625,NJ State Tax,1,0,1,reduced-rate
+US,NM,,,4.875,NM State Tax,1,0,1,reduced-rate
+US,NY,,,4,NY State Tax,1,0,1,reduced-rate
+US,NC,,,4.75,NC State Tax,1,0,1,reduced-rate
+US,ND,,,5,ND State Tax,1,0,1,reduced-rate
+US,OH,,,5.75,OH State Tax,1,0,1,reduced-rate
+US,OK,,,4.5,OK State Tax,1,0,1,reduced-rate
+US,OR,,,0,OR No State Tax,1,0,0,reduced-rate
+US,PA,,,6,PA State Tax,1,0,1,reduced-rate
+US,RI,,,7,RI State Tax,1,0,1,reduced-rate
+US,SC,,,6,SC State Tax,1,0,1,reduced-rate
+US,SD,,,4.2,SD State Tax,1,0,1,reduced-rate
+US,TN,,,7,TN State Tax,1,0,1,reduced-rate
+US,TX,,,6.25,TX State Tax,1,0,1,reduced-rate
+US,UT,,,6.1,UT State Tax,1,0,1,reduced-rate
+US,VT,,,6,VT State Tax,1,0,1,reduced-rate
+US,VA,,,5.3,VA State Tax,1,0,1,reduced-rate
+US,WA,,,6.5,WA State Tax,1,0,1,reduced-rate
+US,WV,,,6,WV State Tax,1,0,1,reduced-rate
+US,WI,,,5,WI State Tax,1,0,1,reduced-rate
+US,WY,,,4,WY State Tax,1,0,1,reduced-rate
