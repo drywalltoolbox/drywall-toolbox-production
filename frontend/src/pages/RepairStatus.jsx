@@ -2,11 +2,6 @@
  * frontend/src/pages/RepairStatus.jsx
  *
  * Public repair tracking page — /repairs/status/:id
- *
- * - Uses :id from URL params + ?token=xxx from search params
- * - No auth required; token is the public repair token issued at submission
- * - If no token is present and user is not authenticated, shows a token entry form
- * - Customer-safe timeline only (no backend/system event stream rendering)
  */
 
 import { useState } from 'react';
@@ -14,29 +9,31 @@ import { useParams, useSearchParams, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Search, AlertTriangle, SearchX, RefreshCw } from 'lucide-react';
 import SEOHead from '../components/shared/SEOHead.jsx';
-import useRepairStatus       from '../hooks/useRepairStatus.js';
-import RepairStatusTracker   from '../components/repairs/RepairStatusTracker.jsx';
-import RepairTimeline        from '../components/repairs/RepairTimeline.jsx';
-import RepairQuoteReview     from '../components/repairs/RepairQuoteReview.jsx';
+import useRepairStatus from '../hooks/useRepairStatus.js';
+import RepairStatusTracker from '../components/repairs/RepairStatusTracker.jsx';
+import RepairTimeline from '../components/repairs/RepairTimeline.jsx';
+import RepairQuoteReview from '../components/repairs/RepairQuoteReview.jsx';
 import RepairIntegrationNotice from '../components/repairs/RepairIntegrationNotice.jsx';
-import RepairUpdateComposer  from '../components/repairs/RepairUpdateComposer.jsx';
+import RepairUpdateComposer from '../components/repairs/RepairUpdateComposer.jsx';
 import { REPAIR_STATUS_LABELS } from '../api/repairs.js';
 
-// ─── Token entry form (shown when no token in URL) ────────────────────────────
+function formatRepairDisplayId(id) {
+  return id ? `Repair #${id}` : 'Repair';
+}
 
-function TokenEntryForm( { onSubmit } ) {
-  const [ repairId, setRepairId ] = useState( '' );
-  const [ token,    setToken    ] = useState( '' );
-  const [ error,    setError    ] = useState( '' );
+function TokenEntryForm({ onSubmit }) {
+  const [repairId, setRepairId] = useState('');
+  const [token, setToken] = useState('');
+  const [error, setError] = useState('');
 
-  const handleSubmit = ( e ) => {
-    e.preventDefault();
-    if ( ! repairId.trim() || ! token.trim() ) {
-      setError( 'Please enter both your Repair ID and tracking token.' );
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    if (!repairId.trim() || !token.trim()) {
+      setError('Please enter both your repair number and tracking token.');
       return;
     }
-    setError( '' );
-    onSubmit( repairId.trim(), token.trim() );
+    setError('');
+    onSubmit(repairId.trim(), token.trim());
   };
 
   return (
@@ -44,34 +41,29 @@ function TokenEntryForm( { onSubmit } ) {
       <motion.div
         initial={{ opacity: 0, y: 24 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, ease: [ 0.25, 0.46, 0.45, 0.94 ] }}
+        transition={{ duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }}
         className="w-full max-w-md"
       >
         <div className="text-center mb-8">
-          <motion.div
-            initial={{ scale: 0.7, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ type: 'spring', stiffness: 280, damping: 22, delay: 0.1 }}
-            className="w-14 h-14 rounded-2xl bg-blue-50 flex items-center justify-center mx-auto mb-4 shadow-sm"
-          >
-            <Search size={ 26 } className="text-blue-500" strokeWidth={ 1.75 } />
-          </motion.div>
+          <div className="w-14 h-14 rounded-2xl bg-blue-50 flex items-center justify-center mx-auto mb-4 shadow-sm">
+            <Search size={26} className="text-blue-500" strokeWidth={1.75} />
+          </div>
           <h1 className="text-2xl font-bold text-neutral-900">Track Your Repair</h1>
           <p className="text-sm text-neutral-500 mt-2">
-            Enter your repair ID and the tracking token from your confirmation email.
+            Enter your repair number and the tracking token from your confirmation email.
           </p>
         </div>
 
-        <form onSubmit={ handleSubmit } className="bg-white rounded-2xl border border-neutral-200 shadow-sm p-6 space-y-4">
+        <form onSubmit={handleSubmit} className="bg-white rounded-2xl border border-neutral-200 shadow-sm p-6 space-y-4">
           <div>
             <label htmlFor="repair-id" className="block text-xs font-semibold text-neutral-500 uppercase tracking-wider mb-1.5">
-              Repair ID
+              Repair Number
             </label>
             <input
               id="repair-id"
               type="text"
-              value={ repairId }
-              onChange={ ( e ) => setRepairId( e.target.value ) }
+              value={repairId}
+              onChange={(event) => setRepairId(event.target.value)}
               placeholder="e.g. 1042"
               className="w-full px-3.5 py-2.5 text-sm border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all bg-neutral-50 focus:bg-white"
               autoComplete="off"
@@ -84,8 +76,8 @@ function TokenEntryForm( { onSubmit } ) {
             <input
               id="repair-token"
               type="text"
-              value={ token }
-              onChange={ ( e ) => setToken( e.target.value ) }
+              value={token}
+              onChange={(event) => setToken(event.target.value)}
               placeholder="From your confirmation email"
               className="w-full px-3.5 py-2.5 text-sm border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all bg-neutral-50 focus:bg-white"
               autoComplete="off"
@@ -93,7 +85,7 @@ function TokenEntryForm( { onSubmit } ) {
           </div>
 
           <AnimatePresence>
-            { error && (
+            {error ? (
               <motion.p
                 initial={{ opacity: 0, height: 0 }}
                 animate={{ opacity: 1, height: 'auto' }}
@@ -101,9 +93,9 @@ function TokenEntryForm( { onSubmit } ) {
                 className="text-xs text-red-600 overflow-hidden"
                 role="alert"
               >
-                { error }
+                {error}
               </motion.p>
-            ) }
+            ) : null}
           </AnimatePresence>
 
           <button
@@ -115,18 +107,15 @@ function TokenEntryForm( { onSubmit } ) {
         </form>
 
         <p className="text-center text-xs text-neutral-400 mt-4">
-          Need help?{' '}
-          <Link to="/contact" className="text-blue-600 hover:underline">Contact us</Link>
+          Need help? <Link to="/contact" className="text-blue-600 hover:underline">Contact us</Link>
         </p>
       </motion.div>
     </div>
   );
 }
 
-// ─── Loading skeleton ─────────────────────────────────────────────────────────
-
-function Skeleton( { className } ) {
-  return <div className={ `animate-pulse rounded bg-neutral-100 ${ className }` } />;
+function Skeleton({ className }) {
+  return <div className={`animate-pulse rounded bg-neutral-100 ${className}`} />;
 }
 
 function StatusSkeleton() {
@@ -141,24 +130,17 @@ function StatusSkeleton() {
       </div>
       <Skeleton className="h-2 w-full rounded-full" />
       <div className="grid grid-cols-2 gap-3">
-        <div className="space-y-1">
-          <Skeleton className="h-3 w-16" />
-          <Skeleton className="h-4 w-28" />
-        </div>
-        <div className="space-y-1">
-          <Skeleton className="h-3 w-20" />
-          <Skeleton className="h-4 w-28" />
-        </div>
+        <Skeleton className="h-12 w-full" />
+        <Skeleton className="h-12 w-full" />
       </div>
     </div>
   );
 }
 
-// ─── Error display ────────────────────────────────────────────────────────────
-
-function ErrorDisplay( { message, onRetry } ) {
-  const isNotFound  = message?.toLowerCase().includes( 'not found' ) || message?.includes( '404' );
-  const isUnauth    = message?.toLowerCase().includes( 'token' ) || message?.includes( '401' ) || message?.includes( '403' );
+function ErrorDisplay({ message, onRetry }) {
+  const normalized = String(message || '').toLowerCase();
+  const isNotFound = normalized.includes('not found') || normalized.includes('404');
+  const isUnauth = normalized.includes('token') || normalized.includes('401') || normalized.includes('403');
 
   return (
     <div className="min-h-[60vh] flex items-center justify-center px-4">
@@ -168,40 +150,32 @@ function ErrorDisplay( { message, onRetry } ) {
         transition={{ duration: 0.4, ease: 'easeOut' }}
         className="text-center max-w-sm"
       >
-        <motion.div
-          initial={{ scale: 0.6, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ type: 'spring', stiffness: 260, damping: 20, delay: 0.1 }}
-          className={ `w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-4 ${ isNotFound ? 'bg-neutral-100' : 'bg-yellow-50' }` }
-        >
-          { isNotFound
-            ? <SearchX size={ 28 } className="text-neutral-400" strokeWidth={ 1.5 } />
-            : <AlertTriangle size={ 28 } className="text-yellow-500" strokeWidth={ 1.5 } />
-          }
-        </motion.div>
+        <div className={`w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-4 ${isNotFound ? 'bg-neutral-100' : 'bg-yellow-50'}`}>
+          {isNotFound
+            ? <SearchX size={28} className="text-neutral-400" strokeWidth={1.5} />
+            : <AlertTriangle size={28} className="text-yellow-500" strokeWidth={1.5} />}
+        </div>
         <h2 className="text-lg font-semibold text-neutral-800 mb-2">
-          { isNotFound ? 'Repair Not Found' : isUnauth ? 'Access Denied' : 'Something Went Wrong' }
+          {isNotFound ? 'Repair Not Found' : isUnauth ? 'Access Denied' : 'Something Went Wrong'}
         </h2>
         <p className="text-sm text-neutral-500 mb-4">
-          { isNotFound
-            ? 'We couldn\'t find a repair matching this ID. Please double-check your repair ID and token.'
+          {isNotFound
+            ? 'We could not find a repair matching this number. Please double-check your repair number and token.'
             : isUnauth
-            ? 'The tracking token is invalid or has expired. Please check your confirmation email.'
-            : message || 'An unexpected error occurred. Please try again.' }
+              ? 'The tracking token is invalid or has expired. Please check your confirmation email.'
+              : message || 'An unexpected error occurred. Please try again.'}
         </p>
         <div className="flex gap-3 justify-center">
-          { onRetry && (
+          {onRetry ? (
             <button
-              onClick={ onRetry }
+              onClick={onRetry}
               className="px-4 py-2 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700 active:scale-[0.97] transition-all"
+              type="button"
             >
               Retry
             </button>
-          ) }
-          <Link
-            to="/repairs"
-            className="px-4 py-2 border border-neutral-300 text-neutral-700 text-sm font-semibold rounded-lg hover:bg-neutral-50 transition-colors"
-          >
+          ) : null}
+          <Link to="/repairs" className="px-4 py-2 border border-neutral-300 text-neutral-700 text-sm font-semibold rounded-lg hover:bg-neutral-50 transition-colors">
             Submit a Repair
           </Link>
         </div>
@@ -210,63 +184,56 @@ function ErrorDisplay( { message, onRetry } ) {
   );
 }
 
-// ─── Main page ────────────────────────────────────────────────────────────────
-
 export default function RepairStatus() {
-  const { id: urlRepairId }    = useParams();
-  const [ searchParams ]       = useSearchParams();
-  const urlToken               = searchParams.get( 'token' );
+  const { id: urlRepairId } = useParams();
+  const [searchParams] = useSearchParams();
+  const urlToken = searchParams.get('token');
 
-  // When the token-entry form is submitted, we store the resolved IDs here
-  const [ resolvedId,    setResolvedId    ] = useState( urlRepairId  || null );
-  const [ resolvedToken, setResolvedToken ] = useState( urlToken     || null );
-
-  const needsTokenEntry = ! resolvedId || ! resolvedToken;
+  const [resolvedId, setResolvedId] = useState(urlRepairId || null);
+  const [resolvedToken, setResolvedToken] = useState(urlToken || null);
+  const needsTokenEntry = !resolvedId || !resolvedToken;
 
   const { data, loading, error, refresh } = useRepairStatus(
     needsTokenEntry ? null : resolvedId,
-    needsTokenEntry ? null : resolvedToken
+    needsTokenEntry ? null : resolvedToken,
   );
 
-  const customerTimeline = toCustomerTimeline( data?.timeline );
-  const requestDetails = toDisplayRequestDetails( data?.request_details );
+  const customerTimeline = toCustomerTimeline(data?.timeline);
+  const requestDetails = toDisplayRequestDetails(data?.request_details);
+  const status = data?.status;
+  const label = data?.label || REPAIR_STATUS_LABELS[status] || status;
+  const displayId = formatRepairDisplayId(resolvedId);
 
-  const handleTokenFormSubmit = ( repairId, token ) => {
-    setResolvedId( repairId );
-    setResolvedToken( token );
+  const handleTokenFormSubmit = (repairId, token) => {
+    setResolvedId(repairId);
+    setResolvedToken(token);
   };
 
   const handleQuoteResponse = () => {
-    // Re-fetch status after quote response
-    setTimeout( () => refresh(), 800 );
+    setTimeout(() => refresh(), 800);
   };
 
-  if ( needsTokenEntry ) {
+  if (needsTokenEntry) {
     return (
       <>
         <SEOHead title="Track Your Repair | Drywall Toolbox" />
-        <TokenEntryForm onSubmit={ handleTokenFormSubmit } />
+        <TokenEntryForm onSubmit={handleTokenFormSubmit} />
       </>
     );
   }
 
-  if ( error && ! data ) {
+  if (error && !data) {
     return (
       <>
         <SEOHead title="Repair Status | Drywall Toolbox" />
-        <ErrorDisplay message={ error } onRetry={ refresh } />
+        <ErrorDisplay message={error} onRetry={refresh} />
       </>
     );
   }
 
-  const status = data?.status;
-  const label  = data?.label || REPAIR_STATUS_LABELS[ status ] || status;
-
   return (
     <>
-      <SEOHead
-        title={ data ? `Repair DTB-${ resolvedId } — ${ label } | Drywall Toolbox` : 'Repair Status | Drywall Toolbox' }
-      />
+      <SEOHead title={data ? `${displayId} — ${label} | Drywall Toolbox` : 'Repair Status | Drywall Toolbox'} />
 
       <motion.div
         initial={{ opacity: 0 }}
@@ -274,7 +241,6 @@ export default function RepairStatus() {
         transition={{ duration: 0.3 }}
         className="max-w-2xl mx-auto px-4 py-8 space-y-4"
       >
-        {/* ── Page header ───────────────────────────────────────────── */}
         <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
@@ -282,87 +248,70 @@ export default function RepairStatus() {
           className="flex items-center justify-between"
         >
           <div>
-            <div className="text-[10px] text-neutral-400 uppercase tracking-widest font-semibold">Repair ID</div>
+            <div className="text-[10px] text-neutral-400 uppercase tracking-widest font-semibold">Repair Number</div>
             <div className="flex items-center gap-2 mt-0.5">
-              <h1 className="text-xl font-bold text-neutral-900">DTB-{ resolvedId }</h1>
+              <h1 className="text-xl font-bold text-neutral-900">{displayId}</h1>
             </div>
           </div>
           <button
-            onClick={ refresh }
-            disabled={ loading }
+            onClick={refresh}
+            disabled={loading}
             aria-label="Refresh status"
             className="p-2 text-neutral-400 hover:text-blue-600 disabled:opacity-40 transition-colors rounded-xl hover:bg-blue-50"
+            type="button"
           >
-            <RefreshCw
-              size={ 17 }
-              className={ loading ? 'animate-spin' : '' }
-            />
+            <RefreshCw size={17} className={loading ? 'animate-spin' : ''} />
           </button>
         </motion.div>
 
-        {/* ── Status tracker ────────────────────────────────────────── */}
-        { loading && ! data ? (
+        {loading && !data ? (
           <StatusSkeleton />
         ) : data ? (
           <RepairStatusTracker
-            status={ data.status }
-            label={ label }
-            submittedAt={ data.submitted_at }
-            lastUpdatedAt={ data.last_updated_at }
-            trackingNumber={ data.tracking_number }
+            status={data.status}
+            label={label}
+            submittedAt={data.submitted_at}
+            lastUpdatedAt={data.last_updated_at}
+            trackingNumber={data.tracking_number}
           />
-        ) : null }
+        ) : null}
 
-        {/* ── Integration notice ─────────────────────────────────────── */}
-        { status && (
-          <RepairIntegrationNotice status={ status } />
-        ) }
+        {status ? <RepairIntegrationNotice status={status} /> : null}
 
-        {/* ── Quote review ──────────────────────────────────────────── */}
-        { status === 'quoted' && (
+        {status === 'quoted' ? (
           <RepairQuoteReview
-            repairId={ resolvedId }
-            token={ resolvedToken }
-            onAccepted={ handleQuoteResponse }
-            onDeclined={ handleQuoteResponse }
+            repairId={resolvedId}
+            token={resolvedToken}
+            onAccepted={handleQuoteResponse}
+            onDeclined={handleQuoteResponse}
           />
-        ) }
+        ) : null}
 
-        {/* ── Submitted request details ───────────────────────────── */}
-        { requestDetails.length > 0 && (
-          <SubmittedRequestDetails details={ requestDetails } />
-        ) }
+        {requestDetails.length > 0 ? <SubmittedRequestDetails details={requestDetails} /> : null}
 
-        {/* ── Unified customer update composer ─────────────────────── */}
-        { data && ! [ 'completed', 'closed', 'cancelled', 'quote_declined' ].includes( status ) && (
-          <RepairUpdateComposer
-            repairId={ resolvedId }
-            token={ resolvedToken }
-            onSubmitted={ () => refresh() }
-          />
-        ) }
+        {data && !['completed', 'closed', 'cancelled', 'quote_declined'].includes(status) ? (
+          <RepairUpdateComposer repairId={resolvedId} token={resolvedToken} onSubmitted={() => refresh()} />
+        ) : null}
 
-        {/* ── Timeline ──────────────────────────────────────────────── */}
-        { ( loading && ! data ) ? (
+        {loading && !data ? (
           <div className="bg-white rounded-2xl border border-neutral-200 shadow-sm p-6 space-y-3">
             <Skeleton className="h-4 w-24" />
-            { [ 1, 2 ].map( ( i ) => (
-              <div key={ i } className="flex gap-3">
+            {[1, 2].map((item) => (
+              <div key={item} className="flex gap-3">
                 <Skeleton className="w-8 h-8 rounded-full shrink-0" />
                 <div className="flex-1 space-y-1.5 pt-1">
                   <Skeleton className="h-4 w-48" />
                   <Skeleton className="h-3 w-24" />
                 </div>
               </div>
-            ) ) }
+            ))}
           </div>
         ) : (
-          <RepairTimeline events={ customerTimeline } />
-        ) }
+          <RepairTimeline events={customerTimeline} />
+        )}
 
-        {/* ── Stale-data error banner ────────────────────────────────── */}
         <AnimatePresence>
-          { error && data && (
+          {error && data ? (
             <motion.div
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
@@ -374,7 +323,7 @@ export default function RepairStatus() {
                 Could not refresh status — showing last known data.
               </div>
             </motion.div>
-          ) }
+          ) : null}
         </AnimatePresence>
 
         <div className="text-center pt-2 pb-4">
@@ -387,10 +336,8 @@ export default function RepairStatus() {
   );
 }
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
-
-function toCustomerTimeline( timeline ) {
-  if ( ! Array.isArray( timeline ) ) return [];
+function toCustomerTimeline(timeline) {
+  if (!Array.isArray(timeline)) return [];
 
   const labelByType = {
     'repair.submitted': 'Request submitted',
@@ -411,57 +358,52 @@ function toCustomerTimeline( timeline ) {
   };
 
   return timeline
-    .map( ( event ) => {
+    .map((event) => {
       const type = typeof event?.type === 'string' ? event.type : event?.event_type;
       const occurredAt = event?.occurred_at || event?.created_at;
-      if ( typeof type !== 'string' || ! type.startsWith( 'repair.' ) ) return null;
+      if (typeof type !== 'string' || !type.startsWith('repair.')) return null;
       return { ...event, type, occurred_at: occurredAt };
-    } )
-    .filter( Boolean )
-    .map( ( event ) => ( {
+    })
+    .filter(Boolean)
+    .map((event) => ({
       ...event,
-      label: labelByType[ event.type ] || event.label || 'Repair updated',
-    } ) )
-    .sort( ( a, b ) => new Date( a.occurred_at ) - new Date( b.occurred_at ) );
+      label: labelByType[event.type] || event.label || 'Repair updated',
+    }))
+    .sort((a, b) => new Date(a.occurred_at) - new Date(b.occurred_at));
 }
 
-function SubmittedRequestDetails( { details } ) {
-  const [ isOpen, setIsOpen ] = useState( false );
+function SubmittedRequestDetails({ details }) {
+  const [isOpen, setIsOpen] = useState(false);
   const panelId = 'submitted-request-details-panel';
 
-  if ( ! Array.isArray( details ) || details.length === 0 ) return null;
+  if (!Array.isArray(details) || details.length === 0) return null;
 
   return (
     <div className="bg-white rounded-2xl border border-neutral-200 shadow-sm overflow-hidden">
       <button
         type="button"
-        onClick={ () => setIsOpen( ( prev ) => ! prev ) }
+        onClick={() => setIsOpen((prev) => !prev)}
         className="w-full text-left px-5 py-4 hover:bg-neutral-50 transition-colors"
-        aria-expanded={ isOpen }
-        aria-controls={ panelId }
+        aria-expanded={isOpen}
+        aria-controls={panelId}
       >
         <div className="flex items-start justify-between gap-3">
           <div>
             <h3 className="text-sm font-semibold text-neutral-800">Submitted Request Details</h3>
             <p className="text-xs text-neutral-500 mt-1">
-              { isOpen
-                ? 'Click to close your submitted request details.'
-                : 'Click to view the information you originally submitted.' }
+              {isOpen ? 'Click to close your submitted request details.' : 'Click to view the information you originally submitted.'}
             </p>
           </div>
-          <span
-            className={ `text-neutral-400 text-base leading-none mt-0.5 transition-transform duration-200 ${ isOpen ? 'rotate-180' : '' }` }
-            aria-hidden="true"
-          >
+          <span className={`text-neutral-400 text-base leading-none mt-0.5 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} aria-hidden="true">
             ▾
           </span>
         </div>
       </button>
 
-      <AnimatePresence initial={ false }>
-        { isOpen && (
+      <AnimatePresence initial={false}>
+        {isOpen ? (
           <motion.div
-            id={ panelId }
+            id={panelId}
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: 'auto', opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
@@ -469,75 +411,75 @@ function SubmittedRequestDetails( { details } ) {
             className="overflow-hidden border-t border-neutral-100"
           >
             <dl className="p-5 grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2.5">
-              { details.map( ( item ) => (
-                <div key={ item.label } className={ item.fullWidth ? 'sm:col-span-2' : '' }>
+              {details.map((item) => (
+                <div key={item.label} className={item.fullWidth ? 'sm:col-span-2' : ''}>
                   <dt className="text-[10px] text-neutral-400 uppercase tracking-wider font-semibold mb-0.5">
-                    { item.label }
+                    {item.label}
                   </dt>
                   <dd className="text-sm text-neutral-800 leading-snug whitespace-pre-line wrap-break-word">
-                    { item.value }
+                    {item.value}
                   </dd>
                 </div>
-              ) ) }
+              ))}
             </dl>
           </motion.div>
-        ) }
+        ) : null}
       </AnimatePresence>
     </div>
   );
 }
 
-function toDisplayRequestDetails( details ) {
-  if ( ! details || typeof details !== 'object' ) return [];
+function toDisplayRequestDetails(details) {
+  if (!details || typeof details !== 'object') return [];
 
-  const shipping = ( typeof details.shipping_rate_price === 'number' && Number.isFinite( details.shipping_rate_price ) )
-    ? `${ details.shipping_rate_name || 'Shipping' } (${ formatCurrency( details.shipping_rate_price ) })`
+  const shipping = (typeof details.shipping_rate_price === 'number' && Number.isFinite(details.shipping_rate_price))
+    ? `${details.shipping_rate_name || 'Shipping'} (${formatCurrency(details.shipping_rate_price)})`
     : details.shipping_rate_name;
 
-  const returnAddress = [ details.address_1, details.city, details.state, details.postcode, details.country ]
-    .map( ( part ) => normalizeField( part ) )
-    .filter( Boolean )
-    .join( ', ' );
+  const returnAddress = [details.address_1, details.city, details.state, details.postcode, details.country]
+    .map((part) => normalizeField(part))
+    .filter(Boolean)
+    .join(', ');
 
   return [
-    { label: 'Tool Brand', value: normalizeField( details.tool_brand ) },
-    { label: 'Tool Category', value: normalizeField( details.tool_category ) },
-    { label: 'Model', value: normalizeField( details.tool_model ) },
-    { label: 'Serial Number', value: normalizeField( details.serial_number ) },
-    { label: 'Service Tier', value: formatSlugLabel( details.service_tier ) },
-    { label: 'Priority', value: formatSlugLabel( details.priority ) },
-    { label: 'Contact Preference', value: formatSlugLabel( details.contact_preference ) },
-    { label: 'Issue Started', value: formatSlugLabel( details.issue_start ) },
-    { label: 'Customer Name', value: normalizeField( details.customer_name ) },
-    { label: 'Customer Email', value: normalizeField( details.customer_email ) },
-    { label: 'Customer Phone', value: normalizeField( details.customer_phone ) },
-    { label: 'Company', value: normalizeField( details.company ) },
+    { label: 'Tool Brand', value: normalizeField(details.tool_brand) },
+    { label: 'Tool Category', value: normalizeField(details.tool_category) },
+    { label: 'Model', value: normalizeField(details.tool_model) },
+    { label: 'Serial Number', value: normalizeField(details.serial_number) },
+    { label: 'Service Tier', value: formatSlugLabel(details.service_tier) },
+    { label: 'Priority', value: formatSlugLabel(details.priority) },
+    { label: 'Contact Preference', value: formatSlugLabel(details.contact_preference) },
+    { label: 'Issue Started', value: formatSlugLabel(details.issue_start) },
+    { label: 'Customer Name', value: normalizeField(details.customer_name) },
+    { label: 'Customer Email', value: normalizeField(details.customer_email) },
+    { label: 'Customer Phone', value: normalizeField(details.customer_phone) },
+    { label: 'Company', value: normalizeField(details.company) },
     { label: 'Return Address', value: returnAddress || null, fullWidth: true },
-    { label: 'Shipping Service', value: normalizeField( shipping ) },
-    { label: 'Tool Age', value: normalizeField( details.tool_age ) },
-    { label: 'Issue Description', value: normalizeField( details.issue_description ), fullWidth: true },
-  ].filter( ( item ) => Boolean( item.value ) );
+    { label: 'Shipping Service', value: normalizeField(shipping) },
+    { label: 'Tool Age', value: normalizeField(details.tool_age) },
+    { label: 'Issue Description', value: normalizeField(details.issue_description), fullWidth: true },
+  ].filter((item) => Boolean(item.value));
 }
 
-function normalizeField( value ) {
-  if ( value === null || value === undefined ) return null;
-  const normalized = String( value ).trim();
+function normalizeField(value) {
+  if (value === null || value === undefined) return null;
+  const normalized = String(value).trim();
   return normalized ? normalized : null;
 }
 
-function formatSlugLabel( value ) {
-  const normalized = normalizeField( value );
-  if ( ! normalized ) return null;
+function formatSlugLabel(value) {
+  const normalized = normalizeField(value);
+  if (!normalized) return null;
   return normalized
-    .replaceAll( '_', ' ' )
-    .replace( /\s+/g, ' ' )
-    .replace( /\b\w/g, ( char ) => char.toUpperCase() );
+    .replaceAll('_', ' ')
+    .replace(/\s+/g, ' ')
+    .replace(/\b\w/g, (char) => char.toUpperCase());
 }
 
-function formatCurrency( value ) {
+function formatCurrency(value) {
   try {
-    return new Intl.NumberFormat( undefined, { style: 'currency', currency: 'USD' } ).format( value );
+    return new Intl.NumberFormat(undefined, { style: 'currency', currency: 'USD' }).format(value);
   } catch {
-    return `$${ value }`;
+    return `$${value}`;
   }
 }
