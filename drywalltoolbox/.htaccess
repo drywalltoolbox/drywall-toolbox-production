@@ -16,6 +16,7 @@ Options +FollowSymLinks
   AddType image/svg+xml .svg
   AddType font/woff2 .woff2
   AddType font/woff .woff
+  AddType text/plain .txt
 </IfModule>
 
 <IfModule mod_rewrite.c>
@@ -34,6 +35,25 @@ Options +FollowSymLinks
   # Canonical host. Keep the public site and WordPress cookies on one host.
   RewriteCond %{HTTP_HOST} ^www\.drywalltoolbox\.com$ [NC]
   RewriteRule ^ https://drywalltoolbox.com%{REQUEST_URI} [R=301,L]
+
+  # Apple Pay / Stripe / WooPayments domain-association verification.
+  # The file must be non-empty. If WooPayments writes it under the WordPress
+  # subdirectory because WP core lives in /wp, expose that non-empty generated
+  # copy at the public domain-root .well-known URL Apple verifies.
+  RewriteCond %{DOCUMENT_ROOT}/.well-known/apple-developer-merchantid-domain-association -s
+  RewriteRule ^\.well-known/apple-developer-merchantid-domain-association$ .well-known/apple-developer-merchantid-domain-association [L]
+
+  RewriteCond %{DOCUMENT_ROOT}/wp/.well-known/apple-developer-merchantid-domain-association -s
+  RewriteRule ^\.well-known/apple-developer-merchantid-domain-association$ wp/.well-known/apple-developer-merchantid-domain-association [L]
+
+  RewriteCond %{DOCUMENT_ROOT}/.well-known/apple-developer-merchantid-domain-association -s
+  RewriteRule ^\.well-known/apple-developer-merchantid-domain-association\.txt$ .well-known/apple-developer-merchantid-domain-association [L]
+
+  RewriteCond %{DOCUMENT_ROOT}/wp/.well-known/apple-developer-merchantid-domain-association -s
+  RewriteRule ^\.well-known/apple-developer-merchantid-domain-association\.txt$ wp/.well-known/apple-developer-merchantid-domain-association [L]
+
+  RewriteCond %{REQUEST_URI} ^/\.well-known/apple-developer-merchantid-domain-association(?:\.txt)?/?$ [NC]
+  RewriteRule ^ - [R=404,L]
 
   # Route root/query-string REST fallback into WordPress before the SPA homepage.
   # Woo.com and some diagnostics probe ?rest_route=/ instead of /wp-json/.
@@ -99,9 +119,10 @@ Options +FollowSymLinks
   RewriteCond %{REQUEST_URI} ^/wp/ [NC]
   RewriteRule ^ - [L]
 
-  # Do not serve the SPA shell for missing static assets. Returning HTML for
-  # missing JS/CSS causes blank white screens and MIME/type failures.
-  RewriteCond %{REQUEST_URI} \.(?:css|js|mjs|map|json|webmanifest|png|jpe?g|gif|webp|avif|svg|ico|woff2?|ttf|otf|eot|pdf|txt|xml)$ [NC]
+  # Do not serve the SPA shell for missing static assets or verification files.
+  # Returning HTML for missing JS/CSS/provider verification paths causes blank
+  # screens, MIME/type failures, and Apple Pay domain-verification failures.
+  RewriteCond %{REQUEST_URI} (?:\.(?:css|js|mjs|map|json|webmanifest|png|jpe?g|gif|webp|avif|svg|ico|woff2?|ttf|otf|eot|pdf|txt|xml)$|^/\.well-known/) [NC]
   RewriteRule ^ - [R=404,L]
 
   # Root React Router SPA catch-all.
@@ -111,6 +132,15 @@ Options +FollowSymLinks
 <IfModule mod_headers.c>
   # HTML shell must revalidate so clients pick up newly deployed asset paths.
   <FilesMatch "^index\.html$">
+    Header set Cache-Control "no-cache, no-store, must-revalidate"
+    Header set Pragma "no-cache"
+    Header set Expires "0"
+  </FilesMatch>
+
+  # Apple Pay / Stripe domain association files must not be cached aggressively
+  # while verification is being repaired.
+  <FilesMatch "^apple-developer-merchantid-domain-association$">
+    Header set Content-Type "text/plain; charset=utf-8"
     Header set Cache-Control "no-cache, no-store, must-revalidate"
     Header set Pragma "no-cache"
     Header set Expires "0"
