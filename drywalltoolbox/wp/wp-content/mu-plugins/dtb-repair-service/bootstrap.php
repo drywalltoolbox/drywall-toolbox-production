@@ -56,6 +56,7 @@ require_once __DIR__ . '/Tracking/RepairOperatorTimeline.php';
 
 // REST
 require_once __DIR__ . '/Rest/SubmitRepairController.php';
+require_once __DIR__ . '/Rest/RepairCustomerListController.php';
 require_once __DIR__ . '/Rest/RepairStatusController.php';
 require_once __DIR__ . '/Rest/RepairMediaController.php';
 require_once __DIR__ . '/Rest/RepairCommentController.php';
