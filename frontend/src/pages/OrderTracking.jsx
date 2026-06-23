@@ -46,38 +46,6 @@ const STATUS_ICONS = {
   failed: AlertCircle,
 };
 
-const TIMELINE_ICONS = {
-  'order.created': Package,
-  'order.payment_pending': Clock,
-  'order.payment_confirmed': CheckCircle,
-  'order.inventory_reserved': PackageCheck,
-  'order.picked': PackageCheck,
-  'order.packed': PackageCheck,
-  'order.shipped': Truck,
-  'order.delivered': CheckCircle,
-  'order.completed': CheckCircle,
-  'order.cancelled': AlertCircle,
-  'order.refunded': AlertCircle,
-  'order.payment_failed': AlertCircle,
-};
-
-const TIMELINE_LABELS = {
-  'order.created': 'Order created',
-  'order.payment_pending': 'Payment pending',
-  'order.payment_review_required': 'Payment under review',
-  'order.payment_confirmed': 'Payment confirmed',
-  'order.inventory_reserved': 'Inventory reserved',
-  'order.picked': 'Order picked',
-  'order.packed': 'Order packed',
-  'order.shipped': 'Shipment created',
-  'order.delivered': 'Delivered',
-  'order.completed': 'Order completed',
-  'order.cancelled': 'Order cancelled',
-  'order.refunded': 'Order refunded',
-  'order.payment_failed': 'Payment failed',
-  'order.status_changed': 'Order status updated',
-};
-
 const TRACKING_STEPS = [
   { id: 'received', label: 'Received', description: 'Order captured' },
   { id: 'payment', label: 'Payment', description: 'Secure payment' },
@@ -153,48 +121,6 @@ function humanizeToken(value) {
 function resolveStatusLabel(order) {
   if (order?.payment_required && order?.status === 'pending') return 'Payment pending';
   return order?.label || order?.status_label || ORDER_STATUS_LABELS[order?.status] || humanizeToken(order?.status) || 'Order received';
-}
-
-function normalizeTimelineLabel(event) {
-  const type = String(event?.type || event?.event_type || '');
-  if (TIMELINE_LABELS[type]) return TIMELINE_LABELS[type];
-
-  const rawLabel = String(event?.label || '').trim();
-  if (rawLabel) {
-    const readable = rawLabel
-      .replace(/([a-z])([A-Z])/g, '$1 $2')
-      .replace(/ordercreated/i, 'Order created')
-      .replace(/paymentconfirmed/i, 'Payment confirmed')
-      .replace(/paymentpending/i, 'Payment pending')
-      .replace(/\s+/g, ' ')
-      .trim();
-    return readable || 'Order updated';
-  }
-
-  return humanizeToken(type) || 'Order updated';
-}
-
-function normalizeTimeline(timeline, order) {
-  const source = Array.isArray(timeline) ? timeline : [];
-  const normalized = source
-    .map((event, index) => ({
-      ...event,
-      type: String(event?.type || event?.event_type || 'order.updated'),
-      label: normalizeTimelineLabel(event),
-      occurred_at: event?.occurred_at || event?.created_at || event?.date_created || order?.placed_at || order?.date_created,
-      index,
-    }))
-    .filter((event) => event.occurred_at || event.label)
-    .sort((a, b) => new Date(a.occurred_at || 0) - new Date(b.occurred_at || 0));
-
-  if (normalized.length > 0) return normalized;
-
-  return [{
-    type: 'order.created',
-    label: 'Order created',
-    occurred_at: order?.placed_at || order?.date_created || order?.created_at,
-    index: 0,
-  }];
 }
 
 function getLineItems(order) {
@@ -296,11 +222,6 @@ function TrackingSkeleton() {
       </div>
     </div>
   );
-}
-
-function TimelineIcon({ type }) {
-  const Icon = TIMELINE_ICONS[type] || Package;
-  return <Icon size={15} strokeWidth={2} />;
 }
 
 function OrderStatusTracker({ order, streaming }) {
@@ -497,33 +418,6 @@ function DetailsCard({ order }) {
   );
 }
 
-function OrderTimeline({ timeline }) {
-  if (!timeline?.length) return null;
-
-  return (
-    <section className="dtb-order-sheet-section dtb-order-sheet-section--tracking" aria-labelledby="timeline-title">
-      <header className="dtb-order-sheet-section__header">
-        <h2 id="timeline-title" className="dtb-order-card__title">
-          <Clock size={20} /> Activity timeline
-        </h2>
-      </header>
-      <div className="dtb-order-sheet-section__body">
-        <ol className="dtb-order-timeline dtb-order-timeline--friendly">
-          {timeline.map((event, i) => (
-            <li key={`${event.type || 'event'}-${event.occurred_at || i}`} className="dtb-order-timeline__item">
-              <span className="dtb-order-timeline__icon"><TimelineIcon type={event.type} /></span>
-              <div>
-                <p className="dtb-order-timeline__label">{event.label}</p>
-                <time className="dtb-order-timeline__time">{formatDateTime(event.occurred_at)}</time>
-              </div>
-            </li>
-          ))}
-        </ol>
-      </div>
-    </section>
-  );
-}
-
 export default function OrderTracking() {
   const { id } = useParams();
   const [searchParams] = useSearchParams();
@@ -544,7 +438,6 @@ export default function OrderTracking() {
       order,
       items: getLineItems(order),
       tracking: getTracking(order),
-      timeline: normalizeTimeline(order?.timeline, order),
     };
   }, [data, id]);
   const itemImageFallbacks = useOrderItemImageFallbacks(viewModel.items);
@@ -585,7 +478,7 @@ export default function OrderTracking() {
     );
   }
 
-  const { order, items, tracking, timeline } = viewModel;
+  const { order, items, tracking } = viewModel;
   const isTerminal = order && ORDER_TERMINAL_STATUSES.includes(order.status);
 
   return (
@@ -614,7 +507,6 @@ export default function OrderTracking() {
             <div className="dtb-order-tracking-grid">
               <main className="dtb-order-stack">
                 <ItemsCard items={items} currency={order?.currency} imageFallbacks={itemImageFallbacks} />
-                <OrderTimeline timeline={timeline} />
               </main>
 
               <aside className="dtb-order-stack">
