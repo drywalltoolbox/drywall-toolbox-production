@@ -5,13 +5,113 @@
 	'use strict';
 
 	var WB = window.DtbWorkbench || null;
-	if ( ! WB ) { return; }
-
+	var Admin = window.DtbAdmin || null;
 	var MODAL_ID = 'dtb-orders-modal';
+	var ORDERS_REGION_ID = 'dtb-orders-workspace';
 	var state = {
 		orderId: null,
 		payload: null,
 	};
+
+	function ordersRegion() {
+		return document.querySelector( '[data-dtb-live-region="' + ORDERS_REGION_ID + '"]' );
+	}
+
+	function activeSearchValue() {
+		var input = document.querySelector( '[data-dtb-live-search][data-dtb-live-target="' + ORDERS_REGION_ID + '"]' );
+		return input ? input.value : '';
+	}
+
+	function normalizeOrderType( value ) {
+		value = String( value || '' ).toLowerCase();
+		return [ 'product', 'repair', 'return' ].indexOf( value ) === -1 ? '' : value;
+	}
+
+	function setTypeFilterActiveState( orderType ) {
+		orderType = normalizeOrderType( orderType );
+		document.querySelectorAll( '.dtb-orders-type-filter a' ).forEach( function ( link ) {
+			var url;
+			try {
+				url = new URL( link.href, window.location.origin );
+			} catch ( err ) {
+				return;
+			}
+			var linkType = normalizeOrderType( url.searchParams.get( 'order_type' ) || '' );
+			var isActive = linkType === orderType;
+			link.classList.toggle( 'button-primary', isActive );
+			link.setAttribute( 'aria-pressed', isActive ? 'true' : 'false' );
+		} );
+	}
+
+	function buildTypeFilterQuery( link ) {
+		var url = new URL( link.href, window.location.origin );
+		var orderType = normalizeOrderType( url.searchParams.get( 'order_type' ) || '' );
+		var search = activeSearchValue();
+		var query = {
+			order_type: orderType,
+			paged: 1,
+			open_order: '',
+		};
+
+		if ( url.searchParams.has( 'status' ) ) {
+			var status = url.searchParams.get( 'status' ) || '';
+			query.status = status === 'all' ? '' : status;
+		}
+
+		if ( search ) {
+			query.s = search;
+			query.search = '';
+		} else {
+			query.s = '';
+			query.search = '';
+		}
+
+		return query;
+	}
+
+	function closeOrderModalIfOpen() {
+		if ( Admin && typeof Admin.closeModal === 'function' ) {
+			Admin.closeModal( MODAL_ID );
+		}
+	}
+
+	function bindOrdersTypeFilterNavigation() {
+		document.addEventListener( 'click', function ( event ) {
+			var link = event.target.closest ? event.target.closest( '.dtb-orders-type-filter a' ) : null;
+			if ( ! link ) { return; }
+
+			var region = ordersRegion();
+			if ( ! Admin || typeof Admin.liveNavigate !== 'function' || ! region ) {
+				return;
+			}
+
+			var endpoint = region.getAttribute( 'data-dtb-endpoint' );
+			if ( ! endpoint ) { return; }
+
+			event.preventDefault();
+			var query = buildTypeFilterQuery( link );
+			setTypeFilterActiveState( query.order_type );
+			closeOrderModalIfOpen();
+			Admin.liveNavigate( {
+				target: region,
+				endpoint: endpoint,
+				query: query,
+			} );
+		} );
+
+		document.addEventListener( 'dtb:live:navigated', function ( event ) {
+			if ( ! event.detail || event.detail.regionId !== ORDERS_REGION_ID ) { return; }
+			var payloadState = event.detail.payload && event.detail.payload.state ? event.detail.payload.state : {};
+			var nextState = Object.assign( {}, event.detail.state || {}, payloadState );
+			setTypeFilterActiveState( nextState.order_type || '' );
+		} );
+
+		setTypeFilterActiveState( new URLSearchParams( window.location.search ).get( 'order_type' ) || '' );
+	}
+
+	bindOrdersTypeFilterNavigation();
+
+	if ( ! WB ) { return; }
 
 	function bodyEl() {
 		var modal = document.getElementById( MODAL_ID );
