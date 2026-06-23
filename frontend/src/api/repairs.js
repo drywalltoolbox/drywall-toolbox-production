@@ -221,7 +221,7 @@ export async function uploadRepairMedia( repairId, formData, token ) {
  * @returns {string}  Absolute URL
  */
 export function getRepairEventStreamUrl( repairId, token ) {
-  const base = ( process.env.REACT_APP_WP_BASE_URL || '' ).replace( /\/+$/{0}, '' );
+  const base = ( process.env.REACT_APP_WP_BASE_URL || '' ).replace( /\/+$/, '' );
   const wpJson = base
     ? ( base.endsWith( '/wp-json' ) ? base : `${ base }/wp-json` )
     : ( typeof window !== 'undefined' ? `${ window.location.origin }/wp-json` : '' );
