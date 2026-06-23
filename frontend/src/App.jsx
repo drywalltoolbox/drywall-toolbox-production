@@ -218,13 +218,31 @@ function App() {
 
 function AppShell({ cartOpen, toggleCart, closeCart }) {
   const location = useLocation();
-  const navigate = useNavigate();
   const { user } = useAuthContext();
+
+  const isHome = location.pathname === '/';
+  const minimalChrome = false;
+
+  return (
+    <>
+      {!minimalChrome && <Header onCartClick={toggleCart} />}
+      <main className={!isHome && !minimalChrome ? 'main-content' : minimalChrome ? '' : 'main-content home-main'}>
+        <AppRoutes />
+      </main>
+      {!minimalChrome && <Footer />}
+      {!minimalChrome && <CartSidebar isOpen={cartOpen} onClose={closeCart} />}
+      <MobileInstallNudge />
+      {!user && <HomepageSignupCtaController />}
+    </>
+  );
+}
+
+function HomepageSignupCtaController() {
+  const navigate = useNavigate();
   const [showSignupCta, setShowSignupCta] = useState(false);
 
   useEffect(() => {
-    if (user || getLocalStorageFlag(HOMEPAGE_SIGNUP_CTA_SEEN_KEY)) {
-      setShowSignupCta(false);
+    if (getLocalStorageFlag(HOMEPAGE_SIGNUP_CTA_SEEN_KEY)) {
       return undefined;
     }
 
@@ -234,7 +252,7 @@ function AppShell({ cartOpen, toggleCart, closeCart }) {
     }, HOMEPAGE_SIGNUP_CTA_DELAY_MS);
 
     return () => clearTimeout(timer);
-  }, [user]);
+  }, []);
 
   const handleSignupCtaClose = useCallback(() => {
     setShowSignupCta(false);
@@ -250,25 +268,13 @@ function AppShell({ cartOpen, toggleCart, closeCart }) {
     navigate('/login');
   }, [navigate]);
 
-  const isHome = location.pathname === '/';
-  const minimalChrome = false;
-
   return (
-    <>
-      {!minimalChrome && <Header onCartClick={toggleCart} />}
-      <main className={!isHome && !minimalChrome ? 'main-content' : minimalChrome ? '' : 'main-content home-main'}>
-        <AppRoutes />
-      </main>
-      {!minimalChrome && <Footer />}
-      {!minimalChrome && <CartSidebar isOpen={cartOpen} onClose={closeCart} />}
-      <MobileInstallNudge />
       <HomepageSignupCTA
         isOpen={showSignupCta}
         onClose={handleSignupCtaClose}
         onCreateAccount={handleSignupCtaCreateAccount}
         onSignIn={handleSignupCtaSignIn}
       />
-    </>
   );
 }
 
