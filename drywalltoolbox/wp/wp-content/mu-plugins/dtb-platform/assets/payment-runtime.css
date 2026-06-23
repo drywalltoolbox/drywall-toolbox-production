@@ -11,45 +11,56 @@ body.dtb-payment-runtime {
 
 .dtb-payment-shell {
 	min-height: 100vh;
-	padding: 34px 16px 48px;
+	padding: 38px 16px 56px;
 	background:
-		radial-gradient(circle at 50% 0%, rgba(37, 99, 235, 0.14), transparent 34rem),
+		radial-gradient(circle at 14% 0%, rgba(37, 99, 235, 0.13), transparent 30rem),
+		radial-gradient(circle at 92% 12%, rgba(20, 184, 166, 0.08), transparent 26rem),
 		linear-gradient(180deg, #f8fbff 0%, #eef3f9 100%);
 }
 
 .dtb-payment-card {
-	width: min(980px, 100%);
+	width: min(1040px, 100%);
 	margin: 0 auto;
 	overflow: hidden;
 	border: 1px solid rgba(148, 163, 184, 0.35);
-	border-radius: 18px;
+	border-radius: 24px;
 	background: #fff;
-	box-shadow: 0 22px 60px rgba(15, 23, 42, 0.12);
+	box-shadow: 0 24px 70px rgba(15, 23, 42, 0.13);
 }
 
 .dtb-payment-header {
-	padding: 28px clamp(18px, 4vw, 42px);
-	background: linear-gradient(135deg, #071226 0%, #12346b 100%);
+	position: relative;
+	display: grid;
+	justify-items: center;
+	text-align: center;
+	padding: 28px clamp(20px, 5vw, 48px) 30px;
+	background:
+		radial-gradient(circle at 50% 0%, rgba(96, 165, 250, 0.28), transparent 26rem),
+		linear-gradient(135deg, #061226 0%, #102b5e 100%);
 	color: #fff;
 }
 
 .dtb-payment-brand {
 	display: flex;
 	align-items: center;
-	justify-content: space-between;
-	gap: 16px;
-	margin-bottom: 18px;
+	justify-content: center;
+	margin-bottom: 16px;
+	width: 100%;
 }
 
 .dtb-payment-logo {
-	height: 52px;
+	height: clamp(48px, 5vw, 68px);
 	width: auto;
+	max-width: min(280px, 72vw);
+	object-fit: contain;
 	display: block;
 }
 
 .dtb-payment-secure-pill {
 	display: inline-flex;
 	align-items: center;
+	justify-content: center;
+	margin-bottom: 12px;
 	border: 1px solid rgba(191, 219, 254, 0.34);
 	border-radius: 999px;
 	background: rgba(15, 23, 42, 0.24);
@@ -64,14 +75,14 @@ body.dtb-payment-runtime {
 
 .dtb-payment-title {
 	margin: 0;
-	font-size: clamp(30px, 4vw, 46px);
+	font-size: clamp(30px, 4vw, 44px);
 	line-height: 1.02;
 	letter-spacing: 0;
 	font-weight: 900;
 }
 
 .dtb-payment-subtitle {
-	max-width: 680px;
+	max-width: 720px;
 	margin: 12px 0 0;
 	color: rgba(226, 232, 240, 0.86);
 	font-size: 15px;
@@ -79,7 +90,7 @@ body.dtb-payment-runtime {
 }
 
 .dtb-payment-content {
-	padding: clamp(18px, 4vw, 38px);
+	padding: clamp(18px, 4vw, 40px);
 }
 
 .dtb-payment-runtime .woocommerce {
@@ -88,13 +99,14 @@ body.dtb-payment-runtime {
 
 .dtb-payment-runtime table.shop_table {
 	width: 100%;
-	margin: 0 0 24px;
+	margin: 0 0 26px;
 	overflow: hidden;
 	border: 1px solid #dbe3ef;
 	border-collapse: separate;
 	border-spacing: 0;
-	border-radius: 14px;
-	background: #fff;
+	border-radius: 18px;
+	background: #f8fafc;
+	box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.86);
 }
 
 .dtb-payment-runtime table.shop_table th,
@@ -128,11 +140,14 @@ body.dtb-payment-runtime {
 
 .dtb-payment-runtime #payment,
 .dtb-payment-runtime .woocommerce-checkout-payment {
-	margin-top: 22px;
+	margin-top: 24px;
 	border: 1px solid #dbe3ef;
-	border-radius: 16px;
-	background: #f8fafc;
-	padding: 18px;
+	border-radius: 20px;
+	background:
+		radial-gradient(circle at 100% 0%, rgba(37, 99, 235, 0.08), transparent 22rem),
+		#f8fafc;
+	padding: clamp(16px, 3vw, 24px);
+	box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9);
 }
 
 .dtb-payment-runtime #payment ul.payment_methods {
@@ -143,28 +158,77 @@ body.dtb-payment-runtime {
 }
 
 .dtb-payment-runtime #payment ul.payment_methods li {
+	position: relative;
 	margin: 0 0 12px;
-	padding: 14px;
+	padding: 0;
 	border: 1px solid #dbe3ef;
-	border-radius: 14px;
+	border-radius: 16px;
 	background: #fff;
+	overflow: hidden;
+	transition: border-color 0.16s ease, box-shadow 0.16s ease, background 0.16s ease;
+}
+
+.dtb-payment-runtime #payment ul.payment_methods li:hover {
+	border-color: #bfdbfe;
+	box-shadow: 0 12px 28px rgba(15, 23, 42, 0.06);
+}
+
+.dtb-payment-runtime #payment ul.payment_methods li > input[type="radio"] {
+	position: absolute;
+	inline-size: 1px;
+	block-size: 1px;
+	opacity: 0;
 }
 
 .dtb-payment-runtime #payment ul.payment_methods li > label {
-	display: inline-flex;
+	display: flex;
 	align-items: center;
-	gap: 8px;
+	gap: 12px;
+	min-height: 60px;
+	padding: 14px 16px;
 	font-weight: 850;
 	color: #0f172a;
+	cursor: pointer;
+}
+
+.dtb-payment-runtime #payment ul.payment_methods li > input[type="radio"]:checked + label,
+.dtb-payment-runtime #payment ul.payment_methods li.is-active > label {
+	background: linear-gradient(180deg, #ffffff, #f8fbff);
+}
+
+.dtb-payment-method-radio {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 18px;
+	height: 18px;
+	flex: 0 0 auto;
+	border: 1.5px solid #94a3b8;
+	border-radius: 999px;
+	background: #fff;
+	box-shadow: inset 0 0 0 4px #fff;
+}
+
+.dtb-payment-runtime #payment ul.payment_methods li > input[type="radio"]:checked + label .dtb-payment-method-radio {
+	border-color: #2563eb;
+	background: #2563eb;
 }
 
 .dtb-payment-runtime .payment_box {
-	margin: 14px 0 0;
-	border: 1px solid #dbe3ef;
-	border-radius: 13px;
-	background: #f1f5f9;
-	padding: 16px;
+	margin: 0;
+	border-top: 1px solid #e2e8f0;
+	border-right: 0;
+	border-bottom: 0;
+	border-left: 0;
+	border-radius: 0;
+	background: #f6f8fc;
+	padding: clamp(16px, 3vw, 24px);
 	color: #334155;
+}
+
+.dtb-payment-runtime .payment_box::before,
+.dtb-payment-runtime .payment_box::after {
+	display: none !important;
 }
 
 .dtb-payment-runtime .form-row {
@@ -179,9 +243,9 @@ body.dtb-payment-runtime {
 .dtb-payment-runtime textarea,
 .dtb-payment-runtime .InputElement {
 	width: 100%;
-	min-height: 44px;
+	min-height: 46px;
 	border: 1px solid #cbd5e1;
-	border-radius: 10px;
+	border-radius: 12px;
 	background: #fff;
 	padding: 10px 12px;
 	color: #0f172a;
@@ -199,12 +263,12 @@ body.dtb-payment-runtime {
 .dtb-payment-runtime button,
 .dtb-payment-runtime .button,
 .dtb-payment-runtime #place_order {
-	min-height: 48px;
+	min-height: 50px;
 	border: 0;
-	border-radius: 12px;
+	border-radius: 14px;
 	background: #2563eb;
 	color: #fff;
-	padding: 12px 18px;
+	padding: 12px 20px;
 	font-weight: 900;
 	cursor: pointer;
 	transition: background 0.16s ease, transform 0.16s ease, box-shadow 0.16s ease;
@@ -226,6 +290,15 @@ body.dtb-payment-runtime {
 	margin: 12px 0;
 }
 
+.dtb-payment-runtime .wcpay-express-checkout-wrapper,
+.dtb-payment-runtime .wc-stripe-payment-request-wrapper,
+.dtb-payment-runtime .wcpay-payment-request-wrapper,
+.dtb-payment-runtime .wc-block-components-express-payment,
+.dtb-payment-runtime .ppc-button-wrapper {
+	overflow: hidden;
+	border-radius: 14px;
+}
+
 .dtb-payment-runtime .wc-stripe-payment-request-button,
 .dtb-payment-runtime .wcpay-payment-request-button,
 .dtb-payment-runtime .gpay-card-info-container,
@@ -234,8 +307,48 @@ body.dtb-payment-runtime {
 	max-width: 100%;
 }
 
-.dtb-payment-runtime .dtb-wallet-duplicate {
+.dtb-payment-runtime .dtb-wallet-duplicate,
+.dtb-payment-runtime .dtb-wallet-separator-hidden,
+.dtb-payment-runtime .dtb-payment-method-duplicate {
 	display: none !important;
+}
+
+.dtb-payment-runtime .dtb-wallet-disabled,
+.dtb-payment-runtime [class*="woopay" i],
+.dtb-payment-runtime [id*="woopay" i],
+.dtb-payment-runtime [aria-label*="woopay" i],
+.dtb-payment-runtime [title*="woopay" i],
+.dtb-payment-runtime [class*="woo-pay" i],
+.dtb-payment-runtime [id*="woo-pay" i],
+.dtb-payment-runtime [aria-label*="woo pay" i],
+.dtb-payment-runtime [title*="woo pay" i] {
+	display: none !important;
+}
+
+.dtb-payment-runtime .woocommerce-privacy-policy-text {
+	margin: 20px 0 0;
+	padding-top: 18px;
+	border-top: 1px solid #dbe3ef;
+	color: #475569;
+	font-size: 14px;
+	line-height: 1.55;
+}
+
+.dtb-payment-runtime .woocommerce-privacy-policy-text p {
+	margin: 0;
+}
+
+.dtb-payment-runtime .form-row.place-order {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 18px;
+	margin: 20px 0 0;
+}
+
+.dtb-payment-runtime .form-row.place-order #place_order {
+	margin-left: auto;
+	min-width: 160px;
 }
 
 .dtb-payment-runtime .woocommerce-error,
@@ -262,12 +375,20 @@ body.dtb-payment-runtime {
 	}
 
 	.dtb-payment-brand {
-		align-items: flex-start;
-		flex-direction: column;
+		align-items: center;
 	}
 
 	.dtb-payment-runtime table.shop_table th,
 	.dtb-payment-runtime table.shop_table td {
 		padding: 12px;
+	}
+
+	.dtb-payment-runtime .form-row.place-order {
+		display: grid;
+	}
+
+	.dtb-payment-runtime .form-row.place-order #place_order {
+		width: 100%;
+		margin-left: 0;
 	}
 }

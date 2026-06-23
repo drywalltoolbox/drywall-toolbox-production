@@ -19,8 +19,6 @@ import {
   Loader2,
   Lock,
   MapPin,
-  PackageCheck,
-  ShieldCheck,
   ShoppingBag,
   ShoppingCart,
   Tag,
@@ -53,9 +51,16 @@ const PAYMENT_LOGO_BASE = `${process.env.PUBLIC_URL || ''}/payment_logos`;
 const SHIPPING_DEBOUNCE_MS = 650;
 
 const CARD_BRAND_LOGOS = [
-  { key: 'visa', src: `${PAYMENT_LOGO_BASE}/visa.svg`, alt: 'Visa', className: 'h-[12px]' },
-  { key: 'mastercard', src: `${PAYMENT_LOGO_BASE}/mastercard.svg`, alt: 'Mastercard', className: 'h-[13px]' },
-  { key: 'amex', src: `${PAYMENT_LOGO_BASE}/american-express.svg`, alt: 'American Express', className: 'h-[12px]' },
+  { key: 'visa', src: `${PAYMENT_LOGO_BASE}/visa.svg`, alt: 'Visa' },
+  { key: 'mastercard', src: `${PAYMENT_LOGO_BASE}/mastercard.svg`, alt: 'Mastercard' },
+  { key: 'amex', src: `${PAYMENT_LOGO_BASE}/american-express.svg`, alt: 'American Express' },
+];
+
+const PAYMENT_METHOD_LOGOS = [
+  { key: 'paypal', src: `${PAYMENT_LOGO_BASE}/paypal.svg`, alt: 'PayPal' },
+  { key: 'apple-pay', src: `${PAYMENT_LOGO_BASE}/apple-pay.svg`, alt: 'Apple Pay' },
+  { key: 'google-pay', src: `${PAYMENT_LOGO_BASE}/google-pay.svg`, alt: 'Google Pay' },
+  ...CARD_BRAND_LOGOS,
 ];
 
 const CHECKOUT_STEPS = [
@@ -226,7 +231,7 @@ function StepProgress({ activeStep }) {
 
 function StepCard({ children, delay = 0, className = '', id }) {
   return (
-    <Motion.div id={id} variants={cardVariants} initial="hidden" animate="visible" custom={delay} className={`bg-white rounded-2xl border border-slate-200/90 shadow-[0_2px_16px_rgba(15,23,42,0.06)] ${className}`}>
+    <Motion.div id={id} variants={cardVariants} initial="hidden" animate="visible" custom={delay} className={`dtb-checkout-step-card bg-white rounded-2xl border border-slate-200/90 shadow-[0_2px_16px_rgba(15,23,42,0.06)] ${className}`}>
       {children}
     </Motion.div>
   );
@@ -250,6 +255,16 @@ function InlineSubmitStatus({ status }) {
     <div className="mt-3 flex items-center justify-center gap-2 text-xs font-semibold text-slate-500" role="status" aria-live="polite">
       <Loader2 size={14} className="animate-spin text-primary-600" />
       {SUBMIT_MESSAGES[status] || 'Preparing checkout…'}
+    </div>
+  );
+}
+
+function PaymentMethodLogos({ compact = false }) {
+  return (
+    <div className={`dtb-checkout-payment-logos ${compact ? 'dtb-checkout-payment-logos--compact' : ''}`} aria-label="Supported payment methods">
+      {PAYMENT_METHOD_LOGOS.map((logo) => (
+        <img key={logo.key} src={logo.src} alt={logo.alt} className={`dtb-checkout-payment-logo dtb-checkout-payment-logo--${logo.key}`} loading="lazy" decoding="async" />
+      ))}
     </div>
   );
 }
@@ -292,7 +307,6 @@ function MobileSummaryStrip({ cartItems, subtotal, shipping, tax, total }) {
                     <div key={item.cartKey || item.id} className="flex items-center gap-3">
                       <div className="relative h-12 w-12 rounded-xl border border-slate-100 bg-slate-50 overflow-hidden shrink-0">
                         {image ? <img src={image} alt={item.name} className="h-full w-full object-contain p-1" loading="lazy" /> : null}
-                        <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-slate-900 px-1 text-[10px] font-bold text-white">{item.quantity}</span>
                       </div>
                       <div className="min-w-0 flex-1"><p className="truncate text-xs font-semibold text-slate-900">{item.name}</p><p className="text-[11px] text-slate-500 tabular-nums">${toMoney(item.price).toFixed(2)} ea</p></div>
                       <span className="text-xs font-bold text-slate-900 tabular-nums">${(toMoney(item.price) * Number(item.quantity || 1)).toFixed(2)}</span>
@@ -314,18 +328,17 @@ function MobileSummaryStrip({ cartItems, subtotal, shipping, tax, total }) {
   );
 }
 
-function DesktopSummaryPanel({ cartItems, subtotal, shipping, tax, total, couponInput, setCouponInput, addManualCoupon, manualCoupons, removeManualCoupon, processing, canSubmit, submitStatus, onPlaceOrder }) {
+function DesktopSummaryPanel({ cartItems, subtotal, shipping, tax, total, couponInput, setCouponInput, addManualCoupon, manualCoupons, removeManualCoupon, setupError, processing, canSubmit, submitStatus, onPlaceOrder }) {
   const totalQty = cartItems.reduce((sum, item) => sum + Number(item.quantity || 0), 0);
   return (
-    <aside className="dtb-summary-panel hidden lg:flex flex-col lg:sticky lg:top-6 lg:self-start overflow-hidden rounded-2xl text-slate-100" style={{ background: 'linear-gradient(170deg, #0d1829 0%, #0a1020 80%)' }}>
-      <div className="h-[3px] shrink-0 bg-gradient-to-r from-primary-700 via-primary-500 to-primary-600" />
+    <aside className="dtb-summary-panel hidden lg:flex flex-col lg:sticky lg:top-6 lg:self-start overflow-hidden rounded-2xl text-slate-100">
       <div className="p-6 border-b border-white/10">
         <div className="flex items-start justify-between gap-4 mb-5"><div><p className="text-[10px] font-bold uppercase tracking-[0.18em] text-primary-200/75 mb-1">Order Review</p><h2 className="text-xl font-black text-white tracking-tight">Your Cart</h2></div><span className="rounded-full bg-white/10 px-3 py-1 text-xs font-bold text-white">{totalQty} item{totalQty === 1 ? '' : 's'}</span></div>
         <div className="space-y-4 max-h-[360px] overflow-y-auto pr-1">
           {cartItems.map((item) => {
             const image = resolveCartItemImage(item);
             return (
-              <div key={item.cartKey || item.id} className="flex gap-3"><div className="relative h-14 w-14 rounded-xl overflow-hidden bg-white/8 border border-white/10 shrink-0">{image ? <img src={image} alt={item.name} className="h-full w-full object-contain p-1.5" loading="lazy" /> : null}<span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-primary-500 px-1 text-[10px] font-bold text-white">{item.quantity}</span></div><div className="min-w-0 flex-1"><p className="line-clamp-2 text-sm font-semibold text-white leading-snug">{item.name}</p><p className="mt-1 text-[11px] text-slate-400 tabular-nums">${toMoney(item.price).toFixed(2)} ea</p></div><span className="text-sm font-bold text-white tabular-nums shrink-0">${(toMoney(item.price) * Number(item.quantity || 1)).toFixed(2)}</span></div>
+              <div key={item.cartKey || item.id} className="flex gap-3"><div className="relative h-14 w-14 rounded-xl overflow-hidden bg-white/8 border border-white/10 shrink-0">{image ? <img src={image} alt={item.name} className="h-full w-full object-contain p-1.5" loading="lazy" /> : null}</div><div className="min-w-0 flex-1"><p className="line-clamp-2 text-sm font-semibold text-white leading-snug">{item.name}</p><p className="mt-1 text-[11px] text-slate-400 tabular-nums">${toMoney(item.price).toFixed(2)} ea</p></div><span className="text-sm font-bold text-white tabular-nums shrink-0">${(toMoney(item.price) * Number(item.quantity || 1)).toFixed(2)}</span></div>
             );
           })}
         </div>
@@ -333,28 +346,15 @@ function DesktopSummaryPanel({ cartItems, subtotal, shipping, tax, total, coupon
       <div className="p-6 space-y-5">
         <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-4 space-y-2.5 text-sm"><div className="flex justify-between text-slate-300"><span>Subtotal</span><span className="font-semibold text-white tabular-nums">${subtotal.toFixed(2)}</span></div><div className="flex justify-between text-slate-300"><span>Shipping</span><span className={`font-semibold tabular-nums ${shipping === 0 ? 'text-emerald-300' : 'text-white'}`}>{shipping === 0 ? 'Free' : `$${shipping.toFixed(2)}`}</span></div><div className="flex justify-between text-slate-300"><span>Tax</span><span className="font-semibold text-white tabular-nums">${tax.toFixed(2)}</span></div><div className="flex justify-between pt-3 border-t border-white/10"><span className="font-bold text-white">Total</span><span className="font-black text-2xl text-white tabular-nums">${total.toFixed(2)}</span></div></div>
         <div><label htmlFor="desktop-coupon" className="block text-[10px] font-bold uppercase tracking-[0.13em] text-slate-400 mb-2">Discount Code</label><div className="flex gap-2"><input id="desktop-coupon" type="text" value={couponInput} onChange={(event) => setCouponInput(event.target.value.toUpperCase())} placeholder="ENTER CODE" className="min-w-0 flex-1 rounded-xl border border-white/10 bg-white/10 px-3 py-2.5 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-primary-400/35" /><button type="button" onClick={addManualCoupon} className="rounded-xl bg-white text-slate-950 px-4 py-2.5 text-sm font-bold hover:bg-slate-100 transition-colors">Apply</button></div>{manualCoupons.length > 0 && <div className="mt-3 flex flex-wrap gap-2">{manualCoupons.map((code) => <button key={code} type="button" onClick={() => removeManualCoupon(code)} className="rounded-full border border-emerald-400/30 bg-emerald-400/10 px-3 py-1 text-[11px] font-semibold text-emerald-200">{code} ×</button>)}</div>}</div>
+        {setupError ? <div className="flex items-start gap-2 rounded-xl border border-amber-200 bg-amber-50 px-3.5 py-3 text-xs leading-relaxed text-amber-800"><AlertTriangle size={14} className="mt-0.5 shrink-0" /><span>{setupError}</span></div> : null}
         <button type="button" onClick={onPlaceOrder} disabled={!canSubmit || processing} className="w-full inline-flex min-h-[52px] items-center justify-center gap-2.5 rounded-xl bg-primary-600 px-5 py-3.5 text-sm font-black text-white shadow-[0_16px_36px_rgba(37,99,235,0.35)] transition-all hover:bg-primary-700 disabled:cursor-not-allowed disabled:opacity-50">
-          {processing ? <Loader2 size={16} className="animate-spin" /> : <Lock size={16} strokeWidth={2.5} />}{processing ? 'Preparing Payment…' : 'Continue to Secure Payment'}<ExternalLink size={15} strokeWidth={2.5} />
+          {processing ? <Loader2 size={16} className="animate-spin" /> : null}{processing ? 'Preparing Payment…' : 'Continue to Secure Payment'}
         </button>
+        <PaymentMethodLogos />
         <InlineSubmitStatus status={submitStatus} />
         <p className="text-center text-[11px] leading-relaxed text-slate-400">Encrypted checkout · Secure card processing · Order confirmation by email</p>
       </div>
     </aside>
-  );
-}
-
-function SecurePaymentSection({ gatewayLabel, capabilitiesLoading, setupError, submitStatus }) {
-  return (
-    <StepCard delay={0.21} className="overflow-hidden p-0" id="payment-section">
-      <div className="p-5 sm:p-6">
-        <div className="flex items-start gap-3 mb-5"><span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-primary-50 text-primary-600 ring-1 ring-primary-100"><ShieldCheck size={19} strokeWidth={2.2} /></span><div className="min-w-0"><div className="flex flex-wrap items-center gap-2"><h2 className="text-lg font-black text-slate-950 tracking-tight">Secure Payment</h2><span className="rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.12em] text-emerald-700">Encrypted</span></div><p className="mt-1 text-sm leading-relaxed text-slate-500">Review your order first. Payment opens on a protected checkout page.</p></div></div>
-        <div className="rounded-[1.35rem] border border-primary-100/90 bg-[radial-gradient(circle_at_top_left,rgba(37,99,235,0.12),transparent_42%),linear-gradient(135deg,#ffffff_0%,#f8fbff_100%)] p-4 sm:p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.85)]">
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"><div className="min-w-0"><p className="text-[10px] font-black uppercase tracking-[0.16em] text-primary-600">Payment Method</p><p className="mt-1 text-xl font-black tracking-tight text-slate-950">{capabilitiesLoading ? 'Loading secure payment…' : gatewayLabel}</p><p className="mt-2 max-w-md text-sm leading-relaxed text-slate-600">Card details are never stored in this storefront. Accepted payment options are shown on the secure payment page.</p></div><div className="flex w-full items-center justify-center gap-4 rounded-2xl border border-slate-200 bg-white px-4 py-4 shadow-[0_10px_24px_rgba(15,23,42,0.08)] sm:w-auto sm:min-w-[220px]">{CARD_BRAND_LOGOS.map((logo) => <img key={logo.key} src={logo.src} alt={logo.alt} className={`${logo.className} w-auto object-contain`} loading="lazy" decoding="async" />)}</div></div>
-          {setupError ? <div className="mt-4 flex items-start gap-2 rounded-xl border border-amber-200 bg-amber-50 px-3.5 py-3 text-xs leading-relaxed text-amber-800"><AlertTriangle size={14} className="mt-0.5 shrink-0" /><span>{setupError}</span></div> : <div className="mt-4 grid gap-2 text-xs font-semibold text-slate-600 sm:grid-cols-3"><div className="flex items-center gap-2 rounded-xl bg-white/70 px-3 py-2"><ShieldCheck size={14} className="text-primary-600" />PCI-safe flow</div><div className="flex items-center gap-2 rounded-xl bg-white/70 px-3 py-2"><Lock size={14} className="text-primary-600" />Encrypted checkout</div><div className="flex items-center gap-2 rounded-xl bg-white/70 px-3 py-2"><PackageCheck size={14} className="text-primary-600" />Order securely held</div></div>}
-          <InlineSubmitStatus status={submitStatus} />
-        </div>
-      </div>
-    </StepCard>
   );
 }
 
@@ -370,7 +370,6 @@ export default function Checkout() {
   const [orderComplete, setOrderComplete] = useState(false);
   const [orderDetails, setOrderDetails] = useState(null);
   const [paymentMethod, setPaymentMethod] = useState(WOO_PAYMENTS_METHOD_ID);
-  const [paymentGatewayLabel, setPaymentGatewayLabel] = useState(PUBLIC_PAYMENT_LABEL);
   const [paymentMethodTitle, setPaymentMethodTitle] = useState(PUBLIC_PAYMENT_TITLE);
   const [paymentSetupError, setPaymentSetupError] = useState(null);
   const [capabilitiesLoading, setCapabilitiesLoading] = useState(true);
@@ -403,14 +402,12 @@ export default function Checkout() {
         if (!mounted) return;
         const selection = resolvePaymentSelection(caps);
         setPaymentMethod(selection.methodId);
-        setPaymentGatewayLabel(selection.label);
         setPaymentMethodTitle(selection.orderTitle);
         setPaymentSetupError(selection.setupError);
       })
       .catch(() => {
         if (!mounted) return;
         setPaymentMethod(WOO_PAYMENTS_METHOD_ID);
-        setPaymentGatewayLabel(PUBLIC_PAYMENT_LABEL);
         setPaymentMethodTitle(PUBLIC_PAYMENT_TITLE);
         setPaymentSetupError(null);
       })
@@ -578,10 +575,10 @@ export default function Checkout() {
   }
 
   return (
-    <div className="dtb-checkout min-h-screen bg-slate-50 page-wrapper">
+    <div className="dtb-checkout min-h-screen page-wrapper">
       <SEOHead noindex title="Checkout" />
-      <div className="mx-auto w-full max-w-[1380px] lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(420px,460px)] lg:gap-6 xl:gap-7 lg:items-start min-h-screen">
-        <div className="px-4 py-8 sm:px-7 md:px-8 lg:px-8 xl:px-10 pb-32 lg:pb-16">
+      <div className="dtb-checkout-frame mx-auto w-full max-w-[1380px] lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(420px,460px)] lg:gap-6 xl:gap-7 lg:items-start min-h-screen">
+        <div className="dtb-checkout-form-pane px-4 py-8 sm:px-7 md:px-8 lg:px-8 xl:px-10 pb-32 lg:pb-16">
           <div className="max-w-2xl mx-auto lg:mx-0 lg:max-w-[780px]">
             <Motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35 }} className="mb-6"><div className="flex items-center justify-between mb-1"><div className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-[0.18em] text-slate-500"><Lock size={11} />Secure checkout</div>{!isAuthenticated && <Link to="/login" className="text-xs font-semibold text-slate-500 hover:text-slate-800 transition-colors">Sign in</Link>}</div><h1 className="text-2xl sm:text-3xl font-black text-slate-950 tracking-tight">Complete your order</h1></Motion.div>
             <StepProgress activeStep={processing ? 'review' : isFormComplete ? 'payment' : 'shipping'} />
@@ -591,15 +588,14 @@ export default function Checkout() {
               <StepCard delay={0} className="p-5 sm:p-6"><SectionHeader icon={User} title="Contact Information" complete={isContactComplete} /><div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">{[{ name: 'firstName', label: 'First Name', type: 'text', autoComplete: 'given-name' }, { name: 'lastName', label: 'Last Name', type: 'text', autoComplete: 'family-name' }, { name: 'email', label: 'Email Address', type: 'email', autoComplete: 'email' }, { name: 'phone', label: 'Phone', type: 'tel', autoComplete: 'tel', inputMode: 'numeric' }].map(({ name, label, type, autoComplete, inputMode }) => (<div key={name}><label htmlFor={`field-${name}`} className={labelClass}>{label}{requiredMark}</label><input id={`field-${name}`} type={type} name={name} value={formData[name]} onChange={handleInputChange} autoComplete={autoComplete} {...(inputMode ? { inputMode } : {})} className={inputClass(name)} aria-invalid={!!errors[name]} />{errors[name] && <p className="text-red-500 text-[11px] mt-1 font-medium" role="alert">{errors[name]}</p>}</div>))}</div></StepCard>
               <StepCard delay={0.05} className="p-5 sm:p-6"><SectionHeader icon={MapPin} title="Shipping Address" complete={isAddressComplete} /><div className="space-y-3.5"><div><label htmlFor="field-address" className={labelClass}>Street Address{requiredMark}</label><input id="field-address" type="text" name="address" value={formData.address} onChange={handleInputChange} autoComplete="street-address" className={inputClass('address')} aria-invalid={!!errors.address} />{errors.address && <p className="text-red-500 text-[11px] mt-1 font-medium" role="alert">{errors.address}</p>}</div><div className="grid grid-cols-3 gap-3">{[{ name: 'city', label: 'City', autoComplete: 'address-level2' }, { name: 'state', label: 'State', autoComplete: 'address-level1' }, { name: 'zip', label: 'ZIP Code', autoComplete: 'postal-code', inputMode: 'numeric' }].map(({ name, label, autoComplete, inputMode }) => (<div key={name}><label htmlFor={`field-${name}`} className={labelClass}>{label}{requiredMark}</label><input id={`field-${name}`} type="text" name={name} value={formData[name]} onChange={handleInputChange} autoComplete={autoComplete} {...(inputMode ? { inputMode } : {})} className={inputClass(name)} aria-invalid={!!errors[name]} />{errors[name] && <p className="text-red-500 text-[11px] mt-1 font-medium" role="alert">{errors[name]}</p>}</div>))}</div>{subtotal > 0 && subtotal < FREE_SHIP_THRESHOLD && <div className="flex items-center gap-2 rounded-xl bg-primary-50 border border-primary-100 px-4 py-2.5 text-xs text-primary-700"><Truck size={13} className="shrink-0" /><span>Spend <strong>${(FREE_SHIP_THRESHOLD - subtotal).toFixed(2)}</strong> more for free shipping</span></div>}</div></StepCard>
               <StepCard delay={0.1} className="p-5 sm:p-6"><SectionHeader icon={Truck} title="Shipping Method" />{ratesLoading && <div className="flex items-center gap-2 text-sm text-slate-400 py-1"><Loader2 size={14} className="animate-spin" />Loading shipping options…</div>}{ratesError && !ratesLoading && <div className="flex items-center gap-2 rounded-xl border border-amber-200 bg-amber-50 px-3.5 py-2.5 text-xs text-amber-700"><AlertTriangle size={13} className="shrink-0" />{ratesError}</div>}{!ratesLoading && shippingRates.length === 0 && !ratesError && <p className="text-xs text-slate-400 italic">Enter your address above to see available rates.</p>}{!ratesLoading && shippingRates.length > 0 && <div className="space-y-2" role="radiogroup" aria-label="Shipping method">{shippingRates.map((rate) => (<label key={rate.id} className={`flex items-center justify-between gap-3 px-4 py-3.5 rounded-xl border cursor-pointer transition-all ${selectedRate?.id === rate.id ? 'border-primary-500 bg-primary-50/60 ring-1 ring-primary-400/30' : 'border-slate-200 bg-white hover:border-slate-300'}`}><div className="flex items-center gap-3"><input type="radio" name="shippingRate" value={rate.id} checked={selectedRate?.id === rate.id} onChange={() => setSelectedRate(rate)} className="accent-primary-600" /><div><p className="text-sm font-semibold text-slate-900">{rate.name}</p>{rate.eta && <p className="text-xs text-slate-500 mt-0.5">{rate.eta}</p>}</div></div><span className={`text-sm font-bold shrink-0 ${toMoney(rate.price) === 0 ? 'text-emerald-600' : 'text-slate-900'}`}>{toMoney(rate.price) === 0 ? 'Free' : `$${toMoney(rate.price).toFixed(2)}`}</span></label>))}</div>}</StepCard>
-              <StepCard delay={0.15} className="p-5 sm:p-6"><SectionHeader icon={Tag} title="Discount Code" /><div className="flex gap-2"><input id="coupon-code" type="text" value={couponInput} onChange={(event) => setCouponInput(event.target.value.toUpperCase())} placeholder="ENTER CODE" className="flex-1 rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20 transition-all" /><button type="button" onClick={addManualCoupon} className="rounded-xl bg-slate-900 hover:bg-slate-800 px-5 py-3 text-sm font-semibold text-white transition-colors">Apply</button></div>{manualCoupons.length > 0 && <div className="mt-3 flex flex-wrap gap-2">{manualCoupons.map((code) => <button key={code} type="button" onClick={() => removeManualCoupon(code)} className="flex items-center gap-1 rounded-full border border-teal-200 bg-teal-50 px-3 py-1 text-[11px] font-semibold text-teal-700 hover:bg-teal-100 transition-colors"><Tag size={9} /> {code} ×</button>)}</div>}</StepCard>
+              <StepCard delay={0.15} className="lg:hidden p-5 sm:p-6"><SectionHeader icon={Tag} title="Discount Code" /><div className="flex gap-2"><input id="coupon-code" type="text" value={couponInput} onChange={(event) => setCouponInput(event.target.value.toUpperCase())} placeholder="ENTER CODE" className="flex-1 rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20 transition-all" /><button type="button" onClick={addManualCoupon} className="rounded-xl bg-slate-900 hover:bg-slate-800 px-5 py-3 text-sm font-semibold text-white transition-colors">Apply</button></div>{manualCoupons.length > 0 && <div className="mt-3 flex flex-wrap gap-2">{manualCoupons.map((code) => <button key={code} type="button" onClick={() => removeManualCoupon(code)} className="flex items-center gap-1 rounded-full border border-teal-200 bg-teal-50 px-3 py-1 text-[11px] font-semibold text-teal-700 hover:bg-teal-100 transition-colors"><Tag size={9} /> {code} ×</button>)}</div>}</StepCard>
               <StepCard delay={0.17} className="p-5 sm:p-6"><label htmlFor="field-customerNote" className={labelClass}>Order Note <span className="text-slate-400 normal-case font-normal">(optional)</span></label><textarea id="field-customerNote" name="customerNote" value={formData.customerNote} onChange={handleInputChange} rows={2} placeholder="Special instructions for your order…" className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-sm resize-none placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all hover:border-slate-300" /></StepCard>
-              <SecurePaymentSection gatewayLabel={paymentGatewayLabel} capabilitiesLoading={capabilitiesLoading} setupError={paymentSetupError} submitStatus={submitStatus} />
               {checkoutError && <Motion.div initial={{ opacity: 0, y: -6 }} animate={{ opacity: 1, y: 0 }} className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 flex items-start gap-2"><AlertCircle size={16} className="shrink-0 mt-0.5" /><span>{checkoutError}</span></Motion.div>}
-              <div className="lg:hidden fixed inset-x-0 bottom-0 z-40 border-t border-slate-200 bg-white/96 backdrop-blur px-4 py-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] shadow-[0_-14px_34px_rgba(15,23,42,0.10)]"><div className="mx-auto max-w-2xl"><button type="button" onClick={handlePlaceOrder} disabled={!canSubmitCheckout || processing} className="w-full inline-flex min-h-[52px] items-center justify-center gap-2.5 rounded-xl bg-primary-600 px-5 py-3.5 text-sm font-black text-white shadow-[0_16px_36px_rgba(37,99,235,0.28)] transition-all hover:bg-primary-700 disabled:cursor-not-allowed disabled:opacity-50">{processing ? <Loader2 size={16} className="animate-spin" /> : <Lock size={16} strokeWidth={2.5} />}{processing ? 'Preparing Payment…' : 'Continue to Secure Payment'}<ExternalLink size={15} strokeWidth={2.5} /></button><InlineSubmitStatus status={submitStatus} /><p className="mt-2 text-center text-[11px] text-slate-500">Encrypted checkout · Secure card processing · Order confirmation by email</p></div></div>
+              <div className="lg:hidden fixed inset-x-0 bottom-0 z-40 border-t border-slate-200 bg-white/96 backdrop-blur px-4 py-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] shadow-[0_-14px_34px_rgba(15,23,42,0.10)]"><div className="mx-auto max-w-2xl"><button type="button" onClick={handlePlaceOrder} disabled={!canSubmitCheckout || processing} className="w-full inline-flex min-h-[52px] items-center justify-center gap-2.5 rounded-xl bg-primary-600 px-5 py-3.5 text-sm font-black text-white shadow-[0_16px_36px_rgba(37,99,235,0.28)] transition-all hover:bg-primary-700 disabled:cursor-not-allowed disabled:opacity-50">{processing ? <Loader2 size={16} className="animate-spin" /> : null}{processing ? 'Preparing Payment…' : 'Continue to Secure Payment'}</button><PaymentMethodLogos compact /><InlineSubmitStatus status={submitStatus} /><p className="mt-2 text-center text-[11px] text-slate-500">Encrypted checkout · Secure card processing · Order confirmation by email</p></div></div>
             </div>
           </div>
         </div>
-        <DesktopSummaryPanel cartItems={safeCartItems} subtotal={subtotal} shipping={shipping} tax={tax} total={total} couponInput={couponInput} setCouponInput={setCouponInput} addManualCoupon={addManualCoupon} manualCoupons={manualCoupons} removeManualCoupon={removeManualCoupon} processing={processing} canSubmit={canSubmitCheckout} submitStatus={submitStatus} onPlaceOrder={handlePlaceOrder} />
+        <DesktopSummaryPanel cartItems={safeCartItems} subtotal={subtotal} shipping={shipping} tax={tax} total={total} couponInput={couponInput} setCouponInput={setCouponInput} addManualCoupon={addManualCoupon} manualCoupons={manualCoupons} removeManualCoupon={removeManualCoupon} setupError={paymentSetupError} processing={processing} canSubmit={canSubmitCheckout} submitStatus={submitStatus} onPlaceOrder={handlePlaceOrder} />
       </div>
     </div>
   );
