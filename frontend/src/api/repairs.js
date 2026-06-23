@@ -1,13 +1,13 @@
 /**
  * frontend/src/api/repairs.js
  *
- * DTB Repair Services API client — wraps the dtb/v1/repairs/* endpoints.
+ * Repair Services API client — wraps the dtb/v1/repairs/* endpoints.
  *
- * Public endpoints (no auth required): submit, status, media upload via token.
- * All calls go through apiClient() except media upload (raw fetch with FormData).
+ * Public endpoints: submit, status, media upload via token.
+ * Authenticated endpoints: customer repair history.
  *
  * Usage:
- *   import { submitRepair, getRepairStatus, REPAIR_STATUS_LABELS } from '@api/repairs';
+ *   import { submitRepair, getRepairStatus, getCustomerRepairs, REPAIR_STATUS_LABELS } from '@api/repairs';
  */
 
 import { apiClient } from './client.js';
@@ -133,6 +133,18 @@ function unwrapRepairResponse( response ) {
 // ─── API functions ────────────────────────────────────────────────────────────
 
 /**
+ * Retrieve the authenticated customer's repair history.
+ *
+ * @param {number} [page=1]
+ * @param {number} [perPage=20]
+ * @returns {Promise<{ repairs: Array, page: number, per_page: number, has_more: boolean, total?: number }>}
+ */
+export async function getCustomerRepairs( page = 1, perPage = 20 ) {
+  const params = new URLSearchParams( { page, per_page: perPage } ).toString();
+  return apiClient( `/wp-json/dtb/v1/repairs?${ params }` );
+}
+
+/**
  * Submit a new repair request.
  * An idempotency key is automatically generated and merged into the payload.
  *
@@ -209,7 +221,7 @@ export async function uploadRepairMedia( repairId, formData, token ) {
  * @returns {string}  Absolute URL
  */
 export function getRepairEventStreamUrl( repairId, token ) {
-  const base = ( process.env.REACT_APP_WP_BASE_URL || '' ).replace( /\/+$/, '' );
+  const base = ( process.env.REACT_APP_WP_BASE_URL || '' ).replace( /\/+$/{0}, '' );
   const wpJson = base
     ? ( base.endsWith( '/wp-json' ) ? base : `${ base }/wp-json` )
     : ( typeof window !== 'undefined' ? `${ window.location.origin }/wp-json` : '' );
