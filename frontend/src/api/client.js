@@ -133,6 +133,62 @@ function buildApiRequestUrls( endpoint ) {
   return [ `${ API_BASE_URL }${ normalizedEndpoint }` ];
 }
 
+function looksLikeJson( text = '' ) {
+  const trimmed = String( text || '' ).trim();
+  return trimmed.startsWith( '{' ) || trimmed.startsWith( '[' );
+}
+
+async function readJsonEnvelope( response ) {
+  const text = await response.text();
+  if ( ! text ) return null;
+
+  if ( ! looksLikeJson( text ) ) {
+    return null;
+  }
+
+  try {
+    return JSON.parse( text );
+  } catch {
+    return null;
+  }
+}
+
+function nonJsonResponseError( response, url, bodyText = '' ) {
+  const preview = String( bodyText || '' ).trim().slice( 0, 80 );
+  const looksLikeHtml = /^<!doctype\s+html|^<html|^</i.test( preview );
+
+  return {
+    code: 'non_json_response',
+    message: looksLikeHtml
+      ? 'API endpoint returned HTML instead of JSON. The REST route may be missing, redirected, or routed to the site shell.'
+      : 'API endpoint returned a non-JSON response.',
+    status: response.status,
+    url,
+  };
+}
+
+async function parseSuccessfulJsonResponse( response, url ) {
+  const contentType = ( response.headers.get( 'Content-Type' ) || '' ).toLowerCase();
+  const text = await response.text();
+
+  if ( ! text ) return null;
+
+  if ( ! contentType.includes( 'json' ) && ! looksLikeJson( text ) ) {
+    throw nonJsonResponseError( response, url, text );
+  }
+
+  try {
+    return JSON.parse( text );
+  } catch {
+    throw {
+      code: 'invalid_json_response',
+      message: 'API endpoint returned malformed JSON.',
+      status: response.status,
+      url,
+    };
+  }
+}
+
 // ─── Runtime credential bootstrap (backward compat) ──────────────────────────
 // Only attempt the config fetch when a WP base URL is explicitly configured.
 // On GitHub Pages, _wpBase is empty — skip entirely to avoid 404 noise.
@@ -273,8 +329,7 @@ export async function apiClient( endpoint, options = {} ) {
         if ( shouldExpireSession && typeof window !== 'undefined' ) {
           window.dispatchEvent( new Event( 'auth:expired' ) );
         }
-        let envelope = {};
-        try { envelope = await response.json(); } catch { /**/ }
+        const envelope = await readJsonEnvelope( response ) || {};
         throw {
           code:    envelope.code    || 'unauthorized',
           message: envelope.message || 'Authentication required.',
@@ -283,8 +338,7 @@ export async function apiClient( endpoint, options = {} ) {
       }
 
       if ( response.status === 429 ) {
-        let envelope = {};
-        try { envelope = await response.json(); } catch { /**/ }
+        const envelope = await readJsonEnvelope( response ) || {};
         const retryAfterSec = parseInt( response.headers.get( 'Retry-After' ) || '60', 10 );
         const retryAfterMs = retryAfterSec * 1000;
         if ( method === 'GET' ) {
@@ -299,8 +353,7 @@ export async function apiClient( endpoint, options = {} ) {
       }
 
       if ( ! response.ok ) {
-        let envelope = {};
-        try { envelope = await response.json(); } catch { /**/ }
+        const envelope = await readJsonEnvelope( response ) || {};
         lastError = {
           code:    envelope.code    || 'api_error',
           message: envelope.message || `Request failed with status ${ response.status }.`,
@@ -318,7 +371,20 @@ export async function apiClient( endpoint, options = {} ) {
 
       if ( response.status === 204 ) return null;
 
-      return response.json();
+      try {
+        return await parseSuccessfulJsonResponse( response, url );
+      } catch ( error ) {
+        lastError = error;
+
+        // A 200 HTML response is usually the React/WordPress shell caused by a
+        // rewrite/route miss. For GET requests, try alternate REST aliases before
+        // failing the feature. For mutating requests, fail closed.
+        if ( method === 'GET' && [ 'non_json_response', 'invalid_json_response' ].includes( error?.code ) ) {
+          continue;
+        }
+
+        throw error;
+      }
     }
 
     throw lastError || { code: 'network_error', message: 'Network request failed.', status: 0 };
