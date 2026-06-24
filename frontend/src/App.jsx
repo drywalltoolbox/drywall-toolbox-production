@@ -14,6 +14,7 @@ import CartSidebar from './components/shell/CartSidebar';
 import ProtectedRoute from './components/routing/ProtectedRoute';
 import HomepageSignupCTA from './components/cta/HomepageSignupCTA.jsx';
 import MobileInstallNudge from './components/pwa/MobileInstallNudge.jsx';
+import SmartBackButton from './components/navigation/SmartBackButton.jsx';
 import { isRewardsEnabled } from './utils/featureFlags.js';
 import { initializeWebpackPublicPath } from './setWebpackPublicPath.js';
 
@@ -116,6 +117,24 @@ function RedirectToProducts() {
   return <Navigate to={`/products${search || ''}`} replace />;
 }
 
+function getRouteBackConfig(pathname) {
+  if (pathname.startsWith('/repairs/status/')) return { fallbackTo: '/dashboard?tab=repairs', label: 'Back to repairs' };
+  if (pathname.startsWith('/order-tracking/') || pathname.startsWith('/order/')) return { fallbackTo: '/dashboard?tab=orders', label: 'Back to orders' };
+  return null;
+}
+
+function RouteBackBar() {
+  const location = useLocation();
+  const config = getRouteBackConfig(location.pathname);
+  if (!config) return null;
+
+  return (
+    <div className="mx-auto max-w-5xl px-4 pt-5">
+      <SmartBackButton fallbackTo={config.fallbackTo} label={config.label} />
+    </div>
+  );
+}
+
 function AppRoutes() {
   const location = useLocation();
   const rewardsEnabled = isRewardsEnabled();
@@ -213,6 +232,7 @@ function AppShell({ cartOpen, toggleCart, closeCart }) {
     <>
       {!minimalChrome && <Header onCartToggle={toggleCart} />}
       <main className={!isHome && !minimalChrome ? 'main-content' : minimalChrome ? '' : 'main-content home-main'}>
+        <RouteBackBar />
         <AppRoutes />
       </main>
       {!minimalChrome && <Footer />}
