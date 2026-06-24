@@ -31,8 +31,8 @@ const SYSTEM_LINKS = [
 ];
 
 const SERVICE_LINKS = [
-  { to: '/parts', label: 'Replacement Parts', badge: 'Parts' },
-  { to: '/schematics', label: 'Schematics Lookup' },
+  { to: '/schematics', label: 'Schematics' },
+  { to: '/calculators', label: 'Calculators' },
   { to: '/repairs', label: 'Repair Services' },
   { to: '/returns', label: 'Returns Portal' },
   { to: '/contact', label: 'Contact Support' },
