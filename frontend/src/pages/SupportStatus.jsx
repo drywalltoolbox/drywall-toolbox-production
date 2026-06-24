@@ -1,10 +1,12 @@
 import { useMemo, useState } from 'react';
 import { Link, useParams, useSearchParams } from 'react-router-dom';
-import { AlertTriangle, CheckCircle2, Headphones, MessageSquareReply, RefreshCw, Send, ShieldCheck, UserRoundCheck } from 'lucide-react';
+import { AlertTriangle, CheckCircle2, Headphones, MessageSquare, RefreshCw, Send, ShieldCheck, UserRoundCheck } from 'lucide-react';
 import SEOHead from '../components/shared/SEOHead.jsx';
 import SmartBackButton from '../components/navigation/SmartBackButton.jsx';
 import usePublicStatus from '../hooks/usePublicStatus.js';
 import { getSupportStatus, submitSupportReply, SUPPORT_STATUS_LABELS, SUPPORT_TERMINAL_STATUSES } from '../api/statusTracking.js';
+
+const MAX_REPLY_CHARS = 600;
 
 const STATUS_COPY = {
   open: 'Your request is in the support queue.',
@@ -14,6 +16,27 @@ const STATUS_COPY = {
   resolved: 'This ticket has been marked resolved.',
   closed: 'This ticket is closed.',
 };
+
+const SUPPORT_STEPS = [
+  { key: 'open', label: 'Opened' },
+  { key: 'in_progress', label: 'Review' },
+  { key: 'pending_customer', label: 'Response' },
+  { key: 'resolved', label: 'Resolved' },
+];
+
+const SUPPORT_STEP_INDEX = {
+  open: 0,
+  pending_staff: 1,
+  in_progress: 1,
+  pending_customer: 2,
+  resolved: 3,
+  closed: 3,
+  spam: 3,
+};
+
+function formatSupportDisplayId(id) {
+  return id ? `Support #${id}` : 'Support Ticket';
+}
 
 export default function SupportStatus() {
   const { id } = useParams();
@@ -29,10 +52,12 @@ export default function SupportStatus() {
 
   const status = data?.status || 'open';
   const label = data?.label || SUPPORT_STATUS_LABELS[ status ] || 'Support Status';
+  const displayId = formatSupportDisplayId( id );
+  const conversation = toConversation( data?.timeline );
 
   return (
     <main className="min-h-screen bg-slate-50">
-      <SEOHead title={ data ? `${ data.ticket_number } - ${ label } | Drywall Toolbox` : 'Support Status | Drywall Toolbox' } />
+      <SEOHead title={ data ? `${ displayId } - ${ label } | Drywall Toolbox` : 'Support Status | Drywall Toolbox' } />
       <section className="border-b border-slate-200 bg-white">
         <div className="mx-auto max-w-5xl px-4 py-8">
           <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
@@ -46,14 +71,14 @@ export default function SupportStatus() {
               <RefreshCw size={ 16 } className={ loading ? 'animate-spin' : '' } /> Refresh
             </button>
           </div>
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-            <div>
-              <div className="mb-2 inline-flex items-center gap-2 rounded-full bg-blue-50 px-3 py-1.5 text-xs font-semibold uppercase tracking-wide text-blue-700">
-                <Headphones size={ 14 } /> Support Ticket
-              </div>
-              <h1 className="text-3xl font-bold text-slate-950">{ data?.ticket_number || `Ticket #${ id || '' }` }</h1>
-              <p className="mt-2 max-w-2xl text-sm text-slate-600">{ data?.subject || 'Review support replies, send updates, and track the current handling state.' }</p>
+          <div>
+            <div className="mb-2 inline-flex items-center gap-2 rounded-full bg-blue-50 px-3 py-1.5 text-xs font-semibold uppercase tracking-wide text-blue-700">
+              <Headphones size={ 14 } /> Support Ticket
             </div>
+            <h1 className="text-3xl font-bold text-slate-950">{ displayId }</h1>
+            <p className="mt-2 max-w-2xl text-sm text-slate-600">
+              { data?.subject || 'Review support replies, send updates, and track the current handling state.' }
+            </p>
           </div>
         </div>
       </section>
@@ -64,14 +89,14 @@ export default function SupportStatus() {
         ) : error && ! data ? (
           <Notice title="Ticket not available" body={ error } />
         ) : (
-          <div className="grid gap-5 lg:grid-cols-[1fr_360px]">
+          <div className="grid gap-5 lg:grid-cols-[1fr_340px]">
             <div className="space-y-5">
-              <SupportState status={ status } label={ label } />
-              <Conversation events={ toConversation( data?.timeline ) } />
+              <SupportState status={ status } label={ label } events={ conversation } />
+              <Conversation events={ conversation } />
             </div>
             <aside className="space-y-5">
               <ReplyBox ticketId={ id } token={ token } disabled={ SUPPORT_TERMINAL_STATUSES.includes( status ) } status={ status } onSent={ refresh } />
-              <TicketFacts data={ data } />
+              <TicketFacts data={ data } displayId={ displayId } />
             </aside>
           </div>
         ) }
@@ -80,22 +105,73 @@ export default function SupportStatus() {
   );
 }
 
-function SupportState( { status, label } ) {
+function SupportState( { status, label, events = [] } ) {
   const waitingOnCustomer = status === 'pending_customer';
+  const activeIndex = SUPPORT_STEP_INDEX[ status ] ?? 0;
+  const progress = Math.max( 8, ( activeIndex / ( SUPPORT_STEPS.length - 1 ) ) * 100 );
   const Icon = waitingOnCustomer ? UserRoundCheck : status === 'resolved' || status === 'closed' ? ShieldCheck : Headphones;
 
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-      <div className="flex items-start gap-4">
-        <div className={ `flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl ${ waitingOnCustomer ? 'bg-amber-50 text-amber-600' : 'bg-blue-50 text-blue-700' }` }>
-          <Icon size={ 23 } />
+    <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+      <div className="h-1 bg-blue-600" />
+      <div className="space-y-5 p-5">
+        <div className="flex items-start gap-4">
+          <div className={ `flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl ${ waitingOnCustomer ? 'bg-amber-50 text-amber-600' : 'bg-blue-50 text-blue-700' }` }>
+            <Icon size={ 23 } />
+          </div>
+          <div className="min-w-0 flex-1">
+            <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Current Status</p>
+            <h2 className="mt-1 text-xl font-bold text-slate-950">{ label }</h2>
+            <p className="mt-2 text-sm leading-6 text-slate-600">{ STATUS_COPY[ status ] || STATUS_COPY.open }</p>
+          </div>
         </div>
+
         <div>
-          <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Current Status</p>
-          <h2 className="mt-1 text-xl font-bold text-slate-950">{ label }</h2>
-          <p className="mt-2 text-sm leading-6 text-slate-600">{ STATUS_COPY[ status ] || STATUS_COPY.open }</p>
+          <div className="h-1.5 overflow-hidden rounded-full bg-slate-100">
+            <span className="block h-full rounded-full bg-blue-600" style={ { width: `${ progress }%` } } />
+          </div>
+          <div className="mt-3 grid grid-cols-4 gap-2">
+            { SUPPORT_STEPS.map( ( step, index ) => {
+              const complete = index < activeIndex;
+              const active = index === activeIndex;
+              return (
+                <div key={ step.key } className="min-w-0 text-center">
+                  <span className={ `mx-auto flex h-5 w-5 items-center justify-center rounded-full border-2 text-[10px] font-bold ${ complete ? 'border-blue-600 bg-blue-600 text-white' : active ? 'border-blue-600 bg-white text-blue-700' : 'border-slate-300 bg-white text-slate-300' }` }>
+                    { complete ? '✓' : index + 1 }
+                  </span>
+                  <p className={ `mt-1 truncate text-[11px] font-semibold ${ active ? 'text-blue-700' : complete ? 'text-blue-500' : 'text-slate-400' }` }>{ step.label }</p>
+                </div>
+              );
+            } ) }
+          </div>
         </div>
+
+        <SupportProgressUpdates events={ events } />
       </div>
+    </div>
+  );
+}
+
+function SupportProgressUpdates( { events } ) {
+  if ( ! Array.isArray( events ) || events.length === 0 ) return null;
+  const visibleEvents = events.slice( -3 ).reverse();
+  return (
+    <div className="rounded-xl border border-slate-100 bg-slate-50/80 p-3.5">
+      <div className="mb-3 flex items-center justify-between gap-3">
+        <h3 className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Support Updates</h3>
+        <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-400">Latest first</span>
+      </div>
+      <ol className="space-y-3">
+        { visibleEvents.map( ( event, index ) => (
+          <li key={ `${ event.type }-${ event.occurred_at }-${ index }` } className="flex gap-3">
+            <span className="mt-1.5 h-2.5 w-2.5 shrink-0 rounded-full bg-blue-600 ring-4 ring-blue-100" />
+            <div>
+              <p className="text-sm font-semibold leading-snug text-slate-800">{ event.label }</p>
+              <p className="mt-0.5 text-xs text-slate-500">{ formatDate( event.occurred_at ) }</p>
+            </div>
+          </li>
+        ) ) }
+      </ol>
     </div>
   );
 }
@@ -103,19 +179,27 @@ function SupportState( { status, label } ) {
 function Conversation( { events } ) {
   return (
     <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-      <h2 className="text-sm font-semibold text-slate-900">Conversation</h2>
-      <div className="mt-4 space-y-4">
+      <div className="mb-4 flex items-center gap-2">
+        <MessageSquare size={ 16 } className="text-blue-600" />
+        <h2 className="text-sm font-semibold text-slate-900">Messages</h2>
+      </div>
+      <div className="space-y-3">
         { events.length === 0 ? (
           <p className="text-sm text-slate-500">No public conversation updates yet.</p>
-        ) : events.map( ( event, index ) => (
-          <article key={ `${ event.type }-${ event.occurred_at }-${ index }` } className={ `rounded-2xl border p-4 ${ event.actor_type === 'customer' ? 'border-blue-100 bg-blue-50/60' : 'border-slate-200 bg-white' }` }>
-            <div className="mb-2 flex items-center justify-between gap-3">
-              <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">{ event.actor_type === 'customer' ? 'You' : 'Drywall Toolbox Support' }</p>
-              <time className="text-xs text-slate-400">{ formatDate( event.occurred_at ) }</time>
-            </div>
-            <p className="whitespace-pre-line text-sm leading-6 text-slate-700">{ event.body || event.label }</p>
-          </article>
-        ) ) }
+        ) : events.map( ( event, index ) => {
+          const isCustomer = event.actor_type === 'customer';
+          return (
+            <article key={ `${ event.type }-${ event.occurred_at }-${ index }` } className={ `flex ${ isCustomer ? 'justify-end' : 'justify-start' }` }>
+              <div className={ `max-w-[88%] rounded-2xl border px-4 py-3 shadow-sm ${ isCustomer ? 'border-blue-100 bg-blue-50 text-slate-800' : 'border-slate-200 bg-white text-slate-800' }` }>
+                <div className="mb-1.5 flex items-center justify-between gap-3">
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">{ isCustomer ? 'You' : 'Drywall Toolbox Support' }</p>
+                  <time className="text-[11px] text-slate-400">{ formatDate( event.occurred_at ) }</time>
+                </div>
+                <p className="whitespace-pre-line text-sm leading-6">{ event.body || event.label }</p>
+              </div>
+            </article>
+          );
+        } ) }
       </div>
     </div>
   );
@@ -126,17 +210,15 @@ function ReplyBox( { ticketId, token, disabled, status, onSent } ) {
   const [ sending, setSending ] = useState( false );
   const [ error, setError ] = useState( '' );
   const [ sent, setSent ] = useState( false );
-  const remaining = useMemo( () => Math.max( 0, 1000 - message.length ), [ message.length ] );
+  const remaining = useMemo( () => MAX_REPLY_CHARS - message.length, [ message.length ] );
   const closed = disabled || status === 'closed' || status === 'resolved';
+  const canSend = message.trim().length >= 2 && ! closed && ! sending;
 
   const handleSubmit = async ( event ) => {
     event.preventDefault();
+    if ( ! canSend ) return;
     setError( '' );
     setSent( false );
-    if ( message.trim().length < 2 ) {
-      setError( 'Please enter a reply before sending.' );
-      return;
-    }
     setSending( true );
     try {
       await submitSupportReply( ticketId, token, message.trim() );
@@ -151,63 +233,50 @@ function ReplyBox( { ticketId, token, disabled, status, onSent } ) {
   };
 
   return (
-    <form onSubmit={ handleSubmit } className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-      <div className="relative overflow-hidden bg-gradient-to-br from-slate-950 via-blue-950 to-blue-700 p-5 text-white">
-        <div className="absolute inset-0 opacity-30 [background-image:radial-gradient(circle_at_2px_2px,rgba(255,255,255,.22)_1px,transparent_0)] [background-size:22px_22px]" aria-hidden="true" />
-        <div className="relative flex items-start gap-3">
-          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-white/10 ring-1 ring-white/15">
-            <MessageSquareReply size={ 19 } />
+    <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+      <div className="mb-2 flex items-center gap-2">
+        <MessageSquare size={ 16 } className="text-blue-600" />
+        <h3 className="text-sm font-semibold text-slate-800">Send an Update</h3>
+      </div>
+      <p className="mb-3 text-xs text-slate-500">
+        { closed ? 'This ticket is closed. Open a new support request if you need more help.' : 'Share details with our support team. This is not live chat.' }
+      </p>
+
+      <form onSubmit={ handleSubmit } className="space-y-3">
+        <textarea
+          value={ message }
+          onChange={ ( event ) => setMessage( event.target.value.slice( 0, MAX_REPLY_CHARS ) ) }
+          disabled={ closed || sending }
+          maxLength={ MAX_REPLY_CHARS }
+          rows={ 4 }
+          placeholder={ closed ? 'This ticket is closed.' : 'Add details for our support team...' }
+          className="w-full resize-y rounded-xl border border-slate-300 px-3 py-2.5 text-sm text-slate-700 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-slate-100 disabled:text-slate-500"
+        />
+
+        <div className="flex items-center justify-between gap-2">
+          <span className={ `text-xs ${ remaining < 80 ? 'text-amber-600' : 'text-slate-400' }` }>
+            { remaining } characters remaining
           </span>
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-blue-100">Support reply</p>
-            <h2 className="mt-1 text-lg font-bold">Send an update</h2>
-            <p className="mt-1 text-sm leading-5 text-blue-100/90">
-              { closed ? 'This ticket is closed. Contact support if you need to open a new request.' : 'Add context, order details, photos links, or any update our team should review.' }
-            </p>
-          </div>
+          <button
+            type="submit"
+            disabled={ ! canSend }
+            className="inline-flex h-10 items-center gap-1.5 rounded-xl bg-blue-600 px-4 text-sm font-semibold text-white transition-colors hover:bg-blue-700 disabled:bg-blue-300"
+          >
+            { sending ? <RefreshCw size={ 14 } className="animate-spin" /> : <Send size={ 14 } /> }
+            { sending ? 'Sending…' : 'Send Update' }
+          </button>
         </div>
-      </div>
+      </form>
 
-      <div className="space-y-3 p-5">
-        <label htmlFor="support-reply-message" className="sr-only">Reply message</label>
-        <div className="rounded-2xl border border-slate-200 bg-slate-50 p-2 transition focus-within:border-blue-300 focus-within:bg-white focus-within:ring-4 focus-within:ring-blue-50">
-          <textarea
-            id="support-reply-message"
-            value={ message }
-            onChange={ ( event ) => setMessage( event.target.value.slice( 0, 1000 ) ) }
-            disabled={ closed || sending }
-            rows={ 7 }
-            className="min-h-[168px] w-full resize-none rounded-xl border-0 bg-transparent px-3 py-2 text-sm leading-6 text-slate-900 outline-none placeholder:text-slate-400 disabled:cursor-not-allowed disabled:text-slate-500"
-            placeholder={ closed ? 'This ticket is closed.' : 'Type your reply here…' }
-          />
-          <div className="flex items-center justify-between border-t border-slate-200 px-3 py-2 text-[11px] font-semibold uppercase tracking-wide text-slate-400">
-            <span>{ closed ? 'Replies disabled' : 'Secure customer reply' }</span>
-            <span>{ remaining } characters left</span>
-          </div>
-        </div>
-
-        { error && <p className="rounded-xl bg-red-50 px-3 py-2 text-xs font-semibold text-red-700">{ error }</p> }
-        { sent && (
-          <p className="inline-flex items-center gap-2 rounded-xl bg-emerald-50 px-3 py-2 text-xs font-semibold text-emerald-700">
-            <CheckCircle2 size={ 14 } /> Reply sent.
-          </p>
-        ) }
-
-        <button
-          type="submit"
-          disabled={ closed || sending || message.trim().length < 2 }
-          className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-blue-700 px-4 py-3 text-sm font-bold text-white shadow-sm shadow-blue-700/20 transition hover:bg-blue-800 disabled:cursor-not-allowed disabled:bg-slate-300 disabled:shadow-none"
-        >
-          { sending ? <RefreshCw size={ 16 } className="animate-spin" /> : <Send size={ 16 } /> }
-          { closed ? 'Ticket closed' : sending ? 'Sending reply…' : 'Send Reply' }
-        </button>
-      </div>
-    </form>
+      { error && <p className="mt-2 text-xs text-red-600" role="alert">{ error }</p> }
+      { sent && <p className="mt-2 text-xs text-green-700" role="status">Reply sent.</p> }
+    </div>
   );
 }
 
-function TicketFacts( { data } ) {
+function TicketFacts( { data, displayId } ) {
   const facts = [
+    [ 'Ticket', displayId ],
     [ 'Type', formatSlug( data?.ticket_type ) ],
     [ 'Priority', formatSlug( data?.priority ) ],
     [ 'Opened', formatDate( data?.created_at ) ],
@@ -218,9 +287,9 @@ function TicketFacts( { data } ) {
     <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
       <h2 className="text-sm font-semibold text-slate-900">Ticket Details</h2>
       <dl className="mt-4 space-y-3">
-        { facts.map( ( [ label, value ] ) => (
-          <div key={ label }>
-            <dt className="text-xs font-semibold uppercase tracking-wide text-slate-400">{ label }</dt>
+        { facts.map( ( [ factLabel, value ] ) => (
+          <div key={ factLabel }>
+            <dt className="text-xs font-semibold uppercase tracking-wide text-slate-400">{ factLabel }</dt>
             <dd className="mt-1 text-sm text-slate-800">{ value }</dd>
           </div>
         ) ) }
@@ -246,7 +315,7 @@ function toConversation( timeline ) {
     .filter( ( event ) => event?.type === 'ticket.created' || event?.type === 'ticket.reply_customer' || event?.type === 'ticket.reply_staff' )
     .map( ( event ) => ( {
       ...event,
-      label: event.type === 'ticket.created' ? 'Ticket opened' : 'Support updated the ticket',
+      label: event.type === 'ticket.created' ? 'Ticket opened' : event.actor_type === 'customer' ? 'Customer reply sent' : 'Support replied',
     } ) )
     .sort( ( a, b ) => new Date( a.occurred_at ) - new Date( b.occurred_at ) );
 }
