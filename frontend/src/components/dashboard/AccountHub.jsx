@@ -145,8 +145,6 @@ export default function AccountHub() {
     if ( ! user?.id || activeTabId !== 'overview' ) return undefined;
     let cancelled = false;
 
-    setOrdersLoading( true );
-
     Promise.allSettled( [
       getCustomerOrders( user.id, 1, 50 ),
       getCustomerRepairs( 1, 50 ),
