@@ -7,7 +7,7 @@
  * and resource hints.
  *
  * Props:
- *   title       {string}          — page title (appended with "| Drywall Toolbox")
+ *   title       {string}          — page title; non-product pages receive "| Drywall Toolbox"
  *   description {string}          — meta description (truncated to 160 chars)
  *   canonical   {string}          — canonical URL override
  *   og          {object}          — Open Graph overrides: { type, image, imageAlt }
@@ -23,6 +23,59 @@ const SITE_URL       = 'https://drywalltoolbox.com';
 const DEFAULT_OG_IMG = `${SITE_URL}/logo-black.svg`;
 const MAX_DESC_LEN   = 160;
 
+const STATIC_ROUTE_TITLES = {
+  '/': '',
+  '/products': 'Products',
+  '/products/brands': 'Brands',
+  '/parts': 'Parts',
+  '/schematics': 'Schematics',
+  '/repairs': 'Repairs',
+  '/repairs/start': 'Start a Repair',
+  '/repairs/packages': 'Repair Packages',
+  '/repairs/track': 'Track a Repair',
+  '/faq': 'FAQ',
+  '/calculators': 'Calculators',
+  '/shipping-policy': 'Shipping Policy',
+  '/returns': 'Returns',
+  '/policies': 'Store Policies',
+  '/cart': 'Cart',
+  '/checkout': 'Checkout',
+  '/checkout/complete': 'Order Complete',
+  '/checkout/payment-failed': 'Payment Failed',
+  '/checkout/payment-cancelled': 'Payment Cancelled',
+  '/contact': 'Contact',
+  '/login': 'Sign In',
+  '/register': 'Create Account',
+  '/forgot-password': 'Forgot Password',
+  '/reset-password': 'Reset Password',
+  '/dashboard': 'Account Dashboard',
+  '/account-settings': 'Account Settings',
+  '/addresses': 'Addresses',
+  '/notifications': 'Notifications',
+};
+
+function currentPathname() {
+  if (typeof window === 'undefined') return '';
+  return window.location.pathname.replace(/\/+$/, '') || '/';
+}
+
+function routeTitleFor(pathname) {
+  if (!pathname) return '';
+  return STATIC_ROUTE_TITLES[pathname] || '';
+}
+
+function stripSiteName(title) {
+  return String(title || '')
+    .replace(new RegExp(`\\s*(?:\\||-|—)\\s*${SITE_NAME}\\s*$`, 'i'), '')
+    .trim();
+}
+
+function normalizeBrowserTitle(title, pathname, noSuffix) {
+  const routeTitle = noSuffix ? '' : routeTitleFor(pathname);
+  const cleanTitle = stripSiteName(title);
+  return routeTitle || cleanTitle;
+}
+
 export default function SEOHead({
   title       = '',
   description = '',
@@ -33,10 +86,10 @@ export default function SEOHead({
   noindex     = false,
   links       = [],
 }) {
-  // Build final title — product pages with a full custom title pass noSuffix=true
-  // to use their full 60-char budget. All other pages get "| Drywall Toolbox" appended.
-  const fullTitle = title
-    ? (noSuffix ? title : `${title} | ${SITE_NAME}`)
+  const pathname = currentPathname();
+  const browserTitle = normalizeBrowserTitle(title, pathname, noSuffix);
+  const fullTitle = browserTitle
+    ? (noSuffix ? browserTitle : `${browserTitle} | ${SITE_NAME}`)
     : SITE_NAME;
 
   // Truncate description
