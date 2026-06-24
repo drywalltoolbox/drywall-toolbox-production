@@ -1,5 +1,5 @@
 import { BrowserRouter as Router, Routes, Route, useLocation, Navigate, useNavigate } from 'react-router-dom';
-import { useState, useEffect, lazy, Suspense, useCallback } from 'react';
+import { useState, useEffect, useLayoutEffect, lazy, Suspense, useCallback } from 'react';
 import PageTransition from './components/routing/PageTransition';
 import LoadingSpinner from './components/shared/LoadingSpinner';
 import { CartProvider } from './context/CartContext';
@@ -107,8 +107,50 @@ function PageLoader() {
 }
 
 function ScrollToTop() {
-  const { pathname } = useLocation();
-  useEffect(() => { window.scrollTo(0, 0); }, [pathname]);
+  const { pathname, hash } = useLocation();
+
+  useEffect(() => {
+    if (typeof window === 'undefined' || !('scrollRestoration' in window.history)) {
+      return undefined;
+    }
+
+    const previousScrollRestoration = window.history.scrollRestoration;
+    window.history.scrollRestoration = 'manual';
+
+    return () => {
+      window.history.scrollRestoration = previousScrollRestoration;
+    };
+  }, []);
+
+  useLayoutEffect(() => {
+    if (typeof window === 'undefined') return undefined;
+
+    const scrollToRouteStart = () => {
+      if (hash) {
+        const target = document.getElementById(decodeURIComponent(hash.slice(1)));
+        if (target) {
+          target.scrollIntoView({ block: 'start', behavior: 'auto' });
+          return;
+        }
+      }
+
+      window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+
+      document.querySelectorAll('[data-route-scroll-container]').forEach((element) => {
+        element.scrollTop = 0;
+      });
+    };
+
+    scrollToRouteStart();
+    const frame = window.requestAnimationFrame(scrollToRouteStart);
+
+    return () => {
+      window.cancelAnimationFrame(frame);
+    };
+  }, [pathname, hash]);
+
   return null;
 }
 
@@ -211,6 +253,7 @@ function App() {
           <CartProvider>
             <WorkflowTransitionProvider>
               <Router basename={basename}>
+                <ScrollToTop />
                 <AppShell cartOpen={cartOpen} toggleCart={toggleCart} closeCart={closeCart} />
               </Router>
             </WorkflowTransitionProvider>
