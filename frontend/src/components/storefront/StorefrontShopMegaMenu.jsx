@@ -5,7 +5,6 @@ import {
   Boxes,
   ChevronDown,
   ChevronRight,
-  ClipboardList,
   PackageSearch,
   ShieldCheck,
   Tags,
