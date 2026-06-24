@@ -21,6 +21,27 @@ function rejectedMessage(result, fallback) {
   return result.reason?.message || fallback;
 }
 
+async function fetchAccountHistory() {
+  const [ordersResult, repairsResult, returnsResult] = await Promise.allSettled([
+    getOrders(1, 50),
+    getCustomerRepairs(1, 50),
+    getCustomerReturns(1, 50),
+  ]);
+
+  return {
+    data: {
+      orders: ordersResult.status === 'fulfilled' ? normalizeOrders(ordersResult.value) : [],
+      repairs: repairsResult.status === 'fulfilled' ? normalizeRepairs(repairsResult.value) : [],
+      returns: returnsResult.status === 'fulfilled' ? normalizeReturns(returnsResult.value) : [],
+    },
+    errors: {
+      orders: rejectedMessage(ordersResult, 'Orders are temporarily unavailable.'),
+      repairs: rejectedMessage(repairsResult, 'Repairs are temporarily unavailable.'),
+      returns: rejectedMessage(returnsResult, 'Returns are temporarily unavailable.'),
+    },
+  };
+}
+
 export default function OrdersTab() {
   const [data, setData] = useState({ orders: [], repairs: [], returns: [] });
   const [loading, setLoading] = useState(true);
@@ -31,30 +52,24 @@ export default function OrdersTab() {
     setLoading(true);
     setErrors({ orders: '', repairs: '', returns: '' });
 
-    const [ordersResult, repairsResult, returnsResult] = await Promise.allSettled([
-      getOrders(1, 50),
-      getCustomerRepairs(1, 50),
-      getCustomerReturns(1, 50),
-    ]);
-
-    setData({
-      orders: ordersResult.status === 'fulfilled' ? normalizeOrders(ordersResult.value) : [],
-      repairs: repairsResult.status === 'fulfilled' ? normalizeRepairs(repairsResult.value) : [],
-      returns: returnsResult.status === 'fulfilled' ? normalizeReturns(returnsResult.value) : [],
-    });
-
-    setErrors({
-      orders: rejectedMessage(ordersResult, 'Orders are temporarily unavailable.'),
-      repairs: rejectedMessage(repairsResult, 'Repairs are temporarily unavailable.'),
-      returns: rejectedMessage(returnsResult, 'Returns are temporarily unavailable.'),
-    });
-
+    const nextState = await fetchAccountHistory();
+    setData(nextState.data);
+    setErrors(nextState.errors);
     setLoading(false);
   }, []);
 
   useEffect(() => {
-    loadHistory();
-  }, [loadHistory]);
+    let cancelled = false;
+
+    fetchAccountHistory().then((nextState) => {
+      if (cancelled) return;
+      setData(nextState.data);
+      setErrors(nextState.errors);
+      setLoading(false);
+    });
+
+    return () => { cancelled = true; };
+  }, []);
 
   const activity = useMemo(() => buildAccountActivity(data), [data]);
   const filteredActivity = useMemo(() => {
