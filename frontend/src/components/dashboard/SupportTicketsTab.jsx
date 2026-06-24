@@ -5,6 +5,10 @@ import { getCustomerSupportTickets } from '../../api/support.js';
 import { buildAccountActivity, normalizeSupportTickets } from '../../utils/accountActivity.js';
 import AccountActivityList from '../account/AccountActivityList.jsx';
 
+async function fetchTickets() {
+  return normalizeSupportTickets(await getCustomerSupportTickets(1, 50));
+}
+
 export default function SupportTicketsTab() {
   const [tickets, setTickets] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -14,7 +18,7 @@ export default function SupportTicketsTab() {
     setLoading(true);
     setError('');
     try {
-      setTickets(normalizeSupportTickets(await getCustomerSupportTickets(1, 50)));
+      setTickets(await fetchTickets());
     } catch {
       setTickets([]);
       setError('Support tickets are temporarily unavailable. Please try again shortly.');
@@ -24,8 +28,22 @@ export default function SupportTicketsTab() {
   }, []);
 
   useEffect(() => {
-    loadTickets();
-  }, [loadTickets]);
+    let cancelled = false;
+    fetchTickets()
+      .then((items) => {
+        if (cancelled) return;
+        setTickets(items);
+      })
+      .catch(() => {
+        if (cancelled) return;
+        setTickets([]);
+        setError('Support tickets are temporarily unavailable. Please try again shortly.');
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+    return () => { cancelled = true; };
+  }, []);
 
   const activity = useMemo(() => buildAccountActivity({ supportTickets: tickets }), [tickets]);
 
