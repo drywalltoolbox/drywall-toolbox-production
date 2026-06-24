@@ -9,6 +9,18 @@ body.dtb-payment-runtime {
 	box-sizing: border-box;
 }
 
+.dtb-sr-only {
+	position: absolute !important;
+	width: 1px !important;
+	height: 1px !important;
+	padding: 0 !important;
+	margin: -1px !important;
+	overflow: hidden !important;
+	clip: rect(0, 0, 0, 0) !important;
+	white-space: nowrap !important;
+	border: 0 !important;
+}
+
 .dtb-payment-shell {
 	min-height: 100vh;
 	padding: 38px 16px 56px;
@@ -214,6 +226,33 @@ body.dtb-payment-runtime {
 	background: #2563eb;
 }
 
+.dtb-payment-provider-label--logo-only {
+	justify-content: flex-start;
+}
+
+.dtb-payment-provider-label--logo-only img,
+.dtb-payment-provider-label--logo-only svg {
+	max-width: 132px;
+	max-height: 26px;
+	width: auto;
+	height: auto;
+	object-fit: contain;
+	display: inline-block;
+}
+
+.dtb-payment-provider-label--afterpay img,
+.dtb-payment-provider-label--afterpay svg {
+	max-width: 168px;
+	max-height: 30px;
+}
+
+.dtb-payment-provider-label--klarna img,
+.dtb-payment-provider-label--klarna svg,
+.dtb-payment-provider-label--affirm img,
+.dtb-payment-provider-label--affirm svg {
+	max-height: 24px;
+}
+
 .dtb-payment-runtime .payment_box {
 	margin: 0;
 	border-top: 1px solid #e2e8f0;
@@ -358,9 +397,15 @@ body.dtb-payment-runtime {
 	border: 1px solid #bfdbfe;
 	border-radius: 12px;
 	background: #eff6ff;
-	padding: 13px 15px;
 	color: #1e3a8a;
-	list-style: none;
+	padding: 13px 15px;
+	font-weight: 700;
+}
+
+.dtb-payment-runtime .woocommerce-error {
+	border-color: #fecaca;
+	background: #fef2f2;
+	color: #991b1b;
 }
 
 @media (max-width: 720px) {
@@ -370,21 +415,23 @@ body.dtb-payment-runtime {
 
 	.dtb-payment-card {
 		min-height: 100vh;
-		border-width: 0;
 		border-radius: 0;
+		border: 0;
 	}
 
-	.dtb-payment-brand {
-		align-items: center;
+	.dtb-payment-content {
+		padding: 16px;
 	}
 
 	.dtb-payment-runtime table.shop_table th,
 	.dtb-payment-runtime table.shop_table td {
-		padding: 12px;
+		padding: 13px 12px;
+		font-size: 13px;
 	}
 
 	.dtb-payment-runtime .form-row.place-order {
-		display: grid;
+		flex-direction: column;
+		align-items: stretch;
 	}
 
 	.dtb-payment-runtime .form-row.place-order #place_order {
