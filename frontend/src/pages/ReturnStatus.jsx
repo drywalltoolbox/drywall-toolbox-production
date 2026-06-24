@@ -38,6 +38,7 @@ export default function ReturnStatus() {
 
   const status = data?.status || 'pending_review';
   const label = data?.label || RETURN_STATUS_LABELS[ status ] || 'Return Status';
+  const timeline = toTimeline( data );
 
   return (
     <main className="min-h-screen bg-neutral-50">
@@ -77,9 +78,8 @@ export default function ReturnStatus() {
         ) : (
           <div className="grid gap-5 lg:grid-cols-[1fr_320px]">
             <div className="space-y-5">
-              <StatusPanel status={ status } label={ label } loading={ loading && ! data } />
+              <StatusPanel status={ status } label={ label } loading={ loading && ! data } events={ timeline } />
               <ReturnDetails data={ data } />
-              <Timeline events={ toTimeline( data ) } />
             </div>
             <aside className="space-y-5">
               <NextStep status={ status } />
@@ -96,7 +96,7 @@ export default function ReturnStatus() {
   );
 }
 
-function StatusPanel( { status, label, loading } ) {
+function StatusPanel( { status, label, loading, events = [] } ) {
   const active = STEP_INDEX[ status ] ?? 0;
   return (
     <div className="rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm">
@@ -121,6 +121,31 @@ function StatusPanel( { status, label, loading } ) {
           );
         } ) }
       </div>
+      <ProgressUpdates events={ events } />
+    </div>
+  );
+}
+
+function ProgressUpdates( { events } ) {
+  if ( ! Array.isArray( events ) || events.length === 0 ) return null;
+  const visibleEvents = events.slice( -4 ).reverse();
+  return (
+    <div className="mt-5 rounded-xl border border-neutral-100 bg-neutral-50/80 p-3.5">
+      <div className="mb-3 flex items-center justify-between gap-3">
+        <h3 className="text-[10px] font-bold uppercase tracking-widest text-neutral-400">Return Progress</h3>
+        <span className="text-[10px] font-semibold uppercase tracking-wider text-neutral-400">Latest first</span>
+      </div>
+      <ol className="space-y-3">
+        { visibleEvents.map( ( event, index ) => (
+          <li key={ `${ event.label }-${ event.occurred_at }-${ index }` } className="flex gap-3">
+            <span className="mt-1.5 h-2.5 w-2.5 shrink-0 rounded-full bg-emerald-500 ring-4 ring-emerald-100" />
+            <div>
+              <p className="text-sm font-semibold leading-snug text-neutral-800">{ event.label }</p>
+              <p className="mt-0.5 text-xs text-neutral-500">{ formatDate( event.occurred_at ) }</p>
+            </div>
+          </li>
+        ) ) }
+      </ol>
     </div>
   );
 }
@@ -165,25 +190,6 @@ function NextStep( { status } ) {
     <div className="rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm">
       <h2 className="text-sm font-semibold text-neutral-900">Next Step</h2>
       <p className="mt-2 text-sm leading-6 text-neutral-600">{ copy[ status ] || copy.pending_review }</p>
-    </div>
-  );
-}
-
-function Timeline( { events } ) {
-  return (
-    <div className="rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm">
-      <h2 className="text-sm font-semibold text-neutral-900">Return Timeline</h2>
-      <ol className="mt-4 space-y-3">
-        { events.map( ( event, index ) => (
-          <li key={ `${ event.label }-${ index }` } className="flex gap-3">
-            <span className="mt-1 h-2.5 w-2.5 rounded-full bg-emerald-500" />
-            <div>
-              <p className="text-sm font-semibold text-neutral-800">{ event.label }</p>
-              <p className="text-xs text-neutral-500">{ formatDate( event.occurred_at ) }</p>
-            </div>
-          </li>
-        ) ) }
-      </ol>
     </div>
   );
 }
