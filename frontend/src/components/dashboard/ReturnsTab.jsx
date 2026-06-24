@@ -15,8 +15,9 @@ export default function ReturnsTab() {
     setError('');
     try {
       setReturns(normalizeReturns(await getCustomerReturns(1, 50)));
-    } catch (err) {
-      setError(err?.message || 'Unable to load return requests.');
+    } catch {
+      setReturns([]);
+      setError('Returns are temporarily unavailable. Please try again shortly.');
     } finally {
       setLoading(false);
     }
