@@ -1,6 +1,7 @@
 import { Link, useParams, useSearchParams } from 'react-router-dom';
 import { AlertTriangle, Box, CheckCircle2, ClipboardCheck, PackageCheck, RefreshCw, RotateCcw, Truck } from 'lucide-react';
 import SEOHead from '../components/shared/SEOHead.jsx';
+import SmartBackButton from '../components/navigation/SmartBackButton.jsx';
 import usePublicStatus from '../hooks/usePublicStatus.js';
 import { getReturnStatus, RETURN_STATUS_LABELS, RETURN_TERMINAL_STATUSES } from '../api/statusTracking.js';
 
@@ -43,9 +44,20 @@ export default function ReturnStatus() {
       <SEOHead title={ data ? `Return ${ data.return_number } - ${ label } | Drywall Toolbox` : 'Return Status | Drywall Toolbox' } />
       <section className="border-b border-neutral-200 bg-white">
         <div className="mx-auto max-w-5xl px-4 py-8">
+          <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
+            <SmartBackButton fallbackTo="/dashboard?tab=returns" label="Back to returns" />
+            <button
+              type="button"
+              onClick={ refresh }
+              disabled={ loading || needsToken }
+              className="inline-flex items-center justify-center gap-2 rounded-full border border-neutral-300 bg-white px-3 py-2 text-sm font-semibold text-neutral-800 shadow-sm hover:bg-neutral-50 disabled:opacity-50"
+            >
+              <RefreshCw size={ 16 } className={ loading ? 'animate-spin' : '' } /> Refresh
+            </button>
+          </div>
           <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
             <div>
-              <div className="mb-2 inline-flex items-center gap-2 rounded bg-emerald-50 px-2.5 py-1 text-xs font-semibold uppercase tracking-wide text-emerald-700">
+              <div className="mb-2 inline-flex items-center gap-2 rounded-full bg-emerald-50 px-3 py-1.5 text-xs font-semibold uppercase tracking-wide text-emerald-700">
                 <RotateCcw size={ 14 } /> Return Tracking
               </div>
               <h1 className="text-3xl font-bold text-neutral-950">{ data?.return_number || `Return #${ id || '' }` }</h1>
@@ -53,14 +65,6 @@ export default function ReturnStatus() {
                 Track approval, item receipt, and refund or exchange progress from one customer-safe view.
               </p>
             </div>
-            <button
-              type="button"
-              onClick={ refresh }
-              disabled={ loading || needsToken }
-              className="inline-flex items-center justify-center gap-2 rounded border border-neutral-300 bg-white px-3 py-2 text-sm font-semibold text-neutral-800 hover:bg-neutral-50 disabled:opacity-50"
-            >
-              <RefreshCw size={ 16 } className={ loading ? 'animate-spin' : '' } /> Refresh
-            </button>
           </div>
         </div>
       </section>
@@ -79,7 +83,7 @@ export default function ReturnStatus() {
             </div>
             <aside className="space-y-5">
               <NextStep status={ status } />
-              <div className="rounded border border-neutral-200 bg-white p-5">
+              <div className="rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm">
                 <h2 className="text-sm font-semibold text-neutral-900">Need a hand?</h2>
                 <p className="mt-2 text-sm text-neutral-600">Questions about packaging, eligibility, or timing can be handled by support.</p>
                 <Link to="/contact" className="mt-4 inline-flex text-sm font-semibold text-blue-700 hover:text-blue-800">Contact support</Link>
@@ -95,13 +99,13 @@ export default function ReturnStatus() {
 function StatusPanel( { status, label, loading } ) {
   const active = STEP_INDEX[ status ] ?? 0;
   return (
-    <div className="rounded border border-neutral-200 bg-white p-5">
+    <div className="rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm">
       <div className="mb-5 flex items-center justify-between gap-4">
         <div>
           <p className="text-xs font-semibold uppercase tracking-wide text-neutral-500">Current Status</p>
           <h2 className="mt-1 text-xl font-bold text-neutral-950">{ loading ? 'Loading...' : label }</h2>
         </div>
-        <span className="rounded bg-emerald-50 px-3 py-1 text-sm font-semibold text-emerald-700">{ Math.min( 100, ( active + 1 ) * 20 ) }%</span>
+        <span className="rounded-full bg-emerald-50 px-3 py-1 text-sm font-semibold text-emerald-700">{ Math.min( 100, ( active + 1 ) * 20 ) }%</span>
       </div>
       <div className="grid grid-cols-5 gap-2">
         { STEPS.map( ( step, index ) => {
@@ -109,7 +113,7 @@ function StatusPanel( { status, label, loading } ) {
           const complete = index <= active;
           return (
             <div key={ step.key } className="min-w-0">
-              <div className={ `flex h-10 items-center justify-center rounded ${ complete ? 'bg-emerald-600 text-white' : 'bg-neutral-100 text-neutral-400' }` }>
+              <div className={ `flex h-10 items-center justify-center rounded-xl ${ complete ? 'bg-emerald-600 text-white' : 'bg-neutral-100 text-neutral-400' }` }>
                 <Icon size={ 18 } />
               </div>
               <p className="mt-2 truncate text-center text-[11px] font-semibold text-neutral-600">{ step.label }</p>
@@ -131,7 +135,7 @@ function ReturnDetails( { data } ) {
   ].filter( ( [ , value ] ) => value );
 
   return (
-    <div className="rounded border border-neutral-200 bg-white p-5">
+    <div className="rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm">
       <h2 className="text-sm font-semibold text-neutral-900">Return Details</h2>
       <dl className="mt-4 grid gap-3 sm:grid-cols-2">
         { items.map( ( [ label, value ] ) => (
@@ -158,7 +162,7 @@ function NextStep( { status } ) {
   };
 
   return (
-    <div className="rounded border border-neutral-200 bg-white p-5">
+    <div className="rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm">
       <h2 className="text-sm font-semibold text-neutral-900">Next Step</h2>
       <p className="mt-2 text-sm leading-6 text-neutral-600">{ copy[ status ] || copy.pending_review }</p>
     </div>
@@ -167,7 +171,7 @@ function NextStep( { status } ) {
 
 function Timeline( { events } ) {
   return (
-    <div className="rounded border border-neutral-200 bg-white p-5">
+    <div className="rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm">
       <h2 className="text-sm font-semibold text-neutral-900">Return Timeline</h2>
       <ol className="mt-4 space-y-3">
         { events.map( ( event, index ) => (
@@ -186,7 +190,7 @@ function Timeline( { events } ) {
 
 function Notice( { title, body, tone = 'neutral' } ) {
   return (
-    <div className="mx-auto max-w-md rounded border border-neutral-200 bg-white p-6 text-center">
+    <div className="mx-auto max-w-md rounded-2xl border border-neutral-200 bg-white p-6 text-center shadow-sm">
       <AlertTriangle className={ `mx-auto mb-3 ${ tone === 'warning' ? 'text-amber-500' : 'text-neutral-400' }` } />
       <h1 className="text-lg font-bold text-neutral-900">{ title }</h1>
       <p className="mt-2 text-sm text-neutral-600">{ body }</p>
