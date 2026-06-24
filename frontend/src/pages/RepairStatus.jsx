@@ -11,7 +11,6 @@ import { Search, AlertTriangle, SearchX, RefreshCw } from 'lucide-react';
 import SEOHead from '../components/shared/SEOHead.jsx';
 import useRepairStatus from '../hooks/useRepairStatus.js';
 import RepairStatusTracker from '../components/repairs/RepairStatusTracker.jsx';
-import RepairTimeline from '../components/repairs/RepairTimeline.jsx';
 import RepairQuoteReview from '../components/repairs/RepairQuoteReview.jsx';
 import RepairIntegrationNotice from '../components/repairs/RepairIntegrationNotice.jsx';
 import RepairUpdateComposer from '../components/repairs/RepairUpdateComposer.jsx';
@@ -37,26 +36,26 @@ function TokenEntryForm({ onSubmit }) {
   };
 
   return (
-    <div className="min-h-[60vh] flex items-center justify-center px-4">
+    <div className="flex min-h-[60vh] items-center justify-center px-4">
       <motion.div
         initial={{ opacity: 0, y: 24 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }}
         className="w-full max-w-md"
       >
-        <div className="text-center mb-8">
-          <div className="w-14 h-14 rounded-2xl bg-blue-50 flex items-center justify-center mx-auto mb-4 shadow-sm">
+        <div className="mb-8 text-center">
+          <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-50 shadow-sm">
             <Search size={26} className="text-blue-500" strokeWidth={1.75} />
           </div>
           <h1 className="text-2xl font-bold text-neutral-900">Track Your Repair</h1>
-          <p className="text-sm text-neutral-500 mt-2">
+          <p className="mt-2 text-sm text-neutral-500">
             Enter your repair number and the tracking token from your confirmation email.
           </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="bg-white rounded-2xl border border-neutral-200 shadow-sm p-6 space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4 rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm">
           <div>
-            <label htmlFor="repair-id" className="block text-xs font-semibold text-neutral-500 uppercase tracking-wider mb-1.5">
+            <label htmlFor="repair-id" className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-neutral-500">
               Repair Number
             </label>
             <input
@@ -65,12 +64,12 @@ function TokenEntryForm({ onSubmit }) {
               value={repairId}
               onChange={(event) => setRepairId(event.target.value)}
               placeholder="e.g. 1042"
-              className="w-full px-3.5 py-2.5 text-sm border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all bg-neutral-50 focus:bg-white"
+              className="w-full rounded-xl border border-neutral-200 bg-neutral-50 px-3.5 py-2.5 text-sm transition-all focus:border-transparent focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
               autoComplete="off"
             />
           </div>
           <div>
-            <label htmlFor="repair-token" className="block text-xs font-semibold text-neutral-500 uppercase tracking-wider mb-1.5">
+            <label htmlFor="repair-token" className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-neutral-500">
               Tracking Token
             </label>
             <input
@@ -79,7 +78,7 @@ function TokenEntryForm({ onSubmit }) {
               value={token}
               onChange={(event) => setToken(event.target.value)}
               placeholder="From your confirmation email"
-              className="w-full px-3.5 py-2.5 text-sm border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all bg-neutral-50 focus:bg-white"
+              className="w-full rounded-xl border border-neutral-200 bg-neutral-50 px-3.5 py-2.5 text-sm transition-all focus:border-transparent focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
               autoComplete="off"
             />
           </div>
@@ -90,7 +89,7 @@ function TokenEntryForm({ onSubmit }) {
                 initial={{ opacity: 0, height: 0 }}
                 animate={{ opacity: 1, height: 'auto' }}
                 exit={{ opacity: 0, height: 0 }}
-                className="text-xs text-red-600 overflow-hidden"
+                className="overflow-hidden text-xs text-red-600"
                 role="alert"
               >
                 {error}
@@ -100,13 +99,13 @@ function TokenEntryForm({ onSubmit }) {
 
           <button
             type="submit"
-            className="w-full px-4 py-2.5 bg-blue-600 hover:bg-blue-700 active:scale-[0.98] text-white text-sm font-semibold rounded-xl transition-all"
+            className="w-full rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white transition-all hover:bg-blue-700 active:scale-[0.98]"
           >
             Look Up Repair →
           </button>
         </form>
 
-        <p className="text-center text-xs text-neutral-400 mt-4">
+        <p className="mt-4 text-center text-xs text-neutral-400">
           Need help? <Link to="/contact" className="text-blue-600 hover:underline">Contact us</Link>
         </p>
       </motion.div>
@@ -120,9 +119,9 @@ function Skeleton({ className }) {
 
 function StatusSkeleton() {
   return (
-    <div className="bg-white rounded-2xl border border-neutral-200 shadow-sm p-6 space-y-4">
+    <div className="space-y-4 rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm">
       <div className="flex items-center gap-3">
-        <Skeleton className="w-12 h-12 rounded-xl" />
+        <Skeleton className="h-12 w-12 rounded-xl" />
         <div className="flex-1 space-y-2">
           <Skeleton className="h-3 w-24" />
           <Skeleton className="h-5 w-40" />
@@ -143,39 +142,39 @@ function ErrorDisplay({ message, onRetry }) {
   const isUnauth = normalized.includes('token') || normalized.includes('401') || normalized.includes('403');
 
   return (
-    <div className="min-h-[60vh] flex items-center justify-center px-4">
+    <div className="flex min-h-[60vh] items-center justify-center px-4">
       <motion.div
         initial={{ opacity: 0, scale: 0.96, y: 12 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         transition={{ duration: 0.4, ease: 'easeOut' }}
-        className="text-center max-w-sm"
+        className="max-w-sm text-center"
       >
-        <div className={`w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-4 ${isNotFound ? 'bg-neutral-100' : 'bg-yellow-50'}`}>
+        <div className={`mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl ${isNotFound ? 'bg-neutral-100' : 'bg-yellow-50'}`}>
           {isNotFound
             ? <SearchX size={28} className="text-neutral-400" strokeWidth={1.5} />
             : <AlertTriangle size={28} className="text-yellow-500" strokeWidth={1.5} />}
         </div>
-        <h2 className="text-lg font-semibold text-neutral-800 mb-2">
+        <h2 className="mb-2 text-lg font-semibold text-neutral-800">
           {isNotFound ? 'Repair Not Found' : isUnauth ? 'Access Denied' : 'Something Went Wrong'}
         </h2>
-        <p className="text-sm text-neutral-500 mb-4">
+        <p className="mb-4 text-sm text-neutral-500">
           {isNotFound
             ? 'We could not find a repair matching this number. Please double-check your repair number and token.'
             : isUnauth
               ? 'The tracking token is invalid or has expired. Please check your confirmation email.'
               : message || 'An unexpected error occurred. Please try again.'}
         </p>
-        <div className="flex gap-3 justify-center">
+        <div className="flex justify-center gap-3">
           {onRetry ? (
             <button
               onClick={onRetry}
-              className="px-4 py-2 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700 active:scale-[0.97] transition-all"
+              className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition-all hover:bg-blue-700 active:scale-[0.97]"
               type="button"
             >
               Retry
             </button>
           ) : null}
-          <Link to="/repairs" className="px-4 py-2 border border-neutral-300 text-neutral-700 text-sm font-semibold rounded-lg hover:bg-neutral-50 transition-colors">
+          <Link to="/repairs" className="rounded-lg border border-neutral-300 px-4 py-2 text-sm font-semibold text-neutral-700 transition-colors hover:bg-neutral-50">
             Submit a Repair
           </Link>
         </div>
@@ -239,7 +238,7 @@ export default function RepairStatus() {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.3 }}
-        className="max-w-2xl mx-auto px-4 py-8 space-y-4"
+        className="mx-auto max-w-2xl space-y-4 px-4 py-8"
       >
         <motion.div
           initial={{ opacity: 0, y: -10 }}
@@ -248,8 +247,8 @@ export default function RepairStatus() {
           className="flex items-center justify-between"
         >
           <div>
-            <div className="text-[10px] text-neutral-400 uppercase tracking-widest font-semibold">Repair Number</div>
-            <div className="flex items-center gap-2 mt-0.5">
+            <div className="text-[10px] font-semibold uppercase tracking-widest text-neutral-400">Repair Number</div>
+            <div className="mt-0.5 flex items-center gap-2">
               <h1 className="text-xl font-bold text-neutral-900">{displayId}</h1>
             </div>
           </div>
@@ -257,7 +256,7 @@ export default function RepairStatus() {
             onClick={refresh}
             disabled={loading}
             aria-label="Refresh status"
-            className="p-2 text-neutral-400 hover:text-blue-600 disabled:opacity-40 transition-colors rounded-xl hover:bg-blue-50"
+            className="rounded-xl p-2 text-neutral-400 transition-colors hover:bg-blue-50 hover:text-blue-600 disabled:opacity-40"
             type="button"
           >
             <RefreshCw size={17} className={loading ? 'animate-spin' : ''} />
@@ -273,6 +272,7 @@ export default function RepairStatus() {
             submittedAt={data.submitted_at}
             lastUpdatedAt={data.last_updated_at}
             trackingNumber={data.tracking_number}
+            events={customerTimeline}
           />
         ) : null}
 
@@ -293,23 +293,6 @@ export default function RepairStatus() {
           <RepairUpdateComposer repairId={resolvedId} token={resolvedToken} onSubmitted={() => refresh()} />
         ) : null}
 
-        {loading && !data ? (
-          <div className="bg-white rounded-2xl border border-neutral-200 shadow-sm p-6 space-y-3">
-            <Skeleton className="h-4 w-24" />
-            {[1, 2].map((item) => (
-              <div key={item} className="flex gap-3">
-                <Skeleton className="w-8 h-8 rounded-full shrink-0" />
-                <div className="flex-1 space-y-1.5 pt-1">
-                  <Skeleton className="h-4 w-48" />
-                  <Skeleton className="h-3 w-24" />
-                </div>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <RepairTimeline events={customerTimeline} />
-        )}
-
         <AnimatePresence>
           {error && data ? (
             <motion.div
@@ -319,15 +302,15 @@ export default function RepairStatus() {
               transition={{ duration: 0.3 }}
               className="overflow-hidden"
             >
-              <div className="p-3 bg-yellow-50 border border-yellow-200 rounded-xl text-yellow-800 text-xs" role="alert">
+              <div className="rounded-xl border border-yellow-200 bg-yellow-50 p-3 text-xs text-yellow-800" role="alert">
                 Could not refresh status — showing last known data.
               </div>
             </motion.div>
           ) : null}
         </AnimatePresence>
 
-        <div className="text-center pt-2 pb-4">
-          <Link to="/contact" className="text-xs text-neutral-400 hover:text-blue-600 underline transition-colors">
+        <div className="pb-4 pt-2 text-center">
+          <Link to="/contact" className="text-xs text-neutral-400 underline transition-colors hover:text-blue-600">
             Need help with your repair?
           </Link>
         </div>
@@ -379,22 +362,22 @@ function SubmittedRequestDetails({ details }) {
   if (!Array.isArray(details) || details.length === 0) return null;
 
   return (
-    <div className="bg-white rounded-2xl border border-neutral-200 shadow-sm overflow-hidden">
+    <div className="overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-sm">
       <button
         type="button"
         onClick={() => setIsOpen((prev) => !prev)}
-        className="w-full text-left px-5 py-4 hover:bg-neutral-50 transition-colors"
+        className="w-full px-5 py-4 text-left transition-colors hover:bg-neutral-50"
         aria-expanded={isOpen}
         aria-controls={panelId}
       >
         <div className="flex items-start justify-between gap-3">
           <div>
             <h3 className="text-sm font-semibold text-neutral-800">Submitted Request Details</h3>
-            <p className="text-xs text-neutral-500 mt-1">
+            <p className="mt-1 text-xs text-neutral-500">
               {isOpen ? 'Click to close your submitted request details.' : 'Click to view the information you originally submitted.'}
             </p>
           </div>
-          <span className={`text-neutral-400 text-base leading-none mt-0.5 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} aria-hidden="true">
+          <span className={`mt-0.5 text-base leading-none text-neutral-400 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} aria-hidden="true">
             ▾
           </span>
         </div>
@@ -410,13 +393,13 @@ function SubmittedRequestDetails({ details }) {
             transition={{ duration: 0.24, ease: 'easeOut' }}
             className="overflow-hidden border-t border-neutral-100"
           >
-            <dl className="p-5 grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2.5">
+            <dl className="grid grid-cols-1 gap-x-4 gap-y-2.5 p-5 sm:grid-cols-2">
               {details.map((item) => (
                 <div key={item.label} className={item.fullWidth ? 'sm:col-span-2' : ''}>
-                  <dt className="text-[10px] text-neutral-400 uppercase tracking-wider font-semibold mb-0.5">
+                  <dt className="mb-0.5 text-[10px] font-semibold uppercase tracking-wider text-neutral-400">
                     {item.label}
                   </dt>
-                  <dd className="text-sm text-neutral-800 leading-snug whitespace-pre-line wrap-break-word">
+                  <dd className="wrap-break-word whitespace-pre-line text-sm leading-snug text-neutral-800">
                     {item.value}
                   </dd>
                 </div>
