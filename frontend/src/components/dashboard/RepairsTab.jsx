@@ -4,11 +4,11 @@
  * Dashboard Repairs tab — quick access + authenticated repair-service history.
  */
 
-import { useState, useEffect, useMemo } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion as Motion } from 'framer-motion';
-import { Wrench, Clock3, CheckCircle2, Loader, ArrowRight, Package } from 'lucide-react';
-import { getCustomerRepairs, REPAIR_STATUS_LABELS, TERMINAL_STATUSES } from '../../api/repairs.js';
+import { Wrench, Loader, ArrowRight, Package } from 'lucide-react';
+import { getCustomerRepairs, REPAIR_STATUS_LABELS } from '../../api/repairs.js';
 
 const CARD = {
   background:   'white',
@@ -31,6 +31,10 @@ function normalizeRepairsResponse( data ) {
   if ( Array.isArray( data?.repairs ) ) return data.repairs;
   if ( Array.isArray( data?.data?.repairs ) ) return data.data.repairs;
   return [];
+}
+
+async function fetchRepairs() {
+  return normalizeRepairsResponse( await getCustomerRepairs( 1, 50 ) );
 }
 
 function formatRepairNumber( repair ) {
@@ -61,26 +65,6 @@ function repairStatusPath( repair ) {
     : `/repairs/status/${ encodeURIComponent( repairId ) }`;
 }
 
-function StatTile( { icon: Icon, label, value, color, bg, delay = 0 } ) {
-  return (
-    <Motion.div custom={ delay } variants={ fadeUp } initial="hidden" animate="visible"
-      style={ { ...CARD, padding: '16px 18px', display: 'flex', alignItems: 'center', gap: '12px' } }
-    >
-      <div style={ { width: '40px', height: '40px', borderRadius: '10px', background: bg, display: 'flex', alignItems: 'center', justifyContent: 'center' } }>
-        <Icon size={ 18 } style={ { color } } />
-      </div>
-      <div>
-        <p style={ { margin: 0, fontSize: '0.65rem', textTransform: 'uppercase', letterSpacing: '0.09em', color: 'rgba(15,23,42,0.42)', fontWeight: 700 } }>
-          { label }
-        </p>
-        <p style={ { margin: '2px 0 0', fontSize: '1.35rem', fontWeight: 800, color: '#0f172a', lineHeight: 1 } }>
-          { value }
-        </p>
-      </div>
-    </Motion.div>
-  );
-}
-
 export default function RepairsTab() {
   const [ repairs, setRepairs ] = useState( [] );
   const [ loading, setLoading ] = useState( true );
@@ -89,40 +73,26 @@ export default function RepairsTab() {
   useEffect( () => {
     let cancelled = false;
 
-    ( async () => {
-      setLoading( true );
-      setError( null );
-      try {
-        const data = await getCustomerRepairs( 1, 50 );
-        if ( ! cancelled ) setRepairs( normalizeRepairsResponse( data ) );
-      } catch ( err ) {
-        if ( ! cancelled ) setError( err?.message || 'Unable to load repair requests.' );
-      } finally {
+    fetchRepairs()
+      .then( ( items ) => {
+        if ( cancelled ) return;
+        setRepairs( items );
+        setError( null );
+      } )
+      .catch( ( err ) => {
+        if ( cancelled ) return;
+        setError( err?.message || 'Unable to load repair requests.' );
+      } )
+      .finally( () => {
         if ( ! cancelled ) setLoading( false );
-      }
-    } )();
+      } );
 
     return () => { cancelled = true; };
   }, [] );
 
-  const activeCount = useMemo(
-    () => repairs.filter( ( repair ) => ! TERMINAL_STATUSES.includes( repair.status ) ).length,
-    [ repairs ],
-  );
-  const completedCount = useMemo(
-    () => repairs.filter( ( repair ) => [ 'completed', 'closed' ].includes( repair.status ) ).length,
-    [ repairs ],
-  );
-
   return (
     <div style={ { display: 'flex', flexDirection: 'column', gap: '14px' } }>
-      <div style={ { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '12px' } }>
-        <StatTile icon={ Wrench } label="Repairs" value={ loading ? '…' : String( repairs.length ) } color="#0ea5e9" bg="#ecfeff" delay={ 0 } />
-        <StatTile icon={ Clock3 } label="Active" value={ loading ? '…' : String( activeCount ) } color="#d97706" bg="#fffbeb" delay={ 0.04 } />
-        <StatTile icon={ CheckCircle2 } label="Completed" value={ loading ? '…' : String( completedCount ) } color="#16a34a" bg="#f0fdf4" delay={ 0.08 } />
-      </div>
-
-      <Motion.div custom={ 0.15 } variants={ fadeUp } initial="hidden" animate="visible" style={ { ...CARD, padding: '18px 20px' } }>
+      <Motion.div custom={ 0.05 } variants={ fadeUp } initial="hidden" animate="visible" style={ { ...CARD, padding: '18px 20px' } }>
         <div style={ { display: 'flex', flexWrap: 'wrap', gap: '10px', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' } }>
           <div style={ { display: 'flex', alignItems: 'center', gap: '10px' } }>
             <div style={ { width: '34px', height: '34px', borderRadius: '8px', background: '#ecfeff', display: 'flex', alignItems: 'center', justifyContent: 'center' } }>
