@@ -182,7 +182,7 @@ export default function NavbarTabs({ tabs = [], activeIndex = 0, onChange, class
               type="button"
               className="dtb-navtab-btn"
               onClick={(event) => handleTabClick(event, index)}
-              whileTap={{ scale: pointerDraggingRef.current ? 1 : 0.96 }}
+              whileTap={{ scale: 0.96 }}
               transition={{ duration: 0.1 }}
               style={{
                 position: 'relative',
