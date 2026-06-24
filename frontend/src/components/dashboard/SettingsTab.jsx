@@ -1,99 +1,192 @@
-/**
- * frontend/src/components/dashboard/SettingsTab.jsx
- *
- * Dashboard Settings tab — profile, password, notifications stubs.
- */
+import { useEffect, useState } from 'react';
+import { Bell, CheckCircle2, Loader, Lock, Mail, Save, User } from 'lucide-react';
+import { useAuthContext } from '../../auth/AuthContext.js';
+import { changeAccountPassword, getAccountSettings, updateAccountSettings } from '../../api/account.js';
+import AddressesTab from './AddressesTab.jsx';
 
-import { motion as Motion } from 'framer-motion';
-import { User, Lock, Bell, Mail } from 'lucide-react';
-
-const fadeUp = {
-  hidden:  { opacity: 0, y: 12 },
-  visible: ( d ) => ( {
-    opacity: 1, y: 0,
-    transition: { duration: 0.36, ease: [ 0.16, 1, 0.3, 1 ], delay: d ?? 0 },
-  } ),
+const DEFAULT_PREFERENCES = {
+  order_updates: true,
+  repair_updates: true,
+  return_updates: true,
+  marketing: false,
+  newsletter: false,
 };
 
-const SECTIONS = [
-  {
-    id:    'profile',
-    Icon:  User,
-    color: '#2563eb',
-    bg:    '#eff6ff',
-    title: 'Profile',
-    desc:  'Update your name, email address, and company information.',
-  },
-  {
-    id:    'password',
-    Icon:  Lock,
-    color: '#d97706',
-    bg:    '#fffbeb',
-    title: 'Password',
-    desc:  'Change your account password or reset it via email.',
-  },
-  {
-    id:    'notifications',
-    Icon:  Bell,
-    color: '#0891b2',
-    bg:    '#ecfeff',
-    title: 'Notification Preferences',
-    desc:  'Choose which updates you receive for orders, repairs, and promotions.',
-  },
-  {
-    id:    'email',
-    Icon:  Mail,
-    color: '#7c3aed',
-    bg:    '#faf5ff',
-    title: 'Email & Communications',
-    desc:  'Manage marketing emails, newsletters, and promotional offers.',
-  },
-];
+function Message({ message }) {
+  if (!message?.text) return null;
+  return <p className={`account-settings__message is-${message.type}`} role="status">{message.text}</p>;
+}
 
-export default function SettingsTab() {
+function PreferenceToggle({ name, label, description, checked, onChange }) {
   return (
-    <div style={ { display: 'flex', flexDirection: 'column', gap: '10px' } }>
-      { SECTIONS.map( ( section, i ) => (
-        <Motion.div
-          key={ section.id }
-          custom={ i * 0.07 }
-          variants={ fadeUp }
-          initial="hidden"
-          animate="visible"
-          style={ {
-            display:      'flex',
-            alignItems:   'center',
-            gap:          '14px',
-            background:   'white',
-            border:       '1px solid rgba(15,23,42,0.08)',
-            borderRadius: '11px',
-            padding:      '16px 18px',
-            boxShadow:    '0 2px 10px rgba(15,23,42,0.04)',
-          } }
-        >
-          <div style={ { width: '38px', height: '38px', borderRadius: '9px', background: section.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 } }>
-            <section.Icon size={ 17 } style={ { color: section.color } } />
-          </div>
-          <div style={ { flex: 1 } }>
-            <p style={ { margin: 0, fontWeight: 700, color: '#0f172a', fontSize: '0.9rem' } }>{ section.title }</p>
-            <p style={ { margin: '3px 0 0', fontSize: '0.76rem', color: 'rgba(15,23,42,0.48)' } }>{ section.desc }</p>
-          </div>
-          <span style={ {
-            background:    '#f1f5f9',
-            color:         'rgba(15,23,42,0.4)',
-            borderRadius:  '999px',
-            padding:       '3px 9px',
-            fontSize:      '0.6rem',
-            fontWeight:    700,
-            letterSpacing: '0.06em',
-            textTransform: 'uppercase',
-            whiteSpace:    'nowrap',
-            flexShrink:    0,
-          } }>
-            Coming Soon
-          </span>
-        </Motion.div>
-      ) ) }
+    <label className="account-settings__toggle-row">
+      <span>
+        <strong>{label}</strong>
+        <small>{description}</small>
+      </span>
+      <input type="checkbox" name={name} checked={checked} onChange={onChange} />
+      <span className="account-settings__toggle" aria-hidden="true" />
+    </label>
+  );
+}
+
+export default function SettingsTab({ user }) {
+  const { updateUser, logout } = useAuthContext();
+  const [profile, setProfile] = useState({
+    first_name: '',
+    last_name: '',
+    email: '',
+    company: '',
+    phone: '',
+  });
+  const [preferences, setPreferences] = useState(DEFAULT_PREFERENCES);
+  const [passwords, setPasswords] = useState({ current: '', next: '', confirm: '' });
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState('');
+  const [message, setMessage] = useState(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    getAccountSettings()
+      .then((data) => {
+        if (cancelled) return;
+        const account = data?.user || {};
+        setProfile({
+          first_name: account.first_name || '',
+          last_name: account.last_name || '',
+          email: account.email || '',
+          company: account.company || '',
+          phone: account.phone || '',
+        });
+        setPreferences({ ...DEFAULT_PREFERENCES, ...(account.preferences || {}) });
+        updateUser(account);
+      })
+      .catch((error) => {
+        if (!cancelled) setMessage({ type: 'error', text: error?.message || 'Unable to load account settings.' });
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+    return () => { cancelled = true; };
+  }, [updateUser]);
+
+  const handleProfileSubmit = async (event) => {
+    event.preventDefault();
+    setSaving('profile');
+    setMessage(null);
+    try {
+      const data = await updateAccountSettings({ ...profile, preferences });
+      updateUser(data?.user);
+      setMessage({ type: 'success', text: data?.message || 'Account settings saved.' });
+    } catch (error) {
+      setMessage({ type: 'error', text: error?.message || 'Unable to save account settings.' });
+    } finally {
+      setSaving('');
+    }
+  };
+
+  const handlePreferencesSubmit = async () => {
+    setSaving('preferences');
+    setMessage(null);
+    try {
+      const data = await updateAccountSettings({ preferences });
+      updateUser(data?.user);
+      setMessage({ type: 'success', text: 'Communication preferences saved.' });
+    } catch (error) {
+      setMessage({ type: 'error', text: error?.message || 'Unable to save preferences.' });
+    } finally {
+      setSaving('');
+    }
+  };
+
+  const handlePasswordSubmit = async (event) => {
+    event.preventDefault();
+    if (passwords.next !== passwords.confirm) {
+      setMessage({ type: 'error', text: 'New passwords do not match.' });
+      return;
+    }
+    setSaving('password');
+    setMessage(null);
+    try {
+      const data = await changeAccountPassword(passwords.current, passwords.next);
+      setMessage({ type: 'success', text: data?.message || 'Password updated.' });
+      setPasswords({ current: '', next: '', confirm: '' });
+      if (data?.reauth_required) {
+        window.setTimeout(async () => {
+          await logout();
+          window.location.assign('/login');
+        }, 1200);
+      }
+    } catch (error) {
+      setMessage({ type: 'error', text: error?.message || 'Unable to update password.' });
+    } finally {
+      setSaving('');
+    }
+  };
+
+  if (loading) {
+    return <div className="account-history-state"><Loader size={20} className="animate-spin" /> Loading settings…</div>;
+  }
+
+  return (
+    <div className="account-settings">
+      <Message message={message} />
+
+      <form className="account-settings__card account-settings__card--profile" onSubmit={handleProfileSubmit}>
+        <header className="account-settings__card-header">
+          <span className="is-blue"><User size={18} /></span>
+          <div><h2>Profile</h2><p>Your account and customer contact information.</p></div>
+        </header>
+        <div className="account-settings__fields">
+          <label>First name<input value={profile.first_name} onChange={(e) => setProfile({ ...profile, first_name: e.target.value })} autoComplete="given-name" /></label>
+          <label>Last name<input value={profile.last_name} onChange={(e) => setProfile({ ...profile, last_name: e.target.value })} autoComplete="family-name" /></label>
+          <label className="is-wide">Email address<input type="email" required value={profile.email} onChange={(e) => setProfile({ ...profile, email: e.target.value })} autoComplete="email" /></label>
+          <label>Company<input value={profile.company} onChange={(e) => setProfile({ ...profile, company: e.target.value })} autoComplete="organization" /></label>
+          <label>Phone<input value={profile.phone} onChange={(e) => setProfile({ ...profile, phone: e.target.value })} autoComplete="tel" /></label>
+        </div>
+        <button className="account-settings__save" disabled={saving === 'profile'}>
+          {saving === 'profile' ? <Loader size={15} className="animate-spin" /> : <Save size={15} />} Save profile
+        </button>
+      </form>
+
+      <section className="account-settings__card">
+        <header className="account-settings__card-header">
+          <span className="is-cyan"><Bell size={18} /></span>
+          <div><h2>Notifications and email</h2><p>Control account updates and optional marketing messages.</p></div>
+        </header>
+        <div className="account-settings__toggles">
+          <PreferenceToggle name="order_updates" label="Order updates" description="Payment, fulfillment, and shipping updates." checked={preferences.order_updates} onChange={(e) => setPreferences({ ...preferences, order_updates: e.target.checked })} />
+          <PreferenceToggle name="repair_updates" label="Repair updates" description="Quotes, status changes, and technician messages." checked={preferences.repair_updates} onChange={(e) => setPreferences({ ...preferences, repair_updates: e.target.checked })} />
+          <PreferenceToggle name="return_updates" label="Return updates" description="Approvals, item receipt, refunds, and exchanges." checked={preferences.return_updates} onChange={(e) => setPreferences({ ...preferences, return_updates: e.target.checked })} />
+          <PreferenceToggle name="marketing" label="Promotions" description="Product offers and contractor promotions." checked={preferences.marketing} onChange={(e) => setPreferences({ ...preferences, marketing: e.target.checked })} />
+          <PreferenceToggle name="newsletter" label="Newsletter" description="Product education, launches, and company news." checked={preferences.newsletter} onChange={(e) => setPreferences({ ...preferences, newsletter: e.target.checked })} />
+        </div>
+        <button type="button" className="account-settings__save" disabled={saving === 'preferences'} onClick={handlePreferencesSubmit}>
+          {saving === 'preferences' ? <Loader size={15} className="animate-spin" /> : <Mail size={15} />} Save preferences
+        </button>
+      </section>
+
+      <form className="account-settings__card" onSubmit={handlePasswordSubmit}>
+        <header className="account-settings__card-header">
+          <span className="is-amber"><Lock size={18} /></span>
+          <div><h2>Password</h2><p>Changing your password securely signs out existing sessions.</p></div>
+        </header>
+        <div className="account-settings__fields">
+          <label className="is-wide">Current password<input type="password" required value={passwords.current} onChange={(e) => setPasswords({ ...passwords, current: e.target.value })} autoComplete="current-password" /></label>
+          <label>New password<input type="password" required minLength={8} value={passwords.next} onChange={(e) => setPasswords({ ...passwords, next: e.target.value })} autoComplete="new-password" /></label>
+          <label>Confirm password<input type="password" required minLength={8} value={passwords.confirm} onChange={(e) => setPasswords({ ...passwords, confirm: e.target.value })} autoComplete="new-password" /></label>
+        </div>
+        <button className="account-settings__save is-secondary" disabled={saving === 'password'}>
+          {saving === 'password' ? <Loader size={15} className="animate-spin" /> : <CheckCircle2 size={15} />} Update password
+        </button>
+      </form>
+
+      <section className="account-settings__addresses">
+        <header className="account-settings__section-heading">
+          <div><h2>Saved addresses</h2><p>Billing and shipping addresses used during checkout.</p></div>
+        </header>
+        <AddressesTab user={user} />
+      </section>
     </div>
   );
 }

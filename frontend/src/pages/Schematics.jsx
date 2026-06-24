@@ -1,6 +1,7 @@
-import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import { useState, useEffect, useRef, useCallback, useMemo, useLayoutEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { ArrowLeft } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import Toast from '../components/ui/Toast';
 import BrandSelector from '../components/schematics/BrandSelector';
@@ -32,6 +33,66 @@ const brandLogos = {
   'Dura-Stilts': duraStiltsLogo,
   'Level5': level5Logo,
 };
+
+function AutoFitViewerTitle({ children }) {
+  const titleRef = useRef(null);
+
+  useLayoutEffect(() => {
+    const title = titleRef.current;
+    if (!title) return undefined;
+
+    let animationFrame = 0;
+    const fitTitle = () => {
+      cancelAnimationFrame(animationFrame);
+      animationFrame = requestAnimationFrame(() => {
+        if (!window.matchMedia('(max-width: 768px)').matches) {
+          title.style.removeProperty('--viewer-title-size');
+          return;
+        }
+
+        const availableWidth = title.clientWidth;
+        if (!availableWidth) return;
+
+        const minimumSize = 10;
+        const maximumSize = Math.min(14, Math.max(12, window.innerWidth * 0.037));
+        let lowerBound = minimumSize;
+        let upperBound = maximumSize;
+
+        title.style.setProperty('--viewer-title-size', `${maximumSize}px`);
+
+        for (let iteration = 0; iteration < 9; iteration += 1) {
+          const candidate = (lowerBound + upperBound) / 2;
+          title.style.setProperty('--viewer-title-size', `${candidate}px`);
+
+          if (title.scrollWidth <= availableWidth + 1) {
+            lowerBound = candidate;
+          } else {
+            upperBound = candidate;
+          }
+        }
+
+        title.style.setProperty('--viewer-title-size', `${Math.floor(lowerBound * 10) / 10}px`);
+      });
+    };
+
+    const resizeObserver = new ResizeObserver(fitTitle);
+    resizeObserver.observe(title);
+    if (title.parentElement) resizeObserver.observe(title.parentElement);
+    fitTitle();
+    document.fonts?.ready?.then(fitTitle).catch(() => {});
+
+    return () => {
+      cancelAnimationFrame(animationFrame);
+      resizeObserver.disconnect();
+    };
+  }, [children]);
+
+  return (
+    <h1 id="viewer-tool-title-id" ref={titleRef} className="viewer-tool-title">
+      {children}
+    </h1>
+  );
+}
 
 // ---------------------------------------------------------------------------
 // Schematic JSON data — static imports (bundled by webpack at build time).
@@ -3624,7 +3685,8 @@ const ALLOWED_BRANDS = [
           {/* ── Compact viewer top bar: back | logo + title | pager ── */}
           <div className="viewer-top-bar">
             <button
-              className="back-button"
+              type="button"
+              className="viewer-back-button"
               onClick={() => {
                 setSelectedSchematic(null);
                 setSelectedSchematicVariant(null);
@@ -3634,10 +3696,8 @@ const ALLOWED_BRANDS = [
               }}
               aria-label="Back to Tools"
             >
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M19 12H5M12 19l-7-7 7-7" />
-              </svg>
-              <span>Back</span>
+              <ArrowLeft aria-hidden="true" />
+              <span className="viewer-back-button__label">Back</span>
             </button>
 
             <div className="viewer-title-group" aria-labelledby="viewer-tool-title-id">
@@ -3648,7 +3708,7 @@ const ALLOWED_BRANDS = [
                   className="viewer-brand-logo"
                 />
               )}
-              <h1 id="viewer-tool-title-id" className="viewer-tool-title">{currentSchematic?.title}</h1>
+              <AutoFitViewerTitle>{currentSchematic?.title}</AutoFitViewerTitle>
             </div>
 
             {/* Inline pager removed — multi-page nav rendered via SchematicPageSelector bar below */}

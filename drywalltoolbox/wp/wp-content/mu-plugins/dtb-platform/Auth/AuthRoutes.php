@@ -493,6 +493,8 @@ function dtb_auth_login( WP_REST_Request $request ): WP_REST_Response {
 			'id'           => $user->ID,
 			'email'        => $user->user_email,
 			'display_name' => $user->display_name,
+			'first_name'   => (string) get_user_meta( $user->ID, 'first_name', true ),
+			'last_name'    => (string) get_user_meta( $user->ID, 'last_name', true ),
 			'roles'        => array_values( (array) $user->roles ),
 		],
 	], 200 );
@@ -673,6 +675,8 @@ function dtb_auth_register( WP_REST_Request $request ): WP_REST_Response {
 			'id'           => $user->ID,
 			'email'        => $user->user_email,
 			'display_name' => $user->display_name,
+			'first_name'   => (string) get_user_meta( $user->ID, 'first_name', true ),
+			'last_name'    => (string) get_user_meta( $user->ID, 'last_name', true ),
 			'roles'        => array_values( (array) $user->roles ),
 		],
 	], 201 );
@@ -945,6 +949,8 @@ function dtb_auth_validate( WP_REST_Request $request ): WP_REST_Response {
 			'id'           => $user->ID,
 			'email'        => $user->user_email,
 			'display_name' => $user->display_name,
+			'first_name'   => (string) get_user_meta( $user->ID, 'first_name', true ),
+			'last_name'    => (string) get_user_meta( $user->ID, 'last_name', true ),
 			'roles'        => array_values( (array) $user->roles ),
 		],
 	], 200 );

@@ -87,6 +87,10 @@ export function useAuth() {
     } catch { /**/ }
   }, [] );
 
+  const updateUser = useCallback((nextUser) => {
+    setUser((current) => ({ ...(current || {}), ...(nextUser || {}) }));
+  }, []);
+
   // ── auth:expired listener ────────────────────────────────────────────────────
   useEffect( () => {
     const handler = () => logout();
@@ -207,6 +211,7 @@ export function useAuth() {
     register,
     forgotPassword,
     resetPassword,
+    updateUser,
     error,
   };
 }

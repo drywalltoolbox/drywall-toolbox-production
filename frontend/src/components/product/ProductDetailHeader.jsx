@@ -84,6 +84,10 @@ export default function ProductDetailHeader({
         ) : title}
       </h2>
 
+      <div className="dtb-pdp-header__desktop-reviews">
+        {desktopReviewsButton}
+      </div>
+
       <div className="dtb-pdp-header__meta">
         <span className={`dtb-pdp-header__meta-stock dtb-pdp-header__meta-stock--desktop${isOutOfStock ? ' is-out' : ''}`}>
           <span className="dtb-pdp-header__meta-stock-dot" aria-hidden="true" />
@@ -119,9 +123,12 @@ export default function ProductDetailHeader({
         </div>
       </div>
 
-      <div className="dtb-pdp-header__desktop-reviews">
-        {desktopReviewsButton}
-      </div>
+      <p className="dtb-pdp-shipping-note">
+        <Link to="/shipping-policy" className="dtb-pdp-shipping-note__link">
+          Shipping
+        </Link>{' '}
+        calculated at checkout.
+      </p>
     </header>
   );
 }

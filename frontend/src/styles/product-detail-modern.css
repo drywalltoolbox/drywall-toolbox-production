@@ -66,6 +66,43 @@
   }
 }
 
+/* Keep the desktop quick-view dense and vertically coherent. The gallery
+   determines the hero height, but the purchase column should retain its
+   intrinsic row heights instead of distributing spare space between rows. */
+@media (min-width: 769px) {
+  .dtb-pdp--modal .dtb-pdp__inner {
+    gap: 1.25rem;
+    padding: 2rem 3rem 2.5rem;
+  }
+
+  .dtb-pdp--modal .dtb-pdp__hero {
+    column-gap: 2rem;
+    margin-bottom: 0;
+  }
+
+  .dtb-pdp--modal .dtb-pdp__info-column {
+    align-content: start;
+    grid-auto-rows: max-content;
+    gap: 1rem;
+  }
+
+  .dtb-pdp--modal .dtb-pdp-header {
+    gap: 0.65rem;
+  }
+
+  .dtb-pdp--modal .dtb-pdp-shipping-note {
+    margin: 0;
+  }
+
+  .dtb-pdp--modal .dtb-pdp-stock-meter--pre-cart {
+    margin: 0.35rem 0 0.15rem;
+  }
+
+  .dtb-pdp--modal .dtb-pdp-purchase-panel {
+    gap: 1rem;
+  }
+}
+
 /* Gallery column — stretch image to fill height on desktop */
 .dtb-pdp__hero {
   align-items: start;

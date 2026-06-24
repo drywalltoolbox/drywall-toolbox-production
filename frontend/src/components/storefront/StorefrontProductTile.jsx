@@ -61,7 +61,6 @@ export default function StorefrontProductTile({
   // Parent identity must remain canonical on listing cards.
   const name = displayProduct.name || commerceProduct.name || displayProduct.part_number || 'Product';
   const sku = displayProduct.sku || commerceProduct.sku || '';
-  const desc = stripHtml(displayProduct.short_description || displayProduct.description || '');
   const shortDescription = stripHtml(displayProduct.short_description || '', 132);
 
   const priceStr = isVariable && displayProduct.min_price != null
@@ -326,15 +325,7 @@ export default function StorefrontProductTile({
           {name}
         </button>
 
-        {variant === 'list'
-          ? desc
-            ? <p className="dtb-product-card__desc">{desc}</p>
-            : sku
-              ? <span className="dtb-product-card__sku">SKU: {sku}</span>
-              : null
-          : sku
-            ? <span className="dtb-product-card__sku">SKU: {sku}</span>
-            : null}
+        {sku ? <span className="dtb-product-card__sku">SKU: {sku}</span> : null}
 
         <div className="dtb-product-card__divider" />
 

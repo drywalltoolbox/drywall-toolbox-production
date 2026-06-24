@@ -1638,6 +1638,53 @@
   min-width: 0;
 }
 
+.viewer-back-button {
+  position: relative;
+  z-index: 2;
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  min-width: 42px;
+  min-height: 40px;
+  padding: 0 0.75rem;
+  border: 1px solid rgba(15, 23, 42, 0.12);
+  border-radius: 10px;
+  background: #f8fafc;
+  color: #0f172a;
+  font-size: 0.86rem;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08);
+  transition: background 140ms ease, border-color 140ms ease, transform 120ms ease;
+}
+
+.viewer-back-button:hover {
+  border-color: rgba(15, 23, 42, 0.22);
+  background: #f1f5f9;
+}
+
+.viewer-back-button:active {
+  transform: scale(0.96);
+}
+
+.viewer-back-button:focus-visible {
+  outline: 2px solid #2563eb;
+  outline-offset: 2px;
+}
+
+.viewer-back-button svg {
+  display: block;
+  width: 20px;
+  height: 20px;
+  flex: 0 0 20px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.4;
+}
+
 .schematic-variant-bar {
   display: flex;
   align-items: center;
@@ -1835,57 +1882,69 @@
 @media (max-width: 768px) {
   .viewer-top-bar {
     position: relative;
-    padding-left: 42px;
+    padding-left: 54px;
     min-height: 58px;
+    overflow: hidden;
   }
 
-  .viewer-top-bar .back-button {
+  .viewer-back-button {
     position: absolute;
-    left: 8px;
+    left: 10px;
     top: 50%;
     transform: translateY(-50%);
-    width: 24px;
-    height: 24px;
-    min-height: 24px;
+    width: 36px;
+    height: 36px;
+    min-width: 36px;
+    min-height: 36px;
     padding: 0;
-    border: none;
-    border-radius: 999px;
-    background: transparent;
-    color: var(--text-primary, #0f172a);
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0;
-    box-shadow: none;
-    opacity: 0.92;
-    transition: opacity 120ms ease;
+    border-radius: 9px;
   }
 
-  .viewer-top-bar .back-button:hover {
+  .viewer-back-button:hover {
     transform: translateY(-50%);
-    background: transparent;
-    border-color: transparent;
-    opacity: 1;
   }
 
-  .viewer-top-bar .back-button:active {
-    transform: translateY(-50%);
-    background: transparent;
-    opacity: 0.7;
+  .viewer-back-button:active {
+    transform: translateY(-50%) scale(0.94);
   }
 
-  .viewer-top-bar .back-button svg {
-    width: 17px;
-    height: 17px;
+  .viewer-back-button svg {
+    width: 21px;
+    height: 21px;
+    flex-basis: 21px;
   }
 
-  .viewer-top-bar .back-button span {
+  .viewer-back-button__label {
     display: none;
   }
 
   /* Title can now span almost the full width minus the back button */
   .viewer-title-group {
-    max-width: calc(100% - 100px);
+    width: calc(100% - 88px);
+    max-width: calc(100% - 88px);
+    min-width: 0;
+    overflow: hidden;
+  }
+
+  /* This h1 lives inside the app-wide page wrapper, whose final mobile
+     typography layer intentionally enlarges normal page headings. Restore the
+     compact viewer treatment and give ellipsis a definite width to constrain. */
+  .page-wrapper .viewer-top-bar .viewer-tool-title,
+  .viewer-top-bar .viewer-tool-title {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    margin: 0;
+    overflow: hidden;
+    color: var(--text-primary, #0f172a);
+    font-size: var(--viewer-title-size, clamp(0.72rem, 3.25vw, 0.86rem)) !important;
+    font-weight: 700 !important;
+    line-height: 1.15 !important;
+    letter-spacing: -0.01em !important;
+    text-align: center;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 }
 

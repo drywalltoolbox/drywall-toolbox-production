@@ -7,9 +7,14 @@
 import { Link } from 'react-router-dom';
 import { motion as Motion } from 'framer-motion';
 import {
-  Package, Clock, CheckCircle, Wrench, ShoppingCart,
-  ChevronRight, Loader, CreditCard,
+  Package, Wrench, ShoppingCart, Headphones,
+  ChevronRight, Loader, CreditCard, RotateCcw,
 } from 'lucide-react';
+import AccountActivityList from '../account/AccountActivityList.jsx';
+import { buildAccountActivity } from '../../utils/accountActivity.js';
+import { ORDER_TERMINAL_STATUSES } from '../../api/orders.js';
+import { TERMINAL_STATUSES as REPAIR_TERMINAL_STATUSES } from '../../api/repairs.js';
+import { RETURN_TERMINAL_STATUSES, SUPPORT_TERMINAL_STATUSES } from '../../api/statusTracking.js';
 
 const fadeUp = {
   hidden:  { opacity: 0, y: 14 },
@@ -26,38 +31,12 @@ const CARD = {
   boxShadow:    '0 2px 12px rgba(15,23,42,0.05)',
 };
 
-const ORDER_STATUS = {
-  pending:    { label: 'Pending',    color: '#d97706', bg: '#fffbeb' },
-  processing: { label: 'Processing', color: '#2563eb', bg: '#eff6ff' },
-  'on-hold':  { label: 'On Hold',    color: '#d97706', bg: '#fff7ed' },
-  completed:  { label: 'Completed',  color: '#16a34a', bg: '#f0fdf4' },
-  cancelled:  { label: 'Cancelled',  color: '#dc2626', bg: '#fef2f2' },
-  refunded:   { label: 'Refunded',   color: '#64748b', bg: '#f8fafc' },
-  shipped:    { label: 'Shipped',    color: '#2563eb', bg: '#eff6ff' },
-  failed:     { label: 'Failed',     color: '#dc2626', bg: '#fef2f2' },
-};
-
-function StatusPill( { status } ) {
-  const cfg = ORDER_STATUS[ status ] || { label: status, color: '#64748b', bg: '#f8fafc' };
-  return (
-    <span style={ {
-      padding:      '2px 8px',
-      borderRadius: '999px',
-      background:   cfg.bg,
-      color:        cfg.color,
-      fontSize:     '0.68rem',
-      fontWeight:   700,
-      whiteSpace:   'nowrap',
-    } }>
-      { cfg.label }
-    </span>
-  );
-}
-
-function StatCard( { icon, label, value, color, bg, delay } ) {
+function StatCard( { icon, label, value, color, bg, delay, onClick } ) {
   const Icon = icon;
   return (
-    <Motion.div custom={ delay } variants={ fadeUp } initial="hidden" animate="visible"
+    <Motion.button type="button" custom={ delay } variants={ fadeUp } initial="hidden" animate="visible"
+      whileHover={ { y: -2 } } whileTap={ { scale: 0.98 } } onClick={ onClick }
+      className="account-overview-stat"
       style={ { ...CARD, padding: '16px 18px', display: 'flex', alignItems: 'center', gap: '12px' } }
     >
       <div style={ {
@@ -74,7 +53,8 @@ function StatCard( { icon, label, value, color, bg, delay } ) {
           { value }
         </p>
       </div>
-    </Motion.div>
+      <ChevronRight size={ 16 } className="account-overview-stat__arrow" />
+    </Motion.button>
   );
 }
 
@@ -83,89 +63,61 @@ function isRepairOrder( order ) {
   return type === 'repair_service';
 }
 
-export default function OverviewTab( { user, orders, ordersLoading, onTabChange } ) {
+function ActivitySection({ title, icon: Icon, color, bg, items, emptyText, onViewAll, loading, delay }) {
+  return (
+    <Motion.section custom={delay} variants={fadeUp} initial="hidden" animate="visible" style={{ ...CARD, padding: '18px 20px' }}>
+      <div className="account-overview-section__header">
+        <div className="account-overview-section__title">
+          <span style={{ background: bg, color }}><Icon size={16} /></span>
+          <strong>{title}</strong>
+        </div>
+        <button type="button" onClick={onViewAll}>View all <ChevronRight size={12} /></button>
+      </div>
+      {loading ? (
+        <div className="account-overview-section__loading"><Loader size={15} className="animate-spin" /> Loading…</div>
+      ) : items.length ? (
+        <AccountActivityList items={items} limit={4} />
+      ) : (
+        <p className="account-overview-section__empty">{emptyText}</p>
+      )}
+    </Motion.section>
+  );
+}
+
+export default function OverviewTab( { user, orders, repairs = [], returns = [], supportTickets = [], ordersLoading, onTabChange } ) {
   const displayName = [ user.first_name, user.last_name ].filter( Boolean ).join( ' ' ) || user.email;
 
-  const pendingCount   = orders.filter( ( o ) => [ 'pending', 'processing', 'on-hold' ].includes( o.status ) ).length;
-  const completedCount = orders.filter( ( o ) => o.status === 'completed' ).length;
-  const repairsCount   = orders.filter( isRepairOrder ).length;
+  const repairOrders   = orders.filter(isRepairOrder);
+  const productOrders  = orders.filter((order) => !isRepairOrder(order));
+  const orderActivity  = buildAccountActivity({ orders: productOrders });
+  const repairActivity = buildAccountActivity({ orders: repairOrders, repairs });
+  const returnActivity = buildAccountActivity({ returns });
+  const activeOrders = productOrders.filter((order) => !ORDER_TERMINAL_STATUSES.includes(order.status));
+  const activeRepairs = repairActivity.filter((item) => (
+    item.type === 'repair-order'
+      ? !ORDER_TERMINAL_STATUSES.includes(item.status)
+      : !REPAIR_TERMINAL_STATUSES.includes(item.status)
+  ));
+  const activeReturns = returns.filter((item) => !RETURN_TERMINAL_STATUSES.includes(item.status));
+  const activeSupportTickets = supportTickets.filter((ticket) => !SUPPORT_TERMINAL_STATUSES.includes(ticket.status));
 
   return (
     <div style={ { display: 'flex', flexDirection: 'column', gap: '18px' } }>
 
       {/* Stats row */}
-      <div style={ { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '12px' } }>
-        <StatCard icon={ Package }     label="Orders"    value={ ordersLoading ? '…' : String( orders.length ) }                                                               color="#2563eb" bg="#eff6ff" delay={ 0 } />
-        <StatCard icon={ Clock }       label="Active"    value={ ordersLoading ? '…' : String( pendingCount ) }                                                                color="#d97706" bg="#fffbeb" delay={ 0.05 } />
-        <StatCard icon={ CheckCircle } label="Completed" value={ ordersLoading ? '…' : String( completedCount ) }                                                              color="#16a34a" bg="#f0fdf4" delay={ 0.1 } />
-        <StatCard icon={ Wrench }      label="Repairs"   value={ ordersLoading ? '…' : String( repairsCount ) }                                                                color="#0ea5e9" bg="#ecfeff" delay={ 0.15 } />
+      <div className="account-overview-stats">
+        <StatCard icon={ Package } label="Orders" value={ ordersLoading ? '…' : String( activeOrders.length ) } color="#2563eb" bg="#eff6ff" delay={ 0 } onClick={ () => onTabChange( 1 ) } />
+        <StatCard icon={ Wrench } label="Repairs" value={ ordersLoading ? '…' : String( activeRepairs.length ) } color="#0284c7" bg="#ecfeff" delay={ 0.05 } onClick={ () => onTabChange( 2 ) } />
+        <StatCard icon={ RotateCcw } label="Returns" value={ ordersLoading ? '…' : String( activeReturns.length ) } color="#7c3aed" bg="#f5f3ff" delay={ 0.1 } onClick={ () => onTabChange( 3 ) } />
+        <StatCard icon={ Headphones } label="Support Tickets" value={ ordersLoading ? '…' : String( activeSupportTickets.length ) } color="#d97706" bg="#fffbeb" delay={ 0.15 } onClick={ () => onTabChange( 4 ) } />
       </div>
 
-      {/* Recent orders */}
-      <Motion.div custom={ 0.24 } variants={ fadeUp } initial="hidden" animate="visible"
-        style={ { ...CARD, padding: '18px 20px' } }
-      >
-        <div style={ { display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '14px', flexWrap: 'wrap', gap: '8px' } }>
-          <div style={ { display: 'flex', alignItems: 'center', gap: '10px' } }>
-            <div style={ { width: '34px', height: '34px', borderRadius: '8px', background: '#eff6ff', display: 'flex', alignItems: 'center', justifyContent: 'center' } }>
-              <Package size={ 16 } style={ { color: '#2563eb' } } />
-            </div>
-            <span style={ { fontSize: '0.92rem', fontWeight: 700, color: '#0f172a' } }>Recent Orders</span>
-          </div>
-          <button
-            type="button"
-            onClick={ () => onTabChange( 1 ) }
-            style={ { fontSize: '0.76rem', fontWeight: 650, color: '#2563eb', background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '3px', padding: 0 } }
-          >
-            View all <ChevronRight size={ 12 } />
-          </button>
-        </div>
+      <ActivitySection title="Recent Orders" icon={Package} color="#2563eb" bg="#eff6ff" items={orderActivity} emptyText="No product orders yet." onViewAll={() => onTabChange(1)} loading={ordersLoading} delay={0.24} />
 
-        { ordersLoading ? (
-          <div style={ { display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 0' } }>
-            <Loader size={ 15 } className="animate-spin" style={ { color: '#2563eb' } } />
-            <span style={ { fontSize: '0.82rem', color: 'rgba(15,23,42,0.45)' } }>Loading orders…</span>
-          </div>
-        ) : orders.length === 0 ? (
-          <div style={ { textAlign: 'center', padding: '24px 16px', background: '#f8fafc', borderRadius: '8px' } }>
-            <Package size={ 26 } style={ { color: 'rgba(15,23,42,0.18)', display: 'block', margin: '0 auto 8px' } } />
-            <p style={ { margin: '0 0 12px', fontSize: '0.82rem', color: 'rgba(15,23,42,0.45)' } }>No orders yet.</p>
-            <Link to="/products" style={ { fontSize: '0.78rem', fontWeight: 650, color: '#2563eb', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '5px', background: '#eff6ff', padding: '6px 12px', borderRadius: '6px' } }>
-              <ShoppingCart size={ 12 } /> Browse Products
-            </Link>
-          </div>
-        ) : (
-          <div>
-            { orders.slice( 0, 4 ).map( ( order, i ) => (
-              <Link key={ order.id } to={ `/order/${ order.id }` } style={ { textDecoration: 'none', display: 'block' } }>
-                <div style={ {
-                  display: 'flex', alignItems: 'center', gap: '10px',
-                  padding: '10px 0',
-                  borderBottom: i < Math.min( orders.length, 4 ) - 1 ? '1px solid rgba(15,23,42,0.055)' : 'none',
-                  transition: 'background 0.1s',
-                } }
-                  onMouseEnter={ ( e ) => { e.currentTarget.style.background = '#f8fafc'; e.currentTarget.style.padding = '10px 8px'; e.currentTarget.style.borderRadius = '6px'; e.currentTarget.style.margin = '0 -8px'; } }
-                  onMouseLeave={ ( e ) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.padding = '10px 0'; e.currentTarget.style.borderRadius = '0'; e.currentTarget.style.margin = '0'; } }
-                >
-                  <div style={ { flex: 1 } }>
-                    <div style={ { display: 'flex', alignItems: 'center', gap: '7px', marginBottom: '2px' } }>
-                      <span style={ { fontSize: '0.85rem', fontWeight: 700, color: '#0f172a' } }>Order #{ order.id }</span>
-                      <StatusPill status={ order.status } />
-                    </div>
-                    <p style={ { margin: 0, fontSize: '0.72rem', color: 'rgba(15,23,42,0.4)' } }>
-                      { order.date_created ? new Date( order.date_created ).toLocaleDateString( 'en-US', { month: 'short', day: 'numeric', year: 'numeric' } ) : '' }
-                    </p>
-                  </div>
-                  <div style={ { display: 'flex', alignItems: 'center', gap: '6px' } }>
-                    <span style={ { fontWeight: 750, color: '#0f172a', fontSize: '0.88rem' } }>${ parseFloat( order.total ?? 0 ).toFixed( 2 ) }</span>
-                    <ChevronRight size={ 13 } style={ { color: 'rgba(15,23,42,0.25)' } } />
-                  </div>
-                </div>
-              </Link>
-            ) ) }
-          </div>
-        ) }
-      </Motion.div>
+      <div className="account-overview-service-grid">
+        <ActivitySection title="Recent Repairs" icon={Wrench} color="#0284c7" bg="#ecfeff" items={repairActivity} emptyText="No repair activity yet." onViewAll={() => onTabChange(2)} loading={ordersLoading} delay={0.28} />
+        <ActivitySection title="Recent Returns" icon={RotateCcw} color="#7c3aed" bg="#f5f3ff" items={returnActivity} emptyText="No return activity yet." onViewAll={() => onTabChange(3)} loading={ordersLoading} delay={0.32} />
+      </div>
 
       {/* Account info */}
       <Motion.div custom={ 0.3 } variants={ fadeUp } initial="hidden" animate="visible"

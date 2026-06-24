@@ -6,10 +6,10 @@
  * Layout:
  *   Gradient hero strip  →  floating pill tab nav  →  animated tab panel
  *
- * Tabs: Overview · Orders · Repairs · Addresses · Settings
+ * Tabs: Overview · Orders · Repairs · Returns · Support Tickets · Settings
  *
  * Features:
- *   - Deep-linkable via ?tab= query param (overview | orders | repairs | addresses | settings)
+ *   - Deep-linkable via ?tab= query param (overview | orders | repairs | returns | support | settings)
  *   - Tab persisted to localStorage
  *   - AnimatePresence tab transitions (opacity + scale, 0.22 s)
  *   - Touch swipe support for mobile
@@ -20,16 +20,21 @@ import { useState, useEffect, useRef, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion as Motion, AnimatePresence } from 'framer-motion';
 import {
-  LayoutDashboard, Package, Wrench, MapPin, Settings, LogOut, User,
+  Headphones, LayoutDashboard, Package, Wrench, RotateCcw, Settings, LogOut, User,
 } from 'lucide-react';
 
 import { useAuthContext }             from '../../auth/AuthContext.js';
 import { getCustomerOrders }          from '../../api/orders.js';
+import { getCustomerRepairs }         from '../../api/repairs.js';
+import { getCustomerReturns }         from '../../api/returns.js';
+import { getCustomerSupportTickets }  from '../../api/support.js';
+import { normalizeOrders, normalizeRepairs, normalizeReturns, normalizeSupportTickets } from '../../utils/accountActivity.js';
 
 import OverviewTab   from './OverviewTab.jsx';
 import OrdersTab     from './OrdersTab.jsx';
 import RepairsTab    from './RepairsTab.jsx';
-import AddressesTab  from './AddressesTab.jsx';
+import ReturnsTab    from './ReturnsTab.jsx';
+import SupportTicketsTab from './SupportTicketsTab.jsx';
 import SettingsTab   from './SettingsTab.jsx';
 import NavbarTabs    from '../ui/NavbarTabs.jsx';
 
@@ -39,7 +44,8 @@ const BASE_TABS = [
   { id: 'overview',   label: 'Overview',   shortLabel: 'Overview',  icon: LayoutDashboard },
   { id: 'orders',     label: 'Orders',     shortLabel: 'Orders',    icon: Package         },
   { id: 'repairs',    label: 'Repairs',    shortLabel: 'Repairs',   icon: Wrench          },
-  { id: 'addresses',  label: 'Addresses',  shortLabel: 'Addresses', icon: MapPin          },
+  { id: 'returns',    label: 'Returns',     shortLabel: 'Returns',   icon: RotateCcw       },
+  { id: 'support',    label: 'Support Tickets', shortLabel: 'Support', icon: Headphones    },
   { id: 'settings',   label: 'Settings',   shortLabel: 'Settings',  icon: Settings        },
 ];
 
@@ -72,17 +78,32 @@ export default function AccountHub() {
   const resolveInitialTab = () => {
     const urlTab = new URLSearchParams( window.location.search ).get( 'tab' );
     if ( urlTab ) {
+      if ( urlTab === 'addresses' ) {
+        return TABS.findIndex( ( t ) => t.id === 'settings' );
+      }
       const idx = TABS.findIndex( ( t ) => t.id === urlTab );
       if ( idx >= 0 ) return idx;
     }
     try {
       const cached = JSON.parse( localStorage.getItem( 'dtb_dashboard_tab' ) || '0' );
-      return typeof cached === 'number' && cached >= 0 && cached < TABS.length ? cached : 0;
+      if ( typeof cached === 'string' ) {
+        const cachedIndex = TABS.findIndex( ( tab ) => tab.id === cached );
+        return cachedIndex >= 0 ? cachedIndex : 0;
+      }
+      // Numeric values were stored by the previous five-tab dashboard.
+      if ( typeof cached === 'number' ) {
+        if ( cached === 4 ) return TABS.findIndex( ( tab ) => tab.id === 'settings' );
+        return cached >= 0 && cached <= 3 ? cached : 0;
+      }
+      return 0;
     } catch { return 0; }
   };
 
   const [ activeTab,      setActiveTab      ] = useState( resolveInitialTab );
   const [ recentOrders,   setRecentOrders   ] = useState( [] );
+  const [ recentRepairs,  setRecentRepairs  ] = useState( [] );
+  const [ recentReturns,  setRecentReturns  ] = useState( [] );
+  const [ recentSupportTickets, setRecentSupportTickets ] = useState( [] );
   const [ ordersLoading,  setOrdersLoading  ] = useState( true );
 
   // Touch swipe
@@ -108,7 +129,7 @@ export default function AccountHub() {
         url.searchParams.set( 'tab', tabId );
       }
       window.history.replaceState( null, '', url.toString() );
-      localStorage.setItem( 'dtb_dashboard_tab', JSON.stringify( activeTab ) );
+      localStorage.setItem( 'dtb_dashboard_tab', JSON.stringify( tabId ) );
     } catch { /* noop */ }
   }, [ TABS, activeTab ] );
 
@@ -117,10 +138,18 @@ export default function AccountHub() {
     if ( ! user?.id ) return;
     let cancelled = false;
 
-    getCustomerOrders( user.id, 1, 5 )
-      .then( ( data ) => {
+    Promise.all( [
+      getCustomerOrders( user.id, 1, 50 ),
+      getCustomerRepairs( 1, 50 ),
+      getCustomerReturns( 1, 50 ),
+      getCustomerSupportTickets( 1, 50 ),
+    ] )
+      .then( ( [ ordersData, repairsData, returnsData, supportData ] ) => {
         if ( cancelled ) return;
-        setRecentOrders( Array.isArray( data ) ? data : ( data?.orders ?? [] ) );
+        setRecentOrders( normalizeOrders( ordersData ) );
+        setRecentRepairs( normalizeRepairs( repairsData ) );
+        setRecentReturns( normalizeReturns( returnsData ) );
+        setRecentSupportTickets( normalizeSupportTickets( supportData ) );
         setOrdersLoading( false );
       } )
       .catch( () => { if ( ! cancelled ) setOrdersLoading( false ); } );
@@ -219,24 +248,6 @@ export default function AccountHub() {
 
               {/* Text block */}
               <div className="dash-hero-text">
-                <div style={ {
-                  display:       'inline-flex',
-                  alignItems:    'center',
-                  gap:           '5px',
-                  background:    'rgba(255,255,255,0.1)',
-                  border:        '1px solid rgba(255,255,255,0.18)',
-                  borderRadius:  '5px',
-                  padding:       '2px 10px',
-                  fontSize:      '0.58rem',
-                  fontWeight:    700,
-                  letterSpacing: '0.14em',
-                  textTransform: 'uppercase',
-                  color:         'rgba(255,255,255,0.7)',
-                  marginBottom:  '8px',
-                } }>
-                  My Account
-                </div>
-
                 <h1 style={ {
                   color:         'white',
                   fontSize:      'clamp(1.25rem, 3.5vw, 1.75rem)',
@@ -247,7 +258,7 @@ export default function AccountHub() {
                 } }>
                   Welcome back,<br className="dash-hero-br" />
                   <span style={ { color: '#93c5fd' } }>
-                    { user.first_name || displayName }
+                    { displayName }
                   </span>
                 </h1>
               </div>
@@ -294,14 +305,18 @@ export default function AccountHub() {
                 <OverviewTab
                   user={ user }
                   orders={ recentOrders }
+                  repairs={ recentRepairs }
+                  returns={ recentReturns }
+                  supportTickets={ recentSupportTickets }
                   ordersLoading={ ordersLoading }
                   onTabChange={ changeTab }
                 />
               ) }
               { TABS[ activeTab ]?.id === 'orders' && <OrdersTab userId={ user.id } /> }
               { TABS[ activeTab ]?.id === 'repairs' && <RepairsTab userId={ user.id } /> }
-              { TABS[ activeTab ]?.id === 'addresses' && <AddressesTab user={ user } /> }
-              { TABS[ activeTab ]?.id === 'settings' && <SettingsTab /> }
+              { TABS[ activeTab ]?.id === 'returns' && <ReturnsTab /> }
+              { TABS[ activeTab ]?.id === 'support' && <SupportTicketsTab /> }
+              { TABS[ activeTab ]?.id === 'settings' && <SettingsTab user={ user } /> }
             </Motion.div>
           </AnimatePresence>
         </div>

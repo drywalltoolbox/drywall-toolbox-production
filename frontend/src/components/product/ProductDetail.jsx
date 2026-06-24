@@ -876,13 +876,6 @@ export default function ProductDetail({
                 reviewsClassName="dtb-pdp-mobile-relocate"
               />
 
-              <p className="dtb-pdp-shipping-note">
-                <Link to="/shipping-policy" className="dtb-pdp-shipping-note__link">
-                  Shipping
-                </Link>{' '}
-                calculated at checkout.
-              </p>
-
               {needsVariation ? (
                 <ProductVariationRail
                   variationAttributes={variationAttributes}

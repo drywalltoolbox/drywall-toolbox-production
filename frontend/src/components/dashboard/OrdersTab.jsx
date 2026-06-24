@@ -1,184 +1,104 @@
 /**
- * frontend/src/components/dashboard/OrdersTab.jsx
- *
- * Dashboard Orders tab — paginated customer order history.
+ * Unified customer history: product orders, repair requests, and returns.
  */
 
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { motion as Motion } from 'framer-motion';
-import { Package, Clock, CheckCircle, AlertCircle, Truck, Loader, ChevronRight, ShoppingCart } from 'lucide-react';
+import { Loader, Package, RotateCcw, ShoppingCart, Wrench } from 'lucide-react';
 import { getOrders } from '../../api/orders.js';
-import { useOrderItemImageFallbacks } from '../../hooks/useOrderItemImageFallbacks.js';
-import { getOrderItemKey, getOrderPreviewItem, resolveOrderItemImage } from '../../utils/orderItemImages.js';
-
-const fadeUp = {
-  hidden:  { opacity: 0, y: 12 },
-  visible: ( d ) => ( {
-    opacity: 1, y: 0,
-    transition: { duration: 0.36, ease: [ 0.16, 1, 0.3, 1 ], delay: d ?? 0 },
-  } ),
-};
-
-const STATUS_CFG = {
-  pending:    { label: 'Pending',    color: '#d97706', bg: '#fffbeb', Icon: Clock       },
-  processing: { label: 'Processing', color: '#2563eb', bg: '#eff6ff', Icon: Package     },
-  'on-hold':  { label: 'On Hold',    color: '#d97706', bg: '#fff7ed', Icon: Clock       },
-  completed:  { label: 'Completed',  color: '#16a34a', bg: '#f0fdf4', Icon: CheckCircle },
-  cancelled:  { label: 'Cancelled',  color: '#dc2626', bg: '#fef2f2', Icon: AlertCircle },
-  refunded:   { label: 'Refunded',   color: '#64748b', bg: '#f8fafc', Icon: AlertCircle },
-  shipped:    { label: 'Shipped',    color: '#2563eb', bg: '#eff6ff', Icon: Truck       },
-  failed:     { label: 'Failed',     color: '#dc2626', bg: '#fef2f2', Icon: AlertCircle },
-};
-
-const ORDER_TYPE_CFG = {
-  product: { label: 'Product', color: '#334155', bg: '#f8fafc', border: '#e2e8f0' },
-  repair_service: { label: 'Repair Service', color: '#1d4ed8', bg: '#eff6ff', border: '#bfdbfe' },
-};
-
-function normalizeOrdersPayload( data ) {
-  if ( Array.isArray( data ) ) return { orders: data, hasMore: data.length >= PER_PAGE };
-  return {
-    orders: Array.isArray( data?.orders ) ? data.orders : [],
-    hasMore: Boolean( data?.has_more ),
-  };
-}
-
-function resolveOrderType( order ) {
-  const rawType = typeof order?.order_type === 'string' ? order.order_type.trim().toLowerCase() : '';
-  if ( rawType === 'repair_service' || rawType === 'product' ) return rawType;
-  return 'product';
-}
-
-function OrderTypeBadge( { order } ) {
-  const type = resolveOrderType( order );
-  const cfg = ORDER_TYPE_CFG[ type ] || ORDER_TYPE_CFG.product;
-
-  return (
-    <span style={ { display: 'inline-flex', alignItems: 'center', padding: '2px 8px', borderRadius: '999px', border: `1px solid ${ cfg.border }`, background: cfg.bg, color: cfg.color, fontSize: '0.66rem', fontWeight: 700, lineHeight: 1.2 } }>
-      { cfg.label }
-    </span>
-  );
-}
-
-function StatusBadge( { status } ) {
-  const cfg = STATUS_CFG[ status ] || { label: status || 'Order', color: '#64748b', bg: '#f8fafc', Icon: Package };
-  return (
-    <span style={ { display: 'inline-flex', alignItems: 'center', gap: '4px', padding: '3px 9px', borderRadius: '999px', background: cfg.bg, color: cfg.color, fontSize: '0.68rem', fontWeight: 700, whiteSpace: 'nowrap' } }>
-      <cfg.Icon size={ 10 } />{ cfg.label }
-    </span>
-  );
-}
-
-function OrderPreviewThumb( { item, fallbackImage = '' } ) {
-  const image = item ? ( resolveOrderItemImage( item ) || fallbackImage ) : '';
-
-  return (
-    <div style={ { width: '36px', height: '36px', borderRadius: '9px', background: '#eff6ff', border: '1px solid rgba(37,99,235,0.14)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, overflow: 'hidden' } }>
-      { image
-        ? <img src={ image } alt={ item?.name || 'Ordered product' } loading="lazy" decoding="async" style={ { width: '100%', height: '100%', objectFit: 'contain', padding: '4px', background: '#fff' } } />
-        : <Package size={ 15 } style={ { color: '#2563eb' } } />
-      }
-    </div>
-  );
-}
-
-const PER_PAGE = 20;
+import { getCustomerRepairs } from '../../api/repairs.js';
+import { getCustomerReturns } from '../../api/returns.js';
+import {
+  buildAccountActivity,
+  normalizeOrders,
+  normalizeRepairs,
+  normalizeReturns,
+} from '../../utils/accountActivity.js';
+import AccountActivityList from '../account/AccountActivityList.jsx';
 
 export default function OrdersTab() {
-  const [ orders,      setOrders      ] = useState( [] );
-  const [ page,        setPage        ] = useState( 1 );
-  const [ hasMore,     setHasMore     ] = useState( false );
-  const [ loading,     setLoading     ] = useState( true );
-  const [ loadingMore, setLoadingMore ] = useState( false );
-  const [ error,       setError       ] = useState( null );
+  const [data, setData] = useState({ orders: [], repairs: [], returns: [] });
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [filter, setFilter] = useState('all');
 
-  const loadPage = useCallback( async ( pageNum, append = false ) => {
-    append ? setLoadingMore( true ) : setLoading( true );
-    setError( null );
+  const loadHistory = useCallback(async () => {
+    setLoading(true);
+    setError('');
     try {
-      const data = await getOrders( pageNum, PER_PAGE );
-      const normalized = normalizeOrdersPayload( data );
-      setOrders( ( prev ) => append ? [ ...prev, ...normalized.orders ] : normalized.orders );
-      setHasMore( normalized.hasMore );
-      setPage( pageNum );
-    } catch ( err ) {
-      setError( err.message || 'Unable to load orders.' );
+      const [ordersData, repairsData, returnsData] = await Promise.all([
+        getOrders(1, 50),
+        getCustomerRepairs(1, 50),
+        getCustomerReturns(1, 50),
+      ]);
+      setData({
+        orders: normalizeOrders(ordersData),
+        repairs: normalizeRepairs(repairsData),
+        returns: normalizeReturns(returnsData),
+      });
+    } catch (err) {
+      setError(err?.message || 'Unable to load account history.');
     } finally {
-      append ? setLoadingMore( false ) : setLoading( false );
+      setLoading(false);
     }
-  }, [] );
+  }, []);
 
-  useEffect( () => { loadPage( 1 ); }, [ loadPage ] );
+  useEffect(() => {
+    loadHistory();
+  }, [loadHistory]);
 
-  const orderPreviewItems = useMemo( () => orders.map( getOrderPreviewItem ).filter( Boolean ), [ orders ] );
-  const itemImageFallbacks = useOrderItemImageFallbacks( orderPreviewItems );
+  const activity = useMemo(() => buildAccountActivity(data), [data]);
+  const filteredActivity = useMemo(() => {
+    if (filter === 'all') return activity;
+    if (filter === 'orders') return activity.filter((item) => item.type === 'order' || item.type === 'repair-order');
+    return activity.filter((item) => item.type === filter);
+  }, [activity, filter]);
 
-  if ( loading ) {
-    return (
-      <div style={ { display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', padding: '48px 0' } }>
-        <Loader size={ 20 } className="animate-spin" style={ { color: '#2563eb' } } />
-        <span style={ { fontSize: '0.875rem', color: 'rgba(15,23,42,0.45)' } }>Loading orders…</span>
-      </div>
-    );
+  const filters = [
+    { id: 'all', label: 'All activity', count: activity.length, Icon: Package },
+    { id: 'orders', label: 'Orders', count: data.orders.length, Icon: ShoppingCart },
+    { id: 'repair', label: 'Repairs', count: data.repairs.length, Icon: Wrench },
+    { id: 'return', label: 'Returns', count: data.returns.length, Icon: RotateCcw },
+  ];
+
+  if (loading) {
+    return <div className="account-history-state"><Loader size={20} className="animate-spin" /> Loading account history…</div>;
   }
 
   return (
-    <div style={ { display: 'flex', flexDirection: 'column', gap: '10px' } }>
-      { error && (
-        <div style={ { background: '#fef2f2', border: '1px solid #fecaca', borderRadius: '10px', padding: '12px 16px', color: '#dc2626', fontSize: '0.83rem' } }>
-          { error }
-          <button type="button" onClick={ () => loadPage( 1 ) } style={ { display: 'block', marginTop: '8px', color: '#991b1b', fontWeight: 700, textDecoration: 'underline', background: 'transparent', border: 0, padding: 0, cursor: 'pointer' } }>Retry</button>
+    <div className="account-history">
+      <div className="account-history__filters" role="tablist" aria-label="Filter account history">
+        {filters.map(({ id, label, count, Icon }) => (
+          <button
+            key={id}
+            type="button"
+            role="tab"
+            aria-selected={filter === id}
+            className={`account-history__filter${filter === id ? ' is-active' : ''}`}
+            onClick={() => setFilter(id)}
+          >
+            <Icon size={14} />
+            <span>{label}</span>
+            <strong>{count}</strong>
+          </button>
+        ))}
+      </div>
+
+      {error ? (
+        <div className="account-history-state is-error">
+          <span>{error}</span>
+          <button type="button" onClick={loadHistory}>Retry</button>
         </div>
-      ) }
-
-      { ! error && orders.length === 0 ? (
-        <Motion.div custom={ 0 } variants={ fadeUp } initial="hidden" animate="visible" style={ { background: 'white', border: '1px solid rgba(15,23,42,0.08)', borderRadius: '12px', padding: '48px 24px', textAlign: 'center', boxShadow: '0 2px 12px rgba(15,23,42,0.04)' } }>
-          <Package size={ 38 } style={ { color: 'rgba(15,23,42,0.15)', display: 'block', margin: '0 auto 14px' } } />
-          <h3 style={ { fontSize: '0.95rem', fontWeight: 750, color: '#0f172a', margin: '0 0 8px' } }>No orders yet</h3>
-          <p style={ { fontSize: '0.83rem', color: 'rgba(15,23,42,0.45)', margin: '0 0 20px' } }>Your order history will appear here after your first purchase.</p>
-          <Link to="/products" style={ { display: 'inline-flex', alignItems: 'center', gap: '6px', background: '#2563eb', color: 'white', padding: '9px 18px', borderRadius: '8px', fontSize: '0.83rem', fontWeight: 650, textDecoration: 'none' } }><ShoppingCart size={ 13 } /> Browse Products</Link>
-        </Motion.div>
-      ) : null }
-
-      { ! error && orders.map( ( order, i ) => (
-        <Motion.div key={ order.id } custom={ i * 0.03 } variants={ fadeUp } initial="hidden" animate="visible" style={ { background: 'white', border: '1px solid rgba(15,23,42,0.08)', borderRadius: '11px', boxShadow: '0 2px 10px rgba(15,23,42,0.04)', overflow: 'hidden' } }>
-          <div style={ { display: 'flex', alignItems: 'stretch', overflow: 'hidden' } }>
-            <Link to={ `/order/${ order.id }${ order.order_key ? `?order_key=${ encodeURIComponent( order.order_key ) }` : '' }` } style={ { textDecoration: 'none', flex: 1, display: 'block', padding: '14px 16px' } }>
-              <div style={ { display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '10px' } }>
-                <div style={ { display: 'flex', alignItems: 'center', gap: '11px' } }>
-                  <OrderPreviewThumb item={ getOrderPreviewItem( order ) } fallbackImage={ itemImageFallbacks[ getOrderItemKey( getOrderPreviewItem( order ) ) ] } />
-                  <div>
-                    <div style={ { display: 'flex', alignItems: 'center', gap: '7px', marginBottom: '3px', flexWrap: 'wrap' } }>
-                      <span style={ { fontWeight: 700, color: '#0f172a', fontSize: '0.9rem' } }>Order #{ order.number || order.id }</span>
-                      <OrderTypeBadge order={ order } />
-                      <StatusBadge status={ order.status } />
-                    </div>
-                    <p style={ { margin: 0, fontSize: '0.73rem', color: 'rgba(15,23,42,0.4)' } }>
-                      { order.date_created ? new Date( order.date_created ).toLocaleDateString( 'en-US', { year: 'numeric', month: 'short', day: 'numeric' } ) : '' }
-                      { order.items_count > 0 && ` · ${ order.items_count } item${ order.items_count !== 1 ? 's' : '' }` }
-                      { order.line_items?.length > 0 && ! order.items_count && ` · ${ order.line_items.length } item${ order.line_items.length !== 1 ? 's' : '' }` }
-                    </p>
-                  </div>
-                </div>
-                <div style={ { display: 'flex', alignItems: 'center', gap: '8px' } }>
-                  <span style={ { fontWeight: 800, color: '#0f172a', fontSize: '0.92rem' } }>${ parseFloat( order.total ?? 0 ).toFixed( 2 ) }</span>
-                  <ChevronRight size={ 14 } style={ { color: 'rgba(15,23,42,0.25)' } } />
-                </div>
-              </div>
-            </Link>
-            { ( order.status === 'processing' || order.status === 'shipped' ) && (
-              <Link to={ `/order-tracking/${ order.id }${ order.order_key ? `?order_key=${ encodeURIComponent( order.order_key ) }` : '' }` } title="Track order" style={ { display: 'flex', alignItems: 'center', padding: '0 14px', borderLeft: '1px solid rgba(15,23,42,0.06)', color: '#2563eb', textDecoration: 'none', fontSize: '0.72rem', fontWeight: 650, flexShrink: 0 } }><Truck size={ 13 } style={ { marginRight: '4px' } } />Track</Link>
-            ) }
-          </div>
-        </Motion.div>
-      ) ) }
-
-      { ! error && hasMore && (
-        <button type="button" onClick={ () => loadPage( page + 1, true ) } disabled={ loadingMore } style={ { display: 'flex', alignItems: 'center', gap: '6px', justifyContent: 'center', padding: '12px', borderRadius: '10px', border: '1px solid rgba(15,23,42,0.1)', background: 'white', fontSize: '0.83rem', fontWeight: 650, color: '#2563eb', cursor: 'pointer' } }>
-          { loadingMore ? <><Loader size={ 13 } className="animate-spin" /> Loading…</> : 'Load more orders' }
-        </button>
-      ) }
+      ) : filteredActivity.length ? (
+        <AccountActivityList items={filteredActivity} />
+      ) : (
+        <div className="account-history-state">
+          <Package size={34} />
+          <strong>No activity found</strong>
+          <span>Your product orders, repair requests, and returns will appear here.</span>
+          <Link to="/products">Browse products</Link>
+        </div>
+      )}
     </div>
   );
 }

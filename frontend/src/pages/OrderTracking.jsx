@@ -16,10 +16,9 @@ import {
   ArrowLeft,
   CheckCircle,
   Clock,
-  CreditCard,
   ExternalLink,
+  Headphones,
   Loader,
-  MapPin,
   Package,
   PackageCheck,
   RefreshCw,
@@ -30,7 +29,7 @@ import SEOHead from '../components/shared/SEOHead';
 import { useOrderStatus } from '../hooks/useOrderStatus.js';
 import { useOrderEventStream } from '../hooks/useOrderEventStream.js';
 import { useOrderItemImageFallbacks } from '../hooks/useOrderItemImageFallbacks.js';
-import { ORDER_STATUS_LABELS, ORDER_TERMINAL_STATUSES } from '../api/orders.js';
+import { ORDER_STATUS_LABELS } from '../api/orders.js';
 import { getOrderItemKey, resolveOrderItemImage } from '../utils/orderItemImages.js';
 import '../styles/order-pages.css';
 import '../styles/order-tracking.css';
@@ -193,17 +192,6 @@ function getStatusTone(status) {
   return 'info';
 }
 
-function StatusBadge({ status, label, paymentRequired = false }) {
-  const Icon = STATUS_ICONS[status] || Package;
-  const tone = getStatusTone(status);
-  return (
-    <span className={`dtb-order-status-badge dtb-order-status-badge--${tone}`}>
-      <Icon size={14} />
-      {paymentRequired && status === 'pending' ? 'Payment pending' : label || ORDER_STATUS_LABELS[status] || humanizeToken(status) || 'Order received'}
-    </span>
-  );
-}
-
 function TrackingSkeleton() {
   return (
     <div className="dtb-order-page page-wrapper">
@@ -230,7 +218,6 @@ function OrderStatusTracker({ order, streaming }) {
   const label = resolveStatusLabel(order);
   const StatusIcon = STATUS_ICONS[status] || Package;
   const progressWidth = `${Math.max(8, (activeIndex / (TRACKING_STEPS.length - 1)) * 100)}%`;
-  const orderTotal = order?.total ? formatMoney(order.total, order.currency) : '';
 
   return (
     <section className="dtb-order-status-panel" aria-labelledby="tracking-order-title">
@@ -239,24 +226,9 @@ function OrderStatusTracker({ order, streaming }) {
           <p className="dtb-order-eyebrow">Order tracking</p>
           <h1 id="tracking-order-title" className="dtb-order-tracking-title">Order #{order?.number || order?.id}</h1>
         </div>
-        <StatusBadge status={status} label={label} paymentRequired={Boolean(order?.payment_required)} />
-      </div>
-
-      <div className="dtb-order-status-panel__metrics" aria-label="Order summary">
-        <div>
-          <span>Placed</span>
-          <strong>{formatDate(getPlacedAt(order))}</strong>
-        </div>
-        <div>
-          <span>Last update</span>
-          <strong>{formatDateTime(getLastUpdatedAt(order))}</strong>
-        </div>
-        {orderTotal ? (
-          <div>
-            <span>Total</span>
-            <strong>{orderTotal}</strong>
-          </div>
-        ) : null}
+        <Link to="/contact" className="dtb-order-help-link">
+          <Headphones size={15} /> Need help?
+        </Link>
       </div>
 
       <div className="dtb-order-status-panel__summary">
@@ -326,7 +298,6 @@ function ItemsCard({ items, currency, imageFallbacks = {} }) {
         <h2 id="tracking-items-title" className="dtb-order-card__title">
           <ShoppingBag size={20} /> Items ordered
         </h2>
-        <span className="dtb-order-card__chip">{items.length} line{items.length === 1 ? '' : 's'}</span>
       </header>
       <div className="dtb-order-sheet-section__body">
         <div className="dtb-order-items dtb-order-items--friendly">
@@ -370,7 +341,6 @@ function ShipmentCard({ tracking, order }) {
           </dl>
         ) : (
           <div className="dtb-order-empty-state">
-            <span><MapPin size={20} /></span>
             <h3>Shipment details are not available yet</h3>
             <p>{order?.payment_required ? 'Shipping starts after secure payment is completed.' : 'Tracking will appear here once the order is packed and handed to the carrier.'}</p>
           </div>
@@ -394,27 +364,6 @@ function DetailRow({ label, value }) {
       <dt className="dtb-order-detail-label">{label}</dt>
       <dd className="dtb-order-detail-value">{value}</dd>
     </div>
-  );
-}
-
-function DetailsCard({ order }) {
-  return (
-    <section className="dtb-order-sheet-section dtb-order-sheet-section--tracking" aria-labelledby="order-meta-title">
-      <header className="dtb-order-sheet-section__header">
-        <h2 id="order-meta-title" className="dtb-order-card__title">
-          <CreditCard size={20} /> Order details
-        </h2>
-      </header>
-      <div className="dtb-order-sheet-section__body">
-        <dl className="dtb-order-detail-list dtb-order-detail-list--compact">
-          <DetailRow label="Placed" value={formatDateTime(getPlacedAt(order))} />
-          <DetailRow label="Last updated" value={formatDateTime(getLastUpdatedAt(order))} />
-          <DetailRow label="Payment" value={order?.payment_method_title || humanizeToken(order?.payment_method) || 'Secure payment'} />
-          <DetailRow label="Order type" value={formatOrderType(order?.order_type)} />
-          {order?.total ? <DetailRow label="Total" value={formatMoney(order.total, order.currency)} /> : null}
-        </dl>
-      </div>
-    </section>
   );
 }
 
@@ -479,7 +428,6 @@ export default function OrderTracking() {
   }
 
   const { order, items, tracking } = viewModel;
-  const isTerminal = order && ORDER_TERMINAL_STATUSES.includes(order.status);
 
   return (
     <div className="dtb-order-page page-wrapper">
@@ -511,7 +459,6 @@ export default function OrderTracking() {
 
               <aside className="dtb-order-stack">
                 <ShipmentCard tracking={tracking} order={order} />
-                <DetailsCard order={order} />
               </aside>
             </div>
 
@@ -521,19 +468,6 @@ export default function OrderTracking() {
               </div>
             ) : null}
 
-            <div className="dtb-order-actions dtb-order-actions--footer">
-              {!isTerminal ? (
-                <button onClick={refresh} className="dtb-order-button dtb-order-button--secondary" type="button">
-                  <RefreshCw size={15} /> Refresh status
-                </button>
-              ) : null}
-              <Link to="/products" className="dtb-order-button dtb-order-button--primary">
-                Continue Shopping
-              </Link>
-              <Link to="/contact" className="dtb-order-button dtb-order-button--ghost">
-                Need help?
-              </Link>
-            </div>
           </div>
         </section>
       </motion.div>

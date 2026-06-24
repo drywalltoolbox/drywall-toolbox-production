@@ -41,6 +41,12 @@ function dtb_returns_rest_register_routes(): void {
 		],
 	] );
 
+	register_rest_route( 'dtb/v1', '/returns/mine', [
+		'methods'             => WP_REST_Server::READABLE,
+		'callback'            => 'dtb_returns_rest_customer_list',
+		'permission_callback' => 'dtb_jwt_permission',
+	] );
+
 	register_rest_route( 'dtb/v1', '/returns/status/(?P<id>\d+)', [
 		'methods'             => WP_REST_Server::READABLE,
 		'callback'            => 'dtb_returns_rest_public_status',
@@ -126,6 +132,49 @@ function dtb_returns_rest_register_routes(): void {
 			],
 		],
 	] );
+}
+
+function dtb_returns_rest_customer_list( WP_REST_Request $request ): WP_REST_Response {
+	$user = DTB_CurrentUserResolver::resolve_user();
+	if ( ! $user ) {
+		return new WP_REST_Response( [ 'code' => 'dtb_returns_unauthorized', 'message' => 'Authentication required.' ], 401 );
+	}
+
+	$page     = max( 1, (int) ( $request->get_param( 'page' ) ?? 1 ) );
+	$per_page = min( 50, max( 1, (int) ( $request->get_param( 'per_page' ) ?? 20 ) ) );
+	$query    = new WP_Query( [
+		'post_type'      => 'dtb_return',
+		'post_status'    => 'publish',
+		'posts_per_page' => $per_page,
+		'paged'          => $page,
+		'orderby'        => 'date',
+		'order'          => 'DESC',
+		'meta_query'     => [
+			[
+				'key'     => '_dtb_return_customer_email',
+				'value'   => sanitize_email( $user->user_email ),
+				'compare' => '=',
+			],
+		],
+	] );
+
+	$items = array_map(
+		static function ( WP_Post $post ): array {
+			$entity               = DTB_Return_Entity::from_post( $post );
+			$item                 = $entity->to_array();
+			$item['public_token'] = dtb_returns_generate_public_status_token( $entity->id, $entity->customer_email );
+			return $item;
+		},
+		$query->posts
+	);
+
+	return new WP_REST_Response( [
+		'returns'  => $items,
+		'page'     => $page,
+		'per_page' => $per_page,
+		'total'    => (int) $query->found_posts,
+		'has_more' => $page < (int) $query->max_num_pages,
+	], 200 );
 }
 
 function dtb_returns_rest_list( WP_REST_Request $request ): WP_REST_Response {
@@ -286,7 +335,10 @@ function dtb_returns_rest_public_submit( WP_REST_Request $request ): WP_REST_Res
 		'Reply-To: ' . $site_name . ' Support <info@drywalltoolbox.com>',
 	];
 
-	if ( is_email( $customer_email ) ) {
+	if (
+		is_email( $customer_email )
+		&& ( ! function_exists( 'dtb_account_email_preference' ) || dtb_account_email_preference( $customer_email, 'return_updates' ) )
+	) {
 		if ( function_exists( 'dtb_send_email' ) ) {
 			dtb_send_email( [
 				'to'           => $customer_email,

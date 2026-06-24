@@ -1,41 +1,51 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Home, Package, LifeBuoy, User, X, ShoppingBag, ChevronRight, Clock, CheckCircle, AlertCircle, Truck, Loader } from 'lucide-react';
+import { Home, Package, User, X, ShoppingBag, ChevronRight, AlertCircle, Loader, Wrench, RotateCcw, ChevronDown, LayoutDashboard, Calculator, LifeBuoy, BookOpen } from 'lucide-react';
 import { getCustomerOrders } from '../../api/orders.js';
+import { getCustomerRepairs } from '../../api/repairs.js';
+import { getCustomerReturns } from '../../api/returns.js';
 import { getRecentlyViewed } from '../../utils/recentlyViewed.js';
-import { useOrderItemImageFallbacks } from '../../hooks/useOrderItemImageFallbacks.js';
-import { getOrderItemKey, getOrderPreviewItem, resolveOrderItemImage } from '../../utils/orderItemImages.js';
+import { buildAccountActivity, normalizeOrders, normalizeRepairs, normalizeReturns } from '../../utils/accountActivity.js';
+import AccountActivityList from './AccountActivityList.jsx';
 
 const TABS = [
   { id: 'home',    label: 'Home',    Icon: Home },
   { id: 'orders',  label: 'Orders',  Icon: Package },
-  { id: 'support', label: 'Support', Icon: LifeBuoy },
   { id: 'account', label: 'Account', Icon: User },
 ];
 
-const ORDER_STATUS_CFG = {
-  pending:    { label: 'Pending',    color: '#d97706', bg: '#fffbeb', Icon: Clock        },
-  processing: { label: 'Processing', color: '#2563eb', bg: '#eff6ff', Icon: Package      },
-  'on-hold':  { label: 'On Hold',    color: '#d97706', bg: '#fff7ed', Icon: Clock        },
-  completed:  { label: 'Completed',  color: '#16a34a', bg: '#f0fdf4', Icon: CheckCircle  },
-  cancelled:  { label: 'Cancelled',  color: '#dc2626', bg: '#fef2f2', Icon: AlertCircle  },
-  refunded:   { label: 'Refunded',   color: '#64748b', bg: '#f8fafc', Icon: AlertCircle  },
-  failed:     { label: 'Failed',     color: '#dc2626', bg: '#fef2f2', Icon: AlertCircle  },
-  shipped:    { label: 'Shipped',    color: '#2563eb', bg: '#eff6ff', Icon: Truck        },
-};
-
-function normalizeOrdersPayload(data) {
-  if (Array.isArray(data)) return data;
-  if (Array.isArray(data?.orders)) return data.orders;
-  return [];
+function AccountHubHero({ eyebrow, title, subtitle, Icon }) {
+  return (
+    <header className="account-hub__hero">
+      <div className="account-hub__hero-pattern" aria-hidden="true" />
+      <span className="account-hub__hero-icon"><Icon size={22} /></span>
+      <div className="account-hub__hero-copy">
+        {eyebrow ? <p>{eyebrow}</p> : null}
+        <h2>{title}</h2>
+        {subtitle ? <span>{subtitle}</span> : null}
+      </div>
+    </header>
+  );
 }
 
-function OrderStatusBadge({ status }) {
-  const cfg = ORDER_STATUS_CFG[status] || { label: status || 'Order', color: '#64748b', bg: '#f8fafc', Icon: Package };
+function AccountHubAccordion({ title, Icon, open, onToggle, links, onNavigate }) {
   return (
-    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '3px', padding: '2px 7px', borderRadius: '999px', background: cfg.bg, color: cfg.color, fontSize: '0.65rem', fontWeight: 700, whiteSpace: 'nowrap' }}>
-      <cfg.Icon size={9} />{cfg.label}
-    </span>
+    <section className={`account-hub__accordion${open ? ' is-open' : ''}`}>
+      <button type="button" className="account-hub__accordion-trigger" onClick={onToggle} aria-expanded={open}>
+        <span className="account-hub__accordion-title"><Icon size={18} />{title}</span>
+        <ChevronDown size={17} />
+      </button>
+      <div className="account-hub__accordion-panel">
+        <div>
+          {links.map(({ to, label, icon: LinkIcon }) => (
+            <Link key={to} to={to} onClick={onNavigate} className="account-hub__accordion-link">
+              <span>{LinkIcon ? <LinkIcon size={16} /> : null}{label}</span>
+              <ChevronRight size={15} />
+            </Link>
+          ))}
+        </div>
+      </div>
+    </section>
   );
 }
 
@@ -60,19 +70,6 @@ function RecentlyViewedTile({ product, onClose }) {
       </div>
       <ChevronRight size={14} strokeWidth={2.5} style={{ color: 'rgba(15,23,42,0.25)', flexShrink: 0 }} />
     </Link>
-  );
-}
-
-function OrderPreviewThumb({ item, fallbackImage = '' }) {
-  const image = item ? (resolveOrderItemImage(item) || fallbackImage) : '';
-
-  return (
-    <div style={{ width: '36px', height: '36px', borderRadius: '8px', background: '#eff6ff', border: '1px solid rgba(37,99,235,0.14)', flexShrink: 0, overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-      {image
-        ? <img src={image} alt={item?.name || 'Ordered product'} loading="lazy" decoding="async" style={{ width: '100%', height: '100%', objectFit: 'contain', padding: '4px', background: '#fff' }} />
-        : <Package size={15} style={{ color: '#2563eb' }} />
-      }
-    </div>
   );
 }
 
@@ -118,11 +115,15 @@ export default function AccountHubSheet({ isOpen, onClose, user, onLogout }) {
   const [activeTab, setActiveTab] = useState('home');
   const [recentlyViewed, setRecentlyViewed] = useState([]);
   const [orders, setOrders] = useState([]);
+  const [repairs, setRepairs] = useState([]);
+  const [returns, setReturns] = useState([]);
   const [ordersLoading, setOrdersLoading] = useState(false);
   const [ordersError, setOrdersError] = useState('');
+  const [accountSections, setAccountSections] = useState({ services: false, support: false });
 
   const closeSheet = useCallback(() => {
     setActiveTab('home');
+    setAccountSections({ services: false, support: false });
     onClose?.();
   }, [onClose]);
 
@@ -131,10 +132,18 @@ export default function AccountHubSheet({ isOpen, onClose, user, onLogout }) {
     setOrdersLoading(true);
     setOrdersError('');
     try {
-      const data = await getCustomerOrders(user?.id, 1, 5);
-      setOrders(normalizeOrdersPayload(data));
+      const [ordersData, repairsData, returnsData] = await Promise.all([
+        getCustomerOrders(user?.id, 1, 20),
+        getCustomerRepairs(1, 20),
+        getCustomerReturns(1, 20),
+      ]);
+      setOrders(normalizeOrders(ordersData));
+      setRepairs(normalizeRepairs(repairsData));
+      setReturns(normalizeReturns(returnsData));
     } catch (error) {
       setOrders([]);
+      setRepairs([]);
+      setReturns([]);
       setOrdersError(error?.message || 'Unable to load your orders.');
     } finally {
       setOrdersLoading(false);
@@ -154,12 +163,20 @@ export default function AccountHubSheet({ isOpen, onClose, user, onLogout }) {
       setOrdersLoading(true);
       setOrdersError('');
       try {
-        const data = await getCustomerOrders(user?.id, 1, 5);
+        const [ordersData, repairsData, returnsData] = await Promise.all([
+          getCustomerOrders(user?.id, 1, 20),
+          getCustomerRepairs(1, 20),
+          getCustomerReturns(1, 20),
+        ]);
         if (cancelled) return;
-        setOrders(normalizeOrdersPayload(data));
+        setOrders(normalizeOrders(ordersData));
+        setRepairs(normalizeRepairs(repairsData));
+        setReturns(normalizeReturns(returnsData));
       } catch (error) {
         if (cancelled) return;
         setOrders([]);
+        setRepairs([]);
+        setReturns([]);
         setOrdersError(error?.message || 'Unable to load your orders.');
       } finally {
         if (!cancelled) setOrdersLoading(false);
@@ -182,10 +199,8 @@ export default function AccountHubSheet({ isOpen, onClose, user, onLogout }) {
     };
   }, [isOpen, closeSheet]);
 
-  const firstName = useMemo(() => user?.first_name || user?.name?.split(' ')?.[0] || 'there', [user]);
-  const displayName = useMemo(() => [user?.first_name, user?.last_name].filter(Boolean).join(' ') || user?.name || 'My Account', [user]);
-  const orderPreviewItems = useMemo(() => orders.map(getOrderPreviewItem).filter(Boolean), [orders]);
-  const itemImageFallbacks = useOrderItemImageFallbacks(orderPreviewItems);
+  const displayName = useMemo(() => [user?.first_name, user?.last_name].filter(Boolean).join(' ') || user?.display_name || 'My Account', [user]);
+  const activity = useMemo(() => buildAccountActivity({ orders, repairs, returns }), [orders, repairs, returns]);
 
   return (
     <div className={`account-hub${isOpen ? ' account-hub--open' : ''}`} role="dialog" aria-modal="true" aria-label="Account hub" aria-hidden={!isOpen}>
@@ -206,14 +221,53 @@ export default function AccountHubSheet({ isOpen, onClose, user, onLogout }) {
           )}
 
           {user && activeTab === 'home' && (
-            <div className="account-hub__panel">
-              <h2 className="account-hub__welcome">Welcome,<br />{firstName}</h2>
+            <div className="account-hub__panel account-hub__panel--home">
+              <AccountHubHero
+                eyebrow="Account overview"
+                title={`Welcome back, ${displayName}`}
+                subtitle="Orders, service activity, and recently viewed tools."
+                Icon={Home}
+              />
+              <div className="account-hub__home-header">
+                <div className="account-hub__summary-grid">
+                  <button type="button" onClick={() => setActiveTab('orders')} className="account-hub__summary-card">
+                    <Package size={18} /><strong>{orders.length}</strong><span>Orders</span>
+                  </button>
+                  <button type="button" onClick={() => { closeSheet(); navigate('/dashboard?tab=repairs'); }} className="account-hub__summary-card is-repair">
+                    <Wrench size={18} /><strong>{repairs.length}</strong><span>Repairs</span>
+                  </button>
+                  <button type="button" onClick={() => setActiveTab('orders')} className="account-hub__summary-card is-return">
+                    <RotateCcw size={18} /><strong>{returns.length}</strong><span>Returns</span>
+                  </button>
+                </div>
+              </div>
+
+              <section className="account-hub__list-section">
+                <button type="button" className="account-hub__section-header" onClick={() => setActiveTab('orders')}>
+                  <span>Recent activity</span>
+                  <span className="account-hub__section-action">View all <ChevronRight size={14} /></span>
+                </button>
+                {ordersLoading ? (
+                  <div className="account-hub__loading"><Loader size={18} className="animate-spin" /> Loading activity…</div>
+                ) : activity.length ? (
+                  <AccountActivityList items={activity} limit={4} onNavigate={closeSheet} />
+                ) : (
+                  <div className="account-hub__empty-card"><div className="account-hub__empty-icon"><Package size={24} /></div><p>Your orders, repairs, and returns will appear here.</p></div>
+                )}
+              </section>
+
               <RecentlyViewedSection recentlyViewed={recentlyViewed} closeSheet={closeSheet} navigate={navigate} />
             </div>
           )}
 
           {user && activeTab === 'orders' && (
             <div className="account-hub__panel">
+              <AccountHubHero
+                eyebrow="Account history"
+                title="Orders & services"
+                subtitle="Product orders, repair requests, and returns in one place."
+                Icon={Package}
+              />
               {ordersLoading ? (
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', padding: '48px 0' }}>
                   <Loader size={20} style={{ color: '#2563eb' }} className="animate-spin" />
@@ -228,44 +282,18 @@ export default function AccountHubSheet({ isOpen, onClose, user, onLogout }) {
                     <button type="button" className="account-hub__outline-btn" onClick={loadOrders}>Retry</button>
                   </div>
                 </div>
-              ) : orders.length === 0 ? (
+              ) : activity.length === 0 ? (
                 <div className="account-hub__panel account-hub__panel--centered">
                   <div className="account-hub__empty-state">
                     <div className="account-hub__empty-state-icon"><Package size={34} strokeWidth={1.4} /></div>
                     <strong className="account-hub__empty-state-title">No orders yet</strong>
-                    <p className="account-hub__empty-state-body">Current and past orders will appear here to track shipping updates.</p>
+                    <p className="account-hub__empty-state-body">Product orders, repair requests, and returns will appear here.</p>
                     <button type="button" className="account-hub__outline-btn" onClick={() => { closeSheet(); navigate('/products'); }}>Start shopping</button>
                   </div>
                 </div>
               ) : (
                 <div className="account-hub__list-section">
-                  <div className="account-hub__links-card" style={{ padding: 0 }}>
-                    {orders.map((order, i) => (
-                      <Link
-                        key={order.id || order.number}
-                        to={`/order/${order.id}${order.order_key ? `?order_key=${encodeURIComponent(order.order_key)}` : ''}`}
-                        onClick={closeSheet}
-                        style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '12px 14px', textDecoration: 'none', borderBottom: i < orders.length - 1 ? '1px solid rgba(15,23,42,0.06)' : 'none', transition: 'background 0.12s' }}
-                        onMouseEnter={(e) => { e.currentTarget.style.background = '#f8fafc'; }}
-                        onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}
-                      >
-                        <OrderPreviewThumb item={getOrderPreviewItem(order)} fallbackImage={itemImageFallbacks[getOrderItemKey(getOrderPreviewItem(order))]} />
-                        <div style={{ flex: 1, minWidth: 0 }}>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '7px', marginBottom: '3px' }}>
-                            <span style={{ fontSize: '0.82rem', fontWeight: 700, color: '#0f172a' }}>Order #{order.number || order.id}</span>
-                            <OrderStatusBadge status={order.status} />
-                          </div>
-                          <p style={{ margin: 0, fontSize: '0.72rem', color: 'rgba(15,23,42,0.42)' }}>
-                            {order.date_created ? new Date(order.date_created).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : ''}
-                          </p>
-                        </div>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexShrink: 0 }}>
-                          <span style={{ fontWeight: 750, color: '#0f172a', fontSize: '0.88rem' }}>${parseFloat(order.total ?? 0).toFixed(2)}</span>
-                          <ChevronRight size={13} style={{ color: 'rgba(15,23,42,0.25)' }} />
-                        </div>
-                      </Link>
-                    ))}
-                  </div>
+                  <AccountActivityList items={activity} onNavigate={closeSheet} />
                   <button
                     type="button"
                     onClick={() => { closeSheet(); navigate('/dashboard?tab=orders'); }}
@@ -273,53 +301,51 @@ export default function AccountHubSheet({ isOpen, onClose, user, onLogout }) {
                     onMouseEnter={(e) => { e.currentTarget.style.background = '#eff6ff'; }}
                     onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}
                   >
-                    View all orders <ChevronRight size={13} />
+                    View full history <ChevronRight size={13} />
                   </button>
                 </div>
               )}
             </div>
           )}
 
-          {user && activeTab === 'support' && (
-            <div className="account-hub__panel">
-              <h2 className="account-hub__welcome">Support</h2>
-              <section className="account-hub__list-section">
-                <div className="account-hub__links-card">
-                  {[
-                    { to: '/contact', label: 'Contact Support' },
-                    { to: '/repairs', label: 'Repairs' },
-                    { to: '/faq', label: 'FAQ' },
-                    { to: '/schematics', label: 'Schematics' },
-                  ].map(({ to, label }) => (
-                    <Link key={to} to={to} onClick={closeSheet} className="account-hub__row-link">
-                      <span>{label}</span>
-                      <ChevronRight size={16} strokeWidth={2.5} className="account-hub__row-chevron" />
-                    </Link>
-                  ))}
-                </div>
-              </section>
-            </div>
-          )}
-
           {user && activeTab === 'account' && (
             <div className="account-hub__panel">
-              <h2 className="account-hub__welcome">{displayName}</h2>
-              {user?.email && <p className="account-hub__account-email">{user.email}</p>}
-              <section className="account-hub__list-section">
-                <div className="account-hub__links-card">
-                  {[
-                    { to: '/dashboard', label: 'My Dashboard' },
-                    { to: '/dashboard?tab=orders', label: 'Order History' },
-                    { to: '/dashboard?tab=addresses', label: 'Saved Addresses' },
-                    { to: '/dashboard?tab=settings', label: 'Account Settings' },
-                  ].map(({ to, label }) => (
-                    <Link key={to} to={to} onClick={closeSheet} className="account-hub__row-link">
-                      <span>{label}</span>
-                      <ChevronRight size={16} strokeWidth={2.5} className="account-hub__row-chevron" />
-                    </Link>
-                  ))}
-                </div>
-              </section>
+              <AccountHubHero
+                eyebrow="My account"
+                title={displayName}
+                subtitle={user?.email || 'Manage your Drywall Toolbox account.'}
+                Icon={User}
+              />
+              <div className="account-hub__account-menu">
+                <Link to="/dashboard" onClick={closeSheet} className="account-hub__dashboard-link">
+                  <span><LayoutDashboard size={18} />My Dashboard</span>
+                  <ChevronRight size={16} />
+                </Link>
+                <AccountHubAccordion
+                  title="Services"
+                  Icon={Wrench}
+                  open={accountSections.services}
+                  onToggle={() => setAccountSections((state) => ({ ...state, services: !state.services }))}
+                  onNavigate={closeSheet}
+                  links={[
+                    { to: '/repairs', label: 'Repair Services', icon: Wrench },
+                    { to: '/schematics', label: 'Schematics', icon: BookOpen },
+                    { to: '/calculators', label: 'Calculators', icon: Calculator },
+                  ]}
+                />
+                <AccountHubAccordion
+                  title="Support"
+                  Icon={LifeBuoy}
+                  open={accountSections.support}
+                  onToggle={() => setAccountSections((state) => ({ ...state, support: !state.support }))}
+                  onNavigate={closeSheet}
+                  links={[
+                    { to: '/contact', label: 'Contact Us', icon: LifeBuoy },
+                    { to: '/returns', label: 'Returns Portal', icon: RotateCcw },
+                    { to: '/faq', label: 'FAQ', icon: BookOpen },
+                  ]}
+                />
+              </div>
               <section className="account-hub__list-section">
                 <button type="button" className="account-hub__signout-btn" onClick={async () => { closeSheet(); await onLogout?.(); }}>Sign out</button>
               </section>

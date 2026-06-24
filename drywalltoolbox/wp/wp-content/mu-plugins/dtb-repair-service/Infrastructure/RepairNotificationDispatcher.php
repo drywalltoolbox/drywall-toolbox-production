@@ -649,6 +649,14 @@ error_log( "[DTB Repairs] dispatch_notification: no recipient for template '{$te
 return;
 }
 
+if (
+	! in_array( $template, $admin_templates, true )
+	&& function_exists( 'dtb_account_email_preference' )
+	&& ! dtb_account_email_preference( $to, 'repair_updates' )
+) {
+	return;
+}
+
 // Log queued event.
 if ( function_exists( 'dtb_repair_append_event' ) ) {
 dtb_repair_append_event( $repair_id, 'notification.email.queued', [

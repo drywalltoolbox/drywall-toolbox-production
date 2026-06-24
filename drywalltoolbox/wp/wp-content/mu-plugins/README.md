@@ -135,6 +135,16 @@ From `dtb-auth.php`:
 - `POST /auth/forgot-password`
 - `POST /auth/reset-password`
 
+From `dtb-platform/Rest/AccountController.php`:
+- `GET|PATCH /account` (authenticated customer profile and preferences)
+- `POST /account/password` (authenticated password change)
+
+From `dtb-returns/Rest/ReturnsController.php`:
+- `GET /returns/mine` (authenticated customer return history)
+
+From `dtb-support/Rest/SupportCustomerController.php`:
+- `GET /support/mine` (authenticated customer support ticket history)
+
 From `dtb-api-security.php`:
 - `GET /nonce`
 
