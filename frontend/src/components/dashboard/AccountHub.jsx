@@ -66,6 +66,10 @@ const DOT_GRID = {
   pointerEvents:   'none',
 };
 
+function settledValue(result, normalize) {
+  return result.status === 'fulfilled' ? normalize(result.value) : [];
+}
+
 // ─── Hub component ────────────────────────────────────────────────────────────
 
 export default function AccountHub() {
@@ -105,6 +109,7 @@ export default function AccountHub() {
   const [ recentReturns,  setRecentReturns  ] = useState( [] );
   const [ recentSupportTickets, setRecentSupportTickets ] = useState( [] );
   const [ ordersLoading,  setOrdersLoading  ] = useState( true );
+  const activeTabId = TABS[ activeTab ]?.id ?? 'overview';
 
   // Touch swipe
   const touchStartX = useRef( null );
@@ -133,29 +138,32 @@ export default function AccountHub() {
     } catch { /* noop */ }
   }, [ TABS, activeTab ] );
 
-  // Fetch shared data once when user changes
+  // Fetch overview data only when the Overview tab is visible. Settings, support,
+  // returns, and orders have isolated tab-level loaders; preloading every service
+  // on every dashboard visit causes unrelated 404s to surface on the Settings tab.
   useEffect( () => {
-    if ( ! user?.id ) return;
+    if ( ! user?.id || activeTabId !== 'overview' ) return undefined;
     let cancelled = false;
 
-    Promise.all( [
+    setOrdersLoading( true );
+
+    Promise.allSettled( [
       getCustomerOrders( user.id, 1, 50 ),
       getCustomerRepairs( 1, 50 ),
       getCustomerReturns( 1, 50 ),
       getCustomerSupportTickets( 1, 50 ),
     ] )
-      .then( ( [ ordersData, repairsData, returnsData, supportData ] ) => {
+      .then( ( [ ordersResult, repairsResult, returnsResult, supportResult ] ) => {
         if ( cancelled ) return;
-        setRecentOrders( normalizeOrders( ordersData ) );
-        setRecentRepairs( normalizeRepairs( repairsData ) );
-        setRecentReturns( normalizeReturns( returnsData ) );
-        setRecentSupportTickets( normalizeSupportTickets( supportData ) );
-        setOrdersLoading( false );
+        setRecentOrders( settledValue( ordersResult, normalizeOrders ) );
+        setRecentRepairs( settledValue( repairsResult, normalizeRepairs ) );
+        setRecentReturns( settledValue( returnsResult, normalizeReturns ) );
+        setRecentSupportTickets( settledValue( supportResult, normalizeSupportTickets ) );
       } )
-      .catch( () => { if ( ! cancelled ) setOrdersLoading( false ); } );
+      .finally( () => { if ( ! cancelled ) setOrdersLoading( false ); } );
 
     return () => { cancelled = true; };
-  }, [ user?.id ] );
+  }, [ activeTabId, user?.id ] );
 
   function changeTab( idx ) {
     if ( idx === activeTab ) return;
