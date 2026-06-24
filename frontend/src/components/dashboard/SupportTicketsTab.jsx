@@ -15,8 +15,9 @@ export default function SupportTicketsTab() {
     setError('');
     try {
       setTickets(normalizeSupportTickets(await getCustomerSupportTickets(1, 50)));
-    } catch (err) {
-      setError(err?.message || 'Unable to load support tickets.');
+    } catch {
+      setTickets([]);
+      setError('Support tickets are temporarily unavailable. Please try again shortly.');
     } finally {
       setLoading(false);
     }
