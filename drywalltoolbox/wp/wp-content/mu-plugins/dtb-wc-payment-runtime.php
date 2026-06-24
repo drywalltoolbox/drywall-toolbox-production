@@ -2,11 +2,103 @@
 /**
  * Plugin Name: DTB WooCommerce Payment Runtime
  * Description: Routes keyed order-payment requests to the native WooCommerce payment runtime while the React storefront owns checkout intake.
- * Version: 1.4.0
+ * Version: 1.5.0
  * Author: Drywall Toolbox
  */
 
 defined( 'ABSPATH' ) || exit;
+
+if ( ! function_exists( 'dtb_wc_payment_runtime_configure_wallets' ) ) {
+	/**
+	 * Configure WooPayments' supported Apple Pay / Google Pay order-pay flow.
+	 *
+	 * Newer WooPayments releases can expose wallets as payment-method rows,
+	 * which is the compatible express-payment path for an existing order. The
+	 * legacy payment-request settings remain enabled as a fallback for older
+	 * releases and for the standard cart/checkout locations.
+	 */
+	function dtb_wc_payment_runtime_configure_wallets(): void {
+		if ( ! class_exists( 'WC_Payments' ) || ! is_callable( [ 'WC_Payments', 'get_gateway' ] ) ) {
+			return;
+		}
+
+		$gateway = WC_Payments::get_gateway();
+		if ( ! is_object( $gateway ) || ! method_exists( $gateway, 'update_option' ) ) {
+			return;
+		}
+
+		$wallet_gateways = [];
+		if ( is_callable( [ 'WC_Payments', 'get_payment_gateway_by_id' ] ) ) {
+			foreach ( [ 'apple_pay', 'google_pay' ] as $wallet_id ) {
+				$wallet_gateway = WC_Payments::get_payment_gateway_by_id( $wallet_id );
+				if ( is_object( $wallet_gateway ) && method_exists( $wallet_gateway, 'enable' ) ) {
+					$wallet_gateways[ $wallet_id ] = $wallet_gateway;
+				}
+			}
+		}
+
+		$supports_order_pay_wallets = 2 === count( $wallet_gateways )
+			&& class_exists( 'WC_Payments_Features' )
+			&& method_exists( 'WC_Payments_Features', 'is_dynamic_checkout_place_order_button_enabled' )
+			&& defined( 'WC_VERSION' )
+			&& version_compare( WC_VERSION, '10.6.0', '>=' );
+
+		$configuration_version = $supports_order_pay_wallets ? '1-order-pay-wallets' : '1-legacy-payment-request';
+		if ( $configuration_version === (string) get_option( 'dtb_payment_wallet_configuration_version', '' ) ) {
+			return;
+		}
+
+		// Legacy WooPayments compatibility and standard express-checkout pages.
+		$gateway->update_option( 'payment_request', 'yes' );
+		$gateway->update_option( 'payment_request_button_theme', 'dark' );
+		$gateway->update_option( 'payment_request_button_height', '48' );
+		$gateway->update_option( 'payment_request_button_border_radius', '12' );
+
+		$locations = method_exists( $gateway, 'get_option' )
+			? (array) $gateway->get_option( 'payment_request_button_locations', [] )
+			: [];
+		$gateway->update_option(
+			'payment_request_button_locations',
+			array_values( array_unique( array_merge( $locations, [ 'checkout' ] ) ) )
+		);
+
+		// Current WooPayments: enable both wallet gateways exactly as its settings
+		// controller does. Enabling Apple Pay also triggers native domain verification.
+		$enabled_wallets = [];
+		foreach ( $wallet_gateways as $wallet_id => $wallet_gateway ) {
+			$wallet_gateway->enable();
+			$enabled_wallets[] = $wallet_id;
+		}
+
+		if ( $supports_order_pay_wallets && 2 === count( $enabled_wallets ) ) {
+			// WooPayments gates its native wallet rows behind this feature flag.
+			// Its own runtime still enforces the WooCommerce 10.6+ requirement.
+			update_option( '_wcpay_feature_dynamic_checkout_place_order_button', '1', false );
+
+			$enabled_methods = method_exists( $gateway, 'get_upe_enabled_payment_method_ids' )
+				? (array) $gateway->get_upe_enabled_payment_method_ids()
+				: (array) $gateway->get_option( 'upe_enabled_payment_method_ids', [ 'card' ] );
+
+			$gateway->update_option(
+				'upe_enabled_payment_method_ids',
+				array_values( array_unique( array_merge( $enabled_methods, $enabled_wallets ) ) )
+			);
+
+			// This is the supported order-pay presentation in current WooPayments.
+			$gateway->update_option( 'express_checkout_in_payment_methods', 'yes' );
+
+			$checkout_methods = (array) $gateway->get_option( 'express_checkout_checkout_methods', [] );
+			$gateway->update_option(
+				'express_checkout_checkout_methods',
+				array_values( array_unique( array_merge( $checkout_methods, [ 'payment_request' ] ) ) )
+			);
+		}
+
+		update_option( 'dtb_payment_wallet_configuration_version', $configuration_version, false );
+	}
+}
+
+add_action( 'woocommerce_init', 'dtb_wc_payment_runtime_configure_wallets', 100 );
 
 if ( ! function_exists( 'dtb_wc_payment_runtime_order_pay_id' ) ) {
 	/**

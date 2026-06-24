@@ -1,4 +1,87 @@
 (function () {
+  function applyWooPaymentsAppearance(event) {
+    var detail = event && event.detail;
+    var appearance = detail && detail.appearance;
+    if (!appearance) return;
+
+    appearance.theme = 'stripe';
+    appearance.labels = 'above';
+    appearance.variables = Object.assign({}, appearance.variables || {}, {
+      colorPrimary: '#0f766e',
+      colorBackground: '#ffffff',
+      colorText: '#172033',
+      colorDanger: '#b42318',
+      colorTextSecondary: '#526077',
+      colorTextPlaceholder: '#7a879c',
+      fontFamily: 'Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
+      fontSizeBase: '16px',
+      borderRadius: '10px',
+      spacingUnit: '4px'
+    });
+
+    appearance.rules = Object.assign({}, appearance.rules || {}, {
+      '.AccordionItem': {
+        backgroundColor: '#ffffff',
+        border: '1px solid #d9e2ec',
+        borderRadius: '12px',
+        boxShadow: 'none'
+      },
+      '.Block': {
+        backgroundColor: '#ffffff',
+        border: '1px solid #d9e2ec',
+        borderRadius: '12px',
+        boxShadow: 'none'
+      },
+      '.Input': {
+        backgroundColor: '#ffffff',
+        border: '1px solid #b8c5d6',
+        borderRadius: '10px',
+        boxShadow: '0 1px 2px rgba(15, 23, 42, 0.04)',
+        color: '#172033',
+        padding: '12px'
+      },
+      '.Input:focus': {
+        border: '1px solid #0f766e',
+        boxShadow: '0 0 0 3px rgba(15, 118, 110, 0.14)',
+        outline: 'none'
+      },
+      '.Input--invalid': {
+        border: '1px solid #d92d20',
+        boxShadow: '0 0 0 3px rgba(217, 45, 32, 0.1)'
+      },
+      '.Label': {
+        color: '#344054',
+        fontSize: '14px',
+        fontWeight: '600'
+      },
+      '.Tab': {
+        backgroundColor: '#ffffff',
+        border: '1px solid #d9e2ec',
+        borderRadius: '10px',
+        boxShadow: 'none',
+        color: '#344054'
+      },
+      '.Tab:hover': {
+        backgroundColor: '#f7fafc',
+        border: '1px solid #9fb0c3',
+        color: '#172033'
+      },
+      '.Tab--selected': {
+        backgroundColor: '#f0fdfa',
+        border: '1px solid #0f766e',
+        boxShadow: '0 0 0 2px rgba(15, 118, 110, 0.12)',
+        color: '#134e4a'
+      },
+      '.Text': {
+        color: '#526077'
+      }
+    });
+  }
+
+  // WooPayments dispatches this before creating Stripe Elements and explicitly
+  // allows listeners to mutate the appearance object in place.
+  document.addEventListener('wcpay_elements_appearance', applyWooPaymentsAppearance);
+
   function compactText(value) {
     return String(value || '').replace(/\s+/g, ' ').trim().toLowerCase();
   }
@@ -172,6 +255,8 @@
     var providerKey = providerKeyFor(row);
     if (!providerKey || providerKey === 'disabled-woopay' || providerKey === 'link') return;
 
+    row.classList.add('dtb-payment-method--' + providerKey);
+
     var hasLogo = Boolean(label.querySelector('img, svg'));
     if (!hasLogo) return;
 
@@ -181,7 +266,6 @@
     }
 
     label.classList.add('dtb-provider-label-ready', 'dtb-payment-provider-label', 'dtb-payment-provider-label--logo-only', 'dtb-payment-provider-label--' + providerKey);
-    row.classList.add('dtb-payment-method--' + providerKey);
     hideDuplicateProviderText(label);
   }
 
@@ -226,6 +310,16 @@
     input.checked = true;
     input.dispatchEvent(new Event('change', { bubbles: true }));
     input.dispatchEvent(new Event('click', { bubbles: true }));
+  }
+
+  function syncActivePaymentRows() {
+    var methods = document.querySelector('#payment ul.payment_methods');
+    if (!methods) return;
+
+    Array.prototype.forEach.call(methods.querySelectorAll('li'), function (row) {
+      var input = row.querySelector('input[type="radio"]');
+      row.classList.toggle('is-active', Boolean(input && input.checked));
+    });
   }
 
   function hideDuplicateCardMethodRows() {
@@ -306,6 +400,7 @@
   function enhancePaymentRuntime() {
     normalizePaymentMethodRows();
     hideDuplicateCardMethodRows();
+    syncActivePaymentRows();
     dedupeWalletButtons();
   }
 
@@ -321,6 +416,12 @@
   } else {
     scheduleEnhancements();
   }
+
+  document.addEventListener('change', function (event) {
+    if (event.target && event.target.matches('#payment input[type="radio"]')) {
+      syncActivePaymentRows();
+    }
+  });
 
   if ('MutationObserver' in window) {
     var observer = new MutationObserver(function () {

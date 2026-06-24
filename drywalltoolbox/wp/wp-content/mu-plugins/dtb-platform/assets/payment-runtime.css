@@ -1,7 +1,7 @@
 body.dtb-payment-runtime {
 	margin: 0;
-	background: #eef3f9;
-	color: #0f172a;
+	background: #edf2f7;
+	color: #172033;
 	font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
@@ -25,19 +25,19 @@ body.dtb-payment-runtime {
 	min-height: 100vh;
 	padding: 38px 16px 56px;
 	background:
-		radial-gradient(circle at 14% 0%, rgba(37, 99, 235, 0.13), transparent 30rem),
-		radial-gradient(circle at 92% 12%, rgba(20, 184, 166, 0.08), transparent 26rem),
-		linear-gradient(180deg, #f8fbff 0%, #eef3f9 100%);
+		radial-gradient(circle at 12% 0%, rgba(15, 118, 110, 0.12), transparent 30rem),
+		radial-gradient(circle at 92% 10%, rgba(30, 64, 175, 0.1), transparent 28rem),
+		linear-gradient(180deg, #f8fafc 0%, #eaf0f6 100%);
 }
 
 .dtb-payment-card {
 	width: min(1040px, 100%);
 	margin: 0 auto;
 	overflow: hidden;
-	border: 1px solid rgba(148, 163, 184, 0.35);
+	border: 1px solid rgba(148, 163, 184, 0.32);
 	border-radius: 24px;
 	background: #fff;
-	box-shadow: 0 24px 70px rgba(15, 23, 42, 0.13);
+	box-shadow: 0 28px 75px rgba(15, 23, 42, 0.14);
 }
 
 .dtb-payment-header {
@@ -45,10 +45,10 @@ body.dtb-payment-runtime {
 	display: grid;
 	justify-items: center;
 	text-align: center;
-	padding: 28px clamp(20px, 5vw, 48px) 30px;
+	padding: 24px clamp(20px, 5vw, 48px) 28px;
 	background:
-		radial-gradient(circle at 50% 0%, rgba(96, 165, 250, 0.28), transparent 26rem),
-		linear-gradient(135deg, #061226 0%, #102b5e 100%);
+		radial-gradient(circle at 82% 0%, rgba(45, 212, 191, 0.18), transparent 22rem),
+		linear-gradient(135deg, #071a2f 0%, #102f4f 58%, #0b4b55 100%);
 	color: #fff;
 }
 
@@ -56,14 +56,14 @@ body.dtb-payment-runtime {
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	margin-bottom: 16px;
+	margin-bottom: 12px;
 	width: 100%;
 }
 
 .dtb-payment-logo {
-	height: clamp(48px, 5vw, 68px);
+	height: clamp(32px, 3.2vw, 42px);
 	width: auto;
-	max-width: min(280px, 72vw);
+	max-width: min(190px, 58vw);
 	object-fit: contain;
 	display: block;
 }
@@ -73,11 +73,11 @@ body.dtb-payment-runtime {
 	align-items: center;
 	justify-content: center;
 	margin-bottom: 12px;
-	border: 1px solid rgba(191, 219, 254, 0.34);
+	border: 1px solid rgba(153, 246, 228, 0.3);
 	border-radius: 999px;
-	background: rgba(15, 23, 42, 0.24);
+	background: rgba(3, 19, 35, 0.28);
 	padding: 7px 11px;
-	color: #dbeafe;
+	color: #ccfbf1;
 	font-size: 11px;
 	font-weight: 800;
 	letter-spacing: 0.08em;
@@ -87,7 +87,7 @@ body.dtb-payment-runtime {
 
 .dtb-payment-title {
 	margin: 0;
-	font-size: clamp(30px, 4vw, 44px);
+	font-size: clamp(28px, 3.6vw, 40px);
 	line-height: 1.02;
 	letter-spacing: 0;
 	font-weight: 900;
@@ -96,7 +96,7 @@ body.dtb-payment-runtime {
 .dtb-payment-subtitle {
 	max-width: 720px;
 	margin: 12px 0 0;
-	color: rgba(226, 232, 240, 0.86);
+	color: rgba(226, 232, 240, 0.88);
 	font-size: 15px;
 	line-height: 1.55;
 }
@@ -113,11 +113,11 @@ body.dtb-payment-runtime {
 	width: 100%;
 	margin: 0 0 26px;
 	overflow: hidden;
-	border: 1px solid #dbe3ef;
+	border: 1px solid #d9e2ec;
 	border-collapse: separate;
 	border-spacing: 0;
 	border-radius: 18px;
-	background: #f8fafc;
+	background: #f7f9fc;
 	box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.86);
 }
 
@@ -153,11 +153,11 @@ body.dtb-payment-runtime {
 .dtb-payment-runtime #payment,
 .dtb-payment-runtime .woocommerce-checkout-payment {
 	margin-top: 24px;
-	border: 1px solid #dbe3ef;
+	border: 1px solid #d5dee9;
 	border-radius: 20px;
 	background:
-		radial-gradient(circle at 100% 0%, rgba(37, 99, 235, 0.08), transparent 22rem),
-		#f8fafc;
+		radial-gradient(circle at 100% 0%, rgba(15, 118, 110, 0.07), transparent 22rem),
+		#f7f9fc;
 	padding: clamp(16px, 3vw, 24px);
 	box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9);
 }
@@ -173,16 +173,17 @@ body.dtb-payment-runtime {
 	position: relative;
 	margin: 0 0 12px;
 	padding: 0;
-	border: 1px solid #dbe3ef;
+	border: 1px solid #d9e2ec;
 	border-radius: 16px;
 	background: #fff;
 	overflow: hidden;
-	transition: border-color 0.16s ease, box-shadow 0.16s ease, background 0.16s ease;
+	transition: border-color 0.16s ease, box-shadow 0.16s ease, background 0.16s ease, transform 0.16s ease;
 }
 
 .dtb-payment-runtime #payment ul.payment_methods li:hover {
-	border-color: #bfdbfe;
-	box-shadow: 0 12px 28px rgba(15, 23, 42, 0.06);
+	border-color: #9fb0c3;
+	box-shadow: 0 12px 28px rgba(15, 23, 42, 0.07);
+	transform: translateY(-1px);
 }
 
 .dtb-payment-runtime #payment ul.payment_methods li > input[type="radio"] {
@@ -205,7 +206,12 @@ body.dtb-payment-runtime {
 
 .dtb-payment-runtime #payment ul.payment_methods li > input[type="radio"]:checked + label,
 .dtb-payment-runtime #payment ul.payment_methods li.is-active > label {
-	background: linear-gradient(180deg, #ffffff, #f8fbff);
+	background: linear-gradient(180deg, #ffffff, #f3fbfa);
+}
+
+.dtb-payment-runtime #payment ul.payment_methods li.is-active {
+	border-color: #0f766e;
+	box-shadow: 0 0 0 2px rgba(15, 118, 110, 0.11), 0 14px 30px rgba(15, 23, 42, 0.07);
 }
 
 .dtb-payment-method-radio {
@@ -222,8 +228,14 @@ body.dtb-payment-runtime {
 }
 
 .dtb-payment-runtime #payment ul.payment_methods li > input[type="radio"]:checked + label .dtb-payment-method-radio {
-	border-color: #2563eb;
-	background: #2563eb;
+	border-color: #0f766e;
+	background: #0f766e;
+}
+
+.dtb-payment-runtime #payment ul.payment_methods li.dtb-payment-method--apple-pay,
+.dtb-payment-runtime #payment ul.payment_methods li.dtb-payment-method--google-pay {
+	border-color: #b8c5d6;
+	background: linear-gradient(135deg, #ffffff 0%, #f0fdfa 100%);
 }
 
 .dtb-payment-provider-label--logo-only {
@@ -255,14 +267,21 @@ body.dtb-payment-runtime {
 
 .dtb-payment-runtime .payment_box {
 	margin: 0;
-	border-top: 1px solid #e2e8f0;
+	border-top: 1px solid #d9e2ec;
 	border-right: 0;
 	border-bottom: 0;
 	border-left: 0;
 	border-radius: 0;
-	background: #f6f8fc;
+	background: #ffffff;
 	padding: clamp(16px, 3vw, 24px);
-	color: #334155;
+	color: #344054;
+}
+
+.dtb-payment-runtime #payment .payment_box fieldset,
+.dtb-payment-runtime #payment .wc-payment-form,
+.dtb-payment-runtime #payment .wcpay-upe-element,
+.dtb-payment-runtime #payment [id*="wcpay"] {
+	background-color: #ffffff;
 }
 
 .dtb-payment-runtime .payment_box::before,
@@ -283,11 +302,11 @@ body.dtb-payment-runtime {
 .dtb-payment-runtime .InputElement {
 	width: 100%;
 	min-height: 46px;
-	border: 1px solid #cbd5e1;
-	border-radius: 12px;
+	border: 1px solid #b8c5d6;
+	border-radius: 10px;
 	background: #fff;
 	padding: 10px 12px;
-	color: #0f172a;
+	color: #172033;
 	font: inherit;
 	box-shadow: none;
 }
@@ -295,17 +314,16 @@ body.dtb-payment-runtime {
 .dtb-payment-runtime input:focus,
 .dtb-payment-runtime select:focus,
 .dtb-payment-runtime textarea:focus {
-	outline: 2px solid rgba(37, 99, 235, 0.28);
-	border-color: #2563eb;
+	outline: 3px solid rgba(15, 118, 110, 0.14);
+	border-color: #0f766e;
 }
 
-.dtb-payment-runtime button,
-.dtb-payment-runtime .button,
+.dtb-payment-runtime .button:not(.wcpay-express-checkout-button):not([class*="gpay"]):not([class*="apple-pay"]),
 .dtb-payment-runtime #place_order {
 	min-height: 50px;
 	border: 0;
 	border-radius: 14px;
-	background: #2563eb;
+	background: linear-gradient(135deg, #0f766e 0%, #0b5e59 100%);
 	color: #fff;
 	padding: 12px 20px;
 	font-weight: 900;
@@ -313,11 +331,10 @@ body.dtb-payment-runtime {
 	transition: background 0.16s ease, transform 0.16s ease, box-shadow 0.16s ease;
 }
 
-.dtb-payment-runtime button:hover,
-.dtb-payment-runtime .button:hover,
+.dtb-payment-runtime .button:not(.wcpay-express-checkout-button):not([class*="gpay"]):not([class*="apple-pay"]):hover,
 .dtb-payment-runtime #place_order:hover {
-	background: #1d4ed8;
-	box-shadow: 0 14px 32px rgba(37, 99, 235, 0.24);
+	background: linear-gradient(135deg, #0b5e59 0%, #084b47 100%);
+	box-shadow: 0 14px 32px rgba(15, 118, 110, 0.25);
 }
 
 .dtb-payment-runtime .wc-stripe-payment-request-wrapper,
@@ -335,7 +352,7 @@ body.dtb-payment-runtime {
 .dtb-payment-runtime .wc-block-components-express-payment,
 .dtb-payment-runtime .ppc-button-wrapper {
 	overflow: hidden;
-	border-radius: 14px;
+	border-radius: 12px;
 }
 
 .dtb-payment-runtime .wc-stripe-payment-request-button,
