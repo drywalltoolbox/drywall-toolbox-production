@@ -1,6 +1,11 @@
-import { apiClient } from './client.js';
+import { getAccountHistory } from './accountHistory.js';
 
 export async function getCustomerSupportTickets(page = 1, perPage = 20) {
-  const params = new URLSearchParams({ page, per_page: perPage }).toString();
-  return apiClient(`/wp-json/dtb/v1/support/mine?${params}`);
+  const history = await getAccountHistory({ perPage });
+  return {
+    tickets: Array.isArray(history?.tickets) ? history.tickets : [],
+    page,
+    per_page: perPage,
+    has_more: false,
+  };
 }
