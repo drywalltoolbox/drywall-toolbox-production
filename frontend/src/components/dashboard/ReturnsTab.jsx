@@ -5,6 +5,10 @@ import { getCustomerReturns } from '../../api/returns.js';
 import { buildAccountActivity, normalizeReturns } from '../../utils/accountActivity.js';
 import AccountActivityList from '../account/AccountActivityList.jsx';
 
+async function fetchReturns() {
+  return normalizeReturns(await getCustomerReturns(1, 50));
+}
+
 export default function ReturnsTab() {
   const [returns, setReturns] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -14,7 +18,7 @@ export default function ReturnsTab() {
     setLoading(true);
     setError('');
     try {
-      setReturns(normalizeReturns(await getCustomerReturns(1, 50)));
+      setReturns(await fetchReturns());
     } catch {
       setReturns([]);
       setError('Returns are temporarily unavailable. Please try again shortly.');
@@ -24,8 +28,22 @@ export default function ReturnsTab() {
   }, []);
 
   useEffect(() => {
-    loadReturns();
-  }, [loadReturns]);
+    let cancelled = false;
+    fetchReturns()
+      .then((items) => {
+        if (cancelled) return;
+        setReturns(items);
+      })
+      .catch(() => {
+        if (cancelled) return;
+        setReturns([]);
+        setError('Returns are temporarily unavailable. Please try again shortly.');
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+    return () => { cancelled = true; };
+  }, []);
 
   const activity = useMemo(() => buildAccountActivity({ returns }), [returns]);
 
