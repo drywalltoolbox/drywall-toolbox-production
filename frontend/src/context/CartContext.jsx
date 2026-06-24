@@ -45,23 +45,81 @@ function getStoreItemImage(item) {
   return image?.thumbnail || image?.src || item?.image || '';
 }
 
+function normalizeAttributeName(value) {
+  const decoded = decodeHtmlEntities(value || '').trim();
+  return decoded
+    .replace(/^attribute_/i, '')
+    .replace(/^pa[_-]/i, '')
+    .replace(/[_-]+/g, ' ')
+    .replace(/\s+/g, ' ')
+    .replace(/\b\w/g, (char) => char.toUpperCase());
+}
+
+function normalizeAttributeOption(value) {
+  return decodeHtmlEntities(value || '')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function normalizeVariationAttributes(attributes) {
+  if (!Array.isArray(attributes)) return [];
+
+  return attributes
+    .map((attr) => {
+      const name = normalizeAttributeName(attr?.name || attr?.attribute || attr?.slug || '');
+      const option = normalizeAttributeOption(attr?.option || attr?.value || '');
+      if (!option) return null;
+      return { ...attr, name, option };
+    })
+    .filter(Boolean);
+}
+
+function extractVariationOptionSuffix(attributes) {
+  const normalized = normalizeVariationAttributes(attributes);
+  if (normalized.length === 0) return '';
+  return normalized.map((attr) => attr.option).filter(Boolean).join(' / ');
+}
+
+function buildVariationDetailText(attributes) {
+  const normalized = normalizeVariationAttributes(attributes);
+  if (normalized.length === 0) return '';
+  return normalized
+    .map((attr) => (attr.name ? `${attr.name}: ${attr.option}` : attr.option))
+    .join(' / ');
+}
+
+function cartNameAlreadyIncludesVariation(name, suffix) {
+  if (!name || !suffix) return false;
+  const normalizedName = String(name).toLowerCase().replace(/[\s–—-]+/g, ' ').trim();
+  const normalizedSuffix = String(suffix).toLowerCase().replace(/[\s–—-]+/g, ' ').trim();
+  return normalizedName.endsWith(normalizedSuffix) || normalizedName.includes(` ${normalizedSuffix}`);
+}
+
+function buildDisplayNameWithVariation(baseName, attributes) {
+  const name = decodeHtmlEntities(baseName || '').trim();
+  const suffix = extractVariationOptionSuffix(attributes);
+  if (!name || !suffix || cartNameAlreadyIncludesVariation(name, suffix)) return name;
+  return `${name} - ${suffix}`;
+}
+
+function normalizeCartSnapshotItem(item) {
+  if (!item || typeof item !== 'object') return item;
+  const attrs = normalizeVariationAttributes(item.variation_attribute_values || item.variation || []);
+  const name = buildDisplayNameWithVariation(item.name || item.product_name || '', attrs);
+  return {
+    ...item,
+    name,
+    variation_name: item.variation_name || buildVariationDetailText(attrs),
+    variation_attribute_values: attrs.length ? attrs : item.variation_attribute_values,
+  };
+}
+
 function normalizeStoreCartItem(item) {
-  const variationValues = Array.isArray(item?.variation)
-    ? item.variation.map((attr) => ({
-        name: attr?.attribute || attr?.name || '',
-        option: decodeHtmlEntities(attr?.value || attr?.option || ''),
-      })).filter((attr) => attr.name && attr.option)
-    : null;
-
+  const variationValues = normalizeVariationAttributes(item?.variation || []);
   const parentName = decodeHtmlEntities(item.name || '');
-  const optionsSuffix = variationValues?.length
-    ? variationValues.map((v) => v.option).join(' / ')
-    : '';
-  const displayName = (item.variation_id && optionsSuffix)
-    ? `${parentName} – ${optionsSuffix}`
-    : parentName;
-
+  const displayName = buildDisplayNameWithVariation(parentName, variationValues);
   const decodedSku = decodeHtmlEntities(item.sku || '');
+  const hasVariation = variationValues.length > 0 || Number(item?.variation_id || 0) > 0;
 
   return {
     cartKey: item.key,
@@ -73,9 +131,10 @@ function normalizeStoreCartItem(item) {
     image: getStoreItemImage(item),
     part_number: decodedSku || String(item.id || ''),
     sku: decodedSku,
-    parent_id: item.variation_id ? item.id : null,
-    variation_id: item.variation_id || null,
-    variation_attribute_values: variationValues,
+    parent_id: item.parent_id || null,
+    variation_id: item.variation_id || (hasVariation ? item.id : null),
+    variation_name: buildVariationDetailText(variationValues),
+    variation_attribute_values: variationValues.length ? variationValues : null,
     quantity: item.quantity || 1,
     raw: item,
   };
@@ -117,7 +176,7 @@ function readSnapshot() {
   try {
     const saved = localStorage.getItem(CART_SNAPSHOT_KEY);
     const parsed = saved ? JSON.parse(saved) : [];
-    return Array.isArray(parsed) ? parsed : [];
+    return Array.isArray(parsed) ? parsed.map(normalizeCartSnapshotItem) : [];
   } catch {
     return [];
   }
@@ -125,7 +184,7 @@ function readSnapshot() {
 
 function writeSnapshot(items) {
   try {
-    localStorage.setItem(CART_SNAPSHOT_KEY, JSON.stringify(items));
+    localStorage.setItem(CART_SNAPSHOT_KEY, JSON.stringify(asCartItems(items).map(normalizeCartSnapshotItem)));
   } catch {
     // Snapshot persistence is non-critical.
   }
@@ -231,7 +290,7 @@ export function CartProvider({ children }) {
       const extensions = buildStoreApiExtensions(product);
       const nextCart = await storeAddToCart(product.id, quantity, variation, extensions);
       const normalizedItems = await applyOrRefreshServerCart(nextCart, mutationId);
-      const addedItem = normalizedItems.find((item) => String(item.id) === String(product.id)) || { ...product, quantity };
+      const addedItem = normalizedItems.find((item) => String(item.id) === String(product.id)) || normalizeCartSnapshotItem({ ...product, quantity });
       trackAddToCart({ ...addedItem, quantity });
       return nextCart;
     } catch (err) {
