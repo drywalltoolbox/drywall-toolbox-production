@@ -54,9 +54,14 @@ const STATIC_ROUTE_TITLES = {
   '/notifications': 'Notifications',
 };
 
+function normalizedRoutePath(pathname) {
+  const withoutTrailingSlash = String(pathname || '').replace(/\/+$/, '') || '/';
+  return withoutTrailingSlash.replace(/^\/staging\/[^/]+(?=\/|$)/, '') || '/';
+}
+
 function currentPathname() {
   if (typeof window === 'undefined') return '';
-  return window.location.pathname.replace(/\/+$/, '') || '/';
+  return normalizedRoutePath(window.location.pathname);
 }
 
 function routeTitleFor(pathname) {
