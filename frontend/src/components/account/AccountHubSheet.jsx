@@ -14,6 +14,11 @@ const TABS = [
   { id: 'account', label: 'Account', Icon: User },
 ];
 
+function settledError(result, fallback) {
+  if (!result || result.status !== 'rejected') return '';
+  return result.reason?.message || fallback;
+}
+
 function AccountHubHero({ eyebrow, title, subtitle, Icon }) {
   return (
     <header className="account-hub__hero">
@@ -118,7 +123,7 @@ export default function AccountHubSheet({ isOpen, onClose, user, onLogout }) {
   const [repairs, setRepairs] = useState([]);
   const [returns, setReturns] = useState([]);
   const [ordersLoading, setOrdersLoading] = useState(false);
-  const [ordersError, setOrdersError] = useState('');
+  const [historyErrors, setHistoryErrors] = useState({ orders: '', repairs: '', returns: '' });
   const [accountSections, setAccountSections] = useState({ services: false, support: false });
 
   const closeSheet = useCallback(() => {
@@ -127,28 +132,31 @@ export default function AccountHubSheet({ isOpen, onClose, user, onLogout }) {
     onClose?.();
   }, [onClose]);
 
+  const applyHistoryResults = useCallback(([ordersResult, repairsResult, returnsResult]) => {
+    setOrders(ordersResult.status === 'fulfilled' ? normalizeOrders(ordersResult.value) : []);
+    setRepairs(repairsResult.status === 'fulfilled' ? normalizeRepairs(repairsResult.value) : []);
+    setReturns(returnsResult.status === 'fulfilled' ? normalizeReturns(returnsResult.value) : []);
+    setHistoryErrors({
+      orders: settledError(ordersResult, 'Orders are temporarily unavailable.'),
+      repairs: settledError(repairsResult, 'Repairs are temporarily unavailable.'),
+      returns: settledError(returnsResult, 'Returns are temporarily unavailable.'),
+    });
+  }, []);
+
   const loadOrders = useCallback(async () => {
     if (!isOpen || !user) return;
     setOrdersLoading(true);
-    setOrdersError('');
-    try {
-      const [ordersData, repairsData, returnsData] = await Promise.all([
-        getCustomerOrders(user?.id, 1, 20),
-        getCustomerRepairs(1, 20),
-        getCustomerReturns(1, 20),
-      ]);
-      setOrders(normalizeOrders(ordersData));
-      setRepairs(normalizeRepairs(repairsData));
-      setReturns(normalizeReturns(returnsData));
-    } catch (error) {
-      setOrders([]);
-      setRepairs([]);
-      setReturns([]);
-      setOrdersError(error?.message || 'Unable to load your orders.');
-    } finally {
-      setOrdersLoading(false);
-    }
-  }, [isOpen, user]);
+    setHistoryErrors({ orders: '', repairs: '', returns: '' });
+
+    const results = await Promise.allSettled([
+      getCustomerOrders(user?.id, 1, 20),
+      getCustomerRepairs(1, 20),
+      getCustomerReturns(1, 20),
+    ]);
+
+    applyHistoryResults(results);
+    setOrdersLoading(false);
+  }, [applyHistoryResults, isOpen, user]);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -161,31 +169,20 @@ export default function AccountHubSheet({ isOpen, onClose, user, onLogout }) {
 
     async function load() {
       setOrdersLoading(true);
-      setOrdersError('');
-      try {
-        const [ordersData, repairsData, returnsData] = await Promise.all([
-          getCustomerOrders(user?.id, 1, 20),
-          getCustomerRepairs(1, 20),
-          getCustomerReturns(1, 20),
-        ]);
-        if (cancelled) return;
-        setOrders(normalizeOrders(ordersData));
-        setRepairs(normalizeRepairs(repairsData));
-        setReturns(normalizeReturns(returnsData));
-      } catch (error) {
-        if (cancelled) return;
-        setOrders([]);
-        setRepairs([]);
-        setReturns([]);
-        setOrdersError(error?.message || 'Unable to load your orders.');
-      } finally {
-        if (!cancelled) setOrdersLoading(false);
-      }
+      setHistoryErrors({ orders: '', repairs: '', returns: '' });
+      const results = await Promise.allSettled([
+        getCustomerOrders(user?.id, 1, 20),
+        getCustomerRepairs(1, 20),
+        getCustomerReturns(1, 20),
+      ]);
+      if (cancelled) return;
+      applyHistoryResults(results);
+      setOrdersLoading(false);
     }
 
     load();
     return () => { cancelled = true; };
-  }, [isOpen, user]);
+  }, [applyHistoryResults, isOpen, user]);
 
   useEffect(() => {
     if (!isOpen) return undefined;
@@ -201,6 +198,8 @@ export default function AccountHubSheet({ isOpen, onClose, user, onLogout }) {
 
   const displayName = useMemo(() => [user?.first_name, user?.last_name].filter(Boolean).join(' ') || user?.display_name || 'My Account', [user]);
   const activity = useMemo(() => buildAccountActivity({ orders, repairs, returns }), [orders, repairs, returns]);
+  const historyErrorText = useMemo(() => Object.values(historyErrors).filter(Boolean).join(' '), [historyErrors]);
+  const allHistoryFailed = Boolean(historyErrorText) && activity.length === 0;
 
   return (
     <div className={`account-hub${isOpen ? ' account-hub--open' : ''}`} role="dialog" aria-modal="true" aria-label="Account hub" aria-hidden={!isOpen}>
@@ -250,7 +249,10 @@ export default function AccountHubSheet({ isOpen, onClose, user, onLogout }) {
                 {ordersLoading ? (
                   <div className="account-hub__loading"><Loader size={18} className="animate-spin" /> Loading activity…</div>
                 ) : activity.length ? (
-                  <AccountActivityList items={activity} limit={4} onNavigate={closeSheet} />
+                  <>
+                    {historyErrorText ? <div className="account-hub__empty-card"><p>Some account history is temporarily unavailable. Available activity is shown below.</p></div> : null}
+                    <AccountActivityList items={activity} limit={4} onNavigate={closeSheet} />
+                  </>
                 ) : (
                   <div className="account-hub__empty-card"><div className="account-hub__empty-icon"><Package size={24} /></div><p>Your orders, repairs, and returns will appear here.</p></div>
                 )}
@@ -273,12 +275,12 @@ export default function AccountHubSheet({ isOpen, onClose, user, onLogout }) {
                   <Loader size={20} style={{ color: '#2563eb' }} className="animate-spin" />
                   <span style={{ fontSize: '0.85rem', color: 'rgba(15,23,42,0.5)' }}>Loading orders…</span>
                 </div>
-              ) : ordersError ? (
+              ) : allHistoryFailed ? (
                 <div className="account-hub__panel account-hub__panel--centered">
                   <div className="account-hub__empty-state">
                     <div className="account-hub__empty-state-icon"><AlertCircle size={34} strokeWidth={1.4} /></div>
-                    <strong className="account-hub__empty-state-title">Orders unavailable</strong>
-                    <p className="account-hub__empty-state-body">{ordersError}</p>
+                    <strong className="account-hub__empty-state-title">Account history unavailable</strong>
+                    <p className="account-hub__empty-state-body">{historyErrorText}</p>
                     <button type="button" className="account-hub__outline-btn" onClick={loadOrders}>Retry</button>
                   </div>
                 </div>
@@ -293,6 +295,7 @@ export default function AccountHubSheet({ isOpen, onClose, user, onLogout }) {
                 </div>
               ) : (
                 <div className="account-hub__list-section">
+                  {historyErrorText ? <div className="account-hub__empty-card"><p>Some account history is temporarily unavailable. Available activity is shown below.</p><button type="button" className="account-hub__outline-btn" onClick={loadOrders}>Retry</button></div> : null}
                   <AccountActivityList items={activity} onNavigate={closeSheet} />
                   <button
                     type="button"
