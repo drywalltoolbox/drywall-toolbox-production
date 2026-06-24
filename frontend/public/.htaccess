@@ -1,5 +1,41 @@
 DirectoryIndex index.html index.php
 
+ErrorDocument 400 __DTB_PUBLIC_URL__/errors/400.html
+ErrorDocument 401 __DTB_PUBLIC_URL__/errors/401.html
+ErrorDocument 402 __DTB_PUBLIC_URL__/errors/402.html
+ErrorDocument 403 __DTB_PUBLIC_URL__/errors/403.html
+ErrorDocument 404 __DTB_PUBLIC_URL__/errors/404.html
+ErrorDocument 405 __DTB_PUBLIC_URL__/errors/405.html
+ErrorDocument 406 __DTB_PUBLIC_URL__/errors/406.html
+ErrorDocument 408 __DTB_PUBLIC_URL__/errors/408.html
+ErrorDocument 409 __DTB_PUBLIC_URL__/errors/409.html
+ErrorDocument 410 __DTB_PUBLIC_URL__/errors/410.html
+ErrorDocument 411 __DTB_PUBLIC_URL__/errors/411.html
+ErrorDocument 412 __DTB_PUBLIC_URL__/errors/412.html
+ErrorDocument 413 __DTB_PUBLIC_URL__/errors/413.html
+ErrorDocument 414 __DTB_PUBLIC_URL__/errors/414.html
+ErrorDocument 415 __DTB_PUBLIC_URL__/errors/415.html
+ErrorDocument 416 __DTB_PUBLIC_URL__/errors/416.html
+ErrorDocument 417 __DTB_PUBLIC_URL__/errors/417.html
+ErrorDocument 421 __DTB_PUBLIC_URL__/errors/421.html
+ErrorDocument 422 __DTB_PUBLIC_URL__/errors/422.html
+ErrorDocument 423 __DTB_PUBLIC_URL__/errors/423.html
+ErrorDocument 424 __DTB_PUBLIC_URL__/errors/424.html
+ErrorDocument 426 __DTB_PUBLIC_URL__/errors/426.html
+ErrorDocument 428 __DTB_PUBLIC_URL__/errors/428.html
+ErrorDocument 429 __DTB_PUBLIC_URL__/errors/429.html
+ErrorDocument 431 __DTB_PUBLIC_URL__/errors/431.html
+ErrorDocument 451 __DTB_PUBLIC_URL__/errors/451.html
+ErrorDocument 500 __DTB_PUBLIC_URL__/errors/500.html
+ErrorDocument 501 __DTB_PUBLIC_URL__/errors/501.html
+ErrorDocument 502 __DTB_PUBLIC_URL__/errors/502.html
+ErrorDocument 503 __DTB_PUBLIC_URL__/errors/503.html
+ErrorDocument 504 __DTB_PUBLIC_URL__/errors/504.html
+ErrorDocument 505 __DTB_PUBLIC_URL__/errors/505.html
+ErrorDocument 507 __DTB_PUBLIC_URL__/errors/507.html
+ErrorDocument 508 __DTB_PUBLIC_URL__/errors/508.html
+ErrorDocument 511 __DTB_PUBLIC_URL__/errors/511.html
+
 <IfModule mod_rewrite.c>
   RewriteEngine On
 
@@ -21,5 +57,9 @@ DirectoryIndex index.html index.php
     Header set Cache-Control "no-cache, no-store, must-revalidate"
     Header set Pragma "no-cache"
     Header set Expires "0"
+  </FilesMatch>
+
+  <FilesMatch "^[45][0-9]{2}\.html$">
+    Header set Cache-Control "no-cache, no-store, must-revalidate"
   </FilesMatch>
 </IfModule>

@@ -7,6 +7,7 @@ import { WooCommerceProvider } from './context/WooCommerceContext';
 import { WorkflowTransitionProvider } from './context/WorkflowTransitionContext.jsx';
 import { AuthProvider, useAuthContext } from './auth/AuthContext.js';
 import AppErrorBoundary from './components/system/AppErrorBoundary.jsx';
+import CustomerErrorPage from './components/errors/CustomerErrorPage.jsx';
 import Header from './components/shell/Header';
 import Footer from './components/shell/Footer';
 import CartSidebar from './components/shell/CartSidebar';
@@ -16,16 +17,10 @@ import MobileInstallNudge from './components/pwa/MobileInstallNudge.jsx';
 import { isRewardsEnabled } from './utils/featureFlags.js';
 import { initializeWebpackPublicPath } from './setWebpackPublicPath.js';
 
-const APP_BASE = (process.env.PUBLIC_URL || '').replace(/\/+$/, '');
 const HOMEPAGE_SIGNUP_CTA_SEEN_KEY = 'dtb:homepage-signup-cta-seen:v1';
 const HOMEPAGE_SIGNUP_CTA_DELAY_MS = 900;
 
 initializeWebpackPublicPath();
-
-function toAppHref(path = '/') {
-  const normalized = path.startsWith('/') ? path : `/${ path }`;
-  return `${ APP_BASE }${ normalized }` || '/';
-}
 
 function getLocalStorageFlag(key) {
   if (typeof window === 'undefined') return false;
@@ -106,16 +101,6 @@ const StorePolicies = lazyWithReload(() => import('./pages/StorePolicies'));
 // const ToolsetBuilder = lazy(() => import('./pages/ToolsetBuilder')); // DISABLED: temporarily hide Toolset Builder
 const TechnicalSpecificationsPreview = lazyWithReload(() => import('./pages/TechnicalSpecificationsPreview'));
 
-function NotFound() {
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '60vh', textAlign: 'center', padding: '2rem', color: '#888' }}>
-      <h1 style={{ fontSize: '4rem', fontWeight: 700, margin: 0 }}>404</h1>
-      <p style={{ fontSize: '1.1rem', margin: '0.75rem 0 1.5rem' }}>Page not found</p>
-      <a href={toAppHref('/')} style={{ color: '#3b82f6', textDecoration: 'underline' }}>Return to home</a>
-    </div>
-  );
-}
-
 function PageLoader() {
   return <LoadingSpinner size="md" label="Loading page…" fullPage />;
 }
@@ -186,7 +171,8 @@ function AppRoutes() {
           <Route path="/account-settings" element={<Navigate to="/dashboard?tab=settings" replace />} />
           <Route path="/addresses" element={<Navigate to="/dashboard?tab=addresses" replace />} />
           <Route path="/notifications" element={<Navigate to="/dashboard?tab=settings" replace />} />
-          <Route path="*" element={<NotFound />} />
+          <Route path="/error/:code" element={<CustomerErrorPage />} />
+          <Route path="*" element={<CustomerErrorPage code={404} />} />
         </Routes>
       </Suspense>
     </PageTransition>

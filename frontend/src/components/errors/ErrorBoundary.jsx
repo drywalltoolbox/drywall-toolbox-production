@@ -1,4 +1,5 @@
 import { Component } from 'react';
+import CustomerErrorPage from './CustomerErrorPage.jsx';
 
 /**
  * Top-level React error boundary.
@@ -32,52 +33,9 @@ class ErrorBoundary extends Component {
     }
   }
 
-  handleReload = () => {
-    window.location.reload();
-  }
-
   render() {
     if (this.state.hasError) {
-      return (
-        <div
-          role="alert"
-          style={{
-            display:        'flex',
-            flexDirection:  'column',
-            alignItems:     'center',
-            justifyContent: 'center',
-            minHeight:      '100vh',
-            textAlign:      'center',
-            padding:        '2rem',
-            fontFamily:     'Inter, system-ui, sans-serif',
-            background:     '#0f172a',
-            color:          '#e2e8f0',
-          }}
-        >
-          <h1 style={{ fontSize: '1.75rem', fontWeight: 700, marginBottom: '0.5rem' }}>
-            Something went wrong
-          </h1>
-          <p style={{ color: '#94a3b8', marginBottom: '1.5rem', maxWidth: 440 }}>
-            An unexpected error occurred. Please reload the page — if the
-            problem persists, contact support.
-          </p>
-          <button
-            onClick={this.handleReload}
-            style={{
-              padding:      '0.6rem 1.5rem',
-              background:   '#3b82f6',
-              color:        '#fff',
-              border:       'none',
-              borderRadius: '0.375rem',
-              cursor:       'pointer',
-              fontSize:     '0.95rem',
-              fontWeight:   600,
-            }}
-          >
-            Reload page
-          </button>
-        </div>
-      );
+      return <CustomerErrorPage code={500} />;
     }
 
     return this.props.children;

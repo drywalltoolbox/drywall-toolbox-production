@@ -44,6 +44,11 @@ const { GenerateSW }            = require('workbox-webpack-plugin');
 
 /** Read an env var, trim whitespace, return empty string if absent/empty. */
 const env = (key) => (process.env[key] || '').trim();
+const SERVER_ERROR_CODES = [
+  400, 401, 402, 403, 404, 405, 406, 408, 409, 410, 411, 412, 413, 414, 415, 416, 417,
+  421, 422, 423, 424, 426, 428, 429, 431, 451,
+  500, 501, 502, 503, 504, 505, 507, 508, 511,
+];
 
 // ─── Config factory ──────────────────────────────────────────────────────────
 
@@ -178,6 +183,26 @@ module.exports = (envFlags, argv) => {
     },
   };
 
+  const EmitServerErrorPagesPlugin = {
+    apply(compiler) {
+      compiler.hooks.thisCompilation.tap('EmitServerErrorPagesPlugin', (compilation) => {
+        compilation.hooks.processAssets.tap(
+          { name: 'EmitServerErrorPagesPlugin', stage: webpack.Compilation.PROCESS_ASSETS_STAGE_ADDITIONAL },
+          () => {
+            const template = fs.readFileSync(path.resolve(__dirname, 'error-page.html'), 'utf8')
+              .replaceAll('__PUBLIC_URL__', PUBLIC_URL);
+            for (const code of SERVER_ERROR_CODES) {
+              compilation.emitAsset(
+                `errors/${code}.html`,
+                new webpack.sources.RawSource(template.replaceAll('__ERROR_CODE__', String(code))),
+              );
+            }
+          },
+        );
+      });
+    },
+  };
+
   return {
     mode,
     bail: !isDev,
@@ -302,6 +327,7 @@ module.exports = (envFlags, argv) => {
               ignore: [
                 // HTML handled by HtmlWebpackPlugin
                 '**/index.html',
+                '**/.htaccess',
                 // CSV data files — served via WooCommerce REST API, not bundled
                 '**/*.csv',
                 '**/*.bak',
@@ -314,8 +340,18 @@ module.exports = (envFlags, argv) => {
               ],
             },
           },
+          {
+            from: 'public/.htaccess',
+            to: '.htaccess',
+            toType: 'file',
+            transform(content) {
+              return content.toString().replaceAll('__DTB_PUBLIC_URL__', PUBLIC_URL);
+            },
+          },
         ],
       }),
+
+      EmitServerErrorPagesPlugin,
 
       ...(!isDev ? [
         new MiniCssExtractPlugin({
