@@ -1,6 +1,11 @@
 import { Link } from 'react-router-dom';
 import { ShoppingCart, X, Package, Minus, Plus, ArrowRight, Trash2 } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCart } from '../../context/CartContext.jsx';
+import ProductModal from '../product/ProductModal.jsx';
+import ProductDetail from '../product/ProductDetail.jsx';
+import { getProduct, getProductVariations } from '../../services/api.js';
+import { getVariationSelectionMap } from '../../utils/variationSelection.js';
 
 const CART_QTY_SYNC_DELAY_MS = 260;
 const MAX_CART_QUANTITY = 99;
@@ -18,6 +23,71 @@ function getDisplayQuantity(item, localQuantities) {
   return 1;
 }
 
+function toNumericId(value) {
+  const parsed = Number(value);
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : null;
+}
+
+function getCartItemSku(item) {
+  return String(item?.sku || item?.part_number || item?.raw?.sku || '').trim();
+}
+
+function buildFallbackProductFromCartItem(item) {
+  const image = item?.image || '';
+  const sku = getCartItemSku(item);
+  const id = toNumericId(item?.parent_id) || toNumericId(item?.id) || sku || getCartItemKey(item);
+
+  return {
+    id,
+    name: item?.name || sku || 'Product',
+    brand: item?.brand || '',
+    sku,
+    part_number: sku,
+    price: Number(item?.price) || 0,
+    regular_price: item?.price != null ? String(item.price) : '',
+    sale_price: '',
+    image,
+    images: image ? [image] : [],
+    stock_status: 'instock',
+    type: 'simple',
+    is_variable: false,
+    variation_attributes: [],
+    variation_attribute_values: null,
+    attributes: [],
+    meta_data: [],
+    short_description: '',
+    description_full: '',
+    _source: 'cart-fallback',
+  };
+}
+
+function buildFallbackVariationFromCartItem(item) {
+  const fallback = buildFallbackProductFromCartItem(item);
+  return {
+    ...fallback,
+    id: toNumericId(item?.variation_id) || toNumericId(item?.id) || fallback.id,
+    parent_id: toNumericId(item?.parent_id) || null,
+    type: 'variation',
+    is_variable: false,
+    variation_attribute_values: Array.isArray(item?.variation_attribute_values)
+      ? item.variation_attribute_values
+      : [],
+    variation_attribute: item?.variation_name || '',
+  };
+}
+
+function findCartItemVariation(variations, item) {
+  if (!Array.isArray(variations) || variations.length === 0) return null;
+
+  const variationId = toNumericId(item?.variation_id) || toNumericId(item?.id);
+  const sku = getCartItemSku(item).toLowerCase();
+
+  return variations.find((variation) => (
+    (variationId && String(variation?.id) === String(variationId))
+    || (sku && String(variation?.sku || variation?.part_number || '').trim().toLowerCase() === sku)
+  )) || null;
+}
+
 export default function StorefrontCartSheet({
   isOpen,
   onClose,
@@ -25,6 +95,7 @@ export default function StorefrontCartSheet({
   removeFromCart,
   updateQuantity,
 }) {
+  const { addToCart } = useCart();
   const overlayRef = useRef(null);
   const closeButtonRef = useRef(null);
   const previouslyFocusedRef = useRef(null);
@@ -35,6 +106,8 @@ export default function StorefrontCartSheet({
   const [removingKey, setRemovingKey] = useState(null);
   const [syncingKeys, setSyncingKeys] = useState(() => new Set());
   const [localQuantities, setLocalQuantities] = useState({});
+  const [productModalState, setProductModalState] = useState(null);
+  const [productModalLoadingKey, setProductModalLoadingKey] = useState('');
 
   const setItemSyncing = useCallback((key, isSyncing) => {
     if (!key) return;
@@ -57,6 +130,7 @@ export default function StorefrontCartSheet({
     if (overlayRef.current?.contains(document.activeElement)) {
       document.activeElement?.blur?.();
     }
+    setProductModalState(null);
     onClose?.();
   }, [onClose]);
 
@@ -64,6 +138,68 @@ export default function StorefrontCartSheet({
     event.currentTarget?.blur?.();
     handleClose();
   }, [handleClose]);
+
+  const closeProductModal = useCallback(() => {
+    setProductModalState(null);
+    setProductModalLoadingKey('');
+  }, []);
+
+  const handleProductModalAddToCart = useCallback(async (product, quantity = 1) => {
+    await addToCart(product, quantity);
+  }, [addToCart]);
+
+  const handleOpenProduct = useCallback(async (item) => {
+    const key = getCartItemKey(item);
+    if (!item || !key || productModalLoadingKey === key) return;
+
+    const fallbackProduct = buildFallbackProductFromCartItem(item);
+    const fallbackVariation = buildFallbackVariationFromCartItem(item);
+    const parentId = toNumericId(item?.parent_id);
+    const variationId = toNumericId(item?.variation_id);
+
+    setProductModalLoadingKey(key);
+
+    try {
+      let parentProduct = null;
+      let selectedVariation = null;
+      let initialVariations = [];
+
+      if (parentId) {
+        parentProduct = await getProduct(parentId);
+        initialVariations = await getProductVariations(parentId);
+        selectedVariation = findCartItemVariation(initialVariations, item) || fallbackVariation;
+      } else {
+        const fetchedProduct = await getProduct(item.id);
+        if (fetchedProduct?.parent_id) {
+          parentProduct = await getProduct(fetchedProduct.parent_id);
+          initialVariations = await getProductVariations(fetchedProduct.parent_id);
+          selectedVariation = findCartItemVariation(initialVariations, item) || fetchedProduct;
+        } else {
+          parentProduct = fetchedProduct || fallbackProduct;
+        }
+      }
+
+      const shouldSeedVariation = Boolean(selectedVariation && (parentId || variationId || selectedVariation?.parent_id));
+
+      setProductModalState({
+        key,
+        product: parentProduct || fallbackProduct,
+        initialVariations,
+        initialResolvedVariation: shouldSeedVariation ? selectedVariation : null,
+        initialSelectedAttrs: shouldSeedVariation ? getVariationSelectionMap(selectedVariation) : {},
+      });
+    } catch {
+      setProductModalState({
+        key,
+        product: fallbackProduct,
+        initialVariations: [],
+        initialResolvedVariation: null,
+        initialSelectedAttrs: {},
+      });
+    } finally {
+      setProductModalLoadingKey((current) => (current === key ? '' : current));
+    }
+  }, [productModalLoadingKey]);
 
   const handleRemove = useCallback(async (key) => {
     if (!key || removingKey === key) return;
@@ -145,10 +281,12 @@ export default function StorefrontCartSheet({
       return;
     }
 
+    closeProductModal();
+
     if (previouslyFocusedRef.current?.focus) {
       previouslyFocusedRef.current.focus();
     }
-  }, [isOpen]);
+  }, [isOpen, closeProductModal]);
 
   useEffect(() => {
     if (!isOpen) return undefined;
@@ -223,25 +361,40 @@ export default function StorefrontCartSheet({
                 const quantity = getDisplayQuantity(item, localQuantities);
                 const isSyncing = syncingKeys.has(key);
                 const isRemoving = removingKey === key;
-                const skuText = item.sku || item.part_number || '';
+                const isPreviewLoading = productModalLoadingKey === key;
+                const skuText = getCartItemSku(item);
                 const lineTotal = ((Number(item.price) || 0) * quantity).toFixed(2);
 
                 return (
                   <li
                     key={key}
-                    className={`scs-item${isSyncing ? ' scs-item--syncing' : ''}${isRemoving ? ' scs-item--removing' : ''}`}
+                    className={`scs-item${isSyncing ? ' scs-item--syncing' : ''}${isRemoving ? ' scs-item--removing' : ''}${isPreviewLoading ? ' scs-item--preview-loading' : ''}`}
                     role="listitem"
-                    aria-busy={isSyncing || isRemoving ? 'true' : 'false'}
+                    aria-busy={isSyncing || isRemoving || isPreviewLoading ? 'true' : 'false'}
                   >
-                    <div className="scs-item-img">
+                    <button
+                      type="button"
+                      className="scs-item-img scs-item-open-target"
+                      onClick={() => handleOpenProduct(item)}
+                      aria-label={`View ${item.name} details`}
+                      disabled={isRemoving || isPreviewLoading}
+                    >
                       {item.image
-                        ? <img src={item.image} alt={item.name} loading="lazy" decoding="async" />
+                        ? <img src={item.image} alt="" loading="lazy" decoding="async" />
                         : <Package size={22} strokeWidth={1.4} className="scs-item-img-placeholder" />}
-                    </div>
+                    </button>
 
                     <div className="scs-item-body">
                       <div className="scs-item-top">
-                        <span className="scs-item-name">{item.name}</span>
+                        <button
+                          type="button"
+                          className="scs-item-name scs-item-name-button"
+                          onClick={() => handleOpenProduct(item)}
+                          disabled={isRemoving || isPreviewLoading}
+                          aria-label={`View ${item.name} details`}
+                        >
+                          {item.name}
+                        </button>
                         <button
                           type="button"
                           onClick={() => handleRemove(key)}
@@ -281,7 +434,7 @@ export default function StorefrontCartSheet({
                         </div>
 
                         <span className="scs-item-line-total">
-                          {isSyncing ? <span className="scs-sync-dot" aria-hidden="true" /> : null}
+                          {isSyncing || isPreviewLoading ? <span className="scs-sync-dot" aria-hidden="true" /> : null}
                           ${lineTotal}
                         </span>
                       </div>
@@ -322,6 +475,24 @@ export default function StorefrontCartSheet({
           </footer>
         )}
       </aside>
+
+      <ProductModal
+        isOpen={Boolean(productModalState?.product)}
+        product={productModalState?.product || null}
+        onClose={closeProductModal}
+      >
+        {productModalState?.product ? (
+          <ProductDetail
+            key={`${productModalState.product?.id || productModalState.key}:${productModalState.initialResolvedVariation?.id || 'parent'}`}
+            product={productModalState.product}
+            onAddToCart={handleProductModalAddToCart}
+            onClose={closeProductModal}
+            initialVariations={productModalState.initialVariations || []}
+            initialResolvedVariation={productModalState.initialResolvedVariation || null}
+            initialSelectedAttrs={productModalState.initialSelectedAttrs || {}}
+          />
+        ) : null}
+      </ProductModal>
 
       <style>{`
         .storefront-cart-sheet {
@@ -494,7 +665,12 @@ export default function StorefrontCartSheet({
           transition: background 140ms ease, opacity 160ms ease, transform 160ms ease;
         }
 
-        .scs-item--syncing {
+        .scs-item:hover {
+          background: #fbfdff;
+        }
+
+        .scs-item--syncing,
+        .scs-item--preview-loading {
           background: linear-gradient(90deg, rgba(37,99,235,0.045), transparent 72%);
         }
 
@@ -526,6 +702,34 @@ export default function StorefrontCartSheet({
 
         .scs-item-img-placeholder { color: #cbd5e1; }
 
+        .scs-item-open-target,
+        .scs-item-name-button {
+          appearance: none;
+          -webkit-appearance: none;
+          padding: 0;
+          cursor: pointer;
+          text-align: left;
+        }
+
+        .scs-item-open-target {
+          transition: border-color 120ms ease, box-shadow 120ms ease, transform 120ms ease;
+        }
+
+        .scs-item-open-target:hover,
+        .scs-item-open-target:focus-visible {
+          border-color: rgba(37, 99, 235, 0.38);
+          box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .scs-item-open-target:active {
+          transform: scale(0.98);
+        }
+
+        .scs-item-open-target:disabled,
+        .scs-item-name-button:disabled {
+          cursor: wait;
+        }
+
         .scs-item-body {
           flex: 1;
           min-width: 0;
@@ -550,6 +754,25 @@ export default function StorefrontCartSheet({
           display: -webkit-box;
           -webkit-line-clamp: 2;
           -webkit-box-orient: vertical;
+        }
+
+        .scs-item-name-button {
+          flex: 1 1 auto;
+          min-width: 0;
+          border: 0;
+          background: transparent;
+          transition: color 120ms ease;
+        }
+
+        .scs-item-name-button:hover,
+        .scs-item-name-button:focus-visible {
+          color: #2563eb;
+          outline: none;
+        }
+
+        .scs-item-name-button:focus-visible {
+          text-decoration: underline;
+          text-underline-offset: 3px;
         }
 
         .scs-item-sku {
@@ -657,7 +880,8 @@ export default function StorefrontCartSheet({
           transition: color 140ms ease, transform 140ms ease;
         }
 
-        .scs-item--syncing .scs-item-line-total {
+        .scs-item--syncing .scs-item-line-total,
+        .scs-item--preview-loading .scs-item-line-total {
           color: #2563eb;
         }
 
