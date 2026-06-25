@@ -19,7 +19,7 @@ defined( 'ABSPATH' ) || exit;
 
 final class DTB_CatalogFacetService {
 
-	const CACHE_KEY = 'dtb_catalog_facets_v1';
+	const CACHE_KEY = 'dtb_catalog_facets_v2';
 	const CACHE_TTL = 600; // 10 minutes
 
 	/**
