@@ -172,4 +172,34 @@ function dtb_tool_library_menu_register_pages(): void {
 		'template'   => 'tool',
 		'section'    => 'Data',
 	] );
+
+	dtb_register_admin_page( [
+		'library'    => 'tools',
+		'slug'       => 'dtb-record-cleanup',
+		'title'      => __( 'Record Cleanup', 'drywall-toolbox' ),
+		'menu_title' => __( 'Record Cleanup', 'drywall-toolbox' ),
+		'capability' => 'manage_woocommerce',
+		'callback'   => 'dtb_record_cleanup_render_page',
+		'position'   => 75,
+		'template'   => 'tool',
+		'section'    => 'Data',
+		'assets'     => [
+			'css' => [
+				[
+					'id'   => 'dtb-record-cleanup',
+					'dir'  => __DIR__ . '/assets/',
+					'url'  => plugin_dir_url( __FILE__ ) . 'assets/',
+					'file' => 'dtb-record-cleanup.css',
+				],
+			],
+			'js' => [
+				[
+					'id'   => 'dtb-record-cleanup',
+					'dir'  => __DIR__ . '/assets/',
+					'url'  => plugin_dir_url( __FILE__ ) . 'assets/',
+					'file' => 'dtb-record-cleanup.js',
+				],
+			],
+		],
+	] );
 }

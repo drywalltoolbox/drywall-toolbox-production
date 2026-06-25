@@ -149,6 +149,7 @@ require_once $_dtb_platform . '/Admin/SettingsPage.php';
 require_once $_dtb_platform . '/Admin/CacheToolsPage.php';
 require_once $_dtb_platform . '/Admin/SeoToolsPage.php';
 require_once $_dtb_platform . '/Admin/ConfigReferencePage.php';
+require_once $_dtb_platform . '/Admin/RecordCleanupPage.php';
 
 // =============================================================================
 // 10. COMMAND CENTER

@@ -277,8 +277,12 @@
     if (!input || input.checked) return;
 
     input.checked = true;
+    if (window.jQuery) {
+      window.jQuery(input).trigger('change');
+      return;
+    }
+
     input.dispatchEvent(new Event('change', { bubbles: true }));
-    input.dispatchEvent(new Event('click', { bubbles: true }));
   }
 
   function syncActivePaymentRows() {
@@ -287,7 +291,22 @@
 
     Array.prototype.forEach.call(methods.querySelectorAll('li'), function (row) {
       var input = row.querySelector('input[type="radio"]');
-      row.classList.toggle('is-active', Boolean(input && input.checked));
+      var label = row.querySelector('label');
+      var box = row.querySelector('.payment_box');
+      var isActive = Boolean(input && input.checked);
+
+      row.classList.toggle('is-active', isActive);
+      if (label) {
+        label.setAttribute('aria-expanded', isActive ? 'true' : 'false');
+      }
+
+      if (!box || box.classList.contains('dtb-payment-box-empty')) return;
+
+      box.hidden = !isActive;
+      box.setAttribute('aria-hidden', isActive ? 'false' : 'true');
+      if (isActive) {
+        box.style.removeProperty('display');
+      }
     });
   }
 
@@ -372,6 +391,32 @@
     });
   }
 
+  function normalizePaymentLayout() {
+    var table = document.querySelector('form#order_review table.shop_table');
+    if (!table) return;
+
+    if (!table.closest('.dtb-order-summary-card')) {
+      var wrapper = document.createElement('section');
+      wrapper.className = 'dtb-order-summary-card';
+      table.parentNode.insertBefore(wrapper, table);
+      wrapper.appendChild(table);
+    }
+
+    if (!table.querySelector('caption.dtb-order-summary-caption')) {
+      var caption = table.createCaption();
+      caption.className = 'dtb-order-summary-caption';
+      caption.textContent = 'Order Summary';
+    }
+
+    Array.prototype.forEach.call(table.querySelectorAll('tbody tr'), function (row) {
+      row.classList.add('dtb-order-product-row');
+    });
+
+    Array.prototype.forEach.call(table.querySelectorAll('tfoot tr'), function (row) {
+      row.classList.add('dtb-order-total-row');
+    });
+  }
+
   function dedupeWalletButtons() {
     var seen = Object.create(null);
     var selector = [
@@ -417,6 +462,7 @@
   }
 
   function enhancePaymentRuntime() {
+    normalizePaymentLayout();
     hideOrderSummaryPaymentMethodRows();
     normalizePaymentMethodRows();
     hideDuplicateCardMethodRows();
@@ -443,6 +489,30 @@
     if (event.target && event.target.matches('#payment input[type="radio"]')) {
       window.setTimeout(enhancePaymentRuntime, 0);
       window.setTimeout(enhancePaymentRuntime, 150);
+    }
+  });
+
+  document.addEventListener('click', function (event) {
+    var row = event.target && event.target.closest
+      ? event.target.closest('#payment ul.payment_methods > li')
+      : null;
+    if (!row || event.target.closest('.payment_box')) return;
+
+    var label = event.target.closest('label');
+    var input = row.querySelector('input[type="radio"]');
+    if (!input || input.disabled) return;
+
+    if (label) {
+      window.setTimeout(function () {
+        if (!input.checked) selectPaymentRow(row);
+        enhancePaymentRuntime();
+      }, 0);
+      return;
+    }
+
+    if (!event.target.closest('a, button, input, select, textarea')) {
+      selectPaymentRow(row);
+      enhancePaymentRuntime();
     }
   });
 

@@ -212,7 +212,7 @@ function TrackingSkeleton() {
   );
 }
 
-function OrderStatusTracker({ order, streaming }) {
+function OrderStatusTracker({ order, streaming, loading, onRefresh }) {
   const status = String(order?.status || 'pending').toLowerCase();
   const activeIndex = getStepIndex(order);
   const label = resolveStatusLabel(order);
@@ -226,9 +226,17 @@ function OrderStatusTracker({ order, streaming }) {
           <p className="dtb-order-eyebrow">Order tracking</p>
           <h1 id="tracking-order-title" className="dtb-order-tracking-title">Order #{order?.number || order?.id}</h1>
         </div>
-        <Link to="/contact" className="dtb-order-help-link">
-          <Headphones size={15} /> Need help?
-        </Link>
+        <div className="dtb-order-status-panel__actions">
+          <Link to="/dashboard?tab=orders" className="dtb-order-back-link">
+            <ArrowLeft size={14} /> Back to orders
+          </Link>
+          <button onClick={onRefresh} disabled={loading} className="dtb-order-refresh-button" type="button" aria-label="Refresh order tracking">
+            <RefreshCw size={16} className={loading ? 'animate-spin' : ''} />
+          </button>
+          <Link to="/contact" className="dtb-order-help-link">
+            <Headphones size={15} /> Need help?
+          </Link>
+        </div>
       </div>
 
       <div className="dtb-order-status-panel__summary">
@@ -438,18 +446,9 @@ export default function OrderTracking() {
         transition={{ duration: 0.34, ease: [0.16, 1, 0.3, 1] }}
         className="dtb-order-tracking-shell"
       >
-        <div className="dtb-order-tracking-header">
-          <Link to="/dashboard?tab=orders" className="dtb-order-back-link">
-            <ArrowLeft size={14} /> Back to orders
-          </Link>
-          <button onClick={refresh} disabled={loading} className="dtb-order-refresh-button" type="button" aria-label="Refresh order tracking">
-            <RefreshCw size={16} className={loading ? 'animate-spin' : ''} />
-          </button>
-        </div>
-
         <section className="dtb-order-sheet dtb-order-sheet--tracking">
           <div className="dtb-order-sheet__content">
-            {order ? <OrderStatusTracker order={order} streaming={streaming} /> : null}
+            {order ? <OrderStatusTracker order={order} streaming={streaming} loading={loading} onRefresh={refresh} /> : null}
             {order ? <PaymentActionCard order={order} /> : null}
 
             <div className="dtb-order-tracking-grid">

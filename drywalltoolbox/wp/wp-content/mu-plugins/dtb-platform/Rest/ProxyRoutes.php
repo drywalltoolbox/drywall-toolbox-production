@@ -508,6 +508,65 @@ function dtb_checkout_context_from_request( WP_REST_Request $request ): array {
 	return $payload;
 }
 
+function dtb_checkout_normalize_country_code( string $country ): string {
+	$country = strtoupper( trim( sanitize_text_field( $country ) ) );
+	if ( 2 === strlen( $country ) ) {
+		return $country;
+	}
+
+	if ( function_exists( 'WC' ) && WC()->countries ) {
+		foreach ( WC()->countries->get_countries() as $code => $name ) {
+			if ( 0 === strcasecmp( $country, (string) $name ) ) {
+				return strtoupper( (string) $code );
+			}
+		}
+	}
+
+	return 'US';
+}
+
+function dtb_checkout_normalize_state_code( string $country, string $state ): string {
+	$state = trim( sanitize_text_field( $state ) );
+	if ( '' === $state || ! function_exists( 'WC' ) || ! WC()->countries ) {
+		return strtoupper( $state );
+	}
+
+	$states = WC()->countries->get_states( $country );
+	if ( ! is_array( $states ) || empty( $states ) ) {
+		return strtoupper( $state );
+	}
+
+	foreach ( $states as $code => $name ) {
+		if ( 0 === strcasecmp( $state, (string) $code ) || 0 === strcasecmp( $state, (string) $name ) ) {
+			return strtoupper( (string) $code );
+		}
+	}
+
+	return strtoupper( $state );
+}
+
+function dtb_checkout_normalize_address( array $address, bool $include_contact = false ): array {
+	$country = dtb_checkout_normalize_country_code( (string) ( $address['country'] ?? 'US' ) );
+	$mapped  = [
+		'first_name' => sanitize_text_field( (string) ( $address['first_name'] ?? '' ) ),
+		'last_name'  => sanitize_text_field( (string) ( $address['last_name'] ?? '' ) ),
+		'company'    => sanitize_text_field( (string) ( $address['company'] ?? '' ) ),
+		'address_1'  => sanitize_text_field( (string) ( $address['address_1'] ?? '' ) ),
+		'address_2'  => sanitize_text_field( (string) ( $address['address_2'] ?? '' ) ),
+		'city'       => sanitize_text_field( (string) ( $address['city'] ?? '' ) ),
+		'state'      => dtb_checkout_normalize_state_code( $country, (string) ( $address['state'] ?? '' ) ),
+		'postcode'   => sanitize_text_field( (string) ( $address['postcode'] ?? '' ) ),
+		'country'    => $country,
+	];
+
+	if ( $include_contact ) {
+		$mapped['email'] = sanitize_email( (string) ( $address['email'] ?? '' ) );
+		$mapped['phone'] = sanitize_text_field( (string) ( $address['phone'] ?? '' ) );
+	}
+
+	return $mapped;
+}
+
 function dtb_checkout_capabilities_route( WP_REST_Request $request ): WP_REST_Response {
 	$guard = dtb_checkout_route_guard();
 	if ( $guard instanceof WP_REST_Response ) {
@@ -872,33 +931,11 @@ function dtb_checkout_woo_native_finalize( array $context, WP_REST_Request $requ
 		$order->add_product( $product, $quantity );
 	}
 
-	$mapped_billing = [
-		'first_name' => sanitize_text_field( (string) ( $billing['first_name'] ?? '' ) ),
-		'last_name'  => sanitize_text_field( (string) ( $billing['last_name'] ?? '' ) ),
-		'company'    => sanitize_text_field( (string) ( $billing['company'] ?? '' ) ),
-		'address_1'  => sanitize_text_field( (string) ( $billing['address_1'] ?? '' ) ),
-		'address_2'  => sanitize_text_field( (string) ( $billing['address_2'] ?? '' ) ),
-		'city'       => sanitize_text_field( (string) ( $billing['city'] ?? '' ) ),
-		'state'      => sanitize_text_field( (string) ( $billing['state'] ?? '' ) ),
-		'postcode'   => sanitize_text_field( (string) ( $billing['postcode'] ?? '' ) ),
-		'country'    => sanitize_text_field( (string) ( $billing['country'] ?? 'US' ) ),
-		'email'      => sanitize_email( (string) ( $billing['email'] ?? '' ) ),
-		'phone'      => sanitize_text_field( (string) ( $billing['phone'] ?? '' ) ),
-	];
+	$mapped_billing = dtb_checkout_normalize_address( $billing, true );
 	$order->set_address( $mapped_billing, 'billing' );
 
 	$shipping = is_array( $context['shipping'] ?? null ) ? $context['shipping'] : $billing;
-	$mapped_shipping = [
-		'first_name' => sanitize_text_field( (string) ( $shipping['first_name'] ?? '' ) ),
-		'last_name'  => sanitize_text_field( (string) ( $shipping['last_name'] ?? '' ) ),
-		'company'    => sanitize_text_field( (string) ( $shipping['company'] ?? '' ) ),
-		'address_1'  => sanitize_text_field( (string) ( $shipping['address_1'] ?? '' ) ),
-		'address_2'  => sanitize_text_field( (string) ( $shipping['address_2'] ?? '' ) ),
-		'city'       => sanitize_text_field( (string) ( $shipping['city'] ?? '' ) ),
-		'state'      => sanitize_text_field( (string) ( $shipping['state'] ?? '' ) ),
-		'postcode'   => sanitize_text_field( (string) ( $shipping['postcode'] ?? '' ) ),
-		'country'    => sanitize_text_field( (string) ( $shipping['country'] ?? 'US' ) ),
-	];
+	$mapped_shipping = dtb_checkout_normalize_address( $shipping );
 	$order->set_address( $mapped_shipping, 'shipping' );
 
 	foreach ( $shipping_lines as $shipping_line ) {
@@ -935,7 +972,14 @@ function dtb_checkout_woo_native_finalize( array $context, WP_REST_Request $requ
 	$order->update_meta_data( '_dtb_checkout_session_id', $sid );
 	$order->update_meta_data( '_dtb_checkout_idempotency_key', $idempotency_key );
 	$order->update_meta_data( '_dtb_order_type', 'product' );
-	$order->calculate_totals( true );
+	$order->calculate_taxes( [
+		'country'  => $mapped_shipping['country'],
+		'state'    => $mapped_shipping['state'],
+		'postcode' => $mapped_shipping['postcode'],
+		'city'     => $mapped_shipping['city'],
+	] );
+	$order->calculate_totals( false );
+	$order->update_meta_data( '_dtb_tax_calculation_version', '1' );
 	$order->save();
 	set_transient( 'dtb_checkout_idem_' . md5( $idempotency_key ), (int) $order->get_id(), DAY_IN_SECONDS );
 	delete_transient( 'dtb_checkout_session_' . md5( $sid ) );

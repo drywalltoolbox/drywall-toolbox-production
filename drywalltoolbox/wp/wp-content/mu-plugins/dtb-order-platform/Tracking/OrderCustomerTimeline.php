@@ -51,14 +51,16 @@ function dtb_order_format_detail( WC_Order $order ): array {
 	$items = [];
 	foreach ( $order->get_items() as $item ) {
 		/** @var WC_Order_Item_Product $item */
-		$items[] = [
-			'id'          => (int) $item->get_id(),
-			'name'        => wp_strip_all_tags( $item->get_name() ),
-			'quantity'    => (int) $item->get_quantity(),
-			'total'       => $item->get_total(),
-			'product_id'  => (int) $item->get_product_id(),
-			'variation_id'=> (int) $item->get_variation_id(),
-		];
+		$items[] = function_exists( 'dtb_order_format_product_item' )
+			? dtb_order_format_product_item( $item )
+			: [
+				'id'           => (int) $item->get_id(),
+				'name'         => wp_strip_all_tags( $item->get_name() ),
+				'quantity'     => (int) $item->get_quantity(),
+				'total'        => $item->get_total(),
+				'product_id'   => (int) $item->get_product_id(),
+				'variation_id' => (int) $item->get_variation_id(),
+			];
 	}
 
 	$billing = [

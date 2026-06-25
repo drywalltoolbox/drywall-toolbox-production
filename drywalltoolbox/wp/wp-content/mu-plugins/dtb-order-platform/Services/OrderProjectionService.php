@@ -7,6 +7,36 @@
 
 defined( 'ABSPATH' ) || exit;
 
+function dtb_order_format_product_item( WC_Order_Item_Product $item ): array {
+	$product      = $item->get_product();
+	$image_id     = $product instanceof WC_Product ? (int) $product->get_image_id() : 0;
+	if ( $image_id <= 0 && $item->get_variation_id() > 0 ) {
+		$parent_product = wc_get_product( $item->get_product_id() );
+		$image_id       = $parent_product instanceof WC_Product ? (int) $parent_product->get_image_id() : 0;
+	}
+	$image_url    = $image_id > 0 ? (string) wp_get_attachment_image_url( $image_id, 'woocommerce_thumbnail' ) : '';
+	$image_srcset = $image_id > 0 ? (string) wp_get_attachment_image_srcset( $image_id, 'woocommerce_thumbnail' ) : '';
+
+	if ( '' === $image_url && function_exists( 'wc_placeholder_img_src' ) ) {
+		$image_url = (string) wc_placeholder_img_src( 'woocommerce_thumbnail' );
+	}
+
+	return [
+		'id'           => (int) $item->get_id(),
+		'name'         => wp_strip_all_tags( $item->get_name() ),
+		'quantity'     => (int) $item->get_quantity(),
+		'total'        => $item->get_total(),
+		'product_id'   => (int) $item->get_product_id(),
+		'variation_id' => (int) $item->get_variation_id(),
+		'sku'          => $product instanceof WC_Product ? (string) $product->get_sku() : '',
+		'image'        => esc_url_raw( $image_url ),
+		'image_srcset' => $image_srcset,
+		'image_alt'    => $product instanceof WC_Product
+			? wp_strip_all_tags( $product->get_name() )
+			: wp_strip_all_tags( $item->get_name() ),
+	];
+}
+
 function dtb_order_build_status_projection( int $order_id ): array {
 	$order = wc_get_order( $order_id );
 	if ( ! $order ) {
@@ -68,11 +98,9 @@ function dtb_order_build_tracking_projection( int $order_id ): ?array {
 	$items = [];
 	foreach ( $order->get_items() as $item ) {
 		/** @var WC_Order_Item_Product $item */
-		$items[] = [
-			'name'     => wp_strip_all_tags( $item->get_name() ),
-			'quantity' => (int) $item->get_quantity(),
-			'status'   => $status_proj['fulfillment_substate'],
-		];
+		$formatted_item           = dtb_order_format_product_item( $item );
+		$formatted_item['status'] = $status_proj['fulfillment_substate'];
+		$items[]                  = $formatted_item;
 	}
 
 	return [
@@ -92,7 +120,7 @@ function dtb_order_build_tracking_projection( int $order_id ): ?array {
 }
 
 function dtb_order_get_tracking_projection( int $order_id ): ?array {
-	$cache_key = 'dtb_order_tracking_' . $order_id;
+	$cache_key = 'dtb_order_tracking_v2_' . $order_id;
 	$cached    = get_transient( $cache_key );
 
 	if ( is_array( $cached ) ) {

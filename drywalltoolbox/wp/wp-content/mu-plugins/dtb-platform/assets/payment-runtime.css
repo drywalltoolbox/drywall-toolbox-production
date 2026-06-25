@@ -1,8 +1,9 @@
 body.dtb-payment-runtime {
 	margin: 0;
-	background: #edf2f7;
-	color: #172033;
+	background: #f8fafc;
+	color: #0f172a;
 	font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+	-webkit-font-smoothing: antialiased;
 }
 
 .dtb-payment-runtime * {
@@ -21,111 +22,162 @@ body.dtb-payment-runtime {
 	border: 0 !important;
 }
 
-.dtb-payment-shell {
-	min-height: 100vh;
-	padding: 38px 16px 56px;
-	background:
-		radial-gradient(circle at 12% 0%, rgba(15, 118, 110, 0.12), transparent 30rem),
-		radial-gradient(circle at 92% 10%, rgba(30, 64, 175, 0.1), transparent 28rem),
-		linear-gradient(180deg, #f8fafc 0%, #eaf0f6 100%);
-}
-
-.dtb-payment-card {
-	width: min(1040px, 100%);
-	margin: 0 auto;
-	overflow: hidden;
-	border: 1px solid rgba(148, 163, 184, 0.32);
-	border-radius: 24px;
-	background: #fff;
-	box-shadow: 0 28px 75px rgba(15, 23, 42, 0.14);
-}
-
 .dtb-payment-header {
-	position: relative;
-	display: grid;
-	justify-items: center;
-	text-align: center;
-	padding: 24px clamp(20px, 5vw, 48px) 28px;
-	background:
-		radial-gradient(circle at 82% 0%, rgba(45, 212, 191, 0.18), transparent 22rem),
-		linear-gradient(135deg, #071a2f 0%, #102f4f 58%, #0b4b55 100%);
+	background: #050505;
 	color: #fff;
+	box-shadow: 0 10px 28px rgba(15, 23, 42, 0.16);
+}
+
+.dtb-payment-header-inner {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	width: min(1152px, calc(100% - 48px));
+	min-height: 92px;
+	margin: 0 auto;
 }
 
 .dtb-payment-brand {
-	display: flex;
+	display: inline-flex;
 	align-items: center;
-	justify-content: center;
-	margin-bottom: 12px;
-	width: 100%;
+	text-decoration: none;
 }
 
 .dtb-payment-logo {
-	height: clamp(32px, 3.2vw, 42px);
-	width: auto;
-	max-width: min(190px, 58vw);
-	object-fit: contain;
 	display: block;
+	width: min(150px, 42vw) !important;
+	height: auto !important;
+	max-width: 150px !important;
+	max-height: 44px !important;
+	object-fit: contain;
 }
 
 .dtb-payment-secure-pill {
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
-	margin-bottom: 12px;
-	border: 1px solid rgba(153, 246, 228, 0.3);
+	border: 1px solid rgba(255, 255, 255, 0.2);
 	border-radius: 999px;
-	background: rgba(3, 19, 35, 0.28);
-	padding: 7px 11px;
-	color: #ccfbf1;
-	font-size: 11px;
+	background: #151515;
+	padding: 8px 12px;
+	color: #dbeafe;
+	font-size: 10px;
 	font-weight: 800;
-	letter-spacing: 0.08em;
+	letter-spacing: 0.1em;
 	text-transform: uppercase;
 	white-space: nowrap;
 }
 
+.dtb-payment-shell {
+	min-height: calc(100vh - 92px);
+	padding: 48px 24px 64px;
+}
+
+.dtb-payment-card {
+	width: min(1152px, 100%);
+	margin: 0 auto;
+}
+
+.dtb-payment-intro {
+	display: flex;
+	align-items: flex-start;
+	justify-content: space-between;
+	gap: 24px;
+	margin-bottom: 30px;
+}
+
 .dtb-payment-title {
 	margin: 0;
-	font-size: clamp(28px, 3.6vw, 40px);
-	line-height: 1.02;
-	letter-spacing: 0;
-	font-weight: 850;
+	color: #020617;
+	font-size: clamp(28px, 3vw, 38px);
+	font-weight: 900;
+	line-height: 1.08;
+	letter-spacing: -0.03em;
 }
 
 .dtb-payment-subtitle {
-	max-width: 650px;
-	margin: 12px 0 0;
-	color: rgba(226, 232, 240, 0.88);
-	font-size: 15px;
-	line-height: 1.55;
+	margin: 7px 0 0;
+	color: #64748b;
+	font-size: 14px;
+	line-height: 1.5;
 }
 
-.dtb-payment-content {
-	padding: clamp(18px, 4vw, 40px);
+.dtb-payment-return-link {
+	display: inline-flex;
+	align-items: center;
+	flex: 0 0 auto;
+	padding-top: 5px;
+	color: #64748b;
+	font-size: 14px;
+	font-weight: 700;
+	text-decoration: none;
 }
 
+.dtb-payment-return-link::before {
+	content: "‹";
+	margin-right: 7px;
+	font-size: 21px;
+	line-height: 0.8;
+}
+
+.dtb-payment-return-link:hover {
+	color: #2563eb;
+}
+
+.dtb-payment-content,
 .dtb-payment-runtime .woocommerce {
 	max-width: none;
 }
 
+.dtb-payment-runtime form#order_review {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr) 400px;
+	align-items: start;
+	gap: 24px;
+}
+
+.dtb-order-summary-card {
+	position: relative;
+	min-width: 0;
+	overflow: hidden;
+	border: 1px solid rgba(226, 232, 240, 0.9);
+	border-radius: 16px;
+	background: #fff;
+	box-shadow: 0 2px 16px rgba(15, 23, 42, 0.06);
+}
+
+.dtb-order-summary-card::before {
+	content: "";
+	position: absolute;
+	z-index: 2;
+	inset: 0 0 auto;
+	height: 3px;
+	background: linear-gradient(90deg, #1d4ed8, #3b82f6, #2563eb);
+}
+
 .dtb-payment-runtime table.shop_table {
 	width: 100%;
-	margin: 0 0 24px;
-	overflow: hidden;
-	border: 1px solid #d9e2ec;
+	margin: 0;
+	border: 0;
 	border-collapse: separate;
 	border-spacing: 0;
-	border-radius: 18px;
-	background: #f7f9fc;
-	box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.86);
+	background: #fff;
+	box-shadow: none;
+}
+
+.dtb-payment-runtime table.shop_table caption {
+	padding: 25px 24px 18px;
+	color: #0f172a;
+	font-size: 18px;
+	font-weight: 750;
+	text-align: left;
 }
 
 .dtb-payment-runtime table.shop_table th,
 .dtb-payment-runtime table.shop_table td {
-	padding: 15px 18px;
+	padding: 15px 24px;
 	border: 0;
-	border-bottom: 1px solid #e5edf6;
+	border-bottom: 1px solid #eef2f7;
 	text-align: left;
 	vertical-align: middle;
 	font-size: 14px;
@@ -133,16 +185,97 @@ body.dtb-payment-runtime {
 
 .dtb-payment-runtime table.shop_table th {
 	background: #f8fafc;
-	color: #334155;
-	font-size: 12px;
-	font-weight: 850;
+	color: #64748b;
+	font-size: 11px;
+	font-weight: 800;
 	letter-spacing: 0.08em;
 	text-transform: uppercase;
 }
 
 .dtb-payment-runtime table.shop_table td {
-	color: #172033;
+	color: #0f172a;
 	font-weight: 650;
+}
+
+.dtb-payment-runtime table.shop_table tbody tr.dtb-order-product-row td {
+	padding-top: 14px;
+	padding-bottom: 14px;
+}
+
+.dtb-payment-runtime table.shop_table tbody tr.dtb-order-product-row:hover {
+	background: #fbfdff;
+}
+
+.dtb-order-product {
+	display: flex;
+	align-items: center;
+	gap: 15px;
+	min-width: 0;
+}
+
+.dtb-order-product-media {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 76px;
+	height: 76px;
+	flex: 0 0 76px;
+	overflow: hidden;
+	border: 1px solid #eef2f7;
+	border-radius: 12px;
+	background: #f8fafc;
+}
+
+.dtb-order-product-image {
+	display: block;
+	width: 100% !important;
+	height: 100% !important;
+	margin: 0 !important;
+	padding: 5px;
+	object-fit: contain;
+}
+
+.dtb-order-product-copy {
+	display: flex;
+	flex-direction: column;
+	gap: 5px;
+	min-width: 0;
+}
+
+.dtb-order-product-name,
+.dtb-order-product-name a {
+	color: #0f172a;
+	font-size: 14px;
+	font-weight: 750;
+	line-height: 1.35;
+	text-decoration: none;
+}
+
+.dtb-order-product-sku {
+	color: #94a3b8;
+	font-size: 11px;
+	font-weight: 600;
+	line-height: 1.3;
+}
+
+.dtb-payment-runtime table.shop_table tfoot tr:first-child th,
+.dtb-payment-runtime table.shop_table tfoot tr:first-child td {
+	border-top: 8px solid #f8fafc;
+}
+
+.dtb-payment-runtime table.shop_table tfoot th {
+	background: #fff;
+	color: #64748b;
+}
+
+.dtb-payment-runtime table.shop_table tfoot tr:last-child th,
+.dtb-payment-runtime table.shop_table tfoot tr:last-child td {
+	padding-top: 18px;
+	padding-bottom: 20px;
+	background: #fbfdff;
+	color: #020617;
+	font-size: 15px;
+	font-weight: 850;
 }
 
 .dtb-payment-runtime table.shop_table tr:last-child th,
@@ -151,8 +284,8 @@ body.dtb-payment-runtime {
 }
 
 .dtb-payment-runtime table.shop_table .amount {
+	color: #020617;
 	font-weight: 850;
-	color: #071226;
 }
 
 .dtb-payment-runtime table.shop_table tr.dtb-order-summary-payment-method-row {
@@ -161,33 +294,61 @@ body.dtb-payment-runtime {
 
 .dtb-payment-runtime #payment,
 .dtb-payment-runtime .woocommerce-checkout-payment {
-	margin-top: 24px;
-	border: 1px solid #d5dee9;
-	border-radius: 20px;
-	background:
-		radial-gradient(circle at 100% 0%, rgba(37, 99, 235, 0.07), transparent 22rem),
-		#f7f9fc;
-	padding: clamp(16px, 3vw, 24px);
-	box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9);
+	position: relative;
+	margin: 0;
+	overflow: hidden;
+	border: 1px solid rgba(226, 232, 240, 0.9);
+	border-radius: 16px;
+	background: #fff;
+	padding: 25px 22px 22px;
+	box-shadow: 0 2px 16px rgba(15, 23, 42, 0.06);
+}
+
+.dtb-payment-runtime #payment::before {
+	content: "";
+	position: absolute;
+	inset: 0 0 auto;
+	height: 3px;
+	background: linear-gradient(90deg, #1d4ed8, #3b82f6, #2563eb);
 }
 
 .dtb-payment-runtime #payment ul.payment_methods {
+	display: flex;
+	flex-direction: column;
 	margin: 0;
 	padding: 0;
 	border: 0;
 	list-style: none;
 }
 
+.dtb-payment-runtime #payment ul.payment_methods::before {
+	content: "Payment Method";
+	display: block;
+	margin: 0 0 5px;
+	color: #0f172a;
+	font-size: 18px;
+	font-weight: 750;
+	order: -2;
+}
+
+.dtb-payment-runtime #payment ul.payment_methods::after {
+	content: "Choose how you would like to securely complete this order.";
+	display: block;
+	margin: 0 0 20px;
+	color: #64748b;
+	font-size: 12px;
+	line-height: 1.45;
+	order: -1;
+}
+
 .dtb-payment-runtime #payment ul.payment_methods li {
 	position: relative;
-	margin: 0 0 12px;
-	padding: 0;
-	border: 1px solid #d9e2ec;
-	border-radius: 18px;
-	background: #fff;
+	margin: 0 0 10px;
 	overflow: hidden;
-	box-shadow: 0 1px 2px rgba(15, 23, 42, 0.03);
-	transition: border-color 0.16s ease, box-shadow 0.16s ease, background 0.16s ease, transform 0.16s ease;
+	border: 1px solid #e2e8f0;
+	border-radius: 12px;
+	background: #fff;
+	transition: border-color 0.16s ease, box-shadow 0.16s ease, background 0.16s ease;
 }
 
 .dtb-payment-runtime #payment ul.payment_methods li:last-child {
@@ -195,9 +356,12 @@ body.dtb-payment-runtime {
 }
 
 .dtb-payment-runtime #payment ul.payment_methods li:hover {
-	border-color: #9fb0c3;
-	box-shadow: 0 12px 28px rgba(15, 23, 42, 0.07);
-	transform: translateY(-1px);
+	border-color: #cbd5e1;
+}
+
+.dtb-payment-runtime #payment ul.payment_methods li.is-active {
+	border-color: #3b82f6;
+	box-shadow: 0 0 0 1px rgba(59, 130, 246, 0.16);
 }
 
 .dtb-payment-runtime #payment ul.payment_methods li > input[type="radio"] {
@@ -205,29 +369,26 @@ body.dtb-payment-runtime {
 	inline-size: 1px;
 	block-size: 1px;
 	opacity: 0;
+	pointer-events: none;
 }
 
 .dtb-payment-runtime #payment ul.payment_methods li > label {
 	display: flex;
 	align-items: center;
-	gap: 12px;
-	min-height: 62px;
-	padding: 14px 16px;
-	font-size: 15px;
-	font-weight: 800;
-	line-height: 1.2;
+	gap: 11px;
+	min-height: 58px;
+	padding: 13px 14px;
 	color: #0f172a;
+	font-size: 14px;
+	font-weight: 800;
+	line-height: 1.25;
 	cursor: pointer;
+	-webkit-tap-highlight-color: transparent;
+	touch-action: manipulation;
 }
 
-.dtb-payment-runtime #payment ul.payment_methods li > input[type="radio"]:checked + label,
 .dtb-payment-runtime #payment ul.payment_methods li.is-active > label {
-	background: linear-gradient(180deg, #ffffff, #f7fbff);
-}
-
-.dtb-payment-runtime #payment ul.payment_methods li.is-active {
-	border-color: #2563eb;
-	box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.11), 0 14px 30px rgba(15, 23, 42, 0.07);
+	background: #f8fbff;
 }
 
 .dtb-payment-method-radio {
@@ -243,18 +404,9 @@ body.dtb-payment-runtime {
 	box-shadow: inset 0 0 0 4px #fff;
 }
 
-.dtb-payment-runtime #payment ul.payment_methods li > input[type="radio"]:checked + label .dtb-payment-method-radio,
 .dtb-payment-runtime #payment ul.payment_methods li.is-active .dtb-payment-method-radio {
 	border-color: #2563eb;
 	background: #2563eb;
-}
-
-.dtb-payment-runtime #payment ul.payment_methods li.dtb-payment-method--apple-pay,
-.dtb-payment-runtime #payment ul.payment_methods li.dtb-payment-method--google-pay,
-.dtb-payment-runtime #payment ul.payment_methods li.dtb-payment-method--afterpay,
-.dtb-payment-runtime #payment ul.payment_methods li.dtb-payment-method--affirm,
-.dtb-payment-runtime #payment ul.payment_methods li.dtb-payment-method--klarna {
-	background: linear-gradient(135deg, #ffffff 0%, #fbfdff 100%);
 }
 
 .dtb-payment-provider-label--logo-only {
@@ -263,12 +415,12 @@ body.dtb-payment-runtime {
 
 .dtb-payment-provider-label--logo-only img,
 .dtb-payment-provider-label--logo-only svg {
-	max-width: 132px;
-	max-height: 26px;
+	display: inline-block;
 	width: auto;
 	height: auto;
+	max-width: 132px;
+	max-height: 26px;
 	object-fit: contain;
-	display: inline-block;
 }
 
 .dtb-payment-provider-label--afterpay img,
@@ -277,23 +429,22 @@ body.dtb-payment-runtime {
 	max-height: 30px;
 }
 
-.dtb-payment-provider-label--klarna img,
-.dtb-payment-provider-label--klarna svg,
-.dtb-payment-provider-label--affirm img,
-.dtb-payment-provider-label--affirm svg {
-	max-height: 24px;
-}
-
 .dtb-payment-runtime .payment_box {
 	margin: 0;
-	border-top: 1px solid #d9e2ec;
-	border-right: 0;
-	border-bottom: 0;
-	border-left: 0;
-	border-radius: 0;
-	background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
-	padding: clamp(16px, 3vw, 22px);
-	color: #344054;
+	border-top: 1px solid #e2e8f0;
+	background: #fff;
+	padding: 17px 14px;
+	color: #475569;
+}
+
+.dtb-payment-runtime #payment ul.payment_methods li:not(.is-active) > .payment_box {
+	display: none !important;
+}
+
+.dtb-payment-runtime #payment ul.payment_methods li.is-active > .payment_box:not(.dtb-payment-box-empty) {
+	display: block !important;
+	visibility: visible !important;
+	opacity: 1 !important;
 }
 
 .dtb-payment-runtime .payment_box.dtb-payment-box-empty,
@@ -301,23 +452,20 @@ body.dtb-payment-runtime {
 	display: none !important;
 }
 
-.dtb-payment-runtime #payment .payment_box fieldset,
-.dtb-payment-runtime #payment .wc-payment-form,
-.dtb-payment-runtime #payment .wcpay-upe-element,
-.dtb-payment-runtime #payment [id*="wcpay"] {
-	background-color: #ffffff;
+.dtb-payment-runtime .payment_box::before,
+.dtb-payment-runtime .payment_box::after {
+	display: none !important;
 }
 
 .dtb-payment-runtime #payment .wc-payment-form,
 .dtb-payment-runtime #payment .wcpay-upe-element,
 .dtb-payment-runtime #payment .StripeElement,
 .dtb-payment-runtime #payment iframe {
-	border-radius: 12px;
-}
-
-.dtb-payment-runtime .payment_box::before,
-.dtb-payment-runtime .payment_box::after {
-	display: none !important;
+	width: 100% !important;
+	min-width: 0 !important;
+	max-width: 100%;
+	border-radius: 10px;
+	background-color: #fff;
 }
 
 .dtb-payment-runtime .form-row {
@@ -333,11 +481,11 @@ body.dtb-payment-runtime {
 .dtb-payment-runtime .InputElement {
 	width: 100%;
 	min-height: 46px;
-	border: 1px solid #b8c5d6;
+	border: 1px solid #cbd5e1;
 	border-radius: 10px;
 	background: #fff;
 	padding: 10px 12px;
-	color: #172033;
+	color: #0f172a;
 	font: inherit;
 	box-shadow: none;
 }
@@ -345,29 +493,28 @@ body.dtb-payment-runtime {
 .dtb-payment-runtime input:focus,
 .dtb-payment-runtime select:focus,
 .dtb-payment-runtime textarea:focus {
-	outline: 3px solid rgba(37, 99, 235, 0.14);
+	outline: 3px solid rgba(37, 99, 235, 0.12);
 	border-color: #2563eb;
 }
 
 .dtb-payment-runtime .button:not(.wcpay-express-checkout-button):not([class*="gpay"]):not([class*="apple-pay"]),
 .dtb-payment-runtime #place_order {
-	min-height: 52px;
+	width: 100%;
+	min-height: 48px;
 	border: 0;
-	border-radius: 16px;
-	background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 100%);
+	border-radius: 12px;
+	background: #2563eb;
 	color: #fff;
-	padding: 13px 22px;
-	font-size: 15px;
+	padding: 13px 18px;
+	font-size: 14px;
 	font-weight: 850;
-	letter-spacing: 0.01em;
 	cursor: pointer;
-	transition: background 0.16s ease, transform 0.16s ease, box-shadow 0.16s ease;
+	transition: background 0.16s ease, transform 0.16s ease;
 }
 
 .dtb-payment-runtime .button:not(.wcpay-express-checkout-button):not([class*="gpay"]):not([class*="apple-pay"]):hover,
 .dtb-payment-runtime #place_order:hover {
-	background: linear-gradient(135deg, #1e40af 0%, #1d4ed8 100%);
-	box-shadow: 0 14px 32px rgba(37, 99, 235, 0.24);
+	background: #1d4ed8;
 }
 
 .dtb-payment-runtime .wc-stripe-payment-request-wrapper,
@@ -379,70 +526,37 @@ body.dtb-payment-runtime {
 	margin: 12px 0;
 }
 
-.dtb-payment-runtime .wcpay-express-checkout-wrapper,
-.dtb-payment-runtime .wc-stripe-payment-request-wrapper,
-.dtb-payment-runtime .wcpay-payment-request-wrapper,
-.dtb-payment-runtime .wc-block-components-express-payment,
-.dtb-payment-runtime .ppc-button-wrapper {
-	overflow: hidden;
-	border-radius: 12px;
-}
-
-.dtb-payment-runtime .wc-stripe-payment-request-button,
-.dtb-payment-runtime .wcpay-payment-request-button,
-.dtb-payment-runtime .gpay-card-info-container,
-.dtb-payment-runtime .StripeElement,
-.dtb-payment-runtime iframe {
-	max-width: 100%;
-}
-
 .dtb-payment-runtime .dtb-wallet-duplicate,
 .dtb-payment-runtime .dtb-wallet-separator-hidden,
-.dtb-payment-runtime .dtb-payment-method-duplicate {
-	display: none !important;
-}
-
+.dtb-payment-runtime .dtb-payment-method-duplicate,
 .dtb-payment-runtime .dtb-wallet-disabled,
 .dtb-payment-runtime [class*="woopay" i],
 .dtb-payment-runtime [id*="woopay" i],
 .dtb-payment-runtime [aria-label*="woopay" i],
 .dtb-payment-runtime [title*="woopay" i],
 .dtb-payment-runtime [class*="woo-pay" i],
-.dtb-payment-runtime [id*="woo-pay" i],
-.dtb-payment-runtime [aria-label*="woo pay" i],
-.dtb-payment-runtime [title*="woo pay" i] {
+.dtb-payment-runtime [id*="woo-pay" i] {
 	display: none !important;
 }
 
 .dtb-payment-runtime .woocommerce-privacy-policy-text {
-	margin: 20px 0 0;
-	padding-top: 18px;
-	border-top: 1px solid #dbe3ef;
-	color: #475569;
-	font-size: 14px;
+	margin: 18px 0 0;
+	padding-top: 16px;
+	border-top: 1px solid #e2e8f0;
+	color: #64748b;
+	font-size: 12px;
 	line-height: 1.55;
 }
 
-.dtb-payment-runtime .woocommerce-privacy-policy-text p {
-	margin: 0;
-}
-
 .dtb-payment-runtime .form-row.place-order {
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
-	gap: 18px;
-	margin: 20px 0 0;
-}
-
-.dtb-payment-runtime .form-row.place-order #place_order {
-	margin-left: auto;
-	min-width: 180px;
+	display: block;
+	margin: 18px 0 0;
 }
 
 .dtb-payment-runtime .woocommerce-error,
 .dtb-payment-runtime .woocommerce-info,
 .dtb-payment-runtime .woocommerce-message {
+	grid-column: 1 / -1;
 	margin: 0 0 18px;
 	border: 1px solid #bfdbfe;
 	border-radius: 12px;
@@ -458,32 +572,51 @@ body.dtb-payment-runtime {
 	color: #991b1b;
 }
 
-@media (max-width: 720px) {
+@media (max-width: 860px) {
+	.dtb-payment-runtime form#order_review {
+		grid-template-columns: 1fr;
+	}
+
+	.dtb-payment-runtime #payment,
+	.dtb-payment-runtime .woocommerce-checkout-payment {
+		max-width: none;
+	}
+}
+
+@media (max-width: 640px) {
+	.dtb-payment-header-inner {
+		width: calc(100% - 32px);
+		min-height: 74px;
+	}
+
+	.dtb-payment-logo {
+		width: min(118px, 38vw) !important;
+		max-width: 118px !important;
+		max-height: 34px !important;
+	}
+
+	.dtb-payment-secure-pill {
+		padding: 7px 9px;
+		font-size: 9px;
+	}
+
 	.dtb-payment-shell {
-		padding: 0;
+		min-height: calc(100vh - 74px);
+		padding: 24px 16px 40px;
 	}
 
-	.dtb-payment-card {
-		min-height: 100vh;
-		border-radius: 0;
-		border: 0;
-	}
-
-	.dtb-payment-header {
-		padding: 20px 18px 24px;
+	.dtb-payment-intro {
+		display: block;
+		margin-bottom: 20px;
 	}
 
 	.dtb-payment-title {
-		font-size: clamp(30px, 7.2vw, 38px);
+		font-size: 28px;
 	}
 
-	.dtb-payment-subtitle {
-		font-size: 14px;
-		line-height: 1.5;
-	}
-
-	.dtb-payment-content {
-		padding: 16px;
+	.dtb-payment-return-link {
+		margin-top: 12px;
+		padding-top: 0;
 	}
 
 	.dtb-payment-runtime table.shop_table th,
@@ -492,25 +625,37 @@ body.dtb-payment-runtime {
 		font-size: 13px;
 	}
 
+	.dtb-payment-runtime table.shop_table caption {
+		padding: 22px 16px 15px;
+	}
+
+	.dtb-order-product {
+		gap: 11px;
+	}
+
+	.dtb-order-product-media {
+		width: 60px;
+		height: 60px;
+		flex-basis: 60px;
+	}
+
+	.dtb-order-product-name,
+	.dtb-order-product-name a {
+		font-size: 13px;
+	}
+
 	.dtb-payment-runtime #payment,
 	.dtb-payment-runtime .woocommerce-checkout-payment {
-		padding: 14px;
-		border-radius: 18px;
+		padding: 18px 14px 16px;
 	}
 
 	.dtb-payment-runtime #payment ul.payment_methods li > label {
-		min-height: 58px;
-		padding: 13px 14px;
-		font-size: 15px;
+		min-height: 56px;
+		padding: 12px;
 	}
 
-	.dtb-payment-runtime .form-row.place-order {
-		flex-direction: column;
-		align-items: stretch;
-	}
-
-	.dtb-payment-runtime .form-row.place-order #place_order {
-		width: 100%;
-		margin-left: 0;
+	.dtb-payment-runtime .payment_box {
+		overflow: visible;
+		padding: 15px 12px;
 	}
 }

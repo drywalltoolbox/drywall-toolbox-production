@@ -62,21 +62,28 @@ if ( ! function_exists( 'dtb_payment_runtime_logo_url' ) ) {
 </head>
 <body <?php body_class( 'dtb-payment-runtime woocommerce-checkout woocommerce-order-pay' ); ?>>
 <?php wp_body_open(); ?>
+<header class="dtb-payment-header">
+	<div class="dtb-payment-header-inner">
+		<a class="dtb-payment-brand" href="<?php echo esc_url( home_url( '/' ) ); ?>" aria-label="<?php echo esc_attr( get_bloginfo( 'name' ) ?: 'Drywall Toolbox' ); ?>">
+			<?php $dtb_payment_logo_url = dtb_payment_runtime_logo_url(); ?>
+			<?php if ( $dtb_payment_logo_url ) : ?>
+				<img class="dtb-payment-logo" src="<?php echo esc_url( $dtb_payment_logo_url ); ?>" alt="<?php echo esc_attr( get_bloginfo( 'name' ) ); ?>">
+			<?php else : ?>
+				<strong><?php echo esc_html( get_bloginfo( 'name' ) ?: 'Drywall Toolbox' ); ?></strong>
+			<?php endif; ?>
+		</a>
+		<span class="dtb-payment-secure-pill"><?php esc_html_e( 'Secure Payment', 'drywall-toolbox' ); ?></span>
+	</div>
+</header>
 <main class="dtb-payment-shell">
 	<section class="dtb-payment-card" aria-labelledby="dtb-payment-title">
-		<header class="dtb-payment-header">
-			<div class="dtb-payment-brand">
-				<?php $dtb_payment_logo_url = dtb_payment_runtime_logo_url(); ?>
-				<?php if ( $dtb_payment_logo_url ) : ?>
-					<img class="dtb-payment-logo" src="<?php echo esc_url( $dtb_payment_logo_url ); ?>" alt="<?php echo esc_attr( get_bloginfo( 'name' ) ); ?>">
-				<?php else : ?>
-					<strong><?php echo esc_html( get_bloginfo( 'name' ) ?: 'Drywall Toolbox' ); ?></strong>
-				<?php endif; ?>
-			</div>
-			<span class="dtb-payment-secure-pill"><?php esc_html_e( 'Secure Payment', 'drywall-toolbox' ); ?></span>
+		<div class="dtb-payment-intro">
+			<div>
 			<h1 id="dtb-payment-title" class="dtb-payment-title"><?php esc_html_e( 'Complete Your Payment', 'drywall-toolbox' ); ?></h1>
-			<p class="dtb-payment-subtitle"><?php esc_html_e( 'Review your order and complete payment securely. Available wallet options depend on your browser, device, and selected payment method.', 'drywall-toolbox' ); ?></p>
-		</header>
+			<p class="dtb-payment-subtitle"><?php esc_html_e( 'Review your order and choose a secure payment method.', 'drywall-toolbox' ); ?></p>
+			</div>
+			<a class="dtb-payment-return-link" href="<?php echo esc_url( home_url( '/cart' ) ); ?>"><?php esc_html_e( 'Back to Cart', 'drywall-toolbox' ); ?></a>
+		</div>
 		<div class="dtb-payment-content woocommerce">
 			<?php dtb_payment_runtime_render_native_checkout(); ?>
 		</div>

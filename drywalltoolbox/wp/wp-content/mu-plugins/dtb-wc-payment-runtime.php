@@ -288,6 +288,37 @@ if ( ! function_exists( 'dtb_wc_payment_runtime_prepare_payable_order' ) ) {
 			$changed = true;
 		}
 
+		$is_dtb_checkout_order = 'woo_native' === (string) $order->get_meta( '_dtb_checkout_gateway', true );
+		$tax_version           = (string) $order->get_meta( '_dtb_tax_calculation_version', true );
+		if ( $is_dtb_checkout_order && '1' !== $tax_version ) {
+			$shipping = [
+				'first_name' => (string) $order->get_shipping_first_name(),
+				'last_name'  => (string) $order->get_shipping_last_name(),
+				'company'    => (string) $order->get_shipping_company(),
+				'address_1'  => (string) $order->get_shipping_address_1(),
+				'address_2'  => (string) $order->get_shipping_address_2(),
+				'city'       => (string) $order->get_shipping_city(),
+				'state'      => (string) $order->get_shipping_state(),
+				'postcode'   => (string) $order->get_shipping_postcode(),
+				'country'    => (string) $order->get_shipping_country(),
+			];
+
+			if ( function_exists( 'dtb_checkout_normalize_address' ) ) {
+				$shipping = dtb_checkout_normalize_address( $shipping );
+				$order->set_address( $shipping, 'shipping' );
+			}
+
+			$order->calculate_taxes( [
+				'country'  => (string) ( $shipping['country'] ?? '' ),
+				'state'    => (string) ( $shipping['state'] ?? '' ),
+				'postcode' => (string) ( $shipping['postcode'] ?? '' ),
+				'city'     => (string) ( $shipping['city'] ?? '' ),
+			] );
+			$order->calculate_totals( false );
+			$order->update_meta_data( '_dtb_tax_calculation_version', '1' );
+			$changed = true;
+		}
+
 		if ( ! $changed ) {
 			return;
 		}
@@ -341,6 +372,42 @@ add_filter(
 	},
 	PHP_INT_MAX,
 	2
+);
+
+add_filter(
+	'woocommerce_order_item_name',
+	static function ( string $item_name, $item, bool $is_visible ): string {
+		if ( ! dtb_wc_payment_runtime_request() || ! $item instanceof WC_Order_Item_Product ) {
+			return $item_name;
+		}
+
+		$product = $item->get_product();
+		if ( ! $product instanceof WC_Product ) {
+			return $item_name;
+		}
+
+		$image = $product->get_image(
+			[ 96, 96 ],
+			[
+				'class'    => 'dtb-order-product-image',
+				'loading'  => 'eager',
+				'decoding' => 'async',
+				'alt'      => $product->get_name(),
+			]
+		);
+		$sku   = trim( (string) $product->get_sku() );
+
+		return sprintf(
+			'<span class="dtb-order-product"><span class="dtb-order-product-media">%1$s</span><span class="dtb-order-product-copy"><span class="dtb-order-product-name">%2$s</span>%3$s</span></span>',
+			wp_kses_post( $image ),
+			wp_kses_post( $item_name ),
+			'' !== $sku
+				? '<span class="dtb-order-product-sku">' . esc_html( sprintf( 'SKU: %s', $sku ) ) . '</span>'
+				: ''
+		);
+	},
+	20,
+	3
 );
 
 add_action(

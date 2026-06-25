@@ -12,11 +12,16 @@
   gap: 1.05rem;
 }
 
-.dtb-order-tracking-header {
+.dtb-order-status-panel__actions {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 0.9rem;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+}
+
+.dtb-order-status-panel__actions .dtb-order-back-link {
+  margin-bottom: 0;
 }
 
 .dtb-order-refresh-button {
@@ -504,9 +509,20 @@
 }
 
 .dtb-order-item__thumb {
-  width: 52px;
-  height: 52px;
-  border-radius: 16px;
+  width: 72px;
+  height: 72px;
+  border: 1px solid rgba(226, 232, 240, 0.96);
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: none;
+}
+
+.dtb-order-item__thumb.has-image {
+  background: #fff;
+}
+
+.dtb-order-item__thumb img {
+  padding: 0.3rem;
 }
 
 .dtb-order-detail-list--compact {
@@ -617,8 +633,8 @@
     gap: 0.85rem;
   }
 
-  .dtb-order-tracking-header .dtb-order-back-link {
-    margin-bottom: 0;
+  .dtb-order-status-panel__actions {
+    justify-content: flex-start;
   }
 
   .dtb-order-status-panel {
@@ -687,6 +703,12 @@
 
   .dtb-order-item--friendly {
     grid-template-columns: 1fr;
+  }
+
+  .dtb-order-item__thumb {
+    width: 62px;
+    height: 62px;
+    border-radius: 13px;
   }
 
   .dtb-order-item__price {

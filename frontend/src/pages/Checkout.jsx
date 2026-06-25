@@ -12,6 +12,7 @@ import {
   AlertCircle,
   AlertTriangle,
   CheckCircle,
+  ChevronLeft,
   ChevronRight,
   ClipboardCheck,
   CreditCard,
@@ -49,6 +50,21 @@ const PUBLIC_PAYMENT_LABEL = 'Secure card payment';
 const PUBLIC_PAYMENT_TITLE = 'Secure Card Payment';
 const PAYMENT_LOGO_BASE = `${process.env.PUBLIC_URL || ''}/payment_logos`;
 const SHIPPING_DEBOUNCE_MS = 650;
+const US_STATES = [
+  ['AL', 'Alabama'], ['AK', 'Alaska'], ['AZ', 'Arizona'], ['AR', 'Arkansas'],
+  ['CA', 'California'], ['CO', 'Colorado'], ['CT', 'Connecticut'], ['DE', 'Delaware'],
+  ['FL', 'Florida'], ['GA', 'Georgia'], ['HI', 'Hawaii'], ['ID', 'Idaho'],
+  ['IL', 'Illinois'], ['IN', 'Indiana'], ['IA', 'Iowa'], ['KS', 'Kansas'],
+  ['KY', 'Kentucky'], ['LA', 'Louisiana'], ['ME', 'Maine'], ['MD', 'Maryland'],
+  ['MA', 'Massachusetts'], ['MI', 'Michigan'], ['MN', 'Minnesota'], ['MS', 'Mississippi'],
+  ['MO', 'Missouri'], ['MT', 'Montana'], ['NE', 'Nebraska'], ['NV', 'Nevada'],
+  ['NH', 'New Hampshire'], ['NJ', 'New Jersey'], ['NM', 'New Mexico'], ['NY', 'New York'],
+  ['NC', 'North Carolina'], ['ND', 'North Dakota'], ['OH', 'Ohio'], ['OK', 'Oklahoma'],
+  ['OR', 'Oregon'], ['PA', 'Pennsylvania'], ['RI', 'Rhode Island'], ['SC', 'South Carolina'],
+  ['SD', 'South Dakota'], ['TN', 'Tennessee'], ['TX', 'Texas'], ['UT', 'Utah'],
+  ['VT', 'Vermont'], ['VA', 'Virginia'], ['WA', 'Washington'], ['WV', 'West Virginia'],
+  ['WI', 'Wisconsin'], ['WY', 'Wyoming'], ['DC', 'District of Columbia'],
+];
 
 const CARD_BRAND_LOGOS = [
   { key: 'visa', src: `${PAYMENT_LOGO_BASE}/visa.svg`, alt: 'Visa' },
@@ -287,7 +303,7 @@ function PendingPaymentBanner({ pendingPayment, onResume, onDismiss }) {
   );
 }
 
-function MobileSummaryStrip({ cartItems, subtotal, shipping, tax, total }) {
+function MobileSummaryStrip({ cartItems, subtotal, shipping, total }) {
   const [open, setOpen] = useState(false);
   const totalQty = cartItems.reduce((sum, item) => sum + Number(item.quantity || 0), 0);
   return (
@@ -315,10 +331,10 @@ function MobileSummaryStrip({ cartItems, subtotal, shipping, tax, total }) {
                 })}
               </div>
               <div className="px-4 py-3.5 border-t border-slate-100 space-y-1.5 text-xs text-slate-500">
-                {[{ label: 'Subtotal', value: `$${subtotal.toFixed(2)}` }, { label: 'Shipping', value: shipping === 0 ? 'Free' : `$${shipping.toFixed(2)}` }, { label: 'Tax (est.)', value: `$${tax.toFixed(2)}` }].map(({ label, value }) => (
+                {[{ label: 'Subtotal', value: `$${subtotal.toFixed(2)}` }, { label: 'Shipping', value: shipping === 0 ? 'Free' : `$${shipping.toFixed(2)}` }, { label: 'Tax', value: 'Calculated by address' }].map(({ label, value }) => (
                   <div key={label} className="flex justify-between"><span>{label}</span><span className={`font-semibold tabular-nums ${label === 'Shipping' && shipping === 0 ? 'text-emerald-600' : 'text-slate-800'}`}>{value}</span></div>
                 ))}
-                <div className="flex justify-between pt-2 border-t border-slate-100"><span className="font-bold text-slate-900 text-sm">Total</span><span className="font-black text-primary-600 tabular-nums text-base">${total.toFixed(2)}</span></div>
+                <div className="flex justify-between pt-2 border-t border-slate-100"><span className="font-bold text-slate-900 text-sm">Est. Total</span><span className="font-black text-primary-600 tabular-nums text-base">${total.toFixed(2)}</span></div>
               </div>
             </div>
           </Motion.div>
@@ -328,31 +344,29 @@ function MobileSummaryStrip({ cartItems, subtotal, shipping, tax, total }) {
   );
 }
 
-function DesktopSummaryPanel({ cartItems, subtotal, shipping, tax, total, couponInput, setCouponInput, addManualCoupon, manualCoupons, removeManualCoupon, setupError, processing, canSubmit, submitStatus, onPlaceOrder }) {
+function DesktopSummaryPanel({ cartItems, subtotal, shipping, total, couponInput, setCouponInput, addManualCoupon, manualCoupons, removeManualCoupon, setupError, processing, canSubmit, submitStatus, onPlaceOrder }) {
   const totalQty = cartItems.reduce((sum, item) => sum + Number(item.quantity || 0), 0);
   return (
-    <aside className="dtb-summary-panel hidden lg:flex flex-col lg:sticky lg:top-6 lg:self-start overflow-hidden rounded-2xl text-slate-100">
-      <div className="p-6 border-b border-white/10">
-        <div className="flex items-start justify-between gap-4 mb-5"><div><p className="text-[10px] font-bold uppercase tracking-[0.18em] text-primary-200/75 mb-1">Order Review</p><h2 className="text-xl font-black text-white tracking-tight">Your Cart</h2></div><span className="rounded-full bg-white/10 px-3 py-1 text-xs font-bold text-white">{totalQty} item{totalQty === 1 ? '' : 's'}</span></div>
-        <div className="space-y-4 max-h-[360px] overflow-y-auto pr-1">
+    <aside className="dtb-summary-panel hidden lg:flex flex-col lg:sticky lg:top-6 lg:self-start overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-[0_2px_16px_rgba(15,23,42,0.06)]">
+      <div className="h-[3px] shrink-0 bg-gradient-to-r from-primary-700 via-primary-500 to-primary-600" />
+      <div className="p-5 sm:p-6">
+        <div className="flex items-start justify-between gap-4 mb-5"><div><h2 className="text-lg font-bold text-slate-900">Order Summary</h2><p className="mt-1 text-xs text-slate-500">{totalQty} item{totalQty === 1 ? '' : 's'}</p></div></div>
+        <div className="space-y-3 max-h-[300px] overflow-y-auto pr-1 pb-5 border-b border-slate-100">
           {cartItems.map((item) => {
             const image = resolveCartItemImage(item);
             return (
-              <div key={item.cartKey || item.id} className="flex gap-3"><div className="relative h-14 w-14 rounded-xl overflow-hidden bg-white/8 border border-white/10 shrink-0">{image ? <img src={image} alt={item.name} className="h-full w-full object-contain p-1.5" loading="lazy" /> : null}</div><div className="min-w-0 flex-1"><p className="line-clamp-2 text-sm font-semibold text-white leading-snug">{item.name}</p><p className="mt-1 text-[11px] text-slate-400 tabular-nums">${toMoney(item.price).toFixed(2)} ea</p></div><span className="text-sm font-bold text-white tabular-nums shrink-0">${(toMoney(item.price) * Number(item.quantity || 1)).toFixed(2)}</span></div>
+              <div key={item.cartKey || item.id} className="flex gap-3"><div className="relative h-14 w-14 rounded-xl overflow-hidden bg-slate-50 border border-slate-100 shrink-0">{image ? <img src={image} alt={item.name} className="h-full w-full object-contain p-1.5" loading="lazy" /> : null}</div><div className="min-w-0 flex-1"><p className="line-clamp-2 text-sm font-semibold text-slate-900 leading-snug">{item.name}</p><p className="mt-1 text-[11px] text-slate-400 tabular-nums">${toMoney(item.price).toFixed(2)} ea</p></div><span className="text-sm font-bold text-slate-900 tabular-nums shrink-0">${(toMoney(item.price) * Number(item.quantity || 1)).toFixed(2)}</span></div>
             );
           })}
         </div>
-      </div>
-      <div className="p-6 space-y-5">
-        <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-4 space-y-2.5 text-sm"><div className="flex justify-between text-slate-300"><span>Subtotal</span><span className="font-semibold text-white tabular-nums">${subtotal.toFixed(2)}</span></div><div className="flex justify-between text-slate-300"><span>Shipping</span><span className={`font-semibold tabular-nums ${shipping === 0 ? 'text-emerald-300' : 'text-white'}`}>{shipping === 0 ? 'Free' : `$${shipping.toFixed(2)}`}</span></div><div className="flex justify-between text-slate-300"><span>Tax</span><span className="font-semibold text-white tabular-nums">${tax.toFixed(2)}</span></div><div className="flex justify-between pt-3 border-t border-white/10"><span className="font-bold text-white">Total</span><span className="font-black text-2xl text-white tabular-nums">${total.toFixed(2)}</span></div></div>
-        <div><label htmlFor="desktop-coupon" className="block text-[10px] font-bold uppercase tracking-[0.13em] text-slate-400 mb-2">Discount Code</label><div className="flex gap-2"><input id="desktop-coupon" type="text" value={couponInput} onChange={(event) => setCouponInput(event.target.value.toUpperCase())} placeholder="ENTER CODE" className="min-w-0 flex-1 rounded-xl border border-white/10 bg-white/10 px-3 py-2.5 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-primary-400/35" /><button type="button" onClick={addManualCoupon} className="rounded-xl bg-white text-slate-950 px-4 py-2.5 text-sm font-bold hover:bg-slate-100 transition-colors">Apply</button></div>{manualCoupons.length > 0 && <div className="mt-3 flex flex-wrap gap-2">{manualCoupons.map((code) => <button key={code} type="button" onClick={() => removeManualCoupon(code)} className="rounded-full border border-emerald-400/30 bg-emerald-400/10 px-3 py-1 text-[11px] font-semibold text-emerald-200">{code} ×</button>)}</div>}</div>
+        <div className="py-5 space-y-2.5 text-sm"><div className="flex justify-between text-slate-500"><span>Subtotal</span><span className="font-semibold text-slate-900 tabular-nums">${subtotal.toFixed(2)}</span></div><div className="flex justify-between text-slate-500"><span>Shipping</span><span className={`font-semibold tabular-nums ${shipping === 0 ? 'text-emerald-600' : 'text-slate-900'}`}>{shipping === 0 ? 'Free' : `$${shipping.toFixed(2)}`}</span></div><div className="flex justify-between gap-4 text-slate-500"><span>Tax</span><span className="text-right text-xs italic text-slate-400">Calculated from shipping address</span></div><div className="flex justify-between items-baseline pt-4 border-t border-slate-100"><span className="font-bold text-slate-900">Est. Total</span><span className="font-black text-2xl text-slate-950 tabular-nums">${total.toFixed(2)}</span></div></div>
+        <div className="mb-5"><label htmlFor="desktop-coupon" className="block text-[10px] font-bold uppercase tracking-[0.13em] text-slate-500 mb-2">Discount Code</label><div className="flex gap-2"><input id="desktop-coupon" type="text" value={couponInput} onChange={(event) => setCouponInput(event.target.value.toUpperCase())} placeholder="ENTER CODE" className="min-w-0 flex-1 rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500/20" /><button type="button" onClick={addManualCoupon} className="rounded-xl bg-slate-900 text-white px-4 py-2.5 text-sm font-bold hover:bg-slate-800 transition-colors">Apply</button></div>{manualCoupons.length > 0 && <div className="mt-3 flex flex-wrap gap-2">{manualCoupons.map((code) => <button key={code} type="button" onClick={() => removeManualCoupon(code)} className="rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-[11px] font-semibold text-emerald-700">{code} ×</button>)}</div>}</div>
         {setupError ? <div className="flex items-start gap-2 rounded-xl border border-amber-200 bg-amber-50 px-3.5 py-3 text-xs leading-relaxed text-amber-800"><AlertTriangle size={14} className="mt-0.5 shrink-0" /><span>{setupError}</span></div> : null}
-        <button type="button" onClick={onPlaceOrder} disabled={!canSubmit || processing} className="w-full inline-flex min-h-[52px] items-center justify-center gap-2.5 rounded-xl bg-primary-600 px-5 py-3.5 text-sm font-black text-white shadow-[0_16px_36px_rgba(37,99,235,0.35)] transition-all hover:bg-primary-700 disabled:cursor-not-allowed disabled:opacity-50">
+        <button type="button" onClick={onPlaceOrder} disabled={!canSubmit || processing} className="w-full inline-flex min-h-[48px] items-center justify-center gap-2.5 rounded-xl bg-primary-600 px-5 py-3.5 text-sm font-black text-white shadow-sm transition-all hover:bg-primary-700 disabled:cursor-not-allowed disabled:opacity-50">
           {processing ? <Loader2 size={16} className="animate-spin" /> : null}{processing ? 'Preparing Payment…' : 'Continue to Secure Payment'}
         </button>
-        <PaymentMethodLogos />
+        <div className="mt-5 pt-4 border-t border-slate-100"><p className="text-[9px] font-bold uppercase tracking-[0.14em] text-slate-400 text-center mb-3">Accepted Payments</p><PaymentMethodLogos /></div>
         <InlineSubmitStatus status={submitStatus} />
-        <p className="text-center text-[11px] leading-relaxed text-slate-400">Encrypted checkout · Secure card processing · Order confirmation by email</p>
       </div>
     </aside>
   );
@@ -388,8 +402,7 @@ export default function Checkout() {
   const processing = submitStatus !== 'idle';
   const subtotal = toMoney(getCartTotal());
   const shipping = selectedRate ? toMoney(selectedRate.price) : (subtotal >= FREE_SHIP_THRESHOLD ? 0 : ESTIMATED_SHIP_RATE);
-  const tax = toMoney(subtotal * 0.08);
-  const total = toMoney(subtotal + shipping + tax);
+  const total = toMoney(subtotal + shipping);
   const isContactComplete = useMemo(() => formData.firstName.trim() !== '' && formData.lastName.trim() !== '' && formData.email.trim() !== '' && formData.phone.trim() !== '', [formData]);
   const isAddressComplete = useMemo(() => formData.address.trim() !== '' && formData.city.trim() !== '' && formData.state.trim() !== '' && formData.zip.trim() !== '', [formData]);
   const isFormComplete = isContactComplete && isAddressComplete;
@@ -577,16 +590,18 @@ export default function Checkout() {
   return (
     <div className="dtb-checkout min-h-screen page-wrapper">
       <SEOHead noindex title="Checkout" />
-      <div className="dtb-checkout-frame mx-auto w-full max-w-[1380px] lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(420px,460px)] lg:gap-6 xl:gap-7 lg:items-start min-h-screen">
-        <div className="dtb-checkout-form-pane px-4 py-8 sm:px-7 md:px-8 lg:px-8 xl:px-10 pb-32 lg:pb-16">
-          <div className="max-w-2xl mx-auto lg:mx-0 lg:max-w-[780px]">
-            <Motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35 }} className="mb-6"><div className="flex items-center justify-between mb-1"><div className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-[0.18em] text-slate-500"><Lock size={11} />Secure checkout</div>{!isAuthenticated && <Link to="/login" className="text-xs font-semibold text-slate-500 hover:text-slate-800 transition-colors">Sign in</Link>}</div><h1 className="text-2xl sm:text-3xl font-black text-slate-950 tracking-tight">Complete your order</h1></Motion.div>
+      <div className="dtb-checkout-frame max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-14 pb-32 sm:py-12">
+        <Motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }} className="flex items-start justify-between gap-4 mb-8"><div><h1 className="text-2xl sm:text-3xl font-black text-slate-950 tracking-tight">Checkout</h1><p className="text-sm text-slate-500 mt-0.5">Complete shipping details and continue to secure payment.</p></div><Link to="/cart" className="flex items-center gap-1.5 pt-1 text-sm font-semibold text-slate-500 hover:text-primary-600 transition-colors"><ChevronLeft size={16} strokeWidth={2.5} />Back to Cart</Link></Motion.div>
+        <div className="lg:grid lg:grid-cols-[1fr_360px] lg:gap-6 lg:items-start">
+        <div className="dtb-checkout-form-pane">
+          <div>
+            <div className="mb-5 flex items-center justify-between"><div className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-[0.18em] text-slate-500"><Lock size={11} />Secure checkout</div>{!isAuthenticated && <Link to="/login" className="text-xs font-semibold text-slate-500 hover:text-primary-600 transition-colors">Sign in</Link>}</div>
             <StepProgress activeStep={processing ? 'review' : isFormComplete ? 'payment' : 'shipping'} />
             <PendingPaymentBanner pendingPayment={pendingPayment} onResume={resumePendingPayment} onDismiss={dismissPendingPayment} />
-            <MobileSummaryStrip cartItems={safeCartItems} subtotal={subtotal} shipping={shipping} tax={tax} total={total} />
+            <MobileSummaryStrip cartItems={safeCartItems} subtotal={subtotal} shipping={shipping} total={total} />
             <div className="space-y-4">
               <StepCard delay={0} className="p-5 sm:p-6"><SectionHeader icon={User} title="Contact Information" complete={isContactComplete} /><div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">{[{ name: 'firstName', label: 'First Name', type: 'text', autoComplete: 'given-name' }, { name: 'lastName', label: 'Last Name', type: 'text', autoComplete: 'family-name' }, { name: 'email', label: 'Email Address', type: 'email', autoComplete: 'email' }, { name: 'phone', label: 'Phone', type: 'tel', autoComplete: 'tel', inputMode: 'numeric' }].map(({ name, label, type, autoComplete, inputMode }) => (<div key={name}><label htmlFor={`field-${name}`} className={labelClass}>{label}{requiredMark}</label><input id={`field-${name}`} type={type} name={name} value={formData[name]} onChange={handleInputChange} autoComplete={autoComplete} {...(inputMode ? { inputMode } : {})} className={inputClass(name)} aria-invalid={!!errors[name]} />{errors[name] && <p className="text-red-500 text-[11px] mt-1 font-medium" role="alert">{errors[name]}</p>}</div>))}</div></StepCard>
-              <StepCard delay={0.05} className="p-5 sm:p-6"><SectionHeader icon={MapPin} title="Shipping Address" complete={isAddressComplete} /><div className="space-y-3.5"><div><label htmlFor="field-address" className={labelClass}>Street Address{requiredMark}</label><input id="field-address" type="text" name="address" value={formData.address} onChange={handleInputChange} autoComplete="street-address" className={inputClass('address')} aria-invalid={!!errors.address} />{errors.address && <p className="text-red-500 text-[11px] mt-1 font-medium" role="alert">{errors.address}</p>}</div><div className="grid grid-cols-3 gap-3">{[{ name: 'city', label: 'City', autoComplete: 'address-level2' }, { name: 'state', label: 'State', autoComplete: 'address-level1' }, { name: 'zip', label: 'ZIP Code', autoComplete: 'postal-code', inputMode: 'numeric' }].map(({ name, label, autoComplete, inputMode }) => (<div key={name}><label htmlFor={`field-${name}`} className={labelClass}>{label}{requiredMark}</label><input id={`field-${name}`} type="text" name={name} value={formData[name]} onChange={handleInputChange} autoComplete={autoComplete} {...(inputMode ? { inputMode } : {})} className={inputClass(name)} aria-invalid={!!errors[name]} />{errors[name] && <p className="text-red-500 text-[11px] mt-1 font-medium" role="alert">{errors[name]}</p>}</div>))}</div>{subtotal > 0 && subtotal < FREE_SHIP_THRESHOLD && <div className="flex items-center gap-2 rounded-xl bg-primary-50 border border-primary-100 px-4 py-2.5 text-xs text-primary-700"><Truck size={13} className="shrink-0" /><span>Spend <strong>${(FREE_SHIP_THRESHOLD - subtotal).toFixed(2)}</strong> more for free shipping</span></div>}</div></StepCard>
+              <StepCard delay={0.05} className="p-5 sm:p-6"><SectionHeader icon={MapPin} title="Shipping Address" complete={isAddressComplete} /><div className="space-y-3.5"><div><label htmlFor="field-address" className={labelClass}>Street Address{requiredMark}</label><input id="field-address" type="text" name="address" value={formData.address} onChange={handleInputChange} autoComplete="street-address" className={inputClass('address')} aria-invalid={!!errors.address} />{errors.address && <p className="text-red-500 text-[11px] mt-1 font-medium" role="alert">{errors.address}</p>}</div><div className="grid grid-cols-1 sm:grid-cols-[minmax(0,1fr)_minmax(180px,1fr)_140px] gap-3"><div><label htmlFor="field-city" className={labelClass}>City{requiredMark}</label><input id="field-city" type="text" name="city" value={formData.city} onChange={handleInputChange} autoComplete="address-level2" className={inputClass('city')} aria-invalid={!!errors.city} />{errors.city && <p className="text-red-500 text-[11px] mt-1 font-medium" role="alert">{errors.city}</p>}</div><div><label htmlFor="field-state" className={labelClass}>State{requiredMark}</label><select id="field-state" name="state" value={formData.state} onChange={handleInputChange} autoComplete="address-level1" className={inputClass('state')} aria-invalid={!!errors.state}><option value="">Select state</option>{US_STATES.map(([code, name]) => <option key={code} value={code}>{name} ({code})</option>)}</select>{errors.state && <p className="text-red-500 text-[11px] mt-1 font-medium" role="alert">{errors.state}</p>}</div><div><label htmlFor="field-zip" className={labelClass}>ZIP Code{requiredMark}</label><input id="field-zip" type="text" name="zip" value={formData.zip} onChange={handleInputChange} autoComplete="postal-code" inputMode="numeric" className={inputClass('zip')} aria-invalid={!!errors.zip} />{errors.zip && <p className="text-red-500 text-[11px] mt-1 font-medium" role="alert">{errors.zip}</p>}</div></div>{subtotal > 0 && subtotal < FREE_SHIP_THRESHOLD && <div className="flex items-center gap-2 rounded-xl bg-primary-50 border border-primary-100 px-4 py-2.5 text-xs text-primary-700"><Truck size={13} className="shrink-0" /><span>Spend <strong>${(FREE_SHIP_THRESHOLD - subtotal).toFixed(2)}</strong> more for free shipping</span></div>}</div></StepCard>
               <StepCard delay={0.1} className="p-5 sm:p-6"><SectionHeader icon={Truck} title="Shipping Method" />{ratesLoading && <div className="flex items-center gap-2 text-sm text-slate-400 py-1"><Loader2 size={14} className="animate-spin" />Loading shipping options…</div>}{ratesError && !ratesLoading && <div className="flex items-center gap-2 rounded-xl border border-amber-200 bg-amber-50 px-3.5 py-2.5 text-xs text-amber-700"><AlertTriangle size={13} className="shrink-0" />{ratesError}</div>}{!ratesLoading && shippingRates.length === 0 && !ratesError && <p className="text-xs text-slate-400 italic">Enter your address above to see available rates.</p>}{!ratesLoading && shippingRates.length > 0 && <div className="space-y-2" role="radiogroup" aria-label="Shipping method">{shippingRates.map((rate) => (<label key={rate.id} className={`flex items-center justify-between gap-3 px-4 py-3.5 rounded-xl border cursor-pointer transition-all ${selectedRate?.id === rate.id ? 'border-primary-500 bg-primary-50/60 ring-1 ring-primary-400/30' : 'border-slate-200 bg-white hover:border-slate-300'}`}><div className="flex items-center gap-3"><input type="radio" name="shippingRate" value={rate.id} checked={selectedRate?.id === rate.id} onChange={() => setSelectedRate(rate)} className="accent-primary-600" /><div><p className="text-sm font-semibold text-slate-900">{rate.name}</p>{rate.eta && <p className="text-xs text-slate-500 mt-0.5">{rate.eta}</p>}</div></div><span className={`text-sm font-bold shrink-0 ${toMoney(rate.price) === 0 ? 'text-emerald-600' : 'text-slate-900'}`}>{toMoney(rate.price) === 0 ? 'Free' : `$${toMoney(rate.price).toFixed(2)}`}</span></label>))}</div>}</StepCard>
               <StepCard delay={0.15} className="lg:hidden p-5 sm:p-6"><SectionHeader icon={Tag} title="Discount Code" /><div className="flex gap-2"><input id="coupon-code" type="text" value={couponInput} onChange={(event) => setCouponInput(event.target.value.toUpperCase())} placeholder="ENTER CODE" className="flex-1 rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20 transition-all" /><button type="button" onClick={addManualCoupon} className="rounded-xl bg-slate-900 hover:bg-slate-800 px-5 py-3 text-sm font-semibold text-white transition-colors">Apply</button></div>{manualCoupons.length > 0 && <div className="mt-3 flex flex-wrap gap-2">{manualCoupons.map((code) => <button key={code} type="button" onClick={() => removeManualCoupon(code)} className="flex items-center gap-1 rounded-full border border-teal-200 bg-teal-50 px-3 py-1 text-[11px] font-semibold text-teal-700 hover:bg-teal-100 transition-colors"><Tag size={9} /> {code} ×</button>)}</div>}</StepCard>
               <StepCard delay={0.17} className="p-5 sm:p-6"><label htmlFor="field-customerNote" className={labelClass}>Order Note <span className="text-slate-400 normal-case font-normal">(optional)</span></label><textarea id="field-customerNote" name="customerNote" value={formData.customerNote} onChange={handleInputChange} rows={2} placeholder="Special instructions for your order…" className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-sm resize-none placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all hover:border-slate-300" /></StepCard>
@@ -595,7 +610,8 @@ export default function Checkout() {
             </div>
           </div>
         </div>
-        <DesktopSummaryPanel cartItems={safeCartItems} subtotal={subtotal} shipping={shipping} tax={tax} total={total} couponInput={couponInput} setCouponInput={setCouponInput} addManualCoupon={addManualCoupon} manualCoupons={manualCoupons} removeManualCoupon={removeManualCoupon} setupError={paymentSetupError} processing={processing} canSubmit={canSubmitCheckout} submitStatus={submitStatus} onPlaceOrder={handlePlaceOrder} />
+        <DesktopSummaryPanel cartItems={safeCartItems} subtotal={subtotal} shipping={shipping} total={total} couponInput={couponInput} setCouponInput={setCouponInput} addManualCoupon={addManualCoupon} manualCoupons={manualCoupons} removeManualCoupon={removeManualCoupon} setupError={paymentSetupError} processing={processing} canSubmit={canSubmitCheckout} submitStatus={submitStatus} onPlaceOrder={handlePlaceOrder} />
+        </div>
       </div>
     </div>
   );
