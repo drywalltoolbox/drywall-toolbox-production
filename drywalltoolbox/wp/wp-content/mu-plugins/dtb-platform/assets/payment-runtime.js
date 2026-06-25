@@ -7,7 +7,7 @@
     appearance.theme = 'stripe';
     appearance.labels = 'above';
     appearance.variables = Object.assign({}, appearance.variables || {}, {
-      colorPrimary: '#0f766e',
+      colorPrimary: '#2563eb',
       colorBackground: '#ffffff',
       colorText: '#172033',
       colorDanger: '#b42318',
@@ -41,8 +41,8 @@
         padding: '12px'
       },
       '.Input:focus': {
-        border: '1px solid #0f766e',
-        boxShadow: '0 0 0 3px rgba(15, 118, 110, 0.14)',
+        border: '1px solid #2563eb',
+        boxShadow: '0 0 0 3px rgba(37, 99, 235, 0.14)',
         outline: 'none'
       },
       '.Input--invalid': {
@@ -67,10 +67,10 @@
         color: '#172033'
       },
       '.Tab--selected': {
-        backgroundColor: '#f0fdfa',
-        border: '1px solid #0f766e',
-        boxShadow: '0 0 0 2px rgba(15, 118, 110, 0.12)',
-        color: '#134e4a'
+        backgroundColor: '#eff6ff',
+        border: '1px solid #2563eb',
+        boxShadow: '0 0 0 2px rgba(37, 99, 235, 0.12)',
+        color: '#1e3a8a'
       },
       '.Text': {
         color: '#526077'
@@ -78,8 +78,6 @@
     });
   }
 
-  // WooPayments dispatches this before creating Stripe Elements and explicitly
-  // allows listeners to mutate the appearance object in place.
   document.addEventListener('wcpay_elements_appearance', applyWooPaymentsAppearance);
 
   function compactText(value) {
@@ -91,6 +89,8 @@
   }
 
   function signatureFor(element) {
+    if (!element || element.nodeType !== 1) return '';
+
     var attrs = [
       element.id,
       element.className,
@@ -120,33 +120,13 @@
   function providerKeyFor(element) {
     var signature = signatureFor(element);
 
-    if (signature.indexOf('apple pay') !== -1 || signature.indexOf('applepay') !== -1) {
-      return 'apple-pay';
-    }
-
-    if (signature.indexOf('google pay') !== -1 || signature.indexOf('gpay') !== -1 || signature.indexOf('g pay') !== -1) {
-      return 'google-pay';
-    }
-
-    if (signature.indexOf('woo pay') !== -1 || signature.indexOf('woopay') !== -1) {
-      return 'disabled-woopay';
-    }
-
-    if (signature.indexOf('afterpay') !== -1 || signature.indexOf('cash app afterpay') !== -1) {
-      return 'afterpay';
-    }
-
-    if (signature.indexOf('affirm') !== -1) {
-      return 'affirm';
-    }
-
-    if (signature.indexOf('klarna') !== -1) {
-      return 'klarna';
-    }
-
-    if (signature.indexOf('link') !== -1 && signature.indexOf('pay') !== -1) {
-      return 'link';
-    }
+    if (signature.indexOf('apple pay') !== -1 || signature.indexOf('applepay') !== -1) return 'apple-pay';
+    if (signature.indexOf('google pay') !== -1 || signature.indexOf('gpay') !== -1 || signature.indexOf('g pay') !== -1) return 'google-pay';
+    if (signature.indexOf('woo pay') !== -1 || signature.indexOf('woopay') !== -1) return 'disabled-woopay';
+    if (signature.indexOf('afterpay') !== -1 || signature.indexOf('cash app afterpay') !== -1) return 'afterpay';
+    if (signature.indexOf('affirm') !== -1) return 'affirm';
+    if (signature.indexOf('klarna') !== -1) return 'klarna';
+    if (signature.indexOf('link') !== -1 && signature.indexOf('pay') !== -1) return 'link';
 
     return '';
   }
@@ -154,6 +134,17 @@
   function walletKeyFor(element) {
     var key = providerKeyFor(element);
     return ['apple-pay', 'google-pay', 'disabled-woopay', 'link'].indexOf(key) !== -1 ? key : '';
+  }
+
+  function rowLabelText(row) {
+    var label = row && row.querySelector('label');
+    if (!label) return '';
+    return compactText(label.textContent);
+  }
+
+  function isCardMethodRow(row) {
+    var text = rowLabelText(row);
+    return text === 'card' || text === 'credit card' || text === 'secure card payment' || text === 'credit / debit card' || text === 'credit or debit card';
   }
 
   function nearestWalletContainer(element) {
@@ -164,9 +155,7 @@
       'a'
     );
 
-    if (interactiveContainer) {
-      return interactiveContainer;
-    }
+    if (interactiveContainer) return interactiveContainer;
 
     return element.closest(
       '.wcpay-express-checkout-wrapper,' +
@@ -205,21 +194,10 @@
     var previous = container.previousElementSibling;
     var next = container.nextElementSibling;
 
-    if (isOrSeparator(previous)) {
-      previous.classList.add('dtb-wallet-separator-hidden');
-    }
-
-    if (isOrSeparator(next)) {
-      next.classList.add('dtb-wallet-separator-hidden');
-    }
-
-    if (parent.children.length <= 3 && isOrSeparator(parent.previousElementSibling)) {
-      parent.previousElementSibling.classList.add('dtb-wallet-separator-hidden');
-    }
-
-    if (parent.children.length <= 3 && isOrSeparator(parent.nextElementSibling)) {
-      parent.nextElementSibling.classList.add('dtb-wallet-separator-hidden');
-    }
+    if (isOrSeparator(previous)) previous.classList.add('dtb-wallet-separator-hidden');
+    if (isOrSeparator(next)) next.classList.add('dtb-wallet-separator-hidden');
+    if (parent.children.length <= 3 && isOrSeparator(parent.previousElementSibling)) parent.previousElementSibling.classList.add('dtb-wallet-separator-hidden');
+    if (parent.children.length <= 3 && isOrSeparator(parent.nextElementSibling)) parent.nextElementSibling.classList.add('dtb-wallet-separator-hidden');
   }
 
   function nodeHasProviderLogo(node) {
@@ -261,9 +239,7 @@
     if (!hasLogo) return;
 
     var accessibleLabel = readableText(label.textContent) || providerKey.replace('-', ' ');
-    if (input && !input.getAttribute('aria-label')) {
-      input.setAttribute('aria-label', accessibleLabel);
-    }
+    if (input && !input.getAttribute('aria-label')) input.setAttribute('aria-label', accessibleLabel);
 
     label.classList.add('dtb-provider-label-ready', 'dtb-payment-provider-label', 'dtb-payment-provider-label--logo-only', 'dtb-payment-provider-label--' + providerKey);
     hideDuplicateProviderText(label);
@@ -271,7 +247,7 @@
 
   function normalizePaymentMethodRows() {
     var methods = document.querySelector('#payment ul.payment_methods');
-    if (!methods || methods.classList.contains('dtb-payment-methods-ready')) return;
+    if (!methods) return;
 
     methods.classList.add('dtb-payment-methods-ready');
 
@@ -294,13 +270,6 @@
 
       normalizeProviderLogoLabel(row);
     });
-  }
-
-  function rowLabelText(row) {
-    var label = row && row.querySelector('label');
-    if (!label) return '';
-
-    return compactText(label.textContent);
   }
 
   function selectPaymentRow(row) {
@@ -327,29 +296,79 @@
     if (!methods) return;
 
     var rows = Array.prototype.slice.call(methods.querySelectorAll('li'));
-    var explicitCardRow = rows.find(function (row) {
-      var text = rowLabelText(row);
-      return text === 'card' || text === 'credit card' || text === 'secure card payment';
-    });
-
-    if (!explicitCardRow || explicitCardRow.classList.contains('dtb-payment-method-duplicate')) return;
+    var explicitCardRow = rows.find(isCardMethodRow);
+    if (!explicitCardRow) return;
 
     rows.forEach(function (row) {
+      if (row === explicitCardRow) return;
+
       var text = rowLabelText(row);
       var looksLikeGenericCard = (
-        text === 'payment methods'
-        || text === 'payment method'
-        || text === 'credit / debit card'
-        || text === 'credit or debit card'
+        text === 'payment methods' ||
+        text === 'payment method' ||
+        text === 'credit / debit card' ||
+        text === 'credit or debit card'
       );
 
-      if (!looksLikeGenericCard || row === explicitCardRow) return;
+      if (!looksLikeGenericCard) return;
 
-      if (row.querySelector('input[type="radio"]:checked')) {
-        selectPaymentRow(explicitCardRow);
-      }
-
+      if (row.querySelector('input[type="radio"]:checked')) selectPaymentRow(explicitCardRow);
       row.classList.add('dtb-payment-method-duplicate');
+    });
+  }
+
+  function hasMeaningfulPaymentBoxContent(box, row) {
+    if (!box) return false;
+    if (isCardMethodRow(row)) return true;
+
+    var providerKey = providerKeyFor(row || box);
+    var text = readableText(box.textContent);
+    var nonFieldProvider = ['afterpay', 'affirm', 'klarna', 'apple-pay', 'google-pay', 'link'].indexOf(providerKey) !== -1;
+
+    if (nonFieldProvider && text.length === 0) return false;
+    if (text.length > 1) return true;
+
+    var usefulControl = box.querySelector(
+      '.StripeElement,' +
+      '.wcpay-upe-element,' +
+      'iframe[src],' +
+      'select,' +
+      'textarea,' +
+      'button,' +
+      'input:not([type="hidden"]):not([aria-hidden="true"])'
+    );
+
+    if (!usefulControl) return false;
+
+    if (usefulControl.matches && usefulControl.matches('input:not([type="hidden"])')) {
+      var placeholder = usefulControl.getAttribute('placeholder') || '';
+      var label = usefulControl.getAttribute('aria-label') || usefulControl.getAttribute('name') || usefulControl.getAttribute('id') || '';
+      return readableText(placeholder + ' ' + label).length > 1;
+    }
+
+    return true;
+  }
+
+  function normalizePaymentBoxes() {
+    Array.prototype.forEach.call(document.querySelectorAll('#payment ul.payment_methods li'), function (row) {
+      var box = row.querySelector('.payment_box');
+      if (!box) return;
+
+      var hasContent = hasMeaningfulPaymentBoxContent(box, row);
+      box.classList.toggle('dtb-payment-box-empty', !hasContent);
+      row.classList.toggle('dtb-payment-box-row-empty', !hasContent);
+    });
+  }
+
+  function hideOrderSummaryPaymentMethodRows() {
+    Array.prototype.forEach.call(document.querySelectorAll('table.shop_table tr'), function (row) {
+      var firstCell = row.querySelector('th, td');
+      if (!firstCell) return;
+
+      var label = compactText(firstCell.textContent).replace(/:+$/, '').trim();
+      if (label === 'payment method' || row.classList.contains('payment-method')) {
+        row.classList.add('dtb-order-summary-payment-method-row');
+      }
     });
   }
 
@@ -398,17 +417,20 @@
   }
 
   function enhancePaymentRuntime() {
+    hideOrderSummaryPaymentMethodRows();
     normalizePaymentMethodRows();
     hideDuplicateCardMethodRows();
+    normalizePaymentBoxes();
     syncActivePaymentRows();
     dedupeWalletButtons();
   }
 
   function scheduleEnhancements() {
     enhancePaymentRuntime();
-    window.setTimeout(enhancePaymentRuntime, 350);
-    window.setTimeout(enhancePaymentRuntime, 1000);
-    window.setTimeout(enhancePaymentRuntime, 2200);
+    window.setTimeout(enhancePaymentRuntime, 250);
+    window.setTimeout(enhancePaymentRuntime, 700);
+    window.setTimeout(enhancePaymentRuntime, 1400);
+    window.setTimeout(enhancePaymentRuntime, 2600);
   }
 
   if (document.readyState === 'loading') {
@@ -419,7 +441,8 @@
 
   document.addEventListener('change', function (event) {
     if (event.target && event.target.matches('#payment input[type="radio"]')) {
-      syncActivePaymentRows();
+      window.setTimeout(enhancePaymentRuntime, 0);
+      window.setTimeout(enhancePaymentRuntime, 150);
     }
   });
 
