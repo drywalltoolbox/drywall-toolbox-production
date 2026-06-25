@@ -105,8 +105,8 @@ final class DTB_CategoryNormalizer {
 	 *   1. _dtb_category_key meta (explicit)
 	 *   2. WC category names mapped through CATEGORY_MAP
 	 *
-	 * @param  array $wc_categories  WC product categories ([ { id, name, slug } ]).
-	 * @param  string $meta_key      Existing _dtb_category_key value (may be empty).
+	 * @param  array  $wc_categories  WC product categories ([ { id, name, slug } ]).
+	 * @param  string $meta_key       Existing _dtb_category_key value (may be empty).
 	 * @return array{ key: string, label: string, slug: string }
 	 */
 	public static function resolve( array $wc_categories, string $meta_key = '' ): array {
@@ -167,7 +167,7 @@ final class DTB_CategoryNormalizer {
 		'parts'                 => 'Parts',
 		'stilts'                => 'Stilts',
 		'semi_automatic_tapers' => 'Semi-Automatic Tapers',
-		'predator_family'       => 'Predator Family',
+		'predator_family'       => 'Automatic Tapers',
 	];
 
 	/**
@@ -186,6 +186,8 @@ final class DTB_CategoryNormalizer {
 		'taper'                     => 'automatic_tapers',
 		'taping_tool'               => 'automatic_tapers',
 		'auto_taper'                => 'automatic_tapers',
+		'predator_family'           => 'automatic_tapers',
+		'predator'                  => 'automatic_tapers',
 		// Nail Spotters
 		'nail_spotters'             => 'nail_spotters',
 		'nail_spotter'              => 'nail_spotters',
@@ -253,9 +255,6 @@ final class DTB_CategoryNormalizer {
 		// Semi-Automatic Tapers
 		'semi_automatic_tapers'     => 'semi_automatic_tapers',
 		'semi_automatic_taper'      => 'semi_automatic_tapers',
-		// Predator Family
-		'predator_family'           => 'predator_family',
-		'predator'                  => 'predator_family',
 	];
 
 	/**
@@ -271,6 +270,8 @@ final class DTB_CategoryNormalizer {
 			'automatic_tapers', 'automatic tapers', 'Automatic Tapers',
 			'automatic_taping_tools', 'automatic taping tools', 'Automatic Taping Tools',
 			'automatic_taper', 'auto_taper', 'auto taper', 'Auto Taper', 'taper', 'Taper',
+			'predator_family', 'predator family', 'Predator Family',
+			'predator-family', 'Predator-Family', 'predator', 'Predator',
 		],
 		'nail_spotters'     => [
 			'nail_spotters', 'nail spotters', 'Nail Spotters',
