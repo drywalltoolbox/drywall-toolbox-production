@@ -146,9 +146,6 @@ function variationImageTokens(product = {}) {
     product.attributes.forEach((entry) => addWords(tokens, entry?.option || entry?.value || entry?.label || ''));
   }
 
-  // Name tokens are only used as a weak secondary signal. They help with variant
-  // galleries whose filenames include words like "carbon" or "standard" instead
-  // of the exact SKU.
   addWords(tokens, product?.name || '');
 
   return Array.from(tokens).filter(Boolean);
@@ -196,9 +193,6 @@ function collectVariationImageMeta(product = {}) {
     }
   });
 
-  // Hard guardrail: a selected variation must never fall back to the parent
-  // gallery. If no scoped match is available, show the selected variation image
-  // only, then the placeholder as a final degraded fallback.
   if (out.length === 0) {
     push(product?.media?.image);
     push(product?.image);
@@ -269,18 +263,21 @@ export default function ProductImageGallery({ product }) {
     [baseImageMeta, isVariationProduct, parentImageMeta]
   );
   const images = useMemo(() => imageMeta.map((image) => image.src), [imageMeta]);
-  const imageSignature = images.join('|');
-  const hasMultiple = images.length > 1;
-  const activeIndex = images.length > 0 ? Math.min(currentIndex, images.length - 1) : 0;
-  const activeLightboxIndex = images.length > 0 ? Math.min(lightbox.index, images.length - 1) : 0;
+  const resetKey = `${product?.id ?? ''}|${product?.sku ?? ''}|${parentId ?? ''}`;
+  const [lastResetKey, setLastResetKey] = useState(resetKey);
 
-  useEffect(() => {
+  if (resetKey !== lastResetKey) {
+    setLastResetKey(resetKey);
     setCurrentIndex(0);
     setDirection(0);
     setImgLoaded({});
     setLightbox({ open: false, index: 0, dir: 0 });
     setParentImageMeta([]);
-  }, [product?.id, product?.sku, parentId, imageSignature]);
+  }
+
+  const hasMultiple = images.length > 1;
+  const activeIndex = images.length > 0 ? Math.min(currentIndex, images.length - 1) : 0;
+  const activeLightboxIndex = images.length > 0 ? Math.min(lightbox.index, images.length - 1) : 0;
 
   useEffect(() => {
     if (isVariationProduct || !parentId || baseImageMeta.length > 1) return undefined;
