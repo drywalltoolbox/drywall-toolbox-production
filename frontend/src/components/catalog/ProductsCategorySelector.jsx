@@ -3,6 +3,13 @@ import { ChevronRight } from 'lucide-react';
 import BackButton from '../shared/BackButton';
 import './products-selector.css';
 
+const ALL_PRODUCTS_CATEGORY = {
+  key: 'all-products',
+  slug: 'all-products',
+  name: 'All Products',
+  isAllProducts: true,
+};
+
 /**
  * Brand+category image overrides.
  * Keyed by brand slug → category key/slug → image URL.
@@ -90,6 +97,20 @@ export default function ProductsCategorySelector({
   onSelectCategory,
   onBack,
 }) {
+  const normalizedCategories = Array.isArray(categories) ? categories : [];
+  const categoryProductCount = normalizedCategories.reduce((sum, category) => (
+    sum + Number(category?.count || category?.productCount || 0)
+  ), 0);
+  const allProductsCard = {
+    ...ALL_PRODUCTS_CATEGORY,
+    count: categoryProductCount,
+    image: brandLogo || '',
+  };
+  const displayCategories = [
+    allProductsCard,
+    ...normalizedCategories.filter((category) => !['all-products', 'all_products'].includes(String(category?.slug || category?.key || '').toLowerCase())),
+  ];
+
   return (
     <div className="product-selector">
       <div className="product-selector-header">
@@ -106,7 +127,7 @@ export default function ProductsCategorySelector({
       </div>
 
       <div className="product-categories-grid">
-        {categories.map((category, index) => (
+        {displayCategories.map((category, index) => (
           <ProductCategoryCard
             key={category.key || category.slug || category.name}
             brand={brand}
