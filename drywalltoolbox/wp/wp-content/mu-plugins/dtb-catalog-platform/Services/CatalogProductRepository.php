@@ -91,7 +91,7 @@ final class DTB_CatalogProductRepository {
 		$is_parts_constrained   = false;
 		$display_category_slug  = sanitize_title( (string) ( $filters['display_category'] ?? '' ) );
 		$display_category_key   = str_replace( '-', '_', $display_category_slug );
-		if ( '' !== $display_category_slug ) {
+		if ( '' !== $display_category_slug && ! self::is_all_products_display_category( $display_category_slug ) ) {
 			if ( self::is_parts_display_category( $display_category_slug ) ) {
 				$meta_query[] = [
 					'key'     => DTB_ProductMeta::IS_PARTS,
@@ -220,6 +220,14 @@ final class DTB_CatalogProductRepository {
 			'total'      => $total,
 			'totalPages' => $total_pages,
 		];
+	}
+
+	/**
+	 * True when a customer-facing display-category selection is the synthetic
+	 * brand-wide selector card. It must not become a meta_query constraint.
+	 */
+	private static function is_all_products_display_category( string $display_category ): bool {
+		return in_array( sanitize_title( $display_category ), [ 'all-products', 'all-products-category', 'all' ], true );
 	}
 
 	/**
