@@ -44,15 +44,22 @@ function normalizeImageMeta(rawImage, product = {}, index = 0) {
   };
 }
 
+function imageIdentity(src = '') {
+  return String(src || '')
+    .split('?')[0]
+    .replace(/\/+$/, '')
+    .toLowerCase();
+}
+
 function pushUniqueImage(out, seen, imageMeta) {
   if (!imageMeta?.src) return;
-  const key = imageMeta.src.split('?')[0].replace(/\/+$/, '').toLowerCase();
+  const key = imageIdentity(imageMeta.src);
   if (!key || seen.has(key)) return;
   seen.add(key);
   out.push(imageMeta);
 }
 
-function collectImageMeta(product = {}) {
+function collectDefaultImageMeta(product = {}) {
   const out = [];
   const seen = new Set();
 
@@ -66,6 +73,136 @@ function collectImageMeta(product = {}) {
   push(product?.media?.image);
   pushArray(product?.images);
   push(product?.image);
+
+  return out;
+}
+
+function collectExplicitVariationImages(product = {}) {
+  const explicitSets = [
+    product?.variation_images,
+    product?.variationImages,
+    product?.variation_gallery_images,
+    product?.variationGalleryImages,
+    product?.media?.variation_images,
+    product?.media?.variationImages,
+  ];
+
+  const out = [];
+  const seen = new Set();
+  explicitSets.forEach((images) => {
+    if (!Array.isArray(images)) return;
+    images.forEach((image) => pushUniqueImage(out, seen, normalizeImageMeta(image, product, out.length)));
+  });
+
+  return out;
+}
+
+function normalizeToken(value = '') {
+  return String(value || '')
+    .toLowerCase()
+    .replace(/[“”]/g, '"')
+    .replace(/[‘’]/g, "'")
+    .replace(/&/g, 'and')
+    .replace(/[^a-z0-9]+/g, '')
+    .trim();
+}
+
+function normalizeWords(value = '') {
+  return String(value || '')
+    .toLowerCase()
+    .replace(/[“”]/g, '"')
+    .replace(/[‘’]/g, "'")
+    .replace(/&/g, ' and ')
+    .replace(/[^a-z0-9]+/g, ' ')
+    .split(/\s+/)
+    .map((word) => word.trim())
+    .filter((word) => word.length >= 4);
+}
+
+function addToken(tokens, value) {
+  const normalized = normalizeToken(value);
+  if (normalized && normalized.length >= 3) tokens.add(normalized);
+}
+
+function addWords(tokens, value) {
+  normalizeWords(value).forEach((word) => addToken(tokens, word));
+}
+
+function variationImageTokens(product = {}) {
+  const tokens = new Set();
+  const sku = product?.sku || product?.part_number || product?.partNumber || '';
+
+  addToken(tokens, sku);
+  addToken(tokens, String(sku).replace(/-/g, '_'));
+  addToken(tokens, String(sku).replace(/-/g, ''));
+
+  const variationLabel = product?.variation_label || product?.variationLabel || product?.variation?.label || product?.variation?.value || '';
+  addWords(tokens, variationLabel);
+
+  if (Array.isArray(product?.variation_attribute_values)) {
+    product.variation_attribute_values.forEach((entry) => addWords(tokens, entry?.option || entry?.value || entry?.label || ''));
+  }
+  if (Array.isArray(product?.attributes)) {
+    product.attributes.forEach((entry) => addWords(tokens, entry?.option || entry?.value || entry?.label || ''));
+  }
+
+  // Name tokens are only used as a weak secondary signal. They help with variant
+  // galleries whose filenames include words like "carbon" or "standard" instead
+  // of the exact SKU.
+  addWords(tokens, product?.name || '');
+
+  return Array.from(tokens).filter(Boolean);
+}
+
+function imageMatchesVariation(imageMeta, tokens = []) {
+  if (!imageMeta?.src || tokens.length === 0) return false;
+  const srcKey = normalizeToken(decodeURIComponent(imageMeta.src.split('/').pop() || imageMeta.src));
+  return tokens.some((token) => token.length >= 4 && srcKey.includes(token));
+}
+
+function collectVariationImageMeta(product = {}) {
+  const out = [];
+  const seen = new Set();
+  const push = (image) => pushUniqueImage(out, seen, normalizeImageMeta(image, product, out.length));
+
+  const explicitVariationImages = collectExplicitVariationImages(product);
+  if (explicitVariationImages.length > 0) {
+    explicitVariationImages.forEach((image) => pushUniqueImage(out, seen, image));
+    push(product?.media?.image);
+    push(product?.image);
+    return out;
+  }
+
+  const candidates = [];
+  const candidateSeen = new Set();
+  const pushCandidate = (image) => pushUniqueImage(candidates, candidateSeen, normalizeImageMeta(image, product, candidates.length));
+  const pushCandidateArray = (images = []) => {
+    if (!Array.isArray(images)) return;
+    images.forEach((image) => pushCandidate(image));
+  };
+
+  pushCandidateArray(product?.media?.images);
+  pushCandidateArray(product?.images);
+  pushCandidate(product?.media?.image);
+  pushCandidate(product?.image);
+
+  const selectedImageKey = imageIdentity(normalizeImageMeta(product?.image || product?.media?.image, product)?.src || '');
+  const tokens = variationImageTokens(product);
+
+  candidates.forEach((image) => {
+    const isSelectedImage = selectedImageKey && imageIdentity(image.src) === selectedImageKey;
+    if (isSelectedImage || imageMatchesVariation(image, tokens)) {
+      pushUniqueImage(out, seen, image);
+    }
+  });
+
+  // Hard guardrail: a selected variation must never fall back to the parent
+  // gallery. If no scoped match is available, show the selected variation image
+  // only, then the placeholder as a final degraded fallback.
+  if (out.length === 0) {
+    push(product?.media?.image);
+    push(product?.image);
+  }
 
   return out;
 }
@@ -121,28 +258,32 @@ export default function ProductImageGallery({ product }) {
   const lbCloseBtnRef = useRef(null);
   const lbPrevFocusRef = useRef(null);
 
-  const baseImageMeta = useMemo(() => collectImageMeta(product), [product]);
-  const imageMeta = useMemo(() => mergeImageSets(baseImageMeta, parentImageMeta), [baseImageMeta, parentImageMeta]);
-  const images = imageMeta.map((image) => image.src);
+  const parentId = product?.parent_id || product?.parentId;
+  const isVariationProduct = Boolean(parentId);
+  const baseImageMeta = useMemo(
+    () => (isVariationProduct ? collectVariationImageMeta(product) : collectDefaultImageMeta(product)),
+    [product, isVariationProduct]
+  );
+  const imageMeta = useMemo(
+    () => mergeImageSets(baseImageMeta, isVariationProduct ? [] : parentImageMeta),
+    [baseImageMeta, isVariationProduct, parentImageMeta]
+  );
+  const images = useMemo(() => imageMeta.map((image) => image.src), [imageMeta]);
+  const imageSignature = images.join('|');
   const hasMultiple = images.length > 1;
-  const productKey = `${product?.id ?? ''}|${product?.sku ?? ''}|${product?.parent_id ?? product?.parentId ?? ''}`;
-  const [lastProductKey, setLastProductKey] = useState(productKey);
+  const activeIndex = images.length > 0 ? Math.min(currentIndex, images.length - 1) : 0;
+  const activeLightboxIndex = images.length > 0 ? Math.min(lightbox.index, images.length - 1) : 0;
 
-  if (productKey !== lastProductKey) {
-    setLastProductKey(productKey);
+  useEffect(() => {
     setCurrentIndex(0);
     setDirection(0);
     setImgLoaded({});
     setLightbox({ open: false, index: 0, dir: 0 });
     setParentImageMeta([]);
-  }
-
-  const activeIndex = images.length > 0 ? Math.min(currentIndex, images.length - 1) : 0;
-  const activeLightboxIndex = images.length > 0 ? Math.min(lightbox.index, images.length - 1) : 0;
+  }, [product?.id, product?.sku, parentId, imageSignature]);
 
   useEffect(() => {
-    const parentId = product?.parent_id || product?.parentId;
-    if (!parentId || baseImageMeta.length > 1) return undefined;
+    if (isVariationProduct || !parentId || baseImageMeta.length > 1) return undefined;
 
     let cancelled = false;
     fetchParentGallery(parentId).then((parentImages) => {
@@ -150,7 +291,7 @@ export default function ProductImageGallery({ product }) {
     });
 
     return () => { cancelled = true; };
-  }, [baseImageMeta.length, product?.parent_id, product?.parentId]);
+  }, [baseImageMeta.length, isVariationProduct, parentId]);
 
   const scrollThumb = useCallback((index) => {
     thumbsRef.current?.children[index]?.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
