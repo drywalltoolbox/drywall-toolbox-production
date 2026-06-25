@@ -22,7 +22,7 @@ import { apiClient } from '../../api/client.js';
 import { getBrandLogo } from '../../utils/brandAssets.js';
 import { toProductDetailDTO } from '../../utils/catalogDtoAdapters.js';
 import { BRAND_TO_SLUG, BRAND_ALIASES } from '../../utils/catalogUrlState.js';
-import { getSchematicIdForProduct, buildSchematicsUrl } from '../../data/schematicMappings';
+import { getSchematicLinkForProduct } from '../../data/schematicMappings';
 import DOMPurify from 'dompurify';
 
 function buildSeedVariations(initialVariations = [], initialResolvedVariation = null) {
@@ -741,13 +741,13 @@ export default function ProductDetail({
       .replace(/<table[^>]*>([\s\S]*?)(?:Specification|Detail|DETAIL|SPECIFICATION)([\s\S]*?)<\/table>/gi, '');
   };
 
-  const schematicId = getSchematicIdForProduct(product);
-  const partsUrl = schematicId ? buildSchematicsUrl(schematicId) : null;
   const selectedVariationLabel = getSelectedVariationLabel(selectedVariation, selectedAttrs, variationAttributes);
 
   const effectiveProduct = selectedVariation
     ? composeEffectiveVariationProduct(product, selectedVariation, selectedVariationLabel)
     : product;
+  const schematicLink = getSchematicLinkForProduct(effectiveProduct, { allowLegacyFallback: false });
+  const partsUrl = schematicLink?.url || null;
   const brandLabel = getBrandLabel(product, effectiveProduct);
 
   // Build the "browse all compatible parts" URL — prefer the specific schematic link,
@@ -802,7 +802,17 @@ export default function ProductDetail({
   const displayPrice = money(rawPrice);
   const pricePrefix = product.is_variable && !selectedVariation ? 'From $' : '$';
   const compareAt = getCompareAtPrice(selectedVariation) ?? getCompareAtPrice(product);
-  const productSpecifications = getProductSpecifications(product);
+  const baseProductSpecifications = getProductSpecifications(effectiveProduct);
+  const productSpecifications = schematicLink
+    ? [
+        ...baseProductSpecifications.filter((spec) => spec?.label !== 'Schematic Diagram'),
+        {
+          label: 'Schematic Diagram',
+          value: schematicLink.title,
+          href: schematicLink.url,
+        },
+      ]
+    : baseProductSpecifications;
   const stockQuantityRaw = selectedVariation?.stock_quantity ?? effectiveProduct?.stock_quantity ?? product?.stock_quantity;
   const stockQuantity = Number.isFinite(Number(stockQuantityRaw)) ? Number(stockQuantityRaw) : null;
   const stockProgress = isOutOfStock

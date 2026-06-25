@@ -45,9 +45,24 @@ function getRowType(label = '') {
   return 'standard';
 }
 
-function renderSpecValue(value, isMono) {
+function renderSpecValue(spec, isMono, onItemClick) {
+  const { value, href } = spec;
+
   if (value === null || value === undefined || value === '') {
     return <span className="ts-value__empty">Not listed</span>;
+  }
+
+  if (href) {
+    return (
+      <Link
+        to={href}
+        onClick={onItemClick}
+        className="ts-value__link"
+        title={`View ${value}`}
+      >
+        {value}
+      </Link>
+    );
   }
 
   if (Array.isArray(value)) {
@@ -154,7 +169,7 @@ export default function TechnicalSpecifications({
               <span className="ts-row__value" role="cell">
                 {isIncludesLabel(spec.label)
                   ? renderIncludesValue(spec, onItemClick)
-                  : renderSpecValue(spec.value, isMono)}
+                  : renderSpecValue(spec, isMono, onItemClick)}
               </span>
             </div>
           );

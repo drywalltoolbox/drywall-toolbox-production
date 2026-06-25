@@ -1,0 +1,837 @@
+﻿record_type,status,brand,product_type,sku,parent_sku,product_name,schematic_id,schematic_title,schematic_category,schematic_page,schematic_variant,schematic_url,source,reason
+catalog,mapped,Columbia Tools,variable,COL-180-GRIP-FLAT-BOX-HANDLE,,Columbia 180° Grip Flat Box Handle,columbia-flat-box-handle,Flat Box Handle,Handles,,,/schematics?brand=columbia-taping-tools&category=Handles&schematic=columbia-flat-box-handle,seed_exact,
+catalog,mapped,Columbia Tools,variation,3BH,COL-180-GRIP-FLAT-BOX-HANDLE,Columbia 180° Grip Flat Box Handle - 3',columbia-flat-box-handle,Flat Box Handle,Handles,,,/schematics?brand=columbia-taping-tools&category=Handles&schematic=columbia-flat-box-handle,seed_parent_family,
+catalog,mapped,Columbia Tools,variation,42BH,COL-180-GRIP-FLAT-BOX-HANDLE,"Columbia 180° Grip Flat Box Handle - 42""",columbia-flat-box-handle,Flat Box Handle,Handles,,,/schematics?brand=columbia-taping-tools&category=Handles&schematic=columbia-flat-box-handle,seed_parent_family,
+catalog,mapped,Columbia Tools,variation,4BH,COL-180-GRIP-FLAT-BOX-HANDLE,Columbia 180° Grip Flat Box Handle - 4',columbia-flat-box-handle,Flat Box Handle,Handles,,,/schematics?brand=columbia-taping-tools&category=Handles&schematic=columbia-flat-box-handle,seed_parent_family,
+catalog,mapped,Columbia Tools,variation,5BH,COL-180-GRIP-FLAT-BOX-HANDLE,Columbia 180° Grip Flat Box Handle - 5',columbia-flat-box-handle,Flat Box Handle,Handles,,,/schematics?brand=columbia-taping-tools&category=Handles&schematic=columbia-flat-box-handle,seed_parent_family,
+catalog,mapped,Columbia Tools,variation,6BH,COL-180-GRIP-FLAT-BOX-HANDLE,Columbia 180° Grip Flat Box Handle - 6',columbia-flat-box-handle,Flat Box Handle,Handles,,,/schematics?brand=columbia-taping-tools&category=Handles&schematic=columbia-flat-box-handle,seed_parent_family,
+catalog,mapped,Columbia Tools,variable,COL-ANGLE-HEAD,,Columbia Angle Head,columbia-angle-head,Angle Head,Angleheads,,,/schematics?brand=columbia-taping-tools&category=Angleheads&schematic=columbia-angle-head,seed_exact,
+catalog,mapped,Columbia Tools,variation,2AH,COL-ANGLE-HEAD,"Columbia Angle Head - 2""",columbia-angle-head,Angle Head,Angleheads,,2,/schematics?brand=columbia-taping-tools&category=Angleheads&schematic=columbia-angle-head&variant=2,seed_parent_family,
+catalog,mapped,Columbia Tools,variation,2.5AH,COL-ANGLE-HEAD,"Columbia Angle Head - 2.5""",columbia-angle-head,Angle Head,Angleheads,,2-5,/schematics?brand=columbia-taping-tools&category=Angleheads&schematic=columbia-angle-head&variant=2-5,seed_parent_family,
+catalog,mapped,Columbia Tools,variation,3AH,COL-ANGLE-HEAD,"Columbia Angle Head - 3""",columbia-angle-head,Angle Head,Angleheads,,3,/schematics?brand=columbia-taping-tools&category=Angleheads&schematic=columbia-angle-head&variant=3,seed_parent_family,
+catalog,mapped,Columbia Tools,variation,3.5AH,COL-ANGLE-HEAD,"Columbia Angle Head - 3.5""",columbia-angle-head,Angle Head,Angleheads,,3-5,/schematics?brand=columbia-taping-tools&category=Angleheads&schematic=columbia-angle-head&variant=3-5,seed_parent_family,
+catalog,mapped,Columbia Tools,variable,COL-AUTOMATIC-FAT-BOY-BOX,,Columbia Automatic Fat Boy Box,columbia-fat-boy-box,Fat Boy Box,Finishing Boxes,,,/schematics?brand=columbia-taping-tools&category=Finishing+Boxes&schematic=columbia-fat-boy-box,seed_exact,
+catalog,mapped,Columbia Tools,variation,8FBBA,COL-AUTOMATIC-FAT-BOY-BOX,"Columbia Automatic Fat Boy Box - 8""",columbia-fat-boy-box,Fat Boy Box,Finishing Boxes,,,/schematics?brand=columbia-taping-tools&category=Finishing+Boxes&schematic=columbia-fat-boy-box,seed_parent_family,
+catalog,mapped,Columbia Tools,variation,10FBBA,COL-AUTOMATIC-FAT-BOY-BOX,"Columbia Automatic Fat Boy Box - 10""",columbia-fat-boy-box,Fat Boy Box,Finishing Boxes,,,/schematics?brand=columbia-taping-tools&category=Finishing+Boxes&schematic=columbia-fat-boy-box,seed_parent_family,
+catalog,mapped,Columbia Tools,variation,12FBBA,COL-AUTOMATIC-FAT-BOY-BOX,"Columbia Automatic Fat Boy Box - 12""",columbia-fat-boy-box,Fat Boy Box,Finishing Boxes,,,/schematics?brand=columbia-taping-tools&category=Finishing+Boxes&schematic=columbia-fat-boy-box,seed_parent_family,
+catalog,mapped,Columbia Tools,variable,COL-AUTOMATIC-FLAT-BOX,,Columbia Automatic Flat Box,columbia-automatic-flat-box,Automatic Flat Box,Finishing Boxes,,,/schematics?brand=columbia-taping-tools&category=Finishing+Boxes&schematic=columbia-automatic-flat-box,seed_exact,
+catalog,mapped,Columbia Tools,variation,8FFBA,COL-AUTOMATIC-FLAT-BOX,"Columbia Automatic Flat Box - 8""",columbia-automatic-flat-box,Automatic Flat Box,Finishing Boxes,,8,/schematics?brand=columbia-taping-tools&category=Finishing+Boxes&schematic=columbia-automatic-flat-box&variant=8,seed_parent_family,
+catalog,mapped,Columbia Tools,variation,10FFBA,COL-AUTOMATIC-FLAT-BOX,"Columbia Automatic Flat Box - 10""",columbia-automatic-flat-box,Automatic Flat Box,Finishing Boxes,,10,/schematics?brand=columbia-taping-tools&category=Finishing+Boxes&schematic=columbia-automatic-flat-box&variant=10,seed_parent_family,
+catalog,mapped,Columbia Tools,variation,12FFBA,COL-AUTOMATIC-FLAT-BOX,"Columbia Automatic Flat Box - 12""",columbia-automatic-flat-box,Automatic Flat Box,Finishing Boxes,,12,/schematics?brand=columbia-taping-tools&category=Finishing+Boxes&schematic=columbia-automatic-flat-box&variant=12,seed_parent_family,
+catalog,mapped,Columbia Tools,variation,14FFBA,COL-AUTOMATIC-FLAT-BOX,"Columbia Automatic Flat Box - 14""",columbia-automatic-flat-box,Automatic Flat Box,Finishing Boxes,,14,/schematics?brand=columbia-taping-tools&category=Finishing+Boxes&schematic=columbia-automatic-flat-box&variant=14,seed_parent_family,
+catalog,unmapped,Columbia Tools,variable,COL-AUTOMATIC-TAPER,,Columbia Automatic Taper,,,,,,,,no exact supported schematic match
+catalog,unmapped,Columbia Tools,simple,SPTAPER,,Columbia Predator Sawed Off Taper,,,,,,,,no exact supported schematic match
+catalog,unmapped,Columbia Tools,variation,STAPER,COL-AUTOMATIC-TAPER,Columbia Automatic Taper - Sawed Off 39 in.,,,,,,,,no exact supported schematic match
+catalog,mapped,Columbia Tools,simple,PTAPER,,Columbia One Predator Taper,columbia-predator-taper,Predator Taper,Automatic Tapers,,,/schematics?brand=columbia-taping-tools&category=Automatic+Tapers&schematic=columbia-predator-taper,seed_exact,
+catalog,unmapped,Columbia Tools,variation,TAPER,COL-AUTOMATIC-TAPER,Columbia Automatic Taper - Standard 53 in.,,,,,,,,no exact supported schematic match
+catalog,unmapped,Columbia Tools,variable,COL-BILLET-MUD-APPLICATOR,,Columbia Billet Mud Applicator,,,,,,,,no exact supported schematic match
+catalog,mapped,Columbia Tools,variation,ICA2-1,COL-BILLET-MUD-APPLICATOR,"Columbia Billet Mud Applicator - Inside Corner - 2 Wheels - 1""",columbia-inside-corner-applicator,Inside Corner Applicator,Applicators,,,/schematics?brand=columbia-taping-tools&category=Applicators&schematic=columbia-inside-corner-applicator,seed_exact,
+catalog,unmapped,Columbia Tools,variation,ICA4-1,COL-BILLET-MUD-APPLICATOR,"Columbia Billet Mud Applicator - Inside Corner - 4 Wheels - 1""",,,,,,,,no exact supported schematic match
+catalog,mapped,Columbia Tools,variation,ICATW,COL-BILLET-MUD-APPLICATOR,Columbia Billet Mud Applicator - Two-Way Internal Corner - 4 Wheels,columbia-2-way-internal-corner,2-Way Internal Corner Applicator,Applicators,,,/schematics?brand=columbia-taping-tools&category=Applicators&schematic=columbia-2-way-internal-corner,seed_exact,
+catalog,mapped,Columbia Tools,variation,CEXT90,COL-BILLET-MUD-APPLICATOR,Columbia Billet Mud Applicator - External 90,columbia-external-corner-applicator,External Corner Applicator,Applicators,,,/schematics?brand=columbia-taping-tools&category=Applicators&schematic=columbia-external-corner-applicator,seed_exact,
+catalog,unmapped,Columbia Tools,variation,CFLT,COL-BILLET-MUD-APPLICATOR,Columbia Billet Mud Applicator - Flat,,,,,,,,no exact supported schematic match
+catalog,mapped,Columbia Tools,variable,COL-BOX-FILLER,,Columbia Box Filler,columbia-box-filler,Box Filler,Pumps,,,/schematics?brand=columbia-taping-tools&category=Pumps&schematic=columbia-box-filler,seed_exact,
+catalog,mapped,Columbia Tools,variation,BF,COL-BOX-FILLER,Columbia Box Filler - Standard,columbia-box-filler,Box Filler,Pumps,,,/schematics?brand=columbia-taping-tools&category=Pumps&schematic=columbia-box-filler,seed_parent_family,
+catalog,mapped,Columbia Tools,variation,TBBF,COL-BOX-FILLER,Columbia Box Filler - Tall Boy,columbia-box-filler,Box Filler,Pumps,,,/schematics?brand=columbia-taping-tools&category=Pumps&schematic=columbia-box-filler,seed_parent_family,
+catalog,mapped,Columbia Tools,variable,COL-CAM-LOCK-TUBE,,Columbia Cam Lock Tube,columbia-cam-lock-tube,Cam Lock Tube,Compound Tubes,,,/schematics?brand=columbia-taping-tools&category=Compound+Tubes&schematic=columbia-cam-lock-tube,seed_exact,
+catalog,mapped,Columbia Tools,variation,CLT24,COL-CAM-LOCK-TUBE,"Columbia Cam Lock Tube - 24""",columbia-cam-lock-tube,Cam Lock Tube,Compound Tubes,,,/schematics?brand=columbia-taping-tools&category=Compound+Tubes&schematic=columbia-cam-lock-tube,seed_parent_family,
+catalog,mapped,Columbia Tools,variation,CLT32,COL-CAM-LOCK-TUBE,"Columbia Cam Lock Tube - 32""",columbia-cam-lock-tube,Cam Lock Tube,Compound Tubes,,,/schematics?brand=columbia-taping-tools&category=Compound+Tubes&schematic=columbia-cam-lock-tube,seed_parent_family,
+catalog,mapped,Columbia Tools,variation,CLT42,COL-CAM-LOCK-TUBE,"Columbia Cam Lock Tube - 42""",columbia-cam-lock-tube,Cam Lock Tube,Compound Tubes,,,/schematics?brand=columbia-taping-tools&category=Compound+Tubes&schematic=columbia-cam-lock-tube,seed_parent_family,
+catalog,mapped,Columbia Tools,variation,CLT55,COL-CAM-LOCK-TUBE,"Columbia Cam Lock Tube - 55""",columbia-cam-lock-tube,Cam Lock Tube,Compound Tubes,,,/schematics?brand=columbia-taping-tools&category=Compound+Tubes&schematic=columbia-cam-lock-tube,seed_parent_family,
+catalog,mapped,Columbia Tools,variable,COL-COMBO-FLUSHER,,Columbia Combo Flusher,columbia-combo-flusher,Combo Flusher,Corner Flushers,,,/schematics?brand=columbia-taping-tools&category=Corner+Flushers&schematic=columbia-combo-flusher,seed_exact,
+catalog,mapped,Columbia Tools,variation,2.5CSF,COL-COMBO-FLUSHER,"Columbia Combo Flusher - 2.5""",columbia-combo-flusher,Combo Flusher,Corner Flushers,,,/schematics?brand=columbia-taping-tools&category=Corner+Flushers&schematic=columbia-combo-flusher,seed_parent_family,
+catalog,mapped,Columbia Tools,variation,3CSF,COL-COMBO-FLUSHER,"Columbia Combo Flusher - 3""",columbia-combo-flusher,Combo Flusher,Corner Flushers,,,/schematics?brand=columbia-taping-tools&category=Corner+Flushers&schematic=columbia-combo-flusher,seed_parent_family,
+catalog,mapped,Columbia Tools,variation,3WTCSF,COL-COMBO-FLUSHER,"Columbia Combo Flusher - 3"" Widetrack",columbia-combo-flusher,Combo Flusher,Corner Flushers,,,/schematics?brand=columbia-taping-tools&category=Corner+Flushers&schematic=columbia-combo-flusher,seed_parent_family,
+catalog,mapped,Columbia Tools,variation,3.5CSF,COL-COMBO-FLUSHER,"Columbia Combo Flusher - 3.5""",columbia-combo-flusher,Combo Flusher,Corner Flushers,,,/schematics?brand=columbia-taping-tools&category=Corner+Flushers&schematic=columbia-combo-flusher,seed_parent_family,
+catalog,mapped,Columbia Tools,variable,COL-COMPOUND-TUBE,,Columbia Compound Tube,columbia-compound-tube,Compound Tube,Compound Tubes,,,/schematics?brand=columbia-taping-tools&category=Compound+Tubes&schematic=columbia-compound-tube,seed_exact,
+catalog,mapped,Columbia Tools,variation,CMT24,COL-COMPOUND-TUBE,"Columbia Compound Tube - 24""",columbia-compound-tube,Compound Tube,Compound Tubes,,,/schematics?brand=columbia-taping-tools&category=Compound+Tubes&schematic=columbia-compound-tube,seed_parent_family,
+catalog,mapped,Columbia Tools,variation,CMT32,COL-COMPOUND-TUBE,"Columbia Compound Tube - 32""",columbia-compound-tube,Compound Tube,Compound Tubes,,,/schematics?brand=columbia-taping-tools&category=Compound+Tubes&schematic=columbia-compound-tube,seed_parent_family,
+catalog,mapped,Columbia Tools,variation,CMT42,COL-COMPOUND-TUBE,"Columbia Compound Tube - 42""",columbia-compound-tube,Compound Tube,Compound Tubes,,,/schematics?brand=columbia-taping-tools&category=Compound+Tubes&schematic=columbia-compound-tube,seed_parent_family,
+catalog,mapped,Columbia Tools,variation,CMT55,COL-COMPOUND-TUBE,"Columbia Compound Tube - 55""",columbia-compound-tube,Compound Tube,Compound Tubes,,,/schematics?brand=columbia-taping-tools&category=Compound+Tubes&schematic=columbia-compound-tube,seed_parent_family,
+catalog,mapped,Columbia Tools,variable,COL-DIRECT-FLUSHER,,Columbia Direct Flusher,columbia-direct-corner-flusher,Direct Corner Flusher,Corner Flushers,,,/schematics?brand=columbia-taping-tools&category=Corner+Flushers&schematic=columbia-direct-corner-flusher,seed_exact,
+catalog,mapped,Columbia Tools,variation,2.5DF,COL-DIRECT-FLUSHER,"Columbia Direct Flusher - 2.5""",columbia-direct-corner-flusher,Direct Corner Flusher,Corner Flushers,,,/schematics?brand=columbia-taping-tools&category=Corner+Flushers&schematic=columbia-direct-corner-flusher,seed_parent_family,
+catalog,mapped,Columbia Tools,variation,3DF,COL-DIRECT-FLUSHER,"Columbia Direct Flusher - 3""",columbia-direct-corner-flusher,Direct Corner Flusher,Corner Flushers,,,/schematics?brand=columbia-taping-tools&category=Corner+Flushers&schematic=columbia-direct-corner-flusher,seed_parent_family,
+catalog,mapped,Columbia Tools,variation,3WTDF,COL-DIRECT-FLUSHER,"Columbia Direct Flusher - 3"" Widetrack",columbia-direct-corner-flusher,Direct Corner Flusher,Corner Flushers,,,/schematics?brand=columbia-taping-tools&category=Corner+Flushers&schematic=columbia-direct-corner-flusher,seed_parent_family,
+catalog,mapped,Columbia Tools,variation,3.5DF,COL-DIRECT-FLUSHER,"Columbia Direct Flusher - 3.5""",columbia-direct-corner-flusher,Direct Corner Flusher,Corner Flushers,,,/schematics?brand=columbia-taping-tools&category=Corner+Flushers&schematic=columbia-direct-corner-flusher,seed_parent_family,
+catalog,mapped,Columbia Tools,variation,4DF,COL-DIRECT-FLUSHER,"Columbia Direct Flusher - 4""",columbia-direct-corner-flusher,Direct Corner Flusher,Corner Flushers,,,/schematics?brand=columbia-taping-tools&category=Corner+Flushers&schematic=columbia-direct-corner-flusher,seed_parent_family,
+catalog,unmapped,Columbia Tools,variable,COL-FAT-BOY-FLAT-BOX,,Columbia Fat Boy Flat Box,,,,,,,,no exact supported schematic match
+catalog,unmapped,Columbia Tools,variation,5.5FBB,COL-FAT-BOY-FLAT-BOX,"Columbia Fat Boy Flat Box - 5.5""",,,,,,,,no exact supported schematic match
+catalog,unmapped,Columbia Tools,variation,8FBB,COL-FAT-BOY-FLAT-BOX,"Columbia Fat Boy Flat Box - 8""",,,,,,,,no exact supported schematic match
+catalog,unmapped,Columbia Tools,variation,10FBB,COL-FAT-BOY-FLAT-BOX,"Columbia Fat Boy Flat Box - 10""",,,,,,,,no exact supported schematic match
+catalog,unmapped,Columbia Tools,variation,12FBB,COL-FAT-BOY-FLAT-BOX,"Columbia Fat Boy Flat Box - 12""",,,,,,,,no exact supported schematic match
+catalog,mapped,Columbia Tools,variable,COL-FLAT-FINISHER-BOX,,Columbia Flat Finisher Box,columbia-flat-box,Flat Box,Finishing Boxes,,,/schematics?brand=columbia-taping-tools&category=Finishing+Boxes&schematic=columbia-flat-box,seed_exact,
+catalog,mapped,Columbia Tools,variation,5.5FFB,COL-FLAT-FINISHER-BOX,"Columbia Flat Finisher Box - 5.5""",columbia-flat-box,Flat Box,Finishing Boxes,,5-5,/schematics?brand=columbia-taping-tools&category=Finishing+Boxes&schematic=columbia-flat-box&variant=5-5,seed_parent_family,
+catalog,mapped,Columbia Tools,variation,7FFB,COL-FLAT-FINISHER-BOX,"Columbia Flat Finisher Box - 7""",columbia-flat-box,Flat Box,Finishing Boxes,,7,/schematics?brand=columbia-taping-tools&category=Finishing+Boxes&schematic=columbia-flat-box&variant=7,seed_parent_family,
+catalog,mapped,Columbia Tools,variation,8FFB,COL-FLAT-FINISHER-BOX,"Columbia Flat Finisher Box - 8""",columbia-flat-box,Flat Box,Finishing Boxes,,8,/schematics?brand=columbia-taping-tools&category=Finishing+Boxes&schematic=columbia-flat-box&variant=8,seed_parent_family,
+catalog,mapped,Columbia Tools,variation,10FFB,COL-FLAT-FINISHER-BOX,"Columbia Flat Finisher Box - 10""",columbia-flat-box,Flat Box,Finishing Boxes,,10,/schematics?brand=columbia-taping-tools&category=Finishing+Boxes&schematic=columbia-flat-box&variant=10,seed_parent_family,
+catalog,mapped,Columbia Tools,variation,12FFB,COL-FLAT-FINISHER-BOX,"Columbia Flat Finisher Box - 12""",columbia-flat-box,Flat Box,Finishing Boxes,,12,/schematics?brand=columbia-taping-tools&category=Finishing+Boxes&schematic=columbia-flat-box&variant=12,seed_parent_family,
+catalog,mapped,Columbia Tools,variation,14FFB,COL-FLAT-FINISHER-BOX,"Columbia Flat Finisher Box - 14""",columbia-flat-box,Flat Box,Finishing Boxes,,14,/schematics?brand=columbia-taping-tools&category=Finishing+Boxes&schematic=columbia-flat-box&variant=14,seed_parent_family,
+catalog,mapped,Columbia Tools,variable,COL-GOOSENECK,,Columbia Gooseneck,columbia-gooseneck-adapter,Gooseneck Adapter,Pumps,,,/schematics?brand=columbia-taping-tools&category=Pumps&schematic=columbia-gooseneck-adapter,seed_exact,
+catalog,mapped,Columbia Tools,variation,GN,COL-GOOSENECK,Columbia Gooseneck - Standard,columbia-gooseneck-adapter,Gooseneck Adapter,Pumps,,,/schematics?brand=columbia-taping-tools&category=Pumps&schematic=columbia-gooseneck-adapter,seed_parent_family,
+catalog,mapped,Columbia Tools,variation,TBGN,COL-GOOSENECK,Columbia Gooseneck - Tall Boy,columbia-gooseneck-adapter,Gooseneck Adapter,Pumps,,,/schematics?brand=columbia-taping-tools&category=Pumps&schematic=columbia-gooseneck-adapter,seed_parent_family,
+catalog,unmapped,Columbia Tools,variable,COL-HOT-MUD-PUMP,,Columbia Hot Mud Pump,,,,,,,,no exact supported schematic match
+catalog,mapped,Columbia Tools,variation,HMP,COL-HOT-MUD-PUMP,Columbia Hot Mud Pump - Standard,columbia-mud-pump,Mud Pump,Pumps,,,/schematics?brand=columbia-taping-tools&category=Pumps&schematic=columbia-mud-pump,seed_exact,
+catalog,mapped,Columbia Tools,variation,TBMP,COL-HOT-MUD-PUMP,Columbia Hot Mud Pump - Tall Boy,columbia-tall-boy-mud-pump,Tall Boy Mud Pump,Pumps,,,/schematics?brand=columbia-taping-tools&category=Pumps&schematic=columbia-tall-boy-mud-pump,seed_exact,
+catalog,unmapped,Columbia Tools,variation,HMP-C,COL-HOT-MUD-PUMP,Columbia Hot Mud Pump - CDN,,,,,,,,no exact supported schematic match
+catalog,unmapped,Columbia Tools,variable,COL-MATRIX-FLAT-BOX-HANDLE,,Columbia Matrix Flat Box Handle,,,,,,,,no exact supported schematic match
+catalog,unmapped,Columbia Tools,variation,MHS,COL-MATRIX-FLAT-BOX-HANDLE,"Columbia Matrix Flat Box Handle - 29""-39""",,,,,,,,no exact supported schematic match
+catalog,unmapped,Columbia Tools,variation,MH,COL-MATRIX-FLAT-BOX-HANDLE,"Columbia Matrix Flat Box Handle - 40""-60""",,,,,,,,no exact supported schematic match
+catalog,unmapped,Columbia Tools,variation,MHL,COL-MATRIX-FLAT-BOX-HANDLE,"Columbia Matrix Flat Box Handle - 56""-76""",,,,,,,,no exact supported schematic match
+catalog,unmapped,Columbia Tools,variable,COL-NAIL-SPOTTER,,Columbia Nail Spotter,,,,,,,,no exact supported schematic match
+catalog,unmapped,Columbia Tools,variation,2NS,COL-NAIL-SPOTTER,"Columbia Nail Spotter - 2""",,,,,,,,no exact supported schematic match
+catalog,mapped,Columbia Tools,variation,3NS,COL-NAIL-SPOTTER,"Columbia Nail Spotter - 3""",columbia-nailspotter,Nailspotter,Nailspotters,,3,/schematics?brand=columbia-taping-tools&category=Nailspotters&schematic=columbia-nailspotter&variant=3,seed_exact,
+catalog,mapped,Columbia Tools,variable,COL-ONE-HANDLE,,Columbia One Handle,columbia-one,Columbia One,Handles,,,/schematics?brand=columbia-taping-tools&category=Handles&schematic=columbia-one,seed_exact,
+catalog,mapped,Columbia Tools,variation,C1HEXT,COL-ONE-HANDLE,Columbia One Handle - Extendible 3'-5',columbia-one,Columbia One,Handles,,,/schematics?brand=columbia-taping-tools&category=Handles&schematic=columbia-one,seed_parent_family,
+catalog,mapped,Columbia Tools,variation,CHXL,COL-ONE-HANDLE,Columbia One Handle - Long Extendible 4'-8',columbia-long-extendable-handle,Long Extendable Handle,Handles,,,/schematics?brand=columbia-taping-tools&category=Handles&schematic=columbia-long-extendable-handle,seed_exact,
+catalog,mapped,Columbia Tools,variation,C1HS,COL-ONE-HANDLE,Columbia One Handle - Stubby,columbia-one,Columbia One,Handles,,,/schematics?brand=columbia-taping-tools&category=Handles&schematic=columbia-one,seed_parent_family,
+catalog,mapped,Columbia Tools,variation,C1H,COL-ONE-HANDLE,Columbia One Handle - Fixed,columbia-one,Columbia One,Handles,,,/schematics?brand=columbia-taping-tools&category=Handles&schematic=columbia-one,seed_parent_family,
+catalog,unmapped,Columbia Tools,variable,COL-OUTSIDE-CORNER-ROLLER,,Columbia Outside Corner Roller,,,,,,,,no exact supported schematic match
+catalog,mapped,Columbia Tools,variation,COBCR,COL-OUTSIDE-CORNER-ROLLER,Columbia Outside Corner Roller - Standard,columbia-standard-outside-corner-roller,Standard Outside Corner Roller,Corner Rollers,,,/schematics?brand=columbia-taping-tools&category=Corner+Rollers&schematic=columbia-standard-outside-corner-roller,seed_exact,
+catalog,unmapped,Columbia Tools,variation,CBNCR,COL-OUTSIDE-CORNER-ROLLER,Columbia Outside Corner Roller - Bullnose,,,,,,,,no exact supported schematic match
+catalog,unmapped,Columbia Tools,variation,COBCRE,COL-OUTSIDE-CORNER-ROLLER,Columbia Outside Corner Roller - European,,,,,,,,no exact supported schematic match
+catalog,unmapped,Columbia Tools,variation,COBCRW,COL-OUTSIDE-CORNER-ROLLER,Columbia Outside Corner Roller - Wide,,,,,,,,no exact supported schematic match
+catalog,mapped,Columbia Tools,variable,COL-PREDATOR-MATRIX-HANDLE,,Columbia Predator Matrix Handle,columbia-matrix,Predator Matrix Handle,Handles,,,/schematics?brand=columbia-taping-tools&category=Handles&schematic=columbia-matrix,seed_exact,
+catalog,mapped,Columbia Tools,variation,PMHS,COL-PREDATOR-MATRIX-HANDLE,"Columbia Predator Matrix Handle - Short 29""-39""",columbia-matrix,Predator Matrix Handle,Handles,,,/schematics?brand=columbia-taping-tools&category=Handles&schematic=columbia-matrix,seed_parent_family,
+catalog,mapped,Columbia Tools,variation,PMH,COL-PREDATOR-MATRIX-HANDLE,"Columbia Predator Matrix Handle - 40""-60""",columbia-matrix,Predator Matrix Handle,Handles,,,/schematics?brand=columbia-taping-tools&category=Handles&schematic=columbia-matrix,seed_parent_family,
+catalog,mapped,Columbia Tools,variation,PMHL,COL-PREDATOR-MATRIX-HANDLE,"Columbia Predator Matrix Handle - Long 56""-76""",columbia-matrix,Predator Matrix Handle,Handles,,,/schematics?brand=columbia-taping-tools&category=Handles&schematic=columbia-matrix,seed_parent_family,
+catalog,unmapped,Columbia Tools,variable,COL-PREDATOR-ONE-HANDLE,,Columbia Predator One Handle,,,,,,,,no exact supported schematic match
+catalog,unmapped,Columbia Tools,variation,PC1HEXT,COL-PREDATOR-ONE-HANDLE,Columbia Predator One Handle - Extendable 3'-5',,,,,,,,no exact supported schematic match
+catalog,unmapped,Columbia Tools,variation,PC1H,COL-PREDATOR-ONE-HANDLE,Columbia Predator One Handle - 4' Fixed,,,,,,,,no exact supported schematic match
+catalog,unmapped,Columbia Tools,variation,PCHXL,COL-PREDATOR-ONE-HANDLE,Columbia Predator One Handle - Long Extendable 4'-8',,,,,,,,no exact supported schematic match
+catalog,mapped,Columbia Tools,variable,COL-STANDARD-FLUSHER,,Columbia Standard Flusher,columbia-standard-corner-flusher,Standard Corner Flusher,Corner Flushers,,,/schematics?brand=columbia-taping-tools&category=Corner+Flushers&schematic=columbia-standard-corner-flusher,seed_exact,
+catalog,mapped,Columbia Tools,variation,2.5SF,COL-STANDARD-FLUSHER,"Columbia Standard Flusher - 2.5""",columbia-standard-corner-flusher,Standard Corner Flusher,Corner Flushers,,,/schematics?brand=columbia-taping-tools&category=Corner+Flushers&schematic=columbia-standard-corner-flusher,seed_parent_family,
+catalog,mapped,Columbia Tools,variation,3SF,COL-STANDARD-FLUSHER,"Columbia Standard Flusher - 3""",columbia-standard-corner-flusher,Standard Corner Flusher,Corner Flushers,,,/schematics?brand=columbia-taping-tools&category=Corner+Flushers&schematic=columbia-standard-corner-flusher,seed_parent_family,
+catalog,mapped,Columbia Tools,variation,3WTSF,COL-STANDARD-FLUSHER,"Columbia Standard Flusher - 3"" Widetrack",columbia-standard-corner-flusher,Standard Corner Flusher,Corner Flushers,,,/schematics?brand=columbia-taping-tools&category=Corner+Flushers&schematic=columbia-standard-corner-flusher,seed_parent_family,
+catalog,mapped,Columbia Tools,variation,3.5SF,COL-STANDARD-FLUSHER,"Columbia Standard Flusher - 3.5""",columbia-standard-corner-flusher,Standard Corner Flusher,Corner Flushers,,,/schematics?brand=columbia-taping-tools&category=Corner+Flushers&schematic=columbia-standard-corner-flusher,seed_parent_family,
+catalog,mapped,Columbia Tools,variation,4SF,COL-STANDARD-FLUSHER,"Columbia Standard Flusher - 4""",columbia-standard-corner-flusher,Standard Corner Flusher,Corner Flushers,,,/schematics?brand=columbia-taping-tools&category=Corner+Flushers&schematic=columbia-standard-corner-flusher,seed_parent_family,
+catalog,mapped,Columbia Tools,variable,COL-THROTTLE-CORNER-FLUSHER-BOX,,Columbia Throttle Corner Flusher Box,columbia-throttle-box,Throttle Box,Corner Boxes,,,/schematics?brand=columbia-taping-tools&category=Corner+Boxes&schematic=columbia-throttle-box,seed_exact,
+catalog,mapped,Columbia Tools,variation,7CFB,COL-THROTTLE-CORNER-FLUSHER-BOX,"Columbia Throttle Corner Flusher Box - 7""",columbia-throttle-box,Throttle Box,Corner Boxes,,7,/schematics?brand=columbia-taping-tools&category=Corner+Boxes&schematic=columbia-throttle-box&variant=7,seed_parent_family,
+catalog,mapped,Columbia Tools,variation,8CFB,COL-THROTTLE-CORNER-FLUSHER-BOX,"Columbia Throttle Corner Flusher Box - 8""",columbia-throttle-box,Throttle Box,Corner Boxes,,8,/schematics?brand=columbia-taping-tools&category=Corner+Boxes&schematic=columbia-throttle-box&variant=8,seed_parent_family,
+catalog,unmapped,Columbia Tools,variable,COL-TOOL-CASE,,Columbia Tool Case,,,,,,,,no exact supported schematic match
+catalog,unmapped,Columbia Tools,variation,TCS,COL-TOOL-CASE,Columbia Tool Case - Gun Case,,,,,,,,no exact supported schematic match
+catalog,unmapped,Columbia Tools,variation,RC,COL-TOOL-CASE,Columbia Tool Case - Road Case,,,,,,,,no exact supported schematic match
+catalog,unmapped,Columbia Tools,simple,TS,,Columbia Tactical Set,,,,,,,,no exact supported schematic match
+catalog,unmapped,Columbia Tools,simple,PTS,,Columbia Predator Tactical Set,,,,,,,,no exact supported schematic match
+catalog,unmapped,Columbia Tools,simple,SACS,,Columbia Commando Set,,,,,,,,no exact supported schematic match
+catalog,unmapped,Columbia Tools,simple,TWS,,Columbia Warrior Set,,,,,,,,no exact supported schematic match
+catalog,unmapped,Columbia Tools,variable,COL-UHMW-MUD-APPLICATOR,,Columbia UHMW Mud Applicator,,,,,,,,no exact supported schematic match
+catalog,unmapped,Columbia Tools,variation,FMH,COL-UHMW-MUD-APPLICATOR,Columbia UHMW Mud Applicator - L-Trim,,,,,,,,no exact supported schematic match
+catalog,unmapped,Columbia Tools,variation,IA90,COL-UHMW-MUD-APPLICATOR,Columbia UHMW Mud Applicator - Inside 90°,,,,,,,,no exact supported schematic match
+catalog,unmapped,Columbia Tools,variation,OA90,COL-UHMW-MUD-APPLICATOR,Columbia UHMW Mud Applicator - Outside 90°,,,,,,,,no exact supported schematic match
+catalog,unmapped,Columbia Tools,variation,OA90-325,COL-UHMW-MUD-APPLICATOR,Columbia UHMW Mud Applicator - Outside 90° 325,,,,,,,,no exact supported schematic match
+catalog,unmapped,Columbia Tools,simple,CPFP,,Columbia PowerFill 3.5 Pro Series Cordless Loading Pump,,,,,,,,no exact supported schematic match
+catalog,unmapped,Columbia Tools,simple,CPFGN,,Columbia Powerfill 5 Gallon Taper Gooseneck Fill Tube,,,,,,,,no exact supported schematic match
+catalog,not_applicable_part,Columbia Tools,simple,FA280,,#10 Belleville Washer,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,FA268,,#10 Flat Washer,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,FA270,,"#10 x 3/4"" Fender Washer",,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,FA228,,#6 Flat Washer,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,FA229,,#6 Lock Washer,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,FA230,,#6 Star Washer,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,FA253,,#8 Flat Washer,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,FA252,,#8 Star Washer,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,FA202,,"1/16 X 1/2"" Cotter Pin",,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,FA200,,"1/16 x 1/4"" Split Pin",,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,FA203,,"1/16 x 3/4"" Cotter Pin",,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,FA3,,"1/2"" x 7/8"" Flat Washer",,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,CT109,,1/4 - 20 Hex Nut,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,FA296,,"1/4 -20 x 1/2"" Hex Bolt",,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,FA295,,"1/4 x 1/2"" Flathead Socket",,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,FA379,,"1/4"" SS E-Clip",,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,FA286,,"1/4"" x 1/2"" Flat Washer",,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,FA288,,"1/4"" X 3/4"" Split Pin",,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,FA291,,1/4-20 Hex Nut,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,FA299,,"1/4-20 x 1 1/2"" Pan Phillips",,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,FA313,,1/4-20 X 1/4 Socket Head Set Screw,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,FA301,,"1/4-20 x 2 1/4"" Hex Bolt",,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,FA300,,"1/4-20 x 2"" Hex Bolt",,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,FA294,,"1/4-20 x 38"" Socket",,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,FA297,,"1/4-20 x 5/8"" Socket",,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,FA298,,"1/4-20 x 7/8"" Flat Socket",,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,FA302,,"1/4-28 x 1/4"" Set Screw",,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,FA320,,"1/4-28-3/8"" Socket Set Screw",,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,FA380,,"1/8"" SS E-Clip",,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,FA225,,"1/8"" x 3/8"" Rivet Shoulder Washer",,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,FA224,,"1/8"" x 3/8"" Split Pin",,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,variable,HFFB14,,Flat Box Hinged Door Gasket,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,variation,HFFB14-8,HFFB14,"Flat Box Hinged Door Gasket - 8""",,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,variation,HFFB14-10,HFFB14,"Flat Box Hinged Door Gasket - 10""",,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,variation,HFFB14-12,HFFB14,"Flat Box Hinged Door Gasket - 12""",,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,variation,HFFB14-14,HFFB14,"Flat Box Hinged Door Gasket - 14""",,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,variable,FFB25,,Rubber Gasket Retainer,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,variation,FFB25-10,FFB25,"Rubber Gasket Retainer - 10""",,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,variation,FFB25-12,FFB25,"Rubber Gasket Retainer - 12""",,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,FA271,,10-24 Nyloc Nut,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,FA272,,10-24 Wing Nut,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,FA273,,"10-24 x 1"" Hex Bolt",,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,FA312,,"10-24 X 1/4"" Socket Hand Set",,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,FA274,,"10-24 x 3/8"" Socket",,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,FA275,,"10-24 x 7/8"" Hex Bolt",,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,FA276,,"10-24 x 7/8"" Pan Slot",,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,FA316,,"10-32 X 1/2"" Flat Socket Head",,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,FA382,,"10-32 x 1/4"" SS Set Screw",,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,variable,AH3,,Top Blade,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,variation,AH3-2,AH3,"Top Blade - 2""",,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,variation,AH3-2.5,AH3,"Top Blade - 2.5""",,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,variation,AH3-3,AH3,"Top Blade - 3""",,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,variation,AH3-3.5,AH3,"Top Blade - 3.5""",,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,FA199,,"2-56 x 3/16"" Binder Slot",,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,FA365,,"3/16 x 1"" Sping Pin SS",,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,FA206,,4-40 Hex Nut,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,FA207,,4-40 Nyloc Nut,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,FA219,,"4-40 x 1/2"" Fillister Slot",,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,FA213,,"4-40 x 1/4"" Binder Slot",,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,FA214,,"4-40 x 1/4"" Flat Slot",,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,FA2,,"4-40 x 1/8"" Binder Slot",,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,FA210,,"4-40 x 3/16"" Binder Slot",,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,FA212,,"4-40 x 3/16"" Truss Slot",,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,FA220,,"4-40 x 3/4"" Hex Bolt",,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,FA218,,"4-40 x 3/8"" Flat Slot",,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,FA216,,4-40 X 3/8” Fillister Slot,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,FA215,,"4-40 x 5/16"" Binder Slot",,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,FA303,,5-16 Flat Washer,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,FA307,,5-16 x 24 Jam Nut,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,FA305,,"5/16 -18 x 3/4"" Hex Bolt",,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,FA306,,"5/16-18 x 1 1/4"" Hex Bolt",,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,CFB10,,"5/16-18 x 3/4"" Thumb Screw",,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,FA317,,"5/32"" x 7/8"" Roll Pin",,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,FA232,,6-32 Hex Nut,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,FA234,,6-32 Nyloc Jam Nut,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,FA233,,6-32 Nyloc Nut,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,FA245,,"6-32 x 1/2"" Fillister Slot",,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,FA244,,"6-32 x 1/2"" Pan Slot",,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,FA239,,"6-32 X 1/4"" Binder Slot",,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,FA227,,"6-32 X 1/4"" Flat Slot",,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,FA236,,"6-32 X 1/8"" Binder Slot",,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,FA235,,"6-32 X 1/8"" Set Screw",,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,FA237,,"6-32 x 3/16"" Binder Slot",,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,FA238,,"6-32 X 3/16"" Fillister Slot",,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,FA241,,"6-32 X 3/8"" Binder Slot",,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,FA243,,"6-32 x 3/8"" Flat Slot",,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,FA231,,"6-32 x 3/8"" Hex Bolt",,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,FA247,,"6-32 X 5/8"" Hex Bolt",,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,FA254,,8-32 Nyloc Nut,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,FA267,,"8-32 x 1 1/2"" Pan Slot",,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,FA262,,"8-32 x 1/2"" Socket",,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,FA257,,"8-32 x 1/4"" Fillister Slot",,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,FA256,,"8-32 X 3/16"" Pan Slot",,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,FA265,,"8-32 x 3/4"" Truss Slot",,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,FA260,,"8-32 x 3/8"" Pan Slot",,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,FA261,,"8-32 X 3/8"" Socket Screw",,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,FA376,,8-32 x 5/16 SS Socket Head,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,FA264,,"8-32 x 5/8"" Truss Slot",,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,FA258,,8-32X 1/4 Half Dog Set,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,FA249,,"8-32X3/16"" Set Screw",,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,variable,FFB11,,Adjuster Spring,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,variation,FFB11-8,FFB11,"Adjuster Spring - 8""",,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,variation,FFB11-10,FFB11,"Adjuster Spring - 10""",,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,variation,FFB11-12,FFB11,"Adjuster Spring - 12""",,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,FFB5A,,Axel Bushing,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,variable,FFB5,,Axle,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,variation,FFB5-7,FFB5,"Axle - 7""",,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,variation,FFB5-8,FFB5,"Axle - 8""",,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,variation,FFB5-10,FFB5,"Axle - 10""",,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,variation,FFB5-12,FFB5,"Axle - 12""",,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,variation,FFB5-14,FFB5,"Axle - 14""",,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,MP32,,Backing Washer Locator,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,FFB8,,Bar Retainer Clip,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,CT103,,Barrel- Main Body,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,CT125A,,Bearing,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,BH24A,,Bearing Sleeve,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,CFB16,,Bearing Sleeve,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,CR-3,,Bearing Sleeve,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,variable,FFB9,,Blade,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,variation,FFB9-5.5,FFB9,"Blade - 5.5""",,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,variation,FFB9-7,FFB9,"Blade - 7""",,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,variation,FFB9-8,FFB9,"Blade - 8""",,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,variation,FFB9-10,FFB9,"Blade - 10""",,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,variation,FFB9-12,FFB9,"Blade - 12""",,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,variation,FFB9-14,FFB9,"Blade - 14""",,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,variable,HNS7,,Blade,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,variation,HNS7-2,HNS7,"Blade - 2""",,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,variation,HNS7-3,HNS7,"Blade - 3""",,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,variable,HNS8,,Blade Holder,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,variation,HNS8-2,HNS8,"Blade Holder - 2""",,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,variation,HNS8-3,HNS8,"Blade Holder - 3""",,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,HH16A,,Bleeder Screw,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,HH10B,,Bottom Cap,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,variable,AH9-CLIP,,Bottom Retainer Corner Clip,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,variation,AH9A,AH9-CLIP,"Bottom Retainer Corner Clip - 3.5"" / All Sizes Post 2014",,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,variation,AH9,AH9-CLIP,Bottom Retainer Corner Clip - Standard,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,CFB8,,Box Mount,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,FFB36,,Box Wheel,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,CT87A,,Bracket Brace,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,HH7,,Brake,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,MH9A,,Brake Activation Rod,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,variable,BH9,,Brake Connecting Strap,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,variation,BH9-3,BH9,Brake Connecting Strap - 3',,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,variation,BH9-42,BH9,"Brake Connecting Strap - 42""",,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,variation,BH9-4,BH9,Brake Connecting Strap - 4',,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,variation,BH9-5,BH9,Brake Connecting Strap - 5',,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,variation,BH9-6,BH9,Brake Connecting Strap - 6',,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,CT16,,Brake Dog,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,HH13,,Brake Pin,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,HH14,,Brake Piston,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,MH8,,Brake Rod Bushing,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,HH12,,Brake Spring,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,variable,HH-BRASS-CONNECTOR,,Brass Connector,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,variation,HH17A,HH-BRASS-CONNECTOR,Brass Connector - 1,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,variation,HH17B,HH-BRASS-CONNECTOR,Brass Connector - 2,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,CT72,,Cable,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,CT73,,Cable Drum,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,BH26,,Cam,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,BH7,,Cam Follower,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,HH19,,Cap,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,CT35,,Cap Reinforcing Tab,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,CT55,,Carriage Guide Rod,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,CT56,,Carriage Guide Rod Stop,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,CT31,,Chain Tension & Guide Bracket,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,CT83,,Clutch Dog,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,CT82,,Clutch Lever,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,CT88,,Clutch Release Rod,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,CT85,,Clutch Release Shaft,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,CT81,,Clutch Return Spring,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,HH9,,Coiled Hydraulic Line,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,HP44,,Collar O-Ring,,,,,,,,replacement part
+catalog,unmapped,Columbia Tools,simple,AHA,,Columbia Angle Head Adapter,,,,,,,,no exact supported schematic match
+catalog,mapped,Columbia Tools,simple,CMH,,Columbia Closet Monster Handle,columbia-closet-monster-flat-box-handle,Closet Monster Flat Box Handle,Handles,,,/schematics?brand=columbia-taping-tools&category=Handles&schematic=columbia-closet-monster-flat-box-handle,seed_exact,
+catalog,mapped,Columbia Tools,simple,CC,,Columbia Corner Cobra,columbia-corner-cobra,Corner Cobra,Corner Rollers,,,/schematics?brand=columbia-taping-tools&category=Corner+Rollers&schematic=columbia-corner-cobra,seed_exact,
+catalog,mapped,Columbia Tools,simple,CR,,Columbia Corner Roller,columbia-inside-corner-roller,Inside Corner Roller,Corner Rollers,,,/schematics?brand=columbia-taping-tools&category=Corner+Rollers&schematic=columbia-inside-corner-roller,seed_exact,
+catalog,not_applicable_part,Columbia Tools,simple,CT86,,Columbia CT86 – Toe Kicker Cable,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,FA259,,"Columbia FA259 8-32 X 5/16"" Binder Slot",,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,FA292,,Columbia FA292 1/4-20 Nyloc Jam Nut,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,FA311,,"Columbia FA311 1/4-28 X 1/2"" Socket Head",,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,FA315,,"Columbia FA315 10-32 X 3/8"" Flat Socket Head",,,,,,,,replacement part
+catalog,unmapped,Columbia Tools,simple,PCLT42,,Columbia Predator Camlock Tube,,,,,,,,no exact supported schematic match
+catalog,unmapped,Columbia Tools,simple,PCMT42,,"Columbia Predator Compound Tube 42""",,,,,,,,no exact supported schematic match
+catalog,unmapped,Columbia Tools,simple,PHMP,,Columbia Predator Mud Pump,,,,,,,,no exact supported schematic match
+catalog,mapped,Columbia Tools,simple,SAT,,Columbia Semi Automatic Taper,columbia-semi-automatic-taper,Semi-Automatic Taper,Semi-Automatic Tapers,,,/schematics?brand=columbia-taping-tools&category=Semi-Automatic+Tapers&schematic=columbia-semi-automatic-taper,seed_exact,
+catalog,not_applicable_part,Columbia Tools,simple,CFB5B,,Cone Ball,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,CT132,,Connecting Link,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,MH7,,Connecting Link Fork,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,MH5,,Connecting Link Pin,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,CT45,,Connecting Rod,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,MH16,,Connecting Rod Housing,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,CT112,,Connecting Stud,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,CT104,,Connection Strap,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,CT105,,Crimper Lever,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,CT10A,,Crimping Arm Shaft Bushing - L,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,CT47,,Crimping Wheel,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,CT50,,Crimping Wheel Bushing,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,CR4,,Cut Washer,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,CT42A,,Diamond Blade,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,CT13,,Dog Base Bracket,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,variable,HNS4,,Door,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,variation,HNS4-2,HNS4,"Door - 2""",,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,variation,HNS4-3,HNS4,"Door - 3""",,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,variable,CFB4,,Door,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,variation,CFB4-7,CFB4,"Door - 7""",,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,variation,CFB4-8,CFB4,"Door - 8""",,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,variable,HNS15,,Door Gasket,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,variation,HNS15-2,HNS15,"Door Gasket - 2""",,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,variation,HNS15-3,HNS15,"Door Gasket - 3""",,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,variable,CFB7,,Door Gasket,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,variation,CFB7-7,CFB7,"Door Gasket - 7""",,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,variation,CFB7-8,CFB7,"Door Gasket - 8""",,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,CFB15,,Door Hinge,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,FFB17,,Door Spring,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,variable,HNS-DOOR-SPRING,,Door Spring,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,variation,HNS10A,HNS-DOOR-SPRING,Door Spring - Short,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,variation,HNS10,HNS-DOOR-SPRING,Door Spring - Long,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,FFB16,,Door Spring Nut,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,CFB11A,,Door Stop,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,FFB32,,Door Stop,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,CT78,,Drive Chain,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,CT70,,Drive Shaft,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,variable,CT-SPROCKET,,Drive Sprocket,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,variation,CT71,CT-SPROCKET,Drive Sprocket - Small,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,variation,CT77,CT-SPROCKET,Drive Sprocket - Large,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,CT87,,Engraved Cover Plate Cap,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,HH5,,Extension Housing,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,HH30,,Extension Release Trigger,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,CT130,,Extension Shaft,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,CT127,,Extension Shaft Bracket,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,MP33,,Filler Gasket,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,MP28,,Filler Nut,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,MP25,,Filler Studs,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,MP2,,Foot Valve Casting,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,AH5,,Frame Retainer Clip,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,variable,AH7,,Frame Tension Spring,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,variation,AH7-2,AH7,"Frame Tension Spring - 2""",,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,variation,AH7-2.5,AH7,"Frame Tension Spring - 2.5""",,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,variation,AH7-3,AH7,"Frame Tension Spring - 3""",,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,variation,AH7-3.5,AH7,"Frame Tension Spring - 3.5""",,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,AH6A,,Funnel Retainer Clip,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,MH21,,Grip Adjuster Housing,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,MH23,,Grip Adjusting Fastener,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,MH22,,Grip Adjustment Pin,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,HH15,,Grip Sleeve Octagon,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,CT115,,Guard Ring,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,CT58,,Guide Rod Bushing,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,CT126,,Hand Grip Body,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,CT124,,Hand Grip Guard Ring,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,HNS12,,Handle Clamp,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,CR11,,Handle Connecting Link,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,HH35,,Handle Grip,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,MH4,,Handle Grip,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,MH11,,Handle Grip Bushing,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,MP6,,Handle Link,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,HNSA-14,,Handle Link Assembly,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,MH1,,Handle Mount Plate,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,CR6,,Handle Mounting Swivel,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,HPA-48,,Handle Pin Assembly,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,HH8,,Handle Tube,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,MP5,,Head Bushing,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,CR1,,Head Casting,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,variable,AH1,,Head Casting,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,variation,AH1-2,AH1,"Head Casting - 2""",,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,variation,AH1-2.5,AH1,"Head Casting - 2.5""",,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,variation,AH1-3,AH1,"Head Casting - 3""",,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,variation,AH1-3.5,AH1,"Head Casting - 3.5""",,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,FFB39,,Hex Bolt,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,CT20,,Hinge Block,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,variable,HFFB3-PLATE,,Hinge Box End Plate,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,variation,HFFB3,HFFB3-PLATE,Hinge Box End Plate - Right,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,variation,HFFB3A,HFFB3-PLATE,Hinge Box End Plate - Left,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,CFB15A,,Hinge Bushing (Plastic Washer),,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,BH6,,Hinge Pin,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,MH6,,Hinge Pin,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,CT79,,Hollow Shaft,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,CT68,,Hub,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,CT2,,Insert Bushing for CT#7A,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,MH13,,Large Nyliner Bushing,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,HP47,,Latch Clamp Assembly,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,HP46,,Latch Keeper,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,variable,CT-WAFER-BUSHING,,Wafer Bushing,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,variation,CT4,CT-WAFER-BUSHING,Wafer Bushing - Left,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,variation,CT5,CT-WAFER-BUSHING,Wafer Bushing - Right,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,MP8,,Leg,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,HH17C,,Line Pincher,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,BH4,,Lower Brake Lever,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,MH3,,Lower Mount Bracket,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,BH3,,Lower Mounting Bracket,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,CT80,,Manual Drive Grip,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,MH2,,Matrix Handle Head,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,CT43,,Micro Chain,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,MH3A,,Mounting Bracket Stem,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,BH1,,Mounting Plate,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,MP24,,Mud Pump Screen,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,MP23,,Mud Pump Seal,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,HFFB1A-10,,"Mud Seal Strip - 10""",,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,CT96,,Mud Shut-Off Gasket,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,CT98,,Mud Supply Seal Plate & Shaft,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,CT97,,Mud Supply Valve Body,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,CFB6,,Mud Supply Valve Unit,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,HNS17A,,Nail Spotter Handle Tightness Screw,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,CT63,,Needle,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,CT62,,Needle Holding Shaft,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,CT64,,Needle Return Shaft,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,CT65,,Needle Return Spring,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,HFFB4D,,Nylatron Bushing,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,MP36,,Nylatron Bushing,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,CT76,,Nylatron Washer,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,FFB38,,Nyliner Bearing,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,HP45,,O Ring Enclosure,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,CT121A,,O-Ring,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,MP23A,,O-Ring,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,MH10,,Octagon,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,CT19,,Paper Feed Guide,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,MH17,,Pinch Brake,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,MH15,,Pinch Brake Activator,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,MH24,,Pinch Brake Bushing,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,MH18,,Pinch Brake Housing,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,MH19,,Pinch Brake Sleeve,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,MH25,,Pinch Brake Stem,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,MH12,,PinchBrake Spring,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,variable,MP-PISTON-BACKING-WASHER,,Piston Backing Washer,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,variation,MP13A,MP-PISTON-BACKING-WASHER,Piston Backing Washer - Small,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,variation,MP13,MP-PISTON-BACKING-WASHER,Piston Backing Washer - Large,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,CT107,,Piston Body,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,CT111,,Piston Cup,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,MP14,,Piston Cup,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,HH16,,Piston Housing,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,HH23,,Piston O-Ring,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,MP11,,Piston Shaft,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,HNS18,,Pivot,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,BH2,,Plate,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,HP1,,Pump Cylinder,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,MP3,,Pump Flapper Valve,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,MP7,,Pump Handle,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,CT67,,Ratchet Gear,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,CT15,,Ratchet Rod for Adjustable Brake,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,CT92,,Release Clip Bushing,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,HH31,,Release Clip Pin,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,HH32,,Release Clip Washer,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,CT89,,Release Rod Sleeve,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,AH1B,,Return Spring,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,CT101,,Return Spring,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,CT54,,Return Spring,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,CT40,,Return Spring Ring,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,CT36,,Return Spring Tube,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,variable,CT-INSERT-BUSHING,,Insert Bushing,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,variation,CT3,CT-INSERT-BUSHING,Insert Bushing - Right,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,variation,CT3A,CT-INSERT-BUSHING,Insert Bushing - Left,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,variable,CT-NYLATRON-CHAIN-ROLLER,,Nylatron Chain Roller,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,variation,CT29,CT-NYLATRON-CHAIN-ROLLER,Nylatron Chain Roller - Right (Small),,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,variation,CT29A,CT-NYLATRON-CHAIN-ROLLER,Nylatron Chain Roller - Left (Large),,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,HH33,,Rlease Trigger Spring,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,CT90,,Rod Sleeve Housing,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,HNS12A,,Roll Pin,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,HNS13,,Roll Pin Bushing,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,CR2,,Roller (2 piece - nylatron/steel),,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,CT28,,Roller Bushing,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,CT125,,Rollers,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,FFB37,,Rubber for Box Wheel,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,CT87-CS,,Rubber Seal,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,variable,FFB7-SHOE,,Shoe,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,variation,FFB7,FFB7-SHOE,Shoe - Right,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,variation,FFB7A,FFB7-SHOE,Shoe - Left,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,AH4,,Side Blade,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,variable,CFB3,,Side Plate,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,variation,CFB3-7,CFB3,"Side Plate - 7""",,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,variation,CFB3-8,CFB3,"Side Plate - 8""",,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,CT7A,,Side Plate Hub,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,MP39,,Sleeve,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,MH20,,Small Nyliner Bushing,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,AH18,,Socket Wear Cap,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,CT119,,Spool Retaining Spring,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,AH1A,,Spring Housing,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,FFB4B,,Stainless Steel Backing Washer,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,CT6A,,Stainless Steel Side Plate - Left,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,FFB4A,,Stainless Steel Washer,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,CT116A,,Strap,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,BH11,,Strap Connecting Pin,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,CR12,,Swivel Coupling Pin,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,CT57,,Tape Advance Carriage,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,CT120,,Tape Spool,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,CT14A,,Taper Adjustable Brake,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,FFB32A,,Thumb Release Clip Screw,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,CT53,,Toe Kicker,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,CT92A,,Toe Kicker Caple Retainer Clip,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,HH10A,,Top Cap,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,variable,AH8-CLIP,,Top Retainer Corner Clip,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,variation,AH8A,AH8-CLIP,"Top Retainer Corner Clip - 3.5"" / All Sizes Post 2014",,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,variation,AH8,AH8-CLIP,Top Retainer Corner Clip - Standard,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,BH5,,Upper Mounting Bracket,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,HH2,,Upper Mounting Bracket,,,,,,,,replacement part
+catalog,not_applicable_part,Columbia Tools,simple,HNS20,,Wedge,,,,,,,,replacement part
+catalog,mapped,Dura-Stilts,variable,DS-DURA-III,,Dura-III Adjustable,dura-stilts-dura-iii,DURA III,Stilts,,,/schematics?brand=dura-stilts&category=Stilts&schematic=dura-stilts-dura-iii,family_parent,
+catalog,mapped,Dura-Stilts,variation,D14-22,DS-DURA-III,Dura-III Adjustable - 14”-22”,dura-stilts-dura-iii,DURA III,Stilts,1,,/schematics?brand=dura-stilts&category=Stilts&schematic=dura-stilts-dura-iii&page=1,family_child,
+catalog,mapped,Dura-Stilts,variation,D18-30,DS-DURA-III,Dura-III Adjustable - 18”-30”,dura-stilts-dura-iii,DURA III,Stilts,2,,/schematics?brand=dura-stilts&category=Stilts&schematic=dura-stilts-dura-iii&page=2,family_child,
+catalog,mapped,Dura-Stilts,variation,D24-40,DS-DURA-III,Dura-III Adjustable - 24”-40”,dura-stilts-dura-iii,DURA III,Stilts,3,,/schematics?brand=dura-stilts&category=Stilts&schematic=dura-stilts-dura-iii&page=3,family_child,
+catalog,mapped,Dura-Stilts,variation,D38-64,DS-DURA-III,Dura-III Adjustable - 38”-64”,dura-stilts-dura-iii,DURA III,Stilts,,,/schematics?brand=dura-stilts&category=Stilts&schematic=dura-stilts-dura-iii,family_child,
+catalog,unmapped,LEVEL5,variable,LV5-CORNER-APPLICATOR,,LEVEL5 Corner Applicator,,,,,,,,no exact supported schematic match
+catalog,unmapped,LEVEL5,variation,4-701,LV5-CORNER-APPLICATOR,"LEVEL5 Corner Applicator - 7""",,,,,,,,no exact supported schematic match
+catalog,unmapped,LEVEL5,variation,4-702,LV5-CORNER-APPLICATOR,"LEVEL5 Corner Applicator - 8""",,,,,,,,no exact supported schematic match
+catalog,unmapped,LEVEL5,variable,LV5-CORNER-HANDLE-APPLICATOR-EXT,,LEVEL5 Corner Applicator Handle (Extendable),,,,,,,,no exact supported schematic match
+catalog,unmapped,LEVEL5,variation,4-794,LV5-CORNER-HANDLE-APPLICATOR-EXT,"LEVEL5 Corner Applicator Handle (Extendable) - 31""-50""",,,,,,,,no exact supported schematic match
+catalog,unmapped,LEVEL5,variation,4-798,LV5-CORNER-HANDLE-APPLICATOR-EXT,"LEVEL5 Corner Applicator Handle (Extendable) - 43""-72""",,,,,,,,no exact supported schematic match
+catalog,unmapped,LEVEL5,variable,LV5-CORNER-FINISHER,,LEVEL5 Corner Finisher,,,,,,,,no exact supported schematic match
+catalog,unmapped,LEVEL5,variation,4-732,LV5-CORNER-FINISHER,"LEVEL5 Corner Finisher - 2.5""",,,,,,,,no exact supported schematic match
+catalog,unmapped,LEVEL5,variation,4-733,LV5-CORNER-FINISHER,"LEVEL5 Corner Finisher - 3""",,,,,,,,no exact supported schematic match
+catalog,mapped,LEVEL5,variation,4-734,LV5-CORNER-FINISHER,"LEVEL5 Corner Finisher - 3.5""",level5-4-734-3-5-corner-finisher,"3.5"" Corner Finisher",Corner Finishers,,,/schematics?brand=level5&category=Corner+Finishers&schematic=level5-4-734-3-5-corner-finisher,seed_exact,
+catalog,unmapped,LEVEL5,variation,4-735,LV5-CORNER-FINISHER,"LEVEL5 Corner Finisher - 4""",,,,,,,,no exact supported schematic match
+catalog,unmapped,LEVEL5,variable,LV5-CORNER-HANDLE-FINISHER-EXT,,LEVEL5 Corner Finisher Handle (Extendable),,,,,,,,no exact supported schematic match
+catalog,unmapped,LEVEL5,variation,4-795,LV5-CORNER-HANDLE-FINISHER-EXT,"LEVEL5 Corner Finisher Handle (Extendable) - 31""-50""",,,,,,,,no exact supported schematic match
+catalog,unmapped,LEVEL5,variation,4-799,LV5-CORNER-HANDLE-FINISHER-EXT,"LEVEL5 Corner Finisher Handle (Extendable) - 43""-72""",,,,,,,,no exact supported schematic match
+catalog,unmapped,LEVEL5,variable,LV5-CORNER-FLUSHER,,LEVEL5 Corner Flusher,,,,,,,,no exact supported schematic match
+catalog,unmapped,LEVEL5,variation,4-743,LV5-CORNER-FLUSHER,"LEVEL5 Corner Flusher - 3""",,,,,,,,no exact supported schematic match
+catalog,unmapped,LEVEL5,variation,4-744,LV5-CORNER-FLUSHER,"LEVEL5 Corner Flusher - 3.5""",,,,,,,,no exact supported schematic match
+catalog,unmapped,LEVEL5,variable,LV5-FLAT-BOX-MEGA,,LEVEL5 Flat Box (MEGA),,,,,,,,no exact supported schematic match
+catalog,mapped,LEVEL5,variation,4-767,LV5-FLAT-BOX-MEGA,"LEVEL5 Flat Box (MEGA) - 7""",level5-7-inch-mega-flat-box-4-767,"7"" Mega Flat Box",Finishing Boxes,,,/schematics?brand=level5&category=Finishing+Boxes&schematic=level5-7-inch-mega-flat-box-4-767,seed_exact,
+catalog,mapped,LEVEL5,variation,4-768,LV5-FLAT-BOX-MEGA,"LEVEL5 Flat Box (MEGA) - 10""",level5-10-inch-mega-flat-box-4-768,"10"" Mega Flat Box",Finishing Boxes,,,/schematics?brand=level5&category=Finishing+Boxes&schematic=level5-10-inch-mega-flat-box-4-768,seed_exact,
+catalog,mapped,LEVEL5,variation,4-769,LV5-FLAT-BOX-MEGA,"LEVEL5 Flat Box (MEGA) - 12""",level5-12-inch-mega-box-4-769,"12"" Mega Flat Box",Finishing Boxes,,,/schematics?brand=level5&category=Finishing+Boxes&schematic=level5-12-inch-mega-box-4-769,seed_exact,
+catalog,unmapped,LEVEL5,variable,LV5-FLAT-BOX-STANDARD,,LEVEL5 Flat Box (Standard),,,,,,,,no exact supported schematic match
+catalog,mapped,LEVEL5,variation,4-764,LV5-FLAT-BOX-STANDARD,"LEVEL5 Flat Box (Standard) - 7""",level5-7-inch-flat-box-4-764,"7"" Flat Box",Finishing Boxes,,,/schematics?brand=level5&category=Finishing+Boxes&schematic=level5-7-inch-flat-box-4-764,seed_exact,
+catalog,mapped,LEVEL5,variation,4-765,LV5-FLAT-BOX-STANDARD,"LEVEL5 Flat Box (Standard) - 10""",level5-10-inch-flat-box-4-765,"10"" Flat Box",Finishing Boxes,,,/schematics?brand=level5&category=Finishing+Boxes&schematic=level5-10-inch-flat-box-4-765,seed_exact,
+catalog,mapped,LEVEL5,variation,4-766,LV5-FLAT-BOX-STANDARD,"LEVEL5 Flat Box (Standard) - 12""",level5-12-inch-flat-box-4-766,"12"" Flat Box",Finishing Boxes,,,/schematics?brand=level5&category=Finishing+Boxes&schematic=level5-12-inch-flat-box-4-766,seed_exact,
+catalog,unmapped,LEVEL5,variation,4-770,LV5-FLAT-BOX-STANDARD,"LEVEL5 Flat Box (Standard) - 14""",,,,,,,,no exact supported schematic match
+catalog,unmapped,LEVEL5,variable,LV5-FLAT-BOX-HANDLE-EXT,,LEVEL5 Flat Box Handle (Extendable),,,,,,,,no exact supported schematic match
+catalog,unmapped,LEVEL5,variation,4-759,LV5-FLAT-BOX-HANDLE-EXT,"LEVEL5 Flat Box Handle (Extendable) - 48""-78""",,,,,,,,no exact supported schematic match
+catalog,unmapped,LEVEL5,variation,4-780,LV5-FLAT-BOX-HANDLE-EXT,"LEVEL5 Flat Box Handle (Extendable) - 40""-62""",,,,,,,,no exact supported schematic match
+catalog,unmapped,LEVEL5,variation,4-781,LV5-FLAT-BOX-HANDLE-EXT,"LEVEL5 Flat Box Handle (Extendable) - 30""-42""",,,,,,,,no exact supported schematic match
+catalog,unmapped,LEVEL5,variation,4-782,LV5-FLAT-BOX-HANDLE-EXT,"LEVEL5 Flat Box Handle (Extendable) - 23""-32""",,,,,,,,no exact supported schematic match
+catalog,unmapped,LEVEL5,variable,LV5-FLAT-BOX-HANDLE-FIXED,,LEVEL5 Flat Box Handle (Fixed Length),,,,,,,,no exact supported schematic match
+catalog,unmapped,LEVEL5,variation,4-711,LV5-FLAT-BOX-HANDLE-FIXED,"LEVEL5 Flat Box Handle (Fixed Length) - 34""",,,,,,,,no exact supported schematic match
+catalog,unmapped,LEVEL5,variation,4-712,LV5-FLAT-BOX-HANDLE-FIXED,"LEVEL5 Flat Box Handle (Fixed Length) - 42""",,,,,,,,no exact supported schematic match
+catalog,unmapped,LEVEL5,variation,4-740,LV5-FLAT-BOX-HANDLE-FIXED,"LEVEL5 Flat Box Handle (Fixed Length) - 54""",,,,,,,,no exact supported schematic match
+catalog,unmapped,LEVEL5,variable,LV5-NAIL-SPOTTER,,LEVEL5 Nail Spotter,,,,,,,,no exact supported schematic match
+catalog,unmapped,LEVEL5,variation,4-754,LV5-NAIL-SPOTTER,"LEVEL5 Nail Spotter - 2""",,,,,,,,no exact supported schematic match
+catalog,unmapped,LEVEL5,variation,4-755,LV5-NAIL-SPOTTER,"LEVEL5 Nail Spotter - 3""",,,,,,,,no exact supported schematic match
+catalog,unmapped,LEVEL5,variable,LV5-BOX-SET-10-12,,"LEVEL5 10""/12"" Box Set with Extendable Handle",,,,,,,,no exact supported schematic match
+catalog,unmapped,LEVEL5,variation,4-605,LV5-BOX-SET-10-12,"LEVEL5 10""/12"" Box Set with Extendable Handle - Standard",,,,,,,,no exact supported schematic match
+catalog,unmapped,LEVEL5,variation,4-629,LV5-BOX-SET-10-12,"LEVEL5 10""/12"" Box Set with Extendable Handle - Mega",,,,,,,,no exact supported schematic match
+catalog,unmapped,LEVEL5,simple,4-792,,"LEVEL5 31""- 50"" Corner Roller/Nail Spotter Handle",,,,,,,,no exact supported schematic match
+catalog,unmapped,LEVEL5,variable,LV5-CORNER-ROLLER-HANDLE,,LEVEL5 Corner Roller Handle,,,,,,,,no exact supported schematic match
+catalog,unmapped,LEVEL5,variation,5-777,LV5-CORNER-ROLLER-HANDLE,"LEVEL5 Corner Roller Handle - 50""",,,,,,,,no exact supported schematic match
+catalog,unmapped,LEVEL5,variation,4-777,LV5-CORNER-ROLLER-HANDLE,"LEVEL5 Corner Roller Handle - 54""",,,,,,,,no exact supported schematic match
+catalog,unmapped,LEVEL5,variable,LV5-FIXED-HANDLE-50,,"LEVEL5 50"" Fixed Handle",,,,,,,,no exact supported schematic match
+catalog,unmapped,LEVEL5,variation,4-778,LV5-FIXED-HANDLE-50,"LEVEL5 50"" Fixed Handle - Corner Applicator",,,,,,,,no exact supported schematic match
+catalog,unmapped,LEVEL5,variation,4-779,LV5-FIXED-HANDLE-50,"LEVEL5 50"" Fixed Handle - Corner Finisher",,,,,,,,no exact supported schematic match
+catalog,unmapped,LEVEL5,simple,4-760,,LEVEL5 Automatic Taper,,,,,,,,no exact supported schematic match
+catalog,unmapped,LEVEL5,simple,4-715,,LEVEL5 Box Filler,,,,,,,,no exact supported schematic match
+catalog,mapped,LEVEL5,simple,4-771,,LEVEL5 Compound Pump,level5-compound-pump-4-771,Compound Pump,Pumps,,,/schematics?brand=level5&category=Pumps&schematic=level5-compound-pump-4-771,seed_exact,
+catalog,unmapped,LEVEL5,simple,4-741,,LEVEL5 Compound Tube,,,,,,,,no exact supported schematic match
+catalog,mapped,LEVEL5,simple,4-707,,LEVEL5 Corner Roller,level5-corner-roller-4-707,Corner Roller,Corner Rollers,,,/schematics?brand=level5&category=Corner+Rollers&schematic=level5-corner-roller-4-707,seed_exact,
+catalog,unmapped,LEVEL5,simple,5-311,,LEVEL5 Drywall Banjo,,,,,,,,no exact supported schematic match
+catalog,unmapped,LEVEL5,simple,4-687P,,LEVEL5 Finishing Set w/ Ext. Handles & MiniShot,,,,,,,,no exact supported schematic match
+catalog,unmapped,LEVEL5,simple,4-714,,LEVEL5 Gooseneck,,,,,,,,no exact supported schematic match
+catalog,unmapped,LEVEL5,simple,4-772,,LEVEL5 MiniShot,,,,,,,,no exact supported schematic match
+catalog,unmapped,LEVEL5,simple,4-773,,LEVEL5 MiniShot Ext. Handle,,,,,,,,no exact supported schematic match
+catalog,unmapped,LEVEL5,simple,4-746,,LEVEL5 Outside Corner Tool,,,,,,,,no exact supported schematic match
+catalog,unmapped,LEVEL5,variable,LV5-ENTRY-FINISHING-SET,,LEVEL5 Entry to Automatic Finishing Set,,,,,,,,no exact supported schematic match
+catalog,unmapped,LEVEL5,variation,4-600P,LV5-ENTRY-FINISHING-SET,LEVEL5 Entry to Automatic Finishing Set - With Automatic Taper,,,,,,,,no exact supported schematic match
+catalog,unmapped,LEVEL5,variation,4-602,LV5-ENTRY-FINISHING-SET,LEVEL5 Entry to Automatic Finishing Set - Tools Only,,,,,,,,no exact supported schematic match
+catalog,unmapped,LEVEL5,simple,4-661P,,LEVEL5 The Full Taping Set w/ Ext. Handles & MiniShot,,,,,,,,no exact supported schematic match
+catalog,unmapped,LEVEL5,simple,4-630,,LEVEL5 The Starter Taping Set,,,,,,,,no exact supported schematic match
+catalog,unmapped,LEVEL5,simple,4-677P,,LEVEL5 The Ultimate Taping & Finishing Set,,,,,,,,no exact supported schematic match
+catalog,mapped,Platinum Drywall Tools,variable,PT-CF,,Platinum Angle Head Corner Finisher with Wheels,platinum-corner-finisher,Corner Finisher,Corner Finishers,,,/schematics?brand=platinum&category=Corner+Finishers&schematic=platinum-corner-finisher,seed_exact,
+catalog,mapped,Platinum Drywall Tools,variation,PT-CF2.5,PT-CF,"Platinum Angle Head Corner Finisher with Wheels - 2.5""",platinum-corner-finisher,Corner Finisher,Corner Finishers,,,/schematics?brand=platinum&category=Corner+Finishers&schematic=platinum-corner-finisher,seed_parent_family,
+catalog,mapped,Platinum Drywall Tools,variation,PT-3CF,PT-CF,"Platinum Angle Head Corner Finisher with Wheels - 3""",platinum-corner-finisher,Corner Finisher,Corner Finishers,,,/schematics?brand=platinum&category=Corner+Finishers&schematic=platinum-corner-finisher,seed_parent_family,
+catalog,mapped,Platinum Drywall Tools,variation,PT-CF3.5,PT-CF,"Platinum Angle Head Corner Finisher with Wheels - 3.5""",platinum-corner-finisher,Corner Finisher,Corner Finishers,,,/schematics?brand=platinum&category=Corner+Finishers&schematic=platinum-corner-finisher,seed_parent_family,
+catalog,unmapped,Platinum Drywall Tools,variable,PT-CT,,Platinum Compound Tube,,,,,,,,no exact supported schematic match
+catalog,unmapped,Platinum Drywall Tools,variation,PT-CT24,PT-CT,"Platinum Compound Tube - 24""",,,,,,,,no exact supported schematic match
+catalog,unmapped,Platinum Drywall Tools,variation,PT-CT36,PT-CT,"Platinum Compound Tube - 36""",,,,,,,,no exact supported schematic match
+catalog,unmapped,Platinum Drywall Tools,variation,PT-CT42,PT-CT,"Platinum Compound Tube - 42""",,,,,,,,no exact supported schematic match
+catalog,unmapped,Platinum Drywall Tools,variable,PT-BH,,Platinum Flat Box Handle,,,,,,,,no exact supported schematic match
+catalog,unmapped,Platinum Drywall Tools,variation,PT-BH34,PT-BH,"Platinum Flat Box Handle - 34""",,,,,,,,no exact supported schematic match
+catalog,unmapped,Platinum Drywall Tools,variation,PT-BH42,PT-BH,"Platinum Flat Box Handle - 42""",,,,,,,,no exact supported schematic match
+catalog,unmapped,Platinum Drywall Tools,variation,PT-BH54,PT-BH,"Platinum Flat Box Handle - 54""",,,,,,,,no exact supported schematic match
+catalog,mapped,Platinum Drywall Tools,variable,PT-FB,,Platinum Flat Finishing Box,platinum-flat-box,Flat Box,Finishing Boxes,,,/schematics?brand=platinum&category=Finishing+Boxes&schematic=platinum-flat-box,seed_exact,
+catalog,mapped,Platinum Drywall Tools,variation,PT-10FB,PT-FB,"Platinum Flat Finishing Box - 10""",platinum-flat-box,Flat Box,Finishing Boxes,,,/schematics?brand=platinum&category=Finishing+Boxes&schematic=platinum-flat-box,seed_parent_family,
+catalog,mapped,Platinum Drywall Tools,variation,PT-12FB,PT-FB,"Platinum Flat Finishing Box - 12""",platinum-flat-box,Flat Box,Finishing Boxes,,,/schematics?brand=platinum&category=Finishing+Boxes&schematic=platinum-flat-box,seed_parent_family,
+catalog,mapped,Platinum Drywall Tools,variation,PT-14FB,PT-FB,"Platinum Flat Finishing Box - 14""",platinum-flat-box,Flat Box,Finishing Boxes,,,/schematics?brand=platinum&category=Finishing+Boxes&schematic=platinum-flat-box,seed_parent_family,
+catalog,mapped,Platinum Drywall Tools,variation,PT-8FB,PT-FB,"Platinum Flat Finishing Box - 8""",platinum-flat-box,Flat Box,Finishing Boxes,,,/schematics?brand=platinum&category=Finishing+Boxes&schematic=platinum-flat-box,seed_parent_family,
+catalog,unmapped,Platinum Drywall Tools,variable,PT-NS,,Platinum Nail Spotter,,,,,,,,no exact supported schematic match
+catalog,unmapped,Platinum Drywall Tools,variation,PT-2NS,PT-NS,"Platinum Nail Spotter - 2""",,,,,,,,no exact supported schematic match
+catalog,unmapped,Platinum Drywall Tools,variation,PT-3NS,PT-NS,"Platinum Nail Spotter - 3""",,,,,,,,no exact supported schematic match
+catalog,unmapped,Platinum Drywall Tools,variable,PT-SSCF,,Platinum Stainless Steel Corner Flusher,,,,,,,,no exact supported schematic match
+catalog,unmapped,Platinum Drywall Tools,variation,PT-3.5CF,PT-SSCF,"Platinum Stainless Steel Corner Flusher - 3.5""",,,,,,,,no exact supported schematic match
+catalog,unmapped,Platinum Drywall Tools,variation,PT-2.5CF,PT-SSCF,"Platinum Stainless Steel Corner Flusher - 2.5""",,,,,,,,no exact supported schematic match
+catalog,unmapped,Platinum Drywall Tools,simple,PT-FA,,"Platinum 4"" Flat Applicator",,,,,,,,no exact supported schematic match
+catalog,unmapped,Platinum Drywall Tools,variable,PT-CORNER-HANDLE-50,,"Platinum 50"" Corner Tool Handle",,,,,,,,no exact supported schematic match
+catalog,unmapped,Platinum Drywall Tools,variation,PT-CFH50,PT-CORNER-HANDLE-50,"Platinum 50"" Corner Tool Handle - Angle Head",,,,,,,,no exact supported schematic match
+catalog,unmapped,Platinum Drywall Tools,variation,PT-CAH50,PT-CORNER-HANDLE-50,"Platinum 50"" Corner Tool Handle - Corner Box",,,,,,,,no exact supported schematic match
+catalog,mapped,Platinum Drywall Tools,variation,PT-CRH50,PT-CORNER-HANDLE-50,"Platinum 50"" Corner Tool Handle - Corner Roller",platinum-corner-roller-handle,Corner Roller Handle,Handles,,,/schematics?brand=platinum&category=Handles&schematic=platinum-corner-roller-handle,seed_exact,
+catalog,unmapped,Platinum Drywall Tools,simple,PT-CA8,,"Platinum 8"" Corner Applicator",,,,,,,,no exact supported schematic match
+catalog,unmapped,Platinum Drywall Tools,simple,PT-BF,,Platinum Box Filler Attachment,,,,,,,,no exact supported schematic match
+catalog,mapped,Platinum Drywall Tools,simple,PT-CP,,Platinum Drywall Pump w/Filler,platinum-compound-pump,Compound Pump,Pumps,,,/schematics?brand=platinum&category=Pumps&schematic=platinum-compound-pump,seed_exact,
+catalog,unmapped,Platinum Drywall Tools,simple,PT-FIN,,Platinum Drywall Starter Finishing Set,,,,,,,,no exact supported schematic match
+catalog,unmapped,Platinum Drywall Tools,simple,PT-EXT3IN1-1,,Platinum Extendable Angle Head Handle,,,,,,,,no exact supported schematic match
+catalog,unmapped,Platinum Drywall Tools,simple,PT-EBH,,"Platinum Extendable Flat Box Handle 40"" – 64""",,,,,,,,no exact supported schematic match
+catalog,unmapped,Platinum Drywall Tools,variable,PT-90-APPLICATOR,,Platinum 90° Corner Applicator,,,,,,,,no exact supported schematic match
+catalog,unmapped,Platinum Drywall Tools,variation,PT-ICA,PT-90-APPLICATOR,Platinum 90° Corner Applicator - Inside,,,,,,,,no exact supported schematic match
+catalog,unmapped,Platinum Drywall Tools,variation,PT-OCA,PT-90-APPLICATOR,Platinum 90° Corner Applicator - Outside,,,,,,,,no exact supported schematic match
+catalog,unmapped,Platinum Drywall Tools,variable,PT-CORNER-ROLLER,,Platinum Corner Roller,,,,,,,,no exact supported schematic match
+catalog,unmapped,Platinum Drywall Tools,variation,PT-CRE,PT-CORNER-ROLLER,Platinum Corner Roller - ECO Inside,,,,,,,,no exact supported schematic match
+catalog,unmapped,Platinum Drywall Tools,variation,PT-CR,PT-CORNER-ROLLER,Platinum Corner Roller - Inside,,,,,,,,no exact supported schematic match
+catalog,mapped,Platinum Drywall Tools,variation,PT-OCR,PT-CORNER-ROLLER,Platinum Corner Roller - Outside 90°,platinum-outside-corner-roller,Outside Corner Roller,Corner Rollers,,,/schematics?brand=platinum&category=Corner+Rollers&schematic=platinum-outside-corner-roller,seed_exact,
+catalog,unmapped,Platinum Drywall Tools,simple,PT-MNBH,,Platinum Mini Box Handle,,,,,,,,no exact supported schematic match
+catalog,unmapped,Platinum Drywall Tools,simple,PT-AICA,,Platinum 4 Wheel Inside Angle / Corner Applicator,,,,,,,,no exact supported schematic match
+catalog,unmapped,Platinum Drywall Tools,simple,PT-TP,,Platinum Semi Automatic Drywall Taper,,,,,,,,no exact supported schematic match
+catalog,unmapped,Platinum Drywall Tools,simple,PT-GN,,Platinum Gooseneck,,,,,,,,no exact supported schematic match
+catalog,mapped,SurPro,variable,SP-S1-A,,SurPro S1 Aluminum Drywall Stilts,surpro-s1,S1,Stilts,,,/schematics?brand=surpro&category=Stilts&schematic=surpro-s1,family_parent,
+catalog,mapped,SurPro,variation,S1-A-1624,SP-S1-A,"SurPro S1 Aluminum Drywall Stilts - 16""-24""",surpro-s1,S1,Stilts,,,/schematics?brand=surpro&category=Stilts&schematic=surpro-s1,family_child,
+catalog,mapped,SurPro,variation,S1-A-2030,SP-S1-A,"SurPro S1 Aluminum Drywall Stilts - 20""-30""",surpro-s1,S1,Stilts,,,/schematics?brand=surpro&category=Stilts&schematic=surpro-s1,family_child,
+catalog,mapped,SurPro,variation,S1-A-2640,SP-S1-A,"SurPro S1 Aluminum Drywall Stilts - 26""-40""",surpro-s1,S1,Stilts,,,/schematics?brand=surpro&category=Stilts&schematic=surpro-s1,family_child,
+catalog,mapped,SurPro,variable,SP-S1-M,,SurPro S1 Magnesium Drywall Stilts,surpro-s1,S1,Stilts,,,/schematics?brand=surpro&category=Stilts&schematic=surpro-s1,family_parent,
+catalog,mapped,SurPro,variation,S1-M-1624,SP-S1-M,"SurPro S1 Magnesium Drywall Stilts - 16""-24""",surpro-s1,S1,Stilts,,,/schematics?brand=surpro&category=Stilts&schematic=surpro-s1,family_child,
+catalog,mapped,SurPro,variation,S1-M-2030,SP-S1-M,"SurPro S1 Magnesium Drywall Stilts - 20""-30""",surpro-s1,S1,Stilts,,,/schematics?brand=surpro&category=Stilts&schematic=surpro-s1,family_child,
+catalog,mapped,SurPro,variation,S1-M-2640,SP-S1-M,"SurPro S1 Magnesium Drywall Stilts - 26""-40""",surpro-s1,S1,Stilts,,,/schematics?brand=surpro&category=Stilts&schematic=surpro-s1,family_child,
+catalog,mapped,SurPro,variable,SP-S1X-A,,SurPro S1X Aluminum Drywall Stilts,surpro-s1x,S1X,Stilts,,,/schematics?brand=surpro&category=Stilts&schematic=surpro-s1x,family_parent,
+catalog,mapped,SurPro,variation,S1X-A-2131,SP-S1X-A,"SurPro S1X Aluminum Drywall Stilts - 21""-31""",surpro-s1x,S1X,Stilts,,,/schematics?brand=surpro&category=Stilts&schematic=surpro-s1x,family_child,
+catalog,mapped,SurPro,variation,S1X-A-2640,SP-S1X-A,"SurPro S1X Aluminum Drywall Stilts - 26""-40""",surpro-s1x,S1X,Stilts,,,/schematics?brand=surpro&category=Stilts&schematic=surpro-s1x,family_child,
+catalog,mapped,SurPro,variable,SP-S1X-M,,SurPro S1X Magnesium Drywall Stilts,surpro-s1x,S1X,Stilts,,,/schematics?brand=surpro&category=Stilts&schematic=surpro-s1x,family_parent,
+catalog,mapped,SurPro,variation,S1X-M-2131,SP-S1X-M,"SurPro S1X Magnesium Drywall Stilts - 21""-31""",surpro-s1x,S1X,Stilts,,,/schematics?brand=surpro&category=Stilts&schematic=surpro-s1x,family_child,
+catalog,mapped,SurPro,variation,S1X-M-2640,SP-S1X-M,"SurPro S1X Magnesium Drywall Stilts - 26""-40""",surpro-s1x,S1X,Stilts,,,/schematics?brand=surpro&category=Stilts&schematic=surpro-s1x,family_child,
+catalog,mapped,SurPro,variable,SP-S2-A,,SurPro S2 Aluminum Drywall Stilts,surpro-s2,S2,Stilts,,,/schematics?brand=surpro&category=Stilts&schematic=surpro-s2,family_parent,
+catalog,mapped,SurPro,variation,S2-A-1624,SP-S2-A,"SurPro S2 Aluminum Drywall Stilts - 16""-24""",surpro-s2,S2,Stilts,,,/schematics?brand=surpro&category=Stilts&schematic=surpro-s2,family_child,
+catalog,mapped,SurPro,variation,S2-A-2030,SP-S2-A,"SurPro S2 Aluminum Drywall Stilts - 20""-30""",surpro-s2,S2,Stilts,,,/schematics?brand=surpro&category=Stilts&schematic=surpro-s2,family_child,
+catalog,mapped,SurPro,variation,S2-A-2640,SP-S2-A,"SurPro S2 Aluminum Drywall Stilts - 26""-40""",surpro-s2,S2,Stilts,,,/schematics?brand=surpro&category=Stilts&schematic=surpro-s2,family_child,
+catalog,mapped,SurPro,variable,SP-S2-M,,SurPro S2 Magnesium Drywall Stilts,surpro-s2,S2,Stilts,,,/schematics?brand=surpro&category=Stilts&schematic=surpro-s2,family_parent,
+catalog,mapped,SurPro,variation,S2-M-1624,SP-S2-M,"SurPro S2 Magnesium Drywall Stilts - 16""-24""",surpro-s2,S2,Stilts,,,/schematics?brand=surpro&category=Stilts&schematic=surpro-s2,family_child,
+catalog,mapped,SurPro,variation,S2-M-2030,SP-S2-M,"SurPro S2 Magnesium Drywall Stilts - 20""-30""",surpro-s2,S2,Stilts,,,/schematics?brand=surpro&category=Stilts&schematic=surpro-s2,family_child,
+catalog,mapped,SurPro,variation,S2-M-2640,SP-S2-M,"SurPro S2 Magnesium Drywall Stilts - 26""-40""",surpro-s2,S2,Stilts,,,/schematics?brand=surpro&category=Stilts&schematic=surpro-s2,family_child,
+catalog,mapped,SurPro,variable,SP-S2X-A,,SurPro S2X Aluminum Drywall Stilts,surpro-s2x,S2X,Stilts,,,/schematics?brand=surpro&category=Stilts&schematic=surpro-s2x,family_parent,
+catalog,mapped,SurPro,variation,S2X-A-3852,SP-S2X-A,"SurPro S2X Aluminum Drywall Stilts - 38""-52""",surpro-s2x,S2X,Stilts,,,/schematics?brand=surpro&category=Stilts&schematic=surpro-s2x,family_child,
+catalog,mapped,SurPro,variation,S2X-A-2640,SP-S2X-A,"SurPro S2X Aluminum Drywall Stilts - 26""-40""",surpro-s2x,S2X,Stilts,,,/schematics?brand=surpro&category=Stilts&schematic=surpro-s2x,family_child,
+catalog,mapped,SurPro,variable,SP-S2X-M,,SurPro S2X Magnesium Drywall Stilts,surpro-s2x,S2X,Stilts,,,/schematics?brand=surpro&category=Stilts&schematic=surpro-s2x,family_parent,
+catalog,mapped,SurPro,variation,S2X-M-2131,SP-S2X-M,"SurPro S2X Magnesium Drywall Stilts - 21""-31""",surpro-s2x,S2X,Stilts,,,/schematics?brand=surpro&category=Stilts&schematic=surpro-s2x,family_child,
+catalog,mapped,SurPro,variation,S2X-M-2640,SP-S2X-M,"SurPro S2X Magnesium Drywall Stilts - 26""-40""",surpro-s2x,S2X,Stilts,,,/schematics?brand=surpro&category=Stilts&schematic=surpro-s2x,family_child,
+catalog,unmapped,TapeTech,variable,TT-APPLICATOR-HEAD,,TapeTech Applicator Head,,,,,,,,no exact supported schematic match
+catalog,unmapped,TapeTech,variation,16TT,TT-APPLICATOR-HEAD,TapeTech Applicator Head - Outside Corner,,,,,,,,no exact supported schematic match
+catalog,unmapped,TapeTech,variation,16TT90,TT-APPLICATOR-HEAD,TapeTech Applicator Head - Inside Corner,,,,,,,,no exact supported schematic match
+catalog,unmapped,TapeTech,variable,TT-BASIC-FULL-SET,,TapeTech Basic Full Set,,,,,,,,no exact supported schematic match
+catalog,unmapped,TapeTech,variation,TTFULL7/10,TT-BASIC-FULL-SET,"TapeTech Basic Full Set - 7"" and 10"" Boxes",,,,,,,,no exact supported schematic match
+catalog,unmapped,TapeTech,variation,TTFULL10/12,TT-BASIC-FULL-SET,"TapeTech Basic Full Set - 10"" and 12"" Boxes",,,,,,,,no exact supported schematic match
+catalog,unmapped,TapeTech,variable,TT-BASIC-JUMBO-SET,,TapeTech Basic Jumbo Set,,,,,,,,no exact supported schematic match
+catalog,unmapped,TapeTech,variation,TTJUMBO7/10,TT-BASIC-JUMBO-SET,"TapeTech Basic Jumbo Set - 7"" and 10"" Boxes",,,,,,,,no exact supported schematic match
+catalog,unmapped,TapeTech,variation,TTJUMBO10/12,TT-BASIC-JUMBO-SET,"TapeTech Basic Jumbo Set - 10"" and 12"" Boxes",,,,,,,,no exact supported schematic match
+catalog,unmapped,TapeTech,variable,TT-BRAKELESS-BOX-HANDLE,,TapeTech Brakeless Box Handle,,,,,,,,no exact supported schematic match
+catalog,unmapped,TapeTech,variation,BHE-SW,TT-BRAKELESS-BOX-HANDLE,"TapeTech Brakeless Box Handle - Rotational Extendable 34""-60""",,,,,,,,no exact supported schematic match
+catalog,unmapped,TapeTech,variation,BH,TT-BRAKELESS-BOX-HANDLE,"TapeTech Brakeless Box Handle - Fixed 34""",,,,,,,,no exact supported schematic match
+catalog,unmapped,TapeTech,variation,BHE,TT-BRAKELESS-BOX-HANDLE,"TapeTech Brakeless Box Handle - Extendable 34""-60""",,,,,,,,no exact supported schematic match
+catalog,unmapped,TapeTech,variable,TT-CARBON-FIBER-BOX-HANDLE,,TapeTech Carbon Fiber Box Handle,,,,,,,,no exact supported schematic match
+catalog,unmapped,TapeTech,variation,FBH2642TT-CF,TT-CARBON-FIBER-BOX-HANDLE,"TapeTech Carbon Fiber Box Handle - 26""-42""",,,,,,,,no exact supported schematic match
+catalog,unmapped,TapeTech,variation,FBH4272TT-CF,TT-CARBON-FIBER-BOX-HANDLE,"TapeTech Carbon Fiber Box Handle - 42""-72""",,,,,,,,no exact supported schematic match
+catalog,unmapped,TapeTech,variable,TT-COMBO-CORNER-FLUSHER,,TapeTech Combo Corner Flusher,,,,,,,,no exact supported schematic match
+catalog,unmapped,TapeTech,variation,CF25COMBO,TT-COMBO-CORNER-FLUSHER,"TapeTech Combo Corner Flusher - 2.5""",,,,,,,,no exact supported schematic match
+catalog,unmapped,TapeTech,variation,CF30COMBO,TT-COMBO-CORNER-FLUSHER,"TapeTech Combo Corner Flusher - 3""",,,,,,,,no exact supported schematic match
+catalog,unmapped,TapeTech,variation,CF35COMBO,TT-COMBO-CORNER-FLUSHER,"TapeTech Combo Corner Flusher - 3.5""",,,,,,,,no exact supported schematic match
+catalog,unmapped,TapeTech,variation,CF40COMBO,TT-COMBO-CORNER-FLUSHER,"TapeTech Combo Corner Flusher - 4""",,,,,,,,no exact supported schematic match
+catalog,unmapped,TapeTech,variable,TT-COMPOUND-TUBE,,TapeTech Compound Tube,,,,,,,,no exact supported schematic match
+catalog,unmapped,TapeTech,variation,CT24TT,TT-COMPOUND-TUBE,"TapeTech Compound Tube - 24""",,,,,,,,no exact supported schematic match
+catalog,unmapped,TapeTech,variation,CT36TT,TT-COMPOUND-TUBE,"TapeTech Compound Tube - 36""",,,,,,,,no exact supported schematic match
+catalog,unmapped,TapeTech,variation,CT42TT,TT-COMPOUND-TUBE,"TapeTech Compound Tube - 42""",,,,,,,,no exact supported schematic match
+catalog,unmapped,TapeTech,variable,TT-CORNER-APPLICATOR,,TapeTech Corner Applicator,,,,,,,,no exact supported schematic match
+catalog,unmapped,TapeTech,variation,CA07TT,TT-CORNER-APPLICATOR,"TapeTech Corner Applicator - 7""",,,,,,,,no exact supported schematic match
+catalog,unmapped,TapeTech,variation,CA08TT,TT-CORNER-APPLICATOR,"TapeTech Corner Applicator - 8""",,,,,,,,no exact supported schematic match
+catalog,unmapped,TapeTech,variable,TT-CORNER-APPLICATOR-WITH-FHTT-HANDLE,,TapeTech Corner Applicator with FHTT Fiberglass Handle,,,,,,,,no exact supported schematic match
+catalog,unmapped,TapeTech,variation,CA07FHTT,TT-CORNER-APPLICATOR-WITH-FHTT-HANDLE,"TapeTech Corner Applicator with FHTT Fiberglass Handle - 7""",,,,,,,,no exact supported schematic match
+catalog,unmapped,TapeTech,variation,CA08FHTT,TT-CORNER-APPLICATOR-WITH-FHTT-HANDLE,"TapeTech Corner Applicator with FHTT Fiberglass Handle - 8""",,,,,,,,no exact supported schematic match
+catalog,unmapped,TapeTech,variable,TT-CORNER-FINISHER,,TapeTech Corner Finisher,,,,,,,,no exact supported schematic match
+catalog,unmapped,TapeTech,variation,40XTT,TT-CORNER-FINISHER,"TapeTech Corner Finisher - 2""",,,,,,,,no exact supported schematic match
+catalog,mapped,TapeTech,variation,42TT,TT-CORNER-FINISHER,"TapeTech Corner Finisher - 2.5""",tapetech-42tt,"Corner Finisher - 2.5"" (42TT)",Corner Tools,,,/schematics?brand=tapetech&category=Corner+Tools&schematic=tapetech-42tt,seed_exact,
+catalog,mapped,TapeTech,variation,48TT,TT-CORNER-FINISHER,"TapeTech Corner Finisher - 3"" EasyRoll® Adjustable",tapetech-48tt,"Corner Finisher - 3"" EasyRoll Adjustable (48TT)",Corner Tools,,,/schematics?brand=tapetech&category=Corner+Tools&schematic=tapetech-48tt,seed_exact,
+catalog,unmapped,TapeTech,variation,48XTT,TT-CORNER-FINISHER,"TapeTech Corner Finisher - 3.5"" EasyRoll® Adjustable",,,,,,,,no exact supported schematic match
+catalog,unmapped,TapeTech,variable,TT-CORNER-ROLLER,,TapeTech Corner Roller,,,,,,,,no exact supported schematic match
+catalog,unmapped,TapeTech,variation,15TTE,TT-CORNER-ROLLER,TapeTech Corner Roller - Inside Corner,,,,,,,,no exact supported schematic match
+catalog,mapped,TapeTech,variation,17TT,TT-CORNER-ROLLER,TapeTech Corner Roller - Outside Corner,tapetech-17tt,Corner Roller - Outside Corner (17TT),Corner Tools,,,/schematics?brand=tapetech&category=Corner+Tools&schematic=tapetech-17tt,seed_exact,
+catalog,unmapped,TapeTech,variation,17TTE,TT-CORNER-ROLLER,TapeTech Corner Roller - Flex Tape Outside Corner,,,,,,,,no exact supported schematic match
+catalog,unmapped,TapeTech,variable,TT-COVE-APPLICATOR-HEAD,,TapeTech Cove Applicator Head,,,,,,,,no exact supported schematic match
+catalog,unmapped,TapeTech,variation,CH55TT,TT-COVE-APPLICATOR-HEAD,TapeTech Cove Applicator Head - 55 mm,,,,,,,,no exact supported schematic match
+catalog,unmapped,TapeTech,variation,CH75TT,TT-COVE-APPLICATOR-HEAD,TapeTech Cove Applicator Head - 75 mm,,,,,,,,no exact supported schematic match
+catalog,unmapped,TapeTech,variation,CH83TT,TT-COVE-APPLICATOR-HEAD,TapeTech Cove Applicator Head - 83 mm,,,,,,,,no exact supported schematic match
+catalog,unmapped,TapeTech,variation,CH90TT,TT-COVE-APPLICATOR-HEAD,TapeTech Cove Applicator Head - 90 mm,,,,,,,,no exact supported schematic match
+catalog,unmapped,TapeTech,variable,TT-DIRECT-CORNER-FLUSHER,,TapeTech Direct Corner Flusher,,,,,,,,no exact supported schematic match
+catalog,unmapped,TapeTech,variation,CF25TT,TT-DIRECT-CORNER-FLUSHER,"TapeTech Direct Corner Flusher - 2.5""",,,,,,,,no exact supported schematic match
+catalog,unmapped,TapeTech,variation,CF30TT,TT-DIRECT-CORNER-FLUSHER,"TapeTech Direct Corner Flusher - 3""",,,,,,,,no exact supported schematic match
+catalog,unmapped,TapeTech,variation,CF35TT,TT-DIRECT-CORNER-FLUSHER,"TapeTech Direct Corner Flusher - 3.5""",,,,,,,,no exact supported schematic match
+catalog,unmapped,TapeTech,variation,CF40TT,TT-DIRECT-CORNER-FLUSHER,"TapeTech Direct Corner Flusher - 4""",,,,,,,,no exact supported schematic match
+catalog,unmapped,TapeTech,variable,TT-EASYCLEAN-AUTOMATIC-TAPER,,TapeTech EasyClean® Automatic Taper,,,,,,,,no exact supported schematic match
+catalog,unmapped,TapeTech,variation,03TT,TT-EASYCLEAN-AUTOMATIC-TAPER,"TapeTech EasyClean® Automatic Taper - Mini-Taper 40.5""",,,,,,,,no exact supported schematic match
+catalog,mapped,TapeTech,variation,07TT,TT-EASYCLEAN-AUTOMATIC-TAPER,TapeTech EasyClean® Automatic Taper - Standard,tapetech-07tt,TapeTech EasyClean® Automatic Taper,Automatic Tapers,,,/schematics?brand=tapetech&category=Automatic+Tapers&schematic=tapetech-07tt,seed_exact,
+catalog,unmapped,TapeTech,variation,07TT-C,TT-EASYCLEAN-AUTOMATIC-TAPER,TapeTech EasyClean® Automatic Taper - Carbon Fiber,,,,,,,,no exact supported schematic match
+catalog,mapped,TapeTech,variable,TT-EASYCLEAN-FINISHING-BOX,,TapeTech EasyClean® Finishing Box,tapetech-easyclean-finishing-box,EasyClean® Finishing Box,Finishing Boxes,,,/schematics?brand=tapetech&category=Finishing+Boxes&schematic=tapetech-easyclean-finishing-box,all_children_same_schematic,
+catalog,mapped,TapeTech,variation,EZ07TT,TT-EASYCLEAN-FINISHING-BOX,"TapeTech EasyClean® Finishing Box - 7""",tapetech-easyclean-finishing-box,EasyClean® Finishing Box,Finishing Boxes,1,,/schematics?brand=tapetech&category=Finishing+Boxes&schematic=tapetech-easyclean-finishing-box&page=1,seed_exact,
+catalog,mapped,TapeTech,variation,EZ10TT,TT-EASYCLEAN-FINISHING-BOX,"TapeTech EasyClean® Finishing Box - 10""",tapetech-easyclean-finishing-box,EasyClean® Finishing Box,Finishing Boxes,2,,/schematics?brand=tapetech&category=Finishing+Boxes&schematic=tapetech-easyclean-finishing-box&page=2,seed_exact,
+catalog,mapped,TapeTech,variation,EZ12TT,TT-EASYCLEAN-FINISHING-BOX,"TapeTech EasyClean® Finishing Box - 12""",tapetech-easyclean-finishing-box,EasyClean® Finishing Box,Finishing Boxes,3,,/schematics?brand=tapetech&category=Finishing+Boxes&schematic=tapetech-easyclean-finishing-box&page=3,seed_exact,
+catalog,mapped,TapeTech,variation,EZ15TT,TT-EASYCLEAN-FINISHING-BOX,"TapeTech EasyClean® Finishing Box - 15""",tapetech-easyclean-finishing-box,EasyClean® Finishing Box,Finishing Boxes,4,,/schematics?brand=tapetech&category=Finishing+Boxes&schematic=tapetech-easyclean-finishing-box&page=4,seed_exact,
+catalog,unmapped,TapeTech,variable,TT-EASYCLEAN-NAIL-SPOTTER-WITH-FHTT-HANDLE,,TapeTech EasyClean® Nail Spotter with Fiberglass Handle,,,,,,,,no exact supported schematic match
+catalog,unmapped,TapeTech,variation,NS02FHTT,TT-EASYCLEAN-NAIL-SPOTTER-WITH-FHTT-HANDLE,"TapeTech EasyClean® Nail Spotter with Fiberglass Handle - 2""",,,,,,,,no exact supported schematic match
+catalog,unmapped,TapeTech,variation,NS03FHTT,TT-EASYCLEAN-NAIL-SPOTTER-WITH-FHTT-HANDLE,"TapeTech EasyClean® Nail Spotter with Fiberglass Handle - 3""",,,,,,,,no exact supported schematic match
+catalog,unmapped,TapeTech,variable,TT-EASYCLEAN-PUMP,,TapeTech EasyClean® Pump,,,,,,,,no exact supported schematic match
+catalog,mapped,TapeTech,variation,76TT,TT-EASYCLEAN-PUMP,TapeTech EasyClean® Pump - Standard,tapetech-76tt,TapeTech EasyClean® Pump - Standard,Pumps,,,/schematics?brand=tapetech&category=Pumps&schematic=tapetech-76tt,seed_exact,
+catalog,unmapped,TapeTech,variation,76TT-CA,TT-EASYCLEAN-PUMP,TapeTech EasyClean® Pump - Canada,,,,,,,,no exact supported schematic match
+catalog,unmapped,TapeTech,variation,76XLTT,TT-EASYCLEAN-PUMP,TapeTech EasyClean® Pump - Extra Long,,,,,,,,no exact supported schematic match
+catalog,mapped,TapeTech,variable,TT-EASYFINISH-BOX-HANDLE,,TapeTech EasyFinish™ Box Handle,tapetech-81xxtt,TapeTech EasyFinish™ Box Handle Assemblies (81XXTT),Handles,,,/schematics?brand=tapetech&category=Handles&schematic=tapetech-81xxtt,family_parent,
+catalog,mapped,TapeTech,variation,8134TT,TT-EASYFINISH-BOX-HANDLE,"TapeTech EasyFinish™ Box Handle - 34""",tapetech-81xxtt,TapeTech EasyFinish™ Box Handle Assemblies (81XXTT),Handles,,34,/schematics?brand=tapetech&category=Handles&schematic=tapetech-81xxtt&variant=34,family_child,
+catalog,mapped,TapeTech,variation,8142TT,TT-EASYFINISH-BOX-HANDLE,"TapeTech EasyFinish™ Box Handle - 42""",tapetech-81xxtt,TapeTech EasyFinish™ Box Handle Assemblies (81XXTT),Handles,,42,/schematics?brand=tapetech&category=Handles&schematic=tapetech-81xxtt&variant=42,family_child,
+catalog,mapped,TapeTech,variation,8154TT,TT-EASYFINISH-BOX-HANDLE,"TapeTech EasyFinish™ Box Handle - 54""",tapetech-81xxtt,TapeTech EasyFinish™ Box Handle Assemblies (81XXTT),Handles,,54,/schematics?brand=tapetech&category=Handles&schematic=tapetech-81xxtt&variant=54,family_child,
+catalog,mapped,TapeTech,variation,8172TT,TT-EASYFINISH-BOX-HANDLE,"TapeTech EasyFinish™ Box Handle - 72""",tapetech-81xxtt,TapeTech EasyFinish™ Box Handle Assemblies (81XXTT),Handles,,72,/schematics?brand=tapetech&category=Handles&schematic=tapetech-81xxtt&variant=72,family_child,
+catalog,mapped,TapeTech,variable,TT-FLAT-BOX-HANDLE,,TapeTech Flat Box Handle,tapetech-80xxtt,TapeTech Finishing Box Handle Assemblies (80XXTT),Handles,,,/schematics?brand=tapetech&category=Handles&schematic=tapetech-80xxtt,family_parent,
+catalog,mapped,TapeTech,variation,8034TT,TT-FLAT-BOX-HANDLE,"TapeTech Flat Box Handle - 34""",tapetech-80xxtt,TapeTech Finishing Box Handle Assemblies (80XXTT),Handles,,34,/schematics?brand=tapetech&category=Handles&schematic=tapetech-80xxtt&variant=34,family_child,
+catalog,mapped,TapeTech,variation,8042TT,TT-FLAT-BOX-HANDLE,"TapeTech Flat Box Handle - 42""",tapetech-80xxtt,TapeTech Finishing Box Handle Assemblies (80XXTT),Handles,,42,/schematics?brand=tapetech&category=Handles&schematic=tapetech-80xxtt&variant=42,family_child,
+catalog,mapped,TapeTech,variation,8054TT,TT-FLAT-BOX-HANDLE,"TapeTech Flat Box Handle - 54""",tapetech-80xxtt,TapeTech Finishing Box Handle Assemblies (80XXTT),Handles,,54,/schematics?brand=tapetech&category=Handles&schematic=tapetech-80xxtt&variant=54,family_child,
+catalog,mapped,TapeTech,variation,8072TT,TT-FLAT-BOX-HANDLE,"TapeTech Flat Box Handle - 72""",tapetech-80xxtt,TapeTech Finishing Box Handle Assemblies (80XXTT),Handles,,72,/schematics?brand=tapetech&category=Handles&schematic=tapetech-80xxtt&variant=72,family_child,
+catalog,unmapped,TapeTech,variable,TT-GOOSENECK,,TapeTech Gooseneck,,,,,,,,no exact supported schematic match
+catalog,mapped,TapeTech,variation,85T,TT-GOOSENECK,TapeTech Gooseneck - Standard,tapetech-85t,TapeTech Gooseneck - Standard,Pumps,,,/schematics?brand=tapetech&category=Pumps&schematic=tapetech-85t,seed_exact,
+catalog,unmapped,TapeTech,variation,85XLTT,TT-GOOSENECK,TapeTech Gooseneck - Extra Long,,,,,,,,no exact supported schematic match
+catalog,mapped,TapeTech,variable,TT-MAXXBOX-HIGH-CAPACITY-FINISHING-BOX,,TapeTech MaxxBox® High Capacity Finishing Box,tapetech-maxxbox-ehc,MaxxBox® High Capacity Finishing Box,Finishing Boxes,,,/schematics?brand=tapetech&category=Finishing+Boxes&schematic=tapetech-maxxbox-ehc,all_children_same_schematic,
+catalog,mapped,TapeTech,variation,EHC07,TT-MAXXBOX-HIGH-CAPACITY-FINISHING-BOX,"TapeTech MaxxBox® High Capacity Finishing Box - 7""",tapetech-maxxbox-ehc,MaxxBox® High Capacity Finishing Box,Finishing Boxes,1,,/schematics?brand=tapetech&category=Finishing+Boxes&schematic=tapetech-maxxbox-ehc&page=1,seed_exact,
+catalog,mapped,TapeTech,variation,EHC10,TT-MAXXBOX-HIGH-CAPACITY-FINISHING-BOX,"TapeTech MaxxBox® High Capacity Finishing Box - 10""",tapetech-maxxbox-ehc,MaxxBox® High Capacity Finishing Box,Finishing Boxes,2,,/schematics?brand=tapetech&category=Finishing+Boxes&schematic=tapetech-maxxbox-ehc&page=2,seed_exact,
+catalog,mapped,TapeTech,variation,EHC12,TT-MAXXBOX-HIGH-CAPACITY-FINISHING-BOX,"TapeTech MaxxBox® High Capacity Finishing Box - 12""",tapetech-maxxbox-ehc,MaxxBox® High Capacity Finishing Box,Finishing Boxes,3,,/schematics?brand=tapetech&category=Finishing+Boxes&schematic=tapetech-maxxbox-ehc&page=3,seed_exact,
+catalog,unmapped,TapeTech,variable,TT-NAIL-SPOTTER,,TapeTech Nail Spotter,,,,,,,,no exact supported schematic match
+catalog,unmapped,TapeTech,variation,NS02TT,TT-NAIL-SPOTTER,"TapeTech Nail Spotter - 2""",,,,,,,,no exact supported schematic match
+catalog,unmapped,TapeTech,variation,NS03TT,TT-NAIL-SPOTTER,"TapeTech Nail Spotter - 3""",,,,,,,,no exact supported schematic match
+catalog,mapped,TapeTech,variable,TT-POWER-ASSIST-MAXXBOX-FINISHING-BOX,,TapeTech Power Assist® MaxxBox® Finishing Box,tapetech-power-assist-maxxbox,Power Assist® MaxxBox® Finishing Box,Finishing Boxes,,,/schematics?brand=tapetech&category=Finishing+Boxes&schematic=tapetech-power-assist-maxxbox,all_children_same_schematic,
+catalog,mapped,TapeTech,variation,PAHC07,TT-POWER-ASSIST-MAXXBOX-FINISHING-BOX,"TapeTech Power Assist® MaxxBox® Finishing Box - 7""",tapetech-power-assist-maxxbox,Power Assist® MaxxBox® Finishing Box,Finishing Boxes,1,,/schematics?brand=tapetech&category=Finishing+Boxes&schematic=tapetech-power-assist-maxxbox&page=1,seed_exact,
+catalog,mapped,TapeTech,variation,PAHC10,TT-POWER-ASSIST-MAXXBOX-FINISHING-BOX,"TapeTech Power Assist® MaxxBox® Finishing Box - 10""",tapetech-power-assist-maxxbox,Power Assist® MaxxBox® Finishing Box,Finishing Boxes,2,,/schematics?brand=tapetech&category=Finishing+Boxes&schematic=tapetech-power-assist-maxxbox&page=2,seed_exact,
+catalog,mapped,TapeTech,variation,PAHC12,TT-POWER-ASSIST-MAXXBOX-FINISHING-BOX,"TapeTech Power Assist® MaxxBox® Finishing Box - 12""",tapetech-power-assist-maxxbox,Power Assist® MaxxBox® Finishing Box,Finishing Boxes,3,,/schematics?brand=tapetech&category=Finishing+Boxes&schematic=tapetech-power-assist-maxxbox&page=3,seed_exact,
+catalog,mapped,TapeTech,variable,TT-QUICKBOX-QSX-FINISHING-BOX,,TapeTech QuickBox® QSX Finishing Box,tapetech-quickbox-qsx,QuickBox® QSX Finishing Box,Finishing Boxes,,,/schematics?brand=tapetech&category=Finishing+Boxes&schematic=tapetech-quickbox-qsx,all_children_same_schematic,
+catalog,mapped,TapeTech,variation,QB06-QSX,TT-QUICKBOX-QSX-FINISHING-BOX,"TapeTech QuickBox® QSX Finishing Box - 6.5""",tapetech-quickbox-qsx,QuickBox® QSX Finishing Box,Finishing Boxes,1,,/schematics?brand=tapetech&category=Finishing+Boxes&schematic=tapetech-quickbox-qsx&page=1,seed_exact,
+catalog,mapped,TapeTech,variation,QB08-QSX,TT-QUICKBOX-QSX-FINISHING-BOX,"TapeTech QuickBox® QSX Finishing Box - 8.5""",tapetech-quickbox-qsx,QuickBox® QSX Finishing Box,Finishing Boxes,2,,/schematics?brand=tapetech&category=Finishing+Boxes&schematic=tapetech-quickbox-qsx&page=2,seed_exact,
+catalog,unmapped,TapeTech,variable,TT-STANDARD-FULL-SET,,TapeTech Standard Full Set,,,,,,,,no exact supported schematic match
+catalog,unmapped,TapeTech,variation,TTSFS,TT-STANDARD-FULL-SET,TapeTech Standard Full Set - Standard,,,,,,,,no exact supported schematic match
+catalog,unmapped,TapeTech,variation,TTSFS-2,TT-STANDARD-FULL-SET,TapeTech Standard Full Set - With 2 Pumps,,,,,,,,no exact supported schematic match
+catalog,unmapped,TapeTech,variable,TT-SUPPORT-HANDLE,,TapeTech Support Handle,,,,,,,,no exact supported schematic match
+catalog,unmapped,TapeTech,variation,FHTT,TT-SUPPORT-HANDLE,TapeTech Support Handle - Fiberglass,,,,,,,,no exact supported schematic match
+catalog,unmapped,TapeTech,variation,FHTT-CC,TT-SUPPORT-HANDLE,TapeTech Support Handle - Closet Crusher Fiberglass,,,,,,,,no exact supported schematic match
+catalog,mapped,TapeTech,variation,XHTT,TT-SUPPORT-HANDLE,TapeTech Support Handle - Extension,tapetech-xhtt,TapeTech Support Handle - Extension,Handles,,,/schematics?brand=tapetech&category=Handles&schematic=tapetech-xhtt,seed_exact,
+catalog,unmapped,TapeTech,variable,TT-SUPPORT-HANDLE-ADAPTER,,TapeTech Support Handle Adapter,,,,,,,,no exact supported schematic match
+catalog,unmapped,TapeTech,variation,CAA-TT,TT-SUPPORT-HANDLE-ADAPTER,TapeTech Support Handle Adapter - Corner Applicator,,,,,,,,no exact supported schematic match
+catalog,unmapped,TapeTech,variation,CFA-TT,TT-SUPPORT-HANDLE-ADAPTER,TapeTech Support Handle Adapter - Corner Finisher,,,,,,,,no exact supported schematic match
+catalog,unmapped,TapeTech,variation,NSA-TT,TT-SUPPORT-HANDLE-ADAPTER,TapeTech Support Handle Adapter - Nail Spotter,,,,,,,,no exact supported schematic match
+catalog,unmapped,TapeTech,variable,TT-WIZARD-COMPACT-FINISHING-BOX-HANDLE,,TapeTech Wizard® Compact Finishing Box Handle,,,,,,,,no exact supported schematic match
+catalog,unmapped,TapeTech,variation,8000TT,TT-WIZARD-COMPACT-FINISHING-BOX-HANDLE,TapeTech Wizard® Compact Finishing Box Handle - Standard,,,,,,,,no exact supported schematic match
+catalog,unmapped,TapeTech,variation,8000TT-PA,TT-WIZARD-COMPACT-FINISHING-BOX-HANDLE,TapeTech Wizard® Compact Finishing Box Handle - Power Assist,,,,,,,,no exact supported schematic match
+catalog,unmapped,TapeTech,simple,70171,,TapeTech 2 Pump Set,,,,,,,,no exact supported schematic match
+catalog,unmapped,TapeTech,simple,NS02WX1HDL,,"TapeTech 2"" Nail Spotter with X1 Extension Handle",,,,,,,,no exact supported schematic match
+catalog,unmapped,TapeTech,variable,TT-ANGLE-BOX-XHTT,,TapeTech Angle Box with Extendable XHTT Handle,,,,,,,,no exact supported schematic match
+catalog,unmapped,TapeTech,variation,CA07XHTT,TT-ANGLE-BOX-XHTT,"TapeTech Angle Box with Extendable XHTT Handle - 7""",,,,,,,,no exact supported schematic match
+catalog,unmapped,TapeTech,variation,CA08TTXHTT,TT-ANGLE-BOX-XHTT,"TapeTech Angle Box with Extendable XHTT Handle - 8""",,,,,,,,no exact supported schematic match
+catalog,unmapped,TapeTech,simple,ATX01TT,,TapeTech Automatic Taper Extension,,,,,,,,no exact supported schematic match
+catalog,unmapped,TapeTech,simple,TTBBS,,TapeTech Basic Box Set,,,,,,,,no exact supported schematic match
+catalog,unmapped,TapeTech,simple,TTBTS,,TapeTech Basic Taping Set,,,,,,,,no exact supported schematic match
+catalog,mapped,TapeTech,simple,88TTE,,TapeTech Box XTender Handle,tapetech-88tte,TapeTech Box XTender Handle,Handles,,,/schematics?brand=tapetech&category=Handles&schematic=tapetech-88tte,seed_exact,
+catalog,unmapped,TapeTech,simple,CROLLHAN2,,TapeTech Compound Roller Support Handle,,,,,,,,no exact supported schematic match
+catalog,unmapped,TapeTech,simple,CTA01TT,,TapeTech Compound Tube Filler Adapter,,,,,,,,no exact supported schematic match
+catalog,unmapped,TapeTech,simple,TTCFS,,TapeTech Corner Finishing Set,,,,,,,,no exact supported schematic match
+catalog,unmapped,TapeTech,variable,TT-CORNER-ROLLER-WITH-HANDLE,,TapeTech Corner Roller with Handle,,,,,,,,no exact supported schematic match
+catalog,unmapped,TapeTech,variation,15TTEWHANDLE,TT-CORNER-ROLLER-WITH-HANDLE,TapeTech Corner Roller with Handle - Standard Handle,,,,,,,,no exact supported schematic match
+catalog,unmapped,TapeTech,variation,15TTEXHTT,TT-CORNER-ROLLER-WITH-HANDLE,TapeTech Corner Roller with Handle - Extendable XHTT Handle,,,,,,,,no exact supported schematic match
+catalog,unmapped,TapeTech,simple,TTFINISH7/10,,TapeTech Drywall Finishing Set - 7 in. & 10 in. Boxes,,,,,,,,no exact supported schematic match
+catalog,unmapped,TapeTech,simple,MRX01TT,,TapeTech Extension,,,,,,,,no exact supported schematic match
+catalog,unmapped,TapeTech,variable,TT-FHTT-WITH-ADAPTER,,TapeTech Fiberglass Handle with Adapter (FHTT),,,,,,,,no exact supported schematic match
+catalog,unmapped,TapeTech,variation,FHTTCAATT,TT-FHTT-WITH-ADAPTER,TapeTech Fiberglass Handle with Adapter (FHTT) - Angle Box,,,,,,,,no exact supported schematic match
+catalog,unmapped,TapeTech,variation,FHTTCFA,TT-FHTT-WITH-ADAPTER,TapeTech Fiberglass Handle with Adapter (FHTT) - Angle Head,,,,,,,,no exact supported schematic match
+catalog,unmapped,TapeTech,variation,FHTTNSA,TT-FHTT-WITH-ADAPTER,TapeTech Fiberglass Handle with Adapter (FHTT) - Nail Spotter,,,,,,,,no exact supported schematic match
+catalog,mapped,TapeTech,simple,90T,,TapeTech Filler Adapter,tapetech-90t,TapeTech Filler Adapter,Pumps,,,/schematics?brand=tapetech&category=Pumps&schematic=tapetech-90t,seed_exact,
+catalog,unmapped,TapeTech,simple,TTFBC,,TapeTech Flat Box Combo,,,,,,,,no exact supported schematic match
+catalog,unmapped,TapeTech,simple,TTFULL2SET,,TapeTech Full Set X2 Contractors Pack,,,,,,,,no exact supported schematic match
+catalog,unmapped,TapeTech,simple,GSR-TT,,TapeTech Gooseneck Riser,,,,,,,,no exact supported schematic match
+catalog,unmapped,TapeTech,simple,804003F,,TapeTech Grip Assembly For Box Handle,,,,,,,,no exact supported schematic match
+catalog,unmapped,TapeTech,variable,TT-MUDRUNNER,,TapeTech MudRunner® Compound Applicator,,,,,,,,no exact supported schematic match
+catalog,unmapped,TapeTech,variation,14TT,TT-MUDRUNNER,TapeTech MudRunner® Compound Applicator - Standard,,,,,,,,no exact supported schematic match
+catalog,unmapped,TapeTech,variation,MR01TT,TT-MUDRUNNER,TapeTech MudRunner® Compound Applicator - Pro,,,,,,,,no exact supported schematic match
+catalog,unmapped,TapeTech,simple,TTPFB,,TapeTech Paper Faced Bead Pro Set,,,,,,,,no exact supported schematic match
+catalog,unmapped,TapeTech,simple,TTPPS-EF,,TapeTech Pro Performance Easy Finish Set,,,,,,,,no exact supported schematic match
+catalog,unmapped,TapeTech,simple,TTPPS,,TapeTech Pro Performance Set,,,,,,,,no exact supported schematic match
+catalog,unmapped,TapeTech,simple,TTPSS,,TapeTech Professional Starter Set,,,,,,,,no exact supported schematic match
+catalog,unmapped,TapeTech,simple,TTFFS,,TapeTech Value Drywall Finishing Set,,,,,,,,no exact supported schematic match
+catalog,unmapped,TapeTech,simple,TTFTFS,,TapeTech Value Full Drywall Taping & Finishing Set,,,,,,,,no exact supported schematic match
+schematic_seed,unmapped,Asgard,,AH25-AD,,2.5″ Angle Head Corner Finisher,asgard-ah25-ad,2.5″ Angle Head Corner Finisher,,,,,seed,catalog SKU not found
+schematic_seed,unmapped,Asgard,,AH30-AD,,3″ Angle Head Corner Finisher,asgard-ah30-ad,3″ Angle Head Corner Finisher,,,,,seed,catalog SKU not found
+schematic_seed,unmapped,Asgard,,AH35-AD,,3.5″ Angle Head Corner Finisher,asgard-ah35-ad,3.5″ Angle Head Corner Finisher,,,,,seed,catalog SKU not found
+schematic_seed,unmapped,Asgard,,AT01-AD,,HAMMER Automatic Taper,asgard-at01-ad,HAMMER Automatic Taper,,,,,seed,catalog SKU not found
+schematic_seed,unmapped,Asgard,,BBH-AD,,Brakeless Box Handle,asgard-bbh-ad,Brakeless Box Handle,,,,,seed,catalog SKU not found
+schematic_seed,unmapped,Asgard,,BBHE-AD,,Brakeless Box Handle – Extendable,asgard-bbhe-ad,Brakeless Box Handle – Extendable,,,,,seed,catalog SKU not found
+schematic_seed,unmapped,Asgard,,CA08-AD,,8″ Angle Box Corner Applicator,asgard-ca08-ad,8″ Angle Box Corner Applicator,,,,,seed,catalog SKU not found
+schematic_seed,unmapped,Asgard,,CFA-AD,,Angle Head Adapter,asgard-cfa-ad,Angle Head Adapter,,,,,seed,catalog SKU not found
+schematic_seed,unmapped,Asgard,,CR01-AD,,Inside Corner Roller,asgard-cr01-ad,Inside Corner Roller,,,,,seed,catalog SKU not found
+schematic_seed,unmapped,Asgard,,EHC07-AD,,7″ MaxxBox Finishing Box,asgard-ehc07-ad,7″ MaxxBox Finishing Box,,,,,seed,catalog SKU not found
+schematic_seed,unmapped,Asgard,,EHC10-AD,,10″ MaxxBox Finishing Box,asgard-ehc10-ad,10″ MaxxBox Finishing Box,,,,,seed,catalog SKU not found
+schematic_seed,unmapped,Asgard,,EHC12-AD,,12″ MaxxBox Finishing Box,asgard-ehc12-ad,12″ MaxxBox Finishing Box,,,,,seed,catalog SKU not found
+schematic_seed,unmapped,Asgard,,EZ07-AD,,7″ Flat Finishing Box,asgard-ez07-ad,7″ Flat Finishing Box,,,,,seed,catalog SKU not found
+schematic_seed,unmapped,Asgard,,EZ10-AD,,10″ Flat Finishing Box,asgard-ez10-ad,10″ Flat Finishing Box,,,,,seed,catalog SKU not found
+schematic_seed,unmapped,Asgard,,EZ12-AD,,12″ Flat Finishing Box,asgard-ez12-ad,12″ Flat Finishing Box,,,,,seed,catalog SKU not found
+schematic_seed,unmapped,Asgard,,FA01-AD,,Filler Adapter,asgard-fa01-ad,Filler Adapter,,,,,seed,catalog SKU not found
+schematic_seed,unmapped,Asgard,,FBHE-AD,,Extendable Flat Box Handle with Brake,asgard-fbhe-ad,Extendable Flat Box Handle with Brake,,,,,seed,catalog SKU not found
+schematic_seed,unmapped,Asgard,,FH-AD,,Fiberglass Handle,asgard-fh-ad,Fiberglass Handle,,,,,seed,catalog SKU not found
+schematic_seed,unmapped,Asgard,,GN01-AD,,Gooseneck,asgard-gn01-ad,Gooseneck,,,,,seed,catalog SKU not found
+schematic_seed,unmapped,Asgard,,LP01-AD,,Compound Loading Pump,asgard-lp01-ad,Compound Loading Pump,,,,,seed,catalog SKU not found
+schematic_seed,unmapped,Asgard,,NS03-AD,,3″ Nail Spotter,asgard-ns03-ad,3″ Nail Spotter,,,,,seed,catalog SKU not found
+schematic_seed,unmapped,Asgard,,PA07-AD,,7″ Power Assist Finishing Box,asgard-pa07-ad,7″ Power Assist Finishing Box,,,,,seed,catalog SKU not found
+schematic_seed,unmapped,Asgard,,PA10-AD,,10″ Power Assist Finishing Box,asgard-pa10-ad,10″ Power Assist Finishing Box,,,,,seed,catalog SKU not found
+schematic_seed,unmapped,Asgard,,PA12-AD,,12″ Power Assist Finishing Box,asgard-pa12-ad,12″ Power Assist Finishing Box,,,,,seed,catalog SKU not found
+schematic_seed,unmapped,Asgard,,XH-AD,,Extendable Support Handle,asgard-xh-ad,Extendable Support Handle,,,,,seed,catalog SKU not found
+schematic_seed,unmapped,Columbia Tools,,PDDM,,Sander Head,columbia-sander-head,Sander Head,,,,,seed,catalog SKU not found
+schematic_seed,unmapped,Columbia Tools,,COL-TOMAHAWK-SMOOTHING-BLADE,,Tomahawk Smoothing Blades,columbia-tomahawk-smoothing-blades,Tomahawk Smoothing Blades,,,,,seed,catalog SKU not found
+schematic_seed,unmapped,Level5,,7097,,Drive Dog Assembly,level5-7097-drive-dog-assembly,Drive Dog Assembly,,,,,seed,catalog SKU not found
+schematic_seed,unmapped,Level5,,7218,,Taper Wheel Assembly,level5-7218-taper-wheel-assembly,Taper Wheel Assembly,,,,,seed,catalog SKU not found
+schematic_seed,unmapped,Level5,,7293,,Gooser Assembly,level5-7293-gooser-assembly,Gooser Assembly,,,,,seed,catalog SKU not found
+schematic_seed,unmapped,Level5,,7377,,Cover Plate Assembly (Old Style),level5-7377-cover-plate-assembly-old-style,Cover Plate Assembly (Old Style),,,,,seed,catalog SKU not found
+schematic_seed,unmapped,Level5,,9333,,Cutter Chain Assembly,level5-9333-cutter-chain-assembly,Cutter Chain Assembly,,,,,seed,catalog SKU not found
+schematic_seed,unmapped,Platinum Drywall Tools,,PT-CAH,,Corner Applicator Handle,platinum-corner-applicator-handle,Corner Applicator Handle,,,,,seed,catalog SKU not found
+schematic_seed,unmapped,Platinum Drywall Tools,,PT-CF,,Corner Finisher Handle,platinum-corner-finisher-handle,Corner Finisher Handle,,,,,seed,duplicate model belongs to tool route
+schematic_seed,unmapped,Platinum Drywall Tools,,PT-FBH,,Flat Box Handle,platinum-flat-box-handle,Flat Box Handle,,,,,seed,catalog SKU not found
+schematic_seed,unmapped,TapeTech,,80XXTT,,TapeTech Finishing Box Handle Assemblies (80XXTT),tapetech-80xxtt,TapeTech Finishing Box Handle Assemblies (80XXTT),,,,,seed,catalog SKU not found

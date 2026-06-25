@@ -157,6 +157,18 @@
 .ts-value__html :is(p, ul, ol) { margin: 0; }
 .ts-value__html :is(a) { color: var(--ts-blue); text-decoration: underline; text-underline-offset: 0.18em; }
 
+.ts-value__link {
+  color: var(--ts-blue);
+  font-weight: 700;
+  text-decoration: underline;
+  text-decoration-thickness: 1.4px;
+  text-underline-offset: 0.18em;
+}
+
+.ts-value__link:hover {
+  color: #1d4ed8;
+}
+
 .ts-includes-list {
   display: grid;
   gap: 0.42rem;

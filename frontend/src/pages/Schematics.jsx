@@ -1178,6 +1178,7 @@ const ALLOWED_BRANDS = [
   const _initSchematicId = _initParams.get('schematic');
   const _initCategorySlug = _initParams.get('category');
   const _initVariantId = _initParams.get('variant');
+  const _initPage = Math.max(1, Number.parseInt(_initParams.get('page') || '1', 10) || 1);
   const [selectedBrand, setSelectedBrand] = useState(
     () => {
       if (_initBrandSlug) return SLUG_TO_BRAND[_initBrandSlug] ?? null;
@@ -1194,6 +1195,7 @@ const ALLOWED_BRANDS = [
   const [selectedSchematicVariant, setSelectedSchematicVariant] = useState(
     () => _initVariantId ?? null
   );
+  const [currentPage, setCurrentPage] = useState(() => _initPage);
   const [searchQuery, setSearchQuery] = useState('');
 
   // Schematic viewer state
@@ -1273,12 +1275,13 @@ const ALLOWED_BRANDS = [
     if (selectedCategory) params.set('category', selectedCategory);
     if (selectedSchematic) params.set('schematic', selectedSchematic);
     if (selectedSchematicVariant) params.set('variant', selectedSchematicVariant);
+    if (selectedSchematic && currentPage > 1) params.set('page', String(currentPage));
     const depth = (selectedBrand ? 1 : 0) + (selectedCategory ? 1 : 0) + (selectedSchematic ? 1 : 0);
     const isForward = depth > _prevDepthRef.current;
     _prevDepthRef.current = depth;
     const qs = params.toString();
     navigate(qs ? `/schematics?${qs}` : '/schematics', { replace: !isForward });
-  }, [selectedBrand, selectedCategory, selectedSchematic, selectedSchematicVariant, navigate]);
+  }, [selectedBrand, selectedCategory, selectedSchematic, selectedSchematicVariant, currentPage, navigate]);
 
   // Sync URL → state when the user navigates with the browser back/forward buttons.
   // Without this, clicking browser-back changes the URL but not the React state.
@@ -1288,6 +1291,7 @@ const ALLOWED_BRANDS = [
     const categorySlug = params.get('category');
     const schematicId  = params.get('schematic');
     const variantId = params.get('variant');
+    const page = Math.max(1, Number.parseInt(params.get('page') || '1', 10) || 1);
     const newBrand     = brandSlug    ? (SLUG_TO_BRAND[brandSlug] ?? null) : null;
     const newCategory  = categorySlug ?? null;
     const newSchematic = schematicId  ?? null;
@@ -1297,6 +1301,7 @@ const ALLOWED_BRANDS = [
     setSelectedCategory(prev  => prev     === newCategory  ? prev     : newCategory);
     setSelectedSchematic(prev => prev     === newSchematic ? prev     : newSchematic);
     setSelectedSchematicVariant(prev => prev === newVariant ? prev : newVariant);
+    setCurrentPage(prev => prev === page ? prev : page);
   }, [location.search]);
 
   // Schematic data for tools
@@ -3002,8 +3007,6 @@ const ALLOWED_BRANDS = [
   const currentSchematicParts = currentSchematic
     ? applySchematicVariantParts(currentSchematic.parts || [], activeSchematicVariant)
     : [];
-  const [currentPage, setCurrentPage] = useState(1);
-
   useEffect(() => {
     if (!currentSchematic) {
       setSelectedSchematicVariant(null);

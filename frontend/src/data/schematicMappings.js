@@ -7,6 +7,8 @@
  * detail pages to the correct replacement-parts schematic diagram.
  */
 
+import { PRODUCT_SCHEMATIC_LINKS } from './productSchematicLinks.generated.js';
+
 // Defined schematics from Parts.jsx organized by brand
 export const SCHEMATIC_DEFINITIONS = {
   'Columbia Taping Tools': [
@@ -240,6 +242,9 @@ export function getSchematicToProductMap(allProducts) {
  * @returns {string|null} schematic ID (e.g. 'columbia-flat-box') or null
  */
 export function getSchematicIdForProduct(product) {
+  const exactLink = getSchematicLinkForProduct(product, { allowLegacyFallback: false });
+  if (exactLink) return exactLink.schematicId;
+
   if (!product) return null;
 
   const name = (product.name || '').toLowerCase();
@@ -453,6 +458,71 @@ export function getSchematicIdForProduct(product) {
   return null;
 }
 
+function getMetaValue(product, key) {
+  if (!Array.isArray(product?.meta_data)) return '';
+  const entry = product.meta_data.find((item) => item?.key === key);
+  return entry?.value == null ? '' : String(entry.value).trim();
+}
+
+/**
+ * Resolve a product to its exact, catalog-synchronized schematic route.
+ * Variation SKU metadata/generated mappings take precedence over legacy
+ * name-based matching, which remains only as a compatibility fallback.
+ */
+export function getSchematicLinkForProduct(product, { allowLegacyFallback = true } = {}) {
+  if (!product) return null;
+
+  const sku = String(product.sku || product.part_number || '').trim();
+  const generated = sku
+    ? (PRODUCT_SCHEMATIC_LINKS[sku] || PRODUCT_SCHEMATIC_LINKS[sku.toUpperCase()])
+    : null;
+  const metaId = getMetaValue(product, '_dtb_schematic_id');
+  const schematicId = metaId || generated?.schematicId || '';
+
+  if (schematicId) {
+    const definition = Object.values(SCHEMATIC_DEFINITIONS)
+      .flat()
+      .find((item) => item.id === schematicId);
+    const page = getMetaValue(product, '_dtb_schematic_page') || generated?.page || null;
+    const variant = getMetaValue(product, '_dtb_schematic_variant') || generated?.variant || null;
+    const category = getMetaValue(product, '_dtb_schematic_category')
+      || generated?.category
+      || definition?.category
+      || '';
+    const url = getMetaValue(product, '_dtb_schematic_url')
+      || generated?.url
+      || buildSchematicsUrl(schematicId, { category, page, variant });
+
+    return {
+      schematicId,
+      title: generated?.title || definition?.title || 'View schematic diagram',
+      brand: generated?.brand || SCHEMATIC_ID_TO_BRAND[schematicId] || product.brand || '',
+      category,
+      page: page ? Number(page) : null,
+      variant: variant || null,
+      url,
+      exact: true,
+    };
+  }
+
+  if (!allowLegacyFallback) return null;
+  const legacyId = getSchematicIdForProduct(product);
+  if (!legacyId) return null;
+  const definition = Object.values(SCHEMATIC_DEFINITIONS)
+    .flat()
+    .find((item) => item.id === legacyId);
+  return {
+    schematicId: legacyId,
+    title: definition?.title || 'View schematic diagram',
+    brand: SCHEMATIC_ID_TO_BRAND[legacyId] || product.brand || '',
+    category: definition?.category || '',
+    page: null,
+    variant: null,
+    url: buildSchematicsUrl(legacyId, { category: definition?.category || '' }),
+    exact: false,
+  };
+}
+
 /**
  * Builds the URL path for the Parts page pre-selected to a given schematic.
  *
@@ -489,9 +559,15 @@ const SCHEMATIC_ID_TO_BRAND = (() => {
  * @param {string} schematicId  - e.g. 'asgard-at01-ad'
  * @returns {string} URL path   - e.g. '/schematics?brand=asgard&schematic=asgard-at01-ad'
  */
-export function buildSchematicsUrl(schematicId) {
+export function buildSchematicsUrl(schematicId, { category = '', page = null, variant = null } = {}) {
   if (!schematicId) return '/schematics';
   const brand = SCHEMATIC_ID_TO_BRAND[schematicId] || '';
   const slug  = BRAND_TO_SLUG[brand] || '';
-  return `/schematics?brand=${encodeURIComponent(slug)}&schematic=${encodeURIComponent(schematicId)}`;
+  const params = new URLSearchParams();
+  if (slug) params.set('brand', slug);
+  if (category) params.set('category', category);
+  params.set('schematic', schematicId);
+  if (variant) params.set('variant', variant);
+  if (page) params.set('page', String(page));
+  return `/schematics?${params.toString()}`;
 }
