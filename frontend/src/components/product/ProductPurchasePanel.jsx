@@ -1,5 +1,4 @@
 import { Minus, Plus, ShoppingCart } from 'lucide-react';
-import { Link } from 'react-router-dom';
 
 export default function ProductPurchasePanel({
   quantity,
@@ -11,7 +10,6 @@ export default function ProductPurchasePanel({
   isOutOfStock,
   needsVariation,
   hasCompleteSelection,
-  partsUrl,
 }) {
   const handleInputChange = (e) => {
     const val = parseInt(e.target.value, 10);
@@ -65,14 +63,6 @@ export default function ProductPurchasePanel({
           </span>
         </button>
       </div>
-
-      {partsUrl ? (
-        <div className="dtb-pdp-purchase-panel__meta-row">
-          <Link to={partsUrl} className="dtb-pdp-parts-link dtb-pdp-parts-link--desktop">
-            View compatible schematics and parts
-          </Link>
-        </div>
-      ) : null}
     </div>
   );
 }
