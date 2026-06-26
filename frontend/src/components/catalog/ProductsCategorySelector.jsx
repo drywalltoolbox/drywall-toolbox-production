@@ -66,19 +66,22 @@ function ProductCategoryCard({ brand, category, index, onSelectCategory }) {
   const [failedImage, setFailedImage] = useState({ key: '', src: '' });
   const imageKey = `${toBrandSlug(brand)}:${category.key || category.slug || category.name}:${resolvedImage}`;
   const cardImage = failedImage.key === imageKey && failedImage.src === resolvedImage ? '' : resolvedImage;
+  const isAllProducts = Boolean(category?.isAllProducts);
+  const cardClassName = `product-category-card${cardImage ? '' : ' product-category-card--no-image'}${isAllProducts ? ' product-category-card--all-products' : ''}`;
+  const imageClassName = `product-category-card__image${isAllProducts ? ' product-category-card__image--logo' : ''}`;
 
   return (
     <button
       type="button"
-      className={`product-category-card${cardImage ? '' : ' product-category-card--no-image'}`}
+      className={cardClassName}
       style={{ animationDelay: `${(index + 1) * 0.07}s` }}
       onClick={() => onSelectCategory(category)}
     >
       {cardImage && (
         <img
           src={cardImage}
-          alt={category.name}
-          className="product-category-card__image"
+          alt={isAllProducts ? `${brand} logo` : category.name}
+          className={imageClassName}
           onError={() => setFailedImage({ key: imageKey, src: resolvedImage })}
         />
       )}
