@@ -200,14 +200,14 @@ add_action(
 		}
 
 		if ( $plain_text ) {
-			echo "\nTrack your order: " . esc_url_raw( $url ) . "\n"; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+			echo "\nTrack Order: " . esc_url_raw( $url ) . "\n"; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 			return;
 		}
 
-		echo '<div style="margin:24px 0;padding:20px;border:1px solid #dbe4f0;border-radius:16px;background:#f8fafc;">';
-		echo '<p style="margin:0 0 12px;font-size:15px;line-height:1.55;color:#334155;">Track your order status, payment state, and shipping updates from your Drywall Toolbox order page.</p>';
-		echo '<a href="' . esc_url( $url ) . '" style="display:inline-block;padding:12px 18px;border-radius:12px;background:#2563eb;color:#ffffff;font-weight:800;text-decoration:none;">Track Order</a>';
-		echo '</div>';
+		echo '<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin:26px 0 22px;border-collapse:separate;">';
+		echo '<tr><td align="center" style="padding:0;">';
+		echo '<a href="' . esc_url( $url ) . '" style="display:block;width:100%;box-sizing:border-box;padding:16px 22px;border-radius:16px;background:#2563eb;color:#ffffff;font-family:-apple-system,BlinkMacSystemFont,\'Segoe UI\',Arial,sans-serif;font-size:16px;font-weight:800;line-height:22px;text-align:center;text-decoration:none;box-shadow:0 14px 28px rgba(37,99,235,0.24);">Track Order</a>';
+		echo '</td></tr></table>';
 	},
 	20,
 	4
