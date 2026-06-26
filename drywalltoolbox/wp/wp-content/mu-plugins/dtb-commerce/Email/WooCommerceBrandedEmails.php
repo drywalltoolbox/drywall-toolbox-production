@@ -25,6 +25,9 @@ function dtb_commerce_init_wc_branded_emails(): void {
 
 	add_action( 'woocommerce_email_header', 'DTB\\Commerce\\Email\\dtb_commerce_wc_email_header_capture', 1 );
 	add_action( 'woocommerce_email_footer', 'DTB\\Commerce\\Email\\dtb_commerce_wc_email_footer_wrap', 999 );
+	add_filter( 'woocommerce_email_order_items_args', 'DTB\\Commerce\\Email\\dtb_commerce_wc_email_order_items_args', 20, 1 );
+	add_filter( 'woocommerce_order_item_thumbnail', 'DTB\\Commerce\\Email\\dtb_commerce_wc_email_order_item_thumbnail', 20, 2 );
+	add_filter( 'woocommerce_order_item_name', 'DTB\\Commerce\\Email\\dtb_commerce_wc_email_order_item_name', 20, 3 );
 }
 add_action( 'init', 'DTB\\Commerce\\Email\\dtb_commerce_init_wc_branded_emails' );
 
@@ -73,7 +76,7 @@ function dtb_commerce_wc_email_footer_wrap(): void {
 	$heading    = $dtb_wc_email_capture['heading'] ?? '';
 	$user_email = '';
 
-	// Extract order from WC email object
+	// Extract order from WC email object.
 	if ( is_object( $email ) && isset( $email->object ) && is_a( $email->object, 'WC_Order' ) ) {
 		$order      = $email->object;
 		$order_id   = $order->get_id();
@@ -105,6 +108,119 @@ function dtb_commerce_wc_email_footer_wrap(): void {
 }
 
 /**
+ * Determine whether WooCommerce is currently rendering a customer email captured
+ * by the branded wrapper.
+ *
+ * @return bool
+ */
+function dtb_commerce_is_rendering_branded_wc_email(): bool {
+	global $dtb_wc_email_capture;
+
+	return ! empty( $dtb_wc_email_capture['start'] ) && dtb_commerce_should_brand_current_email();
+}
+
+/**
+ * Normalize WooCommerce email item rendering so thumbnails are present and sized
+ * consistently before the HTML is wrapped by the branded shell.
+ *
+ * @param mixed $args WooCommerce email order item args.
+ * @return mixed
+ */
+function dtb_commerce_wc_email_order_items_args( $args ) {
+	if ( ! is_array( $args ) || ! dtb_commerce_is_rendering_branded_wc_email() || ! empty( $args['plain_text'] ) ) {
+		return $args;
+	}
+
+	$args['show_image'] = true;
+	$args['image_size'] = [ 58, 58 ];
+
+	return $args;
+}
+
+/**
+ * Resolve a stable product thumbnail URL for a WooCommerce order item.
+ *
+ * @param mixed $item Order item.
+ * @return string
+ */
+function dtb_commerce_get_order_item_thumbnail_url( $item ): string {
+	if ( ! is_object( $item ) || ! method_exists( $item, 'get_product' ) ) {
+		return '';
+	}
+
+	$product = $item->get_product();
+	if ( ! $product instanceof \WC_Product ) {
+		return '';
+	}
+
+	$image_id = (int) $product->get_image_id();
+
+	if ( ! $image_id && $product->is_type( 'variation' ) && function_exists( 'wc_get_product' ) ) {
+		$parent_id = (int) $product->get_parent_id();
+		$parent    = $parent_id > 0 ? wc_get_product( $parent_id ) : null;
+		if ( $parent instanceof \WC_Product ) {
+			$image_id = (int) $parent->get_image_id();
+		}
+	}
+
+	$url = $image_id > 0 ? wp_get_attachment_image_url( $image_id, 'woocommerce_thumbnail' ) : '';
+	if ( ! $url && function_exists( 'wc_placeholder_img_src' ) ) {
+		$url = wc_placeholder_img_src( 'woocommerce_thumbnail' );
+	}
+
+	return $url ? esc_url_raw( $url ) : '';
+}
+
+/**
+ * Replace WooCommerce's default stacked thumbnail markup with a two-column
+ * product cell shell so thumbnail, name, quantity, and price align cleanly.
+ *
+ * @param string $image Default image markup.
+ * @param mixed  $item  Order item.
+ * @return string
+ */
+function dtb_commerce_wc_email_order_item_thumbnail( $image, $item ): string {
+	if ( ! dtb_commerce_is_rendering_branded_wc_email() ) {
+		return (string) $image;
+	}
+
+	$src = dtb_commerce_get_order_item_thumbnail_url( $item );
+	if ( '' === $src ) {
+		return '';
+	}
+
+	$name = is_object( $item ) && method_exists( $item, 'get_name' ) ? (string) $item->get_name() : 'Product image';
+	$alt  = sprintf( '%s thumbnail', wp_strip_all_tags( $name ) );
+
+	return '<table class="dtb-email-product-cell" role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="width:100%;border-collapse:collapse;border-spacing:0;"><tr>'
+		. '<td class="dtb-email-product-thumb" width="70" valign="middle" style="width:70px;min-width:70px;padding:0 14px 0 0;vertical-align:middle;">'
+		. '<img src="' . esc_url( $src ) . '" width="58" height="58" alt="' . esc_attr( $alt ) . '" style="display:block;width:58px;height:58px;max-width:58px;border:1px solid #e2e8f0;border-radius:10px;background:#ffffff;object-fit:contain;">'
+		. '</td><td class="dtb-email-product-copy" valign="middle" style="padding:0;vertical-align:middle;text-align:left;">';
+}
+
+/**
+ * Close the custom product cell around the order item name.
+ *
+ * @param string $item_name Rendered item name.
+ * @param mixed  $item      Order item.
+ * @param bool   $is_visible Whether the product is visible.
+ * @return string
+ */
+function dtb_commerce_wc_email_order_item_name( $item_name, $item, $is_visible ): string {
+	if ( ! dtb_commerce_is_rendering_branded_wc_email() ) {
+		return (string) $item_name;
+	}
+
+	$rendered_name = '<span class="dtb-email-product-name" style="display:block;color:#0f172a;font-family:-apple-system,BlinkMacSystemFont,\'Segoe UI\',Arial,sans-serif;font-size:15px;font-weight:700;line-height:21px;text-align:left;">' . wp_kses_post( (string) $item_name ) . '</span>';
+
+	if ( '' === dtb_commerce_get_order_item_thumbnail_url( $item ) ) {
+		return $rendered_name;
+	}
+
+	return $rendered_name . '</td></tr></table>';
+}
+
+/**
  * Determine if the current email should be branded.
  *
  * @return bool
@@ -116,7 +232,7 @@ function dtb_commerce_should_brand_current_email(): bool {
 		return false;
 	}
 
-	// Only brand customer-facing emails
+	// Only brand customer-facing emails.
 	$customer_emails = [
 		'customer_processing_order',
 		'customer_completed_order',
@@ -134,7 +250,7 @@ function dtb_commerce_should_brand_current_email(): bool {
 /**
  * Get email configuration based on email type and order.
  *
- * @param string        $email_id Email ID.
+ * @param string         $email_id Email ID.
  * @param \WC_Order|null $order    Order object.
  * @return array<string,mixed>
  */
