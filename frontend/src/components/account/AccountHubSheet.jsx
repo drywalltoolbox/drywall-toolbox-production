@@ -197,6 +197,10 @@ export default function AccountHubSheet({ isOpen, onClose, user, onLogout }) {
   }, [isOpen, closeSheet]);
 
   const displayName = useMemo(() => [user?.first_name, user?.last_name].filter(Boolean).join(' ') || user?.display_name || 'My Account', [user]);
+  const firstName = useMemo(() => {
+    const preferredName = user?.first_name || user?.display_name || user?.name || displayName;
+    return String(preferredName).trim().split(/\s+/)[0] || 'there';
+  }, [displayName, user]);
   const activity = useMemo(() => buildAccountActivity({ orders, repairs, returns }), [orders, repairs, returns]);
   const historyErrorText = useMemo(() => Object.values(historyErrors).filter(Boolean).join(' '), [historyErrors]);
   const allHistoryFailed = Boolean(historyErrorText) && activity.length === 0;
@@ -223,8 +227,7 @@ export default function AccountHubSheet({ isOpen, onClose, user, onLogout }) {
             <div className="account-hub__panel account-hub__panel--home">
               <AccountHubHero
                 eyebrow="Account overview"
-                title={`Welcome back, ${displayName}`}
-                subtitle="Orders, service activity, and recently viewed tools."
+                title={`Welcome back, ${firstName}`}
                 Icon={Home}
               />
               <div className="account-hub__home-header">
