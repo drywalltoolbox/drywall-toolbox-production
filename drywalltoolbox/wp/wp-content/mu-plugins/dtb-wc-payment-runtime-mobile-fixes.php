@@ -1,8 +1,8 @@
 <?php
 /**
  * Plugin Name: DTB WooCommerce Payment Runtime Mobile Fixes
- * Description: Loads mobile-specific order-pay card-field rendering safeguards after the primary DTB payment runtime stylesheet.
- * Version: 1.0.0
+ * Description: Loads mobile-specific order-pay card-field rendering safeguards after the primary DTB payment runtime assets.
+ * Version: 1.1.0
  * Author: Drywall Toolbox
  */
 
@@ -15,20 +15,39 @@ add_action(
 			return;
 		}
 
-		$asset_dir  = __DIR__ . '/dtb-platform/assets';
-		$asset_url  = plugin_dir_url( __FILE__ ) . 'dtb-platform/assets';
-		$style_path = $asset_dir . '/payment-runtime-mobile-fixes.css';
+		$asset_dir = __DIR__ . '/dtb-platform/assets';
+		$asset_url = plugin_dir_url( __FILE__ ) . 'dtb-platform/assets';
 
-		if ( ! file_exists( $style_path ) ) {
-			return;
+		$style_path = $asset_dir . '/payment-runtime-mobile-fixes.css';
+		if ( file_exists( $style_path ) ) {
+			wp_enqueue_style(
+				'dtb-payment-runtime-mobile-fixes',
+				$asset_url . '/payment-runtime-mobile-fixes.css',
+				[ 'dtb-payment-runtime' ],
+				(string) filemtime( $style_path )
+			);
 		}
 
-		wp_enqueue_style(
-			'dtb-payment-runtime-mobile-fixes',
-			$asset_url . '/payment-runtime-mobile-fixes.css',
-			[ 'dtb-payment-runtime' ],
-			(string) filemtime( $style_path )
-		);
+		$sheet_style_path = $asset_dir . '/payment-runtime-mobile-sheet.css';
+		if ( file_exists( $sheet_style_path ) ) {
+			wp_enqueue_style(
+				'dtb-payment-runtime-mobile-sheet',
+				$asset_url . '/payment-runtime-mobile-sheet.css',
+				[ 'dtb-payment-runtime-mobile-fixes' ],
+				(string) filemtime( $sheet_style_path )
+			);
+		}
+
+		$sheet_script_path = $asset_dir . '/payment-runtime-mobile-sheet.js';
+		if ( file_exists( $sheet_script_path ) ) {
+			wp_enqueue_script(
+				'dtb-payment-runtime-mobile-sheet',
+				$asset_url . '/payment-runtime-mobile-sheet.js',
+				[ 'dtb-payment-runtime' ],
+				(string) filemtime( $sheet_script_path ),
+				true
+			);
+		}
 	},
 	20
 );
