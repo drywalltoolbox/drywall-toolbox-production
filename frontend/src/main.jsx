@@ -23,6 +23,7 @@ import './styles/mobile-liquid-typography.css'
 import './styles/order-item-images.css'
 import './styles/product-compatible-schematics-cleanup.css'
 import App from './App.jsx'
+import './components/catalog/products-selector-overrides.css'
 import ErrorBoundary from './components/errors/ErrorBoundary.jsx'
 import { joinRuntimeAssetUrl } from './setWebpackPublicPath.js'
 import { installSchematicPageLabelRuntime } from './utils/schematicPageLabelRuntime.js'
@@ -79,23 +80,12 @@ if (process.env.NODE_ENV === 'production' && 'serviceWorker' in navigator) {
 
   window.addEventListener('load', () => {
     if (enableServiceWorker) {
-      const swUrl = joinRuntimeAssetUrl('service-worker.js');
-      navigator.serviceWorker
-        .register(swUrl)
-        .catch(() => {
-          // SW registration failures are non-fatal.
-        });
+      navigator.serviceWorker.register(joinRuntimeAssetUrl('/service-worker.js')).catch(() => {});
       return;
     }
 
     navigator.serviceWorker.getRegistrations()
-      .then((registrations) => {
-        registrations.forEach((registration) => {
-          registration.unregister();
-        });
-      })
-      .catch(() => {
-        // SW cleanup failures are non-fatal.
-      });
+      .then((registrations) => Promise.all(registrations.map((registration) => registration.unregister())))
+      .catch(() => {});
   });
 }
