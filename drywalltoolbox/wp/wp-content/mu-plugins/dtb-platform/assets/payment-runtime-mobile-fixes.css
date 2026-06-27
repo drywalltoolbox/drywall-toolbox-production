@@ -1,0 +1,125 @@
+/* Mobile order-pay runtime hardening for WooPayments/Stripe card fields. */
+.dtb-payment-runtime #payment ul.payment_methods,
+.dtb-payment-runtime #payment ul.payment_methods li,
+.dtb-payment-runtime #payment .payment_box,
+.dtb-payment-runtime #payment .wc-payment-form,
+.dtb-payment-runtime #payment .wcpay-upe-form,
+.dtb-payment-runtime #payment .wcpay-upe-element,
+.dtb-payment-runtime #payment .StripeElement,
+.dtb-payment-runtime #payment [id*="wcpay"],
+.dtb-payment-runtime #payment [id*="stripe"] {
+	min-width: 0 !important;
+	max-width: 100% !important;
+}
+
+.dtb-payment-runtime #payment ul.payment_methods li.is-active > .payment_box:not(.dtb-payment-box-empty),
+.dtb-payment-runtime #payment ul.payment_methods li.payment_method_woocommerce_payments.is-active > .payment_box,
+.dtb-payment-runtime #payment ul.payment_methods li.payment_method_stripe.is-active > .payment_box {
+	display: block !important;
+	visibility: visible !important;
+	opacity: 1 !important;
+	inline-size: 100% !important;
+	width: 100% !important;
+	height: auto !important;
+	overflow: visible !important;
+}
+
+.dtb-payment-runtime #payment .payment_method_woocommerce_payments .payment_box,
+.dtb-payment-runtime #payment .payment_method_stripe .payment_box {
+	box-sizing: border-box !important;
+	padding: 16px !important;
+}
+
+.dtb-payment-runtime #payment .wc-payment-form,
+.dtb-payment-runtime #payment .wcpay-upe-form,
+.dtb-payment-runtime #payment .wcpay-upe-element,
+.dtb-payment-runtime #payment .StripeElement,
+.dtb-payment-runtime #payment .wc-stripe-elements-field,
+.dtb-payment-runtime #payment .wc-stripe-card-element,
+.dtb-payment-runtime #payment #wcpay-card-element,
+.dtb-payment-runtime #payment #wcpay-payment-element,
+.dtb-payment-runtime #payment [data-testid*="card"],
+.dtb-payment-runtime #payment [class*="card-element" i] {
+	display: block !important;
+	box-sizing: border-box !important;
+	inline-size: 100% !important;
+	width: 100% !important;
+	min-height: 56px !important;
+	height: auto !important;
+	overflow: visible !important;
+	background: #fff !important;
+}
+
+.dtb-payment-runtime #payment .wcpay-upe-element,
+.dtb-payment-runtime #payment .StripeElement,
+.dtb-payment-runtime #payment .wc-stripe-elements-field,
+.dtb-payment-runtime #payment .wc-stripe-card-element,
+.dtb-payment-runtime #payment #wcpay-card-element {
+	border: 1px solid #b8c7da !important;
+	border-radius: 12px !important;
+	padding: 12px !important;
+}
+
+.dtb-payment-runtime #payment .payment_box iframe,
+.dtb-payment-runtime #payment .wc-payment-form iframe,
+.dtb-payment-runtime #payment .wcpay-upe-form iframe,
+.dtb-payment-runtime #payment .wcpay-upe-element iframe,
+.dtb-payment-runtime #payment .StripeElement iframe,
+.dtb-payment-runtime #payment iframe[name^="__privateStripeFrame"] {
+	display: block !important;
+	inline-size: 100% !important;
+	width: 100% !important;
+	min-width: 100% !important;
+	max-width: 100% !important;
+	min-height: 46px !important;
+	height: 46px !important;
+	border: 0 !important;
+	background: transparent !important;
+}
+
+.dtb-payment-runtime #payment .wcpay-upe-element:empty,
+.dtb-payment-runtime #payment .StripeElement:empty,
+.dtb-payment-runtime #payment .wc-stripe-elements-field:empty {
+	min-height: 56px !important;
+}
+
+@media (max-width: 640px) {
+	.dtb-payment-runtime .dtb-payment-shell {
+		padding-bottom: calc(22px + env(safe-area-inset-bottom)) !important;
+	}
+
+	.dtb-payment-runtime #payment,
+	.dtb-payment-runtime .woocommerce-checkout-payment {
+		inline-size: auto !important;
+		max-width: none !important;
+		overflow: visible !important;
+	}
+
+	.dtb-payment-runtime #payment ul.payment_methods {
+		display: flex !important;
+		flex-direction: column !important;
+		align-items: stretch !important;
+	}
+
+	.dtb-payment-runtime #payment ul.payment_methods li > label {
+		width: 100% !important;
+	}
+
+	.dtb-payment-runtime #payment .payment_method_woocommerce_payments .payment_box,
+	.dtb-payment-runtime #payment .payment_method_stripe .payment_box {
+		margin: 4px 0 2px !important;
+		padding: 14px !important;
+		border-radius: 18px !important;
+	}
+
+	.dtb-payment-runtime #payment .wc-payment-form,
+	.dtb-payment-runtime #payment .wcpay-upe-form,
+	.dtb-payment-runtime #payment .wcpay-upe-element,
+	.dtb-payment-runtime #payment .StripeElement,
+	.dtb-payment-runtime #payment .wc-stripe-elements-field,
+	.dtb-payment-runtime #payment .wc-stripe-card-element,
+	.dtb-payment-runtime #payment #wcpay-card-element {
+		min-height: 58px !important;
+		font-size: 16px !important;
+	}
+}
