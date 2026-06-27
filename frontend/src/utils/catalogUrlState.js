@@ -11,11 +11,11 @@
 
 export const BRAND_TO_SLUG = {
   TapeTech: 'tapetech',
-  'Columbia Tools': 'columbia-tools',
+  'Columbia Tools': 'columbia-taping-tools',
   Asgard: 'asgard',
   SurPro: 'surpro',
   Graco: 'graco',
-  'Platinum Drywall Tools': 'platinum-drywall-tools',
+  'Platinum Drywall Tools': 'platinum',
   'Dura-Stilts': 'dura-stilts',
   'Level 5': 'level5',
 };
@@ -33,7 +33,11 @@ export const BRAND_ALIASES = {
   'columbia-tools': 'Columbia Tools',
   'columbia-taping-tools': 'Columbia Tools',
   Platinum: 'Platinum Drywall Tools',
+  platinum: 'Platinum Drywall Tools',
   PLATINUM: 'Platinum Drywall Tools',
+  'platinum-drywall-tools': 'Platinum Drywall Tools',
+  'Platinum Drywall Tools': 'Platinum Drywall Tools',
+  'platinum drywall tools': 'Platinum Drywall Tools',
   TAPETECH: 'TapeTech',
   'Tape Tech': 'TapeTech',
   'tape tech': 'TapeTech',
@@ -63,6 +67,16 @@ const NORMALIZED_BRAND_ALIASES = Object.fromEntries(
 export const SLUG_TO_BRAND = Object.fromEntries(
   Object.entries(BRAND_TO_SLUG).map(([name, slug]) => [slug, name])
 );
+
+export function isAllProductsCategorySlug(value = '') {
+  const normalized = String(value || '')
+    .trim()
+    .toLowerCase()
+    .replace(/[_\s]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+
+  return ['all-products', 'all-products-category', 'all'].includes(normalized);
+}
 
 // Brand visual assets are owned by frontend/src/utils/brandAssets.js so bundled
 // imports can resolve through Webpack. Keep URL state free of asset imports.
@@ -146,6 +160,8 @@ export function parseCatalogQuery(searchParams, pathParams = {}) {
   // them together which always produces zero results.  If both are present in
   // the URL (e.g. from a stale/shared link), search takes priority and the
   // display_category is silently cleared so the query makes sense.
+  // The synthetic All Products slug is preserved here as view state so the page
+  // can still render the correct heading; lower data layers strip it from API filters.
   const displayCategory = search ? '' : rawDisplayCategory;
 
   return {
@@ -177,8 +193,9 @@ export function buildCatalogUrl(query, pathParams = {}) {
     params.set('brand', query.brands.map((b) => brandToSlug(b)).join(','));
   }
   // Never include display_category and search in the same URL — they are
-  // mutually exclusive.  Search takes priority.
-  if (!pathParams.categorySlug && query.displayCategory && !query.search) {
+  // mutually exclusive.  Search takes priority. The synthetic All Products
+  // selector is only a route/view state and must not become a filter param.
+  if (!pathParams.categorySlug && query.displayCategory && !query.search && !isAllProductsCategorySlug(query.displayCategory)) {
     params.set('display_category', query.displayCategory);
   }
   if (query.category) params.set('category', query.category);
