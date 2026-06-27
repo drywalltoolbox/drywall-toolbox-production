@@ -74,10 +74,6 @@
   color: #0f172a;
 }
 
-.dtb-checkout .dtb-summary-panel button {
-  color: inherit;
-}
-
 .dtb-checkout .dtb-summary-panel > div:first-child {
   padding: 0 !important;
 }

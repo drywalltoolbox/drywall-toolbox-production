@@ -29,7 +29,7 @@ import {
 import DOMPurify from 'dompurify';
 
 import { getCheckoutCapabilities } from '../api/checkout.js';
-import { syncAndPlace } from '../api/cart.js';
+import { syncAndPlace, updateCartCustomer } from '../api/cart.js';
 import { useAuthContext } from '../auth/AuthContext.js';
 import { useCart } from '../context/CartContext';
 import { ESTIMATED_SHIP_RATE, FREE_SHIP_THRESHOLD } from '../constants/shipping';
@@ -50,6 +50,8 @@ const PUBLIC_PAYMENT_LABEL = 'Secure card payment';
 const PUBLIC_PAYMENT_TITLE = 'Secure Card Payment';
 const PAYMENT_LOGO_BASE = `${process.env.PUBLIC_URL || ''}/payment_logos`;
 const SHIPPING_DEBOUNCE_MS = 650;
+const TAX_PREVIEW_DEBOUNCE_MS = 700;
+const TAX_PREVIEW_TIMEOUT_MS = 12000;
 const US_STATES = [
   ['AL', 'Alabama'], ['AK', 'Alaska'], ['AZ', 'Arizona'], ['AR', 'Arkansas'],
   ['CA', 'California'], ['CO', 'Colorado'], ['CT', 'Connecticut'], ['DE', 'Delaware'],
@@ -105,6 +107,42 @@ const cardVariants = {
 function toMoney(value) {
   const n = Number(value);
   return Number.isFinite(n) ? n : 0;
+}
+
+function parseStoreApiAmount(value, minorUnit = 2) {
+  const rawString = String(value ?? '').trim();
+  const raw = typeof value === 'number' ? value : Number(rawString || 0);
+  if (!Number.isFinite(raw)) return 0;
+
+  const parsedMinor = Number(minorUnit);
+  const hasMinorUnit = Number.isFinite(parsedMinor) && parsedMinor >= 0;
+  const hasDecimalPoint = rawString.includes('.');
+
+  if (hasMinorUnit && Number.isInteger(raw) && !hasDecimalPoint) {
+    return raw / (10 ** parsedMinor);
+  }
+
+  return raw > 999 ? raw / 100 : raw;
+}
+
+function resolveTaxPreviewAmount(cart) {
+  const totals = cart?.totals || {};
+  const minorUnit = totals.currency_minor_unit ?? 2;
+  const directTax = parseStoreApiAmount(totals.total_tax, minorUnit);
+  if (directTax > 0) return directTax;
+
+  const itemTax = parseStoreApiAmount(totals.total_items_tax, minorUnit);
+  const shippingTax = parseStoreApiAmount(totals.total_shipping_tax, minorUnit);
+  return itemTax + shippingTax;
+}
+
+function withTimeout(promise, timeoutMs) {
+  let timeoutId;
+  const timeout = new Promise((_, reject) => {
+    timeoutId = window.setTimeout(() => reject(new Error('Tax preview timed out.')), timeoutMs);
+  });
+
+  return Promise.race([promise, timeout]).finally(() => window.clearTimeout(timeoutId));
 }
 
 function isManualPaymentMethod(method) {
@@ -303,14 +341,31 @@ function PendingPaymentBanner({ pendingPayment, onResume, onDismiss }) {
   );
 }
 
-function MobileSummaryStrip({ cartItems, subtotal, shipping, total }) {
+function TaxSummaryValue({ status, amount, compact = false }) {
+  if (status === 'loading') {
+    return <span className="text-right text-xs italic text-slate-400">Calculating...</span>;
+  }
+
+  if (status === 'ready') {
+    return <span className={`font-semibold tabular-nums ${compact ? 'text-slate-800' : 'text-slate-900'}`}>${amount.toFixed(2)}</span>;
+  }
+
+  if (status === 'error') {
+    return <span className="text-right text-xs italic text-slate-400">Calculated at payment</span>;
+  }
+
+  return <span className="text-right text-xs italic text-slate-400">Calculated by address</span>;
+}
+
+function MobileSummaryStrip({ cartItems, subtotal, shipping, total, taxAmount, taxStatus }) {
   const [open, setOpen] = useState(false);
   const totalQty = cartItems.reduce((sum, item) => sum + Number(item.quantity || 0), 0);
+  const displayTotal = total + taxAmount;
   return (
     <Motion.div className="lg:hidden mb-5">
       <button type="button" onClick={() => setOpen((value) => !value)} className="w-full flex items-center justify-between rounded-2xl bg-white border border-slate-200 px-4 py-3 shadow-sm" aria-expanded={open}>
         <span className="flex items-center gap-2.5 text-sm font-bold text-slate-900"><ShoppingBag size={16} className="text-primary-600" />Order Summary<span className="text-xs font-semibold text-slate-400">{totalQty} item{totalQty === 1 ? '' : 's'}</span></span>
-        <span className="flex items-center gap-1.5 text-sm font-black text-primary-600 tabular-nums">${total.toFixed(2)}<ChevronRight className={`h-4 w-4 transition-transform ${open ? 'rotate-90' : ''}`} /></span>
+        <span className="flex items-center gap-1.5 text-sm font-black text-primary-600 tabular-nums">${displayTotal.toFixed(2)}<ChevronRight className={`h-4 w-4 transition-transform ${open ? 'rotate-90' : ''}`} /></span>
       </button>
       <AnimatePresence initial={false}>
         {open && (
@@ -331,10 +386,10 @@ function MobileSummaryStrip({ cartItems, subtotal, shipping, total }) {
                 })}
               </div>
               <div className="px-4 py-3.5 border-t border-slate-100 space-y-1.5 text-xs text-slate-500">
-                {[{ label: 'Subtotal', value: `$${subtotal.toFixed(2)}` }, { label: 'Shipping', value: shipping === 0 ? 'Free' : `$${shipping.toFixed(2)}` }, { label: 'Tax', value: 'Calculated by address' }].map(({ label, value }) => (
-                  <div key={label} className="flex justify-between"><span>{label}</span><span className={`font-semibold tabular-nums ${label === 'Shipping' && shipping === 0 ? 'text-emerald-600' : 'text-slate-800'}`}>{value}</span></div>
-                ))}
-                <div className="flex justify-between pt-2 border-t border-slate-100"><span className="font-bold text-slate-900 text-sm">Est. Total</span><span className="font-black text-primary-600 tabular-nums text-base">${total.toFixed(2)}</span></div>
+                <div className="flex justify-between"><span>Subtotal</span><span className="font-semibold tabular-nums text-slate-800">${subtotal.toFixed(2)}</span></div>
+                <div className="flex justify-between"><span>Shipping</span><span className={`font-semibold tabular-nums ${shipping === 0 ? 'text-emerald-600' : 'text-slate-800'}`}>{shipping === 0 ? 'Free' : `$${shipping.toFixed(2)}`}</span></div>
+                <div className="flex justify-between gap-4"><span>Tax</span><TaxSummaryValue status={taxStatus} amount={taxAmount} compact /></div>
+                <div className="flex justify-between pt-2 border-t border-slate-100"><span className="font-bold text-slate-900 text-sm">Est. Total</span><span className="font-black text-primary-600 tabular-nums text-base">${displayTotal.toFixed(2)}</span></div>
               </div>
             </div>
           </Motion.div>
@@ -344,8 +399,9 @@ function MobileSummaryStrip({ cartItems, subtotal, shipping, total }) {
   );
 }
 
-function DesktopSummaryPanel({ cartItems, subtotal, shipping, total, couponInput, setCouponInput, addManualCoupon, manualCoupons, removeManualCoupon, setupError, processing, canSubmit, submitStatus, onPlaceOrder }) {
+function DesktopSummaryPanel({ cartItems, subtotal, shipping, total, taxAmount, taxStatus, couponInput, setCouponInput, addManualCoupon, manualCoupons, removeManualCoupon, setupError, processing, canSubmit, submitStatus, onPlaceOrder }) {
   const totalQty = cartItems.reduce((sum, item) => sum + Number(item.quantity || 0), 0);
+  const displayTotal = total + taxAmount;
   return (
     <aside className="dtb-summary-panel hidden lg:flex flex-col lg:sticky lg:top-6 lg:self-start overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-[0_2px_16px_rgba(15,23,42,0.06)]">
       <div className="h-[3px] shrink-0 bg-gradient-to-r from-primary-700 via-primary-500 to-primary-600" />
@@ -359,8 +415,8 @@ function DesktopSummaryPanel({ cartItems, subtotal, shipping, total, couponInput
             );
           })}
         </div>
-        <div className="py-5 space-y-2.5 text-sm"><div className="flex justify-between text-slate-500"><span>Subtotal</span><span className="font-semibold text-slate-900 tabular-nums">${subtotal.toFixed(2)}</span></div><div className="flex justify-between text-slate-500"><span>Shipping</span><span className={`font-semibold tabular-nums ${shipping === 0 ? 'text-emerald-600' : 'text-slate-900'}`}>{shipping === 0 ? 'Free' : `$${shipping.toFixed(2)}`}</span></div><div className="flex justify-between gap-4 text-slate-500"><span>Tax</span><span className="text-right text-xs italic text-slate-400">Calculated from shipping address</span></div><div className="flex justify-between items-baseline pt-4 border-t border-slate-100"><span className="font-bold text-slate-900">Est. Total</span><span className="font-black text-2xl text-slate-950 tabular-nums">${total.toFixed(2)}</span></div></div>
-        <div className="mb-5"><label htmlFor="desktop-coupon" className="block text-[10px] font-bold uppercase tracking-[0.13em] text-slate-500 mb-2">Discount Code</label><div className="flex gap-2"><input id="desktop-coupon" type="text" value={couponInput} onChange={(event) => setCouponInput(event.target.value.toUpperCase())} placeholder="ENTER CODE" className="min-w-0 flex-1 rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500/20" /><button type="button" onClick={addManualCoupon} className="rounded-xl bg-slate-900 text-white px-4 py-2.5 text-sm font-bold hover:bg-slate-800 transition-colors">Apply</button></div>{manualCoupons.length > 0 && <div className="mt-3 flex flex-wrap gap-2">{manualCoupons.map((code) => <button key={code} type="button" onClick={() => removeManualCoupon(code)} className="rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-[11px] font-semibold text-emerald-700">{code} ×</button>)}</div>}</div>
+        <div className="py-5 space-y-2.5 text-sm"><div className="flex justify-between text-slate-500"><span>Subtotal</span><span className="font-semibold text-slate-900 tabular-nums">${subtotal.toFixed(2)}</span></div><div className="flex justify-between text-slate-500"><span>Shipping</span><span className={`font-semibold tabular-nums ${shipping === 0 ? 'text-emerald-600' : 'text-slate-900'}`}>{shipping === 0 ? 'Free' : `$${shipping.toFixed(2)}`}</span></div><div className="flex justify-between gap-4 text-slate-500"><span>Tax</span><TaxSummaryValue status={taxStatus} amount={taxAmount} /></div><div className="flex justify-between items-baseline pt-4 border-t border-slate-100"><span className="font-bold text-slate-900">Est. Total</span><span className="font-black text-2xl text-slate-950 tabular-nums">${displayTotal.toFixed(2)}</span></div></div>
+        <div className="mb-5"><label htmlFor="desktop-coupon" className="block text-[10px] font-bold uppercase tracking-[0.13em] text-slate-500 mb-2">Discount Code</label><div className="flex gap-2"><input id="desktop-coupon" type="text" value={couponInput} onChange={(event) => setCouponInput(event.target.value.toUpperCase())} placeholder="ENTER CODE" className="min-w-0 flex-1 rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500/20" /><button type="button" onClick={addManualCoupon} className="inline-flex min-h-[42px] items-center justify-center rounded-xl border border-primary-200 bg-primary-50 px-4 py-2.5 text-sm font-bold text-primary-700 transition-colors hover:border-primary-300 hover:bg-primary-100 focus:outline-none focus:ring-2 focus:ring-primary-500/20">Apply</button></div>{manualCoupons.length > 0 && <div className="mt-3 flex flex-wrap gap-2">{manualCoupons.map((code) => <button key={code} type="button" onClick={() => removeManualCoupon(code)} className="rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-[11px] font-semibold text-emerald-700">{code} ×</button>)}</div>}</div>
         {setupError ? <div className="flex items-start gap-2 rounded-xl border border-amber-200 bg-amber-50 px-3.5 py-3 text-xs leading-relaxed text-amber-800"><AlertTriangle size={14} className="mt-0.5 shrink-0" /><span>{setupError}</span></div> : null}
         <button type="button" onClick={onPlaceOrder} disabled={!canSubmit || processing} className="w-full inline-flex min-h-[48px] items-center justify-center gap-2.5 rounded-xl bg-primary-600 px-5 py-3.5 text-sm font-black text-white shadow-sm transition-all hover:bg-primary-700 disabled:cursor-not-allowed disabled:opacity-50">
           {processing ? <Loader2 size={16} className="animate-spin" /> : null}{processing ? 'Preparing Payment…' : 'Continue to Secure Payment'}
@@ -393,16 +449,19 @@ export default function Checkout() {
   const [selectedRate, setSelectedRate] = useState(null);
   const [ratesLoading, setRatesLoading] = useState(false);
   const [ratesError, setRatesError] = useState(null);
+  const [taxPreview, setTaxPreview] = useState({ status: 'idle', amount: 0 });
   const [pendingPayment, setPendingPayment] = useState(() => readPendingCheckoutPayment());
   const selectedRateRef = useRef(selectedRate);
   const checkoutAttemptIdRef = useRef(pendingPayment?.attemptId || makeCheckoutAttemptId());
   const shippingRequestSeq = useRef(0);
+  const taxRequestSeq = useRef(0);
   selectedRateRef.current = selectedRate;
 
   const processing = submitStatus !== 'idle';
   const subtotal = toMoney(getCartTotal());
   const shipping = selectedRate ? toMoney(selectedRate.price) : (subtotal >= FREE_SHIP_THRESHOLD ? 0 : ESTIMATED_SHIP_RATE);
   const total = toMoney(subtotal + shipping);
+  const taxAmount = taxPreview.status === 'ready' ? toMoney(taxPreview.amount) : 0;
   const isContactComplete = useMemo(() => formData.firstName.trim() !== '' && formData.lastName.trim() !== '' && formData.email.trim() !== '' && formData.phone.trim() !== '', [formData]);
   const isAddressComplete = useMemo(() => formData.address.trim() !== '' && formData.city.trim() !== '' && formData.state.trim() !== '' && formData.zip.trim() !== '', [formData]);
   const isFormComplete = isContactComplete && isAddressComplete;
@@ -457,6 +516,48 @@ export default function Checkout() {
     }, SHIPPING_DEBOUNCE_MS);
     return () => window.clearTimeout(timer);
   }, [fetchShippingRates, formData, isAddressComplete, safeCartItems]);
+
+  useEffect(() => {
+    if (!isAddressComplete) {
+      taxRequestSeq.current += 1;
+      setTaxPreview({ status: 'idle', amount: 0 });
+      return undefined;
+    }
+
+    const requestId = taxRequestSeq.current + 1;
+    taxRequestSeq.current = requestId;
+    const timer = window.setTimeout(async () => {
+      const address = {
+        first_name: formData.firstName,
+        last_name: formData.lastName,
+        address_1: formData.address,
+        address_2: '',
+        city: formData.city,
+        state: formData.state,
+        postcode: formData.zip,
+        country: formData.country || 'US',
+        email: formData.email,
+        phone: formData.phone,
+      };
+
+      setTaxPreview((current) => ({ status: 'loading', amount: current.status === 'ready' ? current.amount : 0 }));
+
+      try {
+        const cart = await withTimeout(
+          updateCartCustomer({ billing_address: address, shipping_address: address }),
+          TAX_PREVIEW_TIMEOUT_MS,
+        );
+        if (requestId !== taxRequestSeq.current) return;
+        setTaxPreview({ status: 'ready', amount: resolveTaxPreviewAmount(cart) });
+      } catch (error) {
+        if (requestId !== taxRequestSeq.current) return;
+        console.warn('Tax preview fetch failed:', error?.message || error);
+        setTaxPreview({ status: 'error', amount: 0 });
+      }
+    }, TAX_PREVIEW_DEBOUNCE_MS);
+
+    return () => window.clearTimeout(timer);
+  }, [formData, isAddressComplete]);
 
   const sanitize = (value) => DOMPurify.sanitize(value, { ALLOWED_TAGS: [] });
   const handleInputChange = (event) => {
@@ -598,7 +699,7 @@ export default function Checkout() {
             <div className="mb-5 flex items-center justify-between"><div className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-[0.18em] text-slate-500"><Lock size={11} />Secure checkout</div>{!isAuthenticated && <Link to="/login" className="text-xs font-semibold text-slate-500 hover:text-primary-600 transition-colors">Sign in</Link>}</div>
             <StepProgress activeStep={processing ? 'review' : isFormComplete ? 'payment' : 'shipping'} />
             <PendingPaymentBanner pendingPayment={pendingPayment} onResume={resumePendingPayment} onDismiss={dismissPendingPayment} />
-            <MobileSummaryStrip cartItems={safeCartItems} subtotal={subtotal} shipping={shipping} total={total} />
+            <MobileSummaryStrip cartItems={safeCartItems} subtotal={subtotal} shipping={shipping} total={total} taxAmount={taxAmount} taxStatus={taxPreview.status} />
             <div className="space-y-4">
               <StepCard delay={0} className="p-5 sm:p-6"><SectionHeader icon={User} title="Contact Information" complete={isContactComplete} /><div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">{[{ name: 'firstName', label: 'First Name', type: 'text', autoComplete: 'given-name' }, { name: 'lastName', label: 'Last Name', type: 'text', autoComplete: 'family-name' }, { name: 'email', label: 'Email Address', type: 'email', autoComplete: 'email' }, { name: 'phone', label: 'Phone', type: 'tel', autoComplete: 'tel', inputMode: 'numeric' }].map(({ name, label, type, autoComplete, inputMode }) => (<div key={name}><label htmlFor={`field-${name}`} className={labelClass}>{label}{requiredMark}</label><input id={`field-${name}`} type={type} name={name} value={formData[name]} onChange={handleInputChange} autoComplete={autoComplete} {...(inputMode ? { inputMode } : {})} className={inputClass(name)} aria-invalid={!!errors[name]} />{errors[name] && <p className="text-red-500 text-[11px] mt-1 font-medium" role="alert">{errors[name]}</p>}</div>))}</div></StepCard>
               <StepCard delay={0.05} className="p-5 sm:p-6"><SectionHeader icon={MapPin} title="Shipping Address" complete={isAddressComplete} /><div className="space-y-3.5"><div><label htmlFor="field-address" className={labelClass}>Street Address{requiredMark}</label><input id="field-address" type="text" name="address" value={formData.address} onChange={handleInputChange} autoComplete="street-address" className={inputClass('address')} aria-invalid={!!errors.address} />{errors.address && <p className="text-red-500 text-[11px] mt-1 font-medium" role="alert">{errors.address}</p>}</div><div className="grid grid-cols-1 sm:grid-cols-[minmax(0,1fr)_minmax(180px,1fr)_140px] gap-3"><div><label htmlFor="field-city" className={labelClass}>City{requiredMark}</label><input id="field-city" type="text" name="city" value={formData.city} onChange={handleInputChange} autoComplete="address-level2" className={inputClass('city')} aria-invalid={!!errors.city} />{errors.city && <p className="text-red-500 text-[11px] mt-1 font-medium" role="alert">{errors.city}</p>}</div><div><label htmlFor="field-state" className={labelClass}>State{requiredMark}</label><select id="field-state" name="state" value={formData.state} onChange={handleInputChange} autoComplete="address-level1" className={inputClass('state')} aria-invalid={!!errors.state}><option value="">Select state</option>{US_STATES.map(([code, name]) => <option key={code} value={code}>{name} ({code})</option>)}</select>{errors.state && <p className="text-red-500 text-[11px] mt-1 font-medium" role="alert">{errors.state}</p>}</div><div><label htmlFor="field-zip" className={labelClass}>ZIP Code{requiredMark}</label><input id="field-zip" type="text" name="zip" value={formData.zip} onChange={handleInputChange} autoComplete="postal-code" inputMode="numeric" className={inputClass('zip')} aria-invalid={!!errors.zip} />{errors.zip && <p className="text-red-500 text-[11px] mt-1 font-medium" role="alert">{errors.zip}</p>}</div></div>{subtotal > 0 && subtotal < FREE_SHIP_THRESHOLD && <div className="flex items-center gap-2 rounded-xl bg-primary-50 border border-primary-100 px-4 py-2.5 text-xs text-primary-700"><Truck size={13} className="shrink-0" /><span>Spend <strong>${(FREE_SHIP_THRESHOLD - subtotal).toFixed(2)}</strong> more for free shipping</span></div>}</div></StepCard>
@@ -610,7 +711,7 @@ export default function Checkout() {
             </div>
           </div>
         </div>
-        <DesktopSummaryPanel cartItems={safeCartItems} subtotal={subtotal} shipping={shipping} total={total} couponInput={couponInput} setCouponInput={setCouponInput} addManualCoupon={addManualCoupon} manualCoupons={manualCoupons} removeManualCoupon={removeManualCoupon} setupError={paymentSetupError} processing={processing} canSubmit={canSubmitCheckout} submitStatus={submitStatus} onPlaceOrder={handlePlaceOrder} />
+        <DesktopSummaryPanel cartItems={safeCartItems} subtotal={subtotal} shipping={shipping} total={total} taxAmount={taxAmount} taxStatus={taxPreview.status} couponInput={couponInput} setCouponInput={setCouponInput} addManualCoupon={addManualCoupon} manualCoupons={manualCoupons} removeManualCoupon={removeManualCoupon} setupError={paymentSetupError} processing={processing} canSubmit={canSubmitCheckout} submitStatus={submitStatus} onPlaceOrder={handlePlaceOrder} />
         </div>
       </div>
     </div>

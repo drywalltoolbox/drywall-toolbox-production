@@ -35,10 +35,8 @@ import { installSchematicPageLabelRuntime } from './utils/schematicPageLabelRunt
 // visible product grid render on a cold device.
 import { prewarmCatalog } from './services/catalog.js';
 import { prewarmCatalogPlatformForCurrentRoute } from './services/catalogPlatformCache.js';
-import { installCheckoutTaxPreviewRuntime } from './services/checkoutTaxPreviewRuntime.js';
 
 installSchematicPageLabelRuntime();
-installCheckoutTaxPreviewRuntime();
 prewarmCatalogPlatformForCurrentRoute();
 
 if (typeof window !== 'undefined') {
