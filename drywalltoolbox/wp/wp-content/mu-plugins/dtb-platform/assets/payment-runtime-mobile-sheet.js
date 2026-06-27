@@ -1,8 +1,7 @@
 (function () {
   var MOBILE_QUERY = '(max-width: 640px)';
   var state = {
-    open: false,
-    initialized: false
+    open: false
   };
 
   function isMobilePaymentRuntime() {
@@ -23,8 +22,8 @@
 
   function activePaymentRow() {
     var methods = paymentMethods();
-    if (!methods) return null;
-    return methods.querySelector('li input[type="radio"]:checked')?.closest('li') || methods.querySelector('li');
+    var checked = methods ? methods.querySelector('li input[type="radio"]:checked') : null;
+    return checked ? checked.closest('li') : (methods ? methods.querySelector('li') : null);
   }
 
   function selectedPaymentLabel() {
@@ -122,7 +121,7 @@
     window.setTimeout(function () {
       var firstChecked = root.querySelector('input[type="radio"]:checked');
       var activeRow = firstChecked && firstChecked.closest('li');
-      var focusTarget = activeRow?.querySelector('label') || root.querySelector('label, button, input:not([type="hidden"]), iframe');
+      var focusTarget = (activeRow && activeRow.querySelector('label')) || root.querySelector('label, button, input:not([type="hidden"]), iframe');
       if (focusTarget && typeof focusTarget.focus === 'function' && focusTarget.tagName !== 'IFRAME') {
         focusTarget.focus({ preventScroll: true });
       }
@@ -185,8 +184,10 @@
     }
 
     root.classList.add('dtb-mobile-payment-sheet');
-    ensureToggle().hidden = false;
-    ensureBackdrop().hidden = false;
+    var toggle = ensureToggle();
+    if (toggle) toggle.hidden = false;
+    var backdrop = ensureBackdrop();
+    if (backdrop) backdrop.hidden = false;
     ensureCloseButton();
     prepareRows();
 
@@ -211,10 +212,7 @@
 
   document.addEventListener('change', function (event) {
     if (!event.target || !event.target.matches('#payment input[type="radio"]')) return;
-    window.setTimeout(function () {
-      updateToggle();
-      if (isMobilePaymentRuntime()) closeSheet();
-    }, 180);
+    window.setTimeout(updateToggle, 120);
   });
 
   document.addEventListener('keydown', function (event) {
