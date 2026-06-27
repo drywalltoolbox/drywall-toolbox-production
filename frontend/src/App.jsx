@@ -1,5 +1,5 @@
 import { BrowserRouter as Router, Routes, Route, useLocation, Navigate, useNavigate } from 'react-router-dom';
-import { useState, useEffect, useLayoutEffect, lazy, Suspense, useCallback } from 'react';
+import { useState, useEffect, useLayoutEffect, lazy, Suspense, useCallback, useRef } from 'react';
 import PageTransition from './components/routing/PageTransition';
 import LoadingSpinner from './components/shared/LoadingSpinner';
 import { CartProvider } from './context/CartContext';
@@ -107,7 +107,8 @@ function PageLoader() {
 }
 
 function ScrollToTop() {
-  const { pathname, hash } = useLocation();
+  const location = useLocation();
+  const lastRouteRef = useRef('');
 
   useEffect(() => {
     if (typeof window === 'undefined' || !('scrollRestoration' in window.history)) {
@@ -125,11 +126,30 @@ function ScrollToTop() {
   useLayoutEffect(() => {
     if (typeof window === 'undefined') return undefined;
 
+    const routeKey = `${location.pathname}${location.search}${location.hash}`;
+    if (lastRouteRef.current === routeKey) return undefined;
+    lastRouteRef.current = routeKey;
+
+    let cancelled = false;
+    const timeoutIds = [];
+    const frameIds = [];
+
+    const scrollNestedContainers = () => {
+      document.querySelectorAll('[data-route-scroll-container], [data-scroll-container], .overflow-y-auto, .overflow-auto').forEach((element) => {
+        if (!(element instanceof HTMLElement)) return;
+        const style = window.getComputedStyle(element);
+        if (!/(auto|scroll)/.test(`${style.overflowY} ${style.overflow}`)) return;
+        element.scrollTop = 0;
+      });
+    };
+
     const scrollToRouteStart = () => {
-      if (hash) {
-        const target = document.getElementById(decodeURIComponent(hash.slice(1)));
+      if (cancelled) return;
+
+      if (location.hash) {
+        const target = document.getElementById(decodeURIComponent(location.hash.slice(1)));
         if (target) {
-          target.scrollIntoView({ block: 'start', behavior: 'auto' });
+          target.scrollIntoView({ block: 'start', inline: 'nearest', behavior: 'auto' });
           return;
         }
       }
@@ -137,19 +157,27 @@ function ScrollToTop() {
       window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
       document.documentElement.scrollTop = 0;
       document.body.scrollTop = 0;
+      scrollNestedContainers();
+    };
 
-      document.querySelectorAll('[data-route-scroll-container]').forEach((element) => {
-        element.scrollTop = 0;
-      });
+    const scheduleFrame = () => {
+      const frameId = window.requestAnimationFrame(scrollToRouteStart);
+      frameIds.push(frameId);
     };
 
     scrollToRouteStart();
-    const frame = window.requestAnimationFrame(scrollToRouteStart);
+    scheduleFrame();
+    timeoutIds.push(window.setTimeout(scrollToRouteStart, 60));
+    timeoutIds.push(window.setTimeout(scheduleFrame, 140));
+    timeoutIds.push(window.setTimeout(scrollToRouteStart, 320));
+    timeoutIds.push(window.setTimeout(scrollToRouteStart, 650));
 
     return () => {
-      window.cancelAnimationFrame(frame);
+      cancelled = true;
+      frameIds.forEach((frameId) => window.cancelAnimationFrame(frameId));
+      timeoutIds.forEach((timeoutId) => window.clearTimeout(timeoutId));
     };
-  }, [pathname, hash]);
+  }, [location.pathname, location.search, location.hash, location.key]);
 
   return null;
 }
@@ -182,7 +210,7 @@ function AppRoutes() {
   const rewardsEnabled = isRewardsEnabled();
   const productSelectorElement = <Products title="Products" isPartsFilter={0} />;
   return (
-    <PageTransition locationKey={location.pathname}>
+    <PageTransition locationKey={`${location.pathname}${location.search}`}>
       <Suspense fallback={<PageLoader />}>
         <Routes>
           <Route path="/" element={<Home />} />
