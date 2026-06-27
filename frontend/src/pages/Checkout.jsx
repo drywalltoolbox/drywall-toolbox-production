@@ -28,8 +28,8 @@ import {
 } from 'lucide-react';
 import DOMPurify from 'dompurify';
 
-import { getCheckoutCapabilities } from '../api/checkout.js';
-import { syncAndPlace, updateCartCustomer } from '../api/cart.js';
+import { getCheckoutCapabilities, previewCheckoutTax } from '../api/checkout.js';
+import { buildCheckoutLineItems, syncAndPlace } from '../api/cart.js';
 import { useAuthContext } from '../auth/AuthContext.js';
 import { useCart } from '../context/CartContext';
 import { ESTIMATED_SHIP_RATE, FREE_SHIP_THRESHOLD } from '../constants/shipping';
@@ -107,33 +107,6 @@ const cardVariants = {
 function toMoney(value) {
   const n = Number(value);
   return Number.isFinite(n) ? n : 0;
-}
-
-function parseStoreApiAmount(value, minorUnit = 2) {
-  const rawString = String(value ?? '').trim();
-  const raw = typeof value === 'number' ? value : Number(rawString || 0);
-  if (!Number.isFinite(raw)) return 0;
-
-  const parsedMinor = Number(minorUnit);
-  const hasMinorUnit = Number.isFinite(parsedMinor) && parsedMinor >= 0;
-  const hasDecimalPoint = rawString.includes('.');
-
-  if (hasMinorUnit && Number.isInteger(raw) && !hasDecimalPoint) {
-    return raw / (10 ** parsedMinor);
-  }
-
-  return raw > 999 ? raw / 100 : raw;
-}
-
-function resolveTaxPreviewAmount(cart) {
-  const totals = cart?.totals || {};
-  const minorUnit = totals.currency_minor_unit ?? 2;
-  const directTax = parseStoreApiAmount(totals.total_tax, minorUnit);
-  if (directTax > 0) return directTax;
-
-  const itemTax = parseStoreApiAmount(totals.total_items_tax, minorUnit);
-  const shippingTax = parseStoreApiAmount(totals.total_shipping_tax, minorUnit);
-  return itemTax + shippingTax;
 }
 
 function withTimeout(promise, timeoutMs) {
@@ -543,12 +516,23 @@ export default function Checkout() {
       setTaxPreview((current) => ({ status: 'loading', amount: current.status === 'ready' ? current.amount : 0 }));
 
       try {
-        const cart = await withTimeout(
-          updateCartCustomer({ billing_address: address, shipping_address: address }),
+        const shippingLines = selectedRate ? [{
+          method_id: `dtb_veeqo_rates`,
+          method_title: selectedRate.name || 'Shipping',
+          total: String(toMoney(selectedRate.price)),
+        }] : [];
+        const preview = await withTimeout(
+          previewCheckoutTax({
+            billing: address,
+            shipping: address,
+            line_items: buildCheckoutLineItems(safeCartItems),
+            shipping_lines: shippingLines,
+            coupon_codes: manualCoupons,
+          }),
           TAX_PREVIEW_TIMEOUT_MS,
         );
         if (requestId !== taxRequestSeq.current) return;
-        setTaxPreview({ status: 'ready', amount: resolveTaxPreviewAmount(cart) });
+        setTaxPreview({ status: 'ready', amount: toMoney(preview?.tax) });
       } catch (error) {
         if (requestId !== taxRequestSeq.current) return;
         console.warn('Tax preview fetch failed:', error?.message || error);
@@ -557,7 +541,7 @@ export default function Checkout() {
     }, TAX_PREVIEW_DEBOUNCE_MS);
 
     return () => window.clearTimeout(timer);
-  }, [formData, isAddressComplete]);
+  }, [formData, isAddressComplete, manualCoupons, safeCartItems, selectedRate]);
 
   const sanitize = (value) => DOMPurify.sanitize(value, { ALLOWED_TAGS: [] });
   const handleInputChange = (event) => {

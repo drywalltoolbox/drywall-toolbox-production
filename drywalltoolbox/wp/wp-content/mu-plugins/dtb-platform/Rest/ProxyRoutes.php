@@ -349,6 +349,12 @@ function dtb_register_config_routes(): void {
 		'callback'            => 'dtb_checkout_finalize_route',
 		'permission_callback' => '__return_true',
 	] );
+
+	register_rest_route( $ns, '/checkout/tax-preview', [
+		'methods'             => 'POST',
+		'callback'            => 'dtb_checkout_tax_preview_route',
+		'permission_callback' => '__return_true',
+	] );
 }
 
 /**
@@ -591,6 +597,82 @@ function dtb_checkout_capabilities_route( WP_REST_Request $request ): WP_REST_Re
 		'default_gateway' => dtb_checkout_default_gateway(),
 		'currency'        => function_exists( 'get_woocommerce_currency' ) ? get_woocommerce_currency() : 'USD',
 		'gateways'        => $gateways,
+	], 200 );
+}
+
+function dtb_checkout_tax_preview_route( WP_REST_Request $request ): WP_REST_Response {
+	$guard = dtb_checkout_route_guard();
+	if ( $guard instanceof WP_REST_Response ) {
+		return $guard;
+	}
+	if ( ! class_exists( 'WC_Order' ) || ! function_exists( 'wc_get_product' ) ) {
+		return new WP_REST_Response( dtb_error_envelope( 'dtb_checkout_wc_unavailable', 'WooCommerce is not available.', 500 ), 500 );
+	}
+
+	$context    = dtb_checkout_context_from_request( $request );
+	$line_items = $context['line_items'] ?? [];
+	if ( ! is_array( $line_items ) || empty( $line_items ) ) {
+		return new WP_REST_Response( dtb_error_envelope( 'dtb_checkout_missing_items', 'line_items is required.', 400 ), 400 );
+	}
+
+	$shipping = is_array( $context['shipping'] ?? null ) ? $context['shipping'] : [];
+	if ( empty( $shipping ) ) {
+		return new WP_REST_Response( dtb_error_envelope( 'dtb_checkout_missing_shipping', 'shipping is required.', 400 ), 400 );
+	}
+
+	$mapped_shipping = dtb_checkout_normalize_address( $shipping );
+	$order           = new WC_Order();
+	$order->set_created_via( 'dtb_checkout_tax_preview' );
+	$order->set_address( $mapped_shipping, 'shipping' );
+	$order->set_address( dtb_checkout_normalize_address( is_array( $context['billing'] ?? null ) ? $context['billing'] : $shipping, true ), 'billing' );
+
+	foreach ( $line_items as $item ) {
+		$product_id   = absint( $item['product_id'] ?? 0 );
+		$variation_id = absint( $item['variation_id'] ?? 0 );
+		$quantity     = max( 1, absint( $item['quantity'] ?? 1 ) );
+		if ( $product_id <= 0 ) {
+			continue;
+		}
+
+		$product = wc_get_product( $variation_id > 0 ? $variation_id : $product_id );
+		if ( $product ) {
+			$order->add_product( $product, $quantity );
+		}
+	}
+
+	foreach ( is_array( $context['shipping_lines'] ?? null ) ? $context['shipping_lines'] : [] as $shipping_line ) {
+		if ( ! is_array( $shipping_line ) || ! class_exists( 'WC_Order_Item_Shipping' ) ) {
+			continue;
+		}
+
+		$item = new WC_Order_Item_Shipping();
+		$item->set_method_title( sanitize_text_field( (string) ( $shipping_line['method_title'] ?? 'Shipping' ) ) );
+		$item->set_method_id( sanitize_text_field( (string) ( $shipping_line['method_id'] ?? 'flat_rate' ) ) );
+		$item->set_total( wc_format_decimal( (string) ( $shipping_line['total'] ?? '0' ) ) );
+		$order->add_item( $item );
+	}
+
+	foreach ( is_array( $context['coupon_codes'] ?? null ) ? $context['coupon_codes'] : [] as $coupon_code ) {
+		$code = sanitize_text_field( (string) $coupon_code );
+		if ( '' !== $code ) {
+			$order->apply_coupon( $code );
+		}
+	}
+
+	$order->calculate_taxes( [
+		'country'  => $mapped_shipping['country'],
+		'state'    => $mapped_shipping['state'],
+		'postcode' => $mapped_shipping['postcode'],
+		'city'     => $mapped_shipping['city'],
+	] );
+	$order->calculate_totals( false );
+
+	return new WP_REST_Response( [
+		'tax'      => (float) $order->get_total_tax(),
+		'subtotal' => (float) $order->get_subtotal(),
+		'shipping' => (float) $order->get_shipping_total(),
+		'total'    => (float) $order->get_total(),
+		'currency' => function_exists( 'get_woocommerce_currency' ) ? get_woocommerce_currency() : 'USD',
 	], 200 );
 }
 

@@ -248,6 +248,27 @@ function normalizeShippingMethodTitle(rateId = '', explicitTitle = '') {
  * paymentMethod must be an actual WooCommerce payment gateway ID such as
  * `woocommerce_payments`; `gateway` remains the DTB orchestration adapter.
  */
+export function buildCheckoutLineItems( cartItems ) {
+  const safeItems = Array.isArray( cartItems ) ? cartItems : [];
+  if ( safeItems.length === 0 ) {
+    throw new Error( 'Cart is empty.' );
+  }
+
+  return safeItems.map( ( item ) => {
+    const productId = Number( item?.parent_id || item?.product_id || item?.id || 0 );
+    const variationId = Number( item?.parent_id ? item.id : ( item?.variation_id || 0 ) );
+    const quantity = Number( item?.quantity || 1 );
+    if ( productId <= 0 || quantity <= 0 ) {
+      throw new Error( `Invalid cart line item: ${ item?.sku || item?.id || 'unknown' }` );
+    }
+    return {
+      product_id: productId,
+      variation_id: variationId > 0 ? variationId : 0,
+      quantity,
+    };
+  } );
+}
+
 export async function syncAndPlace(
   cartItems,
   billingAddress,
@@ -262,10 +283,7 @@ export async function syncAndPlace(
   paymentMethodTitle = '',
   idempotencyKey = '',
 ) {
-  const safeItems = Array.isArray( cartItems ) ? cartItems : [];
-  if ( safeItems.length === 0 ) {
-    throw new Error( 'Cart is empty.' );
-  }
+  const line_items = buildCheckoutLineItems( cartItems );
 
   let resolvedShippingRateTitle = shippingRateTitle;
   let resolvedCouponCodes = couponCodes;
@@ -278,20 +296,6 @@ export async function syncAndPlace(
     resolvedPaymentMethodTitle = typeof couponCodes === 'string' ? couponCodes : '';
     resolvedIdempotencyKey = typeof paymentMethodTitle === 'string' ? paymentMethodTitle : '';
   }
-
-  const line_items = safeItems.map( ( item ) => {
-    const productId = Number( item?.parent_id || item?.product_id || item?.id || 0 );
-    const variationId = Number( item?.parent_id ? item.id : ( item?.variation_id || 0 ) );
-    const quantity = Number( item?.quantity || 1 );
-    if ( productId <= 0 || quantity <= 0 ) {
-      throw new Error( `Invalid cart line item: ${ item?.sku || item?.id || 'unknown' }` );
-    }
-    return {
-      product_id: productId,
-      variation_id: variationId > 0 ? variationId : 0,
-      quantity,
-    };
-  } );
 
   const shippingLineTotal = Number.isFinite( Number( shippingRateTotal ) )
     ? String( Number( shippingRateTotal ) )

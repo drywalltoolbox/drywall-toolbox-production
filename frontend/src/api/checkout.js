@@ -28,6 +28,13 @@ export async function finalizeCheckout(payload = {}) {
   });
 }
 
+export async function previewCheckoutTax(payload = {}) {
+  return apiClient('/wp-json/dtb/v1/checkout/tax-preview', {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  });
+}
+
 export async function getCheckoutCapabilities() {
   return apiClient('/wp-json/dtb/v1/checkout/capabilities');
 }

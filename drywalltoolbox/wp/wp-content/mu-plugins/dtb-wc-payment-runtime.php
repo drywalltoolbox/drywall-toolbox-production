@@ -349,6 +349,32 @@ add_action( 'template_redirect', 'dtb_wc_payment_runtime_prepare_current_order',
 add_action( 'woocommerce_before_checkout_form', 'dtb_wc_payment_runtime_prepare_current_order', 0 );
 
 add_filter(
+	'woocommerce_get_notices',
+	static function ( array $notices ): array {
+		if ( ! dtb_wc_payment_runtime_request() ) {
+			return $notices;
+		}
+
+		foreach ( $notices as $type => $typed_notices ) {
+			if ( ! is_array( $typed_notices ) ) {
+				continue;
+			}
+
+			$notices[ $type ] = array_values( array_filter(
+				$typed_notices,
+				static function ( $notice ): bool {
+					$message = is_array( $notice ) ? (string) ( $notice['notice'] ?? '' ) : (string) $notice;
+					return ! preg_match( '/customer\s+matched\s+zone/i', wp_strip_all_tags( $message ) );
+				}
+			) );
+		}
+
+		return $notices;
+	},
+	20
+);
+
+add_filter(
 	'woocommerce_valid_order_statuses_for_payment',
 	static function ( array $statuses, WC_Order $order ): array {
 		if ( ! dtb_wc_payment_runtime_is_unpaid_online_order( $order ) ) {
