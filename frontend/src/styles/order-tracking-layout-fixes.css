@@ -1,0 +1,165 @@
+/* Order tracking layout corrections: centered header, single back affordance, bottom help CTA, Edge/Safari rendering stability. */
+.dtb-order-page .dtb-order-tracking-shell {
+  isolation: isolate;
+}
+
+.dtb-order-status-panel__topline {
+  position: relative;
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: start !important;
+  justify-content: stretch !important;
+  gap: 1rem;
+  min-height: 72px;
+}
+
+.dtb-order-status-panel__heading {
+  grid-column: 2;
+  justify-self: center;
+  width: min(100%, 34rem);
+  text-align: center;
+}
+
+.dtb-order-status-panel__heading .dtb-order-eyebrow {
+  justify-content: center;
+  text-align: center;
+}
+
+.dtb-order-back-link--tracking-header {
+  grid-column: 1;
+  justify-self: start;
+  align-self: start;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  min-height: 40px;
+  margin: 0;
+  padding: 0 0.85rem;
+  border: 1px solid rgba(203, 213, 225, 0.9);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.92);
+  color: #334155;
+  font-size: 0.86rem;
+  font-weight: 800;
+  line-height: 1;
+  text-decoration: none;
+  box-shadow: 0 9px 20px rgba(15, 23, 42, 0.05);
+  transition: transform 150ms ease, border-color 150ms ease, color 150ms ease, background 150ms ease;
+}
+
+.dtb-order-back-link--tracking-header:hover {
+  border-color: rgba(147, 197, 253, 0.95);
+  background: #fff;
+  color: #1d4ed8;
+  transform: translateY(-1px);
+}
+
+.dtb-order-refresh-button--tracking-header {
+  grid-column: 3;
+  justify-self: end;
+  align-self: start;
+}
+
+.dtb-order-tracking-help-footer {
+  display: flex;
+  justify-content: center;
+  padding: clamp(1rem, 2.4vw, 1.4rem) 0 0.2rem;
+}
+
+.dtb-order-help-link--footer {
+  min-height: 44px;
+  padding: 0 1.1rem;
+  border-color: rgba(147, 197, 253, 0.9);
+  background: #fff;
+  color: #1d4ed8;
+  font-size: 0.88rem;
+  font-weight: 850;
+  box-shadow: 0 12px 24px rgba(37, 99, 235, 0.10);
+}
+
+/* Microsoft Edge/Chromium can paint nested gradients + backdrop-like shadows differently during scroll.
+   Flatten decorative layers and force stable compositing for this page. */
+.dtb-order-status-panel,
+.dtb-order-sheet--tracking,
+.dtb-order-sheet-section--tracking,
+.dtb-order-status-panel__summary {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  contain: paint;
+}
+
+@supports (-ms-ime-align: auto) {
+  .dtb-order-status-panel::after {
+    opacity: 0.08;
+  }
+}
+
+@media (max-width: 767px) {
+  .dtb-order-status-panel__topline {
+    grid-template-columns: 1fr auto 1fr;
+    min-height: 116px;
+    align-items: start !important;
+    gap: 0.5rem;
+  }
+
+  .dtb-order-status-panel__heading {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    align-self: center;
+    justify-self: center;
+    padding-top: 0.25rem;
+  }
+
+  .dtb-order-back-link--tracking-header {
+    grid-column: 1;
+    grid-row: 1;
+    min-width: 44px;
+    min-height: 44px;
+    padding: 0;
+    justify-content: center;
+    border-radius: 14px;
+    font-size: 0;
+  }
+
+  .dtb-order-back-link--tracking-header svg {
+    width: 19px;
+    height: 19px;
+  }
+
+  .dtb-order-refresh-button--tracking-header {
+    grid-column: 3;
+    grid-row: 1;
+    width: 44px;
+    height: 44px;
+    border-radius: 14px;
+  }
+
+  .dtb-order-status-panel__heading .dtb-order-eyebrow {
+    margin-bottom: 0.4rem;
+  }
+
+  .dtb-order-status-panel__heading .dtb-order-tracking-title {
+    max-width: 100%;
+    font-size: clamp(2.25rem, 11vw, 3rem);
+    text-align: center;
+  }
+
+  .dtb-order-tracking-help-footer {
+    padding-top: 1.15rem;
+    padding-bottom: 0.35rem;
+  }
+
+  .dtb-order-help-link--footer {
+    width: min(100%, 18rem);
+  }
+}
+
+@media (max-width: 390px) {
+  .dtb-order-status-panel__topline {
+    min-height: 108px;
+  }
+
+  .dtb-order-status-panel__heading .dtb-order-tracking-title {
+    font-size: clamp(2.05rem, 10.5vw, 2.65rem);
+  }
+}
