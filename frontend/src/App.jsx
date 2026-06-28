@@ -189,7 +189,8 @@ function RedirectToProducts() {
 
 function getRouteBackConfig(pathname) {
   if (pathname.startsWith('/repairs/status/')) return { fallbackTo: '/dashboard?tab=repairs', label: 'Back to repairs' };
-  if (pathname.startsWith('/order-tracking/') || pathname.startsWith('/order/')) return { fallbackTo: '/dashboard?tab=orders', label: 'Back to orders' };
+  if (pathname.startsWith('/order-tracking/')) return null;
+  if (pathname.startsWith('/order/')) return { fallbackTo: '/dashboard?tab=orders', label: 'Back to orders' };
   return null;
 }
 
