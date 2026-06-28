@@ -212,6 +212,16 @@ function TrackingSkeleton() {
   );
 }
 
+function OrderTrackingHelpFooter() {
+  return (
+    <div className="dtb-order-tracking-help-footer">
+      <Link to="/contact" className="dtb-order-help-link dtb-order-help-link--footer">
+        <Headphones size={15} /> Need help?
+      </Link>
+    </div>
+  );
+}
+
 function OrderStatusTracker({ order, streaming, loading, onRefresh }) {
   const status = String(order?.status || 'pending').toLowerCase();
   const activeIndex = getStepIndex(order);
@@ -222,21 +232,18 @@ function OrderStatusTracker({ order, streaming, loading, onRefresh }) {
   return (
     <section className="dtb-order-status-panel" aria-labelledby="tracking-order-title">
       <div className="dtb-order-status-panel__topline">
-        <div>
+        <Link to="/dashboard?tab=orders" className="dtb-order-back-link dtb-order-back-link--tracking-header">
+          <ArrowLeft size={16} /> Back to orders
+        </Link>
+
+        <div className="dtb-order-status-panel__heading">
           <p className="dtb-order-eyebrow">Order tracking</p>
           <h1 id="tracking-order-title" className="dtb-order-tracking-title">Order #{order?.number || order?.id}</h1>
         </div>
-        <div className="dtb-order-status-panel__actions">
-          <Link to="/dashboard?tab=orders" className="dtb-order-back-link">
-            <ArrowLeft size={14} /> Back to orders
-          </Link>
-          <button onClick={onRefresh} disabled={loading} className="dtb-order-refresh-button" type="button" aria-label="Refresh order tracking">
-            <RefreshCw size={16} className={loading ? 'animate-spin' : ''} />
-          </button>
-          <Link to="/contact" className="dtb-order-help-link">
-            <Headphones size={15} /> Need help?
-          </Link>
-        </div>
+
+        <button onClick={onRefresh} disabled={loading} className="dtb-order-refresh-button dtb-order-refresh-button--tracking-header" type="button" aria-label="Refresh order tracking">
+          <RefreshCw size={16} className={loading ? 'animate-spin' : ''} />
+        </button>
       </div>
 
       <div className="dtb-order-status-panel__summary">
@@ -467,6 +474,7 @@ export default function OrderTracking() {
               </div>
             ) : null}
 
+            <OrderTrackingHelpFooter />
           </div>
         </section>
       </motion.div>
