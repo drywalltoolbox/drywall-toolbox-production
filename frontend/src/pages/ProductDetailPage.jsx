@@ -5,7 +5,7 @@
  *
  * Architecture:
  *   - useProductDetail(slug)       → fetches parent + variations + computed
- *   - useSelectedVariation(...)    → URL-driven variation state machine
+ *   - URL-derived initial variant  → seeds the PDP once without route churn
  *   - ProductMediaGallery          → variation-aware gallery
  *   - ProductPrice                 → price with From/sale
  *   - ProductSkuBlock              → SKU / MPN
@@ -17,22 +17,24 @@
  *   /products/:slug                — resolve default variation (see variationUrl.js)
  *   /products/:slug?variant=12345  — pre-select variation 12345
  *
- * State is always fully re-derivable from URL + API data — safe to refresh,
- * use back/forward, or deep-link to any specific variation.
+ * Full-page variation changes are intentionally handled in local component state
+ * and mirrored into the address bar with history.replaceState. This preserves a
+ * copyable variant URL without notifying React Router, which prevents the route
+ * transition shell from remounting the full PDP on each size click.
  */
 
 import { useParams, Link, useLocation, useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import useCatalogProductDetail from '../hooks/useCatalogProductDetail.js';
-import { useSelectedVariation } from '../hooks/useSelectedVariation';
 import { getVariationSelectionMap } from '../utils/variationSelection';
 import { buildBreadcrumbSchema, buildProductSchema, stripHtml } from '../utils/schema';
 import ProductDetail from '../components/product/ProductDetail';
 import SEOHead from '../components/shared/SEOHead';
 import LoadingSpinner from '../components/shared/LoadingSpinner';
 import Toast from '../components/ui/Toast';
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { addRecentlyViewed } from '../utils/recentlyViewed.js';
+import { buildVariantSearch, getVariantParam, resolveInitialVariation } from '../utils/variationUrl.js';
 
 function getVariationDisplayName(product, selectedVariation, effectiveVariationName) {
   const variationName = `${selectedVariation?.name || ''}`.trim();
@@ -43,6 +45,22 @@ function getVariationDisplayName(product, selectedVariation, effectiveVariationN
   return [parentName, effectiveVariationName].filter(Boolean).join(' — ');
 }
 
+function replaceVariantInAddressBar(location, variationId) {
+  if (typeof window === 'undefined' || !window.history?.replaceState) return;
+
+  const currentPath = window.location.pathname || location.pathname;
+  const currentSearch = window.location.search || location.search || '';
+  const currentHash = window.location.hash || location.hash || '';
+  const productPath = currentPath.replace(/\/variations\/[^/]+\/?$/, '');
+  const nextSearch = buildVariantSearch(currentSearch, variationId ?? null);
+  const nextUrl = `${productPath}${nextSearch}${currentHash}`;
+  const currentUrl = `${currentPath}${currentSearch}${currentHash}`;
+
+  if (nextUrl !== currentUrl) {
+    window.history.replaceState(window.history.state, '', nextUrl);
+  }
+}
+
 export default function ProductDetailPage() {
   const { slug, variationId } = useParams();
   const location = useLocation();
@@ -51,17 +69,38 @@ export default function ProductDetailPage() {
   const legacyPathVariantId = Number.isFinite(parseInt(variationId || '', 10)) ? parseInt(variationId, 10) : null;
 
   const [toast, setToast] = useState(null);
+  const [locallySelectedVariation, setLocallySelectedVariation] = useState(null);
 
   // ── Data fetching ──────────────────────────────────────────────────────────
   const { product, variations, computed, status, error } = useCatalogProductDetail(slug);
 
-  // ── Variation state machine ────────────────────────────────────────────────
-  const { selectedVariation } = useSelectedVariation(
-    variations,
-    computed,
-    null,
-    { syncSearchParam: true }
+  const urlVariantId = useMemo(
+    () => legacyPathVariantId ?? getVariantParam(location.search),
+    [legacyPathVariantId, location.search]
   );
+
+  const resolvedInitialVariation = useMemo(
+    () => resolveInitialVariation(urlVariantId, variations, computed),
+    [urlVariantId, variations, computed]
+  );
+
+  useEffect(() => {
+    if (!Array.isArray(variations) || variations.length === 0) {
+      setLocallySelectedVariation(null);
+      return;
+    }
+
+    setLocallySelectedVariation((previous) => {
+      if (urlVariantId != null) return resolvedInitialVariation;
+      if (previous?.id) {
+        const stillValid = variations.find((variation) => variation.id === previous.id);
+        if (stillValid) return stillValid;
+      }
+      return resolvedInitialVariation;
+    });
+  }, [product?.id, resolvedInitialVariation, urlVariantId, variations]);
+
+  const selectedVariation = locallySelectedVariation || resolvedInitialVariation;
 
   // Normalize legacy /products/:slug/variations/:id routes to the canonical
   // /products/:slug?variant=:id contract used by quick view and selectors.
@@ -104,20 +143,9 @@ export default function ProductDetailPage() {
   };
 
   const handleVariationChange = useCallback((variation) => {
-    const baseSlug = product?.slug || slug;
-    if (!baseSlug) return;
-    const params = new URLSearchParams(location.search);
-    if (variation?.id) {
-      params.set('variant', String(variation.id));
-    } else {
-      params.delete('variant');
-    }
-    const qs = params.toString();
-    const target = `/products/${encodeURIComponent(baseSlug)}${qs ? `?${qs}` : ''}`;
-    const current = `${location.pathname}${location.search}`;
-    if (current === target) return;
-    navigate(target, { replace: true });
-  }, [location.pathname, location.search, navigate, product?.slug, slug]);
+    setLocallySelectedVariation(variation || null);
+    replaceVariantInAddressBar(location, variation?.id ? Number(variation.id) : null);
+  }, [location]);
 
   // ── Loading state ──────────────────────────────────────────────────────────
   if (status === 'loading' || status === 'idle') {
