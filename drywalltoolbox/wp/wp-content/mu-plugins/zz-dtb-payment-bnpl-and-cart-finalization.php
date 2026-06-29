@@ -2,7 +2,7 @@
 /**
  * Plugin Name: DTB Payment BNPL and Cart Finalization
  * Description: Enables WooPayments BNPL methods, keeps BNPL order-pay flows payable until gateway authorization, and clears the headless cart after successful payment.
- * Version: 1.0.0
+ * Version: 1.0.1
  * Author: Drywall Toolbox
  */
 
@@ -116,6 +116,18 @@ if ( ! function_exists( 'dtb_payment_clear_headless_cart_storage_script' ) ) {
 	}
 }
 
+if ( ! function_exists( 'dtb_payment_print_cart_storage_clear_script' ) ) {
+	function dtb_payment_print_cart_storage_clear_script(): void {
+		$script = dtb_payment_clear_headless_cart_storage_script();
+		if ( function_exists( 'wp_print_inline_script_tag' ) ) {
+			wp_print_inline_script_tag( $script );
+			return;
+		}
+
+		echo '<script>' . $script . '</script>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Script is static and generated server-side.
+	}
+}
+
 if ( ! function_exists( 'dtb_payment_clear_cart_for_order' ) ) {
 	function dtb_payment_clear_cart_for_order( int $order_id ): void {
 		if ( $order_id <= 0 || ! function_exists( 'wc_get_order' ) ) {
@@ -147,13 +159,13 @@ add_action(
 	'wp_footer',
 	static function (): void {
 		if ( function_exists( 'is_order_received_page' ) && is_order_received_page() ) {
-			echo '<script>' . esc_html( dtb_payment_clear_headless_cart_storage_script() ) . '</script>';
+			dtb_payment_print_cart_storage_clear_script();
 			return;
 		}
 
 		$request_uri = isset( $_SERVER['REQUEST_URI'] ) ? sanitize_text_field( wp_unslash( $_SERVER['REQUEST_URI'] ) ) : '';
 		if ( false !== strpos( $request_uri, 'order-received' ) ) {
-			echo '<script>' . esc_html( dtb_payment_clear_headless_cart_storage_script() ) . '</script>';
+			dtb_payment_print_cart_storage_clear_script();
 		}
 	},
 	PHP_INT_MAX
