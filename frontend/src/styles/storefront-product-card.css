@@ -1,3 +1,15 @@
+.dtb-product-grid,
+.product-skeleton-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: stretch;
+  gap: 12px;
+}
+
+.dtb-product-grid--list {
+  grid-template-columns: 1fr;
+}
+
 .dtb-product-card {
   display: flex;
   flex-direction: column;
@@ -272,6 +284,17 @@
 .dtb-product-card__inside { display: none; }
 
 @media (min-width: 768px) {
+  .dtb-product-grid,
+  .product-skeleton-grid {
+    grid-template-columns: repeat(auto-fill, minmax(240px, 273px));
+    justify-content: start;
+    gap: 20px;
+  }
+
+  .dtb-product-grid--list {
+    grid-template-columns: 1fr;
+  }
+
   .dtb-product-card { position: relative; height: 100%; }
 
   .dtb-product-card--rail { width: clamp(210px, 22vw, 248px); }
