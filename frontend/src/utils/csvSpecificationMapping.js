@@ -42,23 +42,6 @@ function normalizeCondition(value) {
   return raw.replace(/condition$/i, '').trim() || raw;
 }
 
-function looksLikeMultiSku(value) {
-  const raw = clean(value);
-  return raw.includes(',') || raw.includes('|') || raw.includes('/');
-}
-
-function shouldKeepModel(model, sku) {
-  const normalizedModel = normalizeLabel(model);
-  const normalizedSku = normalizeLabel(sku);
-  return normalizedModel && normalizedModel !== normalizedSku;
-}
-
-function shouldKeepMpn(mpn, sku) {
-  const normalizedMpn = normalizeLabel(mpn);
-  const normalizedSku = normalizeLabel(sku);
-  return normalizedMpn && normalizedMpn !== normalizedSku && !looksLikeMultiSku(mpn);
-}
-
 function createRow(label, value) {
   const normalizedValue = Array.isArray(value)
     ? value.filter(Boolean)
@@ -170,10 +153,7 @@ export function extractSpecRowsFromMeta(metaData = []) {
 
 export function buildSpecificationsFromCsvRow(row, attrIndexes = []) {
   const coreRows = [
-    createRow('Brand', row['Brands']),
     createRow('SKU', row['SKU']),
-    shouldKeepModel(row['meta:model'], row['SKU']) ? createRow('Model', row['meta:model']) : null,
-    shouldKeepMpn(row['meta:schema_mpn'], row['SKU']) ? createRow('MPN', row['meta:schema_mpn']) : null,
     createRow('Product Family', row['meta:product_family']),
     createRow('Series', row['meta:series']),
     createRow('Product Type', mapProductType(row['Type'])),
@@ -195,14 +175,7 @@ export function buildSpecificationsFromApiProduct(product, fallback = {}) {
   const dimensions = product?.dimensions || {};
 
   const coreRows = [
-    createRow('Brand', fallback.brand || extractMetaValue(metaData, ['_dtb_brand', 'dtb_brand', '_schema_brand'])),
     createRow('SKU', sku),
-    shouldKeepModel(extractMetaValue(metaData, ['meta:model', '_model', 'model']), sku)
-      ? createRow('Model', extractMetaValue(metaData, ['meta:model', '_model', 'model']))
-      : null,
-    shouldKeepMpn(extractMetaValue(metaData, ['meta:schema_mpn', '_mpn', 'mpn']), sku)
-      ? createRow('MPN', extractMetaValue(metaData, ['meta:schema_mpn', '_mpn', 'mpn']))
-      : null,
     createRow('Product Family', extractMetaValue(metaData, ['meta:product_family', '_product_family'])),
     createRow('Series', extractMetaValue(metaData, ['meta:series', '_series'])),
     createRow('Product Type', mapProductType(product?.type)),
