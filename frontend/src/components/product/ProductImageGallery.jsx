@@ -220,7 +220,6 @@ async function fetchParentGallery(parentId) {
   const request = apiClient(`/wp-json/drywall/v1/products/${encodeURIComponent(normalizedParentId)}`)
     .then((parentProduct) => collectRawWooImageMeta(parentProduct))
     .catch(() => []);
-
   parentGalleryCache.set(normalizedParentId, request);
   return request;
 }
@@ -447,6 +446,16 @@ export default function ProductImageGallery({ product }) {
     lbTouchStartTime.current = null;
   };
 
+  const onThumbPrev = (event) => {
+    event.stopPropagation();
+    prev();
+  };
+
+  const onThumbNext = (event) => {
+    event.stopPropagation();
+    next();
+  };
+
   const activeMeta = imageMeta[activeIndex] || imageMeta[0];
   const activeLightboxMeta = imageMeta[activeLightboxIndex] || imageMeta[0];
 
@@ -549,28 +558,48 @@ export default function ProductImageGallery({ product }) {
         </div>
 
         {hasMultiple && (
-          <div ref={thumbsRef} className="flex gap-2 overflow-x-auto rounded-2xl border border-gray-50 bg-white p-2 pb-2 shadow-[inset_0_1px_0_rgba(255,255,255,0.96)]" style={{ scrollbarWidth: 'none' }}>
-            {images.map((image, index) => (
-              <button
-                key={`${image}-${index}`}
-                type="button"
-                onClick={() => goTo(index, index > activeIndex ? 1 : -1)}
-                aria-label={`View image ${index + 1}`}
-                aria-current={index === activeIndex ? 'true' : undefined}
-                className={`shrink-0 w-16 h-16 rounded-xl overflow-hidden border-2 transition-all duration-200 ${index === activeIndex ? 'border-blue-600 bg-white ring-2 ring-blue-100/80 scale-[1.04] shadow-sm' : 'border-gray-100 bg-white hover:border-gray-300'}`}
-              >
-                <img
-                  src={image}
-                  alt={`Thumbnail ${index + 1}`}
-                  width={64}
-                  height={64}
-                  loading="lazy"
-                  decoding="async"
-                  className="w-full h-full object-contain bg-white p-1"
-                  onError={(event) => { event.currentTarget.onerror = null; event.currentTarget.src = PLACEHOLDER_IMAGE; }}
-                />
-              </button>
-            ))}
+          <div className="product-image-gallery__thumb-shell relative rounded-2xl border border-gray-50 bg-white p-2 shadow-[inset_0_1px_0_rgba(255,255,255,0.96)]">
+            <button
+              type="button"
+              onClick={onThumbPrev}
+              className="product-image-gallery__thumb-nav product-image-gallery__thumb-nav--prev hidden md:flex absolute left-1 top-1/2 z-10 h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full border border-slate-200/80 bg-white/95 text-slate-700 shadow-lg backdrop-blur-sm transition-all hover:border-blue-300 hover:text-blue-700 hover:shadow-xl active:scale-95"
+              aria-label="Previous thumbnail image"
+            >
+              <ChevronLeft size={17} strokeWidth={2.5} />
+            </button>
+
+            <div ref={thumbsRef} className="product-image-gallery__thumbs flex gap-2 overflow-x-auto md:px-10" style={{ scrollbarWidth: 'none' }}>
+              {images.map((image, index) => (
+                <button
+                  key={`${image}-${index}`}
+                  type="button"
+                  onClick={() => goTo(index, index > activeIndex ? 1 : -1)}
+                  aria-label={`View image ${index + 1}`}
+                  aria-current={index === activeIndex ? 'true' : undefined}
+                  className={`shrink-0 w-16 h-16 rounded-xl overflow-hidden border-2 transition-all duration-200 ${index === activeIndex ? 'border-blue-600 bg-white ring-2 ring-blue-100/80 scale-[1.04] shadow-sm' : 'border-gray-100 bg-white hover:border-gray-300'}`}
+                >
+                  <img
+                    src={image}
+                    alt={`Thumbnail ${index + 1}`}
+                    width={64}
+                    height={64}
+                    loading="lazy"
+                    decoding="async"
+                    className="w-full h-full object-contain bg-white p-1"
+                    onError={(event) => { event.currentTarget.onerror = null; event.currentTarget.src = PLACEHOLDER_IMAGE; }}
+                  />
+                </button>
+              ))}
+            </div>
+
+            <button
+              type="button"
+              onClick={onThumbNext}
+              className="product-image-gallery__thumb-nav product-image-gallery__thumb-nav--next hidden md:flex absolute right-1 top-1/2 z-10 h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full border border-slate-200/80 bg-white/95 text-slate-700 shadow-lg backdrop-blur-sm transition-all hover:border-blue-300 hover:text-blue-700 hover:shadow-xl active:scale-95"
+              aria-label="Next thumbnail image"
+            >
+              <ChevronRight size={17} strokeWidth={2.5} />
+            </button>
           </div>
         )}
       </div>
