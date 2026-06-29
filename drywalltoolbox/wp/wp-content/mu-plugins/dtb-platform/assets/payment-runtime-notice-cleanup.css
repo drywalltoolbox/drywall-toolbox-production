@@ -3,6 +3,12 @@ body.dtb-payment-runtime .woocommerce-info:not(.woocommerce-error) {
 	display: none !important;
 }
 
+body.dtb-payment-runtime table.shop_table tr.payment-method,
+body.dtb-payment-runtime table.shop_table tr.dtb-order-summary-payment-method-row,
+body.dtb-payment-runtime table.shop_table tfoot tr[class*="payment-method"] {
+	display: none !important;
+}
+
 @media (max-width: 640px) {
 	body.dtb-payment-runtime .dtb-mobile-payment-toggle {
 		grid-template-columns: 20px minmax(0, 1fr) auto !important;
