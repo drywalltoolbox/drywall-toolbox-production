@@ -1,4 +1,0 @@
-body.dtb-payment-runtime .woocommerce-message,
-body.dtb-payment-runtime .woocommerce-info:not(.woocommerce-error) {
-	display: none !important;
-}
