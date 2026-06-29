@@ -1,4 +1,4 @@
-/* Mobile order-pay runtime hardening + Powdur-style payment sheet. */
+/* Mobile order-pay runtime hardening. Do not force Stripe/WooPayments iframe heights; gateways own their field sizing. */
 .dtb-payment-runtime #payment ul.payment_methods,
 .dtb-payment-runtime #payment ul.payment_methods li,
 .dtb-payment-runtime #payment .payment_box,
@@ -10,6 +10,7 @@
 .dtb-payment-runtime #payment [id*="stripe"] {
 	min-width: 0 !important;
 	max-width: 100% !important;
+	overflow: visible !important;
 }
 
 .dtb-payment-runtime #payment ul.payment_methods li.is-active > .payment_box:not(.dtb-payment-box-empty),
@@ -20,7 +21,6 @@
 	opacity: 1 !important;
 	inline-size: 100% !important;
 	width: 100% !important;
-	height: auto !important;
 	overflow: visible !important;
 }
 
@@ -45,9 +45,8 @@
 	inline-size: 100% !important;
 	width: 100% !important;
 	min-height: 56px !important;
-	height: auto !important;
-	overflow: visible !important;
 	background: #fff !important;
+	overflow: visible !important;
 }
 
 .dtb-payment-runtime #payment .wcpay-upe-element,
@@ -71,16 +70,8 @@
 	width: 100% !important;
 	min-width: 100% !important;
 	max-width: 100% !important;
-	min-height: 46px !important;
-	height: 46px !important;
 	border: 0 !important;
 	background: transparent !important;
-}
-
-.dtb-payment-runtime #payment .wcpay-upe-element:empty,
-.dtb-payment-runtime #payment .StripeElement:empty,
-.dtb-payment-runtime #payment .wc-stripe-elements-field:empty {
-	min-height: 56px !important;
 }
 
 .dtb-payment-runtime .wcpay-payment-request-wrapper,
@@ -296,16 +287,6 @@
 		padding: 12px !important;
 		font-size: 16px !important;
 		box-shadow: inset 0 0 0 1px rgba(226, 232, 240, 0.45) !important;
-	}
-
-	.dtb-payment-runtime #payment .payment_box iframe,
-	.dtb-payment-runtime #payment .wc-payment-form iframe,
-	.dtb-payment-runtime #payment .wcpay-upe-form iframe,
-	.dtb-payment-runtime #payment .wcpay-upe-element iframe,
-	.dtb-payment-runtime #payment .StripeElement iframe,
-	.dtb-payment-runtime #payment iframe[name^="__privateStripeFrame"] {
-		min-height: 48px !important;
-		height: 48px !important;
 	}
 
 	.dtb-payment-runtime .wc-stripe-payment-request-wrapper,
