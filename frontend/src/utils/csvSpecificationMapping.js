@@ -168,7 +168,7 @@ export function buildSpecificationsFromCsvRow(row, attrIndexes = []) {
   return mergeSpecRows(coreRows, attributeRows);
 }
 
-export function buildSpecificationsFromApiProduct(product, fallback = {}) {
+export function buildSpecificationsFromApiProduct(product) {
   const metaData = Array.isArray(product?.meta_data) ? product.meta_data : [];
   const sku = clean(product?.sku);
   const weight = clean(product?.weight);
