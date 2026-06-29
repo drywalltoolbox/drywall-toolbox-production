@@ -111,8 +111,12 @@ final class DTB_CatalogProductRepository {
 				$space_form  = str_replace( '_', ' ', $display_category_key );
 				$title_form  = ucwords( $space_form );
 				$hyphen_form = str_replace( '_', '-', $display_category_key );
+				$is_compound_selection = in_array( $canonical, [ 'compound_tubes', 'compound_tube', 'cam_lock_tube', 'cam_lock_tubes' ], true )
+					|| in_array( $display_category_key, [ 'compound_tubes', 'compound_tube', 'cam_lock_tube', 'cam_lock_tubes' ], true );
+				$is_semi_automatic_selection = in_array( $canonical, [ 'semi_automatic_tapers', 'semi_automatic_tools', 'semi_automatic_taping_tools' ], true )
+					|| in_array( $display_category_key, [ 'semi_automatic_tapers', 'semi_automatic_tools', 'semi_automatic_taping_tools' ], true );
 
-				if ( 'compound_tubes' === $canonical ) {
+				if ( $is_compound_selection ) {
 					$compound_ids     = self::compound_tube_product_ids();
 					$args['post__in'] = ! empty( $compound_ids ) ? $compound_ids : [ 0 ];
 				} else {
@@ -129,7 +133,7 @@ final class DTB_CatalogProductRepository {
 					];
 				}
 
-				if ( 'semi_automatic_tapers' === $canonical ) {
+				if ( $is_semi_automatic_selection ) {
 					$args['post__not_in'] = array_values( array_unique( array_merge(
 						array_map( 'absint', $args['post__not_in'] ?? [] ),
 						self::compound_tube_product_ids()
