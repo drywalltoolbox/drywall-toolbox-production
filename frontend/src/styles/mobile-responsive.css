@@ -311,7 +311,7 @@ canvas {
   }
 
   .dtb-pdp--modal .dtb-pdp-brand-banner {
-    margin-top: 0.35rem;
+    margin-top: clamp(1.65rem, 5.5vw, 2.15rem);
     padding: 1.2rem 1rem;
   }
 

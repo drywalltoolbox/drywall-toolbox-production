@@ -37,7 +37,7 @@ const POLICY_LINKS = [
     Icon: CheckCircle,
     to: '/return-policy',
     title: 'Full Return Policy',
-    body: 'Eligibility, RMA steps, refund timing, and the 45-day return window.',
+    body: 'Eligibility, Return ID steps, refund timing, and the 45-day return window.',
   },
   {
     Icon: Package,
@@ -173,7 +173,7 @@ export default function ReturnPortal() {
     <div style={{ minHeight: '100vh' }} className="page-wrapper">
       <SEOHead
         title="Return Portal"
-        description="Start a return or exchange with Drywall Toolbox. Enter your order number and email to begin. 45-day return window, no restocking fee."
+        description="Start a return or exchange with Drywall Toolbox. Enter your order number and email to begin. 45-day return window, no restocking fee on unused approved returns."
         canonical="https://drywalltoolbox.com/returns"
       />
 
@@ -225,8 +225,8 @@ export default function ReturnPortal() {
             lineHeight: 1.6,
           }}>
             Start a return or exchange in seconds. Enter your order details below
-            and our team will get back to you within one business day with an RMA
-            number and next steps.
+            and our team will get back to you within one business day with your
+            Return ID and next steps.
           </p>
         </div>
       </section>
@@ -567,8 +567,8 @@ export default function ReturnPortal() {
                   </p>
                   <p style={{ fontSize: '0.85rem', color: 'rgba(15,23,42,0.5)', margin: 0, lineHeight: 1.6 }}>
                     Our team will respond to <strong>{lookupEmail.trim()}</strong> within
-                    1 business day with your RMA number and return instructions.
-                    Do not ship items back until you receive your RMA.
+                    1 business day with your Return ID and return instructions.
+                    Do not ship items back until you receive your Return ID.
                   </p>
                 </div>
 
@@ -585,9 +585,9 @@ export default function ReturnPortal() {
                 }}>
                   <strong style={{ color: '#0f172a' }}>What happens next?</strong>
                   <ol style={{ margin: '8px 0 0', paddingLeft: '18px', display: 'flex', flexDirection: 'column', gap: '5px' }}>
-                    <li>We review your request and email your RMA number.</li>
+                    <li>We review your request and email your Return ID.</li>
                     <li>Package the item securely in its original packaging.</li>
-                    <li>Ship using the carrier and address provided in the RMA email.</li>
+                    <li>Ship using the carrier and address provided in the return instructions email.</li>
                     <li>Refund is processed within 3–5 business days of receiving the item.</li>
                   </ol>
                 </div>

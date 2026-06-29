@@ -80,26 +80,60 @@
     margin-bottom: 0;
   }
 
+  .dtb-pdp--modal .dtb-pdp-gallery > * {
+    flex: 0 0 auto;
+  }
+
+  .dtb-pdp--modal .product-image-gallery__main {
+    aspect-ratio: auto !important;
+    height: clamp(24rem, 30vw, 30rem);
+    min-height: 0;
+    max-height: clamp(24rem, 30vw, 30rem);
+  }
+
+  .dtb-pdp--modal .product-image-gallery__main img {
+    padding: 1.25rem !important;
+  }
+
   .dtb-pdp--modal .dtb-pdp__info-column {
     align-content: start;
     grid-auto-rows: max-content;
-    gap: 1rem;
+    gap: 1.28rem;
+    padding-top: 0.15rem;
   }
 
   .dtb-pdp--modal .dtb-pdp-header {
-    gap: 0.65rem;
+    gap: 0.88rem;
+  }
+
+  .dtb-pdp--modal .dtb-pdp-header__reviews {
+    margin-top: 0;
+  }
+
+  .dtb-pdp--modal .dtb-pdp-header__meta {
+    margin-top: 0.05rem;
+  }
+
+  .dtb-pdp--modal .dtb-pdp-header__price-block {
+    gap: 0.52rem;
+    margin-top: 0.12rem;
   }
 
   .dtb-pdp--modal .dtb-pdp-shipping-note {
-    margin: 0;
+    margin: 0.05rem 0 0.2rem;
   }
 
   .dtb-pdp--modal .dtb-pdp-stock-meter--pre-cart {
-    margin: 0.35rem 0 0.15rem;
+    margin: 0.5rem 0 0.28rem;
+    gap: 0.58rem;
   }
 
   .dtb-pdp--modal .dtb-pdp-purchase-panel {
-    gap: 1rem;
+    gap: 1.12rem;
+  }
+
+  .dtb-pdp--modal .dtb-pdp-purchase-row {
+    gap: 0.88rem;
   }
 }
 

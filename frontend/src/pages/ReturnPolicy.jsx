@@ -22,7 +22,7 @@ import '../styles/store-policies.css';
 
 const QUICK_FACTS = [
   { Icon: Clock3, label: '45 days', text: 'Return eligible items within 45 days of invoice date.' },
-  { Icon: CheckCircle2, label: 'No restocking fee', text: 'Standard returns are not punished with a restocking fee.' },
+  { Icon: CheckCircle2, label: 'No restocking fee', text: 'Unused approved returns are not charged a restocking fee.' },
   { Icon: PackageCheck, label: 'Like-new condition', text: 'Items must be unused, complete, and in original packaging.' },
 ];
 
@@ -32,18 +32,18 @@ const RETURN_STEPS = [
     text: 'Use the Return Portal or email info@drywalltoolbox.com with your order number.',
   },
   {
-    title: 'Wait for your RMA',
-    text: 'We send your RMA number and return instructions by email, usually within 1 business day.',
+    title: 'Wait for return approval',
+    text: 'We send your Return ID and return instructions by email, usually within 1 business day.',
   },
   {
     title: 'Pack and ship',
-    text: 'Pack the item securely and write the RMA number clearly on the outside of the box.',
+    text: 'Pack the item securely and include your Return ID with the package.',
   },
 ];
 
 const SHIPPING_RULES = [
   { label: 'Damaged, defective, wrong item, or covered warranty claim', value: 'Drywall Toolbox provides a prepaid label.' },
-  { label: 'Ordered wrong item, changed mind, or no longer needed', value: 'Customer pays return shipping.' },
+  { label: 'Ordered wrong item, changed mind, or no longer needed', value: 'Customer pays return shipping; label cost may be deducted from the refund.' },
 ];
 
 const NOT_RETURNABLE = [
@@ -51,7 +51,7 @@ const NOT_RETURNABLE = [
   'Closeout, final-sale, outlet, discontinued, or specially priced items.',
   'Special-order or direct-ship items marked non-returnable on the product page.',
   'Partially used consumables such as sandpaper, tape, abrasives, or case quantities.',
-  'Returns shipped without an approved RMA number.',
+  'Returns shipped without an approved Return ID.',
 ];
 
 const RELATED_POLICIES = [
@@ -115,7 +115,7 @@ export default function ReturnPolicy() {
     <div className="store-policy-page">
       <SEOHead
         title="Return Policy"
-        description="Drywall Toolbox return policy: 45-day returns, no restocking fee on standard returns, RMA instructions, refund timing, and warranty support."
+        description="Drywall Toolbox return policy: 45-day returns, no restocking fee on unused approved returns, Return ID instructions, refund timing, and warranty support."
         canonical="https://drywalltoolbox.com/return-policy"
       />
 
@@ -146,7 +146,7 @@ export default function ReturnPolicy() {
         <section className="store-policy-section store-policy-section--intro">
           <div>
             <PolicyPill>Standard returns</PolicyPill>
-            <h2>45-day return window. No standard restocking fee.</h2>
+            <h2>45-day return window. No restocking fee for unused approved returns.</h2>
           </div>
           <p>
             Returns are accepted within 45 days of invoice date. Items must be
@@ -169,8 +169,8 @@ export default function ReturnPolicy() {
           <div className="store-policy-alert">
             <AlertCircle size={18} />
             <p>
-              Do not ship returns directly to a manufacturer or without an RMA.
-              Returns without a valid RMA may be refused or delayed.
+              Do not ship returns directly to a manufacturer or without a Return ID.
+              Returns without a valid Return ID may be refused or delayed.
             </p>
           </div>
         </section>
@@ -188,9 +188,11 @@ export default function ReturnPolicy() {
               ))}
             </div>
             <p>
-              Use a trackable shipping service for returns over $75. We are not
-              responsible for items lost or damaged in transit when return shipping
-              is the customer's responsibility.
+              Use a trackable shipping service for returns over $75. When we
+              provide a discounted label for a discretionary return, the label
+              cost may be deducted from the refund. We are not responsible for
+              items lost or damaged in transit when return shipping is the
+              customer's responsibility.
             </p>
           </article>
 
@@ -203,9 +205,14 @@ export default function ReturnPolicy() {
               payment method within 3-5 business days.
             </p>
             <p>
-              Original outbound shipping charges are non-refundable. If an order
-              shipped under a free-shipping promotion, the actual outbound shipping
-              cost may be deducted from the refund.
+              Original outbound shipping charges are non-refundable unless the
+              return is caused by our error, damage in transit, or a verified
+              defect. If an order shipped under a free-shipping promotion, the
+              actual outbound shipping cost may be deducted from the refund.
+            </p>
+            <p>
+              Items returned used, incomplete, damaged, or missing accessories
+              may be refused or refunded at a reduced amount after inspection.
             </p>
           </article>
         </section>

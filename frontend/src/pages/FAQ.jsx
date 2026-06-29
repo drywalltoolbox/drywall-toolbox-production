@@ -22,9 +22,9 @@ const FAQ_CATEGORIES = [
     id: 'warranty-returns',
     label: 'Warranty & Returns',
     questions: [
-      { q: 'What is your standard return policy for tools and parts?', a: 'New, unused products in original, unaltered packaging may be returned within 45 days of delivery for a refund to the original payment method. Items must be in resalable condition.' },
+      { q: 'What is your standard return policy for tools and parts?', a: 'New, unused products in original, unaltered packaging may be returned within 45 days of invoice date for a refund to the original payment method. Items must be in resalable condition.' },
       { q: 'Which items are non-returnable?', a: 'Electrical components, special-order parts, custom-configured items, final-sale products, and products that have been installed, modified, or used in the field are non-returnable.' },
-      { q: 'How do I initiate a return?', a: 'Log in to your Account Dashboard and select the order you would like to return, then choose Request Return. Returns sent without an RMA number may be refused or delayed.' },
+      { q: 'How do I initiate a return?', a: 'Log in to your Account Dashboard and select the order you would like to return, then choose Request Return. Returns sent without a Return ID may be refused or delayed.' },
       { q: 'What if my order arrives damaged or incorrect?', a: 'Photograph the outer packaging and product contents immediately, then contact us within 72 hours of delivery. We will review the issue and coordinate the replacement, claim, or correction.' },
       { q: 'Do new tools carry a manufacturer warranty?', a: 'All new tools sold by Drywall Toolbox are covered by the applicable manufacturer warranty. Warranty claims are processed through us so you do not need to contact the manufacturer separately.' },
       { q: 'Do replacement parts carry a warranty?', a: 'OEM replacement parts carry a 90-day defect warranty from delivery. Wear items such as blades, seals, o-rings, and springs are consumables and are excluded from defect coverage unless clearly defective on arrival.' },

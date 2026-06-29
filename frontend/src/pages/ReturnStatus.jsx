@@ -177,7 +177,7 @@ function ReturnDetails( { data } ) {
 function NextStep( { status } ) {
   const copy = {
     pending_review: 'Our team is checking eligibility, order history, and the reason for return.',
-    approved: 'Your return is approved. Watch for RMA and shipping instructions from our team.',
+    approved: 'Your return is approved. Watch for your Return ID and shipping instructions from our team.',
     awaiting_item: 'Package the item securely and send it using the instructions provided.',
     item_received: 'We have the item and are inspecting it before issuing the final resolution.',
     refund_issued: 'The refund has been issued. Bank posting times vary by payment method.',

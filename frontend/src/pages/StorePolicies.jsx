@@ -22,7 +22,7 @@ const POLICY_CARDS = [
   {
     Icon: RotateCcw,
     title: 'Return Policy',
-    text: '45-day returns, no standard restocking fee, RMA steps, return shipping, exclusions, and refund timing.',
+    text: '45-day returns, no restocking fee on unused approved returns, Return ID steps, return shipping, exclusions, and refund timing.',
     to: '/return-policy',
     action: 'View return policy',
   },
@@ -36,7 +36,7 @@ const POLICY_CARDS = [
   {
     Icon: FileText,
     title: 'Return Portal',
-    text: 'Start a return request, submit order details, and receive your RMA instructions by email.',
+    text: 'Start a return request, submit order details, and receive your Return ID and instructions by email.',
     to: '/returns',
     action: 'Start a return',
   },

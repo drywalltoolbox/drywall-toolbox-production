@@ -557,10 +557,10 @@ module.exports = (envFlags, argv) => {
 
     performance: {
       hints:             isDev ? false : 'warning',
-      // Baseline production output currently exceeds webpack defaults due to
-      // intentional route/data payloads (for example, schematics).
-      maxEntrypointSize: 1_050_000,
-      maxAssetSize:      750_000,
+      // Keep budgets close to the measured production baseline so warnings
+      // flag meaningful growth instead of expected storefront/schematics size.
+      maxEntrypointSize: 1_200_000,
+      maxAssetSize:      950_000,
       // Only warn on JS and CSS — images/fonts/media are expected to be large
       assetFilter: (assetFilename) =>
         /\.(js|css)$/.test(assetFilename) && !assetFilename.endsWith('.map'),
