@@ -357,6 +357,13 @@
   white-space: nowrap;
 }
 
+.account-activity-card__title-row {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 7px;
+}
+
 .account-activity-card__meta {
   overflow: hidden;
   color: #64748b;
@@ -841,6 +848,7 @@
 
   .account-activity-card__aside {
     grid-column: 2;
+    justify-self: start;
     align-items: flex-start;
     flex-direction: row;
   }

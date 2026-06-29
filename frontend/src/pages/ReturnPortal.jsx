@@ -35,19 +35,19 @@ const RETURN_REASONS = [
 const POLICY_LINKS = [
   {
     Icon: CheckCircle,
-    to: '/policies#returns',
+    to: '/return-policy',
     title: 'Full Return Policy',
     body: 'Eligibility, RMA steps, refund timing, and the 45-day return window.',
   },
   {
     Icon: Package,
-    to: '/policies#returns',
+    to: '/return-policy',
     title: 'Return Shipping',
     body: 'Who pays return shipping for damaged, defective, warranty, or customer-error returns.',
   },
   {
     Icon: AlertCircle,
-    to: '/policies#returns',
+    to: '/return-policy',
     title: 'Non-Returnable Items',
     body: 'Used, final-sale, special-order, direct-ship, and consumable-item exclusions.',
   },
@@ -148,7 +148,7 @@ export default function ReturnPortal() {
     } catch (err) {
       setSubmitError(
         err?.message ||
-        'Unable to submit your return request. Please email us directly at elliott.miller@drywalltoolbox.com.'
+        'Unable to submit your return request. Please email us directly at info@drywalltoolbox.com.'
       );
     } finally {
       setSubmitLoading(false);
@@ -729,7 +729,7 @@ export default function ReturnPortal() {
             </div>
 
             <Link
-              to="/policies"
+              to="/return-policy"
               style={{
                 display:        'inline-flex',
                 alignItems:     'center',
@@ -743,7 +743,7 @@ export default function ReturnPortal() {
               onMouseEnter={(e) => (e.currentTarget.style.textDecoration = 'underline')}
               onMouseLeave={(e) => (e.currentTarget.style.textDecoration = 'none')}
             >
-              View all store policies <ArrowRight size={14} />
+              View full return policy <ArrowRight size={14} />
             </Link>
           </aside>
         </div>

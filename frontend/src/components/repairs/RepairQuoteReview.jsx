@@ -122,10 +122,10 @@ export default function RepairQuoteReview( { repairId, token, onAccepted, onDecl
       <p className="text-sm text-yellow-700">
         Questions? Contact us at{' '}
         <a
-          href="mailto:repairs@drywalltoolbox.com"
+          href="mailto:info@drywalltoolbox.com"
           className="font-medium underline hover:text-yellow-900"
         >
-          repairs@drywalltoolbox.com
+          info@drywalltoolbox.com
         </a>
         {' '}and reference your repair ID.
       </p>

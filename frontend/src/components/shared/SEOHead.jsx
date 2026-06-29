@@ -37,6 +37,7 @@ const STATIC_ROUTE_TITLES = {
   '/calculators': 'Calculators',
   '/shipping-policy': 'Shipping Policy',
   '/returns': 'Returns',
+  '/return-policy': 'Return Policy',
   '/policies': 'Store Policies',
   '/cart': 'Cart',
   '/checkout': 'Checkout',

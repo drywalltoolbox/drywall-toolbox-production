@@ -137,7 +137,7 @@ export function buildOrganizationSchema() {
     contactPoint: {
       '@type':            'ContactPoint',
       contactType:        'customer service',
-      email:              'support@drywalltoolbox.com',
+      email:              'info@drywalltoolbox.com',
       availableLanguage:  'English',
     },
     sameAs: [

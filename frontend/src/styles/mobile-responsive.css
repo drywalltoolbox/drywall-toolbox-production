@@ -227,6 +227,94 @@ canvas {
     min-height: 52px;
   }
 
+  .dtb-pdp--modal .dtb-pdp__inner {
+    padding: 3.45rem var(--dtb-mobile-gutter) calc(30px + env(safe-area-inset-bottom, 0px)) !important;
+    gap: 1.18rem !important;
+  }
+
+  .dtb-pdp--modal .dtb-pdp__hero {
+    gap: 1.22rem !important;
+  }
+
+  .dtb-pdp--modal .dtb-pdp-gallery > div:first-child {
+    gap: 0.9rem !important;
+  }
+
+  .dtb-pdp--modal .product-image-gallery__main {
+    border-radius: 20px !important;
+  }
+
+  .dtb-pdp--modal .product-image-gallery__main img {
+    padding: 16px !important;
+  }
+
+  .dtb-pdp--modal .dtb-pdp-gallery [class*="overflow-x-auto"] {
+    gap: 0.72rem !important;
+    padding: 0.65rem !important;
+    border-radius: 18px !important;
+  }
+
+  .dtb-pdp--modal .dtb-pdp-gallery [aria-label^="View image"] {
+    width: 4.35rem !important;
+    height: 4.35rem !important;
+    border-radius: 14px !important;
+  }
+
+  .dtb-pdp--modal .dtb-pdp__info-column {
+    gap: 1.18rem !important;
+  }
+
+  .dtb-pdp--modal .dtb-pdp-header {
+    gap: 0.72rem !important;
+  }
+
+  .dtb-pdp--modal .dtb-pdp-header__mobile-status-row {
+    gap: 0.58rem !important;
+    margin-bottom: 0.06rem;
+  }
+
+  .dtb-pdp--modal .dtb-pdp-header__title {
+    margin-top: 0.04rem;
+  }
+
+  .dtb-pdp--modal .dtb-pdp-header__meta {
+    gap: 0.42rem 0.68rem !important;
+    margin-top: 0.04rem;
+  }
+
+  .dtb-pdp--modal .dtb-pdp-header__price-block {
+    gap: 0.36rem !important;
+    margin-top: 0.18rem;
+  }
+
+  .dtb-pdp--modal .dtb-pdp-shipping-note {
+    margin: 0.02rem 0 0 !important;
+  }
+
+  .dtb-pdp--modal .dtb-pdp-stock-meter--pre-cart {
+    margin-top: 0.32rem !important;
+    margin-bottom: 0.08rem !important;
+    gap: 0.55rem !important;
+  }
+
+  .dtb-pdp--modal .dtb-pdp-purchase-panel {
+    gap: 0.95rem !important;
+  }
+
+  .dtb-pdp--modal .dtb-pdp-purchase-row {
+    gap: 0.82rem !important;
+  }
+
+  .dtb-pdp--modal .dtb-pdp-qty-root,
+  .dtb-pdp--modal .dtb-pdp-add-to-cart {
+    border-radius: 15px !important;
+  }
+
+  .dtb-pdp--modal .dtb-pdp-brand-banner {
+    margin-top: 0.35rem;
+    padding: 1.2rem 1rem;
+  }
+
   .dtb-checkout,
   .dtb-cart-page {
     padding-bottom: env(safe-area-inset-bottom, 0px);

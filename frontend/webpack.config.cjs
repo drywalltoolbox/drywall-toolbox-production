@@ -108,6 +108,7 @@ module.exports = (envFlags, argv) => {
     : path.resolve(__dirname, '..', 'dist');
 
   const DEV_PROXY_TARGET = env('REACT_APP_API_BASE_URL') || 'https://drywalltoolbox.com';
+  const cacheName = `${mode}-${appEnv}-${PUBLIC_URL || 'root'}`.replace(/[^a-z0-9_.-]+/gi, '-');
 
   // ─── DefinePlugin values ────────────────────────────────────────────────
   const defines = {
@@ -206,6 +207,18 @@ module.exports = (envFlags, argv) => {
   return {
     mode,
     bail: !isDev,
+    cache: {
+      type: 'filesystem',
+      name: cacheName,
+      buildDependencies: {
+        config: [
+          __filename,
+          path.resolve(__dirname, 'babel.config.json'),
+          path.resolve(__dirname, 'postcss.config.js'),
+          path.resolve(__dirname, 'package-lock.json'),
+        ],
+      },
+    },
 
     // ─── Entry ─────────────────────────────────────────────────────────────
     entry: './src/main.jsx',

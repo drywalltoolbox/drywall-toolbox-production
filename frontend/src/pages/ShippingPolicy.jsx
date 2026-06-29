@@ -541,7 +541,7 @@ export default function ShippingPolicy() {
             <ArrowRight size={18} style={{ color: 'var(--primary-600)', flexShrink: 0 }} />
           </Link>
           <Link
-            to="/policies"
+            to="/return-policy"
             style={{
               display:         'flex',
               alignItems:      'center',
@@ -565,7 +565,7 @@ export default function ShippingPolicy() {
           >
             <div>
               <div style={{ fontWeight: 700, fontSize: '0.9rem', color: '#0f172a', marginBottom: '3px' }}>
-                Store Policies
+                Return Policy
               </div>
               <div style={{ fontSize: '0.8rem', color: 'rgba(15,23,42,0.5)' }}>
                 Returns, warranty, cancellations &amp; payment

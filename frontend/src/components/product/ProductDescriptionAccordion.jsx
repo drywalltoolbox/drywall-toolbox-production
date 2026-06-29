@@ -110,7 +110,7 @@ export default function ProductDescriptionAccordion({ product }) {
                   <div style={{ fontSize: '0.85rem', color: '#475569', lineHeight: 1.75 }}>
                     <p>Free standard shipping on orders over $75 (contiguous USA).</p>
                     <p>Express and overnight options available at checkout.</p>
-                    <p>Returns accepted within 30 days of delivery. See our <a href="/returns" style={{ color: 'var(--primary-600)', textDecoration: 'underline' }}>Return Policy</a> for details.</p>
+                    <p>Returns accepted within 45 days of invoice date. See our <a href="/return-policy" style={{ color: 'var(--primary-600)', textDecoration: 'underline' }}>Return Policy</a> for details.</p>
                   </div>
                 )}
               </div>

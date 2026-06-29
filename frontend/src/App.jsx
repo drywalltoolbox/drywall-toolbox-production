@@ -99,6 +99,7 @@ const FAQ = lazyWithReload(() => import('./pages/FAQ'));
 const ShippingPolicy = lazyWithReload(() => import('./pages/ShippingPolicy'));
 const ReturnPortal = lazyWithReload(() => import('./pages/ReturnPortal'));
 const StorePolicies = lazyWithReload(() => import('./pages/StorePolicies'));
+const ReturnPolicy = lazyWithReload(() => import('./pages/ReturnPolicy'));
 // const ToolsetBuilder = lazy(() => import('./pages/ToolsetBuilder')); // DISABLED: temporarily hide Toolset Builder
 const TechnicalSpecificationsPreview = lazyWithReload(() => import('./pages/TechnicalSpecificationsPreview'));
 
@@ -246,6 +247,7 @@ function AppRoutes() {
           <Route path="/shipping-policy" element={<ShippingPolicy />} />
           <Route path="/returns" element={<ReturnPortal />} />
           <Route path="/returns/status/:id" element={<ReturnStatus />} />
+          <Route path="/return-policy" element={<ReturnPolicy />} />
           <Route path="/policies" element={<StorePolicies />} />
           {/* <Route path="/toolset-builder" element={<ToolsetBuilder />} /> */}
           <Route path="/preview/technical-specifications" element={<TechnicalSpecificationsPreview />} />

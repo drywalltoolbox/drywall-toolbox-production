@@ -135,8 +135,8 @@ export default function Footer() {
               { to: '/all-products', label: 'All Products' },
               { to: '/products?category=taping', label: 'Taping Tools' },
               { to: '/products?category=finishing', label: 'Finishing Tools' },
-              { to: '/products?category=sanding', label: 'Sanding Tools' },
-              { to: '/parts', label: 'Parts & Schematics' },
+              { to: '/parts', label: 'Parts' },
+              { to: '/schematics', label: 'Schematics' },
             ].map(({ to, label }) => (
               <li key={to}><FooterLink to={to}>{label}</FooterLink></li>
             ))}
@@ -159,8 +159,8 @@ export default function Footer() {
             {[
               { to: '/contact', label: 'Contact Us' },
               { to: '/repairs', label: 'Repair Services' },
-              { to: '/shipping-policy', label: 'Shipping Policy' },
               { to: '/returns', label: 'Return Portal' },
+              { to: '/shipping-policy', label: 'Shipping' },
               { to: '/policies', label: 'Store Policies' },
             ].map(({ to, label }) => (
               <li key={label}><FooterLink to={to}>{label}</FooterLink></li>
