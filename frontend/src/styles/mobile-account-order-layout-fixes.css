@@ -1,0 +1,119 @@
+/* Mobile account/order layout corrections. */
+.account-activity-card__title-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.42rem;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.account-activity-card__title-row .account-activity-card__title {
+  min-width: 0;
+}
+
+.account-activity-card__title-row .account-activity-card__status {
+  flex: 0 0 auto;
+}
+
+.account-activity-card__aside {
+  justify-content: center;
+}
+
+.dtb-order-item,
+.dtb-order-item--friendly {
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+}
+
+.dtb-order-item__main {
+  min-width: 0;
+}
+
+.dtb-order-item__price {
+  justify-self: end;
+  align-self: center;
+  text-align: right;
+}
+
+@media (max-width: 767px) {
+  .account-activity-card {
+    grid-template-columns: auto minmax(0, 1fr) auto auto;
+    align-items: center;
+  }
+
+  .account-activity-card__body {
+    gap: 0.16rem;
+  }
+
+  .account-activity-card__title-row {
+    width: 100%;
+  }
+
+  .account-activity-card__title {
+    display: inline-block;
+  }
+
+  .account-activity-card__status {
+    max-width: 7.25rem;
+    font-size: 0.62rem;
+  }
+
+  .account-activity-card__aside {
+    align-items: flex-end;
+    gap: 0;
+  }
+
+  .account-activity-card__amount {
+    font-size: 0.84rem;
+    font-weight: 850;
+    white-space: nowrap;
+  }
+
+  .dtb-order-item,
+  .dtb-order-item--friendly {
+    grid-template-columns: minmax(0, 1fr) auto !important;
+    gap: 0.7rem !important;
+    align-items: center !important;
+  }
+
+  .dtb-order-item__main {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
+    min-width: 0;
+  }
+
+  .dtb-order-item__name {
+    max-width: 100%;
+  }
+
+  .dtb-order-item__price {
+    justify-self: end !important;
+    align-self: center !important;
+    padding-top: 0 !important;
+    text-align: right !important;
+    white-space: nowrap;
+  }
+
+  .dtb-order-page .mx-auto.max-w-5xl.px-4.pt-5:has(+ .dtb-order-tracking-shell),
+  .dtb-order-page + .mx-auto.max-w-5xl.px-4.pt-5,
+  main > .mx-auto.max-w-5xl.px-4.pt-5:has(+ .dtb-order-tracking-shell) {
+    display: none !important;
+  }
+}
+
+@media (max-width: 390px) {
+  .account-activity-card {
+    gap: 10px;
+    padding-inline: 12px;
+  }
+
+  .account-activity-card__status {
+    max-width: 6.5rem;
+  }
+
+  .dtb-order-item,
+  .dtb-order-item--friendly {
+    gap: 0.58rem !important;
+  }
+}
