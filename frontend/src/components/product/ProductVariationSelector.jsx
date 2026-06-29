@@ -77,6 +77,18 @@ export default function ProductVariationSelector({
                     whileTap={disabled ? undefined : { scale: 0.985 }}
                     transition={{ duration: 0.18, ease: [0.22, 1, 0.36, 1] }}
                   >
+                    <AnimatePresence>
+                      {!variationsLoading && selected ? (
+                        <Motion.span
+                          className="dtb-variant-pill__selection-overlay"
+                          aria-hidden="true"
+                          initial={{ opacity: 0, scale: 0.92 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          exit={{ opacity: 0, scale: 0.96 }}
+                          transition={{ duration: 0.16, ease: [0.22, 1, 0.36, 1] }}
+                        />
+                      ) : null}
+                    </AnimatePresence>
                     <span className="dtb-variant-pill__label">{option.value}</span>
                     {!variationsLoading && selected ? (
                       <AnimatePresence>
