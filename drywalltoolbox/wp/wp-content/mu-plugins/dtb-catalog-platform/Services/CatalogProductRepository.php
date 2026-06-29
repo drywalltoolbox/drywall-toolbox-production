@@ -23,6 +23,9 @@ if ( class_exists( 'DTB_CatalogProductRepository' ) ) {
 
 final class DTB_CatalogProductRepository {
 
+	/** SKU/name/meta pattern for compound/mud/cam-lock tube tools. */
+	const COMPOUND_TUBE_PATTERN = '(compound[[:space:]_-]*tube|mud[[:space:]_-]*tube|cam[[:space:]_-]*lock[[:space:]_-]*tube|(^|[^A-Z0-9])(CMT[0-9]{2}|CLT[0-9]{2}|CLTBF)([^A-Z0-9]|$))';
+
 	/**
 	 * Return a paginated set of product IDs and totals for the current filter set.
 	 *
@@ -108,17 +111,30 @@ final class DTB_CatalogProductRepository {
 				$space_form  = str_replace( '_', ' ', $display_category_key );
 				$title_form  = ucwords( $space_form );
 				$hyphen_form = str_replace( '_', '-', $display_category_key );
-				$meta_query[] = [
-					'key'     => DTB_ProductMeta::DISPLAY_CATEGORY_KEY,
-					'value'   => array_values( array_unique( array_filter( array_merge( $raw_forms, [
-						$display_category_key,
-						$display_category_slug,
-						$hyphen_form,
-						$space_form,
-						$title_form,
-					] ) ) ) ),
-					'compare' => 'IN',
-				];
+
+				if ( 'compound_tubes' === $canonical ) {
+					$compound_ids     = self::compound_tube_product_ids();
+					$args['post__in'] = ! empty( $compound_ids ) ? $compound_ids : [ 0 ];
+				} else {
+					$meta_query[] = [
+						'key'     => DTB_ProductMeta::DISPLAY_CATEGORY_KEY,
+						'value'   => array_values( array_unique( array_filter( array_merge( $raw_forms, [
+							$display_category_key,
+							$display_category_slug,
+							$hyphen_form,
+							$space_form,
+							$title_form,
+						] ) ) ) ),
+						'compare' => 'IN',
+					];
+				}
+
+				if ( 'semi_automatic_tapers' === $canonical ) {
+					$args['post__not_in'] = array_values( array_unique( array_merge(
+						array_map( 'absint', $args['post__not_in'] ?? [] ),
+						self::compound_tube_product_ids()
+					) ) );
+				}
 
 				// Tool/category filters must not leak schematic replacement parts.
 				// Use NOT EXISTS OR != '1' so products whose meta is absent are
@@ -236,6 +252,45 @@ final class DTB_CatalogProductRepository {
 	 */
 	private static function is_parts_display_category( string $display_category ): bool {
 		return in_array( sanitize_title( $display_category ), [ 'parts', 'repair-parts', 'replacement-parts' ], true );
+	}
+
+	/** Return product IDs that are compound/mud/cam-lock tube tools. */
+	private static function compound_tube_product_ids(): array {
+		$query = new WP_Query( [
+			'post_type'              => 'product',
+			'post_status'            => 'publish',
+			'fields'                 => 'ids',
+			'posts_per_page'         => -1,
+			'no_found_rows'          => true,
+			'ignore_sticky_posts'    => true,
+			'update_post_meta_cache' => false,
+			'update_post_term_cache' => false,
+			'meta_query'             => [
+				'relation' => 'OR',
+				[
+					'key'     => DTB_ProductMeta::DISPLAY_CATEGORY_KEY,
+					'value'   => DTB_CategoryNormalizer::display_category_raw_forms( 'compound_tubes' ),
+					'compare' => 'IN',
+				],
+				[
+					'key'     => '_sku',
+					'value'   => self::COMPOUND_TUBE_PATTERN,
+					'compare' => 'REGEXP',
+				],
+				[
+					'key'     => DTB_ProductMeta::MPN,
+					'value'   => self::COMPOUND_TUBE_PATTERN,
+					'compare' => 'REGEXP',
+				],
+				[
+					'key'     => DTB_ProductMeta::MANUFACTURER_SKU,
+					'value'   => self::COMPOUND_TUBE_PATTERN,
+					'compare' => 'REGEXP',
+				],
+			],
+		] );
+
+		return array_values( array_map( 'absint', $query->posts ?? [] ) );
 	}
 
 	/**
