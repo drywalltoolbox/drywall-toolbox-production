@@ -2,7 +2,7 @@
 /**
  * Plugin Name: DTB WooCommerce Payment Runtime Mobile Fixes
  * Description: Loads mobile-specific order-pay card-field rendering safeguards after the primary DTB payment runtime assets.
- * Version: 1.2.0
+ * Version: 1.2.1
  * Author: Drywall Toolbox
  */
 
@@ -45,6 +45,16 @@ add_action(
 				$asset_url . '/payment-runtime-mobile-polish.css',
 				[ 'dtb-payment-runtime-mobile-sheet', 'dtb-payment-runtime-modern-typography' ],
 				(string) filemtime( $polish_style_path )
+			);
+		}
+
+		$notice_style_path = $asset_dir . '/payment-runtime-notice-cleanup.css';
+		if ( file_exists( $notice_style_path ) ) {
+			wp_enqueue_style(
+				'dtb-payment-runtime-notice-cleanup',
+				$asset_url . '/payment-runtime-notice-cleanup.css',
+				[ 'dtb-payment-runtime-mobile-polish' ],
+				(string) filemtime( $notice_style_path )
 			);
 		}
 
