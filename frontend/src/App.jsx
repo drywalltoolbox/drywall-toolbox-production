@@ -190,7 +190,13 @@ function RedirectToProducts() {
 function getRouteBackConfig(pathname) {
   if (pathname.startsWith('/repairs/status/')) return { fallbackTo: '/dashboard?tab=repairs', label: 'Back to repairs' };
   if (pathname.startsWith('/order-tracking/')) return null;
-  if (pathname.startsWith('/order/')) return { fallbackTo: '/dashboard?tab=orders', label: 'Back to orders' };
+  if (pathname.startsWith('/order/')) {
+    return {
+      fallbackTo: '/dashboard?tab=orders',
+      label: 'Back to orders',
+      scope: 'orders',
+    };
+  }
   return null;
 }
 
@@ -200,8 +206,12 @@ function RouteBackBar() {
   if (!config) return null;
 
   return (
-    <div className="mx-auto max-w-5xl px-4 pt-5">
-      <SmartBackButton fallbackTo={config.fallbackTo} label={config.label} />
+    <div className={`dtb-route-back-bar${config.scope ? ` dtb-route-back-bar--${config.scope}` : ''}`}>
+      <SmartBackButton
+        fallbackTo={config.fallbackTo}
+        label={config.label}
+        className={config.scope ? `dtb-route-back-button dtb-route-back-button--${config.scope}` : 'dtb-route-back-button'}
+      />
     </div>
   );
 }
@@ -271,8 +281,8 @@ function AppRoutes() {
 
 function App() {
   const [cartOpen, setCartOpen] = useState(false);
-  const toggleCart = () => setCartOpen(prev => !prev);
-  const closeCart = () => setCartOpen(false);
+  const toggleCart = useCallback(() => setCartOpen(prev => !prev), []);
+  const closeCart = useCallback(() => setCartOpen(false), []);
   const basename = (process.env.PUBLIC_URL || '').replace(/\/+$/, '') || '/';
 
   return (
@@ -296,13 +306,21 @@ function App() {
 function AppShell({ cartOpen, toggleCart, closeCart }) {
   const location = useLocation();
   const { user } = useAuthContext();
+  const routeKey = `${location.pathname}${location.search}${location.hash}`;
+  const previousRouteKeyRef = useRef(routeKey);
 
   const isHome = location.pathname === '/';
   const minimalChrome = false;
 
+  useEffect(() => {
+    if (previousRouteKeyRef.current === routeKey) return;
+    previousRouteKeyRef.current = routeKey;
+    if (cartOpen) closeCart();
+  }, [cartOpen, closeCart, routeKey]);
+
   return (
     <>
-      {!minimalChrome && <Header onCartToggle={toggleCart} />}
+      {!minimalChrome && <Header onCartToggle={toggleCart} onMobileMenuOpen={closeCart} />}
       <main className={!isHome && !minimalChrome ? 'main-content' : minimalChrome ? '' : 'main-content home-main'}>
         <RouteBackBar />
         <AppRoutes />

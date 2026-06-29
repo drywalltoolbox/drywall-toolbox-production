@@ -78,7 +78,7 @@ const buildProductsBrandRoute = (slug) => `/products/brands/${slug}`;
 const buildPartsBrandRoute = (slug) => `/parts?brand=${encodeURIComponent(slug)}`;
 const buildSchematicsBrandRoute = (slug) => `/schematics?brand=${encodeURIComponent(slug)}`;
 
-export default function Header({ onCartToggle, hasTopTicker = false }) {
+export default function Header({ onCartToggle, onMobileMenuOpen, hasTopTicker = false }) {
   const location = useLocation();
   const navigate = useNavigate();
   const { getCartCount } = useCart();
@@ -165,6 +165,21 @@ export default function Header({ onCartToggle, hasTopTicker = false }) {
     setMobileSearchQuery('');
     setSearchSuggestions([]);
   }, []);
+
+  const handleMobileMenuCheckedChange = useCallback((checked) => {
+    if (checked) {
+      onMobileMenuOpen?.();
+      setAccountDropdownOpen(false);
+      closeSearchOverlay();
+    }
+    setMobileMenuOpen(checked);
+  }, [closeSearchOverlay, onMobileMenuOpen]);
+
+  const handleCartToggle = useCallback(() => {
+    setMobileMenuOpen(false);
+    closeSearchOverlay();
+    onCartToggle?.();
+  }, [closeSearchOverlay, onCartToggle]);
 
   const resetDrawerExpansions = useCallback(() => {
     setProductsExpanded(false);
@@ -406,7 +421,7 @@ export default function Header({ onCartToggle, hasTopTicker = false }) {
         <div className="site-header-inner">
           <div className="header-mobile-layout" style={{ display: isTablet ? 'flex' : undefined }}>
             <div className="header-mobile-slot header-mobile-slot--left">
-              <MobileHamburgerToggle checked={mobileMenuOpen} onCheckedChange={setMobileMenuOpen} />
+              <MobileHamburgerToggle checked={mobileMenuOpen} onCheckedChange={handleMobileMenuCheckedChange} />
             </div>
 
             <Link to="/" className="header-mobile-logo" onClick={closeMobileMenu}>
@@ -423,7 +438,7 @@ export default function Header({ onCartToggle, hasTopTicker = false }) {
               </button>
               <button
                 type="button"
-                onClick={onCartToggle}
+                onClick={handleCartToggle}
                 className="header-mobile-cart-toggle cart-toggle header-icon"
                 aria-label="Open cart"
               >
@@ -466,7 +481,7 @@ export default function Header({ onCartToggle, hasTopTicker = false }) {
               </div>
               {!isLoading && <div ref={accountDropdownRef} className="header-account"><button onClick={() => { if (isAuthenticated) { setAccountHubOpen(true); } else { setAccountDropdownOpen((o) => !o); } }} aria-label={isAuthenticated ? 'Open account hub' : 'Account menu'} aria-expanded={!isAuthenticated && accountDropdownOpen} className="header-account-toggle header-icon"><User size={20} /></button>{!isAuthenticated && <div className={`header-account-panel${accountDropdownOpen ? ' is-open' : ''}`}><div className="header-account-guest-header"><p className="header-account-guest-title">My Account</p></div><Link to="/login" onClick={() => setAccountDropdownOpen(false)} className="header-account-link header-account-link--strong"><LogIn size={14} />Sign In</Link><div className="header-account-divider header-account-divider--inset" /><div className="header-account-guest-body"><Link to="/register" onClick={() => setAccountDropdownOpen(false)} className="header-account-cta"><UserPlus size={13} />Create Account</Link><p className="header-account-note">No account needed to browse or checkout.</p></div></div>}</div>}
               {!isLoading && isAuthenticated && <NotificationsBell />}
-              <div className="cart-area"><button onClick={onCartToggle} className="cart-toggle header-icon" aria-label="Toggle cart"><ShoppingCart size={20} />{getCartCount() > 0 && <span className="cart-badge">{getCartCount()}</span>}</button></div>
+              <div className="cart-area"><button onClick={handleCartToggle} className="cart-toggle header-icon" aria-label="Toggle cart"><ShoppingCart size={20} />{getCartCount() > 0 && <span className="cart-badge">{getCartCount()}</span>}</button></div>
             </div>
           </div>
         </div>

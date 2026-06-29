@@ -209,10 +209,6 @@ export default function OrderConfirmation() {
     <div className="dtb-order-page page-wrapper">
       <SEOHead noindex title={`Order #${id}`} />
       <div className="dtb-order-shell">
-        <Link to="/dashboard?tab=orders" className="dtb-order-back-link">
-          <ArrowLeft size={14} /> Back to orders
-        </Link>
-
         <section className="dtb-order-sheet" aria-labelledby="order-title">
           <header className="dtb-order-sheet__hero">
             <span className="dtb-order-success-icon">

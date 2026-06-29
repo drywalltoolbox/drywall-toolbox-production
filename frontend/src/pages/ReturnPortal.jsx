@@ -31,28 +31,25 @@ const RETURN_REASONS = [
   'Other',
 ];
 
-/* ─── Policy summary cards ───────────────────────────────────────────────────── */
-const POLICY_POINTS = [
+/* ─── Policy navigation links ────────────────────────────────────────────────── */
+const POLICY_LINKS = [
   {
-    Icon:  CheckCircle,
-    color: '#16a34a',
-    bg:    'linear-gradient(135deg, #f0fdf4, #dcfce7)',
-    title: '45-Day Return Window',
-    body:  'New, unused products in original packaging may be returned within 45 days of purchase — 50% longer than the industry-standard 30 days.',
+    Icon: CheckCircle,
+    to: '/policies#returns',
+    title: 'Full Return Policy',
+    body: 'Eligibility, RMA steps, refund timing, and the 45-day return window.',
   },
   {
-    Icon:  Package,
-    color: '#2563eb',
-    bg:    'linear-gradient(135deg, #eff6ff, #dbeafe)',
-    title: 'No Restocking Fee — Ever',
-    body:  'Standard returns carry zero restocking fees. Used tool returns may be evaluated case-by-case, but we never penalise honest mistakes.',
+    Icon: Package,
+    to: '/policies#returns',
+    title: 'Return Shipping',
+    body: 'Who pays return shipping for damaged, defective, warranty, or customer-error returns.',
   },
   {
-    Icon:  AlertCircle,
-    color: '#d97706',
-    bg:    'linear-gradient(135deg, #fffbeb, #fef3c7)',
+    Icon: AlertCircle,
+    to: '/policies#returns',
     title: 'Non-Returnable Items',
-    body:  'Used tools with wear/residue, final-sale or outlet items, special-order items, direct-ship items marked non-returnable, and partially used consumables.',
+    body: 'Used, final-sale, special-order, direct-ship, and consumable-item exclusions.',
   },
 ];
 
@@ -247,97 +244,7 @@ export default function ReturnPortal() {
           alignItems:          'start',
         }}>
 
-          {/* ── Left: policy summary ──────────────────────────────────────── */}
-          <div>
-            <h2 style={{
-              fontSize:      'clamp(1.3rem, 2.5vw, 1.75rem)',
-              fontWeight:    800,
-              color:         'var(--primary-600)',
-              margin:        '0 0 6px',
-              letterSpacing: '-0.02em',
-            }}>
-              Return Policy
-            </h2>
-            <p style={{ fontSize: '0.875rem', color: 'rgba(15,23,42,0.6)', margin: '0 0 28px', lineHeight: 1.6 }}>
-              New, unused products in original packaging may be returned within
-              45 days for a full refund to the original payment method — with
-              no restocking fee, ever.
-            </p>
-
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', marginBottom: '28px' }}>
-              {POLICY_POINTS.map(({ Icon, color, bg, title, body }) => (
-                <div key={title} style={{
-                  background:   'white',
-                  border:       '1px solid var(--machined-border)',
-                  borderRadius: '4px',
-                  padding:      '16px 18px',
-                  display:      'flex',
-                  gap:          '14px',
-                  alignItems:   'flex-start',
-                }}>
-                  <div style={{
-                    width:          '38px',
-                    height:         '38px',
-                    background:     bg,
-                    borderRadius:   '9px',
-                    display:        'flex',
-                    alignItems:     'center',
-                    justifyContent: 'center',
-                    color,
-                    flexShrink:     0,
-                  }}>
-                    <Icon size={18} />
-                  </div>
-                  <div>
-                    <div style={{ fontWeight: 700, fontSize: '0.875rem', color: '#0f172a', marginBottom: '4px' }}>
-                      {title}
-                    </div>
-                    <div style={{ fontSize: '0.8rem', color: 'rgba(15,23,42,0.6)', lineHeight: 1.55 }}>
-                      {body}
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            {/* Shipping policy link */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              <Link
-                to="/shipping-policy"
-                style={{
-                  display:        'inline-flex',
-                  alignItems:     'center',
-                  gap:            '6px',
-                  fontSize:       '0.825rem',
-                  color:          'var(--primary-600)',
-                  textDecoration: 'none',
-                  fontWeight:     600,
-                }}
-                onMouseEnter={(e) => (e.currentTarget.style.textDecoration = 'underline')}
-                onMouseLeave={(e) => (e.currentTarget.style.textDecoration = 'none')}
-              >
-                View full Shipping Policy <ArrowRight size={14} />
-              </Link>
-              <Link
-                to="/policies"
-                style={{
-                  display:        'inline-flex',
-                  alignItems:     'center',
-                  gap:            '6px',
-                  fontSize:       '0.825rem',
-                  color:          'var(--primary-600)',
-                  textDecoration: 'none',
-                  fontWeight:     600,
-                }}
-                onMouseEnter={(e) => (e.currentTarget.style.textDecoration = 'underline')}
-                onMouseLeave={(e) => (e.currentTarget.style.textDecoration = 'none')}
-              >
-                View full Store Policies <ArrowRight size={14} />
-              </Link>
-            </div>
-          </div>
-
-          {/* ── Right: multi-step form ─────────────────────────────────────── */}
+          {/* ── Return request form ───────────────────────────────────────── */}
           <div>
 
             {/* Step indicator */}
@@ -747,6 +654,98 @@ export default function ReturnPortal() {
               </div>
             )}
           </div>
+
+          {/* ── Return policy links ───────────────────────────────────────── */}
+          <aside style={{
+            background:   'white',
+            border:       '1px solid var(--machined-border)',
+            borderRadius: '4px',
+            padding:      'clamp(1.25rem, 3vw, 1.75rem)',
+          }}>
+            <h2 style={{
+              fontSize:      'clamp(1.1rem, 2.2vw, 1.35rem)',
+              fontWeight:    800,
+              color:         '#0f172a',
+              margin:        '0 0 8px',
+              letterSpacing: '-0.02em',
+            }}>
+              Return Policy Details
+            </h2>
+            <p style={{ fontSize: '0.85rem', color: 'rgba(15,23,42,0.58)', margin: '0 0 18px', lineHeight: 1.6 }}>
+              Review the full store policy before submitting a request, including return eligibility,
+              shipping responsibility, exclusions, and refund timing.
+            </p>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              {POLICY_LINKS.map(({ Icon, to, title, body }) => (
+                <Link
+                  key={title}
+                  to={to}
+                  style={{
+                    display:        'grid',
+                    gridTemplateColumns: 'auto minmax(0, 1fr) auto',
+                    alignItems:     'center',
+                    gap:            '12px',
+                    padding:        '13px 14px',
+                    border:         '1px solid var(--machined-border)',
+                    borderRadius:   '4px',
+                    background:     '#f8fafc',
+                    color:          'inherit',
+                    textDecoration: 'none',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.borderColor = 'rgba(37,99,235,0.35)';
+                    e.currentTarget.style.background = '#eff6ff';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.borderColor = 'var(--machined-border)';
+                    e.currentTarget.style.background = '#f8fafc';
+                  }}
+                >
+                  <span style={{
+                    width:          '36px',
+                    height:         '36px',
+                    borderRadius:   '8px',
+                    background:     'white',
+                    color:          'var(--primary-600)',
+                    display:        'flex',
+                    alignItems:     'center',
+                    justifyContent: 'center',
+                    border:         '1px solid rgba(37,99,235,0.12)',
+                  }}>
+                    <Icon size={17} />
+                  </span>
+                  <span style={{ minWidth: 0 }}>
+                    <span style={{ display: 'block', fontSize: '0.86rem', fontWeight: 800, color: '#0f172a', marginBottom: '2px' }}>
+                      {title}
+                    </span>
+                    <span style={{ display: 'block', fontSize: '0.76rem', color: 'rgba(15,23,42,0.58)', lineHeight: 1.45 }}>
+                      {body}
+                    </span>
+                  </span>
+                  <ArrowRight size={15} style={{ color: 'var(--primary-600)' }} />
+                </Link>
+              ))}
+            </div>
+
+            <Link
+              to="/policies"
+              style={{
+                display:        'inline-flex',
+                alignItems:     'center',
+                gap:            '6px',
+                marginTop:      '16px',
+                fontSize:       '0.825rem',
+                color:          'var(--primary-600)',
+                textDecoration: 'none',
+                fontWeight:     700,
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.textDecoration = 'underline')}
+              onMouseLeave={(e) => (e.currentTarget.style.textDecoration = 'none')}
+            >
+              View all store policies <ArrowRight size={14} />
+            </Link>
+          </aside>
         </div>
       </section>
     </div>

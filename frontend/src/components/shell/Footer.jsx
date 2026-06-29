@@ -7,7 +7,7 @@
 
 import { Link } from 'react-router-dom';
 import { useState } from 'react';
-import { Instagram, Facebook, Twitter, ChevronDown, Mail, Phone, MapPin } from 'lucide-react';
+import { Instagram, Facebook, Twitter, ChevronDown, Mail, Phone } from 'lucide-react';
 import { motion as Motion } from 'framer-motion';
 import LogoWhite from '/logo-white.svg';
 
@@ -42,10 +42,16 @@ function FooterLink({ to, children }) {
 }
 
 export default function Footer() {
-  const [expandedMobile, setExpandedMobile] = useState(null);
+  const [expandedMobile, setExpandedMobile] = useState({
+    shop: true,
+    support: true,
+  });
 
   const toggleMobileSection = (section) => {
-    setExpandedMobile(expandedMobile === section ? null : section);
+    setExpandedMobile((current) => ({
+      ...current,
+      [section]: !current[section],
+    }));
   };
 
   return (
@@ -122,9 +128,9 @@ export default function Footer() {
             style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', padding: 0, textTransform: 'uppercase', fontSize: '0.67rem', letterSpacing: '0.12em', fontWeight: 800, color: '#ffffff', width: '100%' }}
           >
             Shop
-            <ChevronDown size={14} style={{ transition: 'transform 0.25s', transform: expandedMobile === 'shop' ? 'rotate(180deg)' : 'rotate(0deg)', color: '#ffffff' }} />
+            <ChevronDown size={14} style={{ transition: 'transform 0.25s', transform: expandedMobile.shop ? 'rotate(180deg)' : 'rotate(0deg)', color: '#ffffff' }} />
           </button>
-          <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: expandedMobile === 'shop' ? 'flex' : 'none', flexDirection: 'column', gap: '10px', alignItems: 'center' }} className="footer-list-shop">
+          <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: expandedMobile.shop ? 'flex' : 'none', flexDirection: 'column', gap: '10px', alignItems: 'center' }} className="footer-list-shop">
             {[
               { to: '/all-products', label: 'All Products' },
               { to: '/products?category=taping', label: 'Taping Tools' },
@@ -147,9 +153,9 @@ export default function Footer() {
             style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', padding: 0, textTransform: 'uppercase', fontSize: '0.67rem', letterSpacing: '0.12em', fontWeight: 800, color: '#ffffff', width: '100%' }}
           >
             Support
-            <ChevronDown size={14} style={{ transition: 'transform 0.25s', transform: expandedMobile === 'support' ? 'rotate(180deg)' : 'rotate(0deg)', color: '#ffffff' }} />
+            <ChevronDown size={14} style={{ transition: 'transform 0.25s', transform: expandedMobile.support ? 'rotate(180deg)' : 'rotate(0deg)', color: '#ffffff' }} />
           </button>
-          <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: expandedMobile === 'support' ? 'flex' : 'none', flexDirection: 'column', gap: '10px', alignItems: 'center' }} className="footer-list-support">
+          <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: expandedMobile.support ? 'flex' : 'none', flexDirection: 'column', gap: '10px', alignItems: 'center' }} className="footer-list-support">
             {[
               { to: '/contact', label: 'Contact Us' },
               { to: '/repairs', label: 'Repair Services' },
@@ -167,9 +173,8 @@ export default function Footer() {
             Contact &amp; Support
           </h5>
           {[
-            { Icon: Mail, href: 'mailto:support@drywalltoolbox.com', text: 'support@drywalltoolbox.com' },
+            { Icon: Mail, to: '/contact', text: 'Contact Us' },
             { Icon: Phone, href: 'tel:+16098665269', text: '(609) 866-5269' },
-            { Icon: MapPin, to: '/repairs', text: 'Tool Repair Services' },
           ].map(({ Icon, href, to, text }) => {
             const inner = (
               <span style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.82rem', color: 'rgba(255,255,255,0.85)', transition: 'color 0.18s' }}>
@@ -180,14 +185,14 @@ export default function Footer() {
             if (href) return (
               <a key={text} href={href} style={{ textDecoration: 'none' }}
                 onMouseEnter={(e) => { e.currentTarget.querySelector('span').style.color = '#93c5fd'; }}
-                onMouseLeave={(e) => { e.currentTarget.querySelector('span').style.color = 'rgba(255,255,255,0.5)'; }}>
+                onMouseLeave={(e) => { e.currentTarget.querySelector('span').style.color = 'rgba(255,255,255,0.85)'; }}>
                 {inner}
               </a>
             );
             if (to) return (
               <Link key={text} to={to} style={{ textDecoration: 'none' }}
                 onMouseEnter={(e) => { e.currentTarget.querySelector('span').style.color = '#93c5fd'; }}
-                onMouseLeave={(e) => { e.currentTarget.querySelector('span').style.color = 'rgba(255,255,255,0.5)'; }}>
+                onMouseLeave={(e) => { e.currentTarget.querySelector('span').style.color = 'rgba(255,255,255,0.85)'; }}>
                 {inner}
               </Link>
             );

@@ -341,10 +341,11 @@ export default function ProductsCatalogPlatform({ forceProductGrid = false, titl
     return match?.name || formatCategoryLabel(query.displayCategory);
   }, [brandCategoryCards, filterCategories, query.displayCategory]);
 
-  const pageHeading = selectedBrand && selectedCategoryLabel
-    ? `${selectedBrandFacet?.label || selectedBrand} ${selectedCategoryLabel}`
+  const categoryScopeLabel = selectedBrandFacet?.label || selectedBrand;
+  const pageHeading = selectedCategoryLabel
+    ? `${categoryScopeLabel ? `${categoryScopeLabel} ` : ''}${selectedCategoryLabel}`
     : title;
-  const isCategoryProductRoute = Boolean(selectedBrand && selectedCategoryLabel);
+  const isCategoryProductRoute = Boolean(selectedCategoryLabel);
   const isPartsPage = isPartsFilter === 1;
   const page = Number(pagination?.page || query.page || 1);
   const totalPages = Math.max(1, Number(pagination?.totalPages || 1));
@@ -354,7 +355,7 @@ export default function ProductsCatalogPlatform({ forceProductGrid = false, titl
   const desktopHeading = isCategoryProductRoute ? pageHeading : title;
   const unifiedHeadingTitle = isCategoryProductRoute ? selectedCategoryLabel : desktopHeading;
   const unifiedHeadingMeta = isCategoryProductRoute
-    ? `${selectedBrandFacet?.label || selectedBrand}${total > 0 ? ` · ${total.toLocaleString()} product${total === 1 ? '' : 's'}` : ''}`
+    ? `${categoryScopeLabel || 'All brands'}${total > 0 ? ` · ${total.toLocaleString()} product${total === 1 ? '' : 's'}` : ''}`
     : `${isPartsPage ? 'Replacement parts and service components' : 'All brands and categories'}${total > 0 ? ` · ${total.toLocaleString()} product${total === 1 ? '' : 's'}` : ''}`;
   const canonicalUrl = isPartsPage ? 'https://drywalltoolbox.com/parts' : 'https://drywalltoolbox.com/products';
   const seoDescription = isPartsPage
@@ -425,11 +426,11 @@ export default function ProductsCatalogPlatform({ forceProductGrid = false, titl
     <div className="min-h-screen bg-gray-50 page-wrapper">
       <SEOHead title={pageHeading} description={seoDescription} canonical={canonicalUrl} schema={buildSiteLinksSearchBoxSchema()} />
       <div className="container mx-auto px-4 py-4 pt-6">
-        {!showCategoryLanding && selectedBrand && (
+        {!showCategoryLanding && isCategoryProductRoute && (
           <div className="mb-4 hidden sm:block">
             <BackButton
-              onClick={query.displayCategory ? resetToCategoryCards : resetToBrandList}
-              label={query.displayCategory ? selectedBrand : 'Brands'}
+              onClick={selectedBrand ? (query.displayCategory ? resetToCategoryCards : resetToBrandList) : () => navigate('/products')}
+              label={selectedBrand ? (query.displayCategory ? selectedBrand : 'Brands') : 'Products'}
               className="dtb-product-nav-back"
             />
           </div>
@@ -441,11 +442,11 @@ export default function ProductsCatalogPlatform({ forceProductGrid = false, titl
               {isCategoryProductRoute && (
                 <button
                   type="button"
-                  onClick={query.displayCategory ? resetToCategoryCards : resetToBrandList}
+                  onClick={selectedBrand ? (query.displayCategory ? resetToCategoryCards : resetToBrandList) : () => navigate('/products')}
                   className="dtb-listing-heading__back-pill sm:hidden"
                 >
                   <ArrowLeft size={14} aria-hidden="true" />
-                  <span>{selectedBrandFacet?.label || selectedBrand}</span>
+                  <span>{categoryScopeLabel || 'Products'}</span>
                 </button>
               )}
               <h1 className="dtb-listing-heading__title">{unifiedHeadingTitle}</h1>
