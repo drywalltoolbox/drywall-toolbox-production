@@ -117,6 +117,9 @@ function PackageCard({ pkg, index, packageCount }) {
           <AnimatedPrice price={pkg.priceLabel} />
         </AnimatePresence>
       </div>
+      <p className="repair-package-card__price-note">
+        Starting estimate. Final quote confirmed after inspection.
+      </p>
 
       <p className="repair-package-card__summary">
         Best for {pkg.recommendedFor.join(', ')}.

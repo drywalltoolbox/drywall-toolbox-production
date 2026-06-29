@@ -355,12 +355,16 @@ export const PRICING_TAB_DATA = [
 const REPAIR_COPY = {
   anchor:         'New Taper: ~$1,899  |  Standard Rebuild: $299  —  Save 84%',
   partsLock:      'All replacement parts quoted and locked before work begins. No surprise invoices.',
-  noCharge:       'No charges until you review and approve your final quote.',
+  noCharge:       'Final quote confirmed after inspection. No additional work begins without approval.',
   sustainability: 'Every rebuilt tool keeps ~2.5 lbs of steel out of the landfill.',
   warrantyBase:   '15-day workmanship warranty on all repairs.',
   warrantyPro:    '30-day warranty — Professional members.',
   warrantyFleet:  '60-day warranty — Fleet members.',
 };
+
+const REPAIR_PRICING_DISCLOSURE = 'Prices shown are starting estimates, not final repair quotes. Final pricing is confirmed after your tool is received, checked in, and thoroughly inspected. Additional parts, labor, damage, missing components, or service needs may change the final quote. No additional work begins without your approval.';
+
+const REPAIR_CARD_PRICE_NOTE = 'Starting estimate. Final quote confirmed after inspection.';
 
 const MAINTENANCE_SCHEDULE = [
   { level: 'High-Volume Pro', usage: '6+ rolls (500 ft) / day', interval: 'Every 6 months', badge: 'Heavy' },
@@ -1009,6 +1013,18 @@ function PricingTabs() {
                     </span>
                   </div>
 
+                  {!isFree && (
+                    <p style={{
+                      margin: '-4px 0 10px',
+                      color: 'rgba(15,23,42,0.48)',
+                      fontSize: '0.68rem',
+                      fontWeight: 700,
+                      lineHeight: 1.35,
+                    }}>
+                      {REPAIR_CARD_PRICE_NOTE}
+                    </p>
+                  )}
+
                   {/* Target */}
                   <p style={{
                     margin: '0 0 12px 0',
@@ -1052,8 +1068,7 @@ function PricingTabs() {
         marginTop: '20px',
         lineHeight: 1.6,
       }}>
-        * All prices are industry estimates. Actual costs may vary based on tool condition, parts availability, and findings during disassembly.
-        Budget an extra 20–30% for potential "hard parts" (chains, sprockets, shafts). No charges until you approve your quote.
+        * {REPAIR_PRICING_DISCLOSURE}
       </p>
     </div>
   );
@@ -2044,6 +2059,9 @@ export function RepairStartExperience() {
                                   {tier.priceLabel}
                                 </span>
                               </div>
+                              <p style={{ margin: '5px 0 0', color: 'rgba(15,23,42,0.45)', fontSize: '0.68rem', fontWeight: 700, lineHeight: 1.35 }}>
+                                {REPAIR_CARD_PRICE_NOTE}
+                              </p>
                               <p style={{ margin: '6px 0 0', fontSize: '0.78rem', color: 'rgba(15,23,42,0.55)' }}>
                                 {tier.recommendedFor?.[0] || tier.commonSymptoms?.[0] || 'Technician-guided service path'}
                               </p>
@@ -2083,6 +2101,21 @@ export function RepairStartExperience() {
                           {copy}
                         </span>
                       ))}
+                    </div>
+
+                    <div style={{
+                      marginBottom: '24px',
+                      padding: '14px 16px',
+                      background: 'rgba(245,158,11,0.07)',
+                      border: '1px solid rgba(245,158,11,0.24)',
+                      borderRadius: '12px',
+                    }}>
+                      <p style={{ margin: '0 0 5px', color: '#92400e', fontSize: '0.78rem', fontWeight: 800 }}>
+                        Repair pricing is estimate-based until inspection is complete.
+                      </p>
+                      <p style={{ margin: 0, color: 'rgba(15,23,42,0.66)', fontSize: '0.76rem', lineHeight: 1.55 }}>
+                        {REPAIR_PRICING_DISCLOSURE}
+                      </p>
                     </div>
 
                     <Field label="Approval Preference" required hint="Choose how we should handle work that needs parts or labor beyond the selected package.">

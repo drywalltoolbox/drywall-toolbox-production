@@ -218,9 +218,17 @@
   overflow-wrap: anywhere;
 }
 
+.repair-package-card__price-note {
+  margin: 0.28rem 0 0;
+  color: rgba(15, 23, 42, 0.48);
+  font-size: 0.72rem;
+  font-weight: 800;
+  line-height: 1.38;
+}
+
 .repair-package-card__summary {
   min-height: 58px;
-  margin: 0.75rem 0 0;
+  margin: 0.78rem 0 0;
   color: rgba(15, 23, 42, 0.62);
   font-size: 0.84rem;
   line-height: 1.55;
