@@ -1,15 +1,13 @@
 (function () {
   var MOBILE_QUERY = '(max-width: 640px)';
+  var TOGGLE_EYEBROW = 'Payment options';
+  var TOGGLE_LABEL = 'Choose secure payment';
   var state = {
     open: false
   };
 
   function isMobilePaymentRuntime() {
     return document.body && document.body.classList.contains('dtb-payment-runtime') && window.matchMedia(MOBILE_QUERY).matches;
-  }
-
-  function compactText(value) {
-    return String(value || '').replace(/\s+/g, ' ').trim();
   }
 
   function paymentRoot() {
@@ -27,18 +25,9 @@
   }
 
   function selectedPaymentLabel() {
-    var row = activePaymentRow();
-    var label = row && row.querySelector('label');
-    if (!label) return 'Select payment method';
-
-    var clone = label.cloneNode(true);
-    Array.prototype.forEach.call(clone.querySelectorAll('.dtb-payment-method-radio, script, style'), function (node) {
-      node.remove();
-    });
-
-    var text = compactText(clone.textContent);
-    if (!text) return 'Payment method';
-    return text.replace(/›$/, '').trim();
+    // This is the trigger for the all-in-one payment-method sheet, not a selected-card summary.
+    // Keep the collapsed control generic so it does not read as a dedicated card-only tile.
+    return TOGGLE_LABEL;
   }
 
   function ensureBackdrop() {
@@ -63,15 +52,15 @@
 
     var toggle = document.createElement('button');
     toggle.type = 'button';
-    toggle.className = 'dtb-mobile-payment-toggle';
+    toggle.className = 'dtb-mobile-payment-toggle dtb-mobile-payment-toggle--sheet-trigger';
     toggle.setAttribute('aria-controls', 'payment');
     toggle.setAttribute('aria-expanded', 'false');
+    toggle.setAttribute('aria-label', 'Open payment options');
     toggle.innerHTML = [
       '<span class="dtb-mobile-payment-toggle__radio" aria-hidden="true"></span>',
-      '<span class="dtb-mobile-payment-toggle__icon" aria-hidden="true"></span>',
       '<span class="dtb-mobile-payment-toggle__copy">',
-        '<span class="dtb-mobile-payment-toggle__eyebrow">Payment method</span>',
-        '<span class="dtb-mobile-payment-toggle__label">Select payment method</span>',
+        '<span class="dtb-mobile-payment-toggle__eyebrow">' + TOGGLE_EYEBROW + '</span>',
+        '<span class="dtb-mobile-payment-toggle__label">' + TOGGLE_LABEL + '</span>',
       '</span>',
       '<span class="dtb-mobile-payment-toggle__chevron" aria-hidden="true">›</span>'
     ].join('');
@@ -101,8 +90,12 @@
     var toggle = ensureToggle();
     if (!toggle) return;
 
+    var eyebrow = toggle.querySelector('.dtb-mobile-payment-toggle__eyebrow');
+    if (eyebrow) eyebrow.textContent = TOGGLE_EYEBROW;
+
     var label = toggle.querySelector('.dtb-mobile-payment-toggle__label');
     if (label) label.textContent = selectedPaymentLabel();
+
     toggle.setAttribute('aria-expanded', state.open ? 'true' : 'false');
   }
 
