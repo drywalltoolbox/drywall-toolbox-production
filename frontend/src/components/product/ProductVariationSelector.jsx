@@ -1,5 +1,4 @@
 import { motion as Motion, AnimatePresence } from 'framer-motion';
-import { Check } from 'lucide-react';
 
 function attributeLabel(attr) {
   return (attr?.name || '').replace(/^pa_/i, '').replace(/[_-]+/g, ' ').trim();
@@ -90,19 +89,6 @@ export default function ProductVariationSelector({
                       ) : null}
                     </AnimatePresence>
                     <span className="dtb-variant-pill__label">{option.value}</span>
-                    {!variationsLoading && selected ? (
-                      <AnimatePresence>
-                        <Motion.span
-                          className="dtb-variant-pill__check"
-                          initial={{ scale: 0.4, opacity: 0 }}
-                          animate={{ scale: 1, opacity: 1 }}
-                          exit={{ scale: 0.4, opacity: 0 }}
-                          transition={{ duration: 0.16 }}
-                        >
-                          <Check size={13} strokeWidth={3} />
-                        </Motion.span>
-                      </AnimatePresence>
-                    ) : null}
                     {!variationsLoading && (soldOut || unavailable) ? (
                       <span className="sr-only">Unavailable</span>
                     ) : null}
