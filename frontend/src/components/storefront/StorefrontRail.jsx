@@ -1,29 +1,108 @@
-import { useRef } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+
+const SCROLL_RATIO = 0.82;
+const MIN_SCROLL_AMOUNT = 240;
+const EDGE_TOLERANCE_PX = 2;
 
 export default function StorefrontRail({ label, className = '', children }) {
   const railRef = useRef(null);
+  const [scrollState, setScrollState] = useState({ canScrollPrev: false, canScrollNext: false });
+
+  const updateScrollState = useCallback(() => {
+    const rail = railRef.current;
+    if (!rail) return;
+
+    const maxScrollLeft = Math.max(0, rail.scrollWidth - rail.clientWidth);
+    const nextState = {
+      canScrollPrev: rail.scrollLeft > EDGE_TOLERANCE_PX,
+      canScrollNext: rail.scrollLeft < maxScrollLeft - EDGE_TOLERANCE_PX,
+    };
+
+    setScrollState((previous) => (
+      previous.canScrollPrev === nextState.canScrollPrev && previous.canScrollNext === nextState.canScrollNext
+        ? previous
+        : nextState
+    ));
+  }, []);
+
+  const scrollRail = useCallback((direction) => {
+    const rail = railRef.current;
+    if (!rail) return;
+
+    const amount = Math.max(MIN_SCROLL_AMOUNT, rail.clientWidth * SCROLL_RATIO);
+    rail.scrollBy({
+      left: direction === 'next' ? amount : -amount,
+      behavior: 'smooth',
+    });
+  }, []);
 
   const onKeyDown = (event) => {
     if (!railRef.current) return;
     if (event.key !== 'ArrowRight' && event.key !== 'ArrowLeft') return;
     event.preventDefault();
-    const amount = Math.max(180, railRef.current.clientWidth * 0.85);
-    railRef.current.scrollBy({
-      left: event.key === 'ArrowRight' ? amount : -amount,
-      behavior: 'smooth',
-    });
+    scrollRail(event.key === 'ArrowRight' ? 'next' : 'prev');
   };
 
+  useEffect(() => {
+    const rail = railRef.current;
+    if (!rail) return undefined;
+
+    updateScrollState();
+
+    const onScroll = () => updateScrollState();
+    rail.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', updateScrollState, { passive: true });
+
+    let resizeObserver;
+    if ('ResizeObserver' in window) {
+      resizeObserver = new ResizeObserver(updateScrollState);
+      resizeObserver.observe(rail);
+    }
+
+    const raf = window.requestAnimationFrame(updateScrollState);
+    const timeout = window.setTimeout(updateScrollState, 250);
+
+    return () => {
+      rail.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', updateScrollState);
+      if (resizeObserver) resizeObserver.disconnect();
+      window.cancelAnimationFrame(raf);
+      window.clearTimeout(timeout);
+    };
+  }, [children, updateScrollState]);
+
   return (
-    <div
-      ref={railRef}
-      className={`storefront-rail ${className}`.trim()}
-      role="region"
-      aria-label={label || 'Product rail'}
-      tabIndex={0}
-      onKeyDown={onKeyDown}
-    >
-      {children}
+    <div className="storefront-rail-shell">
+      <button
+        type="button"
+        className="storefront-rail-arrow storefront-rail-arrow--prev"
+        onClick={() => scrollRail('prev')}
+        disabled={!scrollState.canScrollPrev}
+        aria-label={`Scroll ${label || 'product rail'} left`}
+      >
+        <span aria-hidden="true">‹</span>
+      </button>
+
+      <div
+        ref={railRef}
+        className={`storefront-rail ${className}`.trim()}
+        role="region"
+        aria-label={label || 'Product rail'}
+        tabIndex={0}
+        onKeyDown={onKeyDown}
+      >
+        {children}
+      </div>
+
+      <button
+        type="button"
+        className="storefront-rail-arrow storefront-rail-arrow--next"
+        onClick={() => scrollRail('next')}
+        disabled={!scrollState.canScrollNext}
+        aria-label={`Scroll ${label || 'product rail'} right`}
+      >
+        <span aria-hidden="true">›</span>
+      </button>
     </div>
   );
 }
