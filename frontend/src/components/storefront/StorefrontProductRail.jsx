@@ -164,7 +164,7 @@ export default function StorefrontProductRail({
               key={product.sku || product.id}
               product={product}
               cardProduct={cardProduct}
-              variant="rail"
+              variant="grid"
               onOpenModal={() => openModal(product, cardProduct)}
               onAddToCart={() => handleAddToCart(cardProduct)}
               index={index}

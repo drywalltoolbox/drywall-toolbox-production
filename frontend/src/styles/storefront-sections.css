@@ -139,7 +139,7 @@
 
 @media (min-width: 768px) {
   .storefront-rail--fixed-tiles {
-    grid-auto-columns: clamp(210px, 22vw, 248px);
+    grid-auto-columns: clamp(210px, 20vw, 236px);
   }
 }
 

@@ -13,18 +13,48 @@ import columbiaHeroLogo from '/brands/Columbia/columbia_logo_white.svg';
 import platinumHeroLogo from '/brands/Platinum/platinum_logo_white.svg';
 import { mapCatalogBrands } from '../utils/catalogFacets.js';
 
-const MAX_HOME_BRANDS = 8;
+const MAX_HOME_BRANDS = 6;
+const HOME_BRAND_ORDER = ['TapeTech', 'Columbia Tools', 'Platinum Drywall Tools', 'Level5', 'SurPro', 'DuraStilts'];
+
+function normalizeHomeBrandName(value = '') {
+  return String(value).toLowerCase().replace(/[^a-z0-9]/g, '');
+}
+
+function getHomeBrandOrderIndex(value = '') {
+  const normalized = normalizeHomeBrandName(value);
+  if (normalized.includes('tapetech')) return 0;
+  if (normalized.includes('columbia')) return 1;
+  if (normalized.includes('platinum')) return 2;
+  if (normalized.includes('level5')) return 3;
+  if (normalized.includes('surpro')) return 4;
+  if (normalized.includes('durastilts')) return 5;
+  return Number.POSITIVE_INFINITY;
+}
+
+function getHomeBrandDisplayName(value = '') {
+  const normalized = normalizeHomeBrandName(value);
+  if (normalized.includes('tapetech')) return 'TapeTech';
+  if (normalized.includes('columbia')) return 'Columbia Tools';
+  if (normalized.includes('platinum')) return 'Platinum Drywall Tools';
+  if (normalized.includes('level5')) return 'Level5';
+  if (normalized.includes('surpro')) return 'SurPro';
+  if (normalized.includes('durastilts')) return 'DuraStilts';
+  return value;
+}
 
 export default function Home() {
   const { facets } = useCatalogFacets();
   const brands = useMemo(() => {
     const mapped = mapCatalogBrands(facets?.brands);
     return mapped
+      .filter((brand) => Number.isFinite(getHomeBrandOrderIndex(brand.name)))
+      .sort((a, b) => getHomeBrandOrderIndex(a.name) - getHomeBrandOrderIndex(b.name))
       .slice(0, MAX_HOME_BRANDS)
       .map((brand) => {
-        const logo = getBrandLogo(brand.name);
+        const name = getHomeBrandDisplayName(brand.name);
+        const logo = getBrandLogo(brand.name) || getBrandLogo(name);
         return {
-          name: brand.name,
+          name,
           logo,
           to: `/products/brands/${brand.slug}`,
         };
