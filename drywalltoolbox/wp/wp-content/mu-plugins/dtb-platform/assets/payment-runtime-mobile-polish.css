@@ -118,4 +118,45 @@
 		border: 0 !important;
 		background: transparent !important;
 	}
+
+	.dtb-payment-runtime table.shop_table tbody { padding: 14px 14px 12px !important; }
+
+	.dtb-payment-runtime table.shop_table tbody tr.dtb-order-product-row {
+		display: grid !important;
+		grid-template-columns: minmax(0, 1fr) auto !important;
+		grid-template-areas: "product total" "product qty" !important;
+		gap: 3px 10px !important;
+		align-items: center !important;
+		padding: 13px !important;
+		border: 1px solid #e6ebf2 !important;
+		border-radius: 14px !important;
+		background: #fbfdff !important;
+	}
+
+	.dtb-payment-runtime table.shop_table tbody tr.dtb-order-product-row td { padding: 0 !important; border: 0 !important; }
+	.dtb-payment-runtime table.shop_table tbody tr.dtb-order-product-row td.product-name { grid-area: product !important; min-width: 0 !important; }
+	.dtb-payment-runtime table.shop_table tbody tr.dtb-order-product-row td.product-quantity { grid-area: qty !important; justify-self: end !important; width: auto !important; color: #64748b !important; font-size: 0.76rem !important; font-weight: 800 !important; }
+	.dtb-payment-runtime table.shop_table tbody tr.dtb-order-product-row td.product-total { grid-area: total !important; justify-self: end !important; width: auto !important; color: #0f172a !important; font-size: 0.86rem !important; font-weight: 900 !important; letter-spacing: -0.032em !important; text-align: right !important; white-space: nowrap !important; }
+
+	.dtb-order-product { display: grid !important; grid-template-columns: 58px minmax(0, 1fr) !important; align-items: center !important; gap: 11px !important; min-width: 0 !important; }
+	.dtb-order-product-media { width: 58px !important; height: 58px !important; flex-basis: 58px !important; border-color: #e5ebf3 !important; border-radius: 13px !important; background: #fff !important; box-shadow: 0 5px 12px rgba(15, 23, 42, 0.045) !important; }
+	.dtb-order-product-image { padding: 5px !important; }
+	.dtb-order-product-copy { gap: 4px !important; min-width: 0 !important; }
+	.dtb-order-product-name,
+	.dtb-order-product-name a { display: -webkit-box !important; overflow: hidden !important; color: #0f172a !important; font-size: 0.82rem !important; font-weight: 900 !important; letter-spacing: -0.032em !important; line-height: 1.2 !important; -webkit-box-orient: vertical !important; -webkit-line-clamp: 2 !important; }
+	.dtb-order-product-sku { color: #94a3b8 !important; font-size: 0.66rem !important; font-weight: 750 !important; line-height: 1.2 !important; }
+
+	.dtb-payment-runtime table.shop_table tfoot { padding: 0 14px 16px !important; }
+	.dtb-payment-runtime table.shop_table tfoot tr.dtb-order-total-row { display: grid !important; grid-template-columns: minmax(0, 1fr) auto !important; align-items: center !important; min-height: 38px !important; padding: 0 !important; }
+	.dtb-payment-runtime table.shop_table tfoot tr.dtb-order-total-row:first-child { padding-top: 12px !important; border-top: 1px solid #e5eaf1 !important; }
+	.dtb-payment-runtime table.shop_table tfoot tr.dtb-order-total-row:last-child { min-height: 48px !important; margin-top: 6px !important; border-top: 2px solid #0f172a !important; }
+	.dtb-payment-runtime table.shop_table tfoot th,
+	.dtb-payment-runtime table.shop_table tfoot td,
+	.dtb-payment-runtime table.shop_table tfoot tr:last-child th,
+	.dtb-payment-runtime table.shop_table tfoot tr:last-child td { padding: 0 !important; background: transparent !important; font-size: 0.78rem !important; line-height: 1.2 !important; }
+	.dtb-payment-runtime table.shop_table tfoot th { color: #64748b !important; font-weight: 850 !important; letter-spacing: 0.055em !important; text-transform: uppercase !important; }
+	.dtb-payment-runtime table.shop_table tfoot td { justify-self: end !important; width: auto !important; color: #0f172a !important; font-weight: 850 !important; letter-spacing: -0.02em !important; text-align: right !important; white-space: nowrap !important; }
+	.dtb-payment-runtime table.shop_table tfoot tr:last-child th { color: #0f172a !important; font-size: 0.92rem !important; font-weight: 900 !important; letter-spacing: -0.018em !important; text-transform: none !important; }
+	.dtb-payment-runtime table.shop_table tfoot tr:last-child td,
+	.dtb-payment-runtime table.shop_table tfoot tr:last-child td .amount { color: #2563eb !important; font-size: 1.3rem !important; font-weight: 950 !important; letter-spacing: -0.048em !important; }
 }
