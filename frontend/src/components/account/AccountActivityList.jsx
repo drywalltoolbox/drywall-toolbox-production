@@ -32,13 +32,15 @@ export default function AccountActivityList({ items, limit, onNavigate }) {
             </span>
             <span className="account-activity-card__body">
               <span className="account-activity-card__eyebrow">{item.label}</span>
-              <span className="account-activity-card__title">{item.title}</span>
+              <span className="account-activity-card__title-row">
+                <span className="account-activity-card__title">{item.title}</span>
+                <span className={`account-activity-card__status is-${item.type}`}>{item.statusLabel}</span>
+              </span>
               <span className="account-activity-card__meta">
                 {[item.detail, formatDate(item.date)].filter(Boolean).join(' · ')}
               </span>
             </span>
             <span className="account-activity-card__aside">
-              <span className={`account-activity-card__status is-${item.type}`}>{item.statusLabel}</span>
               {Number.isFinite(item.amount) ? (
                 <strong className="account-activity-card__amount">${item.amount.toFixed(2)}</strong>
               ) : null}
