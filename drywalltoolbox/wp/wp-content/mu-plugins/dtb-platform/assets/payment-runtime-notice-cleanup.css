@@ -2,3 +2,17 @@ body.dtb-payment-runtime .woocommerce-message,
 body.dtb-payment-runtime .woocommerce-info:not(.woocommerce-error) {
 	display: none !important;
 }
+
+@media (max-width: 640px) {
+	body.dtb-payment-runtime .dtb-mobile-payment-toggle {
+		grid-template-columns: 20px minmax(0, 1fr) auto !important;
+	}
+
+	body.dtb-payment-runtime .dtb-mobile-payment-toggle__icon {
+		display: none !important;
+	}
+
+	body.dtb-payment-runtime .dtb-mobile-payment-toggle__eyebrow {
+		text-transform: uppercase !important;
+	}
+}
