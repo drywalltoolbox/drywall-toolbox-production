@@ -3,6 +3,7 @@ const SCHEMATIC_BRAND_BY_LABEL = {
   'columbia tools': 'columbia-taping-tools',
   'columbia taping tools': 'columbia-taping-tools',
   'dura-stilts': 'dura-stilts',
+  'dura stilts': 'dura-stilts',
   'dura stilt': 'dura-stilts',
   'dura-stilt': 'dura-stilts',
   'level 5': 'level5',
@@ -43,12 +44,33 @@ function normalizeLabel(value = '') {
     .trim();
 }
 
+function normalizePath(pathname = '/') {
+  return `/${String(pathname || '/')
+    .split('/')
+    .filter(Boolean)
+    .join('/')}`;
+}
+
+function getStagingMountPath(segments) {
+  const stagingIndex = segments.findIndex((segment) => segment === 'staging');
+  if (stagingIndex < 0 || !segments[stagingIndex + 1]) return '';
+
+  return `/${segments.slice(0, stagingIndex + 2).join('/')}`;
+}
+
 function getAppBasePath() {
-  const pathname = window.location.pathname || '/';
+  const pathname = normalizePath(window.location.pathname || '/');
   const segments = pathname.split('/').filter(Boolean);
   const routeIndex = segments.findIndex((segment) => ROUTE_ROOTS.includes(segment));
-  if (routeIndex <= 0) return '';
-  return `/${segments.slice(0, routeIndex).join('/')}`;
+
+  if (routeIndex > 0) {
+    return `/${segments.slice(0, routeIndex).join('/')}`;
+  }
+
+  const stagingMountPath = getStagingMountPath(segments);
+  if (stagingMountPath) return stagingMountPath;
+
+  return '';
 }
 
 function isSchematicsDrawerBrandButton(button) {
@@ -62,8 +84,9 @@ function isSchematicsDrawerBrandButton(button) {
 function navigateToSchematicBrand(slug) {
   const basePath = getAppBasePath();
   const target = `${basePath}/schematics?brand=${encodeURIComponent(slug)}`;
+  const current = `${normalizePath(window.location.pathname)}${window.location.search}`;
 
-  if (window.location.pathname + window.location.search === target) {
+  if (current === target) {
     return;
   }
 
