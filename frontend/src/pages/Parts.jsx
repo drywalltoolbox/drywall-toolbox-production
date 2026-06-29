@@ -16,18 +16,22 @@ function extractProductCountSuffix(value = '') {
   return match ? ` · ${match[1]}` : '';
 }
 
+function setTextIfChanged(element, value) {
+  if (!element || element.textContent === value) return;
+  element.textContent = value;
+}
+
 function syncPartsHeading(search = '') {
   const title = document.querySelector('.dtb-listing-heading__title');
   const meta = document.querySelector('.dtb-listing-heading__meta');
 
-  if (title) {
-    title.textContent = 'Parts';
-  }
+  setTextIfChanged(title, 'Parts');
 
   if (meta) {
     const brandLabel = getPartsBrandLabel(search);
     const countSuffix = extractProductCountSuffix(meta.textContent || '');
-    meta.textContent = `${brandLabel || 'Replacement parts and service components'}${countSuffix}`;
+    const nextMeta = `${brandLabel || 'Replacement parts and service components'}${countSuffix}`;
+    setTextIfChanged(meta, nextMeta);
   }
 }
 
