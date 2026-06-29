@@ -7,6 +7,7 @@ import './styles/machined-design.css'
 import './styles/tool-selector.css'
 import './styles/technical-specifications.css'
 import './styles/product-detail-modern.css'
+import './styles/product-variation-selector-overlay.css'
 import './styles/reviews.css'
 import './styles/storefront-tokens.css'
 import './styles/storefront-shell.css'
@@ -78,21 +79,7 @@ createRoot(document.getElementById('root')).render(
 )
 
 // ─── Service Worker policy ───────────────────────────────────────────────────
-// Production shared hosting/manual uploads must not keep a stale cached HTML
-// shell that references deleted JS/CSS bundle paths. Keep SW disabled unless a
-// future deployment intentionally sets REACT_APP_ENV=production-sw.
-if (process.env.NODE_ENV === 'production' && 'serviceWorker' in navigator) {
-  const isGithubPagesHost = typeof window !== 'undefined' && /\.github\.io$/i.test(window.location.hostname);
-  const enableServiceWorker = process.env.REACT_APP_ENV === 'production-sw' && !isGithubPagesHost;
-
-  window.addEventListener('load', () => {
-    if (enableServiceWorker) {
-      navigator.serviceWorker.register(joinRuntimeAssetUrl('/service-worker.js')).catch(() => {});
-      return;
-    }
-
-    navigator.serviceWorker.getRegistrations()
-      .then((registrations) => Promise.all(registrations.map((registration) => registration.unregister())))
-      .catch(() => {});
-  });
-}
+// We intentionally do not register the old Vite PWA service worker here. Prior
+// deployments may still have cached /sw.js or /service-worker.js, but
+// bootstrapRuntimeAssetBase.js unregisters those legacy workers before the app
+// renders so stale precache manifests cannot serve deleted hashed chunks.
