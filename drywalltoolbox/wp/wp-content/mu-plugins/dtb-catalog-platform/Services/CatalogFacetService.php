@@ -108,7 +108,7 @@ final class DTB_CatalogFacetService {
 				'status'   => 'publish',
 				'per_page' => $per_page,
 				'page'     => $page,
-				'_fields'  => 'id,type,categories,meta_data,attributes,brands,name,images',
+				'_fields'  => 'id,type,categories,meta_data,attributes,brands,name,images,sku,slug',
 			] );
 
 			if ( $response->get_status() !== 200 ) {
@@ -209,6 +209,14 @@ final class DTB_CatalogFacetService {
 				'key'   => 'parts',
 				'label' => 'Parts',
 				'slug'  => 'parts',
+			];
+		}
+
+		if ( function_exists( 'dtb_catalog_product_is_compound_tube' ) && dtb_catalog_product_is_compound_tube( $dto ) ) {
+			return [
+				'key'   => 'compound_tubes',
+				'label' => 'Compound Tubes',
+				'slug'  => 'compound-tubes',
 			];
 		}
 
