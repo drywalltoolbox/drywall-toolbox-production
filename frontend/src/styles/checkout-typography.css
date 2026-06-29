@@ -1,13 +1,20 @@
 @import "./mobile-responsive.css";
 
 .dtb-checkout {
-  --checkout-font: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  color: #0f172a;
+  --checkout-font: "Inter", "SF Pro Text", "SF Pro Display", "Segoe UI Variable", "Segoe UI", Roboto, "Helvetica Neue", Arial, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  --checkout-display-font: "Inter", "SF Pro Display", "Segoe UI Variable", "Segoe UI", Roboto, "Helvetica Neue", Arial, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  --checkout-text: #0f172a;
+  --checkout-muted: #64748b;
+  --checkout-soft: #f8fafc;
+  --checkout-border: rgba(226, 232, 240, 0.92);
+  color: var(--checkout-text);
   font-family: var(--checkout-font);
+  font-size: 16px;
   font-synthesis-weight: none;
-  letter-spacing: 0;
+  letter-spacing: -0.011em;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 .dtb-checkout.page-wrapper {
@@ -25,7 +32,7 @@
 .dtb-checkout *,
 .dtb-checkout *::before,
 .dtb-checkout *::after {
-  letter-spacing: 0;
+  letter-spacing: inherit;
 }
 
 .dtb-checkout h1,
@@ -42,12 +49,55 @@
   font-family: inherit;
 }
 
+.dtb-checkout h1,
+.dtb-checkout h2,
+.dtb-checkout h3,
+.dtb-checkout .dtb-summary-panel h2 {
+  font-family: var(--checkout-display-font);
+  color: #0b1220;
+  font-weight: 850;
+  letter-spacing: -0.036em;
+  line-height: 1.04;
+}
+
+.dtb-checkout h1 {
+  font-size: clamp(1.85rem, 4vw, 3rem);
+}
+
+.dtb-checkout h2,
+.dtb-checkout .dtb-summary-panel h2 {
+  font-size: clamp(1.08rem, 1.7vw, 1.32rem);
+}
+
+.dtb-checkout h3 {
+  font-size: clamp(0.96rem, 1.3vw, 1.08rem);
+}
+
+.dtb-checkout p {
+  color: var(--checkout-muted);
+  font-size: 0.93rem;
+  font-weight: 500;
+  line-height: 1.55;
+}
+
+.dtb-checkout label,
+.dtb-checkout .dtb-checkout-field-label {
+  color: #64748b;
+  font-size: 0.72rem;
+  font-weight: 850;
+  letter-spacing: 0.095em;
+  line-height: 1.25;
+  text-transform: uppercase;
+}
+
 .dtb-checkout input,
 .dtb-checkout select,
 .dtb-checkout textarea {
   color: #0f172a;
-  font-size: 0.875rem;
-  font-weight: 500;
+  font-size: 0.96rem;
+  font-weight: 650;
+  letter-spacing: -0.015em;
+  line-height: 1.35;
 }
 
 .dtb-checkout select {
@@ -57,6 +107,12 @@
 .dtb-checkout input::placeholder,
 .dtb-checkout textarea::placeholder {
   color: #94a3b8;
+  font-weight: 500;
+}
+
+.dtb-checkout button,
+.dtb-checkout a {
+  letter-spacing: -0.012em;
 }
 
 .dtb-checkout .tabular-nums {
@@ -64,14 +120,30 @@
 }
 
 .dtb-checkout-step-card {
-  border-color: rgba(226, 232, 240, 0.9) !important;
-  border-radius: 1rem !important;
+  border-color: var(--checkout-border) !important;
+  border-radius: 1.15rem !important;
   background: #fff !important;
-  box-shadow: 0 2px 12px rgba(15, 23, 42, 0.05) !important;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.055), 0 1px 2px rgba(15, 23, 42, 0.04) !important;
+}
+
+.dtb-checkout-step-card [class*="text-slate-900"],
+.dtb-checkout-step-card [class*="text-slate-800"] {
+  color: #101827 !important;
+}
+
+.dtb-checkout-step-card [class*="text-slate-500"],
+.dtb-checkout-step-card [class*="text-slate-400"] {
+  color: #64748b !important;
+}
+
+.dtb-checkout-step-card [class*="font-bold"],
+.dtb-checkout-step-card [class*="font-black"] {
+  letter-spacing: -0.025em;
 }
 
 .dtb-checkout .dtb-summary-panel {
   color: #0f172a;
+  font-variant-numeric: tabular-nums;
 }
 
 .dtb-checkout .dtb-summary-panel > div:first-child {
@@ -80,6 +152,43 @@
 
 .dtb-checkout .dtb-summary-panel > div:nth-child(2) {
   padding: 1.5rem !important;
+}
+
+.dtb-checkout .dtb-summary-panel p,
+.dtb-checkout .dtb-summary-panel span {
+  letter-spacing: -0.012em;
+}
+
+.dtb-checkout .dtb-summary-panel [class*="font-semibold"],
+.dtb-checkout .dtb-summary-panel [class*="font-bold"],
+.dtb-checkout .dtb-summary-panel [class*="font-black"] {
+  font-weight: 800;
+}
+
+.dtb-checkout .dtb-summary-panel [class*="text-primary-600"],
+.dtb-checkout [class*="text-primary-600"].tabular-nums {
+  letter-spacing: -0.035em;
+}
+
+.dtb-checkout .dtb-summary-panel [class*="line-clamp"],
+.dtb-checkout .dtb-summary-panel [class*="truncate"] {
+  color: #111827;
+  font-weight: 750;
+  line-height: 1.28;
+}
+
+.dtb-checkout input,
+.dtb-checkout select,
+.dtb-checkout textarea,
+.dtb-checkout [class*="rounded-xl"][class*="bg-slate-50"],
+.dtb-checkout [class*="rounded-2xl"][class*="bg-white"] {
+  text-shadow: none;
+}
+
+.dtb-checkout input:focus,
+.dtb-checkout select:focus,
+.dtb-checkout textarea:focus {
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12) !important;
 }
 
 .dtb-checkout-payment-logos {
@@ -110,10 +219,45 @@
 }
 
 @media (max-width: 767px) {
+  .dtb-checkout {
+    font-size: 15.5px;
+    letter-spacing: -0.009em;
+  }
+
+  .dtb-checkout h1 {
+    font-size: clamp(1.58rem, 7.2vw, 2.16rem);
+  }
+
+  .dtb-checkout h2,
+  .dtb-checkout .dtb-summary-panel h2 {
+    font-size: 1.05rem;
+  }
+
+  .dtb-checkout p {
+    font-size: 0.86rem;
+    line-height: 1.45;
+  }
+
+  .dtb-checkout label,
+  .dtb-checkout .dtb-checkout-field-label {
+    font-size: 0.68rem;
+    letter-spacing: 0.085em;
+  }
+
   .dtb-checkout input,
   .dtb-checkout select,
   .dtb-checkout textarea {
     font-size: 16px !important;
+    font-weight: 650;
+  }
+
+  .dtb-checkout-step-card {
+    border-radius: 1rem !important;
+    box-shadow: 0 7px 22px rgba(15, 23, 42, 0.055), 0 1px 2px rgba(15, 23, 42, 0.035) !important;
+  }
+
+  .dtb-checkout .dtb-summary-panel > div:nth-child(2) {
+    padding: 1rem !important;
   }
 
   .dtb-checkout-payment-logo {
