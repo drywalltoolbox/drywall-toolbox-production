@@ -39,6 +39,10 @@ final class DTB_CategoryNormalizer {
 		'corner tools'            => 'corner',
 		'corner boxes'            => 'corner',
 		'corner applicators'      => 'corner',
+		'compound tubes'          => 'corner',
+		'compound tube'           => 'corner',
+		'cam lock tubes'          => 'corner',
+		'cam lock tube'           => 'corner',
 		// Mud Boxes / Pumps
 		'mud boxes'               => 'mudboxes',
 		'mud boxes & pumps'       => 'mudboxes',
@@ -161,6 +165,7 @@ final class DTB_CategoryNormalizer {
 		'handles'               => 'Handles & Extensions',
 		'pumps'                 => 'Pumps',
 		'corner_tools'          => 'Corner Tools',
+		'compound_tubes'        => 'Compound Tubes',
 		'accessories'           => 'Accessories',
 		'smoothing_blades'      => 'Smoothing Blades',
 		'toolsets'              => 'Tool Sets & Kits',
@@ -231,6 +236,15 @@ final class DTB_CategoryNormalizer {
 		'corner_applicator'         => 'corner_tools',
 		'inside_corner_tool'        => 'corner_tools',
 		'outside_corner_tool'       => 'corner_tools',
+		// Compound Tubes
+		'compound_tubes'            => 'compound_tubes',
+		'compound_tube'             => 'compound_tubes',
+		'mud_tube'                  => 'compound_tubes',
+		'mud_tubes'                 => 'compound_tubes',
+		'cam_lock_tube'             => 'compound_tubes',
+		'cam_lock_tubes'            => 'compound_tubes',
+		'camlock_tube'              => 'compound_tubes',
+		'camlock_tubes'             => 'compound_tubes',
 		// Accessories
 		'accessories'               => 'accessories',
 		'accessory'                 => 'accessories',
@@ -301,6 +315,15 @@ final class DTB_CategoryNormalizer {
 			'corner_tool', 'corner tool', 'corner finisher', 'corner flusher',
 			'angle head', 'corner roller', 'corner applicator',
 		],
+		'compound_tubes'    => [
+			'compound_tubes', 'compound tubes', 'Compound Tubes',
+			'compound_tube', 'compound tube', 'Compound Tube',
+			'mud_tube', 'mud tube', 'Mud Tube', 'mud_tubes', 'mud tubes', 'Mud Tubes',
+			'cam_lock_tube', 'cam lock tube', 'Cam Lock Tube',
+			'cam_lock_tubes', 'cam lock tubes', 'Cam Lock Tubes',
+			'camlock_tube', 'camlock tube', 'Camlock Tube',
+			'camlock_tubes', 'camlock tubes', 'Camlock Tubes',
+		],
 		'accessories'       => [ 'accessories', 'Accessories', 'accessory' ],
 		'smoothing_blades'  => [
 			'smoothing_blades', 'smoothing blades', 'Smoothing Blades',
@@ -318,7 +341,7 @@ final class DTB_CategoryNormalizer {
 		'stilts'            => [ 'stilts', 'Stilts', 'stilt' ],
 		'semi_automatic_tapers' => [
 			'semi_automatic_tapers', 'semi automatic tapers', 'Semi Automatic Tapers',
-			'semi_automatic_taper',
+			' semi automatic taper', 'semi_automatic_taper', 'Semi-Automatic Tapers',
 		],
 		'predator_family' => [
 			'predator_family', 'predator family', 'Predator Family',
