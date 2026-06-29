@@ -2,7 +2,7 @@
 /**
  * Plugin Name: DTB WooCommerce Payment Runtime Notice Cleanup
  * Description: Removes WooCommerce shipping-zone debug notices from customer-facing order-pay pages.
- * Version: 1.0.0
+ * Version: 1.0.1
  * Author: Drywall Toolbox
  */
 
@@ -85,4 +85,55 @@ add_action(
 		wc_set_notices( dtb_payment_runtime_notice_cleanup_filter_notices( wc_get_notices() ) );
 	},
 	0
+);
+
+add_action(
+	'wp_head',
+	static function (): void {
+		if ( ! dtb_payment_runtime_notice_cleanup_is_runtime() ) {
+			return;
+		}
+		?>
+		<style id="dtb-payment-runtime-notice-cleanup-inline">
+			body.dtb-payment-runtime .woocommerce-notices-wrapper .woocommerce-info,
+			body.dtb-payment-runtime .woocommerce-notices-wrapper .woocommerce-message,
+			body.dtb-payment-runtime .woocommerce .woocommerce-info:not(.woocommerce-error),
+			body.dtb-payment-runtime .woocommerce .woocommerce-message:not(.woocommerce-error) {
+				display: none !important;
+			}
+		</style>
+		<?php
+	},
+	PHP_INT_MAX
+);
+
+add_action(
+	'wp_footer',
+	static function (): void {
+		if ( ! dtb_payment_runtime_notice_cleanup_is_runtime() ) {
+			return;
+		}
+		?>
+		<script id="dtb-payment-runtime-notice-cleanup-script">
+		(function () {
+			function cleanup() {
+				var nodes = document.querySelectorAll('.woocommerce-notices-wrapper > *, .woocommerce-info, .woocommerce-message');
+				Array.prototype.forEach.call(nodes, function (node) {
+					var text = String(node.textContent || '').replace(/\s+/g, ' ');
+					if (/customer\s+matched\s+zone/i.test(text)) {
+						node.remove();
+					}
+				});
+			}
+			cleanup();
+			window.setTimeout(cleanup, 80);
+			window.setTimeout(cleanup, 400);
+			if ('MutationObserver' in window) {
+				new MutationObserver(cleanup).observe(document.documentElement, { childList: true, subtree: true });
+			}
+		})();
+		</script>
+		<?php
+	},
+	PHP_INT_MAX
 );
