@@ -2,7 +2,7 @@
 /**
  * Plugin Name: DTB WooCommerce Payment Runtime
  * Description: Routes keyed order-payment requests to the native WooCommerce payment runtime while the React storefront owns checkout intake.
- * Version: 1.5.0
+ * Version: 1.5.1
  * Author: Drywall Toolbox
  */
 
@@ -466,6 +466,16 @@ add_action(
 				$asset_url . '/payment-runtime.css',
 				[],
 				(string) filemtime( $style_path )
+			);
+		}
+
+		$typography_path = $asset_dir . '/payment-runtime-modern-typography.css';
+		if ( file_exists( $typography_path ) ) {
+			wp_enqueue_style(
+				'dtb-payment-runtime-modern-typography',
+				$asset_url . '/payment-runtime-modern-typography.css',
+				[ 'dtb-payment-runtime' ],
+				(string) filemtime( $typography_path )
 			);
 		}
 
