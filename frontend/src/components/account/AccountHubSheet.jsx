@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Home, Package, User, X, ShoppingBag, ShoppingCart, ChevronRight, AlertCircle, Loader, Wrench, RotateCcw, ChevronDown, LayoutDashboard, Calculator, LifeBuoy, BookOpen, Headphones } from 'lucide-react';
+import { Home, Package, User, X, ShoppingBag, ChevronRight, AlertCircle, Loader, Wrench, RotateCcw, ChevronDown, LayoutDashboard, Calculator, LifeBuoy, BookOpen } from 'lucide-react';
 import { getCustomerOrders } from '../../api/orders.js';
 import { getCustomerRepairs } from '../../api/repairs.js';
 import { getCustomerReturns } from '../../api/returns.js';
@@ -16,10 +16,10 @@ const TABS = [
 ];
 
 const HISTORY_FILTERS = [
-  { id: 'product', label: 'Product', Icon: ShoppingCart },
-  { id: 'repairs', label: 'Repairs', Icon: Wrench },
-  { id: 'returns', label: 'Returns', Icon: RotateCcw },
-  { id: 'support', label: 'Support', Icon: Headphones },
+  { id: 'product', label: 'Product' },
+  { id: 'repairs', label: 'Repairs' },
+  { id: 'returns', label: 'Returns' },
+  { id: 'support', label: 'Support' },
 ];
 
 function settledError(result, fallback) {
@@ -250,12 +250,6 @@ export default function AccountHubSheet({ isOpen, onClose, user, onLogout }) {
   const historyErrorText = useMemo(() => Object.values(historyErrors).filter(Boolean).join(' '), [historyErrors]);
   const activeHistoryError = useMemo(() => historyFilterError(historyErrors, historyFilter), [historyErrors, historyFilter]);
   const allHistoryFailed = Boolean(historyErrorText) && activity.length === 0;
-  const historyFilterCounts = useMemo(() => ({
-    product: activity.filter((item) => item.type === 'order').length,
-    repairs: activity.filter((item) => item.type === 'repair' || item.type === 'repair-order').length,
-    returns: activity.filter((item) => item.type === 'return').length,
-    support: activity.filter((item) => item.type === 'support').length,
-  }), [activity]);
 
   return (
     <div className={`account-hub${isOpen ? ' account-hub--open' : ''}`} role="dialog" aria-modal="true" aria-label="Account hub" aria-hidden={!isOpen}>
@@ -351,18 +345,16 @@ export default function AccountHubSheet({ isOpen, onClose, user, onLogout }) {
               ) : (
                 <div className="account-history account-hub__history-section">
                   <div className="account-history__filters account-hub__history-filters" role="tablist" aria-label="Filter account history">
-                    {HISTORY_FILTERS.map(({ id, label, Icon }) => (
+                    {HISTORY_FILTERS.map(({ id, label }) => (
                       <button
                         key={id}
                         type="button"
                         role="tab"
                         aria-selected={historyFilter === id}
-                        className={`account-history__filter${historyFilter === id ? ' is-active' : ''}`}
+                        className={`account-history__filter account-hub__history-filter${historyFilter === id ? ' is-active' : ''}`}
                         onClick={() => setHistoryFilter(id)}
                       >
-                        <Icon size={14} />
                         <span>{label}</span>
-                        <strong>{historyFilterCounts[id] || 0}</strong>
                       </button>
                     ))}
                   </div>
