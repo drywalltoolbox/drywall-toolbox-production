@@ -1,17 +1,25 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Home, Package, User, X, ShoppingBag, ChevronRight, AlertCircle, Loader, Wrench, RotateCcw, ChevronDown, LayoutDashboard, Calculator, LifeBuoy, BookOpen } from 'lucide-react';
+import { Home, Package, User, X, ShoppingBag, ShoppingCart, ChevronRight, AlertCircle, Loader, Wrench, RotateCcw, ChevronDown, LayoutDashboard, Calculator, LifeBuoy, BookOpen, Headphones } from 'lucide-react';
 import { getCustomerOrders } from '../../api/orders.js';
 import { getCustomerRepairs } from '../../api/repairs.js';
 import { getCustomerReturns } from '../../api/returns.js';
+import { getCustomerSupportTickets } from '../../api/support.js';
 import { getRecentlyViewed } from '../../utils/recentlyViewed.js';
-import { buildAccountActivity, normalizeOrders, normalizeRepairs, normalizeReturns } from '../../utils/accountActivity.js';
+import { buildAccountActivity, normalizeOrders, normalizeRepairs, normalizeReturns, normalizeSupportTickets } from '../../utils/accountActivity.js';
 import AccountActivityList from './AccountActivityList.jsx';
 
 const TABS = [
   { id: 'home',    label: 'Home',    Icon: Home },
   { id: 'orders',  label: 'Orders',  Icon: Package },
   { id: 'account', label: 'Account', Icon: User },
+];
+
+const HISTORY_FILTERS = [
+  { id: 'product', label: 'Product', Icon: ShoppingCart },
+  { id: 'repairs', label: 'Repairs', Icon: Wrench },
+  { id: 'returns', label: 'Returns', Icon: RotateCcw },
+  { id: 'support', label: 'Support', Icon: Headphones },
 ];
 
 function settledError(result, fallback) {
@@ -115,43 +123,78 @@ function RecentlyViewedSection({ recentlyViewed, closeSheet, navigate }) {
   );
 }
 
+function filterAccountHistory(activity, filter) {
+  if (filter === 'product') return activity.filter((item) => item.type === 'order');
+  if (filter === 'repairs') return activity.filter((item) => item.type === 'repair' || item.type === 'repair-order');
+  if (filter === 'returns') return activity.filter((item) => item.type === 'return');
+  if (filter === 'support') return activity.filter((item) => item.type === 'support');
+  return activity;
+}
+
+function historyFilterError(errors, filter) {
+  if (filter === 'product') return errors.orders;
+  if (filter === 'repairs') return errors.repairs;
+  if (filter === 'returns') return errors.returns;
+  if (filter === 'support') return errors.support;
+  return Object.values(errors).filter(Boolean).join(' ');
+}
+
+function historyFilterEmptyCopy(filter) {
+  if (filter === 'product') return 'Product orders will appear here after checkout.';
+  if (filter === 'repairs') return 'Repair requests and repair service orders will appear here.';
+  if (filter === 'returns') return 'Return requests will appear here.';
+  if (filter === 'support') return 'Support tickets and service conversations will appear here.';
+  return 'Product orders, repair requests, returns, and support tickets will appear here.';
+}
+
 export default function AccountHubSheet({ isOpen, onClose, user, onLogout }) {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('home');
+  const [historyFilter, setHistoryFilter] = useState('product');
   const [recentlyViewed, setRecentlyViewed] = useState([]);
   const [orders, setOrders] = useState([]);
   const [repairs, setRepairs] = useState([]);
   const [returns, setReturns] = useState([]);
+  const [supportTickets, setSupportTickets] = useState([]);
   const [ordersLoading, setOrdersLoading] = useState(false);
-  const [historyErrors, setHistoryErrors] = useState({ orders: '', repairs: '', returns: '' });
+  const [historyErrors, setHistoryErrors] = useState({ orders: '', repairs: '', returns: '', support: '' });
   const [accountSections, setAccountSections] = useState({ services: false, support: false });
+
+  const showOrdersTab = useCallback((filter = 'product') => {
+    setHistoryFilter(filter);
+    setActiveTab('orders');
+  }, []);
 
   const closeSheet = useCallback(() => {
     setActiveTab('home');
+    setHistoryFilter('product');
     setAccountSections({ services: false, support: false });
     onClose?.();
   }, [onClose]);
 
-  const applyHistoryResults = useCallback(([ordersResult, repairsResult, returnsResult]) => {
+  const applyHistoryResults = useCallback(([ordersResult, repairsResult, returnsResult, supportResult]) => {
     setOrders(ordersResult.status === 'fulfilled' ? normalizeOrders(ordersResult.value) : []);
     setRepairs(repairsResult.status === 'fulfilled' ? normalizeRepairs(repairsResult.value) : []);
     setReturns(returnsResult.status === 'fulfilled' ? normalizeReturns(returnsResult.value) : []);
+    setSupportTickets(supportResult.status === 'fulfilled' ? normalizeSupportTickets(supportResult.value) : []);
     setHistoryErrors({
-      orders: settledError(ordersResult, 'Orders are temporarily unavailable.'),
+      orders: settledError(ordersResult, 'Product orders are temporarily unavailable.'),
       repairs: settledError(repairsResult, 'Repairs are temporarily unavailable.'),
       returns: settledError(returnsResult, 'Returns are temporarily unavailable.'),
+      support: settledError(supportResult, 'Support tickets are temporarily unavailable.'),
     });
   }, []);
 
   const loadOrders = useCallback(async () => {
     if (!isOpen || !user) return;
     setOrdersLoading(true);
-    setHistoryErrors({ orders: '', repairs: '', returns: '' });
+    setHistoryErrors({ orders: '', repairs: '', returns: '', support: '' });
 
     const results = await Promise.allSettled([
       getCustomerOrders(user?.id, 1, 20),
       getCustomerRepairs(1, 20),
       getCustomerReturns(1, 20),
+      getCustomerSupportTickets(1, 20),
     ]);
 
     applyHistoryResults(results);
@@ -169,11 +212,12 @@ export default function AccountHubSheet({ isOpen, onClose, user, onLogout }) {
 
     async function load() {
       setOrdersLoading(true);
-      setHistoryErrors({ orders: '', repairs: '', returns: '' });
+      setHistoryErrors({ orders: '', repairs: '', returns: '', support: '' });
       const results = await Promise.allSettled([
         getCustomerOrders(user?.id, 1, 20),
         getCustomerRepairs(1, 20),
         getCustomerReturns(1, 20),
+        getCustomerSupportTickets(1, 20),
       ]);
       if (cancelled) return;
       applyHistoryResults(results);
@@ -201,9 +245,17 @@ export default function AccountHubSheet({ isOpen, onClose, user, onLogout }) {
     const preferredName = user?.first_name || user?.display_name || user?.name || displayName;
     return String(preferredName).trim().split(/\s+/)[0] || 'there';
   }, [displayName, user]);
-  const activity = useMemo(() => buildAccountActivity({ orders, repairs, returns }), [orders, repairs, returns]);
+  const activity = useMemo(() => buildAccountActivity({ orders, repairs, returns, supportTickets }), [orders, repairs, returns, supportTickets]);
+  const filteredHistoryActivity = useMemo(() => filterAccountHistory(activity, historyFilter), [activity, historyFilter]);
   const historyErrorText = useMemo(() => Object.values(historyErrors).filter(Boolean).join(' '), [historyErrors]);
+  const activeHistoryError = useMemo(() => historyFilterError(historyErrors, historyFilter), [historyErrors, historyFilter]);
   const allHistoryFailed = Boolean(historyErrorText) && activity.length === 0;
+  const historyFilterCounts = useMemo(() => ({
+    product: activity.filter((item) => item.type === 'order').length,
+    repairs: activity.filter((item) => item.type === 'repair' || item.type === 'repair-order').length,
+    returns: activity.filter((item) => item.type === 'return').length,
+    support: activity.filter((item) => item.type === 'support').length,
+  }), [activity]);
 
   return (
     <div className={`account-hub${isOpen ? ' account-hub--open' : ''}`} role="dialog" aria-modal="true" aria-label="Account hub" aria-hidden={!isOpen}>
@@ -232,20 +284,20 @@ export default function AccountHubSheet({ isOpen, onClose, user, onLogout }) {
               />
               <div className="account-hub__home-header">
                 <div className="account-hub__summary-grid">
-                  <button type="button" onClick={() => setActiveTab('orders')} className="account-hub__summary-card">
+                  <button type="button" onClick={() => showOrdersTab('product')} className="account-hub__summary-card">
                     <Package size={18} /><strong>{orders.length}</strong><span>Orders</span>
                   </button>
-                  <button type="button" onClick={() => { closeSheet(); navigate('/dashboard?tab=repairs'); }} className="account-hub__summary-card is-repair">
+                  <button type="button" onClick={() => showOrdersTab('repairs')} className="account-hub__summary-card is-repair">
                     <Wrench size={18} /><strong>{repairs.length}</strong><span>Repairs</span>
                   </button>
-                  <button type="button" onClick={() => setActiveTab('orders')} className="account-hub__summary-card is-return">
+                  <button type="button" onClick={() => showOrdersTab('returns')} className="account-hub__summary-card is-return">
                     <RotateCcw size={18} /><strong>{returns.length}</strong><span>Returns</span>
                   </button>
                 </div>
               </div>
 
               <section className="account-hub__list-section">
-                <button type="button" className="account-hub__section-header" onClick={() => setActiveTab('orders')}>
+                <button type="button" className="account-hub__section-header" onClick={() => showOrdersTab('product')}>
                   <span>Recent activity</span>
                   <span className="account-hub__section-action">View all <ChevronRight size={14} /></span>
                 </button>
@@ -257,7 +309,7 @@ export default function AccountHubSheet({ isOpen, onClose, user, onLogout }) {
                     <AccountActivityList items={activity} limit={4} onNavigate={closeSheet} />
                   </>
                 ) : (
-                  <div className="account-hub__empty-card"><div className="account-hub__empty-icon"><Package size={24} /></div><p>Your orders, repairs, and returns will appear here.</p></div>
+                  <div className="account-hub__empty-card"><div className="account-hub__empty-icon"><Package size={24} /></div><p>Your orders, repairs, returns, and support tickets will appear here.</p></div>
                 )}
               </section>
 
@@ -270,13 +322,13 @@ export default function AccountHubSheet({ isOpen, onClose, user, onLogout }) {
               <AccountHubHero
                 eyebrow="Account history"
                 title="Orders & services"
-                subtitle="Product orders, repair requests, and returns in one place."
+                subtitle="Product orders, repairs, returns, and support tickets in one place."
                 Icon={Package}
               />
               {ordersLoading ? (
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', padding: '48px 0' }}>
                   <Loader size={20} style={{ color: '#2563eb' }} className="animate-spin" />
-                  <span style={{ fontSize: '0.85rem', color: 'rgba(15,23,42,0.5)' }}>Loading orders…</span>
+                  <span style={{ fontSize: '0.85rem', color: 'rgba(15,23,42,0.5)' }}>Loading account history…</span>
                 </div>
               ) : allHistoryFailed ? (
                 <div className="account-hub__panel account-hub__panel--centered">
@@ -291,15 +343,47 @@ export default function AccountHubSheet({ isOpen, onClose, user, onLogout }) {
                 <div className="account-hub__panel account-hub__panel--centered">
                   <div className="account-hub__empty-state">
                     <div className="account-hub__empty-state-icon"><Package size={34} strokeWidth={1.4} /></div>
-                    <strong className="account-hub__empty-state-title">No orders yet</strong>
-                    <p className="account-hub__empty-state-body">Product orders, repair requests, and returns will appear here.</p>
+                    <strong className="account-hub__empty-state-title">No account activity yet</strong>
+                    <p className="account-hub__empty-state-body">Product orders, repair requests, returns, and support tickets will appear here.</p>
                     <button type="button" className="account-hub__outline-btn" onClick={() => { closeSheet(); navigate('/products'); }}>Start shopping</button>
                   </div>
                 </div>
               ) : (
-                <div className="account-hub__list-section">
-                  {historyErrorText ? <div className="account-hub__empty-card"><p>Some account history is temporarily unavailable. Available activity is shown below.</p><button type="button" className="account-hub__outline-btn" onClick={loadOrders}>Retry</button></div> : null}
-                  <AccountActivityList items={activity} onNavigate={closeSheet} />
+                <div className="account-history account-hub__history-section">
+                  <div className="account-history__filters account-hub__history-filters" role="tablist" aria-label="Filter account history">
+                    {HISTORY_FILTERS.map(({ id, label, Icon }) => (
+                      <button
+                        key={id}
+                        type="button"
+                        role="tab"
+                        aria-selected={historyFilter === id}
+                        className={`account-history__filter${historyFilter === id ? ' is-active' : ''}`}
+                        onClick={() => setHistoryFilter(id)}
+                      >
+                        <Icon size={14} />
+                        <span>{label}</span>
+                        <strong>{historyFilterCounts[id] || 0}</strong>
+                      </button>
+                    ))}
+                  </div>
+
+                  {activeHistoryError ? <div className="account-history-state is-error" role="status"><AlertCircle size={18} /><span>{activeHistoryError}</span><button type="button" onClick={loadOrders}>Retry</button></div> : null}
+
+                  {filteredHistoryActivity.length ? (
+                    <AccountActivityList items={filteredHistoryActivity} onNavigate={closeSheet} />
+                  ) : (
+                    <div className="account-history-state">
+                      <Package size={34} />
+                      <strong>No activity found</strong>
+                      <span>{historyFilterEmptyCopy(historyFilter)}</span>
+                      {historyFilter === 'support' ? (
+                        <Link to="/contact" onClick={closeSheet}>Contact support</Link>
+                      ) : (
+                        <Link to="/products" onClick={closeSheet}>Browse products</Link>
+                      )}
+                    </div>
+                  )}
+
                   <button
                     type="button"
                     onClick={() => { closeSheet(); navigate('/dashboard?tab=orders'); }}
