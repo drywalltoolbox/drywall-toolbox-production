@@ -1,0 +1,30 @@
+sku,name,type,brand,regular_price,parent,categories,validation_status,source_line
+AH1,Head Casting,variable,Columbia Tools,,,Drywall Finishing Tools > Columbia Tools > Parts,ready,385
+AH3,Top Blade,variable,Columbia Tools,,,Drywall Finishing Tools > Columbia Tools > Parts,ready,172
+AH7,Frame Tension Spring,variable,Columbia Tools,,,Drywall Finishing Tools > Columbia Tools > Parts,ready,358
+AH8-CLIP,Top Retainer Corner Clip,variable,Columbia Tools,,,Drywall Finishing Tools > Columbia Tools > Parts,ready,511
+AH9-CLIP,Bottom Retainer Corner Clip,variable,Columbia Tools,,,Drywall Finishing Tools > Columbia Tools > Parts,ready,257
+BH9,Brake Connecting Strap,variable,Columbia Tools,,,Drywall Finishing Tools > Columbia Tools > Parts,ready,265
+CFB3,Side Plate,variable,Columbia Tools,,,Drywall Finishing Tools > Columbia Tools > Parts,ready,489
+CFB4,Door,variable,Columbia Tools,,,Drywall Finishing Tools > Columbia Tools > Parts,ready,326
+CFB7,Door Gasket,variable,Columbia Tools,,,Drywall Finishing Tools > Columbia Tools > Parts,ready,332
+CT-INSERT-BUSHING,Insert Bushing,variable,Columbia Tools,,,Drywall Finishing Tools > Columbia Tools > Parts,ready,470
+CT-NYLATRON-CHAIN-ROLLER,Nylatron Chain Roller,variable,Columbia Tools,,,Drywall Finishing Tools > Columbia Tools > Parts,ready,473
+CT-SPROCKET,Drive Sprocket,variable,Columbia Tools,,,Drywall Finishing Tools > Columbia Tools > Parts,ready,345
+CT-WAFER-BUSHING,Wafer Bushing,variable,Columbia Tools,,,Drywall Finishing Tools > Columbia Tools > Parts,ready,404
+FA2,"4-40 x 1/8"" Binder Slot",simple,Columbia Tools,1.65,,Drywall Finishing Tools > Columbia Tools > Parts,ready,184
+FA3,"1/2"" x 7/8"" Flat Washer",simple,Columbia Tools,2.50,,Drywall Finishing Tools > Columbia Tools > Parts,ready,135
+FFB11,Adjuster Spring,variable,Columbia Tools,,,Drywall Finishing Tools > Columbia Tools > Parts,ready,224
+FFB25,Rubber Gasket Retainer,variable,Columbia Tools,,,Drywall Finishing Tools > Columbia Tools > Parts,ready,160
+FFB5,Axle,variable,Columbia Tools,,,Drywall Finishing Tools > Columbia Tools > Parts,ready,229
+FFB7-SHOE,Shoe,variable,Columbia Tools,,,Drywall Finishing Tools > Columbia Tools > Parts,ready,485
+FFB9,Blade,variable,Columbia Tools,,,Drywall Finishing Tools > Columbia Tools > Parts,ready,242
+HFFB14,Flat Box Hinged Door Gasket,variable,Columbia Tools,,,Drywall Finishing Tools > Columbia Tools > Parts,ready,155
+HFFB3-PLATE,Hinge Box End Plate,variable,Columbia Tools,,,Drywall Finishing Tools > Columbia Tools > Parts,ready,392
+HH-BRASS-CONNECTOR,Brass Connector,variable,Columbia Tools,,,Drywall Finishing Tools > Columbia Tools > Parts,ready,276
+HNS-DOOR-SPRING,Door Spring,variable,Columbia Tools,,,Drywall Finishing Tools > Columbia Tools > Parts,ready,337
+HNS15,Door Gasket,variable,Columbia Tools,,,Drywall Finishing Tools > Columbia Tools > Parts,ready,329
+HNS4,Door,variable,Columbia Tools,,,Drywall Finishing Tools > Columbia Tools > Parts,ready,323
+HNS7,Blade,variable,Columbia Tools,,,Drywall Finishing Tools > Columbia Tools > Parts,ready,249
+HNS8,Blade Holder,variable,Columbia Tools,,,Drywall Finishing Tools > Columbia Tools > Parts,ready,252
+MP-PISTON-BACKING-WASHER,Piston Backing Washer,variable,Columbia Tools,,,Drywall Finishing Tools > Columbia Tools > Parts,ready,445
