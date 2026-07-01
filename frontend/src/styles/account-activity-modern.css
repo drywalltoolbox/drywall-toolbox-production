@@ -21,3 +21,28 @@
   background: #d97706;
   box-shadow: 0 0 0 7px rgba(217, 119, 6, 0.1);
 }
+
+.account-hub__summary-card > svg,
+.account-hub__accordion-title > svg,
+.account-hub__accordion-link span > svg {
+  display: none;
+}
+
+.account-hub__summary-card {
+  grid-template-columns: 1fr;
+  gap: 2px;
+}
+
+.account-hub__summary-card strong {
+  font-size: 1.18rem;
+  line-height: 1;
+}
+
+.account-hub__summary-card span {
+  grid-column: auto;
+}
+
+.account-hub__accordion-title,
+.account-hub__accordion-link span {
+  gap: 0;
+}
