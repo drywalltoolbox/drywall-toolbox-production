@@ -100,6 +100,9 @@ $shipping_rate_id    = sanitize_text_field( dtb_repair_pick_submission_text( $da
 $shipping_rate_name  = sanitize_text_field( dtb_repair_pick_submission_text( $data, [ 'shipping_rate_name', 'shippingRateName' ] ) );
 $shipping_rate_price = (string) (float) dtb_repair_pick_submission_value( $data, [ 'shipping_rate_price', 'shippingRatePrice' ], 0 );
 $source          = sanitize_text_field( dtb_repair_pick_submission_text( $data, [ 'source' ], 'frontend_repair_form' ) );
+$frontend_base_url = function_exists( 'dtb_repair_resolve_frontend_base_url' )
+? dtb_repair_resolve_frontend_base_url( 0, $data )
+: rtrim( home_url( '/' ), '/' );
 
 $descriptor_detail = $item_model ?: ( 'Repair Service' !== $item_type ? $item_type : '' );
 $tool_descriptor   = trim( implode( ' — ', array_filter( [ $item_brand, $descriptor_detail ] ) ) );
@@ -162,6 +165,7 @@ $meta = [
 '_repair_shipping_rate_price'  => $shipping_rate_price,
 '_repair_status'               => 'submitted',
 '_repair_public_token'         => $public_token,
+'_repair_frontend_base_url'    => $frontend_base_url,
 '_repair_submitted_at'         => gmdate( 'Y-m-d\TH:i:s\Z' ),
 '_repair_source'               => $source,
 '_repair_idempotency_key'      => $idempotency_key,
