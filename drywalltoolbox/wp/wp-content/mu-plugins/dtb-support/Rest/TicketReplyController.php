@@ -94,6 +94,46 @@ function dtb_support_staff_reply_permission( WP_REST_Request $request ): bool|WP
 }
 
 /**
+ * Detect macro placeholders in support reply text.
+ */
+function dtb_support_rest_has_template_tokens( string $message ): bool {
+	return (bool) preg_match( '/\{\{\s*[a-z0-9_]+\s*\}\}|(?<!\{)\{\s*[a-z0-9_]+\s*\}(?!\})/i', $message );
+}
+
+/**
+ * Render any macro tokens before a staff reply is persisted or emailed.
+ */
+function dtb_support_rest_prepare_staff_reply_message( int $ticket_id, string $message ): string {
+	if ( ! dtb_support_rest_has_template_tokens( $message ) ) {
+		return $message;
+	}
+
+	$ticket = dtb_support_get_ticket( $ticket_id );
+	if ( ! $ticket || ! function_exists( 'dtb_support_render_macro' ) ) {
+		return $message;
+	}
+
+	$rendered = dtb_support_render_macro( $message, $ticket );
+	return '' !== trim( $rendered ) ? $rendered : $message;
+}
+
+/**
+ * Prepare public-facing conversation message bodies and clean legacy macro residue.
+ */
+function dtb_support_rest_prepare_public_message_body( object $event, object $ticket ): string {
+	$body = (string) ( $event->body ?? '' );
+
+	if ( function_exists( 'dtb_support_render_macro' ) && dtb_support_rest_has_template_tokens( $body ) ) {
+		$body = dtb_support_render_macro( $body, $ticket );
+	} elseif ( function_exists( 'dtb_support_clean_rendered_macro' ) ) {
+		$body = dtb_support_clean_rendered_macro( $body );
+	}
+
+	$body = wp_strip_all_tags( $body );
+	return function_exists( 'dtb_str_normalize_display' ) ? dtb_str_normalize_display( $body, true ) : trim( $body );
+}
+
+/**
  * POST /dtb/v1/support/tickets/{id}/reply   (staff)
  *
  * @param WP_REST_Request $request
@@ -108,6 +148,8 @@ function dtb_support_rest_staff_reply( WP_REST_Request $request ): WP_REST_Respo
 	if ( '' === $message ) {
 		return new WP_Error( 'dtb_support_empty', __( 'Message cannot be empty.', 'drywall-toolbox' ), [ 'status' => 422 ] );
 	}
+
+	$message = dtb_support_rest_prepare_staff_reply_message( $ticket_id, $message );
 
 	$event_id = dtb_support_add_reply( $ticket_id, $message, 'staff', $actor_id, $is_internal );
 	if ( is_wp_error( $event_id ) ) {
@@ -198,7 +240,7 @@ function dtb_support_rest_public_status( WP_REST_Request $request ): WP_REST_Res
 		static fn( $event ) => [
 			'id'          => (int) $event->id,
 			'type'        => (string) $event->event_type,
-			'body'        => (string) $event->body,
+			'body'        => dtb_support_rest_prepare_public_message_body( $event, $ticket ),
 			'actor_type'  => (string) $event->actor_type,
 			'occurred_at' => (string) $event->created_at,
 		],
