@@ -1,12 +1,12 @@
 import { Link } from 'react-router-dom';
-import { ChevronRight, Headphones, Package, RotateCcw, Wrench } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
 
 const TYPE_CONFIG = {
-  order: { Icon: Package, className: 'is-order' },
-  'repair-order': { Icon: Wrench, className: 'is-repair' },
-  repair: { Icon: Wrench, className: 'is-repair' },
-  return: { Icon: RotateCcw, className: 'is-return' },
-  support: { Icon: Headphones, className: 'is-support' },
+  order: { className: 'is-order' },
+  'repair-order': { className: 'is-repair' },
+  repair: { className: 'is-repair' },
+  return: { className: 'is-return' },
+  support: { className: 'is-support' },
 };
 
 function formatDate(value) {
@@ -27,9 +27,7 @@ export default function AccountActivityList({ items, limit, onNavigate }) {
         const config = TYPE_CONFIG[item.type] || TYPE_CONFIG.order;
         return (
           <Link key={item.id} to={item.href} onClick={onNavigate} className="account-activity-card">
-            <span className={`account-activity-card__icon ${config.className}`}>
-              <config.Icon size={18} strokeWidth={2} />
-            </span>
+            <span className={`account-activity-card__marker ${config.className}`} aria-hidden="true" />
             <span className="account-activity-card__body">
               <span className="account-activity-card__eyebrow">{item.label}</span>
               <span className="account-activity-card__title-row">
