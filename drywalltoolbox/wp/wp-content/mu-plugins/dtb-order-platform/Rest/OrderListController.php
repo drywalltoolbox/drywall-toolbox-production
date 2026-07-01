@@ -48,10 +48,17 @@ function dtb_order_rest_list_orders( WP_REST_Request $request ): WP_REST_Respons
 		if ( ! ( $wc_order instanceof WC_Order ) ) {
 			continue;
 		}
+
+		if ( function_exists( 'dtb_payment_is_incomplete_checkout_order' ) && dtb_payment_is_incomplete_checkout_order( $wc_order ) ) {
+			--$total;
+			continue;
+		}
+
 		$results[] = dtb_order_format_summary( $wc_order );
 	}
 
-	if ( $total_pages <= 0 ) {
+	$total = max( 0, $total );
+	if ( $total_pages <= 0 || count( $results ) < count( $orders ) ) {
 		$total_pages = $per_page > 0 ? (int) ceil( $total / $per_page ) : 1;
 	}
 	if ( $total_pages <= 0 ) {
