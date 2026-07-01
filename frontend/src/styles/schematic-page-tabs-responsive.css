@@ -1,0 +1,82 @@
+/* Mobile schematic page selector hardening.
+   Keeps the existing viewer design while preventing long multi-page labels from
+   compressing, overlapping, or escaping the viewport. */
+
+.schematic-variant-pill {
+  flex: 0 0 auto;
+  min-width: 0;
+}
+
+.schematic-variant-pill__label {
+  display: block;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (max-width: 768px) {
+  .schematic-variant-bar[aria-label="Schematic page selector"] {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0;
+    width: 100%;
+    max-width: 100vw;
+    min-width: 0;
+    overflow: hidden;
+    padding: 8px 8px 9px;
+    background: #f8fafc;
+  }
+
+  .schematic-variant-bar[aria-label="Schematic page selector"] .schematic-variant-bar__summary {
+    display: none;
+  }
+
+  .schematic-variant-bar[aria-label="Schematic page selector"] .schematic-variant-pills {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0 2px 2px;
+    scroll-padding-inline: 2px;
+    scroll-snap-type: x proximity;
+    overscroll-behavior-x: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .schematic-variant-bar[aria-label="Schematic page selector"] .schematic-variant-pill {
+    flex: 0 0 auto;
+    width: auto;
+    min-width: clamp(92px, 30vw, 126px);
+    max-width: min(44vw, 172px);
+    min-height: 42px;
+    padding: 0 12px;
+    border-radius: 11px;
+    flex-direction: row;
+    scroll-snap-align: start;
+  }
+
+  .schematic-variant-bar[aria-label="Schematic page selector"] .schematic-variant-pill__label {
+    width: 100%;
+    font-size: clamp(0.73rem, 3.05vw, 0.84rem);
+    line-height: 1.05;
+    letter-spacing: -0.01em;
+    text-align: center;
+  }
+}
+
+@media (max-width: 390px) {
+  .schematic-variant-bar[aria-label="Schematic page selector"] .schematic-variant-pill {
+    min-width: clamp(86px, 31vw, 112px);
+    max-width: 42vw;
+    padding-inline: 10px;
+  }
+
+  .schematic-variant-bar[aria-label="Schematic page selector"] .schematic-variant-pill__label {
+    font-size: clamp(0.68rem, 3.15vw, 0.78rem);
+  }
+}
