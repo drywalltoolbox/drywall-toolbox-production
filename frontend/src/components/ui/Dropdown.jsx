@@ -109,7 +109,7 @@ export default function Dropdown({
           whiteSpace: 'nowrap',
         }}
       >
-        <span style={{ flex: 1, textAlign: 'left' }}>
+        <span style={{ flex: 1, minWidth: 0, textAlign: 'left', overflow: 'hidden', textOverflow: 'ellipsis' }}>
           {selectedOption ? selectedOption.label : placeholder}
         </span>
         <Motion.span
@@ -135,11 +135,16 @@ export default function Dropdown({
               top: 'calc(100% + 6px)',
               left: 0,
               minWidth: '100%',
+              width: fullWidth ? '100%' : undefined,
               background: 'white',
               border: '1px solid rgba(15,23,42,0.09)',
               borderRadius: '12px',
               boxShadow: '0 8px 24px rgba(15,23,42,0.12), 0 2px 8px rgba(15,23,42,0.06)',
-              overflow: 'hidden',
+              overflowX: 'hidden',
+              overflowY: 'auto',
+              overscrollBehavior: 'contain',
+              WebkitOverflowScrolling: 'touch',
+              maxHeight: 'min(360px, calc(100vh - 180px))',
               zIndex: 10000,
               padding: '4px',
             }}
@@ -174,13 +179,14 @@ export default function Dropdown({
                     if (!isSelected) e.currentTarget.style.background = 'transparent';
                   }}
                 >
-                  <span>
+                  <span style={{ minWidth: 0 }}>
                     <span style={{
                       display: 'block',
                       fontSize: '0.875rem',
                       fontWeight: isSelected ? 700 : 500,
                       color: isSelected ? 'var(--primary-700)' : '#0f172a',
                       lineHeight: 1.3,
+                      overflowWrap: 'anywhere',
                     }}>
                       {option.label}
                     </span>
@@ -190,6 +196,7 @@ export default function Dropdown({
                         fontSize: '0.72rem',
                         color: 'rgba(15,23,42,0.45)',
                         marginTop: '1px',
+                        lineHeight: 1.35,
                       }}>
                         {option.description}
                       </span>
