@@ -21,6 +21,7 @@ import './styles/checkout-typography.css'
 import './styles/mobile-responsive.css'
 import './styles/mobile-product-typography.css'
 import './styles/mobile-liquid-typography.css'
+import './styles/schematic-page-tabs-responsive.css'
 import './styles/order-item-images.css'
 import './styles/product-compatible-schematics-cleanup.css'
 import './styles/order-tracking-layout-fixes.css'
@@ -80,5 +81,5 @@ createRoot(document.getElementById('root')).render(
 // ─── Service Worker policy ───────────────────────────────────────────────────
 // We intentionally do not register the old Vite PWA service worker here. Prior
 // deployments may still have cached /sw.js or /service-worker.js, but
-// bootstrapRuntimeAssetBase.js unregisters those legacy workers before the app
+// bootstrapRuntimeAssetBase.js.unregisters those legacy workers before the app
 // renders so stale precache manifests cannot serve deleted hashed chunks.
