@@ -33,6 +33,7 @@ import ErrorBoundary from './components/errors/ErrorBoundary.jsx'
 import { installSchematicPageLabelRuntime } from './utils/schematicPageLabelRuntime.js'
 import { installMobileCheckoutSummaryAutoOpen } from './utils/checkoutMobileSummaryRuntime.js'
 import { installMobileSchematicNavRuntime } from './utils/mobileSchematicNavRuntime.js'
+import { installRepairPackageSelectionRuntime } from './utils/repairPackageSelectionRuntime.js'
 
 // ─── Pre-warm product catalog cache ──────────────────────────────────────────
 // Product listing pages use the DTB catalog-platform endpoints, so prewarm
@@ -45,6 +46,7 @@ import { prewarmCatalogPlatformForCurrentRoute } from './services/catalogPlatfor
 installSchematicPageLabelRuntime();
 installMobileCheckoutSummaryAutoOpen();
 installMobileSchematicNavRuntime();
+installRepairPackageSelectionRuntime();
 prewarmCatalogPlatformForCurrentRoute();
 
 if (typeof window !== 'undefined') {
