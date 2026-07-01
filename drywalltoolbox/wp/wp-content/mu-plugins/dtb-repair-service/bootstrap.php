@@ -21,6 +21,7 @@ require_once __DIR__ . '/Infrastructure/RepairPostType.php';
 require_once __DIR__ . '/Infrastructure/RepairMetaRepository.php';
 require_once __DIR__ . '/Infrastructure/RepairMediaStorage.php';
 require_once __DIR__ . '/Infrastructure/RepairStatusStore.php';
+require_once __DIR__ . '/Infrastructure/RepairFrontendRouting.php';
 
 // Services (TransitionMap first — WorkflowService depends on it)
 require_once __DIR__ . '/Services/RepairWorkflowTransitionMap.php';
