@@ -8,7 +8,7 @@
  *   /order-tracking/:id?order_key=…  — guest tracking via order key
  */
 
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import { useParams, useSearchParams, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
@@ -23,6 +23,8 @@ import { useOrderStatus } from '../hooks/useOrderStatus.js';
 import { useOrderEventStream } from '../hooks/useOrderEventStream.js';
 import { useOrderItemImageFallbacks } from '../hooks/useOrderItemImageFallbacks.js';
 import { ORDER_STATUS_LABELS } from '../api/orders.js';
+import { useCart } from '../context/CartContext.jsx';
+import { clearPendingCheckoutPayment } from '../utils/checkoutRecovery.js';
 import { getOrderItemKey, resolveOrderItemImage } from '../utils/orderItemImages.js';
 import '../styles/order-pages.css';
 import '../styles/order-tracking.css';
@@ -34,6 +36,9 @@ const TRACKING_STEPS = [
   { id: 'shipped', label: 'Shipped', description: 'In transit' },
   { id: 'complete', label: 'Complete', description: 'Delivered' },
 ];
+
+const CHECKOUT_COMPLETE_QUERY_KEYS = ['checkout_complete', 'payment_complete', 'dtb_checkout_complete'];
+const CLEAR_CART_BLOCKED_STATUSES = new Set(['failed', 'cancelled', 'canceled', 'refunded']);
 
 function formatDateTime(value) {
   if (!value) return '—';
@@ -92,6 +97,19 @@ function humanizeToken(value) {
     .replace(/([a-z])([A-Z])/g, '$1 $2')
     .replace(/\s+/g, ' ')
     .replace(/\b\w/g, (char) => char.toUpperCase());
+}
+
+function hasCheckoutCompleteSignal(searchParams) {
+  return CHECKOUT_COMPLETE_QUERY_KEYS.some((key) => {
+    const value = String(searchParams.get(key) || '').toLowerCase();
+    return value === '1' || value === 'true' || value === 'yes';
+  });
+}
+
+function shouldClearCartForCompletedCheckout(order) {
+  const status = String(order?.status || '').toLowerCase();
+  if (CLEAR_CART_BLOCKED_STATUSES.has(status)) return false;
+  return !order?.payment_required;
 }
 
 function resolveStatusLabel(order) {
@@ -424,15 +442,25 @@ export default function OrderTracking() {
   const { id } = useParams();
   const [searchParams] = useSearchParams();
   const orderKey = searchParams.get('order_key') || '';
+  const { clearCart } = useCart();
+  const cartClearHandledRef = useRef(false);
 
   const { data, loading, error, refresh } = useOrderStatus(id, orderKey);
   const { streaming } = useOrderEventStream(id, orderKey);
+  const checkoutComplete = useMemo(() => hasCheckoutCompleteSignal(searchParams), [searchParams]);
 
   useEffect(() => {
     if (!streaming) return undefined;
     const timer = setInterval(refresh, 60_000);
     return () => clearInterval(timer);
   }, [streaming, refresh]);
+
+  useEffect(() => {
+    if (!checkoutComplete || cartClearHandledRef.current || !data || !shouldClearCartForCompletedCheckout(data)) return;
+    cartClearHandledRef.current = true;
+    clearPendingCheckoutPayment();
+    Promise.resolve(clearCart()).catch(() => {});
+  }, [checkoutComplete, clearCart, data]);
 
   const viewModel = useMemo(() => {
     const order = data ? { ...data, id: data.id || id, number: data.number || id } : null;
