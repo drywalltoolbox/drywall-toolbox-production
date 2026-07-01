@@ -24,6 +24,10 @@ function dtb_order_rest_get_order( WP_REST_Request $request ): WP_REST_Response|
 		return new WP_Error( 'dtb_forbidden', 'You do not have access to this order.', [ 'status' => 403 ] );
 	}
 
+	if ( ! current_user_can( 'manage_woocommerce' ) && function_exists( 'dtb_payment_is_incomplete_checkout_order' ) && dtb_payment_is_incomplete_checkout_order( $order ) ) {
+		return new WP_Error( 'dtb_not_found', 'Order not found.', [ 'status' => 404 ] );
+	}
+
 	return new WP_REST_Response( dtb_order_format_detail( $order ), 200 );
 }
 
@@ -179,79 +183,25 @@ function dtb_order_rest_admin_action( WP_REST_Request $request ): WP_REST_Respon
 			$current_status = '';
 			if ( function_exists( 'wc_get_order' ) ) {
 				$order = wc_get_order( $order_id );
-				if ( $order ) {
-					$current_status = $order->get_status();
+				if ( $order instanceof WC_Order ) {
+					$order_type     = function_exists( 'dtb_order_resolve_type' ) ? dtb_order_resolve_type( $order ) : 'product';
+					$workflow_key   = 'repair' === $order_type ? 'repair_order' : 'product_order';
+					$current_status = sanitize_key( (string) $order->get_status() );
 				}
 			}
-			if ( function_exists( 'dtb_admin_get_allowed_workflow_transitions' ) && $current_status ) {
-				$allowed = dtb_admin_get_allowed_workflow_transitions( $workflow_key, $current_status );
-				if ( ! empty( $allowed ) && ! in_array( $to_status, $allowed, true ) ) {
-					return new WP_Error( 'dtb_invalid_transition', __( 'Status transition not allowed.', 'drywall-toolbox' ), [ 'status' => 422 ] );
+			if ( function_exists( 'dtb_admin_transition_record_status' ) ) {
+				$result = dtb_admin_transition_record_status( $workflow_key, $order_id, $to_status, [ 'from_status' => $current_status ] );
+				if ( is_wp_error( $result ) ) {
+					return $result;
 				}
-			}
-			if ( function_exists( 'wc_get_order' ) ) {
-				$order = wc_get_order( $order_id );
-				if ( $order ) {
-					$order->update_status( $to_status, __( 'Status updated from admin workbench.', 'drywall-toolbox' ), true );
-				}
-			}
-			if ( function_exists( 'dtb_order_append_event' ) ) {
-				dtb_order_append_event( $order_id, 'order.status_changed', [
-					'from_status' => $current_status,
-					'to_status'   => $to_status,
-					'source'      => 'admin',
-					'actor_type'  => 'admin',
-					'visibility'  => 'operator',
-				] );
-			}
-			break;
-
-		case 'retry_veeqo':
-			if ( function_exists( 'dtb_order_enqueue_job' ) ) {
-				dtb_order_enqueue_job( 'dtb_order_sync_veeqo', $order_id );
-			}
-			if ( function_exists( 'dtb_order_append_event' ) ) {
-				dtb_order_append_event( $order_id, 'integration.veeqo.queued', [
-					'source'     => 'admin',
-					'actor_type' => 'admin',
-					'visibility' => 'operator',
-				] );
-			}
-			break;
-
-		case 'retry_quickbooks':
-			if ( function_exists( 'dtb_order_enqueue_job' ) ) {
-				dtb_order_enqueue_job( 'dtb_order_sync_quickbooks', $order_id, [ 'action' => 'create' ] );
-			}
-			if ( function_exists( 'dtb_order_append_event' ) ) {
-				dtb_order_append_event( $order_id, 'integration.quickbooks.queued', [
-					'source'     => 'admin',
-					'actor_type' => 'admin',
-					'visibility' => 'operator',
-				] );
 			}
 			break;
 
 		default:
-			return new WP_Error( 'dtb_invalid_action', __( 'Invalid order action.', 'drywall-toolbox' ), [ 'status' => 400 ] );
-	}
-
-	if ( function_exists( 'dtb_admin_audit_write' ) ) {
-		dtb_admin_audit_write( 'order', $order_id, 'order.' . $action, [
-			'action' => $action,
-		] );
-	}
-	if ( function_exists( 'dtb_command_center_flush_cache' ) ) {
-		dtb_command_center_flush_cache();
+			return new WP_Error( 'dtb_invalid_action', __( 'Unsupported order action.', 'drywall-toolbox' ), [ 'status' => 400 ] );
 	}
 
 	$detail = dtb_order_rest_get_admin_detail( $request );
 	$data   = $detail instanceof WP_REST_Response ? $detail->get_data() : [];
-
-	return new WP_REST_Response( [
-		'ok'      => true,
-		'action'  => $action,
-		'detail'  => $data,
-		'message' => __( 'Order action queued.', 'drywall-toolbox' ),
-	], 200 );
+	return new WP_REST_Response( [ 'ok' => true, 'detail' => $data ], 200 );
 }
