@@ -125,4 +125,42 @@ function dtb_email_theme_wrap_plain_message( array $mail_args ): array {
 
 	return $mail_args;
 }
-add_filter( 'wp_mail', 'dtb_email_theme_wrap_plain_message', PHP_INT_MAX );
+add_filter( 'wp_mail', 'dtb_email_theme_wrap_plain_message', PHP_INT_MAX - 1 );
+
+function dtb_email_theme_polish_branded_message( array $mail_args ): array {
+	$message = (string) ( $mail_args['message'] ?? '' );
+	if ( '' === $message || ! dtb_email_theme_is_branded_message( $message ) ) {
+		return $mail_args;
+	}
+
+	$replacements = [
+		'content="light dark"' => 'content="dark"',
+		'padding:36px 16px;' => 'padding:24px 12px;',
+		'box-shadow:0 24px 60px rgba(15,23,42,.12);' => 'box-shadow:none;',
+		'border:1px solid #dbe5f2' => 'border:1px solid #263751',
+		'border-top:1px solid #dbe5f2' => 'border-top:1px solid #263751',
+		'background:#f8fafc;' => 'background:#0a1222;',
+		'background:#f8fbff;' => 'background:#0a1222;',
+		'color:#475569' => 'color:#c9d4e5',
+		'color:#64748b' => 'color:#9aa8bb',
+		'color:#738196' => 'color:#9aa8bb',
+		'color:#111827' => 'color:#eef4ff',
+		'color:#1f2937' => 'color:#e5edf7',
+	];
+
+	$message = str_replace( array_keys( $replacements ), array_values( $replacements ), $message );
+	$message = str_replace(
+		'class="dtb-quote-note" style="padding:18px 20px;border:1px solid #263751;border-radius:8px;background:#0a1222;"',
+		'class="dtb-quote-note" style="padding:18px 20px;border:1px solid #263751;border-radius:14px;background:#0a1222;color:#eef4ff;font-size:15px;line-height:24px;"',
+		$message
+	);
+	$message = str_replace(
+		'class="dtb-quote-note" style="margin-top:12px;padding:14px;border:1px solid #263751;border-radius:8px;background:#0a1222;"',
+		'class="dtb-quote-note" style="margin-top:12px;padding:16px 18px;border:1px solid #263751;border-radius:14px;background:#0a1222;color:#eef4ff;font-size:15px;line-height:24px;"',
+		$message
+	);
+
+	$mail_args['message'] = $message;
+	return $mail_args;
+}
+add_filter( 'wp_mail', 'dtb_email_theme_polish_branded_message', PHP_INT_MAX );
