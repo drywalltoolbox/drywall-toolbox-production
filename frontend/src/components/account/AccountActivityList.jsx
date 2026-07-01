@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { ChevronRight } from 'lucide-react';
+import '../../styles/account-activity-modern.css';
 
 const TYPE_CONFIG = {
   order: { className: 'is-order' },
@@ -40,7 +41,7 @@ export default function AccountActivityList({ items, limit, onNavigate }) {
             </span>
             <span className="account-activity-card__aside">
               {Number.isFinite(item.amount) ? (
-                <strong className="account-activity-card__amount">${item.amount.toFixed(2)}</strong>
+                <strong className="account-activity-card__amount">{`$${item.amount.toFixed(2)}`}</strong>
               ) : null}
             </span>
             <ChevronRight className="account-activity-card__chevron" size={16} />
