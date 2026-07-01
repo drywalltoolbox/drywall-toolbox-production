@@ -163,8 +163,24 @@ function dtb_orders_render_page(): void {
 	// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 	echo dtb_admin_ui_update_badge( 'dtb-orders-workspace' );
 
+	echo '<div class="dtb-bulk-toolbar" data-dtb-bulk-toolbar data-dtb-bulk-record="order" data-dtb-bulk-endpoint="' . esc_attr( 'dtb/v1/admin/orders/bulk' ) . '" data-dtb-bulk-refresh="dtb-orders-workspace" data-dtb-bulk-label="' . esc_attr__( 'orders', 'drywall-toolbox' ) . '" hidden>';
+	echo '<div class="dtb-bulk-toolbar__summary"><span class="dtb-bulk-toolbar__count" data-dtb-bulk-count>0</span><span>' . esc_html__( 'selected orders', 'drywall-toolbox' ) . '</span></div>';
+	echo '<div class="dtb-bulk-toolbar__actions">';
+	echo dtb_admin_ui_button( __( 'Move to Trash', 'drywall-toolbox' ), [ // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		'type' => 'danger',
+		'size' => 'sm',
+		'data' => [ 'dtb-bulk-delete' => '1' ],
+	] );
+	echo '</div></div>';
+
 	// Table.
 	echo dtb_admin_ui_table_open( [
+		[
+			'label' => '',
+			'key'   => 'select',
+			'class' => 'dtb-table__select-col',
+			'html'  => '<input type="checkbox" class="dtb-bulk-select-all" data-dtb-bulk-select-all data-dtb-bulk-record="order" aria-label="' . esc_attr__( 'Select all orders', 'drywall-toolbox' ) . '">',
+		],
 		[ 'label' => __( 'Order', 'drywall-toolbox' ),    'key' => 'id' ],
 		[ 'label' => __( 'Date', 'drywall-toolbox' ),     'key' => 'date' ],
 		[ 'label' => __( 'Type', 'drywall-toolbox' ),     'key' => 'type' ],
@@ -186,6 +202,7 @@ function dtb_orders_render_page(): void {
 
 		echo '<tr class="dtb-table__row dtb-table__row--clickable"'
 			. ' data-dtb-open-order="' . esc_attr( (string) $order_id ) . '">';
+		echo '<td class="dtb-table__cell dtb-table__cell--select"><input type="checkbox" class="dtb-bulk-checkbox" data-dtb-bulk-record="order" data-dtb-bulk-id="' . esc_attr( (string) $order_id ) . '" aria-label="' . esc_attr( sprintf( __( 'Select order #%d', 'drywall-toolbox' ), $order_id ) ) . '"></td>';
 		echo '<td class="dtb-table__cell"><a href="' . esc_url( get_edit_post_link( $order_id ) ) . '">#' . esc_html( $order_id ) . '</a></td>';
 		echo '<td class="dtb-table__cell">' . esc_html( $order->get_date_created() ? $order->get_date_created()->date_i18n( get_option( 'date_format' ) ) : '—' ) . '</td>';
 		echo '<td class="dtb-table__cell">' . dtb_admin_ui_badge( esc_html( $type_label ), $type_badge ) . '</td>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped

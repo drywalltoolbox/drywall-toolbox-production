@@ -438,8 +438,18 @@ function dtb_admin_ui_table_open( array $columns, array $args = [] ): string {
 	foreach ( $columns as $col ) {
 		$sort_class = ! empty( $col['sortable'] ) ? ' sortable' : '';
 		$col_class  = ! empty( $col['class'] ) ? ' ' . esc_attr( $col['class'] ) : '';
+		$label      = isset( $col['html'] ) ? wp_kses( (string) $col['html'], [
+			'input' => [
+				'type'                 => true,
+				'class'                => true,
+				'title'                => true,
+				'aria-label'           => true,
+				'data-dtb-bulk-select-all' => true,
+				'data-dtb-bulk-record' => true,
+			],
+		] ) : esc_html( $col['label'] ?? '' );
 		$html .= '<th class="' . esc_attr( ltrim( $sort_class . $col_class ) ) . '">'
-			. esc_html( $col['label'] ?? '' ) . '</th>';
+			. $label . '</th>';
 	}
 
 	$html .= '</tr></thead>';

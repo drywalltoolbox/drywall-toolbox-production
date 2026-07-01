@@ -112,6 +112,16 @@ function dtb_returns_rest_register_routes(): void {
 		],
 	] );
 
+	register_rest_route( 'dtb/v1', '/admin/returns/bulk', [
+		'methods'             => WP_REST_Server::CREATABLE,
+		'callback'            => 'dtb_returns_rest_admin_bulk_action',
+		'permission_callback' => fn() => is_user_logged_in() && current_user_can( 'dtb_manage_returns' ),
+		'args'                => [
+			'action' => [ 'type' => 'string', 'required' => true, 'sanitize_callback' => 'sanitize_key' ],
+			'ids'    => [ 'type' => 'array', 'required' => true ],
+		],
+	] );
+
 	// ── Admin: PATCH update (status / resolution / note) ─────────────────────
 	register_rest_route( 'dtb/v1', '/returns/(?P<id>\d+)', [
 		[
@@ -730,6 +740,52 @@ function dtb_returns_admin_get_events( int $return_id ): array {
 	}
 
 	return $events;
+}
+
+function dtb_returns_rest_admin_bulk_action( WP_REST_Request $request ): WP_REST_Response|WP_Error {
+	$action = sanitize_key( (string) $request->get_param( 'action' ) );
+	$ids    = array_values( array_filter( array_map( 'absint', (array) $request->get_param( 'ids' ) ) ) );
+
+	if ( 'delete' !== $action ) {
+		return new WP_Error( 'dtb_returns_invalid_bulk_action', __( 'Unsupported bulk return action.', 'drywall-toolbox' ), [ 'status' => 400 ] );
+	}
+
+	if ( empty( $ids ) ) {
+		return new WP_Error( 'dtb_returns_invalid_bulk_request', __( 'No return IDs provided.', 'drywall-toolbox' ), [ 'status' => 400 ] );
+	}
+
+	$processed = [];
+	$errors    = [];
+
+	foreach ( array_unique( $ids ) as $return_id ) {
+		$post = get_post( $return_id );
+		if ( ! $post || 'dtb_return' !== $post->post_type ) {
+			$errors[] = $return_id;
+			continue;
+		}
+
+		if ( function_exists( 'dtb_admin_audit_write' ) ) {
+			dtb_admin_audit_write( 'returns', $return_id, 'return.moved_to_trash', [
+				'return_id' => $return_id,
+				'actor_id'  => get_current_user_id(),
+				'source'    => 'admin_bulk_action',
+			] );
+		}
+
+		$result = wp_trash_post( $return_id );
+		if ( ! $result ) {
+			$errors[] = $return_id;
+			continue;
+		}
+		$processed[] = $return_id;
+	}
+
+	return new WP_REST_Response( [
+		'ok'        => empty( $errors ),
+		'processed' => $processed,
+		'deleted'   => $processed,
+		'errors'    => $errors,
+	], 200 );
 }
 
 // =============================================================================

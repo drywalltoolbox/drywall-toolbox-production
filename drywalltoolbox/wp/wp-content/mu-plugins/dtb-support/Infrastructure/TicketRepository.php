@@ -224,7 +224,7 @@ function dtb_support_query_queue( string $queue, array $args = [] ): array {
 	$search_raw = sanitize_text_field( $args['search'] ?? '' );
 	$search   = function_exists( 'dtb_str_normalize_display' ) ? dtb_str_normalize_display( $search_raw ) : $search_raw;
 	$active   = "(snooze_until IS NULL OR snooze_until <= UTC_TIMESTAMP())";
-	$closed   = "status NOT IN ('resolved','closed','spam')";
+	$closed   = "status NOT IN ('resolved','closed','spam','deleted')";
 	$staff_actionable = "status IN ('open','pending_staff','in_progress')";
 	$action_due_hours    = function_exists( 'dtb_support_action_due_hours' ) ? max( 1, (int) dtb_support_action_due_hours() ) : 24;
 	$warning_window_secs = (int) floor( $action_due_hours * HOUR_IN_SECONDS * 0.25 );
@@ -283,12 +283,12 @@ function dtb_support_get_queue_counts(): array {
 		SUM(CASE WHEN status IN ('open','pending_staff','in_progress') AND (snooze_until IS NULL OR snooze_until <= UTC_TIMESTAMP()) THEN 1 ELSE 0 END) AS needs_reply,
 		SUM(CASE WHEN {$action_due_expr} >= UTC_TIMESTAMP() AND TIMESTAMPDIFF(SECOND, UTC_TIMESTAMP(), {$action_due_expr}) <= {$warning_window_secs} AND status IN ('open','pending_staff','in_progress') AND (snooze_until IS NULL OR snooze_until <= UTC_TIMESTAMP()) THEN 1 ELSE 0 END) AS due_soon,
 		SUM(CASE WHEN {$action_due_expr} < UTC_TIMESTAMP() AND status IN ('open','pending_staff','in_progress') AND (snooze_until IS NULL OR snooze_until <= UTC_TIMESTAMP()) THEN 1 ELSE 0 END) AS overdue,
-		SUM(CASE WHEN priority = 'urgent' AND status NOT IN ('resolved','closed','spam') AND (snooze_until IS NULL OR snooze_until <= UTC_TIMESTAMP()) THEN 1 ELSE 0 END) AS urgent,
+		SUM(CASE WHEN priority = 'urgent' AND status NOT IN ('resolved','closed','spam','deleted') AND (snooze_until IS NULL OR snooze_until <= UTC_TIMESTAMP()) THEN 1 ELSE 0 END) AS urgent,
 		SUM(CASE WHEN status = 'in_progress' AND (snooze_until IS NULL OR snooze_until <= UTC_TIMESTAMP()) THEN 1 ELSE 0 END) AS in_progress,
 		SUM(CASE WHEN status = 'pending_customer' AND (snooze_until IS NULL OR snooze_until <= UTC_TIMESTAMP()) THEN 1 ELSE 0 END) AS waiting_on_customer,
-		SUM(CASE WHEN snooze_until IS NOT NULL AND snooze_until > UTC_TIMESTAMP() AND status NOT IN ('resolved','closed','spam') THEN 1 ELSE 0 END) AS snoozed,
+		SUM(CASE WHEN snooze_until IS NOT NULL AND snooze_until > UTC_TIMESTAMP() AND status NOT IN ('resolved','closed','spam','deleted') THEN 1 ELSE 0 END) AS snoozed,
 		SUM(CASE WHEN status = 'resolved' THEN 1 ELSE 0 END) AS resolved_pending_close,
-		SUM(CASE WHEN status NOT IN ('resolved','closed','spam') THEN 1 ELSE 0 END) AS all_active
+		SUM(CASE WHEN status NOT IN ('resolved','closed','spam','deleted') THEN 1 ELSE 0 END) AS all_active
 	FROM {$table}" , ARRAY_A );
 	$counts = [];
 	foreach ( [ 'needs_reply', 'due_soon', 'overdue', 'urgent', 'in_progress', 'waiting_on_customer', 'snoozed', 'resolved_pending_close', 'all_active' ] as $key ) {

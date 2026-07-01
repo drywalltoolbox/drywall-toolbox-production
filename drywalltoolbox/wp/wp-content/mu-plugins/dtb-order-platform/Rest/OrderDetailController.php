@@ -492,3 +492,69 @@ function dtb_order_rest_admin_action( WP_REST_Request $request ): WP_REST_Respon
 	$data   = $detail instanceof WP_REST_Response ? $detail->get_data() : [];
 	return new WP_REST_Response( [ 'ok' => true, 'message' => $message ?? __( 'Order action queued.', 'drywall-toolbox' ), 'detail' => $data ], 200 );
 }
+
+/**
+ * POST /dtb/v1/admin/orders/bulk
+ *
+ * Bulk admin operations for the order queue.
+ *
+ * @param WP_REST_Request $request REST request.
+ * @return WP_REST_Response|WP_Error
+ */
+function dtb_order_rest_admin_bulk_action( WP_REST_Request $request ): WP_REST_Response|WP_Error {
+	$action = sanitize_key( (string) $request->get_param( 'action' ) );
+	$ids    = array_values( array_filter( array_map( 'absint', (array) $request->get_param( 'ids' ) ) ) );
+
+	if ( 'delete' !== $action ) {
+		return new WP_Error( 'dtb_invalid_action', __( 'Unsupported bulk order action.', 'drywall-toolbox' ), [ 'status' => 400 ] );
+	}
+
+	if ( empty( $ids ) ) {
+		return new WP_Error( 'dtb_invalid_request', __( 'No order IDs provided.', 'drywall-toolbox' ), [ 'status' => 400 ] );
+	}
+
+	if ( ! function_exists( 'wc_get_order' ) ) {
+		return new WP_Error( 'dtb_woocommerce_unavailable', __( 'WooCommerce is not available.', 'drywall-toolbox' ), [ 'status' => 503 ] );
+	}
+
+	$processed = [];
+	$errors    = [];
+
+	foreach ( array_unique( $ids ) as $order_id ) {
+		$order = wc_get_order( $order_id );
+		if ( ! $order instanceof WC_Order ) {
+			$errors[] = $order_id;
+			continue;
+		}
+
+		if ( function_exists( 'dtb_order_append_event' ) ) {
+			dtb_order_append_event( $order_id, 'order.admin_moved_to_trash', [
+				'source'     => 'admin',
+				'actor_type' => 'admin',
+				'actor_id'   => get_current_user_id(),
+				'visibility' => 'operator',
+			] );
+		}
+
+		$deleted = $order->delete( false );
+		if ( ! $deleted ) {
+			$errors[] = $order_id;
+			continue;
+		}
+
+		if ( class_exists( 'WC_Cache_Helper' ) ) {
+			WC_Cache_Helper::invalidate_cache_group( 'orders' );
+		}
+		clean_post_cache( $order_id );
+		wp_cache_delete( $order_id, 'orders' );
+		wp_cache_delete( 'order-' . $order_id, 'orders' );
+		$processed[] = $order_id;
+	}
+
+	return new WP_REST_Response( [
+		'ok'        => empty( $errors ),
+		'processed' => $processed,
+		'deleted'   => $processed,
+		'errors'    => $errors,
+	], 200 );
+}

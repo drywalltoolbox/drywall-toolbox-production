@@ -46,7 +46,7 @@ function dtb_support_compute_next_action( object $ticket ): array {
 	}
 
 	// Already resolved or closed — no action needed.
-	if ( in_array( $status, [ 'resolved', 'closed' ], true ) ) {
+	if ( in_array( $status, [ 'resolved', 'closed', 'deleted' ], true ) ) {
 		return [
 			'action' => 'none',
 			'label'  => __( 'No Action Required', 'drywall-toolbox' ),

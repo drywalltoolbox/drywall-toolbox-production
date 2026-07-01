@@ -38,7 +38,7 @@ function dtb_support_project_ticket( object $ticket ): array {
 	$status   = (string) $ticket->status;
 	$priority = (string) $ticket->priority;
 
-	$is_resolved = in_array( $status, [ 'resolved', 'closed', 'spam' ], true );
+	$is_resolved = in_array( $status, [ 'resolved', 'closed', 'spam', 'deleted' ], true );
 
 	// Internal SLA state (ok/warning/breach) mapped to operator-friendly action_state.
 	$raw_sla = function_exists( 'dtb_support_compute_sla_state' )
@@ -218,11 +218,11 @@ function dtb_support_get_kpis(): array {
 	// Priority counts (open tickets only).
 	$urgent = (int) $wpdb->get_var(
 		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-		"SELECT COUNT(*) FROM {$table} WHERE priority = 'urgent' AND status NOT IN ('resolved','closed','spam')"
+		"SELECT COUNT(*) FROM {$table} WHERE priority = 'urgent' AND status NOT IN ('resolved','closed','spam','deleted')"
 	);
 	$high   = (int) $wpdb->get_var(
 		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-		"SELECT COUNT(*) FROM {$table} WHERE priority = 'high' AND status NOT IN ('resolved','closed','spam')"
+		"SELECT COUNT(*) FROM {$table} WHERE priority = 'high' AND status NOT IN ('resolved','closed','spam','deleted')"
 	);
 
 	$action_due_hours    = max( 1, (int) dtb_support_action_due_hours() );
@@ -233,11 +233,11 @@ function dtb_support_get_kpis(): array {
 	// Overdue and due-soon counts calculated from due timestamp.
 	$overdue_count  = (int) $wpdb->get_var(
 		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-		"SELECT COUNT(*) FROM {$table} WHERE {$action_due_expr} < UTC_TIMESTAMP() AND status NOT IN ('resolved','closed','spam')"
+		"SELECT COUNT(*) FROM {$table} WHERE {$action_due_expr} < UTC_TIMESTAMP() AND status NOT IN ('resolved','closed','spam','deleted')"
 	);
 	$due_soon_count = (int) $wpdb->get_var(
 		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-		"SELECT COUNT(*) FROM {$table} WHERE {$action_due_expr} >= UTC_TIMESTAMP() AND TIMESTAMPDIFF(SECOND, UTC_TIMESTAMP(), {$action_due_expr}) <= {$warning_window_secs} AND status NOT IN ('resolved','closed','spam')"
+		"SELECT COUNT(*) FROM {$table} WHERE {$action_due_expr} >= UTC_TIMESTAMP() AND TIMESTAMPDIFF(SECOND, UTC_TIMESTAMP(), {$action_due_expr}) <= {$warning_window_secs} AND status NOT IN ('resolved','closed','spam','deleted')"
 	);
 
 	// Needs reply = open/pending_staff/in_progress and not snoozed.
@@ -262,7 +262,7 @@ function dtb_support_get_kpis(): array {
 	// Email failures.
 	$email_failures = (int) $wpdb->get_var(
 		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-		"SELECT COUNT(*) FROM {$table} WHERE notification_fail_count > 0 AND status NOT IN ('resolved','closed','spam')"
+		"SELECT COUNT(*) FROM {$table} WHERE notification_fail_count > 0 AND status NOT IN ('resolved','closed','spam','deleted')"
 	);
 
 	return [

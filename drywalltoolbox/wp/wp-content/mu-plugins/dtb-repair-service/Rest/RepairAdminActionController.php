@@ -87,6 +87,16 @@ function dtb_repair_admin_action_register_routes(): void {
 		'sanitize_callback' => 'absint',
 	];
 
+	register_rest_route( 'dtb/v1', '/admin/repairs/bulk', [
+		'methods'             => WP_REST_Server::CREATABLE,
+		'callback'            => 'dtb_repair_admin_bulk_action_handler',
+		'permission_callback' => fn() => is_user_logged_in() && current_user_can( 'dtb_manage_repairs' ),
+		'args'                => [
+			'action' => [ 'type' => 'string', 'required' => true, 'sanitize_callback' => 'sanitize_key' ],
+			'ids'    => [ 'type' => 'array', 'required' => true ],
+		],
+	] );
+
 	// PATCH core fields
 	register_rest_route( 'dtb/v1', $base, [
 		'methods'             => WP_REST_Server::EDITABLE,
@@ -117,6 +127,51 @@ function dtb_repair_admin_action_register_routes(): void {
 			'args'                => [ 'id' => $id_arg ],
 		] );
 	}
+}
+
+function dtb_repair_admin_bulk_action_handler( WP_REST_Request $request ): WP_REST_Response|WP_Error {
+	$action = sanitize_key( (string) $request->get_param( 'action' ) );
+	$ids    = array_values( array_filter( array_map( 'absint', (array) $request->get_param( 'ids' ) ) ) );
+
+	if ( 'delete' !== $action ) {
+		return new WP_Error( 'dtb_repair_invalid_bulk_action', __( 'Unsupported bulk repair action.', 'drywall-toolbox' ), [ 'status' => 400 ] );
+	}
+
+	if ( empty( $ids ) ) {
+		return new WP_Error( 'dtb_repair_invalid_bulk_request', __( 'No repair IDs provided.', 'drywall-toolbox' ), [ 'status' => 400 ] );
+	}
+
+	$processed = [];
+	$errors    = [];
+
+	foreach ( array_unique( $ids ) as $repair_id ) {
+		$guard = _dtb_repair_action_guard( $repair_id );
+		if ( is_wp_error( $guard ) ) {
+			$errors[] = $repair_id;
+			continue;
+		}
+
+		if ( function_exists( 'dtb_admin_audit_write' ) ) {
+			dtb_admin_audit_write( 'repairs', $repair_id, 'repair.moved_to_trash', [
+				'actor_id' => get_current_user_id(),
+				'source'   => 'admin_bulk_action',
+			] );
+		}
+
+		$result = wp_trash_post( $repair_id );
+		if ( ! $result ) {
+			$errors[] = $repair_id;
+			continue;
+		}
+		$processed[] = $repair_id;
+	}
+
+	return new WP_REST_Response( [
+		'ok'        => empty( $errors ),
+		'processed' => $processed,
+		'deleted'   => $processed,
+		'errors'    => $errors,
+	], 200 );
 }
 
 // ── PATCH core fields ─────────────────────────────────────────────────────────

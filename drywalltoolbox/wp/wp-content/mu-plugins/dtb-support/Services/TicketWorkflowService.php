@@ -123,7 +123,7 @@ function dtb_support_maybe_reopen_on_customer_reply( int $ticket_id ): void {
 	if ( ! $ticket ) {
 		return;
 	}
-	if ( in_array( $ticket->status, [ 'resolved', 'closed' ], true ) ) {
+	if ( in_array( $ticket->status, [ 'resolved', 'closed', 'deleted' ], true ) ) {
 		dtb_support_transition_ticket( $ticket_id, 'open', [
 			'actor_type' => 'customer',
 			'source'     => 'customer_reply',

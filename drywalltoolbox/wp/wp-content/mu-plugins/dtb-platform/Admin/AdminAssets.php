@@ -95,6 +95,24 @@ function dtb_admin_assets_enqueue(): void {
 		);
 	}
 
+	// ── Shared bulk-select and remove actions for operational queues ──
+	$bulk_actions_css_file = $assets_dir . 'dtb-admin-bulk-actions.css';
+	if ( file_exists( $bulk_actions_css_file ) ) {
+		$bulk_actions_css_deps = [ 'dtb-admin' ];
+		if ( wp_style_is( 'dtb-admin-workbench', 'enqueued' ) ) {
+			$bulk_actions_css_deps[] = 'dtb-admin-workbench';
+		}
+		if ( wp_style_is( 'dtb-admin-workbench-actions', 'enqueued' ) ) {
+			$bulk_actions_css_deps[] = 'dtb-admin-workbench-actions';
+		}
+		wp_enqueue_style(
+			'dtb-admin-bulk-actions',
+			$assets_url . 'dtb-admin-bulk-actions.css',
+			$bulk_actions_css_deps,
+			(string) filemtime( $bulk_actions_css_file )
+		);
+	}
+
 	// ── Shared JS ──
 	$js_file = $assets_dir . 'dtb-admin.js';
 	$js_ver  = file_exists( $js_file ) ? (string) filemtime( $js_file ) : '2.0.0';
@@ -131,6 +149,22 @@ function dtb_admin_assets_enqueue(): void {
 			$assets_url . 'dtb-admin-workbench-actions.js',
 			$wb_actions_js_deps,
 			(string) filemtime( $wb_actions_js_file ),
+			true
+		);
+	}
+
+	// ── Shared bulk-select and remove actions JS ──
+	$bulk_actions_js_file = $assets_dir . 'dtb-admin-bulk-actions.js';
+	if ( file_exists( $bulk_actions_js_file ) ) {
+		$bulk_actions_js_deps = [ 'dtb-admin' ];
+		if ( wp_script_is( 'dtb-admin-workbench', 'enqueued' ) ) {
+			$bulk_actions_js_deps[] = 'dtb-admin-workbench';
+		}
+		wp_enqueue_script(
+			'dtb-admin-bulk-actions',
+			$assets_url . 'dtb-admin-bulk-actions.js',
+			$bulk_actions_js_deps,
+			(string) filemtime( $bulk_actions_js_file ),
 			true
 		);
 	}
@@ -238,6 +272,7 @@ function dtb_admin_assets_enqueue(): void {
 			wp_style_is( 'dtb-admin-wp-chrome', 'enqueued' ) ? [ 'dtb-admin-wp-chrome' ] : [],
 			wp_style_is( 'dtb-admin-workbench', 'enqueued' ) ? [ 'dtb-admin-workbench' ] : [],
 			wp_style_is( 'dtb-admin-workbench-actions', 'enqueued' ) ? [ 'dtb-admin-workbench-actions' ] : [],
+			wp_style_is( 'dtb-admin-bulk-actions', 'enqueued' ) ? [ 'dtb-admin-bulk-actions' ] : [],
 			$module_css_handles,
 			$legacy_tool_css_handle ? [ $legacy_tool_css_handle ] : []
 		) ) );

@@ -288,8 +288,24 @@ function dtb_repairs_render_queue_workspace( WP_Query $query, int $paged, int $t
 	// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 	echo dtb_admin_ui_update_badge( 'dtb-repairs-workspace' );
 
+	echo '<div class="dtb-bulk-toolbar" data-dtb-bulk-toolbar data-dtb-bulk-record="repair" data-dtb-bulk-endpoint="' . esc_attr( 'dtb/v1/admin/repairs/bulk' ) . '" data-dtb-bulk-refresh="dtb-repairs-workspace" data-dtb-bulk-label="' . esc_attr__( 'repairs', 'drywall-toolbox' ) . '" hidden>';
+	echo '<div class="dtb-bulk-toolbar__summary"><span class="dtb-bulk-toolbar__count" data-dtb-bulk-count>0</span><span>' . esc_html__( 'selected repairs', 'drywall-toolbox' ) . '</span></div>';
+	echo '<div class="dtb-bulk-toolbar__actions">';
+	echo dtb_admin_ui_button( __( 'Move to Trash', 'drywall-toolbox' ), [ // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		'type' => 'danger',
+		'size' => 'sm',
+		'data' => [ 'dtb-bulk-delete' => '1' ],
+	] );
+	echo '</div></div>';
+
 	// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 	echo dtb_admin_ui_table_open( [
+		[
+			'label' => '',
+			'key'   => 'select',
+			'class' => 'dtb-table__select-col',
+			'html'  => '<input type="checkbox" class="dtb-bulk-select-all" data-dtb-bulk-select-all data-dtb-bulk-record="repair" aria-label="' . esc_attr__( 'Select all repairs', 'drywall-toolbox' ) . '">',
+		],
 		[ 'label' => __( 'Repair',      'drywall-toolbox' ), 'key' => 'repair' ],
 		[ 'label' => __( 'Customer',    'drywall-toolbox' ), 'key' => 'customer' ],
 		[ 'label' => __( 'Workflow',    'drywall-toolbox' ), 'key' => 'workflow' ],
@@ -354,6 +370,8 @@ function dtb_repairs_render_queue_row( int $repair_id ): void {
 		. ' data-dtb-field-device="' . esc_attr( $device ) . '"'
 		. ' data-dtb-field-status="' . esc_attr( $status ) . '"'
 		. '>';
+
+	echo '<td class="dtb-table__cell dtb-table__cell--select"><input type="checkbox" class="dtb-bulk-checkbox" data-dtb-bulk-record="repair" data-dtb-bulk-id="' . esc_attr( (string) $repair_id ) . '" aria-label="' . esc_attr( sprintf( __( 'Select repair #%d', 'drywall-toolbox' ), $repair_id ) ) . '"></td>';
 
 	echo '<td class="dtb-table__cell">';
 	echo '<div class="dtb-object-cell">';

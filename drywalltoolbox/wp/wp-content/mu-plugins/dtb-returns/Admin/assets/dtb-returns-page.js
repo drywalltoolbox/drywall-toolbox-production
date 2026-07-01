@@ -718,6 +718,7 @@
 
 			var row = e.target.closest( '.dtb-returns-row[data-dtb-return-id]' );
 			if ( ! row ) { return; }
+			if ( e.target.closest( 'a,button,input,select,textarea,label' ) ) { return; }
 
 			e.preventDefault();
 			e.stopPropagation();

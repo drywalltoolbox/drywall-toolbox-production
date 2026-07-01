@@ -18,6 +18,7 @@ if ( ! defined( 'DTB_SUPPORT_STATUS_IN_PROGRESS' ) )      define( 'DTB_SUPPORT_S
 if ( ! defined( 'DTB_SUPPORT_STATUS_RESOLVED' ) )         define( 'DTB_SUPPORT_STATUS_RESOLVED',         'resolved' );
 if ( ! defined( 'DTB_SUPPORT_STATUS_CLOSED' ) )           define( 'DTB_SUPPORT_STATUS_CLOSED',           'closed' );
 if ( ! defined( 'DTB_SUPPORT_STATUS_SPAM' ) )             define( 'DTB_SUPPORT_STATUS_SPAM',             'spam' );
+if ( ! defined( 'DTB_SUPPORT_STATUS_DELETED' ) )          define( 'DTB_SUPPORT_STATUS_DELETED',          'deleted' );
 
 // ---------------------------------------------------------------------------
 // STATUS REGISTRY
@@ -37,6 +38,7 @@ function dtb_support_all_statuses(): array {
 		'resolved'         => __( 'Resolved',            'drywall-toolbox' ),
 		'closed'           => __( 'Closed',              'drywall-toolbox' ),
 		'spam'             => __( 'Spam',                'drywall-toolbox' ),
+		'deleted'          => __( 'Deleted',             'drywall-toolbox' ),
 	];
 }
 
@@ -57,7 +59,7 @@ function dtb_support_status_label( string $status ): string {
  * @return string[]
  */
 function dtb_support_terminal_statuses(): array {
-	return [ 'closed', 'spam' ];
+	return [ 'closed', 'spam', 'deleted' ];
 }
 
 /**
@@ -84,6 +86,7 @@ function dtb_support_allowed_transitions(): array {
 		'resolved'         => [ 'open', 'closed' ],
 		'closed'           => [ 'open' ],   // re-open
 		'spam'             => [ 'open' ],   // un-spam
+		'deleted'          => [ 'open' ],   // restore
 	];
 }
 
@@ -127,6 +130,7 @@ function dtb_support_status_css( string $status ): string {
 		'resolved'         => 'resolved',
 		'closed'           => 'closed',
 		'spam'             => 'spam',
+		'deleted'          => 'closed',
 	];
 	return $map[ $status ] ?? 'open';
 }

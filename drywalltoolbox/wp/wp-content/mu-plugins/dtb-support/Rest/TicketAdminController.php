@@ -1242,7 +1242,7 @@ return new WP_REST_Response( [
 /**
  * POST /dtb/v1/support/bulk
  *
- * Supported actions: status, priority, snooze, close, spam.
+ * Supported actions: status, priority, snooze, close, spam, delete.
  *
  * @param WP_REST_Request $request
  * @return WP_REST_Response|WP_Error
@@ -1312,6 +1312,30 @@ function dtb_support_rest_bulk_action( WP_REST_Request $request ): WP_REST_Respo
 			case 'spam':
 				$r = dtb_support_do_transition( $ticket_id, 'spam', '', $actor_id );
 				if ( ! is_wp_error( $r ) ) {
+					$updated[] = $ticket_id;
+				} else {
+					$errors[] = $ticket_id;
+				}
+				break;
+
+			case 'delete':
+				$from_status = (string) ( $ticket->status ?? '' );
+				$r = dtb_support_update_ticket( $ticket_id, [
+					'status'    => 'deleted',
+					'closed_at' => gmdate( 'Y-m-d H:i:s' ),
+				] );
+				if ( ! is_wp_error( $r ) ) {
+					if ( function_exists( 'dtb_support_append_event' ) && function_exists( 'dtb_support_build_event' ) ) {
+						dtb_support_append_event( dtb_support_build_event( $ticket_id, 'ticket.deleted', [
+							'from_status' => $from_status,
+							'to_status'   => 'deleted',
+							'actor_type'  => 'staff',
+							'actor_id'    => $actor_id,
+							'source'      => 'bulk_action',
+							'visibility'  => 'operator',
+							'body'        => __( 'Ticket moved to trash by admin.', 'drywall-toolbox' ),
+						] ) );
+					}
 					$updated[] = $ticket_id;
 				} else {
 					$errors[] = $ticket_id;
@@ -1523,7 +1547,7 @@ function dtb_support_rest_get_health(): WP_REST_Response {
 
 	$oldest = $wpdb->get_var(
 		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-		"SELECT created_at FROM {$table} WHERE status NOT IN ('resolved','closed','spam') ORDER BY created_at ASC LIMIT 1"
+		"SELECT created_at FROM {$table} WHERE status NOT IN ('resolved','closed','spam','deleted') ORDER BY created_at ASC LIMIT 1"
 	);
 	$oldest_seconds = $oldest ? ( time() - strtotime( $oldest ) ) : null;
 

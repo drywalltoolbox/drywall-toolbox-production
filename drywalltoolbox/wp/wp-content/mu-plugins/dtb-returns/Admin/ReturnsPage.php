@@ -197,8 +197,24 @@ function dtb_returns_render_page(): void {
 	// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 	echo dtb_admin_ui_update_badge( 'dtb-returns-workspace' );
 
+	echo '<div class="dtb-bulk-toolbar" data-dtb-bulk-toolbar data-dtb-bulk-record="return" data-dtb-bulk-endpoint="' . esc_attr( 'dtb/v1/admin/returns/bulk' ) . '" data-dtb-bulk-refresh="dtb-returns-workspace" data-dtb-bulk-label="' . esc_attr__( 'returns', 'drywall-toolbox' ) . '" hidden>';
+	echo '<div class="dtb-bulk-toolbar__summary"><span class="dtb-bulk-toolbar__count" data-dtb-bulk-count>0</span><span>' . esc_html__( 'selected returns', 'drywall-toolbox' ) . '</span></div>';
+	echo '<div class="dtb-bulk-toolbar__actions">';
+	echo dtb_admin_ui_button( __( 'Move to Trash', 'drywall-toolbox' ), [ // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		'type' => 'danger',
+		'size' => 'sm',
+		'data' => [ 'dtb-bulk-delete' => '1' ],
+	] );
+	echo '</div></div>';
+
 	// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 	echo dtb_admin_ui_table_open( [
+		[
+			'label' => '',
+			'key'   => 'select',
+			'class' => 'dtb-table__select-col',
+			'html'  => '<input type="checkbox" class="dtb-bulk-select-all" data-dtb-bulk-select-all data-dtb-bulk-record="return" aria-label="' . esc_attr__( 'Select all returns', 'drywall-toolbox' ) . '">',
+		],
 		[ 'label' => __( 'RMA / ID',    'drywall-toolbox' ), 'key' => 'rma' ],
 		[ 'label' => __( 'Customer',    'drywall-toolbox' ), 'key' => 'customer' ],
 		[ 'label' => __( 'Order',       'drywall-toolbox' ), 'key' => 'order' ],
@@ -237,6 +253,8 @@ function dtb_returns_render_page(): void {
 			. ' data-dtb-field-status="' . esc_attr( $status_val ) . '"'
 			. ' data-dtb-field-resolution="' . esc_attr( $item->resolution ) . '"'
 			. '>';
+
+		echo '<td class="dtb-table__cell dtb-table__cell--select"><input type="checkbox" class="dtb-bulk-checkbox" data-dtb-bulk-record="return" data-dtb-bulk-id="' . esc_attr( (string) $item->id ) . '" aria-label="' . esc_attr( sprintf( __( 'Select return #%d', 'drywall-toolbox' ), $item->id ) ) . '"></td>';
 
 		echo '<td class="dtb-table__cell">';
 		echo '<div class="dtb-object-cell">';

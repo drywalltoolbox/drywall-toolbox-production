@@ -56,7 +56,7 @@ function dtb_support_sla_resolution_hours( string $priority ): int {
  * Compute SLA state ('ok','warning','breach') for a ticket given current SLA due time.
  */
 function dtb_support_compute_sla_state( object $ticket ): string {
-	if ( in_array( (string) $ticket->status, [ 'pending_customer', 'resolved', 'closed', 'spam' ], true ) ) {
+	if ( in_array( (string) $ticket->status, [ 'pending_customer', 'resolved', 'closed', 'spam', 'deleted' ], true ) ) {
 		return 'ok';
 	}
 
@@ -87,7 +87,7 @@ function dtb_support_compute_sla_state( object $ticket ): string {
  * Return seconds remaining until SLA due (negative means already breached).
  */
 function dtb_support_sla_seconds_remaining( object $ticket ): int {
-	if ( in_array( (string) $ticket->status, [ 'pending_customer', 'resolved', 'closed', 'spam' ], true ) ) {
+	if ( in_array( (string) $ticket->status, [ 'pending_customer', 'resolved', 'closed', 'spam', 'deleted' ], true ) ) {
 		return 0;
 	}
 
@@ -159,7 +159,7 @@ function dtb_support_run_sla_scan(): int {
 	$updated = 0;
 
 	// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-	$tickets = $wpdb->get_results( "SELECT * FROM {$table} WHERE status NOT IN ('resolved','closed','spam')" );
+	$tickets = $wpdb->get_results( "SELECT * FROM {$table} WHERE status NOT IN ('resolved','closed','spam','deleted')" );
 	foreach ( (array) $tickets as $ticket ) {
 		$next_state = dtb_support_compute_sla_state( $ticket );
 		if ( (string) ( $ticket->sla_state ?? '' ) !== $next_state ) {

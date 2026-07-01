@@ -134,7 +134,7 @@ function dtb_support_process_expired_snoozes(): int {
 	$table = dtb_support_tickets_table();
 
 	// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-	$tickets = $wpdb->get_results( "SELECT id FROM {$table} WHERE snooze_until IS NOT NULL AND snooze_until <= UTC_TIMESTAMP() AND status NOT IN ('resolved','closed','spam')" );
+	$tickets = $wpdb->get_results( "SELECT id FROM {$table} WHERE snooze_until IS NOT NULL AND snooze_until <= UTC_TIMESTAMP() AND status NOT IN ('resolved','closed','spam','deleted')" );
 	$count   = 0;
 
 	foreach ( (array) $tickets as $ticket ) {

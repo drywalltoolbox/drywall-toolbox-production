@@ -1136,6 +1136,7 @@
 		document.addEventListener( 'click', function ( e ) {
 			var row = e.target.closest( '[data-dtb-open-repair]' );
 			if ( ! row ) { return; }
+			if ( e.target.closest( 'a,button,input,select,textarea,label' ) ) { return; }
 			e.preventDefault();
 			openRepair( row.dataset.dtbOpenRepair );
 		} );

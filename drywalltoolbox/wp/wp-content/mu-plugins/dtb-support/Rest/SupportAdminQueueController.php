@@ -166,7 +166,7 @@ function dtb_support_admin_ticket_progress( string $status, string $priority ): 
  * Return the CSS modifier for the progress bar fill based on ticket state.
  */
 function dtb_support_admin_progress_bar_class( string $status, string $priority ): string {
-	if ( in_array( $status, [ 'resolved', 'closed' ], true ) ) {
+	if ( in_array( $status, [ 'resolved', 'closed', 'deleted' ], true ) ) {
 		return 'dtb-support-progress__fill--success';
 	}
 	if ( 'spam' === $status ) {
@@ -200,13 +200,28 @@ function dtb_support_admin_render_queue_markup( array $result, int $paged ): str
 
 	echo dtb_admin_ui_update_badge( 'dtb-support-workspace' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 	?>
+	<div class="dtb-bulk-toolbar" data-dtb-bulk-toolbar data-dtb-bulk-record="support" data-dtb-bulk-endpoint="dtb/v1/support/bulk" data-dtb-bulk-refresh="dtb-support-workspace" data-dtb-bulk-label="<?php esc_attr_e( 'tickets', 'drywall-toolbox' ); ?>" hidden>
+		<div class="dtb-bulk-toolbar__summary">
+			<span class="dtb-bulk-toolbar__count" data-dtb-bulk-count>0</span>
+			<span><?php esc_html_e( 'selected tickets', 'drywall-toolbox' ); ?></span>
+		</div>
+		<div class="dtb-bulk-toolbar__actions">
+			<?php
+			echo dtb_admin_ui_button( __( 'Move to Trash', 'drywall-toolbox' ), [ // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+				'type' => 'danger',
+				'size' => 'sm',
+				'data' => [ 'dtb-bulk-delete' => '1' ],
+			] );
+			?>
+		</div>
+	</div>
 	<div class="dtb-support-list-wrap">
 		<table class="dtb-support-list-table">
 			<thead>
 				<tr>
 					<th class="dtb-support-list-th dtb-support-list-th--check">
 						<label class="dtb-support-list-check-all">
-							<input type="checkbox" class="dtb-support-row__checkbox" id="dtb-support-select-all" title="Select all">
+							<input type="checkbox" class="dtb-support-row__checkbox" id="dtb-support-select-all" title="Select all" data-dtb-bulk-select-all data-dtb-bulk-record="support">
 						</label>
 					</th>
 					<th class="dtb-support-list-th"><?php esc_html_e( 'Ticket', 'drywall-toolbox' ); ?></th>
@@ -290,7 +305,7 @@ function dtb_support_admin_render_queue_markup( array $result, int $paged ): str
 
 			<td class="dtb-support-list-td dtb-support-list-td--check">
 				<label onclick="event.stopPropagation()">
-					<input type="checkbox" class="dtb-support-row__checkbox" data-dtb-ticket-id="<?php echo esc_attr( (string) $id ); ?>">
+					<input type="checkbox" class="dtb-support-row__checkbox" data-dtb-ticket-id="<?php echo esc_attr( (string) $id ); ?>" data-dtb-bulk-record="support" data-dtb-bulk-id="<?php echo esc_attr( (string) $id ); ?>">
 				</label>
 			</td>
 

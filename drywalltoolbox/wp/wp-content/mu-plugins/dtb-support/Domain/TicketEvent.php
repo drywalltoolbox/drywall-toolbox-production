@@ -35,6 +35,7 @@ function dtb_support_all_event_types(): array {
 		'ticket.closed',
 		'ticket.merged',
 		'ticket.spam_flagged',
+		'ticket.deleted',
 		'ticket.macro_applied',
 		'ticket.automation_applied',
 		'ticket.bulk_updated',
