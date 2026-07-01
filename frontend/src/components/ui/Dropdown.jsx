@@ -14,9 +14,35 @@
  *   style        object
  */
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useMemo } from 'react';
 import { motion as Motion, AnimatePresence } from 'framer-motion';
 import { ChevronDown, Check } from 'lucide-react';
+
+const DROPDOWN_OPTION_IDENTITY_ALIASES = {
+  columbiatapingtools: 'columbiatools',
+};
+
+function normalizeDropdownOptionIdentity(option) {
+  const source = String(option?.label || option?.value || '')
+    .trim()
+    .toLowerCase()
+    .replace(/&/g, 'and')
+    .replace(/[^a-z0-9]+/g, '');
+
+  return DROPDOWN_OPTION_IDENTITY_ALIASES[source] || source;
+}
+
+function dedupeOptions(options) {
+  const seen = new Set();
+
+  return options.filter((option) => {
+    const key = normalizeDropdownOptionIdentity(option);
+    if (!key) return true;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
 
 export default function Dropdown({
   value,
@@ -31,6 +57,7 @@ export default function Dropdown({
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef(null);
+  const visibleOptions = useMemo(() => dedupeOptions(options), [options]);
   const selectedOption = options.find((o) => o.value === value);
 
   // Close on outside click
@@ -149,7 +176,7 @@ export default function Dropdown({
               padding: '4px',
             }}
           >
-            {options.map((option) => {
+            {visibleOptions.map((option) => {
               const isSelected = option.value === value;
               return (
                 <button
