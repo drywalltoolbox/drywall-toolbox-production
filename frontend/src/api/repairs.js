@@ -69,6 +69,17 @@ function generateIdempotencyKey() {
   ).join( '' );
 }
 
+function getRuntimeFrontendBaseUrl() {
+  if ( typeof window === 'undefined' ) return '';
+
+  const publicUrl = ( process.env.PUBLIC_URL || '' ).replace( /\/+$/, '' );
+  const stagingMatch = window.location.pathname.match( /^\/staging\/\d+(?:\/|$)/ );
+  const stagingBase = stagingMatch ? stagingMatch[0].replace( /\/+$/, '' ) : '';
+  const basePath = stagingBase || ( publicUrl && publicUrl !== '/' ? publicUrl : '' );
+
+  return `${ window.location.origin }${ basePath }`;
+}
+
 // Keep this field-picking behavior aligned with
 // wp/wp-content/mu-plugins/dtb-repair-service/Application/SubmitRepairRequest.php
 // so both frontend submission paths normalize the same payload aliases.
@@ -92,6 +103,7 @@ function normalizeRepairSubmitPayload( payload = {} ) {
 
   return {
     idempotency_key: pickRepairField( payload, [ 'idempotency_key', 'idempotencyKey' ], generateIdempotencyKey() ),
+    frontend_base_url: pickRepairField( payload, [ 'frontend_base_url', 'frontendBaseUrl' ], getRuntimeFrontendBaseUrl() ),
     customer_name: pickRepairField( payload, [ 'customer_name', 'full_name', 'fullName' ] ),
     customer_email: pickRepairField( payload, [ 'customer_email', 'email' ] ),
     customer_phone: pickRepairField( payload, [ 'customer_phone', 'phone' ] ),
@@ -236,54 +248,4 @@ export function getRepairEventStreamUrl( repairId, token ) {
  */
 export async function getRepairHealthcheck() {
   return apiClient( '/wp-json/dtb/v1/repairs/health' );
-}
-
-/**
- * Respond to a repair quote (accept or decline).
- *
- * @param {number|string} repairId
- * @param {'accept'|'decline'} action
- * @param {string}        token    Public repair token
- * @returns {Promise<{ success: boolean, status: string, message: string }>}
- */
-export async function respondToRepairQuote( repairId, action, token ) {
-  return apiClient( `/wp-json/dtb/v1/repairs/${ encodeURIComponent( repairId ) }/respond-to-quote`, {
-    method: 'POST',
-    body: JSON.stringify( { action, token } ),
-  } );
-}
-
-/**
- * Accept a repair quote (convenience wrapper).
- *
- * @param {number|string} repairId
- * @param {string}        token
- */
-export async function acceptRepairQuote( repairId, token ) {
-  return respondToRepairQuote( repairId, 'accept', token );
-}
-
-/**
- * Decline a repair quote (convenience wrapper).
- *
- * @param {number|string} repairId
- * @param {string}        token
- */
-export async function declineRepairQuote( repairId, token ) {
-  return respondToRepairQuote( repairId, 'decline', token );
-}
-
-/**
- * Submit a lightweight customer comment/update for an active repair.
- *
- * @param {number|string} repairId
- * @param {string}        token
- * @param {string}        comment
- * @returns {Promise<{ success: boolean, message: string, data?: { comment: string } }>}
- */
-export async function submitRepairComment( repairId, token, comment ) {
-  return apiClient( `/wp-json/dtb/v1/repairs/${ encodeURIComponent( repairId ) }/comment`, {
-    method: 'POST',
-    body: JSON.stringify( { token, comment } ),
-  } );
 }
