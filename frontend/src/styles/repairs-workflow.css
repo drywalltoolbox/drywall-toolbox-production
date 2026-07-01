@@ -267,6 +267,23 @@
   }
 }
 
+@media (max-width: 640px) {
+  .page-wrapper > section:first-of-type .alloy-button {
+    flex: 1 1 0;
+    min-width: 0;
+    min-height: 56px;
+    padding: 13px 10px !important;
+    white-space: nowrap;
+    text-align: center;
+    font-size: clamp(0.66rem, 3vw, 0.76rem);
+    letter-spacing: 0.08em;
+  }
+
+  .page-wrapper > section:first-of-type .alloy-button + .alloy-button {
+    margin-left: 0;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .repairs-workflow-cta {
     transition: none;
