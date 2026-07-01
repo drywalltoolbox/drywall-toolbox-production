@@ -36,7 +36,7 @@ if ( ! function_exists( 'dtb_repair_normalize_frontend_base_url' ) ) {
 			return '';
 		}
 
-		if ( str_starts_with( $raw, '/' ) ) {
+		if ( 0 === strpos( $raw, '/' ) ) {
 			$raw = $home_scheme . '://' . $home_host . $raw;
 		}
 
