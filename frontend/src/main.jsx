@@ -34,6 +34,7 @@ import { installSchematicPageLabelRuntime } from './utils/schematicPageLabelRunt
 import { installMobileCheckoutSummaryAutoOpen } from './utils/checkoutMobileSummaryRuntime.js'
 import { installMobileSchematicNavRuntime } from './utils/mobileSchematicNavRuntime.js'
 import { installRepairPackageSelectionRuntime } from './utils/repairPackageSelectionRuntime.js'
+import { installCustomerFacingCopyRuntime } from './utils/customerFacingCopyRuntime.js'
 
 // ─── Pre-warm product catalog cache ──────────────────────────────────────────
 // Product listing pages use the DTB catalog-platform endpoints, so prewarm
@@ -47,6 +48,7 @@ installSchematicPageLabelRuntime();
 installMobileCheckoutSummaryAutoOpen();
 installMobileSchematicNavRuntime();
 installRepairPackageSelectionRuntime();
+installCustomerFacingCopyRuntime();
 prewarmCatalogPlatformForCurrentRoute();
 
 if (typeof window !== 'undefined') {
