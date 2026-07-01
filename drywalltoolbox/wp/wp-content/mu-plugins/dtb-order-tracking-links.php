@@ -2,7 +2,7 @@
 /**
  * Plugin Name: DTB Order Tracking Links
  * Description: Routes customer-facing product orders to the React order tracking page and injects tracking links into customer emails.
- * Version: 1.0.0
+ * Version: 1.0.1
  * Author: Drywall Toolbox
  */
 
@@ -114,6 +114,12 @@ if ( ! function_exists( 'dtb_order_tracking_url' ) ) {
 	}
 }
 
+if ( ! function_exists( 'dtb_order_tracking_checkout_complete_url' ) ) {
+	function dtb_order_tracking_checkout_complete_url( WC_Order $order ): string {
+		return add_query_arg( 'checkout_complete', '1', dtb_order_tracking_url( $order ) );
+	}
+}
+
 if ( ! function_exists( 'dtb_tracking_links_capture_frontend_base' ) ) {
 	function dtb_tracking_links_capture_frontend_base(): void {
 		if ( ! dtb_tracking_links_is_public_request() || ! function_exists( 'wc_get_order' ) ) {
@@ -150,7 +156,7 @@ add_filter(
 	'woocommerce_get_checkout_order_received_url',
 	static function ( $url, $order ) {
 		if ( $order instanceof WC_Order ) {
-			return dtb_order_tracking_url( $order );
+			return dtb_order_tracking_checkout_complete_url( $order );
 		}
 
 		return $url;
@@ -181,7 +187,7 @@ add_action(
 			return;
 		}
 
-		wp_safe_redirect( dtb_order_tracking_url( $order ), 303 );
+		wp_safe_redirect( dtb_order_tracking_checkout_complete_url( $order ), 303 );
 		exit;
 	},
 	20
