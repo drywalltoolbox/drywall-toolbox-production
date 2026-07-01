@@ -22,6 +22,24 @@ const DROPDOWN_OPTION_IDENTITY_ALIASES = {
   columbiatapingtools: 'columbiatools',
 };
 
+const VARIABLE_PARENT_SKU_MIN_LENGTH = 12;
+const VARIABLE_PARENT_SKU_TERMS = [
+  'taper',
+  'tube',
+  'box',
+  'head',
+  'handle',
+  'pump',
+  'flusher',
+  'applicator',
+  'spotter',
+  'roller',
+  'stilt',
+  'sander',
+  'extension',
+  'compound',
+];
+
 function normalizeDropdownOptionIdentity(option) {
   const source = String(option?.label || option?.value || '')
     .trim()
@@ -32,16 +50,60 @@ function normalizeDropdownOptionIdentity(option) {
   return DROPDOWN_OPTION_IDENTITY_ALIASES[source] || source;
 }
 
+function normalizeCatalogModelText(value) {
+  return String(value || '')
+    .trim()
+    .toLowerCase()
+    .replace(/&/g, 'and')
+    .replace(/[^a-z0-9]+/g, '');
+}
+
+function parseCatalogModelOption(option) {
+  const label = String(option?.label || option?.value || '').trim();
+  const match = label.match(/^(.*)\s[-—]\s([^—-]+)$/);
+  if (!match) return null;
+
+  const name = match[1].trim();
+  const sku = match[2].trim();
+  if (!name || !sku) return null;
+
+  return {
+    label,
+    name,
+    sku,
+    normalizedSku: normalizeCatalogModelText(sku),
+  };
+}
+
+function isLikelyVariableParentModelOption(option, allOptions) {
+  const parsed = parseCatalogModelOption(option);
+  if (!parsed) return false;
+
+  const skuHasDigits = /\d/.test(parsed.normalizedSku);
+  const skuHasToolTerm = VARIABLE_PARENT_SKU_TERMS.some((term) => parsed.normalizedSku.includes(term));
+  if (skuHasDigits || parsed.normalizedSku.length < VARIABLE_PARENT_SKU_MIN_LENGTH || !skuHasToolTerm) {
+    return false;
+  }
+
+  const childPrefix = `${parsed.name} - `;
+  return allOptions.some((candidate) => {
+    if (candidate === option) return false;
+    const label = String(candidate?.label || candidate?.value || '').trim();
+    return label.startsWith(childPrefix);
+  });
+}
+
 function dedupeOptions(options) {
   const seen = new Set();
-
-  return options.filter((option) => {
+  const uniqueOptions = options.filter((option) => {
     const key = normalizeDropdownOptionIdentity(option);
     if (!key) return true;
     if (seen.has(key)) return false;
     seen.add(key);
     return true;
   });
+
+  return uniqueOptions.filter((option) => !isLikelyVariableParentModelOption(option, uniqueOptions));
 }
 
 export default function Dropdown({
