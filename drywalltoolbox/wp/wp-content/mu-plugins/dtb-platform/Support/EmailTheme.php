@@ -71,3 +71,58 @@ if ( ! function_exists( 'dtb_email_note_box' ) ) {
 
 add_filter( 'dtb_email_theme', static fn(): string => 'dark', PHP_INT_MAX );
 add_filter( 'dtb_repair_email_theme', static fn(): string => 'dark', PHP_INT_MAX );
+
+function dtb_email_theme_is_branded_message( string $message ): bool {
+	return str_contains( $message, 'class="dtb-shell"' ) || str_contains( $message, 'dtb-card' );
+}
+
+function dtb_email_theme_should_wrap_plain_message( string $subject, string $message ): bool {
+	$haystack = strtolower( $subject . "\n" . $message );
+	return str_contains( $haystack, 'new repair request' )
+		|| str_contains( $haystack, 'customer message on repair' )
+		|| str_contains( $haystack, 'review in wp-admin' );
+}
+
+function dtb_email_theme_wrap_plain_message( array $mail_args ): array {
+	if ( ! function_exists( 'dtb_render_branded_email' ) ) {
+		return $mail_args;
+	}
+
+	$subject = sanitize_text_field( (string) ( $mail_args['subject'] ?? '' ) );
+	$message = (string) ( $mail_args['message'] ?? '' );
+
+	if ( '' === $subject || '' === $message || dtb_email_theme_is_branded_message( $message ) ) {
+		return $mail_args;
+	}
+
+	if ( ! dtb_email_theme_should_wrap_plain_message( $subject, $message ) ) {
+		return $mail_args;
+	}
+
+	$plain = trim( wp_strip_all_tags( $message ) );
+	$mail_args['message'] = dtb_render_branded_email(
+		[
+			'title'       => $subject,
+			'preheader'   => preg_replace( '/\s+/', ' ', mb_substr( $plain, 0, 140 ) ),
+			'eyebrow'     => 'Operations Notification',
+			'greeting'    => '',
+			'intro'       => '',
+			'body_html'   => dtb_email_note_box( $plain ),
+			'details'     => [],
+			'cta_url'     => '',
+			'cta_label'   => '',
+			'signoff'     => 'Drywall Toolbox Operations',
+			'footer_note' => 'This message was sent by the Drywall Toolbox operations platform.',
+			'theme'       => 'dark',
+		]
+	);
+
+	$headers = $mail_args['headers'] ?? [];
+	$headers = is_array( $headers ) ? $headers : ( '' !== (string) $headers ? [ (string) $headers ] : [] );
+	$headers = array_values( array_filter( $headers, static fn( string $header ): bool => 0 !== stripos( $header, 'Content-Type:' ) ) );
+	array_unshift( $headers, 'Content-Type: text/html; charset=UTF-8' );
+	$mail_args['headers'] = $headers;
+
+	return $mail_args;
+}
+add_filter( 'wp_mail', 'dtb_email_theme_wrap_plain_message', PHP_INT_MAX );
