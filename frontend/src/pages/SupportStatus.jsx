@@ -362,6 +362,7 @@ function normalizeSupportMessage( raw, ticket ) {
     .replace( /\r\n?/g, '\n' )
     .replace( /\{\{\s*([a-z0-9_]+)\s*\}\}/gi, ( _, key ) => replacements[ String( key ).toLowerCase() ] ?? '' )
     .replace( /\{\s*([a-z0-9_]+)\s*\}/gi, ( _, key ) => replacements[ String( key ).toLowerCase() ] ?? '' )
+    .replace( /\{\s*\}/g, '' )
     .replace( /\{\s*([^{}\n]{2,120})\s*\}/g, '$1' )
     .replace( /[ \t]+([,.!?;:])/g, '$1' )
     .replace( /\bYour order\s+is\b/gi, 'Your order is' )
