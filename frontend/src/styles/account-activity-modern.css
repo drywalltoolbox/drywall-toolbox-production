@@ -1,0 +1,23 @@
+.account-activity-card__marker {
+  display: inline-flex;
+  width: 12px;
+  height: 12px;
+  border-radius: 999px;
+  background: #2563eb;
+  box-shadow: 0 0 0 7px rgba(37, 99, 235, 0.08);
+}
+
+.account-activity-card__marker.is-repair {
+  background: #0891b2;
+  box-shadow: 0 0 0 7px rgba(8, 145, 178, 0.09);
+}
+
+.account-activity-card__marker.is-return {
+  background: #7c3aed;
+  box-shadow: 0 0 0 7px rgba(124, 58, 237, 0.09);
+}
+
+.account-activity-card__marker.is-support {
+  background: #d97706;
+  box-shadow: 0 0 0 7px rgba(217, 119, 6, 0.1);
+}
