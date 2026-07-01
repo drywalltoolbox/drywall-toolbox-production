@@ -53,6 +53,13 @@ if ( '' === $public_token ) {
 	update_post_meta( $result, '_repair_public_token', $public_token );
 }
 
+$tracking_url = function_exists( 'dtb_repair_tracking_url' )
+	? dtb_repair_tracking_url( (int) $result, $public_token )
+	: add_query_arg(
+		[ 'token' => $public_token ],
+		home_url( '/repairs/status/' . $result )
+	);
+
 return new WP_REST_Response(
 [
 'success'      => true,
@@ -61,10 +68,7 @@ return new WP_REST_Response(
 'status'       => '' !== (string) get_post_meta( $result, '_repair_status', true )
 	? (string) get_post_meta( $result, '_repair_status', true )
 	: 'submitted',
-'tracking_url' => add_query_arg(
-	[ 'token' => $public_token ],
-	home_url( '/repairs/status/' . $result )
-),
+'tracking_url' => $tracking_url,
 'message'      => __( 'Your repair request has been submitted.', 'drywall-toolbox' ),
 ],
 201
