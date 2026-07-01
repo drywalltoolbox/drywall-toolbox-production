@@ -1,5 +1,5 @@
 import { useState, useRef, useCallback, useMemo, useEffect } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
+import { Link, useLocation, useSearchParams } from 'react-router-dom';
 import { motion as Motion, AnimatePresence } from 'framer-motion';
 import {
   Camera,
@@ -18,6 +18,7 @@ import { SCHEMATIC_DEFINITIONS } from '../data/schematicMappings';
 import {
   normalizeRepairCategory,
   getOfficialRepairBrands,
+  getOfficialRepairBrandsForCategory,
   getOfficialRepairModelsForBrandCategory,
 } from '../data/repairCatalogMap.js';
 import {
@@ -56,6 +57,14 @@ function getModelsForBrandCategory(brand, category) {
       return { value: label, label };
     })
     .sort((a, b) => a.label.localeCompare(b.label));
+}
+
+function brandHasRepairModelsForCategory(brand, category) {
+  if (!brand || !category) return true;
+  return (
+    getOfficialRepairModelsForBrandCategory(brand, category).length > 0 ||
+    getModelsForBrandCategory(brand, category).length > 0
+  );
 }
 
 function getLiveBrandsFromFacets(facets) {
@@ -317,20 +326,19 @@ export const PRICING_TAB_DATA = [
   },
 ];
 
-// Copy blocks — trust signals and pricing anchor
-const REPAIR_COPY = {
-  anchor:         'New Taper: ~$1,899  |  Standard Rebuild: $299  —  Save 84%',
-  partsLock:      'All replacement parts quoted and locked before work begins. No surprise invoices.',
-  noCharge:       'Final quote confirmed after inspection. No additional work begins without approval.',
-  sustainability: 'Every rebuilt tool keeps ~2.5 lbs of steel out of the landfill.',
-  warrantyBase:   '15-day workmanship warranty on all repairs.',
-  warrantyPro:    '30-day warranty — Professional members.',
-  warrantyFleet:  '60-day warranty — Fleet members.',
-};
-
 const REPAIR_PRICING_DISCLOSURE = 'Prices shown are starting estimates, not final repair quotes. Final pricing is confirmed after your tool is received, checked in, and thoroughly inspected. Additional parts, labor, damage, missing components, or service needs may change the final quote. No additional work begins without your approval.';
 
 const REPAIR_CARD_PRICE_NOTE = 'Starting estimate. Final quote confirmed after inspection.';
+
+const WARRANTY_REQUEST_OPTIONS = [
+  { value: 'no', label: 'Standard paid repair service' },
+  { value: 'yes', label: 'Manufacturer warranty evaluation requested' },
+  { value: 'not_sure', label: 'Eligibility review requested' },
+];
+
+function getWarrantyRequestLabel(value) {
+  return WARRANTY_REQUEST_OPTIONS.find((option) => option.value === value)?.label || 'Standard paid repair service';
+}
 
 const MAINTENANCE_SCHEDULE = [
   { level: 'High-Volume Pro', usage: '6+ rolls (500 ft) / day', interval: 'Every 6 months', badge: 'Heavy' },
@@ -432,7 +440,7 @@ export default function Repairs() {
     {
       to: '/repairs/packages',
       title: 'Compare Packages',
-      description: 'Review standard rebuilds, tune-ups, diagnostic quotes, turnaround expectations, and warranty coverage.',
+      description: 'Review standard rebuilds, tune-ups, and diagnostic quote-first service paths.',
       action: 'View packages',
     },
     {
@@ -650,7 +658,7 @@ function ProgressBar({ step, total, onStepSelect }) {
   );
 }
 
-function SelectedPackageSummary({ pkg }) {
+function SelectedPackageSummary({ pkg, formData, step }) {
   if (!pkg) return null;
 
   return (
@@ -701,13 +709,13 @@ function SelectedPackageSummary({ pkg }) {
             {pkg.name}
           </h3>
           <p style={{ margin: '5px 0 0', color: 'rgba(15,23,42,0.58)', fontSize: '0.78rem', lineHeight: 1.45 }}>
-            {pkg.priceLabel} | {pkg.estimatedTurnaroundDays?.standard || 7} day estimate
-            {pkg.warrantyDays ? ` | ${pkg.warrantyDays} day warranty` : ' | quote first'}
+            {pkg.priceLabel}
           </p>
         </div>
       </div>
       <Link
         to="/repairs/packages"
+        state={{ repairFormResume: { formData, step } }}
         style={{
           color: 'var(--primary-600)',
           fontSize: '0.75rem',
@@ -1118,19 +1126,34 @@ function PricingTabs() {
    Main Repairs page
    ───────────────────────────────────────────────────────────────────────── */
 export function RepairStartExperience() {
+  const location = useLocation();
   const [searchParams] = useSearchParams();
   const initialPackage = getRepairPackageById(searchParams.get('package'));
+  const resumeState = location.state?.repairFormResume;
+  const resumeFormData = resumeState?.formData && typeof resumeState.formData === 'object'
+    ? resumeState.formData
+    : null;
   const initialPackageToolCategory = initialPackage?.toolFamily && initialPackage.toolFamily !== 'diagnostic'
     ? REPAIR_TOOL_FAMILIES[initialPackage.toolFamily]?.label || ''
     : '';
-  const [step, setStep] = useState(1);
+  const [step, setStep] = useState(() => {
+    if (!resumeFormData) return 1;
+    const resumeStep = Number(resumeState?.step) || 2;
+    return Math.max(2, Math.min(resumeStep, 3));
+  });
   const [formData, setFormData] = useState(() => ({
     ...BLANK_FORM,
-    toolCategory: initialPackageToolCategory || BLANK_FORM.toolCategory,
+    ...resumeFormData,
+    toolCategory: initialPackageToolCategory || resumeFormData?.toolCategory || BLANK_FORM.toolCategory,
+    toolModel: initialPackageToolCategory && initialPackageToolCategory !== resumeFormData?.toolCategory
+      ? BLANK_FORM.toolModel
+      : (resumeFormData?.toolModel || BLANK_FORM.toolModel),
     serviceType: initialPackage?.name || BLANK_FORM.serviceType,
     pricingTierId: initialPackage?.id || BLANK_FORM.pricingTierId,
     packageId: initialPackage?.id || BLANK_FORM.packageId,
-    approvalMode: initialPackage?.requiresApproval ? 'quote_required' : BLANK_FORM.approvalMode,
+    approvalMode: initialPackage?.requiresApproval
+      ? 'quote_required'
+      : (resumeFormData?.approvalMode || BLANK_FORM.approvalMode),
   }));
   const [photos, setPhotos] = useState([]);
   const [errors, setErrors] = useState({});
@@ -1150,14 +1173,8 @@ export function RepairStartExperience() {
   );
 
   const servicePackageOptions = useMemo(() => {
-    const packages = getRepairPackagesForToolFamily(selectedToolFamily);
-    if (!selectedRepairPackage) return packages;
-
-    return [
-      selectedRepairPackage,
-      ...packages.filter((pkg) => pkg.id !== selectedRepairPackage.id),
-    ];
-  }, [selectedToolFamily, selectedRepairPackage]);
+    return getRepairPackagesForToolFamily(selectedToolFamily);
+  }, [selectedToolFamily]);
 
   useEffect(() => {
     if (!formData.pricingTierId) return;
@@ -1167,8 +1184,14 @@ export function RepairStartExperience() {
 
   // Service type selection helper
   function selectTier(tier) {
+    const tierCategory = tier.toolFamily && tier.toolFamily !== 'diagnostic'
+      ? REPAIR_TOOL_FAMILIES[tier.toolFamily]?.label || ''
+      : '';
+
     setFormData((prev) => ({
       ...prev,
+      toolCategory:   tierCategory || prev.toolCategory,
+      toolModel:      tierCategory && tierCategory !== prev.toolCategory ? '' : prev.toolModel,
       serviceType:    tier.name,
       pricingTierId:  tier.id,
       packageId:      tier.id,
@@ -1204,14 +1227,45 @@ export function RepairStartExperience() {
 
   const officialBrands = useMemo(() => getOfficialRepairBrands(), []);
 
+  const selectedPackageCategory = useMemo(() => {
+    if (!selectedRepairPackage?.toolFamily || selectedRepairPackage.toolFamily === 'diagnostic') return '';
+    return REPAIR_TOOL_FAMILIES[selectedRepairPackage.toolFamily]?.label || '';
+  }, [selectedRepairPackage]);
+
   const availableBrands = useMemo(() => {
-    const merged = new Set([...officialBrands, ...liveBrands, ...SUPPORTED_BRANDS]);
+    const baseBrands = selectedPackageCategory
+      ? getOfficialRepairBrandsForCategory(selectedPackageCategory)
+      : [...officialBrands, ...liveBrands, ...SUPPORTED_BRANDS];
+
+    const merged = new Set(baseBrands);
+    if (selectedPackageCategory) {
+      [...liveBrands, ...SUPPORTED_BRANDS].forEach((brand) => {
+        if (brandHasRepairModelsForCategory(brand, selectedPackageCategory)) {
+          merged.add(brand);
+        }
+      });
+    }
+
     return [...merged].sort((a, b) => a.localeCompare(b));
-  }, [officialBrands, liveBrands]);
+  }, [officialBrands, liveBrands, selectedPackageCategory]);
 
   const availableCategories = useMemo(() => {
+    if (selectedPackageCategory) return [selectedPackageCategory];
+
     return REPAIR_SERVICE_TOOL_CATEGORIES.map((category) => category.label);
-  }, []);
+  }, [selectedPackageCategory]);
+
+  useEffect(() => {
+    if (brandIsCustom || !selectedPackageCategory || !formData.toolBrand) return;
+    if (availableBrands.includes(formData.toolBrand)) return;
+
+    setFormData((prev) => ({
+      ...prev,
+      toolBrand: '',
+      toolCategory: selectedPackageCategory,
+      toolModel: '',
+    }));
+  }, [availableBrands, brandIsCustom, formData.toolBrand, selectedPackageCategory]);
 
   useEffect(() => {
     if (categoryIsCustom || !formData.toolCategory) return;
@@ -1621,7 +1675,7 @@ export function RepairStartExperience() {
             ) : (
               <form onSubmit={handleSubmit} noValidate>
                 <ProgressBar step={step} total={STEPS.length} onStepSelect={goToStep} />
-                <SelectedPackageSummary pkg={selectedRepairPackage} />
+                <SelectedPackageSummary pkg={selectedRepairPackage} formData={formData} step={step} />
 
                 {/* ── STEP 1: Contact Info ── */}
                 {step === 1 && (
@@ -1735,7 +1789,7 @@ export function RepairStartExperience() {
                           placeholder="Select a brand..."
                           options={[
                             ...availableBrands.map((b) => ({ value: b, label: b })),
-                            { value: '__other__', label: 'Other / Not Listed' },
+                            ...(!selectedPackageCategory ? [{ value: '__other__', label: 'Other / Not Listed' }] : []),
                           ]}
                           fullWidth
                           onChange={(val) => {
@@ -1748,7 +1802,12 @@ export function RepairStartExperience() {
                               setBrandIsCustom(false);
                               setCategoryIsCustom(false);
                               setModelIsCustom(false);
-                              setFormData((prev) => ({ ...prev, toolBrand: val, toolCategory: '', toolModel: '' }));
+                              setFormData((prev) => ({
+                                ...prev,
+                                toolBrand: val,
+                                toolCategory: selectedPackageCategory || '',
+                                toolModel: '',
+                              }));
                             }
                             clearErr('toolBrand'); clearErr('toolCategory'); clearErr('toolModel');
                           }}
@@ -2004,35 +2063,11 @@ export function RepairStartExperience() {
                                   ))}
                                 </ul>
                               )}
-                              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginTop: '12px' }}>
-                                <span style={{ fontSize: '0.66rem', fontWeight: 800, color: 'rgba(15,23,42,0.48)', textTransform: 'uppercase' }}>
-                                  {tier.estimatedTurnaroundDays?.standard || 7} day est.
-                                </span>
-                                <span style={{ fontSize: '0.66rem', fontWeight: 800, color: 'rgba(15,23,42,0.48)', textTransform: 'uppercase' }}>
-                                  {tier.warrantyDays ? `${tier.warrantyDays} day warranty` : 'quote first'}
-                                </span>
-                              </div>
                             </div>
                           );
                         })}
                       </div>
                       {errors.serviceType && <p style={errStyle}>{errors.serviceType}</p>}
-                    </div>
-
-                    {/* Trust signal row */}
-                    <div style={{
-                      display: 'flex', gap: '16px', flexWrap: 'wrap', marginBottom: '24px',
-                      padding: '14px 16px', background: '#f8fafc', borderRadius: '12px',
-                      borderLeft: '3px solid var(--primary-600)',
-                    }}>
-                      {[REPAIR_COPY.noCharge, REPAIR_COPY.partsLock, REPAIR_COPY.sustainability].map((copy) => (
-                        <span key={copy} style={{ fontSize: '0.75rem', color: 'rgba(15,23,42,0.6)', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#16a34a" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
-                            <polyline points="20 6 9 17 4 12"/>
-                          </svg>
-                          {copy}
-                        </span>
-                      ))}
                     </div>
 
                     <div style={{
@@ -2098,14 +2133,11 @@ export function RepairStartExperience() {
                       )}
                     </Field>
 
-                    <Field label="Warranty Request" hint="Select yes or not sure when the tool may qualify for warranty review.">
+                    <Field label="Warranty / Coverage Review" hint="Select whether this repair should be handled as standard paid service or reviewed for possible coverage.">
                       <Dropdown
                         value={formData.warrantyRequested}
-                        options={[
-                          { value: 'no', label: 'No — paid repair request' },
-                          { value: 'yes', label: 'Yes — evaluate as warranty' },
-                          { value: 'not_sure', label: 'Not sure — please check eligibility' },
-                        ]}
+                        placeholder="Standard paid repair service"
+                        options={WARRANTY_REQUEST_OPTIONS}
                         fullWidth
                         onChange={(value) => setFormData((prev) => ({ ...prev, warrantyRequested: value }))}
                       />
@@ -2624,7 +2656,7 @@ export function RepairStartExperience() {
                             ? 'Package price only'
                             : 'Quote required before repair'
                       } />
-                      <ReviewRow label="Warranty"       value={formData.warrantyRequested === 'no' ? 'No' : formData.warrantyRequested === 'yes' ? 'Yes' : 'Not sure'} />
+                      <ReviewRow label="Warranty / Coverage" value={getWarrantyRequestLabel(formData.warrantyRequested)} />
                       {(formData.warrantyRequested === 'yes' || formData.warrantyRequested === 'not_sure') && (
                         <ReviewRow label="Purchase Date" value={formData.purchaseDate} />
                       )}

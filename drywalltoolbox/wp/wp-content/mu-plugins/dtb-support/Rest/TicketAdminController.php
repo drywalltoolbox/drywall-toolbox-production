@@ -803,6 +803,100 @@ function dtb_support_rest_update_ticket( WP_REST_Request $request ): WP_REST_Res
  * @param array  $events Prepared operator events.
  * @return array
  */
+function dtb_support_build_admin_actions( object $ticket, array $workflow_def, array $allowed, array $permissions ): array {
+	$labels  = (array) ( $workflow_def['labels'] ?? [] );
+	$actions = [];
+
+	if ( ! empty( $permissions['can_transition'] ) ) {
+		foreach ( $allowed as $target ) {
+			$target = sanitize_key( (string) $target );
+			if ( '' === $target ) {
+				continue;
+			}
+			$actions[] = [
+				'id'            => 'support_transition_' . $target,
+				'type'          => 'transition',
+				'action_type'   => 'transition',
+				'target_status' => $target,
+				'group'         => 'Workflow',
+				'label'         => sprintf(
+					/* translators: %s: destination status label. */
+					__( 'Move to %s', 'drywall-toolbox' ),
+					(string) ( $labels[ $target ] ?? ucwords( str_replace( '_', ' ', $target ) ) )
+				),
+				'description'   => __( 'Update ticket status and preserve the operator timeline.', 'drywall-toolbox' ),
+				'confirm'       => in_array( $target, [ 'closed', 'spam' ], true ),
+			];
+		}
+		$actions[] = [
+			'id'          => 'set_priority',
+			'type'        => 'form_action',
+			'action_type' => 'set_priority',
+			'group'       => 'Triage',
+			'label'       => __( 'Set Priority', 'drywall-toolbox' ),
+			'description' => __( 'Adjust operational priority for queue routing and SLA visibility.', 'drywall-toolbox' ),
+		];
+		$actions[] = [
+			'id'          => 'set_followup',
+			'type'        => 'form_action',
+			'action_type' => 'set_followup',
+			'group'       => 'Triage',
+			'label'       => __( 'Set Follow-Up', 'drywall-toolbox' ),
+			'description' => __( 'Schedule a follow-up date and note for staff queues.', 'drywall-toolbox' ),
+		];
+		$actions[] = [
+			'id'          => 'snooze_ticket',
+			'type'        => 'form_action',
+			'action_type' => 'snooze',
+			'group'       => 'Triage',
+			'label'       => __( 'Snooze Ticket', 'drywall-toolbox' ),
+			'description' => __( 'Temporarily suppress the ticket until a specific date or customer dependency.', 'drywall-toolbox' ),
+		];
+		if ( ! empty( $ticket->snooze_until ) ) {
+			$actions[] = [
+				'id'          => 'unsnooze_ticket',
+				'type'        => 'server_action',
+				'action_type' => 'unsnooze',
+				'group'       => 'Triage',
+				'label'       => __( 'Unsnooze Ticket', 'drywall-toolbox' ),
+				'description' => __( 'Return this ticket to the active support queue.', 'drywall-toolbox' ),
+			];
+		}
+	}
+
+	if ( ! empty( $permissions['can_reply'] ) ) {
+		$actions[] = [
+			'id'          => 'reply_customer',
+			'type'        => 'form_action',
+			'action_type' => 'reply',
+			'group'       => 'Communication',
+			'label'       => __( 'Reply to Customer', 'drywall-toolbox' ),
+			'description' => __( 'Send a staff response and notify the customer.', 'drywall-toolbox' ),
+		];
+	}
+
+	if ( ! empty( $permissions['can_note'] ) ) {
+		$actions[] = [
+			'id'          => 'internal_note',
+			'type'        => 'form_action',
+			'action_type' => 'internal_note',
+			'group'       => 'Communication',
+			'label'       => __( 'Add Internal Note', 'drywall-toolbox' ),
+			'description' => __( 'Record operator-only context without notifying the customer.', 'drywall-toolbox' ),
+		];
+		$actions[] = [
+			'id'          => 'apply_macro',
+			'type'        => 'form_action',
+			'action_type' => 'macro',
+			'group'       => 'Communication',
+			'label'       => __( 'Use Macro', 'drywall-toolbox' ),
+			'description' => __( 'Insert a saved support response template for faster handling.', 'drywall-toolbox' ),
+		];
+	}
+
+	return $actions;
+}
+
 function dtb_support_build_workbench_detail_payload( object $ticket, array $events ): array {
 	$ticket_id = (int) ( $ticket->id ?? 0 );
 	$record    = dtb_support_project_ticket( $ticket );
@@ -843,6 +937,12 @@ function dtb_support_build_workbench_detail_payload( object $ticket, array $even
 		? dtb_admin_get_timeline( 'support', $ticket_id, [ 'events' => $events ] )
 		: $events;
 
+	$permissions = [
+		'can_transition' => dtb_support_user_can_any( [ 'dtb_change_support_status', 'dtb_manage_support' ] ),
+		'can_reply'      => dtb_support_user_can_any( [ 'dtb_reply_support_tickets', 'dtb_manage_support' ] ),
+		'can_note'       => dtb_support_user_can_any( [ 'dtb_add_support_notes', 'dtb_manage_support' ] ),
+	];
+
 	$payload = [
 		'ok'             => true,
 		'record'         => $record,
@@ -871,12 +971,8 @@ function dtb_support_build_workbench_detail_payload( object $ticket, array $even
 		'integrations'   => $integrations,
 		'timeline'       => $timeline,
 		'events'         => $events, // TODO: remove after support JS reads timeline only.
-		'actions'        => array_values( (array) $allowed ),
-		'permissions'    => [
-			'can_transition' => dtb_support_user_can_any( [ 'dtb_change_support_status', 'dtb_manage_support' ] ),
-			'can_reply'      => dtb_support_user_can_any( [ 'dtb_manage_support' ] ),
-			'can_note'       => dtb_support_user_can_any( [ 'dtb_manage_support' ] ),
-		],
+		'actions'        => dtb_support_build_admin_actions( $ticket, $workflow_def, (array) $allowed, $permissions ),
+		'permissions'    => $permissions,
 		'meta'           => [
 			'fetched_at'    => gmdate( 'c' ),
 			'poll_after_ms' => 60000,

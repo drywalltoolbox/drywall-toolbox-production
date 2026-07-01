@@ -451,6 +451,81 @@ function dtb_returns_rest_transition_status( WP_REST_Request $request ): WP_REST
 	return new WP_REST_Response( dtb_returns_get( (int) $request->get_param( 'id' ) )?->to_array() );
 }
 
+/**
+ * Build structured admin workbench actions for a return request.
+ *
+ * @param string $status      Current return status.
+ * @param array  $workflow    Workflow definition.
+ * @param array  $permissions Permission flags.
+ * @return array<int,array<string,mixed>>
+ */
+function dtb_returns_build_admin_actions( string $status, array $workflow, array $permissions ): array {
+	$status  = sanitize_key( $status );
+	$labels  = (array) ( $workflow['labels'] ?? [] );
+	$allowed = function_exists( 'dtb_return_get_allowed_transitions' )
+		? dtb_return_get_allowed_transitions( $status )
+		: [];
+	$map     = [
+		'approved'       => [ 'approve', __( 'Approve Return', 'drywall-toolbox' ), __( 'Approve eligibility and move the request into RMA preparation.', 'drywall-toolbox' ) ],
+		'rejected'       => [ 'reject', __( 'Reject Return', 'drywall-toolbox' ), __( 'Reject the request and record the decision for staff review.', 'drywall-toolbox' ) ],
+		'awaiting_item'  => [ 'mark_awaiting_item', __( 'Awaiting Item', 'drywall-toolbox' ), __( 'Mark the return as waiting for the customer shipment.', 'drywall-toolbox' ) ],
+		'item_received'  => [ 'mark_item_received', __( 'Item Received', 'drywall-toolbox' ), __( 'Confirm the returned item has arrived and is ready for disposition.', 'drywall-toolbox' ) ],
+		'refund_issued'  => [ 'issue_refund', __( 'Issue Refund', 'drywall-toolbox' ), __( 'Move the return to refund-issued after refund handling is complete.', 'drywall-toolbox' ) ],
+		'exchange_sent'  => [ 'send_exchange', __( 'Exchange Sent', 'drywall-toolbox' ), __( 'Mark replacement or exchange fulfillment as sent.', 'drywall-toolbox' ) ],
+		'closed'         => [ 'close', __( 'Close Return', 'drywall-toolbox' ), __( 'Close the return after final resolution is complete.', 'drywall-toolbox' ) ],
+	];
+	$actions = [];
+
+	if ( ! empty( $permissions['can_transition'] ) ) {
+		foreach ( $allowed as $target ) {
+			$target = sanitize_key( (string) $target );
+			if ( ! isset( $map[ $target ] ) ) {
+				continue;
+			}
+
+			[ $action_type, $label, $description ] = $map[ $target ];
+			$actions[] = [
+				'id'            => 'return_' . $action_type,
+				'type'          => 'server_action',
+				'action_type'   => $action_type,
+				'target_status' => $target,
+				'group'         => 'Workflow',
+				'label'         => $label ?: sprintf(
+					/* translators: %s: target status label. */
+					__( 'Move to %s', 'drywall-toolbox' ),
+					(string) ( $labels[ $target ] ?? ucwords( str_replace( '_', ' ', $target ) ) )
+				),
+				'description'   => $description,
+				'confirm'       => in_array( $action_type, [ 'reject', 'issue_refund', 'send_exchange', 'close' ], true ),
+			];
+		}
+	}
+
+	if ( ! empty( $permissions['can_transition'] ) ) {
+		$actions[] = [
+			'id'          => 'set_resolution',
+			'type'        => 'form_action',
+			'action_type' => 'set_resolution',
+			'group'       => 'Resolution',
+			'label'       => __( 'Set Resolution', 'drywall-toolbox' ),
+			'description' => __( 'Choose refund, exchange, store credit, or replacement before final disposition.', 'drywall-toolbox' ),
+		];
+	}
+
+	if ( ! empty( $permissions['can_note'] ) ) {
+		$actions[] = [
+			'id'          => 'add_note',
+			'type'        => 'form_action',
+			'action_type' => 'add_note',
+			'group'       => 'Notes',
+			'label'       => __( 'Add Internal Note', 'drywall-toolbox' ),
+			'description' => __( 'Record operator-only return context for the team.', 'drywall-toolbox' ),
+		];
+	}
+
+	return $actions;
+}
+
 // =============================================================================
 // ADMIN: ENRICHED DETAIL (modal) — GET /dtb/v1/returns/{id}/detail
 // =============================================================================
@@ -538,6 +613,12 @@ function dtb_returns_rest_admin_detail( WP_REST_Request $request ): WP_REST_Resp
 		? dtb_admin_get_timeline( 'returns', $id, [ 'events' => $events ] )
 		: $events;
 
+	$permissions = [
+		'can_transition' => current_user_can( 'dtb_manage_returns' ) && ! empty( $data['allowed_transitions'] ),
+		'can_note'       => current_user_can( 'dtb_manage_returns' ),
+		'can_sync_order' => current_user_can( 'dtb_manage_returns' ),
+	];
+
 	$payload = [
 		'ok'     => true,
 		'record' => $data,
@@ -566,12 +647,8 @@ function dtb_returns_rest_admin_detail( WP_REST_Request $request ): WP_REST_Resp
 		'timeline' => $timeline,
 		'events' => $events,
 		'order'  => $order_data,
-		'actions' => array_values( (array) $data['allowed_transitions'] ),
-		'permissions' => [
-			'can_transition' => current_user_can( 'dtb_manage_returns' ) && ! empty( $data['allowed_transitions'] ),
-			'can_note'       => current_user_can( 'dtb_manage_returns' ),
-			'can_sync_order' => current_user_can( 'dtb_manage_returns' ),
-		],
+		'actions' => dtb_returns_build_admin_actions( (string) $entity->status->value(), $workflow_def, $permissions ),
+		'permissions' => $permissions,
 		'meta' => [
 			'fetched_at'    => gmdate( 'c' ),
 			'poll_after_ms' => 60000,

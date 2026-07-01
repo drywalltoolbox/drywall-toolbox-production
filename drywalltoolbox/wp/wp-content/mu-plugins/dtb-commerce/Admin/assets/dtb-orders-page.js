@@ -168,28 +168,84 @@
 		return html;
 	}
 
+	function groupActions( actions ) {
+		var grouped = {};
+		actions.forEach( function ( action ) {
+			var group = action.group || 'Actions';
+			if ( ! grouped[ group ] ) {
+				grouped[ group ] = [];
+			}
+			grouped[ group ].push( action );
+		} );
+		return grouped;
+	}
+
+	function renderStructuredAction( action ) {
+		var label = action.label || action.id || 'Action';
+		var description = action.description || '';
+		var html = '<div class="dtb-wb-action-row">';
+
+		if ( action.type === 'link' && action.href ) {
+			html += '<a class="button" href="' + WB.escapeHtml( action.href ) + '" target="_blank" rel="noopener">' + WB.escapeHtml( label ) + '</a>';
+		} else if ( action.type === 'transition' && action.target_status ) {
+			html += '<button type="button" class="button dtb-orders-transition-btn" data-status="' + WB.escapeHtml( action.target_status ) + '" data-confirm="' + ( action.confirm ? '1' : '0' ) + '">' + WB.escapeHtml( label ) + '</button>';
+		} else if ( action.action_type ) {
+			html += '<button type="button" class="button" data-dtb-order-action="' + WB.escapeHtml( action.action_type ) + '" data-confirm="' + ( action.confirm ? '1' : '0' ) + '">' + WB.escapeHtml( label ) + '</button>';
+		} else {
+			html += '<span class="button disabled">' + WB.escapeHtml( label ) + '</span>';
+		}
+
+		if ( description ) {
+			html += '<span class="dtb-wb-action-row__description">' + WB.escapeHtml( description ) + '</span>';
+		}
+		html += '</div>';
+		return html;
+	}
+
+	function renderStructuredActions( actions ) {
+		var grouped = groupActions( actions );
+		var html = '';
+		Object.keys( grouped ).forEach( function ( group ) {
+			html += '<div class="dtb-wb-section" style="padding:1rem">';
+			html += '<h3 class="dtb-wb-section__title">' + WB.escapeHtml( group ) + '</h3>';
+			html += '<div class="dtb-wb-action-list">';
+			grouped[ group ].forEach( function ( action ) {
+				html += renderStructuredAction( action );
+			} );
+			html += '</div></div>';
+		} );
+		return html;
+	}
+
 	function renderActions( payload ) {
 		var perms = payload.permissions || {};
 		var linked = payload.linked_records || {};
 		var workflow = payload.workflow || {};
-		var html = '<div class="dtb-wb-command-bar dtb-orders-command-bar">';
-		if ( perms.can_refresh ) {
-			html += '<button type="button" class="button" data-dtb-order-action="refresh_snapshot">Refresh Snapshot</button>';
-		}
-		html += '</div>';
+		var actions = Array.isArray( payload.actions ) ? payload.actions : [];
+		var html = '';
 
-		// Workflow transitions (server-provided, not hardcoded).
-		var allowed = Array.isArray( workflow.allowed_transitions ) ? workflow.allowed_transitions : [];
-		var labels = workflow.labels || {};
-		if ( perms.can_manage_status && allowed.length ) {
-			html += '<div class="dtb-wb-section" style="padding:1rem">';
-			html += '<h3 class="dtb-wb-section__title">Transition status</h3>';
-			html += '<div style="display:flex;flex-wrap:wrap;gap:.5rem">';
-			allowed.forEach( function ( s ) {
-				var label = labels[ s ] || s.replace( /_/g, ' ' );
-				html += '<button type="button" class="button dtb-orders-transition-btn" data-status="' + WB.escapeHtml( s ) + '">' + WB.escapeHtml( label ) + '</button>';
-			} );
-			html += '</div></div>';
+		if ( actions.length ) {
+			html += renderStructuredActions( actions );
+		} else {
+			html += '<div class="dtb-wb-command-bar dtb-orders-command-bar">';
+			if ( perms.can_refresh ) {
+				html += '<button type="button" class="button" data-dtb-order-action="refresh_snapshot">Refresh Snapshot</button>';
+			}
+			html += '</div>';
+
+			// Workflow transitions (server-provided, not hardcoded).
+			var allowed = Array.isArray( workflow.allowed_transitions ) ? workflow.allowed_transitions : [];
+			var labels = workflow.labels || {};
+			if ( perms.can_manage_status && allowed.length ) {
+				html += '<div class="dtb-wb-section" style="padding:1rem">';
+				html += '<h3 class="dtb-wb-section__title">Transition status</h3>';
+				html += '<div style="display:flex;flex-wrap:wrap;gap:.5rem">';
+				allowed.forEach( function ( s ) {
+					var label = labels[ s ] || s.replace( /_/g, ' ' );
+					html += '<button type="button" class="button dtb-orders-transition-btn" data-status="' + WB.escapeHtml( s ) + '">' + WB.escapeHtml( label ) + '</button>';
+				} );
+				html += '</div></div>';
+			}
 		}
 
 		// Linked records — quick-open buttons.
@@ -212,8 +268,8 @@
 			html += '</div></div>';
 		}
 
-		// Integration retries are available via System Manager only (not primary actions).
-		if ( perms.can_retry_sync ) {
+		// Legacy note only applies before structured retry actions are available.
+		if ( perms.can_retry_sync && ! actions.length ) {
 			var sysUrl = ( ( window.dtbAdminConfig && window.dtbAdminConfig.adminUrl ) || '/wp-admin/admin.php' )
 				.replace( /admin\.php.*$/, 'admin.php' ) + '?page=dtb-system-manager';
 			html += '<div class="dtb-wb-section" style="padding:.5rem 1rem">';
@@ -381,7 +437,15 @@
 		var actionButton = event.target.closest ? event.target.closest( '[data-dtb-order-action]' ) : null;
 		if ( actionButton ) {
 			event.preventDefault();
-			runAction( actionButton.getAttribute( 'data-dtb-order-action' ), actionButton );
+			var actionType = actionButton.getAttribute( 'data-dtb-order-action' );
+			var runOrderAction = function () {
+				runAction( actionType, actionButton );
+			};
+			if ( actionButton.getAttribute( 'data-confirm' ) === '1' ) {
+				WB.confirmDanger( 'Run "' + actionButton.textContent.trim() + '"?', runOrderAction );
+			} else {
+				runOrderAction();
+			}
 			return;
 		}
 
@@ -390,9 +454,14 @@
 		if ( transBtn ) {
 			event.preventDefault();
 			var toStatus = transBtn.getAttribute( 'data-status' );
-			WB.confirmDanger( 'Transition order to "' + toStatus.replace( /_/g, ' ' ) + '"?', function () {
+			var run = function () {
 				runTransition( toStatus, transBtn );
-			} );
+			};
+			if ( transBtn.getAttribute( 'data-confirm' ) === '0' ) {
+				run();
+			} else {
+				WB.confirmDanger( 'Transition order to "' + toStatus.replace( /_/g, ' ' ) + '"?', run );
+			}
 			return;
 		}
 

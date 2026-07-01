@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { motion as Motion, AnimatePresence } from 'framer-motion';
 import {
   ArrowRight,
@@ -106,7 +106,7 @@ function CategoryTabs({ groups, activeGroupId, onChange }) {
   );
 }
 
-function PackageCard({ pkg, index, packageCount }) {
+function PackageCard({ pkg, index, packageCount, resumeState }) {
   const familyLabel = REPAIR_TOOL_FAMILIES[pkg.toolFamily]?.label || 'Repair Service';
   const featured = isFeaturedPackage(pkg, index, packageCount);
   const startUrl = `/repairs/start?package=${encodeURIComponent(pkg.id)}`;
@@ -161,7 +161,11 @@ function PackageCard({ pkg, index, packageCount }) {
 
       <Link
         to={startUrl}
-        state={{ selectedRepairPackageId: pkg.id, selectedRepairToolFamily: pkg.toolFamily }}
+        state={{
+          selectedRepairPackageId: pkg.id,
+          selectedRepairToolFamily: pkg.toolFamily,
+          repairFormResume: resumeState,
+        }}
         onClick={() => persistSelectedPackage(pkg)}
         className="repair-package-card__button repair-package-card__button--primary"
       >
@@ -173,15 +177,17 @@ function PackageCard({ pkg, index, packageCount }) {
 }
 
 export default function RepairPackages() {
+  const location = useLocation();
   const groups = useMemo(() => getRepairPackageGroups(), []);
   const [activeGroupId, setActiveGroupId] = useState(groups[0]?.id || 'automatic_taper');
   const activeGroup = groups.find((group) => group.id === activeGroupId) || groups[0];
+  const resumeState = location.state?.repairFormResume || null;
 
   return (
     <div className="page-wrapper repair-packages-page">
       <SEOHead
         title="Repair Service Packages"
-        description="Compare DTB standard repair packages, diagnostic quote-first paths, turnaround estimates, and warranty coverage."
+        description="Compare DTB standard repair packages and diagnostic quote-first paths."
         canonical="https://drywalltoolbox.com/repairs/packages"
       />
 
@@ -208,7 +214,11 @@ export default function RepairPackages() {
               <p>{formatPackageCount(activeGroup.packages.length)}</p>
               <h2>{activeGroup.label}</h2>
             </div>
-            <Link to="/repairs/start" className="repair-packages-quote-link">
+            <Link
+              to="/repairs/start"
+              state={{ repairFormResume: resumeState }}
+              className="repair-packages-quote-link"
+            >
               Start quote-first repair
               <ArrowRight size={16} aria-hidden="true" />
             </Link>
@@ -232,6 +242,7 @@ export default function RepairPackages() {
                   pkg={pkg}
                   index={index}
                   packageCount={activeGroup.packages.length}
+                  resumeState={resumeState}
                 />
               ))}
             </Motion.section>

@@ -33,6 +33,125 @@ function dtb_repair_admin_detail_register_routes(): void {
 	] );
 }
 
+/**
+ * Build structured admin workbench actions for repair requests.
+ *
+ * @param array  $allowed_next Allowed workflow destinations.
+ * @param array  $workflow_def Workflow definition.
+ * @param array  $perms        Permission flags.
+ * @return array<int,array<string,mixed>>
+ */
+function dtb_repair_admin_build_actions( array $allowed_next, array $workflow_def, array $perms ): array {
+	$labels  = (array) ( $workflow_def['labels'] ?? [] );
+	$actions = [];
+
+	if ( ! empty( $perms['can_transition'] ) ) {
+		foreach ( $allowed_next as $target ) {
+			$target = sanitize_key( (string) $target );
+			if ( '' === $target ) {
+				continue;
+			}
+			$actions[] = [
+				'id'            => 'repair_transition_' . $target,
+				'type'          => 'transition',
+				'action_type'   => 'transition',
+				'target_status' => $target,
+				'group'         => 'Workflow',
+				'label'         => sprintf(
+					/* translators: %s: destination status label. */
+					__( 'Move to %s', 'drywall-toolbox' ),
+					(string) ( $labels[ $target ] ?? ucwords( str_replace( '_', ' ', $target ) ) )
+				),
+				'description'   => __( 'Update the repair workflow status and log the operator transition.', 'drywall-toolbox' ),
+				'confirm'       => in_array( $target, [ 'cancelled', 'quote_declined', 'closed' ], true ),
+			];
+		}
+	}
+
+	if ( ! empty( $perms['can_assign_technician'] ) ) {
+		$actions[] = [
+			'id'          => 'technician_assign',
+			'type'        => 'form_action',
+			'action_type' => 'technician_assign',
+			'group'       => 'Production',
+			'label'       => __( 'Assign Technician', 'drywall-toolbox' ),
+			'description' => __( 'Assign or reassign bench ownership with an internal note.', 'drywall-toolbox' ),
+		];
+	}
+	if ( ! empty( $perms['can_edit_quote'] ) ) {
+		$actions[] = [
+			'id'          => 'quote_save',
+			'type'        => 'form_action',
+			'action_type' => 'quote_save',
+			'group'       => 'Quote',
+			'label'       => __( 'Build / Save Quote', 'drywall-toolbox' ),
+			'description' => __( 'Edit labor, parts, shipping, customer note, and internal quote note.', 'drywall-toolbox' ),
+		];
+		$actions[] = [
+			'id'          => 'quote_send',
+			'type'        => 'server_action',
+			'action_type' => 'quote_send',
+			'group'       => 'Quote',
+			'label'       => __( 'Send Quote', 'drywall-toolbox' ),
+			'description' => __( 'Send the current quote to the customer for approval.', 'drywall-toolbox' ),
+			'confirm'     => true,
+		];
+	}
+	if ( ! empty( $perms['can_allocate_parts'] ) ) {
+		$actions[] = [
+			'id'          => 'parts_allocate',
+			'type'        => 'form_action',
+			'action_type' => 'parts_allocate',
+			'group'       => 'Production',
+			'label'       => __( 'Allocate Parts', 'drywall-toolbox' ),
+			'description' => __( 'Reserve repair parts, quantities, and fitment notes for the bench.', 'drywall-toolbox' ),
+		];
+	}
+	if ( ! empty( $perms['can_message'] ) ) {
+		$actions[] = [
+			'id'          => 'customer_message',
+			'type'        => 'form_action',
+			'action_type' => 'customer_message',
+			'group'       => 'Communication',
+			'label'       => __( 'Message Customer', 'drywall-toolbox' ),
+			'description' => __( 'Send a customer update or request more information.', 'drywall-toolbox' ),
+		];
+	}
+	if ( ! empty( $perms['can_note'] ) ) {
+		$actions[] = [
+			'id'          => 'internal_note',
+			'type'        => 'form_action',
+			'action_type' => 'internal_note',
+			'group'       => 'Communication',
+			'label'       => __( 'Add Internal Note', 'drywall-toolbox' ),
+			'description' => __( 'Record operator-only repair context.', 'drywall-toolbox' ),
+		];
+	}
+	if ( ! empty( $perms['can_transition'] ) ) {
+		$actions[] = [
+			'id'          => 'ready_to_ship',
+			'type'        => 'server_action',
+			'action_type' => 'ready_to_ship',
+			'group'       => 'Shipping',
+			'label'       => __( 'Ready to Ship', 'drywall-toolbox' ),
+			'description' => __( 'Mark repair completion and move the record into outbound shipping prep.', 'drywall-toolbox' ),
+		];
+	}
+	if ( ! empty( $perms['can_close'] ) ) {
+		$actions[] = [
+			'id'          => 'close',
+			'type'        => 'server_action',
+			'action_type' => 'close',
+			'group'       => 'Workflow',
+			'label'       => __( 'Close Repair', 'drywall-toolbox' ),
+			'description' => __( 'Close the repair after completion, cancellation, or final disposition.', 'drywall-toolbox' ),
+			'confirm'     => true,
+		];
+	}
+
+	return $actions;
+}
+
 // ── Handler ───────────────────────────────────────────────────────────────────
 
 function dtb_repair_admin_detail_handler( WP_REST_Request $request ): WP_REST_Response|WP_Error {
@@ -333,7 +452,7 @@ function dtb_repair_admin_detail_handler( WP_REST_Request $request ): WP_REST_Re
 		],
 		'timeline'     => $timeline,
 		'audit'        => $audit_events, // TODO: remove after repairs JS reads timeline only.
-		'actions'      => array_values( (array) $allowed_next ),
+		'actions'      => dtb_repair_admin_build_actions( (array) $allowed_next, $workflow_def, $perms ),
 		'permissions'  => $perms,
 		'meta'         => [
 			'nonce'       => wp_create_nonce( 'wp_rest' ),

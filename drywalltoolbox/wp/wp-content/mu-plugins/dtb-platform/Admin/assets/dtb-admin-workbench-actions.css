@@ -146,6 +146,34 @@
 	min-height: 2.1rem;
 }
 
+.dtb-wb-action-menu__body .dtb-wb-action-list {
+	display: grid;
+	gap: 0.65rem;
+}
+
+.dtb-wb-action-menu__body .dtb-wb-action-row {
+	align-items: start;
+	display: grid;
+	gap: 0.45rem 0.75rem;
+	grid-template-columns: minmax(150px, max-content) minmax(0, 1fr);
+}
+
+.dtb-wb-action-menu__body .dtb-wb-action-row .button {
+	justify-self: start;
+	line-height: 1.2;
+	max-width: 100%;
+	white-space: normal;
+}
+
+.dtb-wb-action-menu__body .dtb-wb-action-row__description {
+	border-left: 1px solid #e2e8f0;
+	color: #475569;
+	font-size: 0.78rem;
+	line-height: 1.4;
+	min-width: 0;
+	padding-left: 0.75rem;
+}
+
 .dtb-wb-action-menu__body select,
 .dtb-wb-action-menu__body input[type="text"],
 .dtb-wb-action-menu__body input[type="datetime-local"],
@@ -294,6 +322,15 @@
 		left: auto;
 		right: -2.5rem;
 		width: calc( 100vw - 2rem );
+	}
+
+	.dtb-wb-action-menu__body .dtb-wb-action-row {
+		grid-template-columns: 1fr;
+	}
+
+	.dtb-wb-action-menu__body .dtb-wb-action-row__description {
+		border-left: 0;
+		padding-left: 0;
 	}
 
 	.dtb-wb-modal-hero h3 {

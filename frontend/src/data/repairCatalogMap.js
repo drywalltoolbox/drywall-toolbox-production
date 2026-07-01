@@ -135,6 +135,15 @@ export function getOfficialRepairBrands() {
   return [...unique.values()].sort((a, b) => a.localeCompare(b));
 }
 
+export function getOfficialRepairBrandsForCategory(category = '') {
+  const normalizedCategory = normalizeRepairCategory(category);
+  if (!normalizedCategory) return getOfficialRepairBrands();
+
+  return getOfficialRepairBrands()
+    .filter((brand) => getOfficialRepairModelsForBrandCategory(brand, normalizedCategory).length > 0)
+    .sort((a, b) => a.localeCompare(b));
+}
+
 export function getOfficialRepairCategoriesForBrand(brand = '') {
   const brandData = getOfficialRepairBrandData(brand);
   if (!brandData || !Array.isArray(brandData.categories)) return [];
