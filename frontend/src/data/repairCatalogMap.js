@@ -8,10 +8,16 @@ export const REPAIR_CATEGORY_ALIASES = {
   'auto tapers': 'Automatic Tapers',
   'automatic taper': 'Automatic Tapers',
   'automatic tapers': 'Automatic Tapers',
+  'automatic taping tool': 'Automatic Tapers',
+  'automatic taping tools': 'Automatic Tapers',
   'semi automatic taper': 'Automatic Tapers',
   'semi automatic tapers': 'Automatic Tapers',
+  'semi automatic taping tool': 'Automatic Tapers',
+  'semi automatic taping tools': 'Automatic Tapers',
   'semi-automatic taper': 'Automatic Tapers',
   'semi-automatic tapers': 'Automatic Tapers',
+  'semi-automatic taping tool': 'Automatic Tapers',
+  'semi-automatic taping tools': 'Automatic Tapers',
   'flat box': 'Flat / Finishing Boxes',
   'flat boxes': 'Flat / Finishing Boxes',
   'finishing box': 'Flat / Finishing Boxes',
@@ -57,6 +63,8 @@ export const REPAIR_CATEGORY_ALIASES = {
   adapter: 'Handles & Accessories',
   pumps: 'Pumps',
   pump: 'Pumps',
+  'mud pans and pumps': 'Pumps',
+  'mud pans & pumps': 'Pumps',
   other: 'Accessories',
 };
 
@@ -82,6 +90,36 @@ function getOfficialRepairBrandData(brand = '') {
 
   const canonicalMatch = entries.find(([key]) => canonicalBrandLabel(key) === requested);
   return canonicalMatch ? canonicalMatch[1] : null;
+}
+
+function isExcludedRepairToolModel(model = {}) {
+  const text = `${model.label || ''} ${model.name || ''} ${model.value || ''}`.toLowerCase();
+  return /\b(parts?|repair kit|wear kit|hardware kit|tool set|sets? of|mud pan|hawk|float|wash station|smoothing blade)\b/.test(text);
+}
+
+function repairToolModelMatchesCategory(model = {}, category = '') {
+  const text = `${model.label || ''} ${model.name || ''} ${model.value || ''}`.toLowerCase();
+
+  switch (category) {
+    case 'Automatic Tapers':
+      return /\btaper\b/.test(text);
+    case 'Flat / Finishing Boxes':
+      return /\b(flat|finishing|angle)\s+box(?:es)?\b/.test(text);
+    case 'Pumps':
+      return /\bpump\b/.test(text);
+    case 'Corner Finishers':
+      return /\b(corner|angle)\s+(finisher|flusher|head|edger)|\bflusher\b|\bangle head\b/.test(text);
+    case 'Corner Rollers':
+      return /\bcorner\s+roller\b|\bcompound\s+roller\b/.test(text);
+    case 'Corner Applicators':
+      return /\bcorner\s+applicator\b|\bmudrunner\b|\bmud runner\b/.test(text);
+    case 'Nail Spotters':
+      return /\bnail\s+spotter\b/.test(text);
+    case 'Handles & Accessories':
+      return /\bhandle\b|\bgooseneck\b|\bcompound tube\b|\bsupport tube\b/.test(text);
+    default:
+      return true;
+  }
 }
 
 export function getOfficialRepairBrands() {
@@ -111,11 +149,12 @@ export function getOfficialRepairModelsForBrandCategory(brand = '', category = '
 
   const normalizedCategory = normalizeRepairCategory(category);
   const entries = Object.entries(brandData.modelsByCategory || {});
-  const match = entries.find(([cat]) => normalizeRepairCategory(cat) === normalizedCategory);
-  if (!match) return [];
-
-  const models = Array.isArray(match[1]) ? match[1] : [];
+  const models = entries
+    .filter(([cat]) => normalizeRepairCategory(cat) === normalizedCategory)
+    .flatMap(([, categoryModels]) => Array.isArray(categoryModels) ? categoryModels : []);
   return models
+    .filter((model) => !isExcludedRepairToolModel(model))
+    .filter((model) => repairToolModelMatchesCategory(model, normalizedCategory))
     .map((m) => {
       const label = String(m?.label || m?.value || m?.name || '').trim();
       if (!label) return null;

@@ -37,6 +37,13 @@ export const REPAIR_TOOL_FAMILIES = {
   },
 };
 
+export const REPAIR_SERVICE_TOOL_CATEGORIES = Object.entries(REPAIR_TOOL_FAMILIES)
+  .filter(([id]) => id !== 'diagnostic')
+  .map(([id, family]) => ({
+    id,
+    label: family.label,
+  }));
+
 export const REPAIR_PACKAGES = [
   {
     id: 'taper_tune_up',

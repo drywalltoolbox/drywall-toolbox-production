@@ -13,17 +13,16 @@ import {
 import SEOHead from '../components/shared/SEOHead';
 import Dropdown from '../components/ui/Dropdown';
 import { useCatalogFacets } from '../hooks/useCatalogFacets.js';
-import { useCatalogProducts } from '../hooks/useCatalogProducts.js';
 import { canonicalBrandLabel } from '../utils/catalogUrlState.js';
-import { normalizeDisplayCategorySlug } from '../utils/catalogFacets.js';
 import { SCHEMATIC_DEFINITIONS } from '../data/schematicMappings';
 import {
   normalizeRepairCategory,
   getOfficialRepairBrands,
-  getOfficialRepairCategoriesForBrand,
   getOfficialRepairModelsForBrandCategory,
 } from '../data/repairCatalogMap.js';
 import {
+  REPAIR_SERVICE_TOOL_CATEGORIES,
+  REPAIR_TOOL_FAMILIES,
   getRepairPackageById,
   getRepairPackagesForToolFamily,
   getRepairToolFamilyFromCategory,
@@ -40,16 +39,6 @@ const SUPPORTED_BRANDS = Object.keys(SCHEMATIC_DEFINITIONS).sort((a, b) => a.loc
 
 function normalizeCategoryForBrand(category, _brand) {
   return normalizeRepairCategory(category);
-}
-
-/**
- * Returns the sorted list of unique categories for a given brand.
- * Falls back to [] for unknown brands or "Other".
- */
-function getCategoriesForBrand(brand) {
-  const entries = SCHEMATIC_DEFINITIONS[brand];
-  if (!entries) return [];
-  return [...new Set(entries.map((t) => normalizeCategoryForBrand(t.category, brand)))].sort();
 }
 
 /**
@@ -78,29 +67,6 @@ function getLiveBrandsFromFacets(facets) {
     .sort((a, b) => a.localeCompare(b));
 }
 
-function getLiveCategoriesForBrand(facets, brand) {
-  if (!brand || !facets?.displayCategoriesByBrand || !Array.isArray(facets?.brands)) return [];
-  const brandFacet = facets.brands.find((b) => {
-    const label = canonicalBrandLabel(b?.label || b?.name || b?.key || b?.slug || '');
-    return label === brand;
-  });
-  if (!brandFacet) return [];
-
-  const byBrand =
-    facets.displayCategoriesByBrand[brandFacet.key] ||
-    facets.displayCategoriesByBrand[brandFacet.slug] ||
-    [];
-
-  if (!Array.isArray(byBrand)) return [];
-
-  return byBrand
-    .map((c) => c?.label || c?.name || c?.slug || c?.key || '')
-    .filter(Boolean)
-    .map((cat) => normalizeCategoryForBrand(cat, brand))
-    .filter((v, i, a) => a.indexOf(v) === i)
-    .sort((a, b) => a.localeCompare(b));
-}
-
 /**
  * Builds a human-readable tool description for the success screen.
  */
@@ -112,9 +78,9 @@ const BLANK_FORM = {
   fullName: '', email: '', phone: '', company: '',
   toolBrand: '', toolCategory: '', toolModel: '', serialNumber: '', toolAge: '',
   // serviceType: human-readable label displayed in Step 5 Review (e.g. "Standard Repair ($85–$195)")
-  // pricingTierId: machine-readable tier id for logic/validation (e.g. "standard")
+  // pricingTierId/packageId: machine-readable package id for logic, validation, and backend intake.
   // Both set together when the user picks a tier card in Step 3.
-  serviceType: '', pricingTierId: '', priority: '', issueStart: '', issueDescription: '',
+  serviceType: '', pricingTierId: '', packageId: '', priority: '', issueStart: '', issueDescription: '',
   approvalMode: 'quote_required',
   preapprovalLimit: '',
   warrantyRequested: 'no',
@@ -527,7 +493,7 @@ export default function Repairs() {
               fontWeight: 900,
               letterSpacing: '0.12em',
             }}>
-              Repair Services
+              Tool Repair & Maintenance
             </p>
             <h1 style={{
               margin: '0 0 18px',
@@ -536,7 +502,8 @@ export default function Repairs() {
               fontWeight: 950,
               letterSpacing: '0',
             }}>
-              Keep your tools working. And your crews moving.
+              KEEP YOUR TOOLS<br />
+              <span style={{ color: '#93c5fd' }}>RUNNING STRONG.</span>
             </h1>
             <p style={{
               margin: '0 0 28px',
@@ -545,8 +512,9 @@ export default function Repairs() {
               lineHeight: 1.65,
               maxWidth: '820px',
             }}>
-              Submit a repair request, receive a professional evaluation, approve recommended work,
-              and track progress every step of the way.
+              Professional drywall tool repair service for all tools. Every repair is unique and quoted after inspection.
+              No work begins until you approve. Submit a repair request, receive a professional evaluation, approve
+              recommended work, and track progress every step of the way.
             </p>
             <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
               <Link to="/repairs/start" className="alloy-button" style={{
@@ -678,6 +646,78 @@ function ProgressBar({ step, total, onStepSelect }) {
           transition: 'width 0.45s cubic-bezier(0.16,1,0.3,1)',
         }} />
       </div>
+    </div>
+  );
+}
+
+function SelectedPackageSummary({ pkg }) {
+  if (!pkg) return null;
+
+  return (
+    <div style={{
+      display: 'flex',
+      flexWrap: 'wrap',
+      justifyContent: 'space-between',
+      gap: '16px',
+      alignItems: 'center',
+      margin: '0 0 24px',
+      padding: '14px 16px',
+      border: '1.5px solid rgba(37,99,235,0.24)',
+      borderRadius: '12px',
+      background: 'linear-gradient(135deg, rgba(239,246,255,0.95), rgba(255,255,255,0.98))',
+    }}>
+      <div style={{ display: 'flex', gap: '12px', minWidth: 0 }}>
+        <span style={{
+          width: '34px',
+          height: '34px',
+          borderRadius: '10px',
+          background: 'var(--primary-600)',
+          color: 'white',
+          display: 'inline-flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          flexShrink: 0,
+        }}>
+          <PackageCheck size={18} aria-hidden="true" />
+        </span>
+        <div style={{ minWidth: 0 }}>
+          <p style={{
+            margin: '0 0 3px',
+            color: 'var(--primary-600)',
+            fontSize: '0.68rem',
+            fontWeight: 900,
+            letterSpacing: '0.08em',
+            textTransform: 'uppercase',
+          }}>
+            Selected repair package
+          </p>
+          <h3 style={{
+            margin: 0,
+            color: '#0f172a',
+            fontSize: 'clamp(0.95rem, 2vw, 1.08rem)',
+            fontWeight: 850,
+            lineHeight: 1.2,
+          }}>
+            {pkg.name}
+          </h3>
+          <p style={{ margin: '5px 0 0', color: 'rgba(15,23,42,0.58)', fontSize: '0.78rem', lineHeight: 1.45 }}>
+            {pkg.priceLabel} | {pkg.estimatedTurnaroundDays?.standard || 7} day estimate
+            {pkg.warrantyDays ? ` | ${pkg.warrantyDays} day warranty` : ' | quote first'}
+          </p>
+        </div>
+      </div>
+      <Link
+        to="/repairs/packages"
+        style={{
+          color: 'var(--primary-600)',
+          fontSize: '0.75rem',
+          fontWeight: 850,
+          textDecoration: 'none',
+          whiteSpace: 'nowrap',
+        }}
+      >
+        Change package
+      </Link>
     </div>
   );
 }
@@ -1080,11 +1120,16 @@ function PricingTabs() {
 export function RepairStartExperience() {
   const [searchParams] = useSearchParams();
   const initialPackage = getRepairPackageById(searchParams.get('package'));
+  const initialPackageToolCategory = initialPackage?.toolFamily && initialPackage.toolFamily !== 'diagnostic'
+    ? REPAIR_TOOL_FAMILIES[initialPackage.toolFamily]?.label || ''
+    : '';
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState(() => ({
     ...BLANK_FORM,
+    toolCategory: initialPackageToolCategory || BLANK_FORM.toolCategory,
     serviceType: initialPackage?.name || BLANK_FORM.serviceType,
     pricingTierId: initialPackage?.id || BLANK_FORM.pricingTierId,
+    packageId: initialPackage?.id || BLANK_FORM.packageId,
     approvalMode: initialPackage?.requiresApproval ? 'quote_required' : BLANK_FORM.approvalMode,
   }));
   const [photos, setPhotos] = useState([]);
@@ -1099,15 +1144,25 @@ export function RepairStartExperience() {
     [formData.toolCategory, initialPackage],
   );
 
-  const servicePackageOptions = useMemo(
-    () => getRepairPackagesForToolFamily(selectedToolFamily),
-    [selectedToolFamily],
+  const selectedRepairPackage = useMemo(
+    () => getRepairPackageById(formData.packageId || formData.pricingTierId),
+    [formData.packageId, formData.pricingTierId],
   );
+
+  const servicePackageOptions = useMemo(() => {
+    const packages = getRepairPackagesForToolFamily(selectedToolFamily);
+    if (!selectedRepairPackage) return packages;
+
+    return [
+      selectedRepairPackage,
+      ...packages.filter((pkg) => pkg.id !== selectedRepairPackage.id),
+    ];
+  }, [selectedToolFamily, selectedRepairPackage]);
 
   useEffect(() => {
     if (!formData.pricingTierId) return;
     if (servicePackageOptions.some((pkg) => pkg.id === formData.pricingTierId)) return;
-    setFormData((prev) => ({ ...prev, serviceType: '', pricingTierId: '' }));
+    setFormData((prev) => ({ ...prev, serviceType: '', pricingTierId: '', packageId: '' }));
   }, [formData.pricingTierId, servicePackageOptions]);
 
   // Service type selection helper
@@ -1116,6 +1171,7 @@ export function RepairStartExperience() {
       ...prev,
       serviceType:    tier.name,
       pricingTierId:  tier.id,
+      packageId:      tier.id,
       approvalMode:   tier.requiresApproval ? 'quote_required' : prev.approvalMode,
     }));
     setErrors((prev) => { const n = { ...prev }; delete n.serviceType; return n; });
@@ -1153,70 +1209,16 @@ export function RepairStartExperience() {
     return [...merged].sort((a, b) => a.localeCompare(b));
   }, [officialBrands, liveBrands]);
 
-  const liveCategories = useMemo(
-    () => getLiveCategoriesForBrand(catalogFacets, formData.toolBrand),
-    [catalogFacets, formData.toolBrand],
-  );
-
-  const fallbackCategories = useMemo(
-    () => getCategoriesForBrand(formData.toolBrand),
-    [formData.toolBrand],
-  );
-
-  const officialCategories = useMemo(
-    () => getOfficialRepairCategoriesForBrand(formData.toolBrand),
-    [formData.toolBrand],
-  );
-
   const availableCategories = useMemo(() => {
-    if (officialCategories.length) return officialCategories;
-    if (liveCategories.length) return liveCategories;
-    return fallbackCategories;
-  }, [officialCategories, liveCategories, fallbackCategories]);
+    return REPAIR_SERVICE_TOOL_CATEGORIES.map((category) => category.label);
+  }, []);
 
-  const selectedDisplayCategorySlug = useMemo(
-    () => normalizeDisplayCategorySlug(formData.toolCategory || ''),
-    [formData.toolCategory],
-  );
+  useEffect(() => {
+    if (categoryIsCustom || !formData.toolCategory) return;
+    if (availableCategories.includes(formData.toolCategory)) return;
 
-  // Live catalog products for model options scoped by selected brand/category.
-  const { items: liveModelProducts } = useCatalogProducts(
-    {
-      brands: formData.toolBrand ? [formData.toolBrand] : [],
-      displayCategory: selectedDisplayCategorySlug,
-      perPage: 250,
-      sort: 'popular',
-    },
-    {
-      enabled: Boolean(formData.toolBrand && formData.toolCategory && !brandIsCustom && !categoryIsCustom),
-    },
-  );
-
-  const liveModelOptions = useMemo(() => {
-    if (!Array.isArray(liveModelProducts) || liveModelProducts.length === 0) return [];
-    const byIdentity = new Map();
-
-    liveModelProducts.forEach((p) => {
-      const sku = String(p?.sku || p?.part_number || '').trim();
-      const name = String(p?.name || '').trim();
-      if (!name) return;
-
-      // Canonical identity:
-      // 1) SKU (most authoritative)
-      // 2) normalized model name when SKU is missing
-      const identity = sku
-        ? `sku:${sku.toLowerCase()}`
-        : `name:${name.toLowerCase().replace(/\s+/g, ' ').trim()}`;
-
-      // Keep the first stable instance for each identity.
-      if (!byIdentity.has(identity)) {
-        const label = sku ? `${name} — ${sku}` : name;
-        byIdentity.set(identity, { value: label, label });
-      }
-    });
-
-    return [...byIdentity.values()].sort((a, b) => a.label.localeCompare(b.label));
-  }, [liveModelProducts]);
+    setFormData((prev) => ({ ...prev, toolCategory: '', toolModel: '' }));
+  }, [availableCategories, categoryIsCustom, formData.toolCategory]);
 
   const fallbackModelOptions = useMemo(
     () => getModelsForBrandCategory(formData.toolBrand, formData.toolCategory),
@@ -1229,8 +1231,8 @@ export function RepairStartExperience() {
   );
 
   const availableModelOptions = useMemo(
-    () => (officialModelOptions.length ? officialModelOptions : (liveModelOptions.length ? liveModelOptions : fallbackModelOptions)),
-    [officialModelOptions, liveModelOptions, fallbackModelOptions],
+    () => (officialModelOptions.length ? officialModelOptions : fallbackModelOptions),
+    [officialModelOptions, fallbackModelOptions],
   );
 
   /* ── field helpers ── */
@@ -1387,6 +1389,7 @@ export function RepairStartExperience() {
         toolAge:            formData.toolAge,
         serviceType:        formData.serviceType,
         pricingTierId:      formData.pricingTierId,
+        packageId:          formData.packageId,
         approvalMode:       formData.approvalMode,
         preapprovalLimit:   formData.preapprovalLimit,
         warrantyRequested:  formData.warrantyRequested,
@@ -1458,78 +1461,6 @@ export function RepairStartExperience() {
         description="Professional drywall tool repair services and guides. Find repair solutions for TapeTech, Columbia, Asgard, Graco, and other professional drywall finishing tools."
         canonical="https://drywalltoolbox.com/repairs"
       />
-
-      {/* ── Hero ─────────────────────────────────────────────────────────── */}
-      <section style={{
-        background: 'linear-gradient(135deg, #0f172a 0%, #1e3a8a 55%, #1d4ed8 100%)',
-        padding: 'clamp(60px, 10vw, 100px) clamp(1.5rem, 5vw, 3rem)',
-        position: 'relative',
-        overflow: 'hidden',
-      }}>
-        {/* Grid dot overlay */}
-        <div style={{
-          position: 'absolute', inset: 0,
-          backgroundImage: 'radial-gradient(circle at 2px 2px, rgba(255,255,255,0.06) 1px, transparent 0)',
-          backgroundSize: '40px 40px', pointerEvents: 'none',
-        }} />
-        {/* Glow blobs */}
-        <div style={{
-          position: 'absolute', top: '-80px', right: '-80px',
-          width: '420px', height: '420px',
-          background: 'radial-gradient(circle, rgba(96,165,250,0.18) 0%, transparent 70%)',
-          pointerEvents: 'none',
-        }} />
-        <div style={{
-          position: 'absolute', bottom: '-60px', left: '10%',
-          width: '300px', height: '300px',
-          background: 'radial-gradient(circle, rgba(29,78,216,0.25) 0%, transparent 70%)',
-          pointerEvents: 'none',
-        }} />
-
-        <div style={{ position: 'relative', zIndex: 1, maxWidth: '1400px', margin: '0 auto' }}>
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 480px), 1fr))',
-            gap: 'clamp(2rem, 5vw, 4rem)',
-            alignItems: 'center',
-          }}>
-            {/* Left: copy */}
-            <div>
-              <div style={{
-                display: 'inline-flex', alignItems: 'center', gap: '8px',
-                background: 'rgba(255,255,255,0.1)',
-                border: '1px solid rgba(255,255,255,0.2)',
-                borderRadius: '99px', padding: '5px 14px',
-                fontSize: '0.68rem', fontWeight: 700,
-                letterSpacing: '0.12em', textTransform: 'uppercase',
-                color: 'rgba(255,255,255,0.8)', marginBottom: '24px',
-              }}>
-                <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#4ade80', flexShrink: 0, boxShadow: '0 0 8px #4ade80' }} />
-                Tool Repair & Maintenance
-              </div>
-              <h1 style={{
-                color: 'white',
-                fontSize: 'clamp(2.2rem, 5.5vw, 4rem)',
-                fontWeight: 900, margin: '0 0 16px 0',
-                lineHeight: 1.08, letterSpacing: '-0.035em',
-              }}>
-                KEEP YOUR TOOLS<br />
-                <span style={{ color: '#93c5fd' }}>RUNNING STRONG.</span>
-              </h1>
-              <p style={{
-                color: 'rgba(255,255,255,0.65)',
-                fontSize: 'clamp(0.95rem, 2vw, 1.1rem)',
-                margin: '0 0 32px 0',
-                lineHeight: 1.6,
-                maxWidth: '480px',
-              }}>
-                Professional drywall tool repair for automatic tapers, flat boxes, mud pumps, and accessories.
-                Every repair is unique and quoted after inspection. No work begins until you approve.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
 
       {/* ── Repair Request Form ──────────────────────────────────────────── */}
       <section style={{
@@ -1690,6 +1621,7 @@ export function RepairStartExperience() {
             ) : (
               <form onSubmit={handleSubmit} noValidate>
                 <ProgressBar step={step} total={STEPS.length} onStepSelect={goToStep} />
+                <SelectedPackageSummary pkg={selectedRepairPackage} />
 
                 {/* ── STEP 1: Contact Info ── */}
                 {step === 1 && (
@@ -2682,6 +2614,9 @@ export function RepairStartExperience() {
                         Service Request
                       </div>
                       <ReviewRow label="Service Type"   value={formData.serviceType} />
+                      {formData.packageId && (
+                        <ReviewRow label="Package ID" value={formData.packageId} />
+                      )}
                       <ReviewRow label="Approval"       value={
                         formData.approvalMode === 'preapprove_limit'
                           ? `Pre-approve up to $${formData.preapprovalLimit}`
@@ -2908,18 +2843,18 @@ export function RepairStartExperience() {
             {[
               {
                 to: '/parts',
-                title: 'Parts & Schematics',
+                title: 'Schematics',
                 description: 'Browse interactive part diagrams and order replacement parts for all major brands.',
               },
               {
                 to: '/products',
-                title: 'Shop Replacement Tools',
-                description: 'Upgrade your toolkit — browse our full catalog of professional drywall tools and accessories.',
+                title: 'Shop Parts',
+                description: 'Find replacement parts, repair supplies, and professional drywall tool essentials.',
               },
               {
                 to: '/contact',
                 title: 'Talk to an Expert',
-                description: 'Our industry veterans are ready to help — no bots, no runaround, just real support.',
+                description: 'Our industry veterans are ready to help - no bots, no runaround, only expert real support.',
               },
             ].map((ql) => (
               <Link key={ql.to} to={ql.to} style={{ textDecoration: 'none' }}>
