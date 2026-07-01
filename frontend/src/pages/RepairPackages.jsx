@@ -20,6 +20,21 @@ function isFeaturedPackage(pkg, index, packageCount) {
   return index === Math.min(1, packageCount - 1) || /standard|full|rebuild|overhaul/i.test(pkg.id);
 }
 
+function persistSelectedPackage(pkg) {
+  if (typeof window === 'undefined' || !pkg?.id) return;
+
+  try {
+    window.sessionStorage.setItem('dtb:repair:selected-package', JSON.stringify({
+      id: pkg.id,
+      toolFamily: pkg.toolFamily,
+      name: pkg.name,
+      selectedAt: Date.now(),
+    }));
+  } catch {
+    // Session storage is non-critical; the URL query param remains authoritative.
+  }
+}
+
 function AnimatedPrice({ price }) {
   return (
     <Motion.span
@@ -94,6 +109,7 @@ function CategoryTabs({ groups, activeGroupId, onChange }) {
 function PackageCard({ pkg, index, packageCount }) {
   const familyLabel = REPAIR_TOOL_FAMILIES[pkg.toolFamily]?.label || 'Repair Service';
   const featured = isFeaturedPackage(pkg, index, packageCount);
+  const startUrl = `/repairs/start?package=${encodeURIComponent(pkg.id)}`;
 
   return (
     <Motion.article
@@ -144,7 +160,9 @@ function PackageCard({ pkg, index, packageCount }) {
       )}
 
       <Link
-        to={`/repairs/start?package=${encodeURIComponent(pkg.id)}`}
+        to={startUrl}
+        state={{ selectedRepairPackageId: pkg.id, selectedRepairToolFamily: pkg.toolFamily }}
+        onClick={() => persistSelectedPackage(pkg)}
         className="repair-package-card__button repair-package-card__button--primary"
       >
         Start with this package
