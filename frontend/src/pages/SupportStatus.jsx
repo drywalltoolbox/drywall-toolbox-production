@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { Link, useParams, useSearchParams } from 'react-router-dom';
-import { AlertTriangle, CheckCircle2, Headphones, MessageSquare, RefreshCw, Send, ShieldCheck, UserRoundCheck } from 'lucide-react';
+import { AlertTriangle, RefreshCw } from 'lucide-react';
 import SEOHead from '../components/shared/SEOHead.jsx';
 import SmartBackButton from '../components/navigation/SmartBackButton.jsx';
 import usePublicStatus from '../hooks/usePublicStatus.js';
@@ -34,6 +34,13 @@ const SUPPORT_STEP_INDEX = {
   spam: 3,
 };
 
+const SUPPORT_TOKEN_LABELS = {
+  ticket_url: 'this ticket page',
+  admin_ticket_url: '',
+  support_email: 'support@drywalltoolbox.com',
+  site_name: 'Drywall Toolbox',
+};
+
 function formatSupportDisplayId(id) {
   return id ? `Support #${id}` : 'Support Ticket';
 }
@@ -53,7 +60,7 @@ export default function SupportStatus() {
   const status = data?.status || 'open';
   const label = data?.label || SUPPORT_STATUS_LABELS[ status ] || 'Support Status';
   const displayId = formatSupportDisplayId( id );
-  const conversation = toConversation( data?.timeline );
+  const conversation = toConversation( data?.timeline, data );
 
   return (
     <main className="min-h-screen bg-slate-50">
@@ -72,8 +79,8 @@ export default function SupportStatus() {
             </button>
           </div>
           <div>
-            <div className="mb-2 inline-flex items-center gap-2 rounded-full bg-blue-50 px-3 py-1.5 text-xs font-semibold uppercase tracking-wide text-blue-700">
-              <Headphones size={ 14 } /> Support Ticket
+            <div className="mb-2 inline-flex rounded-full bg-blue-50 px-3 py-1.5 text-xs font-semibold uppercase tracking-wide text-blue-700">
+              Support Ticket
             </div>
             <h1 className="text-3xl font-bold text-slate-950">{ displayId }</h1>
             <p className="mt-2 max-w-2xl text-sm text-slate-600">
@@ -92,7 +99,7 @@ export default function SupportStatus() {
           <div className="grid gap-5 lg:grid-cols-[1fr_340px]">
             <div className="space-y-5">
               <SupportState status={ status } label={ label } events={ conversation } />
-              <Conversation events={ conversation } />
+              <Conversation events={ conversation } customerName={ data?.customer_name } />
             </div>
             <aside className="space-y-5">
               <ReplyBox ticketId={ id } token={ token } disabled={ SUPPORT_TERMINAL_STATUSES.includes( status ) } status={ status } onSent={ refresh } />
@@ -109,21 +116,19 @@ function SupportState( { status, label, events = [] } ) {
   const waitingOnCustomer = status === 'pending_customer';
   const activeIndex = SUPPORT_STEP_INDEX[ status ] ?? 0;
   const progress = Math.max( 8, ( activeIndex / ( SUPPORT_STEPS.length - 1 ) ) * 100 );
-  const Icon = waitingOnCustomer ? UserRoundCheck : status === 'resolved' || status === 'closed' ? ShieldCheck : Headphones;
+  const statusTone = waitingOnCustomer ? 'text-amber-600' : status === 'resolved' || status === 'closed' ? 'text-emerald-600' : 'text-blue-700';
 
   return (
     <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
       <div className="h-1 bg-blue-600" />
       <div className="space-y-5 p-5">
-        <div className="flex items-start gap-4">
-          <div className={ `flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl ${ waitingOnCustomer ? 'bg-amber-50 text-amber-600' : 'bg-blue-50 text-blue-700' }` }>
-            <Icon size={ 23 } />
-          </div>
+        <div className="flex items-start justify-between gap-4">
           <div className="min-w-0 flex-1">
             <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Current Status</p>
-            <h2 className="mt-1 text-xl font-bold text-slate-950">{ label }</h2>
+            <h2 className={ `mt-1 text-2xl font-bold ${ statusTone }` }>{ label }</h2>
             <p className="mt-2 text-sm leading-6 text-slate-600">{ STATUS_COPY[ status ] || STATUS_COPY.open }</p>
           </div>
+          <span className={ `mt-2 h-2.5 w-2.5 rounded-full ${ waitingOnCustomer ? 'bg-amber-500' : 'bg-blue-600' }` } aria-hidden="true" />
         </div>
 
         <div>
@@ -136,9 +141,7 @@ function SupportState( { status, label, events = [] } ) {
               const active = index === activeIndex;
               return (
                 <div key={ step.key } className="min-w-0 text-center">
-                  <span className={ `mx-auto flex h-5 w-5 items-center justify-center rounded-full border-2 text-[10px] font-bold ${ complete ? 'border-blue-600 bg-blue-600 text-white' : active ? 'border-blue-600 bg-white text-blue-700' : 'border-slate-300 bg-white text-slate-300' }` }>
-                    { complete ? '✓' : index + 1 }
-                  </span>
+                  <span className={ `mx-auto block h-4 w-4 rounded-full border-2 ${ complete ? 'border-blue-600 bg-blue-600' : active ? 'border-blue-600 bg-white' : 'border-slate-300 bg-white' }` } aria-hidden="true" />
                   <p className={ `mt-1 truncate text-[11px] font-semibold ${ active ? 'text-blue-700' : complete ? 'text-blue-500' : 'text-slate-400' }` }>{ step.label }</p>
                 </div>
               );
@@ -176,31 +179,52 @@ function SupportProgressUpdates( { events } ) {
   );
 }
 
-function Conversation( { events } ) {
+function Conversation( { events, customerName } ) {
   return (
     <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-      <div className="mb-4 flex items-center gap-2">
-        <MessageSquare size={ 16 } className="text-blue-600" />
+      <div className="mb-4 flex items-center justify-between gap-3">
         <h2 className="text-sm font-semibold text-slate-900">Messages</h2>
+        <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Conversation</span>
       </div>
       <div className="space-y-3">
         { events.length === 0 ? (
           <p className="text-sm text-slate-500">No public conversation updates yet.</p>
         ) : events.map( ( event, index ) => {
           const isCustomer = event.actor_type === 'customer';
+          const author = isCustomer ? 'You' : 'Drywall Toolbox Support';
+          const message = event.body || event.label;
           return (
             <article key={ `${ event.type }-${ event.occurred_at }-${ index }` } className={ `flex ${ isCustomer ? 'justify-end' : 'justify-start' }` }>
-              <div className={ `max-w-[88%] rounded-2xl border px-4 py-3 shadow-sm ${ isCustomer ? 'border-blue-100 bg-blue-50 text-slate-800' : 'border-slate-200 bg-white text-slate-800' }` }>
-                <div className="mb-1.5 flex items-center justify-between gap-3">
-                  <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">{ isCustomer ? 'You' : 'Drywall Toolbox Support' }</p>
+              <div className={ `max-w-[92%] rounded-2xl border px-4 py-3 shadow-sm ${ isCustomer ? 'border-blue-100 bg-blue-50 text-slate-800' : 'border-slate-200 bg-white text-slate-800' }` }>
+                <div className="mb-2 grid gap-0.5 sm:flex sm:items-center sm:justify-between sm:gap-3">
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">{ author }</p>
                   <time className="text-[11px] text-slate-400">{ formatDate( event.occurred_at ) }</time>
                 </div>
-                <p className="whitespace-pre-line text-sm leading-6">{ event.body || event.label }</p>
+                <MessageBody text={ message } fallback={ isCustomer ? customerName || 'Customer message' : 'Support update' } />
               </div>
             </article>
           );
         } ) }
       </div>
+    </div>
+  );
+}
+
+function MessageBody( { text, fallback } ) {
+  const paragraphs = String( text || fallback || '' )
+    .split( /\n{2,}/ )
+    .map( ( paragraph ) => paragraph.trim() )
+    .filter( Boolean );
+
+  if ( paragraphs.length === 0 ) {
+    return <p className="text-sm leading-6 text-slate-600">{ fallback || 'Support update' }</p>;
+  }
+
+  return (
+    <div className="space-y-3 text-sm leading-6 text-slate-700">
+      { paragraphs.map( ( paragraph, index ) => (
+        <p key={ `${ paragraph.slice( 0, 24 ) }-${ index }` } className="whitespace-pre-line">{ paragraph }</p>
+      ) ) }
     </div>
   );
 }
@@ -234,8 +258,7 @@ function ReplyBox( { ticketId, token, disabled, status, onSent } ) {
 
   return (
     <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-      <div className="mb-2 flex items-center gap-2">
-        <MessageSquare size={ 16 } className="text-blue-600" />
+      <div className="mb-2">
         <h3 className="text-sm font-semibold text-slate-800">Send an Update</h3>
       </div>
       <p className="mb-3 text-xs text-slate-500">
@@ -262,7 +285,7 @@ function ReplyBox( { ticketId, token, disabled, status, onSent } ) {
             disabled={ ! canSend }
             className="inline-flex h-10 items-center gap-1.5 rounded-xl bg-blue-600 px-4 text-sm font-semibold text-white transition-colors hover:bg-blue-700 disabled:bg-blue-300"
           >
-            { sending ? <RefreshCw size={ 14 } className="animate-spin" /> : <Send size={ 14 } /> }
+            { sending ? <RefreshCw size={ 14 } className="animate-spin" /> : null }
             { sending ? 'Sending…' : 'Send Update' }
           </button>
         </div>
@@ -309,15 +332,52 @@ function Notice( { title, body } ) {
   );
 }
 
-function toConversation( timeline ) {
+function toConversation( timeline, ticket ) {
   if ( ! Array.isArray( timeline ) ) return [];
   return timeline
     .filter( ( event ) => event?.type === 'ticket.created' || event?.type === 'ticket.reply_customer' || event?.type === 'ticket.reply_staff' )
     .map( ( event ) => ( {
       ...event,
+      body: normalizeSupportMessage( event?.body || '', ticket ),
       label: event.type === 'ticket.created' ? 'Ticket opened' : event.actor_type === 'customer' ? 'Customer reply sent' : 'Support replied',
     } ) )
     .sort( ( a, b ) => new Date( a.occurred_at ) - new Date( b.occurred_at ) );
+}
+
+function normalizeSupportMessage( raw, ticket ) {
+  const customerName = String( ticket?.customer_name || 'there' ).trim();
+  const ticketNumber = String( ticket?.ticket_number || ( ticket?.id ? `Support #${ ticket.id }` : '' ) ).trim();
+  const orderId = ticket?.order_id ? `#${ ticket.order_id }` : '';
+  const replacements = {
+    customer: customerName,
+    customer_name: customerName,
+    ticket: ticketNumber,
+    ticket_number: ticketNumber,
+    order: orderId,
+    order_id: orderId,
+    ...SUPPORT_TOKEN_LABELS,
+  };
+
+  let message = String( raw || '' )
+    .replace( /\r\n?/g, '\n' )
+    .replace( /\{\{\s*([a-z0-9_]+)\s*\}\}/gi, ( _, key ) => replacements[ String( key ).toLowerCase() ] ?? '' )
+    .replace( /\{\s*([a-z0-9_]+)\s*\}/gi, ( _, key ) => replacements[ String( key ).toLowerCase() ] ?? '' )
+    .replace( /\{\s*([^{}\n]{2,120})\s*\}/g, '$1' )
+    .replace( /[ \t]+([,.!?;:])/g, '$1' )
+    .replace( /\bYour order\s+is\b/gi, 'Your order is' )
+    .replace( /You can also review the latest details here:\s*this ticket page\.?/gi, 'You can also review the latest details on this ticket page.' );
+
+  const lines = message.split( '\n' )
+    .map( ( line ) => line.trim() )
+    .filter( ( line ) => {
+      if ( ! line ) return true;
+      if ( /\{\{.+?\}\}|\{\s*[a-z0-9_]+\s*\}/i.test( line ) ) return false;
+      if ( /^(review the latest details here|you can also review|ticket:)\s*:?[\s]*$/i.test( line ) ) return false;
+      return true;
+    } );
+
+  message = lines.join( '\n' ).replace( /\n{3,}/g, '\n\n' ).trim();
+  return message;
 }
 
 function formatSlug( value ) {
