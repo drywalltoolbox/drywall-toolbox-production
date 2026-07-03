@@ -20,16 +20,10 @@ const DTB_COMING_SOON_REFERRAL_CONTEXT_KEY = 'dtb_coming_soon_referral_context';
  */
 function dtb_coming_soon_referral_source_labels(): array {
 	return [
-		'google_search'       => 'Google / Search Engine',
-		'social_media'        => 'Social Media',
-		'youtube'             => 'YouTube',
-		'facebook_group'      => 'Facebook Group',
-		'reddit_forum'        => 'Reddit / Online Forum',
-		'contractor_referral' => 'Contractor / Friend Referral',
-		'brand_manufacturer'  => 'Tool Brand / Manufacturer',
-		'trade_show'          => 'Trade Show / Event',
-		'existing_customer'   => 'Existing Customer',
-		'other'               => 'Other',
+		'google'       => 'Google',
+		'social_media' => 'Social Media',
+		'friend'       => 'Friend',
+		'other'        => 'Other',
 	];
 }
 
@@ -41,6 +35,16 @@ function dtb_coming_soon_referral_source_labels(): array {
  */
 function dtb_coming_soon_normalize_referral_source( mixed $value ): string {
 	$source = sanitize_key( (string) $value );
+
+	$legacy_map = [
+		'google_search'       => 'google',
+		'contractor_referral' => 'friend',
+	];
+
+	if ( isset( $legacy_map[ $source ] ) ) {
+		$source = $legacy_map[ $source ];
+	}
+
 	$labels = dtb_coming_soon_referral_source_labels();
 
 	return isset( $labels[ $source ] ) ? $source : '';
@@ -78,12 +82,18 @@ function dtb_coming_soon_build_referral_context( array $data ): array {
 	$source = dtb_coming_soon_normalize_referral_source( $data['dtb_referral_source'] ?? $data['referral_source'] ?? '' );
 	$labels = dtb_coming_soon_referral_source_labels();
 
-	$detail = sanitize_textarea_field( (string) ( $data['dtb_referral_detail'] ?? $data['referral_detail'] ?? '' ) );
-	$detail = trim( preg_replace( '/\s+/', ' ', $detail ) );
+	$detail_required_sources = [ 'social_media', 'friend', 'other' ];
+	$detail                  = sanitize_textarea_field( (string) ( $data['dtb_referral_detail'] ?? $data['referral_detail'] ?? '' ) );
+	$detail                  = trim( preg_replace( '/\s+/', ' ', $detail ) );
+
 	if ( function_exists( 'mb_substr' ) ) {
 		$detail = mb_substr( $detail, 0, 180 );
 	} else {
 		$detail = substr( $detail, 0, 180 );
+	}
+
+	if ( ! in_array( $source, $detail_required_sources, true ) ) {
+		$detail = '';
 	}
 
 	$page_referrer = esc_url_raw( (string) ( $data['dtb_page_referrer'] ?? $data['page_referrer'] ?? '' ) );
