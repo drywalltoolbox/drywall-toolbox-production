@@ -443,22 +443,16 @@
                     <label class="field-label" for="referral-source">How did you hear about us?</label>
                     <select class="field-control" name="dtb_referral_source" id="referral-source" required>
                         <option value="" selected disabled>Select one</option>
-                        <option value="google_search">Google / Search Engine</option>
+                        <option value="google">Google</option>
                         <option value="social_media">Social Media</option>
-                        <option value="youtube">YouTube</option>
-                        <option value="facebook_group">Facebook Group</option>
-                        <option value="reddit_forum">Reddit / Online Forum</option>
-                        <option value="contractor_referral">Contractor / Friend Referral</option>
-                        <option value="brand_manufacturer">Tool Brand / Manufacturer</option>
-                        <option value="trade_show">Trade Show / Event</option>
-                        <option value="existing_customer">Existing Customer</option>
+                        <option value="friend">Friend</option>
                         <option value="other">Other</option>
                     </select>
                 </div>
 
                 <div class="form-group referral-detail" id="referral-detail-group">
-                    <label class="sr-only" for="referral-detail">Referral details</label>
-                    <input class="field-control" type="text" name="dtb_referral_detail" id="referral-detail" maxlength="180" placeholder="Tell us where you found us">
+                    <label class="sr-only" for="referral-detail" id="referral-detail-label">Referral details</label>
+                    <input class="field-control" type="text" name="dtb_referral_detail" id="referral-detail" maxlength="180" placeholder="Tell us more">
                 </div>
 
                 <button type="submit" class="submit-trigger">Sign Up</button>
@@ -526,20 +520,39 @@
         var referral = document.getElementById('referral-source');
         var detailGroup = document.getElementById('referral-detail-group');
         var detail = document.getElementById('referral-detail');
+        var detailLabel = document.getElementById('referral-detail-label');
         var nonceField = document.getElementById('dtb_nonce_field');
         var honeypot = document.getElementById('dtb_hp');
         var referrerField = document.getElementById('dtb_page_referrer');
         var landingField = document.getElementById('dtb_landing_url');
+        var detailPrompts = {
+            social_media: {
+                label: 'Social media platform',
+                placeholder: 'Which platform? Instagram, TikTok, Facebook, YouTube, etc.'
+            },
+            friend: {
+                label: 'Friend referral',
+                placeholder: 'Who referred you?'
+            },
+            other: {
+                label: 'Referral details',
+                placeholder: 'Where did you hear about us?'
+            }
+        };
 
         referrerField.value = document.referrer || '';
         landingField.value = window.location.href;
 
         referral.addEventListener('change', function() {
-            var showDetail = referral.value === 'other';
+            var prompt = detailPrompts[referral.value];
+            var showDetail = Boolean(prompt);
             detailGroup.classList.toggle('is-visible', showDetail);
             detail.required = showDetail;
+            detail.placeholder = prompt ? prompt.placeholder : 'Tell us more';
+            detailLabel.textContent = prompt ? prompt.label : 'Referral details';
             if (!showDetail) detail.value = '';
             referral.style.borderColor = '';
+            detail.style.borderColor = '';
         });
 
         (function(){
@@ -559,6 +572,7 @@
             var email = input.value.trim();
             var source = referral.value;
             var sourceDetail = detail.value.trim();
+            var requiresDetail = Boolean(detailPrompts[source]);
 
             if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
                 setInvalid(input);
@@ -568,7 +582,7 @@
                 setInvalid(referral);
                 return;
             }
-            if (source === 'other' && !sourceDetail) {
+            if (requiresDetail && !sourceDetail) {
                 setInvalid(detail);
                 return;
             }
