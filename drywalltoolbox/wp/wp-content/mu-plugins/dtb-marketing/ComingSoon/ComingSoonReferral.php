@@ -144,9 +144,9 @@ add_action( 'admin_post_nopriv_dtb_subscribe', 'dtb_coming_soon_capture_admin_po
 /**
  * Add referral metadata to the subscriber record being created.
  *
- * @param mixed $new_value New option value.
- * @param mixed $old_value Old option value.
- * @param string $option Option name.
+ * @param mixed  $new_value New option value.
+ * @param mixed  $old_value Old option value.
+ * @param string $option    Option name.
  * @return mixed
  */
 function dtb_coming_soon_attach_referral_to_subscriber( mixed $new_value, mixed $old_value, string $option ): mixed {
@@ -177,7 +177,7 @@ function dtb_coming_soon_attach_referral_to_subscriber( mixed $new_value, mixed 
 
 	return $new_value;
 }
-add_filter( 'pre_update_option', 'dtb_coming_soon_attach_referral_to_subscriber', 10, 3 );
+add_filter( 'pre_update_option_dtb_email_subscribers', 'dtb_coming_soon_attach_referral_to_subscriber', 10, 3 );
 
 /**
  * Append referral context to the plain-text admin notification email.
