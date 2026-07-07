@@ -185,12 +185,6 @@ export default function StorefrontProductTile({
     onOpenModal?.();
   }, [closeOverlay, onOpenModal]);
 
-  const handleOverlayAddToCart = useCallback((e) => {
-    e.stopPropagation();
-    closeOverlay();
-    onAddToCart?.();
-  }, [closeOverlay, onAddToCart]);
-
   const badgePositionClass = variant === 'list'
     ? 'dtb-product-card__badge--left'
     : 'dtb-product-card__badge--right';
