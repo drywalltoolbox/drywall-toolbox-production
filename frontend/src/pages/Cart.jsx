@@ -94,8 +94,15 @@ export default function Cart() {
           initial={ { opacity: 0, y: -8 } }
           animate={ { opacity: 1, y: 0 } }
           transition={ { duration: 0.3 } }
-          className="flex items-start justify-between gap-4 mb-8"
+          className="mb-8"
         >
+          <Link
+            to="/products"
+            className="mb-3 inline-flex items-center gap-1.5 text-sm font-semibold text-slate-500 hover:text-primary-600 transition-colors"
+          >
+            <ChevronLeft size={ 16 } strokeWidth={ 2.5 } />
+            Continue Shopping
+          </Link>
           <div>
             <h1 className="text-2xl sm:text-3xl font-black text-slate-950 tracking-tight">
               Shopping Cart
@@ -104,13 +111,6 @@ export default function Cart() {
               { cartItems.length } item{ cartItems.length !== 1 ? 's' : '' }
             </p>
           </div>
-          <Link
-            to="/products"
-            className="flex items-center gap-1.5 pt-1 text-sm font-semibold text-slate-500 hover:text-primary-600 transition-colors"
-          >
-            <ChevronLeft size={ 16 } strokeWidth={ 2.5 } />
-            Continue Shopping
-          </Link>
         </Motion.div>
 
         <div className="grid lg:grid-cols-[1fr_360px] gap-6 items-start">

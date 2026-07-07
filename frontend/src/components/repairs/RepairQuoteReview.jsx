@@ -12,6 +12,7 @@
  */
 
 import { useState } from 'react';
+import { motion } from 'framer-motion';
 import { Handshake, ClipboardList, FileText, Check, X } from 'lucide-react';
 import { acceptRepairQuote, declineRepairQuote } from '../../api/repairs.js';
 

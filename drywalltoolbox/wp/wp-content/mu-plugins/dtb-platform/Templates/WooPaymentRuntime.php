@@ -77,12 +77,12 @@ if ( ! function_exists( 'dtb_payment_runtime_logo_url' ) ) {
 </header>
 <main class="dtb-payment-shell">
 	<section class="dtb-payment-card" aria-labelledby="dtb-payment-title">
+		<a class="dtb-payment-return-link" href="<?php echo esc_url( home_url( '/cart' ) ); ?>"><?php esc_html_e( 'Back to Cart', 'drywall-toolbox' ); ?></a>
 		<div class="dtb-payment-intro">
 			<div>
 			<h1 id="dtb-payment-title" class="dtb-payment-title"><?php esc_html_e( 'Complete Your Payment', 'drywall-toolbox' ); ?></h1>
 			<p class="dtb-payment-subtitle"><?php esc_html_e( 'Review your order and choose a secure payment method.', 'drywall-toolbox' ); ?></p>
 			</div>
-			<a class="dtb-payment-return-link" href="<?php echo esc_url( home_url( '/cart' ) ); ?>"><?php esc_html_e( 'Back to Cart', 'drywall-toolbox' ); ?></a>
 		</div>
 		<div class="dtb-payment-content woocommerce">
 			<?php dtb_payment_runtime_render_native_checkout(); ?>

@@ -185,6 +185,58 @@ export async function getRepairStatus( repairId, token ) {
 }
 
 /**
+ * Accept a pending repair quote.
+ *
+ * @param {number|string} repairId
+ * @param {string}        token
+ * @returns {Promise<Object>}
+ */
+export async function acceptRepairQuote( repairId, token ) {
+  return unwrapRepairResponse( await apiClient( `/wp-json/dtb/v1/repairs/${ encodeURIComponent( repairId ) }/quote`, {
+    method: 'POST',
+    body: JSON.stringify( {
+      token,
+      action: 'accept',
+    } ),
+  } ) );
+}
+
+/**
+ * Decline a pending repair quote.
+ *
+ * @param {number|string} repairId
+ * @param {string}        token
+ * @returns {Promise<Object>}
+ */
+export async function declineRepairQuote( repairId, token ) {
+  return unwrapRepairResponse( await apiClient( `/wp-json/dtb/v1/repairs/${ encodeURIComponent( repairId ) }/quote`, {
+    method: 'POST',
+    body: JSON.stringify( {
+      token,
+      action: 'decline',
+    } ),
+  } ) );
+}
+
+/**
+ * Submit a customer note/comment to the repair timeline.
+ *
+ * @param {number|string} repairId
+ * @param {string}        token
+ * @param {string}        comment
+ * @returns {Promise<Object>}
+ */
+export async function submitRepairComment( repairId, token, comment ) {
+  return await apiClient( `/wp-json/dtb/v1/repairs/${ encodeURIComponent( repairId ) }/comment`, {
+    method: 'POST',
+    body: JSON.stringify( {
+      token,
+      comment,
+    } ),
+  } );
+}
+
+/**
  * Upload media files for an existing repair.
  * Uses raw fetch (no JSON Content-Type) to send FormData.
  * Attaches a Bearer token — prefers the public repair token; falls back to

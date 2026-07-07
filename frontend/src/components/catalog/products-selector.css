@@ -137,6 +137,18 @@
   outline-offset: 3px;
 }
 
+.product-category-card:has(.product-category-card__image)::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: #ffffff;
+  pointer-events: none;
+}
+
+.product-category-card--all-products::before {
+  display: none;
+}
+
 /* Product images fill the frame completely — covers the 3:2 card edge-to-edge */
 .product-category-card__image {
   position: absolute;

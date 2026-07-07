@@ -254,6 +254,36 @@ if ( ! function_exists( 'dtb_wc_payment_runtime_is_unpaid_online_order' ) ) {
 	}
 }
 
+if ( ! function_exists( 'dtb_wc_payment_runtime_is_keyed_unpaid_online_order' ) ) {
+	/**
+	 * REST-safe variant of dtb_wc_payment_runtime_is_unpaid_online_order().
+	 *
+	 * REST requests are not order-pay page requests, so they must validate the
+	 * supplied order key directly instead of relying on page query vars.
+	 */
+	function dtb_wc_payment_runtime_is_keyed_unpaid_online_order( WC_Order $order, string $request_key ): bool {
+		$order_key = (string) $order->get_order_key();
+		if ( '' === $request_key || '' === $order_key || ! hash_equals( $order_key, $request_key ) ) {
+			return false;
+		}
+
+		$payment_method = sanitize_key( (string) $order->get_payment_method() );
+		if ( '' === $payment_method || dtb_wc_payment_runtime_is_manual_payment_method( $payment_method ) ) {
+			return false;
+		}
+
+		if ( (float) $order->get_total() <= 0 ) {
+			return false;
+		}
+
+		if ( in_array( (string) $order->get_status(), [ 'completed', 'cancelled', 'refunded', 'trash' ], true ) ) {
+			return false;
+		}
+
+		return ! dtb_wc_payment_runtime_has_captured_payment( $order );
+	}
+}
+
 if ( ! function_exists( 'dtb_wc_payment_runtime_prepare_payable_order' ) ) {
 	/**
 	 * Keep headless-created online-payment orders payable until gateway capture.
@@ -424,16 +454,130 @@ add_filter(
 		$sku   = trim( (string) $product->get_sku() );
 
 		return sprintf(
-			'<span class="dtb-order-product"><span class="dtb-order-product-media">%1$s</span><span class="dtb-order-product-copy"><span class="dtb-order-product-name">%2$s</span>%3$s</span></span>',
+			'<span class="dtb-order-product" data-dtb-order-item-id="%4$d"><span class="dtb-order-product-media">%1$s</span><span class="dtb-order-product-copy"><span class="dtb-order-product-name">%2$s</span>%3$s</span></span>',
 			wp_kses_post( $image ),
 			wp_kses_post( $item_name ),
 			'' !== $sku
 				? '<span class="dtb-order-product-sku">' . esc_html( sprintf( 'SKU: %s', $sku ) ) . '</span>'
-				: ''
+				: '',
+			absint( $item->get_id() )
 		);
 	},
 	20,
 	3
+);
+
+add_action(
+	'rest_api_init',
+	static function (): void {
+		register_rest_route(
+			'dtb/v1',
+			'/payment-runtime/orders/(?P<order_id>\d+)/items/(?P<item_id>\d+)',
+			[
+				'methods'             => WP_REST_Server::EDITABLE,
+				'permission_callback' => '__return_true',
+				'args'                => [
+					'order_id' => [
+						'required'          => true,
+						'sanitize_callback' => 'absint',
+					],
+					'item_id'  => [
+						'required'          => true,
+						'sanitize_callback' => 'absint',
+					],
+					'key'      => [
+						'required'          => true,
+						'sanitize_callback' => 'sanitize_text_field',
+					],
+					'quantity' => [
+						'required'          => true,
+						'sanitize_callback' => 'absint',
+					],
+				],
+				'callback'            => static function ( WP_REST_Request $request ) {
+					$order_id = absint( $request['order_id'] );
+					$item_id  = absint( $request['item_id'] );
+					$key      = sanitize_text_field( (string) $request->get_param( 'key' ) );
+					$quantity = absint( $request->get_param( 'quantity' ) );
+
+					if ( $quantity > 99 ) {
+						return new WP_Error( 'dtb_invalid_quantity', __( 'Quantity must be 99 or less.', 'drywall-toolbox' ), [ 'status' => 400 ] );
+					}
+
+					$order = wc_get_order( $order_id );
+					if ( ! $order instanceof WC_Order || ! hash_equals( (string) $order->get_order_key(), $key ) ) {
+						return new WP_Error( 'dtb_invalid_order_key', __( 'This payment session could not be verified.', 'drywall-toolbox' ), [ 'status' => 403 ] );
+					}
+
+					if ( ! dtb_wc_payment_runtime_is_keyed_unpaid_online_order( $order, $key ) ) {
+						return new WP_Error( 'dtb_order_not_payable', __( 'This order is no longer editable.', 'drywall-toolbox' ), [ 'status' => 409 ] );
+					}
+
+					$item = $order->get_item( $item_id );
+					if ( ! $item instanceof WC_Order_Item_Product ) {
+						return new WP_Error( 'dtb_invalid_order_item', __( 'This order item could not be found.', 'drywall-toolbox' ), [ 'status' => 404 ] );
+					}
+
+					$line_items = $order->get_items( 'line_item' );
+					if ( 0 === $quantity && count( $line_items ) <= 1 ) {
+						return new WP_Error( 'dtb_cannot_remove_last_item', __( 'Use Back to Cart if you need to remove the last item before payment.', 'drywall-toolbox' ), [ 'status' => 400 ] );
+					}
+
+					if ( 0 === $quantity ) {
+						$order->remove_item( $item_id );
+					} else {
+						$current_quantity = max( 1, absint( $item->get_quantity() ) );
+						$unit_subtotal    = (float) $item->get_subtotal() / $current_quantity;
+						$unit_total       = (float) $item->get_total() / $current_quantity;
+
+						$item->set_quantity( $quantity );
+						$item->set_subtotal( wc_format_decimal( $unit_subtotal * $quantity ) );
+						$item->set_total( wc_format_decimal( $unit_total * $quantity ) );
+						$item->save();
+					}
+
+					$order->calculate_taxes();
+					$order->calculate_totals( false );
+					$order->add_order_note( sprintf( 'Customer updated payment review item #%1$d quantity to %2$d before completing payment.', $item_id, $quantity ) );
+					$order->save();
+
+					$currency = $order->get_currency();
+					$items    = [];
+					foreach ( $order->get_items( 'line_item' ) as $line_item ) {
+						if ( ! $line_item instanceof WC_Order_Item_Product ) {
+							continue;
+						}
+
+						$items[] = [
+							'item_id'         => $line_item->get_id(),
+							'quantity'        => max( 1, absint( $line_item->get_quantity() ) ),
+							'line_total'      => $line_item->get_total(),
+							'line_total_html' => wc_price( $line_item->get_total(), [ 'currency' => $currency ] ),
+						];
+					}
+
+					$shipping_total = (float) $order->get_shipping_total();
+
+					return rest_ensure_response(
+						[
+							'order_id' => $order->get_id(),
+							'item_id'  => $item_id,
+							'quantity' => $quantity,
+							'items'    => $items,
+							'totals'   => [
+								'subtotal_html' => wc_price( $order->get_subtotal(), [ 'currency' => $currency ] ),
+								'shipping_html' => $shipping_total > 0
+									? wc_price( $shipping_total, [ 'currency' => $currency ] )
+									: __( 'Free', 'drywall-toolbox' ),
+								'tax_html'      => wc_price( $order->get_total_tax(), [ 'currency' => $currency ] ),
+								'total_html'    => wc_price( $order->get_total(), [ 'currency' => $currency ] ),
+							],
+						]
+					);
+				},
+			]
+		);
+	}
 );
 
 add_action(

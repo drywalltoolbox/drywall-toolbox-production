@@ -105,8 +105,7 @@ body.dtb-payment-runtime {
 .dtb-payment-return-link {
 	display: inline-flex;
 	align-items: center;
-	flex: 0 0 auto;
-	padding-top: 5px;
+	margin: 0 0 14px;
 	color: #64748b;
 	font-size: 14px;
 	font-weight: 700;
@@ -319,6 +318,82 @@ body.dtb-payment-runtime {
 	line-height: 1.3;
 }
 
+.dtb-order-qty-row {
+	display: inline-flex;
+	align-items: center;
+	gap: 0;
+	overflow: hidden;
+	border: 1px solid #e2e8f0;
+	border-radius: 8px;
+	background: #f1f5f9;
+	transition: border-color 140ms ease, background 140ms ease, box-shadow 140ms ease;
+}
+
+.dtb-order-product-row--syncing .dtb-order-qty-row {
+	border-color: rgba(37, 99, 235, 0.28);
+	background: #eef4ff;
+	box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.08);
+}
+
+.dtb-order-qty-btn {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 28px;
+	height: 28px;
+	flex: 0 0 28px;
+	border: 0;
+	background: transparent;
+	color: #475569;
+	padding: 0;
+	cursor: pointer;
+	touch-action: manipulation;
+	transition: background 100ms ease, color 100ms ease, transform 90ms ease;
+}
+
+.dtb-order-qty-btn svg {
+	display: block;
+	width: 12px;
+	height: 12px;
+	fill: none;
+	stroke: currentColor;
+	stroke-width: 2.2;
+	stroke-linecap: round;
+	stroke-linejoin: round;
+}
+
+.dtb-order-qty-btn:hover:not(:disabled) {
+	background: #e2e8f0;
+	color: #0f172a;
+}
+
+.dtb-order-qty-btn:active:not(:disabled) {
+	background: #cbd5e1;
+	transform: scale(0.94);
+}
+
+.dtb-order-qty-btn:disabled {
+	color: #cbd5e1;
+	cursor: not-allowed;
+}
+
+.dtb-order-qty-display {
+	min-width: 26px;
+	color: #0f172a;
+	font-size: 13px;
+	font-weight: 800;
+	font-variant-numeric: tabular-nums;
+	line-height: 28px;
+	text-align: center;
+	user-select: none;
+	transition: color 140ms ease, transform 140ms ease;
+}
+
+.dtb-order-product-row--syncing .dtb-order-qty-display {
+	color: #2563eb;
+	transform: scale(1.04);
+}
+
 .dtb-payment-runtime table.shop_table tfoot tr:first-child th,
 .dtb-payment-runtime table.shop_table tfoot tr:first-child td {
 	border-top: 8px solid #f8fafc;
@@ -408,7 +483,19 @@ body.dtb-payment-runtime {
 }
 
 .dtb-payment-runtime #payment ul.payment_methods li {
-	display: contents;
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+	min-width: 0;
+}
+
+.dtb-payment-runtime #payment ul.payment_methods li.dtb-payment-method-duplicate,
+.dtb-payment-runtime #payment ul.payment_methods li.dtb-wallet-disabled {
+	display: none !important;
+}
+
+.dtb-payment-runtime #payment ul.payment_methods li.is-active {
+	grid-column: 1 / -1;
 }
 
 .dtb-payment-runtime #payment ul.payment_methods li > input[type="radio"] {
@@ -437,7 +524,6 @@ body.dtb-payment-runtime {
 	line-height: 1.25;
 	text-align: center;
 	cursor: pointer;
-	order: 10;
 	transition: border-color 0.16s ease, box-shadow 0.16s ease, background 0.16s ease, color 0.16s ease;
 	-webkit-tap-highlight-color: transparent;
 	touch-action: manipulation;
@@ -473,6 +559,66 @@ body.dtb-payment-runtime {
 	background: #2563eb;
 }
 
+.dtb-payment-runtime #payment ul.payment_methods li.dtb-payment-method--card-brands > label > img,
+.dtb-payment-runtime #payment ul.payment_methods li.dtb-payment-method--card-brands > label > svg,
+.dtb-payment-runtime #payment ul.payment_methods li.dtb-payment-method--card-brands > label > .payment_method_icon {
+	display: none !important;
+}
+
+.dtb-payment-card-visual {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 10px;
+	min-width: 0;
+	flex: 1 1 auto;
+}
+
+.dtb-payment-card-icon {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 34px;
+	height: 26px;
+	flex: 0 0 34px;
+	border-radius: 7px;
+	background: #f1f5f9;
+	color: #64748b;
+	box-shadow: inset 0 0 0 1px #d8e0ea;
+}
+
+.dtb-payment-card-icon svg {
+	display: block;
+	width: 22px;
+	height: 22px;
+	fill: none;
+	stroke: currentColor;
+	stroke-width: 1.8;
+	stroke-linecap: round;
+	stroke-linejoin: round;
+}
+
+.dtb-payment-card-brands {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 8px;
+	min-width: 0;
+}
+
+.dtb-payment-card-brands img {
+	display: block;
+	width: auto;
+	height: 14px;
+	max-width: 46px;
+	object-fit: contain;
+}
+
+.dtb-payment-card-brands img[src*="american-express"] {
+	height: 15px;
+	max-width: 54px;
+}
+
 .dtb-payment-provider-label--logo-only {
 	justify-content: center;
 }
@@ -494,8 +640,6 @@ body.dtb-payment-runtime {
 }
 
 .dtb-payment-runtime .payment_box {
-	grid-column: 1 / -1;
-	order: 20;
 	margin: 0;
 	border-top: 1px solid #dbe3ef;
 	border: 1px solid #dbe3ef;
@@ -766,8 +910,7 @@ body.dtb-payment-runtime {
 	}
 
 	.dtb-payment-return-link {
-		margin-top: 10px;
-		padding-top: 0;
+		margin: 0 0 10px;
 		font-size: 13px;
 	}
 
@@ -908,6 +1051,20 @@ body.dtb-payment-runtime {
 	.dtb-payment-method-radio {
 		width: 18px;
 		height: 18px;
+	}
+
+	.dtb-payment-card-brands {
+		gap: 8px;
+	}
+
+	.dtb-payment-card-brands img {
+		height: 15px;
+		max-width: 50px;
+	}
+
+	.dtb-payment-card-brands img[src*="american-express"] {
+		height: 16px;
+		max-width: 58px;
 	}
 
 	.dtb-payment-provider-label--logo-only img,

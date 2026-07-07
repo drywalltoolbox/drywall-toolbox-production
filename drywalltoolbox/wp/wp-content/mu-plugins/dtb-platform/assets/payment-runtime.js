@@ -88,6 +88,15 @@
     return String(value || '').replace(/\s+/g, ' ').trim();
   }
 
+  function escapeHtml(value) {
+    return readableText(value)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
+  }
+
   function signatureFor(element) {
     if (!element || element.nodeType !== 1) return '';
 
@@ -143,8 +152,122 @@
   }
 
   function isCardMethodRow(row) {
+    if (!row) return false;
     var text = rowLabelText(row);
-    return text === 'card' || text === 'credit card' || text === 'secure card payment' || text === 'credit / debit card' || text === 'credit or debit card';
+    var input = row.querySelector('input[type="radio"]');
+    var inputSignature = compactText([
+      input && input.id,
+      input && input.name,
+      input && input.value,
+      input && input.getAttribute('data-payment-method'),
+      input && input.getAttribute('aria-label'),
+      row.className
+    ].join(' '));
+
+    if (
+      inputSignature.indexOf('affirm') !== -1 ||
+      inputSignature.indexOf('klarna') !== -1 ||
+      inputSignature.indexOf('afterpay') !== -1 ||
+      inputSignature.indexOf('paypal') !== -1 ||
+      inputSignature.indexOf('apple') !== -1 ||
+      inputSignature.indexOf('google') !== -1 ||
+      inputSignature.indexOf('link') !== -1
+    ) {
+      return false;
+    }
+
+    return text === 'card' ||
+      text === 'credit card' ||
+      text === 'secure card payment' ||
+      text === 'credit / debit card' ||
+      text === 'credit or debit card' ||
+      inputSignature.indexOf('payment_method_woocommerce_payments') !== -1 ||
+      inputSignature.indexOf('payment_method_stripe') !== -1 ||
+      inputSignature.indexOf('woocommerce_payments') !== -1 ||
+      inputSignature.indexOf('stripe') !== -1 ||
+      inputSignature.indexOf('card') !== -1;
+  }
+
+  function paymentLogoCandidates(fileName) {
+    var origin = window.location.origin.replace(/\/+$/, '');
+    var candidates = [];
+    var referrer = '';
+
+    try {
+      referrer = document.referrer ? new URL(document.referrer).pathname : '';
+    } catch (error) {
+      referrer = '';
+    }
+
+    var stagingMatch = referrer.match(/^\/staging\/\d+(?:\/|$)/);
+    if (stagingMatch) {
+      candidates.push(origin + stagingMatch[0].replace(/\/+$/, '') + '/payment_logos/' + fileName);
+    }
+
+    candidates.push(origin + '/payment_logos/' + fileName);
+    candidates.push(origin + '/wp/payment_logos/' + fileName);
+
+    return candidates;
+  }
+
+  function cardLogoImg(fileName) {
+    var candidates = paymentLogoCandidates(fileName);
+    return '<img src="' + candidates[0] + '" data-dtb-logo-candidates="' + candidates.join('|') + '" data-dtb-logo-index="0" alt="" loading="lazy" decoding="async">';
+  }
+
+  function bindCardLogoFallbacks(root) {
+    Array.prototype.forEach.call((root || document).querySelectorAll('.dtb-payment-card-brands img[data-dtb-logo-candidates]'), function (img) {
+      if (img.dataset.dtbLogoFallbackReady === '1') return;
+      img.dataset.dtbLogoFallbackReady = '1';
+      img.addEventListener('error', function () {
+        var candidates = String(img.dataset.dtbLogoCandidates || '').split('|').filter(Boolean);
+        var nextIndex = (parseInt(img.dataset.dtbLogoIndex || '0', 10) || 0) + 1;
+        if (nextIndex >= candidates.length) return;
+        img.dataset.dtbLogoIndex = String(nextIndex);
+        img.src = candidates[nextIndex];
+      });
+    });
+  }
+
+  function normalizeCardMethodLabel(row) {
+    var label = row && row.querySelector('label');
+    var input = row && row.querySelector('input[type="radio"]');
+    if (!label || !input) return;
+
+    row.classList.add('dtb-payment-method--card-brands');
+    if (!input.getAttribute('aria-label')) input.setAttribute('aria-label', 'Secure card payment');
+
+    if (!label.querySelector('.dtb-payment-card-visual')) {
+      var visual = document.createElement('span');
+      visual.className = 'dtb-payment-card-visual';
+      visual.setAttribute('aria-hidden', 'true');
+      visual.innerHTML = [
+        '<span class="dtb-payment-card-icon">',
+          '<svg viewBox="0 0 24 24" focusable="false">',
+            '<rect x="3" y="5" width="18" height="14" rx="2"></rect>',
+            '<path d="M3 10h18"></path>',
+            '<path d="M7 15h3"></path>',
+            '<path d="M13 15h4"></path>',
+          '</svg>',
+        '</span>',
+        '<span class="dtb-payment-card-brands">',
+          cardLogoImg('visa.svg'),
+          cardLogoImg('mastercard.svg'),
+          cardLogoImg('american-express.svg'),
+        '</span>'
+      ].join('');
+      label.insertBefore(visual, label.querySelector('.dtb-payment-method-radio') ? label.querySelector('.dtb-payment-method-radio').nextSibling : label.firstChild);
+    }
+
+    bindCardLogoFallbacks(label);
+
+    if (!label.querySelector('.dtb-payment-card-accessible-label')) {
+      var accessible = document.createElement('span');
+      accessible.className = 'dtb-payment-card-accessible-label dtb-sr-only';
+      accessible.textContent = 'Secure card payment. Accepted cards: Visa, Mastercard, American Express.';
+      label.appendChild(accessible);
+    }
+
   }
 
   function nearestWalletContainer(element) {
@@ -268,21 +391,32 @@
         label.insertBefore(marker, label.firstChild);
       }
 
+      if (isCardMethodRow(row)) normalizeCardMethodLabel(row);
+
       normalizeProviderLogoLabel(row);
     });
   }
 
-  function selectPaymentRow(row) {
-    var input = row && row.querySelector('input[type="radio"]');
-    if (!input || input.checked) return;
-
-    input.checked = true;
+  function triggerPaymentInputChange(input) {
     if (window.jQuery) {
       window.jQuery(input).trigger('change');
       return;
     }
 
     input.dispatchEvent(new Event('change', { bubbles: true }));
+  }
+
+  function selectPaymentRow(row, forceChange) {
+    var input = row && row.querySelector('input[type="radio"]');
+    if (!input) return;
+
+    if (input.checked) {
+      if (forceChange) triggerPaymentInputChange(input);
+      return;
+    }
+
+    input.checked = true;
+    triggerPaymentInputChange(input);
   }
 
   function syncActivePaymentRows() {
@@ -302,10 +436,14 @@
 
       if (!box || box.classList.contains('dtb-payment-box-empty')) return;
 
-      box.hidden = !isActive;
       box.setAttribute('aria-hidden', isActive ? 'false' : 'true');
       if (isActive) {
+        box.hidden = false;
+        box.removeAttribute('hidden');
         box.style.removeProperty('display');
+      } else {
+        box.hidden = true;
+        box.style.setProperty('display', 'none', 'important');
       }
     });
   }
@@ -331,7 +469,7 @@
 
       if (!looksLikeGenericCard) return;
 
-      if (row.querySelector('input[type="radio"]:checked')) selectPaymentRow(explicitCardRow);
+      if (row.querySelector('input[type="radio"]:checked')) selectPaymentRow(explicitCardRow, true);
       row.classList.add('dtb-payment-method-duplicate');
     });
   }
@@ -344,7 +482,7 @@
     var text = readableText(box.textContent);
     var nonFieldProvider = ['afterpay', 'affirm', 'klarna', 'apple-pay', 'google-pay', 'link'].indexOf(providerKey) !== -1;
 
-    if (nonFieldProvider && text.length === 0) return false;
+    if (nonFieldProvider) return true;
     if (text.length > 1) return true;
 
     var usefulControl = box.querySelector(
@@ -391,6 +529,182 @@
     });
   }
 
+  function paymentOrderContext() {
+    var match = window.location.pathname.match(/\/order-pay\/(\d+)\/?/);
+    var params = new URLSearchParams(window.location.search || '');
+    return {
+      orderId: match ? match[1] : '',
+      key: params.get('key') || ''
+    };
+  }
+
+  function restBaseUrl() {
+    if (window.wpApiSettings && window.wpApiSettings.root) {
+      return String(window.wpApiSettings.root).replace(/\/+$/, '') + '/dtb/v1';
+    }
+    return window.location.origin.replace(/\/+$/, '') + '/wp-json/dtb/v1';
+  }
+
+  function quantityFromRow(row) {
+    var quantityNode = row.querySelector('td.product-quantity, .product-quantity');
+    var text = quantityNode ? quantityNode.textContent : row.textContent;
+    var match = String(text || '').match(/(\d+)/);
+    var quantity = match ? parseInt(match[1], 10) : 1;
+    return Number.isFinite(quantity) && quantity > 0 ? quantity : 1;
+  }
+
+  function itemIdFromRow(row) {
+    var product = row.querySelector('.dtb-order-product[data-dtb-order-item-id]');
+    return product ? product.getAttribute('data-dtb-order-item-id') : '';
+  }
+
+  function quantityTargetForRow(row) {
+    var target = row.querySelector('td.product-quantity');
+    if (target) return target;
+
+    var existing = row.querySelector('.dtb-order-product-quantity-cell');
+    if (existing) return existing;
+
+    target = document.createElement('td');
+    target.className = 'product-quantity dtb-order-product-quantity-cell';
+    row.appendChild(target);
+    return target;
+  }
+
+  function setQuantityControlsBusy(row, isBusy) {
+    row.classList.toggle('dtb-order-product-row--syncing', isBusy);
+    Array.prototype.forEach.call(row.querySelectorAll('.dtb-order-qty-btn'), function (button) {
+      button.disabled = isBusy;
+    });
+  }
+
+  function totalLabelForRow(row) {
+    var heading = row && row.querySelector('th, td');
+    return compactText(heading ? heading.textContent : '').replace(/:+$/, '').trim();
+  }
+
+  function updateOrderTotalRows(totals) {
+    if (!totals) return;
+
+    Array.prototype.forEach.call(document.querySelectorAll('table.shop_table tfoot tr'), function (row) {
+      var label = totalLabelForRow(row);
+      var valueCell = row.querySelector('td');
+      if (!valueCell) return;
+
+      if (label === 'subtotal' && totals.subtotal_html) valueCell.innerHTML = totals.subtotal_html;
+      if (label === 'shipping' && totals.shipping_html) valueCell.innerHTML = totals.shipping_html;
+      if (label === 'tax' && totals.tax_html) valueCell.innerHTML = totals.tax_html;
+      if (label === 'total' && totals.total_html) valueCell.innerHTML = totals.total_html;
+    });
+  }
+
+  function updateOrderItemRows(payload, activeRow) {
+    var data = payload && payload.data ? payload.data : payload;
+    if (!data) return;
+
+    if (Number(data.quantity) === 0 && activeRow) {
+      activeRow.remove();
+    }
+
+    var items = Array.isArray(data.items) ? data.items : [];
+    items.forEach(function (item) {
+      var productNode = document.querySelector('.dtb-order-product[data-dtb-order-item-id="' + item.item_id + '"]');
+      var row = productNode ? productNode.closest('tr') : null;
+      if (!row) return;
+
+      var totalCell = row.querySelector('td.product-total');
+      if (totalCell && item.line_total_html) totalCell.innerHTML = item.line_total_html;
+
+      var quantityCell = quantityTargetForRow(row);
+      if (quantityCell) {
+        quantityCell.dataset.dtbOrderQtyReady = '';
+        quantityCell.innerHTML = String(item.quantity || 1);
+      }
+
+      renderOrderQuantityControls(row, true);
+    });
+
+    updateOrderTotalRows(data.totals);
+    enhanceOrderQuantityControls();
+  }
+
+  function updateOrderItemQuantity(row, nextQuantity) {
+    var context = paymentOrderContext();
+    var itemId = itemIdFromRow(row);
+    if (!context.orderId || !context.key || !itemId) return;
+
+    setQuantityControlsBusy(row, true);
+
+    window.fetch(restBaseUrl() + '/payment-runtime/orders/' + encodeURIComponent(context.orderId) + '/items/' + encodeURIComponent(itemId), {
+      method: 'POST',
+      credentials: 'same-origin',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        key: context.key,
+        quantity: Math.max(0, Math.min(99, parseInt(nextQuantity, 10) || 0))
+      })
+    })
+      .then(function (response) {
+        if (!response.ok) {
+          return response.json().catch(function () { return {}; }).then(function (payload) {
+            throw new Error(payload.message || 'Could not update order quantity.');
+          });
+        }
+        return response.json();
+      })
+      .then(function (payload) {
+        updateOrderItemRows(payload, row);
+        setQuantityControlsBusy(row, false);
+      })
+      .catch(function (error) {
+        setQuantityControlsBusy(row, false);
+        window.alert(error && error.message ? error.message : 'Could not update order quantity.');
+      });
+  }
+
+  function renderOrderQuantityControls(row, force) {
+    var itemId = itemIdFromRow(row);
+    if (!itemId) return;
+
+    var target = quantityTargetForRow(row);
+    if (!target || (!force && target.dataset.dtbOrderQtyReady === '1')) return;
+
+    var quantity = quantityFromRow(row);
+    var lineCount = document.querySelectorAll('table.shop_table tbody tr.dtb-order-product-row').length;
+    var canRemove = quantity > 1 || lineCount > 1;
+    var productName = readableText((row.querySelector('.dtb-order-product-name') || {}).textContent) || 'item';
+    var escapedProductName = escapeHtml(productName);
+    target.dataset.dtbOrderQtyReady = '1';
+    target.innerHTML = [
+      '<div class="dtb-order-qty-row" role="group" aria-label="Quantity for ' + escapedProductName + '">',
+        '<button type="button" class="dtb-order-qty-btn dtb-order-qty-btn--decrease" aria-label="' + (quantity === 1 ? 'Remove ' + escapedProductName : 'Decrease quantity') + '"' + (!canRemove ? ' disabled' : '') + '>',
+          quantity === 1 ? '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v5"/><path d="M14 11v5"/></svg>' : '<span aria-hidden="true">-</span>',
+        '</button>',
+        '<span class="dtb-order-qty-display" aria-live="polite">' + quantity + '</span>',
+        '<button type="button" class="dtb-order-qty-btn dtb-order-qty-btn--increase" aria-label="Increase quantity"' + (quantity >= 99 ? ' disabled' : '') + '><span aria-hidden="true">+</span></button>',
+      '</div>'
+    ].join('');
+
+    var decrease = target.querySelector('.dtb-order-qty-btn--decrease');
+    var increase = target.querySelector('.dtb-order-qty-btn--increase');
+    if (decrease) {
+      decrease.addEventListener('click', function () {
+        updateOrderItemQuantity(row, quantity - 1);
+      });
+    }
+    if (increase) {
+      increase.addEventListener('click', function () {
+        updateOrderItemQuantity(row, quantity + 1);
+      });
+    }
+  }
+
+  function enhanceOrderQuantityControls() {
+    Array.prototype.forEach.call(document.querySelectorAll('table.shop_table tbody tr.dtb-order-product-row'), renderOrderQuantityControls);
+  }
+
   function normalizePaymentLayout() {
     var table = document.querySelector('form#order_review table.shop_table');
     if (!table) return;
@@ -415,6 +729,8 @@
     Array.prototype.forEach.call(table.querySelectorAll('tfoot tr'), function (row) {
       row.classList.add('dtb-order-total-row');
     });
+
+    enhanceOrderQuantityControls();
   }
 
   function dedupeWalletButtons() {
@@ -487,8 +803,7 @@
 
   document.addEventListener('change', function (event) {
     if (event.target && event.target.matches('#payment input[type="radio"]')) {
-      window.setTimeout(enhancePaymentRuntime, 0);
-      window.setTimeout(enhancePaymentRuntime, 150);
+      window.setTimeout(enhancePaymentRuntime, 180);
     }
   });
 
@@ -503,28 +818,38 @@
     if (!input || input.disabled) return;
 
     if (label) {
-      window.setTimeout(function () {
-        if (!input.checked) selectPaymentRow(row);
-        enhancePaymentRuntime();
-      }, 0);
       return;
     }
 
     if (!event.target.closest('a, button, input, select, textarea')) {
-      selectPaymentRow(row);
-      enhancePaymentRuntime();
+      selectPaymentRow(row, true);
+      window.setTimeout(enhancePaymentRuntime, 0);
     }
   });
 
   if ('MutationObserver' in window) {
-    var observer = new MutationObserver(function () {
+    var observer = new MutationObserver(function (mutations) {
+      var structuralPaymentChange = mutations.some(function (mutation) {
+        return Array.prototype.some.call(mutation.addedNodes || [], function (node) {
+          return node.nodeType === 1 && (
+            node.matches && node.matches('li, .payment_box, table.shop_table') ||
+            node.querySelector && node.querySelector('li, .payment_box, table.shop_table')
+          );
+        });
+      });
+
+      if (!structuralPaymentChange) return;
+
       window.clearTimeout(observer._dtbTimer);
-      observer._dtbTimer = window.setTimeout(enhancePaymentRuntime, 80);
+      observer._dtbTimer = window.setTimeout(enhancePaymentRuntime, 220);
     });
 
-    observer.observe(document.documentElement, {
-      childList: true,
-      subtree: true
-    });
+    var paymentRoot = document.querySelector('#payment ul.payment_methods, form#order_review');
+    if (paymentRoot) {
+      observer.observe(paymentRoot, {
+        childList: true,
+        subtree: false
+      });
+    }
   }
 })();

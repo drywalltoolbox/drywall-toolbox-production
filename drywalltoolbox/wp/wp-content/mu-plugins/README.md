@@ -145,11 +145,17 @@ From `dtb-returns/Rest/ReturnsController.php`:
 From `dtb-support/Rest/SupportCustomerController.php`:
 - `GET /support/mine` (authenticated customer support ticket history)
 
+From `dtb-repair-service/Rest/RepairQuoteActionController.php`:
+- `POST /repairs/{id}/quote` (public-token/customer quote accept or decline)
+
 From `dtb-api-security.php`:
 - `GET /nonce`
 
 From `dtb-cache.php`:
 - `GET /cache/status`
+
+From `dtb-wc-payment-runtime.php`:
+- `POST /payment-runtime/orders/{order_id}/items/{item_id}` (keyed order-pay line quantity update)
 
 From `dtb-schematics-api.php`:
 - `GET /schematics/media`

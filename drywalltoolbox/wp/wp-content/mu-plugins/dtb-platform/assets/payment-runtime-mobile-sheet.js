@@ -222,10 +222,22 @@
   }
 
   if ('MutationObserver' in window) {
-    var observer = new MutationObserver(function () {
+    var observer = new MutationObserver(function (mutations) {
+      var paymentMethodStructureChanged = mutations.some(function (mutation) {
+        return Array.prototype.some.call(mutation.addedNodes || [], function (node) {
+          return node.nodeType === 1 && (
+            node.matches && node.matches('li, ul.payment_methods') ||
+            node.querySelector && node.querySelector('li, ul.payment_methods')
+          );
+        });
+      });
+
+      if (!paymentMethodStructureChanged) return;
+
       window.clearTimeout(observer._dtbMobilePaymentTimer);
-      observer._dtbMobilePaymentTimer = window.setTimeout(scheduleApply, 120);
+      observer._dtbMobilePaymentTimer = window.setTimeout(scheduleApply, 220);
     });
-    observer.observe(document.documentElement, { childList: true, subtree: true });
+    var methods = paymentMethods();
+    if (methods) observer.observe(methods, { childList: true, subtree: false });
   }
 })();

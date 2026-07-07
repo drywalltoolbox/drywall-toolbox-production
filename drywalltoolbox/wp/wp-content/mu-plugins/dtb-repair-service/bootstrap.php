@@ -61,6 +61,7 @@ require_once __DIR__ . '/Rest/RepairCustomerListController.php';
 require_once __DIR__ . '/Rest/RepairStatusController.php';
 require_once __DIR__ . '/Rest/RepairMediaController.php';
 require_once __DIR__ . '/Rest/RepairCommentController.php';
+require_once __DIR__ . '/Rest/RepairQuoteActionController.php';
 require_once __DIR__ . '/Rest/RepairEventStreamController.php';
 require_once __DIR__ . '/Rest/RepairHealthController.php';
 require_once __DIR__ . '/Rest/RepairAdminQueueController.php';
