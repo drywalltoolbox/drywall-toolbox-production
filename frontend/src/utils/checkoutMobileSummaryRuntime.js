@@ -1,5 +1,7 @@
 const MOBILE_CHECKOUT_SUMMARY_QUERY = '(max-width: 1023px)';
 const CHECKOUT_SUMMARY_AUTO_OPEN_DELAY_MS = 80;
+const CHECKOUT_SUMMARY_VERIFY_DELAY_MS = 140;
+const CHECKOUT_SUMMARY_MAX_OPEN_ATTEMPTS = 8;
 
 function isCheckoutPage() {
   if (typeof window === 'undefined') return false;
@@ -29,9 +31,28 @@ export function installMobileCheckoutSummaryAutoOpen() {
   if (typeof window === 'undefined' || typeof document === 'undefined') return;
 
   const openedRouteKeys = new Set();
+  const routeAttempts = new Map();
   let scheduled = 0;
 
-  const openSummaryForCurrentRoute = () => {
+  const scheduleOpen = () => {
+    if (scheduled) return;
+    scheduled = window.setTimeout(openSummaryForCurrentRoute, CHECKOUT_SUMMARY_AUTO_OPEN_DELAY_MS);
+  };
+
+  const markRouteOpenIfConfirmed = (routeKey) => {
+    if (!isCheckoutPage() || !isMobileCheckoutViewport()) return;
+
+    const toggle = findMobileOrderSummaryToggle();
+    if (toggle?.getAttribute('aria-expanded') === 'true') {
+      openedRouteKeys.add(routeKey);
+      routeAttempts.delete(routeKey);
+      return;
+    }
+
+    scheduleOpen();
+  };
+
+  function openSummaryForCurrentRoute() {
     scheduled = 0;
 
     if (!isCheckoutPage() || !isMobileCheckoutViewport()) return;
@@ -42,18 +63,20 @@ export function installMobileCheckoutSummaryAutoOpen() {
     const toggle = findMobileOrderSummaryToggle();
     if (!toggle) return;
 
-    const expanded = toggle.getAttribute('aria-expanded') === 'true';
-    openedRouteKeys.add(routeKey);
-
-    if (!expanded) {
-      toggle.click();
+    if (toggle.getAttribute('aria-expanded') === 'true') {
+      openedRouteKeys.add(routeKey);
+      routeAttempts.delete(routeKey);
+      return;
     }
-  };
 
-  const scheduleOpen = () => {
-    if (scheduled) return;
-    scheduled = window.setTimeout(openSummaryForCurrentRoute, CHECKOUT_SUMMARY_AUTO_OPEN_DELAY_MS);
-  };
+    const attempts = (routeAttempts.get(routeKey) || 0) + 1;
+    routeAttempts.set(routeKey, attempts);
+
+    if (attempts > CHECKOUT_SUMMARY_MAX_OPEN_ATTEMPTS) return;
+
+    toggle.click();
+    window.setTimeout(() => markRouteOpenIfConfirmed(routeKey), CHECKOUT_SUMMARY_VERIFY_DELAY_MS);
+  }
 
   const wrapHistoryMethod = (methodName) => {
     const original = window.history?.[methodName];
