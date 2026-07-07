@@ -40,6 +40,11 @@ function stripHtml(html, maxLen = 72) {
     : plain;
 }
 
+function isNestedInteractiveTarget(target) {
+  return target instanceof Element
+    && Boolean(target.closest('button, a, input, select, textarea, [data-dtb-card-action]'));
+}
+
 export default function StorefrontProductTile({
   product,
   cardProduct,
@@ -99,6 +104,7 @@ export default function StorefrontProductTile({
   const productUrl = slug ? `/products/${slug}` : null;
 
   const isMobile = useIsMobile();
+  const showDesktopOverlay = !isMobile && variant !== 'list';
   const [overlayActive, setOverlayActive] = useState(false);
   const [overlayHasFocus, setOverlayHasFocus] = useState(false);
   const cardRef = useRef(null);
@@ -128,48 +134,50 @@ export default function StorefrontProductTile({
     return () => document.removeEventListener('pointerdown', handler);
   }, [overlayActive, isMobile]);
 
-  const handleImageClick = useCallback(() => {
-    if (variant === 'list') {
-      if (productUrl) navigate(productUrl);
-      return;
-    }
+  const openModalFromMobileCard = useCallback((event) => {
+    if (!isMobile || event?.defaultPrevented || isNestedInteractiveTarget(event?.target)) return;
 
-    if (!isMobile) {
-      if (productUrl) navigate(productUrl);
-      return;
-    }
+    closeOverlay();
+    onOpenModal?.();
+  }, [closeOverlay, isMobile, onOpenModal]);
 
-    if (overlayActive) {
+  const handleImageClick = useCallback((event) => {
+    event?.stopPropagation();
+
+    if (isMobile) {
       closeOverlay();
-
-      if (productUrl) navigate(productUrl);
-
+      onOpenModal?.();
       return;
     }
 
-    setOverlayActive(true);
-  }, [closeOverlay, isMobile, navigate, overlayActive, productUrl, variant]);
+    if (productUrl) navigate(productUrl);
+  }, [closeOverlay, isMobile, navigate, onOpenModal, productUrl]);
 
   const handleMouseEnter = useCallback(() => {
-    if (!isMobile) setOverlayActive(true);
-  }, [isMobile]);
+    if (showDesktopOverlay) setOverlayActive(true);
+  }, [showDesktopOverlay]);
 
   const handleMouseLeave = useCallback(() => {
-    if (!isMobile) closeOverlay();
-  }, [closeOverlay, isMobile]);
+    if (showDesktopOverlay) closeOverlay();
+  }, [closeOverlay, showDesktopOverlay]);
 
-  const handleCardInteract = useCallback((fallback) => (e) => {
-    if (isMobile && overlayActive) {
-      e.stopPropagation();
-      closeOverlay();
+  const handleTitleClick = useCallback((event) => {
+    event.stopPropagation();
+    closeOverlay();
 
+    if (isMobile) {
       if (productUrl) navigate(productUrl);
-
       return;
     }
 
-    fallback?.(e);
-  }, [closeOverlay, isMobile, navigate, overlayActive, productUrl]);
+    onOpenModal?.();
+  }, [closeOverlay, isMobile, navigate, onOpenModal, productUrl]);
+
+  const handleAddButtonClick = useCallback((event) => {
+    event.stopPropagation();
+    closeOverlay();
+    onAddToCart?.();
+  }, [closeOverlay, onAddToCart]);
 
   const handleQuickView = useCallback((e) => {
     e.stopPropagation();
@@ -194,6 +202,7 @@ export default function StorefrontProductTile({
       style={{ '--dtb-card-delay': `${Math.min(index, 8) * 30}ms` }}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
+      onClick={openModalFromMobileCard}
     >
       <div
         ref={imageButtonRef}
@@ -205,10 +214,10 @@ export default function StorefrontProductTile({
           if (e.target !== e.currentTarget) return;
           if (e.key === 'Enter' || e.key === ' ') {
             e.preventDefault();
-            handleImageClick();
+            handleImageClick(e);
           }
         }}
-        aria-label={`View ${name}`}
+        aria-label={isMobile ? `Quick view ${name}` : `View ${name}`}
       >
         {outOfStock && (
           <span className={`dtb-product-card__badge dtb-product-card__badge--out ${badgePositionClass}`}>
@@ -241,7 +250,7 @@ export default function StorefrontProductTile({
           eager={index < 4}
         />
 
-        {variant !== 'list' && (
+        {showDesktopOverlay && (
           <div
             ref={overlayRef}
             aria-hidden={!overlayActive && !overlayHasFocus}
@@ -268,26 +277,13 @@ export default function StorefrontProductTile({
                 aria-label={`Quick view ${name}`}
               >
                 <Eye size={14} strokeWidth={2.2} />
-                {!isMobile && <span>Quick View</span>}
+                <span>Quick View</span>
               </button>
-
-              {!isVariable && isMobile && (
-                <button
-                  type="button"
-                  disabled={outOfStock}
-                  tabIndex={overlayActive ? 0 : -1}
-                  className={`dtb-product-card__qv-btn dtb-product-card__qv-btn--icon-only${outOfStock ? ' dtb-product-card__qv-btn--disabled' : ''}`}
-                  onClick={outOfStock ? (e) => e.stopPropagation() : handleOverlayAddToCart}
-                  aria-label={outOfStock ? `${name} is out of stock` : `Add ${name} to cart`}
-                >
-                  <ShoppingCart size={15} strokeWidth={2.2} />
-                </button>
-              )}
             </div>
           </div>
         )}
 
-        {variant !== 'list' && (
+        {showDesktopOverlay && (
           <div className="dtb-product-card__inside" aria-hidden="true">
             <div className="dtb-product-card__inside-icon">
               <Info size={18} strokeWidth={2.4} />
@@ -318,9 +314,10 @@ export default function StorefrontProductTile({
 
         <button
           type="button"
-          onClick={handleCardInteract(onOpenModal)}
+          onClick={handleTitleClick}
           className="dtb-product-card__name"
-          aria-label={`View product details for ${name}`}
+          data-dtb-card-action="title"
+          aria-label={isMobile ? `Open full page for ${name}` : `View product details for ${name}`}
         >
           {name}
         </button>
@@ -348,9 +345,10 @@ export default function StorefrontProductTile({
           {!isVariable && (
             <button
               type="button"
-              onClick={handleCardInteract(onAddToCart)}
+              onClick={handleAddButtonClick}
               disabled={outOfStock}
               className={`dtb-product-card__action${isMobile ? ' dtb-product-card__action--hidden-mobile' : ''}`}
+              data-dtb-card-action="add"
               aria-label={`Add ${name} to cart`}
             >
               <ShoppingCart size={14} />
