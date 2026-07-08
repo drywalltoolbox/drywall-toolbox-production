@@ -496,6 +496,7 @@ function dtb_auth_login( WP_REST_Request $request ): WP_REST_Response {
 			'first_name'   => (string) get_user_meta( $user->ID, 'first_name', true ),
 			'last_name'    => (string) get_user_meta( $user->ID, 'last_name', true ),
 			'roles'        => array_values( (array) $user->roles ),
+			'registered'   => $user->user_registered,
 		],
 	], 200 );
 	$response->header( 'Cache-Control', 'private, no-store' );
@@ -678,6 +679,7 @@ function dtb_auth_register( WP_REST_Request $request ): WP_REST_Response {
 			'first_name'   => (string) get_user_meta( $user->ID, 'first_name', true ),
 			'last_name'    => (string) get_user_meta( $user->ID, 'last_name', true ),
 			'roles'        => array_values( (array) $user->roles ),
+			'registered'   => $user->user_registered,
 		],
 	], 201 );
 	$response->header( 'Cache-Control', 'private, no-store' );
@@ -952,6 +954,7 @@ function dtb_auth_validate( WP_REST_Request $request ): WP_REST_Response {
 			'first_name'   => (string) get_user_meta( $user->ID, 'first_name', true ),
 			'last_name'    => (string) get_user_meta( $user->ID, 'last_name', true ),
 			'roles'        => array_values( (array) $user->roles ),
+			'registered'   => $user->user_registered,
 		],
 	], 200 );
 	$response->header( 'Cache-Control', 'private, no-store' );

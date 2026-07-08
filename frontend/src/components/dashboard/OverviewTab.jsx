@@ -85,7 +85,8 @@ function ActivitySection({ title, icon: Icon, color, bg, items, emptyText, onVie
 }
 
 export default function OverviewTab( { user, orders, repairs = [], returns = [], supportTickets = [], ordersLoading, onTabChange } ) {
-  const displayName = [ user.first_name, user.last_name ].filter( Boolean ).join( ' ' ) || user.email;
+  const nameParts = [ user.first_name, user.last_name ].filter( Boolean ).join( ' ' );
+  const displayName = nameParts || user.display_name || user.email;
 
   const repairOrders   = orders.filter(isRepairOrder);
   const productOrders  = orders.filter((order) => !isRepairOrder(order));
@@ -134,7 +135,7 @@ export default function OverviewTab( { user, orders, repairs = [], returns = [],
           { [
             { label: 'Full Name',    value: displayName },
             { label: 'Email',        value: user.email  },
-            { label: 'Account Type', value: user.role || '—' },
+            { label: 'Account Type', value: ( user.roles?.[0] || '' ).replace( /_/g, ' ' ).replace( /\b\w/g, ( c ) => c.toUpperCase() ) || '—' },
             { label: 'Member Since', value: user.registered
                 ? new Date( user.registered ).toLocaleDateString( 'en-US', { year: 'numeric', month: 'long' } ) : '—' },
           ].map( ( row ) => (
