@@ -37,7 +37,7 @@ const DISPLAY_CATEGORY_LABELS = {
   nail_spotters:         'Nail Spotters',
   finishing_boxes:       'Finishing Boxes',
   handles:               'Handles & Extensions',
-  pumps:                 'Pumps',
+  pumps:                 'Mud Pans & Pumps',
   corner_tools:          'Corner Tools',
   accessories:           'Accessories',
   smoothing_blades:      'Smoothing Blades',
