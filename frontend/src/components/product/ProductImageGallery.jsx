@@ -165,6 +165,8 @@ function collectVariationImageMeta(product = {}) {
     explicitVariationImages.forEach((image) => pushUniqueImage(out, seen, image));
     push(product?.media?.image);
     push(product?.image);
+    if (Array.isArray(product?.media?.images)) product.media.images.forEach((image) => push(image));
+    if (Array.isArray(product?.images)) product.images.forEach((image) => push(image));
     return out;
   }
 

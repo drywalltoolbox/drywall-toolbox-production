@@ -442,7 +442,9 @@ function getEffectiveVariationImages(parentProduct, selectedVariation) {
 
   return mergeProductImages(
     selectedImages,
+    Array.isArray(parentProduct?.media?.images) ? parentProduct.media.images : [],
     Array.isArray(parentProduct?.images) ? parentProduct.images : [],
+    parentProduct?.media?.image ? [parentProduct.media.image] : [],
     parentProduct?.image ? [parentProduct.image] : []
   );
 }
@@ -461,8 +463,8 @@ function composeEffectiveVariationProduct(parentProduct, selectedVariation, sele
     description: selectedVariation.description || parentProduct.description,
     description_full: selectedVariation.description_full || parentProduct.description_full,
     short_description: selectedVariation.short_description || parentProduct.short_description,
-    images: images.length > 0 ? images : parentProduct.images,
-    image: selectedVariation.image || images[0] || parentProduct.image,
+    images: images.length > 0 ? images : (parentProduct.images || parentProduct?.media?.images),
+    image: selectedVariation.image || images[0] || parentProduct?.media?.image || parentProduct.image,
     name,
   };
 }
