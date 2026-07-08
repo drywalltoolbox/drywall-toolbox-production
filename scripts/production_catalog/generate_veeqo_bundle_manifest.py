@@ -45,15 +45,16 @@ def read_veeqo_skus() -> set[str]:
         }
 
 
-def parse_component_name(raw_name: str) -> tuple[float, str]:
-    name = raw_name.strip()
-    match = QTY_RE.match(name)
-    if not match:
-        return 1.0, name
+def parse_component_name(raw_name: str) -> tuple[str, str]:
+	name = raw_name.strip()
+	match = QTY_RE.match(name)
+	if not match:
+		return "1", name
 
-    qty = float(match.group("qty"))
-    clean_name = match.group("name").strip()
-    return qty, clean_name
+	qty_raw = match.group("qty")
+	qty = str(int(float(qty_raw))) if float(qty_raw).is_integer() else qty_raw
+	clean_name = match.group("name").strip()
+	return qty, clean_name
 
 
 def split_component_skus(raw_sku: str) -> list[str]:
