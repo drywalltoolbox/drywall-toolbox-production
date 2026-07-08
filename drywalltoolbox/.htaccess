@@ -62,6 +62,9 @@ ErrorDocument 511 /errors/511.html
   # Preserve Authorization headers for PHP/WordPress auth handlers.
   RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
 
+  # Bridge2Cart / Veeqo bridge — serve directly, skip all rewrites.
+  RewriteRule ^bridge2cart/ - [L]
+
   # Force HTTPS in production.
   RewriteCond %{HTTPS} off
   RewriteCond %{HTTP_HOST} !^localhost$ [NC]

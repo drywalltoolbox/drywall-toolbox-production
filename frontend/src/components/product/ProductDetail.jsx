@@ -433,15 +433,33 @@ function mergeProductImages(...sets) {
 }
 
 function getEffectiveVariationImages(parentProduct, selectedVariation) {
+  // Prefer explicit SKU-resolved gallery from the backend (variationGalleryImages
+  // is set by VariationReadModelService.enrich_variation_gallery when the catalog
+  // image manifest knows about this variation's image set).
+  const explicitGallery = Array.isArray(selectedVariation?.variationGalleryImages)
+    ? selectedVariation.variationGalleryImages
+    : Array.isArray(selectedVariation?.media?.variationImages)
+      ? selectedVariation.media.variationImages
+      : null;
+
+  if (explicitGallery && explicitGallery.length > 0) {
+    return mergeProductImages(explicitGallery);
+  }
+
+  // Collect whatever WooCommerce has on the variation object itself.
   const selectedImages = mergeProductImages(
     Array.isArray(selectedVariation?.images) ? selectedVariation.images : [],
     selectedVariation?.image ? [selectedVariation.image] : []
   );
 
-  if (selectedImages.length > 1) return selectedImages;
+  // If the variation has its own images (even just 1), use only those — do NOT
+  // merge the whole parent gallery in. The "1/15" bug happened because the old
+  // threshold (> 1) caused token-based matching against all 15 parent images for
+  // any variation that only had a single WooCommerce-set image.
+  if (selectedImages.length > 0) return selectedImages;
 
+  // Variation has zero images — fall back to full parent gallery.
   return mergeProductImages(
-    selectedImages,
     Array.isArray(parentProduct?.media?.images) ? parentProduct.media.images : [],
     Array.isArray(parentProduct?.images) ? parentProduct.images : [],
     parentProduct?.media?.image ? [parentProduct.media.image] : [],
@@ -465,6 +483,7 @@ function composeEffectiveVariationProduct(parentProduct, selectedVariation, sele
     short_description: selectedVariation.short_description || parentProduct.short_description,
     images: images.length > 0 ? images : (parentProduct.images || parentProduct?.media?.images),
     image: selectedVariation.image || images[0] || parentProduct?.media?.image || parentProduct.image,
+    variationGalleryImages: selectedVariation.variationGalleryImages || selectedVariation?.media?.variationImages || [],
     name,
   };
 }

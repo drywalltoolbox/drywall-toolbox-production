@@ -132,18 +132,30 @@ function variationImageTokens(product = {}) {
   const tokens = new Set();
   const sku = product?.sku || product?.part_number || product?.partNumber || '';
 
+  // SKU-based tokens — most reliable discriminator.
   addToken(tokens, sku);
   addToken(tokens, String(sku).replace(/-/g, '_'));
   addToken(tokens, String(sku).replace(/-/g, ''));
 
-  const variationLabel = product?.variation_label || product?.variationLabel || product?.variation?.label || product?.variation?.value || '';
+  // Variation label (e.g. "Carbon Fiber", "3.5\"") — but NOT product name words.
+  // Adding product name words caused "TapeTech", "EasyClean", "Taper", etc. to
+  // match every image in the parent gallery, producing the "1/15" bloat.
+  const variationLabel = product?.variation_label || product?.variationLabel
+    || product?.variation?.label || product?.variation?.value || '';
   addWords(tokens, variationLabel);
 
+  // Variation axis attribute values only (e.g. "Carbon Fiber", "Mini-Taper").
+  // Explicitly skip attribute names (e.g. "Model", "Size") which are too generic.
   if (Array.isArray(product?.variation_attribute_values)) {
-    product.variation_attribute_values.forEach((entry) => addWords(tokens, entry?.option || entry?.value || entry?.label || ''));
+    product.variation_attribute_values.forEach((entry) => {
+      addWords(tokens, entry?.option || entry?.value || '');
+    });
   }
   if (Array.isArray(product?.attributes)) {
-    product.attributes.forEach((entry) => addWords(tokens, entry?.option || entry?.value || entry?.label || ''));
+    product.attributes.forEach((entry) => {
+      // Only use the option/value, never the attribute name key.
+      addWords(tokens, entry?.option || entry?.value || '');
+    });
   }
 
   return Array.from(tokens).filter(Boolean);
@@ -160,39 +172,57 @@ function collectVariationImageMeta(product = {}) {
   const seen = new Set();
   const push = (image) => pushUniqueImage(out, seen, normalizeImageMeta(image, product, out.length));
 
+  // Path 1 — explicit variation gallery from the backend (highest priority).
+  // VariationReadModelService.enrich_variation_gallery() populates these when the
+  // catalog image manifest resolves a SKU-specific image set.
   const explicitVariationImages = collectExplicitVariationImages(product);
   if (explicitVariationImages.length > 0) {
     explicitVariationImages.forEach((image) => pushUniqueImage(out, seen, image));
-    push(product?.media?.image);
-    push(product?.image);
-    if (Array.isArray(product?.media?.images)) product.media.images.forEach((image) => push(image));
-    if (Array.isArray(product?.images)) product.images.forEach((image) => push(image));
     return out;
   }
 
+  // Path 2 — WooCommerce persisted images[] on the variation object itself.
+  // This is populated when dtb-media LinkImagesToProducts runs for the variation.
+  // Use these directly without pulling in anything from the parent.
+  if (Array.isArray(product?.images) && product.images.length > 0) {
+    product.images.forEach((image) => push(image));
+    if (out.length > 0) return out;
+  }
+  if (Array.isArray(product?.media?.images) && product.media.images.length > 0) {
+    product.media.images.forEach((image) => push(image));
+    if (out.length > 0) return out;
+  }
+
+  // Path 3 — Token-based fallback against the merged candidate pool.
+  // Only reached when the variation has no explicit gallery AND no WC images[].
+  // Tokens are SKU + variation label/attribute values only (NOT product name words).
   const candidates = [];
   const candidateSeen = new Set();
   const pushCandidate = (image) => pushUniqueImage(candidates, candidateSeen, normalizeImageMeta(image, product, candidates.length));
-  const pushCandidateArray = (images = []) => {
-    if (!Array.isArray(images)) return;
-    images.forEach((image) => pushCandidate(image));
-  };
 
-  pushCandidateArray(product?.media?.images);
-  pushCandidateArray(product?.images);
+  // Add the variation's own primary image first, then the parent pool for matching.
+  push(product?.media?.image);
+  push(product?.image);
   pushCandidate(product?.media?.image);
   pushCandidate(product?.image);
 
-  const selectedImageKey = imageIdentity(normalizeImageMeta(product?.image || product?.media?.image, product)?.src || '');
   const tokens = variationImageTokens(product);
+  if (tokens.length > 0) {
+    candidates.forEach((image) => {
+      if (imageMatchesVariation(image, tokens)) {
+        pushUniqueImage(out, seen, image);
+      }
+    });
 
-  candidates.forEach((image) => {
-    const isSelectedImage = selectedImageKey && imageIdentity(image.src) === selectedImageKey;
-    if (isSelectedImage || imageMatchesVariation(image, tokens)) {
-      pushUniqueImage(out, seen, image);
+    // Ensure the primary image is always included even if tokens didn't match it.
+    if (out.length === 0) {
+      push(product?.media?.image);
+      push(product?.image);
     }
-  });
+    return out;
+  }
 
+  // Path 4 — absolute fallback: just the primary image.
   if (out.length === 0) {
     push(product?.media?.image);
     push(product?.image);
