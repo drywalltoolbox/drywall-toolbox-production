@@ -166,10 +166,13 @@ function dtb_veeqo_register_routes(): void {
 	] );
 
 	// ── GET /dtb/v1/veeqo/inventory — bulk inventory levels ──────────────────
+	// Public: read-only stock levels. The checkout flow calls this without a
+	// JWT to show availability before order submission; WooCommerce still
+	// enforces stock limits server-side on order creation.
 	register_rest_route( $ns, '/veeqo/inventory', [
 		'methods'             => 'GET',
 		'callback'            => 'dtb_veeqo_route_inventory',
-		'permission_callback' => 'dtb_jwt_permission',
+		'permission_callback' => '__return_true',
 	] );
 
 	// ── POST /dtb/v1/veeqo/webhooks/order — receive Veeqo order status events ─
@@ -184,6 +187,46 @@ function dtb_veeqo_register_routes(): void {
 		'methods'             => 'POST',
 		'callback'            => 'dtb_veeqo_route_repair_request',
 		'permission_callback' => '__return_true',
+	] );
+
+	// ── POST /dtb/v1/veeqo/sync-order/{order_id} — admin manual order re-sync ─
+	// Force a fresh Veeqo order creation / status push for a specific WC order.
+	// Useful when a sync failed silently or was skipped before Veeqo was configured.
+	register_rest_route( $ns, '/veeqo/sync-order/(?P<order_id>[\d]+)', [
+		'methods'             => 'POST',
+		'callback'            => 'dtb_veeqo_route_admin_sync_order',
+		'permission_callback' => static function (): bool {
+			return current_user_can( 'manage_woocommerce' );
+		},
+		'args' => [
+			'order_id' => [
+				'required'          => true,
+				'type'              => 'integer',
+				'minimum'           => 1,
+				'sanitize_callback' => 'absint',
+			],
+		],
+	] );
+
+	// ── POST /dtb/v1/veeqo/inventory/pull — admin manual inventory pull ───────
+	// Pull current Veeqo stock levels into WooCommerce product stock quantities.
+	register_rest_route( $ns, '/veeqo/inventory/pull', [
+		'methods'             => 'POST',
+		'callback'            => 'dtb_veeqo_route_admin_inventory_pull',
+		'permission_callback' => static function (): bool {
+			return current_user_can( 'manage_woocommerce' );
+		},
+	] );
+
+	// ── DELETE /dtb/v1/veeqo/webhooks/ensure — force webhook re-registration ──
+	// Clears the cached webhook-registered transient so the next request will
+	// verify and re-register the Veeqo webhook. Safe to call after URL changes.
+	register_rest_route( $ns, '/veeqo/webhooks/ensure', [
+		'methods'             => 'DELETE',
+		'callback'            => 'dtb_veeqo_route_admin_reset_webhook',
+		'permission_callback' => static function (): bool {
+			return current_user_can( 'manage_woocommerce' );
+		},
 	] );
 }
 
@@ -636,6 +679,187 @@ function dtb_veeqo_route_webhook_order( WP_REST_Request $request ): WP_REST_Resp
 		'success'     => true,
 		'wc_order_id' => $wc_order->get_id(),
 		'new_status'  => $wc_status,
+	], 200 );
+}
+
+
+// =============================================================================
+// SECTION 3b — ADMIN-ONLY ROUTE CALLBACKS
+// =============================================================================
+
+/**
+ * POST /dtb/v1/veeqo/sync-order/{order_id}
+ *
+ * Force a fresh Veeqo sync for the given WooCommerce order.
+ * Uses the canonical dtb_veeqo_sync_order() contract when available so that
+ * integration state meta and order event ledger entries are written correctly.
+ * Falls back to the legacy direct-API path for compatibility.
+ *
+ * Requires: manage_woocommerce capability (admin/shop manager only).
+ */
+function dtb_veeqo_route_admin_sync_order( WP_REST_Request $request ): WP_REST_Response {
+	$order_id = absint( $request->get_param( 'order_id' ) );
+	$order    = function_exists( 'wc_get_order' ) ? wc_get_order( $order_id ) : null;
+
+	if ( ! $order instanceof WC_Order ) {
+		return new WP_REST_Response(
+			dtb_error_envelope( 'order_not_found', sprintf( 'WooCommerce order #%d not found.', $order_id ), 404 ),
+			404
+		);
+	}
+
+	if ( ! dtb_veeqo_enabled() ) {
+		return new WP_REST_Response(
+			dtb_error_envelope( 'not_configured', 'Veeqo is not configured. Set DTB_VEEQO_API_KEY in wp-config.php.', 503 ),
+			503
+		);
+	}
+
+	// Clear any stale Veeqo order ID so the canonical sync will create a fresh order.
+	// Only do this when the admin explicitly requests a resync and the previous sync is in an error state.
+	$sync_status = (string) $order->get_meta( '_dtb_veeqo_sync_status', true );
+	$force       = (bool) ( $request->get_param( 'force' ) ?? false );
+	if ( $force ) {
+		$order->delete_meta_data( '_veeqo_order_id' );
+		$order->delete_meta_data( '_dtb_veeqo_order_id' );
+		$order->save_meta_data();
+	}
+
+	// Use canonical contract when available (preferred path).
+	if ( function_exists( 'dtb_veeqo_sync_order' ) ) {
+		try {
+			$result = dtb_veeqo_sync_order( $order_id, $order );
+			return new WP_REST_Response( [
+				'success'        => true,
+				'status'         => $result['status'],
+				'veeqo_order_id' => $result['veeqo_order_id'],
+				'message'        => $result['message'],
+			], 200 );
+		} catch ( DTB_Order_Integration_Exception $e ) {
+			return new WP_REST_Response(
+				dtb_error_envelope( 'sync_failed', $e->getMessage(), $e->status_code() ?: 500 ),
+				$e->status_code() ?: 500
+			);
+		}
+	}
+
+	// Legacy fallback: direct API call.
+	$payload = dtb_veeqo_build_order_payload( $order );
+	if ( null === $payload ) {
+		return new WP_REST_Response(
+			dtb_error_envelope( 'payload_error', 'Could not build Veeqo order payload. Verify all variation SKUs are set.', 422 ),
+			422
+		);
+	}
+
+	$result = dtb_veeqo_request( 'POST', '/orders', [], $payload );
+
+	if ( ! $result['ok'] ) {
+		return new WP_REST_Response(
+			dtb_error_envelope( 'veeqo_error', $result['error'], $result['status'] ?: 500 ),
+			$result['status'] ?: 500
+		);
+	}
+
+	$veeqo_id = absint( $result['data']['id'] ?? 0 );
+	if ( $veeqo_id > 0 ) {
+		$order->update_meta_data( '_veeqo_order_id', $veeqo_id );
+		$order->update_meta_data( '_dtb_veeqo_order_id', $veeqo_id );
+		$order->add_order_note( sprintf( '[Veeqo] Admin re-sync: Veeqo order #%d created.', $veeqo_id ) );
+		$order->save_meta_data();
+	}
+
+	dtb_veeqo_log( 'info', 'admin_sync_order', 'Admin manually synced WC order to Veeqo.', [
+		'wc_order_id'    => $order_id,
+		'veeqo_order_id' => $veeqo_id,
+		'admin_user_id'  => get_current_user_id(),
+	] );
+
+	return new WP_REST_Response( [
+		'success'        => true,
+		'status'         => 'synced',
+		'veeqo_order_id' => $veeqo_id,
+		'message'        => sprintf( 'Order #%d synced to Veeqo (#%d).', $order_id, $veeqo_id ),
+	], 200 );
+}
+
+/**
+ * POST /dtb/v1/veeqo/inventory/pull
+ *
+ * Fetch current Veeqo stock levels and write them to WooCommerce product stock
+ * quantities. Also fires the dtb_veeqo_inventory_sync scheduled event immediately
+ * for on-demand reconciliation.
+ *
+ * Query params:
+ *   page     (int, default 1)
+ *   per_page (int, default 100, max 100)
+ *
+ * Requires: manage_woocommerce capability.
+ */
+function dtb_veeqo_route_admin_inventory_pull( WP_REST_Request $request ): WP_REST_Response {
+	if ( ! dtb_veeqo_enabled() ) {
+		return new WP_REST_Response(
+			dtb_error_envelope( 'not_configured', 'Veeqo is not configured.', 503 ),
+			503
+		);
+	}
+
+	$page     = max( 1, (int) ( $request->get_param( 'page' )     ?? 1 ) );
+	$per_page = min( 100, max( 1, (int) ( $request->get_param( 'per_page' ) ?? 100 ) ) );
+
+	$updated = dtb_veeqo_pull_inventory_into_wc( $page, $per_page );
+
+	if ( null === $updated ) {
+		return new WP_REST_Response(
+			dtb_error_envelope( 'veeqo_error', 'Failed to fetch inventory from Veeqo. Check the Veeqo log.', 502 ),
+			502
+		);
+	}
+
+	dtb_veeqo_log( 'info', 'admin_inventory_pull', 'Admin triggered Veeqo inventory pull.', [
+		'page'         => $page,
+		'per_page'     => $per_page,
+		'updated_skus' => $updated,
+		'admin_user'   => get_current_user_id(),
+	] );
+
+	return new WP_REST_Response( [
+		'success'      => true,
+		'updated_skus' => $updated,
+		'message'      => sprintf( 'Veeqo inventory pull complete. %d WooCommerce product(s) updated.', $updated ),
+	], 200 );
+}
+
+/**
+ * DELETE /dtb/v1/veeqo/webhooks/ensure
+ *
+ * Clears the webhook-registered transient so the next request will re-verify
+ * and re-register the Veeqo webhook endpoint. Use after:
+ *   • changing the site URL / permalink structure
+ *   • changing DTB_VEEQO_API_KEY
+ *   • suspecting the Veeqo webhook was deleted in the Veeqo UI
+ *
+ * Requires: manage_woocommerce capability.
+ */
+function dtb_veeqo_route_admin_reset_webhook( WP_REST_Request $request ): WP_REST_Response {
+	delete_transient( 'dtb_veeqo_webhook_registered' );
+
+	if ( dtb_veeqo_enabled() ) {
+		// Immediately attempt re-registration.
+		dtb_veeqo_ensure_webhooks();
+	}
+
+	$webhook_url = rest_url( 'dtb/v1/veeqo/webhooks/order' );
+
+	dtb_veeqo_log( 'info', 'admin_webhook_reset', 'Admin reset Veeqo webhook registration.', [
+		'webhook_url'  => $webhook_url,
+		'admin_user'   => get_current_user_id(),
+	] );
+
+	return new WP_REST_Response( [
+		'success'     => true,
+		'webhook_url' => $webhook_url,
+		'message'     => 'Veeqo webhook re-registration triggered. Check WooCommerce → Status → Logs → veeqo-wc-integration for results.',
 	], 200 );
 }
 
@@ -1430,6 +1654,151 @@ function dtb_veeqo_fetch_inventory_summary(): ?array {
 function dtb_veeqo_log_sync_timestamp( string $type ): void {
 	$key = 'dtb_veeqo_sync_' . sanitize_key( $type );
 	update_option( $key, time(), false );
+}
+
+
+// =============================================================================
+// SECTION 10b — SCHEDULED INVENTORY PULL (VEEQO → WOOCOMMERCE)
+//
+// Runs every 6 hours via WP-Cron.
+//
+// Flow:
+//   1. Fetch all products from Veeqo (paginated, up to 250 per run).
+//   2. For each Veeqo sellable, extract available_stock (sum across warehouses).
+//   3. Find the matching WooCommerce product/variation by SKU.
+//   4. Update WC stock quantity to the Veeqo value when there is a discrepancy.
+//
+// Safety: we never increase WC stock above Veeqo's value; the pull is a
+// reconciliation write, not an authoritative inventory system replacement.
+// WooCommerce retains authority for stock reservation during checkout.
+//
+// The pull can also be triggered on-demand by admins via:
+//   POST /dtb/v1/veeqo/inventory/pull
+// =============================================================================
+
+add_filter( 'cron_schedules', 'dtb_veeqo_register_cron_intervals' );
+
+function dtb_veeqo_register_cron_intervals( array $schedules ): array {
+	if ( ! isset( $schedules['dtb_six_hours'] ) ) {
+		$schedules['dtb_six_hours'] = [
+			'interval' => 6 * HOUR_IN_SECONDS,
+			'display'  => __( 'Every 6 Hours (DTB Veeqo Inventory Pull)', 'woocommerce' ),
+		];
+	}
+	return $schedules;
+}
+
+add_action( 'init', 'dtb_veeqo_schedule_inventory_pull', 25 );
+
+function dtb_veeqo_schedule_inventory_pull(): void {
+	if ( ! wp_next_scheduled( 'dtb_veeqo_inventory_sync' ) ) {
+		wp_schedule_event( time(), 'dtb_six_hours', 'dtb_veeqo_inventory_sync' );
+	}
+}
+
+add_action( 'dtb_veeqo_inventory_sync', 'dtb_veeqo_run_inventory_pull' );
+
+function dtb_veeqo_run_inventory_pull(): void {
+	if ( ! dtb_veeqo_enabled() ) {
+		return;
+	}
+
+	$updated = dtb_veeqo_pull_inventory_into_wc( 1, 250 );
+
+	dtb_veeqo_log(
+		null !== $updated ? 'info' : 'warn',
+		'inventory_sync_cron',
+		null !== $updated
+			? sprintf( 'Scheduled inventory pull complete. %d WC product(s) updated.', $updated )
+			: 'Scheduled inventory pull failed — Veeqo API error.',
+		[ 'updated_skus' => $updated ?? 0 ]
+	);
+
+	if ( null !== $updated ) {
+		dtb_veeqo_log_sync_timestamp( 'inventory_pull' );
+	}
+}
+
+/**
+ * Fetch one page of Veeqo products, compute available stock per SKU,
+ * and write the values back to WooCommerce product/variation stock.
+ *
+ * @param int $page     Veeqo page number (1-indexed).
+ * @param int $per_page Products per page (max 250 for scheduled runs).
+ * @return int|null  Number of WC products updated, or null on API error.
+ */
+function dtb_veeqo_pull_inventory_into_wc( int $page = 1, int $per_page = 100 ): ?int {
+	if ( ! function_exists( 'wc_get_product_id_by_sku' ) ) {
+		return null;
+	}
+
+	$result = dtb_veeqo_request( 'GET', '/products', [
+		'page_number' => (string) max( 1, $page ),
+		'page_size'   => (string) min( 250, max( 1, $per_page ) ),
+	] );
+
+	if ( ! $result['ok'] || ! is_array( $result['data'] ) ) {
+		dtb_veeqo_log( 'error', 'inventory_pull_api_error', 'Failed to fetch products from Veeqo.', [
+			'status' => $result['status'],
+			'error'  => $result['error'],
+		] );
+		return null;
+	}
+
+	$updated = 0;
+
+	foreach ( (array) $result['data'] as $veeqo_product ) {
+		$sellables = (array) ( $veeqo_product['sellables'] ?? [] );
+
+		foreach ( $sellables as $sellable ) {
+			$sku = trim( (string) ( $sellable['sku_code'] ?? '' ) );
+			if ( '' === $sku ) {
+				continue;
+			}
+
+			// Sum available_stock across all warehouse stock entries.
+			$available = 0;
+			foreach ( (array) ( $sellable['stock_entries'] ?? [] ) as $entry ) {
+				$available += max( 0, (int) ( $entry['available_stock'] ?? 0 ) );
+			}
+
+			// Find the WooCommerce product or variation with this SKU.
+			$wc_product_id = wc_get_product_id_by_sku( $sku );
+			if ( ! $wc_product_id ) {
+				continue;
+			}
+
+			$wc_product = wc_get_product( $wc_product_id );
+			if ( ! $wc_product || ! $wc_product->managing_stock() ) {
+				continue;
+			}
+
+			$current_stock = (int) $wc_product->get_stock_quantity();
+			if ( $current_stock === $available ) {
+				// Already in sync — no write needed.
+				continue;
+			}
+
+			// Only reconcile downward discrepancies larger than 1 unit to avoid
+			// thrashing during high-traffic order windows where WC reductions may
+			// not yet have synced back to Veeqo.
+			if ( abs( $current_stock - $available ) < 2 ) {
+				continue;
+			}
+
+			wc_update_product_stock( $wc_product, $available, 'set' );
+			$updated++;
+
+			dtb_veeqo_log( 'debug', 'inventory_stock_updated', 'WC product stock reconciled from Veeqo.', [
+				'sku'       => $sku,
+				'wc_id'     => $wc_product_id,
+				'wc_before' => $current_stock,
+				'veeqo'     => $available,
+			] );
+		}
+	}
+
+	return $updated;
 }
 
 

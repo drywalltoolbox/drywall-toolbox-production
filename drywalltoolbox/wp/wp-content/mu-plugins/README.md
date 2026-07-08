@@ -184,11 +184,14 @@ From `dtb-rewards.php`:
 - `POST /rewards/admin/adjust`
 
 From `dtb-veeqo.php`:
-- `GET /veeqo/status`
-- `POST /veeqo/shipping-rates`
-- `GET /veeqo/inventory`
-- `POST /veeqo/webhooks/order`
-- `POST /repair-request`
+- `GET /veeqo/status` (admin/JWT-gated)
+- `POST /veeqo/shipping-rates` (public — storefront checkout)
+- `GET /veeqo/inventory` (public — storefront inventory check)
+- `POST /veeqo/webhooks/order` (public — Veeqo HMAC-signed webhook receiver)
+- `POST /repair-request` (public — repair form submission)
+- `POST /veeqo/sync-order/{order_id}` (admin — manual order re-sync to Veeqo; requires `manage_woocommerce`)
+- `POST /veeqo/inventory/pull` (admin — pull Veeqo stock into WC; requires `manage_woocommerce`)
+- `DELETE /veeqo/webhooks/ensure` (admin — force webhook re-registration; requires `manage_woocommerce`)
 
 From `dtb-quickbooks.php`:
 - `GET /qbo/status`
@@ -271,7 +274,8 @@ From `dtb-ops-dashboard.php`:
   - `dtb_ops_audit_purge` daily
 
 - `dtb-veeqo.php`
-  - `dtb_veeqo_health_check` daily
+  - `dtb_veeqo_health_check` daily (API reachability; admin alert after 3 consecutive failures)
+  - `dtb_veeqo_inventory_sync` every 6 hours (pull Veeqo stock into WC product quantities via `dtb_veeqo_pull_inventory_into_wc()`)
 
 - `dtb-quickbooks.php`
   - `dtb_qbo_daily_sync` daily (when integration configured)
@@ -306,7 +310,7 @@ This section documents what the mu-plugin suite expects from `wp/wp-config.php`.
 
 ### 7.1 Present and configured (current file)
 
-The following constants are currently defined:
+The following constants are currently defined in `drywalltoolbox/wp/wp-config.php`:
 
 - Core DTB/WC/JWT/import:
   - `WC_PROXY_CONSUMER_KEY`
@@ -318,12 +322,14 @@ The following constants are currently defined:
   - `DRYWALL_JWT_SECRET`
   - `DRYWALL_ALLOWED_ORIGIN`
   - `DTB_DISABLE_PRODUCT_WEBHOOKS`
+  - `DTB_ADMIN_EMAIL`
 
 - Veeqo:
-  - `DTB_VEEQO_API_KEY`
-  - `DTB_VEEQO_WEBHOOK_SECRET`
-  - `DTB_VEEQO_WAREHOUSE_ID`
-  - `DTB_VEEQO_CHANNEL_ID`
+  - `DTB_VEEQO_API_KEY` ← **ACTION REQUIRED: fill in actual API key from Veeqo → Settings → API Keys**
+  - `DTB_VEEQO_WEBHOOK_SECRET` ← set to a default placeholder; update to match Veeqo webhook config
+  - `DTB_VEEQO_WAREHOUSE_ID` ← set to `0`; auto-discovered on first WC Settings → Integrations save
+  - `DTB_VEEQO_CHANNEL_ID` ← set to `0`; auto-discovered on first WC Settings → Integrations save
+  - `DTB_VEEQO_DEBUG` ← `false` (set `true` for verbose logging)
 
 - Platform hardening/perf:
   - `WP_ENVIRONMENT_TYPE`, `WP_DEBUG*`, memory limits, cron mode, SSL admin, file-edit constraints, cookie path overrides
