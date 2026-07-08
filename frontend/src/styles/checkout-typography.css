@@ -1,8 +1,8 @@
 @import "./mobile-responsive.css";
 
 .dtb-checkout {
-  --checkout-font: "Inter", "SF Pro Text", "SF Pro Display", "Segoe UI Variable", "Segoe UI", Roboto, "Helvetica Neue", Arial, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-  --checkout-display-font: "Inter", "SF Pro Display", "Segoe UI Variable", "Segoe UI", Roboto, "Helvetica Neue", Arial, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  --checkout-font: "Geist", "SF Pro Text", "SF Pro Display", "Segoe UI Variable", "Segoe UI", Roboto, "Helvetica Neue", Arial, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  --checkout-display-font: "Geist", "SF Pro Display", "Segoe UI Variable", "Segoe UI", Roboto, "Helvetica Neue", Arial, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
   --checkout-text: #0f172a;
   --checkout-muted: #64748b;
   --checkout-soft: #f8fafc;
@@ -11,7 +11,7 @@
   font-family: var(--checkout-font);
   font-size: 16px;
   font-synthesis-weight: none;
-  letter-spacing: -0.011em;
+  letter-spacing: 0;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -55,9 +55,9 @@
 .dtb-checkout .dtb-summary-panel h2 {
   font-family: var(--checkout-display-font);
   color: #0b1220;
-  font-weight: 850;
-  letter-spacing: -0.036em;
-  line-height: 1.04;
+  font-weight: 820;
+  letter-spacing: 0;
+  line-height: 1.08;
 }
 
 .dtb-checkout h1 {
@@ -76,7 +76,7 @@
 .dtb-checkout p {
   color: var(--checkout-muted);
   font-size: 0.93rem;
-  font-weight: 500;
+  font-weight: 520;
   line-height: 1.55;
 }
 
@@ -84,8 +84,8 @@
 .dtb-checkout .dtb-checkout-field-label {
   color: #64748b;
   font-size: 0.72rem;
-  font-weight: 850;
-  letter-spacing: 0.095em;
+  font-weight: 760;
+  letter-spacing: 0;
   line-height: 1.25;
   text-transform: uppercase;
 }
@@ -95,8 +95,8 @@
 .dtb-checkout textarea {
   color: #0f172a;
   font-size: 0.96rem;
-  font-weight: 650;
-  letter-spacing: -0.015em;
+  font-weight: 560;
+  letter-spacing: 0;
   line-height: 1.35;
 }
 
@@ -112,7 +112,7 @@
 
 .dtb-checkout button,
 .dtb-checkout a {
-  letter-spacing: -0.012em;
+  letter-spacing: 0;
 }
 
 .dtb-checkout .tabular-nums {
@@ -138,7 +138,7 @@
 
 .dtb-checkout-step-card [class*="font-bold"],
 .dtb-checkout-step-card [class*="font-black"] {
-  letter-spacing: -0.025em;
+  letter-spacing: 0;
 }
 
 .dtb-checkout .dtb-summary-panel {
@@ -156,25 +156,25 @@
 
 .dtb-checkout .dtb-summary-panel p,
 .dtb-checkout .dtb-summary-panel span {
-  letter-spacing: -0.012em;
+  letter-spacing: 0;
 }
 
 .dtb-checkout .dtb-summary-panel [class*="font-semibold"],
 .dtb-checkout .dtb-summary-panel [class*="font-bold"],
 .dtb-checkout .dtb-summary-panel [class*="font-black"] {
-  font-weight: 800;
+  font-weight: 760;
 }
 
 .dtb-checkout .dtb-summary-panel [class*="text-primary-600"],
 .dtb-checkout [class*="text-primary-600"].tabular-nums {
-  letter-spacing: -0.035em;
+  letter-spacing: 0;
 }
 
 .dtb-checkout .dtb-summary-panel [class*="line-clamp"],
 .dtb-checkout .dtb-summary-panel [class*="truncate"] {
   color: #111827;
-  font-weight: 750;
-  line-height: 1.28;
+  font-weight: 680;
+  line-height: 1.32;
 }
 
 .dtb-checkout input,
@@ -249,7 +249,7 @@
   .dtb-checkout {
     --checkout-mobile-submit-space: calc(11.5rem + env(safe-area-inset-bottom));
     font-size: 15.5px;
-    letter-spacing: -0.009em;
+    letter-spacing: 0;
   }
 
   .dtb-checkout > .dtb-checkout-frame:first-child {
@@ -306,14 +306,14 @@
   .dtb-checkout label,
   .dtb-checkout .dtb-checkout-field-label {
     font-size: 0.68rem;
-    letter-spacing: 0.085em;
+    letter-spacing: 0;
   }
 
   .dtb-checkout input,
   .dtb-checkout select,
   .dtb-checkout textarea {
     font-size: 16px !important;
-    font-weight: 650;
+    font-weight: 560;
   }
 
   .dtb-checkout-step-card {

@@ -1,5 +1,5 @@
 :root {
-  --dtb-global-font-sans: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --dtb-global-font-sans: Geist, "SF Pro Text", "SF Pro Display", "Segoe UI Variable", "Segoe UI", Roboto, system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
 .dtb-checkout,
@@ -16,7 +16,7 @@
   --dtb-order-font: var(--dtb-global-font-sans);
   font-family: var(--dtb-global-font-sans) !important;
   font-synthesis-weight: none;
-  letter-spacing: -0.011em;
+  letter-spacing: 0;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -45,9 +45,9 @@
 .dtb-order-page .dtb-order-item__name {
   font-family: var(--dtb-global-font-sans) !important;
   color: #0b1220;
-  font-weight: 850;
-  letter-spacing: -0.036em;
-  line-height: 1.06;
+  font-weight: 820;
+  letter-spacing: 0;
+  line-height: 1.08;
 }
 
 .dtb-checkout p,
@@ -76,8 +76,8 @@
 .dtb-order-page select,
 .dtb-order-page textarea {
   font-size: 16px;
-  font-weight: 650;
-  letter-spacing: -0.014em;
+  font-weight: 560;
+  letter-spacing: 0;
 }
 
 .dtb-checkout button,
@@ -85,7 +85,7 @@
 .dtb-order-page button,
 .dtb-order-page a {
   font-weight: 800;
-  letter-spacing: -0.014em;
+  letter-spacing: 0;
 }
 
 .dtb-checkout .tabular-nums,
@@ -102,13 +102,13 @@
   .dtb-checkout,
   .dtb-order-page {
     font-size: 15.5px;
-    letter-spacing: -0.009em;
+    letter-spacing: 0;
   }
 
   .dtb-checkout h1,
   .dtb-order-page h1,
   .dtb-order-page .dtb-order-title,
   .dtb-order-page .dtb-order-tracking-title {
-    letter-spacing: -0.038em;
+    letter-spacing: 0;
   }
 }
