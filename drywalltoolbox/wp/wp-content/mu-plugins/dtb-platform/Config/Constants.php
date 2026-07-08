@@ -27,6 +27,7 @@ defined( 'ABSPATH' ) || exit;
  * define('DTB_VEEQO_WEBHOOK_SECRET', '');  // 32+ char random string for Veeqo webhook HMAC
  * define('DTB_VEEQO_WAREHOUSE_ID',   0);   // Primary Veeqo warehouse ID
  * define('DTB_VEEQO_CHANNEL_ID',     0);   // Veeqo channel ID for this WooCommerce store
+ * define('DTB_VEEQO_DELIVERY_METHOD_ID', 0); // Optional Veeqo delivery method ID for API-created orders
  *
  * -----------------------------------------------------------------------------
  * CONSTANT DOCUMENTATION
@@ -185,6 +186,17 @@ defined( 'ABSPATH' ) || exit;
  *                  channel; it takes precedence over the auto-discovered
  *                  value stored in wp_options.
  *   What breaks  : Without it orders are created without a channel assignment.
+ *
+ * DTB_VEEQO_DELIVERY_METHOD_ID
+ *   What it does : Optional Veeqo delivery method ID included when creating
+ *                  WooCommerce orders in Veeqo. Veeqo's order API documents
+ *                  delivery_method_id as required for order creation.
+ *   Where to get : Use the delivery method ID configured in Veeqo for the
+ *                  shipping method this WooCommerce store should use.
+ *   Override     : Define this constant in wp-config.php to force a specific
+ *                  delivery method; it takes precedence over wp_options.
+ *   What breaks  : Accounts that require delivery_method_id can reject order
+ *                  creation without it.
  *
  * =============================================================================
  * QUICKBOOKS ONLINE CONSTANTS

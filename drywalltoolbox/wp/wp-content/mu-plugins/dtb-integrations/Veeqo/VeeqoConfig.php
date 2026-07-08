@@ -15,14 +15,15 @@ final class DTB_VeeqoConfig {
 	/**
 	 * Return normalized Veeqo configuration without exposing secrets in public payloads.
 	 *
-	 * @return array{api_key:string,webhook_secret:string,warehouse_id:int,channel_id:int}
+	 * @return array{api_key:string,webhook_secret:string,warehouse_id:int,channel_id:int,delivery_method_id:int}
 	 */
 	public static function raw(): array {
 		return function_exists( 'dtb_veeqo_config' ) ? (array) dtb_veeqo_config() : [
-			'api_key'        => '',
-			'webhook_secret' => '',
-			'warehouse_id'   => 0,
-			'channel_id'     => 0,
+			'api_key'            => '',
+			'webhook_secret'     => '',
+			'warehouse_id'       => 0,
+			'channel_id'         => 0,
+			'delivery_method_id' => 0,
 		];
 	}
 
@@ -47,6 +48,7 @@ final class DTB_VeeqoConfig {
 			'webhook_configured'   => '' !== (string) ( $config['webhook_secret'] ?? '' ),
 			'warehouse_id'         => (int) ( $config['warehouse_id'] ?? 0 ),
 			'channel_id'           => (int) ( $config['channel_id'] ?? 0 ),
+			'delivery_method_id'   => (int) ( $config['delivery_method_id'] ?? 0 ),
 			'settings_option_name' => 'woocommerce_dtb_veeqo_settings',
 		];
 	}

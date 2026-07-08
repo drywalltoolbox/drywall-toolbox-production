@@ -135,6 +135,20 @@ if ( ! function_exists( 'dtb_veeqo_sync_order' ) ) {
 			if ( empty( $result['ok'] ) ) {
 				$status = (int) ( $result['status'] ?? 0 );
 				$error  = sanitize_text_field( (string) ( $result['error'] ?? 'Veeqo API error.' ) );
+				$diagnostics = function_exists( 'dtb_veeqo_order_payload_diagnostics' )
+					? dtb_veeqo_order_payload_diagnostics( $payload )
+					: [];
+				if ( function_exists( 'dtb_veeqo_log' ) ) {
+					dtb_veeqo_log( 'error', 'order_create_rejected', 'Veeqo rejected Woo order create request.', [
+						'wc_order_id' => $order_id,
+						'status'      => $status,
+						'error'       => $error,
+						'payload'     => $diagnostics,
+					] );
+				}
+				if ( 404 === $status ) {
+					$error .= ' Verify Veeqo Channel ID, Delivery Method ID, Warehouse ID, and sellable IDs in the payload diagnostics.';
+				}
 				throw new DTB_Order_Integration_Exception( $error, dtb_order_integration_retryable_error( $status, $error ), $status );
 			}
 

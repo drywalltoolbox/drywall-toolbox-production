@@ -440,6 +440,193 @@ function dtb_checkout_build_idempotency_key( array $context ): string {
 	return 'checkout:auto:' . md5( wp_json_encode( $stable ) ?: '' );
 }
 
+function dtb_checkout_line_signature_from_context( array $context ): array {
+	$line_items = [];
+	foreach ( (array) ( $context['line_items'] ?? [] ) as $item ) {
+		if ( ! is_array( $item ) ) {
+			continue;
+		}
+		$line_items[] = [
+			'product_id'   => absint( $item['product_id'] ?? 0 ),
+			'variation_id' => absint( $item['variation_id'] ?? 0 ),
+			'quantity'     => max( 1, absint( $item['quantity'] ?? 1 ) ),
+		];
+	}
+
+	usort(
+		$line_items,
+		static function ( array $a, array $b ): int {
+			return ( $a['product_id'] <=> $b['product_id'] )
+				?: ( $a['variation_id'] <=> $b['variation_id'] )
+				?: ( $a['quantity'] <=> $b['quantity'] );
+		}
+	);
+
+	return $line_items;
+}
+
+function dtb_checkout_line_signature_from_order( WC_Order $order ): array {
+	$line_items = [];
+	foreach ( $order->get_items() as $item ) {
+		if ( ! $item instanceof WC_Order_Item_Product ) {
+			continue;
+		}
+		$line_items[] = [
+			'product_id'   => absint( $item->get_product_id() ),
+			'variation_id' => absint( $item->get_variation_id() ),
+			'quantity'     => max( 1, absint( $item->get_quantity() ) ),
+		];
+	}
+
+	usort(
+		$line_items,
+		static function ( array $a, array $b ): int {
+			return ( $a['product_id'] <=> $b['product_id'] )
+				?: ( $a['variation_id'] <=> $b['variation_id'] )
+				?: ( $a['quantity'] <=> $b['quantity'] );
+		}
+	);
+
+	return $line_items;
+}
+
+function dtb_checkout_build_fingerprint( array $context ): string {
+	$line_items = dtb_checkout_line_signature_from_context( $context );
+
+	$shipping_lines = [];
+	foreach ( (array) ( $context['shipping_lines'] ?? [] ) as $line ) {
+		if ( ! is_array( $line ) ) {
+			continue;
+		}
+		$shipping_lines[] = [
+			'method_id' => sanitize_text_field( (string) ( $line['method_id'] ?? '' ) ),
+			'total'     => wc_format_decimal( (string) ( $line['total'] ?? '0' ) ),
+		];
+	}
+
+	$coupon_codes = array_map(
+		static fn( $code ): string => strtolower( sanitize_text_field( (string) $code ) ),
+		(array) ( $context['coupon_codes'] ?? [] )
+	);
+	sort( $coupon_codes );
+
+	$billing  = is_array( $context['billing'] ?? null ) ? $context['billing'] : [];
+	$shipping = is_array( $context['shipping'] ?? null ) ? $context['shipping'] : $billing;
+
+	$fingerprint = [
+		'email'          => strtolower( sanitize_email( (string) ( $billing['email'] ?? '' ) ) ),
+		'payment_method' => sanitize_key( (string) ( $context['payment_method'] ?? '' ) ),
+		'billing'        => dtb_checkout_normalize_address( $billing, true ),
+		'shipping'       => dtb_checkout_normalize_address( $shipping ),
+		'line_items'     => $line_items,
+		'shipping_lines' => $shipping_lines,
+		'coupon_codes'   => $coupon_codes,
+	];
+
+	return 'checkout-fp:' . md5( wp_json_encode( $fingerprint ) ?: '' );
+}
+
+function dtb_checkout_order_response( WC_Order $order, bool $idempotent = false ): array {
+	$status                   = (string) $order->get_status();
+	$existing_payment_required = in_array( $status, [ 'pending', 'on-hold', 'failed' ], true );
+	$existing_payment_url      = $existing_payment_required
+		? dtb_checkout_payment_url( $order )
+		: '';
+
+	return [
+		'order_id'          => (int) $order->get_id(),
+		'order_key'         => (string) $order->get_order_key(),
+		'status'            => $status,
+		'payment_method'    => (string) $order->get_payment_method(),
+		'payment_ref'       => (string) $order->get_meta( '_dtb_payment_ref', true ),
+		'total'             => (string) $order->get_total(),
+		'currency'          => (string) $order->get_currency(),
+		'idempotent'        => $idempotent,
+		'payment_required'  => $existing_payment_required,
+		'payment_url'       => $existing_payment_url,
+	];
+}
+
+function dtb_checkout_find_unpaid_order_by_fingerprint( string $fingerprint ): ?WC_Order {
+	if ( '' === $fingerprint || ! function_exists( 'wc_get_orders' ) ) {
+		return null;
+	}
+
+	$orders = wc_get_orders( [
+		'limit'        => 1,
+		'orderby'      => 'date',
+		'order'        => 'DESC',
+		'status'       => [ 'pending', 'on-hold' ],
+		'date_created' => '>' . gmdate( 'Y-m-d H:i:s', time() - DAY_IN_SECONDS ),
+		'meta_query'   => [
+			[
+				'key'   => '_dtb_checkout_fingerprint',
+				'value' => $fingerprint,
+			],
+		],
+	] );
+
+	$order = $orders[0] ?? null;
+	return $order instanceof WC_Order ? $order : null;
+}
+
+function dtb_checkout_find_unpaid_order_by_context( array $context ): ?WC_Order {
+	if ( ! function_exists( 'wc_get_orders' ) ) {
+		return null;
+	}
+
+	$billing        = is_array( $context['billing'] ?? null ) ? $context['billing'] : [];
+	$billing_email  = strtolower( sanitize_email( (string) ( $billing['email'] ?? '' ) ) );
+	$payment_method = sanitize_key( (string) ( $context['payment_method'] ?? 'cod' ) );
+	$line_items     = dtb_checkout_line_signature_from_context( $context );
+	if ( empty( $line_items ) ) {
+		return null;
+	}
+
+	$args = [
+		'limit'        => 20,
+		'orderby'      => 'date',
+		'order'        => 'DESC',
+		'status'       => [ 'pending', 'on-hold' ],
+		'date_created' => '>' . gmdate( 'Y-m-d H:i:s', time() - DAY_IN_SECONDS ),
+		'meta_query'   => [
+			'relation' => 'OR',
+			[
+				'key'   => '_dtb_checkout_gateway',
+				'value' => 'woo_native',
+			],
+			[
+				'key'     => '_dtb_checkout_contract_version',
+				'compare' => 'EXISTS',
+			],
+		],
+	];
+
+	if ( '' !== $billing_email ) {
+		$args['billing_email'] = $billing_email;
+	}
+
+	$orders = wc_get_orders( $args );
+	foreach ( $orders as $order ) {
+		if ( ! $order instanceof WC_Order ) {
+			continue;
+		}
+		if ( '' !== $billing_email && strtolower( (string) $order->get_billing_email() ) !== $billing_email ) {
+			continue;
+		}
+		if ( $payment_method !== (string) $order->get_payment_method() ) {
+			continue;
+		}
+		if ( $line_items !== dtb_checkout_line_signature_from_order( $order ) ) {
+			continue;
+		}
+
+		return $order;
+	}
+
+	return null;
+}
+
 function dtb_checkout_payment_url( WC_Order $order ): string {
 	if ( ! method_exists( $order, 'get_checkout_payment_url' ) ) {
 		return '';
@@ -948,10 +1135,6 @@ function dtb_checkout_woo_native_finalize( array $context, WP_REST_Request $requ
 	if ( '' === $sid ) {
 		return new WP_Error( 'dtb_checkout_invalid_session', 'Session id missing.', [ 'status' => 400 ] );
 	}
-	$session_state = get_transient( 'dtb_checkout_session_' . md5( $sid ) );
-	if ( ! is_array( $session_state ) ) {
-		return new WP_Error( 'dtb_checkout_session_not_found', 'Session not found or expired.', [ 'status' => 400 ] );
-	}
 
 	$line_items = $context['line_items'] ?? [];
 	if ( ! is_array( $line_items ) || empty( $line_items ) ) {
@@ -972,25 +1155,29 @@ function dtb_checkout_woo_native_finalize( array $context, WP_REST_Request $requ
 	if ( $existing_order_id > 0 ) {
 		$existing_order = wc_get_order( $existing_order_id );
 		if ( $existing_order ) {
-			$existing_status = (string) $existing_order->get_status();
-			$existing_payment_required = in_array( $existing_status, [ 'pending', 'on-hold', 'failed' ], true );
-			$existing_payment_url = $existing_payment_required
-				? dtb_checkout_payment_url( $existing_order )
-				: '';
-
-			return [
-				'order_id'       => (int) $existing_order->get_id(),
-				'order_key'      => (string) $existing_order->get_order_key(),
-				'status'         => $existing_status,
-				'payment_method' => (string) $existing_order->get_payment_method(),
-				'payment_ref'    => (string) $existing_order->get_meta( '_dtb_payment_ref', true ),
-				'total'          => (string) $existing_order->get_total(),
-				'currency'       => (string) $existing_order->get_currency(),
-				'idempotent'     => true,
-				'payment_required' => $existing_payment_required,
-				'payment_url'      => $existing_payment_url,
-			];
+			return dtb_checkout_order_response( $existing_order, true );
 		}
+	}
+
+	$checkout_fingerprint = dtb_checkout_build_fingerprint( $context );
+	$fingerprint_order    = dtb_checkout_find_unpaid_order_by_fingerprint( $checkout_fingerprint );
+	if ( $fingerprint_order instanceof WC_Order ) {
+		set_transient( 'dtb_checkout_idem_' . md5( $idempotency_key ), (int) $fingerprint_order->get_id(), DAY_IN_SECONDS );
+		return dtb_checkout_order_response( $fingerprint_order, true );
+	}
+
+	$context_order = dtb_checkout_find_unpaid_order_by_context( $context );
+	if ( $context_order instanceof WC_Order ) {
+		$context_order->update_meta_data( '_dtb_checkout_fingerprint', $checkout_fingerprint );
+		$context_order->update_meta_data( '_dtb_checkout_idempotency_key', $idempotency_key );
+		$context_order->save_meta_data();
+		set_transient( 'dtb_checkout_idem_' . md5( $idempotency_key ), (int) $context_order->get_id(), DAY_IN_SECONDS );
+		return dtb_checkout_order_response( $context_order, true );
+	}
+
+	$session_state = get_transient( 'dtb_checkout_session_' . md5( $sid ) );
+	if ( ! is_array( $session_state ) ) {
+		return new WP_Error( 'dtb_checkout_session_not_found', 'Session not found or expired.', [ 'status' => 400 ] );
 	}
 
 	$order = wc_create_order();
@@ -1053,6 +1240,7 @@ function dtb_checkout_woo_native_finalize( array $context, WP_REST_Request $requ
 	$order->update_meta_data( '_dtb_checkout_contract_version', '1' );
 	$order->update_meta_data( '_dtb_checkout_session_id', $sid );
 	$order->update_meta_data( '_dtb_checkout_idempotency_key', $idempotency_key );
+	$order->update_meta_data( '_dtb_checkout_fingerprint', $checkout_fingerprint );
 	$order->update_meta_data( '_dtb_order_type', 'product' );
 	$order->calculate_taxes( [
 		'country'  => $mapped_shipping['country'],

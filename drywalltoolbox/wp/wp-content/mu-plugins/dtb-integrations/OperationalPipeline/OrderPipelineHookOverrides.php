@@ -89,23 +89,6 @@ if ( ! function_exists( 'dtb_operational_pipeline_route_veeqo_status_change' ) )
 
 		$veeqo_order_id = dtb_operational_pipeline_get_veeqo_order_id( $order );
 
-		if ( 'processing' === sanitize_key( $new_status ) && $veeqo_order_id <= 0 ) {
-			if ( function_exists( 'dtb_order_append_event' ) ) {
-				dtb_order_append_event( $order_id, 'integration.veeqo.sync_requested', [
-					'source'          => is_admin() ? 'wp_admin' : 'woocommerce',
-					'actor_type'      => get_current_user_id() ? 'admin' : 'system',
-					'actor_id'        => get_current_user_id() ?: null,
-					'visibility'      => 'operator',
-					'idempotency_key' => 'veeqo-sync-requested-' . $order_id . '-' . sanitize_key( $new_status ),
-					'payload'         => [ 'from' => $old_status, 'to' => $new_status ],
-				] );
-			}
-			if ( function_exists( 'dtb_order_enqueue_job' ) ) {
-				dtb_order_enqueue_job( 'dtb_order_sync_veeqo', $order_id, [ 'trigger' => 'wc_status_processing' ] );
-			}
-			return;
-		}
-
 		if ( $veeqo_order_id <= 0 ) {
 			return;
 		}

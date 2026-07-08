@@ -329,6 +329,7 @@ The following constants are currently defined in `drywalltoolbox/wp/wp-config.ph
   - `DTB_VEEQO_WEBHOOK_SECRET` ← set to a default placeholder; update to match Veeqo webhook config
   - `DTB_VEEQO_WAREHOUSE_ID` ← set to `0`; auto-discovered on first WC Settings → Integrations save
   - `DTB_VEEQO_CHANNEL_ID` ← set to `0`; auto-discovered on first WC Settings → Integrations save
+  - `DTB_VEEQO_DELIVERY_METHOD_ID` ← optional Veeqo delivery method ID for API-created orders
   - `DTB_VEEQO_DEBUG` ← `false` (set `true` for verbose logging)
 
 - Platform hardening/perf:

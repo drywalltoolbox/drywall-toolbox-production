@@ -16,7 +16,8 @@ defined( 'ABSPATH' ) || exit;
  *   DTB_VEEQO_API_KEY        — Veeqo API key (Settings → API Keys in Veeqo)
  *   DTB_VEEQO_WEBHOOK_SECRET — HMAC secret for Veeqo webhook HMAC validation
  *   DTB_VEEQO_WAREHOUSE_ID   — Primary warehouse ID for order routing
- *   DTB_VEEQO_CHANNEL_ID     — Veeqo channel ID mapped to this WooCommerce store
+ *   DTB_VEEQO_CHANNEL_ID     — Veeqo Direct/Phone channel ID for API-created orders
+ *   DTB_VEEQO_DELIVERY_METHOD_ID — Veeqo delivery method ID for API-created orders
  */
 
 defined( 'ABSPATH' ) || exit;
@@ -35,7 +36,8 @@ define( 'DTB_VEEQO_API_BASE', 'https://api.veeqo.com' );
  *
  * Resolution order (highest → lowest priority):
  *   1. wp-config.php constants  (DTB_VEEQO_API_KEY, DTB_VEEQO_WEBHOOK_SECRET,
- *                                DTB_VEEQO_WAREHOUSE_ID, DTB_VEEQO_CHANNEL_ID)
+ *                                DTB_VEEQO_WAREHOUSE_ID, DTB_VEEQO_CHANNEL_ID,
+ *                                DTB_VEEQO_DELIVERY_METHOD_ID)
  *   2. WordPress option         (woocommerce_dtb_veeqo_settings — written by the
  *                                WC admin settings page and auto-discovery)
  *
@@ -43,7 +45,7 @@ define( 'DTB_VEEQO_API_BASE', 'https://api.veeqo.com' );
  * Call `unset( $GLOBALS['_dtb_veeqo_config'] )` to force a fresh read
  * (e.g. after updating settings in the same request).
  *
- * @return array{api_key: string, webhook_secret: string, warehouse_id: int, channel_id: int}
+ * @return array{api_key: string, webhook_secret: string, warehouse_id: int, channel_id: int, delivery_method_id: int}
  */
 function dtb_veeqo_config(): array {
 	if ( isset( $GLOBALS['_dtb_veeqo_config'] ) ) {
@@ -71,6 +73,11 @@ function dtb_veeqo_config(): array {
 		'channel_id' => ( defined( 'DTB_VEEQO_CHANNEL_ID' ) && (int) DTB_VEEQO_CHANNEL_ID > 0 )
 			? (int) DTB_VEEQO_CHANNEL_ID
 			: (int) ( $stored['channel_id'] ?? 0 ),
+
+		// delivery_method_id: optional, but Veeqo documents it as required for order creation.
+		'delivery_method_id' => ( defined( 'DTB_VEEQO_DELIVERY_METHOD_ID' ) && (int) DTB_VEEQO_DELIVERY_METHOD_ID > 0 )
+			? (int) DTB_VEEQO_DELIVERY_METHOD_ID
+			: (int) ( $stored['delivery_method_id'] ?? 0 ),
 	];
 
 	return $GLOBALS['_dtb_veeqo_config'];
@@ -133,8 +140,22 @@ function dtb_veeqo_request( string $method, string $path, array $params = [], ar
 	$data   = json_decode( wp_remote_retrieve_body( $raw ), true );
 
 	if ( $status < 200 || $status >= 300 ) {
-		$msg = ( is_array( $data ) && ! empty( $data['error'] ) ) ? (string) $data['error'] : 'Veeqo API error.';
-		dtb_veeqo_log( 'error', 'api_error', $msg, [ 'path' => $path, 'status' => $status ] );
+		$msg = 'Veeqo API error.';
+		if ( is_array( $data ) ) {
+			if ( ! empty( $data['error_messages'] ) ) {
+				$msg = is_array( $data['error_messages'] )
+					? implode( ' ', array_map( 'sanitize_text_field', $data['error_messages'] ) )
+					: (string) $data['error_messages'];
+			} elseif ( ! empty( $data['errors'] ) ) {
+				$msg = is_array( $data['errors'] )
+					? wp_json_encode( $data['errors'] )
+					: (string) $data['errors'];
+			} elseif ( ! empty( $data['error'] ) ) {
+				$msg = (string) $data['error'];
+			}
+		}
+		$msg = sanitize_text_field( $msg );
+		dtb_veeqo_log( 'error', 'api_error', $msg, [ 'path' => $path, 'status' => $status, 'response' => $data ] );
 		return [ 'ok' => false, 'status' => $status, 'data' => $data, 'error' => $msg ];
 	}
 
@@ -230,7 +251,7 @@ function dtb_veeqo_register_routes(): void {
 	] );
 
 	// ── POST /dtb/v1/veeqo/map-skus — bulk map all WC product SKUs to Veeqo sellable IDs ──
-	// Paginates through all WC products/variations, calls GET /products?q={sku}
+	// Paginates through all WC products/variations, calls GET /products?query={sku}
 	// for each unmatched SKU, and writes _veeqo_sellable_id + _veeqo_mapped_sku
 	// meta. Safe to call multiple times (skips already-mapped SKUs).
 	register_rest_route( $ns, '/veeqo/map-skus', [
@@ -274,11 +295,12 @@ function dtb_veeqo_route_status( WP_REST_Request $request ): WP_REST_Response {
 	$warehouses = is_array( $result['data'] ) ? count( $result['data'] ) : 0;
 
 	return new WP_REST_Response( [
-		'connected'    => true,
-		'warehouse_id' => $cfg['warehouse_id'],
-		'channel_id'   => $cfg['channel_id'],
-		'warehouses'   => $warehouses,
-		'message'      => 'Veeqo connection verified.',
+		'connected'          => true,
+		'warehouse_id'       => $cfg['warehouse_id'],
+		'channel_id'         => $cfg['channel_id'],
+		'delivery_method_id' => $cfg['delivery_method_id'],
+		'warehouses'         => $warehouses,
+		'message'            => 'Veeqo connection verified.',
 	], 200 );
 }
 
@@ -773,13 +795,18 @@ function dtb_veeqo_route_admin_sync_order( WP_REST_Request $request ): WP_REST_R
 		);
 	}
 
-	$veeqo_id = absint( $result['data']['id'] ?? 0 );
-	if ( $veeqo_id > 0 ) {
-		$order->update_meta_data( '_veeqo_order_id', $veeqo_id );
-		$order->update_meta_data( '_dtb_veeqo_order_id', $veeqo_id );
-		$order->add_order_note( sprintf( '[Veeqo] Admin re-sync: Veeqo order #%d created.', $veeqo_id ) );
-		$order->save_meta_data();
+	$veeqo_id = absint( $result['data']['id'] ?? $result['data']['order']['id'] ?? 0 );
+	if ( $veeqo_id <= 0 ) {
+		return new WP_REST_Response(
+			dtb_error_envelope( 'veeqo_missing_order_id', 'Veeqo accepted the request but did not return an order ID.', 502 ),
+			502
+		);
 	}
+
+	$order->update_meta_data( '_veeqo_order_id', $veeqo_id );
+	$order->update_meta_data( '_dtb_veeqo_order_id', $veeqo_id );
+	$order->add_order_note( sprintf( '[Veeqo] Admin re-sync: Veeqo order #%d created.', $veeqo_id ) );
+	$order->save_meta_data();
 
 	dtb_veeqo_log( 'info', 'admin_sync_order', 'Admin manually synced WC order to Veeqo.', [
 		'wc_order_id'    => $order_id,
@@ -911,8 +938,16 @@ function dtb_veeqo_sync_new_order( int $order_id, array $posted_data, WC_Order $
 
 	$result = dtb_veeqo_request( 'POST', '/orders', [], $veeqo_order );
 
-	if ( $result['ok'] && ! empty( $result['data']['id'] ) ) {
-		$veeqo_id = (int) $result['data']['id'];
+	if ( $result['ok'] ) {
+		$veeqo_id = absint( $result['data']['id'] ?? $result['data']['order']['id'] ?? 0 );
+		if ( $veeqo_id <= 0 ) {
+			$order->add_order_note( '[Veeqo] Order sync failed: response did not include a Veeqo order ID.' );
+			dtb_veeqo_log( 'error', 'order_sync_missing_id', 'Veeqo order create response did not include an order ID.', [
+				'wc_order_id' => $order_id,
+				'response'    => $result['data'],
+			] );
+			return;
+		}
 		$order->update_meta_data( '_veeqo_order_id', $veeqo_id );
 		$order->add_order_note( sprintf( '[Veeqo] Order created in Veeqo: #%d.', $veeqo_id ) );
 		$order->save_meta_data();
@@ -999,6 +1034,123 @@ function dtb_veeqo_sync_order_status( int $order_id, string $old_status, string 
 }
 
 /**
+ * Resolve a Veeqo sellable ID for a Woo product SKU and cache it on the product.
+ *
+ * Veeqo order creation requires the variant/sellable ID for every line item.
+ * Product IDs and null values commonly surface as a 404 "Not found" response.
+ *
+ * @param string     $sku     WooCommerce SKU.
+ * @param WC_Product $product Woo product or variation.
+ * @return int
+ */
+function dtb_veeqo_resolve_sellable_id_for_sku( string $sku, WC_Product $product ): int {
+	$sku = trim( $sku );
+	if ( '' === $sku || ! dtb_veeqo_enabled() ) {
+		return 0;
+	}
+
+	$cached_sku     = (string) $product->get_meta( '_veeqo_mapped_sku', true );
+	$cached_mapping = absint( $product->get_meta( '_veeqo_sellable_id', true ) );
+	if ( $cached_mapping > 0 && $cached_sku === $sku ) {
+		return $cached_mapping;
+	}
+
+	$transient_key = 'dtb_veeqo_sellable_' . md5( $sku );
+	$transient_id  = absint( get_transient( $transient_key ) );
+	if ( $transient_id > 0 ) {
+		$product->update_meta_data( '_veeqo_sellable_id', $transient_id );
+		$product->update_meta_data( '_veeqo_mapped_sku', $sku );
+		$product->save_meta_data();
+		return $transient_id;
+	}
+
+	$result = dtb_veeqo_request( 'GET', '/products', [ 'query' => $sku ] );
+	if ( ! $result['ok'] || empty( $result['data'] ) ) {
+		dtb_veeqo_log( 'warn', 'sellable_lookup_failed', 'Could not resolve Veeqo sellable ID for SKU during order sync.', [
+			'product_id' => $product->get_id(),
+			'sku'        => $sku,
+			'status'     => $result['status'] ?? 0,
+			'error'      => $result['error'] ?? '',
+		] );
+		return 0;
+	}
+
+	foreach ( (array) $result['data'] as $veeqo_product ) {
+		foreach ( (array) ( $veeqo_product['sellables'] ?? [] ) as $sellable ) {
+			if ( isset( $sellable['sku_code'], $sellable['id'] ) && $sellable['sku_code'] === $sku ) {
+				$sellable_id = absint( $sellable['id'] );
+				if ( $sellable_id > 0 ) {
+					$product->update_meta_data( '_veeqo_sellable_id', $sellable_id );
+					$product->update_meta_data( '_veeqo_mapped_sku', $sku );
+					$product->save_meta_data();
+					set_transient( $transient_key, $sellable_id, DAY_IN_SECONDS );
+					dtb_veeqo_log( 'info', 'sellable_resolved_for_order', 'Resolved Veeqo sellable ID from SKU during order sync.', [
+						'product_id'  => $product->get_id(),
+						'sku'         => $sku,
+						'sellable_id' => $sellable_id,
+					] );
+					return $sellable_id;
+				}
+			}
+		}
+	}
+
+	dtb_veeqo_log( 'warn', 'sellable_not_found_for_sku', 'No exact Veeqo sellable match found for SKU during order sync.', [
+		'product_id' => $product->get_id(),
+		'sku'        => $sku,
+	] );
+	return 0;
+}
+
+/**
+ * Map a WooCommerce payment method to Veeqo's accepted payment_type values.
+ *
+ * @param WC_Order $order Woo order.
+ * @return string
+ */
+function dtb_veeqo_payment_type_for_order( WC_Order $order ): string {
+	$method = sanitize_key( (string) $order->get_payment_method() );
+
+	if ( str_contains( $method, 'paypal' ) ) {
+		return 'paypal';
+	}
+	if ( str_contains( $method, 'bacs' ) || str_contains( $method, 'bank' ) ) {
+		return 'bank_transfer';
+	}
+	if ( str_contains( $method, 'cheque' ) || str_contains( $method, 'check' ) ) {
+		return 'checkmo';
+	}
+	if ( '' === $method || 'cod' === $method ) {
+		return 'cash';
+	}
+
+	return 'credit_card';
+}
+
+/**
+ * Return a redacted Veeqo order payload summary for diagnostics.
+ *
+ * @param array $payload Veeqo order payload.
+ * @return array<string,mixed>
+ */
+function dtb_veeqo_order_payload_diagnostics( array $payload ): array {
+	$order = is_array( $payload['order'] ?? null ) ? $payload['order'] : [];
+	$lines = is_array( $order['line_items_attributes'] ?? null ) ? $order['line_items_attributes'] : [];
+
+	return [
+		'channel_id'         => absint( $order['channel_id'] ?? 0 ),
+		'delivery_method_id' => absint( $order['delivery_method_id'] ?? 0 ),
+		'warehouse_id'       => absint( $order['allocations_attributes'][0]['warehouse_id'] ?? 0 ),
+		'line_count'         => count( $lines ),
+		'sellable_ids'       => array_values( array_filter( array_map(
+			static fn( $line ): int => is_array( $line ) ? absint( $line['sellable_id'] ?? 0 ) : 0,
+			$lines
+		) ) ),
+		'order_number'       => sanitize_text_field( (string) ( $order['number'] ?? $order['channel_order_number'] ?? '' ) ),
+	];
+}
+
+/**
  * Build the Veeqo order creation payload from a WooCommerce order.
  *
  * @param WC_Order $order
@@ -1012,58 +1164,108 @@ function dtb_veeqo_build_order_payload( WC_Order $order ): ?array {
 		return null;
 	}
 
-	$line_items         = [];
-	$missing_sku_items  = [];
+	if ( empty( $cfg['channel_id'] ) ) {
+		dtb_veeqo_log( 'error', 'order_sync_blocked_missing_channel', 'Veeqo order sync blocked: channel_id is not configured.', [
+			'order_id' => $order->get_id(),
+		] );
+		$order->add_order_note( '[Veeqo] Sync blocked: Veeqo Channel ID is not configured. Re-save WooCommerce > Settings > Integrations > Drywall Toolbox Veeqo, or set DTB_VEEQO_CHANNEL_ID.', false, false );
+		return null;
+	}
+
+	if ( empty( $cfg['delivery_method_id'] ) ) {
+		dtb_veeqo_log( 'error', 'order_sync_blocked_missing_delivery_method', 'Veeqo order sync blocked: delivery_method_id is not configured.', [
+			'order_id'   => $order->get_id(),
+			'channel_id' => (int) $cfg['channel_id'],
+		] );
+		$order->add_order_note( '[Veeqo] Sync blocked: Veeqo Delivery Method ID is not configured. Set it under WooCommerce > Settings > Integrations > Drywall Toolbox Veeqo, or define DTB_VEEQO_DELIVERY_METHOD_ID.', false, false );
+		return null;
+	}
+
+	$line_items          = [];
+	$missing_sku_items   = [];
+	$missing_id_items    = [];
 
 	foreach ( $items as $item ) {
 		/** @var WC_Order_Item_Product $item */
 		$product     = $item->get_product();
-		$sellable_id = $product ? (int) $product->get_meta( '_veeqo_sellable_id' ) : 0;
+		$sellable_id = $product ? absint( $product->get_meta( '_veeqo_sellable_id', true ) ) : 0;
 
-		// SKU enforcement for variable products:
-		// A variation must have its own SKU for Veeqo to identify the correct
-		// sellable record.  A missing variation SKU means Veeqo cannot fulfil
-		// the correct product variant — flag it for logging and block the sync.
-		$sku             = $product ? $product->get_sku() : '';
+		// SKU enforcement: Veeqo requires a sellable/variant ID per line item.
+		// A SKU lets us resolve that ID when product meta is not mapped yet.
+		$sku             = $product ? trim( (string) $product->get_sku() ) : '';
 		$variation_id    = $item->get_variation_id();
 		$is_variation    = $variation_id > 0;
 
-		if ( $is_variation && '' === $sku ) {
+		if ( '' === $sku ) {
 			$missing_sku_items[] = [
 				'item_name'    => $item->get_name(),
 				'variation_id' => $variation_id,
+				'product_id'   => $product ? $product->get_id() : 0,
 				'order_id'     => $order->get_id(),
 			];
-			dtb_veeqo_log( 'warn', 'variation_missing_sku', 'Variation line item has no SKU — Veeqo sync blocked for this item.', [
+			dtb_veeqo_log( 'warn', 'line_item_missing_sku', 'Line item has no SKU; Veeqo sync blocked for this item.', [
 				'order_id'     => $order->get_id(),
 				'item_name'    => $item->get_name(),
 				'variation_id' => $variation_id,
+				'product_id'   => $product ? $product->get_id() : 0,
 			] );
 		}
 
+		if ( $sellable_id <= 0 && $product && '' !== $sku ) {
+			$sellable_id = dtb_veeqo_resolve_sellable_id_for_sku( $sku, $product );
+		}
+
+		if ( $sellable_id <= 0 ) {
+			$missing_id_items[] = [
+				'item_name'    => $item->get_name(),
+				'sku'          => $sku,
+				'variation_id' => $variation_id,
+				'product_id'   => $product ? $product->get_id() : 0,
+			];
+			continue;
+		}
+
+		$quantity       = max( 1, (int) $item->get_quantity() );
+		$subtotal       = (float) $item->get_subtotal();
+		$total_tax      = (float) $item->get_total_tax();
+		$tax_rate       = $subtotal > 0 ? round( $total_tax / $subtotal, 4 ) : 0.0;
+		$discount_total = max( 0.0, $subtotal - (float) $item->get_total() );
+
 		$line_items[] = [
-			'sellable_id'    => $sellable_id ?: null,
-			'sellable_title' => $item->get_name(),
-			'quantity'       => $item->get_quantity(),
-			'price_per_unit' => (float) $item->get_subtotal() / max( 1, $item->get_quantity() ),
-			// Include SKU so Veeqo can fall back to SKU-based lookup if
-			// sellable_id is absent (e.g. newly imported products).
-			'sku'            => $sku ?: null,
+			'sellable_id'                 => $sellable_id,
+			'quantity'                    => $quantity,
+			'price_per_unit'              => round( $subtotal / $quantity, 2 ),
+			'tax_rate'                    => $tax_rate,
+			'taxless_discount_per_unit'   => round( $discount_total / $quantity, 2 ),
 		];
 	}
 
-	// If any variation line items lack a SKU, log an audit event and return
+	// If any line items lack a SKU, log an audit event and return
 	// null to block the Veeqo order creation — partial fulfilment of the wrong
-	// variant is worse than no fulfilment at all.
+	// product is worse than no fulfilment at all.
 	if ( ! empty( $missing_sku_items ) ) {
-		dtb_veeqo_log( 'error', 'order_sync_blocked_missing_sku', 'Veeqo order sync blocked: one or more variation line items have no SKU.', [
+		dtb_veeqo_log( 'error', 'order_sync_blocked_missing_sku', 'Veeqo order sync blocked: one or more line items have no SKU.', [
 			'order_id'           => $order->get_id(),
 			'missing_sku_items'  => $missing_sku_items,
 		] );
 
 		// Mark the WC order with a note so admins can identify and fix it.
 		$order->add_order_note(
-			'⚠️ Veeqo sync blocked: variation line item(s) have no SKU. Assign variation SKUs and retry sync via the Veeqo admin panel.',
+			'[Veeqo] Sync blocked: one or more line item(s) have no SKU. Assign SKUs and retry sync.',
+			false,
+			false
+		);
+		return null;
+	}
+
+	if ( ! empty( $missing_id_items ) ) {
+		dtb_veeqo_log( 'error', 'order_sync_blocked_missing_sellable', 'Veeqo order sync blocked: one or more SKUs could not be mapped to a Veeqo sellable ID.', [
+			'order_id'         => $order->get_id(),
+			'missing_id_items' => $missing_id_items,
+		] );
+
+		$order->add_order_note(
+			'[Veeqo] Sync blocked: one or more SKUs could not be matched to a Veeqo sellable ID. Run the Veeqo SKU mapper or verify the SKU exists in Veeqo, then retry sync.',
 			false,
 			false
 		);
@@ -1071,37 +1273,58 @@ function dtb_veeqo_build_order_payload( WC_Order $order ): ?array {
 	}
 
 	$billing = $order->get_address( 'billing' );
+	$order_number = ltrim( (string) $order->get_order_number(), '#' );
+
+	$payload_order = [
+		'channel_id'                    => (int) $cfg['channel_id'],
+		'delivery_method_id'            => (int) $cfg['delivery_method_id'],
+		'number'                        => $order_number,
+		'channel_order_number'          => $order_number,
+		'send_notification_email'       => false,
+		'total_discounts'               => (float) $order->get_discount_total(),
+		'customer_attributes'           => [
+			'email'     => $order->get_billing_email(),
+			'firstname' => $billing['first_name'],
+			'lastname'  => $billing['last_name'],
+			'mobile'    => $order->get_billing_phone(),
+		],
+		'deliver_to_attributes'         => [
+			'first_name' => $order->get_shipping_first_name() ?: $billing['first_name'],
+			'last_name'  => $order->get_shipping_last_name()  ?: $billing['last_name'],
+			'address1'   => $order->get_shipping_address_1()  ?: $billing['address_1'],
+			'address2'   => $order->get_shipping_address_2()  ?: $billing['address_2'],
+			'city'       => $order->get_shipping_city()       ?: $billing['city'],
+			'state'      => $order->get_shipping_state()      ?: $billing['state'],
+			'zip'        => $order->get_shipping_postcode()   ?: $billing['postcode'],
+			'country'    => $order->get_shipping_country()    ?: $billing['country'],
+			'phone'      => $order->get_shipping_phone() ?: $order->get_billing_phone(),
+			'company'    => $order->get_shipping_company() ?: $billing['company'],
+		],
+		'line_items_attributes'         => $line_items,
+		'payment_attributes'            => [
+			'payment_type'     => dtb_veeqo_payment_type_for_order( $order ),
+			'reference_number' => (string) ( $order->get_transaction_id() ?: $order_number ),
+		],
+	];
+
+	if ( ! empty( $cfg['warehouse_id'] ) ) {
+		$payload_order['allocations_attributes'] = [
+			[
+				'warehouse_id' => (int) $cfg['warehouse_id'],
+			],
+		];
+	}
+
+	if ( '' !== (string) $order->get_customer_note() ) {
+		$payload_order['customer_note_attributes'] = [
+			'text' => (string) $order->get_customer_note(),
+		];
+	}
 
 	// Veeqo REST API requires the payload wrapped in an "order" key,
 	// with nested objects using the _attributes suffix convention.
 	return [
-		'order' => [
-			'channel_id'                    => $cfg['channel_id'] ?: null,
-			'channel_order_number'          => ltrim( $order->get_order_number(), '#' ),
-			'employee_notes'                => $order->get_customer_note(),
-			'customer_attributes'           => [
-				'email'     => $order->get_billing_email(),
-				'firstname' => $billing['first_name'],
-				'lastname'  => $billing['last_name'],
-				'mobile'    => $order->get_billing_phone(),
-			],
-			'deliver_to_attributes'         => [
-				'first_name' => $order->get_shipping_first_name() ?: $billing['first_name'],
-				'last_name'  => $order->get_shipping_last_name()  ?: $billing['last_name'],
-				'address1'   => $order->get_shipping_address_1()  ?: $billing['address_1'],
-				'address2'   => $order->get_shipping_address_2()  ?: $billing['address_2'],
-				'city'       => $order->get_shipping_city()       ?: $billing['city'],
-				'state'      => $order->get_shipping_state()      ?: $billing['state'],
-				'zip'        => $order->get_shipping_postcode()   ?: $billing['postcode'],
-				'country'    => $order->get_shipping_country()    ?: $billing['country'],
-			],
-			'line_items_attributes'         => $line_items,
-			'allocations_attributes'        => [
-				[
-					'warehouse_id' => $cfg['warehouse_id'] ?: null,
-				],
-			],
-		],
+		'order' => $payload_order,
 	];
 }
 
@@ -1337,7 +1560,7 @@ function dtb_veeqo_map_product_sku( int $product_id ): void {
 	}
 	set_transient( $lock_key, 1, 30 );
 
-	$result = dtb_veeqo_request( 'GET', '/products', [ 'q' => $sku ] );
+	$result = dtb_veeqo_request( 'GET', '/products', [ 'query' => $sku ] );
 
 	if ( ! $result['ok'] || empty( $result['data'] ) ) {
 		return;
@@ -1368,7 +1591,7 @@ function dtb_veeqo_map_product_sku( int $product_id ): void {
 // POST /dtb/v1/veeqo/map-skus  (manage_woocommerce only)
 //
 // Iterates all WC products and variations. For each SKU not yet mapped,
-// calls GET /products?q={sku} on the Veeqo API and writes _veeqo_sellable_id.
+// calls GET /products?query={sku} on the Veeqo API and writes _veeqo_sellable_id.
 // Run once after initial product import to unlock order sync.
 // =============================================================================
 
@@ -1407,7 +1630,7 @@ function dtb_veeqo_route_admin_map_skus( WP_REST_Request $request ): WP_REST_Res
 				continue;
 			}
 
-			$result = dtb_veeqo_request( 'GET', '/products', [ 'q' => $sku ] );
+			$result = dtb_veeqo_request( 'GET', '/products', [ 'query' => $sku ] );
 			if ( ! $result['ok'] || empty( $result['data'] ) ) {
 				$failed++;
 				continue;
@@ -2149,8 +2372,18 @@ function dtb_veeqo_route_repair_request( WP_REST_Request $request ): WP_REST_Res
 		$veeqo_payload = dtb_veeqo_build_order_payload( $wc_order );
 		if ( $veeqo_payload ) {
 			$vresult = dtb_veeqo_request( 'POST', '/orders', [], $veeqo_payload );
-			if ( $vresult['ok'] && ! empty( $vresult['data']['id'] ) ) {
-				$veeqo_order_id = (int) $vresult['data']['id'];
+			if ( $vresult['ok'] ) {
+				$veeqo_order_id = absint( $vresult['data']['id'] ?? $vresult['data']['order']['id'] ?? 0 );
+				if ( $veeqo_order_id <= 0 ) {
+					dtb_veeqo_log( 'warn', 'repair_veeqo_sync_missing_id', 'Repair Veeqo sync response did not include an order ID.', [
+						'wc_order_id' => $wc_order_id,
+						'response'    => $vresult['data'],
+					] );
+					$veeqo_order_id = null;
+				}
+			}
+
+			if ( $veeqo_order_id ) {
 				$wc_order->update_meta_data( '_veeqo_order_id', $veeqo_order_id );
 				$wc_order->add_order_note( sprintf( '[Veeqo] Repair order created: #%d.', $veeqo_order_id ) );
 				$wc_order->save_meta_data();
@@ -2268,7 +2501,7 @@ function dtb_veeqo_send_repair_confirmation( WC_Order $order, string $tool_desc,
 //   • Webhook Secret — stored in woocommerce_dtb_veeqo_settings[webhook_secret]
 //
 // Read-only display (auto-discovered on save):
-//   • Channel ID   — populated from GET /channels (first channel returned)
+//   • Channel ID   — populated from GET /channels (first Direct/Phone channel)
 //   • Warehouse ID — populated from GET /warehouses (first warehouse)
 //
 // wp-config.php constants (DTB_VEEQO_*) still take precedence over stored
@@ -2276,31 +2509,35 @@ function dtb_veeqo_send_repair_confirmation( WC_Order $order, string $tool_desc,
 // =============================================================================
 
 /**
- * Discover the Veeqo channel_id (from GET /channels) and warehouse_id
- * (from GET /warehouses) using the currently-active API key, then persist
- * both values to the woocommerce_dtb_veeqo_settings wp_option.
+ * Discover the Veeqo Direct/Phone channel_id (from GET /channels), warehouse_id
+ * (from GET /warehouses), and delivery_method_id (from GET /delivery_methods)
+ * using the currently-active API key, then persist the IDs to the
+ * woocommerce_dtb_veeqo_settings wp_option.
  *
  * Should be called after the API key is saved so that the fresh key is used.
  * Invalidates the in-request config cache before and after the API calls.
  *
- * @return array{channel_id: int, warehouse_id: int, error: string}
+ * @return array{channel_id: int, warehouse_id: int, delivery_method_id: int, error: string}
  */
 function dtb_veeqo_discover_ids(): array {
 	// Clear any cached config so the latest API key (just saved) is used.
 	unset( $GLOBALS['_dtb_veeqo_config'] );
 
-	$channel_id   = 0;
-	$warehouse_id = 0;
+	$opt                = (array) get_option( 'woocommerce_dtb_veeqo_settings', [] );
+	$channel_id         = 0;
+	$warehouse_id       = 0;
+	$delivery_method_id = 0;
 	$errors       = [];
 
 	// ── Channel ID from GET /channels ────────────────────────────────────────
 	// The correct Veeqo endpoint is /channels (GET /stores returns 404).
-	// The response is a flat array of channel objects. We prefer the first
-	// channel whose type_code is 'woocommerce'; fall back to the first
-	// channel with a valid id if no WooCommerce channel is found.
+	// API-created orders must be created against a Direct/Phone channel.
+	// WooCommerce channels are bridge-managed and Veeqo rejects API-created
+	// orders with "The order is unable to be created with this channel type".
 	$stores_result = dtb_veeqo_request( 'GET', '/channels' );
 	if ( $stores_result['ok'] && is_array( $stores_result['data'] ) ) {
-		$first_id = 0;
+		$first_id       = 0;
+		$woocommerce_id = 0;
 		foreach ( $stores_result['data'] as $store ) {
 			if ( ! isset( $store['id'] ) || (int) $store['id'] <= 0 ) {
 				continue;
@@ -2309,18 +2546,23 @@ function dtb_veeqo_discover_ids(): array {
 			if ( 0 === $first_id ) {
 				$first_id = (int) $store['id'];
 			}
-			// Prefer the WooCommerce-type channel.
-			if ( isset( $store['type_code'] ) && 'woocommerce' === $store['type_code'] ) {
+			if ( isset( $store['type_code'] ) && 'woocommerce' === $store['type_code'] && 0 === $woocommerce_id ) {
+				$woocommerce_id = (int) $store['id'];
+			}
+			// Prefer the Direct/Phone channel required by Veeqo's order API.
+			if ( isset( $store['type_code'] ) && 'direct' === $store['type_code'] ) {
 				$channel_id = (int) $store['id'];
 				break;
 			}
 		}
-		// Use the fallback id if no WooCommerce channel was found.
+		// Use the fallback id only if no Direct channel was found.
 		if ( 0 === $channel_id && $first_id > 0 ) {
 			$channel_id = $first_id;
 		}
 		if ( 0 === $channel_id ) {
 			$errors[] = 'GET /channels returned no channels.';
+		} elseif ( $channel_id === $woocommerce_id ) {
+			$errors[] = 'GET /channels returned no Direct/Phone channel; API order creation may fail.';
 		}
 	} else {
 		$errors[] = 'GET /channels failed: ' . $stores_result['error'];
@@ -2342,10 +2584,36 @@ function dtb_veeqo_discover_ids(): array {
 		$errors[] = 'GET /warehouses failed: ' . $warehouses_result['error'];
 	}
 
+	// -- Delivery Method ID from GET /delivery_methods ------------------------
+	$delivery_methods_result = dtb_veeqo_request( 'GET', '/delivery_methods' );
+	if ( $delivery_methods_result['ok'] && is_array( $delivery_methods_result['data'] ) ) {
+		foreach ( $delivery_methods_result['data'] as $method ) {
+			if ( isset( $method['id'] ) && (int) $method['id'] > 0 ) {
+				$delivery_method_id = (int) $method['id'];
+				break;
+			}
+		}
+		if ( 0 === $delivery_method_id ) {
+			$errors[] = 'GET /delivery_methods returned no delivery methods.';
+		}
+	} else {
+		$errors[] = 'GET /delivery_methods failed: ' . $delivery_methods_result['error'];
+	}
+
+	if ( 0 === $channel_id && ! empty( $opt['channel_id'] ) ) {
+		$channel_id = (int) $opt['channel_id'];
+	}
+	if ( 0 === $warehouse_id && ! empty( $opt['warehouse_id'] ) ) {
+		$warehouse_id = (int) $opt['warehouse_id'];
+	}
+	if ( 0 === $delivery_method_id && ! empty( $opt['delivery_method_id'] ) ) {
+		$delivery_method_id = (int) $opt['delivery_method_id'];
+	}
+
 	// ── Persist discovered IDs to wp_options ──────────────────────────────────
-	$opt                 = (array) get_option( 'woocommerce_dtb_veeqo_settings', [] );
-	$opt['channel_id']   = $channel_id;
-	$opt['warehouse_id'] = $warehouse_id;
+	$opt['channel_id']         = $channel_id;
+	$opt['warehouse_id']       = $warehouse_id;
+	$opt['delivery_method_id'] = $delivery_method_id;
 	update_option( 'woocommerce_dtb_veeqo_settings', $opt );
 
 	// Invalidate the cached config so callers within this request use new IDs.
@@ -2356,18 +2624,20 @@ function dtb_veeqo_discover_ids(): array {
 	dtb_veeqo_log(
 		'' === $error_string ? 'info' : 'warn',
 		'ids_discovered',
-		'Veeqo channel_id and warehouse_id auto-discovery completed.',
+		'Veeqo channel_id, warehouse_id, and delivery_method_id auto-discovery completed.',
 		[
-			'channel_id'   => $channel_id,
-			'warehouse_id' => $warehouse_id,
-			'errors'       => $errors,
+			'channel_id'         => $channel_id,
+			'warehouse_id'       => $warehouse_id,
+			'delivery_method_id' => $delivery_method_id,
+			'errors'             => $errors,
 		]
 	);
 
 	return [
-		'channel_id'   => $channel_id,
-		'warehouse_id' => $warehouse_id,
-		'error'        => $error_string,
+		'channel_id'         => $channel_id,
+		'warehouse_id'       => $warehouse_id,
+		'delivery_method_id' => $delivery_method_id,
+		'error'              => $error_string,
 	];
 }
 
@@ -2481,6 +2751,15 @@ add_filter( 'woocommerce_integrations', function ( array $integrations ): array 
 						'type'        => 'title',
 						'description' => $warehouse_note,
 					],
+					'delivery_method_id' => [
+						'title'       => __( 'Delivery Method ID', 'woocommerce' ),
+						'type'        => 'number',
+						'description' => ( defined( 'DTB_VEEQO_DELIVERY_METHOD_ID' ) && (int) DTB_VEEQO_DELIVERY_METHOD_ID > 0 )
+							? __( 'Value overridden by <code>DTB_VEEQO_DELIVERY_METHOD_ID</code> constant in wp-config.php; this field is ignored.', 'woocommerce' )
+							: __( 'Optional Veeqo delivery method ID to include when creating orders. Veeqo documents this field as required for order creation.', 'woocommerce' ),
+						'default'     => '',
+						'desc_tip'    => false,
+					],
 					'webhook_url_info' => [
 						'title'       => __( 'Webhook Endpoint', 'woocommerce' ),
 						'type'        => 'title',
@@ -2516,10 +2795,11 @@ add_filter( 'woocommerce_integrations', function ( array $integrations ): array 
 					} else {
 						WC_Admin_Settings::add_message(
 							sprintf(
-								/* translators: 1: channel_id  2: warehouse_id */
-								__( 'Veeqo connected. Channel ID: <strong>%1$d</strong> — Warehouse ID: <strong>%2$d</strong>.', 'woocommerce' ),
+								/* translators: 1: channel_id 2: warehouse_id 3: delivery_method_id */
+								__( 'Veeqo connected. Channel ID: <strong>%1$d</strong> — Warehouse ID: <strong>%2$d</strong> — Delivery Method ID: <strong>%3$d</strong>.', 'woocommerce' ),
 								$result['channel_id'],
-								$result['warehouse_id']
+								$result['warehouse_id'],
+								$result['delivery_method_id']
 							)
 						);
 					}

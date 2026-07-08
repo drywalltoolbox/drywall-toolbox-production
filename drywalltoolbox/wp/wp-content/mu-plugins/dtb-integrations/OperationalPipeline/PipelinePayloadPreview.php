@@ -32,6 +32,7 @@ if ( ! function_exists( 'dtb_pipeline_preview_order_payloads' ) ) {
 		}
 
 		$veeqo_payload = function_exists( 'dtb_veeqo_build_order_payload' ) ? dtb_veeqo_build_order_payload( $order ) : null;
+		$veeqo_order   = is_array( $veeqo_payload['order'] ?? null ) ? $veeqo_payload['order'] : [];
 		$qbo_lines     = function_exists( 'dtb_qbo_build_sales_lines_for_order' ) ? dtb_qbo_build_sales_lines_for_order( $order, false ) : [];
 		$qbo_refund    = function_exists( 'dtb_qbo_build_refund_lines_for_order' ) ? dtb_qbo_build_refund_lines_for_order( $order ) : [];
 
@@ -54,9 +55,9 @@ if ( ! function_exists( 'dtb_pipeline_preview_order_payloads' ) ) {
 				'endpoint'       => '/orders',
 				'configured'     => function_exists( 'dtb_veeqo_enabled' ) ? dtb_veeqo_enabled() : false,
 				'payload'        => $veeqo_payload,
-				'line_count'     => is_array( $veeqo_payload['line_items'] ?? null ) ? count( $veeqo_payload['line_items'] ) : 0,
-				'has_channel_id' => ! empty( $veeqo_payload['channel_id'] ?? null ),
-				'has_warehouse'  => ! empty( $veeqo_payload['warehouse_id'] ?? null ),
+				'line_count'     => is_array( $veeqo_order['line_items_attributes'] ?? null ) ? count( $veeqo_order['line_items_attributes'] ) : 0,
+				'has_channel_id' => ! empty( $veeqo_order['channel_id'] ?? null ),
+				'has_warehouse'  => ! empty( $veeqo_order['allocations_attributes'][0]['warehouse_id'] ?? null ),
 			],
 			'quickbooks' => [
 				'endpoint'         => '/salesreceipt',
