@@ -30,14 +30,6 @@ const SYSTEM_LINKS = [
   { to: '/products?category=stilts', label: 'Drywall Stilts' },
 ];
 
-const SERVICE_LINKS = [
-  { to: '/schematics', label: 'Schematics' },
-  { to: '/calculators', label: 'Calculators' },
-  { to: '/repairs', label: 'Repair Services' },
-  { to: '/returns', label: 'Returns Portal' },
-  { to: '/contact', label: 'Contact Support' },
-];
-
 function MegaColumn({ title, children }) {
   return (
     <section className="storefront-shop-mega__column" aria-label={title}>
@@ -164,14 +156,6 @@ export default function StorefrontShopMegaMenu({
                 ))}
               </div>
             </MegaColumn>
-
-            <MegaColumn title="Service & Support">
-              <div className="storefront-shop-mega__link-list">
-                {SERVICE_LINKS.map((item) => (
-                  <MegaTextLink key={item.to} {...item} onNavigate={onNavigate} />
-                ))}
-              </div>
-            </MegaColumn>
           </div>
         </div>
 
@@ -181,7 +165,6 @@ export default function StorefrontShopMegaMenu({
           </div>
           <div className="storefront-shop-mega__footer-actions">
             <Link to="/products" className="storefront-shop-mega__cta storefront-shop-mega__cta--primary" onClick={onNavigate}>View All Products</Link>
-            <Link to="/repairs" className="storefront-shop-mega__cta storefront-shop-mega__cta--secondary" onClick={onNavigate}>Start a Repair</Link>
           </div>
         </div>
       </div>

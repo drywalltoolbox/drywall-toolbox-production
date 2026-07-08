@@ -111,29 +111,6 @@ export default function HeroSection({
           width: '100%',
         }}
       >
-        <Motion.div variants={item}>
-          <span style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '8px',
-            marginBottom: '28px',
-            padding: '6px 18px',
-            borderRadius: '999px',
-            border: '1px solid rgba(99,149,255,0.30)',
-            background: 'rgba(37,99,235,0.12)',
-            backdropFilter: 'blur(8px)',
-            color: '#93c5fd',
-            fontSize: '0.78rem',
-            fontWeight: 600,
-            letterSpacing: '0.04em',
-            boxShadow: '0 0 18px rgba(37,99,235,0.18)',
-          }}>
-            {/* Static glowing dot — replaces the continuous scale/opacity pulse loop */}
-            <span style={{ width: '7px', height: '7px', borderRadius: '50%', background: '#60a5fa', flexShrink: 0, boxShadow: '0 0 6px rgba(96,165,250,0.8)' }} />
-            Top Brands. One Place.
-          </span>
-        </Motion.div>
-
         {titleLines && titleLines.length > 0 ? (
           <GradientTitle lines={titleLines} />
         ) : (

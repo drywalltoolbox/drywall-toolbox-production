@@ -13,6 +13,26 @@
   max-width: 760px;
 }
 
+/* Desktop: back button sits in the same row as the page title */
+.dtb-listing-heading__title-row {
+  align-items: flex-start;
+  gap: 2rem; /* mirrors gap-8 of the filter+content row */
+  width: 100%;
+}
+
+/* Left column — matches the filter panel column on desktop */
+.dtb-listing-heading__nav-col {
+  display: flex;
+  align-items: flex-start;
+  padding-top: 10px; /* align button optically with title cap-height */
+}
+
+.dtb-listing-heading__title-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.28rem;
+}
+
 .dtb-listing-heading__title {
   margin: 0;
   color: var(--dtb-text, #0f172a);
@@ -195,6 +215,13 @@
 }
 
 @media (min-width: 640px) {
+  /* Hide the mobile-only back pill on desktop — the styled BackButton above the
+     heading is shown instead. Without this the custom display:inline-flex
+     set in the base rule overrides Tailwind's sm:hidden utility. */
+  .dtb-listing-heading__back-pill {
+    display: none;
+  }
+
   .back-button.dtb-product-nav-back {
     display: inline-flex;
     width: fit-content;

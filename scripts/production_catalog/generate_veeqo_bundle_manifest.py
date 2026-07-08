@@ -13,6 +13,8 @@ LAUNCH_DIR = ROOT / "products" / "Production" / "launch"
 WOO_CATALOG = LAUNCH_DIR / "dtb_woocommerce_official_catalog.csv"
 VEEQO_IMPORT = LAUNCH_DIR / "veeqo_inventory_import.csv"
 OUTPUT = LAUNCH_DIR / "veeqo_bundle_manifest.csv"
+READY_OUTPUT = LAUNCH_DIR / "veeqo_bundlemade_create_ready.csv"
+REVIEW_OUTPUT = LAUNCH_DIR / "veeqo_bundle_review_items.csv"
 
 EXCLUDED_BUNDLE_SKUS = {
     "COL-TOOL-CASE",
@@ -31,6 +33,8 @@ SKU_ALIASES = {
     # Woo include metadata uses the older TapeTech suffix; Veeqo import uses the current SKU.
     "85TT": "85T",
     "90TT": "90T",
+    # PT-FIN lists the flat box handle parent SKU; Veeqo needs a concrete handle variant.
+    "PT-BH": "PT-BH42",
 }
 
 QTY_RE = re.compile(r"^\s*(?P<qty>\d+(?:\.\d+)?)\s*[xX×]\s*(?P<name>.+?)\s*$")
@@ -96,7 +100,61 @@ def status_for_component(source_sku: str, veeqo_sku: str, veeqo_skus: set[str]) 
     return "missing_veeqo_sku", "Component SKU was not found in Veeqo import."
 
 
-def generate() -> tuple[int, int]:
+def write_bundlemade_ready_csv(rows: list[dict[str, object]]) -> int:
+    non_ready_bundles = {
+        str(row["bundle_sku"])
+        for row in rows
+        if row["component_status"] not in {"ready", "mapped_alias"}
+    }
+    ready_rows = [
+        {
+            "sku": row["bundle_sku"],
+            "component_sku": row["component_veeqo_sku"],
+            "quantity": row["quantity"],
+        }
+        for row in rows
+        if row["component_status"] in {"ready", "mapped_alias"}
+        and str(row["bundle_sku"]) not in non_ready_bundles
+    ]
+
+    with READY_OUTPUT.open("w", newline="", encoding="utf-8") as handle:
+        writer = csv.DictWriter(handle, fieldnames=["sku", "component_sku", "quantity"])
+        writer.writeheader()
+        writer.writerows(ready_rows)
+
+    return len(ready_rows)
+
+
+def write_review_csv(rows: list[dict[str, object]]) -> int:
+    review_rows = [
+        row
+        for row in rows
+        if row["component_status"] not in {"ready", "mapped_alias"}
+    ]
+
+    fieldnames = [
+        "bundle_sku",
+        "bundle_name",
+        "bundle_brand",
+        "component_position",
+        "component_source_sku",
+        "component_veeqo_sku",
+        "component_name",
+        "quantity",
+        "component_status",
+        "notes",
+    ]
+
+    with REVIEW_OUTPUT.open("w", newline="", encoding="utf-8") as handle:
+        writer = csv.DictWriter(handle, fieldnames=fieldnames)
+        writer.writeheader()
+        for row in review_rows:
+            writer.writerow({field: row[field] for field in fieldnames})
+
+    return len(review_rows)
+
+
+def generate() -> tuple[int, int, int, int]:
     veeqo_skus = read_veeqo_skus()
     output_rows: list[dict[str, object]] = []
     bundle_count = 0
@@ -191,9 +249,14 @@ def generate() -> tuple[int, int]:
         writer.writeheader()
         writer.writerows(output_rows)
 
-    return bundle_count, len(output_rows)
+    ready_count = write_bundlemade_ready_csv(output_rows)
+    review_count = write_review_csv(output_rows)
+
+    return bundle_count, len(output_rows), ready_count, review_count
 
 
 if __name__ == "__main__":
-    bundles, rows = generate()
+    bundles, rows, ready_rows, review_rows = generate()
     print(f"Wrote {OUTPUT} with {rows} component rows for {bundles} bundles.")
+    print(f"Wrote {READY_OUTPUT} with {ready_rows} ready component rows.")
+    print(f"Wrote {REVIEW_OUTPUT} with {review_rows} rows requiring review.")

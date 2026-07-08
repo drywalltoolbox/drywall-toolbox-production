@@ -78,6 +78,7 @@
   display: flex;
   flex-direction: column;
   gap: clamp(4px, 0.8vw, 8px);
+  position: relative;
 }
 
 .product-selector-header-content h2 {
@@ -287,6 +288,30 @@
 
 .product-category-card--no-image {
   background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+}
+
+@media (min-width: 640px) {
+  /* Back button sits inline with the brand logo — row layout on desktop */
+  .product-selector-header {
+    flex-direction: row;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: clamp(12px, 2vw, 24px);
+  }
+
+  .product-selector-header-content {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  /* Remove auto-centering margins — parent flex handles centering */
+  .product-brand-header-logo {
+    margin-bottom: 0;
+    margin-left: 0;
+    margin-right: 0;
+  }
 }
 
 @media (min-width: 768px) {

@@ -138,7 +138,7 @@ PT-FIN,Platinum Drywall Starter Finishing Set,Platinum Drywall Tools,simple,kit,
 PT-FIN,Platinum Drywall Starter Finishing Set,Platinum Drywall Tools,simple,kit,,4,PT-3CF,PT-3CF,3 in. Angle Head Corner Finisher with Wheels,1,ready,
 PT-FIN,Platinum Drywall Starter Finishing Set,Platinum Drywall Tools,simple,kit,,5,PT-CP,PT-CP,Drywall Pump with Filler,1,ready,
 PT-FIN,Platinum Drywall Starter Finishing Set,Platinum Drywall Tools,simple,kit,,6,PT-BF,PT-BF,Box Filler Attachment,1,ready,
-PT-FIN,Platinum Drywall Starter Finishing Set,Platinum Drywall Tools,simple,kit,,7,PT-BH,PT-BH,Flat Box Handle,1,missing_veeqo_sku,Component SKU was not found in Veeqo import.
+PT-FIN,Platinum Drywall Starter Finishing Set,Platinum Drywall Tools,simple,kit,,7,PT-BH,PT-BH42,Flat Box Handle,1,mapped_alias,Source SKU PT-BH mapped to Veeqo SKU PT-BH42.
 PT-FIN,Platinum Drywall Starter Finishing Set,Platinum Drywall Tools,simple,kit,,8,PT-CRH50,PT-CRH50,50 in. Corner Roller Handle,1,ready,
 PT-FIN,Platinum Drywall Starter Finishing Set,Platinum Drywall Tools,simple,kit,,9,PT-CAH50,PT-CAH50,50 in. Corner Box Handle,1,ready,
 PT-FIN,Platinum Drywall Starter Finishing Set,Platinum Drywall Tools,simple,kit,,10,PT-CFH50,PT-CFH50,50 in. Angle Head Handle,1,ready,

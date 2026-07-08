@@ -127,7 +127,7 @@
 
 .storefront-shop-mega__content {
     display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 26px;
     align-items: start;
     padding: 12px 4px 4px;

@@ -2299,6 +2299,14 @@ button.header-mega-category-link {
     stroke: currentColor; /* ensure SVG strokes inherit */
 }
 
+/* Contact icon — rendered as <a>, needs text-decoration suppressed */
+a.header-contact-icon {
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
 .cart-badge {
     position: absolute;
     background: var(--tension-accent);
@@ -3465,11 +3473,17 @@ button.header-mega-category-link {
         gap: 10px;
         display: flex;
         align-items: center;
-        padding-right: 0;
+        padding-right: clamp(0.75rem, 1.5vw, 1.5rem);
         grid-column: 3;
     }
 
     .header-right > .nav-links { display: none !important; }
+
+    /* Tighten gap between icons and add space from the search pill */
+    .header-right .header-desktop-actions {
+        gap: 14px;
+        margin-left: 16px;
+    }
 
     /* Search icon button */
     .dtb-search-btn {

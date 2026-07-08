@@ -19,7 +19,7 @@ Rules:
   - qty_on_hand               → Stock column value (blank = 0)
   - weight_grams              → Weight (lbs) × 453.592, rounded to 1 dp
   - image_url                 → first image only from Images column
-  - variant_title             → Attribute 1 value(s) for variations, else ''
+  - variant_title             → Attribute 1 value(s) for variations, else 'Standard'
   - product_title             → parent Name for variations, else row Name
   - Strips HTML from description fields for readability
 """
@@ -126,7 +126,9 @@ def main() -> None:
             product_title = (parent.get("Name") or row.get("Name", "")).strip()
             attr_name  = row.get("Attribute 1 name", "").strip() if row_type == "variation" else ""
             attr_value = row.get("Attribute 1 value(s)", "").strip() if row_type == "variation" else ""
-            variant_title = attr_value
+            # Veeqo displays product_title + variant_title. Blank simple variants
+            # are imported back as the product title, causing duplicated names.
+            variant_title = attr_value if row_type == "variation" else "Standard"
             # variant_options must be JSON: {"Attribute Name": "value"}
             if attr_name and attr_value:
                 variant_options = json.dumps({attr_name: attr_value}, ensure_ascii=False)

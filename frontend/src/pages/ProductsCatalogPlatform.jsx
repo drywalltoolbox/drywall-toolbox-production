@@ -426,19 +426,9 @@ export default function ProductsCatalogPlatform({ forceProductGrid = false, titl
     <div className="min-h-screen bg-gray-50 page-wrapper">
       <SEOHead title={pageHeading} description={seoDescription} canonical={canonicalUrl} schema={buildSiteLinksSearchBoxSchema()} />
       <div className="container mx-auto px-4 py-4 pt-6">
-        {!showCategoryLanding && isCategoryProductRoute && (
-          <div className="mb-4 hidden sm:block">
-            <BackButton
-              onClick={selectedBrand ? (query.displayCategory ? resetToCategoryCards : resetToBrandList) : () => navigate('/products')}
-              label={selectedBrand ? (query.displayCategory ? selectedBrand : 'Brands') : 'Products'}
-              className="dtb-product-nav-back"
-            />
-          </div>
-        )}
-
         {!showCategoryLanding && !showBrandLanding && (
           <div className="mb-5 sm:mb-8">
-            <div className="dtb-listing-heading dtb-listing-heading--standard">
+            <div className={`dtb-listing-heading${isCategoryProductRoute ? '' : ' dtb-listing-heading--standard'}`}>
               {isCategoryProductRoute && (
                 <button
                   type="button"
@@ -449,8 +439,26 @@ export default function ProductsCatalogPlatform({ forceProductGrid = false, titl
                   <span>{categoryScopeLabel || 'Products'}</span>
                 </button>
               )}
-              <h1 className="dtb-listing-heading__title">{unifiedHeadingTitle}</h1>
-              <p className="dtb-listing-heading__meta">{unifiedHeadingMeta}</p>
+              {isCategoryProductRoute ? (
+                <div className="dtb-listing-heading__title-row hidden sm:flex">
+                  <div className="dtb-listing-heading__nav-col shrink-0 lg:w-80">
+                    <BackButton
+                      onClick={selectedBrand ? (query.displayCategory ? resetToCategoryCards : resetToBrandList) : () => navigate('/products')}
+                      label={selectedBrand ? (query.displayCategory ? selectedBrand : 'Brands') : 'Products'}
+                      className="dtb-product-nav-back"
+                    />
+                  </div>
+                  <div className="dtb-listing-heading__title-group flex-1">
+                    <h1 className="dtb-listing-heading__title">{unifiedHeadingTitle}</h1>
+                    <p className="dtb-listing-heading__meta">{unifiedHeadingMeta}</p>
+                  </div>
+                </div>
+              ) : (
+                <>
+                  <h1 className="dtb-listing-heading__title">{unifiedHeadingTitle}</h1>
+                  <p className="dtb-listing-heading__meta">{unifiedHeadingMeta}</p>
+                </>
+              )}
             </div>
           </div>
         )}

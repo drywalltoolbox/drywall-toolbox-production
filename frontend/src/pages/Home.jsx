@@ -81,7 +81,7 @@ export default function Home() {
       <div className="page-wrapper dtb-home-page storefront-shell">
         <HeroSection
           titleLines={['The New Standard', 'in Drywall.']}
-          subtitle="Premium tools for every drywall job — unbeatable prices, lightning-fast shipping."
+          subtitle="Premium tools for every drywall job — unbeatable prices, lightning-fast shipping, expert support."
           brands={heroBrands}
         />
 

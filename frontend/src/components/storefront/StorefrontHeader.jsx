@@ -2,7 +2,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { useCart } from '../../context/CartContext';
 import { useAuthContext } from '../../auth/AuthContext.js';
-import { ShoppingCart, X, ChevronRight, User, LogIn, UserPlus, LogOut } from 'lucide-react';
+import { ShoppingCart, X, ChevronRight, User, LogIn, UserPlus, LogOut, Phone } from 'lucide-react';
 import LogoWhite from '/logo-white.svg';
 import NotificationsBell from '../shell/NotificationsBell';
 import StorefrontSearchOverlay from './StorefrontSearchOverlay';
@@ -24,9 +24,7 @@ import {
 const PRIMARY_NAV_LINKS = [
   { to: '/schematics', label: 'Schematics' },
   { to: '/calculators', label: 'Calculators' },
-  { to: '/repairs', label: 'Repairs' },
-  { to: '/faq', label: 'FAQ' },
-  { to: '/contact', label: 'Contact' },
+  { to: '/repairs', label: 'Repair Services' },
 ];
 
 const MAX_DRAWER_CATEGORIES = 12;
@@ -481,6 +479,7 @@ export default function Header({ onCartToggle, onMobileMenuOpen, hasTopTicker = 
               </div>
               {!isLoading && <div ref={accountDropdownRef} className="header-account"><button onClick={() => { if (isAuthenticated) { setAccountHubOpen(true); } else { setAccountDropdownOpen((o) => !o); } }} aria-label={isAuthenticated ? 'Open account hub' : 'Account menu'} aria-expanded={!isAuthenticated && accountDropdownOpen} className="header-account-toggle header-icon"><User size={20} /></button>{!isAuthenticated && <div className={`header-account-panel${accountDropdownOpen ? ' is-open' : ''}`}><div className="header-account-guest-header"><p className="header-account-guest-title">My Account</p></div><Link to="/login" onClick={() => setAccountDropdownOpen(false)} className="header-account-link header-account-link--strong"><LogIn size={14} />Sign In</Link><div className="header-account-divider header-account-divider--inset" /><div className="header-account-guest-body"><Link to="/register" onClick={() => setAccountDropdownOpen(false)} className="header-account-cta"><UserPlus size={13} />Create Account</Link><p className="header-account-note">No account needed to browse or checkout.</p></div></div>}</div>}
               {!isLoading && isAuthenticated && <NotificationsBell />}
+              <Link to="/contact" className="header-icon header-contact-icon" aria-label="Contact support" title="Contact Support" onClick={() => setShopDropdownOpen(false)}><Phone size={19} /></Link>
               <div className="cart-area"><button onClick={handleCartToggle} className="cart-toggle header-icon" aria-label="Toggle cart"><ShoppingCart size={20} />{getCartCount() > 0 && <span className="cart-badge">{getCartCount()}</span>}</button></div>
             </div>
           </div>
