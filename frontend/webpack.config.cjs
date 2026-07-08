@@ -102,10 +102,13 @@ module.exports = (envFlags, argv) => {
   const publicPath = isDev ? '/' : (PUBLIC_URL ? `${PUBLIC_URL}/` : '/');
 
   // Production writes to repo-root dist/ for clean CI separation.
+  // Staging writes to repo-root dist-staging/ to avoid clobbering production.
   // Development writes to a local dist/ inside frontend/.
   const outputPath = isDev
     ? path.resolve(__dirname, 'dist')
-    : path.resolve(__dirname, '..', 'dist');
+    : appEnv === 'staging'
+      ? path.resolve(__dirname, '..', 'dist-staging')
+      : path.resolve(__dirname, '..', 'dist');
 
   const DEV_PROXY_TARGET = env('REACT_APP_API_BASE_URL') || 'https://drywalltoolbox.com';
   const cacheName = `${mode}-${appEnv}-${PUBLIC_URL || 'root'}`.replace(/[^a-z0-9_.-]+/gi, '-');

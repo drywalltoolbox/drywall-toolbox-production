@@ -410,6 +410,7 @@ export default function Checkout() {
   const checkoutAttemptIdRef = useRef(pendingPayment?.attemptId || makeCheckoutAttemptId());
   const shippingRequestSeq = useRef(0);
   const taxRequestSeq = useRef(0);
+  const isSubmittingRef = useRef(false); // synchronous re-entry guard
   selectedRateRef.current = selectedRate;
 
   const processing = submitStatus !== 'idle';
@@ -582,16 +583,19 @@ export default function Checkout() {
   }, [pendingPayment]);
 
   const handlePlaceOrder = useCallback(async () => {
-    if (processing) return;
+    if (processing || isSubmittingRef.current) return;
+    isSubmittingRef.current = true;
     setSubmitStatus('validating');
     setCheckoutError(null);
     if (!validateForm()) {
       setSubmitStatus('idle');
+      isSubmittingRef.current = false;
       return;
     }
     if (!paymentMethod || isManualPaymentMethod(paymentMethod) || paymentSetupError) {
       setCheckoutError(paymentSetupError || 'Secure online payment is not currently available. Please contact support.');
       setSubmitStatus('idle');
+      isSubmittingRef.current = false;
       return;
     }
 
@@ -611,6 +615,7 @@ export default function Checkout() {
         const recovery = writePendingCheckoutPayment({ attemptId: checkoutAttemptIdRef.current, orderId, orderKey, paymentUrl, status: orderPayload?.status || 'pending', total: orderPayload?.total, currency: orderPayload?.currency, cartSnapshot: makeCartSnapshot(safeCartItems) });
         setPendingPayment(recovery);
         setSubmitStatus('ready');
+        // Keep isSubmittingRef true until navigation — page will unmount anyway.
         window.setTimeout(() => window.location.assign(paymentUrl), 250);
         return;
       }
@@ -621,9 +626,11 @@ export default function Checkout() {
       checkoutAttemptIdRef.current = makeCheckoutAttemptId();
       await clearCart();
       setSubmitStatus('idle');
+      isSubmittingRef.current = false;
     } catch (error) {
       setCheckoutError(error?.message || 'Checkout failed. Please try again.');
       setSubmitStatus('idle');
+      isSubmittingRef.current = false;
     }
   }, [clearCart, formData, manualCoupons, paymentMethod, paymentMethodTitle, paymentSetupError, processing, safeCartItems, selectedRate, validateForm]);
 

@@ -26,6 +26,7 @@ Rules:
 
 import csv
 import html
+import json
 import re
 import sys
 from pathlib import Path
@@ -123,12 +124,21 @@ def main() -> None:
             parent     = parent_lookup.get(parent_sku, {})
 
             product_title = (parent.get("Name") or row.get("Name", "")).strip()
-            variant_title = row.get("Attribute 1 value(s)", "").strip() if row_type == "variation" else ""
+            attr_name  = row.get("Attribute 1 name", "").strip() if row_type == "variation" else ""
+            attr_value = row.get("Attribute 1 value(s)", "").strip() if row_type == "variation" else ""
+            variant_title = attr_value
+            # variant_options must be JSON: {"Attribute Name": "value"}
+            if attr_name and attr_value:
+                variant_options = json.dumps({attr_name: attr_value}, ensure_ascii=False)
+            else:
+                variant_options = "{}"
             brand         = (row.get("Brands") or parent.get("Brands", "")).strip()
             tags          = (row.get("Tags") or parent.get("Tags", "")).strip()
             upc           = row.get("GTIN, UPC, EAN, or ISBN", "").strip()
             images        = row.get("Images", "") or parent.get("Images", "")
             description   = strip_html(row.get("Short description", "") or parent.get("Short description", ""))
+            # Veeqo caps description at ~500 chars — truncate to avoid silent row drops.
+            description   = description[:500]
 
             # Price: prefer sale price, fall back to regular
             sale_price    = safe_price(row.get("Sale price", ""))
@@ -168,7 +178,7 @@ def main() -> None:
                 "estimated_delivery": "",
                 "tags":               tags,
                 "product_properties": "",
-                "variant_options":    variant_title,
+                "variant_options":    variant_options,
                 "tariff_code":        "",
                 "qty_on_hand":        str(qty_int),
                 "total_qty":          str(qty_int),

@@ -228,6 +228,18 @@ function dtb_veeqo_register_routes(): void {
 			return current_user_can( 'manage_woocommerce' );
 		},
 	] );
+
+	// ── POST /dtb/v1/veeqo/map-skus — bulk map all WC product SKUs to Veeqo sellable IDs ──
+	// Paginates through all WC products/variations, calls GET /products?q={sku}
+	// for each unmatched SKU, and writes _veeqo_sellable_id + _veeqo_mapped_sku
+	// meta. Safe to call multiple times (skips already-mapped SKUs).
+	register_rest_route( $ns, '/veeqo/map-skus', [
+		'methods'             => 'POST',
+		'callback'            => 'dtb_veeqo_route_admin_map_skus',
+		'permission_callback' => static function (): bool {
+			return current_user_can( 'manage_woocommerce' );
+		},
+	] );
 }
 
 
@@ -1060,28 +1072,36 @@ function dtb_veeqo_build_order_payload( WC_Order $order ): ?array {
 
 	$billing = $order->get_address( 'billing' );
 
+	// Veeqo REST API requires the payload wrapped in an "order" key,
+	// with nested objects using the _attributes suffix convention.
 	return [
-		'channel_id'           => $cfg['channel_id'] ?: null,
-		'channel_order_number' => ltrim( $order->get_order_number(), '#' ),
-		'warehouse_id'         => $cfg['warehouse_id'] ?: null,
-		'customer' => [
-			'email'      => $order->get_billing_email(),
-			'first_name' => $billing['first_name'],
-			'last_name'  => $billing['last_name'],
-			'mobile'     => $order->get_billing_phone(),
+		'order' => [
+			'channel_id'                    => $cfg['channel_id'] ?: null,
+			'channel_order_number'          => ltrim( $order->get_order_number(), '#' ),
+			'employee_notes'                => $order->get_customer_note(),
+			'customer_attributes'           => [
+				'email'     => $order->get_billing_email(),
+				'firstname' => $billing['first_name'],
+				'lastname'  => $billing['last_name'],
+				'mobile'    => $order->get_billing_phone(),
+			],
+			'deliver_to_attributes'         => [
+				'first_name' => $order->get_shipping_first_name() ?: $billing['first_name'],
+				'last_name'  => $order->get_shipping_last_name()  ?: $billing['last_name'],
+				'address1'   => $order->get_shipping_address_1()  ?: $billing['address_1'],
+				'address2'   => $order->get_shipping_address_2()  ?: $billing['address_2'],
+				'city'       => $order->get_shipping_city()       ?: $billing['city'],
+				'state'      => $order->get_shipping_state()      ?: $billing['state'],
+				'zip'        => $order->get_shipping_postcode()   ?: $billing['postcode'],
+				'country'    => $order->get_shipping_country()    ?: $billing['country'],
+			],
+			'line_items_attributes'         => $line_items,
+			'allocations_attributes'        => [
+				[
+					'warehouse_id' => $cfg['warehouse_id'] ?: null,
+				],
+			],
 		],
-		'deliver_to' => [
-			'first_name' => $order->get_shipping_first_name() ?: $billing['first_name'],
-			'last_name'  => $order->get_shipping_last_name()  ?: $billing['last_name'],
-			'address1'   => $order->get_shipping_address_1()  ?: $billing['address_1'],
-			'address2'   => $order->get_shipping_address_2()  ?: $billing['address_2'],
-			'city'       => $order->get_shipping_city()       ?: $billing['city'],
-			'state'      => $order->get_shipping_state()      ?: $billing['state'],
-			'zip'        => $order->get_shipping_postcode()   ?: $billing['postcode'],
-			'country'    => $order->get_shipping_country()    ?: $billing['country'],
-		],
-		'line_items' => $line_items,
-		'notes'      => $order->get_customer_note(),
 	];
 }
 
@@ -1341,6 +1361,92 @@ function dtb_veeqo_map_product_sku( int $product_id ): void {
 	}
 }
 
+
+// =============================================================================
+// SECTION 7b — BULK SKU → SELLABLE ID MAPPING
+//
+// POST /dtb/v1/veeqo/map-skus  (manage_woocommerce only)
+//
+// Iterates all WC products and variations. For each SKU not yet mapped,
+// calls GET /products?q={sku} on the Veeqo API and writes _veeqo_sellable_id.
+// Run once after initial product import to unlock order sync.
+// =============================================================================
+
+function dtb_veeqo_route_admin_map_skus( WP_REST_Request $request ): WP_REST_Response {
+	if ( ! dtb_veeqo_enabled() ) {
+		return new WP_REST_Response(
+			dtb_error_envelope( 'not_configured', 'Veeqo integration is not configured.', 503 ),
+			503
+		);
+	}
+
+	$mapped   = 0;
+	$skipped  = 0;
+	$failed   = 0;
+	$per_page = 100;
+	$page     = 1;
+
+	do {
+		$products = wc_get_products( [
+			'status'   => 'publish',
+			'limit'    => $per_page,
+			'page'     => $page,
+			'type'     => [ 'simple', 'variation' ],
+			'return'   => 'objects',
+		] );
+
+		foreach ( $products as $product ) {
+			$sku = $product->get_sku();
+			if ( '' === $sku ) {
+				$skipped++;
+				continue;
+			}
+			// Already mapped?
+			if ( $product->get_meta( '_veeqo_mapped_sku' ) === $sku ) {
+				$skipped++;
+				continue;
+			}
+
+			$result = dtb_veeqo_request( 'GET', '/products', [ 'q' => $sku ] );
+			if ( ! $result['ok'] || empty( $result['data'] ) ) {
+				$failed++;
+				continue;
+			}
+
+			$found = false;
+			foreach ( (array) $result['data'] as $vp ) {
+				foreach ( (array) ( $vp['sellables'] ?? [] ) as $sellable ) {
+					if ( isset( $sellable['sku_code'] ) && $sellable['sku_code'] === $sku ) {
+						$product->update_meta_data( '_veeqo_sellable_id', (int) $sellable['id'] );
+						$product->update_meta_data( '_veeqo_mapped_sku', $sku );
+						$product->save_meta_data();
+						$mapped++;
+						$found = true;
+						break 2;
+					}
+				}
+			}
+			if ( ! $found ) {
+				$failed++;
+			}
+		}
+
+		$page++;
+	} while ( count( $products ) === $per_page );
+
+	dtb_veeqo_log( 'info', 'bulk_sku_map_complete', 'Bulk SKU → Veeqo sellable ID mapping complete.', [
+		'mapped'  => $mapped,
+		'skipped' => $skipped,
+		'failed'  => $failed,
+	] );
+
+	return new WP_REST_Response( [
+		'success' => true,
+		'mapped'  => $mapped,
+		'skipped' => $skipped,
+		'failed'  => $failed,
+	], 200 );
+}
 
 // =============================================================================
 // SECTION 8 — WEBHOOK AUTO-REGISTRATION (Veeqo → WooCommerce)
