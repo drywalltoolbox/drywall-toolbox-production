@@ -113,7 +113,6 @@ function dtb_route_link_registered_images( WP_REST_Request $request ): WP_REST_R
 	foreach ( $batch as $sku_lower ) {
 		$product_record = $sku_map[ $sku_lower ];
 		$product_id     = (int) $product_record['product_id'];
-		$is_variation   = 'product_variation' === $product_record['post_type'];
 
 		$csv_basenames = $csv_sku_files[ $sku_lower ] ?? [];
 		if ( empty( $csv_basenames ) ) {
@@ -123,11 +122,7 @@ function dtb_route_link_registered_images( WP_REST_Request $request ): WP_REST_R
 
 		// Resolve attachment IDs using exact basenames only.
 		$att_ids = [];
-		foreach ( $csv_basenames as $csv_idx => $basename ) {
-			// Variations only get a primary image (index 0), no gallery.
-			if ( $csv_idx > 0 && $is_variation ) {
-				continue;
-			}
+		foreach ( $csv_basenames as $basename ) {
 			$bl = strtolower( $basename );
 			if ( ! isset( $disk_index[ $bl ] ) ) {
 				continue; // File absent from disk — skip.
@@ -156,11 +151,9 @@ function dtb_route_link_registered_images( WP_REST_Request $request ): WP_REST_R
 		if ( ! $force ) {
 			$current_thumb       = (int) get_post_thumbnail_id( $product_id );
 			$current_gallery_ids = [];
-			if ( ! $is_variation ) {
-				$current_gallery     = get_post_meta( $product_id, '_product_image_gallery', true );
-				$current_gallery_ids = array_values( array_filter( array_map( 'absint', explode( ',', (string) $current_gallery ) ) ) );
-			}
-			if ( $current_thumb === $primary_att && ( $is_variation || $current_gallery_ids === $gallery_att_ids ) ) {
+			$current_gallery     = get_post_meta( $product_id, '_product_image_gallery', true );
+			$current_gallery_ids = array_values( array_filter( array_map( 'absint', explode( ',', (string) $current_gallery ) ) ) );
+			if ( $current_thumb === $primary_att && $current_gallery_ids === $gallery_att_ids ) {
 				++$skipped;
 				continue;
 			}

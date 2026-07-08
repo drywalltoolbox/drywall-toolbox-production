@@ -279,7 +279,6 @@ function dtb_route_sync_images( WP_REST_Request $request ): WP_REST_Response|WP_
 		$last_sku       = $sku_lower;
 		$product_record = $sku_map[ $sku_lower ];
 		$product_id     = (int) $product_record['product_id'];
-		$is_variation   = 'product_variation' === $product_record['post_type'];
 		$last_item      = '';
 		$last_product   = $product_id;
 		++$processed;
@@ -295,13 +294,9 @@ function dtb_route_sync_images( WP_REST_Request $request ): WP_REST_Response|WP_
 		// Match each CSV filename against disk_index using exact basename only.
 		$matched         = [];
 		$missing_on_disk = [];
-		foreach ( $csv_basenames as $csv_idx => $basename ) {
+		foreach ( $csv_basenames as $basename ) {
 			$bl = strtolower( $basename );
 			if ( isset( $disk_index[ $bl ] ) ) {
-				// Variations only get a primary image (index 0), no gallery.
-				if ( $csv_idx > 0 && $is_variation ) {
-					continue;
-				}
 				$matched[] = [
 					'basename' => $bl,
 					'path'     => $disk_index[ $bl ]['path'],

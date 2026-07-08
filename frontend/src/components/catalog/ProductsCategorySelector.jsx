@@ -61,11 +61,53 @@ function resolveCategoryImage(brand, category) {
   return overrides[catKey] || overrides[normalizedCatKey] || overrides[underscoredCatKey] || category.image || '';
 }
 
+const WORDPRESS_RESIZED_IMAGE_RE = /-\d+x\d+(?=\.(?:avif|jpe?g|png|webp)(?:[?#]|$))/i;
+const SELECTOR_IMAGE_SIZES = '(min-width: 1024px) 25vw, (min-width: 768px) 33vw, 50vw';
+
+function normalizePreviewImageUrl(src = '') {
+  if (!src || src.startsWith('data:') || src.endsWith('.svg')) return src;
+  return src.replace(WORDPRESS_RESIZED_IMAGE_RE, '');
+}
+
+function withUrlParam(src, key, value) {
+  try {
+    const url = new URL(src);
+    url.searchParams.set(key, value);
+    return url.toString();
+  } catch {
+    return src;
+  }
+}
+
+function resolvePreviewImageMeta(src = '') {
+  const normalizedSrc = normalizePreviewImageUrl(src);
+  if (!normalizedSrc || normalizedSrc.endsWith('.svg')) {
+    return { src: normalizedSrc, srcSet: undefined, sizes: undefined };
+  }
+
+  if (/cdn\.shopify\.com/i.test(normalizedSrc)) {
+    return {
+      src: withUrlParam(normalizedSrc, 'width', '960'),
+      srcSet: [480, 720, 960, 1280]
+        .map((width) => `${withUrlParam(normalizedSrc, 'width', String(width))} ${width}w`)
+        .join(', '),
+      sizes: SELECTOR_IMAGE_SIZES,
+    };
+  }
+
+  return {
+    src: normalizedSrc,
+    srcSet: `${normalizedSrc} 1x, ${normalizedSrc} 2x`,
+    sizes: SELECTOR_IMAGE_SIZES,
+  };
+}
+
 function ProductCategoryCard({ brand, category, index, onSelectCategory }) {
   const resolvedImage = resolveCategoryImage(brand, category);
   const [failedImage, setFailedImage] = useState({ key: '', src: '' });
-  const imageKey = `${toBrandSlug(brand)}:${category.key || category.slug || category.name}:${resolvedImage}`;
-  const cardImage = failedImage.key === imageKey && failedImage.src === resolvedImage ? '' : resolvedImage;
+  const previewImage = resolvePreviewImageMeta(resolvedImage);
+  const imageKey = `${toBrandSlug(brand)}:${category.key || category.slug || category.name}:${previewImage.src}`;
+  const cardImage = failedImage.key === imageKey && failedImage.src === previewImage.src ? '' : previewImage.src;
   const isAllProducts = Boolean(category?.isAllProducts);
   const cardClassName = `product-category-card${cardImage ? '' : ' product-category-card--no-image'}${isAllProducts ? ' product-category-card--all-products' : ''}`;
   const imageClassName = `product-category-card__image${isAllProducts ? ' product-category-card__image--logo' : ''}`;
@@ -80,9 +122,16 @@ function ProductCategoryCard({ brand, category, index, onSelectCategory }) {
       {cardImage && (
         <img
           src={cardImage}
+          srcSet={previewImage.srcSet}
+          sizes={previewImage.sizes}
           alt={isAllProducts ? `${brand} logo` : category.name}
           className={imageClassName}
-          onError={() => setFailedImage({ key: imageKey, src: resolvedImage })}
+          width={640}
+          height={427}
+          loading={index < 4 ? 'eager' : 'lazy'}
+          fetchPriority={index < 4 ? 'high' : 'auto'}
+          decoding="async"
+          onError={() => setFailedImage({ key: imageKey, src: previewImage.src })}
         />
       )}
       <div className="product-category-card__scrim" />

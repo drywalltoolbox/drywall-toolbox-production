@@ -74,7 +74,8 @@ final class DTB_VariationReadModelService {
 				continue;
 			}
 			$raw['type'] = 'variation';
-			$variations[] = dtb_catalog_normalize_product( $raw, $parent_wc );
+			$dto          = dtb_catalog_normalize_product( $raw, $parent_wc );
+			$variations[] = self::enrich_variation_gallery( $dto );
 		}
 
 		usort( $variations, static function ( array $a, array $b ): int {
@@ -88,6 +89,106 @@ final class DTB_VariationReadModelService {
 
 		self::$last_diagnostics['normalizedCount'] = count( $variations );
 		return $variations;
+	}
+
+	/**
+	 * Add the full SKU-specific variation gallery when the catalog image manifest
+	 * knows about more images than WooCommerce persists on variation products.
+	 *
+	 * @param array<string,mixed> $variation
+	 * @return array<string,mixed>
+	 */
+	private static function enrich_variation_gallery( array $variation ): array {
+		$gallery = self::get_variation_gallery_images( (string) ( $variation['sku'] ?? '' ) );
+
+		if ( empty( $gallery ) ) {
+			return $variation;
+		}
+
+		$media = is_array( $variation['media'] ?? null ) ? $variation['media'] : [];
+		$media['variationImages'] = $gallery;
+
+		if ( count( $gallery ) > count( (array) ( $media['images'] ?? [] ) ) ) {
+			$media['images'] = $gallery;
+			$media['image']  = (string) ( $gallery[0]['src'] ?? $media['image'] ?? '' );
+		}
+
+		$variation['media']                  = $media;
+		$variation['variationGalleryImages'] = $gallery;
+
+		return $variation;
+	}
+
+	/**
+	 * Resolve ordered image URLs from the exact catalog CSV image list for a SKU.
+	 *
+	 * @param string $sku
+	 * @return array<int,array{src:string}>
+	 */
+	private static function get_variation_gallery_images( string $sku ): array {
+		static $disk_indexes = [];
+
+		$sku_key = strtolower( trim( $sku ) );
+		if ( '' === $sku_key ) {
+			return [];
+		}
+
+		if (
+			! function_exists( 'dtb_get_catalog_image_filenames_by_sku' )
+			|| ! function_exists( 'dtb_get_image_file_index' )
+			|| ! function_exists( 'dtb_image_sync_resolve_upload_directory' )
+		) {
+			return [];
+		}
+
+		$csv_sku_files = dtb_get_catalog_image_filenames_by_sku();
+		$basenames     = $csv_sku_files[ $sku_key ] ?? [];
+		if ( ! is_array( $basenames ) || empty( $basenames ) ) {
+			return [];
+		}
+
+		$relative_path = defined( 'DTB_IMAGE_SYNC_DEFAULT_UPLOAD_RELATIVE_PATH' )
+			? (string) DTB_IMAGE_SYNC_DEFAULT_UPLOAD_RELATIVE_PATH
+			: '2026/media';
+		$upload        = dtb_image_sync_resolve_upload_directory( $relative_path );
+		$scan_dir      = (string) ( $upload['basedir'] ?? '' );
+		$scan_url      = (string) ( $upload['baseurl'] ?? '' );
+
+		if ( '' === $scan_dir || ! is_dir( $scan_dir ) ) {
+			return [];
+		}
+
+		$cache_key = $scan_dir . '|' . $scan_url;
+		if ( ! isset( $disk_indexes[ $cache_key ] ) ) {
+			$extensions = [ 'webp', 'jpg', 'jpeg', 'png', 'avif', 'gif' ];
+			$disk_index = [];
+			foreach ( dtb_get_image_file_index( $scan_dir, $scan_url, $extensions ) as $file ) {
+				if ( empty( $file['filename'] ) || empty( $file['url'] ) ) {
+					continue;
+				}
+				$disk_index[ strtolower( (string) $file['filename'] ) ] = (string) $file['url'];
+			}
+			$disk_indexes[ $cache_key ] = $disk_index;
+		}
+		$disk_index = $disk_indexes[ $cache_key ];
+
+		$gallery = [];
+		$seen    = [];
+		foreach ( $basenames as $basename ) {
+			$key = strtolower( basename( (string) $basename ) );
+			if ( '' === $key || empty( $disk_index[ $key ] ) ) {
+				continue;
+			}
+			$url     = $disk_index[ $key ];
+			$url_key = strtolower( rtrim( strtok( $url, '?' ) ?: $url, '/' ) );
+			if ( isset( $seen[ $url_key ] ) ) {
+				continue;
+			}
+			$seen[ $url_key ] = true;
+			$gallery[]        = [ 'src' => $url ];
+		}
+
+		return $gallery;
 	}
 
 	/** Return diagnostics for the last variation read. */

@@ -146,8 +146,6 @@ function variationImageTokens(product = {}) {
     product.attributes.forEach((entry) => addWords(tokens, entry?.option || entry?.value || entry?.label || ''));
   }
 
-  addWords(tokens, product?.name || '');
-
   return Array.from(tokens).filter(Boolean);
 }
 

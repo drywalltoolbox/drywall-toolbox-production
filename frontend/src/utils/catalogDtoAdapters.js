@@ -397,6 +397,12 @@ export function toLegacyVariationDTO(variationDto = {}, parentDto = null) {
       : (Array.isArray(variationDto?.images)
         ? variationDto.images
         : (Array.isArray(parentDto?.media?.images) ? parentDto.media.images : [])),
+    variation_images: Array.isArray(media?.variationImages)
+      ? media.variationImages
+      : (Array.isArray(variationDto?.variationGalleryImages) ? variationDto.variationGalleryImages : []),
+    variationGalleryImages: Array.isArray(variationDto?.variationGalleryImages)
+      ? variationDto.variationGalleryImages
+      : (Array.isArray(media?.variationImages) ? media.variationImages : []),
     attributes,
     variation: variationDto?.variation || {},
     meta_data: mergedMeta,
